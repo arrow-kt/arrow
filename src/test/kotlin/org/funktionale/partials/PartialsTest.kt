@@ -21,10 +21,10 @@ public class PartialsTest {
 
         assertEquals(sum2intsTo17(1, 2), 20)
 
-        val prefixAndPostfix = {(prefix:String, x:String,postfix:String) -> "${prefix}${x}${postfix}"}
+        val prefixAndPostfix = {(prefix: String, x: String, postfix: String) -> "${prefix}${x}${postfix}" }
 
         val helloX = prefixAndPostfix.partially1("Hello, ").partially2("!")
 
-        assertEquals(helloX("funKTionale"),"Hello, funKTionale!")
+        assertEquals(helloX("funKTionale"), "Hello, funKTionale!")
     }
 }
