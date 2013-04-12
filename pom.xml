@@ -87,4 +87,11 @@
             </plugin>
         </plugins>
     </build>
+    <distributionManagement>
+        <repository>
+            <id>bintray-marioariasc-funKTionale-funKTionale</id>
+            <name>marioariasc-funKTionale-funKTionale</name>
+            <url>https://api.bintray.com/maven/marioariasc/funKTionale/funKTionale</url>
+        </repository>
+    </distributionManagement>
 </project>
