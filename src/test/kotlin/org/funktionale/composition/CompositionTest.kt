@@ -15,6 +15,11 @@ public class CompositionTest {
         assertEquals(add5andMultiplyBy2(2), 14)
     }
 
+    [Test] fun testForwardCompose() {
+        val add5andMultiplyBy2 = add5 forwardCompose multiplyBy2
+        assertEquals(add5andMultiplyBy2(2), 14)
+    }
+
     [Test] fun testCompose() {
         val multiplyBy2andAdd5 = add5 compose multiplyBy2
         assertEquals(multiplyBy2andAdd5(2), 9)
