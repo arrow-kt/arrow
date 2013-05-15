@@ -46,4 +46,46 @@ public class UtilTest {
 
         assertEquals(list.map(constant(7)), arrayListOf(7, 7, 7))
     }
+
+    [Test] fun TestGetterAndSetterOperations() {
+        val greeter = Greeter()
+
+        //Test Setter
+        greeter.receive["Hola"] = "Mario"
+        assertEquals("Hola from Mario", greeter.getReceivedHello())
+    }
 }
+
+val Greeter.receive: SetterOperation<String, String>
+    get(){
+        return SetterOperationImpl{ k, v ->
+            this.receiveHello(k, v)
+        }
+    }
+
+val Greeter.sayHello: GetterOperation<String, String>
+    get(){
+        return GetterOperationImpl{ k ->
+            this.sayHelloTo(k)
+        }
+    }
+
+class Greeter{
+
+    var hello: String? = null
+    var name: String? = null
+
+    public fun receiveHello(hello: String, name: String) {
+        this.hello = hello
+        this.name = name
+    }
+
+    public fun getReceivedHello(): String {
+        return "$hello from $name"
+    }
+
+    public fun sayHelloTo(name: String): String {
+        return "Hello $name"
+    }
+}
+
