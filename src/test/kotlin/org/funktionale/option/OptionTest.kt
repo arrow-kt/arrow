@@ -28,9 +28,9 @@ import org.testng.Assert.*
 
 public class OptionTest{
 
-    fun getSome(): Option<String> = Some("kotlin")
+    fun getSome(): Option<String> = "kotlin".toOption()
 
-    fun getNone(): Option<String> = none
+    fun getNone(): Option<String> = null.toOption()
 
     [Test] fun option() {
 

@@ -134,5 +134,13 @@ public abstract class Option<out T> {
 
 }
 
+public fun<T> T?.toOption():Option<T>{
+    return if(this != null){
+        Some(this!!)
+    } else{
+        none
+    }
+}
+
 
 
