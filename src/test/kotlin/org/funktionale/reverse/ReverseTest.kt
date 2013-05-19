@@ -14,10 +14,26 @@
  * limitations under the License.
  */
 
-package org.funktionale.utils
+package org.funktionale.reverse
 
-val<T> identity: (T) -> T = {(t: T) -> t }
+import org.testng.annotations.Test
+import org.testng.Assert.*
+import org.funktionale.partials.partially2
 
-fun<P1, T> constant(t: T): (P1) -> T {
-    return {(p1: P1) -> t }
+/**
+ * Created by IntelliJ IDEA.
+ * @author Mario Arias
+ * Date: 15/05/13
+ * Time: 21:22
+ */
+public class ReverseTest {
+    [Test] fun testReverse() {
+        val f = {(prefix: String, numericPostfix: Int, values: List<String>) ->
+            values.map { "$prefix$it$numericPostfix" }
+        }
+
+        val j = f.partially2(1)
+
+        assertEquals(j("x", listOf("a", "b", "c")), j.reverse()(listOf("a", "b", "c"), "x"))
+    }
 }

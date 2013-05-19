@@ -14,10 +14,17 @@
  * limitations under the License.
  */
 
-package org.funktionale.utils
+package org.funktionale.option
 
-val<T> identity: (T) -> T = {(t: T) -> t }
+/**
+ * Created by IntelliJ IDEA.
+ * @author Mario Arias
+ * Date: 17/05/13
+ * Time: 13:34
+ */
 
-fun<P1, T> constant(t: T): (P1) -> T {
-    return {(p1: P1) -> t }
+public data class Some<out T>(val t:T):Option<T>() {
+    public override fun get() = t
+
+    public override fun isEmpty() = false
 }

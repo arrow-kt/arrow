@@ -14,10 +14,22 @@
  * limitations under the License.
  */
 
-package org.funktionale.utils
+package org.funktionale.option
 
-val<T> identity: (T) -> T = {(t: T) -> t }
+import java.util.NoSuchElementException
 
-fun<P1, T> constant(t: T): (P1) -> T {
-    return {(p1: P1) -> t }
+/**
+ * Created by IntelliJ IDEA.
+ * @author Mario Arias
+ * Date: 17/05/13
+ * Time: 13:35
+ */
+
+public data class None(): Option<Nothing>(){
+    public override fun get() = throw NoSuchElementException("None.get")
+
+    public override fun isEmpty() = true
+
 }
+
+public val none: None = None()

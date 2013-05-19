@@ -1,17 +1,17 @@
 /*
- *    Copyright 2013 Mario Arias
+ * Copyright 2013 Mario Arias
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ * 	http://www.apache.org/licenses/LICENSE-2.0
  *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.funktionale.utils
@@ -47,28 +47,34 @@ public class UtilTest {
         assertEquals(list.map(constant(7)), arrayListOf(7, 7, 7))
     }
 
-    [Test] fun TestGetterAndSetterOperations() {
+    val Greeter.receive: SetterOperation<String, String>
+        get(){
+            return SetterOperationImpl{ k, v ->
+                this.receiveHello(k, v)
+            }
+        }
+
+    val Greeter.sayHello: GetterOperation<String, String>
+        get(){
+            return GetterOperationImpl{ k ->
+                this.sayHelloTo(k)
+            }
+        }
+
+    [Test] fun testGetterAndSetterOperations() {
         val greeter = Greeter()
 
         //Test Setter
         greeter.receive["Hola"] = "Mario"
         assertEquals("Hola from Mario", greeter.getReceivedHello())
+        assertEquals("Hello Mario", greeter.sayHello["Mario"])
+
     }
 }
 
-val Greeter.receive: SetterOperation<String, String>
-    get(){
-        return SetterOperationImpl{ k, v ->
-            this.receiveHello(k, v)
-        }
-    }
 
-val Greeter.sayHello: GetterOperation<String, String>
-    get(){
-        return GetterOperationImpl{ k ->
-            this.sayHelloTo(k)
-        }
-    }
+
+
 
 class Greeter{
 
@@ -87,5 +93,7 @@ class Greeter{
     public fun sayHelloTo(name: String): String {
         return "Hello $name"
     }
+
+
 }
 
