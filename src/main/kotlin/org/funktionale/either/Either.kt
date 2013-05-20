@@ -59,3 +59,11 @@ fun<T> Either<T, T>.merge(): T {
         else -> throw UnsupportedOperationException()
     }
 }
+
+fun<L, R> Pair<L, R>.toLeft(): Left<L, R> {
+    return Left(this.component1())
+}
+
+fun<L, R> Pair<L, R>.toRight(): Right<L, R> {
+    return Right(this.component2())
+}

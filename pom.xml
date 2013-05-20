@@ -22,7 +22,7 @@
 
     <groupId>org.funktionale</groupId>
     <artifactId>funktionale</artifactId>
-    <version>0.2_M5.2</version>
+    <version>0.2.1_M5.2</version>
     <packaging>jar</packaging>
     <properties>
         <kotlin.version>0.5.429</kotlin.version>

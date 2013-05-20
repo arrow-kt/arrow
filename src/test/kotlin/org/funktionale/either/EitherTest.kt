@@ -28,8 +28,9 @@ import org.funktionale.option.*
  */
 public class EitherTest {
 
-    val left = Left<Int, String>(5)
-    val right = Right<Int, String>("kotlin")
+    val pair = 5 to "kotlin"
+    val left = pair.toLeft()
+    val right = pair.toRight()
 
     [Test] fun get() {
         assertEquals(left.left().get(), 5)
