@@ -52,7 +52,7 @@ abstract public class Either<out L, out R> {
     }
 }
 
-fun<T> Either<T, T>.merge(): T {
+public fun<T> Either<T, T>.merge(): T {
     return when (this) {
         is Left<T, T> -> this.l
         is Right<T, T> -> this.r
@@ -60,10 +60,19 @@ fun<T> Either<T, T>.merge(): T {
     }
 }
 
-fun<L, R> Pair<L, R>.toLeft(): Left<L, R> {
+public fun<L, R> Pair<L, R>.toLeft(): Left<L, R> {
     return Left(this.component1())
 }
 
-fun<L, R> Pair<L, R>.toRight(): Right<L, R> {
+public fun<L, R> Pair<L, R>.toRight(): Right<L, R> {
     return Right(this.component2())
 }
+
+public fun<T> either(body: () -> T): Either<Exception, T> {
+    return try{
+        Right(body())
+    } catch(e: Exception){
+        Left(e)
+    }
+}
+

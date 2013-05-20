@@ -119,4 +119,12 @@ public class EitherTest {
         assertEquals(left.merge(), 5)
         assertEquals(right.merge(), "kotlin")
     }
+
+    [Test] fun either(){
+        val e = either {
+            throw RuntimeException()
+        }
+        assertTrue(e.isLeft())
+
+    }
 }
