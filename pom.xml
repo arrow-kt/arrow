@@ -22,7 +22,7 @@
 
     <groupId>org.funktionale</groupId>
     <artifactId>funktionale</artifactId>
-    <version>0.2.2_M6.2</version>
+    <version>0.2.3_M6.2</version>
     <packaging>jar</packaging>
     <name>funKTionale</name>
     <description>Functional constructs and utilities for Kotlin</description>
@@ -98,6 +98,19 @@
                         <phase>test-compile</phase>
                         <goals>
                             <goal>test-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
                         </goals>
                     </execution>
                 </executions>
