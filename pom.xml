@@ -22,33 +22,34 @@
 
     <groupId>org.funktionale</groupId>
     <artifactId>funktionale</artifactId>
-    <version>0.2.1_M6.2</version>
+    <version>0.2.2_M6.2</version>
     <packaging>jar</packaging>
+    <name>funKTionale</name>
+    <description>Functional constructs and utilities for Kotlin</description>
+    <url>https://github.com/MarioAriasC/funKTionale</url>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <url>https://github.com/MarioAriasC/funKTionale</url>
+        <connection>git@github.com:MarioAriasC/funKTionale.git</connection>
+    </scm>
+    <developers>
+        <developer>
+            <name>Mario Arias</name>
+            <roles>
+                <role>Lead Developer</role>
+            </roles>
+            <email>mario@marioarias.org</email>
+        </developer>
+    </developers>
     <properties>
         <kotlin.version>0.6.1670</kotlin.version>
     </properties>
-    <repositories>
-        <repository>
-            <id>jetbrains-all</id>
-            <name>JetBrains</name>
-            <url>http://repository.jetbrains.com/all</url>
-        </repository>
-        <repository>
-            <id>central</id>
-            <url>http://repo1.maven.org/maven2/</url>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>jetbrains-all</id>
-            <name>JetBrains</name>
-            <url>http://repository.jetbrains.com/all</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>central</id>
-            <url>http://repo1.maven.org/maven2/</url>
-        </pluginRepository>
-    </pluginRepositories>
     <dependencies>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
