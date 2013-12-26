@@ -9,13 +9,13 @@ Read the [Wiki](https://github.com/MarioAriasC/funKTionale/wiki)
 
 ## Maven
 
-You must configure your ```pom.xml``` file using this repository
+You must configure your ```pom.xml``` file using JCenter repository
 
 ```xml
 <repository>
-    <id>bintray-funktionale</id>
-    <name>Bintray</name>
-    <url>http://dl.bintray.com/content/marioariasc/funKTionale/</url>
+    <id>central</id>
+    <name>bintray</name>
+    <url>http://jcenter.bintray.com</url>
 </repository>
 ```
 
@@ -25,7 +25,7 @@ Then you can use the funKTionale dependency
 <dependency>
     <groupId>org.funktionale</groupId>
     <artifactId>funktionale</artifactId>
-    <version>0.2.1_M6</version>
+    <version>0.2.3_M6.2</version>
 </dependency>
 ```
 
