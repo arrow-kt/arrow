@@ -30,4 +30,4 @@ trait SetterOperation<K, V> {
     }
 }
 
-class SetterOperationImpl<K, V>(override val setter: (K, V) -> Unit): SetterOperation<K, V>
+class SetterOperationImpl<K, V>(override val setter: (K, V) -> Unit) : SetterOperation<K, V>

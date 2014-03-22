@@ -29,5 +29,5 @@ trait GetterOperation<K, V> {
     }
 }
 
-class GetterOperationImpl<K, V>(override val getter: (K) -> V): GetterOperation<K, V>
+class GetterOperationImpl<K, V>(override val getter: (K) -> V) : GetterOperation<K, V>
 

@@ -26,7 +26,7 @@ import org.testng.Assert.*
  * Time: 13:39
  */
 
-public class OptionTest{
+public class OptionTest {
 
     fun getSome(): Option<String> = "kotlin".toOption()
 
@@ -35,7 +35,7 @@ public class OptionTest{
     [Test] fun option() {
 
         val option = getSome()
-        when(option){
+        when(option) {
             is Some<String> -> {
                 assertEquals(option.get(), "kotlin")
             }
@@ -46,14 +46,14 @@ public class OptionTest{
 
         when (otherOption) {
             is Some<String> -> fail()
-            else -> assertEquals(otherOption, none)
+            else -> assertEquals(otherOption, None<String>())
         }
 
     }
 
     [Test] fun getOrElse() {
-        assertEquals(getSome().getOrElse{ "java" }, "kotlin")
-        assertEquals(getNone().getOrElse{ "java" }, "java")
+        assertEquals(getSome().getOrElse { "java" }, "kotlin")
+        assertEquals(getNone().getOrElse { "java" }, "java")
     }
 
     [Test] fun orNull() {
@@ -63,7 +63,7 @@ public class OptionTest{
 
     [Test] fun map() {
         assertEquals(getSome().map { it.toUpperCase() }.get(), "KOTLIN")
-        assertEquals(getNone().map { it.toUpperCase() }, none)
+        assertEquals(getNone().map { it.toUpperCase() }, None<String>())
     }
 
     [Test] fun fold() {
@@ -73,19 +73,19 @@ public class OptionTest{
 
     [Test] fun flatMap() {
         assertEquals(getSome().flatMap<String> { Some(it.toUpperCase()) }.get(), "KOTLIN")
-        assertEquals(getNone().flatMap<String> { Some(it.toUpperCase()) }, none)
+        assertEquals(getNone().flatMap<String> { Some(it.toUpperCase()) }, None<String>())
     }
 
     [Test] fun filter() {
-        assertEquals(getSome().filter{ it.equals("java") }, none)
-        assertEquals(getNone().filter{ it.equals("java") }, none)
-        assertEquals(getSome().filter{ it.startsWith('k') }.get(), "kotlin")
+        assertEquals(getSome().filter { it.equals("java") }, None<String>())
+        assertEquals(getNone().filter { it.equals("java") }, None<String>())
+        assertEquals(getSome().filter { it.startsWith('k') }.get(), "kotlin")
     }
 
     [Test] fun filterNot() {
-        assertEquals(getSome().filterNot{ it.equals("java") }.get(), "kotlin")
-        assertEquals(getNone().filterNot{ it.equals("java") }, none)
-        assertEquals(getSome().filterNot{ it.startsWith('k') }, none)
+        assertEquals(getSome().filterNot { it.equals("java") }.get(), "kotlin")
+        assertEquals(getNone().filterNot { it.equals("java") }, None<String>())
+        assertEquals(getSome().filterNot { it.startsWith('k') }, None<String>())
     }
 
     [Test] fun exists() {
@@ -124,5 +124,10 @@ public class OptionTest{
         assertFalse(getNone().toLeft { 0 }.isLeft())
     }
 
+    [Test] fun getAsOption() {
+        val map = mapOf(1 to "uno", 2 to "dos")
+        assertEquals(map.getAsOption(1), Some("uno"))
+        assertEquals(map.getAsOption(3), None<String>())
+    }
 
 }

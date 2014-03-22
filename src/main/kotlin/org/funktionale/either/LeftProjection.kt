@@ -25,10 +25,10 @@ import org.funktionale.option.*
  * Date: 17/05/13
  * Time: 20:20
  */
-public class LeftProjection<out L, out R>(val e: Either<L, R>){
+public class LeftProjection<out L, out R>(val e: Either<L, R>) {
 
     public fun get(): L {
-        return when(e){
+        return when(e) {
             is Left<L, R> -> e.l
             else -> throw NoSuchElementException("Either.left.value on Right")
         }
@@ -75,13 +75,13 @@ public class LeftProjection<out L, out R>(val e: Either<L, R>){
     public fun filter(predicate: (L) -> Boolean): Option<Either<L, R>> {
         return when (e) {
             is Left<L, R> -> {
-                if(predicate(e.l)){
+                if (predicate(e.l)) {
                     Some(e)
-                }else{
-                    none
+                } else {
+                    None()
                 }
             }
-            else -> none
+            else -> None()
         }
     }
 
@@ -95,7 +95,7 @@ public class LeftProjection<out L, out R>(val e: Either<L, R>){
     public fun toOption(): Option<L> {
         return when (e) {
             is Left<L, R> -> Some(e.l)
-            else -> none
+            else -> None()
         }
     }
 

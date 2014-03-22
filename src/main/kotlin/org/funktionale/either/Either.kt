@@ -16,8 +16,6 @@
 
 package org.funktionale.either
 
-import java.util.NoSuchElementException
-
 /**
  * Created by IntelliJ IDEA.
  * @author Mario Arias
@@ -69,9 +67,9 @@ public fun<L, R> Pair<L, R>.toRight(): Right<L, R> {
 }
 
 public fun<T> either(body: () -> T): Either<Exception, T> {
-    return try{
+    return try {
         Right(body())
-    } catch(e: Exception){
+    } catch(e: Exception) {
         Left(e)
     }
 }

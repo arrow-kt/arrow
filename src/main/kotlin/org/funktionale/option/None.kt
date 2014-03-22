@@ -25,11 +25,19 @@ import java.util.NoSuchElementException
  * Time: 13:35
  */
 
-public data class None(): Option<Nothing>(){
+public data class None<T>() : Option<T>() {
     public override fun get() = throw NoSuchElementException("None.get")
 
     public override fun isEmpty() = true
 
-}
+    override fun equals(other: Any?): Boolean {
+        return when(other) {
+            is None<*> -> true
+            else -> false
+        }
+    }
 
-public val none: None = None()
+    override fun hashCode(): Int {
+        return Integer.MAX_VALUE
+    }
+}

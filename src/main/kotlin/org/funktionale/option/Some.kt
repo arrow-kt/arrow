@@ -23,7 +23,7 @@ package org.funktionale.option
  * Time: 13:34
  */
 
-public data class Some<out T>(val t:T):Option<T>() {
+public data class Some<out T>(val t: T) : Option<T>() {
     public override fun get() = t
 
     public override fun isEmpty() = false

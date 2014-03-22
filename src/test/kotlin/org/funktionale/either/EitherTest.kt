@@ -81,9 +81,9 @@ public class EitherTest {
 
     [Test] fun filter() {
         assertEquals(left.left().filter { it == 5 }.get().left().get(), 5)
-        assertEquals(left.left().filter { it == 6 }, none)
+        assertEquals(left.left().filter { it == 6 }, None<String>())
         assertEquals(right.right().filter { it.startsWith('k') }.get().right().get(), "kotlin")
-        assertEquals(right.right().filter { it.startsWith('j') }, none)
+        assertEquals(right.right().filter { it.startsWith('j') }, None<Int>())
     }
 
     [Test] fun toList() {
@@ -93,7 +93,7 @@ public class EitherTest {
 
     [Test] fun toOption() {
         assertEquals(left.left().toOption().get(), 5)
-        assertEquals(left.right().toOption(), none)
+        assertEquals(left.right().toOption(), None<String>())
     }
 
     [Test] fun fold() {
