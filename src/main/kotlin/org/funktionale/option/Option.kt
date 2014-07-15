@@ -19,8 +19,8 @@ package org.funktionale.option
 import org.funktionale.either.Either
 import org.funktionale.either.Left
 import org.funktionale.either.Right
-import org.funktionale.utils.GetterOperationImpl
 import org.funktionale.utils.GetterOperation
+import org.funktionale.utils.GetterOperationImpl
 
 /**
  * Created by IntelliJ IDEA.
@@ -143,4 +143,10 @@ public fun<T> T?.toOption(): Option<T> {
     }
 }
 
+[deprecated("Use map.option[key]")]
 public fun<K, V> Map<K, V>.getAsOption(k: K): Option<V> = this[k].toOption()
+
+public val<K, V> Map<K, V>.option: GetterOperation<K, Option<V>>
+    get () {
+        return GetterOperationImpl { k -> this[k].toOption() }
+    }

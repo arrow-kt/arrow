@@ -35,7 +35,7 @@ public class OptionTest {
     [Test] fun option() {
 
         val option = getSome()
-        when(option) {
+        when (option) {
             is Some<String> -> {
                 assertEquals(option.get(), "kotlin")
             }
@@ -128,6 +128,8 @@ public class OptionTest {
         val map = mapOf(1 to "uno", 2 to "dos")
         assertEquals(map.getAsOption(1), Some("uno"))
         assertEquals(map.getAsOption(3), None<String>())
+        assertEquals(map.option[1], Some("uno"))
+        assertEquals(map.option[3], None<String>())
     }
 
 }
