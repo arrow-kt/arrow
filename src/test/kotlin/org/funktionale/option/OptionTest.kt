@@ -126,8 +126,6 @@ public class OptionTest {
 
     [Test] fun getAsOption() {
         val map = mapOf(1 to "uno", 2 to "dos")
-        assertEquals(map.getAsOption(1), Some("uno"))
-        assertEquals(map.getAsOption(3), None<String>())
         assertEquals(map.option[1], Some("uno"))
         assertEquals(map.option[3], None<String>())
     }

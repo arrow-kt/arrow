@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Mario Arias
+ * Copyright 2014 Mario Arias
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package org.funktionale.either
+package org.funktionale.partials
 
 /**
+ * Marker class to be used as the representation of a non-appliled parameter
+ *
  * Created by IntelliJ IDEA.
  * @author Mario Arias
- * Date: 17/05/13
- * Time: 19:09
+ * Date: 6/09/14
+ * Time: 11:07
  */
-[suppress("BASE_WITH_NULLABLE_UPPER_BOUND")]
-public class Right<out L, out R>(val r: R) : Either<L, R>() {
-    public override fun component1(): L? = null
-    public override fun component2(): R? = r
-    public override fun isLeft(): Boolean = false
-    public override fun isRight(): Boolean = true
+public class Partial<T> {
 }
+
+public fun <T> partial(): Partial<T> = Partial()

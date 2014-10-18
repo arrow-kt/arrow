@@ -22,6 +22,7 @@ package org.funktionale.either
  * Date: 17/05/13
  * Time: 19:01
  */
+[suppress("BASE_WITH_NULLABLE_UPPER_BOUND")]
 abstract public class Either<out L, out R> {
 
     public fun left(): LeftProjection<L, R> = LeftProjection(this)

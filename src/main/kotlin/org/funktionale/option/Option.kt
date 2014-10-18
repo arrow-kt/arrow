@@ -28,6 +28,7 @@ import org.funktionale.utils.GetterOperationImpl
  * Date: 17/05/13
  * Time: 12:53
  */
+[suppress("BASE_WITH_NULLABLE_UPPER_BOUND")]
 public abstract class Option<out T> {
     public abstract fun isEmpty(): Boolean
 
@@ -135,6 +136,7 @@ public abstract class Option<out T> {
 
 }
 
+[suppress("BASE_WITH_NULLABLE_UPPER_BOUND")]
 public fun<T> T?.toOption(): Option<T> {
     return if (this != null) {
         Some(this)

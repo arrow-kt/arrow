@@ -43,4 +43,22 @@ public class PartialsTest {
 
         assertEquals(helloX("funKTionale"), "Hello, funKTionale!")
     }
+
+    [Test] fun partials() {
+        val sum5ints = {(a: Int, b: Int, c: Int, d: Int, e: Int) -> a + b + c + d + e }
+
+        val sum4intsTo10: (Int, Int, Int, Int) -> Int = sum5ints(p5 = 10)
+
+        val sum3intsTo15: (Int, Int, Int) -> Int = sum4intsTo10(p4 = 5)
+
+        val sum2intsTo17: (Int, Int) -> Int = sum3intsTo15(p3 = 2)
+
+        assertEquals(sum2intsTo17(1, 2), 20)
+
+        val prefixAndPostfix = {(prefix: String, x: String, postfix: String) -> "${prefix}${x}${postfix}" }
+
+        val helloX: (String) -> String = prefixAndPostfix(p1 = "Hello, ")(p2 ="!")
+
+        assertEquals(helloX("funKTionale"), "Hello, funKTionale!")
+    }
 }
