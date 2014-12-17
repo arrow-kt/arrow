@@ -56,7 +56,7 @@ public class EitherTest {
 
     [Test] fun forEach() {
         assertEquals(left.left().forEach { it * 2 }, 10)
-        assertEquals(right.right().forEach { it.size }, 6)
+        assertEquals(right.right().forEach { it.length() }, 6)
     }
 
     [Test] fun getOrElse() {
@@ -71,12 +71,12 @@ public class EitherTest {
 
     [Test] fun flatMap() {
         assertEquals(left.left().flatMap { Left(it.toString()) }.left().get(), "5")
-        assertEquals(right.right().flatMap { Right(it.size) }.right().get(), 6)
+        assertEquals(right.right().flatMap { Right(it.length()) }.right().get(), 6)
     }
 
     [Test] fun map() {
         assertEquals(left.left().map { it.toString() }.left().get(), "5")
-        assertEquals(right.right().map { it.size }.right().get(), 6)
+        assertEquals(right.right().map { it.length() }.right().get(), 6)
     }
 
     [Test] fun filter() {

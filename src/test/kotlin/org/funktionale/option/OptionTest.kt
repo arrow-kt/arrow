@@ -67,8 +67,8 @@ public class OptionTest {
     }
 
     [Test] fun fold() {
-        assertEquals(getSome().fold({ 0 }) { it.size }, 6)
-        assertEquals(getNone().fold({ 0 }) { it.size }, 0)
+        assertEquals(getSome().fold({ 0 }) { it.length() }, 6)
+        assertEquals(getNone().fold({ 0 }) { it.length() }, 0)
     }
 
     [Test] fun flatMap() {
@@ -125,9 +125,16 @@ public class OptionTest {
     }
 
     [Test] fun getAsOption() {
-        val map = mapOf(1 to "uno", 2 to "dos")
+        val map = mapOf(1 to "uno", 2 to "dos", 4 to null)
         assertEquals(map.option[1], Some("uno"))
         assertEquals(map.option[3], None<String>())
+        assertEquals(map.option[4], None<String>())
+    }
+
+    [Test] fun firstOption() {
+        val l = listOf(1, 2, 3, 4, 5, 6)
+        assertEquals(l.firstOption(), Some(1))
+        assertEquals(l.firstOption { it > 2 }, Some(3))
     }
 
 }

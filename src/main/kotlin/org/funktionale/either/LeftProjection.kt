@@ -28,7 +28,7 @@ import org.funktionale.option.*
 public class LeftProjection<out L, out R>(val e: Either<L, R>) {
 
     public fun get(): L {
-        return when(e) {
+        return when (e) {
             is Left<L, R> -> e.l
             else -> throw NoSuchElementException("Either.left.value on Right")
         }
@@ -42,12 +42,6 @@ public class LeftProjection<out L, out R>(val e: Either<L, R>) {
         }
     }
 
-    public fun getOrElse(default: () -> L): L {
-        return when (e) {
-            is Left<L, R> -> e.l
-            else -> default()
-        }
-    }
 
     public fun exists(predicate: (L) -> Boolean): Boolean {
         return when (e) {
@@ -56,13 +50,6 @@ public class LeftProjection<out L, out R>(val e: Either<L, R>) {
         }
     }
 
-    public fun<X> flatMap(f: (L) -> Either<X, R>): Either<X, R> {
-        return when (e) {
-            is Left<L, R> -> f(e.l)
-            is Right<L, R> -> Right(e.r)
-            else -> throw UnsupportedOperationException()
-        }
-    }
 
     public fun<X> map(f: (L) -> X): Either<X, R> {
         return when (e) {
@@ -99,4 +86,19 @@ public class LeftProjection<out L, out R>(val e: Either<L, R>) {
         }
     }
 
+}
+
+public fun<L, R, X> LeftProjection<L, R>.flatMap(f: (L) -> Either<X, R>): Either<X, R> {
+    return when (e) {
+        is Left<L, R> -> f(e.l)
+        is Right<L, R> -> Right(e.r)
+        else -> throw UnsupportedOperationException()
+    }
+}
+
+public fun<R, L> LeftProjection<L, R>.getOrElse(default: () -> L): L {
+    return when (e) {
+        is Left<L, R> -> e.l
+        else -> default()
+    }
 }

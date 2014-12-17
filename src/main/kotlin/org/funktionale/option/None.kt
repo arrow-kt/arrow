@@ -31,7 +31,7 @@ public data class None<T>() : Option<T>() {
     public override fun isEmpty() = true
 
     override fun equals(other: Any?): Boolean {
-        return when(other) {
+        return when (other) {
             is None<*> -> true
             else -> false
         }

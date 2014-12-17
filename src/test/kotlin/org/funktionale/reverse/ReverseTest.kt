@@ -18,7 +18,7 @@ package org.funktionale.reverse
 
 import org.testng.annotations.Test
 import org.testng.Assert.*
-import org.funktionale.partials.partially2
+import org.funktionale.partials.*
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,7 +32,7 @@ public class ReverseTest {
             values.map { "$prefix$it$numericPostfix" }
         }
 
-        val j = f.partially2(1)
+        val j = f(p2 = 1)
 
         assertEquals(j("x", listOf("a", "b", "c")), j.reverse()(listOf("a", "b", "c"), "x"))
     }

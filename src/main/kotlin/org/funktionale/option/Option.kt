@@ -38,14 +38,6 @@ public abstract class Option<out T> {
 
     public abstract fun get(): T
 
-    public fun getOrElse(default: () -> T): T {
-        return if (isEmpty()) {
-            default()
-        } else {
-            get()
-        }
-    }
-
     public fun orNull(): T? {
         return if (isEmpty()) {
             null
@@ -102,13 +94,6 @@ public abstract class Option<out T> {
         if (nonEmpty()) f(get())
     }
 
-    public fun orElse(alternative: () -> Option<T>): Option<T> {
-        return if (isEmpty()) {
-            alternative()
-        } else {
-            this
-        }
-    }
 
     public fun toList(): List<T> {
         return if (isEmpty()) {
@@ -136,6 +121,22 @@ public abstract class Option<out T> {
 
 }
 
+public fun<T> Option<T>.getOrElse(default: () -> T): T {
+    return if (isEmpty()) {
+        default()
+    } else {
+        get()
+    }
+}
+
+public fun<T> Option<T>.orElse(alternative: () -> Option<T>): Option<T> {
+    return if (isEmpty()) {
+        alternative()
+    } else {
+        this
+    }
+}
+
 [suppress("BASE_WITH_NULLABLE_UPPER_BOUND")]
 public fun<T> T?.toOption(): Option<T> {
     return if (this != null) {
@@ -145,10 +146,116 @@ public fun<T> T?.toOption(): Option<T> {
     }
 }
 
-[deprecated("Use map.option[key]")]
+[deprecated("Use map.option[key]. To be deleted on 0.5")]
 public fun<K, V> Map<K, V>.getAsOption(k: K): Option<V> = this[k].toOption()
 
 public val<K, V> Map<K, V>.option: GetterOperation<K, Option<V>>
     get () {
         return GetterOperationImpl { k -> this[k].toOption() }
     }
+
+
+public fun<T> Array<out T>.firstOption(): Option<T> {
+    return firstOrNull().toOption()
+}
+
+public fun BooleanArray.firstOption(): Option<Boolean> {
+    return firstOrNull().toOption()
+}
+
+public fun ByteArray.firstOption(): Option<Byte> {
+    return firstOrNull().toOption()
+}
+
+public fun CharArray.firstOption(): Option<Char> {
+    return firstOrNull().toOption()
+}
+
+public fun DoubleArray.firstOption(): Option<Double> {
+    return firstOrNull().toOption()
+}
+
+public fun FloatArray.firstOption(): Option<Float> {
+    return firstOrNull().toOption()
+}
+
+
+public fun IntArray.firstOption(): Option<Int> {
+    return firstOrNull().toOption()
+}
+
+
+public fun LongArray.firstOption(): Option<Long> {
+    return firstOrNull().toOption()
+}
+
+
+public fun ShortArray.firstOption(): Option<Short> {
+    return firstOrNull().toOption()
+}
+
+public fun<T> Iterable<T>.firstOption(): Option<T> {
+    return firstOrNull().toOption()
+}
+
+public fun<T> List<T>.firstOption(): Option<T> {
+    return firstOrNull().toOption()
+}
+
+public fun<T> Stream<T>.firstOption(): Option<T> {
+    return firstOrNull().toOption()
+}
+
+public fun String.firstOption(): Option<Char> {
+    return firstOrNull().toOption()
+}
+
+public inline fun <T> Array<out T>.firstOption(predicate: (T) -> Boolean): Option<T> {
+    return firstOrNull(predicate).toOption()
+}
+
+public inline fun BooleanArray.firstOption(predicate: (Boolean) -> Boolean): Option<Boolean> {
+    return firstOrNull(predicate).toOption()
+}
+
+public inline fun ByteArray.firstOption(predicate: (Byte) -> Boolean): Option<Byte> {
+    return firstOrNull(predicate).toOption()
+}
+
+public inline fun CharArray.firstOption(predicate: (Char) -> Boolean): Option<Char> {
+    return firstOrNull(predicate).toOption()
+}
+
+public inline fun DoubleArray.firstOption(predicate: (Double) -> Boolean): Option<Double> {
+    return firstOrNull(predicate).toOption()
+}
+
+public inline fun FloatArray.firstOption(predicate: (Float) -> Boolean): Option<Float> {
+    return firstOrNull(predicate).toOption()
+}
+
+public inline fun IntArray.firstOption(predicate: (Int) -> Boolean): Option<Int> {
+    return firstOrNull(predicate).toOption()
+}
+
+public inline fun LongArray.firstOption(predicate: (Long) -> Boolean): Option<Long> {
+    return firstOrNull(predicate).toOption()
+}
+
+public inline fun ShortArray.firstOption(predicate: (Short) -> Boolean): Option<Short> {
+    return firstOrNull(predicate).toOption()
+}
+
+public inline fun <T> Iterable<T>.firstOption(predicate: (T) -> Boolean): Option<T> {
+    return firstOrNull(predicate).toOption()
+}
+
+
+public inline fun <T> Stream<T>.firstOption(predicate: (T) -> Boolean): Option<T> {
+    return firstOrNull(predicate).toOption()
+}
+
+
+public inline fun String.firstOption(predicate: (Char) -> Boolean): Option<Char> {
+    return firstOrNull(predicate).toOption()
+}

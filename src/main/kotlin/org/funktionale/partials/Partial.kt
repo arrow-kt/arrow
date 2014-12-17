@@ -24,7 +24,6 @@ package org.funktionale.partials
  * Date: 6/09/14
  * Time: 11:07
  */
-public class Partial<T> {
-}
+public class Partial<T>
 
 public fun <T> partial(): Partial<T> = Partial()
