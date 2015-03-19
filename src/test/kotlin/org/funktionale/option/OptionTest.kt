@@ -111,7 +111,7 @@ public class OptionTest {
 
     [Test] fun toList() {
         assertEquals(getSome().toList(), listOf("kotlin"))
-        assertEquals(getNone().toList(), listOf())
+        assertEquals(getNone().toList(), listOf<String>())
     }
 
     [Test] fun toRight() {
