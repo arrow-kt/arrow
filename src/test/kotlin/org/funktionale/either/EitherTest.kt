@@ -88,7 +88,7 @@ public class EitherTest {
 
     [Test] fun toList() {
         assertEquals(left.left().toList(), listOf(5))
-        assertEquals(left.right().toList(), listOf())
+        assertEquals(left.right().toList(), listOf<Int>())
     }
 
     [Test] fun toOption() {
