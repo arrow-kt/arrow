@@ -27,7 +27,7 @@ import org.testng.Assert.*
  */
 public class CurryingTest {
     [Test] fun testCurrying() {
-        val sum2ints = {(x: Int, y: Int)-> x + y }
+        val sum2ints = { x: Int, y: Int -> x + y }
         val curried = sum2ints.curried()
         assertEquals(curried(2)(4), 6)
         val add5 = curried(5)

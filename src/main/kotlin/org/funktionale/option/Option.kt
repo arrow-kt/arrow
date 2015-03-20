@@ -202,9 +202,15 @@ public fun<T> List<T>.firstOption(): Option<T> {
     return firstOrNull().toOption()
 }
 
+[deprecated("Migrate to using Sequence<T> and respective functions")]
 public fun<T> Stream<T>.firstOption(): Option<T> {
     return firstOrNull().toOption()
 }
+
+public fun<T> Sequence<T>.firstOption(): Option<T> {
+    return firstOrNull().toOption()
+}
+
 
 public fun String.firstOption(): Option<Char> {
     return firstOrNull().toOption()
@@ -250,8 +256,12 @@ public inline fun <T> Iterable<T>.firstOption(predicate: (T) -> Boolean): Option
     return firstOrNull(predicate).toOption()
 }
 
-
+[deprecated("Migrate to using Sequence<T> and respective functions")]
 public inline fun <T> Stream<T>.firstOption(predicate: (T) -> Boolean): Option<T> {
+    return firstOrNull(predicate).toOption()
+}
+
+public inline fun <T> Sequence<T>.firstOption(predicate: (T) -> Boolean): Option<T> {
     return firstOrNull(predicate).toOption()
 }
 

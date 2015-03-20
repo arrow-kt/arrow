@@ -21,8 +21,8 @@ import org.testng.Assert.*
 
 public class UtilTest {
 
-    private val add5 = {(i: Int) -> i + 5 }
-    private val multiplyBy2 = {(i: Int)-> i * 2 }
+    private val add5 = { i: Int -> i + 5 }
+    private val multiplyBy2 = { i: Int -> i * 2 }
 
     private fun applyTwoFunctions(i: Int, firstFunction: (Int) -> Int, secondFunction: (Int) -> Int): Int {
         val x = firstFunction(i)

@@ -28,11 +28,11 @@ import org.funktionale.partials.*
  */
 public class ReverseTest {
     [Test] fun testReverse() {
-        val f = {(prefix: String, numericPostfix: Int, values: List<String>) ->
+        val f = { prefix: String, numericPostfix: Int, values: List<String> ->
             values.map { "$prefix$it$numericPostfix" }
         }
 
-        val j = f(p2 = 1)
+        val j: (String, List<String>) -> List<String> = f(p2 = 1)
 
         assertEquals(j("x", listOf("a", "b", "c")), j.reverse()(listOf("a", "b", "c"), "x"))
     }

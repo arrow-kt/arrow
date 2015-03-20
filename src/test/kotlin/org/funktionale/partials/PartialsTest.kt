@@ -27,7 +27,7 @@ import org.testng.Assert.*
  */
 public class PartialsTest {
     [Test] fun partially() {
-        val sum5ints = {(a: Int, b: Int, c: Int, d: Int, e: Int) -> a + b + c + d + e }
+        val sum5ints = { a: Int, b: Int, c: Int, d: Int, e: Int -> a + b + c + d + e }
 
         val sum4intsTo10 = sum5ints.partially5(10)
 
@@ -37,7 +37,7 @@ public class PartialsTest {
 
         assertEquals(sum2intsTo17(1, 2), 20)
 
-        val prefixAndPostfix = {(prefix: String, x: String, postfix: String) -> "${prefix}${x}${postfix}" }
+        val prefixAndPostfix = { prefix: String, x: String, postfix: String -> "${prefix}${x}${postfix}" }
 
         val helloX = prefixAndPostfix.partially1("Hello, ").partially2("!")
 
@@ -45,7 +45,7 @@ public class PartialsTest {
     }
 
     [Test] fun partials() {
-        val sum5ints = {(a: Int, b: Int, c: Int, d: Int, e: Int) -> a + b + c + d + e }
+        val sum5ints = { a: Int, b: Int, c: Int, d: Int, e: Int -> a + b + c + d + e }
 
         val sum4intsTo10: (Int, Int, Int, Int) -> Int = sum5ints(p5 = 10)
 
@@ -55,7 +55,7 @@ public class PartialsTest {
 
         assertEquals(sum2intsTo17(1, 2), 20)
 
-        val prefixAndPostfix = {(prefix: String, x: String, postfix: String) -> "${prefix}${x}${postfix}" }
+        val prefixAndPostfix = { prefix: String, x: String, postfix: String -> "${prefix}${x}${postfix}" }
 
         val helloX: (String) -> String = prefixAndPostfix(p1 = "Hello, ")(p2 ="!")
 
