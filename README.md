@@ -25,7 +25,7 @@ Then you can use the funKTionale dependency
 <dependency>
     <groupId>org.funktionale</groupId>
     <artifactId>funktionale</artifactId>
-    <version>0.4.2_M11</version>
+    <version>0.5_M11</version>
 </dependency>
 ```
 

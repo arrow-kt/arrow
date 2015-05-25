@@ -46,7 +46,7 @@ public class OptionTest {
 
         when (otherOption) {
             is Some<String> -> fail()
-            else -> assertEquals(otherOption, None<String>())
+            else -> assertEquals(otherOption, None)
         }
 
     }
@@ -63,7 +63,7 @@ public class OptionTest {
 
     [Test] fun map() {
         assertEquals(getSome().map { it.toUpperCase() }.get(), "KOTLIN")
-        assertEquals(getNone().map { it.toUpperCase() }, None<String>())
+        assertEquals(getNone().map { it.toUpperCase() }, None)
     }
 
     [Test] fun fold() {
@@ -73,19 +73,19 @@ public class OptionTest {
 
     [Test] fun flatMap() {
         assertEquals(getSome().flatMap<String> { Some(it.toUpperCase()) }.get(), "KOTLIN")
-        assertEquals(getNone().flatMap<String> { Some(it.toUpperCase()) }, None<String>())
+        assertEquals(getNone().flatMap<String> { Some(it.toUpperCase()) }, None)
     }
 
     [Test] fun filter() {
-        assertEquals(getSome().filter { it.equals("java") }, None<String>())
-        assertEquals(getNone().filter { it.equals("java") }, None<String>())
+        assertEquals(getSome().filter { it.equals("java") }, None)
+        assertEquals(getNone().filter { it.equals("java") }, None)
         assertEquals(getSome().filter { it.startsWith('k') }.get(), "kotlin")
     }
 
     [Test] fun filterNot() {
         assertEquals(getSome().filterNot { it.equals("java") }.get(), "kotlin")
-        assertEquals(getNone().filterNot { it.equals("java") }, None<String>())
-        assertEquals(getSome().filterNot { it.startsWith('k') }, None<String>())
+        assertEquals(getNone().filterNot { it.equals("java") }, None)
+        assertEquals(getSome().filterNot { it.startsWith('k') }, None)
     }
 
     [Test] fun exists() {
@@ -127,8 +127,8 @@ public class OptionTest {
     [Test] fun getAsOption() {
         val map = mapOf(1 to "uno", 2 to "dos", 4 to null)
         assertEquals(map.option[1], Some("uno"))
-        assertEquals(map.option[3], None<String>())
-        assertEquals(map.option[4], None<String>())
+        assertEquals(map.option[3], None)
+        assertEquals(map.option[4], None)
     }
 
     [Test] fun firstOption() {

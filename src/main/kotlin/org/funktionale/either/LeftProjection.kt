@@ -65,10 +65,10 @@ public class LeftProjection<out L, out R>(val e: Either<L, R>) {
                 if (predicate(e.l)) {
                     Some(e)
                 } else {
-                    None()
+                    None
                 }
             }
-            else -> None()
+            else -> None
         }
     }
 
@@ -82,7 +82,7 @@ public class LeftProjection<out L, out R>(val e: Either<L, R>) {
     public fun toOption(): Option<L> {
         return when (e) {
             is Left<L, R> -> Some(e.l)
-            else -> None()
+            else -> None
         }
     }
 

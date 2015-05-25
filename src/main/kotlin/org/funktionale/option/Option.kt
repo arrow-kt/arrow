@@ -48,7 +48,7 @@ public abstract class Option<out T> {
 
     public fun<R> map(f: (T) -> R): Option<R> {
         return if (isEmpty()) {
-            None()
+            None
         } else {
             Some(f(get()))
         }
@@ -64,7 +64,7 @@ public abstract class Option<out T> {
 
     public fun<R> flatMap(f: (T) -> Option<R>): Option<R> {
         return if (isEmpty()) {
-            None()
+            None
         } else {
             f(get())
         }
@@ -74,7 +74,7 @@ public abstract class Option<out T> {
         return if (nonEmpty() && predicate(get())) {
             this
         } else {
-            None()
+            None
         }
     }
 
@@ -82,7 +82,7 @@ public abstract class Option<out T> {
         return if (nonEmpty() && !predicate(get())) {
             this
         } else {
-            None()
+            None
         }
     }
 
@@ -142,7 +142,7 @@ public fun<T> T?.toOption(): Option<T> {
     return if (this != null) {
         Some(this)
     } else {
-        None()
+        None
     }
 }
 

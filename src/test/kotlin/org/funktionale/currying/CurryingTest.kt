@@ -16,8 +16,8 @@
 
 package org.funktionale.currying
 
+import org.testng.Assert.assertEquals
 import org.testng.annotations.Test
-import org.testng.Assert.*
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,5 +32,18 @@ public class CurryingTest {
         assertEquals(curried(2)(4), 6)
         val add5 = curried(5)
         assertEquals(add5(7), 12)
+    }
+
+    [Test] fun testUncurrying() {
+        val sum2ints: (Int, Int) -> Int = { x, y -> x + y }
+        val curried: (Int) -> (Int) -> Int = sum2ints.curried()
+        assertEquals(curried(2)(4), 6)
+        //same type as sum2ints,
+        assertEquals(curried.uncurried()(2, 4), 6)
+        assertEquals(sum2ints(2, 4), 6)
+
+        val sum3ints: (Int, Int, Int) -> Int = { x, y, z -> x + y }
+        val f: (Int) -> (Int) -> (Int) -> Int =sum3ints.curried()
+        val x: (Int, Int, Int) -> Int =f.uncurried()
     }
 }
