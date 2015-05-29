@@ -1,7 +1,7 @@
 funKTionale
 ===========
 
-Functional constructs and patterns for [Kotlin](http://kotlin.jetbrains.org)
+Functional constructs and patterns for [Kotlin](http://kotlin-lang.org)
 
 ## Documentation
 
@@ -25,7 +25,7 @@ Then you can use the funKTionale dependency
 <dependency>
     <groupId>org.funktionale</groupId>
     <artifactId>funktionale</artifactId>
-    <version>0.5_M11</version>
+    <version>0.5.1_M12</version>
 </dependency>
 ```
 
