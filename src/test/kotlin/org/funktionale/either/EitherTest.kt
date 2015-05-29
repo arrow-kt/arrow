@@ -32,14 +32,14 @@ public class EitherTest {
     val left = pair.toLeft()
     val right = pair.toRight()
 
-    [Test] fun get() {
+    @Test fun get() {
         assertEquals(left.left().get(), 5)
         assertEquals(right.right().get(), "kotlin")
     }
 
     //[Test(expectedExceptions = array(javaClass<NoSuchElementException>()))]
 
-    [Test] fun getWithException() {
+    @Test fun getWithException() {
         try {
             assertEquals(right.left().get(), 5)
             fail()
@@ -54,58 +54,58 @@ public class EitherTest {
         }
     }
 
-    [Test] fun forEach() {
+    @Test fun forEach() {
         assertEquals(left.left().forEach { it * 2 }, 10)
         assertEquals(right.right().forEach { it.length() }, 6)
     }
 
-    [Test] fun getOrElse() {
+    @Test fun getOrElse() {
         assertEquals(left.left().getOrElse { 2 }, 5)
         assertEquals(left.right().getOrElse { "java" }, "java")
     }
 
-    [Test] fun exists() {
+    @Test fun exists() {
         assertTrue(left.left().exists { it == 5 })
         assertFalse(left.right().exists { it.equals("kotlin") })
     }
 
-    [Test] fun flatMap() {
+    @Test fun flatMap() {
         assertEquals(left.left().flatMap { Left(it.toString()) }.left().get(), "5")
         assertEquals(right.right().flatMap { Right(it.length()) }.right().get(), 6)
     }
 
-    [Test] fun map() {
+    @Test fun map() {
         assertEquals(left.left().map { it.toString() }.left().get(), "5")
         assertEquals(right.right().map { it.length() }.right().get(), 6)
     }
 
-    [Test] fun filter() {
+    @Test fun filter() {
         assertEquals(left.left().filter { it == 5 }.get().left().get(), 5)
         assertEquals(left.left().filter { it == 6 }, None)
         assertEquals(right.right().filter { it.startsWith('k') }.get().right().get(), "kotlin")
         assertEquals(right.right().filter { it.startsWith('j') }, None)
     }
 
-    [Test] fun toList() {
+    @Test fun toList() {
         assertEquals(left.left().toList(), listOf(5))
         assertEquals(left.right().toList(), listOf<Int>())
     }
 
-    [Test] fun toOption() {
+    @Test fun toOption() {
         assertEquals(left.left().toOption().get(), 5)
         assertEquals(left.right().toOption(), None)
     }
 
-    [Test] fun fold() {
+    @Test fun fold() {
         assertEquals(left.fold({ it.toString() }, { it }), "5")
     }
 
-    [Test] fun swap() {
+    @Test fun swap() {
         assertEquals(left.swap().right().get(), 5)
         assertEquals(right.swap().left().get(), "kotlin")
     }
 
-    [Test] fun components() {
+    @Test fun components() {
         val (aInt, aNullString) = left
         assertNotNull(aInt)
         assertNull(aNullString)
@@ -115,12 +115,12 @@ public class EitherTest {
         assertNotNull(aString)
     }
 
-    [Test] fun merge() {
+    @Test fun merge() {
         assertEquals(left.merge(), 5)
         assertEquals(right.merge(), "kotlin")
     }
 
-    [Test] fun either(){
+    @Test fun either(){
         val e = either {
             throw RuntimeException()
         }

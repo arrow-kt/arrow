@@ -26,7 +26,7 @@ import org.testng.annotations.Test
  * Time: 22:26
  */
 public class CurryingTest {
-    [Test] fun testCurrying() {
+    @Test fun testCurrying() {
         val sum2ints = { x: Int, y: Int -> x + y }
         val curried = sum2ints.curried()
         assertEquals(curried(2)(4), 6)
@@ -34,7 +34,7 @@ public class CurryingTest {
         assertEquals(add5(7), 12)
     }
 
-    [Test] fun testUncurrying() {
+    @Test fun testUncurrying() {
         val sum2ints: (Int, Int) -> Int = { x, y -> x + y }
         val curried: (Int) -> (Int) -> Int = sum2ints.curried()
         assertEquals(curried(2)(4), 6)

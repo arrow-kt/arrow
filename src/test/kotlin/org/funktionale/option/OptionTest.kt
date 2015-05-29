@@ -32,7 +32,7 @@ public class OptionTest {
 
     fun getNone(): Option<String> = null.toOption()
 
-    [Test] fun option() {
+    @Test fun option() {
 
         val option = getSome()
         when (option) {
@@ -51,50 +51,50 @@ public class OptionTest {
 
     }
 
-    [Test] fun getOrElse() {
+    @Test fun getOrElse() {
         assertEquals(getSome().getOrElse { "java" }, "kotlin")
         assertEquals(getNone().getOrElse { "java" }, "java")
     }
 
-    [Test] fun orNull() {
+    @Test fun orNull() {
         assertNotNull(getSome().orNull())
         assertNull(getNone().orNull())
     }
 
-    [Test] fun map() {
+    @Test fun map() {
         assertEquals(getSome().map { it.toUpperCase() }.get(), "KOTLIN")
         assertEquals(getNone().map { it.toUpperCase() }, None)
     }
 
-    [Test] fun fold() {
+    @Test fun fold() {
         assertEquals(getSome().fold({ 0 }) { it.length() }, 6)
         assertEquals(getNone().fold({ 0 }) { it.length() }, 0)
     }
 
-    [Test] fun flatMap() {
+    @Test fun flatMap() {
         assertEquals(getSome().flatMap<String> { Some(it.toUpperCase()) }.get(), "KOTLIN")
         assertEquals(getNone().flatMap<String> { Some(it.toUpperCase()) }, None)
     }
 
-    [Test] fun filter() {
+    @Test fun filter() {
         assertEquals(getSome().filter { it.equals("java") }, None)
         assertEquals(getNone().filter { it.equals("java") }, None)
         assertEquals(getSome().filter { it.startsWith('k') }.get(), "kotlin")
     }
 
-    [Test] fun filterNot() {
+    @Test fun filterNot() {
         assertEquals(getSome().filterNot { it.equals("java") }.get(), "kotlin")
         assertEquals(getNone().filterNot { it.equals("java") }, None)
         assertEquals(getSome().filterNot { it.startsWith('k') }, None)
     }
 
-    [Test] fun exists() {
+    @Test fun exists() {
         assertTrue(getSome().exists { it.startsWith('k') })
         assertFalse(getNone().exists { it.startsWith('k') })
 
     }
 
-    [Test] fun forEach() {
+    @Test fun forEach() {
         getSome().forEach {
             assertEquals(it, "kotlin")
         }
@@ -104,34 +104,34 @@ public class OptionTest {
         }
     }
 
-    [Test] fun orElse() {
+    @Test fun orElse() {
         assertEquals(getSome().orElse { Some("java") }.get(), "kotlin")
         assertEquals(getNone().orElse { Some("java") }.get(), "java")
     }
 
-    [Test] fun toList() {
+    @Test fun toList() {
         assertEquals(getSome().toList(), listOf("kotlin"))
         assertEquals(getNone().toList(), listOf<String>())
     }
 
-    [Test] fun toRight() {
+    @Test fun toRight() {
         assertTrue(getSome().toRight { 0 }.isRight())
         assertFalse(getNone().toRight { 0 }.isRight())
     }
 
-    [Test] fun toLeft() {
+    @Test fun toLeft() {
         assertTrue(getSome().toLeft { 0 }.isLeft())
         assertFalse(getNone().toLeft { 0 }.isLeft())
     }
 
-    [Test] fun getAsOption() {
+    @Test fun getAsOption() {
         val map = mapOf(1 to "uno", 2 to "dos", 4 to null)
         assertEquals(map.option[1], Some("uno"))
         assertEquals(map.option[3], None)
         assertEquals(map.option[4], None)
     }
 
-    [Test] fun firstOption() {
+    @Test fun firstOption() {
         val l = listOf(1, 2, 3, 4, 5, 6)
         assertEquals(l.firstOption(), Some(1))
         assertEquals(l.firstOption { it > 2 }, Some(3))

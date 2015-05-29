@@ -27,7 +27,7 @@ import org.funktionale.partials.*
  * Time: 21:22
  */
 public class ReverseTest {
-    [Test] fun testReverse() {
+    @Test fun testReverse() {
         val f = { prefix: String, numericPostfix: Int, values: List<String> ->
             values.map { "$prefix$it$numericPostfix" }
         }

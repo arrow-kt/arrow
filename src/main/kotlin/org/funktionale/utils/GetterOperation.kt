@@ -22,7 +22,7 @@ package org.funktionale.utils
  * Date: 15/05/13
  * Time: 13:03
  */
-trait GetterOperation<K, V> {
+interface GetterOperation<K, V> {
     val getter: (K) -> V
     public fun get(key: K): V {
         return getter(key)

@@ -28,7 +28,7 @@ import org.funktionale.utils.GetterOperationImpl
  * Date: 17/05/13
  * Time: 12:53
  */
-[suppress("BASE_WITH_NULLABLE_UPPER_BOUND")]
+@suppress("BASE_WITH_NULLABLE_UPPER_BOUND")
 public abstract class Option<out T> {
     public abstract fun isEmpty(): Boolean
 
@@ -137,7 +137,7 @@ public fun<T> Option<T>.orElse(alternative: () -> Option<T>): Option<T> {
     }
 }
 
-[suppress("BASE_WITH_NULLABLE_UPPER_BOUND")]
+@suppress("BASE_WITH_NULLABLE_UPPER_BOUND")
 public fun<T> T?.toOption(): Option<T> {
     return if (this != null) {
         Some(this)
@@ -145,9 +145,6 @@ public fun<T> T?.toOption(): Option<T> {
         None
     }
 }
-
-[deprecated("Use map.option[key]. To be deleted on 0.5")]
-public fun<K, V> Map<K, V>.getAsOption(k: K): Option<V> = this[k].toOption()
 
 public val<K, V> Map<K, V>.option: GetterOperation<K, Option<V>>
     get () {
@@ -202,7 +199,7 @@ public fun<T> List<T>.firstOption(): Option<T> {
     return firstOrNull().toOption()
 }
 
-[deprecated("Migrate to using Sequence<T> and respective functions")]
+@deprecated("Migrate to using Sequence<T> and respective functions", ReplaceWith("Sequence<T>.firstOrNull().toOption()"))
 public fun<T> Stream<T>.firstOption(): Option<T> {
     return firstOrNull().toOption()
 }
@@ -256,7 +253,7 @@ public inline fun <T> Iterable<T>.firstOption(predicate: (T) -> Boolean): Option
     return firstOrNull(predicate).toOption()
 }
 
-[deprecated("Migrate to using Sequence<T> and respective functions")]
+@deprecated("Migrate to using Sequence<T> and respective functions", ReplaceWith("Sequence<T>.firstOrNull(predicate).toOption()"))
 public inline fun <T> Stream<T>.firstOption(predicate: (T) -> Boolean): Option<T> {
     return firstOrNull(predicate).toOption()
 }

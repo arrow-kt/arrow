@@ -22,7 +22,7 @@ package org.funktionale.utils
  * Date: 15/05/13
  * Time: 13:06
  */
-trait SetterOperation<K, V> {
+interface SetterOperation<K, V> {
     val setter: (K, V) -> Unit
 
     public fun set(key: K, value: V) {

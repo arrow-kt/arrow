@@ -22,7 +22,7 @@ package org.funktionale.either
  * Date: 17/05/13
  * Time: 19:09
  */
-[suppress("BASE_WITH_NULLABLE_UPPER_BOUND")]
+@suppress("BASE_WITH_NULLABLE_UPPER_BOUND")
 public class Right<out L, out R>(val r: R) : Either<L, R>() {
     public override fun component1(): L? = null
     public override fun component2(): R? = r

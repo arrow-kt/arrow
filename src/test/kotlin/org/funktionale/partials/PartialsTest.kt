@@ -26,7 +26,7 @@ import org.testng.Assert.*
  * Time: 21:35
  */
 public class PartialsTest {
-    [Test] fun partially() {
+    @Test fun partially() {
         val sum5ints = { a: Int, b: Int, c: Int, d: Int, e: Int -> a + b + c + d + e }
 
         val sum4intsTo10 = sum5ints.partially5(10)
@@ -44,7 +44,7 @@ public class PartialsTest {
         assertEquals(helloX("funKTionale"), "Hello, funKTionale!")
     }
 
-    [Test] fun partials() {
+    @Test fun partials() {
         val sum5ints = { a: Int, b: Int, c: Int, d: Int, e: Int -> a + b + c + d + e }
 
         val sum4intsTo10: (Int, Int, Int, Int) -> Int = sum5ints(p5 = 10)

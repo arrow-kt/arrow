@@ -29,7 +29,7 @@ public class UtilTest {
         return secondFunction(x)
     }
 
-    [Test] fun testIdentity() {
+    @Test fun testIdentity() {
 
         assertEquals(applyTwoFunctions(2, add5, multiplyBy2), 14)
 
@@ -38,7 +38,7 @@ public class UtilTest {
         assertEquals(applyTwoFunctions(2, identity, identity), 2)
     }
 
-    [Test] fun testConstant() {
+    @Test fun testConstant() {
 
         assertEquals(applyTwoFunctions(2, add5, constant(1)), 1)
 
@@ -61,7 +61,7 @@ public class UtilTest {
             }
         }
 
-    [Test] fun testGetterAndSetterOperations() {
+    @Test fun testGetterAndSetterOperations() {
         val greeter = Greeter()
 
         //Test Setter
