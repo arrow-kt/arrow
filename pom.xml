@@ -48,7 +48,7 @@
         </developer>
     </developers>
     <properties>
-        <kotlin.version>0.12.200</kotlin.version>
+        <kotlin.version>0.12.412</kotlin.version>
     </properties>
     <dependencies>
         <dependency>
