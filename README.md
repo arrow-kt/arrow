@@ -19,13 +19,13 @@ You must configure your ```pom.xml``` file using JCenter repository
 </repository>
 ```
 
-Then you can use the funKTionale dependency
+Then you can use funKTionale dependency
 
 ```xml
 <dependency>
     <groupId>org.funktionale</groupId>
     <artifactId>funktionale</artifactId>
-    <version>0.5.1_M12</version>
+    <version>0.5.1.1_M12</version>
 </dependency>
 ```
 
