@@ -16,8 +16,8 @@
 
 package org.funktionale.option
 
-import org.testng.annotations.Test
 import org.testng.Assert.*
+import org.testng.annotations.Test
 
 /**
  * Created by IntelliJ IDEA.
@@ -72,8 +72,8 @@ public class OptionTest {
     }
 
     @Test fun flatMap() {
-        assertEquals(getSome().flatMap<String> { Some(it.toUpperCase()) }.get(), "KOTLIN")
-        assertEquals(getNone().flatMap<String> { Some(it.toUpperCase()) }, None)
+        assertEquals(getSome().flatMap { Some(it.toUpperCase()) }.get(), "KOTLIN")
+        assertEquals(getNone().flatMap { Some(it.toUpperCase()) }, None)
     }
 
     @Test fun filter() {
@@ -135,6 +135,20 @@ public class OptionTest {
         val l = listOf(1, 2, 3, 4, 5, 6)
         assertEquals(l.firstOption(), Some(1))
         assertEquals(l.firstOption { it > 2 }, Some(3))
+    }
+
+    @Test fun optionBody() {
+        assertEquals(option { "1".toInt() }, Some(1))
+        assertEquals(option { "foo".toInt() }, None)
+    }
+
+    @Test fun sequential() {
+        fun parseInts(ints:List<String>): Option<Collection<Int>>{
+            return ints.map { option { it.toInt() } }.sequential()
+        }
+
+        assertEquals(parseInts(listOf("1","2","3")), Some(listOf(1,2,3)))
+        assertEquals(parseInts(listOf("1","foo","3")), None)
     }
 
 }

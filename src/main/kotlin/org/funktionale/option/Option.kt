@@ -16,6 +16,7 @@
 
 package org.funktionale.option
 
+import org.funktionale.collections.prependTo
 import org.funktionale.either.Either
 import org.funktionale.either.Left
 import org.funktionale.either.Right
@@ -47,11 +48,11 @@ public abstract class Option<out T> {
     }
 
     public fun<R> map(f: (T) -> R): Option<R> {
-        return if (isEmpty()) {
-            None
-        } else {
-            Some(f(get()))
-        }
+        return flatMap { Some(f(it)) }
+    }
+
+    public fun<P1, R> map(p1: Option<P1>, f: (T, P1) -> R): Option<R> {
+        return flatMap { t -> p1.map { pp1 -> f(t, pp1) } }
     }
 
     public fun<R> fold(ifEmpty: () -> R, f: (T) -> R): R {
@@ -142,6 +143,14 @@ public fun<T> T?.toOption(): Option<T> {
     return if (this != null) {
         Some(this)
     } else {
+        None
+    }
+}
+
+public fun<T> option(body: () -> T): Option<T> {
+    return try {
+        Some(body())
+    } catch(e: Exception) {
         None
     }
 }
@@ -265,4 +274,24 @@ public inline fun <T> Sequence<T>.firstOption(predicate: (T) -> Boolean): Option
 
 public inline fun String.firstOption(predicate: (Char) -> Boolean): Option<Char> {
     return firstOrNull(predicate).toOption()
+}
+
+public fun<T, R> List<T>.traverse(f: (T) -> Option<R>): Option<List<R>> {
+    return foldRight(Some(emptyList())) { i: T, accumulator: Option<List<R>> ->
+        f(i).map(accumulator) { head: R, tail: List<R> ->
+            head prependTo tail
+        }
+    }
+}
+
+public fun<T> List<Option<T>>.sequential(): Option<List<T>>{
+    return traverse { it }
+}
+
+public fun<T> List<Option<T>>.flatten(): List<T> {
+    return filter { it.isDefined() }.map { it.get() }
+}
+
+public fun<P1, R> Function1<P1, R>.optionLift(): (Option<P1>) -> Option<R> {
+    return { it.map(this) }
 }
