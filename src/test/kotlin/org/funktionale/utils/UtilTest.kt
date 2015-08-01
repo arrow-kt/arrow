@@ -16,8 +16,10 @@
 
 package org.funktionale.utils
 
+import org.funktionale.collections.prependTo
+import org.funktionale.collections.tail
+import org.testng.Assert.assertEquals
 import org.testng.annotations.Test
-import org.testng.Assert.*
 
 public class UtilTest {
 
@@ -48,15 +50,15 @@ public class UtilTest {
     }
 
     val Greeter.receive: SetterOperation<String, String>
-        get(){
-            return SetterOperationImpl{ k, v ->
+        get() {
+            return SetterOperationImpl { k, v ->
                 this.receiveHello(k, v)
             }
         }
 
     val Greeter.sayHello: GetterOperation<String, String>
-        get(){
-            return GetterOperationImpl{ k ->
+        get() {
+            return GetterOperationImpl { k ->
                 this.sayHelloTo(k)
             }
         }
@@ -73,10 +75,7 @@ public class UtilTest {
 }
 
 
-
-
-
-class Greeter{
+class Greeter {
 
     var hello: String? = null
     var name: String? = null

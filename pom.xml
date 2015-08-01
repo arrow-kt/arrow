@@ -22,7 +22,7 @@
 
     <groupId>org.funktionale</groupId>
     <artifactId>funktionale</artifactId>
-    <version>0.5.1.1_M12</version>
+    <version>0.6_M12</version>
     <packaging>jar</packaging>
     <name>funKTionale</name>
     <description>Functional constructs and utilities for Kotlin</description>
