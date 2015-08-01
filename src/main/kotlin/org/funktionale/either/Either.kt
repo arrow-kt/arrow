@@ -16,6 +16,8 @@
 
 package org.funktionale.either
 
+import org.funktionale.collections.prependTo
+
 /**
  * Created by IntelliJ IDEA.
  * @author Mario Arias
@@ -67,11 +69,33 @@ public fun<L, R> Pair<L, R>.toRight(): Right<L, R> {
     return Right(this.component2())
 }
 
+@deprecated("Use eitherTry", ReplaceWith("eitherTry(body)"))
 public fun<T> either(body: () -> T): Either<Exception, T> {
+    return eitherTry(body)
+}
+
+public fun<T> eitherTry(body: () -> T): Either<Exception, T> {
     return try {
         Right(body())
     } catch(e: Exception) {
         Left(e)
     }
+}
+
+public fun<T, L, R> List<T>.traverse(f:(T) -> Either<L, R>) : Either<L, List<R>>{
+    return foldRight(Right(emptyList())) { i: T, accumulator:Either<L,List<R>> ->
+        val either = f(i)
+        when(either){
+            is Right -> either.right().map(accumulator) { head: R, tail: List<R> ->
+                head prependTo tail
+            }
+            is Left -> Left(either.l)
+            else -> throw UnsupportedOperationException()
+        }
+    }
+}
+
+public fun<L,R> List<Either<L,R>>.sequential(): Either<L,List<R>>{
+    return traverse { it }
 }
 

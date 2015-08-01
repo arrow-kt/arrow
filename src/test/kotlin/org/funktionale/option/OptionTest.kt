@@ -138,13 +138,13 @@ public class OptionTest {
     }
 
     @Test fun optionBody() {
-        assertEquals(option { "1".toInt() }, Some(1))
-        assertEquals(option { "foo".toInt() }, None)
+        assertEquals(optionTry { "1".toInt() }, Some(1))
+        assertEquals(optionTry { "foo".toInt() }, None)
     }
 
     @Test fun sequential() {
         fun parseInts(ints:List<String>): Option<Collection<Int>>{
-            return ints.map { option { it.toInt() } }.sequential()
+            return ints.map { optionTry { it.toInt() } }.sequential()
         }
 
         assertEquals(parseInts(listOf("1","2","3")), Some(listOf(1,2,3)))

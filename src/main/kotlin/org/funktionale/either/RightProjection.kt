@@ -34,7 +34,7 @@ public class RightProjection<out L, out R>(val e: Either<L, R>) {
         }
     }
 
-    public fun<X> forEach(f: (R) -> X): Any {
+    public fun forEach(f: (R) -> Unit) {
         return when (e) {
             is Right<L, R> -> f(e.r)
             else -> {
@@ -51,11 +51,7 @@ public class RightProjection<out L, out R>(val e: Either<L, R>) {
     }
 
     public fun<X> map(f: (R) -> X): Either<L, X> {
-        return when (e) {
-            is Left<L, R> -> Left(e.l)
-            is Right<L, R> -> Right(f(e.r))
-            else -> throw UnsupportedOperationException()
-        }
+        return flatMap { Right(f(it)) }
     }
 
     public fun filter(predicate: (R) -> Boolean): Option<Either<L, R>> {
@@ -100,4 +96,10 @@ public fun<X, L, R> RightProjection<L, R>.flatMap(f: (R) -> Either<L, X>): Eithe
         is Right<L, R> -> f(e.r)
         else -> throw UnsupportedOperationException()
     }
+}
+
+
+
+public fun<L, R, X, Y> RightProjection<L, R>.map(x: Either<L, X>, f: (R, X) -> Y): Either<L, Y> {
+    return flatMap { r -> x.right().map { xx -> f(r,xx) } }
 }

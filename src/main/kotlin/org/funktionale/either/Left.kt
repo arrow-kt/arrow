@@ -28,4 +28,20 @@ public class Left<out L, out R>(val l: L) : Either<L, R>() {
     public override fun component2(): R? = null
     public override fun isLeft(): Boolean = true
     public override fun isRight(): Boolean = false
+
+    override fun equals(other: Any?): Boolean {
+        return when (other) {
+            is Left<*, *> -> l.equals(other.l)
+            else -> false
+
+        }
+    }
+
+    override fun hashCode(): Int {
+        return 43 * l.hashCode()
+    }
+
+    override fun toString(): String {
+        return "Left($l)"
+    }
 }

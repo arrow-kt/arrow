@@ -16,8 +16,10 @@
 
 package org.funktionale.either
 
+import org.funktionale.option.None
+import org.funktionale.option.Option
+import org.funktionale.option.Some
 import java.util.NoSuchElementException
-import org.funktionale.option.*
 
 /**
  * Created by IntelliJ IDEA.
@@ -34,7 +36,7 @@ public class LeftProjection<out L, out R>(val e: Either<L, R>) {
         }
     }
 
-    public fun<X> forEach(f: (L) -> X): Any {
+    public fun forEach(f: (L) -> Unit) {
         return when (e) {
             is Left<L, R> -> f(e.l)
             else -> {
@@ -52,11 +54,7 @@ public class LeftProjection<out L, out R>(val e: Either<L, R>) {
 
 
     public fun<X> map(f: (L) -> X): Either<X, R> {
-        return when (e) {
-            is Left<L, R> -> Left(f(e.l))
-            is Right<L, R> -> Right(e.r)
-            else -> throw UnsupportedOperationException()
-        }
+        return flatMap { Left(f(it)) }
     }
 
     public fun filter(predicate: (L) -> Boolean): Option<Either<L, R>> {
@@ -94,6 +92,10 @@ public fun<L, R, X> LeftProjection<L, R>.flatMap(f: (L) -> Either<X, R>): Either
         is Right<L, R> -> Right(e.r)
         else -> throw UnsupportedOperationException()
     }
+}
+
+public fun<L, R, X, Y> LeftProjection<L, R>.map(x: Either<X, R>, f: (L, X) -> Y): Either<Y, R> {
+    return flatMap { l -> x.left().map { xx -> f(l,xx) } }
 }
 
 public fun<R, L> LeftProjection<L, R>.getOrElse(default: () -> L): L {

@@ -147,7 +147,7 @@ public fun<T> T?.toOption(): Option<T> {
     }
 }
 
-public fun<T> option(body: () -> T): Option<T> {
+public fun<T> optionTry(body: () -> T): Option<T> {
     return try {
         Some(body())
     } catch(e: Exception) {

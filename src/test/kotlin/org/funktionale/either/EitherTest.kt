@@ -16,9 +16,10 @@
 
 package org.funktionale.either
 
-import org.testng.annotations.Test
+import org.funktionale.option.None
+import org.testng.Assert
 import org.testng.Assert.*
-import org.funktionale.option.*
+import org.testng.annotations.Test
 
 /**
  * Created by IntelliJ IDEA.
@@ -55,8 +56,13 @@ public class EitherTest {
     }
 
     @Test fun forEach() {
-        assertEquals(left.left().forEach { it * 2 }, 10)
-        assertEquals(right.right().forEach { it.length() }, 6)
+        left.left().forEach {
+            assertEquals(it * 2, 10)
+        }
+
+        right.right().forEach {
+            assertEquals(it.length(), 6)
+        }
     }
 
     @Test fun getOrElse() {
@@ -121,10 +127,18 @@ public class EitherTest {
     }
 
     @Test fun either(){
-        val e = either {
+        val e: Either<Exception, Nothing> = eitherTry {
             throw RuntimeException()
         }
         assertTrue(e.isLeft())
+    }
 
+    @Test fun sequential() {
+        fun parseInts(ints:List<String>): Either<Exception,List<Int>> {
+            return ints.map { eitherTry { it.toInt() } }.sequential()
+        }
+
+        assertEquals(parseInts(listOf("1","2","3")), Right<Exception,List<Int>>(listOf(1,2,3)))
+        assertTrue(parseInts(listOf("1","foo","3")) is Left)
     }
 }
