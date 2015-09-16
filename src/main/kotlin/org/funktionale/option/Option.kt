@@ -18,10 +18,12 @@ package org.funktionale.option
 
 import org.funktionale.collections.prependTo
 import org.funktionale.either.Either
-import org.funktionale.either.Left
-import org.funktionale.either.Right
+import org.funktionale.either.Either.Left
+import org.funktionale.either.Either.Right
 import org.funktionale.utils.GetterOperation
 import org.funktionale.utils.GetterOperationImpl
+import org.funktionale.option.Option.*
+import java.util.*
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,8 +31,8 @@ import org.funktionale.utils.GetterOperationImpl
  * Date: 17/05/13
  * Time: 12:53
  */
-@suppress("BASE_WITH_NULLABLE_UPPER_BOUND")
-public abstract class Option<out T> {
+@Suppress("BASE_WITH_NULLABLE_UPPER_BOUND")
+public sealed class Option<out T> {
     public abstract fun isEmpty(): Boolean
 
     public fun nonEmpty(): Boolean = isDefined()
@@ -120,6 +122,28 @@ public abstract class Option<out T> {
         }
     }
 
+    public data object None : Option<Nothing>() {
+        public override fun get() = throw NoSuchElementException("None.get")
+
+        public override fun isEmpty() = true
+
+        override fun equals(other: Any?): Boolean {
+            return when (other) {
+                is None -> true
+                else -> false
+            }
+        }
+
+        override fun hashCode(): Int {
+            return Integer.MAX_VALUE
+        }
+    }
+
+    public data class Some<out T>(val t: T) : Option<T>() {
+        public override fun get() = t
+
+        public override fun isEmpty() = false
+    }
 }
 
 public fun<T> Option<T>.getOrElse(default: () -> T): T {
@@ -138,7 +162,7 @@ public fun<T> Option<T>.orElse(alternative: () -> Option<T>): Option<T> {
     }
 }
 
-@suppress("BASE_WITH_NULLABLE_UPPER_BOUND")
+@Suppress("BASE_WITH_NULLABLE_UPPER_BOUND")
 public fun<T> T?.toOption(): Option<T> {
     return if (this != null) {
         Some(this)
@@ -208,11 +232,6 @@ public fun<T> List<T>.firstOption(): Option<T> {
     return firstOrNull().toOption()
 }
 
-@deprecated("Migrate to using Sequence<T> and respective functions", ReplaceWith("Sequence<T>.firstOrNull().toOption()"))
-public fun<T> Stream<T>.firstOption(): Option<T> {
-    return firstOrNull().toOption()
-}
-
 public fun<T> Sequence<T>.firstOption(): Option<T> {
     return firstOrNull().toOption()
 }
@@ -259,11 +278,6 @@ public inline fun ShortArray.firstOption(predicate: (Short) -> Boolean): Option<
 }
 
 public inline fun <T> Iterable<T>.firstOption(predicate: (T) -> Boolean): Option<T> {
-    return firstOrNull(predicate).toOption()
-}
-
-@deprecated("Migrate to using Sequence<T> and respective functions", ReplaceWith("Sequence<T>.firstOrNull(predicate).toOption()"))
-public inline fun <T> Stream<T>.firstOption(predicate: (T) -> Boolean): Option<T> {
     return firstOrNull(predicate).toOption()
 }
 

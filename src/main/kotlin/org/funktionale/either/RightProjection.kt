@@ -16,8 +16,11 @@
 
 package org.funktionale.either
 
-import java.util.NoSuchElementException
-import org.funktionale.option.*
+import org.funktionale.either.Either.Left
+import org.funktionale.either.Either.Right
+import org.funktionale.option.Option
+import org.funktionale.option.Option.*
+import java.util.*
 
 /**
  * Created by IntelliJ IDEA.
@@ -94,7 +97,6 @@ public fun<X, L, R> RightProjection<L, R>.flatMap(f: (R) -> Either<L, X>): Eithe
     return when (e) {
         is Left<L, R> -> Left(e.l)
         is Right<L, R> -> f(e.r)
-        else -> throw UnsupportedOperationException()
     }
 }
 

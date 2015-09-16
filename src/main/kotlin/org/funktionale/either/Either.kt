@@ -17,6 +17,8 @@
 package org.funktionale.either
 
 import org.funktionale.collections.prependTo
+import org.funktionale.either.Either.Left
+import org.funktionale.either.Either.Right
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,8 +26,8 @@ import org.funktionale.collections.prependTo
  * Date: 17/05/13
  * Time: 19:01
  */
-@suppress("BASE_WITH_NULLABLE_UPPER_BOUND")
-abstract public class Either<out L, out R> {
+@Suppress("BASE_WITH_NULLABLE_UPPER_BOUND")
+sealed public class Either<out L, out R> {
 
     public fun left(): LeftProjection<L, R> = LeftProjection(this)
     public fun right(): RightProjection<L, R> = RightProjection(this)
@@ -40,7 +42,6 @@ abstract public class Either<out L, out R> {
         return when (this) {
             is Left<L, R> -> fl(this.l)
             is Right<L, R> -> fr(this.r)
-            else -> throw UnsupportedOperationException()
         }
     }
 
@@ -48,7 +49,53 @@ abstract public class Either<out L, out R> {
         return when (this) {
             is Left<L, R> -> Right(this.l)
             is Right<L, R> -> Left(this.r)
-            else -> throw UnsupportedOperationException()
+        }
+    }
+
+    @Suppress("BASE_WITH_NULLABLE_UPPER_BOUND")
+    public class Left<out L, out R>(val l: L) : Either<L, R>() {
+        public override fun component1(): L? = l
+        public override fun component2(): R? = null
+        public override fun isLeft(): Boolean = true
+        public override fun isRight(): Boolean = false
+
+        override fun equals(other: Any?): Boolean {
+            return when (other) {
+                is Left<*, *> -> l!!.equals(other.l)
+                else -> false
+
+            }
+        }
+
+        override fun hashCode(): Int {
+            return 43 * l!!.hashCode()
+        }
+
+        override fun toString(): String {
+            return "Left($l)"
+        }
+    }
+
+    @Suppress("BASE_WITH_NULLABLE_UPPER_BOUND")
+    public class Right<out L, out R>(val r: R) : Either<L, R>() {
+        public override fun component1(): L? = null
+        public override fun component2(): R? = r
+        public override fun isLeft(): Boolean = false
+        public override fun isRight(): Boolean = true
+
+        override fun equals(other: Any?): Boolean {
+            return when (other) {
+                is Right<*, *> -> r!!.equals(other.r)
+                else -> false
+            }
+        }
+
+        override fun hashCode(): Int {
+            return 43 * r!!.hashCode()
+        }
+
+        override fun toString(): String {
+            return "Right($r)"
         }
     }
 }
@@ -69,7 +116,7 @@ public fun<L, R> Pair<L, R>.toRight(): Right<L, R> {
     return Right(this.component2())
 }
 
-@deprecated("Use eitherTry", ReplaceWith("eitherTry(body)"))
+@Deprecated("Use eitherTry", ReplaceWith("eitherTry(body)"))
 public fun<T> either(body: () -> T): Either<Exception, T> {
     return eitherTry(body)
 }

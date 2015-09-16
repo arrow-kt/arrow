@@ -16,8 +16,9 @@
 
 package org.funktionale.either
 
-import org.funktionale.option.None
-import org.testng.Assert
+import org.funktionale.either.Either.Left
+import org.funktionale.either.Either.Right
+import org.funktionale.option.Option.None
 import org.testng.Assert.*
 import org.testng.annotations.Test
 

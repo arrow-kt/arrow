@@ -18,6 +18,7 @@ package org.funktionale.option
 
 import org.testng.Assert.*
 import org.testng.annotations.Test
+import org.funktionale.option.Option.*
 
 /**
  * Created by IntelliJ IDEA.
@@ -64,6 +65,9 @@ public class OptionTest {
     @Test fun map() {
         assertEquals(getSome().map { it.toUpperCase() }.get(), "KOTLIN")
         assertEquals(getNone().map { it.toUpperCase() }, None)
+
+        assertEquals(getSome().map(Some(12)) { name, version -> "${name.toUpperCase()} M$version" }.get(), "KOTLIN M12")
+        assertEquals(getNone().map(Some(12)) { name, version -> "${name.toUpperCase()} M$version" }, None)
     }
 
     @Test fun fold() {
@@ -143,12 +147,12 @@ public class OptionTest {
     }
 
     @Test fun sequential() {
-        fun parseInts(ints:List<String>): Option<Collection<Int>>{
+        fun parseInts(ints: List<String>): Option<List<Int>> {
             return ints.map { optionTry { it.toInt() } }.sequential()
         }
 
-        assertEquals(parseInts(listOf("1","2","3")), Some(listOf(1,2,3)))
-        assertEquals(parseInts(listOf("1","foo","3")), None)
+        assertEquals(parseInts(listOf("1", "2", "3")), Some(listOf(1, 2, 3)))
+        assertEquals(parseInts(listOf("1", "foo", "3")), None)
     }
 
 }
