@@ -22,7 +22,7 @@
 
     <groupId>org.funktionale</groupId>
     <artifactId>funktionale</artifactId>
-    <version>0.6_M13</version>
+    <version>0.6_M14</version>
     <packaging>jar</packaging>
     <name>funKTionale</name>
     <description>Functional constructs and utilities for Kotlin</description>
@@ -48,7 +48,7 @@
         </developer>
     </developers>
     <properties>
-        <kotlin.version>0.13.1513</kotlin.version>
+        <kotlin.version>0.14.449</kotlin.version>
     </properties>
     <dependencies>
         <dependency>

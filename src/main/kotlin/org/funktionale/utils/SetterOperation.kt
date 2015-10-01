@@ -25,7 +25,7 @@ package org.funktionale.utils
 interface SetterOperation<K, V> {
     val setter: (K, V) -> Unit
 
-    public fun set(key: K, value: V) {
+    operator public fun set(key: K, value: V) {
         setter(key, value)
     }
 }

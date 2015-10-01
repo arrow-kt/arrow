@@ -20,9 +20,10 @@ import org.funktionale.collections.prependTo
 import org.funktionale.either.Either
 import org.funktionale.either.Either.Left
 import org.funktionale.either.Either.Right
+import org.funktionale.option.Option.None
+import org.funktionale.option.Option.Some
 import org.funktionale.utils.GetterOperation
 import org.funktionale.utils.GetterOperationImpl
-import org.funktionale.option.Option.*
 import java.util.*
 
 /**
@@ -122,7 +123,7 @@ public sealed class Option<out T> {
         }
     }
 
-    public data object None : Option<Nothing>() {
+    public object None : Option<Nothing>() {
         public override fun get() = throw NoSuchElementException("None.get")
 
         public override fun isEmpty() = true
@@ -139,10 +140,27 @@ public sealed class Option<out T> {
         }
     }
 
-    public data class Some<out T>(val t: T) : Option<T>() {
+    public class Some<out T>(val t: T) : Option<T>() {
         public override fun get() = t
 
         public override fun isEmpty() = false
+
+        override fun equals(other: Any?): Boolean {
+            return when (other) {
+                is Some<*> -> t!!.equals(other.get())
+                is None -> false
+                else -> false
+            }
+
+        }
+
+        override fun hashCode(): Int {
+            return t!!.hashCode() + 17
+        }
+
+        override fun toString(): String {
+            return "Some<$t>"
+        }
     }
 }
 
@@ -298,7 +316,7 @@ public fun<T, R> List<T>.traverse(f: (T) -> Option<R>): Option<List<R>> {
     }
 }
 
-public fun<T> List<Option<T>>.sequential(): Option<List<T>>{
+public fun<T> List<Option<T>>.sequential(): Option<List<T>> {
     return traverse { it }
 }
 

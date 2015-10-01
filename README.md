@@ -7,6 +7,8 @@ Functional constructs and patterns for [Kotlin](http://kotlin-lang.org)
 
 Read the [Wiki](https://github.com/MarioAriasC/funKTionale/wiki)
 
+Functional Programming in Kotlin with funKTionale [presentation](https://speakerdeck.com/marioariasc/functional-programming-in-kotlin-with-funktionale)
+
 ## Maven
 
 You must configure your ```pom.xml``` file using JCenter repository
@@ -25,7 +27,7 @@ Then you can use funKTionale dependency
 <dependency>
     <groupId>org.funktionale</groupId>
     <artifactId>funktionale</artifactId>
-    <version>0.6_M13</version>
+    <version>0.6_M14</version>
 </dependency>
 ```
 

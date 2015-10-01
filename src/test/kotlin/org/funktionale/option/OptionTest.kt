@@ -16,9 +16,10 @@
 
 package org.funktionale.option
 
+import org.funktionale.option.Option.None
+import org.funktionale.option.Option.Some
 import org.testng.Assert.*
 import org.testng.annotations.Test
-import org.funktionale.option.Option.*
 
 /**
  * Created by IntelliJ IDEA.
@@ -40,14 +41,14 @@ public class OptionTest {
             is Some<String> -> {
                 assertEquals(option.get(), "kotlin")
             }
-            else -> fail()//Same as None never happen
+            is None -> fail()
         }
 
         val otherOption = getNone()
 
         when (otherOption) {
             is Some<String> -> fail()
-            else -> assertEquals(otherOption, None)
+            is None -> assertEquals(otherOption, None)
         }
 
     }

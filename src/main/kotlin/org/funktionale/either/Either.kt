@@ -32,8 +32,8 @@ sealed public class Either<out L, out R> {
     public fun left(): LeftProjection<L, R> = LeftProjection(this)
     public fun right(): RightProjection<L, R> = RightProjection(this)
 
-    public abstract fun component1(): L?
-    public abstract fun component2(): R?
+    operator public abstract fun component1(): L?
+    operator public abstract fun component2(): R?
 
     public abstract fun isLeft(): Boolean
     public abstract fun isRight(): Boolean
