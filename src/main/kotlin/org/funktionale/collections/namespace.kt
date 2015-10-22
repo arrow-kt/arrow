@@ -24,11 +24,11 @@ package org.funktionale.collections
  */
 
 
-fun<T> List<T>.tail(): List<T> {
+fun <T> List<T>.tail(): List<T> {
     return this.drop(1)
 }
 
-fun <T> T.prependTo(list:List<T>):List<T>{
+infix fun <T> T.prependTo(list: List<T>): List<T> {
     return listOf(this) + list
 }
 

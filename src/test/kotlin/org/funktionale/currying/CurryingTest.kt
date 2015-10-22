@@ -43,7 +43,7 @@ public class CurryingTest {
         assertEquals(sum2ints(2, 4), 6)
 
         val sum3ints: (Int, Int, Int) -> Int = { x, y, z -> x + y }
-        val f: (Int) -> (Int) -> (Int) -> Int =sum3ints.curried()
-        val x: (Int, Int, Int) -> Int =f.uncurried()
+        val f: (Int) -> (Int) -> (Int) -> Int = sum3ints.curried()
+        val x: (Int, Int, Int) -> Int = f.uncurried()
     }
 }

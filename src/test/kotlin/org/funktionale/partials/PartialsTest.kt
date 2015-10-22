@@ -16,8 +16,8 @@
 
 package org.funktionale.partials
 
+import org.testng.Assert.assertEquals
 import org.testng.annotations.Test
-import org.testng.Assert.*
 
 /**
  * Created by IntelliJ IDEA.
@@ -37,7 +37,7 @@ public class PartialsTest {
 
         assertEquals(sum2intsTo17(1, 2), 20)
 
-        val prefixAndPostfix = { prefix: String, x: String, postfix: String -> "${prefix}${x}${postfix}" }
+        val prefixAndPostfix = { prefix: String, x: String, postfix: String -> "$prefix$x$postfix" }
 
         val helloX = prefixAndPostfix.partially1("Hello, ").partially2("!")
 
@@ -55,9 +55,9 @@ public class PartialsTest {
 
         assertEquals(sum2intsTo17(1, 2), 20)
 
-        val prefixAndPostfix = { prefix: String, x: String, postfix: String -> "${prefix}${x}${postfix}" }
+        val prefixAndPostfix = { prefix: String, x: String, postfix: String -> "$prefix$x$postfix" }
 
-        val helloX: (String) -> String = prefixAndPostfix(p1 = "Hello, ")(p2 ="!")
+        val helloX: (String) -> String = prefixAndPostfix(p1 = "Hello, ")(p2 = "!")
 
         assertEquals(helloX("funKTionale"), "Hello, funKTionale!")
     }

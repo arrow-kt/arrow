@@ -62,7 +62,7 @@ public class EitherTest {
         }
 
         right.right().forEach {
-            assertEquals(it.length(), 6)
+            assertEquals(it.length, 6)
         }
     }
 
@@ -77,13 +77,13 @@ public class EitherTest {
     }
 
     @Test fun flatMap() {
-        assertEquals(left.left().flatMap { Left(it.toString()) }.left().get(), "5")
-        assertEquals(right.right().flatMap { Right(it.length()) }.right().get(), 6)
+        assertEquals(left.left().flatMap { Left<String, Int>(it.toString()) }.left().get(), "5")
+        assertEquals(right.right().flatMap { Right<String, Int>(it.length) }.right().get(), 6)
     }
 
     @Test fun map() {
         assertEquals(left.left().map { it.toString() }.left().get(), "5")
-        assertEquals(right.right().map { it.length() }.right().get(), 6)
+        assertEquals(right.right().map { it.length }.right().get(), 6)
     }
 
     @Test fun filter() {
@@ -127,7 +127,7 @@ public class EitherTest {
         assertEquals(right.merge(), "kotlin")
     }
 
-    @Test fun either(){
+    @Test fun either() {
         val e: Either<Exception, Nothing> = eitherTry {
             throw RuntimeException()
         }
@@ -135,11 +135,11 @@ public class EitherTest {
     }
 
     @Test fun sequential() {
-        fun parseInts(ints:List<String>): Either<Exception,List<Int>> {
+        fun parseInts(ints: List<String>): Either<Exception, List<Int>> {
             return ints.map { eitherTry { it.toInt() } }.sequential()
         }
 
-        assertEquals(parseInts(listOf("1","2","3")), Right<Exception,List<Int>>(listOf(1,2,3)))
-        assertTrue(parseInts(listOf("1","foo","3")) is Left)
+        assertEquals(parseInts(listOf("1", "2", "3")), Right<Exception, List<Int>>(listOf(1, 2, 3)))
+        assertTrue(parseInts(listOf("1", "foo", "3")) is Left)
     }
 }

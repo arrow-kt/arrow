@@ -129,10 +129,10 @@ public fun<T> eitherTry(body: () -> T): Either<Exception, T> {
     }
 }
 
-public fun<T, L, R> List<T>.traverse(f:(T) -> Either<L, R>) : Either<L, List<R>>{
-    return foldRight(Right(emptyList())) { i: T, accumulator:Either<L,List<R>> ->
+public fun<T, L, R> List<T>.traverse(f: (T) -> Either<L, R>): Either<L, List<R>> {
+    return foldRight(Right(emptyList())) { i: T, accumulator: Either<L, List<R>> ->
         val either = f(i)
-        when(either){
+        when (either) {
             is Right -> either.right().map(accumulator) { head: R, tail: List<R> ->
                 head prependTo tail
             }
@@ -142,7 +142,7 @@ public fun<T, L, R> List<T>.traverse(f:(T) -> Either<L, R>) : Either<L, List<R>>
     }
 }
 
-public fun<L,R> List<Either<L,R>>.sequential(): Either<L,List<R>>{
+public fun<L, R> List<Either<L, R>>.sequential(): Either<L, List<R>> {
     return traverse { it }
 }
 

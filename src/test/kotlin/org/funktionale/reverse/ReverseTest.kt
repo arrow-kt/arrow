@@ -16,9 +16,9 @@
 
 package org.funktionale.reverse
 
+import org.funktionale.partials.invoke
+import org.testng.Assert.assertEquals
 import org.testng.annotations.Test
-import org.testng.Assert.*
-import org.funktionale.partials.*
 
 /**
  * Created by IntelliJ IDEA.

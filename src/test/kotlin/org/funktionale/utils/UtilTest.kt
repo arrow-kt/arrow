@@ -16,8 +16,6 @@
 
 package org.funktionale.utils
 
-import org.funktionale.collections.prependTo
-import org.funktionale.collections.tail
 import org.testng.Assert.assertEquals
 import org.testng.annotations.Test
 
@@ -35,9 +33,9 @@ public class UtilTest {
 
         assertEquals(applyTwoFunctions(2, add5, multiplyBy2), 14)
 
-        assertEquals(applyTwoFunctions(2, add5, identity), 7)
+        assertEquals(applyTwoFunctions(2, add5, identity()), 7)
 
-        assertEquals(applyTwoFunctions(2, identity, identity), 2)
+        assertEquals(applyTwoFunctions(2, identity(), identity()), 2)
     }
 
     @Test fun testConstant() {

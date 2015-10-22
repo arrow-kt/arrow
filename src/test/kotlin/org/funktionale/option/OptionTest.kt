@@ -72,8 +72,8 @@ public class OptionTest {
     }
 
     @Test fun fold() {
-        assertEquals(getSome().fold({ 0 }) { it.length() }, 6)
-        assertEquals(getNone().fold({ 0 }) { it.length() }, 0)
+        assertEquals(getSome().fold({ 0 }) { it.length }, 6)
+        assertEquals(getNone().fold({ 0 }) { it.length }, 0)
     }
 
     @Test fun flatMap() {

@@ -19,8 +19,8 @@ package org.funktionale.either
 import org.funktionale.either.Either.Left
 import org.funktionale.either.Either.Right
 import org.funktionale.option.Option
-import org.funktionale.option.Option.*
-
+import org.funktionale.option.Option.None
+import org.funktionale.option.Option.Some
 import java.util.*
 
 /**
@@ -56,7 +56,7 @@ public class LeftProjection<out L, out R>(val e: Either<L, R>) {
 
 
     public fun<X> map(f: (L) -> X): Either<X, R> {
-        return flatMap { Left(f(it)) }
+        return flatMap { Left<X, R>(f(it)) }
     }
 
     public fun filter(predicate: (L) -> Boolean): Option<Either<L, R>> {
@@ -96,7 +96,7 @@ public fun<L, R, X> LeftProjection<L, R>.flatMap(f: (L) -> Either<X, R>): Either
 }
 
 public fun<L, R, X, Y> LeftProjection<L, R>.map(x: Either<X, R>, f: (L, X) -> Y): Either<Y, R> {
-    return flatMap { l -> x.left().map { xx -> f(l,xx) } }
+    return flatMap { l -> x.left().map { xx -> f(l, xx) } }
 }
 
 public fun<R, L> LeftProjection<L, R>.getOrElse(default: () -> L): L {
