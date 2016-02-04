@@ -1276,6 +1276,7 @@ operator @Suppress("UNUSED_PARAMETER") fun <P1, P2, P3, P4, P5, P6, P7, P8, P9, 
 }
 
 
+@Deprecated(message = "Don't use it, doesn't make any sense", level = DeprecationLevel.ERROR)
 fun <P1, R> Function1<P1, R>.partially1(p1: P1): () -> R {
     return { -> this(p1) }
 }
