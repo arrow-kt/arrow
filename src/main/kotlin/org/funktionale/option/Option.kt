@@ -33,16 +33,16 @@ import java.util.*
  * Time: 12:53
  */
 @Suppress("BASE_WITH_NULLABLE_UPPER_BOUND")
-public sealed class Option<out T> {
-    public abstract fun isEmpty(): Boolean
+sealed class Option<out T> {
+    abstract fun isEmpty(): Boolean
 
-    public fun nonEmpty(): Boolean = isDefined()
+    fun nonEmpty(): Boolean = isDefined()
 
-    public fun isDefined(): Boolean = !isEmpty()
+    fun isDefined(): Boolean = !isEmpty()
 
-    public abstract fun get(): T
+    abstract fun get(): T
 
-    public fun orNull(): T? {
+    fun orNull(): T? {
         return if (isEmpty()) {
             null
         } else {
@@ -50,15 +50,15 @@ public sealed class Option<out T> {
         }
     }
 
-    public fun<R> map(f: (T) -> R): Option<R> {
+    fun<R> map(f: (T) -> R): Option<R> {
         return flatMap { Some(f(it)) }
     }
 
-    public fun<P1, R> map(p1: Option<P1>, f: (T, P1) -> R): Option<R> {
+    fun<P1, R> map(p1: Option<P1>, f: (T, P1) -> R): Option<R> {
         return flatMap { t -> p1.map { pp1 -> f(t, pp1) } }
     }
 
-    public fun<R> fold(ifEmpty: () -> R, f: (T) -> R): R {
+    fun<R> fold(ifEmpty: () -> R, f: (T) -> R): R {
         return if (isEmpty()) {
             ifEmpty()
         } else {
@@ -66,7 +66,7 @@ public sealed class Option<out T> {
         }
     }
 
-    public fun<R> flatMap(f: (T) -> Option<R>): Option<R> {
+    fun<R> flatMap(f: (T) -> Option<R>): Option<R> {
         return if (isEmpty()) {
             None
         } else {
@@ -74,7 +74,7 @@ public sealed class Option<out T> {
         }
     }
 
-    public fun filter(predicate: (T) -> Boolean): Option<T> {
+    fun filter(predicate: (T) -> Boolean): Option<T> {
         return if (nonEmpty() && predicate(get())) {
             this
         } else {
@@ -82,7 +82,7 @@ public sealed class Option<out T> {
         }
     }
 
-    public fun filterNot(predicate: (T) -> Boolean): Option<T> {
+    fun filterNot(predicate: (T) -> Boolean): Option<T> {
         return if (nonEmpty() && !predicate(get())) {
             this
         } else {
@@ -90,16 +90,16 @@ public sealed class Option<out T> {
         }
     }
 
-    public fun exists(predicate: (T) -> Boolean): Boolean {
+    fun exists(predicate: (T) -> Boolean): Boolean {
         return nonEmpty() && predicate(get())
     }
 
-    public fun forEach(f: (T) -> Unit) {
+    fun forEach(f: (T) -> Unit) {
         if (nonEmpty()) f(get())
     }
 
 
-    public fun toList(): List<T> {
+    fun toList(): List<T> {
         return if (isEmpty()) {
             listOf()
         } else {
@@ -107,7 +107,7 @@ public sealed class Option<out T> {
         }
     }
 
-    public fun<X> toRight(left: () -> X): Either<X, T> {
+    fun<X> toRight(left: () -> X): Either<X, T> {
         return if (isEmpty()) {
             Left(left())
         } else {
@@ -115,7 +115,7 @@ public sealed class Option<out T> {
         }
     }
 
-    public fun<X> toLeft(right: () -> X): Either<T, X> {
+    fun<X> toLeft(right: () -> X): Either<T, X> {
         return if (isEmpty()) {
             Right(right())
         } else {
@@ -123,10 +123,10 @@ public sealed class Option<out T> {
         }
     }
 
-    public object None : Option<Nothing>() {
-        public override fun get() = throw NoSuchElementException("None.get")
+    object None : Option<Nothing>() {
+        override fun get() = throw NoSuchElementException("None.get")
 
-        public override fun isEmpty() = true
+        override fun isEmpty() = true
 
         override fun equals(other: Any?): Boolean {
             return when (other) {
@@ -140,10 +140,10 @@ public sealed class Option<out T> {
         }
     }
 
-    public class Some<out T>(val t: T) : Option<T>() {
-        public override fun get() = t
+    class Some<out T>(val t: T) : Option<T>() {
+        override fun get() = t
 
-        public override fun isEmpty() = false
+        override fun isEmpty() = false
 
         override fun equals(other: Any?): Boolean {
             return when (other) {
@@ -164,7 +164,7 @@ public sealed class Option<out T> {
     }
 }
 
-public fun<T> Option<T>.getOrElse(default: () -> T): T {
+fun<T> Option<T>.getOrElse(default: () -> T): T {
     return if (isEmpty()) {
         default()
     } else {
@@ -172,7 +172,7 @@ public fun<T> Option<T>.getOrElse(default: () -> T): T {
     }
 }
 
-public fun<T> Option<T>.orElse(alternative: () -> Option<T>): Option<T> {
+fun<T> Option<T>.orElse(alternative: () -> Option<T>): Option<T> {
     return if (isEmpty()) {
         alternative()
     } else {
@@ -180,8 +180,7 @@ public fun<T> Option<T>.orElse(alternative: () -> Option<T>): Option<T> {
     }
 }
 
-@Suppress("BASE_WITH_NULLABLE_UPPER_BOUND")
-public fun<T> T?.toOption(): Option<T> {
+@Suppress("BASE_WITH_NULLABLE_UPPER_BOUND") fun<T> T?.toOption(): Option<T> {
     return if (this != null) {
         Some(this)
     } else {
@@ -189,7 +188,7 @@ public fun<T> T?.toOption(): Option<T> {
     }
 }
 
-public fun<T> optionTry(body: () -> T): Option<T> {
+fun<T> optionTry(body: () -> T): Option<T> {
     return try {
         Some(body())
     } catch(e: Exception) {
@@ -197,118 +196,118 @@ public fun<T> optionTry(body: () -> T): Option<T> {
     }
 }
 
-public val<K, V> Map<K, V>.option: GetterOperation<K, Option<V>>
+val<K, V> Map<K, V>.option: GetterOperation<K, Option<V>>
     get () {
         return GetterOperationImpl { k -> this[k].toOption() }
     }
 
 
-public fun<T> Array<out T>.firstOption(): Option<T> {
+fun<T> Array<out T>.firstOption(): Option<T> {
     return firstOrNull().toOption()
 }
 
-public fun BooleanArray.firstOption(): Option<Boolean> {
+fun BooleanArray.firstOption(): Option<Boolean> {
     return firstOrNull().toOption()
 }
 
-public fun ByteArray.firstOption(): Option<Byte> {
+fun ByteArray.firstOption(): Option<Byte> {
     return firstOrNull().toOption()
 }
 
-public fun CharArray.firstOption(): Option<Char> {
+fun CharArray.firstOption(): Option<Char> {
     return firstOrNull().toOption()
 }
 
-public fun DoubleArray.firstOption(): Option<Double> {
+fun DoubleArray.firstOption(): Option<Double> {
     return firstOrNull().toOption()
 }
 
-public fun FloatArray.firstOption(): Option<Float> {
-    return firstOrNull().toOption()
-}
-
-
-public fun IntArray.firstOption(): Option<Int> {
+fun FloatArray.firstOption(): Option<Float> {
     return firstOrNull().toOption()
 }
 
 
-public fun LongArray.firstOption(): Option<Long> {
+fun IntArray.firstOption(): Option<Int> {
     return firstOrNull().toOption()
 }
 
 
-public fun ShortArray.firstOption(): Option<Short> {
-    return firstOrNull().toOption()
-}
-
-public fun<T> Iterable<T>.firstOption(): Option<T> {
-    return firstOrNull().toOption()
-}
-
-public fun<T> List<T>.firstOption(): Option<T> {
-    return firstOrNull().toOption()
-}
-
-public fun<T> Sequence<T>.firstOption(): Option<T> {
+fun LongArray.firstOption(): Option<Long> {
     return firstOrNull().toOption()
 }
 
 
-public fun String.firstOption(): Option<Char> {
+fun ShortArray.firstOption(): Option<Short> {
     return firstOrNull().toOption()
 }
 
-public inline fun <T> Array<out T>.firstOption(predicate: (T) -> Boolean): Option<T> {
+fun<T> Iterable<T>.firstOption(): Option<T> {
+    return firstOrNull().toOption()
+}
+
+fun<T> List<T>.firstOption(): Option<T> {
+    return firstOrNull().toOption()
+}
+
+fun<T> Sequence<T>.firstOption(): Option<T> {
+    return firstOrNull().toOption()
+}
+
+
+fun String.firstOption(): Option<Char> {
+    return firstOrNull().toOption()
+}
+
+inline fun <T> Array<out T>.firstOption(predicate: (T) -> Boolean): Option<T> {
     return firstOrNull(predicate).toOption()
 }
 
-public inline fun BooleanArray.firstOption(predicate: (Boolean) -> Boolean): Option<Boolean> {
+inline fun BooleanArray.firstOption(predicate: (Boolean) -> Boolean): Option<Boolean> {
     return firstOrNull(predicate).toOption()
 }
 
-public inline fun ByteArray.firstOption(predicate: (Byte) -> Boolean): Option<Byte> {
+inline fun ByteArray.firstOption(predicate: (Byte) -> Boolean): Option<Byte> {
     return firstOrNull(predicate).toOption()
 }
 
-public inline fun CharArray.firstOption(predicate: (Char) -> Boolean): Option<Char> {
+inline fun CharArray.firstOption(predicate: (Char) -> Boolean): Option<Char> {
     return firstOrNull(predicate).toOption()
 }
 
-public inline fun DoubleArray.firstOption(predicate: (Double) -> Boolean): Option<Double> {
+inline fun DoubleArray.firstOption(predicate: (Double) -> Boolean): Option<Double> {
     return firstOrNull(predicate).toOption()
 }
 
-public inline fun FloatArray.firstOption(predicate: (Float) -> Boolean): Option<Float> {
+inline fun FloatArray.firstOption(predicate: (Float) -> Boolean): Option<Float> {
     return firstOrNull(predicate).toOption()
 }
 
-public inline fun IntArray.firstOption(predicate: (Int) -> Boolean): Option<Int> {
+inline fun IntArray.firstOption(predicate: (Int) -> Boolean): Option<Int> {
     return firstOrNull(predicate).toOption()
 }
 
-public inline fun LongArray.firstOption(predicate: (Long) -> Boolean): Option<Long> {
+inline fun LongArray.firstOption(predicate: (Long) -> Boolean): Option<Long> {
     return firstOrNull(predicate).toOption()
 }
 
-public inline fun ShortArray.firstOption(predicate: (Short) -> Boolean): Option<Short> {
+inline fun ShortArray.firstOption(predicate: (Short) -> Boolean): Option<Short> {
     return firstOrNull(predicate).toOption()
 }
 
-public inline fun <T> Iterable<T>.firstOption(predicate: (T) -> Boolean): Option<T> {
+inline fun <T> Iterable<T>.firstOption(predicate: (T) -> Boolean): Option<T> {
     return firstOrNull(predicate).toOption()
 }
 
-public inline fun <T> Sequence<T>.firstOption(predicate: (T) -> Boolean): Option<T> {
+inline fun <T> Sequence<T>.firstOption(predicate: (T) -> Boolean): Option<T> {
     return firstOrNull(predicate).toOption()
 }
 
 
-public inline fun String.firstOption(predicate: (Char) -> Boolean): Option<Char> {
+inline fun String.firstOption(predicate: (Char) -> Boolean): Option<Char> {
     return firstOrNull(predicate).toOption()
 }
 
-public fun<T, R> List<T>.traverse(f: (T) -> Option<R>): Option<List<R>> {
+fun<T, R> List<T>.traverse(f: (T) -> Option<R>): Option<List<R>> {
     return foldRight(Some(emptyList())) { i: T, accumulator: Option<List<R>> ->
         f(i).map(accumulator) { head: R, tail: List<R> ->
             head prependTo tail
@@ -316,14 +315,14 @@ public fun<T, R> List<T>.traverse(f: (T) -> Option<R>): Option<List<R>> {
     }
 }
 
-public fun<T> List<Option<T>>.sequential(): Option<List<T>> {
+fun<T> List<Option<T>>.sequential(): Option<List<T>> {
     return traverse { it }
 }
 
-public fun<T> List<Option<T>>.flatten(): List<T> {
+fun<T> List<Option<T>>.flatten(): List<T> {
     return filter { it.isDefined() }.map { it.get() }
 }
 
-public fun<P1, R> Function1<P1, R>.optionLift(): (Option<P1>) -> Option<R> {
+fun<P1, R> Function1<P1, R>.optionLift(): (Option<P1>) -> Option<R> {
     return { it.map(this) }
 }

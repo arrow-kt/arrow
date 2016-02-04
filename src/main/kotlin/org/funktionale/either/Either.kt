@@ -27,37 +27,36 @@ import org.funktionale.either.Either.Right
  * Time: 19:01
  */
 @Suppress("BASE_WITH_NULLABLE_UPPER_BOUND")
-sealed public class Either<out L, out R> {
+sealed class Either<out L, out R> {
 
-    public fun left(): LeftProjection<L, R> = LeftProjection(this)
-    public fun right(): RightProjection<L, R> = RightProjection(this)
+    fun left(): LeftProjection<L, R> = LeftProjection(this)
+    fun right(): RightProjection<L, R> = RightProjection(this)
 
-    operator public abstract fun component1(): L?
-    operator public abstract fun component2(): R?
+    operator abstract fun component1(): L?
+    operator abstract fun component2(): R?
 
-    public abstract fun isLeft(): Boolean
-    public abstract fun isRight(): Boolean
+    abstract fun isLeft(): Boolean
+    abstract fun isRight(): Boolean
 
-    public fun<X> fold(fl: (L) -> X, fr: (R) -> X): X {
+    fun<X> fold(fl: (L) -> X, fr: (R) -> X): X {
         return when (this) {
             is Left<L, R> -> fl(this.l)
             is Right<L, R> -> fr(this.r)
         }
     }
 
-    public fun swap(): Either<R, L> {
+    fun swap(): Either<R, L> {
         return when (this) {
             is Left<L, R> -> Right(this.l)
             is Right<L, R> -> Left(this.r)
         }
     }
 
-    @Suppress("BASE_WITH_NULLABLE_UPPER_BOUND")
-    public class Left<out L, out R>(val l: L) : Either<L, R>() {
-        public override fun component1(): L? = l
-        public override fun component2(): R? = null
-        public override fun isLeft(): Boolean = true
-        public override fun isRight(): Boolean = false
+    @Suppress("BASE_WITH_NULLABLE_UPPER_BOUND") class Left<out L, out R>(val l: L) : Either<L, R>() {
+        override fun component1(): L? = l
+        override fun component2(): R? = null
+        override fun isLeft(): Boolean = true
+        override fun isRight(): Boolean = false
 
         override fun equals(other: Any?): Boolean {
             return when (other) {
@@ -76,12 +75,11 @@ sealed public class Either<out L, out R> {
         }
     }
 
-    @Suppress("BASE_WITH_NULLABLE_UPPER_BOUND")
-    public class Right<out L, out R>(val r: R) : Either<L, R>() {
-        public override fun component1(): L? = null
-        public override fun component2(): R? = r
-        public override fun isLeft(): Boolean = false
-        public override fun isRight(): Boolean = true
+    @Suppress("BASE_WITH_NULLABLE_UPPER_BOUND") class Right<out L, out R>(val r: R) : Either<L, R>() {
+        override fun component1(): L? = null
+        override fun component2(): R? = r
+        override fun isLeft(): Boolean = false
+        override fun isRight(): Boolean = true
 
         override fun equals(other: Any?): Boolean {
             return when (other) {
@@ -100,7 +98,7 @@ sealed public class Either<out L, out R> {
     }
 }
 
-public fun<T> Either<T, T>.merge(): T {
+fun<T> Either<T, T>.merge(): T {
     return when (this) {
         is Left<T, T> -> this.l
         is Right<T, T> -> this.r
@@ -108,20 +106,19 @@ public fun<T> Either<T, T>.merge(): T {
     }
 }
 
-public fun<L, R> Pair<L, R>.toLeft(): Left<L, R> {
+fun<L, R> Pair<L, R>.toLeft(): Left<L, R> {
     return Left(this.component1())
 }
 
-public fun<L, R> Pair<L, R>.toRight(): Right<L, R> {
+fun<L, R> Pair<L, R>.toRight(): Right<L, R> {
     return Right(this.component2())
 }
 
-@Deprecated("Use eitherTry", ReplaceWith("eitherTry(body)"))
-public fun<T> either(body: () -> T): Either<Exception, T> {
+@Deprecated("Use eitherTry", ReplaceWith("eitherTry(body)")) fun<T> either(body: () -> T): Either<Exception, T> {
     return eitherTry(body)
 }
 
-public fun<T> eitherTry(body: () -> T): Either<Exception, T> {
+fun<T> eitherTry(body: () -> T): Either<Exception, T> {
     return try {
         Right(body())
     } catch(e: Exception) {
@@ -129,7 +126,7 @@ public fun<T> eitherTry(body: () -> T): Either<Exception, T> {
     }
 }
 
-public fun<T, L, R> List<T>.traverse(f: (T) -> Either<L, R>): Either<L, List<R>> {
+fun<T, L, R> List<T>.traverse(f: (T) -> Either<L, R>): Either<L, List<R>> {
     return foldRight(Right(emptyList())) { i: T, accumulator: Either<L, List<R>> ->
         val either = f(i)
         when (either) {
@@ -142,7 +139,7 @@ public fun<T, L, R> List<T>.traverse(f: (T) -> Either<L, R>): Either<L, List<R>>
     }
 }
 
-public fun<L, R> List<Either<L, R>>.sequential(): Either<L, List<R>> {
+fun<L, R> List<Either<L, R>>.sequential(): Either<L, List<R>> {
     return traverse { it }
 }
 

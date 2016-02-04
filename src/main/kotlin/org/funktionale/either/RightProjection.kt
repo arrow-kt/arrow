@@ -29,16 +29,16 @@ import java.util.*
  * Date: 17/05/13
  * Time: 20:20
  */
-public class RightProjection<out L, out R>(val e: Either<L, R>) {
+class RightProjection<out L, out R>(val e: Either<L, R>) {
 
-    public fun get(): R {
+    fun get(): R {
         return when (e) {
             is Right<L, R> -> e.r
             else -> throw NoSuchElementException("Either.right.value on Left")
         }
     }
 
-    public fun forEach(f: (R) -> Unit) {
+    fun forEach(f: (R) -> Unit) {
         return when (e) {
             is Right<L, R> -> f(e.r)
             else -> {
@@ -47,18 +47,18 @@ public class RightProjection<out L, out R>(val e: Either<L, R>) {
     }
 
 
-    public fun exists(predicate: (R) -> Boolean): Boolean {
+    fun exists(predicate: (R) -> Boolean): Boolean {
         return when (e) {
             is Right<L, R> -> predicate(e.r)
             else -> false
         }
     }
 
-    public fun<X> map(f: (R) -> X): Either<L, X> {
+    fun<X> map(f: (R) -> X): Either<L, X> {
         return flatMap { Right<L, X>(f(it)) }
     }
 
-    public fun filter(predicate: (R) -> Boolean): Option<Either<L, R>> {
+    fun filter(predicate: (R) -> Boolean): Option<Either<L, R>> {
         return when (e) {
             is Right<L, R> -> {
                 if (predicate(e.r)) {
@@ -71,14 +71,14 @@ public class RightProjection<out L, out R>(val e: Either<L, R>) {
         }
     }
 
-    public fun toList(): List<R> {
+    fun toList(): List<R> {
         return when (e) {
             is Right<L, R> -> listOf(e.r)
             else -> listOf()
         }
     }
 
-    public fun toOption(): Option<R> {
+    fun toOption(): Option<R> {
         return when (e) {
             is Right<L, R> -> Some(e.r)
             else -> None
@@ -87,14 +87,14 @@ public class RightProjection<out L, out R>(val e: Either<L, R>) {
 
 }
 
-public fun<L, R> RightProjection<L, R>.getOrElse(default: () -> R): R {
+fun<L, R> RightProjection<L, R>.getOrElse(default: () -> R): R {
     return when (e) {
         is Right<L, R> -> e.r
         else -> default()
     }
 }
 
-public fun<X, L, R> RightProjection<L, R>.flatMap(f: (R) -> Either<L, X>): Either<L, X> {
+fun<X, L, R> RightProjection<L, R>.flatMap(f: (R) -> Either<L, X>): Either<L, X> {
     return when (e) {
         is Left<L, R> -> Left(e.l)
         is Right<L, R> -> f(e.r)
@@ -102,6 +102,6 @@ public fun<X, L, R> RightProjection<L, R>.flatMap(f: (R) -> Either<L, X>): Eithe
 }
 
 
-public fun<L, R, X, Y> RightProjection<L, R>.map(x: Either<L, X>, f: (R, X) -> Y): Either<L, Y> {
+fun<L, R, X, Y> RightProjection<L, R>.map(x: Either<L, X>, f: (R, X) -> Y): Either<L, Y> {
     return flatMap { r -> x.right().map { xx -> f(r, xx) } }
 }

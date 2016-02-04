@@ -22,7 +22,7 @@
 
     <groupId>org.funktionale</groupId>
     <artifactId>funktionale</artifactId>
-    <version>0.6_1.0.0-beta-3594</version>
+    <version>0.6_1.0.0-rc</version>
     <packaging>jar</packaging>
     <name>funKTionale</name>
     <description>Functional constructs and utilities for Kotlin</description>
@@ -34,6 +34,26 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+    <repositories>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>bintray-kotlin-kotlin-eap</id>
+            <name>bintray</name>
+            <url>http://dl.bintray.com/kotlin/kotlin-eap</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>bintray-kotlin-kotlin-eap</id>
+            <name>bintray-plugins</name>
+            <url>http://dl.bintray.com/kotlin/kotlin-eap</url>
+        </pluginRepository>
+    </pluginRepositories>
     <scm>
         <url>https://github.com/MarioAriasC/funKTionale</url>
         <connection>git@github.com:MarioAriasC/funKTionale.git</connection>
@@ -48,7 +68,7 @@
         </developer>
     </developers>
     <properties>
-        <kotlin.version>1.0.0-beta-3594</kotlin.version>
+        <kotlin.version>1.0.0-rc-1036</kotlin.version>
     </properties>
     <dependencies>
         <dependency>
