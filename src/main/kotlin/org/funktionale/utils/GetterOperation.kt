@@ -24,7 +24,7 @@ package org.funktionale.utils
  */
 interface GetterOperation<K, V> {
     val getter: (K) -> V
-    operator public fun get(key: K): V {
+    operator fun get(key: K): V {
         return getter(key)
     }
 }
