@@ -51,15 +51,23 @@ sealed class Option<out T> {
         }
     }
 
-    fun<R> map(f: (T) -> R): Option<R> {
-        return flatMap { Some(f(it)) }
+    inline fun<R> map(f: (T) -> R): Option<R> {
+        return if(isEmpty()){
+            None
+        }else{
+            Some(f(get()))
+        }
     }
 
-    fun<P1, R> map(p1: Option<P1>, f: (T, P1) -> R): Option<R> {
-        return flatMap { t -> p1.map { pp1 -> f(t, pp1) } }
+    inline fun<P1, R> map(p1: Option<P1>, f: (T, P1) -> R): Option<R> {
+        return if (isEmpty()) {
+            None
+        } else {
+            p1.map { pp1 -> f(get(), pp1) }
+        }
     }
 
-    fun<R> fold(ifEmpty: () -> R, f: (T) -> R): R {
+    inline fun<R> fold(ifEmpty: () -> R, f: (T) -> R): R {
         return if (isEmpty()) {
             ifEmpty()
         } else {
@@ -67,7 +75,7 @@ sealed class Option<out T> {
         }
     }
 
-    fun<R> flatMap(f: (T) -> Option<R>): Option<R> {
+    inline fun<R> flatMap(f: (T) -> Option<R>): Option<R> {
         return if (isEmpty()) {
             None
         } else {
@@ -75,7 +83,7 @@ sealed class Option<out T> {
         }
     }
 
-    fun filter(predicate: (T) -> Boolean): Option<T> {
+    inline fun filter(predicate: (T) -> Boolean): Option<T> {
         return if (nonEmpty() && predicate(get())) {
             this
         } else {
@@ -83,7 +91,7 @@ sealed class Option<out T> {
         }
     }
 
-    fun filterNot(predicate: (T) -> Boolean): Option<T> {
+    inline fun filterNot(predicate: (T) -> Boolean): Option<T> {
         return if (nonEmpty() && !predicate(get())) {
             this
         } else {
@@ -91,11 +99,11 @@ sealed class Option<out T> {
         }
     }
 
-    fun exists(predicate: (T) -> Boolean): Boolean {
+    inline fun exists(predicate: (T) -> Boolean): Boolean {
         return nonEmpty() && predicate(get())
     }
 
-    fun forEach(f: (T) -> Unit) {
+    inline fun forEach(f: (T) -> Unit) {
         if (nonEmpty()) f(get())
     }
 
@@ -108,7 +116,7 @@ sealed class Option<out T> {
         }
     }
 
-    fun<X> toRight(left: () -> X): Either<X, T> {
+    inline fun<X> toRight(left: () -> X): Either<X, T> {
         return if (isEmpty()) {
             Left(left())
         } else {
@@ -116,7 +124,7 @@ sealed class Option<out T> {
         }
     }
 
-    fun<X> toLeft(right: () -> X): Either<T, X> {
+    inline fun<X> toLeft(right: () -> X): Either<T, X> {
         return if (isEmpty()) {
             Right(right())
         } else {
@@ -189,7 +197,7 @@ fun<T> Option<T>.orElse(alternative: () -> Option<T>): Option<T> {
     }
 }
 
-fun<T> optionTry(body: () -> T): Option<T> {
+inline fun<T> optionTry(body: () -> T): Option<T> {
     return try {
         Some(body())
     } catch(e: Exception) {
