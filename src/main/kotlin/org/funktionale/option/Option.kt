@@ -25,7 +25,6 @@ import org.funktionale.option.Option.Some
 import org.funktionale.utils.GetterOperation
 import org.funktionale.utils.GetterOperationImpl
 import java.util.*
-import kotlin.Sequence
 
 /**
  * Created by IntelliJ IDEA.
