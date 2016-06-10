@@ -51,9 +51,9 @@ sealed class Option<out T> {
     }
 
     inline fun<R> map(f: (T) -> R): Option<R> {
-        return if(isEmpty()){
+        return if (isEmpty()) {
             None
-        }else{
+        } else {
             Some(f(get()))
         }
     }
