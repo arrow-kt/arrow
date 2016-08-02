@@ -22,7 +22,7 @@ package org.funktionale.utils
  * Date: 15/05/13
  * Time: 13:06
  */
-interface SetterOperation<K, V> {
+interface SetterOperation<in K, in V> {
     val setter: (K, V) -> Unit
 
     operator fun set(key: K, value: V) {
@@ -30,4 +30,4 @@ interface SetterOperation<K, V> {
     }
 }
 
-class SetterOperationImpl<K, V>(override val setter: (K, V) -> Unit) : SetterOperation<K, V>
+class SetterOperationImpl<in K, in V>(override val setter: (K, V) -> Unit) : SetterOperation<K, V>

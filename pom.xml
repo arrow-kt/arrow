@@ -68,7 +68,7 @@
         </developer>
     </developers>
     <properties>
-        <kotlin.version>1.0.0</kotlin.version>
+        <kotlin.version>1.0.3</kotlin.version>
     </properties>
     <dependencies>
         <dependency>

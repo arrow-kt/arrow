@@ -28,7 +28,7 @@ import org.testng.annotations.Test
  * Date: 17/05/13
  * Time: 21:53
  */
-public class EitherTest {
+class EitherTest {
 
     val pair = 5 to "kotlin"
     val left = pair.toLeft()

@@ -22,6 +22,6 @@ package org.funktionale.utils
  * Date: 15/05/13
  * Time: 13:11
  */
-class GetterSetterOperation<K, V>(override val getter: (K) -> V, override val setter: (K, V) -> Unit) :
+class GetterSetterOperation<in K, V>(override val getter: (K) -> V, override val setter: (K, V) -> Unit) :
         GetterOperation<K, V>,
         SetterOperation<K, V>

@@ -22,12 +22,12 @@ package org.funktionale.utils
  * Date: 15/05/13
  * Time: 13:03
  */
-interface GetterOperation<K, V> {
+interface GetterOperation<in K, out V> {
     val getter: (K) -> V
     operator fun get(key: K): V {
         return getter(key)
     }
 }
 
-class GetterOperationImpl<K, V>(override val getter: (K) -> V) : GetterOperation<K, V>
+class GetterOperationImpl<in K, out V>(override val getter: (K) -> V) : GetterOperation<K, V>
 

@@ -26,7 +26,7 @@ import org.testng.annotations.Test
  * Date: 15/05/13
  * Time: 21:22
  */
-public class ReverseTest {
+class ReverseTest {
     @Test fun testReverse() {
         val f = { prefix: String, numericPostfix: Int, values: List<String> ->
             values.map { "$prefix$it$numericPostfix" }

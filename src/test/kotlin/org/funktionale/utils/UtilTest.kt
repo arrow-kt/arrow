@@ -19,7 +19,7 @@ package org.funktionale.utils
 import org.testng.Assert.assertEquals
 import org.testng.annotations.Test
 
-public class UtilTest {
+class UtilTest {
 
     private val add5 = { i: Int -> i + 5 }
     private val multiplyBy2 = { i: Int -> i * 2 }
@@ -78,16 +78,16 @@ class Greeter {
     var hello: String? = null
     var name: String? = null
 
-    public fun receiveHello(hello: String, name: String) {
+    fun receiveHello(hello: String, name: String) {
         this.hello = hello
         this.name = name
     }
 
-    public fun getReceivedHello(): String {
+    fun getReceivedHello(): String {
         return "$hello from $name"
     }
 
-    public fun sayHelloTo(name: String): String {
+    fun sayHelloTo(name: String): String {
         return "Hello $name"
     }
 

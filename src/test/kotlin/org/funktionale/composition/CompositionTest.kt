@@ -20,7 +20,7 @@ import org.testng.Assert.assertEquals
 import org.testng.annotations.Test
 
 
-public class CompositionTest {
+class CompositionTest {
 
 
     private val add5 = { i: Int -> i + 5 }

@@ -28,7 +28,7 @@ import org.testng.annotations.Test
  * Time: 13:39
  */
 
-public class OptionTest {
+class OptionTest {
 
     fun getSome(): Option<String> = "kotlin".toOption()
 

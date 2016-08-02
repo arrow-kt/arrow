@@ -20,7 +20,7 @@ import org.testng.Assert
 import org.testng.annotations.Test
 
 
-public class CollectionsTest {
+class CollectionsTest {
     @Test fun tail() {
         Assert.assertEquals(listOf(1, 2, 3).tail(), listOf(2, 3))
     }

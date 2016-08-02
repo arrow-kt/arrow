@@ -25,7 +25,7 @@ import org.testng.annotations.Test
  * Date: 29/03/13
  * Time: 21:35
  */
-public class PartialsTest {
+class PartialsTest {
     @Test fun partially() {
         val sum5ints = { a: Int, b: Int, c: Int, d: Int, e: Int -> a + b + c + d + e }
 

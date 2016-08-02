@@ -25,7 +25,7 @@ import org.testng.annotations.Test
  * Date: 29/03/13
  * Time: 22:26
  */
-public class CurryingTest {
+class CurryingTest {
     @Test fun testCurrying() {
         val sum2ints = { x: Int, y: Int -> x + y }
         val curried = sum2ints.curried()

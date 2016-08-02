@@ -180,99 +180,99 @@ fun <P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17,
     }
 }
 
-private interface MemoizedCall<F, R> {
+private interface MemoizedCall<in F, out R> {
     operator fun invoke(f: F): R
 }
 
-private data class MemoizeKey1<P1, R>(val p1: P1) : MemoizedCall<(P1) -> R, R> {
+private data class MemoizeKey1<out P1, R>(val p1: P1) : MemoizedCall<(P1) -> R, R> {
     override fun invoke(f: (P1) -> R) = f(p1)
 }
 
-private data class MemoizeKey2<P1, P2, R>(val p1: P1, val p2: P2) : MemoizedCall<(P1, P2) -> R, R> {
+private data class MemoizeKey2<out P1, out P2, R>(val p1: P1, val p2: P2) : MemoizedCall<(P1, P2) -> R, R> {
     override fun invoke(f: (P1, P2) -> R) = f(p1, p2)
 }
 
-private data class MemoizeKey3<P1, P2, P3, R>(val p1: P1, val p2: P2, val p3: P3) : MemoizedCall<(P1, P2, P3) -> R, R> {
+private data class MemoizeKey3<out P1, out P2, out P3, R>(val p1: P1, val p2: P2, val p3: P3) : MemoizedCall<(P1, P2, P3) -> R, R> {
     override fun invoke(f: (P1, P2, P3) -> R) = f(p1, p2, p3)
 }
 
-private data class MemoizeKey4<P1, P2, P3, P4, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4) : MemoizedCall<(P1, P2, P3, P4) -> R, R> {
+private data class MemoizeKey4<out P1, out P2, out P3, out P4, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4) : MemoizedCall<(P1, P2, P3, P4) -> R, R> {
     override fun invoke(f: (P1, P2, P3, P4) -> R) = f(p1, p2, p3, p4)
 }
 
-private data class MemoizeKey5<P1, P2, P3, P4, P5, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5) : MemoizedCall<(P1, P2, P3, P4, P5) -> R, R> {
+private data class MemoizeKey5<out P1, out P2, out P3, out P4, out P5, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5) : MemoizedCall<(P1, P2, P3, P4, P5) -> R, R> {
     override fun invoke(f: (P1, P2, P3, P4, P5) -> R) = f(p1, p2, p3, p4, p5)
 }
 
-private data class MemoizeKey6<P1, P2, P3, P4, P5, P6, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6) : MemoizedCall<(P1, P2, P3, P4, P5, P6) -> R, R> {
+private data class MemoizeKey6<out P1, out P2, out P3, out P4, out P5, out P6, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6) : MemoizedCall<(P1, P2, P3, P4, P5, P6) -> R, R> {
     override fun invoke(f: (P1, P2, P3, P4, P5, P6) -> R) = f(p1, p2, p3, p4, p5, p6)
 }
 
-private data class MemoizeKey7<P1, P2, P3, P4, P5, P6, P7, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7) -> R, R> {
+private data class MemoizeKey7<out P1, out P2, out P3, out P4, out P5, out P6, out P7, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7) -> R, R> {
     override fun invoke(f: (P1, P2, P3, P4, P5, P6, P7) -> R) = f(p1, p2, p3, p4, p5, p6, p7)
 }
 
-private data class MemoizeKey8<P1, P2, P3, P4, P5, P6, P7, P8, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8) -> R, R> {
+private data class MemoizeKey8<out P1, out P2, out P3, out P4, out P5, out P6, out P7, out P8, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8) -> R, R> {
     override fun invoke(f: (P1, P2, P3, P4, P5, P6, P7, P8) -> R) = f(p1, p2, p3, p4, p5, p6, p7, p8)
 }
 
-private data class MemoizeKey9<P1, P2, P3, P4, P5, P6, P7, P8, P9, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9) -> R, R> {
+private data class MemoizeKey9<out P1, out P2, out P3, out P4, out P5, out P6, out P7, out P8, out P9, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9) -> R, R> {
     override fun invoke(f: (P1, P2, P3, P4, P5, P6, P7, P8, P9) -> R) = f(p1, p2, p3, p4, p5, p6, p7, p8, p9)
 }
 
-private data class MemoizeKey10<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10) -> R, R> {
+private data class MemoizeKey10<out P1, out P2, out P3, out P4, out P5, out P6, out P7, out P8, out P9, out P10, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10) -> R, R> {
     override fun invoke(f: (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10) -> R) = f(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10)
 }
 
-private data class MemoizeKey11<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11) -> R, R> {
+private data class MemoizeKey11<out P1, out P2, out P3, out P4, out P5, out P6, out P7, out P8, out P9, out P10, out P11, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11) -> R, R> {
     override fun invoke(f: (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11) -> R) = f(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
 }
 
-private data class MemoizeKey12<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11, val p12: P12) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12) -> R, R> {
+private data class MemoizeKey12<out P1, out P2, out P3, out P4, out P5, out P6, out P7, out P8, out P9, out P10, out P11, out P12, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11, val p12: P12) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12) -> R, R> {
     override fun invoke(f: (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12) -> R) = f(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12)
 }
 
-private data class MemoizeKey13<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11, val p12: P12, val p13: P13) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13) -> R, R> {
+private data class MemoizeKey13<out P1, out P2, out P3, out P4, out P5, out P6, out P7, out P8, out P9, out P10, out P11, out P12, out P13, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11, val p12: P12, val p13: P13) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13) -> R, R> {
     override fun invoke(f: (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13) -> R) = f(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13)
 }
 
-private data class MemoizeKey14<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11, val p12: P12, val p13: P13, val p14: P14) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14) -> R, R> {
+private data class MemoizeKey14<out P1, out P2, out P3, out P4, out P5, out P6, out P7, out P8, out P9, out P10, out P11, out P12, out P13, out P14, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11, val p12: P12, val p13: P13, val p14: P14) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14) -> R, R> {
     override fun invoke(f: (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14) -> R) = f(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14)
 }
 
-private data class MemoizeKey15<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11, val p12: P12, val p13: P13, val p14: P14, val p15: P15) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15) -> R, R> {
+private data class MemoizeKey15<out P1, out P2, out P3, out P4, out P5, out P6, out P7, out P8, out P9, out P10, out P11, out P12, out P13, out P14, out P15, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11, val p12: P12, val p13: P13, val p14: P14, val p15: P15) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15) -> R, R> {
     override fun invoke(f: (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15) -> R) = f(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15)
 }
 
-private data class MemoizeKey16<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11, val p12: P12, val p13: P13, val p14: P14, val p15: P15, val p16: P16) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16) -> R, R> {
+private data class MemoizeKey16<out P1, out P2, out P3, out P4, out P5, out P6, out P7, out P8, out P9, out P10, out P11, out P12, out P13, out P14, out P15, out P16, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11, val p12: P12, val p13: P13, val p14: P14, val p15: P15, val p16: P16) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16) -> R, R> {
     override fun invoke(f: (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16) -> R) = f(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16)
 }
 
-private data class MemoizeKey17<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11, val p12: P12, val p13: P13, val p14: P14, val p15: P15, val p16: P16, val p17: P17) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17) -> R, R> {
+private data class MemoizeKey17<out P1, out P2, out P3, out P4, out P5, out P6, out P7, out P8, out P9, out P10, out P11, out P12, out P13, out P14, out P15, out P16, out P17, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11, val p12: P12, val p13: P13, val p14: P14, val p15: P15, val p16: P16, val p17: P17) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17) -> R, R> {
     override fun invoke(f: (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17) -> R) = f(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17)
 }
 
-private data class MemoizeKey18<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11, val p12: P12, val p13: P13, val p14: P14, val p15: P15, val p16: P16, val p17: P17, val p18: P18) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18) -> R, R> {
+private data class MemoizeKey18<out P1, out P2, out P3, out P4, out P5, out P6, out P7, out P8, out P9, out P10, out P11, out P12, out P13, out P14, out P15, out P16, out P17, out P18, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11, val p12: P12, val p13: P13, val p14: P14, val p15: P15, val p16: P16, val p17: P17, val p18: P18) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18) -> R, R> {
     override fun invoke(f: (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18) -> R) = f(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18)
 }
 
-private data class MemoizeKey19<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11, val p12: P12, val p13: P13, val p14: P14, val p15: P15, val p16: P16, val p17: P17, val p18: P18, val p19: P19) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19) -> R, R> {
+private data class MemoizeKey19<out P1, out P2, out P3, out P4, out P5, out P6, out P7, out P8, out P9, out P10, out P11, out P12, out P13, out P14, out P15, out P16, out P17, out P18, out P19, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11, val p12: P12, val p13: P13, val p14: P14, val p15: P15, val p16: P16, val p17: P17, val p18: P18, val p19: P19) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19) -> R, R> {
     override fun invoke(f: (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19) -> R) = f(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19)
 }
 
-private data class MemoizeKey20<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11, val p12: P12, val p13: P13, val p14: P14, val p15: P15, val p16: P16, val p17: P17, val p18: P18, val p19: P19, val p20: P20) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20) -> R, R> {
+private data class MemoizeKey20<out P1, out P2, out P3, out P4, out P5, out P6, out P7, out P8, out P9, out P10, out P11, out P12, out P13, out P14, out P15, out P16, out P17, out P18, out P19, out P20, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11, val p12: P12, val p13: P13, val p14: P14, val p15: P15, val p16: P16, val p17: P17, val p18: P18, val p19: P19, val p20: P20) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20) -> R, R> {
     override fun invoke(f: (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20) -> R) = f(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20)
 }
 
-private data class MemoizeKey21<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11, val p12: P12, val p13: P13, val p14: P14, val p15: P15, val p16: P16, val p17: P17, val p18: P18, val p19: P19, val p20: P20, val p21: P21) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21) -> R, R> {
+private data class MemoizeKey21<out P1, out P2, out P3, out P4, out P5, out P6, out P7, out P8, out P9, out P10, out P11, out P12, out P13, out P14, out P15, out P16, out P17, out P18, out P19, out P20, out P21, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11, val p12: P12, val p13: P13, val p14: P14, val p15: P15, val p16: P16, val p17: P17, val p18: P18, val p19: P19, val p20: P20, val p21: P21) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21) -> R, R> {
     override fun invoke(f: (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21) -> R) = f(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21)
 }
 
-private data class MemoizeKey22<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11, val p12: P12, val p13: P13, val p14: P14, val p15: P15, val p16: P16, val p17: P17, val p18: P18, val p19: P19, val p20: P20, val p21: P21, val p22: P22) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22) -> R, R> {
+private data class MemoizeKey22<out P1, out P2, out P3, out P4, out P5, out P6, out P7, out P8, out P9, out P10, out P11, out P12, out P13, out P14, out P15, out P16, out P17, out P18, out P19, out P20, out P21, out P22, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5, val p6: P6, val p7: P7, val p8: P8, val p9: P9, val p10: P10, val p11: P11, val p12: P12, val p13: P13, val p14: P14, val p15: P15, val p16: P16, val p17: P17, val p18: P18, val p19: P19, val p20: P20, val p21: P21, val p22: P22) : MemoizedCall<(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22) -> R, R> {
     override fun invoke(f: (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22) -> R) = f(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21, p22)
 }
 
-private class MemoizedHandler<F, K : MemoizedCall<F, R>, R>(val f: F) {
+private class MemoizedHandler<F, in K : MemoizedCall<F, R>, R>(val f: F) {
     private val m = ConcurrentHashMap<K, R>()
     operator fun invoke(k: K): R {
         return m[k].toOption().fold({
