@@ -27,7 +27,7 @@ import org.funktionale.either.Either.Right
  * Time: 19:01
  */
 @Suppress("BASE_WITH_NULLABLE_UPPER_BOUND")
-sealed class Either<out L, out R> {
+sealed class Either<out L, out R> : EitherLike {
 
     fun left(): LeftProjection<L, R> = LeftProjection(this)
     fun right(): RightProjection<L, R> = RightProjection(this)
@@ -35,111 +35,82 @@ sealed class Either<out L, out R> {
     operator abstract fun component1(): L?
     operator abstract fun component2(): R?
 
-    abstract fun isLeft(): Boolean
-    abstract fun isRight(): Boolean
-
-    fun<X> fold(fl: (L) -> X, fr: (R) -> X): X {
-        return when (this) {
-            is Left<L, R> -> fl(this.l)
-            is Right<L, R> -> fr(this.r)
-        }
+    fun toDisjunction(): Disjunction<L, R> = when (this) {
+        is Right -> Disjunction.Right(r)
+        is Left -> Disjunction.Left(l)
     }
 
-    fun swap(): Either<R, L> {
-        return when (this) {
-            is Left<L, R> -> Right(this.l)
-            is Right<L, R> -> Left(this.r)
-        }
+    fun <X> fold(fl: (L) -> X, fr: (R) -> X): X = when (this) {
+        is Left -> fl(l)
+        is Right -> fr(r)
     }
 
-    @Suppress("BASE_WITH_NULLABLE_UPPER_BOUND") class Left<out L, out R>(val l: L) : Either<L, R>() {
+    fun swap(): Either<R, L> = when (this) {
+        is Left -> Right(this.l)
+        is Right -> Left(this.r)
+    }
+
+    @Suppress("BASE_WITH_NULLABLE_UPPER_BOUND") class Left<out L, out R>(val l: L) : Either<L, R>(), LeftLike {
         override fun component1(): L? = l
         override fun component2(): R? = null
-        override fun isLeft(): Boolean = true
-        override fun isRight(): Boolean = false
 
-        override fun equals(other: Any?): Boolean {
-            return when (other) {
-                is Left<*, *> -> l!!.equals(other.l)
-                else -> false
+        override fun equals(other: Any?): Boolean = when (other) {
+            is Left<*, *> -> l!!.equals(other.l)
+            else -> false
 
-            }
         }
 
-        override fun hashCode(): Int {
-            return 43 * l!!.hashCode()
-        }
+        override fun hashCode(): Int = 43 * l!!.hashCode()
 
-        override fun toString(): String {
-            return "Left($l)"
-        }
+        override fun toString(): String = "Either.Left($l)"
     }
 
-    @Suppress("BASE_WITH_NULLABLE_UPPER_BOUND") class Right<out L, out R>(val r: R) : Either<L, R>() {
+    @Suppress("BASE_WITH_NULLABLE_UPPER_BOUND") class Right<out L, out R>(val r: R) : Either<L, R>(), RightLike {
         override fun component1(): L? = null
         override fun component2(): R? = r
-        override fun isLeft(): Boolean = false
-        override fun isRight(): Boolean = true
 
-        override fun equals(other: Any?): Boolean {
-            return when (other) {
-                is Right<*, *> -> r!!.equals(other.r)
-                else -> false
-            }
+        override fun equals(other: Any?): Boolean = when (other) {
+            is Right<*, *> -> r!!.equals(other.r)
+            else -> false
         }
 
-        override fun hashCode(): Int {
-            return 43 * r!!.hashCode()
-        }
+        override fun hashCode(): Int = 43 * r!!.hashCode()
 
-        override fun toString(): String {
-            return "Right($r)"
-        }
+        override fun toString(): String = "Either.Right($r)"
     }
 }
 
-fun<T> Either<T, T>.merge(): T {
-    return when (this) {
-        is Left<T, T> -> this.l
-        is Right<T, T> -> this.r
-        else -> throw UnsupportedOperationException()
-    }
+fun <T> Either<T, T>.merge(): T = when (this) {
+    is Left -> this.l
+    is Right -> this.r
 }
 
-fun<L, R> Pair<L, R>.toLeft(): Left<L, R> {
-    return Left(this.component1())
+fun <L, R> Pair<L, R>.toLeft(): Left<L, R> = Left(this.component1())
+
+fun <L, R> Pair<L, R>.toRight(): Right<L, R> = Right(this.component2())
+
+@Deprecated("Use eitherTry", ReplaceWith("eitherTry(body)")) fun <T> either(body: () -> T): Either<Exception, T> = eitherTry(body)
+
+fun <T> eitherTry(body: () -> T): Either<Exception, T> = try {
+    Right(body())
+} catch(e: Exception) {
+    Left(e)
 }
 
-fun<L, R> Pair<L, R>.toRight(): Right<L, R> {
-    return Right(this.component2())
-}
+@Deprecated("Use eitherTraverse", ReplaceWith("eitherTraverse(f)"))
+fun <T, L, R> List<T>.traverse(f: (T) -> Either<L, R>) = eitherTraverse(f)
 
-@Deprecated("Use eitherTry", ReplaceWith("eitherTry(body)")) fun<T> either(body: () -> T): Either<Exception, T> {
-    return eitherTry(body)
-}
-
-fun<T> eitherTry(body: () -> T): Either<Exception, T> {
-    return try {
-        Right(body())
-    } catch(e: Exception) {
-        Left(e)
-    }
-}
-
-fun<T, L, R> List<T>.traverse(f: (T) -> Either<L, R>): Either<L, List<R>> {
-    return foldRight(Right(emptyList())) { i: T, accumulator: Either<L, List<R>> ->
-        val either = f(i)
-        when (either) {
-            is Right -> either.right().map(accumulator) { head: R, tail: List<R> ->
-                head prependTo tail
-            }
-            is Left -> Left(either.l)
-            else -> throw UnsupportedOperationException()
+fun <T, L, R> List<T>.eitherTraverse(f: (T) -> Either<L, R>): Either<L, List<R>> = foldRight(Right(emptyList())) { i: T, accumulator: Either<L, List<R>> ->
+    val either = f(i)
+    when (either) {
+        is Right -> either.right().map(accumulator) { head: R, tail: List<R> ->
+            head prependTo tail
         }
+        is Left -> Left(either.l)
     }
 }
 
-fun<L, R> List<Either<L, R>>.sequential(): Either<L, List<R>> {
-    return traverse { it }
-}
+@Deprecated("Use eitherSequential", ReplaceWith("eitherSequential()"))
+fun <L, R> List<Either<L, R>>.sequential() = eitherSequential()
 
+fun <L, R> List<Either<L, R>>.eitherSequential(): Either<L, List<R>> = eitherTraverse { it }

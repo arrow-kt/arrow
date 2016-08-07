@@ -1,8 +1,7 @@
+
 import org.funktionale.either.Either
 import org.funktionale.validation.Validation
-import org.testng.Assert.assertEquals
-import org.testng.Assert.assertTrue
-import org.testng.Assert.assertFalse
+import org.testng.Assert.*
 import org.testng.annotations.Test
 
 class ValidationTest {

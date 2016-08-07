@@ -16,9 +16,9 @@
 
 package org.funktionale.either
 
-import org.funktionale.either.Either.Left
-import org.funktionale.either.Either.Right
-import org.funktionale.option.Option.None
+import org.funktionale.either.Disjunction.Left
+import org.funktionale.either.Disjunction.Right
+import org.funktionale.option.Option
 import org.testng.Assert.*
 import org.testng.annotations.Test
 
@@ -28,28 +28,28 @@ import org.testng.annotations.Test
  * Date: 17/05/13
  * Time: 21:53
  */
-class EitherTest {
+class DisjunctionTest {
 
-    val pair = 5 to "kotlin"
-    val left = pair.toLeft()
-    val right = pair.toRight()
+
+    val left = Left<Int, String>(5)
+    val right = Right<Int, String>("kotlin")
 
     @Test fun get() {
-        assertEquals(left.left().get(), 5)
-        assertEquals(right.right().get(), "kotlin")
+        assertEquals(left.swap().get(), 5)
+        assertEquals(right.get(), "kotlin")
     }
 
     //[Test(expectedExceptions = array(javaClass<NoSuchElementException>()))]
 
     @Test fun getWithException() {
         try {
-            assertEquals(right.left().get(), 5)
+            assertEquals(right.swap().get(), 5)
             fail()
         } catch(e: Exception) {
             //expected
         }
         try {
-            assertEquals(left.right().get(), "kotlin")
+            assertEquals(left.get(), "kotlin")
             fail()
         } catch(e: Exception) {
             //Expected
@@ -57,50 +57,50 @@ class EitherTest {
     }
 
     @Test fun forEach() {
-        left.left().forEach {
+        left.swap().forEach {
             assertEquals(it * 2, 10)
         }
 
-        right.right().forEach {
+        right.forEach {
             assertEquals(it.length, 6)
         }
     }
 
     @Test fun getOrElse() {
-        assertEquals(left.left().getOrElse { 2 }, 5)
-        assertEquals(left.right().getOrElse { "java" }, "java")
+        assertEquals(left.swap().getOrElse { 2 }, 5)
+        assertEquals(left.getOrElse { "java" }, "java")
     }
 
     @Test fun exists() {
-        assertTrue(left.left().exists { it == 5 })
-        assertFalse(left.right().exists { it.equals("kotlin") })
+        assertTrue(left.swap().exists { it == 5 })
+        assertFalse(left.exists { it.equals("kotlin") })
     }
 
     @Test fun flatMap() {
-        assertEquals(left.left().flatMap { Left<String, Int>(it.toString()) }.left().get(), "5")
-        assertEquals(right.right().flatMap { Right<String, Int>(it.length) }.right().get(), 6)
+        assertEquals(left.swap().flatMap { Left<String, Int>(it.toString()) }.swap().get(), "5")
+        assertEquals(right.flatMap { Right<String, Int>(it.length) }.get(), 6)
     }
 
     @Test fun map() {
-        assertEquals(left.left().map { it.toString() }.left().get(), "5")
-        assertEquals(right.right().map { it.length }.right().get(), 6)
+        assertEquals(left.swap().map { it.toString() }.get(), "5")
+        assertEquals(right.map { it.length }.get(), 6)
     }
 
     @Test fun filter() {
-        assertEquals(left.left().filter { it == 5 }.get().left().get(), 5)
-        assertEquals(left.left().filter { it == 6 }, None)
-        assertEquals(right.right().filter { it.startsWith('k') }.get().right().get(), "kotlin")
-        assertEquals(right.right().filter { it.startsWith('j') }, None)
+        assertEquals(left.swap().filter { it == 5 }.get().get(), 5)
+        assertEquals(left.swap().filter { it == 6 }, Option.None)
+        assertEquals(right.filter { it.startsWith('k') }.get().get(), "kotlin")
+        assertEquals(right.filter { it.startsWith('j') }, Option.None)
     }
 
     @Test fun toList() {
-        assertEquals(left.left().toList(), listOf(5))
-        assertEquals(left.right().toList(), listOf<Int>())
+        assertEquals(left.swap().toList(), listOf(5))
+        assertEquals(left.toList(), listOf<Int>())
     }
 
     @Test fun toOption() {
-        assertEquals(left.left().toOption().get(), 5)
-        assertEquals(left.right().toOption(), None)
+        assertEquals(left.swap().toOption().get(), 5)
+        assertEquals(left.toOption(), Option.None)
     }
 
     @Test fun fold() {
@@ -108,8 +108,8 @@ class EitherTest {
     }
 
     @Test fun swap() {
-        assertEquals(left.swap().right().get(), 5)
-        assertEquals(right.swap().left().get(), "kotlin")
+        assertEquals(left.swap().get(), 5)
+        assertEquals(right.swap().swap().get(), "kotlin")
     }
 
     @Test fun components() {
@@ -127,16 +127,16 @@ class EitherTest {
         assertEquals(right.merge(), "kotlin")
     }
 
-    @Test fun either() {
-        val e: Either<Exception, Nothing> = eitherTry {
+    @Test fun disjunctionTry() {
+        val e: Disjunction<Exception, Nothing> = disjunctionTry {
             throw RuntimeException()
         }
         assertTrue(e.isLeft())
     }
 
     @Test fun sequential() {
-        fun parseInts(ints: List<String>): Either<Exception, List<Int>> {
-            return ints.map { eitherTry { it.toInt() } }.eitherSequential()
+        fun parseInts(ints: List<String>): Disjunction<Exception, List<Int>> {
+            return ints.map { disjunctionTry { it.toInt() } }.disjunctionSequential()
         }
 
         assertEquals(parseInts(listOf("1", "2", "3")), Right<Exception, List<Int>>(listOf(1, 2, 3)))

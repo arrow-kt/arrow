@@ -120,13 +120,13 @@ class OptionTest {
     }
 
     @Test fun toRight() {
-        assertTrue(getSome().toRight { 0 }.isRight())
-        assertFalse(getNone().toRight { 0 }.isRight())
+        assertTrue(getSome().toEitherRight { 0 }.isRight())
+        assertFalse(getNone().toEitherRight { 0 }.isRight())
     }
 
     @Test fun toLeft() {
-        assertTrue(getSome().toLeft { 0 }.isLeft())
-        assertFalse(getNone().toLeft { 0 }.isLeft())
+        assertTrue(getSome().toEitherLeft { 0 }.isLeft())
+        assertFalse(getNone().toEitherLeft { 0 }.isLeft())
     }
 
     @Test fun getAsOption() {
@@ -149,7 +149,7 @@ class OptionTest {
 
     @Test fun sequential() {
         fun parseInts(ints: List<String>): Option<List<Int>> {
-            return ints.map { optionTry { it.toInt() } }.sequential()
+            return ints.map { optionTry { it.toInt() } }.optionSequential()
         }
 
         assertEquals(parseInts(listOf("1", "2", "3")), Some(listOf(1, 2, 3)))
