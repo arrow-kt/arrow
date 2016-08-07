@@ -3,6 +3,15 @@ funKTionale
 
 Functional constructs and patterns for [Kotlin](http://kotlin-lang.org)
 
+Features include:
+* Function composition
+* Currying
+* Partial Application
+* Option
+* Either/Disjunction
+* Memoization
+* And others
+
 ## Documentation
 
 Read the [Wiki](https://github.com/MarioAriasC/funKTionale/wiki)
