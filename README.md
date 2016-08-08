@@ -36,7 +36,7 @@ Then you can use funKTionale dependency
 <dependency>
     <groupId>org.funktionale</groupId>
     <artifactId>funktionale</artifactId>
-    <version>0.8</version>
+    <version>0.9</version>
 </dependency>
 ```
 
