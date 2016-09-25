@@ -26,8 +26,7 @@ import org.funktionale.either.Either.Right
  * Date: 17/05/13
  * Time: 19:01
  */
-@Suppress("BASE_WITH_NULLABLE_UPPER_BOUND")
-sealed class Either<out L, out R> : EitherLike {
+sealed class Either<out L : Any, out R : Any> : EitherLike {
 
     fun left(): LeftProjection<L, R> = LeftProjection(this)
     fun right(): RightProjection<L, R> = RightProjection(this)
@@ -40,7 +39,7 @@ sealed class Either<out L, out R> : EitherLike {
         is Left -> Disjunction.Left(l)
     }
 
-    fun <X> fold(fl: (L) -> X, fr: (R) -> X): X = when (this) {
+    fun <X : Any?> fold(fl: (L) -> X, fr: (R) -> X): X = when (this) {
         is Left -> fl(l)
         is Right -> fr(r)
     }
@@ -50,57 +49,58 @@ sealed class Either<out L, out R> : EitherLike {
         is Right -> Left(this.r)
     }
 
-    @Suppress("BASE_WITH_NULLABLE_UPPER_BOUND") class Left<out L, out R>(val l: L) : Either<L, R>(), LeftLike {
-        override fun component1(): L? = l
+    class Left<out L : Any, out R : Any>(val l: L) : Either<L, R>(), LeftLike {
+        override fun component1(): L = l
         override fun component2(): R? = null
 
         override fun equals(other: Any?): Boolean = when (other) {
-            is Left<*, *> -> l!!.equals(other.l)
+            is Left<*, *> -> l.equals(other.l)
             else -> false
 
         }
 
-        override fun hashCode(): Int = 43 * l!!.hashCode()
+        override fun hashCode(): Int = 43 * l.hashCode()
 
         override fun toString(): String = "Either.Left($l)"
     }
 
-    @Suppress("BASE_WITH_NULLABLE_UPPER_BOUND") class Right<out L, out R>(val r: R) : Either<L, R>(), RightLike {
+    class Right<out L : Any, out R : Any>(val r: R) : Either<L, R>(), RightLike {
         override fun component1(): L? = null
-        override fun component2(): R? = r
+        override fun component2(): R = r
 
         override fun equals(other: Any?): Boolean = when (other) {
-            is Right<*, *> -> r!!.equals(other.r)
+            is Right<*, *> -> r.equals(other.r)
             else -> false
         }
 
-        override fun hashCode(): Int = 43 * r!!.hashCode()
+        override fun hashCode(): Int = 43 * r.hashCode()
 
         override fun toString(): String = "Either.Right($r)"
     }
 }
 
-fun <T> Either<T, T>.merge(): T = when (this) {
+fun <T : Any> Either<T, T>.merge(): T = when (this) {
     is Left -> this.l
     is Right -> this.r
 }
 
-fun <L, R> Pair<L, R>.toLeft(): Left<L, R> = Left(this.component1())
+fun <L : Any, R : Any> Pair<L, R>.toLeft(): Left<L, R> = Left(this.component1())
 
-fun <L, R> Pair<L, R>.toRight(): Right<L, R> = Right(this.component2())
+fun <L : Any, R : Any> Pair<L, R>.toRight(): Right<L, R> = Right(this.component2())
 
-@Deprecated("Use eitherTry", ReplaceWith("eitherTry(body)")) fun <T> either(body: () -> T): Either<Exception, T> = eitherTry(body)
+@Deprecated("Use eitherTry", ReplaceWith("eitherTry(body)"))
+fun <T : Any> either(body: () -> T): Either<Exception, T> = eitherTry(body)
 
-fun <T> eitherTry(body: () -> T): Either<Exception, T> = try {
+fun <T : Any> eitherTry(body: () -> T): Either<Exception, T> = try {
     Right(body())
 } catch(e: Exception) {
     Left(e)
 }
 
 @Deprecated("Use eitherTraverse", ReplaceWith("eitherTraverse(f)"))
-fun <T, L, R> List<T>.traverse(f: (T) -> Either<L, R>) = eitherTraverse(f)
+fun <T : Any?, L : Any, R : Any> List<T>.traverse(f: (T) -> Either<L, R>) = eitherTraverse(f)
 
-fun <T, L, R> List<T>.eitherTraverse(f: (T) -> Either<L, R>): Either<L, List<R>> = foldRight(Right(emptyList())) { i: T, accumulator: Either<L, List<R>> ->
+fun <T : Any?, L : Any, R : Any> List<T>.eitherTraverse(f: (T) -> Either<L, R>): Either<L, List<R>> = foldRight(Right(emptyList())) { i: T, accumulator: Either<L, List<R>> ->
     val either = f(i)
     when (either) {
         is Right -> either.right().map(accumulator) { head: R, tail: List<R> ->
@@ -111,6 +111,6 @@ fun <T, L, R> List<T>.eitherTraverse(f: (T) -> Either<L, R>): Either<L, List<R>>
 }
 
 @Deprecated("Use eitherSequential", ReplaceWith("eitherSequential()"))
-fun <L, R> List<Either<L, R>>.sequential() = eitherSequential()
+fun <L : Any, R : Any> List<Either<L, R>>.sequential() = eitherSequential()
 
-fun <L, R> List<Either<L, R>>.eitherSequential(): Either<L, List<R>> = eitherTraverse { it }
+fun <L : Any, R : Any> List<Either<L, R>>.eitherSequential(): Either<L, List<R>> = eitherTraverse { it }
