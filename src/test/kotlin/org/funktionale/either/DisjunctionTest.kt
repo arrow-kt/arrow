@@ -73,7 +73,7 @@ class DisjunctionTest {
 
     @Test fun exists() {
         assertTrue(left.swap().exists { it == 5 })
-        assertFalse(left.exists { it.equals("kotlin") })
+        assertFalse(left.exists { it == "kotlin" })
     }
 
     @Test fun flatMap() {
@@ -82,7 +82,7 @@ class DisjunctionTest {
     }
 
     @Test fun map() {
-        assertEquals(left.swap().map { it.toString() }.get(), "5")
+        assertEquals(left.swap().map(Int::toString).get(), "5")
         assertEquals(right.map { it.length }.get(), 6)
     }
 
@@ -104,7 +104,7 @@ class DisjunctionTest {
     }
 
     @Test fun fold() {
-        assertEquals(left.fold({ it.toString() }, { it }), "5")
+        assertEquals(left.fold(Int::toString, { it }), "5")
     }
 
     @Test fun swap() {

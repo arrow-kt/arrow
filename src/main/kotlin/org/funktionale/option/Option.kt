@@ -138,7 +138,7 @@ sealed class Option<out T : Any> {
         override fun isEmpty() = false
 
         override fun equals(other: Any?): Boolean = when (other) {
-            is Some<*> -> t.equals(other.get())
+            is Some<*> -> t == other.get()
             is None -> false
             else -> false
         }
@@ -235,7 +235,7 @@ fun String.firstOption(): Option<Char> {
     return firstOrNull().toOption()
 }
 
-inline fun <T : Any> Array<out T?>.firstOption(predicate: (T) -> Boolean): Option<T> {
+fun <T : Any> Array<out T?>.firstOption(predicate: (T) -> Boolean): Option<T> {
     return firstOrNull(predicate.mapNullable()).toOption()
 }
 
@@ -271,11 +271,11 @@ inline fun ShortArray.firstOption(predicate: (Short) -> Boolean): Option<Short> 
     return firstOrNull(predicate).toOption()
 }
 
-inline fun <T : Any> Iterable<T?>.firstOption(predicate: (T) -> Boolean): Option<T> {
+fun <T : Any> Iterable<T?>.firstOption(predicate: (T) -> Boolean): Option<T> {
     return firstOrNull(predicate.mapNullable()).toOption()
 }
 
-inline fun <T : Any> Sequence<T?>.firstOption(predicate: (T) -> Boolean): Option<T> {
+fun <T : Any> Sequence<T?>.firstOption(predicate: (T) -> Boolean): Option<T> {
     return firstOrNull(predicate.mapNullable()).toOption()
 }
 
@@ -283,7 +283,7 @@ inline fun String.firstOption(predicate: (Char) -> Boolean): Option<Char> {
     return firstOrNull(predicate).toOption()
 }
 
-inline fun <T : Any> ((T) -> Boolean).mapNullable(): (T?) -> Boolean {
+fun <T : Any> ((T) -> Boolean).mapNullable(): (T?) -> Boolean {
     return { it?.let { this@mapNullable(it) } ?: false }
 }
 

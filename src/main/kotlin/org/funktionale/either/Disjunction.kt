@@ -91,7 +91,7 @@ sealed class Disjunction<out L : Any, out R : Any> : EitherLike {
         override fun component1(): L = value
         override fun component2(): R? = null
         override fun equals(other: Any?): Boolean = when (other) {
-            is Left<*, *> -> value.equals(other.value)
+            is Left<*, *> -> value == other.value
             else -> false
         }
 
@@ -107,7 +107,7 @@ sealed class Disjunction<out L : Any, out R : Any> : EitherLike {
         override fun component2(): R = value
 
         override fun equals(other: Any?): Boolean = when (other) {
-            is Right<*, *> -> value.equals(other.value)
+            is Right<*, *> -> value == other.value
             else -> false
         }
 

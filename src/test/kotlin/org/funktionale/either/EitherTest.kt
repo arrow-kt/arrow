@@ -73,7 +73,7 @@ class EitherTest {
 
     @Test fun exists() {
         assertTrue(left.left().exists { it == 5 })
-        assertFalse(left.right().exists { it.equals("kotlin") })
+        assertFalse(left.right().exists { it == "kotlin" })
     }
 
     @Test fun flatMap() {
@@ -82,7 +82,7 @@ class EitherTest {
     }
 
     @Test fun map() {
-        assertEquals(left.left().map { it.toString() }.left().get(), "5")
+        assertEquals(left.left().map(Int::toString).left().get(), "5")
         assertEquals(right.right().map { it.length }.right().get(), 6)
     }
 
@@ -104,7 +104,7 @@ class EitherTest {
     }
 
     @Test fun fold() {
-        assertEquals(left.fold({ it.toString() }, { it }), "5")
+        assertEquals(left.fold(Int::toString){ it }, "5")
     }
 
     @Test fun swap() {

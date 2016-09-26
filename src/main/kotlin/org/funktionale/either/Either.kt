@@ -54,7 +54,7 @@ sealed class Either<out L : Any, out R : Any> : EitherLike {
         override fun component2(): R? = null
 
         override fun equals(other: Any?): Boolean = when (other) {
-            is Left<*, *> -> l.equals(other.l)
+            is Left<*, *> -> l == other.l
             else -> false
 
         }
@@ -69,7 +69,7 @@ sealed class Either<out L : Any, out R : Any> : EitherLike {
         override fun component2(): R = r
 
         override fun equals(other: Any?): Boolean = when (other) {
-            is Right<*, *> -> r.equals(other.r)
+            is Right<*, *> -> r == other.r
             else -> false
         }
 

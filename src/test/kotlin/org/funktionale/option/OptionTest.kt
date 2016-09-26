@@ -64,8 +64,8 @@ class OptionTest {
     }
 
     @Test fun map() {
-        assertEquals(getSome().map { it.toUpperCase() }.get(), "KOTLIN")
-        assertEquals(getNone().map { it.toUpperCase() }, None)
+        assertEquals(getSome().map(String::toUpperCase).get(), "KOTLIN")
+        assertEquals(getNone().map(String::toUpperCase), None)
 
         assertEquals(getSome().map(Some(12)) { name, version -> "${name.toUpperCase()} M$version" }.get(), "KOTLIN M12")
         assertEquals(getNone().map(Some(12)) { name, version -> "${name.toUpperCase()} M$version" }, None)
@@ -82,14 +82,14 @@ class OptionTest {
     }
 
     @Test fun filter() {
-        assertEquals(getSome().filter { it.equals("java") }, None)
-        assertEquals(getNone().filter { it.equals("java") }, None)
+        assertEquals(getSome().filter { it == "java" }, None)
+        assertEquals(getNone().filter { it == "java" }, None)
         assertEquals(getSome().filter { it.startsWith('k') }.get(), "kotlin")
     }
 
     @Test fun filterNot() {
-        assertEquals(getSome().filterNot { it.equals("java") }.get(), "kotlin")
-        assertEquals(getNone().filterNot { it.equals("java") }, None)
+        assertEquals(getSome().filterNot { it == "java" }.get(), "kotlin")
+        assertEquals(getNone().filterNot { it == "java" }, None)
         assertEquals(getSome().filterNot { it.startsWith('k') }, None)
     }
 

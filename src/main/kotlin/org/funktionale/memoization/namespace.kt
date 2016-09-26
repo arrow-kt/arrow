@@ -272,7 +272,7 @@ private data class MemoizeKey22<out P1, out P2, out P3, out P4, out P5, out P6, 
     override fun invoke(f: (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22) -> R) = f(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21, p22)
 }
 
-private class MemoizedHandler<F, in K : MemoizedCall<F, R>, R : Any>(val f: F) {
+private class MemoizedHandler<F, in K : MemoizedCall<F, R>, out R : Any>(val f: F) {
     private val m = ConcurrentHashMap<K, R>()
     operator fun invoke(k: K): R {
         return m[k].toOption().fold({
