@@ -5,5 +5,5 @@ fun<P1, P2, R> Function2<P1, P2, R>.paired(): (Pair<P1, P2>) -> R {
 }
 
 fun<P1, P2, R> Function1<Pair<P1, P2>, R>.unpaired(): (P1, P2) -> R {
-    return { p1: P1, p2: P2 -> this(Pair(p1, p2)) }
+    return { p1: P1, p2: P2 -> this(p1 to p2) }
 }
