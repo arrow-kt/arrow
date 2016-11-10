@@ -46,14 +46,4 @@ class CurryingTest {
         val f: (Int) -> (Int) -> (Int) -> Int = sum3ints.curried()
         val x: (Int, Int, Int) -> Int = f.uncurried()
     }
-
-    @Test fun testPaired() {
-        val sum2ints = { x: Int, y: Int -> x + y }
-
-        val paired = sum2ints.paired()
-        val unpaired = paired.unpaired()
-
-        assertEquals(sum2ints(5, 9), paired(Pair(5, 9)))
-        assertEquals(paired(Pair(5, 9)), unpaired(5, 9))
-    }
 }
