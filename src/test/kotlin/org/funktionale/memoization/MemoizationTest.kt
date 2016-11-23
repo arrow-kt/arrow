@@ -44,5 +44,21 @@ class MemoizationTest {
         Assert.assertEquals(counterB, 1) // calling several times a memoized function with the same parameter is computed just once
 
     }
+
+    @Test fun memoizeEmpty() {
+        var counterA = 0
+        var counterB = 0
+
+        val a = { counterA++ }
+        val b = { counterB++ }.memoize()
+
+
+        (1..5).forEach { a() }
+        (1..5).forEach { b() }
+
+        Assert.assertEquals(counterA, 5)
+        Assert.assertEquals(counterB, 1) // calling several times a memoized function with the same parameter is computed just once
+
+    }
 }
 

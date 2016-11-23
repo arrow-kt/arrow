@@ -10,13 +10,14 @@ Features include:
 * Option
 * Either/Disjunction
 * Memoization
+* Validation
 * And others
 
 ## Documentation
 
 Read the [Wiki](https://github.com/MarioAriasC/funKTionale/wiki)
 
-Functional Programming in Kotlin with funKTionale [presentation](https://speakerdeck.com/marioariasc/functional-programming-in-kotlin-with-funktionale)
+Functional Programming in Kotlin with funKTionale [presentation](https://speakerdeck.com/marioariasc/functional-programming-in-kotlin-with-funktionale-1)
 
 ## Maven
 
@@ -36,7 +37,7 @@ Then you can use funKTionale dependency
 <dependency>
     <groupId>org.funktionale</groupId>
     <artifactId>funktionale</artifactId>
-    <version>0.9.5</version>
+    <version>0.9.6</version>
 </dependency>
 ```
 
