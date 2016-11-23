@@ -61,4 +61,19 @@ class PartialsTest {
 
         assertEquals(helloX("funKTionale"), "Hello, funKTionale!")
     }
+
+    @Test fun bind() {
+        var i = 0
+        fun inc(a: Int) {
+            i += a;
+        }
+
+        val binded = ::inc.bind(5)
+
+        assertEquals(i, 0)
+
+        binded()
+
+        assertEquals(i, 5)
+    }
 }

@@ -113,4 +113,4 @@ fun <T : Any?, L : Any, R : Any> List<T>.eitherTraverse(f: (T) -> Either<L, R>):
 @Deprecated("Use eitherSequential", ReplaceWith("eitherSequential()"))
 fun <L : Any, R : Any> List<Either<L, R>>.sequential() = eitherSequential()
 
-fun <L : Any, R : Any> List<Either<L, R>>.eitherSequential(): Either<L, List<R>> = eitherTraverse { it }
+fun <L : Any, R : Any> List<Either<L, R>>.eitherSequential(): Either<L, List<R>> = eitherTraverse { it: Either<L, R> -> it }
