@@ -29,7 +29,7 @@ import java.util.*
  * Date: 17/05/13
  * Time: 20:20
  */
-class RightProjection<out L : Any, out R : Any>(val e: Either<L, R>) {
+class RightProjection<out L, out R>(val e: Either<L, R>) {
 
     fun get(): R = when (e) {
         is Right -> e.r
@@ -48,7 +48,7 @@ class RightProjection<out L : Any, out R : Any>(val e: Either<L, R>) {
         is Left -> false
     }
 
-    fun <X : Any> map(f: (R) -> X): Either<L, X> = flatMap { Right<L, X>(f(it)) }
+    fun <X> map(f: (R) -> X): Either<L, X> = flatMap { Right<L, X>(f(it)) }
 
     fun filter(predicate: (R) -> Boolean): Option<Either<L, R>> = when (e) {
         is Right -> {
@@ -73,15 +73,15 @@ class RightProjection<out L : Any, out R : Any>(val e: Either<L, R>) {
 
 }
 
-fun <L : Any, R : Any> RightProjection<L, R>.getOrElse(default: () -> R): R = when (e) {
+fun <L, R> RightProjection<L, R>.getOrElse(default: () -> R): R = when (e) {
     is Right -> e.r
     is Left -> default()
 }
 
-fun <X : Any, L : Any, R : Any> RightProjection<L, R>.flatMap(f: (R) -> Either<L, X>): Either<L, X> = when (e) {
+fun <X, L, R> RightProjection<L, R>.flatMap(f: (R) -> Either<L, X>): Either<L, X> = when (e) {
     is Left -> Left(e.l)
     is Right -> f(e.r)
 }
 
 
-fun <L : Any, R : Any, X : Any, Y : Any> RightProjection<L, R>.map(x: Either<L, X>, f: (R, X) -> Y): Either<L, Y> = flatMap { r -> x.right().map { xx -> f(r, xx) } }
+fun <L, R, X, Y> RightProjection<L, R>.map(x: Either<L, X>, f: (R, X) -> Y): Either<L, Y> = flatMap { r -> x.right().map { xx -> f(r, xx) } }

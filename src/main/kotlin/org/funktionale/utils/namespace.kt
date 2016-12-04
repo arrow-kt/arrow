@@ -16,8 +16,19 @@
 
 package org.funktionale.utils
 
-fun<T> identity(): (T) -> T = { t: T -> t }
+fun <T> identity(): (T) -> T = { t: T -> t }
 
-fun<P1, T> constant(t: T): (P1) -> T {
+fun <P1, T> constant(t: T): (P1) -> T {
     return { p1: P1 -> t }
+}
+
+fun <T : Any> ((T) -> Boolean).mapNullable(): (T?) -> Boolean {
+    return { it?.let { this@mapNullable(it) } ?: false }
+}
+
+inline fun <T> T?.hashCodeForNullable(i: Int, f: (Int, Int) -> Int): Int {
+    return when (this) {
+        null -> i
+        else -> f(i, this.hashCode())
+    }
 }
