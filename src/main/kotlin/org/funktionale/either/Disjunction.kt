@@ -18,6 +18,7 @@ package org.funktionale.either
 
 import org.funktionale.collections.prependTo
 import org.funktionale.option.Option
+import org.funktionale.utils.hashCodeForNullable
 import java.util.*
 
 /**
@@ -26,7 +27,7 @@ import java.util.*
  * Date: 3/08/16
  * Time: 12:01 AM
  */
-sealed class Disjunction<out L : Any, out R : Any> : EitherLike {
+sealed class Disjunction<out L, out R> : EitherLike {
 
     operator abstract fun component1(): L?
     operator abstract fun component2(): R?
@@ -36,7 +37,7 @@ sealed class Disjunction<out L : Any, out R : Any> : EitherLike {
         is Left -> Right(value)
     }
 
-    fun <X : Any?> fold(fl: (L) -> X, fr: (R) -> X): X = when (this) {
+    fun <X> fold(fl: (L) -> X, fr: (R) -> X): X = when (this) {
         is Right -> fr(value)
         is Left -> fl(value)
     }
@@ -57,7 +58,7 @@ sealed class Disjunction<out L : Any, out R : Any> : EitherLike {
         is Left -> false
     }
 
-    fun <X : Any> map(f: (R) -> X): Disjunction<L, X> = when (this) {
+    fun <X> map(f: (R) -> X): Disjunction<L, X> = when (this) {
         is Right -> Right(f(value))
         is Left -> Left(value)
     }
@@ -87,7 +88,7 @@ sealed class Disjunction<out L : Any, out R : Any> : EitherLike {
         is Left -> Either.Left(value)
     }
 
-    class Left<out L : Any, out R : Any>(val value: L) : Disjunction<L, R>(), LeftLike {
+    class Left<out L, out R>(val value: L) : Disjunction<L, R>(), LeftLike {
         override fun component1(): L = value
         override fun component2(): R? = null
         override fun equals(other: Any?): Boolean = when (other) {
@@ -95,14 +96,14 @@ sealed class Disjunction<out L : Any, out R : Any> : EitherLike {
             else -> false
         }
 
-        override fun hashCode(): Int = 43 * value.hashCode()
+        override fun hashCode(): Int = value.hashCodeForNullable(43) { a, b -> a * b }
 
         override fun toString(): String = "Disjunction.Left($value)"
 
 
     }
 
-    class Right<out L : Any, out R : Any>(val value: R) : Disjunction<L, R>(), RightLike {
+    class Right<out L, out R>(val value: R) : Disjunction<L, R>(), RightLike {
         override fun component1(): L? = null
         override fun component2(): R = value
 
@@ -111,7 +112,7 @@ sealed class Disjunction<out L : Any, out R : Any> : EitherLike {
             else -> false
         }
 
-        override fun hashCode(): Int = 43 * value.hashCode()
+        override fun hashCode(): Int = value.hashCodeForNullable(43) { a, b -> a * b }
 
         override fun toString(): String = "Disjunction.Right($value)"
 
@@ -119,30 +120,30 @@ sealed class Disjunction<out L : Any, out R : Any> : EitherLike {
     }
 }
 
-fun <T : Any> disjunctionTry(body: () -> T): Disjunction<Exception, T> = try {
+fun <T> disjunctionTry(body: () -> T): Disjunction<Exception, T> = try {
     Disjunction.Right(body())
 } catch (e: Exception) {
     Disjunction.Left(e)
 }
 
-fun <T : Any> Disjunction<T, T>.merge(): T = when (this) {
+fun <T> Disjunction<T, T>.merge(): T = when (this) {
     is Disjunction.Right -> value
     is Disjunction.Left -> value
 }
 
-fun <L : Any, R : Any> Disjunction<L, R>.getOrElse(default: () -> R): R = when (this) {
+fun <L, R> Disjunction<L, R>.getOrElse(default: () -> R): R = when (this) {
     is Disjunction.Right -> value
     is Disjunction.Left -> default()
 }
 
-fun <X : Any, L : Any, R : Any> Disjunction<L, R>.flatMap(f: (R) -> Disjunction<L, X>): Disjunction<L, X> = when (this) {
+fun <X, L, R> Disjunction<L, R>.flatMap(f: (R) -> Disjunction<L, X>): Disjunction<L, X> = when (this) {
     is Disjunction.Right -> f(value)
     is Disjunction.Left -> Disjunction.Left(value)
 }
 
-fun <L : Any, R : Any, X : Any, Y : Any> Disjunction<L, R>.map(x: Disjunction<L, X>, f: (R, X) -> Y): Disjunction<L, Y> = flatMap { r -> x.map { xx -> f(r, xx) } }
+fun <L, R, X, Y> Disjunction<L, R>.map(x: Disjunction<L, X>, f: (R, X) -> Y): Disjunction<L, Y> = flatMap { r -> x.map { xx -> f(r, xx) } }
 
-fun <T : Any?, L : Any, R : Any> List<T>.disjuntionTraverse(f: (T) -> Disjunction<L, R>): Disjunction<L, List<R>> = foldRight(Disjunction.Right(emptyList())) { i: T, accumulator: Disjunction<L, List<R>> ->
+fun <T, L, R> List<T>.disjuntionTraverse(f: (T) -> Disjunction<L, R>): Disjunction<L, List<R>> = foldRight(Disjunction.Right(emptyList())) { i: T, accumulator: Disjunction<L, List<R>> ->
     val disjunction = f(i)
     when (disjunction) {
         is Disjunction.Right -> disjunction.map(accumulator) { head: R, tail: List<R> ->
@@ -152,4 +153,4 @@ fun <T : Any?, L : Any, R : Any> List<T>.disjuntionTraverse(f: (T) -> Disjunctio
     }
 }
 
-fun <L : Any, R : Any> List<Disjunction<L, R>>.disjunctionSequential(): Disjunction<L, List<R>> = disjuntionTraverse { it }
+fun <L, R> List<Disjunction<L, R>>.disjunctionSequential(): Disjunction<L, List<R>> = disjuntionTraverse { it }
