@@ -29,6 +29,11 @@ import org.funktionale.utils.hashCodeForNullable
  */
 sealed class Either<out L, out R> : EitherLike {
 
+    companion object {
+        fun <L> left(left: L): Either<L, Nothing> = Left(left)
+        fun <R> right(right: R): Either<Nothing, R> = Right(right)
+    }
+
     fun left(): LeftProjection<L, R> = LeftProjection(this)
     fun right(): RightProjection<L, R> = RightProjection(this)
 
