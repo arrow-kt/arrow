@@ -156,4 +156,24 @@ class OptionTest {
         assertEquals(parseInts(listOf("1", "foo", "3")), None)
     }
 
+    @Test fun and() {
+        val x = Some(2)
+        val y = Some("Foo")
+        assertEquals(x and y, Some("Foo"))
+        assertEquals(x and None, None)
+        assertEquals(None and x, None)
+        assertEquals(None and None, None)
+
+    }
+
+    @Test fun or() {
+        val x = Some(2)
+        val y = Some(100)
+        assertEquals(x or y, Some(2))
+        assertEquals(x or None, Some(2))
+        assertEquals(None or x, Some(2))
+        assertEquals(None or None, None)
+
+    }
+
 }

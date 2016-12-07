@@ -1,6 +1,5 @@
 
 import org.funktionale.either.Disjunction
-import org.funktionale.either.Disjunction.*
 import org.funktionale.validation.Validation
 import org.funktionale.validation.validate
 import org.testng.Assert.*
@@ -12,9 +11,9 @@ class ValidationTest {
 
     @Test
     fun validationTest() {
-        val d1 = Right<String, Int>(1)
-        val d2 = Right<String, Int>(2)
-        val d3 = Right<String, Int>(3)
+        val d1 = Disjunction.right(1)
+        val d2 = Disjunction.right(2)
+        val d3 = Disjunction.right(3)
 
         val validation = Validation(d1, d2, d3)
         assertFalse(validation.hasFailures)
@@ -23,9 +22,9 @@ class ValidationTest {
 
     @Test
     fun validationTestWithError() {
-        val d1 = Right<String, Int>(1)
-        val d2 = Left<String, Int>("Not a number")
-        val d3 = Right<String, Int>(3)
+        val d1 = Disjunction.right(1)
+        val d2 = Disjunction.left("Not a number")
+        val d3 = Disjunction.right(3)
 
         val validation = Validation(d1, d2, d3)
         assertTrue(validation.hasFailures)

@@ -30,8 +30,8 @@ import org.funktionale.utils.hashCodeForNullable
 sealed class Either<out L, out R> : EitherLike {
 
     companion object {
-        fun <L> left(left: L): Either<L, Nothing> = Left(left)
-        fun <R> right(right: R): Either<Nothing, R> = Right(right)
+        fun <L> left(left: L): Left<L, Nothing> = Left(left)
+        fun <R> right(right: R): Right<Nothing, R> = Right(right)
     }
 
     fun left(): LeftProjection<L, R> = LeftProjection(this)
@@ -45,7 +45,7 @@ sealed class Either<out L, out R> : EitherLike {
         is Left -> Disjunction.Left(l)
     }
 
-    fun <X : Any?> fold(fl: (L) -> X, fr: (R) -> X): X = when (this) {
+    fun <X> fold(fl: (L) -> X, fr: (R) -> X): X = when (this) {
         is Left -> fl(l)
         is Right -> fr(r)
     }

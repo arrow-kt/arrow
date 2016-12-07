@@ -16,16 +16,23 @@
 
 package org.funktionale.collections
 
-import org.testng.Assert
+import org.testng.Assert.assertEquals
 import org.testng.annotations.Test
 
 
 class CollectionsTest {
     @Test fun tail() {
-        Assert.assertEquals(listOf(1, 2, 3).tail(), listOf(2, 3))
+        assertEquals(listOf(1, 2, 3).tail(), listOf(2, 3))
     }
 
     @Test fun prependTo() {
-        Assert.assertEquals(1 prependTo listOf(2, 3), listOf(1, 2, 3))
+        assertEquals(1 prependTo listOf(2, 3), listOf(1, 2, 3))
+    }
+
+
+    @Test fun destructured() {
+        val (head, tail) = listOf(1, 2, 3).destructured()
+        assertEquals(head, 1)
+        assertEquals(tail, listOf(2, 3))
     }
 }

@@ -120,6 +120,12 @@ sealed class Option<out T> {
 
     inline fun <X> toDisjunctionLeft(right: () -> X): Disjunction<T, X> = toEitherLeft(right).toDisjunction()
 
+    infix fun <X> and(value: Option<X>): Option<X> = if (isEmpty()) {
+        None
+    } else {
+        value
+    }
+
     object None : Option<Nothing>() {
         override fun get() = throw NoSuchElementException("None.get")
 
@@ -158,6 +164,12 @@ fun <T> Option<T>.getOrElse(default: () -> T): T = if (isEmpty()) {
 
 fun <T> Option<T>.orElse(alternative: () -> Option<T>): Option<T> = if (isEmpty()) {
     alternative()
+} else {
+    this
+}
+
+infix fun <T> Option<T>.or(value: Option<T>): Option<T> = if (isEmpty()) {
+    value
 } else {
     this
 }
@@ -305,3 +317,5 @@ fun <T> List<Option<T>>.flatten(): List<T> {
 fun <P1, R> Function1<P1, R>.optionLift(): (Option<P1>) -> Option<R> {
     return { it.map(this) }
 }
+
+
