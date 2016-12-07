@@ -29,6 +29,11 @@ import java.util.*
  */
 sealed class Disjunction<out L, out R> : EitherLike {
 
+    companion object {
+        fun <L> left(left: L): Disjunction<L, Nothing> = Left(left)
+        fun <R> right(right: R): Disjunction<Nothing, R> = Right(right)
+    }
+
     operator abstract fun component1(): L?
     operator abstract fun component2(): R?
 
