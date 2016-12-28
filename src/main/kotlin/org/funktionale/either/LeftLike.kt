@@ -22,7 +22,7 @@ package org.funktionale.either
  * Date: 6/08/16
  * Time: 12:02 AM
  */
-interface LeftLike: EitherLike {
+interface LeftLike : EitherLike {
     override fun isLeft(): Boolean = true
     override fun isRight(): Boolean = false
 }

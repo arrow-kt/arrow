@@ -119,7 +119,6 @@ class OptionTest {
     }
 
 
-
     @Test fun getAsOption() {
         val map = mapOf(1 to "uno", 2 to "dos", 4 to null)
         assertEquals(map.option[1], Some("uno"))

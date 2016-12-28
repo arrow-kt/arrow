@@ -74,14 +74,14 @@ class LeftProjection<out L, out R>(val e: Either<L, R>) {
 
 }
 
-fun <L , R, X> LeftProjection<L, R>.flatMap(f: (L) -> Either<X, R>): Either<X, R> = when (e) {
+fun <L, R, X> LeftProjection<L, R>.flatMap(f: (L) -> Either<X, R>): Either<X, R> = when (e) {
     is Left -> f(e.l)
     is Right -> Right(e.r)
 }
 
-fun <L , R, X, Y> LeftProjection<L, R>.map(x: Either<X, R>, f: (L, X) -> Y): Either<Y, R> = flatMap { l -> x.left().map { xx -> f(l, xx) } }
+fun <L, R, X, Y> LeftProjection<L, R>.map(x: Either<X, R>, f: (L, X) -> Y): Either<Y, R> = flatMap { l -> x.left().map { xx -> f(l, xx) } }
 
-fun <L , R> LeftProjection<L, R>.getOrElse(default: () -> L): L = when (e) {
+fun <L, R> LeftProjection<L, R>.getOrElse(default: () -> L): L = when (e) {
     is Left -> e.l
     is Right -> default()
 }
