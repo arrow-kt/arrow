@@ -72,6 +72,11 @@
             <artifactId>funktionale-utils</artifactId>
             <version>1.0.0-beta</version>
         </dependency>
+        <dependency>
+            <groupId>org.funktionale</groupId>
+            <artifactId>funktionale-option</artifactId>
+            <version>1.0.0-beta</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

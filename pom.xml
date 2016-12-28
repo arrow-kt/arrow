@@ -33,7 +33,9 @@
         <module>funktionale-partials</module>
         <module>funktionale-reverse</module>
         <module>funktionale-utils</module>
+        <module>funktionale-option</module>
         <module>funktionale-all</module>
+        <module>funktionale-either</module>
     </modules>
     <packaging>pom</packaging>
     <name>funKTionale</name>
