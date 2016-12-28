@@ -27,7 +27,9 @@
         <module>funktionale-collections</module>
         <module>funktionale-complement</module>
         <module>funktionale-composition</module>
+        <module>funktionale-currying</module>
         <module>funktionale-all</module>
+        <module>funktionale-memoization</module>
     </modules>
     <packaging>pom</packaging>
     <name>funKTionale</name>

@@ -24,7 +24,7 @@
         <version>1.0.0-beta</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <name>funKTionale GOTY Edition</name>
+    <name>GOTY Edition</name>
     <artifactId>funktionale-all</artifactId>
     <dependencies>
         <dependency>
@@ -40,6 +40,16 @@
         <dependency>
             <groupId>org.funktionale</groupId>
             <artifactId>funktionale-composition</artifactId>
+            <version>1.0.0-beta</version>
+        </dependency>
+        <dependency>
+            <groupId>org.funktionale</groupId>
+            <artifactId>funktionale-currying</artifactId>
+            <version>1.0.0-beta</version>
+        </dependency>
+        <dependency>
+            <groupId>org.funktionale</groupId>
+            <artifactId>funktionale-memoization</artifactId>
             <version>1.0.0-beta</version>
         </dependency>
     </dependencies>

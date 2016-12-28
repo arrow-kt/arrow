@@ -24,7 +24,7 @@
         <version>1.0.0-beta</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <name>funKTionale Collections Module</name>
+    <name>Collections Module</name>
     <artifactId>funktionale-collections</artifactId>
     <packaging>jar</packaging>
     <version>1.0.0-beta</version>

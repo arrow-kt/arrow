@@ -24,27 +24,27 @@
         <version>1.0.0-beta</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <name>Complement Module</name>
-    <artifactId>funktionale-complement</artifactId>
+    <name>Currying Module</name>
+    <artifactId>funktionale-currying</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0-beta</version>
-    <build>
-        <sourceDirectory>src/main/kotlin</sourceDirectory>
-        <testSourceDirectory>src/test/kotlin</testSourceDirectory>
-        <plugins>
-            <plugin>
-                <artifactId>kotlin-maven-plugin</artifactId>
-                <groupId>org.jetbrains.kotlin</groupId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+        <version>1.0.0-beta</version>
+        <build>
+            <sourceDirectory>src/main/kotlin</sourceDirectory>
+            <testSourceDirectory>src/test/kotlin</testSourceDirectory>
+            <plugins>
+                <plugin>
+                    <artifactId>kotlin-maven-plugin</artifactId>
+                    <groupId>org.jetbrains.kotlin</groupId>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                </plugin>
+            </plugins>
+        </build>
 
 </project>
