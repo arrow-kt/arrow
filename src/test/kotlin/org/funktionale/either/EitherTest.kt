@@ -18,7 +18,9 @@ package org.funktionale.either
 
 import org.funktionale.either.Either.Left
 import org.funktionale.either.Either.Right
+import org.funktionale.option.Option
 import org.funktionale.option.Option.None
+import org.funktionale.option.toOption
 import org.testng.Assert.*
 import org.testng.annotations.Test
 
@@ -104,7 +106,7 @@ class EitherTest {
     }
 
     @Test fun fold() {
-        assertEquals(left.fold(Int::toString){ it }, "5")
+        assertEquals(left.fold(Int::toString) { it }, "5")
     }
 
     @Test fun swap() {
@@ -141,5 +143,19 @@ class EitherTest {
 
         assertEquals(parseInts(listOf("1", "2", "3")), Right<Exception, List<Int>>(listOf(1, 2, 3)))
         assertTrue(parseInts(listOf("1", "foo", "3")) is Left)
+    }
+
+    val some: Option<String> = "kotlin".toOption()
+    val none: Option<String> = null.toOption()
+
+    @Test fun toRight() {
+        assertTrue(some.toEitherRight { 0 }.isRight())
+        assertFalse(none.toEitherRight { 0 }.isRight())
+    }
+
+
+    @Test fun toLeft() {
+        assertTrue(some.toEitherLeft { 0 }.isLeft())
+        assertFalse(none.toEitherLeft { 0 }.isLeft())
     }
 }

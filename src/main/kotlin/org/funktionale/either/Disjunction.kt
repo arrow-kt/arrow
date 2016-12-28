@@ -159,3 +159,7 @@ fun <T, L, R> List<T>.disjuntionTraverse(f: (T) -> Disjunction<L, R>): Disjuncti
 }
 
 fun <L, R> List<Disjunction<L, R>>.disjunctionSequential(): Disjunction<L, List<R>> = disjuntionTraverse { it }
+
+inline fun <X, T> Option<T>.toDisjunctionRight(left: () -> X): Disjunction<X, T> = toEitherRight(left).toDisjunction()
+
+inline fun <X, T> Option<T>.toDisjunctionLeft(right: () -> X): Disjunction<T, X> = toEitherLeft(right).toDisjunction()

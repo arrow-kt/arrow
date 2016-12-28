@@ -17,10 +17,6 @@
 package org.funktionale.option
 
 import org.funktionale.collections.prependTo
-import org.funktionale.either.Disjunction
-import org.funktionale.either.Either
-import org.funktionale.either.Either.Left
-import org.funktionale.either.Either.Right
 import org.funktionale.option.Option.None
 import org.funktionale.option.Option.Some
 import org.funktionale.utils.GetterOperation
@@ -98,28 +94,6 @@ sealed class Option<out T> {
         listOf(get())
     }
 
-    @Deprecated("Use toEitherRight", ReplaceWith("toEitherRight(left)"))
-    inline fun <X> toRight(left: () -> X): Either<X, T> = toEitherRight(left)
-
-    inline fun <X> toEitherRight(left: () -> X): Either<X, T> = if (isEmpty()) {
-        Left(left())
-    } else {
-        Right(get())
-    }
-
-    inline fun <X> toDisjunctionRight(left: () -> X): Disjunction<X, T> = toEitherRight(left).toDisjunction()
-
-    @Deprecated("use toEitherLeft", ReplaceWith("toEitherLeft(right)"))
-    inline fun <X> toLeft(right: () -> X): Either<T, X> = toEitherLeft(right)
-
-    inline fun <X> toEitherLeft(right: () -> X): Either<T, X> = if (isEmpty()) {
-        Right(right())
-    } else {
-        Left(get())
-    }
-
-    inline fun <X> toDisjunctionLeft(right: () -> X): Disjunction<T, X> = toEitherLeft(right).toDisjunction()
-
     infix fun <X> and(value: Option<X>): Option<X> = if (isEmpty()) {
         None
     } else {
@@ -146,7 +120,6 @@ sealed class Option<out T> {
 
         override fun equals(other: Any?): Boolean = when (other) {
             is Some<*> -> t == other.get()
-            is None -> false
             else -> false
         }
 
@@ -296,17 +269,11 @@ inline fun String.firstOption(predicate: (Char) -> Boolean): Option<Char> {
     return firstOrNull(predicate).toOption()
 }
 
-@Deprecated("Use optionTraverse", ReplaceWith("optionTraverse(f)"))
-fun <T, R> List<T>.traverse(f: (T) -> Option<R>) = optionTraverse(f)
-
 fun <T, R> List<T>.optionTraverse(f: (T) -> Option<R>): Option<List<R>> = foldRight(Some(emptyList())) { i: T, accumulator: Option<List<R>> ->
     f(i).map(accumulator) { head: R, tail: List<R> ->
         head prependTo tail
     }
 }
-
-@Deprecated("Use optionSequential", ReplaceWith("optionSequential()"))
-fun <T> List<Option<T>>.sequential(): Option<List<T>> = optionSequential()
 
 fun <T> List<Option<T>>.optionSequential(): Option<List<T>> = optionTraverse { it }
 
