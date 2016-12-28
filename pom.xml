@@ -30,6 +30,7 @@
         <module>funktionale-currying</module>
         <module>funktionale-memoization</module>
         <module>funktionale-pairing</module>
+        <module>funktionale-partials</module>
         <module>funktionale-all</module>
     </modules>
     <packaging>pom</packaging>

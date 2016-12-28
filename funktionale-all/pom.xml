@@ -57,6 +57,11 @@
             <artifactId>funktionale-pairing</artifactId>
             <version>1.0.0-beta</version>
         </dependency>
+        <dependency>
+            <groupId>org.funktionale</groupId>
+            <artifactId>funktionale-partials</artifactId>
+            <version>1.0.0-beta</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
