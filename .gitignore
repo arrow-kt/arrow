@@ -1,5 +1,6 @@
 .idea/*
 *.iml
 target/*
+*/target/*
 *.kte
 *.log

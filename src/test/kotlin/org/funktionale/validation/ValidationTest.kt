@@ -1,7 +1,6 @@
+package org.funktionale.validation
 
 import org.funktionale.either.Disjunction
-import org.funktionale.validation.Validation
-import org.funktionale.validation.validate
 import org.testng.Assert.*
 import org.testng.annotations.Test
 
