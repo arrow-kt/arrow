@@ -35,6 +35,7 @@
         <module>funktionale-utils</module>
         <module>funktionale-option</module>
         <module>funktionale-either</module>
+        <module>funktionale-validation</module>
         <module>funktionale-all</module>
     </modules>
     <packaging>pom</packaging>
