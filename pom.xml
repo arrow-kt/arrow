@@ -26,6 +26,7 @@
     <modules>
         <module>funktionale-collections</module>
         <module>funktionale-complement</module>
+        <module>funktionale-composition</module>
         <module>funktionale-all</module>
     </modules>
     <packaging>pom</packaging>

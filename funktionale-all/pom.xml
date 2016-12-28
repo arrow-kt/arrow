@@ -37,6 +37,11 @@
             <artifactId>funktionale-complement</artifactId>
             <version>1.0.0-beta</version>
         </dependency>
+        <dependency>
+            <groupId>org.funktionale</groupId>
+            <artifactId>funktionale-composition</artifactId>
+            <version>1.0.0-beta</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
