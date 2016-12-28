@@ -4,3 +4,4 @@ target/*
 */target/*
 *.kte
 *.log
+*/dependency-reduced-pom.xml
