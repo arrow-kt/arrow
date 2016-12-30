@@ -53,6 +53,6 @@ Then you can use any funKTionale module to your library
 
 ## How to contribute?
 
-Rise your PR against Experimental module (`funktionale-experimental`)
+Rise your PR against Experimental module (`funktionale-experimental`). Once it gets approved I'll move it to a proper module 
 
 
