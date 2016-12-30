@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.funktionale.partials
+package org.funktionale.utils
 
 import org.testng.Assert.assertEquals
 import org.testng.Assert.assertTrue
@@ -23,8 +23,7 @@ import org.testng.annotations.Test
 class PartialFunctionTest {
     val definetAt: (Int) -> Boolean = { it.mod(2) == 0 }
     val body: (Int) -> String = {
-        if (definetAt(it)) "is even"
-        else throw IllegalArgumentException()
+        "is even"
     }
 
     @Test
@@ -43,7 +42,7 @@ class PartialFunctionTest {
 
     @Test fun orElse() {
         val isEven = body.toPartialFunction(definetAt)
-        val isOdd = { i: Int -> if (!definetAt(i)) "is odd" else throw IllegalArgumentException() }.toPartialFunction { !definetAt(it) }
+        val isOdd = { i: Int -> "is odd" }.toPartialFunction { !definetAt(it) }
         assertEquals(listOf(1, 2, 3).map(isEven orElse isOdd), listOf("is odd", "is even", "is odd"))
     }
 

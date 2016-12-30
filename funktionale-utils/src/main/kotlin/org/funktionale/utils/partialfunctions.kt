@@ -14,10 +14,18 @@
  * limitations under the License.
  */
 
-package org.funktionale.partials
+package org.funktionale.utils
 
-class PartialFunction<in P1, out R>(val definetAt: (P1) -> Boolean, f: (P1) -> R) : Function1<P1, R> by f {
-    fun isDefinedAt(p1: P1) = this.definetAt(p1)
+class PartialFunction<in P1, out R>(private val definetAt: (P1) -> Boolean, private val f: (P1) -> R) : Function1<P1, R> {
+    override fun invoke(p1: P1): R {
+        if(definetAt(p1)) {
+            return f(p1)
+        } else {
+            throw IllegalArgumentException("Value: ($p1) isn't supported by this function")
+        }
+    }
+
+    fun isDefinedAt(p1: P1) = definetAt(p1)
 }
 
 fun <P1, R> PartialFunction<P1, R>.invokeOrElse(p1: P1, default: R): R {
