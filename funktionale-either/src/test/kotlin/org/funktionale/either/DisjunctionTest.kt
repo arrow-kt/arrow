@@ -123,14 +123,14 @@ class DisjunctionTest {
     }
 
     @Test fun disjunctionTry() {
-        val e: Disjunction<Exception, Nothing> = disjunctionTry {
+        val e: Disjunction<Throwable, Nothing> = disjunctionTry {
             throw RuntimeException()
         }
         assertTrue(e.isLeft())
     }
 
     @Test fun sequential() {
-        fun parseInts(ints: List<String>): Disjunction<Exception, List<Int>> {
+        fun parseInts(ints: List<String>): Disjunction<Throwable, List<Int>> {
             return ints.map { disjunctionTry { it.toInt() } }.disjunctionSequential()
         }
 

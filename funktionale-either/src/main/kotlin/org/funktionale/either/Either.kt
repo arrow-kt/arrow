@@ -89,10 +89,10 @@ fun <L, R> Pair<L, R>.toLeft(): Left<L, R> = Left(this.component1())
 
 fun <L, R> Pair<L, R>.toRight(): Right<L, R> = Right(this.component2())
 
-fun <T> eitherTry(body: () -> T): Either<Exception, T> = try {
+fun <T> eitherTry(body: () -> T): Either<Throwable, T> = try {
     Right(body())
-} catch(e: Exception) {
-    Left(e)
+} catch(t: Throwable) {
+    Left(t)
 }
 
 fun <T, L, R> List<T>.eitherTraverse(f: (T) -> Either<L, R>): Either<L, List<R>> = foldRight(Right(emptyList())) { i: T, accumulator: Either<L, List<R>> ->

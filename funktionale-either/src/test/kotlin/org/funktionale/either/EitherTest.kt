@@ -130,14 +130,14 @@ class EitherTest {
     }
 
     @Test fun either() {
-        val e: Either<Exception, Nothing> = eitherTry {
+        val e: Either<Throwable, Nothing> = eitherTry {
             throw RuntimeException()
         }
         assertTrue(e.isLeft())
     }
 
     @Test fun sequential() {
-        fun parseInts(ints: List<String>): Either<Exception, List<Int>> {
+        fun parseInts(ints: List<String>): Either<Throwable, List<Int>> {
             return ints.map { eitherTry { it.toInt() } }.eitherSequential()
         }
 

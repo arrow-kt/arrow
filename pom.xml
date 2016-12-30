@@ -36,6 +36,7 @@
         <module>funktionale-option</module>
         <module>funktionale-either</module>
         <module>funktionale-validation</module>
+        <module>funktionale-try</module>
         <module>funktionale-all</module>
         <module>funktionale-experimental</module>
     </modules>

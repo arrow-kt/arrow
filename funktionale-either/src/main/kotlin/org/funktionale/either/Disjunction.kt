@@ -119,10 +119,10 @@ sealed class Disjunction<out L, out R> : EitherLike {
     }
 }
 
-fun <T> disjunctionTry(body: () -> T): Disjunction<Exception, T> = try {
+fun <T> disjunctionTry(body: () -> T): Disjunction<Throwable, T> = try {
     Disjunction.Right(body())
-} catch (e: Exception) {
-    Disjunction.Left(e)
+} catch (t: Throwable) {
+    Disjunction.Left(t)
 }
 
 fun <T> Disjunction<T, T>.merge(): T = when (this) {

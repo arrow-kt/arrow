@@ -87,6 +87,11 @@
             <artifactId>funktionale-validation</artifactId>
             <version>1.0.0-beta</version>
         </dependency>
+        <dependency>
+            <groupId>org.funktionale</groupId>
+            <artifactId>funktionale-try</artifactId>
+            <version>1.0.0-beta</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

@@ -110,7 +110,7 @@ fun main(args: Array<String>) {
 
     data class User(val name: String)
 
-    fun getUser(url: String): Disjunction<Exception, User> = disjunctionTry {
+    fun getUser(url: String): Disjunction<Throwable, User> = disjunctionTry {
         User("Mario")
     }
 
@@ -125,13 +125,13 @@ fun main(args: Array<String>) {
     val user1 = getUser("http://myapi.com/user/1")
     val user2 = getUser("http://myapi.com/user/2")
 
-    val userList: Disjunction<Exception, List<User>> = user1.flatMap { u1 ->
+    val userList: Disjunction<Throwable, List<User>> = user1.flatMap { u1 ->
         user2.map { u2 ->
             listOf(u1, u2)
         }
     }
 
-    val userList2: Disjunction<List<Exception>, List<User>> = validate(user1, user2) { u1, u2 ->
+    val userList2: Disjunction<List<Throwable>, List<User>> = validate(user1, user2) { u1, u2 ->
         listOf(u1, u2)
     }
 
