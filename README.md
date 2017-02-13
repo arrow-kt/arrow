@@ -5,27 +5,29 @@ Functional constructs and patterns for [Kotlin](http://kotlin-lang.org)
 
 ## Modules
 
-| Module | Description | Internal Dependencies | Artifact | Size(KB) |
-|---|---|---|---|---| 
-|All| GOTY edition. Every other module content is included but not Experimental module|N/A|`funktionale-all`|1328|
-|Collections|Collections related extensions such as `tail`, `prependTo` and others|N/A|`funkationale-collections`|4|
-|Complement|Extension functions for predicates to generate complement functions|N/A|`funktionale-complement`|36|
-|Composition| Extensions `andThen` (`forwardCompose`) and `compose` for functions|N/A|`funktionale-composition`|8|
-|Currying|Extension `curried` and `uncurried` for functions|N/A|`funktionale-currying`|348|
-|Either|Either and Disjuntion (right-biased Either) types|Option|`funktionale-either`|44|
-|Experimental|Playground and examples. **Not to be used on production**|All|`funktionale-experimental`|148|
-|Memoization|Memoization for functions|N/A|`funktionale-memoization`|112|
-|Option|Option type|Collections and Utils|`funktionale-option`|20|
-|Pairing|Transformations for functions with arity 2 or 3 to one parameter of type `Pair` or `Triple` respectively |N/A|`funktionale-pairing`|8|
-|Partials|Partial applied functions|N/A|`funktionale-partials`|688|
-|Reverse|Extension `reverse` for functions|N/A|`funktionale-reverse`|32|
-|Try|Try computation type|Either|`funktionale-try`|12|
-|Utils|`identity` and `constant` functions and Partial Functions |N/A|`funktionale-complement`|20|
-|Validation|Validation types and functions with Disjunctions|Either|`funktionale-validation`|12|
+| Module | Description | Internal Dependencies | Size(KB) |
+|---|---|---|---| 
+|`funktionale-all`| GOTY edition. Every other module content is included but not Experimental module|N/A|1328|
+|`funktionale-collections`|Collections related extensions such as `tail`, `prependTo` and others|N/A|4|
+|`funktionale-complement`|Extension functions for predicates to generate complement functions|N/A|36|
+|`funktionale-composition`| Extensions `andThen` (`forwardCompose`) and `compose` for functions|N/A|8|
+|`funktionale-currying`|Extension `curried` and `uncurried` for functions|N/A|348|
+|`funktionale-either`|Either and Disjuntion (right-biased Either) types|`funktionale-option`|44|
+|`funktionale-experimental`|Playground and examples. **Not to be used on production**|All|148|
+|`funktionale-memoization`|Memoization for functions|N/A|112|
+|`funktionale-option`|Option type|`funktionale-collections` and `funktionale-utils`|20|
+|`funktionale-pairing`|Transformations for functions with arity 2 or 3 to one parameter of type `Pair` or `Triple` respectively |N/A|8|
+|`funktionale-partials`|Partial applied functions|N/A|688|
+|`funktionale-reverse`|Extension `reverse` for functions|N/A|32|
+|`funktionale-try`|Try computation type|`funktionale-either`|12|
+|`funktionale-utils`|`identity` and `constant` functions and Partial Functions |N/A|20|
+|`funktionale-validation`|Validation types and functions with Disjunctions|`funktionale-either`|12|
 
 ## Documentation
 
 Read the [Wiki](https://github.com/MarioAriasC/funKTionale/wiki)
+
+## Conference and talks
 
 Functional Programming in Kotlin with funKTionale ([video](https://www.youtube.com/watch?v=klakgWp1KWg), [presentation](https://speakerdeck.com/marioariasc/functional-programming-in-kotlin-with-funktionale-2))
 
@@ -47,7 +49,7 @@ Then you can use any funKTionale module to your library
 <dependency>
     <groupId>org.funktionale</groupId>
     <artifactId>funktionale-all</artifactId>
-    <version>${funktionale.version}</version>
+    <version>1.0.0-final</version>
 </dependency>
 ```
 

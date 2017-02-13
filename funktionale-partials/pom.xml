@@ -21,13 +21,13 @@
     <parent>
         <artifactId>funktionale</artifactId>
         <groupId>org.funktionale</groupId>
-        <version>1.0.0-beta</version>
+        <version>1.0.0-final</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <name>Partials Module</name>
     <artifactId>funktionale-partials</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0-beta</version>
+    <version>1.0.0-final</version>
     <build>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
