@@ -59,6 +59,11 @@ class TryTest {
         failure.foreach { fail() }
     }
 
+    @Test fun onEach() {
+        assertEquals(success.onEach { assertEquals(10, it) }.get(), 10)
+        assertTrue(failure.onEach { fail() }.isFailure())
+    }
+
     @Test fun flatMap() {
         assertEquals(success.flatMap { Success(it * 2) }.get(), 20)
         assertTrue(failure.flatMap { Success(it * 2) }.isFailure())

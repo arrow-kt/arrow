@@ -50,6 +50,11 @@ sealed class Try<T> {
         if (isSuccess()) f(get())
     }
 
+    fun onEach(f: (T) -> Unit): Try<T> = map {
+        f(it)
+        it
+    }
+
     fun <X> flatMap(f: (T) -> Try<X>): Try<X> = when (this) {
         is Success -> try {
             f(get())
