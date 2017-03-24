@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 The Kats Authors
+ * Copyright (C) 2017 The Katz Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package kats
+package katz
 
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/Option.scala
@@ -68,7 +68,7 @@ sealed class Option<out A> {
      * @param  ifEmpty the expression to evaluate if empty.
      * @param  f       the function to apply if nonempty.
      */
-    inline fun <B> fold(ifEmpty: () -> B, f: (A) -> B): B = when(this) {
+    inline fun <B> fold(ifEmpty: () -> B, f: (A) -> B): B = when (this) {
         is None -> ifEmpty()
         is Some -> f(value)
     }
