@@ -27,8 +27,6 @@ sealed class Option<out A> {
     companion object {
 
         inline fun <A> fromNullable(f: () -> A): Option<A> = f().let { if (it == null) None else Some(it) }
-
-        operator fun <A> invoke(a: A): Option<A> = if (a == null) None else Some(a)
     }
 
     /**
@@ -119,7 +117,7 @@ sealed class Option<out A> {
      */
     inline fun forall(p: (A) -> Boolean): Boolean = exists(p)
 
-    class Some<A>(val value: A) : Option<A>() {
+    class Some<out A>(val value: A) : Option<A>() {
         override val isEmpty = false
     }
 
