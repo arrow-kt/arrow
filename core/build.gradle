@@ -26,8 +26,8 @@ repositories {
 
 apply plugin: 'maven'
 
-group = 'finecinnamon.kats'
+group = 'com.github.finecinnamon'
 
 sourceSets {
-    main.java.srcDirs += 'library/src/main/java'
+    main.java.srcDirs += 'core/src/main/java'
 }
