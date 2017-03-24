@@ -38,11 +38,11 @@ class NonEmptyList<out A> private constructor(
 
     fun isEmpty(): Boolean = false
 
-    inline fun <reified B> map(f: (A) -> B): NonEmptyList<B> =
+    fun <B> map(f: (A) -> B): NonEmptyList<B> =
             NonEmptyList(f(head), tail.map(f))
 
-    inline fun <reified B> flatMap(f: (A) -> List<B>): NonEmptyList<B> =
-            unsafeFromList(all.flatMap(f))
+    fun <B> flatMap(f: (A) -> List<B>): NonEmptyList<B> =
+            NonEmptyList(all.flatMap(f))
 
     fun iterator(): Iterator<A> = all.iterator()
 
@@ -66,7 +66,6 @@ class NonEmptyList<out A> private constructor(
     }
 
     companion object Factory {
-        inline fun <reified A> of(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
-        fun <A> unsafeFromList(l: List<A>): NonEmptyList<A> = NonEmptyList(l)
+        fun <A> of(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
     }
 }
