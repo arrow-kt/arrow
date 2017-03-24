@@ -25,8 +25,8 @@ package katz
  */
 class State<S, out A>(val runF: (S) -> Pair<S, A>) {
 
-    fun run(initial: S): Pair<S, A> {
-        return runF(initial)
+    fun run(s: S): Pair<S, A> {
+        return runF(s)
     }
 
     fun <B> map(f: (A) -> B): State<S, B> {
@@ -34,4 +34,12 @@ class State<S, out A>(val runF: (S) -> Pair<S, A>) {
             run(s1).let { (s2, a2) -> Pair(s2, f(a2)) }
         }
     }
+
+    fun <B> flatMap(f: (A) -> State<S, B>): State<S, B> {
+        return State { s1 ->
+            run(s1).let { (s2, a2) -> f(a2).run(s2) }
+        }
+    }
+
+    fun eval(s: S): A = run(s).second
 }
