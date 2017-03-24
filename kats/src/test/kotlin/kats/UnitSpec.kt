@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-apply plugin: 'kotlin'
+package kats
 
-dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
-    compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
+import io.kotlintest.Eventually
+import io.kotlintest.specs.FlatSpec
 
-    testCompile dependencies.create("io.kotlintest:kotlintest:$kotlinTestVersion") {
-        exclude group: 'org.jetbrains.kotlin'
-    }
-}
-
-sourceCompatibility = javaVersion
-targetCompatibility = javaVersion
+/**
+ * Base class for unit tests
+ */
+abstract class UnitSpec: FlatSpec(), Eventually
