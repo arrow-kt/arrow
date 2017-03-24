@@ -28,4 +28,10 @@ class State<S, out A>(val runF: (S) -> Pair<S, A>) {
     fun run(initial: S): Pair<S, A> {
         return runF(initial)
     }
+
+    fun <B> map(f: (A) -> B): State<S, B> {
+        return State { s1 ->
+            run(s1).let { (s2, a2) -> Pair(s2, f(a2)) }
+        }
+    }
 }
