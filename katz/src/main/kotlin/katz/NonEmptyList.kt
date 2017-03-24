@@ -20,14 +20,23 @@ package katz
  * A List that can not be empty
  */
 class NonEmptyList<out A> private constructor(
-        override val head: A,
-        override val tail: List<A>,
-        val all: List<A>) : NonEmptyCollection<A> {
+        val head: A,
+        val tail: List<A>,
+        val all: List<A>) {
 
     constructor(head: A, tail: List<A>) : this(head, tail, listOf(head) + tail)
     private constructor(list: List<A>) : this(list[0], list.drop(1), list)
 
-    override val size: Int = all.size
+    val size: Int = all.size
+
+    fun contains(element: @UnsafeVariance A): Boolean {
+        return (head == element).or(tail.contains(element))
+    }
+
+    fun containsAll(elements: Collection<@UnsafeVariance A>): Boolean =
+            elements.all { contains(it) }
+
+    fun isEmpty(): Boolean = false
 
     inline fun <reified B> map(f: (A) -> B): NonEmptyList<B> =
             NonEmptyList(f(head), tail.map(f))
@@ -35,7 +44,7 @@ class NonEmptyList<out A> private constructor(
     inline fun <reified B> flatMap(f: (A) -> List<B>): NonEmptyList<B> =
             unsafeFromList(all.flatMap(f))
 
-    override fun iterator(): Iterator<A> = all.iterator()
+    fun iterator(): Iterator<A> = all.iterator()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -60,18 +69,4 @@ class NonEmptyList<out A> private constructor(
         inline fun <reified A> of(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
         fun <A> unsafeFromList(l: List<A>): NonEmptyList<A> = NonEmptyList(l)
     }
-}
-
-interface NonEmptyCollection<out A> : Collection<A> {
-    val head: A
-    val tail: Collection<A>
-
-    override fun contains(element: @UnsafeVariance A): Boolean {
-        return (head == element).or(tail.contains(element))
-    }
-
-    override fun containsAll(elements: Collection<@UnsafeVariance A>): Boolean =
-            elements.all { contains(it) }
-
-    override fun isEmpty(): Boolean = false
 }
