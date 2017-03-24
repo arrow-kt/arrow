@@ -44,7 +44,7 @@ sealed class Option<out A> {
      *  @param  f   the function to apply
      *  @see flatMap
      */
-    inline fun <B> map(f: (A) -> B): Option<B> = fold({ None }, { A -> Some(f(A)) })
+    inline fun <B> map(f: (A) -> B): Option<B> = fold({ None }, { a -> Some(f(a)) })
 
     /**
      * Returns the result of applying $f to this $option's value if
@@ -56,7 +56,7 @@ sealed class Option<out A> {
      * @param  f   the function to apply
      * @see map
      */
-    inline fun <B> flatMap(f: (A) -> Option<B>): Option<B> = fold({ None }, { A -> f(A) })
+    inline fun <B> flatMap(f: (A) -> Option<B>): Option<B> = fold({ None }, { a -> f(a) })
 
     /**
      * Returns the result of applying $f to this $option's
@@ -79,7 +79,7 @@ sealed class Option<out A> {
      *
      *  @param  p   the predicate used for testing.
      */
-    inline fun filter(p: (A) -> Boolean): Option<A> = fold({ None }, { A -> if (p(A)) Some(A) else None })
+    inline fun filter(p: (A) -> Boolean): Option<A> = fold({ None }, { a -> if (p(a)) Some(a) else None })
 
     /**
      * Returns this $option if it is nonempty '''and''' applying the predicate $p to
@@ -87,7 +87,7 @@ sealed class Option<out A> {
      *
      * @param  p   the predicate used for testing.
      */
-    inline fun filterNot(p: (A) -> Boolean): Option<A> = fold({ None }, { A -> if (!p(A)) Some(A) else None })
+    inline fun filterNot(p: (A) -> Boolean): Option<A> = fold({ None }, { a -> if (!p(a)) Some(a) else None })
 
     /**
      * Returns false if the option is $none, true otherwise.
@@ -102,7 +102,7 @@ sealed class Option<out A> {
      *
      * @param  p   the predicate to test
      */
-    inline fun exists(p: (A) -> Boolean): Boolean = fold({ false }, { A -> p(A) })
+    inline fun exists(p: (A) -> Boolean): Boolean = fold({ false }, { a -> p(a) })
 
     /**
      * Returns true if this option is empty '''or''' the predicate
