@@ -1,0 +1,7 @@
+language: kotlin
+
+jdk:
+  - oraclejdk8
+
+script:
+  ./gradlew build test
