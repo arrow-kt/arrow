@@ -1,4 +1,8 @@
-# Kats
+Kats
+====
+[![Build Status](https://travis-ci.org/FineCinnamon/kats.svg?branch=master)](https://travis-ci.org/FineCinnamon/kats/)
+[![Kotlin version badge](https://img.shields.io/badge/kotlin-1.1.1-blue.svg)](http://kotlinlang.org/)
+[![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 Functional Datatypes and abstractions for Kotlin inspired by [Cats][cats]
 
