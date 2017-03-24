@@ -25,25 +25,32 @@ package kats
 sealed class Either<out A, out B> {
 
     inline fun <C> fold(fl: (A) -> C, fr: (B) -> C): C = when (this) {
-        is Left -> fl(a)
         is Right -> fr(b)
+        is Left -> fl(a)
     }
 
-    fun swap(): Either<B, A> = fold({ Right<B, A>(it) }, { Left<B, A>(it) })
+    fun swap(): Either<B, A> =
+            fold({ Right<B, A>(it) }, { Left<B, A>(it) })
 
-    inline fun <C> map(f: (B) -> C): Either<A, C> = when (this) {
-        is Right -> Right(f(b))
-        is Left -> this as Either<A, C>
-    }
+    inline fun <C> map(f: (B) -> C): Either<A, C> =
+            fold({ it as Either<A, C> }, { Right(f(it)) })
+
+    fun <BB, B> contains(elem: BB): Boolean where B : BB =
+            fold({ false }, { it == elem })
+
+    inline fun exists(predicate: (B) -> Boolean): Boolean =
+            fold({ false }, { predicate(it) })
+
+    inline fun <AA, A> filterOrElse(predicate: (B) -> Boolean, default: AA): Either<AA, B> where A : AA =
+            fold({ this as Either<AA, B> }, { if (predicate(it)) this as Either<AA, B> else Left(default) })
+
 
 
     class Left<out A, out B>(val a: A) : Either<A, B>()
     class Right<out A, out B>(val b: B) : Either<A, B>()
 }
 
-inline fun <AA, A, B, C> Either<A, B>.flatMap(f: (B) -> Either<AA, C>): Either<AA, C> where A : AA = when (this) {
-    is Either.Right -> f(b)
-    is Either.Left -> this as Either<AA, C>
-}
+inline fun <AA, A, B, C> Either<A, B>.flatMap(f: (B) -> Either<AA, C>): Either<AA, C> where A : AA =
+        fold({ this as Either<AA, C> }, { f(it) })
 
 inline fun <A, B, BB> Either<A, B>.getOrElse(default: () -> BB): BB where B : BB = fold({ default() }, { b -> b })
