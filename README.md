@@ -1,6 +1,6 @@
-Kats
+Katz
 ====
-[![Build Status](https://travis-ci.org/FineCinnamon/kats.svg?branch=master)](https://travis-ci.org/FineCinnamon/kats/)
+[![Build Status](https://travis-ci.org/FineCinnamon/Katz.svg?branch=master)](https://travis-ci.org/FineCinnamon/Katz/)
 [![Kotlin version badge](https://img.shields.io/badge/kotlin-1.1.1-blue.svg)](http://kotlinlang.org/)
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
@@ -11,7 +11,7 @@ Functional Datatypes and abstractions for Kotlin inspired by [Cats][cats]
 If you are thinking about contributing to the project, you should read the following lines about the basics of the contribution philosophy we have:
 
 * All the FP types use similar combinators. Some of them are capable of supporting just a subset of those operations, and other ones support a different subset. But in the end we have no more than a set of N given combinators that we can find in almost all the FP types.
-* The intention of **Kats** this library is to create a straightforward and simple API.
+* The intention of **Katz** this library is to create a straightforward and simple API.
 * For the types we add, we should think about the operations we can find on `Semigroup`, `Monoid`, `Foldable`, `Traversable`, `Functor`, `Applicative`, `Monad`..., and provide them in the types that can support them.
 * For those operations, you should always follow the same naming and form to kind off keep the standards.
 
@@ -32,13 +32,13 @@ If you follow this pattern, you will see by yourself how functional programing l
 
 ## The need to not overoptimize using Kotlin
 
-Once we have the pure functional base, we can start adding `Kotlin` optimizations over it using the language's syntatic sugar. But **we need to put attention on creating correct definitions over performance improvements or any type of early micro-optimization.
+Once we have the pure functional base, we can start adding `Kotlin` optimizations over it using the language's syntatic sugar. But **we need to put attention on creating correct definitions over performance improvements or any type of early micro-optimization.**
 
 Ideally, we would want to have property based tests where we would apply a series of norms over the base abstractions in each one of the types implemented.
 
 # License
 
-    Copyright (C) 2017 The Kats Authors
+    Copyright (C) 2017 The Katz Authors
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

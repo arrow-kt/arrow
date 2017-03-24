@@ -14,4 +14,12 @@
  * limitations under the License.
  */
 
-include ':katz'
+package katz
+
+import io.kotlintest.Eventually
+import io.kotlintest.specs.FlatSpec
+
+/**
+ * Base class for unit tests
+ */
+abstract class UnitSpec: FlatSpec(), Eventually

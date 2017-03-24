@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 The Kats Authors
+ * Copyright (C) 2017 The Katz Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-apply plugin: 'kotlin'
+package katz
 
-dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
-    compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
+import io.kotlintest.KTestJUnitRunner
+import org.junit.Test
+import org.junit.runner.RunWith
+
+/**
+ *
+ */
+@RunWith(KTestJUnitRunner::class)
+class KatzTests : UnitSpec() {
+    init {
+        "String.length" should "return the length of the string" {
+            "Katz".length shouldBe 4
+            "".length shouldBe 0
+        }
+    }
 }
-
-sourceCompatibility = javaVersion
-targetCompatibility = javaVersion
