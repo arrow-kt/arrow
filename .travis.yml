@@ -3,13 +3,5 @@ language: kotlin
 jdk:
   - oraclejdk8
 
-addons:
-  coverity_scan:
-    project:
-      name: "FineCinnamon/kats"
-      description: "Functional Datatypes and abstractions for Kotlin inspired by typelevel/Cats library"
-    build_command:   "./gradlew build test"
-    branch_pattern: master
-
 script:
   ./gradlew build test
