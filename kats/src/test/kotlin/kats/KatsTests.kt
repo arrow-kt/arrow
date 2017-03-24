@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
-apply plugin: 'kotlin'
+package kats
 
-test {
-    testLogging {
-        events "passed", "skipped", "failed", "standardOut", "standardError"
+import io.kotlintest.KTestJUnitRunner
+import org.junit.Test
+import org.junit.runner.RunWith
+
+/**
+ *
+ */
+@RunWith(KTestJUnitRunner::class)
+class KatsTests : UnitSpec() {
+    init {
+        "String.length" should "return the length of the string" {
+            "Kats".length shouldBe 4
+            "".length shouldBe 0
+        }
     }
 }
-
-dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
-    compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
-
-    testCompile dependencies.create("io.kotlintest:kotlintest:$kotlinTestVersion") {
-        exclude group: 'org.jetbrains.kotlin'
-    }
-}
-
-sourceCompatibility = javaVersion
-targetCompatibility = javaVersion
