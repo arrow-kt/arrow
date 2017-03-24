@@ -68,7 +68,7 @@ sealed class Option<out A> {
      * @param  ifEmpty the expression to evaluate if empty.
      * @param  f       the function to apply if nonempty.
      */
-    inline fun <B> fold(ifEmpty: () -> B, f: (A) -> B): B = when(this) {
+    inline fun <B> fold(ifEmpty: () -> B, f: (A) -> B): B = when (this) {
         is None -> ifEmpty()
         is Some -> f(value)
     }
