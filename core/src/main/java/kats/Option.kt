@@ -35,14 +35,6 @@ sealed class Option<out A> {
     val isDefined: Boolean = !isEmpty
 
     /**
-     * Returns the option's value if the option is nonempty, otherwise
-     * return the result of evaluating `default`.
-     *
-     * @param default  the default expression.
-     */
-    inline fun getOrElse(default: () -> A): A = fold({ default() }, { A -> A })
-
-    /**
      * Returns a $some containing the result of applying $f to this $option's
      * value if this $option is nonempty. Otherwise return $none.
      *
@@ -130,3 +122,11 @@ sealed class Option<out A> {
         override val isEmpty = true
     }
 }
+
+/**
+ * Returns the option's value if the option is nonempty, otherwise
+ * return the result of evaluating `default`.
+ *
+ * @param default  the default expression.
+ */
+fun <B> Option<B>.getOrElse(default: () -> B): B = fold({ default() }, { b -> b })
