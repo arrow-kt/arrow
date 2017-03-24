@@ -43,7 +43,6 @@ sealed class Option<out A> {
      *
      *  @param  f   the function to apply
      *  @see flatMap
-     *  @see foreach
      */
     inline fun <B> map(f: (A) -> B): Option<B> = fold({ None }, { A -> Some(f(A)) })
 
@@ -56,7 +55,6 @@ sealed class Option<out A> {
      *
      * @param  f   the function to apply
      * @see map
-     * @see foreach
      */
     inline fun <B> flatMap(f: (A) -> Option<B>): Option<B> = fold({ None }, { A -> f(A) })
 
