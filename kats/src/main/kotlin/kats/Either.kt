@@ -17,40 +17,44 @@
 package kats
 
 /**
- * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/Either.scala
+ * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Either.scala
  *
  * Represents a value of one of two possible types (a disjoint union.)
  * An instance of Either is either an instance of [Left] or [Right].
  */
 sealed class Either<out A, out B> {
 
-    inline fun <C> fold(fl: (A) -> C, fr: (B) -> C): C = when (this) {
-        is Right -> fr(b)
-        is Left -> fl(a)
+    inline fun <C> fold(fa: (A) -> C, fb: (B) -> C): C = when (this) {
+        is Right -> fb(b)
+        is Left -> fa(a)
     }
 
     fun swap(): Either<B, A> =
-            fold({ Right<B, A>(it) }, { Left<B, A>(it) })
+            fold({ Right(it) }, { Left(it) })
 
     inline fun <C> map(f: (B) -> C): Either<A, C> =
-            fold({ it as Either<A, C> }, { Right(f(it)) })
+            fold({ Left(it) }, { Right(f(it)) })
 
-    fun <BB, B> contains(elem: BB): Boolean where B : BB =
-            fold({ false }, { it == elem })
+    fun <BB, B> contains(elem: () -> BB): Boolean where B : BB =
+            fold({ false }, { it == elem() })
 
     inline fun exists(predicate: (B) -> Boolean): Boolean =
             fold({ false }, { predicate(it) })
 
-    inline fun <AA, A> filterOrElse(predicate: (B) -> Boolean, default: AA): Either<AA, B> where A : AA =
-            fold({ this as Either<AA, B> }, { if (predicate(it)) this as Either<AA, B> else Left(default) })
+    inline fun filterOrElse(predicate: (B) -> Boolean, default: () -> A): Either<A, B> =
+            fold({ Left(it) }, { if (predicate(it)) else Left(default()) })
+
+    inline fun <C>flatMap(f: (B) -> Either<out A, C>): Either<A, C> =
+            fold({ Either.Left(it) }, { f(it) })
+
+    fun toOption(): Option<B> =
+            fold({ Option.None }, { Option.Some(it) })
 
 
-
-    class Left<out A, out B>(val a: A) : Either<A, B>()
-    class Right<out A, out B>(val b: B) : Either<A, B>()
+    data class Left<out A>(val a: A) : Either<A, Nothing>()
+    data class Right<out B>(val b: B) : Either<Nothing, B>()
 }
 
-inline fun <AA, A, B, C> Either<A, B>.flatMap(f: (B) -> Either<AA, C>): Either<AA, C> where A : AA =
-        fold({ this as Either<AA, C> }, { f(it) })
 
-inline fun <A, B, BB> Either<A, B>.getOrElse(default: () -> BB): BB where B : BB = fold({ default() }, { b -> b })
+inline fun <A, B> Either<A, B>.getOrElse(default: () -> B): B =
+        fold({ default() }, { b -> b })
