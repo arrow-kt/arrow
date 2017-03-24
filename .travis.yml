@@ -1,4 +1,4 @@
-language: android
+language: kotlin
 
 jdk:
   - oraclejdk8
