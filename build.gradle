@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 The Kats Authors
+ * Copyright (C) 2017 The Katz Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ buildscript {
         gradleVersion = '3.4.1'
         gradleVersionsPluginVersion = '0.14.0'
         javaVersion = '1.7'
-        katsVersion = '0.1-SNAPSHOT'
+        katzVersion = '0.1-SNAPSHOT'
         kotlinTestVersion = '1.3.7'
         kotlinVersion = '1.1.1'
         kotlinxCollectionsImmutableVersion = '0.1'
@@ -47,7 +47,7 @@ allprojects {
 
     group = 'com.github.finecinnamon'
     archivesBaseName = project.name
-    version = katsVersion
+    version = katzVersion
 }
 
 task wrapper(type: Wrapper) {
