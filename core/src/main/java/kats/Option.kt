@@ -16,15 +16,13 @@
 
 package kats
 
-import java.util.*
-
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/Option.scala
  *
  * Represents optional values. Instances of `Option`
  * are either an instance of $some or the object $none.
  */
-sealed class Option<A> {
+sealed class Option<out A> {
 
     /**
      * Returns true if the option is $none, false otherwise.
@@ -37,19 +35,12 @@ sealed class Option<A> {
     val isDefined: Boolean = !isEmpty
 
     /**
-     * Returns the option's value.
-     * @note The option must be nonempty.
-     * @throws java.util.NoSuchElementException if the option is empty.
-     */
-    abstract fun get(): A
-
-    /**
      * Returns the option's value if the option is nonempty, otherwise
      * return the result of evaluating `default`.
      *
      * @param default  the default expression.
      */
-    inline fun getOrElse(default: () -> A): A = if (isEmpty) default() else get()
+    inline fun getOrElse(default: () -> A): A = fold({ default() }, { A -> A })
 
     /**
      * Returns a $some containing the result of applying $f to this $option's
@@ -62,7 +53,7 @@ sealed class Option<A> {
      *  @see flatMap
      *  @see foreach
      */
-    inline fun <B> map(f: (A) -> B): Option<B> = if (isEmpty) None() else Some(f(get()))
+    inline fun <B> map(f: (A) -> B): Option<B> = fold({ None }, { A -> Some(f(A)) })
 
     /**
      * Returns the result of applying $f to this $option's value if
@@ -75,7 +66,7 @@ sealed class Option<A> {
      * @see map
      * @see foreach
      */
-    inline fun <B> flatMap(f: (A) -> Option<B>): Option<B> = if (isEmpty) None() else f(get())
+    inline fun <B> flatMap(f: (A) -> Option<B>): Option<B> = fold({ None }, { A -> f(A) })
 
     /**
      * Returns the result of applying $f to this $option's
@@ -87,7 +78,10 @@ sealed class Option<A> {
      * @param  ifEmpty the expression to evaluate if empty.
      * @param  f       the function to apply if nonempty.
      */
-    inline fun <B> fold(ifEmpty: () -> B, f: (A) -> B): B = if (isEmpty) ifEmpty() else f(get())
+    inline fun <B> fold(ifEmpty: () -> B, f: (A) -> B): B = when(this) {
+        is None -> ifEmpty()
+        is Some -> f(value)
+    }
 
     /**
      * Returns this $option if it is nonempty '''and''' applying the predicate $p to
@@ -95,7 +89,7 @@ sealed class Option<A> {
      *
      *  @param  p   the predicate used for testing.
      */
-    inline fun filter(p: (A) -> Boolean): Option<A> = if (isEmpty || p(get())) this else None()
+    inline fun filter(p: (A) -> Boolean): Option<A> = fold({ None }, { A -> if (p(A)) Some(A) else None })
 
     /**
      * Returns this $option if it is nonempty '''and''' applying the predicate $p to
@@ -103,7 +97,7 @@ sealed class Option<A> {
      *
      * @param  p   the predicate used for testing.
      */
-    inline fun filterNot(p: (A) -> Boolean): Option<A> = if (isEmpty || !p(get())) this else None()
+    inline fun filterNot(p: (A) -> Boolean): Option<A> = fold({ None }, { A -> if (!p(A)) Some(A) else None })
 
     /**
      * Returns false if the option is $none, true otherwise.
@@ -112,22 +106,13 @@ sealed class Option<A> {
     val nonEmpty = isDefined
 
     /**
-     * Tests whether the option contains a given value as an element.
-     *
-     * @param elem the element to test.
-     * @return `true` if the option has an element that is equal (as
-     * determined by `==`) to `elem`, `false` otherwise.
-     */
-    fun contains(elem: A): Boolean = !isEmpty && get() == elem
-
-    /**
      * Returns true if this option is nonempty '''and''' the predicate
      * $p returns true when applied to this $option's value.
      * Otherwise, returns false.
      *
      * @param  p   the predicate to test
      */
-    inline fun exists(p: (A) -> Boolean): Boolean = !isEmpty && p(get())
+    inline fun exists(p: (A) -> Boolean): Boolean = fold({ false }, { A -> p(A) })
 
     /**
      * Returns true if this option is empty '''or''' the predicate
@@ -137,23 +122,11 @@ sealed class Option<A> {
      */
     inline fun forall(p: (A) -> Boolean): Boolean = exists(p)
 
-    /**
-     * Apply the given procedure $f to the option's value,
-     * if it is nonempty. Otherwise, do nothing.
-     *
-     * @param  f   the procedure to apply.
-     * @see map
-     * @see flatMap
-     */
-    inline fun <B> foreach(f: (A) -> B) { if (!isEmpty) f(get()) }
-
     class Some<A>(val value: A) : Option<A>() {
         override val isEmpty = false
-        override fun get(): A = value
     }
 
-    class None<A> : Option<A>() {
+    object None : Option<Nothing>() {
         override val isEmpty = true
-        override fun get(): Nothing = throw NoSuchElementException("None.get")
     }
 }
