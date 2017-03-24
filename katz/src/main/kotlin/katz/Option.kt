@@ -24,6 +24,12 @@ package katz
  */
 sealed class Option<out A> {
 
+    companion object {
+
+        fun <A> apply(f: () -> A): Option<A> = if (f() == null) None else Some(f())
+    }
+
+
     /**
      * Returns true if the option is $none, false otherwise.
      */
