@@ -32,7 +32,7 @@ If you follow this pattern, you will see by yourself how functional programing l
 
 ## The need to not overoptimize using Kotlin
 
-Once we have the pure functional base, we can start adding `Kotlin` optimizations over it using the language's syntatic sugar. But **we need to put attention on creating correct definitions over performance improvements or any type of early micro-optimization.
+Once we have the pure functional base, we can start adding `Kotlin` optimizations over it using the language's syntatic sugar. But **we need to put attention on creating correct definitions over performance improvements or any type of early micro-optimization.**
 
 Ideally, we would want to have property based tests where we would apply a series of norms over the base abstractions in each one of the types implemented.
 
