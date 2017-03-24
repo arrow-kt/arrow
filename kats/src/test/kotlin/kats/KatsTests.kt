@@ -16,9 +16,14 @@
 
 package kats
 
+import io.kotlintest.KTestJUnitRunner
+import org.junit.Test
+import org.junit.runner.RunWith
+
 /**
  *
  */
+@RunWith(KTestJUnitRunner::class)
 class KatsTests : UnitSpec() {
     init {
         "String.length" should "return the length of the string" {
