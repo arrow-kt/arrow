@@ -112,7 +112,7 @@ sealed class Option<out A> {
      */
     inline fun forall(p: (A) -> Boolean): Boolean = exists(p)
 
-    class Some<A>(val value: A) : Option<A>() {
+    data class Some<A>(val value: A) : Option<A>() {
         override val isEmpty = false
     }
 
