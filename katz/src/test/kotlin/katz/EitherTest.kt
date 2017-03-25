@@ -26,71 +26,89 @@ class EitherTest : UnitSpec() {
     init {
 
         "map" should "modify value" {
-            Right(12).map { "flower" } shouldBe Right("flower")
-            Left(12).map { "flower" } shouldBe Left(12)
+            forAll { a: Int, b: String ->
+                Right(a).map { b } == Right(b)
+                        && Left(a).map { b } == Left(a)
+            }
         }
 
         "flatMap" should "modify entity" {
-            val left: Either<String, Int> = Left("Nope")
+            forAll { a: Int, b: String ->
+                {
+                    val left: Either<Int, Int> = Left(a)
 
-            Right(1).flatMap { left } shouldBe left
-            Right(1).flatMap { Right("something") } shouldBe Right("something")
-            left.flatMap { Right("something") } shouldBe left
+                    Right(a).flatMap { left } == left
+                            && Right(a).flatMap { Right(b) } == Right(b)
+                            && left.flatMap { Right(b) } == left
+                }()
+            }
         }
 
         "getOrElse" should "return value" {
-            Right(12).getOrElse { 17 } shouldBe 12
-            Left(12).getOrElse { 17 } shouldBe 17
+            forAll { a: Int, b: Int ->
+                Right(a).getOrElse { b } == a
+                        && Left(a).getOrElse { b } == b
+            }
+
         }
 
         "exits" should "evaluate value" {
-            val left: Either<Int, Int> = Left(12)
+            forAll { a: Int ->
+                {
+                    val left: Either<Int, Int> = Left(a)
 
-            Right(12).exists { it > 10 } shouldBe true
-            Right(7).exists { it > 10 } shouldBe false
-            left.exists { it > 10 } shouldBe false
+                    Right(a).exists { it > a - 1 } == true
+                            && Right(a).exists { it > a + 1 } == false
+                            && left.exists { it > a - 1 } == false
+                }()
+            }
         }
 
         "filterOrElse" should "filters value" {
-            val left: Either<Int, Int> = Left(12)
+            forAll { a: Int, b: Int ->
+                {
+                    val left: Either<Int, Int> = Left(a)
 
-            Right(12).filterOrElse({ it > 10 }, { -1 }) shouldBe Right(12)
-            Right(7).filterOrElse({ it > 10 }, { -1 }) shouldBe Left(-1)
-            left.filterOrElse({ it > 10 }, { -1 }) shouldBe Left(12)
+                    Right(a).filterOrElse({ it > a - 1 }, { b }) == Right(a)
+                            && Right(a).filterOrElse({ it > a + 1 }, { b }) == Left(b)
+                            && left.filterOrElse({ it > a - 1 }, { b }) == Left(a)
+                            && left.filterOrElse({ it > a + 1 }, { b }) == Left(a)
+                }()
+            }
         }
 
         "swap" should "interchange values" {
-            Left("left").swap() shouldBe Right("left")
-            Right("right").swap() shouldBe Left("right")
+            forAll { a: Int ->
+                Left(a).swap() == Right(a)
+                        && Right(a).swap() == Left(a)
+            }
         }
 
         "fold" should "call left function on Left" {
-            val exception = Exception()
-            val result: Either<Exception, String> = Left(exception)
-            result.fold(
-                    { it shouldBe exception },
-                    { fail("Right should not be called") }
-            )
+            forAll { a: Int, b: Int ->
+                Left(a).fold({ b }, { a }) == b
+            }
         }
 
         "fold" should "call right function on Right" {
-            val value = "Some value"
-            val result: Either<Exception, String> = Right(value)
-            result.fold(
-                    { fail("Left should not be called") },
-                    { it shouldBe value }
-            )
+            forAll { a: Int, b: Int ->
+                Right(a).fold({ b }, { a }) == a
+            }
         }
 
         "toOption" should "convert" {
-            Right(12).toOption() shouldBe Option.Some(12)
-            Left(12).toOption() shouldBe Option.None
+            forAll { a: Int ->
+                Right(a).toOption() == Option.Some(a)
+                        && Left(a).toOption() == Option.None
+            }
         }
 
         "contains" should "check value" {
-            Right("something").contains { "something" } shouldBe true
-            Right("something").contains { "anything" } shouldBe false
-            Left("something").contains { "something" } shouldBe false
+            forAll { a: Int, b: Int ->
+                Right(a).contains { a }
+                        && !Right(a).contains { b }
+                        && !Left(a).contains { a }
+            }
         }
     }
 }

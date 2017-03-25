@@ -27,9 +27,8 @@ dependencies {
     compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
 
-    testCompile dependencies.create("io.kotlintest:kotlintest:$kotlinTestVersion") {
-        exclude group: 'org.jetbrains.kotlin'
-    }
+    testCompile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+    testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
 }
 
 sourceCompatibility = javaVersion
