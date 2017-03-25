@@ -22,7 +22,7 @@ package katz
  * Represents a value of one of two possible types (a disjoint union.)
  * An instance of Either is either an instance of [Left] or [Right].
  */
-sealed class Either<out A, out B> {
+sealed class Either<out A : Any, out B : Any> {
 
     /**
      * Returns `true` if this is a [Right], `false` otherwise.
@@ -88,7 +88,7 @@ sealed class Either<out A, out B> {
      * Left(12).map { "flower" }  // Result: Left(12)
      * ```
      */
-    inline fun <C> map(f: (B) -> C): Either<A, C> =
+    inline fun <C : Any> map(f: (B) -> C): Either<A, C> =
             fold({ Left(it) }, { Right(f(it)) })
 
     /**
@@ -140,7 +140,7 @@ sealed class Either<out A, out B> {
     /**
      * The left side of the disjoint union, as opposed to the [Right] side.
      */
-    data class Left<out A>(val a: A) : Either<A, Nothing>() {
+    data class Left<out A : Any>(val a: A) : Either<A, Nothing>() {
         override val isLeft = true
         override val isRight = false
     }
@@ -148,7 +148,7 @@ sealed class Either<out A, out B> {
     /**
      * The right side of the disjoint union, as opposed to the [Left] side.
      */
-    data class Right<out B>(val b: B) : Either<Nothing, B>() {
+    data class Right<out B : Any>(val b: B) : Either<Nothing, B>() {
         override val isLeft = true
         override val isRight = false
     }
@@ -159,7 +159,7 @@ sealed class Either<out A, out B> {
  *
  * @param f The function to bind across [Either.Right].
  */
-inline fun <AA, C, A, B> Either<A, B>.flatMap(f: (B) -> Either<AA, C>): Either<AA, C> where A : AA =
+inline fun <C : Any, A : Any, B : Any> Either<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> =
         fold({ Either.Left(it) }, { f(it) })
 
 /**
@@ -171,7 +171,7 @@ inline fun <AA, C, A, B> Either<A, B>.flatMap(f: (B) -> Either<AA, C>): Either<A
  * Left(12).getOrElse(17)  // Result: 17
  * ```
  */
-inline fun <BB, A, B> Either<A, B>.getOrElse(default: () -> BB): BB where B : BB =
+inline fun <A : Any, B : Any> Either<A, B>.getOrElse(default: () -> B): B =
         fold({ default() }, { b -> b })
 
 /**
@@ -190,5 +190,5 @@ inline fun <BB, A, B> Either<A, B>.getOrElse(default: () -> BB): BB where B : BB
  * left.filterOrElse({ it > 10 }, { -1 })      // Result: Left(12)
  * ```
  */
-inline fun <AA, A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, default: () -> AA): Either<AA, B> where A : AA =
+inline fun <A : Any, B : Any> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, default: () -> A): Either<A, B> =
         fold({ Either.Left(it) }, { if (predicate(it)) Either.Right(it) else Either.Left(default()) })
