@@ -19,7 +19,7 @@ package katz
 /**
  * A List that can not be empty
  */
-class NonEmptyList<out A> private constructor(
+class NonEmptyList<out A: Any> private constructor(
         val head: A,
         val tail: List<A>,
         val all: List<A>) {
@@ -38,10 +38,10 @@ class NonEmptyList<out A> private constructor(
 
     fun isEmpty(): Boolean = false
 
-    fun <B> map(f: (A) -> B): NonEmptyList<B> =
+    fun <B: Any> map(f: (A) -> B): NonEmptyList<B> =
             NonEmptyList(f(head), tail.map(f))
 
-    fun <B> flatMap(f: (A) -> List<B>): NonEmptyList<B> =
+    fun <B: Any> flatMap(f: (A) -> List<B>): NonEmptyList<B> =
             NonEmptyList(all.flatMap(f))
 
     fun iterator(): Iterator<A> = all.iterator()
@@ -66,6 +66,6 @@ class NonEmptyList<out A> private constructor(
     }
 
     companion object Factory {
-        fun <A> of(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
+        fun <A: Any> of(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
     }
 }
