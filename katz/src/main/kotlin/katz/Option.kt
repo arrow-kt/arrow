@@ -24,6 +24,12 @@ package katz
  */
 sealed class Option<out A> {
 
+    companion object {
+
+        inline fun <A> fromNullable(f: () -> A): Option<A> = f().let { if (it == null) None else Some(it) }
+        operator fun <A : Any> invoke(a: A): Option<A> = Some(a)
+    }
+
     /**
      * Returns true if the option is $none, false otherwise.
      */
@@ -38,11 +44,11 @@ sealed class Option<out A> {
      * Returns a $some containing the result of applying $f to this $option's
      * value if this $option is nonempty. Otherwise return $none.
      *
-     *  @note This is similar to `flatMap` except here,
-     *  $f does not need to wrap its result in an $option.
+     * @note This is similar to `flatMap` except here,
+     * $f does not need to wrap its result in an $option.
      *
-     *  @param  f   the function to apply
-     *  @see flatMap
+     * @param  f   the function to apply
+     * @see flatMap
      */
     inline fun <B> map(f: (A) -> B): Option<B> = fold({ None }, { a -> Some(f(a)) })
 
@@ -127,4 +133,4 @@ sealed class Option<out A> {
  *
  * @param default  the default expression.
  */
-fun <B> Option<B>.getOrElse(default: () -> B): B = fold({ default() }, { b -> b })
+fun <B> Option<B>.getOrElse(default: () -> B): B = fold({ default() }, { it })
