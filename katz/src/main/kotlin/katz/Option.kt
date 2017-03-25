@@ -38,11 +38,11 @@ sealed class Option<out A> {
      * Returns a $some containing the result of applying $f to this $option's
      * value if this $option is nonempty. Otherwise return $none.
      *
-     *  @note This is similar to `flatMap` except here,
-     *  $f does not need to wrap its result in an $option.
+     * @note This is similar to `flatMap` except here,
+     * $f does not need to wrap its result in an $option.
      *
-     *  @param  f   the function to apply
-     *  @see flatMap
+     * @param  f   the function to apply
+     * @see flatMap
      */
     inline fun <B> map(f: (A) -> B): Option<B> = fold({ None }, { a -> Some(f(a)) })
 
@@ -112,7 +112,7 @@ sealed class Option<out A> {
      */
     inline fun forall(p: (A) -> Boolean): Boolean = exists(p)
 
-    class Some<A>(val value: A) : Option<A>() {
+    data class Some<A>(val value: A) : Option<A>() {
         override val isEmpty = false
     }
 
