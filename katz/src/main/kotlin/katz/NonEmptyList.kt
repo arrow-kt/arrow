@@ -19,7 +19,7 @@ package katz
 /**
  * A List that can not be empty
  */
-class NonEmptyList<out A: Any> private constructor(
+class NonEmptyList<out A : Any> private constructor(
         val head: A,
         val tail: List<A>,
         val all: List<A>) {
@@ -38,14 +38,15 @@ class NonEmptyList<out A: Any> private constructor(
 
     fun isEmpty(): Boolean = false
 
-    fun <B: Any> map(f: (A) -> B): NonEmptyList<B> =
+    fun <B : Any> map(f: (A) -> B): NonEmptyList<B> =
             NonEmptyList(f(head), tail.map(f))
 
-    fun <B: Any> flatMap(f: (A) -> NonEmptyList<B>): NonEmptyList<B> =
-        f(head) + tail.flatMap { f(it).all }
+    fun <B : Any> flatMap(f: (A) -> NonEmptyList<B>): NonEmptyList<B> =
+            f(head) + tail.flatMap { f(it).all }
 
-    operator fun <A: Any> NonEmptyList<A>.plus(l: List<A>): NonEmptyList<A> = NonEmptyList(all + l)
-    operator fun <A: Any> NonEmptyList<A>.plus(l: NonEmptyList<A>): NonEmptyList<A> = NonEmptyList(all + l.all)
+    operator fun <A : Any> NonEmptyList<A>.plus(l: List<A>): NonEmptyList<A> = NonEmptyList(all + l)
+
+    operator fun <A : Any> NonEmptyList<A>.plus(l: NonEmptyList<A>): NonEmptyList<A> = NonEmptyList(all + l.all)
 
     fun iterator(): Iterator<A> = all.iterator()
 
@@ -69,6 +70,6 @@ class NonEmptyList<out A: Any> private constructor(
     }
 
     companion object Factory {
-        fun <A: Any> of(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
+        fun <A : Any> of(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
     }
 }
