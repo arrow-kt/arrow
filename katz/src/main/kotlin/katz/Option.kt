@@ -24,6 +24,12 @@ package katz
  */
 sealed class Option<out A> {
 
+    companion object {
+
+        inline fun <A> fromNullable(f: () -> A): Option<A> = f().let { if (it == null) None else Some(it) }
+        operator fun <A : Any> invoke(a: A): Option<A> = Some(a)
+    }
+
     /**
      * Returns true if the option is $none, false otherwise.
      */
@@ -111,7 +117,7 @@ sealed class Option<out A> {
      * @param  p   the predicate to test
      */
     inline fun forall(p: (A) -> Boolean): Boolean = exists(p)
-
+    
     data class Some<A>(val value: A) : Option<A>() {
         override val isEmpty = false
     }
@@ -127,4 +133,4 @@ sealed class Option<out A> {
  *
  * @param default  the default expression.
  */
-fun <B> Option<B>.getOrElse(default: () -> B): B = fold({ default() }, { b -> b })
+fun <B> Option<B>.getOrElse(default: () -> B): B = fold({ default() }, { it })

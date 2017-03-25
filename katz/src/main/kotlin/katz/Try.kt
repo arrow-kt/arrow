@@ -98,7 +98,7 @@ sealed class Try<out A> {
  *
  * ''Note:'': This will throw an exception if it is not a success and default throws an exception.
  */
-fun <B> Try<B>.getOrElse(default: () -> B): B = fold({ default() }, { b -> b })
+fun <B> Try<B>.getOrElse(default: () -> B): B = fold({ default() }, { it })
 
 /**
  * Applies the given function `f` if this is a `Failure`, otherwise returns this if this is a `Success`.
