@@ -132,4 +132,4 @@ sealed class Option<out A> {
  *
  * @param default  the default expression.
  */
-fun <B> Option<B>.getOrElse(default: () -> B): B = fold({ default() }, { b -> b })
+fun <B> Option<B>.getOrElse(default: () -> B): B = fold({ default() }, { it })
