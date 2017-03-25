@@ -171,7 +171,7 @@ inline fun <C : Any, A : Any, B : Any> Either<A, B>.flatMap(f: (B) -> Either<A, 
  * Left(12).getOrElse(17)  // Result: 17
  * ```
  */
-inline fun <A : Any, B : Any> Either<A, B>.getOrElse(default: () -> B): B =
+inline fun <B : Any> Either<*, B>.getOrElse(default: () -> B): B =
         fold({ default() }, { b -> b })
 
 /**
