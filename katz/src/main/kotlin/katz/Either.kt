@@ -159,7 +159,7 @@ sealed class Either<out A : Any, out B : Any> {
  *
  * @param f The function to bind across [Either.Right].
  */
-inline fun <C : Any, A : Any, B : Any> Either<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> =
+inline fun <A : Any, B : Any, C : Any> Either<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> =
         fold({ Either.Left(it) }, { f(it) })
 
 /**
