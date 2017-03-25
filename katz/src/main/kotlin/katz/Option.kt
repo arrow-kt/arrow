@@ -27,6 +27,7 @@ sealed class Option<out A> {
     companion object {
 
         inline fun <A> fromNullable(f: () -> A): Option<A> = f().let { if (it == null) None else Some(it) }
+        operator fun <A : Any> invoke(a: A): Option<A> = Some(a)
     }
 
     /**
