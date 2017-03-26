@@ -118,7 +118,7 @@ sealed class Option<out A: Any> {
      * @param  p   the predicate to test
      */
     inline fun forall(p: (A) -> Boolean): Boolean = exists(p)
-    
+
     data class Some<out A : Any>(val value: A) : Option<A>() {
         override val isEmpty = false
     }
