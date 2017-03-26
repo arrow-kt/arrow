@@ -35,6 +35,6 @@ class Reader<C : Any, out A : Any>(val rd: (C) -> A) {
     /**
      * Lifts read function to Reader.
      */
-    fun <C : Any, A : Any> pure(rd: (C) -> A) = Reader(rd)
+    inline operator fun <C : Any, A : Any> invoke(noinline rd: (C) -> A) = Reader(rd)
   }
 }
