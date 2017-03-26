@@ -22,15 +22,13 @@ package katz
  * Represents optional values. Instances of `Option`
  * are either an instance of $some or the object $none.
  */
-sealed class Option<out A : Any> : HK<Option.F, A> {
+sealed class Option<out A> : HK<Option.F, A> {
 
     class F
 
-    companion object Factory: OptionInstances {
-        @Suppress("SENSELESS_COMPARISON")
-        inline fun <A : Any> fromNullable(f: () -> A): Option<A> = f().let { if (it == null) None else Some(it) }
-
-        operator fun <A : Any> invoke(a: A): Option<A> = Some(a)
+    companion object: OptionInstances {
+        inline fun <A> fromNullable(f: () -> A): Option<A> = f().let { if (it == null) None else Some(it) }
+        operator fun <A> invoke(a: A): Option<A> = Some(a)
     }
 
     /**
@@ -53,7 +51,7 @@ sealed class Option<out A : Any> : HK<Option.F, A> {
      * @param  f   the function to apply
      * @see flatMap
      */
-    inline fun <B : Any> map(f: (A) -> B): Option<B> = fold({ None }, { a -> Some(f(a)) })
+    inline fun <B> map(f: (A) -> B): Option<B> = fold({ None }, { a -> Some(f(a)) })
 
     /**
      * Returns the result of applying $f to this $option's value if
@@ -65,7 +63,7 @@ sealed class Option<out A : Any> : HK<Option.F, A> {
      * @param  f   the function to apply
      * @see map
      */
-    inline fun <B : Any> flatMap(f: (A) -> Option<B>): Option<B> = fold({ None }, { a -> f(a) })
+    inline fun <B> flatMap(f: (A) -> Option<B>): Option<B> = fold({ None }, { a -> f(a) })
 
     /**
      * Returns the result of applying $f to this $option's
@@ -77,7 +75,7 @@ sealed class Option<out A : Any> : HK<Option.F, A> {
      * @param  ifEmpty the expression to evaluate if empty.
      * @param  f       the function to apply if nonempty.
      */
-    inline fun <B : Any> fold(ifEmpty: () -> B, f: (A) -> B): B = when (this) {
+    inline fun <B> fold(ifEmpty: () -> B, f: (A) -> B): B = when (this) {
         is None -> ifEmpty()
         is Some -> f(value)
     }
@@ -121,7 +119,7 @@ sealed class Option<out A : Any> : HK<Option.F, A> {
      */
     inline fun forall(p: (A) -> Boolean): Boolean = exists(p)
 
-    data class Some<out A : Any>(val value: A) : Option<A>() {
+    data class Some<out A>(val value: A) : Option<A>() {
         override val isEmpty = false
     }
 
@@ -130,15 +128,15 @@ sealed class Option<out A : Any> : HK<Option.F, A> {
     }
 
     interface OptionInstances {
-        fun <A : Any> HK<Option.F, A>.ev(): Option<A> = this as Option<A>
+        fun <A> HK<Option.F, A>.ev(): Option<A> = this as Option<A>
 
         fun monad() = object : Monad<Option.F> {
-            override fun <A : Any, B : Any> map(fa: HK<F, A>, f: (A) -> B): HK<F, B> =
+            override fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B> =
                     fa.ev().map(f)
 
-            override fun <A : Any> pure(a: A): HK<F, A> = Some(a)
+            override fun <A> pure(a: A): HK<F, A> = Some(a)
 
-            override fun <A : Any, B : Any> flatMap(fa: HK<F, A>, f: (A) -> HK<F, B>): HK<F, B> =
+            override fun <A, B> flatMap(fa: HK<F, A>, f: (A) -> HK<F, B>): HK<F, B> =
                     fa.ev().flatMap { f(it).ev() }
 
         }
@@ -153,4 +151,4 @@ sealed class Option<out A : Any> : HK<Option.F, A> {
  *
  * @param default  the default expression.
  */
-fun <B : Any> Option<B>.getOrElse(default: () -> B): B = fold({ default() }, { it })
+fun <B> Option<B>.getOrElse(default: () -> B): B = fold({ default() }, { it })
