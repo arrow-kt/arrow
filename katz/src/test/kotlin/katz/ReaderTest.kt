@@ -23,7 +23,7 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class ReaderTest : UnitSpec() {
     init {
-        "map" should "return mapped Reader" {
+        "map" should "return mapped value" {
             Reader<Int, Int> { it -> it * 2 }.map { it -> it * 3 }.run(2) shouldBe 12
         }
 
