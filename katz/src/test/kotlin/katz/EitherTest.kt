@@ -105,9 +105,9 @@ class EitherTest : UnitSpec() {
 
         "contains" should "check value" {
             forAll { a: Int, b: Int ->
-                Right(a).contains { a }
-                        && !Right(a).contains { b }
-                        && !Left(a).contains { a }
+                Right(a).contains(a)
+                        && !Right(a).contains(b)
+                        && !Left(a).contains(a)
             }
         }
     }

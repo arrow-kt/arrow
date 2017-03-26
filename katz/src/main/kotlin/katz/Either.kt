@@ -192,5 +192,5 @@ inline fun <A : Any, B : Any> Either<A, B>.filterOrElse(predicate: (B) -> Boolea
  * @param elem    the element to test.
  * @return `true` if the option has an element that is equal (as determined by `==`) to `elem`, `false` otherwise.
  */
-fun <A : Any, B, BB : Any> Either<A, B>.contains(elem: () -> BB): Boolean where B : BB =
-        fold({ false }, { it == elem() })
+fun <A : Any, B, BB : Any> Either<A, B>.contains(elem: BB): Boolean where B : BB =
+        fold({ false }, { it == elem })
