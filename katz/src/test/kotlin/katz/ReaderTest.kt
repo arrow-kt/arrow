@@ -28,8 +28,7 @@ class ReaderTest : UnitSpec() {
         }
 
         "flatMap" should "map over the inner value" {
-            Reader<Int, Int> { it -> it * 2 }.flatMap { Reader<Int, Int> { it -> it * 3 } }
-                    .run(2) shouldBe 12
+            Reader<Int, Int> { it -> it * 2 }.flatMap { Reader<Int, Int> {it * 3} } shouldBe 12
         }
     }
 }
