@@ -29,7 +29,20 @@ dependencies {
 
     testCompile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
 }
 
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
+buildscript {
+    ext.kotlin_version = '1.1.1'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+repositories {
+    mavenCentral()
+}
