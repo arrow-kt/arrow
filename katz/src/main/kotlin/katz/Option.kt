@@ -22,12 +22,14 @@ package katz
  * Represents optional values. Instances of `Option`
  * are either an instance of $some or the object $none.
  */
-sealed class Option<out A: Any> {
+sealed class Option<out A : Any> : HK<Option.F, A> {
 
-    companion object {
+    class F
 
+    companion object Factory: OptionInstances {
         @Suppress("SENSELESS_COMPARISON")
-        inline fun <A: Any> fromNullable(f: () -> A): Option<A> = f().let { if (it == null) None else Some(it) }
+        inline fun <A : Any> fromNullable(f: () -> A): Option<A> = f().let { if (it == null) None else Some(it) }
+
         operator fun <A : Any> invoke(a: A): Option<A> = Some(a)
     }
 
@@ -126,7 +128,24 @@ sealed class Option<out A: Any> {
     object None : Option<Nothing>() {
         override val isEmpty = true
     }
+
+    interface OptionInstances {
+        fun <A : Any> HK<Option.F, A>.ev(): Option<A> = this as Option<A>
+
+        fun monad() = object : Monad<Option.F> {
+            override fun <A : Any, B : Any> map(fa: HK<F, A>, f: (A) -> B): HK<F, B> =
+                    fa.ev().map(f)
+
+            override fun <A : Any> pure(a: A): HK<F, A> = Some(a)
+
+            override fun <A : Any, B : Any> flatMap(fa: HK<F, A>, f: (A) -> HK<F, B>): HK<F, B> =
+                    fa.ev().flatMap { f(it).ev() }
+
+        }
+
+    }
 }
+
 
 /**
  * Returns the option's value if the option is nonempty, otherwise

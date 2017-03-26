@@ -66,5 +66,14 @@ class OptionTest : UnitSpec() {
                     { value }
             ) shouldBe value
         }
+
+        "Option.monad.flatMap" should "be consistent with Option#flatMap" {
+            forAll { a: Int ->
+                val x = {b: Int -> Option(b * a)}
+                val option = Option(a)
+                option.flatMap(x) == Option.monad().flatMap(option, x)
+            }
+        }
+
     }
 }
