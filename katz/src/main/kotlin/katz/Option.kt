@@ -27,7 +27,6 @@ sealed class Option<out A> : HK<Option.F, A> {
     class F
 
     companion object: OptionInstances {
-        inline fun <A> fromNullable(f: () -> A): Option<A> = f().let { if (it == null) None else Some(it) }
         operator fun <A> invoke(a: A): Option<A> = Some(a)
     }
 
