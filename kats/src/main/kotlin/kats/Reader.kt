@@ -24,4 +24,17 @@ class Reader<C : Any, out A : Any>(val rd: (C) -> A) {
   }
 
   fun run(c: C) = rd(c)
+
+  companion object Factory {
+
+    /**
+     * Lifts an A value to Reader wrapping it in a supplier function with no arguments.
+     */
+    fun <C : Any, A : Any> pure(a: A): Reader<C, A> = Reader { _ -> a }
+
+    /**
+     * Lifts read function to Reader.
+     */
+    fun <C : Any, A : Any> pure(rd: (C) -> A) = Reader(rd)
+  }
 }
