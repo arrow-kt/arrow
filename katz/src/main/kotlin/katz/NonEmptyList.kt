@@ -44,9 +44,11 @@ class NonEmptyList<out A : Any> private constructor(
     fun <B : Any> flatMap(f: (A) -> NonEmptyList<B>): NonEmptyList<B> =
             f(head) + tail.flatMap { f(it).all }
 
+    operator fun <A : Any> NonEmptyList<A>.plus(l: NonEmptyList<A>): NonEmptyList<A> = NonEmptyList(all + l.all)
+
     operator fun <A : Any> NonEmptyList<A>.plus(l: List<A>): NonEmptyList<A> = NonEmptyList(all + l)
 
-    operator fun <A : Any> NonEmptyList<A>.plus(l: NonEmptyList<A>): NonEmptyList<A> = NonEmptyList(all + l.all)
+    operator fun <A : Any> NonEmptyList<A>.plus(a: A): NonEmptyList<A> = NonEmptyList(all + a)
 
     fun iterator(): Iterator<A> = all.iterator()
 
