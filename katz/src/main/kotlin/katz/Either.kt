@@ -16,6 +16,8 @@
 
 package katz
 
+import katz.Either.Right
+
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Either.scala
  *
@@ -62,7 +64,7 @@ sealed class Either<out A : Any, out B : Any> {
      * @param fb the function to apply if this is a [Right]
      * @return the results of applying the function
      */
-    inline fun <C> fold(fa: (A) -> C, fb: (B) -> C): C = when (this) {
+    inline fun <C : Any> fold(fa: (A) -> C, fb: (B) -> C): C = when (this) {
         is Right -> fb(b)
         is Left -> fa(a)
     }
@@ -90,23 +92,6 @@ sealed class Either<out A : Any, out B : Any> {
      */
     inline fun <C : Any> map(f: (B) -> C): Either<A, C> =
             fold({ Left(it) }, { Right(f(it)) })
-
-    /**
-     * Returns `true` if this is a [Right] and its value is equal to `elem` (as determined by `==`),
-     * returns `false` otherwise.
-     *
-     * Example:
-     * ```
-     * Right("something").contains { "something" } // Result: true
-     * Right("something").contains { "anything" }  // Result: false
-     * Left("something").contains { "something" }  // Result: false
-     *  ```
-     *
-     * @param elem    the element to test.
-     * @return `true` if the option has an element that is equal (as determined by `==`) to `elem`, `false` otherwise.
-     */
-    fun <BB, B> contains(elem: () -> BB): Boolean where B : BB =
-            fold({ false }, { it == elem() })
 
     /**
      * Returns `false` if [Left] or returns the result of the application of
@@ -149,8 +134,8 @@ sealed class Either<out A : Any, out B : Any> {
      * The right side of the disjoint union, as opposed to the [Left] side.
      */
     data class Right<out B : Any>(val b: B) : Either<Nothing, B>() {
-        override val isLeft = true
-        override val isRight = false
+        override val isLeft = false
+        override val isRight = true
     }
 }
 
@@ -172,7 +157,7 @@ inline fun <A : Any, B : Any, C : Any> Either<A, B>.flatMap(f: (B) -> Either<A, 
  * ```
  */
 inline fun <B : Any> Either<*, B>.getOrElse(default: () -> B): B =
-        fold({ default() }, { b -> b })
+        fold({ default() }, { it })
 
 /**
  * * Returns [Either.Right] with the existing value of [Either.Right] if this is a [Either.Right] and the given predicate
@@ -192,3 +177,20 @@ inline fun <B : Any> Either<*, B>.getOrElse(default: () -> B): B =
  */
 inline fun <A : Any, B : Any> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, default: () -> A): Either<A, B> =
         fold({ Either.Left(it) }, { if (predicate(it)) Either.Right(it) else Either.Left(default()) })
+
+/**
+ * Returns `true` if this is a [Right] and its value is equal to `elem` (as determined by `==`),
+ * returns `false` otherwise.
+ *
+ * Example:
+ * ```
+ * Right("something").contains { "something" } // Result: true
+ * Right("something").contains { "anything" }  // Result: false
+ * Left("something").contains { "something" }  // Result: false
+ *  ```
+ *
+ * @param elem    the element to test.
+ * @return `true` if the option has an element that is equal (as determined by `==`) to `elem`, `false` otherwise.
+ */
+fun <A : Any, B, BB : Any> Either<A, B>.contains(elem: () -> BB): Boolean where B : BB =
+        fold({ false }, { it == elem() })
