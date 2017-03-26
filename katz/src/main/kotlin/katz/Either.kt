@@ -16,7 +16,6 @@
 
 package katz
 
-import katz.Either.Right
 
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Either.scala
@@ -179,7 +178,7 @@ inline fun <A : Any, B : Any> Either<A, B>.filterOrElse(predicate: (B) -> Boolea
         fold({ Either.Left(it) }, { if (predicate(it)) Either.Right(it) else Either.Left(default()) })
 
 /**
- * Returns `true` if this is a [Right] and its value is equal to `elem` (as determined by `==`),
+ * Returns `true` if this is a [Either.Right] and its value is equal to `elem` (as determined by `==`),
  * returns `false` otherwise.
  *
  * Example:
