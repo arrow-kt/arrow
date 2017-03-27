@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package katz
+package katz.data
 
 /**
  * The `Try` type represents a computation that may either result in an exception, or return a

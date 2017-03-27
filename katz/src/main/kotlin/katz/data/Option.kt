@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package katz
+package katz.data
+
+import katz.typeclasses.HK
 
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/Option.scala
@@ -27,8 +29,10 @@ sealed class Option<out A> : HK<Option.F, A> {
     class F private constructor()
 
     companion object {
-        inline fun <reified A : Any> fromNullable(a: A?): Option<A> = if (a != null) Option.Some(a) else Option.None
-        operator fun <A> invoke(a: A): Option<A> = Option.Some(a)
+
+        inline fun <reified A : Any> fromNullable(a: A?): Option<A> = if (a != null) Some(a) else None
+
+        operator fun <A> invoke(a: A): Option<A> = Some(a)
     }
 
     /**
@@ -51,7 +55,7 @@ sealed class Option<out A> : HK<Option.F, A> {
      * @param  f   the function to apply
      * @see flatMap
      */
-    inline fun <B> map(f: (A) -> B): Option<B> = fold({ Option.None }, { a -> Option.Some(f(a)) })
+    inline fun <B> map(f: (A) -> B): Option<B> = fold({ None }, { a -> Some(f(a)) })
 
     /**
      * Returns the result of applying $f to this $option's value if
@@ -63,7 +67,7 @@ sealed class Option<out A> : HK<Option.F, A> {
      * @param  f   the function to apply
      * @see map
      */
-    inline fun <B> flatMap(f: (A) -> Option<B>): Option<B> = fold({ Option.None }, { a -> f(a) })
+    inline fun <B> flatMap(f: (A) -> Option<B>): Option<B> = fold({ None }, { a -> f(a) })
 
     /**
      * Returns the result of applying $f to this $option's
@@ -76,8 +80,8 @@ sealed class Option<out A> : HK<Option.F, A> {
      * @param  f       the function to apply if nonempty.
      */
     inline fun <B> fold(ifEmpty: () -> B, f: (A) -> B): B = when (this) {
-        is Option.None -> ifEmpty()
-        is Option.Some -> f(value)
+        is None -> ifEmpty()
+        is Some -> f(value)
     }
 
     /**
@@ -86,7 +90,7 @@ sealed class Option<out A> : HK<Option.F, A> {
      *
      *  @param  p   the predicate used for testing.
      */
-    inline fun filter(p: (A) -> Boolean): Option<A> = fold({ Option.None }, { a -> if (p(a)) Option.Some(a) else Option.None })
+    inline fun filter(p: (A) -> Boolean): Option<A> = fold({ None }, { a -> if (p(a)) Some(a) else None })
 
     /**
      * Returns this $option if it is nonempty '''and''' applying the predicate $p to
@@ -94,7 +98,7 @@ sealed class Option<out A> : HK<Option.F, A> {
      *
      * @param  p   the predicate used for testing.
      */
-    inline fun filterNot(p: (A) -> Boolean): Option<A> = fold({ Option.None }, { a -> if (!p(a)) Option.Some(a) else Option.None })
+    inline fun filterNot(p: (A) -> Boolean): Option<A> = fold({ None }, { a -> if (!p(a)) Some(a) else None })
 
     /**
      * Returns false if the option is $none, true otherwise.
@@ -126,8 +130,6 @@ sealed class Option<out A> : HK<Option.F, A> {
     object None : Option<Nothing>() {
         override val isEmpty = true
     }
-
-
 }
 
 /**
