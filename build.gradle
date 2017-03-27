@@ -50,25 +50,27 @@ allprojects {
     group = 'com.github.finecinnamon'
     archivesBaseName = project.name
     version = katzVersion
-}
 
-task codeCoverageReport(type: JacocoReport) {
-    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
-
-    subprojects.each {
-        sourceSets it.sourceSets.main
+    jacoco {
+        toolVersion '0.7.8'
     }
 
-    reports {
-        xml.enabled true
-        xml.destination "${buildDir}/reports/jacoco/report.xml"
-        html.enabled false
-        csv.enabled false
-    }
-}
+    task codeCoverageReport(type: JacocoReport) {
+        reports {
+            xml.enabled true
+            xml.destination "${buildDir}/reports/jacoco/report.xml"
+            html.enabled true
+            csv.enabled false
+        }
 
-codeCoverageReport.dependsOn {
-    subprojects*.test
+        classDirectories = fileTree(
+                dir: 'build/classes/main/katz',
+        )
+
+        sourceDirectories = files('src/main/kotlin')
+        executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+    }
+
 }
 
 task wrapper(type: Wrapper) {
