@@ -16,6 +16,12 @@
 
 package katz
 
-interface Functor<F> {
-    fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B>
+class Id<out A>(val value: A): HK<Id.F, A> {
+
+    class F
+
+    inline fun <B> map(f: (A) -> B): Id<B> = Id(f(value))
+
+    inline fun <B> flatMap(f: (A) -> Id<B>): Id<B> = f(value)
+
 }

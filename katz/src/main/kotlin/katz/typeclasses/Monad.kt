@@ -1,4 +1,20 @@
-package katz.typeclasses
+/*
+ * Copyright (C) 2017 The Katz Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package katz
 
 import java.io.Serializable
 import kotlin.coroutines.experimental.Continuation
@@ -6,6 +22,7 @@ import kotlin.coroutines.experimental.EmptyCoroutineContext
 import kotlin.coroutines.experimental.RestrictsSuspension
 import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
+import kotlin.coroutines.experimental.startCoroutine
 
 interface Monad<F> : Applicative<F> {
 
@@ -48,3 +65,14 @@ open class MonadContinuation<F, A>(val M : Monad<F>) : Serializable, Continuatio
 
 }
 
+/**
+ * Entry point for monad bindings which enables for comprehension. The underlying impl is based on coroutines.
+ * A coroutine is initiated and inside `MonadContinuation` suspended yielding to `flatMap` once all the flatMap binds are completed
+ * the underlying monad is returned from the act of executing the coroutine
+ */
+fun <F, B> Monad<F>.binding(c: suspend MonadContinuation<F, *>.() -> HK<F, B>): HK<F, B> {
+    val continuation = MonadContinuation<F, B>(this)
+    val f: suspend MonadContinuation<F, *>.() -> HK<F, B> = { c() }
+    f.startCoroutine(continuation, continuation)
+    return continuation.returnedMonad
+}

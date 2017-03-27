@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 The Kats Authors
+ * Copyright (C) 2017 The Katz Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 
 package katz
-
 
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Either.scala
