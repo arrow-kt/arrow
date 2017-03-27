@@ -52,7 +52,9 @@ open class MonadContinuation<F, A>(val M : Monad<F>) : Serializable, Continuatio
     suspend fun <B> HK<F, B>.bind(): B = bind { this }
 
     suspend fun <B> bind(m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
+        val labelHere = c.stackLabels // save the whole coroutine stack labels
             returnedMonad = M.flatMap(m(), { x ->
+                c.stackLabels = labelHere
                 c.resume(x)
                 returnedMonad
             })
