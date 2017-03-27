@@ -1,8 +1,5 @@
 package katz.typeclasses
 
-import katz.typeclasses.Functor
-import katz.typeclasses.HK
-
 interface Applicative<F> : Functor<F> {
 
     fun <A> pure(a: A): HK<F, A>
