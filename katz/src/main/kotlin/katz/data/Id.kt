@@ -18,7 +18,7 @@ package katz
 
 class Id<out A>(val value: A): HK<Id.F, A> {
 
-    class F
+    class F private constructor()
 
     inline fun <B> map(f: (A) -> B): Id<B> = Id(f(value))
 
