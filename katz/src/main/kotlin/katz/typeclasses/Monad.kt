@@ -32,9 +32,9 @@ open class MonadContinuation<F, A>(val M : Monad<F>) : Serializable, Continuatio
 
     operator suspend fun <B> HK<F, B>.not(): B = bind { this }
 
-    infix suspend fun <B> bind(m: HK<F, B>): B = bind { m }
+    suspend fun <B> HK<F, B>.bind(): B = bind { this }
 
-    infix suspend fun <B> bind(m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
+    suspend fun <B> bind(m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
             returnedMonad = M.flatMap(m(), { x ->
                 c.resume(x)
                 returnedMonad

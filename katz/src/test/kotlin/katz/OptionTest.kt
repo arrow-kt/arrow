@@ -78,10 +78,11 @@ class OptionTest : UnitSpec() {
         "Option.monad.binding" should "for comprehend over option" {
             val result = Option.monad().binding {
                 val x = ! Option(1)
-                val y = ! Option(1)
-                yields (x + y)
+                val y = Option(1).bind()
+                val z = bind { Option(1) }
+                yields (x + y + z)
             }
-            result shouldBe Option(2)
+            result shouldBe Option(3)
         }
     }
 }
