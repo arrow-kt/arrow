@@ -16,10 +16,17 @@
 
 package katz
 
-import io.kotlintest.specs.StringSpec
+object NonEmptyListMonad : Monad<NonEmptyList.F> {
+
+    fun <A> HK<NonEmptyList.F, A>.ev(): NonEmptyList<A> = this as NonEmptyList<A>
+
+    override fun <A, B> map(fa: HK<NonEmptyList.F, A>, f: (A) -> B): HK<NonEmptyList.F, B> =
+            fa.ev().map(f)
 
 
-/**
- * Base class for unit tests
- */
-abstract class UnitSpec : StringSpec()
+    override fun <A> pure(a: A): HK<NonEmptyList.F, A> = NonEmptyList.of(a)
+
+    override fun <A, B> flatMap(fa: HK<NonEmptyList.F, A>, f: (A) -> HK<NonEmptyList.F, B>): HK<NonEmptyList.F, B> =
+            fa.ev().flatMap { f(it).ev() }
+
+}
