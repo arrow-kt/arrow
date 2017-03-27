@@ -17,6 +17,7 @@
 package katz
 
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.properties.forAll
 import katz.Either.Left
 import katz.Either.Right
 import org.junit.runner.RunWith
@@ -24,15 +25,14 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class EitherTest : UnitSpec() {
     init {
-
-        "map" should "modify value" {
+        "map should modify value" {
             forAll { a: Int, b: String ->
                 Right(a).map { b } == Right(b)
                         && Left(a).map { b } == Left(a)
             }
         }
 
-        "flatMap" should "modify entity" {
+        "flatMap should modify entity" {
             forAll { a: Int, b: String ->
                 {
                     val left: Either<Int, Int> = Left(a)
@@ -44,7 +44,7 @@ class EitherTest : UnitSpec() {
             }
         }
 
-        "getOrElse" should "return value" {
+        "getOrElse should return value" {
             forAll { a: Int, b: Int ->
                 Right(a).getOrElse { b } == a
                         && Left(a).getOrElse { b } == b
@@ -52,7 +52,7 @@ class EitherTest : UnitSpec() {
 
         }
 
-        "exits" should "evaluate value" {
+        "exits should evaluate value" {
             forAll { a: Int ->
                 {
                     val left: Either<Int, Int> = Left(a)
@@ -64,7 +64,7 @@ class EitherTest : UnitSpec() {
             }
         }
 
-        "filterOrElse" should "filters value" {
+        "filterOrElse should filters value" {
             forAll { a: Int, b: Int ->
                 {
                     val left: Either<Int, Int> = Left(a)
@@ -77,33 +77,33 @@ class EitherTest : UnitSpec() {
             }
         }
 
-        "swap" should "interchange values" {
+        "swap should interchange values" {
             forAll { a: Int ->
                 Left(a).swap() == Right(a)
                         && Right(a).swap() == Left(a)
             }
         }
 
-        "fold" should "call left function on Left" {
+        "fold should call left function on Left" {
             forAll { a: Int, b: Int ->
                 Left(a).fold({ b }, { a }) == b
             }
         }
 
-        "fold" should "call right function on Right" {
+        "fold should call right function on Right" {
             forAll { a: Int, b: Int ->
                 Right(a).fold({ b }, { a }) == a
             }
         }
 
-        "toOption" should "convert" {
+        "toOption should convert" {
             forAll { a: Int ->
                 Right(a).toOption() == Option.Some(a)
                         && Left(a).toOption() == Option.None
             }
         }
 
-        "contains" should "check value" {
+        "contains should check value" {
             forAll { a: Int, b: Int ->
                 Right(a).contains(a)
                         && !Right(a).contains(b)
