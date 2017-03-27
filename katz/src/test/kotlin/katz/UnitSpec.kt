@@ -16,10 +16,10 @@
 
 package katz
 
-import io.kotlintest.Eventually
-import io.kotlintest.specs.FlatSpec
+import io.kotlintest.specs.StringSpec
+
 
 /**
  * Base class for unit tests
  */
-abstract class UnitSpec: FlatSpec(), Eventually
+abstract class UnitSpec: StringSpec()
