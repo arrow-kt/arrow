@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package katz
+package katz.data
+
+import katz.typeclasses.HK
 
 class Id<out A>(val value: A): HK<Id.F, A> {
 
@@ -23,5 +25,4 @@ class Id<out A>(val value: A): HK<Id.F, A> {
     inline fun <B> map(f: (A) -> B): Id<B> = Id(f(value))
 
     inline fun <B> flatMap(f: (A) -> Id<B>): Id<B> = f(value)
-
 }

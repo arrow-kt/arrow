@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package katz
+package katz.typeclasses
 
 import java.io.Serializable
 import kotlin.coroutines.experimental.Continuation
@@ -62,7 +62,6 @@ open class MonadContinuation<F, A>(val M : Monad<F>) : Serializable, Continuatio
     infix fun <B> yields(b: B) = yields { b }
 
     infix fun <B> yields(b: () -> B) = M.pure(b())
-
 }
 
 /**

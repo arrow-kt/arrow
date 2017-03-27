@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package katz
+package katz.data
 
 /**
  * A List that can not be empty

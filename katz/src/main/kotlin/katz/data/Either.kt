@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package katz
+package katz.data
 
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Either.scala

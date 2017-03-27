@@ -20,8 +20,12 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.forAll
+import katz.data.Option
 import org.junit.runner.RunWith
-import katz.Option.*
+import katz.data.Option.*
+import katz.data.getOrElse
+import katz.instances.OptionMonad
+import katz.typeclasses.binding
 
 @RunWith(KTestJUnitRunner::class)
 class OptionTest : UnitSpec() {

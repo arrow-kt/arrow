@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-package katz
+package katz.instances
+
+import katz.typeclasses.HK
+import katz.typeclasses.Monad
+import katz.data.Option
 
 object OptionMonad : Monad<Option.F> {
 
@@ -27,5 +31,4 @@ object OptionMonad : Monad<Option.F> {
 
     override fun <A, B> flatMap(fa: HK<Option.F, A>, f: (A) -> HK<Option.F, B>): HK<Option.F, B> =
             fa.ev().flatMap { f(it).ev() }
-
 }

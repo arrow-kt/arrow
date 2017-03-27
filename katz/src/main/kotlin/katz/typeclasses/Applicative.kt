@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package katz
+package katz.typeclasses
 
 interface Applicative<F> : Functor<F> {
 
