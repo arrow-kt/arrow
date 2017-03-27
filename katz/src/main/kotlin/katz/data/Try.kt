@@ -74,7 +74,7 @@ sealed class Try<out A> {
      */
     fun <B> fold(fa: (Throwable) -> B, fb: (A) -> B): B = when (this) {
         is Failure -> fa(exception)
-        is Success -> try { fb(value) } catch(e: Throwable) { fa(e) }
+        is Success -> try { fb(value) } catch (e: Throwable) { fa(e) }
     }
 
     /**

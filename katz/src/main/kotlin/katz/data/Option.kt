@@ -48,7 +48,7 @@ sealed class Option<out A> : HK<Option.F, A> {
      * @note This is similar to `flatMap` except here,
      * $f does not need to wrap its result in an $option.
      *
-     * @param  f   the function to apply
+     * @param f the function to apply
      * @see flatMap
      */
     inline fun <B> map(f: (A) -> B): Option<B> = fold({ Option.None }, { a -> Option.Some(f(a)) })
@@ -60,7 +60,7 @@ sealed class Option<out A> : HK<Option.F, A> {
      * Slightly different from `map` in that $f is expected to
      * return an $option (which could be $none).
      *
-     * @param  f   the function to apply
+     * @param f the function to apply
      * @see map
      */
     inline fun <B> flatMap(f: (A) -> Option<B>): Option<B> = fold({ Option.None }, { a -> f(a) })
@@ -72,8 +72,8 @@ sealed class Option<out A> : HK<Option.F, A> {
      *
      * @note This is equivalent to `$option map f getOrElse ifEmpty`.
      *
-     * @param  ifEmpty the expression to evaluate if empty.
-     * @param  f       the function to apply if nonempty.
+     * @param ifEmpty the expression to evaluate if empty.
+     * @param f the function to apply if nonempty.
      */
     inline fun <B> fold(ifEmpty: () -> B, f: (A) -> B): B = when (this) {
         is Option.None -> ifEmpty()
@@ -84,7 +84,7 @@ sealed class Option<out A> : HK<Option.F, A> {
      * Returns this $option if it is nonempty '''and''' applying the predicate $p to
      * this $option's value returns true. Otherwise, return $none.
      *
-     *  @param  p   the predicate used for testing.
+     *  @param p the predicate used for testing.
      */
     inline fun filter(p: (A) -> Boolean): Option<A> = fold({ Option.None }, { a -> if (p(a)) Option.Some(a) else Option.None })
 
@@ -92,13 +92,13 @@ sealed class Option<out A> : HK<Option.F, A> {
      * Returns this $option if it is nonempty '''and''' applying the predicate $p to
      * this $option's value returns false. Otherwise, return $none.
      *
-     * @param  p   the predicate used for testing.
+     * @param p the predicate used for testing.
      */
     inline fun filterNot(p: (A) -> Boolean): Option<A> = fold({ Option.None }, { a -> if (!p(a)) Option.Some(a) else Option.None })
 
     /**
      * Returns false if the option is $none, true otherwise.
-     * @note   Implemented here to avoid the implicit conversion to Iterable.
+     * @note Implemented here to avoid the implicit conversion to Iterable.
      */
     val nonEmpty = isDefined
 
@@ -107,7 +107,7 @@ sealed class Option<out A> : HK<Option.F, A> {
      * $p returns true when applied to this $option's value.
      * Otherwise, returns false.
      *
-     * @param  p   the predicate to test
+     * @param p the predicate to test
      */
     inline fun exists(p: (A) -> Boolean): Boolean = fold({ false }, { a -> p(a) })
 
@@ -115,7 +115,7 @@ sealed class Option<out A> : HK<Option.F, A> {
      * Returns true if this option is empty '''or''' the predicate
      * $p returns true when applied to this $option's value.
      *
-     * @param  p   the predicate to test
+     * @param p the predicate to test
      */
     inline fun forall(p: (A) -> Boolean): Boolean = exists(p)
 
@@ -127,13 +127,12 @@ sealed class Option<out A> : HK<Option.F, A> {
         override val isEmpty = true
     }
 
-
 }
 
 /**
  * Returns the option's value if the option is nonempty, otherwise
  * return the result of evaluating `default`.
  *
- * @param default  the default expression.
+ * @param default the default expression.
  */
 fun <B> Option<B>.getOrElse(default: () -> B): B = fold({ default() }, { it })

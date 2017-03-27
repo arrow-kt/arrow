@@ -16,7 +16,7 @@
 
 package katz
 
-class Id<out A>(val value: A): HK<Id.F, A> {
+class Id<out A>(val value: A) : HK<Id.F, A> {
 
     class F private constructor()
 

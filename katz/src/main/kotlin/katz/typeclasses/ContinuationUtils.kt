@@ -7,7 +7,6 @@
 
 package katz
 
-
 import kotlin.coroutines.experimental.Continuation
 
 private val coroutineImplClass by lazy { Class.forName("kotlin.coroutines.experimental.jvm.internal.CoroutineImpl") }

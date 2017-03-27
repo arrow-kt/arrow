@@ -1,0 +1,91 @@
+autoCorrect: true
+
+build:
+  warningThreshold: 1
+  failThreshold: 1
+
+potential-bugs:
+  active: true
+  NoElseInWhenExpression:
+    active: false
+
+exceptions:
+  active: true
+
+empty:
+  active: true
+
+code-smell:
+  active:
+  weight: 2
+  LongMethod:
+    threshold: 20
+  LongParameterList:
+    active: false
+    threshold: 3
+  LargeClass:
+    threshold: 300
+  ComplexMethod:
+    threshold: 10
+  FeatureEnvy:
+    threshold: 0.5
+    weight: 0.45
+    base: 0.5
+
+formatting:
+  active: true
+  useTabs: false
+  Indentation:
+    active: true
+    autoCorrect: true
+  ConsecutiveBlankLines:
+    active: true
+    autoCorrect: true
+  MultipleSpaces:
+    active: true
+    autoCorrect: true
+  SpacingAfterComma:
+    active: true
+    autoCorrect: true
+  SpacingAfterKeyword:
+    active: true
+    autoCorrect: true
+  SpacingAroundColon:
+    active: true
+    autoCorrect: true
+  SpacingAroundCurlyBraces:
+    active: true
+    autoCorrect: true
+  SpacingAroundOperator:
+    active: true
+    autoCorrect: true
+  TrailingSpaces:
+    active: true
+    autoCorrect: true
+  UnusedImports:
+    active: true
+    autoCorrect: true
+  OptionalSemicolon:
+    active: true
+    autoCorrect: true
+  OptionalUnit:
+    active: true
+    autoCorrect: true
+
+style:
+  active: true
+  WildcardImport:
+    active: true
+  NamingConventionViolation:
+    active: true
+
+comments:
+  active: true
+  CommentOverPrivateMethod:
+    active: true
+  CommentOverPrivateProperty:
+    active: true
+  NoDocOverPublicClass:
+    active: false
+  NoDocOverPublicMethod:
+    active: false
