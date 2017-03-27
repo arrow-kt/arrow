@@ -25,8 +25,7 @@ package katz
 sealed class Option<out A> {
 
     companion object {
-
-        inline fun <reified A : Any> fromNullable(a: A?): Option<A> = if (a is A) Some(a) else None
+        inline fun <reified A : Any> fromNullable(a: A?): Option<A> = if (a != null) Some(a) else None
         operator fun <A> invoke(a: A): Option<A> = Some(a)
     }
 
