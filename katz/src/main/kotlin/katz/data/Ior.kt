@@ -18,6 +18,7 @@ package katz
 
 import katz.Either.Left
 import katz.Either.Right
+import katz.Option
 
 /**
  * Port of https://github.com/typelevel/cats/blob/v0.9.0/core/src/main/scala/cats/data/Ior.scala
@@ -119,9 +120,9 @@ sealed class Ior<out A, out B> {
      * @return the results of applying the function
      */
     inline fun <C> fold(fa: (A) -> C, fb: (B) -> C, fab: (A, B) -> C): C = when (this) {
-        is Ior.Left -> fa(value)
-        is Ior.Right -> fb(value)
-        is Ior.Both -> fab(leftValue, rightValue)
+        is Left -> fa(value)
+        is Right -> fb(value)
+        is Both -> fab(leftValue, rightValue)
     }
 
     /**

@@ -18,9 +18,8 @@ package katz
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.forAll
-import org.junit.runner.RunWith
-
 import katz.Either.*
+import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class EitherTest : UnitSpec() {
