@@ -22,12 +22,12 @@ package katz
  * Represents optional values. Instances of `Option`
  * are either an instance of $some or the object $none.
  */
-sealed class Option<out A> {
+sealed class Option<out A : Any> {
 
     companion object {
 
-        inline fun <A> fromNullable(f: () -> A): Option<A> = f().let { if (it == null) None else Some(it) }
-        operator fun <A> invoke(a: A): Option<A> = Some(a)
+        inline fun <reified A : Any> fromNullable(a: A?): Option<A> = if (a is A) Some(a) else None
+        operator fun <A : Any> invoke(a: A): Option<A> = Some(a)
     }
 
     /**
@@ -50,7 +50,7 @@ sealed class Option<out A> {
      * @param  f   the function to apply
      * @see flatMap
      */
-    inline fun <B> map(f: (A) -> B): Option<B> = fold({ None }, { a -> Some(f(a)) })
+    inline fun <B : Any> map(f: (A) -> B): Option<B> = fold({ None }, { a -> Some(f(a)) })
 
     /**
      * Returns the result of applying $f to this $option's value if
@@ -62,7 +62,7 @@ sealed class Option<out A> {
      * @param  f   the function to apply
      * @see map
      */
-    inline fun <B> flatMap(f: (A) -> Option<B>): Option<B> = fold({ None }, { a -> f(a) })
+    inline fun <B : Any> flatMap(f: (A) -> Option<B>): Option<B> = fold({ None }, { a -> f(a) })
 
     /**
      * Returns the result of applying $f to this $option's
@@ -118,7 +118,7 @@ sealed class Option<out A> {
      */
     inline fun forall(p: (A) -> Boolean): Boolean = exists(p)
 
-    data class Some<out A>(val value: A) : Option<A>() {
+    data class Some<out A : Any>(val value: A) : Option<A>() {
         override val isEmpty = false
     }
 
@@ -133,4 +133,4 @@ sealed class Option<out A> {
  *
  * @param default  the default expression.
  */
-fun <B> Option<B>.getOrElse(default: () -> B): B = fold({ default() }, { it })
+fun <B : Any> Option<B>.getOrElse(default: () -> B): B = fold({ default() }, { it })

@@ -19,6 +19,8 @@ package katz
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
+import io.kotlintest.properties.forAll
+import katz.Option.Companion.fromNullable
 import katz.Option.None
 import katz.Option.Some
 import org.junit.runner.RunWith
@@ -66,6 +68,19 @@ class OptionTest : UnitSpec() {
                     { fail("None should not be called") },
                     { value }
             ) shouldBe value
+        }
+
+        "fromNullable should work for both null and non-null values of nullable types" {
+            forAll { a: Int? ->
+                // This seems to be generating only non-null values, so it is complemented by the next test
+                val o: Option<Int> = fromNullable(a)
+                if (a == null) o == None else o == Some(a)
+            }
+        }
+
+        "fromNullable should return none for null values of nullable types" {
+            val a: Int? = null
+            fromNullable(a) shouldBe None
         }
     }
 }
