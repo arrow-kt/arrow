@@ -17,31 +17,32 @@
 package katz
 
 import io.kotlintest.KTestJUnitRunner
-import katz.Option.Some
+import io.kotlintest.matchers.fail
+import io.kotlintest.matchers.shouldBe
 import katz.Option.None
+import katz.Option.Some
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class OptionTest : UnitSpec() {
     init {
-
-        "map" should "modify value" {
+        "map should modify value" {
             Some(12).map { "flower" } shouldBe Some("flower")
             None.map { "flower" } shouldBe None
         }
 
-        "flatMap" should "modify entity" {
+        "flatMap should modify entity" {
             Some(1).flatMap { None } shouldBe None
             Some(1).flatMap { Some("something") } shouldBe Some("something")
             None.flatMap { Some("something") } shouldBe None
         }
 
-        "getOrElse" should "return value" {
+        "getOrElse should return value" {
             Some(12).getOrElse { 17 } shouldBe 12
             None.getOrElse { 17 } shouldBe 17
         }
 
-        "exits" should "evaluate value" {
+        "exits should evaluate value" {
             val none: Option<Int> = None
 
             Some(12).exists { it > 10 } shouldBe true
@@ -49,7 +50,7 @@ class OptionTest : UnitSpec() {
             none.exists { it > 10 } shouldBe false
         }
 
-        "fold" should "return default value on None" {
+        "fold should return default value on None" {
             val exception = Exception()
             val result: Option<String> = None
             result.fold(
@@ -58,7 +59,7 @@ class OptionTest : UnitSpec() {
             ) shouldBe exception
         }
 
-        "fold" should "call function on Some" {
+        "fold should call function on Some" {
             val value = "Some value"
             val result: Option<String> = Some(value)
             result.fold(
