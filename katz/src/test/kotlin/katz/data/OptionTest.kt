@@ -20,8 +20,8 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.forAll
-import org.junit.runner.RunWith
 import katz.Option.*
+import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class OptionTest : UnitSpec() {
@@ -71,32 +71,32 @@ class OptionTest : UnitSpec() {
         "fromNullable should work for both null and non-null values of nullable types" {
             forAll { a: Int? ->
                 // This seems to be generating only non-null values, so it is complemented by the next test
-                val o: Option<Int> = Option.fromNullable(a)
+                val o: Option<Int> = Companion.fromNullable(a)
                 if (a == null) o == None else o == Some(a)
             }
         }
 
         "fromNullable should return none for null values of nullable types" {
             val a: Int? = null
-            Option.fromNullable(a) shouldBe None
+            Companion.fromNullable(a) shouldBe None
         }
 
         "Option.monad.flatMap should be consistent with Option#flatMap" {
             forAll { a: Int ->
-                val x = {b: Int -> Option(b * a) }
-                val option = Option(a)
+                val x = { b: Int -> Companion(b * a) }
+                val option = Companion(a)
                 option.flatMap(x) == OptionMonad.flatMap(option, x)
             }
         }
 
         "Option.monad.binding should for comprehend over option" {
             val result = OptionMonad.binding {
-                val x = ! Option(1)
-                val y = Option(1).bind()
-                val z = bind { Option(1) }
-                yields (x + y + z)
+                val x = !Companion(1)
+                val y = Companion(1).bind()
+                val z = bind { Companion(1) }
+                yields(x + y + z)
             }
-            result shouldBe Option(3)
+            result shouldBe Companion(3)
         }
     }
 }
