@@ -1,11 +1,11 @@
 /*
- * Copyright (C) 2017 The Kats Authors
+ * Copyright (C) 2017 The Katz Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,10 +20,8 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.forAll
-import katz.Option.Companion.fromNullable
-import katz.Option.None
-import katz.Option.Some
 import org.junit.runner.RunWith
+import katz.Option.*
 
 @RunWith(KTestJUnitRunner::class)
 class OptionTest : UnitSpec() {
@@ -73,14 +71,32 @@ class OptionTest : UnitSpec() {
         "fromNullable should work for both null and non-null values of nullable types" {
             forAll { a: Int? ->
                 // This seems to be generating only non-null values, so it is complemented by the next test
-                val o: Option<Int> = fromNullable(a)
+                val o: Option<Int> = Option.fromNullable(a)
                 if (a == null) o == None else o == Some(a)
             }
         }
 
         "fromNullable should return none for null values of nullable types" {
             val a: Int? = null
-            fromNullable(a) shouldBe None
+            Option.fromNullable(a) shouldBe None
+        }
+
+        "Option.monad.flatMap should be consistent with Option#flatMap" {
+            forAll { a: Int ->
+                val x = {b: Int -> Option(b * a) }
+                val option = Option(a)
+                option.flatMap(x) == OptionMonad.flatMap(option, x)
+            }
+        }
+
+        "Option.monad.binding should for comprehend over option" {
+            val result = OptionMonad.binding {
+                val x = ! Option(1)
+                val y = Option(1).bind()
+                val z = bind { Option(1) }
+                yields (x + y + z)
+            }
+            result shouldBe Option(3)
         }
     }
 }

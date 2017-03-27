@@ -16,10 +16,5 @@
 
 package katz
 
-import io.kotlintest.specs.StringSpec
+interface HK<out F, out A>
 
-
-/**
- * Base class for unit tests
- */
-abstract class UnitSpec: StringSpec()

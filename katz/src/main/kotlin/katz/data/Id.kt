@@ -16,10 +16,12 @@
 
 package katz
 
-import io.kotlintest.specs.StringSpec
+class Id<out A>(val value: A): HK<Id.F, A> {
 
+    class F private constructor()
 
-/**
- * Base class for unit tests
- */
-abstract class UnitSpec: StringSpec()
+    inline fun <B> map(f: (A) -> B): Id<B> = Id(f(value))
+
+    inline fun <B> flatMap(f: (A) -> Id<B>): Id<B> = f(value)
+
+}

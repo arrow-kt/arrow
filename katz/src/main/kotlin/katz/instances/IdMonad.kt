@@ -16,10 +16,15 @@
 
 package katz
 
-import io.kotlintest.specs.StringSpec
+object IdMonad : Monad<Id.F> {
 
+    fun <A> HK<Id.F, A>.ev(): Id<A> = this as Id<A>
 
-/**
- * Base class for unit tests
- */
-abstract class UnitSpec: StringSpec()
+    override fun <A, B> map(fa: HK<Id.F, A>, f: (A) -> B): HK<Id.F, B> =
+            fa.ev().map(f)
+
+    override fun <A> pure(a: A): HK<Id.F, A> = Id(a)
+
+    override fun <A, B> flatMap(fa: HK<Id.F, A>, f: (A) -> HK<Id.F, B>): HK<Id.F, B> =
+            fa.ev().flatMap { f(it).ev() }
+}

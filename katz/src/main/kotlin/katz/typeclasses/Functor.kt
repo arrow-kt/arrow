@@ -16,10 +16,6 @@
 
 package katz
 
-import io.kotlintest.specs.StringSpec
-
-
-/**
- * Base class for unit tests
- */
-abstract class UnitSpec: StringSpec()
+interface Functor<F> {
+    fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B>
+}
