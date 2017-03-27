@@ -22,16 +22,12 @@ package katz
  *
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Try.scala
  */
-sealed class Try<out A : Any> {
+sealed class Try<out A> {
 
     companion object {
 
-        inline operator fun <A : Any> invoke(f: () -> A): Try<A> =
-                try {
-                    Success(f())
-                } catch (e: Throwable) {
-                    Failure(e)
-                }
+        inline operator fun <A> invoke(f: () -> A): Try<A> =
+                try { Success(f()) } catch (e: Throwable) { Failure(e) }
     }
 
     /**
@@ -47,12 +43,12 @@ sealed class Try<out A : Any> {
     /**
      * Returns the given function applied to the value from this `Success` or returns this if this is a `Failure`.
      */
-    inline fun <B : Any> flatMap(crossinline f: (A) -> Try<B>): Try<B> = fold({ Failure(it) }, { f(it) })
+    inline fun <B> flatMap(crossinline f: (A) -> Try<B>): Try<B> = fold({ Failure(it) }, { f(it) })
 
     /**
      * Maps the given function to the value from this `Success` or returns this if this is a `Failure`.
      */
-    inline fun <B : Any> map(crossinline f: (A) -> B): Try<B> = fold({ Failure(it) }, { Success(f(it)) })
+    inline fun <B> map(crossinline f: (A) -> B): Try<B> = fold({ Failure(it) }, { Success(f(it)) })
 
     /**
      * Converts this to a `Failure` if the predicate is not satisfied.
@@ -78,17 +74,13 @@ sealed class Try<out A : Any> {
      */
     fun <B> fold(fa: (Throwable) -> B, fb: (A) -> B): B = when (this) {
         is Failure -> fa(exception)
-        is Success -> try {
-            fb(value)
-        } catch(e: Throwable) {
-            fa(e)
-        }
+        is Success -> try { fb(value) } catch(e: Throwable) { fa(e) }
     }
 
     /**
      * The `Failure` type represents a computation that result in an exception.
      */
-    class Failure<out A : Any>(val exception: Throwable) : Try<A>() {
+    class Failure<out A>(val exception: Throwable) : Try<A>() {
         override val isFailure: Boolean = false
         override val isSuccess: Boolean = true
     }
@@ -96,7 +88,7 @@ sealed class Try<out A : Any> {
     /**
      * The `Success` type represents a computation that return a successfully computed value.
      */
-    class Success<out A : Any>(val value: A) : Try<A>() {
+    class Success<out A>(val value: A) : Try<A>() {
         override val isFailure: Boolean = true
         override val isSuccess: Boolean = false
     }
@@ -107,22 +99,22 @@ sealed class Try<out A : Any> {
  *
  * ''Note:'': This will throw an exception if it is not a success and default throws an exception.
  */
-fun <B : Any> Try<B>.getOrElse(default: () -> B): B = fold({ default() }, { it })
+fun <B> Try<B>.getOrElse(default: () -> B): B = fold({ default() }, { it })
 
 /**
  * Applies the given function `f` if this is a `Failure`, otherwise returns this if this is a `Success`.
  * This is like `flatMap` for the exception.
  */
-fun <B : Any> Try<B>.recoverWith(f: (Throwable) -> Try<B>): Try<B> = fold({ f(it) }, { Try.Success(it) })
+fun <B> Try<B>.recoverWith(f: (Throwable) -> Try<B>): Try<B> = fold({ f(it) }, { Try.Success(it) })
 
 /**
  * Applies the given function `f` if this is a `Failure`, otherwise returns this if this is a `Success`.
  * This is like map for the exception.
  */
-fun <B : Any> Try<B>.recover(f: (Throwable) -> B): Try<B> = fold({ Try.Success(f(it)) }, { Try.Success(it) })
+fun <B> Try<B>.recover(f: (Throwable) -> B): Try<B> = fold({ Try.Success(f(it)) }, { Try.Success(it) })
 
 /**
  * Completes this `Try` by applying the function `f` to this if this is of type `Failure`,
  * or conversely, by applying `s` if this is a `Success`.
  */
-fun <B : Any> Try<B>.transform(s: (B) -> Try<B>, f: (Throwable) -> Try<B>): Try<B> = fold({ f(it) }, { flatMap(s) })
+fun <B> Try<B>.transform(s: (B) -> Try<B>, f: (Throwable) -> Try<B>): Try<B> = fold({ f(it) }, { flatMap(s) })
