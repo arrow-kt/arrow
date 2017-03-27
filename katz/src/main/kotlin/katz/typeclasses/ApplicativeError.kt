@@ -1,8 +1,6 @@
 package katz.typeclasses
 
 import katz.Either
-import katz.typeclasses.HK
-import katz.typeclasses.Applicative
 
 interface ApplicativeError<F, E> : Applicative<F> {
 
