@@ -1,7 +1,9 @@
-package katz
+package katz.data
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.forAll
+import katz.Semigroup
+import katz.UnitSpec
 import org.junit.runner.RunWith
 
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package katz
+package katz.typeclasses
 
 import java.io.Serializable
 import kotlin.coroutines.experimental.RestrictsSuspension

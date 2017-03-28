@@ -5,7 +5,7 @@
  * https://github.com/h0tk3y/kotlin-monads/blob/master/src/main/kotlin/com/github/h0tk3y/kotlinMonads/ContinuationUtils.kt
  */
 
-package katz
+package katz.typeclasses
 
 
 import kotlin.coroutines.experimental.Continuation

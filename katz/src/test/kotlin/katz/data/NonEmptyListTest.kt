@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-package katz
+package katz.data
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.forAll
+import katz.UnitSpec
+import katz.instances.NonEmptyListMonad
+import katz.instances.ev
+import katz.typeclasses.HK
+import katz.typeclasses.binding
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

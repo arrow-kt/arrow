@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-package katz
+package katz.instances
+
+import katz.data.Id
+import katz.typeclasses.HK
+import katz.typeclasses.Monad
 
 object IdMonad : Monad<Id.F> {
 
