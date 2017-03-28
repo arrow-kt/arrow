@@ -147,16 +147,27 @@ class IorTest : UnitSpec() {
 
         }
 
+        val intMonoidInstance: Semigroup<Int> = object : Semigroup<Int> {
+            override fun combine(a: Int, b: Int): Int = a + b
+        }
+        val intIorMonad = IorMonad(intMonoidInstance)
+
+        "Ior.monad.flatMap should combine left values" {
+            val ior1 = Ior.Both(3, "Hello, world!")
+            val iorResult = intIorMonad.flatMap(ior1, { Ior.Left(7) })
+            iorResult shouldBe Ior.Left(10)
+        }
+
         "Ior.monad.flatMap should be consistent with Ior#flatMap" {
             forAll { a: Int ->
                 val x = { b: Int -> Ior.Right(b * a) }
                 val ior = Ior.Right(a)
-                ior.flatMap(IorMonad.combine(), x) == IorMonad.flatMap(ior, x)
+                ior.flatMap(intIorMonad.semigroup, x) == intIorMonad.flatMap(ior, x)
             }
         }
 
         "Ior.monad.binding should for comprehend over right Ior" {
-            val result = IorMonad.binding {
+            val result = intIorMonad.binding {
                 val x = !Ior.Right(1)
                 val y = Ior.Right(1).bind()
                 val z = bind { Ior.Right(1) }

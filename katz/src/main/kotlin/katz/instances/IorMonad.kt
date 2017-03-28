@@ -16,17 +16,12 @@
 
 package katz
 
-object IorMonad : Monad<HK<Ior.F, Nothing>> {
+class IorMonad<A>(val semigroup: Semigroup<A>) : Monad<HK<Ior.F, A>> {
+    override fun <B> pure(b: B): HK2<Ior.F, A, B> =
+            Ior.Right(b)
 
-    override fun <A> pure(a: A): HK2<Ior.F, Nothing, A> =
-            Ior.Right(a)
-
-    override fun <A, B> flatMap(fa: HK2<Ior.F, Nothing, A>, f: (A) -> HK2<Ior.F, Nothing, B>): HK2<Ior.F, Nothing, B> =
-            fa.ev().flatMap(combine()) { f(it).ev() }
-
-    fun <A> combine(): Semigroup<A> = object : Semigroup<A> {
-        override fun combine(a: A, b: A): A = combineAll(a, b)
-    }
+    override fun <B, C> flatMap(fa: HK<HK<Ior.F, A>, B>, f: (B) -> HK<HK<Ior.F, A>, C>): HK<HK<Ior.F, A>, C> =
+            fa.ev().flatMap(semigroup as Semigroup<Any?>) { f(it).ev() } as HK2<Ior.F, A, C>
 }
 
-fun <A> HK2<Ior.F, Nothing, A>.ev(): Ior<Nothing, A> = this as Ior<Nothing, A>
+fun <A> HK2<Ior.F, *, A>.ev(): Ior<*, A> = this as Ior<*, A>
