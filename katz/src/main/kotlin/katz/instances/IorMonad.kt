@@ -21,7 +21,7 @@ class IorMonad<A>(val semigroup: Semigroup<A>) : Monad<HK<Ior.F, A>> {
             Ior.Right(b)
 
     override fun <B, C> flatMap(fa: HK<HK<Ior.F, A>, B>, f: (B) -> HK<HK<Ior.F, A>, C>): HK<HK<Ior.F, A>, C> =
-            fa.ev().flatMap(semigroup as Semigroup<Any?>) { f(it).ev() } as HK2<Ior.F, A, C>
+            fa.ev().flatMap(semigroup) { f(it).ev() }
 }
 
-fun <A> HK2<Ior.F, *, A>.ev(): Ior<*, A> = this as Ior<*, A>
+fun <A, B> HK2<Ior.F, A, B>.ev(): Ior<A, B> = this as Ior<A, B>
