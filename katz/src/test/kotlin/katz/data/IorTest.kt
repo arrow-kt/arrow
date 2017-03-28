@@ -1,6 +1,7 @@
 package katz
 
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
@@ -130,6 +131,27 @@ class IorTest : UnitSpec() {
                         Ior.Both(a, b).getOrElse { a * 2 } == b
             }
 
+        }
+
+        "Ior.monad.flatMap should be consistent with Ior#flatMap" {
+            forAll { a: Int ->
+                val implicit: Semigroup<Number> = object: Semigroup<Number> {
+                    override fun combine(a: Number, b: Number): Number = a
+                }
+                val x = { b: Int -> Ior.Right(b * a) }
+                val ior = Ior.Right(a)
+                ior.flatMap(implicit, x) == IorMonad.flatMap(ior, x)
+            }
+        }
+
+        "Ior.monad.binding should for comprehend over right Ior" {
+            val result = IorMonad.binding {
+                val x = !Ior.Right(1)
+                val y = Ior.Right(1).bind()
+                val z = bind { Ior.Right(1) }
+                yields(x + y + z)
+            }
+            result shouldBe Ior.Right(3)
         }
 
     }
