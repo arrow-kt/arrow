@@ -16,12 +16,12 @@
 
 package katz
 
-object EitherMonad: Monad<HK<Either.F, *>> {
-    override fun <A> pure(a: A): HK2<Either.F, *, A> =
+object EitherMonad : Monad<HK<Either.F, Nothing>> {
+    override fun <A> pure(a: A): HK2<Either.F, Nothing, A> =
             Either.Right(a)
 
-    override fun <A, B> flatMap(fa: HK2<Either.F, *, A>, f: (A) -> HK2<Either.F, *, B>): HK2<Either.F, *, B> =
+    override fun <A, B> flatMap(fa: HK2<Either.F, Nothing, A>, f: (A) -> HK2<Either.F, Nothing, B>): HK2<Either.F, Nothing, B> =
             fa.ev().flatMap { f(it).ev() }
 }
 
-fun <A> HK2<Either.F, *, A>.ev(): Either<*, A> = this as Either<*, A>
+fun <A> HK2<Either.F, Nothing, A>.ev(): Either<Nothing, A> = this as Either<Nothing, A>
