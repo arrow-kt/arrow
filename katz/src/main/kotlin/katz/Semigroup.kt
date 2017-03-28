@@ -16,15 +16,19 @@
 
 package katz
 
-object IdMonad : Monad<Id.F> {
+interface Semigroup<A> {
+    /**
+     * Combine two [A] values.
+     */
+    fun combine(a: A, b: A): A
 
-    override fun <A, B> map(fa: HK<Id.F, A>, f: (A) -> B): HK<Id.F, B> =
-            fa.ev().map(f)
+    /**
+     * Combine an array of [A] values.
+     */
+    fun combineAll(vararg elems: A): A = combineAll(elems.asList())
 
-    override fun <A> pure(a: A): HK<Id.F, A> = Id(a)
-
-    override fun <A, B> flatMap(fa: HK<Id.F, A>, f: (A) -> HK<Id.F, B>): HK<Id.F, B> =
-            fa.ev().flatMap { f(it).ev() }
+    /**
+     * Combine a collection of [A] values.
+     */
+    fun combineAll(elems: Collection<A>): A = elems.reduce { a, b -> combine(a, b) }
 }
-
-fun <A> HK<Id.F, A>.ev(): Id<A> = this as Id<A>
