@@ -50,10 +50,7 @@ class Reader<C : Any, out A : Any>(val run: (C) -> A) {
          * Lifts an A value to Reader wrapping it in a supplier function with a Nothing argument.
          */
         fun <C : Any, A : Any> pure(a: A): Reader<C, A> = Reader { _ -> a }
-
-        /**
-         * Lifts read function to Reader.
-         */
-        inline operator fun <C : Any, A : Any> invoke(noinline rd: (C) -> A) = Reader(rd)
     }
 }
+
+fun <A : Any, B : Any> ((A) -> B).reader() : Reader<A, B> = Reader(this)

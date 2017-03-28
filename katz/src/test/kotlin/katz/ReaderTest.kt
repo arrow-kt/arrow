@@ -29,5 +29,10 @@ class ReaderTest : UnitSpec() {
         "flatMap" should "map over the inner value" {
             Reader<Int, Int> { it -> it * 2 }.flatMap { Reader<Int, Int> {it * 3} } shouldBe 12
         }
+
+        "reader" should "lift a reader from any (A) -> B function" {
+            val r = { x: Int -> x * 2}.reader()
+            r::class.java shouldBe Reader::class.java
+        }
     }
 }
