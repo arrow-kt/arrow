@@ -24,6 +24,20 @@ class IorTest : UnitSpec() {
             }
         }
 
+        "flatMap() should combine with upper bound" {
+            forAll { a: Int, b: String ->
+                {
+                    val implicit: Semigroup<Any> = object : Semigroup<Any> {
+                        override fun combine(a: Any, b: Any): Any = a
+                    }
+                    val iorRightNumber: Ior<String, Int> = Ior.Right(a)
+                    val iorLeftAnyAsUpperBoundOfString: Ior<Any, Int> = Ior.Left(b)
+                    val iorResult: Ior<Any, Int> = iorRightNumber.flatMap(implicit) { iorLeftAnyAsUpperBoundOfString }
+                    iorResult == Ior.Left(b)
+                }()
+            }
+        }
+
         "map() should modify only right value" {
             forAll { a: Int, b: String ->
                 {
