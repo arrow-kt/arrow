@@ -18,12 +18,12 @@ package katz
 
 object OptionMonad : Monad<Option.F> {
 
-    override fun <A, B> map(fa: HK<Option.F, A>, f: (A) -> B): HK<Option.F, B> =
+    override fun <A, B> map(fa: HK<Option.F, A>, f: (A) -> B): Option<B> =
             fa.ev().map(f)
 
-    override fun <A> pure(a: A): HK<Option.F, A> = Option.Some(a)
+    override fun <A> pure(a: A): Option<A> = Option.Some(a)
 
-    override fun <A, B> flatMap(fa: HK<Option.F, A>, f: (A) -> HK<Option.F, B>): HK<Option.F, B> =
+    override fun <A, B> flatMap(fa: HK<Option.F, A>, f: (A) -> HK<Option.F, B>): Option<B> =
             fa.ev().flatMap { f(it).ev() }
 
 }
