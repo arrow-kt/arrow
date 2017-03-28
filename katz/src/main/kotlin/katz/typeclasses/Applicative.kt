@@ -26,6 +26,9 @@ interface Applicative<F> : Functor<F> {
     fun <A, B> product(fa: HK<F, A>, fb: HK<F, B>): HK<F, Tuple2<A, B>> =
             ap(fb, map(fa) { a: A -> { b: B -> Tuple2(a, b) } })
 
+    fun <A, B> product2(fa: HK<F, Tuple2<A, B>>, fb: HK<F, B>): HK<F, Tuple3<A, B>> =
+            ap(fb, map(fa) { a: A -> { b: B -> Tuple2(a, b) } })
+
     override fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B> = ap(fa, pure(f))
 
     fun <A, B, Z> map2(fa: HK<F, A>, fb: HK<F, B>, f: (Tuple2<A, B>) -> Z): HK<F, Z> =
@@ -40,10 +43,13 @@ data class Tuple6<out A, out B, out C, out D, out E, out F>(val a: A, val b: B, 
 data class Tuple7<out A, out B, out C, out D, out E, out F, out G>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G)
 data class Tuple8<out A, out B, out C, out D, out E, out F, out G, out H>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H)
 
-fun <A> Option<A>.product()
 
-object Test {
-    fun test() {
-        Option(1).
-    }
-}
+fun <F, A, B> HK<F, A>.product(AP: Applicative<F>, other: HK<F, B>): HK<F, Tuple2<A, B>> =
+        AP.product(this, other)
+
+fun <F, A, B, C> HK<F, Tuple2<A, B>>.product(AP: Applicative<F>, other: HK<F, C>, dummyImplicit : Any? = null): HK<F, Tuple3<A, B, C>> =
+    AP.map(AP.product(this, other), { Tuple3(it.a.a, it.a.b, it.b) })
+
+fun <F, A, B, C, D> HK<F, Tuple3<A, B, C>>.product(AP: Applicative<F>, other: HK<F, D>, dummyImplicit : Any? = null, dummyImplicit2 : Any? = null): HK<F, Tuple4<A, B, C, D>> =
+        AP.map(AP.product(this, other), { Tuple4(it.a.a, it.a.b, it.a.c, it.b) })
+
