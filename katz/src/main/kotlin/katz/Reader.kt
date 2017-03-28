@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package kats
+package katz
 
 /**
  * Basic implementation of the Reader monad. Provides an "implicit" context (configuration) for

@@ -17,7 +17,6 @@
 package katz
 
 import io.kotlintest.KTestJUnitRunner
-import kats.Reader
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
