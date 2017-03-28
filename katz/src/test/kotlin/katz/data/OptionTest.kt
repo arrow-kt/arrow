@@ -98,5 +98,11 @@ class OptionTest : UnitSpec() {
             }
             result shouldBe Companion(3)
         }
+
+        "Cartesian builder should build products over option" {
+            OptionMonad.map(Option(1), Option("a"), Option(true), { (a, b, c) ->
+                        "$a $b $c"
+                    }) shouldBe Option("1 a true")
+        }
     }
 }
