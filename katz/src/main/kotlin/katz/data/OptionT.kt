@@ -15,14 +15,15 @@
  */
 package katz
 
-typealias FOption<F, A> = HK<F, Option<A>>
 
-data class OptionT<F, A>(val value: FOption<F, A>) {
+data class OptionT<F, A>(val value: HK<F, Option<A>>) : HK<OptionT.F, A> {
+
+    class F private constructor()
 
     fun <B> fold(F: Functor<F>, default: () -> B, f: (A) -> B): HK<F, B> =
             F.map(value, { it.fold(default, f) })
 
-    fun <B> flatMapF(F: Monad<F>, f: (A) -> FOption<F, B>): OptionT<F, B> =
+    fun <B> flatMapF(F: Monad<F>, f: (A) -> HK<F, Option<B>>): OptionT<F, B> =
             OptionT(F.flatMap(value, { it.fold({ F.pure<Option<B>>(Option.None) }, { f(it) }) }))
 
     fun <B> flatMap(F: Monad<F>, f: (A) -> OptionT<F, B>): OptionT<F, B> =
@@ -49,7 +50,7 @@ data class OptionT<F, A>(val value: FOption<F, A>) {
     fun orElse(F: Monad<F>, default: () -> OptionT<F, A>): OptionT<F, A> =
             orElseF(F, { default().value })
 
-    fun orElseF(F: Monad<F>, default: () -> FOption<F, A>): OptionT<F, A> =
+    fun orElseF(F: Monad<F>, default: () -> HK<F, Option<A>>): OptionT<F, A> =
             OptionT(F.flatMap(value) {
                 when (it) {
                     is Option.Some<A> -> F.pure(it)
