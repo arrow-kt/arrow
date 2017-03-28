@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package katz
+package katz.data
+
+import katz.typeclasses.HK
 
 /**
  * A List that can not be empty

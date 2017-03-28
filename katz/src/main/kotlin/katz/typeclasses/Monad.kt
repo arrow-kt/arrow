@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-package katz
+package katz.typeclasses
 
+import katz.typeclasses.Applicative
+import katz.typeclasses.HK
+import katz.typeclasses.stackLabels
 import java.io.Serializable
 import kotlin.coroutines.experimental.Continuation
 import kotlin.coroutines.experimental.EmptyCoroutineContext

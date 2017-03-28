@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package katz
+package katz.data
+
+import katz.typeclasses.HK
 
 class Id<out A>(val value: A): HK<Id.F, A> {
 

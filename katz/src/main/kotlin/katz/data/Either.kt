@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-package katz
+package katz.data
+
+import katz.data.Either.Left
+import katz.data.Either.Right
+import katz.data.Option
 
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Either.scala

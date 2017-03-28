@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package katz
+package katz.data
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.forAll
-import katz.Either.*
+import katz.UnitSpec
+import katz.data.Either.Left
+import katz.data.Either.Right
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

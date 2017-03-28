@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package katz
+package katz.data
 
-import katz.Either.Left
-import katz.Either.Right
-import katz.Option
+import katz.data.Either
+import katz.data.Either.Left
+import katz.data.Either.Right
+import katz.Semigroup
+import katz.data.Option
 
 /**
  * Port of https://github.com/typelevel/cats/blob/v0.9.0/core/src/main/scala/cats/data/Ior.scala

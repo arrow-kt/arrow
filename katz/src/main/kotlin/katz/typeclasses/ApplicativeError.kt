@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-package katz
+package katz.typeclasses
+
+import katz.data.Either
+import katz.typeclasses.HK
 
 interface ApplicativeError<F, E> : Applicative<F> {
 
