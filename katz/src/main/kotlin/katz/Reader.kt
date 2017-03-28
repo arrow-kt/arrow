@@ -37,8 +37,8 @@ class Reader<C : Any, out A : Any>(val run: (C) -> A) {
      * local combinator allows switching the environment to unify two different dependency types, so
      * you can compose readers with different type dependencies.
      *
-     * D: type represents a bigger context than C.
-     * @param fd: function to convert from the bigger context D to a context of type C.
+     * D: type represents a different context than C.
+     * @param fd: function to convert from a D context to a context of type C.
      */
     inline fun <D : Any> local(crossinline fd: (D) -> C): Reader<D, A> = Reader { d ->
         run(fd(d))
