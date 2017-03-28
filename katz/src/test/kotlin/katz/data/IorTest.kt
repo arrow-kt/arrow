@@ -149,12 +149,9 @@ class IorTest : UnitSpec() {
 
         "Ior.monad.flatMap should be consistent with Ior#flatMap" {
             forAll { a: Int ->
-                val implicit: Semigroup<Number> = object: Semigroup<Number> {
-                    override fun combine(a: Number, b: Number): Number = a
-                }
                 val x = { b: Int -> Ior.Right(b * a) }
                 val ior = Ior.Right(a)
-                ior.flatMap(implicit, x) == IorMonad.flatMap(ior, x)
+                ior.flatMap(IorMonad.combine(), x) == IorMonad.flatMap(ior, x)
             }
         }
 
