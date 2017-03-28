@@ -1,6 +1,7 @@
 package katz
 
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
@@ -11,15 +12,15 @@ class IorTest : UnitSpec() {
         "flatMap() should modify entity" {
             forAll { a: Int, b: String ->
                 {
-                    val implicit: Semigroup<Number> = object : Semigroup<Number> {
-                        override fun combine(a: Number, b: Number): Number = a
+                    val intMonoidInstance: Semigroup<Int> = object : Semigroup<Int> {
+                        override fun combine(a: Int, b: Int): Int = a
                     }
-                    Ior.Right(b).flatMap(implicit) { Ior.Left(a) } == Ior.Left(a) &&
-                            Ior.Right(a).flatMap(implicit) { Ior.Right(b) } == Ior.Right(b) &&
-                            Ior.Left(a).flatMap(implicit) { Ior.Right(b) } == Ior.Left(a) &&
-                            Ior.Both(a, b).flatMap(implicit) { Ior.Left(a) } == Ior.Left(implicit.combine(a, a)) &&
-                            Ior.Both(a, b).flatMap(implicit) { Ior.Right(b) } == Ior.Right(b) &&
-                            Ior.Both(a, b).flatMap(implicit) { Ior.Both(a, b) } == Ior.Both(implicit.combine(a, a), b)
+                    Ior.Right(b).flatMap(intMonoidInstance) { Ior.Left(a) } == Ior.Left(a) &&
+                            Ior.Right(a).flatMap(intMonoidInstance) { Ior.Right(b) } == Ior.Right(b) &&
+                            Ior.Left(a).flatMap(intMonoidInstance) { Ior.Right(b) } == Ior.Left(a) &&
+                            Ior.Both(a, b).flatMap(intMonoidInstance) { Ior.Left(a) } == Ior.Left(intMonoidInstance.combine(a, a)) &&
+                            Ior.Both(a, b).flatMap(intMonoidInstance) { Ior.Right(b) } == Ior.Right(b) &&
+                            Ior.Both(a, b).flatMap(intMonoidInstance) { Ior.Both(a, b) } == Ior.Both(intMonoidInstance.combine(a, a), b)
                 }()
             }
         }
@@ -27,13 +28,13 @@ class IorTest : UnitSpec() {
         "flatMap() should combine with upper bound" {
             forAll { a: String, b: Int ->
                 {
-                    val implicit: Semigroup<Number> = object : Semigroup<Number> {
+                    val numberMonoidInstance: Semigroup<Number> = object : Semigroup<Number> {
                         override fun combine(a: Number, b: Number): Number = a
                     }
                     val iorRightString: Ior<Int, String> = Ior.Right(a)
                     val iorLeftNumberAsUpperBoundOfInt: Ior<Number, String> = Ior.Left(b)
-                    val iorResult: Ior<Number, String> = iorRightString.flatMap(implicit) { iorLeftNumberAsUpperBoundOfInt }
-                    iorResult == Ior.Left(b)
+                    val iorResult: Ior<Number, String> = iorRightString.flatMap(numberMonoidInstance) { iorLeftNumberAsUpperBoundOfInt }
+                    iorResult == iorLeftNumberAsUpperBoundOfInt
                 }()
             }
         }
@@ -144,6 +145,35 @@ class IorTest : UnitSpec() {
                         Ior.Both(a, b).getOrElse { a * 2 } == b
             }
 
+        }
+
+        val intMonoidInstance: Semigroup<Int> = object : Semigroup<Int> {
+            override fun combine(a: Int, b: Int): Int = a + b
+        }
+        val intIorMonad = IorMonad(intMonoidInstance)
+
+        "Ior.monad.flatMap should combine left values" {
+            val ior1 = Ior.Both(3, "Hello, world!")
+            val iorResult = intIorMonad.flatMap(ior1, { Ior.Left(7) })
+            iorResult shouldBe Ior.Left(10)
+        }
+
+        "Ior.monad.flatMap should be consistent with Ior#flatMap" {
+            forAll { a: Int ->
+                val x = { b: Int -> Ior.Right(b * a) }
+                val ior = Ior.Right(a)
+                ior.flatMap(intIorMonad.semigroup, x) == intIorMonad.flatMap(ior, x)
+            }
+        }
+
+        "Ior.monad.binding should for comprehend over right Ior" {
+            val result = intIorMonad.binding {
+                val x = !Ior.Right(1)
+                val y = Ior.Right(1).bind()
+                val z = bind { Ior.Right(1) }
+                yields(x + y + z)
+            }
+            result shouldBe Ior.Right(3)
         }
 
     }
