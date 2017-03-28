@@ -25,14 +25,14 @@ class IorTest : UnitSpec() {
         }
 
         "flatMap() should combine with upper bound" {
-            forAll { a: Int, b: String ->
+            forAll { a: String, b: Int ->
                 {
-                    val implicit: Semigroup<Any> = object : Semigroup<Any> {
-                        override fun combine(a: Any, b: Any): Any = a
+                    val implicit: Semigroup<Number> = object : Semigroup<Number> {
+                        override fun combine(a: Number, b: Number): Number = a
                     }
-                    val iorRightNumber: Ior<String, Int> = Ior.Right(a)
-                    val iorLeftAnyAsUpperBoundOfString: Ior<Any, Int> = Ior.Left(b)
-                    val iorResult: Ior<Any, Int> = iorRightNumber.flatMap(implicit) { iorLeftAnyAsUpperBoundOfString }
+                    val iorRightString: Ior<Int, String> = Ior.Right(a)
+                    val iorLeftNumberAsUpperBoundOfInt: Ior<Number, String> = Ior.Left(b)
+                    val iorResult: Ior<Number, String> = iorRightString.flatMap(implicit) { iorLeftNumberAsUpperBoundOfInt }
                     iorResult == Ior.Left(b)
                 }()
             }
