@@ -12,15 +12,15 @@ class IorTest : UnitSpec() {
         "flatMap() should modify entity" {
             forAll { a: Int, b: String ->
                 {
-                    val implicit: Semigroup<Number> = object : Semigroup<Number> {
+                    val intMonoidInstance: Semigroup<Number> = object : Semigroup<Number> {
                         override fun combine(a: Number, b: Number): Number = a
                     }
-                    Ior.Right(b).flatMap(implicit) { Ior.Left(a) } == Ior.Left(a) &&
-                            Ior.Right(a).flatMap(implicit) { Ior.Right(b) } == Ior.Right(b) &&
-                            Ior.Left(a).flatMap(implicit) { Ior.Right(b) } == Ior.Left(a) &&
-                            Ior.Both(a, b).flatMap(implicit) { Ior.Left(a) } == Ior.Left(implicit.combine(a, a)) &&
-                            Ior.Both(a, b).flatMap(implicit) { Ior.Right(b) } == Ior.Right(b) &&
-                            Ior.Both(a, b).flatMap(implicit) { Ior.Both(a, b) } == Ior.Both(implicit.combine(a, a), b)
+                    Ior.Right(b).flatMap(intMonoidInstance) { Ior.Left(a) } == Ior.Left(a) &&
+                            Ior.Right(a).flatMap(intMonoidInstance) { Ior.Right(b) } == Ior.Right(b) &&
+                            Ior.Left(a).flatMap(intMonoidInstance) { Ior.Right(b) } == Ior.Left(a) &&
+                            Ior.Both(a, b).flatMap(intMonoidInstance) { Ior.Left(a) } == Ior.Left(intMonoidInstance.combine(a, a)) &&
+                            Ior.Both(a, b).flatMap(intMonoidInstance) { Ior.Right(b) } == Ior.Right(b) &&
+                            Ior.Both(a, b).flatMap(intMonoidInstance) { Ior.Both(a, b) } == Ior.Both(intMonoidInstance.combine(a, a), b)
                 }()
             }
         }
