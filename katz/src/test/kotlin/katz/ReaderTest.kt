@@ -31,6 +31,12 @@ class ReaderTest : UnitSpec() {
                     .run(2) shouldBe 12
         }
 
+        "zip" should "return a new Reader zipping two given ones" {
+            val double = Reader<Int, Int> { it -> it * 2 }
+            val triple = Reader<Int, Int> { it -> it * 3 }
+            double.zip(triple).run(2) shouldBe Pair(4, 6)
+        }
+
         "reader" should "lift a reader from any (A) -> B function" {
             val r = { x: Int -> x * 2}.reader()
             r::class.java shouldBe Reader::class.java
