@@ -18,7 +18,7 @@ package katz
 
 object EitherMonad: Monad<HK<Either.F, *>> {
     override fun <A> pure(a: A): HK2<Either.F, *, A> =
-            Either.Right(a).ev()
+            Either.Right(a)
 
     override fun <A, B> flatMap(fa: HK2<Either.F, *, A>, f: (A) -> HK2<Either.F, *, B>): HK2<Either.F, *, B> =
             fa.ev().flatMap { f(it).ev() }
