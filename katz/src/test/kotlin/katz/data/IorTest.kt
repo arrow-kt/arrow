@@ -12,8 +12,8 @@ class IorTest : UnitSpec() {
         "flatMap() should modify entity" {
             forAll { a: Int, b: String ->
                 {
-                    val intMonoidInstance: Semigroup<Number> = object : Semigroup<Number> {
-                        override fun combine(a: Number, b: Number): Number = a
+                    val intMonoidInstance: Semigroup<Int> = object : Semigroup<Int> {
+                        override fun combine(a: Int, b: Int): Int = a
                     }
                     Ior.Right(b).flatMap(intMonoidInstance) { Ior.Left(a) } == Ior.Left(a) &&
                             Ior.Right(a).flatMap(intMonoidInstance) { Ior.Right(b) } == Ior.Right(b) &&
