@@ -21,9 +21,8 @@ object IorMonad: Monad<HK<Ior.F, *>> {
     override fun <A> pure(a: A): HK2<Ior.F, *, A> =
             Ior.Right(a).ev()
 
-    override fun <A, B> flatMap(fa: HK2<Ior.F, *, A>, f: (A) -> HK2<Ior.F, *, B>): HK2<Ior.F, *, B> {
-        return fa.ev().flatMap(combine()) { f(it).ev() }
-    }
+    override fun <A, B> flatMap(fa: HK2<Ior.F, *, A>, f: (A) -> HK2<Ior.F, *, B>): HK2<Ior.F, *, B> =
+            fa.ev().flatMap(combine()) { f(it).ev() }
 
     fun <A> combine(): Semigroup<A> = object: Semigroup<A> {
         override fun combine(a: A, b: A): A = a
