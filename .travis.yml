@@ -4,5 +4,9 @@ jdk:
   - oraclejdk8
 
 script:
-  ./gradlew build test
-  ./gradlew detekt
+  - ./gradlew check
+  - ./gradlew detekt
+  - ./gradlew codeCoverageReport
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)

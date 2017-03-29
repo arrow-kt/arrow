@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,12 +16,19 @@
 
 package katz
 
-interface HK<out F, out A>
+interface Semigroup<A> {
+    /**
+     * Combine two [A] values.
+     */
+    fun combine(a: A, b: A): A
 
-typealias HK2<F, A, B> = HK<HK<F, A>, B>
+    /**
+     * Combine an array of [A] values.
+     */
+    fun combineAll(vararg elems: A): A = combineAll(elems.asList())
 
-typealias HK3<F, A, B, C> = HK<HK2<F, A, B>, C>
-
-typealias HK4<F, A, B, C, D> = HK<HK3<F, A, B, C>, D>
-
-typealias HK5<F, A, B, C, D, E> = HK<HK4<F, A, B, C, D>, E>
+    /**
+     * Combine a collection of [A] values.
+     */
+    fun combineAll(elems: Collection<A>): A = elems.reduce { a, b -> combine(a, b) }
+}

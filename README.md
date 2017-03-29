@@ -3,6 +3,8 @@ Katz
 [![Build Status](https://travis-ci.org/FineCinnamon/Katz.svg?branch=master)](https://travis-ci.org/FineCinnamon/Katz/)
 [![Kotlin version badge](https://img.shields.io/badge/kotlin-1.1.1-blue.svg)](http://kotlinlang.org/)
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+[![codecov](https://codecov.io/gh/FineCinnamon/Katz/branch/master/graph/badge.svg)](https://codecov.io/gh/FineCinnamon/Katz)
+[![version](https://jitpack.io/v/FineCinnamon/Katz.svg)](https://jitpack.io/#FineCinnamon/Katz/v0.2)
 
 Functional Datatypes and abstractions for Kotlin inspired by [Cats][cats]
 
@@ -35,6 +37,29 @@ If you follow this pattern, you will see by yourself how functional programing l
 Once we have the pure functional base, we can start adding `Kotlin` optimizations over it using the language's syntatic sugar. But **we need to put attention on creating correct definitions over performance improvements or any type of early micro-optimization.**
 
 Ideally, we would want to have property based tests where we would apply a series of norms over the base abstractions in each one of the types implemented.
+
+# Add it to your project
+
+Use it at your how risk, the actual state is not production ready.
+
+Add it in your root `build.gradle` at the end of repositories.
+
+```
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+```
+
+Add the dependency into project `build.gradle`
+
+```
+dependencies {
+    compile 'com.github.FineCinnamon:Katz:v0.2'
+}
+```
 
 # License
 

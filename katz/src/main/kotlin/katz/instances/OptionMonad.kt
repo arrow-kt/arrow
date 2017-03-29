@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,8 +18,6 @@ package katz
 
 object OptionMonad : Monad<Option.F> {
 
-    fun <A> HK<Option.F, A>.ev(): Option<A> = this as Option<A>
-
     override fun <A, B> map(fa: HK<Option.F, A>, f: (A) -> B): HK<Option.F, B> =
             fa.ev().map(f)
 
@@ -29,3 +27,5 @@ object OptionMonad : Monad<Option.F> {
             fa.ev().flatMap { f(it).ev() }
 
 }
+
+fun <A> HK<Option.F, A>.ev(): Option<A> = this as Option<A>

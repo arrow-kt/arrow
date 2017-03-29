@@ -18,8 +18,6 @@ package katz
 
 object NonEmptyListMonad : Monad<NonEmptyList.F> {
 
-    fun <A> HK<NonEmptyList.F, A>.ev(): NonEmptyList<A> = this as NonEmptyList<A>
-
     override fun <A, B> map(fa: HK<NonEmptyList.F, A>, f: (A) -> B): HK<NonEmptyList.F, B> =
             fa.ev().map(f)
 
@@ -29,3 +27,5 @@ object NonEmptyListMonad : Monad<NonEmptyList.F> {
             fa.ev().flatMap { f(it).ev() }
 
 }
+
+fun <A> HK<NonEmptyList.F, A>.ev(): NonEmptyList<A> = this as NonEmptyList<A>

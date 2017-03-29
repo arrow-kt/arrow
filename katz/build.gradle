@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-apply plugin: 'kotlin'
-
 test {
     testLogging {
         events "passed", "skipped", "failed", "standardOut", "standardError"
