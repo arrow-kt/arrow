@@ -15,18 +15,42 @@
  */
 package katz
 
-
+/**
+ * [OptionT]`<F, A>` is a light wrapper on an `F<`[Option]`<A>>` with some
+ * convenient methods for working with this nested structure.
+ *
+ * It may also be said that [OptionT] is a monad transformer for [Option].
+ */
 data class OptionT<F, A>(val value: HK<F, Option<A>>) : HK2<OptionT.F, F, A> {
 
     class F private constructor()
+
+    companion object {
+        fun <M, A> pure(F: Monad<M>, a: A): OptionT<M, A> = OptionT(F.pure(Option.Some(a)))
+
+        fun <M, A> none(F: Monad<M>): OptionT<M, A> = OptionT(F.pure(Option.None))
+
+        fun <M, A> fromOption(F: Monad<M>, value: Option<A>): OptionT<M, A> = OptionT(F.pure(value))
+    }
+
+    inline fun <B> fold(F: Monad<F>, crossinline default: () -> B, crossinline f: (A) -> B): HK<F, B> =
+            F.map(value, { option -> option.fold({ default() }, { f(it) }) })
+
+    inline fun <B> cata(F: Monad<F>, crossinline default: () -> B, crossinline f: (A) -> B): HK<F, B> =
+            fold(F, { default() }, { f(it) })
 
     inline fun <B> flatMap(F: Monad<F>, crossinline f: (A) -> OptionT<F, B>): OptionT<F, B> = flatMapF(F, { it -> f(it).value })
 
     inline fun <B> flatMapF(F: Monad<F>, crossinline f: (A) -> HK<F, Option<B>>): OptionT<F, B> =
             OptionT(F.flatMap(value, { option -> option.fold({ F.pure(Option.None) }, { f(it) }) }))
 
-    inline fun <B> map(F: Functor<F>, crossinline f: (Option<A>) -> Option<B>): OptionT<F, B> =
-            OptionT(F.map(value, { f(it) }))
+    fun <B> liftF(F: Monad<F>, fa: HK<F, B>): OptionT<F, B> = OptionT(F.map(fa, { Option.Some(it) }))
+
+    inline fun <B> semiflatMap(F: Monad<F>, crossinline f: (A) -> HK<F, B>): OptionT<F, B> =
+            flatMap(F, { option -> liftF(F, f(option)) })
+
+    inline fun <B> map(F: Functor<F>, crossinline f: (A) -> B): OptionT<F, B> =
+            OptionT(F.map(value, { it.map(f) }))
 
     fun getOrElse(F: Functor<F>, default: () -> A): HK<F, A> = F.map(value, { it.getOrElse(default) })
 
@@ -38,14 +62,22 @@ data class OptionT<F, A>(val value: HK<F, Option<A>>) : HK2<OptionT.F, F, A> {
 
     fun isEmpty(F: Functor<F>): HK<F, Boolean> = F.map(value, { it.isEmpty })
 
-    fun orElse(F: Monad<F>, default: () -> OptionT<F, A>): OptionT<F, A> =
+    inline fun orElse(F: Monad<F>, crossinline default: () -> OptionT<F, A>): OptionT<F, A> =
             orElseF(F, { default().value })
 
-    fun orElseF(F: Monad<F>, default: () -> HK<F, Option<A>>): OptionT<F, A> =
+    inline fun orElseF(F: Monad<F>, crossinline default: () -> HK<F, Option<A>>): OptionT<F, A> =
             OptionT(F.flatMap(value) {
                 when (it) {
                     is Option.Some<A> -> F.pure(it)
                     is Option.None -> default()
                 }
             })
+
+    inline fun <B> transform(F: Monad<F>, crossinline f: (Option<A>) -> Option<B>): OptionT<F, B> =
+            OptionT(F.map(value, { f(it) }))
+
+    inline fun <B> subflatMap(F: Monad<F>, crossinline f: (A) -> Option<B>): OptionT<F, B> =
+            transform(F, { it.flatMap(f) })
+
+    //TODO: add toRight() and toLeft() once EitherT it's available
 }

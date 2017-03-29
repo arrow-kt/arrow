@@ -18,11 +18,13 @@ package katz
 
 
 class OptionTMonad<F>(val M: Monad<F>) : Monad<HK<OptionT.F, F>> {
-    override fun <A> pure(a: A): OptionT<F, A> = OptionT(M.pure(Option.Some(a)))
+    override fun <A> pure(a: A): OptionT<F, A> = OptionT.pure(M, a)
 
     override fun <A, B> flatMap(fa: HK<HK<OptionT.F, F>, A>, f: (A) -> HK<HK<OptionT.F, F>, B>): OptionT<F, B> =
             fa.ev().flatMap(M, { f(it).ev() })
 
+    override fun <A, B> map(fa: HK<HK<OptionT.F, F>, A>, f: (A) -> B): OptionT<F, B> =
+            fa.ev().map(M, f)
 }
 
 //unchecked cast though we don't use F
