@@ -18,12 +18,12 @@ package katz
 
 object IdMonad : Monad<Id.F> {
 
-    override fun <A, B> map(fa: HK<Id.F, A>, f: (A) -> B): HK<Id.F, B> =
+    override fun <A, B> map(fa: HK<Id.F, A>, f: (A) -> B): Id<B> =
             fa.ev().map(f)
 
-    override fun <A> pure(a: A): HK<Id.F, A> = Id(a)
+    override fun <A> pure(a: A): Id<A> = Id(a)
 
-    override fun <A, B> flatMap(fa: HK<Id.F, A>, f: (A) -> HK<Id.F, B>): HK<Id.F, B> =
+    override fun <A, B> flatMap(fa: HK<Id.F, A>, f: (A) -> HK<Id.F, B>): Id<B> =
             fa.ev().flatMap { f(it).ev() }
 }
 

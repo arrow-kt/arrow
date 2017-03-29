@@ -114,14 +114,15 @@ class EitherTest : UnitSpec() {
 
         "Either.monad.flatMap should be consistent with Either#flatMap" {
             forAll { a: Int ->
+                val M = EitherMonad<Int>()
                 val x = { b: Int -> Either.Right(b * a) }
                 val option = Either.Right(a)
-                option.flatMap(x) == EitherMonad.flatMap(option, x)
+                option.flatMap(x) == M.flatMap(option, x)
             }
         }
 
         "Either.monad.binding should for comprehend over right either" {
-            val result = EitherMonad.binding {
+            val result = EitherMonad<Int>().binding {
                 val x = !Either.Right(1)
                 val y = Either.Right(1).bind()
                 val z = bind { Either.Right(1) }

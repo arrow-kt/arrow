@@ -18,10 +18,10 @@ package katz
 
 interface HK<out F, out A>
 
-interface HK2<out F, out A, out B> : HK<HK<F, A>, B>
+typealias HK2<F, A, B> = HK<HK<F, A>, B>
 
-interface HK3<out F, out A, out B, out C> : HK<HK2<F, A, B>, C>
+typealias HK3<F, A, B, C> = HK<HK2<F, A, B>, C>
 
-interface HK4<out F, out A, out B, out C, out D> : HK<HK3<F, A, B, C>, D>
+typealias HK4<F, A, B, C, D> = HK<HK3<F, A, B, C>, D>
 
-interface HK5<out F, out A, out B, out C, out D, out E> : HK<HK4<F, A, B, C, D>, E>
+typealias HK5<F, A, B, C, D, E> = HK<HK4<F, A, B, C, D>, E>
