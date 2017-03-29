@@ -41,75 +41,75 @@ data class Tuple8<out A, out B, out C, out D, out E, out F, out G, out H>(val a:
 data class Tuple9<out A, out B, out C, out D, out E, out F, out G, out H, out I>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I)
 data class Tuple10<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I, val j: J)
 
-fun <μ, A, Z> HK<μ, A>.product(AP: Applicative<μ>, other: HK<μ, Z>): HK<μ, Tuple2<A, Z>> =
+fun <HKF, A, Z> HK<HKF, A>.product(AP: Applicative<HKF>, other: HK<HKF, Z>): HK<HKF, Tuple2<A, Z>> =
         AP.product(this, other)
 
-fun <μ, A, B, Z> HK<μ, Tuple2<A, B>>.product(
-        AP: Applicative<μ>,
-        other: HK<μ, Z>,
-        dummyImplicit: Any? = null): HK<μ, Tuple3<A, B, Z>> =
+fun <HKF, A, B, Z> HK<HKF, Tuple2<A, B>>.product(
+        AP: Applicative<HKF>,
+        other: HK<HKF, Z>,
+        dummyImplicit: Any? = null): HK<HKF, Tuple3<A, B, Z>> =
         AP.map(AP.product(this, other), { Tuple3(it.a.a, it.a.b, it.b) })
 
-fun <μ, A, B, C, Z> HK<μ, Tuple3<A, B, C>>.product(
-        AP: Applicative<μ>,
-        other: HK<μ, Z>,
+fun <HKF, A, B, C, Z> HK<HKF, Tuple3<A, B, C>>.product(
+        AP: Applicative<HKF>,
+        other: HK<HKF, Z>,
         dummyImplicit: Any? = null,
-        dummyImplicit2: Any? = null): HK<μ, Tuple4<A, B, C, Z>> =
+        dummyImplicit2: Any? = null): HK<HKF, Tuple4<A, B, C, Z>> =
         AP.map(AP.product(this, other), { Tuple4(it.a.a, it.a.b, it.a.c, it.b) })
 
-fun <μ, A, B, C, D, Z> HK<μ, Tuple4<A, B, C, D>>.product(
-        AP: Applicative<μ>,
-        other: HK<μ, Z>,
+fun <HKF, A, B, C, D, Z> HK<HKF, Tuple4<A, B, C, D>>.product(
+        AP: Applicative<HKF>,
+        other: HK<HKF, Z>,
         dummyImplicit: Any? = null,
         dummyImplicit2: Any? = null,
-        dummyImplicit3: Any? = null): HK<μ, Tuple5<A, B, C, D, Z>> =
+        dummyImplicit3: Any? = null): HK<HKF, Tuple5<A, B, C, D, Z>> =
         AP.map(AP.product(this, other), { Tuple5(it.a.a, it.a.b, it.a.c, it.a.d, it.b) })
 
-fun <μ, A, B, C, D, E, Z> HK<μ, Tuple5<A, B, C, D, E>>.product(
-        AP: Applicative<μ>,
-        other: HK<μ, Z>,
+fun <HKF, A, B, C, D, E, Z> HK<HKF, Tuple5<A, B, C, D, E>>.product(
+        AP: Applicative<HKF>,
+        other: HK<HKF, Z>,
         dummyImplicit: Any? = null,
         dummyImplicit2: Any? = null,
         dummyImplicit3: Any? = null,
-        dummyImplicit4: Any? = null): HK<μ, Tuple6<A, B, C, D, E, Z>> =
+        dummyImplicit4: Any? = null): HK<HKF, Tuple6<A, B, C, D, E, Z>> =
         AP.map(AP.product(this, other), { Tuple6(it.a.a, it.a.b, it.a.c, it.a.d, it.a.e, it.b) })
 
-fun <μ, A, B, C, D, E, F, Z> HK<μ, Tuple6<A, B, C, D, E, F>>.product(
-        AP: Applicative<μ>,
-        other: HK<μ, Z>,
+fun <HKF, A, B, C, D, E, F, Z> HK<HKF, Tuple6<A, B, C, D, E, F>>.product(
+        AP: Applicative<HKF>,
+        other: HK<HKF, Z>,
         dummyImplicit: Any? = null,
         dummyImplicit2: Any? = null,
         dummyImplicit3: Any? = null,
         dummyImplicit4: Any? = null,
-        dummyImplicit5: Any? = null): HK<μ, Tuple7<A, B, C, D, E, F, Z>> =
+        dummyImplicit5: Any? = null): HK<HKF, Tuple7<A, B, C, D, E, F, Z>> =
         AP.map(AP.product(this, other), { Tuple7(it.a.a, it.a.b, it.a.c, it.a.d, it.a.e, it.a.f, it.b) })
 
-fun <μ, A, B, C, D, E, F, G, Z> HK<μ, Tuple7<A, B, C, D, E, F, G>>.product(
-        AP: Applicative<μ>,
-        other: HK<μ, Z>,
+fun <HKF, A, B, C, D, E, F, G, Z> HK<HKF, Tuple7<A, B, C, D, E, F, G>>.product(
+        AP: Applicative<HKF>,
+        other: HK<HKF, Z>,
         dummyImplicit: Any? = null,
         dummyImplicit2: Any? = null,
         dummyImplicit3: Any? = null,
         dummyImplicit4: Any? = null,
         dummyImplicit5: Any? = null,
-        dummyImplicit6: Any? = null): HK<μ, Tuple8<A, B, C, D, E, F, G, Z>> =
+        dummyImplicit6: Any? = null): HK<HKF, Tuple8<A, B, C, D, E, F, G, Z>> =
         AP.map(AP.product(this, other), { Tuple8(it.a.a, it.a.b, it.a.c, it.a.d, it.a.e, it.a.f, it.a.g, it.b) })
 
-fun <μ, A, B, C, D, E, F, G, H, Z> HK<μ, Tuple8<A, B, C, D, E, F, G, H>>.product(
-        AP: Applicative<μ>,
-        other: HK<μ, Z>,
+fun <HKF, A, B, C, D, E, F, G, H, Z> HK<HKF, Tuple8<A, B, C, D, E, F, G, H>>.product(
+        AP: Applicative<HKF>,
+        other: HK<HKF, Z>,
         dummyImplicit: Any? = null,
         dummyImplicit2: Any? = null,
         dummyImplicit3: Any? = null,
         dummyImplicit4: Any? = null,
         dummyImplicit5: Any? = null,
         dummyImplicit6: Any? = null,
-        dummyImplicit7: Any? = null): HK<μ, Tuple9<A, B, C, D, E, F, G, H, Z>> =
+        dummyImplicit7: Any? = null): HK<HKF, Tuple9<A, B, C, D, E, F, G, H, Z>> =
         AP.map(AP.product(this, other), { Tuple9(it.a.a, it.a.b, it.a.c, it.a.d, it.a.e, it.a.f, it.a.g, it.a.h, it.b) })
 
-fun <μ, A, B, C, D, E, F, G, H, I, Z> HK<μ, Tuple9<A, B, C, D, E, F, G, H, I>>.product(
-        AP: Applicative<μ>,
-        other: HK<μ, Z>,
+fun <HKF, A, B, C, D, E, F, G, H, I, Z> HK<HKF, Tuple9<A, B, C, D, E, F, G, H, I>>.product(
+        AP: Applicative<HKF>,
+        other: HK<HKF, Z>,
         dummyImplicit: Any? = null,
         dummyImplicit2: Any? = null,
         dummyImplicit3: Any? = null,
@@ -117,176 +117,176 @@ fun <μ, A, B, C, D, E, F, G, H, I, Z> HK<μ, Tuple9<A, B, C, D, E, F, G, H, I>>
         dummyImplicit5: Any? = null,
         dummyImplicit6: Any? = null,
         dummyImplicit7: Any? = null,
-        dummyImplicit9: Any? = null): HK<μ, Tuple10<A, B, C, D, E, F, G, H, I, Z>> =
+        dummyImplicit9: Any? = null): HK<HKF, Tuple10<A, B, C, D, E, F, G, H, I, Z>> =
         AP.map(AP.product(this, other), { Tuple10(it.a.a, it.a.b, it.a.c, it.a.d, it.a.e, it.a.f, it.a.g, it.a.h, it.a.i, it.b) })
 
-fun <μ, A, B> Applicative<μ>.tupled(
-        a: HK<μ, A>,
-        b: HK<μ, B>): HK<μ, Tuple2<A, B>> =
+fun <HKF, A, B> Applicative<HKF>.tupled(
+        a: HK<HKF, A>,
+        b: HK<HKF, B>): HK<HKF, Tuple2<A, B>> =
         a.product(this, b)
 
-fun <μ, A, B, C> Applicative<μ>.tupled(
-        a: HK<μ, A>,
-        b: HK<μ, B>,
-        c: HK<μ, C>): HK<μ, Tuple3<A, B, C>> =
+fun <HKF, A, B, C> Applicative<HKF>.tupled(
+        a: HK<HKF, A>,
+        b: HK<HKF, B>,
+        c: HK<HKF, C>): HK<HKF, Tuple3<A, B, C>> =
         a.product(this, b).product(this, c)
 
-fun <μ, A, B, C, D> Applicative<μ>.tupled(
-        a: HK<μ, A>,
-        b: HK<μ, B>,
-        c: HK<μ, C>,
-        d: HK<μ, D>): HK<μ, Tuple4<A, B, C, D>> =
+fun <HKF, A, B, C, D> Applicative<HKF>.tupled(
+        a: HK<HKF, A>,
+        b: HK<HKF, B>,
+        c: HK<HKF, C>,
+        d: HK<HKF, D>): HK<HKF, Tuple4<A, B, C, D>> =
         a.product(this, b).product(this, c).product(this, d)
 
-fun <μ, A, B, C, D, E> Applicative<μ>.tupled(
-        a: HK<μ, A>,
-        b: HK<μ, B>,
-        c: HK<μ, C>,
-        d: HK<μ, D>,
-        e: HK<μ, E>): HK<μ, Tuple5<A, B, C, D, E>> =
+fun <HKF, A, B, C, D, E> Applicative<HKF>.tupled(
+        a: HK<HKF, A>,
+        b: HK<HKF, B>,
+        c: HK<HKF, C>,
+        d: HK<HKF, D>,
+        e: HK<HKF, E>): HK<HKF, Tuple5<A, B, C, D, E>> =
         a.product(this, b).product(this, c).product(this, d).product(this, e)
 
-fun <μ, A, B, C, D, E, F> Applicative<μ>.tupled(
-        a: HK<μ, A>,
-        b: HK<μ, B>,
-        c: HK<μ, C>,
-        d: HK<μ, D>,
-        e: HK<μ, E>,
-        f: HK<μ, F>): HK<μ, Tuple6<A, B, C, D, E, F>> =
+fun <HKF, A, B, C, D, E, F> Applicative<HKF>.tupled(
+        a: HK<HKF, A>,
+        b: HK<HKF, B>,
+        c: HK<HKF, C>,
+        d: HK<HKF, D>,
+        e: HK<HKF, E>,
+        f: HK<HKF, F>): HK<HKF, Tuple6<A, B, C, D, E, F>> =
         a.product(this, b).product(this, c).product(this, d).product(this, e).product(this, f)
 
-fun <μ, A, B, C, D, E, F, G> Applicative<μ>.tupled(
-        a: HK<μ, A>,
-        b: HK<μ, B>,
-        c: HK<μ, C>,
-        d: HK<μ, D>,
-        e: HK<μ, E>,
-        f: HK<μ, F>,
-        g: HK<μ, G>): HK<μ, Tuple7<A, B, C, D, E, F, G>> =
+fun <HKF, A, B, C, D, E, F, G> Applicative<HKF>.tupled(
+        a: HK<HKF, A>,
+        b: HK<HKF, B>,
+        c: HK<HKF, C>,
+        d: HK<HKF, D>,
+        e: HK<HKF, E>,
+        f: HK<HKF, F>,
+        g: HK<HKF, G>): HK<HKF, Tuple7<A, B, C, D, E, F, G>> =
         a.product(this, b).product(this, c).product(this, d).product(this, e).product(this, f).product(this, g)
 
-fun <μ, A, B, C, D, E, F, G, H> Applicative<μ>.tupled(
-        a: HK<μ, A>,
-        b: HK<μ, B>,
-        c: HK<μ, C>,
-        d: HK<μ, D>,
-        e: HK<μ, E>,
-        f: HK<μ, F>,
-        g: HK<μ, G>,
-        h: HK<μ, H>): HK<μ, Tuple8<A, B, C, D, E, F, G, H>> =
+fun <HKF, A, B, C, D, E, F, G, H> Applicative<HKF>.tupled(
+        a: HK<HKF, A>,
+        b: HK<HKF, B>,
+        c: HK<HKF, C>,
+        d: HK<HKF, D>,
+        e: HK<HKF, E>,
+        f: HK<HKF, F>,
+        g: HK<HKF, G>,
+        h: HK<HKF, H>): HK<HKF, Tuple8<A, B, C, D, E, F, G, H>> =
         a.product(this, b).product(this, c).product(this, d).product(this, e).product(this, f).product(this, g).product(this, h)
 
-fun <μ, A, B, C, D, E, F, G, H, I> Applicative<μ>.tupled(
-        a: HK<μ, A>,
-        b: HK<μ, B>,
-        c: HK<μ, C>,
-        d: HK<μ, D>,
-        e: HK<μ, E>,
-        f: HK<μ, F>,
-        g: HK<μ, G>,
-        h: HK<μ, H>,
-        i: HK<μ, I>): HK<μ, Tuple9<A, B, C, D, E, F, G, H, I>> =
+fun <HKF, A, B, C, D, E, F, G, H, I> Applicative<HKF>.tupled(
+        a: HK<HKF, A>,
+        b: HK<HKF, B>,
+        c: HK<HKF, C>,
+        d: HK<HKF, D>,
+        e: HK<HKF, E>,
+        f: HK<HKF, F>,
+        g: HK<HKF, G>,
+        h: HK<HKF, H>,
+        i: HK<HKF, I>): HK<HKF, Tuple9<A, B, C, D, E, F, G, H, I>> =
         a.product(this, b).product(this, c).product(this, d).product(this, e).product(this, f).product(this, g).product(this, h).product(this, i)
 
-fun <μ, A, B, C, D, E, F, G, H, I, J> Applicative<μ>.tupled(
-        a: HK<μ, A>,
-        b: HK<μ, B>,
-        c: HK<μ, C>,
-        d: HK<μ, D>,
-        e: HK<μ, E>,
-        f: HK<μ, F>,
-        g: HK<μ, G>,
-        h: HK<μ, H>,
-        i: HK<μ, I>,
-        j: HK<μ, J>): HK<μ, Tuple10<A, B, C, D, E, F, G, H, I, J>> =
+fun <HKF, A, B, C, D, E, F, G, H, I, J> Applicative<HKF>.tupled(
+        a: HK<HKF, A>,
+        b: HK<HKF, B>,
+        c: HK<HKF, C>,
+        d: HK<HKF, D>,
+        e: HK<HKF, E>,
+        f: HK<HKF, F>,
+        g: HK<HKF, G>,
+        h: HK<HKF, H>,
+        i: HK<HKF, I>,
+        j: HK<HKF, J>): HK<HKF, Tuple10<A, B, C, D, E, F, G, H, I, J>> =
         a.product(this, b).product(this, c).product(this, d).product(this, e).product(this, f).product(this, g).product(this, h).product(this, i).product(this, j)
 
-fun <μ, A, B, Z> Applicative<μ>.map(
-        a: HK<μ, A>,
-        b: HK<μ, B>,
-        λ: (Tuple2<A, B>) -> Z): HK<μ, Z> =
-        this.map(a.product(this, b), λ)
+fun <HKF, A, B, Z> Applicative<HKF>.map(
+        a: HK<HKF, A>,
+        b: HK<HKF, B>,
+        lbd: (Tuple2<A, B>) -> Z): HK<HKF, Z> =
+        this.map(a.product(this, b), lbd)
 
-fun <μ, A, B, C, Z> Applicative<μ>.map(
-        a: HK<μ, A>,
-        b: HK<μ, B>,
-        c: HK<μ, C>,
-        λ: (Tuple3<A, B, C>) -> Z): HK<μ, Z> =
-        this.map(a.product(this, b).product(this, c), λ)
+fun <HKF, A, B, C, Z> Applicative<HKF>.map(
+        a: HK<HKF, A>,
+        b: HK<HKF, B>,
+        c: HK<HKF, C>,
+        lbd: (Tuple3<A, B, C>) -> Z): HK<HKF, Z> =
+        this.map(a.product(this, b).product(this, c), lbd)
 
-fun <μ, A, B, C, D, Z> Applicative<μ>.map(
-        a: HK<μ, A>,
-        b: HK<μ, B>,
-        c: HK<μ, C>,
-        d: HK<μ, D>,
-        λ: (Tuple4<A, B, C, D>) -> Z): HK<μ, Z> =
-        this.map(a.product(this, b).product(this, c).product(this, d), λ)
+fun <HKF, A, B, C, D, Z> Applicative<HKF>.map(
+        a: HK<HKF, A>,
+        b: HK<HKF, B>,
+        c: HK<HKF, C>,
+        d: HK<HKF, D>,
+        lbd: (Tuple4<A, B, C, D>) -> Z): HK<HKF, Z> =
+        this.map(a.product(this, b).product(this, c).product(this, d), lbd)
 
-fun <μ, A, B, C, D, E, Z> Applicative<μ>.map(
-        a: HK<μ, A>,
-        b: HK<μ, B>,
-        c: HK<μ, C>,
-        d: HK<μ, D>,
-        e: HK<μ, E>,
-        λ: (Tuple5<A, B, C, D, E>) -> Z): HK<μ, Z> =
-        this.map(a.product(this, b).product(this, c).product(this, d).product(this, e), λ)
+fun <HKF, A, B, C, D, E, Z> Applicative<HKF>.map(
+        a: HK<HKF, A>,
+        b: HK<HKF, B>,
+        c: HK<HKF, C>,
+        d: HK<HKF, D>,
+        e: HK<HKF, E>,
+        lbd: (Tuple5<A, B, C, D, E>) -> Z): HK<HKF, Z> =
+        this.map(a.product(this, b).product(this, c).product(this, d).product(this, e), lbd)
 
-fun <μ, A, B, C, D, E, F, Z> Applicative<μ>.map(
-        a: HK<μ, A>,
-        b: HK<μ, B>,
-        c: HK<μ, C>,
-        d: HK<μ, D>,
-        e: HK<μ, E>,
-        f: HK<μ, F>,
-        λ: (Tuple6<A, B, C, D, E, F>) -> Z): HK<μ, Z> =
-        this.map(a.product(this, b).product(this, c).product(this, d).product(this, e).product(this, f), λ)
+fun <HKF, A, B, C, D, E, F, Z> Applicative<HKF>.map(
+        a: HK<HKF, A>,
+        b: HK<HKF, B>,
+        c: HK<HKF, C>,
+        d: HK<HKF, D>,
+        e: HK<HKF, E>,
+        f: HK<HKF, F>,
+        lbd: (Tuple6<A, B, C, D, E, F>) -> Z): HK<HKF, Z> =
+        this.map(a.product(this, b).product(this, c).product(this, d).product(this, e).product(this, f), lbd)
 
-fun <μ, A, B, C, D, E, F, G, Z> Applicative<μ>.map(
-        a: HK<μ, A>,
-        b: HK<μ, B>,
-        c: HK<μ, C>,
-        d: HK<μ, D>,
-        e: HK<μ, E>,
-        f: HK<μ, F>,
-        g: HK<μ, G>,
-        λ: (Tuple7<A, B, C, D, E, F, G>) -> Z): HK<μ, Z> =
-        this.map(a.product(this, b).product(this, c).product(this, d).product(this, e).product(this, f).product(this, g), λ)
+fun <HKF, A, B, C, D, E, F, G, Z> Applicative<HKF>.map(
+        a: HK<HKF, A>,
+        b: HK<HKF, B>,
+        c: HK<HKF, C>,
+        d: HK<HKF, D>,
+        e: HK<HKF, E>,
+        f: HK<HKF, F>,
+        g: HK<HKF, G>,
+        lbd: (Tuple7<A, B, C, D, E, F, G>) -> Z): HK<HKF, Z> =
+        this.map(a.product(this, b).product(this, c).product(this, d).product(this, e).product(this, f).product(this, g), lbd)
 
-fun <μ, A, B, C, D, E, F, G, H, Z> Applicative<μ>.map(
-        a: HK<μ, A>,
-        b: HK<μ, B>,
-        c: HK<μ, C>,
-        d: HK<μ, D>,
-        e: HK<μ, E>,
-        f: HK<μ, F>,
-        g: HK<μ, G>,
-        h: HK<μ, H>,
-        λ: (Tuple8<A, B, C, D, E, F, G, H>) -> Z): HK<μ, Z> =
-        this.map(a.product(this, b).product(this, c).product(this, d).product(this, e).product(this, f).product(this, g).product(this, h), λ)
+fun <HKF, A, B, C, D, E, F, G, H, Z> Applicative<HKF>.map(
+        a: HK<HKF, A>,
+        b: HK<HKF, B>,
+        c: HK<HKF, C>,
+        d: HK<HKF, D>,
+        e: HK<HKF, E>,
+        f: HK<HKF, F>,
+        g: HK<HKF, G>,
+        h: HK<HKF, H>,
+        lbd: (Tuple8<A, B, C, D, E, F, G, H>) -> Z): HK<HKF, Z> =
+        this.map(a.product(this, b).product(this, c).product(this, d).product(this, e).product(this, f).product(this, g).product(this, h), lbd)
 
-fun <μ, A, B, C, D, E, F, G, H, I, Z> Applicative<μ>.map(
-        a: HK<μ, A>,
-        b: HK<μ, B>,
-        c: HK<μ, C>,
-        d: HK<μ, D>,
-        e: HK<μ, E>,
-        f: HK<μ, F>,
-        g: HK<μ, G>,
-        h: HK<μ, H>,
-        i: HK<μ, I>,
-        λ: (Tuple9<A, B, C, D, E, F, G, H, I>) -> Z): HK<μ, Z> =
-        this.map(a.product(this, b).product(this, c).product(this, d).product(this, e).product(this, f).product(this, g).product(this, h).product(this, i), λ)
+fun <HKF, A, B, C, D, E, F, G, H, I, Z> Applicative<HKF>.map(
+        a: HK<HKF, A>,
+        b: HK<HKF, B>,
+        c: HK<HKF, C>,
+        d: HK<HKF, D>,
+        e: HK<HKF, E>,
+        f: HK<HKF, F>,
+        g: HK<HKF, G>,
+        h: HK<HKF, H>,
+        i: HK<HKF, I>,
+        lbd: (Tuple9<A, B, C, D, E, F, G, H, I>) -> Z): HK<HKF, Z> =
+        this.map(a.product(this, b).product(this, c).product(this, d).product(this, e).product(this, f).product(this, g).product(this, h).product(this, i), lbd)
 
-fun <μ, A, B, C, D, E, F, G, H, I, J, Z> Applicative<μ>.map(
-        a: HK<μ, A>,
-        b: HK<μ, B>,
-        c: HK<μ, C>,
-        d: HK<μ, D>,
-        e: HK<μ, E>,
-        f: HK<μ, F>,
-        g: HK<μ, G>,
-        h: HK<μ, H>,
-        i: HK<μ, I>,
-        j: HK<μ, J>,
-        λ: (Tuple10<A, B, C, D, E, F, G, H, I, J>) -> Z): HK<μ, Z> =
-        this.map(a.product(this, b).product(this, c).product(this, d).product(this, e).product(this, f).product(this, g).product(this, h).product(this, i).product(this, j), λ)
+fun <HKF, A, B, C, D, E, F, G, H, I, J, Z> Applicative<HKF>.map(
+        a: HK<HKF, A>,
+        b: HK<HKF, B>,
+        c: HK<HKF, C>,
+        d: HK<HKF, D>,
+        e: HK<HKF, E>,
+        f: HK<HKF, F>,
+        g: HK<HKF, G>,
+        h: HK<HKF, H>,
+        i: HK<HKF, I>,
+        j: HK<HKF, J>,
+        lbd: (Tuple10<A, B, C, D, E, F, G, H, I, J>) -> Z): HK<HKF, Z> =
+        this.map(a.product(this, b).product(this, c).product(this, d).product(this, e).product(this, f).product(this, g).product(this, h).product(this, i).product(this, j), lbd)
