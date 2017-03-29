@@ -27,5 +27,4 @@ class OptionTMonad<F>(val M: Monad<F>) : Monad<HK<OptionT.F, F>> {
             fa.ev().map(M, f)
 }
 
-//unchecked cast though we don't use F
 fun <F, A> HK2<OptionT.F, F, A>.ev(): OptionT<F, A> = this as OptionT<F, A>
