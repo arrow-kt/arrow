@@ -30,8 +30,6 @@ interface Applicative<F> : Functor<F> {
 
     fun <A, B, Z> map2(fa: HK<F, A>, fb: HK<F, B>, f: (Tuple2<A, B>) -> Z): HK<F, Z> =
             map(product(fa, fb), f)
-
-
 }
 
 data class Tuple2<out A, out B>(val a: A, val b: B)
@@ -43,7 +41,6 @@ data class Tuple7<out A, out B, out C, out D, out E, out F, out G>(val a: A, val
 data class Tuple8<out A, out B, out C, out D, out E, out F, out G, out H>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H)
 data class Tuple9<out A, out B, out C, out D, out E, out F, out G, out H, out I>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I)
 data class Tuple10<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I, val j: J)
-
 
 fun <μ, A, Z> HK<μ, A>.product(AP: Applicative<μ>, other: HK<μ, Z>): HK<μ, Tuple2<A, Z>> =
         AP.product(this, other)
@@ -123,7 +120,6 @@ fun <μ, A, B, C, D, E, F, G, H, I, Z> HK<μ, Tuple9<A, B, C, D, E, F, G, H, I>>
         dummyImplicit7: Any? = null,
         dummyImplicit9: Any? = null): HK<μ, Tuple10<A, B, C, D, E, F, G, H, I, Z>> =
         AP.map(AP.product(this, other), { Tuple10(it.a.a, it.a.b, it.a.c, it.a.d, it.a.e, it.a.f, it.a.g, it.a.h, it.a.i, it.b) })
-
 
 fun <μ, A, B> Applicative<μ>.tupled(
         a: HK<μ, A>,
