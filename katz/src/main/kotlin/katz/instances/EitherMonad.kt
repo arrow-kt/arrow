@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,12 +16,12 @@
 
 package katz
 
-interface HK<out F, out A>
+object EitherMonad : Monad<HK<Either.F, *>> {
+    override fun <A> pure(a: A): HK2<Either.F, *, A> =
+            Either.Right(a)
 
-typealias HK2<F, A, B> = HK<HK<F, A>, B>
+    override fun <A, B> flatMap(fa: HK2<Either.F, *, A>, f: (A) -> HK2<Either.F, *, B>): HK2<Either.F, *, B> =
+            fa.ev().flatMap { f(it).ev() }
+}
 
-typealias HK3<F, A, B, C> = HK<HK2<F, A, B>, C>
-
-typealias HK4<F, A, B, C, D> = HK<HK3<F, A, B, C>, D>
-
-typealias HK5<F, A, B, C, D, E> = HK<HK4<F, A, B, C, D>, E>
+fun <A> HK2<Either.F, *, A>.ev(): Either<*, A> = this as Either<*, A>

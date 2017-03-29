@@ -17,8 +17,10 @@
 package katz
 
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.forAll
-import katz.Either.*
+import katz.Either.Left
+import katz.Either.Right
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -108,6 +110,24 @@ class EitherTest : UnitSpec() {
                         && !Right(a).contains(b)
                         && !Left(a).contains(a)
             }
+        }
+
+        "Either.monad.flatMap should be consistent with Either#flatMap" {
+            forAll { a: Int ->
+                val x = { b: Int -> Either.Right(b * a) }
+                val option = Either.Right(a)
+                option.flatMap(x) == EitherMonad.flatMap(option, x)
+            }
+        }
+
+        "Either.monad.binding should for comprehend over right either" {
+            val result = EitherMonad.binding {
+                val x = !Either.Right(1)
+                val y = Either.Right(1).bind()
+                val z = bind { Either.Right(1) }
+                yields(x + y + z)
+            }
+            result shouldBe Either.Right(3)
         }
     }
 }

@@ -40,9 +40,9 @@ Ideally, we would want to have property based tests where we would apply a serie
 
 # Add it to your project
 
-Use it at your how risk, the actual state is not production ready
+Use it at your how risk, the actual state is not production ready.
 
-Add it in your root `build.gradle` at the end of repositories
+Add it in your root `build.gradle` at the end of repositories.
 
 ```
 allprojects {
