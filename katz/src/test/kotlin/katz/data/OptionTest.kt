@@ -71,7 +71,7 @@ class OptionTest : UnitSpec() {
         "fromNullable should work for both null and non-null values of nullable types" {
             forAll { a: Int? ->
                 // This seems to be generating only non-null values, so it is complemented by the next test
-                val o: Option<Int> = Companion.fromNullable(a)
+                val o: Option<Int> = Option.fromNullable(a)
                 if (a == null) o == None else o == Some(a)
             }
         }
@@ -83,20 +83,36 @@ class OptionTest : UnitSpec() {
 
         "Option.monad.flatMap should be consistent with Option#flatMap" {
             forAll { a: Int ->
-                val x = { b: Int -> Companion(b * a) }
-                val option = Companion(a)
+                val x = { b: Int -> Option(b * a) }
+                val option = Option(a)
                 option.flatMap(x) == OptionMonad.flatMap(option, x)
             }
         }
 
         "Option.monad.binding should for comprehend over option" {
             val result = OptionMonad.binding {
-                val x = !Companion(1)
-                val y = Companion(1).bind()
-                val z = bind { Companion(1) }
+                val x = !Option(1)
+                val y = Option(1).bind()
+                val z = bind { Option(1) }
                 yields(x + y + z)
             }
-            result shouldBe Companion(3)
+            result shouldBe Option(3)
+        }
+
+        "Cartesian builder should build products over option" {
+            OptionMonad.map(Option(1), Option("a"), Option(true), { (a, b, c) ->
+                "$a $b $c"
+            }) shouldBe Option("1 a true")
+        }
+
+        "Cartesian builder works inside for comprehensions" {
+            val result = OptionMonad.binding {
+                val (x, y, z) = !OptionMonad.tupled(Option(1), Option(1), Option(1))
+                val a = Option(1).bind()
+                val b = bind { Option(1) }
+                yields(x + y + z + a + b)
+            }
+            result shouldBe Option(5)
         }
     }
 }
