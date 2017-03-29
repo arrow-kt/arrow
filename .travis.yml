@@ -5,3 +5,4 @@ jdk:
 
 script:
   ./gradlew build test
+  ./gradlew detekt
