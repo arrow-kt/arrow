@@ -16,7 +16,6 @@
 
 package katz
 
-
 interface Applicative<F> : Functor<F> {
 
     fun <A> pure(a: A): HK<F, A>
