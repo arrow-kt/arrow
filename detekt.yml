@@ -15,12 +15,12 @@ exceptions:
 empty:
   active: true
 
-code-smell:
-  active:
+complexity:
+  active: true
   LongMethod:
     threshold: 20
   LongParameterList:
-    active: false
+    active: true
     threshold: 3
   LargeClass:
     threshold: 300
@@ -28,6 +28,9 @@ code-smell:
     threshold: 10
   NestedBlockDepth:
     threshold: 3
+
+code-smell:
+  active: true
   FeatureEnvy:
     threshold: 0.5
     weight: 0.45
