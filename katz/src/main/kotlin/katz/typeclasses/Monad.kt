@@ -64,7 +64,6 @@ open class MonadContinuation<F, A>(val M : Monad<F>) : Serializable, Continuatio
     infix fun <B> yields(b: B) = yields { b }
 
     infix fun <B> yields(b: () -> B) = M.pure(b())
-
 }
 
 /**

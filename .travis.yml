@@ -5,6 +5,7 @@ jdk:
 
 script:
   - ./gradlew check
+  - ./gradlew detekt
   - ./gradlew codeCoverageReport
 
 after_success:

@@ -40,7 +40,7 @@ import katz.Option
  * The isomorphic Either form can be accessed via the [unwrap] method.
  */
 
-sealed class Ior<out A, out B>: HK2<Ior.F, A, B> {
+sealed class Ior<out A, out B> : HK2<Ior.F, A, B> {
 
     class F private constructor()
 

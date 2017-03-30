@@ -22,7 +22,7 @@ package katz
  * Represents a value of one of two possible types (a disjoint union.)
  * An instance of Either is either an instance of [Left] or [Right].
  */
-sealed class Either<out A, out B>: HK2<Either.F, A, B> {
+sealed class Either<out A, out B> : HK2<Either.F, A, B> {
 
     class F private constructor()
 
@@ -189,7 +189,7 @@ inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, default: 
  * Left("something").contains { "something" }  // Result: false
  *  ```
  *
- * @param elem    the element to test.
+ * @param elem the element to test.
  * @return `true` if the option has an element that is equal (as determined by `==`) to `elem`, `false` otherwise.
  */
 fun <A, B> Either<A, B>.contains(elem: B): Boolean =

@@ -1,0 +1,41 @@
+repositories {
+
+    mavenCentral()
+    maven { url "http://dl.bintray.com/arturbosch/code-analysis" }
+
+    configurations {
+        detekt
+    }
+
+    task detekt(type: JavaExec) {
+        group = "verification"
+        main = "io.gitlab.arturbosch.detekt.cli.Main"
+        classpath = configurations.detekt
+        def input = "$project.projectDir.absolutePath"
+        def config = "$project.projectDir/detekt.yml"
+        def reports = "$project.projectDir.absolutePath/reports/"
+        def filters = ".*test.*"
+        def rulesets = ""
+        def params = ['-p', input, '-c', config, '-f', filters, '-r', rulesets, '-o', '-rp', reports]
+        args(params)
+    }
+
+    task detektEstablishAcceptedErrors(type: JavaExec) {
+        group = "verification"
+        main = "io.gitlab.arturbosch.detekt.cli.Main"
+        classpath = configurations.detekt
+        def input = "$project.projectDir.absolutePath"
+        def config = "$project.projectDir/detekt.yml"
+        def reports = "$project.projectDir.absolutePath/reports/"
+        def filters = ".*test.*"
+        def rulesets = ""
+        def params = ['-p', input, '-c', config, '-f', filters, '-r', rulesets, '-o', '-rp', reports, '--baseline']
+        args(params)
+    }
+
+    dependencies {
+
+        detekt 'io.gitlab.arturbosch.detekt:detekt-cli:1.0.0.M7'
+        detekt 'io.gitlab.arturbosch.detekt:detekt-formatting:1.0.0.M7'
+    }
+}

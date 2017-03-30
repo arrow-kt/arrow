@@ -28,5 +28,7 @@ dependencies {
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
 }
 
+build.dependsOn ':detekt'
+
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
