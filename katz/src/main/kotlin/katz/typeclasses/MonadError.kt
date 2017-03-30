@@ -46,7 +46,7 @@ class MonadErrorContinuation<F, A>(val ME : MonadError<F, Throwable>) : Serializ
  */
 fun <F, B> MonadError<F, Throwable>.binding(c: suspend MonadErrorContinuation<F, *>.() -> HK<F, B>): HK<F, B> {
     val continuation = MonadErrorContinuation<F, B>(this)
-    val f: suspend MonadErrorContinuation < F, * > .() -> HK < F, B > = { c() }
+    val f: suspend MonadErrorContinuation<F, *>.() -> HK<F, B> = { c() }
     f.startCoroutine(continuation, continuation)
     return continuation.returnedMonad
 }

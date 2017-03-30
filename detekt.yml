@@ -17,7 +17,6 @@ empty:
 
 code-smell:
   active:
-  weight: 2
   LongMethod:
     threshold: 20
   LongParameterList:
@@ -27,6 +26,8 @@ code-smell:
     threshold: 300
   ComplexMethod:
     threshold: 10
+  NestedBlockDepth:
+    threshold: 3
   FeatureEnvy:
     threshold: 0.5
     weight: 0.45

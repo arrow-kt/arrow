@@ -22,7 +22,7 @@ package katz
  * Represents a value of one of two possible types (a disjoint union.)
  * An instance of Either is either an instance of [Left] or [Right].
  */
-sealed class Either<out A, out B>: HK2<Either.F, A, B> {
+sealed class Either<out A, out B> : HK2<Either.F, A, B> {
 
     class F private constructor()
 

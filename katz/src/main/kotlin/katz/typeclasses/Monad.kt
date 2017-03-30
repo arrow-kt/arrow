@@ -64,7 +64,6 @@ open class MonadContinuation<F, A>(val M : Monad<F>) : Serializable, Continuatio
     infix fun <B> yields(b: B) = yields { b }
 
     infix fun <B> yields(b: () -> B) = M.pure(b())
-
 }
 
 /**
@@ -74,7 +73,7 @@ open class MonadContinuation<F, A>(val M : Monad<F>) : Serializable, Continuatio
  */
 fun <F, B> Monad<F>.binding(c: suspend MonadContinuation<F, *>.() -> HK<F, B>): HK<F, B> {
     val continuation = MonadContinuation<F, B>(this)
-    val f: suspend MonadContinuation < F, * > .() -> HK < F, B > = { c() }
+    val f: suspend MonadContinuation<F, *>.() -> HK<F, B> = { c() }
     f.startCoroutine(continuation, continuation)
     return continuation.returnedMonad
 }
