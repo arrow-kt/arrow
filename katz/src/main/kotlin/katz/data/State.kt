@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package katz
+package katz.data
 
 /**
  * State[S, A] is basically a function S => (S, A),
@@ -29,6 +29,10 @@ class State<S, out A>(val runF: (S) -> Pair<S, A>) {
         return runF(s)
     }
 
+    fun runA(s: S): A = run(s).second
+
+    fun runS(s: S): S = run(s).first
+
     fun <B> map(f: (A) -> B): State<S, B> {
         return State { s1 ->
             run(s1).let { (s2, a2) -> Pair(s2, f(a2)) }
@@ -41,5 +45,4 @@ class State<S, out A>(val runF: (S) -> Pair<S, A>) {
         }
     }
 
-    fun eval(s: S): A = run(s).second
 }
