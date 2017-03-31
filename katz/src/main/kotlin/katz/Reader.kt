@@ -50,7 +50,11 @@ class Reader<C, out A>(val run: (C) -> A) {
          * Lifts an A value to Reader wrapping it in a supplier function with a Nothing argument.
          */
         fun <C, A> pure(a: A): Reader<C, A> = Reader { _ -> a }
+
+        fun <C : Any> ask(): Reader<C, C> = Reader { it }
     }
 }
 
 fun <A, B> ((A) -> B).reader() : Reader<A, B> = Reader(this)
+
+fun <C, A> Reader<C, Reader<C, A>>.flatten(): Reader<C, A> = flatMap { it }
