@@ -16,12 +16,13 @@
 
 package katz
 
-interface Functor<F> {
+class CoproductComonad<F, G>(val FC : Comonad<F>, val GC: Comonad<G>) : Comonad<CoproductFG<F, G>> {
 
-    fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B>
+    override fun <A, B> coflatMap(fa: CoproductKind<F, G, A>, f: (CoproductKind<F, G, A>) -> B): CoproductKind<F, G, B> =
+        fa.ev().coflatMap(FC, GC, f)
 
-    fun <A, B> lift(f: (A) -> B): (HK<F, A>) -> HK<F, B> =
-            { fa: HK<F, A> ->
-                map(fa, f)
-            }
+
+    override fun <A> extract(fa: CoproductKind<F, G, A>): A =
+        fa.ev().extract(FC, GC)
+
 }

@@ -16,12 +16,15 @@
 
 package katz
 
-interface Functor<F> {
+/**
+ * Inject type class as described in "Data types a la carte" (Swierstra 2008).
+ *
+ * @see [[http://www.staff.science.uu.nl/~swier004/publications/2008-jfp.pdf]]
+ */
+interface Inject<F, G> {
 
-    fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B>
+    fun inj(): FunctionK<F, G>
 
-    fun <A, B> lift(f: (A) -> B): (HK<F, A>) -> HK<F, B> =
-            { fa: HK<F, A> ->
-                map(fa, f)
-            }
+    fun <A> invoke(fa: HK<F, A>): HK<G, A> = inj()(fa)
+
 }

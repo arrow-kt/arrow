@@ -94,6 +94,12 @@ sealed class Either<out A, out B> : HK2<Either.F, A, B> {
             fold({ Left(it) }, { Right(f(it)) })
 
     /**
+     * Map over Left and Right of this Either
+     */
+    inline fun <C, D> bimap(fa: (A) -> C, fb: (B) -> D): Either<C, D> =
+            fold({ Left(fa(it)) }, { Right(fb(it)) })
+
+    /**
      * Returns `false` if [Left] or returns the result of the application of
      * the given predicate to the [Right] value.
      *

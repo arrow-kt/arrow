@@ -16,12 +16,18 @@
 
 package katz
 
-interface Functor<F> {
+interface FunctionK<F, G> {
 
-    fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B>
+    /**
+     * Applies this functor transformation from `F` to `G`
+     */
+    operator fun <A> invoke(fa: HK<F, A>): HK<G, A>
 
-    fun <A, B> lift(f: (A) -> B): (HK<F, A>) -> HK<F, B> =
-            { fa: HK<F, A> ->
-                map(fa, f)
-            }
 }
+
+fun <F, G, H> FunctionK<F, G>.or(h: FunctionK<H, G>): FunctionK<CoproductFG<F, H>, G> =
+        object : FunctionK<CoproductFG<F, H>, G> {
+            override fun <A> invoke(fa: CoproductKind<F, H, A>): HK<G, A> {
+                return fa.ev().fold(this@or, h)
+            }
+        }
