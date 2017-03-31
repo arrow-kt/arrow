@@ -30,10 +30,13 @@ interface Monad<F> : Applicative<F> {
 
     override fun <A, B> ap(fa: HK<F, A>, ff: HK<F, (A) -> B>): HK<F, B> =
             flatMap(ff, { f -> map(fa, f) })
+
+    fun <A> flatten(ffa: HK<F, HK<F, A>>): HK<F, A> =
+            flatMap(ffa, { it })
 }
 
 @RestrictsSuspension
-open class MonadContinuation<F, A>(val M : Monad<F>) : Serializable, Continuation<HK<F, A>> {
+open class MonadContinuation<F, A>(val M: Monad<F>) : Serializable, Continuation<HK<F, A>> {
 
     override val context = EmptyCoroutineContext
 
@@ -53,13 +56,13 @@ open class MonadContinuation<F, A>(val M : Monad<F>) : Serializable, Continuatio
 
     suspend fun <B> bind(m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels
-            returnedMonad = M.flatMap(m(), { x ->
-                c.stackLabels = labelHere
-                c.resume(x)
-                returnedMonad
-            })
-            COROUTINE_SUSPENDED
-        }
+        returnedMonad = M.flatMap(m(), { x ->
+            c.stackLabels = labelHere
+            c.resume(x)
+            returnedMonad
+        })
+        COROUTINE_SUSPENDED
+    }
 
     infix fun <B> yields(b: B) = yields { b }
 
