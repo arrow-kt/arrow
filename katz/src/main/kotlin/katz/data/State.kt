@@ -23,19 +23,19 @@ package katz
  * to returning the result of type A, the function
  * returns a new S value, which is the updated state.
  */
-class State<S, out A>(val runF: (S) -> Pair<S, A>) {
+class State<S, out A>(val runF: (S) -> Tuple2<S, A>) {
 
-    fun run(s: S): Pair<S, A> {
+    fun run(s: S): Tuple2<S, A> {
         return runF(s)
     }
 
-    fun runA(s: S): A = run(s).second
+    fun runA(s: S): A = run(s).b
 
-    fun runS(s: S): S = run(s).first
+    fun runS(s: S): S = run(s).a
 
     fun <B> map(f: (A) -> B): State<S, B> {
         return State { s1 ->
-            run(s1).let { (s2, a2) -> Pair(s2, f(a2)) }
+            run(s1).let { (s2, a2) -> Tuple2(s2, f(a2)) }
         }
     }
 
