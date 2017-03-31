@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package katz.data
+package katz
 
 /**
  * State[S, A] is basically a function S => (S, A),
