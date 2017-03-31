@@ -20,15 +20,15 @@ package katz
  * Basic implementation of the Reader monad. Provides an "implicit" context (configuration) for
  * function execution. Intended to provide Dependency Injection.
  */
-class Reader<C : Any, out A : Any>(val run: (C) -> A) {
+class Reader<C, out A>(val run: (C) -> A) {
 
-    inline fun <B : Any> map(crossinline fa: (A) -> B): Reader<C, B> = Reader { c -> fa(run(c)) }
+    inline fun <B> map(crossinline fa: (A) -> B): Reader<C, B> = Reader { c -> fa(run(c)) }
 
-    inline fun <B : Any> flatMap(crossinline fa: (A) -> Reader<C, B>): Reader<C, B> = Reader { c ->
+    inline fun <B> flatMap(crossinline fa: (A) -> Reader<C, B>): Reader<C, B> = Reader { c ->
         fa(run(c)).run(c)
     }
 
-    fun <B : Any> zip(other: Reader<C, B>): Reader<C, Pair<A, B>> =
+    fun <B> zip(other: Reader<C, B>): Reader<C, Pair<A, B>> =
             this.flatMap { a ->
                 other.map { b -> Pair(a, b) }
             }
@@ -40,7 +40,7 @@ class Reader<C : Any, out A : Any>(val run: (C) -> A) {
      * D: type represents a different context than C.
      * @param fd: function to convert from a D context to a context of type C.
      */
-    inline fun <D : Any> local(crossinline fd: (D) -> C): Reader<D, A> = Reader { d ->
+    inline fun <D> local(crossinline fd: (D) -> C): Reader<D, A> = Reader { d ->
         run(fd(d))
     }
 
@@ -49,8 +49,8 @@ class Reader<C : Any, out A : Any>(val run: (C) -> A) {
         /**
          * Lifts an A value to Reader wrapping it in a supplier function with a Nothing argument.
          */
-        fun <C : Any, A : Any> pure(a: A): Reader<C, A> = Reader { _ -> a }
+        fun <C, A> pure(a: A): Reader<C, A> = Reader { _ -> a }
     }
 }
 
-fun <A : Any, B : Any> ((A) -> B).reader() : Reader<A, B> = Reader(this)
+fun <A, B> ((A) -> B).reader() : Reader<A, B> = Reader(this)
