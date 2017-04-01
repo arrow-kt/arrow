@@ -1,11 +1,18 @@
 package katz.data
 
-/*class Kleisli[F[_], Z, A](run: Z => F[A]) {
-    def flatMap[B](f: A => Kleisli[F, Z, B])(implicit F: FlatMap[F]): Kleisli[F, Z, B] =
-    Kleisli(z => F.flatMap(run(z))(a => f(a).run(z)))
+import katz.Functor
+import katz.HK
+import katz.Monad
 
-    def map[B](f: A => B)(implicit F: Functor[F]): Kleisli[F, Z, B] =
-    Kleisli(z => F.map(run(z))(f))
+class Kleisli<F, D, out A>(val run: (D) -> HK<F, A>) {
 
-    def local[ZZ](f: ZZ => Z): Kleisli[F, ZZ, A] = Kleisli(f.andThen(run))
-}*/
+    fun <B> map(ft: Functor<F>, f: (A) -> B): Kleisli<F, D, B> = Kleisli { ft.map(run(it), f) }
+
+    fun <B> flatMap(m: Monad<F>, f: (A) -> Kleisli<F, D, B>): Kleisli<F, D, B> = Kleisli {
+        m.flatMap(run(it)) { a -> f(a).run(it) }
+    }
+
+    fun <DD> local(f: (DD) -> D): Kleisli<F, DD, A> = Kleisli { run(f(it)) }
+}
+
+typealias ReaderT<F, D, A> = Kleisli<F, D, A>
