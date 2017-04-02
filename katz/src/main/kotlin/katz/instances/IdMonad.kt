@@ -28,3 +28,5 @@ object IdMonad : Monad<Id.F> {
 }
 
 fun <A> HK<Id.F, A>.ev(): Id<A> = this as Id<A>
+
+fun <A> HK<Id.F, A>.value(): A = this.ev().value

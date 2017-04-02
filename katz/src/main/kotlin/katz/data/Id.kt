@@ -25,3 +25,4 @@ class Id<out A>(val value: A) : HK<Id.F, A> {
     inline fun <B> flatMap(f: (A) -> Id<B>): Id<B> = f(value)
 
 }
+
