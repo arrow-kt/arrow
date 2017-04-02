@@ -6,7 +6,7 @@ class Reader<D, A>(val k: Kleisli<Id.F, D, A>) {
 
         operator fun <D, A> invoke(fa : (D) -> A): Reader<D, A> = Reader(Kleisli(fa.andThen { Id(it) }))
 
-        fun <A> pure(x: A): Reader<Nothing, A> = Reader { _ -> x }
+        fun <D, A> pure(x: A): Reader<D, A> = Reader { _ -> x }
 
         fun <D> ask(): Reader<D, D> = Reader { it }
 
