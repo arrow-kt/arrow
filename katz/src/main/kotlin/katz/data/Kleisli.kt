@@ -1,4 +1,4 @@
-package katz.data
+package katz
 
 import katz.*
 
