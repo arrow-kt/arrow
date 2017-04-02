@@ -16,12 +16,19 @@
 
 package katz
 
-class CoproductComonad<F, G>(val FC : Comonad<F>, val GC: Comonad<G>) : Comonad<CoproductFG<F, G>> {
+interface Semigroup<A> {
+    /**
+     * Combine two [A] values.
+     */
+    fun combine(a: A, b: A): A
 
-    override fun <A, B> coflatMap(fa: CoproductKind<F, G, A>, f: (CoproductKind<F, G, A>) -> B): CoproductKind<F, G, B> =
-        fa.ev().coflatMap(FC, GC, f)
+    /**
+     * Combine an array of [A] values.
+     */
+    fun combineAll(vararg elems: A): A = combineAll(elems.asList())
 
-    override fun <A> extract(fa: CoproductKind<F, G, A>): A =
-        fa.ev().extract(FC, GC)
-
+    /**
+     * Combine a collection of [A] values.
+     */
+    fun combineAll(elems: Collection<A>): A = elems.reduce { a, b -> combine(a, b) }
 }

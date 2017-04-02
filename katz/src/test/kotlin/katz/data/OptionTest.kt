@@ -21,7 +21,13 @@ import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.forAll
 import katz.Option.*
+import kotlinx.collections.immutable.immutableHashMapOf
 import org.junit.runner.RunWith
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
+import kotlin.reflect.KClass
+import kotlin.reflect.KFunction
+import kotlin.reflect.full.*
 
 @RunWith(KTestJUnitRunner::class)
 class OptionTest : UnitSpec() {
@@ -114,5 +120,36 @@ class OptionTest : UnitSpec() {
             }
             result shouldBe Option(5)
         }
+
+        "kikimangui" {
+            val i: Monad<Option.F> = instance()
+            
+        }
     }
 }
+
+
+//
+open class TypeLiteral<T> {
+    val type: Type
+        get() = (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0]
+}
+
+inline fun <reified T> typeLiteral(): Type = object : TypeLiteral<T>() {}.type
+
+data class TypeclassInstance<T: Any, F : Any>(val tc: KClass<T>, val fc: KClass<F>)
+
+val GlobalInstances = immutableHashMapOf(
+        (typeLiteral<Monad<Option.F>>()).to(OptionMonad)
+)
+
+inline fun <reified T : Any> instance(): T = GlobalInstances.getValue(typeLiteral<T>()) as T
+
+//inline fun <reified T : Any> instance(): T {
+//    val type = object : TypeReference<T>() {}.type
+//    type.typeName
+//    if (type is ParameterizedType)
+//        type.actualTypeArguments.forEach {
+//            println(it.typeName)
+//        }
+//}
