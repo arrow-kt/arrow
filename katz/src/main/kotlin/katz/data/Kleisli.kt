@@ -1,6 +1,6 @@
 package katz
 
-open class Kleisli<F, D, A>(val run: (D) -> HK<F, A>) {
+class Kleisli<F, D, A>(val run: (D) -> HK<F, A>) {
 
     companion object Factory {
 

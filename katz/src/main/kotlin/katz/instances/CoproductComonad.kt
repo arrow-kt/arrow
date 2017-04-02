@@ -21,7 +21,6 @@ class CoproductComonad<F, G>(val FC : Comonad<F>, val GC: Comonad<G>) : Comonad<
     override fun <A, B> coflatMap(fa: CoproductKind<F, G, A>, f: (CoproductKind<F, G, A>) -> B): CoproductKind<F, G, B> =
         fa.ev().coflatMap(FC, GC, f)
 
-
     override fun <A> extract(fa: CoproductKind<F, G, A>): A =
         fa.ev().extract(FC, GC)
 
