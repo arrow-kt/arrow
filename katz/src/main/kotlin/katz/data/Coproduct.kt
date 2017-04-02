@@ -36,8 +36,9 @@ data class Coproduct<F, G, A>(val run: Either<HK<F, A>, HK<G, A>>) : CoproductKi
 
     }
 
-    fun <B> map(F: Functor<F>, G: Functor<G>, f: (A) -> B): Coproduct<F, G, B> =
-            Coproduct(run.bimap(F.lift(f), G.lift(f)))
+    fun <B> map(F: Functor<F>, G: Functor<G>, f: (A) -> B): Coproduct<F, G, B> {
+        return Coproduct(run.bimap(F.lift(f), G.lift(f)))
+    }
 
     fun <B> coflatMap(F: Comonad<F>, G: Comonad<G>, f: (Coproduct<F, G, A>) -> B): Coproduct<F, G, B> =
             Coproduct(run.bimap(

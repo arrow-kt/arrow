@@ -16,7 +16,8 @@
 
 package katz
 
-object OptionMonad : Monad<Option.F> {
+object OptionMonad :
+        Monad<Option.F>, GlobalInstance<Monad<Option.F>>() {
 
     override fun <A, B> map(fa: HK<Option.F, A>, f: (A) -> B): HK<Option.F, B> =
             fa.ev().map(f)
@@ -29,3 +30,4 @@ object OptionMonad : Monad<Option.F> {
 }
 
 fun <A> HK<Option.F, A>.ev(): Option<A> = this as Option<A>
+

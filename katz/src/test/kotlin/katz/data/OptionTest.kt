@@ -123,27 +123,14 @@ class OptionTest : UnitSpec() {
 
         "kikimangui" {
             val i: Monad<Option.F> = instance()
-            
+            i.pure(1).ev() shouldBe Option(1)
         }
     }
 }
 
 
 //
-open class TypeLiteral<T> {
-    val type: Type
-        get() = (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0]
-}
 
-inline fun <reified T> typeLiteral(): Type = object : TypeLiteral<T>() {}.type
-
-data class TypeclassInstance<T: Any, F : Any>(val tc: KClass<T>, val fc: KClass<F>)
-
-val GlobalInstances = immutableHashMapOf(
-        (typeLiteral<Monad<Option.F>>()).to(OptionMonad)
-)
-
-inline fun <reified T : Any> instance(): T = GlobalInstances.getValue(typeLiteral<T>()) as T
 
 //inline fun <reified T : Any> instance(): T {
 //    val type = object : TypeReference<T>() {}.type
