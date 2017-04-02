@@ -26,8 +26,6 @@ class Kleisli<F, D, A>(val run: (D) -> HK<F, A>) {
     fun <DD> local(f: (DD) -> D): Kleisli<F, DD, A> = Kleisli { dd -> run(f(dd)) }
 }
 
-fun <F, D, A> ((D) -> A).reader(): Kleisli<F, D, A> = Kleisli { d -> this }
-
 fun <F, D, A> Kleisli<F, D, Kleisli<F, D, A>>.flatten(m: Monad<F>): Kleisli<F, D, A> =
         flatMap(m) { it }
 
