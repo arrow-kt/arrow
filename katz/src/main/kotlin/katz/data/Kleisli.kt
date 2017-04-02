@@ -1,8 +1,6 @@
 package katz
 
-import katz.*
-
-class Kleisli<F, D, A>(val run: (D) -> HK<F, A>) {
+open class Kleisli<F, D, A>(val run: (D) -> HK<F, A>) {
 
     companion object Factory {
 
@@ -30,4 +28,3 @@ fun <F, D, A> Kleisli<F, D, Kleisli<F, D, A>>.flatten(m: Monad<F>): Kleisli<F, D
         flatMap(m) { it }
 
 typealias ReaderT<F, D, A> = Kleisli<F, D, A>
-typealias Reader<D, A> = ReaderT<Id<A>, D, A>
