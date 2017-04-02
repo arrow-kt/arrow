@@ -21,7 +21,7 @@ fun <D, A, B> Reader<D, A>.map(fa: (A) -> B): Reader<D, B> = Reader(k.map(IdMona
 
 fun <D, A, B> Reader<D, A>.flatMap(fa: (A) -> Reader<D, B>): Reader<D, B> = Reader(k.flatMap(IdMonad, fa.andThen { it.k }))
 
-fun <DD, D, A, B> Reader<D, A>.local(f: (DD) -> D): Reader<DD, A> = Reader(k.local(f))
+fun <DD, D, A> Reader<D, A>.local(f: (DD) -> D): Reader<DD, A> = Reader(k.local(f))
 
 fun <D, A, B> Reader<D, A>.zip(o: Reader<D, B>) = Reader(k.zip(IdMonad, o.k))
 
