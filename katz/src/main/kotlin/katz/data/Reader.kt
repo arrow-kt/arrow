@@ -6,14 +6,11 @@ class Reader<D, A>(val k: Kleisli<Id.F, D, A>) {
 
         operator fun <D, A> invoke(fa : (D) -> A): Reader<D, A> = Reader(Kleisli(fa.andThen { Id(it) }))
 
-        fun <D, A> pure(x: A): Reader<D, A> = Reader { _ -> x }
+        fun <A> pure(x: A): Reader<Nothing, A> = Reader { _ -> x }
 
         fun <D> ask(): Reader<D, D> = Reader { it }
     }
 
-    fun run(d : D): A = k.run(d).value()
-
-    fun <DD> local(f: (DD) -> D): Reader<DD, A> = Reader(k.local(f))
 }
 
 infix fun <A, B, C> ((B) -> C).compose(f: (A) -> B): (A) -> C = { a: A -> this(f(a)) }
@@ -24,6 +21,10 @@ fun <D, A, B> Reader<D, A>.map(fa: (A) -> B): Reader<D, B> = Reader(k.map(IdMona
 
 fun <D, A, B> Reader<D, A>.flatMap(fa: (A) -> Reader<D, B>): Reader<D, B> = Reader(k.flatMap(IdMonad, fa.andThen { it.k }))
 
+fun <DD, D, A, B> Reader<D, A>.local(f: (DD) -> D): Reader<DD, A> = Reader(k.local(f))
+
 fun <D, A, B> Reader<D, A>.zip(o: Reader<D, B>) = Reader(k.zip(IdMonad, o.k))
+
+fun <D, A> Reader<D, A>.run(d : D): A = k.run(d).value()
 
 fun <D, A> ((D) -> A).reader(): Reader<D, A> = Reader(this)
