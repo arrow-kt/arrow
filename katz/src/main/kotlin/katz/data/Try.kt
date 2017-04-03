@@ -22,7 +22,9 @@ package katz
  *
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Try.scala
  */
-sealed class Try<out A> {
+sealed class Try<out A> : HK<Try.F, A> {
+
+    class F private constructor()
 
     companion object {
 
