@@ -22,7 +22,6 @@ class IorMonad<L>(val AA: Semigroup<L>) : Monad<HK<Ior.F, L>> {
 
     override fun <A> pure(a: A): HK2<Ior.F, L, A> = Ior.Right(a)
 
-
 }
 
 fun <A, B> HK2<Ior.F, A, B>.ev(): Ior<A, B> = this as Ior<A, B>
