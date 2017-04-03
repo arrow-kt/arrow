@@ -156,3 +156,21 @@ fun <E, A> Validated<E, A>.orElse(default: () -> Validated<E, A>): Validated<E, 
         { default() },
         { Validated.Valid(it) }
 )
+
+/**
+ * Apply a function (that returns a `Validated`) in the valid case.
+ * Otherwise return the original `Validated`.
+ *
+ * This allows "chained" validation: the output of one validation can be fed
+ * into another validation function.
+ *
+ * This function is similar to `flatMap` on `Either`. It's not called `flatMap`,
+ * because by Cats convention, `flatMap` is a monadic bind that is consistent
+ * with `ap`. This method is not consistent with [[ap]] (or other
+ * `Apply`-based methods), because it has "fail-fast" behavior as opposed to
+ * accumulating validation failures.
+ */
+fun <E, A, B> Validated<E, A>.andThen(f: (A) -> Validated<E, B>): Validated<E, B> = fold(
+        { Validated.Invalid(it) },
+        { f(it) }
+)
