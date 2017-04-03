@@ -55,7 +55,7 @@ sealed class Try<out A> {
      */
     inline fun filter(crossinline p: (A) -> Boolean): Try<A> = fold(
             { Failure(it) },
-            { if (p(it)) Success(it) else Failure(NoSuchElementException("Predicate does not hold for " + it)) }
+            { if (p(it)) Success(it) else Failure(PredicateException("Predicate does not hold for $it")) }
     )
 
     /**
@@ -80,18 +80,21 @@ sealed class Try<out A> {
     /**
      * The `Failure` type represents a computation that result in an exception.
      */
-    class Failure<out A>(val exception: Throwable) : Try<A>() {
-        override val isFailure: Boolean = false
-        override val isSuccess: Boolean = true
+    data class Failure<out A>(val exception: Throwable) : Try<A>() {
+        override val isFailure: Boolean = true
+        override val isSuccess: Boolean = false
     }
 
     /**
      * The `Success` type represents a computation that return a successfully computed value.
      */
-    class Success<out A>(val value: A) : Try<A>() {
-        override val isFailure: Boolean = true
-        override val isSuccess: Boolean = false
+    data class Success<out A>(val value: A) : Try<A>() {
+        override val isFailure: Boolean = false
+        override val isSuccess: Boolean = true
     }
+
+    data class PredicateException(override val message: String) : Throwable(message)
+    data class UnsupportedOperationException(override val message: String) : Throwable(message)
 }
 
 /**
