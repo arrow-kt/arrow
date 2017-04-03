@@ -16,7 +16,6 @@
 
 package katz
 
-
 class OptionTMonad<F>(val M: Monad<F>) : Monad<HK<OptionT.F, F>> {
     override fun <A> pure(a: A): OptionT<F, A> = OptionT.pure(M, a)
 
