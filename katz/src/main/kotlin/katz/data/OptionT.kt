@@ -28,15 +28,15 @@ data class OptionT<F, A>(val value: HK<F, Option<A>>) : HK2<OptionT.F, F, A> {
     companion object {
         fun <M, A> pure(F: Monad<M>, a: A): OptionT<M, A> = OptionT(F.pure(Option.Some(a)))
 
-        fun <M, A> none(F: Monad<M>): OptionT<M, A> = OptionT(F.pure(Option.None))
+        fun <M> none(F: Monad<M>): OptionT<M, Nothing> = OptionT(F.pure(Option.None))
 
         fun <M, A> fromOption(F: Monad<M>, value: Option<A>): OptionT<M, A> = OptionT(F.pure(value))
     }
 
-    inline fun <B> fold(F: Monad<F>, crossinline default: () -> B, crossinline f: (A) -> B): HK<F, B> =
+    inline fun <B> fold(F: Functor<F>, crossinline default: () -> B, crossinline f: (A) -> B): HK<F, B> =
             F.map(value, { option -> option.fold({ default() }, { f(it) }) })
 
-    inline fun <B> cata(F: Monad<F>, crossinline default: () -> B, crossinline f: (A) -> B): HK<F, B> =
+    inline fun <B> cata(F: Functor<F>, crossinline default: () -> B, crossinline f: (A) -> B): HK<F, B> =
             fold(F, { default() }, { f(it) })
 
     inline fun <B> flatMap(F: Monad<F>, crossinline f: (A) -> OptionT<F, B>): OptionT<F, B> = flatMapF(F, { it -> f(it).value })
@@ -44,7 +44,7 @@ data class OptionT<F, A>(val value: HK<F, Option<A>>) : HK2<OptionT.F, F, A> {
     inline fun <B> flatMapF(F: Monad<F>, crossinline f: (A) -> HK<F, Option<B>>): OptionT<F, B> =
             OptionT(F.flatMap(value, { option -> option.fold({ F.pure(Option.None) }, { f(it) }) }))
 
-    fun <B> liftF(F: Monad<F>, fa: HK<F, B>): OptionT<F, B> = OptionT(F.map(fa, { Option.Some(it) }))
+    fun <B> liftF(F: Functor<F>, fa: HK<F, B>): OptionT<F, B> = OptionT(F.map(fa, { Option.Some(it) }))
 
     inline fun <B> semiflatMap(F: Monad<F>, crossinline f: (A) -> HK<F, B>): OptionT<F, B> =
             flatMap(F, { option -> liftF(F, f(option)) })
@@ -53,6 +53,8 @@ data class OptionT<F, A>(val value: HK<F, Option<A>>) : HK2<OptionT.F, F, A> {
             OptionT(F.map(value, { it.map(f) }))
 
     fun getOrElse(F: Functor<F>, default: () -> A): HK<F, A> = F.map(value, { it.getOrElse(default) })
+
+    inline fun getOrElseF(F: Monad<F>, crossinline default: () -> HK<F, A>): HK<F, A> = F.flatMap(value, { it.fold(default, { F.pure(it) }) })
 
     inline fun filter(F: Functor<F>, crossinline p: (A) -> Boolean): OptionT<F, A> = OptionT(F.map(value, { it.filter(p) }))
 
