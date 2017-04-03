@@ -18,14 +18,14 @@ package katz
 
 object NonEmptyListMonad : Monad<NonEmptyList.F> {
 
-    override fun <A, B> map(fa: HK<NonEmptyList.F, A>, f: (A) -> B): HK<NonEmptyList.F, B> =
+    override fun <A, B> map(fa: NonEmptyListKind<A>, f: (A) -> B): NonEmptyList<B> =
             fa.ev().map(f)
 
-    override fun <A> pure(a: A): HK<NonEmptyList.F, A> = NonEmptyList.of(a)
+    override fun <A> pure(a: A): NonEmptyList<A> = NonEmptyList.of(a)
 
-    override fun <A, B> flatMap(fa: HK<NonEmptyList.F, A>, f: (A) -> HK<NonEmptyList.F, B>): HK<NonEmptyList.F, B> =
+    override fun <A, B> flatMap(fa: NonEmptyListKind<A>, f: (A) -> NonEmptyListKind<B>): NonEmptyList<B> =
             fa.ev().flatMap { f(it).ev() }
 
 }
 
-fun <A> HK<NonEmptyList.F, A>.ev(): NonEmptyList<A> = this as NonEmptyList<A>
+fun <A> NonEmptyListKind<A>.ev(): NonEmptyList<A> = this as NonEmptyList<A>
