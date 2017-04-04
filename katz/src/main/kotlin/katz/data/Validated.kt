@@ -59,11 +59,6 @@ sealed class Validated<out E, out A> : HK2<Validated.F, E, A> {
     val isInvalid = fold({ true }, { false })
 
     /**
-     * Run the side-effecting function on the value if it is Valid
-     */
-    fun forEach(f: (A) -> Unit): Unit = fold({ }, f)
-
-    /**
      * Is this Valid and matching the given predicate
      */
     fun exist(predicate: (A) -> Boolean): Boolean = fold({ false }, { predicate(it) })
@@ -137,11 +132,11 @@ fun <E, B> Validated<E, B>.valueOr(f: (E) -> B): B = fold({ f(it) }, { it })
  * This is similar to [[orElse]] except that here failures are accumulated.
  */
 fun <E, A> Validated<E, A>.findValid(
-        semigroup: Semigroup<E>,
+        SE: Semigroup<E>,
         that: () -> Validated<E, A>): Validated<E, A> = fold(
 
         { e -> that().fold(
-                { ee -> Validated.Invalid(semigroup.combine(e, ee)) },
+                { ee -> Validated.Invalid(SE.combine(e, ee)) },
                 { Validated.Valid(it) }
         ) },
         { Validated.Valid(it) }
@@ -155,22 +150,4 @@ fun <E, A> Validated<E, A>.findValid(
 fun <E, A> Validated<E, A>.orElse(default: () -> Validated<E, A>): Validated<E, A> = fold(
         { default() },
         { Validated.Valid(it) }
-)
-
-/**
- * Apply a function (that returns a `Validated`) in the valid case.
- * Otherwise return the original `Validated`.
- *
- * This allows "chained" validation: the output of one validation can be fed
- * into another validation function.
- *
- * This function is similar to `flatMap` on `Either`. It's not called `flatMap`,
- * because by Cats convention, `flatMap` is a monadic bind that is consistent
- * with `ap`. This method is not consistent with [[ap]] (or other
- * `Apply`-based methods), because it has "fail-fast" behavior as opposed to
- * accumulating validation failures.
- */
-fun <E, A, B> Validated<E, A>.andThen(f: (A) -> Validated<E, B>): Validated<E, B> = fold(
-        { Validated.Invalid(it) },
-        { f(it) }
 )
