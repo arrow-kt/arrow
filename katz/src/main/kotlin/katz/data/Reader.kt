@@ -1,6 +1,8 @@
 package katz
 
-class Reader<D, A>(val k: Kleisli<Id.F, D, A>) {
+typealias ReaderKind<D, A> = Kleisli<Id.F, D, A>
+
+class Reader<D, A>(val k: ReaderKind<D, A>) {
 
     companion object Factory {
 

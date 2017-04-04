@@ -15,13 +15,16 @@
  */
 package katz
 
+typealias OptionTKind<F, A> = HK2<OptionT.F, F, A>
+typealias OptionTF<F> = HK<OptionT.F, F>
+
 /**
  * [OptionT]`<F, A>` is a light wrapper on an `F<`[Option]`<A>>` with some
  * convenient methods for working with this nested structure.
  *
  * It may also be said that [OptionT] is a monad transformer for [Option].
  */
-data class OptionT<F, A>(val value: HK<F, Option<A>>) : HK2<OptionT.F, F, A> {
+data class OptionT<F, A>(val value: HK<F, Option<A>>) : OptionTKind<F, A> {
 
     class F private constructor()
 
