@@ -16,6 +16,8 @@
 
 package org.funktionale.tries
 
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.funktionale.tries.Try.Failure
 import org.funktionale.tries.Try.Success
 import org.testng.Assert.*
@@ -54,9 +56,62 @@ class TryTest {
         assertEquals(failure.orElse { Success(5) }.get(), 5)
     }
 
-    @Test fun foreach() {
-        success.foreach { assertEquals(10, it) }
-        failure.foreach { fail() }
+    @Test fun `foreach with side effect (applied on Success)`() {
+        var wasInside = false
+        success.foreach { wasInside = true }
+        assertThat(wasInside).isTrue()
+    }
+
+    @Test fun `foreach with side effect (applied on Failure)`() {
+        var wasInside = false
+        failure.foreach { wasInside = true }
+        assertThat(wasInside).isFalse()
+    }
+
+    @Test fun `foreach with exception thrown inside (applied on Success)`() {
+        assertThatThrownBy {
+            success.foreach { throw RuntimeException("thrown inside") }
+        }.hasMessage("thrown inside")
+    }
+
+    @Test fun `foreach with exception thrown inside (applied on Failure)`() {
+        failure.foreach { throw RuntimeException("thrown inside") }
+        // and no exception should be thrown
+    }
+
+    @Test fun `onEach with side effect (applied on Success)`() {
+        var wasInside = false
+        success.onEach { wasInside = true }
+        assertThat(wasInside).isTrue()
+    }
+
+    @Test fun `onEach with side effect (applied on Failure)`() {
+        var wasInside = false
+        failure.onEach { wasInside = true }
+        assertThat(wasInside).isFalse()
+    }
+
+    @Test fun `onEach with exception thrown inside (applied on Success)`() {
+        assertThatThrownBy {
+            success.onEach { throw RuntimeException("thrown inside") }.get()
+        }.hasMessage("thrown inside")
+    }
+
+    @Test fun `onEach with exception thrown inside (applied on Failure)`() {
+        assertThatThrownBy {
+            failure.onEach { throw RuntimeException("thrown inside") }.get()
+        }.isInstanceOf(NumberFormatException::class.java)
+    }
+
+    @Test fun `onEach with change of carried value (applied on Success)`() {
+        val result = success.onEach { it * 2 }.get()
+        assertThat(result).isEqualTo(10)
+    }
+
+    @Test fun `onEach with change of carried value (applied on Failure)`() {
+        assertThatThrownBy {
+            failure.onEach { it * 2 }.get()
+        }.isInstanceOf(NumberFormatException::class.java)
     }
 
     @Test fun flatMap() {
