@@ -36,18 +36,18 @@ data class Coproduct<F, G, A>(val run: Either<HK<F, A>, HK<G, A>>) : CoproductKi
 
     }
 
-    fun <B> map(F: Functor<F>, G: Functor<G>, f: (A) -> B): Coproduct<F, G, B> {
-        return Coproduct(run.bimap(F.lift(f), G.lift(f)))
+    fun <B> map(f: (A) -> B): Coproduct<F, G, B> {
+        return Coproduct(run.bimap(instance<Functor<F>>().lift(f), instance<Functor<G>>().lift(f)))
     }
 
-    fun <B> coflatMap(F: Comonad<F>, G: Comonad<G>, f: (Coproduct<F, G, A>) -> B): Coproduct<F, G, B> =
+    fun <B> coflatMap(f: (Coproduct<F, G, A>) -> B): Coproduct<F, G, B> =
             Coproduct(run.bimap(
-                    { F.coflatMap(it, { f(Coproduct.leftc(it)) }) },
-                    { G.coflatMap(it, { f(Coproduct.rightc(it)) }) }
+                    { instance<Comonad<F>>().coflatMap(it, { f(Coproduct.leftc(it)) }) },
+                    { instance<Comonad<G>>().coflatMap(it, { f(Coproduct.rightc(it)) }) }
             ))
 
-    fun extract(F: Comonad<F>, G: Comonad<G>): A =
-            run.fold({ F.extract(it) }, { G.extract(it) })
+    fun extract(): A =
+            run.fold({ instance<Comonad<F>>().extract(it) }, { instance<Comonad<G>>().extract(it) })
 
     fun <H> fold(f: FunctionK<F, H>, g: FunctionK<G, H>): HK<H, A> =
             run.fold({ f(it) }, { g(it) })

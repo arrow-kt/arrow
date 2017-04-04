@@ -56,7 +56,7 @@ open class GlobalInstance<T : Typeclass>() {
     /**
      * REcursively scan all implemented interfaces and add as global instances all the ones that match a Typeclass
      */
-    fun recurseInterfaces(c : Class<*>) : Unit {
+    fun recurseInterfaces(c : Class<*>) {
         return when {
             c.interfaces.isEmpty() -> println("$c has no interfaces")
             else -> {
@@ -82,7 +82,7 @@ open class TypeLiteral<T> {
         get() = (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0]
 }
 
-inline fun <reified T> typeLiteral(): Type = object : TypeLiteral<T>() {}.type
+inline fun <reified T> typeLiteral(): Type = object : TypeLiteral<T>(){}.type
 
 /**
  * A concurrent hash map of local global instances that may be invoked at runtime as if they were implicitly summoned

@@ -21,13 +21,7 @@ import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.forAll
 import katz.Option.*
-import kotlinx.collections.immutable.immutableHashMapOf
 import org.junit.runner.RunWith
-import java.lang.reflect.ParameterizedType
-import java.lang.reflect.Type
-import kotlin.reflect.KClass
-import kotlin.reflect.KFunction
-import kotlin.reflect.full.*
 
 @RunWith(KTestJUnitRunner::class)
 class OptionTest : UnitSpec() {

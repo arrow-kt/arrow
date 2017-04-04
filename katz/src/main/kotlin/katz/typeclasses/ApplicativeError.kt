@@ -16,7 +16,7 @@
 
 package katz
 
-interface ApplicativeError<F, E> : Applicative<F>, Typeclass  {
+interface ApplicativeError<F, E> : Applicative<F>, Typeclass {
 
     fun <A> raiseError(e: E): HK<F, A>
 

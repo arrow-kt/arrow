@@ -18,7 +18,7 @@
 
 package katz
 
-interface Applicative<F> : Functor<F> {
+interface Applicative<F> : Functor<F>, Typeclass {
 
     fun <A> pure(a: A): HK<F, A>
 

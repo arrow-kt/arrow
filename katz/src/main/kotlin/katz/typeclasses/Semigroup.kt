@@ -16,7 +16,7 @@
 
 package katz
 
-interface Semigroup<A> : Typeclass  {
+interface Semigroup<A> : Typeclass {
     /**
      * Combine two [A] values.
      */

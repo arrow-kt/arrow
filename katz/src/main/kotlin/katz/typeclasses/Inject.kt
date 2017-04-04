@@ -21,7 +21,7 @@ package katz
  *
  * @see [[http://www.staff.science.uu.nl/~swier004/publications/2008-jfp.pdf]]
  */
-interface Inject<F, G> : Typeclass  {
+interface Inject<in F, out G> : Typeclass {
 
     fun inj(): FunctionK<F, G>
 

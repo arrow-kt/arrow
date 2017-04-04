@@ -28,9 +28,6 @@ package katz
 //    }
 //}
 
-
-object Serializable {
-    init {
-        println("boom")
-    }
+object IntSemigroup : Semigroup<Int>, GlobalInstance<Semigroup<Int>>() {
+    override fun combine(a: Int, b: Int): Int = a
 }
