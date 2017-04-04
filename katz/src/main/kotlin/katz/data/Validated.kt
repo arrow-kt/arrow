@@ -20,6 +20,9 @@ typealias ValidatedKind<E, A> = HK2<Validated.F, E, A>
 typealias ValidatedF<A> = HK<Validated.F, A>
 typealias ValidatedNel<E, A> = Validated<NonEmptyList<E>, A>
 
+/**
+ * Port of https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/data/Validated.scala
+ */
 sealed class Validated<out E, out A> : ValidatedKind<E, A> {
 
     class F private constructor()
