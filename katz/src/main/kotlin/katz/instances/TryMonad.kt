@@ -16,16 +16,18 @@
 
 package katz
 
-object TryMonad : Monad<Try.F> {
+object TryMonad : MonadError<Try.F, Throwable> {
 
-    override fun <A, B> map(fa: HK<Try.F, A>, f: (A) -> B): Try<B> =
-            fa.ev().map(f)
+    override fun <A, B> map(fa: TryKind<A>, f: (A) -> B): Try<B> = fa.ev().map(f)
 
     override fun <A> pure(a: A): Try<A> = Try.Success(a)
 
-    override fun <A, B> flatMap(fa: HK<Try.F, A>, f: (A) -> HK<Try.F, B>): Try<B> =
-            fa.ev().flatMap { f(it).ev() }
+    override fun <A, B> flatMap(fa: TryKind<A>, f: (A) -> TryKind<B>): Try<B> = fa.ev().flatMap { f(it).ev() }
 
+    override fun <A> raiseError(e: Throwable): TryKind<A> = Try.Failure(e)
+
+    override fun <A> handleErrorWith(fa: TryKind<A>, f: (Throwable) -> TryKind<A>): TryKind<A> =
+            fa.ev().recoverWith { f(it).ev() }
 }
 
-fun <A> HK<Try.F, A>.ev(): Try<A> = this as Try<A>
+fun <A> TryKind<A>.ev(): Try<A> = this as Try<A>
