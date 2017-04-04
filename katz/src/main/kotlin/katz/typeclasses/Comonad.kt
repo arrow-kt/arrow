@@ -19,7 +19,7 @@ package katz
 /**
  * The dual of monads, used to extract values from F
  */
-interface Comonad<F> {
+interface Comonad<F> : Typeclass {
 
     fun <A, B> coflatMap(fa: HK<F, A>, f: (HK<F, A>) -> B): HK<F, B>
 

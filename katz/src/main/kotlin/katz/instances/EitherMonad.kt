@@ -16,7 +16,7 @@
 
 package katz
 
-object EitherMonad : Monad<HK<Either.F, *>> {
+object EitherMonad : Monad<HK<Either.F, *>>, GlobalInstance<Monad<Either.F>>() {
     override fun <A> pure(a: A): HK2<Either.F, *, A> =
             Either.Right(a)
 

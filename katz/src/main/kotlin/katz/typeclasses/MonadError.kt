@@ -20,7 +20,7 @@ import java.io.Serializable
 import kotlin.coroutines.experimental.RestrictsSuspension
 import kotlin.coroutines.experimental.startCoroutine
 
-interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
+interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F>, Typeclass  {
     fun <A> ensure(fa: HK<F, A>, error: () -> E, predicate: (A) -> Boolean): HK<F, A> =
             flatMap(fa, {
                 if (predicate(it)) pure(it)

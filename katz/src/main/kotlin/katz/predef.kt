@@ -16,3 +16,21 @@
 
 package katz
 
+/**
+ * Eagerly initialize all instances
+ **/
+//class Bootstrap() {
+//    companion object {
+//        init {
+//            println("called!")
+//            listOf(EitherMonad, IdMonad, NonEmptyListMonad, OptionMonad)
+//        }
+//    }
+//}
+
+
+object Serializable {
+    init {
+        println("boom")
+    }
+}

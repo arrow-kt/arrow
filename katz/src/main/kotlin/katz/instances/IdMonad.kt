@@ -16,7 +16,7 @@
 
 package katz
 
-object IdMonad : Monad<Id.F> {
+object IdMonad : Monad<Id.F>, GlobalInstance<Monad<Id.F>>(){
 
     override fun <A, B> map(fa: HK<Id.F, A>, f: (A) -> B): HK<Id.F, B> =
             fa.ev().map(f)

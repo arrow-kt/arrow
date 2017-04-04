@@ -31,6 +31,7 @@ import kotlin.reflect.full.*
 
 @RunWith(KTestJUnitRunner::class)
 class OptionTest : UnitSpec() {
+
     init {
         "map should modify value" {
             Some(12).map { "flower" } shouldBe Some("flower")

@@ -16,7 +16,7 @@
 
 package katz
 
-object NonEmptyListMonad : Monad<NonEmptyList.F> {
+object NonEmptyListMonad : Monad<NonEmptyList.F>, GlobalInstance<Monad<NonEmptyList.F>>() {
 
     override fun <A, B> map(fa: HK<NonEmptyList.F, A>, f: (A) -> B): HK<NonEmptyList.F, B> =
             fa.ev().map(f)
