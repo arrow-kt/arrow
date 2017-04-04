@@ -16,7 +16,7 @@
 
 package katz
 
-class ValidatedApplicative<E>(val SE: Semigroup<E>) : ApplicativeError<ValidatedF<E>, E> {
+class ValidatedApplicativeError<E>(val SE: Semigroup<E>) : ApplicativeError<ValidatedF<E>, E> {
 
     override fun <A> pure(a: A): Validated<E, A> = Validated.Valid(a)
 
@@ -26,7 +26,7 @@ class ValidatedApplicative<E>(val SE: Semigroup<E>) : ApplicativeError<Validated
             fa.ev().fold({ f(it).ev() }, { Validated.Valid(it) })
 
     override fun <A, B> ap(fa: ValidatedKind<E, A>, ff: HK<ValidatedF<E>, (A) -> B>): Validated<E, B> =
-            fa.ev().ap(ff as Validated<E, (A) -> B>, SE)
+            fa.ev().ap(ff.ev(), SE)
 }
 
 fun <E, A> ValidatedKind<E, A>.ev(): Validated<E, A> = this as Validated<E, A>
