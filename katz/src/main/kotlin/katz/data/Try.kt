@@ -27,7 +27,11 @@ sealed class Try<out A> {
     companion object {
 
         inline operator fun <A> invoke(f: () -> A): Try<A> =
-                try { Success(f()) } catch (e: Throwable) { Failure(e) }
+                try {
+                    Success(f())
+                } catch (e: Throwable) {
+                    Failure(e)
+                }
     }
 
     /**
@@ -55,7 +59,7 @@ sealed class Try<out A> {
      */
     inline fun filter(crossinline p: (A) -> Boolean): Try<A> = fold(
             { Failure(it) },
-            { if (p(it)) Success(it) else Failure(PredicateException("Predicate does not hold for $it")) }
+            { if (p(it)) Success(it) else Failure(TryException.PredicateException("Predicate does not hold for $it")) }
     )
 
     /**
@@ -64,7 +68,7 @@ sealed class Try<out A> {
      */
     fun failed(): Try<Throwable> = fold(
             { Success(it) },
-            { Failure(UnsupportedOperationException("Success.failed")) }
+            { Failure(TryException.UnsupportedOperationException("Success.failed")) }
     )
 
     /**
@@ -74,7 +78,11 @@ sealed class Try<out A> {
      */
     fun <B> fold(fa: (Throwable) -> B, fb: (A) -> B): B = when (this) {
         is Failure -> fa(exception)
-        is Success -> try { fb(value) } catch (e: Throwable) { fa(e) }
+        is Success -> try {
+            fb(value)
+        } catch (e: Throwable) {
+            fa(e)
+        }
     }
 
     /**
@@ -92,9 +100,11 @@ sealed class Try<out A> {
         override val isFailure: Boolean = false
         override val isSuccess: Boolean = true
     }
+}
 
-    data class PredicateException(override val message: String) : Throwable(message)
-    data class UnsupportedOperationException(override val message: String) : Throwable(message)
+sealed class TryException(override val message: String) : kotlin.Exception(message) {
+    data class PredicateException(override val message: String) : TryException(message)
+    data class UnsupportedOperationException(override val message: String) : TryException(message)
 }
 
 /**

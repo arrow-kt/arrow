@@ -52,7 +52,7 @@ class TryTest : UnitSpec() {
             val failure: Try<Int> = Failure(Exception())
 
             Success(1).filter { true } shouldBe Success(1)
-            Success(1).filter { false } shouldBe Failure<Int>(PredicateException("Predicate does not hold for 1"))
+            Success(1).filter { false } shouldBe Failure<Int>(TryException.PredicateException("Predicate does not hold for 1"))
             failure.filter { true } shouldBe failure
             failure.filter { false } shouldBe failure
         }
@@ -61,7 +61,7 @@ class TryTest : UnitSpec() {
             val ex = Exception()
             val failure: Try<Int> = Failure(ex)
 
-            Success(1).failed() shouldBe Failure<Int>(UnsupportedOperationException("Success.failed"))
+            Success(1).failed() shouldBe Failure<Int>(TryException.UnsupportedOperationException("Success.failed"))
             failure.failed() shouldBe Success(ex)
         }
 
