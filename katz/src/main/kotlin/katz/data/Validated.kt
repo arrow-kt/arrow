@@ -16,9 +16,11 @@
 
 package katz
 
+typealias ValidatedKind<E, A> = HK2<Validated.F, E, A>
+typealias ValidatedF<A> = HK<Validated.F, A>
 typealias ValidatedNel<E, A> = Validated<NonEmptyList<E>, A>
 
-sealed class Validated<out E, out A> : HK2<Validated.F, E, A> {
+sealed class Validated<out E, out A> : ValidatedKind<E, A> {
 
     class F private constructor()
 

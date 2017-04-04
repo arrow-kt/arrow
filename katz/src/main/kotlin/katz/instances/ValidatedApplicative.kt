@@ -16,13 +16,15 @@
 
 package katz
 
-class EitherMonad<L> : Monad<EitherF<L>> {
+class ValidatedApplicative<E> : Applicative<ValidatedF<E>> {
 
-    override fun <A> pure(a: A): Either<L, A> = Either.Right(a)
+    override fun <A> pure(a: A): Validated<E, A> = Validated.Valid(a)
 
-    override fun <A, B> flatMap(fa: EitherKind<L, A>, f: (A) -> EitherKind<L, B>): Either<L, B> {
-        return fa.ev().flatMap { f(it).ev() }
-    }
+    override fun <A, B> ap(fa: ValidatedKind<E, A>, ff: HK<ValidatedF<E>, (A) -> B>): Validated<E, B> =
+            flatMap(fa, { a -> map(ff, { f -> f(a) }) }).ev()
+
+    fun <A, B> flatMap(fa: ValidatedKind<E, A>, f: (A) -> ValidatedKind<E, B>): ValidatedKind<E, B> =
+            fa.ev().fold({ Validated.Invalid(it) }, { f(it).ev() })
 }
 
-fun <A, B> EitherKind<A, B>.ev(): Either<A, B> = this as Either<A, B>
+fun <E, A> ValidatedKind<E, A>.ev(): Validated<E, A> = this as Validated<E, A>
