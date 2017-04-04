@@ -16,18 +16,14 @@
 
 package katz
 
-interface FunctionK<in F, out G> {
+class OptionTMonad<F>(val M: Monad<F>) : Monad<OptionTF<F>> {
+    override fun <A> pure(a: A): OptionT<F, A> = OptionT.pure(M, a)
 
-    /**
-     * Applies this functor transformation from `F` to `G`
-     */
-    operator fun <A> invoke(fa: HK<F, A>): HK<G, A>
+    override fun <A, B> flatMap(fa: OptionTKind<F, A>, f: (A) -> OptionTKind<F, B>): OptionT<F, B> =
+            fa.ev().flatMap(M, { f(it).ev() })
 
+    override fun <A, B> map(fa: OptionTKind<F, A>, f: (A) -> B): OptionT<F, B> =
+            fa.ev().map(M, f)
 }
 
-fun <F, G, H> FunctionK<F, G>.or(h: FunctionK<H, G>): FunctionK<CoproductFG<F, H>, G> =
-        object : FunctionK<CoproductFG<F, H>, G> {
-            override fun <A> invoke(fa: CoproductKind<F, H, A>): HK<G, A> {
-                return fa.ev().fold(this@or, h)
-            }
-        }
+fun <F, A> OptionTKind<F, A>.ev(): OptionT<F, A> = this as OptionT<F, A>

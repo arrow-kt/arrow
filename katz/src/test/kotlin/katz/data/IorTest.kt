@@ -162,7 +162,7 @@ class IorTest : UnitSpec() {
             forAll { a: Int ->
                 val x = { b: Int -> Ior.Right(b * a) }
                 val ior = Ior.Right(a)
-                ior.flatMap(intIorMonad.semigroup, x) == intIorMonad.flatMap(ior, x)
+                ior.flatMap(intIorMonad.AA, x) == intIorMonad.flatMap(ior, x)
             }
         }
 
