@@ -16,7 +16,7 @@
 
 package katz
 
-interface FunctionK<F, G> {
+interface FunctionK<in F, out G> {
 
     /**
      * Applies this functor transformation from `F` to `G`

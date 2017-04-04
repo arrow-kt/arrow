@@ -17,11 +17,11 @@
 package katz
 
 class IorMonad<L>(val AA: Semigroup<L>) : Monad<HK<Ior.F, L>> {
-    override fun <A, B> flatMap(fa: HK<HK<Ior.F, L>, A>, f: (A) -> HK<HK<Ior.F, L>, B>): HK<HK<Ior.F, L>, B> =
+    override fun <A, B> flatMap(fa: IorKind<L, A>, f: (A) -> IorKind<L, B>): Ior<L, B> =
             fa.ev().flatMap(AA) { f(it).ev() }
 
-    override fun <A> pure(a: A): HK2<Ior.F, L, A> = Ior.Right(a)
+    override fun <A> pure(a: A): Ior<L, A> = Ior.Right(a)
 
 }
 
-fun <A, B> HK2<Ior.F, A, B>.ev(): Ior<A, B> = this as Ior<A, B>
+fun <A, B> IorKind<A, B>.ev(): Ior<A, B> = this as Ior<A, B>

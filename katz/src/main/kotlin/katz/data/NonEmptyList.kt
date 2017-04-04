@@ -16,13 +16,15 @@
 
 package katz
 
+typealias NonEmptyListKind<A> = HK<NonEmptyList.F, A>
+
 /**
  * A List that can not be empty
  */
 class NonEmptyList<out A> private constructor(
         val head: A,
         val tail: List<A>,
-        val all: List<A>) : HK<NonEmptyList.F, A> {
+        val all: List<A>) : NonEmptyListKind<A> {
 
     class F private constructor()
 
