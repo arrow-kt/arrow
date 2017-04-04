@@ -153,3 +153,13 @@ fun <E, A> Validated<E, A>.orElse(default: () -> Validated<E, A>): Validated<E, 
         { default() },
         { Validated.Valid(it) }
 )
+
+/**
+ * From Apply:
+ * if both the function and this value are Valid, apply the function
+ */
+fun <E, A, B> Validated<E, A>.ap(f: Validated<E, (A) -> B>, SE: Semigroup<E>): Validated<E, B> =
+        when (this) {
+            is Validated.Valid -> { f.fold({ Validated.Invalid(it) }, { Validated.Valid(it(a)) }) }
+            is Validated.Invalid -> { f.fold({ Validated.Invalid(SE.combine(it, e)) }, { Validated.Invalid(e) }) }
+}
