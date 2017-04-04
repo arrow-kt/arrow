@@ -16,13 +16,15 @@
 
 package katz
 
+typealias TryKind<A> = HK<Try.F, A>
+
 /**
  * The `Try` type represents a computation that may either result in an exception, or return a
  * successfully computed value.
  *
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Try.scala
  */
-sealed class Try<out A> : HK<Try.F, A> {
+sealed class Try<out A> : TryKind<A> {
 
     class F private constructor()
 
