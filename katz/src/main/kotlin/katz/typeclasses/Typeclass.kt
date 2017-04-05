@@ -18,6 +18,7 @@ package katz
 
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -30,18 +31,104 @@ interface Typeclass
  * A parametrized type calculated from walking up the interface chain in a Typeclass and finding other relevant
  * typeclasses that should be registered
  */
-data class InstanceParametrizedType(val raw: Type, val typeArgs: List<Type>) : ParameterizedType {
+class InstanceParametrizedType(val raw: Type, val typeArgs: List<Type>) : ParameterizedType {
     override fun getRawType(): Type = raw
 
-    override fun getOwnerType(): Type = null as Type
+    override fun getOwnerType(): Type? = null
 
     override fun getActualTypeArguments(): Array<Type> = typeArgs.toTypedArray()
+
+    override fun equals(o: Any?): Boolean {
+        if (o is ParameterizedType) {
+            // Check that information is equivalent
+            val that = o
+
+            if (this === that)
+                return true
+
+            val thatOwner = that.ownerType
+            val thatRawType = that.rawType
+
+            if (false) { // Debugging
+                val ownerEquality = if (ownerType == null)
+                    thatOwner == null
+                else
+                    ownerType == thatOwner
+                val rawEquality = if (rawType == null)
+                    thatRawType == null
+                else
+                    rawType == thatRawType
+
+                val typeArgEquality = Arrays.equals(actualTypeArguments, // avoid clone
+                        that.actualTypeArguments)
+                for (t in actualTypeArguments) {
+                    System.out.printf("\t\t%s%s%n", t, t.javaClass)
+                }
+
+                System.out.printf("\towner %s\traw %s\ttypeArg %s%n",
+                        ownerEquality, rawEquality, typeArgEquality)
+                return ownerEquality && rawEquality && typeArgEquality
+            }
+
+            return ownerType == thatOwner &&
+                    rawType == thatRawType &&
+                    Arrays.equals(actualTypeArguments, // avoid clone
+                            that.actualTypeArguments)
+        } else
+            return false
+    }
+
+    override fun hashCode(): Int {
+        return Arrays.hashCode(actualTypeArguments) xor
+                Objects.hashCode(ownerType) xor
+                Objects.hashCode(rawType)
+    }
+
+    override fun toString(): String {
+        val sb = StringBuilder()
+
+        if (ownerType != null) {
+            if (ownerType is Class<*>)
+                sb.append((ownerType as Class<*>).name)
+            else
+                sb.append(ownerType.toString())
+
+            sb.append(".")
+
+            if (ownerType is ParameterizedType) {
+                // Find simple name of nested type by removing the
+                // shared prefix with owner.
+                sb.append(rawType.typeName.replace((ownerType as ParameterizedType).rawType.typeName + "$",
+                        ""))
+            } else
+                sb.append(rawType.typeName)
+        } else
+            sb.append(rawType.typeName)
+
+        if (actualTypeArguments.isNotEmpty()) {
+            sb.append("<")
+            var first = true
+            for (t in actualTypeArguments) {
+                if (!first)
+                    sb.append(", ")
+                sb.append(t.typeName)
+                first = false
+            }
+            sb.append(">")
+        }
+
+        return sb.toString()
+    }
+
+
 }
 
 /**
  * Auto registers subtypes as a global instance for all the functional typeclass interfaces they implement
  */
-open class GlobalInstance<T : Typeclass>() {
+open class GlobalInstance<T : Typeclass> {
+
+    operator fun invoke() : GlobalInstance<T> = this
 
     init {
         recurseInterfaces(javaClass)
@@ -79,7 +166,22 @@ open class GlobalInstance<T : Typeclass>() {
  */
 open class TypeLiteral<T> {
     val type: Type
-        get() = (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0]
+        get() {
+            val t = (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0]
+            //force class initialization if it hasn't already happened
+            try {
+                if (t is ParameterizedType) {
+                    val fBound = t.actualTypeArguments[0].typeName
+                    if (fBound.contains('$')) {
+                        val typeName = t.actualTypeArguments[0].typeName.substringBeforeLast('$')
+                        Class.forName(typeName, true, javaClass.classLoader)
+                    }
+                }
+            } catch (e : Exception) {
+                e.printStackTrace()
+            }
+            return t
+        }
 }
 
 inline fun <reified T> typeLiteral(): Type = object : TypeLiteral<T>(){}.type
@@ -101,4 +203,16 @@ data class TypeClassInstanceNotFound(val type : Type)
         "Alternatively invoke `GlobalInstances.put(typeLiteral<$type>(), instance)` if you wish to register " +
         "or override a typeclass manually")
 
-inline fun <reified T : Typeclass> instance(): T = GlobalInstances.getValue(typeLiteral<T>()) as T
+inline fun <reified T : Typeclass> instance(): T {
+    val t = typeLiteral<T>()
+    if (GlobalInstances.containsKey(t))
+        return GlobalInstances.getValue(t) as T
+    else throw TypeClassInstanceNotFound(t)
+}
+
+inline fun <reified F> monad(): Monad<F> {
+    val t = InstanceParametrizedType(Monad::class.java, listOf(typeLiteral<F>()))
+    if (GlobalInstances.containsKey(t))
+        return GlobalInstances.getValue(t) as Monad<F>
+    else throw TypeClassInstanceNotFound(t)
+}

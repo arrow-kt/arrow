@@ -1,27 +1,31 @@
 package katz
 
-class Kleisli<F, D, A>(inline val run: (D) -> HK<F, A>) {
+class Kleisli<F, D, A> (val run: (D) -> HK<F, A>, val MF: Monad<F>) {
 
-    companion object Factory {
+    fun <B> map(f: (A) -> B): Kleisli<F, D, B> = Kleisli({ a -> MF.map(run(a), f) }, MF)
 
-        fun <F, D, A> pure(x: A): Kleisli<F, D, A> = Kleisli { _ -> instance<Applicative<F>>().pure(x) }
-
-        fun <F, D> ask(): Kleisli<F, D, D> = Kleisli { instance<Applicative<F>>().pure(it) }
-    }
-
-    inline fun <B> map(noinline f: (A) -> B): Kleisli<F, D, B> = Kleisli { a -> instance<Functor<F>>().map(run(a), f) }
-
-    inline fun <B> flatMap(crossinline f: (A) -> Kleisli<F, D, B>): Kleisli<F, D, B> =
-            Kleisli { d ->
-                instance<Monad<F>>().flatMap(run(d)) { a -> f(a).run(d) }
-            }
+    fun <B> flatMap(f: (A) -> Kleisli<F, D, B>): Kleisli<F, D, B> =
+            Kleisli({ d ->
+                MF.flatMap(run(d)) { a -> f(a).run(d) }
+            }, MF)
 
     fun <B> zip(o: Kleisli<F, D, B>): Kleisli<F, D, Pair<A, B>> =
             this.flatMap { a ->
                 o.map { b -> Pair(a, b) }
             }
 
-    fun <DD> local(f: (DD) -> D): Kleisli<F, DD, A> = Kleisli { dd -> run(f(dd)) }
+    fun <DD> local(f: (DD) -> D): Kleisli<F, DD, A> = Kleisli({ dd -> run(f(dd)) }, MF)
+}
+
+object KleisliC {
+
+    inline operator fun <reified F, D, A> invoke(noinline run: (D) -> HK<F, A>, MF : Monad<F> = instance<Monad<F>>()): Kleisli<F, D, A> = Kleisli(run, MF)
+
+    inline fun <reified F, D, A> pure(x: A, MF: Monad<F> = monad<F>()): Kleisli<F, D, A> {
+        return KleisliC({ _ -> MF.pure(x) })
+    }
+
+    inline fun <reified F, D> ask(AP : Applicative<F> = instance<Applicative<F>>()): Kleisli<F, D, D> = KleisliC({ AP.pure(it) })
 }
 
 fun <F, D, A> Kleisli<F, D, Kleisli<F, D, A>>.flatten(): Kleisli<F, D, A> =

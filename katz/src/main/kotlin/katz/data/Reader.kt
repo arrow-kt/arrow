@@ -1,33 +1,18 @@
 package katz
 
-typealias ReaderKind<D, A> = Kleisli<Id.F, D, A>
-
-class Reader<D, A>(val k: ReaderKind<D, A>) {
-
-    companion object Factory {
-
-        operator fun <D, A> invoke(fa : (D) -> A): Reader<D, A> = Reader(Kleisli(fa.andThen { Id(it) }))
-
-        fun <D, A> pure(x: A): Reader<D, A> = Reader { _ -> x }
-
-        fun <D> ask(): Reader<D, D> = Reader { it }
-
-    }
-
-    fun <DD> local(f: (DD) -> D): Reader<DD, A> = Reader(k.local(f))
-
-}
-
 infix fun <A, B, C> ((B) -> C).compose(f: (A) -> B): (A) -> C = { a: A -> this(f(a)) }
 
 infix fun <A, B, C> ((A) -> B).andThen(g: (B) -> C): (A) -> C = { a: A -> g(this(a)) }
 
-fun <D, A, B> Reader<D, A>.map(fa: (A) -> B): Reader<D, B> = Reader(k.map(fa.andThen { Id(it).value }))
+inline fun <D, A> ((D) -> A).reader(): ReaderT<Id.F, D, A> = Reader(this)
 
-fun <D, A, B> Reader<D, A>.flatMap(fa: (A) -> Reader<D, B>): Reader<D, B> = Reader(k.flatMap(fa.andThen { it.k }))
+fun <D, A> ReaderT<Id.F, D, A>.runId(d: D): A = this.run(d).value()
 
-fun <D, A, B> Reader<D, A>.zip(o: Reader<D, B>) = Reader(k.zip(o.k))
+object Reader {
+    operator fun <D, A> invoke(run: (D) -> A): ReaderT<Id.F, D, A> = Kleisli(run.andThen { Id(it) }, Id)
 
-inline fun <reified D, A> Reader<D, A>.run(d : D): A = k.run(d).value()
+    fun <D, A> pure(x: A): ReaderT<Id.F, D, A> = KleisliC.pure<Id.F, D, A>(x)
 
-fun <D, A> ((D) -> A).reader(): Reader<D, A> = Reader(this)
+    fun <D> ask(): ReaderT<Id.F, D, D> = KleisliC.ask<Id.F, D>()
+
+}
