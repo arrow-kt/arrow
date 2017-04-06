@@ -35,16 +35,6 @@ sealed class Try<out A> {
     }
 
     /**
-     * Returns `true` if the `Try` is a `Failure`, `false` otherwise.
-     */
-    abstract val isFailure: Boolean
-
-    /**
-     * Returns `true` if the `Try` is a `Success`, `false` otherwise.
-     */
-    abstract val isSuccess: Boolean
-
-    /**
      * Returns the given function applied to the value from this `Success` or returns this if this is a `Failure`.
      */
     inline fun <B> flatMap(crossinline f: (A) -> Try<B>): Try<B> = fold({ Failure(it) }, { f(it) })
@@ -88,18 +78,12 @@ sealed class Try<out A> {
     /**
      * The `Failure` type represents a computation that result in an exception.
      */
-    data class Failure<out A>(val exception: Throwable) : Try<A>() {
-        override val isFailure: Boolean = true
-        override val isSuccess: Boolean = false
-    }
+    data class Failure<out A>(val exception: Throwable) : Try<A>()
 
     /**
      * The `Success` type represents a computation that return a successfully computed value.
      */
-    data class Success<out A>(val value: A) : Try<A>() {
-        override val isFailure: Boolean = false
-        override val isSuccess: Boolean = true
-    }
+    data class Success<out A>(val value: A) : Try<A>()
 }
 
 sealed class TryException(override val message: String) : kotlin.Exception(message) {

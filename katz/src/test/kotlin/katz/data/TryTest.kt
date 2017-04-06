@@ -77,20 +77,6 @@ class TryTest : UnitSpec() {
             Success(1).fold({ 2 }, { throw Exception() }) shouldBe 2
         }
 
-        "failure is failure and not success" {
-            val failure = Failure<Int>(Exception())
-
-            failure.isFailure shouldBe true
-            failure.isSuccess shouldBe false
-        }
-
-        "success is success and not failure" {
-            val success = Success(1)
-
-            success.isFailure shouldBe false
-            success.isSuccess shouldBe true
-        }
-
         "getOrElse returns default if Failure" {
             Success(1).getOrElse { 2 } shouldBe 1
             Failure<Int>(Exception()).getOrElse { 2 } shouldBe 2
