@@ -20,6 +20,8 @@ import katz.Either.Left
 import katz.Either.Right
 import katz.Option
 
+typealias IorKind<A, B> = HK2<Ior.F, A, B>
+
 /**
  * Port of https://github.com/typelevel/cats/blob/v0.9.0/core/src/main/scala/cats/data/Ior.scala
  *
@@ -40,7 +42,7 @@ import katz.Option
  * The isomorphic Either form can be accessed via the [unwrap] method.
  */
 
-sealed class Ior<out A, out B> : HK2<Ior.F, A, B> {
+sealed class Ior<out A, out B> : IorKind<A, B> {
 
     class F private constructor()
 

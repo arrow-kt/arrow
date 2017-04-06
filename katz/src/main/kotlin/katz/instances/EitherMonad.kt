@@ -16,13 +16,12 @@
 
 package katz
 
-class EitherMonad<L> : Monad<HK<Either.F, L>> {
+class EitherMonad<L> : Monad<EitherF<L>> {
     override fun <A> pure(a: A): Either<L, A> = Either.Right(a)
 
-    override fun <A, B> flatMap(fa: HK2<Either.F, L, A>, f: (A) -> HK2<Either.F, L, B>): Either<L, B> {
+    override fun <A, B> flatMap(fa: EitherKind<L, A>, f: (A) -> EitherKind<L, B>): Either<L, B> {
         return fa.ev().flatMap { f(it).ev() }
     }
-
 }
 
-fun <A, B> HK2<Either.F, A, B>.ev(): Either<A, B> = this as Either<A, B>
+fun <A, B> EitherKind<A, B>.ev(): Either<A, B> = this as Either<A, B>
