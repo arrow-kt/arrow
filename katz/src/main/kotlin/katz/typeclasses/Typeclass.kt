@@ -144,7 +144,7 @@ open class GlobalInstance<T : Typeclass> : TypeLiteral<T>() {
                     }.forEach { i ->
                         val instanceType = InstanceParametrizedType(i, listOf(type.actualTypeArguments[0]))
                         println("Considering interface: $i for type: $type and instance type: $instanceType")
-                        GlobalInstances.put(instanceType, this)
+                        GlobalInstances.putIfAbsent(instanceType, this)
                         println("Thread: ${Thread.currentThread().name} Time: ${System.nanoTime()} : registered global instance for type class : $instanceType")
                         recurseInterfaces(i)
                     }
