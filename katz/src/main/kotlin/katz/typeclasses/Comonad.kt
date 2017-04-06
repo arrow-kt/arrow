@@ -16,12 +16,13 @@
 
 package katz
 
-interface Functor<F> {
+/**
+ * The dual of monads, used to extract values from F
+ */
+interface Comonad<F> {
 
-    fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B>
+    fun <A, B> coflatMap(fa: HK<F, A>, f: (HK<F, A>) -> B): HK<F, B>
 
-    fun <A, B> lift(f: (A) -> B): (HK<F, A>) -> HK<F, B> =
-            { fa: HK<F, A> ->
-                map(fa, f)
-            }
+    fun <A> extract(fa: HK<F, A>) : A
+
 }
