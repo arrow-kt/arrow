@@ -51,9 +51,9 @@ sealed class Validated<out E, out A> : ValidatedKind<E, A> {
         )
     }
 
-    class Valid<out A>(val a: A) : Validated<Nothing, A>()
+    data class Valid<out A>(val a: A) : Validated<Nothing, A>()
 
-    class Invalid<out E>(val e: E) : Validated<E, Nothing>()
+    data class Invalid<out E>(val e: E) : Validated<E, Nothing>()
 
     fun <B> fold(fe: (E) -> B, fa: (A) -> B): B = when (this) {
         is Valid -> fa(a)
