@@ -13,12 +13,12 @@ class IorTest : UnitSpec() {
             forAll { a: Int, b: String ->
                 {
 
-                    Ior.Right(b).flatMap(IntSemigroup) { Ior.Left(a) } == Ior.Left(a) &&
-                            Ior.Right(a).flatMap(IntSemigroup) { Ior.Right(b) } == Ior.Right(b) &&
-                            Ior.Left(a).flatMap(IntSemigroup) { Ior.Right(b) } == Ior.Left(a) &&
-                            Ior.Both(a, b).flatMap(IntSemigroup) { Ior.Left(a) } == Ior.Left(IntSemigroup.combine(a, a)) &&
-                            Ior.Both(a, b).flatMap(IntSemigroup) { Ior.Right(b) } == Ior.Right(b) &&
-                            Ior.Both(a, b).flatMap(IntSemigroup) { Ior.Both(a, b) } == Ior.Both(IntSemigroup.combine(a, a), b)
+                    Ior.Right(b).flatMap(IntMonoid) { Ior.Left(a) } == Ior.Left(a) &&
+                            Ior.Right(a).flatMap(IntMonoid) { Ior.Right(b) } == Ior.Right(b) &&
+                            Ior.Left(a).flatMap(IntMonoid) { Ior.Right(b) } == Ior.Left(a) &&
+                            Ior.Both(a, b).flatMap(IntMonoid) { Ior.Left(a) } == Ior.Left(IntMonoid.combine(a, a)) &&
+                            Ior.Both(a, b).flatMap(IntMonoid) { Ior.Right(b) } == Ior.Right(b) &&
+                            Ior.Both(a, b).flatMap(IntMonoid) { Ior.Both(a, b) } == Ior.Both(IntMonoid.combine(a, a), b)
                 }()
             }
         }
@@ -131,7 +131,7 @@ class IorTest : UnitSpec() {
 
         }
 
-        val intIorMonad = IorMonad(IntSemigroup)
+        val intIorMonad = IorMonad(IntMonoid)
 
         "Ior.monad.flatMap should combine left values" {
             val ior1 = Ior.Both(3, "Hello, world!")
@@ -143,7 +143,7 @@ class IorTest : UnitSpec() {
             forAll { a: Int ->
                 val x = { b: Int -> Ior.Right(b * a) }
                 val ior = Ior.Right(a)
-                ior.flatMap(IntSemigroup, x) == intIorMonad.flatMap(ior, x)
+                ior.flatMap(IntMonoid, x) == intIorMonad.flatMap(ior, x)
             }
         }
 
