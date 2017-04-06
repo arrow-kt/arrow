@@ -137,15 +137,13 @@ open class GlobalInstance<T : Typeclass> : TypeLiteral<T>() {
      */
     fun recurseInterfaces(c: Class<*>) {
         return when {
-            c.interfaces.isEmpty() -> println("$c has no interfaces")
+            c.interfaces.isEmpty() -> Unit
             else -> {
                     c.interfaces.filter {
                         it != Typeclass::class.java && Typeclass::class.java.isAssignableFrom(it)
                     }.forEach { i ->
                         val instanceType = InstanceParametrizedType(i, listOf(type.actualTypeArguments[0]))
-                        println("Considering interface: $i for type: $type and instance type: $instanceType")
                         GlobalInstances.putIfAbsent(instanceType, this)
-                        println("Thread: ${Thread.currentThread().name} Time: ${System.nanoTime()} : registered global instance for type class : $instanceType")
                         recurseInterfaces(i)
                     }
             }
