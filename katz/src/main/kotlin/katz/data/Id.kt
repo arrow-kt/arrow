@@ -16,7 +16,9 @@
 
 package katz
 
-data class Id<out A>(val value: A) : HK<Id.F, A> {
+typealias IdKind<A> = HK<Id.F, A>
+
+data class Id<out A>(val value: A) : IdKind<A> {
 
     class F private constructor()
 

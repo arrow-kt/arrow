@@ -16,13 +16,16 @@
 
 package katz
 
+typealias EitherKind<A, B> = HK2<Either.F, A, B>
+typealias EitherF<L> = HK<Either.F, L>
+
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Either.scala
  *
  * Represents a value of one of two possible types (a disjoint union.)
  * An instance of Either is either an instance of [Left] or [Right].
  */
-sealed class Either<out A, out B> : HK2<Either.F, A, B> {
+sealed class Either<out A, out B> : EitherKind<A, B> {
 
     class F private constructor()
 
