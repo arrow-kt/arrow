@@ -16,7 +16,7 @@
 
 package katz
 
-class CoproductComonad<F, G> : Comonad<CoproductFG<F, G>>, GlobalInstance<Comonad<CoproductFG<F, G>>>() {
+class CoproductComonad<F, G> : Comonad<CoproductFG<F, G>> {
 
     override fun <A, B> coflatMap(fa: CoproductKind<F, G, A>, f: (CoproductKind<F, G, A>) -> B): Coproduct<F, G, B> =
             fa.ev().coflatMap(f)
