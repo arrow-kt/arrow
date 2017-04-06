@@ -126,35 +126,28 @@ class InstanceParametrizedType(val raw: Type, val typeArgs: List<Type>) : Parame
 /**
  * Auto registers subtypes as a global instance for all the functional typeclass interfaces they implement
  */
-open class GlobalInstance<T : Typeclass> {
-
-    operator fun invoke() : GlobalInstance<T> = this
+open class GlobalInstance<T : Typeclass> : TypeLiteral<T>() {
 
     init {
         recurseInterfaces(javaClass)
     }
 
     /**
-     * The original typeclass parametrization that trigger this interface lookup
-     */
-    val type: ParameterizedType
-        get() = (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0] as ParameterizedType
-
-    /**
      * REcursively scan all implemented interfaces and add as global instances all the ones that match a Typeclass
      */
-    fun recurseInterfaces(c : Class<*>) {
+    fun recurseInterfaces(c: Class<*>) {
         return when {
             c.interfaces.isEmpty() -> println("$c has no interfaces")
             else -> {
-                c.interfaces.filter {
-                    it != Typeclass::class.java && Typeclass::class.java.isAssignableFrom(it)
-                }.forEach { i ->
-                    val instanceType = InstanceParametrizedType(i, listOf(type.actualTypeArguments[0]))
-                    GlobalInstances.put(type, this)
-                    println("registered global instance for type class : $instanceType")
-                    recurseInterfaces(i)
-                }
+                    c.interfaces.filter {
+                        it != Typeclass::class.java && Typeclass::class.java.isAssignableFrom(it)
+                    }.forEach { i ->
+                        val instanceType = InstanceParametrizedType(i, listOf(type.actualTypeArguments[0]))
+                        println("Considering interface: $i for type: $type and instance type: $instanceType")
+                        GlobalInstances.put(instanceType, this)
+                        println("Thread: ${Thread.currentThread().name} Time: ${System.nanoTime()} : registered global instance for type class : $instanceType")
+                        recurseInterfaces(i)
+                    }
             }
         }
     }
@@ -165,7 +158,7 @@ open class GlobalInstance<T : Typeclass> {
  * Instrospects the generic type arguments to locate generic interfaces and their type args
  */
 open class TypeLiteral<T> {
-    val type: Type
+    val type: ParameterizedType
         get() {
             val t = (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0]
             //force class initialization if it hasn't already happened
@@ -177,19 +170,19 @@ open class TypeLiteral<T> {
                         Class.forName(typeName, true, javaClass.classLoader)
                     }
                 }
-            } catch (e : Exception) {
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
-            return t
+            return t as ParameterizedType
         }
 }
 
-inline fun <reified T> typeLiteral(): Type = object : TypeLiteral<T>(){}.type
+inline fun <reified T> typeLiteral(): Type = object : TypeLiteral<T>() {}.type
 
 /**
  * A concurrent hash map of local global instances that may be invoked at runtime as if they were implicitly summoned
  */
-val GlobalInstances: MutableMap<Type, GlobalInstance<*>> = ConcurrentHashMap()
+object GlobalInstances: ConcurrentHashMap<Type, GlobalInstance<*>>()
 
 /**
  * Obtains a global registered typeclass instance when fast unsafe runtime lookups are desired over passing instances
@@ -197,13 +190,17 @@ val GlobalInstances: MutableMap<Type, GlobalInstance<*>> = ConcurrentHashMap()
  * in the GlobalInstances map
  */
 
-data class TypeClassInstanceNotFound(val type : Type)
-    : RuntimeException("$type not found in Global Typeclass Instances registry. " +
-        "Please ensure your instances implement `GlobalInstance<$type>` for automatic registration." +
-        "Alternatively invoke `GlobalInstances.put(typeLiteral<$type>(), instance)` if you wish to register " +
-        "or override a typeclass manually")
+data class TypeClassInstanceNotFound(val type: Type)
+    : RuntimeException("Thread: ${Thread.currentThread().name} Time: ${System.nanoTime()} : \n$type not found in Global Typeclass Instances registry. " +
+        "\nPlease ensure your instances implement `GlobalInstance<$type>` for automatic registration." +
+        "\nAlternatively invoke `GlobalInstances.put(typeLiteral<$type>(), instance)` if you wish to register " +
+        "\nor override a typeclass manually" +
+        "\n Current global instances are : \n\n" +
+        GlobalInstances.map { "${it.key} -> ${it.value}" }.joinToString("\n") +
+        "\n"
+)
 
-fun <T: Typeclass> instance(t : Type): T {
+fun <T : Typeclass> instance(t: Type): T {
     if (GlobalInstances.containsKey(t))
         return GlobalInstances.getValue(t) as T
     else throw TypeClassInstanceNotFound(t)

@@ -16,8 +16,8 @@
 
 package katz
 
-object OptionMonad :
-        Monad<Option.F>, GlobalInstance<Monad<Option.F>>() {
+interface OptionMonad :
+        Monad<Option.F> {
 
     override fun <A, B> map(fa: OptionKind<A>, f: (A) -> B): Option<B> =
             fa.ev().map(f)

@@ -86,12 +86,12 @@ class OptionTest : UnitSpec() {
             forAll { a: Int ->
                 val x = { b: Int -> Option(b * a) }
                 val option = Option(a)
-                option.flatMap(x) == OptionMonad.flatMap(option, x)
+                option.flatMap(x) == Option.flatMap(option, x)
             }
         }
 
         "Option.monad.binding should for comprehend over option" {
-            val result = OptionMonad.binding {
+            val result = Option.binding {
                 val x = !Option(1)
                 val y = Option(1).bind()
                 val z = bind { Option(1) }
@@ -101,14 +101,14 @@ class OptionTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over option" {
-            OptionMonad.map(Option(1), Option("a"), Option(true), { (a, b, c) ->
+            Option.map(Option(1), Option("a"), Option(true), { (a, b, c) ->
                 "$a $b $c"
             }) shouldBe Option("1 a true")
         }
 
         "Cartesian builder works inside for comprehensions" {
-            val result = OptionMonad.binding {
-                val (x, y, z) = !OptionMonad.tupled(Option(1), Option(1), Option(1))
+            val result = Option.binding {
+                val (x, y, z) = !Option.tupled(Option(1), Option(1), Option(1))
                 val a = Option(1).bind()
                 val b = bind { Option(1) }
                 yields(x + y + z + a + b)
@@ -118,16 +118,3 @@ class OptionTest : UnitSpec() {
 
     }
 }
-
-
-//
-
-
-//inline fun <reified T : Any> instance(): T {
-//    val type = object : TypeReference<T>() {}.type
-//    type.typeName
-//    if (type is ParameterizedType)
-//        type.actualTypeArguments.forEach {
-//            println(it.typeName)
-//        }
-//}
