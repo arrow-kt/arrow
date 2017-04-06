@@ -28,3 +28,6 @@ interface Inject<in F, out G> : Typeclass {
     fun <A> invoke(fa: HK<F, A>): HK<G, A> = inj()(fa)
 
 }
+
+inline fun <reified F, reified G> inject(): Inject<F, G> =
+        instance(InstanceParametrizedType(Inject::class.java, listOf(F::class.java, G::class.java)))

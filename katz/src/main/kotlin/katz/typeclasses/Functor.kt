@@ -25,3 +25,6 @@ interface Functor<F> : Typeclass {
                 map(fa, f)
             }
 }
+
+inline fun <reified F> functor(): Functor<F> =
+        instance(InstanceParametrizedType(Functor::class.java, listOf(F::class.java)))

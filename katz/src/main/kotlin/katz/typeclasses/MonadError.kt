@@ -50,3 +50,6 @@ fun <F, B> MonadError<F, Throwable>.binding(c: suspend MonadErrorContinuation<F,
     f.startCoroutine(continuation, continuation)
     return continuation.returnedMonad
 }
+
+inline fun <reified F, reified E> monadError(): MonadError<F, E> =
+        instance(InstanceParametrizedType(Functor::class.java, listOf(F::class.java, E::class.java)))

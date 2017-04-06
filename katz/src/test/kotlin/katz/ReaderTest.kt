@@ -49,5 +49,6 @@ class ReaderTest : UnitSpec() {
             r::class.java shouldBe Kleisli::class.java
             r.runId(2).value() shouldBe 4
         }
+
     }
 }

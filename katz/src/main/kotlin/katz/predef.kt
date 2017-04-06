@@ -29,5 +29,5 @@ package katz
 //}
 
 object IntSemigroup : Semigroup<Int>, GlobalInstance<Semigroup<Int>>() {
-    override fun combine(a: Int, b: Int): Int = a
+    override fun combine(a: Int, b: Int): Int = a + b
 }

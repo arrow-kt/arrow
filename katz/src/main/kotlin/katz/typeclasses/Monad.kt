@@ -80,3 +80,6 @@ fun <F, B> Monad<F>.binding(c: suspend MonadContinuation<F, *>.() -> HK<F, B>): 
     f.startCoroutine(continuation, continuation)
     return continuation.returnedMonad
 }
+
+inline fun <reified F> monad(): Monad<F> =
+        instance(InstanceParametrizedType(Monad::class.java, listOf(F::class.java)))

@@ -9,10 +9,11 @@ inline fun <D, A> ((D) -> A).reader(): ReaderT<Id.F, D, A> = Reader(this)
 fun <D, A> ReaderT<Id.F, D, A>.runId(d: D): A = this.run(d).value()
 
 object Reader {
-    operator fun <D, A> invoke(run: (D) -> A): ReaderT<Id.F, D, A> = Kleisli(run.andThen { Id(it) }, Id)
 
-    fun <D, A> pure(x: A): ReaderT<Id.F, D, A> = KleisliC.pure<Id.F, D, A>(x)
+    operator fun <D, A> invoke(run: (D) -> A): ReaderT<Id.F, D, A> = Kleisli(Id, run.andThen { Id(it) })
 
-    fun <D> ask(): ReaderT<Id.F, D, D> = KleisliC.ask<Id.F, D>()
+    fun <D, A> pure(x: A): ReaderT<Id.F, D, A> = Kleisli.pure<Id.F, D, A>(Id, x)
+
+    fun <D> ask(): ReaderT<Id.F, D, D> = Kleisli.ask<Id.F, D>(Id)
 
 }

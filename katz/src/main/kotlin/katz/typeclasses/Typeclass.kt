@@ -203,16 +203,8 @@ data class TypeClassInstanceNotFound(val type : Type)
         "Alternatively invoke `GlobalInstances.put(typeLiteral<$type>(), instance)` if you wish to register " +
         "or override a typeclass manually")
 
-inline fun <reified T : Typeclass> instance(): T {
-    val t = typeLiteral<T>()
+fun <T: Typeclass> instance(t : Type): T {
     if (GlobalInstances.containsKey(t))
         return GlobalInstances.getValue(t) as T
-    else throw TypeClassInstanceNotFound(t)
-}
-
-inline fun <reified F> monad(): Monad<F> {
-    val t = InstanceParametrizedType(Monad::class.java, listOf(typeLiteral<F>()))
-    if (GlobalInstances.containsKey(t))
-        return GlobalInstances.getValue(t) as Monad<F>
     else throw TypeClassInstanceNotFound(t)
 }

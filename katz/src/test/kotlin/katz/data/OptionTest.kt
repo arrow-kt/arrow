@@ -116,10 +116,6 @@ class OptionTest : UnitSpec() {
             result shouldBe Option(5)
         }
 
-        "kikimangui" {
-            val i: Monad<Option.F> = instance()
-            i.pure(1).ev() shouldBe Option(1)
-        }
     }
 }
 

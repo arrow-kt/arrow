@@ -1,34 +1,36 @@
 package katz
 
-class Kleisli<F, D, A> (val run: (D) -> HK<F, A>, val MF: Monad<F>) {
+typealias ReaderT<F, D, A> = Kleisli<F, D, A>
 
-    fun <B> map(f: (A) -> B): Kleisli<F, D, B> = Kleisli({ a -> MF.map(run(a), f) }, MF)
+class Kleisli<F, D, A>(val MF : Monad<F>, val run: (D) -> HK<F, A>) {
+
+    fun <B> map(f: (A) -> B): Kleisli<F, D, B> = Kleisli(MF, { a -> MF.map(run(a), f) })
 
     fun <B> flatMap(f: (A) -> Kleisli<F, D, B>): Kleisli<F, D, B> =
-            Kleisli({ d ->
+            Kleisli(MF, { d ->
                 MF.flatMap(run(d)) { a -> f(a).run(d) }
-            }, MF)
+            })
+
+    inline fun <reified F, D, A> Kleisli<F, D, Kleisli<F, D, A>>.flatten(): Kleisli<F, D, A> =
+            flatMap({ it })
 
     fun <B> zip(o: Kleisli<F, D, B>): Kleisli<F, D, Pair<A, B>> =
-            this.flatMap { a ->
-                o.map { b -> Pair(a, b) }
-            }
+            flatMap({ a ->
+                o.map({ b -> Pair(a, b) })
+            })
 
-    fun <DD> local(f: (DD) -> D): Kleisli<F, DD, A> = Kleisli({ dd -> run(f(dd)) }, MF)
-}
+    fun <DD> local(f: (DD) -> D): Kleisli<F, DD, A> = Kleisli(MF, { dd -> run(f(dd)) })
 
-object KleisliC {
+    companion object {
 
-    inline operator fun <reified F, D, A> invoke(noinline run: (D) -> HK<F, A>, MF : Monad<F> = instance<Monad<F>>()): Kleisli<F, D, A> = Kleisli(run, MF)
+        inline operator fun <reified F, D, A> invoke(MF : Monad<F> = monad<F>(), noinline run: (D) -> HK<F, A>): Kleisli<F, D, A> = Kleisli(MF, run)
 
-    inline fun <reified F, D, A> pure(x: A, MF: Monad<F> = monad<F>()): Kleisli<F, D, A> {
-        return KleisliC({ _ -> MF.pure(x) })
+        inline fun <reified F, D, A> pure(MF : Monad<F> = monad<F>(), x: A): Kleisli<F, D, A> = Kleisli(MF, { _ -> MF.pure(x) })
+
+        inline fun <reified F, D> ask(MF : Monad<F> = monad<F>()): Kleisli<F, D, D> = Kleisli(MF, { MF.pure(it) })
     }
 
-    inline fun <reified F, D> ask(AP : Applicative<F> = instance<Applicative<F>>()): Kleisli<F, D, D> = KleisliC({ AP.pure(it) })
 }
 
-fun <F, D, A> Kleisli<F, D, Kleisli<F, D, A>>.flatten(): Kleisli<F, D, A> =
-        flatMap { it }
 
-typealias ReaderT<F, D, A> = Kleisli<F, D, A>
+

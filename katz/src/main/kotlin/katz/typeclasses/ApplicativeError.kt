@@ -30,3 +30,6 @@ interface ApplicativeError<F, E> : Applicative<F>, Typeclass {
                 pure(Either.Left(it))
             }
 }
+
+inline fun <reified F, reified E> applicativeError(): ApplicativeError<F, E> =
+        instance(InstanceParametrizedType(Monad::class.java, listOf(F::class.java, E::class.java)))

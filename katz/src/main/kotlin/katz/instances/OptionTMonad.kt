@@ -16,8 +16,8 @@
 
 package katz
 
-class OptionTMonad<F> : Monad<OptionTF<F>> {
-    override fun <A> pure(a: A): OptionT<F, A> = OptionT.pure(a)
+class OptionTMonad<F>(val MF : Monad<F>) : Monad<OptionTF<F>> {
+    override fun <A> pure(a: A): OptionT<F, A> = OptionT(MF, MF.pure(Option(a)))
 
     override fun <A, B> flatMap(fa: OptionTKind<F, A>, f: (A) -> OptionTKind<F, B>): OptionT<F, B> =
             fa.ev().flatMap { f(it).ev() }
