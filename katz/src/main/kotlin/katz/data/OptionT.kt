@@ -89,5 +89,3 @@ data class OptionT<F, A>(val MF: Monad<F>, val value: HK<F, Option<A>>) : Option
 
     //TODO: add toRight() and toLeft() once EitherT it's available
 }
-
-
