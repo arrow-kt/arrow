@@ -42,5 +42,10 @@ data class Coproduct<F, G, A>(val CF: Comonad<F>, val CG: Comonad<G>, val run: E
     fun <H> fold(f: FunctionK<F, H>, g: FunctionK<G, H>): HK<H, A> =
             run.fold({ f(it) }, { g(it) })
 
+    companion object {
+        inline fun <reified F, reified G, A> invoke(CF: Comonad<F> = comonad<F>(), CG: Comonad<G> = comonad<G>(), run: Either<HK<F, A>, HK<G, A>>) =
+                Coproduct(CF, CG, run)
+    }
+
 }
 
