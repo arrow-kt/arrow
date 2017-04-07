@@ -33,6 +33,8 @@ interface Monad<F> : Applicative<F>, Typeclass {
 
     fun <A> flatten(ffa: HK<F, HK<F, A>>): HK<F, A> =
             flatMap(ffa, { it })
+
+    fun <A, B> tailRecM(a: A, f: (A) -> HK<F, Either<A, B>>) : HK<F, B>
 }
 
 @RestrictsSuspension

@@ -48,11 +48,11 @@ class NonEmptyList<out A> private constructor(
     fun <B> flatMap(f: (A) -> NonEmptyList<B>): NonEmptyList<B> =
             f(head) + tail.flatMap { f(it).all }
 
-    operator fun <A> NonEmptyList<A>.plus(l: NonEmptyList<A>): NonEmptyList<A> = NonEmptyList(all + l.all)
+    infix operator fun <A> NonEmptyList<A>.plus(l: NonEmptyList<A>): NonEmptyList<A> = NonEmptyList(all + l.all)
 
-    operator fun <A> NonEmptyList<A>.plus(l: List<A>): NonEmptyList<A> = NonEmptyList(all + l)
+    infix operator fun <A> NonEmptyList<A>.plus(l: List<A>): NonEmptyList<A> = NonEmptyList(all + l)
 
-    operator fun <A> NonEmptyList<A>.plus(a: A): NonEmptyList<A> = NonEmptyList(all + a)
+    infix operator fun <A> NonEmptyList<A>.plus(a: A): NonEmptyList<A> = NonEmptyList(all + a)
 
     fun iterator(): Iterator<A> = all.iterator()
 
@@ -77,5 +77,7 @@ class NonEmptyList<out A> private constructor(
 
     companion object : NonEmptyListMonad, GlobalInstance<Monad<NonEmptyList.F>>() {
         fun <A> of(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
+        fun <A> fromList(l : List<A>): Option<NonEmptyList<A>> = if (l.isEmpty()) Option.None else Option.Some(NonEmptyList(l))
+        fun <A> fromListUnsafe(l : List<A>): NonEmptyList<A> =NonEmptyList(l)
     }
 }
