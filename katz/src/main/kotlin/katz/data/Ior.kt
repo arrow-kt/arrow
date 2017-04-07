@@ -271,7 +271,7 @@ sealed class Ior<out A, out B> : IorKind<A, B> {
  *
  * @param f The function to bind across [Ior.Right].
  */
-inline fun <A, B, D> Ior<A, B>.flatMap(SA : Semigroup<A>, crossinline f: (B) -> Ior<A, D>): Ior<A, D> = when (this) {
+inline fun <A, B, D> Ior<A, B>.flatMap(SA: Semigroup<A>, crossinline f: (B) -> Ior<A, D>): Ior<A, D> = when (this) {
     is Ior.Left -> Ior.Left(value)
     is Ior.Right -> f(value)
     is Ior.Both -> {
