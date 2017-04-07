@@ -18,7 +18,8 @@ package katz
 
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
-import java.util.*
+import java.util.Arrays
+import java.util.Objects
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -38,10 +39,10 @@ class InstanceParametrizedType(val raw: Type, val typeArgs: List<Type>) : Parame
 
     override fun getActualTypeArguments(): Array<Type> = typeArgs.toTypedArray()
 
-    override fun equals(o: Any?): Boolean {
-        if (o is ParameterizedType) {
+    override fun equals(other: Any?): Boolean {
+        if (other is ParameterizedType) {
             // Check that information is equivalent
-            val that = o
+            val that = other
 
             if (this === that)
                 return true
@@ -54,10 +55,7 @@ class InstanceParametrizedType(val raw: Type, val typeArgs: List<Type>) : Parame
                     thatOwner == null
                 else
                     ownerType == thatOwner
-                val rawEquality = if (rawType == null)
-                    thatRawType == null
-                else
-                    rawType == thatRawType
+                val rawEquality = rawType == thatRawType
 
                 val typeArgEquality = Arrays.equals(actualTypeArguments, // avoid clone
                         that.actualTypeArguments)
@@ -120,7 +118,6 @@ class InstanceParametrizedType(val raw: Type, val typeArgs: List<Type>) : Parame
         return sb.toString()
     }
 
-
 }
 
 /**
@@ -139,13 +136,13 @@ open class GlobalInstance<T : Typeclass> : TypeLiteral<T>() {
         return when {
             c.interfaces.isEmpty() -> Unit
             else -> {
-                    c.interfaces.filter {
-                        it != Typeclass::class.java && Typeclass::class.java.isAssignableFrom(it)
-                    }.forEach { i ->
-                        val instanceType = InstanceParametrizedType(i, listOf(type.actualTypeArguments[0]))
-                        GlobalInstances.putIfAbsent(instanceType, this)
-                        recurseInterfaces(i)
-                    }
+                c.interfaces.filter {
+                    it != Typeclass::class.java && Typeclass::class.java.isAssignableFrom(it)
+                }.forEach { i ->
+                    val instanceType = InstanceParametrizedType(i, listOf(type.actualTypeArguments[0]))
+                    GlobalInstances.putIfAbsent(instanceType, this)
+                    recurseInterfaces(i)
+                }
             }
         }
     }
@@ -168,10 +165,9 @@ open class TypeLiteral<T> {
                         Class.forName(typeName, true, javaClass.classLoader)
                     }
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
+            } finally {
+                return t as ParameterizedType
             }
-            return t as ParameterizedType
         }
 }
 
@@ -180,7 +176,7 @@ inline fun <reified T> typeLiteral(): Type = object : TypeLiteral<T>() {}.type
 /**
  * A concurrent hash map of local global instances that may be invoked at runtime as if they were implicitly summoned
  */
-object GlobalInstances: ConcurrentHashMap<Type, GlobalInstance<*>>()
+object GlobalInstances : ConcurrentHashMap<Type, GlobalInstance<*>>()
 
 /**
  * Obtains a global registered typeclass instance when fast unsafe runtime lookups are desired over passing instances
@@ -198,6 +194,7 @@ data class TypeClassInstanceNotFound(val type: Type)
         "\n"
 )
 
+@Suppress("UNCHECKED_CAST")
 fun <T : Typeclass> instance(t: Type): T {
     if (GlobalInstances.containsKey(t))
         return GlobalInstances.getValue(t) as T

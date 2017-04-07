@@ -2,7 +2,7 @@ package katz
 
 typealias ReaderT<F, D, A> = Kleisli<F, D, A>
 
-class Kleisli<F, D, A>(val MF : Monad<F>, val run: (D) -> HK<F, A>) {
+class Kleisli<F, D, A>(val MF: Monad<F>, val run: (D) -> HK<F, A>) {
 
     fun <B> map(f: (A) -> B): Kleisli<F, D, B> = Kleisli(MF, { a -> MF.map(run(a), f) })
 
@@ -23,14 +23,11 @@ class Kleisli<F, D, A>(val MF : Monad<F>, val run: (D) -> HK<F, A>) {
 
     companion object {
 
-        inline operator fun <reified F, D, A> invoke(MF : Monad<F> = monad<F>(), noinline run: (D) -> HK<F, A>): Kleisli<F, D, A> = Kleisli(MF, run)
+        inline operator fun <reified F, D, A> invoke(MF: Monad<F> = monad<F>(), noinline run: (D) -> HK<F, A>): Kleisli<F, D, A> = Kleisli(MF, run)
 
-        inline fun <reified F, D, A> pure(MF : Monad<F> = monad<F>(), x: A): Kleisli<F, D, A> = Kleisli(MF, { _ -> MF.pure(x) })
+        inline fun <reified F, D, A> pure(MF: Monad<F> = monad<F>(), x: A): Kleisli<F, D, A> = Kleisli(MF, { _ -> MF.pure(x) })
 
-        inline fun <reified F, D> ask(MF : Monad<F> = monad<F>()): Kleisli<F, D, D> = Kleisli(MF, { MF.pure(it) })
+        inline fun <reified F, D> ask(MF: Monad<F> = monad<F>()): Kleisli<F, D, D> = Kleisli(MF, { MF.pure(it) })
     }
 
 }
-
-
-
