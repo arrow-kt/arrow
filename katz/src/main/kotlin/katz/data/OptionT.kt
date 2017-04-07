@@ -24,7 +24,7 @@ typealias OptionTF<F> = HK<OptionT.F, F>
  *
  * It may also be said that [OptionT] is a monad transformer for [Option].
  */
-data class OptionT<F, A>(val MF : Monad<F>, val value: HK<F, Option<A>>) : OptionTKind<F, A> {
+data class OptionT<F, A>(val MF: Monad<F>, val value: HK<F, Option<A>>) : OptionTKind<F, A> {
 
     class F private constructor()
 
@@ -34,15 +34,15 @@ data class OptionT<F, A>(val MF : Monad<F>, val value: HK<F, Option<A>>) : Optio
 
         inline fun <reified F, A> pure(a: A, MF : Monad<F> = monad<F>()): OptionT<F, A> = OptionT(MF, MF.pure(Option.Some(a)))
 
-        inline fun <reified F> none(MF : Monad<F> = monad<F>()): OptionT<F, Nothing> = OptionT(MF, MF.pure(Option.None))
+        inline fun <reified F> none(MF: Monad<F> = monad<F>()): OptionT<F, Nothing> = OptionT(MF, MF.pure(Option.None))
 
-        inline fun <reified F, A> fromOption(value: Option<A>, MF : Monad<F> = monad<F>()): OptionT<F, A> = OptionT(MF, MF.pure(value))
+        inline fun <reified F, A> fromOption(value: Option<A>, MF: Monad<F> = monad<F>()): OptionT<F, A> = OptionT(MF, MF.pure(value))
     }
 
     inline fun <B> fold(crossinline default: () -> B, crossinline f: (A) -> B): HK<F, B> =
             MF.map(value, { option -> option.fold({ default() }, { f(it) }) })
 
-    inline fun <B> cata(F: Functor<F>, crossinline default: () -> B, crossinline f: (A) -> B): HK<F, B> =
+    inline fun <B> cata(crossinline default: () -> B, crossinline f: (A) -> B): HK<F, B> =
             fold({ default() }, { f(it) })
 
     inline fun <B> flatMap(crossinline f: (A) -> OptionT<F, B>): OptionT<F, B> = flatMapF({ it -> f(it).value })
