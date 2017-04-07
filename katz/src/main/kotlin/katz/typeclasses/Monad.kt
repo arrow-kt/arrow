@@ -24,7 +24,7 @@ import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
 import kotlin.coroutines.experimental.startCoroutine
 
-interface Monad<F> : Applicative<F> {
+interface Monad<F> : Applicative<F>, Typeclass {
 
     fun <A, B> flatMap(fa: HK<F, A>, f: (A) -> HK<F, B>): HK<F, B>
 
@@ -80,3 +80,6 @@ fun <F, B> Monad<F>.binding(c: suspend MonadContinuation<F, *>.() -> HK<F, B>): 
     f.startCoroutine(continuation, continuation)
     return continuation.returnedMonad
 }
+
+inline fun <reified F> monad(): Monad<F> =
+        instance(InstanceParametrizedType(Monad::class.java, listOf(F::class.java)))

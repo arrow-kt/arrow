@@ -16,7 +16,7 @@
 
 package katz
 
-interface ApplicativeError<F, E> : Applicative<F> {
+interface ApplicativeError<F, E> : Applicative<F>, Typeclass {
 
     fun <A> raiseError(e: E): HK<F, A>
 
@@ -30,3 +30,6 @@ interface ApplicativeError<F, E> : Applicative<F> {
                 pure(Either.Left(it))
             }
 }
+
+inline fun <reified F, reified E> applicativeError(): ApplicativeError<F, E> =
+        instance(InstanceParametrizedType(Monad::class.java, listOf(F::class.java, E::class.java)))

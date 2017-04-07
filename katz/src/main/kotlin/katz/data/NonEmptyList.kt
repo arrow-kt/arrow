@@ -75,7 +75,7 @@ class NonEmptyList<out A> private constructor(
         return "NonEmptyList(all=$all)"
     }
 
-    companion object Factory {
+    companion object : NonEmptyListMonad, GlobalInstance<Monad<NonEmptyList.F>>() {
         fun <A> of(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
     }
 }

@@ -16,7 +16,7 @@
 
 package katz
 
-object NonEmptyListMonad : Monad<NonEmptyList.F> {
+interface NonEmptyListMonad : Monad<NonEmptyList.F> {
 
     override fun <A, B> map(fa: NonEmptyListKind<A>, f: (A) -> B): NonEmptyList<B> =
             fa.ev().map(f)
