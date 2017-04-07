@@ -30,6 +30,8 @@ data class OptionT<F, A>(val MF : Monad<F>, val value: HK<F, Option<A>>) : Optio
 
     companion object {
 
+        inline operator fun <reified F, A> invoke(value: HK<F, Option<A>>, MF : Monad<F> = monad<F>()): OptionT<F, A> = OptionT(MF, value)
+
         inline fun <reified F, A> pure(a: A, MF : Monad<F> = monad<F>()): OptionT<F, A> = OptionT(MF, MF.pure(Option.Some(a)))
 
         inline fun <reified F> none(MF : Monad<F> = monad<F>()): OptionT<F, Nothing> = OptionT(MF, MF.pure(Option.None))
@@ -89,4 +91,3 @@ data class OptionT<F, A>(val MF : Monad<F>, val value: HK<F, Option<A>>) : Optio
 }
 
 
-inline fun <reified F, A> optionT(value: HK<F, Option<A>>, MF : Monad<F> = monad<F>()): OptionT<F, A> = OptionT(MF, value)

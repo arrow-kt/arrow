@@ -25,9 +25,9 @@ class OptionTTest : UnitSpec() {
     init {
         "map should modify value" {
             forAll { a: String ->
-                val ot = optionT(Id(Option.Some(a)))
+                val ot = OptionT(Id(Option.Some(a)))
                 val mapped = ot.map({ "$it power" })
-                val expected = optionT(Id(Option.Some("$a power")))
+                val expected = OptionT(Id(Option.Some("$a power")))
 
                 mapped == expected
             }
@@ -35,23 +35,23 @@ class OptionTTest : UnitSpec() {
 
         "flatMap should modify entity" {
             forAll { a: String ->
-                val ot = optionT(NonEmptyList.of(Option.Some(a)))
-                val mapped = ot.flatMap{ optionT(NonEmptyList.of(Option.Some(3))) }
+                val ot = OptionT(NonEmptyList.of(Option.Some(a)))
+                val mapped = ot.flatMap{ OptionT(NonEmptyList.of(Option.Some(3))) }
                 val expected: OptionT<NonEmptyList.F, Int> = OptionT.pure(3)
 
                 mapped == expected
             }
 
             forAll { ignored: String ->
-                val ot = optionT(NonEmptyList.of(Option.Some(ignored)))
-                val mapped = ot.flatMap { optionT(NonEmptyList.of(Option.None)) }
+                val ot = OptionT(NonEmptyList.of(Option.Some(ignored)))
+                val mapped = ot.flatMap { OptionT(NonEmptyList.of(Option.None)) }
                 val expected = OptionT.none<NonEmptyList.F>()
 
                 mapped == expected
             }
 
             OptionT.none<NonEmptyList.F>()
-                    .flatMap { optionT(NonEmptyList.of(Option.Some(2))) } shouldBe optionT(NonEmptyList.of(Option.None))
+                    .flatMap { OptionT(NonEmptyList.of(Option.Some(2))) } shouldBe OptionT(NonEmptyList.of(Option.None))
         }
 
         "from option should build a correct OptionT" {
