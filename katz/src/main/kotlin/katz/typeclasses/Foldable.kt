@@ -146,7 +146,7 @@ interface Foldable<F> {
      * needed.
      */
     fun <G, A, B> traverse_(ag: Applicative<G>, fa: HK<F, A>): (f: (A) -> HK<G, B>) -> HK<G, Unit> {
-        
+
         /*foldRight(fa, Always(G.pure(()))) { (a, acc) =>
             G.map2Eval(f(a), acc) { (_, _) => () }
         }.value*/
