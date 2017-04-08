@@ -169,5 +169,33 @@ class ValidatedTest : UnitSpec() {
             Valid(10).withEither { Either.Left(5) } shouldBe Invalid(5)
             Invalid(10).withEither { it } shouldBe Invalid(10)
         }
+
+        val concatStringSG: Semigroup<String> = object : Semigroup<String> {
+            override fun combine(a: String, b: String): String = "$a $b"
+        }
+
+        "Cartesian builder should build products over homogeneous Validated" {
+            ValidatedApplicativeError(concatStringSG).map(
+                    Valid("11th"),
+                    Valid("Doctor"),
+                    Valid("Who"),
+                    { (a, b, c) -> "$a $b $c" }) shouldBe Valid("11th Doctor Who")
+        }
+
+        "Cartesian builder should build products over heterogeneous Validated" {
+            ValidatedApplicativeError(concatStringSG).map(
+                    Valid(13),
+                    Valid("Doctor"),
+                    Valid(false),
+                    { (a, b, c) -> "${a}th $b is $c" }) shouldBe Valid("13th Doctor is false")
+        }
+
+        "Cartesian builder should build products over Invalid Validated" {
+            ValidatedApplicativeError(concatStringSG).map(
+                    Invalid("fail1"),
+                    Invalid("fail2"),
+                    Valid("Who"),
+                    { (a, b, c) -> "${a}th $b $c" }) shouldBe Invalid("fail1 fail2")
+        }
     }
 }
