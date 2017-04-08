@@ -16,7 +16,7 @@
 
 package katz
 
-interface Functor<F> {
+interface Functor<F> : Typeclass {
 
     fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B>
 
@@ -25,3 +25,6 @@ interface Functor<F> {
                 map(fa, f)
             }
 }
+
+inline fun <reified F> functor(): Functor<F> =
+        instance(InstanceParametrizedType(Functor::class.java, listOf(F::class.java)))

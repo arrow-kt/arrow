@@ -16,7 +16,7 @@
 
 package katz
 
-object IdMonad : Monad<Id.F> {
+interface IdMonad : Monad<Id.F> {
 
     override fun <A, B> map(fa: IdKind<A>, f: (A) -> B): Id<B> =
             fa.ev().map(f)
@@ -26,7 +26,3 @@ object IdMonad : Monad<Id.F> {
     override fun <A, B> flatMap(fa: IdKind<A>, f: (A) -> IdKind<B>): Id<B> =
             fa.ev().flatMap { f(it).ev() }
 }
-
-fun <A> IdKind<A>.ev(): Id<A> = this as Id<A>
-
-fun <A> IdKind<A>.value(): A = this.ev().value

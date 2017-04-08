@@ -43,11 +43,11 @@ class NonEmptyListTest : UnitSpec() {
         "NonEmptyListMonad.flatMap should be consistent with NonEmptyList#flatMap" {
             val nel = NonEmptyList.of(1, 2)
             val nel2 = NonEmptyList.of(1, 2)
-            nel.flatMap { nel2 } shouldBe NonEmptyListMonad.flatMap(nel) { nel2 }
+            nel.flatMap { nel2 } shouldBe NonEmptyList.flatMap(nel) { nel2 }
         }
 
         "NonEmptyListMonad.binding should for comprehend over NonEmptyList" {
-            val result = NonEmptyListMonad.binding {
+            val result = NonEmptyList.binding {
                 val x = !NonEmptyList.of(1)
                 val y = NonEmptyList.of(2).bind()
                 val z = bind { NonEmptyList.of(3) }
@@ -57,7 +57,7 @@ class NonEmptyListTest : UnitSpec() {
         }
 
         "NonEmptyListMonad.binding should for comprehend over complex NonEmptyList" {
-            val result = NonEmptyListMonad.binding {
+            val result = NonEmptyList.binding {
                 val x = !NonEmptyList.of(1, 2)
                 val y = NonEmptyList.of(3).bind()
                 val z = bind { NonEmptyList.of(4) }
@@ -71,7 +71,7 @@ class NonEmptyListTest : UnitSpec() {
                 val nel: NonEmptyList<Int> = NonEmptyList(a, b)
                 val nel2 = NonEmptyList.of(1, 2)
                 val nel3 = NonEmptyList.of(3, 4, 5)
-                val result: HK<NonEmptyList.F, Int> = NonEmptyListMonad.binding {
+                val result: HK<NonEmptyList.F, Int> = NonEmptyList.binding {
                     val x = !nel
                     val y = nel2.bind()
                     val z = bind { nel3 }

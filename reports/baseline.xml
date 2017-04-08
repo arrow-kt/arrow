@@ -33,5 +33,7 @@
         <ID>NamingConventionViolation:Applicative.kt$Tuple8&lt;out A, out B, out C, out D, out E, out F, out G, out H&gt;</ID>
         <ID>NamingConventionViolation:Applicative.kt$Tuple9&lt;out A, out B, out C, out D, out E, out F, out G, out H, out I&gt;</ID>
         <ID>NamingConventionViolation:Applicative.kt$Tuple10&lt;out A, out B, out C, out D, out E, out F, out G, out H, out I, out J&gt;</ID>
+    <Whitelist timestamp="1491577642554">
+        <ID>EmptyClassBlock:Typeclass.kt$&lt;no name provided&gt; : TypeLiteral</ID>
     </Whitelist>
 </SmellBaseline>
