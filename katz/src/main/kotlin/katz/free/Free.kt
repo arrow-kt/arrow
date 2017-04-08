@@ -19,9 +19,16 @@ package katz
 typealias FreeKind<S, A> = HK2<Free.F, S, A>
 typealias FreeF<S> = HK<Free.F, S>
 
+fun <S, A> FreeKind<S, A>.ev(): Free<S, A> = this as Free<S, A>
+
 sealed class Free<S, A> : FreeKind<S, A> {
 
     class F private constructor()
+
+    companion object {
+        fun <S, A> pure(a : A): Free<S, A> = Pure(a)
+        fun <S, A> liftF(fa: HK<S, A>): Free<S, A> = Suspend(fa)
+    }
 
     private data class Pure<S, A>(val a: A) : Free<S, A>()
     private data class Suspend<S, A>(val a: HK<S, A>) : Free<S, A>()
@@ -34,29 +41,31 @@ sealed class Free<S, A> : FreeKind<S, A> {
             FlatMapped(this, f)
 
     @Suppress("UNCHECKED_CAST")
-    tailrec fun step(): Free<S, A> =
-            if (this !is FlatMapped<S, A, *>) {
-                this
-            } else {
-                val x = this
-                val xf = (x.f as (A) -> Free<S, A>)
-                val xc = x.c as Free<S, A>
-                when (x) {
-                    is FlatMapped<S, A, *> -> xc.flatMap { xf(it).flatMap(x.f) }.step()
-                    is Pure<S, A> -> xf(x.a)
-                    is Suspend<S, A> -> x
+    tailrec fun step(): Free<S, A> {
+        return when (this) {
+            is Free.Pure -> this
+            is Free.Suspend -> this
+            is Free.FlatMapped<S, *, *> -> {
+                val xf = this.f as (A) -> Free<S, A>
+                val xc = this.c as Free<S, A>
+                return when (this) {
+                    is Free.Pure -> xf(this.a)
+                    is Free.Suspend -> this
+                    is Free.FlatMapped<S, *, *> -> xc.flatMap { xf(it).flatMap(xf) }.step()
                 }
             }
+        }
+    }
 
     @Suppress("UNCHECKED_CAST")
-    tailrec fun resume(SF: Functor<S>): Either<HK<S, Free<S, A>>, A> = when (this) {
+    fun resume(SF: Functor<S>): Either<HK<S, Free<S, A>>, A> = when (this) {
         is Pure -> Either.Right(this.a)
         is Suspend -> Either.Left(SF.map(this.a, { Pure<S, A>(it) }))
-        is FlatMapped<S, A, *> -> {
+        is FlatMapped<S, *, *> -> {
             val xf = (this.f as (A) -> Free<S, A>)
             val xc = this.c as Free<S, A>
             when (xc) {
-                is FlatMapped<S, A, *> -> {
+                is FlatMapped<S, *, *> -> {
                     val xc2 = xc.c as Free<S, A>
                     xc2.flatMap { xf(it).flatMap(xf) }.resume(SF)
                 }
@@ -70,24 +79,23 @@ sealed class Free<S, A> : FreeKind<S, A> {
     fun <B> fold(SF: Functor<S>, r: (A) -> B, s: (HK<S, Free<S, A>>) -> B): B =
             resume(SF).fold(s, r)
 
-    tailrec private fun loop(SF: Functor<S>, t: Free<S, A>, f: (HK<S, Free<S, A>>) -> Free<S, A>): A =
+    private fun loop(SF: Functor<S>, t: Free<S, A>, f: (HK<S, Free<S, A>>) -> Free<S, A>): A =
             t.resume(SF).fold({ l -> loop(SF, f(l), f) }, { it })
-
 
     fun go(SF: Functor<S>, f: (HK<S, Free<S, A>>) -> Free<S, A>): A = loop(SF, this, f)
 
     @Suppress("UNCHECKED_CAST")
     fun <M> foldMap(MM: Monad<M>, f: FunctionK<S, M>): HK<M, A> =
-        MM.tailRecM(step()) {
-            when (it) {
-                is Pure<S, A> -> MM.pure(Either.Right(it.a))
-                is Suspend<S, A> -> MM.map(f(it.a), { a -> Either.Right(a) })
-                is FlatMapped<S, A, *> -> {
-                    val xf = (it.f as (A) -> Free<S, A>)
-                    val xc = it.c as Free<S, A>
-                    MM.map(xc.foldMap(MM, f), { a -> Either.Left(xf(a)) })
+            MM.tailRecM(step()) {
+                when (it) {
+                    is Pure<S, A> -> MM.pure(Either.Right(it.a))
+                    is Suspend<S, A> -> MM.map(f(it.a), { a -> Either.Right(a) })
+                    is FlatMapped<S, A, *> -> {
+                        val xf = (it.f as (A) -> Free<S, A>)
+                        val xc = it.c as Free<S, A>
+                        MM.map(xc.foldMap(MM, f), { a -> Either.Left(xf(a)) })
+                    }
                 }
             }
-        }
 
 }
