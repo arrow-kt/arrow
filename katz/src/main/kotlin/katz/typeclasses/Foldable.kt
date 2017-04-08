@@ -16,6 +16,8 @@
 
 package katz
 
+import katz.Eval.EvalFactory.always
+
 /**
  * Data structures that can be folded to a summary value.
  *
@@ -55,18 +57,13 @@ interface Foldable<F> {
      *
      * Note: will not terminate for infinite-sized collections.
      */
-    fun <A> size(ml: Monoid<Long>, fa: HK<F, A>): Long {
-        val foldM = foldMap(ml, fa)
-        return foldM { _ -> 1L }
-    }
+    fun <A> size(ml: Monoid<Long>, fa: HK<F, A>): Long = foldMap(ml, fa)({ _ -> 1L })
 
     /**
      * Fold implemented using the given Monoid[A] instance.
      */
-    fun <A> fold(ma: Monoid<A>, fa: HK<F, A>): A {
-        val foldL = foldL(fa, ma.empty())
-        return foldL { acc, a -> ma.combine(acc, a) }
-    }
+    fun <A> fold(ma: Monoid<A>, fa: HK<F, A>): A =
+            foldL(fa, ma.empty())({ acc, a -> ma.combine(acc, a) })
 
     /**
      * Alias for [[fold]].
@@ -77,10 +74,8 @@ interface Foldable<F> {
      * Fold implemented by mapping `A` values into `B` and then
      * combining them using the given `Monoid[B]` instance.
      */
-    fun <A, B> foldMap(mb: Monoid<B>, fa: HK<F, A>): (f: (A) -> B) -> B {
-        val foldL = foldL(fa, mb.empty())
-        return { f: (A) -> B -> foldL { b, a -> mb.combine(b, f(a)) } }
-    }
+    fun <A, B> foldMap(mb: Monoid<B>, fa: HK<F, A>): (f: (A) -> B) -> B =
+            { f: (A) -> B -> foldL(fa, mb.empty())({ b, a -> mb.combine(b, f(a)) }) }
 
     /**
      * Left associative monadic folding on `F`.
@@ -146,9 +141,39 @@ interface Foldable<F> {
      * needed.
      */
     fun <G, A, B> traverse_(ag: Applicative<G>, fa: HK<F, A>): (f: (A) -> HK<G, B>) -> HK<G, Unit> {
+        val foldR = foldR(fa, always { ag.pure(Unit) })
+        return { f: (A) -> HK<G, B> -> foldR({ a, acc -> ag.map2Eval(f(a), acc) { Unit } }).value() }
+    }
 
-        /*foldRight(fa, Always(G.pure(()))) { (a, acc) =>
-            G.map2Eval(f(a), acc) { (_, _) => () }
-        }.value*/
+    /**
+     * Check whether at least one element satisfies the predicate.
+     *
+     * If there are no elements, the result is `false`.
+     */
+    fun <A> exists(fa: HK<F, A>): (p: (A) -> Boolean) -> Boolean =
+            { p: (A) -> Boolean -> foldR(fa, Eval.False)({ a, lb -> if (p(a)) Eval.True else lb }).value() }
+
+    /**
+     * Check whether all elements satisfy the predicate.
+     *
+     * If there are no elements, the result is `true`.
+     */
+    fun <A> forall(fa: HK<F, A>): (p: (A) -> Boolean) -> Boolean =
+            { p: (A) -> Boolean -> foldR(fa, Eval.True)({ a, lb -> if (p(a)) lb else Eval.False }).value() }
+
+    /**
+     * Returns true if there are no elements. Otherwise false.
+     */
+    fun <A> isEmpty(fa: HK<F, A>): Boolean = foldR(fa, Eval.True)({ _, _ -> Eval.False }).value()
+
+    fun <A> nonEmpty(fa: HK<F, A>): Boolean = !isEmpty(fa)
+
+    companion object {
+        fun <A, B> iterateRight(it: Iterator<A>, lb: Eval<B>): (f: (A, Eval<B>) -> Eval<B>) -> Eval<B> = {
+            f: (A, Eval<B>) -> Eval<B> ->
+            fun loop(): Eval<B> =
+                    Eval.defer { if (it.hasNext()) f(it.next(), loop()) else lb }
+            loop()
+        }
     }
 }

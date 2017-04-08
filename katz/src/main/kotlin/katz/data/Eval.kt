@@ -43,43 +43,48 @@ package katz
  * Eval instance -- this can defeat the trampolining and lead to stack
  * overflows.
  */
-sealed class Eval<out A> {
+sealed class Eval<A> {
 
     abstract fun value(): A
 
     abstract fun memoize(): Eval<A>
 
-    /*fun <B> map(f: (A) -> B): Eval<B> = flatMap { a -> Now(f(a)) }
+    fun <B> map(f: (A) -> B): Eval<B> = flatMap { a -> Now(f(a)) }
 
-    fun <B> flatMap(f: (A) -> Eval<B>): Eval<B> =
-            this match {
-                case c : Eval . Compute [ A] =>
-                new Eval . Compute [ B] {
-                type Start = c . Start
-                // See https://issues.scala-lang.org/browse/SI-9931 for an explanation
-                // of why the type annotations are necessary in these two lines on
-                // Scala 2.12.0.
-                val start: () => Eval[Start] = c.start
-                val run: Start => Eval[B] = (s: c.Start) =>
-                new Eval . Compute [ B] {
-                type Start = A
-                val start = () => c.run(s)
-                val run = f
+    fun <B> flatMap(f: (A) -> Eval<B>): Eval<B> = when (this) {
+        is Compute<A, *> -> object : Compute<B, Compute.Start>() {
+            override val start: () -> Eval<Start> = (this@Eval as Compute<A, Start>).start
+            override val run: (Start) -> Eval<B> = { s: Compute.Start ->
+                object : Compute<B, A>() {
+                    override val start: () -> Eval<A> = { (this@Eval as Compute<A, Start>).run(s) }
+                    override val run = f
+                }
             }
-            }
-                case c : Eval . Call [ A] =>
-                new Eval . Compute [ B] {
-                type Start = A
-                val start = c.thunk
-                val run = f
-            }
-                case _ =>
-                new Eval . Compute [ B] {
-                type Start = A
-                val start = () => self
-                val run = f
-            }
-            }*/
+        }
+        is Eval.Call<A> -> object : Eval.Compute<B, A>() {
+            override val start: () -> Eval<A> = this@Eval.thunk
+            override val run: (A) -> Eval<B> = f
+        }
+        else -> object : Eval.Compute<B, A>() {
+            override val start: () -> Eval<A> = { this@Eval }
+            override val run: (A) -> Eval<B> = f
+        }
+    }
+
+/*this match {
+    case c: Eval.Call[A] =>
+    new Eval.Compute[B] {
+        type Start = A
+        val start = c.thunk
+        val run = f
+    }
+    case _ =>
+    new Eval.Compute[B] {
+        type Start = A
+        val start = () => self
+        val run = f
+    }
+}*/
 
     /**
      * Construct an eager Eval[A] instance.
@@ -89,7 +94,7 @@ sealed class Eval<out A> {
      * This type should be used when an A value is already in hand, or
      * when the computation to produce an A value is pure and very fast.
      */
-    class Now<out A>(val value: A) : Eval<A>() {
+    class Now<A>(val value: A) : Eval<A>() {
         override fun value(): A = value
         override fun memoize(): Eval<A> = this
     }
@@ -145,8 +150,8 @@ sealed class Eval<out A> {
         fun <A> now(a: A) = Now(a)
         fun <A> later(f: () -> A) = Later(f)
         fun <A> always(f: () -> A) = Always(f)
-        fun <A> defer(f: () -> Eval<A>): Eval<A> = Eval.Call(f)
-        fun raise(t: Throwable): Eval<Nothing> = Eval.defer { throw t }
+        fun <A> defer(f: () -> Eval<A>): Eval<A> = Call(f)
+        fun raise(t: Throwable): Eval<Nothing> = defer { throw t }
 
         val Unit: Eval<Unit> = Now(kotlin.Unit)
         val True: Eval<Boolean> = Now(true)
@@ -162,7 +167,7 @@ sealed class Eval<out A> {
      * Users should not instantiate Call instances themselves. Instead,
      * they will be automatically created when needed.
      */
-    class Call<out A>(val thunk: () -> Eval<A>) : Eval<A>() {
+    class Call<A>(val thunk: () -> Eval<A>) : Eval<A>() {
         override fun memoize(): Eval<A> = Later { value() }
         override fun value(): A = CallFactory.loop(this).value()
     }
@@ -173,10 +178,13 @@ sealed class Eval<out A> {
          * Collapse the call stack for eager evaluations.
          */
         tailrec fun <A> loop(fa: Eval<A>): Eval<A> = when (fa) {
-            is Eval.Call<A> -> loop(fa.thunk())
-            is Eval.Compute<A> -> object : Eval.Compute<A>() {
-                override val start: () -> Eval<Compute.Start> = { fa.start() }
-                override val run: (Compute.Start) -> Eval<A> = { loop1(fa.run(it)) }
+            is Call<A> -> loop(fa.thunk())
+            is Compute<A, *> -> {
+                fa as Compute<A, Compute.Start>
+                object : Compute<A, Compute.Start>() {
+                    override val start: () -> Eval<Compute.Start> = { fa.start() }
+                    override val run: (Compute.Start) -> Eval<A> = { s -> loop1(fa.run(s)) }
+                }
             }
             else -> fa
         }
@@ -201,28 +209,29 @@ sealed class Eval<out A> {
      * trampoline are not exposed. This allows a slightly more efficient
      * implementation of the .value method.
      */
-    abstract class Compute<out A> : Eval<A>() {
-        class Start
+    abstract class Compute<A, StartT> : Eval<A>() {
+        open class Start
 
-        abstract val start: () -> Eval<Start>
-        abstract val run: (Start) -> Eval<A>
+        abstract val start: () -> Eval<StartT>
+        abstract val run: (StartT) -> Eval<A>
 
         override fun memoize(): Eval<A> = Later { value() }
 
         override fun value(): A {
             tailrec fun loop(curr: L, fs: List<C>): Any =
                     when (curr) {
-                        is Compute<*> -> {
+                        is Compute<*, *> -> {
+                            curr as Compute<A, StartT>
                             val cc = curr.start()
                             when (cc) {
-                                is Compute<*> -> loop(
+                                is Compute<*, *> -> loop(
                                         cc.start() as L,
                                         listOf(cc.run as C) + listOf(curr.run as C) + fs)
-                                else -> loop(curr.run(cc.value()), fs)
+                                else -> loop(curr.run(cc.value()) as L, fs)
                             }
                         }
                         else -> when {
-                            fs.size >= 2 -> loop(fs[0](curr.value()!!), fs)
+                            fs.size >= 2 -> loop(fs[0](curr.value()), fs)
                             else -> curr.value()!!
                         }
                     }
@@ -231,5 +240,5 @@ sealed class Eval<out A> {
     }
 }
 
-typealias L = Eval<Any?>
-typealias C = (Any) -> Eval<Any?>
+typealias L = Eval<Any>
+typealias C = (Any) -> Eval<Any>
