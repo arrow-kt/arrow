@@ -22,33 +22,30 @@ typealias CoproductKind<F, G, A> = HK<CoproductFG<F, G>, A>
 
 fun <F, G, A> CoproductKind<F, G, A>.ev(): Coproduct<F, G, A> = this as Coproduct<F, G, A>
 
-data class Coproduct<F, G, A>(val run: Either<HK<F, A>, HK<G, A>>) : CoproductKind<F, G, A> {
+data class Coproduct<F, G, A>(val CF: Comonad<F>, val CG: Comonad<G>, val run: Either<HK<F, A>, HK<G, A>>) : CoproductKind<F, G, A> {
 
     class F private constructor()
 
-    companion object {
-
-        fun <F, G, A> leftc(x: HK<F, A>): Coproduct<F, G, A> =
-                Coproduct(Either.Left(x))
-
-        fun <F, G, A> rightc(x: HK<G, A>): Coproduct<F, G, A> =
-                Coproduct(Either.Right(x))
-
+    fun <B> map(f: (A) -> B): Coproduct<F, G, B> {
+        return Coproduct(CF, CG, run.bimap(CF.lift(f), CG.lift(f)))
     }
 
-    fun <B> map(F: Functor<F>, G: Functor<G>, f: (A) -> B): Coproduct<F, G, B> =
-            Coproduct(run.bimap(F.lift(f), G.lift(f)))
-
-    fun <B> coflatMap(F: Comonad<F>, G: Comonad<G>, f: (Coproduct<F, G, A>) -> B): Coproduct<F, G, B> =
-            Coproduct(run.bimap(
-                    { F.coflatMap(it, { f(Coproduct.leftc(it)) }) },
-                    { G.coflatMap(it, { f(Coproduct.rightc(it)) }) }
+    fun <B> coflatMap(f: (Coproduct<F, G, A>) -> B): Coproduct<F, G, B> =
+            Coproduct(CF, CG, run.bimap(
+                    { CF.coflatMap(it, { f(Coproduct(CF, CG, Either.Left(it))) }) },
+                    { CG.coflatMap(it, { f(Coproduct(CF, CG, Either.Right(it))) }) }
             ))
 
-    fun extract(F: Comonad<F>, G: Comonad<G>): A =
-            run.fold({ F.extract(it) }, { G.extract(it) })
+    fun extract(): A =
+            run.fold({ CF.extract(it) }, { CG.extract(it) })
 
     fun <H> fold(f: FunctionK<F, H>, g: FunctionK<G, H>): HK<H, A> =
             run.fold({ f(it) }, { g(it) })
 
+    companion object {
+        inline operator fun <reified F, reified G, A> invoke(CF: Comonad<F> = comonad<F>(), CG: Comonad<G> = comonad<G>(), run: Either<HK<F, A>, HK<G, A>>) =
+                Coproduct(CF, CG, run)
+    }
+
 }
+

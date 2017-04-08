@@ -31,18 +31,12 @@ sealed class Try<out A> : TryKind<A> {
     companion object {
 
         inline operator fun <A> invoke(f: () -> A): Try<A> =
-                try { Success(f()) } catch (e: Throwable) { Failure(e) }
+                try {
+                    Success(f())
+                } catch (e: Throwable) {
+                    Failure(e)
+                }
     }
-
-    /**
-     * Returns `true` if the `Try` is a `Failure`, `false` otherwise.
-     */
-    abstract val isFailure: Boolean
-
-    /**
-     * Returns `true` if the `Try` is a `Success`, `false` otherwise.
-     */
-    abstract val isSuccess: Boolean
 
     /**
      * Returns the given function applied to the value from this `Success` or returns this if this is a `Failure`.
@@ -59,7 +53,7 @@ sealed class Try<out A> : TryKind<A> {
      */
     inline fun filter(crossinline p: (A) -> Boolean): Try<A> = fold(
             { Failure(it) },
-            { if (p(it)) Success(it) else Failure(NoSuchElementException("Predicate does not hold for " + it)) }
+            { if (p(it)) Success(it) else Failure(TryException.PredicateException("Predicate does not hold for $it")) }
     )
 
     /**
@@ -68,7 +62,7 @@ sealed class Try<out A> : TryKind<A> {
      */
     fun failed(): Try<Throwable> = fold(
             { Success(it) },
-            { Failure(UnsupportedOperationException("Success.failed")) }
+            { Failure(TryException.UnsupportedOperationException("Success.failed")) }
     )
 
     /**
@@ -78,24 +72,27 @@ sealed class Try<out A> : TryKind<A> {
      */
     fun <B> fold(fa: (Throwable) -> B, fb: (A) -> B): B = when (this) {
         is Failure -> fa(exception)
-        is Success -> try { fb(value) } catch (e: Throwable) { fa(e) }
+        is Success -> try {
+            fb(value)
+        } catch (e: Throwable) {
+            fa(e)
+        }
     }
 
     /**
      * The `Failure` type represents a computation that result in an exception.
      */
-    class Failure<out A>(val exception: Throwable) : Try<A>() {
-        override val isFailure: Boolean = false
-        override val isSuccess: Boolean = true
-    }
+    data class Failure<out A>(val exception: Throwable) : Try<A>()
 
     /**
      * The `Success` type represents a computation that return a successfully computed value.
      */
-    class Success<out A>(val value: A) : Try<A>() {
-        override val isFailure: Boolean = true
-        override val isSuccess: Boolean = false
-    }
+    data class Success<out A>(val value: A) : Try<A>()
+}
+
+sealed class TryException(override val message: String) : kotlin.Exception(message) {
+    data class PredicateException(override val message: String) : TryException(message)
+    data class UnsupportedOperationException(override val message: String) : TryException(message)
 }
 
 /**
