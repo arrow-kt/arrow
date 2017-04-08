@@ -71,21 +71,6 @@ sealed class Eval<A> {
         }
     }
 
-/*this match {
-    case c: Eval.Call[A] =>
-    new Eval.Compute[B] {
-        type Start = A
-        val start = c.thunk
-        val run = f
-    }
-    case _ =>
-    new Eval.Compute[B] {
-        type Start = A
-        val start = () => self
-        val run = f
-    }
-}*/
-
     /**
      * Construct an eager Eval[A] instance.
      *
