@@ -28,7 +28,7 @@ sealed class Try<out A> : TryKind<A> {
 
     class F private constructor()
 
-    companion object {
+    companion object : TryMonadError, GlobalInstance<MonadError<Try.F, Throwable>>() {
 
         inline operator fun <A> invoke(f: () -> A): Try<A> =
                 try {
