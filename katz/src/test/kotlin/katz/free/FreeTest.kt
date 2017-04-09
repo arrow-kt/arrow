@@ -45,6 +45,26 @@ val optionInterpreter : FunctionK<Ops.F, Option.F> = object : FunctionK<Ops.F, O
     }
 }
 
+val nonEmptyListInterpter : FunctionK<Ops.F, NonEmptyList.F> = object : FunctionK<Ops.F, NonEmptyList.F> {
+    override fun <A> invoke(fa: HK<Ops.F, A>): NonEmptyList<A> {
+        val op = fa.ev()
+        return when (op) {
+            is Ops.Add -> NonEmptyList.of(op.a + op.y)
+            is Ops.Subtract -> NonEmptyList.of(op.a - op.y)
+        } as NonEmptyList<A>
+    }
+}
+
+val idInterpreter : FunctionK<Ops.F, Id.F> = object : FunctionK<Ops.F, Id.F> {
+    override fun <A> invoke(fa: HK<Ops.F, A>): Id<A> {
+        val op = fa.ev()
+        return when (op) {
+            is Ops.Add -> Id(op.a + op.y)
+            is Ops.Subtract -> Id(op.a - op.y)
+        } as Id<A>
+    }
+}
+
 @RunWith(KTestJUnitRunner::class)
 class FreeTest : UnitSpec() {
 
@@ -57,7 +77,9 @@ class FreeTest : UnitSpec() {
     init {
 
         "Can interpret an ADT as Free operations" {
-            program.foldMap(Option, optionInterpreter).ev() shouldBe Option.Some(0)
+            program.foldMap(Option, optionInterpreter).ev() shouldBe Option.Some(-30)
+            program.foldMap(Id, idInterpreter).ev() shouldBe Id(-30)
+            program.foldMap(NonEmptyList, nonEmptyListInterpter).ev() shouldBe NonEmptyList.of(-30)
         }
 
     }

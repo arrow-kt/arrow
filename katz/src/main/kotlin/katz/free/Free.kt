@@ -40,22 +40,53 @@ sealed class Free<S, A> : FreeKind<S, A> {
     fun <B> flatMap(f: (A) -> Free<S, B>): Free<S, B> =
             FlatMapped(this, f)
 
+    /**
+     * Mutable nonsense ahead
+     * Can't get Kotlin to find tailrec position in recursive version
+     */
     @Suppress("UNCHECKED_CAST")
-    tailrec fun step(): Free<S, A> {
-        return when (this) {
-            is Free.Pure -> this
-            is Free.Suspend -> this
-            is Free.FlatMapped<S, *, *> -> {
-                val xf = this.f as (A) -> Free<S, A>
-                val xc = this.c as Free<S, A>
-                return when (this) {
-                    is Free.Pure -> xf(this.a)
-                    is Free.Suspend -> this
-                    is Free.FlatMapped<S, *, *> -> xc.flatMap { xf(it).flatMap(xf) }.step()
+    fun step(): Free<S, A> {
+        var self = this
+        while (true) {
+            if (self is Pure || self is Suspend) {
+                break
+            } else if (self is FlatMapped<*, *, *>) {
+                val xf = self.f as (A) -> Free<S, A>
+                if (self.c is Pure) {
+                    val xc = self.c as Pure<S, A>
+                    self = xf(xc.a)
+                    continue
+                }
+                if (self.c is FlatMapped<*, *, *>) {
+                    val xc = self.c as FlatMapped<S, A, A>
+                    val xc2 = xc.c
+                    self = xc2.flatMap { cc -> xc.f(cc).flatMap(xc.f)}
+                    continue
+                } else {
+                    break
                 }
             }
         }
+        return self
     }
+
+
+//    @Suppress("UNCHECKED_CAST")
+//    tailrec fun step(): Free<S, A> {
+//        return when (this) {
+//            is Free.Pure -> this
+//            is Free.Suspend -> this
+//            is Free.FlatMapped<S, *, *> -> {
+//                val xf = this.f as (A) -> Free<S, A>
+//                val xc = this.c as Free<S, A>
+//                return when (this) {
+//                    is Free.Pure -> xf(this.a)
+//                    is Free.Suspend -> this
+//                    is Free.FlatMapped<S, *, *> -> xc.flatMap { xf(it).flatMap(xf) }.step()
+//                }
+//            }
+//        }
+//    }
 
     @Suppress("UNCHECKED_CAST")
     fun resume(SF: Functor<S>): Either<HK<S, Free<S, A>>, A> = when (this) {
