@@ -13,7 +13,7 @@ Functional constructs and patterns for [Kotlin](http://kotlin-lang.org)
 |`funktionale-composition`| Extensions `andThen` (`forwardCompose`) and `compose` for functions|N/A|8|
 |`funktionale-currying`|Extension `curried` and `uncurried` for functions|N/A|348|
 |`funktionale-either`|Either and Disjuntion (right-biased Either) types|`funktionale-option`|44|
-|`funktionale-experimental`|Playground and examples. **Not to be used on production**|All|148|
+|`funktionale-experimental`|Playground and examples. **Not to be used on production**|`funktionale-all`|148|
 |`funktionale-memoization`|Memoization for functions|N/A|112|
 |`funktionale-option`|Option type|`funktionale-collections` and `funktionale-utils`|20|
 |`funktionale-pairing`|Transformations for functions with arity 2 or 3 to one parameter of type `Pair` or `Triple` respectively |N/A|8|
@@ -49,7 +49,7 @@ Then you can use any funKTionale module to your library
 <dependency>
     <groupId>org.funktionale</groupId>
     <artifactId>funktionale-all</artifactId>
-    <version>1.0.0-final</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 

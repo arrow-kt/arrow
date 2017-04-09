@@ -21,7 +21,7 @@
     <parent>
         <artifactId>funktionale</artifactId>
         <groupId>org.funktionale</groupId>
-        <version>1.0.0-final</version>
+        <version>1.0.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <name>GOTY Edition</name>
@@ -30,67 +30,67 @@
         <dependency>
             <groupId>org.funktionale</groupId>
             <artifactId>funktionale-collections</artifactId>
-            <version>1.0.0-final</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.funktionale</groupId>
             <artifactId>funktionale-complement</artifactId>
-            <version>1.0.0-final</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.funktionale</groupId>
             <artifactId>funktionale-composition</artifactId>
-            <version>1.0.0-final</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.funktionale</groupId>
             <artifactId>funktionale-currying</artifactId>
-            <version>1.0.0-final</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.funktionale</groupId>
             <artifactId>funktionale-memoization</artifactId>
-            <version>1.0.0-final</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.funktionale</groupId>
             <artifactId>funktionale-pairing</artifactId>
-            <version>1.0.0-final</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.funktionale</groupId>
             <artifactId>funktionale-partials</artifactId>
-            <version>1.0.0-final</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.funktionale</groupId>
             <artifactId>funktionale-reverse</artifactId>
-            <version>1.0.0-final</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.funktionale</groupId>
             <artifactId>funktionale-utils</artifactId>
-            <version>1.0.0-final</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.funktionale</groupId>
             <artifactId>funktionale-option</artifactId>
-            <version>1.0.0-final</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.funktionale</groupId>
             <artifactId>funktionale-either</artifactId>
-            <version>1.0.0-final</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.funktionale</groupId>
             <artifactId>funktionale-validation</artifactId>
-            <version>1.0.0-final</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.funktionale</groupId>
             <artifactId>funktionale-try</artifactId>
-            <version>1.0.0-final</version>
+            <version>1.0.1</version>
         </dependency>
     </dependencies>
     <build>
