@@ -161,15 +161,22 @@ interface Foldable<F> {
     /**
      * Traverse F<A> using Applicative<G>.
      *
-     * A values will be mapped into G<B> and combined using Applicative#map2.
+     * A typed values will be mapped into G<B> by function f and combined using Applicative#map2.
      *
      * This method is primarily useful when G<_> represents an action or effect, and the specific A aspect of G<A> is
      * not otherwise needed.
      */
-    fun <G, A, B> traverse_(ag: Applicative<G>, fa: HK<F, A>): (f: (A) -> HK<G, B>) -> HK<G, Unit> {
-        val foldR = foldR(fa, always { ag.pure(Unit) })
-        return { f: (A) -> HK<G, B> -> foldR({ a, acc -> ag.map2Eval(f(a), acc) { Unit } }).value() }
+    fun <G, A, B> traverse(ag: Applicative<G>, fa: HK<F, A>): (f: (A) -> HK<G, B>) -> HK<G, Unit> = {
+        f: (A) -> HK<G, B> -> foldR(fa, always { ag.pure(Unit) })({ a, acc -> ag.map2Eval(f(a), acc) { Unit } }).value()
     }
+
+    /**
+     * Sequence F<G<A>> using Applicative<G>.
+     *
+     * Similar to traverse except it operates on F<G<A>> values, so no additional functions are needed.
+     */
+    fun <G, A, B> sequence(ag: Applicative<G>, fga: HK<F, HK<G, A>>): HK<G, Unit> =
+            traverse<G, HK<G, A>, B>(ag, fga)({ it })
 
     /**
      * Check whether at least one element satisfies the predicate.
