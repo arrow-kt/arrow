@@ -166,7 +166,7 @@ interface Foldable<F> {
      * This method is primarily useful when G<_> represents an action or effect, and the specific A aspect of G<A> is
      * not otherwise needed.
      */
-    fun <G, A, B> traverse(ag: Applicative<G>, fa: HK<F, A>): (f: (A) -> HK<G, B>) -> HK<G, Unit> = {
+    fun <G, A, B> traverse_(ag: Applicative<G>, fa: HK<F, A>): (f: (A) -> HK<G, B>) -> HK<G, Unit> = {
         f: (A) -> HK<G, B> -> foldR(fa, always { ag.pure(Unit) })({ a, acc -> ag.map2Eval(f(a), acc) { Unit } }).value()
     }
 
@@ -175,8 +175,8 @@ interface Foldable<F> {
      *
      * Similar to traverse except it operates on F<G<A>> values, so no additional functions are needed.
      */
-    fun <G, A, B> sequence(ag: Applicative<G>, fga: HK<F, HK<G, A>>): HK<G, Unit> =
-            traverse<G, HK<G, A>, B>(ag, fga)({ it })
+    fun <G, A> sequence_(ag: Applicative<G>, fga: HK<F, HK<G, A>>): HK<G, Unit> =
+            traverse_<G, HK<G, A>, A>(ag, fga)({ it })
 
     /**
      * Check whether at least one element satisfies the predicate.
