@@ -130,7 +130,7 @@ class TryTest : UnitSpec() {
         }
 
         "Cartesian builder works inside for comprehensions over Try" {
-            val result = Try.bindingR {
+            val result = Try.bindingE {
                 val (x, y, z) = !Try.tupled(Try.pure(1), Try.pure(1), Try.pure(1))
                 val a = Try.pure(1).bind()
                 val b = bind { Try.pure(1) }
@@ -140,7 +140,7 @@ class TryTest : UnitSpec() {
         }
 
         "Cartesian builder works inside for comprehensions over Try with fail fast behaviour" {
-            val result = Try.bindingR {
+            val result = Try.bindingE {
                 val (x, y, z) = !Try.tupled(Try.pure(1), Try.pure(1), Try.pure(1))
                 val failure1: Try<Int> = Failure(DoctorNotFoundException("13th Doctor is coming!"))
                 val failure2: Try<Int> = Failure(DoctorNotFoundException("14th Doctor is not found"))
@@ -149,6 +149,17 @@ class TryTest : UnitSpec() {
                 yields(x + y + z + a + b)
             }
             result shouldBe Failure<Int>(DoctorNotFoundException("13th Doctor is coming!"))
+        }
+
+        "Cartesian builder works inside for comprehensions over Try and raise errors" {
+            val result = Try.bindingE {
+                val (x, y, z) = !Try.tupled(Try.pure(1), Try.pure(1), Try.pure(1))
+                val nullable: String? = null
+                yields(x + y + z + nullable!!.toInt())
+            }
+
+            assert(result is Failure<Int>)
+            assert((result as Failure<Int>).exception is KotlinNullPointerException)
         }
     }
 }
