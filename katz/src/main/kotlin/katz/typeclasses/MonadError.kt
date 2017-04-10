@@ -46,7 +46,7 @@ class MonadErrorContinuation<F, A>(val ME : MonadError<F, Throwable>) : Serializ
  * This one operates over MonadError instances that can support `Throwable` in their error type automatically lifting
  * errors as failed computations in their monadic context and not letting exceptions thrown as the regular monad binding does.
  */
-fun <F, B> MonadError<F, Throwable>.bindingR(c: suspend MonadErrorContinuation<F, *>.() -> HK<F, B>): HK<F, B> {
+fun <F, B> MonadError<F, Throwable>.bindingE(c: suspend MonadErrorContinuation<F, *>.() -> HK<F, B>): HK<F, B> {
     val continuation = MonadErrorContinuation<F, B>(this)
     val f: suspend MonadErrorContinuation<F, *>.() -> HK<F, B> = { c() }
     f.startCoroutine(continuation, continuation)
