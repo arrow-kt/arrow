@@ -2,6 +2,37 @@
 <SmellBaseline>
     <Blacklist timestamp="1490879306930"/>
     <Whitelist timestamp="1491577642554">
+        <ID>LongParameterList:Applicative.kt$( AP: Applicative&lt;HKF&gt;, other: HK&lt;HKF, Z&gt;, dummyImplicit: Any? = null, dummyImplicit2: Any? = null)</ID>
+        <ID>LongParameterList:Applicative.kt$( AP: Applicative&lt;HKF&gt;, other: HK&lt;HKF, Z&gt;, dummyImplicit: Any? = null, dummyImplicit2: Any? = null, dummyImplicit3: Any? = null)</ID>
+        <ID>LongParameterList:Applicative.kt$( AP: Applicative&lt;HKF&gt;, other: HK&lt;HKF, Z&gt;, dummyImplicit: Any? = null, dummyImplicit2: Any? = null, dummyImplicit3: Any? = null, dummyImplicit4: Any? = null)</ID>
+        <ID>LongParameterList:Applicative.kt$( AP: Applicative&lt;HKF&gt;, other: HK&lt;HKF, Z&gt;, dummyImplicit: Any? = null, dummyImplicit2: Any? = null, dummyImplicit3: Any? = null, dummyImplicit4: Any? = null, dummyImplicit5: Any? = null)</ID>
+        <ID>LongParameterList:Applicative.kt$( AP: Applicative&lt;HKF&gt;, other: HK&lt;HKF, Z&gt;, dummyImplicit: Any? = null, dummyImplicit2: Any? = null, dummyImplicit3: Any? = null, dummyImplicit4: Any? = null, dummyImplicit5: Any? = null, dummyImplicit6: Any? = null)</ID>
+        <ID>LongParameterList:Applicative.kt$( AP: Applicative&lt;HKF&gt;, other: HK&lt;HKF, Z&gt;, dummyImplicit: Any? = null, dummyImplicit2: Any? = null, dummyImplicit3: Any? = null, dummyImplicit4: Any? = null, dummyImplicit5: Any? = null, dummyImplicit6: Any? = null, dummyImplicit7: Any? = null)</ID>
+        <ID>LongParameterList:Applicative.kt$( AP: Applicative&lt;HKF&gt;, other: HK&lt;HKF, Z&gt;, dummyImplicit: Any? = null, dummyImplicit2: Any? = null, dummyImplicit3: Any? = null, dummyImplicit4: Any? = null, dummyImplicit5: Any? = null, dummyImplicit6: Any? = null, dummyImplicit7: Any? = null, dummyImplicit9: Any? = null)</ID>
+        <ID>LongParameterList:Applicative.kt$( a: HK&lt;HKF, A&gt;, b: HK&lt;HKF, B&gt;, c: HK&lt;HKF, C&gt;, d: HK&lt;HKF, D&gt;)</ID>
+        <ID>LongParameterList:Applicative.kt$( a: HK&lt;HKF, A&gt;, b: HK&lt;HKF, B&gt;, c: HK&lt;HKF, C&gt;, d: HK&lt;HKF, D&gt;, e: HK&lt;HKF, E&gt;)</ID>
+        <ID>LongParameterList:Applicative.kt$( a: HK&lt;HKF, A&gt;, b: HK&lt;HKF, B&gt;, c: HK&lt;HKF, C&gt;, d: HK&lt;HKF, D&gt;, e: HK&lt;HKF, E&gt;, f: HK&lt;HKF, F&gt;)</ID>
+        <ID>LongParameterList:Applicative.kt$( a: HK&lt;HKF, A&gt;, b: HK&lt;HKF, B&gt;, c: HK&lt;HKF, C&gt;, d: HK&lt;HKF, D&gt;, e: HK&lt;HKF, E&gt;, f: HK&lt;HKF, F&gt;, g: HK&lt;HKF, G&gt;)</ID>
+        <ID>LongParameterList:Applicative.kt$( a: HK&lt;HKF, A&gt;, b: HK&lt;HKF, B&gt;, c: HK&lt;HKF, C&gt;, d: HK&lt;HKF, D&gt;, e: HK&lt;HKF, E&gt;, f: HK&lt;HKF, F&gt;, g: HK&lt;HKF, G&gt;, h: HK&lt;HKF, H&gt;)</ID>
+        <ID>LongParameterList:Applicative.kt$( a: HK&lt;HKF, A&gt;, b: HK&lt;HKF, B&gt;, c: HK&lt;HKF, C&gt;, d: HK&lt;HKF, D&gt;, e: HK&lt;HKF, E&gt;, f: HK&lt;HKF, F&gt;, g: HK&lt;HKF, G&gt;, h: HK&lt;HKF, H&gt;, i: HK&lt;HKF, I&gt;)</ID>
+        <ID>LongParameterList:Applicative.kt$( a: HK&lt;HKF, A&gt;, b: HK&lt;HKF, B&gt;, c: HK&lt;HKF, C&gt;, d: HK&lt;HKF, D&gt;, e: HK&lt;HKF, E&gt;, f: HK&lt;HKF, F&gt;, g: HK&lt;HKF, G&gt;, h: HK&lt;HKF, H&gt;, i: HK&lt;HKF, I&gt;, j: HK&lt;HKF, J&gt;)</ID>
+        <ID>LongParameterList:Applicative.kt$( a: HK&lt;HKF, A&gt;, b: HK&lt;HKF, B&gt;, c: HK&lt;HKF, C&gt;, lbd: (Tuple3&lt;A, B, C&gt;) -&gt; Z)</ID>
+        <ID>LongParameterList:Applicative.kt$( a: HK&lt;HKF, A&gt;, b: HK&lt;HKF, B&gt;, c: HK&lt;HKF, C&gt;, d: HK&lt;HKF, D&gt;, lbd: (Tuple4&lt;A, B, C, D&gt;) -&gt; Z)</ID>
+        <ID>LongParameterList:Applicative.kt$( a: HK&lt;HKF, A&gt;, b: HK&lt;HKF, B&gt;, c: HK&lt;HKF, C&gt;, d: HK&lt;HKF, D&gt;, e: HK&lt;HKF, E&gt;, lbd: (Tuple5&lt;A, B, C, D, E&gt;) -&gt; Z)</ID>
+        <ID>LongParameterList:Applicative.kt$( a: HK&lt;HKF, A&gt;, b: HK&lt;HKF, B&gt;, c: HK&lt;HKF, C&gt;, d: HK&lt;HKF, D&gt;, e: HK&lt;HKF, E&gt;, f: HK&lt;HKF, F&gt;, lbd: (Tuple6&lt;A, B, C, D, E, F&gt;) -&gt; Z)</ID>
+        <ID>LongParameterList:Applicative.kt$( a: HK&lt;HKF, A&gt;, b: HK&lt;HKF, B&gt;, c: HK&lt;HKF, C&gt;, d: HK&lt;HKF, D&gt;, e: HK&lt;HKF, E&gt;, f: HK&lt;HKF, F&gt;, g: HK&lt;HKF, G&gt;, lbd: (Tuple7&lt;A, B, C, D, E, F, G&gt;) -&gt; Z)</ID>
+        <ID>LongParameterList:Applicative.kt$( a: HK&lt;HKF, A&gt;, b: HK&lt;HKF, B&gt;, c: HK&lt;HKF, C&gt;, d: HK&lt;HKF, D&gt;, e: HK&lt;HKF, E&gt;, f: HK&lt;HKF, F&gt;, g: HK&lt;HKF, G&gt;, h: HK&lt;HKF, H&gt;, lbd: (Tuple8&lt;A, B, C, D, E, F, G, H&gt;) -&gt; Z)</ID>
+        <ID>LongParameterList:Applicative.kt$( a: HK&lt;HKF, A&gt;, b: HK&lt;HKF, B&gt;, c: HK&lt;HKF, C&gt;, d: HK&lt;HKF, D&gt;, e: HK&lt;HKF, E&gt;, f: HK&lt;HKF, F&gt;, g: HK&lt;HKF, G&gt;, h: HK&lt;HKF, H&gt;, i: HK&lt;HKF, I&gt;, lbd: (Tuple9&lt;A, B, C, D, E, F, G, H, I&gt;) -&gt; Z)</ID>
+        <ID>LongParameterList:Applicative.kt$( a: HK&lt;HKF, A&gt;, b: HK&lt;HKF, B&gt;, c: HK&lt;HKF, C&gt;, d: HK&lt;HKF, D&gt;, e: HK&lt;HKF, E&gt;, f: HK&lt;HKF, F&gt;, g: HK&lt;HKF, G&gt;, h: HK&lt;HKF, H&gt;, i: HK&lt;HKF, I&gt;, j: HK&lt;HKF, J&gt;, lbd: (Tuple10&lt;A, B, C, D, E, F, G, H, I, J&gt;) -&gt; Z)</ID>
+        <ID>NamingConventionViolation:Applicative.kt$Tuple2&lt;out A, out B&gt;</ID>
+        <ID>NamingConventionViolation:Applicative.kt$Tuple3&lt;out A, out B, out C&gt;</ID>
+        <ID>NamingConventionViolation:Applicative.kt$Tuple4&lt;out A, out B, out C, out D&gt;</ID>
+        <ID>NamingConventionViolation:Applicative.kt$Tuple5&lt;out A, out B, out C, out D, out E&gt;</ID>
+        <ID>NamingConventionViolation:Applicative.kt$Tuple6&lt;out A, out B, out C, out D, out E, out F&gt;</ID>
+        <ID>NamingConventionViolation:Applicative.kt$Tuple7&lt;out A, out B, out C, out D, out E, out F, out G&gt;</ID>
+        <ID>NamingConventionViolation:Applicative.kt$Tuple8&lt;out A, out B, out C, out D, out E, out F, out G, out H&gt;</ID>
+        <ID>NamingConventionViolation:Applicative.kt$Tuple9&lt;out A, out B, out C, out D, out E, out F, out G, out H, out I&gt;</ID>
+        <ID>NamingConventionViolation:Applicative.kt$Tuple10&lt;out A, out B, out C, out D, out E, out F, out G, out H, out I, out J&gt;</ID>
         <ID>EmptyClassBlock:Typeclass.kt$&lt;no name provided&gt; : TypeLiteral</ID>
     </Whitelist>
 </SmellBaseline>

@@ -16,15 +16,19 @@
 
 package katz
 
+typealias TryKind<A> = HK<Try.F, A>
+
 /**
  * The `Try` type represents a computation that may either result in an exception, or return a
  * successfully computed value.
  *
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Try.scala
  */
-sealed class Try<out A> {
+sealed class Try<out A> : TryKind<A> {
 
-    companion object {
+    class F private constructor()
+
+    companion object : TryMonadError, GlobalInstance<MonadError<Try.F, Throwable>>() {
 
         inline operator fun <A> invoke(f: () -> A): Try<A> =
                 try {
