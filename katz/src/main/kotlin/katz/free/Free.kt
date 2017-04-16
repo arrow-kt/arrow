@@ -48,7 +48,7 @@ sealed class Free<S, A> : FreeKind<S, A> {
     fun step(): Free<S, A> {
         var self = this
         while (true) {
-            if (self is Pure || self is Suspend) {
+            if (self is Pure<*,*> || self is Suspend<*, *>) {
                 break
             } else if (self is FlatMapped<*, *, *>) {
                 val xf = self.f as (A) -> Free<S, A>
