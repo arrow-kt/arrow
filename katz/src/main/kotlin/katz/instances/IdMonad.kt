@@ -27,7 +27,7 @@ interface IdMonad : Monad<Id.F> {
             fa.ev().flatMap { f(it).ev() }
 
     @Suppress("UNCHECKED_CAST")
-    tailrec override fun <A, B> tailRecM(a: A, f: (A) -> HK<Id.F, Either<A, B>>): Id<B> {
+    tailrec override fun <A, B> tailRecM(a: A, f: (A) -> IdKind<Either<A, B>>): Id<B> {
         val x = f(a).ev().value
         return when (x) {
             is Either.Left<A> -> tailRecM(x.a, f)

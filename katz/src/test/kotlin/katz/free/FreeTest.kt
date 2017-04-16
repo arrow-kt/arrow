@@ -24,10 +24,12 @@ sealed class Ops<A> : HK<Ops.F, A> {
 
     class F private constructor()
 
+    data class Value(val a: Int) : Ops<Int>()
     data class Add(val a: Int, val y: Int) : Ops<Int>()
     data class Subtract(val a: Int, val y: Int) : Ops<Int>()
 
     companion object : FreeMonad<Ops.F> {
+        fun value(n: Int): Free<Ops.F, Int> = Free.liftF(Ops.Value(n))
         fun add(n: Int, y: Int): Free<Ops.F, Int> = Free.liftF(Ops.Add(n, y))
         fun subtract(n: Int, y: Int): Free<Ops.F, Int> = Free.liftF(Ops.Subtract(n, y))
     }
@@ -41,6 +43,7 @@ val optionInterpreter: FunctionK<Ops.F, Option.F> = object : FunctionK<Ops.F, Op
         return when (op) {
             is Ops.Add -> Option.Some(op.a + op.y)
             is Ops.Subtract -> Option.Some(op.a - op.y)
+            is Ops.Value -> Option.Some(op.a)
         } as Option<A>
     }
 }
@@ -51,6 +54,7 @@ val nonEmptyListInterpter: FunctionK<Ops.F, NonEmptyList.F> = object : FunctionK
         return when (op) {
             is Ops.Add -> NonEmptyList.of(op.a + op.y)
             is Ops.Subtract -> NonEmptyList.of(op.a - op.y)
+            is Ops.Value -> NonEmptyList.of(op.a)
         } as NonEmptyList<A>
     }
 }
@@ -61,6 +65,7 @@ val idInterpreter: FunctionK<Ops.F, Id.F> = object : FunctionK<Ops.F, Id.F> {
         return when (op) {
             is Ops.Add -> Id(op.a + op.y)
             is Ops.Subtract -> Id(op.a - op.y)
+            is Ops.Value -> Id(op.a)
         } as Id<A>
     }
 }
@@ -74,6 +79,12 @@ class FreeTest : UnitSpec() {
         yields(substracted)
     }.ev()
 
+    fun stackSafeTestProgram(n: Int, stopAt: Int): Free<Ops.F, Int> = Ops.binding {
+        val v = !Ops.add(n, 1)
+        val r = !if (v < stopAt) stackSafeTestProgram(v, stopAt) else Free.pure<Ops.F, Int>(v)
+        yields(r)
+    }.ev()
+
     init {
 
         "Can interpret an ADT as Free operations" {
@@ -83,12 +94,9 @@ class FreeTest : UnitSpec() {
         }
 
         "foldMap is stack safe" {
-            val n = 100000
-            val fmo = object : FreeMonad<Id.F> {}
-            val fa = fmo.tailRecM(0, {
-                Free.pure<Id.F, Either<Int, Int>>(if (it < n) Either.Left(it + 1) else Either.Right(it))
-            })
-            fa.foldMap(Id, FunctionK.id<Id.F>()).value() shouldBe n
+            val n = 5000
+            val hugeProg = stackSafeTestProgram(0, n)
+            hugeProg.foldMap(Id, idInterpreter).value() shouldBe n
         }
 
     }

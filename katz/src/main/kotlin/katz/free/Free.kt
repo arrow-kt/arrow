@@ -21,112 +21,54 @@ typealias FreeF<S> = HK<Free.F, S>
 
 fun <S, A> FreeKind<S, A>.ev(): Free<S, A> = this as Free<S, A>
 
-sealed class Free<S, A> : FreeKind<S, A> {
+sealed class Free<out S, out A> : FreeKind<S, A> {
 
     class F private constructor()
 
     companion object {
-        fun <S, A> pure(a : A): Free<S, A> = Pure(a)
+        fun <S, A> pure(a: A): Free<S, A> = Pure(a)
         fun <S, A> liftF(fa: HK<S, A>): Free<S, A> = Suspend(fa)
     }
 
-    private data class Pure<S, A>(val a: A) : Free<S, A>()
-    private data class Suspend<S, A>(val a: HK<S, A>) : Free<S, A>()
-    private data class FlatMapped<S, B, C>(val c: Free<S, C>, val f: (C) -> Free<S, B>) : Free<S, B>()
+    data class Pure<out S, out A>(val a: A) : Free<S, A>()
+    data class Suspend<out S, out A>(val a: HK<S, A>) : Free<S, A>()
+    data class FlatMapped<out S, out B, C>(val c: Free<S, C>, val f: (C) -> Free<S, B>) : Free<S, B>()
 
-    fun <B> map(f: (A) -> B): Free<S, B> =
-            flatMap { Pure<S, B>(f(it)) }
-
-    fun <B> flatMap(f: (A) -> Free<S, B>): Free<S, B> =
-            FlatMapped(this, f)
-
-    /**
-     * Mutable nonsense ahead
-     * Can't get Kotlin to find tailrec position in recursive version
-     */
-    @Suppress("UNCHECKED_CAST")
-    fun step(): Free<S, A> {
-        var self = this
-        while (true) {
-            if (self is Pure<*,*> || self is Suspend<*, *>) {
-                break
-            } else if (self is FlatMapped<*, *, *>) {
-                val xf = self.f as (A) -> Free<S, A>
-                if (self.c is Pure) {
-                    val xc = self.c as Pure<S, A>
-                    self = xf(xc.a)
-                    continue
-                }
-                if (self.c is FlatMapped<*, *, *>) {
-                    val xc = self.c as FlatMapped<S, A, A>
-                    val xc2 = xc.c
-                    self = xc2.flatMap { cc -> xc.f(cc).flatMap(xc.f)}
-                    continue
-                } else {
-                    break
-                }
-            }
-        }
-        return self
-    }
-
-
-//    @Suppress("UNCHECKED_CAST")
-//    tailrec fun step(): Free<S, A> {
-//        return when (this) {
-//            is Free.Pure -> this
-//            is Free.Suspend -> this
-//            is Free.FlatMapped<S, *, *> -> {
-//                val xf = this.f as (A) -> Free<S, A>
-//                val xc = this.c as Free<S, A>
-//                return when (this) {
-//                    is Free.Pure -> xf(this.a)
-//                    is Free.Suspend -> this
-//                    is Free.FlatMapped<S, *, *> -> xc.flatMap { xf(it).flatMap(xf) }.step()
-//                }
-//            }
-//        }
-//    }
-
-    @Suppress("UNCHECKED_CAST")
-    fun resume(SF: Functor<S>): Either<HK<S, Free<S, A>>, A> = when (this) {
-        is Pure -> Either.Right(this.a)
-        is Suspend -> Either.Left(SF.map(this.a, { Pure<S, A>(it) }))
-        is FlatMapped<S, *, *> -> {
-            val xf = (this.f as (A) -> Free<S, A>)
-            val xc = this.c as Free<S, A>
-            when (xc) {
-                is FlatMapped<S, *, *> -> {
-                    val xc2 = xc.c as Free<S, A>
-                    xc2.flatMap { xf(it).flatMap(xf) }.resume(SF)
-                }
-                is Pure<S, A> -> xf(xc.a).resume(SF)
-                is Suspend<S, A> -> Either.Left(SF.map(xc.a, xf))
-
-            }
-        }
-    }
-
-    fun <B> fold(SF: Functor<S>, r: (A) -> B, s: (HK<S, Free<S, A>>) -> B): B =
-            resume(SF).fold(s, r)
-
-    private fun loop(SF: Functor<S>, t: Free<S, A>, f: (HK<S, Free<S, A>>) -> Free<S, A>): A =
-            t.resume(SF).fold({ l -> loop(SF, f(l), f) }, { it })
-
-    fun go(SF: Functor<S>, f: (HK<S, Free<S, A>>) -> Free<S, A>): A = loop(SF, this, f)
-
-    @Suppress("UNCHECKED_CAST")
-    fun <M> foldMap(MM: Monad<M>, f: FunctionK<S, M>): HK<M, A> =
-            MM.tailRecM(step()) {
-                when (it) {
-                    is Pure<S, A> -> MM.pure(Either.Right(it.a))
-                    is Suspend<S, A> -> MM.map(f(it.a), { a -> Either.Right(a) })
-                    is FlatMapped<S, A, *> -> {
-                        val xf = (it.f as (A) -> Free<S, A>)
-                        val xc = it.c as Free<S, A>
-                        MM.map(xc.foldMap(MM, f), { a -> Either.Left(xf(a)) })
-                    }
-                }
-            }
-
+    override fun toString(): String = "Free(...) : toString is not stack-safe"
 }
+
+fun <S, A, B> Free<S, A>.map(f: (A) -> B): Free<S, B> =
+        flatMap { Free.Pure<S, B>(f(it)) }
+
+fun <S, A, B> Free<S, A>.flatMap(f: (A) -> Free<S, B>): Free<S, B> =
+        Free.FlatMapped(this, f)
+
+@Suppress("UNCHECKED_CAST")
+tailrec fun <S, A> Free<S, A>.step(): Free<S, A> =
+    if (this is Free.FlatMapped<S, A, *> && this.c is Free.FlatMapped<S, *, *>) {
+        val g = this.f as (A) -> Free<S, A>
+        val c = this.c.c as Free<S, A>
+        val f = this.c.f as (A) -> Free<S, A>
+        c.flatMap { cc -> f(cc).flatMap(g) }.step()
+    } else if (this is Free.FlatMapped<S, A, *> && this.c is Free.Pure<S, *>) {
+        val a = this.c.a as A
+        val f = this.f as (A) -> Free<S, A>
+        f(a).step()
+    } else {
+        this
+    }
+
+@Suppress("UNCHECKED_CAST")
+fun <M, S, A> Free<S, A>.foldMap(MM: Monad<M>, f: FunctionK<S, M>): HK<M, A> =
+        MM.tailRecM(this) {
+            val x = it.step()
+            when (x) {
+                is Free.Pure<S, A> -> MM.pure(Either.Right(x.a))
+                is Free.Suspend<S, A> -> MM.map(f(x.a), { Either.Right(it) })
+                is Free.FlatMapped<S, A, *> -> {
+                    val g = (x.f as (A) -> Free<S, A>)
+                    val c = x.c as Free<S, A>
+                    MM.map(c.foldMap(MM, f), { cc -> Either.Left(g(cc)) })
+                }
+            }
+        }
