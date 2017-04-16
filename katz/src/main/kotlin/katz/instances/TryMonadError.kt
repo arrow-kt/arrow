@@ -28,6 +28,14 @@ interface TryMonadError : MonadError<Try.F, Throwable> {
 
     override fun <A> handleErrorWith(fa: TryKind<A>, f: (Throwable) -> TryKind<A>): Try<A> =
             fa.ev().recoverWith { f(it).ev() }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <A, B> tailRecM(a: A, f: (A) -> TryKind<Either<A, B>>): Try<B> {
+        val x = f(a).ev()
+        return if (x is Try.Success && x.value is Either.Left<A>) tailRecM(x.value.a, f)
+        else if (x is Try.Success && x.value is Either.Right<B>) Try.Success(x.value.b)
+        else x as Try.Failure<B>
+    }
 }
 
 fun <A> TryKind<A>.ev(): Try<A> = this as Try<A>
