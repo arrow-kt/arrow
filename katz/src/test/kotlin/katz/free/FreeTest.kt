@@ -94,7 +94,7 @@ class FreeTest : UnitSpec() {
         }
 
         "foldMap is stack safe" {
-            val n = 5000
+            val n = 50000
             val hugeProg = stackSafeTestProgram(0, n)
             hugeProg.foldMap(Id, idInterpreter).value() shouldBe n
         }
