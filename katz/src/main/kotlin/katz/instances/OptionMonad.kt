@@ -28,7 +28,7 @@ interface OptionMonad : Monad<Option.F> {
 
     tailrec override fun <A, B> tailRecM(a: A, f: (A) -> HK<Option.F, Either<A, B>>): Option<B> {
         val option = f(a).ev()
-        return when(option) {
+        return when (option) {
             is Option.Some -> {
                 when (option.value) {
                     is Either.Left -> tailRecM(option.value.a, f)

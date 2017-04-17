@@ -16,8 +16,6 @@
 
 package katz
 
-import kotlin.coroutines.experimental.EmptyCoroutineContext.plus
-
 interface NonEmptyListMonad : Monad<NonEmptyList.F> {
 
     override fun <A, B> map(fa: NonEmptyListKind<A>, f: (A) -> B): NonEmptyList<B> =
@@ -29,7 +27,7 @@ interface NonEmptyListMonad : Monad<NonEmptyList.F> {
             fa.ev().flatMap { f(it).ev() }
 
     @Suppress("UNCHECKED_CAST")
-    private tailrec fun <A, B> go(buf: ArrayList<B>, f: (A) -> HK<NonEmptyList.F, Either<A, B>>, v: NonEmptyList<Either<A, B>>): Unit =
+    private tailrec fun <A, B> go(buf: ArrayList<B>, f: (A) -> HK<NonEmptyList.F, Either<A, B>>, v: NonEmptyList<Either<A, B>>) =
             when (v.head) {
                 is Either.Right<*> -> {
                     buf += v.head.b as B
