@@ -88,7 +88,7 @@ import katz.Eval.EvalFactory.always
  *
  * Beyond these it provides many other useful methods related to folding over F<A> values.
  */
-interface Foldable<F> {
+interface Foldable<F> : Typeclass {
 
     /**
      * Left associative fold on F using the provided function.
@@ -167,7 +167,8 @@ interface Foldable<F> {
      * not otherwise needed.
      */
     fun <G, A, B> traverse_(ag: Applicative<G>, fa: HK<F, A>): (f: (A) -> HK<G, B>) -> HK<G, Unit> = {
-        f: (A) -> HK<G, B> -> foldR(fa, always { ag.pure(Unit) })({ a, acc -> ag.map2Eval(f(a), acc) { Unit } }).value()
+        f: (A) -> HK<G, B> ->
+        foldR(fa, always { ag.pure(Unit) })({ a, acc -> ag.map2Eval(f(a), acc) { Unit } }).value()
     }
 
     /**
