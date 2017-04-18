@@ -25,10 +25,10 @@ data class OptionT<F, A>(val MF: Monad<F>, val value: HK<F, Option<A>>) : Option
     }
 
     inline fun <B> fold(crossinline default: () -> B, crossinline f: (A) -> B): HK<F, B> =
-            MF.map(value, { option -> option.fold({ default() }, { f(it) }) })
+            MF.map(value, { option -> option.fold(default, f) })
 
     inline fun <B> cata(crossinline default: () -> B, crossinline f: (A) -> B): HK<F, B> =
-            fold({ default() }, { f(it) })
+            fold(default, { f(it) })
 
     inline fun <B> flatMap(crossinline f: (A) -> OptionT<F, B>): OptionT<F, B> = flatMapF({ it -> f(it).value })
 
