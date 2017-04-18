@@ -16,7 +16,7 @@
 
 package katz
 
-interface FreeMonad<S> : Monad<FreeF<S>> {
+interface FreeMonad<S> : Monad<FreeF<S>>, Typeclass {
     override fun <A> pure(a: A): Free<S, A> =
             Free.pure(a)
 
