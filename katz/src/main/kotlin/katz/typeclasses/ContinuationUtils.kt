@@ -1,10 +1,3 @@
-/*
- * Copyright Sergey Igushkin https://github.com/h0tk3y
- *
- * This file adapted and modified to fit this project originally comes from
- * https://github.com/h0tk3y/kotlin-monads/blob/master/src/main/kotlin/com/github/h0tk3y/kotlinMonads/ContinuationUtils.kt
- */
-
 package katz
 
 import kotlin.coroutines.experimental.Continuation
