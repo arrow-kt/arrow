@@ -139,10 +139,10 @@ interface Foldable<F> : Typeclass {
      * Certain structures are able to implement this in such a way that folds can be short-circuited (not traverse the
      * entirety of the structure), depending on the G result produced at a given step.
      */
-    fun <G, A, B> foldM(g: Monad<G>, fa: HK<F, A>, z: B): ((B, A) -> HK<G, B>) -> HK<G, B> {
-        val foldL = foldL(fa, g.pure(z))
+    fun <G, A, B> foldM(MG: Monad<G>, fa: HK<F, A>, z: B): ((B, A) -> HK<G, B>) -> HK<G, B> {
+        val foldL = foldL(fa, MG.pure(z))
         return { f: (B, A) -> HK<G, B> ->
-            foldL { gb, a -> g.flatMap(gb) { f(it, a) } }
+            foldL { gb, a -> MG.flatMap(gb) { f(it, a) } }
         }
     }
 
@@ -151,10 +151,10 @@ interface Foldable<F> : Typeclass {
      *
      * Similar to foldM, but using a Monoid<B>.
      */
-    fun <G, A, B> foldMapM(g: Monad<G>, bb: Monoid<B>, fa: HK<F, A>): ((A) -> HK<G, B>) -> HK<G, B> {
-        val foldM = foldM(g, fa, bb.empty())
+    fun <G, A, B> foldMapM(MG: Monad<G>, bb: Monoid<B>, fa: HK<F, A>): ((A) -> HK<G, B>) -> HK<G, B> {
+        val foldM = foldM(MG, fa, bb.empty())
         return { f: (A) -> HK<G, B> ->
-            foldM { b, a -> g.map(f(a)) { bb.combine(b, it) } }
+            foldM { b, a -> MG.map(f(a)) { bb.combine(b, it) } }
         }
     }
 
