@@ -1,7 +1,5 @@
 package katz
 
-import kotlin.coroutines.experimental.EmptyCoroutineContext.plus
-
 interface NonEmptyListMonad : Monad<NonEmptyList.F> {
 
     override fun <A, B> map(fa: NonEmptyListKind<A>, f: (A) -> B): NonEmptyList<B> =

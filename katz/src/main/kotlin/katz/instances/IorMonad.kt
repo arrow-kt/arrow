@@ -6,8 +6,8 @@ class IorMonad<L>(val SL: Semigroup<L>) : Monad<HK<Ior.F, L>> {
 
     override fun <A> pure(a: A): Ior<L, A> = Ior.Right(a)
 
-    private tailrec fun <A, B> loop(v: Ior<L, Either<A, B>>, f: (A) -> IorKind<L, Either<A, B>>) : Ior<L, B> {
-        return when(v) {
+    private tailrec fun <A, B> loop(v: Ior<L, Either<A, B>>, f: (A) -> IorKind<L, Either<A, B>>): Ior<L, B> {
+        return when (v) {
             is Ior.Left -> Ior.Left(v.value)
             is Ior.Right -> when (v.value) {
                 is Either.Right -> Ior.Right(v.value.b)
