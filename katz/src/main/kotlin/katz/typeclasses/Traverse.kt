@@ -3,7 +3,7 @@ package katz
 /**
  * Traverse, also known as Traversable. Traversal over a structure with an effect.
  */
-interface Traverse<F> : Functor<F>, Foldable<F> {
+interface Traverse<F> : Functor<F>, Foldable<F>, Typeclass {
 
     /**
      * Given a function which returns a G effect, thread this effect through the running of this function on all the
