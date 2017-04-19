@@ -24,7 +24,7 @@ buildscript {
         javaVersion = '1.7'
         katzVersion = '0.1-SNAPSHOT'
         kotlinTestVersion = '2.0.0'
-        kotlinVersion = '1.1.2-eap-73'
+        kotlinVersion = '1.1.3-dev-1334'
         kotlinxCollectionsImmutableVersion = '0.1'
         kotlinxCoroutinesVersion = '0.14.1'
     }
