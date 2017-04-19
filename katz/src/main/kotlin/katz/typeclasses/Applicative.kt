@@ -15,6 +15,9 @@ interface Applicative<F> : Functor<F>, Typeclass {
 
     fun <A, B, Z> map2(fa: HK<F, A>, fb: HK<F, B>, f: (Tuple2<A, B>) -> Z): HK<F, Z> =
             map(product(fa, fb), f)
+
+    fun <A, B, Z> map2Eval(fa: HK<F, A>, fb: Eval<HK<F, B>>, f: (Tuple2<A, B>) -> Z): Eval<HK<F, Z>> =
+            fb.map { fb -> map2(fa, fb, f) }
 }
 
 data class Tuple2<out A, out B>(val a: A, val b: B)
