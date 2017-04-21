@@ -17,27 +17,27 @@ data class EitherT<F, A, B>(val MF: Monad<F>, val value: HK<F, Either<A, B>>) : 
 
         inline operator fun <reified F, A, B> invoke(value: HK<F, Either<A, B>>, MF: Monad<F> = monad<F>()): EitherT<F, A, B> = EitherT(MF, value)
 
-        inline fun <reified F, B> pure(b: B, MF: Monad<F> = monad<F>()): EitherT<F, Nothing, B> = EitherT(MF, MF.pure(Either.Right(b)))
+        inline fun <reified F, A, B> pure(b: B, MF: Monad<F> = monad<F>()): EitherT<F, A, B> = EitherT(MF, MF.pure(Either.Right(b)))
 
-        inline fun <reified F, A> impure(a: A, MF: Monad<F> = monad<F>()): EitherT<F, A, Nothing> = EitherT(MF, MF.pure(Either.Left(a)))
+        inline fun <reified F, A, B> impure(a: A, MF: Monad<F> = monad<F>()): EitherT<F, A, B> = EitherT(MF, MF.pure(Either.Left(a)))
 
         inline fun <reified F, A, B> fromEither(value: Either<A, B>, MF: Monad<F> = monad<F>()): EitherT<F, A, B> = EitherT(MF, MF.pure(value))
     }
 
     inline fun <C> fold(crossinline l: (A) -> C, crossinline r: (B) -> C): HK<F, C> =
-              MF.map(value, { either -> either.fold(l, r) })
+            MF.map(value, { either -> either.fold(l, r) })
 
     inline fun <C> flatMap(crossinline f: (B) -> EitherT<F, A, C>): EitherT<F, A, C> =
-              flatMapF({ it -> f(it).value })
+            flatMapF({ it -> f(it).value })
 
     inline fun <C> flatMapF(crossinline f: (B) -> HK<F, Either<A, C>>): EitherT<F, A, C> =
-              EitherT(MF, MF.flatMap(value, { either -> either.fold({ MF.pure(Either.Left(it)) }, { f(it) }) }))
+            EitherT(MF, MF.flatMap(value, { either -> either.fold({ MF.pure(Either.Left(it)) }, { f(it) }) }))
 
     inline fun <C> cata(crossinline l: (A) -> C, crossinline r: (B) -> C): HK<F, C> =
-              fold(l, r)
+            fold(l, r)
 
     fun <C> liftF(fa: HK<F, C>): EitherT<F, A, C> =
-              EitherT(MF, MF.map(fa, { Either.Right(it) }))
+            EitherT(MF, MF.map(fa, { Either.Right(it) }))
 
     inline fun <C> semiflatMap(crossinline f: (B) -> HK<F, C>): EitherT<F, A, C> =
             flatMap({ Either -> liftF(f(Either)) })
