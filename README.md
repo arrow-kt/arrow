@@ -49,6 +49,8 @@ allprojects {
     repositories {
         ...
         maven { url 'https://jitpack.io' }
+        maven { url 'https://kotlin.bintray.com/kotlinx' }
+        maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
     }
 }
 ```
