@@ -11,7 +11,7 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class TrampolineTest : UnitSpec() {
     init {
-        "map should modify value" {
+        "trampoline over 10 should return false" {
             Trampoline.More { odd(10) }.runT() shouldBe false
         }
     }
