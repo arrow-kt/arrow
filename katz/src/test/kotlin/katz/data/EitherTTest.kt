@@ -176,14 +176,14 @@ class EitherTTest : UnitSpec() {
                 expected == value
             }
 
-            forAll(Gen.oneOf(listOf(10000))) { a: Int ->
-                val value: EitherT<Id.F, Int, Int> = EitherTMonad<Id.F, Int>(Id).tailRecM(0) { b ->
-                    if (b == a)
-                        EitherT.impure<Id.F, Int, Either<Int, Int>>(b)
+            forAll(Gen.oneOf(listOf(10000))) { limit: Int ->
+                val value: EitherT<Id.F, Int, Int> = EitherTMonad<Id.F, Int>(Id).tailRecM(0) { current ->
+                    if (current == limit)
+                        EitherT.impure<Id.F, Int, Either<Int, Int>>(current)
                     else
-                        EitherT.pure<Id.F, Int, Either<Int, Int>>(Either.Left(b + 1))
+                        EitherT.pure<Id.F, Int, Either<Int, Int>>(Either.Left(current + 1))
                 }
-                val expected = EitherT.impure<Id.F, Int, Int>(a)
+                val expected = EitherT.impure<Id.F, Int, Int>(limit)
 
                 expected == value
             }
