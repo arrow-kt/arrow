@@ -31,13 +31,13 @@ class EitherTTest : UnitSpec() {
             forAll { ignored: String ->
                 val right: EitherT<NonEmptyList.F, Int, String> = EitherT(NonEmptyList.of(Either.Right(ignored)))
                 val mapped = right.flatMap { EitherT(NonEmptyList.of(Either.Left(3))) }
-                val expected = EitherT.impure<NonEmptyList.F, Int, Int>(3)
+                val expected = EitherT.left<NonEmptyList.F, Int, Int>(3)
 
                 mapped == expected
             }
 
             forAll { _: String ->
-                val right = EitherT.impure<NonEmptyList.F, Int, Int>(3)
+                val right = EitherT.left<NonEmptyList.F, Int, Int>(3)
                 val mapped = right.flatMap { EitherT(NonEmptyList.of<Either<Int, Int>>(Either.Right(2))) }
                 val expected = EitherT(NonEmptyList.of(Either.Left(3)))
 
@@ -55,7 +55,7 @@ class EitherTTest : UnitSpec() {
             }
 
             forAll { num: Int ->
-                val right = EitherT.impure<NonEmptyList.F, Int, Int>(num)
+                val right = EitherT.left<NonEmptyList.F, Int, Int>(num)
                 val expected = NonEmptyList.of(true)
                 val result = right.cata({ true }, { false })
 
@@ -179,11 +179,11 @@ class EitherTTest : UnitSpec() {
             forAll(Gen.oneOf(listOf(10000))) { limit: Int ->
                 val value: EitherT<Id.F, Int, Int> = EitherTMonad<Id.F, Int>(Id).tailRecM(0) { current ->
                     if (current == limit)
-                        EitherT.impure<Id.F, Int, Either<Int, Int>>(current)
+                        EitherT.left<Id.F, Int, Either<Int, Int>>(current)
                     else
                         EitherT.pure<Id.F, Int, Either<Int, Int>>(Either.Left(current + 1))
                 }
-                val expected = EitherT.impure<Id.F, Int, Int>(limit)
+                val expected = EitherT.left<Id.F, Int, Int>(limit)
 
                 expected == value
             }
