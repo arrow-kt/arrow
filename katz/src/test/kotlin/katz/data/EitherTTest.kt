@@ -158,7 +158,7 @@ class EitherTTest : UnitSpec() {
             }
         }
 
-        "EitherTMonad.flatMap should be consistent with EitherT#flatMap" {
+        "EitherTMonad#flatMap should be consistent with EitherT#flatMap" {
             forAll { a: Int ->
                 val x = { b: Int -> EitherT.pure<Id.F, Int, Int>(b * a) }
                 val option = EitherT.pure<Id.F, Int, Int>(a)
@@ -166,7 +166,7 @@ class EitherTTest : UnitSpec() {
             }
         }
 
-        "EitherTMonad.tailRecM should execute and terminate without blowing up the stack" {
+        "EitherTMonad#tailRecM should execute and terminate without blowing up the stack" {
             forAll { a: Int ->
                 val value: EitherT<Id.F, Int, Int> = EitherTMonad<Id.F, Int>(Id).tailRecM(a) { b ->
                     EitherT.pure<Id.F, Int, Either<Int, Int>>(Either.Right(b * a))
@@ -189,7 +189,7 @@ class EitherTTest : UnitSpec() {
             }
         }
 
-        "EitherTMonad.binding should for comprehend over option" {
+        "EitherTMonad#binding should for comprehend over option" {
             val M = EitherTMonad<NonEmptyList.F, Int>(NonEmptyList)
             val result = M.binding {
                 val x = !M.pure(1)
