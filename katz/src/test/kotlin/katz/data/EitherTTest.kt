@@ -2,6 +2,7 @@ package katz
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
+import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
@@ -35,7 +36,7 @@ class EitherTTest : UnitSpec() {
                 mapped == expected
             }
 
-            forAll { ignored: String ->
+            forAll { _: String ->
                 val right = EitherT.impure<NonEmptyList.F, Int, Int>(3)
                 val mapped = right.flatMap { EitherT(NonEmptyList.of<Either<Int, Int>>(Either.Right(2))) }
                 val expected = EitherT(NonEmptyList.of(Either.Left(3)))
@@ -162,6 +163,29 @@ class EitherTTest : UnitSpec() {
                 val x = { b: Int -> EitherT.pure<Id.F, Int, Int>(b * a) }
                 val option = EitherT.pure<Id.F, Int, Int>(a)
                 option.flatMap(x) == EitherTMonad<Id.F, Int>(Id).flatMap(option, x)
+            }
+        }
+
+        "EitherTMonad.tailRecM should execute and terminate without blowing up the stack" {
+            forAll { a: Int ->
+                val value: EitherT<Id.F, Int, Int> = EitherTMonad<Id.F, Int>(Id).tailRecM(a) { b ->
+                    EitherT.pure<Id.F, Int, Either<Int, Int>>(Either.Right(b * a))
+                }
+                val expected = EitherT.pure<Id.F, Int, Int>(a * a)
+
+                expected == value
+            }
+
+            forAll(Gen.oneOf(listOf(10000))) { a: Int ->
+                val value: EitherT<Id.F, Int, Int> = EitherTMonad<Id.F, Int>(Id).tailRecM(0) { b ->
+                    if (b == a)
+                        EitherT.impure<Id.F, Int, Either<Int, Int>>(b)
+                    else
+                        EitherT.pure<Id.F, Int, Either<Int, Int>>(Either.Left(b + 1))
+                }
+                val expected = EitherT.impure<Id.F, Int, Int>(a)
+
+                expected == value
             }
         }
 
