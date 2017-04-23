@@ -10,10 +10,10 @@ fun <D, A> ReaderT<Id.F, D, A>.runId(d: D): A = this.run(d).value()
 
 object Reader {
 
-    operator fun <D, A> invoke(run: (D) -> A): ReaderT<Id.F, D, A> = Kleisli(Id, run.andThen { Id(it) })
+    operator fun <D, A> invoke(run: (D) -> A): ReaderT<Id.F, D, A> = Kleisli(run.andThen { Id(it) })
 
-    fun <D, A> pure(x: A): ReaderT<Id.F, D, A> = Kleisli.pure<Id.F, D, A>(Id, x)
+    fun <D, A> pure(x: A): ReaderT<Id.F, D, A> = Kleisli.pure<Id.F, D, A>(x)
 
-    fun <D> ask(): ReaderT<Id.F, D, D> = Kleisli.ask<Id.F, D>(Id)
+    fun <D> ask(): ReaderT<Id.F, D, D> = Kleisli.ask<Id.F, D>()
 
 }
