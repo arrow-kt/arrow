@@ -19,13 +19,11 @@ class EitherTest : UnitSpec() {
 
         "flatMap should modify entity" {
             forAll { a: Int, b: String ->
-                {
                     val left: Either<Int, Int> = Left(a)
 
                     Right(a).flatMap { left } == left
                             && Right(a).flatMap { Right(b) } == Right(b)
                             && left.flatMap { Right(b) } == left
-                }()
             }
         }
 
@@ -39,26 +37,22 @@ class EitherTest : UnitSpec() {
 
         "exits should evaluate value" {
             forAll { a: Int ->
-                {
                     val left: Either<Int, Int> = Left(a)
 
                     Right(a).exists { it > a - 1 } == true
                             && Right(a).exists { it > a + 1 } == false
                             && left.exists { it > a - 1 } == false
-                }()
             }
         }
 
         "filterOrElse should filters value" {
             forAll { a: Int, b: Int ->
-                {
                     val left: Either<Int, Int> = Left(a)
 
                     Right(a).filterOrElse({ it > a - 1 }, { b }) == Right(a)
                             && Right(a).filterOrElse({ it > a + 1 }, { b }) == Left(b)
                             && left.filterOrElse({ it > a - 1 }, { b }) == Left(a)
                             && left.filterOrElse({ it > a + 1 }, { b }) == Left(a)
-                }()
             }
         }
 
