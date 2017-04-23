@@ -12,16 +12,15 @@ class EitherTMonad<F, L>(val MF : Monad<F>) : Monad<EitherTF<F, L>> {
 
     override fun <A, B> tailRecM(a: A, f: (A) -> HK<EitherTF<F, L>, Either<A, B>>): EitherT<F, L, B> =
             EitherT(MF, MF.tailRecM(a, {
-                MF.map(f(it).ev().value) {
-                    it.fold({
-                        Either.Right(Either.Left(it))
-                    }, {
-                        it.fold({
-                            Either.Left(it)
-                        }, {
-                            Either.Right(Either.Right(it))
-                        })
-                    })
+                MF.map(f(it).ev().value) { eithert ->
+                    when (eithert) {
+                        is Either.Left<L> -> Either.Right(Either.Left(eithert.a))
+                        is Either.Right<Either<A, B>> ->
+                            when (eithert.b) {
+                                is Either.Left<A> -> Either.Left(eithert.b.a)
+                                is Either.Right<B> -> Either.Right(Either.Right(eithert.b.b))
+                            }
+                    }
                 }
             }))
 }
