@@ -17,9 +17,9 @@ data class EitherT<F, A, B>(val MF: Monad<F>, val value: HK<F, Either<A, B>>) : 
 
         inline operator fun <reified F, A, B> invoke(value: HK<F, Either<A, B>>, MF: Monad<F> = monad<F>()): EitherT<F, A, B> = EitherT(MF, value)
 
-        inline fun <reified F, B> pure(b: B, MF: Monad<F> = monad<F>()): EitherT<F, Nothing, B> = EitherT(MF, MF.pure(Either.Right(b)))
+        inline fun <reified F, A, B> pure(b: B, MF: Monad<F> = monad<F>()): EitherT<F, A, B> = EitherT(MF, MF.pure(Either.Right(b)))
 
-        inline fun <reified F, A> impure(a: A, MF: Monad<F> = monad<F>()): EitherT<F, A, Nothing> = EitherT(MF, MF.pure(Either.Left(a)))
+        inline fun <reified F, A, B> impure(a: A, MF: Monad<F> = monad<F>()): EitherT<F, A, B> = EitherT(MF, MF.pure(Either.Left(a)))
 
         inline fun <reified F, A, B> fromEither(value: Either<A, B>, MF: Monad<F> = monad<F>()): EitherT<F, A, B> = EitherT(MF, MF.pure(value))
     }
@@ -40,7 +40,7 @@ data class EitherT<F, A, B>(val MF: Monad<F>, val value: HK<F, Either<A, B>>) : 
             EitherT(MF, MF.map(fa, { Either.Right(it) }))
 
     inline fun <C> semiflatMap(crossinline f: (B) -> HK<F, C>): EitherT<F, A, C> =
-            flatMap({ Either -> liftF(f(Either)) })
+            flatMap({ liftF(f(it)) })
 
     inline fun <C> map(crossinline f: (B) -> C): EitherT<F, A, C> =
             EitherT(MF, MF.map(value, { it.map(f) }))

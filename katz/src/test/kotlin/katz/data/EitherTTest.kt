@@ -10,50 +10,157 @@ class EitherTTest : UnitSpec() {
     init {
         "map should modify value" {
             forAll { a: String ->
-                val ot = EitherT(Id(Either.Right(a)))
-                val mapped = ot.map({ "$it power" })
+                val right = EitherT(Id(Either.Right(a)))
+                val mapped = right.map({ "$it power" })
                 val expected = EitherT(Id(Either.Right("$a power")))
 
                 mapped == expected
             }
         }
 
-       "flatMap should modify entity" {
+        "flatMap should modify entity" {
             forAll { a: String ->
-                val ot = EitherT(NonEmptyList.of(Either.Right(a)))
-                val mapped = ot.flatMap{ EitherT(NonEmptyList.of(Either.Right(3))) }
-                val expected = EitherT.pure<NonEmptyList.F, Int>(3)
+                val right = EitherT(NonEmptyList.of(Either.Right(a)))
+                val mapped = right.flatMap { EitherT(NonEmptyList.of(Either.Right(3))) }
+                val expected = EitherT.pure<NonEmptyList.F, Int, Int>(3)
 
                 mapped == expected
             }
 
             forAll { ignored: String ->
-                val ot: EitherT<NonEmptyList.F, Int, String> = EitherT(NonEmptyList.of(Either.Right(ignored)))
-                val mapped = ot.flatMap { EitherT(NonEmptyList.of(Either.Left(3))) }
-                val expected = EitherT.impure<NonEmptyList.F, Int>(3)
+                val right: EitherT<NonEmptyList.F, Int, String> = EitherT(NonEmptyList.of(Either.Right(ignored)))
+                val mapped = right.flatMap { EitherT(NonEmptyList.of(Either.Left(3))) }
+                val expected = EitherT.impure<NonEmptyList.F, Int, Int>(3)
 
                 mapped == expected
             }
 
             forAll { ignored: String ->
-                val ot = EitherT.impure<NonEmptyList.F, Int>(3)
-                val mapped =  ot.flatMap{  EitherT<NonEmptyList.F, Int, Int>(NonEmptyList.of(Either.Right(2))) }
+                val right = EitherT.impure<NonEmptyList.F, Int, Int>(3)
+                val mapped = right.flatMap { EitherT(NonEmptyList.of<Either<Int, Int>>(Either.Right(2))) }
                 val expected = EitherT(NonEmptyList.of(Either.Left(3)))
 
                 mapped == expected
             }
         }
 
-       "from option should build a correct EitherT" {
+        "cata should modify the return" {
+            forAll { num: Int ->
+                val right = EitherT.pure<NonEmptyList.F, Int, Int>(num)
+                val expected = NonEmptyList.of(true)
+                val result = right.cata({ false }, { true })
+
+                expected == result
+            }
+
+            forAll { num: Int ->
+                val right = EitherT.impure<NonEmptyList.F, Int, Int>(num)
+                val expected = NonEmptyList.of(true)
+                val result = right.cata({ true }, { false })
+
+                expected == result
+            }
+        }
+
+        "semiFlatMap should map the right side of the inner either" {
+            forAll { num: Int ->
+                val right: EitherT<NonEmptyList.F, Int, Int> = EitherT(NonEmptyList.of(Either.Right(num)))
+                val calculated = right.semiflatMap { NonEmptyList.of(it > 0) }
+                val expected = EitherT(NonEmptyList.of(Either.Right(num > 0)))
+
+                calculated == expected
+            }
+
+            forAll { num: Int ->
+                val left: EitherT<NonEmptyList.F, Int, Int> = EitherT(NonEmptyList.of(Either.Left(num)))
+                val calculated = left.semiflatMap { NonEmptyList.of(it > 0) }
+                val expected = EitherT(NonEmptyList.of(Either.Left(num)))
+
+                calculated == expected
+            }
+        }
+
+
+        "subFlatMap should map the right side of the Either wrapped by EitherT" {
+            forAll { num: Int ->
+                val right: EitherT<NonEmptyList.F, Int, Int> = EitherT(NonEmptyList.of(Either.Right(num)))
+                val calculated = right.subflatMap { Either.Right(it > 0) }
+                val expected = EitherT(NonEmptyList.of(Either.Right(num > 0)))
+
+                calculated == expected
+            }
+
+            forAll { num: Int ->
+                val left: EitherT<NonEmptyList.F, Int, Int> = EitherT(NonEmptyList.of(Either.Right(num)))
+                val calculated = left.subflatMap { Either.Left(num) }
+                val expected = EitherT(NonEmptyList.of(Either.Left(num)))
+
+                calculated == expected
+            }
+
+            forAll { num: Int ->
+                val left: EitherT<NonEmptyList.F, Int, Int> = EitherT(NonEmptyList.of(Either.Left(num)))
+                val calculated = left.subflatMap { Either.Right(num > 0) }
+                val expected = EitherT(NonEmptyList.of(Either.Left(num)))
+
+                calculated == expected
+            }
+
+            forAll { num: Int ->
+                val left: EitherT<NonEmptyList.F, Int, Int> = EitherT(NonEmptyList.of(Either.Left(num)))
+                val calculated = left.subflatMap { Either.Left(num + 1) }
+                val expected = EitherT(NonEmptyList.of(Either.Left(num)))
+
+                calculated == expected
+            }
+        }
+
+        "exists evaluates a predicate on the right side and lifts it to the wrapped monad" {
+            forAll { num: Int ->
+                val right: EitherT<NonEmptyList.F, Int, Int> = EitherT(NonEmptyList.of(Either.Right(num)))
+                val calculated = right.exists { it > 0 }.ev()
+                val expected = NonEmptyList.of(num > 0)
+
+                calculated == expected
+            }
+
+            forAll { num: Int ->
+                val left: EitherT<NonEmptyList.F, Int, Int> = EitherT(NonEmptyList.of(Either.Left(num)))
+                val calculated = left.exists { true }.ev()
+                val expected = NonEmptyList.of(false)
+
+                calculated == expected
+            }
+        }
+
+        "to OptionT should transform to a correct OptionT" {
             forAll { a: String ->
-                EitherT.fromEither<NonEmptyList.F, Int, String>(Either.Right(a)) == EitherT.pure<NonEmptyList.F, String>(a)
+                val right: EitherT<NonEmptyList.F, String, String> = EitherT(NonEmptyList.of(Either.Right(a)))
+                val expected = OptionT.pure<NonEmptyList.F, String>(a)
+                val calculated = right.toOptionT()
+
+                expected == calculated
+            }
+
+            forAll { a: String ->
+                val left: EitherT<NonEmptyList.F, String, String> = EitherT(NonEmptyList.of(Either.Left(a)))
+                val expected = OptionT.none<NonEmptyList.F>()
+                val calculated = left.toOptionT()
+
+                expected == calculated
+            }
+        }
+
+        "from option should build a correct EitherT" {
+            forAll { a: String ->
+                EitherT.fromEither<NonEmptyList.F, Int, String>(Either.Right(a)) == EitherT.pure<NonEmptyList.F, Int, String>(a)
             }
         }
 
         "EitherTMonad.flatMap should be consistent with EitherT#flatMap" {
             forAll { a: Int ->
-                val x = { b: Int -> EitherT.pure<Id.F, Int>(b * a) }
-                val option = EitherT.pure<Id.F, Int>(a)
+                val x = { b: Int -> EitherT.pure<Id.F, Int, Int>(b * a) }
+                val option = EitherT.pure<Id.F, Int, Int>(a)
                 option.flatMap(x) == EitherTMonad<Id.F, Int>(Id).flatMap(option, x)
             }
         }
@@ -72,7 +179,7 @@ class EitherTTest : UnitSpec() {
         "Cartesian builder should build products over option" {
             EitherTMonad<Id.F, Int>(Id).map(EitherT.pure(1), EitherT.pure("a"), EitherT.pure(true), { (a, b, c) ->
                 "$a $b $c"
-            }) shouldBe EitherT.pure<Id.F, String>("1 a true")
+            }) shouldBe EitherT.pure<Id.F, Int, String>("1 a true")
         }
 
         "Cartesian builder works inside for comprehensions" {
