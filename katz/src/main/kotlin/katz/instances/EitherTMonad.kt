@@ -17,9 +17,9 @@ class EitherTMonad<F, L>(val MF : Monad<F>) : Monad<EitherTF<F, L>> {
                         Either.Right(Either.Left(it))
                     }, {
                         it.fold({
-                                Either.Left(it)
+                            Either.Left(it)
                         }, {
-                                Either.Right(Either.Right(it))
+                            Either.Right(Either.Right(it))
                         })
                     })
                 }
