@@ -109,17 +109,17 @@ sealed class Eval<A> {
     }
 
     companion object EvalFactory {
-        fun <A> now(a: A) = Now(a)
-        fun <A> later(f: () -> A) = Later(f)
-        fun <A> always(f: () -> A) = Always(f)
-        fun <A> defer(f: () -> Eval<A>): Eval<A> = Call(f)
-        fun raise(t: Throwable): Eval<Nothing> = defer { throw t }
+        @JvmStatic fun <A> now(a: A) = Now(a)
+        @JvmStatic fun <A> later(f: () -> A) = Later(f)
+        @JvmStatic fun <A> always(f: () -> A) = Always(f)
+        @JvmStatic fun <A> defer(f: () -> Eval<A>): Eval<A> = Call(f)
+        @JvmStatic fun raise(t: Throwable): Eval<Nothing> = defer { throw t }
 
-        val Unit: Eval<Unit> = Now(kotlin.Unit)
-        val True: Eval<Boolean> = Now(true)
-        val False: Eval<Boolean> = Now(false)
-        val Zero: Eval<Int> = Now(0)
-        val One: Eval<Int> = Now(1)
+        @JvmStatic val Unit: Eval<Unit> = Now(kotlin.Unit)
+        @JvmStatic val True: Eval<Boolean> = Now(true)
+        @JvmStatic val False: Eval<Boolean> = Now(false)
+        @JvmStatic val Zero: Eval<Int> = Now(0)
+        @JvmStatic val One: Eval<Int> = Now(1)
     }
 
     /**

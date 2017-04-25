@@ -17,11 +17,11 @@ data class OptionT<F, A>(val MF: Monad<F>, val value: HK<F, Option<A>>) : Option
 
         inline operator fun <reified F, A> invoke(value: HK<F, Option<A>>, MF: Monad<F> = monad<F>()): OptionT<F, A> = OptionT(MF, value)
 
-        inline fun <reified F, A> pure(a: A, MF: Monad<F> = monad<F>()): OptionT<F, A> = OptionT(MF, MF.pure(Option.Some(a)))
+        @JvmStatic inline fun <reified F, A> pure(a: A, MF: Monad<F> = monad<F>()): OptionT<F, A> = OptionT(MF, MF.pure(Option.Some(a)))
 
-        inline fun <reified F> none(MF: Monad<F> = monad<F>()): OptionT<F, Nothing> = OptionT(MF, MF.pure(Option.None))
+        @JvmStatic inline fun <reified F> none(MF: Monad<F> = monad<F>()): OptionT<F, Nothing> = OptionT(MF, MF.pure(Option.None))
 
-        inline fun <reified F, A> fromOption(value: Option<A>, MF: Monad<F> = monad<F>()): OptionT<F, A> = OptionT(MF, MF.pure(value))
+        @JvmStatic inline fun <reified F, A> fromOption(value: Option<A>, MF: Monad<F> = monad<F>()): OptionT<F, A> = OptionT(MF, MF.pure(value))
     }
 
     inline fun <B> fold(crossinline default: () -> B, crossinline f: (A) -> B): HK<F, B> =

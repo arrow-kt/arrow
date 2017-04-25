@@ -25,9 +25,9 @@ class Kleisli<F, D, A>(val MF: Monad<F>, val run: (D) -> HK<F, A>) {
 
         inline operator fun <reified F, D, A> invoke(noinline run: (D) -> HK<F, A>, MF: Monad<F> = monad<F>()): Kleisli<F, D, A> = Kleisli(MF, run)
 
-        inline fun <reified F, D, A> pure(x: A, MF: Monad<F> = monad<F>()): Kleisli<F, D, A> = Kleisli(MF, { _ -> MF.pure(x) })
+        @JvmStatic inline fun <reified F, D, A> pure(x: A, MF: Monad<F> = monad<F>()): Kleisli<F, D, A> = Kleisli(MF, { _ -> MF.pure(x) })
 
-        inline fun <reified F, D> ask(MF: Monad<F> = monad<F>()): Kleisli<F, D, D> = Kleisli(MF, { MF.pure(it) })
+        @JvmStatic inline fun <reified F, D> ask(MF: Monad<F> = monad<F>()): Kleisli<F, D, D> = Kleisli(MF, { MF.pure(it) })
     }
 
 }

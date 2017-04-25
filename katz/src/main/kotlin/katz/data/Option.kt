@@ -13,7 +13,7 @@ sealed class Option<out A> : OptionKind<A> {
     class F private constructor()
 
     companion object : OptionMonad, GlobalInstance<Monad<Option.F>>() {
-        inline fun <reified A : Any> fromNullable(a: A?): Option<A> = if (a != null) Option.Some(a) else Option.None
+        @JvmStatic fun <A : Any> fromNullable(a: A?): Option<A> = if (a != null) Option.Some(a) else Option.None
         operator fun <A> invoke(a: A): Option<A> = Option.Some(a)
     }
 

@@ -77,7 +77,7 @@ sealed class Ior<out A, out B> : IorKind<A, B> {
          * an [Ior.Left], [Ior.Right], or [Ior.Both] if [oa], [ob], or both are defined (respectively).
          */
 
-        fun <A, B> fromOptions(oa: Option<A>, ob: Option<B>): Option<Ior<A, B>> = when (oa) {
+        @JvmStatic fun <A, B> fromOptions(oa: Option<A>, ob: Option<B>): Option<Ior<A, B>> = when (oa) {
             is Option.Some -> when (ob) {
                 is Option.Some -> Option.Some(Both(oa.value, ob.value))
                 is Option.None -> Option.Some(Left(oa.value))
