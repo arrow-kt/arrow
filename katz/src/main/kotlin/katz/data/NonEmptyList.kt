@@ -60,8 +60,8 @@ class NonEmptyList<out A> private constructor(
     }
 
     companion object : NonEmptyListMonad, GlobalInstance<Monad<NonEmptyList.F>>() {
-        fun <A> of(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
-        fun <A> fromList(l: List<A>): Option<NonEmptyList<A>> = if (l.isEmpty()) Option.None else Option.Some(NonEmptyList(l))
-        fun <A> fromListUnsafe(l: List<A>): NonEmptyList<A> = NonEmptyList(l)
+        @JvmStatic fun <A> of(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
+        @JvmStatic fun <A> fromList(l: List<A>): Option<NonEmptyList<A>> = if (l.isEmpty()) Option.None else Option.Some(NonEmptyList(l))
+        @JvmStatic fun <A> fromListUnsafe(l: List<A>): NonEmptyList<A> = NonEmptyList(l)
     }
 }
