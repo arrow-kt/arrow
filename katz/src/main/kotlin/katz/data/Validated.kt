@@ -13,23 +13,23 @@ sealed class Validated<out E, out A> : ValidatedKind<E, A> {
 
     companion object {
 
-        fun <E, A> invalidNel(e: E): ValidatedNel<E, A> = Validated.Invalid(NonEmptyList(e, listOf()))
+        @JvmStatic fun <E, A> invalidNel(e: E): ValidatedNel<E, A> = Validated.Invalid(NonEmptyList(e, listOf()))
 
         /**
          * Converts a `Try<A>` to a `Validated<Throwable, A>`.
          */
-        fun <A> fromTry(t: Try<A>): Validated<Throwable, A> = t.fold({ Invalid(it) }, { Valid(it) })
+        @JvmStatic fun <A> fromTry(t: Try<A>): Validated<Throwable, A> = t.fold({ Invalid(it) }, { Valid(it) })
 
         /**
          * Converts an `Either<A, B>` to an `Validated<A, B>`.
          */
-        fun <E, A> fromEither(e: Either<E, A>): Validated<E, A> = e.fold({ Invalid(it) }, { Valid(it) })
+        @JvmStatic fun <E, A> fromEither(e: Either<E, A>): Validated<E, A> = e.fold({ Invalid(it) }, { Valid(it) })
 
         /**
          * Converts an `Option<B>` to an `Validated<A, B>`, where the provided `ifNone` values is returned on
          * the invalid of the `Validated` when the specified `Option` is `None`.
          */
-        fun <E, A> fromOption(o: Option<A>, ifNone: () -> E): Validated<E, A> = o.fold(
+        @JvmStatic fun <E, A> fromOption(o: Option<A>, ifNone: () -> E): Validated<E, A> = o.fold(
                 { Invalid(ifNone()) },
                 { Valid(it) }
         )
