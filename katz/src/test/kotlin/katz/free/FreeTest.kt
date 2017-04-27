@@ -4,7 +4,7 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
 
-sealed class Ops<A> : HK<Ops.F, A> {
+sealed class Ops<out A> : HK<Ops.F, A> {
 
     class F private constructor()
 
@@ -72,15 +72,15 @@ class FreeTest : UnitSpec() {
     init {
 
         "Can interpret an ADT as Free operations" {
-            program.foldMap(Option, optionInterpreter).ev() shouldBe Option.Some(-30)
-            program.foldMap(Id, idInterpreter).ev() shouldBe Id(-30)
-            program.foldMap(NonEmptyList, nonEmptyListInterpter).ev() shouldBe NonEmptyList.of(-30)
+            program.foldMap(optionInterpreter, Option).ev() shouldBe Option.Some(-30)
+            program.foldMap(idInterpreter, Id).ev() shouldBe Id(-30)
+            program.foldMap(nonEmptyListInterpter, NonEmptyList).ev() shouldBe NonEmptyList.of(-30)
         }
 
         "foldMap is stack safe" {
             val n = 50000
             val hugeProg = stackSafeTestProgram(0, n)
-            hugeProg.foldMap(Id, idInterpreter).value() shouldBe n
+            hugeProg.foldMap(idInterpreter, Id).value() shouldBe n
         }
 
     }
