@@ -4,8 +4,7 @@ typealias YonedaKind<U, A> = HK2<Yoneda.F, U, A>
 
 typealias YonedaF<U> = HK<Yoneda.F, U>
 
-// FIXME using YonedaKind throws a compiler error, but not the expanded form
-interface Yoneda<FU, A> : HK<HK<Yoneda.F, FU>, A> {
+interface Yoneda<FU, A> : YonedaKind<FU, A> {
 
     class F private constructor()
 
