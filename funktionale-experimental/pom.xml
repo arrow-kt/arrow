@@ -32,6 +32,11 @@
             <artifactId>funktionale-all</artifactId>
             <version>1.0.1</version>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>RELEASE</version>
+        </dependency>
     </dependencies>
     <packaging>jar</packaging>
         <version>1.0.1</version>
