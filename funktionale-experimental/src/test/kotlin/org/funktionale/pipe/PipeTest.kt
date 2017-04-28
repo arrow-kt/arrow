@@ -4,7 +4,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 
-class pipeTest {
+class PipeTest {
 
 
     private val values = listOf(1, "String", 10.2)
