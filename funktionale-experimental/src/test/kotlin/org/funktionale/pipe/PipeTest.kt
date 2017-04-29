@@ -1,7 +1,7 @@
 package org.funktionale.pipe
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.testng.Assert.assertEquals
+import org.testng.annotations.Test
 
 
 class PipeTest {
