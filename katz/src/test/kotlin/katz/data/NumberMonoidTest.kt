@@ -39,6 +39,22 @@ class NumberMonoidTest : UnitSpec() {
 
                 expected == seen
             }
+
+            forAll { value: Short ->
+                val numberSemigroup = ShortMonoid
+                val seen = numberSemigroup.combine(value, value)
+                val expected = (value + value).toShort()
+
+                expected == seen
+            }
+
+            forAll { value: Byte ->
+                val numberSemigroup = ByteMonoid
+                val seen = numberSemigroup.combine(value, value)
+                val expected = (value + value).toByte()
+
+                expected == seen
+            }
         }
     }
 }
