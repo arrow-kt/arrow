@@ -21,6 +21,12 @@ class Kleisli<F, D, A>(val MF: Monad<F>, val run: (D) -> HK<F, A>) {
 
     fun <DD> local(f: (DD) -> D): Kleisli<F, DD, A> = Kleisli(MF, { dd -> run(f(dd)) })
 
+    fun <B> andThen(f: (A) -> HK<F, B>): Kleisli<F, D, B> =
+            Kleisli(MF, { MF.flatMap(run(it), f) })
+
+    fun <B> andThen(a: HK<F, B>): Kleisli<F, D, B> =
+            andThen({ a })
+
     companion object {
 
         inline operator fun <reified F, D, A> invoke(noinline run: (D) -> HK<F, A>, MF: Monad<F> = monad<F>()): Kleisli<F, D, A> = Kleisli(MF, run)
