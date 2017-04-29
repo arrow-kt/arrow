@@ -5,7 +5,7 @@ import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class NumberSemigroupTest : UnitSpec() {
+class NumberMonoidTest : UnitSpec() {
     init {
         "should semigroup with the instance passed" {
             forAll { value: Int ->
