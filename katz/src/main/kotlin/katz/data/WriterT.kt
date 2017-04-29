@@ -6,14 +6,31 @@ typealias WriterF<F, W> = HK2<WriterT.F, F, W>
 data class WriterT<F, W, A>(val MF: Monad<F>, val value: HK<F, Tuple2<W, A>>) : WriterTKind<F, W, A> {
     class F private constructor()
 
+    companion object {
+        inline fun <reified F, reified W, A> pure(a: A, MM: Monoid<W> = monoid(), MF: Monad<F> = monad()) =
+                WriterT(MF.pure(MM.empty() toT a), MF)
+
+        inline fun <reified F, W, A> both(w: W, a: A, MF: Monad<F> = monad()) =
+                WriterT(MF.pure(w toT a), MF)
+
+        inline fun <reified F, W, A> fromTuple(z: Tuple2<W, A>, MF: Monad<F> = monad()) =
+                WriterT(MF.pure(z), MF)
+
+        inline operator fun <reified F, W, A> invoke(value: HK<F, Tuple2<W, A>>, MF: Monad<F> = monad()) =
+                WriterT(MF, value)
+    }
+
     fun tell(w: W, SG: Semigroup<W>): WriterT<F, W, A> =
             mapAcc { SG.combine(it, w) }
 
-    fun value(): HK<F, A> =
+    fun content(): HK<F, A> =
             MF.map(value, { it.b })
 
     fun write(): HK<F, W> =
             MF.map(value, { it.a })
+
+    fun reset(MM: Monoid<W>): WriterT<F, W, A> =
+            mapAcc { MM.empty() }
 
     inline fun <B> map(crossinline f: (A) -> B): WriterT<F, W, B> =
             WriterT(MF, MF.map(value, { it.a toT f(it.b) }))
@@ -41,7 +58,4 @@ data class WriterT<F, W, A>(val MF: Monad<F>, val value: HK<F, Tuple2<W, A>>) : 
 
     inline fun <B> subflatMap(crossinline f: (A) -> Tuple2<W, B>): WriterT<F, W, B> =
             transform({ f(it.b) })
-
-    fun reset(MM: Monoid<W>): WriterT<F, W, A> =
-            mapAcc { MM.empty() }
 }
