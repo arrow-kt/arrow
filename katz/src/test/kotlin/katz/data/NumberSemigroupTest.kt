@@ -9,7 +9,7 @@ class NumberSemigroupTest : UnitSpec() {
     init {
         "should semigroup with the instance passed" {
             forAll { value: Int ->
-                val numberSemigroup = NumberSemigroup<Int>(Int::plus)
+                val numberSemigroup = IntMonoid
                 val seen = numberSemigroup.combine(value, value)
                 val expected = value + value
 
@@ -17,7 +17,7 @@ class NumberSemigroupTest : UnitSpec() {
             }
 
             forAll { value: Float ->
-                val numberSemigroup = NumberSemigroup<Float>(Float::plus)
+                val numberSemigroup = FloatMonoid
                 val seen = numberSemigroup.combine(value, value)
                 val expected = value + value
 
@@ -25,7 +25,7 @@ class NumberSemigroupTest : UnitSpec() {
             }
 
             forAll { value: Double ->
-                val numberSemigroup = NumberSemigroup<Double>(Double::plus)
+                val numberSemigroup = DoubleMonoid
                 val seen = numberSemigroup.combine(value, value)
                 val expected = value + value
 
@@ -33,7 +33,7 @@ class NumberSemigroupTest : UnitSpec() {
             }
 
             forAll { value: Long ->
-                val numberSemigroup = NumberSemigroup<Long>(Long::plus)
+                val numberSemigroup = LongMonoid
                 val seen = numberSemigroup.combine(value, value)
                 val expected = value + value
 
