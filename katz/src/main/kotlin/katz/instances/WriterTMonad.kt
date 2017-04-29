@@ -13,7 +13,7 @@ data class WriterTMonad<F, W>(val MM: Monad<F>, val SG: Monoid<W>) : Monad<Write
     override fun <A, B> tailRecM(a: A, f: (A) -> HK<WriterF<F, W>, Either<A, B>>): WriterT<F, W, B> =
             WriterT(MM, MM.tailRecM(a, {
                 MM.map(f(it).ev().value) {
-                    when(it.b) {
+                    when (it.b) {
                         is Either.Left<A> -> Either.Left(it.b.a)
                         is Either.Right<B> -> Either.Right(it.a toT it.b.b)
                     }

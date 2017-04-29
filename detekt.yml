@@ -73,7 +73,7 @@ formatting:
     autoCorrect: true
   OptionalUnit:
     active: true
-    autoCorrect: true
+    autoCorrect: false
 
 style:
   active: true
