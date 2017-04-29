@@ -8,52 +8,65 @@ import org.junit.runner.RunWith
 class NumberMonoidTest : UnitSpec() {
     init {
         "should semigroup with the instance passed" {
-            forAll { value: Int ->
-                val numberSemigroup = IntMonoid
-                val seen = numberSemigroup.combine(value, value)
-                val expected = value + value
+            "int" {
+                forAll { value: Int ->
+                    val numberSemigroup = IntMonoid
+                    val seen = numberSemigroup.combine(value, value)
+                    val expected = value + value
 
-                expected == seen
+                    expected == seen
+                }
             }
 
-            forAll { value: Float ->
-                val numberSemigroup = FloatMonoid
-                val seen = numberSemigroup.combine(value, value)
-                val expected = value + value
+            "float" {
+                forAll { value: Float ->
+                    val numberSemigroup = FloatMonoid
+                    val seen = numberSemigroup.combine(value, value)
+                    val expected = value + value
 
-                expected == seen
+                    expected == seen
+                }
             }
 
-            forAll { value: Double ->
-                val numberSemigroup = DoubleMonoid
-                val seen = numberSemigroup.combine(value, value)
-                val expected = value + value
+            "double" {
+                forAll { value: Double ->
+                    val numberSemigroup = DoubleMonoid
+                    val seen = numberSemigroup.combine(value, value)
+                    val expected = value + value
 
-                expected == seen
+                    expected == seen
+                }
             }
 
-            forAll { value: Long ->
-                val numberSemigroup = LongMonoid
-                val seen = numberSemigroup.combine(value, value)
-                val expected = value + value
+            "long" {
 
-                expected == seen
+                forAll { value: Long ->
+                    val numberSemigroup = LongMonoid
+                    val seen = numberSemigroup.combine(value, value)
+                    val expected = value + value
+
+                    expected == seen
+                }
             }
 
-            forAll { value: Short ->
-                val numberSemigroup = ShortMonoid
-                val seen = numberSemigroup.combine(value, value)
-                val expected = (value + value).toShort()
+            "short" {
+                forAll { value: Short ->
+                    val numberSemigroup = ShortMonoid
+                    val seen = numberSemigroup.combine(value, value)
+                    val expected = (value + value).toShort()
 
-                expected == seen
+                    expected == seen
+                }
             }
 
-            forAll { value: Byte ->
-                val numberSemigroup = ByteMonoid
-                val seen = numberSemigroup.combine(value, value)
-                val expected = (value + value).toByte()
+            "byte" {
+                forAll { value: Byte ->
+                    val numberSemigroup = ByteMonoid
+                    val seen = numberSemigroup.combine(value, value)
+                    val expected = (value + value).toByte()
 
-                expected == seen
+                    expected == seen
+                }
             }
         }
     }
