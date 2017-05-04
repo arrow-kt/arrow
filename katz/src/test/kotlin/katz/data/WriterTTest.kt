@@ -81,7 +81,7 @@ class WriterTTest : UnitSpec() {
             }
         }
 
-        "reverse should reverse both" {
+        "swap should swap both" {
             forAll { a: Int ->
                 val write = NonEmptyList.of(a)
                 val right = WriterT(Id(write toT a))

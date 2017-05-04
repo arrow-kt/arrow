@@ -54,7 +54,7 @@ class ValidatedTest : UnitSpec() {
             Valid(13).exist { v -> v < 10 } shouldBe false
         }
 
-        "reverse should return Valid(e) if is Invalid and Invalid(v) in otherwise" {
+        "swap should return Valid(e) if is Invalid and Invalid(v) in otherwise" {
             Valid(13).swap() shouldBe Invalid(13)
             Invalid(13).swap() shouldBe Valid(13)
         }

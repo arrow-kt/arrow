@@ -56,7 +56,7 @@ class EitherTest : UnitSpec() {
             }
         }
 
-        "reverse should interchange values" {
+        "swap should interchange values" {
             forAll { a: Int ->
                 Left(a).swap() == Right(a)
                         && Right(a).swap() == Left(a)

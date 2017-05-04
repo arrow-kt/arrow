@@ -165,13 +165,13 @@ sealed class Ior<out A, out B> : IorKind<A, B> {
 
     /**
      * If this is a [Left], then return the left value in [Right] or vice versa,
-     * when this is [Both] , left and right values are reverse
+     * when this is [Both] , left and right values are swap
      *
      * Example:
      * ```
-     * Left("left").reverse()   // Result: Right("left")
-     * Right("right").reverse() // Result: Left("right")
-     * Both("left", "right").reverse() // Result: Both("right", "left")
+     * Left("left").swap()   // Result: Right("left")
+     * Right("right").swap() // Result: Left("right")
+     * Both("left", "right").swap() // Result: Both("right", "left")
      * ```
      */
     fun swap(): Ior<B, A> = fold(
