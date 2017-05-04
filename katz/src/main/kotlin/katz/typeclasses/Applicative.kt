@@ -21,7 +21,7 @@ interface Applicative<F> : Functor<F>, Typeclass {
 }
 
 data class Tuple2<out A, out B>(val a: A, val b: B) {
-    fun swap(): Tuple2<B, A> = Tuple2(b, a)
+    fun reverse(): Tuple2<B, A> = Tuple2(b, a)
 }
 data class Tuple3<out A, out B, out C>(val a: A, val b: B, val c: C)
 data class Tuple4<out A, out B, out C, out D>(val a: A, val b: B, val c: C, val d: D)

@@ -61,8 +61,8 @@ sealed class Either<out A, out B> : EitherKind<A, B> {
      *
      * Example:
      * ```
-     * Left("left").swap()   // Result: Right("left")
-     * Right("right").swap() // Result: Left("right")
+     * Left("left").reverse()   // Result: Right("left")
+     * Right("right").reverse() // Result: Left("right")
      * ```
      */
     fun swap(): Either<B, A> =

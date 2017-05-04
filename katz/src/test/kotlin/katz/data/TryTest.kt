@@ -43,7 +43,7 @@ class TryTest : UnitSpec() {
             failure.filter { false } shouldBe failure
         }
 
-        "failed tries to swap" {
+        "failed tries to reverse" {
             val ex = Exception()
             val failure: Try<Int> = Failure(ex)
 

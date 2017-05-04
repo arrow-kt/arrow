@@ -53,7 +53,7 @@ class IorTest : UnitSpec() {
             }
         }
 
-        "swap() should interchange value" {
+        "reverse() should interchange value" {
             forAll { a: Int, b: String ->
                 {
                     Ior.Both(a, b).swap() == Ior.Both(b, a)
@@ -61,7 +61,7 @@ class IorTest : UnitSpec() {
             }
         }
 
-        "swap() should interchange entity" {
+        "reverse() should interchange entity" {
             forAll { a: Int ->
                 {
                     Ior.Left(a).swap() == Ior.Right(a) &&
