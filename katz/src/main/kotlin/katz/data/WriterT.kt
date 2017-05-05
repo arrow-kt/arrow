@@ -8,10 +8,10 @@ data class WriterT<F, W, A>(val MF: Monad<F>, val value: HK<F, Tuple2<W, A>>) : 
 
     companion object {
         inline fun <reified F, reified W, A> pure(a: A, MM: Monoid<W> = monoid(), MF: Monad<F> = monad()) =
-                WriterT(MF.pure(MM.empty() toT a), MF)
+                WriterT(MF.pure(MM.empty() plus a), MF)
 
         inline fun <reified F, W, A> both(w: W, a: A, MF: Monad<F> = monad()) =
-                WriterT(MF.pure(w toT a), MF)
+                WriterT(MF.pure(w plus a), MF)
 
         inline fun <reified F, W, A> fromTuple(z: Tuple2<W, A>, MF: Monad<F> = monad()) =
                 WriterT(MF.pure(z), MF)

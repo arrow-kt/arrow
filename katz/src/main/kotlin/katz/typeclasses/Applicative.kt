@@ -48,9 +48,9 @@ data class Tuple10<out A, out B, out C, out D, out E, out F, out G, out H, out I
     fun reverse(): Tuple10<J, I, H, G, F, E, D, C, B, A> = Tuple10(j, i, h, g, f, e, d, c, b, a)
 }
 
-infix fun <A, B, C, D> Tuple3<A, B, C>.toT(d: D): Tuple4<A, B, C, D> = Tuple4(this.a, this.b, this.c, d)
-infix fun <A, B, C> Tuple2<A, B>.toT(c: C): Tuple3<A, B, C> = Tuple3(this.a, this.b, c)
-infix fun <A, B> A.toT(b: B): Tuple2<A, B> = Tuple2(this, b)
+infix fun <A, B, C, D> Tuple3<A, B, C>.plus(d: D): Tuple4<A, B, C, D> = Tuple4(this.a, this.b, this.c, d)
+infix fun <A, B, C> Tuple2<A, B>.plus(c: C): Tuple3<A, B, C> = Tuple3(this.a, this.b, c)
+infix fun <A, B> A.plus(b: B): Tuple2<A, B> = Tuple2(this, b)
 
 fun <HKF, A, Z> HK<HKF, A>.product(AP: Applicative<HKF>, other: HK<HKF, Z>): HK<HKF, Tuple2<A, Z>> =
         AP.product(this, other)

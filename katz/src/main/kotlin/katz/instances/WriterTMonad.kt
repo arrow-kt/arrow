@@ -2,7 +2,7 @@ package katz
 
 data class WriterTMonad<F, W>(val MM: Monad<F>, val SG: Monoid<W>) : Monad<WriterF<F, W>> {
     override fun <A> pure(a: A): HK<WriterF<F, W>, A> =
-            WriterT(MM, MM.pure(SG.empty() toT a))
+            WriterT(MM, MM.pure(SG.empty() plus a))
 
     override fun <A, B> map(fa: HK<WriterF<F, W>, A>, f: (A) -> B): HK<WriterF<F, W>, B> =
             fa.ev().map { f(it) }
