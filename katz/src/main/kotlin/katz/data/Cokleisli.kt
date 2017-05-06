@@ -1,11 +1,13 @@
 package katz
 
-typealias CoKleisiTKind<F, A, B> = HK3<Cokleisli.F, F, A, B>
-typealias CoKleisiF<F> = HK<Cokleisli.F, F>
+typealias CokleisiTKind<F, A, B> = HK3<Cokleisli.F, F, A, B>
+typealias CokleisiF<F> = HK<Cokleisli.F, F>
 
-typealias CoKleisiFun<F, A, B> = (HK<F, A>) -> B
+typealias CokleisiFun<F, A, B> = (HK<F, A>) -> B
 
-data class Cokleisli<F, A, B>(val MM: Comonad<F>, val run: CoKleisiFun<F, A, B>) {
+typealias CoreaderT<F, A, B> = Cokleisli<F, A, B>
+
+data class Cokleisli<F, A, B>(val MM: Comonad<F>, val run: CokleisiFun<F, A, B>) : CokleisiTKind<F, A, B> {
     class F private constructor()
 
     inline fun <C, D> bimap(noinline g: (D) -> A, crossinline f: (B) -> C): Cokleisli<F, D, C> =
@@ -23,6 +25,7 @@ data class Cokleisli<F, A, B>(val MM: Comonad<F>, val run: CoKleisiFun<F, A, B>)
     fun <D> compose(a: Cokleisli<F, D, A>): Cokleisli<F, D, B> =
             Cokleisli(MM, { run(MM.coflatMap(it, a.run)) })
 
+    @JvmName("andThenK")
     fun <C> andThen(a: HK<F, C>): Cokleisli<F, A, C> =
             Cokleisli(MM, { MM.extract(a) })
 
@@ -39,7 +42,9 @@ data class Cokleisli<F, A, B>(val MM: Comonad<F>, val run: CoKleisiFun<F, A, B>)
         inline fun <reified F, A, B> pure(b: B, MF: Comonad<F> = comonad<F>()): Cokleisli<F, A, B> =
                 Cokleisli(MF, { b })
 
-        inline fun <reified F, D> ask(MF: Comonad<F> = comonad<F>()): Cokleisli<F, D, D> =
+        inline fun <reified F, B> ask(MF: Comonad<F> = comonad<F>()): Cokleisli<F, B, B> =
                 Cokleisli(MF, { MF.extract(it) })
     }
 }
+
+fun <F, A, B> CokleisiTKind<F, A, B>.ev(): Cokleisli<F, A, B> = this as Cokleisli<F, A, B>
