@@ -16,6 +16,9 @@ interface Comonad<F> : Functor<F>, Typeclass {
     fun <A, B> coflatMap(fa: HK<F, A>, f: (HK<F, A>) -> B): HK<F, B>
 
     fun <A> extract(fa: HK<F, A>): A
+
+    fun <A> duplicate(fa: HK<F, A>): HK<F, HK<F, A>> =
+            coflatMap(fa, { it })
 }
 
 @RestrictsSuspension
@@ -47,9 +50,9 @@ open class ComonadContinuation<F, A : Any>(val CM: Comonad<F>) : Serializable, C
         COROUTINE_SUSPENDED
     }
 
-    infix fun <B> yields(b: HK<F, B>) = yields { b }
+    infix fun <B> yields(b: B) = yields { b }
 
-    infix fun <B> yields(b: () -> HK<F, B>) = CM.extract(b())
+    infix fun <B> yields(b: () -> B) = b()
 }
 
 /**

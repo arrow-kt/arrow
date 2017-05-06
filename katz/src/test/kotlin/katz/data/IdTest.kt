@@ -9,7 +9,7 @@ import katz.cobinding
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class NonEmptyListTest : UnitSpec() {
+class IdTest : UnitSpec() {
     init {
         "IdMonad.binding should for comprehend over all values of multiple Ids" {
             Id.binding {
@@ -25,8 +25,12 @@ class NonEmptyListTest : UnitSpec() {
                 val x = Id(1).bind()
                 val y = !Id(2)
                 val z = bind { Id(3) }
-                yields(Id(x + y + z))
+                yields(x + y + z)
             } shouldBe 6
+        }
+
+        "IdComonad.duplicate should create an instance of Id<Id<A>>" {
+            Id.duplicate(Id(3)) shouldBe Id(Id(3))
         }
     }
 }

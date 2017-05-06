@@ -70,7 +70,7 @@ class NonEmptyListTest : UnitSpec() {
                 val x = !NonEmptyList.of(1)
                 val y = NonEmptyList.of(2).bind()
                 val z = bind { NonEmptyList.of(3) }
-                yields(NonEmptyList.of(x + y + z))
+                yields(x + y + z)
             }
             result shouldBe 6
         }
@@ -80,7 +80,7 @@ class NonEmptyListTest : UnitSpec() {
                 val x = !NonEmptyList.of(1, 2)
                 val y = NonEmptyList.of(3).bind()
                 val z = bind { NonEmptyList.of(4) }
-                yields(NonEmptyList.of(x + y + z))
+                yields(x + y + z)
             }
             result shouldBe 8
         }
@@ -94,10 +94,14 @@ class NonEmptyListTest : UnitSpec() {
                     val x = !nel
                     val y = nel2.bind()
                     val z = bind { nel3 }
-                    yields(NonEmptyList.of(x + y + z))
+                    yields(x + y + z)
                 }
                 result == 1 + 3 + a
             }
+        }
+
+        "NonEmptyListComonad.duplicate should create an instance of NonEmptyList<NonEmptyList<A>>" {
+            NonEmptyList.duplicate(NonEmptyList.of(3)) shouldBe NonEmptyList.of(NonEmptyList.of(3))
         }
     }
 }
