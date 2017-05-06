@@ -7,7 +7,7 @@ interface Comonad<F> : Functor<F>, Typeclass {
 
     fun <A, B> coflatMap(fa: HK<F, A>, f: (HK<F, A>) -> B): HK<F, B>
 
-    fun <A> extract(fa: HK<F, A>) : A
+    fun <A> extract(fa: HK<F, A>): A
 
 }
 
