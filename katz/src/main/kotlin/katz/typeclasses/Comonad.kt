@@ -36,11 +36,11 @@ open class ComonadContinuation<F, A : Any>(val CM: Comonad<F>) : Serializable, C
 
     internal lateinit var returnedMonad: A
 
-    operator suspend fun <B> HK<F, B>.not(): B = bind { this }
+    operator suspend fun <B> HK<F, B>.not(): B = extract { this }
 
-    suspend fun <B> HK<F, B>.bind(): B = bind { this }
+    suspend fun <B> HK<F, B>.extract(): B = extract { this }
 
-    suspend fun <B> bind(m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
+    suspend fun <B> extract(m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels
         returnedMonad = CM.extract(CM.coflatMap(m(), { x: HK<F, B> ->
             c.stackLabels = labelHere

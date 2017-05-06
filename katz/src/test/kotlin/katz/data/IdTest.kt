@@ -22,9 +22,9 @@ class IdTest : UnitSpec() {
 
         "IdComonad.cobinding should for comprehend over all values of multiple Ids" {
             Id.cobinding {
-                val x = Id(1).bind()
+                val x = Id(1).extract()
                 val y = !Id(2)
-                val z = bind { Id(3) }
+                val z = extract { Id(3) }
                 yields(x + y + z)
             } shouldBe 6
         }
