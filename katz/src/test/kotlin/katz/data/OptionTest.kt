@@ -63,7 +63,7 @@ class OptionTest : UnitSpec() {
 
         "fromNullable should return none for null values of nullable types" {
             val a: Int? = null
-            Companion.fromNullable(a) shouldBe None
+            Option.fromNullable(a) shouldBe None
         }
 
         "Option.monad.flatMap should be consistent with Option#flatMap" {

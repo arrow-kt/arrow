@@ -8,7 +8,7 @@ import org.junit.runner.RunWith
 class OptionMonoidTest : UnitSpec() {
     init {
         "should semigroup with the instance passed" {
-            forAll { value: Int ->
+            forAll { _: Int ->
                 val optionMonoid = OptionMonoid(NonEmptyListSemigroup<Int>())
                 val seen = optionMonoid.combine(Option.None, Option.None)
                 val expected = Option.None

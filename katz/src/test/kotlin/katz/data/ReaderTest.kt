@@ -1,7 +1,8 @@
-package katz
+package katz.data
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
+import katz.*
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -19,7 +20,7 @@ class ReaderTest : UnitSpec() {
         "zip should return a new Reader zipping two given ones" {
             val r1 = Reader<Int, Int> ({ it -> it * 2 })
             val r2 = Reader<Int, Int> ({ it -> it * 3 })
-            r1.zip(r2).run(2).value() shouldBe Pair(4, 6)
+            r1.zip(r2).run(2).value() shouldBe Tuple2(4, 6)
         }
 
         "local should switch context to be able to combine Readers with different contexts" {

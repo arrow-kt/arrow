@@ -114,7 +114,7 @@ open class GlobalInstance<T : Typeclass> : TypeLiteral<T>() {
     }
 
     /**
-     * REcursively scan all implemented interfaces and add as global instances all the ones that match a Typeclass
+     * Recursively scan all implemented interfaces and add as global instances all the ones that match a Typeclass
      */
     fun recurseInterfaces(c: Class<*>) {
         return when {
