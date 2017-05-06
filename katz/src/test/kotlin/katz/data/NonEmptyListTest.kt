@@ -64,5 +64,40 @@ class NonEmptyListTest : UnitSpec() {
                 result.ev().size == nel.size * nel2.size * nel3.size
             }
         }
+
+        "NonEmptyListComonad.cobinding should for comprehend over NonEmptyList" {
+            val result = NonEmptyList.cobinding {
+                val x = !NonEmptyList.of(1)
+                val y = NonEmptyList.of(2).bind()
+                val z = bind { NonEmptyList.of(3) }
+                yields(NonEmptyList.of(x + y + z))
+            }
+            result shouldBe 6
+        }
+
+        "NonEmptyListComonad.cobinding should for comprehend over complex NonEmptyList" {
+            val result = NonEmptyList.cobinding {
+                val x = !NonEmptyList.of(1, 2)
+                val y = NonEmptyList.of(3).bind()
+                val z = bind { NonEmptyList.of(4) }
+                yields(NonEmptyList.of(x + y + z))
+            }
+            result shouldBe 8
+        }
+
+        "NonEmptyListComonad.cobinding should for comprehend over all values of multiple NonEmptyList" {
+            forAll { a: Int, b: List<Int> ->
+                val nel: NonEmptyList<Int> = NonEmptyList(a, b)
+                val nel2 = NonEmptyList.of(1, 2)
+                val nel3 = NonEmptyList.of(3, 4, 5)
+                val result: Int = NonEmptyList.cobinding {
+                    val x = !nel
+                    val y = nel2.bind()
+                    val z = bind { nel3 }
+                    yields(NonEmptyList.of(x + y + z))
+                }
+                result == 1 + 3 + a
+            }
+        }
     }
 }
