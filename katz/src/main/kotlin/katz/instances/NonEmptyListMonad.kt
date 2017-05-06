@@ -21,7 +21,7 @@ interface NonEmptyListMonad : Monad<NonEmptyList.F> {
                         is Option.None -> Unit
                     }
                 }
-                is Either.Left<*> -> go(buf, f, NonEmptyList.fromListUnsafe(f(v.head.a as A).ev().all + v.tail))
+                is Either.Left<*> -> go(buf, f, f(v.head.a as A).ev() + v.tail)
             }
 
     override fun <A, B> tailRecM(a: A, f: (A) -> HK<NonEmptyList.F, Either<A, B>>): NonEmptyList<B> {
