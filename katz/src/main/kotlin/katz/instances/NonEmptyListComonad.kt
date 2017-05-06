@@ -1,6 +1,6 @@
 package katz
 
-interface NonEmptyListComonad : NonEmptyListMonad, Comonad<NonEmptyList.F> {
+interface NonEmptyListComonad : Comonad<NonEmptyList.F> {
     override fun <A, B> coflatMap(fa: NonEmptyListKind<A>, f: (NonEmptyListKind<A>) -> B): NonEmptyListKind<B> {
         val buf = mutableListOf<B>()
         tailrec fun consume(list: List<A>): List<B> =
