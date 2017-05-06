@@ -33,25 +33,25 @@ data class WriterT<F, W, A>(val MF: Monad<F>, val value: HK<F, Tuple2<W, A>>) : 
             mapAcc { MM.empty() }
 
     inline fun <B> map(crossinline f: (A) -> B): WriterT<F, W, B> =
-            WriterT(MF, MF.map(value, { it.a toT f(it.b) }))
+            WriterT(MF, MF.map(value, { it.a plus f(it.b) }))
 
     inline fun <U> mapAcc(crossinline f: (W) -> U): WriterT<F, U, A> =
-            transform { f(it.a) toT it.b }
+            transform { f(it.a) plus it.b }
 
     inline fun <C, U> bimap(crossinline g: (W) -> U, crossinline f: (A) -> C): WriterT<F, U, C> =
-            transform { g(it.a) toT f(it.b) }
+            transform { g(it.a) plus f(it.b) }
 
     fun swap(): WriterT<F, A, W> =
-            transform { it.b toT it.a }
+            transform { it.b plus it.a }
 
     inline fun <B> flatMap(crossinline f: (A) -> WriterT<F, W, B>, SG: Semigroup<W>): WriterT<F, W, B> =
-            WriterT(MF, MF.flatMap(value, { value -> MF.map(f(value.b).value, { SG.combine(it.a, value.a) toT it.b }) }))
+            WriterT(MF, MF.flatMap(value, { value -> MF.map(f(value.b).value, { SG.combine(it.a, value.a) plus it.b }) }))
 
     inline fun <B, U> transform(crossinline f: (Tuple2<W, A>) -> Tuple2<U, B>): WriterT<F, U, B> =
             WriterT(MF, MF.flatMap(value, { MF.pure(f(it)) }))
 
     fun <B> liftF(fa: HK<F, B>): WriterT<F, W, B> =
-            WriterT(MF, MF.map2(fa, value, { it.b.a toT it.a }))
+            WriterT(MF, MF.map2(fa, value, { it.b.a plus it.a }))
 
     inline fun <C> semiflatMap(crossinline f: (A) -> HK<F, C>, SG: Semigroup<W>): WriterT<F, W, C> =
             flatMap({ liftF(f(it)) }, SG)
