@@ -1,8 +1,8 @@
 package katz
 
 typealias CoproductF<F> = HK<Coproduct.F, F>
-typealias CoproductFG<F, G> = HK<CoproductF<F>, G>
-typealias CoproductKind<F, G, A> = HK<CoproductFG<F, G>, A>
+typealias CoproductFG<F, G> = HK2<Coproduct.F, F, G>
+typealias CoproductKind<F, G, A> = HK3<Coproduct.F, F, G, A>
 
 fun <F, G, A> CoproductKind<F, G, A>.ev(): Coproduct<F, G, A> = this as Coproduct<F, G, A>
 
@@ -27,7 +27,7 @@ data class Coproduct<F, G, A>(val CF: Comonad<F>, val CG: Comonad<G>, val run: E
             run.fold({ f(it) }, { g(it) })
 
     companion object {
-        inline operator fun <reified F, reified G, A> invoke(CF: Comonad<F> = comonad<F>(), CG: Comonad<G> = comonad<G>(), run: Either<HK<F, A>, HK<G, A>>) =
+        inline operator fun <reified F, reified G, A> invoke(run: Either<HK<F, A>, HK<G, A>>, CF: Comonad<F> = comonad<F>(), CG: Comonad<G> = comonad<G>()) =
                 Coproduct(CF, CG, run)
     }
 

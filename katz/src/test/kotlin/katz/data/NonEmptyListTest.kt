@@ -64,5 +64,44 @@ class NonEmptyListTest : UnitSpec() {
                 result.ev().size == nel.size * nel2.size * nel3.size
             }
         }
+
+        "NonEmptyListComonad.cobinding should for comprehend over NonEmptyList" {
+            val result = NonEmptyList.cobinding {
+                val x = !NonEmptyList.of(1)
+                val y = NonEmptyList.of(2).extract()
+                val z = extract { NonEmptyList.of(3) }
+                yields(x + y + z)
+            }
+            result shouldBe 6
+        }
+
+        "NonEmptyListComonad.cobinding should for comprehend over complex NonEmptyList" {
+            val result = NonEmptyList.cobinding {
+                val x = !NonEmptyList.of(1, 2)
+                val y = NonEmptyList.of(3).extract()
+                val z = extract { NonEmptyList.of(4) }
+                yields(x + y + z)
+            }
+            result shouldBe 8
+        }
+
+        "NonEmptyListComonad.cobinding should for comprehend over all values of multiple NonEmptyList" {
+            forAll { a: Int, b: List<Int> ->
+                val nel: NonEmptyList<Int> = NonEmptyList(a, b)
+                val nel2 = NonEmptyList.of(1, 2)
+                val nel3 = NonEmptyList.of(3, 4, 5)
+                val result: Int = NonEmptyList.cobinding {
+                    val x = !nel
+                    val y = nel2.extract()
+                    val z = extract { nel3 }
+                    yields(x + y + z)
+                }
+                result == 1 + 3 + a
+            }
+        }
+
+        "NonEmptyListComonad.duplicate should create an instance of NonEmptyList<NonEmptyList<A>>" {
+            NonEmptyList.duplicate(NonEmptyList.of(3)) shouldBe NonEmptyList.of(NonEmptyList.of(3))
+        }
     }
 }
