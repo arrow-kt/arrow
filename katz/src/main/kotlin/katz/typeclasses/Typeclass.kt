@@ -2,8 +2,7 @@ package katz
 
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
-import java.util.Arrays
-import java.util.Objects
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -162,6 +161,8 @@ inline fun <reified T> typeLiteral(): Type = object : TypeLiteral<T>() {}.type
  */
 object GlobalInstances : ConcurrentHashMap<Type, GlobalInstance<*>>()
 
+object GlobalInstancesN : ConcurrentHashMap<Type, () -> Monad<*>>()
+
 /**
  * Obtains a global registered typeclass instance when fast unsafe runtime lookups are desired over passing instances
  * as args to functions. Use with care. This lookup will throw an exception if a typeclass is summoned and can't be found
@@ -182,5 +183,7 @@ data class TypeClassInstanceNotFound(val type: Type)
 fun <T : Typeclass> instance(t: Type): T {
     if (GlobalInstances.containsKey(t))
         return GlobalInstances.getValue(t) as T
+    else if (GlobalInstancesN.containsKey(t))
+        return GlobalInstancesN.getValue(t)() as T
     else throw TypeClassInstanceNotFound(t)
 }

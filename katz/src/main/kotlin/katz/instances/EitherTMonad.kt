@@ -26,3 +26,5 @@ class EitherTMonad<F, L>(val MF : Monad<F>) : Monad<EitherTF<F, L>> {
 }
 
 fun <F, A, B> EitherTKind<F, A, B>.ev(): EitherT<F, A, B> = this as EitherT<F, A, B>
+
+inline fun <reified F, reified L> Monad<EitherTF<F, L>>.ev(): EitherTMonad<F, L> = this as EitherTMonad<F, L>
