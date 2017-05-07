@@ -32,11 +32,11 @@ class NonEmptyList<out A> private constructor(
     fun <B> flatMap(f: (A) -> NonEmptyList<B>): NonEmptyList<B> =
             f(head) + tail.flatMap { f(it).all }
 
-    infix operator fun <A> NonEmptyList<A>.plus(l: NonEmptyList<A>): NonEmptyList<A> = NonEmptyList(all + l.all)
+    operator fun plus(l: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> = NonEmptyList(all + l.all)
 
-    infix operator fun <A> NonEmptyList<A>.plus(l: List<A>): NonEmptyList<A> = NonEmptyList(all + l)
+    operator fun plus(l: List<@UnsafeVariance A>): NonEmptyList<A> = NonEmptyList(all + l)
 
-    infix operator fun <A> NonEmptyList<A>.plus(a: A): NonEmptyList<A> = NonEmptyList(all + a)
+    operator fun plus(a: @UnsafeVariance A): NonEmptyList<A> = NonEmptyList(all + a)
 
     fun iterator(): Iterator<A> = all.iterator()
 
@@ -59,7 +59,7 @@ class NonEmptyList<out A> private constructor(
         return "NonEmptyList(all=$all)"
     }
 
-    companion object : NonEmptyListMonad, GlobalInstance<Monad<NonEmptyList.F>>() {
+    companion object : NonEmptyListBimonad, GlobalInstance<Bimonad<NonEmptyList.F>>() {
         @JvmStatic fun <A> of(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
         @JvmStatic fun <A> fromList(l: List<A>): Option<NonEmptyList<A>> = if (l.isEmpty()) Option.None else Option.Some(NonEmptyList(l))
         @JvmStatic fun <A> fromListUnsafe(l: List<A>): NonEmptyList<A> = NonEmptyList(l)

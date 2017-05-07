@@ -4,7 +4,7 @@ infix fun <A, B, C> ((B) -> C).compose(f: (A) -> B): (A) -> C = { a: A -> this(f
 
 infix fun <A, B, C> ((A) -> B).andThen(g: (B) -> C): (A) -> C = { a: A -> g(this(a)) }
 
-inline fun <D, A> ((D) -> A).reader(): ReaderT<Id.F, D, A> = Reader(this)
+fun <D, A> ((D) -> A).reader(): ReaderT<Id.F, D, A> = Reader(this)
 
 fun <D, A> ReaderT<Id.F, D, A>.runId(d: D): A = this.run(d).value()
 

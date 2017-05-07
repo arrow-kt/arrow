@@ -1,11 +1,11 @@
 package katz
 
-import com.sun.net.httpserver.Authenticator
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
+import katz.Validated.Invalid
+import katz.Validated.Valid
 import org.junit.runner.RunWith
-import katz.Validated.*
 
 @RunWith(KTestJUnitRunner::class)
 class ValidatedTest : UnitSpec() {
@@ -76,7 +76,7 @@ class ValidatedTest : UnitSpec() {
         }
 
         "foldLeft should return b when is Invalid" {
-            Invalid(13).foldLeft("Coming soon!") { b, a -> fail("None should not be called") } shouldBe "Coming soon!"
+            Invalid(13).foldLeft("Coming soon!") { _, _ -> fail("None should not be called") } shouldBe "Coming soon!"
         }
 
         "foldLeft should return f processed when is Valid" {
@@ -179,7 +179,7 @@ class ValidatedTest : UnitSpec() {
                     Invalid("fail1"),
                     Invalid("fail2"),
                     Valid("Who"),
-                    { (a, b, c) -> "${a}th $b $c" }) shouldBe Invalid("fail1 fail2")
+                    { "success!" }) shouldBe Invalid("fail1 fail2")
         }
     }
 }
