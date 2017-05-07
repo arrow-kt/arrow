@@ -11,7 +11,7 @@ data class CoYoneda<FU, P, A>(val function: (P) -> A, val pivot: HK<FU, P>) : Co
 
     fun <B> map(f: (A) -> B): CoYoneda<FU, P, B> = CoYoneda({ f(function(it)) }, pivot)
 
-    fun toYoneda(FF: Functor<FU>): Yoneda<FU, A> = object: Yoneda<FU, A> {
+    fun toYoneda(FF: Functor<FU>): Yoneda<FU, A> = object : Yoneda<FU, A> {
         override fun <B> apply(f: (A) -> B): HK<FU, B> = map(f).lower(FF)
     }
 

@@ -11,7 +11,7 @@ interface Yoneda<FU, A> : HK<HK<Yoneda.F, FU>, A> {
 
     fun <B> apply(f: (A) -> B): HK<FU, B>
 
-    fun lower(): HK<FU, A> = apply{ a -> a }
+    fun lower(): HK<FU, A> = apply { a -> a }
 
     fun <B> map(ff: (A) -> B, FF: Functor<FU>): Yoneda<FU, B> = object : Yoneda<FU, B> {
         override fun <C> apply(f: (B) -> C): HK<FU, C> = this@Yoneda.apply({ f(ff(it)) })
@@ -20,7 +20,7 @@ interface Yoneda<FU, A> : HK<HK<Yoneda.F, FU>, A> {
     fun toCoYoneda(): CoYoneda<FU, A, A> = CoYoneda({ it }, lower())
 
     companion object {
-        inline fun <reified U, A> apply(fa: HK<U, A>, FF: Functor<U> = functor()): Yoneda<U, A> = object: Yoneda<U, A> {
+        inline fun <reified U, A> apply(fa: HK<U, A>, FF: Functor<U> = functor()): Yoneda<U, A> = object : Yoneda<U, A> {
             override fun <B> apply(f: (A) -> B): HK<U, B> = FF.map(fa, f)
         }
     }
