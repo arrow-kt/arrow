@@ -10,7 +10,7 @@ data class Id<out A>(val value: A) : IdKind<A> {
 
     inline fun <B> flatMap(f: (A) -> Id<B>): Id<B> = f(value)
 
-    companion object : IdMonad, IdComonad, GlobalInstance<Comonad<Id.F>>()
+    companion object : IdBimonad, GlobalInstance<Bimonad<Id.F>>()
 
 }
 

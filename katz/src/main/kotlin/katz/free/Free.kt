@@ -43,7 +43,7 @@ tailrec fun <S, A> Free<S, A>.step(): Free<S, A> =
     }
 
 @Suppress("UNCHECKED_CAST")
-fun <M, S, A> Free<S, A>.foldMap(MM: Monad<M>, f: FunctionK<S, M>): HK<M, A> =
+fun <M, S, A> Free<S, A>.foldMap(f: FunctionK<S, M>, MM: Monad<M>): HK<M, A> =
         MM.tailRecM(this) {
             val x = it.step()
             when (x) {
@@ -52,7 +52,7 @@ fun <M, S, A> Free<S, A>.foldMap(MM: Monad<M>, f: FunctionK<S, M>): HK<M, A> =
                 is Free.FlatMapped<S, A, *> -> {
                     val g = (x.f as (A) -> Free<S, A>)
                     val c = x.c as Free<S, A>
-                    MM.map(c.foldMap(MM, f), { cc -> Either.Left(g(cc)) })
+                    MM.map(c.foldMap(f, MM), { cc -> Either.Left(g(cc)) })
                 }
             }
         }

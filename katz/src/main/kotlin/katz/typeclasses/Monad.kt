@@ -62,8 +62,7 @@ open class MonadContinuation<F, A>(val M: Monad<F>) : Serializable, Continuation
  */
 fun <F, B> Monad<F>.binding(c: suspend MonadContinuation<F, *>.() -> HK<F, B>): HK<F, B> {
     val continuation = MonadContinuation<F, B>(this)
-    val f: suspend MonadContinuation<F, *>.() -> HK<F, B> = { c() }
-    f.startCoroutine(continuation, continuation)
+    c.startCoroutine(continuation, continuation)
     return continuation.returnedMonad
 }
 
