@@ -25,7 +25,7 @@ class CofreeTest : UnitSpec() {
     }
 
     init {
-        "tail should return just tail without running" {
+        "tailForced should evaluate and return" {
             val sideEffect = SideEffect()
             val start: Cofree<Id.F, Int> = Cofree(sideEffect.counter, { sideEffect.increment(); Id(it) }, Id)
             sideEffect.counter shouldBe 0
