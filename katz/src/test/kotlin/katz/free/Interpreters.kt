@@ -9,21 +9,21 @@ val cofreeOptionToNel: FunctionK<CofreeF<Option.F>, NonEmptyList.F> = object : F
             }
 }
 
-val cofreeListToNel: FunctionK<CofreeF<CofreeTest.ListT.ListF>, NonEmptyList.F> = object : FunctionK<CofreeF<CofreeTest.ListT.ListF>, NonEmptyList.F> {
-    override fun <A> invoke(fa: HK<CofreeF<CofreeTest.ListT.ListF>, A>): HK<NonEmptyList.F, A> =
-            fa.ev().let { c: Cofree<CofreeTest.ListT.ListF, A> ->
-                val all: List<Cofree<CofreeTest.ListT.ListF, A>> = c.tailForced().lev().all
+val cofreeListToNel: FunctionK<CofreeF<ListT.ListF>, NonEmptyList.F> = object : FunctionK<CofreeF<ListT.ListF>, NonEmptyList.F> {
+    override fun <A> invoke(fa: HK<CofreeF<ListT.ListF>, A>): HK<NonEmptyList.F, A> =
+            fa.ev().let { c: Cofree<ListT.ListF, A> ->
+                val all: List<Cofree<ListT.ListF, A>> = c.tailForced().lev().all
                 val tail: List<A> = all.foldRight(listOf<A>(), { v, acc -> acc + invoke(v).ev().all })
                 val headL: List<A> = listOf(c.head)
                 NonEmptyList.fromListUnsafe(headL + tail)
             }
 }
 
-fun <A> HK<CofreeTest.ListT.ListF, A>.lev() = this as CofreeTest.ListT<A>
+fun <A> HK<ListT.ListF, A>.lev() = this as ListT<A>
 
-val optionToList: FunctionK<Option.F, CofreeTest.ListT.ListF> = object : FunctionK<Option.F, CofreeTest.ListT.ListF> {
-    override fun <A> invoke(fa: HK<Option.F, A>): HK<CofreeTest.ListT.ListF, A> =
-            fa.ev().fold({ CofreeTest.ListT(listOf()) }, { CofreeTest.ListT(listOf(it)) })
+val optionToList: FunctionK<Option.F, ListT.ListF> = object : FunctionK<Option.F, ListT.ListF> {
+    override fun <A> invoke(fa: HK<Option.F, A>): HK<ListT.ListF, A> =
+            fa.ev().fold({ ListT(listOf()) }, { ListT(listOf(it)) })
 }
 
 val optionInterpreter: FunctionK<Ops.F, Option.F> = object : FunctionK<Ops.F, Option.F> {

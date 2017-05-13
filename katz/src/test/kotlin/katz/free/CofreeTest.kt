@@ -2,7 +2,7 @@ package katz
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
-import katz.CofreeTest.ListT.ListF
+import katz.ListT.ListF
 import katz.Option.None
 import katz.Option.Some
 import katz.free.cofreeListToNel
@@ -10,24 +10,70 @@ import katz.free.cofreeOptionToNel
 import katz.free.optionToList
 import org.junit.runner.RunWith
 
+
+// Unsafe functor for this test only
+class ListT<out A>(val all: List<A>) : HK<ListF, A> {
+    class ListF private constructor()
+
+    companion object : Functor<ListF> {
+        override fun <A, B> map(fa: HK<ListF, A>, f: (A) -> B): HK<ListF, B> =
+                ListT((fa as ListT<A>).all.map(f))
+
+    }
+}
+
+fun <A> HK<CoAdder.F, A>.ev() = this as CoAdder<A>
+
+abstract class CoAdder<out A> : HK<CoAdder.F, A> {
+    class F private constructor()
+
+    abstract fun add(add: Int): Tuple2<Boolean, A>
+    abstract fun clear(): A
+    abstract fun total(): Tuple2<Int, A>
+
+    companion object : Functor<F> {
+        override fun <A, B> map(fa: HK<F, A>, f: (A) -> B): CoAdder<B> =
+                object : CoAdder<B>() {
+                    override fun add(add: Int): Tuple2<Boolean, B> =
+                            fa.ev().add(add).let { (acc, value) ->
+                                acc toT f(value)
+                            }
+
+                    override fun clear(): B =
+                            f(fa.ev().clear())
+
+                    override fun total(): Tuple2<Int, B> =
+                            fa.ev().total().let { (acc, value) ->
+                                acc toT f(value)
+                            }
+                }
+    }
+}
+
+typealias Limit = Int
+
+typealias Count = Int
+
+data class CoAdderInterpreter(val limit: Limit, val count: Count) : CoAdder<Tuple2<Limit, Count>>() {
+    override fun add(add: Int): Tuple2<Boolean, Tuple2<Limit, Count>> =
+            (count + add).let { next ->
+                (next <= limit) toT (limit toT next)
+            }
+
+    override fun clear(): Tuple2<Limit, Count> =
+            limit toT 0
+
+    override fun total(): Tuple2<Int, Tuple2<Limit, Count>> =
+            count toT (limit toT count)
+}
+
 @RunWith(KTestJUnitRunner::class)
 class CofreeTest : UnitSpec() {
-
-    // Unsafe functor for this test only
-    class ListT<out A>(val all: List<A>) : HK<ListF, A> {
-        class ListF
-
-        companion object : Functor<ListF> {
-            override fun <A, B> map(fa: HK<ListF, A>, f: (A) -> B): HK<ListF, B> =
-                    ListT((fa as ListT<A>).all.map(f))
-
-        }
-    }
 
     init {
         "tailForced should evaluate and return" {
             val sideEffect = SideEffect()
-            val start: Cofree<Id.F, Int> = Cofree(sideEffect.counter, { sideEffect.increment(); Id(it) }, Id)
+            val start: Cofree<Id.F, Int> = Cofree.unfold(sideEffect.counter, { sideEffect.increment(); Id(it) }, Id)
             sideEffect.counter shouldBe 0
             start.tailForced()
             sideEffect.counter shouldBe 1
@@ -35,7 +81,7 @@ class CofreeTest : UnitSpec() {
 
         "runTail should run once and return" {
             val sideEffect = SideEffect()
-            val start: Cofree<Id.F, Int> = Cofree(sideEffect.counter, { sideEffect.increment(); Id(it) }, Id)
+            val start: Cofree<Id.F, Int> = Cofree.unfold(sideEffect.counter, { sideEffect.increment(); Id(it) }, Id)
             sideEffect.counter shouldBe 0
             start.runTail()
             sideEffect.counter shouldBe 1
@@ -43,13 +89,13 @@ class CofreeTest : UnitSpec() {
 
         "run should fold until completion" {
             val sideEffect = SideEffect()
-            val start: Cofree<Option.F, Int> = Cofree(sideEffect.counter, { sideEffect.increment(); if (sideEffect.counter == 5) None else Some(it) }, Option)
+            val start: Cofree<Option.F, Int> = Cofree.unfold(sideEffect.counter, { sideEffect.increment(); if (sideEffect.counter == 5) None else Some(it) }, Option)
             sideEffect.counter shouldBe 0
             start.run()
             sideEffect.counter shouldBe 5
         }
 
-        val startHundred: Cofree<Option.F, Int> = Cofree(0, { if (it == 100) None else Some(it + 1) }, Option)
+        val startHundred: Cofree<Option.F, Int> = Cofree.unfold(0, { if (it == 100) None else Some(it + 1) }, Option)
 
         "mapBranchingRoot should modify the value of the functor" {
             val mapped = startHundred.mapBranchingRoot(object : FunctionK<Option.F, Option.F> {
@@ -63,10 +109,24 @@ class CofreeTest : UnitSpec() {
         "mapBranchingS/T should recur over S and T respectively" {
             val mappedS = startHundred.mapBranchingS(optionToList, ListT)
             val mappedT = startHundred.mapBranchingT(optionToList, ListT)
-
             val expected = NonEmptyList.fromListUnsafe((0..100).toList())
             cofreeListToNel(mappedS) shouldBe expected
             cofreeListToNel(mappedT) shouldBe expected
+        }
+
+        "cofree should cobind correctly without blowing up the stack" {
+            val limit: Int = 10000
+            fun stackSafeProgram(current: Int) = CofreeComonad<CoAdder.F>().cobinding {
+                val value = if (current == 0) {
+                    stackSafeProgram(current - 1)
+                } else {
+                    !Cofree.unfold((limit toT current), { (l, c) -> CoAdderInterpreter(l, c) }, CoAdder)
+                }
+                yields(value)
+            }
+
+            val result = stackSafeProgram(limit)
+            result.b shouldBe limit
         }
     }
 }

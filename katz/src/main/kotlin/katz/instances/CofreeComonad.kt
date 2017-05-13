@@ -1,6 +1,6 @@
 package katz
 
-interface CofreeComonad<S> : Comonad<CofreeF<S>>, Typeclass {
+class CofreeComonad<S> : Comonad<CofreeF<S>>, Typeclass {
     override fun <A, B> coflatMap(fa: HK<CofreeF<S>, A>, f: (HK<CofreeF<S>, A>) -> B): Cofree<S, B> =
             fa.ev().coflatmap(f)
 
