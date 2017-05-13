@@ -24,8 +24,6 @@ class CofreeTest : UnitSpec() {
         }
     }
 
-    fun <A> HK<ListT.ListF, A>.ev() = this as ListT<A>
-
     init {
         "tail should return just tail without running" {
             val sideEffect = SideEffect()

@@ -12,12 +12,14 @@ val cofreeOptionToNel: FunctionK<CofreeF<Option.F>, NonEmptyList.F> = object : F
 val cofreeListToNel: FunctionK<CofreeF<CofreeTest.ListT.ListF>, NonEmptyList.F> = object : FunctionK<CofreeF<CofreeTest.ListT.ListF>, NonEmptyList.F> {
     override fun <A> invoke(fa: HK<CofreeF<CofreeTest.ListT.ListF>, A>): HK<NonEmptyList.F, A> =
             fa.ev().let { c: Cofree<CofreeTest.ListT.ListF, A> ->
-                val all: List<Cofree<CofreeTest.ListT.ListF, A>> = c.tailForced().ev().all
+                val all: List<Cofree<CofreeTest.ListT.ListF, A>> = c.tailForced().lev().all
                 val tail: List<A> = all.foldRight(listOf<A>(), { v, acc -> acc + invoke(v).ev().all })
                 val headL: List<A> = listOf(c.head)
                 NonEmptyList.fromListUnsafe(headL + tail)
             }
 }
+
+fun <A> HK<CofreeTest.ListT.ListF, A>.lev() = this as CofreeTest.ListT<A>
 
 val optionToList: FunctionK<Option.F, CofreeTest.ListT.ListF> = object : FunctionK<Option.F, CofreeTest.ListT.ListF> {
     override fun <A> invoke(fa: HK<Option.F, A>): HK<CofreeTest.ListT.ListF, A> =
