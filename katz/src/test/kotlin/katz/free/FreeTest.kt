@@ -2,6 +2,9 @@ package katz
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
+import katz.free.idInterpreter
+import katz.free.nonEmptyListInterpreter
+import katz.free.optionInterpreter
 import org.junit.runner.RunWith
 
 sealed class Ops<out A> : HK<Ops.F, A> {
@@ -20,39 +23,6 @@ sealed class Ops<out A> : HK<Ops.F, A> {
 }
 
 fun <A> HK<Ops.F, A>.ev(): Ops<A> = this as Ops<A>
-
-val optionInterpreter: FunctionK<Ops.F, Option.F> = object : FunctionK<Ops.F, Option.F> {
-    override fun <A> invoke(fa: HK<Ops.F, A>): Option<A> {
-        val op = fa.ev()
-        return when (op) {
-            is Ops.Add -> Option.Some(op.a + op.y)
-            is Ops.Subtract -> Option.Some(op.a - op.y)
-            is Ops.Value -> Option.Some(op.a)
-        } as Option<A>
-    }
-}
-
-val nonEmptyListInterpter: FunctionK<Ops.F, NonEmptyList.F> = object : FunctionK<Ops.F, NonEmptyList.F> {
-    override fun <A> invoke(fa: HK<Ops.F, A>): NonEmptyList<A> {
-        val op = fa.ev()
-        return when (op) {
-            is Ops.Add -> NonEmptyList.of(op.a + op.y)
-            is Ops.Subtract -> NonEmptyList.of(op.a - op.y)
-            is Ops.Value -> NonEmptyList.of(op.a)
-        } as NonEmptyList<A>
-    }
-}
-
-val idInterpreter: FunctionK<Ops.F, Id.F> = object : FunctionK<Ops.F, Id.F> {
-    override fun <A> invoke(fa: HK<Ops.F, A>): Id<A> {
-        val op = fa.ev()
-        return when (op) {
-            is Ops.Add -> Id(op.a + op.y)
-            is Ops.Subtract -> Id(op.a - op.y)
-            is Ops.Value -> Id(op.a)
-        } as Id<A>
-    }
-}
 
 @RunWith(KTestJUnitRunner::class)
 class FreeTest : UnitSpec() {
@@ -74,7 +44,7 @@ class FreeTest : UnitSpec() {
         "Can interpret an ADT as Free operations" {
             program.foldMap(optionInterpreter, Option).ev() shouldBe Option.Some(-30)
             program.foldMap(idInterpreter, Id).ev() shouldBe Id(-30)
-            program.foldMap(nonEmptyListInterpter, NonEmptyList).ev() shouldBe NonEmptyList.of(-30)
+            program.foldMap(nonEmptyListInterpreter, NonEmptyList).ev() shouldBe NonEmptyList.of(-30)
         }
 
         "foldMap is stack safe" {
