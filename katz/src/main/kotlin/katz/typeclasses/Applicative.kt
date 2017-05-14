@@ -21,20 +21,42 @@ interface Applicative<F> : Functor<F>, Typeclass {
 }
 
 data class Tuple2<out A, out B>(val a: A, val b: B) {
-    fun swap(): Tuple2<B, A> = Tuple2(b, a)
+    fun reverse(): Tuple2<B, A> = Tuple2(b, a)
 }
-data class Tuple3<out A, out B, out C>(val a: A, val b: B, val c: C)
-data class Tuple4<out A, out B, out C, out D>(val a: A, val b: B, val c: C, val d: D)
-data class Tuple5<out A, out B, out C, out D, out E>(val a: A, val b: B, val c: C, val d: D, val e: E)
-data class Tuple6<out A, out B, out C, out D, out E, out F>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F)
-data class Tuple7<out A, out B, out C, out D, out E, out F, out G>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G)
-data class Tuple8<out A, out B, out C, out D, out E, out F, out G, out H>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H)
-data class Tuple9<out A, out B, out C, out D, out E, out F, out G, out H, out I>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I)
-data class Tuple10<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I, val j: J)
+data class Tuple3<out A, out B, out C>(val a: A, val b: B, val c: C){
+    fun reverse(): Tuple3<C, B, A> = Tuple3(c, b, a)
+}
+data class Tuple4<out A, out B, out C, out D>(val a: A, val b: B, val c: C, val d: D){
+    fun reverse(): Tuple4<D, C, B, A> = Tuple4(d, c, b, a)
+}
+data class Tuple5<out A, out B, out C, out D, out E>(val a: A, val b: B, val c: C, val d: D, val e: E){
+    fun reverse(): Tuple5<E, D, C, B, A> = Tuple5(e, d, c, b, a)
+}
+data class Tuple6<out A, out B, out C, out D, out E, out F>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F){
+    fun reverse(): Tuple6<F, E, D, C, B, A> = Tuple6(f, e, d, c, b, a)
+}
+data class Tuple7<out A, out B, out C, out D, out E, out F, out G>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G){
+    fun reverse(): Tuple7<G, F, E, D, C, B, A> = Tuple7(g, f, e, d, c, b, a)
+}
+data class Tuple8<out A, out B, out C, out D, out E, out F, out G, out H>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H){
+    fun reverse(): Tuple8<H, G, F, E, D, C, B, A> = Tuple8(h, g, f, e, d, c, b, a)
+}
+data class Tuple9<out A, out B, out C, out D, out E, out F, out G, out H, out I>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I){
+    fun reverse(): Tuple9<I, H, G, F, E, D, C, B, A> = Tuple9(i, h, g, f, e, d, c, b, a)
+}
+data class Tuple10<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I, val j: J){
+    fun reverse(): Tuple10<J, I, H, G, F, E, D, C, B, A> = Tuple10(j, i, h, g, f, e, d, c, b, a)
+}
 
-infix fun <A, B, C, D> Tuple3<A, B, C>.toT(d: D): Tuple4<A, B, C, D> = Tuple4(this.a, this.b, this.c, d)
-infix fun <A, B, C> Tuple2<A, B>.toT(c: C): Tuple3<A, B, C> = Tuple3(this.a, this.b, c)
-infix fun <A, B> A.toT(b: B): Tuple2<A, B> = Tuple2(this, b)
+infix fun <A, B, C, D, E, F, G, H, I, J> Tuple9<A, B, C, D, E, F, G, H, I>.plus(j: J): Tuple10<A, B, C, D, E, F, G, H, I, J> = Tuple10(this.a, this.b, this.c, this.d, this.e, this.f, this.g, this.h, this.i, j)
+infix fun <A, B, C, D, E, F, G, H, I> Tuple8<A, B, C, D, E, F, G, H>.plus(i: I): Tuple9<A, B, C, D, E, F, G, H, I> = Tuple9(this.a, this.b, this.c, this.d, this.e, this.f, this.g, this.h, i)
+infix fun <A, B, C, D, E, F, G, H> Tuple7<A, B, C, D, E, F, G>.plus(h: H): Tuple8<A, B, C, D, E, F, G, H> = Tuple8(this.a, this.b, this.c, this.d, this.e, this.f, this.g, h)
+infix fun <A, B, C, D, E, F, G> Tuple6<A, B, C, D, E, F>.plus(g: G): Tuple7<A, B, C, D, E, F, G> = Tuple7(this.a, this.b, this.c, this.d, this.e, this.f, g)
+infix fun <A, B, C, D, E, F> Tuple5<A, B, C, D, E>.plus(f: F): Tuple6<A, B, C, D, E, F> = Tuple6(this.a, this.b, this.c, this.d, this.e, f)
+infix fun <A, B, C, D, E> Tuple4<A, B, C, D>.plus(e: E): Tuple5<A, B, C, D, E> = Tuple5(this.a, this.b, this.c, this.d, e)
+infix fun <A, B, C, D> Tuple3<A, B, C>.plus(d: D): Tuple4<A, B, C, D> = Tuple4(this.a, this.b, this.c, d)
+infix fun <A, B, C> Tuple2<A, B>.plus(c: C): Tuple3<A, B, C> = Tuple3(this.a, this.b, c)
+infix fun <A, B> A.plus(b: B): Tuple2<A, B> = Tuple2(this, b)
 
 fun <HKF, A, Z> HK<HKF, A>.product(AP: Applicative<HKF>, other: HK<HKF, Z>): HK<HKF, Tuple2<A, Z>> =
         AP.product(this, other)
