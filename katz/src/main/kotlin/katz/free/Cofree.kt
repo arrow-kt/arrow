@@ -47,7 +47,10 @@ data class Cofree<S, A>(val FS: Functor<S>, val head: A, val tail: Eval<CofreeEv
             head
 
     companion object {
-        fun <S, A> unfold(a: A, f: (A) -> HK<S, A>, FS: Functor<S>): Cofree<S, A> =
-                Cofree(FS, a, Eval.later { FS.map(f(a), { Cofree.unfold(it, f, FS) }) })
+        inline fun <reified S, A> unfold(a: A, noinline f: (A) -> HK<S, A>, FS: Functor<S> = functor<S>()): Cofree<S, A> =
+                create(a, f, FS)
+
+        fun <S, A> create(a: A, f: (A) -> HK<S, A>, FS: Functor<S>): Cofree<S, A> =
+                Cofree(FS, a, Eval.later { FS.map(f(a), { Cofree.create(it, f, FS) }) })
     }
 }

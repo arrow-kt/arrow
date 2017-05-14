@@ -24,58 +24,13 @@ class ListT<out A>(val all: List<A>) : HK<ListF, A> {
     }
 }
 
-fun <A> HK<CoAdder.F, A>.ev() = this as CoAdder<A>
-
-abstract class CoAdder<out A> : HK<CoAdder.F, A> {
-    class F private constructor()
-
-    abstract fun add(add: Int): Tuple2<Boolean, A>
-    abstract fun clear(): A
-    abstract fun total(): Tuple2<Int, A>
-
-    companion object : Functor<F> {
-        override fun <A, B> map(fa: HK<F, A>, f: (A) -> B): CoAdder<B> =
-                object : CoAdder<B>() {
-                    override fun add(add: Int): Tuple2<Boolean, B> =
-                            fa.ev().add(add).let { (acc, value) ->
-                                acc toT f(value)
-                            }
-
-                    override fun clear(): B =
-                            f(fa.ev().clear())
-
-                    override fun total(): Tuple2<Int, B> =
-                            fa.ev().total().let { (acc, value) ->
-                                acc toT f(value)
-                            }
-                }
-    }
-}
-
-typealias Limit = Int
-
-typealias Count = Int
-
-data class CoAdderInterpreter(val limit: Limit, val count: Count) : CoAdder<Tuple2<Limit, Count>>() {
-    override fun add(add: Int): Tuple2<Boolean, Tuple2<Limit, Count>> =
-            (count + add).let { next ->
-                (next <= limit) toT (limit toT next)
-            }
-
-    override fun clear(): Tuple2<Limit, Count> =
-            limit toT 0
-
-    override fun total(): Tuple2<Int, Tuple2<Limit, Count>> =
-            count toT (limit toT count)
-}
-
 @RunWith(KTestJUnitRunner::class)
 class CofreeTest : UnitSpec() {
 
     init {
         "tailForced should evaluate and return" {
             val sideEffect = SideEffect()
-            val start: Cofree<Id.F, Int> = unfold(sideEffect.counter, { sideEffect.increment(); Id(it) }, Id)
+            val start: Cofree<Id.F, Int> = unfold(sideEffect.counter, { sideEffect.increment(); Id(it) })
             sideEffect.counter shouldBe 0
             start.tailForced()
             sideEffect.counter shouldBe 1
@@ -83,7 +38,7 @@ class CofreeTest : UnitSpec() {
 
         "runTail should run once and return" {
             val sideEffect = SideEffect()
-            val start: Cofree<Id.F, Int> = unfold(sideEffect.counter, { sideEffect.increment(); Id(it) }, Id)
+            val start: Cofree<Id.F, Int> = unfold(sideEffect.counter, { sideEffect.increment(); Id(it) })
             sideEffect.counter shouldBe 0
             start.runTail()
             sideEffect.counter shouldBe 1
@@ -124,18 +79,18 @@ class CofreeTest : UnitSpec() {
         }
 
         "cofree should cobind correctly without blowing up the stack" {
-            val limit: Int = 10000
-            fun stackSafeProgram(current: Int, loops: AtomicInteger): Tuple2<Int, Int> = CofreeComonad<CoAdder.F>().cobinding {
-                val value = !unfold((limit toT current), { stack ->
+            val limit: Int = 10
+            fun stackSafeProgram(current: Int, loops: AtomicInteger): Int = CofreeComonad<Id.F>().cobinding {
+                val value = !unfold(current, { _ ->
                     loops.incrementAndGet()
-                    val (a, b) = if (current == 1) stack else stackSafeProgram(current - 1, loops)
-                    CoAdderInterpreter(a, b)
-                }, CoAdder).run()
+                    val a = if (current == 1) current else stackSafeProgram(current - 1, loops)
+                    Id(a)
+                }).run()
                 yields(value)
             }
 
             val loops = AtomicInteger()
-            val (count, total) = stackSafeProgram(limit, loops)
+            val count = stackSafeProgram(limit, loops)
             count shouldBe limit
             loops.toInt() shouldBe limit
         }
