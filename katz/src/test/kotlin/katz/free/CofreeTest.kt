@@ -2,6 +2,7 @@ package katz
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
+import katz.Cofree.Companion.unfold
 import katz.ListT.ListF
 import katz.Option.None
 import katz.Option.Some
@@ -9,6 +10,7 @@ import katz.free.cofreeListToNel
 import katz.free.cofreeOptionToNel
 import katz.free.optionToList
 import org.junit.runner.RunWith
+import java.util.concurrent.atomic.AtomicInteger
 
 
 // Unsafe functor for this test only
@@ -73,7 +75,7 @@ class CofreeTest : UnitSpec() {
     init {
         "tailForced should evaluate and return" {
             val sideEffect = SideEffect()
-            val start: Cofree<Id.F, Int> = Cofree.unfold(sideEffect.counter, { sideEffect.increment(); Id(it) }, Id)
+            val start: Cofree<Id.F, Int> = unfold(sideEffect.counter, { sideEffect.increment(); Id(it) }, Id)
             sideEffect.counter shouldBe 0
             start.tailForced()
             sideEffect.counter shouldBe 1
@@ -81,7 +83,7 @@ class CofreeTest : UnitSpec() {
 
         "runTail should run once and return" {
             val sideEffect = SideEffect()
-            val start: Cofree<Id.F, Int> = Cofree.unfold(sideEffect.counter, { sideEffect.increment(); Id(it) }, Id)
+            val start: Cofree<Id.F, Int> = unfold(sideEffect.counter, { sideEffect.increment(); Id(it) }, Id)
             sideEffect.counter shouldBe 0
             start.runTail()
             sideEffect.counter shouldBe 1
@@ -89,13 +91,20 @@ class CofreeTest : UnitSpec() {
 
         "run should fold until completion" {
             val sideEffect = SideEffect()
-            val start: Cofree<Option.F, Int> = Cofree.unfold(sideEffect.counter, { sideEffect.increment(); if (sideEffect.counter == 5) None else Some(it) }, Option)
+            val start: Cofree<Option.F, Int> = unfold(sideEffect.counter, { sideEffect.increment(); if (sideEffect.counter == 5) None else Some(it) }, Option)
             sideEffect.counter shouldBe 0
             start.run()
             sideEffect.counter shouldBe 5
         }
 
-        val startHundred: Cofree<Option.F, Int> = Cofree.unfold(0, { if (it == 100) None else Some(it + 1) }, Option)
+        val startThousands: Cofree<Option.F, Int> = unfold(0, { if (it == 10000) None else Some(it + 1) }, Option)
+
+        "run should not blow up the stack" {
+            startThousands.run()
+            startThousands.extract() shouldBe 10000
+        }
+
+        val startHundred: Cofree<Option.F, Int> = unfold(0, { if (it == 100) None else Some(it + 1) }, Option)
 
         "mapBranchingRoot should modify the value of the functor" {
             val mapped = startHundred.mapBranchingRoot(object : FunctionK<Option.F, Option.F> {
@@ -116,17 +125,19 @@ class CofreeTest : UnitSpec() {
 
         "cofree should cobind correctly without blowing up the stack" {
             val limit: Int = 10000
-            fun stackSafeProgram(current: Int) = CofreeComonad<CoAdder.F>().cobinding {
-                val value = if (current == 0) {
-                    stackSafeProgram(current - 1)
-                } else {
-                    !Cofree.unfold((limit toT current), { (l, c) -> CoAdderInterpreter(l, c) }, CoAdder)
-                }
+            fun stackSafeProgram(current: Int, loops: AtomicInteger): Tuple2<Int, Int> = CofreeComonad<CoAdder.F>().cobinding {
+                val value = !unfold((limit toT current), { stack ->
+                    loops.incrementAndGet()
+                    val (a, b) = if (current == 1) stack else stackSafeProgram(current - 1, loops)
+                    CoAdderInterpreter(a, b)
+                }, CoAdder).run()
                 yields(value)
             }
 
-            val result = stackSafeProgram(limit)
-            result.b shouldBe limit
+            val loops = AtomicInteger()
+            val (count, total) = stackSafeProgram(limit, loops)
+            count shouldBe limit
+            loops.toInt() shouldBe limit
         }
     }
 }

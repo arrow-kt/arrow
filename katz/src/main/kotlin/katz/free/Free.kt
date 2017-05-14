@@ -14,9 +14,22 @@ sealed class Free<out S, out A> : FreeKind<S, A> {
         fun <S, A> liftF(fa: HK<S, A>): Free<S, A> = Suspend(fa)
     }
 
-    data class Pure<out S, out A>(val a: A) : Free<S, A>()
-    data class Suspend<out S, out A>(val a: HK<S, A>) : Free<S, A>()
-    data class FlatMapped<out S, out B, C>(val c: Free<S, C>, val f: (C) -> Free<S, B>) : Free<S, B>()
+    abstract fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B>
+
+    data class Pure<out S, out A>(val a: A) : Free<S, A>() {
+        override fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B> =
+                Free.pure(f(a))
+    }
+
+    data class Suspend<out S, out A>(val a: HK<S, A>) : Free<S, A>() {
+        override fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B> =
+                Free.liftF(fs(a)).map(f)
+    }
+
+    data class FlatMapped<out S, out A, C>(val c: Free<S, C>, val f: (C) -> Free<S, A>) : Free<S, A>() {
+        override fun <O, B> transform(fm: (A) -> B, fs: FunctionK<S, O>): Free<O, B> =
+                Free.FlatMapped(c.transform({ it }, fs), { c.flatMap { f(it) }.transform(fm, fs) })
+    }
 
     override fun toString(): String = "Free(...) : toString is not stack-safe"
 }
@@ -29,18 +42,18 @@ fun <S, A, B> Free<S, A>.flatMap(f: (A) -> Free<S, B>): Free<S, B> =
 
 @Suppress("UNCHECKED_CAST")
 tailrec fun <S, A> Free<S, A>.step(): Free<S, A> =
-    if (this is Free.FlatMapped<S, A, *> && this.c is Free.FlatMapped<S, *, *>) {
-        val g = this.f as (A) -> Free<S, A>
-        val c = this.c.c as Free<S, A>
-        val f = this.c.f as (A) -> Free<S, A>
-        c.flatMap { cc -> f(cc).flatMap(g) }.step()
-    } else if (this is Free.FlatMapped<S, A, *> && this.c is Free.Pure<S, *>) {
-        val a = this.c.a as A
-        val f = this.f as (A) -> Free<S, A>
-        f(a).step()
-    } else {
-        this
-    }
+        if (this is Free.FlatMapped<S, A, *> && this.c is Free.FlatMapped<S, *, *>) {
+            val g = this.f as (A) -> Free<S, A>
+            val c = this.c.c as Free<S, A>
+            val f = this.c.f as (A) -> Free<S, A>
+            c.flatMap { cc -> f(cc).flatMap(g) }.step()
+        } else if (this is Free.FlatMapped<S, A, *> && this.c is Free.Pure<S, *>) {
+            val a = this.c.a as A
+            val f = this.f as (A) -> Free<S, A>
+            f(a).step()
+        } else {
+            this
+        }
 
 @Suppress("UNCHECKED_CAST")
 fun <M, S, A> Free<S, A>.foldMap(f: FunctionK<S, M>, MM: Monad<M>): HK<M, A> =
