@@ -1,7 +1,7 @@
 package katz
 
 // We don't we want an inherited class to avoid equivalence issues, so a simple HK wrapper will do
-data class Function0<out A>(val f: () -> A) : HK<Function0.F, A> {
+data class Function0<out A>(internal val f: () -> A) : HK<Function0.F, A> {
 
     class F private constructor()
 
@@ -20,15 +20,15 @@ data class Function0<out A>(val f: () -> A) : HK<Function0.F, A> {
                 fa.ev().invoke()
 
         override fun <A, B> tailRecM(a: A, f: (A) -> HK<F, Either<A, B>>): HK<F, B> =
-            f(a).ev().invoke().let { either ->
-                when (either) {
-                    is Either.Left -> tailRecM(either.a, f)
-                    is Either.Right -> ({ either.b }).k()
+                f(a).ev().invoke().let { either ->
+                    when (either) {
+                        is Either.Left -> tailRecM(either.a, f)
+                        is Either.Right -> ({ either.b }).k()
+                    }
                 }
-            }
     }
 }
 
-fun <A> HK<Function0.F, A>.ev() = (this as Function0<A>).f
+fun <A> (() -> A).k(): HK<Function0.F, A> = Function0(this)
 
-fun <A> (()->A).k() = Function0(this)
+fun <A> HK<Function0.F, A>.ev() = (this as Function0<A>).f
