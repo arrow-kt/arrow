@@ -1,7 +1,5 @@
 package katz
 
-import katz.Eval.CallFactory.loop
-
 // We don't we want an inherited class to avoid equivalence issues, so a simple HK wrapper will do
 data class Function0<out A>(val f: () -> A) : HK<Function0.F, A> {
 
