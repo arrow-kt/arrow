@@ -11,10 +11,10 @@ data class Function0<out A>(val f: () -> A) : HK<Function0.F, A> {
                 f(fa.ev().invoke())
 
         override fun <A, B> coflatMap(fa: HK<Function0.F, A>, f: (HK<Function0.F, A>) -> B): HK<Function0.F, B> =
-                Function0 { f(fa) }
+                { f(fa) }.k()
 
         override fun <A> pure(a: A): HK<Function0.F, A> =
-                Function0 { a }
+                { a }.k()
 
         override fun <A> extract(fa: HK<Function0.F, A>): A =
                 fa.ev().invoke()
@@ -23,7 +23,7 @@ data class Function0<out A>(val f: () -> A) : HK<Function0.F, A> {
             f(a).ev().invoke().let { either ->
                 when (either) {
                     is Either.Left -> tailRecM(either.a, f)
-                    is Either.Right -> Function0<B> { either.b }
+                    is Either.Right -> ({ either.b }).k()
                 }
             }
     }
