@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2017 The Katz Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package katz
 
 import katz.Either.Left
@@ -93,7 +77,7 @@ sealed class Ior<out A, out B> : IorKind<A, B> {
          * an [Ior.Left], [Ior.Right], or [Ior.Both] if [oa], [ob], or both are defined (respectively).
          */
 
-        fun <A, B> fromOptions(oa: Option<A>, ob: Option<B>): Option<Ior<A, B>> = when (oa) {
+        @JvmStatic fun <A, B> fromOptions(oa: Option<A>, ob: Option<B>): Option<Ior<A, B>> = when (oa) {
             is Option.Some -> when (ob) {
                 is Option.Some -> Option.Some(Both(oa.value, ob.value))
                 is Option.None -> Option.Some(Left(oa.value))
@@ -271,15 +255,15 @@ sealed class Ior<out A, out B> : IorKind<A, B> {
  *
  * @param f The function to bind across [Ior.Right].
  */
-inline fun <A, B, D> Ior<A, B>.flatMap(AA: Semigroup<A>, crossinline f: (B) -> Ior<A, D>): Ior<A, D> = when (this) {
+inline fun <A, B, D> Ior<A, B>.flatMap(SA: Semigroup<A>, crossinline f: (B) -> Ior<A, D>): Ior<A, D> = when (this) {
     is Ior.Left -> Ior.Left(value)
     is Ior.Right -> f(value)
     is Ior.Both -> {
         val fm = f(rightValue)
         when (fm) {
-            is Ior.Left -> Ior.Left(AA.combine(leftValue, fm.value))
+            is Ior.Left -> Ior.Left(SA.combine(leftValue, fm.value))
             is Ior.Right -> Ior.Right(fm.value)
-            is Ior.Both -> Ior.Both(AA.combine(leftValue, fm.leftValue), fm.rightValue)
+            is Ior.Both -> Ior.Both(SA.combine(leftValue, fm.leftValue), fm.rightValue)
         }
     }
 }

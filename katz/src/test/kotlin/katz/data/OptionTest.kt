@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2017 The Katz Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package katz
 
 import io.kotlintest.KTestJUnitRunner
@@ -25,6 +9,7 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class OptionTest : UnitSpec() {
+
     init {
         "map should modify value" {
             Some(12).map { "flower" } shouldBe Some("flower")
@@ -78,19 +63,19 @@ class OptionTest : UnitSpec() {
 
         "fromNullable should return none for null values of nullable types" {
             val a: Int? = null
-            Companion.fromNullable(a) shouldBe None
+            Option.fromNullable(a) shouldBe None
         }
 
         "Option.monad.flatMap should be consistent with Option#flatMap" {
             forAll { a: Int ->
                 val x = { b: Int -> Option(b * a) }
                 val option = Option(a)
-                option.flatMap(x) == OptionMonad.flatMap(option, x)
+                option.flatMap(x) == Option.flatMap(option, x)
             }
         }
 
         "Option.monad.binding should for comprehend over option" {
-            val result = OptionMonad.binding {
+            val result = Option.binding {
                 val x = !Option(1)
                 val y = Option(1).bind()
                 val z = bind { Option(1) }
@@ -100,19 +85,20 @@ class OptionTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over option" {
-            OptionMonad.map(Option(1), Option("a"), Option(true), { (a, b, c) ->
+            Option.map(Option(1), Option("a"), Option(true), { (a, b, c) ->
                 "$a $b $c"
             }) shouldBe Option("1 a true")
         }
 
         "Cartesian builder works inside for comprehensions" {
-            val result = OptionMonad.binding {
-                val (x, y, z) = !OptionMonad.tupled(Option(1), Option(1), Option(1))
+            val result = Option.binding {
+                val (x, y, z) = !Option.tupled(Option(1), Option(1), Option(1))
                 val a = Option(1).bind()
                 val b = bind { Option(1) }
                 yields(x + y + z + a + b)
             }
             result shouldBe Option(5)
         }
+
     }
 }

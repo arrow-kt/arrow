@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2017 The Katz Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package katz
 
 import io.kotlintest.KTestJUnitRunner
@@ -43,11 +27,11 @@ class NonEmptyListTest : UnitSpec() {
         "NonEmptyListMonad.flatMap should be consistent with NonEmptyList#flatMap" {
             val nel = NonEmptyList.of(1, 2)
             val nel2 = NonEmptyList.of(1, 2)
-            nel.flatMap { nel2 } shouldBe NonEmptyListMonad.flatMap(nel) { nel2 }
+            nel.flatMap { nel2 } shouldBe NonEmptyList.flatMap(nel) { nel2 }
         }
 
         "NonEmptyListMonad.binding should for comprehend over NonEmptyList" {
-            val result = NonEmptyListMonad.binding {
+            val result = NonEmptyList.binding {
                 val x = !NonEmptyList.of(1)
                 val y = NonEmptyList.of(2).bind()
                 val z = bind { NonEmptyList.of(3) }
@@ -57,7 +41,7 @@ class NonEmptyListTest : UnitSpec() {
         }
 
         "NonEmptyListMonad.binding should for comprehend over complex NonEmptyList" {
-            val result = NonEmptyListMonad.binding {
+            val result = NonEmptyList.binding {
                 val x = !NonEmptyList.of(1, 2)
                 val y = NonEmptyList.of(3).bind()
                 val z = bind { NonEmptyList.of(4) }
@@ -71,7 +55,7 @@ class NonEmptyListTest : UnitSpec() {
                 val nel: NonEmptyList<Int> = NonEmptyList(a, b)
                 val nel2 = NonEmptyList.of(1, 2)
                 val nel3 = NonEmptyList.of(3, 4, 5)
-                val result: HK<NonEmptyList.F, Int> = NonEmptyListMonad.binding {
+                val result: HK<NonEmptyList.F, Int> = NonEmptyList.binding {
                     val x = !nel
                     val y = nel2.bind()
                     val z = bind { nel3 }
@@ -79,6 +63,45 @@ class NonEmptyListTest : UnitSpec() {
                 }
                 result.ev().size == nel.size * nel2.size * nel3.size
             }
+        }
+
+        "NonEmptyListComonad.cobinding should for comprehend over NonEmptyList" {
+            val result = NonEmptyList.cobinding {
+                val x = !NonEmptyList.of(1)
+                val y = NonEmptyList.of(2).extract()
+                val z = extract { NonEmptyList.of(3) }
+                yields(x + y + z)
+            }
+            result shouldBe 6
+        }
+
+        "NonEmptyListComonad.cobinding should for comprehend over complex NonEmptyList" {
+            val result = NonEmptyList.cobinding {
+                val x = !NonEmptyList.of(1, 2)
+                val y = NonEmptyList.of(3).extract()
+                val z = extract { NonEmptyList.of(4) }
+                yields(x + y + z)
+            }
+            result shouldBe 8
+        }
+
+        "NonEmptyListComonad.cobinding should for comprehend over all values of multiple NonEmptyList" {
+            forAll { a: Int, b: List<Int> ->
+                val nel: NonEmptyList<Int> = NonEmptyList(a, b)
+                val nel2 = NonEmptyList.of(1, 2)
+                val nel3 = NonEmptyList.of(3, 4, 5)
+                val result: Int = NonEmptyList.cobinding {
+                    val x = !nel
+                    val y = nel2.extract()
+                    val z = extract { nel3 }
+                    yields(x + y + z)
+                }
+                result == 1 + 3 + a
+            }
+        }
+
+        "NonEmptyListComonad.duplicate should create an instance of NonEmptyList<NonEmptyList<A>>" {
+            NonEmptyList.duplicate(NonEmptyList.of(3)) shouldBe NonEmptyList.of(NonEmptyList.of(3))
         }
     }
 }

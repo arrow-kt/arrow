@@ -1,28 +1,70 @@
-/*
- * Copyright (C) 2017 The Katz Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package katz
+
+import java.io.Serializable
+import kotlin.coroutines.experimental.Continuation
+import kotlin.coroutines.experimental.EmptyCoroutineContext
+import kotlin.coroutines.experimental.RestrictsSuspension
+import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
+import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
+import kotlin.coroutines.experimental.startCoroutine
 
 /**
  * The dual of monads, used to extract values from F
  */
-interface Comonad<F> {
+interface Comonad<F> : Functor<F>, Typeclass {
 
     fun <A, B> coflatMap(fa: HK<F, A>, f: (HK<F, A>) -> B): HK<F, B>
 
-    fun <A> extract(fa: HK<F, A>) : A
+    fun <A> extract(fa: HK<F, A>): A
 
+    fun <A> duplicate(fa: HK<F, A>): HK<F, HK<F, A>> =
+            coflatMap(fa, { it })
 }
+
+@RestrictsSuspension
+open class ComonadContinuation<F, A : Any>(val CM: Comonad<F>) : Serializable, Continuation<A> {
+
+    override val context = EmptyCoroutineContext
+
+    override fun resume(value: A) {
+        returnedMonad = value
+    }
+
+    override fun resumeWithException(exception: Throwable) {
+        throw exception
+    }
+
+    internal lateinit var returnedMonad: A
+
+    operator suspend fun <B> HK<F, B>.not(): B = extract { this }
+
+    suspend fun <B> HK<F, B>.extract(): B = extract { this }
+
+    suspend fun <B> extract(m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
+        val labelHere = c.stackLabels // save the whole coroutine stack labels
+        returnedMonad = CM.extract(CM.coflatMap(m(), { x: HK<F, B> ->
+            c.stackLabels = labelHere
+            c.resume(CM.extract(x))
+            returnedMonad
+        }))
+        COROUTINE_SUSPENDED
+    }
+
+    infix fun <B> yields(b: B) = yields { b }
+
+    infix fun <B> yields(b: () -> B) = b()
+}
+
+/**
+ * Entry point for monad bindings which enables for comprehension. The underlying impl is based on coroutines.
+ * A coroutine is initiated and inside `MonadContinuation` suspended yielding to `flatMap` once all the flatMap binds are completed
+ * the underlying monad is returned from the act of executing the coroutine
+ */
+fun <F, B : Any> Comonad<F>.cobinding(c: suspend ComonadContinuation<F, *>.() -> B): B {
+    val continuation = ComonadContinuation<F, B>(this)
+    c.startCoroutine(continuation, continuation)
+    return continuation.returnedMonad
+}
+
+inline fun <reified F> comonad(): Comonad<F> =
+        instance(InstanceParametrizedType(Comonad::class.java, listOf(F::class.java)))

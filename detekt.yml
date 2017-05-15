@@ -20,8 +20,7 @@ complexity:
   LongMethod:
     threshold: 20
   LongParameterList:
-    active: true
-    threshold: 3
+    active: false
   LargeClass:
     threshold: 300
   ComplexMethod:
@@ -74,14 +73,14 @@ formatting:
     autoCorrect: true
   OptionalUnit:
     active: true
-    autoCorrect: true
+    autoCorrect: false
 
 style:
   active: true
   WildcardImport:
     active: true
   NamingConventionViolation:
-    active: true
+    active: false
 
 comments:
   active: true
