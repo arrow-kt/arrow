@@ -30,3 +30,5 @@ data class Function0<out A>(val f: () -> A) : HK<Function0.F, A> {
 }
 
 fun <A> HK<Function0.F, A>.ev() = (this as Function0<A>).f
+
+fun <A> (()->A).k() = Function0(this)
