@@ -10,7 +10,6 @@ import katz.free.cofreeListToNel
 import katz.free.cofreeOptionToNel
 import katz.free.optionToList
 import org.junit.runner.RunWith
-import java.util.concurrent.atomic.AtomicInteger
 
 
 // Unsafe functor for this test only
@@ -52,11 +51,18 @@ class CofreeTest : UnitSpec() {
             sideEffect.counter shouldBe 5
         }
 
-        val startThousands: Cofree<Option.F, Int> = unfold(0, { if (it == 10000) None else Some(it + 1) }, Option)
-
         "run should not blow up the stack" {
+            val limit = 10000
+            val counter = SideEffect()
+            val startThousands: Cofree<Option.F, Int> = unfold(0, {
+                counter.increment()
+                if (it == limit)
+                    None
+                else
+                    Some(it + 1)
+            }, Option)
             startThousands.run()
-            startThousands.extract() shouldBe 10000
+            counter.counter shouldBe limit
         }
 
         val startHundred: Cofree<Option.F, Int> = unfold(0, { if (it == 100) None else Some(it + 1) }, Option)
@@ -80,19 +86,19 @@ class CofreeTest : UnitSpec() {
 
         "cofree should cobind correctly without blowing up the stack" {
             val limit: Int = 10
-            fun stackSafeProgram(current: Int, loops: AtomicInteger): Int = CofreeComonad<Id.F>().cobinding {
+            fun stackSafeProgram(current: Int, loops: SideEffect): Int = CofreeComonad<Id.F>().cobinding {
                 val value = !unfold(current, { _ ->
-                    loops.incrementAndGet()
-                    val a = if (current == 1) current else stackSafeProgram(current - 1, loops)
+                    loops.increment()
+                    val a = if (current == limit) current else stackSafeProgram(current - 1, loops)
                     Id(a)
                 }).run()
                 yields(value)
             }
 
-            val loops = AtomicInteger()
+            val loops = SideEffect()
             val count = stackSafeProgram(limit, loops)
             count shouldBe limit
-            loops.toInt() shouldBe limit
+            loops.counter shouldBe limit
         }
     }
 }
