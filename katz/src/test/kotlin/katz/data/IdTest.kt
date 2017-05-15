@@ -1,11 +1,7 @@
-package katz.data
+package katz
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
-import katz.Id
-import katz.UnitSpec
-import katz.binding
-import katz.cobinding
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
