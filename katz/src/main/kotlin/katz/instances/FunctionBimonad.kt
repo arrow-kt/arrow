@@ -1,5 +1,7 @@
 package katz
 
+import katz.Eval.CallFactory.loop
+
 // We don't we want an inherited class to avoid equivalence issues, so a simple HK wrapper will do
 data class Function0<out A>(val f: () -> A) : HK<Function0.F, A> {
 
@@ -19,16 +21,13 @@ data class Function0<out A>(val f: () -> A) : HK<Function0.F, A> {
         override fun <A> extract(fa: HK<Function0.F, A>): A =
                 fa.ev().invoke()
 
-        override fun <A, B> tailRecM(a: A, f: (A) -> HK<F, Either<A, B>>): HK<F, B> = Function0 {
-            tailrec fun loop(thisA: A): B =
-                    f(thisA).ev().invoke().let { either ->
-                        when (either) {
-                            is Either.Left -> loop(either.a)
-                            is Either.Right -> either.b
-                        }
-                    }
-            loop(a)
-        }
+        override fun <A, B> tailRecM(a: A, f: (A) -> HK<F, Either<A, B>>): HK<F, B> =
+            f(a).ev().invoke().let { either ->
+                when (either) {
+                    is Either.Left -> tailRecM(either.a, f)
+                    is Either.Right -> Function0<B> { either.b }
+                }
+            }
     }
 }
 
