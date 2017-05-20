@@ -2,9 +2,6 @@ package katz
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
-import katz.free.idInterpreter
-import katz.free.nonEmptyListInterpreter
-import katz.free.optionInterpreter
 import org.junit.runner.RunWith
 
 sealed class Ops<out A> : HK<Ops.F, A> {

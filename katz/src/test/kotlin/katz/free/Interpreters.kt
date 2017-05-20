@@ -1,6 +1,4 @@
-package katz.free
-
-import katz.*
+package katz
 
 val cofreeOptionToNel: FunctionK<CofreeF<Option.F>, NonEmptyList.F> = object : FunctionK<CofreeF<Option.F>, NonEmptyList.F> {
     override fun <A> invoke(fa: HK<CofreeF<Option.F>, A>): HK<NonEmptyList.F, A> =

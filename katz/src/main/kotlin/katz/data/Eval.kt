@@ -85,7 +85,6 @@ sealed class Eval<out A> {
         override fun memoize(): Eval<A> = this
     }
 
-
     /**
      * Construct a lazy Eval<A> instance.
      *
@@ -157,19 +156,20 @@ sealed class Eval<out A> {
 
         tailrec fun <A> loop(curr: Eval<A>, fs: List<(Any?) -> Eval<A>>): A =
                 when (curr) {
-                    is Compute<A> ->
+                    is Compute ->
                         curr.start<A>().let { cc ->
                             when (cc) {
                                 is Compute -> {
-                                    val startFun: (Any?) -> Eval<A> = { cc.run(it) }
-                                    loop(cc.start<A>(), listOf(startFun, startFun) + fs)
+                                    val inStartFun: (Any?) -> Eval<A> = { cc.run(it) }
+                                    val outStartFun: (Any?) -> Eval<A> = { curr.run(it) }
+                                    loop(cc.start<A>(), listOf(inStartFun, outStartFun) + fs)
                                 }
                                 else -> loop(curr.run(cc.value()), fs)
                             }
                         }
                     else ->
-                        if (fs.size >= 2) {
-                            loop(fs[0](curr.value()), fs)
+                        if (fs.isNotEmpty()) {
+                            loop(fs[0](curr.value()), fs.drop(1))
                         } else {
                             curr.value()
                         }

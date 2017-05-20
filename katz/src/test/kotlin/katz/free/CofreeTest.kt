@@ -6,9 +6,6 @@ import katz.Cofree.Companion.unfold
 import katz.ListT.ListF
 import katz.Option.None
 import katz.Option.Some
-import katz.free.cofreeListToNel
-import katz.free.cofreeOptionToNel
-import katz.free.optionToList
 import org.junit.runner.RunWith
 
 
@@ -29,7 +26,7 @@ class CofreeTest : UnitSpec() {
     init {
         "tailForced should evaluate and return" {
             val sideEffect = SideEffect()
-            val start: Cofree<Id.F, Int> = unfold(sideEffect.counter, { sideEffect.increment(); Id(it) })
+            val start: Cofree<Id.F, Int> = unfold(sideEffect.counter, { sideEffect.increment(); Id(it + 1) })
             sideEffect.counter shouldBe 0
             start.tailForced()
             sideEffect.counter shouldBe 1
@@ -45,17 +42,16 @@ class CofreeTest : UnitSpec() {
 
         "run should fold until completion" {
             val sideEffect = SideEffect()
-            val start: Cofree<Option.F, Int> = unfold(sideEffect.counter, { sideEffect.increment(); if (sideEffect.counter == 5) None else Some(it) }, Option)
+            val start: Cofree<Option.F, Int> = unfold(sideEffect.counter, { sideEffect.increment(); if (it == 5) None else Some(it + 1) }, Option)
             sideEffect.counter shouldBe 0
             start.run()
-            sideEffect.counter shouldBe 5
+            sideEffect.counter shouldBe 6
         }
 
         "run should not blow up the stack" {
             val limit = 10000
             val counter = SideEffect()
             val startThousands: Cofree<Option.F, Int> = unfold(0, {
-                counter.increment()
                 if (it == limit)
                     None
                 else
@@ -85,19 +81,22 @@ class CofreeTest : UnitSpec() {
         }
 
         "cofree should cobind correctly without blowing up the stack" {
-            val limit: Int = 10
-            fun stackSafeProgram(current: Int, loops: SideEffect): Int = CofreeComonad<Id.F>().cobinding {
-                val value = !unfold(current, { _ ->
+            val offset = 5
+            val limit = offset
+            fun stackSafeProgram(loops: SideEffect): Either<Int, CofreeKind<EitherF<Int>, Int>> = CofreeComonad<EitherF<Int>>().cobinding {
+                val value = unfold(offset, { current ->
                     loops.increment()
-                    val a = if (current == limit) current else stackSafeProgram(current - 1, loops)
-                    Id(a)
-                }).run()
+                    if (current == limit)
+                        Either.Left(current)
+                    else
+                        Either.Right(current + 1)
+                }, EitherMonad<Int>()).tailForced().ev()
                 yields(value)
             }
 
             val loops = SideEffect()
-            val count = stackSafeProgram(limit, loops)
-            count shouldBe limit
+            val count = stackSafeProgram(loops)
+            count shouldBe Either.Left(offset)
             loops.counter shouldBe limit
         }
     }
