@@ -1,7 +1,5 @@
 package katz
 
-import java.util.Vector
-
 typealias NonEmptyVectorKind<A> = HK<NonEmptyVector.F, A>
 
 /**
@@ -9,61 +7,55 @@ typealias NonEmptyVectorKind<A> = HK<NonEmptyVector.F, A>
  */
 class NonEmptyVector<A> private constructor(
         val head: A,
-        val tail: Vector<A>,
-        val toVector: Vector<A>) : NonEmptyVectorKind<A> {
+        val tail: Array<A>,
+        val array: Array<A>) : NonEmptyVectorKind<A> {
 
     class F private constructor()
 
-    constructor(head: A, tail: Vector<A>) : this(head, tail, Vector<A>().apply {
-        add(head)
-        addAll(tail)
-    })
+    constructor(head: A, tail: Array<A>) : this(head, tail, tail.copyOfRange(0, 0).plus(head).plus(tail))
+    private constructor(array: Array<A>) : this(array[0], array.copyOfRange(0, array.size), array)
 
-    private constructor(list: Vector<A>) : this(list[0], Vector<A>(list.drop(1)), list)
-
-    val size: Int = toVector.size
+    val size: Int = array.size
 
     fun contains(element: @UnsafeVariance A): Boolean =
-            toVector.contains(element)
+            array.contains(element)
 
     fun containsAll(elements: Collection<@UnsafeVariance A>): Boolean =
-            elements.all(toVector::contains)
+            elements.all(array::contains)
 
     fun isEmpty(): Boolean = false
 
-    fun <B> map(f: (A) -> B): NonEmptyVector<B> =
-            NonEmptyVector(toVector.mapTo(Vector<B>(toVector.capacity()), f))
+    fun <B> map(f: (A) -> B): NonEmptyVector<B> = TODO()
 
-    fun <B> flatMap(f: (A) -> NonEmptyVector<B>): NonEmptyVector<B> =
-            NonEmptyVector(toVector.flatMapTo(Vector<B>(toVector.capacity()), { f.invoke(it).toVector }))
+    fun <B> flatMap(f: (A) -> NonEmptyVector<B>): NonEmptyVector<B> = TODO()
 
-    operator fun plus(l: NonEmptyVector<@UnsafeVariance A>): NonEmptyVector<A> = NonEmptyVector(toVector.apply { addAll(l.toVector) })
+    operator fun plus(l: NonEmptyVector<@UnsafeVariance A>): NonEmptyVector<A> = NonEmptyVector(array + l.array)
 
-    operator fun plus(l: Vector<@UnsafeVariance A>): NonEmptyVector<A> = NonEmptyVector(toVector.apply { addAll(l) })
+    operator fun plus(l: Array<@UnsafeVariance A>): NonEmptyVector<A> = NonEmptyVector(array + l)
 
-    operator fun plus(a: @UnsafeVariance A): NonEmptyVector<A> = NonEmptyVector(toVector.apply { add(a) })
+    operator fun plus(a: @UnsafeVariance A): NonEmptyVector<A> = NonEmptyVector(array + a)
 
-    fun iterator(): Iterator<A> = toVector.iterator()
+    fun iterator(): Iterator<A> = array.iterator()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other?.javaClass != javaClass) return false
         other as NonEmptyVector<*>
-        if (toVector != other.toVector) return false
+        if (array != other.array) return false
 
         return true
     }
 
     override fun hashCode(): Int =
-            toVector.hashCode()
+            array.hashCode()
 
     override fun toString(): String =
-            "NonEmptyVector(toVector=$toVector)"
+            "NonEmptyVector(array=$array)"
 
     companion object : NonEmptyVectorBimonad, GlobalInstance<Bimonad<NonEmptyVector.F>>() {
-        @JvmStatic fun <A> of(head: A, vararg t: A): NonEmptyVector<A> = NonEmptyVector(head, Vector<A>(t.asList()))
-        @JvmStatic fun <A> fromVector(v: Vector<A>): Option<NonEmptyVector<A>> = if (v.isEmpty()) Option.None else Option.Some(NonEmptyVector(v))
-        @JvmStatic fun <A> fromVectorUnsafe(v: Vector<A>): NonEmptyVector<A> = NonEmptyVector(v)
+        @JvmStatic inline fun <reified A> of(head: A, vararg t: A): NonEmptyVector<A> = NonEmptyVector(head, arrayOf(*t))
+        @JvmStatic fun <A> fromArray(v: Array<A>): Option<NonEmptyVector<A>> = if (v.isEmpty()) Option.None else Option.Some(NonEmptyVector(v))
+        @JvmStatic fun <A> fromArrayUnsafe(v: Array<A>): NonEmptyVector<A> = NonEmptyVector(v)
     }
 
 }

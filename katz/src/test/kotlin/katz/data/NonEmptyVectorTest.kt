@@ -26,7 +26,7 @@ class NonEmptyVectorTest : UnitSpec() {
             nel.flatMap { nel2 } shouldBe NonEmptyVector.flatMap(nel) { nel2 }
         }
 
-        "NonEmptyVector.binding should for comprehend over NonEmptyList" {
+        "NonEmptyVector.binding should for comprehend over NonEmptyVector" {
             val result = NonEmptyVector.binding {
                 val x = !NonEmptyVector.of(1)
                 val y = NonEmptyVector.of(2).bind()
@@ -36,7 +36,7 @@ class NonEmptyVectorTest : UnitSpec() {
             result shouldBe NonEmptyVector.of(6)
         }
 
-        "NonEmptyVector.binding should for comprehend over complex NonEmptyList" {
+        "NonEmptyVector.binding should for comprehend over complex NonEmptyVector" {
             val result = NonEmptyVector.binding {
                 val x = !NonEmptyVector.of(1, 2)
                 val y = NonEmptyVector.of(3).bind()
@@ -47,7 +47,7 @@ class NonEmptyVectorTest : UnitSpec() {
         }
 
         "NonEmptyVector.binding should for comprehend over all values of multiple NonEmptyVector" {
-            forAll(Gen.int(), VectorGenerator, { a: Int, b: Vector<Int> ->
+            forAll(Gen.int(), ArrayGenerator, { a: Int, b: Array<Int> ->
                 val nel: NonEmptyVector<Int> = NonEmptyVector(a, b)
                 val nel2 = NonEmptyVector.of(1, 2)
                 val nel3 = NonEmptyVector.of(3, 4, 5)
@@ -82,7 +82,7 @@ class NonEmptyVectorTest : UnitSpec() {
         }
 
         "NonEmptyVectorComonad.cobinding should for comprehend over all values of multiple NonEmptyVector" {
-            forAll(Gen.int(), VectorGenerator, { a: Int, b: Vector<Int> ->
+            forAll(Gen.int(), ArrayGenerator, { a: Int, b: Array<Int> ->
                 val nel: NonEmptyVector<Int> = NonEmptyVector(a, b)
                 val nel2 = NonEmptyVector.of(1, 2)
                 val nel3 = NonEmptyVector.of(3, 4, 5)
@@ -101,8 +101,8 @@ class NonEmptyVectorTest : UnitSpec() {
         }
     }
 
-    object VectorGenerator : Gen<Vector<Int>> {
-        override fun generate(): Vector<Int> = Vector(Gen.list(Gen.int()).generate())
+    object ArrayGenerator : Gen<Array<Int>> {
+        override fun generate(): Array<Int> = Array(Gen.choose(0,100).generate()) { Gen.int().generate() }
     }
 
 }
