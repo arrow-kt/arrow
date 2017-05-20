@@ -86,6 +86,18 @@ class CofreeTest : UnitSpec() {
             cofreeListToNel(mappedT) shouldBe expected
         }
 
+        "cata should traverse the structure" {
+            val cata: NonEmptyList<Int> = startHundred.cata<Option.F, Id.F, Int, NonEmptyList<Int>>(
+                    { i, lb -> Eval.now(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) },
+                    OptionTraverse,
+                    Id
+            ).value()
+
+            val expected = NonEmptyList.fromListUnsafe((0..100).toList())
+
+            cata shouldBe expected
+        }
+
         "cofree should cobind correctly" {
             val offset = 0
             val limit = 10

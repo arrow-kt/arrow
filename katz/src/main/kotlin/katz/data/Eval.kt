@@ -143,7 +143,7 @@ sealed class Eval<out A> : HK<Eval.F, A> {
      * Unlike a traditional trampoline, the internal workings of the trampoline are not exposed. This allows a slightly
      * more efficient implementation of the .value method.
      */
-    private abstract class Compute<out A> : Eval<A>() {
+    internal abstract class Compute<out A> : Eval<A>() {
 
         abstract fun <S> start(): Eval<S>
 
@@ -177,7 +177,7 @@ sealed class Eval<out A> : HK<Eval.F, A> {
                 }
     }
 
-    companion object EvalFactory {
+    companion object EvalFactory: EvalMonad, GlobalInstance<Monad<Eval.F>>() {
         @JvmStatic fun <A> now(a: A) = Now(a)
         @JvmStatic fun <A> later(f: () -> A) = Later(f)
         @JvmStatic fun <A> always(f: () -> A) = Always(f)
