@@ -27,7 +27,8 @@ package katz
  * Eval instance -- this can defeat the trampolining and lead to stack
  * overflows.
  */
-sealed class Eval<out A> {
+sealed class Eval<out A> : HK<Eval.F, A> {
+    class F private constructor()
 
     abstract fun value(): A
 
@@ -190,3 +191,5 @@ sealed class Eval<out A> {
         @JvmStatic val One: Eval<Int> = Now(1)
     }
 }
+
+fun <A> HK<Eval.F, A>.ev(): Eval<A> = this as Eval<A>

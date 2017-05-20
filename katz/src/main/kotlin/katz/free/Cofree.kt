@@ -54,3 +54,15 @@ data class Cofree<S, A>(val FS: Functor<S>, val head: A, val tail: Eval<CofreeEv
                 Cofree(FS, a, Eval.later { FS.map(f(a), { Cofree.create(it, f, FS) }) })
     }
 }
+
+fun <F, A, B> CofreeKind<F, A>.cata(folder: (A, HK<F, B>) -> Eval<B>, TF: Traverse<F>): Eval<B> =
+        TF.traverse(this.ev().tailForced(), { it.cata(folder, TF) }).ev().flatMap { folder(this.ev().head, it) }
+
+fun <F, M, A, B> CofreeKind<F, A>.cataM(folder: (A, HK<F, B>) -> HK<M, B>, inclusion: FunctionK<Eval.F, M>, TF: Traverse<F>, MM: Monad<M>): HK<M, B> {
+    fun loop(ev: Cofree<F, A>): Eval<HK<M, B>> {
+        val looped: HK<M, HK<F, B>> = TF.traverse(ev.tailForced()) { MM.flatten(inclusion(Eval.defer { loop(it) })) }
+        val folded: HK<M, B> = MM.flatMap(looped) { fb -> folder(ev.head, fb) }
+        return Eval.now(folded)
+    }
+    return MM.flatten(inclusion(loop(this.ev())))
+}
