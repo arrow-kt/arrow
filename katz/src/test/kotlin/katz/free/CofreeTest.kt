@@ -52,15 +52,19 @@ class CofreeTest : UnitSpec() {
             start.extract() shouldBe 0
         }
 
-        "run should not blow up the stack" {
-            val limit = 10000
-            val counter = SideEffect()
-            val startThousands: Cofree<Option.F, Int> = unfold(counter.counter, {
-                counter.increment()
-                if (it == limit) None else Some(it + 1)
-            })
-            startThousands.run()
-            counter.counter shouldBe limit + 1
+        "run should blow up the stack" {
+            try {
+                val limit = 10000
+                val counter = SideEffect()
+                val startThousands: Cofree<Option.F, Int> = unfold(counter.counter, {
+                    counter.increment()
+                    if (it == limit) None else Some(it + 1)
+                })
+                startThousands.run()
+                counter.counter shouldBe limit + 1
+            } catch (e: StackOverflowError) {
+                // Expected. For stack safety, use cata and cataM instead
+            }
         }
 
         val startHundred: Cofree<Option.F, Int> = unfold(0, { if (it == 100) None else Some(it + 1) }, Option)
@@ -83,15 +87,17 @@ class CofreeTest : UnitSpec() {
         }
 
         "cofree should cobind correctly" {
-            val offset = 10
-            val limit = offset
+            val offset = 0
+            val limit = 10
             fun stackSafeProgram(loops: SideEffect): Int =
                     CofreeComonad<Option.F>().cobinding {
-                        val value = !unfold(loops.counter, {
+                        val program = unfold(offset, {
                             loops.increment()
                             if (it == limit) None else Some(it + 1)
-                        }).run()
-                        yields(value)
+                        })
+                        val value = !program.run()
+                        val tail = !program.runTail()
+                        yields(value + tail)
                     }
 
             val loops = SideEffect()
