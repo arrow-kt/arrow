@@ -39,7 +39,7 @@ sealed class Eval<out A> : HK<Eval.F, A> {
 
     fun <B> flatMap(f: (A) -> Eval<B>): Eval<B> =
             when (this) {
-                is Compute<A> -> object : Compute<B>() {
+                is Eval.Compute<A> -> object : Compute<B>() {
                     override fun <S> start(): Eval<S> = (this@Eval).start()
                     override fun <S> run(s: S): Eval<B> =
                             object : Compute<B>() {
@@ -106,31 +106,35 @@ sealed class Eval<out A> : HK<Eval.F, A> {
      */
     data class Call<out A>(val thunk: () -> Eval<A>) : Eval<A>() {
         override fun memoize(): Eval<A> = Later { value() }
-        override fun value(): A = CallFactory.loop(this).value()
-    }
+        override fun value(): A = collapse(this).value()
 
-    object CallFactory {
-
-        /**
-         * Collapse the call stack for eager evaluations.
-         */
-        tailrec fun <A> loop(fa: Eval<A>): Eval<A> =
-                when (fa) {
-                    is Call -> loop(fa.thunk())
-                    is Compute -> {
-                        object : Compute<A>() {
-                            override fun <S> start(): Eval<S> = fa.start()
-                            override fun <S> run(s: S): Eval<A> = loop1(fa.run(s))
+        companion object {
+            /**
+             * Collapse the call stack for eager evaluations.
+             */
+            fun <A> collapse(fa: Eval<A>): Eval<A> {
+                var lfa = fa
+                loop@ while (true) {
+                    when (lfa) {
+                        is Call -> {
+                            lfa = lfa.thunk()
                         }
+                        is Compute -> {
+                            val clfa: Compute<A> = lfa
+                            object : Compute<A>() {
+                                override fun <S> start(): Eval<S> = clfa.start()
+                                override fun <S> run(s: S): Eval<A> {
+                                    lfa = clfa.run(s)
+                                    return lfa
+                                }
+                            }
+                        }
+                        else -> break@loop
                     }
-                    else -> fa
                 }
-
-        /**
-         * Alias for loop that can be called in a non-tail position from an otherwise tailrec-optimized loop.
-         */
-        fun <A> loop1(fa: Eval<A>): Eval<A> =
-                loop(fa)
+                return lfa
+            }
+        }
     }
 
     /**
@@ -152,32 +156,42 @@ sealed class Eval<out A> : HK<Eval.F, A> {
         override fun memoize(): Eval<A> =
                 Later { value() }
 
-        override fun value(): A =
-                loop(this, listOf())
+        override fun value(): A {
+            var curr: Eval<A> = this
+            var fs: List<(Any?) -> Eval<A>> = listOf()
 
-        tailrec fun <A> loop(curr: Eval<A>, fs: List<(Any?) -> Eval<A>>): A =
+            loop@ while (true) {
                 when (curr) {
-                    is Compute ->
-                        curr.start<A>().let { cc ->
+                    is Compute -> {
+                        val currComp: Compute<A> = curr
+                        currComp.start<A>().let { cc ->
                             when (cc) {
                                 is Compute -> {
                                     val inStartFun: (Any?) -> Eval<A> = { cc.run(it) }
-                                    val outStartFun: (Any?) -> Eval<A> = { curr.run(it) }
-                                    loop(cc.start<A>(), listOf(inStartFun, outStartFun) + fs)
+                                    val outStartFun: (Any?) -> Eval<A> = { currComp.run(it) }
+                                    curr = cc.start<A>()
+                                    fs = listOf(inStartFun, outStartFun) + fs
                                 }
-                                else -> loop(curr.run(cc.value()), fs)
+                                else -> {
+                                    curr = currComp.run(cc.value())
+                                }
                             }
                         }
+                    }
                     else ->
                         if (fs.isNotEmpty()) {
-                            loop(fs[0](curr.value()), fs.drop(1))
+                            curr = fs[0](curr.value())
+                            fs = fs.drop(1)
                         } else {
-                            curr.value()
+                            break@loop
                         }
                 }
+            }
+            return curr.value()
+        }
     }
 
-    companion object EvalFactory: EvalMonad, GlobalInstance<Monad<Eval.F>>() {
+    companion object : EvalMonad, GlobalInstance<Monad<Eval.F>>() {
         @JvmStatic fun <A> now(a: A) = Now(a)
         @JvmStatic fun <A> later(f: () -> A) = Later(f)
         @JvmStatic fun <A> always(f: () -> A) = Always(f)

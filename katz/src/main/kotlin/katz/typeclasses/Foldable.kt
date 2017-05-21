@@ -1,6 +1,6 @@
 package katz
 
-import katz.Eval.EvalFactory.always
+import katz.Eval.Companion.always
 
 /**
  * Data structures that can be folded to a summary value.
