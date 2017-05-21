@@ -61,7 +61,7 @@ class CofreeTest : UnitSpec() {
                     if (it == limit) None else Some(it + 1)
                 })
                 startThousands.run()
-                counter.counter shouldBe limit + 1
+                throw AssertionError("Run should overflow on a stack-unsafe monad")
             } catch (e: StackOverflowError) {
                 // Expected. For stack safety, use cata and cataM instead
             }
