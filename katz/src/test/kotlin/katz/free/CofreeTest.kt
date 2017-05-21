@@ -52,7 +52,7 @@ class CofreeTest : UnitSpec() {
             start.extract() shouldBe 0
         }
 
-        "run should blow up the stack" {
+        "run with an stack-unsafe monad should blow up the stack" {
             try {
                 val limit = 10000
                 val counter = SideEffect()
@@ -65,6 +65,16 @@ class CofreeTest : UnitSpec() {
             } catch (e: StackOverflowError) {
                 // Expected. For stack safety, use cata and cataM instead
             }
+        }
+
+        "run with an stack-safe monad should not blow up the stack" {
+            val counter = SideEffect()
+            val startThousands: Cofree<Eval.F, Int> = unfold(counter.counter, {
+                counter.increment()
+                Eval.now(it + 1)
+            })
+            startThousands.run()
+            counter.counter shouldBe 1
         }
 
         val startHundred: Cofree<Option.F, Int> = unfold(0, { if (it == 100) None else Some(it + 1) }, Option)
@@ -86,16 +96,32 @@ class CofreeTest : UnitSpec() {
             cofreeListToNel(mappedT) shouldBe expected
         }
 
-        "cata should traverse the structure" {
-            val cata: NonEmptyList<Int> = startHundred.cata<Option.F, Id.F, Int, NonEmptyList<Int>>(
+        "cata should traverse the structure in a stack-safe way" {
+            val cata: NonEmptyList<Int> = startHundred.cata<Option.F, Int, NonEmptyList<Int>>(
                     { i, lb -> Eval.now(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) },
-                    OptionTraverse,
-                    Id
+                    OptionTraverse
             ).value()
 
             val expected = NonEmptyList.fromListUnsafe((0..100).toList())
 
             cata shouldBe expected
+        }
+
+        "cataM should traverse the structure in a stack-safe way on a monad" {
+            val folder: (Int, HK<Option.F, NonEmptyList<Int>>) -> EvalOption<NonEmptyList<Int>> = {
+                i, lb ->
+                if (i <= 100) OptionT.pure(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) else OptionT.none()
+            }
+            val inclusion = object : FunctionK<Eval.F, EvailOptionF> {
+                override fun <A> invoke(fa: HK<Eval.F, A>): HK<EvailOptionF, A> =
+                        OptionT(fa.ev().map { Some(it) })
+            }
+            val cataHundred = startHundred.cataM(folder, inclusion, OptionTraverse, OptionTMonad()).ev().value.ev().value()
+            val newCof = Cofree(Option, 101, Eval.now(Some(startHundred)))
+            val cataHundredOne = newCof.cataM(folder, inclusion, OptionTraverse, OptionTMonad()).ev().value.ev().value()
+
+            cataHundred shouldBe Some(NonEmptyList.fromListUnsafe((0..100).toList()))
+            cataHundredOne shouldBe None
         }
 
         "cofree should cobind correctly" {
@@ -107,15 +133,19 @@ class CofreeTest : UnitSpec() {
                             loops.increment()
                             if (it == limit) None else Some(it + 1)
                         })
-                        val value = !program.run()
-                        val tail = !program.runTail()
+                        val value: Int = !program.run()
+                        val tail: Int = !program.runTail()
                         yields(value + tail)
                     }
 
             val loops = SideEffect()
-            val count = stackSafeProgram(loops)
-            count shouldBe 0
+            val program = stackSafeProgram(loops)
+            program shouldBe 0
             loops.counter shouldBe limit + 1
         }
     }
 }
+
+typealias EvalOption<A> = OptionTKind<Eval.F, A>
+
+typealias EvailOptionF = OptionTF<Eval.F>
