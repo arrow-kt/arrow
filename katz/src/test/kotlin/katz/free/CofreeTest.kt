@@ -142,19 +142,16 @@ class CofreeTest : UnitSpec() {
         "cofree should cobind correctly" {
             val offset = 0
             val limit = 10
-            fun stackSafeProgram(loops: SideEffect): Int =
-                    CofreeComonad<Option.F>().cobinding {
-                        val program = unfold(offset, {
-                            loops.increment()
-                            if (it == limit) None else Some(it + 1)
-                        })
-                        val value: Int = !program.run()
-                        val tail: Int = !program.runTail()
-                        yields(value + tail)
-                    }
-
             val loops = SideEffect()
-            val program = stackSafeProgram(loops)
+            val program = CofreeComonad<Option.F>().cobinding {
+                val program = unfold(offset, {
+                    loops.increment()
+                    if (it == limit) None else Some(it + 1)
+                })
+                val value: Int = !program.run()
+                val tail: Int = !program.runTail()
+                yields(value + tail)
+            }
             program shouldBe 0
             loops.counter shouldBe limit + 1
         }
