@@ -4,5 +4,6 @@
     <Whitelist timestamp="1492411880669">
         <ID>EmptyClassBlock:Typeclass.kt$&lt;no name provided&gt; : TypeLiteral</ID>
         <ID>OptionalUnit:NonEmptyListMonad.kt$NonEmptyListMonad$Unit</ID>
+        <ID>NestedBlockDepth:Eval.kt$Eval.Compute$override fun value(): A</ID>
     </Whitelist>
 </SmellBaseline>

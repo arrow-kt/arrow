@@ -1,6 +1,6 @@
 package katz
 
-class OptionTMonad<F>(val MF: Monad<F>) : Monad<OptionTF<F>> {
+data class OptionTMonad<F>(val MF: Monad<F>, val dummy: Unit = Unit) : Monad<OptionTF<F>> {
     override fun <A> pure(a: A): OptionT<F, A> = OptionT(MF, MF.pure(Option(a)))
 
     override fun <A, B> flatMap(fa: OptionTKind<F, A>, f: (A) -> OptionTKind<F, B>): OptionT<F, B> =
@@ -19,6 +19,11 @@ class OptionTMonad<F>(val MF: Monad<F>) : Monad<OptionTF<F>> {
                     })
                 })
             }))
+
+    companion object {
+        inline operator fun <reified F> invoke(MF: Monad<F> = monad<F>()): OptionTMonad<F> =
+                OptionTMonad(MF, Unit)
+    }
 }
 
 fun <F, A> OptionTKind<F, A>.ev(): OptionT<F, A> = this as OptionT<F, A>
