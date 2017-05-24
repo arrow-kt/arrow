@@ -107,20 +107,21 @@ class CofreeTest : UnitSpec() {
             cata shouldBe expected
         }
 
-        val startTenThousand: Cofree<Option.F, Int> = unfold(0, { if (it == 10000) None else Some(it + 1) }, Option)
+        val startThousand: Cofree<Option.F, Int> = unfold(0, { if (it == 5000) None else Some(it + 1) }, Option)
 
         "cata with an stack-unsafe monad should blow up the stack" {
             try {
-                startTenThousand.cata<Option.F, Int, NonEmptyList<Int>>(
+                startThousand.cata<Option.F, Int, NonEmptyList<Int>>(
                         { i, lb -> Eval.now(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) },
                         OptionTraverse
                 ).value()
-
                 throw AssertionError("Run should overflow on a stack-unsafe monad")
             } catch (e: StackOverflowError) {
                 // Expected. For stack safety use cataM instead
             }
         }
+
+        val startTenThousand: Cofree<Option.F, Int> = unfold(0, { if (it == 10000) None else Some(it + 1) }, Option)
 
         "cataM should traverse the structure in a stack-safe way on a monad" {
             val folder: (Int, HK<Option.F, NonEmptyList<Int>>) -> EvalOption<NonEmptyList<Int>> = {
