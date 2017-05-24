@@ -107,7 +107,7 @@ class CofreeTest : UnitSpec() {
             cata shouldBe expected
         }
 
-        val startThousand: Cofree<Option.F, Int> = unfold(0, { if (it == 5000) None else Some(it + 1) }, Option)
+        val startThousand: Cofree<Option.F, Int> = unfold(0, { if (it == 2000) None else Some(it + 1) }, Option)
 
         "cata with an stack-unsafe monad should blow up the stack" {
             try {
