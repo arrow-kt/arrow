@@ -63,7 +63,7 @@ class CofreeTest : UnitSpec() {
                 startThousands.run()
                 throw AssertionError("Run should overflow on a stack-unsafe monad")
             } catch (e: StackOverflowError) {
-                // Expected. For stack safety, use cata and cataM instead
+                // Expected. For stack safety use cataM instead
             }
         }
 
@@ -96,7 +96,7 @@ class CofreeTest : UnitSpec() {
             cofreeListToNel(mappedT) shouldBe expected
         }
 
-        "cata should traverse the structure in a stack-safe way" {
+        "cata should traverse the structure" {
             val cata: NonEmptyList<Int> = startHundred.cata<Option.F, Int, NonEmptyList<Int>>(
                     { i, lb -> Eval.now(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) },
                     OptionTraverse
@@ -107,20 +107,35 @@ class CofreeTest : UnitSpec() {
             cata shouldBe expected
         }
 
+        val startTenThousand: Cofree<Option.F, Int> = unfold(0, { if (it == 10000) None else Some(it + 1) }, Option)
+
+        "cata with an stack-unsafe monad should blow up the stack" {
+            try {
+                startTenThousand.cata<Option.F, Int, NonEmptyList<Int>>(
+                        { i, lb -> Eval.now(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) },
+                        OptionTraverse
+                ).value()
+
+                throw AssertionError("Run should overflow on a stack-unsafe monad")
+            } catch (e: StackOverflowError) {
+                // Expected. For stack safety use cataM instead
+            }
+        }
+
         "cataM should traverse the structure in a stack-safe way on a monad" {
             val folder: (Int, HK<Option.F, NonEmptyList<Int>>) -> EvalOption<NonEmptyList<Int>> = {
                 i, lb ->
-                if (i <= 100) OptionT.pure(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) else OptionT.none()
+                if (i <= 10000) OptionT.pure(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) else OptionT.none()
             }
             val inclusion = object : FunctionK<Eval.F, EvailOptionF> {
                 override fun <A> invoke(fa: HK<Eval.F, A>): HK<EvailOptionF, A> =
                         OptionT(fa.ev().map { Some(it) })
             }
-            val cataHundred = startHundred.cataM(folder, inclusion, OptionTraverse, OptionTMonad()).ev().value.ev().value()
-            val newCof = Cofree(Option, 101, Eval.now(Some(startHundred)))
+            val cataHundred = startTenThousand.cataM(folder, inclusion, OptionTraverse, OptionTMonad()).ev().value.ev().value()
+            val newCof = Cofree(Option, 10001, Eval.now(Some(startTenThousand)))
             val cataHundredOne = newCof.cataM(folder, inclusion, OptionTraverse, OptionTMonad()).ev().value.ev().value()
 
-            cataHundred shouldBe Some(NonEmptyList.fromListUnsafe((0..100).toList()))
+            cataHundred shouldBe Some(NonEmptyList.fromListUnsafe((0..10000).toList()))
             cataHundredOne shouldBe None
         }
 
