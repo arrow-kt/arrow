@@ -5,5 +5,6 @@
         <ID>EmptyClassBlock:Typeclass.kt$&lt;no name provided&gt; : TypeLiteral</ID>
         <ID>OptionalUnit:NonEmptyListMonad.kt$NonEmptyListMonad$Unit</ID>
         <ID>OptionalUnit:NonEmptyVectorMonad.kt$NonEmptyVectorMonad$Unit</ID>
+        <ID>NestedBlockDepth:Eval.kt$Eval.Compute$override fun value(): A</ID>
     </Whitelist>
 </SmellBaseline>

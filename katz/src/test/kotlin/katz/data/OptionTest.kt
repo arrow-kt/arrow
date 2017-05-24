@@ -4,7 +4,8 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.forAll
-import katz.Option.*
+import katz.Option.Some
+import katz.Option.None
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
