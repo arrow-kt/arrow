@@ -7,7 +7,7 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class EvalTest : UnitSpec() {
     init {
-        "Eval should map wrapped value" {
+        "should map wrapped value" {
             val sideEffect = SideEffect()
             val mapped = Eval.now(0)
                     .map { sideEffect.increment(); it + 1 }
@@ -20,7 +20,7 @@ class EvalTest : UnitSpec() {
             sideEffect.counter shouldBe 3
         }
 
-        "Eval#later should lazily evaluate values once" {
+        "later should lazily evaluate values once" {
             val sideEffect = SideEffect()
             val mapped = Eval.later { sideEffect.increment(); sideEffect.counter }
             sideEffect.counter shouldBe 0
@@ -32,7 +32,7 @@ class EvalTest : UnitSpec() {
             sideEffect.counter shouldBe 1
         }
 
-        "Eval#later should memoize values" {
+        "later should memoize values" {
             val sideEffect = SideEffect()
             val mapped = Eval.later { sideEffect.increment(); sideEffect.counter }.memoize()
             sideEffect.counter shouldBe 0
@@ -44,7 +44,7 @@ class EvalTest : UnitSpec() {
             sideEffect.counter shouldBe 1
         }
 
-        "Eval#always should lazily evaluate values repeatedly" {
+        "always should lazily evaluate values repeatedly" {
             val sideEffect = SideEffect()
             val mapped = Eval.always { sideEffect.increment(); sideEffect.counter }
             sideEffect.counter shouldBe 0
@@ -56,7 +56,7 @@ class EvalTest : UnitSpec() {
             sideEffect.counter shouldBe 3
         }
 
-        "Eval#always should memoize values" {
+        "always should memoize values" {
             val sideEffect = SideEffect()
             val mapped = Eval.always { sideEffect.increment(); sideEffect.counter }.memoize()
             sideEffect.counter shouldBe 0
@@ -68,7 +68,7 @@ class EvalTest : UnitSpec() {
             sideEffect.counter shouldBe 1
         }
 
-        "Eval#defer should lazily evaluate other Evals" {
+        "defer should lazily evaluate other Evals" {
             val sideEffect = SideEffect()
             val mapped = Eval.defer { sideEffect.increment(); Eval.later { sideEffect.increment(); sideEffect.counter } }
             sideEffect.counter shouldBe 0
@@ -80,19 +80,7 @@ class EvalTest : UnitSpec() {
             sideEffect.counter shouldBe 6
         }
 
-        "Eval#defer should memoize other Eval#now" {
-            val sideEffect = SideEffect()
-            val mapped = Eval.defer { sideEffect.increment(); Eval.now(sideEffect.counter) }.memoize()
-            sideEffect.counter shouldBe 0
-            mapped.value() shouldBe 1
-            sideEffect.counter shouldBe 1
-            mapped.value() shouldBe 1
-            sideEffect.counter shouldBe 1
-            mapped.value() shouldBe 1
-            sideEffect.counter shouldBe 1
-        }
-
-        "Eval#defer should memoize other Eval#later" {
+        "defer should memoize Eval#later" {
             val sideEffect = SideEffect()
             val mapped = Eval.defer { sideEffect.increment(); Eval.later { sideEffect.increment(); sideEffect.counter } }.memoize()
             sideEffect.counter shouldBe 0
@@ -104,7 +92,19 @@ class EvalTest : UnitSpec() {
             sideEffect.counter shouldBe 2
         }
 
-        "should flatMap without blowing up the stack" {
+        "defer should memoize Eval#now" {
+            val sideEffect = SideEffect()
+            val mapped = Eval.defer { sideEffect.increment(); Eval.now(sideEffect.counter) }.memoize()
+            sideEffect.counter shouldBe 0
+            mapped.value() shouldBe 1
+            sideEffect.counter shouldBe 1
+            mapped.value() shouldBe 1
+            sideEffect.counter shouldBe 1
+            mapped.value() shouldBe 1
+            sideEffect.counter shouldBe 1
+        }
+
+        "flatMap should complete without blowing up the stack" {
             val limit = 10000
             val sideEffect = SideEffect()
             val flatMapped = Eval.pure(0).flatMap(recur(limit, sideEffect))
