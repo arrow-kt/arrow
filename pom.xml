@@ -85,7 +85,8 @@
         </developer>
     </developers>
     <properties>
-        <kotlin.version>1.0.6</kotlin.version>
+        <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
+        <kotlin.version>1.1.2-2</kotlin.version>
     </properties>
     <dependencies>
         <dependency>

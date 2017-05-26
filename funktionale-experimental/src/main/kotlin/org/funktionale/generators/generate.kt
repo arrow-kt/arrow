@@ -32,7 +32,7 @@ val paramDeclaration = { i: Int -> "p$i: P$i" }.memoize()
 
 val paramDeclarationWithVal = { i: Int -> "val p$i: P$i" }.memoize()
 
-fun buildCompleteParams(paramType:(Int) -> String): (Int) -> String = { i: Int -> (1..i).mapTo(arrayListOf<String>(), paramType).joinToString() }.memoize()
+fun buildCompleteParams(paramType: (Int) -> String): (Int) -> String = { i: Int -> (1..i).mapTo(arrayListOf<String>(), paramType).joinToString() }.memoize()
 
 val completeParams = buildCompleteParams(paramType)
 
@@ -46,164 +46,160 @@ val callFunctionParamsWithParenthesis = callFunction(p2 = paramWithParenthesis)(
 
 val closed = { i: Int -> (1..i).mapTo(arrayListOf<String>()) { "}" }.joinToString(separator = " ") }
 
-val filteredParams = { i: Int, filtered: Int -> (1..i).filterNotTo(arrayListOf<Int>()) { it.equals(filtered) }.mapTo(arrayListOf<String>(), paramType).joinToString() }
+val filteredParams = { i: Int, filtered: Int -> (1..i).filterNotTo(arrayListOf<Int>()) { it == filtered }.mapTo(arrayListOf<String>(), paramType).joinToString() }
 
-val filteredDeclaredParams = { i: Int, filtered: Int -> (1..i).filterNotTo(arrayListOf<Int>()) { it.equals(filtered) }.mapTo(arrayListOf<String>(), paramDeclaration).joinToString() }
+val filteredDeclaredParams = { i: Int, filtered: Int -> (1..i).filterNotTo(arrayListOf<Int>()) { it == filtered }.mapTo(arrayListOf<String>(), paramDeclaration).joinToString() }
 
 fun partially() {
 
-    (1..22).forEach { i ->
+	(1..22).forEach { i ->
 
-        (1..i).forEach { j ->
-            println("""
-public fun <${completeParams(i)}, R> Function$i<${completeParams(i)}, R>.partially$j(${paramDeclaration(j)}): (${filteredParams(i, j)}) -> R {
-    return {${filteredDeclaredParams(i, j)} -> this(${callFunctionParams(i)})}
-}
+		(1..i).forEach { j ->
+			println(
+					"""
+fun <${completeParams(i)}, R> ((${completeParams(i)}) -> R).partially$j(${paramDeclaration(j)}): (${filteredParams(i, j)}) -> R {
+    return { ${filteredDeclaredParams(i, j)} -> this(${callFunctionParams(i)}) }
+}""")
+		}
 
-                """)
-        }
-
-    }
+	}
 }
 
 fun newPartially() {
 
-    val partials: (Int, Int) -> String = { i: Int, parameter: Int ->
-        (1..i).map { num ->
-            if (num == parameter) {
-                paramDeclaration(num)
-            } else {
-                "partial$num: Partial<P$num> = partial()"
-            }
-        }.joinToString()
-    }
+	val partials: (Int, Int) -> String = { i: Int, parameter: Int ->
+		(1..i).map { num ->
+			if (num == parameter) {
+				paramDeclaration(num)
+			} else {
+				"partial$num: Partial<P$num> = partial()"
+			}
+		}.joinToString()
+	}
 
-    (2..22).forEach { i ->
-        (1..i).forEach { j ->
-            println("""
-[suppress("UNUSED_PARAMETER")]
-public fun <${completeParams(i)}, R> Function$i<${completeParams(i)}, R>.invoke(${partials(i, j)}): (${filteredParams(i, j)}) -> R {
-    return {${filteredDeclaredParams(i, j)} -> this(${callFunctionParams(i)})}
-}
-""")
-        }
-    }
+	(2..22).forEach { i ->
+		(1..i).forEach { j ->
+			println("""
+operator @Suppress("UNUSED_PARAMETER") fun <${completeParams(i)}, R> ((${completeParams(i)}) -> R).invoke(${partials(i, j)}): (${filteredParams(i, j)}) -> R {
+    return { ${filteredDeclaredParams(i, j)} -> this(${callFunctionParams(i)}) }
+}""")
+		}
+	}
 }
 
 
 fun currying() {
 
-    val returnType = { i: Int -> (1..i).mapTo(arrayListOf<String>(), paramType).joinToString(separator = ") -> (", prefix = "(", postfix = ")") }
+	val returnType = { i: Int -> (1..i).mapTo(arrayListOf<String>(), paramType).joinToString(separator = ") -> (", prefix = "(", postfix = ")") }
 
-    val returned = { i: Int -> (1..i).mapTo(arrayListOf<String>(), paramDeclaration).joinToString(separator = " -> {") }
+	val returned = { i: Int -> (1..i).mapTo(arrayListOf<String>(), paramDeclaration).joinToString(separator = " -> { ") }
 
 
-    (2..22).forEach { i ->
-        println("""
-public fun<${completeParams(i)}, R> Function$i<${completeParams(i)}, R>.curried(): ${returnType(i)} -> R {
-    return {${returned(i)}  -> this(${callFunctionParams(i)}) ${closed(i)}
+	(2..22).forEach { i ->
+		println("""
+fun <${completeParams(i)}, R> ((${completeParams(i)}) -> R).curried(): ${returnType(i)} -> R {
+    return { ${returned(i)}  -> this(${callFunctionParams(i)}) ${closed(i)}
 }
         """)
-    }
+	}
 }
 
 fun uncurrying() {
 
-    val receiverType = { i: Int -> (1..i).mapTo(arrayListOf<String>(), paramType).joinToString(separator = ") -> (", prefix = "(", postfix = ")") }
+	val receiverType = { i: Int -> (1..i).mapTo(arrayListOf<String>(), paramType).joinToString(separator = ") -> (", prefix = "(", postfix = ")") }
 
-    val returned = { i: Int -> (1..i).mapTo(arrayListOf<String>(), paramDeclaration).joinToString(separator = ", ") }
+	val returned = { i: Int -> (1..i).mapTo(arrayListOf<String>(), paramDeclaration).joinToString(separator = ", ") }
 
 
-    (2..22).forEach { i ->
-        println("""
-public fun<${completeParams(i)}, R> (${receiverType(i)} -> R).uncurried(): (${completeParams(i)}) -> R {
+	(2..22).forEach { i ->
+		println("""
+fun<${completeParams(i)}, R> (${receiverType(i)} -> R).uncurried(): (${completeParams(i)}) -> R {
     return { ${returned(i)}  -> this${callFunction(i, paramWithParenthesis, "")} }
 }
         """)
-    }
+	}
 }
 
 fun flip() {
 
-    val returnType = { i: Int -> (i downTo 1).mapTo(arrayListOf<String>(), paramType).joinToString(separator = ") -> (", prefix = "(", postfix = ")") }
+	val returnType = { i: Int -> (i downTo 1).mapTo(arrayListOf<String>(), paramType).joinToString(separator = ") -> (", prefix = "(", postfix = ")") }
 
-    val returned = { i: Int -> (i downTo 1).mapTo(arrayListOf<String>(), paramDeclaration).joinToString(separator = ") -> {(", prefix = "(", postfix = ")") }
+	val returned = { i: Int -> (i downTo 1).mapTo(arrayListOf<String>(), paramDeclaration).joinToString(separator = ") -> {(", prefix = "(", postfix = ")") }
 
-    fun receptorType(i: Int, finalType: String): String {
-        if (i > 0) {
-            return receptorType((i - 1), "Function1<P$i, $finalType>")
-        } else {
-            return finalType
-        }
-    }
+	fun receptorType(i: Int, finalType: String): String {
+		if (i > 0) {
+			return receptorType((i - 1), "Function1<P$i, $finalType>")
+		} else {
+			return finalType
+		}
+	}
 
-    (2..22).forEach { i ->
-        println("""
-public fun<${completeParams(i)}, R> ${receptorType(i, "R")}.flip(): ${returnType(i)} -> R {
+	(2..22).forEach { i ->
+		println("""
+public fun <${completeParams(i)}, R> ${receptorType(i, "R")}.flip(): ${returnType(i)} -> R {
     return {${returned(i)}  -> this${callFunctionParamsWithParenthesis(i)} ${closed(i)}
 }
         """)
-    }
+	}
 }
 
 fun reverse() {
 
-    val returnType = { i: Int -> (i downTo 1).mapTo(arrayListOf<String>(), paramType).joinToString(separator = ", ", prefix = "(", postfix = ")") }
+	val returnType = { i: Int -> (i downTo 1).mapTo(arrayListOf<String>(), paramType).joinToString(separator = ", ", prefix = "(", postfix = ")") }
 
-    val returned = { i: Int -> (i downTo 1).mapTo(arrayListOf<String>(), paramDeclaration).joinToString(separator = ", ") }
+	val returned = { i: Int -> (i downTo 1).mapTo(arrayListOf<String>(), paramDeclaration).joinToString(separator = ", ") }
 
 
-    (2..22).forEach { i ->
-        println("""
-    public fun<${completeParams(i)}, R> Function$i<${completeParams(i)}, R>.reverse(): ${returnType(i)} -> R {
-        return {${returned(i)}  -> this(${callFunctionParams(i)}) }
-    }
-            """)
-    }
+	(2..22).forEach { i ->
+		println("""
+fun<${completeParams(i)}, R> ((${completeParams(i)}) -> R).reverse(): ${returnType(i)} -> R {
+	return { ${returned(i)}  -> this(${callFunctionParams(i)}) }
+}""")
+	}
 }
 
 val anies = { i: Int ->
-    (1..(i + 1)).mapTo(arrayListOf<String>()) {
-        "Any"
-    }.joinToString(separator = ", ")
+	(1..(i + 1)).mapTo(arrayListOf<String>()) {
+		"Any"
+	}.joinToString(separator = ", ")
 }
 
 private fun javaFunClasses(i: Int): String {
 
 
-    return (0..i).mapTo(arrayListOf<String>()) { i ->
-        "javaClass<Function$i<${anies(i)}>>()"
-    }.joinToString(separator = ",\n")
+	return (0..i).mapTo(arrayListOf<String>()) { i ->
+		"javaClass<Function$i<${anies(i)}>>()"
+	}.joinToString(separator = ",\n")
 }
 
 fun functionClasses() {
-    println("""
+	println("""
     return array(${javaFunClasses(22)})
 """)
 }
 
 val callParamArray = { i: Int ->
-    (0..(i - 1)).mapTo(arrayListOf<String>()) {
-        "args[$it]"
-    }.joinToString(separator = ", ")
+	(0..(i - 1)).mapTo(arrayListOf<String>()) {
+		"args[$it]"
+	}.joinToString(separator = ", ")
 }
 
 
 fun callFunctions() {
-    println((1..22).mapTo(arrayListOf<String>()) { i ->
-        "$i -> (function!! as Function$i<${anies(i)}>)(${callParamArray(i)})"
-    }.joinToString(separator = "\n"))
+	println((1..22).mapTo(arrayListOf<String>()) { i ->
+		"$i -> (function!! as Function$i<${anies(i)}>)(${callParamArray(i)})"
+	}.joinToString(separator = "\n"))
 }
 
 fun String.capitalizeFirstCharacter(): String {
-    val firstCharacter = this[0].toString().capitalize()
-    return firstCharacter + this.substring(1)
+	val firstCharacter = this[0].toString().capitalize()
+	return firstCharacter + this.substring(1)
 }
 
 fun functionsForResultSet(vararg names: String) {
-    names.forEach { name ->
-        println(
-                """
+	names.forEach { name ->
+		println(
+				"""
 public val $name: GetFieldsToken<${name.capitalizeFirstCharacter()}?>
         get(){
             return GetFieldsToken(
@@ -211,31 +207,41 @@ public val $name: GetFieldsToken<${name.capitalizeFirstCharacter()}?>
                     { columnIndex -> get${name.capitalizeFirstCharacter()}(columnIndex) })
         }
                 """
-        )
-    }
+		)
+	}
 }
 
 fun memoizeKeys() {
 
-    fun params(i: Int) = (1..i).mapTo(arrayListOf(), paramDeclarationWithVal).joinToString(", ")
+	fun params(i: Int) = (1..i).mapTo(arrayListOf(), paramDeclarationWithVal).joinToString(", ")
 
-    println((1..22).mapTo(arrayListOf()) { i ->
+	println((1..22).mapTo(arrayListOf()) { i ->
 
-        """
+		"""
 private data class MemoizeKey$i<${completeOutParams(i)}, R>(${params(i)}) : MemoizedCall<(${completeParams(i)}) -> R, R> {
     override fun invoke(f: (${completeParams(i)}) -> R) = f(${callFunctionParams(i)})
 }
 """
 
-    }.joinToString(separator = ""))
+	}.joinToString(separator = ""))
+}
+
+fun complement() {
+	println((1..22).mapTo(arrayListOf()) { i ->
+		"""
+fun <${completeParams(i)}> ((${completeParams(i)}) -> Boolean).complement(): (${completeParams(i)}) -> Boolean {
+    return { ${buildCompleteParams(paramDeclaration)(i)} -> !this(${buildCompleteParams(param)(i)}) }
+}
+"""
+	}.joinToString(""))
 }
 
 fun memoizeFunctions() {
 
-    fun params(i: Int) = (1..i).mapTo(arrayListOf(), paramDeclaration).joinToString(", ")
+	fun params(i: Int) = (1..i).mapTo(arrayListOf(), paramDeclaration).joinToString(", ")
 
-    println((1..22).mapTo(arrayListOf()) { i ->
-        """
+	println((1..22).mapTo(arrayListOf()) { i ->
+		"""
 fun <${completeParams(i)}, R> ((${completeParams(i)}) -> R).memoize(): (${completeParams(i)}) -> R {
     return object : (${completeParams(i)}) -> R {
         private val m = MemoizedHandler<((${completeParams(i)}) -> R), MemoizeKey$i<${completeParams(i)}, R>, R>(this@memoize)
@@ -243,28 +249,29 @@ fun <${completeParams(i)}, R> ((${completeParams(i)}) -> R).memoize(): (${comple
     }
 }
 """
-    }.joinToString(""))
+	}.joinToString(""))
 }
 
 //functionsForResultSet("boolean", "byte", "bytes", "characterStream", "clob", "date", "double", "float", "int", "long", "nCharacterStream", "nClob", "nString", "object", "ref", "rowId", "short", "SQLXML", "string", "time", "timestamp", "URL")
 
 fun f(): Array<String> {
-    val xs = setOf("foo", "bar")
-    return xs.toArray()
+	val xs = setOf("foo", "bar")
+	return xs.toArray()
 }
 
 fun main(args: Array<String>) {
-    //setOf("foo", "bar").toArray().forEach { it -> println(it as String) }
-    //    partially()
-    //    newPartially()
-    //    currying()
-    //    reverse()
-    //uncurrying()
-    //memoizeFunctions()
-        memoizeKeys()
+	//setOf("foo", "bar").toArray().forEach { it -> println(it as String) }
+	//partially()
+	//newPartially()
+	//    currying()
+	reverse()
+	//uncurrying()
+	//memoizeFunctions()
+	//memoizeKeys()
+	//complement()
 }
 
 
-fun<T> Set<T>.toArray(): Array<T> {
-    return toArray()
+fun <T> Set<T>.toArray(): Array<T> {
+	return toArray()
 }

@@ -16,7 +16,7 @@
 
 package org.funktionale.utils
 
-class PartialFunction<in P1, out R>(private val definetAt: (P1) -> Boolean, private val f: (P1) -> R) : Function1<P1, R> {
+class PartialFunction<in P1, out R>(private val definetAt: (P1) -> Boolean, private val f: (P1) -> R) :(P1) -> R {
     override fun invoke(p1: P1): R {
         if(definetAt(p1)) {
             return f(p1)
@@ -46,6 +46,6 @@ infix fun <P1, R> PartialFunction<P1, R>.orElse(that: PartialFunction<P1, R>): P
     }
 }
 
-fun <P1, R> Function1<P1, R>.toPartialFunction(definedAt: (P1) -> Boolean): PartialFunction<P1, R> {
+fun <P1, R> ((P1) -> R).toPartialFunction(definedAt: (P1) -> Boolean): PartialFunction<P1, R> {
     return PartialFunction(definedAt, this)
 }

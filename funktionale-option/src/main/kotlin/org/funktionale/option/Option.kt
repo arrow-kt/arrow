@@ -275,7 +275,7 @@ fun <T> List<Option<T>>.flatten(): List<T> {
     return filter { it.isDefined() }.map { it.get() }
 }
 
-fun <P1, R> Function1<P1, R>.optionLift(): (Option<P1>) -> Option<R> {
+fun <P1, R> ((P1) -> R).optionLift(): (Option<P1>) -> Option<R> {
     return { it.map(this) }
 }
 
