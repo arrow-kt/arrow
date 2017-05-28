@@ -2,7 +2,6 @@ package katz
 
 import katz.Either.Left
 import katz.Either.Right
-import katz.Option
 
 typealias IorKind<A, B> = HK2<Ior.F, A, B>
 
@@ -269,3 +268,5 @@ inline fun <A, B, D> Ior<A, B>.flatMap(SA: Semigroup<A>, crossinline f: (B) -> I
 }
 
 inline fun <A, B> Ior<A, B>.getOrElse(crossinline default: () -> B): B = fold({ default() }, { it }, { _, b -> b })
+
+fun <A, B> IorKind<A, B>.ev(): Ior<A, B> = this as Ior<A, B>
