@@ -20,6 +20,9 @@ sealed class Try<out A> : TryKind<A> {
                 } catch (e: Throwable) {
                     Failure(e)
                 }
+
+        fun <A> raise(e: Exception): Try<A> =
+                Failure(e)
     }
 
     /**
