@@ -32,7 +32,7 @@ data class ComposedFoldable<F, G>(val FF: Foldable<F>, val GF: Foldable<G>) : Fo
     }
 }
 
-inline fun <F, reified G> Foldable<F>.compose(GT: Foldable<G> = foldable<G>()) =
+inline fun <F, reified G> Foldable<F>.compose(GT: Foldable<G> = foldable<G>()): ComposedFoldable<F, G> =
         ComposedFoldable(this, GT)
 
 data class ComposedTraverse<F, G>(val FT: Traverse<F>, val GT: Traverse<G>, val GA: Applicative<G>, val CF: ComposedFoldable<F, G> = ComposedFoldable(FT, GT))
