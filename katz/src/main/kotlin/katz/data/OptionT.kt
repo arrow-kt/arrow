@@ -79,7 +79,7 @@ data class OptionT<F, A>(val MF: Monad<F>, val value: HK<F, Option<A>>) : Option
             FF.compose(CFO, OptionTraverse).foldR(CFO.unapply(value), lb, f)
 
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>, FF: Traverse<F>, MF: Monad<F>, CFO: ComposedType<F, Option.F>): HK<G, HK<OptionTF<F>, B>> {
-        val fa = FF.compose(CFO, OptionTraverse).traverse(CFO.unapply(value), f, GA)
+        val fa = ComposedTraverse(CFO, FF, OptionTraverse, Option).traverse(CFO.unapply(value), f, GA)
         return GA.map(fa, { OptionT(MF, MF.map(CFO.apply(it), { it.ev() })) })
     }
 
