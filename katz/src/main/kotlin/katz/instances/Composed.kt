@@ -5,9 +5,11 @@ package katz
  */
 interface ComposedType<out F, out G>
 
+@Suppress("UNCHECKED_CAST")
 fun <F, G, A> HK<F, HK<G, A>>.lift(): HK<ComposedType<F, G>, A> =
         this as HK<ComposedType<F, G>, A>
 
+@Suppress("UNCHECKED_CAST")
 fun <F, G, A> HK<ComposedType<F, G>, A>.lower(): HK<F, HK<G, A>> =
         this as HK<F, HK<G, A>>
 
