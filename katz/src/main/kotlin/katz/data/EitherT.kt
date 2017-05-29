@@ -13,6 +13,8 @@ data class EitherT<F, A, B>(val MF: Monad<F>, val value: HK<F, Either<A, B>>) : 
 
     class F private constructor()
 
+    private val CFE: ComposedType<F, EitherF<A>> = ComposedType()
+
     companion object {
 
         inline operator fun <reified F, A, B> invoke(value: HK<F, Either<A, B>>, MF: Monad<F> = monad<F>()): EitherT<F, A, B> = EitherT(MF, value)
@@ -59,13 +61,13 @@ data class EitherT<F, A, B>(val MF: Monad<F>, val value: HK<F, Either<A, B>>) : 
     fun toOptionT(): OptionT<F, B> =
             OptionT(MF, MF.map(value, { it.toOption() }))
 
-    fun <C> foldL(b: C, f: (C, B) -> C, FF: Foldable<F>, CFE: ComposedType<F, EitherF<A>>): C =
+    fun <C> foldL(b: C, f: (C, B) -> C, FF: Foldable<F>): C =
             FF.compose(EitherTraverse<A>()).foldL(CFE.unapply(value), b, f)
 
-    fun <C> foldR(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>, FF: Foldable<F>, CFE: ComposedType<F, EitherF<A>>): Eval<C> =
+    fun <C> foldR(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>, FF: Foldable<F>): Eval<C> =
             FF.compose(EitherTraverse<A>()).foldR(CFE.unapply(value), lb, f)
 
-    fun <G, C> traverse(f: (B) -> HK<G, C>, GA: Applicative<G>, FF: Traverse<F>, MF: Monad<F>, CFE: ComposedType<F, EitherF<A>>): HK<G, HK<EitherTF<F, A>, C>> {
+    fun <G, C> traverse(f: (B) -> HK<G, C>, GA: Applicative<G>, FF: Traverse<F>, MF: Monad<F>): HK<G, HK<EitherTF<F, A>, C>> {
         val fa = ComposedTraverse(FF, EitherTraverse<A>(), EitherMonad<A>(), CFE).traverse(CFE.unapply(value), f, GA)
         return GA.map(fa, { EitherT(MF, MF.map(CFE.apply(it), { it.ev() })) })
     }

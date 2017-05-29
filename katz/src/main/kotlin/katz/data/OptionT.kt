@@ -13,6 +13,8 @@ data class OptionT<F, A>(val MF: Monad<F>, val value: HK<F, Option<A>>) : Option
 
     class F private constructor()
 
+    private val CFO: ComposedType<F, Option.F> = ComposedType()
+
     companion object {
 
         inline operator fun <reified F, A> invoke(value: HK<F, Option<A>>, MF: Monad<F> = monad<F>()): OptionT<F, A> = OptionT(MF, value)
@@ -72,13 +74,13 @@ data class OptionT<F, A>(val MF: Monad<F>, val value: HK<F, Option<A>>) : Option
     inline fun <B> subflatMap(crossinline f: (A) -> Option<B>): OptionT<F, B> =
             transform({ it.flatMap(f) })
 
-    fun <B> foldL(b: B, f: (B, A) -> B, FF: Foldable<F>, CFO: ComposedType<F, Option.F>): B =
+    fun <B> foldL(b: B, f: (B, A) -> B, FF: Foldable<F>): B =
             FF.compose(OptionTraverse).foldL(CFO.unapply(value), b, f)
 
-    fun <B> foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>, CFO: ComposedType<F, Option.F>): Eval<B> =
+    fun <B> foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>): Eval<B> =
             FF.compose(OptionTraverse).foldR(CFO.unapply(value), lb, f)
 
-    fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>, FF: Traverse<F>, MF: Monad<F>, CFO: ComposedType<F, Option.F>): HK<G, HK<OptionTF<F>, B>> {
+    fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>, FF: Traverse<F>, MF: Monad<F>): HK<G, HK<OptionTF<F>, B>> {
         val fa = ComposedTraverse(FF, OptionTraverse, Option, CFO).traverse(CFO.unapply(value), f, GA)
         return GA.map(fa, { OptionT(MF, MF.map(CFO.apply(it), { it.ev() })) })
     }
