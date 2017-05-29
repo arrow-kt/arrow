@@ -31,5 +31,3 @@ class IorMonad<L>(val SL: Semigroup<L>) : Monad<HK<Ior.F, L>> {
         return loop(f(a).ev(), f)
     }
 }
-
-fun <A, B> IorKind<A, B>.ev(): Ior<A, B> = this as Ior<A, B>

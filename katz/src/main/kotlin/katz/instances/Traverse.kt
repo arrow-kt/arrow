@@ -23,3 +23,6 @@ interface Traverse<F> : Functor<F>, Foldable<F>, Typeclass {
     override fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B> =
             traverse(fa, { Id(f(it)) }, Id).value()
 }
+
+inline fun <reified F> traverse(): Traverse<F> =
+        instance(InstanceParametrizedType(Traverse::class.java, listOf(F::class.java)))

@@ -3,6 +3,9 @@ package katz
 typealias EitherKind<A, B> = HK2<Either.F, A, B>
 typealias EitherF<L> = HK<Either.F, L>
 
+fun <A, B> EitherKind<A, B>.ev(): Either<A, B> =
+        this as Either<A, B>
+
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Either.scala
  *

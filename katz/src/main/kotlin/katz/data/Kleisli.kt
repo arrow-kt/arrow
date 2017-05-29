@@ -7,10 +7,14 @@ typealias KleisiFun<F, D, A> = (D) -> HK<F, A>
 
 typealias ReaderT<F, D, A> = Kleisli<F, D, A>
 
+fun <F, D, A> KleisiTKind<F, D, A>.ev(): Kleisli<F, D, A> =
+        this as Kleisli<F, D, A>
+
 class Kleisli<F, D, A>(val MF: Monad<F>, val run: KleisiFun<F, D, A>) : KleisiTKind<F, D, A> {
     class F private constructor()
 
-    fun <B> map(f: (A) -> B): Kleisli<F, D, B> = Kleisli(MF, { a -> MF.map(run(a), f) })
+    fun <B> map(f: (A) -> B): Kleisli<F, D, B> =
+            Kleisli(MF, { a -> MF.map(run(a), f) })
 
     fun <B> flatMap(f: (A) -> Kleisli<F, D, B>): Kleisli<F, D, B> =
             Kleisli(MF, { d ->
@@ -22,7 +26,8 @@ class Kleisli<F, D, A>(val MF: Monad<F>, val run: KleisiFun<F, D, A>) : KleisiTK
                 o.map({ b -> Tuple2(a, b) })
             })
 
-    fun <DD> local(f: (DD) -> D): Kleisli<F, DD, A> = Kleisli(MF, { dd -> run(f(dd)) })
+    fun <DD> local(f: (DD) -> D): Kleisli<F, DD, A> =
+            Kleisli(MF, { dd -> run(f(dd)) })
 
     fun <B> andThen(f: (A) -> HK<F, B>): Kleisli<F, D, B> =
             Kleisli(MF, { MF.flatMap(run(it), f) })
@@ -32,16 +37,17 @@ class Kleisli<F, D, A>(val MF: Monad<F>, val run: KleisiFun<F, D, A>) : KleisiTK
 
     companion object {
 
-        inline operator fun <reified F, D, A> invoke(noinline run: KleisiFun<F, D, A>, MF: Monad<F> = monad<F>()): Kleisli<F, D, A> = Kleisli(MF, run)
+        inline operator fun <reified F, D, A> invoke(noinline run: KleisiFun<F, D, A>, MF: Monad<F> = monad<F>()): Kleisli<F, D, A> =
+                Kleisli(MF, run)
 
-        @JvmStatic inline fun <reified F, D, A> pure(x: A, MF: Monad<F> = monad<F>()): Kleisli<F, D, A> = Kleisli(MF, { _ -> MF.pure(x) })
+        @JvmStatic inline fun <reified F, D, A> pure(x: A, MF: Monad<F> = monad<F>()): Kleisli<F, D, A> =
+                Kleisli(MF, { _ -> MF.pure(x) })
 
-        @JvmStatic inline fun <reified F, D> ask(MF: Monad<F> = monad<F>()): Kleisli<F, D, D> = Kleisli(MF, { MF.pure(it) })
+        @JvmStatic inline fun <reified F, D> ask(MF: Monad<F> = monad<F>()): Kleisli<F, D, D> =
+                Kleisli(MF, { MF.pure(it) })
     }
 
 }
 
 inline fun <reified F, D, A> Kleisli<F, D, Kleisli<F, D, A>>.flatten(): Kleisli<F, D, A> =
         flatMap({ it })
-
-fun <F, D, A> KleisiTKind<F, D, A>.ev(): Kleisli<F, D, A> = this as Kleisli<F, D, A>

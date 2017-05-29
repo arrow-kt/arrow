@@ -1,5 +1,8 @@
 package katz
 
+fun <A> HK<Eval.F, A>.ev(): Eval<A> =
+        this as Eval<A>
+
 /**
  * Eval is a monad which controls evaluation of a value or a computation that produces a value.
  *
@@ -205,5 +208,3 @@ sealed class Eval<out A> : HK<Eval.F, A> {
         @JvmStatic val One: Eval<Int> = Now(1)
     }
 }
-
-fun <A> HK<Eval.F, A>.ev(): Eval<A> = this as Eval<A>

@@ -5,7 +5,8 @@ typealias CofreeF<S> = HK<Cofree.F, S>
 
 typealias CofreeEval<S, A> = HK<S, Cofree<S, A>>
 
-fun <S, A> CofreeKind<S, A>.ev(): Cofree<S, A> = this as Cofree<S, A>
+fun <S, A> CofreeKind<S, A>.ev(): Cofree<S, A> =
+        this as Cofree<S, A>
 
 data class Cofree<S, A>(val FS: Functor<S>, val head: A, val tail: Eval<CofreeEval<S, A>>) : CofreeKind<S, A> {
 

@@ -127,3 +127,6 @@ interface Foldable<F> : Typeclass {
         }
     }
 }
+
+inline fun <reified F> foldable(): Foldable<F> =
+        instance(InstanceParametrizedType(Foldable::class.java, listOf(F::class.java)))
