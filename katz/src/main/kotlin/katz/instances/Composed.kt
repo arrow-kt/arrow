@@ -23,6 +23,11 @@ open class ComposedFoldable<F, G>(val FF: Foldable<F>, val GF: Foldable<G>, val 
 
     fun <A, B> foldRC(fa: HK<F, HK<G, A>>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
             foldR(CFG.unapply(fa), lb, f)
+
+    companion object {
+        inline operator fun <reified F, reified G> invoke(FF: Foldable<F> = foldable<F>(), GF: Foldable<G> = foldable<G>()) =
+                ComposedFoldable(FF, GF)
+    }
 }
 
 inline fun <F, reified G> Foldable<F>.compose(GT: Foldable<G> = foldable<G>()) =
@@ -36,6 +41,11 @@ data class ComposedTraverse<F, G>(val FT: Traverse<F>, val GT: Traverse<G>, val 
 
     fun <H, A, B> traverseC(fa: HK<F, HK<G, A>>, f: (A) -> HK<H, B>, HA: Applicative<H>) =
             traverse(CCFG.unapply(fa), f, HA)
+
+    companion object {
+        inline operator fun <reified F, reified G> invoke(FF: Traverse<F> = traverse<F>(), GF: Traverse<G> = traverse<G>(), GA: Applicative<G> = applicative<G>()) =
+                ComposedTraverse(FF, GF, GA)
+    }
 }
 
 inline fun <F, reified G> Traverse<F>.compose(GT: Traverse<G> = traverse<G>(), GA: Applicative<G> = applicative<G>()) =
