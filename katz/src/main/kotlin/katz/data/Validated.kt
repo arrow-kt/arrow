@@ -4,6 +4,8 @@ typealias ValidatedKind<E, A> = HK2<Validated.F, E, A>
 typealias ValidatedF<A> = HK<Validated.F, A>
 typealias ValidatedNel<E, A> = Validated<NonEmptyList<E>, A>
 
+fun <E, A> ValidatedKind<E, A>.ev(): Validated<E, A> = this as Validated<E, A>
+
 /**
  * Port of https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/data/Validated.scala
  */

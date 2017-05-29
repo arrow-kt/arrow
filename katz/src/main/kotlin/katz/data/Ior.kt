@@ -5,6 +5,8 @@ import katz.Either.Right
 
 typealias IorKind<A, B> = HK2<Ior.F, A, B>
 
+fun <A, B> IorKind<A, B>.ev(): Ior<A, B> = this as Ior<A, B>
+
 /**
  * Port of https://github.com/typelevel/cats/blob/v0.9.0/core/src/main/scala/cats/data/Ior.scala
  *
@@ -268,5 +270,3 @@ inline fun <A, B, D> Ior<A, B>.flatMap(SA: Semigroup<A>, crossinline f: (B) -> I
 }
 
 inline fun <A, B> Ior<A, B>.getOrElse(crossinline default: () -> B): B = fold({ default() }, { it }, { _, b -> b })
-
-fun <A, B> IorKind<A, B>.ev(): Ior<A, B> = this as Ior<A, B>

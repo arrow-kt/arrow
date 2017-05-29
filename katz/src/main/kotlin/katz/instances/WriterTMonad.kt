@@ -25,5 +25,3 @@ data class WriterTMonad<F, W>(val MM: Monad<F>, val SG: Monoid<W>, val dummy: Un
                 WriterTMonad(MF, SG, Unit)
     }
 }
-
-fun <F, A, B> WriterTKind<F, A, B>.ev(): WriterT<F, A, B> = this as WriterT<F, A, B>

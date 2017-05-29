@@ -12,5 +12,3 @@ class ValidatedApplicativeError<E>(val SE: Semigroup<E>) : ApplicativeError<Vali
     override fun <A, B> ap(fa: ValidatedKind<E, A>, ff: HK<ValidatedF<E>, (A) -> B>): Validated<E, B> =
             fa.ev().ap(ff.ev(), SE)
 }
-
-fun <E, A> ValidatedKind<E, A>.ev(): Validated<E, A> = this as Validated<E, A>

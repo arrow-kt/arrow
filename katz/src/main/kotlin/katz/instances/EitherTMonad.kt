@@ -29,5 +29,3 @@ data class EitherTMonad<F, L>(val MF : Monad<F>, val dummy: Unit = Unit) : Monad
                 EitherTMonad(MF, Unit)
     }
 }
-
-fun <F, A, B> EitherTKind<F, A, B>.ev(): EitherT<F, A, B> = this as EitherT<F, A, B>

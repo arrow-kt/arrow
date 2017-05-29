@@ -2,6 +2,8 @@ package katz
 
 typealias NonEmptyListKind<A> = HK<NonEmptyList.F, A>
 
+fun <A> NonEmptyListKind<A>.ev(): NonEmptyList<A> = this as NonEmptyList<A>
+
 /**
  * A List that can not be empty
  */

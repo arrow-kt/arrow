@@ -7,6 +7,8 @@ typealias KleisiFun<F, D, A> = (D) -> HK<F, A>
 
 typealias ReaderT<F, D, A> = Kleisli<F, D, A>
 
+fun <F, D, A> KleisiTKind<F, D, A>.ev(): Kleisli<F, D, A> = this as Kleisli<F, D, A>
+
 class Kleisli<F, D, A>(val MF: Monad<F>, val run: KleisiFun<F, D, A>) : KleisiTKind<F, D, A> {
     class F private constructor()
 
@@ -43,5 +45,3 @@ class Kleisli<F, D, A>(val MF: Monad<F>, val run: KleisiFun<F, D, A>) : KleisiTK
 
 inline fun <reified F, D, A> Kleisli<F, D, Kleisli<F, D, A>>.flatten(): Kleisli<F, D, A> =
         flatMap({ it })
-
-fun <F, D, A> KleisiTKind<F, D, A>.ev(): Kleisli<F, D, A> = this as Kleisli<F, D, A>

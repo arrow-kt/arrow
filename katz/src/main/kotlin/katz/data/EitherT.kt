@@ -3,6 +3,8 @@ package katz
 typealias EitherTKind<F, A, B> = HK3<EitherT.F, F, A, B>
 typealias EitherTF<F, L> = HK2<EitherT.F, F, L>
 
+fun <F, A, B> EitherTKind<F, A, B>.ev(): EitherT<F, A, B> = this as EitherT<F, A, B>
+
 /**
  * [EitherT]`<F, A, B>` is a light wrapper on an `F<`[Either]`<A, B>>` with some
  * convenient methods for working with this nested structure.

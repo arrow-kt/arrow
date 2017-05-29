@@ -2,6 +2,8 @@ package katz
 
 typealias TryKind<A> = HK<Try.F, A>
 
+fun <A> TryKind<A>.ev(): Try<A> = this as Try<A>
+
 /**
  * The `Try` type represents a computation that may either result in an exception, or return a
  * successfully computed value.

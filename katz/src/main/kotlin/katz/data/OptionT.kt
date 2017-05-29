@@ -3,6 +3,8 @@ package katz
 typealias OptionTKind<F, A> = HK2<OptionT.F, F, A>
 typealias OptionTF<F> = HK<OptionT.F, F>
 
+fun <F, A> OptionTKind<F, A>.ev(): OptionT<F, A> = this as OptionT<F, A>
+
 /**
  * [OptionT]`<F, A>` is a light wrapper on an `F<`[Option]`<A>>` with some
  * convenient methods for working with this nested structure.

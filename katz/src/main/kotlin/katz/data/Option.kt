@@ -2,6 +2,8 @@ package katz
 
 typealias OptionKind<A> = HK<Option.F, A>
 
+fun <A> OptionKind<A>.ev(): Option<A> = this as Option<A>
+
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/Option.scala
  *

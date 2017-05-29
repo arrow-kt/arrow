@@ -25,5 +25,3 @@ data class OptionTMonad<F>(val MF: Monad<F>, val dummy: Unit = Unit) : Monad<Opt
                 OptionTMonad(MF, Unit)
     }
 }
-
-fun <F, A> OptionTKind<F, A>.ev(): OptionT<F, A> = this as OptionT<F, A>
