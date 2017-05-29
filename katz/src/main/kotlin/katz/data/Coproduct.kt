@@ -26,6 +26,19 @@ data class Coproduct<F, G, A>(val CF: Comonad<F>, val CG: Comonad<G>, val run: E
     fun <H> fold(f: FunctionK<F, H>, g: FunctionK<G, H>): HK<H, A> =
             run.fold({ f(it) }, { g(it) })
 
+    fun <B> foldL(b: B, f: (B, A) -> B, FF: Foldable<F>, FG: Foldable<G>): B =
+            run.fold({ FF.foldL(it, b, f) },{ FG.foldL(it, b, f) })
+
+    fun <B> foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>, FG: Foldable<G>): Eval<B> =
+            run.fold({ FF.foldR(it, lb, f) },{ FG.foldR(it, lb, f) })
+
+    fun <H, B> traverse(f: (A) -> HK<H, B>, GA: Applicative<H>, FT: Traverse<F>, GT: Traverse<G>) =
+        run.fold({
+            GA.map(FT.traverse(it, f, GA), { Coproduct(CF, CG, Either.Left(it)) })
+        }, {
+            GA.map(GT.traverse(it, f, GA), { Coproduct(CF, CG, Either.Right(it)) })
+        })
+
     companion object {
         inline operator fun <reified F, reified G, A> invoke(run: Either<HK<F, A>, HK<G, A>>, CF: Comonad<F> = comonad<F>(), CG: Comonad<G> = comonad<G>()) =
                 Coproduct(CF, CG, run)
