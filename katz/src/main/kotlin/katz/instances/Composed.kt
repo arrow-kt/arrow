@@ -15,8 +15,14 @@ open class ComposedFoldable<F, G>(val FF: Foldable<F>, val GF: Foldable<G>, val 
     override fun <A, B> foldL(fa: HK<ComposedType<F, G>, A>, b: B, f: (B, A) -> B): B =
             FF.foldL(CFG.apply(fa), b, { bb, aa -> GF.foldL(aa, bb, f) })
 
+    fun <A, B> foldLC(fa: HK<F, HK<G, A>>, b: B, f: (B, A) -> B): B =
+            foldL(CFG.unapply(fa), b, f)
+
     override fun <A, B> foldR(fa: HK<ComposedType<F, G>, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
             FF.foldR(CFG.apply(fa), lb, { laa, lbb -> GF.foldR(laa, lbb, f) })
+
+    fun <A, B> foldRC(fa: HK<F, HK<G, A>>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+            foldR(CFG.unapply(fa), lb, f)
 }
 
 inline fun <F, reified G> Foldable<F>.compose(GT: Foldable<G> = foldable<G>()) =
@@ -27,6 +33,9 @@ data class ComposedTraverse<F, G>(val FT: Traverse<F>, val GT: Traverse<G>, val 
 
     override fun <H, A, B> traverse(fa: HK<ComposedType<F, G>, A>, f: (A) -> HK<H, B>, HA: Applicative<H>): HK<H, HK<ComposedType<F, G>, B>> =
             HA.map(FT.traverse(CCFG.apply(fa), { ga -> GT.traverse(ga, f, HA) }, HA), CCFG::unapply)
+
+    fun <H, A, B> traverseC(fa: HK<F, HK<G, A>>, f: (A) -> HK<H, B>, HA: Applicative<H>) =
+            traverse(CCFG.unapply(fa), f, HA)
 }
 
 inline fun <F, reified G> Traverse<F>.compose(GT: Traverse<G> = traverse<G>(), GA: Applicative<G> = applicative<G>()) =
