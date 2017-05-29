@@ -4,6 +4,8 @@ typealias CoYonedaKind<U, P, A> = HK3<CoYoneda.F, U, P, A>
 
 typealias CoYonedaF<U, P> = HK2<CoYoneda.F, U, P>
 
+fun <U, A, B> CoYonedaKind<U, A, B>.ev(): CoYoneda<U, A, B> = this as CoYoneda<U, A, B>
+
 data class CoYoneda<FU, P, A>(val function: (P) -> A, val pivot: HK<FU, P>) : CoYonedaKind<FU, P, A> {
     class F private constructor()
 
@@ -21,5 +23,3 @@ data class CoYoneda<FU, P, A>(val function: (P) -> A, val pivot: HK<FU, P>) : Co
     }
 
 }
-
-fun <U, A, B> CoYonedaKind<U, A, B>.ev(): CoYoneda<U, A, B> = this as CoYoneda<U, A, B>
