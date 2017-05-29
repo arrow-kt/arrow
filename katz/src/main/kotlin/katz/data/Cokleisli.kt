@@ -7,7 +7,8 @@ typealias CokleisiFun<F, A, B> = (HK<F, A>) -> B
 
 typealias CoreaderT<F, A, B> = Cokleisli<F, A, B>
 
-fun <F, A, B> CokleisiTKind<F, A, B>.ev(): Cokleisli<F, A, B> = this as Cokleisli<F, A, B>
+fun <F, A, B> CokleisiTKind<F, A, B>.ev(): Cokleisli<F, A, B> =
+        this as Cokleisli<F, A, B>
 
 data class Cokleisli<F, A, B>(val MM: Comonad<F>, val run: CokleisiFun<F, A, B>) : CokleisiTKind<F, A, B> {
     class F private constructor()

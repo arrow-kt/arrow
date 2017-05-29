@@ -1,6 +1,7 @@
 package katz
 
-fun <A> HK<Eval.F, A>.ev(): Eval<A> = this as Eval<A>
+fun <A> HK<Eval.F, A>.ev(): Eval<A> =
+        this as Eval<A>
 
 /**
  * Eval is a monad which controls evaluation of a value or a computation that produces a value.

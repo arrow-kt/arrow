@@ -13,7 +13,7 @@ fun <F, G, A> HK<F, HK<G, A>>.lift(): HK<ComposedType<F, G>, A> =
 fun <F, G, A> HK<ComposedType<F, G>, A>.lower(): HK<F, HK<G, A>> =
         this as HK<F, HK<G, A>>
 
-open class ComposedFoldable<F, G>(val FF: Foldable<F>, val GF: Foldable<G>) : Foldable<ComposedType<F, G>> {
+data class ComposedFoldable<F, G>(val FF: Foldable<F>, val GF: Foldable<G>) : Foldable<ComposedType<F, G>> {
     override fun <A, B> foldL(fa: HK<ComposedType<F, G>, A>, b: B, f: (B, A) -> B): B =
             FF.foldL(fa.lower(), b, { bb, aa -> GF.foldL(aa, bb, f) })
 
@@ -27,7 +27,7 @@ open class ComposedFoldable<F, G>(val FF: Foldable<F>, val GF: Foldable<G>) : Fo
             foldR(fa.lift(), lb, f)
 
     companion object {
-        inline operator fun <reified F, reified G> invoke(FF: Foldable<F> = foldable<F>(), GF: Foldable<G> = foldable<G>()) =
+        inline operator fun <reified F, reified G> invoke(FF: Foldable<F> = foldable<F>(), GF: Foldable<G> = foldable<G>()): ComposedFoldable<F, G> =
                 ComposedFoldable(FF, GF)
     }
 }
@@ -41,14 +41,14 @@ data class ComposedTraverse<F, G>(val FT: Traverse<F>, val GT: Traverse<G>, val 
     override fun <H, A, B> traverse(fa: HK<ComposedType<F, G>, A>, f: (A) -> HK<H, B>, HA: Applicative<H>): HK<H, HK<ComposedType<F, G>, B>> =
             HA.map(FT.traverse(fa.lower(), { ga -> GT.traverse(ga, f, HA) }, HA), { it.lift() })
 
-    fun <H, A, B> traverseC(fa: HK<F, HK<G, A>>, f: (A) -> HK<H, B>, HA: Applicative<H>) =
+    fun <H, A, B> traverseC(fa: HK<F, HK<G, A>>, f: (A) -> HK<H, B>, HA: Applicative<H>): HK<H, HK<ComposedType<F, G>, B>> =
             traverse(fa.lift(), f, HA)
 
     companion object {
-        inline operator fun <reified F, reified G> invoke(FF: Traverse<F> = traverse<F>(), GF: Traverse<G> = traverse<G>(), GA: Applicative<G> = applicative<G>()) =
+        inline operator fun <reified F, reified G> invoke(FF: Traverse<F> = traverse<F>(), GF: Traverse<G> = traverse<G>(), GA: Applicative<G> = applicative<G>()): ComposedTraverse<F, G> =
                 ComposedTraverse(FF, GF, GA)
     }
 }
 
-inline fun <F, reified G> Traverse<F>.compose(GT: Traverse<G> = traverse<G>(), GA: Applicative<G> = applicative<G>()) =
+inline fun <F, reified G> Traverse<F>.compose(GT: Traverse<G> = traverse<G>(), GA: Applicative<G> = applicative<G>()): Traverse<ComposedType<F, G>> =
         ComposedTraverse(this, GT, GA)
