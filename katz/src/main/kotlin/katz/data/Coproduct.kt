@@ -27,10 +27,10 @@ data class Coproduct<F, G, A>(val CF: Comonad<F>, val CG: Comonad<G>, val run: E
             run.fold({ f(it) }, { g(it) })
 
     fun <B> foldL(b: B, f: (B, A) -> B, FF: Foldable<F>, FG: Foldable<G>): B =
-            run.fold({ FF.foldL(it, b, f) },{ FG.foldL(it, b, f) })
+            run.fold({ FF.foldL(it, b, f) }, { FG.foldL(it, b, f) })
 
     fun <B> foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>, FG: Foldable<G>): Eval<B> =
-            run.fold({ FF.foldR(it, lb, f) },{ FG.foldR(it, lb, f) })
+            run.fold({ FF.foldR(it, lb, f) }, { FG.foldR(it, lb, f) })
 
     fun <H, B> traverse(f: (A) -> HK<H, B>, GA: Applicative<H>, FT: Traverse<F>, GT: Traverse<G>) =
         run.fold({

@@ -1,6 +1,5 @@
 package katz
 
-
 data class EitherTTraverse<F, A>(val FF: Traverse<F>, val MF: Monad<F>, val CFE: ComposedType<F, EitherF<A>>) : Traverse<EitherTF<F, A>> {
     override fun <G, B, C> traverse(fa: HK<EitherTF<F, A>, B>, f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, HK<EitherTF<F, A>, C>> =
             fa.ev().traverse(f, GA, FF, MF, CFE)
