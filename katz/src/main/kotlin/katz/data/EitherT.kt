@@ -13,8 +13,6 @@ data class EitherT<F, A, B>(val MF: Monad<F>, val value: HK<F, Either<A, B>>) : 
 
     class F private constructor()
 
-    private val CFE: ComposedType<F, EitherF<A>> = ComposedType()
-
     companion object {
 
         inline operator fun <reified F, A, B> invoke(value: HK<F, Either<A, B>>, MF: Monad<F> = monad<F>()): EitherT<F, A, B> = EitherT(MF, value)
@@ -69,6 +67,6 @@ data class EitherT<F, A, B>(val MF: Monad<F>, val value: HK<F, Either<A, B>>) : 
 
     fun <G, C> traverse(f: (B) -> HK<G, C>, GA: Applicative<G>, FF: Traverse<F>, MF: Monad<F>): HK<G, HK<EitherTF<F, A>, C>> {
         val fa = ComposedTraverse(FF, EitherTraverse<A>(), EitherMonad<A>()).traverseC(value, f, GA)
-        return GA.map(fa, { EitherT(MF, MF.map(CFE.lower(it), { it.ev() })) })
+        return GA.map(fa, { EitherT(MF, MF.map(it.lower(), { it.ev() })) })
     }
 }

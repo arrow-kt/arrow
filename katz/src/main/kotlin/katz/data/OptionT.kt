@@ -13,8 +13,6 @@ data class OptionT<F, A>(val MF: Monad<F>, val value: HK<F, Option<A>>) : Option
 
     class F private constructor()
 
-    private val CFO: ComposedType<F, Option.F> = ComposedType()
-
     companion object {
 
         inline operator fun <reified F, A> invoke(value: HK<F, Option<A>>, MF: Monad<F> = monad<F>()): OptionT<F, A> = OptionT(MF, value)
@@ -82,7 +80,7 @@ data class OptionT<F, A>(val MF: Monad<F>, val value: HK<F, Option<A>>) : Option
 
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>, FF: Traverse<F>, MF: Monad<F>): HK<G, HK<OptionTF<F>, B>> {
         val fa = ComposedTraverse(FF, OptionTraverse, Option).traverseC(value, f, GA)
-        return GA.map(fa, { OptionT(MF, MF.map(CFO.lower(it), { it.ev() })) })
+        return GA.map(fa, { OptionT(MF, MF.map(it.lower(), { it.ev() })) })
     }
 
     //TODO: add toRight() and toLeft() once EitherT it's available
