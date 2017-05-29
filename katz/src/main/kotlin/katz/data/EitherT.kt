@@ -60,13 +60,13 @@ data class EitherT<F, A, B>(val MF: Monad<F>, val value: HK<F, Either<A, B>>) : 
             OptionT(MF, MF.map(value, { it.toOption() }))
 
     fun <C> foldL(b: C, f: (C, B) -> C, FF: Foldable<F>, CFE: ComposedType<F, EitherF<A>>): C =
-            FF.compose(CFE, EitherTraverse<A>()).foldL(CFE.unapply(value), b, f)
+            FF.compose(EitherTraverse<A>()).foldL(CFE.unapply(value), b, f)
 
     fun <C> foldR(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>, FF: Foldable<F>, CFE: ComposedType<F, EitherF<A>>): Eval<C> =
-            FF.compose(CFE, EitherTraverse<A>()).foldR(CFE.unapply(value), lb, f)
+            FF.compose(EitherTraverse<A>()).foldR(CFE.unapply(value), lb, f)
 
     fun <G, C> traverse(f: (B) -> HK<G, C>, GA: Applicative<G>, FF: Traverse<F>, MF: Monad<F>, CFE: ComposedType<F, EitherF<A>>): HK<G, HK<EitherTF<F, A>, C>> {
-        val fa = ComposedTraverse(CFE, FF, EitherTraverse<A>(), EitherMonad<A>()).traverse(CFE.unapply(value), f, GA)
+        val fa = ComposedTraverse(FF, EitherTraverse<A>(), EitherMonad<A>(), CFE).traverse(CFE.unapply(value), f, GA)
         return GA.map(fa, { EitherT(MF, MF.map(CFE.apply(it), { it.ev() })) })
     }
 }

@@ -73,13 +73,13 @@ data class OptionT<F, A>(val MF: Monad<F>, val value: HK<F, Option<A>>) : Option
             transform({ it.flatMap(f) })
 
     fun <B> foldL(b: B, f: (B, A) -> B, FF: Foldable<F>, CFO: ComposedType<F, Option.F>): B =
-            FF.compose(CFO, OptionTraverse).foldL(CFO.unapply(value), b, f)
+            FF.compose(OptionTraverse).foldL(CFO.unapply(value), b, f)
 
     fun <B> foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>, CFO: ComposedType<F, Option.F>): Eval<B> =
-            FF.compose(CFO, OptionTraverse).foldR(CFO.unapply(value), lb, f)
+            FF.compose(OptionTraverse).foldR(CFO.unapply(value), lb, f)
 
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>, FF: Traverse<F>, MF: Monad<F>, CFO: ComposedType<F, Option.F>): HK<G, HK<OptionTF<F>, B>> {
-        val fa = ComposedTraverse(CFO, FF, OptionTraverse, Option).traverse(CFO.unapply(value), f, GA)
+        val fa = ComposedTraverse(FF, OptionTraverse, Option, CFO).traverse(CFO.unapply(value), f, GA)
         return GA.map(fa, { OptionT(MF, MF.map(CFO.apply(it), { it.ev() })) })
     }
 
