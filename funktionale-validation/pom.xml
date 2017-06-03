@@ -21,7 +21,7 @@
     <parent>
         <artifactId>funktionale</artifactId>
         <groupId>org.funktionale</groupId>
-        <version>1.0.1</version>
+        <version>1.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <name>Validation Module</name>
@@ -29,12 +29,12 @@
         <dependency>
             <groupId>org.funktionale</groupId>
             <artifactId>funktionale-either</artifactId>
-            <version>1.0.1</version>
+            <version>1.1</version>
         </dependency>
     </dependencies>
     <artifactId>funktionale-validation</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.1</version>
+    <version>1.1</version>
     <build>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>

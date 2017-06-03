@@ -21,6 +21,7 @@ import org.funktionale.either.Either
 import org.funktionale.option.Option
 import org.funktionale.option.Option.None
 import org.funktionale.option.Option.Some
+import org.funktionale.utils.Predicate
 import java.util.*
 
 /**
@@ -66,12 +67,12 @@ sealed class Try<T> {
 
     fun <X> map(f: (T) -> X): Try<X> = flatMap { Success(f(it)) }
 
-    fun exists(predicate: (T) -> Boolean): Boolean = when (this) {
+    fun exists(predicate: Predicate<T>): Boolean = when (this) {
         is Success -> predicate(get())
         is Failure -> false
     }
 
-    fun filter(predicate: (T) -> Boolean): Try<T> = when (this) {
+    fun filter(predicate: Predicate<T>): Try<T> = when (this) {
         is Success -> try {
             val value = get()
             if (predicate(value)) {

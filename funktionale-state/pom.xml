@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2013 - 2016 Mario Arias
+  ~ Copyright 2013 - 2017 Mario Arias
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -24,34 +24,34 @@
         <version>1.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <name>Try Module</name>
-    <artifactId>funktionale-try</artifactId>
+    <name>State Module</name>
+    <artifactId>funktionale-state</artifactId>
+    <packaging>jar</packaging>
+    <version>1.1</version>
     <dependencies>
         <dependency>
             <groupId>org.funktionale</groupId>
-            <artifactId>funktionale-either</artifactId>
+            <artifactId>funktionale-collections</artifactId>
             <version>1.1</version>
         </dependency>
     </dependencies>
-    <packaging>jar</packaging>
-        <version>1.1</version>
-        <build>
-            <sourceDirectory>src/main/kotlin</sourceDirectory>
-            <testSourceDirectory>src/test/kotlin</testSourceDirectory>
-            <plugins>
-                <plugin>
-                    <artifactId>kotlin-maven-plugin</artifactId>
-                    <groupId>org.jetbrains.kotlin</groupId>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-gpg-plugin</artifactId>
-                </plugin>
-            </plugins>
-        </build>
+    <build>
+        <sourceDirectory>src/main/kotlin</sourceDirectory>
+        <testSourceDirectory>src/test/kotlin</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <groupId>org.jetbrains.kotlin</groupId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

@@ -21,6 +21,7 @@ import org.funktionale.option.Option.None
 import org.funktionale.option.Option.Some
 import org.funktionale.utils.GetterOperation
 import org.funktionale.utils.GetterOperationImpl
+import org.funktionale.utils.Predicate
 import org.funktionale.utils.hashCodeForNullable
 import java.util.*
 
@@ -63,19 +64,19 @@ sealed class Option<out T> {
         f(get())
     }
 
-    inline fun filter(predicate: (T) -> Boolean): Option<T> = if (nonEmpty() && predicate(get())) {
+    inline fun filter(predicate: Predicate<T>): Option<T> = if (nonEmpty() && predicate(get())) {
         this
     } else {
         None
     }
 
-    inline fun filterNot(predicate: (T) -> Boolean): Option<T> = if (nonEmpty() && !predicate(get())) {
+    inline fun filterNot(predicate: Predicate<T>): Option<T> = if (nonEmpty() && !predicate(get())) {
         this
     } else {
         None
     }
 
-    inline fun exists(predicate: (T) -> Boolean): Boolean = nonEmpty() && predicate(get())
+    inline fun exists(predicate: Predicate<T>): Boolean = nonEmpty() && predicate(get())
 
     inline fun forEach(f: (T) -> Unit) {
         if (nonEmpty()) f(get())
@@ -215,7 +216,7 @@ fun String.firstOption(): Option<Char> {
     return firstOrNull().toOption()
 }
 
-fun <T> Array<out T>.firstOption(predicate: (T) -> Boolean): Option<T> {
+fun <T> Array<out T>.firstOption(predicate: Predicate<T>): Option<T> {
     return firstOrNull(predicate).toOption()
 }
 
@@ -251,11 +252,11 @@ inline fun ShortArray.firstOption(predicate: (Short) -> Boolean): Option<Short> 
     return firstOrNull(predicate).toOption()
 }
 
-fun <T> Iterable<T>.firstOption(predicate: (T) -> Boolean): Option<T> {
+fun <T> Iterable<T>.firstOption(predicate: Predicate<T>): Option<T> {
     return firstOrNull(predicate).toOption()
 }
 
-fun <T> Sequence<T>.firstOption(predicate: (T) -> Boolean): Option<T> {
+fun <T> Sequence<T>.firstOption(predicate: Predicate<T>): Option<T> {
     return firstOrNull(predicate).toOption()
 }
 

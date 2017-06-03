@@ -19,10 +19,12 @@ package org.funktionale.utils
 fun <T> identity(): (T) -> T = { t: T -> t }
 
 fun <P1, T> constant(t: T): (P1) -> T {
-    return { p1: P1 -> t }
+    return { _: P1 -> t }
 }
 
-fun <T : Any> ((T) -> Boolean).mapNullable(): (T?) -> Boolean {
+typealias Predicate<T> = (T) -> Boolean
+
+fun <T : Any> Predicate<T>.mapNullable(): (T?) -> Boolean {
     return { it?.let { this@mapNullable(it) } ?: false }
 }
 

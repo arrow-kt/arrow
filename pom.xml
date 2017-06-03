@@ -22,7 +22,7 @@
 
     <groupId>org.funktionale</groupId>
     <artifactId>funktionale</artifactId>
-    <version>1.0.1</version>
+    <version>1.1</version>
     <modules>
         <module>funktionale-collections</module>
         <module>funktionale-complement</module>
@@ -37,6 +37,8 @@
         <module>funktionale-either</module>
         <module>funktionale-validation</module>
         <module>funktionale-try</module>
+        <module>funktionale-state</module>
+        <module>funktionale-pipe</module>
         <module>funktionale-all</module>
         <module>funktionale-experimental</module>
     </modules>

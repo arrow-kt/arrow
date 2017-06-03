@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 - 2016 Mario Arias
+ * Copyright 2013 - 2017 Mario Arias
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,29 @@
  * limitations under the License.
  */
 
-package org.funktionale.composition
+package org.funktionale.pipe
 
-infix fun <P1, IP, R> ((P1) -> IP).andThen(f: (IP) -> R): (P1) -> R = forwardCompose(f)
+import org.funktionale.utils.identity
+import org.testng.Assert.assertEquals
+import org.testng.annotations.Test
 
-infix fun <IP, R> (() -> IP).andThen(f: (IP) -> R): () -> R = forwardCompose(f)
 
-infix fun <P1, IP, R> ((P1) -> IP).forwardCompose(f: (IP) -> R): (P1) -> R {
-    return { p1: P1 -> f(this(p1)) }
-}
+class PipeTest {
 
-infix fun <IP, R> (() -> IP).forwardCompose(f: (IP) -> R): () -> R {
-    return { f(this()) }
-}
 
-infix fun <IP, R, P1> ((IP) -> R).compose(f: (P1) -> IP): (P1) -> R {
-    return { p1: P1 -> this(f(p1)) }
+    private val values = listOf(1, "String", 10.2)
+    private val intFunctions = listOf({ x: Int -> x }, { x: Int -> x * x })
+
+
+
+    @Test fun testPipe() {
+
+        values.forEach {
+            assertEquals(it pipe identity() , it)
+        }
+
+        intFunctions.forEach {
+            assertEquals(it(2), 2 pipe it)
+        }
+    }
 }
