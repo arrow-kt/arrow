@@ -3,6 +3,9 @@ package katz
 typealias EitherTKind<F, A, B> = HK3<EitherT.F, F, A, B>
 typealias EitherTF<F, L> = HK2<EitherT.F, F, L>
 
+fun <F, A, B> EitherTKind<F, A, B>.ev(): EitherT<F, A, B> =
+        this as EitherT<F, A, B>
+
 /**
  * [EitherT]`<F, A, B>` is a light wrapper on an `F<`[Either]`<A, B>>` with some
  * convenient methods for working with this nested structure.
@@ -15,15 +18,20 @@ data class EitherT<F, A, B>(val MF: Monad<F>, val value: HK<F, Either<A, B>>) : 
 
     companion object {
 
-        inline operator fun <reified F, A, B> invoke(value: HK<F, Either<A, B>>, MF: Monad<F> = monad<F>()): EitherT<F, A, B> = EitherT(MF, value)
+        inline operator fun <reified F, A, B> invoke(value: HK<F, Either<A, B>>, MF: Monad<F> = monad<F>()): EitherT<F, A, B> =
+                EitherT(MF, value)
 
-        @JvmStatic inline fun <reified F, A, B> pure(b: B, MF: Monad<F> = monad<F>()): EitherT<F, A, B> = right(b, MF)
+        @JvmStatic inline fun <reified F, A, B> pure(b: B, MF: Monad<F> = monad<F>()): EitherT<F, A, B> =
+                right(b, MF)
 
-        @JvmStatic inline fun <reified F, A, B> right(b: B, MF: Monad<F> = monad<F>()): EitherT<F, A, B> = EitherT(MF, MF.pure(Either.Right(b)))
+        @JvmStatic inline fun <reified F, A, B> right(b: B, MF: Monad<F> = monad<F>()): EitherT<F, A, B> =
+                EitherT(MF, MF.pure(Either.Right(b)))
 
-        @JvmStatic inline fun <reified F, A, B> left(a: A, MF: Monad<F> = monad<F>()): EitherT<F, A, B> = EitherT(MF, MF.pure(Either.Left(a)))
+        @JvmStatic inline fun <reified F, A, B> left(a: A, MF: Monad<F> = monad<F>()): EitherT<F, A, B> =
+                EitherT(MF, MF.pure(Either.Left(a)))
 
-        @JvmStatic inline fun <reified F, A, B> fromEither(value: Either<A, B>, MF: Monad<F> = monad<F>()): EitherT<F, A, B> = EitherT(MF, MF.pure(value))
+        @JvmStatic inline fun <reified F, A, B> fromEither(value: Either<A, B>, MF: Monad<F> = monad<F>()): EitherT<F, A, B> =
+                EitherT(MF, MF.pure(value))
     }
 
     inline fun <C> fold(crossinline l: (A) -> C, crossinline r: (B) -> C): HK<F, C> =
@@ -59,4 +67,14 @@ data class EitherT<F, A, B>(val MF: Monad<F>, val value: HK<F, Either<A, B>>) : 
     fun toOptionT(): OptionT<F, B> =
             OptionT(MF, MF.map(value, { it.toOption() }))
 
+    fun <C> foldL(b: C, f: (C, B) -> C, FF: Foldable<F>): C =
+            FF.compose(EitherTraverse<A>()).foldLC(value, b, f)
+
+    fun <C> foldR(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>, FF: Foldable<F>): Eval<C> =
+            FF.compose(EitherTraverse<A>()).foldRC(value, lb, f)
+
+    fun <G, C> traverse(f: (B) -> HK<G, C>, GA: Applicative<G>, FF: Traverse<F>, MF: Monad<F>): HK<G, HK<EitherTF<F, A>, C>> {
+        val fa = ComposedTraverse(FF, EitherTraverse<A>(), EitherMonad<A>()).traverseC(value, f, GA)
+        return GA.map(fa, { EitherT(MF, MF.map(it.lower(), { it.ev() })) })
+    }
 }

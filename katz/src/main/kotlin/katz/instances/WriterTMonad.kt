@@ -1,6 +1,6 @@
 package katz
 
-data class WriterTMonad<F, W>(val MM: Monad<F>, val SG: Monoid<W>) : Monad<WriterF<F, W>> {
+data class WriterTMonad<F, W>(val MM: Monad<F>, val SG: Monoid<W>, val dummy: Unit = Unit) : Monad<WriterF<F, W>> {
     override fun <A> pure(a: A): HK<WriterF<F, W>, A> =
             WriterT(MM, MM.pure(SG.empty() toT a))
 
@@ -19,6 +19,9 @@ data class WriterTMonad<F, W>(val MM: Monad<F>, val SG: Monoid<W>) : Monad<Write
                     }
                 }
             }))
-}
 
-fun <F, A, B> WriterTKind<F, A, B>.ev(): WriterT<F, A, B> = this as WriterT<F, A, B>
+    companion object {
+        inline operator fun <reified F, reified W> invoke(MF: Monad<F> = monad<F>(), SG: Monoid<W>): WriterTMonad<F, W> =
+                WriterTMonad(MF, SG, Unit)
+    }
+}

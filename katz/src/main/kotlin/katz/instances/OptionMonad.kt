@@ -23,5 +23,3 @@ interface OptionMonad : Monad<Option.F> {
         }
     }
 }
-
-fun <A> OptionKind<A>.ev(): Option<A> = this as Option<A>

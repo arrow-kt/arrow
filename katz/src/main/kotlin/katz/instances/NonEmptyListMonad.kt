@@ -26,5 +26,3 @@ interface NonEmptyListMonad : Monad<NonEmptyList.F> {
         return NonEmptyList.fromListUnsafe(buf)
     }
 }
-
-fun <A> NonEmptyListKind<A>.ev(): NonEmptyList<A> = this as NonEmptyList<A>

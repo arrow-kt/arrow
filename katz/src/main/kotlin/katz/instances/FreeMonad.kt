@@ -4,7 +4,7 @@ interface FreeMonad<S> : Monad<FreeF<S>>, Typeclass {
     override fun <A> pure(a: A): Free<S, A> =
             Free.pure(a)
 
-    override fun <A, B> map(fa: FreeKind<S, A>, f: (A) -> B): HK<FreeF<S>, B> =
+    override fun <A, B> map(fa: FreeKind<S, A>, f: (A) -> B): Free<S, B> =
             fa.ev().map(f)
 
     override fun <A, B> flatMap(fa: FreeKind<S, A>, f: (A) -> FreeKind<S, B>): Free<S, B> =

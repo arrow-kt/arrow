@@ -21,5 +21,3 @@ interface TryMonadError : MonadError<Try.F, Throwable> {
         else x as Try.Failure<B>
     }
 }
-
-fun <A> TryKind<A>.ev(): Try<A> = this as Try<A>

@@ -1,5 +1,11 @@
 package katz
 
+fun <A> (() -> A).k(): HK<Function0.F, A> =
+        Function0(this)
+
+fun <A> HK<Function0.F, A>.ev(): () -> A =
+        (this as Function0<A>).f
+
 // We don't we want an inherited class to avoid equivalence issues, so a simple HK wrapper will do
 data class Function0<out A>(internal val f: () -> A) : HK<Function0.F, A> {
 
@@ -28,7 +34,3 @@ data class Function0<out A>(internal val f: () -> A) : HK<Function0.F, A> {
                 }
     }
 }
-
-fun <A> (() -> A).k(): HK<Function0.F, A> = Function0(this)
-
-fun <A> HK<Function0.F, A>.ev() = (this as Function0<A>).f

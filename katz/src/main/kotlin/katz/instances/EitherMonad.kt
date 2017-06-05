@@ -18,5 +18,3 @@ class EitherMonad<L> : Monad<EitherF<L>> {
         }
     }
 }
-
-fun <A, B> EitherKind<A, B>.ev(): Either<A, B> = this as Either<A, B>

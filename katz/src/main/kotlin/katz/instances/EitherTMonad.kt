@@ -1,6 +1,6 @@
 package katz
 
-class EitherTMonad<F, L>(val MF : Monad<F>) : Monad<EitherTF<F, L>> {
+data class EitherTMonad<F, L>(val MF : Monad<F>, val dummy: Unit = Unit) : Monad<EitherTF<F, L>> {
     override fun <A> pure(a: A): EitherT<F, L, A> =
             EitherT(MF, MF.pure(Either.Right(a)))
 
@@ -23,6 +23,9 @@ class EitherTMonad<F, L>(val MF : Monad<F>) : Monad<EitherTF<F, L>> {
                     }
                 }
             }))
-}
 
-fun <F, A, B> EitherTKind<F, A, B>.ev(): EitherT<F, A, B> = this as EitherT<F, A, B>
+    companion object {
+        inline operator fun <reified F, L> invoke(MF: Monad<F> = monad<F>()): EitherTMonad<F, L> =
+                EitherTMonad(MF, Unit)
+    }
+}

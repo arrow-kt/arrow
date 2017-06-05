@@ -2,9 +2,11 @@ package katz
 
 import katz.Either.Left
 import katz.Either.Right
-import katz.Option
 
 typealias IorKind<A, B> = HK2<Ior.F, A, B>
+
+fun <A, B> IorKind<A, B>.ev(): Ior<A, B> =
+        this as Ior<A, B>
 
 /**
  * Port of https://github.com/typelevel/cats/blob/v0.9.0/core/src/main/scala/cats/data/Ior.scala

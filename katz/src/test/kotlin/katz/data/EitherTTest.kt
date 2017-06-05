@@ -189,6 +189,39 @@ class EitherTTest : UnitSpec() {
             }
         }
 
+        "EitherT#foldL should fold with the instance of its content" {
+            val eitherT = EitherT(Id(Either.Right(1)))
+            val content: Id<Either<Nothing, Int>> = eitherT.value.ev()
+
+            val expected = IdTraverse.foldL(content, 1, { a, _ -> a + 1 })
+            val result = eitherT.foldL(1, { a, _ -> a + 1 }, IdTraverse)
+
+            expected shouldBe result
+        }
+
+        "EitherT#foldR should fold with the instance of its content" {
+            val eitherT = EitherT(Id(Either.Right(1)))
+            val content: Id<Either<Nothing, Int>> = eitherT.value.ev()
+
+            val expected = IdTraverse.foldR(content, Eval.now(1), { _, b-> Eval.now(b.value() + 1) })
+            val result = eitherT.foldR(Eval.now(1), { a, b -> Eval.now(a + 1) }, IdTraverse)
+
+            expected shouldBe result
+        }
+
+        "EitherT#traverse should traverse with the instance of its content" {
+            val eitherT = EitherT(Id(Either.Right(1)))
+            val either: Either<String, Int> = eitherT.value.ev().value()
+
+
+            val f: (Int) -> Option<Int> = { Option.Some(it + 1) }
+            val traverse = eitherT.traverse(f, Option, IdTraverse, Id).ev()
+            val result = traverse.map { it.ev().value.value() }
+
+            val expected = EitherTraverse<String>().traverse(either, f, Option)
+            result shouldBe expected
+        }
+
         "EitherTMonad#binding should for comprehend over option" {
             val M = EitherTMonad<NonEmptyList.F, Int>(NonEmptyList)
             val result = M.binding {

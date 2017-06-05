@@ -14,6 +14,7 @@ abstract class UnitSpec : StringSpec() {
             NonEmptyList
             Option
             Try
+            Eval
         }
     }
 }
