@@ -14,13 +14,13 @@ fun <D, A> ReaderT<Id.F, D, A>.runId(d: D): A =
 
 object Reader {
 
-    inline operator fun <D, A> invoke(noinline run: (D) -> A, MF: Monad<Id.F> = monad<Id.F>()): ReaderT<Id.F, D, A> =
+    operator fun <D, A> invoke(run: (D) -> A, MF: Monad<Id.F> = Id): ReaderT<Id.F, D, A> =
             Kleisli(run.andThen { Id(it) }, MF)
 
-    fun <D, A> pure(x: A, MF: Monad<Id.F> = monad<Id.F>()): ReaderT<Id.F, D, A> =
+    fun <D, A> pure(x: A, MF: Monad<Id.F> = Id): ReaderT<Id.F, D, A> =
             Kleisli.pure<Id.F, D, A>(x, MF)
 
-    fun <D> ask(MF: Monad<Id.F> = monad<Id.F>()): ReaderT<Id.F, D, D> =
+    fun <D> ask(MF: Monad<Id.F> = Id): ReaderT<Id.F, D, D> =
             Kleisli.ask<Id.F, D>(MF)
 
 }
