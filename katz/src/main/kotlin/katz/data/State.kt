@@ -1,48 +1,6 @@
-/*
- * Copyright (C) 2017 The Katz Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package katz
 
-/**
- * State[S, A] is basically a function S => (S, A),
- * where S is the type that represents your state
- * and A is the result the function produces. In addition
- * to returning the result of type A, the function
- * returns a new S value, which is the updated state.
- */
-class State<S, out A>(val runF: (S) -> Tuple2<S, A>) {
-
-    fun run(s: S): Tuple2<S, A> {
-        return runF(s)
-    }
-
-    fun runA(s: S): A = run(s).b
-
-    fun runS(s: S): S = run(s).a
-
-    fun <B> map(f: (A) -> B): State<S, B> {
-        return State { s1 ->
-            run(s1).let { (s2, a2) -> Tuple2(s2, f(a2)) }
-        }
-    }
-
-    fun <B> flatMap(f: (A) -> State<S, B>): State<S, B> {
-        return State { s1 ->
-            run(s1).let { (s2, a2) -> f(a2).run(s2) }
-        }
-    }
-
+object State {
+    operator fun <S, A> invoke(run: (S) -> Tuple2<S, A>, MF: Monad<Id.F> = Id): StateT<Id.F, S, A> =
+            StateT(MF, Id(run.andThen { Id(it) }))
 }
