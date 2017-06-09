@@ -19,14 +19,14 @@ apply from: 'detekt.gradle'
 buildscript {
     ext {
         // Constants
-        gradleVersion = '3.4.1'
-        gradleVersionsPluginVersion = '0.14.0'
+        gradleVersion = '3.5'
+        gradleVersionsPluginVersion = '0.15.0'
         javaVersion = '1.7'
         katzVersion = '0.1-SNAPSHOT'
-        kotlinTestVersion = '2.0.0'
-        kotlinVersion = '1.1.3-dev-1450'
+        kotlinTestVersion = '2.0.3'
+        kotlinVersion = '1.1.4-dev-600'
         kotlinxCollectionsImmutableVersion = '0.1'
-        kotlinxCoroutinesVersion = '0.14.1'
+        kotlinxCoroutinesVersion = '0.16'
     }
 
     repositories {
