@@ -4,8 +4,8 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.forAll
-import katz.Option.Some
 import katz.Option.None
+import katz.Option.Some
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -101,5 +101,11 @@ class OptionTest : UnitSpec() {
             result shouldBe Option(5)
         }
 
+        "OptionTraverse.sequence should sequence info" {
+            val sequence = OptionTraverse.sequence(Option(Either.Right(0)), EitherMonad<Int>()).ev()
+            val expected = Either.Right(Option(0))
+
+            sequence shouldBe expected
+        }
     }
 }
