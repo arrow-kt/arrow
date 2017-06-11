@@ -90,11 +90,45 @@ class AndThenTest : UnitSpec() {
                                     }
                                 })
                         )
-                        .andThen({
-                            it.toString()
+                        .andThen(AndThen { num: Int ->
+                            num.toString()
                         })
 
                 f(num) == expected.toString()
+            }
+        }
+
+        "should recover from raised errors if there's an ErrorHandler on the chain" {
+            forAll { num: Int ->
+                val expected = 10
+                val dummy = MyException()
+
+                val f = AndThen { num: Int -> num }
+                        .andThen(AndThen { num: Int ->
+                            num.toString()
+                        })
+                        .error(dummy, { expected.toString() })
+
+                f == expected.toString()
+            }
+        }
+
+        "should not recover from raised errors if the ErrorHandler function is incorrect" {
+            val expected = 10
+            val dummy = MyException()
+
+            try {
+                val value = AndThen { num: Int -> num }
+                        .andThen(AndThen { num: Int ->
+                            num.toString()
+                        })
+                        .error(dummy, { /* Expects a String */ expected })
+                value shouldBe expected
+                fail("should throw ClassCastException")
+            } catch (cce: ClassCastException) {
+                // Success!
+            } catch (throwable: Throwable) {
+                fail("should only throw ClassCastException")
             }
         }
 
