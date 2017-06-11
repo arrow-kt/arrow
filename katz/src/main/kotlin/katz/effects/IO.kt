@@ -1,10 +1,17 @@
 package katz
 
 import katz.effects.internal.AndThen
-import katz.effects.internal.Platform
+import katz.effects.internal.Platform.onceOnly
 import katz.effects.internal.Platform.unsafeResync
 
-sealed class IO<out A> {
+typealias IOKind<A> = HK<IO.F, A>
+
+fun <A> IOKind<A>.ev(): IO<A> = this as IO<A>
+
+sealed class IO<out A> : HK<IO.F, A> {
+
+    class F private constructor()
+
     abstract fun <B> map(f: (A) -> B): IO<B>
 
     fun <B> flatMap(f: (A) -> IO<B>): IO<B> =
@@ -39,7 +46,7 @@ sealed class IO<out A> {
 
     abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
 
-    companion object {
+    companion object : IOMonad, GlobalInstance<Monad<IO.F>>() {
         internal fun <A, B> mapDefault(t: IO<A>, f: (A) -> B): IO<B> =
                 t.flatMap(f.andThen { Pure(it) })
 
@@ -49,8 +56,8 @@ sealed class IO<out A> {
         operator fun <A> invoke(f: (Unit) -> A): IO<A> =
                 suspend { Pure(f(Unit)) }
 
-        fun <A> pure(f: (Unit) -> A): IO<A> =
-                Pure(f(Unit))
+        fun <A> just(a: A): IO<A> =
+                Pure(a)
 
         fun <A> suspend(f: (Unit) -> IO<A>): IO<A> =
                 Suspend(AndThen { _ ->
@@ -66,7 +73,7 @@ sealed class IO<out A> {
 
         fun <A> async(k: ((Either<Throwable, A>) -> Unit) -> Unit): IO<A> =
                 Async { callBack ->
-                    Platform.onceOnly(callBack).let {
+                    onceOnly(callBack).let {
                         try {
                             k(it)
                         } catch (throwable: Throwable) {
@@ -75,8 +82,8 @@ sealed class IO<out A> {
                     }
                 }
 
-        fun unit(): IO<Unit> =
-                pure({})
+        val unit: IO<Unit> =
+                just(Unit)
 
         fun <A> eval(eval: Eval<A>) =
                 when (eval) {
