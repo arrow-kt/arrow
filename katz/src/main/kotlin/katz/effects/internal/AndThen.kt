@@ -120,6 +120,7 @@ internal sealed class AndThen<in A, out B> : (A) -> B {
         if (isSuccess) {
             return success as B
         } else {
+            /* If we've made it this far then failure isn't null */
             throw failure!!
         }
     }
