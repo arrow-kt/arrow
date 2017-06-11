@@ -41,7 +41,7 @@ internal sealed class AndThen<in A, out B> : (A) -> B {
         fun processSuccess(f: (Any?) -> Any?): Unit =
                 try {
                     success = f(success)
-                } catch(throwable: Throwable) {
+                } catch (throwable: Throwable) {
                     failure = throwable
                     isSuccess = false
                 }
@@ -51,7 +51,7 @@ internal sealed class AndThen<in A, out B> : (A) -> B {
                     /* If we've made it this far then failure isn't null */
                     success = f(failure!!)
                     isSuccess = true
-                } catch(throwable: Throwable) {
+                } catch (throwable: Throwable) {
                     failure = throwable
                 }
 
