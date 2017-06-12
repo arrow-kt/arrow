@@ -1,8 +1,11 @@
 package katz.effects.internal
 
 /**
- * Abandon all hope
- * Ye who enter here
+ * [AndThen] is a wrapper for chained functions capable of failing.
+ * Chained operations install error handlers for recovery.
+ *
+ * Calling the operator invoke () executes the operation.
+ * If no error handlers are installed, the operation throws.
  */
 internal sealed class AndThen<in A, out B> : (A) -> B {
     internal data class Single<in A, out B>(val f: (A) -> B) : AndThen<A, B>()
@@ -19,19 +22,11 @@ internal sealed class AndThen<in A, out B> : (A) -> B {
             runLoop(a, null, true)
 
     /**
-     * Raises an error continuation.
-     * As Kotlin lacks a way of signaling superclass, the return type of the function has to be hinted by the caller.
+     * Abandon all hope
+     * Ye who enter here.
      */
     @Suppress("UNCHECKED_CAST")
-    fun error(throwable: Throwable, fe: Function1<Throwable, /* B */ *>): B =
-            try {
-                runLoop(null, throwable, false)
-            } catch (throwable: Throwable) {
-                fe(throwable) as B
-            }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun runLoop(_success: A?, _failure: Throwable?, _isSuccess: Boolean): B {
+    internal fun runLoop(_success: A?, _failure: Throwable?, _isSuccess: Boolean): B {
         var self: AndThen<Any?, Any?> = this as AndThen<Any?, Any?>
         var success: Any? = _success
         var failure = _failure
@@ -41,7 +36,7 @@ internal sealed class AndThen<in A, out B> : (A) -> B {
         fun processSuccess(f: (Any?) -> Any?): Unit =
                 try {
                     success = f(success)
-                } catch(throwable: Throwable) {
+                } catch (throwable: Throwable) {
                     failure = throwable
                     isSuccess = false
                 }
@@ -51,7 +46,7 @@ internal sealed class AndThen<in A, out B> : (A) -> B {
                     /* If we've made it this far then failure isn't null */
                     success = f(failure!!)
                     isSuccess = true
-                } catch(throwable: Throwable) {
+                } catch (throwable: Throwable) {
                     failure = throwable
                 }
 
@@ -133,3 +128,11 @@ internal sealed class AndThen<in A, out B> : (A) -> B {
                 ErrorHandler(fa, fb)
     }
 }
+
+/* Defined outside the class to keep the variance of B */
+internal fun <A, B> AndThen<A, B>.error(throwable: Throwable, fe: Function1<Throwable, B>): B =
+        try {
+            runLoop(null, throwable, false)
+        } catch (throwable: Throwable) {
+            fe(throwable)
+        }
