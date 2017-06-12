@@ -40,7 +40,7 @@ sealed class IO<out A> : HK<IO.F, A> {
     abstract fun unsafeStep(): IO<A>
 
     fun unsafeRunSync(): Option<A> =
-            unsafeRunTimed(Duration.Infinite)
+            unsafeRunTimed(Duration.INFINITE)
 
     fun unsafeRunTimed(limit: Duration): Option<A> =
             unsafeStep().unsafeRunTimedTotal(limit)

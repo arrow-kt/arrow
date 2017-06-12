@@ -27,7 +27,7 @@ object Platform {
             latch.releaseShared(1)
         }
 
-        if (limit == Duration.Infinite) {
+        if (limit == Duration.INFINITE) {
             latch.acquireSharedInterruptibly(1)
         } else {
             latch.tryAcquireSharedNanos(1, limit.nanoseconds)
