@@ -75,6 +75,13 @@ class IOTest : UnitSpec() {
             (elapsed >= 100) shouldBe true
         }
 
+        "should return a null value from unsafeRunTimed" {
+            val never = IO.pure<Int?>(null)
+            val received = never.unsafeRunTimed(100.milliseconds)
+
+            received shouldBe Option.Some(null)
+        }
+
         "should return a null value from unsafeRunSync" {
             val value = IO.pure<Int?>(null).unsafeRunSync()
 
