@@ -3,13 +3,19 @@ package kategory
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
+import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kategory.Option.Some
 import kategory.Option.None
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class OptionTest : UnitSpec() {
+class OptionTest :
+        FunctorLaws<Option.F, Int, String, Int>(
+                functor = Option,
+                generator = genOptionHK(Gen.positiveIntegers()),
+                genB = Gen.string(),
+                genC = Gen.positiveIntegers()) {
 
     init {
         "map should modify value" {
