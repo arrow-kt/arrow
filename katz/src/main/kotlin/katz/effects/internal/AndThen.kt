@@ -18,20 +18,8 @@ internal sealed class AndThen<in A, out B> : (A) -> B {
     override operator fun invoke(a: A): B =
             runLoop(a, null, true)
 
-    /**
-     * Raises an error continuation.
-     * As Kotlin lacks a way of signaling superclass, the return type of the function has to be hinted by the caller.
-     */
     @Suppress("UNCHECKED_CAST")
-    fun error(throwable: Throwable, fe: Function1<Throwable, /* B */ *>): B =
-            try {
-                runLoop(null, throwable, false)
-            } catch (throwable: Throwable) {
-                fe(throwable) as B
-            }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun runLoop(_success: A?, _failure: Throwable?, _isSuccess: Boolean): B {
+    internal fun runLoop(_success: A?, _failure: Throwable?, _isSuccess: Boolean): B {
         var self: AndThen<Any?, Any?> = this as AndThen<Any?, Any?>
         var success: Any? = _success
         var failure = _failure
@@ -133,3 +121,11 @@ internal sealed class AndThen<in A, out B> : (A) -> B {
                 ErrorHandler(fa, fb)
     }
 }
+
+/* Defined outside the class to keep the variance of B */
+internal fun <A, B> AndThen<A, B>.error(throwable: Throwable, fe: Function1<Throwable, B>): B =
+        try {
+            runLoop(null, throwable, false)
+        } catch (throwable: Throwable) {
+            fe(throwable)
+        }

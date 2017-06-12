@@ -5,6 +5,7 @@ import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.forAll
 import katz.effects.internal.AndThen
+import katz.effects.internal.error
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -113,23 +114,16 @@ class AndThenTest : UnitSpec() {
             }
         }
 
-        "should not recover from raised errors if the ErrorHandler function is incorrect" {
+        "should recover from raised errors if the ErrorHandler function has different type than the chain" {
             val expected = 10
             val dummy = MyException()
 
-            try {
-                val value = AndThen { num: Int -> num }
-                        .andThen(AndThen { num: Int ->
-                            num.toString()
-                        })
-                        .error(dummy, { /* Expects a String */ expected })
-                value shouldBe expected
-                fail("should throw ClassCastException")
-            } catch (cce: ClassCastException) {
-                // Success!
-            } catch (throwable: Throwable) {
-                fail("should only throw ClassCastException")
-            }
+            val value = AndThen { num: Int -> num }
+                    .andThen(AndThen { num: Int ->
+                        num.toString()
+                    })
+                    .error(dummy, { expected })
+            value shouldBe expected
         }
 
         "should throw without ErrorHandler on exception" {
