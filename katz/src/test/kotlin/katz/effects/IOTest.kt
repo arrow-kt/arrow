@@ -23,9 +23,9 @@ class IOTest : UnitSpec() {
         "should catch exceptions within main block" {
             val exception = MyException()
             val ioa = IO { throw exception }
-            val result: Option<Either<Throwable, Nothing>> = ioa.attempt().unsafeRunSync()
+            val result: Either<Throwable, Nothing> = ioa.attempt().unsafeRunSync()
 
-            val expected = Option.Some(Either.Left(exception))
+            val expected = Either.Left(exception)
 
             result shouldBe expected
         }
@@ -33,7 +33,7 @@ class IOTest : UnitSpec() {
         "should yield immediate successful invoke value" {
             val run = IO { 1 }.unsafeRunSync()
 
-            val expected = Option.Some(1)
+            val expected = 1
 
             run shouldBe expected
         }
@@ -41,7 +41,7 @@ class IOTest : UnitSpec() {
         "should yield immediate successful just value" {
             val run = IO.just(1).unsafeRunSync()
 
-            val expected = Option.Some(1)
+            val expected = 1
 
             run shouldBe expected
         }
@@ -49,7 +49,7 @@ class IOTest : UnitSpec() {
         "should yield immediate successful pure value" {
             val run = IO.pure(1).unsafeRunSync()
 
-            val expected = Option.Some(1)
+            val expected = 1
 
             run shouldBe expected
         }
@@ -57,7 +57,7 @@ class IOTest : UnitSpec() {
         "should throw immediate failure by raiseError" {
             try {
                 IO.raiseError<Int>(MyException()).unsafeRunSync()
-                fail("Should throw MyException")
+                fail("")
             } catch (myException: MyException) {
                 // Success
             } catch (throwable: Throwable) {
@@ -73,6 +73,12 @@ class IOTest : UnitSpec() {
 
             received shouldBe Option.None
             (elapsed >= 100) shouldBe true
+        }
+
+        "should return a null value from unsafeRunSync" {
+            val value = IO.pure<Int?>(null).unsafeRunSync()
+
+            value shouldBe null
         }
     }
 }

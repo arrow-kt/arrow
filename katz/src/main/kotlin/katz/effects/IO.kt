@@ -39,8 +39,8 @@ sealed class IO<out A> : HK<IO.F, A> {
 
     abstract fun unsafeStep(): IO<A>
 
-    fun unsafeRunSync(): Option<A> =
-            unsafeRunTimed(Duration.INFINITE)
+    fun unsafeRunSync(): A =
+            unsafeRunTimed(Duration.INFINITE).fold({ throw IllegalArgumentException("IO execution should yield a valid result") }, { it })
 
     fun unsafeRunTimed(limit: Duration): Option<A> =
             unsafeStep().unsafeRunTimedTotal(limit)
