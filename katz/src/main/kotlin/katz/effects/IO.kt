@@ -17,9 +17,9 @@ sealed class IO<out A> : HK<IO.F, A> {
 
     fun <B> flatMap(f: (A) -> IO<B>): IO<B> =
             flatMapTotal(
-                    AndThen { a: A ->
+                    AndThen {
                         try {
-                            f(a)
+                            f(it)
                         } catch (error: Throwable) {
                             RaiseError<B>(error)
                         }

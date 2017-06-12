@@ -1,7 +1,7 @@
 package katz
 
 interface IOMonad : Monad<IO.F> {
-    override fun <A, B> map(fa: HK<IO.F, A>, f: (A) -> B): HK<IO.F, B> =
+    override fun <A, B> map(fa: HK<IO.F, A>, f: (A) -> B): IO<B> =
             fa.ev().map(f)
 
     override fun <A> pure(a: A): IO<A> =
