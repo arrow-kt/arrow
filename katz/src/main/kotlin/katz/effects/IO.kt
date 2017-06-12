@@ -3,6 +3,7 @@ package katz
 import katz.effects.internal.AndThen
 import katz.effects.internal.Platform.onceOnly
 import katz.effects.internal.Platform.unsafeResync
+import katz.effects.internal.error
 
 typealias IOKind<A> = HK<IO.F, A>
 
@@ -122,7 +123,7 @@ internal data class RaiseError<out A>(val exception: Throwable) : IO<A>() {
             RaiseError(exception)
 
     override fun <B> flatMapTotal(f: AndThen<A, IO<B>>): IO<B> =
-            Suspend(AndThen { f.error(exception, { RaiseError<B>(it) }) })
+            Suspend(AndThen { f.error(exception, { RaiseError(it) }) })
 
     override fun attempt(): IO<Either<Throwable, A>> =
             Pure(Either.Left(exception))
@@ -162,7 +163,7 @@ internal data class BindSuspend<E, out A>(val cont: AndThen<Unit, IO<E>>, val f:
             mapDefault(this, f)
 
     override fun <B> flatMapTotal(ff: AndThen<A, IO<B>>): IO<B> =
-            BindSuspend(cont, f.andThen(AndThen({ it.flatMapTotal(ff) }, { ff.error(it, { RaiseError<B>(it) }) })))
+            BindSuspend(cont, f.andThen(AndThen({ it.flatMapTotal(ff) }, { ff.error(it, { RaiseError(it) }) })))
 
     override fun attempt(): IO<Either<Throwable, A>> =
             BindSuspend(AndThen { _ -> this }, attemptValue())
@@ -202,7 +203,7 @@ internal data class BindAsync<E, out A>(val cont: ((Either<Throwable, E>) -> Uni
             mapDefault(this, f)
 
     override fun <B> flatMapTotal(ff: AndThen<A, IO<B>>): IO<B> =
-            BindAsync(cont, f.andThen(AndThen({ it.flatMapTotal(ff) }, { ff.error(it, { RaiseError<B>(it) }) })))
+            BindAsync(cont, f.andThen(AndThen({ it.flatMapTotal(ff) }, { ff.error(it, { RaiseError(it) }) })))
 
     override fun attempt(): IO<Either<Throwable, A>> =
             BindSuspend(AndThen { _ -> this }, attemptValue())
@@ -215,7 +216,7 @@ internal data class BindAsync<E, out A>(val cont: ((Either<Throwable, E>) -> Uni
                 try {
                     when (result) {
                         is Either.Right -> f(result.b).unsafeRunAsync(cb)
-                        is Either.Left -> f.error(result.a, { RaiseError<A>(it) }).unsafeRunAsync(cb)
+                        is Either.Left -> f.error(result.a, { RaiseError(it) }).unsafeRunAsync(cb)
                     }
                 } catch (throwable: Throwable) {
                     cb(Either.Left(throwable))
