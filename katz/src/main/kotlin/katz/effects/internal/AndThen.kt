@@ -1,8 +1,11 @@
 package katz.effects.internal
 
 /**
- * Abandon all hope
- * Ye who enter here
+ * [AndThen] is a wrapper for chained functions capable of failing.
+ * Chained operations install error handlers for recovery.
+ *
+ * Calling the operator invoke () executes the operation.
+ * If no error handlers are installed, the operation throws.
  */
 internal sealed class AndThen<in A, out B> : (A) -> B {
     internal data class Single<in A, out B>(val f: (A) -> B) : AndThen<A, B>()
@@ -18,6 +21,10 @@ internal sealed class AndThen<in A, out B> : (A) -> B {
     override operator fun invoke(a: A): B =
             runLoop(a, null, true)
 
+    /**
+     * Abandon all hope
+     * Ye who enter here.
+     */
     @Suppress("UNCHECKED_CAST")
     internal fun runLoop(_success: A?, _failure: Throwable?, _isSuccess: Boolean): B {
         var self: AndThen<Any?, Any?> = this as AndThen<Any?, Any?>
