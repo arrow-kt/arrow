@@ -1,6 +1,7 @@
 package katz
 
 typealias StateTKind<F, S, A> = HK3<StateT.F, F, S, A>
+typealias StateTF<F, S> = HK2<StateT.F, F, S>
 
 typealias StateTFun<F, S, A> = (S) -> HK<F, Tuple2<S, A>>
 typealias StateTFunKind<F, S, A> = HK<F, StateTFun<F, S, A>>
@@ -21,6 +22,27 @@ class StateT<F, S, A>(
 
     fun <B> map(f: (A) -> B): StateT<F, S, B> =
             transform { (s, a) -> Tuple2(s, f(a)) }
+
+    fun <B, Z> map2(sb: StateT<F, S, B>, fn: (A, B) -> Z): StateT<F, S, Z> =
+            applyF(MF.map2(runF, sb.runF) { (ssa, ssb) ->
+                ssa.andThen { fsa ->
+                    MF.flatMap(fsa) { (s, a) ->
+                        MF.map(ssb(s)) { (s, b) -> Tuple2(s, fn(a, b)) }
+                    }
+                }
+            }, MF)
+
+    fun <B, Z> map2Eval(sb: Eval<StateT<F, S, B>>, fn: (A, B) -> Z): Eval<StateT<F, S, Z>> =
+            MF.map2Eval(runF, sb.map { it.runF }) { (ssa, ssb) ->
+                ssa.andThen { fsa ->
+                    MF.flatMap(fsa) { (s, a) ->
+                        MF.map(ssb((s))) { (s, b) -> Tuple2(s, fn(a, b)) }
+                    }
+                }
+            }.map { applyF(it, MF) }
+
+    fun <B> product(sb: StateT<F, S, B>): StateT<F, S, Tuple2<A, B>> =
+            map2(sb) { a, b -> Tuple2(a, b) }
 
     fun <B> flatMap(fas: (A) -> StateTKind<F, S, B>): StateT<F, S, B> =
             applyF(
