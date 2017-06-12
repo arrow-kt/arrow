@@ -4,9 +4,9 @@
     <Whitelist timestamp="1492411880669">
         <ID>EmptyClassBlock:Typeclass.kt$&lt;no name provided&gt; : TypeLiteral</ID>
         <ID>OptionalUnit:AndThen.kt$AndThen$Unit</ID>
-        <ID>ComplexMethod:AndThen.kt$AndThen$@Suppress("UNCHECKED_CAST") private fun runLoop(_success: A?, _failure: Throwable?, _isSuccess: Boolean): B</ID>
+        <ID>ComplexMethod:AndThen.kt$AndThen$@Suppress("UNCHECKED_CAST") internal fun runLoop(_success: A?, _failure: Throwable?, _isSuccess: Boolean): B</ID>
         <ID>OptionalUnit:NonEmptyListMonad.kt$NonEmptyListMonad$Unit</ID>
-        <ID>NestedBlockDepth:AndThen.kt$AndThen$@Suppress("UNCHECKED_CAST") private fun runLoop(_success: A?, _failure: Throwable?, _isSuccess: Boolean): B</ID>
+        <ID>NestedBlockDepth:AndThen.kt$AndThen$@Suppress("UNCHECKED_CAST") internal fun runLoop(_success: A?, _failure: Throwable?, _isSuccess: Boolean): B</ID>
         <ID>NestedBlockDepth:Eval.kt$Eval.Compute$override fun value(): A</ID>
     </Whitelist>
 </SmellBaseline>
