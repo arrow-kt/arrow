@@ -26,6 +26,8 @@ fun <A, B> IorKind<A, B>.ev(): Ior<A, B> =
  * [Ior]<`A`,`B`> is isomorphic to [Either]<[Either]<`A`,`B`>, [Pair]<`A`,`B`>>, but provides methods biased toward `B`
  * values, regardless of whether the `B` values appear in a [Ior.Right] or a [Ior.Both].
  * The isomorphic Either form can be accessed via the [unwrap] method.
+ *
+ * El primogenito de @ffgiraldez
  */
 
 sealed class Ior<out A, out B> : IorKind<A, B> {
