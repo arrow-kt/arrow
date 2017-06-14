@@ -2,8 +2,8 @@ package katz
 
 import io.kotlintest.properties.Gen
 
-inline fun <reified F, reified A> genMonad(valueGen: Gen<A> = Gen.default(), M : Monad<F> = monad<F>()): Gen<HK<F, A>> = object : Gen<HK<F, A>> {
-    override fun generate(): HK<F, A> = M.pure(valueGen.generate())
+inline fun <reified F, A> genApplicative(valueGen: Gen<A>, AP: Applicative<F> = applicative<F>()): Gen<HK<F, A>> = object : Gen<HK<F, A>> {
+    override fun generate(): HK<F, A> = AP.pure(valueGen.generate())
 }
 
 fun <A, B> genFunctionAToB(genB: Gen<B>): Gen<(A) -> B> = object : Gen<(A) -> B> {
