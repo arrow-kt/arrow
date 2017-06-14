@@ -1,11 +1,9 @@
 package katz
 
 import io.kotlintest.properties.Gen
-import katz.HK
-import katz.Option
 
-fun <A> genOptionHK(valueGen: Gen<A>): Gen<HK<Option.F, A>> = object : Gen<HK<Option.F, A>> {
-    override fun generate(): HK<Option.F, A> = Option(valueGen.generate())
+inline fun <reified F, reified A> genMonad(valueGen: Gen<A> = Gen.default(), M : Monad<F> = monad<F>()): Gen<HK<F, A>> = object : Gen<HK<F, A>> {
+    override fun generate(): HK<F, A> = M.pure(valueGen.generate())
 }
 
 fun <A, B> genFunctionAToB(genB: Gen<B>): Gen<(A) -> B> = object : Gen<(A) -> B> {
