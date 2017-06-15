@@ -10,7 +10,7 @@ interface OptionMonad : Monad<Option.F> {
     override fun <A, B> flatMap(fa: OptionKind<A>, f: (A) -> OptionKind<B>): Option<B> =
             fa.ev().flatMap { f(it).ev() }
 
-    tailrec override fun <A, B> tailRecM(a: A, f: (A) -> HK<Option.F, Either<A, B>>): Option<B> {
+    tailrec override fun <A, B> tailRecM(a: A, f: (A) -> OptionKind<Either<A, B>>): Option<B> {
         val option = f(a).ev()
         return when (option) {
             is Option.Some -> {

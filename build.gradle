@@ -26,6 +26,7 @@ buildscript {
         kotlinVersion = '1.1.4-dev-600'
         kotlinxCollectionsImmutableVersion = '0.1'
         kotlinxCoroutinesVersion = '0.16'
+        rxJavaVersion = '2.1.0'
     }
 
     repositories {
