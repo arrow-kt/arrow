@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 The Katz Authors
+ * Copyright (C) 2017 The Kategory Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ buildscript {
         gradleVersion = '3.5'
         gradleVersionsPluginVersion = '0.15.0'
         javaVersion = '1.7'
-        katzVersion = '0.1-SNAPSHOT'
+        kategoryVersion = '0.1-SNAPSHOT'
         kotlinTestVersion = '2.0.3'
         kotlinVersion = '1.1.4-dev-600'
         kotlinxCollectionsImmutableVersion = '0.1'
@@ -53,7 +53,7 @@ allprojects {
 
     group = 'com.github.finecinnamon'
     archivesBaseName = project.name
-    version = katzVersion
+    version = kategoryVersion
 
     jacoco {
         toolVersion '0.7.8'
@@ -68,7 +68,7 @@ allprojects {
         }
 
         classDirectories = fileTree(
-                dir: 'build/classes/main/katz',
+                dir: 'build/classes/main/kategory',
         )
 
         sourceDirectories = files('src/main/kotlin')
