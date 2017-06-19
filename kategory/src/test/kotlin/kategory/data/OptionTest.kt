@@ -13,7 +13,7 @@ class OptionTest: UnitSpec() {
 
     init {
 
-        testLaws(ApplicativeLaws.laws(Option))
+        testLaws(MonadLaws.laws(Option))
 
         "map should modify value" {
             Some(12).map { "flower" } shouldBe Some("flower")
