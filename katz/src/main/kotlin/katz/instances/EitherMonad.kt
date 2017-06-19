@@ -1,6 +1,6 @@
 package katz
 
-class EitherMonad<L> : Monad<EitherF<L>> {
+open class EitherMonad<L> : Monad<EitherF<L>> {
 
     override fun <A> pure(a: A): Either<L, A> = Either.Right(a)
 
