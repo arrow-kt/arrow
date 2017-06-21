@@ -17,8 +17,7 @@ Add it in your root `build.gradle` at the end of repositories.
 ```groovy
 allprojects {
     repositories {
-        ...
-        maven { url 'https://jitpack.io' }
+        maven { url "http://dl.bintray.com/kategory/maven" }
         maven { url 'https://kotlin.bintray.com/kotlinx' }
         maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
     }
@@ -29,7 +28,7 @@ Add the dependency into project `build.gradle`
 
 ```groovy
 dependencies {
-    compile 'com.github.kategory:kategory:0.3.2'
+    compile 'io.kategory:kategory:0.3.3'
 }
 ```
 
