@@ -1,16 +1,16 @@
 package kategory
 
-typealias KleisiTKind<F, A, B> = HK3<Kleisli.F, F, A, B>
-typealias KleisiF<F> = HK<Kleisli.F, F>
+typealias KleisliTKind<F, A, B> = HK3<Kleisli.F, F, A, B>
+typealias KleisliF<F> = HK<Kleisli.F, F>
 
 typealias KleisliFun<F, D, A> = (D) -> HK<F, A>
 
 typealias ReaderT<F, D, A> = Kleisli<F, D, A>
 
-fun <F, D, A> KleisiTKind<F, D, A>.ev(): Kleisli<F, D, A> =
+fun <F, D, A> KleisliTKind<F, D, A>.ev(): Kleisli<F, D, A> =
         this as Kleisli<F, D, A>
 
-class Kleisli<F, D, A>(val MF: Monad<F>, val run: KleisliFun<F, D, A>) : KleisiTKind<F, D, A> {
+class Kleisli<F, D, A>(val MF: Monad<F>, val run: KleisliFun<F, D, A>) : KleisliTKind<F, D, A> {
     class F private constructor()
 
     fun <B> map(f: (A) -> B): Kleisli<F, D, B> =
