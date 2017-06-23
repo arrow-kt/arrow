@@ -12,6 +12,12 @@ class ValidatedTest : UnitSpec() {
 
     init {
 
+        val concatStringSG: Semigroup<String> = object : Semigroup<String> {
+            override fun combine(a: String, b: String): String = "$a $b"
+        }
+
+        testLaws(ApplicativeLaws.laws(ValidatedApplicativeError(concatStringSG)))
+
         "fold should call function on Invalid" {
             val exception = Exception("My Exception")
             val result: Validated<Throwable, String> = Invalid(exception)
@@ -152,10 +158,6 @@ class ValidatedTest : UnitSpec() {
         "withEither should return Invalid(result) if f return Left" {
             Valid(10).withEither { Either.Left(5) } shouldBe Invalid(5)
             Invalid(10).withEither { it } shouldBe Invalid(10)
-        }
-
-        val concatStringSG: Semigroup<String> = object : Semigroup<String> {
-            override fun combine(a: String, b: String): String = "$a $b"
         }
 
         "Cartesian builder should build products over homogeneous Validated" {
