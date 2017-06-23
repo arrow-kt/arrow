@@ -9,6 +9,8 @@ import org.junit.runner.RunWith
 class WriterTTest : UnitSpec() {
     init {
 
+        testLaws(MonadLaws.laws(WriterTMonad(NonEmptyList, IntMonoid)))
+
         "tell should accumulate write" {
             forAll { a: Int ->
                 val right = WriterT(Id(NonEmptyList.of(a) toT a))
