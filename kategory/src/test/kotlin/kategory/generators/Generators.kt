@@ -1,4 +1,4 @@
-package katz
+package kategory
 
 import io.kotlintest.properties.Gen
 
