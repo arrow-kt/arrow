@@ -7,6 +7,9 @@ open class EitherMonad<L> : Monad<EitherF<L>> {
     override fun <A, B> flatMap(fa: EitherKind<L, A>, f: (A) -> EitherKind<L, B>): Either<L, B> =
             fa.ev().flatMap { f(it).ev() }
 
+    override fun <A, B> map(fa: HK<EitherF<L>, A>, f: (A) -> B): Either<L, B> =
+            fa.ev().map(f)
+
     tailrec override fun <A, B> tailRecM(a: A, f: (A) -> HK<EitherF<L>, Either<A, B>>): Either<L, B> {
         val e = f(a).ev().ev()
         return when (e) {
