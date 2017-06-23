@@ -9,6 +9,9 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class EitherTTest : UnitSpec() {
     init {
+
+        testLaws(MonadLaws.laws(EitherTMonad<Id.F, Int>()))
+
         "map should modify value" {
             forAll { a: String ->
                 val right = EitherT(Id(Either.Right(a)))
