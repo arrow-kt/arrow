@@ -7,6 +7,9 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class IdTest : UnitSpec() {
     init {
+
+        testLaws(MonadLaws.laws(Id))
+
         "IdMonad.binding should for comprehend over all values of multiple Ids" {
             Id.binding {
                 val x = Id(1).bind()
