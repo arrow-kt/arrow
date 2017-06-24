@@ -7,6 +7,9 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class Function0Test : UnitSpec() {
     init {
+
+        testLaws(MonadLaws.laws(Function0))
+
         "Function0Monad.binding should for comprehend over all values of multiple Function0" {
             Function0.binding {
                 val x = Function0 { 1 }.bind()

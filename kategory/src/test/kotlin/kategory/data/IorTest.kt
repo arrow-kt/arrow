@@ -8,7 +8,13 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class IorTest : UnitSpec() {
+
     init {
+
+        val intIorMonad = IorMonad(IntMonoid)
+
+        testLaws(MonadLaws.laws(intIorMonad))
+
         "flatMap() should modify entity" {
             forAll { a: Int, b: String ->
                 {
@@ -130,8 +136,6 @@ class IorTest : UnitSpec() {
             }
 
         }
-
-        val intIorMonad = IorMonad(IntMonoid)
 
         "Ior.monad.flatMap should combine left values" {
             val ior1 = Ior.Both(3, "Hello, world!")

@@ -11,6 +11,8 @@ class TryTest : UnitSpec() {
 
     init {
 
+        testLaws(MonadLaws.laws(Try))
+
         "invoke of any should be success" {
             Try.invoke { 1 } shouldBe Success(1)
         }

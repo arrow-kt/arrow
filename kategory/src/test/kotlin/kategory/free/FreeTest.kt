@@ -38,6 +38,8 @@ class FreeTest : UnitSpec() {
 
     init {
 
+        testLaws(MonadLaws.laws(Ops))
+
         "Can interpret an ADT as Free operations" {
             program.foldMap(optionInterpreter, Option).ev() shouldBe Option.Some(-30)
             program.foldMap(idInterpreter, Id).ev() shouldBe Id(-30)

@@ -6,6 +6,9 @@ interface NonEmptyListMonad : Monad<NonEmptyList.F> {
     override fun <A, B> flatMap(fa: NonEmptyListKind<A>, f: (A) -> NonEmptyListKind<B>): NonEmptyList<B> =
             fa.ev().flatMap { f(it).ev() }
 
+    override fun <A, B> map(fa: NonEmptyListKind<A>, f: (A) -> B): NonEmptyList<B> =
+            fa.ev().map(f)
+
     @Suppress("UNCHECKED_CAST")
     private tailrec fun <A, B> go(buf: ArrayList<B>, f: (A) -> HK<NonEmptyList.F, Either<A, B>>, v: NonEmptyList<Either<A, B>>): Unit =
             when (v.head) {

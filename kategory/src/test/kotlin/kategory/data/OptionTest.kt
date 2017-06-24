@@ -9,9 +9,12 @@ import kategory.Option.None
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class OptionTest : UnitSpec() {
+class OptionTest: UnitSpec() {
 
     init {
+
+        testLaws(MonadLaws.laws(Option))
+
         "map should modify value" {
             Some(12).map { "flower" } shouldBe Some("flower")
             None.map { "flower" } shouldBe None
@@ -102,4 +105,5 @@ class OptionTest : UnitSpec() {
         }
 
     }
+
 }

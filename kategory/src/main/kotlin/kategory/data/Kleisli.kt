@@ -1,16 +1,16 @@
 package kategory
 
-typealias KleisiTKind<F, A, B> = HK3<Kleisli.F, F, A, B>
-typealias KleisiF<F> = HK<Kleisli.F, F>
+typealias KleisliTKind<F, A, B> = HK3<Kleisli.F, F, A, B>
+typealias KleisliF<F> = HK<Kleisli.F, F>
 
-typealias KleisiFun<F, D, A> = (D) -> HK<F, A>
+typealias KleisliFun<F, D, A> = (D) -> HK<F, A>
 
 typealias ReaderT<F, D, A> = Kleisli<F, D, A>
 
-fun <F, D, A> KleisiTKind<F, D, A>.ev(): Kleisli<F, D, A> =
+fun <F, D, A> KleisliTKind<F, D, A>.ev(): Kleisli<F, D, A> =
         this as Kleisli<F, D, A>
 
-class Kleisli<F, D, A>(val MF: Monad<F>, val run: KleisiFun<F, D, A>) : KleisiTKind<F, D, A> {
+class Kleisli<F, D, A>(val MF: Monad<F>, val run: KleisliFun<F, D, A>) : KleisliTKind<F, D, A> {
     class F private constructor()
 
     fun <B> map(f: (A) -> B): Kleisli<F, D, B> =
@@ -29,15 +29,18 @@ class Kleisli<F, D, A>(val MF: Monad<F>, val run: KleisiFun<F, D, A>) : KleisiTK
     fun <DD> local(f: (DD) -> D): Kleisli<F, DD, A> =
             Kleisli(MF, { dd -> run(f(dd)) })
 
-    fun <B> andThen(f: (A) -> HK<F, B>): Kleisli<F, D, B> =
+    infix fun <C> andThen(f: Kleisli<F, A, C>): Kleisli<F, D, C> =
+            andThen(f.run)
+
+    infix fun <B> andThen(f: (A) -> HK<F, B>): Kleisli<F, D, B> =
             Kleisli(MF, { MF.flatMap(run(it), f) })
 
-    fun <B> andThen(a: HK<F, B>): Kleisli<F, D, B> =
+    infix fun <B> andThen(a: HK<F, B>): Kleisli<F, D, B> =
             andThen({ a })
 
     companion object {
 
-        inline operator fun <reified F, D, A> invoke(noinline run: KleisiFun<F, D, A>, MF: Monad<F> = monad<F>()): Kleisli<F, D, A> =
+        inline operator fun <reified F, D, A> invoke(noinline run: KleisliFun<F, D, A>, MF: Monad<F> = monad<F>()): Kleisli<F, D, A> =
                 Kleisli(MF, run)
 
         @JvmStatic inline fun <reified F, D, A> pure(x: A, MF: Monad<F> = monad<F>()): Kleisli<F, D, A> =

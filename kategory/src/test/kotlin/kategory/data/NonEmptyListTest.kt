@@ -8,6 +8,9 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class NonEmptyListTest : UnitSpec() {
     init {
+
+        testLaws(MonadLaws.laws(NonEmptyList))
+
         "map should modify values" {
             NonEmptyList.of(14).map { it * 3 } shouldBe NonEmptyList.of(42)
         }

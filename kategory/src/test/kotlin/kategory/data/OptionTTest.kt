@@ -8,6 +8,9 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class OptionTTest : UnitSpec() {
     init {
+
+        testLaws(MonadLaws.laws(OptionTMonad(NonEmptyList)))
+
         "map should modify value" {
             forAll { a: String ->
                 val ot = OptionT(Id(Option.Some(a)))
