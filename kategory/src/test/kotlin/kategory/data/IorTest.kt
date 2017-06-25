@@ -13,7 +13,7 @@ class IorTest : UnitSpec() {
 
         val intIorMonad = IorMonad(IntMonoid)
 
-        testLaws(MonadLaws.laws(intIorMonad))
+        testLaws(MonadLaws.laws(intIorMonad, Eq()))
 
         "flatMap() should modify entity" {
             forAll { a: Int, b: String ->

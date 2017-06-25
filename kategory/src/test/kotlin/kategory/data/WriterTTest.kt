@@ -9,7 +9,7 @@ import org.junit.runner.RunWith
 class WriterTTest : UnitSpec() {
     init {
 
-        testLaws(MonadLaws.laws(WriterTMonad(NonEmptyList, IntMonoid)))
+        testLaws(MonadLaws.laws(WriterTMonad(NonEmptyList, IntMonoid), Eq()))
 
         "tell should accumulate write" {
             forAll { a: Int ->

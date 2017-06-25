@@ -8,7 +8,7 @@ import org.junit.runner.RunWith
 class FunctionMemo0Test : UnitSpec() {
     init {
 
-        testLaws(MonadLaws.laws(FunctionMemo0))
+        testLaws(MonadLaws.laws(FunctionMemo0, Eq()))
 
         "Function0 should trigger lazily" {
             val counter: SideEffect = SideEffect()

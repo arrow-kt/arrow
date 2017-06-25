@@ -38,7 +38,10 @@ class FreeTest : UnitSpec() {
 
     init {
 
-        testLaws(MonadLaws.laws(Ops))
+        testLaws(MonadLaws.laws(Ops, object: Eq<HK<FreeF<Ops.F>, Int>> {
+            override fun eqv(a: HK<FreeF<Ops.F>, Int>, b: HK<FreeF<Ops.F>, Int>): Boolean =
+                    TODO()
+        }))
 
         "Can interpret an ADT as Free operations" {
             program.foldMap(optionInterpreter, Option).ev() shouldBe Option.Some(-30)
