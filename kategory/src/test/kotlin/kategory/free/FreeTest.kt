@@ -26,8 +26,8 @@ class FreeTest : UnitSpec() {
 
     val program = Ops.binding {
         val added = !Ops.add(10, 10)
-        val substracted = !Ops.subtract(added, 50)
-        yields(substracted)
+        val subtracted = !Ops.subtract(added, 50)
+        yields(subtracted)
     }.ev()
 
     fun stackSafeTestProgram(n: Int, stopAt: Int): Free<Ops.F, Int> = Ops.binding {
