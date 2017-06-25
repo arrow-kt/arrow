@@ -13,7 +13,7 @@ object FunctorLaws {
 
     inline fun <reified F> covariantIdentity(AP: Applicative<F> = applicative<F>()): Unit =
             forAll(genApplicative(Gen.int(), AP), { fa: HK<F, Int> ->
-                AP.map(fa, ::identity) == fa
+                AP.map(fa, ::identity).equalUnderTheLaw(fa)
             })
 
     inline fun <reified F> covariantComposition(AP: Applicative<F> = applicative<F>()): Unit =
@@ -22,7 +22,7 @@ object FunctorLaws {
                     genFunctionAToB<Int, Int>(Gen.int()),
                     genFunctionAToB<Int, Int>(Gen.int()),
                     { fa: HK<F, Int>, f, g ->
-                        AP.map(AP.map(fa, f), g) == AP.map(fa, f andThen g)
+                        AP.map(AP.map(fa, f), g).equalUnderTheLaw(AP.map(fa, f andThen g))
                     }
             )
 

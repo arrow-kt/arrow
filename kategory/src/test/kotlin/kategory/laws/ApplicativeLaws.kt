@@ -15,22 +15,22 @@ object ApplicativeLaws {
 
     inline fun <reified F> apIdentity(A: Applicative<F> = applicative<F>()): Unit =
             forAll(genApplicative(Gen.int(), A), { fa: HK<F, Int> ->
-                A.ap(fa, A.pure({ n: Int -> n })) == fa
+                A.ap(fa, A.pure({ n: Int -> n })).equalUnderTheLaw(fa)
             })
 
     inline fun <reified F> homomorphism(A: Applicative<F> = applicative<F>()): Unit =
             forAll(genFunctionAToB<Int, Int>(Gen.int()), Gen.int(), { ab: (Int) -> Int, a: Int ->
-                A.ap(A.pure(a), A.pure(ab)) == A.pure(ab(a))
+                A.ap(A.pure(a), A.pure(ab)).equalUnderTheLaw(A.pure(ab(a)))
             })
 
     inline fun <reified F> interchange(A: Applicative<F> = applicative<F>()): Unit =
             forAll(genApplicative(genFunctionAToB<Int, Int>(Gen.int()), A), Gen.int(), { fa: HK<F, (Int) -> Int>, a: Int ->
-                A.ap(A.pure(a), fa) == A.ap(fa, A.pure({ x: (Int) -> Int -> x(a) }))
+                A.ap(A.pure(a), fa).equalUnderTheLaw(A.ap(fa, A.pure({ x: (Int) -> Int -> x(a) })))
             })
 
     inline fun <reified F> mapDerived(A: Applicative<F> = applicative<F>()): Unit =
             forAll(genApplicative(Gen.int(), A), genFunctionAToB<Int, Int>(Gen.int()), { fa: HK<F, Int>, f: (Int) -> Int ->
-                A.map(fa, f) == A.ap(fa, A.pure(f))
+                A.map(fa, f).equalUnderTheLaw(A.ap(fa, A.pure(f)))
             })
 
 }

@@ -1,6 +1,5 @@
 package kategory
 
-import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -18,27 +17,27 @@ object MonadLaws {
 
     inline fun <reified F> leftIdentity(M: Monad<F> = monad<F>()): Unit =
             forAll(genFunctionAToB<Int, HK<F, Int>>(genApplicative(Gen.int(), M)), Gen.int(), { f: (Int) -> HK<F, Int>, a: Int ->
-                M.flatMap(M.pure(a), f) == f(a)
+                M.flatMap(M.pure(a), f).equalUnderTheLaw(f(a))
             })
 
     inline fun <reified F> rightIdentity(M: Monad<F> = monad<F>()): Unit =
             forAll(genApplicative(Gen.int(), M), { fa: HK<F, Int> ->
-                M.flatMap(fa, { M.pure(it) }) == fa
+                M.flatMap(fa, { M.pure(it) }).equalUnderTheLaw(fa)
             })
 
     inline fun <reified F> kleisliLeftIdentity(M: Monad<F> = monad<F>()): Unit =
             forAll(genFunctionAToB<Int, HK<F, Int>>(genApplicative(Gen.int(), M)), Gen.int(), { f: (Int) -> HK<F, Int>, a: Int ->
-                (Kleisli({ n : Int -> M.pure(n)}, M) andThen Kleisli(f, M)).run(a) == f(a)
+                (Kleisli({ n : Int -> M.pure(n)}, M) andThen Kleisli(f, M)).run(a).equalUnderTheLaw(f(a))
             })
 
     inline fun <reified F> kleisliRightIdentity(M: Monad<F> = monad<F>()): Unit =
             forAll(genFunctionAToB<Int, HK<F, Int>>(genApplicative(Gen.int(), M)), Gen.int(), { f: (Int) -> HK<F, Int>, a: Int ->
-                (Kleisli(f, M) andThen Kleisli({ n : Int -> M.pure(n)}, M)).run(a) == f(a)
+                (Kleisli(f, M) andThen Kleisli({ n : Int -> M.pure(n)}, M)).run(a).equalUnderTheLaw(f(a))
             })
 
     inline fun <reified F> mapFlatMapCoherence(M: Monad<F> = monad<F>()): Unit =
             forAll(genFunctionAToB<Int, Int>(Gen.int()), genApplicative(Gen.int(), M), { f: (Int) -> Int, fa: HK<F, Int> ->
-                M.flatMap(fa, { M.pure(f(it))}) == M.map(fa, f)
+                M.flatMap(fa, { M.pure(f(it))}).equalUnderTheLaw(M.map(fa, f))
             })
 
     inline fun <reified F> stackSafety(iterations : Int = 5000, M: Monad<F> = monad<F>()): Unit {
