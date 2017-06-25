@@ -29,6 +29,11 @@ data class Function0<out A>(internal val f: () -> A) : HK<Function0.F, A> {
                 pure(f(fa.ev().invoke()))
 
         override fun <A, B> tailRecM(a: A, f: (A) -> HK<F, Either<A, B>>): HK<F, B> =
-                f(a).ev().invoke().fold({ tailRecM(it, f) }, { ({ it }).k() })
+                Function0 {
+                    tailrec fun loop(thisA: A): B =
+                            f(thisA).ev().invoke().fold({ loop(it) }, { it })
+
+                    loop(a)
+                }
     }
 }
