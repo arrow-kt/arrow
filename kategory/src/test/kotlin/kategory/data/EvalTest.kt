@@ -7,6 +7,9 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class EvalTest : UnitSpec() {
     init {
+
+        testLaws(MonadLaws.laws(Eval))
+
         "should map wrapped value" {
             val sideEffect = SideEffect()
             val mapped = Eval.now(0)

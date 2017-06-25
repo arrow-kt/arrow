@@ -25,6 +25,9 @@ data class Function0<out A>(internal val f: () -> A) : HK<Function0.F, A> {
         override fun <A> extract(fa: HK<Function0.F, A>): A =
                 fa.ev().invoke()
 
+        override fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B> =
+                pure(f(fa.ev().invoke()))
+
         override fun <A, B> tailRecM(a: A, f: (A) -> HK<F, Either<A, B>>): HK<F, B> =
                 f(a).ev().invoke().let { either ->
                     when (either) {
