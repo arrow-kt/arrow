@@ -10,7 +10,7 @@ class EvalTest : UnitSpec() {
 
         testLaws(MonadLaws.laws(Eval, object : Eq<HK<Eval.F, Int>> {
             override fun eqv(a: HK<Eval.F, Int>, b: HK<Eval.F, Int>): Boolean =
-                    TODO()
+                    a.ev().value() == b.ev().value()
         }))
 
         "should map wrapped value" {
