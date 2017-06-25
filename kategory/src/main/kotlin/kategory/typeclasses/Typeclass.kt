@@ -62,8 +62,8 @@ class InstanceParametrizedType(val raw: Type, val typeArgs: List<Type>) : Parame
 
     override fun hashCode(): Int {
         return Arrays.hashCode(actualTypeArguments) xor
-                Objects.hashCode(ownerType) xor
-                Objects.hashCode(rawType)
+                hashCode(ownerType) xor
+                hashCode(rawType)
     }
 
     override fun toString(): String {
@@ -100,6 +100,10 @@ class InstanceParametrizedType(val raw: Type, val typeArgs: List<Type>) : Parame
         }
 
         return sb.toString()
+    }
+
+    fun hashCode(o: Any?): Int {
+        return o?.hashCode() ?: 0
     }
 
 }
