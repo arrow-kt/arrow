@@ -10,6 +10,28 @@ class Function0Test : UnitSpec() {
 
         testLaws(MonadLaws.laws(Function0))
 
+        "Function0 should trigger lazily" {
+            val counter: SideEffect = SideEffect()
+            val function0 = Function0 {
+                counter.increment()
+                counter.counter
+            }
+            counter.counter shouldBe 0
+            function0.f() shouldBe 1
+            counter.counter shouldBe 1
+        }
+
+        "Function0 should memoize a call to f" {
+            val counter: SideEffect = SideEffect()
+            val function0 = Function0 {
+                counter.increment()
+                counter.counter
+            }
+            counter.counter shouldBe 0
+            function0.f() shouldBe 1
+            function0.f() shouldBe 1
+        }
+
         "Function0Monad.binding should for comprehend over all values of multiple Function0" {
             Function0.binding {
                 val x = Function0 { 1 }.bind()

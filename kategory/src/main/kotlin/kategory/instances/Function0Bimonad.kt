@@ -7,9 +7,27 @@ fun <A> HK<Function0.F, A>.ev(): () -> A =
         (this as Function0<A>).f
 
 // We don't we want an inherited class to avoid equivalence issues, so a simple HK wrapper will do
-data class Function0<out A>(internal val f: () -> A) : HK<Function0.F, A> {
+data class Function0<out A>(private val _f: () -> A) : HK<Function0.F, A> {
+
+    private val memoized: A by lazy(_f)
+
+    internal val f = { memoized }
 
     class F private constructor()
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other?.javaClass != javaClass) return false
+
+        other as Function0<*>
+
+        if (memoized != other.memoized) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int =
+            memoized?.hashCode() ?: 0
 
     companion object : Bimonad<Function0.F>, GlobalInstance<Bimonad<Function0.F>>() {
 
