@@ -1,13 +1,13 @@
 package kategory
 
-fun <A> (() -> A).k(): HK<Function0.F, A> =
-        Function0(this)
+fun <A> (() -> A).k(): HK<FunctionMemo0.F, A> =
+        FunctionMemo0(this)
 
-fun <A> HK<Function0.F, A>.ev(): () -> A =
-        (this as Function0<A>).f
+fun <A> HK<FunctionMemo0.F, A>.ev(): () -> A =
+        (this as FunctionMemo0<A>).f
 
 // We don't we want an inherited class to avoid equivalence issues, so a simple HK wrapper will do
-data class Function0<out A>(private val _f: () -> A) : HK<Function0.F, A> {
+data class FunctionMemo0<out A>(private val _f: () -> A) : HK<FunctionMemo0.F, A> {
 
     private val memoized: A by lazy(_f)
 
@@ -19,7 +19,7 @@ data class Function0<out A>(private val _f: () -> A) : HK<Function0.F, A> {
         if (this === other) return true
         if (other?.javaClass != javaClass) return false
 
-        other as Function0<*>
+        other as FunctionMemo0<*>
 
         if (memoized != other.memoized) return false
 
@@ -29,18 +29,18 @@ data class Function0<out A>(private val _f: () -> A) : HK<Function0.F, A> {
     override fun hashCode(): Int =
             memoized?.hashCode() ?: 0
 
-    companion object : Bimonad<Function0.F>, GlobalInstance<Bimonad<Function0.F>>() {
+    companion object : Bimonad<FunctionMemo0.F>, GlobalInstance<Bimonad<FunctionMemo0.F>>() {
 
-        override fun <A, B> flatMap(fa: HK<Function0.F, A>, f: (A) -> HK<Function0.F, B>): HK<Function0.F, B> =
+        override fun <A, B> flatMap(fa: HK<FunctionMemo0.F, A>, f: (A) -> HK<FunctionMemo0.F, B>): HK<FunctionMemo0.F, B> =
                 f(fa.ev().invoke())
 
-        override fun <A, B> coflatMap(fa: HK<Function0.F, A>, f: (HK<Function0.F, A>) -> B): HK<Function0.F, B> =
+        override fun <A, B> coflatMap(fa: HK<FunctionMemo0.F, A>, f: (HK<FunctionMemo0.F, A>) -> B): HK<FunctionMemo0.F, B> =
                 { f(fa) }.k()
 
-        override fun <A> pure(a: A): HK<Function0.F, A> =
+        override fun <A> pure(a: A): HK<FunctionMemo0.F, A> =
                 { a }.k()
 
-        override fun <A> extract(fa: HK<Function0.F, A>): A =
+        override fun <A> extract(fa: HK<FunctionMemo0.F, A>): A =
                 fa.ev().invoke()
 
         override fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B> =
