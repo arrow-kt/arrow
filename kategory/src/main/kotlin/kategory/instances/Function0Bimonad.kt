@@ -29,11 +29,6 @@ data class Function0<out A>(internal val f: () -> A) : HK<Function0.F, A> {
                 pure(f(fa.ev().invoke()))
 
         override fun <A, B> tailRecM(a: A, f: (A) -> HK<F, Either<A, B>>): HK<F, B> =
-                f(a).ev().invoke().let { either ->
-                    when (either) {
-                        is Either.Left -> tailRecM(either.a, f)
-                        is Either.Right -> ({ either.b }).k()
-                    }
-                }
+                f(a).ev().invoke().fold({ tailRecM(it, f) }, { ({ it }).k() })
     }
 }
