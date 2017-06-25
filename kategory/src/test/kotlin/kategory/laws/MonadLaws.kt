@@ -12,7 +12,7 @@ object MonadLaws {
                     Law("Monad Laws: kleisli left identity", { kleisliLeftIdentity(M, EQ) }),
                     Law("Monad Laws: kleisli right identity", { kleisliRightIdentity(M, EQ) }),
                     Law("Monad Laws: map / flatMap coherence", { mapFlatMapCoherence(M, EQ) }),
-                    Law("Monad / JVM: stack safe", { stackSafety(500, M) })
+                    Law("Monad / JVM: stack safe", { stackSafety(5000, M) })
             )
 
     inline fun <reified F> leftIdentity(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
