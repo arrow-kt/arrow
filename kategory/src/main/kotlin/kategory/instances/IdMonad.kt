@@ -6,6 +6,9 @@ interface IdMonad : Monad<Id.F> {
     override fun <A, B> flatMap(fa: IdKind<A>, f: (A) -> IdKind<B>): Id<B> =
             fa.ev().flatMap { f(it).ev() }
 
+    override fun <A, B> map(fa: HK<Id.F, A>, f: (A) -> B): Id<B> =
+            fa.ev().map(f)
+
     @Suppress("UNCHECKED_CAST")
     tailrec override fun <A, B> tailRecM(a: A, f: (A) -> IdKind<Either<A, B>>): Id<B> {
         val x = f(a).ev().value
