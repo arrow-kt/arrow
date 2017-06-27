@@ -10,7 +10,7 @@ import org.junit.runner.RunWith
 class EitherTTest : UnitSpec() {
     init {
 
-        testLaws(MonadLaws.laws(EitherTMonad<Id.F, Int>()))
+        testLaws(MonadLaws.laws(EitherTMonad<Id.F, Int>(), Eq()))
 
         "map should modify value" {
             forAll { a: String ->

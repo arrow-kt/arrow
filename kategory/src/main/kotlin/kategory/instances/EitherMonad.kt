@@ -1,6 +1,6 @@
 package kategory
 
-class EitherMonad<L> : Monad<EitherF<L>> {
+open class EitherMonad<L> : Monad<EitherF<L>> {
 
     override fun <A> pure(a: A): Either<L, A> = Either.Right(a)
 
@@ -20,4 +20,18 @@ class EitherMonad<L> : Monad<EitherF<L>> {
             }
         }
     }
+}
+
+class EitherMonadError<L> : EitherMonad<L>(), MonadError<EitherF<L>, L> {
+
+    override fun <A> raiseError(e: L): Either<L, A> = Either.Left(e)
+
+    override fun <A> handleErrorWith(fa: HK<EitherF<L>, A>, f: (L) -> HK<EitherF<L>, A>): Either<L, A> {
+        val fea = fa.ev()
+        return when (fea) {
+            is Either.Left -> f(fea.a).ev()
+            is Either.Right -> fea
+        }
+    }
+
 }
