@@ -7,8 +7,13 @@ inline fun <reified F, A> genApplicative(valueGen: Gen<A>, AP: Applicative<F> = 
 }
 
 fun <A, B> genFunctionAToB(genB: Gen<B>): Gen<(A) -> B> = object : Gen<(A) -> B> {
-    override fun generate(): (A) -> B  {
+    override fun generate(): (A) -> B {
         val v = genB.generate()
         return { a -> v }
     }
+}
+
+fun genThrowable(): Gen<Throwable> = object : Gen<Throwable> {
+    override fun generate(): Throwable =
+            Gen.oneOf(listOf(RuntimeException(), NoSuchElementException(), IllegalArgumentException())).generate()
 }
