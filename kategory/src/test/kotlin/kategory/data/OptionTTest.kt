@@ -9,7 +9,7 @@ import org.junit.runner.RunWith
 class OptionTTest : UnitSpec() {
     init {
 
-        testLaws(MonadLaws.laws(OptionTMonad(NonEmptyList)))
+        testLaws(MonadLaws.laws(OptionTMonad(NonEmptyList), Eq()))
 
         "map should modify value" {
             forAll { a: String ->

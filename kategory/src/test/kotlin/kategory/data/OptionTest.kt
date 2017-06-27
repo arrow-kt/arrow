@@ -4,8 +4,8 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.forAll
-import kategory.Option.Some
 import kategory.Option.None
+import kategory.Option.Some
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -13,7 +13,7 @@ class OptionTest: UnitSpec() {
 
     init {
 
-        testLaws(MonadLaws.laws(Option))
+        testLaws(MonadLaws.laws(Option, Eq()))
 
         "map should modify value" {
             Some(12).map { "flower" } shouldBe Some("flower")

@@ -1,7 +1,6 @@
 package kategory
 
 interface OptionMonad : Monad<Option.F> {
-
     override fun <A, B> map(fa: OptionKind<A>, f: (A) -> B): Option<B> =
             fa.ev().map(f)
 

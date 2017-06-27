@@ -11,7 +11,7 @@ import org.junit.runner.RunWith
 class EitherTest : UnitSpec() {
     init {
 
-        testLaws(MonadLaws.laws(EitherMonad<Int>()))
+        testLaws(MonadLaws.laws(EitherMonad<Int>(), Eq()))
 
         "map should modify value" {
             forAll { a: Int, b: String ->

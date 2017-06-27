@@ -26,8 +26,8 @@ class FreeTest : UnitSpec() {
 
     val program = Ops.binding {
         val added = !Ops.add(10, 10)
-        val substracted = !Ops.subtract(added, 50)
-        yields(substracted)
+        val subtracted = !Ops.subtract(added, 50)
+        yields(subtracted)
     }.ev()
 
     fun stackSafeTestProgram(n: Int, stopAt: Int): Free<Ops.F, Int> = Ops.binding {
@@ -38,7 +38,10 @@ class FreeTest : UnitSpec() {
 
     init {
 
-        testLaws(MonadLaws.laws(Ops))
+        testLaws(MonadLaws.laws(Ops, object : Eq<HK<FreeF<Ops.F>, Int>> {
+            override fun eqv(a: HK<FreeF<Ops.F>, Int>, b: HK<FreeF<Ops.F>, Int>): Boolean =
+                    a.ev().foldMap(idInterpreter, Id) == b.ev().foldMap(idInterpreter, Id)
+        }))
 
         "Can interpret an ADT as Free operations" {
             program.foldMap(optionInterpreter, Option).ev() shouldBe Option.Some(-30)

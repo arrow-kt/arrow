@@ -8,7 +8,7 @@ import org.junit.runner.RunWith
 class IdTest : UnitSpec() {
     init {
 
-        testLaws(MonadLaws.laws(Id))
+        testLaws(MonadLaws.laws(Id, Eq()))
 
         "IdMonad.binding should for comprehend over all values of multiple Ids" {
             Id.binding {
