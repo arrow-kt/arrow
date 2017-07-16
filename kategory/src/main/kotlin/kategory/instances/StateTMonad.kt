@@ -26,9 +26,9 @@ data class StateTMonad<F, S>(val MF: Monad<F>) : Monad<StateTF<F, S>>, Typeclass
 
     override fun <A, B> tailRecM(a: A, f: (A) -> HK<StateTF<F, S>, Either<A, B>>): StateT<F, S, B> =
             StateT(MF, MF.pure({ s: S ->
-                MF.tailRecM<Tuple2<S, A>, Tuple2<S, B>>(Tuple2(s, a), { (s, a) ->
-                    MF.map(f(a).ev().run(s)) { (s, ab) ->
-                        ab.bimap({ a -> Tuple2(s, a) }, { b -> Tuple2(s, b) })
+                MF.tailRecM(Tuple2(s, a), { (s, a0) ->
+                    MF.map(f(a0).ev().run(s)) { (s, ab) ->
+                        ab.bimap({ a1 -> Tuple2(s, a1) }, { b -> Tuple2(s, b) })
                     }
                 })
             }))

@@ -1,9 +1,9 @@
 package kategory
 
 import kategory.effects.internal.AndThen
-import kategory.effects.internal.error
 import kategory.effects.internal.Platform.onceOnly
 import kategory.effects.internal.Platform.unsafeResync
+import kategory.effects.internal.error
 
 typealias IOKind<A> = HK<IO.F, A>
 
