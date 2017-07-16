@@ -204,6 +204,18 @@ class IOTest : UnitSpec() {
             run shouldBe expected
         }
 
+        "should combine with Semigroup" {
+            val one = IO.pure(1)
+            val two = IO.pure(2)
+
+            IOSemigroup<Int>().combine(one, two).unsafeRunSync() shouldBe 3
+        }
+
+        "should have an empty value with Monoid" {
+
+            IOMonoid<Int>().empty().unsafeRunSync() shouldBe 0
+        }
+
         "IO.binding should for comprehend over IO" {
             val result = IO.binding {
                 val x = IO.pure(1).bind()
