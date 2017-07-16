@@ -4,7 +4,8 @@ import io.kotlintest.properties.Gen
 
 inline fun <reified F, A> genApplicative(valueGen: Gen<A>, AP: Applicative<F> = applicative<F>()): Gen<HK<F, A>> =
         object : Gen<HK<F, A>> {
-            override fun generate(): HK<F, A> = AP.pure(valueGen.generate())
+            override fun generate(): HK<F, A> =
+                    AP.pure(valueGen.generate())
         }
 
 fun <A, B> genFunctionAToB(genB: Gen<B>): Gen<(A) -> B> =
@@ -22,7 +23,8 @@ fun genThrowable(): Gen<Throwable> = object : Gen<Throwable> {
 
 inline fun <F, A> genConstructor(valueGen: Gen<A>, crossinline cf: (A) -> HK<F, A>): Gen<HK<F, A>> =
         object : Gen<HK<F, A>> {
-            override fun generate(): HK<F, A> = cf(valueGen.generate())
+            override fun generate(): HK<F, A> =
+                    cf(valueGen.generate())
         }
 
 fun genIntSmall(): Gen<Int> =
@@ -32,10 +34,11 @@ fun genIntPredicate(): Gen<(Int) -> Boolean> =
         Gen.int().let { gen ->
             /* If you ever see two 0s in a row please contact the maintainers for a pat in the back */
             val num = gen.generate().let { if (it == 0) gen.generate() else it }
+            val absNum = Math.abs(num)
             Gen.oneOf(listOf<(Int) -> Boolean>(
                     { it > num },
                     { it <= num },
-                    { it % num == 0 },
-                    { it % num == num - 1 })
+                    { it % absNum == 0 },
+                    { it % absNum == absNum - 1 })
             )
         }
