@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 The Katz Authors
+ * Copyright (C) 2017 The Kategory Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,7 @@ buildscript {
         // Constants
         gradleVersion = '3.5'
         gradleVersionsPluginVersion = '0.15.0'
-        javaVersion = '1.7'
-        katzVersion = '0.1-SNAPSHOT'
+        javaVersion = JavaVersion.VERSION_1_7
         kotlinTestVersion = '2.0.3'
         kotlinVersion = '1.1.4-dev-600'
         kotlinxCollectionsImmutableVersion = '0.1'
@@ -37,10 +36,15 @@ buildscript {
     dependencies {
         classpath "com.github.ben-manes:gradle-versions-plugin:$gradleVersionsPluginVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
     }
 }
 
-allprojects {
+subprojects { project ->
+
+    group = GROUP
+    version = VERSION_NAME
+
     repositories {
         jcenter()
         maven { url 'https://kotlin.bintray.com/kotlinx' }
@@ -48,12 +52,9 @@ allprojects {
     }
 
     apply plugin: 'kotlin'
-    apply plugin: 'maven'
     apply plugin: 'jacoco'
 
-    group = 'com.github.finecinnamon'
     archivesBaseName = project.name
-    version = katzVersion
 
     jacoco {
         toolVersion '0.7.8'
@@ -68,13 +69,24 @@ allprojects {
         }
 
         classDirectories = fileTree(
-                dir: 'build/classes/main/katz',
+                dir: 'build/classes/main/kategory',
         )
 
         sourceDirectories = files('src/main/kotlin')
         executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
     }
 
+    apply plugin: 'com.jfrog.bintray'
+    bintray {
+        user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+        key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+        configurations = ['archives']
+        pkg {
+            repo = 'maven'
+            name = POM_ARTIFACT_ID
+            userOrg = POM_DEVELOPER_ID
+        }
+    }
 }
 
 task wrapper(type: Wrapper) {
