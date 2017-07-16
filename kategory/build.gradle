@@ -1,0 +1,20 @@
+test {
+    testLogging {
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+    }
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
+    compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
+
+    testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
+}
+
+build.dependsOn ':detekt'
+
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
