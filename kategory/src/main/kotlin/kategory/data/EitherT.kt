@@ -78,3 +78,51 @@ data class EitherT<F, A, B>(val MF: Monad<F>, val value: HK<F, Either<A, B>>) : 
         return GA.map(fa, { EitherT(MF, MF.map(it.lower(), { it.ev() })) })
     }
 }
+
+class EitherTInstances<F, L>(val MF : Monad<F>) : EitherTMonadError<F, L> {
+    override fun MF(): Monad<F> = MF
+}
+
+interface EitherTMonad<F, L> : Monad<EitherTF<F, L>> {
+
+    fun MF() : Monad<F>
+
+    override fun <A> pure(a: A): EitherT<F, L, A> =
+            EitherT(MF(), MF().pure(Either.Right(a)))
+
+    override fun <A, B> map(fa: EitherTKind<F, L, A>, f: (A) -> B): EitherT<F, L, B> =
+            fa.ev().map { f(it) }
+
+    override fun <A, B> flatMap(fa: EitherTKind<F, L, A>, f: (A) -> EitherTKind<F, L, B>): EitherT<F, L, B> =
+            fa.ev().flatMap { f(it).ev() }
+
+    override fun <A, B> tailRecM(a: A, f: (A) -> HK<EitherTF<F, L>, Either<A, B>>): EitherT<F, L, B> =
+            EitherT(MF(), MF().tailRecM(a, {
+                MF().map(f(it).ev().value) { recursionControl ->
+                    when (recursionControl) {
+                        is Either.Left<L> -> Either.Right(Either.Left(recursionControl.a))
+                        is Either.Right<Either<A, B>> ->
+                            when (recursionControl.b) {
+                                is Either.Left<A> -> Either.Left(recursionControl.b.a)
+                                is Either.Right<B> -> Either.Right(Either.Right(recursionControl.b.b))
+                            }
+                    }
+                }
+            }))
+
+}
+
+interface EitherTMonadError<F, E> : EitherTMonad<F, E>, MonadError<EitherTF<F, E>, E> {
+
+    override fun <A> handleErrorWith(fa: EitherTKind<F, E, A>, f: (E) -> EitherTKind<F, E, A>): EitherT<F, E, A> =
+            EitherT(MF(), MF().flatMap(fa.ev().value, {
+                when (it) {
+                    is Either.Left -> f(it.a).ev().value
+                    is Either.Right -> MF().pure(it)
+                }
+            }))
+
+    override fun <A> raiseError(e: E): EitherT<F, E, A> =
+            EitherT(MF(), MF().pure(Either.Left(e)))
+
+}

@@ -65,42 +65,6 @@ class InstanceParametrizedType(val raw: Type, val typeArgs: List<Type>) : Parame
                 hashCode(rawType)
     }
 
-    override fun toString(): String {
-        val sb = StringBuilder()
-
-        if (ownerType != null) {
-            if (ownerType is Class<*>)
-                sb.append((ownerType as Class<*>).name)
-            else
-                sb.append(ownerType.toString())
-
-            sb.append(".")
-
-            if (ownerType is ParameterizedType) {
-                // Find simple name of nested type by removing the
-                // shared prefix with owner.
-                sb.append(rawType.typeName.replace((ownerType as ParameterizedType).rawType.typeName + "$",
-                        ""))
-            } else
-                sb.append(rawType.typeName)
-        } else
-            sb.append(rawType.typeName)
-
-        if (actualTypeArguments.isNotEmpty()) {
-            sb.append("<")
-            var first = true
-            for (t in actualTypeArguments) {
-                if (!first)
-                    sb.append(", ")
-                sb.append(t.typeName)
-                first = false
-            }
-            sb.append(">")
-        }
-
-        return sb.toString()
-    }
-
     fun hashCode(o: Any?): Int {
         return o?.hashCode() ?: 0
     }
