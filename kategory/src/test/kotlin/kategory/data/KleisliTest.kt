@@ -7,6 +7,15 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class KleisliTest : UnitSpec() {
     init {
+
+        val instances = KleisliInstances<Try.F, Int, Throwable>(Try)
+
+        testLaws(MonadErrorLaws.laws(instances, object : Eq<KleisliTKind<Try.F, Int, Int>> {
+            override fun eqv(a: KleisliTKind<Try.F, Int, Int>, b: KleisliTKind<Try.F, Int, Int>): Boolean =
+                a.ev().run(1) == b.ev().run(1)
+
+        }))
+
         "andThen should continue sequence" {
             val kleisli: Kleisli<Id.F, Int, Int> = Kleisli({ a: Int -> Id(a) })
 
