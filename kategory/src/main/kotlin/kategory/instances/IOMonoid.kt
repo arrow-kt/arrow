@@ -1,4 +1,4 @@
-package katz
+package kategory
 
 class IOMonoid<A>(val SM: Monoid<A>, val SG: Semigroup<HK<IO.F, A>> = IOSemigroup(SM)) : Monoid<HK<IO.F, A>>, Semigroup<HK<IO.F, A>> by SG {
 

@@ -1,4 +1,4 @@
-package katz
+package kategory
 
 interface IOMonad : Monad<IO.F> {
     override fun <A, B> map(fa: HK<IO.F, A>, f: (A) -> B): IO<B> =

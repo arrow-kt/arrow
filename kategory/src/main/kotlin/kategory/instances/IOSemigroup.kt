@@ -1,4 +1,4 @@
-package katz
+package kategory
 
 class IOSemigroup<A>(val SM: Semigroup<A>) : Semigroup<HK<IO.F, A>> {
     override fun combine(ioa: HK<IO.F, A>, iob: HK<IO.F, A>): IO<A> =

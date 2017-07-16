@@ -1,9 +1,9 @@
-package katz.effects.internal
+package kategory.effects.internal
 
-import katz.Duration
-import katz.Either
-import katz.IO
-import katz.Option
+import kategory.Duration
+import kategory.Either
+import kategory.IO
+import kategory.Option
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
 

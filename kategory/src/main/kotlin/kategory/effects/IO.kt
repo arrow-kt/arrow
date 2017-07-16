@@ -1,9 +1,9 @@
-package katz
+package kategory
 
-import katz.effects.internal.AndThen
-import katz.effects.internal.Platform.onceOnly
-import katz.effects.internal.Platform.unsafeResync
-import katz.effects.internal.error
+import kategory.effects.internal.AndThen
+import kategory.effects.internal.error
+import kategory.effects.internal.Platform.onceOnly
+import kategory.effects.internal.Platform.unsafeResync
 
 typealias IOKind<A> = HK<IO.F, A>
 

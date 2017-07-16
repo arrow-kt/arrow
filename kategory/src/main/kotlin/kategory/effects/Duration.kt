@@ -1,4 +1,4 @@
-package katz
+package kategory
 
 import java.util.concurrent.TimeUnit
 
