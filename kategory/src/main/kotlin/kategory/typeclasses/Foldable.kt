@@ -12,7 +12,7 @@ import kategory.Eval.Companion.always
  *
  * Beyond these it provides many other useful methods related to folding over F<A> values.
  */
-interface Foldable<F> : Typeclass {
+interface Foldable<in F> : Typeclass {
 
     /**
      * Left associative fold on F using the provided function.
@@ -37,7 +37,8 @@ interface Foldable<F> : Typeclass {
      *
      * Note: will not terminate for infinite-sized collections.
      */
-    fun <A> size(ml: Monoid<Long>, fa: HK<F, A>): Long = foldMap(ml, fa)({ _ -> 1L })
+    fun <A> size(ml: Monoid<Long>, fa: HK<F, A>): Long =
+            foldMap(ml, fa, { _ -> 1L })
 
     /**
      * Fold implemented using the given Monoid<A> instance.
@@ -53,8 +54,8 @@ interface Foldable<F> : Typeclass {
     /**
      * Fold implemented by mapping A values into B and then combining them using the given Monoid<B> instance.
      */
-    fun <A, B> foldMap(mb: Monoid<B>, fa: HK<F, A>): (f: (A) -> B) -> B =
-            { f: (A) -> B -> foldL(fa, mb.empty(), { b, a -> mb.combine(b, f(a)) }) }
+    fun <A, B> foldMap(mb: Monoid<B>, fa: HK<F, A>, f: (A) -> B): B =
+            foldL(fa, mb.empty(), { b, a -> mb.combine(b, f(a)) })
 
     /**
      * Left associative monadic folding on F.
@@ -63,18 +64,16 @@ interface Foldable<F> : Typeclass {
      * Certain structures are able to implement this in such a way that folds can be short-circuited (not traverse the
      * entirety of the structure), depending on the G result produced at a given step.
      */
-    fun <G, A, B> foldM(MG: Monad<G>, fa: HK<F, A>, z: B, f: (B, A) -> HK<G, B>): HK<G, B> {
-        return foldL(fa, MG.pure(z), { gb, a -> MG.flatMap(gb) { f(it, a) } })
-    }
+    fun <G, A, B> foldM(MG: Monad<G>, fa: HK<F, A>, z: B, f: (B, A) -> HK<G, B>): HK<G, B> =
+            foldL(fa, MG.pure(z), { gb, a -> MG.flatMap(gb) { f(it, a) } })
 
     /**
      * Monadic folding on F by mapping A values to G<B>, combining the B values using the given Monoid<B> instance.
      *
      * Similar to foldM, but using a Monoid<B>.
      */
-    fun <G, A, B> foldMapM(MG: Monad<G>, bb: Monoid<B>, fa: HK<F, A>, f: (A) -> HK<G, B>) : HK<G, B> {
-        return foldM(MG, fa, bb.empty(), { b, a -> MG.map(f(a)) { bb.combine(b, it) } })
-    }
+    fun <G, A, B> foldMapM(MG: Monad<G>, bb: Monoid<B>, fa: HK<F, A>, f: (A) -> HK<G, B>) : HK<G, B> =
+            foldM(MG, fa, bb.empty(), { b, a -> MG.map(f(a)) { bb.combine(b, it) } })
 
     /**
      * Traverse F<A> using Applicative<G>.
@@ -96,27 +95,37 @@ interface Foldable<F> : Typeclass {
             traverse_(ag, fga, { it })
 
     /**
+     * Find the first element matching the predicate, if one exists.
+     */
+    fun <A> find(fa: HK<F, A>, f: (A) -> Boolean): Option<A> =
+            foldR(fa, Eval.now<Option<A>>(Option.None), { a, lb ->
+                if (f(a)) Eval.now(Option.Some(a)) else lb
+            }).value()
+
+    /**
      * Check whether at least one element satisfies the predicate.
      *
      * If there are no elements, the result is false.
      */
-    fun <A> exists(fa: HK<F, A>): (p: (A) -> Boolean) -> Boolean =
-            { p: (A) -> Boolean -> foldR(fa, Eval.False, { a, lb -> if (p(a)) Eval.True else lb }).value() }
+    fun <A> exists(fa: HK<F, A>, p: (A) -> Boolean): Boolean =
+            foldR(fa, Eval.False, { a, lb -> if (p(a)) Eval.True else lb }).value()
 
     /**
      * Check whether all elements satisfy the predicate.
      *
      * If there are no elements, the result is true.
      */
-    fun <A> forall(fa: HK<F, A>): (p: (A) -> Boolean) -> Boolean =
-            { p: (A) -> Boolean -> foldR(fa, Eval.True, { a, lb -> if (p(a)) lb else Eval.False }).value() }
+    fun <A> forall(fa: HK<F, A>, p: (A) -> Boolean): Boolean =
+            foldR(fa, Eval.True, { a, lb -> if (p(a)) lb else Eval.False }).value()
 
     /**
      * Returns true if there are no elements. Otherwise false.
      */
-    fun <A> isEmpty(fa: HK<F, A>): Boolean = foldR(fa, Eval.True, { _, _ -> Eval.False }).value()
+    fun <A> isEmpty(fa: HK<F, A>): Boolean =
+            foldR(fa, Eval.True, { _, _ -> Eval.False }).value()
 
-    fun <A> nonEmpty(fa: HK<F, A>): Boolean = !isEmpty(fa)
+    fun <A> nonEmpty(fa: HK<F, A>): Boolean =
+            !isEmpty(fa)
 
     companion object {
         fun <A, B> iterateRight(it: Iterator<A>, lb: Eval<B>): (f: (A, Eval<B>) -> Eval<B>) -> Eval<B> = {
