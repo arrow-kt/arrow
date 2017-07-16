@@ -8,7 +8,7 @@ object FunctorLaws {
     inline fun <reified F> laws(AP: Applicative<F> = applicative<F>(), EQ: Eq<HK<F, Int>>): List<Law> =
             listOf(
                     Law("Functor Laws: Covariant Identity", { covariantIdentity(AP, EQ) }),
-                    Law("Functor: Covariant Composition", { covariantComposition(AP, EQ) })
+                    Law("Functor Laws: Covariant Composition", { covariantComposition(AP, EQ) })
             )
 
     inline fun <reified F> covariantIdentity(AP: Applicative<F> = applicative<F>(), EQ: Eq<HK<F, Int>> = Eq.any()): Unit =
