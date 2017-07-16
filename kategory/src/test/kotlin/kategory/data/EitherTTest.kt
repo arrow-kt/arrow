@@ -10,7 +10,7 @@ import org.junit.runner.RunWith
 class EitherTTest : UnitSpec() {
     init {
 
-        testLaws(MonadLaws.laws(EitherTMonad<Id.F, Int>(), Eq()))
+        testLaws(MonadLaws.laws(EitherTMonad<Id.F, Int>(), Eq.any()))
 
         "map should modify value" {
             forAll { a: String ->
@@ -182,7 +182,7 @@ class EitherTTest : UnitSpec() {
             forAll(Gen.oneOf(listOf(10000))) { limit: Int ->
                 val value: EitherT<Id.F, Int, Int> = EitherTMonad<Id.F, Int>(Id).tailRecM(0) { current ->
                     if (current == limit)
-                        EitherT.left<Id.F, Int, Either<Int, Int>>(current)
+                        EitherT.left(current)
                     else
                         EitherT.pure<Id.F, Int, Either<Int, Int>>(Either.Left(current + 1))
                 }

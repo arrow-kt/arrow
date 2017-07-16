@@ -7,11 +7,14 @@ interface Eq<in F> : Typeclass {
             !eqv(a, b)
 
     companion object {
-        operator fun <F> invoke() = object : Eq<F> {
-            override fun eqv(a: F, b: F): Boolean =
+        fun any(): Eq<Any?> =
+                EqAny()
+
+        private class EqAny : Eq<Any?> {
+            override fun eqv(a: Any?, b: Any?): Boolean =
                     a == b
 
-            override fun neqv(a: F, b: F): Boolean =
+            override fun neqv(a: Any?, b: Any?): Boolean =
                     a != b
         }
     }

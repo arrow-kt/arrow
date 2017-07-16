@@ -24,24 +24,21 @@ fun <A> HK<Ops.F, A>.ev(): Ops<A> = this as Ops<A>
 @RunWith(KTestJUnitRunner::class)
 class FreeTest : UnitSpec() {
 
-    val program = Ops.binding {
+    private val program = Ops.binding {
         val added = !Ops.add(10, 10)
         val subtracted = !Ops.subtract(added, 50)
         yields(subtracted)
     }.ev()
 
-    fun stackSafeTestProgram(n: Int, stopAt: Int): Free<Ops.F, Int> = Ops.binding {
+    private fun stackSafeTestProgram(n: Int, stopAt: Int): Free<Ops.F, Int> = Ops.binding {
         val v = !Ops.add(n, 1)
-        val r = !if (v < stopAt) stackSafeTestProgram(v, stopAt) else Free.pure<Ops.F, Int>(v)
+        val r = !if (v < stopAt) stackSafeTestProgram(v, stopAt) else Free.pure(v)
         yields(r)
     }.ev()
 
     init {
 
-        testLaws(MonadLaws.laws(Ops, object : Eq<HK<FreeF<Ops.F>, Int>> {
-            override fun eqv(a: HK<FreeF<Ops.F>, Int>, b: HK<FreeF<Ops.F>, Int>): Boolean =
-                    a.ev().foldMap(idInterpreter, Id) == b.ev().foldMap(idInterpreter, Id)
-        }))
+        testLaws(MonadLaws.laws(Ops, FreeEq(idInterpreter)))
 
         "Can interpret an ADT as Free operations" {
             program.foldMap(optionInterpreter, Option).ev() shouldBe Option.Some(-30)

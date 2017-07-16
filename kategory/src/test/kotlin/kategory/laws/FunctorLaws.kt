@@ -11,12 +11,12 @@ object FunctorLaws {
                     Law("Functor: Covariant Composition", { covariantComposition(AP, EQ) })
             )
 
-    inline fun <reified F> covariantIdentity(AP: Applicative<F> = applicative<F>(), EQ: Eq<HK<F, Int>> = Eq()): Unit =
+    inline fun <reified F> covariantIdentity(AP: Applicative<F> = applicative<F>(), EQ: Eq<HK<F, Int>> = Eq.any()): Unit =
             forAll(genApplicative(Gen.int(), AP), { fa: HK<F, Int> ->
                 AP.map(fa, ::identity).equalUnderTheLaw(fa, EQ)
             })
 
-    inline fun <reified F> covariantComposition(AP: Applicative<F> = applicative<F>(), EQ: Eq<HK<F, Int>> = Eq()): Unit =
+    inline fun <reified F> covariantComposition(AP: Applicative<F> = applicative<F>(), EQ: Eq<HK<F, Int>> = Eq.any()): Unit =
             forAll(
                     genApplicative(Gen.int(), AP),
                     genFunctionAToB<Int, Int>(Gen.int()),
