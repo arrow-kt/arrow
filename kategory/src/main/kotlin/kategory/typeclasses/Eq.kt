@@ -7,7 +7,8 @@ interface Eq<in F> : Typeclass {
             !eqv(a, b)
 
     companion object {
-        fun any(): Eq<Any?> = EqAny()
+        fun any(): Eq<Any?> =
+                EqAny()
 
         private class EqAny : Eq<Any?> {
             override fun eqv(a: Any?, b: Any?): Boolean =
