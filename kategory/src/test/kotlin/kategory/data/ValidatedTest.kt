@@ -16,7 +16,7 @@ class ValidatedTest : UnitSpec() {
             override fun combine(a: String, b: String): String = "$a $b"
         }
 
-        testLaws(ApplicativeLaws.laws(ValidatedApplicativeError(concatStringSG), Eq()))
+        testLaws(ApplicativeLaws.laws(ValidatedApplicativeError(concatStringSG), Eq.any()))
 
         "fold should call function on Invalid" {
             val exception = Exception("My Exception")

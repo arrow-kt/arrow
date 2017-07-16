@@ -9,7 +9,7 @@ import org.junit.runner.RunWith
 class NonEmptyListTest : UnitSpec() {
     init {
 
-        testLaws(MonadLaws.laws(NonEmptyList, Eq()))
+        testLaws(MonadLaws.laws(NonEmptyList, Eq.any()))
 
         "map should modify values" {
             NonEmptyList.of(14).map { it * 3 } shouldBe NonEmptyList.of(42)
