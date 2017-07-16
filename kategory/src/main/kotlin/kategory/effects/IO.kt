@@ -86,9 +86,9 @@ sealed class IO<out A> : HK<IO.F, A> {
         val unit: IO<Unit> =
                 just(Unit)
 
-        fun <A> eval(eval: Eval<A>) =
+        fun <A> eval(eval: Eval<A>): IO<A> =
                 when (eval) {
-                    is Eval.Now -> pure { eval.value }
+                    is Eval.Now -> pure(eval.value)
                     else -> invoke { eval.value() }
                 }
     }
