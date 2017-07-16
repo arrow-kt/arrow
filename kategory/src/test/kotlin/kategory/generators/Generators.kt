@@ -32,7 +32,7 @@ fun genIntSmall(): Gen<Int> =
 
 fun genIntPredicate(): Gen<(Int) -> Boolean> =
         Gen.int().let { gen ->
-            /* If you ever see two 0s in a row please contact the maintainers for a pat in the back */
+            /* If you ever see two zeros in a row please contact the maintainers for a pat in the back */
             val num = gen.generate().let { if (it == 0) gen.generate() else it }
             val absNum = Math.abs(num)
             Gen.oneOf(listOf<(Int) -> Boolean>(
