@@ -1,9 +1,6 @@
 package kategory
 
 class IorMonad<L>(val SL: Semigroup<L>) : Monad<HK<Ior.F, L>> {
-    override fun <A, B> map(fa: HK<HK<Ior.F, L>, A>, f: (A) -> B): HK<HK<Ior.F, L>, B> =
-            fa.ev().map(f)
-
     override fun <A, B> flatMap(fa: IorKind<L, A>, f: (A) -> IorKind<L, B>): Ior<L, B> =
             fa.ev().flatMap(SL, { f(it).ev() })
 

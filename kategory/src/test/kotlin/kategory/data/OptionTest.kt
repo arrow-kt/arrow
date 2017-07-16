@@ -104,6 +104,12 @@ class OptionTest: UnitSpec() {
             result shouldBe Option(5)
         }
 
+        "OptionTraverse.sequence should sequence info" {
+            val sequence = OptionTraverse.sequence(Option(Either.Right(0)), EitherMonad<Int>()).ev()
+            val expected = Either.Right(Option(0))
+
+            sequence shouldBe expected
+        }
     }
 
 }
