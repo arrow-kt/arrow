@@ -13,6 +13,16 @@ interface ApplicativeError<F, E> : Applicative<F>, Typeclass {
             handleErrorWith(map(fa) { Either.Right(it) }) {
                 pure(Either.Left(it))
             }
+
+    fun <A> fromEither(fab: Either<E, A>): HK<F, A> =
+            fab.fold({ raiseError<A>(it) }, { pure(it) })
+
+    fun <A> catch(f: () -> A, recover: (Throwable) -> E): HK<F, A> =
+            try {
+                pure(f())
+            } catch (t: Throwable) {
+                raiseError<A>(recover(t))
+            }
 }
 
 fun <F, A> ApplicativeError<F, Throwable>.catch(f: () -> A): HK<F, A> =
@@ -24,4 +34,4 @@ fun <F, A> ApplicativeError<F, Throwable>.catch(f: () -> A): HK<F, A> =
         }
 
 inline fun <reified F, reified E> applicativeError(): ApplicativeError<F, E> =
-        instance(InstanceParametrizedType(Monad::class.java, listOf(F::class.java, E::class.java)))
+        instance(InstanceParametrizedType(ApplicativeError::class.java, listOf(F::class.java, E::class.java)))
