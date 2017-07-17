@@ -35,5 +35,11 @@ data class Function0<out A>(internal val f: () -> A) : HK<Function0.F, A> {
 
                     loop(a)
                 }
+
+        fun bimonad(): Bimonad<Function0.F> = this
+
+        fun monad(): Monad<Function0.F> = this
+
+        fun comonad(): Comonad<Function0.F> = this
     }
 }
