@@ -33,15 +33,23 @@ data class Coproduct<F, G, A>(val CF: Comonad<F>, val CG: Comonad<G>, val run: E
             run.fold({ FF.foldR(it, lb, f) }, { FG.foldR(it, lb, f) })
 
     fun <H, B> traverse(f: (A) -> HK<H, B>, GA: Applicative<H>, FT: Traverse<F>, GT: Traverse<G>): HK<H, Coproduct<F, G, B>> =
-        run.fold({
-            GA.map(FT.traverse(it, f, GA), { Coproduct(CF, CG, Either.Left(it)) })
-        }, {
-            GA.map(GT.traverse(it, f, GA), { Coproduct(CF, CG, Either.Right(it)) })
-        })
+            run.fold({
+                GA.map(FT.traverse(it, f, GA), { Coproduct(CF, CG, Either.Left(it)) })
+            }, {
+                GA.map(GT.traverse(it, f, GA), { Coproduct(CF, CG, Either.Right(it)) })
+            })
 
     companion object {
         inline operator fun <reified F, reified G, A> invoke(run: Either<HK<F, A>, HK<G, A>>, CF: Comonad<F> = comonad<F>(), CG: Comonad<G> = comonad<G>()): Coproduct<F, G, A> =
                 Coproduct(CF, CG, run)
+
+        fun <F, G> comonad(): CoproductComonad<F, G> = object : CoproductComonad<F, G> {}
+
+        fun <F, G> traverse(FF: Traverse<F>, FG: Traverse<G>): CoproductTraverse<F, G> = object : CoproductTraverse<F, G> {
+            override fun FF(): Traverse<F> = FF
+
+            override fun FG(): Traverse<G> = FG
+        }
     }
 
 }
