@@ -22,6 +22,18 @@ sealed class Option<out A> : OptionKind<A> {
         operator fun <A> invoke(a: A): Option<A> =
                 Option.Some(a)
 
+        fun functor(): Functor<Option.F> = this
+
+        fun applicative(): Applicative<Option.F> = this
+
+        fun monad(): Monad<Option.F> = this
+
+        fun monadError(): MonadError<Option.F, Unit> = this
+
+        fun foldable(): Foldable<Option.F> = this
+
+        fun traverse(): Traverse<Option.F> = this
+
         fun <A> monoid(SG: Semigroup<A>): OptionMonoid<A> = object : OptionMonoid<A> {
             override fun SG(): Semigroup<A> = SG
         }
