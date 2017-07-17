@@ -37,3 +37,9 @@ object FloatMonoid : Monoid<Float>, Semigroup<Float> by SGFloat, GlobalInstance<
 }
 
 private val SGFloat: Semigroup<Float> = NumberSemigroup(Float::plus)
+
+inline fun <reified A> ListMonoid(): Monoid<List<A>> = object : Monoid<List<A>>, GlobalInstance<Monoid<List<A>>>() {
+    override fun empty(): List<A> = emptyList()
+
+    override fun combine(a: List<A>, b: List<A>): List<A> = a + b
+}
