@@ -47,7 +47,7 @@ sealed class IO<out A> : HK<IO.F, A> {
 
     abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
 
-    companion object : IOMonad, GlobalInstance<Monad<IO.F>>() {
+    companion object : IOInstances, GlobalInstance<Monad<IO.F>>() {
         internal fun <A, B> mapDefault(t: IO<A>, f: (A) -> B): IO<B> =
                 t.flatMap(f.andThen { Pure(it) })
 
@@ -57,7 +57,7 @@ sealed class IO<out A> : HK<IO.F, A> {
         operator fun <A> invoke(f: (Unit) -> A): IO<A> =
                 suspend { Pure(f(Unit)) }
 
-        fun <A> just(a: A): IO<A> =
+        override fun <A> pure(a: A): IO<A> =
                 Pure(a)
 
         fun <A> suspend(f: (Unit) -> IO<A>): IO<A> =
@@ -84,13 +84,27 @@ sealed class IO<out A> : HK<IO.F, A> {
                 }
 
         val unit: IO<Unit> =
-                just(Unit)
+                pure(Unit)
 
         fun <A> eval(eval: Eval<A>): IO<A> =
                 when (eval) {
                     is Eval.Now -> pure(eval.value)
                     else -> invoke { eval.value() }
                 }
+
+        fun functor(): Functor<IO.F> = this
+
+        fun applicative(): Applicative<IO.F> = this
+
+        fun monad(): Monad<IO.F> = this
+
+        fun <A> semigroup(SG: Semigroup<A>): IOSemigroup<A> = object : IOSemigroup<A> {
+            override fun SG(): Semigroup<A> = SG
+        }
+
+        fun <A> monoid(SM: Monoid<A>): IOMonoid<A> = object : IOMonoid<A> {
+            override fun SM(): Monoid<A> = SM
+        }
     }
 }
 
