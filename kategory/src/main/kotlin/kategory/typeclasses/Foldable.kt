@@ -124,8 +124,8 @@ interface Foldable<in F> : Typeclass {
  *
  * Similar to foldM, but using a Monoid<B>.
  */
-inline fun <F, reified G, A, B> Foldable<F>.foldMapM(MG: Monad<G>, bb: Monoid<B>, fa: HK<F, A>, noinline f: (A) -> HK<G, B>): HK<G, B> =
-        foldM(MG, fa, bb.empty(), { b, a -> MG.map(f(a)) { bb.combine(b, it) } })
+inline fun <F, reified G, A, reified B> Foldable<F>.foldMapM(fa: HK<F, A>, noinline f: (A) -> HK<G, B>, MG: Monad<G> = monad(), bb: Monoid<B> = monoid()): HK<G, B> =
+        foldM(fa, bb.empty(), { b, a -> MG.map(f(a)) { bb.combine(b, it) } }, MG)
 
 /**
  * Left associative monadic folding on F.
@@ -134,7 +134,7 @@ inline fun <F, reified G, A, B> Foldable<F>.foldMapM(MG: Monad<G>, bb: Monoid<B>
  * Certain structures are able to implement this in such a way that folds can be short-circuited (not traverse the
  * entirety of the structure), depending on the G result produced at a given step.
  */
-inline fun <F, reified G, A, B> Foldable<F>.foldM(MG: Monad<G> = monad(), fa: HK<F, A>, z: B, crossinline f: (B, A) -> HK<G, B>): HK<G, B> =
+inline fun <F, reified G, A, B> Foldable<F>.foldM(fa: HK<F, A>, z: B, crossinline f: (B, A) -> HK<G, B>, MG: Monad<G> = monad()): HK<G, B> =
         foldL(fa, MG.pure(z), { gb, a -> MG.flatMap(gb) { f(it, a) } })
 
 inline fun <reified F> foldable(): Foldable<F> =
