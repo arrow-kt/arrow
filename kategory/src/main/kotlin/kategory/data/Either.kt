@@ -144,6 +144,10 @@ sealed class Either<out A, out B> : EitherKind<A, B> {
 
         fun <L> monad(): EitherInstances<L> = instances()
 
+        fun <L> foldable(): EitherInstances<L> = instances()
+
+        fun <L> traverse(): EitherInstances<L> = instances()
+
         fun <L> monadError(): EitherInstances<L> = instances()
 
     }
