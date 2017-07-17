@@ -21,6 +21,18 @@ data class WriterT<F, W, A>(val MF: Monad<F>, val value: HK<F, Tuple2<W, A>>) : 
 
         inline operator fun <reified F, W, A> invoke(value: HK<F, Tuple2<W, A>>, MF: Monad<F> = monad()) =
                 WriterT(MF, value)
+
+        fun <F, W> instances(MM: Monad<F>, SG: Monoid<W>): WriterTInstances<F, W> = object : WriterTInstances<F, W> {
+            override fun MM(): Monad<F> = MM
+
+            override fun SG(): Monoid<W> = SG
+        }
+
+        fun <F, W> functor(MM: Monad<F>, SG: Monoid<W>): Functor<WriterF<F, W>> = instances(MM, SG)
+
+        fun <F, W> applicative(MM: Monad<F>, SG: Monoid<W>): Applicative<WriterF<F, W>> = instances(MM, SG)
+
+        fun <F, W> monad(MM: Monad<F>, SG: Monoid<W>): Monad<WriterF<F, W>> = instances(MM, SG)
     }
 
     fun tell(w: W, SG: Semigroup<W>): WriterT<F, W, A> =

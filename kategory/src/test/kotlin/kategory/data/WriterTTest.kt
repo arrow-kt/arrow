@@ -9,7 +9,7 @@ import org.junit.runner.RunWith
 class WriterTTest : UnitSpec() {
     init {
 
-        testLaws(MonadLaws.laws(WriterTMonad(NonEmptyList, IntMonoid), Eq.any()))
+        testLaws(MonadLaws.laws(WriterT.monad(NonEmptyList, IntMonoid), Eq.any()))
 
         "tell should accumulate write" {
             forAll { a: Int ->
@@ -129,15 +129,15 @@ class WriterTTest : UnitSpec() {
             forAll { a: Int ->
                 val x = { b: Int -> WriterT.pure<Id.F, Int, Int>(b * a) }
                 val option = WriterT.pure<Id.F, Int, Int>(a)
-                option.flatMap(x, IntMonoid) == WriterTMonad(Id, IntMonoid).flatMap(option, x)
+                option.flatMap(x, IntMonoid) == WriterT.monad(Id, IntMonoid).flatMap(option, x)
             }
         }
 
         "WriterTMonad#tailRecM should execute and terminate without blowing up the stack" {
             forAll { a: Int ->
-                val value: WriterT<Id.F, Int, Int> = WriterTMonad(Id, IntMonoid).tailRecM(a) { b ->
+                val value: WriterT<Id.F, Int, Int> = WriterT.monad(Id, IntMonoid).tailRecM(a) { b ->
                     WriterT.pure<Id.F, Int, Either<Int, Int>>(Either.Right(b * a))
-                }
+                }.ev()
                 val expected = WriterT.pure<Id.F, Int, Int>(a * a)
 
                 expected == value
@@ -145,7 +145,7 @@ class WriterTTest : UnitSpec() {
         }
 
         "WriterTMonad#binding should for comprehend over option" {
-            val M = WriterTMonad(NonEmptyList, IntMonoid)
+            val M = WriterT.monad(NonEmptyList, IntMonoid)
             val result = M.binding {
                 val x = !M.pure(1)
                 val y = M.pure(1).bind()
@@ -156,13 +156,13 @@ class WriterTTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over option" {
-            WriterTMonad(NonEmptyList, IntMonoid).map(WriterT.pure(1), WriterT.pure("a"), WriterT.pure(true), { (a, b, c) ->
+            WriterT.monad(NonEmptyList, IntMonoid).map(WriterT.pure(1), WriterT.pure("a"), WriterT.pure(true), { (a, b, c) ->
                 "$a $b $c"
             }) shouldBe WriterT.pure<NonEmptyList.F, Int, String>("1 a true")
         }
 
         "Cartesian builder works inside for comprehensions" {
-            val M = WriterTMonad(NonEmptyList, IntMonoid)
+            val M = WriterT.monad(NonEmptyList, IntMonoid)
             val result = M.binding {
                 val (x, y, z) = !M.tupled(M.pure(1), M.pure(1), M.pure(1))
                 val a = M.pure(1).bind()
