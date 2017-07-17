@@ -58,24 +58,6 @@ interface Foldable<in F> : Typeclass {
             foldL(fa, mb.empty(), { b, a -> mb.combine(b, f(a)) })
 
     /**
-     * Left associative monadic folding on F.
-     *
-     * The default implementation of this is based on foldL, and thus will always fold across the entire structure.
-     * Certain structures are able to implement this in such a way that folds can be short-circuited (not traverse the
-     * entirety of the structure), depending on the G result produced at a given step.
-     */
-    fun <G, A, B> foldM(MG: Monad<G>, fa: HK<F, A>, z: B, f: (B, A) -> HK<G, B>): HK<G, B> =
-            foldL(fa, MG.pure(z), { gb, a -> MG.flatMap(gb) { f(it, a) } })
-
-    /**
-     * Monadic folding on F by mapping A values to G<B>, combining the B values using the given Monoid<B> instance.
-     *
-     * Similar to foldM, but using a Monoid<B>.
-     */
-    fun <G, A, B> foldMapM(MG: Monad<G>, bb: Monoid<B>, fa: HK<F, A>, f: (A) -> HK<G, B>) : HK<G, B> =
-            foldM(MG, fa, bb.empty(), { b, a -> MG.map(f(a)) { bb.combine(b, it) } })
-
-    /**
      * Traverse F<A> using Applicative<G>.
      *
      * A typed values will be mapped into G<B> by function f and combined using Applicative#map2.
@@ -84,7 +66,7 @@ interface Foldable<in F> : Typeclass {
      * not otherwise needed.
      */
     fun <G, A, B> traverse_(ag: Applicative<G>, fa: HK<F, A>, f: (A) -> HK<G, B>): HK<G, Unit> =
-        foldR(fa, always { ag.pure(Unit) }, { a, acc -> ag.map2Eval(f(a), acc) { Unit } }).value()
+            foldR(fa, always { ag.pure(Unit) }, { a, acc -> ag.map2Eval(f(a), acc) { Unit } }).value()
 
     /**
      * Sequence F<G<A>> using Applicative<G>.
@@ -136,6 +118,24 @@ interface Foldable<in F> : Typeclass {
         }
     }
 }
+
+/**
+ * Monadic folding on F by mapping A values to G<B>, combining the B values using the given Monoid<B> instance.
+ *
+ * Similar to foldM, but using a Monoid<B>.
+ */
+inline fun <F, reified G, A, B> Foldable<F>.foldMapM(MG: Monad<G>, bb: Monoid<B>, fa: HK<F, A>, noinline f: (A) -> HK<G, B>): HK<G, B> =
+        foldM(MG, fa, bb.empty(), { b, a -> MG.map(f(a)) { bb.combine(b, it) } })
+
+/**
+ * Left associative monadic folding on F.
+ *
+ * The default implementation of this is based on foldL, and thus will always fold across the entire structure.
+ * Certain structures are able to implement this in such a way that folds can be short-circuited (not traverse the
+ * entirety of the structure), depending on the G result produced at a given step.
+ */
+inline fun <F, reified G, A, B> Foldable<F>.foldM(MG: Monad<G> = monad(), fa: HK<F, A>, z: B, crossinline f: (B, A) -> HK<G, B>): HK<G, B> =
+        foldL(fa, MG.pure(z), { gb, a -> MG.flatMap(gb) { f(it, a) } })
 
 inline fun <reified F> foldable(): Foldable<F> =
         instance(InstanceParametrizedType(Foldable::class.java, listOf(F::class.java)))
