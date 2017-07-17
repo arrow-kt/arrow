@@ -64,9 +64,17 @@ class NonEmptyList<out A> private constructor(
         return "NonEmptyList(all=$all)"
     }
 
-    companion object : NonEmptyListBimonad, GlobalInstance<Bimonad<NonEmptyList.F>>() {
+    companion object : NonEmptyListInstances, GlobalInstance<Bimonad<NonEmptyList.F>>() {
         @JvmStatic fun <A> of(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
         @JvmStatic fun <A> fromList(l: List<A>): Option<NonEmptyList<A>> = if (l.isEmpty()) Option.None else Option.Some(NonEmptyList(l))
         @JvmStatic fun <A> fromListUnsafe(l: List<A>): NonEmptyList<A> = NonEmptyList(l)
+
+        fun functor(): Functor<NonEmptyList.F> = this
+
+        fun applicative(): Applicative<NonEmptyList.F> = this
+
+        fun monad(): Monad<NonEmptyList.F> = this
+
+        fun <A> semigroup(): Semigroup<NonEmptyList<A>> = object : NonEmptyListSemigroup<A> {}
     }
 }

@@ -1,6 +1,12 @@
 package kategory
 
-interface NonEmptyListMonad : Monad<NonEmptyList.F> {
+interface NonEmptyListInstances :
+        Functor<NonEmptyList.F>,
+        Applicative<NonEmptyList.F>,
+        Monad<NonEmptyList.F>,
+        Comonad<NonEmptyList.F>,
+        Bimonad<NonEmptyList.F> {
+
     override fun <A> pure(a: A): NonEmptyList<A> = NonEmptyList.of(a)
 
     override fun <A, B> flatMap(fa: NonEmptyListKind<A>, f: (A) -> NonEmptyListKind<B>): NonEmptyList<B> =
@@ -28,4 +34,25 @@ interface NonEmptyListMonad : Monad<NonEmptyList.F> {
         go(buf, f, f(a).ev())
         return NonEmptyList.fromListUnsafe(buf)
     }
+
+    override fun <A, B> coflatMap(fa: NonEmptyListKind<A>, f: (NonEmptyListKind<A>) -> B): NonEmptyListKind<B> {
+        val buf = mutableListOf<B>()
+        tailrec fun consume(list: List<A>): List<B> =
+                if (list.isEmpty()) {
+                    buf
+                } else {
+                    val tail = list.subList(1, list.size)
+                    buf += f(NonEmptyList(list[0], tail))
+                    consume(tail)
+                }
+        return NonEmptyList(f(fa), consume(fa.ev().tail))
+    }
+
+    override fun <A> extract(fa: NonEmptyListKind<A>): A =
+            fa.ev().head
+
+}
+
+interface NonEmptyListSemigroup<A> : Semigroup<NonEmptyList<A>> {
+    override fun combine(a: NonEmptyList<A>, b: NonEmptyList<A>): NonEmptyList<A> = a + b
 }

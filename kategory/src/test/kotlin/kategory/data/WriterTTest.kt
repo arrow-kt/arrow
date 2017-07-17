@@ -14,7 +14,7 @@ class WriterTTest : UnitSpec() {
         "tell should accumulate write" {
             forAll { a: Int ->
                 val right = WriterT(Id(NonEmptyList.of(a) toT a))
-                val mapped = right.tell(NonEmptyList.of(a), NonEmptyListSemigroup<Int>()).value.ev()
+                val mapped = right.tell(NonEmptyList.of(a), NonEmptyList.semigroup<Int>()).value.ev()
                 val expected = WriterT(Id(NonEmptyList.of(a, a) toT a)).value.ev()
 
                 expected == mapped
@@ -44,7 +44,7 @@ class WriterTTest : UnitSpec() {
         "reset should return write to its initial value" {
             forAll { a: Int ->
                 val right = WriterT(Id(Option(NonEmptyList.of(a)) toT a))
-                val mapped = right.reset(Option.monoid(NonEmptyListSemigroup<Int>())).value.ev()
+                val mapped = right.reset(Option.monoid(NonEmptyList.semigroup<Int>())).value.ev()
                 val expected: Id<Tuple2<Option<Int>, Int>> = WriterT(Id(Option.None toT a)).value.ev()
 
                 expected == mapped
@@ -97,7 +97,7 @@ class WriterTTest : UnitSpec() {
         "flatMap should combine the writer and map the left side of the tuple" {
             forAll { a: Int ->
                 val right = WriterT(NonEmptyList.of(NonEmptyList.of(a) toT a))
-                val mapped = right.flatMap({ WriterT(NonEmptyList.of(NonEmptyList.of(a) toT it + 1)) }, NonEmptyListSemigroup<Int>()).value.ev()
+                val mapped = right.flatMap({ WriterT(NonEmptyList.of(NonEmptyList.of(a) toT it + 1)) }, NonEmptyList.semigroup<Int>()).value.ev()
                 val expected = WriterT.both<NonEmptyList.F, NonEmptyList<Int>, Int>(NonEmptyList.of(a, a), a + 1).value.ev()
 
                 mapped == expected
@@ -107,7 +107,7 @@ class WriterTTest : UnitSpec() {
         "semiFlatMap should combine the writer and map the left side of the tuple" {
             forAll { num: Int ->
                 val right: WriterT<Id.F, NonEmptyList<Int>, Int> = WriterT(Id(NonEmptyList.of(num) toT num))
-                val calculated = right.semiflatMap({ Id(it > 0) }, NonEmptyListSemigroup<Int>()).value.ev()
+                val calculated = right.semiflatMap({ Id(it > 0) }, NonEmptyList.semigroup<Int>()).value.ev()
                 val expected = WriterT(Id(NonEmptyList.of(num, num) toT (num > 0))).value.ev()
 
                 calculated == expected
