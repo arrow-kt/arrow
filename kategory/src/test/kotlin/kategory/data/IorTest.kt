@@ -11,7 +11,7 @@ class IorTest : UnitSpec() {
 
     init {
 
-        val intIorMonad = IorMonad(IntMonoid)
+        val intIorMonad = Ior.monad(IntMonoid)
 
         testLaws(MonadLaws.laws(intIorMonad, Eq.any()))
 
