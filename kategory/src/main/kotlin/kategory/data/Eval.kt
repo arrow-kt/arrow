@@ -194,7 +194,7 @@ sealed class Eval<out A> : HK<Eval.F, A> {
         }
     }
 
-    companion object : EvalMonad, GlobalInstance<Monad<Eval.F>>() {
+    companion object : EvalInstances, GlobalInstance<Monad<Eval.F>>() {
         @JvmStatic fun <A> now(a: A) = Now(a)
         @JvmStatic fun <A> later(f: () -> A) = Later(f)
         @JvmStatic fun <A> always(f: () -> A) = Always(f)

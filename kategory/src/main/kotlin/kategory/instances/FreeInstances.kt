@@ -1,6 +1,10 @@
 package kategory
 
-interface FreeMonad<S> : Monad<FreeF<S>>, Typeclass {
+interface FreeInstances<S> :
+        Functor<FreeF<S>>,
+        Applicative<FreeF<S>>,
+        Monad<FreeF<S>> {
+
     override fun <A> pure(a: A): Free<S, A> =
             Free.pure(a)
 

@@ -16,6 +16,12 @@ sealed class Free<out S, out A> : FreeKind<S, A> {
 
         fun <S, A> liftF(fa: HK<S, A>): Free<S, A> =
                 Suspend(fa)
+
+        fun <S> functor(): FreeInstances<S> = object : FreeInstances<S> {}
+
+        fun <S> applicative(): FreeInstances<S> = object : FreeInstances<S> {}
+
+        fun <S> monad(): FreeInstances<S> = object : FreeInstances<S> {}
     }
 
     abstract fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B>

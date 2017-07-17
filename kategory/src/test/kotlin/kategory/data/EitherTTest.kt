@@ -196,8 +196,8 @@ class EitherTTest : UnitSpec() {
             val eitherT = EitherT(Id(Either.Right(1)))
             val content: Id<Either<Nothing, Int>> = eitherT.value.ev()
 
-            val expected = IdTraverse.foldL(content, 1, { a, _ -> a + 1 })
-            val result = eitherT.foldL(1, { a, _ -> a + 1 }, IdTraverse)
+            val expected = Id.foldL(content, 1, { a, _ -> a + 1 })
+            val result = eitherT.foldL(1, { a, _ -> a + 1 }, Id)
 
             expected shouldBe result
         }
@@ -206,8 +206,8 @@ class EitherTTest : UnitSpec() {
             val eitherT = EitherT(Id(Either.Right(1)))
             val content: Id<Either<Nothing, Int>> = eitherT.value.ev()
 
-            val expected = IdTraverse.foldR(content, Eval.now(1), { _, b-> Eval.now(b.value() + 1) })
-            val result = eitherT.foldR(Eval.now(1), { a, b -> Eval.now(a + 1) }, IdTraverse)
+            val expected = Id.foldR(content, Eval.now(1), { _, b-> Eval.now(b.value() + 1) })
+            val result = eitherT.foldR(Eval.now(1), { a, b -> Eval.now(a + 1) }, Id)
 
             expected shouldBe result
         }
@@ -218,7 +218,7 @@ class EitherTTest : UnitSpec() {
 
 
             val f: (Int) -> Option<Int> = { Option.Some(it + 1) }
-            val traverse = eitherT.traverse(f, Option, IdTraverse, Id).ev()
+            val traverse = eitherT.traverse(f, Option, Id, Id).ev()
             val result = traverse.map { it.ev().value.value() }
 
             val expected = EitherTraverse<String>().traverse(either, f, Option)

@@ -1,6 +1,11 @@
 package kategory
 
-data class StateTMonad<F, S>(val MF: Monad<F>) : Monad<StateTF<F, S>>, Typeclass {
+interface StateTInstances<F, S> :
+        Functor<StateTF<F, S>>,
+        Applicative<StateTF<F, S>>,
+        Monad<StateTF<F, S>> {
+    
+    fun MF(): Monad<F>
 
     override fun <A, B> flatMap(fa: HK<StateTF<F, S>, A>, f: (A) -> HK<StateTF<F, S>, B>): StateT<F, S, B> =
             fa.ev().flatMap(f)
@@ -9,7 +14,7 @@ data class StateTMonad<F, S>(val MF: Monad<F>) : Monad<StateTF<F, S>>, Typeclass
             fa.ev().map(f)
 
     override fun <A> pure(a: A): StateT<F, S, A> =
-            StateT(MF, MF.pure({ s: S -> MF.pure(Tuple2(s, a)) }))
+            StateT(MF(), MF().pure({ s: S -> MF().pure(Tuple2(s, a)) }))
 
     override fun <A, B> ap(fa: HK<StateTF<F, S>, A>, ff: HK<StateTF<F, S>, (A) -> B>): StateT<F, S, B> =
             ff.ev().map2(fa.ev()) { f, a -> f(a) }
@@ -25,9 +30,9 @@ data class StateTMonad<F, S>(val MF: Monad<F>) : Monad<StateTF<F, S>>, Typeclass
             fa.ev().product(fb.ev())
 
     override fun <A, B> tailRecM(a: A, f: (A) -> HK<StateTF<F, S>, Either<A, B>>): StateT<F, S, B> =
-            StateT(MF, MF.pure({ s: S ->
-                MF.tailRecM(Tuple2(s, a), { (s, a0) ->
-                    MF.map(f(a0).ev().run(s)) { (s, ab) ->
+            StateT(MF(), MF().pure({ s: S ->
+                MF().tailRecM(Tuple2(s, a), { (s, a0) ->
+                    MF().map(f(a0).ev().run(s)) { (s, ab) ->
                         ab.bimap({ a1 -> Tuple2(s, a1) }, { b -> Tuple2(s, b) })
                     }
                 })

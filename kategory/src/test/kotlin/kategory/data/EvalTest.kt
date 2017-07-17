@@ -8,7 +8,10 @@ import org.junit.runner.RunWith
 class EvalTest : UnitSpec() {
     init {
 
-        testLaws(MonadLaws.laws(Eval, EvalEq()))
+        testLaws(MonadLaws.laws(Eval, object : Eq<HK<Eval.F, Int>> {
+            override fun eqv(a: HK<Eval.F, Int>, b: HK<Eval.F, Int>): Boolean =
+                    a.ev().value() == b.ev().value()
+        }))
 
         "should map wrapped value" {
             val sideEffect = SideEffect()
