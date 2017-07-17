@@ -142,7 +142,7 @@ class CofreeTest : UnitSpec() {
             val offset = 0
             val limit = 10
             val loops = SideEffect()
-            val program = CofreeComonad<Option.F>().cobinding {
+            val program = Cofree.comonad<Option.F>().cobinding {
                 val program = unfold(offset, {
                     loops.increment()
                     if (it == limit) None else Some(it + 1)

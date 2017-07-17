@@ -1,6 +1,6 @@
 package kategory
 
-class CofreeComonad<S> : Comonad<CofreeF<S>>, Typeclass {
+interface CofreeInstances<S> : Comonad<CofreeF<S>>, Typeclass {
     override fun <A, B> coflatMap(fa: CofreeKind<S, A>, f: (CofreeKind<S, A>) -> B): Cofree<S, B> =
             fa.ev().coflatMap(f)
 
