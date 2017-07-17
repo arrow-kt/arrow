@@ -4,7 +4,7 @@ interface StateTInstances<F, S> :
         Functor<StateTF<F, S>>,
         Applicative<StateTF<F, S>>,
         Monad<StateTF<F, S>> {
-    
+
     fun MF(): Monad<F>
 
     override fun <A, B> flatMap(fa: HK<StateTF<F, S>, A>, f: (A) -> HK<StateTF<F, S>, B>): StateT<F, S, B> =

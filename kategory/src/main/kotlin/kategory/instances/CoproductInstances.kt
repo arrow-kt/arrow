@@ -22,9 +22,9 @@ interface CoproductComonad<F, G> : Comonad<CoproductFG<F, G>> {
 interface CoproductTraverse<F, G> : Traverse<CoproductFG<F, G>> {
 
     fun FF(): Traverse<F>
-    
+
     fun FG(): Traverse<G>
-    
+
     override fun <H, A, B> traverse(fa: HK<CoproductFG<F, G>, A>, f: (A) -> HK<H, B>, GA: Applicative<H>): HK<H, HK<CoproductFG<F, G>, B>> =
             fa.ev().traverse(f, GA, FF(), FG())
 
