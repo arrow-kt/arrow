@@ -31,3 +31,9 @@ object ShortMonoid : Monoid<Short>, Semigroup<Short> by SGShort, GlobalInstance<
 }
 
 private val SGShort: Semigroup<Short> = NumberSemigroup({ one, two -> (one + two).toShort() })
+
+object FloatMonoid : Monoid<Float>, Semigroup<Float> by SGFloat, GlobalInstance<Monoid<Float>>() {
+    override fun empty(): Float = .0f
+}
+
+private val SGFloat: Semigroup<Float> = NumberSemigroup(Float::plus)
