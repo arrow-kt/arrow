@@ -15,12 +15,16 @@ sealed class Option<out A> : OptionKind<A> {
 
     class F private constructor()
 
-    companion object : OptionMonad, GlobalInstance<Monad<Option.F>>() {
+    companion object : OptionInstances, GlobalInstance<Monad<Option.F>>() {
         @JvmStatic fun <A : Any> fromNullable(a: A?): Option<A> =
                 if (a != null) Option.Some(a) else Option.None
 
         operator fun <A> invoke(a: A): Option<A> =
                 Option.Some(a)
+
+        fun <A> monoid(SG: Semigroup<A>): OptionMonoid<A> = object : OptionMonoid<A> {
+            override fun SG(): Semigroup<A> = SG
+        }
     }
 
     /**
@@ -128,3 +132,12 @@ sealed class Option<out A> : OptionKind<A> {
  * @param default the default expression.
  */
 fun <B> Option<B>.getOrElse(default: () -> B): B = fold({ default() }, { it })
+
+/**
+ * Returns this option's if the option is nonempty, otherwise
+ * returns another option provided lazily by `default`.
+ *
+ * @param default the default option if this is empty.
+ */
+fun <A, B : A> Option<B>.orElse(alternative: () -> Option<B>): Option<B> =
+    if (isEmpty) alternative() else this

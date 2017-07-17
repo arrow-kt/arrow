@@ -44,7 +44,7 @@ class WriterTTest : UnitSpec() {
         "reset should return write to its initial value" {
             forAll { a: Int ->
                 val right = WriterT(Id(Option(NonEmptyList.of(a)) toT a))
-                val mapped = right.reset(OptionMonoid(NonEmptyListSemigroup<Int>())).value.ev()
+                val mapped = right.reset(Option.monoid(NonEmptyListSemigroup<Int>())).value.ev()
                 val expected: Id<Tuple2<Option<Int>, Int>> = WriterT(Id(Option.None toT a)).value.ev()
 
                 expected == mapped

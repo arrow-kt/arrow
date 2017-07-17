@@ -99,7 +99,7 @@ class CofreeTest : UnitSpec() {
         "cata should traverse the structure" {
             val cata: NonEmptyList<Int> = startHundred.cata<Option.F, Int, NonEmptyList<Int>>(
                     { i, lb -> Eval.now(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) },
-                    OptionTraverse
+                    Option
             ).value()
 
             val expected = NonEmptyList.fromListUnsafe((0..100).toList())
@@ -113,7 +113,7 @@ class CofreeTest : UnitSpec() {
             try {
                 startTwoThousand.cata<Option.F, Int, NonEmptyList<Int>>(
                         { i, lb -> Eval.now(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) },
-                        OptionTraverse
+                        Option
                 ).value()
                 throw AssertionError("Run should overflow on a stack-unsafe monad")
             } catch (e: StackOverflowError) {
@@ -130,9 +130,9 @@ class CofreeTest : UnitSpec() {
                 override fun <A> invoke(fa: HK<Eval.F, A>): HK<EvailOptionF, A> =
                         OptionT(fa.ev().map { Some(it) })
             }
-            val cataHundred = startTwoThousand.cataM(folder, inclusion, OptionTraverse, OptionTMonad()).ev().value.ev().value()
+            val cataHundred = startTwoThousand.cataM(folder, inclusion, Option, OptionTMonad()).ev().value.ev().value()
             val newCof = Cofree(Option, 2001, Eval.now(Some(startTwoThousand)))
-            val cataHundredOne = newCof.cataM(folder, inclusion, OptionTraverse, OptionTMonad()).ev().value.ev().value()
+            val cataHundredOne = newCof.cataM(folder, inclusion, Option, OptionTMonad()).ev().value.ev().value()
 
             cataHundred shouldBe Some(NonEmptyList.fromListUnsafe((0..2000).toList()))
             cataHundredOne shouldBe None
