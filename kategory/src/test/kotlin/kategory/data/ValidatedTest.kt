@@ -16,7 +16,7 @@ class ValidatedTest : UnitSpec() {
             override fun combine(a: String, b: String): String = "$a $b"
         }
 
-        testLaws(ApplicativeLaws.laws(ValidatedApplicativeError(concatStringSG), Eq.any()))
+        testLaws(ApplicativeLaws.laws(Validated.applicative(concatStringSG), Eq.any()))
 
         "fold should call function on Invalid" {
             val exception = Exception("My Exception")
@@ -161,7 +161,7 @@ class ValidatedTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over homogeneous Validated" {
-            ValidatedApplicativeError(concatStringSG).map(
+            Validated.applicative(concatStringSG).map(
                     Valid("11th"),
                     Valid("Doctor"),
                     Valid("Who"),
@@ -169,7 +169,7 @@ class ValidatedTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over heterogeneous Validated" {
-            ValidatedApplicativeError(concatStringSG).map(
+            Validated.applicative(concatStringSG).map(
                     Valid(13),
                     Valid("Doctor"),
                     Valid(false),
@@ -177,7 +177,7 @@ class ValidatedTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over Invalid Validated" {
-            ValidatedApplicativeError(concatStringSG).map(
+            Validated.applicative(concatStringSG).map(
                     Invalid("fail1"),
                     Invalid("fail2"),
                     Valid("Who"),

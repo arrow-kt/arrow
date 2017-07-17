@@ -39,6 +39,19 @@ sealed class Validated<out E, out A> : ValidatedKind<E, A> {
                         { Invalid(ifNone()) },
                         { Valid(it) }
                 )
+
+        fun <E> instances(SE: Semigroup<E>): ValidatedInstances<E> = object : ValidatedInstances<E> {
+            override fun SE(): Semigroup<E> = SE
+
+        }
+
+        fun <E> functor(SE: Semigroup<E>): Functor<ValidatedF<E>> = instances(SE)
+
+        fun <E> applicative(SE: Semigroup<E>): Applicative<ValidatedF<E>> = instances(SE)
+
+        fun <E> foldable(SE: Semigroup<E>): Foldable<ValidatedF<E>> = instances(SE)
+
+        fun <E> traverse(SE: Semigroup<E>): Traverse<ValidatedF<E>> = instances(SE)
     }
 
     data class Valid<out A>(val a: A) : Validated<Nothing, A>()
