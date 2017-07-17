@@ -24,6 +24,9 @@ data class CoYoneda<FU, P, A>(val function: (P) -> A, val pivot: HK<FU, P>) : Co
     companion object {
         inline fun <reified U, A, B> apply(fa: HK<U, A>, noinline f: (A) -> B): CoYoneda<U, A, B> =
                 CoYoneda(f, fa)
+
+        fun <U, P> functor(): Functor<CoYonedaF<U, P>> = object : CoYonedaInstances<U, P> {}
+
     }
 
 }
