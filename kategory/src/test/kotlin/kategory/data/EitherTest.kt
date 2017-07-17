@@ -11,7 +11,7 @@ import org.junit.runner.RunWith
 class EitherTest : UnitSpec() {
     init {
 
-        testLaws(MonadErrorLaws.laws(EitherMonadError(), Eq.any()))
+        testLaws(MonadErrorLaws.laws(Either.monadError(), Eq.any()))
 
         "map should modify value" {
             forAll { a: Int, b: String ->
@@ -95,7 +95,7 @@ class EitherTest : UnitSpec() {
 
         "Either.monad.flatMap should be consistent with Either#flatMap" {
             forAll { a: Int ->
-                val M = EitherMonad<Int>()
+                val M = Either.monad<Int>()
                 val x = { b: Int -> Either.Right(b * a) }
                 val option = Either.Right(a)
                 option.flatMap(x) == M.flatMap(option, x)
@@ -103,7 +103,7 @@ class EitherTest : UnitSpec() {
         }
 
         "Either.monad.binding should for comprehend over right either" {
-            val result = EitherMonad<Int>().binding {
+            val result = Either.monad<Int>().binding {
                 val x = !Either.Right(1)
                 val y = Either.Right(1).bind()
                 val z = bind { Either.Right(1) }

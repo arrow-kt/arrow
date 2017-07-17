@@ -133,6 +133,20 @@ sealed class Either<out A, out B> : EitherKind<A, B> {
         override val isLeft = false
         override val isRight = true
     }
+
+    companion object {
+
+        fun <L> instances(): EitherInstances<L> = object : EitherInstances<L> {}
+
+        fun <L> functor(): EitherInstances<L> = instances()
+
+        fun <L> applicative(): EitherInstances<L> = instances()
+
+        fun <L> monad(): EitherInstances<L> = instances()
+
+        fun <L> monadError(): EitherInstances<L> = instances()
+
+    }
 }
 
 /**

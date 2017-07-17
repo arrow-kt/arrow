@@ -74,7 +74,7 @@ data class EitherT<F, A, B>(val MF: Monad<F>, val value: HK<F, Either<A, B>>) : 
             FF.compose(EitherTraverse<A>()).foldRC(value, lb, f)
 
     fun <G, C> traverse(f: (B) -> HK<G, C>, GA: Applicative<G>, FF: Traverse<F>, MF: Monad<F>): HK<G, HK<EitherTF<F, A>, C>> {
-        val fa = ComposedTraverse(FF, EitherTraverse<A>(), EitherMonad<A>()).traverseC(value, f, GA)
+        val fa = ComposedTraverse(FF, EitherTraverse<A>(), Either.monad<A>()).traverseC(value, f, GA)
         return GA.map(fa, { EitherT(MF, MF.map(it.lower(), { it.ev() })) })
     }
 }
