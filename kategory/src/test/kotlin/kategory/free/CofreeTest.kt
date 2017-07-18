@@ -126,13 +126,13 @@ class CofreeTest : UnitSpec() {
                 i, lb ->
                 if (i <= 2000) OptionT.pure(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) else OptionT.none()
             }
-            val inclusion = object : FunctionK<Eval.F, EvailOptionF> {
-                override fun <A> invoke(fa: HK<Eval.F, A>): HK<EvailOptionF, A> =
+            val inclusion = object : FunctionK<Eval.F, EvalOptionF> {
+                override fun <A> invoke(fa: HK<Eval.F, A>): HK<EvalOptionF, A> =
                         OptionT(fa.ev().map { Some(it) })
             }
-            val cataHundred = startTwoThousand.cataM(folder, inclusion, Option, OptionTMonad()).ev().value.ev().value()
+            val cataHundred = startTwoThousand.cataM(folder, inclusion, Option, OptionT.monad(Eval)).ev().value.ev().value()
             val newCof = Cofree(Option, 2001, Eval.now(Some(startTwoThousand)))
-            val cataHundredOne = newCof.cataM(folder, inclusion, Option, OptionTMonad()).ev().value.ev().value()
+            val cataHundredOne = newCof.cataM(folder, inclusion, Option, OptionT.monad(Eval)).ev().value.ev().value()
 
             cataHundred shouldBe Some(NonEmptyList.fromListUnsafe((0..2000).toList()))
             cataHundredOne shouldBe None
@@ -159,4 +159,4 @@ class CofreeTest : UnitSpec() {
 
 typealias EvalOption<A> = OptionTKind<Eval.F, A>
 
-typealias EvailOptionF = OptionTF<Eval.F>
+typealias EvalOptionF = OptionTF<Eval.F>

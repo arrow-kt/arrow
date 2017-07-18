@@ -29,6 +29,25 @@ data class OptionT<F, A>(val MF: Monad<F>, val value: HK<F, Option<A>>) : Option
 
         @JvmStatic inline fun <reified F, A> fromOption(value: Option<A>, MF: Monad<F> = monad<F>()): OptionT<F, A> =
                 OptionT(MF, MF.pure(value))
+
+
+        fun <F> instances(MF : Monad<F>): OptionTInstances<F> = object : OptionTInstances<F> {
+            override fun MF(): Monad<F> = MF
+        }
+
+        fun <F> functor(MF : Monad<F>): Functor<OptionTF<F>> = instances(MF)
+
+        fun <F> applicative(MF : Monad<F>): Applicative<OptionTF<F>> = instances(MF)
+
+        fun <F> monad(MF : Monad<F>): Monad<OptionTF<F>> = instances(MF)
+
+        fun <F> traverse(FF: Traverse<F>, MF: Monad<F>): Traverse<OptionTF<F>> = object : OptionTTraverse<F> {
+            override fun FF(): Traverse<F> = FF
+
+            override fun MF(): Monad<F> = MF
+        }
+
+        fun <F, A> foldable(FF: Traverse<F>, MF: Monad<F>): Foldable<OptionTF<F>> = traverse(FF, MF)
     }
 
     inline fun <B> fold(crossinline default: () -> B, crossinline f: (A) -> B): HK<F, B> =
