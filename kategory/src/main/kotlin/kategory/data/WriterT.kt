@@ -10,29 +10,29 @@ data class WriterT<F, W, A>(val MF: Monad<F>, val value: HK<F, Tuple2<W, A>>) : 
     class F private constructor()
 
     companion object {
-        inline fun <reified F, reified W, A> pure(a: A, MM: Monoid<W> = monoid(), MF: Monad<F> = monad()) =
+        inline fun <reified F, reified W, A> pure(a: A, MM: Monoid<W> = monoid(), MF: Monad<F> = kategory.monad()) =
                 WriterT(MF.pure(MM.empty() toT a), MF)
 
-        inline fun <reified F, W, A> both(w: W, a: A, MF: Monad<F> = monad()) =
+        inline fun <reified F, W, A> both(w: W, a: A, MF: Monad<F> = kategory.monad()) =
                 WriterT(MF.pure(w toT a), MF)
 
-        inline fun <reified F, W, A> fromTuple(z: Tuple2<W, A>, MF: Monad<F> = monad()) =
+        inline fun <reified F, W, A> fromTuple(z: Tuple2<W, A>, MF: Monad<F> = kategory.monad()) =
                 WriterT(MF.pure(z), MF)
 
-        inline operator fun <reified F, W, A> invoke(value: HK<F, Tuple2<W, A>>, MF: Monad<F> = monad()) =
+        inline operator fun <reified F, W, A> invoke(value: HK<F, Tuple2<W, A>>, MF: Monad<F> = kategory.monad()) =
                 WriterT(MF, value)
 
-        fun <F, W> instances(MM: Monad<F>, SG: Monoid<W>): WriterTInstances<F, W> = object : WriterTInstances<F, W> {
+        inline fun <reified F, reified W> instances(MM: Monad<F> = kategory.monad<F>(), SG: Monoid<W> = kategory.monoid<W>()): WriterTInstances<F, W> = object : WriterTInstances<F, W> {
             override fun MM(): Monad<F> = MM
 
             override fun SG(): Monoid<W> = SG
         }
 
-        fun <F, W> functor(MM: Monad<F>, SG: Monoid<W>): Functor<WriterF<F, W>> = instances(MM, SG)
+        inline fun <reified F, reified W> functor(MM: Monad<F> = kategory.monad<F>(), SG: Monoid<W> = kategory.monoid<W>()): Functor<WriterF<F, W>> = instances(MM, SG)
 
-        fun <F, W> applicative(MM: Monad<F>, SG: Monoid<W>): Applicative<WriterF<F, W>> = instances(MM, SG)
+        inline fun <reified F, reified W> applicative(MM: Monad<F> = kategory.monad<F>(), SG: Monoid<W> = kategory.monoid<W>()): Applicative<WriterF<F, W>> = instances(MM, SG)
 
-        fun <F, W> monad(MM: Monad<F>, SG: Monoid<W>): Monad<WriterF<F, W>> = instances(MM, SG)
+        inline fun <reified F, reified W> monad(MM: Monad<F> = kategory.monad<F>(), SG: Monoid<W> = kategory.monoid<W>()): Monad<WriterF<F, W>> = instances(MM, SG)
     }
 
     fun tell(w: W, SG: Semigroup<W>): WriterT<F, W, A> =

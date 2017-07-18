@@ -33,25 +33,25 @@ data class EitherT<F, A, B>(val MF: Monad<F>, val value: HK<F, Either<A, B>>) : 
         @JvmStatic inline fun <reified F, A, B> fromEither(value: Either<A, B>, MF: Monad<F> = monad<F>()): EitherT<F, A, B> =
                 EitherT(MF, MF.pure(value))
 
-        fun <F, L> instances(MF : Monad<F>): EitherTInstances<F, L> = object : EitherTInstances<F, L> {
+        inline fun <F, L> instances(MF : Monad<F>): EitherTInstances<F, L> = object : EitherTInstances<F, L> {
             override fun MF(): Monad<F> = MF
         }
 
-        fun <F, L> functor(MF : Monad<F>): Functor<EitherTF<F, L>> = instances(MF)
+        inline fun <reified F, L> functor(MF : Monad<F> = monad<F>()): Functor<EitherTF<F, L>> = instances(MF)
 
-        fun <F, L> applicative(MF : Monad<F>): Applicative<EitherTF<F, L>> = instances(MF)
+        inline fun <reified F, L> applicative(MF : Monad<F> = monad<F>()): Applicative<EitherTF<F, L>> = instances(MF)
 
-        fun <F, L> monad(MF : Monad<F>): Monad<EitherTF<F, L>> = instances(MF)
+        inline fun <reified F, L> monad(MF : Monad<F> = monad<F>()): Monad<EitherTF<F, L>> = instances(MF)
 
-        fun <F, L> monadError(MF : Monad<F>): MonadError<EitherTF<F, L>, L> = instances(MF)
+        inline fun <reified F, L> monadError(MF : Monad<F> = monad<F>()): MonadError<EitherTF<F, L>, L> = instances(MF)
 
-        fun <F, A> traverse(FF: Traverse<F>, MF: Monad<F>): Traverse<EitherTF<F, A>> = object : EitherTTraverse<F, A> {
+        inline fun <reified F, A> traverse(FF: Traverse<F> = traverse<F>(), MF: Monad<F> = monad<F>()): Traverse<EitherTF<F, A>> = object : EitherTTraverse<F, A> {
             override fun FF(): Traverse<F> = FF
 
             override fun MF(): Monad<F> = MF
         }
 
-        fun <F, A> foldable(FF: Traverse<F>, MF: Monad<F>): Foldable<EitherTF<F, A>> = traverse(FF, MF)
+        inline fun <reified F, A> foldable(FF: Traverse<F> = traverse<F>(), MF: Monad<F> = monad<F>()): Foldable<EitherTF<F, A>> = traverse(FF, MF)
     }
 
     inline fun <C> fold(crossinline l: (A) -> C, crossinline r: (B) -> C): HK<F, C> =

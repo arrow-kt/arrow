@@ -92,15 +92,15 @@ sealed class Ior<out A, out B> : IorKind<A, B> {
             }
         }
 
-        fun <L> instances(SL: Semigroup<L>): IorInstances<L> = object : IorInstances<L> {
+        inline fun <reified L> instances(SL: Semigroup<L> = semigroup<L>()): IorInstances<L> = object : IorInstances<L> {
             override fun SL(): Semigroup<L> = SL
         }
 
-        fun <L> functor(SL: Semigroup<L>): Functor<HK<F, L>> = instances(SL)
+        inline fun <reified L> functor(SL: Semigroup<L> = semigroup<L>()): Functor<HK<F, L>> = instances(SL)
 
-        fun <L> applicative(SL: Semigroup<L>): Applicative<HK<F, L>> = instances(SL)
+        inline fun <reified L> applicative(SL: Semigroup<L> = semigroup<L>()): Applicative<HK<F, L>> = instances(SL)
 
-        fun <L> monad(SL: Semigroup<L>): Monad<HK<F, L>> = instances(SL)
+        inline fun <reified L> monad(SL: Semigroup<L> = semigroup<L>()): Monad<HK<F, L>> = instances(SL)
 
         fun <L> foldable(): Foldable<HK<F, L>> = object : IorTraverse<L> {}
 

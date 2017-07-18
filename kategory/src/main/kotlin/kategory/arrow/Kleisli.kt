@@ -52,13 +52,13 @@ class Kleisli<F, D, A>(val MF: Monad<F>, val run: KleisliFun<F, D, A>) : Kleisli
             override fun MF(): Monad<F> = MF
         }
 
-        fun <F, D> functor(MF : Monad<F>): Functor<KleisliFD<F, D>> = instances(MF)
+        inline fun <reified F, D> functor(MF : Monad<F> = monad<F>()): Functor<KleisliFD<F, D>> = instances(MF)
 
-        fun <F, D> applicative(MF : Monad<F>): Applicative<KleisliFD<F, D>> = instances(MF)
+        inline fun <reified F, D> applicative(MF : Monad<F> = monad<F>()): Applicative<KleisliFD<F, D>> = instances(MF)
 
-        fun <F, D> monad(MF : Monad<F>): Monad<KleisliFD<F, D>> = instances(MF)
+        inline fun <reified F, D> monad(MF : Monad<F> = monad<F>()): Monad<KleisliFD<F, D>> = instances(MF)
 
-        fun <F, D, E> monadError(MFE : MonadError<F, E>): MonadError<KleisliFD<F, D>, E> = object : KleisliMonadError<F, D, E> {
+        inline fun <reified F, D, reified E> monadError(MFE : MonadError<F, E> = monadError<F, E>()): MonadError<KleisliFD<F, D>, E> = object : KleisliMonadError<F, D, E> {
             override fun MF(): Monad<F> = MFE
 
             override fun MFE(): MonadError<F, E> = MFE
