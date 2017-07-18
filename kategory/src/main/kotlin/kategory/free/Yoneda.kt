@@ -30,5 +30,9 @@ interface Yoneda<FU, A> : HK<HK<Yoneda.F, FU>, A> {
                 object : Yoneda<U, A> {
                     override fun <B> apply(f: (A) -> B): HK<U, B> = FF.map(fa, f)
                 }
+
+        fun <U> functor(FM: Functor<U>) = object : YonedaInstances<U> {
+            override fun FM(): Functor<U> = FM
+        }
     }
 }

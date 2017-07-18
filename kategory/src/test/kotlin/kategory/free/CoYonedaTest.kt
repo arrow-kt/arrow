@@ -22,7 +22,7 @@ class CoYonedaTest : UnitSpec() {
             forAll { x: Int ->
                 val op = CoYoneda.apply(Id(x), { _ -> "" })
                 val mapped = op.map { _ -> true }.lower(functor<Id.F>())
-                val expected = CoYonedaFunctor<Id.F, Int>().map(op, {_ -> true}).ev().lower(functor<Id.F>())
+                val expected = CoYoneda.functor<Id.F, Int>().map(op, { _ -> true}).ev().lower(functor<Id.F>())
 
                 expected == mapped
             }

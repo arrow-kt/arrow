@@ -11,7 +11,10 @@ class IOTest : UnitSpec() {
 
     init {
 
-        testLaws(MonadLaws.laws(IO, IOEq()))
+        testLaws(MonadLaws.laws(IO, object : Eq<HK<IO.F, Int>> {
+            override fun eqv(a: HK<IO.F, Int>, b: HK<IO.F, Int>): Boolean =
+                    a.ev().unsafeRunSync() == b.ev().unsafeRunSync()
+        }))
 
         "should defer evaluation until run" {
             var run = false
@@ -41,8 +44,8 @@ class IOTest : UnitSpec() {
             run shouldBe expected
         }
 
-        "should yield immediate successful just value" {
-            val run = IO.just(1).unsafeRunSync()
+        "should yield immediate successful pure value" {
+            val run = IO.pure(1).unsafeRunSync()
 
             val expected = 1
 
@@ -205,12 +208,12 @@ class IOTest : UnitSpec() {
             val one = IO.pure(1)
             val two = IO.pure(2)
 
-            IOSemigroup<Int>().combine(one, two).unsafeRunSync() shouldBe 3
+            IO.semigroup<Int>(semigroup()).combine(one, two).unsafeRunSync() shouldBe 3
         }
 
         "should have an empty value with Monoid" {
 
-            IOMonoid<Int>().empty().unsafeRunSync() shouldBe 0
+            IO.monoid<Int>(monoid()).empty().unsafeRunSync() shouldBe 0
         }
 
         "IO.binding should for comprehend over IO" {

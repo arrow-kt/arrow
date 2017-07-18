@@ -12,7 +12,7 @@ sealed class Ops<out A> : HK<Ops.F, A> {
     data class Add(val a: Int, val y: Int) : Ops<Int>()
     data class Subtract(val a: Int, val y: Int) : Ops<Int>()
 
-    companion object : FreeMonad<Ops.F> {
+    companion object : FreeInstances<Ops.F> {
         fun value(n: Int): Free<Ops.F, Int> = Free.liftF(Ops.Value(n))
         fun add(n: Int, y: Int): Free<Ops.F, Int> = Free.liftF(Ops.Add(n, y))
         fun subtract(n: Int, y: Int): Free<Ops.F, Int> = Free.liftF(Ops.Subtract(n, y))

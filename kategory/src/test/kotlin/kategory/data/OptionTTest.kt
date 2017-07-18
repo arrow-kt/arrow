@@ -9,7 +9,7 @@ import org.junit.runner.RunWith
 class OptionTTest : UnitSpec() {
     init {
 
-        testLaws(MonadLaws.laws(OptionTMonad(NonEmptyList), Eq.any()))
+        testLaws(MonadLaws.laws(OptionT.monad(NonEmptyList), Eq.any()))
 
         "map should modify value" {
             forAll { a: String ->
@@ -52,12 +52,12 @@ class OptionTTest : UnitSpec() {
             forAll { a: Int ->
                 val x = { b: Int -> OptionT.pure<Id.F, Int>(b * a) }
                 val option = OptionT.pure<Id.F, Int>(a)
-                option.flatMap(x) == OptionTMonad(Id).flatMap(option, x)
+                option.flatMap(x) == OptionT.monad(Id).flatMap(option, x)
             }
         }
 
         "OptionTMonad.binding should for comprehend over option" {
-            val M = OptionTMonad(NonEmptyList)
+            val M = OptionT.monad(NonEmptyList)
             val result = M.binding {
                 val x = !M.pure(1)
                 val y = M.pure(1).bind()
@@ -68,13 +68,13 @@ class OptionTTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over option" {
-            OptionTMonad(Id).map(OptionT.pure(1), OptionT.pure("a"), OptionT.pure(true), { (a, b, c) ->
+            OptionT.applicative(Id).map(OptionT.pure(1), OptionT.pure("a"), OptionT.pure(true), { (a, b, c) ->
                 "$a $b $c"
             }) shouldBe OptionT.pure<Id.F, String>("1 a true")
         }
 
         "Cartesian builder works inside for comprehensions" {
-            val M = OptionTMonad(NonEmptyList)
+            val M = OptionT.monad(NonEmptyList)
             val result = M.binding {
                 val (x, y, z) = !M.tupled(M.pure(1), M.pure(1), M.pure(1))
                 val a = M.pure(1).bind()

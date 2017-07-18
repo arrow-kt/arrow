@@ -32,6 +32,26 @@ data class EitherT<F, A, B>(val MF: Monad<F>, val value: HK<F, Either<A, B>>) : 
 
         @JvmStatic inline fun <reified F, A, B> fromEither(value: Either<A, B>, MF: Monad<F> = monad<F>()): EitherT<F, A, B> =
                 EitherT(MF, MF.pure(value))
+
+        inline fun <F, L> instances(MF : Monad<F>): EitherTInstances<F, L> = object : EitherTInstances<F, L> {
+            override fun MF(): Monad<F> = MF
+        }
+
+        inline fun <reified F, L> functor(MF : Monad<F> = monad<F>()): Functor<EitherTF<F, L>> = instances(MF)
+
+        inline fun <reified F, L> applicative(MF : Monad<F> = monad<F>()): Applicative<EitherTF<F, L>> = instances(MF)
+
+        inline fun <reified F, L> monad(MF : Monad<F> = monad<F>()): Monad<EitherTF<F, L>> = instances(MF)
+
+        inline fun <reified F, L> monadError(MF : Monad<F> = monad<F>()): MonadError<EitherTF<F, L>, L> = instances(MF)
+
+        inline fun <reified F, A> traverse(FF: Traverse<F> = traverse<F>(), MF: Monad<F> = monad<F>()): Traverse<EitherTF<F, A>> = object : EitherTTraverse<F, A> {
+            override fun FF(): Traverse<F> = FF
+
+            override fun MF(): Monad<F> = MF
+        }
+
+        inline fun <reified F, A> foldable(FF: Traverse<F> = traverse<F>(), MF: Monad<F> = monad<F>()): Foldable<EitherTF<F, A>> = traverse(FF, MF)
     }
 
     inline fun <C> fold(crossinline l: (A) -> C, crossinline r: (B) -> C): HK<F, C> =
@@ -68,61 +88,14 @@ data class EitherT<F, A, B>(val MF: Monad<F>, val value: HK<F, Either<A, B>>) : 
             OptionT(MF, MF.map(value, { it.toOption() }))
 
     fun <C> foldL(b: C, f: (C, B) -> C, FF: Foldable<F>): C =
-            FF.compose(EitherTraverse<A>()).foldLC(value, b, f)
+            FF.compose(Either.foldable<A>()).foldLC(value, b, f)
 
     fun <C> foldR(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>, FF: Foldable<F>): Eval<C> =
-            FF.compose(EitherTraverse<A>()).foldRC(value, lb, f)
+            FF.compose(Either.foldable<A>()).foldRC(value, lb, f)
 
     fun <G, C> traverse(f: (B) -> HK<G, C>, GA: Applicative<G>, FF: Traverse<F>, MF: Monad<F>): HK<G, HK<EitherTF<F, A>, C>> {
-        val fa = ComposedTraverse(FF, EitherTraverse<A>(), EitherMonad<A>()).traverseC(value, f, GA)
+        val fa = ComposedTraverse(FF, Either.traverse<A>(), Either.monad<A>()).traverseC(value, f, GA)
         return GA.map(fa, { EitherT(MF, MF.map(it.lower(), { it.ev() })) })
     }
 }
 
-class EitherTInstances<F, L>(val MF : Monad<F>) : EitherTMonadError<F, L> {
-    override fun MF(): Monad<F> = MF
-}
-
-interface EitherTMonad<F, L> : Monad<EitherTF<F, L>> {
-
-    fun MF() : Monad<F>
-
-    override fun <A> pure(a: A): EitherT<F, L, A> =
-            EitherT(MF(), MF().pure(Either.Right(a)))
-
-    override fun <A, B> map(fa: EitherTKind<F, L, A>, f: (A) -> B): EitherT<F, L, B> =
-            fa.ev().map { f(it) }
-
-    override fun <A, B> flatMap(fa: EitherTKind<F, L, A>, f: (A) -> EitherTKind<F, L, B>): EitherT<F, L, B> =
-            fa.ev().flatMap { f(it).ev() }
-
-    override fun <A, B> tailRecM(a: A, f: (A) -> HK<EitherTF<F, L>, Either<A, B>>): EitherT<F, L, B> =
-            EitherT(MF(), MF().tailRecM(a, {
-                MF().map(f(it).ev().value) { recursionControl ->
-                    when (recursionControl) {
-                        is Either.Left<L> -> Either.Right(Either.Left(recursionControl.a))
-                        is Either.Right<Either<A, B>> ->
-                            when (recursionControl.b) {
-                                is Either.Left<A> -> Either.Left(recursionControl.b.a)
-                                is Either.Right<B> -> Either.Right(Either.Right(recursionControl.b.b))
-                            }
-                    }
-                }
-            }))
-
-}
-
-interface EitherTMonadError<F, E> : EitherTMonad<F, E>, MonadError<EitherTF<F, E>, E> {
-
-    override fun <A> handleErrorWith(fa: EitherTKind<F, E, A>, f: (E) -> EitherTKind<F, E, A>): EitherT<F, E, A> =
-            EitherT(MF(), MF().flatMap(fa.ev().value, {
-                when (it) {
-                    is Either.Left -> f(it.a).ev().value
-                    is Either.Right -> MF().pure(it)
-                }
-            }))
-
-    override fun <A> raiseError(e: E): EitherT<F, E, A> =
-            EitherT(MF(), MF().pure(Either.Left(e)))
-
-}

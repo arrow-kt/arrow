@@ -10,7 +10,7 @@ import org.junit.runner.RunWith
 class EitherTTest : UnitSpec() {
     init {
 
-        testLaws(MonadErrorLaws.laws(EitherTInstances<Id.F, Throwable>(Id), Eq.any()))
+        testLaws(MonadErrorLaws.laws(EitherT.monadError<Id.F, Throwable>(Id), Eq.any()))
 
         "map should modify value" {
             forAll { a: String ->
@@ -165,27 +165,27 @@ class EitherTTest : UnitSpec() {
             forAll { a: Int ->
                 val x = { b: Int -> EitherT.pure<Id.F, Int, Int>(b * a) }
                 val option = EitherT.pure<Id.F, Int, Int>(a)
-                option.flatMap(x) == EitherTInstances<Id.F, Int>(Id).flatMap(option, x)
+                option.flatMap(x) == EitherT.monad<Id.F, Int>(Id).flatMap(option, x)
             }
         }
 
         "EitherTMonad#tailRecM should execute and terminate without blowing up the stack" {
             forAll { a: Int ->
-                val value: EitherT<Id.F, Int, Int> = EitherTInstances<Id.F, Int>(Id).tailRecM(a) { b ->
+                val value: EitherT<Id.F, Int, Int> = EitherT.monad<Id.F, Int>(Id).tailRecM(a) { b ->
                     EitherT.pure<Id.F, Int, Either<Int, Int>>(Either.Right(b * a))
-                }
+                }.ev().ev()
                 val expected = EitherT.pure<Id.F, Int, Int>(a * a)
 
                 expected == value
             }
 
             forAll(Gen.oneOf(listOf(10000))) { limit: Int ->
-                val value: EitherT<Id.F, Int, Int> = EitherTInstances<Id.F, Int>(Id).tailRecM(0) { current ->
+                val value: EitherT<Id.F, Int, Int> = EitherT.monad<Id.F, Int>(Id).tailRecM(0) { current ->
                     if (current == limit)
                         EitherT.left(current)
                     else
                         EitherT.pure<Id.F, Int, Either<Int, Int>>(Either.Left(current + 1))
-                }
+                }.ev().ev()
                 val expected = EitherT.left<Id.F, Int, Int>(limit)
 
                 expected == value
@@ -196,8 +196,8 @@ class EitherTTest : UnitSpec() {
             val eitherT = EitherT(Id(Either.Right(1)))
             val content: Id<Either<Nothing, Int>> = eitherT.value.ev()
 
-            val expected = IdTraverse.foldL(content, 1, { a, _ -> a + 1 })
-            val result = eitherT.foldL(1, { a, _ -> a + 1 }, IdTraverse)
+            val expected = Id.foldL(content, 1, { a, _ -> a + 1 })
+            val result = eitherT.foldL(1, { a, _ -> a + 1 }, Id)
 
             expected shouldBe result
         }
@@ -206,8 +206,8 @@ class EitherTTest : UnitSpec() {
             val eitherT = EitherT(Id(Either.Right(1)))
             val content: Id<Either<Nothing, Int>> = eitherT.value.ev()
 
-            val expected = IdTraverse.foldR(content, Eval.now(1), { _, b-> Eval.now(b.value() + 1) })
-            val result = eitherT.foldR(Eval.now(1), { a, b -> Eval.now(a + 1) }, IdTraverse)
+            val expected = Id.foldR(content, Eval.now(1), { _, b-> Eval.now(b.value() + 1) })
+            val result = eitherT.foldR(Eval.now(1), { a, b -> Eval.now(a + 1) }, Id)
 
             expected shouldBe result
         }
@@ -218,15 +218,15 @@ class EitherTTest : UnitSpec() {
 
 
             val f: (Int) -> Option<Int> = { Option.Some(it + 1) }
-            val traverse = eitherT.traverse(f, Option, IdTraverse, Id).ev()
+            val traverse = eitherT.traverse(f, Option, Id, Id).ev()
             val result = traverse.map { it.ev().value.value() }
 
-            val expected = EitherTraverse<String>().traverse(either, f, Option)
+            val expected = Either.traverse<String>().traverse(either, f, Option)
             result shouldBe expected
         }
 
         "EitherTMonad#binding should for comprehend over option" {
-            val M = EitherTInstances<NonEmptyList.F, Int>(NonEmptyList)
+            val M = EitherT.monad<NonEmptyList.F, Int>(NonEmptyList)
             val result = M.binding {
                 val x = !M.pure(1)
                 val y = M.pure(1).bind()
@@ -237,13 +237,13 @@ class EitherTTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over option" {
-            EitherTInstances<Id.F, Int>(Id).map(EitherT.pure(1), EitherT.pure("a"), EitherT.pure(true), { (a, b, c) ->
+            EitherT.applicative<Id.F, Int>(Id).map(EitherT.pure(1), EitherT.pure("a"), EitherT.pure(true), { (a, b, c) ->
                 "$a $b $c"
             }) shouldBe EitherT.pure<Id.F, Int, String>("1 a true")
         }
 
         "Cartesian builder works inside for comprehensions" {
-            val M = EitherTInstances<NonEmptyList.F, Int>(NonEmptyList)
+            val M = EitherT.monad<NonEmptyList.F, Int>(NonEmptyList)
             val result = M.binding {
                 val (x, y, z) = !M.tupled(M.pure(1), M.pure(1), M.pure(1))
                 val a = M.pure(1).bind()

@@ -22,7 +22,7 @@ class YonedaTest : UnitSpec() {
             forAll { x: Int ->
                 val op = Yoneda.apply(Id(x))
                 val mapped = op.map({ _ -> true }, functor()).lower()
-                val expected = YonedaFunctor<Id.F>(functor()).map(op, { _ -> true}).ev().lower()
+                val expected = Yoneda.functor<Id.F>(functor()).map(op, { _ -> true}).ev().lower()
 
                 expected == mapped
             }

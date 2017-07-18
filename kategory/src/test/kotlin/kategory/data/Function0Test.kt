@@ -8,7 +8,10 @@ import org.junit.runner.RunWith
 class Function0Test : UnitSpec() {
     init {
 
-        testLaws(MonadLaws.laws(Function0, Function0Eq()))
+        testLaws(MonadLaws.laws(Function0, object : Eq<HK<Function0.F, Int>> {
+            override fun eqv(a: HK<Function0.F, Int>, b: HK<Function0.F, Int>): Boolean =
+                    a.ev()() == b.ev()()
+        }))
 
         "Function0Monad.binding should for comprehend over all values of multiple Function0" {
             Function0.binding {

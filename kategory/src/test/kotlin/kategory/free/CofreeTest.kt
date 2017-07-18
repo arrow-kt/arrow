@@ -99,7 +99,7 @@ class CofreeTest : UnitSpec() {
         "cata should traverse the structure" {
             val cata: NonEmptyList<Int> = startHundred.cata<Option.F, Int, NonEmptyList<Int>>(
                     { i, lb -> Eval.now(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) },
-                    OptionTraverse
+                    Option
             ).value()
 
             val expected = NonEmptyList.fromListUnsafe((0..100).toList())
@@ -113,7 +113,7 @@ class CofreeTest : UnitSpec() {
             try {
                 startTwoThousand.cata<Option.F, Int, NonEmptyList<Int>>(
                         { i, lb -> Eval.now(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) },
-                        OptionTraverse
+                        Option
                 ).value()
                 throw AssertionError("Run should overflow on a stack-unsafe monad")
             } catch (e: StackOverflowError) {
@@ -126,13 +126,13 @@ class CofreeTest : UnitSpec() {
                 i, lb ->
                 if (i <= 2000) OptionT.pure(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) else OptionT.none()
             }
-            val inclusion = object : FunctionK<Eval.F, EvailOptionF> {
-                override fun <A> invoke(fa: HK<Eval.F, A>): HK<EvailOptionF, A> =
+            val inclusion = object : FunctionK<Eval.F, EvalOptionF> {
+                override fun <A> invoke(fa: HK<Eval.F, A>): HK<EvalOptionF, A> =
                         OptionT(fa.ev().map { Some(it) })
             }
-            val cataHundred = startTwoThousand.cataM(folder, inclusion, OptionTraverse, OptionTMonad()).ev().value.ev().value()
+            val cataHundred = startTwoThousand.cataM(folder, inclusion, Option, OptionT.monad(Eval)).ev().value.ev().value()
             val newCof = Cofree(Option, 2001, Eval.now(Some(startTwoThousand)))
-            val cataHundredOne = newCof.cataM(folder, inclusion, OptionTraverse, OptionTMonad()).ev().value.ev().value()
+            val cataHundredOne = newCof.cataM(folder, inclusion, Option, OptionT.monad(Eval)).ev().value.ev().value()
 
             cataHundred shouldBe Some(NonEmptyList.fromListUnsafe((0..2000).toList()))
             cataHundredOne shouldBe None
@@ -142,7 +142,7 @@ class CofreeTest : UnitSpec() {
             val offset = 0
             val limit = 10
             val loops = SideEffect()
-            val program = CofreeComonad<Option.F>().cobinding {
+            val program = Cofree.comonad<Option.F>().cobinding {
                 val program = unfold(offset, {
                     loops.increment()
                     if (it == limit) None else Some(it + 1)
@@ -159,4 +159,4 @@ class CofreeTest : UnitSpec() {
 
 typealias EvalOption<A> = OptionTKind<Eval.F, A>
 
-typealias EvailOptionF = OptionTF<Eval.F>
+typealias EvalOptionF = OptionTF<Eval.F>
