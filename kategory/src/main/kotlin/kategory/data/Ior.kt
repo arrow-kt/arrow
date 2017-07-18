@@ -105,8 +105,6 @@ sealed class Ior<out A, out B> : IorKind<A, B> {
         fun <L> foldable(): Foldable<HK<F, L>> = object : IorTraverse<L> {}
 
         fun <L> traverse(): Traverse<HK<F, L>> = object : IorTraverse<L> {}
-
-
     }
 
     /**

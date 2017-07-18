@@ -30,7 +30,6 @@ data class OptionT<F, A>(val MF: Monad<F>, val value: HK<F, Option<A>>) : Option
         @JvmStatic inline fun <reified F, A> fromOption(value: Option<A>, MF: Monad<F> = monad<F>()): OptionT<F, A> =
                 OptionT(MF, MF.pure(value))
 
-
         fun <F> instances(MF : Monad<F>): OptionTInstances<F> = object : OptionTInstances<F> {
             override fun MF(): Monad<F> = MF
         }

@@ -6,9 +6,9 @@ interface WriterTInstances<F, W> :
         Monad<WriterF<F, W>> {
 
     fun MM(): Monad<F>
-    
+
     fun SG(): Monoid<W>
-    
+
     override fun <A> pure(a: A): HK<WriterF<F, W>, A> =
             WriterT(MM(), MM().pure(SG().empty() toT a))
 

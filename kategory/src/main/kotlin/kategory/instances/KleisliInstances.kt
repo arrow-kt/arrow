@@ -1,6 +1,5 @@
 package kategory
 
-
 interface KleisliInstances<F, D> :
         Functor<KleisliFD<F, D>>,
         Applicative<KleisliFD<F, D>>,

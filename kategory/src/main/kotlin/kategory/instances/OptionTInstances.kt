@@ -6,7 +6,7 @@ interface OptionTInstances<F> :
         Monad<OptionTF<F>> {
 
     fun MF(): Monad<F>
-    
+
     override fun <A> pure(a: A): OptionT<F, A> = OptionT(MF(), MF().pure(Option(a)))
 
     override fun <A, B> flatMap(fa: OptionTKind<F, A>, f: (A) -> OptionTKind<F, B>): OptionT<F, B> =
@@ -28,14 +28,14 @@ interface OptionTInstances<F> :
 
 }
 
-interface OptionTTraverse<F>:
+interface OptionTTraverse<F> :
         Foldable<OptionTF<F>>,
         Traverse<OptionTF<F>> {
 
     fun FF(): Traverse<F>
-    
+
     fun MF(): Monad<F>
-    
+
     override fun <G, A, B> traverse(fa: HK<OptionTF<F>, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<OptionTF<F>, B>> =
             fa.ev().traverse(f, GA, FF(), MF())
 
