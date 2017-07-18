@@ -206,5 +206,11 @@ sealed class Eval<out A> : HK<Eval.F, A> {
         @JvmStatic val False: Eval<Boolean> = Now(false)
         @JvmStatic val Zero: Eval<Int> = Now(0)
         @JvmStatic val One: Eval<Int> = Now(1)
+
+        fun functor(): Functor<Eval.F> = this
+
+        fun applicative(): Applicative<Eval.F> = this
+
+        fun monad(): Monad<Eval.F> = this
     }
 }
