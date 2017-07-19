@@ -17,8 +17,7 @@ class CoproductTest : UnitSpec() {
                     val c = extract { Coproduct<Id.F, Id.F, Int>(Either.Left(Id(b * 3))) }
                     yields(c)
                 }
-
-                Option(1).map { it + 2 } == Option(3)
+                cobinding == num * 6
             }
         }
     }
