@@ -131,3 +131,6 @@ fun <B> Try<B>.recover(f: (Throwable) -> B): Try<B> =
  */
 fun <B> Try<B>.transform(s: (B) -> Try<B>, f: (Throwable) -> Try<B>): Try<B> =
         fold({ f(it) }, { flatMap(s) })
+
+fun <A> (() -> A).try_(): Try<A> =
+        Try(this)

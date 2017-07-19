@@ -7,6 +7,7 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class CoproductTest : UnitSpec() {
     init {
+
         "CoproductComonad should comprehend with cobind" {
             forAll { num: Int ->
                 val cobinding = CoproductComonad.any().cobinding {
@@ -17,7 +18,7 @@ class CoproductTest : UnitSpec() {
                     yields(c)
                 }
 
-                cobinding == num * 6
+                Option(1).map { it + 2 } == Option(3)
             }
         }
     }

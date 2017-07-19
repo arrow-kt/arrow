@@ -18,8 +18,14 @@ interface Monad<F> : Applicative<F>, Typeclass {
     fun <A> flatten(ffa: HK<F, HK<F, A>>): HK<F, A> =
             flatMap(ffa, { it })
 
-    fun <A, B> tailRecM(a: A, f: (A) -> HK<F, Either<A, B>>) : HK<F, B>
+    fun <A, B> tailRecM(a: A, f: (A) -> HK<F, Either<A, B>>): HK<F, B>
 }
+
+inline fun <reified F, A, B> HK<F, A>.flatMap(FT: Monad<F> = monad(), noinline f: (A) -> HK<F, B>): HK<F, B> =
+        FT.flatMap(this, f)
+
+inline fun <reified F, A, B> HK<F, HK<F, A>>.flatten(FT: Monad<F> = monad()): HK<F, A> =
+        FT.flatten(this)
 
 @RestrictsSuspension
 open class MonadContinuation<F, A>(val M: Monad<F>) : Serializable, Continuation<HK<F, A>> {

@@ -286,3 +286,16 @@ inline fun <A, B, D> Ior<A, B>.flatMap(SA: Semigroup<A>, crossinline f: (B) -> I
 }
 
 inline fun <A, B> Ior<A, B>.getOrElse(crossinline default: () -> B): B = fold({ default() }, { it }, { _, b -> b })
+
+
+fun <A, B> A.rightIor(): Ior<B, A> =
+        Ior.Right(this)
+
+fun <A, B> A.leftIor(): Ior<A, B> =
+        Ior.Left(this)
+
+fun <A, B> Pair<A, B>.bothIor(): Ior<A, B> =
+        Ior.Both(this.first, this.second)
+
+fun <A, B> Tuple2<A, B>.bothIor(): Ior<A, B> =
+        Ior.Both(this.a, this.b)

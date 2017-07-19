@@ -98,4 +98,3 @@ data class EitherT<F, A, B>(val MF: Monad<F>, val value: HK<F, Either<A, B>>) : 
         return GA.map(fa, { EitherT(MF, MF.map(it.lower(), { it.ev() })) })
     }
 }
-
