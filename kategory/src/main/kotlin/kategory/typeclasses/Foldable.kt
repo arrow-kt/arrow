@@ -30,7 +30,6 @@ interface Foldable<in F> : Typeclass {
      */
     fun <A, B> foldR(fa: HK<F, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B>
 
-
     /**
      * Fold implemented using the given Monoid<A> instance.
      */
@@ -130,8 +129,6 @@ inline fun <F, reified G, A, B> Foldable<F>.foldM(fa: HK<F, A>, z: B, crossinlin
 
 inline fun <reified F> foldable(): Foldable<F> =
         instance(InstanceParametrizedType(Foldable::class.java, listOf(F::class.java)))
-
-//Syntax
 
 inline fun <reified F, A, B> HK<F, A>.foldL(FT: Foldable<F> = foldable(), b: B, noinline f: (B, A) -> B): B =
         FT.foldL(this, b, f)

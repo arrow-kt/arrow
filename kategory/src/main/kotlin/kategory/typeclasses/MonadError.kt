@@ -20,7 +20,6 @@ inline fun <reified F, A, reified E> HK<F, A>.ensure(
         noinline predicate: (A) -> Boolean): HK<F, A> =
         FT.ensure(this, error, predicate)
 
-
 @RestrictsSuspension
 class MonadErrorContinuation<F, A>(val ME: MonadError<F, Throwable>) : Serializable, MonadContinuation<F, A>(ME) {
 

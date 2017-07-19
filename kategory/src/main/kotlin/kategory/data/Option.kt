@@ -154,7 +154,6 @@ fun <B> Option<B>.getOrElse(default: () -> B): B = fold({ default() }, { it })
 fun <A, B : A> Option<B>.orElse(alternative: () -> Option<B>): Option<B> =
     if (isEmpty) alternative() else this
 
-
 fun <A> A.some(): Option<A> =
         Option.Some(this)
 

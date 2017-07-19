@@ -79,6 +79,5 @@ class NonEmptyList<out A> private constructor(
     }
 }
 
-
 fun <A> A.nel() : NonEmptyList<A> =
         NonEmptyList.of(this)
