@@ -240,3 +240,6 @@ internal data class BindAsync<E, out A>(val cont: ((Either<Throwable, E>) -> Uni
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> =
             unsafeResync(this, limit)
 }
+
+fun <A> A.liftIO(): IO<A> =
+        IO.pure(this)

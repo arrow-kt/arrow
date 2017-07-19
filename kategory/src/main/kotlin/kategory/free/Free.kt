@@ -79,3 +79,6 @@ fun <M, S, A> Free<S, A>.foldMap(f: FunctionK<S, M>, MM: Monad<M>): HK<M, A> =
                 }
             }
         }
+
+fun <S, A> A.free(): Free<S, A> =
+        Free.pure<S, A>(this)

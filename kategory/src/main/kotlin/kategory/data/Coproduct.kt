@@ -54,3 +54,5 @@ data class Coproduct<F, G, A>(val CF: Comonad<F>, val CG: Comonad<G>, val run: E
 
 }
 
+inline fun <reified F, reified G, A> Either<HK<F, A>, HK<G, A>>.coproduct(CF: Comonad<F> = comonad(), CG: Comonad<G> = comonad()): Coproduct<F, G, A> =
+        Coproduct(CF, CG, this)

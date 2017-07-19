@@ -97,3 +97,5 @@ class StateT<F, S, A>(
             MF.map(run(s)) { it.a }
 }
 
+inline fun <reified F, S, A> StateTFunKind<F, S, A>.stateT(FT: Monad<F> = monad()) : StateT<F, S, A> =
+        StateT(FT, this)

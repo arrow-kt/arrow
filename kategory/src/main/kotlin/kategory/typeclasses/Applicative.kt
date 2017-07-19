@@ -20,6 +20,22 @@ interface Applicative<F> : Functor<F>, Typeclass {
             fb.map { fc -> map2(fa, fc, f) }
 }
 
+// Syntax
+
+inline fun <reified F, A> A.pure(FT : Applicative<F> = applicative()): HK<F, A> =
+        FT.pure(this)
+
+inline fun <reified F, A, B> HK<F, A>.ap(FT : Applicative<F> = applicative(), ff: HK<F, (A) -> B>): HK<F, B> =
+        FT.ap(this, ff)
+
+inline fun <reified F, A, B, Z> HK<F, A>.map2(FT : Applicative<F> = applicative(), fb: HK<F, B>, noinline f: (Tuple2<A, B>) -> Z): HK<F, Z> =
+        FT.map2(this, fb, f)
+
+inline fun <reified F, A, B, Z> HK<F, A>.map2Eval(FT : Applicative<F> = applicative(), fb: Eval<HK<F, B>>, noinline f: (Tuple2<A, B>) -> Z): Eval<HK<F, Z>> =
+        FT.map2Eval(this, fb, f)
+
+//Applicative Builder
+
 data class Tuple2<out A, out B>(val a: A, val b: B) {
     fun reverse(): Tuple2<B, A> = Tuple2(b, a)
 }

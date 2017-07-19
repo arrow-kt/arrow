@@ -14,8 +14,14 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F>, Typeclass {
 
 }
 
+inline fun <reified F, A, reified E> HK<F, A>.ensure(
+        FT: MonadError<F, E> = monadError(),
+        noinline error: () -> E,
+        noinline predicate: (A) -> Boolean): HK<F, A> =
+        FT.ensure(this, error, predicate)
+
 @RestrictsSuspension
-class MonadErrorContinuation<F, A>(val ME : MonadError<F, Throwable>) : Serializable, MonadContinuation<F, A>(ME) {
+class MonadErrorContinuation<F, A>(val ME: MonadError<F, Throwable>) : Serializable, MonadContinuation<F, A>(ME) {
 
     override fun resumeWithException(exception: Throwable) {
         returnedMonad = ME.raiseError(exception)

@@ -69,3 +69,6 @@ class Kleisli<F, D, A>(val MF: Monad<F>, val run: KleisliFun<F, D, A>) : Kleisli
 
 inline fun <reified F, D, A> Kleisli<F, D, Kleisli<F, D, A>>.flatten(): Kleisli<F, D, A> =
         flatMap({ it })
+
+inline fun <reified F, reified D, A> KleisliFun<F, D, A>.kleisli(FT: Monad<F> = monad()): Kleisli<F, D, A> =
+        Kleisli(FT, this)

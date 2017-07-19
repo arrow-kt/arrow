@@ -78,3 +78,6 @@ class NonEmptyList<out A> private constructor(
         fun <A> semigroup(): Semigroup<NonEmptyList<A>> = object : NonEmptyListSemigroup<A> {}
     }
 }
+
+fun <A> A.nel() : NonEmptyList<A> =
+        NonEmptyList.of(this)

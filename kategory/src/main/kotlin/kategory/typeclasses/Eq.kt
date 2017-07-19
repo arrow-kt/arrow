@@ -7,7 +7,7 @@ interface Eq<in F> : Typeclass {
             !eqv(a, b)
 
     companion object {
-        inline fun any(): Eq<Any?> =
+        fun any(): Eq<Any?> =
                 EqAny
 
         object EqAny : Eq<Any?> {
@@ -19,3 +19,12 @@ interface Eq<in F> : Typeclass {
         }
     }
 }
+
+inline fun <reified F> eq(): Eq<F> =
+        instance(InstanceParametrizedType(Eq::class.java, listOf(F::class.java)))
+
+inline fun <reified F> F.eqv(FT: Eq<F> = eq(), b: F) : Boolean =
+        FT.eqv(this, b)
+
+inline fun <reified F> F.neqv(FT: Eq<F> = eq(), b: F) : Boolean =
+        FT.neqv(this, b)
