@@ -9,7 +9,7 @@ class IdTest : UnitSpec() {
     init {
 
         testLaws(MonadLaws.laws(Id, Eq.any()))
-        testLaws(TraverseLaws.laws(Id, ::Id, Eq.any()))
+        testLaws(TraverseLaws.laws(Id, Id, ::Id, Eq.any()))
 
         "IdMonad.binding should for comprehend over all values of multiple Ids" {
             Id.binding {

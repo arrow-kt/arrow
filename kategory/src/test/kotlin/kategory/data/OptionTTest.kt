@@ -10,7 +10,7 @@ class OptionTTest : UnitSpec() {
     init {
 
         testLaws(MonadLaws.laws(OptionT.monad(NonEmptyList), Eq.any()))
-        testLaws(TraverseLaws.laws(OptionT.traverse(), { OptionT(Id(kategory.Option.Some(it))) }, Eq.any()))
+        testLaws(TraverseLaws.laws(OptionT.traverse(), OptionT.applicative(Id), { OptionT(Id(kategory.Option.Some(it))) }, Eq.any()))
 
         "map should modify value" {
             forAll { a: String ->

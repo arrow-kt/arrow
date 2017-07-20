@@ -12,7 +12,7 @@ class TryTest : UnitSpec() {
     init {
 
         testLaws(MonadErrorLaws.laws(Try, Eq.any()))
-        testLaws(TraverseLaws.laws(Try, ::Success, Eq.any()))
+        testLaws(TraverseLaws.laws(Try, Try, ::Success, Eq.any()))
 
         "invoke of any should be success" {
             Try.invoke { 1 } shouldBe Success(1)
