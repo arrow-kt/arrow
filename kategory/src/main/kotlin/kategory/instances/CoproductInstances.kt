@@ -19,6 +19,11 @@ interface CoproductComonad<F, G> : Comonad<CoproductFG<F, G>> {
     }
 }
 
+interface CoproductFunctor<F, G> : Functor<CoproductFG<F, G>> {
+    override fun <A, B> map(fa: HK<CoproductFG<F, G>, A>, f: (A) -> B): HK<CoproductFG<F, G>, B> =
+            fa.ev().map(f)
+}
+
 interface CoproductTraverse<F, G> : Traverse<CoproductFG<F, G>> {
 
     fun FF(): Traverse<F>

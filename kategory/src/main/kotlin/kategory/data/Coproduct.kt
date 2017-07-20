@@ -45,6 +45,8 @@ data class Coproduct<F, G, A>(val CF: Comonad<F>, val CG: Comonad<G>, val run: E
 
         fun <F, G> comonad(): CoproductComonad<F, G> = object : CoproductComonad<F, G> {}
 
+        fun <F, G> functor(): CoproductFunctor<F, G> = object : CoproductFunctor<F, G> {}
+
         inline fun <reified F, reified G> traverse(FF: Traverse<F> = traverse<F>(), FG: Traverse<G> = traverse<G>()): CoproductTraverse<F, G> = object : CoproductTraverse<F, G> {
             override fun FF(): Traverse<F> = FF
 
