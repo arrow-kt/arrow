@@ -17,7 +17,7 @@ class ValidatedTest : UnitSpec() {
         }
 
         testLaws(ApplicativeLaws.laws(Validated.applicative(concatStringSG), Eq.any()))
-        testLaws(TraverseLaws.laws(Validated.traverse(IntMonoid), { it.valid() }, Eq.any()))
+        testLaws(TraverseLaws.laws(Validated.traverse(concatStringSG), { it.valid() }, Eq.any()))
 
         "fold should call function on Invalid" {
             val exception = Exception("My Exception")
