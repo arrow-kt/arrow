@@ -12,13 +12,12 @@ class ValidatedTest : UnitSpec() {
 
     init {
 
-        testLaws(TraverseLaws.laws(Validated.traverse(IntMonoid), { it.valid() }, Eq.any()))
-
         val concatStringSG: Semigroup<String> = object : Semigroup<String> {
             override fun combine(a: String, b: String): String = "$a $b"
         }
 
         testLaws(ApplicativeLaws.laws(Validated.applicative(concatStringSG), Eq.any()))
+        testLaws(TraverseLaws.laws(Validated.traverse(IntMonoid), { it.valid() }, Eq.any()))
 
         "fold should call function on Invalid" {
             val exception = Exception("My Exception")
