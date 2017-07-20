@@ -13,7 +13,7 @@ class ValidatedTest : UnitSpec() {
     init {
 
         testLaws(ApplicativeLaws.laws(Validated.applicative(StringMonoid), Eq.any()))
-        testLaws(TraverseLaws.laws(Validated.traverse(StringMonoid), { it.valid() }, Eq.any()))
+        testLaws(TraverseLaws.laws(Validated.traverse(StringMonoid), ::Valid, Eq.any()))
 
         "fold should call function on Invalid" {
             val exception = Exception("My Exception")
@@ -158,7 +158,7 @@ class ValidatedTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over homogeneous Validated" {
-            Validated.applicative(concatStringSG).map(
+            Validated.applicative(StringMonoid).map(
                     Valid("11th"),
                     Valid("Doctor"),
                     Valid("Who"),
@@ -166,7 +166,7 @@ class ValidatedTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over heterogeneous Validated" {
-            Validated.applicative(concatStringSG).map(
+            Validated.applicative(StringMonoid).map(
                     Valid(13),
                     Valid("Doctor"),
                     Valid(false),
@@ -174,7 +174,7 @@ class ValidatedTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over Invalid Validated" {
-            Validated.applicative(concatStringSG).map(
+            Validated.applicative(StringMonoid).map(
                     Invalid("fail1"),
                     Invalid("fail2"),
                     Valid("Who"),
