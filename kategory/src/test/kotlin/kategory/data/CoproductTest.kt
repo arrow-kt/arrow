@@ -8,15 +8,20 @@ import org.junit.runner.RunWith
 class CoproductTest : UnitSpec() {
     init {
 
-        val coproductIdIdIntApplicative = object : Applicative<CoproductFG<Id.F, Id.F>> {
+        val coproductIdIdApplicative = object : Applicative<CoproductFG<Id.F, Id.F>> {
+            val coproductIdIdFunctor = Coproduct.functor<Id.F, Id.F>()
+
             override fun <A> pure(a: A): HK<CoproductFG<Id.F, Id.F>, A> =
                     Coproduct(Either.Right(Id(a)))
 
             override fun <A, B> ap(fa: HK<CoproductFG<Id.F, Id.F>, A>, ff: HK<CoproductFG<Id.F, Id.F>, (A) -> B>): HK<CoproductFG<Id.F, Id.F>, B> =
                     throw IllegalStateException("This method should not be called")
+
+            override fun <A, B> map(fa: HK<CoproductFG<Id.F, Id.F>, A>, f: (A) -> B): HK<CoproductFG<Id.F, Id.F>, B> =
+                    coproductIdIdFunctor.map(fa, f)
         }
 
-        testLaws(TraverseLaws.laws(Coproduct.traverse<Id.F, Id.F>(), coproductIdIdIntApplicative, { Coproduct(Either.Right(Id(it))) }, object : Eq<HK3<Coproduct.F, Id.F, Id.F, Int>>{
+        testLaws(TraverseLaws.laws(Coproduct.traverse<Id.F, Id.F>(), coproductIdIdApplicative, { Coproduct(Either.Right(Id(it))) }, object : Eq<HK3<Coproduct.F, Id.F, Id.F, Int>>{
             override fun eqv(a: CoproductKind<Id.F, Id.F, Int>, b: CoproductKind<Id.F, Id.F, Int>): Boolean =
                     a.ev().extract() == b.ev().extract()
         } ))
