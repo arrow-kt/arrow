@@ -23,8 +23,8 @@ interface Eq<in F> : Typeclass {
 inline fun <reified F> eq(): Eq<F> =
         instance(InstanceParametrizedType(Eq::class.java, listOf(F::class.java)))
 
-inline fun <reified F> F.eqv(FT: Eq<F> = eq(), b: F) : Boolean =
-        FT.eqv(this, b)
+inline fun <reified F> F.eqv(EQ: Eq<F> = eq(), b: F) : Boolean =
+        EQ.eqv(this, b)
 
-inline fun <reified F> F.neqv(FT: Eq<F> = eq(), b: F) : Boolean =
-        FT.neqv(this, b)
+inline fun <reified F> F.neqv(EQ: Eq<F> = eq(), b: F) : Boolean =
+        EQ.neqv(this, b)
