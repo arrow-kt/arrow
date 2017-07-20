@@ -2,8 +2,8 @@ package kategory
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
-import kategory.Try.Success
 import kategory.Try.Failure
+import kategory.Try.Success
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -12,6 +12,7 @@ class TryTest : UnitSpec() {
     init {
 
         testLaws(MonadErrorLaws.laws(Try, Eq.any()))
+        testLaws(TraverseLaws.laws(Try, ::Success, Eq.any()))
 
         "invoke of any should be success" {
             Try.invoke { 1 } shouldBe Success(1)

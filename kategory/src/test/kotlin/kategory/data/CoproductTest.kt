@@ -8,6 +8,8 @@ import org.junit.runner.RunWith
 class CoproductTest : UnitSpec() {
     init {
 
+        testLaws(TraverseLaws.laws(Coproduct.traverse<Id.F, Id.F>(), { Coproduct(Either.Right(Id(it))) }, Eq.any()))
+
         "CoproductComonad should comprehend with cobind" {
             forAll { num: Int ->
                 val cobinding = CoproductComonad.any().cobinding {

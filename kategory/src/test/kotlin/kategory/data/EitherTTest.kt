@@ -11,6 +11,7 @@ class EitherTTest : UnitSpec() {
     init {
 
         testLaws(MonadErrorLaws.laws(EitherT.monadError<Id.F, Throwable>(Id), Eq.any()))
+        testLaws(TraverseLaws.laws(EitherT.traverse<Id.F, Int>(), { EitherT(Id(Either.Right(it))) }, Eq.any()))
 
         "map should modify value" {
             forAll { a: String ->
