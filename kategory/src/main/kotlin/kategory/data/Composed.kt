@@ -13,7 +13,7 @@ fun <F, G, A> HK<F, HK<G, A>>.lift(): HK<ComposedType<F, G>, A> =
 fun <F, G, A> HK<ComposedType<F, G>, A>.lower(): HK<F, HK<G, A>> =
         this as HK<F, HK<G, A>>
 
-data class ComposedFoldable<F, G>(val FF: Foldable<F>, val GF: Foldable<G>) : Foldable<ComposedType<F, G>> {
+data class ComposedFoldable<in F, in G>(val FF: Foldable<F>, val GF: Foldable<G>) : Foldable<ComposedType<F, G>> {
     override fun <A, B> foldL(fa: HK<ComposedType<F, G>, A>, b: B, f: (B, A) -> B): B =
             FF.foldL(fa.lower(), b, { bb, aa -> GF.foldL(aa, bb, f) })
 
