@@ -1,8 +1,6 @@
-package kategory.collections
+package kategory
 
 import io.kotlintest.KTestJUnitRunner
-import kategory.Tuple2
-import kategory.UnitSpec
 import org.junit.Assert
 import org.junit.runner.RunWith
 
@@ -34,5 +32,6 @@ class MapsTest : UnitSpec() {
             val mapOfPair = mapOf("one" to 1)
             Assert.assertEquals(mapOfPair, mapOfTuple)
         }
+
     }
 }
