@@ -47,11 +47,14 @@ object TraverseLaws {
 
                 }
 
-                val seen: TI<HK<F, Int>> = FF.traverse(fha, { TIC(f(it) toT g(it)) }, TIA).ev().ti
-                val expected: TI<HK<F, Int>> = TIC(FF.traverse(fha, f, Id) toT FF.traverse(fha, g, Id)).ti
-                seen.equalUnderTheLaw(expected, object : Eq<TI<HK<F, Int>>> {
+                val TIEQ: Eq<TI<HK<F, Int>>> = object : Eq<TI<HK<F, Int>>> {
                     override fun eqv(a: TI<HK<F, Int>>, b: TI<HK<F, Int>>): Boolean =
                             EQ.eqv(a.a.value(), b.a.value()) && EQ.eqv(a.b.value(), b.b.value())
-                })
+                }
+
+                val seen: TI<HK<F, Int>> = FF.traverse(fha, { TIC(f(it) toT g(it)) }, TIA).ev().ti
+                val expected: TI<HK<F, Int>> = TIC(FF.traverse(fha, f, Id) toT FF.traverse(fha, g, Id)).ti
+
+                seen.equalUnderTheLaw(expected, TIEQ)
             })
 }
