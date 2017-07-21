@@ -6,7 +6,7 @@ fun <A> (() -> A).k(): Function0<A> =
 fun <A> HK<Function0.F, A>.ev(): () -> A =
         (this as Function0<A>).f
 
-// We don't we want an inherited class to avoid equivalence issues, so a simple HK wrapper will do
+// We don't want an inherited class to avoid equivalence issues, so a simple HK wrapper will do
 data class Function0<out A>(internal val f: () -> A) : HK<Function0.F, A> {
 
     class F private constructor()
