@@ -1,6 +1,6 @@
 package kategory
 
-typealias Function1F<P> = HK<Function1.F, P>
+typealias Function1F<R> = HK<Function1.F, R>
 
 fun <P, R> ((P) -> R).k(): Function1<P, R> =
         Function1(this)
