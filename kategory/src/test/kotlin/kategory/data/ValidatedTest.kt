@@ -178,7 +178,7 @@ class ValidatedTest : UnitSpec() {
                     Invalid("fail1"),
                     Invalid("fail2"),
                     Valid("Who"),
-                    { "success!" }) shouldBe Invalid("fail1 fail2")
+                    { "success!" }) shouldBe Invalid("fail1fail2")
         }
     }
 }
