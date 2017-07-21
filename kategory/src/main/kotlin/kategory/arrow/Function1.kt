@@ -11,9 +11,12 @@ fun <R> Function1F<R>.ev(): FunctionInject<R> =
 
 // We don't want an inherited class to avoid equivalence issues, so a simple HK wrapper will do
 data class Function1<in A, out R>(val f: (A) -> R) : FunctionInject<R>, Function1F<R> {
-    @Suppress("UNCHECKED_CAST")
-    override operator fun <P> invoke(p: P): R =
+    override fun <P> invokeInject(p: P): R =
             f(p as A)
+
+    @Suppress("UNCHECKED_CAST")
+    operator fun invoke(a: A): R =
+            f(a)
 
     class F private constructor()
 
