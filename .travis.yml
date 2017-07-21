@@ -1,9 +1,11 @@
 language: kotlin
+sudo: required
 
 jdk:
   - oraclejdk8
 
 script:
+  - ./gradlew wrapper
   - ./gradlew check
   - ./gradlew detekt
   - ./gradlew codeCoverageReport
