@@ -27,7 +27,7 @@ class Function0Test : UnitSpec() {
                 val x = Function0 { 1 }.extract()
                 val y = !Function0 { 2 }
                 val z = extract { Function0 { 3 } }
-                yields(x + y + z)
+                x + y + z
             } shouldBe 6
         }
 

@@ -32,8 +32,7 @@ class CoproductTest : UnitSpec() {
                     val a = !Coproduct(Either.Right(Coproduct(Either.Right(Id(num.toString())))), Id, Coproduct.comonad<Id.F, Id.F>())
                     val parseA = Integer.parseInt(a)
                     val b = Coproduct<NonEmptyList.F, NonEmptyList.F, Int>(Either.Left(NonEmptyList.of(parseA * 2, parseA * 100))).extract()
-                    val c = extract { Coproduct<Id.F, Id.F, Int>(Either.Left(Id(b * 3))) }
-                    yields(c)
+                    extract { Coproduct<Id.F, Id.F, Int>(Either.Left(Id(b * 3))) }
                 }
                 cobinding == num * 6
             }

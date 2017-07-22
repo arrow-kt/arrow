@@ -25,7 +25,7 @@ class IdTest : UnitSpec() {
                 val x = Id(1).extract()
                 val y = !Id(2)
                 val z = extract { Id(3) }
-                yields(x + y + z)
+                x + y + z
             } shouldBe 6
         }
 

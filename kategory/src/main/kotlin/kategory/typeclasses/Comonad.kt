@@ -58,10 +58,6 @@ open class ComonadContinuation<F, A : Any>(val CM: Comonad<F>) : Serializable, C
         }))
         COROUTINE_SUSPENDED
     }
-
-    infix fun <B> yields(b: B) = yields { b }
-
-    infix fun <B> yields(b: () -> B) = b()
 }
 
 /**
