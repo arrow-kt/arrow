@@ -11,10 +11,10 @@ fun <A> HK<Function0.F, A>.invoke(): A =
 
 // We don't want an inherited class to avoid equivalence issues, so a simple HK wrapper will do
 data class Function0<out A>(internal val f: () -> A) : HK<Function0.F, A> {
+    class F private constructor()
+
     operator fun invoke(): A =
             f()
-
-    class F private constructor()
 
     companion object : Bimonad<Function0.F>, GlobalInstance<Bimonad<Function0.F>>() {
 
