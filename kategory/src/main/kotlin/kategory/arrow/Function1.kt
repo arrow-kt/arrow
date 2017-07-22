@@ -14,10 +14,10 @@ fun <P, R> Function1F<R>.invoke(p: P): R =
 
 // We don't want an inherited class to avoid equivalence issues, so a simple HK wrapper will do
 data class Function1<in A, out R>(val f: (A) -> R) : Function1F<R> {
+    class F private constructor()
+
     operator fun invoke(a: A): R =
             f(a)
-
-    class F private constructor()
 
     companion object {
         fun <P> functor() = object : Function1Instances<P> {}
