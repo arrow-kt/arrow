@@ -9,15 +9,12 @@ fun <P, R> ((P) -> R).k(): Function1<P, R> =
 fun <P, R> Function1F<R>.ev(): (P) -> R =
         (this as Function1<P, R>).f
 
-fun <P, R> Function1F<R>.invoke(p: P): R =
+operator fun <P, R> Function1F<R>.invoke(p: P): R =
         this.ev<P, R>().invoke(p)
 
 // We don't want an inherited class to avoid equivalence issues, so a simple HK wrapper will do
 data class Function1<in A, out R>(val f: (A) -> R) : Function1F<R> {
     class F private constructor()
-
-    operator fun invoke(a: A): R =
-            f(a)
 
     companion object {
         fun <P> functor() = object : Function1Instances<P> {}
