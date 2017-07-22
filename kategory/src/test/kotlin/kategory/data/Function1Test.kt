@@ -12,10 +12,6 @@ class Function1Test : UnitSpec() {
                     a.invoke(1) == b.invoke(1)
         }))
 
-        "bla" {
-           { a: Int -> a + 1 }.k().invoke(1)
-        }
-
         "Function1Monad.binding should for comprehend over all values of multiple Function0" {
             val M = Function1.monad<Int>()
             M.binding {
