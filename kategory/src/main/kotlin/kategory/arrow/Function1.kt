@@ -6,15 +6,11 @@ fun <P, R> ((P) -> R).k(): Function1<P, R> =
         Function1(this)
 
 @Suppress("UNCHECKED_CAST")
-fun <R> Function1F<R>.ev(): FunctionInject<R> =
-        this as FunctionInject<R>
+fun <P, R> Function1F<R>.ev(): Function1<P, R> =
+        this as Function1<P, R>
 
 // We don't want an inherited class to avoid equivalence issues, so a simple HK wrapper will do
-data class Function1<in A, out R>(val f: (A) -> R) : FunctionInject<R>, Function1F<R> {
-    override fun <P> invokeInject(p: P): R =
-            f(p as A)
-
-    @Suppress("UNCHECKED_CAST")
+data class Function1<in A, out R>(val f: (A) -> R) : Function1F<R> {
     operator fun invoke(a: A): R =
             f(a)
 
