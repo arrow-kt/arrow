@@ -9,7 +9,7 @@ class Function1Test : UnitSpec() {
     init {
         testLaws(MonadLaws.laws(Function1.monad<Int>(), object : Eq<HK<Function1.F, Int>> {
             override fun eqv(a: HK<Function1.F, Int>, b: HK<Function1.F, Int>): Boolean =
-                    a.invoke(1) == b.invoke(1)
+                    a(1) == b(1)
         }))
 
         "Function1Monad.binding should for comprehend over all values of multiple Function0" {

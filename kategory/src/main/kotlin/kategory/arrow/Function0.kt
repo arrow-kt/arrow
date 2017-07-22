@@ -16,7 +16,7 @@ data class Function0<out A>(internal val f: () -> A) : HK<Function0.F, A> {
     companion object : Bimonad<Function0.F>, GlobalInstance<Bimonad<Function0.F>>() {
 
         override fun <A, B> flatMap(fa: HK<Function0.F, A>, f: (A) -> HK<Function0.F, B>): Function0<B> =
-                Function0(f(fa.invoke()).ev())
+                Function0(f(fa()).ev())
 
         override fun <A, B> coflatMap(fa: HK<Function0.F, A>, f: (HK<Function0.F, A>) -> B): Function0<B> =
                 { f(fa) }.k()
