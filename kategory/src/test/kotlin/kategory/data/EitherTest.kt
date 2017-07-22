@@ -12,6 +12,7 @@ class EitherTest : UnitSpec() {
     init {
 
         testLaws(MonadErrorLaws.laws(Either.monadError(), Eq.any()))
+        testLaws(TraverseLaws.laws(Either.traverse<Throwable>(), Either.applicative(), { it.right() }, Eq.any()))
 
         "map should modify value" {
             forAll { a: Int, b: String ->
