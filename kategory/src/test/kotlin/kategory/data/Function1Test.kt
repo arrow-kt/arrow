@@ -9,7 +9,7 @@ class Function1Test : UnitSpec() {
     init {
         testLaws(MonadLaws.laws(Function1.monad<Int>(), object : Eq<HK<Function1.F, Int>> {
             override fun eqv(a: HK<Function1.F, Int>, b: HK<Function1.F, Int>): Boolean =
-                    a.ev<Int, Int>().invoke(1) == b.ev<Int, Int>().invoke(1)
+                    a.invoke(1) == b.invoke(1)
         }))
 
         "bla" {
@@ -23,7 +23,7 @@ class Function1Test : UnitSpec() {
                 val y = !Function1 { _: Int -> 2 }
                 val z = bind { Function1 { _: Int -> 3 } }
                 yields(x + y + z)
-            }.ev<Int, Int>().invoke(0) shouldBe 6
+            }.invoke(0) shouldBe 6
         }
     }
 }
