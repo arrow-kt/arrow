@@ -6,8 +6,11 @@ fun <P, R> ((P) -> R).k(): Function1<P, R> =
         Function1(this)
 
 @Suppress("UNCHECKED_CAST")
-fun <P, R> Function1F<R>.ev(): Function1<P, R> =
-        this as Function1<P, R>
+fun <P, R> Function1F<R>.ev(): (P) -> R =
+        (this as Function1<P, R>).f
+
+fun <P, R> Function1F<R>.invoke(p: P): R =
+        this.ev<P, R>().invoke(p)
 
 // We don't want an inherited class to avoid equivalence issues, so a simple HK wrapper will do
 data class Function1<in A, out R>(val f: (A) -> R) : Function1F<R> {
