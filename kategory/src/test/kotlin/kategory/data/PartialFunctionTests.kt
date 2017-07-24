@@ -36,5 +36,15 @@ class PartialFunctionTests : UnitSpec() {
             fa.isDefinedAt(-1) shouldBe false
         }
 
+        "match statements " {
+            val result: Int = match("1")(
+                case(typeOf<String>() then { (it).toInt() }),
+                case(typeOf<Option.Some<Int>>() then { it.value }),
+                case(typeOf<Int>() then { it }),
+                default = { it.toInt() }
+            )
+            result shouldBe 1
+        }
+
     }
 }

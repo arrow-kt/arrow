@@ -44,9 +44,10 @@ infix fun <A, B> ((A) -> Boolean).then(f: (A) -> B): Tuple2<(A) -> Boolean, (A) 
 
 fun <A, B> default(f: (A) -> B): (A) -> B = f
 
+@Suppress("UNCHECKED_CAST")
 class match<A>(val a: A) {
-    operator fun <B> invoke(vararg cases: PartialFunction<A, B>, default: (A) -> B): B {
-        val f = cases.reduce { a, b -> a.orElse(b) }
+    operator fun <B> invoke(vararg cases: PartialFunction<*, B>, default: (A) -> B): B {
+        val f = cases.reduce { a, b -> a.orElse(b) } as PartialFunction<A, B>
         return if (f.isDefinedAt(a)) f(a) else default(a)
     }
 }
