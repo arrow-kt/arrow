@@ -32,7 +32,7 @@ class PartialFunctionTests : UnitSpec() {
         }
 
         "match nested statements" {
-            val result: Any? = match("1".some())(
+            val result: Int = match("1".some())(
                     case(typeOf<String>() then { (it).toInt() }),
                     case(typeOf<Option.Some<Int>>() then { it.value + 1 }),
                     case(typeOf<Option.Some<String>>() then { it.value.toInt() * 10 }),
