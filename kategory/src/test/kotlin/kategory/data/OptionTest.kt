@@ -14,6 +14,7 @@ class OptionTest: UnitSpec() {
     init {
 
         testLaws(MonadLaws.laws(Option, Eq.any()))
+        testLaws(TraverseLaws.laws(Option, Option, ::Some, Eq.any()))
 
         "map should modify value" {
             Some(12).map { "flower" } shouldBe Some("flower")

@@ -73,7 +73,7 @@ class NonEmptyListTest : UnitSpec() {
                 val x = !NonEmptyList.of(1)
                 val y = NonEmptyList.of(2).extract()
                 val z = extract { NonEmptyList.of(3) }
-                yields(x + y + z)
+                x + y + z
             }
             result shouldBe 6
         }
@@ -83,7 +83,7 @@ class NonEmptyListTest : UnitSpec() {
                 val x = !NonEmptyList.of(1, 2)
                 val y = NonEmptyList.of(3).extract()
                 val z = extract { NonEmptyList.of(4) }
-                yields(x + y + z)
+                x + y + z
             }
             result shouldBe 8
         }
@@ -97,7 +97,7 @@ class NonEmptyListTest : UnitSpec() {
                     val x = !nel
                     val y = nel2.extract()
                     val z = extract { nel3 }
-                    yields(x + y + z)
+                    x + y + z
                 }
                 result == 1 + 3 + a
             }

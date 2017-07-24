@@ -9,6 +9,7 @@ class IdTest : UnitSpec() {
     init {
 
         testLaws(MonadLaws.laws(Id, Eq.any()))
+        testLaws(TraverseLaws.laws(Id, Id, ::Id, Eq.any()))
 
         "IdMonad.binding should for comprehend over all values of multiple Ids" {
             Id.binding {
@@ -24,7 +25,7 @@ class IdTest : UnitSpec() {
                 val x = Id(1).extract()
                 val y = !Id(2)
                 val z = extract { Id(3) }
-                yields(x + y + z)
+                x + y + z
             } shouldBe 6
         }
 

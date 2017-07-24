@@ -149,7 +149,7 @@ class CofreeTest : UnitSpec() {
                 })
                 val value: Int = !program.run()
                 val tail: Int = !program.runTail()
-                yields(value + tail)
+                value + tail
             }
             program shouldBe 0
             loops.counter shouldBe limit + 1

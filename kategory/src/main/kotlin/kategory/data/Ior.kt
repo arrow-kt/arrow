@@ -5,6 +5,8 @@ import kategory.Either.Right
 
 typealias IorKind<A, B> = HK2<Ior.F, A, B>
 
+typealias IorF<L> = HK<Ior.F, L>
+
 fun <A, B> IorKind<A, B>.ev(): Ior<A, B> =
         this as Ior<A, B>
 
@@ -96,11 +98,11 @@ sealed class Ior<out A, out B> : IorKind<A, B> {
             override fun SL(): Semigroup<L> = SL
         }
 
-        inline fun <reified L> functor(SL: Semigroup<L> = semigroup<L>()): Functor<HK<F, L>> = instances(SL)
+        inline fun <reified L> functor(SL: Semigroup<L> = semigroup<L>()): Functor<IorF<L>> = instances(SL)
 
-        inline fun <reified L> applicative(SL: Semigroup<L> = semigroup<L>()): Applicative<HK<F, L>> = instances(SL)
+        inline fun <reified L> applicative(SL: Semigroup<L> = semigroup<L>()): Applicative<IorF<L>> = instances(SL)
 
-        inline fun <reified L> monad(SL: Semigroup<L> = semigroup<L>()): Monad<HK<F, L>> = instances(SL)
+        inline fun <reified L> monad(SL: Semigroup<L> = semigroup<L>()): Monad<IorF<L>> = instances(SL)
 
         fun <L> foldable(): Foldable<HK<F, L>> = object : IorTraverse<L> {}
 

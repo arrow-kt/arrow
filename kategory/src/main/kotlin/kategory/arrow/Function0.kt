@@ -6,15 +6,17 @@ fun <A> (() -> A).k(): Function0<A> =
 fun <A> HK<Function0.F, A>.ev(): () -> A =
         (this as Function0<A>).f
 
+operator fun <A> HK<Function0.F, A>.invoke(): A =
+        (this as Function0<A>).f()
+
 // We don't want an inherited class to avoid equivalence issues, so a simple HK wrapper will do
 data class Function0<out A>(internal val f: () -> A) : HK<Function0.F, A> {
-
     class F private constructor()
 
     companion object : Bimonad<Function0.F>, GlobalInstance<Bimonad<Function0.F>>() {
 
         override fun <A, B> flatMap(fa: HK<Function0.F, A>, f: (A) -> HK<Function0.F, B>): Function0<B> =
-                f(fa.ev().invoke()).ev().k()
+                Function0(f(fa()).ev())
 
         override fun <A, B> coflatMap(fa: HK<Function0.F, A>, f: (HK<Function0.F, A>) -> B): Function0<B> =
                 { f(fa) }.k()
@@ -23,15 +25,15 @@ data class Function0<out A>(internal val f: () -> A) : HK<Function0.F, A> {
                 { a }.k()
 
         override fun <A> extract(fa: HK<Function0.F, A>): A =
-                fa.ev().invoke()
+                fa()
 
         override fun <A, B> map(fa: HK<F, A>, f: (A) -> B): Function0<B> =
-                pure(f(fa.ev().invoke()))
+                pure(f(fa()))
 
         override fun <A, B> tailRecM(a: A, f: (A) -> HK<F, Either<A, B>>): Function0<B> =
                 Function0 {
                     tailrec fun loop(thisA: A): B =
-                            f(thisA).ev().invoke().fold({ loop(it) }, { it })
+                            f(thisA).invoke().fold({ loop(it) }, { it })
 
                     loop(a)
                 }
