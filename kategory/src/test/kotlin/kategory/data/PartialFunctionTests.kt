@@ -21,11 +21,12 @@ class PartialFunctionTests : UnitSpec() {
         }
 
         "match statements " {
-            val result: Int = match("1")(
+            val value: Any = "1"
+            val result: Int = match(value)(
                 case(typeOf<String>() then { (it).toInt() }),
                 case(typeOf<Option.Some<Int>>() then { it.value }),
                 case(typeOf<Int>() then { it }),
-                default = { it.toInt() }
+                default = { 0 }
             )
             result shouldBe 1
         }
@@ -34,8 +35,9 @@ class PartialFunctionTests : UnitSpec() {
             val result: Any? = match("1".some())(
                     case(typeOf<String>() then { (it).toInt() }),
                     case(typeOf<Option.Some<Int>>() then { it.value + 1 }),
+                    case(typeOf<Option.Some<Double>>() then { it.value.toInt() }),
                     case(typeOf<Int>() then { it }),
-                    default = { it.fold({ "" },{ it }).toInt() }
+                    default = { 0 }
             )
             result shouldBe 1
         }
