@@ -47,7 +47,7 @@ fun <B> default(f: (Any) -> B): (Any) -> B = f
 class match<A>(val a: A) {
     operator fun <B> invoke(vararg cases: PartialFunction<*, B>, default: (A) -> B): B {
         val maybeB = collectLoop(a, cases.toList() as List<PartialFunction<A, B>>, Option.None)
-        return maybeB.fold({default(a)}, {it})
+        return maybeB.fold({ default(a) }, { it })
     }
 }
 
