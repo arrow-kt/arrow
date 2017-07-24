@@ -24,15 +24,12 @@ fun <A, B> PartialFunction<A, B>.orElse(f: PartialFunction<A, B>): PartialFuncti
 fun <A, B, C> PartialFunction<A, B>.andThen(f: (B) -> C): PartialFunction<A, C> {
     val fthis = this
     return object : PartialFunction<A, C>() {
-
         override fun isDefinedAt(a: A): Boolean = fthis.isDefinedAt(a)
-
         override fun invoke(a: A): C = f(fthis(a))
-
     }
 }
 
-fun <A: Any?, B> case(ff: Tuple2<(A) -> Boolean, (A) -> B>): PartialFunction<A, B> =
+fun <A : Any?, B> case(ff: Tuple2<(A) -> Boolean, (A) -> B>): PartialFunction<A, B> =
         object : PartialFunction<A, B>() {
             override fun isDefinedAt(a: A): Boolean = ff.a(a)
             override fun invoke(a: A): B = ff.b(a)
