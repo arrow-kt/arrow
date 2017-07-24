@@ -30,5 +30,15 @@ class PartialFunctionTests : UnitSpec() {
             result shouldBe 1
         }
 
+        "match nested statements" {
+            val result: Any? = match("1".some())(
+                    case(typeOf<String>() then { (it).toInt() }),
+                    case(typeOf<Option.Some<Int>>() then { it.value + 1 }),
+                    case(typeOf<Int>() then { it }),
+                    default = { it.fold({ "" },{ it }).toInt() }
+            )
+            result shouldBe 1
+        }
+
     }
 }
