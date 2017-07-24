@@ -58,5 +58,30 @@ class PartialFunctionTests : UnitSpec() {
             result shouldBe 666
         }
 
+        "match with Nothing" {
+            val result: Int = match("1".some())(
+                    case(typeOf<String>() then { (it).toInt() }),
+                    case(typeOf<Option.Some<Nothing?>>() then { 666 }),
+                    case(typeOf<Option.Some<String>>() then { it.value.toInt() * 10 }),
+                    case(typeOf<Option.Some<Double>>() then { it.value.toInt() }),
+                    case(typeOf<Int>() then { it }),
+                    default = { 0 }
+            )
+            result shouldBe 666
+        }
+
+
+        "match with Any?" {
+            val result: Int = match("1".some())(
+                    case(typeOf<String>() then { (it).toInt() }),
+                    case(typeOf<Option.Some<Any?>>() then { 666 }),
+                    case(typeOf<Option.Some<String>>() then { it.value.toInt() * 10 }),
+                    case(typeOf<Option.Some<Double>>() then { it.value.toInt() }),
+                    case(typeOf<Int>() then { it }),
+                    default = { 0 }
+            )
+            result shouldBe 666
+        }
+
     }
 }
