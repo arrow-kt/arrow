@@ -1,8 +1,6 @@
 package kategory
 
 import io.kotlintest.properties.forAll
-import kategory.typeclasses.MonadState
-import kategory.typeclasses.monadState
 
 object MonadStateLaws {
 

@@ -16,8 +16,8 @@ class StateT<F, S, A>(
     class F private constructor()
 
     companion object {
-        inline operator fun <reified F, S, A> invoke(run: StateTFunKind<F, S, A>, MF: Monad<F> = monad<F>()): StateT<F, S, A> =
-                StateT(MF, run)
+        operator fun <F, S, A> invoke(run: (S) -> HK<F, Tuple2<S, A>>, MF: Monad<F>): StateT<F, S, A> =
+                StateT(MF, MF.pure(run))
 
         inline fun <reified F, S> instances(MF: Monad<F> = monad<F>()): StateTInstances<F, S> = object : StateTInstances<F, S> {
             override fun MF(): Monad<F> = MF
