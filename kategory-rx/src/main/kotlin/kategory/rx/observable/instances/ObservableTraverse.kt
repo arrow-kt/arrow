@@ -1,6 +1,4 @@
-package kategory.rx.observable.instances
-
-import kategory.*
+package kategory
 
 class ObservableTraverse() : Traverse<ObservableKindAdapter.F> {
     override fun <G, A, B> traverse(fa: ObservableKind<A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, ObservableKind<B>> {
