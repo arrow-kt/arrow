@@ -3,7 +3,8 @@ package kategory
 interface StateTInstances<F, S> :
         Functor<StateTF<F, S>>,
         Applicative<StateTF<F, S>>,
-        Monad<StateTF<F, S>> {
+        Monad<StateTF<F, S>>,
+        MonadState<StateTF<F, S>, S> {
 
     fun MF(): Monad<F>
 

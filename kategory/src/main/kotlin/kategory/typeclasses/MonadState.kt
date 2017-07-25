@@ -1,12 +1,6 @@
-package kategory.typeclasses
-
-import kategory.*
+package kategory
 
 interface MonadState<F, S> : Monad<F>, Typeclass {
-
-    companion object {
-        inline fun <reified F, reified S> apply(FS: MonadState<F, S> = monadState<F, S>()): MonadState<F, S> = FS
-    }
 
     fun <A> state(f: (S) -> Tuple2<S, A>): HK<F, A> =
             flatMap(get(), { s -> f(s).let { (a, b) -> map(set(a), { b }) } })

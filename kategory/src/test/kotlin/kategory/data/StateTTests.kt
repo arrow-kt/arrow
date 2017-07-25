@@ -8,9 +8,10 @@ import org.junit.runner.RunWith
 class StateTTests : UnitSpec() {
 
     init {
-        val instances = StateT.monad<Try.F, Int>(Try)
 
-        testLaws(MonadLaws.laws(instances, object : Eq<StateTKind<Try.F, Int, Int>> {
+        val instances = StateT.monadState<Try.F, Int>(Try)
+
+        testLaws(MonadStateLaws.laws(instances, object : Eq<StateTKind<Try.F, Int, Int>> {
             override fun eqv(a: StateTKind<Try.F, Int, Int>, b: StateTKind<Try.F, Int, Int>): Boolean =
                     a.ev().run(1) == b.ev().run(1)
 
