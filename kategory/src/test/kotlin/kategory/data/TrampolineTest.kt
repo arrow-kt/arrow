@@ -7,20 +7,13 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class TrampolineTest : UnitSpec() {
 
-    val idInterpreter: FunctionK<Function0.F, Id.F> = object : FunctionK<Function0.F, Id.F> {
-        override fun <A> invoke(fa: HK<Function0.F, A>): Id<A> {
-            val op = fa.ev()
-            return Id(op())
-        }
-    }
-
     init {
         "trampoline over 10000 should return false and not break the stack" {
-            odd(10000).foldMap(idInterpreter, Id).value() shouldBe false
+            odd(10000).foldMap(idFunction0Interpreter, Id).value() shouldBe false
         }
 
         "trampoline over 10001 should return true and not break the stack" {
-            odd(10001).foldMap(idInterpreter, Id).value() shouldBe true
+            odd(10001).foldMap(idFunction0Interpreter, Id).value() shouldBe true
         }
     }
 
