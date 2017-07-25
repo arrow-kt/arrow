@@ -18,6 +18,16 @@ class StateT<F, S, A>(
     companion object {
         inline operator fun <reified F, S, A> invoke(run: StateTFunKind<F, S, A>, MF: Monad<F> = monad<F>()): StateT<F, S, A> =
                 StateT(MF, run)
+
+        inline fun <reified F, S> instances(MF: Monad<F> = monad<F>()): StateTInstances<F, S> = object : StateTInstances<F, S> {
+            override fun MF(): Monad<F> = MF
+        }
+
+        inline fun <reified F, S> functor(MF: Monad<F> = monad<F>()): StateTInstances<F, S> = instances(MF)
+
+        inline fun <reified F, S> applicative(MF: Monad<F> = monad<F>()): StateTInstances<F, S> = instances(MF)
+
+        inline fun <reified F, S> monad(MF: Monad<F> = monad<F>()): StateTInstances<F, S> = instances(MF)
     }
 
     fun <B> map(f: (A) -> B): StateT<F, S, B> =
@@ -87,3 +97,5 @@ class StateT<F, S, A>(
             MF.map(run(s)) { it.a }
 }
 
+inline fun <reified F, S, A> StateTFunKind<F, S, A>.stateT(FT: Monad<F> = monad()) : StateT<F, S, A> =
+        StateT(FT, this)

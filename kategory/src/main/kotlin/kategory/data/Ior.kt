@@ -5,6 +5,8 @@ import kategory.Either.Right
 
 typealias IorKind<A, B> = HK2<Ior.F, A, B>
 
+typealias IorF<L> = HK<Ior.F, L>
+
 fun <A, B> IorKind<A, B>.ev(): Ior<A, B> =
         this as Ior<A, B>
 
@@ -92,6 +94,19 @@ sealed class Ior<out A, out B> : IorKind<A, B> {
             }
         }
 
+        inline fun <reified L> instances(SL: Semigroup<L> = semigroup<L>()): IorInstances<L> = object : IorInstances<L> {
+            override fun SL(): Semigroup<L> = SL
+        }
+
+        inline fun <reified L> functor(SL: Semigroup<L> = semigroup<L>()): Functor<IorF<L>> = instances(SL)
+
+        inline fun <reified L> applicative(SL: Semigroup<L> = semigroup<L>()): Applicative<IorF<L>> = instances(SL)
+
+        inline fun <reified L> monad(SL: Semigroup<L> = semigroup<L>()): Monad<IorF<L>> = instances(SL)
+
+        fun <L> foldable(): Foldable<HK<F, L>> = object : IorTraverse<L> {}
+
+        fun <L> traverse(): Traverse<HK<F, L>> = object : IorTraverse<L> {}
     }
 
     /**
@@ -273,3 +288,15 @@ inline fun <A, B, D> Ior<A, B>.flatMap(SA: Semigroup<A>, crossinline f: (B) -> I
 }
 
 inline fun <A, B> Ior<A, B>.getOrElse(crossinline default: () -> B): B = fold({ default() }, { it }, { _, b -> b })
+
+fun <A, B> A.rightIor(): Ior<B, A> =
+        Ior.Right(this)
+
+fun <A, B> A.leftIor(): Ior<A, B> =
+        Ior.Left(this)
+
+fun <A, B> Pair<A, B>.bothIor(): Ior<A, B> =
+        Ior.Both(this.first, this.second)
+
+fun <A, B> Tuple2<A, B>.bothIor(): Ior<A, B> =
+        Ior.Both(this.a, this.b)

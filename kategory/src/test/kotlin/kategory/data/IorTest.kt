@@ -3,6 +3,7 @@ package kategory
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.forAll
+import kategory.Ior.Right
 import org.junit.runner.RunWith
 
 
@@ -11,9 +12,10 @@ class IorTest : UnitSpec() {
 
     init {
 
-        val intIorMonad = IorMonad(IntMonoid)
+        val intIorMonad = Ior.monad(IntMonoid)
 
-        testLaws(MonadLaws.laws(intIorMonad))
+        testLaws(MonadLaws.laws(intIorMonad, Eq.any()))
+        testLaws(TraverseLaws.laws(Ior.traverse(), Ior.applicative<Int>(), ::Right, Eq.any()))
 
         "flatMap() should modify entity" {
             forAll { a: Int, b: String ->

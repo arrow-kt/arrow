@@ -15,7 +15,7 @@ sealed class Try<out A> : TryKind<A> {
 
     class F private constructor()
 
-    companion object : TryMonadError, GlobalInstance<MonadError<Try.F, Throwable>>() {
+    companion object : TryInstances, GlobalInstance<MonadError<Try.F, Throwable>>() {
 
         inline operator fun <A> invoke(f: () -> A): Try<A> =
                 try {
@@ -26,6 +26,19 @@ sealed class Try<out A> : TryKind<A> {
 
         fun <A> raise(e: Exception): Try<A> =
                 Failure(e)
+
+        fun functor(): Functor<Try.F> = this
+
+        fun applicative(): Applicative<Try.F> = this
+
+        fun monad(): Monad<Try.F> = this
+
+        fun monadError(): MonadError<Try.F, Throwable> = this
+
+        fun foldable(): Foldable<Try.F> = this
+
+        fun traverse(): Traverse<Try.F> = this
+
     }
 
     /**
@@ -118,3 +131,6 @@ fun <B> Try<B>.recover(f: (Throwable) -> B): Try<B> =
  */
 fun <B> Try<B>.transform(s: (B) -> Try<B>, f: (Throwable) -> Try<B>): Try<B> =
         fold({ f(it) }, { flatMap(s) })
+
+fun <A> (() -> A).try_(): Try<A> =
+        Try(this)

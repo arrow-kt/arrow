@@ -8,7 +8,7 @@ import org.junit.runner.RunWith
 class ReaderTest : UnitSpec() {
     init {
         "map should return mapped value" {
-            Reader<Int, Int> { it -> it * 2 }.map { it -> it * 3 }.runId(2) shouldBe 12
+            Reader<Int, Int> ({ it -> it * 2 }).map { it -> it * 3 }.runId(2) shouldBe 12
         }
 
         "flatMap should map over the inner value" {

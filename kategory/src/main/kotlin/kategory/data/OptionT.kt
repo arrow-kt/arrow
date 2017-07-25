@@ -18,17 +18,35 @@ data class OptionT<F, A>(val MF: Monad<F>, val value: HK<F, Option<A>>) : Option
 
     companion object {
 
-        inline operator fun <reified F, A> invoke(value: HK<F, Option<A>>, MF: Monad<F> = monad<F>()): OptionT<F, A> =
+        inline operator fun <reified F, A> invoke(value: HK<F, Option<A>>, MF: Monad<F> = kategory.monad<F>()): OptionT<F, A> =
                 OptionT(MF, value)
 
-        @JvmStatic inline fun <reified F, A> pure(a: A, MF: Monad<F> = monad<F>()): OptionT<F, A> =
+        @JvmStatic inline fun <reified F, A> pure(a: A, MF: Monad<F> = kategory.monad<F>()): OptionT<F, A> =
                 OptionT(MF, MF.pure(Option.Some(a)))
 
-        @JvmStatic inline fun <reified F> none(MF: Monad<F> = monad<F>()): OptionT<F, Nothing> =
+        @JvmStatic inline fun <reified F> none(MF: Monad<F> = kategory.monad<F>()): OptionT<F, Nothing> =
                 OptionT(MF, MF.pure(Option.None))
 
-        @JvmStatic inline fun <reified F, A> fromOption(value: Option<A>, MF: Monad<F> = monad<F>()): OptionT<F, A> =
+        @JvmStatic inline fun <reified F, A> fromOption(value: Option<A>, MF: Monad<F> = kategory.monad<F>()): OptionT<F, A> =
                 OptionT(MF, MF.pure(value))
+
+        inline fun <reified F> instances(MF : Monad<F> = kategory.monad<F>()): OptionTInstances<F> = object : OptionTInstances<F> {
+            override fun MF(): Monad<F> = MF
+        }
+
+        inline fun <reified F> functor(MF : Monad<F> = kategory.monad<F>()): Functor<OptionTF<F>> = instances(MF)
+
+        inline fun <reified F> applicative(MF : Monad<F> = kategory.monad<F>()): Applicative<OptionTF<F>> = instances(MF)
+
+        inline fun <reified F> monad(MF : Monad<F> = kategory.monad<F>()): Monad<OptionTF<F>> = instances(MF)
+
+        inline fun <reified F> traverse(FF: Traverse<F> = kategory.traverse<F>(), MF: Monad<F> = kategory.monad<F>()): Traverse<OptionTF<F>> = object : OptionTTraverse<F> {
+            override fun FF(): Traverse<F> = FF
+
+            override fun MF(): Monad<F> = MF
+        }
+
+        inline fun <reified F> foldable(FF: Traverse<F> = kategory.traverse<F>(), MF: Monad<F> = kategory.monad<F>()): Foldable<OptionTF<F>> = traverse(FF, MF)
     }
 
     inline fun <B> fold(crossinline default: () -> B, crossinline f: (A) -> B): HK<F, B> =
@@ -86,13 +104,13 @@ data class OptionT<F, A>(val MF: Monad<F>, val value: HK<F, Option<A>>) : Option
             transform({ it.flatMap(f) })
 
     fun <B> foldL(b: B, f: (B, A) -> B, FF: Foldable<F>): B =
-            FF.compose(OptionTraverse).foldLC(value, b, f)
+            FF.compose(Option).foldLC(value, b, f)
 
     fun <B> foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>): Eval<B> =
-            FF.compose(OptionTraverse).foldRC(value, lb, f)
+            FF.compose(Option).foldRC(value, lb, f)
 
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>, FF: Traverse<F>, MF: Monad<F>): HK<G, HK<OptionTF<F>, B>> {
-        val fa = ComposedTraverse(FF, OptionTraverse, Option).traverseC(value, f, GA)
+        val fa = ComposedTraverse(FF, Option, Option).traverseC(value, f, GA)
         return GA.map(fa, { OptionT(MF, MF.map(it.lower(), { it.ev() })) })
     }
 

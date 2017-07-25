@@ -12,7 +12,7 @@ sealed class Ops<out A> : HK<Ops.F, A> {
     data class Add(val a: Int, val y: Int) : Ops<Int>()
     data class Subtract(val a: Int, val y: Int) : Ops<Int>()
 
-    companion object : FreeMonad<Ops.F> {
+    companion object : FreeInstances<Ops.F> {
         fun value(n: Int): Free<Ops.F, Int> = Free.liftF(Ops.Value(n))
         fun add(n: Int, y: Int): Free<Ops.F, Int> = Free.liftF(Ops.Add(n, y))
         fun subtract(n: Int, y: Int): Free<Ops.F, Int> = Free.liftF(Ops.Subtract(n, y))
@@ -24,21 +24,21 @@ fun <A> HK<Ops.F, A>.ev(): Ops<A> = this as Ops<A>
 @RunWith(KTestJUnitRunner::class)
 class FreeTest : UnitSpec() {
 
-    val program = Ops.binding {
+    private val program = Ops.binding {
         val added = !Ops.add(10, 10)
-        val substracted = !Ops.subtract(added, 50)
-        yields(substracted)
+        val subtracted = !Ops.subtract(added, 50)
+        yields(subtracted)
     }.ev()
 
-    fun stackSafeTestProgram(n: Int, stopAt: Int): Free<Ops.F, Int> = Ops.binding {
+    private fun stackSafeTestProgram(n: Int, stopAt: Int): Free<Ops.F, Int> = Ops.binding {
         val v = !Ops.add(n, 1)
-        val r = !if (v < stopAt) stackSafeTestProgram(v, stopAt) else Free.pure<Ops.F, Int>(v)
+        val r = !if (v < stopAt) stackSafeTestProgram(v, stopAt) else Free.pure(v)
         yields(r)
     }.ev()
 
     init {
 
-        testLaws(MonadLaws.laws(Ops))
+        testLaws(MonadLaws.laws(Ops, FreeEq(idInterpreter)))
 
         "Can interpret an ADT as Free operations" {
             program.foldMap(optionInterpreter, Option).ev() shouldBe Option.Some(-30)

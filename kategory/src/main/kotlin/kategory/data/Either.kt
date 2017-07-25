@@ -133,6 +133,24 @@ sealed class Either<out A, out B> : EitherKind<A, B> {
         override val isLeft = false
         override val isRight = true
     }
+
+    companion object {
+
+        fun <L> instances(): EitherInstances<L> = object : EitherInstances<L> {}
+
+        fun <L> functor(): Functor<EitherF<L>> = instances()
+
+        fun <L> applicative(): Applicative<EitherF<L>> = instances()
+
+        fun <L> monad(): Monad<EitherF<L>> = instances()
+
+        fun <L> foldable(): Foldable<EitherF<L>> = instances()
+
+        fun <L> traverse(): Traverse<EitherF<L>> = instances()
+
+        fun <L> monadError(): MonadError<EitherF<L>, L> = instances()
+
+    }
 }
 
 /**
@@ -190,3 +208,8 @@ inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, default: 
  */
 fun <A, B> Either<A, B>.contains(elem: B): Boolean =
         fold({ false }, { it == elem })
+
+fun <A> A.left() : Either<A, Nothing> = Either.Left(this)
+
+fun <A> A.right() : Either<Nothing, A> = Either.Right(this)
+

@@ -21,6 +21,15 @@ interface Comonad<F> : Functor<F>, Typeclass {
             coflatMap(fa, { it })
 }
 
+inline fun <reified F, A, B> HK<F, A>.coflatMap(FT: Comonad<F> = comonad(), noinline f: (HK<F, A>) -> B): HK<F, B> =
+        FT.coflatMap(this, f)
+
+inline fun <reified F, A> HK<F, A>.extract(FT: Comonad<F> = comonad()): A =
+        FT.extract(this)
+
+inline fun <reified F, A> HK<F, A>.duplicate(FT: Comonad<F> = comonad()): HK<F, HK<F, A>> =
+        FT.duplicate(this)
+
 @RestrictsSuspension
 open class ComonadContinuation<F, A : Any>(val CM: Comonad<F>) : Serializable, Continuation<A> {
 
@@ -49,10 +58,6 @@ open class ComonadContinuation<F, A : Any>(val CM: Comonad<F>) : Serializable, C
         }))
         COROUTINE_SUSPENDED
     }
-
-    infix fun <B> yields(b: B) = yields { b }
-
-    infix fun <B> yields(b: () -> B) = b()
 }
 
 /**

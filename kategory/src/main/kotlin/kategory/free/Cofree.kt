@@ -53,6 +53,8 @@ data class Cofree<S, A>(val FS: Functor<S>, val head: A, val tail: Eval<CofreeEv
 
         fun <S, A> create(a: A, f: (A) -> HK<S, A>, FS: Functor<S>): Cofree<S, A> =
                 Cofree(FS, a, Eval.later { FS.map(f(a), { create(it, f, FS) }) })
+
+        fun <S> comonad() : CofreeInstances<S> = object : CofreeInstances<S> {}
     }
 }
 

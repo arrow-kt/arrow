@@ -194,7 +194,7 @@ sealed class Eval<out A> : HK<Eval.F, A> {
         }
     }
 
-    companion object : EvalMonad, GlobalInstance<Monad<Eval.F>>() {
+    companion object : EvalInstances, GlobalInstance<Monad<Eval.F>>() {
         @JvmStatic fun <A> now(a: A) = Now(a)
         @JvmStatic fun <A> later(f: () -> A) = Later(f)
         @JvmStatic fun <A> always(f: () -> A) = Always(f)
@@ -206,5 +206,11 @@ sealed class Eval<out A> : HK<Eval.F, A> {
         @JvmStatic val False: Eval<Boolean> = Now(false)
         @JvmStatic val Zero: Eval<Int> = Now(0)
         @JvmStatic val One: Eval<Int> = Now(1)
+
+        fun functor(): Functor<Eval.F> = this
+
+        fun applicative(): Applicative<Eval.F> = this
+
+        fun monad(): Monad<Eval.F> = this
     }
 }

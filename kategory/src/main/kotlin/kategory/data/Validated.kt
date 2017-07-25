@@ -18,6 +18,9 @@ sealed class Validated<out E, out A> : ValidatedKind<E, A> {
         @JvmStatic fun <E, A> invalidNel(e: E): ValidatedNel<E, A> =
                 Validated.Invalid(NonEmptyList(e, listOf()))
 
+        @JvmStatic fun <E, A> validNel(a: A): ValidatedNel<E, A> =
+                Validated.Valid(a)
+
         /**
          * Converts a `Try<A>` to a `Validated<Throwable, A>`.
          */
@@ -39,6 +42,19 @@ sealed class Validated<out E, out A> : ValidatedKind<E, A> {
                         { Invalid(ifNone()) },
                         { Valid(it) }
                 )
+
+        inline fun <reified E> instances(SE: Semigroup<E> = semigroup<E>()): ValidatedInstances<E> = object : ValidatedInstances<E> {
+            override fun SE(): Semigroup<E> = SE
+
+        }
+
+        inline fun <reified E> functor(SE: Semigroup<E> = semigroup<E>()): Functor<ValidatedF<E>> = instances(SE)
+
+        inline fun <reified E> applicative(SE: Semigroup<E> = semigroup<E>()): Applicative<ValidatedF<E>> = instances(SE)
+
+        inline fun <reified E> foldable(SE: Semigroup<E> = semigroup<E>()): Foldable<ValidatedF<E>> = instances(SE)
+
+        inline fun <reified E> traverse(SE: Semigroup<E> = semigroup<E>()): Traverse<ValidatedF<E>> = instances(SE)
     }
 
     data class Valid<out A>(val a: A) : Validated<Nothing, A>()
@@ -178,3 +194,15 @@ fun <E, A, B> Validated<E, A>.ap(f: Validated<E, (A) -> B>, SE: Semigroup<E>): V
                 f.fold({ Validated.Invalid(SE.combine(it, e)) }, { Validated.Invalid(e) })
             }
         }
+
+fun <E, A> A.valid(): Validated<E, A> =
+        Validated.Valid(this)
+
+fun <E, A> E.invalid(): Validated<E, A> =
+        Validated.Invalid(this)
+
+fun <E, A> A.validNel(): ValidatedNel<E, A> =
+        Validated.validNel(this)
+
+fun <E, A> E.invalidNel(): ValidatedNel<E, A> =
+        Validated.invalidNel(this)

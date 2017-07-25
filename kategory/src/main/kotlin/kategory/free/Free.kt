@@ -16,6 +16,15 @@ sealed class Free<out S, out A> : FreeKind<S, A> {
 
         fun <S, A> liftF(fa: HK<S, A>): Free<S, A> =
                 Suspend(fa)
+
+        fun <S, A> defer(value: () -> Free<S, A>): Free<S, A> =
+                pure<S, Unit>(Unit).flatMap { _ -> value() }
+
+        fun <S> functor(): FreeInstances<S> = object : FreeInstances<S> {}
+
+        fun <S> applicative(): FreeInstances<S> = object : FreeInstances<S> {}
+
+        fun <S> monad(): FreeInstances<S> = object : FreeInstances<S> {}
     }
 
     abstract fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B>
@@ -73,3 +82,6 @@ fun <M, S, A> Free<S, A>.foldMap(f: FunctionK<S, M>, MM: Monad<M>): HK<M, A> =
                 }
             }
         }
+
+fun <S, A> A.free(): Free<S, A> =
+        Free.pure<S, A>(this)
