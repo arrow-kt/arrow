@@ -30,19 +30,4 @@ fun <A, B> case(ff: Tuple2<(A) -> Boolean, (A) -> B>): PartialFunction<A, B> =
             override fun invoke(a: A): B = ff.b(a)
         }
 
-inline fun <reified A> typeOf(): (A) -> Boolean = {
-    Try({ it }).fold({ false }, { true })
-}
-
 infix fun <A, B> ((A) -> Boolean).then(f: (A) -> B): Tuple2<(A) -> Boolean, (A) -> B> = Tuple2(this, f)
-
-fun <B> default(f: (Any) -> B): (Any) -> B = f
-
-@Suppress("UNCHECKED_CAST")
-class match<out A>(val a: A) {
-    operator fun <B> invoke(vararg cases: PartialFunction<*, B>, default: (A) -> B): B {
-        val maybeB = collectLoop(a, cases.toList() as List<PartialFunction<A, B>>, Option.None)
-        return maybeB.fold({ default(a) }, { it })
-    }
-}
-
