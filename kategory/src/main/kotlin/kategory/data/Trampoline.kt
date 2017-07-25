@@ -1,10 +1,5 @@
 package kategory
 
-typealias TrampolineKind<A> = HK<Trampoline.F, A>
-
-fun <A> TrampolineKind<A>.ev(): Trampoline<A> =
-        this as Trampoline<A>
-
 /**
  * Trampoline is often used to emulate tail recursion. The idea is to have some step code that can be trampolined itself
  * to emulate recursion. The difference with standard recursion would be that there is no need to rewind the whole stack
@@ -12,15 +7,17 @@ fun <A> TrampolineKind<A>.ev(): Trampoline<A> =
  * returned as the overall result value for the whole function chain. That means Trampoline emulates what tail recursion
  * does.
  */
-sealed class Trampoline<out A> : TrampolineKind<A> {
+typealias TrampolineF<A> = Free<Function0.F, A>
 
-    class F private constructor()
+object Trampoline : TrampolineFunctions
 
-    class More<out A>(val f: () -> Trampoline<A>) : Trampoline<A>()
-    class Done<out A>(val result: A) : Trampoline<A>()
+interface TrampolineFunctions {
 
-    fun runT(): A = when (this) {
-        is More -> f().runT()
-        is Done -> result
-    }
+    fun <A> done(a: A): TrampolineF<A> = Free.pure<Function0.F, A>(a)
+
+    fun <A> suspend(a: () -> TrampolineF<A>): TrampolineF<A> = defer(a)
+
+    fun <A> defer(a: () -> TrampolineF<A>): TrampolineF<A> = Free.defer(a)
+
+    fun <A> delay(a: () -> A): TrampolineF<A> = defer { done(a()) }
 }

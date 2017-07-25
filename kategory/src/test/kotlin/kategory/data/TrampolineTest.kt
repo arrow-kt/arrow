@@ -6,32 +6,40 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class TrampolineTest : UnitSpec() {
-    init {
-        "trampoline over 10000 should return false and not break the stack" {
-            Trampoline.More { odd(10000) }.runT() shouldBe false
-        }
 
-        "trampoline over 10001 should return true and not break the stack" {
-            Trampoline.More { odd(10001) }.runT() shouldBe true
+    val idInterpreter: FunctionK<Function0.F, Id.F> = object : FunctionK<Function0.F, Id.F> {
+        override fun <A> invoke(fa: HK<Function0.F, A>): Id<A> {
+            val op = fa.ev()
+            return Id(op())
         }
     }
 
-    fun odd(n: Int): Trampoline<Boolean> {
+    init {
+        "trampoline over 10000 should return false and not break the stack" {
+            odd(10000).foldMap(idInterpreter, Id).value() shouldBe false
+        }
+
+        "trampoline over 10001 should return true and not break the stack" {
+            odd(10001).foldMap(idInterpreter, Id).value() shouldBe true
+        }
+    }
+
+    fun odd(n: Int): TrampolineF<Boolean> {
         return when (n) {
-            0 -> Trampoline.Done(false)
+            0 -> Trampoline.done(false)
             else -> {
                 println(n)
-                Trampoline.More { even(n - 1) }
+                Trampoline.defer { even(n - 1) }
             }
         }
     }
 
-    fun even(n: Int): Trampoline<Boolean> {
+    fun even(n: Int): TrampolineF<Boolean> {
         return when (n) {
-            0 -> Trampoline.Done(true)
+            0 -> Trampoline.done(true)
             else -> {
                 println(n)
-                Trampoline.More { odd(n - 1) }
+                Trampoline.defer { odd(n - 1) }
             }
         }
     }
