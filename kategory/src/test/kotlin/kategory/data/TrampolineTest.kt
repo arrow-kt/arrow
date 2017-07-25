@@ -28,7 +28,6 @@ class TrampolineTest : UnitSpec() {
         return when (n) {
             0 -> Trampoline.done(false)
             else -> {
-                println(n)
                 Trampoline.defer { even(n - 1) }
             }
         }
@@ -38,7 +37,6 @@ class TrampolineTest : UnitSpec() {
         return when (n) {
             0 -> Trampoline.done(true)
             else -> {
-                println(n)
                 Trampoline.defer { odd(n - 1) }
             }
         }
