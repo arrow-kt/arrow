@@ -121,17 +121,29 @@ sealed class Either<out A, out B> : EitherKind<A, B> {
     /**
      * The left side of the disjoint union, as opposed to the [Right] side.
      */
-    data class Left<out A>(val a: A) : Either<A, Nothing>() {
+    data class Left<out A, out B>(val a: A, val dummy: Unit) : Either<A, B>() {
         override val isLeft = true
         override val isRight = false
+
+        companion object {
+            inline operator fun <A> invoke(a: A): Either<A, Nothing> =
+                    Left(a, Unit)
+
+        }
     }
 
     /**
      * The right side of the disjoint union, as opposed to the [Left] side.
      */
-    data class Right<out B>(val b: B) : Either<Nothing, B>() {
+    data class Right<out A, out B>(val b: B, val dummy: Unit) : Either<A, B>() {
         override val isLeft = false
         override val isRight = true
+
+        companion object {
+            inline operator fun <B> invoke(b: B): Either<Nothing, B> =
+                    Right(b, Unit)
+
+        }
     }
 
     companion object {
