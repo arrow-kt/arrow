@@ -40,9 +40,9 @@ interface StateTInstances<F, S> :
             }))
 
     override fun get(): HK<StateTF<F, S>, S> =
-            StateT({ s: S -> MF().pure(Tuple2(s, s)) }, MF())
+            StateT(MF(), MF().pure({ s: S -> MF().pure(Tuple2(s, s)) }))
 
     override fun set(s: S): HK<StateTF<F, S>, Unit> =
-            StateT({ s: S -> MF().pure(Tuple2(s, Unit)) }, MF())
+            StateT(MF(), MF().pure({ s: S -> MF().pure(Tuple2(s, Unit)) }))
 
 }
