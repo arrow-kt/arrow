@@ -19,7 +19,7 @@ class StateTTests : UnitSpec() {
                 },
                 object : Eq<StateTKind<Try.F, Int, Unit>> {
                     override fun eqv(a: StateTKind<Try.F, Int, Unit>, b: StateTKind<Try.F, Int, Unit>): Boolean =
-                            a.ev() === b.ev()
+                            a.ev().run(1) == b.ev().run(1)
                 }))
     }
 }
