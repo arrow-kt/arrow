@@ -21,16 +21,5 @@ class StateTTests : UnitSpec() {
                     override fun eqv(a: StateTKind<Try.F, Int, Unit>, b: StateTKind<Try.F, Int, Unit>): Boolean =
                             a.ev().run(1) == b.ev().run(1)
                 }))
-
-        "FAKE: set get playground" {
-            val instances = StateT.monadState<Try.F, Int>(Try)
-            val M = instances
-            val s = 1
-            val a = M.flatMap(M.set(s), { M.get() }).run(10)
-            val b = M.set(s).ev().run(10)
-            a.equalUnderTheLaw(b)
-
-            // M.flatMap(M.set(s), { M.get() }).equalUnderTheLaw(M.flatMap(M.set(s), { M.pure(s) }), EQ)
-        }
     }
 }
