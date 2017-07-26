@@ -1,5 +1,5 @@
-Kategory
-====
+KΛTEGORY
+========
 [![Build Status](https://travis-ci.org/kategory/kategory.svg?branch=master)](https://travis-ci.org/kategory/kategory/)
 [![Kotlin version badge](https://img.shields.io/badge/kotlin-1.1.3.dev.1450-blue.svg)](http://kotlinlang.org/)
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](http://www.apache.org/licenses/LICENSE-2.0)
@@ -7,6 +7,7 @@ Kategory
 [![version](https://jitpack.io/v/kategory/kategory.svg)](https://jitpack.io/#kategory/kategory/)
 
 Functional Datatypes and abstractions for Kotlin inspired by [Cats][cats]
+<img height="100" src="https://avatars2.githubusercontent.com/u/29458023?v=4&amp;s=200" width="100">
 
 # Add it to your project
 
