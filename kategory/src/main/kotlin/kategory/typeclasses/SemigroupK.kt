@@ -1,6 +1,4 @@
-package kategory.typeclasses
-
-import kategory.*
+package kategory
 
 interface SemigroupK<F> : Typeclass {
 
