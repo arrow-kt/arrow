@@ -7,6 +7,7 @@ KΛTEGORY
 [![version](https://jitpack.io/v/kategory/kategory.svg)](https://jitpack.io/#kategory/kategory/)
 
 Functional Datatypes and abstractions for Kotlin inspired by [Cats][cats]
+
 <img height="100" src="https://avatars2.githubusercontent.com/u/29458023?v=4&amp;s=200" width="100">
 
 # Add it to your project
