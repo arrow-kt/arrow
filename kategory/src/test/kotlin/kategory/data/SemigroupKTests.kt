@@ -1,8 +1,6 @@
 package kategory
 
 import io.kotlintest.KTestJUnitRunner
-import kategory.laws.SemigroupKLaws
-import kategory.typeclasses.OptionSemigroupK
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
