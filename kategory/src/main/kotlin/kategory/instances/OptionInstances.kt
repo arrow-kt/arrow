@@ -81,3 +81,12 @@ interface OptionInstances :
             fa.ev().orElse({ f(Unit).ev() })
 
 }
+
+/**
+ * Dummy SemigroupK instance to be able to test laws for SemigroupK.
+ */
+class OptionSemigroupK : SemigroupK<Option.F> {
+    override fun <A> combineK(x: HK<Option.F, A>, y: HK<Option.F, A>): HK<Option.F, A> {
+        return x.flatMap { y }
+    }
+}
