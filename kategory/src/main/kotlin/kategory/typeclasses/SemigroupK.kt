@@ -15,12 +15,3 @@ interface SemigroupK<F> : Typeclass {
                 combineK(x, y)
     }
 }
-
-/**
- * Dummy SemigroupK instance to be able to test laws.
- */
-class OptionSemigroupK : SemigroupK<Option.F> {
-    override fun <A> combineK(x: HK<Option.F, A>, y: HK<Option.F, A>): HK<Option.F, A> {
-        return x.flatMap { y }
-    }
-}
