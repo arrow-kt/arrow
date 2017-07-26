@@ -4,12 +4,12 @@ import io.kotlintest.properties.forAll
 
 object MonadStateLaws {
 
-    inline fun <reified F> laws(M: MonadState<F, Int> = monadState<F, Int>(), EQ: Eq<HK<F, Int>>): List<Law> =
+    inline fun <reified F> laws(M: MonadState<F, Int> = monadState<F, Int>(), EQ: Eq<HK<F, Int>>, EQUnit: Eq<HK<F, Unit>>): List<Law> =
             MonadLaws.laws(M, EQ) + listOf(
-                    Law("Monad State Laws: idempotence", { monadStateGetIdempotent(M, Eq.any()) }),
-                    Law("Monad State Laws: set twice", { monadStateSetTwice(M, Eq.any()) }),
-                    Law("Monad State Laws: set get", { monadStateSetTwice(M, Eq.any()) }),
-                    Law("Monad State Laws: get set", { monadStateSetTwice(M, Eq.any()) })
+                    Law("Monad State Laws: idempotence", { monadStateGetIdempotent(M, EQ) }),
+                    Law("Monad State Laws: set twice eq to set once the last element", { monadStateSetTwice(M, EQUnit) }),
+                    Law("Monad State Laws: set get", { monadStateSetGet(M, EQ) }),
+                    Law("Monad State Laws: get set", { monadStateGetSet(M, EQUnit) })
             )
 
     inline fun <reified F> monadStateGetIdempotent(M: MonadState<F, Int> = monadState<F, Int>(), EQ: Eq<HK<F, Int>>) {
@@ -28,9 +28,7 @@ object MonadStateLaws {
         })
     }
 
-    inline fun <reified F> monadStateGetSet(M: MonadState<F, Int> = monadState<F, Int>(), EQ: Eq<HK<F, Any>>) {
-        forAll(genIntSmall(), { s: Int ->
-            M.flatMap(M.get(), { M.set(it) }).equalUnderTheLaw(M.pure(s), EQ)
-        })
+    inline fun <reified F> monadStateGetSet(M: MonadState<F, Int> = monadState<F, Int>(), EQ: Eq<HK<F, Unit>>) {
+        M.flatMap(M.get(), { M.set(it) }).equalUnderTheLaw(M.pure(Unit), EQ)
     }
 }
