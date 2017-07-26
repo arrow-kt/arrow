@@ -23,11 +23,9 @@ object MonadStateLaws {
     }
 
     inline fun <reified F> monadStateSetGet(M: MonadState<F, Int> = monadState<F, Int>(), EQ: Eq<HK<F, Int>>) {
-        //forAll(genIntSmall(), { s: Int ->
-        //     M.flatMap(M.set(-1060669983), { M.get() }).equalUnderTheLaw(M.flatMap(M.set(-1060669983), { M.pure(-1060669983) }), EQ)
-        //})
-
-        M.flatMap(M.set(-1060669983), { M.get() }).equalUnderTheLaw(M.flatMap(M.set(-1060669983), { M.pure(-1060669983) }), EQ)
+        forAll(genIntSmall(), { s: Int ->
+             M.flatMap(M.set(s), { M.get() }).equalUnderTheLaw(M.flatMap(M.set(s), { M.pure(s) }), EQ)
+        })
     }
 
     inline fun <reified F> monadStateGetSet(M: MonadState<F, Int> = monadState<F, Int>(), EQ: Eq<HK<F, Unit>>) {
