@@ -9,6 +9,9 @@ typealias StateTFunKind<F, S, A> = HK<F, StateTFun<F, S, A>>
 fun <F, S, A> StateTKind<F, S, A>.ev(): StateT<F, S, A> =
         this as StateT<F, S, A>
 
+fun <F, S, A> StateTKind<F, S, A>.runM(initial: S): HK<F, Tuple2<S, A>> =
+        (this as StateT<F, S, A>).run(initial)
+
 class StateT<F, S, A>(
         val MF: Monad<F>,
         val runF: StateTFunKind<F, S, A>
@@ -61,7 +64,7 @@ class StateT<F, S, A>(
                     MF.map(runF) { sfsa ->
                         sfsa.andThen { fsa ->
                             MF.flatMap(fsa) {
-                                fas(it.b).ev().run(it.a)
+                                fas(it.b).runM(it.a)
                             }
                         }
                     }
