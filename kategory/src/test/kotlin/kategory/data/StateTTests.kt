@@ -14,12 +14,12 @@ class StateTTests : UnitSpec() {
                 instances,
                 object : Eq<StateTKind<Try.F, Int, Int>> {
                     override fun eqv(a: StateTKind<Try.F, Int, Int>, b: StateTKind<Try.F, Int, Int>): Boolean =
-                            a.ev().run(1) == b.ev().run(1)
+                            a.runM(1) == b.runM(1)
 
                 },
                 object : Eq<StateTKind<Try.F, Int, Unit>> {
                     override fun eqv(a: StateTKind<Try.F, Int, Unit>, b: StateTKind<Try.F, Int, Unit>): Boolean =
-                            a.ev().run(1) == b.ev().run(1)
+                            a.runM(1) == b.runM(1)
                 }))
     }
 }
