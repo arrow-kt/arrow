@@ -22,8 +22,8 @@ interface WriterTInstances<F, W> :
             WriterT(MM(), MM().tailRecM(a, {
                 MM().map(f(it).ev().value) {
                     when (it.b) {
-                        is Either.Left<A> -> Either.Left(it.b.a)
-                        is Either.Right<B> -> Either.Right(it.a toT it.b.b)
+                        is Either.Left<A, B> -> Either.Left(it.b.a)
+                        is Either.Right<A, B> -> Either.Right(it.a toT it.b.b)
                     }
                 }
             }))
