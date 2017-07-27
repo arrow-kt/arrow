@@ -3,13 +3,13 @@ package kategory
 typealias FreeKind<S, A> = HK2<Free.F, S, A>
 typealias FreeF<S> = HK<Free.F, S>
 
-fun <S, M> FreeKind<S, M>.ev(): Free<S, M> =
-        this as Free<S, M>
+fun <S, A> FreeKind<S, A>.ev(): Free<S, A> =
+        this as Free<S, A>
 
 fun <M, S, A> FreeKind<S, A>.foldMapM(f: FunctionK<S, M>, MM: Monad<M>): HK<M, A> =
         (this as Free<S, A>).foldMap(f, MM)
 
-sealed class Free<out S, out M> : FreeKind<S, M> {
+sealed class Free<out S, out A> : FreeKind<S, A> {
 
     class F private constructor()
 
@@ -30,7 +30,7 @@ sealed class Free<out S, out M> : FreeKind<S, M> {
         fun <S> monad(): FreeInstances<S> = object : FreeInstances<S> {}
     }
 
-    abstract fun <O, B> transform(f: (M) -> B, fs: FunctionK<S, O>): Free<O, B>
+    abstract fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B>
 
     data class Pure<out S, out A>(val a: A) : Free<S, A>() {
         override fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B> =
