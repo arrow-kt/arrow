@@ -55,9 +55,3 @@ val idInterpreter: FunctionK<Ops.F, Id.F> = object : FunctionK<Ops.F, Id.F> {
     }
 }
 
-val idFunction0Interpreter: FunctionK<Function0.F, Id.F> = object : FunctionK<Function0.F, Id.F> {
-    override fun <A> invoke(fa: HK<Function0.F, A>): Id<A> {
-        val op = fa.ev()
-        return Id(op())
-    }
-}
