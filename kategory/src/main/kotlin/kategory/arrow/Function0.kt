@@ -30,13 +30,16 @@ data class Function0<out A>(internal val f: () -> A) : HK<Function0.F, A> {
         override fun <A, B> map(fa: HK<F, A>, f: (A) -> B): Function0<B> =
                 pure(f(fa()))
 
-        override fun <A, B> tailRecM(a: A, f: (A) -> HK<F, Either<A, B>>): Function0<B> =
-                Function0 {
-                    tailrec fun loop(thisA: A): B =
-                            f(thisA).invoke().fold({ loop(it) }, { it })
+        tailrec fun <A, B> loop(a: A, f: (A) -> HK<F, Either<A, B>>) : B {
+            val fa = f(a).ev()()
+            return when(fa) {
+                is Either.Right<A, B> -> fa.b
+                is Either.Left<A, B> -> loop(fa.a, f)
+            }
+        }
 
-                    loop(a)
-                }
+        override fun <A, B> tailRecM(a: A, f: (A) -> HK<F, Either<A, B>>): Function0<B> =
+                { loop(a, f) }.k()
 
         fun bimonad(): Bimonad<Function0.F> = this
 
