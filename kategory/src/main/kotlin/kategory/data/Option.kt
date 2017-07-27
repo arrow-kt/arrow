@@ -40,9 +40,10 @@ sealed class Option<out A> : OptionKind<A> {
     }
 
     /**
-     * Returns true if the option is $none, false otherwise.
+     * Returns true if the option is [None], false otherwise.
+     * Used only for performance instead of fold.
      */
-    abstract val isEmpty: Boolean
+    internal abstract val isEmpty: Boolean
 
     /**
      * Returns true if the option is an instance of $some, false otherwise.
@@ -128,11 +129,11 @@ sealed class Option<out A> : OptionKind<A> {
     inline fun forall(p: (A) -> Boolean): Boolean = exists(p)
 
     data class Some<out A>(val value: A) : Option<A>() {
-        override val isEmpty = false
+        override internal val isEmpty = false
     }
 
     object None : Option<Nothing>() {
-        override val isEmpty = true
+        override internal val isEmpty = true
     }
 
 }
