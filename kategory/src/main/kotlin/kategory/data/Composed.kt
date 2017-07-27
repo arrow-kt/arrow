@@ -53,11 +53,14 @@ data class ComposedTraverse<F, G>(val FT: Traverse<F>, val GT: Traverse<G>, val 
 inline fun <F, reified G> Traverse<F>.compose(GT: Traverse<G> = traverse<G>(), GA: Applicative<G> = applicative<G>()): Traverse<ComposedType<F, G>> =
         ComposedTraverse(this, GT, GA)
 
-data class ComposedSemigroupK<F, G>(val SGK: SemigroupK<F>) : SemigroupK<ComposedType<F, G>> {
+interface ComposedSemigroupK<F, G> : SemigroupK<ComposedType<F, G>> {
+
+    fun F(): SemigroupK<F>
 
     override fun <A> combineK(x: HK<ComposedType<F, G>, A>, y: HK<ComposedType<F, G>, A>): HK<ComposedType<F, G>, A> =
-            SGK.combineK(x, y)
+            F().combineK(x, y)
 }
 
-inline fun <F, reified G> SemigroupK<F>.compose(): SemigroupK<ComposedType<F, G>> =
-        ComposedSemigroupK(this)
+inline fun <F, reified G> SemigroupK<F>.compose(): SemigroupK<ComposedType<F, G>> = object : ComposedSemigroupK<F, G> {
+    override fun F(): SemigroupK<F> = this@compose
+}
