@@ -10,19 +10,19 @@ interface Function1Instances<I> :
             { a: I -> a }.k()
 
     override fun <A> local(f: (I) -> I, fa: Function1Kind<I, A>): Function1<I, A> =
-            f.andThen { fa.ev().f(it) }.k()
+            f.andThen { fa(it) }.k()
 
     override fun <A> pure(a: A): Function1<I, A> =
             { _: I -> a }.k()
 
     override fun <A, B> map(fa: Function1Kind<I, A>, f: (A) -> B): Function1<I, B> =
-            f.compose { a: I -> fa.ev().f(a) }.k()
+            f.compose { a: I -> fa(a) }.k()
 
     override fun <A, B> flatMap(fa: Function1Kind<I, A>, f: (A) -> Function1Kind<I, B>): Function1<I, B> =
-            { p: I -> f(fa.ev().f(p)).ev().f(p) }.k()
+            { p: I -> f(fa(p))(p) }.k()
 
     tailrec private fun <A, B> step(a: A, t: I, fn: (A) -> Function1Kind<I, Either<A, B>>): B {
-        val af = fn(a).ev().f(t)
+        val af = fn(a)(t)
         return when (af) {
             is Either.Right<A, B> -> af.b
             is Either.Left<A, B> -> step(af.a, t, fn)
