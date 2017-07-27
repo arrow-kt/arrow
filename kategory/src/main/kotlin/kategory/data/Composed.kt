@@ -58,7 +58,10 @@ interface ComposedSemigroupK<F, G> : SemigroupK<ComposedType<F, G>> {
     fun F(): SemigroupK<F>
 
     override fun <A> combineK(x: HK<ComposedType<F, G>, A>, y: HK<ComposedType<F, G>, A>): HK<ComposedType<F, G>, A> =
-            F().combineK(x, y)
+            F().combineK(x.lower(), y.lower()).lift()
+
+    fun <A> combineKC(x: HK<F, HK<G, A>>, y: HK<F, HK<G, A>>): HK<ComposedType<F, G>, A> =
+            combineK(x.lift(), y.lift())
 }
 
 inline fun <F, reified G> SemigroupK<F>.compose(): SemigroupK<ComposedType<F, G>> = object : ComposedSemigroupK<F, G> {
