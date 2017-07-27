@@ -21,12 +21,14 @@ interface EitherTInstances<F, L> :
             EitherT(MF(), MF().tailRecM(a, {
                 MF().map(f(it).ev().value) { recursionControl ->
                     when (recursionControl) {
-                        is Either.Left<L> -> Either.Right(Either.Left(recursionControl.a))
-                        is Either.Right<Either<A, B>> ->
-                            when (recursionControl.b) {
-                                is Either.Left<A> -> Either.Left(recursionControl.b.a)
-                                is Either.Right<B> -> Either.Right(Either.Right(recursionControl.b.b))
+                        is Either.Left<L, Either<A, B>> -> Either.Right(Either.Left(recursionControl.a))
+                        is Either.Right<L, Either<A, B>> -> {
+                            val b: Either<A, B> = recursionControl.b
+                            when (b) {
+                                is Either.Left<A, B> -> Either.Left(b.a)
+                                is Either.Right<A, B> -> Either.Right(Either.Right(b.b))
                             }
+                        }
                     }
                 }
             }))

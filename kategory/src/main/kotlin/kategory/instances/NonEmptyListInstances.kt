@@ -20,16 +20,17 @@ interface NonEmptyListInstances :
             buf: ArrayList<B>,
             f: (A) -> HK<NonEmptyList.F, Either<A, B>>,
             v: NonEmptyList<Either<A, B>>) {
-        when (v.head) {
-            is Either.Right<*> -> {
-                buf += v.head.b as B
+        val head: Either<A, B> = v.head
+        when (head) {
+            is Either.Right<A, B> -> {
+                buf += head.b
                 val x = NonEmptyList.fromList(v.tail)
                 when (x) {
                     is Option.Some<NonEmptyList<Either<A, B>>> -> go(buf, f, x.value)
                     is Option.None -> Unit
                 }
             }
-            is Either.Left<*> -> go(buf, f, f(v.head.a as A).ev() + v.tail)
+            is Either.Left<A, B> -> go(buf, f, f(head.a).ev() + v.tail)
         }
     }
 

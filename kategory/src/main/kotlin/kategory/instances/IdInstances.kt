@@ -18,10 +18,10 @@ interface IdInstances :
             fa.ev().map(f)
 
     tailrec override fun <A, B> tailRecM(a: A, f: (A) -> IdKind<Either<A, B>>): Id<B> {
-        val x = f(a).ev().value
+        val x: Either<A, B> = f(a).ev().value
         return when (x) {
-            is Either.Left<A> -> tailRecM(x.a, f)
-            is Either.Right<B> -> Id(x.b)
+            is Either.Left<A, B> -> tailRecM(x.a, f)
+            is Either.Right<A, B> -> Id(x.b)
         }
     }
 
