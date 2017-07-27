@@ -3,7 +3,8 @@ package kategory
 interface StateTInstances<F, S> :
         Functor<StateTF<F, S>>,
         Applicative<StateTF<F, S>>,
-        Monad<StateTF<F, S>> {
+        Monad<StateTF<F, S>>,
+        MonadState<StateTF<F, S>, S> {
 
     fun MF(): Monad<F>
 
@@ -32,9 +33,16 @@ interface StateTInstances<F, S> :
     override fun <A, B> tailRecM(a: A, f: (A) -> HK<StateTF<F, S>, Either<A, B>>): StateT<F, S, B> =
             StateT(MF(), MF().pure({ s: S ->
                 MF().tailRecM(Tuple2(s, a), { (s, a0) ->
-                    MF().map(f(a0).ev().run(s)) { (s, ab) ->
+                    MF().map(f(a0).runM(s)) { (s, ab) ->
                         ab.bimap({ a1 -> Tuple2(s, a1) }, { b -> Tuple2(s, b) })
                     }
                 })
             }))
+
+    override fun get(): StateT<F, S, S> =
+            StateT(MF(), MF().pure({ s: S -> MF().pure(Tuple2(s, s)) }))
+
+    override fun set(s: S): StateT<F, S, Unit> =
+            StateT(MF(), MF().pure({ _: S -> MF().pure(Tuple2(s, Unit)) }))
+
 }
