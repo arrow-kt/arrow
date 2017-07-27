@@ -1,22 +1,23 @@
 package kategory
 
-typealias Function1F<R> = HK<Function1.F, R>
+typealias Function1Kind<I, O> = HK2<Function1.F, I, O>
+typealias Function1F<I> = HK<Function1.F, I>
 
-fun <P, R> ((P) -> R).k(): Function1<P, R> =
+fun <I, O> ((I) -> O).k(): Function1<I, O> =
         Function1(this)
 
-@Suppress("UNCHECKED_CAST")
-fun <P, R> Function1F<R>.ev(): (P) -> R =
-        (this as Function1<P, R>).f
+fun <I, O> Function1Kind<I, O>.ev(): Function1<I, O> =
+        this as Function1<I, O>
 
-operator fun <P, R> Function1F<R>.invoke(p: P): R =
-        this.ev<P, R>().invoke(p)
+operator fun <I, O> Function1Kind<I, O>.invoke(i: I): O =
+        this.ev().f(i)
 
-// We don't want an inherited class to avoid equivalence issues, so a simple HK wrapper will do
-data class Function1<in A, out R>(val f: (A) -> R) : Function1F<R> {
+class Function1<I, out O>(val f: (I) -> O) : Function1Kind<I, O> {
+
     class F private constructor()
 
     companion object {
+
         fun <P> functor() = object : Function1Instances<P> {}
 
         fun <P> applicative() = object : Function1Instances<P> {}
