@@ -9,11 +9,11 @@ class TrampolineTest : UnitSpec() {
 
     init {
         "trampoline over 10000 should return false and not break the stack" {
-            odd(10000).foldMap(idFunction0Interpreter, Id).value() shouldBe false
+            odd(10000).runT() shouldBe false
         }
 
         "trampoline over 10001 should return true and not break the stack" {
-            odd(10001).foldMap(idFunction0Interpreter, Id).value() shouldBe true
+            odd(10001).runT() shouldBe true
         }
     }
 
