@@ -18,25 +18,15 @@ sealed class Either<out A, out B> : EitherKind<A, B> {
 
     /**
      * Returns `true` if this is a [Right], `false` otherwise.
-     *
-     * Example:
-     * ```
-     * Left("tulip").isRight           // Result: false
-     * Right("venus fly-trap").isRight // Result: true
-     * ```
+     * Used only for performance instead of fold.
      */
-    abstract val isRight: Boolean
+    internal abstract val isRight: Boolean
 
     /**
      * Returns `true` if this is a [Left], `false` otherwise.
-     *
-     * Example:
-     * ```
-     * Left("tulip").isLeft           // Result: true
-     * Right("venus fly-trap").isLeft // Result: false
-     * ```
+     * Used only for performance instead of fold.
      */
-    abstract val isLeft: Boolean
+    internal abstract val isLeft: Boolean
 
     /**
      * Applies `fa` if this is a [Left] or `fb` if this is a [Right].
@@ -121,28 +111,26 @@ sealed class Either<out A, out B> : EitherKind<A, B> {
     /**
      * The left side of the disjoint union, as opposed to the [Right] side.
      */
-    data class Left<out A, out B>(val a: A, val dummy: Unit) : Either<A, B>() {
-        override val isLeft = true
-        override val isRight = false
+    data class Left<out A, out B>(val a: A, private val dummy: Unit) : Either<A, B>() {
+        override internal val isLeft = true
+        override internal val isRight = false
 
         companion object {
             inline operator fun <A> invoke(a: A): Either<A, Nothing> =
                     Left(a, Unit)
-
         }
     }
 
     /**
      * The right side of the disjoint union, as opposed to the [Left] side.
      */
-    data class Right<out A, out B>(val b: B, val dummy: Unit) : Either<A, B>() {
-        override val isLeft = false
-        override val isRight = true
+    data class Right<out A, out B>(val b: B, private val dummy: Unit) : Either<A, B>() {
+        override internal val isLeft = false
+        override internal val isRight = true
 
         companion object {
             inline operator fun <B> invoke(b: B): Either<Nothing, B> =
                     Right(b, Unit)
-
         }
     }
 
