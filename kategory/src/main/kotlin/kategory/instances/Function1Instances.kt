@@ -1,31 +1,35 @@
 package kategory
 
-interface Function1Instances<P> :
-        Functor<Function1.F>,
-        Applicative<Function1.F>,
-        Monad<Function1.F>,
-        MonadReader<Function1.F, P> {
+interface Function1Instances<I> :
+        Functor<Function1F<I>>,
+        Applicative<Function1F<I>>,
+        Monad<Function1F<I>>,
+        MonadReader<Function1F<I>, I> {
 
-    override fun ask(): Function1<P, P> =
-            { a: P -> a }.k()
+    override fun ask(): Function1<I, I> =
+            { a: I -> a }.k()
 
-    override fun <A> local(f: (P) -> P, fa: HK<Function1.F, A>): Function1<P, A> =
-            f.andThen { fa(it) }.k()
+    override fun <A> local(f: (I) -> I, fa: Function1Kind<I, A>): Function1<I, A> =
+            f.andThen { fa.ev().f(it) }.k()
 
-    override fun <A> pure(a: A): Function1<P, A> =
-            { _: P -> a }.k()
+    override fun <A> pure(a: A): Function1<I, A> =
+            { _: I -> a }.k()
 
-    override fun <A, B> map(fa: HK<Function1.F, A>, f: (A) -> B): Function1<P, B> =
-            f.compose { a: P -> fa(a) }.k()
+    override fun <A, B> map(fa: Function1Kind<I, A>, f: (A) -> B): Function1<I, B> =
+            f.compose { a: I -> fa.ev().f(a) }.k()
 
-    override fun <A, B> flatMap(fa: HK<Function1.F, A>, f: (A) -> HK<Function1.F, B>): Function1<P, B> =
-            Function1 { p -> f(fa(p)).invoke(p) }
+    override fun <A, B> flatMap(fa: Function1Kind<I, A>, f: (A) -> Function1Kind<I, B>): Function1<I, B> =
+            { p: I -> f(fa.ev().f(p)).ev().f(p) }.k()
 
-    override fun <A, B> tailRecM(a: A, f: (A) -> HK<Function1.F, Either<A, B>>): Function1<P, B> =
-            Function1 { p ->
-                tailrec fun loop(thisA: A): B =
-                        f(thisA).invoke(p).fold({ loop(it) }, { it })
+    tailrec private fun <A, B> step(a: A, t: I, fn: (A) -> Function1Kind<I, Either<A, B>>): B {
+        val af = fn(a).ev().f(t)
+        return when (af) {
+            is Either.Right<A, B> -> af.b
+            is Either.Left<A, B> -> step(af.a, t, fn)
+        }
+    }
 
-                loop(a)
-            }
+    override fun <A, B> tailRecM(a: A, f: (A) -> Function1Kind<I, Either<A, B>>): Function1<I, B> =
+            { t: I -> step(a, t, f) }.k()
 }
+
