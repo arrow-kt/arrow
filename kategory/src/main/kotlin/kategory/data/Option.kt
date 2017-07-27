@@ -129,11 +129,11 @@ sealed class Option<out A> : OptionKind<A> {
     inline fun forall(crossinline p: (A) -> Boolean): Boolean = exists(p)
 
     data class Some<out A>(val value: A) : Option<A>() {
-        override internal val isEmpty = false
+        override val isEmpty = false
     }
 
     object None : Option<Nothing>() {
-        override internal val isEmpty = true
+        override val isEmpty = true
     }
 
 }
