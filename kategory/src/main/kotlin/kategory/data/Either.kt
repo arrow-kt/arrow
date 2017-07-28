@@ -151,10 +151,10 @@ sealed class Either<out A, out B> : EitherKind<A, B> {
         fun <L> monadError(): MonadError<EitherF<L>, L> = instances()
 
         fun <L> semigroupK(): SemigroupK<EitherF<L>> = object : SemigroupK<EitherF<L>> {
-            override fun <A> combineK(x: HK<EitherF<L>, A>, y: HK<EitherF<L>, A>): HK<EitherF<L>, A> =
+            override fun <A> combineK(x: HK<EitherF<L>, A>, y: HK<EitherF<L>, A>): Either<L, A> =
                     when (x) {
-                        is Left -> y
-                        else -> x
+                        is Left -> y.ev()
+                        else -> x.ev()
                     }
         }
     }
