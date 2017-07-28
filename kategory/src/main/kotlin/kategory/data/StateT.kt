@@ -36,6 +36,12 @@ class StateT<F, S, A>(
         inline fun <reified F, S> monad(MF: Monad<F> = monad<F>()): StateTInstances<F, S> = instances(MF)
 
         inline fun <reified F, reified S> monadState(MF: Monad<F> = monad<F>()): StateTInstances<F, S> = instances(MF)
+
+        inline fun <reified F, S> semigroupK(F0: Monad<F> = monad<F>(), G0: SemigroupK<F>): SemigroupK<StateTF<F, S>> =
+                object : StateTSemigroupK<F, S> {
+                    override fun F(): Monad<F> = F0
+                    override fun G(): SemigroupK<F> = G0
+                }
     }
 
     fun <B> map(f: (A) -> B): StateT<F, S, B> =
