@@ -33,17 +33,17 @@ data class EitherT<F, A, B>(val MF: Monad<F>, val value: HK<F, Either<A, B>>) : 
         @JvmStatic inline fun <reified F, A, B> fromEither(value: Either<A, B>, MF: Monad<F> = monad<F>()): EitherT<F, A, B> =
                 EitherT(MF, MF.pure(value))
 
-        inline fun <F, L> instances(MF : Monad<F>): EitherTInstances<F, L> = object : EitherTInstances<F, L> {
+        inline fun <F, L> instances(MF: Monad<F>): EitherTInstances<F, L> = object : EitherTInstances<F, L> {
             override fun MF(): Monad<F> = MF
         }
 
-        inline fun <reified F, L> functor(MF : Monad<F> = monad<F>()): Functor<EitherTF<F, L>> = instances(MF)
+        inline fun <reified F, L> functor(MF: Monad<F> = monad<F>()): Functor<EitherTF<F, L>> = instances(MF)
 
-        inline fun <reified F, L> applicative(MF : Monad<F> = monad<F>()): Applicative<EitherTF<F, L>> = instances(MF)
+        inline fun <reified F, L> applicative(MF: Monad<F> = monad<F>()): Applicative<EitherTF<F, L>> = instances(MF)
 
-        inline fun <reified F, L> monad(MF : Monad<F> = monad<F>()): Monad<EitherTF<F, L>> = instances(MF)
+        inline fun <reified F, L> monad(MF: Monad<F> = monad<F>()): Monad<EitherTF<F, L>> = instances(MF)
 
-        inline fun <reified F, L> monadError(MF : Monad<F> = monad<F>()): MonadError<EitherTF<F, L>, L> = instances(MF)
+        inline fun <reified F, L> monadError(MF: Monad<F> = monad<F>()): MonadError<EitherTF<F, L>, L> = instances(MF)
 
         inline fun <reified F, A> traverse(FF: Traverse<F> = traverse<F>(), MF: Monad<F> = monad<F>()): Traverse<EitherTF<F, A>> = object : EitherTTraverse<F, A> {
             override fun FF(): Traverse<F> = FF
@@ -52,6 +52,17 @@ data class EitherT<F, A, B>(val MF: Monad<F>, val value: HK<F, Either<A, B>>) : 
         }
 
         inline fun <reified F, A> foldable(FF: Traverse<F> = traverse<F>(), MF: Monad<F> = monad<F>()): Foldable<EitherTF<F, A>> = traverse(FF, MF)
+
+        inline fun <reified F, L> semigroupK(MF: Monad<F> = monad<F>()): SemigroupK<EitherTF<F, L>> =
+                object : SemigroupK<EitherTF<F, L>> {
+                    override fun <A> combineK(x: HK<EitherTF<F, L>, A>, y: HK<EitherTF<F, L>, A>): EitherT<F, L, A> =
+                            EitherT(MF.flatMap(x.ev().value) {
+                                when (it) {
+                                    is Either.Left -> y.ev().value
+                                    is Either.Right -> MF.pure(it)
+                                }
+                            })
+                }
     }
 
     inline fun <C> fold(crossinline l: (A) -> C, crossinline r: (B) -> C): HK<F, C> =
