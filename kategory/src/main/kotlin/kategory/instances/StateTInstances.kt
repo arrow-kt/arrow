@@ -50,7 +50,7 @@ interface StateTInstances<F, S> :
 
 interface StateTInstances0 {
 
-    fun <F, S> kategoryDataSemigroupKForStateT(F0: Monad<F> = monad<F>(), G0: SemigroupK<F>): SemigroupK<StateTF<F, S>> =
+    fun <F, S> kategoryDataSemigroupKForStateT(F0: Monad<F>, G0: SemigroupK<F>): SemigroupK<StateTF<F, S>> =
             object : StateTSemigroupK<F, S> {
                 override fun F(): Monad<F> = F0
                 override fun G(): SemigroupK<F> = G0
