@@ -44,9 +44,9 @@ sealed class Either<out A, out B> : EitherKind<A, B> {
      * @param fb the function to apply if this is a [Right]
      * @return the results of applying the function
      */
-    inline fun <C> fold(fa: (A) -> C, fb: (B) -> C): C = when (this) {
-        is Right -> fb(b)
-        is Left -> fa(a)
+    inline fun <C> fold(crossinline fa: (A) -> C, crossinline fb: (B) -> C): C = when (this) {
+        is Right<A, B> -> fb(b)
+        is Left<A, B> -> fa(a)
     }
 
     /**
@@ -70,13 +70,13 @@ sealed class Either<out A, out B> : EitherKind<A, B> {
      * Left(12).map { "flower" }  // Result: Left(12)
      * ```
      */
-    inline fun <C> map(f: (B) -> C): Either<A, C> =
+    inline fun <C> map(crossinline f: (B) -> C): Either<A, C> =
             fold({ Left(it) }, { Right(f(it)) })
 
     /**
      * Map over Left and Right of this Either
      */
-    inline fun <C, D> bimap(fa: (A) -> C, fb: (B) -> D): Either<C, D> =
+    inline fun <C, D> bimap(crossinline fa: (A) -> C, crossinline fb: (B) -> D): Either<C, D> =
             fold({ Left(fa(it)) }, { Right(fb(it)) })
 
     /**
@@ -92,7 +92,7 @@ sealed class Either<out A, out B> : EitherKind<A, B> {
      * left.exists { it > 10 }      // Result: false
      * ```
      */
-    inline fun exists(predicate: (B) -> Boolean): Boolean =
+    inline fun exists(crossinline predicate: (B) -> Boolean): Boolean =
             fold({ false }, { predicate(it) })
 
     /**
@@ -158,7 +158,7 @@ sealed class Either<out A, out B> : EitherKind<A, B> {
  *
  * @param f The function to bind across [Either.Right].
  */
-inline fun <A, B, C> Either<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> =
+inline fun <A, B, C> Either<A, B>.flatMap(crossinline f: (B) -> Either<A, C>): Either<A, C> =
         fold({ Either.Left(it) }, { f(it) })
 
 /**
@@ -170,7 +170,7 @@ inline fun <A, B, C> Either<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> 
  * Left(12).getOrElse(17)  // Result: 17
  * ```
  */
-inline fun <B> Either<*, B>.getOrElse(default: () -> B): B =
+inline fun <B> Either<*, B>.getOrElse(crossinline default: () -> B): B =
         fold({ default() }, { it })
 
 /**
@@ -189,7 +189,7 @@ inline fun <B> Either<*, B>.getOrElse(default: () -> B): B =
  * left.filterOrElse({ it > 10 }, { -1 })      // Result: Left(12)
  * ```
  */
-inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, default: () -> A): Either<A, B> =
+inline fun <A, B> Either<A, B>.filterOrElse(crossinline predicate: (B) -> Boolean, crossinline default: () -> A): Either<A, B> =
         fold({ Either.Left(it) }, { if (predicate(it)) Either.Right(it) else Either.Left(default()) })
 
 /**
