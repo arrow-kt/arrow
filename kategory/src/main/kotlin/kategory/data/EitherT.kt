@@ -53,16 +53,9 @@ data class EitherT<F, A, B>(val MF: Monad<F>, val value: HK<F, Either<A, B>>) : 
 
         inline fun <reified F, A> foldable(FF: Traverse<F> = traverse<F>(), MF: Monad<F> = monad<F>()): Foldable<EitherTF<F, A>> = traverse(FF, MF)
 
-        inline fun <reified F, L> semigroupK(MF: Monad<F> = monad<F>()): SemigroupK<EitherTF<F, L>> =
-                object : SemigroupK<EitherTF<F, L>> {
-                    override fun <A> combineK(x: HK<EitherTF<F, L>, A>, y: HK<EitherTF<F, L>, A>): EitherT<F, L, A> =
-                            EitherT(MF.flatMap(x.ev().value) {
-                                when (it) {
-                                    is Either.Left -> y.ev().value
-                                    is Either.Right -> MF.pure(it)
-                                }
-                            })
-                }
+        inline fun <reified F, L> semigroupK(MF: Monad<F> = monad<F>()): SemigroupK<EitherTF<F, L>> = object : EitherTSemigroupK<F, L> {
+            override fun F(): Monad<F> = MF
+        }
     }
 
     inline fun <C> fold(crossinline l: (A) -> C, crossinline r: (B) -> C): HK<F, C> =

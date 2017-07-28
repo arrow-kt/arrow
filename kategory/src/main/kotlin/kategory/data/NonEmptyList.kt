@@ -77,9 +77,7 @@ class NonEmptyList<out A> private constructor(
 
         fun <A> semigroup(): Semigroup<NonEmptyList<A>> = object : NonEmptyListSemigroup<A> {}
 
-        fun semigroupK(): SemigroupK<NonEmptyList.F> = object : SemigroupK<NonEmptyList.F> {
-            override fun <A> combineK(x: HK<F, A>, y: HK<F, A>): NonEmptyList<A> = x.ev().plus(y.ev())
-        }
+        fun semigroupK(): SemigroupK<NonEmptyList.F> = object : NonEmptyListSemigroupK {}
     }
 }
 
