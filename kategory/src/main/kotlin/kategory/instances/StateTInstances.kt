@@ -4,7 +4,8 @@ interface StateTInstances<F, S> :
         Functor<StateTF<F, S>>,
         Applicative<StateTF<F, S>>,
         Monad<StateTF<F, S>>,
-        MonadState<StateTF<F, S>, S> {
+        MonadState<StateTF<F, S>, S>,
+        StateTInstances0 {
 
     fun MF(): Monad<F>
 
@@ -45,4 +46,22 @@ interface StateTInstances<F, S> :
     override fun set(s: S): StateT<F, S, Unit> =
             StateT(MF(), MF().pure({ _: S -> MF().pure(Tuple2(s, Unit)) }))
 
+}
+
+interface StateTInstances0 {
+
+    fun <F, S> catsDataSemigroupKForStateT(F0: Monad<F> = monad<F>(), G0: SemigroupK<F>): SemigroupK<StateTF<F, S>> =
+            object : StateTSemigroupK<F, S> {
+                override fun F(): Monad<F> = F0
+                override fun G(): SemigroupK<F> = G0
+            }
+}
+
+private interface StateTSemigroupK<F, S> : SemigroupK<StateTF<F, S>> {
+
+    fun F(): Monad<F>
+    fun G(): SemigroupK<F>
+
+    override fun <A> combineK(x: HK<HK2<StateT.F, F, S>, A>, y: HK<HK2<StateT.F, F, S>, A>): StateT<F, S, A> =
+            StateT(F(), F().pure({ s -> G().combineK(x.ev().run(s), y.ev().run(s)) }))
 }
