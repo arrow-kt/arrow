@@ -4,8 +4,7 @@ interface StateTInstances<F, S> :
         Functor<StateTF<F, S>>,
         Applicative<StateTF<F, S>>,
         Monad<StateTF<F, S>>,
-        MonadState<StateTF<F, S>, S>,
-        StateTInstances0 {
+        MonadState<StateTF<F, S>, S> {
 
     fun MF(): Monad<F>
 
@@ -48,16 +47,7 @@ interface StateTInstances<F, S> :
 
 }
 
-interface StateTInstances0 {
-
-    fun <F, S> kategoryDataSemigroupKForStateT(F0: Monad<F>, G0: SemigroupK<F>): SemigroupK<StateTF<F, S>> =
-            object : StateTSemigroupK<F, S> {
-                override fun F(): Monad<F> = F0
-                override fun G(): SemigroupK<F> = G0
-            }
-}
-
-private interface StateTSemigroupK<F, S> : SemigroupK<StateTF<F, S>> {
+interface StateTSemigroupK<F, S> : SemigroupK<StateTF<F, S>> {
 
     fun F(): Monad<F>
     fun G(): SemigroupK<F>
