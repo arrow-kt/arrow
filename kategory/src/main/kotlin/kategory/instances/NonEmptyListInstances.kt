@@ -61,3 +61,7 @@ interface NonEmptyListInstances :
 interface NonEmptyListSemigroup<A> : Semigroup<NonEmptyList<A>> {
     override fun combine(a: NonEmptyList<A>, b: NonEmptyList<A>): NonEmptyList<A> = a + b
 }
+
+interface NonEmptyListSemigroupK : SemigroupK<NonEmptyList.F> {
+    override fun <A> combineK(x: HK<NonEmptyList.F, A>, y: HK<NonEmptyList.F, A>): NonEmptyList<A> = x.ev().plus(y.ev())
+}

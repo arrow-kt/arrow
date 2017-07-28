@@ -64,3 +64,15 @@ interface EitherTTraverse<F, A> :
             fa.ev().foldR(lb, f, FF())
 
 }
+
+interface EitherTSemigroupK<F, L> : SemigroupK<EitherTF<F, L>> {
+    fun F(): Monad<F>
+
+    override fun <A> combineK(x: HK<EitherTF<F, L>, A>, y: HK<EitherTF<F, L>, A>): EitherT<F, L, A> =
+            EitherT(F(), F().flatMap(x.ev().value) {
+                when (it) {
+                    is Either.Left -> y.ev().value
+                    is Either.Right -> F().pure(it)
+                }
+            })
+}
