@@ -150,6 +150,13 @@ sealed class Either<out A, out B> : EitherKind<A, B> {
 
         fun <L> monadError(): MonadError<EitherF<L>, L> = instances()
 
+        fun <L> semigroupK(): SemigroupK<EitherF<L>> = object : SemigroupK<EitherF<L>> {
+            override fun <A> combineK(x: HK<EitherF<L>, A>, y: HK<kategory.EitherF<L>, A>): HK<kategory.EitherF<L>, A> =
+                    when (x) {
+                        is Left -> y
+                        else -> x
+                    }
+        }
     }
 }
 
@@ -209,7 +216,7 @@ inline fun <A, B> Either<A, B>.filterOrElse(crossinline predicate: (B) -> Boolea
 fun <A, B> Either<A, B>.contains(elem: B): Boolean =
         fold({ false }, { it == elem })
 
-fun <A> A.left() : Either<A, Nothing> = Either.Left(this)
+fun <A> A.left(): Either<A, Nothing> = Either.Left(this)
 
-fun <A> A.right() : Either<Nothing, A> = Either.Right(this)
+fun <A> A.right(): Either<Nothing, A> = Either.Right(this)
 
