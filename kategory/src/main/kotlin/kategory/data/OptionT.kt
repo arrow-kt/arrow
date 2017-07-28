@@ -47,6 +47,10 @@ data class OptionT<F, A>(val MF: Monad<F>, val value: HK<F, Option<A>>) : Option
         }
 
         inline fun <reified F> foldable(FF: Traverse<F> = kategory.traverse<F>(), MF: Monad<F> = kategory.monad<F>()): Foldable<OptionTF<F>> = traverse(FF, MF)
+
+        inline fun <reified F> semigroupK(MF : Monad<F> = kategory.monad<F>()): SemigroupK<OptionTF<F>> = object : OptionTSemigroupK<F> {
+            override fun F(): Monad<F> = MF
+        }
     }
 
     inline fun <B> fold(crossinline default: () -> B, crossinline f: (A) -> B): HK<F, B> =

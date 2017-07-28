@@ -6,7 +6,7 @@ interface EitherTInstances<F, L> :
         Monad<EitherTF<F, L>>,
         MonadError<EitherTF<F, L>, L> {
 
-    fun MF() : Monad<F>
+    fun MF(): Monad<F>
 
     override fun <A> pure(a: A): EitherT<F, L, A> =
             EitherT(MF(), MF().pure(Either.Right(a)))

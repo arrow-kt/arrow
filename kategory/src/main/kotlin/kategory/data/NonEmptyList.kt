@@ -76,8 +76,12 @@ class NonEmptyList<out A> private constructor(
         fun monad(): Monad<NonEmptyList.F> = this
 
         fun <A> semigroup(): Semigroup<NonEmptyList<A>> = object : NonEmptyListSemigroup<A> {}
+
+        fun semigroupK(): SemigroupK<NonEmptyList.F> = object : SemigroupK<NonEmptyList.F> {
+            override fun <A> combineK(x: HK<F, A>, y: HK<F, A>): HK<F, A> = x.ev().plus(y.ev())
+        }
     }
 }
 
-fun <A> A.nel() : NonEmptyList<A> =
+fun <A> A.nel(): NonEmptyList<A> =
         NonEmptyList.of(this)
