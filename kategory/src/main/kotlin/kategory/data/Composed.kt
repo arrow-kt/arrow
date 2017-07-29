@@ -72,9 +72,9 @@ interface ComposedMonoidK<F, G> : MonoidK<ComposedType<F, G>>, ComposedSemigroup
 
     override fun F(): MonoidK<F>
 
-    override fun <A> empty(): HK<ComposedType<F, G>, A> = F().empty()
+    override fun <A> empty(): HK<ComposedType<F, G>, A> = F().empty<HK<G, A>>().lift()
 }
 
-inline fun <F, G> MonoidK<F>.compose(): MonoidK<ComposedType<F, G>> = object : ComposedMonoidK<F, G> {
+fun <F, G> MonoidK<F>.compose(): MonoidK<ComposedType<F, G>> = object : ComposedMonoidK<F, G> {
     override fun F(): MonoidK<F> = this@compose
 }
