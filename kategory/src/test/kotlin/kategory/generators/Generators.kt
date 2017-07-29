@@ -8,6 +8,12 @@ inline fun <reified F, A> genApplicative(valueGen: Gen<A>, AP: Applicative<F> = 
                     AP.pure(valueGen.generate())
         }
 
+inline fun <reified F, A> genEmpty(MKF: MonoidK<F>): Gen<HK<F, A>> =
+        object : Gen<HK<F, A>> {
+            override fun generate(): HK<F, A> =
+                    MKF.empty()
+        }
+
 fun <A, B> genFunctionAToB(genB: Gen<B>): Gen<(A) -> B> =
         object : Gen<(A) -> B> {
             override fun generate(): (A) -> B {
