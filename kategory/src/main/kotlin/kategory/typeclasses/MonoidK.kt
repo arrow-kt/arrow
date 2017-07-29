@@ -14,6 +14,7 @@ interface MonoidK<F> : SemigroupK<F> {
     fun <A> empty(): HK<F, A>
 
     override fun <A> algebra(): Monoid<HK<F, A>> = object : Monoid<HK<F, A>> {
+
         override fun empty(): HK<F, A> = this@MonoidK.empty()
 
         override fun combine(a: HK<F, A>, b: HK<F, A>): HK<F, A> = this@MonoidK.combineK(a, b)
