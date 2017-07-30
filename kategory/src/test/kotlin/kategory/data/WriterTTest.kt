@@ -10,19 +10,27 @@ class WriterTTest : UnitSpec() {
     init {
 
         testLaws(MonadLaws.laws(WriterT.monad(NonEmptyList, IntMonoid), Eq.any()))
-        /*testLaws(MonoidKLaws.laws(
-                WriterT.monoidK<Id.F, Int>(Id, ),
-                WriterT.applicative(Id),
-                object : Eq<HK<WriterF<Id.F>, Id.F>> {
-                    override fun eqv(a: HK<WriterF<Id.F>, Id.F>, b: HK<WriterF<Id.F>, Id.F>): Boolean {
+        testLaws(SemigroupKLaws.laws<WriterF<Id.F, Int>>(
+                WriterT.semigroupK(Id, IdSemigroupK),
+                WriterT.applicative(Id, IntMonoid),
+                object : Eq<HK<WriterF<Id.F, Int>, Int>> {
+                    override fun eqv(a: HK<WriterF<Id.F, Int>, Int>, b: HK<WriterF<Id.F, Int>, Int>): Boolean {
+                        return a.ev().value == b.ev().value
+                    }
+                }))
+        testLaws(MonoidKLaws.laws<WriterF<Id.F, Int>>(
+                WriterT.monoidK(Id, IdMonoidK(0)),
+                WriterT.applicative(Id, IntMonoid),
+                object : Eq<HK<WriterF<Id.F, Int>, Id.F>> {
+                    override fun eqv(a: HK<WriterF<Id.F, Int>, Id.F>, b: HK<WriterF<Id.F, Int>, Id.F>): Boolean {
                         return a.ev().value == b.ev().value
                     }
                 },
-                object : Eq<HK<WriterF<Id.F>, Int>> {
-                    override fun eqv(a: HK<WriterF<Id.F>, Int>, b: HK<WriterF<Id.F>, Int>): Boolean {
+                object : Eq<HK<WriterF<Id.F, Int>, Int>> {
+                    override fun eqv(a: HK<WriterF<Id.F, Int>, Int>, b: HK<WriterF<Id.F, Int>, Int>): Boolean {
                         return a.ev().value == b.ev().value
                     }
-                }))*/
+                }))
 
         "tell should accumulate write" {
             forAll { a: Int ->

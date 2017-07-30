@@ -20,3 +20,6 @@ interface MonoidK<F> : SemigroupK<F> {
         override fun combine(a: HK<F, A>, b: HK<F, A>): HK<F, A> = this@MonoidK.combineK(a, b)
     }
 }
+
+inline fun <reified F> monoidK(): MonoidK<F> =
+        instance(InstanceParametrizedType(MonoidK::class.java, listOf(F::class.java)))
