@@ -55,6 +55,10 @@ sealed class Validated<out E, out A> : ValidatedKind<E, A> {
         inline fun <reified E> foldable(SE: Semigroup<E> = semigroup<E>()): Foldable<ValidatedF<E>> = instances(SE)
 
         inline fun <reified E> traverse(SE: Semigroup<E> = semigroup<E>()): Traverse<ValidatedF<E>> = instances(SE)
+
+        inline fun <reified A> semigroupK(SGK: SemigroupK<A> = kategory.semigroupK<A>()): ValidatedSemigroupK<A> = object : ValidatedSemigroupK<A> {
+            override fun F(): SemigroupK<A> = SGK
+        }
     }
 
     data class Valid<out A>(val a: A) : Validated<Nothing, A>()
