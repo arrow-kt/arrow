@@ -94,19 +94,9 @@ typealias OptionTF<F> = HK<OptionTHK, F>
     //TODO: add toRight() and toLeft() once EitherT it's available
 }
 
-inline fun <reified G, reified B> OptionT<F, A>.traverse(f: (A) -> HK<G, B>, GA: Applicative<G>, FF: Traverse<F>, MF: Monad<F>): HK<G, HK<OptionTF<F>, B>> {
+inline fun <reified F, reified G, reified B, A> OptionT<F, A>.traverse(noinline f: (A) -> HK<G, B>, GA: Applicative<G> = applicative(), FF: Traverse<F> = traverse(), GF: Traverse<G> = traverse(), MF: Monad<F> = monad()): HK<G, HK<OptionTF<F>, B>> {
     //val fa = ComposedTraverse(FF, Option, Option).traverseC(value, f, GA)
     //TODO Attempt to fix OptionT.kt: (113, 18): Cannot use 'F' as reified type parameter. Use a class instead.
-    val fa = object : ComposedTraverse<F, G> {
-        override fun FF() = FF
-
-        override fun GF() =
-
-                override fun FT() =
-
-                override fun GT() =
-
-                override fun GA() = GA
-    }.traverseC(value, f, GA)
+    val fa = ComposedTraverse.invoke(FF, GF, GA).traverseC(value, f, GA)
     return GA.map(fa, { OptionT(MF, MF.map(it.lower(), { it.ev() })) })
 }
