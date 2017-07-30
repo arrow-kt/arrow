@@ -117,8 +117,11 @@ open class StackSafeMonadContinuation<F, A>(val M: Monad<F>) : Serializable, Con
  * Entry point for monad bindings which enables for comprehension. The underlying impl is based on coroutines.
  * A coroutine is initiated and inside `MonadContinuation` suspended yielding to `flatMap` once all the flatMap binds are completed
  * the underlying monad is returned from the act of executing the coroutine
+ *
+ * This combinator ultimately returns computations lifting to Free to automatically for comprehend in a stack-safe way
+ * over any stack-unsafe monads
  */
-fun <F, B> Monad<F>.bindingT(c: suspend StackSafeMonadContinuation<F, *>.() -> Free<F, B>): Free<F, B> {
+fun <F, B> Monad<F>.bindingStackSafe(c: suspend StackSafeMonadContinuation<F, *>.() -> Free<F, B>): Free<F, B> {
     val continuation = StackSafeMonadContinuation<F, B>(this)
     c.startCoroutine(continuation, continuation)
     return continuation.returnedMonad

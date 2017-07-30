@@ -62,7 +62,7 @@ object MonadLaws {
                     val c = M.pure(b + 1).bind()
                     yields(c)
                 }
-                val b = M.bindingT {
+                val b = M.bindingStackSafe {
                     val a = M.pure(x).bind()
                     val b = M.pure(a + 1).bind()
                     val c = M.pure(b + 1).bind()
@@ -82,7 +82,7 @@ object MonadLaws {
                 }.equalUnderTheLaw(M.pure(a + 2), EQ)
             })
 
-    fun <F> stackSafeTestProgram(M: Monad<F>, n: Int, stopAt: Int): Free<F, Int> = M.bindingT {
+    fun <F> stackSafeTestProgram(M: Monad<F>, n: Int, stopAt: Int): Free<F, Int> = M.bindingStackSafe {
         val v = M.pure(n + 1).bind()
         val r = if (v < stopAt) stackSafeTestProgram(M, v, stopAt).bind() else M.pure(v).bind()
         yields(r)
