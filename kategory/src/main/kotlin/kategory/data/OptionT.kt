@@ -30,15 +30,15 @@ data class OptionT<F, A>(val MF: Monad<F>, val value: HK<F, Option<A>>) : Option
         @JvmStatic inline fun <reified F, A> fromOption(value: Option<A>, MF: Monad<F> = kategory.monad<F>()): OptionT<F, A> =
                 OptionT(MF, MF.pure(value))
 
-        inline fun <reified F> instances(MF : Monad<F> = kategory.monad<F>()): OptionTInstances<F> = object : OptionTInstances<F> {
+        inline fun <reified F> instances(MF: Monad<F> = kategory.monad<F>()): OptionTInstances<F> = object : OptionTInstances<F> {
             override fun MF(): Monad<F> = MF
         }
 
-        inline fun <reified F> functor(MF : Monad<F> = kategory.monad<F>()): Functor<OptionTF<F>> = instances(MF)
+        inline fun <reified F> functor(MF: Monad<F> = kategory.monad<F>()): Functor<OptionTF<F>> = instances(MF)
 
-        inline fun <reified F> applicative(MF : Monad<F> = kategory.monad<F>()): Applicative<OptionTF<F>> = instances(MF)
+        inline fun <reified F> applicative(MF: Monad<F> = kategory.monad<F>()): Applicative<OptionTF<F>> = instances(MF)
 
-        inline fun <reified F> monad(MF : Monad<F> = kategory.monad<F>()): Monad<OptionTF<F>> = instances(MF)
+        inline fun <reified F> monad(MF: Monad<F> = kategory.monad<F>()): Monad<OptionTF<F>> = instances(MF)
 
         inline fun <reified F> traverse(FF: Traverse<F> = kategory.traverse<F>(), MF: Monad<F> = kategory.monad<F>()): Traverse<OptionTF<F>> = object : OptionTTraverse<F> {
             override fun FF(): Traverse<F> = FF
@@ -48,7 +48,11 @@ data class OptionT<F, A>(val MF: Monad<F>, val value: HK<F, Option<A>>) : Option
 
         inline fun <reified F> foldable(FF: Traverse<F> = kategory.traverse<F>(), MF: Monad<F> = kategory.monad<F>()): Foldable<OptionTF<F>> = traverse(FF, MF)
 
-        inline fun <reified F> semigroupK(MF : Monad<F> = kategory.monad<F>()): SemigroupK<OptionTF<F>> = object : OptionTSemigroupK<F> {
+        inline fun <reified F> semigroupK(MF: Monad<F> = kategory.monad<F>()): SemigroupK<OptionTF<F>> = object : OptionTSemigroupK<F> {
+            override fun F(): Monad<F> = MF
+        }
+
+        inline fun <reified F> monoidK(MF: Monad<F> = kategory.monad<F>()): MonoidK<OptionTF<F>> = object : OptionTMonoidK<F> {
             override fun F(): Monad<F> = MF
         }
     }
