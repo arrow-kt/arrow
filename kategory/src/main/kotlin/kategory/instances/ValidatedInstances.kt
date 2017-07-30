@@ -52,14 +52,18 @@ interface ValidatedInstances<E> :
 
 interface ValidatedSemigroupK<A> : SemigroupK<ValidatedF<A>> {
 
-    fun F(): SemigroupK<A>
+    fun F(): Semigroup<A>
 
-    override fun <B> combineK(x: HK<ValidatedF<A>, B>, y: HK<ValidatedF<A>, B>): Validated<A, B> =
-            when (x) {
-                is Valid -> x
-                else -> when (y) {
-                    is Invalid -> Invalid(F().combine((x as Invalid).e, y.e))
-                    else -> y.ev()
-                }
+    override fun <B> combineK(x: HK<ValidatedF<A>, B>, y: HK<ValidatedF<A>, B>): Validated<A, B> {
+        val xev = x.ev()
+        val yev = y.ev()
+        return when (xev) {
+            is Valid -> xev
+            is Invalid -> when (yev) {
+                is Invalid -> Invalid(F().combine(xev.e, yev.e))
+                is Valid -> yev
             }
+        }.ev()
+    }
+
 }
