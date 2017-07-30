@@ -1,5 +1,9 @@
 package kategory
 
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.CoroutineStart
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.runBlocking
 import java.io.Serializable
 import kotlin.coroutines.experimental.Continuation
 import kotlin.coroutines.experimental.EmptyCoroutineContext
@@ -68,6 +72,58 @@ open class MonadContinuation<F, A>(val M: Monad<F>) : Serializable, Continuation
  */
 fun <F, B> Monad<F>.binding(c: suspend MonadContinuation<F, *>.() -> HK<F, B>): HK<F, B> {
     val continuation = MonadContinuation<F, B>(this)
+    c.startCoroutine(continuation, continuation)
+    return continuation.returnedMonad
+}
+
+@RestrictsSuspension
+open class StackSafeMonadContinuation<F, A>(val M: Monad<F>) : Serializable, Continuation<TrampolineF<HK<F, A>>> {
+
+    override val context = EmptyCoroutineContext
+
+    override fun resume(value: TrampolineF<HK<F, A>>) {
+        returnedMonad = value
+    }
+
+    override fun resumeWithException(exception: Throwable) {
+        throw exception
+    }
+
+    internal lateinit var returnedMonad: TrampolineF<HK<F, A>>
+
+    operator suspend fun <B> HK<F, B>.not(): B = this.bind()
+
+    suspend fun <B> HK<F, B>.bind(): B = bind { Trampoline.done(this) }
+
+    suspend fun <B> TrampolineF<HK<F, B>>.bind(): B = bind { this }
+
+    suspend fun <B> bind(m: () -> TrampolineF<HK<F, B>>): B = suspendCoroutineOrReturn { c ->
+        val labelHere = c.stackLabels // save the whole coroutine stack labels
+        returnedMonad = m().flatMap { x ->
+            c.stackLabels = labelHere
+            M.flatMap(x,  { z ->
+                println("Resuming $z")
+                c.resume(z)
+                println("REturning Unit")
+                M.pure(Unit)
+            })
+            returnedMonad
+        }
+        COROUTINE_SUSPENDED
+    }
+
+    infix fun <B> yields(b: B) = yields { b }
+
+    infix fun <B> yields(b: () -> B) = Trampoline.done(M.pure(b()))
+}
+
+/**
+ * Entry point for monad bindings which enables for comprehension. The underlying impl is based on coroutines.
+ * A coroutine is initiated and inside `MonadContinuation` suspended yielding to `flatMap` once all the flatMap binds are completed
+ * the underlying monad is returned from the act of executing the coroutine
+ */
+fun <F, B> Monad<F>.bindingT(c: suspend StackSafeMonadContinuation<F, *>.() -> TrampolineF<HK<F, B>>): TrampolineF<HK<F, B>> {
+    val continuation = StackSafeMonadContinuation<F, B>(this)
     c.startCoroutine(continuation, continuation)
     return continuation.returnedMonad
 }

@@ -12,7 +12,8 @@ object MonadLaws {
                     Law("Monad Laws: kleisli left identity", { kleisliLeftIdentity(M, EQ) }),
                     Law("Monad Laws: kleisli right identity", { kleisliRightIdentity(M, EQ) }),
                     Law("Monad Laws: map / flatMap coherence", { mapFlatMapCoherence(M, EQ) }),
-                    Law("Monad / JVM: stack safe", { stackSafety(5000, M, EQ) })
+                    Law("Monad / JVM: stack safe", { stackSafety(5000, M, EQ) }),
+                    Law("Monad / JVM: stack safe comprehensions", { stackSafetyComprehensions(5000, M, EQ) })
             )
 
     inline fun <reified F> leftIdentity(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
@@ -43,6 +44,18 @@ object MonadLaws {
     inline fun <reified F> stackSafety(iterations: Int = 5000, M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit {
         val res = M.tailRecM(0, { i -> M.pure(if (i < iterations) Either.Left(i + 1) else Either.Right(i)) })
         res.equalUnderTheLaw(M.pure(iterations), EQ)
+    }
+
+    inline fun <reified F> stackSafetyComprehensions(iterations: Int = 5000, M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit {
+        val res = stackSafeTestProgram(M, 0, iterations)
+        println("res == $iterations")
+        res.runT().equalUnderTheLaw(M.pure(iterations), EQ)
+    }
+
+    fun <F> stackSafeTestProgram(M: Monad<F>, n: Int, stopAt: Int): TrampolineF<HK<F, Int>> = M.bindingT {
+        val v = M.pure(n + 1).bind()
+        val r = if (v < stopAt) stackSafeTestProgram(M, v, stopAt).bind() else M.pure(v).bind()
+        yields(r)
     }
 
 }
