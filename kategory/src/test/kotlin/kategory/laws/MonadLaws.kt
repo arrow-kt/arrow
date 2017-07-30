@@ -50,7 +50,6 @@ object MonadLaws {
 
     inline fun <reified F> stackSafetyComprehensions(iterations: Int = 5000, M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit {
         val res = stackSafeTestProgram(M, 0, iterations)
-        println("res == $iterations")
         res.run(M).equalUnderTheLaw(M.pure(iterations), EQ)
     }
 
