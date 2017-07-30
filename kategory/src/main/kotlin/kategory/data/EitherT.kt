@@ -73,8 +73,7 @@ typealias EitherTF<F, L> = HK2<EitherTHK, F, L>
 
     fun <C> foldR(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>, FF: Foldable<F>): Eval<C> = FF.compose(Either.foldable<A>()).foldRC(value, lb, f)
 
-    fun <G, C> traverse(f: (B) -> HK<G, C>, GA: Applicative<G>, FF: Traverse<F>, MF: Monad<F>): HK<G, HK<EitherTF<F, A>, C>>
-        // TODO Fix EitherT.kt: (97, 18): Cannot use 'F' as reified type parameter. Use a class instead.
+    fun <G, C> traverse(f: (B) -> HK<G, C>, GA: Applicative<G>, FF: Traverse<F>, MF: Monad<F>): HK<G, HK<EitherTF<F, A>, C>> {
         val fa = ComposedTraverse(FF, Either.traverse<A>(), Either.monad<A>()).traverseC(value, f, GA)
         return GA.map(fa, { EitherT(MF, MF.map(it.lower(), { it.ev() })) })
     }
