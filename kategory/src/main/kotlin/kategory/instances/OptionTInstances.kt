@@ -51,7 +51,7 @@ interface OptionTSemigroupK<F> : SemigroupK<OptionTF<F>> {
     fun F(): Monad<F>
 
     override fun <A> combineK(x: HK<OptionTF<F>, A>, y: HK<OptionTF<F>, A>): OptionT<F, A> =
-        x.ev().orElse { y.ev() }
+            x.ev().orElse { y.ev() }
 }
 
 interface OptionTMonoidK<F> : MonoidK<OptionTF<F>>, OptionTSemigroupK<F> {
