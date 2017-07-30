@@ -91,12 +91,11 @@ typealias OptionTF<F> = HK<OptionTHK, F>
 
     fun <B> foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>): Eval<B> = FF.compose(Option).foldRC(value, lb, f)
 
-    //TODO: add toRight() and toLeft() once EitherT it's available
+    fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>, FF: Traverse<F>, MF: Monad<F>): HK<G, HK<OptionTF<F>, B>> {
+        val fa = ComposedTraverse(FF, Option, Option).traverseC(value, f, GA)
+        return GA.map(fa, { OptionT(MF, MF.map(it.lower(), { it.ev() })) })
+    }
+
 }
 
-inline fun <reified F, reified G, reified B, A> OptionT<F, A>.traverse(noinline f: (A) -> HK<G, B>, GA: Applicative<G> = applicative(), FF: Traverse<F> = traverse(), GF: Traverse<G> = traverse(), MF: Monad<F> = monad()): HK<G, HK<OptionTF<F>, B>> {
-    //val fa = ComposedTraverse(FF, Option, Option).traverseC(value, f, GA)
-    //TODO Attempt to fix OptionT.kt: (113, 18): Cannot use 'F' as reified type parameter. Use a class instead.
-    val fa = ComposedTraverse.invoke(FF, GF, GA).traverseC(value, f, GA)
-    return GA.map(fa, { OptionT(MF, MF.map(it.lower(), { it.ev() })) })
-}
+
