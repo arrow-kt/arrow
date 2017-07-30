@@ -54,6 +54,6 @@ interface OptionTSemigroupK<F> : SemigroupK<OptionTF<F>> {
         x.ev().orElse { y.ev() }
 }
 
-interface OptionTMonoidK<F>: MonoidK<OptionTF<F>>, OptionTSemigroupK<F> {
+interface OptionTMonoidK<F> : MonoidK<OptionTF<F>>, OptionTSemigroupK<F> {
     override fun <A> empty(): HK<OptionTF<F>, A> = OptionT(F(), F().pure(Option.None))
 }
