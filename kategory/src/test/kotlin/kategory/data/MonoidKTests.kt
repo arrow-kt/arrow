@@ -7,11 +7,20 @@ import org.junit.runner.RunWith
 class MonoidKTests : UnitSpec() {
 
     init {
-        val monoidK = OptionMonoidK()
-        testLaws(MonoidKLaws.laws(monoidK, object : Eq<HK<Option.F, Int?>> {
-            override fun eqv(a: HK<Option.F, Int?>, b: HK<Option.F, Int?>): Boolean {
-                return a.ev() == b.ev()
-            }
-        }))
+        val monoidK = OptionT.monoidK(Id)
+
+        testLaws(MonoidKLaws.laws(
+                monoidK,
+                OptionT.applicative(Id),
+                object : Eq<HK<OptionTF<Id.F>, Id.F>> {
+                    override fun eqv(a: HK<OptionTF<Id.F>, Id.F>, b: HK<OptionTF<Id.F>, Id.F>): Boolean {
+                        return a.ev().value == b.ev().value
+                    }
+                },
+                object : Eq<HK<OptionTF<Id.F>, Int>> {
+                    override fun eqv(a: HK<OptionTF<Id.F>, Int>, b: HK<OptionTF<Id.F>, Int>): Boolean {
+                        return a.ev().value == b.ev().value
+                    }
+                }))
     }
 }

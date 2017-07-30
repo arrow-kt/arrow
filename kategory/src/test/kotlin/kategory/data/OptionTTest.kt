@@ -11,6 +11,19 @@ class OptionTTest : UnitSpec() {
 
         testLaws(MonadLaws.laws(OptionT.monad(NonEmptyList), Eq.any()))
         testLaws(TraverseLaws.laws(OptionT.traverse(), OptionT.applicative(Id), { OptionT(Id(it.some())) }, Eq.any()))
+        testLaws(MonoidKLaws.laws(
+                OptionT.monoidK(Id),
+                OptionT.applicative(Id),
+                object : Eq<HK<OptionTF<Id.F>, Id.F>> {
+                    override fun eqv(a: HK<OptionTF<Id.F>, Id.F>, b: HK<OptionTF<Id.F>, Id.F>): Boolean {
+                        return a.ev().value == b.ev().value
+                    }
+                },
+                object : Eq<HK<OptionTF<Id.F>, Int>> {
+                    override fun eqv(a: HK<OptionTF<Id.F>, Int>, b: HK<OptionTF<Id.F>, Int>): Boolean {
+                        return a.ev().value == b.ev().value
+                    }
+                }))
 
         "map should modify value" {
             forAll { a: String ->
@@ -25,7 +38,7 @@ class OptionTTest : UnitSpec() {
         "flatMap should modify entity" {
             forAll { a: String ->
                 val ot = OptionT(NonEmptyList.of(Option.Some(a)))
-                val mapped = ot.flatMap{ OptionT(NonEmptyList.of(Option.Some(3))) }
+                val mapped = ot.flatMap { OptionT(NonEmptyList.of(Option.Some(3))) }
                 val expected: OptionT<NonEmptyList.F, Int> = OptionT.pure(3)
 
                 mapped == expected
