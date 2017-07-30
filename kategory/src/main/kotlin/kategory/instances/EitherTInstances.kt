@@ -6,7 +6,7 @@ interface EitherTInstances<F, L> :
         Monad<EitherTF<F, L>>,
         MonadError<EitherTF<F, L>, L> {
 
-    fun MF() : Monad<F>
+    fun MF(): Monad<F>
 
     override fun <A> pure(a: A): EitherT<F, L, A> =
             EitherT(MF(), MF().pure(Either.Right(a)))
@@ -63,4 +63,16 @@ interface EitherTTraverse<F, A> :
     override fun <B, C> foldR(fa: HK<EitherTF<F, A>, B>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
             fa.ev().foldR(lb, f, FF())
 
+}
+
+interface EitherTSemigroupK<F, L> : SemigroupK<EitherTF<F, L>> {
+    fun F(): Monad<F>
+
+    override fun <A> combineK(x: HK<EitherTF<F, L>, A>, y: HK<EitherTF<F, L>, A>): EitherT<F, L, A> =
+            EitherT(F(), F().flatMap(x.ev().value) {
+                when (it) {
+                    is Either.Left -> y.ev().value
+                    is Either.Right -> F().pure(it)
+                }
+            })
 }

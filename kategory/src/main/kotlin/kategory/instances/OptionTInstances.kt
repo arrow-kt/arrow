@@ -45,3 +45,11 @@ interface OptionTTraverse<F> :
     override fun <A, B> foldR(fa: HK<OptionTF<F>, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
             fa.ev().foldR(lb, f, FF())
 }
+
+interface OptionTSemigroupK<F> : SemigroupK<OptionTF<F>> {
+
+    fun F(): Monad<F>
+
+    override fun <A> combineK(x: HK<OptionTF<F>, A>, y: HK<OptionTF<F>, A>): OptionT<F, A> =
+        x.ev().orElse { y.ev() }
+}

@@ -37,7 +37,23 @@ sealed class IO<out A> : HK<IO.F, A> {
 
     abstract fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit)
 
-    abstract fun unsafeStep(): IO<A>
+    @Suppress("UNCHECKED_CAST")
+    fun unsafeStep(): IO<A> {
+        var current: IO<A> = this
+        while (true) {
+            when (current) {
+                is Suspend -> {
+                    current = current.cont(Unit)
+                }
+                is BindSuspend<*, A> -> {
+                    val cont: IO<Any?> = current.cont(Unit)
+                    val f: AndThen<Any?, IO<A>> = current.f as AndThen<Any?, IO<A>>
+                    current = cont.flatMapTotal(f)
+                }
+                else -> return current
+            }
+        }
+    }
 
     fun unsafeRunSync(): A =
             unsafeRunTimed(Duration.INFINITE).fold({ throw IllegalArgumentException("IO execution should yield a valid result") }, { it })
@@ -122,9 +138,6 @@ internal data class Pure<out A>(val a: A) : IO<A>() {
     override fun attempt(): IO<Either<Throwable, A>> =
             Pure(Either.Right(a))
 
-    override fun unsafeStep(): IO<A> =
-            this
-
     override fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit) =
             cb(Either.Right(a))
 
@@ -141,9 +154,6 @@ internal data class RaiseError<out A>(val exception: Throwable) : IO<A>() {
 
     override fun attempt(): IO<Either<Throwable, A>> =
             Pure(Either.Left(exception))
-
-    override fun unsafeStep(): IO<A> =
-            this
 
     override fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit) =
             cb(Either.Left(exception))
@@ -162,9 +172,6 @@ internal data class Suspend<out A>(val cont: AndThen<Unit, IO<A>>) : IO<A>() {
     override fun attempt(): IO<Either<Throwable, A>> =
             BindSuspend(cont, attemptValue())
 
-    override fun unsafeStep(): IO<A> =
-            cont(Unit).unsafeStep()
-
     override fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit) =
             throw AssertionError("Unreachable")
 
@@ -181,9 +188,6 @@ internal data class BindSuspend<E, out A>(val cont: AndThen<Unit, IO<E>>, val f:
 
     override fun attempt(): IO<Either<Throwable, A>> =
             BindSuspend(AndThen { _ -> this }, attemptValue())
-
-    override fun unsafeStep(): IO<A> =
-            cont(Unit).flatMapTotal(this.f).unsafeStep()
 
     override fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit) =
             throw AssertionError("Unreachable")
@@ -202,9 +206,6 @@ internal data class Async<out A>(val cont: ((Either<Throwable, A>) -> Unit) -> U
     override fun attempt(): IO<Either<Throwable, A>> =
             BindAsync(cont, attemptValue())
 
-    override fun unsafeStep(): IO<A> =
-            this
-
     override fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit) =
             cont(cb)
 
@@ -221,9 +222,6 @@ internal data class BindAsync<E, out A>(val cont: ((Either<Throwable, E>) -> Uni
 
     override fun attempt(): IO<Either<Throwable, A>> =
             BindSuspend(AndThen { _ -> this }, attemptValue())
-
-    override fun unsafeStep(): IO<A> =
-            this
 
     override fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit) =
             cont { result ->
