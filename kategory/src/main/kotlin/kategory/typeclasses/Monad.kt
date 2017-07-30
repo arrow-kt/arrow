@@ -77,11 +77,11 @@ fun <F, B> Monad<F>.binding(c: suspend MonadContinuation<F, *>.() -> HK<F, B>): 
 }
 
 @RestrictsSuspension
-open class StackSafeMonadContinuation<F, A>(val M: Monad<F>) : Serializable, Continuation<TrampolineF<HK<F, A>>> {
+open class StackSafeMonadContinuation<F, A>(val M: Monad<F>) : Serializable, Continuation<Free<F, A>> {
 
     override val context = EmptyCoroutineContext
 
-    override fun resume(value: TrampolineF<HK<F, A>>) {
+    override fun resume(value: Free<F, A>) {
         returnedMonad = value
     }
 
@@ -89,24 +89,20 @@ open class StackSafeMonadContinuation<F, A>(val M: Monad<F>) : Serializable, Con
         throw exception
     }
 
-    internal lateinit var returnedMonad: TrampolineF<HK<F, A>>
+    internal lateinit var returnedMonad: Free<F, A>
 
     operator suspend fun <B> HK<F, B>.not(): B = this.bind()
 
-    suspend fun <B> HK<F, B>.bind(): B = bind { Trampoline.done(this) }
+    suspend fun <B> HK<F, B>.bind(): B = bind { Free.liftF(this) }
 
-    suspend fun <B> TrampolineF<HK<F, B>>.bind(): B = bind { this }
+    suspend fun <B> Free<F, B>.bind(): B = bind { this }
 
-    suspend fun <B> bind(m: () -> TrampolineF<HK<F, B>>): B = suspendCoroutineOrReturn { c ->
+    suspend fun <B> bind(m: () -> Free<F, B>): B = suspendCoroutineOrReturn { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels
-        returnedMonad = m().flatMap { x ->
+        val freeResult = m()
+        returnedMonad = freeResult.flatMap { z ->
             c.stackLabels = labelHere
-            M.flatMap(x,  { z ->
-                println("Resuming $z")
-                c.resume(z)
-                println("REturning Unit")
-                M.pure(Unit)
-            })
+            c.resume(z)
             returnedMonad
         }
         COROUTINE_SUSPENDED
@@ -114,7 +110,7 @@ open class StackSafeMonadContinuation<F, A>(val M: Monad<F>) : Serializable, Con
 
     infix fun <B> yields(b: B) = yields { b }
 
-    infix fun <B> yields(b: () -> B) = Trampoline.done(M.pure(b()))
+    infix fun <B> yields(b: () -> B) = Free.liftF(M.pure(b()))
 }
 
 /**
@@ -122,7 +118,7 @@ open class StackSafeMonadContinuation<F, A>(val M: Monad<F>) : Serializable, Con
  * A coroutine is initiated and inside `MonadContinuation` suspended yielding to `flatMap` once all the flatMap binds are completed
  * the underlying monad is returned from the act of executing the coroutine
  */
-fun <F, B> Monad<F>.bindingT(c: suspend StackSafeMonadContinuation<F, *>.() -> TrampolineF<HK<F, B>>): TrampolineF<HK<F, B>> {
+fun <F, B> Monad<F>.bindingT(c: suspend StackSafeMonadContinuation<F, *>.() -> Free<F, B>): Free<F, B> {
     val continuation = StackSafeMonadContinuation<F, B>(this)
     c.startCoroutine(continuation, continuation)
     return continuation.returnedMonad

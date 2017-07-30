@@ -49,10 +49,10 @@ object MonadLaws {
     inline fun <reified F> stackSafetyComprehensions(iterations: Int = 5000, M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit {
         val res = stackSafeTestProgram(M, 0, iterations)
         println("res == $iterations")
-        res.runT().equalUnderTheLaw(M.pure(iterations), EQ)
+        res.run(M).equalUnderTheLaw(M.pure(iterations), EQ)
     }
 
-    fun <F> stackSafeTestProgram(M: Monad<F>, n: Int, stopAt: Int): TrampolineF<HK<F, Int>> = M.bindingT {
+    fun <F> stackSafeTestProgram(M: Monad<F>, n: Int, stopAt: Int): Free<F, Int> = M.bindingT {
         val v = M.pure(n + 1).bind()
         val r = if (v < stopAt) stackSafeTestProgram(M, v, stopAt).bind() else M.pure(v).bind()
         yields(r)
