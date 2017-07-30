@@ -21,5 +21,13 @@ class StateTTests : UnitSpec() {
                     override fun eqv(a: StateTKind<Try.F, Int, Unit>, b: StateTKind<Try.F, Int, Unit>): Boolean =
                             a.runM(1) == b.runM(1)
                 }))
+
+        testLaws(SemigroupKLaws.laws<StateTF<Id.F, Int>>(
+                StateT.semigroupK(Id, IdSemigroupK),
+                StateT.applicative(Id),
+                object : Eq<HK<StateTF<Id.F, Int>, Int>> {
+                    override fun eqv(a: HK<StateTF<Id.F, Int>, Int>, b: HK<StateTF<Id.F, Int>, Int>): Boolean =
+                            a.runM(1) == b.runM(1)
+                }))
     }
 }
