@@ -40,7 +40,7 @@ data class WriterT<F, W, A>(val MF: Monad<F>, val value: HK<F, Tuple2<W, A>>) : 
             override fun F0(): SemigroupK<F> = SGK
         }
 
-        inline fun <reified F, reified W> monoidK(MF: Monad<F> = monad<F>(), MKF: MonoidK<F>): SemigroupK<WriterF<F, W>> = object : WriterTMonoidK<F, W> {
+        inline fun <reified F, reified W> monoidK(MF: Monad<F> = monad<F>(), MKF: MonoidK<F>): MonoidK<WriterF<F, W>> = object : WriterTMonoidK<F, W> {
             override fun MF(): Monad<F> = MF
 
             override fun F0(): MonoidK<F> = MKF

@@ -10,6 +10,19 @@ class WriterTTest : UnitSpec() {
     init {
 
         testLaws(MonadLaws.laws(WriterT.monad(NonEmptyList, IntMonoid), Eq.any()))
+        /*testLaws(MonoidKLaws.laws(
+                WriterT.monoidK<Id.F, Int>(Id, ),
+                WriterT.applicative(Id),
+                object : Eq<HK<WriterF<Id.F>, Id.F>> {
+                    override fun eqv(a: HK<WriterF<Id.F>, Id.F>, b: HK<WriterF<Id.F>, Id.F>): Boolean {
+                        return a.ev().value == b.ev().value
+                    }
+                },
+                object : Eq<HK<WriterF<Id.F>, Int>> {
+                    override fun eqv(a: HK<WriterF<Id.F>, Int>, b: HK<WriterF<Id.F>, Int>): Boolean {
+                        return a.ev().value == b.ev().value
+                    }
+                }))*/
 
         "tell should accumulate write" {
             forAll { a: Int ->
