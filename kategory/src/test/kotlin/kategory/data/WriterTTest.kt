@@ -10,10 +10,6 @@ class WriterTTest : UnitSpec() {
     init {
 
         testLaws(MonadLaws.laws(WriterT.monad(NonEmptyList, IntMonoid), Eq.any()))
-        testLaws(SemigroupKLaws.laws<WriterF<Option.F, Int>>(
-                WriterT.semigroupK(Option, OptionSemigroupK()),
-                WriterT.applicative(Option, IntMonoid),
-                Eq.any()))
         testLaws(MonoidKLaws.laws<WriterF<Option.F, Int>>(
                 WriterT.monoidK(Option, OptionMonoidK()),
                 WriterT.applicative(Option, IntMonoid),
