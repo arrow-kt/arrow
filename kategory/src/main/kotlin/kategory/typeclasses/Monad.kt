@@ -1,9 +1,5 @@
 package kategory
 
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.CoroutineStart
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.runBlocking
 import java.io.Serializable
 import kotlin.coroutines.experimental.Continuation
 import kotlin.coroutines.experimental.EmptyCoroutineContext
