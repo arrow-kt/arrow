@@ -15,9 +15,9 @@ interface TrampolineFunctions {
 
     fun <A> done(a: A): TrampolineF<A> = Free.pure<Function0.F, A>(a)
 
-    fun <A> suspend(a: () -> TrampolineF<A>): TrampolineF<A> = defer(a)
-
     fun <A> defer(a: () -> TrampolineF<A>): TrampolineF<A> = Free.defer(a)
 
     fun <A> delay(a: () -> A): TrampolineF<A> = defer { done(a()) }
 }
+
+fun <A> TrampolineF<A>.runT(): A = this.foldMap(FunctionK.id(), Function0).ev().invoke()

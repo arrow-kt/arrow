@@ -12,7 +12,7 @@ object MonadLaws {
                     Law("Monad Laws: kleisli left identity", { kleisliLeftIdentity(M, EQ) }),
                     Law("Monad Laws: kleisli right identity", { kleisliRightIdentity(M, EQ) }),
                     Law("Monad Laws: map / flatMap coherence", { mapFlatMapCoherence(M, EQ) }),
-                    Law("Monad / JVM: stack safe", { stackSafety(5000, M) })
+                    Law("Monad / JVM: stack safe", { stackSafety(5000, M, EQ) })
             )
 
     inline fun <reified F> leftIdentity(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
@@ -40,8 +40,9 @@ object MonadLaws {
                 M.flatMap(fa, { M.pure(f(it)) }).equalUnderTheLaw(M.map(fa, f), EQ)
             })
 
-    inline fun <reified F> stackSafety(iterations: Int = 5000, M: Monad<F> = monad<F>()): Unit {
+    inline fun <reified F> stackSafety(iterations: Int = 5000, M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit {
         val res = M.tailRecM(0, { i -> M.pure(if (i < iterations) Either.Left(i + 1) else Either.Right(i)) })
-        res.equalUnderTheLaw(iterations)
+        res.equalUnderTheLaw(M.pure(iterations), EQ)
     }
+
 }
