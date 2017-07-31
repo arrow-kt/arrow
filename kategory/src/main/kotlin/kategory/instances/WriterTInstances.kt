@@ -29,3 +29,20 @@ interface WriterTInstances<F, W> :
             }))
 
 }
+
+interface WriterTSemigroupK<F, W> : SemigroupK<WriterF<F, W>> {
+
+    fun MF(): Monad<F>
+
+    fun F0(): SemigroupK<F>
+
+    override fun <A> combineK(x: HK<WriterF<F, W>, A>, y: HK<WriterF<F, W>, A>): WriterT<F, W, A> =
+            WriterT(MF(), F0().combineK(x.ev().value, y.ev().value))
+}
+
+interface WriterTMonoidK<F, W> : MonoidK<WriterF<F, W>>, WriterTSemigroupK<F, W> {
+
+    override fun F0(): MonoidK<F>
+
+    override fun <A> empty(): HK<WriterF<F, W>, A> = WriterT(MF(), F0().empty())
+}

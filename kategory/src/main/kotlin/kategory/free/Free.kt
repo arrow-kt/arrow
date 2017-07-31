@@ -6,6 +6,9 @@ typealias FreeF<S> = HK<Free.F, S>
 fun <S, A> FreeKind<S, A>.ev(): Free<S, A> =
         this as Free<S, A>
 
+fun <M, S, A> FreeKind<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M>): HK<M, A> =
+        (this as Free<S, A>).foldMap(f, MM)
+
 sealed class Free<out S, out A> : FreeKind<S, A> {
 
     class F private constructor()
