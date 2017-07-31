@@ -1,5 +1,6 @@
 package kategory
 
+/** A monad that support monoidal accumulation (e.g. logging List<String>) */
 interface MonadWriter<F, W> : Monad<F> {
 
     /** Lift a writer action into the effect */
