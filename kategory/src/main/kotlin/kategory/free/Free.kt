@@ -87,3 +87,5 @@ fun <S, A> A.free(): Free<S, A> =
         Free.pure<S, A>(this)
 
 fun <F, A> Free<F, A>.run(M: Monad<F>): HK<F, A> = this.foldMap(FunctionK.id(), M)
+
+fun <F, A> FreeKind<F, A>.runK(M: Monad<F>): HK<F, A> = this.ev().foldMap(FunctionK.id(), M)
