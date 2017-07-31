@@ -15,3 +15,6 @@ interface SemigroupK<F> : Typeclass {
                 combineK(x, y)
     }
 }
+
+inline fun <reified F> semigroupK(): SemigroupK<F> =
+        instance(InstanceParametrizedType(SemigroupK::class.java, listOf(F::class.java)))

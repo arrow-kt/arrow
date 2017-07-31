@@ -1,5 +1,8 @@
 package kategory
 
+import kategory.Validated.Valid
+import kategory.Validated.Invalid
+
 interface ValidatedInstances<E> :
         Functor<ValidatedF<E>>,
         Applicative<ValidatedF<E>>,
@@ -45,4 +48,22 @@ interface ValidatedInstances<E> :
                     is Validated.Invalid -> lb
                 }
             }
+}
+
+interface ValidatedSemigroupK<A> : SemigroupK<ValidatedF<A>> {
+
+    fun F(): Semigroup<A>
+
+    override fun <B> combineK(x: HK<ValidatedF<A>, B>, y: HK<ValidatedF<A>, B>): Validated<A, B> {
+        val xev = x.ev()
+        val yev = y.ev()
+        return when (xev) {
+            is Valid -> xev
+            is Invalid -> when (yev) {
+                is Invalid -> Invalid(F().combine(xev.e, yev.e))
+                is Valid -> yev
+            }
+        }.ev()
+    }
+
 }

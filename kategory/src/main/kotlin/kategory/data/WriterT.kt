@@ -34,9 +34,16 @@ data class WriterT<F, W, A>(val MF: Monad<F>, val value: HK<F, Tuple2<W, A>>) : 
 
         inline fun <reified F, reified W> monad(MM: Monad<F> = kategory.monad<F>(), SG: Monoid<W> = kategory.monoid<W>()): Monad<WriterF<F, W>> = instances(MM, SG)
 
-        inline fun <reified F, reified W> semigroupK(SGK: SemigroupK<F>): SemigroupK<WriterF<F, W>> = object : SemigroupK<WriterF<F, W>> {
-            override fun <A> combineK(x: HK<WriterF<F, W>, A>, y: HK<WriterF<F, W>, A>): WriterT<F, W, A> =
-                    WriterT(SGK.combineK(x.ev().value, y.ev().value))
+        inline fun <reified F, reified W> semigroupK(MF: Monad<F> = monad<F>(), SGK: SemigroupK<F> = semigroupK<F>()): SemigroupK<WriterF<F, W>> = object : WriterTSemigroupK<F, W> {
+            override fun MF(): Monad<F> = MF
+
+            override fun F0(): SemigroupK<F> = SGK
+        }
+
+        inline fun <reified F, reified W> monoidK(MF: Monad<F> = monad<F>(), MKF: MonoidK<F> = monoidK<F>()): MonoidK<WriterF<F, W>> = object : WriterTMonoidK<F, W> {
+            override fun MF(): Monad<F> = MF
+
+            override fun F0(): MonoidK<F> = MKF
         }
     }
 

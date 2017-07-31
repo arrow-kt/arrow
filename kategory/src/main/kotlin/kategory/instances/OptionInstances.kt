@@ -86,7 +86,17 @@ interface OptionInstances :
  * Dummy SemigroupK instance to be able to test laws for SemigroupK.
  */
 class OptionSemigroupK : SemigroupK<Option.F> {
-    override fun <A> combineK(x: HK<Option.F, A>, y: HK<Option.F, A>): Option<A> {
-        return x.ev().flatMap { y.ev() }
-    }
+    override fun <A> combineK(x: HK<Option.F, A>, y: HK<Option.F, A>): Option<A> =
+            x.ev().flatMap { y.ev() }
 }
+
+/**
+ * Dummy MonoidK instance to be able to test laws for MonoidK.
+ */
+class OptionMonoidK : MonoidK<Option.F>, GlobalInstance<ApplicativeError<Option.F, Unit>>() {
+    override fun <A> combineK(x: HK<Option.F, A>, y: HK<Option.F, A>): Option<A> =
+            x.ev().flatMap { y.ev() }
+
+    override fun <A> empty(): HK<Option.F, A> = Option.None
+}
+
