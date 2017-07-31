@@ -21,15 +21,13 @@ class OptionTTest : UnitSpec() {
                 OptionT.semigroupK(Id),
                 OptionT.applicative(Id),
                 OptionTFIdEq))
+
         testLaws(MonoidKLaws.laws(
-                OptionT.monoidK(Id),
-                OptionT.applicative(Id),
-                object : Eq<HK<OptionTF<Id.F>, Id.F>> {
-                    override fun eqv(a: HK<OptionTF<Id.F>, Id.F>, b: HK<OptionTF<Id.F>, Id.F>): Boolean {
-                        return a.ev().value == b.ev().value
-                    }
-                },
-                OptionTFIdEq))
+                OptionT.monoidK(Option),
+                OptionT.applicative(Option),
+                OptionT.invoke(Option(Option(1)), Option.monad()),
+                Eq.any(),
+                Eq.any()))
 
         "map should modify value" {
             forAll { a: String ->

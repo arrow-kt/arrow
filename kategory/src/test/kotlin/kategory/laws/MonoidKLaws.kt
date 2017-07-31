@@ -1,21 +1,15 @@
 package kategory
 
-import io.kotlintest.properties.forAll
-
 object MonoidKLaws {
 
-    inline fun <reified F> laws(SGK: MonoidK<F>, AP: Applicative<F>, EQ: Eq<HK<F, Id.F>>, EQSemigroupK: Eq<HK<F, Int>>): List<Law> =
+    inline fun <reified F> laws(SGK: MonoidK<F>, AP: Applicative<F>, a: HK<F, Int>, EQ: Eq<HK<F, Int>>, EQSemigroupK: Eq<HK<F, Int>>): List<Law> =
             SemigroupKLaws.laws(SGK, AP, EQSemigroupK) + listOf(
-                    Law("MonoidK: Left identity", { monoidKLeftIdentity(SGK, EQ) }),
-                    Law("MonoidK: Right identity", { monoidKRightIdentity(SGK, EQ) }))
+                    Law("MonoidK Laws: Left identity", { monoidKLeftIdentity(SGK, a, EQ) }),
+                    Law("MonoidK Laws: Right identity", { monoidKRightIdentity(SGK, a, EQ) }))
 
-    inline fun <reified F> monoidKLeftIdentity(SGK: MonoidK<F>, EQ: Eq<HK<F, Id.F>>): Unit =
-            forAll(genEmpty<F, Id.F>(SGK), { a ->
-                SGK.combineK(SGK.empty<Id.F>(), a).equalUnderTheLaw(a, EQ)
-            })
+    inline fun <reified F> monoidKLeftIdentity(SGK: MonoidK<F>, a: HK<F, Int>, EQ: Eq<HK<F, Int>>): Boolean =
+            SGK.combineK(SGK.empty<Int>(), a).equalUnderTheLaw(a, EQ)
 
-    inline fun <reified F> monoidKRightIdentity(SGK: MonoidK<F>, EQ: Eq<HK<F, Id.F>>): Unit =
-            forAll(genEmpty<F, Id.F>(SGK), { a ->
-                SGK.combineK(a, SGK.empty<Id.F>()).equalUnderTheLaw(a, EQ)
-            })
+    inline fun <reified F> monoidKRightIdentity(SGK: MonoidK<F>, a: HK<F, Int>, EQ: Eq<HK<F, Int>>): Boolean =
+            SGK.combineK(a, SGK.empty<Int>()).equalUnderTheLaw(a, EQ)
 }

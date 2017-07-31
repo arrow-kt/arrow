@@ -41,14 +41,3 @@ interface IdInstances :
             fa.ev().value
 
 }
-
-object IdSemigroupK : SemigroupK<Id.F>, GlobalInstance<SemigroupK<Id.F>>() {
-    override fun <A> combineK(x: HK<Id.F, A>, y: HK<Id.F, A>): HK<Id.F, A> = y
-}
-
-class IdMonoidK(val a: Any) : MonoidK<Id.F>, GlobalInstance<MonoidK<Id.F>>() {
-    override fun <A> empty(): HK<Id.F, A> = Id(a as A)
-
-    override fun <A> combineK(x: HK<Id.F, A>, y: HK<Id.F, A>): HK<Id.F, A> = y
-}
-

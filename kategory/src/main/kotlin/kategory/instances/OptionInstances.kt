@@ -94,8 +94,9 @@ class OptionSemigroupK : SemigroupK<Option.F> {
  * Dummy MonoidK instance to be able to test laws for MonoidK.
  */
 class OptionMonoidK : MonoidK<Option.F>, GlobalInstance<ApplicativeError<Option.F, Unit>>() {
-    override fun <A> combineK(x: HK<Option.F, A>, y: HK<Option.F, A>): HK<Option.F, A> =
+    override fun <A> combineK(x: HK<Option.F, A>, y: HK<Option.F, A>): Option<A> =
             x.ev().flatMap { y.ev() }
 
     override fun <A> empty(): HK<Option.F, A> = Option.None
 }
+

@@ -22,11 +22,11 @@ class StateTTests : UnitSpec() {
                             a.runM(1) == b.runM(1)
                 }))
 
-        testLaws(SemigroupKLaws.laws<StateTF<Id.F, Int>>(
-                StateT.semigroupK(Id, IdSemigroupK),
-                StateT.applicative(Id),
-                object : Eq<HK<StateTF<Id.F, Int>, Int>> {
-                    override fun eqv(a: HK<StateTF<Id.F, Int>, Int>, b: HK<StateTF<Id.F, Int>, Int>): Boolean =
+        testLaws(SemigroupKLaws.laws<StateTF<Option.F, Int>>(
+                StateT.semigroupK(Option, OptionSemigroupK()),
+                StateT.applicative(Option),
+                object : Eq<HK<StateTF<Option.F, Int>, Int>> {
+                    override fun eqv(a: HK<StateTF<Option.F, Int>, Int>, b: HK<StateTF<Option.F, Int>, Int>): Boolean =
                             a.runM(1) == b.runM(1)
                 }))
     }
