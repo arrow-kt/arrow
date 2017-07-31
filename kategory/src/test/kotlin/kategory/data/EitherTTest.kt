@@ -12,6 +12,13 @@ class EitherTTest : UnitSpec() {
 
         testLaws(MonadErrorLaws.laws(EitherT.monadError<Id.F, Throwable>(Id), Eq.any()))
         testLaws(TraverseLaws.laws(EitherT.traverse<Id.F, Int>(), EitherT.applicative(), { EitherT(Id(Either.Right(it))) }, Eq.any()))
+        testLaws(SemigroupKLaws.laws<EitherTF<Id.F, Int>>(
+                EitherT.semigroupK(Id),
+                EitherT.applicative(Id),
+                object : Eq<HK<EitherTF<Id.F, Int>, Int>> {
+                    override fun eqv(a: HK<EitherTF<Id.F, Int>, Int>, b: HK<EitherTF<Id.F, Int>, Int>): Boolean =
+                            a.ev() == b.ev()
+                }))
 
         "map should modify value" {
             forAll { a: String ->

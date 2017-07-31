@@ -9,8 +9,25 @@ import org.junit.runner.RunWith
 class OptionTTest : UnitSpec() {
     init {
 
+        val OptionTFIdEq = object : Eq<HK<OptionTF<Id.F>, Int>> {
+            override fun eqv(a: HK<OptionTF<Id.F>, Int>, b: HK<OptionTF<Id.F>, Int>): Boolean {
+                return a.ev().value == b.ev().value
+            }
+        }
+
         testLaws(MonadLaws.laws(OptionT.monad(NonEmptyList), Eq.any()))
         testLaws(TraverseLaws.laws(OptionT.traverse(), OptionT.applicative(Id), { OptionT(Id(it.some())) }, Eq.any()))
+        testLaws(SemigroupKLaws.laws(
+                OptionT.semigroupK(Id),
+                OptionT.applicative(Id),
+                OptionTFIdEq))
+
+        testLaws(MonoidKLaws.laws(
+                OptionT.monoidK(Option),
+                OptionT.applicative(Option),
+                OptionT.invoke(Option(Option(1)), Option.monad()),
+                Eq.any(),
+                Eq.any()))
 
         "map should modify value" {
             forAll { a: String ->
@@ -25,7 +42,7 @@ class OptionTTest : UnitSpec() {
         "flatMap should modify entity" {
             forAll { a: String ->
                 val ot = OptionT(NonEmptyList.of(Option.Some(a)))
-                val mapped = ot.flatMap{ OptionT(NonEmptyList.of(Option.Some(3))) }
+                val mapped = ot.flatMap { OptionT(NonEmptyList.of(Option.Some(3))) }
                 val expected: OptionT<NonEmptyList.F, Int> = OptionT.pure(3)
 
                 mapped == expected
