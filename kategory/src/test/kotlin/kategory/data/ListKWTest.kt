@@ -6,9 +6,6 @@ import kategory.ListKW
 import kategory.UnitSpec
 import org.junit.runner.RunWith
 
-/**
- * Created by marc on 2/8/17.
- */
 @RunWith(KTestJUnitRunner::class)
 class ListKWTest : UnitSpec() {
     init {
@@ -25,6 +22,7 @@ class ListKWTest : UnitSpec() {
 
         "flatMap should modify entity" {
             val emptyListKW: ListKW<Int> = ListKW.listOfK()
+
             kategory.ListKW.listOfK(14).flatMap { kategory.ListKW.listOfK(it * 3) } shouldBe kategory.ListKW.listOfK(42)
             kategory.ListKW.listOfK(14).flatMap { emptyListKW } shouldBe emptyListKW
 
