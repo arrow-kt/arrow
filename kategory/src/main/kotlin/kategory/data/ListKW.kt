@@ -44,6 +44,9 @@ class ListKW<A> private constructor(private val list: List<A>) : ListKindW<A>, C
         fun <A> semigroup(): Semigroup<ListKW<A>> = object : ListKWSemigroup<A> {}
 
         fun semigroupK(): SemigroupK<ListKW.F> = object : ListKWSemigroupK {}
+
+        fun <A> monoid(): ListKWMonoid<A> = object : ListKWMonoid<A> {}
+
     }
 
 }
