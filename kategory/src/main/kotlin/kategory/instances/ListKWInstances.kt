@@ -1,8 +1,5 @@
 package kategory
 
-/**
- * Created by marc on 1/8/17.
- */
 interface ListKWInstances :
         Functor<ListKW.F>,
         Applicative<ListKW.F>,
@@ -17,7 +14,6 @@ interface ListKWInstances :
     override fun <A, B> map(fa: HK<ListKW.F, A>, f: (A) -> B): HK<ListKW.F, B> {
         return fa.ev().map(f)
     }
-
 
     override fun <A, B> tailRecM(a: A, f: (A) -> HK<ListKW.F, Either<A, B>>): ListKW<B> {
         return f(a).ev().flatMap {
