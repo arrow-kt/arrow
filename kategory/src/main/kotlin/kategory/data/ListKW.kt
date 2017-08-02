@@ -5,27 +5,35 @@ typealias ListKindW<A> = HK<ListKW.F, A>
 fun <A> ListKindW<A>.ev(): ListKW<A> =
         this as ListKW<A>
 
-class ListKW<A> private constructor(private val list: List<A>) : ListKindW<A>, Collection<A> {
+class ListKW<A> private constructor(private val list: List<A>) : ListKindW<A> {
 
-    companion object {
-        fun <A> listOfK(vararg a: A): ListKW<A> {
-            return ListKW(if (a.isEmpty()) emptyList() else a.asList())
-        }
+    companion object : ListKWInstances, GlobalInstance<Monad<ListKW.F>>() {
+        @JvmStatic fun <A> listOfK(vararg a: A): ListKW<A> = ListKW(if (a.isEmpty()) emptyList() else a.asList())
+
+        fun functor(): Functor<ListKW.F> = this
+
+        fun applicative(): Applicative<ListKW.F> = this
+
+        fun monad(): Monad<ListKW.F> = this
+
+        fun <A> semigroup(): Semigroup<ListKW<A>> = object : ListKWSemigroup<A> {}
+
+        fun semigroupK(): SemigroupK<ListKW.F> = object : ListKWSemigroupK {}
     }
 
     class F private constructor()
 
-    override val size: Int = list.size
+    val size: Int = list.size
 
-    override fun contains(element: A): Boolean = list.contains(element)
+    fun contains(element: A): Boolean = list.contains(element)
 
-    override fun containsAll(elements: Collection<A>): Boolean = list.containsAll(elements)
+    fun containsAll(elements: Collection<A>): Boolean = list.containsAll(elements)
 
-    override fun isEmpty(): Boolean = list.isEmpty()
+    fun isEmpty(): Boolean = list.isEmpty()
 
     fun <B> map(f: (A) -> B): ListKW<B> = ListKW(list.map(f))
 
-    fun <B> flatMap(f: (A) -> ListKW<B>): ListKW<B> = ListKW(list.flatMap(f))
+    fun <B> flatMap(f: (A) -> ListKW<B>): ListKW<B> = ListKW(list.flatMap { f(it).list })
 
     operator fun plus(list: List<@UnsafeVariance A>): ListKW<A> = ListKW(this.list + list)
 
@@ -46,5 +54,5 @@ class ListKW<A> private constructor(private val list: List<A>) : ListKindW<A>, C
         return super.hashCode()
     }
 
-    override fun iterator(): Iterator<A> = list.iterator()
+    fun iterator(): Iterator<A> = list.iterator()
 }
