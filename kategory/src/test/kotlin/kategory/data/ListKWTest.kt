@@ -3,7 +3,9 @@ package kategory.data
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import kategory.ListKW
+import kategory.NonEmptyList
 import kategory.UnitSpec
+import kategory.binding
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -12,8 +14,8 @@ class ListKWTest : UnitSpec() {
 
         testLaws(kategory.MonadLaws.laws(kategory.NonEmptyList, kategory.Eq.any()))
         testLaws(kategory.SemigroupKLaws.laws(
-                kategory.NonEmptyList.semigroupK(),
-                kategory.NonEmptyList.applicative(),
+                kategory.ListKW.semigroupK(),
+                kategory.ListKW.applicative(),
                 kategory.Eq.any()))
 
         "map should modify values" {
@@ -27,6 +29,34 @@ class ListKWTest : UnitSpec() {
             kategory.ListKW.listOfK(14).flatMap { emptyListKW } shouldBe emptyListKW
 
             emptyListKW.flatMap { kategory.ListKW.listOfK(it * 3) } shouldBe emptyListKW
+        }
+
+        "ListKWMonad.flatMap should be consistent with ListKW#flatMap" {
+            val nel = ListKW.listOfK(1, 2)
+            val nel2 = ListKW.listOfK(1, 2)
+            nel.flatMap { nel2 } shouldBe ListKW.flatMap(nel) { nel2 }
+        }
+
+        "ListKWMonad.binding should for comprehend over ListKW" {
+            val result = ListKW.binding {
+                val x_p: ListKW<Int> = ListKW.listOfK()
+                val x = !ListKW.listOfK(1)
+                val y = ListKW.listOfK(2).bind()
+                val z = bind { ListKW.listOfK(3) }
+                yields(x_p + x + y + z)
+            }
+            result shouldBe ListKW.listOfK(6)
+        }
+
+        "ListKWMonad.binding should for comprehend over complex ListKW" {
+            val result = ListKW.binding {
+                val x_p: ListKW<Int> = ListKW.listOfK()
+                val x = !ListKW.listOfK(1, 2)
+                val y = ListKW.listOfK(3).bind()
+                val z = bind { ListKW.listOfK(4) }
+                yields(x_p, x + y + z)
+            }
+            result shouldBe ListKW.listOfK(8, 9)
         }
 
     }

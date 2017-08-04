@@ -17,8 +17,12 @@ class ListKW<A> private constructor(private val list: List<A>) : ListKindW<A>, C
 
     operator fun plus(listKW: ListKW<@UnsafeVariance A>): ListKW<A> = ListKW(this.list + listKW.list)
 
-    operator fun get(position:Int): A {
-        return list[position]
+    operator fun get(position:Int): Option<A> {
+        return if(list.isEmpty() || position < 0 || position > list.size) {
+            Option.None
+        } else {
+            Option.Some(list[position])
+        }
     }
 
     fun <B> fold(b: B, f: (B, A) -> B): B = list.fold(b, f)
