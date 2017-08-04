@@ -17,6 +17,12 @@ class ListKW<A> private constructor(private val list: List<A>) : ListKindW<A>, C
 
     operator fun plus(listKW: ListKW<@UnsafeVariance A>): ListKW<A> = ListKW(this.list + listKW.list)
 
+    operator fun get(position:Int): A {
+        return list[position]
+    }
+
+    fun <B> fold(b: B, f: (B, A) -> B): B = list.fold(b, f)
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other?.javaClass != javaClass) return false
@@ -33,7 +39,9 @@ class ListKW<A> private constructor(private val list: List<A>) : ListKindW<A>, C
     }
 
     companion object : ListKWInstances, GlobalInstance<Monad<ListKW.F>>() {
+
         @JvmStatic fun <A> listOfK(vararg a: A): ListKW<A> = ListKW(if (a.isEmpty()) emptyList() else a.asList())
+        @JvmStatic fun <A> listOfK(list: List<A>): ListKW<A> = ListKW(if (list.isEmpty()) emptyList() else list)
 
         fun functor(): Functor<ListKW.F> = this
 
@@ -49,4 +57,8 @@ class ListKW<A> private constructor(private val list: List<A>) : ListKindW<A>, C
 
     }
 
+}
+
+fun <A> List<A>.toListKW(): ListKW<A> {
+    return ListKW.listOfK(this)
 }
