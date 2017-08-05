@@ -55,6 +55,10 @@ interface ComposedTraverse<F, G> :
 
     fun GA(): Applicative<G>
 
+    override fun FF(): Foldable<F> = FT()
+
+    override fun GF(): Foldable<G> = GT()
+
     override fun <H, A, B> traverse(fa: HK<ComposedType<F, G>, A>, f: (A) -> HK<H, B>, HA: Applicative<H>): HK<H, HK<ComposedType<F, G>, B>> =
             HA.map(FT().traverse(fa.lower(), { ga -> GT().traverse(ga, f, HA) }, HA), { it.lift() })
 
@@ -79,9 +83,9 @@ interface ComposedTraverse<F, G> :
     }
 }
 
-inline fun <reified F, reified G> Traverse<F>.compose(FT: Traverse<F> = traverse<F>(), GT: Traverse<G> = traverse<G>(), GA: Applicative<G> = applicative<G>()): Traverse<ComposedType<F, G>> = object :
+inline fun <reified F, reified G> Traverse<F>.compose(GT: Traverse<G> = traverse<G>(), GA: Applicative<G> = applicative<G>()): Traverse<ComposedType<F, G>> = object :
         ComposedTraverse<F, G> {
-    override fun FF(): Foldable<F> = FT
+    override fun FF(): Foldable<F> = this@compose
 
     override fun GF(): Foldable<G> = GT
 
