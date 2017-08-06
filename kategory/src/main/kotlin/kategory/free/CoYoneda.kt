@@ -33,9 +33,9 @@ data class CoYoneda<FU, P, A>(val pivot: HK<FU, P>, internal val ks: List<AnyFun
     companion object {
         @Suppress("UNCHECKED_CAST")
         inline fun <reified U, A, B> apply(fa: HK<U, A>, noinline f: (A) -> B): CoYoneda<U, A, B> =
-                usafeApply(fa, listOf(f as AnyFunc))
+                unsafeApply(fa, listOf(f as AnyFunc))
 
-        inline fun <reified U, A, B> usafeApply(fa: HK<U, A>, f: List<AnyFunc>): CoYoneda<U, A, B> =
+        inline fun <reified U, A, B> unsafeApply(fa: HK<U, A>, f: List<AnyFunc>): CoYoneda<U, A, B> =
                 CoYoneda(fa, f)
 
         fun <U, P> functor(): Functor<CoYonedaF<U, P>> = object : CoYonedaInstances<U, P> {}
