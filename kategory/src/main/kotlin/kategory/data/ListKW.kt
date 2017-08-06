@@ -5,27 +5,27 @@ typealias ListKindW<A> = HK<ListKW.F, A>
 fun <A> ListKindW<A>.ev(): ListKW<A> =
         this as ListKW<A>
 
-class ListKW<A> private constructor(private val list: List<A>) : ListKindW<A>, Collection<A> by list {
+data class ListKW<A> constructor(val list: List<A>) : ListKindW<A>, Collection<A> by list {
 
     class F private constructor()
 
-    fun <B> map(f: (A) -> B): ListKW<B> = ListKW(list.map(f))
+    fun <B> map(f: (A) -> B): ListKW<B> =
+            ListKW(list.map(f))
 
-    fun <B> flatMap(f: (A) -> ListKW<B>): ListKW<B> = ListKW(list.flatMap { f(it).list })
+    fun <B> flatMap(f: (A) -> ListKW<B>): ListKW<B> =
+            ListKW(list.flatMap { f(it).list })
 
-    operator fun plus(list: List<A>): ListKW<A> = ListKW(this.list + list)
+    operator fun plus(list: List<A>): ListKW<A> =
+            ListKW(this.list + list)
 
-    operator fun plus(listKW: ListKW<A>): ListKW<A> = ListKW(this.list + listKW.list)
+    operator fun plus(listKW: ListKW<A>): ListKW<A> =
+            ListKW(this.list + listKW.list)
 
-    operator fun get(position:Int): Option<A> {
-        return if(list.isEmpty() || position < 0 || position > list.size) {
-            Option.None
-        } else {
-            Option.Some(list[position])
-        }
-    }
+    operator fun get(position: Int): Option<A> =
+            if (list.isEmpty() || position < 0 || position > list.size) Option.None else Option.Some(list[position])
 
-    fun <B> fold(b: B, f: (B, A) -> B): B = list.fold(b, f)
+    fun <B> fold(b: B, f: (B, A) -> B): B =
+            list.fold(b, f)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -38,14 +38,13 @@ class ListKW<A> private constructor(private val list: List<A>) : ListKindW<A>, C
         return true
     }
 
-    override fun hashCode(): Int {
-        return super.hashCode()
-    }
+    override fun hashCode(): Int =
+            super.hashCode()
 
     companion object : ListKWInstances, GlobalInstance<Monad<ListKW.F>>() {
 
         @JvmStatic fun <A> listOfK(vararg a: A): ListKW<A> = ListKW(if (a.isEmpty()) emptyList() else a.asList())
-        @JvmStatic fun <A> listOfK(list: List<A>): ListKW<A> = ListKW(if (list.isEmpty()) emptyList() else list)
+        @JvmStatic fun <A> listOfK(list: List<A>): ListKW<A> = ListKW(list)
 
         fun functor(): Functor<ListKW.F> = this
 
@@ -63,6 +62,5 @@ class ListKW<A> private constructor(private val list: List<A>) : ListKindW<A>, C
 
 }
 
-fun <A> List<A>.toListKW(): ListKW<A> {
-    return ListKW.listOfK(this)
-}
+fun <A> List<A>.toListKW(): ListKW<A> =
+        ListKW.listOfK(this)

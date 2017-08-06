@@ -37,7 +37,7 @@ class ListKWTest : UnitSpec() {
             nel.flatMap { nel2 } shouldBe ListKW.flatMap(nel) { nel2 }
         }
 
-        "ListKWMonad.binding should for comprehend over ListKW" {
+        /*"ListKWMonad.binding should for comprehend over ListKW" {
             val result = ListKW.binding {
                 val x_p: ListKW<Int> = ListKW.listOfK()
                 val x = !ListKW.listOfK(1)
@@ -57,7 +57,7 @@ class ListKWTest : UnitSpec() {
                 yields(x_p, x + y + z)
             }
             result shouldBe ListKW.listOfK(8, 9)
-        }
+        }*/
 
     }
 
