@@ -30,21 +30,19 @@ interface ListKWInstances :
         return Eval.defer { loop(fa.ev()) }
     }
 
-    override fun <G, A, B> traverse(fa: HK<ListKW.F, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<ListKW.F, B>> {
-        return foldR(fa, Eval.always { GA.pure(ListKW.listOfK<B>()) }) { a, eval ->
+    override fun <G, A, B> traverse(fa: HK<ListKW.F, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<ListKW.F, B>> =
+        foldR(fa, Eval.always { GA.pure(ListKW.listOfK<B>()) }) { a, eval ->
             GA.map2Eval(f(a), eval) { ListKW.listOfK(it.a) + it.b }
         }.value()
-    }
 
-    override fun <A, B> tailRecM(a: A, f: (A) -> HK<ListKW.F, Either<A, B>>): ListKW<B> {
-        return f(a).ev().flatMap {
+
+    override fun <A, B> tailRecM(a: A, f: (A) -> HK<ListKW.F, Either<A, B>>): ListKW<B> =
+        f(a).ev().flatMap {
             when (it) {
                 is Either.Left -> tailRecM(it.a, f)
                 is Either.Right -> pure(it.b)
             }
         }
-    }
-
 }
 
 interface ListKWSemigroup<A> : Semigroup<ListKW<A>> {
