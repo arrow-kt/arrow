@@ -3,11 +3,14 @@ package kategory
 typealias FreeApplicativeKind<S, A> = HK2<FreeApplicative.F, S, A>
 typealias FreeApplicativeF<S> = HK<FreeApplicative.F, S>
 
-fun <S, A> FreeApplicativeKind<S, A>.ev(): FreeApplicative<S, A> =
-        this as FreeApplicative<S, A>
+fun <F, A> FreeApplicativeKind<F, A>.ev(): FreeApplicative<F, A> =
+        this as FreeApplicative<F, A>
 
-fun <G, S, A> FreeApplicativeKind<S, A>.foldMapK(f: FunctionK<S, G>, GA: Applicative<G>): HK<G, A> =
-        (this as FreeApplicative<S, A>).foldMap(f, GA)
+inline fun <F, reified G, A> FreeApplicativeKind<F, A>.foldMapK(f: FunctionK<F, G>, GA: Applicative<G> = applicative<G>()): HK<G, A> =
+        (this as FreeApplicative<F, A>).foldMap(f, GA)
+
+inline fun <reified F, A> FreeApplicativeKind<F, A>.foldK(FA: Applicative<F> = applicative<F>()): HK<F, A> =
+        (this as FreeApplicative<F, A>).fold(FA)
 
 /**
  * See [https://github.com/edmundnoble/cats/blob/6454b4f8b7c5cefd15d8198fa7d52e46e2f45fea/docs/src/main/tut/datatypes/freeapplicative.md]
