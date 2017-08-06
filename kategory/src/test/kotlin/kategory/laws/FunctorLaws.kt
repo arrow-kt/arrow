@@ -6,7 +6,10 @@ import io.kotlintest.properties.forAll
 object FunctorLaws {
 
     inline fun <reified F> laws(AP: Applicative<F> = applicative<F>(), EQ: Eq<HK<F, Int>>): List<Law> =
-            laws(AP, AP::pure, EQ)
+            listOf(
+                    Law("Functor Laws: Covariant Identity", { covariantIdentity(AP, AP::pure, EQ) }),
+                    Law("Functor Laws: Covariant Composition", { covariantComposition(AP, AP::pure, EQ) })
+            )
 
     inline fun <reified F> laws(FF: Functor<F> = functor<F>(), crossinline f: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): List<Law> =
             listOf(
