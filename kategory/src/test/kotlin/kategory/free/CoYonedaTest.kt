@@ -1,6 +1,7 @@
 package kategory
 
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
@@ -55,11 +56,16 @@ class CoYonedaTest : UnitSpec() {
         }
 
         "map should be stack-safe" {
+            val loops = 5000
+
             fun loop(n: Int, acc: CoYoneda<Option.F, Int, Int>): CoYoneda<Option.F, Int, Int> =
                     if (n <= 0) acc
                     else loop(n - 1, acc.map { it + 1 })
 
-            loop(10000, CoYoneda.apply(Option.Some(1), { it })).lower(Option)
+            val result = loop(loops, CoYoneda.apply(Option.Some(0), { it })).lower(Option)
+            val expected = Option.Some(loops)
+
+            expected shouldBe result
         }
 
         "toYoneda should convert to an equivalent Yoneda" {
