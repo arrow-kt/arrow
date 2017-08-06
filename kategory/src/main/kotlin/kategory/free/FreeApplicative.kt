@@ -82,6 +82,7 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeKind<F, A> {
             }).ev()
 
     // Beware: smart code
+    @Suppress("UNCHECKED_CAST")
     fun <G> foldMap(f: FunctionK<F, G>, GA: Applicative<G>): HK<G, A> {
         // the remaining arguments to G[A => B]'s
         var argsF: List<FreeApplicative<F, Any?>> = mutableListOf(this)
