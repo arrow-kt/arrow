@@ -6,8 +6,10 @@
         <ID>ComplexMethod:AndThen.kt$AndThen$ @Suppress("UNCHECKED_CAST") internal fun runLoop(_success: A?, _failure: Throwable?, _isSuccess: Boolean): B</ID>
         <ID>OptionalUnit:IO.kt$IO$Unit</ID>
         <ID>OptionalUnit:AndThen.kt$AndThen$Unit</ID>
+        <ID>OptionalUnit:FreeApplicative.kt$FreeApplicative$Unit</ID>
         <ID>OptionalUnit:NonEmptyListMonad.kt$NonEmptyListMonad$Unit</ID>
         <ID>NestedBlockDepth:AndThen.kt$AndThen$ @Suppress("UNCHECKED_CAST") internal fun runLoop(_success: A?, _failure: Throwable?, _isSuccess: Boolean): B</ID>
         <ID>NestedBlockDepth:Eval.kt$Eval.Compute$override fun value(): A</ID>
+        <ID><![CDATA[NestedBlockDepth:FreeApplicative.kt$FreeApplicative$// Beware: smart code @Suppress("UNCHECKED_CAST") fun <G> foldMap(f: FunctionK<F, G>, GA: Applicative<G>): HK<G, A>]]></ID>
     </Whitelist>
 </SmellBaseline>
