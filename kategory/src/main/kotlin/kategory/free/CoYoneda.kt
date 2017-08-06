@@ -7,23 +7,36 @@ typealias CoYonedaF<U, P> = HK2<CoYoneda.F, U, P>
 fun <U, A, B> CoYonedaKind<U, A, B>.ev(): CoYoneda<U, A, B> =
         this as CoYoneda<U, A, B>
 
-data class CoYoneda<FU, P, A>(val function: (P) -> A, val pivot: HK<FU, P>) : CoYonedaKind<FU, P, A> {
+private typealias AnyFunc = (Any?) -> Any?
+
+data class CoYoneda<F, P, A>(val pivot: HK<F, P>, internal val ks: List<AnyFunc>) : CoYonedaKind<F, P, A> {
     class F private constructor()
 
-    fun lower(FF: Functor<FU>): HK<FU, A> =
-            FF.map(pivot, function)
+    private val transform: (P) -> A = {
+        var curr: Any? = it
+        ks.forEach { curr = it(curr) }
+        curr as A
+    }
 
-    fun <B> map(f: (A) -> B): CoYoneda<FU, P, B> =
-            CoYoneda({ f(function(it)) }, pivot)
+    fun lower(FF: Functor<F>): HK<F, A> =
+            FF.map(pivot, transform)
 
-    fun toYoneda(FF: Functor<FU>): Yoneda<FU, A> =
-            object : Yoneda<FU, A> {
-                override fun <B> apply(f: (A) -> B): HK<FU, B> = map(f).lower(FF)
+    @Suppress("UNCHECKED_CAST")
+    fun <B> map(f: (A) -> B): CoYoneda<F, P, B> =
+            CoYoneda(pivot, ks + f as AnyFunc)
+
+    fun toYoneda(FF: Functor<F>): Yoneda<F, A> =
+            object : Yoneda<F, A> {
+                override fun <B> apply(f: (A) -> B): HK<F, B> = map(f).lower(FF)
             }
 
     companion object {
+        @Suppress("UNCHECKED_CAST")
         inline fun <reified U, A, B> apply(fa: HK<U, A>, noinline f: (A) -> B): CoYoneda<U, A, B> =
-                CoYoneda(f, fa)
+                unsafeApply(fa, listOf(f as AnyFunc))
+
+        inline fun <reified U, A, B> unsafeApply(fa: HK<U, A>, f: List<AnyFunc>): CoYoneda<U, A, B> =
+                CoYoneda(fa, f)
 
         fun <U, P> functor(): Functor<CoYonedaF<U, P>> = object : CoYonedaInstances<U, P> {}
 

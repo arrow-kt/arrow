@@ -10,6 +10,10 @@ class NonEmptyListTest : UnitSpec() {
     init {
 
         testLaws(MonadLaws.laws(NonEmptyList, Eq.any()))
+        testLaws(SemigroupKLaws.laws(
+                NonEmptyList.semigroupK(),
+                NonEmptyList.applicative(),
+                Eq.any()))
 
         "map should modify values" {
             NonEmptyList.of(14).map { it * 3 } shouldBe NonEmptyList.of(42)

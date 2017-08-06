@@ -14,6 +14,10 @@ class ValidatedTest : UnitSpec() {
 
         testLaws(ApplicativeLaws.laws(Validated.applicative(StringMonoid), Eq.any()))
         testLaws(TraverseLaws.laws(Validated.traverse(StringMonoid), Validated.applicative(StringMonoid), ::Valid, Eq.any()))
+        testLaws(SemigroupKLaws.laws(
+                Validated.semigroupK(IntMonoid),
+                Validated.applicative(IntMonoid),
+                Eq.any()))
 
         "fold should call function on Invalid" {
             val exception = Exception("My Exception")
