@@ -13,9 +13,9 @@ class ListKW<A> private constructor(private val list: List<A>) : ListKindW<A>, C
 
     fun <B> flatMap(f: (A) -> ListKW<B>): ListKW<B> = ListKW(list.flatMap { f(it).list })
 
-    operator fun plus(list: List<@UnsafeVariance A>): ListKW<A> = ListKW(this.list + list)
+    operator fun plus(list: List<A>): ListKW<A> = ListKW(this.list + list)
 
-    operator fun plus(listKW: ListKW<@UnsafeVariance A>): ListKW<A> = ListKW(this.list + listKW.list)
+    operator fun plus(listKW: ListKW<A>): ListKW<A> = ListKW(this.list + listKW.list)
 
     operator fun get(position:Int): Option<A> {
         return if(list.isEmpty() || position < 0 || position > list.size) {
