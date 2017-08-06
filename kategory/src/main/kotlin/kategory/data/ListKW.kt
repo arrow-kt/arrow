@@ -46,6 +46,8 @@ data class ListKW<A> constructor(val list: List<A>) : ListKindW<A>, Collection<A
 
         fun monoidK(): MonoidK<ListKW.F> = object : ListKWMonoidK {}
 
+        fun traverse(): Traverse<ListKW.F> = this
+
     }
 
 }

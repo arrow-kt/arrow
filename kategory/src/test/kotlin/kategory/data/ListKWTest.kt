@@ -1,24 +1,24 @@
 package kategory.data
 
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
+import kategory.Eq
 import kategory.ListKW
-import kategory.NonEmptyList
+import kategory.TraverseLaws
 import kategory.UnitSpec
-import kategory.binding
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class ListKWTest : UnitSpec() {
     init {
-
-        testLaws(kategory.MonadLaws.laws(kategory.NonEmptyList, kategory.Eq.any()))
+        val applicative = ListKW.applicative()
+        testLaws(kategory.MonadLaws.laws(ListKW, kategory.Eq.any()))
         testLaws(kategory.SemigroupKLaws.laws(
                 kategory.ListKW.semigroupK(),
-                kategory.ListKW.applicative(),
+                applicative,
                 kategory.Eq.any()))
+        testLaws(TraverseLaws.laws(ListKW.traverse(), applicative, { applicative.pure(it) }, Eq.any()))
 
-        "map should modify values" {
+        /*"map should modify values" {
             kategory.ListKW.listOfK(14).map { it * 3 } shouldBe kategory.ListKW.listOfK(42)
         }
 
@@ -35,7 +35,7 @@ class ListKWTest : UnitSpec() {
             val nel = ListKW.listOfK(1, 2)
             val nel2 = ListKW.listOfK(1, 2)
             nel.flatMap { nel2 } shouldBe ListKW.flatMap(nel) { nel2 }
-        }
+        }*/
 
         /*"ListKWMonad.binding should for comprehend over ListKW" {
             val result = ListKW.binding {
