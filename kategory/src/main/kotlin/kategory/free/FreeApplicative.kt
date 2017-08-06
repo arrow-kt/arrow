@@ -78,14 +78,15 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeKind<F, A> {
                         Free.applicative<F>().ap(fa, ff).ev()
             }).ev()
 
+    // Beware: smart code
     fun <G> foldMap(f: FunctionK<F, G>, GA: Applicative<G>): HK<G, A> =
             TODO()
 
-    /** Represents a curried function `F[A => B => C => ...]`
+    /** Represents a curried function `F<(A) -> (B) -> (C) -> ...>`
      * that has been constructed with chained `ap` calls.
-     * Fn#argc denotes the amount of curried params remaining.
+     * [CurriedFunction.remaining] denotes the amount of curried params remaining.
      */
-    private data class CurriedFunction<out G, in A, out B>(val gab: HK<G, (A) -> B>, val argc: Int)
+    private data class CurriedFunction<out G, in A, out B>(val gab: HK<G, (A) -> B>, val remaining: Int)
 
     private data class Pure<S, out A>(val value: A) : FreeApplicative<S, A>()
 
