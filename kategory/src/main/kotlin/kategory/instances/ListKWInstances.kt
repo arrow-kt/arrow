@@ -45,20 +45,17 @@ interface ListKWInstances :
         }
 }
 
-interface ListKWSemigroup<A> : Semigroup<ListKW<A>> {
+interface ListKWMonoid<A> : Monoid<ListKW<A>> {
     override fun combine(a: ListKW<A>, b: ListKW<A>): ListKW<A> =
             a + b
-}
-
-interface ListKWSemigroupK : SemigroupK<ListKW.F> {
-    override fun <A> combineK(x: HK<ListKW.F, A>, y: HK<ListKW.F, A>): ListKW<A> =
-            x.ev() + y.ev()
-}
-
-interface ListKWMonoid<A> : Monoid<ListKW<A>> {
     override fun empty(): ListKW<A> =
             ListKW.listOfK()
+}
 
-    override fun combine(a: ListKW<A>, b: ListKW<A>): ListKW<A> =
-            a + b
+interface ListKWMonoidK : MonoidK<ListKW.F> {
+    override fun <A> combineK(x: HK<ListKW.F, A>, y: HK<ListKW.F, A>): ListKW<A> =
+            x.ev() + y.ev()
+
+    override fun <A> empty(): HK<ListKW.F, A> =
+            ListKW.listOfK()
 }

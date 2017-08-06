@@ -38,11 +38,13 @@ data class ListKW<A> constructor(val list: List<A>) : ListKindW<A>, Collection<A
 
         fun monad(): Monad<ListKW.F> = this
 
-        fun <A> semigroup(): Semigroup<ListKW<A>> = object : ListKWSemigroup<A> {}
+        fun <A> semigroup(): Semigroup<ListKW<A>> = object : ListKWMonoid<A> {}
 
-        fun semigroupK(): SemigroupK<ListKW.F> = object : ListKWSemigroupK {}
+        fun semigroupK(): SemigroupK<ListKW.F> = object : ListKWMonoidK {}
 
         fun <A> monoid(): ListKWMonoid<A> = object : ListKWMonoid<A> {}
+
+        fun <A> monoidK(): MonoidK<ListKW.F> = object : ListKWMonoidK {}
 
     }
 
