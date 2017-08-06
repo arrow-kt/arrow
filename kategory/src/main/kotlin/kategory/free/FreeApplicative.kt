@@ -6,6 +6,9 @@ typealias FreeApplicativeF<S> = HK<FreeApplicative.F, S>
 fun <S, A> FreeApplicativeKind<S, A>.ev(): FreeApplicative<S, A> =
         this as FreeApplicative<S, A>
 
+fun <G, S, A> FreeApplicativeKind<S, A>.foldMapK(f: FunctionK<S, G>, GA: Applicative<G>): HK<G, A> =
+        (this as FreeApplicative<S, A>).foldMap(f, GA)
+
 /**
  * See [https://github.com/edmundnoble/cats/blob/6454b4f8b7c5cefd15d8198fa7d52e46e2f45fea/docs/src/main/tut/datatypes/freeapplicative.md]
  */
@@ -22,6 +25,10 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeKind<F, A> {
 
         fun <F, A> lift(fa: HK<F, A>): FreeApplicative<F, A> =
                 Lift(fa)
+
+        fun <S> functor(): FreeApplicativeInstances<S> = object : FreeApplicativeInstances<S> {}
+
+        fun <S> applicative(): FreeApplicativeInstances<S> = object : FreeApplicativeInstances<S> {}
     }
 
     fun <B> ap(ap: FreeApplicative<F, (A) -> B>): FreeApplicative<F, B> =
