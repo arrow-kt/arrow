@@ -49,7 +49,7 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeKind<F, A> {
     fun <G> compile(f: FunctionK<F, G>): FreeApplicative<G, A> =
             foldMap(object : FunctionK<F, FreeApplicativeF<G>> {
                 override fun <A> invoke(fa: HK<F, A>): FreeApplicative<G, A> =
-                        FreeApplicative.lift(f(fa)).ev()
+                        FreeApplicative.lift(f(fa))
 
             }, object : Applicative<FreeApplicativeF<G>> {
                 override fun <A> pure(a: A): FreeApplicative<G, A> =
