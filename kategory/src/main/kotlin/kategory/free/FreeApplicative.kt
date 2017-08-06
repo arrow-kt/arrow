@@ -84,7 +84,6 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeKind<F, A> {
     // Beware: smart code
     @Suppress("UNCHECKED_CAST")
     fun <G> foldMap(f: FunctionK<F, G>, GA: Applicative<G>): HK<G, A> {
-        // the remaining arguments to G[A => B]'s
         var argsF: List<FreeApplicative<F, Any?>> = mutableListOf(this)
         var argsFLength: Int = 1
 
@@ -164,10 +163,6 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeKind<F, A> {
         return loop() as HK<G, A>
     }
 
-    /** Represents a curried function `F<(A) -> (B) -> (C) -> ...>`
-     * that has been constructed with chained `ap` calls.
-     * [CurriedFunction.remaining] denotes the amount of curried params remaining.
-     */
     internal data class CurriedFunction<out G, in A, out B>(val gab: HK<G, (A) -> B>, val remaining: Int)
 
     internal data class Pure<S, out A>(val value: A) : FreeApplicative<S, A>()
@@ -181,7 +176,6 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeKind<F, A> {
     }
 }
 
-// Internal helper function for foldMap, it folds only Pure and Lift nodes
 private fun <F, G, A> foldArg(node: FreeApplicative<F, A>, f: FunctionK<F, G>, GA: Applicative<G>): HK<G, A> =
         when (node) {
             is FreeApplicative.Pure<F, A> -> GA.pure(node.value)
