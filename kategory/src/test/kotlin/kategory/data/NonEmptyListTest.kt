@@ -19,6 +19,12 @@ class NonEmptyListTest : UnitSpec() {
             NonEmptyList.of(14).map { it * 3 } shouldBe NonEmptyList.of(42)
         }
 
+        "flatMap should modify entity" {
+            Option.Some(1).flatMap { Option.None } shouldBe Option.None
+            Option.Some(1).flatMap { Option.Some("something") } shouldBe Option.Some("something")
+            Option.None.flatMap { Option.Some("something") } shouldBe Option.None
+        }
+
         "flatMap should work" {
             val nel = NonEmptyList.of(1, 2)
             val nel2 = nel.flatMap { it -> NonEmptyList.of(it, it) }
