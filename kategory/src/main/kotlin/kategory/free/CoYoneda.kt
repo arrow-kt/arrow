@@ -7,7 +7,9 @@ typealias CoYonedaF<U, P> = HK2<CoYoneda.F, U, P>
 fun <U, A, B> CoYonedaKind<U, A, B>.ev(): CoYoneda<U, A, B> =
         this as CoYoneda<U, A, B>
 
-data class CoYoneda<FU, P, A>(val pivot: HK<FU, P>, internal val ks: List<(Any?) -> Any?>) : CoYonedaKind<FU, P, A> {
+private typealias AnyFunc = (Any?) -> Any?
+
+data class CoYoneda<FU, P, A>(val pivot: HK<FU, P>, internal val ks: List<AnyFunc>) : CoYonedaKind<FU, P, A> {
     class F private constructor()
 
     private val transform: (P) -> A = {
@@ -21,7 +23,7 @@ data class CoYoneda<FU, P, A>(val pivot: HK<FU, P>, internal val ks: List<(Any?)
 
     @Suppress("UNCHECKED_CAST")
     fun <B> map(f: (A) -> B): CoYoneda<FU, P, B> =
-            CoYoneda(pivot, ks + f as (Any?) -> Any)
+            CoYoneda(pivot, ks + f as AnyFunc)
 
     fun toYoneda(FF: Functor<FU>): Yoneda<FU, A> =
             object : Yoneda<FU, A> {
@@ -31,9 +33,9 @@ data class CoYoneda<FU, P, A>(val pivot: HK<FU, P>, internal val ks: List<(Any?)
     companion object {
         @Suppress("UNCHECKED_CAST")
         inline fun <reified U, A, B> apply(fa: HK<U, A>, noinline f: (A) -> B): CoYoneda<U, A, B> =
-                usafeApply(fa, listOf(f as (Any?) -> Any))
+                usafeApply(fa, listOf(f as AnyFunc))
 
-        inline fun <reified U, A, B> usafeApply(fa: HK<U, A>, f: List<(Any?) -> Any?>): CoYoneda<U, A, B> =
+        inline fun <reified U, A, B> usafeApply(fa: HK<U, A>, f: List<AnyFunc>): CoYoneda<U, A, B> =
                 CoYoneda(fa, f)
 
         fun <U, P> functor(): Functor<CoYonedaF<U, P>> = object : CoYonedaInstances<U, P> {}
