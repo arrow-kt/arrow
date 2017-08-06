@@ -1,7 +1,6 @@
 package kategory
 
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
 
 sealed class OpsAp<out A> : HK<OpsAp.F, A> {
@@ -13,9 +12,9 @@ sealed class OpsAp<out A> : HK<OpsAp.F, A> {
     data class Subtract(val a: Int, val y: Int) : OpsAp<Int>()
 
     companion object : FreeApplicativeInstances<F> {
-        fun value(n: Int): FreeApplicative<F, Int> = FreeApplicative.lift(Value(n))
-        fun add(n: Int, y: Int): FreeApplicative<F, Int> = FreeApplicative.lift(Add(n, y))
-        fun subtract(n: Int, y: Int): FreeApplicative<F, Int> = FreeApplicative.lift(Subtract(n, y))
+        fun value(n: Int): FreeApplicative<F, Int> = FreeApplicative.liftF(Value(n))
+        fun add(n: Int, y: Int): FreeApplicative<F, Int> = FreeApplicative.liftF(Add(n, y))
+        fun subtract(n: Int, y: Int): FreeApplicative<F, Int> = FreeApplicative.liftF(Subtract(n, y))
     }
 }
 
