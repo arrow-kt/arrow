@@ -82,25 +82,113 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeKind<F, A> {
             }).ev()
 
     // Beware: smart code
-    fun <G> foldMap(f: FunctionK<F, G>, GA: Applicative<G>): HK<G, A> =
-            TODO()
+    fun <G> foldMap(f: FunctionK<F, G>, GA: Applicative<G>): HK<G, A> {
+        // the remaining arguments to G[A => B]'s
+        var argsF: List<FreeApplicative<F, Any?>> = mutableListOf(this)
+        var argsFLength: Int = 1
+
+        var fns: List<CurriedFunction<G, Any?, Any?>> = mutableListOf()
+        var fnsLength: Int = 0
+
+        tailrec fun loop(): HK<G, Any?> {
+            var argF: FreeApplicative<F, Any?> = argsF.first()
+            argsF = argsF.drop(1)
+            argsFLength -= 1
+
+            return if (argF is Ap<F, *, *>) {
+                val lengthInitial = argsFLength
+
+                do {
+                    val ap = argF as Ap<F, Any?, Any?>
+                    argsF = listOf(ap.fp) + argsF
+                    argsFLength += 1
+                    argF = ap.fn
+                } while (argF is Ap<F, *, *>)
+
+                val argc = argsFLength - lengthInitial
+                fns = listOf(CurriedFunction(foldArg(argF as FreeApplicative<F, (Any?) -> Any?>, f, GA), argc)) + fns
+                fnsLength += 1
+
+                loop()
+            } else {
+                val argT: HK<G, Any?> = foldArg(argF, f, GA)
+
+                if (fns.isNotEmpty()) {
+
+                    var fn = fns.first()
+                    fns = fns.drop(1)
+                    fnsLength -= 1
+
+                    var res = GA.ap(argT, fn.gab)
+
+                    if (fn.remaining > 1) {
+                        fns = listOf(CurriedFunction(res as HK<G, (Any?) -> Any?>, fn.remaining - 1)) + fns
+                        fnsLength += 1
+                        loop()
+
+                    } else {
+                        if (fnsLength > 0) {
+
+                            tailrec fun innerLoop(): Unit {
+                                fn = fns.first()
+                                fns = fns.drop(1)
+                                fnsLength -= 1
+                                res = GA.ap(res, fn.gab)
+
+                                if (fn.remaining > 1) {
+                                    fns = listOf(CurriedFunction(res as HK<G, (Any?) -> Any?>, fn.remaining - 1)) + fns
+                                    fnsLength += 1
+                                }
+
+                                if (fn.remaining == 1 && fnsLength > 0) {
+                                    innerLoop()
+                                }
+                            }
+
+                            innerLoop()
+                        }
+
+                        if (fnsLength == 0) {
+                            res
+                        } else {
+                            loop()
+                        }
+                    }
+                } else {
+                    argT
+                }
+            }
+        }
+
+        return loop() as HK<G, A>
+    }
 
     /** Represents a curried function `F<(A) -> (B) -> (C) -> ...>`
      * that has been constructed with chained `ap` calls.
      * [CurriedFunction.remaining] denotes the amount of curried params remaining.
      */
-    private data class CurriedFunction<out G, in A, out B>(val gab: HK<G, (A) -> B>, val remaining: Int)
+    internal data class CurriedFunction<out G, in A, out B>(val gab: HK<G, (A) -> B>, val remaining: Int)
 
-    private data class Pure<S, out A>(val value: A) : FreeApplicative<S, A>()
+    internal data class Pure<S, out A>(val value: A) : FreeApplicative<S, A>()
 
-    private data class Lift<S, out A>(val fa: HK<S, A>) : FreeApplicative<S, A>()
+    internal data class Lift<S, out A>(val fa: HK<S, A>) : FreeApplicative<S, A>()
 
-    private data class Ap<S, P, out A>(val fn: FreeApplicative<S, (P) -> A>, val fp: FreeApplicative<S, P>) : FreeApplicative<S, A>()
+    internal data class Ap<S, P, out A>(val fn: FreeApplicative<S, (P) -> A>, val fp: FreeApplicative<S, P>) : FreeApplicative<S, A>()
 
     override fun toString(): String {
         return "FreeApplicative(...)"
     }
 }
+
+// Internal helper function for foldMap, it folds only Pure and Lift nodes
+private fun <F, G, A> foldArg(node: FreeApplicative<F, A>, f: FunctionK<F, G>, GA: Applicative<G>): HK<G, A> =
+        when (node) {
+            is FreeApplicative.Pure<F, A> -> GA.pure(node.value)
+            else -> {
+                val lift = node as FreeApplicative.Lift<F, A>
+                f(lift.fa)
+            }
+        }
 
 fun <S, A> A.freeAp(): FreeApplicative<S, A> =
         FreeApplicative.pure(this)
