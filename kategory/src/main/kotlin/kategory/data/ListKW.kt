@@ -27,20 +27,6 @@ data class ListKW<A> constructor(val list: List<A>) : ListKindW<A>, Collection<A
     fun <B> fold(b: B, f: (B, A) -> B): B =
             list.fold(b, f)
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other?.javaClass != javaClass) return false
-
-        other as ListKW<*>
-
-        if (list != other.list) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int =
-            super.hashCode()
-
     companion object : ListKWInstances, GlobalInstance<Monad<ListKW.F>>() {
 
         @JvmStatic fun <A> listOfK(vararg a: A): ListKW<A> = ListKW(if (a.isEmpty()) emptyList() else a.asList())
