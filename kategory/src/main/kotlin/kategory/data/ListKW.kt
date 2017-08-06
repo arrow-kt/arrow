@@ -44,7 +44,7 @@ data class ListKW<A> constructor(val list: List<A>) : ListKindW<A>, Collection<A
 
         fun <A> monoid(): ListKWMonoid<A> = object : ListKWMonoid<A> {}
 
-        fun <A> monoidK(): MonoidK<ListKW.F> = object : ListKWMonoidK {}
+        fun monoidK(): MonoidK<ListKW.F> = object : ListKWMonoidK {}
 
     }
 
