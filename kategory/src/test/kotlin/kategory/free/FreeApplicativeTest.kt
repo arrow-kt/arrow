@@ -36,5 +36,15 @@ class FreeApplicativeTest : UnitSpec() {
             program.foldMap(idApInterpreter, Id).ev() shouldBe Id(result)
             program.foldMap(nonEmptyListApInterpreter, NonEmptyList).ev() shouldBe NonEmptyList.of(result)
         }
+
+        "fold is stack safe" {
+            val loops = 10000
+            val start = 333
+            val r = FreeApplicative.liftF(NonEmptyList.of(start))
+            val rr = (1..loops).toList().fold(r, { v, _ -> v.ap(FreeApplicative.liftF(NonEmptyList.of({ a: Int -> a + 1 }))) })
+            rr.foldK() shouldBe NonEmptyList.of(start + loops)
+            val rx = (1..loops).toList().foldRight(r, { _, v -> v.ap(FreeApplicative.liftF(NonEmptyList.of({ a: Int -> a + 1 }))) })
+            rx.foldK() shouldBe NonEmptyList.of(start + loops)
+        }
     }
 }
