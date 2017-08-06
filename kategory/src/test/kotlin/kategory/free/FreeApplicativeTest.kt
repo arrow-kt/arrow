@@ -1,0 +1,40 @@
+package kategory
+
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
+import org.junit.runner.RunWith
+
+sealed class OpsAp<out A> : HK<OpsAp.F, A> {
+
+    class F private constructor()
+
+    data class Value(val a: Int) : OpsAp<Int>()
+    data class Add(val a: Int, val y: Int) : OpsAp<Int>()
+    data class Subtract(val a: Int, val y: Int) : OpsAp<Int>()
+
+    companion object : FreeApplicativeInstances<F> {
+        fun value(n: Int): FreeApplicative<F, Int> = FreeApplicative.lift(Value(n))
+        fun add(n: Int, y: Int): FreeApplicative<F, Int> = FreeApplicative.lift(Add(n, y))
+        fun subtract(n: Int, y: Int): FreeApplicative<F, Int> = FreeApplicative.lift(Subtract(n, y))
+    }
+}
+
+fun <A> HK<OpsAp.F, A>.ev(): OpsAp<A> = this as OpsAp<A>
+
+@RunWith(KTestJUnitRunner::class)
+class FreeApplicativeTest : UnitSpec() {
+
+    private val program = OpsAp.tupled(OpsAp.value(1), OpsAp.add(3, 4), OpsAp.subtract(3, 4)).ev()
+
+    init {
+
+        testLaws(ApplicativeLaws.laws(OpsAp, FreeApplicativeEq(idApInterpreter)))
+
+        "Can interpret an ADT as FreeApplicative operations" {
+            val result: Tuple3<Int, Int, Int> = (1 toT 7) + -1
+            program.foldMap(optionApInterpreter, Option).ev() shouldBe Option.Some(result)
+            program.foldMap(idApInterpreter, Id).ev() shouldBe Id(result)
+            program.foldMap(nonEmptyListApInterpreter, NonEmptyList).ev() shouldBe NonEmptyList.of(result)
+        }
+    }
+}
