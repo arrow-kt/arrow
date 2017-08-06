@@ -171,9 +171,8 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeKind<F, A> {
 
     internal data class Ap<S, P, out A>(val fn: FreeApplicative<S, (P) -> A>, val fp: FreeApplicative<S, P>) : FreeApplicative<S, A>()
 
-    override fun toString(): String {
-        return "FreeApplicative(...)"
-    }
+    override fun toString(): String =
+            "FreeApplicative(...)"
 }
 
 private fun <F, G, A> foldArg(node: FreeApplicative<F, A>, f: FunctionK<F, G>, GA: Applicative<G>): HK<G, A> =
