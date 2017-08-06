@@ -9,7 +9,7 @@ fun <U, A, B> CoYonedaKind<U, A, B>.ev(): CoYoneda<U, A, B> =
 
 private typealias AnyFunc = (Any?) -> Any?
 
-data class CoYoneda<FU, P, A>(val pivot: HK<FU, P>, internal val ks: List<AnyFunc>) : CoYonedaKind<FU, P, A> {
+data class CoYoneda<F, P, A>(val pivot: HK<F, P>, internal val ks: List<AnyFunc>) : CoYonedaKind<F, P, A> {
     class F private constructor()
 
     private val transform: (P) -> A = {
@@ -18,16 +18,16 @@ data class CoYoneda<FU, P, A>(val pivot: HK<FU, P>, internal val ks: List<AnyFun
         curr as A
     }
 
-    fun lower(FF: Functor<FU>): HK<FU, A> =
+    fun lower(FF: Functor<F>): HK<F, A> =
             FF.map(pivot, transform)
 
     @Suppress("UNCHECKED_CAST")
-    fun <B> map(f: (A) -> B): CoYoneda<FU, P, B> =
+    fun <B> map(f: (A) -> B): CoYoneda<F, P, B> =
             CoYoneda(pivot, ks + f as AnyFunc)
 
-    fun toYoneda(FF: Functor<FU>): Yoneda<FU, A> =
-            object : Yoneda<FU, A> {
-                override fun <B> apply(f: (A) -> B): HK<FU, B> = map(f).lower(FF)
+    fun toYoneda(FF: Functor<F>): Yoneda<F, A> =
+            object : Yoneda<F, A> {
+                override fun <B> apply(f: (A) -> B): HK<F, B> = map(f).lower(FF)
             }
 
     companion object {
