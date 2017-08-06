@@ -23,7 +23,7 @@ interface Yoneda<FU, A> : HK<HK<Yoneda.F, FU>, A> {
             }
 
     fun toCoYoneda(): CoYoneda<FU, A, A> =
-            CoYoneda({ it }, lower())
+            CoYoneda(lower(), listOf({ a: Any? -> a }))
 
     companion object {
         inline fun <reified U, A> apply(fa: HK<U, A>, FF: Functor<U> = functor()): Yoneda<U, A> =
