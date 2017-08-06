@@ -29,7 +29,7 @@ data class ListKW<A> constructor(val list: List<A>) : ListKindW<A>, Collection<A
 
     companion object : ListKWInstances, GlobalInstance<Monad<ListKW.F>>() {
 
-        @JvmStatic fun <A> listOfK(vararg a: A): ListKW<A> = ListKW(if (a.isEmpty()) emptyList() else a.asList())
+        @JvmStatic fun <A> listOfK(vararg a: A): ListKW<A> = ListKW(a.asList())
         @JvmStatic fun <A> listOfK(list: List<A>): ListKW<A> = ListKW(list)
 
         fun functor(): Functor<ListKW.F> = this
@@ -48,5 +48,5 @@ data class ListKW<A> constructor(val list: List<A>) : ListKindW<A>, Collection<A
 
 }
 
-fun <A> List<A>.toListKW(): ListKW<A> =
+fun <A> List<A>.k(): ListKW<A> =
         ListKW.listOfK(this)
