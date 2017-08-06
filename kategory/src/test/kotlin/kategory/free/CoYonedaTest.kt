@@ -7,23 +7,26 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class CoYonedaTest : UnitSpec() {
+    val EQ = object : Eq<CoYonedaKind<Id.F, Int, Int>> {
+        override fun eqv(a: CoYonedaKind<Id.F, Int, Int>, b: CoYonedaKind<Id.F, Int, Int>): Boolean =
+                a.ev().lower(Id) == a.ev().lower(Id)
+
+    }
+
+    val AP: Applicative<CoYonedaF<Id.F, Int>> = object : Applicative<CoYonedaF<Id.F, Int>> {
+        override fun <A> pure(a: A): CoYonedaKind<Id.F, Int, A> =
+                CoYoneda.apply(Id(0), { a })
+
+        override fun <A, B> map(fa: CoYonedaKind<Id.F, Int, A>, f: (A) -> B): CoYonedaKind<Id.F, Int, B> =
+                fa.ev().map(f)
+
+        override fun <A, B> ap(fa: CoYonedaKind<Id.F, Int, A>, ff: CoYonedaKind<Id.F, Int, (A) -> B>): CoYonedaKind<Id.F, Int, B> =
+                throw IllegalStateException("Operation not allowed")
+    }
 
     init {
-        val EQ = object : Eq<CoYonedaKind<Id.F, Int, Int>> {
-            override fun eqv(a: CoYonedaKind<Id.F, Int, Int>, b: CoYonedaKind<Id.F, Int, Int>): Boolean =
-                    a.ev().lower(Id) == a.ev().lower(Id)
 
-        }
-        testLaws(FunctorLaws.laws(object : Applicative<CoYonedaF<Id.F, Int>> {
-            override fun <A> pure(a: A): CoYonedaKind<Id.F, Int, A> =
-                    CoYoneda.apply(Id(0), { a })
-
-            override fun <A, B> map(fa: CoYonedaKind<Id.F, Int, A>, f: (A) -> B): CoYonedaKind<Id.F, Int, B> =
-                    fa.ev().map(f)
-
-            override fun <A, B> ap(fa: CoYonedaKind<Id.F, Int, A>, ff: CoYonedaKind<Id.F, Int, (A) -> B>): CoYonedaKind<Id.F, Int, B> =
-                    throw IllegalStateException("Operation not allowed")
-        }, EQ))
+        testLaws(FunctorLaws.laws(AP, EQ))
 
         "map should modify the content of any HK1" {
             forAll { x: Int ->
