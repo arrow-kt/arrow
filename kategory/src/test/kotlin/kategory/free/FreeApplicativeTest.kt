@@ -1,6 +1,7 @@
 package kategory
 
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
 
 sealed class OpsAp<out A> : HK<OpsAp.F, A> {
