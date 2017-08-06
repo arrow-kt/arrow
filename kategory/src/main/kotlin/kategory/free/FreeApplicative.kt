@@ -71,11 +71,14 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeKind<F, A> {
                         Free.liftF(fa)
 
             }, object : Applicative<FreeF<F>> {
+                private val applicative: Applicative<FreeF<F>> = Free.applicative<F>()
+
                 override fun <A> pure(a: A): Free<F, A> =
                         Free.pure(a)
 
-                override fun <A, B> ap(fa: HK<FreeF<F>, A>, ff: HK<FreeF<F>, (A) -> B>): Free<F, B> =
-                        Free.applicative<F>().ap(fa, ff).ev()
+                override fun <A, B> ap(fa: HK<FreeF<F>, A>, ff: HK<FreeF<F>, (A) -> B>): Free<F, B> {
+                    return applicative.ap(fa, ff).ev()
+                }
             }).ev()
 
     // Beware: smart code
