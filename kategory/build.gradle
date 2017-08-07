@@ -4,10 +4,19 @@ test {
     }
 }
 
+repositories {
+    jcenter()
+    maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
+    maven { url 'https://jitpack.io' }
+}
+
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
+    compile "com.github.kategory.kategory-annotations:annotations:master"
+    kapt "com.github.kategory.kategory-annotations:compile-time:master"
+    compileOnly "com.github.kategory.kategory-annotations:compile-time:master"
 
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
 }
@@ -18,3 +27,6 @@ sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+apply from: 'generated-kotlin-sources.gradle'
+
+compileKotlin.kotlinOptions.freeCompilerArgs += ["-Xskip-runtime-version-check"]

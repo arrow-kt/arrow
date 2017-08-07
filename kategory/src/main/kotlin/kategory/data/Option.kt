@@ -1,17 +1,12 @@
 package kategory
 
-typealias OptionKind<A> = HK<Option.F, A>
-
-fun <A> OptionKind<A>.ev(): Option<A> =
-        this as Option<A>
-
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/Option.scala
  *
  * Represents optional values. Instances of `Option`
  * are either an instance of $some or the object $none.
  */
-sealed class Option<out A> : OptionKind<A> {
+@higherkind sealed class Option<out A> : OptionKind<A> {
 
     class F private constructor()
 
