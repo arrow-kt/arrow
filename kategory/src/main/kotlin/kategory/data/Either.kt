@@ -1,10 +1,6 @@
 package kategory
 
-typealias EitherKind<A, B> = HK2<Either.F, A, B>
-typealias EitherF<L> = HK<Either.F, L>
-
-fun <A, B> EitherKind<A, B>.ev(): Either<A, B> =
-        this as Either<A, B>
+typealias EitherF<L> = HK<EitherHK, L>
 
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Either.scala
@@ -12,9 +8,7 @@ fun <A, B> EitherKind<A, B>.ev(): Either<A, B> =
  * Represents a value of one of two possible types (a disjoint union.)
  * An instance of Either is either an instance of [Left] or [Right].
  */
-sealed class Either<out A, out B> : EitherKind<A, B> {
-
-    class F private constructor()
+@higherkind sealed class Either<out A, out B> : EitherKind<A, B> {
 
     /**
      * Returns `true` if this is a [Right], `false` otherwise.
