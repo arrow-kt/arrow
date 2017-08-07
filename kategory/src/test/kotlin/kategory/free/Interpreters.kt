@@ -34,6 +34,16 @@ val optionInterpreter: FunctionK<Ops.F, Option.F> = object : FunctionK<Ops.F, Op
         } as Option<A>
     }
 }
+val optionApInterpreter: FunctionK<OpsAp.F, Option.F> = object : FunctionK<OpsAp.F, Option.F> {
+    override fun <A> invoke(fa: HK<OpsAp.F, A>): Option<A> {
+        val op = fa.ev()
+        return when (op) {
+            is OpsAp.Add -> Option.Some(op.a + op.y)
+            is OpsAp.Subtract -> Option.Some(op.a - op.y)
+            is OpsAp.Value -> Option.Some(op.a)
+        } as Option<A>
+    }
+}
 val nonEmptyListInterpreter: FunctionK<Ops.F, NonEmptyList.F> = object : FunctionK<Ops.F, NonEmptyList.F> {
     override fun <A> invoke(fa: HK<Ops.F, A>): NonEmptyList<A> {
         val op = fa.ev()
@@ -41,6 +51,16 @@ val nonEmptyListInterpreter: FunctionK<Ops.F, NonEmptyList.F> = object : Functio
             is Ops.Add -> NonEmptyList.of(op.a + op.y)
             is Ops.Subtract -> NonEmptyList.of(op.a - op.y)
             is Ops.Value -> NonEmptyList.of(op.a)
+        } as NonEmptyList<A>
+    }
+}
+val nonEmptyListApInterpreter: FunctionK<OpsAp.F, NonEmptyList.F> = object : FunctionK<OpsAp.F, NonEmptyList.F> {
+    override fun <A> invoke(fa: HK<OpsAp.F, A>): NonEmptyList<A> {
+        val op = fa.ev()
+        return when (op) {
+            is OpsAp.Add -> NonEmptyList.of(op.a + op.y)
+            is OpsAp.Subtract -> NonEmptyList.of(op.a - op.y)
+            is OpsAp.Value -> NonEmptyList.of(op.a)
         } as NonEmptyList<A>
     }
 }
@@ -54,4 +74,13 @@ val idInterpreter: FunctionK<Ops.F, Id.F> = object : FunctionK<Ops.F, Id.F> {
         } as Id<A>
     }
 }
-
+val idApInterpreter: FunctionK<OpsAp.F, Id.F> = object : FunctionK<OpsAp.F, Id.F> {
+    override fun <A> invoke(fa: HK<OpsAp.F, A>): Id<A> {
+        val op = fa.ev()
+        return when (op) {
+            is OpsAp.Add -> Id(op.a + op.y)
+            is OpsAp.Subtract -> Id(op.a - op.y)
+            is OpsAp.Value -> Id(op.a)
+        } as Id<A>
+    }
+}
