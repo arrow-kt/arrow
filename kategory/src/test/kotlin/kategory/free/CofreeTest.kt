@@ -69,7 +69,7 @@ class CofreeTest : UnitSpec() {
 
         "run with an stack-safe monad should not blow up the stack" {
             val counter = SideEffect()
-            val startThousands: Cofree<Eval.F, Int> = unfold(counter.counter, {
+            val startThousands: Cofree<EvalHK, Int> = unfold(counter.counter, {
                 counter.increment()
                 Eval.now(it + 1)
             })
@@ -126,8 +126,8 @@ class CofreeTest : UnitSpec() {
                 i, lb ->
                 if (i <= 2000) OptionT.pure(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) else OptionT.none()
             }
-            val inclusion = object : FunctionK<Eval.F, EvalOptionF> {
-                override fun <A> invoke(fa: HK<Eval.F, A>): HK<EvalOptionF, A> =
+            val inclusion = object : FunctionK<EvalHK, EvalOptionF> {
+                override fun <A> invoke(fa: HK<EvalHK, A>): HK<EvalOptionF, A> =
                         OptionT(fa.ev().map { Some(it) })
             }
             val cataHundred = startTwoThousand.cataM(folder, inclusion, Option, OptionT.monad(Eval)).ev().value.ev().value()
@@ -157,6 +157,6 @@ class CofreeTest : UnitSpec() {
     }
 }
 
-typealias EvalOption<A> = OptionTKind<Eval.F, A>
+typealias EvalOption<A> = OptionTKind<EvalHK, A>
 
-typealias EvalOptionF = OptionTF<Eval.F>
+typealias EvalOptionF = OptionTF<EvalHK>
