@@ -28,12 +28,12 @@ object TraverseLaws {
             )
 
     inline fun <reified F> identityTraverse(FF: Traverse<F>, AP: Applicative<F> = applicative<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>) =
-            forAll(genFunctionAToB<Int, HK<Id.F, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf), { f: (Int) -> HK<Id.F, Int>, fa: HK<F, Int> ->
+            forAll(genFunctionAToB<Int, HK<IdHK, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf), { f: (Int) -> HK<IdHK, Int>, fa: HK<F, Int> ->
                 FF.traverse(fa, f, Id).value().equalUnderTheLaw(FF.map(fa, f).map(AP) { it.value() }, EQ)
             })
 
     inline fun <reified F> parallelComposition(FF: Traverse<F>, crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>) =
-            forAll(genFunctionAToB<Int, HK<Id.F, Int>>(genConstructor(genIntSmall(), ::Id)), genFunctionAToB<Int, HK<Id.F, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf), { f: (Int) -> HK<Id.F, Int>, g: (Int) -> HK<Id.F, Int>, fha: HK<F, Int> ->
+            forAll(genFunctionAToB<Int, HK<IdHK, Int>>(genConstructor(genIntSmall(), ::Id)), genFunctionAToB<Int, HK<IdHK, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf), { f: (Int) -> HK<IdHK, Int>, g: (Int) -> HK<IdHK, Int>, fha: HK<F, Int> ->
                 val TIA = object : Applicative<TIF> {
                     override fun <A> pure(a: A): HK<TIF, A> =
                             TIC(Id(a) toT Id(a))

@@ -9,8 +9,8 @@ class YonedaTest : UnitSpec() {
 
     val F = Yoneda.functor(Id)
 
-    val EQ = object : Eq<YonedaKind<Id.F, Int>> {
-        override fun eqv(a: YonedaKind<Id.F, Int>, b: YonedaKind<Id.F, Int>): Boolean =
+    val EQ = object : Eq<YonedaKind<IdHK, Int>> {
+        override fun eqv(a: YonedaKind<IdHK, Int>, b: YonedaKind<IdHK, Int>): Boolean =
                 a.ev().lower() == b.ev().lower()
     }
 

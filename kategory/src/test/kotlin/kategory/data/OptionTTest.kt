@@ -9,8 +9,8 @@ import org.junit.runner.RunWith
 class OptionTTest : UnitSpec() {
     init {
 
-        val OptionTFIdEq = object : Eq<HK<OptionTF<Id.F>, Int>> {
-            override fun eqv(a: HK<OptionTF<Id.F>, Int>, b: HK<OptionTF<Id.F>, Int>): Boolean {
+        val OptionTFIdEq = object : Eq<HK<OptionTF<IdHK>, Int>> {
+            override fun eqv(a: HK<OptionTF<IdHK>, Int>, b: HK<OptionTF<IdHK>, Int>): Boolean {
                 return a.ev().value == b.ev().value
             }
         }
@@ -68,8 +68,8 @@ class OptionTTest : UnitSpec() {
 
         "OptionTMonad.flatMap should be consistent with OptionT#flatMap" {
             forAll { a: Int ->
-                val x = { b: Int -> OptionT.pure<Id.F, Int>(b * a) }
-                val option = OptionT.pure<Id.F, Int>(a)
+                val x = { b: Int -> OptionT.pure<IdHK, Int>(b * a) }
+                val option = OptionT.pure<IdHK, Int>(a)
                 option.flatMap(x) == OptionT.monad(Id).flatMap(option, x)
             }
         }
@@ -88,7 +88,7 @@ class OptionTTest : UnitSpec() {
         "Cartesian builder should build products over option" {
             OptionT.applicative(Id).map(OptionT.pure(1), OptionT.pure("a"), OptionT.pure(true), { (a, b, c) ->
                 "$a $b $c"
-            }) shouldBe OptionT.pure<Id.F, String>("1 a true")
+            }) shouldBe OptionT.pure<IdHK, String>("1 a true")
         }
 
         "Cartesian builder works inside for comprehensions" {

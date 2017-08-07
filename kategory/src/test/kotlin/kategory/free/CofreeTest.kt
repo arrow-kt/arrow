@@ -26,7 +26,7 @@ class CofreeTest : UnitSpec() {
     init {
         "tailForced should evaluate and return" {
             val sideEffect = SideEffect()
-            val start: Cofree<Id.F, Int> = unfold(sideEffect.counter, { sideEffect.increment(); Id(it + 1) })
+            val start: Cofree<IdHK, Int> = unfold(sideEffect.counter, { sideEffect.increment(); Id(it + 1) })
             sideEffect.counter shouldBe 0
             start.tailForced()
             sideEffect.counter shouldBe 1
@@ -34,7 +34,7 @@ class CofreeTest : UnitSpec() {
 
         "runTail should run once and return" {
             val sideEffect = SideEffect()
-            val start: Cofree<Id.F, Int> = unfold(sideEffect.counter, { sideEffect.increment(); Id(it) })
+            val start: Cofree<IdHK, Int> = unfold(sideEffect.counter, { sideEffect.increment(); Id(it) })
             sideEffect.counter shouldBe 0
             start.runTail()
             sideEffect.counter shouldBe 1

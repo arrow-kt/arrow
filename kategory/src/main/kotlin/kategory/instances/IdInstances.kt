@@ -1,13 +1,13 @@
 package kategory
 
 interface IdInstances :
-        Functor<Id.F>,
-        Applicative<Id.F>,
-        Monad<Id.F>,
-        Foldable<Id.F>,
-        Traverse<Id.F>,
-        Comonad<Id.F>,
-        Bimonad<Id.F> {
+        Functor<IdHK>,
+        Applicative<IdHK>,
+        Monad<IdHK>,
+        Foldable<IdHK>,
+        Traverse<IdHK>,
+        Comonad<IdHK>,
+        Bimonad<IdHK> {
 
     override fun <A> pure(a: A): Id<A> = Id(a)
 

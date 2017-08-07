@@ -10,13 +10,13 @@ import org.junit.runner.RunWith
 class EitherTTest : UnitSpec() {
     init {
 
-        testLaws(MonadErrorLaws.laws(EitherT.monadError<Id.F, Throwable>(Id), Eq.any()))
-        testLaws(TraverseLaws.laws(EitherT.traverse<Id.F, Int>(), EitherT.applicative(), { EitherT(Id(Either.Right(it))) }, Eq.any()))
-        testLaws(SemigroupKLaws.laws<EitherTF<Id.F, Int>>(
+        testLaws(MonadErrorLaws.laws(EitherT.monadError<IdHK, Throwable>(Id), Eq.any()))
+        testLaws(TraverseLaws.laws(EitherT.traverse<IdHK, Int>(), EitherT.applicative(), { EitherT(Id(Either.Right(it))) }, Eq.any()))
+        testLaws(SemigroupKLaws.laws<EitherTF<IdHK, Int>>(
                 EitherT.semigroupK(Id),
                 EitherT.applicative(Id),
-                object : Eq<HK<EitherTF<Id.F, Int>, Int>> {
-                    override fun eqv(a: HK<EitherTF<Id.F, Int>, Int>, b: HK<EitherTF<Id.F, Int>, Int>): Boolean =
+                object : Eq<HK<EitherTF<IdHK, Int>, Int>> {
+                    override fun eqv(a: HK<EitherTF<IdHK, Int>, Int>, b: HK<EitherTF<IdHK, Int>, Int>): Boolean =
                             a.ev() == b.ev()
                 }))
 
@@ -171,30 +171,30 @@ class EitherTTest : UnitSpec() {
 
         "EitherTMonad#flatMap should be consistent with EitherT#flatMap" {
             forAll { a: Int ->
-                val x = { b: Int -> EitherT.pure<Id.F, Int, Int>(b * a) }
-                val option = EitherT.pure<Id.F, Int, Int>(a)
-                option.flatMap(x) == EitherT.monad<Id.F, Int>(Id).flatMap(option, x)
+                val x = { b: Int -> EitherT.pure<IdHK, Int, Int>(b * a) }
+                val option = EitherT.pure<IdHK, Int, Int>(a)
+                option.flatMap(x) == EitherT.monad<IdHK, Int>(Id).flatMap(option, x)
             }
         }
 
         "EitherTMonad#tailRecM should execute and terminate without blowing up the stack" {
             forAll { a: Int ->
-                val value: EitherT<Id.F, Int, Int> = EitherT.monad<Id.F, Int>(Id).tailRecM(a) { b ->
-                    EitherT.pure<Id.F, Int, Either<Int, Int>>(Either.Right(b * a))
+                val value: EitherT<IdHK, Int, Int> = EitherT.monad<IdHK, Int>(Id).tailRecM(a) { b ->
+                    EitherT.pure<IdHK, Int, Either<Int, Int>>(Either.Right(b * a))
                 }.ev().ev()
-                val expected = EitherT.pure<Id.F, Int, Int>(a * a)
+                val expected = EitherT.pure<IdHK, Int, Int>(a * a)
 
                 expected == value
             }
 
             forAll(Gen.oneOf(listOf(10000))) { limit: Int ->
-                val value: EitherT<Id.F, Int, Int> = EitherT.monad<Id.F, Int>(Id).tailRecM(0) { current ->
+                val value: EitherT<IdHK, Int, Int> = EitherT.monad<IdHK, Int>(Id).tailRecM(0) { current ->
                     if (current == limit)
                         EitherT.left(current)
                     else
-                        EitherT.pure<Id.F, Int, Either<Int, Int>>(Either.Left(current + 1))
+                        EitherT.pure<IdHK, Int, Either<Int, Int>>(Either.Left(current + 1))
                 }.ev().ev()
-                val expected = EitherT.left<Id.F, Int, Int>(limit)
+                val expected = EitherT.left<IdHK, Int, Int>(limit)
 
                 expected == value
             }
@@ -245,9 +245,9 @@ class EitherTTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over option" {
-            EitherT.applicative<Id.F, Int>(Id).map(EitherT.pure(1), EitherT.pure("a"), EitherT.pure(true), { (a, b, c) ->
+            EitherT.applicative<IdHK, Int>(Id).map(EitherT.pure(1), EitherT.pure("a"), EitherT.pure(true), { (a, b, c) ->
                 "$a $b $c"
-            }) shouldBe EitherT.pure<Id.F, Int, String>("1 a true")
+            }) shouldBe EitherT.pure<IdHK, Int, String>("1 a true")
         }
 
         "Cartesian builder works inside for comprehensions" {

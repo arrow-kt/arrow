@@ -17,7 +17,7 @@ class KleisliTest : UnitSpec() {
         }))
 
         "andThen should continue sequence" {
-            val kleisli: Kleisli<Id.F, Int, Int> = Kleisli({ a: Int -> Id(a) })
+            val kleisli: Kleisli<IdHK, Int, Int> = Kleisli({ a: Int -> Id(a) })
 
             kleisli.andThen(Id(3)).run(0).ev().value shouldBe 3
 

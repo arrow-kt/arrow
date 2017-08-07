@@ -64,7 +64,7 @@ val nonEmptyListApInterpreter: FunctionK<OpsAp.F, NonEmptyList.F> = object : Fun
         } as NonEmptyList<A>
     }
 }
-val idInterpreter: FunctionK<Ops.F, Id.F> = object : FunctionK<Ops.F, Id.F> {
+val idInterpreter: FunctionK<Ops.F, IdHK> = object : FunctionK<Ops.F, IdHK> {
     override fun <A> invoke(fa: HK<Ops.F, A>): Id<A> {
         val op = fa.ev()
         return when (op) {
@@ -74,7 +74,7 @@ val idInterpreter: FunctionK<Ops.F, Id.F> = object : FunctionK<Ops.F, Id.F> {
         } as Id<A>
     }
 }
-val idApInterpreter: FunctionK<OpsAp.F, Id.F> = object : FunctionK<OpsAp.F, Id.F> {
+val idApInterpreter: FunctionK<OpsAp.F, IdHK> = object : FunctionK<OpsAp.F, IdHK> {
     override fun <A> invoke(fa: HK<OpsAp.F, A>): Id<A> {
         val op = fa.ev()
         return when (op) {

@@ -7,10 +7,10 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class CoYonedaTest : UnitSpec() {
-    val F = CoYoneda.functor<Id.F, Int>()
+    val F = CoYoneda.functor<IdHK, Int>()
 
-    val EQ = object : Eq<CoYonedaKind<Id.F, Int, Int>> {
-        override fun eqv(a: CoYonedaKind<Id.F, Int, Int>, b: CoYonedaKind<Id.F, Int, Int>): Boolean =
+    val EQ = object : Eq<CoYonedaKind<IdHK, Int, Int>> {
+        override fun eqv(a: CoYonedaKind<IdHK, Int, Int>, b: CoYonedaKind<IdHK, Int, Int>): Boolean =
                 a.ev().lower(Id) == a.ev().lower(Id)
 
     }
@@ -33,7 +33,7 @@ class CoYonedaTest : UnitSpec() {
             forAll { x: Int ->
                 val op = CoYoneda.apply(Id(x), { _ -> "" })
                 val mapped = op.map { _ -> true }.lower(Id)
-                val expected = CoYoneda.functor<Id.F, Int>().map(op, { _ -> true }).ev().lower(Id)
+                val expected = CoYoneda.functor<IdHK, Int>().map(op, { _ -> true }).ev().lower(Id)
 
                 expected == mapped
             }

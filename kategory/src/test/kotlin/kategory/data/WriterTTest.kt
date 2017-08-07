@@ -112,7 +112,7 @@ class WriterTTest : UnitSpec() {
 
         "semiFlatMap should combine the writer and map the left side of the tuple" {
             forAll { num: Int ->
-                val right: WriterT<Id.F, NonEmptyList<Int>, Int> = WriterT(Id(NonEmptyList.of(num) toT num))
+                val right: WriterT<IdHK, NonEmptyList<Int>, Int> = WriterT(Id(NonEmptyList.of(num) toT num))
                 val calculated = right.semiflatMap({ Id(it > 0) }, NonEmptyList.semigroup<Int>()).value.ev()
                 val expected = WriterT(Id(NonEmptyList.of(num, num) toT (num > 0))).value.ev()
 
@@ -123,7 +123,7 @@ class WriterTTest : UnitSpec() {
 
         "subFlatMap should combine the writer and map the left side of the tuple" {
             forAll { num: Int ->
-                val right: WriterT<Id.F, NonEmptyList<Int>, Int> = WriterT(Id(NonEmptyList.of(num) toT num))
+                val right: WriterT<IdHK, NonEmptyList<Int>, Int> = WriterT(Id(NonEmptyList.of(num) toT num))
                 val calculated = right.subflatMap { NonEmptyList.of(it + 1) toT (it > 0) }
                 val expected = WriterT(Id(NonEmptyList.of(num + 1) toT (num > 0)))
 
@@ -133,18 +133,18 @@ class WriterTTest : UnitSpec() {
 
         "WriterTMonad#flatMap should be consistent with WriterT#flatMap" {
             forAll { a: Int ->
-                val x = { b: Int -> WriterT.pure<Id.F, Int, Int>(b * a) }
-                val option = WriterT.pure<Id.F, Int, Int>(a)
+                val x = { b: Int -> WriterT.pure<IdHK, Int, Int>(b * a) }
+                val option = WriterT.pure<IdHK, Int, Int>(a)
                 option.flatMap(x, IntMonoid) == WriterT.monad(Id, IntMonoid).flatMap(option, x)
             }
         }
 
         "WriterTMonad#tailRecM should execute and terminate without blowing up the stack" {
             forAll { a: Int ->
-                val value: WriterT<Id.F, Int, Int> = WriterT.monad(Id, IntMonoid).tailRecM(a) { b ->
-                    WriterT.pure<Id.F, Int, Either<Int, Int>>(Either.Right(b * a))
+                val value: WriterT<IdHK, Int, Int> = WriterT.monad(Id, IntMonoid).tailRecM(a) { b ->
+                    WriterT.pure<IdHK, Int, Either<Int, Int>>(Either.Right(b * a))
                 }.ev()
-                val expected = WriterT.pure<Id.F, Int, Int>(a * a)
+                val expected = WriterT.pure<IdHK, Int, Int>(a * a)
 
                 expected == value
             }
