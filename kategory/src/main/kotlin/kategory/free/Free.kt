@@ -1,17 +1,11 @@
 package kategory
 
-typealias FreeKind<S, A> = HK2<Free.F, S, A>
-typealias FreeF<S> = HK<Free.F, S>
-
-fun <S, A> FreeKind<S, A>.ev(): Free<S, A> =
-        this as Free<S, A>
+typealias FreeF<S> = HK<FreeHK, S>
 
 inline fun <reified M, S, A> FreeKind<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M> = monad()): HK<M, A> =
         (this as Free<S, A>).foldMap(f, MM)
 
-sealed class Free<out S, out A> : FreeKind<S, A> {
-
-    class F private constructor()
+@higherkind sealed class Free<out S, out A> : FreeKind<S, A> {
 
     companion object {
         fun <S, A> pure(a: A): Free<S, A> =
