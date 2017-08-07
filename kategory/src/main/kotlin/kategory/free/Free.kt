@@ -28,6 +28,25 @@ sealed class Free<out S, out A> : FreeKind<S, A> {
         fun <S> applicative(): FreeInstances<S> = object : FreeInstances<S> {}
 
         fun <S> monad(): FreeInstances<S> = object : FreeInstances<S> {}
+
+        internal fun <F> functionKF(): FunctionK<F, FreeF<F>> =
+                object : FunctionK<F, FreeF<F>> {
+                    override fun <A> invoke(fa: HK<F, A>): Free<F, A> =
+                            Free.liftF(fa)
+
+                }
+
+        internal fun <F> applicativeF(): Applicative<FreeF<F>> =
+                object : Applicative<FreeF<F>> {
+                    private val applicative: Applicative<FreeF<F>> = applicative<F>()
+
+                    override fun <A> pure(a: A): Free<F, A> =
+                            Free.pure(a)
+
+                    override fun <A, B> ap(fa: HK<FreeF<F>, A>, ff: HK<FreeF<F>, (A) -> B>): Free<F, B> {
+                        return applicative.ap(fa, ff).ev()
+                    }
+                }
     }
 
     abstract fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B>

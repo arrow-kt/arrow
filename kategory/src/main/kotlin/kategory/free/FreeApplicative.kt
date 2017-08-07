@@ -32,6 +32,21 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeKind<F, A> {
         fun <S> functor(): FreeApplicativeInstances<S> = object : FreeApplicativeInstances<S> {}
 
         fun <S> applicative(): FreeApplicativeInstances<S> = object : FreeApplicativeInstances<S> {}
+
+        internal fun <F, G> functionKF(f: FunctionK<F, G>): FunctionK<F, FreeApplicativeF<G>> =
+                object : FunctionK<F, FreeApplicativeF<G>> {
+                    override fun <A> invoke(fa: HK<F, A>): FreeApplicative<G, A> =
+                            FreeApplicative.liftF(f(fa))
+
+                }
+
+        internal fun <F> applicativeF(): Applicative<FreeApplicativeF<F>> = object : Applicative<FreeApplicativeF<F>> {
+            override fun <A> pure(a: A): FreeApplicative<F, A> =
+                    FreeApplicative.pure(a)
+
+            override fun <A, B> ap(fa: HK<FreeApplicativeF<F>, A>, ff: HK<FreeApplicativeF<F>, (A) -> B>): FreeApplicative<F, B> =
+                    FreeApplicative.ap(fa.ev(), ff.ev())
+        }
     }
 
     fun <B> ap(ap: FreeApplicative<F, (A) -> B>): FreeApplicative<F, B> =
@@ -50,17 +65,7 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeKind<F, A> {
             foldMap(FunctionK.id(), FA)
 
     fun <G> compile(f: FunctionK<F, G>): FreeApplicative<G, A> =
-            foldMap(object : FunctionK<F, FreeApplicativeF<G>> {
-                override fun <A> invoke(fa: HK<F, A>): FreeApplicative<G, A> =
-                        FreeApplicative.liftF(f(fa))
-
-            }, object : Applicative<FreeApplicativeF<G>> {
-                override fun <A> pure(a: A): FreeApplicative<G, A> =
-                        FreeApplicative.pure(a)
-
-                override fun <A, B> ap(fa: HK<FreeApplicativeF<G>, A>, ff: HK<FreeApplicativeF<G>, (A) -> B>): FreeApplicative<G, B> =
-                        FreeApplicative.ap(fa.ev(), ff.ev())
-            }).ev()
+            foldMap(functionKF(f), applicativeF()).ev()
 
     fun <G> flatCompile(f: FunctionK<F, FreeApplicativeF<G>>, GFA: Applicative<FreeApplicativeF<G>>): FreeApplicative<G, A> =
             foldMap(f, GFA).ev()
@@ -69,20 +74,7 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeKind<F, A> {
     // final def analyze[M: Monoid](f: FunctionK[F, λ[α => M]]): M
 
     fun monad(): Free<F, A> =
-            foldMap(object : FunctionK<F, FreeF<F>> {
-                override fun <A> invoke(fa: HK<F, A>): Free<F, A> =
-                        Free.liftF(fa)
-
-            }, object : Applicative<FreeF<F>> {
-                private val applicative: Applicative<FreeF<F>> = Free.applicative<F>()
-
-                override fun <A> pure(a: A): Free<F, A> =
-                        Free.pure(a)
-
-                override fun <A, B> ap(fa: HK<FreeF<F>, A>, ff: HK<FreeF<F>, (A) -> B>): Free<F, B> {
-                    return applicative.ap(fa, ff).ev()
-                }
-            }).ev()
+            foldMap(Free.functionKF(), Free.applicativeF()).ev()
 
     // Beware: smart code
     @Suppress("UNCHECKED_CAST")
