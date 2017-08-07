@@ -20,7 +20,7 @@ private typealias AnyFunc = (Any?) -> Any?
             Coyoneda(pivot, ks + f as AnyFunc)
 
     fun toYoneda(FF: Functor<F>): Yoneda<F, A> =
-            object : Yoneda<F, A> {
+            object : Yoneda<F, A>() {
                 override fun <B> apply(f: (A) -> B): HK<F, B> = map(f).lower(FF)
             }
 
