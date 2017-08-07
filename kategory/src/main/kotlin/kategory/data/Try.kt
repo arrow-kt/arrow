@@ -1,21 +1,14 @@
 package kategory
 
-typealias TryKind<A> = HK<Try.F, A>
-
-fun <A> TryKind<A>.ev(): Try<A> =
-        this as Try<A>
-
 /**
  * The `Try` type represents a computation that may either result in an exception, or return a
  * successfully computed value.
  *
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Try.scala
  */
-sealed class Try<out A> : TryKind<A> {
+@higherkind sealed class Try<out A> : TryKind<A> {
 
-    class F private constructor()
-
-    companion object : TryInstances, GlobalInstance<MonadError<Try.F, Throwable>>() {
+    companion object : TryInstances, GlobalInstance<MonadError<TryHK, Throwable>>() {
 
         inline operator fun <A> invoke(f: () -> A): Try<A> =
                 try {
@@ -27,17 +20,17 @@ sealed class Try<out A> : TryKind<A> {
         fun <A> raise(e: Exception): Try<A> =
                 Failure(e)
 
-        fun functor(): Functor<Try.F> = this
+        fun functor(): Functor<TryHK> = this
 
-        fun applicative(): Applicative<Try.F> = this
+        fun applicative(): Applicative<TryHK> = this
 
-        fun monad(): Monad<Try.F> = this
+        fun monad(): Monad<TryHK> = this
 
-        fun monadError(): MonadError<Try.F, Throwable> = this
+        fun monadError(): MonadError<TryHK, Throwable> = this
 
-        fun foldable(): Foldable<Try.F> = this
+        fun foldable(): Foldable<TryHK> = this
 
-        fun traverse(): Traverse<Try.F> = this
+        fun traverse(): Traverse<TryHK> = this
 
     }
 
