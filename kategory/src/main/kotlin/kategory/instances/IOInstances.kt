@@ -1,11 +1,11 @@
 package kategory
 
 interface IOInstances :
-        Functor<IO.F>,
-        Applicative<IO.F>,
-        Monad<IO.F> {
+        Functor<IOHK>,
+        Applicative<IOHK>,
+        Monad<IOHK> {
 
-    override fun <A, B> map(fa: HK<IO.F, A>, f: (A) -> B): IO<B> =
+    override fun <A, B> map(fa: HK<IOHK, A>, f: (A) -> B): IO<B> =
             fa.ev().map(f)
 
     override fun <A> pure(a: A): IO<A> =
@@ -23,11 +23,11 @@ interface IOInstances :
             }
 }
 
-interface IOMonoid<A> : Monoid<HK<IO.F, A>>, Semigroup<HK<IO.F, A>> {
+interface IOMonoid<A> : Monoid<HK<IOHK, A>>, Semigroup<HK<IOHK, A>> {
 
     fun SM(): Monoid<A>
 
-    override fun combine(ioa: HK<IO.F, A>, iob: HK<IO.F, A>): IO<A> =
+    override fun combine(ioa: HK<IOHK, A>, iob: HK<IOHK, A>): IO<A> =
             ioa.ev().flatMap { a1 -> iob.ev().map { a2 -> SM().combine(a1, a2) } }
 
     override fun empty(): IO<A> =
@@ -35,10 +35,10 @@ interface IOMonoid<A> : Monoid<HK<IO.F, A>>, Semigroup<HK<IO.F, A>> {
 
 }
 
-interface IOSemigroup<A> : Semigroup<HK<IO.F, A>> {
+interface IOSemigroup<A> : Semigroup<HK<IOHK, A>> {
 
     fun SG(): Semigroup<A>
 
-    override fun combine(ioa: HK<IO.F, A>, iob: HK<IO.F, A>): IO<A> =
+    override fun combine(ioa: HK<IOHK, A>, iob: HK<IOHK, A>): IO<A> =
             ioa.ev().flatMap { a1 -> iob.ev().map { a2 -> SG().combine(a1, a2) } }
 }

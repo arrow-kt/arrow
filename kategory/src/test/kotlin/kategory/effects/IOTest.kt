@@ -11,8 +11,8 @@ class IOTest : UnitSpec() {
 
     init {
 
-        testLaws(MonadLaws.laws(IO, object : Eq<HK<IO.F, Int>> {
-            override fun eqv(a: HK<IO.F, Int>, b: HK<IO.F, Int>): Boolean =
+        testLaws(MonadLaws.laws(IO, object : Eq<HK<IOHK, Int>> {
+            override fun eqv(a: HK<IOHK, Int>, b: HK<IOHK, Int>): Boolean =
                     a.ev().unsafeRunSync() == b.ev().unsafeRunSync()
         }))
 
