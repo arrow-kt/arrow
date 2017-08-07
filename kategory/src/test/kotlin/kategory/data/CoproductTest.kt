@@ -21,7 +21,7 @@ class CoproductTest : UnitSpec() {
                     coproductIdIdFunctor.map(fa, f)
         }
 
-        testLaws(TraverseLaws.laws(Coproduct.traverse<Id.F, Id.F>(), coproductIdIdApplicative, { Coproduct(Either.Right(Id(it))) }, object : Eq<HK3<Coproduct.F, Id.F, Id.F, Int>>{
+        testLaws(TraverseLaws.laws(Coproduct.traverse<Id.F, Id.F>(), coproductIdIdApplicative, { Coproduct(Either.Right(Id(it))) }, object : Eq<HK3<CoproductHK, Id.F, Id.F, Int>>{
             override fun eqv(a: CoproductKind<Id.F, Id.F, Int>, b: CoproductKind<Id.F, Id.F, Int>): Boolean =
                     a.ev().extract() == b.ev().extract()
         } ))
