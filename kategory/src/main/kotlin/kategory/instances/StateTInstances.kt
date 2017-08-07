@@ -52,6 +52,6 @@ interface StateTSemigroupK<F, S> : SemigroupK<StateTF<F, S>> {
     fun F(): Monad<F>
     fun G(): SemigroupK<F>
 
-    override fun <A> combineK(x: HK<HK2<StateT.F, F, S>, A>, y: HK<HK2<StateT.F, F, S>, A>): StateT<F, S, A> =
+    override fun <A> combineK(x: HK<HK2<StateTHK, F, S>, A>, y: HK<HK2<StateTHK, F, S>, A>): StateT<F, S, A> =
             StateT(F(), F().pure({ s -> G().combineK(x.ev().run(s), y.ev().run(s)) }))
 }
