@@ -20,7 +20,7 @@ class GlobalInstancesTest : UnitSpec() {
         }
 
         "NonEmptyList monad inference" {
-            testTypeclassHierarchyInference<NonEmptyList.F>(NonEmptyList)
+            testTypeclassHierarchyInference<NonEmptyListHK>(NonEmptyList)
         }
 
         "Option monad inference" {

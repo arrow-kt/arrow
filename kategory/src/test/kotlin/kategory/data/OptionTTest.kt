@@ -43,7 +43,7 @@ class OptionTTest : UnitSpec() {
             forAll { a: String ->
                 val ot = OptionT(NonEmptyList.of(Option.Some(a)))
                 val mapped = ot.flatMap { OptionT(NonEmptyList.of(Option.Some(3))) }
-                val expected: OptionT<NonEmptyList.F, Int> = OptionT.pure(3)
+                val expected: OptionT<NonEmptyListHK, Int> = OptionT.pure(3)
 
                 mapped == expected
             }
@@ -51,18 +51,18 @@ class OptionTTest : UnitSpec() {
             forAll { ignored: String ->
                 val ot = OptionT(NonEmptyList.of(Option.Some(ignored)))
                 val mapped = ot.flatMap { OptionT(NonEmptyList.of(Option.None)) }
-                val expected = OptionT.none<NonEmptyList.F>()
+                val expected = OptionT.none<NonEmptyListHK>()
 
                 mapped == expected
             }
 
-            OptionT.none<NonEmptyList.F>()
+            OptionT.none<NonEmptyListHK>()
                     .flatMap { OptionT(NonEmptyList.of(Option.Some(2))) } shouldBe OptionT(NonEmptyList.of(Option.None))
         }
 
         "from option should build a correct OptionT" {
             forAll { a: String ->
-                OptionT.fromOption<NonEmptyList.F, String>(Option.Some(a)) == OptionT.pure<NonEmptyList.F, String>(a)
+                OptionT.fromOption<NonEmptyListHK, String>(Option.Some(a)) == OptionT.pure<NonEmptyListHK, String>(a)
             }
         }
 

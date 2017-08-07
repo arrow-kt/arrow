@@ -34,21 +34,21 @@ class EitherTTest : UnitSpec() {
             forAll { a: String ->
                 val right = EitherT(NonEmptyList.of(Either.Right(a)))
                 val mapped = right.flatMap { EitherT(NonEmptyList.of(Either.Right(3))) }
-                val expected = EitherT.pure<NonEmptyList.F, Int, Int>(3)
+                val expected = EitherT.pure<NonEmptyListHK, Int, Int>(3)
 
                 mapped == expected
             }
 
             forAll { ignored: String ->
-                val right: EitherT<NonEmptyList.F, Int, String> = EitherT(NonEmptyList.of(Either.Right(ignored)))
+                val right: EitherT<NonEmptyListHK, Int, String> = EitherT(NonEmptyList.of(Either.Right(ignored)))
                 val mapped = right.flatMap { EitherT(NonEmptyList.of(Either.Left(3))) }
-                val expected = EitherT.left<NonEmptyList.F, Int, Int>(3)
+                val expected = EitherT.left<NonEmptyListHK, Int, Int>(3)
 
                 mapped == expected
             }
 
             forAll { _: String ->
-                val right = EitherT.left<NonEmptyList.F, Int, Int>(3)
+                val right = EitherT.left<NonEmptyListHK, Int, Int>(3)
                 val mapped = right.flatMap { EitherT(NonEmptyList.of<Either<Int, Int>>(Either.Right(2))) }
                 val expected = EitherT(NonEmptyList.of(Either.Left(3)))
 
@@ -58,7 +58,7 @@ class EitherTTest : UnitSpec() {
 
         "cata should modify the return" {
             forAll { num: Int ->
-                val right = EitherT.pure<NonEmptyList.F, Int, Int>(num)
+                val right = EitherT.pure<NonEmptyListHK, Int, Int>(num)
                 val expected = NonEmptyList.of(true)
                 val result = right.cata({ false }, { true })
 
@@ -66,7 +66,7 @@ class EitherTTest : UnitSpec() {
             }
 
             forAll { num: Int ->
-                val right = EitherT.left<NonEmptyList.F, Int, Int>(num)
+                val right = EitherT.left<NonEmptyListHK, Int, Int>(num)
                 val expected = NonEmptyList.of(true)
                 val result = right.cata({ true }, { false })
 
@@ -76,7 +76,7 @@ class EitherTTest : UnitSpec() {
 
         "semiFlatMap should map the right side of the inner either" {
             forAll { num: Int ->
-                val right: EitherT<NonEmptyList.F, Int, Int> = EitherT(NonEmptyList.of(Either.Right(num)))
+                val right: EitherT<NonEmptyListHK, Int, Int> = EitherT(NonEmptyList.of(Either.Right(num)))
                 val calculated = right.semiflatMap { NonEmptyList.of(it > 0) }
                 val expected = EitherT(NonEmptyList.of(Either.Right(num > 0)))
 
@@ -84,7 +84,7 @@ class EitherTTest : UnitSpec() {
             }
 
             forAll { num: Int ->
-                val left: EitherT<NonEmptyList.F, Int, Int> = EitherT(NonEmptyList.of(Either.Left(num)))
+                val left: EitherT<NonEmptyListHK, Int, Int> = EitherT(NonEmptyList.of(Either.Left(num)))
                 val calculated = left.semiflatMap { NonEmptyList.of(it > 0) }
                 val expected = EitherT(NonEmptyList.of(Either.Left(num)))
 
@@ -95,7 +95,7 @@ class EitherTTest : UnitSpec() {
 
         "subFlatMap should map the right side of the Either wrapped by EitherT" {
             forAll { num: Int ->
-                val right: EitherT<NonEmptyList.F, Int, Int> = EitherT(NonEmptyList.of(Either.Right(num)))
+                val right: EitherT<NonEmptyListHK, Int, Int> = EitherT(NonEmptyList.of(Either.Right(num)))
                 val calculated = right.subflatMap { Either.Right(it > 0) }
                 val expected = EitherT(NonEmptyList.of(Either.Right(num > 0)))
 
@@ -103,7 +103,7 @@ class EitherTTest : UnitSpec() {
             }
 
             forAll { num: Int ->
-                val left: EitherT<NonEmptyList.F, Int, Int> = EitherT(NonEmptyList.of(Either.Right(num)))
+                val left: EitherT<NonEmptyListHK, Int, Int> = EitherT(NonEmptyList.of(Either.Right(num)))
                 val calculated = left.subflatMap { Either.Left(num) }
                 val expected = EitherT(NonEmptyList.of(Either.Left(num)))
 
@@ -111,7 +111,7 @@ class EitherTTest : UnitSpec() {
             }
 
             forAll { num: Int ->
-                val left: EitherT<NonEmptyList.F, Int, Int> = EitherT(NonEmptyList.of(Either.Left(num)))
+                val left: EitherT<NonEmptyListHK, Int, Int> = EitherT(NonEmptyList.of(Either.Left(num)))
                 val calculated = left.subflatMap { Either.Right(num > 0) }
                 val expected = EitherT(NonEmptyList.of(Either.Left(num)))
 
@@ -119,7 +119,7 @@ class EitherTTest : UnitSpec() {
             }
 
             forAll { num: Int ->
-                val left: EitherT<NonEmptyList.F, Int, Int> = EitherT(NonEmptyList.of(Either.Left(num)))
+                val left: EitherT<NonEmptyListHK, Int, Int> = EitherT(NonEmptyList.of(Either.Left(num)))
                 val calculated = left.subflatMap { Either.Left(num + 1) }
                 val expected = EitherT(NonEmptyList.of(Either.Left(num)))
 
@@ -129,7 +129,7 @@ class EitherTTest : UnitSpec() {
 
         "exists evaluates a predicate on the right side and lifts it to the wrapped monad" {
             forAll { num: Int ->
-                val right: EitherT<NonEmptyList.F, Int, Int> = EitherT(NonEmptyList.of(Either.Right(num)))
+                val right: EitherT<NonEmptyListHK, Int, Int> = EitherT(NonEmptyList.of(Either.Right(num)))
                 val calculated = right.exists { it > 0 }.ev()
                 val expected = NonEmptyList.of(num > 0)
 
@@ -137,7 +137,7 @@ class EitherTTest : UnitSpec() {
             }
 
             forAll { num: Int ->
-                val left: EitherT<NonEmptyList.F, Int, Int> = EitherT(NonEmptyList.of(Either.Left(num)))
+                val left: EitherT<NonEmptyListHK, Int, Int> = EitherT(NonEmptyList.of(Either.Left(num)))
                 val calculated = left.exists { true }.ev()
                 val expected = NonEmptyList.of(false)
 
@@ -147,16 +147,16 @@ class EitherTTest : UnitSpec() {
 
         "to OptionT should transform to a correct OptionT" {
             forAll { a: String ->
-                val right: EitherT<NonEmptyList.F, String, String> = EitherT(NonEmptyList.of(Either.Right(a)))
-                val expected = OptionT.pure<NonEmptyList.F, String>(a)
+                val right: EitherT<NonEmptyListHK, String, String> = EitherT(NonEmptyList.of(Either.Right(a)))
+                val expected = OptionT.pure<NonEmptyListHK, String>(a)
                 val calculated = right.toOptionT()
 
                 expected == calculated
             }
 
             forAll { a: String ->
-                val left: EitherT<NonEmptyList.F, String, String> = EitherT(NonEmptyList.of(Either.Left(a)))
-                val expected = OptionT.none<NonEmptyList.F>()
+                val left: EitherT<NonEmptyListHK, String, String> = EitherT(NonEmptyList.of(Either.Left(a)))
+                val expected = OptionT.none<NonEmptyListHK>()
                 val calculated = left.toOptionT()
 
                 expected == calculated
@@ -165,7 +165,7 @@ class EitherTTest : UnitSpec() {
 
         "from option should build a correct EitherT" {
             forAll { a: String ->
-                EitherT.fromEither<NonEmptyList.F, Int, String>(Either.Right(a)) == EitherT.pure<NonEmptyList.F, Int, String>(a)
+                EitherT.fromEither<NonEmptyListHK, Int, String>(Either.Right(a)) == EitherT.pure<NonEmptyListHK, Int, String>(a)
             }
         }
 
@@ -234,7 +234,7 @@ class EitherTTest : UnitSpec() {
         }
 
         "EitherTMonad#binding should for comprehend over option" {
-            val M = EitherT.monad<NonEmptyList.F, Int>(NonEmptyList)
+            val M = EitherT.monad<NonEmptyListHK, Int>(NonEmptyList)
             val result = M.binding {
                 val x = !M.pure(1)
                 val y = M.pure(1).bind()
@@ -251,7 +251,7 @@ class EitherTTest : UnitSpec() {
         }
 
         "Cartesian builder works inside for comprehensions" {
-            val M = EitherT.monad<NonEmptyList.F, Int>(NonEmptyList)
+            val M = EitherT.monad<NonEmptyListHK, Int>(NonEmptyList)
             val result = M.binding {
                 val (x, y, z) = !M.tupled(M.pure(1), M.pure(1), M.pure(1))
                 val a = M.pure(1).bind()

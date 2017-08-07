@@ -104,7 +104,7 @@ class WriterTTest : UnitSpec() {
             forAll { a: Int ->
                 val right = WriterT(NonEmptyList.of(NonEmptyList.of(a) toT a))
                 val mapped = right.flatMap({ WriterT(NonEmptyList.of(NonEmptyList.of(a) toT it + 1)) }, NonEmptyList.semigroup<Int>()).value.ev()
-                val expected = WriterT.both<NonEmptyList.F, NonEmptyList<Int>, Int>(NonEmptyList.of(a, a), a + 1).value.ev()
+                val expected = WriterT.both<NonEmptyListHK, NonEmptyList<Int>, Int>(NonEmptyList.of(a, a), a + 1).value.ev()
 
                 mapped == expected
             }
@@ -164,7 +164,7 @@ class WriterTTest : UnitSpec() {
         "Cartesian builder should build products over option" {
             WriterT.monad(NonEmptyList, IntMonoid).map(WriterT.pure(1), WriterT.pure("a"), WriterT.pure(true), { (a, b, c) ->
                 "$a $b $c"
-            }) shouldBe WriterT.pure<NonEmptyList.F, Int, String>("1 a true")
+            }) shouldBe WriterT.pure<NonEmptyListHK, Int, String>("1 a true")
         }
 
         "Cartesian builder works inside for comprehensions" {
