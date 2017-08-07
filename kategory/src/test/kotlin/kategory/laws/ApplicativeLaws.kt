@@ -35,7 +35,7 @@ object ApplicativeLaws {
             })
 
     inline fun <reified F> cartesianBuilder(A: Applicative<F> = applicative<F>(), EQ: Eq<HK<F, Int>>): Unit =
-            forAll(genIntSmall(), genIntSmall(), { a: Int, b: Int ->
-                A.map2(A.pure(a), A.pure(b), { (x, y) -> x - y }).equalUnderTheLaw(A.pure(a - b), EQ)
+            forAll(genIntSmall(), genIntSmall(), genIntSmall(), genIntSmall(), genIntSmall(), genIntSmall(), { a: Int, b: Int, c: Int, d: Int, e: Int, f: Int ->
+                A.map(A.pure(a), A.pure(b), A.pure(c), A.pure(d), A.pure(e), A.pure(f), { (x, y, z, u, v, w) -> x + y + z - u - v - w }).equalUnderTheLaw(A.pure(a + b + c - d - e - f), EQ)
             })
 }
