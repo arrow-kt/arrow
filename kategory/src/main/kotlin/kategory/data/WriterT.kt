@@ -1,13 +1,8 @@
 package kategory
 
-typealias WriterTKind<F, W, A> = HK3<WriterT.F, F, W, A>
-typealias WriterF<F, W> = HK2<WriterT.F, F, W>
+typealias WriterF<F, W> = HK2<WriterTHK, F, W>
 
-fun <F, A, B> WriterTKind<F, A, B>.ev(): WriterT<F, A, B> =
-        this as WriterT<F, A, B>
-
-data class WriterT<F, W, A>(val MF: Monad<F>, val value: HK<F, Tuple2<W, A>>) : WriterTKind<F, W, A> {
-    class F private constructor()
+@higherkind data class WriterT<F, W, A>(val MF: Monad<F>, val value: HK<F, Tuple2<W, A>>) : WriterTKind<F, W, A> {
 
     companion object {
         inline fun <reified F, reified W, A> pure(a: A, MM: Monoid<W> = monoid(), MF: Monad<F> = kategory.monad()) =
