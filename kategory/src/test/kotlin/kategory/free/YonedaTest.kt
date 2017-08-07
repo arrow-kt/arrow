@@ -37,11 +37,11 @@ class YonedaTest : UnitSpec() {
             }
         }
 
-        "toCoYoneda should convert to an equivalent CoYoneda" {
+        "toCoyoneda should convert to an equivalent Coyoneda" {
             forAll { x: Int ->
                 val op = Yoneda.apply(Id(x.toString()))
-                val toYoneda = op.toCoYoneda().lower(Id).ev()
-                val expected = CoYoneda.apply(Id(x), Int::toString).lower(Id).ev()
+                val toYoneda = op.toCoyoneda().lower(Id).ev()
+                val expected = Coyoneda.apply(Id(x), Int::toString).lower(Id).ev()
 
                 expected == toYoneda
             }
