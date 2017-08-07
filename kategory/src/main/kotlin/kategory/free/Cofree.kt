@@ -1,16 +1,10 @@
 package kategory
 
-typealias CofreeKind<S, A> = HK2<Cofree.F, S, A>
-typealias CofreeF<S> = HK<Cofree.F, S>
+typealias CofreeF<S> = HK<CofreeHK, S>
 
 typealias CofreeEval<S, A> = HK<S, Cofree<S, A>>
 
-fun <S, A> CofreeKind<S, A>.ev(): Cofree<S, A> =
-        this as Cofree<S, A>
-
-data class Cofree<S, A>(val FS: Functor<S>, val head: A, val tail: Eval<CofreeEval<S, A>>) : CofreeKind<S, A> {
-
-    class F private constructor()
+@higherkind data class Cofree<S, A>(val FS: Functor<S>, val head: A, val tail: Eval<CofreeEval<S, A>>) : CofreeKind<S, A> {
 
     fun tailForced(): CofreeEval<S, A> =
             tail.value()
@@ -60,7 +54,7 @@ data class Cofree<S, A>(val FS: Functor<S>, val head: A, val tail: Eval<CofreeEv
 
 fun <F, A, B> Cofree<F, A>.cata(folder: (A, HK<F, B>) -> Eval<B>, TF: Traverse<F>): Eval<B> {
     val ev: Eval<HK<F, B>> = TF.traverse(this.tailForced(), { it.cata(folder, TF) }, Eval).ev()
-    return ev.flatMap { folder(this.ev().extract(), it) }
+    return ev.flatMap { folder(extract(), it) }
 }
 
 fun <F, M, A, B> Cofree<F, A>.cataM(folder: (A, HK<F, B>) -> HK<M, B>, inclusion: FunctionK<EvalHK, M>, TF: Traverse<F>, MM: Monad<M>): HK<M, B> {
