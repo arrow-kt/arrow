@@ -14,9 +14,9 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
-    compile "com.github.kategory.kategory-annotations:annotations:master"
-    kapt "com.github.kategory.kategory-annotations:compile-time:master"
-    compileOnly "com.github.kategory.kategory-annotations:compile-time:master"
+    compile "com.github.kategory.kategory-annotations:annotations:master-SNAPSHOT"
+    kapt "com.github.kategory.kategory-annotations:compile-time:master-SNAPSHOT"
+    compileOnly "com.github.kategory.kategory-annotations:compile-time:master-SNAPSHOT"
 
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
 }
@@ -28,5 +28,6 @@ targetCompatibility = javaVersion
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
 apply from: 'generated-kotlin-sources.gradle'
+apply plugin: 'kotlin-kapt'
 
 compileKotlin.kotlinOptions.freeCompilerArgs += ["-Xskip-runtime-version-check"]

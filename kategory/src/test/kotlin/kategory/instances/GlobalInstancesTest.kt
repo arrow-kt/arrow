@@ -24,7 +24,7 @@ class GlobalInstancesTest : UnitSpec() {
         }
 
         "Option monad inference" {
-            testTypeclassHierarchyInference<Option.F>(Option)
+            testTypeclassHierarchyInference<OptionHK>(Option)
         }
     }
 }

@@ -1,7 +1,7 @@
 package kategory
 
-val cofreeOptionToNel: FunctionK<CofreeF<Option.F>, NonEmptyList.F> = object : FunctionK<CofreeF<Option.F>, NonEmptyList.F> {
-    override fun <A> invoke(fa: HK<CofreeF<Option.F>, A>): HK<NonEmptyList.F, A> =
+val cofreeOptionToNel: FunctionK<CofreeF<OptionHK>, NonEmptyList.F> = object : FunctionK<CofreeF<OptionHK>, NonEmptyList.F> {
+    override fun <A> invoke(fa: HK<CofreeF<OptionHK>, A>): HK<NonEmptyList.F, A> =
             fa.ev().let { c ->
                 NonEmptyList.fromListUnsafe(listOf(c.head) + c.tailForced().ev().fold({ listOf<A>() }, { invoke(it).ev().all }))
             }
@@ -19,12 +19,12 @@ val cofreeListToNel: FunctionK<CofreeF<ListT.ListF>, NonEmptyList.F> = object : 
 
 fun <A> HK<ListT.ListF, A>.lev() = this as ListT<A>
 
-val optionToList: FunctionK<Option.F, ListT.ListF> = object : FunctionK<Option.F, ListT.ListF> {
-    override fun <A> invoke(fa: HK<Option.F, A>): HK<ListT.ListF, A> =
+val optionToList: FunctionK<OptionHK, ListT.ListF> = object : FunctionK<OptionHK, ListT.ListF> {
+    override fun <A> invoke(fa: HK<OptionHK, A>): HK<ListT.ListF, A> =
             fa.ev().fold({ ListT(listOf()) }, { ListT(listOf(it)) })
 }
 
-val optionInterpreter: FunctionK<Ops.F, Option.F> = object : FunctionK<Ops.F, Option.F> {
+val optionInterpreter: FunctionK<Ops.F, OptionHK> = object : FunctionK<Ops.F, OptionHK> {
     override fun <A> invoke(fa: HK<Ops.F, A>): Option<A> {
         val op = fa.ev()
         return when (op) {
@@ -34,7 +34,7 @@ val optionInterpreter: FunctionK<Ops.F, Option.F> = object : FunctionK<Ops.F, Op
         } as Option<A>
     }
 }
-val optionApInterpreter: FunctionK<OpsAp.F, Option.F> = object : FunctionK<OpsAp.F, Option.F> {
+val optionApInterpreter: FunctionK<OpsAp.F, OptionHK> = object : FunctionK<OpsAp.F, OptionHK> {
     override fun <A> invoke(fa: HK<OpsAp.F, A>): Option<A> {
         val op = fa.ev()
         return when (op) {

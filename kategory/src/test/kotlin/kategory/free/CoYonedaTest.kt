@@ -52,7 +52,7 @@ class CoYonedaTest : UnitSpec() {
         "map should be stack-safe" {
             val loops = 5000
 
-            fun loop(n: Int, acc: CoYoneda<Option.F, Int, Int>): CoYoneda<Option.F, Int, Int> =
+            fun loop(n: Int, acc: CoYoneda<OptionHK, Int, Int>): CoYoneda<OptionHK, Int, Int> =
                     if (n <= 0) acc
                     else loop(n - 1, acc.map { it + 1 })
 

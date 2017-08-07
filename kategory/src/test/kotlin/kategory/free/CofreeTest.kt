@@ -42,7 +42,7 @@ class CofreeTest : UnitSpec() {
 
         "run should fold until completion" {
             val sideEffect = SideEffect()
-            val start: Cofree<Option.F, Int> = unfold(sideEffect.counter, {
+            val start: Cofree<OptionHK, Int> = unfold(sideEffect.counter, {
                 sideEffect.increment()
                 if (it == 5) None else Some(it + 1)
             })
@@ -56,7 +56,7 @@ class CofreeTest : UnitSpec() {
             try {
                 val limit = 10000
                 val counter = SideEffect()
-                val startThousands: Cofree<Option.F, Int> = unfold(counter.counter, {
+                val startThousands: Cofree<OptionHK, Int> = unfold(counter.counter, {
                     counter.increment()
                     if (it == limit) None else Some(it + 1)
                 })
@@ -77,11 +77,11 @@ class CofreeTest : UnitSpec() {
             counter.counter shouldBe 1
         }
 
-        val startHundred: Cofree<Option.F, Int> = unfold(0, { if (it == 100) None else Some(it + 1) }, Option)
+        val startHundred: Cofree<OptionHK, Int> = unfold(0, { if (it == 100) None else Some(it + 1) }, Option)
 
         "mapBranchingRoot should modify the value of the functor" {
-            val mapped = startHundred.mapBranchingRoot(object : FunctionK<Option.F, Option.F> {
-                override fun <A> invoke(fa: HK<Option.F, A>): HK<Option.F, A> =
+            val mapped = startHundred.mapBranchingRoot(object : FunctionK<OptionHK, OptionHK> {
+                override fun <A> invoke(fa: HK<OptionHK, A>): HK<OptionHK, A> =
                         None
             })
             val expected = NonEmptyList.of(0)
@@ -97,7 +97,7 @@ class CofreeTest : UnitSpec() {
         }
 
         "cata should traverse the structure" {
-            val cata: NonEmptyList<Int> = startHundred.cata<Option.F, Int, NonEmptyList<Int>>(
+            val cata: NonEmptyList<Int> = startHundred.cata<OptionHK, Int, NonEmptyList<Int>>(
                     { i, lb -> Eval.now(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) },
                     Option
             ).value()
@@ -107,11 +107,11 @@ class CofreeTest : UnitSpec() {
             cata shouldBe expected
         }
 
-        val startTwoThousand: Cofree<Option.F, Int> = unfold(0, { if (it == 2000) None else Some(it + 1) }, Option)
+        val startTwoThousand: Cofree<OptionHK, Int> = unfold(0, { if (it == 2000) None else Some(it + 1) }, Option)
 
         "cata with an stack-unsafe monad should blow up the stack" {
             try {
-                startTwoThousand.cata<Option.F, Int, NonEmptyList<Int>>(
+                startTwoThousand.cata<OptionHK, Int, NonEmptyList<Int>>(
                         { i, lb -> Eval.now(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) },
                         Option
                 ).value()
@@ -122,7 +122,7 @@ class CofreeTest : UnitSpec() {
         }
 
         "cataM should traverse the structure in a stack-safe way on a monad" {
-            val folder: (Int, HK<Option.F, NonEmptyList<Int>>) -> EvalOption<NonEmptyList<Int>> = {
+            val folder: (Int, HK<OptionHK, NonEmptyList<Int>>) -> EvalOption<NonEmptyList<Int>> = {
                 i, lb ->
                 if (i <= 2000) OptionT.pure(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) else OptionT.none()
             }
@@ -142,7 +142,7 @@ class CofreeTest : UnitSpec() {
             val offset = 0
             val limit = 10
             val loops = SideEffect()
-            val program = Cofree.comonad<Option.F>().cobinding {
+            val program = Cofree.comonad<OptionHK>().cobinding {
                 val program = unfold(offset, {
                     loops.increment()
                     if (it == limit) None else Some(it + 1)
