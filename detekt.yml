@@ -74,6 +74,12 @@ formatting:
   OptionalUnit:
     active: true
     autoCorrect: false
+  ExpressionBodySyntax:
+    active: true
+    autoCorrect: true
+  ExpressionBodySyntaxLineBreaks:
+      active: false
+      autoCorrect: false
 
 style:
   active: true
