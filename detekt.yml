@@ -84,8 +84,8 @@ formatting:
     active: true
     autoCorrect: true
   ExpressionBodySyntaxLineBreaks:
-      active: false
-      autoCorrect: false
+      active: true
+      autoCorrect: true
 
 style:
   active: true
@@ -95,7 +95,7 @@ style:
     active: false
   MaxLineLength:
     active: true
-    maxLineLength: 150
+    maxLineLength: 160
 
 comments:
   active: true
