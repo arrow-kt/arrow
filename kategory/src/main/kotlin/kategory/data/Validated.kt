@@ -15,23 +15,19 @@ sealed class Validated<out E, out A> : ValidatedKind<E, A> {
 
     companion object {
 
-        @JvmStatic fun <E, A> invalidNel(e: E): ValidatedNel<E, A> =
-                Validated.Invalid(NonEmptyList(e, listOf()))
+        @JvmStatic fun <E, A> invalidNel(e: E): ValidatedNel<E, A> = Validated.Invalid(NonEmptyList(e, listOf()))
 
-        @JvmStatic fun <E, A> validNel(a: A): ValidatedNel<E, A> =
-                Validated.Valid(a)
+        @JvmStatic fun <E, A> validNel(a: A): ValidatedNel<E, A> = Validated.Valid(a)
 
         /**
          * Converts a `Try<A>` to a `Validated<Throwable, A>`.
          */
-        @JvmStatic fun <A> fromTry(t: Try<A>): Validated<Throwable, A> =
-                t.fold({ Invalid(it) }, { Valid(it) })
+        @JvmStatic fun <A> fromTry(t: Try<A>): Validated<Throwable, A> = t.fold({ Invalid(it) }, { Valid(it) })
 
         /**
          * Converts an `Either<A, B>` to an `Validated<A, B>`.
          */
-        @JvmStatic fun <E, A> fromEither(e: Either<E, A>): Validated<E, A> =
-                e.fold({ Invalid(it) }, { Valid(it) })
+        @JvmStatic fun <E, A> fromEither(e: Either<E, A>): Validated<E, A> = e.fold({ Invalid(it) }, { Valid(it) })
 
         /**
          * Converts an `Option<B>` to an `Validated<A, B>`, where the provided `ifNone` values is returned on
@@ -79,27 +75,23 @@ sealed class Validated<out E, out A> : ValidatedKind<E, A> {
     /**
      * Is this Valid and matching the given predicate
      */
-    fun exist(predicate: (A) -> Boolean): Boolean =
-            fold({ false }, { predicate(it) })
+    fun exist(predicate: (A) -> Boolean): Boolean = fold({ false }, { predicate(it) })
 
     /**
      * Converts the value to an Either<E, A>
      */
-    fun toEither(): Either<E, A> =
-            fold({ Either.Left(it) }, { Either.Right(it) })
+    fun toEither(): Either<E, A> = fold({ Either.Left(it) }, { Either.Right(it) })
 
     /**
      * Returns Valid values wrapped in Some, and None for Invalid values
      */
-    fun toOption(): Option<A> =
-            fold({ Option.None }, { Option.Some(it) })
+    fun toOption(): Option<A> = fold({ Option.None }, { Option.Some(it) })
 
     /**
      * Convert this value to a single element List if it is Valid,
      * otherwise return an empty List
      */
-    fun toList(): List<A> =
-            fold({ listOf() }, { listOf(it) })
+    fun toList(): List<A> = fold({ listOf() }, { listOf(it) })
 
     /** Lift the Invalid value into a NonEmptyList. */
     fun toValidatedNel(): ValidatedNel<E, A> =
@@ -112,51 +104,43 @@ sealed class Validated<out E, out A> : ValidatedKind<E, A> {
      * Convert to an Either, apply a function, convert back. This is handy
      * when you want to use the Monadic properties of the Either type.
      */
-    fun <EE, B> withEither(f: (Either<E, A>) -> Either<EE, B>): Validated<EE, B> =
-            Validated.fromEither(f(toEither()))
+    fun <EE, B> withEither(f: (Either<E, A>) -> Either<EE, B>): Validated<EE, B> = Validated.fromEither(f(toEither()))
 
     /**
      * Validated is a [[functor.Bifunctor]], this method applies one of the
      * given functions.
      */
-    fun <EE, AA> bimap(fe: (E) -> EE, fa: (A) -> AA): Validated<EE, AA> =
-            fold({ Invalid(fe(it)) }, { Valid(fa(it)) })
+    fun <EE, AA> bimap(fe: (E) -> EE, fa: (A) -> AA): Validated<EE, AA> = fold({ Invalid(fe(it)) }, { Valid(fa(it)) })
 
     /**
      * Apply a function to a Valid value, returning a new Valid value
      */
-    fun <B> map(f: (A) -> B): Validated<E, B> =
-            bimap({ it }, { f(it) })
+    fun <B> map(f: (A) -> B): Validated<E, B> = bimap({ it }, { f(it) })
 
     /**
      * Apply a function to an Invalid value, returning a new Invalid value.
      * Or, if the original valid was Valid, return it.
      */
-    fun <EE> leftMap(f: (E) -> EE): Validated<EE, A> =
-            bimap({ f(it) }, { it })
+    fun <EE> leftMap(f: (E) -> EE): Validated<EE, A> = bimap({ f(it) }, { it })
 
     /**
      * apply the given function to the value with the given B when
      * valid, otherwise return the given B
      */
-    fun <B> foldLeft(b: B, f: (B, A) -> B): B =
-            fold({ b }, { f(b, it) })
+    fun <B> foldLeft(b: B, f: (B, A) -> B): B = fold({ b }, { f(b, it) })
 
-    fun swap(): Validated<A, E> =
-            fold({ Valid(it) }, { Invalid(it) })
+    fun swap(): Validated<A, E> = fold({ Valid(it) }, { Invalid(it) })
 }
 
 /**
  * Return the Valid value, or the default if Invalid
  */
-fun <E, B> Validated<E, B>.getOrElse(default: () -> B): B =
-        fold({ default() }, { it })
+fun <E, B> Validated<E, B>.getOrElse(default: () -> B): B = fold({ default() }, { it })
 
 /**
  * Return the Valid value, or the result of f if Invalid
  */
-fun <E, B> Validated<E, B>.valueOr(f: (E) -> B): B =
-        fold({ f(it) }, { it })
+fun <E, B> Validated<E, B>.valueOr(f: (E) -> B): B = fold({ f(it) }, { it })
 
 /**
  * If `this` is valid return `this`, otherwise if `that` is valid return `that`, otherwise combine the failures.
@@ -199,14 +183,10 @@ fun <E, A, B> Validated<E, A>.ap(f: Validated<E, (A) -> B>, SE: Semigroup<E>): V
             }
         }
 
-fun <E, A> A.valid(): Validated<E, A> =
-        Validated.Valid(this)
+fun <E, A> A.valid(): Validated<E, A> = Validated.Valid(this)
 
-fun <E, A> E.invalid(): Validated<E, A> =
-        Validated.Invalid(this)
+fun <E, A> E.invalid(): Validated<E, A> = Validated.Invalid(this)
 
-fun <E, A> A.validNel(): ValidatedNel<E, A> =
-        Validated.validNel(this)
+fun <E, A> A.validNel(): ValidatedNel<E, A> = Validated.validNel(this)
 
-fun <E, A> E.invalidNel(): ValidatedNel<E, A> =
-        Validated.invalidNel(this)
+fun <E, A> E.invalidNel(): ValidatedNel<E, A> = Validated.invalidNel(this)

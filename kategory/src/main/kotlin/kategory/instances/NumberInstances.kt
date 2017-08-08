@@ -1,8 +1,7 @@
 package kategory
 
 class NumberSemigroup<A : Number>(val f: (A, A) -> A) : Semigroup<A> {
-    override fun combine(a: A, b: A): A =
-            f(a, b)
+    override fun combine(a: A, b: A): A = f(a, b)
 }
 
 object ByteMonoid : Monoid<Byte>, Semigroup<Byte> by SGByte, GlobalInstance<Monoid<Byte>>() {

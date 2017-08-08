@@ -2,8 +2,7 @@ package kategory
 
 typealias NonEmptyListKind<A> = HK<NonEmptyList.F, A>
 
-fun <A> NonEmptyListKind<A>.ev(): NonEmptyList<A> =
-        this as NonEmptyList<A>
+fun <A> NonEmptyListKind<A>.ev(): NonEmptyList<A> = this as NonEmptyList<A>
 
 /**
  * A List that can not be empty
@@ -20,28 +19,21 @@ class NonEmptyList<out A> private constructor(
 
     val size: Int = all.size
 
-    fun contains(element: @UnsafeVariance A): Boolean =
-            (head == element).or(tail.contains(element))
+    fun contains(element: @UnsafeVariance A): Boolean = (head == element).or(tail.contains(element))
 
-    fun containsAll(elements: Collection<@UnsafeVariance A>): Boolean =
-            elements.all { contains(it) }
+    fun containsAll(elements: Collection<@UnsafeVariance A>): Boolean = elements.all { contains(it) }
 
     fun isEmpty(): Boolean = false
 
-    fun <B> map(f: (A) -> B): NonEmptyList<B> =
-            NonEmptyList(f(head), tail.map(f))
+    fun <B> map(f: (A) -> B): NonEmptyList<B> = NonEmptyList(f(head), tail.map(f))
 
-    fun <B> flatMap(f: (A) -> NonEmptyList<B>): NonEmptyList<B> =
-            f(head) + tail.flatMap { f(it).all }
+    fun <B> flatMap(f: (A) -> NonEmptyList<B>): NonEmptyList<B> = f(head) + tail.flatMap { f(it).all }
 
-    operator fun plus(l: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> =
-            NonEmptyList(all + l.all)
+    operator fun plus(l: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> = NonEmptyList(all + l.all)
 
-    operator fun plus(l: List<@UnsafeVariance A>): NonEmptyList<A> =
-            NonEmptyList(all + l)
+    operator fun plus(l: List<@UnsafeVariance A>): NonEmptyList<A> = NonEmptyList(all + l)
 
-    operator fun plus(a: @UnsafeVariance A): NonEmptyList<A> =
-            NonEmptyList(all + a)
+    operator fun plus(a: @UnsafeVariance A): NonEmptyList<A> = NonEmptyList(all + a)
 
     fun iterator(): Iterator<A> = all.iterator()
 
@@ -77,5 +69,4 @@ class NonEmptyList<out A> private constructor(
     }
 }
 
-fun <A> A.nel(): NonEmptyList<A> =
-        NonEmptyList.of(this)
+fun <A> A.nel(): NonEmptyList<A> = NonEmptyList.of(this)

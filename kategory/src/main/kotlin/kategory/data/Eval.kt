@@ -1,7 +1,6 @@
 package kategory
 
-fun <A> HK<Eval.F, A>.ev(): Eval<A> =
-        this as Eval<A>
+fun <A> HK<Eval.F, A>.ev(): Eval<A> = this as Eval<A>
 
 /**
  * Eval is a monad which controls evaluation of a value or a computation that produces a value.
@@ -37,8 +36,7 @@ sealed class Eval<out A> : HK<Eval.F, A> {
 
     abstract fun memoize(): Eval<A>
 
-    fun <B> map(f: (A) -> B): Eval<B> =
-            flatMap { a -> Now(f(a)) }
+    fun <B> map(f: (A) -> B): Eval<B> = flatMap { a -> Now(f(a)) }
 
     fun <B> flatMap(f: (A) -> Eval<B>): Eval<B> =
             when (this) {
@@ -156,8 +154,7 @@ sealed class Eval<out A> : HK<Eval.F, A> {
 
         abstract fun <S> run(s: S): Eval<A>
 
-        override fun memoize(): Eval<A> =
-                Later { value() }
+        override fun memoize(): Eval<A> = Later { value() }
 
         override fun value(): A {
             var curr: Eval<A> = this

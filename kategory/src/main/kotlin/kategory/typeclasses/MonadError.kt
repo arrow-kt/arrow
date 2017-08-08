@@ -17,8 +17,7 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F>, Typeclass {
 inline fun <reified F, A, reified E> HK<F, A>.ensure(
         FT: MonadError<F, E> = monadError(),
         noinline error: () -> E,
-        noinline predicate: (A) -> Boolean): HK<F, A> =
-        FT.ensure(this, error, predicate)
+        noinline predicate: (A) -> Boolean): HK<F, A> = FT.ensure(this, error, predicate)
 
 @RestrictsSuspension
 class MonadErrorContinuation<F, A>(val ME: MonadError<F, Throwable>) : Serializable, MonadContinuation<F, A>(ME) {
@@ -43,5 +42,4 @@ fun <F, B> MonadError<F, Throwable>.bindingE(c: suspend MonadErrorContinuation<F
     return continuation.returnedMonad
 }
 
-inline fun <reified F, reified E> monadError(): MonadError<F, E> =
-        instance(InstanceParametrizedType(MonadError::class.java, listOf(F::class.java, E::class.java)))
+inline fun <reified F, reified E> monadError(): MonadError<F, E> = instance(InstanceParametrizedType(MonadError::class.java, listOf(F::class.java, E::class.java)))
