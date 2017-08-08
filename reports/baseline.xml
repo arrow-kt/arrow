@@ -1,12 +1,13 @@
 <?xml version="1.0" ?>
 <SmellBaseline>
   <Blacklist timestamp="1490879306930"></Blacklist>
-  <Whitelist timestamp="1502158266953">
+  <Whitelist timestamp="1502159270801">
     <ID>ComplexMethod:AndThen.kt$AndThen$ @Suppress("UNCHECKED_CAST") internal fun runLoop(_success: A?, _failure: Throwable?, _isSuccess: Boolean): B</ID>
     <ID>EmptyClassBlock:Typeclass.kt$&lt;no name provided&gt; : TypeLiteral</ID>
     <ID>OptionalUnit:AndThen.kt$AndThen$Unit</ID>
     <ID>OptionalUnit:IO.kt$IO$Unit</ID>
     <ID>OptionalUnit:FreeApplicative.kt$FreeApplicative$Unit</ID>
+    <ID>OptionalUnit:Typeclass.kt$GlobalInstance$Unit</ID>
     <ID>UnsafeCallOnNullableType:AndThen.kt$AndThen$failure!!</ID>
     <ID>LateinitUsage:Comonad.kt$ComonadContinuation$internal lateinit var returnedMonad: A</ID>
     <ID>LateinitUsage:Monad.kt$MonadContinuation$internal lateinit var returnedMonad: HK&lt;F, A&gt;</ID>

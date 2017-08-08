@@ -2,7 +2,7 @@ package kategory
 
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
-import java.util.Arrays
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -79,7 +79,7 @@ open class GlobalInstance<T : Typeclass> : TypeLiteral<T>() {
     /**
      * Recursively scan all implemented interfaces and add as global instances all the ones that match a Typeclass
      */
-    fun recurseInterfaces(c: Class<*>) = when {
+    fun recurseInterfaces(c: Class<*>): Unit = when {
             c.interfaces.isEmpty() -> Unit
             else -> {
                 c.interfaces.filter {
