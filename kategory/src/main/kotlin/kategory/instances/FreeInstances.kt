@@ -14,14 +14,12 @@ interface FreeInstances<S> :
     override fun <A, B> flatMap(fa: FreeKind<S, A>, f: (A) -> FreeKind<S, B>): Free<S, B> =
             fa.ev().flatMap { f(it).ev() }
 
-    override fun <A, B> tailRecM(a: A, f: (A) -> FreeKind<S, Either<A, B>>): Free<S, B> {
-        return f(a).ev().flatMap {
+    override fun <A, B> tailRecM(a: A, f: (A) -> FreeKind<S, Either<A, B>>): Free<S, B> = f(a).ev().flatMap {
             when (it) {
                 is Either.Left -> tailRecM(it.a, f)
                 is Either.Right -> pure(it.b)
             }
         }
-    }
 }
 
 data class FreeEq<in F, in G, in A>(private val interpreter: FunctionK<F, G>, private val MG: Monad<G>) : Eq<HK<FreeF<F>, A>> {

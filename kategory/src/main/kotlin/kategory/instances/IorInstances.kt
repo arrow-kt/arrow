@@ -15,8 +15,7 @@ interface IorInstances<L> :
     override fun <A, B> map(fa: IorKind<L, A>, f: (A) -> B): Ior<L, B> =
             fa.ev().map(f)
 
-    private tailrec fun <A, B> loop(v: Ior<L, Either<A, B>>, f: (A) -> IorKind<L, Either<A, B>>): Ior<L, B> {
-        return when (v) {
+    private tailrec fun <A, B> loop(v: Ior<L, Either<A, B>>, f: (A) -> IorKind<L, Either<A, B>>): Ior<L, B> = when (v) {
             is Ior.Left -> Ior.Left(v.value)
             is Ior.Right -> when (v.value) {
                 is Either.Right -> Ior.Right(v.value.b)
@@ -34,11 +33,8 @@ interface IorInstances<L> :
                 }
             }
         }
-    }
 
-    override fun <A, B> tailRecM(a: A, f: (A) -> IorKind<L, Either<A, B>>): Ior<L, B> {
-        return loop(f(a).ev(), f)
-    }
+    override fun <A, B> tailRecM(a: A, f: (A) -> IorKind<L, Either<A, B>>): Ior<L, B> = loop(f(a).ev(), f)
 }
 
 interface IorTraverse<A> :

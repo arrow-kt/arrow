@@ -59,15 +59,11 @@ class InstanceParametrizedType(val raw: Type, val typeArgs: List<Type>) : Parame
             return false
     }
 
-    override fun hashCode(): Int {
-        return Arrays.hashCode(actualTypeArguments) xor
+    override fun hashCode(): Int = Arrays.hashCode(actualTypeArguments) xor
                 hashCode(ownerType) xor
                 hashCode(rawType)
-    }
 
-    fun hashCode(o: Any?): Int {
-        return o?.hashCode() ?: 0
-    }
+    fun hashCode(o: Any?): Int = o?.hashCode() ?: 0
 
 }
 
@@ -83,8 +79,7 @@ open class GlobalInstance<T : Typeclass> : TypeLiteral<T>() {
     /**
      * Recursively scan all implemented interfaces and add as global instances all the ones that match a Typeclass
      */
-    fun recurseInterfaces(c: Class<*>) {
-        return when {
+    fun recurseInterfaces(c: Class<*>) = when {
             c.interfaces.isEmpty() -> Unit
             else -> {
                 c.interfaces.filter {
@@ -96,7 +91,6 @@ open class GlobalInstance<T : Typeclass> : TypeLiteral<T>() {
                 }
             }
         }
-    }
 
 }
 

@@ -56,13 +56,9 @@ class NonEmptyList<out A> private constructor(
         return true
     }
 
-    override fun hashCode(): Int {
-        return all.hashCode()
-    }
+    override fun hashCode(): Int = all.hashCode()
 
-    override fun toString(): String {
-        return "NonEmptyList(all=$all)"
-    }
+    override fun toString(): String = "NonEmptyList(all=$all)"
 
     companion object : NonEmptyListInstances, GlobalInstance<Bimonad<NonEmptyList.F>>() {
         @JvmStatic fun <A> of(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
