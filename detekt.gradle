@@ -14,9 +14,10 @@ repositories {
         def input = "$project.projectDir.absolutePath"
         def config = "$project.projectDir/detekt.yml"
         def reports = "$project.projectDir.absolutePath/reports/report.detekt"
+        def baseline = "$project.projectDir.absolutePath/reports/baseline.xml"
         def filters = ".*test.*"
         def rulesets = ""
-        def params = ['-p', input, '-c', config, '-f', filters, '-r', rulesets, '-o', reports]
+        def params = ['-p', input, '-c', config, '-f', filters, '-r', rulesets, '-o', reports, '-b', baseline]
         args(params)
     }
 
