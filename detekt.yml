@@ -9,7 +9,7 @@ potential-bugs:
   NoElseInWhenExpression:
     active: false
   UnsafeCast:
-    active: false
+    active: true
 
 exceptions:
   active: true
@@ -32,7 +32,7 @@ complexity:
   TooManyFunctions:
     active: false
   LabeledExpression:
-    active: false
+    active: true
 
 code-smell:
   active: true
