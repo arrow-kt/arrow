@@ -12,14 +12,11 @@ internal sealed class AndThen<in A, out B> : (A) -> B {
     internal data class ErrorHandler<in A, out B>(val fa: (A) -> B, val fe: (Throwable) -> B) : AndThen<A, B>()
     internal data class Concat<in A, E, out B>(val left: AndThen<A, E>, val right: AndThen<E, B>) : AndThen<A, B>()
 
-    fun <C> andThen(g: AndThen<B, C>): AndThen<A, C> =
-            Concat(this, g)
+    fun <C> andThen(g: AndThen<B, C>): AndThen<A, C> = Concat(this, g)
 
-    fun <C> compose(g: AndThen<C, A>): AndThen<C, B> =
-            Concat(g, this)
+    fun <C> compose(g: AndThen<C, A>): AndThen<C, B> = Concat(g, this)
 
-    override operator fun invoke(a: A): B =
-            runLoop(a, null, true)
+    override operator fun invoke(a: A): B = runLoop(a, null, true)
 
     /**
      * Abandon all hope
@@ -121,11 +118,9 @@ internal sealed class AndThen<in A, out B> : (A) -> B {
     }
 
     companion object {
-        operator fun <A, B> invoke(f: (A) -> B): AndThen<A, B> =
-                Single(f)
+        operator fun <A, B> invoke(f: (A) -> B): AndThen<A, B> = Single(f)
 
-        operator fun <A, B> invoke(fa: (A) -> B, fb: (Throwable) -> B): AndThen<A, B> =
-                ErrorHandler(fa, fb)
+        operator fun <A, B> invoke(fa: (A) -> B, fb: (Throwable) -> B): AndThen<A, B> = ErrorHandler(fa, fb)
     }
 }
 

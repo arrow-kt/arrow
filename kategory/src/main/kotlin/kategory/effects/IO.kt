@@ -29,11 +29,9 @@ sealed class IO<out A> : HK<IO.F, A> {
 
     abstract fun attempt(): IO<Either<Throwable, A>>
 
-    fun runAsync(cb: (Either<Throwable, A>) -> IO<Unit>): IO<Unit> =
-            IO { unsafeRunAsync(cb.andThen { it.unsafeRunAsync { } }) }
+    fun runAsync(cb: (Either<Throwable, A>) -> IO<Unit>): IO<Unit> = IO { unsafeRunAsync(cb.andThen { it.unsafeRunAsync { } }) }
 
-    fun unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
-            unsafeStep().unsafeRunAsyncTotal(cb)
+    fun unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit = unsafeStep().unsafeRunAsyncTotal(cb)
 
     abstract fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit)
 
@@ -55,26 +53,20 @@ sealed class IO<out A> : HK<IO.F, A> {
         }
     }
 
-    fun unsafeRunSync(): A =
-            unsafeRunTimed(Duration.INFINITE).fold({ throw IllegalArgumentException("IO execution should yield a valid result") }, { it })
+    fun unsafeRunSync(): A = unsafeRunTimed(Duration.INFINITE).fold({ throw IllegalArgumentException("IO execution should yield a valid result") }, { it })
 
-    fun unsafeRunTimed(limit: Duration): Option<A> =
-            unsafeStep().unsafeRunTimedTotal(limit)
+    fun unsafeRunTimed(limit: Duration): Option<A> = unsafeStep().unsafeRunTimedTotal(limit)
 
     abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
 
     companion object : IOInstances, GlobalInstance<Monad<IO.F>>() {
-        internal fun <A, B> mapDefault(t: IO<A>, f: (A) -> B): IO<B> =
-                t.flatMap(f.andThen { Pure(it) })
+        internal fun <A, B> mapDefault(t: IO<A>, f: (A) -> B): IO<B> = t.flatMap(f.andThen { Pure(it) })
 
-        internal fun <A> attemptValue(): AndThen<A, IO<Either<Throwable, A>>> =
-                AndThen({ a: A -> Pure(Either.Right(a)) }, { e -> Pure(Either.Left(e)) })
+        internal fun <A> attemptValue(): AndThen<A, IO<Either<Throwable, A>>> = AndThen({ a: A -> Pure(Either.Right(a)) }, { e -> Pure(Either.Left(e)) })
 
-        operator fun <A> invoke(f: (Unit) -> A): IO<A> =
-                suspend { Pure(f(Unit)) }
+        operator fun <A> invoke(f: (Unit) -> A): IO<A> = suspend { Pure(f(Unit)) }
 
-        override fun <A> pure(a: A): IO<A> =
-                Pure(a)
+        override fun <A> pure(a: A): IO<A> = Pure(a)
 
         fun <A> suspend(f: (Unit) -> IO<A>): IO<A> =
                 Suspend(AndThen { _ ->
@@ -85,8 +77,7 @@ sealed class IO<out A> : HK<IO.F, A> {
                     }
                 })
 
-        fun <A> raiseError(throwable: Throwable): IO<A> =
-                RaiseError(throwable)
+        fun <A> raiseError(throwable: Throwable): IO<A> = RaiseError(throwable)
 
         fun <A> async(k: ((Either<Throwable, A>) -> Unit) -> Unit): IO<A> =
                 Async { callBack ->
@@ -125,8 +116,7 @@ sealed class IO<out A> : HK<IO.F, A> {
 }
 
 internal data class Pure<out A>(val a: A) : IO<A>() {
-    override fun <B> flatMapTotal(f: AndThen<A, IO<B>>): IO<B> =
-            Suspend(AndThen({ _: Unit -> a }.andThen(f)))
+    override fun <B> flatMapTotal(f: AndThen<A, IO<B>>): IO<B> = Suspend(AndThen({ _: Unit -> a }.andThen(f)))
 
     override fun <B> map(f: (A) -> B): IO<B> =
             try {
@@ -135,93 +125,67 @@ internal data class Pure<out A>(val a: A) : IO<A>() {
                 RaiseError(exception)
             }
 
-    override fun attempt(): IO<Either<Throwable, A>> =
-            Pure(Either.Right(a))
+    override fun attempt(): IO<Either<Throwable, A>> = Pure(Either.Right(a))
 
-    override fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit) =
-            cb(Either.Right(a))
+    override fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit) = cb(Either.Right(a))
 
-    override fun unsafeRunTimedTotal(limit: Duration): Option<A> =
-            Option.Some(a)
+    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = Option.Some(a)
 }
 
 internal data class RaiseError<out A>(val exception: Throwable) : IO<A>() {
-    override fun <B> map(f: (A) -> B): IO<B> =
-            RaiseError(exception)
+    override fun <B> map(f: (A) -> B): IO<B> = RaiseError(exception)
 
-    override fun <B> flatMapTotal(f: AndThen<A, IO<B>>): IO<B> =
-            Suspend(AndThen { f.error(exception, { RaiseError(it) }) })
+    override fun <B> flatMapTotal(f: AndThen<A, IO<B>>): IO<B> = Suspend(AndThen { f.error(exception, { RaiseError(it) }) })
 
-    override fun attempt(): IO<Either<Throwable, A>> =
-            Pure(Either.Left(exception))
+    override fun attempt(): IO<Either<Throwable, A>> = Pure(Either.Left(exception))
 
-    override fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit) =
-            cb(Either.Left(exception))
+    override fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit) = cb(Either.Left(exception))
 
-    override fun unsafeRunTimedTotal(limit: Duration): Option<A> =
-            throw exception
+    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw exception
 }
 
 internal data class Suspend<out A>(val cont: AndThen<Unit, IO<A>>) : IO<A>() {
-    override fun <B> map(f: (A) -> B): IO<B> =
-            mapDefault(this, f)
+    override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
 
-    override fun <B> flatMapTotal(f: AndThen<A, IO<B>>): IO<B> =
-            BindSuspend(cont, f)
+    override fun <B> flatMapTotal(f: AndThen<A, IO<B>>): IO<B> = BindSuspend(cont, f)
 
-    override fun attempt(): IO<Either<Throwable, A>> =
-            BindSuspend(cont, attemptValue())
+    override fun attempt(): IO<Either<Throwable, A>> = BindSuspend(cont, attemptValue())
 
-    override fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit) =
-            throw AssertionError("Unreachable")
+    override fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit) = throw AssertionError("Unreachable")
 
-    override fun unsafeRunTimedTotal(limit: Duration): Option<A> =
-            throw AssertionError("Unreachable")
+    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
 }
 
 internal data class BindSuspend<E, out A>(val cont: AndThen<Unit, IO<E>>, val f: AndThen<E, IO<A>>) : IO<A>() {
-    override fun <B> map(f: (A) -> B): IO<B> =
-            mapDefault(this, f)
+    override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
 
-    override fun <B> flatMapTotal(ff: AndThen<A, IO<B>>): IO<B> =
-            BindSuspend(cont, f.andThen(AndThen({ it.flatMapTotal(ff) }, { ff.error(it, { RaiseError(it) }) })))
+    override fun <B> flatMapTotal(ff: AndThen<A, IO<B>>): IO<B> = BindSuspend(cont, f.andThen(AndThen({ it.flatMapTotal(ff) }, { ff.error(it, { RaiseError(it) }) })))
 
-    override fun attempt(): IO<Either<Throwable, A>> =
-            BindSuspend(AndThen { _ -> this }, attemptValue())
+    override fun attempt(): IO<Either<Throwable, A>> = BindSuspend(AndThen { _ -> this }, attemptValue())
 
-    override fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit) =
-            throw AssertionError("Unreachable")
+    override fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit) = throw AssertionError("Unreachable")
 
-    override fun unsafeRunTimedTotal(limit: Duration): Option<A> =
-            throw AssertionError("Unreachable")
+    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
 }
 
 internal data class Async<out A>(val cont: ((Either<Throwable, A>) -> Unit) -> Unit) : IO<A>() {
-    override fun <B> map(f: (A) -> B): IO<B> =
-            mapDefault(this, f)
+    override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
 
-    override fun <B> flatMapTotal(f: AndThen<A, IO<B>>): IO<B> =
-            BindAsync(cont, f)
+    override fun <B> flatMapTotal(f: AndThen<A, IO<B>>): IO<B> = BindAsync(cont, f)
 
-    override fun attempt(): IO<Either<Throwable, A>> =
-            BindAsync(cont, attemptValue())
+    override fun attempt(): IO<Either<Throwable, A>> = BindAsync(cont, attemptValue())
 
-    override fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit) =
-            cont(cb)
+    override fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit) = cont(cb)
 
-    override fun unsafeRunTimedTotal(limit: Duration): Option<A> =
-            unsafeResync(this, limit)
+    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
 }
 
 internal data class BindAsync<E, out A>(val cont: ((Either<Throwable, E>) -> Unit) -> Unit, val f: AndThen<E, IO<A>>) : IO<A>() {
-    override fun <B> map(f: (A) -> B): IO<B> =
-            mapDefault(this, f)
+    override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
 
-    override fun <B> flatMapTotal(ff: AndThen<A, IO<B>>): IO<B> =
-            BindAsync(cont, f.andThen(AndThen({ it.flatMapTotal(ff) }, { ff.error(it, { RaiseError(it) }) })))
+    override fun <B> flatMapTotal(ff: AndThen<A, IO<B>>): IO<B> = BindAsync(cont, f.andThen(AndThen({ it.flatMapTotal(ff) }, { ff.error(it, { RaiseError(it) }) })))
 
-    override fun attempt(): IO<Either<Throwable, A>> =
-            BindSuspend(AndThen { _ -> this }, attemptValue())
+    override fun attempt(): IO<Either<Throwable, A>> = BindSuspend(AndThen { _ -> this }, attemptValue())
 
     override fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit) =
             cont { result ->
@@ -235,9 +199,7 @@ internal data class BindAsync<E, out A>(val cont: ((Either<Throwable, E>) -> Uni
                 }
             }
 
-    override fun unsafeRunTimedTotal(limit: Duration): Option<A> =
-            unsafeResync(this, limit)
+    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
 }
 
-fun <A> A.liftIO(): IO<A> =
-        IO.pure(this)
+fun <A> A.liftIO(): IO<A> = IO.pure(this)

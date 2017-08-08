@@ -4,8 +4,7 @@ interface OptionMonoid<A> : Monoid<Option<A>> {
 
     fun SG(): Semigroup<A>
 
-    override fun empty(): Option<A> =
-            Option.None
+    override fun empty(): Option<A> = Option.None
 
     override fun combine(a: Option<A>, b: Option<A>): Option<A> =
             when (a) {
@@ -26,16 +25,13 @@ interface OptionInstances :
         Traverse<Option.F>,
         MonadError<Option.F, Unit> {
 
-    override fun <A, B> map(fa: OptionKind<A>, f: (A) -> B): Option<B> =
-            fa.ev().map(f)
+    override fun <A, B> map(fa: OptionKind<A>, f: (A) -> B): Option<B> = fa.ev().map(f)
 
     override fun <A> pure(a: A): Option<A> = Option.Some(a)
 
-    override fun <A, B> ap(fa: OptionKind<A>, ff: OptionKind<(A) -> B>): Option<B> =
-            ff.ev().flatMap { fa.ev().map(it) }
+    override fun <A, B> ap(fa: OptionKind<A>, ff: OptionKind<(A) -> B>): Option<B> = ff.ev().flatMap { fa.ev().map(it) }
 
-    override fun <A, B> flatMap(fa: OptionKind<A>, f: (A) -> OptionKind<B>): Option<B> =
-            fa.ev().flatMap { f(it).ev() }
+    override fun <A, B> flatMap(fa: OptionKind<A>, f: (A) -> OptionKind<B>): Option<B> = fa.ev().flatMap { f(it).ev() }
 
     tailrec override fun <A, B> tailRecM(a: A, f: (A) -> HK<Option.F, Either<A, B>>): Option<B> {
         val option = f(a).ev()
@@ -74,11 +70,9 @@ interface OptionInstances :
                 }
             }
 
-    override fun <A> raiseError(e: Unit): Option<A> =
-            Option.None
+    override fun <A> raiseError(e: Unit): Option<A> = Option.None
 
-    override fun <A> handleErrorWith(fa: OptionKind<A>, f: (Unit) -> OptionKind<A>): Option<A> =
-            fa.ev().orElse({ f(Unit).ev() })
+    override fun <A> handleErrorWith(fa: OptionKind<A>, f: (Unit) -> OptionKind<A>): Option<A> = fa.ev().orElse({ f(Unit).ev() })
 
 }
 
@@ -86,16 +80,14 @@ interface OptionInstances :
  * Dummy SemigroupK instance to be able to test laws for SemigroupK.
  */
 class OptionSemigroupK : SemigroupK<Option.F> {
-    override fun <A> combineK(x: HK<Option.F, A>, y: HK<Option.F, A>): Option<A> =
-            x.ev().flatMap { y.ev() }
+    override fun <A> combineK(x: HK<Option.F, A>, y: HK<Option.F, A>): Option<A> = x.ev().flatMap { y.ev() }
 }
 
 /**
  * Dummy MonoidK instance to be able to test laws for MonoidK.
  */
 class OptionMonoidK : MonoidK<Option.F>, GlobalInstance<ApplicativeError<Option.F, Unit>>() {
-    override fun <A> combineK(x: HK<Option.F, A>, y: HK<Option.F, A>): Option<A> =
-            x.ev().flatMap { y.ev() }
+    override fun <A> combineK(x: HK<Option.F, A>, y: HK<Option.F, A>): Option<A> = x.ev().flatMap { y.ev() }
 
     override fun <A> empty(): HK<Option.F, A> = Option.None
 }

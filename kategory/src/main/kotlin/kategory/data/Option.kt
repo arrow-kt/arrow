@@ -2,8 +2,7 @@ package kategory
 
 typealias OptionKind<A> = HK<Option.F, A>
 
-fun <A> OptionKind<A>.ev(): Option<A> =
-        this as Option<A>
+fun <A> OptionKind<A>.ev(): Option<A> = this as Option<A>
 
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/Option.scala
@@ -16,11 +15,9 @@ sealed class Option<out A> : OptionKind<A> {
     class F private constructor()
 
     companion object : OptionInstances, GlobalInstance<Monad<Option.F>>() {
-        @JvmStatic fun <A : Any> fromNullable(a: A?): Option<A> =
-                if (a != null) Option.Some(a) else Option.None
+        @JvmStatic fun <A : Any> fromNullable(a: A?): Option<A> = if (a != null) Option.Some(a) else Option.None
 
-        operator fun <A> invoke(a: A): Option<A> =
-                Option.Some(a)
+        operator fun <A> invoke(a: A): Option<A> = Option.Some(a)
 
         fun functor(): Functor<Option.F> = this
 
@@ -152,11 +149,8 @@ fun <B> Option<B>.getOrElse(default: () -> B): B = fold({ default() }, { it })
  *
  * @param default the default option if this is empty.
  */
-fun <A, B : A> Option<B>.orElse(alternative: () -> Option<B>): Option<B> =
-    if (isEmpty) alternative() else this
+fun <A, B : A> Option<B>.orElse(alternative: () -> Option<B>): Option<B> = if (isEmpty) alternative() else this
 
-fun <A> A.some(): Option<A> =
-        Option.Some(this)
+fun <A> A.some(): Option<A> = Option.Some(this)
 
-fun <A> none(): Option<A> =
-        Option.None
+fun <A> none(): Option<A> = Option.None

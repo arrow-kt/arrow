@@ -3,14 +3,11 @@ package kategory
 typealias FreeApplicativeKind<S, A> = HK2<FreeApplicative.F, S, A>
 typealias FreeApplicativeF<S> = HK<FreeApplicative.F, S>
 
-fun <F, A> FreeApplicativeKind<F, A>.ev(): FreeApplicative<F, A> =
-        this as FreeApplicative<F, A>
+fun <F, A> FreeApplicativeKind<F, A>.ev(): FreeApplicative<F, A> = this as FreeApplicative<F, A>
 
-inline fun <F, reified G, A> FreeApplicativeKind<F, A>.foldMapK(f: FunctionK<F, G>, GA: Applicative<G> = applicative<G>()): HK<G, A> =
-        (this as FreeApplicative<F, A>).foldMap(f, GA)
+inline fun <F, reified G, A> FreeApplicativeKind<F, A>.foldMapK(f: FunctionK<F, G>, GA: Applicative<G> = applicative<G>()): HK<G, A> = (this as FreeApplicative<F, A>).foldMap(f, GA)
 
-inline fun <reified F, A> FreeApplicativeKind<F, A>.foldK(FA: Applicative<F> = applicative<F>()): HK<F, A> =
-        (this as FreeApplicative<F, A>).fold(FA)
+inline fun <reified F, A> FreeApplicativeKind<F, A>.foldK(FA: Applicative<F> = applicative<F>()): HK<F, A> = (this as FreeApplicative<F, A>).fold(FA)
 
 /**
  * See [https://github.com/edmundnoble/cats/blob/6454b4f8b7c5cefd15d8198fa7d52e46e2f45fea/docs/src/main/tut/datatypes/freeapplicative.md]
@@ -20,14 +17,11 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeKind<F, A> {
     class F private constructor()
 
     companion object {
-        fun <F, A> pure(a: A): FreeApplicative<F, A> =
-                Pure(a)
+        fun <F, A> pure(a: A): FreeApplicative<F, A> = Pure(a)
 
-        fun <F, P, A> ap(fp: FreeApplicative<F, P>, fn: FreeApplicative<F, (P) -> A>): FreeApplicative<F, A> =
-                Ap(fn, fp)
+        fun <F, P, A> ap(fp: FreeApplicative<F, P>, fn: FreeApplicative<F, (P) -> A>): FreeApplicative<F, A> = Ap(fn, fp)
 
-        fun <F, A> liftF(fa: HK<F, A>): FreeApplicative<F, A> =
-                Lift(fa)
+        fun <F, A> liftF(fa: HK<F, A>): FreeApplicative<F, A> = Lift(fa)
 
         fun <S> functor(): FreeApplicativeInstances<S> = object : FreeApplicativeInstances<S> {}
 
@@ -61,20 +55,16 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeKind<F, A> {
                 else -> Ap(Pure(f), this)
             }
 
-    fun fold(FA: Applicative<F>): HK<F, A> =
-            foldMap(FunctionK.id(), FA)
+    fun fold(FA: Applicative<F>): HK<F, A> = foldMap(FunctionK.id(), FA)
 
-    fun <G> compile(f: FunctionK<F, G>): FreeApplicative<G, A> =
-            foldMap(functionKF(f), applicativeF()).ev()
+    fun <G> compile(f: FunctionK<F, G>): FreeApplicative<G, A> = foldMap(functionKF(f), applicativeF()).ev()
 
-    fun <G> flatCompile(f: FunctionK<F, FreeApplicativeF<G>>, GFA: Applicative<FreeApplicativeF<G>>): FreeApplicative<G, A> =
-            foldMap(f, GFA).ev()
+    fun <G> flatCompile(f: FunctionK<F, FreeApplicativeF<G>>, GFA: Applicative<FreeApplicativeF<G>>): FreeApplicative<G, A> = foldMap(f, GFA).ev()
 
     // TODO(paco): requires Const
     // final def analyze[M: Monoid](f: FunctionK[F, λ[α => M]]): M
 
-    fun monad(): Free<F, A> =
-            foldMap(Free.functionKF(), Free.applicativeF()).ev()
+    fun monad(): Free<F, A> = foldMap(Free.functionKF(), Free.applicativeF()).ev()
 
     // Beware: smart code
     @Suppress("UNCHECKED_CAST")
@@ -166,8 +156,7 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeKind<F, A> {
 
     internal data class Ap<S, P, out A>(val fn: FreeApplicative<S, (P) -> A>, val fp: FreeApplicative<S, P>) : FreeApplicative<S, A>()
 
-    override fun toString(): String =
-            "FreeApplicative(...)"
+    override fun toString(): String = "FreeApplicative(...)"
 }
 
 private fun <F, G, A> foldArg(node: FreeApplicative<F, A>, f: FunctionK<F, G>, GA: Applicative<G>): HK<G, A> =
@@ -179,5 +168,4 @@ private fun <F, G, A> foldArg(node: FreeApplicative<F, A>, f: FunctionK<F, G>, G
             }
         }
 
-fun <S, A> A.freeAp(): FreeApplicative<S, A> =
-        FreeApplicative.pure(this)
+fun <S, A> A.freeAp(): FreeApplicative<S, A> = FreeApplicative.pure(this)

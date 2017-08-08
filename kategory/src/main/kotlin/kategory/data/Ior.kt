@@ -7,8 +7,7 @@ typealias IorKind<A, B> = HK2<Ior.F, A, B>
 
 typealias IorF<L> = HK<Ior.F, L>
 
-fun <A, B> IorKind<A, B>.ev(): Ior<A, B> =
-        this as Ior<A, B>
+fun <A, B> IorKind<A, B>.ev(): Ior<A, B> = this as Ior<A, B>
 
 /**
  * Port of https://github.com/typelevel/cats/blob/v0.9.0/core/src/main/scala/cats/data/Ior.scala
@@ -289,14 +288,10 @@ inline fun <A, B, D> Ior<A, B>.flatMap(SA: Semigroup<A>, crossinline f: (B) -> I
 
 inline fun <A, B> Ior<A, B>.getOrElse(crossinline default: () -> B): B = fold({ default() }, { it }, { _, b -> b })
 
-fun <A, B> A.rightIor(): Ior<B, A> =
-        Ior.Right(this)
+fun <A, B> A.rightIor(): Ior<B, A> = Ior.Right(this)
 
-fun <A, B> A.leftIor(): Ior<A, B> =
-        Ior.Left(this)
+fun <A, B> A.leftIor(): Ior<A, B> = Ior.Left(this)
 
-fun <A, B> Pair<A, B>.bothIor(): Ior<A, B> =
-        Ior.Both(this.first, this.second)
+fun <A, B> Pair<A, B>.bothIor(): Ior<A, B> = Ior.Both(this.first, this.second)
 
-fun <A, B> Tuple2<A, B>.bothIor(): Ior<A, B> =
-        Ior.Both(this.a, this.b)
+fun <A, B> Tuple2<A, B>.bothIor(): Ior<A, B> = Ior.Both(this.a, this.b)
