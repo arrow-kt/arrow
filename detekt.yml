@@ -94,7 +94,8 @@ style:
   NamingConventionViolation:
     active: false
   MaxLineLength:
-    active: false
+    active: true
+    maxLineLength: 150
 
 comments:
   active: true
