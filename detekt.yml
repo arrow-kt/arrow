@@ -9,7 +9,7 @@ potential-bugs:
   NoElseInWhenExpression:
     active: false
   UnsafeCast:
-    active: true
+    active: false
 
 exceptions:
   active: true
@@ -54,8 +54,8 @@ formatting:
     active: true
     autoCorrect: true
   SpacingAfterComma:
-    active: true
-    autoCorrect: true
+    active: false
+    autoCorrect: false
   SpacingAfterKeyword:
     active: true
     autoCorrect: true
