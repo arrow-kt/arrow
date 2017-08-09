@@ -12,12 +12,10 @@ private typealias AnyFunc = (Any?) -> Any?
         curr as A
     }
 
-    fun lower(FF: Functor<F>): HK<F, A> =
-            FF.map(pivot, transform)
+    fun lower(FF: Functor<F>): HK<F, A> = FF.map(pivot, transform)
 
     @Suppress("UNCHECKED_CAST")
-    fun <B> map(f: (A) -> B): Coyoneda<F, P, B> =
-            Coyoneda(pivot, ks + f as AnyFunc)
+    fun <B> map(f: (A) -> B): Coyoneda<F, P, B> = Coyoneda(pivot, ks + f as AnyFunc)
 
     fun toYoneda(FF: Functor<F>): Yoneda<F, A> =
             object : Yoneda<F, A>() {
@@ -26,11 +24,9 @@ private typealias AnyFunc = (Any?) -> Any?
 
     companion object {
         @Suppress("UNCHECKED_CAST")
-        inline fun <reified U, A, B> apply(fa: HK<U, A>, noinline f: (A) -> B): Coyoneda<U, A, B> =
-                unsafeApply(fa, listOf(f as AnyFunc))
+        inline fun <reified U, A, B> apply(fa: HK<U, A>, noinline f: (A) -> B): Coyoneda<U, A, B> = unsafeApply(fa, listOf(f as AnyFunc))
 
-        inline fun <reified U, A, B> unsafeApply(fa: HK<U, A>, f: List<AnyFunc>): Coyoneda<U, A, B> =
-                Coyoneda(fa, f)
+        inline fun <reified U, A, B> unsafeApply(fa: HK<U, A>, f: List<AnyFunc>): Coyoneda<U, A, B> = Coyoneda(fa, f)
 
         fun <U, P> functor(): Functor<CoyonedaF<U, P>> = object : CoyonedaInstances<U, P> {}
 

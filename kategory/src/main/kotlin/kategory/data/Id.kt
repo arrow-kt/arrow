@@ -1,15 +1,12 @@
 package kategory
 
-fun <A> IdKind<A>.value(): A =
-        this.ev().value
+fun <A> IdKind<A>.value(): A = this.ev().value
 
 @higherkind data class Id<out A>(val value: A) : IdKind<A> {
 
-    inline fun <B> map(f: (A) -> B): Id<B> =
-            Id(f(value))
+    inline fun <B> map(f: (A) -> B): Id<B> = Id(f(value))
 
-    inline fun <B> flatMap(f: (A) -> Id<B>): Id<B> =
-            f(value)
+    inline fun <B> flatMap(f: (A) -> Id<B>): Id<B> = f(value)
 
     companion object : IdInstances, GlobalInstance<Bimonad<IdHK>>() {
         fun functor(): Functor<IdHK> = this

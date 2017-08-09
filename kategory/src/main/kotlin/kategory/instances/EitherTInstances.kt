@@ -8,14 +8,11 @@ interface EitherTInstances<F, L> :
 
     fun MF(): Monad<F>
 
-    override fun <A> pure(a: A): EitherT<F, L, A> =
-            EitherT(MF(), MF().pure(Either.Right(a)))
+    override fun <A> pure(a: A): EitherT<F, L, A> = EitherT(MF(), MF().pure(Either.Right(a)))
 
-    override fun <A, B> map(fa: EitherTKind<F, L, A>, f: (A) -> B): EitherT<F, L, B> =
-            fa.ev().map { f(it) }
+    override fun <A, B> map(fa: EitherTKind<F, L, A>, f: (A) -> B): EitherT<F, L, B> = fa.ev().map { f(it) }
 
-    override fun <A, B> flatMap(fa: EitherTKind<F, L, A>, f: (A) -> EitherTKind<F, L, B>): EitherT<F, L, B> =
-            fa.ev().flatMap { f(it).ev() }
+    override fun <A, B> flatMap(fa: EitherTKind<F, L, A>, f: (A) -> EitherTKind<F, L, B>): EitherT<F, L, B> = fa.ev().flatMap { f(it).ev() }
 
     override fun <A, B> tailRecM(a: A, f: (A) -> HK<EitherTF<F, L>, Either<A, B>>): EitherT<F, L, B> =
             EitherT(MF(), MF().tailRecM(a, {
@@ -41,8 +38,7 @@ interface EitherTInstances<F, L> :
                 }
             }))
 
-    override fun <A> raiseError(e: L): EitherT<F, L, A> =
-            EitherT(MF(), MF().pure(Either.Left(e)))
+    override fun <A> raiseError(e: L): EitherT<F, L, A> = EitherT(MF(), MF().pure(Either.Left(e)))
 
 }
 
@@ -54,14 +50,11 @@ interface EitherTTraverse<F, A> :
 
     fun MF(): Monad<F>
 
-    override fun <G, B, C> traverse(fa: HK<EitherTF<F, A>, B>, f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, HK<EitherTF<F, A>, C>> =
-            fa.ev().traverse(f, GA, FF(), MF())
+    override fun <G, B, C> traverse(fa: HK<EitherTF<F, A>, B>, f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, HK<EitherTF<F, A>, C>> = fa.ev().traverse(f, GA, FF(), MF())
 
-    override fun <B, C> foldL(fa: HK<EitherTF<F, A>, B>, b: C, f: (C, B) -> C): C =
-            fa.ev().foldL(b, f, FF())
+    override fun <B, C> foldL(fa: HK<EitherTF<F, A>, B>, b: C, f: (C, B) -> C): C = fa.ev().foldL(b, f, FF())
 
-    override fun <B, C> foldR(fa: HK<EitherTF<F, A>, B>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
-            fa.ev().foldR(lb, f, FF())
+    override fun <B, C> foldR(fa: HK<EitherTF<F, A>, B>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> = fa.ev().foldR(lb, f, FF())
 
 }
 

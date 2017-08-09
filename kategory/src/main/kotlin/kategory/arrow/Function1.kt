@@ -2,11 +2,9 @@ package kategory
 
 typealias Function1F<I> = HK<Function1HK, I>
 
-fun <I, O> ((I) -> O).k(): Function1<I, O> =
-        Function1(this)
+fun <I, O> ((I) -> O).k(): Function1<I, O> = Function1(this)
 
-operator fun <I, O> Function1Kind<I, O>.invoke(i: I): O =
-        this.ev().f(i)
+operator fun <I, O> Function1Kind<I, O>.invoke(i: I): O = this.ev().f(i)
 
 @higherkind class Function1<I, out O>(val f: (I) -> O) : Function1Kind<I, O> {
 

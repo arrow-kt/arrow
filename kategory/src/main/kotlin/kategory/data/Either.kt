@@ -52,8 +52,7 @@ typealias EitherF<L> = HK<EitherHK, L>
      * Right("right").swap() // Result: Left("right")
      * ```
      */
-    fun swap(): Either<B, A> =
-            fold({ Right(it) }, { Left(it) })
+    fun swap(): Either<B, A> = fold({ Right(it) }, { Left(it) })
 
     /**
      * The given function is applied if this is a `Right`.
@@ -64,14 +63,12 @@ typealias EitherF<L> = HK<EitherHK, L>
      * Left(12).map { "flower" }  // Result: Left(12)
      * ```
      */
-    inline fun <C> map(crossinline f: (B) -> C): Either<A, C> =
-            fold({ Left(it) }, { Right(f(it)) })
+    inline fun <C> map(crossinline f: (B) -> C): Either<A, C> = fold({ Left(it) }, { Right(f(it)) })
 
     /**
      * Map over Left and Right of this Either
      */
-    inline fun <C, D> bimap(crossinline fa: (A) -> C, crossinline fb: (B) -> D): Either<C, D> =
-            fold({ Left(fa(it)) }, { Right(fb(it)) })
+    inline fun <C, D> bimap(crossinline fa: (A) -> C, crossinline fb: (B) -> D): Either<C, D> = fold({ Left(fa(it)) }, { Right(fb(it)) })
 
     /**
      * Returns `false` if [Left] or returns the result of the application of
@@ -86,8 +83,7 @@ typealias EitherF<L> = HK<EitherHK, L>
      * left.exists { it > 10 }      // Result: false
      * ```
      */
-    inline fun exists(crossinline predicate: (B) -> Boolean): Boolean =
-            fold({ false }, { predicate(it) })
+    inline fun exists(crossinline predicate: (B) -> Boolean): Boolean = fold({ false }, { predicate(it) })
 
     /**
      * Returns a [Option.Some] containing the [Right] value
@@ -99,8 +95,7 @@ typealias EitherF<L> = HK<EitherHK, L>
      * Left(12).toOption()  // Result: None
      * ```
      */
-    fun toOption(): Option<B> =
-            fold({ Option.None }, { Option.Some(it) })
+    fun toOption(): Option<B> = fold({ Option.None }, { Option.Some(it) })
 
     /**
      * The left side of the disjoint union, as opposed to the [Right] side.
@@ -110,8 +105,7 @@ typealias EitherF<L> = HK<EitherHK, L>
         override internal val isRight = false
 
         companion object {
-            inline operator fun <A> invoke(a: A): Either<A, Nothing> =
-                    Left(a, Unit)
+            inline operator fun <A> invoke(a: A): Either<A, Nothing> = Left(a, Unit)
         }
     }
 
@@ -123,8 +117,7 @@ typealias EitherF<L> = HK<EitherHK, L>
         override internal val isRight = true
 
         companion object {
-            inline operator fun <B> invoke(b: B): Either<Nothing, B> =
-                    Right(b, Unit)
+            inline operator fun <B> invoke(b: B): Either<Nothing, B> = Right(b, Unit)
         }
     }
 
@@ -159,8 +152,7 @@ typealias EitherF<L> = HK<EitherHK, L>
  *
  * @param f The function to bind across [Either.Right].
  */
-inline fun <A, B, C> Either<A, B>.flatMap(crossinline f: (B) -> Either<A, C>): Either<A, C> =
-        fold({ Either.Left(it) }, { f(it) })
+inline fun <A, B, C> Either<A, B>.flatMap(crossinline f: (B) -> Either<A, C>): Either<A, C> = fold({ Either.Left(it) }, { f(it) })
 
 /**
  * Returns the value from this [Either.Right] or the given argument if this is a [Either.Left].
@@ -171,8 +163,7 @@ inline fun <A, B, C> Either<A, B>.flatMap(crossinline f: (B) -> Either<A, C>): E
  * Left(12).getOrElse(17)  // Result: 17
  * ```
  */
-inline fun <B> Either<*, B>.getOrElse(crossinline default: () -> B): B =
-        fold({ default() }, { it })
+inline fun <B> Either<*, B>.getOrElse(crossinline default: () -> B): B = fold({ default() }, { it })
 
 /**
  * * Returns [Either.Right] with the existing value of [Either.Right] if this is a [Either.Right] and the given predicate
@@ -190,8 +181,7 @@ inline fun <B> Either<*, B>.getOrElse(crossinline default: () -> B): B =
  * left.filterOrElse({ it > 10 }, { -1 })      // Result: Left(12)
  * ```
  */
-inline fun <A, B> Either<A, B>.filterOrElse(crossinline predicate: (B) -> Boolean, crossinline default: () -> A): Either<A, B> =
-        fold({ Either.Left(it) }, { if (predicate(it)) Either.Right(it) else Either.Left(default()) })
+inline fun <A, B> Either<A, B>.filterOrElse(crossinline predicate: (B) -> Boolean, crossinline default: () -> A): Either<A, B> = fold({ Either.Left(it) }, { if (predicate(it)) Either.Right(it) else Either.Left(default()) })
 
 /**
  * Returns `true` if this is a [Either.Right] and its value is equal to `elem` (as determined by `==`),
@@ -207,8 +197,7 @@ inline fun <A, B> Either<A, B>.filterOrElse(crossinline predicate: (B) -> Boolea
  * @param elem the element to test.
  * @return `true` if the option has an element that is equal (as determined by `==`) to `elem`, `false` otherwise.
  */
-fun <A, B> Either<A, B>.contains(elem: B): Boolean =
-        fold({ false }, { it == elem })
+fun <A, B> Either<A, B>.contains(elem: B): Boolean = fold({ false }, { it == elem })
 
 fun <A> A.left(): Either<A, Nothing> = Either.Left(this)
 

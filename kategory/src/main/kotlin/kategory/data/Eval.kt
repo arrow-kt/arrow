@@ -33,8 +33,7 @@ package kategory
 
     abstract fun memoize(): Eval<A>
 
-    fun <B> map(f: (A) -> B): Eval<B> =
-            flatMap { a -> Now(f(a)) }
+    fun <B> map(f: (A) -> B): Eval<B> = flatMap { a -> Now(f(a)) }
 
     fun <B> flatMap(f: (A) -> Eval<B>): Eval<B> =
             when (this) {
@@ -152,8 +151,7 @@ package kategory
 
         abstract fun <S> run(s: S): Eval<A>
 
-        override fun memoize(): Eval<A> =
-                Later { value() }
+        override fun memoize(): Eval<A> = Later { value() }
 
         override fun value(): A {
             var curr: Eval<A> = this

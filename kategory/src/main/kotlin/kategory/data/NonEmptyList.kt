@@ -13,28 +13,21 @@ package kategory
 
     val size: Int = all.size
 
-    fun contains(element: @UnsafeVariance A): Boolean =
-            (head == element).or(tail.contains(element))
+    fun contains(element: @UnsafeVariance A): Boolean = (head == element).or(tail.contains(element))
 
-    fun containsAll(elements: Collection<@UnsafeVariance A>): Boolean =
-            elements.all { contains(it) }
+    fun containsAll(elements: Collection<@UnsafeVariance A>): Boolean = elements.all { contains(it) }
 
     fun isEmpty(): Boolean = false
 
-    fun <B> map(f: (A) -> B): NonEmptyList<B> =
-            NonEmptyList(f(head), tail.map(f))
+    fun <B> map(f: (A) -> B): NonEmptyList<B> = NonEmptyList(f(head), tail.map(f))
 
-    fun <B> flatMap(f: (A) -> NonEmptyList<B>): NonEmptyList<B> =
-            f(head) + tail.flatMap { f(it).all }
+    fun <B> flatMap(f: (A) -> NonEmptyList<B>): NonEmptyList<B> = f(head) + tail.flatMap { f(it).all }
 
-    operator fun plus(l: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> =
-            NonEmptyList(all + l.all)
+    operator fun plus(l: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> = NonEmptyList(all + l.all)
 
-    operator fun plus(l: List<@UnsafeVariance A>): NonEmptyList<A> =
-            NonEmptyList(all + l)
+    operator fun plus(l: List<@UnsafeVariance A>): NonEmptyList<A> = NonEmptyList(all + l)
 
-    operator fun plus(a: @UnsafeVariance A): NonEmptyList<A> =
-            NonEmptyList(all + a)
+    operator fun plus(a: @UnsafeVariance A): NonEmptyList<A> = NonEmptyList(all + a)
 
     fun iterator(): Iterator<A> = all.iterator()
 
@@ -49,13 +42,9 @@ package kategory
         return true
     }
 
-    override fun hashCode(): Int {
-        return all.hashCode()
-    }
+    override fun hashCode(): Int = all.hashCode()
 
-    override fun toString(): String {
-        return "NonEmptyList(all=$all)"
-    }
+    override fun toString(): String = "NonEmptyList(all=$all)"
 
     companion object : NonEmptyListInstances, GlobalInstance<Bimonad<NonEmptyListHK>>() {
         @JvmStatic fun <A> of(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
@@ -74,5 +63,4 @@ package kategory
     }
 }
 
-fun <A> A.nel(): NonEmptyList<A> =
-        NonEmptyList.of(this)
+fun <A> A.nel(): NonEmptyList<A> = NonEmptyList.of(this)

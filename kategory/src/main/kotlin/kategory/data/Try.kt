@@ -17,8 +17,7 @@ package kategory
                     Failure(e)
                 }
 
-        fun <A> raise(e: Exception): Try<A> =
-                Failure(e)
+        fun <A> raise(e: Exception): Try<A> = Failure(e)
 
         fun functor(): Functor<TryHK> = this
 
@@ -37,14 +36,12 @@ package kategory
     /**
      * Returns the given function applied to the value from this `Success` or returns this if this is a `Failure`.
      */
-    inline fun <B> flatMap(crossinline f: (A) -> Try<B>): Try<B> =
-            fold({ Failure(it) }, { f(it) })
+    inline fun <B> flatMap(crossinline f: (A) -> Try<B>): Try<B> = fold({ Failure(it) }, { f(it) })
 
     /**
      * Maps the given function to the value from this `Success` or returns this if this is a `Failure`.
      */
-    inline fun <B> map(crossinline f: (A) -> B): Try<B> =
-            fold({ Failure(it) }, { Success(f(it)) })
+    inline fun <B> map(crossinline f: (A) -> B): Try<B> = fold({ Failure(it) }, { Success(f(it)) })
 
     /**
      * Converts this to a `Failure` if the predicate is not satisfied.
@@ -101,29 +98,24 @@ sealed class TryException(override val message: String) : kotlin.Exception(messa
  *
  * ''Note:'': This will throw an exception if it is not a success and default throws an exception.
  */
-fun <B> Try<B>.getOrElse(default: () -> B): B =
-        fold({ default() }, { it })
+fun <B> Try<B>.getOrElse(default: () -> B): B = fold({ default() }, { it })
 
 /**
  * Applies the given function `f` if this is a `Failure`, otherwise returns this if this is a `Success`.
  * This is like `flatMap` for the exception.
  */
-fun <B> Try<B>.recoverWith(f: (Throwable) -> Try<B>): Try<B> =
-        fold({ f(it) }, { Try.Success(it) })
+fun <B> Try<B>.recoverWith(f: (Throwable) -> Try<B>): Try<B> = fold({ f(it) }, { Try.Success(it) })
 
 /**
  * Applies the given function `f` if this is a `Failure`, otherwise returns this if this is a `Success`.
  * This is like map for the exception.
  */
-fun <B> Try<B>.recover(f: (Throwable) -> B): Try<B> =
-        fold({ Try.Success(f(it)) }, { Try.Success(it) })
+fun <B> Try<B>.recover(f: (Throwable) -> B): Try<B> = fold({ Try.Success(f(it)) }, { Try.Success(it) })
 
 /**
  * Completes this `Try` by applying the function `f` to this if this is of type `Failure`,
  * or conversely, by applying `s` if this is a `Success`.
  */
-fun <B> Try<B>.transform(s: (B) -> Try<B>, f: (Throwable) -> Try<B>): Try<B> =
-        fold({ f(it) }, { flatMap(s) })
+fun <B> Try<B>.transform(s: (B) -> Try<B>, f: (Throwable) -> Try<B>): Try<B> = fold({ f(it) }, { flatMap(s) })
 
-fun <A> (() -> A).try_(): Try<A> =
-        Try(this)
+fun <A> (() -> A).try_(): Try<A> = Try(this)
