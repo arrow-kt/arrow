@@ -19,10 +19,9 @@ Add it in your root `build.gradle` at the end of repositories.
 ```groovy
 allprojects {
     repositories {
-        maven { url "http://dl.bintray.com/kategory/maven" }
+        jcenter()
         maven { url 'https://kotlin.bintray.com/kotlinx' }
         maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
-        maven { url "http://dl.bintray.com/kategory/maven" } // can be removed once the annotations project is in jcenter as well
     }
 }
 ```
