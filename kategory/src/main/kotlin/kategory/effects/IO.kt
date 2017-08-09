@@ -5,13 +5,7 @@ import kategory.effects.internal.Platform.onceOnly
 import kategory.effects.internal.Platform.unsafeResync
 import kategory.effects.internal.error
 
-typealias IOKind<A> = HK<IO.F, A>
-
-fun <A> IOKind<A>.ev(): IO<A> = this as IO<A>
-
-sealed class IO<out A> : HK<IO.F, A> {
-
-    class F private constructor()
+@higherkind sealed class IO<out A> : IOKind<A> {
 
     abstract fun <B> map(f: (A) -> B): IO<B>
 
@@ -59,7 +53,7 @@ sealed class IO<out A> : HK<IO.F, A> {
 
     abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
 
-    companion object : IOInstances, GlobalInstance<Monad<IO.F>>() {
+    companion object : IOInstances, GlobalInstance<Monad<IOHK>>() {
         internal fun <A, B> mapDefault(t: IO<A>, f: (A) -> B): IO<B> = t.flatMap(f.andThen { Pure(it) })
 
         internal fun <A> attemptValue(): AndThen<A, IO<Either<Throwable, A>>> = AndThen({ a: A -> Pure(Either.Right(a)) }, { e -> Pure(Either.Left(e)) })
@@ -99,11 +93,11 @@ sealed class IO<out A> : HK<IO.F, A> {
                     else -> invoke { eval.value() }
                 }
 
-        fun functor(): Functor<IO.F> = this
+        fun functor(): Functor<IOHK> = this
 
-        fun applicative(): Applicative<IO.F> = this
+        fun applicative(): Applicative<IOHK> = this
 
-        fun monad(): Monad<IO.F> = this
+        fun monad(): Monad<IOHK> = this
 
         fun <A> semigroup(SG: Semigroup<A>): IOSemigroup<A> = object : IOSemigroup<A> {
             override fun SG(): Semigroup<A> = SG

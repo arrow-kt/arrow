@@ -1,35 +1,29 @@
 package kategory
 
-typealias OptionKind<A> = HK<Option.F, A>
-
-fun <A> OptionKind<A>.ev(): Option<A> = this as Option<A>
-
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/Option.scala
  *
  * Represents optional values. Instances of `Option`
  * are either an instance of $some or the object $none.
  */
-sealed class Option<out A> : OptionKind<A> {
+@higherkind sealed class Option<out A> : OptionKind<A> {
 
-    class F private constructor()
-
-    companion object : OptionInstances, GlobalInstance<Monad<Option.F>>() {
+    companion object : OptionInstances, GlobalInstance<Monad<OptionHK>>() {
         @JvmStatic fun <A : Any> fromNullable(a: A?): Option<A> = if (a != null) Option.Some(a) else Option.None
 
         operator fun <A> invoke(a: A): Option<A> = Option.Some(a)
 
-        fun functor(): Functor<Option.F> = this
+        fun functor(): Functor<OptionHK> = this
 
-        fun applicative(): Applicative<Option.F> = this
+        fun applicative(): Applicative<OptionHK> = this
 
-        fun monad(): Monad<Option.F> = this
+        fun monad(): Monad<OptionHK> = this
 
-        fun monadError(): MonadError<Option.F, Unit> = this
+        fun monadError(): MonadError<OptionHK, Unit> = this
 
-        fun foldable(): Foldable<Option.F> = this
+        fun foldable(): Foldable<OptionHK> = this
 
-        fun traverse(): Traverse<Option.F> = this
+        fun traverse(): Traverse<OptionHK> = this
 
         fun <A> monoid(SG: Semigroup<A>): OptionMonoid<A> = object : OptionMonoid<A> {
             override fun SG(): Semigroup<A> = SG

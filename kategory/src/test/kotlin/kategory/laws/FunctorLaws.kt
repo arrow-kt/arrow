@@ -22,9 +22,9 @@ object FunctorLaws {
                 FF.map(fa, ::identity).equalUnderTheLaw(fa, EQ)
             })
 
-    inline fun <reified F> covariantComposition(FF: Functor<F> = functor<F>(), crossinline f: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>> = Eq.any()): Unit =
+    inline fun <reified F> covariantComposition(FF: Functor<F> = functor<F>(), crossinline ff: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>> = Eq.any()): Unit =
             forAll(
-                    genConstructor(Gen.int(), f),
+                    genConstructor(Gen.int(), ff),
                     genFunctionAToB<Int, Int>(Gen.int()),
                     genFunctionAToB<Int, Int>(Gen.int()),
                     { fa: HK<F, Int>, f, g ->

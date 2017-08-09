@@ -1,16 +1,12 @@
 package kategory
 
-typealias CokleisiTKind<F, A, B> = HK3<Cokleisli.F, F, A, B>
-typealias CokleisiF<F> = HK<Cokleisli.F, F>
+typealias CokleisliF<F> = HK<CokleisliHK, F>
 
-typealias CokleisiFun<F, A, B> = (HK<F, A>) -> B
+typealias CokleisliFun<F, A, B> = (HK<F, A>) -> B
 
 typealias CoreaderT<F, A, B> = Cokleisli<F, A, B>
 
-fun <F, A, B> CokleisiTKind<F, A, B>.ev(): Cokleisli<F, A, B> = this as Cokleisli<F, A, B>
-
-data class Cokleisli<F, A, B>(val MM: Comonad<F>, val run: CokleisiFun<F, A, B>) : CokleisiTKind<F, A, B> {
-    class F private constructor()
+@higherkind data class Cokleisli<F, A, B>(val MM: Comonad<F>, val run: CokleisliFun<F, A, B>) : CokleisliKind<F, A, B> {
 
     inline fun <C, D> bimap(noinline g: (D) -> A, crossinline f: (B) -> C): Cokleisli<F, D, C> = Cokleisli(MM, { f(run(MM.map(it, g))) })
 

@@ -1,9 +1,6 @@
 package kategory
 
-typealias OptionTKind<F, A> = HK2<OptionT.F, F, A>
-typealias OptionTF<F> = HK<OptionT.F, F>
-
-fun <F, A> OptionTKind<F, A>.ev(): OptionT<F, A> = this as OptionT<F, A>
+typealias OptionTF<F> = HK<OptionTHK, F>
 
 /**
  * [OptionT]`<F, A>` is a light wrapper on an `F<`[Option]`<A>>` with some
@@ -11,9 +8,7 @@ fun <F, A> OptionTKind<F, A>.ev(): OptionT<F, A> = this as OptionT<F, A>
  *
  * It may also be said that [OptionT] is a monad transformer for [Option].
  */
-data class OptionT<F, A>(val MF: Monad<F>, val value: HK<F, Option<A>>) : OptionTKind<F, A> {
-
-    class F private constructor()
+@higherkind data class OptionT<F, A>(val MF: Monad<F>, val value: HK<F, Option<A>>) : OptionTKind<F, A> {
 
     companion object {
 

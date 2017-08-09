@@ -1,11 +1,11 @@
 package kategory
 
 interface NonEmptyListInstances :
-        Functor<NonEmptyList.F>,
-        Applicative<NonEmptyList.F>,
-        Monad<NonEmptyList.F>,
-        Comonad<NonEmptyList.F>,
-        Bimonad<NonEmptyList.F> {
+        Functor<NonEmptyListHK>,
+        Applicative<NonEmptyListHK>,
+        Monad<NonEmptyListHK>,
+        Comonad<NonEmptyListHK>,
+        Bimonad<NonEmptyListHK> {
 
     override fun <A> pure(a: A): NonEmptyList<A> = NonEmptyList.of(a)
 
@@ -16,7 +16,7 @@ interface NonEmptyListInstances :
     @Suppress("UNCHECKED_CAST")
     private tailrec fun <A, B> go(
             buf: ArrayList<B>,
-            f: (A) -> HK<NonEmptyList.F, Either<A, B>>,
+            f: (A) -> HK<NonEmptyListHK, Either<A, B>>,
             v: NonEmptyList<Either<A, B>>) {
         val head: Either<A, B> = v.head
         when (head) {
@@ -32,7 +32,7 @@ interface NonEmptyListInstances :
         }
     }
 
-    override fun <A, B> tailRecM(a: A, f: (A) -> HK<NonEmptyList.F, Either<A, B>>): NonEmptyList<B> {
+    override fun <A, B> tailRecM(a: A, f: (A) -> HK<NonEmptyListHK, Either<A, B>>): NonEmptyList<B> {
         val buf = ArrayList<B>()
         go(buf, f, f(a).ev())
         return NonEmptyList.fromListUnsafe(buf)
@@ -59,6 +59,6 @@ interface NonEmptyListSemigroup<A> : Semigroup<NonEmptyList<A>> {
     override fun combine(a: NonEmptyList<A>, b: NonEmptyList<A>): NonEmptyList<A> = a + b
 }
 
-interface NonEmptyListSemigroupK : SemigroupK<NonEmptyList.F> {
-    override fun <A> combineK(x: HK<NonEmptyList.F, A>, y: HK<NonEmptyList.F, A>): NonEmptyList<A> = x.ev().plus(y.ev())
+interface NonEmptyListSemigroupK : SemigroupK<NonEmptyListHK> {
+    override fun <A> combineK(x: HK<NonEmptyListHK, A>, y: HK<NonEmptyListHK, A>): NonEmptyList<A> = x.ev().plus(y.ev())
 }

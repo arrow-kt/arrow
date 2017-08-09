@@ -1,20 +1,16 @@
 package kategory
 
-typealias StateTKind<F, S, A> = HK3<StateT.F, F, S, A>
-typealias StateTF<F, S> = HK2<StateT.F, F, S>
+typealias StateTF<F, S> = HK2<StateTHK, F, S>
 
 typealias StateTFun<F, S, A> = (S) -> HK<F, Tuple2<S, A>>
 typealias StateTFunKind<F, S, A> = HK<F, StateTFun<F, S, A>>
 
-fun <F, S, A> StateTKind<F, S, A>.ev(): StateT<F, S, A> = this as StateT<F, S, A>
-
 fun <F, S, A> StateTKind<F, S, A>.runM(initial: S): HK<F, Tuple2<S, A>> = (this as StateT<F, S, A>).run(initial)
 
-class StateT<F, S, A>(
+@higherkind class StateT<F, S, A>(
         val MF: Monad<F>,
         val runF: StateTFunKind<F, S, A>
 ) : StateTKind<F, S, A> {
-    class F private constructor()
 
     companion object {
         inline operator fun <reified F, S, A> invoke(noinline run: StateTFun<F, S, A>, MF: Monad<F> = monad<F>()): StateT<F, S, A> = StateT(MF, MF.pure(run))

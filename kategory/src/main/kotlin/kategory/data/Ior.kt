@@ -3,11 +3,7 @@ package kategory
 import kategory.Either.Left
 import kategory.Either.Right
 
-typealias IorKind<A, B> = HK2<Ior.F, A, B>
-
-typealias IorF<L> = HK<Ior.F, L>
-
-fun <A, B> IorKind<A, B>.ev(): Ior<A, B> = this as Ior<A, B>
+typealias IorF<L> = HK<IorHK, L>
 
 /**
  * Port of https://github.com/typelevel/cats/blob/v0.9.0/core/src/main/scala/cats/data/Ior.scala
@@ -31,9 +27,7 @@ fun <A, B> IorKind<A, B>.ev(): Ior<A, B> = this as Ior<A, B>
  * El primogenito de @ffgiraldez
  */
 
-sealed class Ior<out A, out B> : IorKind<A, B> {
-
-    class F private constructor()
+@higherkind sealed class Ior<out A, out B> : IorKind<A, B> {
 
     /**
      * Returns `true` if this is a [Right], `false` otherwise.
@@ -103,9 +97,9 @@ sealed class Ior<out A, out B> : IorKind<A, B> {
 
         inline fun <reified L> monad(SL: Semigroup<L> = semigroup<L>()): Monad<IorF<L>> = instances(SL)
 
-        fun <L> foldable(): Foldable<HK<F, L>> = object : IorTraverse<L> {}
+        fun <L> foldable(): Foldable<HK<IorHK, L>> = object : IorTraverse<L> {}
 
-        fun <L> traverse(): Traverse<HK<F, L>> = object : IorTraverse<L> {}
+        fun <L> traverse(): Traverse<HK<IorHK, L>> = object : IorTraverse<L> {}
     }
 
     /**

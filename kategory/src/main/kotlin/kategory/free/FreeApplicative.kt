@@ -1,9 +1,6 @@
 package kategory
 
-typealias FreeApplicativeKind<S, A> = HK2<FreeApplicative.F, S, A>
-typealias FreeApplicativeF<S> = HK<FreeApplicative.F, S>
-
-fun <F, A> FreeApplicativeKind<F, A>.ev(): FreeApplicative<F, A> = this as FreeApplicative<F, A>
+typealias FreeApplicativeF<S> = HK<FreeApplicativeHK, S>
 
 inline fun <F, reified G, A> FreeApplicativeKind<F, A>.foldMapK(f: FunctionK<F, G>, GA: Applicative<G> = applicative<G>()): HK<G, A> = (this as FreeApplicative<F, A>).foldMap(f, GA)
 
@@ -12,9 +9,7 @@ inline fun <reified F, A> FreeApplicativeKind<F, A>.foldK(FA: Applicative<F> = a
 /**
  * See [https://github.com/edmundnoble/cats/blob/6454b4f8b7c5cefd15d8198fa7d52e46e2f45fea/docs/src/main/tut/datatypes/freeapplicative.md]
  */
-sealed class FreeApplicative<F, out A> : FreeApplicativeKind<F, A> {
-
-    class F private constructor()
+@higherkind sealed class FreeApplicative<F, out A> : FreeApplicativeKind<F, A> {
 
     companion object {
         fun <F, A> pure(a: A): FreeApplicative<F, A> = Pure(a)

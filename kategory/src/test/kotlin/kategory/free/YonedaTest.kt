@@ -9,8 +9,8 @@ class YonedaTest : UnitSpec() {
 
     val F = Yoneda.functor(Id)
 
-    val EQ = object : Eq<YonedaKind<Id.F, Int>> {
-        override fun eqv(a: YonedaKind<Id.F, Int>, b: YonedaKind<Id.F, Int>): Boolean =
+    val EQ = object : Eq<YonedaKind<IdHK, Int>> {
+        override fun eqv(a: YonedaKind<IdHK, Int>, b: YonedaKind<IdHK, Int>): Boolean =
                 a.ev().lower() == b.ev().lower()
     }
 
@@ -37,11 +37,11 @@ class YonedaTest : UnitSpec() {
             }
         }
 
-        "toCoYoneda should convert to an equivalent CoYoneda" {
+        "toCoyoneda should convert to an equivalent Coyoneda" {
             forAll { x: Int ->
                 val op = Yoneda.apply(Id(x.toString()))
-                val toYoneda = op.toCoYoneda().lower(Id).ev()
-                val expected = CoYoneda.apply(Id(x), Int::toString).lower(Id).ev()
+                val toYoneda = op.toCoyoneda().lower(Id).ev()
+                val expected = Coyoneda.apply(Id(x), Int::toString).lower(Id).ev()
 
                 expected == toYoneda
             }

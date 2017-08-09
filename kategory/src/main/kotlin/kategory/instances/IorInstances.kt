@@ -1,9 +1,9 @@
 package kategory
 
 interface IorInstances<L> :
-        Functor<HK<Ior.F, L>>,
-        Applicative<HK<Ior.F, L>>,
-        Monad<HK<Ior.F, L>> {
+        Functor<HK<IorHK, L>>,
+        Applicative<HK<IorHK, L>>,
+        Monad<HK<IorHK, L>> {
 
     fun SL(): Semigroup<L>
 
@@ -36,11 +36,11 @@ interface IorInstances<L> :
 }
 
 interface IorTraverse<A> :
-        Foldable<HK<Ior.F, A>>,
-        Traverse<HK<Ior.F, A>> {
-    override fun <G, B, C> traverse(fa: HK<HK<Ior.F, A>, B>, f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, HK<HK<Ior.F, A>, C>> = fa.ev().fold({ GA.pure(Ior.Left(it)) }, { GA.map(f(it), { Ior.Right(it) }) }, { _, b -> GA.map(f(b), { Ior.Right(it) }) })
+        Foldable<HK<IorHK, A>>,
+        Traverse<HK<IorHK, A>> {
+    override fun <G, B, C> traverse(fa: HK<HK<IorHK, A>, B>, f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, HK<HK<IorHK, A>, C>> = fa.ev().fold({ GA.pure(Ior.Left(it)) }, { GA.map(f(it), { Ior.Right(it) }) }, { _, b -> GA.map(f(b), { Ior.Right(it) }) })
 
-    override fun <B, C> foldL(fa: HK<HK<Ior.F, A>, B>, c: C, f: (C, B) -> C): C = fa.ev().fold({ c }, { f(c, it) }, { _, b -> f(c, b) })
+    override fun <B, C> foldL(fa: HK<HK<IorHK, A>, B>, c: C, f: (C, B) -> C): C = fa.ev().fold({ c }, { f(c, it) }, { _, b -> f(c, b) })
 
-    override fun <B, C> foldR(fa: HK<HK<Ior.F, A>, B>, lc: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> = fa.ev().fold({ lc }, { f(it, lc) }, { _, b -> f(b, lc) })
+    override fun <B, C> foldR(fa: HK<HK<IorHK, A>, B>, lc: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> = fa.ev().fold({ lc }, { f(it, lc) }, { _, b -> f(b, lc) })
 }

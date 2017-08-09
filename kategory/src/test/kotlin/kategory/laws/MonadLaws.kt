@@ -54,31 +54,31 @@ object MonadLaws {
     }
 
     inline fun <reified F> equivalentComprehensions(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
-            forAll(Gen.int(), { x: Int ->
-                val a = M.binding {
-                    val a = M.pure(x).bind()
+            forAll(Gen.int(), { num: Int ->
+                val aa = M.binding {
+                    val a = M.pure(num).bind()
                     val b = M.pure(a + 1).bind()
                     val c = M.pure(b + 1).bind()
                     yields(c)
                 }
-                val b = M.bindingStackSafe {
-                    val a = M.pure(x).bind()
+                val bb = M.bindingStackSafe {
+                    val a = M.pure(num).bind()
                     val b = M.pure(a + 1).bind()
                     val c = M.pure(b + 1).bind()
                     yields(c)
                 }.run(M)
-                a.equalUnderTheLaw(b, EQ)
-                a.equalUnderTheLaw(M.pure(x + 2), EQ)
+                aa.equalUnderTheLaw(bb, EQ)
+                aa.equalUnderTheLaw(M.pure(num + 2), EQ)
             })
 
     inline fun <reified F> monadComprehensions(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
-            forAll(Gen.int(), { a: Int ->
+            forAll(Gen.int(), { num: Int ->
                 M.binding {
-                    val a = M.pure(a).bind()
+                    val a = M.pure(num).bind()
                     val b = M.pure(a + 1).bind()
                     val c = M.pure(b + 1).bind()
                     yields(c)
-                }.equalUnderTheLaw(M.pure(a + 2), EQ)
+                }.equalUnderTheLaw(M.pure(num + 2), EQ)
             })
 
     fun <F> stackSafeTestProgram(M: Monad<F>, n: Int, stopAt: Int): Free<F, Int> = M.bindingStackSafe {

@@ -1,14 +1,9 @@
 package kategory
 
-typealias CoproductF<F> = HK<Coproduct.F, F>
-typealias CoproductFG<F, G> = HK2<Coproduct.F, F, G>
-typealias CoproductKind<F, G, A> = HK3<Coproduct.F, F, G, A>
+typealias CoproductF<F> = HK<CoproductHK, F>
+typealias CoproductFG<F, G> = HK2<CoproductHK, F, G>
 
-fun <F, G, A> CoproductKind<F, G, A>.ev(): Coproduct<F, G, A> = this as Coproduct<F, G, A>
-
-data class Coproduct<F, G, A>(val CF: Comonad<F>, val CG: Comonad<G>, val run: Either<HK<F, A>, HK<G, A>>) : CoproductKind<F, G, A> {
-
-    class F private constructor()
+@higherkind data class Coproduct<F, G, A>(val CF: Comonad<F>, val CG: Comonad<G>, val run: Either<HK<F, A>, HK<G, A>>) : CoproductKind<F, G, A> {
 
     fun <B> map(f: (A) -> B): Coproduct<F, G, B> = Coproduct(CF, CG, run.bimap(CF.lift(f), CG.lift(f)))
 
