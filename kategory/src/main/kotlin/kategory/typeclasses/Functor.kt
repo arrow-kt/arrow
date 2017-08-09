@@ -8,6 +8,17 @@ interface Functor<F> : Typeclass {
             { fa: HK<F, A> ->
                 map(fa, f)
             }
+
+    fun <A> void(fa: HK<F, A>): HK<F, Unit> = map(fa, { _ -> Unit })
+
+    fun <A, B> fproduct(fa: HK<F, A>, f: (A) -> B): HK<F, Tuple2<A, B>> = map(fa, { a -> Tuple2(a, f(a)) })
+
+    fun <A, B> `as`(fa: HK<F, A>, b: B): HK<F, B> = map(fa, { _ -> b})
+
+    fun <A, B> tupleLeft(fa: HK<F, A>, b: B): HK<F, Tuple2<B, A>> = map(fa, { a -> Tuple2(b, a)})
+
+    fun <A, B> tupleRigth(fa: HK<F, A>, b: B): HK<F, Tuple2<A, B>> = map(fa, { a -> Tuple2(a, b)})
+
 }
 
 inline fun <reified F> functor(): Functor<F> = instance(InstanceParametrizedType(Functor::class.java, listOf(F::class.java)))
