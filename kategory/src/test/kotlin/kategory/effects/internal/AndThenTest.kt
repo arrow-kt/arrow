@@ -14,7 +14,7 @@ class AndThenTest : UnitSpec() {
     init {
         "should chains operations with compose" {
             forAll { num: Int ->
-                val f = AndThen { num: Int -> num.toString() }
+                val f = AndThen { n: Int -> n.toString() }
                 val g = AndThen { str: String -> Integer.parseInt(str) }
                 num == g.compose(f)(num)
             }
@@ -22,7 +22,7 @@ class AndThenTest : UnitSpec() {
 
         "should chains operations with andThen" {
             forAll { num: Int ->
-                val f = AndThen { num: Int -> num.toString() }
+                val f = AndThen { n: Int -> n.toString() }
                 val g = AndThen { str: String -> Integer.parseInt(str) }
                 num == f.andThen(g)(num)
             }
@@ -91,8 +91,8 @@ class AndThenTest : UnitSpec() {
                                     }
                                 })
                         )
-                        .andThen(AndThen { num: Int ->
-                            num.toString()
+                        .andThen(AndThen { n: Int ->
+                            n.toString()
                         })
 
                 f(num) == expected.toString()
@@ -104,8 +104,8 @@ class AndThenTest : UnitSpec() {
                 val expected = 10
                 val dummy = MyException()
 
-                val f = AndThen { num: Int -> num }
-                        .andThen(AndThen { num: Int ->
+                val f = AndThen { n: Int -> num }
+                        .andThen(AndThen { n: Int ->
                             num.toString()
                         })
                         .error(dummy, { expected.toString() })

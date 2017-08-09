@@ -42,7 +42,7 @@ package kategory
                     override fun <S> run(s: S): Eval<B> =
                             object : Compute<B>() {
                                 override fun <S1> start(): Eval<S1> = (this@Eval).run(s) as Eval<S1>
-                                override fun <S1> run(s: S1): Eval<B> = f(s as A)
+                                override fun <S1> run(s1: S1): Eval<B> = f(s1 as A)
                             }
                 }
                 is Eval.Call<A> -> object : Eval.Compute<B>() {
