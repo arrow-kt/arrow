@@ -2,7 +2,7 @@ package kategory
 
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
-import java.util.*
+import java.util.Arrays
 import java.util.concurrent.ConcurrentHashMap
 
 /**
