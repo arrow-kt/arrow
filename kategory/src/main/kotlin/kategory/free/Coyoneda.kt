@@ -6,6 +6,7 @@ private typealias AnyFunc = (Any?) -> Any?
 
 @higherkind data class Coyoneda<F, P, A>(val pivot: HK<F, P>, internal val ks: List<AnyFunc>) : CoyonedaKind<F, P, A> {
 
+    @Suppress("UNCHECKED_CAST")
     private val transform: (P) -> A = {
         var curr: Any? = it
         ks.forEach { curr = it(curr) }
