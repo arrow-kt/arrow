@@ -10,11 +10,9 @@ interface EitherInstances<L> :
 
     override fun <A> pure(a: A): Either<L, A> = Either.Right(a)
 
-    override fun <A, B> flatMap(fa: EitherKind<L, A>, f: (A) -> EitherKind<L, B>): Either<L, B> =
-            fa.ev().flatMap { f(it).ev() }
+    override fun <A, B> flatMap(fa: EitherKind<L, A>, f: (A) -> EitherKind<L, B>): Either<L, B> = fa.ev().flatMap { f(it).ev() }
 
-    override fun <A, B> map(fa: HK<EitherF<L>, A>, f: (A) -> B): Either<L, B> =
-            fa.ev().map(f)
+    override fun <A, B> map(fa: HK<EitherF<L>, A>, f: (A) -> B): Either<L, B> = fa.ev().map(f)
 
     tailrec override fun <A, B> tailRecM(a: A, f: (A) -> HK<EitherF<L>, Either<A, B>>): Either<L, B> {
         val ev: Either<L, Either<A, B>> = f(a).ev()
@@ -40,8 +38,7 @@ interface EitherInstances<L> :
         }
     }
 
-    override fun <G, A, B> traverse(fa: HK<EitherF<L>, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<EitherF<L>, B>> =
-            fa.ev().fold({ GA.pure(it.left()) }, { GA.map(f(it), { Either.Right(it) }) })
+    override fun <G, A, B> traverse(fa: HK<EitherF<L>, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<EitherF<L>, B>> = fa.ev().fold({ GA.pure(it.left()) }, { GA.map(f(it), { Either.Right(it) }) })
 
     override fun <A, B> foldL(fa: HK<EitherF<L>, A>, b: B, f: (B, A) -> B): B =
             fa.ev().let { either ->

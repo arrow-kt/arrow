@@ -16,15 +16,15 @@ class GlobalInstancesTest : UnitSpec() {
     init {
 
         "Id inference" {
-            testTypeclassHierarchyInference<Id.F>(Id)
+            testTypeclassHierarchyInference<IdHK>(Id)
         }
 
         "NonEmptyList monad inference" {
-            testTypeclassHierarchyInference<NonEmptyList.F>(NonEmptyList)
+            testTypeclassHierarchyInference<NonEmptyListHK>(NonEmptyList)
         }
 
         "Option monad inference" {
-            testTypeclassHierarchyInference<Option.F>(Option)
+            testTypeclassHierarchyInference<OptionHK>(Option)
         }
     }
 }

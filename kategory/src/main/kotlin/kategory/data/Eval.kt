@@ -1,8 +1,5 @@
 package kategory
 
-fun <A> HK<Eval.F, A>.ev(): Eval<A> =
-        this as Eval<A>
-
 /**
  * Eval is a monad which controls evaluation of a value or a computation that produces a value.
  *
@@ -30,15 +27,13 @@ fun <A> HK<Eval.F, A>.ev(): Eval<A> =
  * Eval instance -- this can defeat the trampolining and lead to stack
  * overflows.
  */
-sealed class Eval<out A> : HK<Eval.F, A> {
-    class F private constructor()
+@higherkind sealed class Eval<out A> : EvalKind<A> {
 
     abstract fun value(): A
 
     abstract fun memoize(): Eval<A>
 
-    fun <B> map(f: (A) -> B): Eval<B> =
-            flatMap { a -> Now(f(a)) }
+    fun <B> map(f: (A) -> B): Eval<B> = flatMap { a -> Now(f(a)) }
 
     fun <B> flatMap(f: (A) -> Eval<B>): Eval<B> =
             when (this) {
@@ -47,7 +42,7 @@ sealed class Eval<out A> : HK<Eval.F, A> {
                     override fun <S> run(s: S): Eval<B> =
                             object : Compute<B>() {
                                 override fun <S1> start(): Eval<S1> = (this@Eval).run(s) as Eval<S1>
-                                override fun <S1> run(s: S1): Eval<B> = f(s as A)
+                                override fun <S1> run(s1: S1): Eval<B> = f(s1 as A)
                             }
                 }
                 is Eval.Call<A> -> object : Eval.Compute<B>() {
@@ -156,8 +151,7 @@ sealed class Eval<out A> : HK<Eval.F, A> {
 
         abstract fun <S> run(s: S): Eval<A>
 
-        override fun memoize(): Eval<A> =
-                Later { value() }
+        override fun memoize(): Eval<A> = Later { value() }
 
         override fun value(): A {
             var curr: Eval<A> = this
@@ -194,7 +188,7 @@ sealed class Eval<out A> : HK<Eval.F, A> {
         }
     }
 
-    companion object : EvalInstances, GlobalInstance<Monad<Eval.F>>() {
+    companion object : EvalInstances, GlobalInstance<Monad<EvalHK>>() {
         @JvmStatic fun <A> now(a: A) = Now(a)
         @JvmStatic fun <A> later(f: () -> A) = Later(f)
         @JvmStatic fun <A> always(f: () -> A) = Always(f)
@@ -207,10 +201,10 @@ sealed class Eval<out A> : HK<Eval.F, A> {
         @JvmStatic val Zero: Eval<Int> = Now(0)
         @JvmStatic val One: Eval<Int> = Now(1)
 
-        fun functor(): Functor<Eval.F> = this
+        fun functor(): Functor<EvalHK> = this
 
-        fun applicative(): Applicative<Eval.F> = this
+        fun applicative(): Applicative<EvalHK> = this
 
-        fun monad(): Monad<Eval.F> = this
+        fun monad(): Monad<EvalHK> = this
     }
 }

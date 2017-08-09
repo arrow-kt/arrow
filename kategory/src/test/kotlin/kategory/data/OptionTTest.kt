@@ -9,8 +9,8 @@ import org.junit.runner.RunWith
 class OptionTTest : UnitSpec() {
     init {
 
-        val OptionTFIdEq = object : Eq<HK<OptionTF<Id.F>, Int>> {
-            override fun eqv(a: HK<OptionTF<Id.F>, Int>, b: HK<OptionTF<Id.F>, Int>): Boolean {
+        val OptionTFIdEq = object : Eq<HK<OptionTF<IdHK>, Int>> {
+            override fun eqv(a: HK<OptionTF<IdHK>, Int>, b: HK<OptionTF<IdHK>, Int>): Boolean {
                 return a.ev().value == b.ev().value
             }
         }
@@ -43,7 +43,7 @@ class OptionTTest : UnitSpec() {
             forAll { a: String ->
                 val ot = OptionT(NonEmptyList.of(Option.Some(a)))
                 val mapped = ot.flatMap { OptionT(NonEmptyList.of(Option.Some(3))) }
-                val expected: OptionT<NonEmptyList.F, Int> = OptionT.pure(3)
+                val expected: OptionT<NonEmptyListHK, Int> = OptionT.pure(3)
 
                 mapped == expected
             }
@@ -51,25 +51,25 @@ class OptionTTest : UnitSpec() {
             forAll { ignored: String ->
                 val ot = OptionT(NonEmptyList.of(Option.Some(ignored)))
                 val mapped = ot.flatMap { OptionT(NonEmptyList.of(Option.None)) }
-                val expected = OptionT.none<NonEmptyList.F>()
+                val expected = OptionT.none<NonEmptyListHK>()
 
                 mapped == expected
             }
 
-            OptionT.none<NonEmptyList.F>()
+            OptionT.none<NonEmptyListHK>()
                     .flatMap { OptionT(NonEmptyList.of(Option.Some(2))) } shouldBe OptionT(NonEmptyList.of(Option.None))
         }
 
         "from option should build a correct OptionT" {
             forAll { a: String ->
-                OptionT.fromOption<NonEmptyList.F, String>(Option.Some(a)) == OptionT.pure<NonEmptyList.F, String>(a)
+                OptionT.fromOption<NonEmptyListHK, String>(Option.Some(a)) == OptionT.pure<NonEmptyListHK, String>(a)
             }
         }
 
         "OptionTMonad.flatMap should be consistent with OptionT#flatMap" {
             forAll { a: Int ->
-                val x = { b: Int -> OptionT.pure<Id.F, Int>(b * a) }
-                val option = OptionT.pure<Id.F, Int>(a)
+                val x = { b: Int -> OptionT.pure<IdHK, Int>(b * a) }
+                val option = OptionT.pure<IdHK, Int>(a)
                 option.flatMap(x) == OptionT.monad(Id).flatMap(option, x)
             }
         }
@@ -88,7 +88,7 @@ class OptionTTest : UnitSpec() {
         "Cartesian builder should build products over option" {
             OptionT.applicative(Id).map(OptionT.pure(1), OptionT.pure("a"), OptionT.pure(true), { (a, b, c) ->
                 "$a $b $c"
-            }) shouldBe OptionT.pure<Id.F, String>("1 a true")
+            }) shouldBe OptionT.pure<IdHK, String>("1 a true")
         }
 
         "Cartesian builder works inside for comprehensions" {

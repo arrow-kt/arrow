@@ -1,60 +1,64 @@
 package kategory
 
-typealias FreeKind<S, A> = HK2<Free.F, S, A>
-typealias FreeF<S> = HK<Free.F, S>
+typealias FreeF<S> = HK<FreeHK, S>
 
-fun <S, A> FreeKind<S, A>.ev(): Free<S, A> =
-        this as Free<S, A>
+inline fun <reified M, S, A> FreeKind<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M> = monad()): HK<M, A> = (this as Free<S, A>).foldMap(f, MM)
 
-fun <M, S, A> FreeKind<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M>): HK<M, A> =
-        (this as Free<S, A>).foldMap(f, MM)
-
-sealed class Free<out S, out A> : FreeKind<S, A> {
-
-    class F private constructor()
+@higherkind sealed class Free<out S, out A> : FreeKind<S, A> {
 
     companion object {
-        fun <S, A> pure(a: A): Free<S, A> =
-                Pure(a)
+        fun <S, A> pure(a: A): Free<S, A> = Pure(a)
 
-        fun <S, A> liftF(fa: HK<S, A>): Free<S, A> =
-                Suspend(fa)
+        fun <S, A> liftF(fa: HK<S, A>): Free<S, A> = Suspend(fa)
 
-        fun <S, A> defer(value: () -> Free<S, A>): Free<S, A> =
-                pure<S, Unit>(Unit).flatMap { _ -> value() }
+        fun <S, A> defer(value: () -> Free<S, A>): Free<S, A> = pure<S, Unit>(Unit).flatMap { _ -> value() }
 
         fun <S> functor(): FreeInstances<S> = object : FreeInstances<S> {}
 
         fun <S> applicative(): FreeInstances<S> = object : FreeInstances<S> {}
 
         fun <S> monad(): FreeInstances<S> = object : FreeInstances<S> {}
+
+        internal fun <F> functionKF(): FunctionK<F, FreeF<F>> =
+                object : FunctionK<F, FreeF<F>> {
+                    override fun <A> invoke(fa: HK<F, A>): Free<F, A> =
+                            Free.liftF(fa)
+
+                }
+
+        internal fun <F> applicativeF(): Applicative<FreeF<F>> =
+                object : Applicative<FreeF<F>> {
+                    private val applicative: Applicative<FreeF<F>> = applicative<F>()
+
+                    override fun <A> pure(a: A): Free<F, A> =
+                            Free.pure(a)
+
+                    override fun <A, B> ap(fa: HK<FreeF<F>, A>, ff: HK<FreeF<F>, (A) -> B>): Free<F, B> {
+                        return applicative.ap(fa, ff).ev()
+                    }
+                }
     }
 
     abstract fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B>
 
     data class Pure<out S, out A>(val a: A) : Free<S, A>() {
-        override fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B> =
-                Free.pure(f(a))
+        override fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B> = Free.pure(f(a))
     }
 
     data class Suspend<out S, out A>(val a: HK<S, A>) : Free<S, A>() {
-        override fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B> =
-                Free.liftF(fs(a)).map(f)
+        override fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B> = Free.liftF(fs(a)).map(f)
     }
 
     data class FlatMapped<out S, out A, C>(val c: Free<S, C>, val f: (C) -> Free<S, A>) : Free<S, A>() {
-        override fun <O, B> transform(fm: (A) -> B, fs: FunctionK<S, O>): Free<O, B> =
-                Free.FlatMapped(c.transform({ it }, fs), { c.flatMap { f(it) }.transform(fm, fs) })
+        override fun <O, B> transform(fm: (A) -> B, fs: FunctionK<S, O>): Free<O, B> = Free.FlatMapped(c.transform({ it }, fs), { c.flatMap { f(it) }.transform(fm, fs) })
     }
 
     override fun toString(): String = "Free(...) : toString is not stack-safe"
 }
 
-fun <S, A, B> Free<S, A>.map(f: (A) -> B): Free<S, B> =
-        flatMap { Free.Pure<S, B>(f(it)) }
+fun <S, A, B> Free<S, A>.map(f: (A) -> B): Free<S, B> = flatMap { Free.Pure<S, B>(f(it)) }
 
-fun <S, A, B> Free<S, A>.flatMap(f: (A) -> Free<S, B>): Free<S, B> =
-        Free.FlatMapped(this, f)
+fun <S, A, B> Free<S, A>.flatMap(f: (A) -> Free<S, B>): Free<S, B> = Free.FlatMapped(this, f)
 
 @Suppress("UNCHECKED_CAST")
 tailrec fun <S, A> Free<S, A>.step(): Free<S, A> =
@@ -86,8 +90,7 @@ fun <M, S, A> Free<S, A>.foldMap(f: FunctionK<S, M>, MM: Monad<M>): HK<M, A> =
             }
         }
 
-fun <S, A> A.free(): Free<S, A> =
-        Free.pure<S, A>(this)
+fun <S, A> A.free(): Free<S, A> = Free.pure<S, A>(this)
 
 fun <F, A> Free<F, A>.run(M: Monad<F>): HK<F, A> = this.foldMap(FunctionK.id(), M)
 

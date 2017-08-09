@@ -50,7 +50,7 @@ class CoreaderTest : UnitSpec() {
         }
 
         "andThen should continue sequence" {
-            val cokleisli: Cokleisli<Id.F, Int, Int> = Cokleisli({ it.value() })
+            val cokleisli: Cokleisli<IdHK, Int, Int> = Cokleisli({ it.value() })
 
             cokleisli.andThen(Id(3)).run(Id(0)) shouldBe 3
 

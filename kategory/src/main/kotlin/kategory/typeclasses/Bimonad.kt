@@ -5,5 +5,4 @@ package kategory
  */
 interface Bimonad<F> : Monad<F>, Comonad<F>, Typeclass
 
-inline fun <reified F> bimonad(): Bimonad<F> =
-        instance(InstanceParametrizedType(Bimonad::class.java, listOf(F::class.java)))
+inline fun <reified F> bimonad(): Bimonad<F> = instance(InstanceParametrizedType(Bimonad::class.java, listOf(F::class.java)))

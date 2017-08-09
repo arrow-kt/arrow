@@ -22,6 +22,7 @@ allprojects {
         maven { url "http://dl.bintray.com/kategory/maven" }
         maven { url 'https://kotlin.bintray.com/kotlinx' }
         maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
+        maven { url "http://dl.bintray.com/kategory/maven" } // can be removed once the annotations project is in jcenter as well
     }
 }
 ```

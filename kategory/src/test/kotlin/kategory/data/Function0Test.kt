@@ -8,8 +8,8 @@ import org.junit.runner.RunWith
 class Function0Test : UnitSpec() {
     init {
 
-        testLaws(MonadLaws.laws(Function0, object : Eq<HK<Function0.F, Int>> {
-            override fun eqv(a: HK<Function0.F, Int>, b: HK<Function0.F, Int>): Boolean =
+        testLaws(MonadLaws.laws(Function0, object : Eq<HK<Function0HK, Int>> {
+            override fun eqv(a: HK<Function0HK, Int>, b: HK<Function0HK, Int>): Boolean =
                     a() == b()
         }))
 
