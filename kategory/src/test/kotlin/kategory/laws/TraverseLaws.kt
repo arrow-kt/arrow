@@ -17,9 +17,9 @@ class TIF {
 }
 
 object TraverseLaws {
-    inline fun <reified F> laws(FF: Traverse<F> = traverse<F>(), APF: Applicative<F> = applicative<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): List<Law> =
-            FoldableLaws.laws(FF, cf, Eq.any()) + FunctorLaws.laws(APF, EQ) + listOf(
-                    Law("Traverse Laws: Identity", { identityTraverse(FF, APF, cf, EQ) }),
+    inline fun <reified F> laws(FF: Traverse<F> = traverse<F>(), AP: Applicative<F> = applicative<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): List<Law> =
+            FoldableLaws.laws(FF, cf, Eq.any()) + FunctorLaws.laws(AP, EQ) + listOf(
+                    Law("Traverse Laws: Identity", { identityTraverse(FF, AP, cf, EQ) }),
                     Law("Traverse Laws: Sequential composition", { sequentialComposition(FF, cf, EQ) }),
                     Law("Traverse Laws: Parallel composition", { parallelComposition(FF, cf, EQ) })
                     // TODO (#136)
