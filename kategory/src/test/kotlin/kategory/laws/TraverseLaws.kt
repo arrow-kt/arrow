@@ -20,8 +20,7 @@ object TraverseLaws {
     inline fun <reified F> laws(FF: Traverse<F> = traverse<F>(), AP: Applicative<F> = applicative<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): List<Law> =
             FoldableLaws.laws(FF, cf, Eq.any()) + FunctorLaws.laws(AP, EQ) + listOf(
                     Law("Traverse Laws: Identity", { identityTraverse(FF, AP, cf, EQ) }),
-                    // TODO (#136)
-                    // Law("Traverse Laws: Sequential composition", { sequentialComposition(FF, AP, cf, EQ) })
+                    Law("Traverse Laws: Sequential composition", { sequentialComposition(FF, cf, EQ) }),
                     Law("Traverse Laws: Parallel composition", { parallelComposition(FF, cf, EQ) })
                     // TODO (#136)
                     // Law("Traverse Laws: FoldMap derived", { foldMapDerived(FF, AP, cf, EQ) })
@@ -30,6 +29,14 @@ object TraverseLaws {
     inline fun <reified F> identityTraverse(FF: Traverse<F>, AP: Applicative<F> = applicative<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>) =
             forAll(genFunctionAToB<Int, HK<IdHK, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf), { f: (Int) -> HK<IdHK, Int>, fa: HK<F, Int> ->
                 FF.traverse(fa, f, Id).value().equalUnderTheLaw(FF.map(fa, f).map(AP) { it.value() }, EQ)
+            })
+
+    inline fun <reified F> sequentialComposition(FF: Traverse<F>, crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>) =
+            forAll(genFunctionAToB<Int, HK<IdHK, Int>>(genConstructor(genIntSmall(), ::Id)), genFunctionAToB<Int, HK<IdHK, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf), { f: (Int) -> HK<IdHK, Int>, g: (Int) -> HK<IdHK, Int>, fha: HK<F, Int> ->
+                val fa = fha.traverse(FF, Id, f).ev()
+                val composed = Id.map(fa, { it.traverse(FF, Id, g) }).value.value()
+                val expected = fha.traverse(FF, ComposedApplicative(Id, Id), { a: Int -> Id.map(f(a), g).lift() }).lower().value().value()
+                composed.equalUnderTheLaw(expected, EQ)
             })
 
     inline fun <reified F> parallelComposition(FF: Traverse<F>, crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>) =
