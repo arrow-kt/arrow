@@ -12,8 +12,8 @@ object Reader {
 
     operator fun <D, A> invoke(run: (D) -> A, MF: Monad<IdHK> = Id): ReaderT<IdHK, D, A> = Kleisli(run.andThen { Id(it) }, MF)
 
-    fun <D, A> pure(x: A, MF: Monad<IdHK> = Id): ReaderT<IdHK, D, A> = Kleisli.pure<IdHK, D, A>(x, Id)
+    fun <D, A> pure(x: A, MF: Monad<IdHK> = Id): ReaderT<IdHK, D, A> = Kleisli.pure<IdHK, D, A>(x, MF)
 
-    fun <D> ask(MF: Monad<IdHK> = Id): ReaderT<IdHK, D, D> = Kleisli.ask<IdHK, D>(Id)
+    fun <D> ask(MF: Monad<IdHK> = Id): ReaderT<IdHK, D, D> = Kleisli.ask<IdHK, D>(MF)
 
 }
