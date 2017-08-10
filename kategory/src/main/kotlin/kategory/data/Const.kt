@@ -14,21 +14,15 @@ typealias ConstF<A> = HK<ConstHK, A>
     companion object {
         fun <T, A> pure(a: A): Const<A, T> = Const(a)
 
-        fun <A> instances(MA: Monoid<A>): ConstInstances<A> = object : ConstInstances<A> {
-            override fun MA(): Monoid<A> = MA
-        }
+        inline fun <reified A> instances(MA: Monoid<A> = kategory.monoid<A>()): ConstInstances<A> = ConstInstances(MA)
 
         inline fun <reified A> applicative(MA: Monoid<A> = kategory.monoid<A>()): Applicative<ConstF<A>> = instances(MA)
 
         inline fun <reified A> traverse(MA: Monoid<A> = kategory.monoid<A>()): Traverse<ConstF<A>> = instances(MA)
 
-        fun <A, T> semigroup(MA: Monoid<A>): Semigroup<ConstKind<A, T>> = object : ConstMonoid<A, T> {
-            override fun MA(): Monoid<A> = MA
-        }
+        inline fun <reified A, T> semigroup(MA: Monoid<A> = kategory.monoid<A>()): Semigroup<ConstKind<A, T>> = ConstMonoid(MA)
 
-        fun <A, T> monoid(MA: Monoid<A>): Monoid<ConstKind<A, T>> = object : ConstMonoid<A, T> {
-            override fun MA(): Monoid<A> = MA
-        }
+        inline fun <reified A, T> monoid(MA: Monoid<A> = kategory.monoid<A>()): Monoid<ConstKind<A, T>> = ConstMonoid(MA)
     }
 }
 
