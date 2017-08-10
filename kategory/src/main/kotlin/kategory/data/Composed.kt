@@ -78,11 +78,9 @@ interface ComposedFunctor<F, G> : Functor<ComposedType<F, G>> {
 
     fun G(): Functor<G>
 
-    override fun <A, B> map(fa: HK<ComposedType<F, G>, A>, f: (A) -> B): HK<ComposedType<F, G>, B> =
-            F().map(fa.lower(), { G().map(it, f) }).lift()
+    override fun <A, B> map(fa: HK<ComposedType<F, G>, A>, f: (A) -> B): HK<ComposedType<F, G>, B> = F().map(fa.lower(), { G().map(it, f) }).lift()
 
-    fun <A, B> mapC(fa: HK<F, HK<G, A>>, f: (A) -> B): HK<F, HK<G, B>> =
-            map(fa.lift(), f).lower()
+    fun <A, B> mapC(fa: HK<F, HK<G, A>>, f: (A) -> B): HK<F, HK<G, B>> = map(fa.lift(), f).lower()
 
     companion object {
         inline operator fun <reified F, reified G> invoke(FF: Functor<F> = functor<F>(), GF: Functor<G> = functor<G>()): Functor<ComposedType<F, G>> = object : ComposedFunctor<F, G> {
@@ -100,17 +98,13 @@ interface ComposedApplicative<F, G> : Applicative<ComposedType<F, G>>, ComposedF
 
     override fun G(): Applicative<G>
 
-    override fun <A, B> map(fa: HK<ComposedType<F, G>, A>, f: (A) -> B): HK<ComposedType<F, G>, B> =
-            ap(fa, pure(f))
+    override fun <A, B> map(fa: HK<ComposedType<F, G>, A>, f: (A) -> B): HK<ComposedType<F, G>, B> = ap(fa, pure(f))
 
-    override fun <A> pure(a: A): HK<ComposedType<F, G>, A> =
-            F().pure(G().pure(a)).lift()
+    override fun <A> pure(a: A): HK<ComposedType<F, G>, A> = F().pure(G().pure(a)).lift()
 
-    override fun <A, B> ap(fa: HK<ComposedType<F, G>, A>, ff: HK<ComposedType<F, G>, (A) -> B>): HK<ComposedType<F, G>, B> =
-            F().ap(fa.lower(), F().map(ff.lower(), { gfa: HK<G, (A) -> B> -> { ga: HK<G, A> -> G().ap(ga, gfa) } })).lift()
+    override fun <A, B> ap(fa: HK<ComposedType<F, G>, A>, ff: HK<ComposedType<F, G>, (A) -> B>): HK<ComposedType<F, G>, B> = F().ap(fa.lower(), F().map(ff.lower(), { gfa: HK<G, (A) -> B> -> { ga: HK<G, A> -> G().ap(ga, gfa) } })).lift()
 
-    fun <A, B> apC(fa: HK<F, HK<G, A>>, ff: HK<F, HK<G, (A) -> B>>): HK<F, HK<G, B>> =
-            ap(fa.lift(), ff.lift()).lower()
+    fun <A, B> apC(fa: HK<F, HK<G, A>>, ff: HK<F, HK<G, (A) -> B>>): HK<F, HK<G, B>> = ap(fa.lift(), ff.lift()).lower()
 
     companion object {
         inline operator fun <reified F, reified G> invoke(FF: Applicative<F> = applicative<F>(), GF: Applicative<G> = applicative<G>()): Applicative<ComposedType<F, G>> = object : ComposedApplicative<F, G> {
@@ -121,5 +115,4 @@ interface ComposedApplicative<F, G> : Applicative<ComposedType<F, G>>, ComposedF
     }
 }
 
-inline fun <reified F, reified G> Applicative<F>.compose(GA: Applicative<G> = applicative<G>()): Applicative<ComposedType<F, G>> =
-        ComposedApplicative(this, GA)
+inline fun <reified F, reified G> Applicative<F>.compose(GA: Applicative<G> = applicative<G>()): Applicative<ComposedType<F, G>> = ComposedApplicative(this, GA)
