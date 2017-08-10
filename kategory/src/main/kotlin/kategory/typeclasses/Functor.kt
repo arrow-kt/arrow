@@ -13,12 +13,11 @@ interface Functor<F> : Typeclass {
 
     fun <A, B> fproduct(fa: HK<F, A>, f: (A) -> B): HK<F, Tuple2<A, B>> = map(fa, { a -> Tuple2(a, f(a)) })
 
-    fun <A, B> `as`(fa: HK<F, A>, b: B): HK<F, B> = map(fa, { _ -> b})
+    fun <A, B> `as`(fa: HK<F, A>, b: B): HK<F, B> = map(fa, { _ -> b })
 
-    fun <A, B> tupleLeft(fa: HK<F, A>, b: B): HK<F, Tuple2<B, A>> = map(fa, { a -> Tuple2(b, a)})
+    fun <A, B> tupleLeft(fa: HK<F, A>, b: B): HK<F, Tuple2<B, A>> = map(fa, { a -> Tuple2(b, a) })
 
-    fun <A, B> tupleRigth(fa: HK<F, A>, b: B): HK<F, Tuple2<A, B>> = map(fa, { a -> Tuple2(a, b)})
-
+    fun <A, B> tupleRigth(fa: HK<F, A>, b: B): HK<F, Tuple2<A, B>> = map(fa, { a -> Tuple2(a, b) })
 }
 
 fun <F, B, A : B> Functor<F>.widen(fa: HK<F, A>): HK<F, B> = fa as HK<F, B>
