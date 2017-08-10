@@ -39,3 +39,5 @@ fun <A, T> ConstKind<A, T>.combine(that: ConstKind<A, T>, SG: Semigroup<A>): Con
 
 fun <A, T, U> ConstKind<A, T>.ap(ff: ConstKind<A, (T) -> U>, SG: Semigroup<A>): Const<A, U> =
         ff.ev().retag<U>().combine(this.ev().retag(), SG)
+
+fun <A> A.const(): Const<A, Nothing> = Const(this)

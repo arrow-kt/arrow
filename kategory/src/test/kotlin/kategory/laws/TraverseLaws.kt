@@ -60,7 +60,7 @@ object TraverseLaws {
 
     inline fun <reified F> foldMapDerived(FF: Traverse<F>, AP: Applicative<F> = applicative<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>) =
             forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: HK<F, Int> ->
-                val traversed = fa.traverse(FF, Const.applicative(IntMonoid), { a -> Const<Int, String>(f(a)) }).value()
+                val traversed = fa.traverse(FF, Const.applicative(IntMonoid), { a -> f(a).const() }).value()
                 val mapped = fa.foldMap(FF, IntMonoid, f)
                 mapped.equalUnderTheLaw(traversed, Eq.any())
             })
