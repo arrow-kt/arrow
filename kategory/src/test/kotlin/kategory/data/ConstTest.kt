@@ -10,4 +10,3 @@ class ConstTest : UnitSpec() {
         testLaws(ApplicativeLaws.laws(Const.applicative(IntMonoid), Eq.any()))
     }
 }
-
