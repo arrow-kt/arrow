@@ -4,11 +4,6 @@ test {
     }
 }
 
-repositories {
-    jcenter()
-    maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
-}
-
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
