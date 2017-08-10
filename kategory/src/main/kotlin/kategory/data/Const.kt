@@ -1,7 +1,6 @@
 package kategory
 
-fun <A, T> ConstKind<A, T>.value(): A =
-        this.ev().value
+fun <A, T> ConstKind<A, T>.value(): A = this.ev().value
 
 typealias ConstF<A> = HK<ConstHK, A>
 
@@ -10,8 +9,7 @@ typealias ConstF<A> = HK<ConstHK, A>
     @Suppress("UNCHECKED_CAST")
     fun <U> retag(): Const<A, U> = this as Const<A, U>
 
-    inline fun <F, U> traverse(f: (T) -> HK<F, U>, FA: Applicative<F>): HK<F, Const<A, U>> =
-            FA.pure(retag())
+    inline fun <F, U> traverse(f: (T) -> HK<F, U>, FA: Applicative<F>): HK<F, Const<A, U>> = FA.pure(retag())
 
     companion object {
         fun <T, A> pure(a: A): Const<A, T> = Const(a)
@@ -34,10 +32,8 @@ typealias ConstF<A> = HK<ConstHK, A>
     }
 }
 
-fun <A, T> ConstKind<A, T>.combine(that: ConstKind<A, T>, SG: Semigroup<A>): Const<A, T> =
-        Const(SG.combine(this.value(), that.value()))
+fun <A, T> ConstKind<A, T>.combine(that: ConstKind<A, T>, SG: Semigroup<A>): Const<A, T> = Const(SG.combine(this.value(), that.value()))
 
-fun <A, T, U> ConstKind<A, T>.ap(ff: ConstKind<A, (T) -> U>, SG: Semigroup<A>): Const<A, U> =
-        ff.ev().retag<U>().combine(this.ev().retag(), SG)
+fun <A, T, U> ConstKind<A, T>.ap(ff: ConstKind<A, (T) -> U>, SG: Semigroup<A>): Const<A, U> = ff.ev().retag<U>().combine(this.ev().retag(), SG)
 
 fun <A> A.const(): Const<A, Nothing> = Const(this)
