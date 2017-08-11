@@ -121,9 +121,7 @@ package kategory
                         else -> fa
                     }
 
-            /**
-             * Enforce tailrec call to collapse inside compute loop
-             */
+            //Enforce tailrec call to collapse inside compute loop
             private inline fun <A> collapse1(fa: Eval<A>): Eval<A> = collapse(fa)
         }
     }
