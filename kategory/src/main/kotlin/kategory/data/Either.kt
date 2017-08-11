@@ -101,8 +101,8 @@ typealias EitherF<L> = HK<EitherHK, L>
      * The left side of the disjoint union, as opposed to the [Right] side.
      */
     data class Left<out A, out B>(val a: A, private val dummy: Unit) : Either<A, B>() {
-        override internal val isLeft = true
-        override internal val isRight = false
+        override val isLeft = true
+        override val isRight = false
 
         companion object {
             inline operator fun <A> invoke(a: A): Either<A, Nothing> = Left(a, Unit)
@@ -113,8 +113,8 @@ typealias EitherF<L> = HK<EitherHK, L>
      * The right side of the disjoint union, as opposed to the [Left] side.
      */
     data class Right<out A, out B>(val b: B, private val dummy: Unit) : Either<A, B>() {
-        override internal val isLeft = false
-        override internal val isRight = true
+        override val isLeft = false
+        override val isRight = true
 
         companion object {
             inline operator fun <B> invoke(b: B): Either<Nothing, B> = Right(b, Unit)
