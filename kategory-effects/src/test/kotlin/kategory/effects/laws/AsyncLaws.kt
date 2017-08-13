@@ -25,9 +25,9 @@ object AsyncLaws {
     inline fun <reified F> asyncBind(AC: AsyncContext<F> = asyncContext(), M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(genIntSmall(), genIntSmall(), genIntSmall(), { x: Int, y: Int, z: Int ->
                 val bound = M.binding {
-                    val a = !runAsync(AC) { x }
-                    val b = !runAsync(AC) { a + y }
-                    val c = !runAsync(AC) { b + z }
+                    val a = bindAsync(AC) { x }
+                    val b = bindAsync(AC) { a + y }
+                    val c = bindAsync(AC) { b + z }
                     yields(c)
                 }
                 bound.equalUnderTheLaw(M.pure<Int>(x + y + z), EQ)
