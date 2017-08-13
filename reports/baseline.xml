@@ -1,12 +1,12 @@
 <?xml version="1.0" ?>
 <SmellBaseline>
   <Blacklist timestamp="1490879306930"></Blacklist>
-  <Whitelist timestamp="1502651620375">
+  <Whitelist timestamp="1502654393507">
     <ID>LabeledExpression:FunctionK.kt$&lt;no name provided&gt;$this@or</ID>
     <ID>LabeledExpression:PartialFunction.kt$&lt;no name provided&gt;$this@orElse</ID>
     <ID>LabeledExpression:PartialFunction.kt$&lt;no name provided&gt;$this@andThen</ID>
-    <ID>LabeledExpression:Eval.kt$Eval.&lt;no name provided&gt;$this@Eval</ID>
     <ID>LabeledExpression:Eval.kt$Eval.&lt;no name provided&gt;.&lt;no name provided&gt;$this@Eval</ID>
+    <ID>LabeledExpression:Eval.kt$Eval.&lt;no name provided&gt;$this@Eval</ID>
     <ID>LabeledExpression:Eval.kt$Eval.Compute$break@loop</ID>
     <ID>LabeledExpression:Eval.kt$Eval.Compute$loop@ while (true) { when (curr) { is Compute -&gt; { val currComp: Compute&lt;A&gt; = curr currComp.start&lt;A&gt;().let { cc -&gt; when (cc) { is Compute -&gt; { val inStartFun: (Any?) -&gt; Eval&lt;A&gt; = { cc.run(it) } val outStartFun: (Any?) -&gt; Eval&lt;A&gt; = { currComp.run(it) } curr = cc.start&lt;A&gt;() fs = listOf(inStartFun, outStartFun) + fs } else -&gt; { curr = currComp.run(cc.value()) } } } } else -&gt; if (fs.isNotEmpty()) { curr = fs[0](curr.value()) fs = fs.drop(1) } else { break@loop } } }</ID>
     <ID>LabeledExpression:Yoneda.kt$Yoneda.&lt;no name provided&gt;$this@Yoneda</ID>
@@ -20,8 +20,8 @@
     <ID>OptionalUnit:AndThen.kt$AndThen$Unit</ID>
     <ID>OptionalUnit:IO.kt$IO$Unit</ID>
     <ID>LateinitUsage:Comonad.kt$ComonadContinuation$internal lateinit var returnedMonad: A</ID>
-    <ID>LateinitUsage:Monad.kt$MonadContinuation$internal lateinit var returnedMonad: HK&lt;F, A&gt;</ID>
-    <ID>LateinitUsage:Monad.kt$StackSafeMonadContinuation$internal lateinit var returnedMonad: Free&lt;F, A&gt;</ID>
+    <ID>LateinitUsage:Monad.kt$MonadContinuation$protected lateinit var returnedMonad: HK&lt;F, A&gt;</ID>
+    <ID>LateinitUsage:Monad.kt$StackSafeMonadContinuation$protected lateinit var returnedMonad: Free&lt;F, A&gt;</ID>
     <ID>UnsafeCallOnNullableType:AndThen.kt$AndThen$failure!!</ID>
     <ID>MaxLineLength:Kleisli.kt$kategory.Kleisli.kt</ID>
     <ID>MaxLineLength:Composed.kt$kategory.Composed.kt</ID>
