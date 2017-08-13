@@ -17,7 +17,8 @@ interface Functor<F> : Typeclass {
 
     fun <A, B> tupleLeft(fa: HK<F, A>, b: B): HK<F, Tuple2<B, A>> = map(fa, { a -> Tuple2(b, a) })
 
-    fun <A, B> tupleRigth(fa: HK<F, A>, b: B): HK<F, Tuple2<A, B>> = map(fa, { a -> Tuple2(a, b) })
+    fun <A, B> tupleRight(fa: HK<F, A>, b: B): HK<F, Tuple2<A, B>> = map(fa, { a -> Tuple2(a, b) })
+
 }
 
 fun <F, B, A : B> Functor<F>.widen(fa: HK<F, A>): HK<F, B> = fa as HK<F, B>

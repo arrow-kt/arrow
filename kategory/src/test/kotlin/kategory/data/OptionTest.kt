@@ -112,7 +112,7 @@ class OptionTest : UnitSpec() {
 
         "Option.functor.tupleRight should return a tuple the current value and the value passed" {
             forAll { a: Int ->
-                Option.tupleRigth(Option(a), a + 1) == Some(Tuple2(a, a + 1))
+                Option.tupleRight(Option(a), a + 1) == Some(Tuple2(a, a + 1))
             }
         }
 
