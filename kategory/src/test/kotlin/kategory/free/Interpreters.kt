@@ -1,14 +1,14 @@
 package kategory
 
-val cofreeOptionToNel: FunctionK<CofreeF<OptionHK>, NonEmptyListHK> = object : FunctionK<CofreeF<OptionHK>, NonEmptyListHK> {
-    override fun <A> invoke(fa: HK<CofreeF<OptionHK>, A>): HK<NonEmptyListHK, A> =
+val cofreeOptionToNel: FunctionK<CofreeKindPartial<OptionHK>, NonEmptyListHK> = object : FunctionK<CofreeKindPartial<OptionHK>, NonEmptyListHK> {
+    override fun <A> invoke(fa: HK<CofreeKindPartial<OptionHK>, A>): HK<NonEmptyListHK, A> =
             fa.ev().let { c ->
                 NonEmptyList.fromListUnsafe(listOf(c.head) + c.tailForced().ev().fold({ listOf<A>() }, { invoke(it).ev().all }))
             }
 }
 
-val cofreeListToNel: FunctionK<CofreeF<ListT.ListF>, NonEmptyListHK> = object : FunctionK<CofreeF<ListT.ListF>, NonEmptyListHK> {
-    override fun <A> invoke(fa: HK<CofreeF<ListT.ListF>, A>): HK<NonEmptyListHK, A> =
+val cofreeListToNel: FunctionK<CofreeKindPartial<ListT.ListF>, NonEmptyListHK> = object : FunctionK<CofreeKindPartial<ListT.ListF>, NonEmptyListHK> {
+    override fun <A> invoke(fa: HK<CofreeKindPartial<ListT.ListF>, A>): HK<NonEmptyListHK, A> =
             fa.ev().let { c: Cofree<ListT.ListF, A> ->
                 val all: List<Cofree<ListT.ListF, A>> = c.tailForced().lev().all
                 val tail: List<A> = all.foldRight(listOf<A>(), { v, acc -> acc + invoke(v).ev().all })

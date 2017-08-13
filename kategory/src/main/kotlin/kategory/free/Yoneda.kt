@@ -1,7 +1,5 @@
 package kategory
 
-typealias YonedaF<F> = HK<YonedaHK, F>
-
 @higherkind abstract class Yoneda<F, A> : YonedaKind<F, A> {
 
     abstract fun <B> apply(f: (A) -> B): HK<F, B>
