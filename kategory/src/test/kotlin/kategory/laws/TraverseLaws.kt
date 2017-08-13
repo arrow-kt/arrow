@@ -17,23 +17,30 @@ class TIF {
 }
 
 object TraverseLaws {
+    // FIXME(paco): cf is only required because AP::pure will crash the inliner
     inline fun <reified F> laws(FF: Traverse<F> = traverse<F>(), AP: Applicative<F> = applicative<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): List<Law> =
             FoldableLaws.laws(FF, cf, Eq.any()) + FunctorLaws.laws(AP, EQ) + listOf(
                     Law("Traverse Laws: Identity", { identityTraverse(FF, AP, cf, EQ) }),
-                    // TODO (#136)
-                    // Law("Traverse Laws: Sequential composition", { sequentialComposition(FF, AP, cf, EQ) })
-                    Law("Traverse Laws: Parallel composition", { parallelComposition(FF, cf, EQ) })
-                    // TODO (#136)
-                    // Law("Traverse Laws: FoldMap derived", { foldMapDerived(FF, AP, cf, EQ) })
+                    Law("Traverse Laws: Sequential composition", { sequentialComposition(FF, cf, EQ) }),
+                    Law("Traverse Laws: Parallel composition", { parallelComposition(FF, cf, EQ) }),
+                    Law("Traverse Laws: FoldMap derived", { foldMapDerived(FF, AP, cf, EQ) })
             )
 
     inline fun <reified F> identityTraverse(FF: Traverse<F>, AP: Applicative<F> = applicative<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>) =
-            forAll(genFunctionAToB<Int, HK<Id.F, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf), { f: (Int) -> HK<Id.F, Int>, fa: HK<F, Int> ->
+            forAll(genFunctionAToB<Int, HK<IdHK, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf), { f: (Int) -> HK<IdHK, Int>, fa: HK<F, Int> ->
                 FF.traverse(fa, f, Id).value().equalUnderTheLaw(FF.map(fa, f).map(AP) { it.value() }, EQ)
             })
 
+    inline fun <reified F> sequentialComposition(FF: Traverse<F>, crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>) =
+            forAll(genFunctionAToB<Int, HK<IdHK, Int>>(genConstructor(genIntSmall(), ::Id)), genFunctionAToB<Int, HK<IdHK, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf), { f: (Int) -> HK<IdHK, Int>, g: (Int) -> HK<IdHK, Int>, fha: HK<F, Int> ->
+                val fa = fha.traverse(FF, Id, f).ev()
+                val composed = Id.map(fa, { it.traverse(FF, Id, g) }).value.value()
+                val expected = fha.traverse(FF, ComposedApplicative(Id, Id), { a: Int -> Id.map(f(a), g).lift() }).lower().value().value()
+                composed.equalUnderTheLaw(expected, EQ)
+            })
+
     inline fun <reified F> parallelComposition(FF: Traverse<F>, crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>) =
-            forAll(genFunctionAToB<Int, HK<Id.F, Int>>(genConstructor(genIntSmall(), ::Id)), genFunctionAToB<Int, HK<Id.F, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf), { f: (Int) -> HK<Id.F, Int>, g: (Int) -> HK<Id.F, Int>, fha: HK<F, Int> ->
+            forAll(genFunctionAToB<Int, HK<IdHK, Int>>(genConstructor(genIntSmall(), ::Id)), genFunctionAToB<Int, HK<IdHK, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf), { f: (Int) -> HK<IdHK, Int>, g: (Int) -> HK<IdHK, Int>, fha: HK<F, Int> ->
                 val TIA = object : Applicative<TIF> {
                     override fun <A> pure(a: A): HK<TIF, A> =
                             TIC(Id(a) toT Id(a))
@@ -56,5 +63,12 @@ object TraverseLaws {
                 val expected: TI<HK<F, Int>> = TIC(FF.traverse(fha, f, Id) toT FF.traverse(fha, g, Id)).ti
 
                 seen.equalUnderTheLaw(expected, TIEQ)
+            })
+
+    inline fun <reified F> foldMapDerived(FF: Traverse<F>, AP: Applicative<F> = applicative<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>) =
+            forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: HK<F, Int> ->
+                val traversed = fa.traverse(FF, Const.applicative(IntMonoid), { a -> f(a).const() }).value()
+                val mapped = fa.foldMap(FF, IntMonoid, f)
+                mapped.equalUnderTheLaw(traversed, Eq.any())
             })
 }

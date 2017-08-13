@@ -10,7 +10,9 @@ object ApplicativeLaws {
                     Law("Applicative Laws: ap identity", { apIdentity(A, EQ) }),
                     Law("Applicative Laws: homomorphism", { homomorphism(A, EQ) }),
                     Law("Applicative Laws: interchange", { interchange(A, EQ) }),
-                    Law("Applicative Laws: map derived", { mapDerived(A, EQ) })
+                    Law("Applicative Laws: map derived", { mapDerived(A, EQ) }),
+                    Law("Applicative Laws: cartesian builder map", { cartesianBuilderMap(A, EQ) }),
+                    Law("Applicative Laws: cartesian builder tupled", { cartesianBuilderTupled(A, EQ) })
             )
 
     inline fun <reified F> apIdentity(A: Applicative<F> = applicative<F>(), EQ: Eq<HK<F, Int>>): Unit =
@@ -33,4 +35,13 @@ object ApplicativeLaws {
                 A.map(fa, f).equalUnderTheLaw(A.ap(fa, A.pure(f)), EQ)
             })
 
+    inline fun <reified F> cartesianBuilderMap(A: Applicative<F> = applicative<F>(), EQ: Eq<HK<F, Int>>): Unit =
+            forAll(genIntSmall(), genIntSmall(), genIntSmall(), genIntSmall(), genIntSmall(), genIntSmall(), { a: Int, b: Int, c: Int, d: Int, e: Int, f: Int ->
+                A.map(A.pure(a), A.pure(b), A.pure(c), A.pure(d), A.pure(e), A.pure(f), { (x, y, z, u, v, w) -> x + y + z - u - v - w }).equalUnderTheLaw(A.pure(a + b + c - d - e - f), EQ)
+            })
+
+    inline fun <reified F> cartesianBuilderTupled(A: Applicative<F> = applicative<F>(), EQ: Eq<HK<F, Int>>): Unit =
+            forAll(genIntSmall(), genIntSmall(), genIntSmall(), genIntSmall(), genIntSmall(), genIntSmall(), { a: Int, b: Int, c: Int, d: Int, e: Int, f: Int ->
+                A.map(A.tupled(A.pure(a), A.pure(b), A.pure(c), A.pure(d), A.pure(e), A.pure(f)), { (x, y, z, u, v, w) -> x + y + z - u - v - w }).equalUnderTheLaw(A.pure(a + b + c - d - e - f), EQ)
+            })
 }

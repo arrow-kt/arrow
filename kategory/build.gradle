@@ -8,7 +8,11 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
-
+    compile "io.kategory:kategory-annotations:0.3.5"
+    kapt "io.kategory:kategory-annotations-compile:0.3.5"
+    kaptTest "io.kategory:kategory-annotations-compile:0.3.5"
+    compileOnly "io.kategory:kategory-annotations-compile:0.3.5"
+    testCompileOnly "io.kategory:kategory-annotations-compile:0.3.5"
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
 }
 
@@ -18,3 +22,7 @@ sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+apply from: 'generated-kotlin-sources.gradle'
+apply plugin: 'kotlin-kapt'
+
+compileKotlin.kotlinOptions.freeCompilerArgs += ["-Xskip-runtime-version-check"]

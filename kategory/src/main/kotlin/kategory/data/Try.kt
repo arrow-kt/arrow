@@ -1,21 +1,14 @@
 package kategory
 
-typealias TryKind<A> = HK<Try.F, A>
-
-fun <A> TryKind<A>.ev(): Try<A> =
-        this as Try<A>
-
 /**
  * The `Try` type represents a computation that may either result in an exception, or return a
  * successfully computed value.
  *
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Try.scala
  */
-sealed class Try<out A> : TryKind<A> {
+@higherkind sealed class Try<out A> : TryKind<A> {
 
-    class F private constructor()
-
-    companion object : TryInstances, GlobalInstance<MonadError<Try.F, Throwable>>() {
+    companion object : TryInstances, GlobalInstance<MonadError<TryHK, Throwable>>() {
 
         inline operator fun <A> invoke(f: () -> A): Try<A> =
                 try {
@@ -24,34 +17,31 @@ sealed class Try<out A> : TryKind<A> {
                     Failure(e)
                 }
 
-        fun <A> raise(e: Exception): Try<A> =
-                Failure(e)
+        fun <A> raise(e: Exception): Try<A> = Failure(e)
 
-        fun functor(): Functor<Try.F> = this
+        fun functor(): Functor<TryHK> = this
 
-        fun applicative(): Applicative<Try.F> = this
+        fun applicative(): Applicative<TryHK> = this
 
-        fun monad(): Monad<Try.F> = this
+        fun monad(): Monad<TryHK> = this
 
-        fun monadError(): MonadError<Try.F, Throwable> = this
+        fun monadError(): MonadError<TryHK, Throwable> = this
 
-        fun foldable(): Foldable<Try.F> = this
+        fun foldable(): Foldable<TryHK> = this
 
-        fun traverse(): Traverse<Try.F> = this
+        fun traverse(): Traverse<TryHK> = this
 
     }
 
     /**
      * Returns the given function applied to the value from this `Success` or returns this if this is a `Failure`.
      */
-    inline fun <B> flatMap(crossinline f: (A) -> Try<B>): Try<B> =
-            fold({ Failure(it) }, { f(it) })
+    inline fun <B> flatMap(crossinline f: (A) -> Try<B>): Try<B> = fold({ Failure(it) }, { f(it) })
 
     /**
      * Maps the given function to the value from this `Success` or returns this if this is a `Failure`.
      */
-    inline fun <B> map(crossinline f: (A) -> B): Try<B> =
-            fold({ Failure(it) }, { Success(f(it)) })
+    inline fun <B> map(crossinline f: (A) -> B): Try<B> = fold({ Failure(it) }, { Success(f(it)) })
 
     /**
      * Converts this to a `Failure` if the predicate is not satisfied.
@@ -108,29 +98,24 @@ sealed class TryException(override val message: String) : kotlin.Exception(messa
  *
  * ''Note:'': This will throw an exception if it is not a success and default throws an exception.
  */
-fun <B> Try<B>.getOrElse(default: () -> B): B =
-        fold({ default() }, { it })
+fun <B> Try<B>.getOrElse(default: () -> B): B = fold({ default() }, { it })
 
 /**
  * Applies the given function `f` if this is a `Failure`, otherwise returns this if this is a `Success`.
  * This is like `flatMap` for the exception.
  */
-fun <B> Try<B>.recoverWith(f: (Throwable) -> Try<B>): Try<B> =
-        fold({ f(it) }, { Try.Success(it) })
+fun <B> Try<B>.recoverWith(f: (Throwable) -> Try<B>): Try<B> = fold({ f(it) }, { Try.Success(it) })
 
 /**
  * Applies the given function `f` if this is a `Failure`, otherwise returns this if this is a `Success`.
  * This is like map for the exception.
  */
-fun <B> Try<B>.recover(f: (Throwable) -> B): Try<B> =
-        fold({ Try.Success(f(it)) }, { Try.Success(it) })
+fun <B> Try<B>.recover(f: (Throwable) -> B): Try<B> = fold({ Try.Success(f(it)) }, { Try.Success(it) })
 
 /**
  * Completes this `Try` by applying the function `f` to this if this is of type `Failure`,
  * or conversely, by applying `s` if this is a `Success`.
  */
-fun <B> Try<B>.transform(s: (B) -> Try<B>, f: (Throwable) -> Try<B>): Try<B> =
-        fold({ f(it) }, { flatMap(s) })
+fun <B> Try<B>.transform(s: (B) -> Try<B>, f: (Throwable) -> Try<B>): Try<B> = fold({ f(it) }, { flatMap(s) })
 
-fun <A> (() -> A).try_(): Try<A> =
-        Try(this)
+fun <A> (() -> A).try_(): Try<A> = Try(this)

@@ -62,7 +62,7 @@ class NonEmptyListTest : UnitSpec() {
                 val nel: NonEmptyList<Int> = NonEmptyList(a, b)
                 val nel2 = NonEmptyList.of(1, 2)
                 val nel3 = NonEmptyList.of(3, 4, 5)
-                val result: HK<NonEmptyList.F, Int> = NonEmptyList.binding {
+                val result: HK<NonEmptyListHK, Int> = NonEmptyList.binding {
                     val x = !nel
                     val y = nel2.bind()
                     val z = bind { nel3 }

@@ -7,13 +7,13 @@ package kategory
  * returned as the overall result value for the whole function chain. That means Trampoline emulates what tail recursion
  * does.
  */
-typealias TrampolineF<A> = Free<Function0.F, A>
+typealias TrampolineF<A> = Free<Function0HK, A>
 
 object Trampoline : TrampolineFunctions
 
 interface TrampolineFunctions {
 
-    fun <A> done(a: A): TrampolineF<A> = Free.pure<Function0.F, A>(a)
+    fun <A> done(a: A): TrampolineF<A> = Free.pure<Function0HK, A>(a)
 
     fun <A> defer(a: () -> TrampolineF<A>): TrampolineF<A> = Free.defer(a)
 
