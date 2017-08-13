@@ -56,8 +56,8 @@ inline fun <reified F, A> FreeApplicativeKind<F, A>.foldK(FA: Applicative<F> = a
 
     fun <G> flatCompile(f: FunctionK<F, FreeApplicativeF<G>>, GFA: Applicative<FreeApplicativeF<G>>): FreeApplicative<G, A> = foldMap(f, GFA).ev()
 
-    fun <M> analyze(f: FunctionK<F, ConstF<M>>, MM: Monoid<M>): M =
-            foldMap(object : FunctionK<F, ConstF<M>> {
+    fun <M> analyze(f: FunctionK<F, ConstKindPartial<M>>, MM: Monoid<M>): M =
+            foldMap(object : FunctionK<F, ConstKindPartial<M>> {
                 override fun <A> invoke(fa: HK<F, A>): Const<M, A> = f(fa).ev()
             }, ConstInstances(MM)).value()
 

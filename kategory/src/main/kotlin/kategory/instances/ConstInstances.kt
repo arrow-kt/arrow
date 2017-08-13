@@ -1,22 +1,22 @@
 package kategory
 
 interface ConstInstances<A> :
-        Applicative<ConstF<A>>,
-        Traverse<ConstF<A>> {
+        Applicative<ConstKindPartial<A>>,
+        Traverse<ConstKindPartial<A>> {
 
     fun MA(): Monoid<A>
 
     override fun <T> pure(a: T): Const<A, T> = ConstMonoid<A, T>(MA()).empty().ev()
 
-    override fun <T, U> ap(fa: HK<ConstF<A>, T>, ff: HK<ConstF<A>, (T) -> U>): Const<A, U> = fa.ap(ff, MA())
+    override fun <T, U> ap(fa: HK<ConstKindPartial<A>, T>, ff: HK<ConstKindPartial<A>, (T) -> U>): Const<A, U> = fa.ap(ff, MA())
 
-    override fun <T, U> map(fa: HK<ConstF<A>, T>, f: (T) -> U): Const<A, U> = fa.ev().retag()
+    override fun <T, U> map(fa: HK<ConstKindPartial<A>, T>, f: (T) -> U): Const<A, U> = fa.ev().retag()
 
-    override fun <T, U> foldL(fa: HK<ConstF<A>, T>, b: U, f: (U, T) -> U): U = b
+    override fun <T, U> foldL(fa: HK<ConstKindPartial<A>, T>, b: U, f: (U, T) -> U): U = b
 
-    override fun <T, U> foldR(fa: HK<ConstF<A>, T>, lb: Eval<U>, f: (T, Eval<U>) -> Eval<U>): Eval<U> = lb
+    override fun <T, U> foldR(fa: HK<ConstKindPartial<A>, T>, lb: Eval<U>, f: (T, Eval<U>) -> Eval<U>): Eval<U> = lb
 
-    override fun <G, T, U> traverse(fa: HK<ConstF<A>, T>, f: (T) -> HK<G, U>, GA: Applicative<G>): HK<G, HK<ConstF<A>, U>> = fa.ev().traverse(f, GA)
+    override fun <G, T, U> traverse(fa: HK<ConstKindPartial<A>, T>, f: (T) -> HK<G, U>, GA: Applicative<G>): HK<G, HK<ConstKindPartial<A>, U>> = fa.ev().traverse(f, GA)
 
     companion object {
         operator fun <A> invoke(MA: Monoid<A>): ConstInstances<A> = object : kategory.ConstInstances<A> {
