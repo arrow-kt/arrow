@@ -8,9 +8,9 @@ import org.junit.runner.RunWith
 class Function0Test : UnitSpec() {
     init {
 
-        testLaws(MonadLaws.laws(Function0, object : Eq<HK<Function0.F, Int>> {
-            override fun eqv(a: HK<Function0.F, Int>, b: HK<Function0.F, Int>): Boolean =
-                    a.ev()() == b.ev()()
+        testLaws(MonadLaws.laws(Function0, object : Eq<HK<Function0HK, Int>> {
+            override fun eqv(a: HK<Function0HK, Int>, b: HK<Function0HK, Int>): Boolean =
+                    a() == b()
         }))
 
         "Function0Monad.binding should for comprehend over all values of multiple Function0" {
@@ -27,13 +27,13 @@ class Function0Test : UnitSpec() {
                 val x = Function0 { 1 }.extract()
                 val y = !Function0 { 2 }
                 val z = extract { Function0 { 3 } }
-                yields(x + y + z)
+                x + y + z
             } shouldBe 6
         }
 
         "Function0Comonad.duplicate should create an instance of Function0<Function0<A>>" {
-            Function0.duplicate(Function0 { 3 }).ev().invoke().ev().invoke() shouldBe
-                    Function0 { Function0 { 3 } }.ev().invoke().ev().invoke()
+            Function0.duplicate(Function0 { 3 }).invoke().invoke() shouldBe
+                    Function0 { Function0 { 3 } }.invoke().invoke()
         }
     }
 }

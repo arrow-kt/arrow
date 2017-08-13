@@ -10,6 +10,10 @@ class NonEmptyListTest : UnitSpec() {
     init {
 
         testLaws(MonadLaws.laws(NonEmptyList, Eq.any()))
+        testLaws(SemigroupKLaws.laws(
+                NonEmptyList.semigroupK(),
+                NonEmptyList.applicative(),
+                Eq.any()))
 
         "map should modify values" {
             NonEmptyList.of(14).map { it * 3 } shouldBe NonEmptyList.of(42)
@@ -58,7 +62,7 @@ class NonEmptyListTest : UnitSpec() {
                 val nel: NonEmptyList<Int> = NonEmptyList(a, b)
                 val nel2 = NonEmptyList.of(1, 2)
                 val nel3 = NonEmptyList.of(3, 4, 5)
-                val result: HK<NonEmptyList.F, Int> = NonEmptyList.binding {
+                val result: HK<NonEmptyListHK, Int> = NonEmptyList.binding {
                     val x = !nel
                     val y = nel2.bind()
                     val z = bind { nel3 }
@@ -73,7 +77,7 @@ class NonEmptyListTest : UnitSpec() {
                 val x = !NonEmptyList.of(1)
                 val y = NonEmptyList.of(2).extract()
                 val z = extract { NonEmptyList.of(3) }
-                yields(x + y + z)
+                x + y + z
             }
             result shouldBe 6
         }
@@ -83,7 +87,7 @@ class NonEmptyListTest : UnitSpec() {
                 val x = !NonEmptyList.of(1, 2)
                 val y = NonEmptyList.of(3).extract()
                 val z = extract { NonEmptyList.of(4) }
-                yields(x + y + z)
+                x + y + z
             }
             result shouldBe 8
         }
@@ -97,7 +101,7 @@ class NonEmptyListTest : UnitSpec() {
                     val x = !nel
                     val y = nel2.extract()
                     val z = extract { nel3 }
-                    yields(x + y + z)
+                    x + y + z
                 }
                 result == 1 + 3 + a
             }

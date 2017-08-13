@@ -12,11 +12,12 @@ class ValidatedTest : UnitSpec() {
 
     init {
 
-        val concatStringSG: Semigroup<String> = object : Semigroup<String> {
-            override fun combine(a: String, b: String): String = "$a $b"
-        }
-
-        testLaws(ApplicativeLaws.laws(Validated.applicative(concatStringSG), Eq.any()))
+        testLaws(ApplicativeLaws.laws(Validated.applicative(StringMonoid), Eq.any()))
+        testLaws(TraverseLaws.laws(Validated.traverse(StringMonoid), Validated.applicative(StringMonoid), ::Valid, Eq.any()))
+        testLaws(SemigroupKLaws.laws(
+                Validated.semigroupK(IntMonoid),
+                Validated.applicative(IntMonoid),
+                Eq.any()))
 
         "fold should call function on Invalid" {
             val exception = Exception("My Exception")
@@ -161,7 +162,7 @@ class ValidatedTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over homogeneous Validated" {
-            Validated.applicative(concatStringSG).map(
+            Validated.applicative(StringMonoid).map(
                     Valid("11th"),
                     Valid("Doctor"),
                     Valid("Who"),
@@ -169,7 +170,7 @@ class ValidatedTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over heterogeneous Validated" {
-            Validated.applicative(concatStringSG).map(
+            Validated.applicative(StringMonoid).map(
                     Valid(13),
                     Valid("Doctor"),
                     Valid(false),
@@ -177,11 +178,11 @@ class ValidatedTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over Invalid Validated" {
-            Validated.applicative(concatStringSG).map(
+            Validated.applicative(StringMonoid).map(
                     Invalid("fail1"),
                     Invalid("fail2"),
                     Valid("Who"),
-                    { "success!" }) shouldBe Invalid("fail1 fail2")
+                    { "success!" }) shouldBe Invalid("fail1fail2")
         }
     }
 }

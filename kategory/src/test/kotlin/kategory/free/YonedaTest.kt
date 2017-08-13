@@ -7,11 +7,20 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class YonedaTest : UnitSpec() {
 
+    val F = Yoneda.functor(Id)
+
+    val EQ = object : Eq<YonedaKind<IdHK, Int>> {
+        override fun eqv(a: YonedaKind<IdHK, Int>, b: YonedaKind<IdHK, Int>): Boolean =
+                a.ev().lower() == b.ev().lower()
+    }
+
     init {
+        testLaws(FunctorLaws.laws(F, { Yoneda.apply(kategory.Id(it)) }, EQ))
+
         "map should modify the content of any HK1" {
             forAll { x: Int ->
                 val op = Yoneda.apply(Id(x))
-                val mapped = op.map({ _ -> true }, functor<Id.F>()).lower()
+                val mapped = op.map({ _ -> true }, Id).lower()
                 val expected = Id(true)
 
                 expected == mapped
@@ -21,18 +30,18 @@ class YonedaTest : UnitSpec() {
         "instance map should be consistent with YonedaFunctor#map" {
             forAll { x: Int ->
                 val op = Yoneda.apply(Id(x))
-                val mapped = op.map({ _ -> true }, functor()).lower()
-                val expected = Yoneda.functor<Id.F>(functor()).map(op, { _ -> true}).ev().lower()
+                val mapped = op.map({ _ -> true }, Id).lower()
+                val expected = Yoneda.functor(Id).map(op, { _ -> true }).ev().lower()
 
                 expected == mapped
             }
         }
 
-        "toCoYoneda should convert to an equivalent CoYoneda" {
+        "toCoyoneda should convert to an equivalent Coyoneda" {
             forAll { x: Int ->
                 val op = Yoneda.apply(Id(x.toString()))
-                val toYoneda = op.toCoYoneda().lower(functor<Id.F>()).ev()
-                val expected = CoYoneda.apply(Id(x), Int::toString).lower(functor<Id.F>()).ev()
+                val toYoneda = op.toCoyoneda().lower(Id).ev()
+                val expected = Coyoneda.apply(Id(x), Int::toString).lower(Id).ev()
 
                 expected == toYoneda
             }

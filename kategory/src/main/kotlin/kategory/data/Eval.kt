@@ -1,8 +1,5 @@
 package kategory
 
-fun <A> HK<Eval.F, A>.ev(): Eval<A> =
-        this as Eval<A>
-
 /**
  * Eval is a monad which controls evaluation of a value or a computation that produces a value.
  *
@@ -30,15 +27,13 @@ fun <A> HK<Eval.F, A>.ev(): Eval<A> =
  * Eval instance -- this can defeat the trampolining and lead to stack
  * overflows.
  */
-sealed class Eval<out A> : HK<Eval.F, A> {
-    class F private constructor()
+@higherkind sealed class Eval<out A> : EvalKind<A> {
 
     abstract fun value(): A
 
     abstract fun memoize(): Eval<A>
 
-    fun <B> map(f: (A) -> B): Eval<B> =
-            flatMap { a -> Now(f(a)) }
+    fun <B> map(f: (A) -> B): Eval<B> = flatMap { a -> Now(f(a)) }
 
     fun <B> flatMap(f: (A) -> Eval<B>): Eval<B> =
             when (this) {
@@ -47,7 +42,7 @@ sealed class Eval<out A> : HK<Eval.F, A> {
                     override fun <S> run(s: S): Eval<B> =
                             object : Compute<B>() {
                                 override fun <S1> start(): Eval<S1> = (this@Eval).run(s) as Eval<S1>
-                                override fun <S1> run(s: S1): Eval<B> = f(s as A)
+                                override fun <S1> run(s1: S1): Eval<B> = f(s1 as A)
                             }
                 }
                 is Eval.Call<A> -> object : Eval.Compute<B>() {
@@ -115,28 +110,19 @@ sealed class Eval<out A> : HK<Eval.F, A> {
             /**
              * Collapse the call stack for eager evaluations.
              */
-            fun <A> collapse(fa: Eval<A>): Eval<A> {
-                var lfa = fa
-                loop@ while (true) {
-                    when (lfa) {
-                        is Call -> {
-                            lfa = lfa.thunk()
-                        }
-                        is Compute -> {
-                            val clfa: Compute<A> = lfa
+            tailrec fun <A> collapse(fa: Eval<A>): Eval<A> =
+                    when (fa) {
+                        is Call -> collapse(fa.thunk())
+                        is Compute ->
                             object : Compute<A>() {
-                                override fun <S> start(): Eval<S> = clfa.start()
-                                override fun <S> run(s: S): Eval<A> {
-                                    lfa = clfa.run(s)
-                                    return lfa
-                                }
+                                override fun <S> start(): Eval<S> = fa.start()
+                                override fun <S> run(s: S): Eval<A> = collapse1(fa.run(s))
                             }
-                        }
-                        else -> break@loop
+                        else -> fa
                     }
-                }
-                return lfa
-            }
+
+            //Enforce tailrec call to collapse inside compute loop
+            private inline fun <A> collapse1(fa: Eval<A>): Eval<A> = collapse(fa)
         }
     }
 
@@ -156,8 +142,7 @@ sealed class Eval<out A> : HK<Eval.F, A> {
 
         abstract fun <S> run(s: S): Eval<A>
 
-        override fun memoize(): Eval<A> =
-                Later { value() }
+        override fun memoize(): Eval<A> = Later { value() }
 
         override fun value(): A {
             var curr: Eval<A> = this
@@ -194,23 +179,37 @@ sealed class Eval<out A> : HK<Eval.F, A> {
         }
     }
 
-    companion object : EvalInstances, GlobalInstance<Monad<Eval.F>>() {
-        @JvmStatic fun <A> now(a: A) = Now(a)
-        @JvmStatic fun <A> later(f: () -> A) = Later(f)
-        @JvmStatic fun <A> always(f: () -> A) = Always(f)
-        @JvmStatic fun <A> defer(f: () -> Eval<A>): Eval<A> = Call(f)
-        @JvmStatic fun raise(t: Throwable): Eval<Nothing> = defer { throw t }
+    companion object : EvalInstances, GlobalInstance<Monad<EvalHK>>() {
+        @JvmStatic
+        fun <A> now(a: A) = Now(a)
 
-        @JvmStatic val Unit: Eval<Unit> = Now(kotlin.Unit)
-        @JvmStatic val True: Eval<Boolean> = Now(true)
-        @JvmStatic val False: Eval<Boolean> = Now(false)
-        @JvmStatic val Zero: Eval<Int> = Now(0)
-        @JvmStatic val One: Eval<Int> = Now(1)
+        @JvmStatic
+        fun <A> later(f: () -> A) = Later(f)
 
-        fun functor(): Functor<Eval.F> = this
+        @JvmStatic
+        fun <A> always(f: () -> A) = Always(f)
 
-        fun applicative(): Applicative<Eval.F> = this
+        @JvmStatic
+        fun <A> defer(f: () -> Eval<A>): Eval<A> = Call(f)
 
-        fun monad(): Monad<Eval.F> = this
+        @JvmStatic
+        fun raise(t: Throwable): Eval<Nothing> = defer { throw t }
+
+        @JvmStatic
+        val Unit: Eval<Unit> = Now(kotlin.Unit)
+        @JvmStatic
+        val True: Eval<Boolean> = Now(true)
+        @JvmStatic
+        val False: Eval<Boolean> = Now(false)
+        @JvmStatic
+        val Zero: Eval<Int> = Now(0)
+        @JvmStatic
+        val One: Eval<Int> = Now(1)
+
+        fun functor(): Functor<EvalHK> = this
+
+        fun applicative(): Applicative<EvalHK> = this
+
+        fun monad(): Monad<EvalHK> = this
     }
 }

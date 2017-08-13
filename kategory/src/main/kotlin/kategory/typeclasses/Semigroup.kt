@@ -17,11 +17,8 @@ interface Semigroup<A> : Typeclass {
     fun combineAll(elems: Collection<A>): A = elems.reduce { a, b -> combine(a, b) }
 }
 
-inline fun <reified A> A.combine(FT: Semigroup<A> = semigroup(), b: A): A =
-    FT.combine(this, b)
+inline fun <reified A> A.combine(FT: Semigroup<A> = semigroup(), b: A): A = FT.combine(this, b)
 
-inline fun <reified A> Collection<A>.combineAll(FT: Semigroup<A> = semigroup()): A =
-        FT.combineAll(this)
+inline fun <reified A> Collection<A>.combineAll(FT: Semigroup<A> = semigroup()): A = FT.combineAll(this)
 
-inline fun <reified A> semigroup(): Semigroup<A> =
-        instance(InstanceParametrizedType(Semigroup::class.java, listOf(A::class.java)))
+inline fun <reified A> semigroup(): Semigroup<A> = instance(InstanceParametrizedType(Semigroup::class.java, listOf(A::class.java)))

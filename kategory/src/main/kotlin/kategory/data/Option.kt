@@ -1,38 +1,29 @@
 package kategory
 
-typealias OptionKind<A> = HK<Option.F, A>
-
-fun <A> OptionKind<A>.ev(): Option<A> =
-        this as Option<A>
-
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/Option.scala
  *
  * Represents optional values. Instances of `Option`
  * are either an instance of $some or the object $none.
  */
-sealed class Option<out A> : OptionKind<A> {
+@higherkind sealed class Option<out A> : OptionKind<A> {
 
-    class F private constructor()
+    companion object : OptionInstances, GlobalInstance<Monad<OptionHK>>() {
+        @JvmStatic fun <A : Any> fromNullable(a: A?): Option<A> = if (a != null) Option.Some(a) else Option.None
 
-    companion object : OptionInstances, GlobalInstance<Monad<Option.F>>() {
-        @JvmStatic fun <A : Any> fromNullable(a: A?): Option<A> =
-                if (a != null) Option.Some(a) else Option.None
+        operator fun <A> invoke(a: A): Option<A> = Option.Some(a)
 
-        operator fun <A> invoke(a: A): Option<A> =
-                Option.Some(a)
+        fun functor(): Functor<OptionHK> = this
 
-        fun functor(): Functor<Option.F> = this
+        fun applicative(): Applicative<OptionHK> = this
 
-        fun applicative(): Applicative<Option.F> = this
+        fun monad(): Monad<OptionHK> = this
 
-        fun monad(): Monad<Option.F> = this
+        fun monadError(): MonadError<OptionHK, Unit> = this
 
-        fun monadError(): MonadError<Option.F, Unit> = this
+        fun foldable(): Foldable<OptionHK> = this
 
-        fun foldable(): Foldable<Option.F> = this
-
-        fun traverse(): Traverse<Option.F> = this
+        fun traverse(): Traverse<OptionHK> = this
 
         fun <A> monoid(SG: Semigroup<A>): OptionMonoid<A> = object : OptionMonoid<A> {
             override fun SG(): Semigroup<A> = SG
@@ -40,9 +31,10 @@ sealed class Option<out A> : OptionKind<A> {
     }
 
     /**
-     * Returns true if the option is $none, false otherwise.
+     * Returns true if the option is [None], false otherwise.
+     * Used only for performance instead of fold.
      */
-    abstract val isEmpty: Boolean
+    internal abstract val isEmpty: Boolean
 
     /**
      * Returns true if the option is an instance of $some, false otherwise.
@@ -59,7 +51,7 @@ sealed class Option<out A> : OptionKind<A> {
      * @param f the function to apply
      * @see flatMap
      */
-    inline fun <B> map(f: (A) -> B): Option<B> = fold({ Option.None }, { a -> Option.Some(f(a)) })
+    inline fun <B> map(crossinline f: (A) -> B): Option<B> = fold({ Option.None }, { a -> Option.Some(f(a)) })
 
     /**
      * Returns the result of applying $f to this $option's value if
@@ -71,7 +63,7 @@ sealed class Option<out A> : OptionKind<A> {
      * @param f the function to apply
      * @see map
      */
-    inline fun <B> flatMap(f: (A) -> Option<B>): Option<B> = fold({ Option.None }, { a -> f(a) })
+    inline fun <B> flatMap(crossinline f: (A) -> Option<B>): Option<B> = fold({ Option.None }, { a -> f(a) })
 
     /**
      * Returns the result of applying $f to this $option's
@@ -83,9 +75,9 @@ sealed class Option<out A> : OptionKind<A> {
      * @param ifEmpty the expression to evaluate if empty.
      * @param f the function to apply if nonempty.
      */
-    inline fun <B> fold(ifEmpty: () -> B, f: (A) -> B): B = when (this) {
+    inline fun <B> fold(crossinline ifEmpty: () -> B, crossinline f: (A) -> B): B = when (this) {
         is Option.None -> ifEmpty()
-        is Option.Some -> f(value)
+        is Option.Some<A> -> f(value)
     }
 
     /**
@@ -94,7 +86,7 @@ sealed class Option<out A> : OptionKind<A> {
      *
      *  @param p the predicate used for testing.
      */
-    inline fun filter(p: (A) -> Boolean): Option<A> = fold({ Option.None }, { a -> if (p(a)) Option.Some(a) else Option.None })
+    inline fun filter(crossinline p: (A) -> Boolean): Option<A> = fold({ Option.None }, { a -> if (p(a)) Option.Some(a) else Option.None })
 
     /**
      * Returns this $option if it is nonempty '''and''' applying the predicate $p to
@@ -102,7 +94,7 @@ sealed class Option<out A> : OptionKind<A> {
      *
      * @param p the predicate used for testing.
      */
-    inline fun filterNot(p: (A) -> Boolean): Option<A> = fold({ Option.None }, { a -> if (!p(a)) Option.Some(a) else Option.None })
+    inline fun filterNot(crossinline p: (A) -> Boolean): Option<A> = fold({ Option.None }, { a -> if (!p(a)) Option.Some(a) else Option.None })
 
     /**
      * Returns false if the option is $none, true otherwise.
@@ -117,7 +109,7 @@ sealed class Option<out A> : OptionKind<A> {
      *
      * @param p the predicate to test
      */
-    inline fun exists(p: (A) -> Boolean): Boolean = fold({ false }, { a -> p(a) })
+    inline fun exists(crossinline p: (A) -> Boolean): Boolean = fold({ false }, { a -> p(a) })
 
     /**
      * Returns true if this option is empty '''or''' the predicate
@@ -125,7 +117,7 @@ sealed class Option<out A> : OptionKind<A> {
      *
      * @param p the predicate to test
      */
-    inline fun forall(p: (A) -> Boolean): Boolean = exists(p)
+    inline fun forall(crossinline p: (A) -> Boolean): Boolean = exists(p)
 
     data class Some<out A>(val value: A) : Option<A>() {
         override val isEmpty = false
@@ -151,11 +143,8 @@ fun <B> Option<B>.getOrElse(default: () -> B): B = fold({ default() }, { it })
  *
  * @param default the default option if this is empty.
  */
-fun <A, B : A> Option<B>.orElse(alternative: () -> Option<B>): Option<B> =
-    if (isEmpty) alternative() else this
+fun <A, B : A> Option<B>.orElse(alternative: () -> Option<B>): Option<B> = if (isEmpty) alternative() else this
 
-fun <A> A.some(): Option<A> =
-        Option.Some(this)
+fun <A> A.some(): Option<A> = Option.Some(this)
 
-fun <A> none(): Option<A> =
-        Option.None
+fun <A> none(): Option<A> = Option.None

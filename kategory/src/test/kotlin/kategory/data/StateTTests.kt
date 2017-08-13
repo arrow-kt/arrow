@@ -1,35 +1,33 @@
-/*
- * Copyright (C) 2017 The Kategory Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package kategory
 
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class StateTTests : UnitSpec() {
 
     init {
-        val instances = StateT.monad<Try.F, Int>(Try)
 
-        testLaws(MonadLaws.laws(instances, object : Eq<StateTKind<Try.F, Int, Int>> {
-            override fun eqv(a: StateTKind<Try.F, Int, Int>, b: StateTKind<Try.F, Int, Int>): Boolean =
-                    a.ev().run(1) == b.ev().run(1)
+        val instances = StateT.monadState<TryHK, Int>(Try)
 
-        }))
+        testLaws(MonadStateLaws.laws(
+                instances,
+                object : Eq<StateTKind<TryHK, Int, Int>> {
+                    override fun eqv(a: StateTKind<TryHK, Int, Int>, b: StateTKind<TryHK, Int, Int>): Boolean =
+                            a.runM(1) == b.runM(1)
+
+                },
+                object : Eq<StateTKind<TryHK, Int, Unit>> {
+                    override fun eqv(a: StateTKind<TryHK, Int, Unit>, b: StateTKind<TryHK, Int, Unit>): Boolean =
+                            a.runM(1) == b.runM(1)
+                }))
+
+        testLaws(SemigroupKLaws.laws<StateTF<OptionHK, Int>>(
+                StateT.semigroupK(Option, OptionSemigroupK()),
+                StateT.applicative(Option),
+                object : Eq<HK<StateTF<OptionHK, Int>, Int>> {
+                    override fun eqv(a: HK<StateTF<OptionHK, Int>, Int>, b: HK<StateTF<OptionHK, Int>, Int>): Boolean =
+                            a.runM(1) == b.runM(1)
+                }))
     }
 }

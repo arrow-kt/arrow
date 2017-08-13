@@ -2,8 +2,4 @@ package kategory
 
 fun <A> identity(a: A): A = a
 
-inline fun <reified A> ListMonoid(): Monoid<List<A>> = object : Monoid<List<A>>, GlobalInstance<Monoid<List<A>>>() {
-    override fun empty(): List<A> = emptyList()
-
-    override fun combine(a: List<A>, b: List<A>): List<A> = a + b
-}
+fun <A, B, Z> ((A, B) -> Z).curry(): (A) -> (B) -> Z = { p1: A -> { p2: B -> this(p1, p2) } }
