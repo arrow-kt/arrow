@@ -33,7 +33,8 @@ interface WriterTSemigroupK<F, W> : SemigroupK<WriterTKindPartial<F, W>> {
 
     fun F0(): SemigroupK<F>
 
-    override fun <A> combineK(x: HK<WriterTKindPartial<F, W>, A>, y: HK<WriterTKindPartial<F, W>, A>): WriterT<F, W, A> = WriterT(MF(), F0().combineK(x.ev().value, y.ev().value))
+    override fun <A> combineK(x: HK<WriterTKindPartial<F, W>, A>, y: HK<WriterTKindPartial<F, W>, A>):
+            WriterT<F, W, A> = WriterT(MF(), F0().combineK(x.ev().value, y.ev().value))
 }
 
 interface WriterTMonoidK<F, W> : MonoidK<WriterTKindPartial<F, W>>, WriterTSemigroupK<F, W> {
