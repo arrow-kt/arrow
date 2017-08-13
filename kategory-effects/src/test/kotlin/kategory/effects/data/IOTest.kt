@@ -8,13 +8,15 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class IOTest : UnitSpec() {
+    val EQ: Eq<HK<IOHK, Int>> = object : Eq<HK<IOHK, Int>> {
+        override fun eqv(a: HK<IOHK, Int>, b: HK<IOHK, Int>): Boolean =
+                a.ev().attempt().unsafeRunSync() == b.ev().attempt().unsafeRunSync()
+    }
 
     init {
 
-        testLaws(MonadLaws.laws(IO, object : Eq<HK<IOHK, Int>> {
-            override fun eqv(a: HK<IOHK, Int>, b: HK<IOHK, Int>): Boolean =
-                    a.ev().unsafeRunSync() == b.ev().unsafeRunSync()
-        }))
+        testLaws(MonadLaws.laws(IO, EQ))
+        testLaws(AsyncLaws.laws(IO, IO, EQ, EQ))
 
         "should defer evaluation until run" {
             var run = false
@@ -202,18 +204,6 @@ class IOTest : UnitSpec() {
             val expected = 2
 
             run shouldBe expected
-        }
-
-        "should combine with Semigroup" {
-            val one = IO.pure(1)
-            val two = IO.pure(2)
-
-            IO.semigroup<Int>(semigroup()).combine(one, two).unsafeRunSync() shouldBe 3
-        }
-
-        "should have an empty value with Monoid" {
-
-            IO.monoid<Int>(monoid()).empty().unsafeRunSync() shouldBe 0
         }
 
         "IO.binding should for comprehend over IO" {

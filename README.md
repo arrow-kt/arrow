@@ -12,7 +12,7 @@ Functional Datatypes and abstractions for Kotlin inspired by [Cats][cats]
 
 # Add it to your project
 
-Use it at your how risk, the actual state is not production ready.
+Use it at your own risk, the actual state is not production ready.
 
 Add it in your root `build.gradle` at the end of repositories.
 

@@ -110,28 +110,19 @@ package kategory
             /**
              * Collapse the call stack for eager evaluations.
              */
-            fun <A> collapse(fa: Eval<A>): Eval<A> {
-                var lfa = fa
-                loop@ while (true) {
-                    when (lfa) {
-                        is Call -> {
-                            lfa = lfa.thunk()
-                        }
-                        is Compute -> {
-                            val clfa: Compute<A> = lfa
+            tailrec fun <A> collapse(fa: Eval<A>): Eval<A> =
+                    when (fa) {
+                        is Call -> collapse(fa.thunk())
+                        is Compute ->
                             object : Compute<A>() {
-                                override fun <S> start(): Eval<S> = clfa.start()
-                                override fun <S> run(s: S): Eval<A> {
-                                    lfa = clfa.run(s)
-                                    return lfa
-                                }
+                                override fun <S> start(): Eval<S> = fa.start()
+                                override fun <S> run(s: S): Eval<A> = collapse1(fa.run(s))
                             }
-                        }
-                        else -> break@loop
+                        else -> fa
                     }
-                }
-                return lfa
-            }
+
+            //Enforce tailrec call to collapse inside compute loop
+            private inline fun <A> collapse1(fa: Eval<A>): Eval<A> = collapse(fa)
         }
     }
 
@@ -189,17 +180,31 @@ package kategory
     }
 
     companion object : EvalInstances, GlobalInstance<Monad<EvalHK>>() {
-        @JvmStatic fun <A> now(a: A) = Now(a)
-        @JvmStatic fun <A> later(f: () -> A) = Later(f)
-        @JvmStatic fun <A> always(f: () -> A) = Always(f)
-        @JvmStatic fun <A> defer(f: () -> Eval<A>): Eval<A> = Call(f)
-        @JvmStatic fun raise(t: Throwable): Eval<Nothing> = defer { throw t }
+        @JvmStatic
+        fun <A> now(a: A) = Now(a)
 
-        @JvmStatic val Unit: Eval<Unit> = Now(kotlin.Unit)
-        @JvmStatic val True: Eval<Boolean> = Now(true)
-        @JvmStatic val False: Eval<Boolean> = Now(false)
-        @JvmStatic val Zero: Eval<Int> = Now(0)
-        @JvmStatic val One: Eval<Int> = Now(1)
+        @JvmStatic
+        fun <A> later(f: () -> A) = Later(f)
+
+        @JvmStatic
+        fun <A> always(f: () -> A) = Always(f)
+
+        @JvmStatic
+        fun <A> defer(f: () -> Eval<A>): Eval<A> = Call(f)
+
+        @JvmStatic
+        fun raise(t: Throwable): Eval<Nothing> = defer { throw t }
+
+        @JvmStatic
+        val Unit: Eval<Unit> = Now(kotlin.Unit)
+        @JvmStatic
+        val True: Eval<Boolean> = Now(true)
+        @JvmStatic
+        val False: Eval<Boolean> = Now(false)
+        @JvmStatic
+        val Zero: Eval<Int> = Now(0)
+        @JvmStatic
+        val One: Eval<Int> = Now(1)
 
         fun functor(): Functor<EvalHK> = this
 
