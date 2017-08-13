@@ -1,6 +1,5 @@
 package kategory
 
-typealias KleisliF<F> = HK<KleisliHK, F>
 typealias KleisliFun<F, D, A> = (D) -> HK<F, A>
 typealias ReaderT<F, D, A> = Kleisli<F, D, A>
 
