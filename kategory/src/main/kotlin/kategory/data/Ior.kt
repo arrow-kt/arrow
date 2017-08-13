@@ -3,8 +3,6 @@ package kategory
 import kategory.Either.Left
 import kategory.Either.Right
 
-typealias IorF<L> = HK<IorHK, L>
-
 /**
  * Port of https://github.com/typelevel/cats/blob/v0.9.0/core/src/main/scala/cats/data/Ior.scala
  *
@@ -91,11 +89,11 @@ typealias IorF<L> = HK<IorHK, L>
             override fun SL(): Semigroup<L> = SL
         }
 
-        inline fun <reified L> functor(SL: Semigroup<L> = semigroup<L>()): Functor<IorF<L>> = instances(SL)
+        inline fun <reified L> functor(SL: Semigroup<L> = semigroup<L>()): Functor<IorKindPartial<L>> = instances(SL)
 
-        inline fun <reified L> applicative(SL: Semigroup<L> = semigroup<L>()): Applicative<IorF<L>> = instances(SL)
+        inline fun <reified L> applicative(SL: Semigroup<L> = semigroup<L>()): Applicative<IorKindPartial<L>> = instances(SL)
 
-        inline fun <reified L> monad(SL: Semigroup<L> = semigroup<L>()): Monad<IorF<L>> = instances(SL)
+        inline fun <reified L> monad(SL: Semigroup<L> = semigroup<L>()): Monad<IorKindPartial<L>> = instances(SL)
 
         fun <L> foldable(): Foldable<HK<IorHK, L>> = object : IorTraverse<L> {}
 
