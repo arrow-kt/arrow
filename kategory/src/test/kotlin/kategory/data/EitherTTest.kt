@@ -12,11 +12,11 @@ class EitherTTest : UnitSpec() {
 
         testLaws(MonadErrorLaws.laws(EitherT.monadError<IdHK, Throwable>(Id), Eq.any()))
         testLaws(TraverseLaws.laws(EitherT.traverse<IdHK, Int>(), EitherT.applicative(), { EitherT(Id(Either.Right(it))) }, Eq.any()))
-        testLaws(SemigroupKLaws.laws<EitherTF<IdHK, Int>>(
+        testLaws(SemigroupKLaws.laws<EitherTKindPartial<IdHK, Int>>(
                 EitherT.semigroupK(Id),
                 EitherT.applicative(Id),
-                object : Eq<HK<EitherTF<IdHK, Int>, Int>> {
-                    override fun eqv(a: HK<EitherTF<IdHK, Int>, Int>, b: HK<EitherTF<IdHK, Int>, Int>): Boolean =
+                object : Eq<HK<EitherTKindPartial<IdHK, Int>, Int>> {
+                    override fun eqv(a: HK<EitherTKindPartial<IdHK, Int>, Int>, b: HK<EitherTKindPartial<IdHK, Int>, Int>): Boolean =
                             a.ev() == b.ev()
                 }))
 
