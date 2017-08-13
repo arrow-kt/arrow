@@ -9,8 +9,8 @@ import org.junit.runner.RunWith
 class OptionTTest : UnitSpec() {
     init {
 
-        val OptionTFIdEq = object : Eq<HK<OptionTF<IdHK>, Int>> {
-            override fun eqv(a: HK<OptionTF<IdHK>, Int>, b: HK<OptionTF<IdHK>, Int>): Boolean {
+        val OptionTFIdEq = object : Eq<HK<OptionTKindPartial<IdHK>, Int>> {
+            override fun eqv(a: HK<OptionTKindPartial<IdHK>, Int>, b: HK<OptionTKindPartial<IdHK>, Int>): Boolean {
                 return a.ev().value == b.ev().value
             }
         }

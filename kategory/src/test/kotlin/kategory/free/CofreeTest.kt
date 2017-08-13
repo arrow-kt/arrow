@@ -159,4 +159,4 @@ class CofreeTest : UnitSpec() {
 
 typealias EvalOption<A> = OptionTKind<EvalHK, A>
 
-typealias EvalOptionF = OptionTF<EvalHK>
+typealias EvalOptionF = OptionTKindPartial<EvalHK>
