@@ -1,4 +1,4 @@
-package kategory.effects.internal
+package kategory.effects.data.internal
 
 import kategory.Duration
 import kategory.Either
