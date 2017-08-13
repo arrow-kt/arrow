@@ -36,7 +36,9 @@ open class MonadContinuation<F, A>(val M: Monad<F>) : Serializable, Continuation
         throw exception
     }
 
-    internal lateinit var returnedMonad: HK<F, A>
+    protected lateinit var returnedMonad: HK<F, A>
+
+    internal fun returnedMonad(): HK<F, A> = returnedMonad
 
     operator suspend fun <B> HK<F, B>.not(): B = bind { this }
 
@@ -65,7 +67,7 @@ open class MonadContinuation<F, A>(val M: Monad<F>) : Serializable, Continuation
 fun <F, B> Monad<F>.binding(c: suspend MonadContinuation<F, *>.() -> HK<F, B>): HK<F, B> {
     val continuation = MonadContinuation<F, B>(this)
     c.startCoroutine(continuation, continuation)
-    return continuation.returnedMonad
+    return continuation.returnedMonad()
 }
 
 @RestrictsSuspension
@@ -81,7 +83,9 @@ open class StackSafeMonadContinuation<F, A>(val M: Monad<F>) : Serializable, Con
         throw exception
     }
 
-    internal lateinit var returnedMonad: Free<F, A>
+    protected lateinit var returnedMonad: Free<F, A>
+
+    internal fun returnedMonad(): Free<F, A> = returnedMonad
 
     operator suspend fun <B> HK<F, B>.not(): B = this.bind()
 
@@ -116,7 +120,7 @@ open class StackSafeMonadContinuation<F, A>(val M: Monad<F>) : Serializable, Con
 fun <F, B> Monad<F>.bindingStackSafe(c: suspend StackSafeMonadContinuation<F, *>.() -> Free<F, B>): Free<F, B> {
     val continuation = StackSafeMonadContinuation<F, B>(this)
     c.startCoroutine(continuation, continuation)
-    return continuation.returnedMonad
+    return continuation.returnedMonad()
 }
 
 inline fun <reified F> monad(): Monad<F> = instance(InstanceParametrizedType(Monad::class.java, listOf(F::class.java)))

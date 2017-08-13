@@ -33,14 +33,14 @@ import kategory.effects.data.internal.error
     fun unsafeStep(): IO<A> {
         var current: IO<A> = this
         while (true) {
-            when (current) {
+            current = when (current) {
                 is Suspend -> {
-                    current = current.cont(Unit)
+                    current.cont(Unit)
                 }
                 is BindSuspend<*, A> -> {
                     val cont: IO<Any?> = current.cont(Unit)
                     val f: AndThen<Any?, IO<A>> = current.f as AndThen<Any?, IO<A>>
-                    current = cont.flatMapTotal(f)
+                    cont.flatMapTotal(f)
                 }
                 else -> return current
             }
@@ -60,8 +60,6 @@ import kategory.effects.data.internal.error
 
         operator fun <A> invoke(f: (Unit) -> A): IO<A> = suspend { Pure(f(Unit)) }
 
-        override fun <A> pure(a: A): IO<A> = Pure(a)
-
         fun <A> suspend(f: (Unit) -> IO<A>): IO<A> =
                 Suspend(AndThen { _ ->
                     try {
@@ -71,15 +69,13 @@ import kategory.effects.data.internal.error
                     }
                 })
 
-        fun <A> raiseError(throwable: Throwable): IO<A> = RaiseError(throwable)
-
         fun <A> async(k: ((Either<Throwable, A>) -> Unit) -> Unit): IO<A> =
                 Async { callBack ->
-                    onceOnly(callBack).let {
+                    onceOnly(callBack).let { ff: (Either<Throwable, A>) -> Unit ->
                         try {
-                            k(it)
+                            k(ff)
                         } catch (throwable: Throwable) {
-                            it(Either.Left(throwable))
+                            ff(Either.Left(throwable))
                         }
                     }
                 }
