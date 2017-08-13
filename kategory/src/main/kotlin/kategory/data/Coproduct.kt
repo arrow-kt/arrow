@@ -1,7 +1,6 @@
 package kategory
 
 typealias CoproductF<F> = HK<CoproductHK, F>
-typealias CoproductFG<F, G> = HK2<CoproductHK, F, G>
 
 @higherkind data class Coproduct<F, G, A>(val CF: Comonad<F>, val CG: Comonad<G>, val run: Either<HK<F, A>, HK<G, A>>) : CoproductKind<F, G, A> {
 
