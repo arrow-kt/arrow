@@ -15,6 +15,7 @@ dependencies {
     compileOnly "io.kategory:kategory-annotations-compile:0.3.5"
     testCompileOnly "io.kategory:kategory-annotations-compile:0.3.5"
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
+    testCompile project(':kategory-test')
 }
 
 build.dependsOn ':detekt'
