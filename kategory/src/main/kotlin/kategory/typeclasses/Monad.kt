@@ -40,8 +40,6 @@ open class MonadContinuation<F, A>(val M: Monad<F>, override val context: Corout
 
     internal fun returnedMonad(): HK<F, A> = returnedMonad
 
-    operator suspend fun <B> HK<F, B>.not(): B = bind { this }
-
     suspend fun <B> HK<F, B>.bind(): B = bind { this }
 
     suspend fun <B> bind(m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
@@ -95,8 +93,6 @@ open class StackSafeMonadContinuation<F, A>(val M: Monad<F>, override val contex
     protected lateinit var returnedMonad: Free<F, A>
 
     internal fun returnedMonad(): Free<F, A> = returnedMonad
-
-    operator suspend fun <B> HK<F, B>.not(): B = this.bind()
 
     suspend fun <B> HK<F, B>.bind(): B = bind { Free.liftF(this) }
 

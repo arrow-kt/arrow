@@ -24,10 +24,9 @@ class Function0Test : UnitSpec() {
         "Function0Comonad.cobinding should for comprehend over all values of multiple Function0" {
             Function0.cobinding {
                 val x = Function0 { 1 }.extract()
-                val y = !Function0 { 2 }
-                val z = extract { Function0 { 3 } }
-                x + y + z
-            } shouldBe 6
+                val y = extract { Function0 { 2 } }
+                x + y
+            } shouldBe 3
         }
 
         "Function0Comonad.duplicate should create an instance of Function0<Function0<A>>" {
