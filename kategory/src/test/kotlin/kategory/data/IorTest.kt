@@ -155,12 +155,11 @@ class IorTest : UnitSpec() {
 
         "Ior.monad.binding should for comprehend over right Ior" {
             val result = intIorMonad.binding {
-                val x = !Ior.Right(1)
-                val y = Ior.Right(1).bind()
-                val z = bind { Ior.Right(1) }
-                yields(x + y + z)
+                val x = Ior.Right(1).bind()
+                val y = bind { Ior.Right(1) }
+                yields(x + y)
             }
-            result shouldBe Ior.Right(3)
+            result shouldBe Ior.Right(2)
         }
 
     }

@@ -1,7 +1,5 @@
 package kategory
 
-typealias OptionTF<F> = HK<OptionTHK, F>
-
 /**
  * [OptionT]`<F, A>` is a light wrapper on an `F<`[Option]`<A>>` with some
  * convenient methods for working with this nested structure.
@@ -24,25 +22,25 @@ typealias OptionTF<F> = HK<OptionTHK, F>
             override fun MF(): Monad<F> = MF
         }
 
-        inline fun <reified F> functor(MF: Monad<F> = kategory.monad<F>()): Functor<OptionTF<F>> = instances(MF)
+        inline fun <reified F> functor(MF: Monad<F> = kategory.monad<F>()): Functor<OptionTKindPartial<F>> = instances(MF)
 
-        inline fun <reified F> applicative(MF: Monad<F> = kategory.monad<F>()): Applicative<OptionTF<F>> = instances(MF)
+        inline fun <reified F> applicative(MF: Monad<F> = kategory.monad<F>()): Applicative<OptionTKindPartial<F>> = instances(MF)
 
-        inline fun <reified F> monad(MF: Monad<F> = kategory.monad<F>()): Monad<OptionTF<F>> = instances(MF)
+        inline fun <reified F> monad(MF: Monad<F> = kategory.monad<F>()): Monad<OptionTKindPartial<F>> = instances(MF)
 
-        inline fun <reified F> traverse(FF: Traverse<F> = kategory.traverse<F>(), MF: Monad<F> = kategory.monad<F>()): Traverse<OptionTF<F>> = object : OptionTTraverse<F> {
+        inline fun <reified F> traverse(FF: Traverse<F> = kategory.traverse<F>(), MF: Monad<F> = kategory.monad<F>()): Traverse<OptionTKindPartial<F>> = object : OptionTTraverse<F> {
             override fun FF(): Traverse<F> = FF
 
             override fun MF(): Monad<F> = MF
         }
 
-        inline fun <reified F> foldable(FF: Traverse<F> = kategory.traverse<F>(), MF: Monad<F> = kategory.monad<F>()): Foldable<OptionTF<F>> = traverse(FF, MF)
+        inline fun <reified F> foldable(FF: Traverse<F> = kategory.traverse<F>(), MF: Monad<F> = kategory.monad<F>()): Foldable<OptionTKindPartial<F>> = traverse(FF, MF)
 
-        inline fun <reified F> semigroupK(MF: Monad<F> = kategory.monad<F>()): SemigroupK<OptionTF<F>> = object : OptionTSemigroupK<F> {
+        inline fun <reified F> semigroupK(MF: Monad<F> = kategory.monad<F>()): SemigroupK<OptionTKindPartial<F>> = object : OptionTSemigroupK<F> {
             override fun F(): Monad<F> = MF
         }
 
-        inline fun <reified F> monoidK(MF: Monad<F> = kategory.monad<F>()): MonoidK<OptionTF<F>> = object : OptionTMonoidK<F> {
+        inline fun <reified F> monoidK(MF: Monad<F> = kategory.monad<F>()): MonoidK<OptionTKindPartial<F>> = object : OptionTMonoidK<F> {
             override fun F(): Monad<F> = MF
         }
     }
@@ -91,7 +89,7 @@ typealias OptionTF<F> = HK<OptionTHK, F>
 
     fun <B> foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>): Eval<B> = FF.compose(Option).foldRC(value, lb, f)
 
-    fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>, FF: Traverse<F>, MF: Monad<F>): HK<G, HK<OptionTF<F>, B>> {
+    fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>, FF: Traverse<F>, MF: Monad<F>): HK<G, HK<OptionTKindPartial<F>, B>> {
         val fa = ComposedTraverse(FF, Option, Option).traverseC(value, f, GA)
         return GA.map(fa, { OptionT(MF, MF.map(it.lower(), { it.ev() })) })
     }

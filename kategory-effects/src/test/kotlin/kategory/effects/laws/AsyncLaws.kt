@@ -69,7 +69,7 @@ object AsyncLaws {
     inline fun <reified F> asyncParallelBind(AC: AsyncContext<F> = asyncContext(), M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(genIntSmall(), genIntSmall(), genIntSmall(), { x: Int, y: Int, z: Int ->
                 val bound = M.binding {
-                    val value = !M.tupled(runAsync(AC) { x }, runAsync(AC) { y }, runAsync(AC) { z })
+                    val value = bind { M.tupled(runAsync(AC) { x }, runAsync(AC) { y }, runAsync(AC) { z }) }
                     yields(value.a + value.b + value.c)
                 }
                 bound.equalUnderTheLaw(M.pure<Int>(x + y + z), EQ)

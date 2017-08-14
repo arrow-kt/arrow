@@ -2,8 +2,6 @@ package kategory
 
 fun <A, T> ConstKind<A, T>.value(): A = this.ev().value
 
-typealias ConstF<A> = HK<ConstHK, A>
-
 @higherkind data class Const<out A, out T>(val value: A) : ConstKind<A, T> {
 
     @Suppress("UNCHECKED_CAST")
@@ -16,9 +14,9 @@ typealias ConstF<A> = HK<ConstHK, A>
 
         inline fun <reified A> instances(MA: Monoid<A> = kategory.monoid<A>()): ConstInstances<A> = ConstInstances(MA)
 
-        inline fun <reified A> applicative(MA: Monoid<A> = kategory.monoid<A>()): Applicative<ConstF<A>> = instances(MA)
+        inline fun <reified A> applicative(MA: Monoid<A> = kategory.monoid<A>()): Applicative<ConstKindPartial<A>> = instances(MA)
 
-        inline fun <reified A> traverse(MA: Monoid<A> = kategory.monoid<A>()): Traverse<ConstF<A>> = instances(MA)
+        inline fun <reified A> traverse(MA: Monoid<A> = kategory.monoid<A>()): Traverse<ConstKindPartial<A>> = instances(MA)
 
         inline fun <reified A, T> semigroup(MA: Monoid<A> = kategory.monoid<A>()): Semigroup<ConstKind<A, T>> = ConstMonoid(MA)
 

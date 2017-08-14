@@ -10,7 +10,7 @@ class WriterTTest : UnitSpec() {
     init {
 
         testLaws(MonadLaws.laws(WriterT.monad(NonEmptyList, IntMonoid), Eq.any()))
-        testLaws(MonoidKLaws.laws<WriterF<OptionHK, Int>>(
+        testLaws(MonoidKLaws.laws<WriterTKindPartial<OptionHK, Int>>(
                 WriterT.monoidK(Option, OptionMonoidK()),
                 WriterT.applicative(Option, IntMonoid),
                 WriterT.invoke(Option(Tuple2(1, 2)), Option.monad()),
@@ -153,12 +153,11 @@ class WriterTTest : UnitSpec() {
         "WriterTMonad#binding should for comprehend over option" {
             val M = WriterT.monad(NonEmptyList, IntMonoid)
             val result = M.binding {
-                val x = !M.pure(1)
-                val y = M.pure(1).bind()
-                val z = bind { M.pure(1) }
-                yields(x + y + z)
+                val x = M.pure(1).bind()
+                val y = bind { M.pure(1) }
+                yields(x + y)
             }
-            result shouldBe M.pure(3)
+            result shouldBe M.pure(2)
         }
 
         "Cartesian builder should build products over option" {
@@ -170,12 +169,11 @@ class WriterTTest : UnitSpec() {
         "Cartesian builder works inside for comprehensions" {
             val M = WriterT.monad(NonEmptyList, IntMonoid)
             val result = M.binding {
-                val (x, y, z) = !M.tupled(M.pure(1), M.pure(1), M.pure(1))
-                val a = M.pure(1).bind()
-                val b = bind { M.pure(1) }
-                yields(x + y + z + a + b)
+                val (x, y, z) = M.tupled(M.pure(1), M.pure(1), M.pure(1)).bind()
+                val a = bind { M.pure(1) }
+                yields(x + y + z + a)
             }
-            result shouldBe M.pure(5)
+            result shouldBe M.pure(4)
         }
     }
 }

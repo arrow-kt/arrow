@@ -1,12 +1,12 @@
 <?xml version="1.0" ?>
 <SmellBaseline>
   <Blacklist timestamp="1490879306930"></Blacklist>
-  <Whitelist timestamp="1502654393507">
+  <Whitelist timestamp="1502670811218">
     <ID>LabeledExpression:FunctionK.kt$&lt;no name provided&gt;$this@or</ID>
     <ID>LabeledExpression:PartialFunction.kt$&lt;no name provided&gt;$this@orElse</ID>
     <ID>LabeledExpression:PartialFunction.kt$&lt;no name provided&gt;$this@andThen</ID>
-    <ID>LabeledExpression:Eval.kt$Eval.&lt;no name provided&gt;.&lt;no name provided&gt;$this@Eval</ID>
     <ID>LabeledExpression:Eval.kt$Eval.&lt;no name provided&gt;$this@Eval</ID>
+    <ID>LabeledExpression:Eval.kt$Eval.&lt;no name provided&gt;.&lt;no name provided&gt;$this@Eval</ID>
     <ID>LabeledExpression:Eval.kt$Eval.Compute$break@loop</ID>
     <ID>LabeledExpression:Eval.kt$Eval.Compute$loop@ while (true) { when (curr) { is Compute -&gt; { val currComp: Compute&lt;A&gt; = curr currComp.start&lt;A&gt;().let { cc -&gt; when (cc) { is Compute -&gt; { val inStartFun: (Any?) -&gt; Eval&lt;A&gt; = { cc.run(it) } val outStartFun: (Any?) -&gt; Eval&lt;A&gt; = { currComp.run(it) } curr = cc.start&lt;A&gt;() fs = listOf(inStartFun, outStartFun) + fs } else -&gt; { curr = currComp.run(cc.value()) } } } } else -&gt; if (fs.isNotEmpty()) { curr = fs[0](curr.value()) fs = fs.drop(1) } else { break@loop } } }</ID>
     <ID>LabeledExpression:Yoneda.kt$Yoneda.&lt;no name provided&gt;$this@Yoneda</ID>
@@ -46,6 +46,7 @@
     <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
     <ID>MaxLineLength:ApplicativeError.kt$kategory.ApplicativeError.kt</ID>
     <ID>MaxLineLength:Foldable.kt$kategory.Foldable.kt</ID>
+    <ID>MaxLineLength:Monad.kt$kategory.Monad.kt</ID>
     <ID>MaxLineLength:MonadError.kt$kategory.MonadError.kt</ID>
     <ID>MaxLineLength:MonadReader.kt$kategory.MonadReader.kt</ID>
     <ID>MaxLineLength:MonadState.kt$kategory.MonadState.kt</ID>

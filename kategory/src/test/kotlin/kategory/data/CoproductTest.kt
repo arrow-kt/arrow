@@ -8,16 +8,16 @@ import org.junit.runner.RunWith
 class CoproductTest : UnitSpec() {
     init {
 
-        val coproductIdIdApplicative = object : Applicative<CoproductFG<IdHK, IdHK>> {
+        val coproductIdIdApplicative = object : Applicative<CoproductKindPartial<IdHK, IdHK>> {
             val coproductIdIdFunctor = Coproduct.functor<IdHK, IdHK>()
 
-            override fun <A> pure(a: A): HK<CoproductFG<IdHK, IdHK>, A> =
+            override fun <A> pure(a: A): HK<CoproductKindPartial<IdHK, IdHK>, A> =
                     Coproduct(Either.Right(Id(a)))
 
-            override fun <A, B> ap(fa: HK<CoproductFG<IdHK, IdHK>, A>, ff: HK<CoproductFG<IdHK, IdHK>, (A) -> B>): HK<CoproductFG<IdHK, IdHK>, B> =
+            override fun <A, B> ap(fa: HK<CoproductKindPartial<IdHK, IdHK>, A>, ff: HK<CoproductKindPartial<IdHK, IdHK>, (A) -> B>): HK<CoproductKindPartial<IdHK, IdHK>, B> =
                     throw IllegalStateException("This method should not be called")
 
-            override fun <A, B> map(fa: HK<CoproductFG<IdHK, IdHK>, A>, f: (A) -> B): HK<CoproductFG<IdHK, IdHK>, B> =
+            override fun <A, B> map(fa: HK<CoproductKindPartial<IdHK, IdHK>, A>, f: (A) -> B): HK<CoproductKindPartial<IdHK, IdHK>, B> =
                     coproductIdIdFunctor.map(fa, f)
         }
 
@@ -29,7 +29,7 @@ class CoproductTest : UnitSpec() {
         "CoproductComonad should comprehend with cobind" {
             forAll { num: Int ->
                 val cobinding = CoproductComonad.any().cobinding {
-                    val a = !Coproduct(Either.Right(Coproduct(Either.Right(Id(num.toString())))), Id, Coproduct.comonad<IdHK, IdHK>())
+                    val a = Coproduct(Either.Right(Coproduct(Either.Right(Id(num.toString())))), Id, Coproduct.comonad<IdHK, IdHK>()).extract()
                     val parseA = Integer.parseInt(a)
                     val b = Coproduct<NonEmptyListHK, NonEmptyListHK, Int>(Either.Left(NonEmptyList.of(parseA * 2, parseA * 100))).extract()
                     extract { Coproduct<IdHK, IdHK, Int>(Either.Left(Id(b * 3))) }

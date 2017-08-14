@@ -1,7 +1,5 @@
 package kategory
 
-typealias FreeF<S> = HK<FreeHK, S>
-
 inline fun <reified M, S, A> FreeKind<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M> = monad()): HK<M, A> = (this as Free<S, A>).foldMap(f, MM)
 
 @higherkind sealed class Free<out S, out A> : FreeKind<S, A> {
@@ -19,21 +17,21 @@ inline fun <reified M, S, A> FreeKind<S, A>.foldMapK(f: FunctionK<S, M>, MM: Mon
 
         fun <S> monad(): FreeInstances<S> = object : FreeInstances<S> {}
 
-        internal fun <F> functionKF(): FunctionK<F, FreeF<F>> =
-                object : FunctionK<F, FreeF<F>> {
+        internal fun <F> functionKF(): FunctionK<F, FreeKindPartial<F>> =
+                object : FunctionK<F, FreeKindPartial<F>> {
                     override fun <A> invoke(fa: HK<F, A>): Free<F, A> =
                             Free.liftF(fa)
 
                 }
 
-        internal fun <F> applicativeF(): Applicative<FreeF<F>> =
-                object : Applicative<FreeF<F>> {
-                    private val applicative: Applicative<FreeF<F>> = applicative<F>()
+        internal fun <F> applicativeF(): Applicative<FreeKindPartial<F>> =
+                object : Applicative<FreeKindPartial<F>> {
+                    private val applicative: Applicative<FreeKindPartial<F>> = applicative<F>()
 
                     override fun <A> pure(a: A): Free<F, A> =
                             Free.pure(a)
 
-                    override fun <A, B> ap(fa: HK<FreeF<F>, A>, ff: HK<FreeF<F>, (A) -> B>): Free<F, B> {
+                    override fun <A, B> ap(fa: HK<FreeKindPartial<F>, A>, ff: HK<FreeKindPartial<F>, (A) -> B>): Free<F, B> {
                         return applicative.ap(fa, ff).ev()
                     }
                 }

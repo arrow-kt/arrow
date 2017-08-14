@@ -147,8 +147,8 @@ class CofreeTest : UnitSpec() {
                     loops.increment()
                     if (it == limit) None else Some(it + 1)
                 })
-                val value: Int = !program.run()
-                val tail: Int = !program.runTail()
+                val value: Int = program.run().extract()
+                val tail: Int = program.runTail().extract()
                 value + tail
             }
             program shouldBe 0
@@ -159,4 +159,4 @@ class CofreeTest : UnitSpec() {
 
 typealias EvalOption<A> = OptionTKind<EvalHK, A>
 
-typealias EvalOptionF = OptionTF<EvalHK>
+typealias EvalOptionF = OptionTKindPartial<EvalHK>
