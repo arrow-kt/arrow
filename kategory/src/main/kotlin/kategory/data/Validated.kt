@@ -1,6 +1,5 @@
 package kategory
 
-typealias ValidatedF<A> = HK<ValidatedHK, A>
 typealias ValidatedNel<E, A> = Validated<NonEmptyList<E>, A>
 
 /**
@@ -39,13 +38,13 @@ typealias ValidatedNel<E, A> = Validated<NonEmptyList<E>, A>
 
         }
 
-        inline fun <reified E> functor(SE: Semigroup<E> = semigroup<E>()): Functor<ValidatedF<E>> = instances(SE)
+        inline fun <reified E> functor(SE: Semigroup<E> = semigroup<E>()): Functor<ValidatedKindPartial<E>> = instances(SE)
 
-        inline fun <reified E> applicative(SE: Semigroup<E> = semigroup<E>()): Applicative<ValidatedF<E>> = instances(SE)
+        inline fun <reified E> applicative(SE: Semigroup<E> = semigroup<E>()): Applicative<ValidatedKindPartial<E>> = instances(SE)
 
-        inline fun <reified E> foldable(SE: Semigroup<E> = semigroup<E>()): Foldable<ValidatedF<E>> = instances(SE)
+        inline fun <reified E> foldable(SE: Semigroup<E> = semigroup<E>()): Foldable<ValidatedKindPartial<E>> = instances(SE)
 
-        inline fun <reified E> traverse(SE: Semigroup<E> = semigroup<E>()): Traverse<ValidatedF<E>> = instances(SE)
+        inline fun <reified E> traverse(SE: Semigroup<E> = semigroup<E>()): Traverse<ValidatedKindPartial<E>> = instances(SE)
 
         inline fun <reified A> semigroupK(SGK: Semigroup<A> = kategory.semigroup<A>()): ValidatedSemigroupK<A> = object : ValidatedSemigroupK<A> {
             override fun F(): Semigroup<A> = SGK

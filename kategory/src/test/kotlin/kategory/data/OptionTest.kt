@@ -124,12 +124,11 @@ class OptionTest : UnitSpec() {
 
         "Option.monad.binding should for comprehend over option" {
             val result = Option.binding {
-                val x = !Option(1)
-                val y = Option(1).bind()
-                val z = bind { Option(1) }
-                yields(x + y + z)
+                val x = Option(1).bind()
+                val y = bind { Option(1) }
+                yields(x + y)
             }
-            result shouldBe Option(3)
+            result shouldBe Option(2)
         }
 
         "Cartesian builder should build products over option" {
@@ -140,12 +139,11 @@ class OptionTest : UnitSpec() {
 
         "Cartesian builder works inside for comprehensions" {
             val result = Option.binding {
-                val (x, y, z) = !Option.tupled(Option(1), Option(1), Option(1))
-                val a = Option(1).bind()
-                val b = bind { Option(1) }
-                yields(x + y + z + a + b)
+                val (x, y, z) = Option.tupled(Option(1), Option(1), Option(1)).bind()
+                val a = bind { Option(1) }
+                yields(x + y + z + a)
             }
-            result shouldBe Option(5)
+            result shouldBe Option(4)
         }
 
     }

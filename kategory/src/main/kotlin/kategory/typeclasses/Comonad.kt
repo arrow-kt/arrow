@@ -41,8 +41,6 @@ open class ComonadContinuation<F, A : Any>(val CM: Comonad<F>) : Serializable, C
 
     internal lateinit var returnedMonad: A
 
-    operator suspend fun <B> HK<F, B>.not(): B = extract { this }
-
     suspend fun <B> HK<F, B>.extract(): B = extract { this }
 
     suspend fun <B> extract(m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->

@@ -39,71 +39,63 @@ class NonEmptyListTest : UnitSpec() {
 
         "NonEmptyListMonad.binding should for comprehend over NonEmptyList" {
             val result = NonEmptyList.binding {
-                val x = !NonEmptyList.of(1)
-                val y = NonEmptyList.of(2).bind()
-                val z = bind { NonEmptyList.of(3) }
-                yields(x + y + z)
+                val x = NonEmptyList.of(1).bind()
+                val y = bind { NonEmptyList.of(2) }
+                yields(x + y)
             }
-            result shouldBe NonEmptyList.of(6)
+            result shouldBe NonEmptyList.of(3)
         }
 
         "NonEmptyListMonad.binding should for comprehend over complex NonEmptyList" {
             val result = NonEmptyList.binding {
-                val x = !NonEmptyList.of(1, 2)
-                val y = NonEmptyList.of(3).bind()
-                val z = bind { NonEmptyList.of(4) }
-                yields(x + y + z)
+                val x = NonEmptyList.of(1, 2).bind()
+                val y = bind { NonEmptyList.of(3) }
+                yields(x + y)
             }
-            result shouldBe NonEmptyList.of(8, 9)
+            result shouldBe NonEmptyList.of(4, 5)
         }
 
         "NonEmptyListMonad.binding should for comprehend over all values of multiple NonEmptyList" {
             forAll { a: Int, b: List<Int> ->
                 val nel: NonEmptyList<Int> = NonEmptyList(a, b)
                 val nel2 = NonEmptyList.of(1, 2)
-                val nel3 = NonEmptyList.of(3, 4, 5)
                 val result: HK<NonEmptyListHK, Int> = NonEmptyList.binding {
-                    val x = !nel
+                    val x = bind { nel }
                     val y = nel2.bind()
-                    val z = bind { nel3 }
-                    yields(x + y + z)
+                    yields(x + y)
                 }
-                result.ev().size == nel.size * nel2.size * nel3.size
+                result.ev().size == nel.size * nel2.size
             }
         }
 
         "NonEmptyListComonad.cobinding should for comprehend over NonEmptyList" {
             val result = NonEmptyList.cobinding {
-                val x = !NonEmptyList.of(1)
-                val y = NonEmptyList.of(2).extract()
-                val z = extract { NonEmptyList.of(3) }
-                x + y + z
+                val x = NonEmptyList.of(1).extract()
+                val y = extract { NonEmptyList.of(2) }
+                x + y
             }
-            result shouldBe 6
+            result shouldBe 3
         }
 
         "NonEmptyListComonad.cobinding should for comprehend over complex NonEmptyList" {
             val result = NonEmptyList.cobinding {
-                val x = !NonEmptyList.of(1, 2)
-                val y = NonEmptyList.of(3).extract()
-                val z = extract { NonEmptyList.of(4) }
-                x + y + z
+                val x = NonEmptyList.of(1, 2).extract()
+                val y = extract { NonEmptyList.of(3) }
+                x + y
             }
-            result shouldBe 8
+            result shouldBe 4
         }
 
         "NonEmptyListComonad.cobinding should for comprehend over all values of multiple NonEmptyList" {
             forAll { a: Int, b: List<Int> ->
                 val nel: NonEmptyList<Int> = NonEmptyList(a, b)
-                val nel2 = NonEmptyList.of(1, 2)
-                val nel3 = NonEmptyList.of(3, 4, 5)
+                val nel2 = NonEmptyList.of(1, 2, 3)
                 val result: Int = NonEmptyList.cobinding {
-                    val x = !nel
-                    val y = nel2.extract()
-                    val z = extract { nel3 }
-                    x + y + z
+                    val x = nel.extract()
+                    val y = extract { nel2 }
+                    x + y
                 }
-                result == 1 + 3 + a
+                result == 1 + a
             }
         }
 

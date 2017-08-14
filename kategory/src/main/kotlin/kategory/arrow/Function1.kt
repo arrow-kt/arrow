@@ -1,7 +1,5 @@
 package kategory
 
-typealias Function1F<I> = HK<Function1HK, I>
-
 fun <I, O> ((I) -> O).k(): Function1<I, O> = Function1(this)
 
 operator fun <I, O> Function1Kind<I, O>.invoke(i: I): O = this.ev().f(i)
