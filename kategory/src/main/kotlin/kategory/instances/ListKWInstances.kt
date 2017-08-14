@@ -6,11 +6,9 @@ interface ListKWInstances :
         Monad<ListKW.F>,
         Traverse<ListKW.F> {
 
-    override fun <A> pure(a: A): ListKW<A> =
-            ListKW.listOfK(a)
+    override fun <A> pure(a: A): ListKW<A> = ListKW.listOfK(a)
 
-    override fun <A, B> flatMap(fa: HK<ListKW.F, A>, f: (A) -> HK<ListKW.F, B>): ListKW<B> =
-            fa.ev().flatMap { f(it).ev() }
+    override fun <A, B> flatMap(fa: HK<ListKW.F, A>, f: (A) -> HK<ListKW.F, B>): ListKW<B> = fa.ev().flatMap { f(it).ev() }
 
     override fun <A, B> map(fa: HK<ListKW.F, A>, f: (A) -> B): HK<ListKW.F, B> =
             fa.ev().map(f)
