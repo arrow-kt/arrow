@@ -2,9 +2,13 @@ package kategory
 
 import kotlinx.coroutines.experimental.runBlocking
 import java.io.Serializable
-import kotlin.coroutines.experimental.*
+import kotlin.coroutines.experimental.Continuation
+import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.experimental.EmptyCoroutineContext
+import kotlin.coroutines.experimental.RestrictsSuspension
 import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
+import kotlin.coroutines.experimental.startCoroutine
 
 interface Monad<F> : Applicative<F>, Typeclass {
 
