@@ -77,12 +77,11 @@ class OptionTTest : UnitSpec() {
         "OptionTMonad.binding should for comprehend over option" {
             val M = OptionT.monad(NonEmptyList)
             val result = M.binding {
-                val x = !M.pure(1)
-                val y = M.pure(1).bind()
-                val z = bind { M.pure(1) }
-                yields(x + y + z)
+                val x = M.pure(1).bind()
+                val y = bind { M.pure(1) }
+                yields(x + y)
             }
-            result shouldBe M.pure(3)
+            result shouldBe M.pure(2)
         }
 
         "Cartesian builder should build products over option" {
@@ -94,12 +93,11 @@ class OptionTTest : UnitSpec() {
         "Cartesian builder works inside for comprehensions" {
             val M = OptionT.monad(NonEmptyList)
             val result = M.binding {
-                val (x, y, z) = !M.tupled(M.pure(1), M.pure(1), M.pure(1))
-                val a = M.pure(1).bind()
-                val b = bind { M.pure(1) }
-                yields(x + y + z + a + b)
+                val (x, y, z) = M.tupled(M.pure(1), M.pure(1), M.pure(1)).bind()
+                val a = bind { M.pure(1) }
+                yields(x + y + z + a)
             }
-            result shouldBe M.pure(5)
+            result shouldBe M.pure(4)
         }
     }
 }

@@ -209,11 +209,10 @@ class IOTest : UnitSpec() {
         "IO.binding should for comprehend over IO" {
             val result = IO.binding {
                 val x = IO.pure(1).bind()
-                val y = !IO { x + 1 }
-                val z = bind { IO { y + 1 } }
-                yields(z)
+                val y = bind { IO { x + 1 } }
+                yields(y)
             }.ev()
-            result.unsafeRunSync() shouldBe 3
+            result.unsafeRunSync() shouldBe 2
         }
     }
 }

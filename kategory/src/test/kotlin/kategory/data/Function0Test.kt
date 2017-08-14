@@ -16,10 +16,9 @@ class Function0Test : UnitSpec() {
         "Function0Monad.binding should for comprehend over all values of multiple Function0" {
             Function0.binding {
                 val x = Function0 { 1 }.bind()
-                val y = !Function0 { 2 }
-                val z = bind { Function0 { 3 } }
-                yields(x + y + z)
-            }.ev().invoke() shouldBe 6
+                val y = bind { Function0 { 2 } }
+                yields(x + y)
+            }.ev().invoke() shouldBe 3
         }
 
         "Function0Comonad.cobinding should for comprehend over all values of multiple Function0" {
