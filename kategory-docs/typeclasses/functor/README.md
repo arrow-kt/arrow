@@ -110,7 +110,6 @@ f(Option(1))
 ### Laws
 
 Kategory provides [`FunctorLaws`](/docs/typeclasses/laws#functorlaws) for internal verification of lawful instances and third party apps creating their own Functor instances.
-Functors must obey the following laws:
 
 #### Creating your own `Functor` instances
 
