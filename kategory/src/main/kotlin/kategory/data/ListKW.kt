@@ -14,6 +14,10 @@ package kategory
 
     fun <B> fold(b: B, f: (B, A) -> B): B = list.fold(b, f)
 
+    fun drop(n: Int): ListKW<A> = ListKW(this.list.drop(n))
+
+    fun first(): A = this.list.first()
+
     companion object : ListKWInstances, GlobalInstance<Monad<ListKWHK>>() {
 
         @JvmStatic fun <A> listOfK(vararg a: A): ListKW<A> = ListKW(a.asList())
@@ -40,7 +44,3 @@ package kategory
 }
 
 fun <A> List<A>.k(): ListKW<A> = ListKW.listOfK(this)
-
-fun <A> ListKW<A>.drop(n: Int): ListKW<A> = this.list.drop(n).k()
-
-fun <A> ListKW<A>.first(): A = this.list.first()
