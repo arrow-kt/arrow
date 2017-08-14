@@ -37,7 +37,7 @@ repositories {
 
     dependencies {
 
-        detekt 'io.gitlab.arturbosch.detekt:detekt-cli:1.0.0.RC2'
-        detekt 'io.gitlab.arturbosch.detekt:detekt-formatting:1.0.0.RC2'
+        detekt 'io.gitlab.arturbosch.detekt:detekt-cli:1.0.0.M13'
+        detekt 'io.gitlab.arturbosch.detekt:detekt-formatting:1.0.0.M13'
     }
 }
