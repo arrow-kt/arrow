@@ -1,7 +1,5 @@
 package kategory
 
-typealias KleisliF<F> = HK<KleisliHK, F>
-typealias KleisliFD<F, D> = HK2<KleisliHK, F, D>
 typealias KleisliFun<F, D, A> = (D) -> HK<F, A>
 typealias ReaderT<F, D, A> = Kleisli<F, D, A>
 
@@ -39,13 +37,13 @@ typealias ReaderT<F, D, A> = Kleisli<F, D, A>
             override fun MF(): Monad<F> = MF
         }
 
-        inline fun <reified F, D> functor(MF : Monad<F> = monad<F>()): Functor<KleisliFD<F, D>> = instances(MF)
+        inline fun <reified F, D> functor(MF : Monad<F> = monad<F>()): Functor<KleisliKindPartial<F, D>> = instances(MF)
 
-        inline fun <reified F, D> applicative(MF : Monad<F> = monad<F>()): Applicative<KleisliFD<F, D>> = instances(MF)
+        inline fun <reified F, D> applicative(MF : Monad<F> = monad<F>()): Applicative<KleisliKindPartial<F, D>> = instances(MF)
 
-        inline fun <reified F, D> monad(MF : Monad<F> = monad<F>()): Monad<KleisliFD<F, D>> = instances(MF)
+        inline fun <reified F, D> monad(MF : Monad<F> = monad<F>()): Monad<KleisliKindPartial<F, D>> = instances(MF)
 
-        inline fun <reified F, D, reified E> monadError(MFE : MonadError<F, E> = monadError<F, E>()): MonadError<KleisliFD<F, D>, E> = object : KleisliMonadError<F, D, E> {
+        inline fun <reified F, D, reified E> monadError(MFE : MonadError<F, E> = monadError<F, E>()): MonadError<KleisliKindPartial<F, D>, E> = object : KleisliMonadError<F, D, E> {
             override fun MF(): Monad<F> = MFE
 
             override fun MFE(): MonadError<F, E> = MFE

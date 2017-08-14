@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <SmellBaseline>
   <Blacklist timestamp="1490879306930"></Blacklist>
-  <Whitelist timestamp="1502651620375">
+  <Whitelist timestamp="1502670811218">
     <ID>LabeledExpression:FunctionK.kt$&lt;no name provided&gt;$this@or</ID>
     <ID>LabeledExpression:PartialFunction.kt$&lt;no name provided&gt;$this@orElse</ID>
     <ID>LabeledExpression:PartialFunction.kt$&lt;no name provided&gt;$this@andThen</ID>
@@ -20,8 +20,8 @@
     <ID>OptionalUnit:AndThen.kt$AndThen$Unit</ID>
     <ID>OptionalUnit:IO.kt$IO$Unit</ID>
     <ID>LateinitUsage:Comonad.kt$ComonadContinuation$internal lateinit var returnedMonad: A</ID>
-    <ID>LateinitUsage:Monad.kt$MonadContinuation$internal lateinit var returnedMonad: HK&lt;F, A&gt;</ID>
-    <ID>LateinitUsage:Monad.kt$StackSafeMonadContinuation$internal lateinit var returnedMonad: Free&lt;F, A&gt;</ID>
+    <ID>LateinitUsage:Monad.kt$MonadContinuation$protected lateinit var returnedMonad: HK&lt;F, A&gt;</ID>
+    <ID>LateinitUsage:Monad.kt$StackSafeMonadContinuation$protected lateinit var returnedMonad: Free&lt;F, A&gt;</ID>
     <ID>UnsafeCallOnNullableType:AndThen.kt$AndThen$failure!!</ID>
     <ID>MaxLineLength:Kleisli.kt$kategory.Kleisli.kt</ID>
     <ID>MaxLineLength:Composed.kt$kategory.Composed.kt</ID>
@@ -46,6 +46,7 @@
     <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
     <ID>MaxLineLength:ApplicativeError.kt$kategory.ApplicativeError.kt</ID>
     <ID>MaxLineLength:Foldable.kt$kategory.Foldable.kt</ID>
+    <ID>MaxLineLength:Monad.kt$kategory.Monad.kt</ID>
     <ID>MaxLineLength:MonadError.kt$kategory.MonadError.kt</ID>
     <ID>MaxLineLength:MonadReader.kt$kategory.MonadReader.kt</ID>
     <ID>MaxLineLength:MonadState.kt$kategory.MonadState.kt</ID>

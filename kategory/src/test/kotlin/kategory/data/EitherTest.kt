@@ -16,8 +16,8 @@ class EitherTest : UnitSpec() {
         testLaws(SemigroupKLaws.laws(
                 Either.semigroupK(),
                 Either.applicative(),
-                object : Eq<HK<EitherF<IdHK>, Int>> {
-                    override fun eqv(a: HK<EitherF<IdHK>, Int>, b: HK<EitherF<IdHK>, Int>): Boolean =
+                object : Eq<HK<EitherKindPartial<IdHK>, Int>> {
+                    override fun eqv(a: HK<EitherKindPartial<IdHK>, Int>, b: HK<EitherKindPartial<IdHK>, Int>): Boolean =
                             a.ev() == b.ev()
                 }))
 

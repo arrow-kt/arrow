@@ -10,7 +10,7 @@ class WriterTTest : UnitSpec() {
     init {
 
         testLaws(MonadLaws.laws(WriterT.monad(NonEmptyList, IntMonoid), Eq.any()))
-        testLaws(MonoidKLaws.laws<WriterF<OptionHK, Int>>(
+        testLaws(MonoidKLaws.laws<WriterTKindPartial<OptionHK, Int>>(
                 WriterT.monoidK(Option, OptionMonoidK()),
                 WriterT.applicative(Option, IntMonoid),
                 WriterT.invoke(Option(Tuple2(1, 2)), Option.monad()),
