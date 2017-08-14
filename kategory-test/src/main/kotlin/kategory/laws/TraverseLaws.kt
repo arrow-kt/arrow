@@ -23,7 +23,7 @@ object TraverseLaws {
                     Law("Traverse Laws: Identity", { identityTraverse(FF, AP, cf, EQ) }),
                     Law("Traverse Laws: Sequential composition", { sequentialComposition(FF, cf, EQ) }),
                     Law("Traverse Laws: Parallel composition", { parallelComposition(FF, cf, EQ) }),
-                    Law("Traverse Laws: FoldMap derived", { foldMapDerived(FF, AP, cf, EQ) })
+                    Law("Traverse Laws: FoldMap derived", { foldMapDerived(FF, cf) })
             )
 
     inline fun <reified F> identityTraverse(FF: Traverse<F>, AP: Applicative<F> = applicative<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>) =
