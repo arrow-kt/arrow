@@ -1,12 +1,10 @@
 package kategory
 
+import kotlinx.coroutines.experimental.runBlocking
 import java.io.Serializable
-import kotlin.coroutines.experimental.Continuation
-import kotlin.coroutines.experimental.EmptyCoroutineContext
-import kotlin.coroutines.experimental.RestrictsSuspension
+import kotlin.coroutines.experimental.*
 import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
-import kotlin.coroutines.experimental.startCoroutine
 
 interface Monad<F> : Applicative<F>, Typeclass {
 
@@ -21,7 +19,7 @@ interface Monad<F> : Applicative<F>, Typeclass {
 
 inline fun <reified F, A, B> HK<F, A>.flatMap(FT: Monad<F> = monad(), noinline f: (A) -> HK<F, B>): HK<F, B> = FT.flatMap(this, f)
 
-inline fun <reified F, A, B> HK<F, HK<F, A>>.flatten(FT: Monad<F> = monad()): HK<F, A> = FT.flatten(this)
+inline fun <reified F, A> HK<F, HK<F, A>>.flatten(FT: Monad<F> = monad()): HK<F, A> = FT.flatten(this)
 
 @RestrictsSuspension
 open class MonadContinuation<F, A>(val M: Monad<F>) : Serializable, Continuation<HK<F, A>> {
@@ -47,6 +45,17 @@ open class MonadContinuation<F, A>(val M: Monad<F>) : Serializable, Continuation
     suspend fun <B> bind(m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels
         returnedMonad = M.flatMap(m(), { x ->
+            c.stackLabels = labelHere
+            c.resume(x)
+            returnedMonad
+        })
+        COROUTINE_SUSPENDED
+    }
+
+    suspend fun <B> bindInContext(coroutineContext: CoroutineContext, m: suspend () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
+        val labelHere = c.stackLabels // save the whole coroutine stack labels
+        val result = runBlocking(coroutineContext) { m() }
+        returnedMonad = M.flatMap(result, { x ->
             c.stackLabels = labelHere
             c.resume(x)
             returnedMonad
@@ -96,6 +105,17 @@ open class StackSafeMonadContinuation<F, A>(val M: Monad<F>) : Serializable, Con
     suspend fun <B> bind(m: () -> Free<F, B>): B = suspendCoroutineOrReturn { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels
         val freeResult = m()
+        returnedMonad = freeResult.flatMap { z ->
+            c.stackLabels = labelHere
+            c.resume(z)
+            returnedMonad
+        }
+        COROUTINE_SUSPENDED
+    }
+
+    suspend fun <B> bindInContext(coroutineContext: CoroutineContext, m: suspend () -> Free<F, B>): B = suspendCoroutineOrReturn { c ->
+        val labelHere = c.stackLabels // save the whole coroutine stack labels
+        val freeResult = runBlocking(coroutineContext) { m() }
         returnedMonad = freeResult.flatMap { z ->
             c.stackLabels = labelHere
             c.resume(z)
