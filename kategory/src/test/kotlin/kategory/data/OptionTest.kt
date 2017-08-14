@@ -2,15 +2,15 @@ package kategory
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
+import io.kotlintest.matchers.should
 import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldThrow
 import io.kotlintest.properties.forAll
 import kategory.Option.None
 import kategory.Option.Some
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class OptionTest: UnitSpec() {
+class OptionTest : UnitSpec() {
 
     init {
 
@@ -84,6 +84,42 @@ class OptionTest: UnitSpec() {
                 val option = Option(a)
                 option.flatMap(x) == Option.flatMap(option, x)
             }
+        }
+
+        "Option.functor.void should return Unit" {
+            forAll { a: Int ->
+                Option.void(Option(a)) == Some(Unit)
+            }
+        }
+
+        "Option.functor.as should change its value" {
+            forAll { a: Int ->
+                Option.`as`(Option("1"), a) == Some(a)
+            }
+        }
+
+        "Option.functor.fproduct should return a tuple of the current value and the transformed" {
+            forAll { a: Int ->
+                Option.fproduct(Option(a), { it + 1 }) == Some(Tuple2(a, a + 1))
+            }
+        }
+
+        "Option.functor.tupleLeft should return a tuple the current value and the value passed" {
+            forAll { a: Int ->
+                Option.tupleLeft(Option(a), a + 1) == Some(Tuple2(a + 1, a))
+            }
+        }
+
+        "Option.functor.tupleRight should return a tuple the current value and the value passed" {
+            forAll { a: Int ->
+                Option.tupleRigth(Option(a), a + 1) == Some(Tuple2(a, a + 1))
+            }
+        }
+
+        "Option.functor.widen should cast the result to other super type" {
+            val x: Option<Any> = Option.widen(Option("1")).ev()
+
+            x should { x -> x is Option<Any> }
         }
 
         "Option.monad.binding should for comprehend over option" {
