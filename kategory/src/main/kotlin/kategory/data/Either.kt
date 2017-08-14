@@ -1,7 +1,5 @@
 package kategory
 
-typealias EitherF<L> = HK<EitherHK, L>
-
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Either.scala
  *
@@ -125,20 +123,20 @@ typealias EitherF<L> = HK<EitherHK, L>
 
         fun <L> instances(): EitherInstances<L> = object : EitherInstances<L> {}
 
-        fun <L> functor(): Functor<EitherF<L>> = instances()
+        fun <L> functor(): Functor<EitherKindPartial<L>> = instances()
 
-        fun <L> applicative(): Applicative<EitherF<L>> = instances()
+        fun <L> applicative(): Applicative<EitherKindPartial<L>> = instances()
 
-        fun <L> monad(): Monad<EitherF<L>> = instances()
+        fun <L> monad(): Monad<EitherKindPartial<L>> = instances()
 
-        fun <L> foldable(): Foldable<EitherF<L>> = instances()
+        fun <L> foldable(): Foldable<EitherKindPartial<L>> = instances()
 
-        fun <L> traverse(): Traverse<EitherF<L>> = instances()
+        fun <L> traverse(): Traverse<EitherKindPartial<L>> = instances()
 
-        fun <L> monadError(): MonadError<EitherF<L>, L> = instances()
+        fun <L> monadError(): MonadError<EitherKindPartial<L>, L> = instances()
 
-        fun <L> semigroupK(): SemigroupK<EitherF<L>> = object : SemigroupK<EitherF<L>> {
-            override fun <A> combineK(x: HK<EitherF<L>, A>, y: HK<EitherF<L>, A>): Either<L, A> =
+        fun <L> semigroupK(): SemigroupK<EitherKindPartial<L>> = object : SemigroupK<EitherKindPartial<L>> {
+            override fun <A> combineK(x: HK<EitherKindPartial<L>, A>, y: HK<EitherKindPartial<L>, A>): Either<L, A> =
                     when (x) {
                         is Left -> y.ev()
                         else -> x.ev()

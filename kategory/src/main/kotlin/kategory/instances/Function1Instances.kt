@@ -1,10 +1,10 @@
 package kategory
 
 interface Function1Instances<I> :
-        Functor<Function1F<I>>,
-        Applicative<Function1F<I>>,
-        Monad<Function1F<I>>,
-        MonadReader<Function1F<I>, I> {
+        Functor<Function1KindPartial<I>>,
+        Applicative<Function1KindPartial<I>>,
+        Monad<Function1KindPartial<I>>,
+        MonadReader<Function1KindPartial<I>, I> {
 
     override fun ask(): Function1<I, I> = { a: I -> a }.k()
 

@@ -1,7 +1,5 @@
 package kategory
 
-typealias CoyonedaF<U, P> = HK2<CoyonedaHK, U, P>
-
 private typealias AnyFunc = (Any?) -> Any?
 
 @higherkind data class Coyoneda<F, P, A>(val pivot: HK<F, P>, internal val ks: List<AnyFunc>) : CoyonedaKind<F, P, A> {
@@ -29,7 +27,7 @@ private typealias AnyFunc = (Any?) -> Any?
 
         inline fun <reified U, A, B> unsafeApply(fa: HK<U, A>, f: List<AnyFunc>): Coyoneda<U, A, B> = Coyoneda(fa, f)
 
-        fun <U, P> functor(): Functor<CoyonedaF<U, P>> = object : CoyonedaInstances<U, P> {}
+        fun <U, P> functor(): Functor<CoyonedaKindPartial<U, P>> = object : CoyonedaInstances<U, P> {}
 
     }
 

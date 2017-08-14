@@ -1,7 +1,5 @@
 package kategory
 
-typealias CokleisliF<F> = HK<CokleisliHK, F>
-
 typealias CokleisliFun<F, A, B> = (HK<F, A>) -> B
 
 typealias CoreaderT<F, A, B> = Cokleisli<F, A, B>
