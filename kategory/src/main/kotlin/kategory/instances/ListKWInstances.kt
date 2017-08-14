@@ -21,7 +21,6 @@ interface ListKWInstances :
     override fun <A, B> foldL(fa: HK<ListKW.F, A>, b: B, f: (B, A) -> B): B =
             fa.ev().fold(b, f)
 
-
     override fun <A, B> foldR(fa: HK<ListKW.F, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
         fun loop(fa_p: ListKW<A>): Eval<B> = when {
             fa_p.isEmpty() -> lb
@@ -60,17 +59,13 @@ interface ListKWInstances :
 }
 
 interface ListKWMonoid<A> : Monoid<ListKW<A>> {
-    override fun combine(a: ListKW<A>, b: ListKW<A>): ListKW<A> =
-            a + b
+    override fun combine(a: ListKW<A>, b: ListKW<A>): ListKW<A> = a + b
 
-    override fun empty(): ListKW<A> =
-            ListKW.listOfK()
+    override fun empty(): ListKW<A> = ListKW.listOfK()
 }
 
 interface ListKWMonoidK : MonoidK<ListKW.F> {
-    override fun <A> combineK(x: HK<ListKW.F, A>, y: HK<ListKW.F, A>): ListKW<A> =
-            x.ev() + y.ev()
+    override fun <A> combineK(x: HK<ListKW.F, A>, y: HK<ListKW.F, A>): ListKW<A> = x.ev() + y.ev()
 
-    override fun <A> empty(): HK<ListKW.F, A> =
-            ListKW.listOfK()
+    override fun <A> empty(): HK<ListKW.F, A> = ListKW.listOfK()
 }
