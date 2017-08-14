@@ -50,5 +50,8 @@ data class ListKW<A> constructor(val list: List<A>) : ListKindW<A> {
 
 }
 
-fun <A> List<A>.k(): ListKW<A> =
-        ListKW.listOfK(this)
+fun <A> List<A>.k(): ListKW<A> = ListKW.listOfK(this)
+
+fun <A> ListKW<A>.drop(n: Int): ListKW<A> = this.list.drop(n).k()
+
+fun <A> ListKW<A>.first(): A = this.list.first()
