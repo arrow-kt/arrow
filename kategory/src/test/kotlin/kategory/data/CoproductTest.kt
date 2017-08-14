@@ -29,7 +29,7 @@ class CoproductTest : UnitSpec() {
         "CoproductComonad should comprehend with cobind" {
             forAll { num: Int ->
                 val cobinding = CoproductComonad.any().cobinding {
-                    val a = !Coproduct(Either.Right(Coproduct(Either.Right(Id(num.toString())))), Id, Coproduct.comonad<IdHK, IdHK>())
+                    val a = Coproduct(Either.Right(Coproduct(Either.Right(Id(num.toString())))), Id, Coproduct.comonad<IdHK, IdHK>()).extract()
                     val parseA = Integer.parseInt(a)
                     val b = Coproduct<NonEmptyListHK, NonEmptyListHK, Int>(Either.Left(NonEmptyList.of(parseA * 2, parseA * 100))).extract()
                     extract { Coproduct<IdHK, IdHK, Int>(Either.Left(Id(b * 3))) }

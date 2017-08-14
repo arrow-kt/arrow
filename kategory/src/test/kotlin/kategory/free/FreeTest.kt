@@ -25,14 +25,14 @@ fun <A> HK<Ops.F, A>.ev(): Ops<A> = this as Ops<A>
 class FreeTest : UnitSpec() {
 
     private val program = Ops.binding {
-        val added = !Ops.add(10, 10)
-        val subtracted = !Ops.subtract(added, 50)
+        val added = Ops.add(10, 10).bind()
+        val subtracted = bind { Ops.subtract(added, 50) }
         yields(subtracted)
     }.ev()
 
     private fun stackSafeTestProgram(n: Int, stopAt: Int): Free<Ops.F, Int> = Ops.binding {
-        val v = !Ops.add(n, 1)
-        val r = !if (v < stopAt) stackSafeTestProgram(v, stopAt) else Free.pure(v)
+        val v = Ops.add(n, 1).bind()
+        val r = bind { if (v < stopAt) stackSafeTestProgram(v, stopAt) else Free.pure(v) }
         yields(r)
     }.ev()
 

@@ -112,12 +112,11 @@ class EitherTest : UnitSpec() {
 
         "Either.monad.binding should for comprehend over right either" {
             val result = Either.monad<Int>().binding {
-                val x = !Either.Right(1)
-                val y = Either.Right(1).bind()
-                val z = bind { Either.Right(1) }
-                yields(x + y + z)
+                val x = Either.Right(1).bind()
+                val y = bind { Either.Right(1) }
+                yields(x + y)
             }
-            result shouldBe Either.Right(3)
+            result shouldBe Either.Right(2)
         }
     }
 }

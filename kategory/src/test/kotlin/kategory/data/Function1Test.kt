@@ -16,10 +16,9 @@ class Function1Test : UnitSpec() {
             val M = Function1.monad<Int>()
             M.binding {
                 val x = Function1 { _: Int -> 1 }.bind()
-                val y = !Function1 { _: Int -> 2 }
-                val z = bind { Function1 { _: Int -> 3 } }
-                yields(x + y + z)
-            }.invoke(0) shouldBe 6
+                val y = bind { Function1 { _: Int -> 2 } }
+                yields(x + y)
+            }.invoke(0) shouldBe 3
         }
     }
 }
