@@ -4,7 +4,7 @@ typealias ListKindW<A> = HK<ListKW.F, A>
 
 fun <A> ListKindW<A>.ev(): ListKW<A> = this as ListKW<A>
 
-data class ListKW<A> constructor(val list: List<A>) : ListKindW<A> {
+@higherkind data class ListKW<A> constructor(val list: List<A>) : ListKWKind<A> {
 
     class F private constructor()
 

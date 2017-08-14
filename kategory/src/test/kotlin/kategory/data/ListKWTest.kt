@@ -16,6 +16,6 @@ class ListKWTest : UnitSpec() {
                 kategory.ListKW.semigroupK(),
                 applicative,
                 Eq.any()))
-        testLaws(TraverseLaws.laws(ListKW.traverse(), applicative, { ListKW.listOfK() }, Eq.any()))
+        testLaws(TraverseLaws.laws(ListKW.traverse(), applicative, { applicative.pure(it) }, Eq.any()))
     }
 }
