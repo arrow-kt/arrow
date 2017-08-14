@@ -23,7 +23,7 @@ object TraverseLaws {
                     Law("Traverse Laws: Identity", { identityTraverse(FF, AP, cf, EQ) }),
                     Law("Traverse Laws: Sequential composition", { sequentialComposition(FF, cf, EQ) }),
                     Law("Traverse Laws: Parallel composition", { parallelComposition(FF, cf, EQ) }),
-                    Law("Traverse Laws: FoldMap derived", { foldMapDerived(FF, AP, cf, EQ) })
+                    Law("Traverse Laws: FoldMap derived", { foldMapDerived(FF, cf) })
             )
 
     inline fun <reified F> identityTraverse(FF: Traverse<F>, AP: Applicative<F> = applicative<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>) =
@@ -65,7 +65,7 @@ object TraverseLaws {
                 seen.equalUnderTheLaw(expected, TIEQ)
             })
 
-    inline fun <reified F> foldMapDerived(FF: Traverse<F>, AP: Applicative<F> = applicative<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>) =
+    inline fun <reified F> foldMapDerived(FF: Traverse<F>, crossinline cf: (Int) -> HK<F, Int>) =
             forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: HK<F, Int> ->
                 val traversed = fa.traverse(FF, Const.applicative(IntMonoid), { a -> f(a).const() }).value()
                 val mapped = fa.foldMap(FF, IntMonoid, f)
