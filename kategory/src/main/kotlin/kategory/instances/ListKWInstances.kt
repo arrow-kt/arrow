@@ -6,18 +6,18 @@ interface ListKWInstances :
         Monad<ListKWHK>,
         Traverse<ListKWHK> {
 
-    override fun <A> pure(a: A): ListKW<A> = ListKW.listOfK(a)
+    override fun <A> pure(a: A): ListKW<A> = listOf(a).k()
 
-    override fun <A, B> flatMap(fa: HK<ListKWHK, A>, f: (A) -> HK<ListKWHK, B>): ListKW<B> = fa.ev().flatMap { f(it).ev() }
+    override fun <A, B> flatMap(fa: HK<ListKWHK, A>, f: (A) -> HK<ListKWHK, B>): ListKW<B> = fa.ev().list.flatMap { f(it).ev().list }.k()
 
-    override fun <A, B> map(fa: HK<ListKWHK, A>, f: (A) -> B): HK<ListKWHK, B> = fa.ev().map(f)
+    override fun <A, B> map(fa: HK<ListKWHK, A>, f: (A) -> B): ListKW<B> = fa.ev().map(f).k()
 
-    override fun <A, B, Z> map2(fa: HK<ListKWHK, A>, fb: HK<ListKWHK, B>, f: (Tuple2<A, B>) -> Z): HK<ListKWHK, Z> =
+    override fun <A, B, Z> map2(fa: HK<ListKWHK, A>, fb: HK<ListKWHK, B>, f: (Tuple2<A, B>) -> Z): ListKW<Z> =
         fa.ev().flatMap { a ->
             fb.ev().map { b ->
                 f(Tuple2(a, b))
             }
-        }
+        }.ev()
 
     override fun <A, B> foldL(fa: HK<ListKWHK, A>, b: B, f: (B, A) -> B): B = fa.ev().fold(b, f)
 
@@ -30,8 +30,8 @@ interface ListKWInstances :
     }
 
     override fun <G, A, B> traverse(fa: HK<ListKWHK, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<ListKWHK, B>> =
-            foldR(fa, Eval.always { GA.pure(ListKW.listOfK<B>()) }) { a, eval ->
-                GA.map2Eval(f(a), eval) { ListKW.listOfK(it.a) + it.b }
+            foldR(fa, Eval.always { GA.pure(emptyList<B>().k()) }) { a, eval ->
+                GA.map2Eval(f(a), eval) { (listOf(it.a) + it.b).k() }
             }.value()
 
     @Suppress("UNCHECKED_CAST")
@@ -44,9 +44,9 @@ interface ListKWInstances :
             when (head) {
                 is Either.Right<A, B> -> {
                     buf += head.b
-                    go(buf, f, v.drop(1))
+                    go(buf, f, v.drop(1).k())
                 }
-                is Either.Left<A, B> -> go(buf, f, f(head.a).ev() + v.drop(1))
+                is Either.Left<A, B> -> go(buf, f, (f(head.a).ev() + v.drop(1)).k())
             }
         }
     }
@@ -54,18 +54,18 @@ interface ListKWInstances :
     override fun <A, B> tailRecM(a: A, f: (A) -> HK<ListKWHK, Either<A, B>>): ListKW<B> {
         val buf = ArrayList<B>()
         go(buf, f, f(a).ev())
-        return ListKW.listOfK(buf)
+        return ListKW(buf)
     }
 }
 
 interface ListKWMonoid<A> : Monoid<ListKW<A>> {
-    override fun combine(a: ListKW<A>, b: ListKW<A>): ListKW<A> = a + b
+    override fun combine(a: ListKW<A>, b: ListKW<A>): ListKW<A> = (a + b).k()
 
-    override fun empty(): ListKW<A> = ListKW.listOfK()
+    override fun empty(): ListKW<A> = emptyList<A>().k()
 }
 
 interface ListKWMonoidK : MonoidK<ListKWHK> {
-    override fun <A> combineK(x: HK<ListKWHK, A>, y: HK<ListKWHK, A>): ListKW<A> = x.ev() + y.ev()
+    override fun <A> combineK(x: HK<ListKWHK, A>, y: HK<ListKWHK, A>): ListKW<A> = (x.ev() + y.ev()).k()
 
-    override fun <A> empty(): HK<ListKWHK, A> = ListKW.listOfK()
+    override fun <A> empty(): ListKW<A> = emptyList<A>().k()
 }
