@@ -16,18 +16,16 @@ interface MonadWriter<F, W> : Monad<F> {
     fun tell(w: W): HK<F, Unit> = writer(Tuple2(w, Unit))
 
     /** Pair the value with an inspection of the accumulator */
-    fun <A, B> listens(fa: HK<F, A>, f: (W) -> B): HK<F, Tuple2<B, A>> =
-            map(listen(fa)) { Tuple2(f(it.a), it.b) }
+    fun <A, B> listens(fa: HK<F, A>, f: (W) -> B): HK<F, Tuple2<B, A>> = map(listen(fa)) { Tuple2(f(it.a), it.b) }
 
     /** Modify the accumulator */
-    fun <A> censor(fa: HK<F, A>, f: (W) -> W): HK<F, A> =
-            flatMap(listen(fa)) { writer(Tuple2(f(it.a), it.b)) }
+    fun <A> censor(fa: HK<F, A>, f: (W) -> W): HK<F, A> = flatMap(listen(fa)) { writer(Tuple2(f(it.a), it.b)) }
 
     companion object {
 
-        inline fun <reified F, reified W> invoke(MWF: MonadWriter<F, W> = monadWriter<F, W>()) = MWF
+        inline fun <reified F, reified W> invoke(MWF: MonadWriter<F, W> = monadWriter()) = MWF
     }
 }
 
-inline fun <reified F, reified W> monadWriter(): MonadWriter<F, W> =
-        instance(InstanceParametrizedType(MonadWriter::class.java, listOf(F::class.java, W::class.java)))
+inline fun <reified F, reified W> monadWriter(): MonadWriter<F, W> = instance(
+        InstanceParametrizedType(MonadWriter::class.java, listOf(F::class.java, W::class.java)))
