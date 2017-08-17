@@ -27,6 +27,21 @@ interface WriterTInstances<F, W> :
 
 }
 
+interface WriterTMonadWriter<F, W> : MonadWriter<WriterTKindPartial<F, W>, W> {
+
+    fun MF(): Monad<F>
+
+    override fun <A> writer(aw: Tuple2<W, A>): WriterT<F, W, A> = WriterT.put(aw.b, aw.a)
+
+    override fun <A> listen(fa: HK<WriterTKindPartial<F, W>, A>): HK<WriterTKindPartial<F, W>, Tuple2<W, A>> =
+            WriterT(MF(), MF().flatMap(fa.ev().content(), { a -> MF().map(fa.ev().write(), { l -> Tuple2(l, Tuple2(l, a)) }) }))
+
+    override fun <A> pass(fa: HK<WriterTKindPartial<F, W>, Tuple2<(W) -> W, A>>): HK<WriterTKindPartial<F, W>, A> =
+            WriterT(MF(), MF().flatMap(fa.ev().content(), { tuple2FA -> MF().map(fa.ev().write(), { l -> Tuple2(tuple2FA.a(l), tuple2FA.b) }) }))
+
+    override fun tell(w: W): HK<WriterTKindPartial<F, W>, Unit> = WriterT.tell(w)
+}
+
 interface WriterTSemigroupK<F, W> : SemigroupK<WriterTKindPartial<F, W>> {
 
     fun MF(): Monad<F>
