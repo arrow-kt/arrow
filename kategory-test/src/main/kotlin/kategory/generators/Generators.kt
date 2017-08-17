@@ -30,6 +30,11 @@ inline fun <F, A> genConstructor(valueGen: Gen<A>, crossinline cf: (A) -> HK<F, 
 fun genIntSmall(): Gen<Int> =
         Gen.oneOf(Gen.negativeIntegers(), Gen.choose(0, Int.MAX_VALUE / 10000))
 
+fun <A, B> genTuple(genA : Gen<A>, genB: Gen<B>): Gen<Tuple2<A, B>> =
+        object : Gen<Tuple2<A, B>> {
+            override fun generate(): Tuple2<A, B> = Tuple2(genA.generate(), genB.generate())
+        }
+
 fun genIntPredicate(): Gen<(Int) -> Boolean> =
         Gen.int().let { gen ->
             /* If you ever see two zeros in a row please contact the maintainers for a pat in the back */
