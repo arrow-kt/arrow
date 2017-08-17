@@ -3,7 +3,8 @@ package kategory
 interface WriterTInstances<F, W> :
         Functor<WriterTKindPartial<F, W>>,
         Applicative<WriterTKindPartial<F, W>>,
-        Monad<WriterTKindPartial<F, W>>, WriterTMonadWriter<F, W> {
+        Monad<WriterTKindPartial<F, W>>,
+        MonadWriter<WriterTKindPartial<F, W>, W> {
 
     fun MM(): Monad<F>
 
@@ -26,8 +27,6 @@ interface WriterTInstances<F, W> :
             }))
 
 }
-
-interface WriterTMonadWriter<F, W> : MonadWriter<WriterTKindPartial<F, W>, W>
 
 interface WriterTSemigroupK<F, W> : SemigroupK<WriterTKindPartial<F, W>> {
 

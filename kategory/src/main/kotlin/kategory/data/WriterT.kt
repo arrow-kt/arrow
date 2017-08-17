@@ -48,20 +48,15 @@ package kategory
 
         inline fun <reified F, reified W> monadWriter(MM: Monad<F> = kategory.monad(), SG: Monoid<W> = kategory.monoid()): MonadWriter<WriterTKindPartial<F, W>, W> = instances(MM, SG)
 
-        inline fun <reified F, W, A> putT(vf: HK<F, A>, w: W, MF: Monad<F> = kategory.monad()): WriterT<F, W, A> =
-                WriterT(MF, MF.map(vf, { v -> Tuple2(w, v) }))
+        inline fun <reified F, W, A> putT(vf: HK<F, A>, w: W, MF: Monad<F> = kategory.monad()): WriterT<F, W, A> = WriterT(MF, MF.map(vf, { v -> Tuple2(w, v) }))
 
-        inline fun <reified F, W, A> put(a: A, w: W, applicativeF: Applicative<F> = kategory.applicative()): WriterT<F, W, A> =
-                WriterT.putT(applicativeF.pure(a), w)
+        inline fun <reified F, W, A> put(a: A, w: W, applicativeF: Applicative<F> = kategory.applicative()): WriterT<F, W, A> = WriterT.putT(applicativeF.pure(a), w)
 
-        inline fun <reified F, W> tell(l: W, applicativeF: Applicative<F> = kategory.applicative()): WriterT<F, W, Unit> =
-                WriterT.put(Unit, l)
+        inline fun <reified F, W> tell(l: W, applicativeF: Applicative<F> = kategory.applicative()): WriterT<F, W, Unit> = WriterT.put(Unit, l)
 
-        inline fun <reified F, reified W, A> value(v: A, applicativeF: Applicative<F> = kategory.applicative(), monoidW: Monoid<W> = monoid()): WriterT<F, W, A> =
-                WriterT.put(v, monoidW.empty())
+        inline fun <reified F, reified W, A> value(v: A, applicativeF: Applicative<F> = kategory.applicative(), monoidW: Monoid<W> = monoid()): WriterT<F, W, A> = WriterT.put(v, monoidW.empty())
 
-        inline fun <reified F, reified W, A> valueT(vf: HK<F, A>, functorF: Functor<F> = kategory.functor(), monoidW: Monoid<W> = monoid()): WriterT<F, W, A> =
-                WriterT.putT(vf, monoidW.empty())
+        inline fun <reified F, reified W, A> valueT(vf: HK<F, A>, functorF: Functor<F> = kategory.functor(), monoidW: Monoid<W> = monoid()): WriterT<F, W, A> = WriterT.putT(vf, monoidW.empty())
     }
 
     fun tell(w: W, SG: Semigroup<W>): WriterT<F, W, A> = mapAcc { SG.combine(it, w) }
