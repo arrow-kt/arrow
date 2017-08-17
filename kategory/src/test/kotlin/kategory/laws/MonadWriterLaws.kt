@@ -34,7 +34,7 @@ object MonadWriterLaws {
                                                             MW: MonadWriter<F, W>,
                                                             MOW: Monoid<W> = monoid<W>()): Unit {
         forAll(genW, genW, { x: W, y: W ->
-            MW.flatMap(MW.tell(x), { MW.tell(y) }).equalUnderTheLaw(MOW.combine(x, y), Eq.any())
+            MW.flatMap(MW.tell(x), { MW.tell(y) }).equalUnderTheLaw(MW.tell(MOW.combine(x, y)), Eq.any())
         })
     }
 
