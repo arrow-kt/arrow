@@ -39,7 +39,7 @@ abstract class WriterTMonadWriter<F, W> : MonadWriter<WriterTKindPartial<F, W>, 
         inline fun <reified F, W, A> pass(fa: HK<WriterTKindPartial<F, W>, Tuple2<(W) -> W, A>>, MF: Monad<F> = monad()): HK<WriterTKindPartial<F, W>, A> =
                 WriterT(MF, MF.flatMap(fa.ev().content(), { tuple2FA -> MF.map(fa.ev().write(), { l -> Tuple2(tuple2FA.a(l), tuple2FA.b) }) }))
 
-        inline fun <reified F, W, A> tell(w: W): HK<WriterTKindPartial<F, W>, Unit> = WriterT.tell(w)
+        inline fun <reified F, W> tell(w: W): HK<WriterTKindPartial<F, W>, Unit> = WriterT.tell(w)
     }
 }
 
