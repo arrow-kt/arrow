@@ -33,7 +33,7 @@ interface Reducible<in F> : Foldable<F>, Typeclass {
      */
     fun <A, B> reduceLeftTo(fa: HK<F, A>, f: (A) -> B, g: (B, A) -> B): B
 
-    fun <A, B> reduceLeftToOption(fa: HK<F, A>, f: (A) -> B, g: (B, A) -> B): Option<B> =
+    override fun <A, B> reduceLeftToOption(fa: HK<F, A>, f: (A) -> B, g: (B, A) -> B): Option<B> =
             Option.Some(reduceLeftTo(fa, f, g))
 
     /**
@@ -42,7 +42,7 @@ interface Reducible<in F> : Foldable<F>, Typeclass {
      */
     fun <A, B> reduceRightTo(fa: HK<F, A>, f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<B>
 
-    fun <A, B> reduceRightToOption(fa: HK<F, A>, f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<Option<B>> =
+    override fun <A, B> reduceRightToOption(fa: HK<F, A>, f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<Option<B>> =
             reduceRightTo(fa, f, g).map({ Option.Some(it) })
 
     fun <A> toNonEmptyList(fa: HK<F, A>): NonEmptyList<A> =
@@ -103,77 +103,45 @@ abstract class NonEmptyReducible<F, G> : Reducible<F> {
     }
 
     override fun <A, B> reduceRightTo(fa: HK<F, A>, f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            Eval.Always({ split(fa) }).flatMap { (a, ga) -> FG().reduceRightToOption(ga)(f)(g).flatMap {
-                    case Some (b) => g(a, Now(b))
-                    case None => Later (f(a))
+            Eval.Always({ split(fa) }).flatMap { (a, ga) ->
+                FG().reduceRightToOption(ga, f, g).flatMap { option ->
+                    when (option) {
+                        is Option.Some<B> -> g(a, Eval.Now(option.value))
+                        is Option.None -> Eval.Later({ f(a) })
+                    }
                 }
             }
 
-    /*
-    def reduceRightTo[A, B](fa: F[A])(f: A => B)(g: (A, Eval[B]) => Eval[B]): Eval[B] =
-    Always(split(fa)).flatMap { case (a, ga) =>
-        G.reduceRightToOption(ga)(f)(g).flatMap {
-            case Some(b) => g(a, Now(b))
-            case None => Later(f(a))
-        }
-    }
-
-    override def size[A](fa: F[A]): Long = {
-        val (_, tail) = split(fa)
-        1 + G.size(tail)
-    }
-
-    override def get[A](fa: F[A])(idx: Long): Option[A] =
-    if (idx == 0L) Some(split(fa)._1) else G.get(split(fa)._2)(idx - 1L)
-
-    override def fold[A](fa: F[A])(implicit A: Monoid[A]): A = {
+    override fun <A> fold(ma: Monoid<A>, fa: HK<F, A>): A {
         val (a, ga) = split(fa)
-        A.combine(a, G.fold(ga))
+        return ma.combine(a, FG().fold(ma, ga))
     }
 
-    override def foldM[H[_], A, B](fa: F[A], z: B)(f: (B, A) => H[B])(implicit H: Monad[H]): H[B] = {
+    override fun <A> find(fa: HK<F, A>, f: (A) -> Boolean): Option<A> {
         val (a, ga) = split(fa)
-        H.flatMap(f(z, a))(G.foldM(ga, _)(f))
+        return if (f(a)) Option.Some(a) else FG().find(ga, f)
     }
 
-    override def find[A](fa: F[A])(f: A => Boolean): Option[A] = {
+    override fun <A> exists(fa: HK<F, A>, p: (A) -> Boolean): Boolean {
         val (a, ga) = split(fa)
-        if (f(a)) Some(a) else G.find(ga)(f)
+        return p(a) || FG().exists(ga, p)
     }
 
-    override def exists[A](fa: F[A])(p: A => Boolean): Boolean = {
+    override fun <A> forall(fa: HK<F, A>, p: (A) -> Boolean): Boolean {
         val (a, ga) = split(fa)
-        p(a) || G.exists(ga)(p)
+        return p(a) && FG().forall(ga, p)
     }
+}
 
-    override def forall[A](fa: F[A])(p: A => Boolean): Boolean = {
-        val (a, ga) = split(fa)
-        p(a) && G.forall(ga)(p)
-    }
+inline fun <reified F, reified G, A> NonEmptyReducible<F, G>.size(MB: Monoid<Long> = monoid(), fa: HK<F, A>): Long {
+    val (_, tail) = split(fa)
+    return 1 + FG().size(MB, tail)
+}
 
-    override def toList[A](fa: F[A]): List[A] = {
-        val (a, ga) = split(fa)
-        a :: G.toList(ga)
-    }
+fun <F, G, A> NonEmptyReducible<F, G>.get(fa: HK<F, A>, idx: Long): Option<A> =
+        if (idx == 0L) Option.Some(split(fa).a) else FG().get(split(fa).b, idx - 1L)
 
-    override def toNonEmptyList[A](fa: F[A]): NonEmptyList[A] = {
-        val (a, ga) = split(fa)
-        NonEmptyList(a, G.toList(ga))
-    }
-
-    override def filter_[A](fa: F[A])(p: A => Boolean): List[A] = {
-        val (a, ga) = split(fa)
-        val filteredTail = G.filter_(ga)(p)
-        if (p(a)) a :: filteredTail else filteredTail
-    }
-
-    override def takeWhile_[A](fa: F[A])(p: A => Boolean): List[A] = {
-        val (a, ga) = split(fa)
-        if (p(a)) a :: G.takeWhile_(ga)(p) else Nil
-    }
-
-    override def dropWhile_[A](fa: F[A])(p: A => Boolean): List[A] = {
-        val (a, ga) = split(fa)
-        if (p(a)) G.dropWhile_(ga)(p) else a :: G.toList(ga)
-    }*/
+inline fun <F, reified G, A, B> NonEmptyReducible<F, G>.foldM(fa: HK<F, A>, z: B, crossinline f: (B, A) -> HK<G, B>, MG: Monad<G> = monad()): HK<G, B> {
+    val (a, ga) = split(fa)
+    return MG.flatMap(f(z, a), { FG().foldM(ga, it, f) })
 }
