@@ -35,6 +35,20 @@ interface Foldable<in F> : Typeclass {
      */
     fun <A> fold(ma: Monoid<A>, fa: HK<F, A>): A = foldL(fa, ma.empty(), { acc, a -> ma.combine(acc, a) })
 
+    fun <A, B> reduceLeftToOption(fa: HK<F, A>, f: (A) -> B, g: (B, A) -> B): Option<B> =
+            foldL(fa, Option.empty()) { option, a -> when (option) {
+                is Option.Some<B> -> Option.Some(g(option.value, a))
+                is Option.None -> Option.Some(f(a))
+            }}
+
+    fun <A, B> reduceRightToOption(fa: HK<F, A>, f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<Option<B>> =
+    foldR(fa, Eval.Now(Option.empty[B])) { (a, lb) =>
+        lb.flatMap {
+            case Some(b) => g(a, Now(b)).map(Some(_))
+            case None => Later(Some(f(a)))
+        }
+    }*/
+
     /**
      * Alias for fold.
      */
