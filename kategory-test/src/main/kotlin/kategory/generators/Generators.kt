@@ -24,18 +24,6 @@ fun <A> genFunctionAAToA(genA: Gen<A>): Gen<(A, A) -> A> =
             }
         }
 
-fun <A, B> genFunctionABToB(genB: Gen<B>): Gen<(A, B) -> B> =
-        object : Gen<(A, B) -> B> {
-            override fun generate(): (A, B) -> B {
-                val v = genB.generate()
-                return { _, _ -> v }
-            }
-        }
-
-fun <A> genEval(genA: Gen<A>): Gen<Eval<A>> = object : Gen<Eval<A>> {
-    override fun generate(): Eval<A> = Eval.Always({ genA.generate() })
-}
-
 fun genThrowable(): Gen<Throwable> = object : Gen<Throwable> {
     override fun generate(): Throwable =
             Gen.oneOf(listOf(RuntimeException(), NoSuchElementException(), IllegalArgumentException())).generate()
