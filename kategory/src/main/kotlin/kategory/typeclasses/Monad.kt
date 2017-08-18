@@ -19,7 +19,25 @@ interface Monad<F> : Applicative<F>, Typeclass {
     fun <A> flatten(ffa: HK<F, HK<F, A>>): HK<F, A> = flatMap(ffa, { it })
 
     fun <A, B> tailRecM(a: A, f: (A) -> HK<F, Either<A, B>>): HK<F, B>
+
+    fun <A, B> followedBy(fa: HK<F, A>, fb: HK<F, B>): HK<F, B> =
+            flatMap(fa, { fb })
+
+    fun <A, B> followedByEval(fa: HK<F, A>, fb: Eval<HK<F, B>>): HK<F, B> =
+            flatMap(fa, { fb.value() })
+
+    fun <A, B> forEffect(fa: HK<F, A>, fb: HK<F, B>): HK<F, A> =
+            flatMap(fa, { a -> map(fb, { a }) })
+
+    fun <A, B> forEffectEval(fa: HK<F, A>, fb: Eval<HK<F, B>>): HK<F, A> =
+            flatMap(fa, { a -> map(fb.value(), { a }) })
 }
+
+inline fun <F, A, B> Monad<F>.mproduct(fa: HK<F, A>, crossinline f: (A) -> HK<F, B>): HK<F, Tuple2<A, B>> =
+        flatMap(fa, { a -> map(f(a), { a toT it }) })
+
+inline fun <F, B> Monad<F>.ifM(fa: HK<F, Boolean>, crossinline ifTrue: () -> HK<F, B>, crossinline ifFalse: () -> HK<F, B>): HK<F, B> =
+        flatMap(fa, { if (it) ifTrue() else ifFalse() })
 
 inline fun <reified F, A, B> HK<F, A>.flatMap(FT: Monad<F> = monad(), noinline f: (A) -> HK<F, B>): HK<F, B> = FT.flatMap(this, f)
 
