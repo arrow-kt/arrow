@@ -17,7 +17,7 @@ class TIF {
 }
 
 object TraverseLaws {
-    // FIXME(paco): this implementation will crash the inliner
+    // FIXME(paco): this implementation will crash the inliner. Wait for fix: https://youtrack.jetbrains.com/issue/KT-18660
     /*
     inline fun <reified F> laws(TF: Traverse<F> = traverse<F>(), AF: Applicative<F> = applicative<F>(), EQ: Eq<HK<F, Int>>): List<Law> =
         FoldableLaws.laws(TF, { AF.pure(it) }, Eq.any()) + FunctorLaws.laws(AF, EQ) + listOf(
