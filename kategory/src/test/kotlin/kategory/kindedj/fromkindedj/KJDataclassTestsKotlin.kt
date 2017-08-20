@@ -5,7 +5,7 @@ import io.kotlintest.matchers.shouldBe
 import io.kotlintest.specs.StringSpec
 import kategory.fromKindedJ
 import kategory.kindedj.fromkindedj.KJDataclassHK.*
-import kategory.kindedj.fromkindedj.KJDataclassKindJShow
+import kategory.kindedj.fromkindedj.KJDataclassKindedJShow
 import org.junit.runner.RunWith
 
 
@@ -24,7 +24,7 @@ class KJDataclassTestsKotlin : StringSpec() {
 
     init {
         "Values should be convertible" {
-            KJDataclassKindJShow.INSTANCE.show(kinded) shouldBe KJDataclassKategoryShow.show(kinded.fromKindedJ())
+            KJDataclassKindedJShow.INSTANCE.show(kinded) shouldBe KJDataclassKategoryShow.show(kinded.fromKindedJ())
         }
     }
 }

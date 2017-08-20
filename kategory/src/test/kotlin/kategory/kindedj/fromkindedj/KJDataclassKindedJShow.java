@@ -3,10 +3,10 @@ package kategory.kindedj.fromkindedj;
 import io.kindedj.HK;
 import kategory.kindedj.KindJShow;
 
-public class KJDataclassKindJShow implements KindJShow<KJDataclassHK> {
-    public static KJDataclassKindJShow INSTANCE = new KJDataclassKindJShow();
+public class KJDataclassKindedJShow implements KindJShow<KJDataclassHK> {
+    public static KJDataclassKindedJShow INSTANCE = new KJDataclassKindedJShow();
 
-    private KJDataclassKindJShow() {
+    private KJDataclassKindedJShow() {
     }
 
     @Override

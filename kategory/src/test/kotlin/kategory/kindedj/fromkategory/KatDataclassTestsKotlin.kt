@@ -3,7 +3,7 @@ package kategory.fromkotlin
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.specs.StringSpec
-import kategory.kindedj.fromkategory.KatDataclassKindJShow
+import kategory.kindedj.fromkategory.KatDataclassKindedJShow
 import kategory.toKindedJ
 import org.junit.runner.RunWith
 
@@ -22,7 +22,7 @@ class KatDataclassTestsKotlin : StringSpec() {
 
     init {
         "Values should be convertible" {
-            KatDataclassKategoryShow.show(kinded) shouldBe  KatDataclassKindJShow.INSTANCE.show(kinded.toKindedJ())
+            KatDataclassKategoryShow.show(kinded) shouldBe  KatDataclassKindedJShow.INSTANCE.show(kinded.toKindedJ())
         }
     }
 }

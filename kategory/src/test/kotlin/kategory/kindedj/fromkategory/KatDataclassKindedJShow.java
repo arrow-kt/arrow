@@ -7,8 +7,8 @@ import kategory.fromkotlin.KatDataclassHK;
 import kategory.fromkotlin.KatDataclassKt;
 import kategory.kindedj.KindJShow;
 
-public class KatDataclassKindJShow implements KindJShow<HK<ConvertHK, KatDataclassHK>> {
-    private KatDataclassKindJShow() {
+public class KatDataclassKindedJShow implements KindJShow<HK<ConvertHK, KatDataclassHK>> {
+    private KatDataclassKindedJShow() {
     }
 
     @Override
@@ -17,5 +17,5 @@ public class KatDataclassKindJShow implements KindJShow<HK<ConvertHK, KatDatacla
         return KatDataclassKt.value(cast).toString();
     }
 
-    public static KatDataclassKindJShow INSTANCE = new KatDataclassKindJShow();
+    public static KatDataclassKindedJShow INSTANCE = new KatDataclassKindedJShow();
 }
