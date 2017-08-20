@@ -8,7 +8,7 @@ dependencies {
     compile 'com.github.KindedJ:KindedJ:5bee1acf6f'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
-    compile 'com.github.kategory:kategory-annotations:paco-kindedj-SNAPSHOT'
+    compile "io.kategory:kategory-annotations:$kategoryAnnotationsVersion"
     kapt "io.kategory:kategory-annotations-compile:$kategoryAnnotationsVersion"
     kaptTest "io.kategory:kategory-annotations-compile:$kategoryAnnotationsVersion"
     compileOnly "io.kategory:kategory-annotations-compile:$kategoryAnnotationsVersion"
