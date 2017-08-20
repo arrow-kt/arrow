@@ -1,6 +1,6 @@
 package kategory
 
-@higherkind abstract class Yoneda<F, A> : YonedaKind<F, A> {
+@higherkind abstract class Yoneda<F, A> : YonedaKind<F, A>, YonedaKindJ<F, A> {
 
     abstract fun <B> apply(f: (A) -> B): HK<F, B>
 
