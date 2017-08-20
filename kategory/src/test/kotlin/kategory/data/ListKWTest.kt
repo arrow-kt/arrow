@@ -1,10 +1,6 @@
-package kategory.data
+package kategory
 
 import io.kotlintest.KTestJUnitRunner
-import kategory.Eq
-import kategory.ListKW
-import kategory.TraverseLaws
-import kategory.UnitSpec
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

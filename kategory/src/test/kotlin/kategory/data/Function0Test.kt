@@ -6,12 +6,14 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class Function0Test : UnitSpec() {
-    init {
+    val EQ: Eq<HK<Function0HK, Int>> = object : Eq<HK<Function0HK, Int>> {
+        override fun eqv(a: HK<Function0HK, Int>, b: HK<Function0HK, Int>): Boolean =
+                a() == b()
+    }
 
-        testLaws(MonadLaws.laws(Function0, object : Eq<HK<Function0HK, Int>> {
-            override fun eqv(a: HK<Function0HK, Int>, b: HK<Function0HK, Int>): Boolean =
-                    a() == b()
-        }))
+    init {
+        testLaws(MonadLaws.laws(Function0, EQ))
+        testLaws(ComonadLaws.laws(Function0, { { it }.k() }, EQ))
 
         "Function0Monad.binding should for comprehend over all values of multiple Function0" {
             Function0.binding {
