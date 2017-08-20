@@ -60,8 +60,7 @@ interface Foldable<in F> : Typeclass {
      * @return None if the structure is empty, otherwise the result of combining the cumulative left-associative result
      * of the f operation over all of the elements.
      */
-    fun <A> reduceLeftOption(fa: HK<F, A>, f: (A, A) -> A): Option<A> =
-            reduceLeftToOption(fa, { a -> a }, f)
+    fun <A> reduceLeftOption(fa: HK<F, A>, f: (A, A) -> A): Option<A> = reduceLeftToOption(fa, { a -> a }, f)
 
     /**
      * Reduce the elements of this structure down to a single value by applying the provided aggregation function in
@@ -70,8 +69,7 @@ interface Foldable<in F> : Typeclass {
      * @return None if the structure is empty, otherwise the result of combining the cumulative right-associative
      * result of the f operation over the A elements.
      */
-    fun <A> reduceRightOption(fa: HK<F, A>, f: (A, Eval<A>) -> Eval<A>): Eval<Option<A>> =
-            reduceRightToOption(fa, { a -> a }, f)
+    fun <A> reduceRightOption(fa: HK<F, A>, f: (A, Eval<A>) -> Eval<A>): Eval<Option<A>> = reduceRightToOption(fa, { a -> a }, f)
 
     /**
      * Alias for fold.

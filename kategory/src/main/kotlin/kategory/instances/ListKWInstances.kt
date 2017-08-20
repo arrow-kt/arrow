@@ -4,7 +4,8 @@ interface ListKWInstances :
         Functor<ListKWHK>,
         Applicative<ListKWHK>,
         Monad<ListKWHK>,
-        Traverse<ListKWHK> {
+        Traverse<ListKWHK>,
+        Foldable<ListKWHK> {
 
     override fun <A> pure(a: A): ListKW<A> = listOf(a).k()
 
@@ -13,11 +14,11 @@ interface ListKWInstances :
     override fun <A, B> map(fa: HK<ListKWHK, A>, f: (A) -> B): ListKW<B> = fa.ev().map(f).k()
 
     override fun <A, B, Z> map2(fa: HK<ListKWHK, A>, fb: HK<ListKWHK, B>, f: (Tuple2<A, B>) -> Z): ListKW<Z> =
-        fa.ev().flatMap { a ->
-            fb.ev().map { b ->
-                f(Tuple2(a, b))
-            }
-        }.ev()
+            fa.ev().flatMap { a ->
+                fb.ev().map { b ->
+                    f(Tuple2(a, b))
+                }
+            }.ev()
 
     override fun <A, B> foldL(fa: HK<ListKWHK, A>, b: B, f: (B, A) -> B): B = fa.ev().fold(b, f)
 

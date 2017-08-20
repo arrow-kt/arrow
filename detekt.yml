@@ -84,7 +84,7 @@ formatting:
     active: true
     autoCorrect: true
   ExpressionBodySyntaxLineBreaks:
-      active: true
+      active: false
       autoCorrect: true
 
 style:
