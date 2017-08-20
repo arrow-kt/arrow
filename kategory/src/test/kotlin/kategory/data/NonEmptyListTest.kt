@@ -14,6 +14,7 @@ class NonEmptyListTest : UnitSpec() {
                 NonEmptyList.semigroupK(),
                 NonEmptyList.applicative(),
                 Eq.any()))
+        testLaws(ComonadLaws.laws(NonEmptyList, { NonEmptyList.of(it) }, Eq.any()))
 
         "map should modify values" {
             NonEmptyList.of(14).map { it * 3 } shouldBe NonEmptyList.of(42)

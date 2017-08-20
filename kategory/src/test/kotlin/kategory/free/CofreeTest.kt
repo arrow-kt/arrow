@@ -3,27 +3,25 @@ package kategory
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import kategory.Cofree.Companion.unfold
-import kategory.ListT.ListF
 import kategory.Option.None
 import kategory.Option.Some
 import org.junit.runner.RunWith
-
-
-// Unsafe functor for this test only
-class ListT<out A>(val all: List<A>) : HK<ListF, A> {
-    class ListF private constructor()
-
-    companion object : Functor<ListF> {
-        override fun <A, B> map(fa: HK<ListF, A>, f: (A) -> B): HK<ListF, B> =
-                ListT((fa as ListT<A>).all.map(f))
-
-    }
-}
 
 @RunWith(KTestJUnitRunner::class)
 class CofreeTest : UnitSpec() {
 
     init {
+        testLaws(ComonadLaws.laws(Cofree.comonad<OptionHK>(), {
+            val sideEffect = SideEffect()
+            unfold(sideEffect.counter, {
+                sideEffect.increment()
+                if (it % 2 == 0) None else Some(it + 1)
+            })
+        }, object : Eq<HK<CofreeKindPartial<OptionHK>, Int>> {
+            override fun eqv(a: HK<CofreeKindPartial<OptionHK>, Int>, b: HK<CofreeKindPartial<OptionHK>, Int>): Boolean =
+                    a.ev().run().extract() == b.ev().run().extract()
+        }))
+
         "tailForced should evaluate and return" {
             val sideEffect = SideEffect()
             val start: Cofree<IdHK, Int> = unfold(sideEffect.counter, { sideEffect.increment(); Id(it + 1) })
@@ -89,8 +87,8 @@ class CofreeTest : UnitSpec() {
         }
 
         "mapBranchingS/T should recur over S and T respectively" {
-            val mappedS = startHundred.mapBranchingS(optionToList, ListT)
-            val mappedT = startHundred.mapBranchingT(optionToList, ListT)
+            val mappedS = startHundred.mapBranchingS(optionToList, ListKW)
+            val mappedT = startHundred.mapBranchingT(optionToList, ListKW)
             val expected = NonEmptyList.fromListUnsafe((0..100).toList())
             cofreeListToNel(mappedS) shouldBe expected
             cofreeListToNel(mappedT) shouldBe expected
