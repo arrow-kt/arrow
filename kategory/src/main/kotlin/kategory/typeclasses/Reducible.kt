@@ -39,8 +39,7 @@ interface Reducible<in F> : Foldable<F>, Typeclass {
      */
     fun <A, B> reduceRightTo(fa: HK<F, A>, f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<B>
 
-    override fun <A, B> reduceRightToOption(fa: HK<F, A>, f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<Option<B>> =
-            reduceRightTo(fa, f, g).map({ Option.Some(it) })
+    override fun <A, B> reduceRightToOption(fa: HK<F, A>, f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<Option<B>> = reduceRightTo(fa, f, g).map({ Option.Some(it) })
 
     fun <A> toNonEmptyList(fa: HK<F, A>): NonEmptyList<A> =
             reduceRightTo(fa, { a -> NonEmptyList.of(a) }, { a, lnel ->
@@ -67,8 +66,7 @@ inline fun <F, reified G, A> Reducible<F>.reduceK(fga: HK<F, HK<G, A>>, SGKG: Se
 /**
  * Apply f to each element of fa and combine them using the given Semigroup<B>.
  */
-inline fun <F, A, reified B> Reducible<F>.reduceMap(fa: HK<F, A>, noinline f: (A) -> B, SB: Semigroup<B> = semigroup()): B =
-        reduceLeftTo(fa, f, { b, a -> SB.combine(b, f(a)) })
+inline fun <F, A, reified B> Reducible<F>.reduceMap(fa: HK<F, A>, noinline f: (A) -> B, SB: Semigroup<B> = semigroup()): B = reduceLeftTo(fa, f, { b, a -> SB.combine(b, f(a)) })
 
 inline fun <reified F> reducible(): Reducible<F> = instance(InstanceParametrizedType(Reducible::class.java, listOf(F::class.java)))
 
@@ -88,8 +86,7 @@ abstract class NonEmptyReducible<F, G> : Reducible<F> {
         return FG().foldL(ga, f(b, a), f)
     }
 
-    override fun <A, B> foldR(fa: HK<F, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            Eval.Always({ split(fa) }).flatMap { (a, ga) -> f(a, FG().foldR(ga, lb, f)) }
+    override fun <A, B> foldR(fa: HK<F, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = Eval.Always({ split(fa) }).flatMap { (a, ga) -> f(a, FG().foldR(ga, lb, f)) }
 
     override fun <A, B> reduceLeftTo(fa: HK<F, A>, f: (A) -> B, g: (B, A) -> B): B {
         val (a, ga) = split(fa)
