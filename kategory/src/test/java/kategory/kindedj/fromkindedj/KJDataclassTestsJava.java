@@ -20,7 +20,7 @@ public class KJDataclassTestsJava {
     private final KJDataclass5<Integer, String, Boolean, Long, Float> kinded5 = new KJDataclass5<>(0);
 
     @Test
-    public void hkIsKindJ() {
+    public void hk1CanBeConvertedToKategory() {
         final Convert.FromKindedJToKategory<KJDataclassHK, Integer> hkKindedJ = Convert.fromKindedJ(kinded);
         Assert.assertEquals(KJDataclassKindedJShow.INSTANCE.show(kinded), KJDataclassKategoryShow.INSTANCE.show(hkKindedJ));
     }

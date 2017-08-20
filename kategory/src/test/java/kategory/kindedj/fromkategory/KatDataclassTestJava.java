@@ -25,7 +25,7 @@ public class KatDataclassTestJava {
     private final KatDataclass5<Integer, String, Boolean, Long, Float> kinded5 = new KatDataclass5<>(0);
 
     @Test
-    public void hkIsKindJ() {
+    public void hk1CanBeConvertedToKategory() {
         final Convert.FromKategoryToKindedJ<KatDataclassHK, Integer> toKindedJ = Convert.toKindedJ(kinded);
         Assert.assertEquals(KatDataclassKategoryShow.INSTANCE.show(this.kinded), KatDataclassKindedJShow.INSTANCE.show(toKindedJ));
     }
