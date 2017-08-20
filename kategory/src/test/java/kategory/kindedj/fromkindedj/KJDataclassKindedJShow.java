@@ -1,9 +1,9 @@
 package kategory.kindedj.fromkindedj;
 
 import io.kindedj.HK;
-import kategory.kindedj.KindJShow;
+import kategory.kindedj.KindedJShow;
 
-public class KJDataclassKindedJShow implements KindJShow<KJDataclassHK> {
+public class KJDataclassKindedJShow implements KindedJShow<KJDataclassHK> {
     public static KJDataclassKindedJShow INSTANCE = new KJDataclassKindedJShow();
 
     private KJDataclassKindedJShow() {

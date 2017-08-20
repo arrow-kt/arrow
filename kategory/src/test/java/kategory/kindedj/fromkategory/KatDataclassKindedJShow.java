@@ -5,9 +5,9 @@ import kategory.ConvertHK;
 import kategory.ConvertKt;
 import kategory.fromkotlin.KatDataclassHK;
 import kategory.fromkotlin.KatDataclassKt;
-import kategory.kindedj.KindJShow;
+import kategory.kindedj.KindedJShow;
 
-public class KatDataclassKindedJShow implements KindJShow<HK<ConvertHK, KatDataclassHK>> {
+public class KatDataclassKindedJShow implements KindedJShow<HK<ConvertHK, KatDataclassHK>> {
     private KatDataclassKindedJShow() {
     }
 
