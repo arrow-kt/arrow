@@ -20,6 +20,8 @@ package kategory
 
         fun traverse(): Traverse<ListKWHK> = this
 
+        fun foldable(): Foldable<ListKWHK> = this
+
     }
 
 }

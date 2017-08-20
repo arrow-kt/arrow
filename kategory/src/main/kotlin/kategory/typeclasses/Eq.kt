@@ -6,7 +6,7 @@ interface Eq<in F> : Typeclass {
     fun neqv(a: F, b: F): Boolean = !eqv(a, b)
 
     companion object {
-        fun any(): Eq<Any?> = EqAny
+        fun  any(): Eq<Any?> = EqAny
 
         object EqAny : Eq<Any?> {
             override fun eqv(a: Any?, b: Any?): Boolean = a == b

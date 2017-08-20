@@ -18,14 +18,12 @@ interface Reducible<in F> : Foldable<F>, Typeclass {
      *
      * Implementations should override this method when possible.
      */
-    fun <A> reduceLeft(fa: HK<F, A>, f: (A, A) -> A): A =
-            reduceLeftTo(fa, { a -> a }, f)
+    fun <A> reduceLeft(fa: HK<F, A>, f: (A, A) -> A): A = reduceLeftTo(fa, { a -> a }, f)
 
     /**
      * Right-associative reduction on F using the function f.
      */
-    fun <A> reduceRight(fa: HK<F, A>, f: (A, Eval<A>) -> Eval<A>): Eval<A> =
-            reduceRightTo(fa, { a -> a }, f)
+    fun <A> reduceRight(fa: HK<F, A>, f: (A, Eval<A>) -> Eval<A>): Eval<A> = reduceRightTo(fa, { a -> a }, f)
 
     /**
      * Apply f to the "initial element" of fa and combine it with every other value using
@@ -33,8 +31,7 @@ interface Reducible<in F> : Foldable<F>, Typeclass {
      */
     fun <A, B> reduceLeftTo(fa: HK<F, A>, f: (A) -> B, g: (B, A) -> B): B
 
-    override fun <A, B> reduceLeftToOption(fa: HK<F, A>, f: (A) -> B, g: (B, A) -> B): Option<B> =
-            Option.Some(reduceLeftTo(fa, f, g))
+    override fun <A, B> reduceLeftToOption(fa: HK<F, A>, f: (A) -> B, g: (B, A) -> B): Option<B> = Option.Some(reduceLeftTo(fa, f, g))
 
     /**
      * Apply f to the "initial element" of fa and lazily combine it with every other value using the
@@ -58,16 +55,14 @@ interface Reducible<in F> : Foldable<F>, Typeclass {
 /**
  * Reduce a F<A> value using the given Semigroup<A>.
  */
-inline fun <F, reified A> Reducible<F>.reduce(fa: HK<F, A>, SA: Semigroup<A> = semigroup()): A =
-        reduceLeft(fa, { a, b -> SA.combine(a, b) })
+inline fun <F, reified A> Reducible<F>.reduce(fa: HK<F, A>, SA: Semigroup<A> = semigroup()): A = reduceLeft(fa, { a, b -> SA.combine(a, b) })
 
 /**
  * Reduce a F<G<A>> value using SemigroupK<G>, a universal semigroup for G<_>.
  *
  * This method is a generalization of reduce.
  */
-inline fun <F, reified G, A> Reducible<F>.reduceK(fga: HK<F, HK<G, A>>, SGKG: SemigroupK<G> = semigroupK()): HK<G, A> =
-        reduce(fga, SGKG.algebra())
+inline fun <F, reified G, A> Reducible<F>.reduceK(fga: HK<F, HK<G, A>>, SGKG: SemigroupK<G> = semigroupK()): HK<G, A> = reduce(fga, SGKG.algebra())
 
 /**
  * Apply f to each element of fa and combine them using the given Semigroup<B>.
@@ -76,7 +71,6 @@ inline fun <F, A, reified B> Reducible<F>.reduceMap(fa: HK<F, A>, noinline f: (A
         reduceLeftTo(fa, f, { b, a -> SB.combine(b, f(a)) })
 
 inline fun <reified F> reducible(): Reducible<F> = instance(InstanceParametrizedType(Reducible::class.java, listOf(F::class.java)))
-
 
 /**
  * This class defines a Reducible<F> in terms of a Foldable<G> together with a split method, F<A> -> (A, G<A>).
@@ -138,8 +132,7 @@ inline fun <reified F, reified G, A> NonEmptyReducible<F, G>.size(MB: Monoid<Lon
     return 1 + FG().size(MB, tail)
 }
 
-fun <F, G, A> NonEmptyReducible<F, G>.get(fa: HK<F, A>, idx: Long): Option<A> =
-        if (idx == 0L) Option.Some(split(fa).a) else FG().get(split(fa).b, idx - 1L)
+fun <F, G, A> NonEmptyReducible<F, G>.get(fa: HK<F, A>, idx: Long): Option<A> = if (idx == 0L) Option.Some(split(fa).a) else FG().get(split(fa).b, idx - 1L)
 
 inline fun <F, reified G, A, B> NonEmptyReducible<F, G>.foldM(fa: HK<F, A>, z: B, crossinline f: (B, A) -> HK<G, B>, MG: Monad<G> = monad()): HK<G, B> {
     val (a, ga) = split(fa)
