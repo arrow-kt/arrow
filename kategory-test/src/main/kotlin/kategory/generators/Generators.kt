@@ -16,6 +16,14 @@ fun <A, B> genFunctionAToB(genB: Gen<B>): Gen<(A) -> B> =
             }
         }
 
+fun <A> genFunctionAAToA(genA: Gen<A>): Gen<(A, A) -> A> =
+        object : Gen<(A, A) -> A> {
+            override fun generate(): (A, A) -> A {
+                val v = genA.generate()
+                return { _, _ -> v }
+            }
+        }
+
 fun genThrowable(): Gen<Throwable> = object : Gen<Throwable> {
     override fun generate(): Throwable =
             Gen.oneOf(listOf(RuntimeException(), NoSuchElementException(), IllegalArgumentException())).generate()
@@ -30,7 +38,7 @@ inline fun <F, A> genConstructor(valueGen: Gen<A>, crossinline cf: (A) -> HK<F, 
 fun genIntSmall(): Gen<Int> =
         Gen.oneOf(Gen.negativeIntegers(), Gen.choose(0, Int.MAX_VALUE / 10000))
 
-fun <A, B> genTuple(genA : Gen<A>, genB: Gen<B>): Gen<Tuple2<A, B>> =
+fun <A, B> genTuple(genA: Gen<A>, genB: Gen<B>): Gen<Tuple2<A, B>> =
         object : Gen<Tuple2<A, B>> {
             override fun generate(): Tuple2<A, B> = Tuple2(genA.generate(), genB.generate())
         }

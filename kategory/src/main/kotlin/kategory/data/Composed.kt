@@ -41,6 +41,23 @@ data class ComposedTraverse<F, G>(val FT: Traverse<F>, val GT: Traverse<G>, val 
 
 inline fun <F, reified G> Traverse<F>.compose(GT: Traverse<G> = traverse<G>(), GA: Applicative<G> = applicative<G>()): Traverse<ComposedType<F, G>> = ComposedTraverse(this, GT, GA)
 
+data class ComposedReducible<F, G>(val RF: Reducible<F>, val RG: Reducible<G>, val FT: Traverse<F>, val GT: Traverse<G>, val CF: ComposedFoldable<F, G> = ComposedFoldable(FT, GT))
+    : Reducible<ComposedType<F, G>>, Foldable<ComposedType<F, G>> by CF {
+
+    override fun <A, B> reduceLeftTo(fa: HK<ComposedType<F, G>, A>, f: (A) -> B, g: (B, A) -> B): B =
+            RF.reduceLeftTo(fa.lower(), { ga: HK<G, A> -> RG.reduceLeftTo(ga, f, g) }) { b, ga ->
+                RG.foldL(ga, b, g)
+            }
+
+    override fun <A, B> reduceRightTo(fa: HK<ComposedType<F, G>, A>, f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<B> =
+            RF.reduceRightTo(fa.lower(), { ga: HK<G, A> -> RG.reduceRightTo(ga, f, g).value() }) { ga, lb ->
+                RG.foldR(ga, lb, g)
+            }
+}
+
+inline fun <reified F, reified G> Reducible<F>.compose(RG: Reducible<G> = reducible<G>(), FT: Traverse<F> = traverse<F>(), GT: Traverse<G> = traverse<G>(), GA: Applicative<G> = applicative<G>())
+        : Reducible<ComposedType<F, G>> = ComposedReducible(this, RG, FT, GT)
+
 interface ComposedSemigroupK<F, G> : SemigroupK<ComposedType<F, G>> {
 
     fun F(): SemigroupK<F>
