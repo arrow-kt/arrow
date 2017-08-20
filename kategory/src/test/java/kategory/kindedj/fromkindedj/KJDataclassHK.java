@@ -6,8 +6,8 @@ public class KJDataclassHK {
     private KJDataclassHK() {
     }
 
-    public static <A> A value(HK<KJDataclassHK, A> hk) {
-        return ((KJDataclass1<A>) hk).a;
+    public static <A> String show(HK<KJDataclassHK, A> hk) {
+        return ((KJDataclass1<A>) hk).a.toString();
     }
 
     public static final class KJDataclass1<A> implements HK<KJDataclassHK, A> {

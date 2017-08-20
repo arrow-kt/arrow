@@ -14,7 +14,7 @@ public class KatDataclassKindedJShow implements KindJShow<HK<ConvertHK, KatDatac
     @Override
     public <A> String show(HK<HK<ConvertHK, KatDataclassHK>, A> hk) {
         final kategory.HK<KatDataclassHK, A> cast = ConvertKt.convert(hk);
-        return KatDataclassKt.value(cast).toString();
+        return KatDataclassKt.show(cast);
     }
 
     public static KatDataclassKindedJShow INSTANCE = new KatDataclassKindedJShow();
