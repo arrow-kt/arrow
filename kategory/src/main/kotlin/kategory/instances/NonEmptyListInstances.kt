@@ -5,9 +5,11 @@ interface NonEmptyListInstances :
         Applicative<NonEmptyListHK>,
         Monad<NonEmptyListHK>,
         Comonad<NonEmptyListHK>,
-        Bimonad<NonEmptyListHK> {
+        Bimonad<NonEmptyListHK>,
+        Traverse<NonEmptyListHK>,
+        Foldable<NonEmptyListHK> {
 
-    override fun <A> pure(a: A): NonEmptyList<A> = NonEmptyList.of(a)
+    override fun <A> pure(a: A): NonEmptyList<A> = a.k()
 
     override fun <A, B> flatMap(fa: NonEmptyListKind<A>, f: (A) -> NonEmptyListKind<B>): NonEmptyList<B> = fa.ev().flatMap { f(it).ev() }
 
@@ -31,6 +33,19 @@ interface NonEmptyListInstances :
             is Either.Left<A, B> -> go(buf, f, f(head.a).ev() + v.tail)
         }
     }
+
+    override fun <A, B> foldL(fa: HK<NonEmptyListHK, A>, b: B, f: (B, A) -> B): B = fa.ev().tail.fold(f(b, fa.ev().head), f)
+
+    override fun <A, B> foldR(fa: HK<NonEmptyListHK, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
+        fun loop(fa_p: NonEmptyList<A>): Eval<B> = when {
+            fa_p.tail.isEmpty() -> f(fa_p.ev().head, lb)
+            else -> f(fa_p.ev().head, Eval.defer { loop(NonEmptyList(fa_p.ev().tail.first(), fa_p.tail.drop(1))) })
+        }
+        return Eval.defer { loop(fa.ev()) }
+    }
+
+    override fun <G, A, B> traverse(fa: HK<NonEmptyListHK, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<NonEmptyListHK, B>> =
+            GA.map2Eval(f(fa.ev().head), Eval.always { ListKW.traverse().traverse(fa.ev().tail.k(), f, GA)}, { NonEmptyList(it.a, it.b.ev().list)}).value()
 
     override fun <A, B> tailRecM(a: A, f: (A) -> HK<NonEmptyListHK, Either<A, B>>): NonEmptyList<B> {
         val buf = ArrayList<B>()
