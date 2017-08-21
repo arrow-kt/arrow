@@ -1,6 +1,4 @@
-package kategory.typeclasses
-
-import kategory.*
+package kategory
 
 interface FunctorFilter<F> : Functor<F>, Typeclass {
 
@@ -13,6 +11,6 @@ interface FunctorFilter<F> : Functor<F>, Typeclass {
      * Similar to mapFilter but uses a partial function instead of a function that returns an Option.
      */
     fun <A, B> collect(fa: HK<F, A>, f: PartialFunction<A, B>): HK<F, B> =
-            mapFilter(fa, f.lift)
+            mapFilter(fa, f.lift())
 
 }
