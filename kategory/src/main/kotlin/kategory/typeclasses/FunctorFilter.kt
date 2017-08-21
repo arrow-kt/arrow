@@ -13,4 +13,15 @@ interface FunctorFilter<F> : Functor<F>, Typeclass {
     fun <A, B> collect(fa: HK<F, A>, f: PartialFunction<A, B>): HK<F, B> =
             mapFilter(fa, f.lift())
 
+    /**
+     * "Flatten" out a structure by collapsing Options.
+     */
+    fun <A> flattenOption(fa: HK<F, Option<A>>): HK<F, A> = mapFilter(fa, { it })
+
+    /**
+     * Apply a filter to a structure such that the output structure contains all A elements in the input structure that satisfy the predicate f but none
+     * that don't.
+     */
+    fun <A> filter(fa: HK<F, A>, f: (A) -> Boolean): HK<F, A> =
+            mapFilter(fa, { a -> if (f(a)) Option.Some(a) else Option.None })
 }
