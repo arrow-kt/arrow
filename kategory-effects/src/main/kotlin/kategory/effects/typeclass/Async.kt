@@ -23,17 +23,24 @@ inline fun <F, A> runAsync(AC: AsyncContext<F>, crossinline f: () -> A): HK<F, A
 
 suspend inline fun <reified F, A> (() -> A).runAsync(AC: AsyncContext<F> = asyncContext()): HK<F, A> = runAsync(AC, this)
 
-suspend inline fun <reified F, A, B> MonadContinuation<F, A>.bindAsync(AC: AsyncContext<F> = asyncContext(), crossinline f: () -> B): B = runAsync(AC, f).bind()
+suspend inline fun <reified F, A, B> MonadContinuation<F, A>.bindAsync(AC: AsyncContext<F> = asyncContext(), crossinline f: () -> B): B =
+        runAsync(AC, f).bind()
 
-suspend inline fun <reified F, A, B> StackSafeMonadContinuation<F, A>.bindAsync(AC: AsyncContext<F> = asyncContext(), crossinline f: () -> B): B = runAsync(AC, f).bind()
+suspend inline fun <reified F, A, B> StackSafeMonadContinuation<F, A>.bindAsync(AC: AsyncContext<F> = asyncContext(), crossinline f: () -> B): B =
+        runAsync(AC, f).bind()
 
-inline fun <F, A> runAsyncUnsafe(AC: AsyncContext<F>, crossinline f: () -> Either<Throwable, A>): HK<F, A> = AC.runAsync { ff: (Either<Throwable, A>) -> Unit -> ff(f()) }
+inline fun <F, A> runAsyncUnsafe(AC: AsyncContext<F>, crossinline f: () -> Either<Throwable, A>): HK<F, A> =
+        AC.runAsync { ff: (Either<Throwable, A>) -> Unit -> ff(f()) }
 
-suspend inline fun <reified F, A> (() -> Either<Throwable, A>).runAsyncUnsafe(AC: AsyncContext<F> = asyncContext()): HK<F, A> = runAsyncUnsafe(AC, this)
+suspend inline fun <reified F, A> (() -> Either<Throwable, A>).runAsyncUnsafe(AC: AsyncContext<F> = asyncContext()): HK<F, A> =
+        runAsyncUnsafe(AC, this)
 
-suspend inline fun <reified F, A, B> MonadContinuation<F, A>.bindAsyncUnsafe(AC: AsyncContext<F> = asyncContext(), crossinline f: () -> Either<Throwable, B>): B = runAsyncUnsafe(AC, f).bind()
+suspend inline fun <reified F, A, B> MonadContinuation<F, A>.bindAsyncUnsafe(AC: AsyncContext<F> = asyncContext(), crossinline f: () -> Either<Throwable, B>):
+        B = runAsyncUnsafe(AC, f).bind()
 
-suspend inline fun <reified F, A, B> StackSafeMonadContinuation<F, A>.bindAsyncUnsafe(AC: AsyncContext<F> = asyncContext(), crossinline f: () -> Either<Throwable, B>): B = runAsyncUnsafe(AC, f).bind()
+suspend inline fun <reified F, A, B> StackSafeMonadContinuation<F, A>.bindAsyncUnsafe(AC: AsyncContext<F> = asyncContext(),
+                                                                                      crossinline f: () -> Either<Throwable, B>): B =
+        runAsyncUnsafe(AC, f).bind()
 
 open class AsyncMonadContinuation<F, A>(M: Monad<F>, val AC: AsyncContext<F>) : MonadContinuation<F, A>(M) {
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <SmellBaseline>
-  <Blacklist timestamp="1490879306930"></Blacklist>
-  <Whitelist timestamp="1503248886832">
+  <Blacklist timestamp="1503308049178"></Blacklist>
+  <Whitelist timestamp="1503308097846">
     <ID>LabeledExpression:FunctionK.kt$&lt;no name provided&gt;$this@or</ID>
     <ID>LabeledExpression:PartialFunction.kt$&lt;no name provided&gt;$this@orElse</ID>
     <ID>LabeledExpression:PartialFunction.kt$&lt;no name provided&gt;$this@orElse</ID>
@@ -31,108 +31,5 @@
     <ID>LateinitUsage:Monad.kt$StackSafeMonadContinuation$protected lateinit var returnedMonad: Free&lt;F, A&gt;</ID>
     <ID>UnsafeCallOnNullableType:AndThen.kt$AndThen$failure!!</ID>
     <ID>UnsafeCallOnNullableType:AndThen.kt$AndThen$failure!!</ID>
-    <ID>MaxLineLength:Kleisli.kt$kategory.Kleisli.kt</ID>
-    <ID>MaxLineLength:Composed.kt$kategory.Composed.kt</ID>
-    <ID>MaxLineLength:Composed.kt$kategory.Composed.kt</ID>
-    <ID>MaxLineLength:Composed.kt$kategory.Composed.kt</ID>
-    <ID>MaxLineLength:Composed.kt$kategory.Composed.kt</ID>
-    <ID>MaxLineLength:Composed.kt$kategory.Composed.kt</ID>
-    <ID>MaxLineLength:Composed.kt$kategory.Composed.kt</ID>
-    <ID>MaxLineLength:Composed.kt$kategory.Composed.kt</ID>
-    <ID>MaxLineLength:Composed.kt$kategory.Composed.kt</ID>
-    <ID>MaxLineLength:Composed.kt$kategory.Composed.kt</ID>
-    <ID>MaxLineLength:Composed.kt$kategory.Composed.kt</ID>
-    <ID>MaxLineLength:Coproduct.kt$kategory.Coproduct.kt</ID>
-    <ID>MaxLineLength:Coproduct.kt$kategory.Coproduct.kt</ID>
-    <ID>MaxLineLength:Coproduct.kt$kategory.Coproduct.kt</ID>
-    <ID>MaxLineLength:Coproduct.kt$kategory.Coproduct.kt</ID>
-    <ID>MaxLineLength:Either.kt$kategory.Either.kt</ID>
-    <ID>MaxLineLength:EitherT.kt$kategory.EitherT.kt</ID>
-    <ID>MaxLineLength:EitherT.kt$kategory.EitherT.kt</ID>
-    <ID>MaxLineLength:OptionT.kt$kategory.OptionT.kt</ID>
-    <ID>MaxLineLength:OptionT.kt$kategory.OptionT.kt</ID>
-    <ID>MaxLineLength:OptionT.kt$kategory.OptionT.kt</ID>
-    <ID>MaxLineLength:WriterT.kt$kategory.WriterT.kt</ID>
-    <ID>MaxLineLength:WriterT.kt$kategory.WriterT.kt</ID>
-    <ID>MaxLineLength:WriterT.kt$kategory.WriterT.kt</ID>
-    <ID>MaxLineLength:WriterT.kt$kategory.WriterT.kt</ID>
-    <ID>MaxLineLength:WriterT.kt$kategory.WriterT.kt</ID>
-    <ID>MaxLineLength:WriterT.kt$kategory.WriterT.kt</ID>
-    <ID>MaxLineLength:WriterT.kt$kategory.WriterT.kt</ID>
-    <ID>MaxLineLength:WriterT.kt$kategory.WriterT.kt</ID>
-    <ID>MaxLineLength:WriterT.kt$kategory.WriterT.kt</ID>
-    <ID>MaxLineLength:WriterT.kt$kategory.WriterT.kt</ID>
-    <ID>MaxLineLength:WriterT.kt$kategory.WriterT.kt</ID>
-    <ID>MaxLineLength:WriterT.kt$kategory.WriterT.kt</ID>
-    <ID>MaxLineLength:Free.kt$kategory.Free.kt</ID>
-    <ID>MaxLineLength:FreeApplicative.kt$kategory.FreeApplicative.kt</ID>
-    <ID>MaxLineLength:FreeApplicative.kt$kategory.FreeApplicative.kt</ID>
-    <ID>MaxLineLength:CoproductInstances.kt$kategory.CoproductInstances.kt</ID>
-    <ID>MaxLineLength:EitherInstances.kt$kategory.EitherInstances.kt</ID>
-    <ID>MaxLineLength:EitherTInstances.kt$kategory.EitherTInstances.kt</ID>
-    <ID>MaxLineLength:FreeApplicativeInstances.kt$kategory.FreeApplicativeInstances.kt</ID>
-    <ID>MaxLineLength:FreeApplicativeInstances.kt$kategory.FreeApplicativeInstances.kt</ID>
-    <ID>MaxLineLength:FreeApplicativeInstances.kt$kategory.FreeApplicativeInstances.kt</ID>
-    <ID>MaxLineLength:FreeInstances.kt$kategory.FreeInstances.kt</ID>
-    <ID>MaxLineLength:IorInstances.kt$kategory.IorInstances.kt</ID>
-    <ID>MaxLineLength:IorInstances.kt$kategory.IorInstances.kt</ID>
-    <ID>MaxLineLength:KleisliInstances.kt$kategory.KleisliInstances.kt</ID>
-    <ID>MaxLineLength:KleisliInstances.kt$kategory.KleisliInstances.kt</ID>
-    <ID>MaxLineLength:KleisliInstances.kt$kategory.KleisliInstances.kt</ID>
-    <ID>MaxLineLength:OptionTInstances.kt$kategory.OptionTInstances.kt</ID>
-    <ID>MaxLineLength:StateTInstances.kt$kategory.StateTInstances.kt</ID>
-    <ID>MaxLineLength:StateTInstances.kt$kategory.StateTInstances.kt</ID>
-    <ID>MaxLineLength:StateTInstances.kt$kategory.StateTInstances.kt</ID>
-    <ID>MaxLineLength:StateTInstances.kt$kategory.StateTInstances.kt</ID>
-    <ID>MaxLineLength:StateTInstances.kt$kategory.StateTInstances.kt</ID>
-    <ID>MaxLineLength:TryInstances.kt$kategory.TryInstances.kt</ID>
-    <ID>MaxLineLength:TryInstances.kt$kategory.TryInstances.kt</ID>
-    <ID>MaxLineLength:ValidatedInstances.kt$kategory.ValidatedInstances.kt</ID>
-    <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
-    <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
-    <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
-    <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
-    <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
-    <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
-    <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
-    <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
-    <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
-    <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
-    <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
-    <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
-    <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
-    <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
-    <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
-    <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
-    <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
-    <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
-    <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
-    <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
-    <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
-    <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
-    <ID>MaxLineLength:ApplicativeError.kt$kategory.ApplicativeError.kt</ID>
-    <ID>MaxLineLength:ApplicativeError.kt$kategory.ApplicativeError.kt</ID>
-    <ID>MaxLineLength:Foldable.kt$kategory.Foldable.kt</ID>
-    <ID>MaxLineLength:Foldable.kt$kategory.Foldable.kt</ID>
-    <ID>MaxLineLength:Foldable.kt$kategory.Foldable.kt</ID>
-    <ID>MaxLineLength:Foldable.kt$kategory.Foldable.kt</ID>
-    <ID>MaxLineLength:Foldable.kt$kategory.Foldable.kt</ID>
-    <ID>MaxLineLength:Monad.kt$kategory.Monad.kt</ID>
-    <ID>MaxLineLength:Monad.kt$kategory.Monad.kt</ID>
-    <ID>MaxLineLength:Monad.kt$kategory.Monad.kt</ID>
-    <ID>MaxLineLength:MonadError.kt$kategory.MonadError.kt</ID>
-    <ID>MaxLineLength:MonadReader.kt$kategory.MonadReader.kt</ID>
-    <ID>MaxLineLength:MonadState.kt$kategory.MonadState.kt</ID>
-    <ID>MaxLineLength:Reducible.kt$kategory.Reducible.kt</ID>
-    <ID>MaxLineLength:Reducible.kt$kategory.Reducible.kt</ID>
-    <ID>MaxLineLength:Reducible.kt$kategory.Reducible.kt</ID>
-    <ID>MaxLineLength:Traverse.kt$kategory.Traverse.kt</ID>
-    <ID>MaxLineLength:IO.kt$kategory.IO.kt</ID>
-    <ID>MaxLineLength:IO.kt$kategory.IO.kt</ID>
-    <ID>MaxLineLength:IOInstances.kt$kategory.IOInstances.kt</ID>
-    <ID>MaxLineLength:Async.kt$kategory.Async.kt</ID>
-    <ID>MaxLineLength:Async.kt$kategory.Async.kt</ID>
-    <ID>MaxLineLength:Async.kt$kategory.Async.kt</ID>
-    <ID>MaxLineLength:Async.kt$kategory.Async.kt</ID>
   </Whitelist>
 </SmellBaseline>

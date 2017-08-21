@@ -29,9 +29,11 @@ interface Monad<F> : Applicative<F>, Typeclass {
     fun <A, B> forEffectEval(fa: HK<F, A>, fb: Eval<HK<F, B>>): HK<F, A> = flatMap(fa, { a -> map(fb.value(), { a }) })
 }
 
-inline fun <F, A, B> Monad<F>.mproduct(fa: HK<F, A>, crossinline f: (A) -> HK<F, B>): HK<F, Tuple2<A, B>> = flatMap(fa, { a -> map(f(a), { a toT it }) })
+inline fun <F, A, B> Monad<F>.mproduct(fa: HK<F, A>, crossinline f: (A) -> HK<F, B>): HK<F, Tuple2<A, B>> =
+        flatMap(fa, { a -> map(f(a), { a toT it }) })
 
-inline fun <F, B> Monad<F>.ifM(fa: HK<F, Boolean>, crossinline ifTrue: () -> HK<F, B>, crossinline ifFalse: () -> HK<F, B>): HK<F, B> = flatMap(fa, { if (it) ifTrue() else ifFalse() })
+inline fun <F, B> Monad<F>.ifM(fa: HK<F, Boolean>, crossinline ifTrue: () -> HK<F, B>, crossinline ifFalse: () -> HK<F, B>): HK<F, B> =
+        flatMap(fa, { if (it) ifTrue() else ifFalse() })
 
 inline fun <reified F, A, B> HK<F, A>.flatMap(FT: Monad<F> = monad(), noinline f: (A) -> HK<F, B>): HK<F, B> = FT.flatMap(this, f)
 
@@ -92,7 +94,8 @@ fun <F, B> Monad<F>.binding(coroutineContext: CoroutineContext = EmptyCoroutineC
 }
 
 @RestrictsSuspension
-open class StackSafeMonadContinuation<F, A>(val M: Monad<F>, override val context: CoroutineContext = EmptyCoroutineContext) : Serializable, Continuation<Free<F, A>> {
+open class StackSafeMonadContinuation<F, A>(val M: Monad<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
+        Serializable, Continuation<Free<F, A>> {
 
     override fun resume(value: Free<F, A>) {
         returnedMonad = value
@@ -145,7 +148,8 @@ open class StackSafeMonadContinuation<F, A>(val M: Monad<F>, override val contex
  * This combinator ultimately returns computations lifting to Free to automatically for comprehend in a stack-safe way
  * over any stack-unsafe monads
  */
-fun <F, B> Monad<F>.bindingStackSafe(coroutineContext: CoroutineContext = EmptyCoroutineContext, c: suspend StackSafeMonadContinuation<F, *>.() -> Free<F, B>): Free<F, B> {
+fun <F, B> Monad<F>.bindingStackSafe(coroutineContext: CoroutineContext = EmptyCoroutineContext, c: suspend StackSafeMonadContinuation<F, *>.() -> Free<F, B>):
+        Free<F, B> {
     val continuation = StackSafeMonadContinuation<F, B>(this, coroutineContext)
     c.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()

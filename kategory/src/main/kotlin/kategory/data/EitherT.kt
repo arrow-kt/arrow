@@ -32,11 +32,12 @@ package kategory
 
         inline fun <reified F, L> monadError(MF: Monad<F> = monad<F>()): MonadError<EitherTKindPartial<F, L>, L> = instances(MF)
 
-        inline fun <reified F, A> traverse(FF: Traverse<F> = traverse<F>(), MF: Monad<F> = monad<F>()): Traverse<EitherTKindPartial<F, A>> = object : EitherTTraverse<F, A> {
-            override fun FF(): Traverse<F> = FF
+        inline fun <reified F, A> traverse(FF: Traverse<F> = traverse<F>(), MF: Monad<F> = monad<F>()): Traverse<EitherTKindPartial<F, A>> =
+                object : EitherTTraverse<F, A> {
+                    override fun FF(): Traverse<F> = FF
 
-            override fun MF(): Monad<F> = MF
-        }
+                    override fun MF(): Monad<F> = MF
+                }
 
         inline fun <reified F, A> foldable(FF: Traverse<F> = traverse<F>(), MF: Monad<F> = monad<F>()): Foldable<EitherTKindPartial<F, A>> = traverse(FF, MF)
 
@@ -49,7 +50,8 @@ package kategory
 
     inline fun <C> flatMap(crossinline f: (B) -> EitherT<F, A, C>): EitherT<F, A, C> = flatMapF({ it -> f(it).value })
 
-    inline fun <C> flatMapF(crossinline f: (B) -> HK<F, Either<A, C>>): EitherT<F, A, C> = EitherT(MF, MF.flatMap(value, { either -> either.fold({ MF.pure(Either.Left(it)) }, { f(it) }) }))
+    inline fun <C> flatMapF(crossinline f: (B) -> HK<F, Either<A, C>>): EitherT<F, A, C> =
+            EitherT(MF, MF.flatMap(value, { either -> either.fold({ MF.pure(Either.Left(it)) }, { f(it) }) }))
 
     inline fun <C> cata(crossinline l: (A) -> C, crossinline r: (B) -> C): HK<F, C> = fold(l, r)
 

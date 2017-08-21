@@ -15,7 +15,8 @@ interface IOInstances :
 
     override fun <A> raiseError(e: Throwable): IO<A> = RaiseError(e)
 
-    override fun <A> handleErrorWith(fa: HK<IOHK, A>, f: (Throwable) -> HK<IOHK, A>): HK<IOHK, A> = fa.ev().attempt().flatMap { it.fold(f, { IO.pure(it) }).ev() }
+    override fun <A> handleErrorWith(fa: HK<IOHK, A>, f: (Throwable) -> HK<IOHK, A>): HK<IOHK, A> =
+            fa.ev().attempt().flatMap { it.fold(f, { IO.pure(it) }).ev() }
 
     override fun <A> runAsync(fa: Proc<A>): IO<A> = IO.async(fa)
 

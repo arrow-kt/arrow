@@ -34,7 +34,8 @@ interface OptionTTraverse<F> :
 
     fun MF(): Monad<F>
 
-    override fun <G, A, B> traverse(fa: HK<OptionTKindPartial<F>, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<OptionTKindPartial<F>, B>> = fa.ev().traverse(f, GA, FF(), MF())
+    override fun <G, A, B> traverse(fa: HK<OptionTKindPartial<F>, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<OptionTKindPartial<F>, B>> =
+            fa.ev().traverse(f, GA, FF(), MF())
 
     override fun <A, B> foldL(fa: HK<OptionTKindPartial<F>, A>, b: B, f: (B, A) -> B): B = fa.ev().foldL(b, f, FF())
 

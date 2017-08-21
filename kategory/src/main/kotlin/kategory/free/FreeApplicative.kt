@@ -1,6 +1,7 @@
 package kategory
 
-inline fun <F, reified G, A> FreeApplicativeKind<F, A>.foldMapK(f: FunctionK<F, G>, GA: Applicative<G> = applicative<G>()): HK<G, A> = (this as FreeApplicative<F, A>).foldMap(f, GA)
+inline fun <F, reified G, A> FreeApplicativeKind<F, A>.foldMapK(f: FunctionK<F, G>, GA: Applicative<G> = applicative<G>()): HK<G, A> =
+        (this as FreeApplicative<F, A>).foldMap(f, GA)
 
 inline fun <reified F, A> FreeApplicativeKind<F, A>.foldK(FA: Applicative<F> = applicative<F>()): HK<F, A> = (this as FreeApplicative<F, A>).fold(FA)
 
@@ -52,7 +53,8 @@ inline fun <reified F, A> FreeApplicativeKind<F, A>.foldK(FA: Applicative<F> = a
 
     fun <G> compile(f: FunctionK<F, G>): FreeApplicative<G, A> = foldMap(functionKF(f), applicativeF()).ev()
 
-    fun <G> flatCompile(f: FunctionK<F, FreeApplicativeKindPartial<G>>, GFA: Applicative<FreeApplicativeKindPartial<G>>): FreeApplicative<G, A> = foldMap(f, GFA).ev()
+    fun <G> flatCompile(f: FunctionK<F, FreeApplicativeKindPartial<G>>, GFA: Applicative<FreeApplicativeKindPartial<G>>): FreeApplicative<G, A> =
+            foldMap(f, GFA).ev()
 
     fun <M> analyze(f: FunctionK<F, ConstKindPartial<M>>, MM: Monoid<M>): M =
             foldMap(object : FunctionK<F, ConstKindPartial<M>> {
