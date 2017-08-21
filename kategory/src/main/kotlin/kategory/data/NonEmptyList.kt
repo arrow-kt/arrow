@@ -60,6 +60,10 @@ package kategory
         fun <A> semigroup(): Semigroup<NonEmptyList<A>> = object : NonEmptyListSemigroup<A> {}
 
         fun semigroupK(): SemigroupK<NonEmptyListHK> = object : NonEmptyListSemigroupK {}
+
+        fun foldable(): Foldable<NonEmptyListHK> = this
+
+        fun traverse(): Traverse<NonEmptyListHK> = this
     }
 }
 
