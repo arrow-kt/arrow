@@ -45,6 +45,5 @@ fun <A, B> case(ff: Tuple2<(A) -> Boolean, (A) -> B>): PartialFunction<A, B> =
 infix fun <A, B> ((A) -> Boolean).then(f: (A) -> B): Tuple2<(A) -> Boolean, (A) -> B> = Tuple2(this, f)
 
 private class Lifted<A, B>(val pf: PartialFunction<A, B>) : (A) -> Option<B> {
-    override fun invoke(x: A): Option<B> = if (pf.isDefinedAt(x)) pf.andThen { Option.Some(it) } (x)
-        else Option.None
+    override fun invoke(x: A): Option<B> = pf.andThen { Option.Some(it) }.applyOrElse(x, { Option.None })
 }
