@@ -5,14 +5,16 @@ test {
 }
 
 dependencies {
+    compile 'com.github.KindedJ:KindedJ:5bee1acf6f'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
-    compile "io.kategory:kategory-annotations:$kategoryAnnotationsVersion"
-    kapt "io.kategory:kategory-annotations-compile:$kategoryAnnotationsVersion"
-    kaptTest "io.kategory:kategory-annotations-compile:$kategoryAnnotationsVersion"
-    compileOnly "io.kategory:kategory-annotations-compile:$kategoryAnnotationsVersion"
-    testCompileOnly "io.kategory:kategory-annotations-compile:$kategoryAnnotationsVersion"
+    compile 'com.github.kategory:kategory-annotations:paco-kindedjgen-SNAPSHOT'
+    kapt 'com.github.kategory.kategory-annotations:kategory-annotations-compile:paco-kindedjgen-SNAPSHOT'
+    kaptTest 'com.github.kategory.kategory-annotations:kategory-annotations-compile:paco-kindedjgen-SNAPSHOT'
+    compileOnly 'com.github.kategory.kategory-annotations:kategory-annotations-compile:paco-kindedjgen-SNAPSHOT'
+    testCompileOnly 'com.github.kategory.kategory-annotations:kategory-annotations-compile:paco-kindedjgen-SNAPSHOT'
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
+    testCompile 'junit:junit:4.12'
     testCompile project(':kategory-test')
 }
 

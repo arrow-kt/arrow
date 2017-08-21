@@ -3,7 +3,7 @@ package kategory
 typealias KleisliFun<F, D, A> = (D) -> HK<F, A>
 typealias ReaderT<F, D, A> = Kleisli<F, D, A>
 
-@higherkind class Kleisli<F, D, A>(val MF: Monad<F>, val run: KleisliFun<F, D, A>) : KleisliKind<F, D, A> {
+@higherkind class Kleisli<F, D, A>(val MF: Monad<F>, val run: KleisliFun<F, D, A>) : KleisliKind<F, D, A>, KleisliKindJ<F, D, A> {
 
     fun <B> map(f: (A) -> B): Kleisli<F, D, B> = Kleisli(MF, { a -> MF.map(run(a), f) })
 

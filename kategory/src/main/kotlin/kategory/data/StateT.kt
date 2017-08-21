@@ -8,7 +8,7 @@ fun <F, S, A> StateTKind<F, S, A>.runM(initial: S): HK<F, Tuple2<S, A>> = (this 
 @higherkind class StateT<F, S, A>(
         val MF: Monad<F>,
         val runF: StateTFunKind<F, S, A>
-) : StateTKind<F, S, A> {
+) : StateTKind<F, S, A>, StateTKindJ<F, S, A> {
 
     companion object {
         inline operator fun <reified F, S, A> invoke(noinline run: StateTFun<F, S, A>, MF: Monad<F> = monad<F>()): StateT<F, S, A> = StateT(MF, MF.pure(run))
