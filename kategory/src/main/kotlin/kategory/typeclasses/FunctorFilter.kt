@@ -25,3 +25,5 @@ interface FunctorFilter<F> : Functor<F>, Typeclass {
     fun <A> filter(fa: HK<F, A>, f: (A) -> Boolean): HK<F, A> =
             mapFilter(fa, { a -> if (f(a)) Option.Some(a) else Option.None })
 }
+
+inline fun <reified F> functorFilter(): FunctorFilter<F> = instance(InstanceParametrizedType(FunctorFilter::class.java, listOf(F::class.java)))
