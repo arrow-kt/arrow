@@ -44,12 +44,9 @@ fun <A, B> case(ff: Tuple2<(A) -> Boolean, (A) -> B>): PartialFunction<A, B> =
 
 infix fun <A, B> ((A) -> Boolean).then(f: (A) -> B): Tuple2<(A) -> Boolean, (A) -> B> = Tuple2(this, f)
 
-private val fallback_pf : PartialFunction<Any, Any> = { _ -> fallback_pf }
-private fun <B> checkFallback() = fallback_pf as PartialFunction<Any, B>
-private fun <B> fallbackOccurred(x: B) = (fallback_pf == (x as Any))
-
 private class Lifted<A, B>(val pf: PartialFunction<A, B>) : (A) -> Option<B> {
     override fun invoke(x: A): Option<B> {
+        if (pf.isDefinedAt(x))  = f(x)
         val z = pf.applyOrElse(x, checkFallback<B>())
         return if (!fallbackOccurred(z)) Option.Some(z) else Option.None
     }
