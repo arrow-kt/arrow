@@ -45,7 +45,11 @@ interface NonEmptyListInstances :
     }
 
     override fun <G, A, B> traverse(fa: HK<NonEmptyListHK, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<NonEmptyListHK, B>> =
-            GA.map2Eval(f(fa.ev().head), Eval.always { ListKW.traverse().traverse(fa.ev().tail.k(), f, GA)}, { NonEmptyList(it.a, it.b.ev().list)}).value()
+            GA.map2Eval(f(fa.ev().head), Eval.always {
+                ListKW.traverse().traverse(fa.ev().tail.k(), f, GA)
+            }, {
+                NonEmptyList(it.a, it.b.ev().list)
+            }).value()
 
     override fun <A, B> tailRecM(a: A, f: (A) -> HK<NonEmptyListHK, Either<A, B>>): NonEmptyList<B> {
         val buf = ArrayList<B>()
