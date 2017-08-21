@@ -2,6 +2,7 @@ package kategory
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
+import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
@@ -16,6 +17,17 @@ class WriterTTest : UnitSpec() {
                 WriterT.invoke(Option(Tuple2(1, 2)), Option.monad()),
                 Eq.any(),
                 Eq.any()))
+
+        testLaws(MonadWriterLaws.laws(WriterT.monad(Option, IntMonoid),
+                WriterT.monadWriter(Option, IntMonoid),
+                IntMonoid,
+                Gen.string(),
+                genIntSmall(),
+                genTuple(genIntSmall(), Gen.string()),
+                Eq.any(),
+                Eq.any(),
+                Eq.any()
+        ))
 
         "tell should accumulate write" {
             forAll { a: Int ->

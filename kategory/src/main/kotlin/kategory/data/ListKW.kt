@@ -1,27 +1,8 @@
 package kategory
 
-@higherkind data class ListKW<A> constructor(val list: List<A>) : ListKWKind<A> {
-
-    fun <B> map(f: (A) -> B): ListKW<B> = ListKW(list.map(f))
-
-    fun <B> flatMap(f: (A) -> ListKW<B>): ListKW<B> = ListKW(list.flatMap { f(it).list })
-
-    operator fun plus(list: List<A>): ListKW<A> = ListKW(this.list + list)
-
-    operator fun plus(listKW: ListKW<A>): ListKW<A> = ListKW(this.list + listKW.list)
-
-    operator fun get(position: Int): Option<A> = if (list.isEmpty() || position < 0 || position > list.size) Option.None else Option.Some(list[position])
-
-    fun <B> fold(b: B, f: (B, A) -> B): B = list.fold(b, f)
-
-    fun drop(n: Int): ListKW<A> = ListKW(this.list.drop(n))
-
-    fun first(): A = this.list.first()
+@higherkind data class ListKW<A> constructor(val list: List<A>) : ListKWKind<A>, List<A> by list {
 
     companion object : ListKWInstances, GlobalInstance<Monad<ListKWHK>>() {
-
-        @JvmStatic fun <A> listOfK(vararg a: A): ListKW<A> = ListKW(a.asList())
-        @JvmStatic fun <A> listOfK(list: List<A>): ListKW<A> = ListKW(list)
 
         fun functor(): Functor<ListKWHK> = this
 
@@ -39,8 +20,10 @@ package kategory
 
         fun traverse(): Traverse<ListKWHK> = this
 
+        fun foldable(): Foldable<ListKWHK> = this
+
     }
 
 }
 
-fun <A> List<A>.k(): ListKW<A> = ListKW.listOfK(this)
+fun <A> List<A>.k(): ListKW<A> = ListKW(this)

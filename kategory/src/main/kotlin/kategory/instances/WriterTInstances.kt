@@ -3,7 +3,8 @@ package kategory
 interface WriterTInstances<F, W> :
         Functor<WriterTKindPartial<F, W>>,
         Applicative<WriterTKindPartial<F, W>>,
-        Monad<WriterTKindPartial<F, W>> {
+        Monad<WriterTKindPartial<F, W>>,
+        MonadWriter<WriterTKindPartial<F, W>, W> {
 
     fun MM(): Monad<F>
 
