@@ -1,3 +1,5 @@
+apply plugin: 'ank-gradle-plugin'
+
 dependencies {
     compile project(':kategory')
     compile project(':kategory-effects')
@@ -5,6 +7,13 @@ dependencies {
     compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
     compile "io.kotlintest:kotlintest:$kotlinTestVersion"
+}
+
+ank {
+    classpath = sourceSets.main.runtimeClasspath
+    arguments = ["${projectDir}/typeclasses/applicative",
+                 "${projectDir}/site",
+                 "-classpath", "${sourceSets.main.runtimeClasspath.join(":")}"]
 }
 
 sourceCompatibility = javaVersion
