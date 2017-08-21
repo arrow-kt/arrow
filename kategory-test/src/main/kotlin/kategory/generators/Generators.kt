@@ -55,3 +55,8 @@ fun genIntPredicate(): Gen<(Int) -> Boolean> =
                     { it % absNum == absNum - 1 })
             )
         }
+
+fun <B> genOption(genB: Gen<B>): Gen<Option<B>> =
+        object : Gen<Option<B>> {
+            override fun generate(): Option<B> = Option.pure(genB.generate())
+        }
