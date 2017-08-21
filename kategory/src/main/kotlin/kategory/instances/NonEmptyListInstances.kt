@@ -36,13 +36,8 @@ interface NonEmptyListInstances :
 
     override fun <A, B> foldL(fa: HK<NonEmptyListHK, A>, b: B, f: (B, A) -> B): B = fa.ev().tail.fold(f(b, fa.ev().head), f)
 
-    override fun <A, B> foldR(fa: HK<NonEmptyListHK, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
-        fun loop(fa_p: NonEmptyList<A>): Eval<B> = when {
-            fa_p.tail.isEmpty() -> f(fa_p.ev().head, lb)
-            else -> f(fa_p.ev().head, Eval.defer { loop(NonEmptyList(fa_p.ev().tail.first(), fa_p.tail.drop(1))) })
-        }
-        return Eval.defer { loop(fa.ev()) }
-    }
+    override fun <A, B> foldR(fa: HK<NonEmptyListHK, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+            ListKW.foldable().foldR(fa.ev().all.k(), lb, f)
 
     override fun <G, A, B> traverse(fa: HK<NonEmptyListHK, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<NonEmptyListHK, B>> =
             GA.map2Eval(f(fa.ev().head), Eval.always {
