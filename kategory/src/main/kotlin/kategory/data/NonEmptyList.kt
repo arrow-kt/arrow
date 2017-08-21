@@ -67,4 +67,4 @@ package kategory
     }
 }
 
-fun <A> A.k(): NonEmptyList<A> = NonEmptyList.of(this)
+fun <A> A.nel(): NonEmptyList<A> = NonEmptyList.of(this)

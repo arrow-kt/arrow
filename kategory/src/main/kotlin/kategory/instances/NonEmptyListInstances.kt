@@ -9,7 +9,7 @@ interface NonEmptyListInstances :
         Traverse<NonEmptyListHK>,
         Foldable<NonEmptyListHK> {
 
-    override fun <A> pure(a: A): NonEmptyList<A> = a.k()
+    override fun <A> pure(a: A): NonEmptyList<A> = a.nel()
 
     override fun <A, B> flatMap(fa: NonEmptyListKind<A>, f: (A) -> NonEmptyListKind<B>): NonEmptyList<B> = fa.ev().flatMap { f(it).ev() }
 
@@ -36,8 +36,7 @@ interface NonEmptyListInstances :
 
     override fun <A, B> foldL(fa: HK<NonEmptyListHK, A>, b: B, f: (B, A) -> B): B = fa.ev().tail.fold(f(b, fa.ev().head), f)
 
-    override fun <A, B> foldR(fa: HK<NonEmptyListHK, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            ListKW.foldable().foldR(fa.ev().all.k(), lb, f)
+    override fun <A, B> foldR(fa: HK<NonEmptyListHK, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = ListKW.foldable().foldR(fa.ev().all.k(), lb, f)
 
     override fun <G, A, B> traverse(fa: HK<NonEmptyListHK, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<NonEmptyListHK, B>> =
             GA.map2Eval(f(fa.ev().head), Eval.always {
