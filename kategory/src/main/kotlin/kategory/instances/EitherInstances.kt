@@ -38,7 +38,8 @@ interface EitherInstances<L> :
         }
     }
 
-    override fun <G, A, B> traverse(fa: HK<EitherKindPartial<L>, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<EitherKindPartial<L>, B>> = fa.ev().fold({ GA.pure(it.left()) }, { GA.map(f(it), { Either.Right(it) }) })
+    override fun <G, A, B> traverse(fa: HK<EitherKindPartial<L>, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<EitherKindPartial<L>, B>> =
+            fa.ev().fold({ GA.pure(it.left()) }, { GA.map(f(it), { Either.Right(it) }) })
 
     override fun <A, B> foldL(fa: HK<EitherKindPartial<L>, A>, b: B, f: (B, A) -> B): B =
             fa.ev().let { either ->

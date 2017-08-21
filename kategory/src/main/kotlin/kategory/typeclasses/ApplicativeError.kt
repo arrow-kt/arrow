@@ -25,7 +25,8 @@ interface ApplicativeError<F, E> : Applicative<F>, Typeclass {
 
 inline fun <reified F, reified E, A> A.raiseError(FT: ApplicativeError<F, E> = applicativeError(), e: E): HK<F, A> = FT.raiseError<A>(e)
 
-inline fun <reified F, reified E, A> HK<F, A>.handlerErrorWith(FT: ApplicativeError<F, E> = applicativeError(), noinline f: (E) -> HK<F, A>): HK<F, A> = FT.handleErrorWith(this, f)
+inline fun <reified F, reified E, A> HK<F, A>.handlerErrorWith(FT: ApplicativeError<F, E> = applicativeError(), noinline f: (E) -> HK<F, A>): HK<F, A> =
+        FT.handleErrorWith(this, f)
 
 inline fun <reified F, reified E, A> HK<F, A>.attempt(FT: ApplicativeError<F, E> = applicativeError()): HK<F, Either<E, A>> = FT.attempt(this)
 
@@ -41,4 +42,5 @@ fun <F, A> ApplicativeError<F, Throwable>.catch(f: () -> A): HK<F, A> =
             raiseError(e)
         }
 
-inline fun <reified F, reified E> applicativeError(): ApplicativeError<F, E> = instance(InstanceParametrizedType(ApplicativeError::class.java, listOf(F::class.java, E::class.java)))
+inline fun <reified F, reified E> applicativeError(): ApplicativeError<F, E> =
+        instance(InstanceParametrizedType(ApplicativeError::class.java, listOf(F::class.java, E::class.java)))

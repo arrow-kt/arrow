@@ -21,7 +21,8 @@ interface CoproductTraverse<F, G> : Traverse<CoproductKindPartial<F, G>> {
 
     fun FG(): Traverse<G>
 
-    override fun <H, A, B> traverse(fa: HK<CoproductKindPartial<F, G>, A>, f: (A) -> HK<H, B>, GA: Applicative<H>): HK<H, HK<CoproductKindPartial<F, G>, B>> = fa.ev().traverse(f, GA, FF(), FG())
+    override fun <H, A, B> traverse(fa: HK<CoproductKindPartial<F, G>, A>, f: (A) -> HK<H, B>, GA: Applicative<H>): HK<H, HK<CoproductKindPartial<F, G>, B>> =
+            fa.ev().traverse(f, GA, FF(), FG())
 
     override fun <A, B> foldL(fa: HK<CoproductKindPartial<F, G>, A>, b: B, f: (B, A) -> B): B = fa.ev().foldL(b, f, FF(), FG())
 

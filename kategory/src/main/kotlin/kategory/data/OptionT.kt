@@ -28,13 +28,15 @@ package kategory
 
         inline fun <reified F> monad(MF: Monad<F> = kategory.monad<F>()): Monad<OptionTKindPartial<F>> = instances(MF)
 
-        inline fun <reified F> traverse(FF: Traverse<F> = kategory.traverse<F>(), MF: Monad<F> = kategory.monad<F>()): Traverse<OptionTKindPartial<F>> = object : OptionTTraverse<F> {
-            override fun FF(): Traverse<F> = FF
+        inline fun <reified F> traverse(FF: Traverse<F> = kategory.traverse<F>(), MF: Monad<F> = kategory.monad<F>()): Traverse<OptionTKindPartial<F>> =
+                object : OptionTTraverse<F> {
+                    override fun FF(): Traverse<F> = FF
 
-            override fun MF(): Monad<F> = MF
-        }
+                    override fun MF(): Monad<F> = MF
+                }
 
-        inline fun <reified F> foldable(FF: Traverse<F> = kategory.traverse<F>(), MF: Monad<F> = kategory.monad<F>()): Foldable<OptionTKindPartial<F>> = traverse(FF, MF)
+        inline fun <reified F> foldable(FF: Traverse<F> = kategory.traverse<F>(), MF: Monad<F> = kategory.monad<F>()): Foldable<OptionTKindPartial<F>> =
+                traverse(FF, MF)
 
         inline fun <reified F> semigroupK(MF: Monad<F> = kategory.monad<F>()): SemigroupK<OptionTKindPartial<F>> = object : OptionTSemigroupK<F> {
             override fun F(): Monad<F> = MF
@@ -51,7 +53,8 @@ package kategory
 
     inline fun <B> flatMap(crossinline f: (A) -> OptionT<F, B>): OptionT<F, B> = flatMapF({ it -> f(it).value })
 
-    inline fun <B> flatMapF(crossinline f: (A) -> HK<F, Option<B>>): OptionT<F, B> = OptionT(MF, MF.flatMap(value, { option -> option.fold({ MF.pure(Option.None) }, f) }))
+    inline fun <B> flatMapF(crossinline f: (A) -> HK<F, Option<B>>): OptionT<F, B> =
+            OptionT(MF, MF.flatMap(value, { option -> option.fold({ MF.pure(Option.None) }, f) }))
 
     fun <B> liftF(fa: HK<F, B>): OptionT<F, B> = OptionT(MF, MF.map(fa, { Option.Some(it) }))
 

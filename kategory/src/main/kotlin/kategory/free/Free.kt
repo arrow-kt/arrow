@@ -48,7 +48,8 @@ inline fun <reified M, S, A> FreeKind<S, A>.foldMapK(f: FunctionK<S, M>, MM: Mon
     }
 
     data class FlatMapped<out S, out A, C>(val c: Free<S, C>, val f: (C) -> Free<S, A>) : Free<S, A>() {
-        override fun <O, B> transform(fm: (A) -> B, fs: FunctionK<S, O>): Free<O, B> = Free.FlatMapped(c.transform({ it }, fs), { c.flatMap { f(it) }.transform(fm, fs) })
+        override fun <O, B> transform(fm: (A) -> B, fs: FunctionK<S, O>): Free<O, B> =
+                Free.FlatMapped(c.transform({ it }, fs), { c.flatMap { f(it) }.transform(fm, fs) })
     }
 
     override fun toString(): String = "Free(...) : toString is not stack-safe"

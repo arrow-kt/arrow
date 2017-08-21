@@ -179,7 +179,8 @@ inline fun <B> Either<*, B>.getOrElse(crossinline default: () -> B): B = fold({ 
  * left.filterOrElse({ it > 10 }, { -1 })      // Result: Left(12)
  * ```
  */
-inline fun <A, B> Either<A, B>.filterOrElse(crossinline predicate: (B) -> Boolean, crossinline default: () -> A): Either<A, B> = fold({ Either.Left(it) }, { if (predicate(it)) Either.Right(it) else Either.Left(default()) })
+inline fun <A, B> Either<A, B>.filterOrElse(crossinline predicate: (B) -> Boolean, crossinline default: () -> A): Either<A, B> =
+        fold({ Either.Left(it) }, { if (predicate(it)) Either.Right(it) else Either.Left(default()) })
 
 /**
  * Returns `true` if this is a [Either.Right] and its value is equal to `elem` (as determined by `==`),

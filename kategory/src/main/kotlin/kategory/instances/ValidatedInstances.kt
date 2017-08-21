@@ -18,7 +18,8 @@ interface ValidatedInstances<E> :
 
     override fun <A> raiseError(e: E): Validated<E, A> = Validated.Invalid(e)
 
-    override fun <A> handleErrorWith(fa: ValidatedKind<E, A>, f: (E) -> ValidatedKind<E, A>): Validated<E, A> = fa.ev().fold({ f(it).ev() }, { Validated.Valid(it) })
+    override fun <A> handleErrorWith(fa: ValidatedKind<E, A>, f: (E) -> ValidatedKind<E, A>): Validated<E, A> =
+            fa.ev().fold({ f(it).ev() }, { Validated.Valid(it) })
 
     override fun <A, B> ap(fa: ValidatedKind<E, A>, ff: HK<ValidatedKindPartial<E>, (A) -> B>): Validated<E, B> = fa.ev().ap(ff.ev(), SE())
 

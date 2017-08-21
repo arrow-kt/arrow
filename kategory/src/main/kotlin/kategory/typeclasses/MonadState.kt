@@ -13,4 +13,5 @@ interface MonadState<F, S> : Monad<F>, Typeclass {
     fun <A> inspect(f: (S) -> A): HK<F, A> = map(get(), f)
 }
 
-inline fun <reified F, reified S> monadState(): MonadState<F, S> = instance(InstanceParametrizedType(MonadState::class.java, listOf(F::class.java, S::class.java)))
+inline fun <reified F, reified S> monadState(): MonadState<F, S> =
+        instance(InstanceParametrizedType(MonadState::class.java, listOf(F::class.java, S::class.java)))

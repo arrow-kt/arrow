@@ -50,7 +50,8 @@ interface EitherTTraverse<F, A> :
 
     fun MF(): Monad<F>
 
-    override fun <G, B, C> traverse(fa: HK<EitherTKindPartial<F, A>, B>, f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, HK<EitherTKindPartial<F, A>, C>> = fa.ev().traverse(f, GA, FF(), MF())
+    override fun <G, B, C> traverse(fa: HK<EitherTKindPartial<F, A>, B>, f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, HK<EitherTKindPartial<F, A>, C>> =
+            fa.ev().traverse(f, GA, FF(), MF())
 
     override fun <B, C> foldL(fa: HK<EitherTKindPartial<F, A>, B>, b: C, f: (C, B) -> C): C = fa.ev().foldL(b, f, FF())
 
