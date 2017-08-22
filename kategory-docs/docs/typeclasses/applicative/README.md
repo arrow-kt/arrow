@@ -17,6 +17,8 @@ Often times we find ourselves in situations where we need to compute multiple in
 In the following example we will define 3 invocations that may as well be remote or local services each one of them returning different results in the same computational context of `Option`
 
 ```kotlin:ank
+import kategory.*
+
 fun profileService(): Option<String> = Option("Alfredo Lambda")
 fun phoneService(): Option<Int> = Option(55555555)
 fun addressService(): Option<List<String>> = Option(listOf("1 Main Street", "11130", "NYC"))

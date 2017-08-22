@@ -25,6 +25,8 @@ In a similar fashion `Try<A>` may have two possible cases `Success(a: A)` for co
 Both `Try` and `Option` are example datatypes that can be computed over transforming their inner results.
 
 ```kotlin:ank
+import kategory.*
+
 Try { "1".toInt() }.map { it * 2 }
 Option(1).map { it * 2 }
 ```

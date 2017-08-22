@@ -11,8 +11,8 @@ dependencies {
 
 ank {
     classpath = sourceSets.main.runtimeClasspath
-    arguments = ["${projectDir}/typeclasses/applicative",
-                 "${projectDir}/site",
+    arguments = ["${projectDir}/docs",
+                 "${projectDir}/build/site",
                  "-classpath", "${sourceSets.main.runtimeClasspath.join(":")}"]
 }
 
