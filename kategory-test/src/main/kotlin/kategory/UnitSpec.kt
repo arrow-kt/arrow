@@ -23,7 +23,9 @@ abstract class UnitSpec : StringSpec() {
             Try.foldable()
             Try.traverse()
             Try.monadError()
-            Eval
+            Eval.functor()
+            Eval.applicative()
+            Eval.monad()
         }
     }
 
