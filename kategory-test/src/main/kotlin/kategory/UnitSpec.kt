@@ -18,7 +18,11 @@ abstract class UnitSpec : StringSpec() {
             Option.monad()
             Option.foldable()
             Option.traverse()
-            Try
+            Try.functor()
+            Try.monad()
+            Try.foldable()
+            Try.traverse()
+            Try.monadError()
             Eval
         }
     }

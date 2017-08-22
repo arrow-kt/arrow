@@ -11,8 +11,8 @@ class TryTest : UnitSpec() {
 
     init {
 
-        testLaws(MonadErrorLaws.laws(Try, Eq.any()))
-        testLaws(TraverseLaws.laws(Try, Try, ::Success, Eq.any()))
+        testLaws(MonadErrorLaws.laws(Try.monadError(), Eq.any()))
+        testLaws(TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any()))
 
         "invoke of any should be success" {
             Try.invoke { 1 } shouldBe Success(1)
@@ -92,7 +92,7 @@ class TryTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over homogeneous Try" {
-            Try.map(
+            Try.applicative().map(
                     Success("11th"),
                     Success("Doctor"),
                     Success("Who"),
@@ -100,7 +100,7 @@ class TryTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over heterogeneous Try" {
-            Try.map(
+            Try.applicative().map(
                     Success(13),
                     Success("Doctor"),
                     Success(false),
@@ -110,7 +110,7 @@ class TryTest : UnitSpec() {
         data class DoctorNotFoundException(val msg: String) : Exception()
 
         "Cartesian builder should build products over Failure Try" {
-            Try.map(
+            Try.applicative().map(
                     Success(13),
                     Failure<Boolean>(DoctorNotFoundException("13th Doctor is coming!")),
                     Success("Who"),
@@ -118,8 +118,8 @@ class TryTest : UnitSpec() {
         }
 
         "Cartesian builder works inside for comprehensions over Try" {
-            val result = Try.bindingE {
-                val (x, y, z) = Try.tupled(Try.pure(1), Try.pure(1), Try.pure(1)).bind()
+            val result = Try.monadError().bindingE {
+                val (x, y, z) = Try.applicative().tupled(Try.pure(1), Try.pure(1), Try.pure(1)).bind()
                 val a = Try.pure(1).bind()
                 val b = bind { Try.pure(1) }
                 yields(x + y + z + a + b)
@@ -128,8 +128,8 @@ class TryTest : UnitSpec() {
         }
 
         "Cartesian builder works inside for comprehensions over Try with fail fast behaviour" {
-            val result = Try.bindingE {
-                val (x, y, z) = Try.tupled(Try.pure(1), Try.pure(1), Try.pure(1)).bind()
+            val result = Try.monadError().bindingE {
+                val (x, y, z) = Try.applicative().tupled(Try.pure(1), Try.pure(1), Try.pure(1)).bind()
                 val failure1: Try<Int> = Failure(DoctorNotFoundException("13th Doctor is coming!"))
                 val failure2: Try<Int> = Failure(DoctorNotFoundException("14th Doctor is not found"))
                 val a = failure1.bind()
@@ -140,8 +140,8 @@ class TryTest : UnitSpec() {
         }
 
         "Cartesian builder works inside for comprehensions over Try and raise errors" {
-            val result = Try.bindingE {
-                val (x, y, z) = Try.tupled(Try.pure(1), Try.pure(1), Try.pure(1)).bind()
+            val result = Try.monadError().bindingE {
+                val (x, y, z) = Try.applicative().tupled(Try.pure(1), Try.pure(1), Try.pure(1)).bind()
                 val nullable: String? = null
                 yields(x + y + z + nullable!!.toInt())
             }

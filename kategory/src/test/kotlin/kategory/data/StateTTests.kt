@@ -8,7 +8,7 @@ class StateTTests : UnitSpec() {
 
     init {
 
-        val instances = StateT.monadState<TryHK, Int>(Try)
+        val instances = StateT.monadState<TryHK, Int>(Try.monad())
 
         testLaws(MonadStateLaws.laws(
                 instances,
