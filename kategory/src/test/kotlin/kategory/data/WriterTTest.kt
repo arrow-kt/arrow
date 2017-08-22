@@ -2,9 +2,7 @@ package kategory
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
-import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import javaslang.Tuple
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
