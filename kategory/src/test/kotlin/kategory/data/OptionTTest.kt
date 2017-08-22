@@ -23,8 +23,8 @@ class OptionTTest : UnitSpec() {
                 OptionTFIdEq))
 
         testLaws(MonoidKLaws.laws(
-                OptionT.monoidK(Option),
-                OptionT.applicative(Option),
+                OptionT.monoidK(Option.monad()),
+                OptionT.applicative(Option.monad()),
                 OptionT.invoke(Option(Option(1)), Option.monad()),
                 Eq.any(),
                 Eq.any()))

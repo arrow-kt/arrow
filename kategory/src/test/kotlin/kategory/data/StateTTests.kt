@@ -23,8 +23,8 @@ class StateTTests : UnitSpec() {
                 }))
 
         testLaws(SemigroupKLaws.laws<StateTKindPartial<OptionHK, Int>>(
-                StateT.semigroupK(Option, OptionSemigroupK()),
-                StateT.applicative(Option),
+                StateT.semigroupK(Option.monad(), OptionSemigroupK()),
+                StateT.applicative(Option.monad()),
                 object : Eq<HK<StateTKindPartial<OptionHK, Int>, Int>> {
                     override fun eqv(a: HK<StateTKindPartial<OptionHK, Int>, Int>, b: HK<StateTKindPartial<OptionHK, Int>, Int>): Boolean =
                             a.runM(1) == b.runM(1)

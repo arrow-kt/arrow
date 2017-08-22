@@ -56,7 +56,7 @@ class CoyonedaTest : UnitSpec() {
                     if (n <= 0) acc
                     else loop(n - 1, acc.map { it + 1 })
 
-            val result = loop(loops, Coyoneda.apply(Option.Some(0), { it })).lower(Option)
+            val result = loop(loops, Coyoneda.apply(Option.Some(0), { it })).lower(Option.functor())
             val expected = Option.Some(loops)
 
             expected shouldBe result

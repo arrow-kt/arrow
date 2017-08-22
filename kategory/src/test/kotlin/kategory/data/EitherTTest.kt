@@ -226,10 +226,10 @@ class EitherTTest : UnitSpec() {
 
 
             val f: (Int) -> Option<Int> = { Option.Some(it + 1) }
-            val traverse = eitherT.traverse(f, Option, Id, Id).ev()
+            val traverse = eitherT.traverse(f, Option.applicative(), Id, Id).ev()
             val result = traverse.map { it.ev().value.value() }
 
-            val expected = Either.traverse<String>().traverse(either, f, Option)
+            val expected = Either.traverse<String>().traverse(either, f, Option.applicative())
             result shouldBe expected
         }
 

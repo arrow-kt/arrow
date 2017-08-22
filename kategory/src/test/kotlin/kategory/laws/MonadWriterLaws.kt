@@ -47,7 +47,7 @@ object MonadWriterLaws {
         })
     }
 
-    inline fun <reified F, reified W, A> monadWriterListenWriter(genTupleWA: Gen<Tuple2<W, A>>,
+    fun <F, W, A> monadWriterListenWriter(genTupleWA: Gen<Tuple2<W, A>>,
                                                                  MW: MonadWriter<F, W>,
                                                                  EqTupleWA: Eq<HK<F, Tuple2<W, A>>>): Unit {
         forAll(genTupleWA, { tupleWA: Tuple2<W, A> ->

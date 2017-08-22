@@ -23,7 +23,7 @@ interface ListKWInstances :
     override fun <A, B> foldL(fa: HK<ListKWHK, A>, b: B, f: (B, A) -> B): B = fa.ev().fold(b, f)
 
     override fun <A, B> foldR(fa: HK<ListKWHK, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
-        fun loop(fa_p: ListKW<A>): Eval<B> = when {
+        tailrec fun loop(fa_p: ListKW<A>): Eval<B> = when {
             fa_p.list.isEmpty() -> lb
             else -> f(fa_p.ev().list.first(), Eval.defer { loop(fa_p.list.drop(1).k()) })
         }

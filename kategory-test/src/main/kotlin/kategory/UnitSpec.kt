@@ -13,7 +13,11 @@ abstract class UnitSpec : StringSpec() {
             // To get the instances before tests are initialized the following global typeclasses are preloaded
             Id
             NonEmptyList
-            Option
+            Option.functor()
+            Option.applicative()
+            Option.monad()
+            Option.foldable()
+            Option.traverse()
             Try
             Eval
         }

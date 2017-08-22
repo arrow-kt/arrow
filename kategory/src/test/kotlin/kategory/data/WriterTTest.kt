@@ -12,14 +12,14 @@ class WriterTTest : UnitSpec() {
 
         testLaws(MonadLaws.laws(WriterT.monad(NonEmptyList, IntMonoid), Eq.any()))
         testLaws(MonoidKLaws.laws<WriterTKindPartial<OptionHK, Int>>(
-                WriterT.monoidK(Option, OptionMonoidK()),
-                WriterT.applicative(Option, IntMonoid),
+                WriterT.monoidK(Option.monad(), OptionMonoidK()),
+                WriterT.applicative(Option.monad(), IntMonoid),
                 WriterT.invoke(Option(Tuple2(1, 2)), Option.monad()),
                 Eq.any(),
                 Eq.any()))
 
-        testLaws(MonadWriterLaws.laws(WriterT.monad(Option, IntMonoid),
-                WriterT.monadWriter(Option, IntMonoid),
+        testLaws(MonadWriterLaws.laws(WriterT.monad(Option.monad(), IntMonoid),
+                WriterT.monadWriter(Option.monad(), IntMonoid),
                 IntMonoid,
                 Gen.string(),
                 genIntSmall(),

@@ -14,8 +14,8 @@ class OptionTest : UnitSpec() {
 
     init {
 
-        testLaws(MonadLaws.laws(Option, Eq.any()))
-        testLaws(TraverseLaws.laws(Option, Option, ::Some, Eq.any()))
+        testLaws(MonadLaws.laws(Option.monad(), Eq.any()))
+        testLaws(TraverseLaws.laws(Option.traverse(), Option.functor(), ::Some, Eq.any()))
         testLaws(MonoidKLaws.laws(
                 OptionMonoidK(),
                 Option.applicative(),
@@ -82,48 +82,48 @@ class OptionTest : UnitSpec() {
             forAll { a: Int ->
                 val x = { b: Int -> Option(b * a) }
                 val option = Option(a)
-                option.flatMap(x) == Option.flatMap(option, x)
+                option.flatMap(x) == Option.monad().flatMap(option, x)
             }
         }
 
         "Option.functor.void should return Unit" {
             forAll { a: Int ->
-                Option.void(Option(a)) == Some(Unit)
+                Option.functor().void(Option(a)) == Some(Unit)
             }
         }
 
         "Option.functor.as should change its value" {
             forAll { a: Int ->
-                Option.`as`(Option("1"), a) == Some(a)
+                Option.functor().`as`(Option("1"), a) == Some(a)
             }
         }
 
         "Option.functor.fproduct should return a tuple of the current value and the transformed" {
             forAll { a: Int ->
-                Option.fproduct(Option(a), { it + 1 }) == Some(Tuple2(a, a + 1))
+                Option.functor().fproduct(Option(a), { it + 1 }) == Some(Tuple2(a, a + 1))
             }
         }
 
         "Option.functor.tupleLeft should return a tuple the current value and the value passed" {
             forAll { a: Int ->
-                Option.tupleLeft(Option(a), a + 1) == Some(Tuple2(a + 1, a))
+                Option.functor().tupleLeft(Option(a), a + 1) == Some(Tuple2(a + 1, a))
             }
         }
 
         "Option.functor.tupleRight should return a tuple the current value and the value passed" {
             forAll { a: Int ->
-                Option.tupleRigth(Option(a), a + 1) == Some(Tuple2(a, a + 1))
+                Option.functor().tupleRigth(Option(a), a + 1) == Some(Tuple2(a, a + 1))
             }
         }
 
         "Option.functor.widen should cast the result to other super type" {
-            val x: Option<Any> = Option.widen(Option("1")).ev()
+            val x: Option<Any> = Option.functor().widen(Option("1")).ev()
 
             x should { x -> x is Option<Any> }
         }
 
         "Option.monad.binding should for comprehend over option" {
-            val result = Option.binding {
+            val result = Option.monad().binding {
                 val x = Option(1).bind()
                 val y = bind { Option(1) }
                 yields(x + y)
@@ -132,14 +132,14 @@ class OptionTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over option" {
-            Option.map(Option(1), Option("a"), Option(true), { (a, b, c) ->
+            Option.applicative().map(Option(1), Option("a"), Option(true), { (a, b, c) ->
                 "$a $b $c"
             }) shouldBe Option("1 a true")
         }
 
         "Cartesian builder works inside for comprehensions" {
-            val result = Option.binding {
-                val (x, y, z) = Option.tupled(Option(1), Option(1), Option(1)).bind()
+            val result = Option.monad().binding {
+                val (x, y, z) = Option.applicative().tupled(Option(1), Option(1), Option(1)).bind()
                 val a = bind { Option(1) }
                 yields(x + y + z + a)
             }
