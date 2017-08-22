@@ -4,6 +4,7 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import javaslang.Tuple
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -21,12 +22,22 @@ class WriterTTest : UnitSpec() {
         testLaws(MonadWriterLaws.laws(WriterT.monad(Option.monad(), IntMonoid),
                 WriterT.monadWriter(Option.monad(), IntMonoid),
                 IntMonoid,
-                Gen.string(),
                 genIntSmall(),
-                genTuple(genIntSmall(), Gen.string()),
-                Eq.any(),
-                Eq.any(),
-                Eq.any()
+                genTuple(genIntSmall(), genIntSmall()),
+                object : Eq<HK<WriterTKindPartial<OptionHK, Int>, Int>> {
+                    override fun eqv(a: HK<WriterTKindPartial<OptionHK, Int>, Int>, b: HK<WriterTKindPartial<OptionHK, Int>, Int>): Boolean =
+                            a.ev().value.ev().let { optionA: Option<Tuple2<Int, Int>> ->
+                                val optionB = a.ev().value.ev()
+                                optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Int> -> optionB.fold({ false }, { value == it }) })
+                            }
+                },
+                object : Eq<HK<WriterTKindPartial<OptionHK, Int>, Tuple2<Int, Int>>> {
+                    override fun eqv(a: HK<WriterTKindPartial<OptionHK, Int>, Tuple2<Int, Int>>, b: HK<WriterTKindPartial<OptionHK, Int>, Tuple2<Int, Int>>): Boolean =
+                            a.ev().value.ev().let { optionA: Option<Tuple2<Int, Tuple2<Int, Int>>> ->
+                                val optionB = a.ev().value.ev()
+                                optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Tuple2<Int, Int>> -> optionB.fold({ false }, { value == it }) })
+                            }
+                }
         ))
 
         "tell should accumulate write" {
