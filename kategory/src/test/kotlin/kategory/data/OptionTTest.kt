@@ -3,6 +3,7 @@ package kategory
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.forAll
+import kategory.laws.FunctorFilterLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -27,6 +28,11 @@ class OptionTTest : UnitSpec() {
                 OptionT.applicative(Option),
                 OptionT.invoke(Option(Option(1)), Option.monad()),
                 Eq.any(),
+                Eq.any()))
+
+        testLaws(FunctorFilterLaws.laws(
+                OptionT.applicative(Option),
+                OptionT.functorFilter(),
                 Eq.any()))
 
         "map should modify value" {
