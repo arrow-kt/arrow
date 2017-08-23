@@ -3,6 +3,7 @@ package kategory
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.forAll
+import kategory.laws.FunctorFilterLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -28,6 +29,11 @@ class OptionTTest : UnitSpec() {
                 OptionT.invoke(Option(Option(1)), Option.monad()),
                 Eq.any(),
                 Eq.any()))
+
+        testLaws(FunctorFilterLaws.laws(
+                OptionT.functorFilter(),
+                { OptionT(Id(it.some())) },
+                OptionTFIdEq))
 
         "from option should build a correct OptionT" {
             forAll { a: String ->
