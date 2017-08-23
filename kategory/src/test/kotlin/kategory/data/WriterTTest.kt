@@ -16,7 +16,7 @@ class WriterTTest : UnitSpec() {
                 WriterT.applicative(ListKW.monad(), IntMonoid),
                 object : Eq<WriterTKind<ListKWHK, Int, Int>> {
                     override fun eqv(a: WriterTKind<ListKWHK, Int, Int>, b: WriterTKind<ListKWHK, Int, Int>): Boolean =
-                            a.value() == b.value()
+                            a.ev().value == b.ev().value
                 }))
 
         testLaws(MonadWriterLaws.laws(WriterT.monad(Option, IntMonoid),
