@@ -1,5 +1,7 @@
 package kategory
 
+@Suppress("UNCHECKED_CAST") inline fun <F, W, A> WriterTKind<F, W, A>.value(): HK<F, Tuple2<W, A>> = (this as WriterT<F, W, A>).value
+
 @higherkind data class WriterT<F, W, A>(val MF: Monad<F>, val value: HK<F, Tuple2<W, A>>) : WriterTKind<F, W, A> {
 
     companion object {
@@ -42,14 +44,14 @@ package kategory
                 object : WriterTSemigroupK<F, W> {
                     override fun MF(): Monad<F> = MF
 
-                    override fun F0(): SemigroupK<F> = SGK
+                    override fun GF(): SemigroupK<F> = SGK
                 }
 
         inline fun <reified F, reified W> monoidK(MF: Monad<F> = monad<F>(), MKF: MonoidK<F> = monoidK<F>()): MonoidK<WriterTKindPartial<F, W>> =
                 object : WriterTMonoidK<F, W> {
                     override fun MF(): Monad<F> = MF
 
-                    override fun F0(): MonoidK<F> = MKF
+                    override fun GF(): MonoidK<F> = MKF
                 }
 
         inline fun <reified F, reified W> monadWriter(MM: Monad<F> = kategory.monad(), SG: Monoid<W> = kategory.monoid()):

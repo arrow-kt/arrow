@@ -1,6 +1,6 @@
 package kategory
 
-@higherkind data class ListKW<A> constructor(val list: List<A>) : ListKWKind<A>, List<A> by list {
+@higherkind data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A> by list {
 
     companion object : ListKWInstances, GlobalInstance<Monad<ListKWHK>>() {
 

@@ -11,12 +11,13 @@ class WriterTTest : UnitSpec() {
     init {
 
         testLaws(MonadLaws.laws(WriterT.monad(NonEmptyList, IntMonoid), Eq.any()))
-        testLaws(MonoidKLaws.laws<WriterTKindPartial<OptionHK, Int>>(
-                WriterT.monoidK(Option, OptionMonoidK()),
-                WriterT.applicative(Option, IntMonoid),
-                WriterT.invoke(Option(Tuple2(1, 2)), Option.monad()),
-                Eq.any(),
-                Eq.any()))
+        testLaws(MonoidKLaws.laws(
+                WriterT.monoidK<ListKWHK, Int>(ListKW.monad(), ListKW.monoidK()),
+                WriterT.applicative(ListKW.monad(), IntMonoid),
+                object : Eq<HK<WriterTKindPartial<ListKWHK, Int>, Int>> {
+                    override fun eqv(a: HK<WriterTKindPartial<ListKWHK, Int>, Int>, b: HK<WriterTKindPartial<ListKWHK, Int>, Int>): Boolean =
+                            a.value() == b.value()
+                }))
 
         testLaws(MonadWriterLaws.laws(WriterT.monad(Option, IntMonoid),
                 WriterT.monadWriter(Option, IntMonoid),
