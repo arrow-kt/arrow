@@ -23,7 +23,7 @@ class StateTTests : UnitSpec() {
                 }))
 
         testLaws(SemigroupKLaws.laws<StateTKindPartial<OptionHK, Int>>(
-                StateT.semigroupK(Option, OptionSemigroupK()),
+                StateT.semigroupK(Option, OptionSemigroupK),
                 StateT.applicative(Option),
                 object : Eq<HK<StateTKindPartial<OptionHK, Int>, Int>> {
                     override fun eqv(a: HK<StateTKindPartial<OptionHK, Int>, Int>, b: HK<StateTKindPartial<OptionHK, Int>, Int>): Boolean =
