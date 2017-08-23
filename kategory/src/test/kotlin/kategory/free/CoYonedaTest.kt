@@ -19,36 +19,6 @@ class CoyonedaTest : UnitSpec() {
 
         testLaws(FunctorLaws.laws(Coyoneda.functor(), { Coyoneda.apply(Id(0), { it }) }, EQ))
 
-        "map should modify the content of any HK1" {
-            forAll { x: Int ->
-                val op = Coyoneda.apply(Id(x), { _ -> "" })
-                val mapped = op.map { _ -> true }.lower(Id.functor())
-                val expected = Id(true)
-
-                expected == mapped
-            }
-        }
-
-        "instance map should be consistent with CoyonedaFunctor#map" {
-            forAll { x: Int ->
-                val op = Coyoneda.apply(Id(x), { _ -> "" })
-                val mapped = op.map { _ -> true }.lower(Id.functor())
-                val expected = Coyoneda.functor<IdHK, Int>().map(op, { _ -> true }).ev().lower(Id.functor())
-
-                expected == mapped
-            }
-        }
-
-        "map should retain function application ordering" {
-            forAll { x: Int ->
-                val op = Coyoneda.apply(Id(x), { it })
-                val mapped = op.map { it + 1 }.map { it * 3 }.lower(Id.functor()).ev()
-                val expected = Id((x + 1) * 3)
-
-                expected == mapped
-            }
-        }
-
         "map should be stack-safe" {
             val loops = 10000
 

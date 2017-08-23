@@ -23,21 +23,6 @@ class TryTest : UnitSpec() {
             Try.invoke { throw ex } shouldBe Failure<Any>(ex)
         }
 
-        "flatMap should modify entity" {
-            val failure: Try<Int> = Failure(Exception())
-
-            Success(1).flatMap { failure } shouldBe failure
-            Success(1).flatMap { Success(2) } shouldBe Success(2)
-            failure.flatMap { Success(2) } shouldBe failure
-        }
-
-        "map should modify value" {
-            val failure: Try<Int> = Failure(Exception())
-
-            Success(1).map { 2 } shouldBe Success(2)
-            failure.map { 2 } shouldBe failure
-        }
-
         "filter evaluates predicate" {
             val failure: Try<Int> = Failure(Exception())
 
@@ -117,37 +102,5 @@ class TryTest : UnitSpec() {
                     { (a, b, c) -> "${a}th $b is $c" }) shouldBe Failure<String>(DoctorNotFoundException("13th Doctor is coming!"))
         }
 
-        "Cartesian builder works inside for comprehensions over Try" {
-            val result = Try.monadError().bindingE {
-                val (x, y, z) = Try.applicative().tupled(Try.pure(1), Try.pure(1), Try.pure(1)).bind()
-                val a = Try.pure(1).bind()
-                val b = bind { Try.pure(1) }
-                yields(x + y + z + a + b)
-            }
-            result shouldBe Success(5)
-        }
-
-        "Cartesian builder works inside for comprehensions over Try with fail fast behaviour" {
-            val result = Try.monadError().bindingE {
-                val (x, y, z) = Try.applicative().tupled(Try.pure(1), Try.pure(1), Try.pure(1)).bind()
-                val failure1: Try<Int> = Failure(DoctorNotFoundException("13th Doctor is coming!"))
-                val failure2: Try<Int> = Failure(DoctorNotFoundException("14th Doctor is not found"))
-                val a = failure1.bind()
-                val b = bind { failure2 }
-                yields(x + y + z + a + b)
-            }
-            result shouldBe Failure<Int>(DoctorNotFoundException("13th Doctor is coming!"))
-        }
-
-        "Cartesian builder works inside for comprehensions over Try and raise errors" {
-            val result = Try.monadError().bindingE {
-                val (x, y, z) = Try.applicative().tupled(Try.pure(1), Try.pure(1), Try.pure(1)).bind()
-                val nullable: String? = null
-                yields(x + y + z + nullable!!.toInt())
-            }
-
-            assert(result is Failure<Int>)
-            assert((result as Failure<Int>).exception is KotlinNullPointerException)
-        }
     }
 }

@@ -17,26 +17,6 @@ class YonedaTest : UnitSpec() {
     init {
         testLaws(FunctorLaws.laws(F, { Yoneda.apply(kategory.Id(it)) }, EQ))
 
-        "map should modify the content of any HK1" {
-            forAll { x: Int ->
-                val op = Yoneda.apply(Id(x))
-                val mapped = op.map({ _ -> true }, Id.functor()).lower()
-                val expected = Id(true)
-
-                expected == mapped
-            }
-        }
-
-        "instance map should be consistent with YonedaFunctor#map" {
-            forAll { x: Int ->
-                val op = Yoneda.apply(Id(x))
-                val mapped = op.map({ _ -> true }, Id.functor()).lower()
-                val expected = Yoneda.functor(Id.functor()).map(op, { _ -> true }).ev().lower()
-
-                expected == mapped
-            }
-        }
-
         "toCoyoneda should convert to an equivalent Coyoneda" {
             forAll { x: Int ->
                 val op = Yoneda.apply(Id(x.toString()))

@@ -136,22 +136,6 @@ class CofreeTest : UnitSpec() {
             cataHundredOne shouldBe None
         }
 
-        "cofree should cobind correctly" {
-            val offset = 0
-            val limit = 10
-            val loops = SideEffect()
-            val program = Cofree.comonad<OptionHK>().cobinding {
-                val program = unfold(offset, {
-                    loops.increment()
-                    if (it == limit) None else Some(it + 1)
-                })
-                val value: Int = program.run().extract()
-                val tail: Int = program.runTail().extract()
-                value + tail
-            }
-            program shouldBe 0
-            loops.counter shouldBe limit + 1
-        }
     }
 }
 
