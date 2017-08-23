@@ -114,8 +114,82 @@ interface ComposedMonoidK<F, G> : MonoidK<ComposedType<F, G>>, ComposedSemigroup
     override fun F(): MonoidK<F>
 
     override fun <A> empty(): HK<ComposedType<F, G>, A> = F().empty<HK<G, A>>().lift()
+
+    fun <A> emptyC(): HK<F, HK<G, A>> = empty<A>().lower()
 }
 
 fun <F, G> MonoidK<F>.compose(): MonoidK<ComposedType<F, G>> = object : ComposedMonoidK<F, G> {
     override fun F(): MonoidK<F> = this@compose
 }
+
+interface ComposedFunctor<F, G> : Functor<ComposedType<F, G>> {
+    fun F(): Functor<F>
+
+    fun G(): Functor<G>
+
+    override fun <A, B> map(fa: HK<ComposedType<F, G>, A>, f: (A) -> B): HK<ComposedType<F, G>, B> = F().map(fa.lower(), { G().map(it, f) }).lift()
+
+    fun <A, B> mapC(fa: HK<F, HK<G, A>>, f: (A) -> B): HK<F, HK<G, B>> = map(fa.lift(), f).lower()
+
+    companion object {
+        inline operator fun <reified F, reified G> invoke(FF: Functor<F> = functor<F>(), GF: Functor<G> = functor<G>()): Functor<ComposedType<F, G>> =
+                object : ComposedFunctor<F, G> {
+                    override fun F(): Functor<F> = FF
+
+                    override fun G(): Functor<G> = GF
+                }
+    }
+}
+
+inline fun <reified F, reified G> Functor<F>.compose(GF: Functor<G> = functor<G>()): Functor<ComposedType<F, G>> = ComposedFunctor(this, GF)
+
+interface ComposedApplicative<F, G> : Applicative<ComposedType<F, G>>, ComposedFunctor<F, G> {
+    override fun F(): Applicative<F>
+
+    override fun G(): Applicative<G>
+
+    override fun <A, B> map(fa: HK<ComposedType<F, G>, A>, f: (A) -> B): HK<ComposedType<F, G>, B> = ap(fa, pure(f))
+
+    override fun <A> pure(a: A): HK<ComposedType<F, G>, A> = F().pure(G().pure(a)).lift()
+
+    override fun <A, B> ap(fa: HK<ComposedType<F, G>, A>, ff: HK<ComposedType<F, G>, (A) -> B>):
+            HK<ComposedType<F, G>, B> = F().ap(fa.lower(), F().map(ff.lower(), { gfa: HK<G, (A) -> B> -> { ga: HK<G, A> -> G().ap(ga, gfa) } })).lift()
+
+    fun <A, B> apC(fa: HK<F, HK<G, A>>, ff: HK<F, HK<G, (A) -> B>>): HK<F, HK<G, B>> = ap(fa.lift(), ff.lift()).lower()
+
+    companion object {
+        inline operator fun <reified F, reified G> invoke(FF: Applicative<F> = applicative<F>(), GF: Applicative<G> = applicative<G>())
+                : Applicative<ComposedType<F, G>> =
+                object : ComposedApplicative<F, G> {
+                    override fun F(): Applicative<F> = FF
+
+                    override fun G(): Applicative<G> = GF
+                }
+    }
+}
+
+inline fun <reified F, reified G> Applicative<F>.compose(GA: Applicative<G> = applicative<G>()): Applicative<ComposedType<F, G>> = ComposedApplicative(this, GA)
+
+interface ComposedFunctorFilter<F, G> : FunctorFilter<ComposedType<F, G>>, ComposedFunctor<F, G> {
+
+    override fun F(): Functor<F>
+    override fun G(): FunctorFilter<G>
+
+    override fun <A, B> mapFilter(fga: HK<ComposedType<F, G>, A>, f: (A) -> Option<B>): HK<ComposedType<F, G>, B> =
+            F().map(fga.lower(), { G().mapFilter(it, f) }).lift()
+
+    fun <A, B> mapFilterC(fga: HK<F, HK<G, A>>, f: (A) -> Option<B>): HK<F, HK<G, B>> =
+            mapFilter(fga.lift(), f).lower()
+
+    companion object {
+        inline operator fun <reified F, reified G> invoke(FF: Functor<F> = functor(), FFG: FunctorFilter<G> = functorFilter()): ComposedFunctorFilter<F, G> =
+                object : ComposedFunctorFilter<F, G> {
+                    override fun F(): Functor<F> = FF
+
+                    override fun G(): FunctorFilter<G> = FFG
+                }
+    }
+}
+
+inline fun <reified F, reified G> Functor<F>.composeFilter(FFG: FunctorFilter<G> = functorFilter()):
+        FunctorFilter<ComposedType<F, G>> = ComposedFunctorFilter(this, FFG)
