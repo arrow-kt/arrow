@@ -146,3 +146,24 @@ interface ComposedApplicative<F, G> : Applicative<ComposedType<F, G>>, ComposedF
 }
 
 inline fun <reified F, reified G> Applicative<F>.compose(GA: Applicative<G> = applicative<G>()): Applicative<ComposedType<F, G>> = ComposedApplicative(this, GA)
+
+interface ComposedFunctorFilter<F, G> : FunctorFilter<ComposedType<F, G>>, ComposedFunctor<F, G> {
+
+    override fun F(): Functor<F>
+    override fun G(): FunctorFilter<G>
+
+    override fun <A, B> mapFilter(fga: HK<ComposedType<F, G>, A>, f: (A) -> Option<B>): HK<ComposedType<F, G>, B> =
+            F().map(fga.lower(), { G().mapFilter(it, f) }).lift()
+
+    companion object {
+        inline operator fun <reified F, reified G> invoke(FF: Functor<F> = functor(), FFG: FunctorFilter<G> = functorFilter()): ComposedFunctorFilter<F, G> =
+                object : ComposedFunctorFilter<F, G> {
+                    override fun F(): Functor<F> = FF
+
+                    override fun G(): FunctorFilter<G> = FFG
+                }
+    }
+}
+
+inline fun <reified F, reified G> Functor<F>.composeFilter(FFG: FunctorFilter<G> = functorFilter()):
+        FunctorFilter<ComposedType<F, G>> = ComposedFunctorFilter(this, FFG)
