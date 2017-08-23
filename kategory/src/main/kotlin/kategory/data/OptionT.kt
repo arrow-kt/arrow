@@ -46,10 +46,8 @@ package kategory
             override fun F(): Monad<F> = MF
         }
 
-        inline fun <reified F> functorFilter(MF: Monad<F> = kategory.monad<F>(), FF: Functor<F> = kategory.functor()): FunctorFilter<OptionTKindPartial<F>> =
+        inline fun <reified F> functorFilter(MF: Monad<F> = kategory.monad<F>()): FunctorFilter<OptionTKindPartial<F>> =
                 object : OptionTFunctor<F> {
-                    override fun FF(): Functor<F> = FF
-
                     override fun MF(): Monad<F> = MF
                 }
     }
@@ -107,5 +105,5 @@ package kategory
     //TODO: add toRight() and toLeft() once EitherT it's available
 }
 
-inline fun <F, A, B> OptionT<F, A>.mapFilter(crossinline f: (A) -> Option<B>, FF: Functor<F>, MF: Monad<F>): OptionT<F, B> =
-        OptionT(MF, FF.map(value, { it.flatMap(f) }))
+inline fun <F, A, B> OptionT<F, A>.mapFilter(crossinline f: (A) -> Option<B>, MF: Monad<F>): OptionT<F, B> =
+        OptionT(MF, MF.map(value, { it.flatMap(f) }))
