@@ -1,5 +1,7 @@
 package kategory
 
+@Suppress("UNCHECKED_CAST") inline fun <F, A> OptionTKind<F, A>.value(): HK<F, Option<A>> = (this as OptionT<F, A>).value
+
 /**
  * [OptionT]`<F, A>` is a light wrapper on an `F<`[Option]`<A>>` with some
  * convenient methods for working with this nested structure.
