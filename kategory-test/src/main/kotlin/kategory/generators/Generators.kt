@@ -58,5 +58,8 @@ fun genIntPredicate(): Gen<(Int) -> Boolean> =
 
 fun <B> genOption(genB: Gen<B>): Gen<Option<B>> =
         object : Gen<Option<B>> {
-            override fun generate(): Option<B> = Option.pure(genB.generate())
+            override fun generate(): Option<B> {
+                val random = genIntSmall().generate()
+                return if (random % 20 == 0) Option.None else Option.pure(genB.generate())
+            }
         }
