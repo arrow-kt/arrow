@@ -55,11 +55,9 @@ interface OptionTMonoidK<F> : MonoidK<OptionTKindPartial<F>>, OptionTSemigroupK<
 
 interface OptionTFunctor<F> : FunctorFilter<OptionTKindPartial<F>> {
 
-    fun FF(): Functor<F>
-
     fun MF(): Monad<F>
 
     override fun <A, B> map(fa: HK<OptionTKindPartial<F>, A>, f: (A) -> B): OptionT<F, B> = fa.ev().map(f)
 
-    override fun <A, B> mapFilter(fa: HK<OptionTKindPartial<F>, A>, f: (A) -> Option<B>): OptionT<F, B> = fa.ev().mapFilter(f, FF(), MF())
+    override fun <A, B> mapFilter(fa: HK<OptionTKindPartial<F>, A>, f: (A) -> Option<B>): OptionT<F, B> = fa.ev().mapFilter(f, MF())
 }
