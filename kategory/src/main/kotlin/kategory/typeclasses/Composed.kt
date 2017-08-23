@@ -40,10 +40,10 @@ interface ComposedFoldable<in F, in G> :
 
 inline fun <F, reified G> Foldable<F>.compose(GT: Foldable<G> = foldable<G>()): ComposedFoldable<F, G> = object :
         ComposedFoldable<F, G> {
-            override fun FF(): Foldable<F> = this@compose
+    override fun FF(): Foldable<F> = this@compose
 
-            override fun GF(): Foldable<G> = GT
-        }
+    override fun GF(): Foldable<G> = GT
+}
 
 interface ComposedTraverse<F, G> :
         Traverse<ComposedType<F, G>>,
@@ -103,6 +103,13 @@ interface ComposedSemigroupK<F, G> : SemigroupK<ComposedType<F, G>> {
     override fun <A> combineK(x: HK<ComposedType<F, G>, A>, y: HK<ComposedType<F, G>, A>): HK<ComposedType<F, G>, A> = F().combineK(x.lower(), y.lower()).lift()
 
     fun <A> combineKC(x: HK<F, HK<G, A>>, y: HK<F, HK<G, A>>): HK<ComposedType<F, G>, A> = combineK(x.lift(), y.lift())
+
+    companion object {
+        inline operator fun <reified F, reified G> invoke(SF: SemigroupK<F> = semigroupK<F>()): SemigroupK<ComposedType<F, G>> =
+                object : ComposedSemigroupK<F, G> {
+                    override fun F(): SemigroupK<F> = SF
+                }
+    }
 }
 
 inline fun <F, reified G> SemigroupK<F>.compose(): SemigroupK<ComposedType<F, G>> = object : ComposedSemigroupK<F, G> {
@@ -116,6 +123,13 @@ interface ComposedMonoidK<F, G> : MonoidK<ComposedType<F, G>>, ComposedSemigroup
     override fun <A> empty(): HK<ComposedType<F, G>, A> = F().empty<HK<G, A>>().lift()
 
     fun <A> emptyC(): HK<F, HK<G, A>> = empty<A>().lower()
+
+    companion object {
+        inline operator fun <reified F, reified G> invoke(MK: MonoidK<F> = monoidK<F>()): MonoidK<ComposedType<F, G>> =
+                object : ComposedMonoidK<F, G> {
+                    override fun F(): MonoidK<F> = MK
+                }
+    }
 }
 
 fun <F, G> MonoidK<F>.compose(): MonoidK<ComposedType<F, G>> = object : ComposedMonoidK<F, G> {
