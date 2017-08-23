@@ -9,7 +9,7 @@ import org.junit.runner.RunWith
 class WriterTTest : UnitSpec() {
     init {
 
-        testLaws(MonadLaws.laws(WriterT.monad(NonEmptyList, IntMonoid), Eq.any()))
+        testLaws(MonadLaws.laws(WriterT.monad(NonEmptyList.monad(), IntMonoid), Eq.any()))
         testLaws(MonoidKLaws.laws<WriterTKindPartial<OptionHK, Int>>(
                 WriterT.monoidK(Option.monad(), OptionMonoidK()),
                 WriterT.applicative(Option.monad(), IntMonoid),

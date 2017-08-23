@@ -2,7 +2,7 @@ package kategory
 
 @higherkind
 @deriving(Monad::class, Traverse::class, MonoidK::class)
-data class ListKW<A> constructor(val list: List<A>) : ListKWKind<A>, List<A> by list {
+data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A> by list {
 
     fun <B> flatMap(f: (A) -> ListKWKind<B>): ListKW<B> = this.ev().list.flatMap { f(it).ev().list }.k()
 
@@ -29,8 +29,6 @@ data class ListKW<A> constructor(val list: List<A>) : ListKWKind<A>, List<A> by 
                     f(Tuple2(a, b))
                 }
             }.ev()
-
-    fun combineK(y: ListKWKind<A>): ListKW<A> = (this.list + y.ev().list).k()
 
     companion object {
 
@@ -76,5 +74,7 @@ data class ListKW<A> constructor(val list: List<A>) : ListKWKind<A>, List<A> by 
     }
 
 }
+
+fun <A> ListKW<A>.combineK(y: ListKWKind<A>): ListKW<A> = (this.list + y.ev().list).k()
 
 fun <A> List<A>.k(): ListKW<A> = ListKW(this)

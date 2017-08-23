@@ -15,7 +15,7 @@ class OptionTTest : UnitSpec() {
             }
         }
 
-        testLaws(MonadLaws.laws(OptionT.monad(NonEmptyList), Eq.any()))
+        testLaws(MonadLaws.laws(OptionT.monad(NonEmptyList.monad()), Eq.any()))
         testLaws(TraverseLaws.laws(OptionT.traverse(), OptionT.applicative(Id.monad()), { OptionT(Id(it.some())) }, Eq.any()))
         testLaws(SemigroupKLaws.laws(
                 OptionT.semigroupK(Id.monad()),
@@ -75,7 +75,7 @@ class OptionTTest : UnitSpec() {
         }
 
         "OptionTMonad.binding should for comprehend over option" {
-            val M = OptionT.monad(NonEmptyList)
+            val M = OptionT.monad(NonEmptyList.monad())
             val result = M.binding {
                 val x = M.pure(1).bind()
                 val y = bind { M.pure(1) }
@@ -91,7 +91,7 @@ class OptionTTest : UnitSpec() {
         }
 
         "Cartesian builder works inside for comprehensions" {
-            val M = OptionT.monad(NonEmptyList)
+            val M = OptionT.monad(NonEmptyList.monad())
             val result = M.binding {
                 val (x, y, z) = M.tupled(M.pure(1), M.pure(1), M.pure(1)).bind()
                 val a = bind { M.pure(1) }
