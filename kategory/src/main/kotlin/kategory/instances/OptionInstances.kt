@@ -76,13 +76,3 @@ interface OptionInstances :
 
 }
 
-object OptionSemigroupK : SemigroupK<OptionHK> {
-    override fun <A> combineK(x: HK<OptionHK, A>, y: HK<OptionHK, A>): Option<A> = x.ev().flatMap { y.ev() }
-}
-
-object OptionMonoidK : MonoidK<OptionHK>, GlobalInstance<ApplicativeError<OptionHK, Unit>>() {
-    override fun <A> combineK(x: HK<OptionHK, A>, y: HK<OptionHK, A>): Option<A> = x.ev().flatMap { y.ev() }
-
-    override fun <A> empty(): HK<OptionHK, A> = Option.None
-}
-

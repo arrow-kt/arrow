@@ -23,10 +23,6 @@ package kategory
 
         fun monadError(): MonadError<OptionHK, Unit> = this
 
-        fun semigroupK(): SemigroupK<OptionHK> = OptionSemigroupK
-
-        fun monoidK(): MonoidK<OptionHK> = OptionMonoidK
-
         fun foldable(): Foldable<OptionHK> = this
 
         fun traverse(): Traverse<OptionHK> = this
