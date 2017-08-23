@@ -11,9 +11,8 @@ class OptionTTest : UnitSpec() {
     init {
 
         val OptionTFIdEq = object : Eq<HK<OptionTKindPartial<IdHK>, Int>> {
-            override fun eqv(a: HK<OptionTKindPartial<IdHK>, Int>, b: HK<OptionTKindPartial<IdHK>, Int>): Boolean {
-                return a.ev().value == b.ev().value
-            }
+            override fun eqv(a: HK<OptionTKindPartial<IdHK>, Int>, b: HK<OptionTKindPartial<IdHK>, Int>): Boolean =
+                    a.ev().value == b.ev().value
         }
 
         testLaws(MonadLaws.laws(OptionT.monad(NonEmptyList), Eq.any()))
@@ -24,11 +23,9 @@ class OptionTTest : UnitSpec() {
                 OptionTFIdEq))
 
         testLaws(MonoidKLaws.laws(
-                OptionT.monoidK(Option),
-                OptionT.applicative(Option),
-                OptionT.invoke(Option(Option(1)), Option.monad()),
-                Eq.any(),
-                Eq.any()))
+                OptionT.monoidK(Id),
+                OptionT.applicative(Id),
+                OptionTFIdEq))
 
         testLaws(FunctorFilterLaws.laws(
                 OptionT.functorFilter(),
