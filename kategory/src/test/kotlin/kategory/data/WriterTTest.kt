@@ -14,8 +14,8 @@ class WriterTTest : UnitSpec() {
         testLaws(MonoidKLaws.laws(
                 WriterT.monoidK<ListKWHK, Int>(ListKW.monad(), ListKW.monoidK()),
                 WriterT.applicative(ListKW.monad(), IntMonoid),
-                object : Eq<HK<WriterTKindPartial<ListKWHK, Int>, Int>> {
-                    override fun eqv(a: HK<WriterTKindPartial<ListKWHK, Int>, Int>, b: HK<WriterTKindPartial<ListKWHK, Int>, Int>): Boolean =
+                object : Eq<WriterTKind<ListKWHK, Int, Int>> {
+                    override fun eqv(a: WriterTKind<ListKWHK, Int, Int>, b: WriterTKind<ListKWHK, Int, Int>): Boolean =
                             a.value() == b.value()
                 }))
 
@@ -33,7 +33,7 @@ class WriterTTest : UnitSpec() {
         "tell should accumulate write" {
             forAll { a: Int ->
                 val right = WriterT(Id(NonEmptyList.of(a) toT a))
-                val mapped = right.tell(NonEmptyList.of(a), NonEmptyList.semigroup<Int>()).value.ev()
+                val mapped = right.tell(NonEmptyList.of(a), NonEmptyList.semigroup()).value.ev()
                 val expected = WriterT(Id(NonEmptyList.of(a, a) toT a)).value.ev()
 
                 expected == mapped
