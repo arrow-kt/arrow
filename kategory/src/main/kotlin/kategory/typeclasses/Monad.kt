@@ -40,7 +40,8 @@ inline fun <reified F, A, B> HK<F, A>.flatMap(FT: Monad<F> = monad(), noinline f
 inline fun <reified F, A> HK<F, HK<F, A>>.flatten(FT: Monad<F> = monad()): HK<F, A> = FT.flatten(this)
 
 @RestrictsSuspension
-open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineContext = EmptyCoroutineContext) : Serializable, Continuation<HK<F, A>>, Monad<F> by M {
+open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
+        Serializable, Continuation<HK<F, A>>, Monad<F> by M {
 
     override fun resume(value: HK<F, A>) {
         returnedMonad = value
