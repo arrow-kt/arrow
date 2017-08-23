@@ -7,11 +7,11 @@ test {
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
-    compile "com.github.kategory.kategory-annotations:kategory-annotations:rr-typeclass-deps-SNAPSHOT"
-    kapt "com.github.kategory.kategory-annotations:kategory-annotations-compile:rr-typeclass-deps-SNAPSHOT"
-    kaptTest "com.github.kategory.kategory-annotations:kategory-annotations-compile:rr-typeclass-deps-SNAPSHOT"
-    compileOnly "com.github.kategory.kategory-annotations:kategory-annotations-compile:rr-typeclass-deps-SNAPSHOT"
-    testCompileOnly "com.github.kategory.kategory-annotations:kategory-annotations-compile:rr-typeclass-deps-SNAPSHOT"
+    compile "io.kategory:annotations:$kategoryAnnotationsVersion"
+    kapt "io.kategory:compile-time:$kategoryAnnotationsVersion"
+    kaptTest "io.kategory:compile-time:$kategoryAnnotationsVersion"
+    compileOnly "io.kategory:compile-time:$kategoryAnnotationsVersion"
+    testCompileOnly "io.kategory:compile-time:$kategoryAnnotationsVersion"
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
     testCompile project(':kategory-test')
 }
