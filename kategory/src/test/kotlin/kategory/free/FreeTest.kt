@@ -42,14 +42,14 @@ class FreeTest : UnitSpec() {
 
         "Can interpret an ADT as Free operations" {
             program.foldMap(optionInterpreter, Option.monad()).ev() shouldBe Option.Some(-30)
-            program.foldMap(idInterpreter, Id).ev() shouldBe Id(-30)
+            program.foldMap(idInterpreter, Id.monad()).ev() shouldBe Id(-30)
             program.foldMap(nonEmptyListInterpreter, NonEmptyList).ev() shouldBe NonEmptyList.of(-30)
         }
 
         "foldMap is stack safe" {
             val n = 50000
             val hugeProg = stackSafeTestProgram(0, n)
-            hugeProg.foldMap(idInterpreter, Id).value() shouldBe n
+            hugeProg.foldMap(idInterpreter, Id.monad()).value() shouldBe n
         }
 
     }

@@ -156,13 +156,13 @@ class WriterTTest : UnitSpec() {
             forAll { a: Int ->
                 val x = { b: Int -> WriterT.pure<IdHK, Int, Int>(b * a) }
                 val option = WriterT.pure<IdHK, Int, Int>(a)
-                option.flatMap(x, IntMonoid) == WriterT.monad(Id, IntMonoid).flatMap(option, x)
+                option.flatMap(x, IntMonoid) == WriterT.monad(Id.monad(), IntMonoid).flatMap(option, x)
             }
         }
 
         "WriterTMonad#tailRecM should execute and terminate without blowing up the stack" {
             forAll { a: Int ->
-                val value: WriterT<IdHK, Int, Int> = WriterT.monad(Id, IntMonoid).tailRecM(a) { b ->
+                val value: WriterT<IdHK, Int, Int> = WriterT.monad(Id.monad(), IntMonoid).tailRecM(a) { b ->
                     WriterT.pure<IdHK, Int, Either<Int, Int>>(Either.Right(b * a))
                 }.ev()
                 val expected = WriterT.pure<IdHK, Int, Int>(a * a)

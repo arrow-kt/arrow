@@ -16,10 +16,10 @@ class OptionTTest : UnitSpec() {
         }
 
         testLaws(MonadLaws.laws(OptionT.monad(NonEmptyList), Eq.any()))
-        testLaws(TraverseLaws.laws(OptionT.traverse(), OptionT.applicative(Id), { OptionT(Id(it.some())) }, Eq.any()))
+        testLaws(TraverseLaws.laws(OptionT.traverse(), OptionT.applicative(Id.monad()), { OptionT(Id(it.some())) }, Eq.any()))
         testLaws(SemigroupKLaws.laws(
-                OptionT.semigroupK(Id),
-                OptionT.applicative(Id),
+                OptionT.semigroupK(Id.monad()),
+                OptionT.applicative(Id.monad()),
                 OptionTFIdEq))
 
         testLaws(MonoidKLaws.laws(
@@ -70,7 +70,7 @@ class OptionTTest : UnitSpec() {
             forAll { a: Int ->
                 val x = { b: Int -> OptionT.pure<IdHK, Int>(b * a) }
                 val option = OptionT.pure<IdHK, Int>(a)
-                option.flatMap(x) == OptionT.monad(Id).flatMap(option, x)
+                option.flatMap(x) == OptionT.monad(Id.monad()).flatMap(option, x)
             }
         }
 
@@ -85,7 +85,7 @@ class OptionTTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over option" {
-            OptionT.applicative(Id).map(OptionT.pure(1), OptionT.pure("a"), OptionT.pure(true), { (a, b, c) ->
+            OptionT.applicative(Id.monad()).map(OptionT.pure(1), OptionT.pure("a"), OptionT.pure(true), { (a, b, c) ->
                 "$a $b $c"
             }) shouldBe OptionT.pure<IdHK, String>("1 a true")
         }

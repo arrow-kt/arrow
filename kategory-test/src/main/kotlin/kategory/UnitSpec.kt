@@ -11,7 +11,8 @@ abstract class UnitSpec : StringSpec() {
     companion object {
         init {
             // To get the instances before tests are initialized the following global typeclasses are preloaded
-            Id
+            Id.bimonad()
+            Id.traverse()
             NonEmptyList
             Option.functor()
             Option.applicative()

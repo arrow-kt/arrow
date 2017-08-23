@@ -8,12 +8,12 @@ import org.junit.runner.RunWith
 class IdTest : UnitSpec() {
     init {
 
-        testLaws(MonadLaws.laws(Id, Eq.any()))
-        testLaws(TraverseLaws.laws(Id, Id, ::Id, Eq.any()))
-        testLaws(ComonadLaws.laws(Id, ::Id, Eq.any()))
+        testLaws(MonadLaws.laws(Id.monad(), Eq.any()))
+        testLaws(TraverseLaws.laws(Id.traverse(), Id.functor(), ::Id, Eq.any()))
+        testLaws(ComonadLaws.laws(Id.comonad(), ::Id, Eq.any()))
 
         "IdMonad.binding should for comprehend over all values of multiple Ids" {
-            Id.binding {
+            Id.monad().binding {
                 val x = Id(1).bind()
                 val y = bind { Id(2) }
                 yields(x + y)
@@ -21,7 +21,7 @@ class IdTest : UnitSpec() {
         }
 
         "IdComonad.cobinding should for comprehend over all values of multiple Ids" {
-            Id.cobinding {
+            Id.comonad().cobinding {
                 val x = Id(1).extract()
                 val y = extract { Id(2) }
                 x + y
@@ -29,7 +29,7 @@ class IdTest : UnitSpec() {
         }
 
         "IdComonad.duplicate should create an instance of Id<Id<A>>" {
-            Id.duplicate(Id(3)) shouldBe Id(Id(3))
+            Id.comonad().duplicate(Id(3)) shouldBe Id(Id(3))
         }
     }
 }
