@@ -2,15 +2,15 @@ package kategory
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
+import io.kotlintest.matchers.should
 import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldThrow
 import io.kotlintest.properties.forAll
 import kategory.Option.None
 import kategory.Option.Some
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class OptionTest: UnitSpec() {
+class OptionTest : UnitSpec() {
 
     init {
 
@@ -86,14 +86,49 @@ class OptionTest: UnitSpec() {
             }
         }
 
+        "Option.functor.void should return Unit" {
+            forAll { a: Int ->
+                Option.void(Option(a)) == Some(Unit)
+            }
+        }
+
+        "Option.functor.as should change its value" {
+            forAll { a: Int ->
+                Option.`as`(Option("1"), a) == Some(a)
+            }
+        }
+
+        "Option.functor.fproduct should return a tuple of the current value and the transformed" {
+            forAll { a: Int ->
+                Option.fproduct(Option(a), { it + 1 }) == Some(Tuple2(a, a + 1))
+            }
+        }
+
+        "Option.functor.tupleLeft should return a tuple the current value and the value passed" {
+            forAll { a: Int ->
+                Option.tupleLeft(Option(a), a + 1) == Some(Tuple2(a + 1, a))
+            }
+        }
+
+        "Option.functor.tupleRight should return a tuple the current value and the value passed" {
+            forAll { a: Int ->
+                Option.tupleRigth(Option(a), a + 1) == Some(Tuple2(a, a + 1))
+            }
+        }
+
+        "Option.functor.widen should cast the result to other super type" {
+            val x: Option<Any> = Option.widen(Option("1")).ev()
+
+            x should { x -> x is Option<Any> }
+        }
+
         "Option.monad.binding should for comprehend over option" {
             val result = Option.binding {
-                val x = !Option(1)
-                val y = Option(1).bind()
-                val z = bind { Option(1) }
-                yields(x + y + z)
+                val x = Option(1).bind()
+                val y = bind { Option(1) }
+                yields(x + y)
             }
-            result shouldBe Option(3)
+            result shouldBe Option(2)
         }
 
         "Cartesian builder should build products over option" {
@@ -104,12 +139,11 @@ class OptionTest: UnitSpec() {
 
         "Cartesian builder works inside for comprehensions" {
             val result = Option.binding {
-                val (x, y, z) = !Option.tupled(Option(1), Option(1), Option(1))
-                val a = Option(1).bind()
-                val b = bind { Option(1) }
-                yields(x + y + z + a + b)
+                val (x, y, z) = Option.tupled(Option(1), Option(1), Option(1)).bind()
+                val a = bind { Option(1) }
+                yields(x + y + z + a)
             }
-            result shouldBe Option(5)
+            result shouldBe Option(4)
         }
 
     }

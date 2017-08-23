@@ -1,10 +1,10 @@
 package kategory
 
 interface EitherTInstances<F, L> :
-        Functor<EitherTF<F, L>>,
-        Applicative<EitherTF<F, L>>,
-        Monad<EitherTF<F, L>>,
-        MonadError<EitherTF<F, L>, L> {
+        Functor<EitherTKindPartial<F, L>>,
+        Applicative<EitherTKindPartial<F, L>>,
+        Monad<EitherTKindPartial<F, L>>,
+        MonadError<EitherTKindPartial<F, L>, L> {
 
     fun MF(): Monad<F>
 
@@ -14,7 +14,7 @@ interface EitherTInstances<F, L> :
 
     override fun <A, B> flatMap(fa: EitherTKind<F, L, A>, f: (A) -> EitherTKind<F, L, B>): EitherT<F, L, B> = fa.ev().flatMap { f(it).ev() }
 
-    override fun <A, B> tailRecM(a: A, f: (A) -> HK<EitherTF<F, L>, Either<A, B>>): EitherT<F, L, B> =
+    override fun <A, B> tailRecM(a: A, f: (A) -> HK<EitherTKindPartial<F, L>, Either<A, B>>): EitherT<F, L, B> =
             EitherT(MF(), MF().tailRecM(a, {
                 MF().map(f(it).ev().value) { recursionControl ->
                     when (recursionControl) {
@@ -43,25 +43,26 @@ interface EitherTInstances<F, L> :
 }
 
 interface EitherTTraverse<F, A> :
-        Foldable<EitherTF<F, A>>,
-        Traverse<EitherTF<F, A>> {
+        Foldable<EitherTKindPartial<F, A>>,
+        Traverse<EitherTKindPartial<F, A>> {
 
     fun FF(): Traverse<F>
 
     fun MF(): Monad<F>
 
-    override fun <G, B, C> traverse(fa: HK<EitherTF<F, A>, B>, f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, HK<EitherTF<F, A>, C>> = fa.ev().traverse(f, GA, FF(), MF())
+    override fun <G, B, C> traverse(fa: HK<EitherTKindPartial<F, A>, B>, f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, HK<EitherTKindPartial<F, A>, C>> =
+            fa.ev().traverse(f, GA, FF(), MF())
 
-    override fun <B, C> foldL(fa: HK<EitherTF<F, A>, B>, b: C, f: (C, B) -> C): C = fa.ev().foldL(b, f, FF())
+    override fun <B, C> foldL(fa: HK<EitherTKindPartial<F, A>, B>, b: C, f: (C, B) -> C): C = fa.ev().foldL(b, f, FF())
 
-    override fun <B, C> foldR(fa: HK<EitherTF<F, A>, B>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> = fa.ev().foldR(lb, f, FF())
+    override fun <B, C> foldR(fa: HK<EitherTKindPartial<F, A>, B>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> = fa.ev().foldR(lb, f, FF())
 
 }
 
-interface EitherTSemigroupK<F, L> : SemigroupK<EitherTF<F, L>> {
+interface EitherTSemigroupK<F, L> : SemigroupK<EitherTKindPartial<F, L>> {
     fun F(): Monad<F>
 
-    override fun <A> combineK(x: HK<EitherTF<F, L>, A>, y: HK<EitherTF<F, L>, A>): EitherT<F, L, A> =
+    override fun <A> combineK(x: HK<EitherTKindPartial<F, L>, A>, y: HK<EitherTKindPartial<F, L>, A>): EitherT<F, L, A> =
             EitherT(F(), F().flatMap(x.ev().value) {
                 when (it) {
                     is Either.Left -> y.ev().value

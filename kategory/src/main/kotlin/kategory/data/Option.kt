@@ -13,6 +13,8 @@ package kategory
 
         operator fun <A> invoke(a: A): Option<A> = Option.Some(a)
 
+        fun <A> empty() : Option<A> = None
+
         fun functor(): Functor<OptionHK> = this
 
         fun applicative(): Applicative<OptionHK> = this

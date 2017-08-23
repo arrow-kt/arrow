@@ -1,7 +1,5 @@
 package kategory
 
-typealias EitherF<L> = HK<EitherHK, L>
-
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Either.scala
  *
@@ -101,8 +99,8 @@ typealias EitherF<L> = HK<EitherHK, L>
      * The left side of the disjoint union, as opposed to the [Right] side.
      */
     data class Left<out A, out B>(val a: A, private val dummy: Unit) : Either<A, B>() {
-        override internal val isLeft = true
-        override internal val isRight = false
+        override val isLeft = true
+        override val isRight = false
 
         companion object {
             inline operator fun <A> invoke(a: A): Either<A, Nothing> = Left(a, Unit)
@@ -113,8 +111,8 @@ typealias EitherF<L> = HK<EitherHK, L>
      * The right side of the disjoint union, as opposed to the [Left] side.
      */
     data class Right<out A, out B>(val b: B, private val dummy: Unit) : Either<A, B>() {
-        override internal val isLeft = false
-        override internal val isRight = true
+        override val isLeft = false
+        override val isRight = true
 
         companion object {
             inline operator fun <B> invoke(b: B): Either<Nothing, B> = Right(b, Unit)
@@ -125,20 +123,20 @@ typealias EitherF<L> = HK<EitherHK, L>
 
         fun <L> instances(): EitherInstances<L> = object : EitherInstances<L> {}
 
-        fun <L> functor(): Functor<EitherF<L>> = instances()
+        fun <L> functor(): Functor<EitherKindPartial<L>> = instances()
 
-        fun <L> applicative(): Applicative<EitherF<L>> = instances()
+        fun <L> applicative(): Applicative<EitherKindPartial<L>> = instances()
 
-        fun <L> monad(): Monad<EitherF<L>> = instances()
+        fun <L> monad(): Monad<EitherKindPartial<L>> = instances()
 
-        fun <L> foldable(): Foldable<EitherF<L>> = instances()
+        fun <L> foldable(): Foldable<EitherKindPartial<L>> = instances()
 
-        fun <L> traverse(): Traverse<EitherF<L>> = instances()
+        fun <L> traverse(): Traverse<EitherKindPartial<L>> = instances()
 
-        fun <L> monadError(): MonadError<EitherF<L>, L> = instances()
+        fun <L> monadError(): MonadError<EitherKindPartial<L>, L> = instances()
 
-        fun <L> semigroupK(): SemigroupK<EitherF<L>> = object : SemigroupK<EitherF<L>> {
-            override fun <A> combineK(x: HK<EitherF<L>, A>, y: HK<EitherF<L>, A>): Either<L, A> =
+        fun <L> semigroupK(): SemigroupK<EitherKindPartial<L>> = object : SemigroupK<EitherKindPartial<L>> {
+            override fun <A> combineK(x: HK<EitherKindPartial<L>, A>, y: HK<EitherKindPartial<L>, A>): Either<L, A> =
                     when (x) {
                         is Left -> y.ev()
                         else -> x.ev()
@@ -181,7 +179,8 @@ inline fun <B> Either<*, B>.getOrElse(crossinline default: () -> B): B = fold({ 
  * left.filterOrElse({ it > 10 }, { -1 })      // Result: Left(12)
  * ```
  */
-inline fun <A, B> Either<A, B>.filterOrElse(crossinline predicate: (B) -> Boolean, crossinline default: () -> A): Either<A, B> = fold({ Either.Left(it) }, { if (predicate(it)) Either.Right(it) else Either.Left(default()) })
+inline fun <A, B> Either<A, B>.filterOrElse(crossinline predicate: (B) -> Boolean, crossinline default: () -> A): Either<A, B> =
+        fold({ Either.Left(it) }, { if (predicate(it)) Either.Right(it) else Either.Left(default()) })
 
 /**
  * Returns `true` if this is a [Either.Right] and its value is equal to `elem` (as determined by `==`),

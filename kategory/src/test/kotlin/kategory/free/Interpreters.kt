@@ -1,27 +1,25 @@
 package kategory
 
-val cofreeOptionToNel: FunctionK<CofreeF<OptionHK>, NonEmptyListHK> = object : FunctionK<CofreeF<OptionHK>, NonEmptyListHK> {
-    override fun <A> invoke(fa: HK<CofreeF<OptionHK>, A>): HK<NonEmptyListHK, A> =
+val cofreeOptionToNel: FunctionK<CofreeKindPartial<OptionHK>, NonEmptyListHK> = object : FunctionK<CofreeKindPartial<OptionHK>, NonEmptyListHK> {
+    override fun <A> invoke(fa: HK<CofreeKindPartial<OptionHK>, A>): HK<NonEmptyListHK, A> =
             fa.ev().let { c ->
                 NonEmptyList.fromListUnsafe(listOf(c.head) + c.tailForced().ev().fold({ listOf<A>() }, { invoke(it).ev().all }))
             }
 }
 
-val cofreeListToNel: FunctionK<CofreeF<ListT.ListF>, NonEmptyListHK> = object : FunctionK<CofreeF<ListT.ListF>, NonEmptyListHK> {
-    override fun <A> invoke(fa: HK<CofreeF<ListT.ListF>, A>): HK<NonEmptyListHK, A> =
-            fa.ev().let { c: Cofree<ListT.ListF, A> ->
-                val all: List<Cofree<ListT.ListF, A>> = c.tailForced().lev().all
+val cofreeListToNel: FunctionK<CofreeKindPartial<ListKWHK>, NonEmptyListHK> = object : FunctionK<CofreeKindPartial<ListKWHK>, NonEmptyListHK> {
+    override fun <A> invoke(fa: HK<CofreeKindPartial<ListKWHK>, A>): HK<NonEmptyListHK, A> =
+            fa.ev().let { c: Cofree<ListKWHK, A> ->
+                val all: List<Cofree<ListKWHK, A>> = c.tailForced().ev()
                 val tail: List<A> = all.foldRight(listOf<A>(), { v, acc -> acc + invoke(v).ev().all })
                 val headL: List<A> = listOf(c.head)
                 NonEmptyList.fromListUnsafe(headL + tail)
             }
 }
 
-fun <A> HK<ListT.ListF, A>.lev() = this as ListT<A>
-
-val optionToList: FunctionK<OptionHK, ListT.ListF> = object : FunctionK<OptionHK, ListT.ListF> {
-    override fun <A> invoke(fa: HK<OptionHK, A>): HK<ListT.ListF, A> =
-            fa.ev().fold({ ListT(listOf()) }, { ListT(listOf(it)) })
+val optionToList: FunctionK<OptionHK, ListKWHK> = object : FunctionK<OptionHK, ListKWHK> {
+    override fun <A> invoke(fa: HK<OptionHK, A>): HK<ListKWHK, A> =
+            fa.ev().fold({ listOf<A>().k() }, { listOf(it).k() })
 }
 
 val optionInterpreter: FunctionK<Ops.F, OptionHK> = object : FunctionK<Ops.F, OptionHK> {

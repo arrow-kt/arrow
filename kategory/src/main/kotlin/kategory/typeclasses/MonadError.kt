@@ -39,7 +39,8 @@ fun <F, B> MonadError<F, Throwable>.bindingE(c: suspend MonadErrorContinuation<F
     val continuation = MonadErrorContinuation<F, B>(this)
     val f: suspend MonadErrorContinuation<F, *>.() -> HK<F, B> = { c() }
     f.startCoroutine(continuation, continuation)
-    return continuation.returnedMonad
+    return continuation.returnedMonad()
 }
 
-inline fun <reified F, reified E> monadError(): MonadError<F, E> = instance(InstanceParametrizedType(MonadError::class.java, listOf(F::class.java, E::class.java)))
+inline fun <reified F, reified E> monadError(): MonadError<F, E> =
+        instance(InstanceParametrizedType(MonadError::class.java, listOf(F::class.java, E::class.java)))

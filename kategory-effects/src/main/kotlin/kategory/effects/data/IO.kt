@@ -1,9 +1,9 @@
 package kategory
 
-import kategory.effects.internal.AndThen
-import kategory.effects.internal.Platform.onceOnly
-import kategory.effects.internal.Platform.unsafeResync
-import kategory.effects.internal.error
+import kategory.effects.data.internal.AndThen
+import kategory.effects.data.internal.Platform.onceOnly
+import kategory.effects.data.internal.Platform.unsafeResync
+import kategory.effects.data.internal.error
 
 @higherkind sealed class IO<out A> : IOKind<A> {
 
@@ -33,14 +33,14 @@ import kategory.effects.internal.error
     fun unsafeStep(): IO<A> {
         var current: IO<A> = this
         while (true) {
-            when (current) {
+            current = when (current) {
                 is Suspend -> {
-                    current = current.cont(Unit)
+                    current.cont(Unit)
                 }
                 is BindSuspend<*, A> -> {
                     val cont: IO<Any?> = current.cont(Unit)
                     val f: AndThen<Any?, IO<A>> = current.f as AndThen<Any?, IO<A>>
-                    current = cont.flatMapTotal(f)
+                    cont.flatMapTotal(f)
                 }
                 else -> return current
             }
@@ -60,8 +60,6 @@ import kategory.effects.internal.error
 
         operator fun <A> invoke(f: (Unit) -> A): IO<A> = suspend { Pure(f(Unit)) }
 
-        override fun <A> pure(a: A): IO<A> = Pure(a)
-
         fun <A> suspend(f: (Unit) -> IO<A>): IO<A> =
                 Suspend(AndThen { _ ->
                     try {
@@ -71,15 +69,13 @@ import kategory.effects.internal.error
                     }
                 })
 
-        fun <A> raiseError(throwable: Throwable): IO<A> = RaiseError(throwable)
-
         fun <A> async(k: ((Either<Throwable, A>) -> Unit) -> Unit): IO<A> =
                 Async { callBack ->
-                    onceOnly(callBack).let {
+                    onceOnly(callBack).let { ff: (Either<Throwable, A>) -> Unit ->
                         try {
-                            k(it)
+                            k(ff)
                         } catch (throwable: Throwable) {
-                            it(Either.Left(throwable))
+                            ff(Either.Left(throwable))
                         }
                     }
                 }
@@ -153,7 +149,8 @@ internal data class Suspend<out A>(val cont: AndThen<Unit, IO<A>>) : IO<A>() {
 internal data class BindSuspend<E, out A>(val cont: AndThen<Unit, IO<E>>, val f: AndThen<E, IO<A>>) : IO<A>() {
     override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
 
-    override fun <B> flatMapTotal(ff: AndThen<A, IO<B>>): IO<B> = BindSuspend(cont, f.andThen(AndThen({ it.flatMapTotal(ff) }, { ff.error(it, { RaiseError(it) }) })))
+    override fun <B> flatMapTotal(ff: AndThen<A, IO<B>>): IO<B> =
+            BindSuspend(cont, f.andThen(AndThen({ it.flatMapTotal(ff) }, { ff.error(it, { RaiseError(it) }) })))
 
     override fun attempt(): IO<Either<Throwable, A>> = BindSuspend(AndThen { _ -> this }, attemptValue())
 
@@ -177,7 +174,8 @@ internal data class Async<out A>(val cont: ((Either<Throwable, A>) -> Unit) -> U
 internal data class BindAsync<E, out A>(val cont: ((Either<Throwable, E>) -> Unit) -> Unit, val f: AndThen<E, IO<A>>) : IO<A>() {
     override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
 
-    override fun <B> flatMapTotal(ff: AndThen<A, IO<B>>): IO<B> = BindAsync(cont, f.andThen(AndThen({ it.flatMapTotal(ff) }, { ff.error(it, { RaiseError(it) }) })))
+    override fun <B> flatMapTotal(ff: AndThen<A, IO<B>>): IO<B> =
+            BindAsync(cont, f.andThen(AndThen({ it.flatMapTotal(ff) }, { ff.error(it, { RaiseError(it) }) })))
 
     override fun attempt(): IO<Either<Throwable, A>> = BindSuspend(AndThen { _ -> this }, attemptValue())
 

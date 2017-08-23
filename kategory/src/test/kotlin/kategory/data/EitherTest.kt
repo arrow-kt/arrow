@@ -16,8 +16,8 @@ class EitherTest : UnitSpec() {
         testLaws(SemigroupKLaws.laws(
                 Either.semigroupK(),
                 Either.applicative(),
-                object : Eq<HK<EitherF<IdHK>, Int>> {
-                    override fun eqv(a: HK<EitherF<IdHK>, Int>, b: HK<EitherF<IdHK>, Int>): Boolean =
+                object : Eq<HK<EitherKindPartial<IdHK>, Int>> {
+                    override fun eqv(a: HK<EitherKindPartial<IdHK>, Int>, b: HK<EitherKindPartial<IdHK>, Int>): Boolean =
                             a.ev() == b.ev()
                 }))
 
@@ -112,12 +112,11 @@ class EitherTest : UnitSpec() {
 
         "Either.monad.binding should for comprehend over right either" {
             val result = Either.monad<Int>().binding {
-                val x = !Either.Right(1)
-                val y = Either.Right(1).bind()
-                val z = bind { Either.Right(1) }
-                yields(x + y + z)
+                val x = Either.Right(1).bind()
+                val y = bind { Either.Right(1) }
+                yields(x + y)
             }
-            result shouldBe Either.Right(3)
+            result shouldBe Either.Right(2)
         }
     }
 }

@@ -1,120 +1,35 @@
 <?xml version="1.0" ?>
 <SmellBaseline>
-  <Blacklist timestamp="1490879306930"></Blacklist>
-  <Whitelist timestamp="1502238166427">
+  <Blacklist timestamp="1503308049178"></Blacklist>
+  <Whitelist timestamp="1503308097846">
     <ID>LabeledExpression:FunctionK.kt$&lt;no name provided&gt;$this@or</ID>
     <ID>LabeledExpression:PartialFunction.kt$&lt;no name provided&gt;$this@orElse</ID>
+    <ID>LabeledExpression:PartialFunction.kt$&lt;no name provided&gt;$this@orElse</ID>
+    <ID>LabeledExpression:PartialFunction.kt$&lt;no name provided&gt;$this@orElse</ID>
     <ID>LabeledExpression:PartialFunction.kt$&lt;no name provided&gt;$this@andThen</ID>
-    <ID>LabeledExpression:Composed.kt$&lt;no name provided&gt;$this@compose</ID>
+    <ID>LabeledExpression:PartialFunction.kt$&lt;no name provided&gt;$this@andThen</ID>
     <ID>LabeledExpression:Eval.kt$Eval.&lt;no name provided&gt;$this@Eval</ID>
     <ID>LabeledExpression:Eval.kt$Eval.&lt;no name provided&gt;.&lt;no name provided&gt;$this@Eval</ID>
-    <ID>LabeledExpression:Eval.kt$Eval.Call.Companion$break@loop</ID>
-    <ID>LabeledExpression:Eval.kt$Eval.Call.Companion$loop@ while (true) { when (lfa) { is Call -&gt; { lfa = lfa.thunk() } is Compute -&gt; { val clfa: Compute&lt;A&gt; = lfa object : Compute&lt;A&gt;() { override fun &lt;S&gt; start(): Eval&lt;S&gt; = clfa.start() override fun &lt;S&gt; run(s: S): Eval&lt;A&gt; { lfa = clfa.run(s) return lfa } } } else -&gt; break@loop } }</ID>
+    <ID>LabeledExpression:Eval.kt$Eval.&lt;no name provided&gt;$this@Eval</ID>
+    <ID>LabeledExpression:Eval.kt$Eval.&lt;no name provided&gt;$this@Eval</ID>
     <ID>LabeledExpression:Eval.kt$Eval.Compute$break@loop</ID>
     <ID>LabeledExpression:Eval.kt$Eval.Compute$loop@ while (true) { when (curr) { is Compute -&gt; { val currComp: Compute&lt;A&gt; = curr currComp.start&lt;A&gt;().let { cc -&gt; when (cc) { is Compute -&gt; { val inStartFun: (Any?) -&gt; Eval&lt;A&gt; = { cc.run(it) } val outStartFun: (Any?) -&gt; Eval&lt;A&gt; = { currComp.run(it) } curr = cc.start&lt;A&gt;() fs = listOf(inStartFun, outStartFun) + fs } else -&gt; { curr = currComp.run(cc.value()) } } } } else -&gt; if (fs.isNotEmpty()) { curr = fs[0](curr.value()) fs = fs.drop(1) } else { break@loop } } }</ID>
-    <ID>ComplexMethod:AndThen.kt$AndThen$ @Suppress("UNCHECKED_CAST") internal fun runLoop(_success: A?, _failure: Throwable?, _isSuccess: Boolean): B</ID>
     <ID>LabeledExpression:Yoneda.kt$Yoneda.&lt;no name provided&gt;$this@Yoneda</ID>
     <ID>LabeledExpression:ContinuationUtils.kt$this@label</ID>
     <ID>LabeledExpression:ContinuationUtils.kt$this@completion</ID>
     <ID>LabeledExpression:MonoidK.kt$MonoidK.&lt;no name provided&gt;$this@MonoidK</ID>
+    <ID>LabeledExpression:MonoidK.kt$MonoidK.&lt;no name provided&gt;$this@MonoidK</ID>
+    <ID>ComplexMethod:AndThen.kt$AndThen$ @Suppress("UNCHECKED_CAST") internal fun runLoop(_success: A?, _failure: Throwable?, _isSuccess: Boolean): B</ID>
     <ID>EmptyClassBlock:Typeclass.kt$&lt;no name provided&gt; : TypeLiteral</ID>
-    <ID>OptionalUnit:AndThen.kt$AndThen$Unit</ID>
-    <ID>OptionalUnit:IO.kt$IO$Unit</ID>
     <ID>OptionalUnit:FreeApplicative.kt$FreeApplicative$Unit</ID>
     <ID>OptionalUnit:Typeclass.kt$GlobalInstance$Unit</ID>
-    <ID>UnsafeCast:higherkindExtensions0.kt$this as Cofree&lt;S, A&gt;</ID>
-    <ID>UnsafeCast:higherkindExtensions1.kt$this as Cokleisli&lt;F, A, B&gt;</ID>
-    <ID>UnsafeCast:higherkindExtensions10.kt$this as Function1&lt;I, O&gt;</ID>
-    <ID>UnsafeCast:higherkindExtensions11.kt$this as Id&lt;A&gt;</ID>
-    <ID>UnsafeCast:higherkindExtensions12.kt$this as IO&lt;A&gt;</ID>
-    <ID>UnsafeCast:higherkindExtensions13.kt$this as Ior&lt;A, B&gt;</ID>
-    <ID>UnsafeCast:higherkindExtensions14.kt$this as Kleisli&lt;F, D, A&gt;</ID>
-    <ID>UnsafeCast:higherkindExtensions15.kt$this as NonEmptyList&lt;A&gt;</ID>
-    <ID>UnsafeCast:higherkindExtensions16.kt$this as Option&lt;A&gt;</ID>
-    <ID>UnsafeCast:higherkindExtensions17.kt$this as OptionT&lt;F, A&gt;</ID>
-    <ID>UnsafeCast:higherkindExtensions18.kt$this as StateT&lt;F, S, A&gt;</ID>
-    <ID>UnsafeCast:higherkindExtensions19.kt$this as Try&lt;A&gt;</ID>
-    <ID>UnsafeCast:higherkindExtensions2.kt$this as Coproduct&lt;F, G, A&gt;</ID>
-    <ID>UnsafeCast:higherkindExtensions20.kt$this as Validated&lt;E, A&gt;</ID>
-    <ID>UnsafeCast:higherkindExtensions21.kt$this as WriterT&lt;F, W, A&gt;</ID>
-    <ID>UnsafeCast:higherkindExtensions22.kt$this as Yoneda&lt;F, A&gt;</ID>
-    <ID>UnsafeCast:higherkindExtensions3.kt$this as Coyoneda&lt;F, P, A&gt;</ID>
-    <ID>UnsafeCast:higherkindExtensions4.kt$this as Either&lt;A, B&gt;</ID>
-    <ID>UnsafeCast:higherkindExtensions5.kt$this as EitherT&lt;F, A, B&gt;</ID>
-    <ID>UnsafeCast:higherkindExtensions6.kt$this as Eval&lt;A&gt;</ID>
-    <ID>UnsafeCast:higherkindExtensions7.kt$this as Free&lt;S, A&gt;</ID>
-    <ID>UnsafeCast:higherkindExtensions8.kt$this as FreeApplicative&lt;F, A&gt;</ID>
-    <ID>UnsafeCast:higherkindExtensions9.kt$this as Function0&lt;A&gt;</ID>
-    <ID>UnsafeCast:Function0.kt$this as Function0&lt;A&gt;</ID>
-    <ID>UnsafeCast:Composed.kt$this as HK&lt;ComposedType&lt;F, G&gt;, A&gt;</ID>
-    <ID>UnsafeCast:Composed.kt$this as HK&lt;F, HK&lt;G, A&gt;&gt;</ID>
-    <ID>UnsafeCast:Eval.kt$Eval.&lt;no name provided&gt;.&lt;no name provided&gt;$(this@Eval).run(s) as Eval&lt;S1&gt;</ID>
-    <ID>UnsafeCast:Eval.kt$Eval.&lt;no name provided&gt;.&lt;no name provided&gt;$s1 as A</ID>
-    <ID>UnsafeCast:Eval.kt$Eval.&lt;no name provided&gt;$this@Eval.thunk() as Eval&lt;S&gt;</ID>
-    <ID>UnsafeCast:Eval.kt$Eval.&lt;no name provided&gt;$s as A</ID>
-    <ID>UnsafeCast:Eval.kt$Eval.&lt;no name provided&gt;$this@Eval as Eval&lt;S&gt;</ID>
-    <ID>UnsafeCast:NonEmptyList.kt$NonEmptyList$other as NonEmptyList&lt;*&gt;</ID>
-    <ID>UnsafeCast:StateT.kt$this as StateT&lt;F, S, A&gt;</ID>
-    <ID>UnsafeCallOnNullableType:AndThen.kt$AndThen$failure!!</ID>
-    <ID>UnsafeCast:AndThen.kt$AndThen$this as AndThen&lt;Any?, Any?&gt;</ID>
-    <ID>UnsafeCast:AndThen.kt$AndThen$_right as AndThen&lt;Any?, Any?&gt;</ID>
-    <ID>UnsafeCast:AndThen.kt$AndThen$me as Concat&lt;Any?, Any?, Any?&gt;</ID>
-    <ID>UnsafeCast:AndThen.kt$AndThen$me as AndThen&lt;A, E&gt;</ID>
-    <ID>UnsafeCast:AndThen.kt$AndThen$self.left as AndThen&lt;Any?, Any?&gt;</ID>
-    <ID>UnsafeCast:AndThen.kt$AndThen$self.right as AndThen&lt;Any?, Any?&gt;</ID>
-    <ID>UnsafeCast:AndThen.kt$AndThen$success as B</ID>
-    <ID>UnsafeCast:IO.kt$IO$current.f as AndThen&lt;Any?, IO&lt;A&gt;&gt;</ID>
-    <ID>UnsafeCast:Coyoneda.kt$Coyoneda$curr as A</ID>
-    <ID>UnsafeCast:Coyoneda.kt$Coyoneda$f as AnyFunc</ID>
-    <ID>UnsafeCast:Coyoneda.kt$Coyoneda.Companion$f as AnyFunc</ID>
-    <ID>UnsafeCast:Free.kt$this as Free&lt;S, A&gt;</ID>
-    <ID>UnsafeCast:Free.kt$this.f as (A) -&gt; Free&lt;S, A&gt;</ID>
-    <ID>UnsafeCast:Free.kt$this.c.c as Free&lt;S, A&gt;</ID>
-    <ID>UnsafeCast:Free.kt$this.c.f as (A) -&gt; Free&lt;S, A&gt;</ID>
-    <ID>UnsafeCast:Free.kt$this.c.a as A</ID>
-    <ID>UnsafeCast:Free.kt$x.f as (A) -&gt; Free&lt;S, A&gt;</ID>
-    <ID>UnsafeCast:Free.kt$x.c as Free&lt;S, A&gt;</ID>
-    <ID>UnsafeCast:FreeApplicative.kt$this as FreeApplicative&lt;F, A&gt;</ID>
-    <ID>UnsafeCast:FreeApplicative.kt$FreeApplicative$argF as Ap&lt;F, Any?, Any?&gt;</ID>
-    <ID>UnsafeCast:FreeApplicative.kt$FreeApplicative$argF as FreeApplicative&lt;F, (Any?) -&gt; Any?&gt;</ID>
-    <ID>UnsafeCast:FreeApplicative.kt$FreeApplicative$res as HK&lt;G, (Any?) -&gt; Any?&gt;</ID>
-    <ID>UnsafeCast:FreeApplicative.kt$FreeApplicative$loop() as HK&lt;G, A&gt;</ID>
-    <ID>UnsafeCast:FreeApplicative.kt$node as FreeApplicative.Lift&lt;F, A&gt;</ID>
-    <ID>UnsafeCast:StateTInstances.kt$StateTInstances$fb as Eval&lt;StateT&lt;F, S, B&gt;&gt;</ID>
+    <ID>OptionalUnit:AndThen.kt$AndThen$Unit</ID>
+    <ID>OptionalUnit:AndThen.kt$AndThen$Unit</ID>
+    <ID>OptionalUnit:IO.kt$IO$Unit</ID>
     <ID>LateinitUsage:Comonad.kt$ComonadContinuation$internal lateinit var returnedMonad: A</ID>
-    <ID>UnsafeCast:ContinuationUtils.kt$completionField.get(this) as Continuation&lt;*&gt;</ID>
-    <ID>LateinitUsage:Monad.kt$MonadContinuation$internal lateinit var returnedMonad: HK&lt;F, A&gt;</ID>
-    <ID>LateinitUsage:Monad.kt$StackSafeMonadContinuation$internal lateinit var returnedMonad: Free&lt;F, A&gt;</ID>
-    <ID>UnsafeCast:Typeclass.kt$TypeLiteral$javaClass.genericSuperclass as ParameterizedType</ID>
-    <ID>UnsafeCast:Typeclass.kt$TypeLiteral$t as ParameterizedType</ID>
-    <ID>UnsafeCast:Typeclass.kt$GlobalInstances.getValue(t) as T</ID>
-    <ID>MaxLineLength:Kleisli.kt$kategory.Kleisli.kt</ID>
-    <ID>MaxLineLength:Composed.kt$kategory.Composed.kt</ID>
-    <ID>MaxLineLength:Coproduct.kt$kategory.Coproduct.kt</ID>
-    <ID>MaxLineLength:Either.kt$kategory.Either.kt</ID>
-    <ID>MaxLineLength:EitherT.kt$kategory.EitherT.kt</ID>
-    <ID>MaxLineLength:OptionT.kt$kategory.OptionT.kt</ID>
-    <ID>MaxLineLength:WriterT.kt$kategory.WriterT.kt</ID>
-    <ID>MaxLineLength:IO.kt$kategory.IO.kt</ID>
-    <ID>MaxLineLength:Free.kt$kategory.Free.kt</ID>
-    <ID>MaxLineLength:FreeApplicative.kt$kategory.FreeApplicative.kt</ID>
-    <ID>MaxLineLength:CoproductInstances.kt$kategory.CoproductInstances.kt</ID>
-    <ID>MaxLineLength:EitherInstances.kt$kategory.EitherInstances.kt</ID>
-    <ID>MaxLineLength:EitherTInstances.kt$kategory.EitherTInstances.kt</ID>
-    <ID>MaxLineLength:FreeApplicativeInstances.kt$kategory.FreeApplicativeInstances.kt</ID>
-    <ID>MaxLineLength:FreeInstances.kt$kategory.FreeInstances.kt</ID>
-    <ID>MaxLineLength:IorInstances.kt$kategory.IorInstances.kt</ID>
-    <ID>MaxLineLength:KleisliInstances.kt$kategory.KleisliInstances.kt</ID>
-    <ID>MaxLineLength:OptionTInstances.kt$kategory.OptionTInstances.kt</ID>
-    <ID>MaxLineLength:StateTInstances.kt$kategory.StateTInstances.kt</ID>
-    <ID>MaxLineLength:TryInstances.kt$kategory.TryInstances.kt</ID>
-    <ID>MaxLineLength:ValidatedInstances.kt$kategory.ValidatedInstances.kt</ID>
-    <ID>MaxLineLength:Applicative.kt$kategory.Applicative.kt</ID>
-    <ID>MaxLineLength:ApplicativeError.kt$kategory.ApplicativeError.kt</ID>
-    <ID>MaxLineLength:Foldable.kt$kategory.Foldable.kt</ID>
-    <ID>MaxLineLength:MonadError.kt$kategory.MonadError.kt</ID>
-    <ID>MaxLineLength:MonadReader.kt$kategory.MonadReader.kt</ID>
-    <ID>MaxLineLength:MonadState.kt$kategory.MonadState.kt</ID>
-    <ID>MaxLineLength:Traverse.kt$kategory.Traverse.kt</ID>
+    <ID>LateinitUsage:Monad.kt$MonadContinuation$protected lateinit var returnedMonad: HK&lt;F, A&gt;</ID>
+    <ID>LateinitUsage:Monad.kt$StackSafeMonadContinuation$protected lateinit var returnedMonad: Free&lt;F, A&gt;</ID>
+    <ID>UnsafeCallOnNullableType:AndThen.kt$AndThen$failure!!</ID>
+    <ID>UnsafeCallOnNullableType:AndThen.kt$AndThen$failure!!</ID>
   </Whitelist>
 </SmellBaseline>

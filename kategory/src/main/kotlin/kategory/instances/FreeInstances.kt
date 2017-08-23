@@ -1,9 +1,9 @@
 package kategory
 
 interface FreeInstances<S> :
-        Functor<FreeF<S>>,
-        Applicative<FreeF<S>>,
-        Monad<FreeF<S>> {
+        Functor<FreeKindPartial<S>>,
+        Applicative<FreeKindPartial<S>>,
+        Monad<FreeKindPartial<S>> {
 
     override fun <A> pure(a: A): Free<S, A> = Free.pure(a)
 
@@ -19,10 +19,11 @@ interface FreeInstances<S> :
         }
 }
 
-data class FreeEq<in F, in G, in A>(private val interpreter: FunctionK<F, G>, private val MG: Monad<G>) : Eq<HK<FreeF<F>, A>> {
-    override fun eqv(a: HK<FreeF<F>, A>, b: HK<FreeF<F>, A>): Boolean = a.ev().foldMap(interpreter, MG) == b.ev().foldMap(interpreter, MG)
+data class FreeEq<in F, in G, in A>(private val interpreter: FunctionK<F, G>, private val MG: Monad<G>) : Eq<HK<FreeKindPartial<F>, A>> {
+    override fun eqv(a: HK<FreeKindPartial<F>, A>, b: HK<FreeKindPartial<F>, A>): Boolean = a.ev().foldMap(interpreter, MG) == b.ev().foldMap(interpreter, MG)
 
     companion object {
-        inline operator fun <F, reified G, A> invoke(interpreter: FunctionK<F, G>, MG: Monad<G> = monad(), dummy: Unit = Unit): FreeEq<F, G, A> = FreeEq(interpreter, MG)
+        inline operator fun <F, reified G, A> invoke(interpreter: FunctionK<F, G>, MG: Monad<G> = monad(), dummy: Unit = Unit): FreeEq<F, G, A> =
+                FreeEq(interpreter, MG)
     }
 }
