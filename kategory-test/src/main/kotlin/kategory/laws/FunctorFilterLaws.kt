@@ -6,10 +6,10 @@ import kategory.*
 
 object FunctorFilterLaws {
 
-    inline fun <reified F> laws(AP: Applicative<F> = applicative(), FFF: FunctorFilter<F> = functorFilter(), EQ: Eq<HK<F, Int>>): List<Law> =
-            FunctorLaws.laws(AP, EQ) + listOf(
-                    Law("Functor Filter: mapFilter composition", { mapFilterComposition(FFF, AP::pure, EQ) }),
-                    Law("Functor Filter: mapFilter map consistency", { mapFilterMapConsistency(FFF, AP::pure, EQ) })
+    inline fun <reified F> laws(FFF: FunctorFilter<F> = functorFilter(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): List<Law> =
+            FunctorLaws.laws(FFF, cf, EQ) + listOf(
+                    Law("Functor Filter: mapFilter composition", { mapFilterComposition(FFF, cf, EQ) }),
+                    Law("Functor Filter: mapFilter map consistency", { mapFilterMapConsistency(FFF, cf, EQ) })
             )
 
     inline fun <reified F> mapFilterComposition(FFF: FunctorFilter<F> = functorFilter(), crossinline ff: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>> = Eq.any()): Unit =
