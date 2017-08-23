@@ -33,7 +33,10 @@ class OptionTTest : UnitSpec() {
         testLaws(FunctorFilterLaws.laws(
                 OptionT.applicative(Option),
                 OptionT.functorFilter(),
-                Eq.any()))
+                object : Eq<HK<OptionTKindPartial<OptionHK>, Int>>{
+                    override fun eqv(a: HK<OptionTKindPartial<OptionHK>, Int>, b: HK<OptionTKindPartial<OptionHK>, Int>): Boolean =
+                            a.ev().value == b.ev().value
+                }))
 
         "map should modify value" {
             forAll { a: String ->
