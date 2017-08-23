@@ -83,18 +83,19 @@ interface ComposedTraverse<F, G> :
     }
 }
 
-inline fun <reified F, reified G> Traverse<F>.compose(GT: Traverse<G> = traverse<G>(), GA: Applicative<G> = applicative<G>()): Traverse<ComposedType<F, G>> = object :
-        ComposedTraverse<F, G> {
-    override fun FF(): Foldable<F> = this@compose
+inline fun <reified F, reified G> Traverse<F>.compose(GT: Traverse<G> = traverse<G>(), GA: Applicative<G> = applicative<G>()): Traverse<ComposedType<F, G>> =
+        object :
+                ComposedTraverse<F, G> {
+            override fun FF(): Foldable<F> = this@compose
 
-    override fun GF(): Foldable<G> = GT
+            override fun GF(): Foldable<G> = GT
 
-    override fun FT(): Traverse<F> = this@compose
+            override fun FT(): Traverse<F> = this@compose
 
-    override fun GT(): Traverse<G> = GT
+            override fun GT(): Traverse<G> = GT
 
-    override fun GA(): Applicative<G> = GA
-}
+            override fun GA(): Applicative<G> = GA
+        }
 
 interface ComposedSemigroupK<F, G> : SemigroupK<ComposedType<F, G>> {
 
