@@ -11,11 +11,22 @@ abstract class UnitSpec : StringSpec() {
     companion object {
         init {
             // To get the instances before tests are initialized the following global typeclasses are preloaded
-            Id
+            Id.bimonad()
+            Id.traverse()
             NonEmptyList
-            Option
-            Try
-            Eval
+            Option.functor()
+            Option.applicative()
+            Option.monad()
+            Option.foldable()
+            Option.traverse()
+            Try.functor()
+            Try.monad()
+            Try.foldable()
+            Try.traverse()
+            Try.monadError()
+            Eval.functor()
+            Eval.applicative()
+            Eval.monad()
         }
     }
 

@@ -75,7 +75,7 @@ class CofreeTest : UnitSpec() {
             counter.counter shouldBe 1
         }
 
-        val startHundred: Cofree<OptionHK, Int> = unfold(0, { if (it == 100) None else Some(it + 1) }, Option)
+        val startHundred: Cofree<OptionHK, Int> = unfold(0, { if (it == 100) None else Some(it + 1) }, Option.functor())
 
         "mapBranchingRoot should modify the value of the functor" {
             val mapped = startHundred.mapBranchingRoot(object : FunctionK<OptionHK, OptionHK> {
@@ -87,8 +87,8 @@ class CofreeTest : UnitSpec() {
         }
 
         "mapBranchingS/T should recur over S and T respectively" {
-            val mappedS = startHundred.mapBranchingS(optionToList, ListKW)
-            val mappedT = startHundred.mapBranchingT(optionToList, ListKW)
+            val mappedS = startHundred.mapBranchingS(optionToList, ListKW.functor())
+            val mappedT = startHundred.mapBranchingT(optionToList, ListKW.functor())
             val expected = NonEmptyList.fromListUnsafe((0..100).toList())
             cofreeListToNel(mappedS) shouldBe expected
             cofreeListToNel(mappedT) shouldBe expected
@@ -97,7 +97,7 @@ class CofreeTest : UnitSpec() {
         "cata should traverse the structure" {
             val cata: NonEmptyList<Int> = startHundred.cata<OptionHK, Int, NonEmptyList<Int>>(
                     { i, lb -> Eval.now(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) },
-                    Option
+                    Option.traverse()
             ).value()
 
             val expected = NonEmptyList.fromListUnsafe((0..100).toList())
@@ -105,13 +105,13 @@ class CofreeTest : UnitSpec() {
             cata shouldBe expected
         }
 
-        val startTwoThousand: Cofree<OptionHK, Int> = unfold(0, { if (it == 2000) None else Some(it + 1) }, Option)
+        val startTwoThousand: Cofree<OptionHK, Int> = unfold(0, { if (it == 2000) None else Some(it + 1) }, Option.functor())
 
         "cata with an stack-unsafe monad should blow up the stack" {
             try {
                 startTwoThousand.cata<OptionHK, Int, NonEmptyList<Int>>(
                         { i, lb -> Eval.now(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) },
-                        Option
+                        Option.traverse()
                 ).value()
                 throw AssertionError("Run should overflow on a stack-unsafe monad")
             } catch (e: StackOverflowError) {
@@ -128,30 +128,14 @@ class CofreeTest : UnitSpec() {
                 override fun <A> invoke(fa: HK<EvalHK, A>): HK<EvalOptionF, A> =
                         OptionT(fa.ev().map { Some(it) })
             }
-            val cataHundred = startTwoThousand.cataM(folder, inclusion, Option, OptionT.monad(Eval)).ev().value.ev().value()
-            val newCof = Cofree(Option, 2001, Eval.now(Some(startTwoThousand)))
-            val cataHundredOne = newCof.cataM(folder, inclusion, Option, OptionT.monad(Eval)).ev().value.ev().value()
+            val cataHundred = startTwoThousand.cataM(folder, inclusion, Option.traverse(), OptionT.monad(Eval.monad())).ev().value.ev().value()
+            val newCof = Cofree(Option.functor(), 2001, Eval.now(Some(startTwoThousand)))
+            val cataHundredOne = newCof.cataM(folder, inclusion, Option.traverse(), OptionT.monad(Eval.monad())).ev().value.ev().value()
 
             cataHundred shouldBe Some(NonEmptyList.fromListUnsafe((0..2000).toList()))
             cataHundredOne shouldBe None
         }
 
-        "cofree should cobind correctly" {
-            val offset = 0
-            val limit = 10
-            val loops = SideEffect()
-            val program = Cofree.comonad<OptionHK>().cobinding {
-                val program = unfold(offset, {
-                    loops.increment()
-                    if (it == limit) None else Some(it + 1)
-                })
-                val value: Int = program.run().extract()
-                val tail: Int = program.runTail().extract()
-                value + tail
-            }
-            program shouldBe 0
-            loops.counter shouldBe limit + 1
-        }
     }
 }
 

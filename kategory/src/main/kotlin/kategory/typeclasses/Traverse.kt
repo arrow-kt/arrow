@@ -11,7 +11,7 @@ interface Traverse<F> : Functor<F>, Foldable<F>, Typeclass {
      */
     fun <G, A, B> traverse(fa: HK<F, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<F, B>>
 
-    override fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B> = traverse(fa, { Id(f(it)) }, Id).value()
+    override fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B> = traverse(fa, { Id(f(it)) }, Id.applicative()).value()
 }
 
 inline fun <reified F, reified G, A, B> HK<F, A>.traverse(
