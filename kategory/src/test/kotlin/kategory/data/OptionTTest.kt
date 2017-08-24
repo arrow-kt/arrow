@@ -35,9 +35,27 @@ class OptionTTest : UnitSpec() {
                 { OptionT(Id(it.some())) },
                 OptionTFIdEq))
 
-        "from option should build a correct OptionT" {
-            forAll { a: String ->
-                OptionT.fromOption<NonEmptyListHK, String>(Option.Some(a)) == OptionT.pure<NonEmptyListHK, String>(a)
+        "toLeft for Some should build a correct EitherT" {
+            forAll { a: Int, b: String ->
+                OptionT.fromOption<NonEmptyListHK, Int>(Option.Some(a)).toLeft { b } == EitherT.left<NonEmptyListHK, Int, String>(a)
+            }
+        }
+
+        "toLeft for None should build a correct EitherT" {
+            forAll { a: Int, b: String ->
+                OptionT.fromOption<NonEmptyListHK, Int>(Option.None).toLeft { b } == EitherT.right<NonEmptyListHK, Int, String>(b)
+            }
+        }
+
+        "toRight for Some should build a correct EitherT" {
+            forAll { a: Int, b: String ->
+                OptionT.fromOption<NonEmptyListHK, String>(Option.Some(b)).toRight { a } == EitherT.right<NonEmptyListHK, Int, String>(b)
+            }
+        }
+
+        "toRight for None should build a correct EitherT" {
+            forAll { a: Int, b: String ->
+                OptionT.fromOption<NonEmptyListHK, String>(Option.None).toRight { a } == EitherT.left<NonEmptyListHK, Int, String>(a)
             }
         }
 

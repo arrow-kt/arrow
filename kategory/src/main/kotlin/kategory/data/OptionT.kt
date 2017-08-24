@@ -102,7 +102,11 @@ package kategory
         return GA.map(fa, { OptionT(MF, MF.map(it.lower(), { it.ev() })) })
     }
 
-    //TODO: add toRight() and toLeft() once EitherT it's available
+    fun <R> toLeft(default: () -> R): EitherT<F, A, R> =
+            EitherT(MF, cata({ default().right() }, { it.left() }))
+
+    fun <L> toRight(default: () -> L): EitherT<F, L, A> =
+            EitherT(MF, cata({ default().left() }, { it.right() }))
 }
 
 inline fun <F, A, B> OptionT<F, A>.mapFilter(crossinline f: (A) -> Option<B>, MF: Monad<F>): OptionT<F, B> =
