@@ -95,6 +95,10 @@ import kategory.effects.data.internal.error
 
         fun monad(): Monad<IOHK> = this
 
+        fun monadError(): MonadError<IOHK, Throwable> = this
+
+        fun asyncContext(): AsyncContext<IOHK> = this
+
         fun <A> semigroup(SG: Semigroup<A>): IOSemigroup<A> = object : IOSemigroup<A> {
             override fun SG(): Semigroup<A> = SG
         }
