@@ -1,6 +1,5 @@
 package kategory
 
-
 @higherkind
 @deriving(Monad::class, Traverse::class, MonoidK::class)
 data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A> by list {
