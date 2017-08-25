@@ -2,7 +2,6 @@ package kategory
 
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import java.util.concurrent.CompletableFuture.runAsync
 
 object AsyncLaws {
     inline fun <reified F> laws(AC: AsyncContext<F> = asyncContext(), M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>, EQER: Eq<HK<F, Int>> = EQ): List<Law> =
