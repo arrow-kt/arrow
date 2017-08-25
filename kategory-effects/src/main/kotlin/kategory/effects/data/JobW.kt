@@ -33,21 +33,21 @@ import kotlin.coroutines.experimental.CoroutineContext
             }
 
     companion object {
-        fun <A> pure(a: A, coroutineContext: CoroutineContext): JobW<A> =
+        fun <A> pure(coroutineContext: CoroutineContext, a: A): JobW<A> =
                 JobW { ff: (Either<Throwable, A>) -> Unit ->
                     launch(coroutineContext, CoroutineStart.DEFAULT) {
                         ff(a.right())
                     }
                 }
 
-        fun <A> raiseError(t: Throwable, coroutineContext: CoroutineContext): JobW<A> =
+        fun <A> raiseError(coroutineContext: CoroutineContext, t: Throwable): JobW<A> =
                 JobW { ff: (Either<Throwable, A>) -> Unit ->
                     launch(coroutineContext, CoroutineStart.DEFAULT) {
                         ff(t.left())
                     }
                 }
 
-        fun <A> runAsync(fa: Proc<A>, coroutineContext: CoroutineContext): JobW<A> =
+        fun <A> runAsync(coroutineContext: CoroutineContext, fa: Proc<A>): JobW<A> =
                 JobW { ff: (Either<Throwable, A>) -> Unit ->
                     launch(coroutineContext, CoroutineStart.DEFAULT) {
                         fa(ff)
@@ -85,5 +85,17 @@ fun <A> JobW<A>.handleErrorWith(function: (Throwable) -> JobW<A>): JobW<A> =
                         function(t).thunk(runCallback)
                     }
                 }
+            }
+        }
+
+fun <A, B> JobW<A>.tailRecM(a: A, f: (A) -> JobW<Either<A, B>>, coroutineContext: CoroutineContext): JobW<B> =
+        JobW.runAsync(coroutineContext) { ff: (Either<Throwable, B>) -> Unit ->
+            f(a).runJob { either: Either<Throwable, Either<A, B>> ->
+                either.fold({ ff(it.left()) }, {
+                    when (it) {
+                        is Either.Right -> ff(it.b.right())
+                        is Either.Left -> tailRecM(a, f, coroutineContext)
+                    }
+                })
             }
         }

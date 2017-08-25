@@ -12,7 +12,7 @@ interface JobWInstances :
     fun CC(): CoroutineContext
 
     override fun <A> pure(a: A): JobW<A> =
-            JobW.pure(a, CC())
+            JobW.pure(CC(), a)
 
     override fun <A, B> map(fa: HK<JobWHK, A>, f: (A) -> B): JobW<B> =
             fa.ev().map(f)
@@ -33,12 +33,12 @@ interface JobWInstances :
             }.ev()
 
     override fun <A> raiseError(e: Throwable): JobW<A> =
-            JobW.raiseError(e, CC())
+            JobW.raiseError(CC(), e)
 
     override fun <A> handleErrorWith(fa: HK<JobWHK, A>, f: (Throwable) -> HK<JobWHK, A>): JobW<A> =
             fa.ev().handleErrorWith { err: Throwable -> f(err).ev() }
 
     override fun <A> runAsync(fa: Proc<A>): HK<JobWHK, A> =
-            JobW.runAsync(fa, CC())
+            JobW.runAsync(CC(), fa)
 
 }
