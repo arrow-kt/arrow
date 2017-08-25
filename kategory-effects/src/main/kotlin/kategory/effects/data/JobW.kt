@@ -47,13 +47,13 @@ import kotlin.coroutines.experimental.CoroutineContext
                     }
                 }
 
-        fun <A, B> tailRecM(a: A, f: (A) -> JobW<Either<A, B>>, coroutineContext: CoroutineContext): JobW<B> =
+        fun <A, B> tailRecM(coroutineContext: CoroutineContext, a: A, f: (A) -> JobW<Either<A, B>>): JobW<B> =
                 JobW.runAsync(coroutineContext) { ff: (Either<Throwable, B>) -> Unit ->
                     f(a).runJob { either: Either<Throwable, Either<A, B>> ->
                         either.fold({ ff(it.left()) }, {
                             when (it) {
                                 is Either.Right -> ff(it.b.right())
-                                is Either.Left -> tailRecM(a, f, coroutineContext)
+                                is Either.Left -> tailRecM(coroutineContext, a, f)
                             }
                         })
                     }
