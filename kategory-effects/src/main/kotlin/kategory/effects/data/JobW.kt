@@ -47,6 +47,18 @@ import kotlin.coroutines.experimental.CoroutineContext
                     }
                 }
 
+        fun <A, B> tailRecM(a: A, f: (A) -> JobW<Either<A, B>>, coroutineContext: CoroutineContext): JobW<B> =
+                JobW.runAsync(coroutineContext) { ff: (Either<Throwable, B>) -> Unit ->
+                    f(a).runJob { either: Either<Throwable, Either<A, B>> ->
+                        either.fold({ ff(it.left()) }, {
+                            when (it) {
+                                is Either.Right -> ff(it.b.right())
+                                is Either.Left -> tailRecM(a, f, coroutineContext)
+                            }
+                        })
+                    }
+                }
+
         fun <A> runAsync(coroutineContext: CoroutineContext, fa: Proc<A>): JobW<A> =
                 JobW { ff: (Either<Throwable, A>) -> Unit ->
                     launch(coroutineContext, CoroutineStart.DEFAULT) {
@@ -85,17 +97,5 @@ fun <A> JobW<A>.handleErrorWith(function: (Throwable) -> JobW<A>): JobW<A> =
                         function(t).thunk(runCallback)
                     }
                 }
-            }
-        }
-
-fun <A, B> JobW<A>.tailRecM(a: A, f: (A) -> JobW<Either<A, B>>, coroutineContext: CoroutineContext): JobW<B> =
-        JobW.runAsync(coroutineContext) { ff: (Either<Throwable, B>) -> Unit ->
-            f(a).runJob { either: Either<Throwable, Either<A, B>> ->
-                either.fold({ ff(it.left()) }, {
-                    when (it) {
-                        is Either.Right -> ff(it.b.right())
-                        is Either.Left -> tailRecM(a, f, coroutineContext)
-                    }
-                })
             }
         }
