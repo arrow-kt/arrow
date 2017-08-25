@@ -10,16 +10,16 @@ fun <A> ObservableWKind<A>.value(): Observable<A> =
 
 @higherkind data class ObservableW<A>(val observable: Observable<A>) : ObservableWKind<A> {
     fun <B> map(f: (A) -> B): ObservableW<B> =
-            ObservableW(observable.map(f))
+            observable.map(f).k()
 
     fun <B> flatMap(f: (A) -> ObservableW<B>): ObservableW<B> =
-            ObservableW(observable.flatMap { f(it).observable })
+            observable.flatMap { f(it).observable }.k()
 
     fun <B> concatMap(f: (A) -> ObservableW<B>): ObservableW<B> =
-            ObservableW(observable.concatMap { f(it).observable })
+            observable.concatMap { f(it).observable }.k()
 
     fun <B> switchMap(f: (A) -> ObservableW<B>): ObservableW<B> =
-            ObservableW(observable.switchMap { f(it).observable })
+            observable.switchMap { f(it).observable }.k()
 
     companion object {
         fun <A> pure(a: A): ObservableW<A> =
@@ -72,4 +72,4 @@ fun <A> ObservableWKind<A>.value(): Observable<A> =
 }
 
 fun <A> ObservableW<A>.handleErrorWith(function: (Throwable) -> ObservableW<A>): ObservableW<A> =
-        ObservableW(this.observable.onErrorResumeNext { t: Throwable -> function(t).observable })
+        this.observable.onErrorResumeNext { t: Throwable -> function(t).observable }.k()
