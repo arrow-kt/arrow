@@ -1,7 +1,5 @@
 package kategory
 
-import io.reactivex.Observable
-
 interface ObservableWInstances : Functor<ObservableWHK>,
         Applicative<ObservableWHK>,
         AsyncContext<ObservableWHK> {
@@ -28,7 +26,7 @@ interface ObservableWFlatMapInstances :
 
     override fun <A, B> tailRecM(a: A, f: (A) -> HK<ObservableWHK, Either<A, B>>): HK<ObservableWHK, B> =
             f(a).ev().flatMap {
-                it.fold({ tailRecM(a, f).ev() }, { Observable.just(it).k() })
+                it.fold({ tailRecM(a, f).ev() }, { pure(it).ev() })
             }
 
     override fun <A> raiseError(e: Throwable): HK<ObservableWHK, A> =
@@ -50,7 +48,7 @@ interface ObservableWConcatMapInstances :
 
     override fun <A, B> tailRecM(a: A, f: (A) -> HK<ObservableWHK, Either<A, B>>): HK<ObservableWHK, B> =
             f(a).ev().concatMap {
-                it.fold({ tailRecM(a, f).ev() }, { Observable.just(it).k() })
+                it.fold({ tailRecM(a, f).ev() }, { pure(it).ev() })
             }
 
     override fun <A> raiseError(e: Throwable): HK<ObservableWHK, A> =
@@ -72,7 +70,7 @@ interface ObservableWSwitchMapInstances :
 
     override fun <A, B> tailRecM(a: A, f: (A) -> HK<ObservableWHK, Either<A, B>>): HK<ObservableWHK, B> =
             f(a).ev().switchMap {
-                it.fold({ tailRecM(a, f).ev() }, { Observable.just(it).k() })
+                it.fold({ tailRecM(a, f).ev() }, { pure(it).ev() })
             }
 
     override fun <A> raiseError(e: Throwable): HK<ObservableWHK, A> =
