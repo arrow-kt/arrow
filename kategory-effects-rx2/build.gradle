@@ -1,0 +1,32 @@
+test {
+    testLogging {
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+    }
+}
+
+dependencies {
+    compile project(':kategory')
+    compile project(':kategory-effects')
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
+    compile "io.kategory:kategory-annotations:$kategoryAnnotationsVersion"
+    kapt "io.kategory:kategory-annotations-compile:$kategoryAnnotationsVersion"
+    kaptTest "io.kategory:kategory-annotations-compile:$kategoryAnnotationsVersion"
+    compileOnly "io.kategory:kategory-annotations-compile:$kategoryAnnotationsVersion"
+    testCompileOnly "io.kategory:kategory-annotations-compile:$kategoryAnnotationsVersion"
+    testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
+    testCompile project(':kategory-effects-test')
+
+    compile "io.reactivex.rxjava2:rxjava:2.1.3"
+}
+
+build.dependsOn ':detekt'
+
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+apply from: 'generated-kotlin-sources.gradle'
+apply plugin: 'kotlin-kapt'
+
+compileKotlin.kotlinOptions.freeCompilerArgs += ["-Xskip-runtime-version-check"]
