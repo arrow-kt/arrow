@@ -8,7 +8,7 @@ import org.junit.runner.RunWith
 typealias OptionTNel = HK<OptionTKindPartial<NonEmptyListHK>, Int>
 
 @RunWith(KTestJUnitRunner::class)
-class GlobalInstancesTest : UnitSpec() {
+class ComposedInstancesTest : UnitSpec() {
     val EQ_OPTION_NEL: Eq<HK<ComposedType<OptionHK, NonEmptyListHK>, Int>> = object : Eq<HK<ComposedType<OptionHK, NonEmptyListHK>, Int>> {
         override fun eqv(a: HK<ComposedType<OptionHK, NonEmptyListHK>, Int>, b: HK<ComposedType<OptionHK, NonEmptyListHK>, Int>): Boolean =
                 a.lower().ev() == b.lower().ev()

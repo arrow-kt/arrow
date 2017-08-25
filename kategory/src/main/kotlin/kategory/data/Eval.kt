@@ -27,7 +27,9 @@ package kategory
  * Eval instance -- this can defeat the trampolining and lead to stack
  * overflows.
  */
-@higherkind sealed class Eval<out A> : EvalKind<A> {
+@higherkind
+@deriving(Functor::class, Monad::class)
+sealed class Eval<out A> : EvalKind<A> {
 
     abstract fun value(): A
 
@@ -35,23 +37,23 @@ package kategory
 
     fun <B> map(f: (A) -> B): Eval<B> = flatMap { a -> Now(f(a)) }
 
-    fun <B> flatMap(f: (A) -> Eval<B>): Eval<B> =
+    fun <B> flatMap(f: (A) -> EvalKind<B>): Eval<B> =
             when (this) {
                 is Eval.Compute<A> -> object : Compute<B>() {
                     override fun <S> start(): Eval<S> = (this@Eval).start()
                     override fun <S> run(s: S): Eval<B> =
                             object : Compute<B>() {
                                 override fun <S1> start(): Eval<S1> = (this@Eval).run(s) as Eval<S1>
-                                override fun <S1> run(s1: S1): Eval<B> = f(s1 as A)
+                                override fun <S1> run(s1: S1): Eval<B> = f(s1 as A).ev()
                             }
                 }
                 is Eval.Call<A> -> object : Eval.Compute<B>() {
                     override fun <S> start(): Eval<S> = this@Eval.thunk() as Eval<S>
-                    override fun <S> run(s: S): Eval<B> = f(s as A)
+                    override fun <S> run(s: S): Eval<B> = f(s as A).ev()
                 }
                 else -> object : Eval.Compute<B>() {
                     override fun <S> start(): Eval<S> = this@Eval as Eval<S>
-                    override fun <S> run(s: S): Eval<B> = f(s as A)
+                    override fun <S> run(s: S): Eval<B> = f(s as A).ev()
                 }
             }
 
@@ -179,7 +181,18 @@ package kategory
         }
     }
 
-    companion object : EvalInstances, GlobalInstance<Monad<EvalHK>>() {
+    companion object {
+
+        fun <A, B> tailRecM(a: A, f: (A) -> EvalKind<Either<A, B>>): Eval<B> =
+                f(a).ev().flatMap { eval: Either<A, B> ->
+                    when (eval) {
+                        is Either.Left -> tailRecM(eval.a, f)
+                        is Either.Right -> pure(eval.b)
+                    }
+                }
+
+        fun <A> pure(a: A): Eval<A> = Eval.now(a)
+
         @JvmStatic
         fun <A> now(a: A) = Now(a)
 
@@ -206,10 +219,7 @@ package kategory
         @JvmStatic
         val One: Eval<Int> = Now(1)
 
-        fun functor(): Functor<EvalHK> = this
+        fun applicative(): EvalHKMonadInstance = Eval.monad()
 
-        fun applicative(): Applicative<EvalHK> = this
-
-        fun monad(): Monad<EvalHK> = this
     }
 }
