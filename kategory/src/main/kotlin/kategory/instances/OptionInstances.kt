@@ -17,27 +17,11 @@ interface OptionMonoid<A> : Monoid<Option<A>> {
 
 }
 
-class OptionMonadError : MonadError<OptionHK, Unit> , OptionHKMonadInstance {
+data class OptionMonadError<E>(val error: E) : MonadError<OptionHK, E> , OptionHKMonadInstance {
 
-    override fun <A> raiseError(e: Unit): Option<A> = Option.None
+    override fun <A> raiseError(e: E): Option<A> = Option.None
 
-    override fun <A> handleErrorWith(fa: OptionKind<A>, f: (Unit) -> OptionKind<A>): Option<A> = fa.ev().orElse({ f(Unit).ev() })
+    override fun <A> handleErrorWith(fa: OptionKind<A>, f: (E) -> OptionKind<A>): Option<A> = fa.ev().orElse({ f(error).ev() })
 
-}
-
-/**
- * Dummy SemigroupK instance to be able to test laws for SemigroupK.
- */
-class OptionSemigroupK : SemigroupK<OptionHK> {
-    override fun <A> combineK(x: HK<OptionHK, A>, y: HK<OptionHK, A>): Option<A> = x.ev().flatMap { y.ev() }
-}
-
-/**
- * Dummy MonoidK instance to be able to test laws for MonoidK.
- */
-class OptionMonoidK : MonoidK<OptionHK>, GlobalInstance<ApplicativeError<OptionHK, Unit>>() {
-    override fun <A> combineK(x: HK<OptionHK, A>, y: HK<OptionHK, A>): Option<A> = x.ev().flatMap { y.ev() }
-
-    override fun <A> empty(): HK<OptionHK, A> = Option.None
 }
 

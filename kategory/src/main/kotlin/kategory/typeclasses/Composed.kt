@@ -11,61 +11,83 @@ fun <F, G, A> HK<F, HK<G, A>>.lift(): HK<ComposedType<F, G>, A> = this as HK<Com
 @Suppress("UNCHECKED_CAST")
 fun <F, G, A> HK<ComposedType<F, G>, A>.lower(): HK<F, HK<G, A>> = this as HK<F, HK<G, A>>
 
-data class ComposedFoldable<in F, in G>(val FF: Foldable<F>, val GF: Foldable<G>) : Foldable<ComposedType<F, G>> {
-    override fun <A, B> foldL(fa: HK<ComposedType<F, G>, A>, b: B, f: (B, A) -> B): B = FF.foldL(fa.lower(), b, { bb, aa -> GF.foldL(aa, bb, f) })
+interface ComposedFoldable<in F, in G> :
+        Foldable<ComposedType<F, G>> {
+
+    fun FF(): Foldable<F>
+
+    fun GF(): Foldable<G>
+
+    override fun <A, B> foldL(fa: HK<ComposedType<F, G>, A>, b: B, f: (B, A) -> B): B =
+            FF().foldL(fa.lower(), b, { bb, aa -> GF().foldL(aa, bb, f) })
 
     fun <A, B> foldLC(fa: HK<F, HK<G, A>>, b: B, f: (B, A) -> B): B = foldL(fa.lift(), b, f)
 
     override fun <A, B> foldR(fa: HK<ComposedType<F, G>, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            FF.foldR(fa.lower(), lb, { laa, lbb -> GF.foldR(laa, lbb, f) })
+            FF().foldR(fa.lower(), lb, { laa, lbb -> GF().foldR(laa, lbb, f) })
 
     fun <A, B> foldRC(fa: HK<F, HK<G, A>>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = foldR(fa.lift(), lb, f)
 
     companion object {
-        inline operator fun <reified F, reified G> invoke(FF: Foldable<F> = foldable<F>(), GF: Foldable<G> = foldable<G>()): ComposedFoldable<F, G> =
-                ComposedFoldable(FF, GF)
+        operator fun <F, G> invoke(FF: Foldable<F>, GF: Foldable<G>): ComposedFoldable<F, G> =
+                object : ComposedFoldable<F, G> {
+                    override fun FF(): Foldable<F> = FF
+
+                    override fun GF(): Foldable<G> = GF
+                }
     }
 }
 
-inline fun <F, reified G> Foldable<F>.compose(GT: Foldable<G> = foldable<G>()): ComposedFoldable<F, G> = ComposedFoldable(this, GT)
+inline fun <F, reified G> Foldable<F>.compose(GT: Foldable<G> = foldable<G>()): ComposedFoldable<F, G> = object :
+        ComposedFoldable<F, G> {
+    override fun FF(): Foldable<F> = this@compose
 
-data class ComposedTraverse<F, G>(val FT: Traverse<F>, val GT: Traverse<G>, val GA: Applicative<G>, val CF: ComposedFoldable<F, G> = ComposedFoldable(FT, GT))
-    : Traverse<ComposedType<F, G>>, Foldable<ComposedType<F, G>> by CF {
+    override fun GF(): Foldable<G> = GT
+}
+
+interface ComposedTraverse<F, G> :
+        Traverse<ComposedType<F, G>>,
+        ComposedFoldable<F, G> {
+
+    fun FT(): Traverse<F>
+
+    fun GT(): Traverse<G>
+
+    fun GA(): Applicative<G>
+
+    override fun FF(): Foldable<F> = FT()
+
+    override fun GF(): Foldable<G> = GT()
 
     override fun <H, A, B> traverse(fa: HK<ComposedType<F, G>, A>, f: (A) -> HK<H, B>, HA: Applicative<H>): HK<H, HK<ComposedType<F, G>, B>> =
-            HA.map(FT.traverse(fa.lower(), { ga -> GT.traverse(ga, f, HA) }, HA), { it.lift() })
+            HA.map(FT().traverse(fa.lower(), { ga -> GT().traverse(ga, f, HA) }, HA), { it.lift() })
 
     fun <H, A, B> traverseC(fa: HK<F, HK<G, A>>, f: (A) -> HK<H, B>, HA: Applicative<H>): HK<H, HK<ComposedType<F, G>, B>> = traverse(fa.lift(), f, HA)
 
     companion object {
-        inline operator fun <reified F, reified G> invoke(FF: Traverse<F> = traverse<F>(),
-                                                          GF: Traverse<G> = traverse<G>(),
-                                                          GA: Applicative<G> = applicative<G>()): ComposedTraverse<F, G> = ComposedTraverse(FF, GF, GA)
+        operator fun <F, G> invoke(
+                FF: Traverse<F>,
+                GF: Traverse<G>,
+                GA: Applicative<G>): ComposedTraverse<F, G> =
+                object : ComposedTraverse<F, G> {
+                    override fun FT(): Traverse<F> = FF
+
+                    override fun GT(): Traverse<G> = GF
+
+                    override fun GA(): Applicative<G> = GA
+                }
     }
 }
 
-inline fun <F, reified G> Traverse<F>.compose(GT: Traverse<G> = traverse<G>(), GA: Applicative<G> = applicative<G>()): Traverse<ComposedType<F, G>> =
-        ComposedTraverse(this, GT, GA)
+inline fun <reified F, reified G> Traverse<F>.compose(GT: Traverse<G> = traverse<G>(), GA: Applicative<G> = applicative<G>()): Traverse<ComposedType<F, G>> =
+        object :
+                ComposedTraverse<F, G> {
+            override fun FT(): Traverse<F> = this@compose
 
-data class ComposedReducible<F, G>(val RF: Reducible<F>, val RG: Reducible<G>, val FT: Traverse<F>, val GT: Traverse<G>, val CF: ComposedFoldable<F, G> =
-ComposedFoldable(FT, GT))
-    : Reducible<ComposedType<F, G>>, Foldable<ComposedType<F, G>> by CF {
+            override fun GT(): Traverse<G> = GT
 
-    override fun <A, B> reduceLeftTo(fa: HK<ComposedType<F, G>, A>, f: (A) -> B, g: (B, A) -> B): B =
-            RF.reduceLeftTo(fa.lower(), { ga: HK<G, A> -> RG.reduceLeftTo(ga, f, g) }) { b, ga ->
-                RG.foldL(ga, b, g)
-            }
-
-    override fun <A, B> reduceRightTo(fa: HK<ComposedType<F, G>, A>, f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            RF.reduceRightTo(fa.lower(), { ga: HK<G, A> -> RG.reduceRightTo(ga, f, g).value() }) { ga, lb ->
-                RG.foldR(ga, lb, g)
-            }
-}
-
-inline fun <reified F, reified G> Reducible<F>.compose(RG: Reducible<G> = reducible<G>(),
-                                                       FT: Traverse<F> = traverse<F>(), GT: Traverse<G> = traverse<G>(),
-                                                       GA: Applicative<G> = applicative<G>()): Reducible<ComposedType<F, G>> =
-        ComposedReducible(this, RG, FT, GT)
+            override fun GA(): Applicative<G> = GA
+        }
 
 interface ComposedSemigroupK<F, G> : SemigroupK<ComposedType<F, G>> {
 
@@ -73,16 +95,19 @@ interface ComposedSemigroupK<F, G> : SemigroupK<ComposedType<F, G>> {
 
     override fun <A> combineK(x: HK<ComposedType<F, G>, A>, y: HK<ComposedType<F, G>, A>): HK<ComposedType<F, G>, A> = F().combineK(x.lower(), y.lower()).lift()
 
-    fun <A> combineKC(x: HK<F, HK<G, A>>, y: HK<F, HK<G, A>>): HK<F, HK<G, A>> = combineK(x.lift(), y.lift()).lower()
+    fun <A> combineKC(x: HK<F, HK<G, A>>, y: HK<F, HK<G, A>>): HK<ComposedType<F, G>, A> = combineK(x.lift(), y.lift())
 
     companion object {
-        inline operator fun <reified F, G> invoke(FF: SemigroupK<F> = monoidK<F>()): ComposedSemigroupK<F, G> = object : ComposedSemigroupK<F, G> {
-            override fun F(): SemigroupK<F> = FF
-        }
+        inline operator fun <reified F, reified G> invoke(SF: SemigroupK<F> = semigroupK<F>()): SemigroupK<ComposedType<F, G>> =
+                object : ComposedSemigroupK<F, G> {
+                    override fun F(): SemigroupK<F> = SF
+                }
     }
 }
 
-inline fun <reified F, G> SemigroupK<F>.compose(): SemigroupK<ComposedType<F, G>> = ComposedSemigroupK(this)
+inline fun <F, reified G> SemigroupK<F>.compose(): SemigroupK<ComposedType<F, G>> = object : ComposedSemigroupK<F, G> {
+    override fun F(): SemigroupK<F> = this@compose
+}
 
 interface ComposedMonoidK<F, G> : MonoidK<ComposedType<F, G>>, ComposedSemigroupK<F, G> {
 
@@ -90,14 +115,19 @@ interface ComposedMonoidK<F, G> : MonoidK<ComposedType<F, G>>, ComposedSemigroup
 
     override fun <A> empty(): HK<ComposedType<F, G>, A> = F().empty<HK<G, A>>().lift()
 
+    fun <A> emptyC(): HK<F, HK<G, A>> = empty<A>().lower()
+
     companion object {
-        inline operator fun <reified F, G> invoke(FF: MonoidK<F> = monoidK<F>()): ComposedMonoidK<F, G> = object : ComposedMonoidK<F, G> {
-            override fun F(): MonoidK<F> = FF
-        }
+        inline operator fun <reified F, reified G> invoke(MK: MonoidK<F> = monoidK<F>()): MonoidK<ComposedType<F, G>> =
+                object : ComposedMonoidK<F, G> {
+                    override fun F(): MonoidK<F> = MK
+                }
     }
 }
 
-inline fun <reified F, G> MonoidK<F>.compose(): MonoidK<ComposedType<F, G>> = ComposedMonoidK(this)
+fun <F, G> MonoidK<F>.compose(): MonoidK<ComposedType<F, G>> = object : ComposedMonoidK<F, G> {
+    override fun F(): MonoidK<F> = this@compose
+}
 
 interface ComposedFunctor<F, G> : Functor<ComposedType<F, G>> {
     fun F(): Functor<F>
@@ -150,10 +180,14 @@ inline fun <reified F, reified G> Applicative<F>.compose(GA: Applicative<G> = ap
 interface ComposedFunctorFilter<F, G> : FunctorFilter<ComposedType<F, G>>, ComposedFunctor<F, G> {
 
     override fun F(): Functor<F>
+
     override fun G(): FunctorFilter<G>
 
     override fun <A, B> mapFilter(fga: HK<ComposedType<F, G>, A>, f: (A) -> Option<B>): HK<ComposedType<F, G>, B> =
             F().map(fga.lower(), { G().mapFilter(it, f) }).lift()
+
+    fun <A, B> mapFilterC(fga: HK<F, HK<G, A>>, f: (A) -> Option<B>): HK<F, HK<G, B>> =
+            mapFilter(fga.lift(), f).lower()
 
     companion object {
         inline operator fun <reified F, reified G> invoke(FF: Functor<F> = functor(), FFG: FunctorFilter<G> = functorFilter()): ComposedFunctorFilter<F, G> =

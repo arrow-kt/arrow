@@ -1,21 +1,19 @@
 package kategory
 
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
-import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class WriterTTest : UnitSpec() {
     init {
-
         testLaws(MonadLaws.laws(WriterT.monad(NonEmptyList.monad(), IntMonoid), Eq.any()))
-        testLaws(MonoidKLaws.laws<WriterTKindPartial<OptionHK, Int>>(
-                WriterT.monoidK(Option.monad(), OptionMonoidK()),
-                WriterT.applicative(Option.monad(), IntMonoid),
-                WriterT.invoke(Option(Tuple2(1, 2)), Option.monad()),
-                Eq.any(),
-                Eq.any()))
+        testLaws(MonoidKLaws.laws(
+                WriterT.monoidK<ListKWHK, Int>(ListKW.monad(), ListKW.monoidK()),
+                WriterT.applicative(ListKW.monad(), IntMonoid),
+                object : Eq<WriterTKind<ListKWHK, Int, Int>> {
+                    override fun eqv(a: WriterTKind<ListKWHK, Int, Int>, b: WriterTKind<ListKWHK, Int, Int>): Boolean =
+                            a.ev().value == b.ev().value
+                }))
 
         testLaws(MonadWriterLaws.laws(WriterT.monad(Option.monad(), IntMonoid),
                 WriterT.monadWriter(Option.monad(), IntMonoid),
@@ -37,6 +35,5 @@ class WriterTTest : UnitSpec() {
                             }
                 }
         ))
-
     }
 }

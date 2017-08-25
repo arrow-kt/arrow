@@ -34,7 +34,7 @@ sealed class Option<out A> : OptionKind<A> {
 
         fun <A> empty(): Option<A> = None
 
-        fun monadError(): MonadError<OptionHK, Unit> = OptionMonadError()
+        fun <E> monadError(error: E): MonadError<OptionHK, E> = OptionMonadError(error)
 
         fun <A> monoid(SG: Semigroup<A>): OptionMonoid<A> = object : OptionMonoid<A> {
             override fun SG(): Semigroup<A> = SG
