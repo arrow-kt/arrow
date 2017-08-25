@@ -24,7 +24,11 @@ class ComposedInstancesTest : UnitSpec() {
                 override fun eqv(a: HK<ComposedType<OptionTKindPartial<IdHK>, OptionTKindPartial<NonEmptyListHK>>, Int>, b: HK<ComposedType<OptionTKindPartial<IdHK>, OptionTKindPartial<NonEmptyListHK>>, Int>): Boolean =
                         a.lower().value().value().fold(
                                 { b.lower().value().value().isEmpty },
-                                { optionA: OptionTNel -> b.lower().value().value().ev().fold({ false }, { it.ev() == optionA.ev() }) })
+                                { optionA: OptionTNel ->
+                                    b.lower().value().value().ev().fold(
+                                            { false },
+                                            { it.value() == optionA.value() })
+                                })
             }
 
     val cf: (Int) -> HK<ComposedType<OptionHK, NonEmptyListHK>, Int> = { it.nel().some().lift() }
