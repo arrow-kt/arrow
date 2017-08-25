@@ -11,17 +11,17 @@ class ObservableWTest : UnitSpec() {
         val EQ: Eq<ObservableWKind<Int>> = object : Eq<ObservableWKind<Int>> {
             override fun eqv(a: ObservableWKind<Int>, b: ObservableWKind<Int>): Boolean =
                     try {
-                        a.ev().runObservable { }.blockingFirst() == b.ev().runObservable { }.blockingFirst()
+                        a.value().blockingFirst() == b.value().blockingFirst()
                     } catch (throwable: Throwable) {
                         val errA = try {
-                            a.ev().runObservable { }.blockingFirst()
+                            a.value().blockingFirst()
                             throw IllegalArgumentException()
                         } catch (err: Throwable) {
                             err
                         }
 
                         val errB = try {
-                            b.ev().runObservable { }.blockingFirst()
+                            b.value().blockingFirst()
                             throw IllegalStateException()
                         } catch (err: Throwable) {
                             err

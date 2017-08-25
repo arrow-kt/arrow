@@ -3,36 +3,23 @@ package kategory
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 
-fun <A> Observable<A>.k(): ObservableW<A> = ObservableW { this }
+fun <A> Observable<A>.k(): ObservableW<A> = ObservableW(this)
 
-@higherkind data class ObservableW<A>(val thunk: ((Either<Throwable, A>) -> Unit) -> Observable<A>) : ObservableWKind<A> {
+fun <A> ObservableWKind<A>.value(): Observable<A> =
+        this.ev().observable
+
+@higherkind data class ObservableW<A>(val observable: Observable<A>) : ObservableWKind<A> {
     fun <B> map(f: (A) -> B): ObservableW<B> =
-            ObservableW { ff: (Either<Throwable, B>) -> Unit ->
-                thunk { either: Either<Throwable, A> ->
-                    ff(either.map(f))
-                }.map(f)
-            }
+            ObservableW(observable.map(f))
 
     fun <B> flatMap(f: (A) -> ObservableW<B>): ObservableW<B> =
-            ObservableW { ff: (Either<Throwable, B>) -> Unit ->
-                thunk { either: Either<Throwable, A> ->
-                    either.fold({ t: Throwable -> ObservableW<B> { Observable.error<B>(t) } }, { f(it) })
-                }.flatMap { f(it).thunk(ff) }
-            }
+            ObservableW(observable.flatMap { f(it).observable })
 
     fun <B> concatMap(f: (A) -> ObservableW<B>): ObservableW<B> =
-            ObservableW { ff: (Either<Throwable, B>) -> Unit ->
-                thunk { either: Either<Throwable, A> ->
-                    either.fold({ t: Throwable -> ObservableW<B> { Observable.error<B>(t) } }, { f(it) })
-                }.concatMap { f(it).thunk(ff) }
-            }
+            ObservableW(observable.concatMap { f(it).observable })
 
     fun <B> switchMap(f: (A) -> ObservableW<B>): ObservableW<B> =
-            ObservableW { ff: (Either<Throwable, B>) -> Unit ->
-                thunk { either: Either<Throwable, A> ->
-                    either.fold({ t: Throwable -> ObservableW<B> { Observable.error<B>(t) } }, { f(it) })
-                }.switchMap { f(it).thunk(ff) }
-            }
+            ObservableW(observable.switchMap { f(it).observable })
 
     companion object {
         fun <A> pure(a: A): ObservableW<A> =
@@ -84,10 +71,5 @@ fun <A> Observable<A>.k(): ObservableW<A> = ObservableW { this }
     }
 }
 
-fun <A> ObservableWKind<A>.runObservable(ff: (Either<Throwable, A>) -> Unit): Observable<A> =
-        this.ev().thunk(ff)
-
 fun <A> ObservableW<A>.handleErrorWith(function: (Throwable) -> ObservableW<A>): ObservableW<A> =
-        ObservableW { ff: (Either<Throwable, A>) -> Unit ->
-            this.thunk { either: Either<Throwable, A> -> ff(either) }.onErrorResumeNext { t: Throwable -> function(t).thunk(ff) }
-        }
+        ObservableW(this.observable.onErrorResumeNext { t: Throwable -> function(t).observable })
