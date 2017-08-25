@@ -93,12 +93,12 @@ package kategory
 
     inline fun <B> subflatMap(crossinline f: (A) -> Option<B>): OptionT<F, B> = transform({ it.flatMap(f) })
 
-    fun <B> foldL(b: B, f: (B, A) -> B, FF: Foldable<F>): B = FF.compose(Option).foldLC(value, b, f)
+    fun <B> foldL(b: B, f: (B, A) -> B, FF: Foldable<F>): B = FF.compose(Option.foldable()).foldLC(value, b, f)
 
-    fun <B> foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>): Eval<B> = FF.compose(Option).foldRC(value, lb, f)
+    fun <B> foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>): Eval<B> = FF.compose(Option.foldable()).foldRC(value, lb, f)
 
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>, FF: Traverse<F>, MF: Monad<F>): HK<G, HK<OptionTKindPartial<F>, B>> {
-        val fa = ComposedTraverse(FF, Option, Option).traverseC(value, f, GA)
+        val fa = ComposedTraverse(FF, Option.traverse(), Option.applicative()).traverseC(value, f, GA)
         return GA.map(fa, { OptionT(MF, MF.map(it.lower(), { it.ev() })) })
     }
 

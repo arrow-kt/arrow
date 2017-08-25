@@ -37,16 +37,6 @@ class ValidatedTest : UnitSpec() {
             ) shouldBe value + " processed"
         }
 
-        "bimap should modify the value if this is Valid or the error in otherwise" {
-            Valid(10).bimap({ fail("None should not be called") }, { v -> v.toString() + " is David Tennant" }) shouldBe Valid("10 is David Tennant")
-            Invalid(13).bimap({ i -> i.toString() + " is Coming soon!" }, { fail("None should not be called") }) shouldBe Invalid("13 is Coming soon!")
-        }
-
-        "map should modify value" {
-            Valid(10).map { v -> v.toString() + " is David Tennant" } shouldBe Valid("10 is David Tennant")
-            Invalid(13).map { fail("None should not be called") } shouldBe Invalid(13)
-        }
-
         "leftMap should modify error" {
             Valid(10).leftMap { fail("None should not be called") } shouldBe Valid(10)
             Invalid(13).leftMap { i -> i.toString() + " is Coming soon!" } shouldBe Invalid("13 is Coming soon!")

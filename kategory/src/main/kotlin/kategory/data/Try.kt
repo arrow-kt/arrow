@@ -6,9 +6,16 @@ package kategory
  *
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Try.scala
  */
-@higherkind sealed class Try<out A> : TryKind<A> {
+@higherkind
+@deriving(Functor::class, Monad::class, Foldable::class, Traverse::class)
+sealed class Try<out A> : TryKind<A> {
 
-    companion object : TryInstances, GlobalInstance<MonadError<TryHK, Throwable>>() {
+    companion object {
+
+        fun <A> pure(a: A): Try<A> = Try.Success(a)
+
+        fun <A, B> tailRecM(a: A, f: (A) -> TryKind<Either<A, B>>): Try<B> =
+                f(a).ev().fold({ Try.monadError().raiseError(it) }, { either -> either.fold({ tailRecM(it, f) }, { Try.Success(it) }) })
 
         inline operator fun <A> invoke(f: () -> A): Try<A> =
                 try {
@@ -17,26 +24,22 @@ package kategory
                     Failure(e)
                 }
 
-        fun <A> raise(e: Exception): Try<A> = Failure(e)
+        fun <A> raise(e: Throwable): Try<A> = Failure(e)
 
-        fun functor(): Functor<TryHK> = this
+        fun applicative(): TryHKMonadInstance = Try.monad()
 
-        fun applicative(): Applicative<TryHK> = this
-
-        fun monad(): Monad<TryHK> = this
-
-        fun monadError(): MonadError<TryHK, Throwable> = this
-
-        fun foldable(): Foldable<TryHK> = this
-
-        fun traverse(): Traverse<TryHK> = this
+        fun monadError(): TryMonadError =
+                object : TryMonadError, MonadError<TryHK, Throwable>, GlobalInstance<MonadError<TryHK, Throwable>>() {}
 
     }
+
+    fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, Try<B>> =
+            this.ev().fold({ GA.pure(Try.raise(IllegalStateException())) }, { GA.map(f(it), { Try { it } }) })
 
     /**
      * Returns the given function applied to the value from this `Success` or returns this if this is a `Failure`.
      */
-    inline fun <B> flatMap(crossinline f: (A) -> Try<B>): Try<B> = fold({ Failure(it) }, { f(it) })
+    inline fun <B> flatMap(crossinline f: (A) -> TryKind<B>): Try<B> = fold({ Try.raise(it) }, { f(it).ev() })
 
     /**
      * Maps the given function to the value from this `Success` or returns this if this is a `Failure`.
@@ -92,6 +95,10 @@ sealed class TryException(override val message: String) : kotlin.Exception(messa
     data class PredicateException(override val message: String) : TryException(message)
     data class UnsupportedOperationException(override val message: String) : TryException(message)
 }
+
+fun <A, B> Try<A>.foldL(b: B, f: (B, A) -> B): B = this.ev().fold({ b }, { f(b, it) })
+
+fun <A, B> Try<A>.foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = this.ev().fold({ lb }, { f(it, lb) })
 
 /**
  * Returns the value from this `Success` or the given `default` argument if this is a `Failure`.

@@ -17,30 +17,6 @@ class IorTest : UnitSpec() {
         testLaws(MonadLaws.laws(intIorMonad, Eq.any()))
         testLaws(TraverseLaws.laws(Ior.traverse(), Ior.applicative<Int>(), ::Right, Eq.any()))
 
-        "flatMap() should modify entity" {
-            forAll { a: Int, b: String ->
-                {
-
-                    Ior.Right(b).flatMap(IntMonoid) { Ior.Left(a) } == Ior.Left(a) &&
-                            Ior.Right(a).flatMap(IntMonoid) { Ior.Right(b) } == Ior.Right(b) &&
-                            Ior.Left(a).flatMap(IntMonoid) { Ior.Right(b) } == Ior.Left(a) &&
-                            Ior.Both(a, b).flatMap(IntMonoid) { Ior.Left(a) } == Ior.Left(IntMonoid.combine(a, a)) &&
-                            Ior.Both(a, b).flatMap(IntMonoid) { Ior.Right(b) } == Ior.Right(b) &&
-                            Ior.Both(a, b).flatMap(IntMonoid) { Ior.Both(a, b) } == Ior.Both(IntMonoid.combine(a, a), b)
-                }()
-            }
-        }
-
-        "map() should modify only right value" {
-            forAll { a: Int, b: String ->
-                {
-                    Ior.Right(b).map { a * 2 } == Ior.Right(a * 2) &&
-                            Ior.Left(a).map { b } == Ior.Left(a) &&
-                            Ior.Both(a, b).map { "power of $it" } == Ior.Both(a, "power of $b")
-                }()
-            }
-        }
-
         "bimap() should allow modify both value" {
             forAll { a: Int, b: String ->
                 {
@@ -143,23 +119,6 @@ class IorTest : UnitSpec() {
             val ior1 = Ior.Both(3, "Hello, world!")
             val iorResult = intIorMonad.flatMap(ior1, { Ior.Left(7) })
             iorResult shouldBe Ior.Left(10)
-        }
-
-        "Ior.monad.flatMap should be consistent with Ior#flatMap" {
-            forAll { a: Int ->
-                val x = { b: Int -> Ior.Right(b * a) }
-                val ior = Ior.Right(a)
-                ior.flatMap(IntMonoid, x) == intIorMonad.flatMap(ior, x)
-            }
-        }
-
-        "Ior.monad.binding should for comprehend over right Ior" {
-            val result = intIorMonad.binding {
-                val x = Ior.Right(1).bind()
-                val y = bind { Ior.Right(1) }
-                yields(x + y)
-            }
-            result shouldBe Ior.Right(2)
         }
 
     }
