@@ -13,7 +13,8 @@ abstract class UnitSpec : StringSpec() {
             // To get the instances before tests are initialized the following global typeclasses are preloaded
             Id.bimonad()
             Id.traverse()
-            NonEmptyList
+            NonEmptyList.bimonad()
+            NonEmptyList.traverse()
             Option.functor()
             Option.applicative()
             Option.monad()
