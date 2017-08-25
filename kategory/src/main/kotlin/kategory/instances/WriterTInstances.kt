@@ -44,3 +44,15 @@ interface WriterTMonoidK<F, W> : MonoidK<WriterTKindPartial<F, W>>, WriterTSemig
 
     override fun <A> empty(): HK<WriterTKindPartial<F, W>, A> = WriterT(MF(), GF().empty())
 }
+
+interface WriterTMonad<F, W> : Monad<WriterTKindPartial<F, W>> {
+
+    fun F0(): Monad<F>
+}
+
+interface WriterTMonadFilter<F, W> : MonadFilter<WriterTKindPartial<F, W>>, WriterTMonad<F, W> {
+
+    override fun F0(): MonadFilter<F>
+
+    override fun <A> empty(): HK<WriterTKindPartial<F, W>, A> = WriterT(F0(), F0().empty())
+}
