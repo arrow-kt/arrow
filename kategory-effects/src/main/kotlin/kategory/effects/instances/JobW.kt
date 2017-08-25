@@ -24,7 +24,7 @@ import kotlin.coroutines.experimental.CoroutineContext
                     this.invokeOnCompletion { t: Throwable? ->
                         val a: A? = state.get()
                         if (t == null && a != null) {
-                            f(a).thunk { either ->
+                            f(a).thunk { either: Either<Throwable, B> ->
                                 ff(either)
                             }
                         }

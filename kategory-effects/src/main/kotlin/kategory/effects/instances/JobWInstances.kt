@@ -21,12 +21,16 @@ interface JobWInstances :
             fa.ev().flatMap { a: A -> f(a).ev() }
 
     override fun <A, B> tailRecM(a: A, f: (A) -> HK<JobWHK, Either<A, B>>): JobW<B> =
-            f(a).ev().flatMap {
-                when (it) {
-                    is Either.Left -> tailRecM(it.a, f)
-                    is Either.Right -> pure(it.b)
+            runAsync { ff: (Either<Throwable, B>) -> Unit ->
+                f(a).runJob { either: Either<Throwable, Either<A, B>> ->
+                    either.fold({ ff(it.left()) }, {
+                        when (it) {
+                            is Either.Right -> ff(it.b.right())
+                            is Either.Left -> tailRecM(a, f)
+                        }
+                    })
                 }
-            }
+            }.ev()
 
     override fun <A> raiseError(e: Throwable): JobW<A> =
             JobW.raiseError(e, CC())
