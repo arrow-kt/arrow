@@ -2,7 +2,6 @@ package kategory
 
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
-import io.reactivex.ObservableSource
 
 fun <A> Observable<A>.k(): ObservableW<A> = ObservableW { this }
 
@@ -64,7 +63,6 @@ fun <A> Observable<A>.k(): ObservableW<A> = ObservableW { this }
         inline fun instancesConcatMap(): ObservableWConcatMapInstances = object : ObservableWConcatMapInstances {}
 
         inline fun instancesSwitchMap(): ObservableWSwitchMapInstances = object : ObservableWSwitchMapInstances {}
-
 
         fun functor(): Functor<ObservableWHK> = instances()
 
