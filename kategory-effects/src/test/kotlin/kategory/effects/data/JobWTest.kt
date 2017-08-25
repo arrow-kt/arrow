@@ -1,7 +1,6 @@
-package kategory.effects.data
+package kategory
 
 import io.kotlintest.KTestJUnitRunner
-import kategory.*
 import kotlinx.coroutines.experimental.runBlocking
 import org.junit.runner.RunWith
 import java.util.concurrent.atomic.AtomicInteger
