@@ -8,7 +8,7 @@ import org.junit.runner.RunWith
 class EvalTest : UnitSpec() {
     init {
 
-        testLaws(MonadLaws.laws(Eval, object : Eq<HK<EvalHK, Int>> {
+        testLaws(MonadLaws.laws(Eval.monad(), object : Eq<HK<EvalHK, Int>> {
             override fun eqv(a: HK<EvalHK, Int>, b: HK<EvalHK, Int>): Boolean =
                     a.ev().value() == b.ev().value()
         }))

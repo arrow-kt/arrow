@@ -3,7 +3,9 @@ package kategory
 /**
  * A List that can not be empty
  */
-@higherkind class NonEmptyList<out A> private constructor(
+@higherkind
+@deriving(Bimonad::class, Traverse::class, SemigroupK::class)
+class NonEmptyList<out A> private constructor(
         val head: A,
         val tail: List<A>,
         val all: List<A>) : NonEmptyListKind<A> {
@@ -21,13 +23,39 @@ package kategory
 
     fun <B> map(f: (A) -> B): NonEmptyList<B> = NonEmptyList(f(head), tail.map(f))
 
-    fun <B> flatMap(f: (A) -> NonEmptyList<B>): NonEmptyList<B> = f(head) + tail.flatMap { f(it).all }
+    fun <B> flatMap(f: (A) -> NonEmptyListKind<B>): NonEmptyList<B> = f(head).ev() + tail.flatMap { f(it).ev().all }
 
     operator fun plus(l: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> = NonEmptyList(all + l.all)
 
     operator fun plus(l: List<@UnsafeVariance A>): NonEmptyList<A> = NonEmptyList(all + l)
 
     operator fun plus(a: @UnsafeVariance A): NonEmptyList<A> = NonEmptyList(all + a)
+
+    fun <B> foldL(b: B, f: (B, A) -> B): B = this.ev().tail.fold(f(b, this.ev().head), f)
+
+    fun <B> foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = ListKW.foldable().foldR(this.ev().all.k(), lb, f)
+
+    fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, NonEmptyList<B>> =
+            GA.map2Eval(f(this.ev().head), Eval.always {
+                ListKW.traverse().traverse(this.ev().tail.k(), f, GA)
+            }, {
+                NonEmptyList(it.a, it.b.ev().list)
+            }).value()
+
+    fun <B> coflatMap(f: (NonEmptyListKind<A>) -> B): NonEmptyList<B> {
+        val buf = mutableListOf<B>()
+        tailrec fun consume(list: List<A>): List<B> =
+                if (list.isEmpty()) {
+                    buf
+                } else {
+                    val tail = list.subList(1, list.size)
+                    buf += f(NonEmptyList(list[0], tail))
+                    consume(tail)
+                }
+        return NonEmptyList(f(this), consume(this.ev().tail))
+    }
+
+    fun extract(): A = this.ev().head
 
     fun iterator(): Iterator<A> = all.iterator()
 
@@ -46,25 +74,53 @@ package kategory
 
     override fun toString(): String = "NonEmptyList(all=$all)"
 
-    companion object : NonEmptyListInstances, GlobalInstance<Bimonad<NonEmptyListHK>>() {
+    companion object {
         @JvmStatic fun <A> of(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
         @JvmStatic fun <A> fromList(l: List<A>): Option<NonEmptyList<A>> = if (l.isEmpty()) Option.None else Option.Some(NonEmptyList(l))
         @JvmStatic fun <A> fromListUnsafe(l: List<A>): NonEmptyList<A> = NonEmptyList(l)
 
-        fun functor(): Functor<NonEmptyListHK> = this
+        fun <A> pure(a: A): NonEmptyList<A> = a.nel()
 
-        fun applicative(): Applicative<NonEmptyListHK> = this
+        @Suppress("UNCHECKED_CAST")
+        private tailrec fun <A, B> go(
+                buf: ArrayList<B>,
+                f: (A) -> HK<NonEmptyListHK, Either<A, B>>,
+                v: NonEmptyList<Either<A, B>>) {
+            val head: Either<A, B> = v.head
+            when (head) {
+                is Either.Right<A, B> -> {
+                    buf += head.b
+                    val x = NonEmptyList.fromList(v.tail)
+                    when (x) {
+                        is Option.Some<NonEmptyList<Either<A, B>>> -> go(buf, f, x.value)
+                        is Option.None -> Unit
+                    }
+                }
+                is Either.Left<A, B> -> go(buf, f, f(head.a).ev() + v.tail)
+            }
+        }
 
-        fun monad(): Monad<NonEmptyListHK> = this
+        fun <A, B> tailRecM(a: A, f: (A) -> HK<NonEmptyListHK, Either<A, B>>): NonEmptyList<B> {
+            val buf = ArrayList<B>()
+            go(buf, f, f(a).ev())
+            return NonEmptyList.fromListUnsafe(buf)
+        }
+
+        fun functor(): NonEmptyListHKBimonadInstance = NonEmptyList.bimonad()
+
+        fun applicative(): NonEmptyListHKBimonadInstance = NonEmptyList.bimonad()
+
+        fun monad(): NonEmptyListHKBimonadInstance = NonEmptyList.bimonad()
+
+        fun comonad(): NonEmptyListHKBimonadInstance = NonEmptyList.bimonad()
 
         fun <A> semigroup(): Semigroup<NonEmptyList<A>> = object : NonEmptyListSemigroup<A> {}
 
-        fun semigroupK(): SemigroupK<NonEmptyListHK> = object : NonEmptyListSemigroupK {}
+        fun foldable(): NonEmptyListHKTraverseInstance = NonEmptyList.traverse()
 
-        fun foldable(): Foldable<NonEmptyListHK> = this
-
-        fun traverse(): Traverse<NonEmptyListHK> = this
     }
 }
 
 fun <A> A.nel(): NonEmptyList<A> = NonEmptyList.of(this)
+
+fun <A> NonEmptyList<A>.combineK(y: NonEmptyListKind<A>): NonEmptyList<A> = this.plus(y.ev())

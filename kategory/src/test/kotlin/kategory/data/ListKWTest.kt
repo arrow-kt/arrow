@@ -7,7 +7,7 @@ import org.junit.runner.RunWith
 class ListKWTest : UnitSpec() {
     val applicative = ListKW.applicative()
     init {
-        testLaws(kategory.MonadLaws.laws(ListKW, Eq.any()))
+        testLaws(kategory.MonadLaws.laws(ListKW.monad(), Eq.any()))
         testLaws(kategory.SemigroupKLaws.laws(
                 kategory.ListKW.semigroupK(),
                 applicative,

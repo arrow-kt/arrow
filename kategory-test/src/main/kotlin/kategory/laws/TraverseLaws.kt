@@ -38,14 +38,14 @@ object TraverseLaws {
 
     inline fun <reified F> identityTraverse(FT: Traverse<F>, FF: Functor<F> = functor<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>) =
             forAll(genFunctionAToB<Int, HK<IdHK, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf), { f: (Int) -> HK<IdHK, Int>, fa: HK<F, Int> ->
-                FT.traverse(fa, f, Id).value().equalUnderTheLaw(FF.map(fa, f).map(FF) { it.value() }, EQ)
+                FT.traverse(fa, f, Id.applicative()).value().equalUnderTheLaw(FF.map(fa, f).map(FF) { it.value() }, EQ)
             })
 
     inline fun <reified F> sequentialComposition(FT: Traverse<F>, crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>) =
             forAll(genFunctionAToB<Int, HK<IdHK, Int>>(genConstructor(genIntSmall(), ::Id)), genFunctionAToB<Int, HK<IdHK, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf), { f: (Int) -> HK<IdHK, Int>, g: (Int) -> HK<IdHK, Int>, fha: HK<F, Int> ->
-                val fa = fha.traverse(FT, Id, f).ev()
-                val composed = Id.map(fa, { it.traverse(FT, Id, g) }).value.value()
-                val expected = fha.traverse(FT, ComposedApplicative(Id, Id), { a: Int -> Id.map(f(a), g).lift() }).lower().value().value()
+                val fa = fha.traverse(FT, Id.applicative(), f).ev()
+                val composed = Id.functor().map(fa, { it.traverse(FT, Id.applicative(), g) }).value.value()
+                val expected = fha.traverse(FT, ComposedApplicative(Id.applicative(), Id.applicative()), { a: Int -> Id.functor().map(f(a), g).lift() }).lower().value().value()
                 composed.equalUnderTheLaw(expected, EQ)
             })
 
@@ -59,7 +59,7 @@ object TraverseLaws {
                     override fun <A, B> ap(fa: HK<TIF, A>, ff: HK<TIF, (A) -> B>): HK<TIF, B> {
                         val (fam, fan) = fa.ev().ti
                         val (fm, fn) = ff.ev().ti
-                        return TIC(Id.ap(fam, fm) toT Id.ap(fan, fn))
+                        return TIC(Id.applicative().ap(fam, fm) toT Id.applicative().ap(fan, fn))
                     }
 
                 }
@@ -70,7 +70,7 @@ object TraverseLaws {
                 }
 
                 val seen: TI<HK<F, Int>> = FT.traverse(fha, { TIC(f(it) toT g(it)) }, TIA).ev().ti
-                val expected: TI<HK<F, Int>> = TIC(FT.traverse(fha, f, Id) toT FT.traverse(fha, g, Id)).ti
+                val expected: TI<HK<F, Int>> = TIC(FT.traverse(fha, f, Id.applicative()) toT FT.traverse(fha, g, Id.applicative())).ti
 
                 seen.equalUnderTheLaw(expected, TIEQ)
             })
