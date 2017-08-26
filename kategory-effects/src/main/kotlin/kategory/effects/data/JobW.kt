@@ -7,7 +7,6 @@ import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.launch
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.experimental.CoroutineContext
-import kotlin.coroutines.experimental.EmptyCoroutineContext
 
 @higherkind data class JobW<out A>(val thunk: ((Either<Throwable, A>) -> Unit) -> Job) : HK<JobWHK, A> {
 
@@ -18,27 +17,16 @@ import kotlin.coroutines.experimental.EmptyCoroutineContext
                 }
             }
 
-    fun <B> flatMap(f: (A) -> JobW<B>): JobW<B> =
+    fun <B> flatMap(coroutineContext: CoroutineContext, f: (A) -> JobW<B>): JobW<B> =
             JobW { ff: (Either<Throwable, B>) -> Unit ->
-                val state = AtomicReference<Either<Throwable, A>>()
-                thunk { either: Either<Throwable, A> ->
-                    state.set(either)
-                }.apply {
-                    this.invokeOnCompletion { t: Throwable? ->
-                        val a: Either<Throwable, A>? = state.get()
-                        if (t == null && a != null) {
-                            a.fold(
-                                    { ff(it.left()) },
-                                    {
-                                        f(it).thunk { either: Either<Throwable, B> ->
-                                            ff(either)
-                                        }
-                                    })
-
-                        } else if (t != null) {
-                            JobW.raiseError<B>(EmptyCoroutineContext, t)
-                        } else {
-                            throw IllegalStateException("JobW flatMap completed without success or error")
+                val result = AtomicReference<Either<Throwable, A>>()
+                thunk(result::set).apply {
+                    invokeOnCompletion { t: Throwable? ->
+                        val state: Either<Throwable, A>? = result.get()
+                        when {
+                            t == null && state != null -> state.fold({ ff(it.left()) }, { f(it).thunk(ff) })
+                            t != null -> JobW.raiseError<B>(coroutineContext, t)
+                            else -> throw IllegalStateException("JobW flatMap completed without success or error")
                         }
                     }
                 }
@@ -118,13 +106,14 @@ fun <A> JobWKind<A>.runJob(ff: (Either<Throwable, A>) -> Unit): Job =
 
 inline fun <A> JobW<A>.handleErrorWith(crossinline function: (Throwable) -> JobW<A>): JobW<A> =
         JobW { ff: (Either<Throwable, A>) -> Unit ->
-            val runCallback: (Either<Throwable, A>) -> Unit = { either: Either<Throwable, A> ->
-                ff(either)
-            }
-            this.thunk(runCallback).apply {
+            val result = AtomicReference<Either<Throwable, A>>()
+            thunk(result::set).apply {
                 invokeOnCompletion { t: Throwable? ->
-                    if (t != null) {
-                        function(t).thunk(runCallback)
+                    val state: Either<Throwable, A>? = result.get()
+                    when {
+                        t == null && state != null -> state.fold({ function(it).thunk(ff) }, { ff(it.right()) })
+                        t != null -> function(t).thunk(ff)
+                        else -> throw IllegalStateException("JobW handleErrorWith completed without success or error")
                     }
                 }
             }

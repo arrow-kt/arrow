@@ -18,7 +18,7 @@ interface JobWInstances :
             fa.ev().map(f)
 
     override fun <A, B> flatMap(fa: HK<JobWHK, A>, f: (A) -> HK<JobWHK, B>): JobW<B> =
-            fa.ev().flatMap { a: A -> f(a).ev() }
+            fa.ev().flatMap(CC()) { a: A -> f(a).ev() }
 
     override fun <A, B> tailRecM(a: A, f: (A) -> HK<JobWHK, Either<A, B>>): JobW<B> =
             JobW.tailRecM(CC(), a) { aa: A -> f(aa).ev() }
