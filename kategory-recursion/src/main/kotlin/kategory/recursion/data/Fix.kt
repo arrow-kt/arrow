@@ -8,5 +8,10 @@ package kategory
         inline fun <reified F> embedT(compFG: HK<Nested<Nested<FixHK, F>, FixHK>, F>, FF: Functor<F> = functor<F>()): FixKind<F> =
                 Fix(FF, compFG.lower().lower().ev())
 
+        inline fun <F> instances(FF: Functor<F>): FixInstances<F> = object : FixInstances<F> {
+            override fun FG(): Functor<F> = FF
+        }
+
+        inline fun <reified F> birecursive(FF: Functor<F> = functor<F>()): Birecursive<FixHK, F> = instances(FF)
     }
 }
