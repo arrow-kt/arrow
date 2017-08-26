@@ -19,10 +19,8 @@ fun <M, F, A, B> hyloM(a: A, algM: AlgebraM<M, F, B>, coalgM: CoalgebraM<M, F, A
                 ComposedFunctor(MM, TF)
         )
 
-fun <F, G> algebraIso(alg: Algebra<Nested<F, G>, HK<F, G>>, coalg: Coalgebra<Nested<F, G>, HK<F, G>>, FG: Functor<G>): Birecursive<F, G> =
+fun <F, G> algebraIso(alg: Algebra<Nested<F, G>, HK<F, G>>, coalg: Coalgebra<Nested<F, G>, HK<F, G>>): Birecursive<F, G> =
         object : Birecursive<F, G> {
-            override fun FG(): Functor<G> = FG
-
             override fun projectT(fg: HK<F, G>): HK<Nested<F, G>, HK<F, G>> =
                     coalg(fg)
 
