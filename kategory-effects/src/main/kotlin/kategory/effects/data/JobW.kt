@@ -69,7 +69,7 @@ import kotlin.coroutines.experimental.CoroutineContext
                 }
 
         fun <A> pure(coroutineContext: CoroutineContext, a: A): JobW<A> =
-                JobW.invoke(coroutineContext) { a }
+                JobW(coroutineContext) { a }
 
         fun <A> raiseError(coroutineContext: CoroutineContext, t: Throwable): JobW<A> =
                 JobW.unsafe(coroutineContext) { t.left() }
