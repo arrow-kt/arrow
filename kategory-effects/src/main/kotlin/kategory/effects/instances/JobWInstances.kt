@@ -30,6 +30,6 @@ interface JobWInstances :
             fa.ev().handleErrorWith { err: Throwable -> f(err).ev() }
 
     override fun <A> runAsync(fa: Proc<A>): HK<JobWHK, A> =
-            JobW.runAsync(CC(), fa)
+            JobW.async(CC(), fa)
 
 }

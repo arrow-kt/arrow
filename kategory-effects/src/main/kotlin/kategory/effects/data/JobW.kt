@@ -1,5 +1,7 @@
 package kategory
 
+import kategory.effects.data.internal.Platform.onceOnly
+import kotlinx.coroutines.experimental.CoroutineScope
 import kotlinx.coroutines.experimental.CoroutineStart
 import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.launch
@@ -33,22 +35,47 @@ import kotlin.coroutines.experimental.CoroutineContext
             }
 
     companion object {
-        fun <A> pure(coroutineContext: CoroutineContext, a: A): JobW<A> =
-                JobW { ff: (Either<Throwable, A>) -> Unit ->
-                    launch(coroutineContext, CoroutineStart.DEFAULT) {
-                        ff(a.right())
+        inline operator fun <A> invoke(coroutineContext: CoroutineContext, noinline f: suspend CoroutineScope.() -> A): JobW<A> =
+                JobW {
+                    onceOnly(it).let { callback: (Either<Throwable, A>) -> Unit ->
+                        launch(coroutineContext, CoroutineStart.DEFAULT) {
+                            callback(
+                                    try {
+                                        f().right()
+                                    } catch (err: Throwable) {
+                                        err.left()
+                                    }
+                            )
+                        }
                     }
                 }
+
+        inline fun <A> unsafe(coroutineContext: CoroutineContext, noinline f: suspend CoroutineScope.() -> Either<Throwable, A>): JobW<A> =
+                JobW {
+                    onceOnly(it).let { callback: (Either<Throwable, A>) -> Unit ->
+                        launch(coroutineContext, CoroutineStart.DEFAULT) {
+                            callback(f())
+                        }
+                    }
+                }
+
+        fun <A> async(coroutineContext: CoroutineContext, fa: Proc<A>): JobW<A> =
+                JobW {
+                    onceOnly(it).let { callback: (Either<Throwable, A>) -> Unit ->
+                        launch(coroutineContext, CoroutineStart.DEFAULT) {
+                            fa(callback)
+                        }
+                    }
+                }
+
+        fun <A> pure(coroutineContext: CoroutineContext, a: A): JobW<A> =
+                JobW.invoke(coroutineContext) { a }
 
         fun <A> raiseError(coroutineContext: CoroutineContext, t: Throwable): JobW<A> =
-                JobW { ff: (Either<Throwable, A>) -> Unit ->
-                    launch(coroutineContext, CoroutineStart.DEFAULT) {
-                        ff(t.left())
-                    }
-                }
+                JobW.unsafe(coroutineContext) { t.left() }
 
         fun <A, B> tailRecM(coroutineContext: CoroutineContext, a: A, f: (A) -> JobW<Either<A, B>>): JobW<B> =
-                JobW.runAsync(coroutineContext) { ff: (Either<Throwable, B>) -> Unit ->
+                JobW.async(coroutineContext) { ff: (Either<Throwable, B>) -> Unit ->
                     f(a).runJob { either: Either<Throwable, Either<A, B>> ->
                         either.fold({ ff(it.left()) }, {
                             when (it) {
@@ -56,13 +83,6 @@ import kotlin.coroutines.experimental.CoroutineContext
                                 is Either.Left -> tailRecM(coroutineContext, a, f)
                             }
                         })
-                    }
-                }
-
-        fun <A> runAsync(coroutineContext: CoroutineContext, fa: Proc<A>): JobW<A> =
-                JobW { ff: (Either<Throwable, A>) -> Unit ->
-                    launch(coroutineContext, CoroutineStart.DEFAULT) {
-                        fa(ff)
                     }
                 }
 
