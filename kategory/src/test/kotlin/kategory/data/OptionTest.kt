@@ -1,8 +1,6 @@
 package kategory
 
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.fail
-import io.kotlintest.matchers.should
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.forAll
 import kategory.Option.None
@@ -12,16 +10,12 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class OptionTest : UnitSpec() {
 
+    object OptionError : RuntimeException()
+
     init {
 
-        testLaws(MonadLaws.laws(Option.monad(), Eq.any()))
-        testLaws(TraverseLaws.laws(Option.traverse(), Option.functor(), ::Some, Eq.any()))
-        testLaws(MonoidKLaws.laws(
-                OptionMonoidK(),
-                Option.applicative(),
-                Option(1),
-                Eq.any(),
-                Eq.any()))
+        testLaws(MonadErrorLaws.laws(Option.monadError<Throwable>(OptionError), Eq.any()))
+        testLaws(TraverseLaws.laws(Option.traverse(), Option.monad(), ::Some, Eq.any()))
 
         "fromNullable should work for both null and non-null values of nullable types" {
             forAll { a: Int? ->
