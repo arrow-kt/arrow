@@ -59,7 +59,7 @@ import kotlin.coroutines.experimental.CoroutineContext
                     }
                 }
 
-        fun <A> async(coroutineContext: CoroutineContext, fa: Proc<A>): JobW<A> =
+        inline fun <A> async(coroutineContext: CoroutineContext, crossinline fa: Proc<A>): JobW<A> =
                 JobW {
                     onceOnly(it).let { callback: (Either<Throwable, A>) -> Unit ->
                         launch(coroutineContext, CoroutineStart.DEFAULT) {
@@ -68,10 +68,10 @@ import kotlin.coroutines.experimental.CoroutineContext
                     }
                 }
 
-        fun <A> pure(coroutineContext: CoroutineContext, a: A): JobW<A> =
+        inline fun <A> pure(coroutineContext: CoroutineContext, a: A): JobW<A> =
                 JobW(coroutineContext) { a }
 
-        fun <A> raiseError(coroutineContext: CoroutineContext, t: Throwable): JobW<A> =
+        inline fun <A> raiseError(coroutineContext: CoroutineContext, t: Throwable): JobW<A> =
                 JobW.unsafe(coroutineContext) { t.left() }
 
         fun <A, B> tailRecM(coroutineContext: CoroutineContext, a: A, f: (A) -> JobW<Either<A, B>>): JobW<B> =
@@ -91,22 +91,22 @@ import kotlin.coroutines.experimental.CoroutineContext
                     override fun CC(): CoroutineContext = coroutineContext
                 }
 
-        fun functor(coroutineContext: CoroutineContext): Functor<JobWHK> = instances(coroutineContext)
+        inline fun functor(coroutineContext: CoroutineContext): Functor<JobWHK> = instances(coroutineContext)
 
-        fun applicative(coroutineContext: CoroutineContext): Applicative<JobWHK> = instances(coroutineContext)
+        inline fun applicative(coroutineContext: CoroutineContext): Applicative<JobWHK> = instances(coroutineContext)
 
-        fun monad(coroutineContext: CoroutineContext): Monad<JobWHK> = instances(coroutineContext)
+        inline fun monad(coroutineContext: CoroutineContext): Monad<JobWHK> = instances(coroutineContext)
 
-        fun monadError(coroutineContext: CoroutineContext): MonadError<JobWHK, Throwable> = instances(coroutineContext)
+        inline fun monadError(coroutineContext: CoroutineContext): MonadError<JobWHK, Throwable> = instances(coroutineContext)
 
-        fun asyncContext(coroutineContext: CoroutineContext): AsyncContext<JobWHK> = instances(coroutineContext)
+        inline fun asyncContext(coroutineContext: CoroutineContext): AsyncContext<JobWHK> = instances(coroutineContext)
     }
 }
 
 fun <A> JobWKind<A>.runJob(ff: (Either<Throwable, A>) -> Unit): Job =
         this.ev().thunk(ff)
 
-fun <A> JobW<A>.handleErrorWith(function: (Throwable) -> JobW<A>): JobW<A> =
+inline fun <A> JobW<A>.handleErrorWith(crossinline function: (Throwable) -> JobW<A>): JobW<A> =
         JobW { ff: (Either<Throwable, A>) -> Unit ->
             val runCallback: (Either<Throwable, A>) -> Unit = { either: Either<Throwable, A> ->
                 ff(either)
