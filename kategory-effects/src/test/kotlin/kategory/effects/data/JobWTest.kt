@@ -3,6 +3,7 @@ package kategory
 import io.kotlintest.KTestJUnitRunner
 import kotlinx.coroutines.experimental.runBlocking
 import org.junit.runner.RunWith
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.experimental.EmptyCoroutineContext
@@ -14,13 +15,14 @@ class JobWTest : UnitSpec() {
                 runBlocking {
                     val resultA = AtomicInteger(Int.MIN_VALUE)
                     val resultB = AtomicInteger(Int.MAX_VALUE)
+                    val success = AtomicBoolean(true)
                     a.runJob {
-                        it.fold({ throw it }, { resultA.set(it) })
+                        it.fold({ success.set(false) }, { resultA.set(it) })
                     }.join()
                     b.runJob({
-                        it.fold({ throw it }, { resultB.set(it) })
+                        it.fold({ success.set(false) }, { resultB.set(it) })
                     }).join()
-                    resultA.get() == resultB.get()
+                    success.get() && resultA.get() == resultB.get()
                 }
     }
 
