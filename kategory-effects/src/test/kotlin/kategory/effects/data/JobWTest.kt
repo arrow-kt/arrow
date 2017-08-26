@@ -29,11 +29,13 @@ class JobWTest : UnitSpec() {
     val EQ_ERR: Eq<HK<JobWHK, Int>> = object : Eq<HK<JobWHK, Int>> {
         override fun eqv(a: HK<JobWHK, Int>, b: HK<JobWHK, Int>): Boolean =
                 runBlocking {
+                    val resultA = AtomicInteger(Int.MIN_VALUE)
+                    val resultB = AtomicInteger(Int.MIN_VALUE)
                     val errorA = AtomicReference<Throwable>()
                     val errorB = AtomicReference<Throwable>()
-                    a.runJob({ it.fold({ errorA.set(it) }, { }) }).apply { join() }
-                    b.runJob({ it.fold({ errorB.set(it) }, { }) }).apply { join() }
-                    errorA.get() == errorB.get()
+                    a.runJob({ it.fold({ errorA.set(it) }, { resultA.set(it) }) }).apply { join() }
+                    b.runJob({ it.fold({ errorB.set(it) }, { resultB.set(it) }) }).apply { join() }
+                    errorA.get() == errorB.get() && resultA.get() == resultB.get()
                 }
     }
 
