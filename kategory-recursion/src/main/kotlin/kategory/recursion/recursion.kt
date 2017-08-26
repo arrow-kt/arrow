@@ -18,3 +18,14 @@ fun <M, F, A, B> hyloM(a: A, algM: AlgebraM<M, F, B>, coalgM: CoalgebraM<M, F, A
                 { aa: A -> coalgM(aa).lift() },
                 ComposedFunctor(MM, TF)
         )
+
+fun <F, G> algebraIso(alg: Algebra<ComposedType<F, G>, HK<F, G>>, coalg: Coalgebra<ComposedType<F, G>, HK<F, G>>, FG: Functor<G>): Birecursive<F, G> =
+        object : Birecursive<F, G> {
+            override fun FG(): Functor<G> = FG
+
+            override fun projectT(fg: HK<F, G>): HK<ComposedType<F, G>, HK<F, G>> =
+                    coalg(fg)
+
+            override fun embedT(compFG: HK<ComposedType<ComposedType<F, G>, F>, G>): HK<F, G> =
+                    alg(compFG.lower())
+        }
