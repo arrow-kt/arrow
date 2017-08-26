@@ -7,5 +7,5 @@ interface FixInstances<F> : Birecursive<FixHK, F> {
             fg.ev().projectT()
 
     override fun embedT(compFG: HK<Nested<Nested<FixHK, F>, FixHK>, F>): FixKind<F> =
-            Fix(FG(), compFG.lower().lower().ev())
+            Fix(FG(), compFG.unnest().unnest().ev())
 }

@@ -45,7 +45,7 @@ object TraverseLaws {
             forAll(genFunctionAToB<Int, HK<IdHK, Int>>(genConstructor(genIntSmall(), ::Id)), genFunctionAToB<Int, HK<IdHK, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf), { f: (Int) -> HK<IdHK, Int>, g: (Int) -> HK<IdHK, Int>, fha: HK<F, Int> ->
                 val fa = fha.traverse(FT, Id.applicative(), f).ev()
                 val composed = Id.functor().map(fa, { it.traverse(FT, Id.applicative(), g) }).value.value()
-                val expected = fha.traverse(FT, ComposedApplicative(Id.applicative(), Id.applicative()), { a: Int -> Id.functor().map(f(a), g).lift() }).lower().value().value()
+                val expected = fha.traverse(FT, ComposedApplicative(Id.applicative(), Id.applicative()), { a: Int -> Id.functor().map(f(a), g).nest() }).unnest().value().value()
                 composed.equalUnderTheLaw(expected, EQ)
             })
 
