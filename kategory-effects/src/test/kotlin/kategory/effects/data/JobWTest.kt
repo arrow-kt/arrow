@@ -14,10 +14,10 @@ class JobWTest : UnitSpec() {
                     val resultA = AtomicInteger(Int.MIN_VALUE)
                     val resultB = AtomicInteger(Int.MIN_VALUE)
                     a.runJob {
-                        it.fold({}, { resultA.set(it) })
+                        it.fold({ throw it }, { resultA.set(it) })
                     }.join()
                     b.runJob({
-                        it.fold({}, { resultB.set(it) })
+                        it.fold({ throw it }, { resultB.set(it) })
                     }).join()
                     resultA.get() == resultB.get()
                 }
