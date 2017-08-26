@@ -20,4 +20,4 @@ interface TrampolineFunctions {
     fun <A> delay(a: () -> A): TrampolineF<A> = defer { done(a()) }
 }
 
-fun <A> TrampolineF<A>.runT(): A = this.foldMap(FunctionK.id(), Function0).ev().invoke()
+fun <A> TrampolineF<A>.runT(): A = this.foldMap(FunctionK.id(), Function0.monad()).ev().invoke()

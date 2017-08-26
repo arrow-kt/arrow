@@ -6,8 +6,7 @@ jdk:
   - oraclejdk8
 
 script:
-  - ./gradlew check
-  - ./gradlew detekt
+  - ./gradlew clean build
   - ./gradlew codeCoverageReport
 
 after_success:

@@ -12,7 +12,7 @@ interface JobWInstances :
     fun CC(): CoroutineContext
 
     override fun <A> pure(a: A): JobW<A> =
-            JobW.pure(a, CC())
+            JobW.pure(CC(), a)
 
     override fun <A, B> map(fa: HK<JobWHK, A>, f: (A) -> B): JobW<B> =
             fa.ev().map(f)
@@ -21,24 +21,15 @@ interface JobWInstances :
             fa.ev().flatMap { a: A -> f(a).ev() }
 
     override fun <A, B> tailRecM(a: A, f: (A) -> HK<JobWHK, Either<A, B>>): JobW<B> =
-            runAsync { ff: (Either<Throwable, B>) -> Unit ->
-                f(a).runJob { either: Either<Throwable, Either<A, B>> ->
-                    either.fold({ ff(it.left()) }, {
-                        when (it) {
-                            is Either.Right -> ff(it.b.right())
-                            is Either.Left -> tailRecM(a, f)
-                        }
-                    })
-                }
-            }.ev()
+            JobW.tailRecM(CC(), a) { aa: A -> f(aa).ev() }
 
     override fun <A> raiseError(e: Throwable): JobW<A> =
-            JobW.raiseError(e, CC())
+            JobW.raiseError(CC(), e)
 
     override fun <A> handleErrorWith(fa: HK<JobWHK, A>, f: (Throwable) -> HK<JobWHK, A>): JobW<A> =
             fa.ev().handleErrorWith { err: Throwable -> f(err).ev() }
 
     override fun <A> runAsync(fa: Proc<A>): HK<JobWHK, A> =
-            JobW.runAsync(fa, CC())
+            JobW.runAsync(CC(), fa)
 
 }
