@@ -13,7 +13,7 @@ typealias UnnestedType<F, G, A> = HK<F, HK<G, A>>
 fun <F, G, A> UnnestedType<F, G, A>.nest(): NestedType<F, G, A> = this as HK<Nested<F, G>, A>
 
 @Suppress("UNCHECKED_CAST")
-fun <F, G, A> NestedType<F, G, A>.unnest(): UnnestedType<F, G, A> = this as HK<F, HK<G, A>>
+fun <F, G, A> NestedType<F, G, A>.unnest(): HK<F, HK<G, A>> = this as HK<F, HK<G, A>>
 
 interface ComposedFoldable<in F, in G> :
         Foldable<Nested<F, G>> {
