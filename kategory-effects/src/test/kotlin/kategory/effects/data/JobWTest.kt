@@ -26,10 +26,8 @@ class JobWTest : UnitSpec() {
     val EQ_ERR: Eq<HK<JobWHK, Int>> = object : Eq<HK<JobWHK, Int>> {
         override fun eqv(a: HK<JobWHK, Int>, b: HK<JobWHK, Int>): Boolean =
                 runBlocking {
-                    val jobA = a.runJob({})
-                    jobA.join()
-                    val jobB = b.runJob({})
-                    jobB.join()
+                    val jobA = a.runJob({}).apply { join() }
+                    val jobB = b.runJob({}).apply { join() }
                     jobA.getCompletionException().javaClass == jobB.getCompletionException().javaClass
                 }
     }
