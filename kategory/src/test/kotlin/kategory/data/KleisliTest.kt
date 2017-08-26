@@ -6,15 +6,16 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class KleisliTest : UnitSpec() {
+    private fun <A> EQ(): Eq<KleisliKind<TryHK, Int, A>> {
+        return object : Eq<KleisliKind<TryHK, Int, A>> {
+            override fun eqv(a: KleisliKind<TryHK, Int, A>, b: KleisliKind<TryHK, Int, A>): Boolean =
+                    a.ev().run(1) == b.ev().run(1)
+
+        }
+    }
+
     init {
-
-        val me = Kleisli.monadError<TryHK, Int, Throwable>(Try.monadError())
-
-        testLaws(MonadErrorLaws.laws(me, object : Eq<KleisliKind<TryHK, Int, Int>> {
-            override fun eqv(a: KleisliKind<TryHK, Int, Int>, b: KleisliKind<TryHK, Int, Int>): Boolean =
-                a.ev().run(1) == b.ev().run(1)
-
-        }))
+        testLaws(MonadErrorLaws.laws(Kleisli.monadError<TryHK, Int, Throwable>(Try.monadError()), EQ(), EQ()))
 
         "andThen should continue sequence" {
             val kleisli: Kleisli<IdHK, Int, Int> = Kleisli({ a: Int -> Id(a) })
