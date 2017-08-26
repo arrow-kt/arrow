@@ -4,14 +4,14 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object AsyncLaws {
-    inline fun <reified F> laws(AC: AsyncContext<F> = asyncContext(), M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>, EQER: Eq<HK<F, Int>> = EQ): List<Law> =
-            MonadErrorLaws.laws(M, EQ) + listOf(
+    inline fun <reified F> laws(AC: AsyncContext<F> = asyncContext(), M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>, EQERR: Eq<HK<F, Int>> = EQ): List<Law> =
+            MonadErrorLaws.laws(M, EQERR, EQ) + listOf(
                     Law("Async Laws: success equivalence", { asyncSuccess(AC, M, EQ) }),
-                    Law("Async Laws: error equivalence", { asyncError(AC, M, EQER) }),
+                    Law("Async Laws: error equivalence", { asyncError(AC, M, EQERR) }),
                     Law("Async bind: binding blocks", { asyncBind(AC, M, EQ) }),
-                    Law("Async bind: binding failure", { asyncBindError(AC, M, EQER) }),
+                    Law("Async bind: binding failure", { asyncBindError(AC, M, EQERR) }),
                     Law("Async bind: unsafe binding", { asyncBindUnsafe(AC, M, EQ) }),
-                    Law("Async bind: unsafe binding failure", { asyncBindUnsafeError(AC, M, EQER) }),
+                    Law("Async bind: unsafe binding failure", { asyncBindUnsafeError(AC, M, EQERR) }),
                     Law("Async bind: binding in parallel", { asyncParallelBind(AC, M, EQ) })
             )
 

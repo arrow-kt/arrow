@@ -4,6 +4,7 @@ import io.kotlintest.KTestJUnitRunner
 import kotlinx.coroutines.experimental.runBlocking
 import org.junit.runner.RunWith
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.experimental.EmptyCoroutineContext
 
 @RunWith(KTestJUnitRunner::class)
@@ -12,7 +13,7 @@ class JobWTest : UnitSpec() {
         override fun eqv(a: HK<JobWHK, Int>, b: HK<JobWHK, Int>): Boolean =
                 runBlocking {
                     val resultA = AtomicInteger(Int.MIN_VALUE)
-                    val resultB = AtomicInteger(Int.MIN_VALUE)
+                    val resultB = AtomicInteger(Int.MAX_VALUE)
                     a.runJob {
                         it.fold({ throw it }, { resultA.set(it) })
                     }.join()
