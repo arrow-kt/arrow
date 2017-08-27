@@ -12,6 +12,8 @@ interface Traverse<F> : Functor<F>, Foldable<F>, Typeclass {
     fun <G, A, B> traverse(fa: HK<F, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<F, B>>
 
     override fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B> = traverse(fa, { Id(f(it)) }, Id.applicative()).value()
+
+    fun <G, A> sequence(GA: Applicative<G>, fga: HK<F, HK<G, A>>): HK<G, HK<F, A>> = traverse(fga, { it }, GA)
 }
 
 inline fun <reified F, reified G, A, B> HK<F, A>.traverse(
@@ -30,6 +32,6 @@ applicative(), FM: Monad<F> = monad()): HK<G, HK<F, B>> = GA.map(traverse(fa, f,
 /**
  * Thread all the G effects through the F structure to invert the structure from F<G<A>> to G<F<A>>.
  */
-inline fun <F, reified G, A> Traverse<F>.sequence(fga: HK<F, HK<G, A>>, GA: Applicative<G> = applicative()): HK<G, HK<F, A>> = traverse(fga, { it }, GA)
+inline fun <F, reified G, A> Traverse<F>.sequence(fga: HK<F, HK<G, A>>, GA: Applicative<G> = applicative()): HK<G, HK<F, A>> = sequence(GA, fga)
 
 inline fun <reified F> traverse(): Traverse<F> = instance(InstanceParametrizedType(Traverse::class.java, listOf(F::class.java)))
