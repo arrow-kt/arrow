@@ -34,7 +34,8 @@ interface OptionTTraverse<F> :
 
     fun MF(): Monad<F>
 
-    override fun <G, A, B> traverse(fa: HK<OptionTKindPartial<F>, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<OptionTKindPartial<F>, B>> = fa.ev().traverse(f, GA, FF(), MF())
+    override fun <G, A, B> traverse(fa: HK<OptionTKindPartial<F>, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<OptionTKindPartial<F>, B>> =
+            fa.ev().traverse(f, GA, FF(), MF())
 
     override fun <A, B> foldL(fa: HK<OptionTKindPartial<F>, A>, b: B, f: (B, A) -> B): B = fa.ev().foldL(b, f, FF())
 
@@ -50,4 +51,13 @@ interface OptionTSemigroupK<F> : SemigroupK<OptionTKindPartial<F>> {
 
 interface OptionTMonoidK<F> : MonoidK<OptionTKindPartial<F>>, OptionTSemigroupK<F> {
     override fun <A> empty(): HK<OptionTKindPartial<F>, A> = OptionT(F(), F().pure(Option.None))
+}
+
+interface OptionTFunctor<F> : FunctorFilter<OptionTKindPartial<F>> {
+
+    fun MF(): Monad<F>
+
+    override fun <A, B> map(fa: HK<OptionTKindPartial<F>, A>, f: (A) -> B): OptionT<F, B> = fa.ev().map(f)
+
+    override fun <A, B> mapFilter(fa: HK<OptionTKindPartial<F>, A>, f: (A) -> Option<B>): OptionT<F, B> = fa.ev().mapFilter(f, MF())
 }

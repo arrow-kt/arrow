@@ -16,7 +16,8 @@ package kategory
 
     fun <B> foldL(b: B, f: (B, A) -> B, FF: Foldable<F>, FG: Foldable<G>): B = run.fold({ FF.foldL(it, b, f) }, { FG.foldL(it, b, f) })
 
-    fun <B> foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>, FG: Foldable<G>): Eval<B> = run.fold({ FF.foldR(it, lb, f) }, { FG.foldR(it, lb, f) })
+    fun <B> foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>, FG: Foldable<G>): Eval<B> =
+            run.fold({ FF.foldR(it, lb, f) }, { FG.foldR(it, lb, f) })
 
     fun <H, B> traverse(f: (A) -> HK<H, B>, GA: Applicative<H>, FT: Traverse<F>, GT: Traverse<G>): HK<H, Coproduct<F, G, B>> =
             run.fold({
@@ -26,19 +27,23 @@ package kategory
             })
 
     companion object {
-        inline operator fun <reified F, reified G, A> invoke(run: Either<HK<F, A>, HK<G, A>>, CF: Comonad<F> = comonad<F>(), CG: Comonad<G> = comonad<G>()): Coproduct<F, G, A> = Coproduct(CF, CG, run)
+        inline operator fun <reified F, reified G, A> invoke(run: Either<HK<F, A>, HK<G, A>>,
+                                                             CF: Comonad<F> = comonad<F>(),
+                                                             CG: Comonad<G> = comonad<G>()): Coproduct<F, G, A> = Coproduct(CF, CG, run)
 
         fun <F, G> comonad(): CoproductComonad<F, G> = object : CoproductComonad<F, G> {}
 
         fun <F, G> functor(): CoproductComonad<F, G> = object : CoproductComonad<F, G> {}
 
-        inline fun <reified F, reified G> traverse(FF: Traverse<F> = traverse<F>(), FG: Traverse<G> = traverse<G>()): CoproductTraverse<F, G> = object : CoproductTraverse<F, G> {
-            override fun FF(): Traverse<F> = FF
+        inline fun <reified F, reified G> traverse(FF: Traverse<F> = traverse<F>(), FG: Traverse<G> = traverse<G>()): CoproductTraverse<F, G> =
+                object : CoproductTraverse<F, G> {
+                    override fun FF(): Traverse<F> = FF
 
-            override fun FG(): Traverse<G> = FG
-        }
+                    override fun FG(): Traverse<G> = FG
+                }
     }
 
 }
 
-inline fun <reified F, reified G, A> Either<HK<F, A>, HK<G, A>>.coproduct(CF: Comonad<F> = comonad(), CG: Comonad<G> = comonad()): Coproduct<F, G, A> = Coproduct(CF, CG, this)
+inline fun <reified F, reified G, A> Either<HK<F, A>, HK<G, A>>.coproduct(CF: Comonad<F> = comonad(), CG: Comonad<G> = comonad()): Coproduct<F, G, A> =
+        Coproduct(CF, CG, this)

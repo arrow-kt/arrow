@@ -14,9 +14,7 @@ class IOTest : UnitSpec() {
     }
 
     init {
-
-        testLaws(MonadLaws.laws(IO, EQ))
-        testLaws(AsyncLaws.laws(IO, IO, EQ, EQ))
+        testLaws(AsyncLaws.laws(IO.asyncContext(), IO.monadError(), EQ, EQ))
 
         "should defer evaluation until run" {
             var run = false
@@ -115,7 +113,8 @@ class IOTest : UnitSpec() {
             IO.raiseError<Int>(MyException()).unsafeRunAsync { either ->
                 either.fold({
                     when (it) {
-                        is MyException -> {}
+                        is MyException -> {
+                        }
                         else -> fail("Should only throw MyException")
                     }
                 }, { fail("") })
@@ -163,7 +162,9 @@ class IOTest : UnitSpec() {
             IO.raiseError<Int>(MyException()).runAsync { either ->
                 either.fold({
                     when (it) {
-                        is MyException -> { IO { } }
+                        is MyException -> {
+                            IO { }
+                        }
                         else -> fail("Should only throw MyException")
                     }
                 }, { fail("") })

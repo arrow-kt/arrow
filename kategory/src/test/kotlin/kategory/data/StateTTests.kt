@@ -8,7 +8,7 @@ class StateTTests : UnitSpec() {
 
     init {
 
-        val instances = StateT.monadState<TryHK, Int>(Try)
+        val instances = StateT.monadState<TryHK, Int>(Try.monad())
 
         testLaws(MonadStateLaws.laws(
                 instances,
@@ -22,11 +22,11 @@ class StateTTests : UnitSpec() {
                             a.runM(1) == b.runM(1)
                 }))
 
-        testLaws(SemigroupKLaws.laws<StateTKindPartial<OptionHK, Int>>(
-                StateT.semigroupK(Option, OptionSemigroupK()),
-                StateT.applicative(Option),
-                object : Eq<HK<StateTKindPartial<OptionHK, Int>, Int>> {
-                    override fun eqv(a: HK<StateTKindPartial<OptionHK, Int>, Int>, b: HK<StateTKindPartial<OptionHK, Int>, Int>): Boolean =
+        testLaws(SemigroupKLaws.laws(
+                StateT.semigroupK<ListKWHK, Int>(ListKW.monad(), ListKW.semigroupK()),
+                StateT.applicative<ListKWHK, Int>(ListKW.monad()),
+                object : Eq<HK<StateTKindPartial<ListKWHK, Int>, Int>> {
+                    override fun eqv(a: HK<StateTKindPartial<ListKWHK, Int>, Int>, b: HK<StateTKindPartial<ListKWHK, Int>, Int>): Boolean =
                             a.runM(1) == b.runM(1)
                 }))
     }

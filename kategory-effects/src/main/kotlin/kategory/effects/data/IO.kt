@@ -95,6 +95,10 @@ import kategory.effects.data.internal.error
 
         fun monad(): Monad<IOHK> = this
 
+        fun monadError(): MonadError<IOHK, Throwable> = this
+
+        fun asyncContext(): AsyncContext<IOHK> = this
+
         fun <A> semigroup(SG: Semigroup<A>): IOSemigroup<A> = object : IOSemigroup<A> {
             override fun SG(): Semigroup<A> = SG
         }
@@ -149,7 +153,8 @@ internal data class Suspend<out A>(val cont: AndThen<Unit, IO<A>>) : IO<A>() {
 internal data class BindSuspend<E, out A>(val cont: AndThen<Unit, IO<E>>, val f: AndThen<E, IO<A>>) : IO<A>() {
     override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
 
-    override fun <B> flatMapTotal(ff: AndThen<A, IO<B>>): IO<B> = BindSuspend(cont, f.andThen(AndThen({ it.flatMapTotal(ff) }, { ff.error(it, { RaiseError(it) }) })))
+    override fun <B> flatMapTotal(ff: AndThen<A, IO<B>>): IO<B> =
+            BindSuspend(cont, f.andThen(AndThen({ it.flatMapTotal(ff) }, { ff.error(it, { RaiseError(it) }) })))
 
     override fun attempt(): IO<Either<Throwable, A>> = BindSuspend(AndThen { _ -> this }, attemptValue())
 
@@ -173,7 +178,8 @@ internal data class Async<out A>(val cont: ((Either<Throwable, A>) -> Unit) -> U
 internal data class BindAsync<E, out A>(val cont: ((Either<Throwable, E>) -> Unit) -> Unit, val f: AndThen<E, IO<A>>) : IO<A>() {
     override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
 
-    override fun <B> flatMapTotal(ff: AndThen<A, IO<B>>): IO<B> = BindAsync(cont, f.andThen(AndThen({ it.flatMapTotal(ff) }, { ff.error(it, { RaiseError(it) }) })))
+    override fun <B> flatMapTotal(ff: AndThen<A, IO<B>>): IO<B> =
+            BindAsync(cont, f.andThen(AndThen({ it.flatMapTotal(ff) }, { ff.error(it, { RaiseError(it) }) })))
 
     override fun attempt(): IO<Either<Throwable, A>> = BindSuspend(AndThen { _ -> this }, attemptValue())
 

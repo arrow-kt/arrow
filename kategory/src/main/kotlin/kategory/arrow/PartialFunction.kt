@@ -18,6 +18,18 @@ fun <A, B> PartialFunction<A, B>.orElse(f: PartialFunction<A, B>): PartialFuncti
 
         }
 
+/**
+ * Turns this partial function into a plain function returning an Option result.
+ */
+fun <A, B> PartialFunction<A, B>.lift(): (A) -> Option<B> = Lifted(this)
+
+/**
+ * Applies this partial function to the given argument when it is contained in the function domain.
+ * Applies fallback function where this partial function is not defined.
+ */
+fun <A, B : B1, A1 : A, B1> PartialFunction<A, B>.applyOrElse(x: A1, default: (A1) -> B1): B1 =
+        if (isDefinedAt(x)) invoke(x) else default(x)
+
 fun <A, B, C> PartialFunction<A, B>.andThen(f: (B) -> C): PartialFunction<A, C> =
         object : PartialFunction<A, C>() {
             override fun isDefinedAt(a: A): Boolean = this@andThen.isDefinedAt(a)
@@ -31,3 +43,7 @@ fun <A, B> case(ff: Tuple2<(A) -> Boolean, (A) -> B>): PartialFunction<A, B> =
         }
 
 infix fun <A, B> ((A) -> Boolean).then(f: (A) -> B): Tuple2<(A) -> Boolean, (A) -> B> = Tuple2(this, f)
+
+private class Lifted<A, B>(val pf: PartialFunction<A, B>) : (A) -> Option<B> {
+    override fun invoke(x: A): Option<B> = pf.andThen { Option.Some(it) }.applyOrElse(x, { Option.None })
+}

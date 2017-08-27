@@ -29,16 +29,19 @@ interface Monad<F> : Applicative<F>, Typeclass {
     fun <A, B> forEffectEval(fa: HK<F, A>, fb: Eval<HK<F, B>>): HK<F, A> = flatMap(fa, { a -> map(fb.value(), { a }) })
 }
 
-inline fun <F, A, B> Monad<F>.mproduct(fa: HK<F, A>, crossinline f: (A) -> HK<F, B>): HK<F, Tuple2<A, B>> = flatMap(fa, { a -> map(f(a), { a toT it }) })
+inline fun <F, A, B> Monad<F>.mproduct(fa: HK<F, A>, crossinline f: (A) -> HK<F, B>): HK<F, Tuple2<A, B>> =
+        flatMap(fa, { a -> map(f(a), { a toT it }) })
 
-inline fun <F, B> Monad<F>.ifM(fa: HK<F, Boolean>, crossinline ifTrue: () -> HK<F, B>, crossinline ifFalse: () -> HK<F, B>): HK<F, B> = flatMap(fa, { if (it) ifTrue() else ifFalse() })
+inline fun <F, B> Monad<F>.ifM(fa: HK<F, Boolean>, crossinline ifTrue: () -> HK<F, B>, crossinline ifFalse: () -> HK<F, B>): HK<F, B> =
+        flatMap(fa, { if (it) ifTrue() else ifFalse() })
 
 inline fun <reified F, A, B> HK<F, A>.flatMap(FT: Monad<F> = monad(), noinline f: (A) -> HK<F, B>): HK<F, B> = FT.flatMap(this, f)
 
 inline fun <reified F, A> HK<F, HK<F, A>>.flatten(FT: Monad<F> = monad()): HK<F, A> = FT.flatten(this)
 
 @RestrictsSuspension
-open class MonadContinuation<F, A>(val M: Monad<F>, override val context: CoroutineContext = EmptyCoroutineContext) : Serializable, Continuation<HK<F, A>> {
+open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
+        Serializable, Continuation<HK<F, A>>, Monad<F> by M {
 
     override fun resume(value: HK<F, A>) {
         returnedMonad = value
@@ -56,7 +59,7 @@ open class MonadContinuation<F, A>(val M: Monad<F>, override val context: Corout
 
     suspend fun <B> bind(m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels
-        returnedMonad = M.flatMap(m(), { x ->
+        returnedMonad = flatMap(m(), { x: B ->
             c.stackLabels = labelHere
             c.resume(x)
             returnedMonad
@@ -67,7 +70,7 @@ open class MonadContinuation<F, A>(val M: Monad<F>, override val context: Corout
     suspend fun <B> bindInContext(coroutineContext: CoroutineContext, m: suspend () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels
         val result = runBlocking(coroutineContext) { m() }
-        returnedMonad = M.flatMap(result, { x ->
+        returnedMonad = flatMap(result, { x: B ->
             c.stackLabels = labelHere
             c.resume(x)
             returnedMonad
@@ -75,9 +78,9 @@ open class MonadContinuation<F, A>(val M: Monad<F>, override val context: Corout
         COROUTINE_SUSPENDED
     }
 
-    infix fun <B> yields(b: B) = yields { b }
+    infix fun <B> yields(b: B): HK<F, B> = yields { b }
 
-    infix fun <B> yields(b: () -> B) = M.pure(b())
+    infix fun <B> yields(b: () -> B): HK<F, B> = pure(b())
 }
 
 /**
@@ -92,7 +95,8 @@ fun <F, B> Monad<F>.binding(coroutineContext: CoroutineContext = EmptyCoroutineC
 }
 
 @RestrictsSuspension
-open class StackSafeMonadContinuation<F, A>(val M: Monad<F>, override val context: CoroutineContext = EmptyCoroutineContext) : Serializable, Continuation<Free<F, A>> {
+open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
+        Serializable, Continuation<Free<F, A>>, Monad<F> by M {
 
     override fun resume(value: Free<F, A>) {
         returnedMonad = value
@@ -132,9 +136,9 @@ open class StackSafeMonadContinuation<F, A>(val M: Monad<F>, override val contex
         COROUTINE_SUSPENDED
     }
 
-    infix fun <B> yields(b: B) = yields { b }
+    infix fun <B> yields(b: B): Free<F, B> = yields { b }
 
-    infix fun <B> yields(b: () -> B) = Free.liftF(M.pure(b()))
+    infix fun <B> yields(b: () -> B): Free<F, B> = Free.liftF(pure(b()))
 }
 
 /**
@@ -145,7 +149,8 @@ open class StackSafeMonadContinuation<F, A>(val M: Monad<F>, override val contex
  * This combinator ultimately returns computations lifting to Free to automatically for comprehend in a stack-safe way
  * over any stack-unsafe monads
  */
-fun <F, B> Monad<F>.bindingStackSafe(coroutineContext: CoroutineContext = EmptyCoroutineContext, c: suspend StackSafeMonadContinuation<F, *>.() -> Free<F, B>): Free<F, B> {
+fun <F, B> Monad<F>.bindingStackSafe(coroutineContext: CoroutineContext = EmptyCoroutineContext, c: suspend StackSafeMonadContinuation<F, *>.() -> Free<F, B>):
+        Free<F, B> {
     val continuation = StackSafeMonadContinuation<F, B>(this, coroutineContext)
     c.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
