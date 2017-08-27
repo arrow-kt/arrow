@@ -13,5 +13,8 @@ package kategory
         }
 
         inline fun <reified F> birecursive(FF: Functor<F> = functor<F>()): Birecursive<FixHK, F> = instances(FF)
+
+        fun <F> birecursiveFix(FF: Functor<F>): Birecursive<FixHK, F> =
+                algebraIso({ Fix(FF, it.unnest().ev()) }, { it.ev().unfix.nest() })
     }
 }
