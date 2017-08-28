@@ -31,11 +31,21 @@ Try { "1".toInt() }.map { it * 2 }
 Option(1).map { it * 2 }
 ```
 
+Both `Try` and `Option` include ready to use `Functor` instances:
+
+```kotlin:ank
+val optionFunctor = Option.functor()
+```
+
+```kotlin:ank
+val tryFunctor = Try.functor()
+```
+
 Mapping over the empty/failed cases is always safe since the `map` operation in both Try and Option operate under the bias of those containing success values
 
 ```kotlin:ank
 Try { "x".toInt() }.map { it * 2 }
-none<Int>.map { it * 2 }
+none<Int>().map { it * 2 }
 ```
 
 Kategory allows abstract polymorphic code that operates over the evidence of having an instance of a typeclass available. 
@@ -70,8 +80,7 @@ Transforms the inner contents
 `fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B>`
 
 ```kotlin:ank
-val optionFunctor = functor<OptionHK>()
-optionfunctor.map(Option(1), { it + 1 })
+optionFunctor.map(Option(1), { it + 1 })
 ```
 
 #### lift
@@ -81,7 +90,7 @@ Lift a function to the Functor context so it can be applied over values of the i
 `fun <A, B> lift(f: (A) -> B): (HK<F, A>) -> HK<F, B>`
 
 ```kotlin:ank
-val lifted = optionFunctor.lift({ it + 1 })
+val lifted = optionFunctor.lift({ n: Int -> n + 1 })
 lifted(Option(1))
 ```
 

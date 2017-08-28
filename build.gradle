@@ -31,14 +31,18 @@ buildscript {
 
     repositories {
         jcenter()
+        maven { url 'https://jitpack.io' }
         maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
+        maven { url "https://dl.bintray.com/jetbrains/markdown/" }
     }
 
     dependencies {
         classpath "com.github.ben-manes:gradle-versions-plugin:$gradleVersionsPluginVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
-        classpath group: 'io.kategory', name: 'ank-gradle-plugin', version: '0.1.2'
+        classpath('com.github.kategory:ank:master-SNAPSHOT') {
+            exclude group: 'com.github.kategory'
+        }
     }
 }
 

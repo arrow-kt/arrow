@@ -4,7 +4,7 @@ title: Applicative
 permalink: /docs/typeclasses/applicative/
 ---
 
-## Functor
+## Applicative
 
 The `Applicative` typeclass abstracts the ability to lift values and apply functions over the computational context of a type constructor.
 Examples of type constructors that can implement instances of the Applicative typeclass include `Option`, `NonEmptyList`,
@@ -31,15 +31,15 @@ Kategory features an [Applicative Builder](/docs/patterns/applicativebuilder) th
 ```kotlin:ank
 data class Profile(val name: String, val phone: Int, val address: List<String>)
 
-val r: Option<Tuple3<String, Int, List<String>>> = Option.tupled(profileService(), phoneService(), addressService())
+val r: Option<Tuple3<String, Int, List<String>>> = Option.applicative().tupled(profileService(), phoneService(), addressService()).ev()
 r.map { Profile(it.a, it.b, it.c) } 
 ```
 
 The Applicative Builder also provides a `map` operations that is able to abstract over arity in the same way as `tupled`
 
 ```kotlin:ank
-Option.map(profileService(), phoneService(), addressService(), { name, phone, address ->
-  Profile(name, phone, address)
+Option.applicative().map(profileService(), phoneService(), addressService(), { (name, phone, addresses) ->
+  Profile(name, phone, addresses)
 })
 ```
 
@@ -62,7 +62,7 @@ Apply a function inside the type constructor's context
 `fun <A, B> ap(fa: HK<F, A>, ff: HK<F, (A) -> B>): HK<F, B>`
 
 ```kotlin:ank
-Option.ap(Option(1), Option({ n: Int -> n + 1 })) // Option(2)
+Option.applicative().ap(Option(1), Option({ n: Int -> n + 1 })) // Option(2)
 ```
 
 #### Other combinators
@@ -76,7 +76,7 @@ For a full list of other useful combinators available in `Applicative` see the [
 Lift a value into the computational context of a type constructor
 
 ```kotlin:ank
-1.pure<TryHK, Int> // Try.Success(1)
+1.pure<OptionHK, Int>()
 ```
 
 #### HK<F, A>#ap
@@ -84,7 +84,7 @@ Lift a value into the computational context of a type constructor
 Apply a function inside the type constructor's context
 
 ```kotlin:ank
-Option(1).ap(Option({ n: Int -> n + 1 })) // Option(2)
+Option(1).ap(Option({ n: Int -> n + 1 }))
 ```
 
 #### HK<F, A>#map2
@@ -92,7 +92,7 @@ Option(1).ap(Option({ n: Int -> n + 1 })) // Option(2)
 Map 2 values inside the type constructor context and apply a function to their cartesian product
 
 ```kotlin:ank
-Option(1).map2(Option("x"), { z: Tuple2<Int, String> ->  z.a + z.b }) // Option("1x")
+Option.applicative().map2(Option(1), Option("x"), { z: Tuple2<Int, String> ->  "${z.a}${z.b}" })
 ```
 
 #### HK<F, A>#map2Eval
@@ -101,7 +101,7 @@ Lazily map 2 values inside the type constructor context and apply a function to 
 Computation happens when `.value()` is invoked.
 
 ```kotlin:ank
-Option(1).map2(Eval { Option("x") }, { z: Tuple2<Int, String> ->  z.a + z.b }).value() // Option("1x")
+Option.applicative().map2Eval(Option(1), Eval.later { Option("x") }, { z: Tuple2<Int, String> ->  "${z.a}${z.b}" }).value()
 ```
 
 
