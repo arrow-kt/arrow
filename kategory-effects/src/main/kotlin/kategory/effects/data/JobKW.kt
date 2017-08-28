@@ -8,7 +8,7 @@ import kotlinx.coroutines.experimental.launch
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.experimental.CoroutineContext
 
-@higherkind data class JobKW<out A>(val thunk: ((Either<Throwable, A>) -> Unit) -> Job) : HK<JobKWHK, A> {
+@higherkind data class JobKW<out A>(val thunk: ((Either<Throwable, A>) -> Unit) -> Job) : JobKWKind<A> {
 
     fun <B> map(f: (A) -> B): JobKW<B> =
             JobKW { ff: (Either<Throwable, B>) -> Unit ->
