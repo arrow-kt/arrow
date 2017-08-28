@@ -2,7 +2,7 @@ package kategory
 
 import kotlin.coroutines.experimental.CoroutineContext
 
-interface JobWInstances :
+interface JobKWInstances :
         Functor<JobKWHK>,
         Applicative<JobKWHK>,
         Monad<JobKWHK>,

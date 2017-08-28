@@ -26,7 +26,7 @@ import kotlin.coroutines.experimental.CoroutineContext
                         when {
                             t == null && state != null -> state.fold({ ff(it.left()) }, { f(it).thunk(ff) })
                             t != null -> JobKW.raiseError<B>(coroutineContext, t)
-                            else -> throw IllegalStateException("JobW flatMap completed without success or error")
+                            else -> throw IllegalStateException("JobKW flatMap completed without success or error")
                         }
                     }
                 }
@@ -84,8 +84,8 @@ import kotlin.coroutines.experimental.CoroutineContext
                     }
                 }
 
-        inline fun instances(coroutineContext: CoroutineContext): JobWInstances =
-                object : JobWInstances {
+        inline fun instances(coroutineContext: CoroutineContext): JobKWInstances =
+                object : JobKWInstances {
                     override fun CC(): CoroutineContext = coroutineContext
                 }
 
@@ -113,7 +113,7 @@ inline fun <A> JobKW<A>.handleErrorWith(crossinline function: (Throwable) -> Job
                     when {
                         t == null && state != null -> state.fold({ function(it).thunk(ff) }, { ff(it.right()) })
                         t != null -> function(t).thunk(ff)
-                        else -> throw IllegalStateException("JobW handleErrorWith completed without success or error")
+                        else -> throw IllegalStateException("JobKW handleErrorWith completed without success or error")
                     }
                 }
             }
