@@ -86,6 +86,8 @@ subprojects { project ->
             repo = 'maven'
             name = POM_ARTIFACT_ID
             userOrg = POM_DEVELOPER_ID
+            licenses = ['Apache-2.0']
+            vcsUrl = 'https://github.com/kategory/kategory.git'
         }
     }
 }
