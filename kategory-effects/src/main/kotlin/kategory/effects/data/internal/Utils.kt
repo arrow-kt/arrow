@@ -9,7 +9,7 @@ import java.util.concurrent.locks.AbstractQueuedSynchronizer
 
 object Platform {
 
-    internal fun <A> onceOnly(f: (A) -> Unit): (A) -> Unit {
+    inline fun <A> onceOnly(crossinline f: (A) -> Unit): (A) -> Unit {
         val wasCalled = AtomicBoolean(false)
 
         return { a ->
