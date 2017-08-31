@@ -120,7 +120,7 @@ f(Option(1))
 
 ### Laws
 
-Kategory provides [`FunctorLaws`](/docs/typeclasses/laws#functorlaws) for internal verification of lawful instances and third party apps creating their own Functor instances.
+Kategory provides [`FunctorLaws`](/docs/typeclasses/laws#functorlaws) in the form of test cases for internal verification of lawful instances and third party apps creating their own Functor instances.
 
 #### Creating your own `Functor` instances
 

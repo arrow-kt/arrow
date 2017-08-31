@@ -109,7 +109,7 @@ Option.applicative().map2Eval(Option(1), Eval.later { Option("x") }, { z: Tuple2
 
 ### Laws
 
-Kategory provides [`ApplicativeLaws`](/docs/typeclasses/laws#applicativelaws) for internal verification of lawful instances and third party apps creating their own Applicative instances.
+Kategory provides [`ApplicativeLaws`](/docs/typeclasses/laws#applicativelaws) in the form of test cases for internal verification of lawful instances and third party apps creating their own Applicative instances.
 
 #### Creating your own `Applicative` instances
 
