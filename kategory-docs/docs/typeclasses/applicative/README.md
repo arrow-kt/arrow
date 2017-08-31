@@ -10,6 +10,8 @@ The `Applicative` typeclass abstracts the ability to lift values and apply funct
 Examples of type constructors that can implement instances of the Applicative typeclass include `Option`, `NonEmptyList`,
 `List` and many other datatypes that include a `pure` and either `ap` function. `ap` may be derived for monadic types that include a `Monad` instance via `flatMap`.
 
+`Applicative` includes all combinators present in [`Functor`](/docs/typeclasses/functor/).
+
 ### Applicative Builder examples
 
 Often times we find ourselves in situations where we need to compute multiple independent values resulting from operations that do not depend on each other.
