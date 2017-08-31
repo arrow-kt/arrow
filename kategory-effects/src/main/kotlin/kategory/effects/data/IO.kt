@@ -58,24 +58,24 @@ import kategory.effects.data.internal.error
 
         internal fun <A> attemptValue(): AndThen<A, IO<Either<Throwable, A>>> = AndThen({ a: A -> Pure(Either.Right(a)) }, { e -> Pure(Either.Left(e)) })
 
-        operator fun <A> invoke(f: (Unit) -> A): IO<A> = suspend { Pure(f(Unit)) }
+        operator fun <A> invoke(f: () -> A): IO<A> = suspend { Pure(f()) }
 
-        fun <A> suspend(f: (Unit) -> IO<A>): IO<A> =
+        fun <A> suspend(f: () -> IO<A>): IO<A> =
                 Suspend(AndThen { _ ->
                     try {
-                        f(Unit)
+                        f()
                     } catch (throwable: Throwable) {
                         raiseError(throwable)
                     }
                 })
 
         fun <A> async(k: ((Either<Throwable, A>) -> Unit) -> Unit): IO<A> =
-                Async { callBack ->
-                    onceOnly(callBack).let { ff: (Either<Throwable, A>) -> Unit ->
+                Async { ff: (Either<Throwable, A>) -> Unit ->
+                    onceOnly(ff).let { callback: (Either<Throwable, A>) -> Unit ->
                         try {
-                            k(ff)
+                            k(callback)
                         } catch (throwable: Throwable) {
-                            ff(Either.Left(throwable))
+                            callback(Either.Left(throwable))
                         }
                     }
                 }
