@@ -24,19 +24,25 @@ buildscript {
         javaVersion = JavaVersion.VERSION_1_7
         kotlinTestVersion = '2.0.5'
         kotlinVersion = '1.1.4'
-        kotlinxCoroutinesVersion = '0.17'
+        kotlinxCoroutinesVersion = '0.18'
         kategoryAnnotationsVersion = '0.3.7'
+        kotlinxCollectionsImmutableVersion = '0.1'
     }
 
     repositories {
         jcenter()
+        maven { url 'https://jitpack.io' }
         maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
+        maven { url "https://dl.bintray.com/jetbrains/markdown/" }
     }
 
     dependencies {
         classpath "com.github.ben-manes:gradle-versions-plugin:$gradleVersionsPluginVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath('io.kategory:ank-gradle-plugin:0.1.4') {
+            exclude group: 'io.kategory'
+        }
     }
 }
 
@@ -46,10 +52,12 @@ subprojects { project ->
     version = VERSION_NAME
 
     repositories {
-        maven {url "http://dl.bintray.com/kategory/maven" }
         jcenter()
         maven { url 'https://kotlin.bintray.com/kotlinx' }
         maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
+        maven { url "http://dl.bintray.com/kategory/maven" }
+        maven { url "https://dl.bintray.com/jetbrains/markdown/" }
+        maven { url 'https://jitpack.io' }
     }
 
     apply plugin: 'kotlin'
