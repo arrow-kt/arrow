@@ -12,10 +12,7 @@ class EitherTTest : UnitSpec() {
         testLaws(SemigroupKLaws.laws<EitherTKindPartial<IdHK, Int>>(
                 EitherT.semigroupK(Id.monad()),
                 EitherT.applicative(Id.monad()),
-                object : Eq<HK<EitherTKindPartial<IdHK, Int>, Int>> {
-                    override fun eqv(a: HK<EitherTKindPartial<IdHK, Int>, Int>, b: HK<EitherTKindPartial<IdHK, Int>, Int>): Boolean =
-                            a.ev() == b.ev()
-                }))
+                Eq.any()))
 
     }
 }
