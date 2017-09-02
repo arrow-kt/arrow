@@ -43,13 +43,13 @@ sealed class Option<out A> : OptionKind<A> {
 
     /**
      * Returns true if the option is [None], false otherwise.
-     * Used only for performance instead of fold.
+     * @note Used only for performance instead of fold.
      */
     internal abstract val isEmpty: Boolean
 
     /**
      * Returns true if the option is an instance of $some, false otherwise.
-     * Used only for performance instead of fold.
+     * @note Used only for performance instead of fold.
      */
     internal val isDefined: Boolean = !isEmpty
 
@@ -137,8 +137,9 @@ sealed class Option<out A> : OptionKind<A> {
     /**
      * Returns false if the option is $none, true otherwise.
      * @note Implemented here to avoid the implicit conversion to Iterable.
+     * @note Used only for performance instead of fold.
      */
-    val nonEmpty = isDefined
+    internal val nonEmpty = isDefined
 
     /**
      * Returns true if this option is nonempty '''and''' the predicate
