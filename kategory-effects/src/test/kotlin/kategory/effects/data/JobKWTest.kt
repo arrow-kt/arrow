@@ -10,8 +10,8 @@ import kotlin.coroutines.experimental.EmptyCoroutineContext
 
 @RunWith(KTestJUnitRunner::class)
 class JobWTest : UnitSpec() {
-    private fun <A> EQ(): Eq<HK<JobWHK, A>> = object : Eq<HK<JobWHK, A>> {
-        override fun eqv(a: HK<JobWHK, A>, b: HK<JobWHK, A>): Boolean =
+    private fun <A> EQ(): Eq<HK<JobKWHK, A>> = object : Eq<HK<JobKWHK, A>> {
+        override fun eqv(a: HK<JobKWHK, A>, b: HK<JobKWHK, A>): Boolean =
                 runBlocking {
                     val resultA = AtomicReference<A>()
                     val resultB = AtomicReference<A>()
@@ -26,8 +26,8 @@ class JobWTest : UnitSpec() {
                 }
     }
 
-    val EQ_ERR: Eq<HK<JobWHK, Int>> = object : Eq<HK<JobWHK, Int>> {
-        override fun eqv(a: HK<JobWHK, Int>, b: HK<JobWHK, Int>): Boolean =
+    val EQ_ERR: Eq<HK<JobKWHK, Int>> = object : Eq<HK<JobKWHK, Int>> {
+        override fun eqv(a: HK<JobKWHK, Int>, b: HK<JobKWHK, Int>): Boolean =
                 runBlocking {
                     val resultA = AtomicInteger(Int.MIN_VALUE)
                     val resultB = AtomicInteger(Int.MIN_VALUE)
@@ -40,6 +40,6 @@ class JobWTest : UnitSpec() {
     }
 
     init {
-        testLaws(AsyncLaws.laws(JobW.asyncContext(EmptyCoroutineContext), JobW.monadError(EmptyCoroutineContext), EQ(), EQ(), EQ_ERR))
+        testLaws(AsyncLaws.laws(JobKW.asyncContext(EmptyCoroutineContext), JobKW.monadError(EmptyCoroutineContext), EQ(), EQ(), EQ_ERR))
     }
 }
