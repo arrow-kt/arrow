@@ -60,7 +60,7 @@ typealias DeferredResult<A> = Either<Throwable, A>
         fun <A, B> tailRecM(coroutineContext: CoroutineContext, a: A, f: (A) -> DeferredKW<Either<A, B>>): DeferredKW<B> {
             tailrec fun go(a: A, f: (A) -> DeferredKW<Either<A, B>>): DeferredKW<B> =
                     f(a).attempt().let { result ->
-                        /* If you remove return here tailrec stops working. Jetbrains Please. */
+                        /* FIXME(paco): KT-20075 If you remove return here tailrec stops working. Jetbrains Please. */
                         when (result) {
                             is Either.Left -> raiseError(coroutineContext, result.a)
                             is Either.Right -> {
