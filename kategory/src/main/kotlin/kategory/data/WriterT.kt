@@ -54,7 +54,15 @@ package kategory
         inline fun <reified F, W, A> put(a: A, w: W, applicativeF: Applicative<F> = kategory.applicative()): WriterT<F, W, A> =
                 WriterT.putT(applicativeF.pure(a), w)
 
-            inline fun <reified F, W> tell(l: W, applicativeF: Applicative<F> = kategory.applicative()): WriterT<F, W, Unit> = WriterT.put(Unit, l)
+        fun <F, W, A> putT2(vf: HK<F, A>, w: W, MF: Monad<F>): WriterT<F, W, A> =
+                WriterT(MF, MF.map(vf, { v -> Tuple2(w, v) }))
+
+        fun <F, W, A> put2(a: A, w: W, MF: Monad<F>): WriterT<F, W, A> =
+                WriterT.putT2(MF.pure(a), w, MF)
+        
+        inline fun <reified F, W> tell(l: W, applicativeF: Applicative<F> = kategory.applicative()): WriterT<F, W, Unit> = WriterT.put(Unit, l)
+
+        fun <F, W> tell2(l: W, MF: Monad<F>): WriterT<F, W, Unit> = WriterT.put2(Unit, l, MF)
 
         inline fun <reified F, reified W, A> value(v: A, applicativeF: Applicative<F> = kategory.applicative(), monoidW: Monoid<W> = monoid()):
                 WriterT<F, W, A> = WriterT.put(v, monoidW.empty())
