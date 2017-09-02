@@ -8,13 +8,13 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class IOTest : UnitSpec() {
-    val EQ: Eq<HK<IOHK, Int>> = object : Eq<HK<IOHK, Int>> {
-        override fun eqv(a: HK<IOHK, Int>, b: HK<IOHK, Int>): Boolean =
+    fun <A> EQ(): Eq<HK<IOHK, A>> = object : Eq<HK<IOHK, A>> {
+        override fun eqv(a: HK<IOHK, A>, b: HK<IOHK, A>): Boolean =
                 a.ev().attempt().unsafeRunSync() == b.ev().attempt().unsafeRunSync()
     }
 
     init {
-        testLaws(AsyncLaws.laws(IO.asyncContext(), IO.monadError(), EQ, EQ))
+        testLaws(AsyncLaws.laws(IO.asyncContext(), IO.monadError(), EQ(), EQ()))
 
         "should defer evaluation until run" {
             var run = false
