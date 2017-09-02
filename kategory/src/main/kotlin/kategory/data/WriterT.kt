@@ -4,7 +4,8 @@ package kategory
 
 @higherkind data class WriterT<F, W, A>(val MF: Monad<F>, val value: HK<F, Tuple2<W, A>>) : WriterTKind<F, W, A> {
 
-    companion object {
+    companion object : WriterTInstances {
+
         inline fun <reified F, reified W, A> pure(a: A, MM: Monoid<W> = monoid(), MF: Monad<F> = kategory.monad()) = WriterT(MF.pure(MM.empty() toT a), MF)
 
         inline fun <reified F, W, A> both(w: W, a: A, MF: Monad<F> = kategory.monad()) = WriterT(MF.pure(w toT a), MF)
@@ -80,7 +81,7 @@ package kategory
         inline fun <reified F, W, A> put(a: A, w: W, applicativeF: Applicative<F> = kategory.applicative()): WriterT<F, W, A> =
                 WriterT.putT(applicativeF.pure(a), w)
 
-        inline fun <reified F, W> tell(l: W, applicativeF: Applicative<F> = kategory.applicative()): WriterT<F, W, Unit> = WriterT.put(Unit, l)
+            inline fun <reified F, W> tell(l: W, applicativeF: Applicative<F> = kategory.applicative()): WriterT<F, W, Unit> = WriterT.put(Unit, l)
 
         inline fun <reified F, reified W, A> value(v: A, applicativeF: Applicative<F> = kategory.applicative(), monoidW: Monoid<W> = monoid()):
                 WriterT<F, W, A> = WriterT.put(v, monoidW.empty())
