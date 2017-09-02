@@ -45,7 +45,7 @@ sealed class Option<out A> : OptionKind<A> {
      * Returns true if the option is [None], false otherwise.
      * Used only for performance instead of fold.
      */
-    internal abstract val isEmpty: Boolean
+    abstract val isEmpty: Boolean
 
     /**
      * Returns true if the option is an instance of $some, false otherwise.

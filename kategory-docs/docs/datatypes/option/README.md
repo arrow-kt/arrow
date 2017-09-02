@@ -13,6 +13,8 @@ Kategory models the absence of values through the `Option` datatype similar to h
  
 `Option<A>` is a container for an optional value of type `A`. If the value of type `A` is present, the `Option<A>` is an instance of `Some<A>`, containing the present value of type `A`. If the value is absent, the `Option<A>` is the object `None`.
  
+
+
 ```kotlin:ank
 import kategory.*
 import kategory.Option.*
@@ -51,11 +53,11 @@ value2.getOrElse { "No value" }
 Checking whether option has value:
 
 ```kotlin:ank
-value1.isEmpty()
+value1.isEmpty
 ```
 
 ```kotlin:ank
-value2.isEmpty()
+value2.isEmpty
 ```
 
 Option can also be used with when statements:
