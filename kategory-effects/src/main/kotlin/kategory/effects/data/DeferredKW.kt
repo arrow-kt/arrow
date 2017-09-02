@@ -60,13 +60,13 @@ typealias DeferredResult<A> = Either<Throwable, A>
         fun <A, B> tailRecM(coroutineContext: CoroutineContext, a: A, f: (A) -> DeferredKW<Either<A, B>>): DeferredKW<B> {
             tailrec fun go(a: A, f: (A) -> DeferredKW<Either<A, B>>): DeferredKW<B> =
                     f(a).attempt().let { result ->
-                        /* If you remove return here, tailrec stops working. Magic. */
-                        return when (result) {
+                        /* If you remove return here tailrec stops working. Jetbrains Please. */
+                        when (result) {
                             is Either.Left -> raiseError(coroutineContext, result.a)
                             is Either.Right -> {
                                 val next: Either<A, B> = result.b
                                 when (next) {
-                                    is Either.Left -> go(next.a, f)
+                                    is Either.Left -> return go(next.a, f)
                                     is Either.Right -> pure(coroutineContext, next.b)
                                 }
                             }
