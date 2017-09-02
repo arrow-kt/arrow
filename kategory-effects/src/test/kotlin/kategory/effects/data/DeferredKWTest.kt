@@ -11,6 +11,6 @@ class DeferredKWTest : UnitSpec() {
     }
 
     init {
-        testLaws(MonadErrorLaws.laws(DeferredKW.monadError(EmptyCoroutineContext), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(DeferredKW.asyncContext(EmptyCoroutineContext), DeferredKW.monadError(EmptyCoroutineContext), EQ(), EQ()))
     }
 }

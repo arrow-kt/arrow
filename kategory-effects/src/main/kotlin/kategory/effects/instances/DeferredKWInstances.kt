@@ -7,10 +7,8 @@ interface DeferredKWInstances :
         Functor<DeferredKWHK>,
         Applicative<DeferredKWHK>,
         Monad<DeferredKWHK>,
-        MonadError<DeferredKWHK, Throwable>
-//        ,
-//        AsyncContext<DeferredKWHK>
-{
+        MonadError<DeferredKWHK, Throwable>,
+        AsyncContext<DeferredKWHK> {
 
     fun CC(): CoroutineContext
 
@@ -32,7 +30,7 @@ interface DeferredKWInstances :
     override fun <A> handleErrorWith(fa: HK<DeferredKWHK, A>, f: (Throwable) -> HK<DeferredKWHK, A>): DeferredKW<A> =
             fa.ev().handleErrorWith(CC()) { err: Throwable -> f(err).ev() }
 
-   // override fun <A> runAsync(fa: Proc<A>): HK<DeferredKWHK, A> =
-    //        DeferredKW.async(CC(), fa)
+    override fun <A> runAsync(fa: Proc<A>): HK<DeferredKWHK, A> =
+            DeferredKW.async(CC(), fa)
 
 }

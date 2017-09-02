@@ -1,5 +1,6 @@
 package kategory
 
+import kategory.effects.data.internal.Platform
 import kategory.effects.instances.DeferredKWInstances
 import kotlinx.coroutines.experimental.*
 import kotlin.coroutines.experimental.CoroutineContext
@@ -21,31 +22,34 @@ typealias DeferredResult<A> = Either<Throwable, A>
     companion object {
         inline operator fun <A> invoke(coroutineContext: CoroutineContext, noinline f: suspend CoroutineScope.() -> A): DeferredKW<A> =
                 DeferredKW {
-                    async(coroutineContext, CoroutineStart.DEFAULT) {
-                        try {
-                            f().right()
-                        } catch (throwable: Throwable) {
-                            throwable.left()
+                    Platform.onceOnly<Unit> { Unit }.let {
+                        async(coroutineContext, CoroutineStart.DEFAULT) {
+                            try {
+                                f().right()
+                            } catch (throwable: Throwable) {
+                                throwable.left()
+                            }
                         }
                     }
                 }
 
         inline fun <A> unsafe(coroutineContext: CoroutineContext, noinline f: suspend CoroutineScope.() -> DeferredResult<A>): DeferredKW<A> =
                 DeferredKW {
-                    async(coroutineContext, CoroutineStart.DEFAULT) {
-                        f()
-                    }
-                }
-
-        /*inline fun <A> async(coroutineContext: CoroutineContext, crossinline fa: Proc<A>): DeferredKW<A> =
-                DeferredKW {
-                    async(coroutineContext, CoroutineStart.DEFAULT) {
-                        fa { callback: Either<Throwable, A> ->
-
+                    Platform.onceOnly<Unit> { Unit }.let {
+                        async(coroutineContext, CoroutineStart.DEFAULT) {
+                            f()
                         }
                     }
                 }
-                */
+
+        inline fun <A> async(coroutineContext: CoroutineContext, noinline fa: Proc<A>): DeferredKW<A> =
+                DeferredKW {
+                    Platform.onceOnly<Unit> { Unit }.let {
+                        async(coroutineContext, CoroutineStart.DEFAULT) {
+                            IO.async(fa).attempt().unsafeRunSync()
+                        }
+                    }
+                }
 
         inline fun <A> pure(coroutineContext: CoroutineContext, a: A): DeferredKW<A> =
                 DeferredKW(coroutineContext) { a }
@@ -53,15 +57,23 @@ typealias DeferredResult<A> = Either<Throwable, A>
         inline fun <A> raiseError(coroutineContext: CoroutineContext, t: Throwable): DeferredKW<A> =
                 DeferredKW.unsafe(coroutineContext) { t.left() }
 
-        fun <A, B> tailRecM(coroutineContext: CoroutineContext, a: A, f: (A) -> DeferredKW<Either<A, B>>): DeferredKW<B> = TODO()
-        /*DeferredKW.async(coroutineContext) { ff: (DeferredResult<B>) -> Unit ->
-            f(a).attempt().fold({ ff(it.left()) }, {
-                when (it) {
-                    is Either.Right -> ff(it.b.right())
-                    is Either.Left -> tailRecM(coroutineContext, a, f)
-                }
-            })
-        }*/
+        fun <A, B> tailRecM(coroutineContext: CoroutineContext, a: A, f: (A) -> DeferredKW<Either<A, B>>): DeferredKW<B> {
+            tailrec fun go(a: A, f: (A) -> DeferredKW<Either<A, B>>): DeferredKW<B> =
+                    f(a).attempt().let { result ->
+                        /* If you remove return here, tailrec stops working. Magic. */
+                        return when (result) {
+                            is Either.Left -> raiseError(coroutineContext, result.a)
+                            is Either.Right -> {
+                                val next: Either<A, B> = result.b
+                                when (next) {
+                                    is Either.Left -> go(next.a, f)
+                                    is Either.Right -> pure(coroutineContext, next.b)
+                                }
+                            }
+                        }
+                    }
+            return go(a, f)
+        }
 
         inline fun instances(coroutineContext: CoroutineContext): DeferredKWInstances =
                 object : DeferredKWInstances {
@@ -76,21 +88,17 @@ typealias DeferredResult<A> = Either<Throwable, A>
 
         inline fun monadError(coroutineContext: CoroutineContext): MonadError<DeferredKWHK, Throwable> = instances(coroutineContext)
 
-        //inline fun asyncContext(coroutineContext: CoroutineContext): AsyncContext<DeferredKWHK> = instances(coroutineContext)
+        inline fun asyncContext(coroutineContext: CoroutineContext): AsyncContext<DeferredKWHK> = instances(coroutineContext)
     }
 }
 
 fun <A> DeferredKWKind<A>.attempt(): DeferredResult<A> =
-        try {
-            unsafeRun().right()
-        } catch (e: Throwable) {
-            e.left()
+        runBlocking {
+            this@attempt.ev().thunk().await()
         }
 
 fun <A> DeferredKWKind<A>.unsafeRun(): A =
-        runBlocking { this@unsafeRun.ev().thunk().await() }.fold(
-                { throw it },
-                { it })
+        attempt().fold({ throw it }, { it })
 
 fun <A> DeferredKWKind<A>.runDeferred(): Deferred<DeferredResult<A>> =
         this.ev().thunk()
