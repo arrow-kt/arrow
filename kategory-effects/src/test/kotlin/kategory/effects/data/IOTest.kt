@@ -71,7 +71,7 @@ class IOTest : UnitSpec() {
         }
 
         "should time out on unending unsafeRunTimed" {
-            val never = IO.async<Int> { Unit }
+            val never = IO.async<Int> { }
             val start = System.currentTimeMillis()
             val received = never.unsafeRunTimed(100.milliseconds)
             val elapsed = System.currentTimeMillis() - start

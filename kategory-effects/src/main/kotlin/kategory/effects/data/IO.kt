@@ -51,7 +51,7 @@ import kategory.effects.data.internal.error
 
     fun unsafeRunTimed(limit: Duration): Option<A> = unsafeStep().unsafeRunTimedTotal(limit)
 
-    abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
+    abstract internal fun unsafeRunTimedTotal(limit: Duration): Option<A>
 
     companion object : IOInstances, GlobalInstance<Monad<IOHK>>() {
         internal fun <A, B> mapDefault(t: IO<A>, f: (A) -> B): IO<B> = t.flatMap(f.andThen { Pure(it) })

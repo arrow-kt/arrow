@@ -80,7 +80,7 @@ typealias JobResult<T> = Either<Throwable, T>
                         either.fold({ ff(it.left()) }, {
                             when (it) {
                                 is Either.Right -> ff(it.b.right())
-                                is Either.Left -> tailRecM(coroutineContext, a, f)
+                                is Either.Left -> tailRecM(coroutineContext, it.a, f)
                             }
                         })
                     }
