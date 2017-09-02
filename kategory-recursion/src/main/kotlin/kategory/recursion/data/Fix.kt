@@ -6,10 +6,10 @@ package kategory
 
     companion object {
         inline fun <reified F> embedT(compFG: NestedType<Nested<FixHK, F>, FixHK, F>, dummy: Unit = Unit, FF: Functor<F> = functor<F>()): FixKind<F> =
-                embedT(compFG, FF)
+                embedT(compFG.unnest(), FF)
 
-        inline fun <F> embedT(compFG: NestedType<Nested<FixHK, F>, FixHK, F>, FF: Functor<F>): FixKind<F> =
-                Fix(FF, compFG.unnest().unnest().ev())
+        inline fun <F> embedT(compFG: HK<Nested<FixHK, F>, FixKind<F>>, FF: Functor<F>): FixKind<F> =
+                Fix(FF, compFG.unnest().ev())
 
         inline fun <F> instances(FF: Functor<F>): FixInstances<F> = object : FixInstances<F> {
             override fun FG(): Functor<F> = FF
