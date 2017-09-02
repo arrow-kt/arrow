@@ -49,8 +49,9 @@ sealed class Option<out A> : OptionKind<A> {
 
     /**
      * Returns true if the option is an instance of $some, false otherwise.
+     * Used only for performance instead of fold.
      */
-    val isDefined: Boolean = !isEmpty
+    internal val isDefined: Boolean = !isEmpty
 
     /**
      * Returns a $some containing the result of applying $f to this $option's

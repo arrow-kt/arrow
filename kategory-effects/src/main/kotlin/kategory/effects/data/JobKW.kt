@@ -8,18 +8,20 @@ import kotlinx.coroutines.experimental.launch
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.experimental.CoroutineContext
 
-@higherkind data class JobKW<out A>(val thunk: ((Either<Throwable, A>) -> Unit) -> Job) : JobKWKind<A> {
+typealias JobResult<T> = Either<Throwable, T>
+
+@higherkind data class JobKW<out A>(val thunk: ((JobResult<A>) -> Unit) -> Job) : JobKWKind<A> {
 
     fun <B> map(f: (A) -> B): JobKW<B> =
-            JobKW { ff: (Either<Throwable, B>) -> Unit ->
-                thunk { either: Either<Throwable, A> ->
+            JobKW { ff: (JobResult<B>) -> Unit ->
+                thunk { either: JobResult<A> ->
                     ff(either.map(f))
                 }
             }
 
     fun <B> flatMap(coroutineContext: CoroutineContext, f: (A) -> JobKW<B>): JobKW<B> =
-            JobKW { ff: (Either<Throwable, B>) -> Unit ->
-                val result = AtomicReference<Either<Throwable, A>>()
+            JobKW { ff: (JobResult<B>) -> Unit ->
+                val result = AtomicReference<JobResult<A>>()
                 thunk(result::set).apply {
                     invokeOnCompletion { t: Throwable? ->
                         val state: Either<Throwable, A>? = result.get()
@@ -35,7 +37,7 @@ import kotlin.coroutines.experimental.CoroutineContext
     companion object {
         inline operator fun <A> invoke(coroutineContext: CoroutineContext, noinline f: suspend CoroutineScope.() -> A): JobKW<A> =
                 JobKW {
-                    onceOnly(it).let { callback: (Either<Throwable, A>) -> Unit ->
+                    onceOnly(it).let { callback: (JobResult<A>) -> Unit ->
                         launch(coroutineContext, CoroutineStart.DEFAULT) {
                             callback(
                                     try {
@@ -48,9 +50,9 @@ import kotlin.coroutines.experimental.CoroutineContext
                     }
                 }
 
-        inline fun <A> unsafe(coroutineContext: CoroutineContext, noinline f: suspend CoroutineScope.() -> Either<Throwable, A>): JobKW<A> =
+        inline fun <A> unsafe(coroutineContext: CoroutineContext, noinline f: suspend CoroutineScope.() -> JobResult<A>): JobKW<A> =
                 JobKW {
-                    onceOnly(it).let { callback: (Either<Throwable, A>) -> Unit ->
+                    onceOnly(it).let { callback: (JobResult<A>) -> Unit ->
                         launch(coroutineContext, CoroutineStart.DEFAULT) {
                             callback(f())
                         }
@@ -59,7 +61,7 @@ import kotlin.coroutines.experimental.CoroutineContext
 
         inline fun <A> async(coroutineContext: CoroutineContext, crossinline fa: Proc<A>): JobKW<A> =
                 JobKW {
-                    onceOnly(it).let { callback: (Either<Throwable, A>) -> Unit ->
+                    onceOnly(it).let { callback: (JobResult<A>) -> Unit ->
                         launch(coroutineContext, CoroutineStart.DEFAULT) {
                             fa(callback)
                         }
@@ -73,8 +75,8 @@ import kotlin.coroutines.experimental.CoroutineContext
                 JobKW.unsafe(coroutineContext) { t.left() }
 
         fun <A, B> tailRecM(coroutineContext: CoroutineContext, a: A, f: (A) -> JobKW<Either<A, B>>): JobKW<B> =
-                JobKW.async(coroutineContext) { ff: (Either<Throwable, B>) -> Unit ->
-                    f(a).runJob { either: Either<Throwable, Either<A, B>> ->
+                JobKW.async(coroutineContext) { ff: (JobResult<B>) -> Unit ->
+                    f(a).runJob { either: JobResult<Either<A, B>> ->
                         either.fold({ ff(it.left()) }, {
                             when (it) {
                                 is Either.Right -> ff(it.b.right())
@@ -101,12 +103,12 @@ import kotlin.coroutines.experimental.CoroutineContext
     }
 }
 
-fun <A> JobKWKind<A>.runJob(ff: (Either<Throwable, A>) -> Unit): Job =
+fun <A> JobKWKind<A>.runJob(ff: (JobResult<A>) -> Unit): Job =
         this.ev().thunk(ff)
 
 inline fun <A> JobKW<A>.handleErrorWith(crossinline function: (Throwable) -> JobKW<A>): JobKW<A> =
-        JobKW { ff: (Either<Throwable, A>) -> Unit ->
-            val result = AtomicReference<Either<Throwable, A>>()
+        JobKW { ff: (JobResult<A>) -> Unit ->
+            val result = AtomicReference<JobResult<A>>()
             thunk(result::set).apply {
                 invokeOnCompletion { t: Throwable? ->
                     val state: Either<Throwable, A>? = result.get()

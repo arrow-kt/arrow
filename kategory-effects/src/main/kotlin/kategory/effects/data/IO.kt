@@ -56,7 +56,7 @@ import kategory.effects.data.internal.error
     companion object : IOInstances, GlobalInstance<Monad<IOHK>>() {
         internal fun <A, B> mapDefault(t: IO<A>, f: (A) -> B): IO<B> = t.flatMap(f.andThen { Pure(it) })
 
-        internal fun <A> attemptValue(): AndThen<A, IO<Either<Throwable, A>>> = AndThen({ a: A -> Pure(Either.Right(a)) }, { e -> Pure(Either.Left(e)) })
+        internal fun <A> attemptValue(): AndThen<A, IO<Either<Throwable, A>>> = AndThen({ a: A -> Pure(Either.Right(a)) }, { e: Throwable -> Pure(Either.Left(e)) })
 
         operator fun <A> invoke(f: () -> A): IO<A> = suspend { Pure(f()) }
 
@@ -69,7 +69,7 @@ import kategory.effects.data.internal.error
                     }
                 })
 
-        fun <A> async(k: ((Either<Throwable, A>) -> Unit) -> Unit): IO<A> =
+        fun <A> async(k: Proc<A>): IO<A> =
                 Async { ff: (Either<Throwable, A>) -> Unit ->
                     onceOnly(ff).let { callback: (Either<Throwable, A>) -> Unit ->
                         try {
@@ -163,7 +163,7 @@ internal data class BindSuspend<E, out A>(val cont: AndThen<Unit, IO<E>>, val f:
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
 }
 
-internal data class Async<out A>(val cont: ((Either<Throwable, A>) -> Unit) -> Unit) : IO<A>() {
+internal data class Async<out A>(val cont: Proc<A>) : IO<A>() {
     override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
 
     override fun <B> flatMapTotal(f: AndThen<A, IO<B>>): IO<B> = BindAsync(cont, f)
