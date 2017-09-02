@@ -2,6 +2,15 @@ package kategory
 
 interface WriterTInstances : WriterTInstances0 {
 
+    fun <F, W> monadForWriterT(MF: Monad<F>, MW: Monoid<W>): Monad<WriterTKindPartial<F, W>> =
+            object : WriterTMonad<F, W> {
+                override fun F0(): Monad<F> = MF
+                override fun L0(): Monoid<W> = MW
+            }
+}
+
+interface WriterTInstances0 : WriterTInstances1 {
+
     fun <F, W> monadFilterForWriterT(MF: MonadFilter<F>, MW: Monoid<W>):
             MonadFilter<WriterTKindPartial<F, W>> = object : WriterTMonadFilter<F, W> {
         override fun F0(): MonadFilter<F> = MF
@@ -9,7 +18,8 @@ interface WriterTInstances : WriterTInstances0 {
     }
 }
 
-interface WriterTInstances0 : WriterTInstances1 {
+interface WriterTInstances1 : WriterTInstances2 {
+
     fun <F, W> monadWriterForWriterT(MF: Monad<F>, MW: Monoid<W>): MonadWriter<WriterTKindPartial<F, W>, W> =
             object : WriterTMonadWriter<F, W> {
                 override fun F0(): Monad<F> = MF
@@ -17,25 +27,23 @@ interface WriterTInstances0 : WriterTInstances1 {
             }
 }
 
-interface WriterTInstances1: WriterTInstances2 {
+interface WriterTInstances2 {
+
     fun <F, W> applicativeForWriterT(MF: Monad<F>, MW: Monoid<W>): Applicative<WriterTKindPartial<F, W>> =
             object : WriterTApplicative<F, W> {
                 override fun F0(): Monad<F> = MF
                 override fun L0(): Monoid<W> = MW
             }
 
+    fun <F, W> functorForWriterT(FF: Functor<F>): Functor<WriterTKindPartial<F, W>> =
+            object : WriterTFunctor<F, W> {
+                override fun F0(): Functor<F> = FF
+            }
+
     fun <F, W> monoidKForWriterT(MF: Monad<F>, MKF: MonoidK<F>): MonoidK<WriterTKindPartial<F, W>> =
             object : WriterTMonoidK<F, W> {
                 override fun MF(): Monad<F> = MF
                 override fun F0(): MonoidK<F> = MKF
-            }
-}
-
-interface WriterTInstances2 {
-    fun <F, W> monadForWriterT(MF: Monad<F>, MW: Monoid<W>): Monad<WriterTKindPartial<F, W>> =
-            object : WriterTMonad<F, W> {
-                override fun F0(): Monad<F> = MF
-                override fun L0(): Monoid<W> = MW
             }
 }
 
@@ -47,7 +55,11 @@ interface WriterTApplicative<F, W> : Applicative<WriterTKindPartial<F, W>>, Writ
     override fun <A> pure(a: A): HK<WriterTKindPartial<F, W>, A> = WriterT(F0(), F0().pure(L0().empty() toT a))
 
     override fun <A, B> ap(fa: HK<WriterTKindPartial<F, W>, A>, ff: HK<WriterTKindPartial<F, W>, (A) -> B>): HK<WriterTKindPartial<F, W>, B> =
-            fa.ev().ap(F0(), ff.ev())
+            ap(fa, ff)
+
+    override fun <A, B> map(fa: HK<WriterTKindPartial<F, W>, A>, f: (A) -> B): HK<WriterTKindPartial<F, W>, B> {
+        return super<WriterTFunctor>.map(fa, f)
+    }
 }
 
 interface WriterTMonad<F, W> : WriterTApplicative<F, W>, Monad<WriterTKindPartial<F, W>> {
@@ -62,6 +74,10 @@ interface WriterTMonad<F, W> : WriterTApplicative<F, W>, Monad<WriterTKindPartia
                     }
                 }
             }))
+
+    override fun <A, B> ap(fa: HK<WriterTKindPartial<F, W>, A>, ff: HK<WriterTKindPartial<F, W>, (A) -> B>): HK<WriterTKindPartial<F, W>, B> {
+        return super<Monad>.ap(fa, ff)
+    }
 }
 
 interface WriterTFunctor<F, W> : Functor<WriterTKindPartial<F, W>> {
@@ -109,11 +125,3 @@ interface WriterTMonadWriter<F, W> : MonadWriter<WriterTKindPartial<F, W>, W>, W
 inline fun <reified F, W, A> WriterTMonadWriter<F, W>.writer(aw: Tuple2<W, A>): HK<WriterTKindPartial<F, W>, A> = WriterT.put(aw.b, aw.a, F0())
 
 inline fun <reified F, W> WriterTMonadWriter<F, W>.tell(w: W): HK<WriterTKindPartial<F, W>, Unit> = WriterT.tell(w)
-
-/*
-interface WriterTInstances<F, W> :
-        Functor<WriterTKindPartial<F, W>>,
-        Applicative<WriterTKindPartial<F, W>>,
-        Monad<WriterTKindPartial<F, W>> {
-}
-*/
