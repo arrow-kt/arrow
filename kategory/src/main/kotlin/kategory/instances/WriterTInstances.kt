@@ -27,7 +27,7 @@ interface WriterTInstances1 : WriterTInstances2 {
             }
 }
 
-interface WriterTInstances2 {
+interface WriterTInstances2: WriterTInstances3 {
 
     fun <F, W> applicativeForWriterT(MF: Monad<F>, MW: Monoid<W>): Applicative<WriterTKindPartial<F, W>> =
             object : WriterTApplicative<F, W> {
@@ -47,6 +47,15 @@ interface WriterTInstances2 {
             }
 }
 
+interface WriterTInstances3 {
+
+    fun <F, W> semigroupKForWriterT(MF: Monad<F>, MKF: SemigroupK<F>): SemigroupK<WriterTKindPartial<F, W>> =
+            object : WriterTSemigroupK<F, W> {
+                override fun MF(): Monad<F> = MF
+                override fun F0(): SemigroupK<F> = MKF
+            }
+}
+
 interface WriterTApplicative<F, W> : Applicative<WriterTKindPartial<F, W>>, WriterTFunctor<F, W> {
 
     override fun F0(): Monad<F>
@@ -58,7 +67,7 @@ interface WriterTApplicative<F, W> : Applicative<WriterTKindPartial<F, W>>, Writ
             ap(fa, ff)
 
     override fun <A, B> map(fa: HK<WriterTKindPartial<F, W>, A>, f: (A) -> B): HK<WriterTKindPartial<F, W>, B> {
-        return super<WriterTFunctor>.map(fa, f)
+        return super<Applicative>.map(fa, f)
     }
 }
 
