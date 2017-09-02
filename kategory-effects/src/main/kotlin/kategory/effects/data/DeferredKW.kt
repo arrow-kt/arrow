@@ -54,14 +54,14 @@ typealias DeferredResult<A> = Either<Throwable, A>
                 DeferredKW.unsafe(coroutineContext) { t.left() }
 
         fun <A, B> tailRecM(coroutineContext: CoroutineContext, a: A, f: (A) -> DeferredKW<Either<A, B>>): DeferredKW<B> = TODO()
-                /*DeferredKW.async(coroutineContext) { ff: (DeferredResult<B>) -> Unit ->
-                    f(a).attempt().fold({ ff(it.left()) }, {
-                        when (it) {
-                            is Either.Right -> ff(it.b.right())
-                            is Either.Left -> tailRecM(coroutineContext, a, f)
-                        }
-                    })
-                }*/
+        /*DeferredKW.async(coroutineContext) { ff: (DeferredResult<B>) -> Unit ->
+            f(a).attempt().fold({ ff(it.left()) }, {
+                when (it) {
+                    is Either.Right -> ff(it.b.right())
+                    is Either.Left -> tailRecM(coroutineContext, a, f)
+                }
+            })
+        }*/
 
         inline fun instances(coroutineContext: CoroutineContext): DeferredKWInstances =
                 object : DeferredKWInstances {
@@ -89,7 +89,7 @@ fun <A> DeferredKWKind<A>.attempt(): DeferredResult<A> =
 
 fun <A> DeferredKWKind<A>.unsafeRun(): A =
         runBlocking { this@unsafeRun.ev().thunk().await() }.fold(
-                { throw IllegalArgumentException("Deferred execution should yield a valid result") },
+                { throw it },
                 { it })
 
 fun <A> DeferredKWKind<A>.runDeferred(): Deferred<DeferredResult<A>> =
