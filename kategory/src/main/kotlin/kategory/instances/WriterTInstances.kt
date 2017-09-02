@@ -67,7 +67,7 @@ interface WriterTApplicative<F, W> : Applicative<WriterTKindPartial<F, W>>, Writ
             ap(fa, ff)
 
     override fun <A, B> map(fa: HK<WriterTKindPartial<F, W>, A>, f: (A) -> B): HK<WriterTKindPartial<F, W>, B> {
-        return super<Applicative>.map(fa, f)
+        return super<WriterTFunctor>.map(fa, f)
     }
 }
 
@@ -126,11 +126,7 @@ interface WriterTMonadWriter<F, W> : MonadWriter<WriterTKindPartial<F, W>, W>, W
     override fun <A> pass(fa: HK<WriterTKindPartial<F, W>, Tuple2<(W) -> W, A>>): HK<WriterTKindPartial<F, W>, A> =
             WriterT(F0(), F0().flatMap(fa.ev().content(), { tuple2FA -> F0().map(fa.ev().write(), { l -> Tuple2(tuple2FA.a(l), tuple2FA.b) }) }))
 
-    override fun <A> writer(aw: Tuple2<W, A>): HK<WriterTKindPartial<F, W>, A> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun <A> writer(aw: Tuple2<W, A>): HK<WriterTKindPartial<F, W>, A> = WriterT.put2(aw.b, aw.a, F0())
+
+    override fun tell(w: W): HK<WriterTKindPartial<F, W>, Unit> = WriterT.tell2(w, F0())
 }
-
-inline fun <reified F, W, A> WriterTMonadWriter<F, W>.writer(aw: Tuple2<W, A>): HK<WriterTKindPartial<F, W>, A> = WriterT.put(aw.b, aw.a, F0())
-
-inline fun <reified F, W> WriterTMonadWriter<F, W>.tell(w: W): HK<WriterTKindPartial<F, W>, Unit> = WriterT.tell(w)
