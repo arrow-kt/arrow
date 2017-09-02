@@ -17,9 +17,8 @@ class CofreeTest : UnitSpec() {
                 sideEffect.increment()
                 if (it % 2 == 0) None else Some(it + 1)
             })
-        }, object : Eq<HK<CofreeKindPartial<OptionHK>, Int>> {
-            override fun eqv(a: HK<CofreeKindPartial<OptionHK>, Int>, b: HK<CofreeKindPartial<OptionHK>, Int>): Boolean =
-                    a.ev().run().extract() == b.ev().run().extract()
+        }, Eq { a, b ->
+            a.ev().run().extract() == b.ev().run().extract()
         }))
 
         "tailForced should evaluate and return" {
@@ -120,8 +119,7 @@ class CofreeTest : UnitSpec() {
         }
 
         "cataM should traverse the structure in a stack-safe way on a monad" {
-            val folder: (Int, HK<OptionHK, NonEmptyList<Int>>) -> EvalOption<NonEmptyList<Int>> = {
-                i, lb ->
+            val folder: (Int, HK<OptionHK, NonEmptyList<Int>>) -> EvalOption<NonEmptyList<Int>> = { i, lb ->
                 if (i <= 2000) OptionT.pure(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) else OptionT.none()
             }
             val inclusion = object : FunctionK<EvalHK, EvalOptionF> {

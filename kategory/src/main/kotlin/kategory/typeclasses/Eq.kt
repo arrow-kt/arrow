@@ -6,6 +6,11 @@ interface Eq<in F> : Typeclass {
     fun neqv(a: F, b: F): Boolean = !eqv(a, b)
 
     companion object {
+        inline operator fun <F> invoke(crossinline feqv: (F, F) -> Boolean): Eq<F> = object : Eq<F> {
+            override fun eqv(a: F, b: F): Boolean =
+                    feqv(a, b)
+        }
+
         fun any(): Eq<Any?> = EqAny
 
         object EqAny : Eq<Any?> {

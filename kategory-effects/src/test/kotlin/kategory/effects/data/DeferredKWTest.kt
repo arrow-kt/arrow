@@ -6,9 +6,8 @@ import kotlin.coroutines.experimental.EmptyCoroutineContext
 
 @RunWith(KTestJUnitRunner::class)
 class DeferredKWTest : UnitSpec() {
-    fun <T> EQ(): Eq<HK<DeferredKWHK, T>> = object : Eq<HK<DeferredKWHK, T>> {
-        override fun eqv(a: HK<DeferredKWHK, T>, b: HK<DeferredKWHK, T>): Boolean =
-                a.ev().attempt() == b.ev().attempt()
+    fun <T> EQ(): Eq<HK<DeferredKWHK, T>> = Eq { a: HK<DeferredKWHK, T>, b: HK<DeferredKWHK, T> ->
+        a.ev().attempt() == b.ev().attempt()
     }
 
     init {

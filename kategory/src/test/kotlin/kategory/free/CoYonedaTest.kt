@@ -7,12 +7,8 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class CoyonedaTest : UnitSpec() {
-    val F = Coyoneda.functor<IdHK, Int>()
-
-    val EQ = object : Eq<CoyonedaKind<IdHK, Int, Int>> {
-        override fun eqv(a: CoyonedaKind<IdHK, Int, Int>, b: CoyonedaKind<IdHK, Int, Int>): Boolean =
-                a.ev().lower(Id.functor()) == a.ev().lower(Id.functor())
-
+    val EQ = Eq<CoyonedaKind<IdHK, Int, Int>> { a, b ->
+        a.ev().lower(Id.functor()) == a.ev().lower(Id.functor())
     }
 
     init {

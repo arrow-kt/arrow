@@ -38,13 +38,11 @@ abstract class UnitSpec : StringSpec() {
                 tc
             }
 
-    inline fun <F> Eq<F>.logged(): Eq<F> = object : Eq<F> {
-        override fun eqv(a: F, b: F): Boolean {
-            val result = this@logged.eqv(a, b)
-            if (!result) {
-                println("$a <---> $b")
-            }
-            return result
+    inline fun <F> Eq<F>.logged(): Eq<F> = Eq { a, b ->
+        val result = this@logged.eqv(a, b)
+        if (!result) {
+            println("$a <---> $b")
         }
+        result
     }
 }

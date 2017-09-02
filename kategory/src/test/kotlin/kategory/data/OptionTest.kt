@@ -13,19 +13,18 @@ class OptionTest : UnitSpec() {
     object OptionError : RuntimeException()
 
     init {
-        val EQ_EITHER: Eq<HK<OptionHK, Either<Throwable, Int>>> = object : Eq<HK<OptionHK, Either<Throwable, Int>>> {
-            override fun eqv(a: HK<OptionHK, Either<Throwable, Int>>, b: HK<OptionHK, Either<Throwable, Int>>): Boolean =
-                    a.ev().fold(
-                            { b.ev().fold({ true }, { false }) },
-                            { eitherA: Either<Throwable, Int> ->
-                                b.ev().fold(
-                                        { false },
-                                        { eitherB: Either<Throwable, Int> ->
-                                            eitherA.fold(
-                                                    { eitherB.fold({ true /* Ignore the error kind */ }, { false }) },
-                                                    { ia -> eitherB.fold({ false }, { ia == it }) })
-                                        })
-                            })
+        val EQ_EITHER: Eq<HK<OptionHK, Either<Throwable, Int>>> = Eq { a, b ->
+            a.ev().fold(
+                    { b.ev().fold({ true }, { false }) },
+                    { eitherA: Either<Throwable, Int> ->
+                        b.ev().fold(
+                                { false },
+                                { eitherB: Either<Throwable, Int> ->
+                                    eitherA.fold(
+                                            { eitherB.fold({ true /* Ignore the error kind */ }, { false }) },
+                                            { ia -> eitherB.fold({ false }, { ia == it }) })
+                                })
+                    })
         }
 
 
