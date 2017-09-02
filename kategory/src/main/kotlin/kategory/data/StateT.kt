@@ -27,7 +27,7 @@ fun <F, S, A> StateTKind<F, S, A>.runM(initial: S): HK<F, Tuple2<S, A>> = (this 
 
         inline fun <reified F, reified S> monadState(MF: Monad<F> = monad<F>()): StateTInstances<F, S> = instances(MF)
 
-        inline fun <reified F, S> semigroupK(F0: Monad<F> = monad<F>(), G0: SemigroupK<F>): SemigroupK<StateTKindPartial<F, S>> =
+        inline fun <reified F, S> semigroupK(F0: Monad<F> = monad<F>(), G0: SemigroupK<F> = semigroupK<F>()): SemigroupK<StateTKindPartial<F, S>> =
                 object : StateTSemigroupK<F, S> {
                     override fun F(): Monad<F> = F0
                     override fun G(): SemigroupK<F> = G0

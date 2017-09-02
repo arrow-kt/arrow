@@ -20,7 +20,7 @@ interface IOInstances :
 
     override fun <A> runAsync(fa: Proc<A>): IO<A> = IO.async(fa)
 
-    tailrec override fun <A, B> tailRecM(a: A, f: (A) -> IOKind<Either<A, B>>): IO<B> =
+    override fun <A, B> tailRecM(a: A, f: (A) -> IOKind<Either<A, B>>): IO<B> =
             f(a).ev().flatMap {
                 when (it) {
                     is Either.Left -> tailRecM(it.a, f)

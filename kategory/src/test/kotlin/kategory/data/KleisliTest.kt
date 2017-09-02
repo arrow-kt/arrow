@@ -8,7 +8,7 @@ import org.junit.runner.RunWith
 class KleisliTest : UnitSpec() {
     init {
 
-        val me = Kleisli.monadError<TryHK, Int, Throwable>(Try)
+        val me = Kleisli.monadError<TryHK, Int, Throwable>(Try.monadError())
 
         testLaws(MonadErrorLaws.laws(me, object : Eq<KleisliKind<TryHK, Int, Int>> {
             override fun eqv(a: KleisliKind<TryHK, Int, Int>, b: KleisliKind<TryHK, Int, Int>): Boolean =

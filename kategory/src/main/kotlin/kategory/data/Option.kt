@@ -6,26 +6,35 @@ package kategory
  * Represents optional values. Instances of `Option`
  * are either an instance of $some or the object $none.
  */
-@higherkind sealed class Option<out A> : OptionKind<A> {
+@higherkind
+@deriving(Functor::class, Applicative::class, Monad::class, Foldable::class, Traverse::class)
+sealed class Option<out A> : OptionKind<A> {
 
-    companion object : OptionInstances, GlobalInstance<Monad<OptionHK>>() {
-        @JvmStatic fun <A : Any> fromNullable(a: A?): Option<A> = if (a != null) Option.Some(a) else Option.None
+    companion object {
+
+        fun <A> pure(a: A): Option<A> = Option.Some(a)
+
+        tailrec fun <A, B> tailRecM(a: A, f: (A) -> OptionKind<Either<A, B>>): Option<B> {
+            val option = f(a).ev()
+            return when (option) {
+                is Option.Some -> {
+                    when (option.value) {
+                        is Either.Left -> tailRecM(option.value.a, f)
+                        is Either.Right -> Option.Some(option.value.b)
+                    }
+                }
+                is Option.None -> Option.None
+            }
+        }
+
+        @JvmStatic
+        fun <A : Any> fromNullable(a: A?): Option<A> = if (a != null) Option.Some(a) else Option.None
 
         operator fun <A> invoke(a: A): Option<A> = Option.Some(a)
 
-        fun <A> empty() : Option<A> = None
+        fun <A> empty(): Option<A> = None
 
-        fun functor(): Functor<OptionHK> = this
-
-        fun applicative(): Applicative<OptionHK> = this
-
-        fun monad(): Monad<OptionHK> = this
-
-        fun monadError(): MonadError<OptionHK, Unit> = this
-
-        fun foldable(): Foldable<OptionHK> = this
-
-        fun traverse(): Traverse<OptionHK> = this
+        fun <E> monadError(error: E): MonadError<OptionHK, E> = OptionMonadError(error)
 
         fun <A> monoid(SG: Semigroup<A>): OptionMonoid<A> = object : OptionMonoid<A> {
             override fun SG(): Semigroup<A> = SG
@@ -55,6 +64,8 @@ package kategory
      */
     inline fun <B> map(crossinline f: (A) -> B): Option<B> = fold({ Option.None }, { a -> Option.Some(f(a)) })
 
+    fun <B> ap(ff: OptionKind<(A) -> B>): Option<B> = ff.ev().flatMap { this.ev().map(it) }
+
     /**
      * Returns the result of applying $f to this $option's value if
      * this $option is nonempty.
@@ -65,7 +76,7 @@ package kategory
      * @param f the function to apply
      * @see map
      */
-    inline fun <B> flatMap(crossinline f: (A) -> Option<B>): Option<B> = fold({ Option.None }, { a -> f(a) })
+    inline fun <B> flatMap(crossinline f: (A) -> OptionKind<B>): Option<B> = fold({ Option.None }, { a -> f(a) }).ev()
 
     /**
      * Returns the result of applying $f to this $option's
@@ -81,6 +92,30 @@ package kategory
         is Option.None -> ifEmpty()
         is Option.Some<A> -> f(value)
     }
+
+    fun <B> foldL(b: B, f: (B, A) -> B): B =
+            this.ev().let { option ->
+                when (option) {
+                    is Option.Some -> f(b, option.value)
+                    is Option.None -> b
+                }
+            }
+
+    fun <B> foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+            this.ev().let { option ->
+                when (option) {
+                    is Option.Some -> f(option.value, lb)
+                    is Option.None -> lb
+                }
+            }
+
+    fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, Option<B>> =
+            this.ev().let { option ->
+                when (option) {
+                    is Option.Some -> GA.map(f(option.value), { Option.Some(it) })
+                    is Option.None -> GA.pure(Option.None)
+                }
+            }
 
     /**
      * Returns this $option if it is nonempty '''and''' applying the predicate $p to
