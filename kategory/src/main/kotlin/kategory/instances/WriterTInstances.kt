@@ -4,11 +4,16 @@ interface WriterTInstances<F, W> :
         Functor<WriterTKindPartial<F, W>>,
         Applicative<WriterTKindPartial<F, W>>,
         Monad<WriterTKindPartial<F, W>>,
-        MonadWriter<WriterTKindPartial<F, W>, W> {
+        MonadWriter<WriterTKindPartial<F, W>, W>,
+        MonadFilter<WriterTKindPartial<F, W>> {
 
     fun MM(): Monad<F>
 
     fun SG(): Monoid<W>
+
+    fun F0(): MonadFilter<F>
+
+    override fun <A> empty(): HK<WriterTKindPartial<F, W>, A> = WriterT(F0(), F0().empty())
 
     override fun <A> pure(a: A): HK<WriterTKindPartial<F, W>, A> = WriterT(MM(), MM().pure(SG().empty() toT a))
 
@@ -43,16 +48,4 @@ interface WriterTMonoidK<F, W> : MonoidK<WriterTKindPartial<F, W>>, WriterTSemig
     override fun GF(): MonoidK<F>
 
     override fun <A> empty(): HK<WriterTKindPartial<F, W>, A> = WriterT(MF(), GF().empty())
-}
-
-interface WriterTMonad<F, W> : Monad<WriterTKindPartial<F, W>> {
-
-    fun F0(): Monad<F>
-}
-
-interface WriterTMonadFilter<F, W> : MonadFilter<WriterTKindPartial<F, W>>, WriterTMonad<F, W> {
-
-    override fun F0(): MonadFilter<F>
-
-    override fun <A> empty(): HK<WriterTKindPartial<F, W>, A> = WriterT(F0(), F0().empty())
 }

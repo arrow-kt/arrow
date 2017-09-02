@@ -13,7 +13,9 @@ package kategory
 
         inline operator fun <reified F, W, A> invoke(value: HK<F, Tuple2<W, A>>, MF: Monad<F> = kategory.monad()) = WriterT(MF, value)
 
-        inline fun <reified F, reified W> instances(MM: Monad<F> = kategory.monad(), SG: Monoid<W> = kategory.monoid<W>()): WriterTInstances<F, W> =
+        inline fun <reified F, reified W> instances(MM: Monad<F> = kategory.monad(),
+                                                    SG: Monoid<W> = kategory.monoid<W>(),
+                                                    MF: MonadFilter<F> = kategory.monadFilter()): WriterTInstances<F, W> =
                 object : WriterTInstances<F, W> {
 
                     override fun <A> writer(aw: Tuple2<W, A>): WriterT<F, W, A> = WriterT.put(aw.b, aw.a)
@@ -29,16 +31,24 @@ package kategory
                     override fun MM(): Monad<F> = MM
 
                     override fun SG(): Monoid<W> = SG
+
+                    override fun F0(): MonadFilter<F> = MF
                 }
 
-        inline fun <reified F, reified W> functor(MM: Monad<F> = kategory.monad<F>(), SG: Monoid<W> = kategory.monoid<W>()): Functor<WriterTKindPartial<F, W>> =
-                instances(MM, SG)
+        inline fun <reified F, reified W> functor(MM: Monad<F> = kategory.monad<F>(),
+                                                  SG: Monoid<W> = kategory.monoid<W>(),
+                                                  MF: MonadFilter<F> = kategory.monadFilter()): Functor<WriterTKindPartial<F, W>> =
+                instances(MM, SG, MF)
 
-        inline fun <reified F, reified W> applicative(MM: Monad<F> = kategory.monad<F>(), SG: Monoid<W> = kategory.monoid<W>()):
-                Applicative<WriterTKindPartial<F, W>> = instances(MM, SG)
+        inline fun <reified F, reified W> applicative(MM: Monad<F> = kategory.monad<F>(),
+                                                      SG: Monoid<W> = kategory.monoid<W>(),
+                                                      MF: MonadFilter<F> = kategory.monadFilter()):
+                Applicative<WriterTKindPartial<F, W>> = instances(MM, SG, MF)
 
-        inline fun <reified F, reified W> monad(MM: Monad<F> = kategory.monad<F>(), SG: Monoid<W> = kategory.monoid<W>()): Monad<WriterTKindPartial<F, W>> =
-                instances(MM, SG)
+        inline fun <reified F, reified W> monad(MM: Monad<F> = kategory.monad<F>(),
+                                                SG: Monoid<W> = kategory.monoid<W>(),
+                                                MF: MonadFilter<F> = kategory.monadFilter()): Monad<WriterTKindPartial<F, W>> =
+                instances(MM, SG, MF)
 
         inline fun <reified F, reified W> semigroupK(MF: Monad<F> = monad<F>(), SGK: SemigroupK<F> = semigroupK<F>()): SemigroupK<WriterTKindPartial<F, W>> =
                 object : WriterTSemigroupK<F, W> {
@@ -54,8 +64,15 @@ package kategory
                     override fun GF(): MonoidK<F> = MKF
                 }
 
-        inline fun <reified F, reified W> monadWriter(MM: Monad<F> = kategory.monad(), SG: Monoid<W> = kategory.monoid()):
-                MonadWriter<WriterTKindPartial<F, W>, W> = instances(MM, SG)
+        inline fun <reified F, reified W> monadWriter(MM: Monad<F> = kategory.monad(),
+                                                      SG: Monoid<W> = kategory.monoid(),
+                                                      MF: MonadFilter<F> = kategory.monadFilter()):
+                MonadWriter<WriterTKindPartial<F, W>, W> = instances(MM, SG, MF)
+
+        inline fun <reified F, reified W> monadFilter(MM: Monad<F> = kategory.monad(),
+                                                      SG: Monoid<W> = kategory.monoid(),
+                                                      MF: MonadFilter<F> = kategory.monadFilter()):
+                MonadFilter<WriterTKindPartial<F, W>> = instances(MM, SG, MF)
 
         inline fun <reified F, W, A> putT(vf: HK<F, A>, w: W, MF: Monad<F> = kategory.monad()): WriterT<F, W, A> =
                 WriterT(MF, MF.map(vf, { v -> Tuple2(w, v) }))
