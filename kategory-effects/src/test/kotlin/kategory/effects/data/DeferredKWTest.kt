@@ -6,12 +6,12 @@ import kotlin.coroutines.experimental.EmptyCoroutineContext
 
 @RunWith(KTestJUnitRunner::class)
 class DeferredKWTest : UnitSpec() {
-    val EQ: Eq<HK<DeferredKWHK, Int>> = object : Eq<HK<DeferredKWHK, Int>> {
-        override fun eqv(a: HK<DeferredKWHK, Int>, b: HK<DeferredKWHK, Int>): Boolean =
+    fun <T> EQ(): Eq<HK<DeferredKWHK, T>> = object : Eq<HK<DeferredKWHK, T>> {
+        override fun eqv(a: HK<DeferredKWHK, T>, b: HK<DeferredKWHK, T>): Boolean =
                 a.ev().attempt() == b.ev().attempt()
     }
 
     init {
-        testLaws(MonadErrorLaws.laws(DeferredKW.monadError(EmptyCoroutineContext), EQ, EQ))
+        testLaws(MonadErrorLaws.laws(DeferredKW.monadError(EmptyCoroutineContext), EQ(), EQ()))
     }
 }
