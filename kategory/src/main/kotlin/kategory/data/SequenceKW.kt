@@ -49,7 +49,12 @@ data class SequenceKW<out A> constructor(val sequence: Sequence<A>) : SequenceKW
                         buf += head.b
                         go(buf, f, v.drop(1).k())
                     }
-                    is Either.Left<A, B> -> go(buf, f, (f(head.a).ev() + v.drop(1)).k())
+                    is Either.Left<A, B> -> {
+                        if (v.count() == 1)
+                            go(buf, f, (f(head.a).ev()).k())
+                        else
+                            go(buf, f, (f(head.a).ev() + v.drop(1)).k())
+                    }
                 }
             }
         }
