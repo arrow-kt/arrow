@@ -62,7 +62,9 @@ typealias DeferredResult<A> = Either<Throwable, A>
                     }
                 }
             }
-            return go(a, f)
+            return DeferredKW(coroutineContext) {
+                go(a, f).thunk(coroutineContext)
+            }
         }
 
         inline fun instances(coroutineContext: CoroutineContext): DeferredKWInstances =
