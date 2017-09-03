@@ -1,16 +1,16 @@
 package kategory
 
 import io.kotlintest.KTestJUnitRunner
+import kotlinx.coroutines.experimental.CommonPool
 import org.junit.runner.RunWith
-import kotlin.coroutines.experimental.EmptyCoroutineContext
 
 @RunWith(KTestJUnitRunner::class)
 class DeferredKWTest : UnitSpec() {
     fun <T> EQ(): Eq<HK<DeferredKWHK, T>> = Eq { a, b ->
-        a.ev().attempt() == b.ev().attempt()
+        a.attempt(CommonPool) == b.attempt(CommonPool)
     }
 
     init {
-        testLaws(AsyncLaws.laws(DeferredKW.asyncContext(EmptyCoroutineContext), DeferredKW.monadError(EmptyCoroutineContext), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(DeferredKW.asyncContext(), DeferredKW.monadError(), EQ(), EQ()))
     }
 }
