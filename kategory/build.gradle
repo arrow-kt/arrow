@@ -6,7 +6,6 @@ test {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
     compile "io.kategory:kategory-annotations:$kategoryAnnotationsVersion"
     kapt "io.kategory:kategory-annotations-compile:$kategoryAnnotationsVersion"
     kaptTest "io.kategory:kategory-annotations-compile:$kategoryAnnotationsVersion"
