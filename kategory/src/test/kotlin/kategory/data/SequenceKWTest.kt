@@ -14,7 +14,6 @@ class SequenceKWTest : UnitSpec() {
                     a.toList() == b.toList()
         }
 
-        testLaws(SemigroupKLaws.laws(SequenceKW.semigroupK(), applicative, eq))
         testLaws(MonoidKLaws.laws(SequenceKW.monoidK(), applicative, eq))
         testLaws(TraverseLaws.laws(SequenceKW.traverse(), applicative, { n: Int -> SequenceKW(sequenceOf(n)) }, eq))
     }
