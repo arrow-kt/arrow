@@ -56,7 +56,8 @@ import kategory.effects.data.internal.error
     companion object : IOInstances, GlobalInstance<Monad<IOHK>>() {
         internal fun <A, B> mapDefault(t: IO<A>, f: (A) -> B): IO<B> = t.flatMap(f.andThen { Pure(it) })
 
-        internal fun <A> attemptValue(): AndThen<A, IO<Either<Throwable, A>>> = AndThen({ a: A -> Pure(Either.Right(a)) }, { e: Throwable -> Pure(Either.Left(e)) })
+        internal fun <A> attemptValue(): AndThen<A, IO<Either<Throwable, A>>> =
+                AndThen({ a: A -> Pure(Either.Right(a)) }, { e: Throwable -> Pure(Either.Left(e)) })
 
         operator fun <A> invoke(f: () -> A): IO<A> = suspend { Pure(f()) }
 
