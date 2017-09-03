@@ -16,10 +16,10 @@ interface DeferredKWInstances :
             DeferredKW.pure(CC(), a)
 
     override fun <A, B> map(fa: HK<DeferredKWHK, A>, f: (A) -> B): DeferredKW<B> =
-            fa.ev().map(CC(), f)
+            fa.ev().map(f)
 
     override fun <A, B> flatMap(fa: HK<DeferredKWHK, A>, f: (A) -> HK<DeferredKWHK, B>): DeferredKW<B> =
-            fa.ev().flatMap(CC()) { a: A -> f(a).ev() }
+            fa.ev().flatMap { a: A -> f(a).ev() }
 
     override fun <A, B> tailRecM(a: A, f: (A) -> HK<DeferredKWHK, Either<A, B>>): DeferredKW<B> =
             DeferredKW.tailRecM(CC(), a) { aa: A -> f(aa).ev() }
