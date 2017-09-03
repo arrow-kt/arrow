@@ -15,8 +15,7 @@ object MonadLaws {
                     Law("Monad Laws: monad comprehensions", { monadComprehensions(M, EQ) }),
                     Law("Monad Laws: stack-safe//unsafe monad comprehensions equivalence", { equivalentComprehensions(M, EQ) }),
                     Law("Monad / JVM: stack safe", { stackSafety(5000, M, EQ) }),
-                    Law("Monad / JVM: stack safe comprehensions", { stackSafetyComprehensions(5000, M, EQ) }),
-                    Law("Monad / JVM: monad comprehension support context change", { monadComprehensionsContext(M, EQ) })
+                    Law("Monad / JVM: stack safe comprehensions", { stackSafetyComprehensions(5000, M, EQ) })
             )
 
     inline fun <reified F> leftIdentity(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
@@ -81,23 +80,6 @@ object MonadLaws {
                     yields(c)
                 }.equalUnderTheLaw(M.pure(num + 2), EQ)
             })
-
-    inline fun <reified F> monadComprehensionsContext(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
-            forFew(10, genIntSmall(), genIntSmall(), genIntSmall(), { a: Int, b: Int, c: Int ->
-                val CDA = newCoroutineDispatcher("$a")
-                val CDB = newCoroutineDispatcher("$b")
-                val CDC = newCoroutineDispatcher("$c")
-                val result: HK<F, Int> = M.binding {
-                    val x = bindInContext(CDA) { M.pure(getThreadNumber()) }
-                    val y = bindInContext(CDB) { M.pure(getThreadNumber()) }
-                    val z = bindInContext(CDC) { M.pure(getThreadNumber()) }
-                    yields(x + y + z)
-                }
-                result.equalUnderTheLaw(M.pure(a + b + c), EQ)
-            })
-
-    // The thread name has some values appended at the end by the koroutines library
-    inline fun getThreadNumber() = Thread.currentThread().name.split(" ").first().toInt()
 
     fun <F> stackSafeTestProgram(M: Monad<F>, n: Int, stopAt: Int): Free<F, Int> = M.bindingStackSafe {
         val v = M.pure(n + 1).bind()
