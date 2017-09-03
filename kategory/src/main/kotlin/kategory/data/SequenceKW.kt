@@ -1,5 +1,7 @@
 package kategory
 
+fun <A> SequenceKWKind<A>.toList(): List<A> = this.ev().sequence.toList()
+
 @higherkind
 @deriving(Monad::class, Traverse::class, MonoidK::class)
 data class SequenceKW<out A> constructor(val sequence: Sequence<A>) : SequenceKWKind<A>, Sequence<A> by sequence {
