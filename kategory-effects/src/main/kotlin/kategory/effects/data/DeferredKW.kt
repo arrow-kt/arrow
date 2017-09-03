@@ -6,7 +6,7 @@ import kotlin.coroutines.experimental.EmptyCoroutineContext
 
 @higherkind
 @deriving(Monad::class, AsyncContext::class)
-class DeferredKW<out A>(val ctx: CoroutineContext, val deferred: Deferred<A>) : DeferredKWKind<A> {
+class DeferredKW<out A>(val deferred: Deferred<A>) : DeferredKWKind<A> {
 
     fun <B> map(f: (A) -> B): DeferredKW<B> =
       flatMap { a: A -> pure(f(a)) }
@@ -27,26 +27,25 @@ class DeferredKW<out A>(val ctx: CoroutineContext, val deferred: Deferred<A>) : 
                     }
                 }
             }
-            DeferredKW(ctx, promise)
+            DeferredKW(promise)
         }
 
     companion object {
 
         fun unit(): DeferredKW<Unit> =
-                DeferredKW(CommonPool, CompletableDeferred(Unit))
+                DeferredKW(CompletableDeferred(Unit))
 
         fun <A> pure(a: A): DeferredKW<A> =
-                DeferredKW(CommonPool, CompletableDeferred(a))
+                DeferredKW(CompletableDeferred(a))
 
         fun <A> async(a: () -> A, ctx: CoroutineContext = CommonPool): DeferredKW<A> =
-                DeferredKW(ctx, kotlinx.coroutines.experimental.async(ctx) { a() })
+                DeferredKW(kotlinx.coroutines.experimental.async(ctx) { a() })
 
         fun <A> failed(t: Throwable): DeferredKW<A> {
             val promise = CompletableDeferred<A>()
             promise.completeExceptionally(t)
-            return DeferredKW(CommonPool, promise)
+            return DeferredKW(promise)
         }
-
 
         fun <A> raiseError(t: Throwable): DeferredKW<A> =
                 failed(t)
@@ -56,7 +55,7 @@ class DeferredKW<out A>(val ctx: CoroutineContext, val deferred: Deferred<A>) : 
             fa {
                 it.fold({ promise.completeExceptionally(it) }, { promise.complete(it) })
             }
-            return DeferredKW(ctx, promise)
+            return DeferredKW(promise)
         }
 
         fun <A, B> tailRecM(a: A, f: (A) -> DeferredKWKind<Either<A, B>>): DeferredKW<B> {
@@ -78,7 +77,7 @@ class DeferredKW<out A>(val ctx: CoroutineContext, val deferred: Deferred<A>) : 
             }
             val promise = CompletableDeferred<B>()
             kotlinx.coroutines.experimental.async(CommonPool) { loop(promise, a, f) }
-            return DeferredKW(CommonPool, promise)
+            return DeferredKW(promise)
         }
 
         fun functor(): DeferredKWHKMonadInstance = object : DeferredKWHKMonadInstance {}
@@ -106,7 +105,7 @@ fun <A> DeferredKWKind<A>.handleErrorWith(f: (Throwable) -> DeferredKWKind<A>): 
         }
         else promise.complete(dthis.deferred.getCompleted())
     }
-    return DeferredKW(dthis.ctx, promise)
+    return DeferredKW(promise)
 }
 
 fun <A> DeferredKWKind<A>.unsafeAttemptSync(): Try<A> =
