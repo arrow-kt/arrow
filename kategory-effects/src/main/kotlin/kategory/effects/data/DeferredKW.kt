@@ -69,11 +69,7 @@ data class DeferredKW<out A>(val thunk: (CoroutineContext) -> Deferred<A>) : Def
 
         inline fun applicative(): DeferredKWHKMonadInstance = object : DeferredKWHKMonadInstance {}
 
-        inline fun monad(): DeferredKWHKMonadInstance = object : DeferredKWHKMonadInstance {}
-
         inline fun monadError(): DeferredKWHKMonadErrorInstance = object : DeferredKWHKMonadErrorInstance {}
-
-        inline fun asyncContext(): DeferredKWHKAsyncContextInstance = object : DeferredKWHKAsyncContextInstance {}
     }
 }
 
