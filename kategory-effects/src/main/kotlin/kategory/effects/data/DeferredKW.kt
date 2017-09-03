@@ -50,7 +50,7 @@ class DeferredKW<out A>(val deferred: Deferred<A>) : DeferredKWKind<A> {
         fun <A> raiseError(t: Throwable): DeferredKW<A> =
                 failed(t)
 
-        fun <A> runAsync(fa: Proc<A>, ctx: CoroutineContext = CommonPool): DeferredKW<A> {
+        fun <A> runAsync(fa: Proc<A>): DeferredKW<A> {
             val promise = CompletableDeferred<A>()
             fa {
                 it.fold({ promise.completeExceptionally(it) }, { promise.complete(it) })
