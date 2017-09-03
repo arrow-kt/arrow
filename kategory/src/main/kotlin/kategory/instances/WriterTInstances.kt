@@ -1,5 +1,7 @@
 package kategory
 
+import kategory.typeclasses.Alternative
+
 interface WriterTApplicative<F, W> : Applicative<WriterTKindPartial<F, W>>, WriterTFunctor<F, W> {
 
     override fun F0(): Monad<F>
@@ -34,6 +36,10 @@ interface WriterTFunctor<F, W> : Functor<WriterTKindPartial<F, W>> {
     fun F0(): Functor<F>
 
     override fun <A, B> map(fa: HK<WriterTKindPartial<F, W>, A>, f: (A) -> B): HK<WriterTKindPartial<F, W>, B> = fa.ev().map { f(it) }
+}
+
+interface WriterTAlternative<F, W> : WriterTMonoidK<F, W>, WriterTApplicative<F, W>, Alternative<WriterTKindPartial<F, W>> {
+    // override implicit def F0: Alternative[F]
 }
 
 interface WriterTMonadFilter<F, W> : WriterTMonad<F, W>, MonadFilter<WriterTKindPartial<F, W>> {
