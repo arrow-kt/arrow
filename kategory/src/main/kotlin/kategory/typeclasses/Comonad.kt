@@ -1,12 +1,9 @@
 package kategory
 
 import java.io.Serializable
-import kotlin.coroutines.experimental.Continuation
-import kotlin.coroutines.experimental.EmptyCoroutineContext
-import kotlin.coroutines.experimental.RestrictsSuspension
+import kotlin.coroutines.experimental.*
 import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
-import kotlin.coroutines.experimental.startCoroutine
 
 /**
  * The dual of monads, used to extract values from F
@@ -27,9 +24,7 @@ inline fun <reified F, A> HK<F, A>.extract(FT: Comonad<F> = comonad()): A = FT.e
 inline fun <reified F, A> HK<F, A>.duplicate(FT: Comonad<F> = comonad()): HK<F, HK<F, A>> = FT.duplicate(this)
 
 @RestrictsSuspension
-open class ComonadContinuation<F, A : Any>(val CM: Comonad<F>) : Serializable, Continuation<A> {
-
-    override val context = EmptyCoroutineContext
+open class ComonadContinuation<F, A : Any>(val CM: Comonad<F>, override val context: CoroutineContext = EmptyCoroutineContext) : Serializable, Continuation<A> {
 
     override fun resume(value: A) {
         returnedMonad = value
@@ -59,7 +54,7 @@ open class ComonadContinuation<F, A : Any>(val CM: Comonad<F>) : Serializable, C
  * A coroutine is initiated and inside `MonadContinuation` suspended yielding to `flatMap` once all the flatMap binds are completed
  * the underlying monad is returned from the act of executing the coroutine
  */
-fun <F, B : Any> Comonad<F>.cobinding(c: suspend ComonadContinuation<F, *>.() -> B): B {
+fun <F, B : Any> Comonad<F>.cobinding(coroutineContext: CoroutineContext = EmptyCoroutineContext, c: suspend ComonadContinuation<F, *>.() -> B): B {
     val continuation = ComonadContinuation<F, B>(this)
     c.startCoroutine(continuation, continuation)
     return continuation.returnedMonad
