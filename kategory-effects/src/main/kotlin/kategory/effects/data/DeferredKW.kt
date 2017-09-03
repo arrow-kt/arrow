@@ -45,31 +45,20 @@ data class DeferredKW<out A>(val thunk: (CoroutineContext) -> Deferred<A>) : Def
         inline fun <A> raiseError(t: Throwable): DeferredKW<A> =
                 DeferredKW { throw t }
 
-        fun <A, B> tailRecM(a: A, f: (A) -> DeferredKWKind<Either<A, B>>): DeferredKW<B> {
-            tailrec fun go(coroutineContext: CoroutineContext, a: A, f: (A) -> DeferredKWKind<Either<A, B>>): DeferredKW<B> {
-                val result: DeferredResult<Either<A, B>> = f(a).attempt(coroutineContext)
-                /* FIXME(paco): KT-20075 If you remove return here tailrec stops working. Jetbrains Please. */
-                return when (result) {
-                    is Either.Left -> raiseError(result.a)
-                    is Either.Right -> {
-                        val next: Either<A, B> = result.b
-                        when (next) {
-                            is Either.Left -> go(coroutineContext, next.a, f)
-                            is Either.Right -> pure(next.b)
-                        }
+        fun <A, B> tailRecM(a: A, f: (A) -> DeferredKWKind<Either<A, B>>): DeferredKW<B> =
+                DeferredKW.monad().flatMap(f(a), { result: Either<A, B> ->
+                    when (result) {
+                        is Either.Left -> tailRecM(result.a, f)
+                        is Either.Right -> pure(result.b)
                     }
-                }
-            }
-            return DeferredKW { context: CoroutineContext ->
-                go(context, a, f).thunk(context)
-            }
-        }
+                })
 
         inline fun functor(): DeferredKWHKMonadInstance = object : DeferredKWHKMonadInstance {}
 
         inline fun applicative(): DeferredKWHKMonadInstance = object : DeferredKWHKMonadInstance {}
 
         inline fun monadError(): DeferredKWHKMonadErrorInstance = object : DeferredKWHKMonadErrorInstance {}
+
     }
 }
 
