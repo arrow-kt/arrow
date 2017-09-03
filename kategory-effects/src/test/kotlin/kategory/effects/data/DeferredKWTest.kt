@@ -7,7 +7,7 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class DeferredKWTest : UnitSpec() {
     fun <T> EQ(): Eq<HK<DeferredKWHK, T>> = Eq { a, b ->
-        a.attempt(CommonPool) == b.attempt(CommonPool)
+        a.unsafeRunSync() == b.unsafeRunSync()
     }
 
     init {
