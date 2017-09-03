@@ -10,9 +10,7 @@ interface WriterTApplicative<F, W> : Applicative<WriterTKindPartial<F, W>>, Writ
     override fun <A, B> ap(fa: HK<WriterTKindPartial<F, W>, A>, ff: HK<WriterTKindPartial<F, W>, (A) -> B>): HK<WriterTKindPartial<F, W>, B> =
             ap(fa, ff)
 
-    override fun <A, B> map(fa: HK<WriterTKindPartial<F, W>, A>, f: (A) -> B): HK<WriterTKindPartial<F, W>, B> {
-        return super<WriterTFunctor>.map(fa, f)
-    }
+    override fun <A, B> map(fa: HK<WriterTKindPartial<F, W>, A>, f: (A) -> B): HK<WriterTKindPartial<F, W>, B> = super<WriterTFunctor>.map(fa, f)
 }
 
 interface WriterTMonad<F, W> : WriterTApplicative<F, W>, Monad<WriterTKindPartial<F, W>> {
@@ -28,9 +26,8 @@ interface WriterTMonad<F, W> : WriterTApplicative<F, W>, Monad<WriterTKindPartia
                 }
             }))
 
-    override fun <A, B> ap(fa: HK<WriterTKindPartial<F, W>, A>, ff: HK<WriterTKindPartial<F, W>, (A) -> B>): HK<WriterTKindPartial<F, W>, B> {
-        return super<Monad>.ap(fa, ff)
-    }
+    override fun <A, B> ap(fa: HK<WriterTKindPartial<F, W>, A>, ff: HK<WriterTKindPartial<F, W>, (A) -> B>): HK<WriterTKindPartial<F, W>, B> =
+            super<Monad>.ap(fa, ff)
 }
 
 interface WriterTFunctor<F, W> : Functor<WriterTKindPartial<F, W>> {
@@ -49,17 +46,17 @@ interface WriterTSemigroupK<F, W> : SemigroupK<WriterTKindPartial<F, W>> {
 
     fun MF(): Monad<F>
 
-    fun GF(): SemigroupK<F>
+    fun F0(): SemigroupK<F>
 
     override fun <A> combineK(x: HK<WriterTKindPartial<F, W>, A>, y: HK<WriterTKindPartial<F, W>, A>):
-            WriterT<F, W, A> = WriterT(MF(), GF().combineK(x.ev().value, y.ev().value))
+            WriterT<F, W, A> = WriterT(MF(), F0().combineK(x.ev().value, y.ev().value))
 }
 
 interface WriterTMonoidK<F, W> : MonoidK<WriterTKindPartial<F, W>>, WriterTSemigroupK<F, W> {
 
-    override fun GF(): MonoidK<F>
+    override fun F0(): MonoidK<F>
 
-    override fun <A> empty(): HK<WriterTKindPartial<F, W>, A> = WriterT(MF(), GF().empty())
+    override fun <A> empty(): HK<WriterTKindPartial<F, W>, A> = WriterT(MF(), F0().empty())
 }
 
 interface WriterTMonadWriter<F, W> : MonadWriter<WriterTKindPartial<F, W>, W>, WriterTMonad<F, W> {
