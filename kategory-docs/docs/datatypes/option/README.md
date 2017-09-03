@@ -53,11 +53,11 @@ value2.getOrElse { "No value" }
 Checking whether option has value:
 
 ```kotlin:ank
-value1.isEmpty
+value1 is None
 ```
 
 ```kotlin:ank
-value2.isEmpty
+value2 is None
 ```
 
 Option can also be used with when statements:
@@ -65,7 +65,7 @@ Option can also be used with when statements:
 ```kotlin:ank
 val someValue: Option<Double> = Some(20.0)
 val value = when(someValue) {
-   is Some -> v
+   is Some -> someValue.value
    is None -> 0.0
 }
 value
@@ -74,7 +74,7 @@ value
 ```kotlin:ank
 val noValue: Option<Double> = None
 val value = when(noValue) {
-   is Some -> v
+   is Some -> noValue.value
    is None -> 0.0
 }
 value
@@ -101,11 +101,12 @@ mappedResult2
  
 Another operation is `fold`. This operation will extract the value from the option, or provide a default if the value is `None`
  
-```kotlin:ank
+```kotlin:ank:silent
 val number: Option<Int> = Some(3)
 val noNumber: Option<Int> = None
 val foldedResult1 = number.fold({ 1 }, { n: Int -> n * 3 })
 val foldedResult2 = noNumber.fold({ 1 }, { n: Int -> n * 3 })
+```
  
 ```kotlin:ank
 foldedResult1
