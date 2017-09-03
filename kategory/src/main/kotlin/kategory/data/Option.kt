@@ -7,7 +7,7 @@ package kategory
  * are either an instance of $some or the object $none.
  */
 @higherkind
-@deriving(Functor::class, Applicative::class, Monad::class, Foldable::class, Traverse::class)
+@deriving(Functor::class, Applicative::class, Monad::class, Foldable::class, Traverse::class, MonadFilter::class)
 sealed class Option<out A> : OptionKind<A> {
 
     companion object {
