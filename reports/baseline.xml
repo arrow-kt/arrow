@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <SmellBaseline>
   <Blacklist timestamp="1503308049178"></Blacklist>
-  <Whitelist timestamp="1504397293559">
+  <Whitelist timestamp="1504460488803">
     <ID>LabeledExpression:FunctionK.kt$&lt;no name provided&gt;$this@or</ID>
     <ID>LabeledExpression:PartialFunction.kt$&lt;no name provided&gt;$this@orElse</ID>
     <ID>LabeledExpression:PartialFunction.kt$&lt;no name provided&gt;$this@orElse</ID>
@@ -23,10 +23,10 @@
     <ID>LabeledExpression:ContinuationUtils.kt$this@completion</ID>
     <ID>LabeledExpression:MonoidK.kt$MonoidK.&lt;no name provided&gt;$this@MonoidK</ID>
     <ID>LabeledExpression:MonoidK.kt$MonoidK.&lt;no name provided&gt;$this@MonoidK</ID>
+    <ID>ComplexMethod:AndThen.kt$AndThen$ @Suppress("UNCHECKED_CAST") internal fun runLoop(_success: A?, _failure: Throwable?, _isSuccess: Boolean): B</ID>
     <ID>LabeledExpression:DeferredKW.kt$DeferredKW$this@DeferredKW</ID>
     <ID>LabeledExpression:DeferredKW.kt$this@attempt</ID>
     <ID>LabeledExpression:DeferredKW.kt$this@handleErrorWith</ID>
-    <ID>ComplexMethod:AndThen.kt$AndThen$ @Suppress("UNCHECKED_CAST") internal fun runLoop(_success: A?, _failure: Throwable?, _isSuccess: Boolean): B</ID>
     <ID>OptionalUnit:FreeApplicative.kt$FreeApplicative$Unit</ID>
     <ID>OptionalUnit:AndThen.kt$AndThen$Unit</ID>
     <ID>OptionalUnit:AndThen.kt$AndThen$Unit</ID>
@@ -36,7 +36,7 @@
     <ID>LateinitUsage:Monad.kt$StackSafeMonadContinuation$protected lateinit var returnedMonad: Free&lt;F, A&gt;</ID>
     <ID>UnsafeCallOnNullableType:AndThen.kt$AndThen$failure!!</ID>
     <ID>UnsafeCallOnNullableType:AndThen.kt$AndThen$failure!!</ID>
+    <ID>WildcardImport:Comonad.kt$import kotlin.coroutines.experimental.*</ID>
     <ID>WildcardImport:DeferredKW.kt$import kotlinx.coroutines.experimental.*</ID>
-    <ID>WildcardImport:DeferredKWInstances.kt$import kategory.*</ID>
   </Whitelist>
 </SmellBaseline>
