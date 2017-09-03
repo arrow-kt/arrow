@@ -24,6 +24,6 @@ object MonadFilterLaws {
 
     inline fun <reified F> monadFilterConsistency(MF: MonadFilter<F> = monadFilter<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): Unit =
             forAll(genFunctionAToB(Gen.bool()), genConstructor(Gen.int(), cf), { f: (Int) -> Boolean, fa: HK<F, Int> ->
-                MF.filter(fa, f).equalUnderTheLaw(fa.flatMap { a -> if (f(a)) MF.pure(a) else MF.empty() }, EQ)
+                MF.filter(fa, f).equalUnderTheLaw(fa.flatMap(MF, { a -> if (f(a)) MF.pure(a) else MF.empty() }), EQ)
             })
 }

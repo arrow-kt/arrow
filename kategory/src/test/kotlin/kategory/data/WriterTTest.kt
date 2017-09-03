@@ -1,6 +1,8 @@
 package kategory
 
 import io.kotlintest.KTestJUnitRunner
+import kategory.laws.FunctorFilterLaws
+import kategory.laws.MonadFilterLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -35,5 +37,15 @@ class WriterTTest : UnitSpec() {
                             }
                 }
         ))
+
+        testLaws(MonadFilterLaws.laws(WriterT.monadFilter(Option.monadFilter(), IntMonoid),
+                { WriterT(Option.monad(), Option(Tuple2(it, it))) },
+                object : Eq<HK<WriterTKindPartial<OptionHK, Int>, Int>> {
+                    override fun eqv(a: HK<WriterTKindPartial<OptionHK, Int>, Int>, b: HK<WriterTKindPartial<OptionHK, Int>, Int>): Boolean =
+                            a.ev().value.ev().let { optionA: Option<Tuple2<Int, Int>> ->
+                                val optionB = a.ev().value.ev()
+                                optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Int> -> optionB.fold({ false }, { value == it }) })
+                            }
+                }))
     }
 }
