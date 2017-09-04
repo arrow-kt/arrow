@@ -5,6 +5,7 @@ package kategory
 @higherkind data class WriterT<F, W, A>(val MF: Monad<F>, val value: HK<F, Tuple2<W, A>>) : WriterTKind<F, W, A> {
 
     companion object {
+
         inline fun <reified F, reified W, A> pure(a: A, MM: Monoid<W> = monoid(), MF: Monad<F> = kategory.monad()) = WriterT(MF.pure(MM.empty() toT a), MF)
 
         inline fun <reified F, W, A> both(w: W, a: A, MF: Monad<F> = kategory.monad()) = WriterT(MF.pure(w toT a), MF)
@@ -13,49 +14,49 @@ package kategory
 
         inline operator fun <reified F, W, A> invoke(value: HK<F, Tuple2<W, A>>, MF: Monad<F> = kategory.monad()) = WriterT(MF, value)
 
-        inline fun <reified F, reified W> instances(MM: Monad<F> = kategory.monad(), SG: Monoid<W> = kategory.monoid<W>()): WriterTInstances<F, W> =
-                object : WriterTInstances<F, W> {
-
-                    override fun <A> writer(aw: Tuple2<W, A>): WriterT<F, W, A> = WriterT.put(aw.b, aw.a)
-
-                    override fun <A> listen(fa: HK<WriterTKindPartial<F, W>, A>): HK<WriterTKindPartial<F, W>, Tuple2<W, A>> =
-                            WriterT(MM, MM.flatMap(fa.ev().content(), { a -> MM.map(fa.ev().write(), { l -> Tuple2(l, Tuple2(l, a)) }) }))
-
-                    override fun <A> pass(fa: HK<WriterTKindPartial<F, W>, Tuple2<(W) -> W, A>>): HK<WriterTKindPartial<F, W>, A> =
-                            WriterT(MM, MM.flatMap(fa.ev().content(), { tuple2FA -> MM.map(fa.ev().write(), { l -> Tuple2(tuple2FA.a(l), tuple2FA.b) }) }))
-
-                    override fun tell(w: W): HK<WriterTKindPartial<F, W>, Unit> = WriterT.tell(w)
-
-                    override fun MM(): Monad<F> = MM
-
-                    override fun SG(): Monoid<W> = SG
+        inline fun <reified F, reified W> functor(FF: Functor<F> = kategory.functor<F>()): WriterTFunctor<F, W> =
+                object : WriterTFunctor<F, W> {
+                    override fun F0(): Functor<F> = FF
                 }
 
-        inline fun <reified F, reified W> functor(MM: Monad<F> = kategory.monad<F>(), SG: Monoid<W> = kategory.monoid<W>()): Functor<WriterTKindPartial<F, W>> =
-                instances(MM, SG)
+        inline fun <reified F, reified W> applicative(MF: Monad<F> = kategory.monad<F>(),
+                                                      MW: Monoid<W> = kategory.monoid<W>()): WriterTApplicative<F, W> =
+                object : WriterTApplicative<F, W> {
+                    override fun F0(): Monad<F> = MF
+                    override fun L0(): Monoid<W> = MW
+                }
 
-        inline fun <reified F, reified W> applicative(MM: Monad<F> = kategory.monad<F>(), SG: Monoid<W> = kategory.monoid<W>()):
-                Applicative<WriterTKindPartial<F, W>> = instances(MM, SG)
+        inline fun <reified F, reified W> monad(MF: Monad<F> = kategory.monad<F>(), MW: Monoid<W> = kategory.monoid<W>()): WriterTMonad<F, W> =
+                object : WriterTMonadWriter<F, W> {
+                    override fun F0(): Monad<F> = MF
+                    override fun L0(): Monoid<W> = MW
+                }
 
-        inline fun <reified F, reified W> monad(MM: Monad<F> = kategory.monad<F>(), SG: Monoid<W> = kategory.monoid<W>()): Monad<WriterTKindPartial<F, W>> =
-                instances(MM, SG)
-
-        inline fun <reified F, reified W> semigroupK(MF: Monad<F> = monad<F>(), SGK: SemigroupK<F> = semigroupK<F>()): SemigroupK<WriterTKindPartial<F, W>> =
+        inline fun <reified F, reified W> semigroupK(MF: Monad<F> = monad<F>(), MKF: SemigroupK<F> = semigroupK<F>()): WriterTSemigroupK<F, W> =
                 object : WriterTSemigroupK<F, W> {
                     override fun MF(): Monad<F> = MF
-
-                    override fun GF(): SemigroupK<F> = SGK
+                    override fun F0(): SemigroupK<F> = MKF
                 }
 
-        inline fun <reified F, reified W> monoidK(MF: Monad<F> = monad<F>(), MKF: MonoidK<F> = monoidK<F>()): MonoidK<WriterTKindPartial<F, W>> =
+        inline fun <reified F, reified W> monoidK(MF: Monad<F> = monad<F>(), MKF: MonoidK<F> = monoidK<F>()): WriterTMonoidK<F, W> =
                 object : WriterTMonoidK<F, W> {
                     override fun MF(): Monad<F> = MF
-
-                    override fun GF(): MonoidK<F> = MKF
+                    override fun F0(): MonoidK<F> = MKF
                 }
 
-        inline fun <reified F, reified W> monadWriter(MM: Monad<F> = kategory.monad(), SG: Monoid<W> = kategory.monoid()):
-                MonadWriter<WriterTKindPartial<F, W>, W> = instances(MM, SG)
+        inline fun <reified F, reified W> monadWriter(MF: Monad<F> = kategory.monad(),
+                                                      MW: Monoid<W> = kategory.monoid()): WriterTMonadWriter<F, W> =
+                object : WriterTMonadWriter<F, W> {
+                    override fun F0(): Monad<F> = MF
+                    override fun L0(): Monoid<W> = MW
+                }
+
+        inline fun <reified F, reified W> monadFilter(MF: MonadFilter<F> = kategory.monadFilter(),
+                                                      MW: Monoid<W> = kategory.monoid()): WriterTMonadFilter<F, W> =
+                object : WriterTMonadFilter<F, W> {
+                    override fun F0(): MonadFilter<F> = MF
+                    override fun L0(): Monoid<W> = MW
+                }
 
         inline fun <reified F, W, A> putT(vf: HK<F, A>, w: W, MF: Monad<F> = kategory.monad()): WriterT<F, W, A> =
                 WriterT(MF, MF.map(vf, { v -> Tuple2(w, v) }))
@@ -63,7 +64,15 @@ package kategory
         inline fun <reified F, W, A> put(a: A, w: W, applicativeF: Applicative<F> = kategory.applicative()): WriterT<F, W, A> =
                 WriterT.putT(applicativeF.pure(a), w)
 
+        fun <F, W, A> putT2(vf: HK<F, A>, w: W, MF: Monad<F>): WriterT<F, W, A> =
+                WriterT(MF, MF.map(vf, { v -> Tuple2(w, v) }))
+
+        fun <F, W, A> put2(a: A, w: W, MF: Monad<F>): WriterT<F, W, A> =
+                WriterT.putT2(MF.pure(a), w, MF)
+
         inline fun <reified F, W> tell(l: W, applicativeF: Applicative<F> = kategory.applicative()): WriterT<F, W, Unit> = WriterT.put(Unit, l)
+
+        fun <F, W> tell2(l: W, MF: Monad<F>): WriterT<F, W, Unit> = WriterT.put2(Unit, l, MF)
 
         inline fun <reified F, reified W, A> value(v: A, applicativeF: Applicative<F> = kategory.applicative(), monoidW: Monoid<W> = monoid()):
                 WriterT<F, W, A> = WriterT.put(v, monoidW.empty())
