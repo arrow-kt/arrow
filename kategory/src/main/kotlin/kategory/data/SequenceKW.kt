@@ -15,7 +15,7 @@ data class SequenceKW<out A> constructor(val sequence: Sequence<A>) : SequenceKW
     fun <B> foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
         fun loop(fa_p: SequenceKW<A>): Eval<B> = when {
             fa_p.sequence.none() -> lb
-            else -> f(fa_p.ev().sequence.first(), Eval.defer { loop(fa_p.sequence.drop(1).k()) })
+            else -> f(fa_p.first(), Eval.defer { loop(fa_p.drop(1).k()) })
         }
         return Eval.defer { loop(this.ev()) }
     }
@@ -38,28 +38,28 @@ data class SequenceKW<out A> constructor(val sequence: Sequence<A>) : SequenceKW
 
         fun <A> empty(): SequenceKW<A> = emptySequence<A>().k()
 
-        private tailrec fun <A, B> go(
-                buf: MutableList<B>,
-                f: (A) -> HK<SequenceKWHK, Either<A, B>>,
-                v: SequenceKW<Either<A, B>>) {
-            if (!v.isEmpty()) {
-                val head: Either<A, B> = v.first()
-                when (head) {
-                    is Either.Right<A, B> -> {
-                        buf += head.b
-                        go(buf, f, v.drop(1).k())
-                    }
-                    is Either.Left<A, B> -> {
-                        if (v.count() == 1)
-                            go(buf, f, (f(head.a).ev()).k())
-                        else
-                            go(buf, f, (f(head.a).ev() + v.drop(1)).k())
+        fun <A, B> tailRecM(a: A, f: (A) -> HK<SequenceKWHK, Either<A, B>>): SequenceKW<B> {
+            tailrec fun <A, B> go(
+                    buf: MutableList<B>,
+                    f: (A) -> HK<SequenceKWHK, Either<A, B>>,
+                    v: SequenceKW<Either<A, B>>) {
+                if (!v.isEmpty()) {
+                    val head: Either<A, B> = v.first()
+                    when (head) {
+                        is Either.Right<A, B> -> {
+                            buf += head.b
+                            go(buf, f, v.drop(1).k())
+                        }
+                        is Either.Left<A, B> -> {
+                            if (v.count() == 1)
+                                go(buf, f, (f(head.a).ev()).k())
+                            else
+                                go(buf, f, (f(head.a).ev() + v.drop(1)).k())
+                        }
                     }
                 }
             }
-        }
 
-        fun <A, B> tailRecM(a: A, f: (A) -> HK<SequenceKWHK, Either<A, B>>): SequenceKW<B> {
             val buf = mutableListOf<B>()
             go(buf, f, f(a).ev())
             return SequenceKW(buf.asSequence())
