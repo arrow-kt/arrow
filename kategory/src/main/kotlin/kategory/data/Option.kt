@@ -7,7 +7,7 @@ package kategory
  * are either an instance of $some or the object $none.
  */
 @higherkind
-@deriving(Functor::class, Applicative::class, Monad::class, Foldable::class, Traverse::class)
+@deriving(Functor::class, Applicative::class, Monad::class, Foldable::class, Traverse::class, MonadFilter::class)
 sealed class Option<out A> : OptionKind<A> {
 
     companion object {
@@ -180,7 +180,7 @@ fun <B> Option<B>.getOrElse(default: () -> B): B = fold({ default() }, { it })
  *
  * @param default the default option if this is empty.
  */
-fun <A, B : A> Option<B>.orElse(alternative: () -> Option<B>): Option<B> = if (isEmpty) alternative() else this
+fun <A, B : A> OptionKind<B>.orElse(alternative: () -> Option<B>): Option<B> = if (ev().isEmpty) alternative() else ev()
 
 fun <A> A.some(): Option<A> = Option.Some(this)
 

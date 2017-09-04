@@ -5,10 +5,10 @@ import io.kotlintest.properties.forAll
 
 object MonadErrorLaws {
 
-    inline fun <reified F> laws(M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): List<Law> =
-            MonadLaws.laws(M, EQ) + listOf(
-                    Law("Monad Error Laws: left zero", { monadErrorLeftZero(M, EQ) }),
-                    Law("Monad Error Laws: ensure consistency", { monadErrorEnsureConsistency(M, EQ) })
+    inline fun <reified F> laws(M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQERR: Eq<HK<F, Int>>, EQ_EITHER: Eq<HK<F, Either<Throwable, Int>>>, EQ: Eq<HK<F, Int>> = EQERR): List<Law> =
+            MonadLaws.laws(M, EQ) + ApplicativeErrorLaws.laws(M, EQERR, EQ_EITHER, EQ) + listOf(
+                    Law("Monad Error Laws: left zero", { monadErrorLeftZero(M, EQERR) }),
+                    Law("Monad Error Laws: ensure consistency", { monadErrorEnsureConsistency(M, EQERR) })
             )
 
     inline fun <reified F> monadErrorLeftZero(M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =

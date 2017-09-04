@@ -11,7 +11,7 @@ import org.junit.runner.RunWith
 class EitherTest : UnitSpec() {
     init {
 
-        testLaws(MonadErrorLaws.laws(Either.monadError(), Eq.any()))
+        testLaws(MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()))
         testLaws(TraverseLaws.laws(Either.traverse<Throwable>(), Either.applicative(), { it.right() }, Eq.any()))
         testLaws(SemigroupKLaws.laws(
                 Either.semigroupK(),
