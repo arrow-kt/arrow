@@ -32,10 +32,6 @@ import kategory.*
 ```
 
 ```kotlin:ank
-import kategory.*
-```
-
-```kotlin:ank
 val intSemigroup: Semigroup<Int> = NumberSemigroup(Int::plus)
 intSemigroup.combine(1, 2)
 ```
