@@ -101,19 +101,19 @@ mappedResult2
  
 Another operation is `fold`. This operation will extract the value from the option, or provide a default if the value is `None`
  
-```kotlin:ank:silent
+```kotlin
 val number: Option<Int> = Some(3)
 val noNumber: Option<Int> = None
 val foldedResult1 = number.fold({ 1 }, { n: Int -> n * 3 })
 val foldedResult2 = noNumber.fold({ 1 }, { n: Int -> n * 3 })
 ```
  
-```kotlin:ank
+```kotlin
 foldedResult1
 ```
 
-```kotlin:ank
-foldedResult1
+```kotlin
+foldedResult2
 ```
 
 Kategory also adds syntax to all datatypes so you can easily lift them into the context of `Option` where needed.
@@ -148,21 +148,21 @@ Option.applicative().tupled(Option(1), Option("Hello"), Option(20.0))
 
 Computing over dependent values ignoring absence
 
-```kotlin:ank
-Option.monad().binding {
+```kotlin
+val r1 = Option.monad().binding {
    val x = Option(1).bind()
    val y = Option(1 + x).bind()
    val z = Option(1 + y).bind()
-   yields(z)
+   yields(x + y + z)
 }
 ```
 
-```kotlin:ank
-Option.monad().binding {
+```kotlin
+val r2 = Option.monad().binding {
    val x = none<Int>().bind()
    val y = Option(1 + x).bind()
    val z = Option(1 + y).bind()
-   yields(z)
+   yields(x + y + z)
 }
 ```
 
