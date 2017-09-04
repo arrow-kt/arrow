@@ -40,7 +40,7 @@ buildscript {
         classpath "com.github.ben-manes:gradle-versions-plugin:$gradleVersionsPluginVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
-        classpath('io.kategory:ank-gradle-plugin:0.1.4') {
+        classpath('io.kategory:ank-gradle-plugin:0.1.5') {
             exclude group: 'io.kategory'
         }
     }
