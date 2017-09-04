@@ -64,20 +64,18 @@ Option can also be used with when statements:
 
 ```kotlin:ank
 val someValue: Option<Double> = Some(20.0)
-val value = when(someValue) {
+when(someValue) {
    is Some -> someValue.value
    is None -> 0.0
 }
-value
 ```
 
 ```kotlin:ank
 val noValue: Option<Double> = None
-val value = when(noValue) {
+when(noValue) {
    is Some -> noValue.value
    is None -> 0.0
 }
-value
 ```
 
 An alternative for pattern matching is performing Functor/Foldable style operations. This is possible because an option could be looked at as a collection or foldable structure with either one or zero elements.
@@ -101,19 +99,12 @@ mappedResult2
  
 Another operation is `fold`. This operation will extract the value from the option, or provide a default if the value is `None`
  
-```kotlin
-val number: Option<Int> = Some(3)
-val noNumber: Option<Int> = None
-val foldedResult1 = number.fold({ 1 }, { n: Int -> n * 3 })
-val foldedResult2 = noNumber.fold({ 1 }, { n: Int -> n * 3 })
-```
- 
-```kotlin
-foldedResult1
+```kotlin:ank
+number.fold({ 1 }, { it * 3 })
 ```
 
-```kotlin
-foldedResult2
+```kotlin:ank
+noNumber.fold({ 1 }, { it * 3 })
 ```
 
 Kategory also adds syntax to all datatypes so you can easily lift them into the context of `Option` where needed.
@@ -150,10 +141,10 @@ Computing over dependent values ignoring absence
 
 ```kotlin
 val r1 = Option.monad().binding {
-   val x = Option(1).bind()
-   val y = Option(1 + x).bind()
-   val z = Option(1 + y).bind()
-   yields(x + y + z)
+   val a = Option(1).bind()
+   val b = Option(1 + x).bind()
+   val c = Option(1 + y).bind()
+   yields(a + b + c)
 }
 ```
 
