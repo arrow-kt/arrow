@@ -6,6 +6,7 @@ test {
 
 dependencies {
     compile project(':kategory')
+    compile project(':kategory-test')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
     testCompile project(':kategory-test')

@@ -8,6 +8,7 @@ import kategory.Lens
 import kategory.Option
 import kategory.UnitSpec
 import kategory.applicative
+import kategory.genFunctionAToB
 import kategory.left
 import kategory.right
 import org.junit.runner.RunWith
@@ -26,7 +27,7 @@ class LensTest : UnitSpec() {
                         lens = tokenLens,
                         aGen = TokenGen,
                         bGen = Gen.string(),
-                        funcGen = Gen.create<(String) -> String> { { it } },
+                        funcGen = genFunctionAToB(Gen.string()),
                         EQA = Eq.any(),
                         EQB = Eq.any(),
                         FA = Option.applicative()
