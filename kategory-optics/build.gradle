@@ -1,0 +1,23 @@
+test {
+    testLogging {
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+    }
+}
+
+dependencies {
+    compile project(':kategory')
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
+    testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
+    testCompile project(':kategory-test')
+}
+
+build.dependsOn ':detekt'
+
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+apply from: 'generated-kotlin-sources.gradle'
+apply plugin: 'kotlin-kapt'
+
+compileKotlin.kotlinOptions.freeCompilerArgs += ["-Xskip-runtime-version-check"]
