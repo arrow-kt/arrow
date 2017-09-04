@@ -1,8 +1,11 @@
 package kategory
 
+import kategory.typeclasses.TraverseFilter
+
 interface ConstInstances<A> :
         Applicative<ConstKindPartial<A>>,
-        Traverse<ConstKindPartial<A>> {
+        Traverse<ConstKindPartial<A>>,
+        TraverseFilter<ConstKindPartial<A>> {
 
     fun MA(): Monoid<A>
 
@@ -15,6 +18,9 @@ interface ConstInstances<A> :
     override fun <T, U> foldL(fa: HK<ConstKindPartial<A>, T>, b: U, f: (U, T) -> U): U = b
 
     override fun <T, U> foldR(fa: HK<ConstKindPartial<A>, T>, lb: Eval<U>, f: (T, Eval<U>) -> Eval<U>): Eval<U> = lb
+
+    override fun <G, T, U> traverseFilter(fa: HK<ConstKindPartial<A>, T>, f: (T) -> HK<G, Option<U>>, GA: Applicative<G>):
+            HK<G, HK<ConstKindPartial<A>, U>> = fa.ev().traverseFilter(f, GA)
 
     override fun <G, T, U> traverse(fa: HK<ConstKindPartial<A>, T>, f: (T) -> HK<G, U>, GA: Applicative<G>):
             HK<G, HK<ConstKindPartial<A>, U>> = fa.ev().traverse(f, GA)
