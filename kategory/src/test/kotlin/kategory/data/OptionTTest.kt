@@ -3,6 +3,7 @@ package kategory
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.forAll
 import kategory.laws.FunctorFilterLaws
+import kategory.laws.TraverseFilterLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -30,6 +31,12 @@ class OptionTTest : UnitSpec() {
                 OptionT.functorFilter(),
                 { OptionT(Id(it.some())) },
                 OptionTFIdEq))
+
+        //testLaws(TraverseFilterLaws.laws(
+        //        OptionT.traverseFilter(),
+        //        OptionT.functor(),
+        //        { OptionT(Id(it.some())) },
+        //        OptionTFIdEq))
 
         "toLeft for Some should build a correct EitherT" {
             forAll { a: Int, b: String ->
