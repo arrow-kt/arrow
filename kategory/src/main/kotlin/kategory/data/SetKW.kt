@@ -2,7 +2,7 @@ package kategory
 
 @higherkind
 @deriving(Foldable::class, MonoidK::class)
-data class SetKW<A>(val set: Set<A>) : SetKWKind<A>, Set<A> by set {
+data class SetKW<out A>(val set: Set<A>) : SetKWKind<A>, Set<A> by set {
 
     fun <B> foldL(b: B, f: (B, A) -> B): B = this.fold(b, f)
 
