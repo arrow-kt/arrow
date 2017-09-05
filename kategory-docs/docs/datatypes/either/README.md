@@ -150,7 +150,7 @@ when(x) {
 Instead of using exceptions as our error value, let's instead enumerate explicitly the things that 
 can go wrong in our program.
 
-```kotlin:ank:silent
+```kotlin
 object EitherStyleWithAdts {
 
     sealed class Error {
@@ -178,7 +178,7 @@ exception classes as error values, we use one of the enumerated cases. Now when 
 we get much nicer matching. Moreover, since Error is sealed, no outside code can add additional 
 subtypes which we might fail to handle.
 
-```kotlin:ank
+```kotlin
 val x = EitherStyleWithAdts.magic("2")
 when(x) {
     is Either.Left -> when (x.a){

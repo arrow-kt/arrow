@@ -30,10 +30,6 @@ StringMonoid.empty()
 listOf("K", "Λ", "T", "E", "G", "O", "R", "Y").combineAll(StringMonoid)
 ```
 
-```kotlin:ank
-emptyList<String>().combineAll(StringMonoid)
-```
-
 The advantage of using these type class provided methods, rather than the specific ones for each type, is that we can compose monoids to allow us to operate on more complex types, e.g.
 
 This is also true if we define our own instances. As an example, let's use `Foldable`'s `foldMap`, which maps over values accumulating the results, using the available `Monoid` for the type mapped onto.
@@ -42,7 +38,7 @@ This is also true if we define our own instances. As an example, let's use `Fold
 ListKW.foldable().foldMap(
   IntMonoid,
   listOf(1, 2, 3, 4, 5).k(),
-  identity()
+  ::identity
 )
 ```
 
@@ -59,22 +55,22 @@ To use this with a function that produces a tuple, we can define a Monoid for a 
 ```kotlin:ank:silent
 fun <A, B> monoidTuple(MA: Monoid<A>, MB: Monoid<B>): Monoid<Tuple2<A, B>> =
   object: Monoid<Tuple2<A, B>> {
-    fun combine(x: Tuple2<A, B>, y: Tuple2<A, B>): Tuple2<A, B> {
+    override fun combine(x: Tuple2<A, B>, y: Tuple2<A, B>): Tuple2<A, B> {
+      println("monoitTuple#combine receiving ---> x: $x, y: $y")
       val (xa, xb) = x
       val (ya, yb) = y
-      Tuple2(MA.combine(xa, ya), MB.combine(xb, yb))
+      return Tuple2(MA.combine(xa, ya), MB.combine(xb, yb))
     }
-    fun empty(): Tuple2(A, B) = Tuple2(Monoid[A].empty, Monoid[B].empty)
+    override fun empty(): Tuple2<A, B> = Tuple2(MA.empty(), MB.empty())
   }
 ```
 
 This way we are able to combine both values in one pass, hurrah!
 
 ```kotlin:ank
-
-ListKW.foldable().foldMap(
-  monoidTuple(IntMonoid, StringMonoid),
-  listOf(1, 2, 3, 4, 5).k(),
-  { Tuple2(it, it.toString()) }
-)
+val M = monoidTuple(IntMonoid, StringMonoid)
+val list = listOf(1, 1).k()
+ListKW.foldable().foldMap(M, list, { n: Int -> 
+   Tuple2(n, n.toString()) 
+})
 ```
