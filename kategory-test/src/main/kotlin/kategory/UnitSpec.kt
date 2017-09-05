@@ -20,6 +20,7 @@ abstract class UnitSpec : StringSpec() {
             Option.monad()
             Option.foldable()
             Option.traverse()
+            Option.traverseFilter()
             Try.functor()
             Try.monad()
             Try.foldable()

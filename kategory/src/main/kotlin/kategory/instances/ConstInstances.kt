@@ -18,10 +18,10 @@ interface ConstInstances<A> :
     override fun <T, U> foldR(fa: HK<ConstKindPartial<A>, T>, lb: Eval<U>, f: (T, Eval<U>) -> Eval<U>): Eval<U> = lb
 
     override fun <G, T, U> traverseFilter(fa: HK<ConstKindPartial<A>, T>, f: (T) -> HK<G, Option<U>>, GA: Applicative<G>):
-            HK<G, HK<ConstKindPartial<A>, U>> = fa.ev().traverseFilter(f, GA)
+            HK<G, Const<A, U>> = fa.ev().traverseFilter(f, GA)
 
     override fun <G, T, U> traverse(fa: HK<ConstKindPartial<A>, T>, f: (T) -> HK<G, U>, GA: Applicative<G>):
-            HK<G, HK<ConstKindPartial<A>, U>> = fa.ev().traverse(f, GA)
+            HK<G, Const<A, U>> = fa.ev().traverse(f, GA)
 
     companion object {
         operator fun <A> invoke(MA: Monoid<A>): ConstInstances<A> = object : kategory.ConstInstances<A> {

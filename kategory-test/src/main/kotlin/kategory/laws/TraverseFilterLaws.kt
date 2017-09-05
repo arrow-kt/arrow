@@ -9,7 +9,7 @@ import kategory.Option.None
 object TraverseFilterLaws {
 
     inline fun <reified F> laws(TF: TraverseFilter<F> = traverseFilter<F>(), GA: Applicative<F> = applicative<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): List<Law> =
-            TraverseLaws.laws(TF, GA, cf, EQ) + FunctorLaws.laws(GA, cf, EQ) + listOf(
+            TraverseLaws.laws(TF, GA, cf, EQ) + listOf(
                     Law("TraverseFilter Laws: Identity", { identityTraverseFilter(TF, GA, cf, Eq.any()) }),
                     Law("TraverseFilter Laws: filterA consistent with TraverseFilter", { filterAconsistentWithTraverseFilter(TF, GA, cf, Eq.any()) })
             )
@@ -19,13 +19,8 @@ object TraverseFilterLaws {
                 FT.traverseFilter(fa, { it.some().pure(GA) }, GA).equalUnderTheLaw(GA.pure(fa), EQ)
             })
 
-    inline fun <reified F> filterAconsistentWithTraverseFilter(FT: TraverseFilter<F>,
-                                                               GA: Applicative<F> = applicative<F>(),
-                                                               crossinline cf: (Int) -> HK<F, Int>,
-                                                               EQ: Eq<HK<F, HK<F, Int>>> = Eq.any()) =
-            forAll(genConstructor(genIntSmall(), cf),
-                    genFunctionAToB<Int, HK<F, Boolean>>(genConstructor(Gen.bool(), { GA.pure(it) })),
-                    { fa: HK<F, Int>, f: (Int) -> HK<F, Boolean> ->
-                        FT.filterA(fa, f, GA).equalUnderTheLaw(fa.traverseFilter { a -> f(a).map { b: Boolean -> if (b) Some(a) else None } }, EQ)
-                    })
+    inline fun <reified F> filterAconsistentWithTraverseFilter(FT: TraverseFilter<F>, GA: Applicative<F> = applicative<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, HK<F, Int>>> = Eq.any()) =
+            forAll(genConstructor(genIntSmall(), cf), genFunctionAToB<Int, HK<F, Boolean>>(genConstructor(Gen.bool(), { GA.pure(it) })), { fa: HK<F, Int>, f: (Int) -> HK<F, Boolean> ->
+                FT.filterA(fa, f, GA).equalUnderTheLaw(fa.traverseFilter { a -> f(a).map { b: Boolean -> if (b) Some(a) else None } }, EQ)
+            })
 }
