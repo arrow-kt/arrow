@@ -2,7 +2,7 @@ package kategory
 
 @Suppress("UNCHECKED_CAST") inline fun <F, W, A> WriterTKind<F, W, A>.value(): HK<F, Tuple2<W, A>> = this.ev().value
 
-@higherkind data class WriterT<F, W, A>(val MF: Monad<F>, val value: HK<F, Tuple2<W, A>>) : WriterTKind<F, W, A> {
+@higherkind data class WriterT<F, W, A>(val value: HK<F, Tuple2<W, A>>) : WriterTKind<F, W, A> {
 
     companion object {
 
@@ -12,17 +12,17 @@ package kategory
 
         inline fun <reified F, W, A> fromTuple(z: Tuple2<W, A>, MF: Monad<F> = kategory.monad()) = WriterT(MF.pure(z), MF)
 
-        inline operator fun <reified F, W, A> invoke(value: HK<F, Tuple2<W, A>>, MF: Monad<F> = kategory.monad()) = WriterT(MF, value)
+        inline operator fun <reified F, W, A> invoke(value: HK<F, Tuple2<W, A>>, MF: Monad<F> = kategory.monad()) = WriterT(value)
 
         inline fun <reified F, reified W> functor(FF: Functor<F> = kategory.functor<F>()): WriterTFunctor<F, W> =
                 object : WriterTFunctor<F, W> {
                     override fun F0(): Functor<F> = FF
                 }
 
-        inline fun <reified F, reified W> applicative(MF: Monad<F> = kategory.monad<F>(),
+        inline fun <reified F, reified W> applicative(AP: Applicative<F> = kategory.applicative<F>(),
                                                       MW: Monoid<W> = kategory.monoid<W>()): WriterTApplicative<F, W> =
                 object : WriterTApplicative<F, W> {
-                    override fun F0(): Monad<F> = MF
+                    override fun F0(): Applicative<F> = AP
                     override fun L0(): Monoid<W> = MW
                 }
 
@@ -59,13 +59,13 @@ package kategory
                 }
 
         inline fun <reified F, W, A> putT(vf: HK<F, A>, w: W, MF: Monad<F> = kategory.monad()): WriterT<F, W, A> =
-                WriterT(MF, MF.map(vf, { v -> Tuple2(w, v) }))
+                WriterT(MF.map(vf, { v -> Tuple2(w, v) }))
 
         inline fun <reified F, W, A> put(a: A, w: W, applicativeF: Applicative<F> = kategory.applicative()): WriterT<F, W, A> =
                 WriterT.putT(applicativeF.pure(a), w)
 
         fun <F, W, A> putT2(vf: HK<F, A>, w: W, MF: Monad<F>): WriterT<F, W, A> =
-                WriterT(MF, MF.map(vf, { v -> Tuple2(w, v) }))
+                WriterT(MF.map(vf, { v -> Tuple2(w, v) }))
 
         fun <F, W, A> put2(a: A, w: W, MF: Monad<F>): WriterT<F, W, A> =
                 WriterT.putT2(MF.pure(a), w, MF)
@@ -80,31 +80,38 @@ package kategory
         inline fun <reified F, reified W, A> valueT(vf: HK<F, A>, functorF: Functor<F> = kategory.functor(), monoidW: Monoid<W> = monoid()): WriterT<F, W, A> =
                 WriterT.putT(vf, monoidW.empty())
     }
-
-    fun tell(w: W, SG: Semigroup<W>): WriterT<F, W, A> = mapAcc { SG.combine(it, w) }
-
-    fun content(): HK<F, A> = MF.map(value, { it.b })
-
-    fun write(): HK<F, W> = MF.map(value, { it.a })
-
-    fun reset(MM: Monoid<W>): WriterT<F, W, A> = mapAcc { MM.empty() }
-
-    inline fun <B> map(crossinline f: (A) -> B): WriterT<F, W, B> = WriterT(MF, MF.map(value, { it.a toT f(it.b) }))
-
-    inline fun <U> mapAcc(crossinline f: (W) -> U): WriterT<F, U, A> = transform { f(it.a) toT it.b }
-
-    inline fun <C, U> bimap(crossinline g: (W) -> U, crossinline f: (A) -> C): WriterT<F, U, C> = transform { g(it.a) toT f(it.b) }
-
-    fun swap(): WriterT<F, A, W> = transform { it.b toT it.a }
-
-    inline fun <B> flatMap(crossinline f: (A) -> WriterT<F, W, B>, SG: Semigroup<W>): WriterT<F, W, B> =
-            WriterT(MF, MF.flatMap(value, { value -> MF.map(f(value.b).value, { SG.combine(it.a, value.a) toT it.b }) }))
-
-    inline fun <B, U> transform(crossinline f: (Tuple2<W, A>) -> Tuple2<U, B>): WriterT<F, U, B> = WriterT(MF, MF.flatMap(value, { MF.pure(f(it)) }))
-
-    fun <B> liftF(fa: HK<F, B>): WriterT<F, W, B> = WriterT(MF, MF.map2(fa, value, { it.b.a toT it.a }))
-
-    inline fun <C> semiflatMap(crossinline f: (A) -> HK<F, C>, SG: Semigroup<W>): WriterT<F, W, C> = flatMap({ liftF(f(it)) }, SG)
-
-    inline fun <B> subflatMap(crossinline f: (A) -> Tuple2<W, B>): WriterT<F, W, B> = transform({ f(it.b) })
 }
+
+inline fun <reified F, W, A> WriterT<F, W, A>.tell(w: W, SG: Semigroup<W>, FF: Functor<F> = functor()): WriterT<F, W, A> = mapWritten { SG.combine(it, w) }
+
+inline fun <reified F, W, A> WriterT<F, W, A>.written(FF: Functor<F> = functor()): HK<F, W> = FF.map(value, { it.a })
+
+inline fun <reified F, W, A> WriterT<F, W, A>.value(FF: Functor<F> = functor()): HK<F, A> = FF.map(value, { it.b })
+
+inline fun <reified F, reified W, A> WriterT<F, W, A>.reset(MM: Monoid<W> = monoid(), FF: Functor<F>): WriterT<F, W, A> = mapWritten { MM.empty() }
+
+inline fun <reified F, W, A, B> WriterT<F, W, A>.map(crossinline f: (A) -> B, FF: Functor<F> = functor()): WriterT<F, W, B> =
+        WriterT(FF.map(value, { it.a toT f(it.b) }))
+
+inline fun <reified F, W, A, U> WriterT<F, W, A>.mapWritten(FF: Functor<F> = functor(), crossinline f: (W) -> U): WriterT<F, U, A> =
+        mapBoth { f(it.a) toT it.b }
+
+inline fun <reified F, W, A, C, U> WriterT<F, W, A>.bimap(FF: Functor<F> = functor(), crossinline g: (W) -> U, crossinline f: (A) -> C): WriterT<F, U, C> =
+        mapBoth { g(it.a) toT f(it.b) }
+
+inline fun <reified F, W, A> WriterT<F, W, A>.swap(FF: Functor<F> = functor()): WriterT<F, A, W> = mapBoth { it.b toT it.a }
+
+inline fun <reified F, W, A, B> WriterT<F, W, A>.flatMap(SG: Semigroup<W>, MF: Monad<F> = monad(), crossinline f: (A) -> WriterT<F, W, B>): WriterT<F, W, B> =
+        WriterT(MF.flatMap(value, { value -> MF.map(f(value.b).value, { SG.combine(it.a, value.a) toT it.b }) }))
+
+inline fun <reified F, W, A, B, U> WriterT<F, W, A>.mapBoth(FF: Functor<F> = functor(), noinline f: (Tuple2<W, A>) -> Tuple2<U, B>): WriterT<F, U, B> =
+        WriterT(FF.map(value, f))
+
+inline fun <reified F, W, A, B> WriterT<F, W, A>.liftF(MF: Monad<F> = monad(), fa: HK<F, B>): WriterT<F, W, B> =
+        WriterT(MF.map2(fa, value, { it.b.a toT it.a }))
+
+inline fun <reified F, W, A, C> WriterT<F, W, A>.semiflatMap(MF: Monad<F> = monad(), crossinline f: (A) -> HK<F, C>, SG: Semigroup<W>): WriterT<F, W, C> =
+        flatMap(SG, MF, { liftF(MF, f(it)) })
+
+inline fun <reified F, W, A, B> WriterT<F, W, A>.subflatMap(FF: Functor<F> = functor(), crossinline f: (A) -> Tuple2<W, B>): WriterT<F, W, B> =
+        mapBoth(FF, { f(it.b) })
