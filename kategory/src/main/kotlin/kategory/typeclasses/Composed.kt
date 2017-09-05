@@ -1,5 +1,8 @@
 package kategory
 
+import kategory.typeclasses.TraverseFilter
+import kategory.typeclasses.traverseFilter
+
 /**
  * https://www.youtube.com/watch?v=wvSP5qYiz4Y
  */
@@ -44,6 +47,31 @@ inline fun <F, reified G> Foldable<F>.compose(GT: Foldable<G> = foldable<G>()): 
 
     override fun GF(): Foldable<G> = GT
 }
+
+interface ComposedTraverseFilter<F, G> :
+        TraverseFilter<ComposedType<F, G>>,
+        ComposedTraverse<F, G> {
+
+    override fun FT(): Traverse<F>
+
+    override fun GT(): TraverseFilter<G>
+
+    override fun GA(): Applicative<G>
+
+    override fun <H, A, B> traverseFilter(fa: HK<ComposedType<F, G>, A>, f: (A) -> HK<H, Option<B>>, HA: Applicative<H>):
+            HK<H, HK<ComposedType<F, G>, B>> = HA.map(FT().traverse(fa.lower(), { ga -> GT().traverseFilter(ga, f, HA) }, HA), { it.lift() })
+
+}
+
+inline fun <reified F, reified G> TraverseFilter<F>.compose(GT: TraverseFilter<G> = traverseFilter<G>(), GA: Applicative<G> = applicative<G>()): TraverseFilter<ComposedType<F, G>> =
+        object :
+                ComposedTraverseFilter<F, G> {
+            override fun FT(): Traverse<F> = this@compose
+
+            override fun GT(): TraverseFilter<G> = GT
+
+            override fun GA(): Applicative<G> = GA
+        }
 
 interface ComposedTraverse<F, G> :
         Traverse<ComposedType<F, G>>,
