@@ -38,10 +38,6 @@ interface WriterTFunctor<F, W> : Functor<WriterTKindPartial<F, W>> {
     override fun <A, B> map(fa: HK<WriterTKindPartial<F, W>, A>, f: (A) -> B): HK<WriterTKindPartial<F, W>, B> = fa.ev().map { f(it) }
 }
 
-interface WriterTAlternative<F, W> : WriterTMonoidK<F, W>, WriterTApplicative<F, W>, Alternative<WriterTKindPartial<F, W>> {
-    // override implicit def F0: Alternative[F]
-}
-
 interface WriterTMonadFilter<F, W> : WriterTMonad<F, W>, MonadFilter<WriterTKindPartial<F, W>> {
     override fun F0(): MonadFilter<F>
 

@@ -50,3 +50,4 @@ interface StateTSemigroupK<F, S> : SemigroupK<StateTKindPartial<F, S>> {
     override fun <A> combineK(x: HK<HK2<StateTHK, F, S>, A>, y: HK<HK2<StateTHK, F, S>, A>): StateT<F, S, A> =
             StateT(F(), F().pure({ s -> G().combineK(x.ev().run(s), y.ev().run(s)) }))
 }
+
