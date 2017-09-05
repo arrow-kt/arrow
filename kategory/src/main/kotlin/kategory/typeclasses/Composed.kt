@@ -1,8 +1,5 @@
 package kategory
 
-import kategory.typeclasses.TraverseFilter
-import kategory.typeclasses.traverseFilter
-
 /**
  * https://www.youtube.com/watch?v=wvSP5qYiz4Y
  */
@@ -61,6 +58,22 @@ interface ComposedTraverseFilter<F, G> :
     override fun <H, A, B> traverseFilter(fa: HK<ComposedType<F, G>, A>, f: (A) -> HK<H, Option<B>>, HA: Applicative<H>):
             HK<H, HK<ComposedType<F, G>, B>> = HA.map(FT().traverse(fa.lower(), { ga -> GT().traverseFilter(ga, f, HA) }, HA), { it.lift() })
 
+    fun <H, A, B> traverseFilterC(fa: HK<F, HK<G, A>>, f: (A) -> HK<H, Option<B>>, HA: Applicative<H>): HK<H, HK<ComposedType<F, G>, B>> =
+            traverseFilter(fa.lift(), f, HA)
+
+    companion object {
+        operator fun <F, G> invoke(
+                FF: Traverse<F>,
+                GF: TraverseFilter<G>,
+                GA: Applicative<G>): ComposedTraverseFilter<F, G> =
+                object : ComposedTraverseFilter<F, G> {
+                    override fun FT(): Traverse<F> = FF
+
+                    override fun GT(): TraverseFilter<G> = GF
+
+                    override fun GA(): Applicative<G> = GA
+                }
+    }
 }
 
 inline fun <reified F, reified G> TraverseFilter<F>.composeFilter(GT: TraverseFilter<G> = traverseFilter<G>(), GA: Applicative<G> = applicative<G>()): TraverseFilter<ComposedType<F, G>> =
@@ -90,7 +103,8 @@ interface ComposedTraverse<F, G> :
     override fun <H, A, B> traverse(fa: HK<ComposedType<F, G>, A>, f: (A) -> HK<H, B>, HA: Applicative<H>): HK<H, HK<ComposedType<F, G>, B>> =
             HA.map(FT().traverse(fa.lower(), { ga -> GT().traverse(ga, f, HA) }, HA), { it.lift() })
 
-    fun <H, A, B> traverseC(fa: HK<F, HK<G, A>>, f: (A) -> HK<H, B>, HA: Applicative<H>): HK<H, HK<ComposedType<F, G>, B>> = traverse(fa.lift(), f, HA)
+    fun <H, A, B> traverseC(fa: HK<F, HK<G, A>>, f: (A) -> HK<H, B>, HA: Applicative<H>): HK<H, HK<ComposedType<F, G>, B>> =
+            traverse(fa.lift(), f, HA)
 
     companion object {
         operator fun <F, G> invoke(

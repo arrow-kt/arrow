@@ -7,7 +7,7 @@ package kategory
  * are either an instance of $some or the object $none.
  */
 @higherkind
-@deriving(Functor::class, Applicative::class, Monad::class, Foldable::class, Traverse::class, MonadFilter::class)
+@deriving(Functor::class, Applicative::class, Monad::class, Foldable::class, Traverse::class, TraverseFilter::class, MonadFilter::class)
 sealed class Option<out A> : OptionKind<A> {
 
     companion object {
@@ -113,6 +113,14 @@ sealed class Option<out A> : OptionKind<A> {
             this.ev().let { option ->
                 when (option) {
                     is Option.Some -> GA.map(f(option.value), { Option.Some(it) })
+                    is Option.None -> GA.pure(Option.None)
+                }
+            }
+
+    fun <G, B> traverseFilter(f: (A) -> HK<G, Option<B>>, GA: Applicative<G>): HK<G, Option<B>> =
+            this.ev().let { option ->
+                when (option) {
+                    is Option.Some -> f(option.value)
                     is Option.None -> GA.pure(Option.None)
                 }
             }

@@ -1,6 +1,5 @@
-package kategory.typeclasses
+package kategory
 
-import kategory.*
 import kategory.Option.Some
 import kategory.Option.None
 

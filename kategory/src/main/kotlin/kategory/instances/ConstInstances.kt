@@ -1,6 +1,6 @@
 package kategory
 
-import kategory.typeclasses.TraverseFilter
+
 
 interface ConstInstances<A> :
         Applicative<ConstKindPartial<A>>,

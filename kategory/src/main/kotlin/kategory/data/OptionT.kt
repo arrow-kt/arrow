@@ -30,6 +30,13 @@ package kategory
 
         inline fun <reified F> monad(MF: Monad<F> = kategory.monad<F>()): Monad<OptionTKindPartial<F>> = instances(MF)
 
+        inline fun <reified F> traverseFilter(FF: TraverseFilter<F> = kategory.traverseFilter<F>(), MF: Monad<F> = kategory.monad<F>()): TraverseFilter<OptionTKindPartial<F>> =
+                object : OptionTTraverseFilter<F> {
+                    override fun FF(): TraverseFilter<F> = FF
+
+                    override fun MF(): Monad<F> = MF
+                }
+
         inline fun <reified F> traverse(FF: Traverse<F> = kategory.traverse<F>(), MF: Monad<F> = kategory.monad<F>()): Traverse<OptionTKindPartial<F>> =
                 object : OptionTTraverse<F> {
                     override fun FF(): Traverse<F> = FF
@@ -98,6 +105,12 @@ package kategory
     fun <B> foldL(b: B, f: (B, A) -> B, FF: Foldable<F>): B = FF.compose(Option.foldable()).foldLC(value, b, f)
 
     fun <B> foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>): Eval<B> = FF.compose(Option.foldable()).foldRC(value, lb, f)
+
+    fun <G, B> traverseFilter(f: (A) -> HK<G, Option<B>>, GA: Applicative<G>, FF: Traverse<F>, MF: Monad<F>):
+            HK<G, HK<OptionTKindPartial<F>, B>> {
+        val fa = ComposedTraverseFilter(FF, Option.traverseFilter(), Option.applicative()).traverseFilterC(value, f, GA)
+        return GA.map(fa, { OptionT(MF, MF.map(it.lower(), { it.ev() })) })
+    }
 
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>, FF: Traverse<F>, MF: Monad<F>): HK<G, HK<OptionTKindPartial<F>, B>> {
         val fa = ComposedTraverse(FF, Option.traverse(), Option.applicative()).traverseC(value, f, GA)

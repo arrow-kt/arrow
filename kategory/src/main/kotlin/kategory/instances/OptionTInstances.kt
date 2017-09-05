@@ -1,5 +1,7 @@
 package kategory
 
+
+
 interface OptionTInstances<F> :
         Functor<OptionTKindPartial<F>>,
         Applicative<OptionTKindPartial<F>>,
@@ -23,6 +25,18 @@ interface OptionTInstances<F> :
                     })
                 })
             }))
+
+}
+
+interface OptionTTraverseFilter<F> :
+        OptionTTraverse<F>,
+        Foldable<OptionTKindPartial<F>>,
+        TraverseFilter<OptionTKindPartial<F>> {
+
+    override fun FF(): TraverseFilter<F>
+
+    override fun <G, A, B> traverseFilter(fa: HK<OptionTKindPartial<F>, A>, f: (A) -> HK<G, Option<B>>, GA: Applicative<G>):
+            HK<G, HK<OptionTKindPartial<F>, B>> = fa.ev().traverseFilter(f, GA, FF(), MF())
 
 }
 

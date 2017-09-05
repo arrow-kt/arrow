@@ -1,6 +1,6 @@
 package kategory
 
-import kategory.typeclasses.TraverseFilter
+
 
 fun <A, T> ConstKind<A, T>.value(): A = this.ev().value
 
