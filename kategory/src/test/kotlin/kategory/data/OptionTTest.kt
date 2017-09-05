@@ -34,7 +34,7 @@ class OptionTTest : UnitSpec() {
 
         testLaws(TraverseFilterLaws.laws(
                 OptionT.traverseFilter(),
-                OptionT.applicative(),
+                OptionT.applicative(Option.monad()),
                 { OptionT(Option(it.some())) },
                 Eq.any()))
 

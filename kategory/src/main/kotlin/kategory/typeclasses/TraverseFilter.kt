@@ -18,4 +18,9 @@ interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F>, Typeclass {
 
 }
 
+inline fun <reified F, reified G, A, B> HK<F, A>.traverseFilter(
+        FT: TraverseFilter<F> = traverseFilter(),
+        GA: Applicative<G> = applicative(),
+        noinline f: (A) -> HK<G, Option<B>>): HK<G, HK<F, B>> = FT.traverseFilter(this, f, GA)
+
 inline fun <reified F> traverseFilter(): TraverseFilter<F> = instance(InstanceParametrizedType(TraverseFilter::class.java, listOf(F::class.java)))
