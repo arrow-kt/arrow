@@ -7,24 +7,15 @@ object TraverseFilterLaws {
 
     inline fun <reified F> laws(TF: TraverseFilter<F> = traverseFilter<F>(), GA: Applicative<F> = applicative<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): List<Law> =
             TraverseLaws.laws(TF, GA, cf, EQ) + FunctorLaws.laws(GA, cf, EQ) + listOf(
-                    Law("TraverseFilter Laws: Identity", { identityTraverseFilter(TF, GA, cf, EQ) })
+                    Law("TraverseFilter Laws: Identity", { identityTraverseFilter(TF, GA, cf, Eq.any()) })
             )
 
-    //def traverseIdentity[A, B](fa: F[A], f: A => B): IsEq[F[B]] = {
-    //    fa.traverse[Id, B](f) <-> F.map(fa)(f)
-    //}
-
-
-    // external laws:
-    //def traverseFilterIdentity[G[_] : Applicative, A](fa: F[A]): IsEq[G[F[A]]] = {
-    //    fa.traverseFilter(_.some.pure[G]) <-> fa.pure[G]
-    //}
-
-    inline fun <reified F> identityTraverseFilter(FT: TraverseFilter<F>, GA: Applicative<F> = applicative<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>> = Eq.any()) =
+    inline fun <reified F> identityTraverseFilter(FT: TraverseFilter<F>, GA: Applicative<F> = applicative<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, HK<F, Int>>> = Eq.any()) =
             forAll(
-                    genFunctionAToB<Int, HK<IdHK, Option<Int>>>(genConstructor(genOption(genIntSmall()), ::Id)),
                     genConstructor(genIntSmall(), cf),
-                    { f: (Int) -> HK<IdHK, Option<Int>>, fa: HK<F, Int> ->
-                        FT.traverseFilter(fa, f, Id.applicative()).value().equalUnderTheLaw(fa.pure(GA), EQ)
+                    { fa: HK<F, Int> ->
+                        val traverseFilter: HK<F, HK<F, Int>> = FT.traverseFilter(fa, { n: Int -> n.some().pure(GA) }, GA)
+                        val b: HK<F, HK<F, Int>> = GA.pure(fa)
+                        traverseFilter.equalUnderTheLaw(b, EQ)
                     })
 }

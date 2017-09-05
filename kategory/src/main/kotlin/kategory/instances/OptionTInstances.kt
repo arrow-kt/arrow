@@ -1,7 +1,5 @@
 package kategory
 
-
-
 interface OptionTInstances<F> :
         Functor<OptionTKindPartial<F>>,
         Applicative<OptionTKindPartial<F>>,

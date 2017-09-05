@@ -1,7 +1,5 @@
 package kategory
 
-
-
 fun <A, T> ConstKind<A, T>.value(): A = this.ev().value
 
 @higherkind data class Const<out A, out T>(val value: A) : ConstKind<A, T> {

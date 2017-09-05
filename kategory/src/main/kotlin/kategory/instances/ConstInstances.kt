@@ -1,7 +1,5 @@
 package kategory
 
-
-
 interface ConstInstances<A> :
         Applicative<ConstKindPartial<A>>,
         Traverse<ConstKindPartial<A>>,

@@ -32,11 +32,11 @@ class OptionTTest : UnitSpec() {
                 { OptionT(Id(it.some())) },
                 OptionTFIdEq))
 
-        //testLaws(TraverseFilterLaws.laws(
-        //        OptionT.traverseFilter(),
-        //        OptionT.functor(),
-        //        { OptionT(Id(it.some())) },
-        //        OptionTFIdEq))
+        testLaws(TraverseFilterLaws.laws(
+                OptionT.traverseFilter(),
+                OptionT.applicative(),
+                { OptionT(Option(it.some())) },
+                Eq.any()))
 
         "toLeft for Some should build a correct EitherT" {
             forAll { a: Int, b: String ->
