@@ -16,9 +16,6 @@ interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F>, Typeclass {
     override fun <A> filter(fa: HK<F, A>, f: (A) -> Boolean): HK<F, A> =
             filterA(fa, { Id(f(it)) }, Id.applicative()).value()
 
-    //override fun <G, A, B> traverse(fa: HK<F, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<F, B>> =
-    //        traverseFilter(fa, { a -> GA.map(f(a), { b -> Some(b) }) }, GA)
-
 }
 
 inline fun <reified F> traverseFilter(): TraverseFilter<F> = instance(InstanceParametrizedType(TraverseFilter::class.java, listOf(F::class.java)))
