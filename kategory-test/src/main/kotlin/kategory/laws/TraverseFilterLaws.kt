@@ -6,7 +6,7 @@ import kategory.*
 object TraverseFilterLaws {
 
     inline fun <reified F> laws(TF: TraverseFilter<F> = traverseFilter<F>(), GA: Applicative<F> = applicative<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): List<Law> =
-            TraverseLaws.laws(TF, GA, cf, EQ) + FunctorLaws.laws(GA, cf, EQ) + listOf(
+            TraverseLaws.laws(TF, GA, cf, EQ) + listOf(
                     Law("TraverseFilter Laws: Identity", { identityTraverseFilter(TF, GA, cf, Eq.any()) })
             )
 
