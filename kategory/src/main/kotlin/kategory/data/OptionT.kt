@@ -30,8 +30,8 @@ package kategory
 
         inline fun <reified F> monad(MF: Monad<F> = kategory.monad<F>()): Monad<OptionTKindPartial<F>> = instances(MF)
 
-        inline fun <reified F> traverseFilter(FF: TraverseFilter<F> = kategory.traverseFilter<F>(), MF: Monad<F> = kategory.monad<F>()): TraverseFilter<OptionTKindPartial<F>> =
-                object : OptionTTraverseFilter<F> {
+        inline fun <reified F> traverseFilter(FF: TraverseFilter<F> = kategory.traverseFilter<F>(), MF: Monad<F> = kategory.monad<F>()):
+                TraverseFilter<OptionTKindPartial<F>> = object : OptionTTraverseFilter<F> {
                     override fun FF(): TraverseFilter<F> = FF
 
                     override fun MF(): Monad<F> = MF

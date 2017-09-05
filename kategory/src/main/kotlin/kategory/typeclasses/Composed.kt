@@ -76,15 +76,14 @@ interface ComposedTraverseFilter<F, G> :
     }
 }
 
-inline fun <reified F, reified G> TraverseFilter<F>.composeFilter(GT: TraverseFilter<G> = traverseFilter<G>(), GA: Applicative<G> = applicative<G>()): TraverseFilter<ComposedType<F, G>> =
-        object :
-                ComposedTraverseFilter<F, G> {
-            override fun FT(): Traverse<F> = this@composeFilter
+inline fun <reified F, reified G> TraverseFilter<F>.compose(GT: TraverseFilter<G> = traverseFilter<G>(), GA: Applicative<G> = applicative<G>()):
+        TraverseFilter<ComposedType<F, G>> = object : ComposedTraverseFilter<F, G> {
+    override fun FT(): Traverse<F> = this@compose
 
-            override fun GT(): TraverseFilter<G> = GT
+    override fun GT(): TraverseFilter<G> = GT
 
-            override fun GA(): Applicative<G> = GA
-        }
+    override fun GA(): Applicative<G> = GA
+}
 
 interface ComposedTraverse<F, G> :
         Traverse<ComposedType<F, G>>,
@@ -122,8 +121,7 @@ interface ComposedTraverse<F, G> :
 }
 
 inline fun <reified F, reified G> Traverse<F>.compose(GT: Traverse<G> = traverse<G>(), GA: Applicative<G> = applicative<G>()): Traverse<ComposedType<F, G>> =
-        object :
-                ComposedTraverse<F, G> {
+        object : ComposedTraverse<F, G> {
             override fun FT(): Traverse<F> = this@compose
 
             override fun GT(): Traverse<G> = GT
