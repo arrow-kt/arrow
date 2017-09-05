@@ -1,7 +1,7 @@
 ---
 layout: docs
-title: Functor
-permalink: /docs/typeclasses/functor/
+title: Semigroup
+permalink: /docs/typeclasses/semigroup/
 ---
 
 ## Semigroup
