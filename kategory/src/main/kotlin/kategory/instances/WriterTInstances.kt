@@ -1,7 +1,5 @@
 package kategory
 
-import kategory.typeclasses.Alternative
-
 interface WriterTApplicative<F, W> : Applicative<WriterTKindPartial<F, W>>, WriterTFunctor<F, W> {
 
     override fun F0(): Monad<F>
