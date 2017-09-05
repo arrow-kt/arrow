@@ -16,7 +16,6 @@ class OptionTTest : UnitSpec() {
         }
 
         testLaws(MonadLaws.laws(OptionT.monad(NonEmptyList.monad()), Eq.any()))
-        testLaws(TraverseLaws.laws(OptionT.traverse(), OptionT.applicative(Id.monad()), { OptionT(Id(it.some())) }, Eq.any()))
         testLaws(SemigroupKLaws.laws(
                 OptionT.semigroupK(Id.monad()),
                 OptionT.applicative(Id.monad()),
