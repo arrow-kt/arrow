@@ -72,60 +72,61 @@ take the reciprocal, and then turn the reciprocal into a string.
 In exception-throwing code, we would have something like this:
 
 ```kotlin:ank:silent
-object ExceptionStyle {
-    fun parse(s: String): Int =
-        if (s.matches(Regex("-?[0-9]+"))) s.toInt()
-        else throw NumberFormatException("$s is not a valid integer.")
+// Exception Style
 
-    fun reciprocal(i: Int): Double =
-        if (i == 0) throw IllegalArgumentException("Cannot take reciprocal of 0.")
-        else 1.0 / i
+fun parse(s: String): Int =
+    if (s.matches(Regex("-?[0-9]+"))) s.toInt()
+    else throw NumberFormatException("$s is not a valid integer.")
 
-    fun stringify(d: Double): String = d.toString()
-}
+fun reciprocal(i: Int): Double =
+    if (i == 0) throw IllegalArgumentException("Cannot take reciprocal of 0.")
+    else 1.0 / i
+
+fun stringify(d: Double): String = d.toString()
 ``` 
 
 Instead, let's make the fact that some of our functions can fail explicit in the return type.
 
 ```kotlin:ank:silent
-object EitherStyle {
-    fun parse(s: String): Either<NumberFormatException, Int> =
-        if (s.matches(Regex("-?[0-9]+"))) Either.Right(s.toInt())
-        else Either.Left(NumberFormatException("$s is not a valid integer."))
+// Either Style
 
-    fun reciprocal(i: Int): Either<IllegalArgumentException, Double> =
-        if (i == 0) Either.Left(IllegalArgumentException("Cannot take reciprocal of 0."))
-        else Either.Right(1.0 / i)
+fun parse(s: String): Either<NumberFormatException, Int> =
+    if (s.matches(Regex("-?[0-9]+"))) Either.Right(s.toInt())
+    else Either.Left(NumberFormatException("$s is not a valid integer."))
 
-    fun stringify(d: Double): String = d.toString()
+fun reciprocal(i: Int): Either<IllegalArgumentException, Double> =
+    if (i == 0) Either.Left(IllegalArgumentException("Cannot take reciprocal of 0."))
+    else Either.Right(1.0 / i)
 
-    fun magic(s: String): Either<Exception, String> =
-        parse(s).flatMap{reciprocal(it)}.map{stringify(it)}
-}
+fun stringify(d: Double): String = d.toString()
+
+fun magic(s: String): Either<Exception, String> =
+    parse(s).flatMap{reciprocal(it)}.map{stringify(it)}
+
 ``` 
 
 These calls to `parse` returns a `Left` and `Right` value
 
 ```kotlin:ank
-EitherStyle.parse("Not a number")
+parse("Not a number")
 ``` 
 
 ```kotlin:ank
-EitherStyle.parse("2")
+parse("2")
 ``` 
 
 Now, using combinators like `flatMap` and `map`, we can compose our functions together. 
 
 ```kotlin:ank
-EitherStyle.magic("0")
+magic("0")
 ``` 
 
 ```kotlin:ank
-EitherStyle.magic("1")
+magic("1")
 ``` 
 
 ```kotlin:ank
-EitherStyle.magic("Not a number")
+magic("Not a number")
 ``` 
 
 In the following exercise we pattern-match on every case the `Either` returned by `magic` can be in. 
@@ -136,8 +137,8 @@ given the type `Either[Exception, String]`, there can be inhabitants of `Left` t
 value.
 
 ```kotlin:ank
-val x = EitherStyle.magic("2")
-when(x) {
+val x = magic("2")
+val value = when(x) {
     is Either.Left -> when (x.a){
         is NumberFormatException -> "Not a number!"
         is IllegalArgumentException -> "Can't take reciprocal of 0!"
@@ -145,32 +146,32 @@ when(x) {
     }
     is Either.Right -> "Got reciprocal: ${x.b}"
 }
+value
 ```
 
 Instead of using exceptions as our error value, let's instead enumerate explicitly the things that 
 can go wrong in our program.
 
 ```kotlin
-object EitherStyleWithAdts {
+// Either with ADT Style
 
-    sealed class Error {
-        class NotANumber(val string: String): Error()
-        class NoZeroReciprocal: Error()
-    }
+sealed class Error {
+    object NotANumber : Error()
+    object NoZeroReciprocal : Error()
+}
 
-    fun parse(s: String): Either<Error, Int> =
+fun parse(s: String): Either<Error, Int> =
         if (s.matches(Regex("-?[0-9]+"))) Either.Right(s.toInt())
-        else Either.Left(Error.NotANumber(s))
+        else Either.Left(Error.NotANumber)
 
-    fun reciprocal(i: Int): Either<Error, Double> =
-        if (i == 0) Either.Left(Error.NoZeroReciprocal())
+fun reciprocal(i: Int): Either<Error, Double> =
+        if (i == 0) Either.Left(Error.NoZeroReciprocal)
         else Either.Right(1.0 / i)
 
-    fun stringify(d: Double): String = d.toString()
+fun stringify(d: Double): String = d.toString()
 
-    fun magic(s: String): Either<Error, String> =
+fun magic(s: String): Either<Error, String> =
         parse(s).flatMap{reciprocal(it)}.map{stringify(it)}
-}
 ```
 
 For our little module, we enumerate any and all errors that can occur. Then, instead of using 
@@ -179,11 +180,11 @@ we get much nicer matching. Moreover, since Error is sealed, no outside code can
 subtypes which we might fail to handle.
 
 ```kotlin
-val x = EitherStyleWithAdts.magic("2")
+val x = magic("2")
 when(x) {
     is Either.Left -> when (x.a){
-        is EitherStyle.Error.NotANumber -> "Not a number!"
-        is EitherStyle.Error.NoZeroReciprocal -> "Can't take reciprocal of 0!"
+        is Error.NotANumber -> "Not a number!"
+        is Error.NoZeroReciprocal -> "Can't take reciprocal of 0!"
     }
     is Either.Right -> "Got reciprocal: ${x.b}"
 }
