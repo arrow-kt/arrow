@@ -159,9 +159,7 @@ fun <E, A, B, C>parallelValidate
 
 Kotlin says that our match is not exhaustive and we have to add `else`.
 
-When no errors are present in the configuration, we get a `ConnectionParams` wrapped in a `Valid` instance
-
-val config = Config(mapOf("url" to "127.0.0.1", "port" to "1337"))
+When no errors are present in the configuration, we get a `ConnectionParams` wrapped in a `Valid` instance.
 
 ```kotlin:ank
 val config = Config(mapOf("url" to "127.0.0.1", "port" to "1337"))
