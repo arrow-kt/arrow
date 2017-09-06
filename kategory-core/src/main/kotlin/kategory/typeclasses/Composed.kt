@@ -260,5 +260,3 @@ interface ComposedBifoldable<F, G> : Bifoldable<ComposedType<F, G>> {
 }
 
 inline fun <reified F, reified G> Bifoldable<F>.compose(BG: Bifoldable<G> = bifoldable()): Bifoldable<ComposedType<F, G>> = ComposedBifoldable(this, BG)
-
-

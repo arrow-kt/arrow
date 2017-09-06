@@ -2,6 +2,7 @@ package kategory.data
 
 import io.kotlintest.KTestJUnitRunner
 import kategory.*
+import kategory.laws.BifoldableLaws
 import kategory.typeclasses.Bifoldable
 import org.junit.runner.RunWith
 
@@ -25,7 +26,9 @@ class BifoldableTests : UnitSpec() {
                     }
         }
 
-        val eitherComposeEither: Bifoldable<EitherEither<Int, Int>> = eitherBifoldable.compose(eitherBifoldable)
+        val eitherComposeEither = eitherBifoldable.compose(eitherBifoldable)
+
+        testLaws(BifoldableLaws.laws(eitherComposeEither, { cf: Int ->  }, Eq.any()))
 
         /*testLaws(ReducibleLaws.laws(
                 nonEmptyReducible,
