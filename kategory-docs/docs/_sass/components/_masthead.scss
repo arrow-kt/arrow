@@ -1,0 +1,55 @@
+// MASTHEAD
+// -----------------------------------------------
+// -----------------------------------------------
+
+#masthead {
+    padding: ($base-point-grid * 22) 0;
+    text-align: center;
+    background-color: $brand-primary;
+
+    @include bp(large) {
+        padding-bottom: ($base-point-grid * 12);
+    }
+
+    .masthead-inner {
+        @include grid-column(8, $base-grid);
+        @include grid-push(2);
+        @include bp(large) {
+             @include grid-column(12, $base-grid);
+        }
+
+        .masthead-brand {
+            min-width: 103px;
+            height: auto;
+        }
+
+        .masthead-title {
+            margin-top: ($base-point-grid * 2);
+            font-size: 3.5rem;
+            font-weight: $font-semibold;
+            line-height: 1.2;
+            color: $white;
+            @include bp(large) {
+                font-size: 2rem;
+            }
+        }
+
+        .masthead-button {
+            display: inline-block;
+            margin-top: ($base-point-grid * 3);
+            padding: ($base-point-grid * 2) ($base-point-grid * 5);
+            font-size: 0.875rem;
+            font-weight: $font-semibold;
+            text-transform: uppercase;
+            background: $brand-tertiary;
+            color: $white;
+
+            &:active,
+            &:focus,
+            &:hover {
+                text-decoration: none;
+                background: rgba($brand-tertiary, 0.6);
+            }
+        }
+    }
+}

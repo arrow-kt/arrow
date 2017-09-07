@@ -1,0 +1,19 @@
+@charset "UTF-8";
+/// This function recives a grid map and merges it with Neat's defauls.
+/// It then returns the value of the property that has been passed to it.
+///
+/// @argument {map} $grid
+///
+/// @argument {string} $setting
+///
+/// @return {boolean | color | list | number | string}
+///
+/// @example scss
+///   _retrieve-neat-setting($neat-grid, columns)
+///
+/// @access private
+
+@function _retrieve-neat-setting($grid, $setting) {
+  $_grid-settings: map-merge(_neat-merge-defaults($neat-grid), $grid);
+  @return map-get($_grid-settings, $setting);
+}

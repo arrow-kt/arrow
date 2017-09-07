@@ -1,0 +1,70 @@
+// BASE
+// -----------------------------------------------
+// -----------------------------------------------
+// Body, html...
+// -----------------------------------------------
+
+html {
+    box-sizing: border-box;
+    font-size: $base-font-size;
+}
+
+*,
+*::after,
+*::before {
+    box-sizing: inherit;
+}
+
+body,
+html {
+    height: 100%;
+}
+// Typography
+// -----------------------------------------------
+
+body {
+    font-family: $base-font-family;
+    line-height: $base-line-height;
+    color: $base-font-color;
+}
+
+a {
+    @include links($link-color, $link-color, darken($link-color, 15%), darken($link-color, 15%));
+    text-decoration: none;
+    transition: all $base-duration $base-timing;
+    transition-property: color, background, rotate;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+// Media
+// -----------------------------------------------
+
+img,
+picture {
+    max-width: 100%;
+}
+
+// Forms
+// -----------------------------------------------
+
+input {
+    appearance: none;
+
+
+    &:hover {}
+
+    &:focus {
+        outline: none;
+    }
+
+    &:disabled {
+        &:hover {}
+    }
+
+    &::placeholder {
+        color: rgba($brand-secondary, 0.6);
+    }
+}

@@ -1,0 +1,21 @@
+@charset "UTF-8";
+/// Append attributes to a the `$_grid-visual` variable in `grid-visual` mixin
+///
+/// @argument {map} $grid
+///
+/// @argument {number (unitless) | null} $columns
+///
+/// @return {number}
+///
+/// @example scss
+///   _neat-column-default($neat-grid, 4)
+///
+/// @access private
+
+@function _neat-append-grid-visual($grid-visual-list, $attributes) {
+  @each $attribute in $attributes {
+    $grid-visual-list: append($grid-visual-list, $attribute, comma);
+  }
+
+  @return $grid-visual-list;
+}

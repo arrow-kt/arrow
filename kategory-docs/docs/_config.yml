@@ -1,0 +1,5 @@
+sass:
+  sass_dir: _lib
+
+  sass:
+  style: compressed
