@@ -14,5 +14,5 @@
  * limitations under the License.
  */
 
-include ':kategory', ':kategory-test', ':kategory-effects', ':kategory-effects-test', ':kategory-recursion', ':kategory-docs'
+include ':kategory', ':kategory-test', ':kategory-effects', ':kategory-effects-test', ':kategory-recursion', ':kategory-docs', 'kategory-optics'
 rootProject.name = 'kategory-parent'

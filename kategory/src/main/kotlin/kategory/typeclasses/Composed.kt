@@ -1,5 +1,7 @@
 package kategory
 
+import kategory.typeclasses.Alternative
+
 /**
  * https://www.youtube.com/watch?v=wvSP5qYiz4Y
  */
@@ -216,6 +218,22 @@ interface ComposedApplicative<F, G> : Applicative<ComposedType<F, G>>, ComposedF
 }
 
 inline fun <reified F, reified G> Applicative<F>.compose(GA: Applicative<G> = applicative<G>()): Applicative<ComposedType<F, G>> = ComposedApplicative(this, GA)
+
+interface ComposedAlternative<F, G> : Alternative<ComposedType<F, G>>, ComposedApplicative<F, G>, ComposedMonoidK<F, G> {
+    override fun F(): Alternative<F>
+
+    companion object {
+        operator fun <F, G> invoke(AF: Alternative<F>, AG: Applicative<G>)
+                : Alternative<ComposedType<F, G>> =
+                object : ComposedAlternative<F, G> {
+                    override fun F(): Alternative<F> = AF
+
+                    override fun G(): Applicative<G> = AG
+                }
+    }
+}
+
+inline fun <reified F, reified G> Alternative<F>.compose(GA: Applicative<G> = applicative<G>()): Alternative<ComposedType<F, G>> = ComposedAlternative(this, GA)
 
 interface ComposedFunctorFilter<F, G> : FunctorFilter<ComposedType<F, G>>, ComposedFunctor<F, G> {
 
