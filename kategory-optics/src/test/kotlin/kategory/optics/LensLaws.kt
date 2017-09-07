@@ -5,7 +5,6 @@ import io.kotlintest.properties.forAll
 import kategory.Applicative
 import kategory.Eq
 import kategory.Law
-import kategory.Lens
 import kategory.compose
 import kategory.exists
 import kategory.identity

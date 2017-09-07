@@ -1,4 +1,12 @@
-package kategory
+package kategory.optics
+
+import kategory.Either
+import kategory.Functor
+import kategory.HK
+import kategory.Option
+import kategory.Tuple2
+import kategory.functor
+import kategory.toT
 
 /**
  * A [Lens] can be seen as a pair of functions `get: (A) -> B` and `set: (B) -> (A) -> A`
@@ -59,25 +67,25 @@ abstract class Lens<A, B> {
     /**
      * Pair two disjoint [Lens]
      */
-    fun <C, D> split(other: Lens<C, D>): Lens<Pair<A, C>, Pair<B, D>> = Lens(
-            { (a, c) -> get(a) to other.get(c) },
-            { (b, d) -> { (a, c) -> set(b)(a) to other.set(d)(c) } }
+    fun <C, D> split(other: Lens<C, D>): Lens<Tuple2<A, C>, Tuple2<B, D>> = Lens(
+            { (a, c) -> get(a) toT other.get(c) },
+            { (b, d) -> { (a, c) -> set(b)(a) toT other.set(d)(c) } }
     )
 
     /**
      * Convenience method to create a pair of the target and a type C
      */
-    fun <C> first(): Lens<Pair<A, C>, Pair<B, C>> = Lens(
-            { (a, c) -> get(a) to c },
-            { (b, c) -> { (a, _) -> set(b)(a) to c } }
+    fun <C> first(): Lens<Tuple2<A, C>, Tuple2<B, C>> = Lens(
+            { (a, c) -> get(a) toT c },
+            { (b, c) -> { (a, _) -> set(b)(a) toT c } }
     )
 
     /**
      * Convenience method to create a pair of a type C and the target
      */
-    fun <C> second(): Lens<Pair<C, A>, Pair<C, B>> = Lens(
-            { (c, a) -> c to get(a) },
-            { (c, b) -> { (_, a) -> c to set(b)(a) } }
+    fun <C> second(): Lens<Tuple2<C, A>, Tuple2<C, B>> = Lens(
+            { (c, a) -> c toT get(a) },
+            { (c, b) -> { (_, a) -> c toT set(b)(a) } }
     )
 
     /**
