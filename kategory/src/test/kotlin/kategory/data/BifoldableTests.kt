@@ -1,9 +1,6 @@
-package kategory.data
+package kategory
 
 import io.kotlintest.KTestJUnitRunner
-import kategory.*
-import kategory.laws.BifoldableLaws
-import kategory.typeclasses.Bifoldable
 import org.junit.runner.RunWith
 
 typealias EitherEither<A, B> = Either<Either<A, B>, Either<A, B>>
@@ -28,15 +25,9 @@ class BifoldableTests : UnitSpec() {
 
         val eitherComposeEither = eitherBifoldable.compose(eitherBifoldable)
 
-        testLaws(BifoldableLaws.laws(eitherComposeEither, { cf: Int ->  }, Eq.any()))
+        testLaws(BifoldableLaws.laws(eitherComposeEither, { cf: Int -> Either.Right(Either.Right(cf)).liftB() }, Eq.any()))
 
-        /*testLaws(ReducibleLaws.laws(
-                nonEmptyReducible,
-                { n: Int -> NonEmptyList(n, listOf()) },
-                Eq.any(),
-                Eq.any(),
-                Eq.any()))
-
+        /*
         "Reducible<NonEmptyList> default size implementation" {
             val nel = NonEmptyList.of(1, 2, 3)
             nonEmptyReducible.size(LongMonoid, nel) shouldBe nel.size.toLong()

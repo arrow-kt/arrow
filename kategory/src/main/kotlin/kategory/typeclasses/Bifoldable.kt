@@ -1,6 +1,4 @@
-package kategory.typeclasses
-
-import kategory.*
+package kategory
 
 interface Bifoldable<in F> : Typeclass {
 

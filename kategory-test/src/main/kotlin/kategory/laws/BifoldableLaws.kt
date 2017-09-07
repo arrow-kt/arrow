@@ -1,9 +1,6 @@
-package kategory.laws
+package kategory
 
 import io.kotlintest.properties.forAll
-import kategory.*
-import kategory.typeclasses.Bifoldable
-import kategory.typeclasses.bifoldable
 
 object BifoldableLaws {
     inline fun <reified F> laws(BF: Bifoldable<F> = bifoldable<F>(), crossinline cf: (Int) -> HK2<F, Int, Int>, EQ: Eq<Int>): List<Law> =
@@ -24,9 +21,9 @@ object BifoldableLaws {
     inline fun <reified F> bifoldRightConsistentWithBifoldMap(BF: Bifoldable<F>, crossinline cf: (Int) -> HK2<F, Int, Int>, EQ: Eq<Int>) =
             forAll(genFunctionAToB<Int, Int>(genIntSmall()), genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf),
                     { f: (Int) -> Int, g: (Int) -> Int, fab: HK2<F, Int, Int> ->
-                        val expected = BF.bifoldRight(fab, Eval.Later({IntMonoid.empty()}),
-                                { a: Int, ec: Eval<Int> -> ec.map({ c -> IntMonoid.combine(f(a), c)}) },
-                                { b: Int, ec: Eval<Int> -> ec.map({ c -> IntMonoid.combine(g(b), c)}) })
+                        val expected = BF.bifoldRight(fab, Eval.Later({ IntMonoid.empty() }),
+                                { a: Int, ec: Eval<Int> -> ec.map({ c -> IntMonoid.combine(f(a), c) }) },
+                                { b: Int, ec: Eval<Int> -> ec.map({ c -> IntMonoid.combine(g(b), c) }) })
                         expected.value().equalUnderTheLaw(BF.bifoldMap(fab, f, g, IntMonoid), EQ)
                     })
 }

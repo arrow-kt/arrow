@@ -1,8 +1,6 @@
 package kategory
 
 import kategory.typeclasses.Alternative
-import kategory.typeclasses.Bifoldable
-import kategory.typeclasses.bifoldable
 
 /**
  * https://www.youtube.com/watch?v=wvSP5qYiz4Y
