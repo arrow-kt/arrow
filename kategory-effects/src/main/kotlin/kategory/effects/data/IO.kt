@@ -53,7 +53,7 @@ import kategory.effects.data.internal.error
 
     abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
 
-    companion object : IOInstances, GlobalInstance<Monad<IOHK>>() {
+    companion object : IOInstances {
         internal fun <A, B> mapDefault(t: IO<A>, f: (A) -> B): IO<B> = t.flatMap(f.andThen { Pure(it) })
 
         internal fun <A> attemptValue(): AndThen<A, IO<Either<Throwable, A>>> = AndThen({ a: A -> Pure(Either.Right(a)) }, { e -> Pure(Either.Left(e)) })
