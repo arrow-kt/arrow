@@ -6,9 +6,8 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class CoproductTest : UnitSpec() {
-    val EQ: Eq<HK3<CoproductHK, IdHK, IdHK, Int>> = object : Eq<HK3<CoproductHK, IdHK, IdHK, Int>> {
-        override fun eqv(a: CoproductKind<IdHK, IdHK, Int>, b: CoproductKind<IdHK, IdHK, Int>): Boolean =
-                a.ev().extract() == b.ev().extract()
+    val EQ: Eq<HK3<CoproductHK, IdHK, IdHK, Int>> = Eq { a, b ->
+        a.ev().extract() == b.ev().extract()
     }
 
     init {
