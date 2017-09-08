@@ -65,4 +65,4 @@ fun <F, B : Any> Comonad<F>.cobinding(c: suspend ComonadContinuation<F, *>.() ->
     return continuation.returnedMonad
 }
 
-inline fun <reified F> comonad(): Comonad<F> = instance(InstanceParametrizedType(Comonad::class.java, listOf(F::class.java)))
+inline fun <reified F> comonad(): Comonad<F> = instance(InstanceParametrizedType(Comonad::class.java, listOf(typeLiteral<F>())))

@@ -43,4 +43,4 @@ fun <F, B> MonadError<F, Throwable>.bindingE(c: suspend MonadErrorContinuation<F
 }
 
 inline fun <reified F, reified E> monadError(): MonadError<F, E> =
-        instance(InstanceParametrizedType(MonadError::class.java, listOf(F::class.java, E::class.java)))
+        instance(InstanceParametrizedType(MonadError::class.java, listOf(typeLiteral<F>(), E::class.java)))

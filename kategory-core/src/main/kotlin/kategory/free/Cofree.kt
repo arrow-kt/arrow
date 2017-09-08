@@ -29,11 +29,13 @@ typealias CofreeEval<S, A> = HK<S, Cofree<S, A>>
     fun extract(): A = head
 
     companion object {
-        inline fun <reified S, A> unfold(a: A, noinline f: (A) -> HK<S, A>, FS: Functor<S> = functor<S>()): Cofree<S, A> = create(a, f, FS)
+        inline fun <reified S, A> unfold(a: A, noinline f: (A) -> HK<S, A>, FS: Functor<S> = kategory.functor<S>()): Cofree<S, A> = create(a, f, FS)
 
         fun <S, A> create(a: A, f: (A) -> HK<S, A>, FS: Functor<S>): Cofree<S, A> = Cofree(FS, a, Eval.later { FS.map(f(a), { create(it, f, FS) }) })
 
-        fun <S> comonad() : CofreeInstances<S> = object : CofreeInstances<S> {}
+        fun <S> functor() : CofreeFunctorInstance<S> = object : CofreeFunctorInstance<S> {}
+
+        fun <S> comonad() : CofreeComonadInstance<S> = object : CofreeComonadInstance<S> {}
     }
 }
 

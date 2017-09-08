@@ -16,7 +16,7 @@ interface Eq<in F> : Typeclass {
     }
 }
 
-inline fun <reified F> eq(): Eq<F> = instance(InstanceParametrizedType(Eq::class.java, listOf(F::class.java)))
+inline fun <reified F> eq(): Eq<F> = instance(InstanceParametrizedType(Eq::class.java, listOf(typeLiteral<F>())))
 
 inline fun <reified F> F.eqv(EQ: Eq<F> = eq(), b: F): Boolean = EQ.eqv(this, b)
 

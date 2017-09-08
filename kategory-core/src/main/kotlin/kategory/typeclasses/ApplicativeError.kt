@@ -43,4 +43,4 @@ fun <F, A> ApplicativeError<F, Throwable>.catch(f: () -> A): HK<F, A> =
         }
 
 inline fun <reified F, reified E> applicativeError(): ApplicativeError<F, E> =
-        instance(InstanceParametrizedType(ApplicativeError::class.java, listOf(F::class.java, E::class.java)))
+        instance(InstanceParametrizedType(ApplicativeError::class.java, listOf(typeLiteral<F>(), E::class.java)))
