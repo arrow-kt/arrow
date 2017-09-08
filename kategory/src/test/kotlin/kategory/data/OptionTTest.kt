@@ -15,6 +15,16 @@ class OptionTTest : UnitSpec() {
                     a.ev().value == b.ev().value
         }
 
+        val OptionTFOptionEq = object : Eq<HK<OptionTKindPartial<OptionHK>, Int>> {
+            override fun eqv(a: HK<OptionTKindPartial<OptionHK>, Int>, b: HK<OptionTKindPartial<OptionHK>, Int>): Boolean =
+                    a.ev().value == b.ev().value
+        }
+
+        val OptionTFOptionNestedEq = object : Eq<HK<OptionTKindPartial<OptionHK>, HK<OptionTKindPartial<OptionHK>, Int>>> {
+            override fun eqv(a: HK<OptionTKindPartial<OptionHK>, HK<OptionTKindPartial<OptionHK>, Int>>, b: HK<OptionTKindPartial<OptionHK>, HK<OptionTKindPartial<OptionHK>, Int>>): Boolean =
+                    a.ev().value == b.ev().value
+        }
+
         testLaws(MonadLaws.laws(OptionT.monad(NonEmptyList.monad()), Eq.any()))
         testLaws(SemigroupKLaws.laws(
                 OptionT.semigroupK(Id.monad()),
@@ -35,7 +45,8 @@ class OptionTTest : UnitSpec() {
                 OptionT.traverseFilter(),
                 OptionT.applicative(Option.monad()),
                 { OptionT(Option(it.some())) },
-                Eq.any()))
+                OptionTFOptionEq,
+                OptionTFOptionNestedEq))
 
         "toLeft for Some should build a correct EitherT" {
             forAll { a: Int, b: String ->
