@@ -47,7 +47,7 @@
     }
 
     &.navigation-scroll {
-        background: rgba($brand-primary, 0.9);
+        background: darken($brand-primary, 4%);
         padding: ($base-point-grid * 2) ($base-point-grid * 4);
     }
 }

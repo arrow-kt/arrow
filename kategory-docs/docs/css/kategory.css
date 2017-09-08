@@ -229,7 +229,7 @@ input {
   #navigation a:hover {
     text-decoration: none; }
   #navigation.navigation-scroll {
-    background: rgba(25, 62, 136, 0.9);
+    background: #163677;
     padding: 16px 32px; }
 
 #masthead {
