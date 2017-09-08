@@ -19,11 +19,6 @@
             font-size: 0.875rem;
         }
     }
-
-    .menu-trigger {
-        display: none;
-        color: #F8ECC2;
-    }
     .navigation-menu {
         .navigation-menu-item {
             display: inline-block;
@@ -32,6 +27,13 @@
 
             &:nth-child(-n+2) {
                 margin-right: ($base-point-grid * 4);
+            }
+
+            @include bp(medium) {
+                &:nth-child(-n+2) {
+                    margin-right: ($base-point-grid * 2);
+                }
+                text-transform: none;
             }
         }
     }
@@ -45,7 +47,7 @@
     }
 
     &.navigation-scroll {
-        background: darken($brand-primary, 5%);
+        background: rgba($brand-primary, 0.9);
         padding: ($base-point-grid * 2) ($base-point-grid * 4);
     }
 }

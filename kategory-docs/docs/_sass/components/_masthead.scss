@@ -5,6 +5,9 @@
 #masthead {
     padding: ($base-point-grid * 22) 0;
     text-align: center;
+    background-image: url("../img/header-background-top.svg"), url("../img/header-background-bottom.svg");
+    background-repeat: repeat-x, repeat-x;
+    background-position: top center, bottom center;
     background-color: $brand-primary;
 
     @include bp(large) {

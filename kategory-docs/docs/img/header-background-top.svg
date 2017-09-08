@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="936px" height="167px" viewBox="0 0 936 167" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="936px" height="145px" viewBox="0 0 936 145" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
     <title>header-background-top</title>
     <desc>Created with Sketch.</desc>
@@ -12,7 +12,7 @@
         <circle id="path-3" cx="1659.5" cy="89.5" r="2.5"></circle>
     </defs>
     <g id="kategory-ui" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="section-hero-copy-3" transform="translate(-1581.000000, 0.000000)">
+        <g id="section-hero-copy-3" transform="translate(-1581.000000, -22.000000)">
             <g id="background">
                 <polygon id="path" fill-opacity="0.261492301" fill="#4B74E5" points="1718.05859 110.351562 1585 -76 1863.39844 -40.7773437"></polygon>
                 <path d="M1674.51047,48.955233 L1602,-52.5973229 L1728.0423,-58 L1802.21833,-48.6153331 L1674.51047,48.955233 Z" id="path" fill-opacity="0.2" fill="#4B74E5"></path>
@@ -20,7 +20,6 @@
                 <polygon id="path" fill-opacity="0.65" fill="#4B74E5" points="2713.44531 -102 1995.87094 125.425631 1901 -102"></polygon>
                 <path d="M1996.08489,125.416913 L2179.03398,-72 L1919,-59.3717911 L1996.08489,125.416913 Z" id="path" fill-opacity="0.228317482" fill="#3877EC"></path>
                 <polygon id="path" fill-opacity="0.3" fill="#4B74E5" points="2154 -93.4492188 2491.38281 113.976562 2539.36328 -156"></polygon>
-                <path d="M2518.80287,-40.3106737 L2335.12031,17.9050663 L2154,-93.4492188 L2206.67971,-102 L2529.76635,-102 L2518.80287,-40.3106737 Z" id="path" fill-opacity="0.697124094" fill="#4B74E5"></path>
                 <polyline id="path" stroke="url(#linearGradient-1)" opacity="0.7" stroke-dasharray="3,3,3,3" points="1574.37109 -19.1171875 1657.89453 91.3554688 1875.26758 -78.3222656 1981.12695 156.382813 2694.47266 -78.3222656"></polyline>
                 <g id="path">
                     <use fill-opacity="0.7" fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-2"></use>
