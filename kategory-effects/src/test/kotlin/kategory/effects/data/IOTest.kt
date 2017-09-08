@@ -8,9 +8,8 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class IOTest : UnitSpec() {
-    fun <A> EQ(): Eq<HK<IOHK, A>> = object : Eq<HK<IOHK, A>> {
-        override fun eqv(a: HK<IOHK, A>, b: HK<IOHK, A>): Boolean =
-                a.ev().attempt().unsafeRunSync() == b.ev().attempt().unsafeRunSync()
+    fun <A> EQ(): Eq<HK<IOHK, A>> = Eq { a, b ->
+        a.ev().attempt().unsafeRunSync() == b.ev().attempt().unsafeRunSync()
     }
 
     init {
@@ -72,7 +71,7 @@ class IOTest : UnitSpec() {
         }
 
         "should time out on unending unsafeRunTimed" {
-            val never = IO.async<Int> { Unit }
+            val never = IO.async<Int> { }
             val start = System.currentTimeMillis()
             val received = never.unsafeRunTimed(100.milliseconds)
             val elapsed = System.currentTimeMillis() - start

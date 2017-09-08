@@ -1,14 +1,12 @@
 package kategory
 
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class Function0Test : UnitSpec() {
-    val EQ: Eq<HK<Function0HK, Int>> = object : Eq<HK<Function0HK, Int>> {
-        override fun eqv(a: HK<Function0HK, Int>, b: HK<Function0HK, Int>): Boolean =
-                a() == b()
+    val EQ: Eq<HK<Function0HK, Int>> = Eq { a, b ->
+        a() == b()
     }
 
     init {

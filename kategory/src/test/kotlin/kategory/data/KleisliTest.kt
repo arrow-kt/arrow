@@ -6,12 +6,8 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class KleisliTest : UnitSpec() {
-    private fun <A> EQ(): Eq<KleisliKind<TryHK, Int, A>> {
-        return object : Eq<KleisliKind<TryHK, Int, A>> {
-            override fun eqv(a: KleisliKind<TryHK, Int, A>, b: KleisliKind<TryHK, Int, A>): Boolean =
-                    a.ev().run(1) == b.ev().run(1)
-
-        }
+    private fun <A> EQ(): Eq<KleisliKind<TryHK, Int, A>> = Eq { a, b ->
+        a.ev().run(1) == b.ev().run(1)
     }
 
     init {

@@ -9,9 +9,8 @@ import org.junit.runner.RunWith
 class OptionTTest : UnitSpec() {
     init {
 
-        val OptionTFIdEq = object : Eq<HK<OptionTKindPartial<IdHK>, Int>> {
-            override fun eqv(a: HK<OptionTKindPartial<IdHK>, Int>, b: HK<OptionTKindPartial<IdHK>, Int>): Boolean =
-                    a.ev().value == b.ev().value
+        val OptionTFIdEq = Eq<HK<OptionTKindPartial<IdHK>, Int>> { a, b ->
+            a.ev().value == b.ev().value
         }
 
         testLaws(MonadLaws.laws(OptionT.monad(NonEmptyList.monad()), Eq.any()))
