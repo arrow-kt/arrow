@@ -1,7 +1,5 @@
 package kategory
 
-import kategory.typeclasses.Alternative
-
 /**
  * The combination of a Monad with a MonoidK
  */

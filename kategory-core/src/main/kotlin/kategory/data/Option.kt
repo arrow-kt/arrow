@@ -13,7 +13,8 @@ package kategory
         Monad::class,
         Foldable::class,
         Traverse::class,
-        MonadFilter::class)
+        MonadFilter::class,
+        MonadCombine::class)
 sealed class Option<out A> : OptionKind<A> {
 
     companion object {

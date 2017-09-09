@@ -1,7 +1,5 @@
 package kategory
 
-import kategory.typeclasses.Alternative
-
 /**
  * https://www.youtube.com/watch?v=wvSP5qYiz4Y
  */

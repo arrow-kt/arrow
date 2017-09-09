@@ -5,12 +5,12 @@ import io.kotlintest.properties.forAll
 
 object AlternativeLaws {
 
-    inline fun <reified F> laws(AF: Alternative<F> = alternative(), SGK: MonoidK<F> = monoidK(),
+    inline fun <reified F> laws(AF: Alternative<F> = alternative(),
                                 crossinline cf: (Int) -> HK<F, Int>,
                                 crossinline cff: (Int) -> HK<F, (Int) -> Int>,
                                 EQ: Eq<HK<F, Int>>,
                                 EQF: Eq<HK<F, (Int) -> Int>>): List<Law> =
-            ApplicativeLaws.laws(AF, EQ) + MonoidKLaws.laws(SGK, AF, EQ) + listOf(
+            ApplicativeLaws.laws(AF, EQ) + MonoidKLaws.laws(AF, AF, EQ) + listOf(
                     Law("Alternative Laws: Right Absorption", { alternativeRightAbsorption(AF, cff, EQ) }),
                     Law("Alternative Laws: Left Distributivity", { alternativeLeftDistributivity(AF, cf, EQF) }),
                     Law("Alternative Laws: Right Distributivity", { alternativeRightDistributivity(AF, cf, cff, EQ) }))
