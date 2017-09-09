@@ -39,7 +39,7 @@ class OptionTest : UnitSpec() {
                                         })
                             })
         }
-        
+
         //testLaws(MonadErrorLaws.laws(monadError<OptionHK, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
         testLaws(TraverseLaws.laws(Option.traverse(), Option.monad(), ::Some, Eq.any()))
         testLaws(MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()))
