@@ -1,10 +1,9 @@
 package kategory
 
-import java.lang.reflect.ParameterizedType
-import java.lang.reflect.Type
-import java.lang.reflect.WildcardType
+import java.lang.reflect.*
 import java.util.Arrays
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
 
 /**
@@ -96,10 +95,9 @@ data class TypeClassInstanceNotFound(val type: Type)
  *   }
  * }
  */
-fun <T : Typeclass> registerInstance(value: T, of: KClass<T>, on: KClass<*>, vararg typeArgs: KClass<*>): Unit {
-    val args = listOf(on.java) + typeArgs.map { it.java }
-    val t = InstanceParametrizedType(of.java, args)
+fun registerInstance(t: InstanceParametrizedType, value: Any): Any {
     GlobalInstances.putIfAbsent(t, value)
+    return GlobalInstances.getValue(t)
 }
 
 /**
@@ -155,15 +153,22 @@ private fun instanceFromImplicitObject(t: InstanceParametrizedType): Any? {
         val values: List<Any> = factoryFunction.parameters.mapNotNull {
             if (Typeclass::class.java.isAssignableFrom(it.type)) {
                 val classifier = it.parameterizedType as ParameterizedType
-                val argClasses = classifier.actualTypeArguments.map { it.asKotlinClass() }.filterNotNull()
-                val kClassifier = classifier.asKotlinClass()
-                if (argClasses.isNotEmpty() && kClassifier != null) {
-                    instance(InstanceParametrizedType(kClassifier.java, listOf(argClasses[0].java) + argClasses.drop(1).map { it.java }))
-                } else null
+                val vType = reifyRawParameterizedType(t, classifier)
+                val value = instanceFromImplicitObject(vType)
+                if (value != null) registerInstance(t, value)
+                value
             } else null
         }
         factoryFunction.invoke(globalInstanceProvider, *values.toTypedArray())
     } else null
+}
+
+private fun reifyRawParameterizedType(carrier: InstanceParametrizedType, classifier: ParameterizedType): InstanceParametrizedType {
+    return if (classifier.actualTypeArguments.any { it is TypeVariable<*> }) {
+        InstanceParametrizedType(classifier.rawType, listOf(carrier.actualTypeArguments[1]))
+    } else {
+        InstanceParametrizedType(classifier, classifier.actualTypeArguments.filterNotNull())
+    }
 }
 
 private fun Type.asKotlinClass(): KClass<*>? =

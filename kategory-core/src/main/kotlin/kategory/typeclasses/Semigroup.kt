@@ -21,4 +21,4 @@ inline fun <reified A> A.combine(FT: Semigroup<A> = semigroup(), b: A): A = FT.c
 
 inline fun <reified A> Collection<A>.combineAll(FT: Semigroup<A> = semigroup()): A = FT.combineAll(this)
 
-inline fun <reified A> semigroup(): Semigroup<A> = instance(InstanceParametrizedType(Semigroup::class.java, listOf(A::class.java)))
+inline fun <reified A> semigroup(): Semigroup<A> = instance(InstanceParametrizedType(Semigroup::class.java, listOf(typeLiteral<A>())))

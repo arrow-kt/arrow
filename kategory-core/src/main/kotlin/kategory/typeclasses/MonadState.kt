@@ -14,4 +14,4 @@ interface MonadState<F, S> : Monad<F>, Typeclass {
 }
 
 inline fun <reified F, reified S> monadState(): MonadState<F, S> =
-        instance(InstanceParametrizedType(MonadState::class.java, listOf(typeLiteral<F>(), S::class.java)))
+        instance(InstanceParametrizedType(MonadState::class.java, listOf(typeLiteral<F>(), typeLiteral<S>())))
