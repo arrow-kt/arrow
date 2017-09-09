@@ -21,3 +21,19 @@ class ConstTest : UnitSpec() {
         testLaws(ApplicativeLaws.laws(Const.applicative(IntMonoid), Eq.any()))
     }
 }
+
+fun <A> List<A>?.isNotEmpty(): Boolean =
+        this != null && this.size > 0
+
+object test {
+    val x : List<Int>? = null
+    val xIsNotEmpty: Boolean = x.isNotEmpty()
+    //false
+    val y : List<Int>? = emptyList<Int>()
+    val yIsNotEmpty: Boolean = y.isNotEmpty()
+    //false
+    val z : List<Int>? = listOf(1)
+    val zIsNotEmpty: Boolean = y.isNotEmpty()
+    //true
+}
+

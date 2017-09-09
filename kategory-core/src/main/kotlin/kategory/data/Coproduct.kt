@@ -31,15 +31,22 @@ package kategory
                                                              CF: Comonad<F> = comonad<F>(),
                                                              CG: Comonad<G> = comonad<G>()): Coproduct<F, G, A> = Coproduct(CF, CG, run)
 
-        fun <F, G> comonad(): CoproductComonad<F, G> = object : CoproductComonad<F, G> {}
+        fun <F, G> comonad(): CoproductComonadInstance<F, G> = object : CoproductComonadInstance<F, G> {}
 
-        fun <F, G> functor(): CoproductComonad<F, G> = object : CoproductComonad<F, G> {}
+        fun <F, G> functor(): CoproductFunctorInstance<F, G> = object : CoproductFunctorInstance<F, G> {}
 
-        inline fun <reified F, reified G> traverse(FF: Traverse<F> = traverse<F>(), FG: Traverse<G> = traverse<G>()): CoproductTraverse<F, G> =
-                object : CoproductTraverse<F, G> {
-                    override fun FF(): Traverse<F> = FF
+        inline fun <reified F, reified G> traverse(FF: Traverse<F> = traverse<F>(), FG: Traverse<G> = traverse<G>()): CoproductTraverseInstance<F, G> =
+                object : CoproductTraverseInstance<F, G> {
+                    override fun TF(): Traverse<F> = FF
 
-                    override fun FG(): Traverse<G> = FG
+                    override fun TG(): Traverse<G> = FG
+                }
+
+        inline fun <reified F, reified G> foldable(FF: Foldable<F> = foldable<F>(), FG: Foldable<G> = foldable<G>()): CoproductFoldableInstance<F, G> =
+                object : CoproductFoldableInstance<F, G> {
+                    override fun FF(): Foldable<F> = FF
+
+                    override fun FG(): Foldable<G> = FG
                 }
     }
 
