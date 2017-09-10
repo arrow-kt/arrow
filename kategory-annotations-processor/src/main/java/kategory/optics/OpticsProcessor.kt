@@ -13,9 +13,9 @@ import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
+import javax.lang.model.element.ElementKind
+import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
-import javax.lang.model.element.VariableElement
-import javax.lang.model.type.TypeKind
 
 @AutoService(Processor::class)
 class OptikalProcessor : AbstractProcessor() {
@@ -47,13 +47,13 @@ class OptikalProcessor : AbstractProcessor() {
         }
     }
 
-   private fun evalAnnotatedElement(element: Element): AnnotatedLens.Element = when {
+    private fun evalAnnotatedElement(element: Element): AnnotatedLens.Element = when {
         element.let { it.kotlinMetadata as? KotlinClassMetadata }?.data?.classProto?.isDataClass == true ->
             AnnotatedLens.Element(
                     element as TypeElement,
-                    element.enclosedElements
-                            .filter { it.asType().kind == TypeKind.DECLARED }
-                            .filterIsInstance<VariableElement>()
+                    element.enclosedElements.firstOrNull { it.kind == ElementKind.CONSTRUCTOR }?.let {
+                        it as ExecutableElement
+                    }?.parameters ?: emptyList()
             )
 
         else -> knownError(opticsAnnotationError(element, lensesAnnotationName, lensesAnnotationTarget))
