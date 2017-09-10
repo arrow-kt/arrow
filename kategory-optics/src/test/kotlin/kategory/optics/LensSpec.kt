@@ -9,13 +9,14 @@ import kategory.Tuple2
 import kategory.UnitSpec
 import kategory.applicative
 import kategory.genFunctionAToB
+import kategory.laws.LensLaws
 import kategory.left
 import kategory.right
 import kategory.toT
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class LensTest : UnitSpec() {
+class LensSpec : UnitSpec() {
 
     private val tokenLens: Lens<Token, String> = Lens(
             { token: Token -> token.value },
