@@ -6,7 +6,6 @@ import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
 import kategory.Option.None
 import kategory.Option.Some
-import kategory.laws.MonadFilterLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
