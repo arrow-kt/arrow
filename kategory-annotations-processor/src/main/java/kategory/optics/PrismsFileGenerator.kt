@@ -1,7 +1,9 @@
 package kategory.optics
 
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KotlinFile
+import com.squareup.kotlinpoet.asClassName
 import java.io.File
 
 class PrismsFileGenerator(
@@ -15,19 +17,19 @@ class PrismsFileGenerator(
 
     private fun buildPrisms(elements: Collection<AnnotatedPrism.Element>): List<KotlinFile> = elements.map(this::processElement)
             .map { (name, funs) ->
-                funs.fold(KotlinFile.builder("kategory.optics", "optics.kategory.prisms.$name").skipJavaLangImports(true), { builder, prismSpec ->
+                funs.fold(KotlinFile.builder(name.packageName(), "${name.simpleName().toLowerCase()}.prisms").skipJavaLangImports(true), { builder, prismSpec ->
                     builder.addFun(prismSpec)
                 }).addStaticImport("kategory", "right", "left").build()
             }
 
-    private fun processElement(annotatedPrism: AnnotatedPrism.Element): Pair<String, List<FunSpec>> =
-            annotatedPrism.type.simpleName.toString().toLowerCase() to annotatedPrism.subTypes.map { subClass ->
+    private fun processElement(annotatedPrism: AnnotatedPrism.Element): Pair<ClassName, List<FunSpec>> =
+            annotatedPrism.type.asClassName() to annotatedPrism.subTypes.map { subClass ->
                 val sealedClassName = annotatedPrism.type.simpleName.toString().toLowerCase()
                 val subTypeName = subClass.simpleName.toString()
 
                 FunSpec.builder("$sealedClassName$subTypeName")
                         .addStatement(
-                                """return Prism(
+                                """return kategory.optics.Prism(
                                    |        getOrModify = { $sealedClassName: %T ->
                                    |            when ($sealedClassName) {
                                    |                is %T -> $sealedClassName.right()
