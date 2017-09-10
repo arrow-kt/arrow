@@ -95,3 +95,20 @@ object StateTSemigroupKInstanceImplicits {
     }
 }
 
+interface StateTMonadCombine<F, S> : MonadCombine<StateTKindPartial<F, S>>, StateTMonad<F, S>, StateTSemigroupK<F, S> {
+    override fun F(): MonadCombine<F>
+    override fun G(): MonadCombine<F> = F()
+
+    override fun <A> empty(): StateT<F, S, A> = liftT(F().empty())
+
+    fun <A> liftT(ma: HK<F, A>): StateT<F, S, A> = StateT(F(), F().pure({ s: S -> F().map(ma, { a: A -> s toT a }) }))
+}
+
+interface StateTMonadError<F, S, E> : StateTMonad<F, S>, MonadError<StateTKindPartial<F, S>, E> {
+    override fun F(): MonadError<F, E>
+
+    override fun <A> raiseError(e: E): StateT<F, S, A> = StateT.lift(F().raiseError(e), F())
+
+    override fun <A> handleErrorWith(fa: HK<StateTKindPartial<F, S>, A>, f: (E) -> HK<StateTKindPartial<F, S>, A>): StateT<F, S, A> =
+            StateT(F(), F().pure({ s -> F().handleErrorWith(fa.runM(s), { e -> f(e).runM(s) }) }))
+}
