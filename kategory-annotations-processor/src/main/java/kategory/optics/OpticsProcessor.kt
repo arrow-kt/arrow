@@ -18,7 +18,7 @@ import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
 
 @AutoService(Processor::class)
-class OptikalProcessor : AbstractProcessor() {
+class OpticsProcessor : AbstractProcessor() {
 
     private val annotatedLenses = mutableListOf<AnnotatedLens.Element>()
 
@@ -68,7 +68,7 @@ class OptikalProcessor : AbstractProcessor() {
                     classProto.sealedSubclassFqNameList
                             .map(nameResolver::getString)
                             .map { it.replace('/', '.') }
-                            .mapNotNull(processingEnv.elementUtils::getTypeElement)
+                            .mapNotNull(elementUtils::getTypeElement)
             )
         }
 
