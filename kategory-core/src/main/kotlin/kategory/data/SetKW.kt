@@ -22,7 +22,7 @@ data class SetKW<out A>(val set: Set<A>) : SetKWKind<A>, Set<A> by set {
 
         fun <A> semigroup(): SetKWMonoid<A> = object : SetKWMonoid<A> {}
 
-        fun semigroupK(): SetKWHKMonoidKInstance = SetKW.monoidK()
+        fun semigroupK(): SetKWMonoidKInstance = SetKW.monoidK()
     }
 }
 
