@@ -33,25 +33,25 @@ class OptionTTest : UnitSpec() {
 
         "toLeft for Some should build a correct EitherT" {
             forAll { a: Int, b: String ->
-                OptionT.fromOption<NonEmptyListHK, Int>(Option.Some(a)).toLeft { b } == EitherT.left<NonEmptyListHK, Int, String>(a)
+                OptionT.fromOption<NonEmptyListHK, Int>(Option.Some(a)).toLeft { b } == EitherT.left<NonEmptyListHK, Int, String>(a, applicative())
             }
         }
 
         "toLeft for None should build a correct EitherT" {
             forAll { a: Int, b: String ->
-                OptionT.fromOption<NonEmptyListHK, Int>(Option.None).toLeft { b } == EitherT.right<NonEmptyListHK, Int, String>(b)
+                OptionT.fromOption<NonEmptyListHK, Int>(Option.None).toLeft { b } == EitherT.right<NonEmptyListHK, Int, String>(b, applicative())
             }
         }
 
         "toRight for Some should build a correct EitherT" {
             forAll { a: Int, b: String ->
-                OptionT.fromOption<NonEmptyListHK, String>(Option.Some(b)).toRight { a } == EitherT.right<NonEmptyListHK, Int, String>(b)
+                OptionT.fromOption<NonEmptyListHK, String>(Option.Some(b)).toRight { a } == EitherT.right<NonEmptyListHK, Int, String>(b, applicative())
             }
         }
 
         "toRight for None should build a correct EitherT" {
             forAll { a: Int, b: String ->
-                OptionT.fromOption<NonEmptyListHK, String>(Option.None).toRight { a } == EitherT.left<NonEmptyListHK, Int, String>(a)
+                OptionT.fromOption<NonEmptyListHK, String>(Option.None).toRight { a } == EitherT.left<NonEmptyListHK, Int, String>(a, applicative())
             }
         }
 

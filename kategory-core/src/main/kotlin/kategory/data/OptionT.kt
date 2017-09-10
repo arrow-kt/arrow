@@ -105,10 +105,10 @@ package kategory
     }
 
     fun <R> toLeft(default: () -> R): EitherT<F, A, R> =
-            EitherT(MF, cata({ default().right() }, { it.left() }))
+            EitherT(cata({ default().right() }, { it.left() }))
 
     fun <L> toRight(default: () -> L): EitherT<F, L, A> =
-            EitherT(MF, cata({ default().left() }, { it.right() }))
+            EitherT(cata({ default().left() }, { it.right() }))
 }
 
 inline fun <F, A, B> OptionT<F, A>.mapFilter(crossinline f: (A) -> Option<B>, MF: Monad<F>): OptionT<F, B> =
