@@ -81,12 +81,12 @@ abstract class Prism<A, B> {
     /**
      * Check if there is a target
      */
-    fun isNotEmpty(a: A): Boolean = getOption(a).isDefined
+    fun nonEmpty(a: A): Boolean = getOption(a).nonEmpty
 
     /**
      * Check if there is no target
      */
-    fun isEmpty(a: A): Boolean = !isNotEmpty(a)
+    fun isEmpty(a: A): Boolean = !nonEmpty(a)
 
     /**
      * Find if the target satisfies the predicate
