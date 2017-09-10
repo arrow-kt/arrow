@@ -179,7 +179,7 @@ private fun instanceFromImplicitObject(t: InstanceParametrizedType): Any? {
 
 private fun reifyRawParameterizedType(carrier: InstanceParametrizedType, classifier: ParameterizedType, index: Int): InstanceParametrizedType {
     return if (classifier.actualTypeArguments.any { it is TypeVariable<*> }) {
-        InstanceParametrizedType(classifier.rawType, listOf(carrier.actualTypeArguments[index]))
+        InstanceParametrizedType(classifier.rawType, listOf(carrier.actualTypeArguments[index + 1]))
     } else {
         InstanceParametrizedType(classifier, classifier.actualTypeArguments.filterNotNull())
     }
