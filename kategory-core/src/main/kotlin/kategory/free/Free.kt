@@ -2,7 +2,7 @@ package kategory
 
 inline fun <reified M, S, A> FreeKind<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M> = monad()): HK<M, A> = (this as Free<S, A>).foldMap(f, MM)
 
-@higherkind sealed class Free<out S, out A> : FreeKind<S, A> {
+@higherkind sealed class Free<S, out A> : FreeKind<S, A> {
 
     companion object {
         fun <S, A> pure(a: A): Free<S, A> = Pure(a)
@@ -39,15 +39,15 @@ inline fun <reified M, S, A> FreeKind<S, A>.foldMapK(f: FunctionK<S, M>, MM: Mon
 
     abstract fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B>
 
-    data class Pure<out S, out A>(val a: A) : Free<S, A>() {
+    data class Pure<S, out A>(val a: A) : Free<S, A>() {
         override fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B> = Free.pure(f(a))
     }
 
-    data class Suspend<out S, out A>(val a: HK<S, A>) : Free<S, A>() {
+    data class Suspend<S, out A>(val a: HK<S, A>) : Free<S, A>() {
         override fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B> = Free.liftF(fs(a)).map(f)
     }
 
-    data class FlatMapped<out S, out A, C>(val c: Free<S, C>, val f: (C) -> Free<S, A>) : Free<S, A>() {
+    data class FlatMapped<S, out A, C>(val c: Free<S, C>, val f: (C) -> Free<S, A>) : Free<S, A>() {
         override fun <O, B> transform(fm: (A) -> B, fs: FunctionK<S, O>): Free<O, B> =
                 Free.FlatMapped(c.transform({ it }, fs), { c.flatMap { f(it) }.transform(fm, fs) })
     }

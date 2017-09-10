@@ -52,8 +52,7 @@ interface ConstTraverseInstance<X> : Traverse<ConstKindPartial<X>> {
 }
 
 object ConstTraverseInstanceImplicits {
-    @JvmStatic
-    fun <A> instance(): ConstTraverseInstance<A> = object : ConstTraverseInstance<A> {}
+    @JvmStatic fun <A> instance(): ConstTraverseInstance<A> = object : ConstTraverseInstance<A> {}
 }
 
 interface ConstSemigroup<A, T> : Semigroup<ConstKind<A, T>> {

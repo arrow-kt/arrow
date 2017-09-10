@@ -5,7 +5,7 @@ package kategory
  *
  * @see [[http://www.staff.science.uu.nl/~swier004/publications/2008-jfp.pdf]]
  */
-interface Inject<in F, out G> : Typeclass {
+interface Inject<F, G> : Typeclass {
 
     fun inj(): FunctionK<F, G>
 

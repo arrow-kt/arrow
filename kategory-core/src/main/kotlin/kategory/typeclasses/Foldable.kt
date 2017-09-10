@@ -12,7 +12,7 @@ import kategory.Eval.Companion.always
  *
  * Beyond these it provides many other useful methods related to folding over F<A> values.
  */
-interface Foldable<in F> : Typeclass {
+interface Foldable<F> : Typeclass {
 
     /**
      * Left associative fold on F using the provided function.

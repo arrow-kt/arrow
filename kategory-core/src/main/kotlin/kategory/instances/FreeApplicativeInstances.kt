@@ -12,7 +12,7 @@ interface FreeApplicativeInstances<S> :
             fa.ev().ap(ff.ev())
 }
 
-data class FreeApplicativeEq<in F, in G, in A>(private val interpreter: FunctionK<F, G>, private val MG: Monad<G>) : Eq<HK<FreeApplicativeKindPartial<F>, A>> {
+data class FreeApplicativeEq<F, G, A>(private val interpreter: FunctionK<F, G>, private val MG: Monad<G>) : Eq<HK<FreeApplicativeKindPartial<F>, A>> {
     override fun eqv(a: HK<FreeApplicativeKindPartial<F>, A>, b: HK<FreeApplicativeKindPartial<F>, A>): Boolean =
             a.ev().foldMap(interpreter, MG) == b.ev().foldMap(interpreter, MG)
 

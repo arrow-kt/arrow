@@ -1,30 +1,42 @@
 package kategory
 
 interface CoproductFunctorInstance<F, G> : Functor<CoproductKindPartial<F, G>> {
-    override fun <A, B> map(fa: CoproductKind<F, G, A>, f: (A) -> B): Coproduct<F, G, B> = fa.ev().map(f)
+
+    fun FF(): Functor<F>
+
+    fun FG(): Functor<G>
+
+    override fun <A, B> map(fa: CoproductKind<F, G, A>, f: (A) -> B): Coproduct<F, G, B> = fa.ev().map(FF(), FG(), f)
 }
 
 object CoproductFunctorInstanceImplicits {
-    fun <F, G> instance(): CoproductFunctorInstance<F, G> = object : CoproductFunctorInstance<F, G> {}
+    @JvmStatic fun <F, G> instance(FF: Functor<F>, FG: Functor<G>): CoproductFunctorInstance<F, G> = object : CoproductFunctorInstance<F, G> {
+        override fun FF(): Functor<F> = FF
+
+        override fun FG(): Functor<G> = FG
+    }
 }
 
 interface CoproductComonadInstance<F, G> : Comonad<CoproductKindPartial<F, G>> {
 
-    override fun <A, B> coflatMap(fa: CoproductKind<F, G, A>, f: (CoproductKind<F, G, A>) -> B): Coproduct<F, G, B> = fa.ev().coflatMap(f)
+    fun CF(): Comonad<F>
 
-    override fun <A> extract(fa: CoproductKind<F, G, A>): A = fa.ev().extract()
+    fun CG(): Comonad<G>
 
-    override fun <A, B> map(fa: CoproductKind<F, G, A>, f: (A) -> B): Coproduct<F, G, B> = fa.ev().map(f)
+    override fun <A, B> coflatMap(fa: CoproductKind<F, G, A>, f: (CoproductKind<F, G, A>) -> B): Coproduct<F, G, B> = fa.ev().coflatMap(CF(), CG(), f)
 
-    companion object {
-        // Cobinding for HK2 requires an instance to infer the types.
-        // As cobinding cannot be delegated you have to create an <Any, Any> so any internal type can be used
-        fun any(): CoproductComonadInstance<Any, Any> = object : CoproductComonadInstance<Any, Any> {}
-    }
+    override fun <A> extract(fa: CoproductKind<F, G, A>): A = fa.ev().extract(CF(), CG())
+
+    override fun <A, B> map(fa: CoproductKind<F, G, A>, f: (A) -> B): Coproduct<F, G, B> = fa.ev().map(CF(), CG(), f)
+
 }
 
 object CoproductComonadInstanceImplicits {
-    fun <F, G> instance(): CoproductComonadInstance<F, G> = object : CoproductComonadInstance<F, G> {}
+    @JvmStatic fun <F, G> instance(CF: Comonad<F>, CG: Comonad<G>): CoproductComonadInstance<F, G> = object : CoproductComonadInstance<F, G> {
+        override fun CF(): Comonad<F> = CF
+
+        override fun CG(): Comonad<G> = CG
+    }
 }
 
 interface CoproductFoldableInstance<F, G> : Foldable<CoproductKindPartial<F, G>> {
@@ -40,7 +52,7 @@ interface CoproductFoldableInstance<F, G> : Foldable<CoproductKindPartial<F, G>>
 }
 
 object CoproductFoldableInstanceImplicits {
-    fun <F, G> instance(FF: Foldable<F>, FG: Foldable<G>): CoproductFoldableInstance<F, G> = object : CoproductFoldableInstance<F, G> {
+    @JvmStatic fun <F, G> instance(FF: Foldable<F>, FG: Foldable<G>): CoproductFoldableInstance<F, G> = object : CoproductFoldableInstance<F, G> {
         override fun FF(): Foldable<F> = FF
 
         override fun FG(): Foldable<G> = FG
@@ -63,7 +75,7 @@ interface CoproductTraverseInstance<F, G> : Traverse<CoproductKindPartial<F, G>>
 }
 
 object CoproductTraverseInstanceImplicits {
-    fun <F, G> instance(TF: Traverse<F>, TG: Traverse<G>): CoproductTraverseInstance<F, G> = object : CoproductTraverseInstance<F, G> {
+    @JvmStatic fun <F, G> instance(TF: Traverse<F>, TG: Traverse<G>): CoproductTraverseInstance<F, G> = object : CoproductTraverseInstance<F, G> {
         override fun TF(): Traverse<F> = TF
 
         override fun TG(): Traverse<G> = TG

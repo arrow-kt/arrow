@@ -11,7 +11,7 @@ package kategory
  *  - reduceLeftTo(fa)(f)(g) eagerly reduces with an additional mapping function
  *  - reduceRightTo(fa)(f)(g) lazily reduces with an additional mapping function
  */
-interface Reducible<in F> : Foldable<F>, Typeclass {
+interface Reducible<F> : Foldable<F>, Typeclass {
 
     /**
      * Left-associative reduction on F using the function f.

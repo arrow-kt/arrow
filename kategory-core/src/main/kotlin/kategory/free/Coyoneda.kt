@@ -27,7 +27,7 @@ private typealias AnyFunc = (Any?) -> Any?
 
         inline fun <reified U, A, B> unsafeApply(fa: HK<U, A>, f: List<AnyFunc>): Coyoneda<U, A, B> = Coyoneda(fa, f)
 
-        fun <U, P> functor(): Functor<CoyonedaKindPartial<U, P>> = object : CoyonedaInstances<U, P> {}
+        fun <U, P> functor(): CoyonedaFunctorInstance<U, P> = object : CoyonedaFunctorInstance<U, P> {}
 
     }
 

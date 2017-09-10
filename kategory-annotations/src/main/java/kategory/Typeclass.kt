@@ -125,14 +125,27 @@ fun <T : Typeclass> instance(t: InstanceParametrizedType): T =
             }
         }
 
+private fun resolveNestedTypes(l: List<Type>): List<Type> {
+    tailrec fun loop(remaining: List<Type>, acc: List<Type>): List<Type> =
+            when {
+                remaining.isEmpty() -> acc
+                else -> {
+                    val head = remaining[0]
+                    val tail = remaining.drop(1)
+                    val (newTail, newAcc) = when (head) {
+                        is ParameterizedType -> Pair(head.actualTypeArguments.toList() + tail, acc)
+                        is WildcardType -> Pair(head.upperBounds.toList() + tail, acc)
+                        is Class<*> -> Pair(tail, acc + listOf(head))
+                        else -> Pair(tail, acc)
+                    }
+                    loop(newTail, newAcc)
+                }
+            }
+    return loop(l, emptyList())
+}
+
 private fun parametricInstanceFromImplicitObject(t: InstanceParametrizedType): Any? {
-    val resolved = t.typeArgs
-            .filterIsInstance<ParameterizedType>()
-            .flatMap { it.actualTypeArguments.toList() }
-            .filterIsInstance<WildcardType>()
-            .filter { it.upperBounds.isNotEmpty() }
-            .flatMap { it.upperBounds.toList() }
-            .filterIsInstance<Class<*>>()
+    val resolved = resolveNestedTypes(t.typeArgs)
     return instanceFromImplicitObject(InstanceParametrizedType(t.raw, resolved))
 }
 
@@ -150,22 +163,23 @@ private fun instanceFromImplicitObject(t: InstanceParametrizedType): Any? {
     val allCompanionFunctions = globalInstanceProvider.methods
     val factoryFunction = allCompanionFunctions.find { it.name == "instance" }
     return if (factoryFunction != null) {
-        val values: List<Any> = factoryFunction.parameters.mapNotNull {
-            if (Typeclass::class.java.isAssignableFrom(it.type)) {
-                val classifier = it.parameterizedType as ParameterizedType
-                val vType = reifyRawParameterizedType(t, classifier)
+        val values: List<Any> = factoryFunction.parameters.mapIndexedNotNull { n, p ->
+            if (Typeclass::class.java.isAssignableFrom(p.type)) {
+                val classifier = p.parameterizedType as ParameterizedType
+                val vType = reifyRawParameterizedType(t, classifier, n)
                 val value = instanceFromImplicitObject(vType)
                 if (value != null) registerInstance(t, value)
                 value
             } else null
         }
-        factoryFunction.invoke(globalInstanceProvider, *values.toTypedArray())
+        factoryFunction.isAccessible = true
+        factoryFunction.invoke(null, *values.toTypedArray())
     } else null
 }
 
-private fun reifyRawParameterizedType(carrier: InstanceParametrizedType, classifier: ParameterizedType): InstanceParametrizedType {
+private fun reifyRawParameterizedType(carrier: InstanceParametrizedType, classifier: ParameterizedType, index: Int): InstanceParametrizedType {
     return if (classifier.actualTypeArguments.any { it is TypeVariable<*> }) {
-        InstanceParametrizedType(classifier.rawType, listOf(carrier.actualTypeArguments[1]))
+        InstanceParametrizedType(classifier.rawType, listOf(carrier.actualTypeArguments[index]))
     } else {
         InstanceParametrizedType(classifier, classifier.actualTypeArguments.filterNotNull())
     }
