@@ -8,30 +8,7 @@ import io.kotlintest.specs.StringSpec
  * Base class for unit tests
  */
 abstract class UnitSpec : StringSpec() {
-    companion object {
-        init {
-            // To get the instances before tests are initialized the following global typeclasses are preloaded
-            Id.bimonad()
-            Id.traverse()
-            NonEmptyList.bimonad()
-            NonEmptyList.traverse()
-            Option.functor()
-            Option.applicative()
-            Option.monad()
-            Option.foldable()
-            Option.traverse()
-            Option.traverseFilter()
-            Try.functor()
-            Try.monad()
-            Try.foldable()
-            Try.traverse()
-            Try.monadError()
-            Eval.functor()
-            Eval.applicative()
-            Eval.monad()
-        }
-    }
-
+    
     fun testLaws(laws: List<Law>): List<TestCase> =
         laws.map { law ->
             val tc = TestCase(suite = rootTestSuite, name = law.name, test = law.test, config = defaultTestCaseConfig)
