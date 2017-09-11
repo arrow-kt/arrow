@@ -5,7 +5,7 @@ import me.eugeniomarletti.kotlin.metadata.escapedClassName
 import java.io.File
 
 class IsosFileGenerator(
-        private val annotatedList: Collection<AnnotatedIso.Element>,
+        private val annotatedList: Collection<AnnotatedIso>,
         private val generatedDir: File
 ) {
 
@@ -14,7 +14,7 @@ class IsosFileGenerator(
 
     fun generate() = buildIsos(annotatedList)
 
-    private fun buildIsos(elements: Collection<AnnotatedIso.Element>) =
+    private fun buildIsos(elements: Collection<AnnotatedIso>) =
             elements.map(this::processElement)
                     .forEach { (name, funString) ->
                         File(generatedDir, isosAnnotationClass.simpleName + ".$name.kt").printWriter().use { w ->
@@ -22,7 +22,7 @@ class IsosFileGenerator(
                         }
                     }
 
-    private fun processElement(annotatedIso: AnnotatedIso.Element): Pair<String, String> {
+    private fun processElement(annotatedIso: AnnotatedIso): Pair<String, String> {
         val sourceClassName = annotatedIso.classData.fullName.escapedClassName
         val sourceName = annotatedIso.type.simpleName.toString().toLowerCase()
         val targetName = annotatedIso.properties.map(Variable::fullName)

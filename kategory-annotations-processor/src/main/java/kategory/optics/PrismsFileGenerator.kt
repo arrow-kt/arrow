@@ -7,7 +7,7 @@ import com.squareup.kotlinpoet.asClassName
 import java.io.File
 
 class PrismsFileGenerator(
-        private val annotatedList: Collection<AnnotatedPrism.Element>,
+        private val annotatedList: Collection<AnnotatedPrism>,
         private val generatedDir: File
 ) {
 
@@ -15,14 +15,14 @@ class PrismsFileGenerator(
         it.writeTo(generatedDir)
     }
 
-    private fun buildPrisms(elements: Collection<AnnotatedPrism.Element>): List<KotlinFile> = elements.map(this::processElement)
+    private fun buildPrisms(elements: Collection<AnnotatedPrism>): List<KotlinFile> = elements.map(this::processElement)
             .map { (name, funs) ->
                 funs.fold(KotlinFile.builder(name.packageName(), "${name.simpleName().toLowerCase()}.prisms").skipJavaLangImports(true), { builder, prismSpec ->
                     builder.addFun(prismSpec)
                 }).addStaticImport("kategory", "right", "left").build()
             }
 
-    private fun processElement(annotatedPrism: AnnotatedPrism.Element): Pair<ClassName, List<FunSpec>> =
+    private fun processElement(annotatedPrism: AnnotatedPrism): Pair<ClassName, List<FunSpec>> =
             annotatedPrism.type.asClassName() to annotatedPrism.subTypes.map { subClass ->
                 val sealedClassName = annotatedPrism.type.simpleName.toString().toLowerCase()
                 val subTypeName = subClass.simpleName.toString()
