@@ -11,3 +11,11 @@ script:
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+
+deploy:
+  on:
+    branch: master
+    tags: true
+    condition: "$TRAVIS_TAG =~ ^Release.*$"
+  provider: script
+  script: ./gradlew bintrayUpload
