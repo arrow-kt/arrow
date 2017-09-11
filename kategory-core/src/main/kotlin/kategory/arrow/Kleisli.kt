@@ -4,56 +4,67 @@ typealias KleisliFun<F, D, A> = (D) -> HK<F, A>
 typealias ReaderT<F, D, A> = Kleisli<F, D, A>
 
 @higherkind
-class Kleisli<F, D, A>(val MF: Monad<F>, val run: KleisliFun<F, D, A>) : KleisliKind<F, D, A> {
+class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliKind<F, D, A> {
 
-    fun <B> map(f: (A) -> B): Kleisli<F, D, B> = Kleisli(MF, { a -> MF.map(run(a), f) })
+    fun <B> ap(ff: KleisliKind<F, D, (A) -> B>, AF: Applicative<F>): Kleisli<F, D, B> =
+            Kleisli({ AF.ap(run(it), ff.ev().run(it)) })
 
-    fun <B> flatMap(f: (A) -> Kleisli<F, D, B>): Kleisli<F, D, B> =
-            Kleisli(MF, { d ->
+    fun <B> map(f: (A) -> B, FF: Functor<F>): Kleisli<F, D, B> = Kleisli({ a -> FF.map(run(a), f) })
+
+    fun <B> flatMap(f: (A) -> Kleisli<F, D, B>, MF: Monad<F>): Kleisli<F, D, B> =
+            Kleisli({ d ->
                 MF.flatMap(run(d)) { a -> f(a).run(d) }
             })
 
-    fun <B> zip(o: Kleisli<F, D, B>): Kleisli<F, D, Tuple2<A, B>> =
+    fun <B> zip(o: Kleisli<F, D, B>, MF: Monad<F>): Kleisli<F, D, Tuple2<A, B>> =
             flatMap({ a ->
-                o.map({ b -> Tuple2(a, b) })
+                o.map({ b -> Tuple2(a, b) }, MF)
+            }, MF)
+
+    fun <DD> local(f: (DD) -> D): Kleisli<F, DD, A> = Kleisli({ dd -> run(f(dd)) })
+
+    fun <C> andThen(f: Kleisli<F, A, C>, MF: Monad<F>): Kleisli<F, D, C> = andThen(f.run, MF)
+
+    fun <B> andThen(f: (A) -> HK<F, B>, MF: Monad<F>): Kleisli<F, D, B> = Kleisli({ MF.flatMap(run(it), f) })
+
+    fun <B> andThen(a: HK<F, B>, MF: Monad<F>): Kleisli<F, D, B> = andThen({ a }, MF)
+
+    fun <E> handleErrorWith(f: (E) -> KleisliKind<F, D, A>, ME: MonadError<F, E>): Kleisli<F, D, A> =
+            Kleisli({
+                ME.handleErrorWith(run(it), { e: E -> f(e).ev().run(it) })
             })
-
-    fun <DD> local(f: (DD) -> D): Kleisli<F, DD, A> = Kleisli(MF, { dd -> run(f(dd)) })
-
-    infix fun <C> andThen(f: Kleisli<F, A, C>): Kleisli<F, D, C> = andThen(f.run)
-
-    infix fun <B> andThen(f: (A) -> HK<F, B>): Kleisli<F, D, B> = Kleisli(MF, { MF.flatMap(run(it), f) })
-
-    infix fun <B> andThen(a: HK<F, B>): Kleisli<F, D, B> = andThen({ a })
 
     companion object {
 
-        inline operator fun <reified F, D, A> invoke(noinline run: KleisliFun<F, D, A>, MF: Monad<F> = monad<F>()): Kleisli<F, D, A> = Kleisli(MF, run)
+        operator fun <F, D, A> invoke(run: KleisliFun<F, D, A>): Kleisli<F, D, A> = Kleisli(run)
 
-        @JvmStatic inline fun <reified F, D, A> pure(x: A, MF: Monad<F> = monad<F>()): Kleisli<F, D, A> = Kleisli(MF, { _ -> MF.pure(x) })
+        fun <F, D, A, B> tailRecM(a: A, f: (A) -> KleisliKind<F, D, Either<A, B>>, MF: Monad<F>): Kleisli<F, D, B> =
+                Kleisli({ b -> MF.tailRecM(a, { f(it).ev().run(b) }) })
 
-        @JvmStatic inline fun <reified F, D> ask(MF: Monad<F> = monad<F>()): Kleisli<F, D, D> = Kleisli(MF, { MF.pure(it) })
+        @JvmStatic inline fun <reified F, D, A> pure(x: A, AF: Applicative<F> = applicative<F>()): Kleisli<F, D, A> = Kleisli({ _ -> AF.pure(x) })
 
-        fun <F, D> instances(MF: Monad<F>): KleisliInstances<F, D> = object : KleisliInstances<F, D> {
-            override fun MF(): Monad<F> = MF
-        }
+        @JvmStatic inline fun <reified F, D> ask(AF: Applicative<F> = applicative<F>()): Kleisli<F, D, D> = Kleisli({ AF.pure(it) })
 
-        inline fun <reified F, D> functor(MF: Monad<F> = monad<F>()): Functor<KleisliKindPartial<F, D>> = instances(MF)
+        fun <F, D, E, A> raiseError(e: E, ME: MonadError<F, E>): Kleisli<F, D, A> = Kleisli({ ME.raiseError(e) })
 
-        inline fun <reified F, D> applicative(MF: Monad<F> = monad<F>()): Applicative<KleisliKindPartial<F, D>> = instances(MF)
+        inline fun <reified F, D> functor(FF: Functor<F> = functor<F>()): KleisliFunctorInstance<F, D> =
+                KleisliFunctorInstanceImplicits.instance(FF)
 
-        inline fun <reified F, D> monad(MF: Monad<F> = monad<F>()): Monad<KleisliKindPartial<F, D>> = instances(MF)
+        inline fun <reified F, D> applicative(AF: Applicative<F> = applicative<F>()): KleisliApplicativeInstance<F, D> =
+                KleisliApplicativeInstanceImplicits.instance(AF)
 
-        inline fun <reified F, D, reified E> monadError(MFE: MonadError<F, E> = monadError<F, E>()): MonadError<KleisliKindPartial<F, D>, E> =
-                object : KleisliMonadError<F, D, E> {
-                    override fun MF(): Monad<F> = MFE
+        inline fun <reified F, D> monad(MF: Monad<F> = monad<F>()): KleisliMonadInstance<F, D> =
+                KleisliMonadInstanceImplicits.instance(MF)
 
-                    override fun MFE(): MonadError<F, E> = MFE
-                }
+        inline fun <reified F, D> monadReader(MF: Monad<F> = monad<F>()): KleisliMonadReaderInstance<F, D> =
+                KleisliMonadReaderInstanceImplicits.instance(MF)
+
+        inline fun <reified F, D, reified E> monadError(ME: MonadError<F, E> = monadError<F, E>()): KleisliMonadErrorInstance<F, D, E> =
+                KleisliMonadErrorInstanceImplicits.instance(ME)
     }
 
 }
 
-inline fun <reified F, D, A> Kleisli<F, D, Kleisli<F, D, A>>.flatten(): Kleisli<F, D, A> = flatMap({ it })
+inline fun <reified F, D, A> Kleisli<F, D, Kleisli<F, D, A>>.flatten(MF: Monad<F>): Kleisli<F, D, A> = flatMap({ it }, MF)
 
-inline fun <reified F, reified D, A> KleisliFun<F, D, A>.kleisli(FT: Monad<F> = monad()): Kleisli<F, D, A> = Kleisli(FT, this)
+fun <F, D, A> KleisliFun<F, D, A>.kleisli(): Kleisli<F, D, A> = Kleisli(this)
