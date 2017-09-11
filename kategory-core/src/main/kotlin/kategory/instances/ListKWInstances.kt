@@ -9,7 +9,6 @@ object ListKWSemigroupInstanceImplicits {
     fun <A> instance(): ListKWSemigroupInstance<A> = object : ListKWSemigroupInstance<A> {}
 }
 
-
 interface ListKWMonoidInstance<A> : ListKWSemigroupInstance<A>, Monoid<ListKW<A>> {
     override fun empty(): ListKW<A> = emptyList<A>().k()
 }

@@ -1,6 +1,6 @@
 package kategory
 
-interface KleisliFunctorInstance<F, D>: Functor<KleisliKindPartial<F, D>> {
+interface KleisliFunctorInstance<F, D> : Functor<KleisliKindPartial<F, D>> {
 
     fun FF(): Functor<F>
 
@@ -23,7 +23,7 @@ interface KleisliApplicativeInstance<F, D> : KleisliFunctorInstance<F, D>, Appli
     override fun <A, B> map(fa: KleisliKind<F, D, A>, f: (A) -> B): Kleisli<F, D, B> =
             fa.ev().map(f, AF())
 
-    override fun <A, B> ap(fa: KleisliKind<F, D, A>, ff: KleisliKind<F, D,(A) -> B>): Kleisli<F, D, B> =
+    override fun <A, B> ap(fa: KleisliKind<F, D, A>, ff: KleisliKind<F, D, (A) -> B>): Kleisli<F, D, B> =
             fa.ev().ap(ff, AF())
 
     override fun <A, B> product(fa: KleisliKind<F, D, A>, fb: KleisliKind<F, D, B>): Kleisli<F, D, Tuple2<A, B>> =
@@ -46,7 +46,7 @@ interface KleisliMonadInstance<F, D> : KleisliApplicativeInstance<F, D>, Monad<K
     override fun <A, B> flatMap(fa: KleisliKind<F, D, A>, f: (A) -> KleisliKind<F, D, B>): Kleisli<F, D, B> =
             fa.ev().flatMap(f.andThen { it.ev() }, MF())
 
-    override fun <A, B> ap(fa: KleisliKind<F, D, A>, ff: KleisliKind<F, D,(A) -> B>): Kleisli<F, D, B> =
+    override fun <A, B> ap(fa: KleisliKind<F, D, A>, ff: KleisliKind<F, D, (A) -> B>): Kleisli<F, D, B> =
             fa.ev().ap(ff, AF())
 
     override fun <A, B> tailRecM(a: A, f: (A) -> KleisliKind<F, D, Either<A, B>>): Kleisli<F, D, B> =

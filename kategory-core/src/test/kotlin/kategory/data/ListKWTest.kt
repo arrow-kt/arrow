@@ -17,7 +17,6 @@ class ListKWTest : UnitSpec() {
             foldable<ListKWHK>() shouldNotBe null
             traverse<ListKWHK>() shouldNotBe null
             semigroupK<ListKWHK>() shouldNotBe null
-            monoidK<ListKWHK>() shouldNotBe null
             semigroup<ListKW<Int>>() shouldNotBe null
             monoid<ListKW<Int>>() shouldNotBe null
         }
