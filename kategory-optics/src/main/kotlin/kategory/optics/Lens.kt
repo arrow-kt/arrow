@@ -28,6 +28,10 @@ abstract class Lens<A, B> {
     companion object {
 
         fun <A> id() = Iso.id<A>().asLens()
+        fun <A> codiagonal() = Lens<Either<A, A>, A>(
+                get = { it.fold(::identity, ::identity) },
+                set = { a -> { it.bimap({ a }, { a }) } }
+        )
 
         fun <A> codiagonal() = Lens<Either<A, A>, A>(
                 get = { it.fold(::identity, ::identity) },
@@ -113,5 +117,7 @@ abstract class Lens<A, B> {
      * plus operator overload to compose lenses
      */
     operator fun <C> plus(other: Lens<B, C>): Lens<A, C> = composeLens(other)
+
+    operator fun <C> plus(other: Iso<B, C>): Lens<A, C> = composeIso(other)
 
 }

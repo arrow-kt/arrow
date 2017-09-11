@@ -12,10 +12,13 @@ import java.io.File
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
+import javax.lang.model.element.TypeElement
+
 import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.ExecutableElement
-import javax.lang.model.element.TypeElement
+import javax.lang.model.element.*
+import javax.lang.model.type.TypeKind
 
 @AutoService(Processor::class)
 class OptikalProcessor : AbstractProcessor() {
@@ -24,11 +27,13 @@ class OptikalProcessor : AbstractProcessor() {
 
     private val annotatedPrisms = mutableListOf<AnnotatedPrism.Element>()
 
-    override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
+    private val annotatedIsos = mutableListOf<AnnotatedIso.Element>()
 
+    override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
     override fun getSupportedAnnotationTypes() = setOf(
             lensesAnnotationClass.canonicalName,
-            prismsAnnotationClass.canonicalName
+            prismsAnnotationClass.canonicalName,
+            isosAnnotationClass.canonicalName
     )
 
     override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
@@ -40,10 +45,15 @@ class OptikalProcessor : AbstractProcessor() {
                 .getElementsAnnotatedWith(prismsAnnotationClass)
                 .map(this::evalAnnotatedPrismElement)
 
+        annotatedIsos += roundEnv
+                .getElementsAnnotatedWith(isosAnnotationClass)
+                .map(this::evalAnnotatedIsoElement)
+
         if (roundEnv.processingOver()) {
             val generatedDir = File(this.generatedDir!!, "").also { it.mkdirs() }
             LensesFileGenerator(annotatedLenses, generatedDir).generate()
             PrismsFileGenerator(annotatedPrisms, generatedDir).generate()
+            IsosFileGenerator(annotatedIsos, generatedDir).generate()
         }
     }
 
@@ -82,4 +92,17 @@ class OptikalProcessor : AbstractProcessor() {
     private val ProtoBuf.Class.isSealed
         get() = modality == ProtoBuf.Modality.SEALED
 
+    private fun evalAnnotatedIsoElement(element: Element): AnnotatedIso.Element = when {
+
+        (element.kotlinMetadata as KotlinClassMetadata).data.classProto.isDataClass -> {
+            val params = element.enclosedElements.first { it.kind == ElementKind.CONSTRUCTOR }.let {
+                it as ExecutableElement
+            }.parameters
+            if(params.size < 2 || params.size > 10) knownError("${element.enclosingElement}.${element.simpleName} constructor parameters should be between 2 and 10")
+            else AnnotatedIso.Element(element as TypeElement, params)
+        }
+
+
+        else -> knownError(opticsAnnotationError(element, isosAnnotationName, isosAnnotationTarget))
+    }
 }

@@ -1,6 +1,7 @@
 package kategory.optics
 
 import kategory.*
+import kategory.Either
 
 /**
  * An [Iso] defines an isomorphism between a type S and A:
@@ -48,7 +49,7 @@ abstract class Iso<A, B> {
     /**
      * Reverse a [Iso]: the source becomes the target and the target becomes the source
      */
-    fun reverse(): Iso<B, A> = Iso(this::reverseGet,this::get)
+    fun reverse(): Iso<B, A> = Iso(this::reverseGet, this::get)
 
     /**
      * Modify polymorphically the target of a [Iso] with a function

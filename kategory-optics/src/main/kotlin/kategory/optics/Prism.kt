@@ -7,7 +7,6 @@ import kategory.HK
 import kategory.Option
 import kategory.Tuple2
 import kategory.compose
-import kategory.compose
 import kategory.eq
 import kategory.flatMap
 import kategory.identity
@@ -38,7 +37,7 @@ abstract class Prism<A, B> {
 
         fun <A> id() = Iso.id<A>().asPrism()
 
-        operator fun <A, B> invoke(getOrModify: (A) -> Either<A, B>, reverseGet: (B) -> A) = object : Prism<A,B>() {
+        operator fun <A, B> invoke(getOrModify: (A) -> Either<A, B>, reverseGet: (B) -> A) = object : Prism<A, B>() {
             override fun getOrModify(a: A): Either<A, B> = getOrModify(a)
 
             override fun reverseGet(b: B): A = reverseGet(b)
@@ -143,7 +142,7 @@ abstract class Prism<A, B> {
             composePrism(other.asPrism())
 
     /**
-     * Plus operator overload to compose prisms
+     * Plus operator overload to compose lenses
      */
     operator fun <C> plus(other: Prism<B, C>): Prism<A, C> = composePrism(other)
 
