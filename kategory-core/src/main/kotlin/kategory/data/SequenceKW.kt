@@ -74,9 +74,9 @@ data class SequenceKW<out A> constructor(val sequence: Sequence<A>) : SequenceKW
             return SequenceKW(buf.asSequence())
         }
 
-        fun <A> semigroup(): SequenceKWMonoid<A> = object : SequenceKWMonoid<A> {}
+        fun <A> semigroup(): SequenceKWSemigroupInstance<A> = SequenceKWSemigroupInstanceImplicits.instance()
 
-        fun <A> monoid(): SequenceKWMonoid<A> = object : SequenceKWMonoid<A> {}
+        fun <A> monoid(): SequenceKWMonoidInstance<A> = SequenceKWMonoidInstanceImplicits.instance()
 
     }
 }
