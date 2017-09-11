@@ -1,9 +1,11 @@
 package kategory
 
-import java.lang.reflect.*
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
+import java.lang.reflect.TypeVariable
+import java.lang.reflect.WildcardType
 import java.util.Arrays
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
 
 /**
@@ -177,13 +179,12 @@ private fun instanceFromImplicitObject(t: InstanceParametrizedType): Any? {
     } else null
 }
 
-private fun reifyRawParameterizedType(carrier: InstanceParametrizedType, classifier: ParameterizedType, index: Int): InstanceParametrizedType {
-    return if (classifier.actualTypeArguments.any { it is TypeVariable<*> }) {
-        InstanceParametrizedType(classifier.rawType, listOf(carrier.actualTypeArguments[index + 1]))
-    } else {
-        InstanceParametrizedType(classifier, classifier.actualTypeArguments.filterNotNull())
-    }
-}
+private fun reifyRawParameterizedType(carrier: InstanceParametrizedType, classifier: ParameterizedType, index: Int): InstanceParametrizedType =
+        if (classifier.actualTypeArguments.any { it is TypeVariable<*> }) {
+            InstanceParametrizedType(classifier.rawType, listOf(carrier.actualTypeArguments[index + 1]))
+        } else {
+            InstanceParametrizedType(classifier, classifier.actualTypeArguments.filterNotNull())
+        }
 
 private fun Type.asKotlinClass(): KClass<*>? =
         if (this is Class<*>) this.kotlin else null

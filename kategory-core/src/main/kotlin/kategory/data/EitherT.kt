@@ -34,15 +34,20 @@ package kategory
 
         @JvmStatic fun <F, A, B> left(a: A, MF: Applicative<F>): EitherT<F, A, B> = EitherT(MF.pure(Either.Left(a)))
 
-        @JvmStatic inline fun <reified F, A, B> fromEither(value: Either<A, B>, MF: Applicative<F> = monad<F>()): EitherT<F, A, B> = EitherT(MF.pure(value))
+        @JvmStatic inline fun <reified F, A, B> fromEither(value: Either<A, B>, MF: Applicative<F> = monad<F>()): EitherT<F, A, B> =
+                EitherT(MF.pure(value))
 
-        inline fun <reified F, L> functor(FF: Functor<F> = functor<F>()): Functor<EitherTKindPartial<F, L>> = EitherTFunctorInstanceImplicits.instance(FF)
+        inline fun <reified F, L> functor(FF: Functor<F> = functor<F>()): Functor<EitherTKindPartial<F, L>> =
+                EitherTFunctorInstanceImplicits.instance(FF)
 
-        inline fun <reified F, L> applicative(MF: Monad<F> = monad<F>()): Applicative<EitherTKindPartial<F, L>> = EitherTApplicativeInstanceImplicits.instance(MF)
+        inline fun <reified F, L> applicative(MF: Monad<F> = monad<F>()): Applicative<EitherTKindPartial<F, L>> =
+                EitherTApplicativeInstanceImplicits.instance(MF)
 
-        inline fun <reified F, L> monad(MF: Monad<F> = monad<F>()): Monad<EitherTKindPartial<F, L>> = EitherTMonadInstanceImplicits.instance(MF)
+        inline fun <reified F, L> monad(MF: Monad<F> = monad<F>()): Monad<EitherTKindPartial<F, L>> =
+                EitherTMonadInstanceImplicits.instance(MF)
 
-        inline fun <reified F, L> monadError(MF: Monad<F> = monad<F>()): MonadError<EitherTKindPartial<F, L>, L> = EitherTMonadErrorInstanceImplicits.instance(MF)
+        inline fun <reified F, L> monadError(MF: Monad<F> = monad<F>()): MonadError<EitherTKindPartial<F, L>, L> =
+                EitherTMonadErrorInstanceImplicits.instance(MF)
 
         inline fun <reified F, A> traverse(FF: Traverse<F> = traverse<F>()): Traverse<EitherTKindPartial<F, A>> =
                 EitherTTraverseInstanceImplicits.instance(FF)

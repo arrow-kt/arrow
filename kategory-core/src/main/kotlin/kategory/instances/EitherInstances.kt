@@ -5,13 +5,13 @@ interface EitherFunctorInstance<L> : Functor<EitherKindPartial<L>> {
 }
 
 object EitherFunctorInstanceImplicits {
-    @JvmStatic fun <L> instance(): EitherFunctorInstance<L> = object: EitherFunctorInstance<L> {}
+    @JvmStatic fun <L> instance(): EitherFunctorInstance<L> = object : EitherFunctorInstance<L> {}
 }
 
 interface EitherApplicativeInstance<L> : EitherFunctorInstance<L> , Applicative<EitherKindPartial<L>> {
-    
+
     override fun <A> pure(a: A): Either<L, A> = Either.Right(a)
-    
+
     override fun <A, B> map(fa: EitherKind<L, A>, f: (A) -> B): Either<L, B> = fa.ev().map(f)
 
     override fun <A, B> ap(fa: EitherKind<L, A>, ff: EitherKind<L, (A) -> B>): Either<L, B> =
@@ -19,14 +19,14 @@ interface EitherApplicativeInstance<L> : EitherFunctorInstance<L> , Applicative<
 }
 
 object EitherApplicativeInstanceImplicits {
-    @JvmStatic fun <L> instance(): EitherApplicativeInstance<L> = object: EitherApplicativeInstance<L> {}
+    @JvmStatic fun <L> instance(): EitherApplicativeInstance<L> = object : EitherApplicativeInstance<L> {}
 }
 
 interface EitherMonadInstance<L> : EitherApplicativeInstance<L>, Monad<EitherKindPartial<L>> {
 
     override fun <A, B> ap(fa: EitherKind<L, A>, ff: EitherKind<L, (A) -> B>): Either<L, B> =
             fa.ev().ap(ff)
-    
+
     override fun <A, B> flatMap(fa: EitherKind<L, A>, f: (A) -> EitherKind<L, B>): Either<L, B> = fa.ev().flatMap { f(it).ev() }
 
     override fun <A, B> tailRecM(a: A, f: (A) -> HK<EitherKindPartial<L>, Either<A, B>>): Either<L, B> =
@@ -34,7 +34,7 @@ interface EitherMonadInstance<L> : EitherApplicativeInstance<L>, Monad<EitherKin
 }
 
 object EitherMonadInstanceImplicits {
-    @JvmStatic fun <L> instance(): EitherMonadInstance<L> = object: EitherMonadInstance<L> {}
+    @JvmStatic fun <L> instance(): EitherMonadInstance<L> = object : EitherMonadInstance<L> {}
 }
 
 interface EitherMonadErrorInstance<L> : EitherMonadInstance<L>, MonadError<EitherKindPartial<L>, L> {
@@ -51,7 +51,7 @@ interface EitherMonadErrorInstance<L> : EitherMonadInstance<L>, MonadError<Eithe
 }
 
 object EitherMonadErrorInstanceImplicits {
-    @JvmStatic fun <L> instance(): EitherMonadErrorInstance<L> = object: EitherMonadErrorInstance<L> {}
+    @JvmStatic fun <L> instance(): EitherMonadErrorInstance<L> = object : EitherMonadErrorInstance<L> {}
 }
 
 interface EitherFoldableInstance<L> : Foldable<EitherKindPartial<L>> {
@@ -64,7 +64,7 @@ interface EitherFoldableInstance<L> : Foldable<EitherKindPartial<L>> {
 }
 
 object EitherFoldableInstanceImplicits {
-    @JvmStatic fun <L> instance(): EitherFoldableInstance<L> = object: EitherFoldableInstance<L> {}
+    @JvmStatic fun <L> instance(): EitherFoldableInstance<L> = object : EitherFoldableInstance<L> {}
 }
 
 interface EitherTraverseInstance<L> : EitherFoldableInstance<L>, Traverse<EitherKindPartial<L>> {
@@ -74,7 +74,7 @@ interface EitherTraverseInstance<L> : EitherFoldableInstance<L>, Traverse<Either
 }
 
 object EitherTraverseInstanceImplicits {
-    @JvmStatic fun <L> instance(): EitherTraverseInstance<L> = object: EitherTraverseInstance<L> {}
+    @JvmStatic fun <L> instance(): EitherTraverseInstance<L> = object : EitherTraverseInstance<L> {}
 }
 
 interface EitherSemigroupKInstance<L> : SemigroupK<EitherKindPartial<L>> {
@@ -84,5 +84,5 @@ interface EitherSemigroupKInstance<L> : SemigroupK<EitherKindPartial<L>> {
 }
 
 object EitherSemigroupKInstanceImplicits {
-    @JvmStatic fun <L> instance(): EitherSemigroupKInstance<L> = object: EitherSemigroupKInstance<L> {}
+    @JvmStatic fun <L> instance(): EitherSemigroupKInstance<L> = object : EitherSemigroupKInstance<L> {}
 }
