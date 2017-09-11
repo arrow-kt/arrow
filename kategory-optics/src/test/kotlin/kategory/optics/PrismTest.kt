@@ -6,6 +6,7 @@ import io.kotlintest.properties.forAll
 import kategory.Eq
 import kategory.NonEmptyList
 import kategory.Option
+import kategory.PrismLaws
 import kategory.Try
 import kategory.UnitSpec
 import kategory.applicative

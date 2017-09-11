@@ -4,6 +4,7 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kategory.Eq
+import kategory.LensLaws
 import kategory.Option
 import kategory.Tuple2
 import kategory.UnitSpec
