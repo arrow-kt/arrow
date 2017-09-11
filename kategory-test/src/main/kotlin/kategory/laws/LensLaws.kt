@@ -1,13 +1,8 @@
-package kategory.optics
+package kategory
 
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kategory.Applicative
-import kategory.Eq
-import kategory.Law
-import kategory.compose
-import kategory.exists
-import kategory.identity
+import kategory.optics.Lens
 
 object LensLaws {
 
