@@ -1,4 +1,4 @@
-package kategory.optics
+package kategory.laws
 
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -8,6 +8,7 @@ import kategory.Law
 import kategory.compose
 import kategory.exists
 import kategory.identity
+import kategory.optics.Prism
 
 object PrismLaws {
 
