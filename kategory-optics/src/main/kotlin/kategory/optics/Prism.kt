@@ -7,6 +7,7 @@ import kategory.HK
 import kategory.Option
 import kategory.Tuple2
 import kategory.compose
+import kategory.compose
 import kategory.eq
 import kategory.flatMap
 import kategory.identity
@@ -134,10 +135,16 @@ abstract class Prism<A, B> {
             this::reverseGet compose other::reverseGet
     )
 
+    /** compose an [Iso] as an [Prism] */
+    fun <C> composeIso(other: Iso<B, C>): Prism<A, C> =
+            composePrism(other.asPrism())
+
     /**
-     * Plus operator overload to compose lenses
+     * Plus operator overload to compose prisms
      */
     operator fun <C> plus(other: Prism<B, C>): Prism<A, C> = composePrism(other)
+
+    operator fun <C> plus(other: Iso<B, C>): Prism<A, C> = composeIso(other)
 
 }
 

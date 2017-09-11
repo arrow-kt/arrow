@@ -103,6 +103,10 @@ abstract class Lens<A, B> {
             { c -> { a -> set(l.set(c)(get(a)))(a) } }
     )
 
+    /** compose an [Iso] as an [Prism] */
+    fun <C> composeIso(other: Iso<B, C>): Lens<A, C> =
+            composeLens(other.asLens())
+
     /**
      * plus operator overload to compose lenses
      */
