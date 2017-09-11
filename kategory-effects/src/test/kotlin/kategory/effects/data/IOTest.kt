@@ -72,7 +72,7 @@ class IOTest : UnitSpec() {
         }
 
         "should time out on unending unsafeRunTimed" {
-            val never = IO.async<Int> { Unit }
+            val never = IO.runAsync<Int> { Unit }
             val start = System.currentTimeMillis()
             val received = never.unsafeRunTimed(100.milliseconds)
             val elapsed = System.currentTimeMillis() - start
@@ -192,7 +192,7 @@ class IOTest : UnitSpec() {
         }
 
         "should map values correctly on success" {
-            val run = IO.map(IO.pure(1)) { it + 1 }.unsafeRunSync()
+            val run = IO.functor().map(IO.pure(1)) { it + 1 }.unsafeRunSync()
 
             val expected = 2
 
@@ -200,7 +200,7 @@ class IOTest : UnitSpec() {
         }
 
         "should flatMap values correctly on success" {
-            val run = IO.flatMap(IO.pure(1)) { num -> IO { num + 1 } }.unsafeRunSync()
+            val run = IO.monad().flatMap(IO.pure(1)) { num -> IO { num + 1 } }.unsafeRunSync()
 
             val expected = 2
 
@@ -208,7 +208,7 @@ class IOTest : UnitSpec() {
         }
 
         "IO.binding should for comprehend over IO" {
-            val result = IO.binding {
+            val result = IO.monad().binding {
                 val x = IO.pure(1).bind()
                 val y = bind { IO { x + 1 } }
                 yields(y)
