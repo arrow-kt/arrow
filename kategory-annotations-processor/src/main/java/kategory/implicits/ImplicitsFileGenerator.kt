@@ -8,11 +8,11 @@ import kategory.implicits.AnnotatedImplicits.Provider
 import kategory.implicits.AnnotatedImplicits.Provider.Function
 import kategory.implicits.AnnotatedImplicits.Provider.Property
 import kategory.common.utils.ClassOrPackageDataWrapper
-import kategory.common.utils.escapedClassName
 import kategory.common.utils.extractFullName
 import kategory.common.utils.knownError
-import kategory.common.utils.plusIfNotBlank
-import me.eugeniomarletti.kotlin.metadata.getJvmMethodSignature
+import me.eugeniomarletti.kotlin.metadata.escapedClassName
+import me.eugeniomarletti.kotlin.metadata.jvm.getJvmMethodSignature
+import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 import org.jetbrains.kotlin.serialization.ProtoBuf
 import org.jetbrains.kotlin.serialization.deserialization.NameResolver
 import java.io.File
