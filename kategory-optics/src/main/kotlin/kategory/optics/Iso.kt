@@ -1,7 +1,11 @@
 package kategory.optics
 
-import kategory.*
 import kategory.Either
+import kategory.Functor
+import kategory.HK
+import kategory.compose
+import kategory.functor
+import kategory.identity
 
 /**
  * An [Iso] defines an isomorphism between a type S and A:

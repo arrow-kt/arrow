@@ -2,11 +2,14 @@ package kategory.optics
 
 import com.google.auto.service.AutoService
 import kategory.common.utils.AbstractProcessor
+import kategory.common.utils.asClassOrPackageDataWrapper
+import kategory.common.utils.isSealed
 import kategory.common.utils.knownError
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
+import me.eugeniomarletti.kotlin.metadata.extractFullName
 import me.eugeniomarletti.kotlin.metadata.isDataClass
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
-import me.eugeniomarletti.kotlin.metadata.modality
+import me.eugeniomarletti.kotlin.metadata.proto
 import org.jetbrains.kotlin.serialization.ProtoBuf
 import java.io.File
 import javax.annotation.processing.Processor
@@ -15,10 +18,6 @@ import javax.lang.model.SourceVersion
 import javax.lang.model.element.TypeElement
 
 import javax.lang.model.element.Element
-import javax.lang.model.element.ElementKind
-import javax.lang.model.element.ExecutableElement
-import javax.lang.model.element.*
-import javax.lang.model.type.TypeKind
 
 @AutoService(Processor::class)
 class OptikalProcessor : AbstractProcessor() {
@@ -61,9 +60,7 @@ class OptikalProcessor : AbstractProcessor() {
         element.let { it.kotlinMetadata as? KotlinClassMetadata }?.data?.classProto?.isDataClass == true ->
             AnnotatedLens.Element(
                     element as TypeElement,
-                    element.enclosedElements.firstOrNull { it.kind == ElementKind.CONSTRUCTOR }
-                            ?.let { it as ExecutableElement }
-                            ?.parameters ?: emptyList()
+                    getConstructorTypesNames(element).zip(getConstructorParamNames(element), ::Variable)
             )
 
         else -> knownError(opticsAnnotationError(element, lensesAnnotationName, lensesAnnotationTarget))
@@ -89,20 +86,37 @@ class OptikalProcessor : AbstractProcessor() {
             |Cannot use $annotationName on ${element.enclosingElement}.${element.simpleName}.
             |It can only be used on $targetName.""".trimMargin()
 
-    private val ProtoBuf.Class.isSealed
-        get() = modality == ProtoBuf.Modality.SEALED
-
     private fun evalAnnotatedIsoElement(element: Element): AnnotatedIso.Element = when {
-
         (element.kotlinMetadata as KotlinClassMetadata).data.classProto.isDataClass -> {
-            val params = element.enclosedElements.first { it.kind == ElementKind.CONSTRUCTOR }.let {
-                it as ExecutableElement
-            }.parameters
-            if(params.size < 2 || params.size > 10) knownError("${element.enclosingElement}.${element.simpleName} constructor parameters should be between 2 and 10")
-            else AnnotatedIso.Element(element as TypeElement, params)
-        }
+            val properties = getConstructorTypesNames(element).zip(getConstructorParamNames(element), ::Variable)
 
+            if (properties.size < 2 || properties.size > 10)
+                knownError("${element.enclosingElement}.${element.simpleName} constructor parameters should be between 2 and 10")
+            else
+                AnnotatedIso.Element(element as TypeElement, element.kotlinMetadata.let { it as KotlinClassMetadata }
+                        .data.asClassOrPackageDataWrapper(elementUtils.getPackageOf(element).toString()) , properties)
+        }
 
         else -> knownError(opticsAnnotationError(element, isosAnnotationName, isosAnnotationTarget))
     }
+
+    private fun getConstructorTypesNames(element: Element): List<String> = element.kotlinMetadata
+            .let { it as KotlinClassMetadata }.data
+            .let { data ->
+                data.proto.constructorOrBuilderList
+                        .first()
+                        .valueParameterList
+                        .map { it.type.extractFullName(data) }
+            }
+
+    private fun getConstructorParamNames(element: Element): List<String> = element.kotlinMetadata
+            .let { it as KotlinClassMetadata }.data
+            .let { (nameResolver, classProto) ->
+                classProto.constructorOrBuilderList
+                        .first()
+                        .valueParameterList
+                        .map(ProtoBuf.ValueParameter::getName)
+                        .map(nameResolver::getString)
+            }
+
 }

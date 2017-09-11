@@ -25,9 +25,9 @@ class LensesFileGenerator(
     private fun processElement(annotatedLens: AnnotatedLens.Element): Pair<ClassName, List<FunSpec>> =
             annotatedLens.type.asClassName() to annotatedLens.properties.map { variable ->
                 val className = annotatedLens.type.simpleName.toString().toLowerCase()
-                val variableName = variable.simpleName
+                val variableName = variable.paramName
 
-                FunSpec.builder("$className${variableName.toString().capitalize()}")
+                FunSpec.builder("$className${variableName.capitalize()}")
                         .addStatement(
                                 """return kategory.optics.Lens(
                                    |        get = { $className: %T -> $className.$variableName },

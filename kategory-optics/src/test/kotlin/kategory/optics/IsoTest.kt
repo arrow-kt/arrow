@@ -3,9 +3,10 @@ package kategory.optics
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import kategory.Eq
-import kategory.IntMonoid
 import kategory.IsoLaws
+import kategory.LensLaws
 import kategory.Option
+import kategory.PrismLaws
 import kategory.StringMonoid
 import kategory.Try
 import kategory.UnitSpec

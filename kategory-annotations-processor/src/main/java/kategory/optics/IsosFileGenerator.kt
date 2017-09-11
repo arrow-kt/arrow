@@ -1,53 +1,51 @@
 package kategory.optics
 
-import com.squareup.kotlinpoet.*
-import kategory.*
+import kategory.common.utils.fullName
+import me.eugeniomarletti.kotlin.metadata.escapedClassName
 import java.io.File
-import javax.lang.model.element.VariableElement
 
 class IsosFileGenerator(
         private val annotatedList: Collection<AnnotatedIso.Element>,
         private val generatedDir: File
 ) {
+
+    private val tuple = "kategory.Tuple"
     private val letters = "abcdefghij"
 
-    fun generate() = buildIsos(annotatedList).writeTo(generatedDir)
+    fun generate() = buildIsos(annotatedList)
 
-    private fun buildIsos(elements: Collection<AnnotatedIso.Element>) = elements.map(this::processElement)
-            .fold(KotlinFile.builder("optikal", "Isos").skipJavaLangImports(true), { builder, isoSpec ->
-                builder.addFun(isoSpec)
-            }).build()
+    private fun buildIsos(elements: Collection<AnnotatedIso.Element>) =
+            elements.map(this::processElement)
+                    .forEach { (name, funString) ->
+                        File(generatedDir, isosAnnotationClass.simpleName + ".$name.kt").printWriter().use { w ->
+                            w.println(funString)
+                        }
+                    }
 
-    private fun processElement(annotatedIso: AnnotatedIso.Element): FunSpec {
-        val className = annotatedIso.type.simpleName.toString().toLowerCase()
-        val properties = annotatedIso.properties.toList()
-        val propertiesTypes = properties.map { it.asType().asTypeName() }
+    private fun processElement(annotatedIso: AnnotatedIso.Element): Pair<String, String> {
+        val sourceClassName = annotatedIso.classData.fullName.escapedClassName
+        val sourceName = annotatedIso.type.simpleName.toString().toLowerCase()
+        val targetName = annotatedIso.properties.map(Variable::fullName)
 
-        val startArgs = listOf(annotatedIso.type)
-        val tupleArguments = propertiesTypes
-        val setFuncArgs = listOf(annotatedIso.type) + propertiesTypes
-        val endArgs = listOf(annotatedIso.type)
-        val args = startArgs + tupleArguments + setFuncArgs + endArgs
-        val arrayArgs = Array(args.size, { args[it] })
-
-        return FunSpec.builder("${className}Iso")
-                .addStatement(
-                        """return ${getConstructor(properties)}(
-                                   |        get = { $className: %T -> ${getTuple(properties, className)} },
-                                   |        reverseGet = { tuple: ${setTuple(properties.size)} -> %T(${classConstructor(properties.size)}) }
-                                   |)""".trimMargin(), *arrayArgs
-                ).build()
+        return sourceName to """
+            |package ${annotatedIso.classData.`package`.escapedClassName}
+            |
+            |fun ${sourceName}Iso() = ${isoConstructor(sourceClassName, targetName)}(
+            |        get = { $sourceName: $sourceClassName -> ${tupleConstructor(annotatedIso.properties, sourceName)} },
+            |        reverseGet = { tuple: ${tupleType(targetName)} -> ${classConstructorFromTuple(sourceClassName, targetName.size)} }
+            |)
+            |""".trimMargin()
     }
 
-    private fun getConstructor(properties: List<VariableElement>) =
-            properties.joinToString(prefix = "kategory.optics.Iso<%T, kategory.Tuple${properties.size}<", postfix = ">>", transform = { "%T" })
+    private fun isoConstructor(sourceName: String, targetTypes: List<String>) = "kategory.optics.Iso<$sourceName, ${tupleType(targetTypes)}>"
 
+    private fun tupleConstructor(targetTypes: List<Variable>, sourceName: String) =
+            targetTypes.joinToString(prefix = "$tuple${targetTypes.size}(", postfix = ")", transform = { "$sourceName.${it.paramName}" })
 
-    private fun getTuple(properties: List<VariableElement>, className: String) =
-            properties.joinToString(prefix = "kategory.Tuple${properties.size}(", postfix = ")", transform = { "$className.${it.simpleName}" })
+    private fun tupleType(targetTypes: List<String>) =
+            targetTypes.joinToString(prefix = "$tuple${targetTypes.size}<", postfix = ">")
 
-    private fun setTuple(propertiesSize: Int) =
-            (0 until propertiesSize).joinToString(prefix = "kategory.Tuple$propertiesSize<", postfix = ">", transform = { "%T" })
+    private fun classConstructorFromTuple(sourceClassName: String, propertiesSize: Int) =
+            (0 until propertiesSize).joinToString(prefix = "$sourceClassName(", postfix = ")", transform = { "tuple.${letters[it]}" })
 
-    private fun classConstructor(propertiesSize: Int) = (0 until propertiesSize).joinToString { "tuple.${letters[it]}" }
 }
