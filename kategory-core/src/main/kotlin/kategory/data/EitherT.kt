@@ -80,7 +80,7 @@ package kategory
 
     inline fun <C> subflatMap(crossinline f: (B) -> Either<A, C>, FF: Functor<F>): EitherT<F, A, C> = transform({ it.flatMap(f) }, FF)
 
-    fun toOptionT(FF: Monad<F>): OptionT<F, B> = OptionT(FF, FF.map(value, { it.toOption() }))
+    fun toOptionT(FF: Functor<F>): OptionT<F, B> = OptionT(FF.map(value, { it.toOption() }))
 
     fun <C> foldL(b: C, f: (C, B) -> C, FF: Foldable<F>): C = FF.compose(Either.foldable<A>()).foldLC(value, b, f)
 
