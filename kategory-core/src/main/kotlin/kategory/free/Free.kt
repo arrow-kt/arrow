@@ -11,11 +11,11 @@ inline fun <reified M, S, A> FreeKind<S, A>.foldMapK(f: FunctionK<S, M>, MM: Mon
 
         fun <S, A> defer(value: () -> Free<S, A>): Free<S, A> = pure<S, Unit>(Unit).flatMap { _ -> value() }
 
-        fun <S> functor(): FreeInstances<S> = object : FreeInstances<S> {}
+        fun <S> functor(): FreeFunctorInstance<S> = FreeFunctorInstanceImplicits.instance()
 
-        fun <S> applicative(): FreeInstances<S> = object : FreeInstances<S> {}
+        fun <S> applicative(): FreeApplicativeInstance<S> = FreeApplicativeInstanceImplicits.instance()
 
-        fun <S> monad(): FreeInstances<S> = object : FreeInstances<S> {}
+        fun <S> monad(): FreeMonadInstance<S> = FreeMonadInstanceImplicits.instance()
 
         internal fun <F> functionKF(): FunctionK<F, FreeKindPartial<F>> =
                 object : FunctionK<F, FreeKindPartial<F>> {
@@ -58,6 +58,8 @@ inline fun <reified M, S, A> FreeKind<S, A>.foldMapK(f: FunctionK<S, M>, MM: Mon
 fun <S, A, B> Free<S, A>.map(f: (A) -> B): Free<S, B> = flatMap { Free.Pure<S, B>(f(it)) }
 
 fun <S, A, B> Free<S, A>.flatMap(f: (A) -> Free<S, B>): Free<S, B> = Free.FlatMapped(this, f)
+
+fun <S, A, B> Free<S, A>.ap(ff: FreeKind<S, (A) -> B>): Free<S, B> = ff.flatMap { f -> map(f) }.ev()
 
 @Suppress("UNCHECKED_CAST")
 tailrec fun <S, A> Free<S, A>.step(): Free<S, A> =
