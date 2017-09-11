@@ -1,6 +1,6 @@
 package kategory
 
-interface OptionSemigroupInstance<A>: Semigroup<Option<A>> {
+interface OptionSemigroupInstance<A> : Semigroup<Option<A>> {
 
     fun SG(): Semigroup<A>
 
@@ -15,28 +15,28 @@ interface OptionSemigroupInstance<A>: Semigroup<Option<A>> {
 }
 
 object OptionSemigroupInstanceImplicits {
-    @JvmStatic fun <A> instance(SG: Semigroup<A>): OptionSemigroupInstance<A> = object: OptionSemigroupInstance<A> {
+    @JvmStatic fun <A> instance(SG: Semigroup<A>): OptionSemigroupInstance<A> = object : OptionSemigroupInstance<A> {
         override fun SG(): Semigroup<A> = SG
     }
 }
 
-interface OptionMonoidInstance<A>: OptionSemigroupInstance<A>, Monoid<Option<A>> {
+interface OptionMonoidInstance<A> : OptionSemigroupInstance<A>, Monoid<Option<A>> {
     override fun empty(): Option<A> = Option.None
 }
 
 object OptionMonoidInstanceImplicits {
-    @JvmStatic fun <A> instance(SG: Semigroup<A>): OptionMonoidInstance<A> = object: OptionMonoidInstance<A> {
+    @JvmStatic fun <A> instance(SG: Semigroup<A>): OptionMonoidInstance<A> = object : OptionMonoidInstance<A> {
         override fun SG(): Semigroup<A> = SG
     }
 }
 
-interface OptionMonadErrorInstance: OptionMonadInstance, MonadError<OptionHK, Unit> {
+interface OptionMonadErrorInstance : OptionMonadInstance, MonadError<OptionHK, Unit> {
     override fun <A> raiseError(e: Unit): Option<A> = Option.None
 
     override fun <A> handleErrorWith(fa: OptionKind<A>, f: (Unit) -> OptionKind<A>): Option<A> = fa.ev().orElse({ f(Unit).ev() })
 }
 
 object OptionMonadErrorInstanceImplicits {
-    @JvmStatic fun instance(): OptionMonadErrorInstance = object: OptionMonadErrorInstance {}
+    @JvmStatic fun instance(): OptionMonadErrorInstance = object : OptionMonadErrorInstance {}
 }
 

@@ -97,7 +97,7 @@ performance:
 style:
   active: true
   WildcardImport:
-    active: true
+    active: false
   NamingConventionViolation:
     active: false
   MaxLineLength:

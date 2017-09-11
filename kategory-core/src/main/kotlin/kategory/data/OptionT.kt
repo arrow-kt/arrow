@@ -18,7 +18,8 @@ package kategory
 
         @JvmStatic inline fun <reified F> none(AF: Applicative<F> = kategory.applicative<F>()): OptionT<F, Nothing> = OptionT(AF.pure(Option.None))
 
-        @JvmStatic inline fun <reified F, A> fromOption(value: Option<A>, AF: Applicative<F> = kategory.applicative<F>()): OptionT<F, A> = OptionT(AF.pure(value))
+        @JvmStatic inline fun <reified F, A> fromOption(value: Option<A>, AF: Applicative<F> = kategory.applicative<F>()): OptionT<F, A> =
+                OptionT(AF.pure(value))
 
         fun <F, A, B> tailRecM(a: A, f: (A) -> OptionTKind<F, Either<A, B>>, MF: Monad<F>): OptionT<F, B> =
                 OptionT(MF.tailRecM(a, {
