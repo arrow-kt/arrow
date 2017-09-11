@@ -210,5 +210,4 @@ fun <A, B> IO<A>.ap(ff: kategory.IOKind<(A) -> B>): IO<B> =
 fun <A> IO<A>.handleErrorWith(f: (Throwable) -> IOKind<A>): IO<A> =
         attempt().flatMap { it.ev().fold(f, { IO.pure(it) }).ev() }
 
-
 fun <A> A.liftIO(): IO<A> = IO.pure(this)
