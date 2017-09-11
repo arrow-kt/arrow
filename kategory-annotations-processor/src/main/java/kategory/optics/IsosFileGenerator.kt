@@ -5,7 +5,7 @@ import me.eugeniomarletti.kotlin.metadata.escapedClassName
 import java.io.File
 
 class IsosFileGenerator(
-        private val annotatedList: Collection<AnnotatedIso>,
+        private val annotatedList: Collection<AnnotatedElement>,
         private val generatedDir: File
 ) {
 
@@ -14,7 +14,7 @@ class IsosFileGenerator(
 
     fun generate() = buildIsos(annotatedList)
 
-    private fun buildIsos(elements: Collection<AnnotatedIso>) =
+    private fun buildIsos(elements: Collection<AnnotatedElement>) =
             elements.map(this::processElement)
                     .forEach { (name, funString) ->
                         File(generatedDir, isosAnnotationClass.simpleName + ".$name.kt").printWriter().use { w ->
@@ -22,16 +22,16 @@ class IsosFileGenerator(
                         }
                     }
 
-    private fun processElement(annotatedIso: AnnotatedIso): Pair<String, String> {
+    private fun processElement(annotatedIso: AnnotatedElement): Pair<String, String> {
         val sourceClassName = annotatedIso.classData.fullName.escapedClassName
         val sourceName = annotatedIso.type.simpleName.toString().toLowerCase()
-        val targetName = annotatedIso.properties.map(Variable::fullName)
+        val targetName = annotatedIso.targets.map(Target::fullName)
 
         return sourceName to """
             |package ${annotatedIso.classData.`package`.escapedClassName}
             |
             |fun ${sourceName}Iso() = ${isoConstructor(sourceClassName, targetName)}(
-            |        get = { $sourceName: $sourceClassName -> ${tupleConstructor(annotatedIso.properties, sourceName)} },
+            |        get = { $sourceName: $sourceClassName -> ${tupleConstructor(annotatedIso.targets, sourceName)} },
             |        reverseGet = { tuple: ${tupleType(targetName)} -> ${classConstructorFromTuple(sourceClassName, targetName.size)} }
             |)
             |""".trimMargin()
@@ -39,7 +39,7 @@ class IsosFileGenerator(
 
     private fun isoConstructor(sourceName: String, targetTypes: List<String>) = "kategory.optics.Iso<$sourceName, ${tupleType(targetTypes)}>"
 
-    private fun tupleConstructor(targetTypes: List<Variable>, sourceName: String) =
+    private fun tupleConstructor(targetTypes: List<Target>, sourceName: String) =
             targetTypes.joinToString(prefix = "$tuple${targetTypes.size}(", postfix = ")", transform = { "$sourceName.${it.paramName}" })
 
     private fun tupleType(targetTypes: List<String>) =

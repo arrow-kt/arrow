@@ -6,7 +6,7 @@ apply plugin: 'kotlin-kapt'
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlinVersion"
     compile project(':kategory-annotations')
-    compile 'com.squareup:kotlinpoet:0.4.0'
+//    compile 'com.squareup:kotlinpoet:0.4.0'
     compile 'me.eugeniomarletti:kotlin-metadata:1.2.0'
     compileOnly 'com.google.auto.service:auto-service:1.0-rc3'
     kapt 'com.google.auto.service:auto-service:1.0-rc3'

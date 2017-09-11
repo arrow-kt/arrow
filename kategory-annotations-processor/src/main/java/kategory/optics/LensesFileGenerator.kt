@@ -5,7 +5,7 @@ import me.eugeniomarletti.kotlin.metadata.escapedClassName
 import java.io.File
 
 class LensesFileGenerator(
-        private val annotatedList: Collection<AnnotatedLens>,
+        private val annotatedList: Collection<AnnotatedElement>,
         private val generatedDir: File
 ) {
 
@@ -17,10 +17,10 @@ class LensesFileGenerator(
                         funs.joinToString(prefix = "package ${element.classData.`package`.escapedClassName}\n\n", separator = "\n")
             }.forEach { (name, fileString) -> File(generatedDir, name).writeText(fileString) }
 
-    private fun processElement(annotatedLens: AnnotatedLens): Pair<AnnotatedLens, List<String>> =
-            annotatedLens to annotatedLens.properties.map { variable ->
-                val sourceClassName = annotatedLens.classData.fullName.escapedClassName
-                val sourceName = annotatedLens.type.simpleName.toString().toLowerCase()
+    private fun processElement(annotatedElement: AnnotatedElement): Pair<AnnotatedElement, List<String>> =
+            annotatedElement to annotatedElement.targets.map { variable ->
+                val sourceClassName = annotatedElement.classData.fullName.escapedClassName
+                val sourceName = annotatedElement.type.simpleName.toString().toLowerCase()
                 val targetClassName = variable.fullName
                 val targetName = variable.paramName
 
