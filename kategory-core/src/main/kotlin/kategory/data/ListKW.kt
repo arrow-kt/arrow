@@ -68,9 +68,9 @@ data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A>
             return ListKW(buf)
         }
 
-        fun <A> semigroup(): ListKWMonoid<A> = object : ListKWMonoid<A> {}
+        fun <A> semigroup(): ListKWSemigroupInstance<A> = ListKWSemigroupInstanceImplicits.instance()
 
-        fun <A> monoid(): ListKWMonoid<A> = object : ListKWMonoid<A> {}
+        fun <A> monoid(): ListKWMonoidInstance<A> = ListKWMonoidInstanceImplicits.instance()
 
     }
 
