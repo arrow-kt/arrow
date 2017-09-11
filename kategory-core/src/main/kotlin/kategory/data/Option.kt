@@ -40,11 +40,11 @@ sealed class Option<out A> : OptionKind<A> {
 
         fun <A> empty(): Option<A> = None
 
-        fun <E> monadError(error: E): MonadError<OptionHK, E> = OptionMonadError(error)
+        fun monadError(): OptionMonadErrorInstance = OptionMonadErrorInstanceImplicits.instance()
 
-        fun <A> monoid(SG: Semigroup<A>): OptionMonoid<A> = object : OptionMonoid<A> {
-            override fun SG(): Semigroup<A> = SG
-        }
+        fun <A> semigroup(SG: Semigroup<A>): OptionSemigroupInstance<A> = OptionSemigroupInstanceImplicits.instance(SG)
+
+        fun <A> monoid(SG: Semigroup<A>): OptionMonoidInstance<A> = OptionMonoidInstanceImplicits.instance(SG)
     }
 
     /**
