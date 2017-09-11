@@ -4,25 +4,28 @@ import kategory.*
 
 /**
  * An [Iso] defines an isomorphism between a type S and A:
- * <pre>
+ *
  *             get
  *     -------------------->
  *   S                       A
  *     <--------------------
  *          reverseGet
- * </pre>
- * A [Iso] is also a valid [Getter], [Fold], [Lens], [Prism], [Optional], [Traversal] and [Setter]
  *
+ * A [Iso] is also a valid [Lens], [Prism]
  *
- * @tparam A the source of a [Iso]
- * @tparam B the target of a [Iso]
+ * @param A the source of a [Iso]
+ * @param B the target of a [Iso]
  */
 abstract class Iso<A, B> {
 
-    /** get the target of a [ISO] */
+    /**
+     * Get the target of a [Iso]
+     */
     abstract fun get(a: A): B
 
-    /** get the modified source of a [ISO] */
+    /**
+     * Get the modified source of a [Iso]
+     */
     abstract fun reverseGet(b: B): A
 
     companion object {
@@ -34,40 +37,50 @@ abstract class Iso<A, B> {
         }
     }
 
-    /** reverse a [ISO]: the source becomes the target and the target becomes the source */
-    fun reverse(): Iso<B, A> = object : Iso<B, A>() {
-        /** get the target of a [ISO] */
-        override fun get(b: B): A = reverseGet(b)
+    /**
+     * Reverse a [Iso]: the source becomes the target and the target becomes the source
+     */
+    fun reverse(): Iso<B, A> = Iso(this::reverseGet,this::get)
 
-        /** get the modified source of a [ISO] */
-        override fun reverseGet(a: A): B = get(a)
-    }
-
-    /** modify polymorphically the target of a [ISO] with a function */
+    /**
+     * Modify polymorphically the target of a [Iso] with a function
+     */
     inline fun modify(crossinline f: (B) -> B): (A) -> A = { reverseGet(f(get(it))) }
 
-    /** modify polymorphically the target of a [ISO] with a Functor function */
+    /**
+     * Modify polymorphically the target of a [Iso] with a Functor function
+     */
     inline fun <reified F> modifyF(FF: Functor<F> = functor(), f: (B) -> HK<F, B>, a: A): HK<F, A> =
             FF.map(f(get(a)), this::reverseGet)
 
-    /** set polymorphically the target of a [Iso] with a value */
+    /**
+     * Set polymorphically the target of a [Iso] with a value
+     */
     fun set(b: B): (A) -> (A) = { reverseGet(b) }
 
-    /** compose a [[PIso]] with a [[PIso]] */
-    infix fun <C> composeIso(other: Iso<B, C>): Iso<A, C> = Iso<A, C>(
-            { a -> other.get(get(a)) },
-            { c -> reverseGet(other.reverseGet(c)) }
+    /**
+     * Compose a [Iso] with a [Iso]
+     */
+    infix fun <C> composeIso(other: Iso<B, C>): Iso<A, C> = Iso(
+            other::get compose this::get,
+            this::reverseGet compose other::reverseGet
     )
 
-    /** view a [[PIso]] as a [[PPrism]] */
+    /**
+     * Plus operator overload to compose lenses
+     */
+    operator fun <C> plus(other: Iso<B, C>): Iso<A, C> = composeIso(other)
+
+    /**
+     * View a [Iso] as a [Prism]
+     */
     fun asPrism(): Prism<A, B> = Prism(
             { a -> Either.Right(get(a)) },
-            { b -> reverseGet(b) }
+            this::reverseGet
     )
 
-    /** view a [[PIso]] as a [[PLens]] */
-    fun asLens(): Lens<A, B> = Lens(
-            { a -> get(a) },
-            { b -> set(b) }
-    )
+    /**
+     * View a [Iso] as a [Lens]
+     */
+    fun asLens(): Lens<A, B> = Lens(this::get, this::set)
 }

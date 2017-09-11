@@ -13,41 +13,11 @@ import kategory.applicative
 import kategory.genEither
 import kategory.genFunctionAToB
 import kategory.genTuple
-import kategory.left
-import kategory.right
 import kategory.some
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class PrismTest : UnitSpec() {
-
-    sealed class SumType {
-        data class A(val string: String) : SumType()
-        data class B(val int: Int) : SumType()
-    }
-
-    object AGen : Gen<SumType.A> {
-        override fun generate(): SumType.A = SumType.A(Gen.string().generate())
-    }
-
-    object SumGen : Gen<SumType> {
-        override fun generate(): SumType = Gen.oneOf(AGen, Gen.create { SumType.B(Gen.int().generate()) }).generate()
-    }
-
-    val sumPrism = Prism<SumType, String>(
-            {
-                when (it) {
-                    is SumType.A -> it.string.right()
-                    else -> it.left()
-                }
-            },
-            SumType::A
-    )
-
-    val stringPrism = Prism<String, List<Char>>(
-            { it.toList().right() },
-            { it.joinToString(separator = "") }
-    )
 
     init {
         testLaws(

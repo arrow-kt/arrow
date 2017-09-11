@@ -18,11 +18,6 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class LensTest : UnitSpec() {
 
-    private val tokenLens: Lens<Token, String> = Lens(
-            { token: Token -> token.value },
-            { value: String -> { token: Token -> token.copy(value = value) } }
-    )
-
     init {
         testLaws(
                 LensLaws.laws(
@@ -81,18 +76,4 @@ class LensTest : UnitSpec() {
         }
     }
 
-    private data class Token(val value: String)
-    private object TokenGen : Gen<Token> {
-        override fun generate() = Token(Gen.string().generate())
-    }
-
-    private data class User(val token: Token)
-    private object UserGen : Gen<User> {
-        override fun generate() = User(TokenGen.generate())
-    }
-
-    private val userLens: Lens<User, Token> = Lens(
-            { user: User -> user.token },
-            { token: Token -> { user: User -> user.copy(token = token) } }
-    )
 }
