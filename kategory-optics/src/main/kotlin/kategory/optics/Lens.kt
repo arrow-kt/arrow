@@ -6,6 +6,7 @@ import kategory.HK
 import kategory.Option
 import kategory.Tuple2
 import kategory.functor
+import kategory.identity
 import kategory.toT
 
 /**
@@ -25,6 +26,12 @@ abstract class Lens<A, B> {
     abstract fun set(b: B): (A) -> A
 
     companion object {
+
+        fun <A> codiagonal() = Lens<Either<A, A>, A>(
+                get = { it.fold(::identity, ::identity) },
+                set = { a -> { it.bimap({ a }, { a }) } }
+        )
+
         operator fun <A, B> invoke(get: (A) -> B, set: (B) -> (A) -> A) = object : Lens<A, B>() {
             override fun get(a: A): B = get(a)
 

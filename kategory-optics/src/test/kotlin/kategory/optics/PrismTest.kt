@@ -97,7 +97,16 @@ class PrismTest : UnitSpec() {
 
         "Joining two prisms together with same target should yield same result" {
             forAll(SumGen, { a ->
-                (sumPrism composePrism stringPrism).getOption(a) == sumPrism.getOption(a).flatMap(stringPrism::getOption)
+                (sumPrism composePrism stringPrism).getOption(a) == sumPrism.getOption(a).flatMap(stringPrism::getOption) &&
+                        (sumPrism + stringPrism).getOption(a) == (sumPrism composePrism stringPrism).getOption(a)
+            })
+        }
+
+        "Checking if a prism exists with a target" {
+            forAll(SumGen, Gen.bool(), { a, bool ->
+                Prism.only(a, object : Eq<SumType> {
+                    override fun eqv(a: SumType, b: SumType): Boolean = bool
+                }).isEmpty(a) == bool
             })
         }
 
@@ -109,7 +118,7 @@ class PrismTest : UnitSpec() {
 
         "Checking if a target exists" {
             forAll(SumGen, { sum ->
-                sumPrism.isNotEmpty(sum) == sum is SumType.A
+                sumPrism.nonEmpty(sum) == sum is SumType.A
             })
         }
 

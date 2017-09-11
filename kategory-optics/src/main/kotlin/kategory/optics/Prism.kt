@@ -2,9 +2,12 @@ package kategory.optics
 
 import kategory.Applicative
 import kategory.Either
+import kategory.Eq
 import kategory.HK
 import kategory.Option
 import kategory.Tuple2
+import kategory.compose
+import kategory.eq
 import kategory.flatMap
 import kategory.identity
 import kategory.left
@@ -31,11 +34,20 @@ abstract class Prism<A, B> {
     abstract fun reverseGet(b: B): A
 
     companion object {
-        operator fun <A,B> invoke(getOrModify: (A) -> Either<A, B>, reverseGet: (B) -> A) = object : Prism<A,B>() {
+        operator fun <A, B> invoke(getOrModify: (A) -> Either<A, B>, reverseGet: (B) -> A) = object : Prism<A, B>() {
             override fun getOrModify(a: A): Either<A, B> = getOrModify(a)
 
             override fun reverseGet(b: B): A = reverseGet(b)
         }
+
+        /**
+         * a [Prism] that checks for equality with a given value
+         */
+        inline fun <reified A> only(a: A, EQA: Eq<A> = eq()) = Prism<A, Unit>(
+                getOrModify = { a2 -> (if (EQA.eqv(a, a2)) a.left() else Unit.right()) },
+                reverseGet = { a }
+        )
+
     }
 
     /**
@@ -68,11 +80,6 @@ abstract class Prism<A, B> {
      */
     fun set(b: B): (A) -> A = modify { b }
 
-    infix fun <C> composePrism(other: Prism<B, C>): Prism<A, C> = Prism(
-            { a -> getOrModify(a).flatMap { b: B -> other.getOrModify(b).bimap({ set(it)(a) }, ::identity) } },
-            { reverseGet(other.reverseGet(it)) }
-    )
-
     /**
      * Set the target of a [Prism] with a value
      */
@@ -81,12 +88,12 @@ abstract class Prism<A, B> {
     /**
      * Check if there is a target
      */
-    fun isNotEmpty(a: A): Boolean = getOption(a).isDefined
+    fun nonEmpty(a: A): Boolean = getOption(a).nonEmpty
 
     /**
      * Check if there is no target
      */
-    fun isEmpty(a: A): Boolean = !isNotEmpty(a)
+    fun isEmpty(a: A): Boolean = !nonEmpty(a)
 
     /**
      * Find if the target satisfies the predicate
@@ -118,6 +125,19 @@ abstract class Prism<A, B> {
             { (c, a) -> getOrModify(a).bimap({ c toT it }, { c toT it }) },
             { (c, b) -> c toT reverseGet(b) }
     )
+
+    /**
+     * Compose a [Prism] with another [Prism]
+     */
+    infix fun <C> composePrism(other: Prism<B, C>): Prism<A, C> = Prism(
+            { a -> getOrModify(a).flatMap { b: B -> other.getOrModify(b).bimap({ set(it)(a) }, ::identity) } },
+            this::reverseGet compose other::reverseGet
+    )
+
+    /**
+     * Plus operator overload to compose lenses
+     */
+    operator fun <C> plus(other: Prism<B, C>): Prism<A, C> = composePrism(other)
 
 }
 
