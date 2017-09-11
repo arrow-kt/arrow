@@ -27,6 +27,8 @@ abstract class Lens<A, B> {
 
     companion object {
 
+        fun <A> id() = Iso.id<A>().asLens()
+
         fun <A> codiagonal() = Lens<Either<A, A>, A>(
                 get = { it.fold(::identity, ::identity) },
                 set = { a -> { it.bimap({ a }, { a }) } }

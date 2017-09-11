@@ -35,7 +35,10 @@ abstract class Prism<A, B> {
     abstract fun reverseGet(b: B): A
 
     companion object {
-        operator fun <A, B> invoke(getOrModify: (A) -> Either<A, B>, reverseGet: (B) -> A) = object : Prism<A, B>() {
+
+        fun <A> id() = Iso.id<A>().asPrism()
+
+        operator fun <A, B> invoke(getOrModify: (A) -> Either<A, B>, reverseGet: (B) -> A) = object : Prism<A,B>() {
             override fun getOrModify(a: A): Either<A, B> = getOrModify(a)
 
             override fun reverseGet(b: B): A = reverseGet(b)

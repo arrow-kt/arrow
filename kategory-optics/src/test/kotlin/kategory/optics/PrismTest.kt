@@ -61,6 +61,14 @@ class PrismTest : UnitSpec() {
                         EQA = Eq.any(),
                         EQB = Eq.any(),
                         FA = NonEmptyList.applicative()
+                )  + PrismLaws.laws(
+                        prism = Prism.id(),
+                        aGen = genEither(Gen.int(), Gen.int()),
+                        bGen = genEither(Gen.int(), Gen.int()),
+                        funcGen = genFunctionAToB(genEither(Gen.int(), Gen.int())),
+                        EQA = Eq.any(),
+                        EQB = Eq.any(),
+                        FA = NonEmptyList.applicative()
                 )
 
         )

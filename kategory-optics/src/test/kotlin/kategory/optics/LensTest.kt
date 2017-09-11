@@ -6,6 +6,7 @@ import io.kotlintest.properties.forAll
 import kategory.Eq
 import kategory.LensLaws
 import kategory.Option
+import kategory.Try
 import kategory.Tuple2
 import kategory.UnitSpec
 import kategory.applicative
@@ -28,6 +29,14 @@ class LensTest : UnitSpec() {
                         EQA = Eq.any(),
                         EQB = Eq.any(),
                         FA = Option.applicative()
+                ) +  LensLaws.laws(
+                        lens = Lens.id(),
+                        aGen = Gen.int(),
+                        bGen = Gen.int(),
+                        funcGen = genFunctionAToB(Gen.int()),
+                        EQA = Eq.any(),
+                        EQB = Eq.any(),
+                        FA = Try.applicative()
                 )
         )
 

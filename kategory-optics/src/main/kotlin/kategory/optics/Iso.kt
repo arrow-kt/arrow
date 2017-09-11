@@ -29,6 +29,14 @@ abstract class Iso<A, B> {
     abstract fun reverseGet(b: B): A
 
     companion object {
+
+        /**
+         * create an [Iso] between any type and itself. id is the zero element of optics composition, for all optics o of type O (e.g. Lens, Iso, Prism, ...):
+         * o      composeIso Iso.id == o
+         * Iso.id composeO   o        == o (replace composeO by composeLens, composeIso, composePrism, ...)
+         */
+        fun <A> id() = Iso<A, A>(::identity, ::identity)
+
         operator fun <A, B> invoke(get: (A) -> (B), reverseGet: (B) -> A) = object : Iso<A, B>() {
 
             override fun get(a: A): B = get(a)
