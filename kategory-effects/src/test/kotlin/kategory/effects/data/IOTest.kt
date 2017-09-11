@@ -4,6 +4,7 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldEqual
+import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -15,6 +16,16 @@ class IOTest : UnitSpec() {
 
     init {
         testLaws(AsyncLaws.laws(IO.asyncContext(), IO.monadError(), EQ(), EQ()))
+
+        "instances can be resolved implicitly" {
+            functor<IOHK>() shouldNotBe null
+            applicative<IOHK>() shouldNotBe null
+            monad<IOHK>() shouldNotBe null
+            monadError<IOHK, Throwable>() shouldNotBe null
+            asyncContext<IOHK>() shouldNotBe null
+            semigroup<IOKind<Int>>() shouldNotBe null
+            monoid<IOKind<Int>>() shouldNotBe null
+        }
 
         "should defer evaluation until run" {
             var run = false
