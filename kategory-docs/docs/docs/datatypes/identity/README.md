@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Identity
-permalink: /docs/typeclasses/identity/
+permalink: /docs/datatypes/identity/
 ---
 
 ## Identity

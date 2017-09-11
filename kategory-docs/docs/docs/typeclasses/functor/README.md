@@ -158,5 +158,5 @@ Thw following datatypes in Kategory provide instances that adhere to the `Functo
 - [Id](/docs/datatypes/Id)
 - [Function0](/docs/datatypes/Function0)
 
-Additionally all instances of [`Applicative`](/docs/typeclasses/applicative), [`Monad`](/docs/typeclasses/monad) and their MTL variants implement the `Functor` typeclass directly
+Additionally all instances of [`Applicative`](/docs/typeclasses/applicative), [`Monad`](/docs/_docs/typeclasses/monad) and their MTL variants implement the `Functor` typeclass directly
 since they are all subtypes of `Functor`

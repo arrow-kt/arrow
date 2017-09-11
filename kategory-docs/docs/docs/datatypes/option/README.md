@@ -135,7 +135,7 @@ Computing over independent values
 Option.applicative().tupled(Option(1), Option("Hello"), Option(20.0))
 ```
 
-[`Monad`](/docs/typeclasses/monad/)
+[`Monad`](/docs/_docs/typeclasses/monad/)
 
 Computing over dependent values ignoring absence
 

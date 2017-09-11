@@ -138,5 +138,5 @@ Thw following datatypes in Kategory provide instances that adhere to the `Applic
 - [Id](/docs/datatypes/Id)
 - [Function0](/docs/datatypes/Function0)
 
-Additionally all instances of [`Monad`](/docs/typeclasses/monad) and their MTL variants implement the `Applicative` typeclass directly
+Additionally all instances of [`Monad`](/docs/_docs/typeclasses/monad) and their MTL variants implement the `Applicative` typeclass directly
 since they are all subtypes of `Applicative`

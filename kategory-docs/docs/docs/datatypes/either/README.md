@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Either
-permalink: /docs/typeclasses/either/
+permalink: /docs/datatypes/either/
 ---
 
 ## Either

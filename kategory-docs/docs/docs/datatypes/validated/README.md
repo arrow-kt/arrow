@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Validated
-permalink: /docs/typeclasses/validated/
+permalink: /docs/datatypes/validated/
 ---
 
 ## Validated
