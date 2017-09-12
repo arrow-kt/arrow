@@ -105,6 +105,10 @@ abstract class Lens<A, B> {
             { c -> { a -> set(l.set(c)(get(a)))(a) } }
     )
 
+    /** compose a [Lens] with a [Optional] */
+    infix fun <C> composeOptional(other: Optional<B, C>): Optional<A, C> =
+            asOptional() composeOptional other
+
     /** compose an [Iso] as an [Prism] */
     fun <C> composeIso(other: Iso<B, C>): Lens<A, C> =
             composeLens(other.asLens())
@@ -115,5 +119,13 @@ abstract class Lens<A, B> {
     operator fun <C> plus(other: Lens<B, C>): Lens<A, C> = composeLens(other)
 
     operator fun <C> plus(other: Iso<B, C>): Lens<A, C> = composeIso(other)
+
+    /**
+     * View a [Lens] as an [Optional]
+     */
+    fun asOptional(): Optional<A, B> = Optional(
+            { a -> Option.Some(get(a)) },
+            this::set
+    )
 
 }
