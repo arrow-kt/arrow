@@ -155,8 +155,8 @@ private fun instanceFromImplicitObject(t: InstanceParametrizedType): Any? {
     val of = t.raw as Class<*>
     val on = t.typeArgs[0] as Class<*>
     val targetPackage = on.name.substringBeforeLast(".")
-    val derivationPackage = if (targetPackage == "java.lang") {
-        "java_lang"
+    val derivationPackage = if (targetPackage.startsWith("java.")) {
+        targetPackage.replace(".", "_")
     } else {
         targetPackage
     }
