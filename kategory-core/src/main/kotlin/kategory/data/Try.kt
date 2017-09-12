@@ -31,8 +31,8 @@ sealed class Try<out A> : TryKind<A> {
 
         fun <A> raise(e: Throwable): Try<A> = Failure(e)
 
-        fun monadError(): TryMonadError =
-                object : TryMonadError, MonadError<TryHK, Throwable> {}
+        fun monadError(): TryMonadErrorInstance =
+                TryMonadErrorInstanceImplicits.instance()
 
     }
 
