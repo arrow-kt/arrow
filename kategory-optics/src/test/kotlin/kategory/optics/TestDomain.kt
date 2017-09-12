@@ -37,6 +37,16 @@ internal val tokenLens: Lens<Token, String> = Lens(
         { value: String -> { token: Token -> token.copy(value = value) } }
 )
 
+internal val tokenIso: Iso<Token, String> = Iso(
+        { token: Token -> token.value },
+        ::Token
+)
+
+internal val userIso: Iso<User, Token> = Iso(
+        { user: User -> user.token },
+        ::User
+)
+
 internal data class Token(val value: String)
 internal object TokenGen : Gen<Token> {
     override fun generate() = Token(Gen.string().generate())

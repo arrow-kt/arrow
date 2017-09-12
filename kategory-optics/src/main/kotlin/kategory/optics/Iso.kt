@@ -58,7 +58,7 @@ abstract class Iso<A, B> {
      * Lift a [Iso] to a Functor level
      */
     inline fun <reified F> mapping(FF: Functor<F> = functor()): Iso<HK<F, A>, HK<F, B>> = Iso(
-            { fa -> FF.map(fa, this@Iso::get) },
+            { fa -> FF.map(fa, this::get) },
             { fb -> FF.map(fb, this::reverseGet) }
     )
 
@@ -95,7 +95,7 @@ abstract class Iso<A, B> {
     /**
      * Pair two disjoint [Iso]
      */
-    fun <C, D> split(other: Iso<C, D>): Iso<Tuple2<A, C>, Tuple2<B, D>> = Iso(
+    infix fun <C, D> split(other: Iso<C, D>): Iso<Tuple2<A, C>, Tuple2<B, D>> = Iso(
             { (a, c) -> get(a) toT other.get(c) },
             { (b, d) -> reverseGet(b) toT other.reverseGet(d) }
     )
