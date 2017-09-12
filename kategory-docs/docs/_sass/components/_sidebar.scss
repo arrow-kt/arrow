@@ -26,5 +26,11 @@
         &:hover {
             text-decoration: none;
         }
+
+        &.brand {
+            margin-left: 0px;
+            align-items: center;
+            display: flex;
+        }
     }
 }

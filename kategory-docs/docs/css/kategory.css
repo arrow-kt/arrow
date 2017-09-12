@@ -418,6 +418,10 @@ input {
         color: #fff; }
     .sidebar-brand a:hover {
       text-decoration: none; }
+    .sidebar-brand a.brand {
+      margin-left: 0px;
+      align-items: center;
+      display: flex; }
 
 .sidebar-nav {
   margin-top: 24px; }
