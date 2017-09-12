@@ -22,11 +22,11 @@ import javax.lang.model.element.Element
 @AutoService(Processor::class)
 class OptikalProcessor : AbstractProcessor() {
 
-    private val annotatedLenses = mutableListOf<AnnotatedElement>()
+    private val annotatedLenses = mutableListOf<AnnotatedOptic>()
 
-    private val annotatedPrisms = mutableListOf<AnnotatedElement>()
+    private val annotatedPrisms = mutableListOf<AnnotatedOptic>()
 
-    private val annotatedIsos = mutableListOf<AnnotatedElement>()
+    private val annotatedIsos = mutableListOf<AnnotatedOptic>()
 
     override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
     override fun getSupportedAnnotationTypes() = setOf(
@@ -56,9 +56,9 @@ class OptikalProcessor : AbstractProcessor() {
         }
     }
 
-    private fun evalAnnotatedElement(element: Element): AnnotatedElement = when {
+    private fun evalAnnotatedElement(element: Element): AnnotatedOptic = when {
         element.let { it.kotlinMetadata as? KotlinClassMetadata }?.data?.classProto?.isDataClass == true ->
-            AnnotatedElement(
+            AnnotatedOptic(
                     element as TypeElement,
                     getClassData(element),
                     getConstructorTypesNames(element).zip(getConstructorParamNames(element), ::Target)
@@ -67,11 +67,11 @@ class OptikalProcessor : AbstractProcessor() {
         else -> knownError(opticsAnnotationError(element, lensesAnnotationName, lensesAnnotationTarget))
     }
 
-    private fun evalAnnotatedPrismElement(element: Element): AnnotatedElement = when {
+    private fun evalAnnotatedPrismElement(element: Element): AnnotatedOptic = when {
         element.let { it.kotlinMetadata as? KotlinClassMetadata }?.data?.classProto?.isSealed == true -> {
             val (nameResolver, classProto) = element.kotlinMetadata.let { it as KotlinClassMetadata }.data
 
-            AnnotatedElement(
+            AnnotatedOptic(
                     element as TypeElement,
                     getClassData(element),
                     classProto.sealedSubclassFqNameList
@@ -88,14 +88,14 @@ class OptikalProcessor : AbstractProcessor() {
             |Cannot use $annotationName on ${element.enclosingElement}.${element.simpleName}.
             |It can only be used on $targetName.""".trimMargin()
 
-    private fun evalAnnotatedIsoElement(element: Element): AnnotatedElement = when {
+    private fun evalAnnotatedIsoElement(element: Element): AnnotatedOptic = when {
         (element.kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isDataClass == true -> {
             val properties = getConstructorTypesNames(element).zip(getConstructorParamNames(element), ::Target)
 
             if (properties.size < 2 || properties.size > 10)
                 knownError("${element.enclosingElement}.${element.simpleName} constructor parameters should be between 2 and 10")
             else
-                AnnotatedElement(element as TypeElement, getClassData(element), properties)
+                AnnotatedOptic(element as TypeElement, getClassData(element), properties)
         }
 
         else -> knownError(opticsAnnotationError(element, isosAnnotationName, isosAnnotationTarget))

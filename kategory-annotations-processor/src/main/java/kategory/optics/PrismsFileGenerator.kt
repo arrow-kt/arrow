@@ -5,7 +5,7 @@ import me.eugeniomarletti.kotlin.metadata.escapedClassName
 import java.io.File
 
 class PrismsFileGenerator(
-        private val annotatedList: Collection<AnnotatedElement>,
+        private val annotatedList: Collection<AnnotatedOptic>,
         private val generatedDir: File
 ) {
 
@@ -17,7 +17,7 @@ class PrismsFileGenerator(
                         funs.joinToString(prefix = fileHeader(element.classData.`package`.escapedClassName), separator = "\n\n")
             }.forEach { (name, fileString) -> File(generatedDir, name).writeText(fileString) }
 
-    private fun processElement(annotatedPrism: AnnotatedElement): Pair<AnnotatedElement, List<String>> =
+    private fun processElement(annotatedPrism: AnnotatedOptic): Pair<AnnotatedOptic, List<String>> =
             annotatedPrism to annotatedPrism.targets.map { target ->
                 val sourceClassName = annotatedPrism.classData.fullName.escapedClassName
                 val sourceName = annotatedPrism.type.simpleName.toString().toLowerCase()
