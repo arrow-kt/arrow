@@ -1,5 +1,11 @@
 @import url("https://fonts.googleapis.com/css?family=Titillium+Web:400,600");
 @import url("https://fonts.googleapis.com/css?family=Fira+Mono:400,500,700");
+@font-face {
+  font-family: 'monoidregular';
+  src: url("../fonts/monoid-regular.eot");
+  src: url("../fonts/monoid-regular.eot?#iefix") format("embedded-opentype"), url("../fonts/monoid-regular.woff2") format("woff2"), url("../fonts/monoid-regular.woff") format("woff"), url("../fonts/monoid-regular.ttf") format("truetype"), url("../fonts/monoid-regular.svg#monoidregular") format("svg");
+  font-weight: normal;
+  font-style: normal; }
 .container {
   max-width: 1120px;
   margin: 0 auto; }
@@ -137,6 +143,30 @@ table {
   border-collapse: collapse;
   border-spacing: 0; }
 
+@font-face {
+  font-family: 'monoidbold';
+  src: url("../fonts/monoid-bold.eot");
+  src: url("../fonts/monoid-bold.eot?#iefix") format("embedded-opentype"), url("../fonts/monoid-bold.woff2") format("woff2"), url("../fonts/monoid-bold.woff") format("woff"), url("../fonts/monoid-bold.ttf") format("truetype"), url("../fonts/monoid-bold.svg#monoidbold") format("svg");
+  font-weight: normal;
+  font-style: normal; }
+@font-face {
+  font-family: 'monoiditalic';
+  src: url("../fonts/monoid-italic.eot");
+  src: url("../fonts/monoid-italic.eot?#iefix") format("embedded-opentype"), url("../fonts/monoid-italic.woff2") format("woff2"), url("../fonts/monoid-italic.woff") format("woff"), url("../fonts/monoid-italic.ttf") format("truetype"), url("../fonts/monoid-italic.svg#monoiditalic") format("svg");
+  font-weight: normal;
+  font-style: normal; }
+@font-face {
+  font-family: 'monoidregular';
+  src: url("../fonts/monoid-regular.eot");
+  src: url("../fonts/monoid-regular.eot?#iefix") format("embedded-opentype"), url("../fonts/monoid-regular.woff2") format("woff2"), url("../fonts/monoid-regular.woff") format("woff"), url("../fonts/monoid-regular.ttf") format("truetype"), url("../fonts/monoid-regular.svg#monoidregular") format("svg");
+  font-weight: normal;
+  font-style: normal; }
+@font-face {
+  font-family: 'monoidretina';
+  src: url("../fonts/monoid-retina.eot");
+  src: url("../fonts/monoid-retina.eot?#iefix") format("embedded-opentype"), url("../fonts/monoid-retina.woff2") format("woff2"), url("../fonts/monoid-retina.woff") format("woff"), url("../fonts/monoid-retina.ttf") format("truetype"), url("../fonts/monoid-retina.svg#monoidretina") format("svg");
+  font-weight: normal;
+  font-style: normal; }
 html {
   box-sizing: border-box;
   font-size: 16px; }
@@ -173,6 +203,9 @@ a {
 img,
 picture {
   max-width: 100%; }
+
+pre {
+  margin-bottom: 24px; }
 
 input {
   appearance: none; }
@@ -303,8 +336,7 @@ input {
   background: #fff;
   -webkit-box-shadow: rgba(25, 62, 136, 0.15) 0 0 20px;
   -moz-box-shadow: rgba(25, 62, 136, 0.15) 0 0 20px;
-  box-shadow: rgba(25, 62, 136, 0.15) 0 0 20px;
-  height: 250px; }
+  box-shadow: rgba(25, 62, 136, 0.15) 0 0 20px; }
   .browser ul.action {
     height: 34px;
     display: -webkit-box;
@@ -337,6 +369,8 @@ input {
         background: rgba(25, 62, 136, 0.55); }
       .browser ul.action li:last-child {
         background: rgba(25, 62, 136, 0.2); }
+  .browser pre {
+    margin-bottom: 0; }
 
 #doc-body {
   background: rgba(75, 116, 229, 0.1); }
@@ -544,10 +578,15 @@ input {
     margin-bottom: 16px;
     margin-top: 32px;
     color: #193E88; }
+    .doc-content h1:first-child,
+    .doc-content h2:first-child,
+    .doc-content h3:first-child,
+    .doc-content h4:first-child,
+    .doc-content h5:first-child,
+    .doc-content h6:first-child {
+      margin-top: 0; }
   .doc-content h1 {
     font-size: 2.25rem; }
-    .doc-content h1:first-child {
-      margin-top: 0; }
   .doc-content h2 {
     font-size: 1.75rem; }
   .doc-content h3 {
@@ -558,6 +597,12 @@ input {
     margin-bottom: 16px; }
   .doc-content .browser {
     margin-top: 24px; }
+
+.hljs {
+  padding: 24px;
+  background: #fff;
+  font-family: "monoidregular", monospace;
+  font-size: 0.75rem; }
 
 #footer {
   padding: 32px 0;

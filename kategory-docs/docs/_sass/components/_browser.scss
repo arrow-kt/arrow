@@ -4,7 +4,6 @@
 .browser {
     background: $white;
     @include box-shadow($box-shadow-item);
-    height: 250px;
 
     ul.action {
         height: 34px;
@@ -30,5 +29,7 @@
             }
         }
     }
-    .code {}
+    pre {
+        margin-bottom: 0;
+    }
 }

@@ -1,6 +1,5 @@
 
 // Vendor
-@import "vendors/bourbon/bourbon";
 @import "vendors/neat/neat";
 
 // Utils
@@ -11,6 +10,7 @@
 // Base
 @import "base/reset";
 @import "base/global";
+
 
 // Components
 @import "components/navigation";
@@ -23,4 +23,6 @@
 @import "components/sidebar-nav";
 @import "components/doc-header";
 @import "components/doc-content";
+@import "components/code";
+@import "components/font";
 @import "components/footer";

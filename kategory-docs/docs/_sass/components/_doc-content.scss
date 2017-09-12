@@ -13,13 +13,14 @@
         margin-bottom: ($base-point-grid * 2);
         margin-top: ($base-point-grid * 4);
         color: $header-font-color;
+
+        &:first-child {
+            margin-top: 0;
+        }
     }
 
     h1 {
         font-size: 2.25rem;
-        &:first-child {
-            margin-top: 0;
-        }
     }
 
     h2 {
