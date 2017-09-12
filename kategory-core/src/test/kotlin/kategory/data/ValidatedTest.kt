@@ -3,6 +3,7 @@ package kategory
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
+import io.kotlintest.matchers.shouldNotBe
 import kategory.Validated.Invalid
 import kategory.Validated.Valid
 import org.junit.runner.RunWith
@@ -12,8 +13,16 @@ class ValidatedTest : UnitSpec() {
 
     init {
 
+        "instances can be resolved implicitly" {
+            functor<ValidatedKindPartial<String>>() shouldNotBe null
+            applicative<ValidatedKindPartial<String>>() shouldNotBe null
+            foldable<ValidatedKindPartial<String>>() shouldNotBe null
+            traverse<ValidatedKindPartial<String>>() shouldNotBe null
+            applicativeError<ValidatedKindPartial<String>, String>() shouldNotBe null
+        }
+
         testLaws(ApplicativeLaws.laws(Validated.applicative(StringMonoidInstance), Eq.any()))
-        testLaws(TraverseLaws.laws(Validated.traverse(StringMonoidInstance), Validated.applicative(StringMonoidInstance), ::Valid, Eq.any()))
+        testLaws(TraverseLaws.laws(Validated.traverse(), Validated.applicative(StringMonoidInstance), ::Valid, Eq.any()))
         testLaws(SemigroupKLaws.laws(
                 Validated.semigroupK(IntMonoid),
                 Validated.applicative(IntMonoid),
