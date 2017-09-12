@@ -82,7 +82,7 @@ abstract class Lens<A, B> {
     )
 
     /**
-     * Convenience method to create a pair of the target and a type C
+     * Create a product of the target and a type C
      */
     fun <C> first(): Lens<Tuple2<A, C>, Tuple2<B, C>> = Lens(
             { (a, c) -> get(a) toT c },
@@ -90,7 +90,7 @@ abstract class Lens<A, B> {
     )
 
     /**
-     * Convenience method to create a pair of a type C and the target
+     * Create a product of a type C and the target
      */
     fun <C> second(): Lens<Tuple2<C, A>, Tuple2<C, B>> = Lens(
             { (c, a) -> c toT get(a) },

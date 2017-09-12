@@ -3,20 +3,19 @@ package kategory.optics
 import kategory.Either
 import kategory.Functor
 import kategory.HK
+import kategory.Option
+import kategory.Tuple2
 import kategory.compose
 import kategory.functor
 import kategory.identity
+import kategory.none
+import kategory.some
+import kategory.toT
 
 /**
- * An [Iso] defines an isomorphism between a type S and A:
+ * An [Iso] defines an isomorphism between a type S and A.
  *
- *             get
- *     -------------------->
- *   S                       A
- *     <--------------------
- *          reverseGet
- *
- * A [Iso] is also a valid [Lens], [Prism]
+ * An [Iso] is also a valid [Lens], [Prism]
  *
  * @param A the source of a [Iso]
  * @param B the target of a [Iso]
@@ -56,6 +55,28 @@ abstract class Iso<A, B> {
     fun reverse(): Iso<B, A> = Iso(this::reverseGet, this::get)
 
     /**
+     * Lift a [Iso] to a Functor level
+     */
+    inline fun <reified F> mapping(FF: Functor<F> = functor()): Iso<HK<F, A>, HK<F, B>> = Iso(
+            { fa -> FF.map(fa, this@Iso::get) },
+            { fb -> FF.map(fb, this::reverseGet) }
+    )
+
+    /**
+     * Find if the target satisfies the predicate
+     */
+    fun find(p: (B) -> Boolean): (A) -> Option<B> = { a ->
+        get(a).let { b ->
+            if (p(b)) b.some() else none()
+        }
+    }
+
+    /**
+     * check if the target satisfies the predicate
+     */
+    fun exist(p: (B) -> Boolean): (A) -> Boolean = p compose this::get
+
+    /**
      * Modify polymorphically the target of a [Iso] with a function
      */
     inline fun modify(crossinline f: (B) -> B): (A) -> A = { reverseGet(f(get(it))) }
@@ -70,6 +91,46 @@ abstract class Iso<A, B> {
      * Set polymorphically the target of a [Iso] with a value
      */
     fun set(b: B): (A) -> (A) = { reverseGet(b) }
+
+    /**
+     * Pair two disjoint [Iso]
+     */
+    fun <C, D> split(other: Iso<C, D>): Iso<Tuple2<A, C>, Tuple2<B, D>> = Iso(
+            { (a, c) -> get(a) toT other.get(c) },
+            { (b, d) -> reverseGet(b) toT other.reverseGet(d) }
+    )
+
+    /**
+     * Create a pair of the target and a type C
+     */
+    fun <C> first(): Iso<Tuple2<A, C>, Tuple2<B, C>> = Iso(
+            { (a, c) -> get(a) toT c },
+            { (b, c) -> reverseGet(b) toT c }
+    )
+
+    /**
+     * Create a pair of a type C and the target
+     */
+    fun <C> second(): Iso<Tuple2<C, A>, Tuple2<C, B>> = Iso(
+            { (c, a) -> c toT get(a) },
+            { (c, b) -> c toT reverseGet(b) }
+    )
+
+    /**
+     * Create a sum of the target and a type C
+     */
+    fun <C> left(): Iso<Either<A, C>, Either<B, C>> = Iso(
+            { it.bimap(this::get, ::identity) },
+            { it.bimap(this::reverseGet, ::identity) }
+    )
+
+    /**
+     * Create a sum of a type C and the target
+     */
+    fun <C> right(): Iso<Either<C, A>, Either<C, B>> = Iso(
+            { it.bimap(::identity, this::get) },
+            { it.bimap(::identity, this::reverseGet) }
+    )
 
     /**
      * Compose a [Iso] with a [Iso]
