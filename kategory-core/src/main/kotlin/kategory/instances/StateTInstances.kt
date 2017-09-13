@@ -95,20 +95,39 @@ object StateTSemigroupKInstanceImplicits {
     }
 }
 
-interface StateTMonadCombine<F, S> : MonadCombine<StateTKindPartial<F, S>>, StateTMonad<F, S>, StateTSemigroupK<F, S> {
-    override fun F(): MonadCombine<F>
-    override fun G(): MonadCombine<F> = F()
+interface StateTMonadCombineInstance<F, S> : MonadCombine<StateTKindPartial<F, S>>, StateTMonadInstance<F, S>, StateTSemigroupKInstance<F, S> {
 
-    override fun <A> empty(): StateT<F, S, A> = liftT(F().empty())
+    override fun MF(): MonadCombine<F>
+    override fun SF(): SemigroupK<F> = MF()
 
-    fun <A> liftT(ma: HK<F, A>): StateT<F, S, A> = StateT(F(), F().pure({ s: S -> F().map(ma, { a: A -> s toT a }) }))
+    override fun <A> empty(): HK<StateTKindPartial<F, S>, A> = liftT(MF().empty())
+
+    fun <A> liftT(ma: HK<F, A>): StateT<F, S, A> = StateT(MF().pure({ s: S -> MF().map(ma, { a: A -> s toT a }) }))
 }
 
-interface StateTMonadError<F, S, E> : StateTMonad<F, S>, MonadError<StateTKindPartial<F, S>, E> {
-    override fun F(): MonadError<F, E>
+object StateTMonadCombineInstanceImplicits {
+    @JvmStatic
+    fun <F, S> instance(MCF: MonadCombine<F>): StateTMonadCombineInstance<F, S> = object : StateTMonadCombineInstance<F, S> {
+        override fun FF(): Functor<F> = MCF
+        override fun MF(): MonadCombine<F> = MCF
 
-    override fun <A> raiseError(e: E): StateT<F, S, A> = StateT.lift(F().raiseError(e), F())
+    }
+}
+
+interface StateTMonadErrorInstance<F, S, E> : StateTMonadInstance<F, S>, MonadError<StateTKindPartial<F, S>, E> {
+    override fun MF(): MonadError<F, E>
+
+    override fun <A> raiseError(e: E): HK<StateTKindPartial<F, S>, A> = StateT.lift(MF().raiseError(e), MF())
 
     override fun <A> handleErrorWith(fa: HK<StateTKindPartial<F, S>, A>, f: (E) -> HK<StateTKindPartial<F, S>, A>): StateT<F, S, A> =
-            StateT(F(), F().pure({ s -> F().handleErrorWith(fa.runM(s), { e -> f(e).runM(s) }) }))
+            StateT(MF().pure({ s -> MF().handleErrorWith(fa.runM(s, MF()), { e -> f(e).runM(s, MF()) }) }))
 }
+
+object StateTMonadErrorImplicits {
+    @JvmStatic
+    fun <F, S, E> instance(ME: MonadError<F, E>): StateTMonadErrorInstance<F, S, E> = object : StateTMonadErrorInstance<F, S, E> {
+        override fun FF(): Functor<F> = ME
+        override fun MF(): MonadError<F, E> = ME
+    }
+}
+

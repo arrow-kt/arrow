@@ -44,7 +44,7 @@ class StateTTests : UnitSpec() {
                 { StateT.lift(ListKW.pure({ s: Int -> s * 2 }), ListKW.monad()) },
                 object : Eq<HK<StateTKindPartial<ListKWHK, Int>, Int>> {
                     override fun eqv(a: HK<StateTKindPartial<ListKWHK, Int>, Int>, b: HK<StateTKindPartial<ListKWHK, Int>, Int>): Boolean =
-                            a.runM(1) == b.runM(1)
+                            a.runM(1, ListKW.monad()) == b.runM(1, ListKW.monad())
                 }))
 
     }
