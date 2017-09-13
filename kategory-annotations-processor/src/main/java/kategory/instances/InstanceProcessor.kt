@@ -41,6 +41,7 @@ class InstanceProcessor : AbstractProcessor() {
     }
 
     private fun processClass(element: TypeElement): AnnotatedInstance {
+        knownError("test")
         val proto: ClassOrPackageDataWrapper.Class = getClassOrPackageDataWrapper(element) as ClassOrPackageDataWrapper.Class
         return AnnotatedInstance(element, proto)
     }

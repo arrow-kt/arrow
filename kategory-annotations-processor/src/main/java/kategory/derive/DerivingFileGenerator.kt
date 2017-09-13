@@ -4,7 +4,6 @@ import kategory.common.utils.ClassOrPackageDataWrapper
 import kategory.common.utils.extractFullName
 import kategory.higherkinds.HKMarkerPostFix
 import kategory.higherkinds.KindPostFix
-import kategory.instances.removeBackticks
 import me.eugeniomarletti.kotlin.metadata.modality
 import org.jetbrains.kotlin.serialization.ProtoBuf
 import java.io.File
