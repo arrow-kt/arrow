@@ -5,7 +5,7 @@ test {
 }
 
 dependencies {
-    compile project(':kategory')
+    compile project(':kategory-core')
     compile project(':kategory-effects')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
