@@ -5,13 +5,11 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kategory.Eq
 import kategory.LensLaws
-import kategory.NonEmptyList
 import kategory.Option
 import kategory.Try
 import kategory.Tuple2
 import kategory.UnitSpec
 import kategory.applicative
-import kategory.genEither
 import kategory.genFunctionAToB
 import kategory.left
 import kategory.right
@@ -39,14 +37,6 @@ class LensTest : UnitSpec() {
                         EQA = Eq.any(),
                         EQB = Eq.any(),
                         FA = Try.applicative()
-                ) + LensLaws.laws(
-                        lens = Lens.codiagonal(),
-                        aGen = genEither(Gen.string(), Gen.string()),
-                        bGen = Gen.string(),
-                        funcGen = genFunctionAToB(Gen.string()),
-                        EQA = Eq.any(),
-                        EQB = Eq.any(),
-                        FA = NonEmptyList.applicative()
                 )
         )
 

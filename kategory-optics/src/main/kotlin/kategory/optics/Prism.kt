@@ -149,7 +149,9 @@ abstract class Prism<A, B> {
             this::set
     )
 
-    /** compose a [Prism] with a [Optional] */
+    /**
+     * Compose a [Prism] with a [Optional]
+     */
     infix fun <C> composeOptional(other: Optional<B, C>): Optional<A, C> =
             asOptional() composeOptional other
 
@@ -157,6 +159,8 @@ abstract class Prism<A, B> {
      * Plus operator overload to compose lenses
      */
     operator fun <C> plus(other: Prism<B, C>): Prism<A, C> = composePrism(other)
+
+    operator fun <C> plus(other: Optional<B, C>): Optional<A, C> = composeOptional(other)
 
     operator fun <C> plus(other: Iso<B, C>): Prism<A, C> = composeIso(other)
 

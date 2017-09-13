@@ -3,7 +3,18 @@ package kategory.optics
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kategory.*
+import kategory.Either
+import kategory.Eq
+import kategory.IsoLaws
+import kategory.LensLaws
+import kategory.NonEmptyList
+import kategory.Option
+import kategory.PrismLaws
+import kategory.StringMonoidInstance
+import kategory.UnitSpec
+import kategory.applicative
+import kategory.genFunctionAToB
+import kategory.toT
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -24,7 +35,7 @@ class IsoTest : UnitSpec() {
                         funcGen = genFunctionAToB(Gen.string()),
                         EQA = Eq.any(),
                         EQB = Eq.any(),
-                        FA = Try.applicative()
+                        FA = NonEmptyList.applicative()
                 ) + PrismLaws.laws(
                         prism = aIso.asPrism(),
                         aGen = AGen,
