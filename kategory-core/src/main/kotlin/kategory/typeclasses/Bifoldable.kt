@@ -1,6 +1,6 @@
 package kategory
 
-interface Bifoldable<in F> : Typeclass {
+interface Bifoldable<F> : Typeclass {
 
     fun <A, B, C> bifoldLeft(fab: HK2<F, A, B>, c: C, f: (C, A) -> C, g: (C, B) -> C): C
 
