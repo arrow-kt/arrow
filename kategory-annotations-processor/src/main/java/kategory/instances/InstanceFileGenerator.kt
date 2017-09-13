@@ -2,8 +2,14 @@ package kategory.instances
 
 import java.io.File
 import kategory.common.Package
+import kategory.common.utils.ClassOrPackageDataWrapper
+import kategory.common.utils.extractFullName
+import kategory.common.utils.removeBackticks
 import me.eugeniomarletti.kotlin.metadata.modality
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.ProtoBuf
+import org.jetbrains.kotlin.serialization.deserialization.TypeTable
+import org.jetbrains.kotlin.serialization.deserialization.supertypes
 
 data class Instance(
         val `package`: Package,
@@ -21,11 +27,48 @@ data class Instance(
                     postfix = ">"
             )
 
-    val abstractFunctions: List<ProtoBuf.Function> = target.classOrPackageProto.functionList.filter {
-        it.modality == ProtoBuf.Modality.ABSTRACT
+    private val abstractFunctions: List<Pair<ClassOrPackageDataWrapper, ProtoBuf.Function>> = try {
+        (target.superTypes + listOf(target.classOrPackageProto)).flatMap { tc ->
+            tc.functionList.filter { it.modality == ProtoBuf.Modality.ABSTRACT }.flatMap {
+                val retType = target.processor.elementUtils.getTypeElement(
+                        it.returnType.extractFullName(tc, failOnGeneric = false).removeBackticks().substringBefore("<")
+                )
+                if (retType != null) {
+                    val current = target.processor.getClassOrPackageDataWrapper(retType) as ClassOrPackageDataWrapper.Class
+                    val typeTable = TypeTable(current.classProto.typeTable)
+                    val isTypeClassReturnType = current.classProto.supertypes(typeTable).any {
+                        val typeName = it.extractFullName(current, failOnGeneric = false)
+                        typeName == "`kategory`.`Typeclass`"
+                    }
+                    if (isTypeClassReturnType)
+                        listOf(tc to it)
+                    else
+                        emptyList()
+                } else {
+                    emptyList()
+                }
+            }
+        }
+    } catch (e: Throwable) {
+        throw e
     }
 
-    val factoryArgs: List<String> = emptyList()
+    val args: List<Pair<Name, String>> = abstractFunctions.map { (tc, func) ->
+        val name = tc.nameResolver.getName(func.name)
+        val retType = func.returnType.extractFullName(tc, failOnGeneric = false)
+        name to retType.removeBackticks()
+    }
+
+    val expandedArgs: String = args.joinToString(separator = ", ", transform = {
+        "${it.first}: ${it.second}"
+    })
+
+    val targetImplementations = args.joinToString(
+            separator = "\n\n",
+            transform = {
+                "override fun ${it.first}(): ${it.second} = ${it.first}"
+            }
+    )
 
 }
 
@@ -50,9 +93,9 @@ class InstanceFileGenerator(
 
     private fun genImplicitObject(i: Instance): String = """
             |object ${i.implicitObjectName} {
-            |  @JvmStatic fun ${i.expandedTypeArgs} instance(${i.factoryArgs}): ${i.name}${i.expandedTypeArgs} =
+            |  @JvmStatic fun ${i.expandedTypeArgs} instance(${i.expandedArgs}): ${i.name}${i.expandedTypeArgs} =
             |    object : ${i.name}${i.expandedTypeArgs} {
-            |
+            |      ${i.targetImplementations}
             |    }
             |}
             |""".trimMargin()

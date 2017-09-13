@@ -1,6 +1,5 @@
 package kategory
 
-@instance
 interface OptionSemigroupInstance<A> : Semigroup<Option<A>> {
 
     fun SG(): Semigroup<A>

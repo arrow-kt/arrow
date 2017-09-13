@@ -13,6 +13,7 @@ object WriterTFunctorInstanceImplicits {
     }
 }
 
+@instance
 interface WriterTApplicativeInstance<F, W> : Applicative<WriterTKindPartial<F, W>>, WriterTFunctorInstance<F, W> {
 
     fun MF(): Monad<F>
@@ -29,14 +30,14 @@ interface WriterTApplicativeInstance<F, W> : Applicative<WriterTKindPartial<F, W
             fa.ev().map({ f(it) }, FF())
 }
 
-object WriterTApplicativeInstanceImplicits {
-    @JvmStatic
-    fun <F, W> instance(MF: Monad<F>, MW: Monoid<W>): WriterTApplicativeInstance<F, W> = object : WriterTApplicativeInstance<F, W> {
-        override fun FF(): Functor<F> = MF
-        override fun MF(): Monad<F> = MF
-        override fun MW(): Monoid<W> = MW
-    }
-}
+//object WriterTApplicativeInstanceImplicits {
+//    @JvmStatic
+//    fun <F, W> instance(MF: Monad<F>, MW: Monoid<W>): WriterTApplicativeInstance<F, W> = object : WriterTApplicativeInstance<F, W> {
+//        override fun FF(): Functor<F> = MF
+//        override fun MF(): Monad<F> = MF
+//        override fun MW(): Monoid<W> = MW
+//    }
+//}
 
 interface WriterTMonadInstance<F, W> : WriterTApplicativeInstance<F, W>, Monad<WriterTKindPartial<F, W>> {
     override fun <A, B> flatMap(fa: WriterTKind<F, W, A>, f: (A) -> HK<WriterTKindPartial<F, W>, B>): WriterT<F, W, B> =

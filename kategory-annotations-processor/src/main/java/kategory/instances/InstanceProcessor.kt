@@ -4,7 +4,7 @@ import com.google.auto.service.AutoService
 import kategory.common.utils.AbstractProcessor
 import kategory.common.utils.ClassOrPackageDataWrapper
 import kategory.common.utils.knownError
-import kategory.implicits.implicitAnnotationClass
+import org.jetbrains.kotlin.serialization.deserialization.TypeTable
 import java.io.File
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
@@ -19,7 +19,7 @@ class InstanceProcessor : AbstractProcessor() {
 
     override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
-    override fun getSupportedAnnotationTypes(): Set<String> = setOf(implicitAnnotationClass.canonicalName)
+    override fun getSupportedAnnotationTypes(): Set<String> = setOf(instanceAnnotationClass.canonicalName)
 
     /**
      * Processor entry point
@@ -35,15 +35,16 @@ class InstanceProcessor : AbstractProcessor() {
                 }
 
         if (roundEnv.processingOver()) {
-            val generatedDir = File(this.generatedDir!!, implicitAnnotationClass.simpleName).also { it.mkdirs() }
+            val generatedDir = File(this.generatedDir!!, instanceAnnotationClass.simpleName).also { it.mkdirs() }
             InstanceFileGenerator(generatedDir, annotatedList).generate()
         }
     }
 
     private fun processClass(element: TypeElement): AnnotatedInstance {
-        knownError("test")
         val proto: ClassOrPackageDataWrapper.Class = getClassOrPackageDataWrapper(element) as ClassOrPackageDataWrapper.Class
-        return AnnotatedInstance(element, proto)
+        val typeTable = TypeTable(proto.classProto.typeTable)
+        val superTypes: List<ClassOrPackageDataWrapper> = recurseTypeclassInterfaces(proto, typeTable, emptyList())
+        return AnnotatedInstance(element, proto, superTypes, this)
     }
 
 }
