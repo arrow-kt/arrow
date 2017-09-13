@@ -19,6 +19,23 @@
     // Sidebar nav
     $(document).ready(function() {
         var speed = 300;
+
+        // Touch interactions
+        var sidebarWrapperEl = document.getElementById('sidebar-wrapper');
+        // create a simple instance, by default it only adds horizontal recognizers
+        if (sidebarWrapperEl) {
+          var sidebarWrapperTouch = new Hammer(sidebarWrapperEl);
+          // listen to events...
+          sidebarWrapperTouch.on("swiperight", function(ev) {
+              ev.preventDefault()
+              $("#wrapper").addClass("toggled");
+          });
+          sidebarWrapperTouch.on("swipeleft", function(ev) {
+              ev.preventDefault()
+              $("#wrapper").removeClass("toggled");
+          });
+        }
+
         $('.sidebar-nav > li > a').click(function(e) {
             e.preventDefault();
             if (!$(this).parent().hasClass('active')) {
