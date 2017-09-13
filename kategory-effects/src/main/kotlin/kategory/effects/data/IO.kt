@@ -5,15 +5,21 @@ import kategory.effects.data.internal.Platform.onceOnly
 import kategory.effects.data.internal.Platform.unsafeResync
 import kategory.effects.data.internal.error
 
-@higherkind sealed class IO<out A> : IOKind<A> {
+@higherkind
+@deriving(
+        Functor::class,
+        Applicative::class,
+        Monad::class,
+        AsyncContext::class)
+sealed class IO<out A> : IOKind<A> {
 
     abstract fun <B> map(f: (A) -> B): IO<B>
 
-    fun <B> flatMap(f: (A) -> IO<B>): IO<B> =
+    fun <B> flatMap(f: (A) -> IOKind<B>): IO<B> =
             flatMapTotal(
                     AndThen {
                         try {
-                            f(it)
+                            f(it).ev()
                         } catch (error: Throwable) {
                             RaiseError<B>(error)
                         }
@@ -27,7 +33,7 @@ import kategory.effects.data.internal.error
 
     fun unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit = unsafeStep().unsafeRunAsyncTotal(cb)
 
-    abstract fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit)
+    internal abstract fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit)
 
     @Suppress("UNCHECKED_CAST")
     fun unsafeStep(): IO<A> {
@@ -47,16 +53,22 @@ import kategory.effects.data.internal.error
         }
     }
 
-    fun unsafeRunSync(): A = unsafeRunTimed(Duration.INFINITE).fold({ throw IllegalArgumentException("IO execution should yield a valid result") }, { it })
+    fun unsafeRunSync(): A =
+            unsafeRunTimed(Duration.INFINITE).fold({ throw IllegalArgumentException("IO execution should yield a valid result") }, { it })
 
     fun unsafeRunTimed(limit: Duration): Option<A> = unsafeStep().unsafeRunTimedTotal(limit)
 
-    abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
+    internal abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
 
-    companion object : IOInstances, GlobalInstance<Monad<IOHK>>() {
+    companion object {
+        fun <A> pure(a: A): IO<A> = Pure(a)
+
+        fun <A> raiseError(e: Throwable): IO<A> = RaiseError(e)
+
         internal fun <A, B> mapDefault(t: IO<A>, f: (A) -> B): IO<B> = t.flatMap(f.andThen { Pure(it) })
 
-        internal fun <A> attemptValue(): AndThen<A, IO<Either<Throwable, A>>> = AndThen({ a: A -> Pure(Either.Right(a)) }, { e -> Pure(Either.Left(e)) })
+        internal fun <A> attemptValue(): AndThen<A, IO<Either<Throwable, A>>> =
+                AndThen({ a: A -> Pure(Either.Right(a)) }, { e -> Pure(Either.Left(e)) })
 
         operator fun <A> invoke(f: () -> A): IO<A> = suspend { Pure(f()) }
 
@@ -69,7 +81,7 @@ import kategory.effects.data.internal.error
                     }
                 })
 
-        fun <A> async(k: ((Either<Throwable, A>) -> Unit) -> Unit): IO<A> =
+        fun <A> runAsync(k: Proc<A>): IO<A> =
                 Async { ff: (Either<Throwable, A>) -> Unit ->
                     onceOnly(ff).let { callback: (Either<Throwable, A>) -> Unit ->
                         try {
@@ -89,23 +101,19 @@ import kategory.effects.data.internal.error
                     else -> invoke { eval.value() }
                 }
 
-        fun functor(): Functor<IOHK> = this
+        fun <A, B> tailRecM(a: A, f: (A) -> IOKind<Either<A, B>>): IO<B> =
+                f(a).ev().flatMap {
+                    when (it) {
+                        is Either.Left -> tailRecM(it.a, f)
+                        is Either.Right -> IO.pure(it.b)
+                    }
+                }
 
-        fun applicative(): Applicative<IOHK> = this
+        fun monadError(): IOMonadErrorInstance = IOMonadErrorInstanceImplicits.instance()
 
-        fun monad(): Monad<IOHK> = this
+        inline fun <reified A> semigroup(SG: Semigroup<A> = kategory.semigroup()): IOSemigroupInstance<A> = IOSemigroupInstanceImplicits.instance(SG)
 
-        fun monadError(): MonadError<IOHK, Throwable> = this
-
-        fun asyncContext(): AsyncContext<IOHK> = this
-
-        fun <A> semigroup(SG: Semigroup<A>): IOSemigroup<A> = object : IOSemigroup<A> {
-            override fun SG(): Semigroup<A> = SG
-        }
-
-        fun <A> monoid(SM: Monoid<A>): IOMonoid<A> = object : IOMonoid<A> {
-            override fun SM(): Monoid<A> = SM
-        }
+        inline fun <reified A> monoid(SM: Monoid<A> = kategory.monoid()): IOMonoidInstance<A> = IOMonoidInstanceImplicits.instance(SM)
     }
 }
 
@@ -163,7 +171,7 @@ internal data class BindSuspend<E, out A>(val cont: AndThen<Unit, IO<E>>, val f:
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
 }
 
-internal data class Async<out A>(val cont: ((Either<Throwable, A>) -> Unit) -> Unit) : IO<A>() {
+internal data class Async<out A>(val cont: Proc<A>) : IO<A>() {
     override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
 
     override fun <B> flatMapTotal(f: AndThen<A, IO<B>>): IO<B> = BindAsync(cont, f)
@@ -197,5 +205,11 @@ internal data class BindAsync<E, out A>(val cont: ((Either<Throwable, E>) -> Uni
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
 }
+
+fun <A, B> IO<A>.ap(ff: kategory.IOKind<(A) -> B>): IO<B> =
+        flatMap { a -> ff.ev().map({ it(a) }) }
+
+fun <A> IO<A>.handleErrorWith(f: (Throwable) -> IOKind<A>): IO<A> =
+        attempt().flatMap { it.ev().fold(f, { IO.pure(it) }).ev() }
 
 fun <A> A.liftIO(): IO<A> = IO.pure(this)

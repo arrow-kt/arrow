@@ -29,7 +29,7 @@ object TraverseLaws {
     */
 
     inline fun <reified F> laws(TF: Traverse<F> = traverse<F>(), FF: Functor<F> = functor<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): List<Law> =
-            FoldableLaws.laws(TF, cf, Eq.any()) + FunctorLaws.laws(FF, cf, EQ) + listOf(
+            FoldableLaws.laws(TF, cf, eq<Int>()) + FunctorLaws.laws(FF, cf, EQ) + listOf(
                     Law("Traverse Laws: Identity", { identityTraverse(TF, FF, cf, EQ) }),
                     Law("Traverse Laws: Sequential composition", { sequentialComposition(TF, cf, EQ) }),
                     Law("Traverse Laws: Parallel composition", { parallelComposition(TF, cf, EQ) }),
@@ -64,9 +64,8 @@ object TraverseLaws {
 
                 }
 
-                val TIEQ: Eq<TI<HK<F, Int>>> = object : Eq<TI<HK<F, Int>>> {
-                    override fun eqv(a: TI<HK<F, Int>>, b: TI<HK<F, Int>>): Boolean =
-                            EQ.eqv(a.a.value(), b.a.value()) && EQ.eqv(a.b.value(), b.b.value())
+                val TIEQ: Eq<TI<HK<F, Int>>> = Eq<TI<HK<F, Int>>> { a, b ->
+                    EQ.eqv(a.a.value(), b.a.value()) && EQ.eqv(a.b.value(), b.b.value())
                 }
 
                 val seen: TI<HK<F, Int>> = FT.traverse(fha, { TIC(f(it) toT g(it)) }, TIA).ev().ti
