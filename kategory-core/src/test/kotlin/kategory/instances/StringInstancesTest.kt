@@ -3,7 +3,6 @@ package kategory.instances
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import kategory.*
-import kategory.laws.FunctorFilterLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

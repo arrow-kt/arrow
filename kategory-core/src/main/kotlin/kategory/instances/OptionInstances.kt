@@ -1,16 +1,19 @@
 package kategory
 
+import kategory.Option.None
+import kategory.Option.Some
+
 interface OptionSemigroupInstance<A> : Semigroup<Option<A>> {
 
     fun SG(): Semigroup<A>
 
     override fun combine(a: Option<A>, b: Option<A>): Option<A> =
             when (a) {
-                is Option.Some<A> -> when (b) {
-                    is Option.Some<A> -> Option.Some(SG().combine(a.value, b.value))
-                    is Option.None -> b
+                is Some<A> -> when (b) {
+                    is Some<A> -> Some(SG().combine(a.value, b.value))
+                    is None -> b
                 }
-                is Option.None -> a
+                is None -> a
             }
 }
 

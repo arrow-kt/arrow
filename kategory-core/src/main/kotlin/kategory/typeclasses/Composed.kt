@@ -1,7 +1,5 @@
 package kategory
 
-import kategory.typeclasses.Alternative
-
 /**
  * https://www.youtube.com/watch?v=wvSP5qYiz4Y
  */
@@ -11,7 +9,13 @@ interface ComposedType<out F, out G>
 fun <F, G, A> HK<F, HK<G, A>>.lift(): HK<ComposedType<F, G>, A> = this as HK<ComposedType<F, G>, A>
 
 @Suppress("UNCHECKED_CAST")
+fun <F, G, A, B> HK2<F, HK2<G, A, B>, HK2<G, A, B>>.liftB(): HK2<ComposedType<F, G>, A, B> = this as HK2<ComposedType<F, G>, A, B>
+
+@Suppress("UNCHECKED_CAST")
 fun <F, G, A> HK<ComposedType<F, G>, A>.lower(): HK<F, HK<G, A>> = this as HK<F, HK<G, A>>
+
+@Suppress("UNCHECKED_CAST")
+fun <F, G, A, B> HK2<ComposedType<F, G>, A, B>.lowerB(): HK2<F, HK2<G, A, B>, HK2<G, A, B>> = this as HK2<F, HK2<G, A, B>, HK2<G, A, B>>
 
 interface ComposedFoldable<F, G> :
         Foldable<ComposedType<F, G>> {
@@ -219,3 +223,36 @@ interface ComposedFunctorFilter<F, G> : FunctorFilter<ComposedType<F, G>>, Compo
 
 inline fun <reified F, reified G> Functor<F>.composeFilter(FFG: FunctorFilter<G> = functorFilter()):
         FunctorFilter<ComposedType<F, G>> = ComposedFunctorFilter(this, FFG)
+
+interface ComposedBifoldable<F, G> : Bifoldable<ComposedType<F, G>> {
+    fun F(): Bifoldable<F>
+
+    fun G(): Bifoldable<G>
+
+    override fun <A, B, C> bifoldLeft(fab: HK2<ComposedType<F, G>, A, B>, c: C, f: (C, A) -> C, g: (C, B) -> C): C =
+            F().bifoldLeft(fab.lowerB(), c,
+                    { cc: C, gab: HK2<G, A, B> -> G().bifoldLeft(gab, cc, f, g) },
+                    { cc: C, gab: HK2<G, A, B> -> G().bifoldLeft(gab, cc, f, g) })
+
+    override fun <A, B, C> bifoldRight(fab: HK2<ComposedType<F, G>, A, B>, c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
+            F().bifoldRight(fab.lowerB(), c,
+                    { gab: HK2<G, A, B>, cc: Eval<C> -> G().bifoldRight(gab, cc, f, g) },
+                    { gab: HK2<G, A, B>, cc: Eval<C> -> G().bifoldRight(gab, cc, f, g) })
+
+    fun <A, B, C> bifoldLeftC(fab: HK2<F, HK2<G, A, B>, HK2<G, A, B>>, c: C, f: (C, A) -> C, g: (C, B) -> C): C =
+            bifoldLeft(fab.liftB(), c, f, g)
+
+    fun <A, B, C> bifoldRightC(fab: HK2<F, HK2<G, A, B>, HK2<G, A, B>>, c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
+            bifoldRight(fab.liftB(), c, f, g)
+
+    companion object {
+        operator fun <F, G> invoke(BF: Bifoldable<F>, BG: Bifoldable<G>): ComposedBifoldable<F, G> =
+                object : ComposedBifoldable<F, G> {
+                    override fun F(): Bifoldable<F> = BF
+
+                    override fun G(): Bifoldable<G> = BG
+                }
+    }
+}
+
+inline fun <reified F, reified G> Bifoldable<F>.compose(BG: Bifoldable<G> = bifoldable()): Bifoldable<ComposedType<F, G>> = ComposedBifoldable(this, BG)

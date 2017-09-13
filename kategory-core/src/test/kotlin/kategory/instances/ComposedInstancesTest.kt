@@ -2,7 +2,6 @@ package kategory.instances
 
 import io.kotlintest.KTestJUnitRunner
 import kategory.*
-import kategory.laws.FunctorFilterLaws
 import org.junit.runner.RunWith
 
 typealias OptionTNel = HK<OptionTKindPartial<NonEmptyListHK>, Int>

@@ -47,6 +47,12 @@ inline fun <F, A> genConstructor(valueGen: Gen<A>, crossinline cf: (A) -> HK<F, 
                     cf(valueGen.generate())
         }
 
+inline fun <F, A, B> genConstructor2(valueGen: Gen<A>, crossinline ff: (A) -> HK<F, (A) -> B>): Gen<HK<F, (A) -> B>> =
+        object : Gen<HK<F, (A) -> B>> {
+            override fun generate(): HK<F, (A) -> B> =
+                    ff(valueGen.generate())
+        }
+
 fun genIntSmall(): Gen<Int> =
         Gen.oneOf(Gen.negativeIntegers(), Gen.choose(0, Int.MAX_VALUE / 10000))
 

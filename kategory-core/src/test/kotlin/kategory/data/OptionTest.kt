@@ -6,7 +6,6 @@ import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
 import kategory.Option.None
 import kategory.Option.Some
-import kategory.laws.MonadFilterLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -39,7 +38,7 @@ class OptionTest : UnitSpec() {
                                         })
                             })
         }
-        
+
         //testLaws(MonadErrorLaws.laws(monadError<OptionHK, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
         testLaws(TraverseLaws.laws(Option.traverse(), Option.monad(), ::Some, Eq.any()))
         testLaws(MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()))
