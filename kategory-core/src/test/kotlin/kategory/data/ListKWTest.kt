@@ -1,6 +1,7 @@
 package kategory
 
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldNot
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 
@@ -19,6 +20,10 @@ class ListKWTest : UnitSpec() {
             semigroupK<ListKWHK>() shouldNotBe null
             semigroup<ListKW<Int>>() shouldNotBe null
             monoid<ListKW<Int>>() shouldNotBe null
+            monoidK<ListKW<Int>>() shouldNotBe null
+            monadCombine<ListKW<Int>>() shouldNotBe null
+            functorFilter<ListKW<Int>>() shouldNotBe null
+            monadFilter<ListKW<Int>>() shouldNotBe null
         }
 
         testLaws(MonadLaws.laws(ListKW.monad(), Eq.any()))
