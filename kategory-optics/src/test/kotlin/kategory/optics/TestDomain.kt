@@ -1,6 +1,7 @@
 package kategory.optics
 
 import io.kotlintest.properties.Gen
+import kategory.Option
 import kategory.left
 import kategory.right
 
@@ -60,4 +61,9 @@ internal object UserGen : Gen<User> {
 internal val userLens: Lens<User, Token> = Lens(
         { user: User -> user.token },
         { token: Token -> { user: User -> user.copy(token = token) } }
+)
+
+internal val optionalHead = Optional<List<Int>, Int>(
+        { Option.fromNullable(it.firstOrNull()) },
+        { int -> { list -> listOf(int) + if (list.size > 1) list.drop(1) else emptyList() } }
 )
