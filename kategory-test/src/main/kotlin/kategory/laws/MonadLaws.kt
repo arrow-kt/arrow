@@ -30,12 +30,12 @@ object MonadLaws {
 
     inline fun <reified F> kleisliLeftIdentity(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(genFunctionAToB<Int, HK<F, Int>>(genApplicative(Gen.int(), M)), Gen.int(), { f: (Int) -> HK<F, Int>, a: Int ->
-                (Kleisli({ n: Int -> M.pure(n) }, M) andThen Kleisli(f, M)).run(a).equalUnderTheLaw(f(a), EQ)
+                (Kleisli({ n: Int -> M.pure(n) }).andThen(Kleisli(f), M).run(a).equalUnderTheLaw(f(a), EQ))
             })
 
     inline fun <reified F> kleisliRightIdentity(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(genFunctionAToB<Int, HK<F, Int>>(genApplicative(Gen.int(), M)), Gen.int(), { f: (Int) -> HK<F, Int>, a: Int ->
-                (Kleisli(f, M) andThen Kleisli({ n: Int -> M.pure(n) }, M)).run(a).equalUnderTheLaw(f(a), EQ)
+                (Kleisli(f).andThen(Kleisli({ n: Int -> M.pure(n) }), M).run(a).equalUnderTheLaw(f(a), EQ))
             })
 
     inline fun <reified F> mapFlatMapCoherence(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
