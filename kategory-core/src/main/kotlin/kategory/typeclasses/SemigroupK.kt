@@ -16,4 +16,4 @@ interface SemigroupK<F> : Typeclass {
     }
 }
 
-inline fun <reified F> semigroupK(): SemigroupK<F> = instance(InstanceParametrizedType(SemigroupK::class.java, listOf(F::class.java)))
+inline fun <reified F> semigroupK(): SemigroupK<F> = instance(InstanceParametrizedType(SemigroupK::class.java, listOf(typeLiteral<F>())))

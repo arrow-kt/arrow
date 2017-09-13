@@ -12,7 +12,7 @@ import kategory.Eval.Companion.always
  *
  * Beyond these it provides many other useful methods related to folding over F<A> values.
  */
-interface Foldable<in F> : Typeclass {
+interface Foldable<F> : Typeclass {
 
     /**
      * Left associative fold on F using the provided function.
@@ -172,7 +172,7 @@ inline fun <F, A> Foldable<F>.get(fa: HK<F, A>, idx: Long): Option<A> {
 inline fun <F, reified G, A, B> Foldable<F>.foldM(fa: HK<F, A>, z: B, crossinline f: (B, A) -> HK<G, B>, MG: Monad<G> = monad()): HK<G, B> =
         foldL(fa, MG.pure(z), { gb, a -> MG.flatMap(gb) { f(it, a) } })
 
-inline fun <reified F> foldable(): Foldable<F> = instance(InstanceParametrizedType(Foldable::class.java, listOf(F::class.java)))
+inline fun <reified F> foldable(): Foldable<F> = instance(InstanceParametrizedType(Foldable::class.java, listOf(typeLiteral<F>())))
 
 /**
  * The size of this Foldable.

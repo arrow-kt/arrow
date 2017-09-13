@@ -156,4 +156,4 @@ fun <F, B> Monad<F>.bindingStackSafe(coroutineContext: CoroutineContext = EmptyC
     return continuation.returnedMonad()
 }
 
-inline fun <reified F> monad(): Monad<F> = instance(InstanceParametrizedType(Monad::class.java, listOf(F::class.java)))
+inline fun <reified F> monad(): Monad<F> = instance(InstanceParametrizedType(Monad::class.java, listOf(typeLiteral<F>())))

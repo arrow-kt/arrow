@@ -33,22 +33,19 @@ typealias ValidatedNel<E, A> = Validated<NonEmptyList<E>, A>
                         { Valid(it) }
                 )
 
-        inline fun <reified E> instances(SE: Semigroup<E> = semigroup<E>()): ValidatedInstances<E> = object : ValidatedInstances<E> {
-            override fun SE(): Semigroup<E> = SE
+        fun <E> functor(): ValidatedFunctorInstance<E> = ValidatedFunctorInstanceImplicits.instance()
 
-        }
+        inline fun <reified E> applicative(SE: Semigroup<E> = semigroup<E>()): ValidatedApplicativeInstance<E> =
+                ValidatedApplicativeInstanceImplicits.instance(SE)
 
-        inline fun <reified E> functor(SE: Semigroup<E> = semigroup<E>()): Functor<ValidatedKindPartial<E>> = instances(SE)
+        fun <E> foldable(): ValidatedFoldableInstance<E> =
+                ValidatedFoldableInstanceImplicits.instance()
 
-        inline fun <reified E> applicative(SE: Semigroup<E> = semigroup<E>()): Applicative<ValidatedKindPartial<E>> = instances(SE)
+        fun <E> traverse(): ValidatedTraverseInstance<E> =
+                ValidatedTraverseInstanceImplicits.instance()
 
-        inline fun <reified E> foldable(SE: Semigroup<E> = semigroup<E>()): Foldable<ValidatedKindPartial<E>> = instances(SE)
-
-        inline fun <reified E> traverse(SE: Semigroup<E> = semigroup<E>()): Traverse<ValidatedKindPartial<E>> = instances(SE)
-
-        inline fun <reified A> semigroupK(SGK: Semigroup<A> = kategory.semigroup<A>()): ValidatedSemigroupK<A> = object : ValidatedSemigroupK<A> {
-            override fun F(): Semigroup<A> = SGK
-        }
+        inline fun <reified E> semigroupK(SGK: Semigroup<E> = kategory.semigroup<E>()): ValidatedSemigroupKInstance<E> =
+                ValidatedSemigroupKInstanceImplicits.instance(SGK)
     }
 
     data class Valid<out A>(val a: A) : Validated<Nothing, A>()
@@ -176,6 +173,39 @@ fun <E, A, B> Validated<E, A>.ap(f: Validated<E, (A) -> B>, SE: Semigroup<E>): V
                 f.fold({ Validated.Invalid(SE.combine(it, e)) }, { Validated.Invalid(e) })
             }
         }
+
+fun <E, A> Validated<E, A>.handleLeftWith(f: (E) -> ValidatedKind<E, A>): Validated<E, A> =
+        fold({ f(it).ev() }, { Validated.Valid(it) })
+
+fun <E, A, B> Validated<E, A>.foldL(b: B, f: (B, A) -> B): B =
+        when (this) {
+            is Validated.Valid -> f(b, this.a)
+            is Validated.Invalid -> b
+        }
+
+fun <E, A, B> Validated<E, A>.foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+        when (this) {
+            is Validated.Valid -> f(this.a, lb)
+            is Validated.Invalid -> lb
+        }
+
+fun <G, E, A, B> Validated<E, A>.traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, Validated<E, B>> =
+        when (this) {
+            is Validated.Valid -> GA.map(f(this.a), { Validated.Valid(it) })
+            is Validated.Invalid -> GA.pure(this)
+        }
+
+fun <E, A> Validated<E, A>.combineK(y: ValidatedKind<E, A>, SE: Semigroup<E>): Validated<E, A> {
+    val xev = this
+    val yev = y.ev()
+    return when (xev) {
+        is Validated.Valid -> xev
+        is Validated.Invalid -> when (yev) {
+            is Validated.Invalid -> Validated.Invalid(SE.combine(xev.e, yev.e))
+            is Validated.Valid -> yev
+        }
+    }
+}
 
 fun <E, A> A.valid(): Validated<E, A> = Validated.Valid(this)
 

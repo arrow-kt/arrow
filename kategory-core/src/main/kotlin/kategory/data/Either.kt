@@ -41,6 +41,22 @@ package kategory
         is Left<A, B> -> fa(a)
     }
 
+    fun <C> foldL(b: C, f: (C, B) -> C): C =
+            this.ev().let { either ->
+                when (either) {
+                    is Either.Right -> f(b, either.b)
+                    is Either.Left -> b
+                }
+            }
+
+    fun <C> foldR(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
+            this.ev().let { either ->
+                when (either) {
+                    is Either.Right -> f(either.b, lb)
+                    is Either.Left -> lb
+                }
+            }
+
     /**
      * If this is a `Left`, then return the left value in `Right` or vice versa.
      *
@@ -121,19 +137,31 @@ package kategory
 
     companion object {
 
-        fun <L> instances(): EitherInstances<L> = object : EitherInstances<L> {}
+        tailrec fun <L, A, B> tailRecM(a: A, f: (A) -> HK<EitherKindPartial<L>, Either<A, B>>): Either<L, B> {
+            val ev: Either<L, Either<A, B>> = f(a).ev()
+            return when (ev) {
+                is Either.Left<L, Either<A, B>> -> ev.a.left()
+                is Either.Right<L, Either<A, B>> -> {
+                    val b: Either<A, B> = ev.b
+                    when (b) {
+                        is Either.Left<A, B> -> tailRecM(b.a, f)
+                        is Either.Right<A, B> -> b.b.right()
+                    }
+                }
+            }
+        }
 
-        fun <L> functor(): Functor<EitherKindPartial<L>> = instances()
+        fun <L> functor(): EitherFunctorInstance<L> = EitherFunctorInstanceImplicits.instance()
 
-        fun <L> applicative(): Applicative<EitherKindPartial<L>> = instances()
+        fun <L> applicative(): EitherApplicativeInstance<L> = EitherApplicativeInstanceImplicits.instance()
 
-        fun <L> monad(): Monad<EitherKindPartial<L>> = instances()
+        fun <L> monad(): EitherMonadInstance<L> = EitherMonadInstanceImplicits.instance()
 
-        fun <L> foldable(): Foldable<EitherKindPartial<L>> = instances()
+        fun <L> foldable(): EitherFoldableInstance<L> = EitherFoldableInstanceImplicits.instance()
 
-        fun <L> traverse(): Traverse<EitherKindPartial<L>> = instances()
+        fun <L> traverse(): EitherTraverseInstance<L> = EitherTraverseInstanceImplicits.instance()
 
-        fun <L> monadError(): MonadError<EitherKindPartial<L>, L> = instances()
+        fun <L> monadError(): EitherMonadErrorInstance<L> = EitherMonadErrorInstanceImplicits.instance()
 
         fun <L> semigroupK(): SemigroupK<EitherKindPartial<L>> = object : SemigroupK<EitherKindPartial<L>> {
             override fun <A> combineK(x: HK<EitherKindPartial<L>, A>, y: HK<EitherKindPartial<L>, A>): Either<L, A> =
@@ -197,6 +225,17 @@ inline fun <A, B> Either<A, B>.filterOrElse(crossinline predicate: (B) -> Boolea
  * @return `true` if the option has an element that is equal (as determined by `==`) to `elem`, `false` otherwise.
  */
 fun <A, B> Either<A, B>.contains(elem: B): Boolean = fold({ false }, { it == elem })
+
+fun <A, B, C> Either<A, B>.ap(ff: EitherKind<A, (B) -> C>): Either<A, C> = ff.flatMap { f -> map(f) }.ev()
+
+fun <G, A, B, C> Either<A, B>.traverse(f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, Either<A, C>> =
+        this.ev().fold({ GA.pure(it.left()) }, { GA.map(f(it), { Either.Right(it) }) })
+
+fun <A, B> Either<A, B>.combineK(y: EitherKind<A, B>): Either<A, B> =
+        when (this) {
+            is Either.Left -> y.ev()
+            else -> this.ev()
+        }
 
 fun <A> A.left(): Either<A, Nothing> = Either.Left(this)
 

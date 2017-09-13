@@ -328,4 +328,4 @@ fun <HKF, A, B, C, D, E, F, G, H, I, J, Z> Applicative<HKF>.map(
         lbd: (Tuple10<A, B, C, D, E, F, G, H, I, J>) -> Z): HK<HKF, Z> = this.map(a.product(this, b).product(this, c).product(this, d)
         .product(this, e).product(this, f).product(this, g).product(this, h).product(this, i).product(this, j), lbd)
 
-inline fun <reified F> applicative(): Applicative<F> = instance(InstanceParametrizedType(Applicative::class.java, listOf(F::class.java)))
+inline fun <reified F> applicative(): Applicative<F> = instance(InstanceParametrizedType(Applicative::class.java, listOf(typeLiteral<F>())))

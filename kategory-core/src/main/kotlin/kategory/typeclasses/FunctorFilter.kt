@@ -26,4 +26,4 @@ interface FunctorFilter<F> : Functor<F>, Typeclass {
             mapFilter(fa, { a -> if (f(a)) Option.Some(a) else Option.None })
 }
 
-inline fun <reified F> functorFilter(): FunctorFilter<F> = instance(InstanceParametrizedType(FunctorFilter::class.java, listOf(F::class.java)))
+inline fun <reified F> functorFilter(): FunctorFilter<F> = instance(InstanceParametrizedType(FunctorFilter::class.java, listOf(typeLiteral<F>())))

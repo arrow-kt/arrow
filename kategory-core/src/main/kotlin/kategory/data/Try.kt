@@ -7,7 +7,12 @@ package kategory
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Try.scala
  */
 @higherkind
-@deriving(Functor::class, Monad::class, Foldable::class, Traverse::class)
+@deriving(
+        Functor::class,
+        Applicative::class,
+        Monad::class,
+        Foldable::class,
+        Traverse::class)
 sealed class Try<out A> : TryKind<A> {
 
     companion object {
@@ -26,15 +31,15 @@ sealed class Try<out A> : TryKind<A> {
 
         fun <A> raise(e: Throwable): Try<A> = Failure(e)
 
-        fun applicative(): TryMonadInstance = Try.monad()
-
-        fun monadError(): TryMonadError =
-                object : TryMonadError, MonadError<TryHK, Throwable> {}
+        fun monadError(): TryMonadErrorInstance =
+                TryMonadErrorInstanceImplicits.instance()
 
     }
 
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, Try<B>> =
             this.ev().fold({ GA.pure(Try.raise(IllegalStateException())) }, { GA.map(f(it), { Try { it } }) })
+
+    fun <B> ap(ff: TryKind<(A) -> B>): Try<B> = ff.flatMap { f -> map(f) }.ev()
 
     /**
      * Returns the given function applied to the value from this `Success` or returns this if this is a `Failure`.

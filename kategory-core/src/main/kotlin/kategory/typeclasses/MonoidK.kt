@@ -21,4 +21,4 @@ interface MonoidK<F> : SemigroupK<F> {
     }
 }
 
-inline fun <reified F> monoidK(): MonoidK<F> = instance(InstanceParametrizedType(MonoidK::class.java, listOf(F::class.java)))
+inline fun <reified F> monoidK(): MonoidK<F> = instance(InstanceParametrizedType(MonoidK::class.java, listOf(typeLiteral<F>())))

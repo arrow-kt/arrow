@@ -2,6 +2,7 @@ package kategory
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
+import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
 import kategory.Ior.Right
 import org.junit.runner.RunWith
@@ -12,7 +13,15 @@ class IorTest : UnitSpec() {
 
     init {
 
-        val intIorMonad = Ior.monad(IntMonoid)
+        "instances can be resolved implicitly" {
+            functor<IorKindPartial<Int>>() shouldNotBe null
+            applicative<IorKindPartial<Int>>() shouldNotBe null
+            monad<IorKindPartial<Int>>() shouldNotBe null
+            foldable<IorKindPartial<Int>>() shouldNotBe null
+            traverse<IorKindPartial<Int>>() shouldNotBe null
+        }
+
+        val intIorMonad: Monad<IorKindPartial<Int>> = monad()
 
         testLaws(MonadLaws.laws(intIorMonad, Eq.any()))
         testLaws(TraverseLaws.laws(Ior.traverse(), Ior.applicative<Int>(), ::Right, Eq.any()))

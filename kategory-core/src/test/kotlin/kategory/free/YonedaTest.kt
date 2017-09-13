@@ -1,6 +1,7 @@
 package kategory
 
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
@@ -15,6 +16,11 @@ class YonedaTest : UnitSpec() {
     }
 
     init {
+
+        "instances can be resolved implicitly" {
+            functor<YonedaKindPartial<IdHK>>() shouldNotBe null
+        }
+
         testLaws(FunctorLaws.laws(F, { Yoneda.apply(kategory.Id(it)) }, EQ))
 
         "toCoyoneda should convert to an equivalent Coyoneda" {

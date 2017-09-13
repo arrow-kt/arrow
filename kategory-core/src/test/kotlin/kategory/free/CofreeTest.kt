@@ -2,6 +2,7 @@ package kategory
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
+import io.kotlintest.matchers.shouldNotBe
 import kategory.Cofree.Companion.unfold
 import kategory.Option.None
 import kategory.Option.Some
@@ -11,6 +12,12 @@ import org.junit.runner.RunWith
 class CofreeTest : UnitSpec() {
 
     init {
+
+        "instances can be resolved implicitly" {
+            functor<CofreeKindPartial<OptionHK>>() shouldNotBe null
+            comonad<CofreeKindPartial<OptionHK>>() shouldNotBe null
+        }
+
         testLaws(ComonadLaws.laws(Cofree.comonad<OptionHK>(), {
             val sideEffect = SideEffect()
             unfold(sideEffect.counter, {

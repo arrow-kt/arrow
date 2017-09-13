@@ -7,7 +7,13 @@ package kategory
  * are either an instance of $some or the object $none.
  */
 @higherkind
-@deriving(Functor::class, Applicative::class, Monad::class, Foldable::class, Traverse::class, MonadFilter::class)
+@deriving(
+        Functor::class,
+        Applicative::class,
+        Monad::class,
+        Foldable::class,
+        Traverse::class,
+        MonadFilter::class)
 sealed class Option<out A> : OptionKind<A> {
 
     companion object {
@@ -34,11 +40,11 @@ sealed class Option<out A> : OptionKind<A> {
 
         fun <A> empty(): Option<A> = None
 
-        fun <E> monadError(error: E): MonadError<OptionHK, E> = OptionMonadError(error)
+        fun monadError(): OptionMonadErrorInstance = OptionMonadErrorInstanceImplicits.instance()
 
-        fun <A> monoid(SG: Semigroup<A>): OptionMonoid<A> = object : OptionMonoid<A> {
-            override fun SG(): Semigroup<A> = SG
-        }
+        fun <A> semigroup(SG: Semigroup<A>): OptionSemigroupInstance<A> = OptionSemigroupInstanceImplicits.instance(SG)
+
+        fun <A> monoid(SG: Semigroup<A>): OptionMonoidInstance<A> = OptionMonoidInstanceImplicits.instance(SG)
     }
 
     /**

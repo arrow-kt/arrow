@@ -2,12 +2,13 @@ package kategory
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
+import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class CoyonedaTest : UnitSpec() {
-    val F = Coyoneda.functor<IdHK, Int>()
+    val F = functor<CoyonedaKindPartial<IdHK, Int>>()
 
     val EQ = object : Eq<CoyonedaKind<IdHK, Int, Int>> {
         override fun eqv(a: CoyonedaKind<IdHK, Int, Int>, b: CoyonedaKind<IdHK, Int, Int>): Boolean =
@@ -16,6 +17,10 @@ class CoyonedaTest : UnitSpec() {
     }
 
     init {
+
+        "instances can be resolved implicitly" {
+            functor<CoyonedaKindPartial<IdHK, Int>>() shouldNotBe null
+        }
 
         testLaws(FunctorLaws.laws(Coyoneda.functor(), { Coyoneda.apply(Id(0), { it }) }, EQ))
 

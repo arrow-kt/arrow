@@ -3,6 +3,7 @@ package kategory
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
+import io.kotlintest.matchers.shouldNotBe
 import kategory.Validated.Invalid
 import kategory.Validated.Valid
 import org.junit.runner.RunWith
@@ -12,8 +13,16 @@ class ValidatedTest : UnitSpec() {
 
     init {
 
-        testLaws(ApplicativeLaws.laws(Validated.applicative(StringMonoid), Eq.any()))
-        testLaws(TraverseLaws.laws(Validated.traverse(StringMonoid), Validated.applicative(StringMonoid), ::Valid, Eq.any()))
+        "instances can be resolved implicitly" {
+            functor<ValidatedKindPartial<String>>() shouldNotBe null
+            applicative<ValidatedKindPartial<String>>() shouldNotBe null
+            foldable<ValidatedKindPartial<String>>() shouldNotBe null
+            traverse<ValidatedKindPartial<String>>() shouldNotBe null
+            applicativeError<ValidatedKindPartial<String>, String>() shouldNotBe null
+        }
+
+        testLaws(ApplicativeLaws.laws(Validated.applicative(StringMonoidInstance), Eq.any()))
+        testLaws(TraverseLaws.laws(Validated.traverse(), Validated.applicative(StringMonoidInstance), ::Valid, Eq.any()))
         testLaws(SemigroupKLaws.laws(
                 Validated.semigroupK(IntMonoid),
                 Validated.applicative(IntMonoid),
@@ -152,7 +161,7 @@ class ValidatedTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over homogeneous Validated" {
-            Validated.applicative(StringMonoid).map(
+            Validated.applicative(StringMonoidInstance).map(
                     Valid("11th"),
                     Valid("Doctor"),
                     Valid("Who"),
@@ -160,7 +169,7 @@ class ValidatedTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over heterogeneous Validated" {
-            Validated.applicative(StringMonoid).map(
+            Validated.applicative(StringMonoidInstance).map(
                     Valid(13),
                     Valid("Doctor"),
                     Valid(false),
@@ -168,7 +177,7 @@ class ValidatedTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over Invalid Validated" {
-            Validated.applicative(StringMonoid).map(
+            Validated.applicative(StringMonoidInstance).map(
                     Invalid("fail1"),
                     Invalid("fail2"),
                     Valid("Who"),

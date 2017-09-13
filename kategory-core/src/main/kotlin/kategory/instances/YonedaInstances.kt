@@ -1,8 +1,15 @@
 package kategory
 
-interface YonedaInstances<U> : Functor<YonedaKindPartial<U>> {
+interface YonedaFunctorInstance<U> : Functor<YonedaKindPartial<U>> {
 
-    fun FM(): Functor<U>
+    fun FU(): Functor<U>
 
-    override fun <A, B> map(fa: HK<YonedaKindPartial<U>, A>, f: (A) -> B): HK<YonedaKindPartial<U>, B> = fa.ev().map(f, FM())
+    override fun <A, B> map(fa: HK<YonedaKindPartial<U>, A>, f: (A) -> B): Yoneda<U, B> = fa.ev().map(f, FU())
+}
+
+object YonedaFunctorInstanceImplicits {
+    @JvmStatic
+    fun <U> instance(FU: Functor<U>): YonedaFunctorInstance<U> = object : YonedaFunctorInstance<U> {
+        override fun FU(): Functor<U> = FU
+    }
 }

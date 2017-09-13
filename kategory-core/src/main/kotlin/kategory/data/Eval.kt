@@ -28,7 +28,7 @@ package kategory
  * overflows.
  */
 @higherkind
-@deriving(Functor::class, Monad::class)
+@deriving(Functor::class, Applicative::class, Monad::class)
 sealed class Eval<out A> : EvalKind<A> {
 
     abstract fun value(): A
@@ -36,6 +36,8 @@ sealed class Eval<out A> : EvalKind<A> {
     abstract fun memoize(): Eval<A>
 
     fun <B> map(f: (A) -> B): Eval<B> = flatMap { a -> Now(f(a)) }
+
+    fun <B> ap(ff: EvalKind<(A) -> B>): Eval<B> = ff.flatMap { f -> map(f) }.ev()
 
     fun <B> flatMap(f: (A) -> EvalKind<B>): Eval<B> =
             when (this) {
@@ -218,8 +220,6 @@ sealed class Eval<out A> : EvalKind<A> {
         val Zero: Eval<Int> = Now(0)
         @JvmStatic
         val One: Eval<Int> = Now(1)
-
-        fun applicative(): EvalMonadInstance = Eval.monad()
 
     }
 }

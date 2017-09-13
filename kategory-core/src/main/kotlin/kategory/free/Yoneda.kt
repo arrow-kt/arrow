@@ -19,8 +19,7 @@ package kategory
                     override fun <B> apply(f: (A) -> B): HK<U, B> = FF.map(fa, f)
                 }
 
-        fun <U> functor(FM: Functor<U>) = object : YonedaInstances<U> {
-            override fun FM(): Functor<U> = FM
-        }
+        fun <U> functor(FU: Functor<U>): YonedaFunctorInstance<U> =
+                YonedaFunctorInstanceImplicits.instance(FU)
     }
 }

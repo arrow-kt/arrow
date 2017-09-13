@@ -1,10 +1,8 @@
 package kategory
 
-interface OptionMonoid<A> : Monoid<Option<A>> {
+interface OptionSemigroupInstance<A> : Semigroup<Option<A>> {
 
     fun SG(): Semigroup<A>
-
-    override fun empty(): Option<A> = Option.None
 
     override fun combine(a: Option<A>, b: Option<A>): Option<A> =
             when (a) {
@@ -14,14 +12,31 @@ interface OptionMonoid<A> : Monoid<Option<A>> {
                 }
                 is Option.None -> a
             }
-
 }
 
-data class OptionMonadError<E>(val error: E) : MonadError<OptionHK, E> , OptionMonadInstance {
+object OptionSemigroupInstanceImplicits {
+    @JvmStatic fun <A> instance(SG: Semigroup<A>): OptionSemigroupInstance<A> = object : OptionSemigroupInstance<A> {
+        override fun SG(): Semigroup<A> = SG
+    }
+}
 
-    override fun <A> raiseError(e: E): Option<A> = Option.None
+interface OptionMonoidInstance<A> : OptionSemigroupInstance<A>, Monoid<Option<A>> {
+    override fun empty(): Option<A> = Option.None
+}
 
-    override fun <A> handleErrorWith(fa: OptionKind<A>, f: (E) -> OptionKind<A>): Option<A> = fa.ev().orElse({ f(error).ev() })
+object OptionMonoidInstanceImplicits {
+    @JvmStatic fun <A> instance(SG: Semigroup<A>): OptionMonoidInstance<A> = object : OptionMonoidInstance<A> {
+        override fun SG(): Semigroup<A> = SG
+    }
+}
 
+interface OptionMonadErrorInstance : OptionMonadInstance, MonadError<OptionHK, Unit> {
+    override fun <A> raiseError(e: Unit): Option<A> = Option.None
+
+    override fun <A> handleErrorWith(fa: OptionKind<A>, f: (Unit) -> OptionKind<A>): Option<A> = fa.ev().orElse({ f(Unit).ev() })
+}
+
+object OptionMonadErrorInstanceImplicits {
+    @JvmStatic fun instance(): OptionMonadErrorInstance = object : OptionMonadErrorInstance {}
 }
 

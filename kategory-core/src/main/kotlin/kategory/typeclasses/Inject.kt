@@ -5,7 +5,7 @@ package kategory
  *
  * @see [[http://www.staff.science.uu.nl/~swier004/publications/2008-jfp.pdf]]
  */
-interface Inject<in F, out G> : Typeclass {
+interface Inject<F, G> : Typeclass {
 
     fun inj(): FunctionK<F, G>
 
@@ -13,6 +13,6 @@ interface Inject<in F, out G> : Typeclass {
 
 }
 
-inline fun <reified F, reified G> inject(): Inject<F, G> = instance(InstanceParametrizedType(Inject::class.java, listOf(F::class.java, G::class.java)))
+inline fun <reified F, reified G> inject(): Inject<F, G> = instance(InstanceParametrizedType(Inject::class.java, listOf(typeLiteral<F>(), typeLiteral<G>())))
 
 inline fun <reified F, reified G, A> HK<F, A>.inj(FT: Inject<F, G> = inject()) : HK<G, A> = FT.invoke(this)

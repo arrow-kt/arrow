@@ -13,7 +13,7 @@ fun <F, G, A> HK<F, HK<G, A>>.lift(): HK<ComposedType<F, G>, A> = this as HK<Com
 @Suppress("UNCHECKED_CAST")
 fun <F, G, A> HK<ComposedType<F, G>, A>.lower(): HK<F, HK<G, A>> = this as HK<F, HK<G, A>>
 
-interface ComposedFoldable<in F, in G> :
+interface ComposedFoldable<F, G> :
         Foldable<ComposedType<F, G>> {
 
     fun FF(): Foldable<F>

@@ -34,4 +34,4 @@ applicative(), FM: Monad<F> = monad()): HK<G, HK<F, B>> = GA.map(traverse(fa, f,
  */
 inline fun <F, reified G, A> Traverse<F>.sequence(fga: HK<F, HK<G, A>>, GA: Applicative<G> = applicative()): HK<G, HK<F, A>> = sequence(GA, fga)
 
-inline fun <reified F> traverse(): Traverse<F> = instance(InstanceParametrizedType(Traverse::class.java, listOf(F::class.java)))
+inline fun <reified F> traverse(): Traverse<F> = instance(InstanceParametrizedType(Traverse::class.java, listOf(typeLiteral<F>())))

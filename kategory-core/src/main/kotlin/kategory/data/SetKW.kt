@@ -1,7 +1,7 @@
 package kategory
 
 @higherkind
-@deriving(Foldable::class, MonoidK::class)
+@deriving(Foldable::class, SemigroupK::class, MonoidK::class)
 data class SetKW<out A>(val set: Set<A>) : SetKWKind<A>, Set<A> by set {
 
     fun <B> foldL(b: B, f: (B, A) -> B): B = this.fold(b, f)
@@ -20,9 +20,10 @@ data class SetKW<out A>(val set: Set<A>) : SetKWKind<A>, Set<A> by set {
 
         fun <A> empty(): SetKW<A> = emptySet<A>().k()
 
-        fun <A> semigroup(): SetKWMonoid<A> = object : SetKWMonoid<A> {}
+        fun <A> semigroup(): SetKWSemigroupInstance<A> = SetKWSemigroupInstanceImplicits.instance()
 
-        fun semigroupK(): SetKWMonoidKInstance = SetKW.monoidK()
+        fun <A> monoid(): SetKWMonoidInstance<A> = SetKWMonoidInstanceImplicits.instance()
+
     }
 }
 
