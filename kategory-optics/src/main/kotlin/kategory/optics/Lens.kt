@@ -27,6 +27,8 @@ abstract class Lens<A, B> {
 
     companion object {
 
+        fun <A> id() = Iso.id<A>().asLens()
+
         fun <A> codiagonal() = Lens<Either<A, A>, A>(
                 get = { it.fold(::identity, ::identity) },
                 set = { a -> { it.bimap({ a }, { a }) } }
@@ -80,7 +82,7 @@ abstract class Lens<A, B> {
     )
 
     /**
-     * Convenience method to create a pair of the target and a type C
+     * Create a product of the target and a type C
      */
     fun <C> first(): Lens<Tuple2<A, C>, Tuple2<B, C>> = Lens(
             { (a, c) -> get(a) toT c },
@@ -88,7 +90,7 @@ abstract class Lens<A, B> {
     )
 
     /**
-     * Convenience method to create a pair of a type C and the target
+     * Create a product of a type C and the target
      */
     fun <C> second(): Lens<Tuple2<C, A>, Tuple2<C, B>> = Lens(
             { (c, a) -> c toT get(a) },
@@ -103,9 +105,15 @@ abstract class Lens<A, B> {
             { c -> { a -> set(l.set(c)(get(a)))(a) } }
     )
 
+    /** compose an [Iso] as an [Prism] */
+    fun <C> composeIso(other: Iso<B, C>): Lens<A, C> =
+            composeLens(other.asLens())
+
     /**
      * plus operator overload to compose lenses
      */
     operator fun <C> plus(other: Lens<B, C>): Lens<A, C> = composeLens(other)
+
+    operator fun <C> plus(other: Iso<B, C>): Lens<A, C> = composeIso(other)
 
 }
