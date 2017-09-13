@@ -29,6 +29,9 @@ abstract class Lens<A, B> {
 
         fun <A> id() = Iso.id<A>().asLens()
 
+        /**
+         * [Lens] that takes either A or A and strips the choice of A.
+         */
         fun <A> codiagonal() = Lens<Either<A, A>, A>(
                 get = { it.fold(::identity, ::identity) },
                 set = { a -> { it.bimap({ a }, { a }) } }
@@ -117,6 +120,8 @@ abstract class Lens<A, B> {
      * plus operator overload to compose lenses
      */
     operator fun <C> plus(other: Lens<B, C>): Lens<A, C> = composeLens(other)
+
+    operator fun <C> plus(other: Optional<B, C>): Optional<A, C> = composeOptional(other)
 
     operator fun <C> plus(other: Iso<B, C>): Lens<A, C> = composeIso(other)
 
