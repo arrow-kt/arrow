@@ -8,12 +8,11 @@ dependencies {
     compile project(':kategory-core')
     compile project(':kategory-effects')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
-    compile "io.kategory:kategory-annotations:$kategoryAnnotationsVersion"
-    kapt "io.kategory:kategory-annotations-compile:$kategoryAnnotationsVersion"
-    kaptTest "io.kategory:kategory-annotations-compile:$kategoryAnnotationsVersion"
-    compileOnly "io.kategory:kategory-annotations-compile:$kategoryAnnotationsVersion"
-    testCompileOnly "io.kategory:kategory-annotations-compile:$kategoryAnnotationsVersion"
+    compile project(':kategory-annotations')
+    kapt project(':kategory-annotations-processor')
+    kaptTest project(':kategory-annotations-processor')
+    compileOnly project(':kategory-annotations-processor')
+    testCompileOnly project(':kategory-annotations-processor')
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
     testCompile project(':kategory-effects-test')
 

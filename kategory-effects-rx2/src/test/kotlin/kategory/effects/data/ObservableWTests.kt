@@ -8,8 +8,8 @@ import org.junit.runner.RunWith
 class ObservableWTest : UnitSpec() {
 
     init {
-        val EQ: Eq<ObservableWKind<Int>> = object : Eq<ObservableWKind<Int>> {
-            override fun eqv(a: ObservableWKind<Int>, b: ObservableWKind<Int>): Boolean =
+        fun <T> EQ(): Eq<ObservableWKind<T>> = object : Eq<ObservableWKind<T>> {
+            override fun eqv(a: ObservableWKind<T>, b: ObservableWKind<T>): Boolean =
                     try {
                         a.value().blockingFirst() == b.value().blockingFirst()
                     } catch (throwable: Throwable) {
@@ -30,8 +30,8 @@ class ObservableWTest : UnitSpec() {
                         errA == errB
                     }
         }
-        testLaws(AsyncLaws.laws(ObservableW.asyncContext(), ObservableW.monadErrorFlat(), EQ, EQ))
-        testLaws(AsyncLaws.laws(ObservableW.asyncContext(), ObservableW.monadErrorConcat(), EQ, EQ))
-        testLaws(AsyncLaws.laws(ObservableW.asyncContext(), ObservableW.monadErrorSwitch(), EQ, EQ))
+        testLaws(AsyncLaws.laws(ObservableW.asyncContext(), ObservableW.monadErrorFlat(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(ObservableW.asyncContext(), ObservableW.monadErrorConcat(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(ObservableW.asyncContext(), ObservableW.monadErrorSwitch(), EQ(), EQ()))
     }
 }
