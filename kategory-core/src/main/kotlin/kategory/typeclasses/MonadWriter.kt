@@ -28,4 +28,4 @@ interface MonadWriter<F, W> : Monad<F> {
 }
 
 inline fun <reified F, reified W> monadWriter(): MonadWriter<F, W> = instance(
-        InstanceParametrizedType(MonadWriter::class.java, listOf(F::class.java, W::class.java)))
+        InstanceParametrizedType(MonadWriter::class.java, listOf(typeLiteral<F>(), typeLiteral<W>())))

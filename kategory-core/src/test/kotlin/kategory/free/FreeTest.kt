@@ -2,6 +2,7 @@ package kategory
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
+import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 
 sealed class Ops<out A> : HK<Ops.F, A> {
@@ -12,7 +13,7 @@ sealed class Ops<out A> : HK<Ops.F, A> {
     data class Add(val a: Int, val y: Int) : Ops<Int>()
     data class Subtract(val a: Int, val y: Int) : Ops<Int>()
 
-    companion object : FreeInstances<Ops.F> {
+    companion object : FreeMonadInstance<Ops.F> {
         fun value(n: Int): Free<Ops.F, Int> = Free.liftF(Ops.Value(n))
         fun add(n: Int, y: Int): Free<Ops.F, Int> = Free.liftF(Ops.Add(n, y))
         fun subtract(n: Int, y: Int): Free<Ops.F, Int> = Free.liftF(Ops.Subtract(n, y))
@@ -37,6 +38,12 @@ class FreeTest : UnitSpec() {
     }.ev()
 
     init {
+
+        "instances can be resolved implicitly" {
+            functor<FreeKindPartial<OpsAp.F>>() shouldNotBe null
+            applicative<FreeKindPartial<OpsAp.F>>()  shouldNotBe null
+            monad<FreeKindPartial<OpsAp.F>>()  shouldNotBe null
+        }
 
         testLaws(MonadLaws.laws(Ops, FreeEq(idInterpreter)))
 

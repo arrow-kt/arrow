@@ -1,16 +1,16 @@
 package kategory
 
-@higherkind data class Coproduct<F, G, A>(val CF: Comonad<F>, val CG: Comonad<G>, val run: Either<HK<F, A>, HK<G, A>>) : CoproductKind<F, G, A> {
+@higherkind data class Coproduct<F, G, A>(val run: Either<HK<F, A>, HK<G, A>>) : CoproductKind<F, G, A> {
 
-    fun <B> map(f: (A) -> B): Coproduct<F, G, B> = Coproduct(CF, CG, run.bimap(CF.lift(f), CG.lift(f)))
+    fun <B> map(CF: Functor<F>, CG: Functor<G>, f: (A) -> B): Coproduct<F, G, B> = Coproduct(run.bimap(CF.lift(f), CG.lift(f)))
 
-    fun <B> coflatMap(f: (Coproduct<F, G, A>) -> B): Coproduct<F, G, B> =
-            Coproduct(CF, CG, run.bimap(
-                    { CF.coflatMap(it, { f(Coproduct(CF, CG, Either.Left(it))) }) },
-                    { CG.coflatMap(it, { f(Coproduct(CF, CG, Either.Right(it))) }) }
+    fun <B> coflatMap(CF: Comonad<F>, CG: Comonad<G>, f: (Coproduct<F, G, A>) -> B): Coproduct<F, G, B> =
+            Coproduct(run.bimap(
+                    { CF.coflatMap(it, { f(Coproduct(Either.Left(it))) }) },
+                    { CG.coflatMap(it, { f(Coproduct(Either.Right(it))) }) }
             ))
 
-    fun extract(): A = run.fold({ CF.extract(it) }, { CG.extract(it) })
+    fun extract(CF: Comonad<F>, CG: Comonad<G>): A = run.fold({ CF.extract(it) }, { CG.extract(it) })
 
     fun <H> fold(f: FunctionK<F, H>, g: FunctionK<G, H>): HK<H, A> = run.fold({ f(it) }, { g(it) })
 
@@ -21,29 +21,28 @@ package kategory
 
     fun <H, B> traverse(f: (A) -> HK<H, B>, GA: Applicative<H>, FT: Traverse<F>, GT: Traverse<G>): HK<H, Coproduct<F, G, B>> =
             run.fold({
-                GA.map(FT.traverse(it, f, GA), { Coproduct(CF, CG, Either.Left(it)) })
+                GA.map(FT.traverse(it, f, GA), { Coproduct<F, G, B>(Either.Left(it)) })
             }, {
-                GA.map(GT.traverse(it, f, GA), { Coproduct(CF, CG, Either.Right(it)) })
+                GA.map(GT.traverse(it, f, GA), { Coproduct<F, G, B>(Either.Right(it)) })
             })
 
     companion object {
-        inline operator fun <reified F, reified G, A> invoke(run: Either<HK<F, A>, HK<G, A>>,
-                                                             CF: Comonad<F> = comonad<F>(),
-                                                             CG: Comonad<G> = comonad<G>()): Coproduct<F, G, A> = Coproduct(CF, CG, run)
+        inline operator fun <reified F, reified G, A> invoke(run: Either<HK<F, A>, HK<G, A>>): Coproduct<F, G, A> = Coproduct(run)
 
-        fun <F, G> comonad(): CoproductComonad<F, G> = object : CoproductComonad<F, G> {}
+        inline fun <reified F, reified G> comonad(CF: Comonad<F> = kategory.comonad(), CG: Comonad<G>): CoproductComonadInstance<F, G> =
+                CoproductComonadInstanceImplicits.instance(CF, CG)
 
-        fun <F, G> functor(): CoproductComonad<F, G> = object : CoproductComonad<F, G> {}
+        inline fun <reified F, reified G> functor(FF: Functor<F> = kategory.functor(), FG: Functor<G> = kategory.functor()): CoproductFunctorInstance<F, G> =
+                CoproductFunctorInstanceImplicits.instance(FF, FG)
 
-        inline fun <reified F, reified G> traverse(FF: Traverse<F> = traverse<F>(), FG: Traverse<G> = traverse<G>()): CoproductTraverse<F, G> =
-                object : CoproductTraverse<F, G> {
-                    override fun FF(): Traverse<F> = FF
+        inline fun <reified F, reified G> traverse(FF: Traverse<F> = traverse<F>(), FG: Traverse<G> = traverse<G>()): CoproductTraverseInstance<F, G> =
+                CoproductTraverseInstanceImplicits.instance(FF, FG)
 
-                    override fun FG(): Traverse<G> = FG
-                }
+        inline fun <reified F, reified G> foldable(FF: Foldable<F> = foldable<F>(), FG: Foldable<G> = foldable<G>()): CoproductFoldableInstance<F, G> =
+                CoproductFoldableInstanceImplicits.instance(FF, FG)
     }
 
 }
 
-inline fun <reified F, reified G, A> Either<HK<F, A>, HK<G, A>>.coproduct(CF: Comonad<F> = comonad(), CG: Comonad<G> = comonad()): Coproduct<F, G, A> =
-        Coproduct(CF, CG, this)
+inline fun <reified F, reified G, A> Either<HK<F, A>, HK<G, A>>.coproduct(): Coproduct<F, G, A> =
+        Coproduct(this)

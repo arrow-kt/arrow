@@ -2,6 +2,8 @@ package kategory
 
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
+import java.lang.reflect.TypeVariable
+import java.lang.reflect.WildcardType
 import java.util.Arrays
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KClass
@@ -17,6 +19,9 @@ interface Typeclass
  * typeclasses that should be registered
  */
 class InstanceParametrizedType(val raw: Type, val typeArgs: List<Type>) : ParameterizedType {
+
+    fun typeArgsAreParameterized(): Boolean = typeArgs.isNotEmpty() && typeArgs[0] is ParameterizedType
+
     override fun getRawType(): Type = raw
 
     override fun getOwnerType(): Type? = null
@@ -54,6 +59,21 @@ class InstanceParametrizedType(val raw: Type, val typeArgs: List<Type>) : Parame
 }
 
 /**
+ * Instrospects the generic type arguments to locate generic interfaces and their type args
+ */
+open class TypeLiteral<T> {
+
+    val isParameterizedType: Boolean = javaClass.genericSuperclass is ParameterizedType
+
+    val type: Type = (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0]
+}
+
+inline fun <reified T> typeLiteral(): Type {
+    val t = object : TypeLiteral<T>() {}
+    return if (t.isParameterizedType) t.type else T::class.java
+}
+
+/**
  * A concurrent hash map of local global instances that may be invoked at runtime as if they were implicitly summoned
  */
 object GlobalInstances : ConcurrentHashMap<Type, Any>()
@@ -77,10 +97,9 @@ data class TypeClassInstanceNotFound(val type: Type)
  *   }
  * }
  */
-fun <T : Typeclass> registerInstance(value: T, of: KClass<T>, on: KClass<*>, vararg typeArgs: KClass<*>): Unit {
-    val args = listOf(on.java) + typeArgs.map { it.java }
-    val t = InstanceParametrizedType(of.java, args)
+fun registerInstance(t: InstanceParametrizedType, value: Any): Any {
     GlobalInstances.putIfAbsent(t, value)
+    return GlobalInstances.getValue(t)
 }
 
 /**
@@ -90,44 +109,82 @@ fun <T : Typeclass> registerInstance(value: T, of: KClass<T>, on: KClass<*>, var
  */
 @Suppress("UNCHECKED_CAST")
 fun <T : Typeclass> instance(t: InstanceParametrizedType): T =
-    if (GlobalInstances.containsKey(t)) {
-        GlobalInstances.getValue(t) as T
-    }
-    else {
-        val value = instanceFromImplicitObject(t)
-        if (value != null) {
-            GlobalInstances.putIfAbsent(t, value)
-            value as T
+        if (GlobalInstances.containsKey(t)) {
+            GlobalInstances.getValue(t) as T
         } else {
-            val e = TypeClassInstanceNotFound(t)
-            println(e.message)
-            throw e
+            val value = if (t.typeArgsAreParameterized()) {
+                parametricInstanceFromImplicitObject(t)
+            } else {
+                instanceFromImplicitObject(t)
+            }
+            if (value != null) {
+                GlobalInstances.putIfAbsent(t, value)
+                value as T
+            } else {
+                val e = TypeClassInstanceNotFound(t)
+                println(e.message)
+                throw e
+            }
         }
-    }
+
+private fun resolveNestedTypes(l: List<Type>): List<Type> {
+    tailrec fun loop(remaining: List<Type>, acc: List<Type>): List<Type> =
+            when {
+                remaining.isEmpty() -> acc
+                else -> {
+                    val head = remaining[0]
+                    val tail = remaining.drop(1)
+                    val (newTail, newAcc) = when (head) {
+                        is ParameterizedType -> Pair(head.actualTypeArguments.toList() + tail, acc)
+                        is WildcardType -> Pair(head.upperBounds.toList() + tail, acc)
+                        is Class<*> -> Pair(tail, acc + listOf(head))
+                        else -> Pair(tail, acc)
+                    }
+                    loop(newTail, newAcc)
+                }
+            }
+    return loop(l, emptyList())
+}
+
+private fun parametricInstanceFromImplicitObject(t: InstanceParametrizedType): Any? {
+    val resolved = resolveNestedTypes(t.typeArgs)
+    return instanceFromImplicitObject(InstanceParametrizedType(t.raw, resolved))
+}
 
 private fun instanceFromImplicitObject(t: InstanceParametrizedType): Any? {
     val of = t.raw as Class<*>
     val on = t.typeArgs[0] as Class<*>
     val targetPackage = on.name.substringBeforeLast(".")
-    val derivationPackage = if (targetPackage == "java.lang") { "java_lang" } else { targetPackage }
+    val derivationPackage = if (targetPackage.startsWith("java.")) {
+        targetPackage.replace(".", "_")
+    } else {
+        targetPackage
+    }
     val providerQualifiedName: String = "$derivationPackage.${on.simpleName.replaceFirst("HK", "")}${of.simpleName}InstanceImplicits"
     val globalInstanceProvider = Class.forName(providerQualifiedName)
     val allCompanionFunctions = globalInstanceProvider.methods
     val factoryFunction = allCompanionFunctions.find { it.name == "instance" }
     return if (factoryFunction != null) {
-        val values: List<Any> = factoryFunction.parameters.mapNotNull {
-            if (Typeclass::class.java.isAssignableFrom(it.type)) {
-                val classifier = it.parameterizedType as ParameterizedType
-                val argClasses = classifier.actualTypeArguments.map { it.asKotlinClass() }.filterNotNull()
-                val kClassifier = classifier.asKotlinClass()
-                if (argClasses.isNotEmpty() && kClassifier != null) {
-                    instance(InstanceParametrizedType(kClassifier.java, listOf(argClasses[0].java) + argClasses.drop(1).map { it.java }))
-                } else null
+        val values: List<Any> = factoryFunction.parameters.mapIndexedNotNull { n, p ->
+            if (Typeclass::class.java.isAssignableFrom(p.type)) {
+                val classifier = p.parameterizedType as ParameterizedType
+                val vType = reifyRawParameterizedType(t, classifier, n)
+                val value = instanceFromImplicitObject(vType)
+                if (value != null) registerInstance(t, value)
+                value
             } else null
         }
-        factoryFunction.invoke(globalInstanceProvider, *values.toTypedArray())
+        factoryFunction.isAccessible = true
+        factoryFunction.invoke(null, *values.toTypedArray())
     } else null
 }
 
+private fun reifyRawParameterizedType(carrier: InstanceParametrizedType, classifier: ParameterizedType, index: Int): InstanceParametrizedType =
+        if (classifier.actualTypeArguments.any { it is TypeVariable<*> }) {
+            InstanceParametrizedType(classifier.rawType, listOf(carrier.actualTypeArguments[index + 1]))
+        } else {
+            InstanceParametrizedType(classifier, classifier.actualTypeArguments.filterNotNull())
+        }
+
 private fun Type.asKotlinClass(): KClass<*>? =
-    if (this is Class<*>) this.kotlin else null
+        if (this is Class<*>) this.kotlin else null

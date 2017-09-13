@@ -1,44 +1,47 @@
 package kategory.optics
 
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.KotlinFile
-import com.squareup.kotlinpoet.asClassName
+import kategory.common.utils.fullName
+import me.eugeniomarletti.kotlin.metadata.escapedClassName
 import java.io.File
 
 class PrismsFileGenerator(
-        private val annotatedList: Collection<AnnotatedPrism.Element>,
+        private val annotatedList: Collection<AnnotatedOptic>,
         private val generatedDir: File
 ) {
 
-    fun generate() = buildPrisms(annotatedList).forEach {
-        it.writeTo(generatedDir)
-    }
+    private val prism = "kategory.optics.Prism"
 
-    private fun buildPrisms(elements: Collection<AnnotatedPrism.Element>): List<KotlinFile> = elements.map(this::processElement)
-            .map { (name, funs) ->
-                funs.fold(KotlinFile.builder(name.packageName(), "${name.simpleName().toLowerCase()}.prisms").skipJavaLangImports(true), { builder, prismSpec ->
-                    builder.addFun(prismSpec)
-                }).addStaticImport("kategory", "right", "left").build()
+    fun generate() = annotatedList.map(this::processElement)
+            .map { (element, funs) ->
+                "${prismsAnnotationClass.simpleName}.${element.type.simpleName.toString().toLowerCase()}.kt" to
+                        funs.joinToString(prefix = fileHeader(element.classData.`package`.escapedClassName), separator = "\n\n")
+            }.forEach { (name, fileString) -> File(generatedDir, name).writeText(fileString) }
+
+    private fun processElement(annotatedPrism: AnnotatedOptic): Pair<AnnotatedOptic, List<String>> =
+            annotatedPrism to annotatedPrism.targets.map { target ->
+                val sourceClassName = annotatedPrism.classData.fullName.escapedClassName
+                val sourceName = annotatedPrism.type.simpleName.toString().toLowerCase()
+                val targetClassName = target.fullName.escapedClassName
+                val targetName = target.paramName
+
+                """fun $sourceName$targetName() = $prism(
+                   |        getOrModify = { $sourceName: $sourceClassName ->
+                   |            when ($sourceName) {
+                   |                is $targetClassName -> $sourceName.right()
+                   |                else -> $sourceName.left()
+                   |            }
+                   |        },
+                   |        reverseGet = { it }
+                   |)
+                """.trimMargin()
             }
 
-    private fun processElement(annotatedPrism: AnnotatedPrism.Element): Pair<ClassName, List<FunSpec>> =
-            annotatedPrism.type.asClassName() to annotatedPrism.subTypes.map { subClass ->
-                val sealedClassName = annotatedPrism.type.simpleName.toString().toLowerCase()
-                val subTypeName = subClass.simpleName.toString()
-
-                FunSpec.builder("$sealedClassName$subTypeName")
-                        .addStatement(
-                                """return kategory.optics.Prism(
-                                   |        getOrModify = { $sealedClassName: %T ->
-                                   |            when ($sealedClassName) {
-                                   |                is %T -> $sealedClassName.right()
-                                   |                else -> $sealedClassName.left()
-                                   |            }
-                                   |        },
-                                   |        reverseGet = { it }
-                                   |)""".trimMargin(), annotatedPrism.type, subClass)
-                        .build()
-            }
+    fun fileHeader(packageName: String): String =
+            """package $packageName
+               |
+               |import kategory.left
+               |import kategory.right
+               |
+               |""".trimMargin()
 
 }

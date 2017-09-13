@@ -3,71 +3,83 @@ package kategory
 typealias StateTFun<F, S, A> = (S) -> HK<F, Tuple2<S, A>>
 typealias StateTFunKind<F, S, A> = HK<F, StateTFun<F, S, A>>
 
-fun <F, S, A> StateTKind<F, S, A>.runM(initial: S): HK<F, Tuple2<S, A>> = (this as StateT<F, S, A>).run(initial)
+fun <F, S, A> StateTKind<F, S, A>.runM(initial: S, MF: Monad<F>): HK<F, Tuple2<S, A>> = (this as StateT<F, S, A>).run(initial, MF)
 
-@higherkind class StateT<F, S, A>(
-        val MF: Monad<F>,
+@higherkind
+class StateT<F, S, A>(
         val runF: StateTFunKind<F, S, A>
 ) : StateTKind<F, S, A> {
 
     companion object {
-        inline operator fun <reified F, S, A> invoke(noinline run: StateTFun<F, S, A>, MF: Monad<F> = monad<F>()): StateT<F, S, A> = StateT(MF, MF.pure(run))
+        inline operator fun <reified F, S, A> invoke(noinline run: StateTFun<F, S, A>, MF: Monad<F> = monad<F>()): StateT<F, S, A> = StateT(MF.pure(run))
 
-        fun <F, S, A> invokeF(runF: StateTFunKind<F, S, A>, MF: Monad<F>): StateT<F, S, A> = StateT(MF, runF)
+        fun <F, S, A> invokeF(runF: StateTFunKind<F, S, A>): StateT<F, S, A> = StateT(runF)
 
-        inline fun <reified F, S> instances(MF: Monad<F> = monad<F>()): StateTInstances<F, S> = object : StateTInstances<F, S> {
-            override fun MF(): Monad<F> = MF
-        }
+        inline fun <reified F, S> functor(FF: Functor<F> = functor<F>()): StateTFunctorInstance<F, S> =
+                StateTFunctorInstanceImplicits.instance(FF)
 
-        inline fun <reified F, S> functor(MF: Monad<F> = monad<F>()): StateTInstances<F, S> = instances(MF)
+        inline fun <reified F, S> applicative(MF: Monad<F> = monad<F>()): StateTApplicativeInstance<F, S> =
+                StateTApplicativeInstanceImplicits.instance(MF)
 
-        inline fun <reified F, S> applicative(MF: Monad<F> = monad<F>()): StateTInstances<F, S> = instances(MF)
+        inline fun <reified F, S> monad(MF: Monad<F> = monad<F>()): StateTMonadInstance<F, S> =
+                StateTMonadInstanceImplicits.instance(MF)
 
-        inline fun <reified F, S> monad(MF: Monad<F> = monad<F>()): StateTInstances<F, S> = instances(MF)
+        inline fun <reified F, reified S> monadState(MF: Monad<F> = monad<F>()): StateTMonadStateInstance<F, S> =
+                StateTMonadStateInstanceImplicits.instance(MF)
 
-        inline fun <reified F, reified S> monadState(MF: Monad<F> = monad<F>()): StateTInstances<F, S> = instances(MF)
+        inline fun <reified F, S> semigroupK(MF: Monad<F> = monad<F>(), SF: SemigroupK<F> = semigroupK<F>()): StateTSemigroupKInstance<F, S> =
+                StateTSemigroupKInstanceImplicits.instance(MF, SF)
 
-        inline fun <reified F, S> semigroupK(F0: Monad<F> = monad<F>(), G0: SemigroupK<F> = semigroupK<F>()): SemigroupK<StateTKindPartial<F, S>> =
-                object : StateTSemigroupK<F, S> {
-                    override fun F(): Monad<F> = F0
-                    override fun G(): SemigroupK<F> = G0
-                }
+        fun <F, S> get(AF: Applicative<F>): StateT<F, S, S> = StateT(AF.pure({ s: S -> AF.pure(Tuple2(s, s)) }))
+
+        fun <F, S> set(s: S, AF: Applicative<F>): StateT<F, S, Unit> = StateT(AF.pure({ _: S -> AF.pure(Tuple2(s, Unit)) }))
+
+        fun <F, S, A, B> tailRecM(a: A, f: (A) -> HK<StateTKindPartial<F, S>, Either<A, B>>, MF: Monad<F>): StateT<F, S, B> =
+                StateT(MF.pure({ s: S ->
+                    MF.tailRecM(Tuple2(s, a), { (s, a0) ->
+                        MF.map(f(a0).runM(s, MF)) { (s, ab) ->
+                            ab.bimap({ a1 -> Tuple2(s, a1) }, { b -> Tuple2(s, b) })
+                        }
+                    })
+                }))
     }
 
-    fun <B> map(f: (A) -> B): StateT<F, S, B> = transform { (s, a) -> Tuple2(s, f(a)) }
+    fun <B> map(f: (A) -> B, FF: Functor<F>): StateT<F, S, B> = transform({ (s, a) -> Tuple2(s, f(a)) }, FF)
 
-    fun <B, Z> map2(sb: StateT<F, S, B>, fn: (A, B) -> Z): StateT<F, S, Z> =
+    fun <B, Z> map2(sb: StateT<F, S, B>, fn: (A, B) -> Z, MF: Monad<F>): StateT<F, S, Z> =
             invokeF(MF.map2(runF, sb.runF) { (ssa, ssb) ->
                 ssa.andThen { fsa ->
                     MF.flatMap(fsa) { (s, a) ->
                         MF.map(ssb(s)) { (s, b) -> Tuple2(s, fn(a, b)) }
                     }
                 }
-            }, MF)
+            })
 
-    fun <B, Z> map2Eval(sb: Eval<StateT<F, S, B>>, fn: (A, B) -> Z): Eval<StateT<F, S, Z>> =
+    fun <B, Z> map2Eval(sb: Eval<StateT<F, S, B>>, fn: (A, B) -> Z, MF: Monad<F>): Eval<StateT<F, S, Z>> =
             MF.map2Eval(runF, sb.map { it.runF }) { (ssa, ssb) ->
                 ssa.andThen { fsa ->
                     MF.flatMap(fsa) { (s, a) ->
                         MF.map(ssb((s))) { (s, b) -> Tuple2(s, fn(a, b)) }
                     }
                 }
-            }.map { invokeF(it, MF) }
+            }.map { invokeF(it) }
 
-    fun <B> product(sb: StateT<F, S, B>): StateT<F, S, Tuple2<A, B>> = map2(sb) { a, b -> Tuple2(a, b) }
+    fun <B> ap(ff: StateTKind<F, S, (A) -> B>, MF: Monad<F>): StateT<F, S, B> =
+            ff.ev().map2(this, { f, a -> f(a) }, MF)
 
-    fun <B> flatMap(fas: (A) -> StateTKind<F, S, B>): StateT<F, S, B> =
+    fun <B> product(sb: StateT<F, S, B>, MF: Monad<F>): StateT<F, S, Tuple2<A, B>> = map2(sb, { a, b -> Tuple2(a, b) }, MF)
+
+    fun <B> flatMap(fas: (A) -> StateTKind<F, S, B>, MF: Monad<F>): StateT<F, S, B> =
             invokeF(
                     MF.map(runF) { sfsa ->
                         sfsa.andThen { fsa ->
                             MF.flatMap(fsa) {
-                                fas(it.b).runM(it.a)
+                                fas(it.b).runM(it.a, MF)
                             }
                         }
-                    }
-                    , MF)
+                    })
 
-    fun <B> flatMapF(faf: (A) -> HK<F, B>): StateT<F, S, B> =
+    fun <B> flatMapF(faf: (A) -> HK<F, B>, MF: Monad<F>): StateT<F, S, B> =
             invokeF(
                     MF.map(runF) { sfsa ->
                         sfsa.andThen { fsa ->
@@ -75,22 +87,24 @@ fun <F, S, A> StateTKind<F, S, A>.runM(initial: S): HK<F, Tuple2<S, A>> = (this 
                                 MF.map(faf(a)) { b -> Tuple2(s, b) }
                             }
                         }
-                    }
-                    , MF)
+                    })
 
-    fun <B> transform(f: (Tuple2<S, A>) -> Tuple2<S, B>): StateT<F, S, B> =
+    fun <B> transform(f: (Tuple2<S, A>) -> Tuple2<S, B>, FF: Functor<F>): StateT<F, S, B> =
             invokeF(
-                    MF.map(runF) { sfsa ->
+                    FF.map(runF) { sfsa ->
                         sfsa.andThen { fsa ->
-                            MF.map(fsa, f)
+                            FF.map(fsa, f)
                         }
-                    }, MF)
+                    })
 
-    fun run(initial: S): HK<F, Tuple2<S, A>> = MF.flatMap(runF) { f -> f(initial) }
+    fun combineK(y: StateTKind<F, S, A>, MF: Monad<F>, SF: SemigroupK<F>): StateT<F, S, A> =
+            StateT(MF.pure({ s -> SF.combineK(run(s, MF), y.ev().run(s, MF)) }))
 
-    fun runA(s: S): HK<F, A> = MF.map(run(s)) { it.b }
+    fun run(initial: S, MF: Monad<F>): HK<F, Tuple2<S, A>> = MF.flatMap(runF) { f -> f(initial) }
 
-    fun runS(s: S): HK<F, S> = MF.map(run(s)) { it.a }
+    fun runA(s: S, MF: Monad<F>): HK<F, A> = MF.map(run(s, MF)) { it.b }
+
+    fun runS(s: S, MF: Monad<F>): HK<F, S> = MF.map(run(s, MF)) { it.a }
 }
 
-inline fun <reified F, S, A> StateTFunKind<F, S, A>.stateT(FT: Monad<F> = monad()): StateT<F, S, A> = StateT(FT, this)
+inline fun <reified F, S, A> StateTFunKind<F, S, A>.stateT(): StateT<F, S, A> = StateT(this)

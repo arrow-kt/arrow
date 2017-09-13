@@ -23,7 +23,7 @@ interface Functor<F> : Typeclass {
 
 fun <F, B, A : B> Functor<F>.widen(fa: HK<F, A>): HK<F, B> = fa as HK<F, B>
 
-inline fun <reified F> functor(): Functor<F> = instance(InstanceParametrizedType(Functor::class.java, listOf(F::class.java)))
+inline fun <reified F> functor(): Functor<F> = instance(InstanceParametrizedType(Functor::class.java, listOf(typeLiteral<F>())))
 
 //Syntax
 

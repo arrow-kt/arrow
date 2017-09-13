@@ -1,7 +1,14 @@
 package kategory
 
 @higherkind
-@deriving(Monad::class, Traverse::class, MonoidK::class)
+@deriving(
+        Functor::class,
+        Applicative::class,
+        Monad::class,
+        Foldable::class,
+        Traverse::class,
+        SemigroupK::class,
+        MonoidK::class)
 data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A> by list {
 
     fun <B> flatMap(f: (A) -> ListKWKind<B>): ListKW<B> = this.ev().list.flatMap { f(it).ev().list }.k()
@@ -17,6 +24,8 @@ data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A>
         }
         return Eval.defer { loop(this.ev()) }
     }
+
+    fun <B> ap(ff: ListKWKind<(A) -> B>): ListKW<B> = ff.flatMap { f -> map(f) }.ev()
 
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, ListKW<B>> =
             foldR(Eval.always { GA.pure(emptyList<B>().k()) }) { a, eval ->
@@ -59,17 +68,9 @@ data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A>
             return ListKW(buf)
         }
 
-        fun functor(): ListKWMonadInstance = ListKW.monad()
+        fun <A> semigroup(): ListKWSemigroupInstance<A> = ListKWSemigroupInstanceImplicits.instance()
 
-        fun applicative(): ListKWMonadInstance = ListKW.monad()
-
-        fun <A> semigroup(): ListKWMonoid<A> = object : ListKWMonoid<A> {}
-
-        fun semigroupK(): ListKWMonoidKInstance = ListKW.monoidK()
-
-        fun <A> monoid(): ListKWMonoid<A> = object : ListKWMonoid<A> {}
-
-        fun foldable(): ListKWTraverseInstance = ListKW.traverse()
+        fun <A> monoid(): ListKWMonoidInstance<A> = ListKWMonoidInstanceImplicits.instance()
 
     }
 

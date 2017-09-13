@@ -46,6 +46,14 @@ object IntSemigroupInstanceImplicits {
     @JvmStatic fun instance(): Semigroup<Int> = SGInt
 }
 
+object IntEqInstance: Eq<Int> {
+    override fun eqv(a: Int, b: Int): Boolean = a == b
+}
+
+object IntEqInstanceImplicits {
+    @JvmStatic fun instance(): IntEqInstance = IntEqInstance
+}
+
 object LongMonoid : Monoid<Long>, Semigroup<Long> by SGLong {
     override fun empty(): Long = 0L
 }

@@ -1,5 +1,9 @@
 package kategory
 
-interface CoyonedaInstances<U, P> : Functor<CoyonedaKindPartial<U, P>> {
-    override fun <A, B> map(fa: HK<CoyonedaKindPartial<U, P>, A>, f: (A) -> B): HK<CoyonedaKindPartial<U, P>, B> = fa.ev().map(f)
+interface CoyonedaFunctorInstance<F, G> : Functor<CoyonedaKindPartial<F, G>> {
+    override fun <A, B> map(fa: CoyonedaKind<F, G, A>, f: (A) -> B): Coyoneda<F, G, B> = fa.ev().map(f)
+}
+
+object CoyonedaFunctorInstanceImplicits {
+    @JvmStatic fun <F, G> instance(): CoyonedaFunctorInstance<F, G> = object : CoyonedaFunctorInstance<F, G> {}
 }

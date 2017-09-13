@@ -1,14 +1,7 @@
 package kategory.optics
 
+import kategory.common.utils.ClassOrPackageDataWrapper
 import javax.lang.model.element.TypeElement
-import javax.lang.model.element.VariableElement
 
-sealed class AnnotatedLens {
-    data class Element(val type: TypeElement, val properties: Collection<VariableElement>) : AnnotatedLens()
-    data class InvalidElement(val reason: String) : AnnotatedLens()
-}
-
-sealed class AnnotatedPrism {
-    data class Element(val type: TypeElement, val subTypes: Collection<TypeElement>) : AnnotatedPrism()
-    data class InvalidElement(val reason: String) : AnnotatedPrism()
-}
+data class AnnotatedOptic(val type: TypeElement, val classData: ClassOrPackageDataWrapper.Class, val targets: List<Target>)
+data class Target(val fullName: String, val paramName: String)

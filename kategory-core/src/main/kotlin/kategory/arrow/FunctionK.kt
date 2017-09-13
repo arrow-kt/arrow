@@ -1,6 +1,6 @@
 package kategory
 
-interface FunctionK<in F, out G> {
+interface FunctionK<F, G> {
 
     /**
      * Applies this functor transformation from `F` to `G`

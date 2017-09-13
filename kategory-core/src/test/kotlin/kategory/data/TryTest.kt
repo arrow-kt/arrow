@@ -2,6 +2,7 @@ package kategory
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
+import io.kotlintest.matchers.shouldNotBe
 import kategory.Try.Failure
 import kategory.Try.Success
 import org.junit.runner.RunWith
@@ -10,6 +11,15 @@ import org.junit.runner.RunWith
 class TryTest : UnitSpec() {
 
     init {
+
+        "instances can be resolved implicitly" {
+            functor<TryHK>() shouldNotBe null
+            applicative<TryHK>() shouldNotBe null
+            monad<TryHK>() shouldNotBe null
+            foldable<TryHK>() shouldNotBe null
+            traverse<TryHK>() shouldNotBe null
+            monadError<TryHK, Throwable>() shouldNotBe null
+        }
 
         testLaws(MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()))
         testLaws(TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any()))

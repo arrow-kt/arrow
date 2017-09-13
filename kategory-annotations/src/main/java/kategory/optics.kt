@@ -1,4 +1,4 @@
-package kategory.optics
+package kategory
 
 import kotlin.annotation.AnnotationRetention.SOURCE
 import kotlin.annotation.AnnotationTarget.CLASS
@@ -10,3 +10,7 @@ annotation class lenses
 @Retention(SOURCE)
 @Target(CLASS)
 annotation class prisms
+
+@Retention(SOURCE)
+@Target(CLASS)
+annotation class isos

@@ -23,4 +23,4 @@ inline fun <reified F, reified G, A, B> HK<F, A>.traverseFilter(
         GA: Applicative<G> = applicative<G>(),
         noinline f: (A) -> HK<G, Option<B>>): HK<G, HK<F, B>> = FT.traverseFilter(this, f, GA)
 
-inline fun <reified F> traverseFilter(): TraverseFilter<F> = instance(InstanceParametrizedType(TraverseFilter::class.java, listOf(F::class.java)))
+inline fun <reified F> traverseFilter(): TraverseFilter<F> = instance(InstanceParametrizedType(TraverseFilter::class.java, listOf(typeLiteral<F>())))

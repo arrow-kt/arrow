@@ -1,12 +1,31 @@
 package kategory
 
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class NumberMonoidTest : UnitSpec() {
     init {
+
+        "instances can be resolved implicitly" {
+            semigroup<Long>() shouldNotBe null
+            semigroup<Int>() shouldNotBe null
+            semigroup<Double>() shouldNotBe null
+            semigroup<Float>() shouldNotBe null
+            semigroup<Byte>() shouldNotBe null
+            semigroup<Short>() shouldNotBe null
+            monoid<Long>() shouldNotBe null
+            monoid<Int>() shouldNotBe null
+            monoid<Double>() shouldNotBe null
+            monoid<Float>() shouldNotBe null
+            monoid<Byte>() shouldNotBe null
+            monoid<Short>() shouldNotBe null
+            semigroup<java.lang.Integer>() shouldNotBe null
+            monoid<java.lang.Integer>() shouldNotBe null
+        }
+
         "should semigroup with the instance passed" {
             "int" {
                 forAll { value: Int ->

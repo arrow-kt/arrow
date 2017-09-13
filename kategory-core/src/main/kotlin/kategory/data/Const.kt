@@ -7,26 +7,28 @@ fun <A, T> ConstKind<A, T>.value(): A = this.ev().value
     @Suppress("UNCHECKED_CAST")
     fun <U> retag(): Const<A, U> = this as Const<A, U>
 
-    inline fun <F, U> traverseFilter(f: (T) -> HK<F, Option<U>>, FA: Applicative<F>): HK<F, Const<A, U>> =
-            FA.pure(retag())
+    fun <F, U> traverse(f: (T) -> HK<F, U>, FA: Applicative<F>): HK<F, Const<A, U>> = FA.pure(retag())
 
-    inline fun <F, U> traverse(f: (T) -> HK<F, U>, FA: Applicative<F>): HK<F, Const<A, U>> =
-            FA.pure(retag())
+    fun <F, U> traverseFilter(f: (T) -> HK<F, Option<U>>, FA: Applicative<F>): HK<F, Const<A, U>> = FA.pure(retag())
 
     companion object {
         fun <T, A> pure(a: A): Const<A, T> = Const(a)
 
-        inline fun <reified A> instances(MA: Monoid<A> = kategory.monoid<A>()): ConstInstances<A> = ConstInstances(MA)
+        inline fun <reified A> applicative(MA: Monoid<A> = kategory.monoid<A>()): Applicative<ConstKindPartial<A>> =
+                ConstApplicativeInstanceImplicits.instance(MA)
 
-        inline fun <reified A> applicative(MA: Monoid<A> = kategory.monoid<A>()): Applicative<ConstKindPartial<A>> = instances(MA)
+        inline fun <reified A> traverse(MA: Monoid<A> = kategory.monoid<A>()): Traverse<ConstKindPartial<A>> =
+                ConstTraverseFilterInstanceImplicits.instance()
 
-        inline fun <reified A> traverseFilter(MA: Monoid<A> = kategory.monoid<A>()): TraverseFilter<ConstKindPartial<A>> = instances(MA)
+        inline fun <reified A> traverseFilter(MA: Monoid<A> = kategory.monoid<A>()): TraverseFilter<ConstKindPartial<A>> =
+                ConstTraverseFilterInstanceImplicits.instance()
 
-        inline fun <reified A> traverse(MA: Monoid<A> = kategory.monoid<A>()): Traverse<ConstKindPartial<A>> = instances(MA)
+        inline fun <reified A, T> semigroup(SA: Semigroup<A> = kategory.semigroup<A>()): Semigroup<ConstKind<A, T>> =
+                ConstSemigroupInstanceImplicits.instance(SA)
 
-        inline fun <reified A, T> semigroup(MA: Monoid<A> = kategory.monoid<A>()): Semigroup<ConstKind<A, T>> = ConstMonoid(MA)
+        inline fun <reified A, T> monoid(MA: Monoid<A> = kategory.monoid<A>()): Monoid<ConstKind<A, T>> =
+                ConstMonoidInstanceImplicits.instance(MA)
 
-        inline fun <reified A, T> monoid(MA: Monoid<A> = kategory.monoid<A>()): Monoid<ConstKind<A, T>> = ConstMonoid(MA)
     }
 }
 

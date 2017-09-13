@@ -85,19 +85,38 @@ import kategory.Either.Right
             }
         }
 
-        inline fun <reified L> instances(SL: Semigroup<L> = semigroup<L>()): IorInstances<L> = object : IorInstances<L> {
-            override fun SL(): Semigroup<L> = SL
+        private tailrec fun <L, A, B> loop(v: Ior<L, Either<A, B>>, f: (A) -> IorKind<L, Either<A, B>>, SL: Semigroup<L>): Ior<L, B> = when (v) {
+            is Ior.Left -> Ior.Left(v.value)
+            is Ior.Right -> when (v.value) {
+                is Either.Right -> Ior.Right(v.value.b)
+                is Either.Left -> loop(f(v.value.a).ev().ev(), f, SL)
+            }
+            is Ior.Both -> when (v.rightValue) {
+                is Either.Right -> Ior.Both(v.leftValue, v.rightValue.b)
+                is Either.Left -> {
+                    val fnb = f(v.rightValue.a).ev()
+                    when (fnb) {
+                        is Ior.Left -> Ior.Left(SL.combine(v.leftValue, fnb.value))
+                        is Ior.Right -> loop(Ior.Both(v.leftValue, fnb.value), f, SL)
+                        is Ior.Both -> loop(Ior.Both(SL.combine(v.leftValue, fnb.leftValue), fnb.rightValue), f, SL)
+                    }
+                }
+            }
         }
 
-        inline fun <reified L> functor(SL: Semigroup<L> = semigroup<L>()): Functor<IorKindPartial<L>> = instances(SL)
+        fun <L, A, B> tailRecM(a: A, f: (A) -> IorKind<L, Either<A, B>>, SL: Semigroup<L>): Ior<L, B> = loop(f(a).ev(), f, SL)
 
-        inline fun <reified L> applicative(SL: Semigroup<L> = semigroup<L>()): Applicative<IorKindPartial<L>> = instances(SL)
+        fun <L> functor(): IorFunctorInstance<L> = IorFunctorInstanceImplicits.instance()
 
-        inline fun <reified L> monad(SL: Semigroup<L> = semigroup<L>()): Monad<IorKindPartial<L>> = instances(SL)
+        inline fun <reified L> applicative(SL: Semigroup<L> = semigroup<L>()): IorApplicativeInstance<L> =
+                IorApplicativeInstanceImplicits.instance(SL)
 
-        fun <L> foldable(): Foldable<HK<IorHK, L>> = object : IorTraverse<L> {}
+        inline fun <reified L> monad(SL: Semigroup<L> = semigroup<L>()): IorMonadInstance<L> =
+                IorMonadInstanceImplicits.instance(SL)
 
-        fun <L> traverse(): Traverse<HK<IorHK, L>> = object : IorTraverse<L> {}
+        fun <L> foldable(): IorFoldableInstance<L> = IorFoldableInstanceImplicits.instance()
+
+        fun <L> traverse(): IorTraverseInstance<L> = IorTraverseInstanceImplicits.instance()
     }
 
     /**
@@ -123,6 +142,14 @@ import kategory.Either.Right
         is Right -> fb(value)
         is Both -> fab(leftValue, rightValue)
     }
+
+    fun <C> foldL(c: C, f: (C, B) -> C): C = fold({ c }, { f(c, it) }, { _, b -> f(c, b) })
+
+    fun <C> foldR(lc: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
+            fold({ lc }, { f(it, lc) }, { _, b -> f(b, lc) })
+
+    fun <G, C> traverse(f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, Ior<A, C>> =
+            fold({ GA.pure(Ior.Left(it)) }, { GA.map(f(it), { Ior.Right(it) }) }, { _, b -> GA.map(f(b), { Ior.Right(it) }) })
 
     /**
      * The given function is applied if this is a [Right] or [Both] to `B`.
@@ -265,7 +292,7 @@ import kategory.Either.Right
  *
  * @param f The function to bind across [Ior.Right].
  */
-inline fun <A, B, D> Ior<A, B>.flatMap(SA: Semigroup<A>, crossinline f: (B) -> Ior<A, D>): Ior<A, D> = when (this) {
+inline fun <A, B, D> Ior<A, B>.flatMap(crossinline f: (B) -> Ior<A, D>, SA: Semigroup<A>): Ior<A, D> = when (this) {
     is Ior.Left -> Ior.Left(value)
     is Ior.Right -> f(value)
     is Ior.Both -> {
@@ -277,6 +304,8 @@ inline fun <A, B, D> Ior<A, B>.flatMap(SA: Semigroup<A>, crossinline f: (B) -> I
         }
     }
 }
+
+fun <A, B, D> Ior<A, B>.ap(ff: IorKind<A, (B) -> D>, SA: Semigroup<A>): Ior<A, D> = ff.ev().flatMap({ f -> map(f) }, SA)
 
 inline fun <A, B> Ior<A, B>.getOrElse(crossinline default: () -> B): B = fold({ default() }, { it }, { _, b -> b })
 

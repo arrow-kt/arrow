@@ -34,6 +34,9 @@ abstract class Prism<A, B> {
     abstract fun reverseGet(b: B): A
 
     companion object {
+
+        fun <A> id() = Iso.id<A>().asPrism()
+
         operator fun <A, B> invoke(getOrModify: (A) -> Either<A, B>, reverseGet: (B) -> A) = object : Prism<A, B>() {
             override fun getOrModify(a: A): Either<A, B> = getOrModify(a)
 
@@ -111,7 +114,7 @@ abstract class Prism<A, B> {
     inline fun all(crossinline p: (B) -> Boolean): (A) -> Boolean = { getOption(it).fold({ true }, p) }
 
     /**
-     * Convenience method to create a product of the target and a type C
+     * Create a product of the target and a type C
      */
     fun <C> first(): Prism<Tuple2<A, C>, Tuple2<B, C>> = Prism(
             { (a, c) -> getOrModify(a).bimap({ it toT c }, { it toT c }) },
@@ -119,7 +122,7 @@ abstract class Prism<A, B> {
     )
 
     /**
-     * Convenience method to create a product of a type C and the target
+     * Create a product of a type C and the target
      */
     fun <C> second(): Prism<Tuple2<C, A>, Tuple2<C, B>> = Prism(
             { (c, a) -> getOrModify(a).bimap({ c toT it }, { c toT it }) },
@@ -134,15 +137,21 @@ abstract class Prism<A, B> {
             this::reverseGet compose other::reverseGet
     )
 
+    /** compose an [Iso] as an [Prism] */
+    fun <C> composeIso(other: Iso<B, C>): Prism<A, C> =
+            composePrism(other.asPrism())
+
     /**
      * Plus operator overload to compose lenses
      */
     operator fun <C> plus(other: Prism<B, C>): Prism<A, C> = composePrism(other)
 
+    operator fun <C> plus(other: Iso<B, C>): Prism<A, C> = composeIso(other)
+
 }
 
 /**
- * Convenience method to create a sum of the target and a type C
+ * Create a sum of the target and a type C
  */
 fun <A, B, C> Prism<A, B>.left(): Prism<Either<A, C>, Either<B, C>> = Prism(
         { it.fold({ a -> getOrModify(a).bimap({ it.left() }, { it.left() }) }, { c -> Either.Right(c.right()) }) },
@@ -155,7 +164,7 @@ fun <A, B, C> Prism<A, B>.left(): Prism<Either<A, C>, Either<B, C>> = Prism(
 )
 
 /**
- * Convenience method to create a sum of a type C and the target
+ * Create a sum of a type C and the target
  */
 fun <A, B, C> Prism<A, B>.right(): Prism<Either<C, A>, Either<C, B>> = Prism(
         { it.fold({ c -> Either.Right(c.left()) }, { a -> getOrModify(a).bimap({ it.right() }, { it.right() }) }) },
