@@ -24,8 +24,7 @@ class OptionTest : UnitSpec() {
             monadError<OptionHK, Unit>() shouldNotBe null
         }
 
-        val EQ_EITHER: Eq<HK<OptionHK, Either<Unit, Int>>> = object : Eq<HK<OptionHK, Either<Unit, Int>>> {
-            override fun eqv(a: HK<OptionHK, Either<Unit, Int>>, b: HK<OptionHK, Either<Unit, Int>>): Boolean =
+        val EQ_EITHER: Eq<HK<OptionHK, Either<Unit, Int>>> = Eq { a, b ->
                     a.ev().fold(
                             { b.ev().fold({ true }, { false }) },
                             { eitherA: Either<Unit, Int> ->

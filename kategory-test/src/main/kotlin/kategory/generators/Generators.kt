@@ -2,18 +2,6 @@ package kategory
 
 import io.kotlintest.properties.Gen
 
-fun <F> genEqAnyLogged() = object : Eq<F> {
-    val any = Eq.any()
-
-    override fun eqv(a: F, b: F): Boolean {
-        val result = any.eqv(a, b)
-        if (!result) {
-            println("$a <---> $b")
-        }
-        return result
-    }
-}
-
 inline fun <reified F, A> genApplicative(valueGen: Gen<A>, AP: Applicative<F> = applicative<F>()): Gen<HK<F, A>> =
         object : Gen<HK<F, A>> {
             override fun generate(): HK<F, A> =
