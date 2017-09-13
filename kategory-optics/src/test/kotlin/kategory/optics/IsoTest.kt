@@ -3,21 +3,7 @@ package kategory.optics
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kategory.Either
-import kategory.Eq
-import kategory.IsoLaws
-import kategory.LensLaws
-import kategory.Option
-import kategory.PrismLaws
-import kategory.StringMonoid
-import kategory.Try
-import kategory.Tuple2
-import kategory.UnitSpec
-import kategory.applicative
-import kategory.genFunctionAToB
-import kategory.left
-import kategory.right
-import kategory.toT
+import kategory.*
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -54,7 +40,7 @@ class IsoTest : UnitSpec() {
                         funcGen = genFunctionAToB(Gen.string()),
                         EQA = Eq.any(),
                         EQB = Eq.any(),
-                        bMonoid = StringMonoid
+                        bMonoid = StringMonoidInstance
                 )
         )
 
