@@ -108,7 +108,7 @@ class PrismTest : UnitSpec() {
 
         "Finding a target using a predicate within a Lens should be wrapped in the correct option result" {
             forAll(SumGen, Gen.bool(), { sum, predicate ->
-                sumPrism.find { predicate }(sum).isDefined == (predicate && sum is SumType.A)
+                sumPrism.find { predicate }(sum).fold({ false }, { true }) == (predicate && sum is SumType.A)
             })
         }
 
