@@ -76,7 +76,7 @@ class IsoTest : UnitSpec() {
 
         "Finding a target using a predicate within a Iso should be wrapped in the correct option result" {
             forAll({ predicate: Boolean ->
-                tokenIso.find { predicate }(Token("any value")).isDefined == predicate
+                tokenIso.find { predicate }(Token("any value")).fold({ false }, { true }) == predicate
             })
         }
 

@@ -1,7 +1,6 @@
 package kategory
 
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
 import kategory.Either.Left
@@ -10,6 +9,10 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class EitherTest : UnitSpec() {
+    val EQ: Eq<HK<EitherKindPartial<IdHK>, Int>> = Eq { a, b ->
+        a.ev() == b.ev()
+    }
+
     init {
 
         "instances can be resolved implicitly" {
@@ -24,13 +27,7 @@ class EitherTest : UnitSpec() {
 
         testLaws(MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()))
         testLaws(TraverseLaws.laws(Either.traverse<Throwable>(), Either.applicative(), { it.right() }, Eq.any()))
-        testLaws(SemigroupKLaws.laws(
-                Either.semigroupK(),
-                Either.applicative(),
-                object : Eq<HK<EitherKindPartial<IdHK>, Int>> {
-                    override fun eqv(a: HK<EitherKindPartial<IdHK>, Int>, b: HK<EitherKindPartial<IdHK>, Int>): Boolean =
-                            a.ev() == b.ev()
-                }))
+        testLaws(SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ))
 
         "getOrElse should return value" {
             forAll { a: Int, b: Int ->
