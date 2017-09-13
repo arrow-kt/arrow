@@ -10,6 +10,7 @@ import me.eugeniomarletti.kotlin.metadata.getPropertyOrNull
 import me.eugeniomarletti.kotlin.metadata.getValueParameterOrNull
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmMethodSignature
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
+import me.eugeniomarletti.kotlin.metadata.modality
 import org.jetbrains.kotlin.serialization.ProtoBuf
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
@@ -44,6 +45,12 @@ val ProtoBuf.Class.Kind.isCompanionOrObject get() = when (this) {
     ProtoBuf.Class.Kind.COMPANION_OBJECT -> true
     else -> false
 }
+
+val ProtoBuf.Class.isSealed
+    get() = modality == ProtoBuf.Modality.SEALED
+
+val ClassOrPackageDataWrapper.Class.fullName: String
+    get() = nameResolver.getName(classProto.fqName).asString()
 
 fun ClassOrPackageDataWrapper.getParameter(function: ProtoBuf.Function, parameterElement: VariableElement) =
     getValueParameterOrNull(nameResolver, function, parameterElement)

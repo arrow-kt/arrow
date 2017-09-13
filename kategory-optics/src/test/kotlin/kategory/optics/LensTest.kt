@@ -6,6 +6,7 @@ import io.kotlintest.properties.forAll
 import kategory.Eq
 import kategory.LensLaws
 import kategory.Option
+import kategory.Try
 import kategory.Tuple2
 import kategory.UnitSpec
 import kategory.applicative
@@ -18,11 +19,6 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class LensTest : UnitSpec() {
 
-    private val tokenLens: Lens<Token, String> = Lens(
-            { token: Token -> token.value },
-            { value: String -> { token: Token -> token.copy(value = value) } }
-    )
-
     init {
         testLaws(
                 LensLaws.laws(
@@ -33,6 +29,14 @@ class LensTest : UnitSpec() {
                         EQA = Eq.any(),
                         EQB = Eq.any(),
                         FA = Option.applicative()
+                ) +  LensLaws.laws(
+                        lens = Lens.id(),
+                        aGen = Gen.int(),
+                        bGen = Gen.int(),
+                        funcGen = genFunctionAToB(Gen.int()),
+                        EQA = Eq.any(),
+                        EQB = Eq.any(),
+                        FA = Try.applicative()
                 )
         )
 
@@ -81,18 +85,4 @@ class LensTest : UnitSpec() {
         }
     }
 
-    private data class Token(val value: String)
-    private object TokenGen : Gen<Token> {
-        override fun generate() = Token(Gen.string().generate())
-    }
-
-    private data class User(val token: Token)
-    private object UserGen : Gen<User> {
-        override fun generate() = User(TokenGen.generate())
-    }
-
-    private val userLens: Lens<User, Token> = Lens(
-            { user: User -> user.token },
-            { token: Token -> { user: User -> user.copy(token = token) } }
-    )
 }
