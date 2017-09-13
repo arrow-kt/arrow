@@ -15,7 +15,7 @@ interface MonadCombine<F> : MonadFilter<F>, Alternative<F>, Typeclass {
     }
 }
 
-inline fun <reified F> monadCombine(): MonadCombine<F> = instance(InstanceParametrizedType(MonadCombine::class.java, listOf(F::class.java)))
+inline fun <reified F> monadCombine(): MonadCombine<F> = instance(InstanceParametrizedType(MonadCombine::class.java, listOf(typeLiteral<F>())))
 
 inline fun <F, reified G, A> MonadCombine<F>.uniteF(fga: HK<F, HK<G, A>>, FG: Foldable<G> = foldable()) = unite(fga, FG)
 

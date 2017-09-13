@@ -20,10 +20,10 @@ class ListKWTest : UnitSpec() {
             semigroupK<ListKWHK>() shouldNotBe null
             semigroup<ListKW<Int>>() shouldNotBe null
             monoid<ListKW<Int>>() shouldNotBe null
-            monoidK<ListKW<Int>>() shouldNotBe null
-            monadCombine<ListKW<Int>>() shouldNotBe null
-            functorFilter<ListKW<Int>>() shouldNotBe null
-            monadFilter<ListKW<Int>>() shouldNotBe null
+            monoidK<ListKW<ListKWHK>>() shouldNotBe null
+            monadCombine<ListKW<ListKWHK>>() shouldNotBe null
+            functorFilter<ListKW<ListKWHK>>() shouldNotBe null
+            monadFilter<ListKW<ListKWHK>>() shouldNotBe null
         }
 
         testLaws(MonadLaws.laws(ListKW.monad(), Eq.any()))
