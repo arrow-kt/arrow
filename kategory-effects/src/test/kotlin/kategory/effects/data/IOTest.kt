@@ -4,17 +4,28 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldEqual
+import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class IOTest : UnitSpec() {
-    val EQ: Eq<HK<IOHK, Int>> = object : Eq<HK<IOHK, Int>> {
-        override fun eqv(a: HK<IOHK, Int>, b: HK<IOHK, Int>): Boolean =
+    fun <A> EQ(): Eq<HK<IOHK, A>> = object : Eq<HK<IOHK, A>> {
+        override fun eqv(a: HK<IOHK, A>, b: HK<IOHK, A>): Boolean =
                 a.ev().attempt().unsafeRunSync() == b.ev().attempt().unsafeRunSync()
     }
 
     init {
-        testLaws(AsyncLaws.laws(IO.asyncContext(), IO.monadError(), EQ, EQ))
+        testLaws(AsyncLaws.laws(IO.asyncContext(), IO.monadError(), EQ(), EQ()))
+
+        "instances can be resolved implicitly" {
+            functor<IOHK>() shouldNotBe null
+            applicative<IOHK>() shouldNotBe null
+            monad<IOHK>() shouldNotBe null
+            monadError<IOHK, Throwable>() shouldNotBe null
+            asyncContext<IOHK>() shouldNotBe null
+            semigroup<IOKind<Int>>() shouldNotBe null
+            monoid<IOKind<Int>>() shouldNotBe null
+        }
 
         "should defer evaluation until run" {
             var run = false
@@ -72,7 +83,7 @@ class IOTest : UnitSpec() {
         }
 
         "should time out on unending unsafeRunTimed" {
-            val never = IO.async<Int> { Unit }
+            val never = IO.runAsync<Int> { Unit }
             val start = System.currentTimeMillis()
             val received = never.unsafeRunTimed(100.milliseconds)
             val elapsed = System.currentTimeMillis() - start
@@ -192,7 +203,7 @@ class IOTest : UnitSpec() {
         }
 
         "should map values correctly on success" {
-            val run = IO.map(IO.pure(1)) { it + 1 }.unsafeRunSync()
+            val run = IO.functor().map(IO.pure(1)) { it + 1 }.unsafeRunSync()
 
             val expected = 2
 
@@ -200,7 +211,7 @@ class IOTest : UnitSpec() {
         }
 
         "should flatMap values correctly on success" {
-            val run = IO.flatMap(IO.pure(1)) { num -> IO { num + 1 } }.unsafeRunSync()
+            val run = IO.monad().flatMap(IO.pure(1)) { num -> IO { num + 1 } }.unsafeRunSync()
 
             val expected = 2
 
@@ -208,7 +219,7 @@ class IOTest : UnitSpec() {
         }
 
         "IO.binding should for comprehend over IO" {
-            val result = IO.binding {
+            val result = IO.monad().binding {
                 val x = IO.pure(1).bind()
                 val y = bind { IO { x + 1 } }
                 yields(y)

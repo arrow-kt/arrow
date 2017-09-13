@@ -10,7 +10,7 @@ interface AsyncContext<out F> : Typeclass {
     fun <A> runAsync(fa: Proc<A>): HK<F, A>
 }
 
-inline fun <reified F> asyncContext(): AsyncContext<F> = instance(InstanceParametrizedType(AsyncContext::class.java, listOf(F::class.java)))
+inline fun <reified F> asyncContext(): AsyncContext<F> = instance(InstanceParametrizedType(AsyncContext::class.java, listOf(typeLiteral<F>())))
 
 inline fun <F, A> runAsync(AC: AsyncContext<F>, crossinline f: () -> A): HK<F, A> =
         AC.runAsync { ff: (Either<Throwable, A>) -> Unit ->
