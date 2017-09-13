@@ -42,6 +42,9 @@ data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A>
                 }
             }.ev()
 
+    fun <B> mapFilter(f: (A) -> Option<B>): ListKW<B> =
+            flatMap({ a -> f(a).fold({ empty<B>() }, { pure(it) }) })
+
     companion object {
 
         fun <A> pure(a: A): ListKW<A> = listOf(a).k()
