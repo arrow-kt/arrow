@@ -92,7 +92,7 @@ object OptionalLaws {
         override fun empty(): FirstOption<A> = FirstOption(Option.None)
 
         override fun combine(a: FirstOption<A>, b: FirstOption<A>): FirstOption<A> =
-                if (a.option.isDefined) a else b
+                if (a.option.fold({ true }, { false })) a else b
     }
 
 }

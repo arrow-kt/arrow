@@ -76,7 +76,7 @@ class OptionalTest : UnitSpec() {
 
         "Finding a target using a predicate should be wrapped in the correct option result" {
             forAll(Gen.list(Gen.int()), Gen.bool(), { list, predicate ->
-                optionalHead.find { predicate }(list).isDefined == predicate
+                optionalHead.find { predicate }(list).fold({ false }, { true }) == predicate
             })
         }
 

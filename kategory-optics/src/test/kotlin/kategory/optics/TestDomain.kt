@@ -20,7 +20,7 @@ object SumGen : Gen<SumType> {
     override fun generate(): SumType = Gen.oneOf(AGen, Gen.create { SumType.B(Gen.int().generate()) }).generate()
 }
 
-val sumPrism = Prism<SumType, String>(
+val sumPrism: Prism<SumType, String> = Prism(
         {
             when (it) {
                 is SumType.A -> it.string.right()
@@ -30,7 +30,7 @@ val sumPrism = Prism<SumType, String>(
         SumType::A
 )
 
-val stringPrism = Prism<String, List<Char>>(
+val stringPrism: Prism<String, List<Char>> = Prism(
         { it.toList().right() },
         { it.joinToString(separator = "") }
 )
@@ -65,12 +65,12 @@ internal val userLens: Lens<User, Token> = Lens(
         { token: Token -> { user: User -> user.copy(token = token) } }
 )
 
-internal val optionalHead = Optional<List<Int>, Int>(
-        { Option.fromNullable(it.firstOrNull()) },
+internal val optionalHead: Optional<List<Int>, Int> = Optional(
+        { it.firstOrNull()?.right() ?: it.left() },
         { int -> { list -> listOf(int) + if (list.size > 1) list.drop(1) else emptyList() } }
 )
 
-internal val defaultHead = Optional<Int, Int>(
-        { it.some() },
+internal val defaultHead: Optional<Int, Int> = Optional(
+        { it.right() },
         { ::identity }
 )
