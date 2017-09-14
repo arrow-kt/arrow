@@ -39,7 +39,7 @@ object ConstFoldableInstanceImplicits {
     fun <A> instance(): ConstFoldableInstance<A> = object : ConstFoldableInstance<A> {}
 }
 
-interface ConstTraverseFilterInstance<X> : TraverseFilter<ConstKindPartial<X>> {
+interface ConstTraverseInstance<X> : Traverse<ConstKindPartial<X>> {
 
     override fun <T, U> map(fa: ConstKind<X, T>, f: (T) -> U): Const<X, U> = fa.ev().retag()
 
@@ -49,6 +49,13 @@ interface ConstTraverseFilterInstance<X> : TraverseFilter<ConstKindPartial<X>> {
 
     override fun <G, A, B> traverse(fa: ConstKind<X, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, ConstKind<X, B>> =
             fa.ev().traverse(f, GA)
+}
+
+object ConstTraverseInstanceImplicits {
+    @JvmStatic fun <A> instance(): ConstTraverseInstance<A> = object : ConstTraverseInstance<A> {}
+}
+
+interface ConstTraverseFilterInstance<X> : ConstTraverseInstance<X>, TraverseFilter<ConstKindPartial<X>> {
 
     override fun <G, A, B> traverseFilter(fa: ConstKind<X, A>, f: (A) -> HK<G, Option<B>>, GA: Applicative<G>): HK<G, ConstKind<X, B>> =
             fa.ev().traverseFilter(f, GA)
@@ -57,6 +64,7 @@ interface ConstTraverseFilterInstance<X> : TraverseFilter<ConstKindPartial<X>> {
 object ConstTraverseFilterInstanceImplicits {
     @JvmStatic fun <A> instance(): ConstTraverseFilterInstance<A> = object : ConstTraverseFilterInstance<A> {}
 }
+
 
 interface ConstSemigroup<A, T> : Semigroup<ConstKind<A, T>> {
 

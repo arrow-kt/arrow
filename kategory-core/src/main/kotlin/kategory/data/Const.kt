@@ -18,7 +18,7 @@ fun <A, T> ConstKind<A, T>.value(): A = this.ev().value
                 ConstApplicativeInstanceImplicits.instance(MA)
 
         inline fun <reified A> traverse(MA: Monoid<A> = kategory.monoid<A>()): Traverse<ConstKindPartial<A>> =
-                ConstTraverseFilterInstanceImplicits.instance()
+                ConstTraverseInstanceImplicits.instance()
 
         inline fun <reified A> traverseFilter(MA: Monoid<A> = kategory.monoid<A>()): TraverseFilter<ConstKindPartial<A>> =
                 ConstTraverseFilterInstanceImplicits.instance()

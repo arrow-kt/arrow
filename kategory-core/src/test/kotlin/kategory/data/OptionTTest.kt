@@ -4,6 +4,7 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.forAll
 import kategory.laws.FunctorFilterLaws
 import kategory.laws.TraverseFilterLaws
+import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -15,11 +16,11 @@ class OptionTTest : UnitSpec() {
             applicative<OptionTKindPartial<NonEmptyListHK>>() shouldNotBe null
             monad<OptionTKindPartial<NonEmptyListHK>>() shouldNotBe null
             foldable<OptionTKindPartial<NonEmptyListHK>>() shouldNotBe null
-            traverse<OptionTKindPartial<NonEmptyListHK>>() shouldNotBe null
-            traverseFilter<OptionTKindPartial<ListKWHK>>() shouldNotBe null
+            traverse<OptionTKindPartial<ListKWHK>>() shouldNotBe null
             semigroupK<OptionTKindPartial<ListKWHK>>() shouldNotBe null
             monoidK<OptionTKindPartial<ListKWHK>>() shouldNotBe null
             functorFilter<OptionTKindPartial<ListKWHK>>() shouldNotBe null
+            traverseFilter<OptionTKindPartial<OptionHK>>() shouldNotBe null
         }
 
         val OptionTFIdEq = object : Eq<HK<OptionTKindPartial<IdHK>, Int>> {

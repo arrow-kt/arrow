@@ -44,7 +44,7 @@ package kategory
         inline fun <reified F> foldable(FFF: Foldable<F> = kategory.foldable<F>()): OptionTFoldableInstance<F> =
                 OptionTFoldableInstanceImplicits.instance(FFF)
 
-        inline fun <reified F> traverseFilter(FF: TraverseFilter<F> = kategory.traverseFilter<F>()): OptionTTraverseFilterInstance<F> =
+        inline fun <reified F> traverseFilter(TF: TraverseFilter<F> = kategory.traverseFilter<F>()): OptionTTraverseFilterInstance<F> =
                 OptionTTraverseFilterInstanceImplicits.instance(TF)
 
         inline fun <reified F> traverse(TF: Traverse<F> = kategory.traverse<F>()): OptionTTraverseInstance<F> =
@@ -108,8 +108,7 @@ package kategory
 
     fun <B> foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>): Eval<B> = FF.compose(Option.foldable()).foldRC(value, lb, f)
 
-    fun <G, B> traverseFilter(f: (A) -> HK<G, Option<B>>, GA: Applicative<G>, FF: Traverse<F>):
-            HK<G, OptionT<F, B>> {
+    fun <G, B> traverseFilter(f: (A) -> HK<G, Option<B>>, GA: Applicative<G>, FF: Traverse<F>): HK<G, OptionT<F, B>> {
         val fa = ComposedTraverseFilter(FF, Option.traverseFilter(), Option.applicative()).traverseFilterC(value, f, GA)
         return GA.map(fa, { OptionT(FF.map(it.lower(), { it.ev() })) })
     }
