@@ -95,3 +95,39 @@ object StateTSemigroupKInstanceImplicits {
     }
 }
 
+interface StateTMonadCombineInstance<F, S> : MonadCombine<StateTKindPartial<F, S>>, StateTMonadInstance<F, S>, StateTSemigroupKInstance<F, S> {
+
+    override fun MF(): MonadCombine<F>
+    override fun SF(): SemigroupK<F> = MF()
+
+    override fun <A> empty(): HK<StateTKindPartial<F, S>, A> = liftT(MF().empty())
+
+    fun <A> liftT(ma: HK<F, A>): StateT<F, S, A> = StateT(MF().pure({ s: S -> MF().map(ma, { a: A -> s toT a }) }))
+}
+
+object StateTMonadCombineInstanceImplicits {
+    @JvmStatic
+    fun <F, S> instance(MCF: MonadCombine<F>): StateTMonadCombineInstance<F, S> = object : StateTMonadCombineInstance<F, S> {
+        override fun FF(): Functor<F> = MCF
+        override fun MF(): MonadCombine<F> = MCF
+
+    }
+}
+
+interface StateTMonadErrorInstance<F, S, E> : StateTMonadInstance<F, S>, MonadError<StateTKindPartial<F, S>, E> {
+    override fun MF(): MonadError<F, E>
+
+    override fun <A> raiseError(e: E): HK<StateTKindPartial<F, S>, A> = StateT.lift(MF().raiseError(e), MF())
+
+    override fun <A> handleErrorWith(fa: HK<StateTKindPartial<F, S>, A>, f: (E) -> HK<StateTKindPartial<F, S>, A>): StateT<F, S, A> =
+            StateT(MF().pure({ s -> MF().handleErrorWith(fa.runM(s, MF()), { e -> f(e).runM(s, MF()) }) }))
+}
+
+object StateTMonadErrorImplicits {
+    @JvmStatic
+    fun <F, S, E> instance(ME: MonadError<F, E>): StateTMonadErrorInstance<F, S, E> = object : StateTMonadErrorInstance<F, S, E> {
+        override fun FF(): Functor<F> = ME
+        override fun MF(): MonadError<F, E> = ME
+    }
+}
+

@@ -1,8 +1,7 @@
-package kategory.laws
+package kategory
 
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kategory.*
 import kategory.Option.Some
 import kategory.Option.None
 

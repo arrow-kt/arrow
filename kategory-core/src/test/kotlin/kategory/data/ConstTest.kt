@@ -1,7 +1,6 @@
 package kategory
 
 import io.kotlintest.KTestJUnitRunner
-import kategory.laws.TraverseFilterLaws
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 

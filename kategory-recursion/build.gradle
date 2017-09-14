@@ -11,6 +11,7 @@ dependencies {
     testCompile project(':kategory-test')
 }
 
-apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+// FIXME(paco): re-enable when it's prod-ready
+//apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
 apply from: 'generated-kotlin-sources.gradle'
 apply plugin: 'kotlin-kapt'

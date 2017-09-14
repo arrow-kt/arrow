@@ -2,13 +2,28 @@ package kategory
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.forAll
-import kategory.laws.FunctorFilterLaws
-import kategory.laws.TraverseFilterLaws
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class OptionTTest : UnitSpec() {
+
+    val EQ_ID: Eq<HK<OptionTKindPartial<IdHK>, Int>> = Eq { a, b ->
+        a.value() == b.value()
+    }
+
+    val EQ_OPTION = object : Eq<HK<OptionTKindPartial<OptionHK>, Int>> {
+        override fun eqv(a: HK<OptionTKindPartial<OptionHK>, Int>, b: HK<OptionTKindPartial<OptionHK>, Int>): Boolean =
+                a.ev().value == b.ev().value
+    }
+
+    val EQ_NESTED_OPTION = object : Eq<HK<OptionTKindPartial<OptionHK>, HK<OptionTKindPartial<OptionHK>, Int>>> {
+        override fun eqv(a: HK<OptionTKindPartial<OptionHK>, HK<OptionTKindPartial<OptionHK>, Int>>, b: HK<OptionTKindPartial<OptionHK>, HK<OptionTKindPartial<OptionHK>, Int>>): Boolean =
+                a.ev().value == b.ev().value
+    }
+
+    val NELM: Monad<NonEmptyListHK> = monad<NonEmptyListHK>()
+
     init {
 
         "instances can be resolved implicitly" {
@@ -16,74 +31,57 @@ class OptionTTest : UnitSpec() {
             applicative<OptionTKindPartial<NonEmptyListHK>>() shouldNotBe null
             monad<OptionTKindPartial<NonEmptyListHK>>() shouldNotBe null
             foldable<OptionTKindPartial<NonEmptyListHK>>() shouldNotBe null
-            traverse<OptionTKindPartial<ListKWHK>>() shouldNotBe null
+            traverse<OptionTKindPartial<NonEmptyListHK>>() shouldNotBe null
             semigroupK<OptionTKindPartial<ListKWHK>>() shouldNotBe null
             monoidK<OptionTKindPartial<ListKWHK>>() shouldNotBe null
             functorFilter<OptionTKindPartial<ListKWHK>>() shouldNotBe null
             traverseFilter<OptionTKindPartial<OptionHK>>() shouldNotBe null
         }
 
-        val OptionTFIdEq = object : Eq<HK<OptionTKindPartial<IdHK>, Int>> {
-            override fun eqv(a: HK<OptionTKindPartial<IdHK>, Int>, b: HK<OptionTKindPartial<IdHK>, Int>): Boolean =
-                    a.ev().value == b.ev().value
-        }
-
-        val OptionTFOptionEq = object : Eq<HK<OptionTKindPartial<OptionHK>, Int>> {
-            override fun eqv(a: HK<OptionTKindPartial<OptionHK>, Int>, b: HK<OptionTKindPartial<OptionHK>, Int>): Boolean =
-                    a.ev().value == b.ev().value
-        }
-
-        val OptionTFOptionNestedEq = object : Eq<HK<OptionTKindPartial<OptionHK>, HK<OptionTKindPartial<OptionHK>, Int>>> {
-            override fun eqv(a: HK<OptionTKindPartial<OptionHK>, HK<OptionTKindPartial<OptionHK>, Int>>, b: HK<OptionTKindPartial<OptionHK>, HK<OptionTKindPartial<OptionHK>, Int>>): Boolean =
-                    a.ev().value == b.ev().value
-        }
-
         testLaws(MonadLaws.laws(OptionT.monad(NonEmptyList.monad()), Eq.any()))
         testLaws(SemigroupKLaws.laws(
                 OptionT.semigroupK(Id.monad()),
                 OptionT.applicative(Id.monad()),
-                OptionTFIdEq))
+                EQ_ID))
 
         testLaws(MonoidKLaws.laws(
                 OptionT.monoidK(Id.monad()),
                 OptionT.applicative(Id.monad()),
-                OptionTFIdEq))
+                EQ_ID))
 
         testLaws(FunctorFilterLaws.laws(
                 OptionT.functorFilter(),
                 { OptionT(Id(it.some())) },
-                OptionTFIdEq))
-
-        val nelMonad = monad<NonEmptyListHK>()
+                EQ_ID))
 
         testLaws(TraverseFilterLaws.laws(
                 OptionT.traverseFilter(),
                 OptionT.applicative(Option.monad()),
                 { OptionT(Option(it.some())) },
-                OptionTFOptionEq,
-                OptionTFOptionNestedEq))
+                EQ_OPTION,
+                EQ_NESTED_OPTION))
 
         "toLeft for Some should build a correct EitherT" {
             forAll { a: Int, b: String ->
-                OptionT.fromOption<NonEmptyListHK, Int>(Option.Some(a)).toLeft({ b }, nelMonad) == EitherT.left<NonEmptyListHK, Int, String>(a, applicative())
+                OptionT.fromOption<NonEmptyListHK, Int>(Option.Some(a)).toLeft({ b }, NELM) == EitherT.left<NonEmptyListHK, Int, String>(a, applicative())
             }
         }
 
         "toLeft for None should build a correct EitherT" {
             forAll { a: Int, b: String ->
-                OptionT.fromOption<NonEmptyListHK, Int>(Option.None).toLeft({ b }, nelMonad) == EitherT.right<NonEmptyListHK, Int, String>(b, applicative())
+                OptionT.fromOption<NonEmptyListHK, Int>(Option.None).toLeft({ b }, NELM) == EitherT.right<NonEmptyListHK, Int, String>(b, applicative())
             }
         }
 
         "toRight for Some should build a correct EitherT" {
             forAll { a: Int, b: String ->
-                OptionT.fromOption<NonEmptyListHK, String>(Option.Some(b)).toRight({ a }, nelMonad) == EitherT.right<NonEmptyListHK, Int, String>(b, applicative())
+                OptionT.fromOption<NonEmptyListHK, String>(Option.Some(b)).toRight({ a }, NELM) == EitherT.right<NonEmptyListHK, Int, String>(b, applicative())
             }
         }
 
         "toRight for None should build a correct EitherT" {
             forAll { a: Int, b: String ->
-                OptionT.fromOption<NonEmptyListHK, String>(Option.None).toRight({ a }, nelMonad) == EitherT.left<NonEmptyListHK, Int, String>(a, applicative())
+                OptionT.fromOption<NonEmptyListHK, String>(Option.None).toRight({ a }, NELM) == EitherT.left<NonEmptyListHK, Int, String>(a, applicative())
             }
         }
 
