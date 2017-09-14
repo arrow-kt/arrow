@@ -65,7 +65,6 @@ object ConstTraverseFilterInstanceImplicits {
     @JvmStatic fun <A> instance(): ConstTraverseFilterInstance<A> = object : ConstTraverseFilterInstance<A> {}
 }
 
-
 interface ConstSemigroup<A, T> : Semigroup<ConstKind<A, T>> {
 
     fun SA(): Semigroup<A>
