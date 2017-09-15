@@ -35,8 +35,6 @@ class ObservableWTest : UnitSpec() {
                 }
     }
 
-    data class Wrap(val value: String = "")
-
     init {
 
         "instances can be resolved implicitly" {
