@@ -8,18 +8,12 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class OptionTTest : UnitSpec() {
 
-    val EQ_ID: Eq<HK<OptionTKindPartial<IdHK>, Int>> = Eq { a, b ->
+    fun <A> EQ(): Eq<HK<OptionTKindPartial<A>, Int>> = Eq { a, b ->
         a.value() == b.value()
     }
 
-    val EQ_OPTION = object : Eq<HK<OptionTKindPartial<OptionHK>, Int>> {
-        override fun eqv(a: HK<OptionTKindPartial<OptionHK>, Int>, b: HK<OptionTKindPartial<OptionHK>, Int>): Boolean =
-                a.ev().value == b.ev().value
-    }
-
-    val EQ_NESTED_OPTION = object : Eq<HK<OptionTKindPartial<OptionHK>, HK<OptionTKindPartial<OptionHK>, Int>>> {
-        override fun eqv(a: HK<OptionTKindPartial<OptionHK>, HK<OptionTKindPartial<OptionHK>, Int>>, b: HK<OptionTKindPartial<OptionHK>, HK<OptionTKindPartial<OptionHK>, Int>>): Boolean =
-                a.ev().value == b.ev().value
+    fun <A> EQ_NESTED(): Eq<HK<OptionTKindPartial<A>, HK<OptionTKindPartial<A>, Int>>> = Eq { a, b ->
+        a.value() == b.value()
     }
 
     val NELM: Monad<NonEmptyListHK> = monad<NonEmptyListHK>()
@@ -42,24 +36,24 @@ class OptionTTest : UnitSpec() {
         testLaws(SemigroupKLaws.laws(
                 OptionT.semigroupK(Id.monad()),
                 OptionT.applicative(Id.monad()),
-                EQ_ID))
+                EQ<IdHK>()))
 
         testLaws(MonoidKLaws.laws(
                 OptionT.monoidK(Id.monad()),
                 OptionT.applicative(Id.monad()),
-                EQ_ID))
+                EQ<IdHK>()))
 
         testLaws(FunctorFilterLaws.laws(
                 OptionT.functorFilter(),
                 { OptionT(Id(it.some())) },
-                EQ_ID))
+                EQ<IdHK>()))
 
         testLaws(TraverseFilterLaws.laws(
                 OptionT.traverseFilter(),
                 OptionT.applicative(Option.monad()),
                 { OptionT(Option(it.some())) },
-                EQ_OPTION,
-                EQ_NESTED_OPTION))
+                EQ<OptionHK>(),
+                EQ_NESTED<OptionHK>()))
 
         "toLeft for Some should build a correct EitherT" {
             forAll { a: Int, b: String ->
