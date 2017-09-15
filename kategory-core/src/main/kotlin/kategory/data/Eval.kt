@@ -31,6 +31,117 @@ package kategory
 @deriving(Functor::class, Applicative::class, Monad::class)
 sealed class Eval<out A> : EvalKind<A> {
 
+    companion object {
+
+        fun <A, B> tailRecM(a: A, f: (A) -> EvalKind<Either<A, B>>): Eval<B> =
+                f(a).ev().flatMap { eval: Either<A, B> ->
+                    when (eval) {
+                        is Either.Left -> tailRecM(eval.a, f)
+                        is Either.Right -> pure(eval.b)
+                    }
+                }
+
+        fun <A> pure(a: A): Eval<A> = Eval.now(a)
+
+        @JvmStatic
+        fun <A> now(a: A) = Now(a)
+
+        @JvmStatic
+        fun <A> later(f: () -> A) = Later(f)
+
+        @JvmStatic
+        fun <A> always(f: () -> A) = Always(f)
+
+        @JvmStatic
+        fun <A> defer(f: () -> Eval<A>): Eval<A> = Call(f)
+
+        @JvmStatic
+        fun raise(t: Throwable): Eval<Nothing> = defer { throw t }
+
+        @JvmStatic
+        val Unit: Eval<Unit> = Now(kotlin.Unit)
+        @JvmStatic
+        val True: Eval<Boolean> = Now(true)
+        @JvmStatic
+        val False: Eval<Boolean> = Now(false)
+        @JvmStatic
+        val Zero: Eval<Int> = Now(0)
+        @JvmStatic
+        val One: Eval<Int> = Now(1)
+
+        fun <A, B> merge(
+                op1: () -> A,
+                op2: () -> B): Eval<Tuple2<A, B>> = applicative().tupled(later(op1), later(op2)).ev()
+
+        fun <A, B, C> merge(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C): Eval<Tuple3<A, B, C>> = applicative().tupled(later(op1), later(op2), later(op3)).ev()
+
+        fun <A, B, C, D> merge(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C,
+                op4: () -> D): Eval<Tuple4<A, B, C, D>> = applicative().tupled(later(op1), later(op2), later(op3), later(op4)).ev()
+
+        fun <A, B, C, D, E> merge(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C,
+                op4: () -> D,
+                op5: () -> E): Eval<Tuple5<A, B, C, D, E>> = applicative().tupled(later(op1), later(op2), later(op3), later(op4), later(op5)).ev()
+
+        fun <A, B, C, D, E, F> merge(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C,
+                op4: () -> D,
+                op5: () -> E,
+                op6: () -> F): Eval<Tuple6<A, B, C, D, E, F>> = applicative().tupled(later(op1), later(op2), later(op3), later(op4), later(op5), later(op6)).ev()
+
+        fun <A, B, C, D, E, F, G> merge(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C,
+                op4: () -> D,
+                op5: () -> E,
+                op6: () -> F,
+                op7: () -> G): Eval<Tuple7<A, B, C, D, E, F, G>> = applicative().tupled(later(op1), later(op2), later(op3), later(op4), later(op5), later(op6), later(op7)).ev()
+
+        fun <A, B, C, D, E, F, G, H> merge(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C,
+                op4: () -> D,
+                op5: () -> E,
+                op6: () -> F,
+                op7: () -> G,
+                op8: () -> H): Eval<Tuple8<A, B, C, D, E, F, G, H>> = applicative().tupled(later(op1), later(op2), later(op3), later(op4), later(op5), later(op6), later(op7), later(op8)).ev()
+
+        fun <A, B, C, D, E, F, G, H, I> merge(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C,
+                op4: () -> D,
+                op5: () -> E,
+                op6: () -> F,
+                op7: () -> G,
+                op8: () -> H,
+                op9: () -> I): Eval<Tuple9<A, B, C, D, E, F, G, H, I>> = applicative().tupled(later(op1), later(op2), later(op3), later(op4), later(op5), later(op6), later(op7), later(op8), later(op9)).ev()
+
+        fun <A, B, C, D, E, F, G, H, I, J> merge(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C,
+                op4: () -> D,
+                op5: () -> E,
+                op6: () -> F,
+                op7: () -> G,
+                op8: () -> H,
+                op9: () -> I,
+                op10: () -> J): Eval<Tuple10<A, B, C, D, E, F, G, H, I, J>> = applicative().tupled(later(op1), later(op2), later(op3), later(op4), later(op5), later(op6), later(op7), later(op8), later(op9), later(op10)).ev()
+    }
+
     abstract fun value(): A
 
     abstract fun memoize(): Eval<A>
@@ -181,45 +292,5 @@ sealed class Eval<out A> : EvalKind<A> {
             }
             return curr.value()
         }
-    }
-
-    companion object {
-
-        fun <A, B> tailRecM(a: A, f: (A) -> EvalKind<Either<A, B>>): Eval<B> =
-                f(a).ev().flatMap { eval: Either<A, B> ->
-                    when (eval) {
-                        is Either.Left -> tailRecM(eval.a, f)
-                        is Either.Right -> pure(eval.b)
-                    }
-                }
-
-        fun <A> pure(a: A): Eval<A> = Eval.now(a)
-
-        @JvmStatic
-        fun <A> now(a: A) = Now(a)
-
-        @JvmStatic
-        fun <A> later(f: () -> A) = Later(f)
-
-        @JvmStatic
-        fun <A> always(f: () -> A) = Always(f)
-
-        @JvmStatic
-        fun <A> defer(f: () -> Eval<A>): Eval<A> = Call(f)
-
-        @JvmStatic
-        fun raise(t: Throwable): Eval<Nothing> = defer { throw t }
-
-        @JvmStatic
-        val Unit: Eval<Unit> = Now(kotlin.Unit)
-        @JvmStatic
-        val True: Eval<Boolean> = Now(true)
-        @JvmStatic
-        val False: Eval<Boolean> = Now(false)
-        @JvmStatic
-        val Zero: Eval<Int> = Now(0)
-        @JvmStatic
-        val One: Eval<Int> = Now(1)
-
     }
 }

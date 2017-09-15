@@ -34,6 +34,77 @@ sealed class Try<out A> : TryKind<A> {
         fun monadError(): TryMonadErrorInstance =
                 TryMonadErrorInstanceImplicits.instance()
 
+        fun <A, B> parallel(
+                op1: () -> A,
+                op2: () -> B): Try<Tuple2<A, B>> = applicative().tupled(invoke(op1), invoke(op2)).ev()
+
+        fun <A, B, C> parallel(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C): Try<Tuple3<A, B, C>> = applicative().tupled(invoke(op1), invoke(op2), invoke(op3)).ev()
+
+        fun <A, B, C, D> parallel(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C,
+                op4: () -> D): Try<Tuple4<A, B, C, D>> = applicative().tupled(invoke(op1), invoke(op2), invoke(op3), invoke(op4)).ev()
+
+        fun <A, B, C, D, E> parallel(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C,
+                op4: () -> D,
+                op5: () -> E): Try<Tuple5<A, B, C, D, E>> = applicative().tupled(invoke(op1), invoke(op2), invoke(op3), invoke(op4), invoke(op5)).ev()
+
+        fun <A, B, C, D, E, F> parallel(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C,
+                op4: () -> D,
+                op5: () -> E,
+                op6: () -> F): Try<Tuple6<A, B, C, D, E, F>> = applicative().tupled(invoke(op1), invoke(op2), invoke(op3), invoke(op4), invoke(op5), invoke(op6)).ev()
+
+        fun <A, B, C, D, E, F, G> parallel(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C,
+                op4: () -> D,
+                op5: () -> E,
+                op6: () -> F,
+                op7: () -> G): Try<Tuple7<A, B, C, D, E, F, G>> = applicative().tupled(invoke(op1), invoke(op2), invoke(op3), invoke(op4), invoke(op5), invoke(op6), invoke(op7)).ev()
+
+        fun <A, B, C, D, E, F, G, H> parallel(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C,
+                op4: () -> D,
+                op5: () -> E,
+                op6: () -> F,
+                op7: () -> G,
+                op8: () -> H): Try<Tuple8<A, B, C, D, E, F, G, H>> = applicative().tupled(invoke(op1), invoke(op2), invoke(op3), invoke(op4), invoke(op5), invoke(op6), invoke(op7), invoke(op8)).ev()
+
+        fun <A, B, C, D, E, F, G, H, I> parallel(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C,
+                op4: () -> D,
+                op5: () -> E,
+                op6: () -> F,
+                op7: () -> G,
+                op8: () -> H,
+                op9: () -> I): Try<Tuple9<A, B, C, D, E, F, G, H, I>> = applicative().tupled(invoke(op1), invoke(op2), invoke(op3), invoke(op4), invoke(op5), invoke(op6), invoke(op7), invoke(op8), invoke(op9)).ev()
+
+        fun <A, B, C, D, E, F, G, H, I, J> parallel(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C,
+                op4: () -> D,
+                op5: () -> E,
+                op6: () -> F,
+                op7: () -> G,
+                op8: () -> H,
+                op9: () -> I,
+                op10: () -> J): Try<Tuple10<A, B, C, D, E, F, G, H, I, J>> = applicative().tupled(invoke(op1), invoke(op2), invoke(op3), invoke(op4), invoke(op5), invoke(op6), invoke(op7), invoke(op8), invoke(op9), invoke(op10)).ev()
     }
 
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, Try<B>> =
