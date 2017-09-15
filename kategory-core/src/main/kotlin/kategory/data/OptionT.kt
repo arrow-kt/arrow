@@ -107,7 +107,7 @@ package kategory
 
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>, FF: Traverse<F>): HK<G, OptionT<F, B>> {
         val fa = ComposedTraverse(FF, Option.traverse(), Option.applicative()).traverseC(value, f, GA)
-        return GA.map(fa, { OptionT(FF.map(it.lower(), { it.ev() })) })
+        return GA.map(fa, { OptionT(FF.map(it.unnest(), { it.ev() })) })
     }
 
     fun <R> toLeft(default: () -> R, FF: Functor<F>): EitherT<F, A, R> =

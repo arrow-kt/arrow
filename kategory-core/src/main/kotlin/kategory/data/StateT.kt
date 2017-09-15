@@ -15,6 +15,8 @@ class StateT<F, S, A>(
 
         fun <F, S, A> invokeF(runF: StateTFunKind<F, S, A>): StateT<F, S, A> = StateT(runF)
 
+        fun <F, S, A> lift(fa: HK<F, A>, MF: Monad<F>): StateT<F, S, A> = StateT(MF.pure({ s -> MF.map(fa, { a -> Tuple2(s, a) }) }))
+
         inline fun <reified F, S> functor(FF: Functor<F> = functor<F>()): StateTFunctorInstance<F, S> =
                 StateTFunctorInstanceImplicits.instance(FF)
 
@@ -29,6 +31,12 @@ class StateT<F, S, A>(
 
         inline fun <reified F, S> semigroupK(MF: Monad<F> = monad<F>(), SF: SemigroupK<F> = semigroupK<F>()): StateTSemigroupKInstance<F, S> =
                 StateTSemigroupKInstanceImplicits.instance(MF, SF)
+
+        inline fun <reified F, S> monadCombine(MCF: MonadCombine<F> = monadCombine<F>()): StateTMonadCombineInstance<F, S> =
+                StateTMonadCombineInstanceImplicits.instance(MCF)
+
+        inline fun <reified F, S, reified E> monadError(ME: MonadError<F, E> = monadError<F, E>()) : StateTMonadErrorInstance<F, S, E> =
+                StateTMonadErrorImplicits.instance(ME)
 
         fun <F, S> get(AF: Applicative<F>): StateT<F, S, S> = StateT(AF.pure({ s: S -> AF.pure(Tuple2(s, s)) }))
 

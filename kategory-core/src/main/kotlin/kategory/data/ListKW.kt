@@ -8,7 +8,10 @@ package kategory
         Foldable::class,
         Traverse::class,
         SemigroupK::class,
-        MonoidK::class)
+        MonoidK::class,
+        MonadCombine::class,
+        FunctorFilter::class,
+        MonadFilter::class)
 data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A> by list {
 
     fun <B> flatMap(f: (A) -> ListKWKind<B>): ListKW<B> = this.ev().list.flatMap { f(it).ev().list }.k()
@@ -38,6 +41,9 @@ data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A>
                     f(Tuple2(a, b))
                 }
             }.ev()
+
+    fun <B> mapFilter(f: (A) -> Option<B>): ListKW<B> =
+            flatMap({ a -> f(a).fold({ empty<B>() }, { pure(it) }) })
 
     companion object {
 

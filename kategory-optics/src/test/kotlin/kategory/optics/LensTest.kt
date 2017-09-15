@@ -42,7 +42,7 @@ class LensTest : UnitSpec() {
 
         "Finding a target using a predicate within a Lens should be wrapped in the correct option result" {
             forAll({ predicate: Boolean ->
-                tokenLens.find { predicate }(Token("any value")).isDefined == predicate
+                tokenLens.find { predicate }(Token("any value")).fold({ false }, { true }) == predicate
             })
         }
 

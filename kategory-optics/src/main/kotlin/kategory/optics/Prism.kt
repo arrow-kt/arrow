@@ -91,7 +91,7 @@ abstract class Prism<A, B> {
     /**
      * Check if there is a target
      */
-    fun nonEmpty(a: A): Boolean = getOption(a).nonEmpty
+    fun nonEmpty(a: A): Boolean = getOption(a).fold({ false }, { true })
 
     /**
      * Check if there is no target

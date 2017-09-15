@@ -6,7 +6,6 @@ import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
 import kategory.Option.None
 import kategory.Option.Some
-import kategory.laws.MonadFilterLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -25,8 +24,7 @@ class OptionTest : UnitSpec() {
             monadError<OptionHK, Unit>() shouldNotBe null
         }
 
-        val EQ_EITHER: Eq<HK<OptionHK, Either<Unit, Int>>> = object : Eq<HK<OptionHK, Either<Unit, Int>>> {
-            override fun eqv(a: HK<OptionHK, Either<Unit, Int>>, b: HK<OptionHK, Either<Unit, Int>>): Boolean =
+        val EQ_EITHER: Eq<HK<OptionHK, Either<Unit, Int>>> = Eq { a, b ->
                     a.ev().fold(
                             { b.ev().fold({ true }, { false }) },
                             { eitherA: Either<Unit, Int> ->
@@ -39,7 +37,7 @@ class OptionTest : UnitSpec() {
                                         })
                             })
         }
-        
+
         //testLaws(MonadErrorLaws.laws(monadError<OptionHK, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
         testLaws(TraverseLaws.laws(Option.traverse(), Option.monad(), ::Some, Eq.any()))
         testLaws(MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()))

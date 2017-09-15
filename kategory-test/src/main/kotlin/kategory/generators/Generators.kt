@@ -2,18 +2,6 @@ package kategory
 
 import io.kotlintest.properties.Gen
 
-fun <F> genEqAnyLogged() = object : Eq<F> {
-    val any = Eq.any()
-
-    override fun eqv(a: F, b: F): Boolean {
-        val result = any.eqv(a, b)
-        if (!result) {
-            println("$a <---> $b")
-        }
-        return result
-    }
-}
-
 inline fun <reified F, A> genApplicative(valueGen: Gen<A>, AP: Applicative<F> = applicative<F>()): Gen<HK<F, A>> =
         object : Gen<HK<F, A>> {
             override fun generate(): HK<F, A> =
@@ -45,6 +33,12 @@ inline fun <F, A> genConstructor(valueGen: Gen<A>, crossinline cf: (A) -> HK<F, 
         object : Gen<HK<F, A>> {
             override fun generate(): HK<F, A> =
                     cf(valueGen.generate())
+        }
+
+inline fun <F, A, B> genConstructor2(valueGen: Gen<A>, crossinline ff: (A) -> HK<F, (A) -> B>): Gen<HK<F, (A) -> B>> =
+        object : Gen<HK<F, (A) -> B>> {
+            override fun generate(): HK<F, (A) -> B> =
+                    ff(valueGen.generate())
         }
 
 fun genIntSmall(): Gen<Int> =
