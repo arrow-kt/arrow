@@ -54,7 +54,7 @@ open class ComonadContinuation<F, A : Any>(val CM: Comonad<F>, override val cont
  * A coroutine is initiated and inside `MonadContinuation` suspended yielding to `flatMap` once all the flatMap binds are completed
  * the underlying monad is returned from the act of executing the coroutine
  */
-fun <F, B : Any> Comonad<F>.cobinding(coroutineContext: CoroutineContext = EmptyCoroutineContext, c: suspend ComonadContinuation<F, *>.() -> B): B {
+fun <F, B : Any> Comonad<F>.cobinding(c: suspend ComonadContinuation<F, *>.() -> B): B {
     val continuation = ComonadContinuation<F, B>(this)
     c.startCoroutine(continuation, continuation)
     return continuation.returnedMonad
