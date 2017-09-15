@@ -165,10 +165,10 @@ private fun instanceFromImplicitObject(t: InstanceParametrizedType): Any? {
     val allCompanionFunctions = globalInstanceProvider.methods
     val factoryFunction = allCompanionFunctions.find { it.name == "instance" }
     return if (factoryFunction != null) {
-        val values: List<Any> = factoryFunction.parameters.mapIndexedNotNull { n, p ->
+        val values: List<Any> = factoryFunction.parameters.mapNotNull { p ->
             if (Typeclass::class.java.isAssignableFrom(p.type)) {
                 val classifier = p.parameterizedType as ParameterizedType
-                val vType = reifyRawParameterizedType(t, classifier, n)
+                val vType = reifyRawParameterizedType(t, classifier)
                 val value = instanceFromImplicitObject(vType)
                 if (value != null) registerInstance(t, value)
                 value
@@ -179,9 +179,9 @@ private fun instanceFromImplicitObject(t: InstanceParametrizedType): Any? {
     } else null
 }
 
-private fun reifyRawParameterizedType(carrier: InstanceParametrizedType, classifier: ParameterizedType, index: Int): InstanceParametrizedType =
+private fun reifyRawParameterizedType(carrier: InstanceParametrizedType, classifier: ParameterizedType): InstanceParametrizedType =
         if (classifier.actualTypeArguments.any { it is TypeVariable<*> }) {
-            InstanceParametrizedType(classifier.rawType, listOf(carrier.actualTypeArguments[index + 1]))
+            InstanceParametrizedType(classifier.rawType, listOf(carrier.actualTypeArguments[1]))
         } else {
             InstanceParametrizedType(classifier, classifier.actualTypeArguments.filterNotNull())
         }

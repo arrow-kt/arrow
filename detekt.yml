@@ -101,7 +101,7 @@ style:
   NamingConventionViolation:
     active: false
   MaxLineLength:
-    active: true
+    active: false
     maxLineLength: 160
 
 comments:

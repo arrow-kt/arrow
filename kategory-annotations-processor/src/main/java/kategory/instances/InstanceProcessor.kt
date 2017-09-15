@@ -42,9 +42,19 @@ class InstanceProcessor : AbstractProcessor() {
 
     private fun processClass(element: TypeElement): AnnotatedInstance {
         val proto: ClassOrPackageDataWrapper.Class = getClassOrPackageDataWrapper(element) as ClassOrPackageDataWrapper.Class
+        val dataType = element.annotationMirrors.flatMap { am ->
+            am.elementValues.entries.filter {
+                "target" == it.key.simpleName.toString()
+            }.map {
+                val targetName = it.value.toString().replace(".class", "")
+                val targetElement = elementUtils.getTypeElement(targetName)
+                getClassOrPackageDataWrapper(targetElement) as ClassOrPackageDataWrapper.Class
+            }
+        }
         val typeTable = TypeTable(proto.classProto.typeTable)
-        val superTypes: List<ClassOrPackageDataWrapper> = recurseTypeclassInterfaces(proto, typeTable, emptyList())
-        return AnnotatedInstance(element, proto, superTypes, this)
+        val superTypes: List<ClassOrPackageDataWrapper.Class> =
+                recurseTypeclassInterfaces(proto, typeTable, emptyList()).map { it as ClassOrPackageDataWrapper.Class }
+        return AnnotatedInstance(element, proto, superTypes, this, dataType[0])
     }
 
 }

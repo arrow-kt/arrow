@@ -22,8 +22,8 @@ class WriterTTest : UnitSpec() {
 
         testLaws(MonadLaws.laws(WriterT.monad(NonEmptyList.monad(), IntMonoid), Eq.any()))
         testLaws(MonoidKLaws.laws(
-                WriterT.monoidK<ListKWHK, Int>(ListKW.monad(), ListKW.monoidK()),
-                WriterT.applicative(ListKW.monad(), IntMonoid),
+                WriterT.monoidK<ListKWHK, Int>(ListKW.monoidK()),
+                WriterT.applicative(),
                 object : Eq<WriterTKind<ListKWHK, Int, Int>> {
                     override fun eqv(a: WriterTKind<ListKWHK, Int, Int>, b: WriterTKind<ListKWHK, Int, Int>): Boolean =
                             a.ev().value == b.ev().value
@@ -50,7 +50,7 @@ class WriterTTest : UnitSpec() {
                 }
         ))
 
-        testLaws(MonadFilterLaws.laws(WriterT.monadFilter(Option.monadFilter(), IntMonoid),
+        testLaws(MonadFilterLaws.laws(WriterT.monadFilter(IntMonoid, Option.monadFilter()),
                 { WriterT(Option(Tuple2(it, it))) },
                 object : Eq<HK<WriterTKindPartial<OptionHK, Int>, Int>> {
                     override fun eqv(a: HK<WriterTKindPartial<OptionHK, Int>, Int>, b: HK<WriterTKindPartial<OptionHK, Int>, Int>): Boolean =
