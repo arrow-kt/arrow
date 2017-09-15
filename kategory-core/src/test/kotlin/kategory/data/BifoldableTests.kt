@@ -23,6 +23,6 @@ class BifoldableTests : UnitSpec() {
 
         val eitherComposeEither = eitherBifoldable.compose(eitherBifoldable)
 
-        testLaws(BifoldableLaws.laws(eitherComposeEither, { cf: Int -> Either.Right(Either.Right(cf)).liftB() }, Eq.any()))
+        testLaws(BifoldableLaws.laws(eitherComposeEither, { cf: Int -> Either.Right(Either.Right(cf)).binest() }, Eq.any()))
     }
 }
