@@ -69,13 +69,13 @@ sealed class IO<out A> : IOKind<A> {
 
         inline fun <reified A> monoid(SM: Monoid<A> = kategory.monoid()): IOMonoidInstance<A> = IOMonoidInstanceImplicits.instance(SM)
 
-        fun <A, B> parallel(
+        fun <A, B> merge(
                 op1: () -> A,
                 op2: () -> B): IO<Tuple2<A, B>> = applicative().tupled(
                 invoke(op1),
                 invoke(op2)).ev()
 
-        fun <A, B, C> parallel(
+        fun <A, B, C> merge(
                 op1: () -> A,
                 op2: () -> B,
                 op3: () -> C): IO<Tuple3<A, B, C>> = applicative().tupled(
@@ -83,7 +83,7 @@ sealed class IO<out A> : IOKind<A> {
                 invoke(op2),
                 invoke(op3)).ev()
 
-        fun <A, B, C, D> parallel(
+        fun <A, B, C, D> merge(
                 op1: () -> A,
                 op2: () -> B,
                 op3: () -> C,
@@ -93,7 +93,7 @@ sealed class IO<out A> : IOKind<A> {
                 invoke(op3),
                 invoke(op4)).ev()
 
-        fun <A, B, C, D, E> parallel(
+        fun <A, B, C, D, E> merge(
                 op1: () -> A,
                 op2: () -> B,
                 op3: () -> C,
@@ -105,7 +105,7 @@ sealed class IO<out A> : IOKind<A> {
                 invoke(op4),
                 invoke(op5)).ev()
 
-        fun <A, B, C, D, E, F> parallel(
+        fun <A, B, C, D, E, F> merge(
                 op1: () -> A,
                 op2: () -> B,
                 op3: () -> C,
@@ -119,7 +119,7 @@ sealed class IO<out A> : IOKind<A> {
                 invoke(op5),
                 invoke(op6)).ev()
 
-        fun <A, B, C, D, E, F, G> parallel(
+        fun <A, B, C, D, E, F, G> merge(
                 op1: () -> A,
                 op2: () -> B,
                 op3: () -> C,
@@ -135,7 +135,7 @@ sealed class IO<out A> : IOKind<A> {
                 invoke(op6),
                 invoke(op7)).ev()
 
-        fun <A, B, C, D, E, F, G, H> parallel(
+        fun <A, B, C, D, E, F, G, H> merge(
                 op1: () -> A,
                 op2: () -> B,
                 op3: () -> C,
@@ -153,7 +153,7 @@ sealed class IO<out A> : IOKind<A> {
                 invoke(op7),
                 invoke(op8)).ev()
 
-        fun <A, B, C, D, E, F, G, H, I> parallel(
+        fun <A, B, C, D, E, F, G, H, I> merge(
                 op1: () -> A,
                 op2: () -> B,
                 op3: () -> C,
@@ -173,7 +173,7 @@ sealed class IO<out A> : IOKind<A> {
                 invoke(op8),
                 invoke(op9)).ev()
 
-        fun <A, B, C, D, E, F, G, H, I, J> parallel(
+        fun <A, B, C, D, E, F, G, H, I, J> merge(
                 op1: () -> A,
                 op2: () -> B,
                 op3: () -> C,
