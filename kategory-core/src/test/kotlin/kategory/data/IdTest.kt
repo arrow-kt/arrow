@@ -1,7 +1,6 @@
 package kategory
 
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
