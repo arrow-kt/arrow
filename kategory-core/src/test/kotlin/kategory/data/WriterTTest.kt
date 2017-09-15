@@ -16,8 +16,8 @@ class WriterTTest : UnitSpec() {
             monad<WriterTKindPartial<IdHK, Int>>() shouldNotBe null
             monadFilter<WriterTKindPartial<OptionHK, Int>>() shouldNotBe null
             monadWriter<WriterTKindPartial<OptionHK, Int>, Int>() shouldNotBe null
-            semigroupK<WriterTKindPartial<IdHK, ListKWHK>>() shouldNotBe null
-            monoidK<WriterTKindPartial<IdHK, ListKWHK>>() shouldNotBe null
+            semigroupK<WriterTKindPartial<ListKWHK, Int>>() shouldNotBe null
+            monoidK<WriterTKindPartial<ListKWHK, Int>>() shouldNotBe null
         }
 
         testLaws(MonadLaws.laws(WriterT.monad(NonEmptyList.monad(), IntMonoid), Eq.any()))
@@ -50,7 +50,7 @@ class WriterTTest : UnitSpec() {
                 }
         ))
 
-        testLaws(MonadFilterLaws.laws(WriterT.monadFilter(IntMonoid, Option.monadFilter()),
+        testLaws(MonadFilterLaws.laws(WriterT.monadFilter(Option.monadFilter(), IntMonoid),
                 { WriterT(Option(Tuple2(it, it))) },
                 object : Eq<HK<WriterTKindPartial<OptionHK, Int>, Int>> {
                     override fun eqv(a: HK<WriterTKindPartial<OptionHK, Int>, Int>, b: HK<WriterTKindPartial<OptionHK, Int>, Int>): Boolean =

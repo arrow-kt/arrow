@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.serialization.deserialization.supertypes
 
 data class FunctionMapping(
         val name: String,
-        val typeclass: ClassOrPackageDataWrapper,
+        val typeclass: ClassOrPackageDataWrapper.Class,
         val function: ProtoBuf.Function,
         val retTypeName: String)
 
@@ -44,6 +44,8 @@ data class Instance(
                     postfix = ">"
             )
 
+    // TODO for this to work the functions return types need to b sorted based on the order of the typeclas typeargs
+    //  so they can be instrospected at runtime
     private val abstractFunctions: List<FunctionMapping> =
             (target.superTypes + listOf(target.classOrPackageProto)).flatMap { tc ->
                 tc.functionList
@@ -87,9 +89,11 @@ data class Instance(
                             val avParamInfo = getParamInfo(av.name to avRetTypeUnparsed)
                             avParamInfo.superTypes.contains(parsedRetType)
                         }
-                        if (remove != null) (acc - remove) + listOf(func)
-                        else if (ignore) acc
-                        else acc + listOf(func)
+                        when {
+                            remove != null -> (acc - remove) + listOf(func)
+                            ignore -> acc
+                            else -> acc + listOf(func)
+                        }
                     } //
                 }
             }
@@ -113,7 +117,12 @@ data class Instance(
         return ParamInfo(param, superTypes, paramTypeName, typeVarName)
     }
 
-    val args: List<Pair<String, String>> = abstractFunctions.map { (name, tc, func) ->
+    val args: List<Pair<String, String>> = abstractFunctions.sortedBy { f ->
+        val typeClassTypeArgs = f.typeclass.typeParameters.map { f.typeclass.nameResolver.getString(it.name) }
+        val functionRetTypeTypeArgs = f.function.returnType.extractFullName(f.typeclass, failOnGeneric = false)
+                .removeBackticks().substringAfter("<").substringBefore(">")
+        typeClassTypeArgs.indexOf(functionRetTypeTypeArgs)
+    }.map { (name, tc, func) ->
         val retType = func.returnType.extractFullName(tc, failOnGeneric = false)
         name to retType.removeBackticks()
     }
@@ -181,10 +190,7 @@ class InstanceFileGenerator(
             |""".trimMargin()
 
     private fun genCompanionExtensions(i: Instance): String =
-            """
-                |fun ${i.expandedTypeArgs()} ${i.receiverTypeName}.Companion.${i.companionFactoryName}Instance(${i.expandedArgs}): ${i.name}${i.expandedTypeArgs()} =
-                |  ${i.implicitObjectName}.instance(${i.args.map { it.first }.joinToString(", ")})
-                |
+            """|
                 |inline fun ${i.expandedTypeArgs(reified = true)} ${i.receiverTypeName}.Companion.${i.companionFactoryName}(${i.args.map {
                 "${it.first}: ${it.second} = ${it.second.split(".").map { it.decapitalize() }.joinToString(".")}()"
             }.joinToString(", ")
