@@ -218,7 +218,7 @@ sealed class Try<out A> : TryKind<A> {
      * If `fb` is initially applied and throws an exception,
      * then `fa` is applied with this exception.
      */
-    fun <B> fold(fa: (Throwable) -> B, fb: (A) -> B): B =
+    inline fun <B> fold(fa: (Throwable) -> B, fb: (A) -> B): B =
             when (this) {
                 is Failure -> fa(exception)
                 is Success -> try {
