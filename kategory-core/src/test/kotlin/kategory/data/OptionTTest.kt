@@ -36,24 +36,24 @@ class OptionTTest : UnitSpec() {
         testLaws(SemigroupKLaws.laws(
                 OptionT.semigroupK(Id.monad()),
                 OptionT.applicative(Id.monad()),
-                EQ<IdHK>()))
+                EQ()))
 
         testLaws(MonoidKLaws.laws(
                 OptionT.monoidK(Id.monad()),
                 OptionT.applicative(Id.monad()),
-                EQ<IdHK>()))
+                EQ()))
 
         testLaws(FunctorFilterLaws.laws(
                 OptionT.functorFilter(),
                 { OptionT(Id(it.some())) },
-                EQ<IdHK>()))
+                EQ()))
 
         testLaws(TraverseFilterLaws.laws(
                 OptionT.traverseFilter(),
                 OptionT.applicative(Option.monad()),
                 { OptionT(Option(it.some())) },
-                EQ<OptionHK>(),
-                EQ_NESTED<OptionHK>()))
+                EQ(),
+                EQ_NESTED()))
 
         "toLeft for Some should build a correct EitherT" {
             forAll { a: Int, b: String ->
