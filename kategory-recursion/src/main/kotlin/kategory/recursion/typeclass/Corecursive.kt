@@ -1,6 +1,6 @@
 package kategory
 
-interface Corecursive<F, G> {
+interface Corecursive<F, G> : Typeclass {
     fun embedT(compFG: HK<Nested<F, G>, HK<F, G>>): HK<F, G>
 
     fun <A> ana(a: A, f: Coalgebra<Nested<F, G>, A>, FF: Functor<F>, FG: Functor<G>): HK<F, G> =
