@@ -10,10 +10,10 @@ import org.junit.runner.RunWith
 import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
-class ObservableWTest : UnitSpec() {
+class ObservableKWTest : UnitSpec() {
 
-    fun <T> EQ(): Eq<ObservableWKind<T>> = object : Eq<ObservableWKind<T>> {
-        override fun eqv(a: ObservableWKind<T>, b: ObservableWKind<T>): Boolean =
+    fun <T> EQ(): Eq<ObservableKWKind<T>> = object : Eq<ObservableKWKind<T>> {
+        override fun eqv(a: ObservableKWKind<T>, b: ObservableKWKind<T>): Boolean =
                 try {
                     a.value().blockingFirst() == b.value().blockingFirst()
                 } catch (throwable: Throwable) {
@@ -38,19 +38,19 @@ class ObservableWTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            functor<ObservableWHK>() shouldNotBe null
-            applicative<ObservableWHK>() shouldNotBe null
-            monad<ObservableWHK>() shouldNotBe null
-            monadError<ObservableWHK, Unit>() shouldNotBe null
-            asyncContext<ObservableWHK>() shouldNotBe null
+            functor<ObservableKWHK>() shouldNotBe null
+            applicative<ObservableKWHK>() shouldNotBe null
+            monad<ObservableKWHK>() shouldNotBe null
+            monadError<ObservableKWHK, Unit>() shouldNotBe null
+            asyncContext<ObservableKWHK>() shouldNotBe null
         }
 
-        testLaws(AsyncLaws.laws(ObservableW.asyncContext(), ObservableW.monadErrorFlat(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(ObservableW.asyncContext(), ObservableW.monadErrorConcat(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(ObservableW.asyncContext(), ObservableW.monadErrorSwitch(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(ObservableKW.asyncContext(), ObservableKW.monadErrorFlat(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(ObservableKW.asyncContext(), ObservableKW.monadErrorConcat(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(ObservableKW.asyncContext(), ObservableKW.monadErrorSwitch(), EQ(), EQ()))
 
         "Multi-thread Observables finish correctly" {
-            val value: Observable<Long> = ObservableW.monadErrorFlat().bindingE {
+            val value: Observable<Long> = ObservableKW.monadErrorFlat().bindingE {
                 val a = Observable.timer(2, TimeUnit.SECONDS).k().bind()
                 yields(a)
             }.value()
@@ -63,7 +63,7 @@ class ObservableWTest : UnitSpec() {
         "Multi-thread Observables should run on their required threads" {
             val originalThread: Thread = Thread.currentThread()
             var nextThread: Thread? = null
-            val value: Observable<Long> = ObservableW.monadErrorFlat().bindingE {
+            val value: Observable<Long> = ObservableKW.monadErrorFlat().bindingE {
                 val a = Observable.timer(2, TimeUnit.SECONDS).k().bind()
                 nextThread = Thread.currentThread()
                 val b = Observable.just(a).observeOn(Schedulers.io()).k().bind()
@@ -77,7 +77,7 @@ class ObservableWTest : UnitSpec() {
         }
 
         "Observable cancellation forces binding to cancel without completing too" {
-            val value: Observable<Long> = ObservableW.monadErrorFlat().bindingE {
+            val value: Observable<Long> = ObservableKW.monadErrorFlat().bindingE {
                 val a = Observable.timer(3, TimeUnit.SECONDS).k().bind()
                 yields(a)
             }.value()
