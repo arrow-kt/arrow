@@ -71,25 +71,39 @@ sealed class IO<out A> : IOKind<A> {
 
         fun <A, B> parallel(
                 op1: () -> A,
-                op2: () -> B): IO<Tuple2<A, B>> = applicative().tupled(invoke(op1), invoke(op2)).ev()
+                op2: () -> B): IO<Tuple2<A, B>> = applicative().tupled(
+                invoke(op1),
+                invoke(op2)).ev()
 
         fun <A, B, C> parallel(
                 op1: () -> A,
                 op2: () -> B,
-                op3: () -> C): IO<Tuple3<A, B, C>> = applicative().tupled(invoke(op1), invoke(op2), invoke(op3)).ev()
+                op3: () -> C): IO<Tuple3<A, B, C>> = applicative().tupled(
+                invoke(op1),
+                invoke(op2),
+                invoke(op3)).ev()
 
         fun <A, B, C, D> parallel(
                 op1: () -> A,
                 op2: () -> B,
                 op3: () -> C,
-                op4: () -> D): IO<Tuple4<A, B, C, D>> = applicative().tupled(invoke(op1), invoke(op2), invoke(op3), invoke(op4)).ev()
+                op4: () -> D): IO<Tuple4<A, B, C, D>> = applicative().tupled(
+                invoke(op1),
+                invoke(op2),
+                invoke(op3),
+                invoke(op4)).ev()
 
         fun <A, B, C, D, E> parallel(
                 op1: () -> A,
                 op2: () -> B,
                 op3: () -> C,
                 op4: () -> D,
-                op5: () -> E): IO<Tuple5<A, B, C, D, E>> = applicative().tupled(invoke(op1), invoke(op2), invoke(op3), invoke(op4), invoke(op5)).ev()
+                op5: () -> E): IO<Tuple5<A, B, C, D, E>> = applicative().tupled(
+                invoke(op1),
+                invoke(op2),
+                invoke(op3),
+                invoke(op4),
+                invoke(op5)).ev()
 
         fun <A, B, C, D, E, F> parallel(
                 op1: () -> A,
@@ -97,7 +111,13 @@ sealed class IO<out A> : IOKind<A> {
                 op3: () -> C,
                 op4: () -> D,
                 op5: () -> E,
-                op6: () -> F): IO<Tuple6<A, B, C, D, E, F>> = applicative().tupled(invoke(op1), invoke(op2), invoke(op3), invoke(op4), invoke(op5), invoke(op6)).ev()
+                op6: () -> F): IO<Tuple6<A, B, C, D, E, F>> = applicative().tupled(
+                invoke(op1),
+                invoke(op2),
+                invoke(op3),
+                invoke(op4),
+                invoke(op5),
+                invoke(op6)).ev()
 
         fun <A, B, C, D, E, F, G> parallel(
                 op1: () -> A,
@@ -106,7 +126,14 @@ sealed class IO<out A> : IOKind<A> {
                 op4: () -> D,
                 op5: () -> E,
                 op6: () -> F,
-                op7: () -> G): IO<Tuple7<A, B, C, D, E, F, G>> = applicative().tupled(invoke(op1), invoke(op2), invoke(op3), invoke(op4), invoke(op5), invoke(op6), invoke(op7)).ev()
+                op7: () -> G): IO<Tuple7<A, B, C, D, E, F, G>> = applicative().tupled(
+                invoke(op1),
+                invoke(op2),
+                invoke(op3),
+                invoke(op4),
+                invoke(op5),
+                invoke(op6),
+                invoke(op7)).ev()
 
         fun <A, B, C, D, E, F, G, H> parallel(
                 op1: () -> A,
@@ -116,7 +143,15 @@ sealed class IO<out A> : IOKind<A> {
                 op5: () -> E,
                 op6: () -> F,
                 op7: () -> G,
-                op8: () -> H): IO<Tuple8<A, B, C, D, E, F, G, H>> = applicative().tupled(invoke(op1), invoke(op2), invoke(op3), invoke(op4), invoke(op5), invoke(op6), invoke(op7), invoke(op8)).ev()
+                op8: () -> H): IO<Tuple8<A, B, C, D, E, F, G, H>> = applicative().tupled(
+                invoke(op1),
+                invoke(op2),
+                invoke(op3),
+                invoke(op4),
+                invoke(op5),
+                invoke(op6),
+                invoke(op7),
+                invoke(op8)).ev()
 
         fun <A, B, C, D, E, F, G, H, I> parallel(
                 op1: () -> A,
@@ -127,7 +162,16 @@ sealed class IO<out A> : IOKind<A> {
                 op6: () -> F,
                 op7: () -> G,
                 op8: () -> H,
-                op9: () -> I): IO<Tuple9<A, B, C, D, E, F, G, H, I>> = applicative().tupled(invoke(op1), invoke(op2), invoke(op3), invoke(op4), invoke(op5), invoke(op6), invoke(op7), invoke(op8), invoke(op9)).ev()
+                op9: () -> I): IO<Tuple9<A, B, C, D, E, F, G, H, I>> = applicative().tupled(
+                invoke(op1),
+                invoke(op2),
+                invoke(op3),
+                invoke(op4),
+                invoke(op5),
+                invoke(op6),
+                invoke(op7),
+                invoke(op8),
+                invoke(op9)).ev()
 
         fun <A, B, C, D, E, F, G, H, I, J> parallel(
                 op1: () -> A,
@@ -139,7 +183,17 @@ sealed class IO<out A> : IOKind<A> {
                 op7: () -> G,
                 op8: () -> H,
                 op9: () -> I,
-                op10: () -> J): IO<Tuple10<A, B, C, D, E, F, G, H, I, J>> = applicative().tupled(invoke(op1), invoke(op2), invoke(op3), invoke(op4), invoke(op5), invoke(op6), invoke(op7), invoke(op8), invoke(op9), invoke(op10)).ev()
+                op10: () -> J): IO<Tuple10<A, B, C, D, E, F, G, H, I, J>> = applicative().tupled(
+                invoke(op1),
+                invoke(op2),
+                invoke(op3),
+                invoke(op4),
+                invoke(op5),
+                invoke(op6),
+                invoke(op7),
+                invoke(op8),
+                invoke(op9),
+                invoke(op10)).ev()
     }
 
     abstract fun <B> map(f: (A) -> B): IO<B>

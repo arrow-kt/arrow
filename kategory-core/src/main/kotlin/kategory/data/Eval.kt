@@ -71,25 +71,39 @@ sealed class Eval<out A> : EvalKind<A> {
 
         fun <A, B> merge(
                 op1: () -> A,
-                op2: () -> B): Eval<Tuple2<A, B>> = applicative().tupled(later(op1), later(op2)).ev()
+                op2: () -> B): Eval<Tuple2<A, B>> = applicative().tupled(
+                later(op1),
+                later(op2)).ev()
 
         fun <A, B, C> merge(
                 op1: () -> A,
                 op2: () -> B,
-                op3: () -> C): Eval<Tuple3<A, B, C>> = applicative().tupled(later(op1), later(op2), later(op3)).ev()
+                op3: () -> C): Eval<Tuple3<A, B, C>> = applicative().tupled(
+                later(op1),
+                later(op2),
+                later(op3)).ev()
 
         fun <A, B, C, D> merge(
                 op1: () -> A,
                 op2: () -> B,
                 op3: () -> C,
-                op4: () -> D): Eval<Tuple4<A, B, C, D>> = applicative().tupled(later(op1), later(op2), later(op3), later(op4)).ev()
+                op4: () -> D): Eval<Tuple4<A, B, C, D>> = applicative().tupled(
+                later(op1),
+                later(op2),
+                later(op3),
+                later(op4)).ev()
 
         fun <A, B, C, D, E> merge(
                 op1: () -> A,
                 op2: () -> B,
                 op3: () -> C,
                 op4: () -> D,
-                op5: () -> E): Eval<Tuple5<A, B, C, D, E>> = applicative().tupled(later(op1), later(op2), later(op3), later(op4), later(op5)).ev()
+                op5: () -> E): Eval<Tuple5<A, B, C, D, E>> = applicative().tupled(
+                later(op1),
+                later(op2),
+                later(op3),
+                later(op4),
+                later(op5)).ev()
 
         fun <A, B, C, D, E, F> merge(
                 op1: () -> A,
@@ -97,7 +111,13 @@ sealed class Eval<out A> : EvalKind<A> {
                 op3: () -> C,
                 op4: () -> D,
                 op5: () -> E,
-                op6: () -> F): Eval<Tuple6<A, B, C, D, E, F>> = applicative().tupled(later(op1), later(op2), later(op3), later(op4), later(op5), later(op6)).ev()
+                op6: () -> F): Eval<Tuple6<A, B, C, D, E, F>> = applicative().tupled(
+                later(op1),
+                later(op2),
+                later(op3),
+                later(op4),
+                later(op5),
+                later(op6)).ev()
 
         fun <A, B, C, D, E, F, G> merge(
                 op1: () -> A,
@@ -106,7 +126,14 @@ sealed class Eval<out A> : EvalKind<A> {
                 op4: () -> D,
                 op5: () -> E,
                 op6: () -> F,
-                op7: () -> G): Eval<Tuple7<A, B, C, D, E, F, G>> = applicative().tupled(later(op1), later(op2), later(op3), later(op4), later(op5), later(op6), later(op7)).ev()
+                op7: () -> G): Eval<Tuple7<A, B, C, D, E, F, G>> = applicative().tupled(
+                later(op1),
+                later(op2),
+                later(op3),
+                later(op4),
+                later(op5),
+                later(op6),
+                later(op7)).ev()
 
         fun <A, B, C, D, E, F, G, H> merge(
                 op1: () -> A,
@@ -116,7 +143,15 @@ sealed class Eval<out A> : EvalKind<A> {
                 op5: () -> E,
                 op6: () -> F,
                 op7: () -> G,
-                op8: () -> H): Eval<Tuple8<A, B, C, D, E, F, G, H>> = applicative().tupled(later(op1), later(op2), later(op3), later(op4), later(op5), later(op6), later(op7), later(op8)).ev()
+                op8: () -> H): Eval<Tuple8<A, B, C, D, E, F, G, H>> = applicative().tupled(
+                later(op1),
+                later(op2),
+                later(op3),
+                later(op4),
+                later(op5),
+                later(op6),
+                later(op7),
+                later(op8)).ev()
 
         fun <A, B, C, D, E, F, G, H, I> merge(
                 op1: () -> A,
@@ -127,7 +162,16 @@ sealed class Eval<out A> : EvalKind<A> {
                 op6: () -> F,
                 op7: () -> G,
                 op8: () -> H,
-                op9: () -> I): Eval<Tuple9<A, B, C, D, E, F, G, H, I>> = applicative().tupled(later(op1), later(op2), later(op3), later(op4), later(op5), later(op6), later(op7), later(op8), later(op9)).ev()
+                op9: () -> I): Eval<Tuple9<A, B, C, D, E, F, G, H, I>> = applicative().tupled(
+                later(op1),
+                later(op2),
+                later(op3),
+                later(op4),
+                later(op5),
+                later(op6),
+                later(op7),
+                later(op8),
+                later(op9)).ev()
 
         fun <A, B, C, D, E, F, G, H, I, J> merge(
                 op1: () -> A,
@@ -139,7 +183,17 @@ sealed class Eval<out A> : EvalKind<A> {
                 op7: () -> G,
                 op8: () -> H,
                 op9: () -> I,
-                op10: () -> J): Eval<Tuple10<A, B, C, D, E, F, G, H, I, J>> = applicative().tupled(later(op1), later(op2), later(op3), later(op4), later(op5), later(op6), later(op7), later(op8), later(op9), later(op10)).ev()
+                op10: () -> J): Eval<Tuple10<A, B, C, D, E, F, G, H, I, J>> = applicative().tupled(
+                later(op1),
+                later(op2),
+                later(op3),
+                later(op4),
+                later(op5),
+                later(op6),
+                later(op7),
+                later(op8),
+                later(op9),
+                later(op10)).ev()
     }
 
     abstract fun value(): A
