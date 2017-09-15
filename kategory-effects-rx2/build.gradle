@@ -1,5 +1,6 @@
 dependencies {
     compile project(':kategory-core')
+    compile project(':kategory-effects')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
     compile project(':kategory-annotations')
     kapt project(':kategory-annotations-processor')
@@ -8,6 +9,8 @@ dependencies {
     testCompileOnly project(':kategory-annotations-processor')
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
     testCompile project(':kategory-effects-test')
+
+    compile "io.reactivex.rxjava2:rxjava:2.1.3"
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
