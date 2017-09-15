@@ -88,6 +88,28 @@ object OptionTFoldableInstanceImplicits {
     }
 }
 
+interface OptionTTraverseFilterInstance<F> :
+        OptionTTraverseInstance<F>,
+        TraverseFilter<OptionTKindPartial<F>> {
+
+    fun TFF(): TraverseFilter<F>
+
+    override fun <G, A, B> traverseFilter(fa: OptionTKind<F, A>, f: (A) -> HK<G, Option<B>>, GA: Applicative<G>): HK<G, OptionT<F, B>> =
+            fa.ev().traverseFilter(f, GA, TF())
+
+}
+
+object OptionTTraverseFilterInstanceImplicits {
+    @JvmStatic
+    fun <F> instance(TF: TraverseFilter<F>): OptionTTraverseFilterInstance<F> = object : OptionTTraverseFilterInstance<F> {
+        override fun FFF(): Foldable<F> = TF
+
+        override fun TF(): Traverse<F> = TF
+
+        override fun TFF(): TraverseFilter<F> = TF
+    }
+}
+
 interface OptionTTraverseInstance<F> : OptionTFoldableInstance<F>, Traverse<OptionTKindPartial<F>> {
 
     fun TF(): Traverse<F>

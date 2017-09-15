@@ -55,6 +55,16 @@ object ConstTraverseInstanceImplicits {
     @JvmStatic fun <A> instance(): ConstTraverseInstance<A> = object : ConstTraverseInstance<A> {}
 }
 
+interface ConstTraverseFilterInstance<X> : ConstTraverseInstance<X>, TraverseFilter<ConstKindPartial<X>> {
+
+    override fun <G, A, B> traverseFilter(fa: ConstKind<X, A>, f: (A) -> HK<G, Option<B>>, GA: Applicative<G>): HK<G, ConstKind<X, B>> =
+            fa.ev().traverseFilter(f, GA)
+}
+
+object ConstTraverseFilterInstanceImplicits {
+    @JvmStatic fun <A> instance(): ConstTraverseFilterInstance<A> = object : ConstTraverseFilterInstance<A> {}
+}
+
 interface ConstSemigroup<A, T> : Semigroup<ConstKind<A, T>> {
 
     fun SA(): Semigroup<A>
