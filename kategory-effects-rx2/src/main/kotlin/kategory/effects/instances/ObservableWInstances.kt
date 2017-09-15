@@ -1,81 +1,117 @@
 package kategory
 
-interface ObservableWInstances : Functor<ObservableWHK>,
-        Applicative<ObservableWHK>,
-        AsyncContext<ObservableWHK> {
-
-    override fun <A> pure(a: A): HK<ObservableWHK, A> =
-            ObservableW.pure(a)
-
-    override fun <A, B> ap(fa: HK<ObservableWHK, A>, ff: HK<ObservableWHK, (A) -> B>): HK<ObservableWHK, B> =
-            ff.ev().flatMap { fa.ev().map(it) }
-
-    override fun <A> runAsync(fa: Proc<A>): HK<ObservableWHK, A> =
-            ObservableW.runAsync(fa)
+object ObservableWMonadInstanceImplicits {
+    @JvmStatic
+    fun instance(): ObservableWFlatMonadInstance = ObservableWFlatMonadInstanceImplicits.instance()
 }
 
-interface ObservableWFlatMapInstances :
-        ObservableWInstances,
-        Monad<ObservableWHK>,
-        MonadError<ObservableWHK, Throwable> {
-    override fun <A, B> ap(fa: HK<ObservableWHK, A>, ff: HK<ObservableWHK, (A) -> B>): HK<ObservableWHK, B> =
-            ff.ev().flatMap { fa.ev().map(it) }
+object ObservableWMonadErrorInstanceImplicits {
+    @JvmStatic
+    fun instance(): ObservableWFlatMonadErrorInstance = ObservableWFlatMonadErrorInstanceImplicits.instance()
+}
 
-    override fun <A, B> flatMap(fa: HK<ObservableWHK, A>, f: (A) -> HK<ObservableWHK, B>): HK<ObservableWHK, B> =
+interface ObservableWFlatMonadInstance :
+        ObservableWApplicativeInstance,
+        Monad<ObservableWHK> {
+    override fun <A, B> ap(fa: ObservableWKind<A>, ff: ObservableWKind<(A) -> B>): ObservableW<B> =
+            fa.ev().ap(ff)
+
+    override fun <A, B> flatMap(fa: ObservableWKind<A>, f: (A) -> ObservableWKind<B>): ObservableWKind<B> =
             fa.ev().flatMap { f(it).ev() }
 
-    override fun <A, B> tailRecM(a: A, f: (A) -> HK<ObservableWHK, Either<A, B>>): HK<ObservableWHK, B> =
+    override fun <A, B> tailRecM(a: A, f: (A) -> ObservableWKind<Either<A, B>>): ObservableWKind<B> =
             f(a).ev().flatMap {
                 it.fold({ tailRecM(a, f).ev() }, { pure(it).ev() })
             }
+}
 
-    override fun <A> raiseError(e: Throwable): HK<ObservableWHK, A> =
+object ObservableWFlatMonadInstanceImplicits {
+    @JvmStatic
+    fun instance(): ObservableWFlatMonadInstance = object : ObservableWFlatMonadInstance {}
+}
+
+interface ObservableWFlatMonadErrorInstance :
+        ObservableWFlatMonadInstance,
+        MonadError<ObservableWHK, Throwable> {
+    override fun <A> raiseError(e: Throwable): ObservableW<A> =
             ObservableW.raiseError(e)
 
-    override fun <A> handleErrorWith(fa: HK<ObservableWHK, A>, f: (Throwable) -> HK<ObservableWHK, A>): HK<ObservableWHK, A> =
+    override fun <A> handleErrorWith(fa: ObservableWKind<A>, f: (Throwable) -> ObservableWKind<A>): ObservableW<A> =
             fa.ev().handleErrorWith { f(it).ev() }
 }
 
-interface ObservableWConcatMapInstances :
-        ObservableWInstances,
-        Monad<ObservableWHK>,
-        MonadError<ObservableWHK, Throwable> {
-    override fun <A, B> ap(fa: HK<ObservableWHK, A>, ff: HK<ObservableWHK, (A) -> B>): HK<ObservableWHK, B> =
-            ff.ev().flatMap { fa.ev().map(it) }
+object ObservableWFlatMonadErrorInstanceImplicits {
+    @JvmStatic
+    fun instance(): ObservableWFlatMonadErrorInstance = object : ObservableWFlatMonadErrorInstance {}
+}
 
-    override fun <A, B> flatMap(fa: HK<ObservableWHK, A>, f: (A) -> HK<ObservableWHK, B>): HK<ObservableWHK, B> =
+interface ObservableWConcatMonadInstance :
+        ObservableWApplicativeInstance,
+        Monad<ObservableWHK> {
+    override fun <A, B> ap(fa: ObservableWKind<A>, ff: ObservableWKind<(A) -> B>): ObservableW<B> =
+            fa.ev().ap(ff)
+
+    override fun <A, B> flatMap(fa: ObservableWKind<A>, f: (A) -> ObservableWKind<B>): ObservableW<B> =
             fa.ev().concatMap { f(it).ev() }
 
-    override fun <A, B> tailRecM(a: A, f: (A) -> HK<ObservableWHK, Either<A, B>>): HK<ObservableWHK, B> =
+    override fun <A, B> tailRecM(a: A, f: (A) -> ObservableWKind<Either<A, B>>): ObservableW<B> =
             f(a).ev().concatMap {
                 it.fold({ tailRecM(a, f).ev() }, { pure(it).ev() })
             }
+}
 
-    override fun <A> raiseError(e: Throwable): HK<ObservableWHK, A> =
+object ObservableWConcatMonadInstanceImplicits {
+    @JvmStatic
+    fun instance(): ObservableWConcatMonadInstance = object : ObservableWConcatMonadInstance {}
+}
+
+interface ObservableWConcatMonadErrorInstance :
+        ObservableWConcatMonadInstance,
+        MonadError<ObservableWHK, Throwable> {
+    override fun <A> raiseError(e: Throwable): ObservableW<A> =
             ObservableW.raiseError(e)
 
-    override fun <A> handleErrorWith(fa: HK<ObservableWHK, A>, f: (Throwable) -> HK<ObservableWHK, A>): HK<ObservableWHK, A> =
+    override fun <A> handleErrorWith(fa: ObservableWKind<A>, f: (Throwable) -> ObservableWKind<A>): ObservableW<A> =
             fa.ev().handleErrorWith { f(it).ev() }
 }
 
-interface ObservableWSwitchMapInstances :
-        ObservableWInstances,
-        Monad<ObservableWHK>,
-        MonadError<ObservableWHK, Throwable> {
-    override fun <A, B> ap(fa: HK<ObservableWHK, A>, ff: HK<ObservableWHK, (A) -> B>): HK<ObservableWHK, B> =
-            ff.ev().flatMap { fa.ev().map(it) }
+object ObservableWConcatMonadErrorInstanceImplicits {
+    @JvmStatic
+    fun instance(): ObservableWConcatMonadErrorInstance = object : ObservableWConcatMonadErrorInstance {}
+}
 
-    override fun <A, B> flatMap(fa: HK<ObservableWHK, A>, f: (A) -> HK<ObservableWHK, B>): HK<ObservableWHK, B> =
+interface ObservableWSwitchMonadInstance :
+        ObservableWApplicativeInstance,
+        Monad<ObservableWHK> {
+    override fun <A, B> ap(fa: ObservableWKind<A>, ff: ObservableWKind<(A) -> B>): ObservableW<B> =
+            fa.ev().ap(ff)
+
+    override fun <A, B> flatMap(fa: ObservableWKind<A>, f: (A) -> ObservableWKind<B>): ObservableW<B> =
             fa.ev().switchMap { f(it).ev() }
 
-    override fun <A, B> tailRecM(a: A, f: (A) -> HK<ObservableWHK, Either<A, B>>): HK<ObservableWHK, B> =
+    override fun <A, B> tailRecM(a: A, f: (A) -> ObservableWKind<Either<A, B>>): ObservableW<B> =
             f(a).ev().switchMap {
                 it.fold({ tailRecM(a, f).ev() }, { pure(it).ev() })
             }
+}
 
-    override fun <A> raiseError(e: Throwable): HK<ObservableWHK, A> =
+object ObservableWSwitchMonadInstanceImplicits {
+    @JvmStatic
+    fun instance(): ObservableWSwitchMonadInstance = object : ObservableWSwitchMonadInstance {}
+}
+
+interface ObservableWSwitchMonadErrorInstance :
+        ObservableWSwitchMonadInstance,
+        MonadError<ObservableWHK, Throwable> {
+
+    override fun <A> raiseError(e: Throwable): ObservableW<A> =
             ObservableW.raiseError(e)
 
-    override fun <A> handleErrorWith(fa: HK<ObservableWHK, A>, f: (Throwable) -> HK<ObservableWHK, A>): HK<ObservableWHK, A> =
+    override fun <A> handleErrorWith(fa: ObservableWKind<A>, f: (Throwable) -> ObservableWKind<A>): ObservableW<A> =
             fa.ev().handleErrorWith { f(it).ev() }
+}
+
+object ObservableWSwitchMonadErrorInstanceImplicits {
+    @JvmStatic
+    fun instance(): ObservableWSwitchMonadErrorInstance = object : ObservableWSwitchMonadErrorInstance {}
 }

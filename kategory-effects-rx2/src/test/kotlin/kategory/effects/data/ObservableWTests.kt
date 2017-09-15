@@ -12,31 +12,41 @@ import java.util.concurrent.TimeUnit
 @RunWith(KTestJUnitRunner::class)
 class ObservableWTest : UnitSpec() {
 
+    fun <T> EQ(): Eq<ObservableWKind<T>> = object : Eq<ObservableWKind<T>> {
+        override fun eqv(a: ObservableWKind<T>, b: ObservableWKind<T>): Boolean =
+                try {
+                    a.value().blockingFirst() == b.value().blockingFirst()
+                } catch (throwable: Throwable) {
+                    val errA = try {
+                        a.value().blockingFirst()
+                        throw IllegalArgumentException()
+                    } catch (err: Throwable) {
+                        err
+                    }
+
+                    val errB = try {
+                        b.value().blockingFirst()
+                        throw IllegalStateException()
+                    } catch (err: Throwable) {
+                        err
+                    }
+
+                    errA == errB
+                }
+    }
+
     data class Wrap(val value: String = "")
 
     init {
-        fun <T> EQ(): Eq<ObservableWKind<T>> = object : Eq<ObservableWKind<T>> {
-            override fun eqv(a: ObservableWKind<T>, b: ObservableWKind<T>): Boolean =
-                    try {
-                        a.value().blockingFirst() == b.value().blockingFirst()
-                    } catch (throwable: Throwable) {
-                        val errA = try {
-                            a.value().blockingFirst()
-                            throw IllegalArgumentException()
-                        } catch (err: Throwable) {
-                            err
-                        }
 
-                        val errB = try {
-                            b.value().blockingFirst()
-                            throw IllegalStateException()
-                        } catch (err: Throwable) {
-                            err
-                        }
-
-                        errA == errB
-                    }
+        "instances can be resolved implicitly" {
+            functor<ObservableWHK>() shouldNotBe null
+            applicative<ObservableWHK>() shouldNotBe null
+            monad<ObservableWHK>() shouldNotBe null
+            monadError<ObservableWHK, Unit>() shouldNotBe null
+            asyncContext<ObservableWHK>() shouldNotBe null
         }
+
         testLaws(AsyncLaws.laws(ObservableW.asyncContext(), ObservableW.monadErrorFlat(), EQ(), EQ()))
         testLaws(AsyncLaws.laws(ObservableW.asyncContext(), ObservableW.monadErrorConcat(), EQ(), EQ()))
         testLaws(AsyncLaws.laws(ObservableW.asyncContext(), ObservableW.monadErrorSwitch(), EQ(), EQ()))

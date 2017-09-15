@@ -8,9 +8,14 @@ fun <A> Observable<A>.k(): ObservableW<A> = ObservableW(this)
 fun <A> ObservableWKind<A>.value(): Observable<A> =
         this.ev().observable
 
-@higherkind data class ObservableW<A>(val observable: Observable<A>) : ObservableWKind<A> {
+@higherkind
+@deriving(Functor::class, Applicative::class, AsyncContext::class)
+data class ObservableW<A>(val observable: Observable<A>) : ObservableWKind<A> {
     fun <B> map(f: (A) -> B): ObservableW<B> =
             observable.map(f).k()
+
+    fun <B> ap(fa: ObservableWKind<(A) -> B>): ObservableW<B> =
+            flatMap { a -> fa.ev().map { ff -> ff(a) } }
 
     fun <B> flatMap(f: (A) -> ObservableW<B>): ObservableW<B> =
             observable.flatMap { f(it).observable }.k()
@@ -41,33 +46,17 @@ fun <A> ObservableWKind<A>.value(): Observable<A> =
                     }
                 }.k()
 
-        inline fun instances(): ObservableWInstances =
-                object : ObservableWInstances {
-                }
+        fun monadFlat(): ObservableWFlatMonadInstance = ObservableWFlatMonadInstanceImplicits.instance()
 
-        inline fun instancesFlatMap(): ObservableWFlatMapInstances = object : ObservableWFlatMapInstances {}
+        fun monadConcat(): ObservableWConcatMonadInstance = ObservableWConcatMonadInstanceImplicits.instance()
 
-        inline fun instancesConcatMap(): ObservableWConcatMapInstances = object : ObservableWConcatMapInstances {}
+        fun monadSwitch(): ObservableWSwitchMonadInstance = ObservableWSwitchMonadInstanceImplicits.instance()
 
-        inline fun instancesSwitchMap(): ObservableWSwitchMapInstances = object : ObservableWSwitchMapInstances {}
+        fun monadErrorFlat(): ObservableWFlatMonadErrorInstance = ObservableWFlatMonadErrorInstanceImplicits.instance()
 
-        fun functor(): Functor<ObservableWHK> = instances()
+        fun monadErrorConcat(): ObservableWConcatMonadErrorInstance = ObservableWConcatMonadErrorInstanceImplicits.instance()
 
-        fun applicative(): Applicative<ObservableWHK> = instances()
-
-        fun monadFlat(): Monad<ObservableWHK> = instancesFlatMap()
-
-        fun monadConcat(): Monad<ObservableWHK> = instancesConcatMap()
-
-        fun monadSwitch(): Monad<ObservableWHK> = instancesSwitchMap()
-
-        fun monadErrorFlat(): MonadError<ObservableWHK, Throwable> = instancesFlatMap()
-
-        fun monadErrorConcat(): MonadError<ObservableWHK, Throwable> = instancesConcatMap()
-
-        fun monadErrorSwitch(): MonadError<ObservableWHK, Throwable> = instancesSwitchMap()
-
-        fun asyncContext(): AsyncContext<ObservableWHK> = instances()
+        fun monadErrorSwitch(): ObservableWSwitchMonadErrorInstance = ObservableWSwitchMonadErrorInstanceImplicits.instance()
     }
 }
 
