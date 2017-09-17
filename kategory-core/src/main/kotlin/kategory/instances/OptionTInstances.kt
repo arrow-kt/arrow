@@ -1,5 +1,6 @@
 package kategory
 
+@instance(OptionT::class)
 interface OptionTFunctorInstance<F> : Functor<OptionTKindPartial<F>> {
 
     fun FF(): Functor<F>
@@ -8,13 +9,7 @@ interface OptionTFunctorInstance<F> : Functor<OptionTKindPartial<F>> {
 
 }
 
-object OptionTFunctorInstanceImplicits {
-    @JvmStatic
-    fun <F> instance(FF: Functor<F>): OptionTFunctorInstance<F> = object : OptionTFunctorInstance<F> {
-        override fun FF(): Functor<F> = FF
-    }
-}
-
+@instance(OptionT::class)
 interface OptionTFunctorFilterInstance<F> : OptionTFunctorInstance<F>, FunctorFilter<OptionTKindPartial<F>> {
 
     override fun <A, B> mapFilter(fa: OptionTKind<F, A>, f: (A) -> Option<B>): OptionT<F, B> =
@@ -22,55 +17,33 @@ interface OptionTFunctorFilterInstance<F> : OptionTFunctorInstance<F>, FunctorFi
 
 }
 
-object OptionTFunctorFilterInstanceImplicits {
-    @JvmStatic
-    fun <F> instance(FF: Functor<F>): OptionTFunctorFilterInstance<F> = object : OptionTFunctorFilterInstance<F> {
-        override fun FF(): Functor<F> = FF
-    }
-}
-
+@instance(OptionT::class)
 interface OptionTApplicativeInstance<F> : OptionTFunctorInstance<F>, Applicative<OptionTKindPartial<F>> {
 
-    fun MF(): Monad<F>
+    override fun FF(): Monad<F>
 
-    override fun <A> pure(a: A): OptionT<F, A> = OptionT(MF().pure(Option(a)))
+    override fun <A> pure(a: A): OptionT<F, A> = OptionT(FF().pure(Option(a)))
 
     override fun <A, B> map(fa: OptionTKind<F, A>, f: (A) -> B): OptionT<F, B> = fa.ev().map(f, FF())
 
     override fun <A, B> ap(fa: OptionTKind<F, A>, ff: OptionTKind<F, (A) -> B>): OptionT<F, B> =
-            fa.ev().ap(ff, MF())
+            fa.ev().ap(ff, FF())
 }
 
-object OptionTApplicativeInstanceImplicits {
-    @JvmStatic
-    fun <F> instance(MF: Monad<F>): OptionTApplicativeInstance<F> = object : OptionTApplicativeInstance<F> {
-        override fun MF(): Monad<F> = MF
-
-        override fun FF(): Functor<F> = MF
-    }
-}
-
+@instance(OptionT::class)
 interface OptionTMonadInstance<F> : OptionTApplicativeInstance<F>, Monad<OptionTKindPartial<F>> {
 
-    override fun <A, B> flatMap(fa: OptionTKind<F, A>, f: (A) -> OptionTKind<F, B>): OptionT<F, B> = fa.ev().flatMap({ f(it).ev() }, MF())
+    override fun <A, B> flatMap(fa: OptionTKind<F, A>, f: (A) -> OptionTKind<F, B>): OptionT<F, B> = fa.ev().flatMap({ f(it).ev() }, FF())
 
     override fun <A, B> ap(fa: OptionTKind<F, A>, ff: OptionTKind<F, (A) -> B>): OptionT<F, B> =
-            fa.ev().ap(ff, MF())
+            fa.ev().ap(ff, FF())
 
     override fun <A, B> tailRecM(a: A, f: (A) -> OptionTKind<F, Either<A, B>>): OptionT<F, B> =
-            OptionT.tailRecM(a, f, MF())
+            OptionT.tailRecM(a, f, FF())
 
 }
 
-object OptionTMonadInstanceImplicits {
-    @JvmStatic
-    fun <F> instance(MF: Monad<F>): OptionTMonadInstance<F> = object : OptionTMonadInstance<F> {
-        override fun MF(): Monad<F> = MF
-
-        override fun FF(): Functor<F> = MF
-    }
-}
-
+@instance(OptionT::class)
 interface OptionTFoldableInstance<F> : Foldable<OptionTKindPartial<F>> {
 
     fun FFF(): Foldable<F>
@@ -81,52 +54,25 @@ interface OptionTFoldableInstance<F> : Foldable<OptionTKindPartial<F>> {
 
 }
 
-object OptionTFoldableInstanceImplicits {
-    @JvmStatic
-    fun <F> instance(FFF: Foldable<F>): OptionTFoldableInstance<F> = object : OptionTFoldableInstance<F> {
-        override fun FFF(): Foldable<F> = FFF
-    }
-}
-
+@instance(OptionT::class)
 interface OptionTTraverseInstance<F> : OptionTFoldableInstance<F>, Traverse<OptionTKindPartial<F>> {
 
-    fun TF(): Traverse<F>
+    override fun FFF(): Traverse<F>
 
     override fun <G, A, B> traverse(fa: OptionTKind<F, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, OptionT<F, B>> =
-            fa.ev().traverse(f, GA, TF())
+            fa.ev().traverse(f, GA, FFF())
 
 }
 
-object OptionTTraverseInstanceImplicits {
-    @JvmStatic
-    fun <F> instance(TF: Traverse<F>): OptionTTraverseInstance<F> = object : OptionTTraverseInstance<F> {
-        override fun FFF(): Foldable<F> = TF
-
-        override fun TF(): Traverse<F> = TF
-    }
-}
-
+@instance(OptionT::class)
 interface OptionTSemigroupKInstance<F> : SemigroupK<OptionTKindPartial<F>> {
 
-    fun MF(): Monad<F>
+    fun FF(): Monad<F>
 
-    override fun <A> combineK(x: OptionTKind<F, A>, y: OptionTKind<F, A>): OptionT<F, A> = x.ev().orElse({ y.ev() }, MF())
+    override fun <A> combineK(x: OptionTKind<F, A>, y: OptionTKind<F, A>): OptionT<F, A> = x.ev().orElse({ y.ev() }, FF())
 }
 
-object OptionTSemigroupKInstanceImplicits {
-    @JvmStatic
-    fun <F> instance(MF: Monad<F>): OptionTSemigroupKInstance<F> = object : OptionTSemigroupKInstance<F> {
-        override fun MF(): Monad<F> = MF
-    }
-}
-
+@instance(OptionT::class)
 interface OptionTMonoidKInstance<F> : MonoidK<OptionTKindPartial<F>>, OptionTSemigroupKInstance<F> {
-    override fun <A> empty(): OptionT<F, A> = OptionT(MF().pure(Option.None))
-}
-
-object OptionTMonoidKInstanceImplicits {
-    @JvmStatic
-    fun <F> instance(MF: Monad<F>): OptionTMonoidKInstance<F> = object : OptionTMonoidKInstance<F> {
-        override fun MF(): Monad<F> = MF
-    }
+    override fun <A> empty(): OptionT<F, A> = OptionT(FF().pure(Option.None))
 }
