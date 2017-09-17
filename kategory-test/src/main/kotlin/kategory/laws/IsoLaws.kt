@@ -6,7 +6,7 @@ import kategory.optics.Iso
 
 object IsoLaws {
 
-    inline fun <A, reified B> laws(iso: Iso<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQB: Eq<B>, bMonoid: Monoid<B> = monoid()): List<Law> = listOf(
+    inline fun <reified A, reified B> laws(iso: Iso<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQB: Eq<B>, bMonoid: Monoid<B> = monoid()): List<Law> = listOf(
             Law("Iso Law: round trip one way", { roundTripOneWay(iso, aGen, EQA) }),
             Law("Iso Law: round trip other way", { roundTripOtherWay(iso, bGen, EQB) }),
             Law("Iso Law: modify identity is identity", { modifyIdentity(iso, aGen, EQA) }),
@@ -16,52 +16,39 @@ object IsoLaws {
             Law("Iso Law: consitent get with modify identity", { consitentGetModifyId(iso, aGen, EQB, bMonoid) })
     )
 
-    fun <A, B> roundTripOneWay(iso: Iso<A, B>, aGen: Gen<A>, EQA: Eq<A>): Unit =
+    inline fun <reified A, reified B> roundTripOneWay(iso: Iso<A, B>, aGen: Gen<A>, EQA: Eq<A>): Unit =
             forAll(aGen, { a ->
-                EQA.eqv(iso.reverseGet(iso.get(a)), a)
+                iso.reverseGet(iso.get(a)).equalUnderTheLaw(a, EQA)
             })
 
-    fun <A, B> roundTripOtherWay(iso: Iso<A, B>, bGen: Gen<B>, EQB: Eq<B>): Unit =
+    inline fun <reified A, reified B> roundTripOtherWay(iso: Iso<A, B>, bGen: Gen<B>, EQB: Eq<B>): Unit =
             forAll(bGen, { b ->
-                EQB.eqv(iso.get(iso.reverseGet(b)), b)
+                iso.get(iso.reverseGet(b)).equalUnderTheLaw(b, EQB)
             })
 
-    fun <A, B> modifyIdentity(iso: Iso<A, B>, aGen: Gen<A>, EQA: Eq<A>): Unit =
+    inline fun <reified A, reified B> modifyIdentity(iso: Iso<A, B>, aGen: Gen<A>, EQA: Eq<A>): Unit =
             forAll(aGen, { a ->
-                EQA.eqv(iso.modify(::identity)(a), a)
+                iso.modify(::identity)(a).equalUnderTheLaw(a, EQA)
             })
 
-    fun <A, B> composeModify(iso: Iso<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>): Unit =
+    inline fun <reified A, reified B> composeModify(iso: Iso<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>): Unit =
             forAll(aGen, funcGen, funcGen, { a, f, g ->
-                EQA.eqv(
-                        iso.modify(g)(iso.modify(f)(a)),
-                        iso.modify(g compose f)(a)
-                )
+                iso.modify(g)(iso.modify(f)(a)).equalUnderTheLaw(iso.modify(g compose f)(a), EQA)
             })
 
-    fun <A, B> consistentSetModify(iso: Iso<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>): Unit =
+    inline fun <reified A, reified B> consistentSetModify(iso: Iso<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>): Unit =
             forAll(aGen, bGen, { a, b ->
-                EQA.eqv(
-                        iso.set(b)(a),
-                        iso.modify { b }(a)
-                )
+                iso.set(b)(a).equalUnderTheLaw(iso.modify { b }(a), EQA)
             })
 
-    fun <A, B> consistentModifyModifyId(iso: Iso<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>): Unit =
+    inline fun <reified A, reified B> consistentModifyModifyId(iso: Iso<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>): Unit =
             forAll(aGen, funcGen, { a, f ->
-                EQA.eqv(
-                        iso.modify(f)(a),
-                        iso.modifyF(Id.functor(), { Id.pure(f(it)) }, a).value()
-                )
+                iso.modify(f)(a).equalUnderTheLaw(iso.modifyF(Id.functor(), { Id.pure(f(it)) }, a).value(), EQA)
             })
 
-    inline fun <A, reified B> consitentGetModifyId(iso: Iso<A, B>, aGen: Gen<A>, EQB: Eq<B>, bMonoid: Monoid<B>): Unit =
+    inline fun <reified A, reified B> consitentGetModifyId(iso: Iso<A, B>, aGen: Gen<A>, EQB: Eq<B>, bMonoid: Monoid<B>): Unit =
             forAll(aGen, { a ->
-                EQB.eqv(
-                        iso.get(a),
-                        iso.modifyF(Const.applicative(bMonoid), ::Const, a).value()
-
-                )
+                iso.get(a).equalUnderTheLaw(iso.modifyF(Const.applicative(bMonoid), ::Const, a).value(), EQB)
             })
 
 }

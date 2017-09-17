@@ -157,4 +157,12 @@ abstract class Iso<A, B> {
      * View a [Iso] as a [Lens]
      */
     fun asLens(): Lens<A, B> = Lens(this::get, this::set)
+
+    /**
+     * View a [Iso] as a [Optional]
+     */
+    fun asOptional(): Optional<A, B> = Optional(
+            { a -> Option.Some(get(a)) },
+            this::set
+    )
 }
