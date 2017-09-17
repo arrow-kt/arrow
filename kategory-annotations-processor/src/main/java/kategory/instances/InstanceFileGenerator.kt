@@ -173,7 +173,9 @@ class InstanceFileGenerator(
      */
     fun generate() {
         instances.forEach {
-            val elementsToGenerate: List<String> = listOf(genImplicitObject(it), genCompanionExtensions(it))
+            val elementsToGenerate: List<String> =
+                    listOf(genImplicitObject(it), genCompanionExtensions(it)) +
+                            (if (it.args.isNotEmpty()) listOf(genCompanionReifiedExtensions(it)) else emptyList())
             val source: String = elementsToGenerate.joinToString(prefix = "package ${it.`package`}\n\n", separator = "\n", postfix = "\n")
             val file = File(generatedDir, instanceAnnotationClass.simpleName + ".${it.target.classElement.qualifiedName}.kt")
             file.writeText(source)
@@ -190,6 +192,16 @@ class InstanceFileGenerator(
             |""".trimMargin()
 
     private fun genCompanionExtensions(i: Instance): String =
+            """|
+                |fun ${i.expandedTypeArgs(reified = false)} ${i.receiverTypeName}.Companion.${i.companionFactoryName}(${(i.args.map {
+                "${it.first}: ${it.second}"
+            } + listOf("dummy: Unit = Unit")).joinToString(", ")
+            }): ${i.name}${i.expandedTypeArgs()} =
+                |  ${i.implicitObjectName}.instance(${i.args.map { it.first }.joinToString(", ")})
+                |
+                |""".trimMargin()
+
+    private fun genCompanionReifiedExtensions(i: Instance): String =
             """|
                 |inline fun ${i.expandedTypeArgs(reified = true)} ${i.receiverTypeName}.Companion.${i.companionFactoryName}(${i.args.map {
                 "${it.first}: ${it.second} = ${it.second.split(".").map { it.decapitalize() }.joinToString(".")}()"

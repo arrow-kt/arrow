@@ -151,25 +151,6 @@ package kategory
             }
         }
 
-        fun <L> functor(): EitherFunctorInstance<L> = EitherFunctorInstanceImplicits.instance()
-
-        fun <L> applicative(): EitherApplicativeInstance<L> = EitherApplicativeInstanceImplicits.instance()
-
-        fun <L> monad(): EitherMonadInstance<L> = EitherMonadInstanceImplicits.instance()
-
-        fun <L> foldable(): EitherFoldableInstance<L> = EitherFoldableInstanceImplicits.instance()
-
-        fun <L> traverse(): EitherTraverseInstance<L> = EitherTraverseInstanceImplicits.instance()
-
-        fun <L> monadError(): EitherMonadErrorInstance<L> = EitherMonadErrorInstanceImplicits.instance()
-
-        fun <L> semigroupK(): SemigroupK<EitherKindPartial<L>> = object : SemigroupK<EitherKindPartial<L>> {
-            override fun <A> combineK(x: HK<EitherKindPartial<L>, A>, y: HK<EitherKindPartial<L>, A>): Either<L, A> =
-                    when (x) {
-                        is Left -> y.ev()
-                        else -> x.ev()
-                    }
-        }
     }
 }
 
