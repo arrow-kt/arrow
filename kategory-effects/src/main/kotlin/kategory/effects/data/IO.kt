@@ -63,12 +63,6 @@ sealed class IO<out A> : IOKind<A> {
                     }
                 }
 
-        fun monadError(): IOMonadErrorInstance = IOMonadErrorInstanceImplicits.instance()
-
-        inline fun <reified A> semigroup(SG: Semigroup<A> = kategory.semigroup()): IOSemigroupInstance<A> = IOSemigroupInstanceImplicits.instance(SG)
-
-        inline fun <reified A> monoid(SM: Monoid<A> = kategory.monoid()): IOMonoidInstance<A> = IOMonoidInstanceImplicits.instance(SM)
-
         fun <A, B> merge(
                 op1: () -> A,
                 op2: () -> B): IO<Tuple2<A, B>> =

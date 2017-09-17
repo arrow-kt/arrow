@@ -18,7 +18,7 @@ class ConstTest : UnitSpec() {
             monoid<ConstKind<Int, Int>>() shouldNotBe null
         }
 
-        testLaws(TraverseFilterLaws.laws(Const.traverseFilter(IntMonoid), Const.applicative(IntMonoid), { Const(it) }, Eq.any()))
+        testLaws(TraverseFilterLaws.laws(Const.traverseFilter(), Const.applicative(IntMonoid), { Const(it) }, Eq.any()))
         testLaws(ApplicativeLaws.laws(Const.applicative(IntMonoid), Eq.any()))
     }
 }

@@ -32,33 +32,6 @@ package kategory
                     })
                 }))
 
-        inline fun <reified F> functor(FF: Functor<F> = kategory.functor<F>()): OptionTFunctorInstance<F> =
-                OptionTFunctorInstanceImplicits.instance(FF)
-
-        inline fun <reified F> applicative(MF: Monad<F> = kategory.monad<F>()): OptionTApplicativeInstance<F> =
-                OptionTApplicativeInstanceImplicits.instance(MF)
-
-        inline fun <reified F> monad(MF: Monad<F> = kategory.monad<F>()): OptionTMonadInstance<F> =
-                OptionTMonadInstanceImplicits.instance(MF)
-
-        inline fun <reified F> foldable(FFF: Foldable<F> = kategory.foldable<F>()): OptionTFoldableInstance<F> =
-                OptionTFoldableInstanceImplicits.instance(FFF)
-
-        inline fun <reified F> traverseFilter(TF: TraverseFilter<F> = kategory.traverseFilter<F>()): OptionTTraverseFilterInstance<F> =
-                OptionTTraverseFilterInstanceImplicits.instance(TF)
-
-        inline fun <reified F> traverse(TF: Traverse<F> = kategory.traverse<F>()): OptionTTraverseInstance<F> =
-                OptionTTraverseInstanceImplicits.instance(TF)
-
-        inline fun <reified F> semigroupK(MF: Monad<F> = kategory.monad<F>()): OptionTSemigroupKInstance<F> =
-                OptionTSemigroupKInstanceImplicits.instance(MF)
-
-        inline fun <reified F> monoidK(MF: Monad<F> = kategory.monad<F>()): OptionTMonoidKInstance<F> =
-                OptionTMonoidKInstanceImplicits.instance(MF)
-
-        inline fun <reified F> functorFilter(FF: Functor<F> = kategory.functor<F>()): OptionTFunctorFilterInstance<F> =
-                OptionTFunctorFilterInstanceImplicits.instance(FF)
-
     }
 
     inline fun <B> fold(crossinline default: () -> B, crossinline f: (A) -> B, FF: Functor<F>): HK<F, B> = FF.map(value, { option -> option.fold(default, f) })

@@ -20,14 +20,6 @@ operator fun <I, O> Function1Kind<I, O>.invoke(i: I): O = this.ev().f(i)
 
         fun <I, A> pure(a: A): Function1<I, A> = { _: I -> a }.k()
 
-        fun <P> functor(): Function1FunctorInstance<P> = Function1FunctorInstanceImplicits.instance()
-
-        fun <P> applicative(): Function1ApplicativeInstance<P> = Function1ApplicativeInstanceImplicits.instance()
-
-        fun <P> monad(): Function1MonadInstance<P> = Function1MonadInstanceImplicits.instance()
-
-        fun <P> monadReader(): Function1MonadReaderInstance<P> = Function1MonadReaderInstanceImplicits.instance()
-
         tailrec private fun <I, A, B> step(a: A, t: I, fn: (A) -> Function1Kind<I, Either<A, B>>): B {
             val af = fn(a)(t)
             return when (af) {

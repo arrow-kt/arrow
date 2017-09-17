@@ -12,6 +12,8 @@ import me.eugeniomarletti.kotlin.metadata.jvm.getJvmMethodSignature
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
 import me.eugeniomarletti.kotlin.metadata.modality
 import org.jetbrains.kotlin.serialization.ProtoBuf
+import org.jetbrains.kotlin.serialization.deserialization.TypeTable
+import org.jetbrains.kotlin.serialization.deserialization.supertypes
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
@@ -36,7 +38,32 @@ interface ProcessorUtils : KotlinMetadataUtils {
     fun ClassOrPackageDataWrapper.getFunction(methodElement: ExecutableElement) =
         getFunctionOrNull(methodElement, nameResolver, functionList)
             ?: knownError("Can't find annotated method ${methodElement.jvmMethodSignature}")
+
+    fun recurseTypeclassInterfaces(
+            current: ClassOrPackageDataWrapper.Class,
+            typeTable: TypeTable,
+            acc: List<ClassOrPackageDataWrapper>): List<ClassOrPackageDataWrapper> {
+        val interfaces = current.classProto.supertypes(typeTable).map {
+            it.extractFullName(current, failOnGeneric = false)
+        }.filter {
+            it != "`kategory`.`Typeclass`"
+        }
+        return when {
+            interfaces.isEmpty() -> acc
+            else -> {
+                interfaces.flatMap { i ->
+                    val className = i.removeBackticks().substringBefore("<")
+                    val typeClassElement = elementUtils.getTypeElement(className)
+                    val parentInterface = getClassOrPackageDataWrapper(typeClassElement)
+                    val newAcc = acc + parentInterface
+                    recurseTypeclassInterfaces(parentInterface as ClassOrPackageDataWrapper.Class, typeTable, newAcc)
+                }
+            }
+        }
+    }
 }
+
+fun String.removeBackticks() = this.replace("`", "")
 
 fun knownError(message: String, element: Element? = null): Nothing = throw KnownException(message, element)
 

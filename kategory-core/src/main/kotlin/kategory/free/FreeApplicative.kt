@@ -17,12 +17,6 @@ inline fun <reified F, A> FreeApplicativeKind<F, A>.foldK(FA: Applicative<F> = a
 
         fun <F, A> liftF(fa: HK<F, A>): FreeApplicative<F, A> = Lift(fa)
 
-        fun <S> functor(): FreeApplicativeFunctorInstance<S> =
-                FreeApplicativeFunctorInstanceImplicits.instance()
-
-        fun <S> applicative(): FreeApplicativeApplicativeInstance<S> =
-                FreeApplicativeApplicativeInstanceImplicits.instance()
-
         internal fun <F, G> functionKF(f: FunctionK<F, G>): FunctionK<F, FreeApplicativeKindPartial<G>> =
                 object : FunctionK<F, FreeApplicativeKindPartial<G>> {
                     override fun <A> invoke(fa: HK<F, A>): FreeApplicative<G, A> =

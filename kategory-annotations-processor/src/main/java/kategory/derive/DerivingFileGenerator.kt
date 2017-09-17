@@ -2,6 +2,7 @@ package kategory.derive
 
 import kategory.common.utils.ClassOrPackageDataWrapper
 import kategory.common.utils.extractFullName
+import kategory.common.utils.removeBackticks
 import kategory.higherkinds.HKMarkerPostFix
 import kategory.higherkinds.KindPostFix
 import me.eugeniomarletti.kotlin.metadata.modality
@@ -17,8 +18,6 @@ fun retTypeAsSeenFromReceiver(typeClassFirstTypeArg: String, abstractType: Strin
         } else {
             abstractType.replace("`kategory`.`HK`<`$typeClassFirstTypeArg`,\\s".toRegex(), "`$receiverType$KindPostFix`<")
         }
-
-fun String.removeBackticks() = this.replace("`", "")
 
 sealed class HKArgs {
     object None : HKArgs()
@@ -89,7 +88,7 @@ class TypeclassInstanceGenerator(
 
     val receiverType: String = targetType.classElement.qualifiedName.toString()
 
-    val receiverSimpleName: String = "${receiverType.substringAfterLast(".")}"
+    val receiverSimpleName: String = receiverType.substringAfterLast(".")
 
     val receiverName: String = "$receiverSimpleName$HKMarkerPostFix"
 
