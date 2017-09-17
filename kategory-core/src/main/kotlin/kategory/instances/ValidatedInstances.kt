@@ -1,14 +1,11 @@
 package kategory
 
+@instance(Validated::class)
 interface ValidatedFunctorInstance<E> : Functor<ValidatedKindPartial<E>> {
     override fun <A, B> map(fa: ValidatedKind<E, A>, f: (A) -> B): Validated<E, B> = fa.ev().map(f)
 }
 
-object ValidatedFunctorInstanceImplicits {
-    @JvmStatic
-    fun <E> instance(): ValidatedFunctorInstance<E> = object : ValidatedFunctorInstance<E> {}
-}
-
+@instance(Validated::class)
 interface ValidatedApplicativeInstance<E> : ValidatedFunctorInstance<E>, Applicative<ValidatedKindPartial<E>> {
 
     fun SE(): Semigroup<E>
@@ -21,13 +18,7 @@ interface ValidatedApplicativeInstance<E> : ValidatedFunctorInstance<E>, Applica
 
 }
 
-object ValidatedApplicativeInstanceImplicits {
-    @JvmStatic
-    fun <E> instance(SE: Semigroup<E>): ValidatedApplicativeInstance<E> = object : ValidatedApplicativeInstance<E> {
-        override fun SE(): Semigroup<E> = SE
-    }
-}
-
+@instance(Validated::class)
 interface ValidatedApplicativeErrorInstance<E> : ValidatedApplicativeInstance<E>, ApplicativeError<ValidatedKindPartial<E>, E> {
 
     override fun <A> raiseError(e: E): Validated<E, A> = Validated.Invalid(e)
@@ -37,13 +28,7 @@ interface ValidatedApplicativeErrorInstance<E> : ValidatedApplicativeInstance<E>
 
 }
 
-object ValidatedApplicativeErrorInstanceImplicits {
-    @JvmStatic
-    fun <E> instance(SE: Semigroup<E>): ValidatedApplicativeErrorInstance<E> = object : ValidatedApplicativeErrorInstance<E> {
-        override fun SE(): Semigroup<E> = SE
-    }
-}
-
+@instance(Validated::class)
 interface ValidatedFoldableInstance<E> : Foldable<ValidatedKindPartial<E>> {
 
     override fun <A, B> foldL(fa: ValidatedKind<E, A>, b: B, f: (B, A) -> B): B =
@@ -54,11 +39,7 @@ interface ValidatedFoldableInstance<E> : Foldable<ValidatedKindPartial<E>> {
 
 }
 
-object ValidatedFoldableInstanceImplicits {
-    @JvmStatic
-    fun <E> instance(): ValidatedFoldableInstance<E> = object : ValidatedFoldableInstance<E> {}
-}
-
+@instance(Validated::class)
 interface ValidatedTraverseInstance<E> : ValidatedFoldableInstance<E>, Traverse<ValidatedKindPartial<E>> {
 
     override fun <G, A, B> traverse(fa: HK<ValidatedKindPartial<E>, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, Validated<E, B>> =
@@ -66,11 +47,7 @@ interface ValidatedTraverseInstance<E> : ValidatedFoldableInstance<E>, Traverse<
 
 }
 
-object ValidatedTraverseInstanceImplicits {
-    @JvmStatic
-    fun <E> instance(): ValidatedTraverseInstance<E> = object : ValidatedTraverseInstance<E> {}
-}
-
+@instance(Validated::class)
 interface ValidatedSemigroupKInstance<E> : SemigroupK<ValidatedKindPartial<E>> {
 
     fun SE(): Semigroup<E>
@@ -78,11 +55,4 @@ interface ValidatedSemigroupKInstance<E> : SemigroupK<ValidatedKindPartial<E>> {
     override fun <B> combineK(x: ValidatedKind<E, B>, y: ValidatedKind<E, B>): Validated<E, B> =
             x.ev().combineK(y, SE())
 
-}
-
-object ValidatedSemigroupKInstanceImplicits {
-    @JvmStatic
-    fun <E> instance(SE: Semigroup<E>): ValidatedSemigroupKInstance<E> = object : ValidatedSemigroupKInstance<E> {
-        override fun SE(): Semigroup<E> = SE
-    }
 }

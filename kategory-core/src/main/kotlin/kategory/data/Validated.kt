@@ -33,19 +33,6 @@ typealias ValidatedNel<E, A> = Validated<NonEmptyList<E>, A>
                         { Valid(it) }
                 )
 
-        fun <E> functor(): ValidatedFunctorInstance<E> = ValidatedFunctorInstanceImplicits.instance()
-
-        inline fun <reified E> applicative(SE: Semigroup<E> = semigroup<E>()): ValidatedApplicativeInstance<E> =
-                ValidatedApplicativeInstanceImplicits.instance(SE)
-
-        fun <E> foldable(): ValidatedFoldableInstance<E> =
-                ValidatedFoldableInstanceImplicits.instance()
-
-        fun <E> traverse(): ValidatedTraverseInstance<E> =
-                ValidatedTraverseInstanceImplicits.instance()
-
-        inline fun <reified E> semigroupK(SGK: Semigroup<E> = kategory.semigroup<E>()): ValidatedSemigroupKInstance<E> =
-                ValidatedSemigroupKInstanceImplicits.instance(SGK)
     }
 
     data class Valid<out A>(val a: A) : Validated<Nothing, A>()
