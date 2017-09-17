@@ -57,7 +57,7 @@ data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A> {
 
         fun monadErrorSwitch(): FlowableKWSwitchMonadErrorInstance = FlowableKWSwitchMonadErrorInstanceImplicits.instance()
 
-        fun asyncContext(): FlowableKWAsyncContextInstance = FlowableKWAsyncContextInstanceImplicits.instance()
+        fun asyncContext(): FlowableKWAsyncContextInstance = asyncContextBuffer()
 
         fun asyncContextBuffer(): FlowableKWAsyncContextInstance = object : FlowableKWAsyncContextInstance {
             override fun BS(): BackpressureStrategy = BackpressureStrategy.BUFFER

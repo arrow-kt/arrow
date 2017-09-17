@@ -43,10 +43,6 @@ class FlowableKWTests : UnitSpec() {
             asyncContext<FlowableKWHK>() shouldNotBe null
         }
 
-        testLaws(AsyncLaws.laws(FlowableKW.asyncContext(), FlowableKW.monadErrorFlat(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableKW.asyncContext(), FlowableKW.monadErrorConcat(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableKW.asyncContext(), FlowableKW.monadErrorSwitch(), EQ(), EQ()))
-
         testLaws(AsyncLaws.laws(FlowableKW.asyncContextBuffer(), FlowableKW.monadErrorFlat(), EQ(), EQ()))
         testLaws(AsyncLaws.laws(FlowableKW.asyncContextBuffer(), FlowableKW.monadErrorConcat(), EQ(), EQ()))
         testLaws(AsyncLaws.laws(FlowableKW.asyncContextBuffer(), FlowableKW.monadErrorSwitch(), EQ(), EQ()))
