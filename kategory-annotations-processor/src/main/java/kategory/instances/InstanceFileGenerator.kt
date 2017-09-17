@@ -48,34 +48,11 @@ data class Instance(
                 ""
             }
 
-    // TODO for this to work the functions return types need to b sorted based on the order of the typeclas typeargs
-    //  so they can be instrospected at runtime
     private val abstractFunctions: List<FunctionMapping> =
-            (target.superTypes + listOf(target.classOrPackageProto)).flatMap { tc ->
-                tc.functionList
-                        .filter { it.modality == ProtoBuf.Modality.ABSTRACT }
-                        .flatMap {
-                            val retTypeName = it.returnType.extractFullName(tc, failOnGeneric = false).removeBackticks().substringBefore("<")
-                            val retType = target.processor.elementUtils.getTypeElement(
-                                    it.returnType.extractFullName(tc, failOnGeneric = false).removeBackticks().substringBefore("<")
-                            )
-                            when {
-                                retType != null -> {
-                                    val current = target.processor.getClassOrPackageDataWrapper(retType) as ClassOrPackageDataWrapper.Class
-                                    val typeTable = TypeTable(current.classProto.typeTable)
-                                    val isTypeClassReturnType = current.classProto.supertypes(typeTable).any {
-                                        val typeName = it.extractFullName(current, failOnGeneric = false)
-                                        typeName == "`kategory`.`Typeclass`"
-                                    }
-                                    if (isTypeClassReturnType)
-                                        listOf(FunctionMapping(tc.nameResolver.getString(it.name), tc, it, retTypeName))
-                                    else
-                                        emptyList()
-                                }
-                                else -> emptyList()
-                            }
-                        }
-            }.fold(emptyList()) { acc, func ->
+            getTypeclassReturningFunctions().fold(emptyList(), normalizeOverridenFunctions())
+
+    private fun normalizeOverridenFunctions(): (List<FunctionMapping>, FunctionMapping) -> List<FunctionMapping> =
+            { acc, func ->
                 val retType = func.function.returnType.extractFullName(func.typeclass, failOnGeneric = false).removeBackticks()
                 val existingParamInfo = getParamInfo(func.name to retType)
                 when {
@@ -100,6 +77,33 @@ data class Instance(
                         }
                     } //
                 }
+            }
+
+    private fun getTypeclassReturningFunctions(): List<FunctionMapping> =
+            (target.superTypes + listOf(target.classOrPackageProto)).flatMap { tc ->
+                tc.functionList
+                        .filter { it.modality == ProtoBuf.Modality.ABSTRACT }
+                        .flatMap {
+                            val retTypeName = it.returnType.extractFullName(tc, failOnGeneric = false).removeBackticks().substringBefore("<")
+                            val retType = target.processor.elementUtils.getTypeElement(
+                                    it.returnType.extractFullName(tc, failOnGeneric = false).removeBackticks().substringBefore("<")
+                            )
+                            when {
+                                retType != null -> {
+                                    val current = target.processor.getClassOrPackageDataWrapper(retType) as ClassOrPackageDataWrapper.Class
+                                    val typeTable = TypeTable(current.classProto.typeTable)
+                                    val isTypeClassReturnType = current.classProto.supertypes(typeTable).any {
+                                        val typeName = it.extractFullName(current, failOnGeneric = false)
+                                        typeName == "`kategory`.`Typeclass`"
+                                    }
+                                    if (isTypeClassReturnType)
+                                        listOf(FunctionMapping(tc.nameResolver.getString(it.name), tc, it, retTypeName))
+                                    else
+                                        emptyList()
+                                }
+                                else -> emptyList()
+                            }
+                        }
             }
 
     data class ParamInfo(
@@ -130,27 +134,6 @@ data class Instance(
         val retType = func.returnType.extractFullName(tc, failOnGeneric = false)
         name to retType.removeBackticks()
     }
-
-//    val args: List<Pair<String, String>> = abstractFunctions.map { (name, tc, func) ->
-//        val retType = func.returnType.extractFullName(tc, failOnGeneric = false)
-//        name to retType.removeBackticks()
-//    }.fold(emptyList()) { acc, p ->
-//        val rt = target.processor.elementUtils.getTypeElement(p.second.substringBefore("<"))
-//        val paramType = target.processor.getClassOrPackageDataWrapper(rt) as ClassOrPackageDataWrapper.Class
-//        val paramTypeName = paramType.nameResolver.getString(paramType.classProto.fqName)
-//        val foundSubtype = acc.any {
-//            val ot = target.processor.elementUtils.getTypeElement(it.second.substringBefore("<"))
-//            val otherType = target.processor.getClassOrPackageDataWrapper(ot) as ClassOrPackageDataWrapper.Class
-//            val typeTable = TypeTable(otherType.classProto.typeTable)
-//            val superTypes = target.processor.recurseTypeclassInterfaces(otherType, typeTable, emptyList()).map {
-//                val t = it as ClassOrPackageDataWrapper.Class
-//                t.nameResolver.getString(t.classProto.fqName)
-//            }
-//            superTypes.contains(paramTypeName)
-//        }
-//        if (foundSubtype) acc
-//        else acc + listOf(p)
-//    }
 
     val expandedArgs: String = args.joinToString(separator = ", ", transform = {
         "${it.first}: ${it.second}"
@@ -212,7 +195,6 @@ class InstanceFileGenerator(
             }.joinToString(", ")
             }): ${i.name}${i.expandedTypeArgs()} =
                 |  ${i.implicitObjectName}.instance(${i.args.map { it.first }.joinToString(", ")})
-                |
                 |
                 |""".trimMargin()
 
