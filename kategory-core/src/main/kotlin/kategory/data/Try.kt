@@ -31,9 +31,6 @@ sealed class Try<out A> : TryKind<A> {
 
         fun <A> raise(e: Throwable): Try<A> = Failure(e)
 
-        fun monadError(): TryMonadErrorInstance =
-                TryMonadErrorInstanceImplicits.instance()
-
         fun <A, B> merge(
                 op1: () -> A,
                 op2: () -> B): Try<Tuple2<A, B>> =
