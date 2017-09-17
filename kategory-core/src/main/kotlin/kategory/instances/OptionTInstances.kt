@@ -65,6 +65,18 @@ interface OptionTTraverseInstance<F> : OptionTFoldableInstance<F>, Traverse<Opti
 }
 
 @instance(OptionT::class)
+interface OptionTTraverseFilterInstance<F> :
+        OptionTTraverseInstance<F>,
+        TraverseFilter<OptionTKindPartial<F>> {
+
+    override fun FFF(): TraverseFilter<F>
+
+    override fun <G, A, B> traverseFilter(fa: OptionTKind<F, A>, f: (A) -> HK<G, Option<B>>, GA: Applicative<G>): HK<G, OptionT<F, B>> =
+            fa.ev().traverseFilter(f, GA, FFF())
+
+}
+
+@instance(OptionT::class)
 interface OptionTSemigroupKInstance<F> : SemigroupK<OptionTKindPartial<F>> {
 
     fun FF(): Monad<F>

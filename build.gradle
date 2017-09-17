@@ -62,7 +62,7 @@ subprojects { project ->
     apply plugin: 'kotlin'
     apply plugin: 'jacoco'
 
-    archivesBaseName = project.name
+    archivesBaseName = POM_ARTIFACT_ID
 
     jacoco {
         toolVersion '0.7.8'

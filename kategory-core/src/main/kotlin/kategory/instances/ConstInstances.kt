@@ -54,3 +54,10 @@ interface ConstMonoidInstance<A, T> : ConstSemigroupInstance<A, T>, Monoid<Const
     override fun empty(): Const<A, T> = Const(SA().empty())
 
 }
+
+@instance(Const::class)
+interface ConstTraverseFilterInstance<X> : ConstTraverseInstance<X>, TraverseFilter<ConstKindPartial<X>> {
+
+    override fun <G, A, B> traverseFilter(fa: ConstKind<X, A>, f: (A) -> HK<G, Option<B>>, GA: Applicative<G>): HK<G, ConstKind<X, B>> =
+            fa.ev().traverseFilter(f, GA)
+}

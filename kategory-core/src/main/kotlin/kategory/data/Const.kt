@@ -9,8 +9,30 @@ fun <A, T> ConstKind<A, T>.value(): A = this.ev().value
 
     fun <F, U> traverse(f: (T) -> HK<F, U>, FA: Applicative<F>): HK<F, Const<A, U>> = FA.pure(retag())
 
+    fun <F, U> traverseFilter(f: (T) -> HK<F, Option<U>>, FA: Applicative<F>): HK<F, Const<A, U>> = FA.pure(retag())
+
     companion object {
+< < < < < < < HEAD
         fun <A, T> pure(a: A): Const<A, T> = Const(a)
+=== === =
+        fun <T, A> pure(a: A): Const<A, T> = Const(a)
+
+        inline fun <reified A> applicative(MA: Monoid<A> = kategory.monoid<A>()): Applicative<ConstKindPartial<A>> =
+                ConstApplicativeInstanceImplicits.instance(MA)
+
+        inline fun <reified A> traverse(MA: Monoid<A> = kategory.monoid<A>()): Traverse<ConstKindPartial<A>> =
+                ConstTraverseInstanceImplicits.instance()
+
+        inline fun <reified A> traverseFilter(MA: Monoid<A> = kategory.monoid<A>()): TraverseFilter<ConstKindPartial<A>> =
+                ConstTraverseFilterInstanceImplicits.instance()
+
+        inline fun <reified A, T> semigroup(SA: Semigroup<A> = kategory.semigroup<A>()): Semigroup<ConstKind<A, T>> =
+                ConstSemigroupInstanceImplicits.instance(SA)
+
+        inline fun <reified A, T> monoid(MA: Monoid<A> = kategory.monoid<A>()): Monoid<ConstKind<A, T>> =
+                ConstMonoidInstanceImplicits.instance(MA)
+
+> > > > > > > origin / master
     }
 }
 
