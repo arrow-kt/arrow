@@ -94,12 +94,12 @@ abstract class Optional<A, B> {
     /**
      * Check if there is no target
      */
-    fun isEmpty(a: A): Boolean = !getOption(a).nonEmpty
+    fun isEmpty(a: A): Boolean = !nonEmpty(a)
 
     /**
      * Check if there is a target
      */
-    fun nonEmpty(a: A): Boolean = getOption(a).nonEmpty
+    fun nonEmpty(a: A): Boolean = getOption(a).fold({ false }, { true })
 
     /**
      * Find if the target satisfies the predicate [p]
