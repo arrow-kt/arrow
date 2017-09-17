@@ -34,15 +34,19 @@ data class Instance(
             .decapitalize()
 
     fun expandedTypeArgs(reified: Boolean = false): String =
-            target.classOrPackageProto.typeParameters.joinToString(
-                    prefix = "<",
-                    separator = ", ",
-                    transform = {
-                        val name = target.classOrPackageProto.nameResolver.getString(it.name)
-                        if (reified) "reified $name" else name
-                    },
-                    postfix = ">"
-            )
+            if (target.classOrPackageProto.typeParameters.isNotEmpty()) {
+                target.classOrPackageProto.typeParameters.joinToString(
+                        prefix = "<",
+                        separator = ", ",
+                        transform = {
+                            val name = target.classOrPackageProto.nameResolver.getString(it.name)
+                            if (reified) "reified $name" else name
+                        },
+                        postfix = ">"
+                )
+            } else {
+                ""
+            }
 
     // TODO for this to work the functions return types need to b sorted based on the order of the typeclas typeargs
     //  so they can be instrospected at runtime
@@ -195,7 +199,7 @@ class InstanceFileGenerator(
             """|
                 |fun ${i.expandedTypeArgs(reified = false)} ${i.receiverTypeName}.Companion.${i.companionFactoryName}(${(i.args.map {
                 "${it.first}: ${it.second}"
-            } + listOf("dummy: Unit = Unit")).joinToString(", ")
+            } + (if (i.args.isNotEmpty()) listOf("dummy: Unit = Unit") else emptyList())).joinToString(", ")
             }): ${i.name}${i.expandedTypeArgs()} =
                 |  ${i.implicitObjectName}.instance(${i.args.map { it.first }.joinToString(", ")})
                 |
