@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-deploy_common.sh
+. deploy_common.sh
 
 VERSION_PATTERN=^[0-9].[0-9].[0-9]-SNAPSHOT$
 

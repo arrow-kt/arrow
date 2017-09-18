@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
+set -e
 
 SLUG="kategory/kategory"
 JDK="oraclejdk8"
 BRANCH="master"
-
-set -e
 
 GRADLE_PROPERTIES_FILE=gradle.properties
 

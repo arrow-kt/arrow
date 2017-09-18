@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-deploy_common.sh
+. deploy_common.sh
 
 if [ "$TRAVIS_REPO_SLUG" != "$SLUG" ]; then
   fail "Failed release deployment: wrong repository. Expected '$SLUG' but was '$TRAVIS_REPO_SLUG'."
