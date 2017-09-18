@@ -89,7 +89,7 @@ data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A> {
                     }
         }
 
-        fun asyncContextBuffer(): FlowableKWAsyncContextInstance = object : FlowableKWAsyncContextInstance {}
+        fun asyncContextBuffer(): FlowableKWAsyncContextInstance = FlowableKWAsyncContextInstanceImplicits.instance()
 
         fun asyncContextDrop(): FlowableKWAsyncContextInstance = object : FlowableKWAsyncContextInstance {
             override fun BS(): BackpressureStrategy = BackpressureStrategy.DROP
