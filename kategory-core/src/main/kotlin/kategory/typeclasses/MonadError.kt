@@ -23,10 +23,10 @@ inline fun <reified F, A, reified E> HK<F, A>.ensure(
 
 @RestrictsSuspension
 class MonadErrorContinuation<F, A>(val ME: MonadError<F, Throwable>, override val context: CoroutineContext = EmptyCoroutineContext) :
-        Serializable, MonadContinuation<F, A>(ME) {
+        Serializable, MonadCoroutines<F, A>(ME) {
 
     override fun resumeWithException(exception: Throwable) {
-        returnedMonad = ME.raiseError(exception)
+        returnedMonad.set(ME.raiseError(exception))
     }
 }
 

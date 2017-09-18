@@ -23,7 +23,7 @@ inline fun <F, A> runAsync(AC: AsyncContext<F>, crossinline f: () -> A): HK<F, A
 
 suspend inline fun <reified F, A> (() -> A).runAsync(AC: AsyncContext<F> = asyncContext()): HK<F, A> = runAsync(AC, this)
 
-suspend inline fun <reified F, A, B> MonadContinuation<F, A>.bindAsync(AC: AsyncContext<F> = asyncContext(), crossinline f: () -> B): B =
+suspend inline fun <reified F, A, B> MonadCoroutines<F, A>.bindAsync(AC: AsyncContext<F> = asyncContext(), crossinline f: () -> B): B =
         runAsync(AC, f).bind()
 
 suspend inline fun <reified F, A, B> StackSafeMonadContinuation<F, A>.bindAsync(AC: AsyncContext<F> = asyncContext(), crossinline f: () -> B): B =
@@ -35,16 +35,16 @@ inline fun <F, A> runAsyncUnsafe(AC: AsyncContext<F>, crossinline f: () -> Eithe
 suspend inline fun <reified F, A> (() -> Either<Throwable, A>).runAsyncUnsafe(AC: AsyncContext<F> = asyncContext()): HK<F, A> =
         runAsyncUnsafe(AC, this)
 
-suspend inline fun <reified F, A, B> MonadContinuation<F, A>.bindAsyncUnsafe(AC: AsyncContext<F> = asyncContext(), crossinline f: () -> Either<Throwable, B>):
+suspend inline fun <reified F, A, B> MonadCoroutines<F, A>.bindAsyncUnsafe(AC: AsyncContext<F> = asyncContext(), crossinline f: () -> Either<Throwable, B>):
         B = runAsyncUnsafe(AC, f).bind()
 
 suspend inline fun <reified F, A, B> StackSafeMonadContinuation<F, A>.bindAsyncUnsafe(AC: AsyncContext<F> = asyncContext(),
                                                                                       crossinline f: () -> Either<Throwable, B>): B =
         runAsyncUnsafe(AC, f).bind()
 
-open class AsyncMonadContinuation<F, A>(M: Monad<F>, val AC: AsyncContext<F>) : MonadContinuation<F, A>(M) {
+open class AsyncMonadContinuation<F, A>(M: Monad<F>, val AC: AsyncContext<F>) : MonadCoroutines<F, A>(M) {
 
-    internal fun returnedMonad(): HK<F, A> = returnedMonad
+    internal fun returnedMonad(): HK<F, A> = returnedMonad.get()
 
     suspend inline fun <B> bindAsync(crossinline f: () -> B): B = runAsync(AC, f).bind()
 
@@ -59,7 +59,7 @@ fun <F, B> AsyncContext<F>.bindingAsync(M: Monad<F>, c: suspend AsyncMonadContin
 
 open class AsyncStackSafeMonadContinuation<F, A>(M: Monad<F>, val AC: AsyncContext<F>) : StackSafeMonadContinuation<F, A>(M) {
 
-    internal fun returnedMonad(): Free<F, A> = returnedMonad
+    internal fun returnedMonad(): Free<F, A> = returnedMonad.get()
 
     suspend inline fun <B> bindAsync(crossinline f: () -> B): B = runAsync(AC, f).bind()
 
