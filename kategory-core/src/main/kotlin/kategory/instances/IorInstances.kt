@@ -1,14 +1,11 @@
 package kategory
 
+@instance(Ior::class)
 interface IorFunctorInstance<L> : Functor<IorKindPartial<L>> {
     override fun <A, B> map(fa: IorKind<L, A>, f: (A) -> B): Ior<L, B> = fa.ev().map(f)
 }
 
-object IorFunctorInstanceImplicits {
-    @JvmStatic
-    fun <L> instance(): IorFunctorInstance<L> = object : IorFunctorInstance<L> {}
-}
-
+@instance(Ior::class)
 interface IorApplicativeInstance<L> : IorFunctorInstance<L>, Applicative<IorKindPartial<L>> {
 
     fun SL(): Semigroup<L>
@@ -21,13 +18,7 @@ interface IorApplicativeInstance<L> : IorFunctorInstance<L>, Applicative<IorKind
             fa.ev().ap(ff, SL())
 }
 
-object IorApplicativeInstanceImplicits {
-    @JvmStatic
-    fun <L> instance(SL: Semigroup<L>): IorApplicativeInstance<L> = object : IorApplicativeInstance<L> {
-        override fun SL(): Semigroup<L> = SL
-    }
-}
-
+@instance(Ior::class)
 interface IorMonadInstance<L> : IorApplicativeInstance<L>, Monad<IorKindPartial<L>> {
 
     override fun <A, B> flatMap(fa: IorKind<L, A>, f: (A) -> IorKind<L, B>): Ior<L, B> =
@@ -41,13 +32,7 @@ interface IorMonadInstance<L> : IorApplicativeInstance<L>, Monad<IorKindPartial<
 
 }
 
-object IorMonadInstanceImplicits {
-    @JvmStatic
-    fun <L> instance(SL: Semigroup<L>): IorMonadInstance<L> = object : IorMonadInstance<L> {
-        override fun SL(): Semigroup<L> = SL
-    }
-}
-
+@instance(Ior::class)
 interface IorFoldableInstance<L> : Foldable<IorKindPartial<L>> {
 
     override fun <B, C> foldL(fa: HK<HK<IorHK, L>, B>, b: C, f: (C, B) -> C): C = fa.ev().foldL(b, f)
@@ -57,19 +42,10 @@ interface IorFoldableInstance<L> : Foldable<IorKindPartial<L>> {
 
 }
 
-object IorFoldableInstanceImplicits {
-    @JvmStatic
-    fun <L> instance(): IorFoldableInstance<L> = object : IorFoldableInstance<L> {}
-}
-
+@instance(Ior::class)
 interface IorTraverseInstance<L> : IorFoldableInstance<L>, Traverse<IorKindPartial<L>> {
 
     override fun <G, B, C> traverse(fa: IorKind<L, B>, f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, Ior<L, C>> =
             fa.ev().traverse(f, GA)
 
-}
-
-object IorTraverseInstanceImplicits {
-    @JvmStatic
-    fun <L> instance(): IorTraverseInstance<L> = object : IorTraverseInstance<L> {}
 }

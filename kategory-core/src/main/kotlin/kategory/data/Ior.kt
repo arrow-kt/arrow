@@ -106,17 +106,6 @@ import kategory.Either.Right
 
         fun <L, A, B> tailRecM(a: A, f: (A) -> IorKind<L, Either<A, B>>, SL: Semigroup<L>): Ior<L, B> = loop(f(a).ev(), f, SL)
 
-        fun <L> functor(): IorFunctorInstance<L> = IorFunctorInstanceImplicits.instance()
-
-        inline fun <reified L> applicative(SL: Semigroup<L> = semigroup<L>()): IorApplicativeInstance<L> =
-                IorApplicativeInstanceImplicits.instance(SL)
-
-        inline fun <reified L> monad(SL: Semigroup<L> = semigroup<L>()): IorMonadInstance<L> =
-                IorMonadInstanceImplicits.instance(SL)
-
-        fun <L> foldable(): IorFoldableInstance<L> = IorFoldableInstanceImplicits.instance()
-
-        fun <L> traverse(): IorTraverseInstance<L> = IorTraverseInstanceImplicits.instance()
     }
 
     /**

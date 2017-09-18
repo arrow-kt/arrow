@@ -116,9 +116,6 @@ class NonEmptyList<out A> private constructor(
             return NonEmptyList.fromListUnsafe(buf)
         }
 
-        fun <A> semigroup(): NonEmptyListSemigroup<A> =
-                NonEmptyListSemigroupInstanceImplicits.instance()
-
     }
 }
 

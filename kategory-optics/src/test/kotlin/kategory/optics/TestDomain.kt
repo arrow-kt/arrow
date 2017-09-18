@@ -1,11 +1,9 @@
 package kategory.optics
 
 import io.kotlintest.properties.Gen
-import kategory.Option
 import kategory.identity
 import kategory.left
 import kategory.right
-import kategory.some
 
 sealed class SumType {
     data class A(val string: String) : SumType()

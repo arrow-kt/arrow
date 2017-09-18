@@ -1,6 +1,6 @@
 package kategory
 
-interface Monoid<A> : Semigroup<A> {
+interface Monoid<A> : Semigroup<A>, Typeclass {
     /**
      * A zero value for this A
      */

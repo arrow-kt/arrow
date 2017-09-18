@@ -144,9 +144,25 @@ abstract class PIso<S, T, A, B> {
     )
 
     /**
+     * Compose a [Iso] with a [Lens]
+     */
+    infix fun <C> composeLens(other: Lens<B,C>): Lens<A,C> =
+            asLens() composeLens other
+
+    /**
+     * Compose a [Iso] with a [Getter]
+     */
+    infix fun <C> composeGetter(other: Getter<B,C>): Getter<A,C> =
+            asGetter() composeGetter other
+
+    /**
      * Plus operator overload to compose lenses
      */
     operator fun <C, D> plus(other: PIso<A, B, C, D>): PIso<S, T, C, D> = composeIso(other)
+
+    operator fun <C> plus(other: Lens<B,C>): Lens<A, C> = composeLens(other)
+
+    operator fun <C> plus(other: Getter<B,C>): Getter<A, C> = composeGetter(other)
 
     /**
      * View a [PIso] as a [PPrism]
@@ -160,6 +176,11 @@ abstract class PIso<S, T, A, B> {
      * View a [PIso] as a [PLens]
      */
     fun asLens(): PLens<S, T, A, B> = Lens(this::get, this::set)
+
+    /**
+     * View a [PIso] as a [Getter]
+     */
+    fun asGetter(): Getter<S,A> = Getter(this::get)
 
     /**
      * View a [PIso] as a [POptional]

@@ -17,61 +17,45 @@ object OptionalLaws {
             Law("Optional Law: consistent getOption with modify identity", { consistentGetOptionModifyId(optional, aGen, EQB) })
     )
 
-    fun <A, B> getOptionSet(optional: Optional<A, B>, aGen: Gen<A>, EQA: Eq<A>): Unit =
+    inline fun <reified A, reified B> getOptionSet(optional: Optional<A, B>, aGen: Gen<A>, EQA: Eq<A>): Unit =
             forAll(aGen, { a ->
-                EQA.eqv(
-                        optional.getOrModify(a).fold(::identity, { optional.set(it)(a) }),
-                        a
-                )
+                optional.getOrModify(a).fold(::identity, { optional.set(it)(a) }).equalUnderTheLaw(a, EQA)
             })
 
-    fun <A, B> getGetOption(optional: Optional<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQB: Eq<B>): Unit =
+    inline fun <reified A, reified B> getGetOption(optional: Optional<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQB: Eq<B>): Unit =
             forAll(aGen, bGen, { a, b ->
-                optional.getOption(optional.set(b)(a)).exists { EQB.eqv(it, b) }
+                optional.getOption(optional.set(b)(a)).exists {
+                    it.equalUnderTheLaw(b, EQB)
+                }
             })
 
-    fun <A, B> setIdempotent(optional: Optional<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>): Unit =
+    inline fun <reified A, reified B> setIdempotent(optional: Optional<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>): Unit =
             forAll(aGen, bGen, { a, b ->
-                EQA.eqv(
-                        optional.set(b)(optional.set(b)(a)),
-                        optional.set(b)(a)
-                )
+                optional.set(b)(optional.set(b)(a)).equalUnderTheLaw(optional.set(b)(a), EQA)
             })
 
-    fun <A, B> modifyIdentity(optional: Optional<A, B>, aGen: Gen<A>, EQA: Eq<A>): Unit =
+    inline fun <reified A, reified B> modifyIdentity(optional: Optional<A, B>, aGen: Gen<A>, EQA: Eq<A>): Unit =
             forAll(aGen, { a ->
-                EQA.eqv(
-                        optional.modify(::identity)(a),
-                        a
-                )
+                optional.modify(::identity)(a).equalUnderTheLaw(a, EQA)
             })
 
 
-    fun <A, B> composeModify(optional: Optional<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>): Unit =
+    inline fun <reified A, reified B> composeModify(optional: Optional<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>): Unit =
             forAll(aGen, funcGen, funcGen, { a, f, g ->
-                EQA.eqv(
-                        optional.modify(g)(optional.modify(f)(a)),
-                        optional.modify(g compose f)(a)
-                )
+                optional.modify(g)(optional.modify(f)(a)).equalUnderTheLaw(optional.modify(g compose f)(a), EQA)
             })
 
-    fun <A, B> consistentSetModify(optional: Optional<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>): Unit =
+    inline fun <reified A, reified B> consistentSetModify(optional: Optional<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>): Unit =
             forAll(aGen, bGen, { a, b ->
-                EQA.eqv(
-                        optional.set(b)(a),
-                        optional.modify { b }(a)
-                )
+                optional.set(b)(a).equalUnderTheLaw(optional.modify { b }(a), EQA)
             })
 
-    fun <A, B> consistentModifyModifyId(optional: Optional<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>): Unit =
+    inline fun <reified A, reified B> consistentModifyModifyId(optional: Optional<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>): Unit =
             forAll(aGen, funcGen, { a, f ->
-                EQA.eqv(
-                        optional.modify(f)(a),
-                        optional.modifyF(Id.applicative(), { Id.pure(f(it)) }, a).value()
-                )
+                optional.modify(f)(a).equalUnderTheLaw(optional.modifyF(Id.applicative(), { Id.pure(f(it)) }, a).value(), EQA)
             })
 
-    inline fun <reified A, B> consistentGetOptionModifyId(optional: Optional<A, B>, aGen: Gen<A>, EQB: Eq<B>): Unit =
+    inline fun <reified A, reified B> consistentGetOptionModifyId(optional: Optional<A, B>, aGen: Gen<A>, EQB: Eq<B>): Unit =
             forAll(aGen, { a ->
                 val getOption = optional.getOption(a)
 
@@ -81,7 +65,7 @@ object OptionalLaws {
 
                 getOption.exists { b ->
                     modifyFId.exists {
-                        EQB.eqv(b, it)
+                        it.equalUnderTheLaw(b, EQB)
                     }
                 }
             })
@@ -92,7 +76,7 @@ object OptionalLaws {
         override fun empty(): FirstOption<A> = FirstOption(Option.None)
 
         override fun combine(a: FirstOption<A>, b: FirstOption<A>): FirstOption<A> =
-                if (a.option.fold({ true }, { false })) a else b
+                if (a.option.fold({ false }, { true })) a else b
     }
 
 }

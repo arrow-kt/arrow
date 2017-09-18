@@ -19,6 +19,7 @@ class OptionTest : UnitSpec() {
             monad<OptionHK>() shouldNotBe null
             foldable<OptionHK>() shouldNotBe null
             traverse<OptionHK>() shouldNotBe null
+            traverseFilter<OptionHK>() shouldNotBe null
             semigroup<Option<Int>>() shouldNotBe null
             monoid<Option<Int>>() shouldNotBe null
             monadError<OptionHK, Unit>() shouldNotBe null
@@ -39,7 +40,7 @@ class OptionTest : UnitSpec() {
         }
 
         //testLaws(MonadErrorLaws.laws(monadError<OptionHK, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
-        testLaws(TraverseLaws.laws(Option.traverse(), Option.monad(), ::Some, Eq.any()))
+        testLaws(TraverseFilterLaws.laws(Option.traverseFilter(), Option.monad(), ::Some, Eq.any()))
         testLaws(MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()))
 
         "fromNullable should work for both null and non-null values of nullable types" {

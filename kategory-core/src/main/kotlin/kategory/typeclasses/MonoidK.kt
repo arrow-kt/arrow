@@ -6,7 +6,7 @@ package kategory
  * MonoidK<F> allows two F<A> values to be combined, for any A. It also means that for any A, there
  * is an "empty" F<A> value.
  */
-interface MonoidK<F> : SemigroupK<F> {
+interface MonoidK<F> : SemigroupK<F>, Typeclass {
 
     /**
      * Given a type A, create an "empty" F<A> value.

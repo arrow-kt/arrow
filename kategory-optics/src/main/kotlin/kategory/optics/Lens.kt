@@ -115,12 +115,15 @@ abstract class PLens<S, T, A, B> {
             { c -> { a -> set(l.set(c)(get(a)))(a) } }
     )
 
-    /** compose a [Lens] with a [Optional] */
+    /** compose a [PLens] with a [POptional] */
     infix fun <C, D> composeOptional(other: POptional<A, B, C, D>): POptional<S, T, C, D> =
             asOptional() composeOptional other
 
-    /** compose an [Iso] as an [Prism] */
-    fun <C, D> composeIso(other: PIso<A, B, C, D>): PLens<S, T, C, D> = composeLens(other.asLens())
+    /** compose an [PIso] as an [PPrism] */
+    infix fun <C, D> composeIso(other: PIso<A, B, C, D>): PLens<S, T, C, D> = composeLens(other.asLens())
+
+    infix fun <C> composeGetter(other: Getter<A, C>): Getter<S, C> =
+            asGetter() composeGetter other
 
     /**
      * plus operator overload to compose lenses
@@ -131,8 +134,15 @@ abstract class PLens<S, T, A, B> {
 
     operator fun <C, D> plus(other: PIso<A, B, C, D>): PLens<S, T, C, D> = composeIso(other)
 
+    operator fun <C> plus(other: Getter<A,C>): Getter<S, C> = composeGetter(other)
+
     /**
-     * View a [Lens] as an [Optional]
+     * View [PLens] as [Getter]
+     */
+    fun asGetter(): Getter<S, A> = Getter(this::get)
+
+    /**
+     * View a [PLens] as an [POptional]
      */
     fun asOptional(): POptional<S, T, A, B> = POptional(
             { s -> get(s).right() },

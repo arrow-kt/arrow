@@ -1,14 +1,11 @@
 package kategory
 
+@instance(Free::class)
 interface FreeFunctorInstance<S> : Functor<FreeKindPartial<S>> {
     override fun <A, B> map(fa: FreeKind<S, A>, f: (A) -> B): Free<S, B> = fa.ev().map(f)
 }
 
-object FreeFunctorInstanceImplicits {
-    @JvmStatic
-    fun <S> instance(): FreeFunctorInstance<S> = object : FreeFunctorInstance<S> {}
-}
-
+@instance(Free::class)
 interface FreeApplicativeInstance<S> : FreeFunctorInstance<S>, Applicative<FreeKindPartial<S>> {
     override fun <A> pure(a: A): Free<S, A> = Free.pure(a)
 
@@ -19,11 +16,7 @@ interface FreeApplicativeInstance<S> : FreeFunctorInstance<S>, Applicative<FreeK
 
 }
 
-object FreeApplicativeInstanceImplicits {
-    @JvmStatic
-    fun <S> instance(): FreeApplicativeInstance<S> = object : FreeApplicativeInstance<S> {}
-}
-
+@instance(Free::class)
 interface FreeMonadInstance<S> : FreeApplicativeInstance<S>, Monad<FreeKindPartial<S>> {
 
     override fun <A, B> map(fa: FreeKind<S, A>, f: (A) -> B): Free<S, B> = fa.ev().map(f)
@@ -40,11 +33,6 @@ interface FreeMonadInstance<S> : FreeApplicativeInstance<S>, Monad<FreeKindParti
         }
     }
 
-}
-
-object FreeMonadInstanceImplicits {
-    @JvmStatic
-    fun <S> instance(): FreeMonadInstance<S> = object : FreeMonadInstance<S> {}
 }
 
 data class FreeEq<F, G, A>(private val interpreter: FunctionK<F, G>, private val MG: Monad<G>) : Eq<HK<FreeKindPartial<F>, A>> {

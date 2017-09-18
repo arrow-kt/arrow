@@ -1,13 +1,18 @@
 package kategory
 
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
+import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class OptionTTest : UnitSpec() {
-    val EQ_ID: Eq<HK<OptionTKindPartial<IdHK>, Int>> = Eq { a, b ->
+
+    fun <A> EQ(): Eq<HK<OptionTKindPartial<A>, Int>> = Eq { a, b ->
+        a.value() == b.value()
+    }
+
+    fun <A> EQ_NESTED(): Eq<HK<OptionTKindPartial<A>, HK<OptionTKindPartial<A>, Int>>> = Eq { a, b ->
         a.value() == b.value()
     }
 
@@ -24,24 +29,31 @@ class OptionTTest : UnitSpec() {
             semigroupK<OptionTKindPartial<ListKWHK>>() shouldNotBe null
             monoidK<OptionTKindPartial<ListKWHK>>() shouldNotBe null
             functorFilter<OptionTKindPartial<ListKWHK>>() shouldNotBe null
+            traverseFilter<OptionTKindPartial<OptionHK>>() shouldNotBe null
         }
 
         testLaws(MonadLaws.laws(OptionT.monad(NonEmptyList.monad()), Eq.any()))
-        testLaws(TraverseLaws.laws(OptionT.traverse(), OptionT.applicative(Id.monad()), { OptionT(Id(it.some())) }, Eq.any()))
         testLaws(SemigroupKLaws.laws(
                 OptionT.semigroupK(Id.monad()),
                 OptionT.applicative(Id.monad()),
-                EQ_ID))
+                EQ()))
 
         testLaws(MonoidKLaws.laws(
                 OptionT.monoidK(Id.monad()),
                 OptionT.applicative(Id.monad()),
-                EQ_ID))
+                EQ()))
 
         testLaws(FunctorFilterLaws.laws(
                 OptionT.functorFilter(),
                 { OptionT(Id(it.some())) },
-                EQ_ID))
+                EQ()))
+
+        testLaws(TraverseFilterLaws.laws(
+                OptionT.traverseFilter(),
+                OptionT.applicative(Option.monad()),
+                { OptionT(Option(it.some())) },
+                EQ(),
+                EQ_NESTED()))
 
         "toLeft for Some should build a correct EitherT" {
             forAll { a: Int, b: String ->

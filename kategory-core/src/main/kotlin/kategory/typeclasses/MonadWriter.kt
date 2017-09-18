@@ -1,7 +1,7 @@
 package kategory
 
 /** A monad that support monoidal accumulation (e.g. logging List<String>) */
-interface MonadWriter<F, W> : Monad<F> {
+interface MonadWriter<F, W> : Monad<F>, Typeclass {
 
     /** Lift a writer action into the effect */
     fun <A> writer(aw: Tuple2<W, A>): HK<F, A>
