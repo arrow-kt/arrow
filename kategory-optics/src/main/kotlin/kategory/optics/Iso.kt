@@ -141,9 +141,25 @@ abstract class Iso<A, B> {
     )
 
     /**
+     * Compose a [Iso] with a [Lens]
+     */
+    infix fun <C> composeLens(other: Lens<B,C>): Lens<A,C> =
+            asLens() composeLens other
+
+    /**
+     * Compose a [Iso] with a [Getter]
+     */
+    infix fun <C> composeGetter(other: Getter<B,C>): Getter<A,C> =
+            asGetter() composeGetter other
+
+    /**
      * Plus operator overload to compose lenses
      */
     operator fun <C> plus(other: Iso<B, C>): Iso<A, C> = composeIso(other)
+
+    operator fun <C> plus(other: Lens<B,C>): Lens<A, C> = composeLens(other)
+
+    operator fun <C> plus(other: Getter<B,C>): Getter<A, C> = composeGetter(other)
 
     /**
      * View a [Iso] as a [Prism]
@@ -157,6 +173,11 @@ abstract class Iso<A, B> {
      * View a [Iso] as a [Lens]
      */
     fun asLens(): Lens<A, B> = Lens(this::get, this::set)
+
+    /**
+     * View a [Iso] as a [Getter]
+     */
+    fun asGetter(): Getter<A,B> = Getter(this::get)
 
     /**
      * View a [Iso] as a [Optional]
