@@ -5,13 +5,39 @@
 #masthead {
     padding: ($base-point-grid * 22) 0;
     text-align: center;
-    background-image: url("../img/header-background-top.svg"), url("../img/header-background-bottom.svg");
     background-repeat: repeat-x, repeat-x;
     background-position: top center, bottom center;
     background-color: $brand-primary;
+    position: relative;
 
     @include bp(large) {
         padding-bottom: ($base-point-grid * 12);
+    }
+
+    .masthead-background {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      overflow-x: hidden;
+      &.background {
+        top: 0;
+        opacity: 0.5;
+      }
+      &.top {
+        top: 0;
+        background-image: url("../img/header-background-top.svg");
+        background-repeat: repeat-x, repeat-x;
+        background-position: top center;
+      }
+      &.bottom {
+        bottom: 0;
+        position: absolute;
+        background-image: url("../img/header-background-bottom.svg");
+        background-repeat: repeat-x, repeat-x;
+        background-position: bottom center;
+      }
     }
 
     .masthead-inner {
@@ -21,9 +47,15 @@
              @include grid-column(12, $base-grid);
         }
 
+        perspective: 1000px;
+        transform-style: preserve-3d;
+        transform: rotateX(0deg) rotateY(0deg);
+
         .masthead-brand {
             min-width: 103px;
             height: auto;
+            transform: translateZ(103px);
+            transform-style: preserve-3d;
         }
 
         .masthead-title {
@@ -32,6 +64,10 @@
             font-weight: $font-semibold;
             line-height: 1.2;
             color: $white;
+
+            transform: translateZ(60px);
+            transform-style: preserve-3d;
+
             @include bp(large) {
                 font-size: 2rem;
             }
@@ -47,6 +83,9 @@
             background: $brand-tertiary;
             color: $white;
 
+            transform: translateZ(96px);
+            transform-style: preserve-3d;
+
             &:active,
             &:focus,
             &:hover {
@@ -55,4 +94,60 @@
             }
         }
     }
+}
+
+// @keyframes springish {
+//   0.00% {transform: scale3d(1, 1.02, 1);}
+//   14.86% {transform: scale3d(1, 0.98, 1);}
+//   36.15% {transform: scale3d(1, 1.03, 1);}
+//   57.43% {transform: scale3d(1, 0.97, 1);}
+//   78.72% {transform: scale3d(1, 1.03, 1);}
+//   100.00% {transform: scale3d(1, 1, 1);}
+// }
+// polygon, path, polyline {
+//   animation: springish;
+//   animation-iteration-count: infinite;
+//   animation-direction: alternate;
+//   animation-duration: 5.34s;
+//   animation-timing-function: cubic-bezier(0.445,  0.050, 0.550, 0.950);
+// }
+
+@keyframes springish {
+  0.00% {transform: skew(0deg, 0deg);}
+  14.86% {transform: skew(-2deg, 0deg);}
+  36.15% {transform: skew(1deg, 0deg);}
+  57.43% {transform: skew(-2deg, 0deg);}
+  78.72% {transform: skew(1deg, 0deg);}
+  100.00% {transform: skew(0deg, 0deg);}
+}
+.springish {
+  animation: springish;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-duration: 5.34s;
+  animation-timing-function: cubic-bezier(0.445,  0.050, 0.550, 0.950);
+  transform-origin: center;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 1;
+  }
+  20% {
+    transform: scale(25, 25);
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(40, 40);
+  }
+}
+
+.ripple {
+  animation: ripple;
+  animation-iteration-count: infinite;
+  animation-duration: 2.5s;
+  animation-timing-function: cubic-bezier(0.445,  0.050, 0.550, 0.950);
+  transform-origin: center;
 }

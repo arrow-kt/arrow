@@ -134,3 +134,9 @@ input {
         color: rgba($brand-secondary, 0.6);
     }
 }
+
+// Animations related
+// ------------------------------------------------
+[class*="indirect-injection"] {
+  opacity: 0;
+}

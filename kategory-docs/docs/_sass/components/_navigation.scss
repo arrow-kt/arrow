@@ -4,6 +4,7 @@
 
 #navigation {
     position: fixed;
+    z-index: 2;
     @include flexbox;
     @include justify-content(space-between);
     @include align-items(center);

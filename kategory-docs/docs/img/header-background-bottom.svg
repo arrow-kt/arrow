@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="1971px" height="264px" viewBox="0 0 1971 264" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="1756px" height="229px" viewBox="0 0 1756 229" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
     <title>header-background-bottom</title>
     <desc>Created with Sketch.</desc>
@@ -8,67 +8,14 @@
             <stop stop-color="#61A8FF" offset="0%"></stop>
             <stop stop-color="#4B74E5" offset="100%"></stop>
         </linearGradient>
-        <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="linearGradient-2">
-            <stop stop-color="#FFFFFF" offset="0%"></stop>
-            <stop stop-color="#FFFFFF" stop-opacity="0.174960371" offset="100%"></stop>
-        </linearGradient>
-        <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="linearGradient-3">
-            <stop stop-color="#FFFFFF" offset="0%"></stop>
-            <stop stop-color="#FFFFFF" stop-opacity="0.140709918" offset="100%"></stop>
-        </linearGradient>
-        <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="linearGradient-4">
-            <stop stop-color="#FFFFFF" offset="0%"></stop>
-            <stop stop-color="#FFFFFF" stop-opacity="0" offset="100%"></stop>
-        </linearGradient>
-        <circle id="path-5" cx="1252.5" cy="602.5" r="2.5"></circle>
-        <circle id="path-6" cx="1113.5" cy="613.5" r="2.5"></circle>
-        <circle id="path-7" cx="837.5" cy="581.5" r="2.5"></circle>
-        <circle id="path-8" cx="767.5" cy="640.5" r="2.5"></circle>
-        <circle id="path-9" cx="498.5" cy="465.5" r="2.5"></circle>
-        <circle id="path-10" cx="411.5" cy="549.5" r="2.5"></circle>
-        <circle id="path-11" cx="1761.5" cy="551.5" r="2.5"></circle>
     </defs>
     <g id="kategory-ui" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="section-hero-copy-2" transform="translate(0.000000, -405.000000)">
-            <g id="background">
-                <polygon id="path" fill-opacity="0.65" fill="#4B74E5" points="248.513672 441.089844 1001.83008 685.011719 86.1367188 682.841797"></polygon>
-                <path d="M809.954141,622.882794 L809.960965,622.893521 L751.900174,684.423372 L229.92323,683.194613 L227.873087,470.709341 L248.513672,441.089844 L809.954141,622.882794 Z" id="path" fill-opacity="0.430395154" fill="#4B74E5"></path>
-                <polygon id="path" fill-opacity="0.618631114" fill="#4B74E5" points="1224 689.167969 1643.69922 495.257812 1841.63672 689.167969"></polygon>
-                <path d="M1702.66504,689.167969 L1643.12884,495.521338 L1643.69922,495.257812 L1841.63672,689.167969 L1702.66504,689.167969 Z" id="path" fill="url(#linearGradient-1)" opacity="0.6"></path>
-                <polygon id="path" fill="#4B74E5" opacity="0.563292572" points="1518.32031 708.316406 1131.03516 708.316406 1207.45703 615.652344"></polygon>
-                <polygon id="path" stroke="url(#linearGradient-2)" opacity="0.6" stroke-dasharray="3,3,3,3" points="29.9921875 668.695312 500.878906 466 839.367188 581.964844 1177.94922 696.144531 1251.29297 601.355469 1599.20313 704.695312 1761.65234 550.695313 1971.03906 677.464844"></polygon>
-                <polyline id="path" stroke="url(#linearGradient-3)" opacity="0.6" stroke-dasharray="3,3,3,3" points="782.4375 685.277344 1113.76562 613.554688 1289 741.210937"></polyline>
-                <polyline id="path" stroke="url(#linearGradient-4)" opacity="0.6" stroke-dasharray="3,3,3,3" points="247.867188 652.109375 411.152344 548.070312 727.390625 695.070312"></polyline>
-                <polyline id="path" stroke="url(#linearGradient-3)" opacity="0.6" stroke-dasharray="3,3,3,3" points="677.896484 686.316406 767.148438 640.34375 824.474609 682.630859"></polyline>
-                <g id="path">
-                    <use fill-opacity="0.7" fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-5"></use>
-                    <circle stroke-opacity="0.1" stroke="#FFFFFF" stroke-width="5" cx="1252.5" cy="602.5" r="5"></circle>
-                </g>
-                <g id="path">
-                    <use fill-opacity="0.7" fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-6"></use>
-                    <circle stroke-opacity="0.1" stroke="#FFFFFF" stroke-width="5" cx="1113.5" cy="613.5" r="5"></circle>
-                </g>
-                <g id="path">
-                    <use fill-opacity="0.7" fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-7"></use>
-                    <circle stroke-opacity="0.1" stroke="#FFFFFF" stroke-width="5" cx="837.5" cy="581.5" r="5"></circle>
-                </g>
-                <g id="path">
-                    <use fill-opacity="0.7" fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-8"></use>
-                    <circle stroke-opacity="0.1" stroke="#FFFFFF" stroke-width="5" cx="767.5" cy="640.5" r="5"></circle>
-                </g>
-                <g id="path">
-                    <use fill-opacity="0.7" fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-9"></use>
-                    <circle stroke-opacity="0.1" stroke="#FFFFFF" stroke-width="5" cx="498.5" cy="465.5" r="5"></circle>
-                </g>
-                <g id="path">
-                    <use fill-opacity="0.7" fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-10"></use>
-                    <circle stroke-opacity="0.1" stroke="#FFFFFF" stroke-width="5" cx="411.5" cy="549.5" r="5"></circle>
-                </g>
-                <g id="path">
-                    <use fill-opacity="0.7" fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-11"></use>
-                    <circle stroke-opacity="0.1" stroke="#FFFFFF" stroke-width="5" cx="1761.5" cy="551.5" r="5"></circle>
-                </g>
-            </g>
+        <g id="header-background-bottom" transform="translate(0.000000, 13.000000)" fill-rule="nonzero">
+            <polygon id="path" fill-opacity="0.85" fill="#4B74E5" points="162.513672 0.089844 915.83008 244.011719 0.1367188 241.841797"></polygon>
+            <polygon id="path" fill-opacity="0.630395154" fill="#4B74E5" points="723.954141 181.882794 723.960965 181.893521 665.900174 243.423372 143.92323 242.194613 141.873087 29.709341 162.513672 0.089844"></polygon>
+            <polygon id="path" fill-opacity="0.818631114" fill="#4B74E5" points="1138 248.167969 1557.69922 54.257812 1755.63672 248.167969"></polygon>
+            <polygon id="path" fill="url(#linearGradient-1)" opacity="0.8" points="1616.66504 248.167969 1557.12884 54.521338 1557.69922 54.257812 1755.63672 248.167969"></polygon>
+            <polygon id="path" fill="#4B74E5" opacity="0.763292572" points="1432.32031 267.316406 1045.03516 267.316406 1121.45703 174.652344"></polygon>
         </g>
     </g>
 </svg>
