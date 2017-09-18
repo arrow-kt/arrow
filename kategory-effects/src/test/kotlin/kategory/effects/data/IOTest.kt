@@ -1,5 +1,6 @@
-package kategory
+package kategory.effects
 
+import kategory.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
@@ -10,7 +11,7 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class IOTest : UnitSpec() {
     fun <A> EQ(): Eq<HK<IOHK, A>> = Eq { a, b ->
-                a.ev().attempt().unsafeRunSync() == b.ev().attempt().unsafeRunSync()
+        a.ev().attempt().unsafeRunSync() == b.ev().attempt().unsafeRunSync()
     }
 
     init {

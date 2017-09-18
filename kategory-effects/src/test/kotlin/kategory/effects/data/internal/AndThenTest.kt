@@ -4,8 +4,8 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.forAll
-import kategory.effects.data.internal.AndThen
-import kategory.effects.data.internal.error
+import kategory.effects.internal.AndThen
+import kategory.effects.internal.error
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
