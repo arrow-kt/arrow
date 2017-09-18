@@ -13,9 +13,15 @@ after_success:
   - bash <(curl -s https://codecov.io/bash)
 
 deploy:
-  on:
-    branch: master
-    tags: true
-    condition: "$TRAVIS_TAG =~ ^Release.*$"
-  provider: script
-  script: ./gradlew bintrayUpload
+  # deploy release
+  - provider: script
+    script: ./gradlew bintrayUpload install -PdryRun=false
+    on:
+      tags: true
+      condition: "$TRAVIS_TAG =~ ^Release.*$"
+  # deploy snapshot
+  - provider: script
+    script: ./gradlew bintrayUpload install -PdryRun=false
+    on:
+      branch: master
+      tags: false
