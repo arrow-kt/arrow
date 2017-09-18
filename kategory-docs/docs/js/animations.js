@@ -138,8 +138,8 @@ $(window).on("load", function() {
       });
 
       var pg = particleground(document.getElementById('masthead-background'), {
-        dotColor: '#14C3FF',
-        lineColor: '#14C3FF',
+        dotColor: '#fff',
+        lineColor: '#fff',
         density: 18000,
         parallaxMultiplier: 18,
         lineWidth: 0.5,
