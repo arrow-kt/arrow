@@ -27,10 +27,6 @@ interface Order<F> : Eq<F>, Typeclass {
             override fun compare(a: F, b: F): Int = compare(a, b)
         }
 
-        fun <F : Comparable<F>> fromComparable(): Order<F> = object : Order<F> {
-            override fun compare(a: F, b: F): Int = a.compareTo(b)
-        }
-
         fun <F> allEqual(): Order<F> = object : Order<F> {
             override fun compare(a: F, b: F): Int = 0
         }
@@ -48,3 +44,7 @@ inline fun <reified F> F.lte(O: Order<F> = order(), b: F): Boolean = O.lte(this,
 inline fun <reified F> F.gt(O: Order<F> = order(), b: F): Boolean = O.gt(this, b)
 
 inline fun <reified F> F.gte(O: Order<F> = order(), b: F): Boolean = O.gte(this, b)
+
+fun <F: Comparable<F>> toOrder(): Order<F> = object : Order<F> {
+    override fun compare(a: F, b: F): Int = a.compareTo(b)
+}

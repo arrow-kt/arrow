@@ -1,12 +1,14 @@
 package kategory.instances
 
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.Gen
 import kategory.OrderLaws
 import kategory.UnitSpec
 import kategory.genFunctionAToB
 import kategory.order
+import kategory.toOrder
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -29,5 +31,12 @@ class OrderInstancesTest : UnitSpec() {
             order<Float>() shouldNotBe null
             order<Double>() shouldNotBe null
         }
+
+        "from comparable" {
+            val toOrder = toOrder<Int>()
+            toOrder.gt(10,1) shouldBe true
+            toOrder.lt(10,1) shouldBe false
+        }
+
     }
 }
