@@ -1,8 +1,5 @@
 package kategory
 
-import kotlin.coroutines.experimental.CoroutineContext
-import kotlin.coroutines.experimental.EmptyCoroutineContext
-import kotlin.coroutines.experimental.RestrictsSuspension
 import kotlin.coroutines.experimental.startCoroutine
 
 interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F>, Typeclass {
