@@ -1,10 +1,7 @@
 ---
 layout: docs
-title: Docs
+title: Quick Start
 permalink: /docs/
 ---
 
-## Documentation
-
-* [Data Types](./datatypes/)
-* [Type Classes](./typeclasses/)
+## TODO

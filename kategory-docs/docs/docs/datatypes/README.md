@@ -7,6 +7,6 @@ permalink: /docs/datatypes/
 ## Data Types
 
 * [Either](./either/)
-* [Identity](./identity/)
+* [Identity](id/)
 * [Option](./option/)
 * [Validated](./validated/)

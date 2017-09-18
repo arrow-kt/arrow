@@ -1,10 +1,10 @@
 ---
 layout: docs
-title: Identity
-permalink: /docs/datatypes/identity/
+title: Id
+permalink: /docs/datatypes/id/
 ---
 
-## Identity
+## Id
 
 The identity monad can be seen as the ambient monad that encodes the effect of having no effect. 
 It is ambient in the sense that plain pure values are values of `Id`.
