@@ -15,12 +15,12 @@ import kategory.toT
 typealias Lens<S, A> = PLens<S, S, A, A>
 
 /**
- * A [Lens] can be seen as a pair of functions `get: (A) -> B` and `set: (B) -> (A) -> A`
+ * A [PLens] can be seen as a pair of functions `get: (A) -> B` and `set: (B) -> (A) -> A`
  * - `get: (A) -> B` i.e. from an `A`, we can extract an `B`
  * - `set: (B) -> (A) -> A` i.e. if we replace target value by `B` in an `A`, we obtain another modified `A`
  *
- * @param A the source of a [Lens]
- * @param B the target of a [Lens]
+ * @param A the source of a [PLens]
+ * @param B the target of a [PLens]
  * @property get from an `A` we can extract a `B`
  * @property set replace the target value by `B` in an `A` so we obtain another modified `A`
  * @constructor Creates a Lens of type `A` with target `B`.
@@ -35,7 +35,7 @@ abstract class PLens<S, T, A, B> {
         fun <A> id() = Iso.id<A>().asLens()
 
         /**
-         * [Lens] that takes either A or A and strips the choice of A.
+         * [PLens] that takes either A or A and strips the choice of A.
          */
         fun <A> codiagonal(): Lens<Either<A, A>, A> = Lens(
                 get = { it.fold(::identity, ::identity) },
@@ -50,12 +50,12 @@ abstract class PLens<S, T, A, B> {
     }
 
     /**
-     * Modify the target of a [Lens] using a function `(A) -> B`
+     * Modify the target of a [PLens] using a function `(A) -> B`
      */
     inline fun modify(f: (A) -> B, a: S): T = set(f(get(a)))(a)
 
     /**
-     * Modify the target of a [Lens] using Functor function
+     * Modify the target of a [PLens] using Functor function
      */
     inline fun <reified F> modifyF(FF: Functor<F> = functor(), f: (A) -> HK<F, B>, s: S): HK<F, T> =
             FF.map(f(get(s)), { set(it)(s) })
@@ -70,12 +70,12 @@ abstract class PLens<S, T, A, B> {
     }
 
     /**
-     * Checks if the target of a [Lens] satisfies the predicate
+     * Checks if the target of a [PLens] satisfies the predicate
      */
     inline fun exist(crossinline p: (A) -> Boolean): (S) -> Boolean = { p(get(it)) }
 
     /**
-     * Join two [Lens] with the same target
+     * Join two [PLens] with the same target
      */
     fun <S1, T1> choice(other: PLens<S1, T1, A, B>): PLens<Either<S, S1>, Either<T, T1>, A, B> = PLens(
             { ss -> ss.fold(this::get, other::get) },
@@ -83,7 +83,7 @@ abstract class PLens<S, T, A, B> {
     )
 
     /**
-     * Pair two disjoint [Lens]
+     * Pair two disjoint [PLens]
      */
     fun <S1, T1, A1, B1> split(other: PLens<S1, T1, A1, B1>): PLens<Tuple2<S, S1>, Tuple2<T, T1>, Tuple2<A, A1>, Tuple2<B, B1>> =
             PLens(
@@ -108,7 +108,7 @@ abstract class PLens<S, T, A, B> {
     )
 
     /**
-     * Compose a [Lens] with another [Lens]
+     * Compose a [PLens] with another [PLens]
      */
     infix fun <C, D> composeLens(l: PLens<A, B, C, D>): PLens<S, T, C, D> = Lens(
             { a -> l.get(get(a)) },

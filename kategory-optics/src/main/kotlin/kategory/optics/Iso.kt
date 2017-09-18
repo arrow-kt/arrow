@@ -16,22 +16,22 @@ import kategory.toT
 typealias Iso<S, T> = PIso<S, S, T, T>
 
 /**
- * An [Iso] defines an isomorphism between a type S and A.
+ * An [PIso] defines an isomorphism between a type S and A.
  *
- * An [Iso] is also a valid [Lens], [Prism]
+ * An [PIso] is also a valid [Lens], [Prism]
  *
- * @param A the source of a [Iso]
- * @param B the target of a [Iso]
+ * @param A the source of a [PIso]
+ * @param B the target of a [PIso]
  */
 abstract class PIso<S, T, A, B> {
 
     /**
-     * Get the target of a [Iso]
+     * Get the target of a [PIso]
      */
     abstract fun get(s: S): A
 
     /**
-     * Get the modified source of a [Iso]
+     * Get the modified source of a [PIso]
      */
     abstract fun reverseGet(b: B): T
 
@@ -58,7 +58,7 @@ abstract class PIso<S, T, A, B> {
     fun reverse(): PIso<B, A, T, S> = PIso(this::reverseGet, this::get)
 
     /**
-     * Lift a [Iso] to a Functor level
+     * Lift a [PIso] to a Functor level
      */
     inline fun <reified F> mapping(FF: Functor<F> = functor()): PIso<HK<F, S>, HK<F, T>, HK<F, A>, HK<F, B>> = PIso(
             { fa -> FF.map(fa, this::get) },
@@ -91,12 +91,12 @@ abstract class PIso<S, T, A, B> {
             FF.map(f(get(s)), this::reverseGet)
 
     /**
-     * Set polymorphically the target of a [Iso] with a value
+     * Set polymorphically the target of a [PIso] with a value
      */
     fun set(b: B): (S) -> (T) = { reverseGet(b) }
 
     /**
-     * Pair two disjoint [Iso]
+     * Pair two disjoint [PIso]
      */
     infix fun <S1, T1, A1, B1> split(other: PIso<S1, T1, A1, B1>): PIso<Tuple2<S, S1>, Tuple2<T, T1>, Tuple2<A, A1>, Tuple2<B, B1>> = PIso(
             { (a, c) -> get(a) toT other.get(c) },
@@ -144,15 +144,15 @@ abstract class PIso<S, T, A, B> {
     )
 
     /**
-     * Compose a [Iso] with a [Lens]
+     * Compose a [PIso] with a [PLens]
      */
-    infix fun <C> composeLens(other: Lens<B,C>): Lens<A,C> =
+    infix fun <C, D> composeLens(other: PLens<A, B, C, D>): PLens<S, T, C, D> =
             asLens() composeLens other
 
     /**
-     * Compose a [Iso] with a [Getter]
+     * Compose a [PIso] with a [Getter]
      */
-    infix fun <C> composeGetter(other: Getter<B,C>): Getter<A,C> =
+    infix fun <C> composeGetter(other: Getter<A, C>): Getter<S, C> =
             asGetter() composeGetter other
 
     /**
@@ -160,9 +160,9 @@ abstract class PIso<S, T, A, B> {
      */
     operator fun <C, D> plus(other: PIso<A, B, C, D>): PIso<S, T, C, D> = composeIso(other)
 
-    operator fun <C> plus(other: Lens<B,C>): Lens<A, C> = composeLens(other)
+    operator fun <C, D> plus(other: PLens<A, B, C, D>): PLens<S, T, C, D> = composeLens(other)
 
-    operator fun <C> plus(other: Getter<B,C>): Getter<A, C> = composeGetter(other)
+    operator fun <C> plus(other: Getter<A, C>): Getter<S, C> = composeGetter(other)
 
     /**
      * View a [PIso] as a [PPrism]
@@ -180,7 +180,7 @@ abstract class PIso<S, T, A, B> {
     /**
      * View a [PIso] as a [Getter]
      */
-    fun asGetter(): Getter<S,A> = Getter(this::get)
+    fun asGetter(): Getter<S, A> = Getter(this::get)
 
     /**
      * View a [PIso] as a [POptional]

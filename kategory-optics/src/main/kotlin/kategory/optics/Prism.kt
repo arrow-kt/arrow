@@ -19,17 +19,17 @@ import kategory.toT
 typealias Prism<S, A> = PPrism<S, S, A, A>
 
 /**
- * A [Prism] can be seen as a pair of functions: `reverseGet : B -> A` and `getOrModify: A -> Either<A,B>`
+ * A [PPrism] can be seen as a pair of functions: `reverseGet : B -> A` and `getOrModify: A -> Either<A,B>`
  *
- * - `reverseGet : B -> A` get the source type of a [Prism]
- * - `getOrModify: A -> Either<A,B>` get the target of a [Prism] or return the original value
+ * - `reverseGet : B -> A` get the source type of a [PPrism]
+ * - `getOrModify: A -> Either<A,B>` get the target of a [PPrism] or return the original value
  *
  * It encodes the relation between a Sum or CoProduct type (sealed class) and one of its element.
  *
- * @param A the source of a [Prism]
- * @param B the target of a [Prism]
+ * @param A the source of a [PPrism]
+ * @param B the target of a [PPrism]
  * @property getOrModify from an `B` we can produce an `A`
- * @property reverseGet get the target of a [Prism] or return the original value
+ * @property reverseGet get the target of a [PPrism] or return the original value
  * @constructor Creates a Lens of type `A` with target `B`
  */
 abstract class PPrism<S, T, A, B> {
@@ -48,7 +48,7 @@ abstract class PPrism<S, T, A, B> {
         }
 
         /**
-         * a [Prism] that checks for equality with a given value
+         * a [PPrism] that checks for equality with a given value
          */
         inline fun <reified A> only(a: A, EQA: Eq<A> = eq()): Prism<A, Unit> = Prism(
                 getOrModify = { a2 -> (if (EQA.eqv(a, a2)) a.left() else Unit.right()) },
@@ -63,7 +63,7 @@ abstract class PPrism<S, T, A, B> {
     fun getOption(a: S): Option<A> = getOrModify(a).toOption()
 
     /**
-     * Modify the target of a [Prism] with an Applicative function
+     * Modify the target of a [PPrism] with an Applicative function
      */
     inline fun <reified F> modifyF(FA: Applicative<F> = kategory.applicative(), crossinline f: (A) -> HK<F, B>, s: S): HK<F, T> = getOrModify(s).fold(
             FA::pure,
@@ -71,24 +71,24 @@ abstract class PPrism<S, T, A, B> {
     )
 
     /**
-     * Modify the target of a [Prism] with a function
+     * Modify the target of a [PPrism] with a function
      */
     inline fun modify(crossinline f: (A) -> B): (S) -> T = { s ->
         getOrModify(s).fold(::identity, { a -> reverseGet(f(a)) })
     }
 
     /**
-     * Modify the target of a [Prism] with a function
+     * Modify the target of a [PPrism] with a function
      */
     inline fun modifyOption(crossinline f: (A) -> B): (S) -> Option<T> = { getOption(it).map { b -> reverseGet(f(b)) } }
 
     /**
-     * Set the target of a [Prism] with a value
+     * Set the target of a [PPrism] with a value
      */
     fun set(b: B): (S) -> T = modify { b }
 
     /**
-     * Set the target of a [Prism] with a value
+     * Set the target of a [PPrism] with a value
      */
     fun setOption(b: B): (S) -> Option<T> = modifyOption { b }
 
@@ -140,23 +140,23 @@ abstract class PPrism<S, T, A, B> {
     )
 
     /**
-     * Compose a [Prism] with another [Prism]
+     * Compose a [PPrism] with another [PPrism]
      */
     infix fun <C, D> composePrism(other: PPrism<A, B, C, D>): PPrism<S, T, C, D> = Prism(
             { s -> getOrModify(s).flatMap { a -> other.getOrModify(a).bimap({ set(it)(s) }, ::identity) } },
             this::reverseGet compose other::reverseGet
     )
 
-    /** compose an [Iso] as an [Prism] */
+    /** compose an [Iso] as an [PPrism] */
     fun <C, D> composeIso(other: PIso<A, B, C, D>): PPrism<S, T, C, D> = composePrism(other.asPrism())
 
     /**
-     * View a [Prism] as an [Optional]
+     * View a [PPrism] as an [POptional]
      */
     fun asOptional(): POptional<S, T, A, B> = POptional(this::getOrModify, this::set)
 
     /**
-     * Compose a [Prism] with a [Optional]
+     * Compose a [PPrism] with a [POptional]
      */
     infix fun <C, D> composeOptional(other: POptional<A, B, C, D>): POptional<S, T, C, D> =
             asOptional() composeOptional other
