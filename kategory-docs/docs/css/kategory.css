@@ -311,9 +311,10 @@ input {
         background: rgba(75, 116, 229, 0.6); }
 
 .snippets {
-  padding: 96px 0;
+  padding: 96px 0 48px;
   background: rgba(75, 116, 229, 0.1); }
   .snippets .snippet-item {
+    margin-bottom: 48px;
     width: calc(33.3333333333% - 42.6666666667px);
     float: left;
     margin-left: 32px; }
@@ -602,7 +603,7 @@ input {
   padding: 24px;
   background: #fff;
   font-family: "monoidregular", monospace;
-  font-size: 0.75rem; }
+  font-size: 0.8125rem; }
 
 #footer {
   padding: 32px 0;

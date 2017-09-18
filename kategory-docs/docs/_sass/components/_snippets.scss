@@ -3,10 +3,11 @@
 // -----------------------------------------------
 
 .snippets {
-    padding: ($base-point-grid * 12) 0;
+    padding: ($base-point-grid * 12) 0 ($base-point-grid * 6);
     background: rgba($brand-tertiary, 0.10);
 
     .snippet-item {
+        margin-bottom: ($base-point-grid * 6);
         @include grid-column(4, $base-grid);
 
         @include bp(large) {
