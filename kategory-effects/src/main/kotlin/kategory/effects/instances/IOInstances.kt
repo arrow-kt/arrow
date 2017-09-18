@@ -1,6 +1,9 @@
 package kategory.effects
 
-import kategory.*
+import kategory.MonadError
+import kategory.Monoid
+import kategory.Semigroup
+import kategory.instance
 
 @instance(IO::class)
 interface IOMonadErrorInstance : IOMonadInstance, MonadError<IOHK, Throwable> {

@@ -1,8 +1,8 @@
-package kategory
+package kategory.effects
 
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kategory.effects.*
+import kategory.*
 import kategory.effects.data.internal.BindingCancellationException
 
 object AsyncLaws {

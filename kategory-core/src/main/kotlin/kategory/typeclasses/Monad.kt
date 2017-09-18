@@ -1,6 +1,6 @@
 package kategory
 
-import kotlin.coroutines.experimental.*
+import kotlin.coroutines.experimental.startCoroutine
 
 interface Monad<F> : Applicative<F>, Typeclass {
 

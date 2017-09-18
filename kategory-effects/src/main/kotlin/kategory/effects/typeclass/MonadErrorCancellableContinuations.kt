@@ -10,6 +10,8 @@ import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
 import kotlin.coroutines.experimental.startCoroutine
 
+typealias Disposable = () -> Unit
+
 @RestrictsSuspension
 open class MonadErrorCancellableContinuation<F, A>(ME: MonadError<F, Throwable>, override val context: CoroutineContext = EmptyCoroutineContext) :
         MonadErrorContinuation<F, A>(ME) {
