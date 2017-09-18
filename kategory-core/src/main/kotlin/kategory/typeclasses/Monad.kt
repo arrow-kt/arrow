@@ -36,8 +36,8 @@ inline fun <reified F, A> HK<F, HK<F, A>>.flatten(FT: Monad<F> = monad()): HK<F,
  * A coroutine is initiated and inside `MonadContinuation` suspended yielding to `flatMap` once all the flatMap binds are completed
  * the underlying monad is returned from the act of executing the coroutine
  */
-fun <F, B> Monad<F>.binding(c: suspend MonadCoroutines<F, *>.() -> HK<F, B>): HK<F, B> {
-    val continuation = MonadCoroutines<F, B>(this)
+fun <F, B> Monad<F>.binding(c: suspend MonadContinuation<F, *>.() -> HK<F, B>): HK<F, B> {
+    val continuation = MonadContinuation<F, B>(this)
     c.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
 }

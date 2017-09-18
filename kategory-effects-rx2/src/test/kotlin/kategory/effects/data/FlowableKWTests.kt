@@ -1,4 +1,4 @@
-package kategory.effects.data
+package kategory.effects
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe

@@ -15,7 +15,7 @@ private var <T> Continuation<T>.completion: Continuation<*>?
     get() = completionField.get(this) as Continuation<*>
     set(value) = completionField.set(this@completion, value)
 
-internal var <T> Continuation<T>.stackLabels: List<Any>
+var <T> Continuation<T>.stackLabels: List<Any>
     get() = if (coroutineImplClass.isInstance(this)) listOf(label) + completion?.stackLabels.orEmpty() else emptyList()
     set(value) {
         if (coroutineImplClass.isInstance(this)) {

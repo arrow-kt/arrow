@@ -1,5 +1,6 @@
-package kategory
+package kategory.effects
 
+import kategory.*
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 
@@ -9,7 +10,7 @@ fun <A> ObservableKWKind<A>.value(): Observable<A> =
         this.ev().observable
 
 @higherkind
-@deriving(Functor::class, Applicative::class, AsyncContext::class)
+@deriving(Functor::class, Applicative::class, Monad::class, AsyncContext::class)
 data class ObservableKW<A>(val observable: Observable<A>) : ObservableKWKind<A> {
     fun <B> map(f: (A) -> B): ObservableKW<B> =
             observable.map(f).k()
@@ -17,14 +18,14 @@ data class ObservableKW<A>(val observable: Observable<A>) : ObservableKWKind<A> 
     fun <B> ap(fa: ObservableKWKind<(A) -> B>): ObservableKW<B> =
             flatMap { a -> fa.ev().map { ff -> ff(a) } }
 
-    fun <B> flatMap(f: (A) -> ObservableKW<B>): ObservableKW<B> =
-            observable.flatMap { f(it).observable }.k()
+    fun <B> flatMap(f: (A) -> ObservableKWKind<B>): ObservableKW<B> =
+            observable.flatMap { f(it).ev().observable }.k()
 
-    fun <B> concatMap(f: (A) -> ObservableKW<B>): ObservableKW<B> =
-            observable.concatMap { f(it).observable }.k()
+    fun <B> concatMap(f: (A) -> ObservableKWKind<B>): ObservableKW<B> =
+            observable.concatMap { f(it).ev().observable }.k()
 
-    fun <B> switchMap(f: (A) -> ObservableKW<B>): ObservableKW<B> =
-            observable.switchMap { f(it).observable }.k()
+    fun <B> switchMap(f: (A) -> ObservableKWKind<B>): ObservableKW<B> =
+            observable.switchMap { f(it).ev().observable }.k()
 
     companion object {
         fun <A> pure(a: A): ObservableKW<A> =
@@ -45,6 +46,11 @@ data class ObservableKW<A>(val observable: Observable<A>) : ObservableKWKind<A> 
 
                     }
                 }.k()
+
+        fun <A, B> tailRecM(a: A, f: (A) -> ObservableKWKind<Either<A, B>>): ObservableKW<B> =
+                f(a).ev().flatMap {
+                    it.fold({ tailRecM(a, f).ev() }, { ObservableKW.pure(it).ev() })
+                }
 
         fun monadFlat(): ObservableKWMonadInstance = ObservableKWMonadInstanceImplicits.instance()
 
@@ -92,5 +98,5 @@ data class ObservableKW<A>(val observable: Observable<A>) : ObservableKWKind<A> 
     }
 }
 
-fun <A> ObservableKW<A>.handleErrorWith(function: (Throwable) -> ObservableKW<A>): ObservableKW<A> =
-        this.observable.onErrorResumeNext { t: Throwable -> function(t).observable }.k()
+fun <A> ObservableKWKind<A>.handleErrorWith(function: (Throwable) -> ObservableKW<A>): ObservableKW<A> =
+        this.ev().observable.onErrorResumeNext { t: Throwable -> function(t).observable }.k()

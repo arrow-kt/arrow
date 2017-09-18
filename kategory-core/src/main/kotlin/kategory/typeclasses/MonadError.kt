@@ -1,6 +1,5 @@
 package kategory
 
-import java.io.Serializable
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.EmptyCoroutineContext
 import kotlin.coroutines.experimental.RestrictsSuspension
@@ -21,15 +20,6 @@ inline fun <reified F, A, reified E> HK<F, A>.ensure(
         noinline error: () -> E,
         noinline predicate: (A) -> Boolean): HK<F, A> = FT.ensure(this, error, predicate)
 
-@RestrictsSuspension
-class MonadErrorContinuation<F, A>(val ME: MonadError<F, Throwable>, override val context: CoroutineContext = EmptyCoroutineContext) :
-        Serializable, MonadCoroutines<F, A>(ME) {
-
-    override fun resumeWithException(exception: Throwable) {
-        returnedMonad.set(ME.raiseError(exception))
-    }
-}
-
 /**
  * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.
  * A coroutines is initiated and inside `MonadErrorContinuation` suspended yielding to `flatMap` once all the flatMap binds are completed
@@ -40,8 +30,7 @@ class MonadErrorContinuation<F, A>(val ME: MonadError<F, Throwable>, override va
  */
 fun <F, B> MonadError<F, Throwable>.bindingE(c: suspend MonadErrorContinuation<F, *>.() -> HK<F, B>): HK<F, B> {
     val continuation = MonadErrorContinuation<F, B>(this)
-    val f: suspend MonadErrorContinuation<F, *>.() -> HK<F, B> = { c() }
-    f.startCoroutine(continuation, continuation)
+    c.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
 }
 
