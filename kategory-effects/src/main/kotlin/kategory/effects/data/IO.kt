@@ -5,58 +5,24 @@ import kategory.effects.data.internal.Platform.onceOnly
 import kategory.effects.data.internal.Platform.unsafeResync
 import kategory.effects.data.internal.error
 
-@higherkind sealed class IO<out A> : IOKind<A> {
+@higherkind
+@deriving(
+        Functor::class,
+        Applicative::class,
+        Monad::class,
+        AsyncContext::class)
+sealed class IO<out A> : IOKind<A> {
 
-    abstract fun <B> map(f: (A) -> B): IO<B>
+    companion object {
 
-    fun <B> flatMap(f: (A) -> IO<B>): IO<B> =
-            flatMapTotal(
-                    AndThen {
-                        try {
-                            f(it)
-                        } catch (error: Throwable) {
-                            RaiseError<B>(error)
-                        }
-                    })
+        fun <A> pure(a: A): IO<A> = Pure(a)
 
-    internal abstract fun <B> flatMapTotal(f: AndThen<A, IO<B>>): IO<B>
+        fun <A> raiseError(e: Throwable): IO<A> = RaiseError(e)
 
-    abstract fun attempt(): IO<Either<Throwable, A>>
-
-    fun runAsync(cb: (Either<Throwable, A>) -> IO<Unit>): IO<Unit> = IO { unsafeRunAsync(cb.andThen { it.unsafeRunAsync { } }) }
-
-    fun unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit = unsafeStep().unsafeRunAsyncTotal(cb)
-
-    abstract fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit)
-
-    @Suppress("UNCHECKED_CAST")
-    fun unsafeStep(): IO<A> {
-        var current: IO<A> = this
-        while (true) {
-            current = when (current) {
-                is Suspend -> {
-                    current.cont(Unit)
-                }
-                is BindSuspend<*, A> -> {
-                    val cont: IO<Any?> = current.cont(Unit)
-                    val f: AndThen<Any?, IO<A>> = current.f as AndThen<Any?, IO<A>>
-                    cont.flatMapTotal(f)
-                }
-                else -> return current
-            }
-        }
-    }
-
-    fun unsafeRunSync(): A = unsafeRunTimed(Duration.INFINITE).fold({ throw IllegalArgumentException("IO execution should yield a valid result") }, { it })
-
-    fun unsafeRunTimed(limit: Duration): Option<A> = unsafeStep().unsafeRunTimedTotal(limit)
-
-    abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
-
-    companion object : IOInstances, GlobalInstance<Monad<IOHK>>() {
         internal fun <A, B> mapDefault(t: IO<A>, f: (A) -> B): IO<B> = t.flatMap(f.andThen { Pure(it) })
 
-        internal fun <A> attemptValue(): AndThen<A, IO<Either<Throwable, A>>> = AndThen({ a: A -> Pure(Either.Right(a)) }, { e -> Pure(Either.Left(e)) })
+        internal fun <A> attemptValue(): AndThen<A, IO<Either<Throwable, A>>> =
+                AndThen({ a: A -> Pure(Either.Right(a)) }, { e -> Pure(Either.Left(e)) })
 
         operator fun <A> invoke(f: () -> A): IO<A> = suspend { Pure(f()) }
 
@@ -69,7 +35,7 @@ import kategory.effects.data.internal.error
                     }
                 })
 
-        fun <A> async(k: ((Either<Throwable, A>) -> Unit) -> Unit): IO<A> =
+        fun <A> runAsync(k: Proc<A>): IO<A> =
                 Async { ff: (Either<Throwable, A>) -> Unit ->
                     onceOnly(ff).let { callback: (Either<Throwable, A>) -> Unit ->
                         try {
@@ -89,24 +55,205 @@ import kategory.effects.data.internal.error
                     else -> invoke { eval.value() }
                 }
 
-        fun functor(): Functor<IOHK> = this
+        fun <A, B> tailRecM(a: A, f: (A) -> IOKind<Either<A, B>>): IO<B> =
+                f(a).ev().flatMap {
+                    when (it) {
+                        is Either.Left -> tailRecM(it.a, f)
+                        is Either.Right -> IO.pure(it.b)
+                    }
+                }
 
-        fun applicative(): Applicative<IOHK> = this
+        fun <A, B> merge(
+                op1: () -> A,
+                op2: () -> B): IO<Tuple2<A, B>> =
+                applicative().tupled(
+                        invoke(op1),
+                        invoke(op2)
+                ).ev()
 
-        fun monad(): Monad<IOHK> = this
+        fun <A, B, C> merge(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C): IO<Tuple3<A, B, C>> =
+                applicative().tupled(
+                        invoke(op1),
+                        invoke(op2),
+                        invoke(op3)
+                ).ev()
 
-        fun monadError(): MonadError<IOHK, Throwable> = this
+        fun <A, B, C, D> merge(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C,
+                op4: () -> D): IO<Tuple4<A, B, C, D>> =
+                applicative().tupled(
+                        invoke(op1),
+                        invoke(op2),
+                        invoke(op3),
+                        invoke(op4)
+                ).ev()
 
-        fun asyncContext(): AsyncContext<IOHK> = this
+        fun <A, B, C, D, E> merge(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C,
+                op4: () -> D,
+                op5: () -> E): IO<Tuple5<A, B, C, D, E>> =
+                applicative().tupled(
+                        invoke(op1),
+                        invoke(op2),
+                        invoke(op3),
+                        invoke(op4),
+                        invoke(op5)
+                ).ev()
 
-        fun <A> semigroup(SG: Semigroup<A>): IOSemigroup<A> = object : IOSemigroup<A> {
-            override fun SG(): Semigroup<A> = SG
-        }
+        fun <A, B, C, D, E, F> merge(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C,
+                op4: () -> D,
+                op5: () -> E,
+                op6: () -> F): IO<Tuple6<A, B, C, D, E, F>> =
+                applicative().tupled(
+                        invoke(op1),
+                        invoke(op2),
+                        invoke(op3),
+                        invoke(op4),
+                        invoke(op5),
+                        invoke(op6)
+                ).ev()
 
-        fun <A> monoid(SM: Monoid<A>): IOMonoid<A> = object : IOMonoid<A> {
-            override fun SM(): Monoid<A> = SM
+        fun <A, B, C, D, E, F, G> merge(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C,
+                op4: () -> D,
+                op5: () -> E,
+                op6: () -> F,
+                op7: () -> G): IO<Tuple7<A, B, C, D, E, F, G>> =
+                applicative().tupled(
+                        invoke(op1),
+                        invoke(op2),
+                        invoke(op3),
+                        invoke(op4),
+                        invoke(op5),
+                        invoke(op6),
+                        invoke(op7)
+                ).ev()
+
+        fun <A, B, C, D, E, F, G, H> merge(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C,
+                op4: () -> D,
+                op5: () -> E,
+                op6: () -> F,
+                op7: () -> G,
+                op8: () -> H): IO<Tuple8<A, B, C, D, E, F, G, H>> =
+                applicative().tupled(
+                        invoke(op1),
+                        invoke(op2),
+                        invoke(op3),
+                        invoke(op4),
+                        invoke(op5),
+                        invoke(op6),
+                        invoke(op7),
+                        invoke(op8)
+                ).ev()
+
+        fun <A, B, C, D, E, F, G, H, I> merge(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C,
+                op4: () -> D,
+                op5: () -> E,
+                op6: () -> F,
+                op7: () -> G,
+                op8: () -> H,
+                op9: () -> I): IO<Tuple9<A, B, C, D, E, F, G, H, I>> =
+                applicative().tupled(
+                        invoke(op1),
+                        invoke(op2),
+                        invoke(op3),
+                        invoke(op4),
+                        invoke(op5),
+                        invoke(op6),
+                        invoke(op7),
+                        invoke(op8),
+                        invoke(op9)
+                ).ev()
+
+        fun <A, B, C, D, E, F, G, H, I, J> merge(
+                op1: () -> A,
+                op2: () -> B,
+                op3: () -> C,
+                op4: () -> D,
+                op5: () -> E,
+                op6: () -> F,
+                op7: () -> G,
+                op8: () -> H,
+                op9: () -> I,
+                op10: () -> J): IO<Tuple10<A, B, C, D, E, F, G, H, I, J>> =
+                applicative().tupled(
+                        invoke(op1),
+                        invoke(op2),
+                        invoke(op3),
+                        invoke(op4),
+                        invoke(op5),
+                        invoke(op6),
+                        invoke(op7),
+                        invoke(op8),
+                        invoke(op9),
+                        invoke(op10)
+                ).ev()
+    }
+
+    abstract fun <B> map(f: (A) -> B): IO<B>
+
+    fun <B> flatMap(f: (A) -> IOKind<B>): IO<B> =
+            flatMapTotal(
+                    AndThen {
+                        try {
+                            f(it).ev()
+                        } catch (error: Throwable) {
+                            RaiseError<B>(error)
+                        }
+                    })
+
+    internal abstract fun <B> flatMapTotal(f: AndThen<A, IO<B>>): IO<B>
+
+    abstract fun attempt(): IO<Either<Throwable, A>>
+
+    fun runAsync(cb: (Either<Throwable, A>) -> IO<Unit>): IO<Unit> = IO { unsafeRunAsync(cb.andThen { it.unsafeRunAsync { } }) }
+
+    fun unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit = unsafeStep().unsafeRunAsyncTotal(cb)
+
+    internal abstract fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit)
+
+    @Suppress("UNCHECKED_CAST")
+    fun unsafeStep(): IO<A> {
+        var current: IO<A> = this
+        while (true) {
+            current = when (current) {
+                is Suspend -> {
+                    current.cont(Unit)
+                }
+                is BindSuspend<*, A> -> {
+                    val cont: IO<Any?> = current.cont(Unit)
+                    val f: AndThen<Any?, IO<A>> = current.f as AndThen<Any?, IO<A>>
+                    cont.flatMapTotal(f)
+                }
+                else -> return current
+            }
         }
     }
+
+    fun unsafeRunSync(): A =
+            unsafeRunTimed(Duration.INFINITE).fold({ throw IllegalArgumentException("IO execution should yield a valid result") }, { it })
+
+    fun unsafeRunTimed(limit: Duration): Option<A> = unsafeStep().unsafeRunTimedTotal(limit)
+
+    internal abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
 }
 
 internal data class Pure<out A>(val a: A) : IO<A>() {
@@ -163,7 +310,7 @@ internal data class BindSuspend<E, out A>(val cont: AndThen<Unit, IO<E>>, val f:
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
 }
 
-internal data class Async<out A>(val cont: ((Either<Throwable, A>) -> Unit) -> Unit) : IO<A>() {
+internal data class Async<out A>(val cont: Proc<A>) : IO<A>() {
     override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
 
     override fun <B> flatMapTotal(f: AndThen<A, IO<B>>): IO<B> = BindAsync(cont, f)
@@ -197,5 +344,11 @@ internal data class BindAsync<E, out A>(val cont: ((Either<Throwable, E>) -> Uni
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
 }
+
+fun <A, B> IO<A>.ap(ff: kategory.IOKind<(A) -> B>): IO<B> =
+        flatMap { a -> ff.ev().map({ it(a) }) }
+
+fun <A> IO<A>.handleErrorWith(f: (Throwable) -> IOKind<A>): IO<A> =
+        attempt().flatMap { it.ev().fold(f, { IO.pure(it) }).ev() }
 
 fun <A> A.liftIO(): IO<A> = IO.pure(this)

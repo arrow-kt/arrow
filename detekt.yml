@@ -10,6 +10,8 @@ potential-bugs:
     active: false
   UnsafeCast:
     active: false
+  UnsafeCallOnNullableType:
+    active: false
 
 exceptions:
   active: true
@@ -78,7 +80,7 @@ formatting:
     active: true
     autoCorrect: true
   OptionalUnit:
-    active: true
+    active: false
     autoCorrect: false
   ExpressionBodySyntax:
     active: true
@@ -87,22 +89,27 @@ formatting:
       active: false
       autoCorrect: false
 
+performance:
+  SpreadOperator:
+    active: false
+    autoCorrect: false
+
 style:
   active: true
   WildcardImport:
-    active: true
+    active: false
   NamingConventionViolation:
     active: false
   MaxLineLength:
-    active: true
+    active: false
     maxLineLength: 160
 
 comments:
   active: true
   CommentOverPrivateMethod:
-    active: true
+    active: false
   CommentOverPrivateProperty:
-    active: true
+    active: false
   UndocumentedPublicClass:
     active: false
   UndocumentedPublicFunction:

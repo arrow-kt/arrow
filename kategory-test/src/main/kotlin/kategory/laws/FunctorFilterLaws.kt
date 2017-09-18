@@ -1,8 +1,7 @@
-package kategory.laws
+package kategory
 
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kategory.*
 
 object FunctorFilterLaws {
 
@@ -12,7 +11,7 @@ object FunctorFilterLaws {
                     Law("Functor Filter: mapFilter map consistency", { mapFilterMapConsistency(FFF, cf, EQ) })
             )
 
-    inline fun <reified F> mapFilterComposition(FFF: FunctorFilter<F> = functorFilter(), crossinline ff: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>> = Eq.any()): Unit =
+    inline fun <reified F> mapFilterComposition(FFF: FunctorFilter<F> = functorFilter(), crossinline ff: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): Unit =
             forAll(
                     genConstructor(Gen.int(), ff),
                     genFunctionAToB<Int, Option<Int>>(genOption(genIntSmall())),
@@ -21,7 +20,7 @@ object FunctorFilterLaws {
                         FFF.mapFilter(FFF.mapFilter(fa, f), g).equalUnderTheLaw(FFF.mapFilter(fa, { a -> f(a).flatMap(g) }), EQ)
                     })
 
-    inline fun <reified F> mapFilterMapConsistency(FFF: FunctorFilter<F> = functorFilter(), crossinline ff: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>> = Eq.any()): Unit =
+    inline fun <reified F> mapFilterMapConsistency(FFF: FunctorFilter<F> = functorFilter(), crossinline ff: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): Unit =
             forAll(
                     genConstructor(Gen.int(), ff),
                     genFunctionAToB<Int, Int>(Gen.int()),
