@@ -45,23 +45,51 @@ data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A> {
                     }
                 }, mode).k()
 
-        fun monadFlat(): FlowableKWFlatMonadInstance = FlowableKWFlatMonadInstanceImplicits.instance()
+        fun monadFlat(): FlowableKWMonadInstance = FlowableKWMonadInstanceImplicits.instance()
 
-        fun monadConcat(): FlowableKWConcatMonadInstance = FlowableKWConcatMonadInstanceImplicits.instance()
+        fun monadConcat(): FlowableKWMonadInstance = object : FlowableKWMonadInstance {
+            override fun <A, B> flatMap(fa: FlowableKWKind<A>, f: (A) -> FlowableKWKind<B>): FlowableKW<B> =
+                    fa.ev().concatMap { f(it).ev() }
 
-        fun monadSwitch(): FlowableKWSwitchMonadInstance = FlowableKWSwitchMonadInstanceImplicits.instance()
-
-        fun monadErrorFlat(): FlowableKWFlatMonadErrorInstance = FlowableKWFlatMonadErrorInstanceImplicits.instance()
-
-        fun monadErrorConcat(): FlowableKWConcatMonadErrorInstance = FlowableKWConcatMonadErrorInstanceImplicits.instance()
-
-        fun monadErrorSwitch(): FlowableKWSwitchMonadErrorInstance = FlowableKWSwitchMonadErrorInstanceImplicits.instance()
-
-        fun asyncContext(): FlowableKWAsyncContextInstance = asyncContextBuffer()
-
-        fun asyncContextBuffer(): FlowableKWAsyncContextInstance = object : FlowableKWAsyncContextInstance {
-            override fun BS(): BackpressureStrategy = BackpressureStrategy.BUFFER
+            override fun <A, B> tailRecM(a: A, f: (A) -> FlowableKWKind<Either<A, B>>): FlowableKW<B> =
+                    f(a).ev().concatMap {
+                        it.fold({ tailRecM(a, f).ev() }, { pure(it).ev() })
+                    }
         }
+
+        fun monadSwitch(): FlowableKWMonadInstance = object : FlowableKWMonadInstance {
+            override fun <A, B> flatMap(fa: FlowableKWKind<A>, f: (A) -> FlowableKWKind<B>): FlowableKW<B> =
+                    fa.ev().switchMap { f(it).ev() }
+
+            override fun <A, B> tailRecM(a: A, f: (A) -> FlowableKWKind<Either<A, B>>): FlowableKW<B> =
+                    f(a).ev().switchMap {
+                        it.fold({ tailRecM(a, f).ev() }, { pure(it).ev() })
+                    }
+        }
+
+        fun monadErrorFlat(): FlowableKWMonadErrorInstance = FlowableKWMonadErrorInstanceImplicits.instance()
+
+        fun monadErrorConcat(): FlowableKWMonadErrorInstance = object : FlowableKWMonadErrorInstance {
+            override fun <A, B> flatMap(fa: FlowableKWKind<A>, f: (A) -> FlowableKWKind<B>): FlowableKW<B> =
+                    fa.ev().concatMap { f(it).ev() }
+
+            override fun <A, B> tailRecM(a: A, f: (A) -> FlowableKWKind<Either<A, B>>): FlowableKW<B> =
+                    f(a).ev().concatMap {
+                        it.fold({ tailRecM(a, f).ev() }, { Companion.pure(it).ev() })
+                    }
+        }
+
+        fun monadErrorSwitch(): FlowableKWMonadErrorInstance = object : FlowableKWMonadErrorInstance {
+            override fun <A, B> flatMap(fa: FlowableKWKind<A>, f: (A) -> FlowableKWKind<B>): FlowableKW<B> =
+                    fa.ev().switchMap { f(it).ev() }
+
+            override fun <A, B> tailRecM(a: A, f: (A) -> FlowableKWKind<Either<A, B>>): FlowableKW<B> =
+                    f(a).ev().switchMap {
+                        it.fold({ tailRecM(a, f).ev() }, { Companion.pure(it).ev() })
+                    }
+        }
+
+        fun asyncContextBuffer(): FlowableKWAsyncContextInstance = object : FlowableKWAsyncContextInstance {}
 
         fun asyncContextDrop(): FlowableKWAsyncContextInstance = object : FlowableKWAsyncContextInstance {
             override fun BS(): BackpressureStrategy = BackpressureStrategy.DROP
