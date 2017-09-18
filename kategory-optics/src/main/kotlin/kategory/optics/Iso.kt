@@ -9,55 +9,58 @@ import kategory.compose
 import kategory.functor
 import kategory.identity
 import kategory.none
+import kategory.right
 import kategory.some
 import kategory.toT
 
+typealias Iso<S, T> = PIso<S, S, T, T>
+
 /**
- * An [Iso] defines an isomorphism between a type S and A.
+ * An [PIso] defines an isomorphism between a type S and A.
  *
- * An [Iso] is also a valid [Lens], [Prism]
+ * An [PIso] is also a valid [Lens], [Prism]
  *
- * @param A the source of a [Iso]
- * @param B the target of a [Iso]
+ * @param A the source of a [PIso]
+ * @param B the target of a [PIso]
  */
-abstract class Iso<A, B> {
+abstract class PIso<S, T, A, B> {
 
     /**
-     * Get the target of a [Iso]
+     * Get the target of a [PIso]
      */
-    abstract fun get(a: A): B
+    abstract fun get(s: S): A
 
     /**
-     * Get the modified source of a [Iso]
+     * Get the modified source of a [PIso]
      */
-    abstract fun reverseGet(b: B): A
+    abstract fun reverseGet(b: B): T
 
     companion object {
 
         /**
-         * create an [Iso] between any type and itself. id is the zero element of optics composition, for all optics o of type O (e.g. Lens, Iso, Prism, ...):
+         * create an [PIso] between any type and itself. id is the zero element of optics composition, for all optics o of type O (e.g. Lens, Iso, Prism, ...):
          * o      composeIso Iso.id == o
          * Iso.id composeO   o        == o (replace composeO by composeLens, composeIso, composePrism, ...)
          */
-        fun <A> id() = Iso<A, A>(::identity, ::identity)
+        fun <A> id(): Iso<A, A> = Iso(::identity, ::identity)
 
-        operator fun <A, B> invoke(get: (A) -> (B), reverseGet: (B) -> A) = object : Iso<A, B>() {
+        operator fun <S, T, A, B> invoke(get: (S) -> (A), reverseGet: (B) -> T) = object : PIso<S, T, A, B>() {
 
-            override fun get(a: A): B = get(a)
+            override fun get(s: S): A = get(s)
 
-            override fun reverseGet(b: B): A = reverseGet(b)
+            override fun reverseGet(b: B): T = reverseGet(b)
         }
     }
 
     /**
-     * Reverse a [Iso]: the source becomes the target and the target becomes the source
+     * Reverse a [PIso]: the source becomes the target and the target becomes the source
      */
-    fun reverse(): Iso<B, A> = Iso(this::reverseGet, this::get)
+    fun reverse(): PIso<B, A, T, S> = PIso(this::reverseGet, this::get)
 
     /**
-     * Lift a [Iso] to a Functor level
+     * Lift a [PIso] to a Functor level
      */
-    inline fun <reified F> mapping(FF: Functor<F> = functor()): Iso<HK<F, A>, HK<F, B>> = Iso(
+    inline fun <reified F> mapping(FF: Functor<F> = functor()): PIso<HK<F, S>, HK<F, T>, HK<F, A>, HK<F, B>> = PIso(
             { fa -> FF.map(fa, this::get) },
             { fb -> FF.map(fb, this::reverseGet) }
     )
@@ -65,37 +68,37 @@ abstract class Iso<A, B> {
     /**
      * Find if the target satisfies the predicate
      */
-    fun find(p: (B) -> Boolean): (A) -> Option<B> = { a ->
-        get(a).let { b ->
-            if (p(b)) b.some() else none()
+    fun find(p: (A) -> Boolean): (S) -> Option<A> = { a ->
+        get(a).let { aa ->
+            if (p(aa)) aa.some() else none()
         }
     }
 
     /**
-     * check if the target satisfies the predicate
+     * Check if the target satisfies the predicate
      */
-    fun exist(p: (B) -> Boolean): (A) -> Boolean = p compose this::get
+    fun exist(p: (A) -> Boolean): (S) -> Boolean = p compose this::get
 
     /**
-     * Modify polymorphically the target of a [Iso] with a function
+     * Modify polymorphically the target of a [PIso] with a function
      */
-    inline fun modify(crossinline f: (B) -> B): (A) -> A = { reverseGet(f(get(it))) }
+    inline fun modify(crossinline f: (A) -> B): (S) -> T = { reverseGet(f(get(it))) }
 
     /**
-     * Modify polymorphically the target of a [Iso] with a Functor function
+     * Modify polymorphically the target of a [PIso] with a Functor function
      */
-    inline fun <reified F> modifyF(FF: Functor<F> = functor(), f: (B) -> HK<F, B>, a: A): HK<F, A> =
-            FF.map(f(get(a)), this::reverseGet)
+    inline fun <reified F> modifyF(FF: Functor<F> = functor(), f: (A) -> HK<F, B>, s: S): HK<F, T> =
+            FF.map(f(get(s)), this::reverseGet)
 
     /**
-     * Set polymorphically the target of a [Iso] with a value
+     * Set polymorphically the target of a [PIso] with a value
      */
-    fun set(b: B): (A) -> (A) = { reverseGet(b) }
+    fun set(b: B): (S) -> (T) = { reverseGet(b) }
 
     /**
-     * Pair two disjoint [Iso]
+     * Pair two disjoint [PIso]
      */
-    infix fun <C, D> split(other: Iso<C, D>): Iso<Tuple2<A, C>, Tuple2<B, D>> = Iso(
+    infix fun <S1, T1, A1, B1> split(other: PIso<S1, T1, A1, B1>): PIso<Tuple2<S, S1>, Tuple2<T, T1>, Tuple2<A, A1>, Tuple2<B, B1>> = PIso(
             { (a, c) -> get(a) toT other.get(c) },
             { (b, d) -> reverseGet(b) toT other.reverseGet(d) }
     )
@@ -103,7 +106,7 @@ abstract class Iso<A, B> {
     /**
      * Create a pair of the target and a type C
      */
-    fun <C> first(): Iso<Tuple2<A, C>, Tuple2<B, C>> = Iso(
+    fun <C> first(): PIso<Tuple2<S, C>, Tuple2<T, C>, Tuple2<A, C>, Tuple2<B, C>> = Iso(
             { (a, c) -> get(a) toT c },
             { (b, c) -> reverseGet(b) toT c }
     )
@@ -111,7 +114,7 @@ abstract class Iso<A, B> {
     /**
      * Create a pair of a type C and the target
      */
-    fun <C> second(): Iso<Tuple2<C, A>, Tuple2<C, B>> = Iso(
+    fun <C> second(): PIso<Tuple2<C, S>, Tuple2<C, T>, Tuple2<C, A>, Tuple2<C, B>> = PIso(
             { (c, a) -> c toT get(a) },
             { (c, b) -> c toT reverseGet(b) }
     )
@@ -119,7 +122,7 @@ abstract class Iso<A, B> {
     /**
      * Create a sum of the target and a type C
      */
-    fun <C> left(): Iso<Either<A, C>, Either<B, C>> = Iso(
+    fun <C> left(): PIso<Either<S, C>, Either<T, C>, Either<A, C>, Either<B, C>> = PIso(
             { it.bimap(this::get, ::identity) },
             { it.bimap(this::reverseGet, ::identity) }
     )
@@ -127,63 +130,63 @@ abstract class Iso<A, B> {
     /**
      * Create a sum of a type C and the target
      */
-    fun <C> right(): Iso<Either<C, A>, Either<C, B>> = Iso(
+    fun <C> right(): PIso<Either<C, S>, Either<C, T>, Either<C, A>, Either<C, B>> = PIso(
             { it.bimap(::identity, this::get) },
             { it.bimap(::identity, this::reverseGet) }
     )
 
     /**
-     * Compose a [Iso] with a [Iso]
+     * Compose a [PIso] with a [PIso]
      */
-    infix fun <C> composeIso(other: Iso<B, C>): Iso<A, C> = Iso(
+    infix fun <C, D> composeIso(other: PIso<A, B, C, D>): PIso<S, T, C, D> = PIso(
             other::get compose this::get,
             this::reverseGet compose other::reverseGet
     )
 
     /**
-     * Compose a [Iso] with a [Lens]
+     * Compose a [PIso] with a [PLens]
      */
-    infix fun <C> composeLens(other: Lens<B,C>): Lens<A,C> =
+    infix fun <C, D> composeLens(other: PLens<A, B, C, D>): PLens<S, T, C, D> =
             asLens() composeLens other
 
     /**
-     * Compose a [Iso] with a [Getter]
+     * Compose a [PIso] with a [Getter]
      */
-    infix fun <C> composeGetter(other: Getter<B,C>): Getter<A,C> =
+    infix fun <C> composeGetter(other: Getter<A, C>): Getter<S, C> =
             asGetter() composeGetter other
 
     /**
      * Plus operator overload to compose lenses
      */
-    operator fun <C> plus(other: Iso<B, C>): Iso<A, C> = composeIso(other)
+    operator fun <C, D> plus(other: PIso<A, B, C, D>): PIso<S, T, C, D> = composeIso(other)
 
-    operator fun <C> plus(other: Lens<B,C>): Lens<A, C> = composeLens(other)
+    operator fun <C, D> plus(other: PLens<A, B, C, D>): PLens<S, T, C, D> = composeLens(other)
 
-    operator fun <C> plus(other: Getter<B,C>): Getter<A, C> = composeGetter(other)
+    operator fun <C> plus(other: Getter<A, C>): Getter<S, C> = composeGetter(other)
 
     /**
-     * View a [Iso] as a [Prism]
+     * View a [PIso] as a [PPrism]
      */
-    fun asPrism(): Prism<A, B> = Prism(
+    fun asPrism(): PPrism<S, T, A, B> = PPrism(
             { a -> Either.Right(get(a)) },
             this::reverseGet
     )
 
     /**
-     * View a [Iso] as a [Lens]
+     * View a [PIso] as a [PLens]
      */
-    fun asLens(): Lens<A, B> = Lens(this::get, this::set)
+    fun asLens(): PLens<S, T, A, B> = Lens(this::get, this::set)
 
     /**
-     * View a [Iso] as a [Getter]
+     * View a [PIso] as a [Getter]
      */
-    fun asGetter(): Getter<A,B> = Getter(this::get)
+    fun asGetter(): Getter<S, A> = Getter(this::get)
 
     /**
-     * View a [Iso] as a [Optional]
+     * View a [PIso] as a [POptional]
      */
-    fun asOptional(): Optional<A, B> = Optional(
-            { a -> Option.Some(get(a)) },
+    fun asOptional(): POptional<S, T, A, B> = POptional(
+            { s -> get(s).right() },
             this::set
     )
 }

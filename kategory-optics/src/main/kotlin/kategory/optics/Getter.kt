@@ -95,6 +95,9 @@ abstract class Getter<A, B> {
      */
     infix fun <C> composeIso(other: Iso<B,C>): Getter<A,C> = Getter(other::get compose this::get)
 
+    /**
+     * Plus operator overload to compose optionals
+     */
     operator fun <C> plus(other: Getter<B, C>): Getter<A, C> = composeGetter(other)
 
     operator fun <C> plus(other: Lens<B,C>): Getter<A, C> = composeLens(other)
