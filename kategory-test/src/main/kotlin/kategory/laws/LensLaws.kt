@@ -6,7 +6,7 @@ import kategory.optics.Lens
 
 object LensLaws {
 
-    inline fun <A, B, reified F> laws(lens: Lens<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQB: Eq<B>, FA: Applicative<F>) = listOf(
+    inline fun <reified A, reified B, reified F> laws(lens: Lens<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQB: Eq<B>, FA: Applicative<F>) = listOf(
             Law("Lens law: get set", { lensGetSet(lens, aGen, EQA) }),
             Law("Lens law: set get", { lensSetGet(lens, aGen, bGen, EQB) }),
             Law("Lens law: is set idempotent", { lensSetIdempotent(lens, aGen, bGen, EQA) }),
@@ -17,44 +17,48 @@ object LensLaws {
             Law("Lens law: consistent get modify id", { lensConsistentGetModifyid(lens, aGen, EQB, FA) })
     )
 
-    fun <A, B> lensGetSet(lens: Lens<A, B>, aGen: Gen<A>, EQA: Eq<A>) =
+    inline fun <reified A, reified B> lensGetSet(lens: Lens<A, B>, aGen: Gen<A>, EQA: Eq<A>) =
             forAll(aGen, { a ->
-                EQA.eqv(lens.set(lens.get(a))(a), a)
+                lens.set(lens.get(a))(a).equalUnderTheLaw(a, EQA)
             })
 
-    fun <A, B> lensSetGet(lens: Lens<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQB: Eq<B>) =
+    inline fun <reified A, reified B> lensSetGet(lens: Lens<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQB: Eq<B>) =
             forAll(aGen, bGen, { a, b ->
-                EQB.eqv(lens.get(lens.set(b)(a)), b)
+                lens.get(lens.set(b)(a)).equalUnderTheLaw(b, EQB)
             })
 
-    fun <A, B> lensSetIdempotent(lens: Lens<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>) =
+    inline fun <reified A, reified B> lensSetIdempotent(lens: Lens<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>) =
             forAll(aGen, bGen, { a, b ->
-                EQA.eqv(lens.set(b)(lens.set(b)(a)), lens.set(b)(a))
+                lens.set(b)(lens.set(b)(a)).equalUnderTheLaw(lens.set(b)(a), EQA)
             })
 
-    fun <A, B> lensModifyIdentity(lens: Lens<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>) =
+    inline fun <reified A, reified B> lensModifyIdentity(lens: Lens<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>) =
             forAll(aGen, bGen, { a, b ->
-                EQA.eqv(lens.modify(::identity, a), a)
+                lens.modify(::identity, a).equalUnderTheLaw(a, EQA)
             })
 
-    fun <A, B> lensComposeModify(lens: Lens<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>) =
+    inline fun <reified A, reified B> lensComposeModify(lens: Lens<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>) =
             forAll(aGen, funcGen, funcGen, { a, f, g ->
-                EQA.eqv(lens.modify(g, lens.modify(f, a)), lens.modify(g compose f, a))
+                lens.modify(g, lens.modify(f, a)).equalUnderTheLaw(lens.modify(g compose f, a), EQA)
             })
 
-    fun <A, B> lensConsistentSetModify(lens: Lens<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>) =
+    inline fun <reified A, reified B> lensConsistentSetModify(lens: Lens<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>) =
             forAll(aGen, bGen, { a, b ->
-                EQA.eqv(lens.set(b)(a), lens.modify({ b }, a))
+                lens.set(b)(a).equalUnderTheLaw(lens.modify({ b }, a), EQA)
             })
 
-    inline fun <A, B, reified F> lensConsistentModifyModifyId(lens: Lens<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, FA: Applicative<F>) =
+    inline fun <reified A, reified B, reified F> lensConsistentModifyModifyId(lens: Lens<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, FA: Applicative<F>) =
             forAll(aGen, funcGen, { a, f ->
-                lens.modifyF(FA, { FA.pure(f(it)) }, a).exists { EQA.eqv(lens.modify(f, a), it) }
+                lens.modifyF(FA, { FA.pure(f(it)) }, a).exists {
+                    it.equalUnderTheLaw(lens.modify(f, a), EQA)
+                }
             })
 
-    inline fun <A, B, reified F> lensConsistentGetModifyid(lens: Lens<A, B>, aGen: Gen<A>, EQB: Eq<B>, FA: Applicative<F>) =
+    inline fun <reified A, reified B, reified F> lensConsistentGetModifyid(lens: Lens<A, B>, aGen: Gen<A>, EQB: Eq<B>, FA: Applicative<F>) =
             forAll(aGen, { a ->
-                lens.modifyF(FA, { FA.pure(it) }, a).exists { EQB.eqv(lens.get(a), lens.get(it)) }
+                lens.modifyF(FA, { FA.pure(it) }, a).exists {
+                    lens.get(it).equalUnderTheLaw(lens.get(a), EQB)
+                }
             })
 
 }

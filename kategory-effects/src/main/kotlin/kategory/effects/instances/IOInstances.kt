@@ -1,5 +1,6 @@
 package kategory
 
+@instance(IO::class)
 interface IOMonadErrorInstance : IOMonadInstance, MonadError<IOHK, Throwable> {
     override fun <A> attempt(fa: IOKind<A>): IO<Either<Throwable, A>> =
             fa.ev().attempt()
@@ -11,11 +12,7 @@ interface IOMonadErrorInstance : IOMonadInstance, MonadError<IOHK, Throwable> {
             IO.raiseError(e)
 }
 
-object IOMonadErrorInstanceImplicits {
-    @JvmStatic
-    fun instance(): IOMonadErrorInstance = object : IOMonadErrorInstance {}
-}
-
+@instance(IO::class)
 interface IOMonoidInstance<A> : Monoid<HK<IOHK, A>>, Semigroup<HK<IOHK, A>> {
 
     fun SM(): Monoid<A>
@@ -26,24 +23,11 @@ interface IOMonoidInstance<A> : Monoid<HK<IOHK, A>>, Semigroup<HK<IOHK, A>> {
     override fun empty(): IO<A> = IO.pure(SM().empty())
 }
 
-object IOMonoidInstanceImplicits {
-    @JvmStatic
-    fun <A> instance(SM: Monoid<A>): IOMonoidInstance<A> = object : IOMonoidInstance<A> {
-        override fun SM(): Monoid<A> = SM
-    }
-}
-
+@instance(IO::class)
 interface IOSemigroupInstance<A> : Semigroup<HK<IOHK, A>> {
 
     fun SG(): Semigroup<A>
 
     override fun combine(a: IOKind<A>, b: IOKind<A>): IO<A> =
             a.ev().flatMap { a1: A -> b.ev().map { a2: A -> SG().combine(a1, a2) } }
-}
-
-object IOSemigroupInstanceImplicits {
-    @JvmStatic
-    fun <A> instance(SG: Semigroup<A>): IOSemigroupInstance<A> = object : IOSemigroupInstance<A> {
-        override fun SG(): Semigroup<A> = SG
-    }
 }

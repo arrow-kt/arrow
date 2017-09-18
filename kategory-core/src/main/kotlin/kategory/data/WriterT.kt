@@ -15,30 +15,6 @@ package kategory
 
         operator fun <F, W, A> invoke(value: HK<F, Tuple2<W, A>>): WriterT<F, W, A> = WriterT(value)
 
-        inline fun <reified F, reified W> functor(FF: Functor<F> = kategory.functor<F>()): WriterTFunctorInstance<F, W> =
-                WriterTFunctorInstanceImplicits.instance(FF)
-
-        inline fun <reified F, reified W> applicative(MF: Monad<F> = kategory.monad<F>(),
-                                                      MW: Monoid<W> = kategory.monoid<W>()): WriterTApplicativeInstance<F, W> =
-                WriterTApplicativeInstanceImplicits.instance(MF, MW)
-
-        inline fun <reified F, reified W> monad(MF: Monad<F> = kategory.monad<F>(), MW: Monoid<W> = kategory.monoid<W>()): WriterTMonadInstance<F, W> =
-                WriterTMonadInstanceImplicits.instance(MF, MW)
-
-        inline fun <reified F, reified W> semigroupK(MF: Monad<F> = monad<F>(), MKF: SemigroupK<F> = semigroupK<F>()): WriterTSemigroupKInstance<F, W> =
-                WriterTSemigroupKInstanceImplicits.instance(MF, MKF)
-
-        inline fun <reified F, reified W> monoidK(MF: Monad<F> = monad<F>(), MKF: MonoidK<F> = monoidK<F>()): WriterTMonoidKInstance<F, W> =
-                WriterTMonoidKInstanceImplicits.instance(MF, MKF)
-
-        inline fun <reified F, reified W> monadWriter(MF: Monad<F> = kategory.monad(),
-                                                      MW: Monoid<W> = kategory.monoid()): WriterTMonadWriterInstance<F, W> =
-                WriterTMonadWriterInstanceImplicits.instance(MF, MW)
-
-        inline fun <reified F, reified W> monadFilter(MF: MonadFilter<F> = kategory.monadFilter(),
-                                                      MW: Monoid<W> = kategory.monoid()): WriterTMonadFilterInstance<F, W> =
-                WriterTMonadFilterInstanceImplicits.instance(MF, MW)
-
         inline fun <reified F, W, A> putT(vf: HK<F, A>, w: W, FF: Functor<F> = kategory.functor()): WriterT<F, W, A> =
                 WriterT(FF.map(vf, { v -> Tuple2(w, v) }))
 

@@ -14,14 +14,14 @@ class WriterTTest : UnitSpec() {
             monad<WriterTKindPartial<IdHK, Int>>() shouldNotBe null
             monadFilter<WriterTKindPartial<OptionHK, Int>>() shouldNotBe null
             monadWriter<WriterTKindPartial<OptionHK, Int>, Int>() shouldNotBe null
-            semigroupK<WriterTKindPartial<IdHK, ListKWHK>>() shouldNotBe null
-            monoidK<WriterTKindPartial<IdHK, ListKWHK>>() shouldNotBe null
+            semigroupK<WriterTKindPartial<ListKWHK, Int>>() shouldNotBe null
+            monoidK<WriterTKindPartial<ListKWHK, Int>>() shouldNotBe null
         }
 
         testLaws(MonadLaws.laws(WriterT.monad(NonEmptyList.monad(), IntMonoid), Eq.any()))
         testLaws(MonoidKLaws.laws(
-                WriterT.monoidK<ListKWHK, Int>(ListKW.monad(), ListKW.monoidK()),
-                WriterT.applicative(ListKW.monad(), IntMonoid),
+                WriterT.monoidK<ListKWHK, Int>(ListKW.monoidK()),
+                WriterT.applicative(),
                 Eq { a, b ->
                     a.ev().value == b.ev().value
                 }))

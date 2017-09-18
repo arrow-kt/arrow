@@ -1,8 +1,11 @@
 package kategory.optics
 
 import io.kotlintest.properties.Gen
+import kategory.Option
+import kategory.identity
 import kategory.left
 import kategory.right
+import kategory.some
 
 sealed class SumType {
     data class A(val string: String) : SumType()
@@ -60,4 +63,14 @@ internal object UserGen : Gen<User> {
 internal val userLens: Lens<User, Token> = Lens(
         { user: User -> user.token },
         { token: Token -> { user: User -> user.copy(token = token) } }
+)
+
+internal val optionalHead = Optional<List<Int>, Int>(
+        { Option.fromNullable(it.firstOrNull()) },
+        { int -> { list -> listOf(int) + if (list.size > 1) list.drop(1) else emptyList() } }
+)
+
+internal val defaultHead = Optional<Int, Int>(
+        { it.some() },
+        { ::identity }
 )

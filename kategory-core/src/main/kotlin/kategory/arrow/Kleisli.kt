@@ -47,20 +47,6 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliKind<F, D, A> {
 
         fun <F, D, E, A> raiseError(e: E, ME: MonadError<F, E>): Kleisli<F, D, A> = Kleisli({ ME.raiseError(e) })
 
-        inline fun <reified F, D> functor(FF: Functor<F> = functor<F>()): KleisliFunctorInstance<F, D> =
-                KleisliFunctorInstanceImplicits.instance(FF)
-
-        inline fun <reified F, D> applicative(AF: Applicative<F> = applicative<F>()): KleisliApplicativeInstance<F, D> =
-                KleisliApplicativeInstanceImplicits.instance(AF)
-
-        inline fun <reified F, D> monad(MF: Monad<F> = monad<F>()): KleisliMonadInstance<F, D> =
-                KleisliMonadInstanceImplicits.instance(MF)
-
-        inline fun <reified F, D> monadReader(MF: Monad<F> = monad<F>()): KleisliMonadReaderInstance<F, D> =
-                KleisliMonadReaderInstanceImplicits.instance(MF)
-
-        inline fun <reified F, D, reified E> monadError(ME: MonadError<F, E> = monadError<F, E>()): KleisliMonadErrorInstance<F, D, E> =
-                KleisliMonadErrorInstanceImplicits.instance(ME)
     }
 
 }

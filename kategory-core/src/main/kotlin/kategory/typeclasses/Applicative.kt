@@ -92,20 +92,23 @@ fun <HKF, A, Z> HK<HKF, A>.product(AP: Applicative<HKF>, other: HK<HKF, Z>): HK<
 fun <HKF, A, B, Z> HK<HKF, Tuple2<A, B>>.product(
         AP: Applicative<HKF>,
         other: HK<HKF, Z>,
-        dummyImplicit: Any? = null): HK<HKF, Tuple3<A, B, Z>> = AP.map(AP.product(this, other), { Tuple3(it.a.a, it.a.b, it.b) })
+        dummyImplicit: Any? = null): HK<HKF, Tuple3<A, B, Z>> =
+        AP.map(AP.product(this, other), { Tuple3(it.a.a, it.a.b, it.b) })
 
 fun <HKF, A, B, C, Z> HK<HKF, Tuple3<A, B, C>>.product(
         AP: Applicative<HKF>,
         other: HK<HKF, Z>,
         dummyImplicit: Any? = null,
-        dummyImplicit2: Any? = null): HK<HKF, Tuple4<A, B, C, Z>> = AP.map(AP.product(this, other), { Tuple4(it.a.a, it.a.b, it.a.c, it.b) })
+        dummyImplicit2: Any? = null): HK<HKF, Tuple4<A, B, C, Z>> =
+        AP.map(AP.product(this, other), { Tuple4(it.a.a, it.a.b, it.a.c, it.b) })
 
 fun <HKF, A, B, C, D, Z> HK<HKF, Tuple4<A, B, C, D>>.product(
         AP: Applicative<HKF>,
         other: HK<HKF, Z>,
         dummyImplicit: Any? = null,
         dummyImplicit2: Any? = null,
-        dummyImplicit3: Any? = null): HK<HKF, Tuple5<A, B, C, D, Z>> = AP.map(AP.product(this, other), { Tuple5(it.a.a, it.a.b, it.a.c, it.a.d, it.b) })
+        dummyImplicit3: Any? = null): HK<HKF, Tuple5<A, B, C, D, Z>> =
+        AP.map(AP.product(this, other), { Tuple5(it.a.a, it.a.b, it.a.c, it.a.d, it.b) })
 
 fun <HKF, A, B, C, D, E, Z> HK<HKF, Tuple5<A, B, C, D, E>>.product(
         AP: Applicative<HKF>,
@@ -164,25 +167,29 @@ fun <HKF, A, B, C, D, E, F, G, H, I, Z> HK<HKF, Tuple9<A, B, C, D, E, F, G, H, I
 
 fun <HKF, A, B> Applicative<HKF>.tupled(
         a: HK<HKF, A>,
-        b: HK<HKF, B>): HK<HKF, Tuple2<A, B>> = a.product(this, b)
+        b: HK<HKF, B>): HK<HKF, Tuple2<A, B>> =
+        a.product(this, b)
 
 fun <HKF, A, B, C> Applicative<HKF>.tupled(
         a: HK<HKF, A>,
         b: HK<HKF, B>,
-        c: HK<HKF, C>): HK<HKF, Tuple3<A, B, C>> = a.product(this, b).product(this, c)
+        c: HK<HKF, C>): HK<HKF, Tuple3<A, B, C>> =
+        a.product(this, b).product(this, c)
 
 fun <HKF, A, B, C, D> Applicative<HKF>.tupled(
         a: HK<HKF, A>,
         b: HK<HKF, B>,
         c: HK<HKF, C>,
-        d: HK<HKF, D>): HK<HKF, Tuple4<A, B, C, D>> = a.product(this, b).product(this, c).product(this, d)
+        d: HK<HKF, D>): HK<HKF, Tuple4<A, B, C, D>> =
+        a.product(this, b).product(this, c).product(this, d)
 
 fun <HKF, A, B, C, D, E> Applicative<HKF>.tupled(
         a: HK<HKF, A>,
         b: HK<HKF, B>,
         c: HK<HKF, C>,
         d: HK<HKF, D>,
-        e: HK<HKF, E>): HK<HKF, Tuple5<A, B, C, D, E>> = a.product(this, b).product(this, c).product(this, d).product(this, e)
+        e: HK<HKF, E>): HK<HKF, Tuple5<A, B, C, D, E>> =
+        a.product(this, b).product(this, c).product(this, d).product(this, e)
 
 fun <HKF, A, B, C, D, E, F> Applicative<HKF>.tupled(
         a: HK<HKF, A>,
@@ -243,20 +250,23 @@ fun <HKF, A, B, C, D, E, F, G, H, I, J> Applicative<HKF>.tupled(
 fun <HKF, A, B, Z> Applicative<HKF>.map(
         a: HK<HKF, A>,
         b: HK<HKF, B>,
-        lbd: (Tuple2<A, B>) -> Z): HK<HKF, Z> = this.map(a.product(this, b), lbd)
+        lbd: (Tuple2<A, B>) -> Z): HK<HKF, Z> =
+        this.map(a.product(this, b), lbd)
 
 fun <HKF, A, B, C, Z> Applicative<HKF>.map(
         a: HK<HKF, A>,
         b: HK<HKF, B>,
         c: HK<HKF, C>,
-        lbd: (Tuple3<A, B, C>) -> Z): HK<HKF, Z> = this.map(a.product(this, b).product(this, c), lbd)
+        lbd: (Tuple3<A, B, C>) -> Z): HK<HKF, Z> =
+        this.map(a.product(this, b).product(this, c), lbd)
 
 fun <HKF, A, B, C, D, Z> Applicative<HKF>.map(
         a: HK<HKF, A>,
         b: HK<HKF, B>,
         c: HK<HKF, C>,
         d: HK<HKF, D>,
-        lbd: (Tuple4<A, B, C, D>) -> Z): HK<HKF, Z> = this.map(a.product(this, b).product(this, c).product(this, d), lbd)
+        lbd: (Tuple4<A, B, C, D>) -> Z): HK<HKF, Z> =
+        this.map(a.product(this, b).product(this, c).product(this, d), lbd)
 
 fun <HKF, A, B, C, D, E, Z> Applicative<HKF>.map(
         a: HK<HKF, A>,
@@ -264,7 +274,8 @@ fun <HKF, A, B, C, D, E, Z> Applicative<HKF>.map(
         c: HK<HKF, C>,
         d: HK<HKF, D>,
         e: HK<HKF, E>,
-        lbd: (Tuple5<A, B, C, D, E>) -> Z): HK<HKF, Z> = this.map(a.product(this, b).product(this, c).product(this, d).product(this, e), lbd)
+        lbd: (Tuple5<A, B, C, D, E>) -> Z): HK<HKF, Z> =
+        this.map(a.product(this, b).product(this, c).product(this, d).product(this, e), lbd)
 
 fun <HKF, A, B, C, D, E, F, Z> Applicative<HKF>.map(
         a: HK<HKF, A>,
@@ -325,7 +336,8 @@ fun <HKF, A, B, C, D, E, F, G, H, I, J, Z> Applicative<HKF>.map(
         h: HK<HKF, H>,
         i: HK<HKF, I>,
         j: HK<HKF, J>,
-        lbd: (Tuple10<A, B, C, D, E, F, G, H, I, J>) -> Z): HK<HKF, Z> = this.map(a.product(this, b).product(this, c).product(this, d)
-        .product(this, e).product(this, f).product(this, g).product(this, h).product(this, i).product(this, j), lbd)
+        lbd: (Tuple10<A, B, C, D, E, F, G, H, I, J>) -> Z): HK<HKF, Z> =
+        this.map(a.product(this, b).product(this, c).product(this, d).product(this, e).product(this, f)
+                .product(this, g).product(this, h).product(this, i).product(this, j), lbd)
 
 inline fun <reified F> applicative(): Applicative<F> = instance(InstanceParametrizedType(Applicative::class.java, listOf(typeLiteral<F>())))

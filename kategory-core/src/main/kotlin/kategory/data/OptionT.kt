@@ -32,37 +32,13 @@ package kategory
                     })
                 }))
 
-        inline fun <reified F> functor(FF: Functor<F> = kategory.functor<F>()): OptionTFunctorInstance<F> =
-                OptionTFunctorInstanceImplicits.instance(FF)
-
-        inline fun <reified F> applicative(MF: Monad<F> = kategory.monad<F>()): OptionTApplicativeInstance<F> =
-                OptionTApplicativeInstanceImplicits.instance(MF)
-
-        inline fun <reified F> monad(MF: Monad<F> = kategory.monad<F>()): OptionTMonadInstance<F> =
-                OptionTMonadInstanceImplicits.instance(MF)
-
-        inline fun <reified F> foldable(FFF: Foldable<F> = kategory.foldable<F>()): OptionTFoldableInstance<F> =
-                OptionTFoldableInstanceImplicits.instance(FFF)
-
-        inline fun <reified F> traverse(TF: Traverse<F> = kategory.traverse<F>()): OptionTTraverseInstance<F> =
-                OptionTTraverseInstanceImplicits.instance(TF)
-
-        inline fun <reified F> semigroupK(MF: Monad<F> = kategory.monad<F>()): OptionTSemigroupKInstance<F> =
-                OptionTSemigroupKInstanceImplicits.instance(MF)
-
-        inline fun <reified F> monoidK(MF: Monad<F> = kategory.monad<F>()): OptionTMonoidKInstance<F> =
-                OptionTMonoidKInstanceImplicits.instance(MF)
-
-        inline fun <reified F> functorFilter(FF: Functor<F> = kategory.functor<F>()): OptionTFunctorFilterInstance<F> =
-                OptionTFunctorFilterInstanceImplicits.instance(FF)
-
     }
 
     inline fun <B> fold(crossinline default: () -> B, crossinline f: (A) -> B, FF: Functor<F>): HK<F, B> = FF.map(value, { option -> option.fold(default, f) })
 
     inline fun <B> cata(crossinline default: () -> B, crossinline f: (A) -> B, FF: Functor<F>): HK<F, B> = fold(default, f, FF)
 
-    fun <B> ap(ff: OptionTKind<F, (A) -> B>, MF: Monad<F>): OptionT<F, B> = ff.ev().flatMap ({ f -> map(f, MF) }, MF)
+    fun <B> ap(ff: OptionTKind<F, (A) -> B>, MF: Monad<F>): OptionT<F, B> = ff.ev().flatMap({ f -> map(f, MF) }, MF)
 
     inline fun <B> flatMap(crossinline f: (A) -> OptionT<F, B>, MF: Monad<F>): OptionT<F, B> = flatMapF({ it -> f(it).value }, MF)
 
@@ -104,6 +80,11 @@ package kategory
     fun <B> foldL(b: B, f: (B, A) -> B, FF: Foldable<F>): B = FF.compose(Option.foldable()).foldLC(value, b, f)
 
     fun <B> foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>): Eval<B> = FF.compose(Option.foldable()).foldRC(value, lb, f)
+
+    fun <G, B> traverseFilter(f: (A) -> HK<G, Option<B>>, GA: Applicative<G>, FF: Traverse<F>): HK<G, OptionT<F, B>> {
+        val fa = ComposedTraverseFilter(FF, Option.traverseFilter(), Option.applicative()).traverseFilterC(value, f, GA)
+        return GA.map(fa, { OptionT(FF.map(it.unnest(), { it.ev() })) })
+    }
 
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>, FF: Traverse<F>): HK<G, OptionT<F, B>> {
         val fa = ComposedTraverse(FF, Option.traverse(), Option.applicative()).traverseC(value, f, GA)

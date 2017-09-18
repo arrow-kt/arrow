@@ -76,8 +76,8 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
  * A coroutine is initiated and inside `MonadContinuation` suspended yielding to `flatMap` once all the flatMap binds are completed
  * the underlying monad is returned from the act of executing the coroutine
  */
-fun <F, B> Monad<F>.binding(coroutineContext: CoroutineContext = EmptyCoroutineContext, c: suspend MonadContinuation<F, *>.() -> HK<F, B>): HK<F, B> {
-    val continuation = MonadContinuation<F, B>(this, coroutineContext)
+fun <F, B> Monad<F>.binding(c: suspend MonadContinuation<F, *>.() -> HK<F, B>): HK<F, B> {
+    val continuation = MonadContinuation<F, B>(this)
     c.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
 }
@@ -126,9 +126,9 @@ open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: C
  * This combinator ultimately returns computations lifting to Free to automatically for comprehend in a stack-safe way
  * over any stack-unsafe monads
  */
-fun <F, B> Monad<F>.bindingStackSafe(coroutineContext: CoroutineContext = EmptyCoroutineContext, c: suspend StackSafeMonadContinuation<F, *>.() -> Free<F, B>):
+fun <F, B> Monad<F>.bindingStackSafe(c: suspend StackSafeMonadContinuation<F, *>.() -> Free<F, B>):
         Free<F, B> {
-    val continuation = StackSafeMonadContinuation<F, B>(this, coroutineContext)
+    val continuation = StackSafeMonadContinuation<F, B>(this)
     c.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
 }

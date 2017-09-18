@@ -11,12 +11,6 @@ inline fun <reified M, S, A> FreeKind<S, A>.foldMapK(f: FunctionK<S, M>, MM: Mon
 
         fun <S, A> defer(value: () -> Free<S, A>): Free<S, A> = pure<S, Unit>(Unit).flatMap { _ -> value() }
 
-        fun <S> functor(): FreeFunctorInstance<S> = FreeFunctorInstanceImplicits.instance()
-
-        fun <S> applicative(): FreeApplicativeInstance<S> = FreeApplicativeInstanceImplicits.instance()
-
-        fun <S> monad(): FreeMonadInstance<S> = FreeMonadInstanceImplicits.instance()
-
         internal fun <F> functionKF(): FunctionK<F, FreeKindPartial<F>> =
                 object : FunctionK<F, FreeKindPartial<F>> {
                     override fun <A> invoke(fa: HK<F, A>): Free<F, A> =

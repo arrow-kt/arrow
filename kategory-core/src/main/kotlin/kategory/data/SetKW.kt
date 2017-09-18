@@ -20,10 +20,6 @@ data class SetKW<out A>(val set: Set<A>) : SetKWKind<A>, Set<A> by set {
 
         fun <A> empty(): SetKW<A> = emptySet<A>().k()
 
-        fun <A> semigroup(): SetKWSemigroupInstance<A> = SetKWSemigroupInstanceImplicits.instance()
-
-        fun <A> monoid(): SetKWMonoidInstance<A> = SetKWMonoidInstanceImplicits.instance()
-
     }
 }
 

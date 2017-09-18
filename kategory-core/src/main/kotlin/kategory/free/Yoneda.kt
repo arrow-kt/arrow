@@ -14,12 +14,9 @@ package kategory
     fun toCoyoneda(): Coyoneda<F, A, A> = Coyoneda(lower(), listOf({ a: Any? -> a }))
 
     companion object {
-        inline fun <reified U, A> apply(fa: HK<U, A>, FF: Functor<U> = functor()): Yoneda<U, A> =
+        inline fun <reified U, A> apply(fa: HK<U, A>, FF: Functor<U> = kategory.functor()): Yoneda<U, A> =
                 object : Yoneda<U, A>() {
                     override fun <B> apply(f: (A) -> B): HK<U, B> = FF.map(fa, f)
                 }
-
-        fun <U> functor(FU: Functor<U>): YonedaFunctorInstance<U> =
-                YonedaFunctorInstanceImplicits.instance(FU)
     }
 }

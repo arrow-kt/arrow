@@ -1,12 +1,8 @@
 package kategory.derive
 
 import com.google.auto.service.AutoService
-import kategory.common.utils.AbstractProcessor
-import kategory.common.utils.ClassOrPackageDataWrapper
-import kategory.common.utils.extractFullName
-import kategory.common.utils.knownError
+import kategory.common.utils.*
 import org.jetbrains.kotlin.serialization.deserialization.TypeTable
-import org.jetbrains.kotlin.serialization.deserialization.supertypes
 import java.io.File
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
@@ -42,29 +38,6 @@ class DerivingProcessor : AbstractProcessor() {
         }
     }
 
-    fun recurseInterfaces(
-            current: ClassOrPackageDataWrapper.Class,
-            typeTable: TypeTable,
-            acc: List<ClassOrPackageDataWrapper>): List<ClassOrPackageDataWrapper> {
-        val interfaces = current.classProto.supertypes(typeTable).map {
-            it.extractFullName(current, failOnGeneric = false)
-        }.filter {
-            it != "`kategory`.`Typeclass`"
-        }
-        return when {
-            interfaces.isEmpty() -> acc
-            else -> {
-                interfaces.flatMap { i ->
-                    val className = i.removeBackticks().substringBefore("<")
-                    val typeClassElement = elementUtils.getTypeElement(className)
-                    val parentInterface = getClassOrPackageDataWrapper(typeClassElement)
-                    val newAcc = acc + parentInterface
-                    recurseInterfaces(parentInterface as ClassOrPackageDataWrapper.Class, typeTable, newAcc)
-                }
-            }
-        }
-    }
-
     private fun processClass(element: TypeElement): AnnotatedDeriving {
         val proto: ClassOrPackageDataWrapper.Class = getClassOrPackageDataWrapper(element) as ClassOrPackageDataWrapper.Class
         val typeClasses: List<ClassOrPackageDataWrapper> = element.annotationMirrors.flatMap { am ->
@@ -82,7 +55,7 @@ class DerivingProcessor : AbstractProcessor() {
         val typeclassSuperTypes = typeClasses.map { tc ->
             val typeClassWrapper = tc as ClassOrPackageDataWrapper.Class
             val typeTable = TypeTable(typeClassWrapper.classProto.typeTable)
-            val superTypes = recurseInterfaces(typeClassWrapper, typeTable, emptyList())
+            val superTypes = recurseTypeclassInterfaces(typeClassWrapper, typeTable, emptyList())
             typeClassWrapper to superTypes
         }.toMap()
         val companionName = proto.nameResolver
