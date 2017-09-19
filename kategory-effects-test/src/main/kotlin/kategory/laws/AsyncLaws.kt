@@ -31,10 +31,10 @@ object AsyncLaws {
 
     inline fun <reified F> asyncBind(AC: AsyncContext<F> = asyncContext(), M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(genIntSmall(), genIntSmall(), genIntSmall(), { x: Int, y: Int, z: Int ->
-                val bound = AC.bindingAsync(M) {
-                    val a = bindAsync { x }
-                    val b = bindAsync { a + y }
-                    val c = bindAsync { b + z }
+                val bound = M.bindingE {
+                    val a = bindAsync(AC) { x }
+                    val b = bindAsync(AC) { a + y }
+                    val c = bindAsync(AC) { b + z }
                     yields(c)
                 }
                 bound.equalUnderTheLaw(M.pure<Int>(x + y + z), EQ)
@@ -42,18 +42,18 @@ object AsyncLaws {
 
     inline fun <reified F> asyncBindError(AC: AsyncContext<F> = asyncContext(), M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(genThrowable(), { e: Throwable ->
-                val bound: HK<F, Int> = AC.bindingAsync(M) {
-                    bindAsync { throw e }
+                val bound: HK<F, Int> = M.bindingE {
+                    bindAsync(AC) { throw e }
                 }
                 bound.equalUnderTheLaw(M.raiseError<Int>(e), EQ)
             })
 
     inline fun <reified F> asyncBindUnsafe(AC: AsyncContext<F> = asyncContext(), M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(genIntSmall(), genIntSmall(), genIntSmall(), { x: Int, y: Int, z: Int ->
-                val bound = AC.bindingAsync(M) {
-                    val a = bindAsyncUnsafe { x.right() }
-                    val b = bindAsyncUnsafe { (a + y).right() }
-                    val c = bindAsyncUnsafe { (b + z).right() }
+                val bound = M.bindingE {
+                    val a = bindAsyncUnsafe(AC) { x.right() }
+                    val b = bindAsyncUnsafe(AC) { (a + y).right() }
+                    val c = bindAsyncUnsafe(AC) { (b + z).right() }
                     yields(c)
                 }
                 bound.equalUnderTheLaw(M.pure<Int>(x + y + z), EQ)
@@ -61,15 +61,15 @@ object AsyncLaws {
 
     inline fun <reified F> asyncBindUnsafeError(AC: AsyncContext<F> = asyncContext(), M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(genThrowable(), { e: Throwable ->
-                val bound: HK<F, Int> = AC.bindingAsync(M) {
-                    bindAsyncUnsafe { e.left() }
+                val bound: HK<F, Int> = M.bindingE {
+                    bindAsyncUnsafe(AC) { e.left() }
                 }
                 bound.equalUnderTheLaw(M.raiseError<Int>(e), EQ)
             })
 
     inline fun <reified F> asyncParallelBind(AC: AsyncContext<F> = asyncContext(), M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(genIntSmall(), genIntSmall(), genIntSmall(), { x: Int, y: Int, z: Int ->
-                val bound = M.binding {
+                val bound = M.bindingE {
                     val value = bind { M.tupled(runAsync(AC) { x }, runAsync(AC) { y }, runAsync(AC) { z }) }
                     yields(value.a + value.b + value.c)
                 }
@@ -94,9 +94,9 @@ object AsyncLaws {
             forFew(5, genIntSmall(), { num: Int ->
                 val sideEffect = SideEffect()
                 val (binding, dispose) = M.bindingECancellable {
-                    val a = runAsync(AC) { num }.bind()
+                    val a = bindAsync(AC) { num }
                     sideEffect.increment()
-                    val b = runAsync(AC) { Thread.sleep(500); sideEffect.increment(); a + 1 }.bind()
+                    val b = bindAsync(AC) { Thread.sleep(500); sideEffect.increment(); a + 1 }
                     yields(b)
                 }
                 Try { Thread.sleep(250); dispose() }.recover { throw it }
