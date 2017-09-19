@@ -100,6 +100,6 @@ object AsyncLaws {
                     yields(b)
                 }
                 Try { Thread.sleep(250); dispose() }.recover { throw it }
-                binding.equalUnderTheLaw(M.raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 1
+                binding.equalUnderTheLaw(M.raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 0
             })
 }
