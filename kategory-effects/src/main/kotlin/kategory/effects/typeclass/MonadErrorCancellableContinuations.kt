@@ -23,10 +23,6 @@ open class MonadErrorCancellableContinuation<F, A>(ME: MonadError<F, Throwable>,
 
     internal fun returnedMonad(): HK<F, A> = returnedMonad
 
-    override fun resumeWithException(exception: Throwable) {
-        returnedMonad = ME.raiseError(exception)
-    }
-
     override suspend fun <B> bind(m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels
         returnedMonad = flatMap(m(), { x: B ->
