@@ -14,7 +14,7 @@ elif [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
 elif [ "$TRAVIS_BRANCH" != "$BRANCH" ]; then
   fail "Failed snapshot deployment: wrong branch. Expected '$BRANCH' but was '$TRAVIS_BRANCH'."
 elif ! [ "$VERSION_NAME" =~ VERSION_PATTERN ]; then
-  fail "Failed snapshot deployment: wrong version. Expected '$VERSION_NAME' to have pattern 'X.Y.Z-SNAPSHOT'"
+  echo "Skipping snapshot deployment: This is probably a pre-release build"
 else
   ./gradlew uploadArchives
   echo "Snapshot '$VERSION_NAME' deployed!"
