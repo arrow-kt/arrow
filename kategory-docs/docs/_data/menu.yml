@@ -1,0 +1,119 @@
+options:
+  - title: Quick Start
+    url: /docs/
+
+  - title: Data Types
+
+    nested_options:
+
+     - title: Option
+       url: /docs/datatypes/option/
+
+     - title: OptionT
+       url: /docs/datatypes/optiont/
+
+     - title: Either
+       url: /docs/datatypes/either/
+
+     - title: EitherT
+       url: /docs/datatypes/eithert/
+
+     - title: Validated
+       url: /docs/datatypes/validated/
+
+     - title: Try
+       url: /docs/datatypes/try/
+
+     - title: id
+       url: /docs/datatypes/ior/
+
+  - title: Type Classes
+
+    nested_options:
+
+      - title: Functor
+        url: /docs/typeclasses/functor/
+
+      - title: Either
+        url: /docs/effects/either
+
+      - title: Option
+        url: /docs/effects/option
+
+      - title: Reader
+        url: /docs/effects/reader
+
+      - title: Writer
+        url: /docs/effects/writer
+
+      - title: State
+        url: /docs/effects/state
+
+      - title: Traverse
+        url: /docs/effects/traverse
+
+      - title: Validation
+        url: /docs/effects/validation
+
+      - title: Async Callbacks
+        url: /docs/effects/async
+
+  - title: Effects
+
+  - title: Optics
+
+  - title: Patterns
+
+    nested_options:
+
+      - title: Cache
+        url: /docs/effects/Cache/
+
+      - title: Dependency Injection
+        url: TODO.html
+
+      - title: Configuration
+        url: /docs/patterns/config
+
+      - title: Logging
+        url: /docs/patterns/logging
+
+  - title: Integrations
+
+    nested_options:
+
+      - title: Cats
+        url: /docs/integrations/cats
+
+      - title: Play Framework
+        url: /docs/integrations/play
+
+      - title: Monix
+        url: /docs/integrations/monix
+
+      - title: Fetch
+        url: /docs/integrations/fetch
+
+      - title: FS2
+        url: /docs/integrations/fs2
+
+      - title: Doobie
+        url: /docs/integrations/doobie
+
+      - title: Slick
+        url: /docs/integrations/slick
+
+      - title: Akka HTTP
+        url: /docs/integrations/akkahttp
+
+      - title: Finch
+        url: /docs/integrations/finch
+
+      - title: http4s
+        url: /docs/integrations/http4s
+
+  - title: Credits
+    url: /credits
+
+  - title: License
+    url: /license

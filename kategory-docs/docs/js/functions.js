@@ -18,8 +18,6 @@
 
     // Sidebar nav
     $(document).ready(function() {
-        var speed = 300;
-
         // Touch interactions
         var sidebarWrapperEl = document.getElementById('sidebar-wrapper');
         // create a simple instance, by default it only adds horizontal recognizers
@@ -36,17 +34,31 @@
           });
         }
 
+        function activate (el, speed) {
+          if (!el.parent().hasClass('active')) {
+              $('.sidebar-nav li ul').slideUp(speed);
+              el.next().slideToggle(speed);
+              $('.sidebar-nav li').removeClass('active');
+              el.parent().addClass('active');
+          } else {
+              el.next().slideToggle(speed);
+              $('.sidebar-nav li').removeClass('active');
+          }
+        }
+
         $('.sidebar-nav > li > a').click(function(e) {
             e.preventDefault();
-            if (!$(this).parent().hasClass('active')) {
-                $('.sidebar-nav li ul').slideUp(speed);
-                $(this).next().slideToggle(speed);
-                $('.sidebar-nav li').removeClass('active');
-                $(this).parent().addClass('active');
-            } else {
-                $(this).next().slideToggle(speed);
-                $('.sidebar-nav li').removeClass('active');
-            }
+            activate($(this), 300);
         });
+
+        var current = location.pathname;
+          $('.sidebar-nav > li > ul a').each(function(){
+              var $this = $(this);
+              // if the current path is like this link, make it active
+              if($this.attr('href') === current){
+                  $this.addClass('active');
+                  activate($this.closest('.sidebar-nav > li').children('a'), 0);
+              }
+        })
     });
 })(jQuery);

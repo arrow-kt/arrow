@@ -137,15 +137,17 @@ $(window).on("load", function() {
         easing: 'easeInSine'
       });
 
-      var pg = particleground(document.getElementById('masthead-background'), {
-        dotColor: '#fff',
-        lineColor: '#fff',
-        density: 18000,
-        parallaxMultiplier: 18,
-        lineWidth: 0.5,
-        proximity: 90,
-        particleRadius: 5
-      });
+      try {
+          var pg = particleground(document.getElementById('masthead-background'), {
+          dotColor: '#fff',
+          lineColor: '#fff',
+          density: 18000,
+          parallaxMultiplier: 18,
+          lineWidth: 0.5,
+          proximity: 90,
+          particleRadius: 5
+        });
+      } catch(e) {}
 
       // $("#masthead, #navigation").on("mousemove",function(e) {
       $(window).on("mousemove",function(e) {
