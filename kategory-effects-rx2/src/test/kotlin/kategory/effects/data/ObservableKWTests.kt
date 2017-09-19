@@ -82,7 +82,7 @@ class ObservableKWTest : UnitSpec() {
                 yields(a)
             }.value()
             val test: TestObserver<Long> = value.doOnSubscribe { subscription -> Observable.timer(1, TimeUnit.SECONDS).subscribe { subscription.dispose() } }.test()
-            test.awaitTerminalEvent(10, TimeUnit.SECONDS)
+            test.awaitTerminalEvent(5, TimeUnit.SECONDS)
 
             test.assertNotTerminated().assertNotComplete().assertNoErrors().assertNoValues()
         }
