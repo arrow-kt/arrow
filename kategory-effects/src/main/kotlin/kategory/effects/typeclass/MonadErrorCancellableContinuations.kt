@@ -2,6 +2,7 @@ package kategory.effects
 
 import kategory.*
 import kategory.effects.data.internal.BindingCancellationException
+import kategory.effects.internal.stackLabels
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.EmptyCoroutineContext
