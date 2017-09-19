@@ -77,29 +77,29 @@ object AsyncLaws {
             })
 
     inline fun <reified F> asyncCancellationBefore(AC: AsyncContext<F> = asyncContext(), M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
-            forFew(10, genIntSmall(), { num: Int ->
+            forFew(5, genIntSmall(), { num: Int ->
                 val sideEffect = SideEffect()
                 val (binding, dispose) = M.bindingECancellable {
-                    val a = runAsync(AC) { Thread.sleep(1000); num }.bind()
+                    val a = runAsync(AC) { Thread.sleep(500); num }.bind()
                     sideEffect.increment()
                     val b = runAsync(AC) { a + 1 }.bind()
                     val c = M.pure(b + 1).bind()
                     yields(c)
                 }
-                Try { Thread.sleep(500); dispose() }.recover { throw it }
+                Try { Thread.sleep(250); dispose() }.recover { throw it }
                 binding.equalUnderTheLaw(M.raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 0
             })
 
     inline fun <reified F> asyncCancellationAfter(AC: AsyncContext<F> = asyncContext(), M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
-            forFew(10, genIntSmall(), { num: Int ->
+            forFew(5, genIntSmall(), { num: Int ->
                 val sideEffect = SideEffect()
                 val (binding, dispose) = M.bindingECancellable {
                     val a = runAsync(AC) { num }.bind()
                     sideEffect.increment()
-                    val b = runAsync(AC) { Thread.sleep(1000); sideEffect.increment(); a + 1 }.bind()
+                    val b = runAsync(AC) { Thread.sleep(500); sideEffect.increment(); a + 1 }.bind()
                     yields(b)
                 }
-                Try { Thread.sleep(500); dispose() }.recover { throw it }
+                Try { Thread.sleep(250); dispose() }.recover { throw it }
                 binding.equalUnderTheLaw(M.raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 1
             })
 }
