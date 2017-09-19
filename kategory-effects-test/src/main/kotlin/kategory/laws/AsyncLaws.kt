@@ -95,10 +95,11 @@ object AsyncLaws {
                 val sideEffect = SideEffect()
                 val (binding, dispose) = M.bindingECancellable {
                     val a = runAsync(AC) { num }.bind()
+                    sideEffect.increment()
                     val b = runAsync(AC) { Thread.sleep(1000); sideEffect.increment(); a + 1 }.bind()
                     yields(b)
                 }
                 Try { Thread.sleep(500); dispose() }.recover { throw it }
-                binding.equalUnderTheLaw(M.raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 0
+                binding.equalUnderTheLaw(M.raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 1
             })
 }

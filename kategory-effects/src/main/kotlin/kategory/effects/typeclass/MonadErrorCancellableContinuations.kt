@@ -42,13 +42,14 @@ open class MonadErrorCancellableContinuation<F, A>(ME: MonadError<F, Throwable>,
 
 /**
  * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.
- * A coroutines is initiated and inside `MonadErrorContinuation` suspended yielding to `flatMap` once all the flatMap binds are completed
+ * A coroutines is initiated and inside [MonadErrorCancellableContinuation] suspended yielding to [Monad.flatMap]. Once all the flatMap binds are completed
  * the underlying monad is returned from the act of executing the coroutine
  *
- * This one operates over MonadError instances that can support `Throwable` in their error type automatically lifting
+ * This one operates over [MonadError] instances that can support [Throwable] in their error type automatically lifting
  * errors as failed computations in their monadic context and not letting exceptions thrown as the regular monad binding does.
  *
  * This operation is cancellable by calling invoke on the [Disposable] return.
+ * If [Disposable.invoke] is called the binding result will become a lifted [BindingCancellationException].
  */
 fun <F, B> MonadError<F, Throwable>.bindingECancellable(c: suspend MonadErrorCancellableContinuation<F, *>.() -> HK<F, B>): Tuple2<HK<F, B>, Disposable> {
     val continuation = MonadErrorCancellableContinuation<F, B>(this)
