@@ -16,6 +16,6 @@ elif [ "$TRAVIS_BRANCH" != "$BRANCH" ]; then
 elif ! [ "$VERSION_NAME" =~ VERSION_PATTERN ]; then
   fail "Failed snapshot deployment: wrong version. Expected '$VERSION_NAME' to have pattern 'X.Y.Z-SNAPSHOT'"
 else
-  ./gradlew bintrayUpload -PdryRun=false
+  ./gradlew uploadArchives
   echo "Snapshot '$VERSION_NAME' deployed!"
 fi
