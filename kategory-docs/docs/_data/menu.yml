@@ -24,8 +24,11 @@ options:
      - title: Try
        url: /docs/datatypes/try/
 
-     - title: id
+     - title: Ior
        url: /docs/datatypes/ior/
+       
+     - title: Id
+       url: /docs/datatypes/id/
 
   - title: Type Classes
 
