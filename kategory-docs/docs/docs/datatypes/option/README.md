@@ -157,13 +157,13 @@ val r2 = Option.monad().binding {
 }
 ```
 
-Other instances exist for:
+Instances:
 
-[`Foldable`](/docs/typeclasses/foldable/)
-[`Traverse`](/docs/typeclasses/traverse/)
-[`Semigroup`](/docs/typeclasses/semigroup/)
-[`Monoid`](/docs/typeclasses/monoid/)
-[`MonadError`](/docs/typeclasses/monaderror/)
+```kotlin:ank
+import kategory.debug.*
+
+showInstances<OptionHK, Unit>()
+```
  
 # Credits
  

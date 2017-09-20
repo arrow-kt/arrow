@@ -94,6 +94,7 @@ data class CompilationException(
 data class CompiledMarkdown(val origin: File, val snippets: ListKW<Snippet>)
 
 data class Snippet(
+        val fence: String,
         val lang: String,
         val silent: Boolean,
         val startOffset: Int,
@@ -110,7 +111,7 @@ fun extractCodeImpl(source: String, tree: ASTNode): ListKW<Snippet> {
                 val lang = fence.takeWhile { it != ':' }.toString().replace("```", "")
                 if (fence.startsWith("```$lang$AnkBlock")) {
                     val code = fence.split("\n").drop(1).dropLast(1).joinToString("\n")
-                    sb.add(Snippet(lang, fence.startsWith("```$AnkSilentBlock"), node.startOffset, node.endOffset, code))
+                    sb.add(Snippet(fence.toString(), lang, fence.startsWith("```$AnkSilentBlock"), node.startOffset, node.endOffset, code))
                 }
             }
             super.visitNode(node)
@@ -147,10 +148,9 @@ fun replaceAnkToLangImpl(compiledMarkdown: CompiledMarkdown): String =
         compiledMarkdown.snippets.fold(compiledMarkdown.origin.readText(), { content, snippet ->
             snippet.result.fold(
                     { content },
-                    { content.replace(snippet.code, snippet.code + "\n" + it) }
+                    { content.replace(snippet.fence, "```${snippet.lang}\n" +snippet.code + "\n" + it + "\n```") }
             )
-        }).replace(AnkSilentBlock, "")
-                .replace(AnkBlock, "")
+        })
 
 
 fun generateFilesImpl(candidates: ListKW<File>, newContents: ListKW<String>): ListKW<File> =
