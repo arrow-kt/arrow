@@ -30,11 +30,10 @@ class IsosFileGenerator(
         return sourceName to """
             |package ${annotatedIso.classData.`package`.escapedClassName}
             |
-            |fun ${sourceName}Iso() = ${isoConstructor(sourceClassName, targetName)}(
+            |fun ${sourceName}Iso(): ${isoConstructor(sourceClassName, targetName)} = Iso(
             |        get = { $sourceName: $sourceClassName -> ${tupleConstructor(annotatedIso.targets, sourceName)} },
             |        reverseGet = { tuple: ${tupleType(targetName)} -> ${classConstructorFromTuple(sourceClassName, targetName.size)} }
-            |)
-            |""".trimMargin()
+            |)""".trimMargin()
     }
 
     private fun isoConstructor(sourceName: String, targetTypes: List<String>) = "kategory.optics.Iso<$sourceName, ${tupleType(targetTypes)}>"

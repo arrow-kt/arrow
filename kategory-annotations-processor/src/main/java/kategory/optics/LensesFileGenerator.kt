@@ -25,7 +25,7 @@ class LensesFileGenerator(
                 val targetName = variable.paramName
 
                 """
-                    |fun $sourceName${targetName.capitalize()}() = $lens(
+                    |fun $sourceName${targetName.capitalize()}(): $lens<$sourceClassName, $targetClassName> = $lens(
                     |        get = { $sourceName: $sourceClassName -> $sourceName.$targetName },
                     |        set = { $targetName: $targetClassName ->
                     |            { $sourceName: $sourceClassName ->

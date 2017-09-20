@@ -6,168 +6,176 @@ import kategory.HK
 import kategory.Option
 import kategory.Tuple2
 import kategory.compose
+import kategory.flatMap
 import kategory.identity
+import kategory.left
 import kategory.none
 import kategory.right
 import kategory.some
 import kategory.toT
 
+typealias Optional<S, A> = POptional<S, S, A, A>
+
 /**
- * A [Optional] can be seen as a pair of functions `getOption: (A) -> Option<B>` and `set: (B) -> (A) -> A`
+ * A [POptional] can be seen as a pair of functions `getOption: (A) -> Option<B>` and `set: (B) -> (A) -> A`
  *
- * An [Optional] can also be defined as a weaker [Lens] and [Prism]
+ * An [POptional] can also be defined as a weaker [PLens] and [PPrism]
  *
- * @param A the source of a [Optional]
- * @param B the target of a [Optional]
+ * @param A the source of a [POptional]
+ * @param B the target of a [POptional]
  * @property getOption from an `A` we can extract a `Option<B>`
  * @property set replace the target value by `B` in an `A` so we obtain another modified `A`
  * @constructor Creates a Lens of type `A` with target `B`.
  */
-abstract class Optional<A, B> {
+abstract class POptional<S, T, A, B> {
 
     /**
-     * Get the target of a [Optional] or [Option.None] if there is no target
+     * Get the modified source of a [POptional]
      */
-    abstract fun getOption(a: A): Option<B>
+    abstract fun set(b: B): (S) -> (T)
 
     /**
-     * Get the modified source of a [Optional]
+     * Get the target of a [POptional] or return the original value while allowing the type to change if it does not match
      */
-    abstract fun set(b: B): (A) -> (A)
+    abstract fun getOrModify(s: S): Either<T, A>
 
     companion object {
 
         fun <A> id() = Iso.id<A>().asOptional()
 
         /**
-         * [Optional] that takes either A or A and strips the choice of A.
+         * [POptional] that takes either A or A and strips the choice of A.
          */
-        fun <A> codiagonal() = Optional<Either<A, A>, A>(
-                getOption = { aa -> aa.fold({ a -> a.right() }, { a -> a.right() }).toOption() },
-                set = { a -> { aa -> aa.bimap({ a }, { a }) } }
+        fun <A> codiagonal(): Optional<Either<A, A>, A> = Optional(
+                { it.fold({ it.right() }, { it.right() }) },
+                { a -> { aa -> aa.bimap({ a }, { a }) } }
         )
 
-        operator fun <A, B> invoke(getOption: (A) -> Option<B>, set: (B) -> (A) -> (A)) = object : Optional<A, B>() {
-            override fun getOption(a: A): Option<B> = getOption(a)
+        operator fun <S, T, A, B> invoke(getOrModify: (S) -> Either<T, A>, set: (B) -> (S) -> T): POptional<S, T, A, B> = object : POptional<S, T, A, B>() {
+            override fun getOrModify(s: S): Either<T, A> = getOrModify(s)
 
-            override fun set(b: B): (A) -> A = set(b)
+            override fun set(b: B): (S) -> T = set(b)
         }
 
-        fun <A, B> void() = Optional<A, B>(
-                { none() },
+        fun <A, B> void(): Optional<A, B> = Optional(
+                { it.left() },
                 { _ -> ::identity }
         )
 
     }
 
     /**
-     * Get the target of a [Optional] or return the original value while allowing the type to change if it does not match
+     * Get the target of a [POptional] or [Option.None] if there is no target
      */
-    fun getOrModify(a: A): Either<A, B> = getOption(a).fold({ Either.Left(a) }, { Either.Right(it) })
+    fun getOption(a: S): Option<A> = getOrModify(a).toOption()
 
     /**
-     * Modify polymorphically the target of a [Optional] with a function [f]
+     * Modify polymorphically the target of a [POptional] with a function [f]
      */
-    inline fun modify(crossinline f: (B) -> B): (A) -> A = { a -> getOption(a).fold({ a }, { set(f(it))(a) }) }
+    inline fun modify(crossinline f: (A) -> B): (S) -> T = { s ->
+        getOrModify(s).fold(::identity, { a -> set(f(a))(s) })
+    }
 
     /**
-     * Modify polymorphically the target of a [Optional] with an Applicative function [f]
+     * Modify polymorphically the target of a [POptional] with an Applicative function [f]
      */
-    inline fun <reified F> modifyF(FA: Applicative<F> = kategory.applicative(), crossinline f: (B) -> HK<F, B>, a: A): HK<F, A> =
-            getOrModify(a).fold(
+    inline fun <F> modifyF(FA: Applicative<F>, crossinline f: (A) -> HK<F, B>, s: S): HK<F, T> =
+            getOrModify(s).fold(
                     FA::pure,
-                    { FA.map(f(it), { set(it)(a) }) }
+                    { FA.map(f(it), { set(it)(s) }) }
             )
 
     /**
-     * Modify polymorphically the target of a [Optional] with a function [f]
-     * @return [Option.None] if the [Optional] is not matching
+     * Modify polymorphically the target of a [POptional] with a function [f]
+     * @return [Option.None] if the [POptional] is not matching
      */
-    fun modifiyOption(f: (B) -> B): (A) -> Option<A> = { a -> getOption(a).map({ set(f(it))(a) }) }
+    fun modifiyOption(f: (A) -> B): (S) -> Option<T> = { a -> getOption(a).map({ set(f(it))(a) }) }
 
     /**
-     * Set polymorphically the target of a [Optional] with a value.
-     * @return [Option.None] if the [Optional] is not matching
+     * Set polymorphically the target of a [POptional] with a value.
+     * @return [Option.None] if the [POptional] is not matching
      */
-    fun setOption(b: B): (A) -> Option<A> = modifiyOption { b }
+    fun setOption(b: B): (S) -> Option<T> = modifiyOption { b }
 
     /**
      * Check if there is no target
      */
-    fun isEmpty(a: A): Boolean = !nonEmpty(a)
+    fun isEmpty(s: S): Boolean = !nonEmpty(s)
 
     /**
      * Check if there is a target
      */
-    fun nonEmpty(a: A): Boolean = getOption(a).fold({ false }, { true })
+    fun nonEmpty(s: S): Boolean = getOption(s).fold({ false }, { true })
 
     /**
      * Find if the target satisfies the predicate [p]
      */
-    fun find(p: (B) -> Boolean): (A) -> Option<B> =
+    fun find(p: (A) -> Boolean): (S) -> Option<A> =
             { a -> getOption(a).flatMap { b -> if (p(b)) b.some() else none() } }
 
     /**
      * Check if there is a target and it satisfies the predicate [p]
      */
-    fun exists(p: (B) -> Boolean): (A) -> Boolean =
+    fun exists(p: (A) -> Boolean): (S) -> Boolean =
             { a -> getOption(a).fold({ false }, p) }
 
     /**
      * check if there is no target or the target satisfies the predicate [p]
      */
-    fun all(p: (B) -> Boolean): (A) -> Boolean =
+    fun all(p: (A) -> Boolean): (S) -> Boolean =
             { a -> getOption(a).fold({ true }, p) }
 
     /**
-     * join two [Optional] with the same target [B]
+     * join two [POptional] with the same target [B]
      */
-    fun <C> choice(other: Optional<C, B>): Optional<Either<A, C>, B> =
-            Optional(
-                    { a -> a.fold(this::getOption, other::getOption) },
+    fun <S1, T1> choice(other: POptional<S1, T1, A, B>): POptional<Either<S, S1>, Either<T, T1>, A, B> =
+            POptional(
+                    { ss -> ss.fold({ getOrModify(it).bimap({ it.left() }, ::identity) }, { other.getOrModify(it).bimap({ it.right() }, ::identity) }) },
                     { b -> { it.bimap(this.set(b), other.set(b)) } }
             )
 
     /**
      * Create a product of the target and a type [C]
      */
-    fun <C> first(): Optional<Tuple2<A, C>, Tuple2<B, C>> =
-            Optional(
-                    { (a, c) -> getOption(a).map { it toT c } },
+    fun <C> first(): POptional<Tuple2<S, C>, Tuple2<T, C>, Tuple2<A, C>, Tuple2<B, C>> =
+            POptional(
+                    { (s, c) -> getOrModify(s).bimap({ it toT c }, { it toT c }) },
                     { (b, c) -> { (a, c2) -> setOption(b)(a).fold({ set(b)(a) toT c2 }, { it toT c }) } }
             )
 
     /**
      * Create a product of a type [C] and the target
      */
-    fun <C> second(): Optional<Tuple2<C, A>, Tuple2<C, B>> =
-            Optional(
-                    { (c, a) -> getOption(a).map { c toT it } },
+    fun <C> second(): POptional<Tuple2<C, S>, Tuple2<C, T>, Tuple2<C, A>, Tuple2<C, B>> =
+            POptional(
+                    { (c, s) -> getOrModify(s).bimap({ c toT it }, { c toT it }) },
                     { (c, b) -> { (c2, a) -> setOption(b)(a).fold({ c2 toT set(b)(a) }, { c toT it }) } }
             )
 
-    /** compose a [Optional] with a [Optional] */
-    infix fun <C> composeOptional(other: Optional<B, C>): Optional<A, C> = Optional(
-            { a -> getOption(a).flatMap(other::getOption) },
+    /**
+     * Compose a [POptional] with a [POptional]
+     */
+    infix fun <C, D> composeOptional(other: POptional<A, B, C, D>): POptional<S, T, C, D> = POptional(
+            { s -> getOrModify(s).flatMap { a -> other.getOrModify(a).bimap({ set(it)(s) }, ::identity) } },
             this::modify compose other::set
     )
 
     /**
-     * Compose a [Optional] with a [Prism]
+     * Compose a [POptional] with a [PPrism]
      */
-    infix fun <C> composePrism(other: Prism<B, C>): Optional<A, C> = composeOptional(other.asOptional())
+    infix fun <C, D> composePrism(other: PPrism<A, B, C, D>): POptional<S, T, C, D> = composeOptional(other.asOptional())
 
     /**
-     * Compose a [Optional] with a [Lens]
+     * Compose a [POptional] with a [PLens]
      */
-    infix fun <C> composeLens(other: Lens<B, C>): Optional<A, C> = composeOptional(other.asOptional())
+    infix fun <C, D> composeLens(other: PLens<A, B, C, D>): POptional<S, T, C, D> = composeOptional(other.asOptional())
 
     /**
      * Plus operator overload to compose optionals
      */
-    operator fun <C> plus(o: Optional<B, C>): Optional<A, C> = composeOptional(o)
+    operator fun <C, D> plus(o: POptional<A, B, C, D>): POptional<S, T, C, D> = composeOptional(o)
 
-    operator fun <C> plus(o: Prism<B, C>): Optional<A, C> = composePrism(o)
+    operator fun <C, D> plus(o: PPrism<A, B, C, D>): POptional<S, T, C, D> = composePrism(o)
 
-    operator fun <C> plus(o: Lens<B, C>): Optional<A, C> = composeLens(o)
+    operator fun <C, D> plus(o: PLens<A, B, C, D>): POptional<S, T, C, D> = composeLens(o)
 }
