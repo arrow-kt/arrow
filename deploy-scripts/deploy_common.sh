@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-. deploy_functions.sh
+. $(dirname $0)/deploy_functions.sh
 set -e
 
 SLUG="kategory/kategory"
