@@ -26,9 +26,60 @@ options:
 
      - title: Ior
        url: /docs/datatypes/ior/
-       
+
      - title: Id
        url: /docs/datatypes/id/
+
+     - title: Reader
+       url: /docs/datatypes/reader/
+
+     - title: Kleisli
+       url: /docs/datatypes/kleisli/
+
+     - title: State
+       url: /docs/datatypes/state/
+
+     - title: StateT
+       url: /docs/datatypes/statet/
+
+     - title: WriterT
+       url: /docs/datatypes/writert/
+
+     - title: Trampoline
+       url: /docs/datatypes/trampoline/
+
+     - title: Coproduct
+       url: /docs/datatypes/coproduct/
+
+     - title: Eval
+       url: /docs/datatypes/eval/
+
+     - title: NonEmptyList
+       url: /docs/datatypes/nonemptylist/
+
+     - title: ListKW
+       url: /docs/datatypes/listkw/
+
+     - title: SequenceKW
+       url: /docs/datatypes/sequencekw/
+
+     - title: SetKW
+       url: /docs/datatypes/setkw/
+
+     - title: Free
+       url: /docs/datatypes/free/
+
+     - title: FreeApplicative
+       url: /docs/datatypes/freeapplicative/
+
+     - title: Cofree
+       url: /docs/datatypes/cofree/
+
+     - title: Coyoneda
+       url: /docs/datatypes/coyoneda/
+
+     - title: Yoneda
+       url: /docs/datatypes/yoneda/
 
   - title: Type Classes
 
@@ -37,83 +88,135 @@ options:
       - title: Functor
         url: /docs/typeclasses/functor/
 
-      - title: Either
-        url: /docs/effects/either
+      - title: FunctorFilter
+        url: /docs/typeclasses/functorfilter/
 
-      - title: Option
-        url: /docs/effects/option
+      - title: Applicative
+        url: /docs/typeclasses/applicative/
 
-      - title: Reader
-        url: /docs/effects/reader
+      - title: ApplicativeError
+        url: /docs/typeclasses/applicativeerror/
 
-      - title: Writer
-        url: /docs/effects/writer
-
-      - title: State
-        url: /docs/effects/state
+      - title: Foldable
+        url: /docs/typeclasses/foldable/
 
       - title: Traverse
-        url: /docs/effects/traverse
+        url: /docs/typeclasses/traverse/
 
-      - title: Validation
-        url: /docs/effects/validation
+      - title: TraverseFilter
+        url: /docs/typeclasses/traversefilter/
 
-      - title: Async Callbacks
-        url: /docs/effects/async
+      - title: Monad
+        url: /docs/typeclasses/monad/
+
+      - title: MonadFilter
+        url: /docs/typeclasses/monadfilter/
+
+      - title: MonadReader
+        url: /docs/typeclasses/monadreader/
+
+      - title: MonadWriter
+        url: /docs/typeclasses/monadwriter/
+
+      - title: MonadState
+        url: /docs/typeclasses/monadstate/
+
+      - title: MonadCombine
+        url: /docs/typeclasses/monadcombine/
+
+      - title: MonadError
+        url: /docs/typeclasses/monaderror/
+
+      - title: Semigroup
+        url: /docs/typeclasses/semigroup/
+
+      - title: Monoid
+        url: /docs/typeclasses/monoid/
+
+      - title: SemigroupK
+        url: /docs/typeclasses/semigroupk/
+
+      - title: MonoidK
+        url: /docs/typeclasses/monoidk/
+
+      - title: Bifoldable
+        url: /docs/typeclasses/bifoldable/
+
+      - title: Bimonad
+        url: /docs/typeclasses/bimonad/
+
+      - title: Comonad
+        url: /docs/typeclasses/comonad/
+
+      - title: Order
+        url: /docs/typeclasses/order/
+
+      - title: Eq
+        url: /docs/typeclasses/eq/
 
   - title: Effects
 
+    nested_options:
+
+      - title: IO
+        url: /docs/effects/io/
+
+      - title: Async
+        url: /docs/effects/async/
+
   - title: Optics
+
+    nested_options:
+
+      - title: Iso
+        url: /docs/optics/iso/
+
+      - title: Lenses
+        url: /docs/optics/lenses/
+
+      - title: Optional
+        url: /docs/optics/optional/
+
+      - title: Prism
+        url: /docs/optics/prism/
 
   - title: Patterns
 
     nested_options:
 
-      - title: Cache
-        url: /docs/effects/Cache/
+      - title: Monad Comprehensions
+        url: /docs/patterns/monad_comprehensions/
+
+      - title: Comonad Comprehensions
+        url: /docs/patterns/comonad_comprehensions/
+
+      - title: Applicative Builder
+        url: /docs/patterns/applicative_builder/
+
+      - title: Polymorphic programs
+        url: /docs/patterns/polymorphic_programs/
+
+      - title: Free Algebras
+        url: /docs/patterns/free_algebras/
+
+      - title: Error Handling
+        url: /docs/patterns/error_handling/
 
       - title: Dependency Injection
-        url: TODO.html
+        url: /docs/patterns/dependency_injection/
 
-      - title: Configuration
-        url: /docs/patterns/config
+      - title: Monad Transformers
+        url: /docs/patterns/monad_transformers/
 
-      - title: Logging
-        url: /docs/patterns/logging
+      - title: Concurrency
+        url: /docs/patterns/concurrency/
 
   - title: Integrations
 
     nested_options:
 
-      - title: Cats
-        url: /docs/integrations/cats
-
-      - title: Play Framework
-        url: /docs/integrations/play
-
-      - title: Monix
-        url: /docs/integrations/monix
-
-      - title: Fetch
-        url: /docs/integrations/fetch
-
-      - title: FS2
-        url: /docs/integrations/fs2
-
-      - title: Doobie
-        url: /docs/integrations/doobie
-
-      - title: Slick
-        url: /docs/integrations/slick
-
-      - title: Akka HTTP
-        url: /docs/integrations/akkahttp
-
-      - title: Finch
-        url: /docs/integrations/finch
-
-      - title: http4s
-        url: /docs/integrations/http4s
+      - title: Rx2
+        url: /docs/integrations/rx2
 
   - title: Credits
     url: /credits
