@@ -21,11 +21,6 @@ val extensionMappings = mapOf(
         "kotlin" to "kts"
 )
 
-val emptyEvalMappings = mapOf(
-        "java" to "void",
-        "kotlin" to "Unit"
-)
-
 @Suppress("UNCHECKED_CAST")
 inline fun <reified F> ankMonadErrorInterpreter(ME: MonadError<F, Throwable> = monadError()): FunctionK<AnkOpsHK, F> =
         object : FunctionK<AnkOpsHK, F> {
@@ -137,26 +132,26 @@ fun compileCodeImpl(origin: File, snippets: ListKW<Snippet>, classpath: ListKW<S
             }
             cachedEngines.putIfAbsent(snippet.lang, resolvedEngine)
             //println(":runAnk -> Eval: \n---\n${snippet.code}\n---\n")
-            resolvedEngine.eval(snippet.code) }.fold({
+            resolvedEngine.eval(snippet.code)
+        }.fold({
             throw CompilationException(cachedEngines.get(snippet.lang), snippet, it)
         }, { it })
-        val resultString = Option.fromNullable(result).fold({ emptyEvalMappings.getOrDefault(snippet.lang, "") }, { "$it" })
+        val resultString = Option.fromNullable(result).fold({ Option.None }, { Option.Some("//$it") })
         if (snippet.silent) snippet
-        else snippet.copy(result = "\n```\n$resultString\n```".some())
+        else snippet.copy(result = resultString)
     }.k()
     return CompiledMarkdown(origin, evaledSnippets)
 }
 
 fun replaceAnkToLangImpl(compiledMarkdown: CompiledMarkdown): String =
-        compiledMarkdown.origin.readText().toCharArray().foldIndexed(emptyList<Char>(), { n, acc, char ->
-            compiledMarkdown.snippets
-                    .find { it.endOffset == n }
-                    .flatMap { it.result }
-                    .map { it.toCharArray().map { it } }
-                    .fold({ acc + char }, { (acc + it) + char })
-        }).joinToString("")
-                .replace(AnkSilentBlock, "")
+        compiledMarkdown.snippets.fold(compiledMarkdown.origin.readText(), { content, snippet ->
+            snippet.result.fold(
+                    { content },
+                    { content.replace(snippet.code, snippet.code + "\n" + it) }
+            )
+        }).replace(AnkSilentBlock, "")
                 .replace(AnkBlock, "")
+
 
 fun generateFilesImpl(candidates: ListKW<File>, newContents: ListKW<String>): ListKW<File> =
         ListKW(candidates.mapIndexed { n, file ->

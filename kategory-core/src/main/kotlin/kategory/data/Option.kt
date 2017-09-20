@@ -174,6 +174,7 @@ sealed class Option<out A> : OptionKind<A> {
 
     object None : Option<Nothing>() {
         override val isEmpty = true
+        override fun toString(): String = "None"
     }
 
 }
