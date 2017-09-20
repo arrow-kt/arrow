@@ -39,8 +39,8 @@ abstract class PIso<S, T, A, B> {
 
         /**
          * create an [PIso] between any type and itself. id is the zero element of optics composition, for all optics o of type O (e.g. Lens, Iso, Prism, ...):
-         * o      composeIso Iso.id == o
-         * Iso.id composeO   o        == o (replace composeO by composeLens, composeIso, composePrism, ...)
+         * o      compose Iso.id == o
+         * Iso.id composeO   o        == o (replace composeO by compose, compose, compose, ...)
          */
         fun <A> id(): Iso<A, A> = Iso(::identity, ::identity)
 
@@ -138,7 +138,7 @@ abstract class PIso<S, T, A, B> {
     /**
      * Compose a [PIso] with a [PIso]
      */
-    infix fun <C, D> composeIso(other: PIso<A, B, C, D>): PIso<S, T, C, D> = PIso(
+    infix fun <C, D> compose(other: PIso<A, B, C, D>): PIso<S, T, C, D> = PIso(
             other::get compose this::get,
             this::reverseGet compose other::reverseGet
     )
@@ -146,23 +146,35 @@ abstract class PIso<S, T, A, B> {
     /**
      * Compose a [PIso] with a [PLens]
      */
-    infix fun <C, D> composeLens(other: PLens<A, B, C, D>): PLens<S, T, C, D> =
-            asLens() composeLens other
+    infix fun <C, D> compose(other: PLens<A, B, C, D>): PLens<S, T, C, D> = asLens() compose other
 
     /**
      * Compose a [PIso] with a [Getter]
      */
-    infix fun <C> composeGetter(other: Getter<A, C>): Getter<S, C> =
-            asGetter() composeGetter other
+    infix fun <C> compose(other: Getter<A, C>): Getter<S, C> = asGetter() composeGetter other
+
+    /**
+     * Compose a [PIso] with a [PSetter]
+     */
+    infix fun <C, D> compose(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = asSetter() compose other
+
+    /**
+     * Compose a [PIso] with a [POptional]
+     */
+    infix fun <C, D> compose(other: POptional<A, B, C, D>): POptional<S, T, C, D> = asOptional() compose other
 
     /**
      * Plus operator overload to compose lenses
      */
-    operator fun <C, D> plus(other: PIso<A, B, C, D>): PIso<S, T, C, D> = composeIso(other)
+    operator fun <C, D> plus(other: PIso<A, B, C, D>): PIso<S, T, C, D> = compose(other)
 
-    operator fun <C, D> plus(other: PLens<A, B, C, D>): PLens<S, T, C, D> = composeLens(other)
+    operator fun <C, D> plus(other: PLens<A, B, C, D>): PLens<S, T, C, D> = compose(other)
 
-    operator fun <C> plus(other: Getter<A, C>): Getter<S, C> = composeGetter(other)
+    operator fun <C> plus(other: Getter<A, C>): Getter<S, C> = compose(other)
+
+    operator fun <C, D> plus(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = compose(other)
+
+    operator fun <C, D> plus(other: POptional<A, B, C, D>): POptional<S, T, C, D> = compose(other)
 
     /**
      * View a [PIso] as a [PPrism]
@@ -189,4 +201,9 @@ abstract class PIso<S, T, A, B> {
             { s -> get(s).right() },
             this::set
     )
+
+    /**
+     * View a [PIso] as a [PSetter]
+     */
+    fun asSetter(): PSetter<S, T, A, B> = PSetter(this::modify)
 }

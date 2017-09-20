@@ -155,7 +155,7 @@ abstract class POptional<S, T, A, B> {
     /**
      * Compose a [POptional] with a [POptional]
      */
-    infix fun <C, D> composeOptional(other: POptional<A, B, C, D>): POptional<S, T, C, D> = POptional(
+    infix fun <C, D> compose(other: POptional<A, B, C, D>): POptional<S, T, C, D> = POptional(
             { s -> getOrModify(s).flatMap { a -> other.getOrModify(a).bimap({ set(it)(s) }, ::identity) } },
             this::modify compose other::set
     )
@@ -163,19 +163,39 @@ abstract class POptional<S, T, A, B> {
     /**
      * Compose a [POptional] with a [PPrism]
      */
-    infix fun <C, D> composePrism(other: PPrism<A, B, C, D>): POptional<S, T, C, D> = composeOptional(other.asOptional())
+    infix fun <C, D> compose(other: PPrism<A, B, C, D>): POptional<S, T, C, D> = compose(other.asOptional())
 
     /**
      * Compose a [POptional] with a [PLens]
      */
-    infix fun <C, D> composeLens(other: PLens<A, B, C, D>): POptional<S, T, C, D> = composeOptional(other.asOptional())
+    infix fun <C, D> compose(other: PLens<A, B, C, D>): POptional<S, T, C, D> = compose(other.asOptional())
+
+    /**
+     * Compose a [POptional] with a [PIso]
+     */
+    infix fun <C, D> compose(other: PIso<A, B, C, D>): POptional<S, T, C, D> = compose(other.asOptional())
+
+    /**
+     * Compose a [POptional] with a [PIso]
+     */
+    infix fun <C, D> compose(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = asSetter() compose other
 
     /**
      * Plus operator overload to compose optionals
      */
-    operator fun <C, D> plus(o: POptional<A, B, C, D>): POptional<S, T, C, D> = composeOptional(o)
+    operator fun <C, D> plus(o: POptional<A, B, C, D>): POptional<S, T, C, D> = compose(o)
 
-    operator fun <C, D> plus(o: PPrism<A, B, C, D>): POptional<S, T, C, D> = composePrism(o)
+    operator fun <C, D> plus(o: PPrism<A, B, C, D>): POptional<S, T, C, D> = compose(o)
 
-    operator fun <C, D> plus(o: PLens<A, B, C, D>): POptional<S, T, C, D> = composeLens(o)
+    operator fun <C, D> plus(o: PLens<A, B, C, D>): POptional<S, T, C, D> = compose(o)
+
+    operator fun <C, D> plus(o: PIso<A, B, C, D>): POptional<S, T, C, D> = compose(o)
+
+    operator fun <C, D> plus(o: PSetter<A, B, C, D>): PSetter<S, T, C, D> = compose(o)
+
+    /**
+     * View a [POptional] as a [PSetter]
+     */
+    fun asSetter(): PSetter<S, T, A, B> = PSetter(this::modify)
+
 }

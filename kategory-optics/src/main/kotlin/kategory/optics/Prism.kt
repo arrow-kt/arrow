@@ -142,13 +142,34 @@ abstract class PPrism<S, T, A, B> {
     /**
      * Compose a [PPrism] with another [PPrism]
      */
-    infix fun <C, D> composePrism(other: PPrism<A, B, C, D>): PPrism<S, T, C, D> = Prism(
+    infix fun <C, D> compose(other: PPrism<A, B, C, D>): PPrism<S, T, C, D> = Prism(
             { s -> getOrModify(s).flatMap { a -> other.getOrModify(a).bimap({ set(it)(s) }, ::identity) } },
             this::reverseGet compose other::reverseGet
     )
 
     /** compose an [Iso] as an [PPrism] */
-    fun <C, D> composeIso(other: PIso<A, B, C, D>): PPrism<S, T, C, D> = composePrism(other.asPrism())
+    fun <C, D> compose(other: PIso<A, B, C, D>): PPrism<S, T, C, D> = compose(other.asPrism())
+
+    /**
+     * Compose a [PPrism] with a [POptional]
+     */
+    infix fun <C, D> compose(other: POptional<A, B, C, D>): POptional<S, T, C, D> = asOptional() compose other
+
+    /**
+     * Compose a [PPrism] with a [PSetter]
+     */
+    infix fun <C, D> compose(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = asSetter() compose other
+
+    /**
+     * Plus operator overload to compose lenses
+     */
+    operator fun <C, D> plus(other: PPrism<A, B, C, D>): PPrism<S, T, C, D> = compose(other)
+
+    operator fun <C, D> plus(other: POptional<A, B, C, D>): POptional<S, T, C, D> = compose(other)
+
+    operator fun <C, D> plus(other: PIso<A, B, C, D>): PPrism<S, T, C, D> = compose(other)
+
+    operator fun <C, D> plus(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = compose(other)
 
     /**
      * View a [PPrism] as an [POptional]
@@ -156,19 +177,9 @@ abstract class PPrism<S, T, A, B> {
     fun asOptional(): POptional<S, T, A, B> = POptional(this::getOrModify, this::set)
 
     /**
-     * Compose a [PPrism] with a [POptional]
+     * View a [PPrism] as a [PSetter]
      */
-    infix fun <C, D> composeOptional(other: POptional<A, B, C, D>): POptional<S, T, C, D> =
-            asOptional() composeOptional other
-
-    /**
-     * Plus operator overload to compose lenses
-     */
-    operator fun <C, D> plus(other: PPrism<A, B, C, D>): PPrism<S, T, C, D> = composePrism(other)
-
-    operator fun <C, D> plus(other: POptional<A, B, C, D>): POptional<S, T, C, D> = composeOptional(other)
-
-    operator fun <C, D> plus(other: PIso<A, B, C, D>): PPrism<S, T, C, D> = composeIso(other)
+    fun asSetter(): PSetter<S, T, A, B> = PSetter(this::modify)
 
 }
 

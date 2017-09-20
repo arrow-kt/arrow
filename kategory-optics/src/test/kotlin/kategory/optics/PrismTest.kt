@@ -75,8 +75,8 @@ class PrismTest : UnitSpec() {
 
         "Joining two prisms together with same target should yield same result" {
             forAll(SumGen, { a ->
-                (sumPrism composePrism stringPrism).getOption(a) == sumPrism.getOption(a).flatMap(stringPrism::getOption) &&
-                        (sumPrism + stringPrism).getOption(a) == (sumPrism composePrism stringPrism).getOption(a)
+                (sumPrism compose stringPrism).getOption(a) == sumPrism.getOption(a).flatMap(stringPrism::getOption) &&
+                        (sumPrism + stringPrism).getOption(a) == (sumPrism compose stringPrism).getOption(a)
             })
         }
 

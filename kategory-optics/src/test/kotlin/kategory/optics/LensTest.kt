@@ -53,7 +53,7 @@ class LensTest : UnitSpec() {
         }
 
         "Joining two lenses together with same target should yield same result" {
-            val userTokenStringLens = userLens composeLens tokenLens
+            val userTokenStringLens = userLens compose tokenLens
             val joinedLens = tokenLens.choice(userTokenStringLens)
 
             forAll({ tokenValue: String ->

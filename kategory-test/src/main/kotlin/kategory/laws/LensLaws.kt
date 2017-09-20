@@ -34,23 +34,23 @@ object LensLaws {
 
     inline fun <reified A, reified B> lensModifyIdentity(lens: Lens<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>) =
             forAll(aGen, bGen, { a, b ->
-                lens.modify(::identity, a).equalUnderTheLaw(a, EQA)
+                lens.modify(::identity)(a).equalUnderTheLaw(a, EQA)
             })
 
     inline fun <reified A, reified B> lensComposeModify(lens: Lens<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>) =
             forAll(aGen, funcGen, funcGen, { a, f, g ->
-                lens.modify(g, lens.modify(f, a)).equalUnderTheLaw(lens.modify(g compose f, a), EQA)
+                lens.modify(g)(a).equalUnderTheLaw(lens.modify(g compose f)(a), EQA)
             })
 
     inline fun <reified A, reified B> lensConsistentSetModify(lens: Lens<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>) =
             forAll(aGen, bGen, { a, b ->
-                lens.set(b)(a).equalUnderTheLaw(lens.modify({ b }, a), EQA)
+                lens.set(b)(a).equalUnderTheLaw(lens.modify({ b })(a), EQA)
             })
 
     inline fun <reified A, reified B, reified F> lensConsistentModifyModifyId(lens: Lens<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, FA: Applicative<F>) =
             forAll(aGen, funcGen, { a, f ->
                 lens.modifyF(FA, { FA.pure(f(it)) }, a).exists {
-                    it.equalUnderTheLaw(lens.modify(f, a), EQA)
+                    it.equalUnderTheLaw(lens.modify(f)(a), EQA)
                 }
             })
 

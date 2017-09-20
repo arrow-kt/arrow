@@ -108,7 +108,7 @@ class IsoTest : UnitSpec() {
         }
 
         "Composing isos should result in an iso of the first iso's value with the second iso's target" {
-            val composedIso = userIso composeIso tokenIso
+            val composedIso = userIso compose tokenIso
 
             forAll({ tokenValue: String ->
                 val token = Token(tokenValue)
