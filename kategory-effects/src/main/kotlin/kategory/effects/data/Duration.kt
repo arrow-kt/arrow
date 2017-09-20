@@ -1,4 +1,4 @@
-package kategory
+package kategory.effects
 
 import java.util.concurrent.TimeUnit
 
