@@ -5,15 +5,26 @@ import kategory.Functor
 import kategory.HK
 import kategory.functor
 
+/**
+ * [Setter] is a type alias for [PSetter] which fixes the type arguments
+ * and restricts the Setter to monomorphic updates.
+ */
 typealias Setter<S, A> = PSetter<S, S, A, A>
 
 /**
- * A [[PSetter]] is a generalisation of Functor map:
- *  - `map:    (A => B) => F[A] => F[B]`
- *  - `modify: (A => B) => S    => T`
+ * A [Setter] is an optic that allows you to see into a structure and set or modify its target.
+ *
+ * A (polymorphic) [PSetter] is useful when setting or modifying a value for a constructed type
+ * i.e. PSetter<List<Int>, List<String>, Int, String>
+ *
+ * A [PSetter] is a generalisation of a [kategory.Functor].
+ * Functor::map   (fa: HK<F, A>, f: (A) -> B): HK<F, B>
+ * PSetter::modify(s: S,         f: (A) -> B): T
  *
  * @param S the source of a [PSetter]
+ * @param T the modified source of a [PSetter]
  * @param A the target of a [PSetter]
+ * @param B the modified target of a [PSetter]
  */
 abstract class PSetter<S, T, A, B> {
 

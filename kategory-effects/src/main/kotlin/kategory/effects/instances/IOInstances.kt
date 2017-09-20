@@ -1,4 +1,6 @@
-package kategory
+package kategory.effects
+
+import kategory.*
 
 @instance(IO::class)
 interface IOMonadErrorInstance : IOMonadInstance, MonadError<IOHK, Throwable> {

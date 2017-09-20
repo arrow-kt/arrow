@@ -1,4 +1,4 @@
-package kategory.effects.data
+package kategory.effects
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
@@ -99,7 +99,7 @@ class FlowableKWTests : UnitSpec() {
                     subscription.cancel()
                 }
             }.test()
-            test.awaitTerminalEvent(10, TimeUnit.SECONDS)
+            test.awaitTerminalEvent(5, TimeUnit.SECONDS)
             test.assertNotTerminated().assertNotComplete().assertNoErrors().assertNoValues()
         }
     }

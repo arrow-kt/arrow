@@ -1,9 +1,9 @@
-package kategory
+package kategory.effects
 
-import kategory.effects.data.internal.AndThen
-import kategory.effects.data.internal.Platform.onceOnly
-import kategory.effects.data.internal.Platform.unsafeResync
-import kategory.effects.data.internal.error
+import kategory.*
+import kategory.effects.internal.*
+import kategory.effects.internal.Platform.onceOnly
+import kategory.effects.internal.Platform.unsafeResync
 
 @higherkind
 @deriving(
@@ -345,7 +345,7 @@ internal data class BindAsync<E, out A>(val cont: ((Either<Throwable, E>) -> Uni
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
 }
 
-fun <A, B> IO<A>.ap(ff: kategory.IOKind<(A) -> B>): IO<B> =
+fun <A, B> IO<A>.ap(ff: IOKind<(A) -> B>): IO<B> =
         flatMap { a -> ff.ev().map({ it(a) }) }
 
 fun <A> IO<A>.handleErrorWith(f: (Throwable) -> IOKind<A>): IO<A> =

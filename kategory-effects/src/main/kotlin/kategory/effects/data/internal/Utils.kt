@@ -1,8 +1,8 @@
-package kategory.effects.data.internal
+package kategory.effects.internal
 
-import kategory.Duration
+import kategory.effects.Duration
 import kategory.Either
-import kategory.IO
+import kategory.effects.IO
 import kategory.Option
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.AbstractQueuedSynchronizer

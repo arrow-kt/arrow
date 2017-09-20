@@ -1,5 +1,6 @@
-package kategory
+package kategory.effects
 
+import kategory.*
 import io.reactivex.*
 
 fun <A> Flowable<A>.k(): FlowableKW<A> = FlowableKW(this)
@@ -7,7 +8,7 @@ fun <A> Flowable<A>.k(): FlowableKW<A> = FlowableKW(this)
 fun <A> FlowableKWKind<A>.value(): Flowable<A> = this.ev().flowable
 
 @higherkind
-@deriving(Functor::class, Applicative::class)
+@deriving(Functor::class, Applicative::class, Monad::class)
 data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A> {
 
     fun <B> map(f: (A) -> B): FlowableKW<B> =
@@ -16,14 +17,14 @@ data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A> {
     fun <B> ap(fa: FlowableKWKind<(A) -> B>): FlowableKW<B> =
             flatMap { a -> fa.ev().map { ff -> ff(a) } }
 
-    fun <B> flatMap(f: (A) -> FlowableKW<B>): FlowableKW<B> =
-            flowable.flatMap { f(it).flowable }.k()
+    fun <B> flatMap(f: (A) -> FlowableKWKind<B>): FlowableKW<B> =
+            flowable.flatMap { f(it).ev().flowable }.k()
 
-    fun <B> concatMap(f: (A) -> FlowableKW<B>): FlowableKW<B> =
-            flowable.concatMap { f(it).flowable }.k()
+    fun <B> concatMap(f: (A) -> FlowableKWKind<B>): FlowableKW<B> =
+            flowable.concatMap { f(it).ev().flowable }.k()
 
-    fun <B> switchMap(f: (A) -> FlowableKW<B>): FlowableKW<B> =
-            flowable.switchMap { f(it).flowable }.k()
+    fun <B> switchMap(f: (A) -> FlowableKWKind<B>): FlowableKW<B> =
+            flowable.switchMap { f(it).ev().flowable }.k()
 
     companion object {
         fun <A> pure(a: A): FlowableKW<A> =
@@ -44,6 +45,11 @@ data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A> {
 
                     }
                 }, mode).k()
+
+        fun <A, B> tailRecM(a: A, f: (A) -> FlowableKWKind<Either<A, B>>): FlowableKW<B> =
+                f(a).ev().flatMap {
+                    it.fold({ tailRecM(a, f).ev() }, { pure(it).ev() })
+                }
 
         fun monadFlat(): FlowableKWMonadInstance = FlowableKWMonadInstanceImplicits.instance()
 
@@ -109,5 +115,5 @@ data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A> {
     }
 }
 
-fun <A> FlowableKW<A>.handleErrorWith(function: (Throwable) -> FlowableKW<A>): FlowableKW<A> =
-        this.flowable.onErrorResumeNext { t: Throwable -> function(t).flowable }.k()
+fun <A> FlowableKWKind<A>.handleErrorWith(function: (Throwable) -> FlowableKW<A>): FlowableKW<A> =
+        this.ev().flowable.onErrorResumeNext { t: Throwable -> function(t).flowable }.k()
