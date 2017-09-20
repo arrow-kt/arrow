@@ -20,12 +20,12 @@ abstract class PSetter<S, T, A, B> {
     /**
      * Modify polymorphically the target of a [PSetter] with a function
      */
-    abstract fun modify(f: (A) -> B): (S) -> T
+    abstract fun modify(s: S, f: (A) -> B): T
 
     /**
      * Set polymorphically the target of a [PSetter] with a value
      */
-    abstract fun set(b: B): (S) -> T
+    abstract fun set(s: S, b: B): T
 
     companion object {
 
@@ -37,16 +37,16 @@ abstract class PSetter<S, T, A, B> {
          * Create a [PSetter] using modify function
          */
         operator fun <S, T, A, B> invoke(modify: ((A) -> B) -> (S) -> T): PSetter<S, T, A, B> = object : PSetter<S, T, A, B>() {
-            override fun modify(f: (A) -> B): (S) -> T = modify(f)
+            override fun modify(s: S, f: (A) -> B): T = modify(f)(s)
 
-            override fun set(b: B): (S) -> T = modify { b }
+            override fun set(s: S, b: B): T = modify(s) { b }
         }
 
         /**
          * Create a [PSetter] from a [kategory.Functor]
          */
         inline fun <reified F, A, B> fromFunctor(FF: Functor<F> = functor()): PSetter<HK<F, A>, HK<F, B>, A, B> = PSetter { f ->
-            { fs: HK<F,A> -> FF.map(fs, f) }
+            { fs: HK<F, A> -> FF.map(fs, f) }
         }
     }
 
@@ -54,14 +54,14 @@ abstract class PSetter<S, T, A, B> {
      * Join two [PSetter] with the same target
      */
     fun <U, V> choice(other: PSetter<U, V, A, B>): PSetter<Either<S, U>, Either<T, V>, A, B> = PSetter { f ->
-        { ac -> ac.bimap(modify(f), other.modify(f)) }
+        { ac -> ac.bimap({ s -> modify(s, f) }, { u -> other.modify(u, f) }) }
     }
 
     /**
      * Compose a [PSetter] with a [PSetter]
      */
     infix fun <C, D> compose(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = PSetter { fb ->
-        modify(other.modify(fb))
+        { s -> modify(s) { a -> other.modify(a, fb) } }
     }
 
     /**

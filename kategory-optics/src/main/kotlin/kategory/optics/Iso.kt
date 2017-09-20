@@ -68,21 +68,19 @@ abstract class PIso<S, T, A, B> {
     /**
      * Find if the target satisfies the predicate
      */
-    fun find(p: (A) -> Boolean): (S) -> Option<A> = { a ->
-        get(a).let { aa ->
-            if (p(aa)) aa.some() else none()
-        }
+    fun find(s: S, p: (A) -> Boolean): Option<A> = get(s).let { aa ->
+        if (p(aa)) aa.some() else none()
     }
 
     /**
      * Check if the target satisfies the predicate
      */
-    fun exist(p: (A) -> Boolean): (S) -> Boolean = p compose this::get
+    inline fun exist(s: S, crossinline p: (A) -> Boolean): Boolean = p(get(s))
 
     /**
      * Modify polymorphically the target of a [PIso] with a function
      */
-    inline fun modify(crossinline f: (A) -> B): (S) -> T = { reverseGet(f(get(it))) }
+    inline fun modify(s: S, crossinline f: (A) -> B): T = reverseGet(f(get(s)))
 
     /**
      * Modify polymorphically the target of a [PIso] with a Functor function
@@ -93,7 +91,7 @@ abstract class PIso<S, T, A, B> {
     /**
      * Set polymorphically the target of a [PIso] with a value
      */
-    fun set(b: B): (S) -> (T) = { reverseGet(b) }
+    fun set(b: B): T = reverseGet(b)
 
     /**
      * Pair two disjoint [PIso]
@@ -187,7 +185,7 @@ abstract class PIso<S, T, A, B> {
     /**
      * View a [PIso] as a [PLens]
      */
-    fun asLens(): PLens<S, T, A, B> = Lens(this::get, this::set)
+    fun asLens(): PLens<S, T, A, B> = PLens(this::get, { b -> { _ -> set(b) } })
 
     /**
      * View a [PIso] as a [Getter]
@@ -199,11 +197,11 @@ abstract class PIso<S, T, A, B> {
      */
     fun asOptional(): POptional<S, T, A, B> = POptional(
             { s -> get(s).right() },
-            this::set
+            { b -> { _ -> set(b) } }
     )
 
     /**
      * View a [PIso] as a [PSetter]
      */
-    fun asSetter(): PSetter<S, T, A, B> = PSetter(this::modify)
+    fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s, f) } }
 }

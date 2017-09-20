@@ -52,7 +52,7 @@ abstract class PLens<S, T, A, B> {
     /**
      * Modify the target of s [PLens] using s function `(A) -> B`
      */
-    inline fun modify(crossinline f: (A) -> B): (S) -> T = { s -> set(f(get(s)))(s) }
+    inline fun modify(s: S, crossinline f: (A) -> B): T = set(f(get(s)))(s)
 
     /**
      * Modify the target of a [PLens] using Functor function
@@ -63,16 +63,14 @@ abstract class PLens<S, T, A, B> {
     /**
      * Find if the target satisfies the predicate
      */
-    inline fun find(crossinline p: (A) -> Boolean): (S) -> Option<A> = { s ->
-        get(s).let { a ->
-            if (p(a)) a.some() else none()
-        }
+    inline fun find(s: S, crossinline p: (A) -> Boolean): Option<A> = get(s).let { a ->
+        if (p(a)) a.some() else none()
     }
 
     /**
      * Checks if the target of a [PLens] satisfies the predicate
      */
-    inline fun exist(crossinline p: (A) -> Boolean): (S) -> Boolean = { p(get(it)) }
+    inline fun exist(s: S, crossinline p: (A) -> Boolean): Boolean = p(get(s))
 
     /**
      * Join two [PLens] with the same target
@@ -171,6 +169,6 @@ abstract class PLens<S, T, A, B> {
     /**
      * View a [PLens] as a [PSetter]
      */
-    fun asSetter(): PSetter<S, T, A, B> = PSetter(this::modify)
+    fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s, f) } }
 
 }

@@ -14,19 +14,19 @@ object SetterLaws {
     )
 
     inline fun <reified A, reified B> setIdempotent(setter: Setter<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>): Unit = forAll(aGen, bGen, { a, b ->
-        setter.set(b)(setter.set(b)(a)).equalUnderTheLaw(setter.set(b)(a), EQA)
+        setter.set(setter.set(a, b), b).equalUnderTheLaw(setter.set(a, b), EQA)
     })
 
     inline fun <reified A, reified B> modifyIdentity(setter: Setter<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>): Unit = forAll(aGen, bGen, { a, b ->
-        setter.modify(::identity)(a).equalUnderTheLaw(a, EQA)
+        setter.modify(a, ::identity).equalUnderTheLaw(a, EQA)
     })
 
     inline fun <reified A, reified B> composeModify(setter: Setter<A, B>, aGen: Gen<A>, EQA: Eq<A>, funcGen: Gen<(B) -> B>): Unit = forAll(aGen, funcGen, funcGen, { a, f, g ->
-        setter.modify(g)(setter.modify(f)(a)).equalUnderTheLaw(setter.modify(g compose f)(a), EQA)
+        setter.modify(setter.modify(a, f), g).equalUnderTheLaw(setter.modify(a, g compose f), EQA)
     })
 
     inline fun <reified A, reified B> consistentSetModify(setter: Setter<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>): Unit = forAll(aGen, bGen, { a, b ->
-        setter.modify { b }(a).equalUnderTheLaw(setter.set(b)(a), EQA)
+        setter.modify(a) { b }.equalUnderTheLaw(setter.set(a, b), EQA)
     })
 
 }

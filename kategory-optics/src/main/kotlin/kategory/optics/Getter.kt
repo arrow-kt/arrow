@@ -35,16 +35,14 @@ abstract class Getter<A, B> {
     /**
      * Find if the target satisfies the predicate.
      */
-    inline fun find(crossinline p: (B) -> Boolean): (A) -> Option<B> = { a ->
-        get(a).let { b ->
+    inline fun find(a: A, crossinline p: (B) -> Boolean): Option<B> = get(a).let { b ->
             if (p(b)) b.some() else none()
         }
-    }
 
     /**
      * Check if the target satisfies the predicate
      */
-    fun exist(p: (B) -> Boolean): (A) -> Boolean = p compose this::get
+    inline fun exist(a: A, crossinline p: (B) -> Boolean): Boolean = p(get(a))
 
     /**
      * join two [Getter] with the same target

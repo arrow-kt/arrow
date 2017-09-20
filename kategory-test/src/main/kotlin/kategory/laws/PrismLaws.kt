@@ -29,17 +29,17 @@ object PrismLaws {
 
     inline fun <reified A, reified B> modifyIdentity(prism: Prism<A, B>, aGen: Gen<A>, EQA: Eq<A>): Unit =
             forAll(aGen, { a ->
-                prism.modify(::identity)(a).equalUnderTheLaw(a, EQA)
+                prism.modify(a, ::identity).equalUnderTheLaw(a, EQA)
             })
 
     inline fun <reified A, reified B> composeModify(prism: Prism<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>): Unit =
             forAll(aGen, funcGen, funcGen, { a, f, g ->
-                prism.modify(g)(prism.modify(f)(a)).equalUnderTheLaw(prism.modify(g compose f)(a), EQA)
+                prism.modify(prism.modify(a, f), g).equalUnderTheLaw(prism.modify(a, g compose f), EQA)
             })
 
     inline fun <reified A, reified B> consistentSetModify(prism: Prism<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>): Unit =
             forAll(aGen, bGen, { a, b ->
-                prism.set(b)(a).equalUnderTheLaw(prism.modify { b }(a), EQA)
+                prism.set(a, b).equalUnderTheLaw(prism.modify(a) { b }, EQA)
             })
 
     inline fun <reified A, reified B, reified F> consistentGetOptionModifyId(prism: Prism<A, B>, aGen: Gen<A>, FA: Applicative<F>, EQB: Eq<B>): Unit =
