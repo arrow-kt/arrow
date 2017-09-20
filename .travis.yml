@@ -16,18 +16,4 @@ script:
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
-
-deploy:
-  # deploy release
-  - provider: script
-    script: deploy-scripts/deploy_release.sh
-    on:
-      branch: master
-      tags: true
-      condition: "$TRAVIS_TAG =~ ^[0-9].[0-9].[0-9]$"
-  # deploy snapshot
-  - provider: script
-    script: deploy-scripts/deploy_snapshot.sh
-    on:
-      branch: master
-      tags: false
+  - ./deploy-scripts/deploy.sh
