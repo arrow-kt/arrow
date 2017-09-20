@@ -41,8 +41,8 @@
     }
 
     .masthead-inner {
-        @include grid-column(8, $base-grid);
-        @include grid-push(2);
+        @include grid-column(10, $base-grid);
+        @include grid-push(1);
         @include bp(large) {
              @include grid-column(12, $base-grid);
         }
@@ -60,8 +60,8 @@
 
         .masthead-title {
             margin-top: ($base-point-grid * 2);
-            font-size: 3.5rem;
-            font-weight: $font-semibold;
+            font-size: 3rem;
+            font-weight: $font-regular;
             line-height: 1.2;
             color: $white;
 
