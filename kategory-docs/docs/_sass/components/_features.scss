@@ -2,7 +2,7 @@
 // -----------------------------------------------
 // -----------------------------------------------
 .features {
-    padding: ($base-point-grid * 12) 0 ($base-point-grid * 6);
+    padding: ($base-point-grid * 12) 0 ($base-point-grid * 8);
     background: rgba($brand-tertiary, 0.10);
 
     .feature-item {
@@ -31,6 +31,10 @@
             text-transform: uppercase;
         }
 
+        p {
+            color: $base-font-color;
+        }
+
         &:nth-child(1) {
             .feature-title {
                 color: $feature-typeclasses;
@@ -49,6 +53,18 @@
         &:nth-child(4) {
             .feature-title {
                 color: $feature-integrations;
+            }
+        }
+
+        img {
+            transition: all $base-duration $base-timing;
+        }
+
+        &:hover {
+            text-decoration: none;
+
+            img {
+                transform: scale(1.2,1.2);
             }
         }
     }
