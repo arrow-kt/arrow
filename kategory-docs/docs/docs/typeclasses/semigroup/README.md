@@ -32,8 +32,7 @@ import kategory.*
 ```
 
 ```kotlin:ank
-val intSemigroup: Semigroup<Int> = NumberSemigroup(Int::plus)
-intSemigroup.combine(1, 2)
+semigroup<Int>().combine(1, 2)
 ```
 
 ```kotlin:ank
@@ -41,11 +40,11 @@ ListKW.semigroup<Int>().combine(listOf(1, 2, 3).k(), listOf(4, 5, 6).k())
 ```
 
 ```kotlin:ank
-Option.monoid(intSemigroup).combine(Option(1), Option(2))
+Option.monoid<Int>().combine(Option(1), Option(2))
 ```
 
 ```kotlin:ank
-Option.monoid(intSemigroup).combine(Option(1), Option.None)
+Option.monoid<Int>().combine(Option(1), Option.None)
 ```
 
 Many of these types have methods defined directly on them, which allow for such combining, e.g. `+` on `List`, but the value of having a `Semigroup` typeclass available is that these compose.
@@ -53,15 +52,15 @@ Many of these types have methods defined directly on them, which allow for such 
 There is also extension syntax available for Semigroup.
 
 ```kotlin:ank
-listOf(Option(1), Option(2)).combineAll(Option.monoid(intSemigroup))
+listOf(Option(1), Option(2)).combineAll(Option.semigroup<Int>())
 ```
 
 ```kotlin:ank
-listOf(1, 2, 3).combineAll(intSemigroup)
+listOf(1, 2, 3).combineAll()
 ```
 
 ```kotlin:ank
-listOf("K", "Λ", "T", "E", "G", "O", "R", "Y").combineAll(StringMonoid)
+listOf("K", "Λ", "T", "E", "G", "O", "R", "Y").combineAll()
 ```
 
 Contents partially adapted from [Scala Exercises Cat's Semigroup Tutorial](https://www.scala-exercises.org/cats/semigroup)

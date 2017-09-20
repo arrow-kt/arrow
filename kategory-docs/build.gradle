@@ -1,10 +1,7 @@
 apply plugin: 'ank-gradle-plugin'
 
 dependencies {
-//    compile ("io.kategory:ank-core:0.1.6") {
-//     //   exclude group: "io.kategory", module: "kategory"
-//    }
-    //compile project(':kategory')
+    compile project(':ank-core')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
     compile "io.kotlintest:kotlintest:$kotlinTestVersion"
@@ -18,6 +15,7 @@ ank {
     source = file("${projectDir}/docs")
     target = file("${projectDir}/build/site")
     classpath = sourceSets.main.runtimeClasspath
+    includeAnkCore = false
 }
 
 sourceCompatibility = javaVersion

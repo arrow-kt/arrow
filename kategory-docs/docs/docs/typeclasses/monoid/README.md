@@ -23,11 +23,12 @@ import kategory.*
 And let's see the instance of Monoid<String> in action.
 
 ```kotlin:ank
+val StringMonoid = monoid<String>()
 StringMonoid.empty()
 ```
 
 ```kotlin:ank
-listOf("K", "Λ", "T", "E", "G", "O", "R", "Y").combineAll(StringMonoid)
+listOf("K", "Λ", "T", "E", "G", "O", "R", "Y").combineAll()
 ```
 
 The advantage of using these type class provided methods, rather than the specific ones for each type, is that we can compose monoids to allow us to operate on more complex types, e.g.
@@ -36,7 +37,7 @@ This is also true if we define our own instances. As an example, let's use `Fold
 
 ```kotlin:ank
 ListKW.foldable().foldMap(
-  IntMonoid,
+  monoid<Int>(),
   listOf(1, 2, 3, 4, 5).k(),
   ::identity
 )
@@ -44,7 +45,7 @@ ListKW.foldable().foldMap(
 
 ```kotlin:ank
 ListKW.foldable().foldMap(
-  StringMonoid,
+  monoid<String>(),
   listOf(1, 2, 3, 4, 5).k(),
   { it.toString() }
 )
