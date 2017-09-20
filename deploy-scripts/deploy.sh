@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+echo "Branch '$TRAVIS_BRANCH'"
+
 if [ "$TRAVIS_BRANCH" == "master" ]; then
     if [ -n "$TRAVIS_TAG" ]; then
         . $(dirname $0)/deploy_release.sh
