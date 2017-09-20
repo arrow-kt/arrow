@@ -137,6 +137,7 @@ $(window).on("load", function() {
         easing: 'easeInSine'
       });
 
+      // Particleground instantiation
       try {
           var pg = particleground(document.getElementById('masthead-background'), {
           dotColor: '#fff',
@@ -147,17 +148,27 @@ $(window).on("load", function() {
           proximity: 90,
           particleRadius: 5
         });
-      } catch(e) {}
+      } catch(e) {
+        console.error('Particleground failure');
+        console.error(e);
+      }
 
-      // $("#masthead, #navigation").on("mousemove",function(e) {
+      // Detecting scroll to add specific class to navbar, creating that
+      // smooth transition on the opacity effect
+      $(window).scroll(function() {
+          if ($("#navigation").offset().top > 70) {
+              $("#navigation").addClass("navigation-scroll");
+          }
+          else {
+              $("#navigation").removeClass("navigation-scroll");
+          }
+      });
+
+      // This one follows mouse position and add that 3d effect to the tagline
       $(window).on("mousemove",function(e) {
         var ax = -($(window).innerWidth()/2- e.pageX)/120;
         var ay = ($(window).innerHeight()/2- e.pageY)/50;
         $(".masthead-inner").attr("style", "transform: rotateY("+ax+"deg) rotateX("+ay+"deg)");
-      });
-
-      $("#masthead").on("mouseleave",function(e) {
-        $(".masthead-inner").attr("style", "transform: rotateY(0deg) rotateX(0deg); transition: all .5s ease;");
       });
 
 });
