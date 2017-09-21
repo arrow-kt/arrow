@@ -43,10 +43,18 @@ internal val tokenIso: Iso<Token, String> = Iso(
         ::Token
 )
 
+internal val tokenSetter: Setter<Token, String> = Setter { s ->
+    { token -> token.copy(value = s(token.value)) }
+}
+
 internal val userIso: Iso<User, Token> = Iso(
         { user: User -> user.token },
         ::User
 )
+
+internal val userSetter: Setter<User, Token> = Setter { s ->
+    { user -> user.copy(token = s(user.token)) }
+}
 
 internal data class Token(val value: String)
 internal object TokenGen : Gen<Token> {
