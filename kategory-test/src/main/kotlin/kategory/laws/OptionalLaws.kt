@@ -52,16 +52,16 @@ object OptionalLaws {
 
     inline fun <reified A, reified B> consistentModifyModifyId(optional: Optional<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>): Unit =
             forAll(aGen, funcGen, { a, f ->
-                optional.modify(a, f).equalUnderTheLaw(optional.modifyF(Id.applicative(), { Id.pure(f(it)) }, a).value(), EQA)
+                optional.modify(a, f).equalUnderTheLaw(optional.modifyF(Id.applicative(), a, { Id.pure(f(it)) }).value(), EQA)
             })
 
     inline fun <reified A, reified B> consistentGetOptionModifyId(optional: Optional<A, B>, aGen: Gen<A>, EQB: Eq<B>): Unit =
             forAll(aGen, { a ->
                 val getOption = optional.getOption(a)
 
-                val modifyFId = optional.modifyF(Const.applicative(firstOptionMonoid<B>()), { b ->
+                val modifyFId = optional.modifyF(Const.applicative(firstOptionMonoid<B>()), a, { b ->
                     Const(FirstOption(b.some()))
-                }, a).value().option
+                }).value().option
 
                 getOption.exists { b ->
                     modifyFId.exists {

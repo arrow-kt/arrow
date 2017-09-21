@@ -12,18 +12,27 @@ import kategory.right
 import kategory.some
 import kategory.toT
 
+/**
+ * [Lens] is a type alias for [PLens] which fixes the type arguments
+ * and restricts the [PLens] to monomorphic updates.
+ */
 typealias Lens<S, A> = PLens<S, S, A, A>
 
 /**
- * A [PLens] can be seen as a pair of functions `get: (A) -> B` and `set: (B) -> (A) -> A`
- * - `get: (A) -> B` i.e. from an `A`, we can extract an `B`
- * - `set: (B) -> (A) -> A` i.e. if we replace target value by `B` in an `A`, we obtain another modified `A`
+ * A [Lens] (or Functional Reference) is an optic that allows to see into a structure and
+ * getting, setting or modifying the target.
  *
- * @param A the source of a [PLens]
- * @param B the target of a [PLens]
- * @property get from an `A` we can extract a `B`
- * @property set replace the target value by `B` in an `A` so we obtain another modified `A`
- * @constructor Creates a Lens of type `A` with target `B`.
+ * A (polymorphic) [PLens] is useful when setting or modifying a value for a constructed type
+ * i.e. PLens<Tuple2<Double, Int>, Tuple2<String, Int>, Double, String>
+ *
+ * A [PLens] can be seen as a pair of functions:
+ * - `get: (S) -> A` meaning we can look into an `S` and extract an `A`
+ * - `set: (B) -> (S) -> T` meaning we can look into an `S` and set a value `B` for a target `A` and obtain a modified source `T`
+ *
+ * @param S the source of a [PLens]
+ * @param T the modified source of a [PLens]
+ * @param A the target of a [PLens]
+ * @param B the modified target of a [PLens]
  */
 abstract class PLens<S, T, A, B> {
 
@@ -32,16 +41,20 @@ abstract class PLens<S, T, A, B> {
 
     companion object {
 
-        fun <A> id() = Iso.id<A>().asLens()
+        fun <S> id() = Iso.id<S>().asLens()
 
         /**
-         * [PLens] that takes either A or A and strips the choice of A.
+         * [PLens] that takes either [S] or [S] and strips the choice of [S].
          */
-        fun <A> codiagonal(): Lens<Either<A, A>, A> = Lens(
+        fun <S> codiagonal(): Lens<Either<S, S>, S> = Lens(
                 get = { it.fold(::identity, ::identity) },
                 set = { a -> { it.bimap({ a }, { a }) } }
         )
 
+        /**
+         * Invoke operator overload to create a [PLens] of type `S` with target `A`.
+         * Can also be used to construct [Lens]
+         */
         operator fun <S, T, A, B> invoke(get: (S) -> A, set: (B) -> (S) -> T) = object : PLens<S, T, A, B>() {
             override fun get(s: S): A = get(s)
 
@@ -57,7 +70,7 @@ abstract class PLens<S, T, A, B> {
     /**
      * Modify the target of a [PLens] using Functor function
      */
-    inline fun <reified F> modifyF(FF: Functor<F> = functor(), f: (A) -> HK<F, B>, s: S): HK<F, T> =
+    inline fun <reified F> modifyF(FF: Functor<F> = functor(), s: S, f: (A) -> HK<F, B>): HK<F, T> =
             FF.map(f(get(s)), { set(it)(s) })
 
     /**
@@ -73,7 +86,7 @@ abstract class PLens<S, T, A, B> {
     inline fun exist(s: S, crossinline p: (A) -> Boolean): Boolean = p(get(s))
 
     /**
-     * Join two [PLens] with the same target
+     * Join two [PLens] with the same target [A]
      */
     fun <S1, T1> choice(other: PLens<S1, T1, A, B>): PLens<Either<S, S1>, Either<T, T1>, A, B> = PLens(
             { ss -> ss.fold(this::get, other::get) },
@@ -90,7 +103,7 @@ abstract class PLens<S, T, A, B> {
             )
 
     /**
-     * Create a product of the target and a type C
+     * Create a product of the [PLens] and a type [C]
      */
     fun <C> first(): PLens<Tuple2<S, C>, Tuple2<T, C>, Tuple2<A, C>, Tuple2<B, C>> = PLens(
             { (s, c) -> get(s) toT c },
@@ -98,7 +111,7 @@ abstract class PLens<S, T, A, B> {
     )
 
     /**
-     * Create a product of a type C and the target
+     * Create a product of a type [C] and the [PLens]
      */
     fun <C> second(): PLens<Tuple2<C, S>, Tuple2<C, T>, Tuple2<C, A>, Tuple2<C, B>> = PLens(
             { (c, s) -> c toT get(s) },
