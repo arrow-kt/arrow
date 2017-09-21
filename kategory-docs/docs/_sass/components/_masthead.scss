@@ -41,8 +41,8 @@
     }
 
     .masthead-inner {
-        @include grid-column(10, $base-grid);
-        @include grid-push(1);
+        @include grid-column(8, $base-grid);
+        @include grid-push(2);
         @include bp(large) {
              @include grid-column(12, $base-grid);
         }

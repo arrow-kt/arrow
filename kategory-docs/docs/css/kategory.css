@@ -301,10 +301,10 @@ input {
       background-repeat: repeat-x, repeat-x;
       background-position: bottom center; }
   #masthead .masthead-inner {
-    width: calc(83.3333333333% - 58.6666666667px);
+    width: calc(66.6666666667% - 53.3333333333px);
     float: left;
     margin-left: 32px;
-    margin-left: calc(8.3333333333% - 21.6666666667px + 40px);
+    margin-left: calc(16.6666666667% - 23.3333333333px + 40px);
     perspective: 1000px;
     transform-style: preserve-3d;
     transform: rotateX(0deg) rotateY(0deg); }
@@ -369,9 +369,9 @@ input {
 
 .browser {
   background: #fff;
-  -webkit-box-shadow: rgba(25, 62, 136, 0.15) 0 0 20px;
-  -moz-box-shadow: rgba(25, 62, 136, 0.15) 0 0 20px;
-  box-shadow: rgba(25, 62, 136, 0.15) 0 0 20px; }
+  -webkit-box-shadow: rgba(25, 62, 136, 0.1) 0 0 20px;
+  -moz-box-shadow: rgba(25, 62, 136, 0.1) 0 0 20px;
+  box-shadow: rgba(25, 62, 136, 0.1) 0 0 20px; }
   .browser ul.action {
     height: 34px;
     display: -webkit-box;
@@ -633,11 +633,23 @@ input {
   .doc-content .browser {
     margin-top: 24px; }
 
+p code {
+  background: #fff;
+  font-family: "monoidregular", monospace;
+  padding: 0 8px;
+  font-size: 0.8125rem;
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px; }
+
 .hljs {
   padding: 24px;
   background: #fff;
   font-family: "monoidregular", monospace;
-  font-size: 0.8125rem; }
+  font-size: 0.8125rem;
+  box-shadow: rgba(25, 62, 136, 0.1) 0 0 20px; }
 
 .features {
   padding: 96px 0 64px;
