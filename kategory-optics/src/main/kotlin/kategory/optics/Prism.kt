@@ -188,6 +188,16 @@ abstract class PPrism<S, T, A, B> {
      */
     fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s, f) } }
 
+    /**
+     * View a [PPrism] as a [PTraversal]
+     */
+    fun asTraversal(): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B>() {
+        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> = getOrModify(s).fold(
+                FA::pure,
+                { FA.map(f(it), this@PPrism::reverseGet) }
+        )
+    }
+
 }
 
 /**

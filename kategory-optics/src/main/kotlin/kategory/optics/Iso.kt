@@ -1,5 +1,6 @@
 package kategory.optics
 
+import kategory.Applicative
 import kategory.Either
 import kategory.Functor
 import kategory.HK
@@ -218,4 +219,13 @@ abstract class PIso<S, T, A, B> {
      * View a [PIso] as a [PSetter]
      */
     fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s, f) } }
+
+    /**
+     * View a [PIso] as a [PTraversal]
+     */
+    fun asTraversal(): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B>() {
+        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
+                FA.map(f(get(s)), this@PIso::reverseGet)
+    }
+
 }
