@@ -24,7 +24,7 @@ class PrismsFileGenerator(
                 val targetClassName = target.fullName.escapedClassName
                 val targetName = target.paramName
 
-                """fun $sourceName$targetName() = $prism(
+                """fun $sourceName$targetName(): $prism<$sourceClassName, $targetClassName> = $prism(
                    |        getOrModify = { $sourceName: $sourceClassName ->
                    |            when ($sourceName) {
                    |                is $targetClassName -> $sourceName.right()

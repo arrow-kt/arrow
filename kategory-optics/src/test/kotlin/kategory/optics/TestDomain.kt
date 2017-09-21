@@ -1,11 +1,9 @@
 package kategory.optics
 
 import io.kotlintest.properties.Gen
-import kategory.Option
 import kategory.identity
 import kategory.left
 import kategory.right
-import kategory.some
 
 sealed class SumType {
     data class A(val string: String) : SumType()
@@ -20,7 +18,7 @@ object SumGen : Gen<SumType> {
     override fun generate(): SumType = Gen.oneOf(AGen, Gen.create { SumType.B(Gen.int().generate()) }).generate()
 }
 
-val sumPrism = Prism<SumType, String>(
+val sumPrism: Prism<SumType, String> = Prism(
         {
             when (it) {
                 is SumType.A -> it.string.right()
@@ -30,7 +28,7 @@ val sumPrism = Prism<SumType, String>(
         SumType::A
 )
 
-val stringPrism = Prism<String, List<Char>>(
+val stringPrism: Prism<String, List<Char>> = Prism(
         { it.toList().right() },
         { it.joinToString(separator = "") }
 )
@@ -45,10 +43,18 @@ internal val tokenIso: Iso<Token, String> = Iso(
         ::Token
 )
 
+internal val tokenSetter: Setter<Token, String> = Setter { s ->
+    { token -> token.copy(value = s(token.value)) }
+}
+
 internal val userIso: Iso<User, Token> = Iso(
         { user: User -> user.token },
         ::User
 )
+
+internal val userSetter: Setter<User, Token> = Setter { s ->
+    { user -> user.copy(token = s(user.token)) }
+}
 
 internal data class Token(val value: String)
 internal object TokenGen : Gen<Token> {
@@ -65,12 +71,12 @@ internal val userLens: Lens<User, Token> = Lens(
         { token: Token -> { user: User -> user.copy(token = token) } }
 )
 
-internal val optionalHead = Optional<List<Int>, Int>(
-        { Option.fromNullable(it.firstOrNull()) },
+internal val optionalHead: Optional<List<Int>, Int> = Optional(
+        { it.firstOrNull()?.right() ?: it.left() },
         { int -> { list -> listOf(int) + if (list.size > 1) list.drop(1) else emptyList() } }
 )
 
-internal val defaultHead = Optional<Int, Int>(
-        { it.some() },
+internal val defaultHead: Optional<Int, Int> = Optional(
+        { it.right() },
         { ::identity }
 )

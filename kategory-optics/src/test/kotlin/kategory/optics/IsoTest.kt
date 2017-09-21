@@ -87,13 +87,13 @@ class IsoTest : UnitSpec() {
 
         "Finding a target using a predicate within a Iso should be wrapped in the correct option result" {
             forAll({ predicate: Boolean ->
-                tokenIso.find { predicate }(Token("any value")).fold({ false }, { true }) == predicate
+                tokenIso.find(Token("any value")) { predicate }.fold({ false }, { true }) == predicate
             })
         }
 
         "Checking existence predicate over the target should result in same result as predicate" {
             forAll({ predicate: Boolean ->
-                tokenIso.exist { predicate }(Token("any value")) == predicate
+                tokenIso.exist(Token("any value")) { predicate } == predicate
             })
         }
 
@@ -108,7 +108,7 @@ class IsoTest : UnitSpec() {
         }
 
         "Composing isos should result in an iso of the first iso's value with the second iso's target" {
-            val composedIso = userIso composeIso tokenIso
+            val composedIso = userIso compose tokenIso
 
             forAll({ tokenValue: String ->
                 val token = Token(tokenValue)
