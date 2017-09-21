@@ -1,4 +1,4 @@
-package kategory.effects.data.internal
+package kategory.effects.internal
 
 /**
  * [AndThen] is a wrapper for chained functions capable of failing.

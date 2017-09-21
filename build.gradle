@@ -82,20 +82,6 @@ subprojects { project ->
         executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
     }
 
-    apply plugin: 'com.jfrog.bintray'
-    bintray {
-        user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
-        key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
-        configurations = ['archives']
-        pkg {
-            repo = 'maven'
-            name = POM_ARTIFACT_ID
-            userOrg = POM_DEVELOPER_ID
-            licenses = ['Apache-2.0']
-            vcsUrl = 'https://github.com/kategory/kategory.git'
-        }
-    }
-
     compileKotlin.kotlinOptions.freeCompilerArgs += ["-Xskip-runtime-version-check"]
 
     test {

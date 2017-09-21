@@ -2,6 +2,7 @@ package kategory.debug
 
 import kotlin.reflect.KClass
 import kategory.*
+import kategory.effects.*
 
 
 inline fun <reified F, reified E> debugInstanceLookups(): Map<KClass<out Typeclass>, () -> Typeclass> = mapOf(
@@ -28,7 +29,8 @@ inline fun <reified F, reified E> debugInstanceLookups(): Map<KClass<out Typecla
         Semigroup::class to { semigroup<F>() },
         SemigroupK::class to { semigroupK<F>() },
         Traverse::class to { traverse<F>() },
-        TraverseFilter::class to { traverse<F>() }
+        TraverseFilter::class to { traverse<F>() },
+        AsyncContext::class to { asyncContext<F>() }
 )
 
 inline fun <reified F, reified E> showInstances(

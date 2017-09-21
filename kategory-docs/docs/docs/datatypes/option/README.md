@@ -64,18 +64,20 @@ Option can also be used with when statements:
 
 ```kotlin:ank
 val someValue: Option<Double> = Some(20.0)
-when(someValue) {
+val value = when(someValue) {
    is Some -> someValue.value
    is None -> 0.0
 }
+value
 ```
 
 ```kotlin:ank
 val noValue: Option<Double> = None
-when(noValue) {
+val value = when(noValue) {
    is Some -> noValue.value
    is None -> 0.0
 }
+value
 ```
 
 An alternative for pattern matching is performing Functor/Foldable style operations. This is possible because an option could be looked at as a collection or foldable structure with either one or zero elements.
@@ -140,24 +142,26 @@ Option.applicative().tupled(Option(1), Option("Hello"), Option(20.0))
 Computing over dependent values ignoring absence
 
 ```kotlin
-val r1 = Option.monad().binding {
+Option.monad().binding {
    val a = Option(1).bind()
    val b = Option(1 + x).bind()
    val c = Option(1 + y).bind()
    yields(a + b + c)
 }
+//Some(value=6)
 ```
 
 ```kotlin
-val r2 = Option.monad().binding {
+Option.monad().binding {
    val x = none<Int>().bind()
    val y = Option(1 + x).bind()
    val z = Option(1 + y).bind()
    yields(x + y + z)
 }
+//None
 ```
 
-Instances:
+Available Instances:
 
 ```kotlin:ank
 import kategory.debug.*

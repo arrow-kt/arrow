@@ -132,8 +132,10 @@ fun compileCodeImpl(origin: File, snippets: ListKW<Snippet>, classpath: ListKW<S
                 seManager.getEngineByExtension(extensionMappings.getOrDefault(snippet.lang, "kts"))!!
             }
             cachedEngines.putIfAbsent(snippet.lang, resolvedEngine)
-            //println(":runAnk -> Eval: \n---\n${snippet.code}\n---\n")
-            resolvedEngine.eval(snippet.code)
+            println(":runAnk -> Eval: \n---\n${snippet.code}\n---\n")
+            val retVal = resolvedEngine.eval(snippet.code)
+            println(":runAnk -> result: \n---\n${retVal}\n---\n")
+            retVal
         }.fold({
             throw CompilationException(cachedEngines.get(snippet.lang), snippet, it)
         }, { it })

@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <SmellBaseline>
   <Blacklist timestamp="1503308049178"></Blacklist>
-  <Whitelist timestamp="1505334184631">
+  <Whitelist timestamp="1505778251263">
     <ID>LabeledExpression:FunctionK.kt$&lt;no name provided&gt;$this@or</ID>
     <ID>LabeledExpression:PartialFunction.kt$&lt;no name provided&gt;$this@orElse</ID>
     <ID>LabeledExpression:PartialFunction.kt$&lt;no name provided&gt;$this@orElse</ID>
@@ -19,6 +19,7 @@
     <ID>LabeledExpression:Composed.kt$&lt;no name provided&gt;$this@compose</ID>
     <ID>LabeledExpression:Composed.kt$&lt;no name provided&gt;$this@compose</ID>
     <ID>LabeledExpression:Composed.kt$&lt;no name provided&gt;$this@compose</ID>
+    <ID>LabeledExpression:Composed.kt$&lt;no name provided&gt;$this@compose</ID>
     <ID>LabeledExpression:ContinuationUtils.kt$this@label</ID>
     <ID>LabeledExpression:ContinuationUtils.kt$this@completion</ID>
     <ID>LabeledExpression:MonoidK.kt$MonoidK.&lt;no name provided&gt;$this@MonoidK</ID>
@@ -26,7 +27,7 @@
     <ID>ComplexMethod:AndThen.kt$AndThen$ @Suppress("UNCHECKED_CAST") internal fun runLoop(_success: A?, _failure: Throwable?, _isSuccess: Boolean): B</ID>
     <ID>EmptyClassBlock:Typeclass.kt$&lt;no name provided&gt; : TypeLiteral</ID>
     <ID>LateinitUsage:Comonad.kt$ComonadContinuation$internal lateinit var returnedMonad: A</ID>
-    <ID>LateinitUsage:Monad.kt$MonadContinuation$protected lateinit var returnedMonad: HK&lt;F, A&gt;</ID>
-    <ID>LateinitUsage:Monad.kt$StackSafeMonadContinuation$protected lateinit var returnedMonad: Free&lt;F, A&gt;</ID>
+    <ID>LateinitUsage:MonadContinuations.kt$MonadContinuation$protected lateinit var returnedMonad: HK&lt;F, A&gt;</ID>
+    <ID>LateinitUsage:MonadContinuations.kt$StackSafeMonadContinuation$protected lateinit var returnedMonad: Free&lt;F, A&gt;</ID>
   </Whitelist>
 </SmellBaseline>
