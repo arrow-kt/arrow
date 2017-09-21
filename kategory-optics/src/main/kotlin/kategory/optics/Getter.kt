@@ -1,6 +1,7 @@
 package kategory.optics
 
 import kategory.Either
+import kategory.Monoid
 import kategory.Option
 import kategory.Tuple2
 import kategory.compose
@@ -36,8 +37,8 @@ abstract class Getter<A, B> {
      * Find if the target satisfies the predicate.
      */
     inline fun find(a: A, crossinline p: (B) -> Boolean): Option<B> = get(a).let { b ->
-            if (p(b)) b.some() else none()
-        }
+        if (p(b)) b.some() else none()
+    }
 
     /**
      * Check if the target satisfies the predicate
@@ -100,6 +101,10 @@ abstract class Getter<A, B> {
 
     operator fun <C> plus(other: Lens<B,C>): Getter<A, C> = composeLens(other)
 
-    operator fun <C> plus(other: Iso<B,C>): Getter<A, C> = composeIso(other)
+    operator fun <C> plus(other: Iso<B, C>): Getter<A, C> = composeIso(other)
+
+    fun asFold(): Fold<A, B> = object : Fold<A, B>() {
+        override fun <R> foldMap(M: Monoid<R>, s: A, f: (B) -> R): R = f(get(s))
+    }
 
 }
