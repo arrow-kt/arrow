@@ -50,9 +50,9 @@ abstract class PLens<S, T, A, B> {
     }
 
     /**
-     * Modify the target of a [PLens] using a function `(A) -> B`
+     * Modify the target of s [PLens] using s function `(A) -> B`
      */
-    inline fun modify(f: (A) -> B, a: S): T = set(f(get(a)))(a)
+    inline fun modify(s: S, crossinline f: (A) -> B): T = set(f(get(s)))(s)
 
     /**
      * Modify the target of a [PLens] using Functor function
@@ -63,16 +63,14 @@ abstract class PLens<S, T, A, B> {
     /**
      * Find if the target satisfies the predicate
      */
-    inline fun find(crossinline p: (A) -> Boolean): (S) -> Option<A> = { s ->
-        get(s).let { a ->
-            if (p(a)) a.some() else none()
-        }
+    inline fun find(s: S, crossinline p: (A) -> Boolean): Option<A> = get(s).let { a ->
+        if (p(a)) a.some() else none()
     }
 
     /**
      * Checks if the target of a [PLens] satisfies the predicate
      */
-    inline fun exist(crossinline p: (A) -> Boolean): (S) -> Boolean = { p(get(it)) }
+    inline fun exist(s: S, crossinline p: (A) -> Boolean): Boolean = p(get(s))
 
     /**
      * Join two [PLens] with the same target
@@ -110,43 +108,67 @@ abstract class PLens<S, T, A, B> {
     /**
      * Compose a [PLens] with another [PLens]
      */
-    infix fun <C, D> composeLens(l: PLens<A, B, C, D>): PLens<S, T, C, D> = Lens(
+    infix fun <C, D> compose(l: PLens<A, B, C, D>): PLens<S, T, C, D> = Lens(
             { a -> l.get(get(a)) },
             { c -> { a -> set(l.set(c)(get(a)))(a) } }
     )
 
-    /** compose a [PLens] with a [POptional] */
-    infix fun <C, D> composeOptional(other: POptional<A, B, C, D>): POptional<S, T, C, D> =
-            asOptional() composeOptional other
+    /**
+     * Compose a [PLens] with a [POptional]
+     */
+    infix fun <C, D> compose(other: POptional<A, B, C, D>): POptional<S, T, C, D> = asOptional() compose other
 
-    /** compose an [PIso] as an [PPrism] */
-    infix fun <C, D> composeIso(other: PIso<A, B, C, D>): PLens<S, T, C, D> = composeLens(other.asLens())
+    /**
+     * Compose an [PLens] with a [PIso]
+     */
+    infix fun <C, D> compose(other: PIso<A, B, C, D>): PLens<S, T, C, D> = compose(other.asLens())
 
-    infix fun <C> composeGetter(other: Getter<A, C>): Getter<S, C> =
-            asGetter() composeGetter other
+    /**
+     * Compose an [PLens] with a [Getter]
+     */
+    infix fun <C> compose(other: Getter<A, C>): Getter<S, C> = asGetter() composeGetter other
+
+    /**
+     * Compose an [PLens] with a [PSetter]
+     */
+    infix fun <C, D> compose(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = asSetter() compose other
+
+    /**
+     * Compose an [PLens] with a [PPrism]
+     */
+    infix fun <C, D> compose(other: PPrism<A, B, C, D>): POptional<S, T, C, D> = asOptional() compose other
 
     /**
      * plus operator overload to compose lenses
      */
-    operator fun <C, D> plus(other: PLens<A, B, C, D>): PLens<S, T, C, D> = composeLens(other)
+    operator fun <C, D> plus(other: PLens<A, B, C, D>): PLens<S, T, C, D> = compose(other)
 
-    operator fun <C, D> plus(other: POptional<A, B, C, D>): POptional<S, T, C, D> = composeOptional(other)
+    operator fun <C, D> plus(other: POptional<A, B, C, D>): POptional<S, T, C, D> = compose(other)
 
-    operator fun <C, D> plus(other: PIso<A, B, C, D>): PLens<S, T, C, D> = composeIso(other)
+    operator fun <C, D> plus(other: PIso<A, B, C, D>): PLens<S, T, C, D> = compose(other)
 
-    operator fun <C> plus(other: Getter<A,C>): Getter<S, C> = composeGetter(other)
+    operator fun <C> plus(other: Getter<A, C>): Getter<S, C> = compose(other)
+
+    operator fun <C, D> plus(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = compose(other)
+
+    operator fun <C, D> plus(other: PPrism<A, B, C, D>): POptional<S, T, C, D> = compose(other)
 
     /**
-     * View [PLens] as [Getter]
+     * View [PLens] as a [Getter]
      */
     fun asGetter(): Getter<S, A> = Getter(this::get)
 
     /**
-     * View a [PLens] as an [POptional]
+     * View a [PLens] as a [POptional]
      */
     fun asOptional(): POptional<S, T, A, B> = POptional(
             { s -> get(s).right() },
             this::set
     )
+
+    /**
+     * View a [PLens] as a [PSetter]
+     */
+    fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s, f) } }
 
 }
