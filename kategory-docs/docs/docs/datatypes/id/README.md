@@ -24,4 +24,10 @@ val id: Id<Int> = Id.pure(3)
 id.map{it + 3}
 ```
 
+Available Instances:
 
+```kotlin:ank
+import kategory.debug.*
+
+showInstances<IdHK, Unit>()
+```

@@ -198,3 +198,6 @@ fun <A, B : A> OptionKind<B>.orElse(alternative: () -> Option<B>): Option<B> = i
 fun <A> A.some(): Option<A> = Option.Some(this)
 
 fun <A> none(): Option<A> = Option.None
+
+fun <A, L> Option<A>.toEither(ifEmpty: () -> L): Either<L, A> =
+        this.fold({ ifEmpty().left() }, {it.right()})

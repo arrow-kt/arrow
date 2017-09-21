@@ -206,6 +206,8 @@ import kategory.debug.*
 
 showInstances<OptionTKindPartial<ObservableKWHK>, Unit>()
 ```
+
+Take a look at the [`EitherT` docs](/docs/datatypes/eithert) for an alternative version of this content with the `EitherT` monad transformer
  
 ## Credits
  

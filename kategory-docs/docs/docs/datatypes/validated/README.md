@@ -209,3 +209,11 @@ val houseNumber = config.parse(Read.intRead, "house_number").withEither { either
 
 houseNumber
 ```
+
+## Available Instances
+
+```kotlin:ank
+import kategory.debug.*
+
+showInstances<ValidatedKindPartial<String>, Unit>()
+```
