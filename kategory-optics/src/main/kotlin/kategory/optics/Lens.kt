@@ -3,6 +3,7 @@ package kategory.optics
 import kategory.Either
 import kategory.Functor
 import kategory.HK
+import kategory.Monoid
 import kategory.Option
 import kategory.Tuple2
 import kategory.functor
@@ -170,5 +171,12 @@ abstract class PLens<S, T, A, B> {
      * View a [PLens] as a [PSetter]
      */
     fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s, f) } }
+
+    /**
+     * View a [PLens] as a [Fold]
+     */
+    fun asFold(): Fold<S, A> = object : Fold<S, A>() {
+        override fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R = f(get(s))
+    }
 
 }
