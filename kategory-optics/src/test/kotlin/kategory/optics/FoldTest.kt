@@ -44,7 +44,7 @@ class FoldTest : UnitSpec() {
 
         "getting forall values" {
             forAll(Gen.list(Gen.int()), { ints ->
-                intFold.getAll<ListKWKind<Int>, Int>(object : ListKWMonoidInstance<Int> {}, ints.k()) == ints.k()
+                intFold.getAll(a = ints.k()) == ints.k()
             })
         }
 
