@@ -73,24 +73,22 @@ abstract class PPrism<S, T, A, B> {
     /**
      * Modify the target of a [PPrism] with a function
      */
-    inline fun modify(crossinline f: (A) -> B): (S) -> T = { s ->
-        getOrModify(s).fold(::identity, { a -> reverseGet(f(a)) })
-    }
+    inline fun modify(s: S, crossinline f: (A) -> B): T = getOrModify(s).fold(::identity, { a -> reverseGet(f(a)) })
 
     /**
      * Modify the target of a [PPrism] with a function
      */
-    inline fun modifyOption(crossinline f: (A) -> B): (S) -> Option<T> = { getOption(it).map { b -> reverseGet(f(b)) } }
+    inline fun modifyOption(s: S, crossinline f: (A) -> B): Option<T> = getOption(s).map { b -> reverseGet(f(b)) }
 
     /**
      * Set the target of a [PPrism] with a value
      */
-    fun set(b: B): (S) -> T = modify { b }
+    fun set(s: S, b: B): T = modify(s) { b }
 
     /**
      * Set the target of a [PPrism] with a value
      */
-    fun setOption(b: B): (S) -> Option<T> = modifyOption { b }
+    fun setOption(s: S, b: B): Option<T> = modifyOption(s) { b }
 
     /**
      * Check if there is a target
@@ -105,23 +103,17 @@ abstract class PPrism<S, T, A, B> {
     /**
      * Find if the target satisfies the predicate
      */
-    inline fun find(crossinline p: (A) -> Boolean): (S) -> Option<A> = { s ->
-        getOption(s).flatMap { a -> if (p(a)) a.some() else none() }
-    }
+    inline fun find(s: S, crossinline p: (A) -> Boolean): Option<A> = getOption(s).flatMap { a -> if (p(a)) a.some() else none() }
 
     /**
      * Check if there is a target and it satisfies the predicate
      */
-    inline fun exist(crossinline p: (A) -> Boolean): (S) -> Boolean = { s ->
-        getOption(s).fold({ false }, p)
-    }
+    inline fun exist(s: S, crossinline p: (A) -> Boolean): Boolean = getOption(s).fold({ false }, p)
 
     /**
      * Check if there is no target or the target satisfies the predicate
      */
-    inline fun all(crossinline p: (A) -> Boolean): (S) -> Boolean = { s ->
-        getOption(s).fold({ true }, p)
-    }
+    inline fun all(s: S, crossinline p: (A) -> Boolean): Boolean = getOption(s).fold({ true }, p)
 
     /**
      * Create a product of the target and a type C
@@ -142,33 +134,47 @@ abstract class PPrism<S, T, A, B> {
     /**
      * Compose a [PPrism] with another [PPrism]
      */
-    infix fun <C, D> composePrism(other: PPrism<A, B, C, D>): PPrism<S, T, C, D> = Prism(
-            { s -> getOrModify(s).flatMap { a -> other.getOrModify(a).bimap({ set(it)(s) }, ::identity) } },
+    infix fun <C, D> compose(other: PPrism<A, B, C, D>): PPrism<S, T, C, D> = Prism(
+            { s -> getOrModify(s).flatMap { a -> other.getOrModify(a).bimap({ set(s, it) }, ::identity) } },
             this::reverseGet compose other::reverseGet
     )
 
     /** compose an [Iso] as an [PPrism] */
-    fun <C, D> composeIso(other: PIso<A, B, C, D>): PPrism<S, T, C, D> = composePrism(other.asPrism())
-
-    /**
-     * View a [PPrism] as an [POptional]
-     */
-    fun asOptional(): POptional<S, T, A, B> = POptional(this::getOrModify, this::set)
+    fun <C, D> compose(other: PIso<A, B, C, D>): PPrism<S, T, C, D> = compose(other.asPrism())
 
     /**
      * Compose a [PPrism] with a [POptional]
      */
-    infix fun <C, D> composeOptional(other: POptional<A, B, C, D>): POptional<S, T, C, D> =
-            asOptional() composeOptional other
+    infix fun <C, D> compose(other: POptional<A, B, C, D>): POptional<S, T, C, D> = asOptional() compose other
+
+    /**
+     * Compose a [PPrism] with a [PSetter]
+     */
+    infix fun <C, D> compose(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = asSetter() compose other
 
     /**
      * Plus operator overload to compose lenses
      */
-    operator fun <C, D> plus(other: PPrism<A, B, C, D>): PPrism<S, T, C, D> = composePrism(other)
+    operator fun <C, D> plus(other: PPrism<A, B, C, D>): PPrism<S, T, C, D> = compose(other)
 
-    operator fun <C, D> plus(other: POptional<A, B, C, D>): POptional<S, T, C, D> = composeOptional(other)
+    operator fun <C, D> plus(other: POptional<A, B, C, D>): POptional<S, T, C, D> = compose(other)
 
-    operator fun <C, D> plus(other: PIso<A, B, C, D>): PPrism<S, T, C, D> = composeIso(other)
+    operator fun <C, D> plus(other: PIso<A, B, C, D>): PPrism<S, T, C, D> = compose(other)
+
+    operator fun <C, D> plus(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = compose(other)
+
+    /**
+     * View a [PPrism] as an [POptional]
+     */
+    fun asOptional(): POptional<S, T, A, B> = POptional(
+            this::getOrModify,
+            { b -> { s -> set(s, b) } }
+    )
+
+    /**
+     * View a [PPrism] as a [PSetter]
+     */
+    fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s,f) } }
 
 }
 
