@@ -44,7 +44,7 @@ object PrismLaws {
 
     inline fun <reified A, reified B, reified F> consistentGetOptionModifyId(prism: Prism<A, B>, aGen: Gen<A>, FA: Applicative<F>, EQB: Eq<B>): Unit =
             forAll(aGen, { a ->
-                prism.modifyF(FA, { FA.pure(it) }, a).exists {
+                prism.modifyF(FA, a, { FA.pure(it) }).exists {
                     prism.getOption(it).exists { b ->
                         prism.getOption(a).exists { it.equalUnderTheLaw(b, EQB) }
                     }
