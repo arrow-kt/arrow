@@ -48,9 +48,9 @@ class FoldTest : UnitSpec() {
             })
         }
 
-        "Getting the length" {
+        "Getting the size" {
             forAll(Gen.list(Gen.int()), { ints ->
-                intFold.length(ints.k()) == ints.size
+                intFold.size(ints.k()) == ints.size
             })
         }
 

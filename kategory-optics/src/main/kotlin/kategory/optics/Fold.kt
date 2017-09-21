@@ -69,13 +69,20 @@ abstract class Fold<S, A> {
     /**
      * Calculate the number of targets
      */
-    fun length(s: S) = foldMap(IntMonoid, s = s, f = { _ -> 1 })
+    fun size(s: S) = foldMap(IntMonoid, s = s, f = { _ -> 1 })
 
     /**
-     * Find the first target matching the predicate
+     * Find the first element matching the predicate, if one exists.
      */
     inline fun find(s: S, crossinline p: (A) -> Boolean): Option<A> =
             foldMap(firstOptionMonoid<A>(), s, { b -> (if (p(b)) Const(b.some()) else Const(none())) }).value
+
+    /**
+     * Check whether at least one element satisfies the predicate.
+     *
+     * If there are no elements, the result is false.
+     */
+    inline fun exists(s: S, crossinline p: (A) -> Boolean): Boolean = find(s, p).fold({ false }, { true })
 
     /**
      * Get the first target
@@ -110,11 +117,17 @@ abstract class Fold<S, A> {
                 s.fold({ ac -> this@Fold.foldMap(M, ac, f) }, { c -> other.foldMap(M, c, f) })
     }
 
+    /**
+     * Create a sum of the [Fold] and a type [C]
+     */
     fun <C> left(): Fold<Either<S, C>, Either<A, C>> = object : Fold<Either<S, C>, Either<A, C>>() {
         override fun <R> foldMap(M: Monoid<R>, s: Either<S, C>, f: (Either<A, C>) -> R): R =
                 s.fold({ a1: S -> this@Fold.foldMap(M, a1, { b -> f(b.left()) }) }, { c -> f(c.right()) })
     }
 
+    /**
+     * Create a sum of a type [C] and the [Fold]
+     */
     fun <C> right(): Fold<Either<C, S>, Either<C, A>> = object : Fold<Either<C, S>, Either<C, A>>() {
         override fun <R> foldMap(M: Monoid<R>, s: Either<C, S>, f: (Either<C, A>) -> R): R =
                 s.fold({ c -> f(c.left()) }, { a1 -> this@Fold.foldMap(M, a1, { b -> f(b.right()) }) })
@@ -169,8 +182,19 @@ abstract class Fold<S, A> {
     operator fun <C> plus(other: Iso<A, C>): Fold<S, C> = composeIso(other)
 }
 
+/**
+ * Fold using the given [Monoid] instance.
+ */
 inline fun <A, reified B> Fold<A, B>.fold(M: Monoid<B> = monoid(), a: A): B = foldMap(M, a, ::identity)
 
+/**
+ * Alias for fold.
+ */
+inline fun <A, reified B> Fold<A, B>.combineAll(M: Monoid<B> = monoid(), a: A): B = foldMap(M, a, ::identity)
+
+/**
+ * Get all targets of the [Fold]
+ */
 inline fun <A, reified B> Fold<A, B>.getAll(M: Monoid<ListKW<B>> = monoid(), a: A): ListKW<B> = foldMap(M, a, { ListKW.pure(it) })
 
 internal val addMonoid = object : Monoid<Boolean> {
