@@ -13,15 +13,25 @@ import kategory.right
 import kategory.some
 import kategory.toT
 
+/**
+ * [Iso] is a type alias for [PIso] which fixes the type arguments
+ * and restricts the [PIso] to monomorphic updates.
+ */
 typealias Iso<S, T> = PIso<S, S, T, T>
 
 /**
- * An [PIso] defines an isomorphism between a type S and A.
+ * An [Iso] is an lossless invertible optic that defines an isomorphism between a type `S` and `A`.
+ * i.e. a data class and it's data represented by TupleN
+ *
+ * A (polymorphic) [PIso] is useful when setting or modifying a value for a constructed type
+ * i.e. PIso<Option<Int>, Option<String>, Int?, String?>
  *
  * An [PIso] is also a valid [Lens], [Prism]
  *
- * @param A the source of a [PIso]
- * @param B the target of a [PIso]
+ * @param S the source of a [PIso]
+ * @param T the modified source of a [PIso]
+ * @param A the target of a [PIso]
+ * @param B the modified target of a [PIso]
  */
 abstract class PIso<S, T, A, B> {
 
@@ -39,11 +49,15 @@ abstract class PIso<S, T, A, B> {
 
         /**
          * create an [PIso] between any type and itself. id is the zero element of optics composition, for all optics o of type O (e.g. Lens, Iso, Prism, ...):
-         * o      composeIso Iso.id == o
-         * Iso.id composeO   o        == o (replace composeO by composeLens, composeIso, composePrism, ...)
+         * o      compose Iso.id == o
+         * Iso.id composeO   o        == o (replace composeO by compose, compose, compose, ...)
          */
-        fun <A> id(): Iso<A, A> = Iso(::identity, ::identity)
+        fun <S> id(): Iso<S, S> = Iso(::identity, ::identity)
 
+        /**
+         * Invoke operator overload to create a [PIso] of type `S` with target `A`.
+         * Can also be used to construct [Iso]
+         */
         operator fun <S, T, A, B> invoke(get: (S) -> (A), reverseGet: (B) -> T) = object : PIso<S, T, A, B>() {
 
             override fun get(s: S): A = get(s)
@@ -68,21 +82,19 @@ abstract class PIso<S, T, A, B> {
     /**
      * Find if the target satisfies the predicate
      */
-    fun find(p: (A) -> Boolean): (S) -> Option<A> = { a ->
-        get(a).let { aa ->
-            if (p(aa)) aa.some() else none()
-        }
+    fun find(s: S, p: (A) -> Boolean): Option<A> = get(s).let { aa ->
+        if (p(aa)) aa.some() else none()
     }
 
     /**
      * Check if the target satisfies the predicate
      */
-    fun exist(p: (A) -> Boolean): (S) -> Boolean = p compose this::get
+    inline fun exist(s: S, crossinline p: (A) -> Boolean): Boolean = p(get(s))
 
     /**
      * Modify polymorphically the target of a [PIso] with a function
      */
-    inline fun modify(crossinline f: (A) -> B): (S) -> T = { reverseGet(f(get(it))) }
+    inline fun modify(s: S, crossinline f: (A) -> B): T = reverseGet(f(get(s)))
 
     /**
      * Modify polymorphically the target of a [PIso] with a Functor function
@@ -93,7 +105,7 @@ abstract class PIso<S, T, A, B> {
     /**
      * Set polymorphically the target of a [PIso] with a value
      */
-    fun set(b: B): (S) -> (T) = { reverseGet(b) }
+    fun set(b: B): T = reverseGet(b)
 
     /**
      * Pair two disjoint [PIso]
@@ -104,7 +116,7 @@ abstract class PIso<S, T, A, B> {
     )
 
     /**
-     * Create a pair of the target and a type C
+     * Create a pair of the [PIso] and a type [C]
      */
     fun <C> first(): PIso<Tuple2<S, C>, Tuple2<T, C>, Tuple2<A, C>, Tuple2<B, C>> = Iso(
             { (a, c) -> get(a) toT c },
@@ -112,7 +124,7 @@ abstract class PIso<S, T, A, B> {
     )
 
     /**
-     * Create a pair of a type C and the target
+     * Create a pair of a type [C] and the [PIso]
      */
     fun <C> second(): PIso<Tuple2<C, S>, Tuple2<C, T>, Tuple2<C, A>, Tuple2<C, B>> = PIso(
             { (c, a) -> c toT get(a) },
@@ -120,7 +132,7 @@ abstract class PIso<S, T, A, B> {
     )
 
     /**
-     * Create a sum of the target and a type C
+     * Create a sum of the [PIso] and a type [C]
      */
     fun <C> left(): PIso<Either<S, C>, Either<T, C>, Either<A, C>, Either<B, C>> = PIso(
             { it.bimap(this::get, ::identity) },
@@ -128,7 +140,7 @@ abstract class PIso<S, T, A, B> {
     )
 
     /**
-     * Create a sum of a type C and the target
+     * Create a sum of a type [C] and the [PIso]
      */
     fun <C> right(): PIso<Either<C, S>, Either<C, T>, Either<C, A>, Either<C, B>> = PIso(
             { it.bimap(::identity, this::get) },
@@ -138,7 +150,7 @@ abstract class PIso<S, T, A, B> {
     /**
      * Compose a [PIso] with a [PIso]
      */
-    infix fun <C, D> composeIso(other: PIso<A, B, C, D>): PIso<S, T, C, D> = PIso(
+    infix fun <C, D> compose(other: PIso<A, B, C, D>): PIso<S, T, C, D> = PIso(
             other::get compose this::get,
             this::reverseGet compose other::reverseGet
     )
@@ -146,23 +158,35 @@ abstract class PIso<S, T, A, B> {
     /**
      * Compose a [PIso] with a [PLens]
      */
-    infix fun <C, D> composeLens(other: PLens<A, B, C, D>): PLens<S, T, C, D> =
-            asLens() composeLens other
+    infix fun <C, D> compose(other: PLens<A, B, C, D>): PLens<S, T, C, D> = asLens() compose other
 
     /**
      * Compose a [PIso] with a [Getter]
      */
-    infix fun <C> composeGetter(other: Getter<A, C>): Getter<S, C> =
-            asGetter() composeGetter other
+    infix fun <C> compose(other: Getter<A, C>): Getter<S, C> = asGetter() composeGetter other
+
+    /**
+     * Compose a [PIso] with a [PSetter]
+     */
+    infix fun <C, D> compose(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = asSetter() compose other
+
+    /**
+     * Compose a [PIso] with a [POptional]
+     */
+    infix fun <C, D> compose(other: POptional<A, B, C, D>): POptional<S, T, C, D> = asOptional() compose other
 
     /**
      * Plus operator overload to compose lenses
      */
-    operator fun <C, D> plus(other: PIso<A, B, C, D>): PIso<S, T, C, D> = composeIso(other)
+    operator fun <C, D> plus(other: PIso<A, B, C, D>): PIso<S, T, C, D> = compose(other)
 
-    operator fun <C, D> plus(other: PLens<A, B, C, D>): PLens<S, T, C, D> = composeLens(other)
+    operator fun <C, D> plus(other: PLens<A, B, C, D>): PLens<S, T, C, D> = compose(other)
 
-    operator fun <C> plus(other: Getter<A, C>): Getter<S, C> = composeGetter(other)
+    operator fun <C> plus(other: Getter<A, C>): Getter<S, C> = compose(other)
+
+    operator fun <C, D> plus(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = compose(other)
+
+    operator fun <C, D> plus(other: POptional<A, B, C, D>): POptional<S, T, C, D> = compose(other)
 
     /**
      * View a [PIso] as a [PPrism]
@@ -175,7 +199,7 @@ abstract class PIso<S, T, A, B> {
     /**
      * View a [PIso] as a [PLens]
      */
-    fun asLens(): PLens<S, T, A, B> = Lens(this::get, this::set)
+    fun asLens(): PLens<S, T, A, B> = PLens(this::get, { b -> { _ -> set(b) } })
 
     /**
      * View a [PIso] as a [Getter]
@@ -187,6 +211,11 @@ abstract class PIso<S, T, A, B> {
      */
     fun asOptional(): POptional<S, T, A, B> = POptional(
             { s -> get(s).right() },
-            this::set
+            { b -> { _ -> set(b) } }
     )
+
+    /**
+     * View a [PIso] as a [PSetter]
+     */
+    fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s, f) } }
 }
