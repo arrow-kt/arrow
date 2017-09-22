@@ -2,17 +2,19 @@ package kategory.optics
 
 import kategory.Applicative
 import kategory.Const
-import kategory.ConstHK
-import kategory.ConstKindPartial
 import kategory.Either
 import kategory.HK
 import kategory.Id
 import kategory.IntMonoid
 import kategory.ListKW
+import kategory.ListKWHK
+import kategory.ListKWKind
 import kategory.Monoid
 import kategory.Option
 import kategory.applicative
+import kategory.ev
 import kategory.identity
+import kategory.k
 import kategory.left
 import kategory.map
 import kategory.monoid
@@ -57,7 +59,8 @@ abstract class PTraversal<S, T, A, B> {
         }
 
         inline fun <reified T, S> fromTraversable(TT: kategory.Traverse<T> = traverse()) = object : Traversal<HK<T, S>, S>() {
-            override fun <F> modifyF(FA: Applicative<F>, a: HK<T, S>, f: (S) -> HK<F, S>): HK<F, HK<T, S>> = TT.traverse(a, f, FA)
+            override fun <F> modifyF(FA: Applicative<F>, s: HK<T, S>, f: (S) -> HK<F, S>): HK<F, HK<T, S>> =
+                    TT.traverse(s, f, FA)
         }
 
         /**
@@ -66,20 +69,138 @@ abstract class PTraversal<S, T, A, B> {
         fun <S, A> void() = Optional.void<S, A>().asTraversal()
 
         /**
-         * Composes N lenses horizontally.  Note that although it is possible to pass two or more lenses
-         * that point to the same `A`, in practice it considered an unsafe usage (see https://github.com/julien-truffaut/Monocle/issues/379#issuecomment-236374838).
+         * [PTraversal] constructor from multiple getters of the same source.
          */
-        operator fun <S, A> invoke(vararg lenses: Lens<S, A>): Traversal<S, A> = object : Traversal<S, A>() {
-            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, A>): HK<F, S> = lenses.fold(FA.pure(s), { fs, lens ->
-                FA.map(f(lens.get(s)), fs, { (b, a) ->
-                    lens.set(b)(a)
-                })
-            })
-        }
-
         operator fun <S, A> invoke(get1: (S) -> A, get2: (S) -> A, set: (A, A, S) -> S): Traversal<S, A> = object : Traversal<S, A>() {
             override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, A>): HK<F, S> =
-                    FA.map2(f(get1(s)), f(get2(s)), { (b1, b2) -> set(b1, b2, s) })
+                    FA.map(
+                            f(get1(s)), f(get2(s)),
+                            { (b1, b2) -> set(b1, b2, s) }
+                    )
+        }
+
+        operator fun <S, A> invoke(
+                get1: (S) -> A,
+                get2: (S) -> A,
+                get3: (S) -> A,
+                set: (A, A, A, S) -> S): Traversal<S, A> = object : Traversal<S, A>() {
+            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, A>): HK<F, S> =
+                    FA.map(
+                            f(get1(s)), f(get2(s)), f(get3(s)),
+                            { (b1, b2, b3) -> set(b1, b2, b3, s) }
+                    )
+        }
+
+        operator fun <S, A> invoke(
+                get1: (S) -> A,
+                get2: (S) -> A,
+                get3: (S) -> A,
+                get4: (S) -> A,
+                set: (A, A, A, A, S) -> S): Traversal<S, A> = object : Traversal<S, A>() {
+            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, A>): HK<F, S> =
+                    FA.map(
+                            f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)),
+                            { (b1, b2, b3, b4) -> set(b1, b2, b3, b4, s) }
+                    )
+        }
+
+        operator fun <S, A> invoke(
+                get1: (S) -> A,
+                get2: (S) -> A,
+                get3: (S) -> A,
+                get4: (S) -> A,
+                get5: (S) -> A,
+                set: (A, A, A, A, A, S) -> S): Traversal<S, A> = object : Traversal<S, A>() {
+            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, A>): HK<F, S> =
+                    FA.map(
+                            f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)),
+                            { (b1, b2, b3, b4, b5) -> set(b1, b2, b3, b4, b5, s) }
+                    )
+        }
+
+        operator fun <S, A> invoke(
+                get1: (S) -> A,
+                get2: (S) -> A,
+                get3: (S) -> A,
+                get4: (S) -> A,
+                get5: (S) -> A,
+                get6: (S) -> A,
+                set: (A, A, A, A, A, A, S) -> S): Traversal<S, A> = object : Traversal<S, A>() {
+            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, A>): HK<F, S> =
+                    FA.map(
+                            f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)),
+                            { (b1, b2, b3, b4, b5, b6) -> set(b1, b2, b3, b4, b5, b6, s) }
+                    )
+        }
+
+        operator fun <S, A> invoke(
+                get1: (S) -> A,
+                get2: (S) -> A,
+                get3: (S) -> A,
+                get4: (S) -> A,
+                get5: (S) -> A,
+                get6: (S) -> A,
+                get7: (S) -> A,
+                set: (A, A, A, A, A, A, A, S) -> S): Traversal<S, A> = object : Traversal<S, A>() {
+            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, A>): HK<F, S> =
+                    FA.map(
+                            f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)),
+                            { (b1, b2, b3, b4, b5, b6, b7) -> set(b1, b2, b3, b4, b5, b6, b7, s) }
+                    )
+        }
+
+        operator fun <S, A> invoke(
+                get1: (S) -> A,
+                get2: (S) -> A,
+                get3: (S) -> A,
+                get4: (S) -> A,
+                get5: (S) -> A,
+                get6: (S) -> A,
+                get7: (S) -> A,
+                get8: (S) -> A,
+                set: (A, A, A, A, A, A, A, A, S) -> S): Traversal<S, A> = object : Traversal<S, A>() {
+            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, A>): HK<F, S> =
+                    FA.map(
+                            f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), f(get8(s)),
+                            { (b1, b2, b3, b4, b5, b6, b7, b8) -> set(b1, b2, b3, b4, b5, b6, b7, b8, s) }
+                    )
+        }
+
+        operator fun <S, A> invoke(
+                get1: (S) -> A,
+                get2: (S) -> A,
+                get3: (S) -> A,
+                get4: (S) -> A,
+                get5: (S) -> A,
+                get6: (S) -> A,
+                get7: (S) -> A,
+                get8: (S) -> A,
+                get9: (S) -> A,
+                set: (A, A, A, A, A, A, A, A, A, S) -> S): Traversal<S, A> = object : Traversal<S, A>() {
+            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, A>): HK<F, S> =
+                    FA.map(
+                            f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), f(get8(s)), f(get9(s)),
+                            { (b1, b2, b3, b4, b5, b6, b7, b8, b9) -> set(b1, b2, b3, b4, b5, b6, b7, b8, b9, s) }
+                    )
+        }
+
+        operator fun <S, A> invoke(
+                get1: (S) -> A,
+                get2: (S) -> A,
+                get3: (S) -> A,
+                get4: (S) -> A,
+                get5: (S) -> A,
+                get6: (S) -> A,
+                get7: (S) -> A,
+                get8: (S) -> A,
+                get9: (S) -> A,
+                get10: (S) -> A,
+                set: (A, A, A, A, A, A, A, A, A, A, S) -> S): Traversal<S, A> = object : Traversal<S, A>() {
+            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, A>): HK<F, S> =
+                    FA.map(
+                            f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), f(get8(s)), f(get9(s)), f(get10(s)),
+                            { (b1, b2, b3, b4, b5, b6, b7, b8, b9, b10) -> set(b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, s) }
+                    )
         }
 
     }
@@ -88,10 +209,13 @@ abstract class PTraversal<S, T, A, B> {
      * Map each target to a Monoid and combine the results
      */
     @Suppress("UNUSED_PARAMETER")
-    inline fun <reified R> foldMap(FA: Applicative<ConstKindPartial<R>> = applicative(), M: Monoid<R> = monoid(), s: S, crossinline f: (A) -> R): R =
-            modifyF(FA, s, { b ->
-                Const(f(b))
-            }).value()
+    inline fun <reified R> foldMap(M: Monoid<R> = monoid(), s: S, crossinline f: (A) -> R): R =
+            modifyF(Const.applicative(M), s, { b -> Const(f(b)) }).value()
+
+    /**
+     * Get all targets of the [PTraversal]
+     */
+    fun getAll(s: S): ListKW<A> = foldMap(ListKW.monoid(), s, { ListKW(listOf(it)) })
 
     /**
      * Modify polymorphically the target of a [PTraversal] with a function [f]
@@ -106,7 +230,54 @@ abstract class PTraversal<S, T, A, B> {
     /**
      * Calculate the number of targets in the [PTraversal]
      */
-    fun size(s: S): Int = foldMap(Const.applicative(), IntMonoid, s, { 1 })
+    fun size(s: S): Int = foldMap(IntMonoid, s, { 1 })
+
+    /**
+     * Check if there is no target
+     */
+    fun isEmpty(s: S): Boolean = foldMap(AndMonoid, s, { _ -> false })
+
+    /**
+     * Check if there is at least one target
+     */
+    fun nonEmpty(s: S): Boolean = !isEmpty(s)
+
+    /**
+     * Find the first target matching the predicate
+     */
+    inline fun find(s: S, crossinline p: (A) -> Boolean): Option<A> = foldMap(firstOptionMonoid<A>(), s, { a ->
+        if (p(a)) Const(a.some())
+        else Const(none())
+    }).value
+
+    /**
+     * Find the first target or [Option.None] if no targets
+     */
+    fun headOption(s: S): Option<A> = foldMap(firstOptionMonoid<A>(), s, { b -> Const(b.some()) }).value
+
+    /**
+     * Find the last target or [Option.None] if no targets
+     */
+    fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s, { b -> Const(b.some()) }).value
+
+    /**
+     * Check whether at least one element satisfies the predicate.
+     *
+     * If there are no elements, the result is false.
+     */
+    inline fun exist(s: S, crossinline p: (A) -> Boolean): Boolean = find(s, p).fold({ false }, { true })
+
+    /**
+     * Check if forall targets satisfy the predicate
+     */
+    inline fun forall(s: S, crossinline p: (A) -> Boolean): Boolean = foldMap(AndMonoid, s, p)
+
+    fun <U, V> choice(other: PTraversal<U, V, A, B>): PTraversal<Either<S, U>, Either<T, V>, A, B> = object : PTraversal<Either<S, U>, Either<T, V>, A, B>() {
+        override fun <F> modifyF(FA: Applicative<F>, s: Either<S, U>, f: (A) -> HK<F, B>): HK<F, Either<T, V>> = s.fold(
+                { a -> FA.map(this@PTraversal.modifyF(FA, a, f)) { it.left() } },
+                { u -> FA.map(other.modifyF(FA, u, f)) { it.right() } }
+        )
+    }
 
     /**
      * Compose a [PTraversal] with a [PTraversal]
@@ -117,39 +288,66 @@ abstract class PTraversal<S, T, A, B> {
     }
 
     /**
-     * Plus operator overload to compose traversal
+     * Compose a [PTraversal] with a [PSetter]
+     */
+    infix fun <C, D> compose(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = asSetter() compose other
+
+    /**
+     * Compose a [PTraversal] with a [POptional]
+     */
+    infix fun <C, D> compose(other: POptional<A, B, C, D>): PTraversal<S, T, C, D> = compose(other.asTraversal())
+
+    /**
+     * Compose a [PTraversal] with a [PLens]
+     */
+    infix fun <C, D> compose(other: PLens<A, B, C, D>): PTraversal<S, T, C, D> = compose(other.asTraversal())
+
+    /**
+     * Compose a [PTraversal] with a [PPrism]
+     */
+    infix fun <C, D> compose(other: PPrism<A, B, C, D>): PTraversal<S, T, C, D> = compose(other.asTraversal())
+
+    /**
+     * Compose a [PTraversal] with a [PIso]
+     */
+    infix fun <C, D> compose(other: PIso<A, B, C, D>): PTraversal<S, T, C, D> = compose(other.asTraversal())
+
+    /**
+     * Plus operator overload to compose [PTraversal] with other optics
      */
     operator fun <C, D> plus(other: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> = compose(other)
+
+    operator fun <C, D> plus(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = compose(other)
+
+    operator fun <C, D> plus(other: POptional<A, B, C, D>): PTraversal<S, T, C, D> = compose(other)
+
+    operator fun <C, D> plus(other: PLens<A, B, C, D>): PTraversal<S, T, C, D> = compose(other)
+
+    operator fun <C, D> plus(other: PPrism<A, B, C, D>): PTraversal<S, T, C, D> = compose(other)
+
+    operator fun <C, D> plus(other: PIso<A, B, C, D>): PTraversal<S, T, C, D> = compose(other)
+
+    fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s, f) } }
 
 }
 
 /**
- * Find the first target matching the predicate
- */
-inline fun <S, T, A, B> PTraversal<S, T, A, B>.find(s: S, crossinline p: (A) -> Boolean): Option<A> =
-        foldMap(Const.applicative(), firstOptionMonoid<A>(), s, { a ->
-            if (p(a)) Const(a.some())
-            else Const(none())
-        }).value
-
-/**
  * Fold using the given [Monoid] instance.
  */
-inline fun <S, T, reified A, B> PTraversal<S, T, A, B>.fold(M: Monoid<A> = monoid(), s: S): A =
-        foldMap(Const.applicative(), M, s, ::identity)
+inline fun <S, T, reified A, B> PTraversal<S, T, A, B>.fold(M: Monoid<A> = monoid(), s: S): A = foldMap(M, s, ::identity)
 
 /**
  * Alias for fold.
  */
-inline fun <S, T, reified A, reified B> PTraversal<S, T, A, B>.combineAll(M: Monoid<A> = monoid(), s: S): A = fold(M, s)
+inline fun <S, T, reified A, B> PTraversal<S, T, A, B>.combineAll(M: Monoid<A> = monoid(), s: S): A = fold(M, s)
 
-/**
- * Get all targets of the [PTraversal]
- */
-inline fun <S, T, reified A, reified B> PTraversal<S, T, A, B>.getAll(s: S): ListKW<A> =
-        foldMap(Const.applicative(), ListKW.monoid(), s, { ListKW(listOf(it)) })
+@PublishedApi internal object AndMonoid : Monoid<Boolean> {
+    override fun combine(a: Boolean, b: Boolean): Boolean = a && b
+    override fun empty(): Boolean = true
+}
 
 internal sealed class First
+internal sealed class Last
 
 @PublishedApi internal fun <A> firstOptionMonoid() = object : Monoid<Const<Option<A>, First>> {
 
@@ -157,5 +355,14 @@ internal sealed class First
 
     override fun combine(a: Const<Option<A>, First>, b: Const<Option<A>, First>) =
             if (a.value.fold({ false }, { true })) a else b
+
+}
+
+@PublishedApi internal fun <A> lastOptionMonoid() = object : Monoid<Const<Option<A>, Last>> {
+
+    override fun empty() = Const<Option<A>, Last>(Option.None)
+
+    override fun combine(a: Const<Option<A>, Last>, b: Const<Option<A>, Last>) =
+            if (b.value.fold({ false }, { true })) b else a
 
 }

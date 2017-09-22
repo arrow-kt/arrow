@@ -38,7 +38,7 @@ typealias Lens<S, A> = PLens<S, S, A, A>
 abstract class PLens<S, T, A, B> {
 
     abstract fun get(s: S): A
-    abstract fun set(b: B): (S) -> T
+    abstract fun set(s: S, b: B): T
 
     companion object {
 
@@ -59,20 +59,20 @@ abstract class PLens<S, T, A, B> {
         operator fun <S, T, A, B> invoke(get: (S) -> A, set: (B) -> (S) -> T) = object : PLens<S, T, A, B>() {
             override fun get(s: S): A = get(s)
 
-            override fun set(b: B): (S) -> T = set(b)
+            override fun set(s: S, b: B): T = set(b)(s)
         }
     }
 
     /**
      * Modify the target of s [PLens] using s function `(A) -> B`
      */
-    inline fun modify(s: S, crossinline f: (A) -> B): T = set(f(get(s)))(s)
+    inline fun modify(s: S, crossinline f: (A) -> B): T = set(s, f(get(s)))
 
     /**
      * Modify the target of a [PLens] using Functor function
      */
     inline fun <reified F> modifyF(FF: Functor<F> = functor(), s: S, f: (A) -> HK<F, B>): HK<F, T> =
-            FF.map(f(get(s)), { set(it)(s) })
+            FF.map(f(get(s)), { b -> set(s, b) })
 
     /**
      * Find if the target satisfies the predicate
@@ -91,7 +91,7 @@ abstract class PLens<S, T, A, B> {
      */
     fun <S1, T1> choice(other: PLens<S1, T1, A, B>): PLens<Either<S, S1>, Either<T, T1>, A, B> = PLens(
             { ss -> ss.fold(this::get, other::get) },
-            { b -> { ss -> ss.bimap(set(b), other.set(b)) } }
+            { b -> { ss -> ss.bimap({ s -> set(s, b) }, { s -> other.set(s, b) }) } }
     )
 
     /**
@@ -100,7 +100,7 @@ abstract class PLens<S, T, A, B> {
     fun <S1, T1, A1, B1> split(other: PLens<S1, T1, A1, B1>): PLens<Tuple2<S, S1>, Tuple2<T, T1>, Tuple2<A, A1>, Tuple2<B, B1>> =
             PLens(
                     { (s, c) -> get(s) toT other.get(c) },
-                    { (b, b1) -> { (s, s1) -> set(b)(s) toT other.set(b1)(s1) } }
+                    { (b, b1) -> { (s, s1) -> set(s, b) toT other.set(s1, b1) } }
             )
 
     /**
@@ -108,7 +108,7 @@ abstract class PLens<S, T, A, B> {
      */
     fun <C> first(): PLens<Tuple2<S, C>, Tuple2<T, C>, Tuple2<A, C>, Tuple2<B, C>> = PLens(
             { (s, c) -> get(s) toT c },
-            { (b, c) -> { (a, _) -> set(b)(a) toT c } }
+            { (b, c) -> { (s, _) -> set(s, b) toT c } }
     )
 
     /**
@@ -116,7 +116,7 @@ abstract class PLens<S, T, A, B> {
      */
     fun <C> second(): PLens<Tuple2<C, S>, Tuple2<C, T>, Tuple2<C, A>, Tuple2<C, B>> = PLens(
             { (c, s) -> c toT get(s) },
-            { (c, b) -> { (_, s) -> c toT set(b)(s) } }
+            { (c, b) -> { (_, s) -> c toT set(s, b) } }
     )
 
     /**
@@ -124,7 +124,7 @@ abstract class PLens<S, T, A, B> {
      */
     infix fun <C, D> compose(l: PLens<A, B, C, D>): PLens<S, T, C, D> = Lens(
             { a -> l.get(get(a)) },
-            { c -> { a -> set(l.set(c)(get(a)))(a) } }
+            { c -> { s -> set(s, l.set(get(s), c)) } }
     )
 
     /**
@@ -153,6 +153,11 @@ abstract class PLens<S, T, A, B> {
     infix fun <C, D> compose(other: PPrism<A, B, C, D>): POptional<S, T, C, D> = asOptional() compose other
 
     /**
+     * Compose an [PLens] with a [PTraversal]
+     */
+    infix fun <C, D> compose(other: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> = asTraversal() compose other
+
+    /**
      * plus operator overload to compose lenses
      */
     operator fun <C, D> plus(other: PLens<A, B, C, D>): PLens<S, T, C, D> = compose(other)
@@ -177,7 +182,7 @@ abstract class PLens<S, T, A, B> {
      */
     fun asOptional(): POptional<S, T, A, B> = POptional(
             { s -> get(s).right() },
-            this::set
+            { b -> { s -> set(s, b) } }
     )
 
     /**
@@ -190,7 +195,7 @@ abstract class PLens<S, T, A, B> {
      */
     fun asTraversal(): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B>() {
         override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
-                FA.map(f(get(s)), { b -> set(s, b) })
+                FA.map(f(get(s)), { b -> this@PLens.set(s, b) })
     }
 
 }
