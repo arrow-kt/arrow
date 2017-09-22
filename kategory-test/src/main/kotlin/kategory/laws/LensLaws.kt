@@ -49,14 +49,14 @@ object LensLaws {
 
     inline fun <reified A, reified B, reified F> lensConsistentModifyModifyId(lens: Lens<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, FA: Applicative<F>) =
             forAll(aGen, funcGen, { a, f ->
-                lens.modifyF(FA, { FA.pure(f(it)) }, a).exists {
+                lens.modifyF(FA, a, { FA.pure(f(it)) }).exists {
                     it.equalUnderTheLaw(lens.modify(a, f), EQA)
                 }
             })
 
     inline fun <reified A, reified B, reified F> lensConsistentGetModifyid(lens: Lens<A, B>, aGen: Gen<A>, EQB: Eq<B>, FA: Applicative<F>) =
             forAll(aGen, { a ->
-                lens.modifyF(FA, { FA.pure(it) }, a).exists {
+                lens.modifyF(FA, a, { FA.pure(it) }).exists {
                     lens.get(it).equalUnderTheLaw(lens.get(a), EQB)
                 }
             })
