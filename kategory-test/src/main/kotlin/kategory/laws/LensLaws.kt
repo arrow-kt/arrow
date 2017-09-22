@@ -10,7 +10,7 @@ object LensLaws {
             Law("Lens law: get set", { lensGetSet(lens, aGen, EQA) }),
             Law("Lens law: set get", { lensSetGet(lens, aGen, bGen, EQB) }),
             Law("Lens law: is set idempotent", { lensSetIdempotent(lens, aGen, bGen, EQA) }),
-            Law("Lens law: modify identity", { lensModifyIdentity(lens, aGen, bGen, EQA) }),
+            Law("Lens law: modify identity", { lensModifyIdentity(lens, aGen, EQA) }),
             Law("Lens law: compose modify", { lensComposeModify(lens, aGen, funcGen, EQA) }),
             Law("Lens law: consistent set modify", { lensConsistentSetModify(lens, aGen, bGen, EQA) }),
             Law("Lens law: consistent modify modify id", { lensConsistentModifyModifyId(lens, aGen, funcGen, EQA, FA) }),
@@ -32,8 +32,8 @@ object LensLaws {
                 lens.set(b)(lens.set(b)(a)).equalUnderTheLaw(lens.set(b)(a), EQA)
             })
 
-    inline fun <reified A, reified B> lensModifyIdentity(lens: Lens<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>) =
-            forAll(aGen, bGen, { a, b ->
+    inline fun <reified A, reified B> lensModifyIdentity(lens: Lens<A, B>, aGen: Gen<A>, EQA: Eq<A>) =
+            forAll(aGen, { a ->
                 lens.modify(a, ::identity).equalUnderTheLaw(a, EQA)
             })
 

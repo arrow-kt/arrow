@@ -19,8 +19,7 @@ import kategory.some
 /**
  * A [Fold] is an optic that allows to see into structure and get multiple results.
  *
- * [Fold] is a generalisation of [kategory.Foldable] and can be seen as a representation of foldMap,
- * forall methods are defined in terms of foldMap.
+ * [Fold] is a generalisation of [kategory.Foldable] and is implemented in terms of foldMap.
  *
  * @param S the source of a [Fold]
  * @param A the target of a [Fold]
@@ -39,7 +38,7 @@ abstract class Fold<S, A> {
         fun <A> id() = Iso.id<A>().asFold()
 
         /**
-         * [Fold] that takes either S or S and strips the choice of A.
+         * [Fold] that takes either [S] or [S] and strips the choice of [S].
          */
         inline fun <reified S> codiagonal() = object : Fold<Either<S, S>, S>() {
             override fun <R> foldMap(M: Monoid<R>, s: Either<S, S>, f: (S) -> R): R = s.fold(f, f)
@@ -85,16 +84,6 @@ abstract class Fold<S, A> {
     inline fun exists(s: S, crossinline p: (A) -> Boolean): Boolean = find(s, p).fold({ false }, { true })
 
     /**
-     * Get the first target
-     */
-    fun headOption(s: S): Option<A> = foldMap(firstOptionMonoid<A>(), s, { b -> Const(b.some()) }).value
-
-    /**
-     * Get the last target
-     */
-    fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s, { b -> Const(b.some()) }).value
-
-    /**
      * Check if forall targets satisfy the predicate
      */
     fun forall(s: S, p: (A) -> Boolean): Boolean = foldMap(addMonoid, s, p)
@@ -108,6 +97,16 @@ abstract class Fold<S, A> {
      * Check if there is at least one target
      */
     fun nonEmpty(s: S): Boolean = !isEmpty(s)
+
+    /**
+     * Get the first target
+     */
+    fun headOption(s: S): Option<A> = foldMap(firstOptionMonoid<A>(), s, { b -> Const(b.some()) }).value
+
+    /**
+     * Get the last target
+     */
+    fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s, { b -> Const(b.some()) }).value
 
     /**
      * Join two [Fold] with the same target
@@ -136,7 +135,7 @@ abstract class Fold<S, A> {
     /**
      * Compose a [Fold] with a [Fold]
      */
-    infix fun <C> composeFold(other: Fold<A, C>): Fold<S, C> = object : Fold<S, C>() {
+    infix fun <C> compose(other: Fold<A, C>): Fold<S, C> = object : Fold<S, C>() {
         override fun <R> foldMap(M: Monoid<R>, s: S, f: (C) -> R): R =
                 this@Fold.foldMap(M, s, { c -> other.foldMap(M, c, f) })
     }
@@ -144,42 +143,42 @@ abstract class Fold<S, A> {
     /**
      * Compose a [Fold] with a [Getter]
      */
-    infix fun <C> composeGetter(other: Getter<A, C>): Fold<S, C> = composeFold(other.asFold())
+    infix fun <C> compose(other: Getter<A, C>): Fold<S, C> = compose(other.asFold())
 
     /**
      * Compose a [Fold] with a [Optional]
      */
-    infix fun <C> composeOptional(other: Optional<A, C>): Fold<S, C> = composeFold(other.asFold())
+    infix fun <C> compose(other: Optional<A, C>): Fold<S, C> = compose(other.asFold())
 
     /**
      * Compose a [[Fold]] with a [Prism]
      */
-    infix fun <C> composePrism(other: Prism<A, C>): Fold<S, C> = composeFold(other.asFold())
+    infix fun <C> compose(other: Prism<A, C>): Fold<S, C> = compose(other.asFold())
 
     /**
      * Compose a [Fold] with a [Lens]
      */
-    infix fun <C> composeLens(other: Lens<A, C>): Fold<S, C> = composeFold(other.asFold())
+    infix fun <C> compose(other: Lens<A, C>): Fold<S, C> = compose(other.asFold())
 
     /**
      * Compose a [Fold] with a [Iso]
      */
-    infix fun <C> composeIso(other: Iso<A, C>): Fold<S, C> = composeFold(other.asFold())
+    infix fun <C> compose(other: Iso<A, C>): Fold<S, C> = compose(other.asFold())
 
     /**
      * Plus operator  overload to compose lenses
      */
-    operator fun <C> plus(other: Fold<A, C>): Fold<S, C> = composeFold(other)
+    operator fun <C> plus(other: Fold<A, C>): Fold<S, C> = compose(other)
 
-    operator fun <C> plus(other: Optional<A, C>): Fold<S, C> = composeOptional(other)
+    operator fun <C> plus(other: Optional<A, C>): Fold<S, C> = compose(other)
 
-    operator fun <C> plus(other: Getter<A, C>): Fold<S, C> = composeGetter(other)
+    operator fun <C> plus(other: Getter<A, C>): Fold<S, C> = compose(other)
 
-    operator fun <C> plus(other: Prism<A, C>): Fold<S, C> = composePrism(other)
+    operator fun <C> plus(other: Prism<A, C>): Fold<S, C> = compose(other)
 
-    operator fun <C> plus(other: Lens<A, C>): Fold<S, C> = composeLens(other)
+    operator fun <C> plus(other: Lens<A, C>): Fold<S, C> = compose(other)
 
-    operator fun <C> plus(other: Iso<A, C>): Fold<S, C> = composeIso(other)
+    operator fun <C> plus(other: Iso<A, C>): Fold<S, C> = compose(other)
 }
 
 /**
