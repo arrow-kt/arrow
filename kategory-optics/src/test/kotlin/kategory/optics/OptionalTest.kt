@@ -58,7 +58,7 @@ class OptionalTest : UnitSpec() {
 
         "void should always return source when setting target" {
             forAll({ int: Int, string: String ->
-                Optional.void<String, Int>().set(int)(string) == string
+                Optional.void<String, Int>().set(string, int) == string
             })
         }
 
@@ -76,19 +76,19 @@ class OptionalTest : UnitSpec() {
 
         "Finding a target using a predicate should be wrapped in the correct option result" {
             forAll(Gen.list(Gen.int()), Gen.bool(), { list, predicate ->
-                optionalHead.find { predicate }(list).fold({ false }, { true }) == predicate
+                optionalHead.find(list) { predicate }.fold({ false }, { true }) == predicate
             })
         }
 
         "Checking existence predicate over the target should result in same result as predicate" {
             forAll(Gen.list(Gen.int()), Gen.bool(), { list, predicate ->
-                optionalHead.exists { predicate }(list) == predicate
+                optionalHead.exists(list) { predicate } == predicate
             })
         }
 
         "Checking satisfaction of predicate over the target should result in opposite result as predicate" {
             forAll(Gen.list(Gen.int()), Gen.bool(), { list, predicate ->
-                optionalHead.all { predicate }(list) == predicate
+                optionalHead.all(list) { predicate } == predicate
             })
         }
 

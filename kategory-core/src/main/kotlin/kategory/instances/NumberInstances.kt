@@ -18,6 +18,14 @@ object ByteSemigroupInstanceImplicits {
     @JvmStatic fun instance(): Semigroup<Byte> = SGByte
 }
 
+object ByteOrderInstance : Order<Byte> {
+    override fun compare(a: Byte, b: Byte): Int = a.compareTo(b)
+}
+
+object ByteOrderInstanceImplicits {
+    @JvmStatic fun instance(): Order<Byte> = ByteOrderInstance
+}
+
 object DoubleMonoid : Monoid<Double>, Semigroup<Double> by SGDouble {
     override fun empty(): Double = .0
 }
@@ -30,6 +38,14 @@ private val SGDouble: Semigroup<Double> = NumberSemigroup(Double::plus)
 
 object DoubleSemigroupInstanceImplicits {
     @JvmStatic fun instance(): Semigroup<Double> = SGDouble
+}
+
+object DoubleOrderInstance : Order<Double> {
+    override fun compare(a: Double, b: Double): Int = a.compareTo(b)
+}
+
+object DoubleOrderInstanceImplicits {
+    @JvmStatic fun instance(): Order<Double> = DoubleOrderInstance
 }
 
 object IntMonoid : Monoid<Int>, Semigroup<Int> by SGInt {
@@ -54,6 +70,14 @@ object IntEqInstanceImplicits {
     @JvmStatic fun instance(): IntEqInstance = IntEqInstance
 }
 
+object IntOrderInstance : Order<Int> {
+    override fun compare(a: Int, b: Int): Int = a.compareTo(b)
+}
+
+object IntOrderInstanceImplicits {
+    @JvmStatic fun instance(): Order<Int> = IntOrderInstance
+}
+
 object LongMonoid : Monoid<Long>, Semigroup<Long> by SGLong {
     override fun empty(): Long = 0L
 }
@@ -66,6 +90,14 @@ private val SGLong: Semigroup<Long> = NumberSemigroup(Long::plus)
 
 object LongSemigroupInstanceImplicits {
     @JvmStatic fun instance(): Semigroup<Long> = SGLong
+}
+
+object LongOrderInstance : Order<Long> {
+    override fun compare(a: Long, b: Long): Int = a.compareTo(b)
+}
+
+object LongOrderInstanceImplicits {
+    @JvmStatic fun instance(): Order<Long> = LongOrderInstance
 }
 
 object ShortMonoid : Monoid<Short>, Semigroup<Short> by SGShort {
@@ -82,6 +114,14 @@ object ShortSemigroupInstanceImplicits {
     @JvmStatic fun instance(): Semigroup<Short> = SGShort
 }
 
+object ShortOrderInstance : Order<Short> {
+    override fun compare(a: Short, b: Short): Int = a.compareTo(b)
+}
+
+object ShortOrderInstanceImplicits {
+    @JvmStatic fun instance(): Order<Short> = ShortOrderInstance
+}
+
 object FloatMonoid : Monoid<Float>, Semigroup<Float> by SGFloat {
     override fun empty(): Float = .0f
 }
@@ -96,3 +136,10 @@ object FloatSemigroupInstanceImplicits {
     @JvmStatic fun instance(): Semigroup<Float> = SGFloat
 }
 
+object FloatOrderInstance : Order<Float> {
+    override fun compare(a: Float, b: Float): Int = a.compareTo(b)
+}
+
+object FloatOrderInstanceImplicits {
+    @JvmStatic fun instance(): Order<Float> = FloatOrderInstance
+}

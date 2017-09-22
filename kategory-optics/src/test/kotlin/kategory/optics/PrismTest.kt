@@ -75,8 +75,8 @@ class PrismTest : UnitSpec() {
 
         "Joining two prisms together with same target should yield same result" {
             forAll(SumGen, { a ->
-                (sumPrism composePrism stringPrism).getOption(a) == sumPrism.getOption(a).flatMap(stringPrism::getOption) &&
-                        (sumPrism + stringPrism).getOption(a) == (sumPrism composePrism stringPrism).getOption(a)
+                (sumPrism compose stringPrism).getOption(a) == sumPrism.getOption(a).flatMap(stringPrism::getOption) &&
+                        (sumPrism + stringPrism).getOption(a) == (sumPrism compose stringPrism).getOption(a)
             })
         }
 
@@ -102,25 +102,25 @@ class PrismTest : UnitSpec() {
 
         "Setting a target on a prism should set the correct target"{
             forAll(AGen, Gen.string(), { a, string ->
-                sumPrism.setOption(string)(a) == a.copy(string = string).some()
+                sumPrism.setOption(a, string) == a.copy(string = string).some()
             })
         }
 
         "Finding a target using a predicate within a Lens should be wrapped in the correct option result" {
             forAll(SumGen, Gen.bool(), { sum, predicate ->
-                sumPrism.find { predicate }(sum).fold({ false }, { true }) == (predicate && sum is SumType.A)
+                sumPrism.find(sum) { predicate }.fold({ false }, { true }) == (predicate && sum is SumType.A)
             })
         }
 
         "Checking existence predicate over the target should result in same result as predicate" {
             forAll(SumGen, Gen.bool(), { sum, predicate ->
-                sumPrism.exist { predicate }(sum) == (predicate && sum is SumType.A)
+                sumPrism.exist(sum) { predicate } == (predicate && sum is SumType.A)
             })
         }
 
         "Checking satisfaction of predicate over the target should result in opposite result as predicate" {
             forAll(SumGen, Gen.bool(), { sum, predicate ->
-                sumPrism.all { predicate }(sum) == (predicate || sum is SumType.B)
+                sumPrism.all(sum) { predicate } == (predicate || sum is SumType.B)
             })
         }
 

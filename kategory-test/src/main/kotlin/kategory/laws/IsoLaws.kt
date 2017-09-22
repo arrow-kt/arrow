@@ -28,22 +28,22 @@ object IsoLaws {
 
     inline fun <reified A, reified B> modifyIdentity(iso: Iso<A, B>, aGen: Gen<A>, EQA: Eq<A>): Unit =
             forAll(aGen, { a ->
-                iso.modify(::identity)(a).equalUnderTheLaw(a, EQA)
+                iso.modify(a, ::identity).equalUnderTheLaw(a, EQA)
             })
 
     inline fun <reified A, reified B> composeModify(iso: Iso<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>): Unit =
             forAll(aGen, funcGen, funcGen, { a, f, g ->
-                iso.modify(g)(iso.modify(f)(a)).equalUnderTheLaw(iso.modify(g compose f)(a), EQA)
+                iso.modify(iso.modify(a, f), g).equalUnderTheLaw(iso.modify(a, g compose f), EQA)
             })
 
     inline fun <reified A, reified B> consistentSetModify(iso: Iso<A, B>, aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>): Unit =
             forAll(aGen, bGen, { a, b ->
-                iso.set(b)(a).equalUnderTheLaw(iso.modify { b }(a), EQA)
+                iso.set(b).equalUnderTheLaw(iso.modify(a) { b }, EQA)
             })
 
     inline fun <reified A, reified B> consistentModifyModifyId(iso: Iso<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>): Unit =
             forAll(aGen, funcGen, { a, f ->
-                iso.modify(f)(a).equalUnderTheLaw(iso.modifyF(Id.functor(), { Id.pure(f(it)) }, a).value(), EQA)
+                iso.modify(a, f).equalUnderTheLaw(iso.modifyF(Id.functor(), { Id.pure(f(it)) }, a).value(), EQA)
             })
 
     inline fun <reified A, reified B> consitentGetModifyId(iso: Iso<A, B>, aGen: Gen<A>, EQB: Eq<B>, bMonoid: Monoid<B>): Unit =

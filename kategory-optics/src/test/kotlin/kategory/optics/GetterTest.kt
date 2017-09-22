@@ -28,13 +28,13 @@ class GetterTest : UnitSpec() {
 
         "Finding a target using a predicate within a Getter should be wrapped in the correct option result" {
             forAll({ value: String, predicate: Boolean ->
-                tokenGetter.find { predicate }(Token(value)).fold({ false }, { true }) == predicate
+                tokenGetter.find(Token(value)) { predicate }.fold({ false }, { true }) == predicate
             })
         }
 
         "Checking existence of a target should always result in the same result as predicate" {
             forAll({ value: String, predicate: Boolean ->
-                tokenGetter.exist { predicate }(Token(value)) == predicate
+                tokenGetter.exist(Token(value)) { predicate } == predicate
             })
         }
 
