@@ -19,22 +19,24 @@ apply plugin: 'maven'
 version = VERSION_NAME
 group = GROUP
 
+def findProperty(String key) {
+    [project.properties[key], System.getenv(key)].find { it != null }
+}
+
 def getReleaseRepositoryUrl() {
-    return hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL
-            : "http://oss.jfrog.org/artifactory/oss-release-local"
+    return findProperty('RELEASE_REPOSITORY_URL') ?: "http://oss.jfrog.org/artifactory/oss-release-local"
 }
 
 def getSnapshotRepositoryUrl() {
-    return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL
-            : "http://oss.jfrog.org/artifactory/oss-snapshot-local"
+    return findProperty('SNAPSHOT_REPOSITORY_URL') ?: "http://oss.jfrog.org/artifactory/oss-snapshot-local"
 }
 
 def getRepositoryUsername() {
-    return hasProperty('BINTRAY_USER') ? BINTRAY_USER : ""
+    return findProperty('BINTRAY_USER') ?: "no.bintray.user"
 }
 
 def getRepositoryPassword() {
-    return hasProperty('BINTRAY_API_KEY') ? BINTRAY_API_KEY : ""
+    return findProperty('BINTRAY_API_KEY') ?: "no.bintray.api.key"
 }
 
 uploadArchives {
