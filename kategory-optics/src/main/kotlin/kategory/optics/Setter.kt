@@ -7,7 +7,7 @@ import kategory.functor
 
 /**
  * [Setter] is a type alias for [PSetter] which fixes the type arguments
- * and restricts the Setter to monomorphic updates.
+ * and restricts the [PSetter] to monomorphic updates.
  */
 typealias Setter<S, A> = PSetter<S, S, A, A>
 
@@ -40,12 +40,16 @@ abstract class PSetter<S, T, A, B> {
 
     companion object {
 
-        fun <A> id() = Iso.id<A>().asSetter()
-
-        fun <A> codiagonal(): Setter<Either<A, A>, A> = Setter { f -> { aa -> aa.bimap(f, f) } }
+        fun <S> id() = Iso.id<S>().asSetter()
 
         /**
-         * Create a [PSetter] using modify function
+         * [PSetter] that takes either S or S and strips the choice of S.
+         */
+        fun <S> codiagonal(): Setter<Either<S, S>, S> = Setter { f -> { aa -> aa.bimap(f, f) } }
+
+        /**
+         * Invoke operator overload to create a [PSetter] of type `S` with target `A`.
+         * Can also be used to construct [Setter]
          */
         operator fun <S, T, A, B> invoke(modify: ((A) -> B) -> (S) -> T): PSetter<S, T, A, B> = object : PSetter<S, T, A, B>() {
             override fun modify(s: S, f: (A) -> B): T = modify(f)(s)
@@ -65,7 +69,7 @@ abstract class PSetter<S, T, A, B> {
      * Join two [PSetter] with the same target
      */
     fun <U, V> choice(other: PSetter<U, V, A, B>): PSetter<Either<S, U>, Either<T, V>, A, B> = PSetter { f ->
-        { ac -> ac.bimap({ s -> modify(s, f) }, { u -> other.modify(u, f) }) }
+        { su -> su.bimap({ s -> modify(s, f) }, { u -> other.modify(u, f) }) }
     }
 
     /**
