@@ -3,6 +3,7 @@ package kategory
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.should
 import io.kotlintest.matchers.shouldBe
+import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
@@ -22,6 +23,15 @@ class MapKWTest : UnitSpec() {
 
 
     init {
+
+        "instances can be resolved implicitly" {
+            functor<MapKWHK>() shouldNotBe null
+            foldable<MapKWHK>() shouldNotBe null
+            traverse<MapKWHK>() shouldNotBe null
+            semigroup<MapKWKind<String, Int>>() shouldNotBe null
+            monoid<MapKWKind<String, Int>>() shouldNotBe null
+        }
+
         val monoid = MapKW.monoid<String, Int>(SG)
 
         "Monoid Laws: identity" {
