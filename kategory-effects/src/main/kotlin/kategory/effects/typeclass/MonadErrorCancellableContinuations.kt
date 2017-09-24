@@ -35,6 +35,27 @@ open class MonadErrorCancellableContinuation<F, A>(ME: MonadError<F, Throwable>,
         })
         COROUTINE_SUSPENDED
     }
+
+    override suspend fun <B> bindInContext(context: CoroutineContext, m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
+        val labelHere = c.stackLabels // save the whole coroutine stack labels
+        val monadCreation: suspend () -> HK<F, A> = {
+            flatMap(m(), { xx: B ->
+                c.stackLabels = labelHere
+                if (cancelled.get()) {
+                    throw BindingCancellationException()
+                }
+                c.resume(xx)
+                returnedMonad
+            })
+        }
+        val completion = bindingInContextContinuation(context)
+        returnedMonad = flatMap(pure(Unit), {
+            monadCreation.startCoroutine(completion)
+            completion.await()
+            returnedMonad
+        })
+        COROUTINE_SUSPENDED
+    }
 }
 
 /**
