@@ -29,7 +29,7 @@ val foo = Foo(5)
 fooLens.get(foo)
 ```
 ```kotlin:ank
-fooLens.set(10)(foo)
+fooLens.set(foo, 10)
 ```
 ```kotlin:ank
 fooLens.modify(foo) { it + 1 }
@@ -144,7 +144,7 @@ fun <A, B, R> firstTuple2(): PLens<Tuple2<A, B>, Tuple2<R, B>, A, R> = PLens(
         { r -> { ab -> r toT ab.b } }
 )
 
-firstTuple2<Int, String, String>().set("Hello, ")(5 toT "World")
+firstTuple2<Int, String, String>().set(5 toT "World", "Hello, ")
 ```
 
 ### Laws

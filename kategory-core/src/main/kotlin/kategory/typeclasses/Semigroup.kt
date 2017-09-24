@@ -6,6 +6,8 @@ interface Semigroup<A> : Typeclass {
      */
     fun combine(a: A, b: A): A
 
+    fun maybeCombine(a: A, b: A?): A = Option.fromNullable(b).fold({ a }, { this.combine(a, it) })
+
     /**
      * Combine an array of [A] values.
      */

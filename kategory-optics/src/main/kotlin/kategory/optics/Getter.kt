@@ -1,6 +1,7 @@
 package kategory.optics
 
 import kategory.Either
+import kategory.Monoid
 import kategory.Option
 import kategory.Tuple2
 import kategory.compose
@@ -125,5 +126,9 @@ abstract class Getter<S, A> {
     operator fun <C> plus(other: Lens<A,C>): Getter<S, C> = composeLens(other)
 
     operator fun <C> plus(other: Iso<A,C>): Getter<S, C> = composeIso(other)
+
+    fun asFold(): Fold<S, A> = object : Fold<S, A>() {
+        override fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R = f(get(s))
+    }
 
 }
