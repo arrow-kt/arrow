@@ -1,17 +1,25 @@
 apply plugin: 'ank-gradle-plugin'
 
 dependencies {
-    //compile project(':kategory')
-    //compile project(':kategory-effects')
+    compile project(':ank-core')
+    compile project(':kategory-effects')
+    compile project(':kategory-effects-rx2')
+    compile project(':kategory-optics')
+    compile project(':kategory-recursion')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
     compile "io.kotlintest:kotlintest:$kotlinTestVersion"
+}
+
+task printcp {
+    println sourceSets.main.runtimeClasspath.each { println it }
 }
 
 ank {
     source = file("${projectDir}/docs")
     target = file("${projectDir}/build/site")
     classpath = sourceSets.main.runtimeClasspath
+    includeAnkCore = false
 }
 
 sourceCompatibility = javaVersion

@@ -1,0 +1,27 @@
+// DOC HEADER
+// -----------------------------------------------
+// -----------------------------------------------
+.doc-header {
+    @include flexbox;
+    @include justify-content(flex-start);
+    @include align-items(center);
+    height: ($base-point-grid * 11);
+    padding: 0 ($base-point-grid * 4);
+    background: $white;
+
+    .search {
+        display: block;
+        width: 100%;
+        padding: $base-point-grid 0;
+        font-family: $base-font-family;
+        font-size: $base-font-size;
+        color: $brand-secondary;
+        border: none;
+        cursor: auto;
+    }
+
+    .fa {
+        color: rgba($brand-secondary, 0.9);
+        margin-right: ($base-point-grid * 1.6);
+    }
+}

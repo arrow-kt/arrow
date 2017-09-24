@@ -1,0 +1,57 @@
+// SIDEBAR
+// -----------------------------------------------
+// -----------------------------------------------
+
+#wrapper {
+    padding-left: 50px;
+    transition: all 0.5s ease;
+}
+
+#sidebar-wrapper {
+    z-index: 1000;
+    position: fixed;
+    left: -200px;
+    width: 250px;
+    height: 100%;
+    overflow-y: auto;
+    background: $brand-primary;
+    transition: all 0.5s ease;
+}
+
+#wrapper.toggled {
+    #sidebar-wrapper {
+        left: -250px;
+        margin-left: 250px;
+    }
+}
+
+#doc-wrapper {
+    width: 100%;
+}
+
+
+@media(min-width:768px) {
+    #wrapper {
+        padding-left: 250px;
+    }
+
+    #wrapper.toggled {
+        padding-left: 50px;
+    }
+
+    #sidebar-wrapper {
+        left: 250px;
+        margin-left: -250px;
+    }
+
+    #wrapper.toggled #sidebar-wrapper {
+        left: -200px;
+        margin-left: 0;
+    }
+
+
+    #wrapper.toggled #doc-wrapper {
+        position: relative;
+        margin-right: 50px;
+    }
+}

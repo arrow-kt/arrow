@@ -1,7 +1,5 @@
 package kategory
 
-@Suppress("UNCHECKED_CAST") inline fun <F, A> OptionTKind<F, A>.value(): HK<F, Option<A>> = this.ev().value
-
 /**
  * [OptionT]`<F, A>` is a light wrapper on an `F<`[Option]`<A>>` with some
  * convenient methods for working with this nested structure.
@@ -100,3 +98,5 @@ package kategory
 
 inline fun <F, A, B> OptionT<F, A>.mapFilter(crossinline f: (A) -> Option<B>, FF: Functor<F>): OptionT<F, B> =
         OptionT(FF.map(value, { it.flatMap(f) }))
+
+fun <F, A> OptionTKind<F, A>.value(): HK<F, Option<A>> = this.ev().value
