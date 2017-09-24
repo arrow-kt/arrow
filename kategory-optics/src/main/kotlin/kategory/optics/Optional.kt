@@ -3,9 +3,11 @@ package kategory.optics
 import kategory.Applicative
 import kategory.Either
 import kategory.HK
+import kategory.Monoid
 import kategory.Option
 import kategory.Tuple2
 import kategory.flatMap
+import kategory.getOrElse
 import kategory.identity
 import kategory.left
 import kategory.none
@@ -205,5 +207,12 @@ abstract class POptional<S, T, A, B> {
      * View a [POptional] as a [PSetter]
      */
     fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s, f) } }
+
+    /**
+     * View a [POptional] as a [Fold]
+     */
+    fun asFold() = object : Fold<S, A>() {
+        override fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R = getOption(s).map(f).getOrElse(M::empty)
+    }
 
 }
