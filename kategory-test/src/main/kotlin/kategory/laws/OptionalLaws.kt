@@ -55,28 +55,27 @@ object OptionalLaws {
                 optional.modify(a, f).equalUnderTheLaw(optional.modifyF(Id.applicative(), a, { Id.pure(f(it)) }).value(), EQA)
             })
 
-    inline fun <reified A, reified B> consistentGetOptionModifyId(optional: Optional<A, B>, aGen: Gen<A>, EQB: Eq<B>): Unit =
-            forAll(aGen, { a ->
-                val getOption = optional.getOption(a)
+    inline fun <reified A, reified B> consistentGetOptionModifyId(optional: Optional<A, B>, aGen: Gen<A>, EQB: Eq<B>): Unit {
+        val firstMonoid = object : Monoid<FirstOption<B>> {
+            override fun empty(): FirstOption<B> = FirstOption(Option.None)
+            override fun combine(a: FirstOption<B>, b: FirstOption<B>): FirstOption<B> = if (a.option.fold({ false }, { true })) a else b
+        }
 
-                val modifyFId = optional.modifyF(Const.applicative(firstOptionMonoid<B>()), a, { b ->
-                    Const(FirstOption(b.some()))
-                }).value().option
+        forAll(aGen, { a ->
+            val getOption = optional.getOption(a)
 
-                getOption.exists { b ->
-                    modifyFId.exists {
-                        it.equalUnderTheLaw(b, EQB)
-                    }
+            val modifyFId = optional.modifyF(Const.applicative(firstMonoid), a, { b ->
+                Const(FirstOption(b.some()))
+            }).value().option
+
+            getOption.exists { b ->
+                modifyFId.exists {
+                    it.equalUnderTheLaw(b, EQB)
                 }
-            })
+            }
+        })
+    }
 
     @PublishedApi internal data class FirstOption<A>(val option: Option<A>)
-
-    @PublishedApi internal fun <A> firstOptionMonoid() = object : Monoid<FirstOption<A>> {
-        override fun empty(): FirstOption<A> = FirstOption(Option.None)
-
-        override fun combine(a: FirstOption<A>, b: FirstOption<A>): FirstOption<A> =
-                if (a.option.fold({ false }, { true })) a else b
-    }
 
 }
