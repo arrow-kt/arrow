@@ -4,7 +4,6 @@ import kotlin.reflect.KClass
 import kategory.*
 import kategory.effects.*
 
-
 inline fun <reified F, reified E> debugInstanceLookups(): Map<KClass<out Typeclass>, () -> Typeclass> = mapOf(
         Alternative::class to { alternative<F>() },
         Applicative::class to { applicative<F>() },

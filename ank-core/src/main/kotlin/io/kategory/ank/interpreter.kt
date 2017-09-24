@@ -57,12 +57,10 @@ fun createTargetImpl(source: File, target: File): File {
     return target
 }
 
-
 fun getFileCandidatesImpl(target: File): ListKW<File> =
         ListKW(target.walkTopDown().filter {
             SupportedMarkdownExtensions.contains(it.extension.toLowerCase())
         }.toList())
-
 
 fun readFileImpl(source: File): String =
         source.readText()
@@ -153,7 +151,6 @@ fun replaceAnkToLangImpl(compiledMarkdown: CompiledMarkdown): String =
                     { content.replace(snippet.fence, "```${snippet.lang}\n" +snippet.code + "\n" + it + "\n```") }
             )
         })
-
 
 fun generateFilesImpl(candidates: ListKW<File>, newContents: ListKW<String>): ListKW<File> =
         ListKW(candidates.mapIndexed { n, file ->
