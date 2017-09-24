@@ -8,7 +8,7 @@ permalink: /docs/datatypes/eval/
 
 Eval is a monad that allows us to control evaluation and chain lazy operations that are not executed until `value()` is invoked. 
 
-Eval includes internally trampolining facilities which allows us to chain computations without fear off blowing the stack.
+Eval includes internally trampolining facilities which allows us to chain computations without fear of blowing up the stack.
 There are two different factors that play into evaluation: memoization and laziness.
 
 Eval supports memoization, eager and lazy evaluation strategies
