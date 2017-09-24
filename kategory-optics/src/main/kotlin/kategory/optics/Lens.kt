@@ -20,20 +20,20 @@ import kategory.toT
 typealias Lens<S, A> = PLens<S, S, A, A>
 
 /**
- * A [Lens] (or Functional Reference) is an optic that allows to see into a structure and
- * getting, setting or modifying the target.
+ * A [Lens] (or Functional Reference) is an optic that can focus into a structure for
+ * getting, setting or modifying the focus (target).
  *
  * A (polymorphic) [PLens] is useful when setting or modifying a value for a constructed type
  * i.e. PLens<Tuple2<Double, Int>, Tuple2<String, Int>, Double, String>
  *
  * A [PLens] can be seen as a pair of functions:
- * - `get: (S) -> A` meaning we can look into an `S` and extract an `A`
- * - `set: (B) -> (S) -> T` meaning we can look into an `S` and set a value `B` for a target `A` and obtain a modified source `T`
+ * - `get: (S) -> A` meaning we can focus into an `S` and extract an `A`
+ * - `set: (B) -> (S) -> T` meaning we can focus into an `S` and set a value `B` for a target `A` and obtain a modified source `T`
  *
  * @param S the source of a [PLens]
  * @param T the modified source of a [PLens]
- * @param A the target of a [PLens]
- * @param B the modified target of a [PLens]
+ * @param A the focus of a [PLens]
+ * @param B the modified focus of a [PLens]
  */
 abstract class PLens<S, T, A, B> {
 
@@ -64,30 +64,40 @@ abstract class PLens<S, T, A, B> {
     }
 
     /**
-     * Modify the target of s [PLens] using s function `(A) -> B`
+     * Modify the focus of s [PLens] using s function `(A) -> B`
      */
     inline fun modify(s: S, crossinline f: (A) -> B): T = set(f(get(s)))(s)
 
     /**
-     * Modify the target of a [PLens] using Functor function
+     * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
+     */
+    inline fun lift(crossinline f: (A) -> B): (S) -> T = { s -> modify(s, f) }
+
+    /**
+     * Modify the focus of a [PLens] using Functor function
      */
     inline fun <reified F> modifyF(FF: Functor<F> = functor(), s: S, f: (A) -> HK<F, B>): HK<F, T> =
             FF.map(f(get(s)), { set(it)(s) })
 
     /**
-     * Find if the target satisfies the predicate
+     * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
+     */
+    inline fun <reified F> liftF(FF: Functor<F> = functor(), crossinline f: (A) -> HK<F, B>): (S) -> HK<F, T> = { s -> modifyF(FF, s, f) }
+
+    /**
+     * Find a focus that satisfies the predicate
      */
     inline fun find(s: S, crossinline p: (A) -> Boolean): Option<A> = get(s).let { a ->
         if (p(a)) a.some() else none()
     }
 
     /**
-     * Checks if the target of a [PLens] satisfies the predicate
+     * Verify if the focus of a [PLens] satisfies the predicate
      */
     inline fun exist(s: S, crossinline p: (A) -> Boolean): Boolean = p(get(s))
 
     /**
-     * Join two [PLens] with the same target [A]
+     * Join two [PLens] with the same focus in [A]
      */
     fun <S1, T1> choice(other: PLens<S1, T1, A, B>): PLens<Either<S, S1>, Either<T, T1>, A, B> = PLens(
             { ss -> ss.fold(this::get, other::get) },

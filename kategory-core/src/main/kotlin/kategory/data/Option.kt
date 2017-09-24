@@ -47,7 +47,7 @@ sealed class Option<out A> : OptionKind<A> {
      * Returns true if the option is [None], false otherwise.
      * @note Used only for performance instead of fold.
      */
-    internal abstract val isEmpty: Boolean
+    abstract val isEmpty: Boolean
 
     /**
      * Returns true if the option is an instance of $some, false otherwise.
@@ -174,6 +174,7 @@ sealed class Option<out A> : OptionKind<A> {
 
     object None : Option<Nothing>() {
         override val isEmpty = true
+        override fun toString(): String = "None"
     }
 
 }
@@ -197,3 +198,6 @@ fun <A, B : A> OptionKind<B>.orElse(alternative: () -> Option<B>): Option<B> = i
 fun <A> A.some(): Option<A> = Option.Some(this)
 
 fun <A> none(): Option<A> = Option.None
+
+fun <A, L> Option<A>.toEither(ifEmpty: () -> L): Either<L, A> =
+        this.fold({ ifEmpty().left() }, { it.right() })
