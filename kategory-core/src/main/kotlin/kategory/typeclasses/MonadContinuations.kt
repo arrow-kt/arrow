@@ -5,7 +5,7 @@ import kotlin.coroutines.experimental.*
 import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
 
-interface AwaitableContinuation<in T> : Continuation<T> {
+interface BindingInContextContinuation<in T> : Continuation<T> {
     fun await(): Unit
 }
 
@@ -21,8 +21,8 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
         throw exception
     }
 
-    protected fun bindingInContextContinuation(context: CoroutineContext): AwaitableContinuation<HK<F, A>> =
-            object : AwaitableContinuation<HK<F, A>> {
+    protected fun bindingInContextContinuation(context: CoroutineContext): BindingInContextContinuation<HK<F, A>> =
+            object : BindingInContextContinuation<HK<F, A>> {
                 val latch: CountDownLatch = CountDownLatch(1)
 
                 override fun await() = latch.await()
@@ -95,8 +95,8 @@ open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: C
 
     internal fun returnedMonad(): Free<F, A> = returnedMonad
 
-    protected fun bindingInContextContinuation(context: CoroutineContext): AwaitableContinuation<Free<F, A>> =
-            object : AwaitableContinuation<Free<F, A>> {
+    protected fun bindingInContextContinuation(context: CoroutineContext): BindingInContextContinuation<Free<F, A>> =
+            object : BindingInContextContinuation<Free<F, A>> {
                 val latch: CountDownLatch = CountDownLatch(1)
 
                 override fun await() = latch.await()
