@@ -43,7 +43,7 @@ data class MapKW<K, out A>(val map: Map<K, A>) : MapKWKind<K, A>, Map<K, A> by m
             Foldable.iterateRight(this.map.iterator(), Eval.always { GA.pure(emptyMap<K, B>().k()) })({ kv, lbuf ->
                 GA.map2Eval(f(kv.value), lbuf) { (mapOf(kv.key to it.a).k() + it.b).k() }
             }).value()
-    
+
 }
 
 fun <K, A> Map<K, A>.k(): MapKW<K, A> = MapKW(this)

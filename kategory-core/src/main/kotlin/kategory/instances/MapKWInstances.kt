@@ -21,7 +21,6 @@ interface MapKWTraverseInstance<K> : MapKWFoldableInstance<K>, Traverse<MapKWKin
             fa.ev().traverse(f, GA)
 }
 
-
 @instance(MapKW::class)
 interface MapKWSemigroupInstance<K, A> : Semigroup<MapKWKind<K, A>> {
 
