@@ -38,7 +38,7 @@ typealias Lens<S, A> = PLens<S, S, A, A>
 abstract class PLens<S, T, A, B> {
 
     abstract fun get(s: S): A
-    abstract fun set(b: B): (S) -> T
+    abstract fun set(s: S, b: B): T
 
     companion object {
 
@@ -59,14 +59,14 @@ abstract class PLens<S, T, A, B> {
         operator fun <S, T, A, B> invoke(get: (S) -> A, set: (B) -> (S) -> T) = object : PLens<S, T, A, B>() {
             override fun get(s: S): A = get(s)
 
-            override fun set(b: B): (S) -> T = set(b)
+            override fun set(s: S, b: B): T = set(b)(s)
         }
     }
 
     /**
      * Modify the focus of s [PLens] using s function `(A) -> B`
      */
-    inline fun modify(s: S, crossinline f: (A) -> B): T = set(f(get(s)))(s)
+    inline fun modify(s: S, crossinline f: (A) -> B): T = set(s, f(get(s)))
 
     /**
      * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
@@ -77,7 +77,7 @@ abstract class PLens<S, T, A, B> {
      * Modify the focus of a [PLens] using Functor function
      */
     inline fun <reified F> modifyF(FF: Functor<F> = functor(), s: S, f: (A) -> HK<F, B>): HK<F, T> =
-            FF.map(f(get(s)), { set(it)(s) })
+            FF.map(f(get(s)), { set(s, it) })
 
     /**
      * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
@@ -99,18 +99,18 @@ abstract class PLens<S, T, A, B> {
     /**
      * Join two [PLens] with the same focus in [A]
      */
-    fun <S1, T1> choice(other: PLens<S1, T1, A, B>): PLens<Either<S, S1>, Either<T, T1>, A, B> = PLens(
+    infix fun <S1, T1> choice(other: PLens<S1, T1, A, B>): PLens<Either<S, S1>, Either<T, T1>, A, B> = PLens(
             { ss -> ss.fold(this::get, other::get) },
-            { b -> { ss -> ss.bimap(set(b), other.set(b)) } }
+            { b -> { ss -> ss.bimap({ s -> set(s, b) }, { s -> other.set(s, b) }) } }
     )
 
     /**
      * Pair two disjoint [PLens]
      */
-    fun <S1, T1, A1, B1> split(other: PLens<S1, T1, A1, B1>): PLens<Tuple2<S, S1>, Tuple2<T, T1>, Tuple2<A, A1>, Tuple2<B, B1>> =
+    infix fun <S1, T1, A1, B1> split(other: PLens<S1, T1, A1, B1>): PLens<Tuple2<S, S1>, Tuple2<T, T1>, Tuple2<A, A1>, Tuple2<B, B1>> =
             PLens(
                     { (s, c) -> get(s) toT other.get(c) },
-                    { (b, b1) -> { (s, s1) -> set(b)(s) toT other.set(b1)(s1) } }
+                    { (b, b1) -> { (s, s1) -> set(s, b) toT other.set(s1, b1) } }
             )
 
     /**
@@ -118,7 +118,7 @@ abstract class PLens<S, T, A, B> {
      */
     fun <C> first(): PLens<Tuple2<S, C>, Tuple2<T, C>, Tuple2<A, C>, Tuple2<B, C>> = PLens(
             { (s, c) -> get(s) toT c },
-            { (b, c) -> { (a, _) -> set(b)(a) toT c } }
+            { (b, c) -> { (s, _) -> set(s, b) toT c } }
     )
 
     /**
@@ -126,7 +126,7 @@ abstract class PLens<S, T, A, B> {
      */
     fun <C> second(): PLens<Tuple2<C, S>, Tuple2<C, T>, Tuple2<C, A>, Tuple2<C, B>> = PLens(
             { (c, s) -> c toT get(s) },
-            { (c, b) -> { (_, s) -> c toT set(b)(s) } }
+            { (c, b) -> { (_, s) -> c toT set(s, b) } }
     )
 
     /**
@@ -134,7 +134,7 @@ abstract class PLens<S, T, A, B> {
      */
     infix fun <C, D> compose(l: PLens<A, B, C, D>): PLens<S, T, C, D> = Lens(
             { a -> l.get(get(a)) },
-            { c -> { a -> set(l.set(c)(get(a)))(a) } }
+            { c -> { s -> set(s, l.set(get(s), c)) } }
     )
 
     /**
@@ -187,7 +187,7 @@ abstract class PLens<S, T, A, B> {
      */
     fun asOptional(): POptional<S, T, A, B> = POptional(
             { s -> get(s).right() },
-            this::set
+            { b -> { s -> set(s, b) } }
     )
 
     /**

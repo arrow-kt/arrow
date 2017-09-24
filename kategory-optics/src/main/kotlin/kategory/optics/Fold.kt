@@ -84,7 +84,7 @@ abstract class Fold<S, A> {
     inline fun exists(s: S, crossinline p: (A) -> Boolean): Boolean = find(s, p).fold({ false }, { true })
 
     /**
-     * Check if forall targets satisfy the predicate
+     * Check if all targets satisfy the predicate
      */
     fun forall(s: S, p: (A) -> Boolean): Boolean = foldMap(addMonoid, s, p)
 

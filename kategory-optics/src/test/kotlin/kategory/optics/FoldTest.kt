@@ -5,7 +5,6 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kategory.IntMonoid
 import kategory.ListKWHK
-import kategory.ListKWKind
 import kategory.ListKWMonoidInstance
 import kategory.UnitSpec
 import kategory.k
@@ -21,58 +20,70 @@ class FoldTest : UnitSpec() {
         val intFold = Fold.fromFoldable<ListKWHK, Int>()
         val stringFold = Fold.fromFoldable<ListKWHK, String>()
 
-        "fold select" {
+        "Fold select a list that contains one" {
             val select = Fold.select<List<Int>> { it.contains(1) }
 
             forAll(Gen.list(Gen.int()), { ints ->
-                select.getAll<List<Int>, List<Int>>(object : ListKWMonoidInstance<List<Int>> {}, a = ints).list.firstOrNull() ==
+                select.getAll(a = ints).list.firstOrNull() ==
                         ints.let { if (it.contains(1)) it else null }
             })
         }
 
-        "folding a list of ints" {
+        "Folding a list of ints" {
             forAll(Gen.list(Gen.int()), { ints ->
                 intFold.fold(a = ints.k()) == ints.sum()
             })
         }
 
-        "folding and mapping a list of strings" {
+        "Folding a list should yield same result as combineAll" {
             forAll(Gen.list(Gen.int()), { ints ->
-                stringFold.foldMap(IntMonoid, ints.map(Int::toString).k(), String::toInt) == ints.sum()
+                intFold.combineAll(a = ints.k()) == ints.sum()
             })
         }
 
-        "getting forall values" {
+        "Folding and mapping a list of strings" {
+            forAll(Gen.list(Gen.int()), { ints ->
+                stringFold.foldMap(ints.map(Int::toString).k(), String::toInt) == ints.sum()
+            })
+        }
+
+        "Get all targets" {
             forAll(Gen.list(Gen.int()), { ints ->
                 intFold.getAll(a = ints.k()) == ints.k()
             })
         }
 
-        "Getting the size" {
+        "Get the size of the fold" {
             forAll(Gen.list(Gen.int()), { ints ->
                 intFold.size(ints.k()) == ints.size
             })
         }
 
-        "find" {
-            forAll(Gen.list(Gen.int()), { ints ->
-                intFold.find(ints.k()) { it > 10 } == ints.firstOrNull { it > 2 }?.some() ?: none()
+        "Find the first element matching the predicate" {
+            forAll(Gen.list(Gen.choose(-100, 100)), { ints ->
+                intFold.find(ints.k()) { it > 10 } == ints.firstOrNull { it > 10 }?.some() ?: none<Int>()
             })
         }
 
-        "forall" {
+        "Checking existence of a target" {
+            forAll(Gen.list(Gen.int()), Gen.bool(), { ints, predicate ->
+                intFold.exists(ints.k()) { predicate } == predicate
+            })
+        }
+
+        "Check if all targets match the predicate" {
             forAll(Gen.list(Gen.int()), { ints ->
                 intFold.forall(ints.k()) { it % 2 == 0 } == ints.all { it % 2 == 0 }
             })
         }
 
-        "empty" {
+        "Check if there is no target" {
             forAll(Gen.list(Gen.int()), { ints ->
                 intFold.isEmpty(ints.k()) == ints.isEmpty()
             })
         }
 
-        "nonEmpty" {
+        "Check if there is a target" {
             forAll(Gen.list(Gen.int()), { ints ->
                 intFold.nonEmpty(ints.k()) == ints.isNotEmpty()
             })
