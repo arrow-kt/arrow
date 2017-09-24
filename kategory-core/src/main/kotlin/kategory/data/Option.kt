@@ -35,7 +35,7 @@ sealed class Option<out A> : OptionKind<A> {
         }
 
         @JvmStatic
-        fun <A : Any> fromNullable(a: A?): Option<A> = if (a != null) Option.Some(a) else Option.None
+        fun <A> fromNullable(a: A?): Option<A> = if (a != null) Option.Some(a) else Option.None
 
         operator fun <A> invoke(a: A): Option<A> = Option.Some(a)
 
