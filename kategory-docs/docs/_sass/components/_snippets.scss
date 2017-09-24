@@ -1,0 +1,28 @@
+// CODE SNIPPET
+// -----------------------------------------------
+// -----------------------------------------------
+.snippets {
+    padding: ($base-point-grid * 12) 0 ($base-point-grid * 6);
+    background: rgba($brand-tertiary, 0.10);
+
+    .snippet-item {
+        margin-bottom: ($base-point-grid * 6);
+        @include grid-column(4, $base-grid);
+
+        @include bp(large) {
+          @include grid-column(12, $base-grid);
+
+          &:nth-child(-n+2) {
+              margin-bottom: ($base-point-grid * 5);
+          }
+        }
+        .snippet-title {
+            margin-bottom: ($base-point-grid * 4);
+            font-size: 1.063rem;
+            font-weight: $font-semibold;
+            text-align: center;
+            text-transform: uppercase;
+            color: $header-font-color;
+        }
+    }
+}

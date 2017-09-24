@@ -1,0 +1,22 @@
+@charset "UTF-8";
+/// Return the float direction of the grid.
+///
+/// @argument {map} $grid
+///
+/// @return {string}
+///
+/// @example scss
+///   _neat-float-direction($neat-grid)
+///
+/// @access private
+
+@function _neat-float-direction($grid) {
+  $_direction: _retrieve-neat-setting($grid, direction);
+  $_float-direction: null;
+  @if $_direction == "ltr" {
+      $_float-direction: left;
+  } @else if $_direction == "rtl" {
+    $_float-direction: right;
+  }
+  @return $_float-direction;
+}

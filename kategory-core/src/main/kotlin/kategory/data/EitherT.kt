@@ -101,3 +101,5 @@ package kategory
 
     fun <C> ap(ff: EitherTKind<F, A, (B) -> C>, MF: Monad<F>): EitherT<F, A, C> = ff.ev().flatMap ({ f -> map(f, MF) }, MF)
 }
+
+fun <F, A, B> EitherTKind<F, A, B>.value(): HK<F, Either<A, B>> = this.ev().value
