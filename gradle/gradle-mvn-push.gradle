@@ -24,11 +24,11 @@ def findProperty(String key) {
 }
 
 def getReleaseRepositoryUrl() {
-    return findProperty('RELEASE_REPOSITORY_URL') ?: "http://oss.jfrog.org/artifactory/oss-release-local"
+    return findProperty('RELEASE_REPOSITORY_URL') ?: "https://oss.jfrog.org/artifactory/oss-release-local"
 }
 
 def getSnapshotRepositoryUrl() {
-    return findProperty('SNAPSHOT_REPOSITORY_URL') ?: "http://oss.jfrog.org/artifactory/oss-snapshot-local"
+    return findProperty('SNAPSHOT_REPOSITORY_URL') ?: "https://oss.jfrog.org/artifactory/oss-snapshot-local"
 }
 
 def getRepositoryUsername() {
