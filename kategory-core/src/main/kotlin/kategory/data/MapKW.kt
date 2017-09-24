@@ -37,8 +37,7 @@ data class MapKW<K, out A>(val map: Map<K, A>) : MapKWKind<K, A>, Map<K, A> by m
     fun <B> foldL(b: B, f: (B, A) -> B): B = this.map.values.fold(b, f)
 
     fun <B> foldLeft(b: MapKW<K, B>, f: (MapKW<K, B>, Tuple2<K, A>) -> MapKW<K, B>): MapKW<K, B> =
-       this.map.foldLeft(b) { m, (k, v) -> f(m.k(), Tuple2(k, v))}.k()
-
+            this.map.foldLeft(b) { m, (k, v) -> f(m.k(), Tuple2(k, v)) }.k()
 
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, MapKW<K, B>> =
             Foldable.iterateRight(this.map.iterator(), Eval.always { GA.pure(emptyMap<K, B>().k()) })({ kv, lbuf ->
@@ -80,5 +79,4 @@ fun <K, A, B> Map<K, A>.foldLeft(b: Map<K, B>, f: (Map<K, B>, Map.Entry<K, A>) -
 }
 
 fun <K, A, B> Map<K, A>.foldRight(b: Map<K, B>, f: (Map.Entry<K, A>, Map<K, B>) -> Map<K, B>): Map<K, B> =
-    this.entries.reversed().k().map.foldLeft(b) { x, y -> f(y, x)}
-
+    this.entries.reversed().k().map.foldLeft(b) { x, y -> f(y, x) }
