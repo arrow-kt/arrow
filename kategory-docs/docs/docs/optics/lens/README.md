@@ -51,7 +51,7 @@ fooLens.modifyF(Option.functor(), foo) { it.some() }.ev()
 ```
 
 ```kotlin:ank
-val liftF: (Foo) -> OptionKind<Foo> = fooLens.liftF { (it + 1).some() }
+val liftF: (Foo) -> OptionKind<Foo> = fooLens.liftF(Option.functor()) { (it + 1).some() }
 liftF(foo)
 ```
 
@@ -63,13 +63,14 @@ At first sight a `Lens` does not seem very useful as it is just a getter/setter 
 
 Let's examine following example. We have an `Employee` and he works for a certain `Company` located at a certain `Address` in a `Street`. And as a business requirement we have to capitalize `Street::name` in order to print nicer business cards.
 
-```kotlin:ank:silent
+```kotlin:ank
 data class Street(val number: Int, val name: String)
 data class Address(val city: String, val street: Street)
 data class Company(val name: String, val address: Address)
 data class Employee(val name: String, val company: Company)
 
 val employee = Employee("John Doe", Company("Kategory", Address("Functional city", Street(23, "lambda street"))))
+employee
 ```
 
 Without lenses we could use the `copy` method provided on a `data class` for dealing with immutable structures.
@@ -90,7 +91,7 @@ As we can immediately see this is hard to read, does not scale very well and it 
 
 What we actually wanted to do here is the following: focus into employee's company `and then` focus into the company's address `and then` focus into the address street and finally modify the street name by capitalizing it.
 
-```kotlin:ank
+```kotlin
 val employeeCompany: Lens<Employee, Company> = Lens(
         get = { it.company },
         set = { company -> { employee -> employee.copy(company = company) } }
