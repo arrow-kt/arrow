@@ -44,6 +44,7 @@ data class MapKW<K, out A>(val map: Map<K, A>) : MapKWKind<K, A>, Map<K, A> by m
                 GA.map2Eval(f(kv.value), lbuf) { (mapOf(kv.key to it.a).k() + it.b).k() }
             }).value()
 
+    companion object
 }
 
 fun <K, A> Map<K, A>.k(): MapKW<K, A> = MapKW(this)
