@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Lens
-permalink: /docs/effects/lens/
+permalink: /docs/optics/lens/
 ---
 
 ## Lens
