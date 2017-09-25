@@ -3,6 +3,7 @@ package kategory
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kategory.optics.Traversal
+import kategory.optics.modify
 
 object TraversalLaws {
 

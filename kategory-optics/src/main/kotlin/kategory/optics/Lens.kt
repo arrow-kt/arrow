@@ -220,7 +220,7 @@ abstract class PLens<S, T, A, B> {
     /**
      * View a [PLens] as a [PTraversal]
      */
-    fun asTraversal(): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B>() {
+    fun asTraversal(): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
         override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
                 FA.map(f(get(s)), { b -> this@PLens.set(s, b) })
     }
