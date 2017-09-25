@@ -3,6 +3,8 @@ package kategory
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kategory.optics.Optional
+import kategory.optics.modify
+import kategory.optics.modifyF
 
 object OptionalLaws {
 

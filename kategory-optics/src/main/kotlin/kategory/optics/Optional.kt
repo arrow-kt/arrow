@@ -36,17 +36,17 @@ typealias Optional<S, A> = POptional<S, S, A, A>
  * @param A the target of a [POptional]
  * @param B the modified target of a [POptional]
  */
-abstract class POptional<S, T, A, B> {
+interface POptional<S, T, A, B> {
 
     /**
      * Get the modified source of a [POptional]
      */
-    abstract fun set(s: S, b: B): T
+    fun set(s: S, b: B): T
 
     /**
      * Get the target of a [POptional] or return the original value while allowing the type to change if it does not match
      */
-    abstract fun getOrModify(s: S): Either<T, A>
+    fun getOrModify(s: S): Either<T, A>
 
     companion object {
 
@@ -64,7 +64,7 @@ abstract class POptional<S, T, A, B> {
          * Invoke operator overload to create a [POptional] of type `S` with target `A`.
          * Can also be used to construct [Optional]
          */
-        operator fun <S, T, A, B> invoke(getOrModify: (S) -> Either<T, A>, set: (B) -> (S) -> T): POptional<S, T, A, B> = object : POptional<S, T, A, B>() {
+        operator fun <S, T, A, B> invoke(getOrModify: (S) -> Either<T, A>, set: (B) -> (S) -> T): POptional<S, T, A, B> = object : POptional<S, T, A, B> {
             override fun getOrModify(s: S): Either<T, A> = getOrModify(s)
 
             override fun set(s: S, b: B): T = set(b)(s)
@@ -86,25 +86,6 @@ abstract class POptional<S, T, A, B> {
     fun getOption(a: S): Option<A> = getOrModify(a).toOption()
 
     /**
-     * Modify polymorphically the target of a [POptional] with a function [f]
-     */
-    inline fun modify(s: S, crossinline f: (A) -> B): T = getOrModify(s).fold(::identity, { a -> set(s, f(a)) })
-
-    /**
-     * Modify polymorphically the target of a [POptional] with an Applicative function [f]
-     */
-    inline fun <F> modifyF(FA: Applicative<F>, s: S, crossinline f: (A) -> HK<F, B>): HK<F, T> = getOrModify(s).fold(
-            FA::pure,
-            { FA.map(f(it), { set(s, it) }) }
-    )
-
-    /**
-     * Modify polymorphically the target of a [POptional] with a function [f]
-     * @return [Option.None] if the [POptional] is not matching
-     */
-    inline fun modifiyOption(s: S, crossinline f: (A) -> B): Option<T> = getOption(s).map({ set(s, f(it)) })
-
-    /**
      * Set polymorphically the target of a [POptional] with a value.
      * @return [Option.None] if the [POptional] is not matching
      */
@@ -119,21 +100,6 @@ abstract class POptional<S, T, A, B> {
      * Check if there is a target
      */
     fun nonEmpty(s: S): Boolean = getOption(s).fold({ false }, { true })
-
-    /**
-     * Find the target that satisfies the predicate [p]
-     */
-    inline fun find(s: S, crossinline p: (A) -> Boolean): Option<A> = getOption(s).flatMap { b -> if (p(b)) b.some() else none() }
-
-    /**
-     * Check if there is a target and it satisfies the predicate [p]
-     */
-    inline fun exists(s: S, crossinline p: (A) -> Boolean): Boolean = getOption(s).fold({ false }, p)
-
-    /**
-     * Check if there is no target or the target satisfies the predicate [p]
-     */
-    inline fun all(s: S, crossinline p: (A) -> Boolean): Boolean = getOption(s).fold({ true }, p)
 
     /**
      * Join two [POptional] with the same target [B]
@@ -240,3 +206,38 @@ abstract class POptional<S, T, A, B> {
     }
 
 }
+
+/**
+ * Modify polymorphically the target of a [POptional] with a function [f]
+ */
+inline fun <S, T, A, B> POptional<S, T, A, B>.modify(s: S, crossinline f: (A) -> B): T = getOrModify(s).fold(::identity, { a -> set(s, f(a)) })
+
+/**
+ * Modify polymorphically the target of a [POptional] with an Applicative function [f]
+ */
+inline fun <S, T, A, B, F> POptional<S, T, A, B>.modifyF(FA: Applicative<F>, s: S, crossinline f: (A) -> HK<F, B>): HK<F, T> = getOrModify(s).fold(
+        FA::pure,
+        { FA.map(f(it), { set(s, it) }) }
+)
+
+/**
+ * Modify polymorphically the target of a [POptional] with a function [f]
+ * @return [Option.None] if the [POptional] is not matching
+ */
+inline fun <S, T, A, B> POptional<S, T, A, B>.modifiyOption(s: S, crossinline f: (A) -> B): Option<T> = getOption(s).map({ set(s, f(it)) })
+
+/**
+ * Find the target that satisfies the predicate [p]
+ */
+inline fun <S, T, A, B> POptional<S, T, A, B>.find(s: S, crossinline p: (A) -> Boolean): Option<A> =
+        getOption(s).flatMap { b -> if (p(b)) b.some() else none() }
+
+/**
+ * Check if there is a target and it satisfies the predicate [p]
+ */
+inline fun <S, T, A, B> POptional<S, T, A, B>.exists(s: S, crossinline p: (A) -> Boolean): Boolean = getOption(s).fold({ false }, p)
+
+/**
+ * Check if there is no target or the target satisfies the predicate [p]
+ */
+inline fun <S, T, A, B> POptional<S, T, A, B>.all(s: S, crossinline p: (A) -> Boolean): Boolean = getOption(s).fold({ true }, p)
