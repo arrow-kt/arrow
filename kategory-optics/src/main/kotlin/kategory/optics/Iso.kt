@@ -35,17 +35,17 @@ typealias Iso<S, T> = PIso<S, S, T, T>
  * @param A the target of a [PIso]
  * @param B the modified target of a [PIso]
  */
-abstract class PIso<S, T, A, B> {
+interface PIso<S, T, A, B> {
 
     /**
      * Get the target of a [PIso]
      */
-    abstract fun get(s: S): A
+    fun get(s: S): A
 
     /**
      * Get the modified source of a [PIso]
      */
-    abstract fun reverseGet(b: B): T
+    fun reverseGet(b: B): T
 
     companion object {
 
@@ -60,7 +60,7 @@ abstract class PIso<S, T, A, B> {
          * Invoke operator overload to create a [PIso] of type `S` with target `A`.
          * Can also be used to construct [Iso]
          */
-        operator fun <S, T, A, B> invoke(get: (S) -> (A), reverseGet: (B) -> T) = object : PIso<S, T, A, B>() {
+        operator fun <S, T, A, B> invoke(get: (S) -> (A), reverseGet: (B) -> T) = object : PIso<S, T, A, B> {
 
             override fun get(s: S): A = get(s)
 
@@ -74,35 +74,11 @@ abstract class PIso<S, T, A, B> {
     fun reverse(): PIso<B, A, T, S> = PIso(this::reverseGet, this::get)
 
     /**
-     * Lift a [PIso] to a Functor level
-     */
-    inline fun <reified F> mapping(FF: Functor<F> = functor()): PIso<HK<F, S>, HK<F, T>, HK<F, A>, HK<F, B>> = PIso(
-            { fa -> FF.map(fa, this::get) },
-            { fb -> FF.map(fb, this::reverseGet) }
-    )
-
-    /**
      * Find if the target satisfies the predicate
      */
     fun find(s: S, p: (A) -> Boolean): Option<A> = get(s).let { aa ->
         if (p(aa)) aa.some() else none()
     }
-
-    /**
-     * Check if the target satisfies the predicate
-     */
-    inline fun exist(s: S, crossinline p: (A) -> Boolean): Boolean = p(get(s))
-
-    /**
-     * Modify polymorphically the target of a [PIso] with a function
-     */
-    inline fun modify(s: S, crossinline f: (A) -> B): T = reverseGet(f(get(s)))
-
-    /**
-     * Modify polymorphically the target of a [PIso] with a Functor function
-     */
-    inline fun <reified F> modifyF(FF: Functor<F> = functor(), f: (A) -> HK<F, B>, s: S): HK<F, T> =
-            FF.map(f(get(s)), this::reverseGet)
 
     /**
      * Set polymorphically the target of a [PIso] with a value
@@ -251,3 +227,27 @@ abstract class PIso<S, T, A, B> {
     }
 
 }
+
+/**
+ * Lift a [PIso] to a Functor level
+ */
+inline fun <S, T, A, B, reified F> PIso<S, T, A, B>.mapping(FF: Functor<F> = functor()): PIso<HK<F, S>, HK<F, T>, HK<F, A>, HK<F, B>> = PIso(
+        { fa -> FF.map(fa, this::get) },
+        { fb -> FF.map(fb, this::reverseGet) }
+)
+
+/**
+ * Check if the target satisfies the predicate
+ */
+inline fun <S, T, A, B> PIso<S, T, A, B>.exist(s: S, crossinline p: (A) -> Boolean): Boolean = p(get(s))
+
+/**
+ * Modify polymorphically the target of a [PIso] with a function
+ */
+inline fun <S, T, A, B> PIso<S, T, A, B>.modify(s: S, crossinline f: (A) -> B): T = reverseGet(f(get(s)))
+
+/**
+ * Modify polymorphically the target of a [PIso] with a Functor function
+ */
+inline fun <S, T, A, B, reified F> PIso<S, T, A, B>.modifyF(FF: Functor<F> = functor(), f: (A) -> HK<F, B>, s: S): HK<F, T> =
+        FF.map(f(get(s)), this::reverseGet)
