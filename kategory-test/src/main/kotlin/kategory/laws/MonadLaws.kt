@@ -3,6 +3,7 @@ package kategory
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.experimental.CommonPool
+import kotlin.coroutines.experimental.EmptyCoroutineContext
 
 object MonadLaws {
 
@@ -86,8 +87,8 @@ object MonadLaws {
     inline fun <reified F> monadComprehensionsBindInContext(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
             forFew(5, genIntSmall(), { num: Int ->
                 M.binding {
-                    val a = bindInContext(CommonPool) { M.pure(num) }
-                    val b = bindInContext(CommonPool) { M.pure(a + 1) }
+                    val a = bindInContext(EmptyCoroutineContext) { M.pure(num) }
+                    val b = bindInContext(EmptyCoroutineContext) { M.pure(a + 1) }
                     yields(b)
                 }.equalUnderTheLaw(M.pure(num + 1), EQ)
             })
