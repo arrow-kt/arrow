@@ -4,12 +4,14 @@ import kategory.Applicative
 import kategory.Either
 import kategory.Eq
 import kategory.HK
+import kategory.Monoid
 import kategory.Option
 import kategory.Tuple2
 import kategory.applicative
 import kategory.compose
 import kategory.eq
 import kategory.flatMap
+import kategory.getOrElse
 import kategory.identity
 import kategory.left
 import kategory.none
@@ -187,6 +189,13 @@ abstract class PPrism<S, T, A, B> {
      * View a [PPrism] as a [PSetter]
      */
     fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s, f) } }
+
+    /**
+     * View a [PPrism] as a [Fold]
+     */
+    fun asFold(): Fold<S, A> = object : Fold<S, A>() {
+        override fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R = getOption(s).map(f).getOrElse(M::empty)
+    }
 
 }
 

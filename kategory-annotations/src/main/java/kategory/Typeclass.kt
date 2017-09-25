@@ -1,5 +1,6 @@
 package kategory
 
+import java.lang.IllegalArgumentException
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.lang.reflect.TypeVariable
@@ -21,6 +22,15 @@ interface Typeclass
 class InstanceParametrizedType(val raw: Type, val typeArgs: List<Type>) : ParameterizedType {
 
     fun typeArgsAreParameterized(): Boolean = typeArgs.isNotEmpty() && typeArgs[0] is ParameterizedType
+
+    fun typeArgsIsHKRepresented(): Boolean =
+            if (typeArgsAreParameterized()) {
+                val firstTypeArg = typeArgs[0]
+                when (firstTypeArg) {
+                    is ParameterizedType -> firstTypeArg.rawType == HK::class.java
+                    else -> false
+                }
+            } else false
 
     override fun getRawType(): Type = raw
 
@@ -112,7 +122,7 @@ fun <T : Typeclass> instance(t: InstanceParametrizedType): T =
         if (GlobalInstances.containsKey(t)) {
             GlobalInstances.getValue(t) as T
         } else {
-            val value = if (t.typeArgsAreParameterized()) {
+            val value = if (t.typeArgsAreParameterized() && t.typeArgsIsHKRepresented()) {
                 parametricInstanceFromImplicitObject(t)
             } else {
                 instanceFromImplicitObject(t)
@@ -153,7 +163,12 @@ private fun parametricInstanceFromImplicitObject(t: InstanceParametrizedType): A
 
 private fun instanceFromImplicitObject(t: InstanceParametrizedType): Any? {
     val of = t.raw as Class<*>
-    val on = t.typeArgs[0] as Class<*>
+    val firstTypeArg = t.typeArgs[0]
+    val on = when (firstTypeArg) {
+        is Class<*> -> firstTypeArg
+        is ParameterizedType -> firstTypeArg.rawType as Class<*>
+        else -> throw IllegalArgumentException("$firstTypeArg not a Class or ParameterizedType")
+    }
     val targetPackage = on.name.substringBeforeLast(".")
     val derivationPackage = if (targetPackage.startsWith("java.")) {
         targetPackage.replace(".", "_")
@@ -170,7 +185,7 @@ private fun instanceFromImplicitObject(t: InstanceParametrizedType): Any? {
                 val classifier = p.parameterizedType as ParameterizedType
                 val vType = reifyRawParameterizedType(t, classifier, n)
                 val value = instanceFromImplicitObject(vType)
-                if (value != null) registerInstance(t, value)
+                if (value != null) registerInstance(vType, value)
                 value
             } else null
         }
@@ -180,8 +195,11 @@ private fun instanceFromImplicitObject(t: InstanceParametrizedType): Any? {
 }
 
 private fun reifyRawParameterizedType(carrier: InstanceParametrizedType, classifier: ParameterizedType, index: Int): InstanceParametrizedType =
-        if (classifier.actualTypeArguments.any { it is TypeVariable<*> }) {
+        if (classifier.actualTypeArguments.any { it is TypeVariable<*> } && carrier.actualTypeArguments.size > index + 1) {
             InstanceParametrizedType(classifier.rawType, listOf(carrier.actualTypeArguments[index + 1]))
+        } else if (classifier.actualTypeArguments.any { it is TypeVariable<*> }) {
+            val nestedTypes = resolveNestedTypes(carrier.actualTypeArguments.toList())
+            InstanceParametrizedType(classifier.rawType, nestedTypes)
         } else {
             InstanceParametrizedType(classifier, classifier.actualTypeArguments.filterNotNull())
         }
