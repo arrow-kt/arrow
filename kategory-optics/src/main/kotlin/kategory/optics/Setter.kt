@@ -26,17 +26,17 @@ typealias Setter<S, A> = PSetter<S, S, A, A>
  * @param A the target of a [PSetter]
  * @param B the modified target of a [PSetter]
  */
-abstract class PSetter<S, T, A, B> {
+interface PSetter<S, T, A, B> {
 
     /**
      * Modify polymorphically the target of a [PSetter] with a function
      */
-    abstract fun modify(s: S, f: (A) -> B): T
+    fun modify(s: S, f: (A) -> B): T
 
     /**
      * Set polymorphically the target of a [PSetter] with a value
      */
-    abstract fun set(s: S, b: B): T
+    fun set(s: S, b: B): T
 
     companion object {
 
@@ -51,7 +51,7 @@ abstract class PSetter<S, T, A, B> {
          * Invoke operator overload to create a [PSetter] of type `S` with target `A`.
          * Can also be used to construct [Setter]
          */
-        operator fun <S, T, A, B> invoke(modify: ((A) -> B) -> (S) -> T): PSetter<S, T, A, B> = object : PSetter<S, T, A, B>() {
+        operator fun <S, T, A, B> invoke(modify: ((A) -> B) -> (S) -> T): PSetter<S, T, A, B> = object : PSetter<S, T, A, B> {
             override fun modify(s: S, f: (A) -> B): T = modify(f)(s)
 
             override fun set(s: S, b: B): T = modify(s) { b }
