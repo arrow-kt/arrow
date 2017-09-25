@@ -65,6 +65,17 @@ interface PLens<S, T, A, B> {
     }
 
     /**
+     * Modify the focus of a [PLens] using Functor function
+     */
+    fun <F> modifyF(FF: Functor<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
+            FF.map(f(get(s)), { b -> set(s, b) })
+
+    /**
+     * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
+     */
+    fun <F> liftF(FF: Functor<F>, f: (A) -> HK<F, B>): (S) -> HK<F, T> = { s -> modifyF(FF, s, f) }
+
+    /**
      * Join two [PLens] with the same focus in [A]
      */
     infix fun <S1, T1> choice(other: PLens<S1, T1, A, B>): PLens<Either<S, S1>, Either<T, T1>, A, B> = PLens(
@@ -207,13 +218,13 @@ inline fun <S, T, A, B> PLens<S, T, A, B>.lift(crossinline f: (A) -> B): (S) -> 
 /**
  * Modify the focus of a [PLens] using Functor function
  */
-inline fun <S, T, A, B, reified F> PLens<S, T, A, B>.modifyF(FF: Functor<F> = functor(), s: S, f: (A) -> HK<F, B>): HK<F, T> =
+inline fun <S, T, A, B, reified F> PLens<S, T, A, B>.modifyF(s: S, f: (A) -> HK<F, B>, FF: Functor<F> = functor()): HK<F, T> =
         FF.map(f(get(s)), { b -> set(s, b) })
 
 /**
  * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
  */
-inline fun <S, T, A, B, reified F> PLens<S, T, A, B>.liftF(FF: Functor<F> = functor(), crossinline f: (A) -> HK<F, B>): (S) -> HK<F, T> = { s -> modifyF(FF, s, f) }
+inline fun <S, T, A, B, reified F> PLens<S, T, A, B>.liftF(FF: Functor<F> = functor(), dummy: Unit = Unit, crossinline f: (A) -> HK<F, B>): (S) -> HK<F, T> = { s -> modifyF(FF, s) { a -> f(a) } }
 
 /**
  * Find a focus that satisfies the predicate

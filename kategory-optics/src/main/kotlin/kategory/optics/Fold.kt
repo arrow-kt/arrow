@@ -94,6 +94,21 @@ interface Fold<S, A> {
     fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s, { b -> Const(b.some()) }).value
 
     /**
+     * Fold using the given [Monoid] instance.
+     */
+    fun fold(M: Monoid<A>, s: S): A = foldMap(M, s, ::identity)
+
+    /**
+     * Alias for fold.
+     */
+    fun combineAll(M: Monoid<A>, s: S): A = foldMap(M, s, ::identity)
+
+    /**
+     * Get all targets of the [Fold]
+     */
+    fun getAll(M: Monoid<ListKW<A>>, s: S): ListKW<A> = foldMap(M, s, { ListKW.pure(it) })
+
+    /**
      * Join two [Fold] with the same target
      */
     infix fun <C> choice(other: Fold<C, A>): Fold<Either<S, C>, A> = object : Fold<Either<S, C>, A> {
@@ -169,7 +184,7 @@ interface Fold<S, A> {
 /**
  * Map each target to a type R and use a Monoid to fold the results
  */
-inline fun <S, A, reified R> Fold<S, A>.foldMap(s: S, noinline f: (A) -> R): R = foldMap(monoid(), s) { a -> f(a) }
+inline fun <S, A, reified R> Fold<S, A>.foldMap(s: S, noinline f: (A) -> R, M: Monoid<R> = monoid()): R = foldMap(M, s) { a -> f(a) }
 
 /**
  * Find the first element matching the predicate, if one exists.

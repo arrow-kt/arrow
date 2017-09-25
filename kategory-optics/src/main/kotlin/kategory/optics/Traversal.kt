@@ -197,6 +197,22 @@ interface PTraversal<S, T, A, B> {
     }
 
     /**
+     * Map each target to a Monoid and combine the results
+     */
+    fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R =
+            modifyF(Const.applicative(M, Unit), s, { b -> Const(f(b)) }).value()
+
+    /**
+     * Fold using the given [Monoid] instance.
+     */
+    fun fold(M: Monoid<A>, s: S): A = foldMap(M, s, ::identity)
+
+    /**
+     * Alias for fold.
+     */
+    fun combineAll(M: Monoid<A>, s: S): A = fold(M, s)
+
+    /**
      * Get all targets of the [PTraversal]
      */
     fun getAll(s: S): ListKW<A> = foldMap(ListKW.monoid(), s, { ListKW(listOf(it)) })
@@ -307,7 +323,7 @@ inline fun <S, T, A, B> PTraversal<S, T, A, B>.find(s: S, crossinline p: (A) -> 
 /**
  * Map each target to a Monoid and combine the results
  */
-inline fun <S, T, A, B, reified R> PTraversal<S, T, A, B>.foldMap(M: Monoid<R> = monoid(), s: S, crossinline f: (A) -> R): R =
+inline fun <S, T, A, B, reified R> PTraversal<S, T, A, B>.foldMap(s: S, crossinline f: (A) -> R, M: Monoid<R> = monoid()): R =
         modifyF(Const.applicative(M), s, { b -> Const(f(b)) }).value()
 
 /**
@@ -325,12 +341,12 @@ inline fun <S, T, A, B> PTraversal<S, T, A, B>.exist(s: S, crossinline p: (A) ->
 /**
  * Check if forall targets satisfy the predicate
  */
-inline fun <S, T, A, B> PTraversal<S, T, A, B>.forall(s: S, crossinline p: (A) -> Boolean): Boolean = foldMap(AndMonoid, s, p)
+inline fun <S, T, A, B> PTraversal<S, T, A, B>.forall(s: S, crossinline p: (A) -> Boolean): Boolean = foldMap(s, p, AndMonoid)
 
 /**
  * Fold using the given [Monoid] instance.
  */
-inline fun <S, T, reified A, B> PTraversal<S, T, A, B>.fold(s: S, M: Monoid<A> = monoid()): A = foldMap(M, s, ::identity)
+inline fun <S, T, reified A, B> PTraversal<S, T, A, B>.fold(s: S, M: Monoid<A> = monoid()): A = foldMap(s, ::identity, M)
 
 /**
  * Alias for fold.

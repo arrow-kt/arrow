@@ -72,6 +72,14 @@ interface PPrism<S, T, A, B> {
     }
 
     /**
+     * Modify the target of a [PPrism] with an Applicative function
+     */
+    fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> = getOrModify(s).fold(
+            FA::pure,
+            { FA.map(f(it), this::reverseGet) }
+    )
+
+    /**
      * Get the target or nothing if [S] does not match the target
      */
     fun getOption(s: S): Option<A> = getOrModify(s).toOption()
@@ -193,7 +201,7 @@ interface PPrism<S, T, A, B> {
 /**
  * Modify the target of a [PPrism] with an Applicative function
  */
-inline fun <S, T, A, B, reified F> PPrism<S, T, A, B>.modifyF(FA: Applicative<F> = applicative(), s: S, crossinline f: (A) -> HK<F, B>): HK<F, T> = getOrModify(s).fold(
+inline fun <S, T, A, B, reified F> PPrism<S, T, A, B>.modifyF(s: S, crossinline f: (A) -> HK<F, B>, FA: Applicative<F> = applicative()): HK<F, T> = getOrModify(s).fold(
         FA::pure,
         { FA.map(f(it), this::reverseGet) }
 )

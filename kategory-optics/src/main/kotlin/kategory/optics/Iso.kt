@@ -69,6 +69,20 @@ interface PIso<S, T, A, B> {
     }
 
     /**
+     * Lift a [PIso] to a Functor level
+     */
+    fun <F> mapping(FF: Functor<F>): PIso<HK<F, S>, HK<F, T>, HK<F, A>, HK<F, B>> = PIso(
+            { fa -> FF.map(fa, this::get) },
+            { fb -> FF.map(fb, this::reverseGet) }
+    )
+
+    /**
+     * Modify polymorphically the target of a [PIso] with a Functor function
+     */
+    fun <F> modifyF(FF: Functor<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
+            FF.map(f(get(s)), this::reverseGet)
+
+    /**
      * Reverse a [PIso]: the source becomes the target and the target becomes the source
      */
     fun reverse(): PIso<B, A, T, S> = PIso(this::reverseGet, this::get)
@@ -231,7 +245,7 @@ interface PIso<S, T, A, B> {
 /**
  * Lift a [PIso] to a Functor level
  */
-inline fun <S, T, A, B, reified F> PIso<S, T, A, B>.mapping(FF: Functor<F> = functor()): PIso<HK<F, S>, HK<F, T>, HK<F, A>, HK<F, B>> = PIso(
+inline fun <S, T, A, B, reified F> PIso<S, T, A, B>.mapping(FF: Functor<F> = functor(), dummy: Unit = Unit): PIso<HK<F, S>, HK<F, T>, HK<F, A>, HK<F, B>> = PIso(
         { fa -> FF.map(fa, this::get) },
         { fb -> FF.map(fb, this::reverseGet) }
 )
@@ -249,5 +263,5 @@ inline fun <S, T, A, B> PIso<S, T, A, B>.modify(s: S, crossinline f: (A) -> B): 
 /**
  * Modify polymorphically the target of a [PIso] with a Functor function
  */
-inline fun <S, T, A, B, reified F> PIso<S, T, A, B>.modifyF(FF: Functor<F> = functor(), f: (A) -> HK<F, B>, s: S): HK<F, T> =
+inline fun <S, T, A, B, reified F> PIso<S, T, A, B>.modifyF(s: S, f: (A) -> HK<F, B>, FF: Functor<F> = functor()): HK<F, T> =
         FF.map(f(get(s)), this::reverseGet)

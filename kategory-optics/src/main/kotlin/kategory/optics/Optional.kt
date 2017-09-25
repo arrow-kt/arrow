@@ -6,6 +6,7 @@ import kategory.HK
 import kategory.Monoid
 import kategory.Option
 import kategory.Tuple2
+import kategory.applicative
 import kategory.flatMap
 import kategory.getOrElse
 import kategory.identity
@@ -79,6 +80,14 @@ interface POptional<S, T, A, B> {
         )
 
     }
+
+    /**
+     * Modify polymorphically the target of a [POptional] with an Applicative function [f]
+     */
+    fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> = getOrModify(s).fold(
+            FA::pure,
+            { FA.map(f(it), { set(s, it) }) }
+    )
 
     /**
      * Get the target of a [POptional] or [Option.None] if the is not there
@@ -215,7 +224,7 @@ inline fun <S, T, A, B> POptional<S, T, A, B>.modify(s: S, crossinline f: (A) ->
 /**
  * Modify polymorphically the target of a [POptional] with an Applicative function [f]
  */
-inline fun <S, T, A, B, F> POptional<S, T, A, B>.modifyF(FA: Applicative<F>, s: S, crossinline f: (A) -> HK<F, B>): HK<F, T> = getOrModify(s).fold(
+inline fun <S, T, A, B, reified F> POptional<S, T, A, B>.modifyF(s: S, crossinline f: (A) -> HK<F, B>, FA: Applicative<F> = applicative()): HK<F, T> = getOrModify(s).fold(
         FA::pure,
         { FA.map(f(it), { set(s, it) }) }
 )
