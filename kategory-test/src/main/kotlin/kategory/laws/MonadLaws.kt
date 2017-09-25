@@ -84,13 +84,12 @@ object MonadLaws {
             })
 
     inline fun <reified F> monadComprehensionsBindInContext(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
-            forFew(5, Gen.int(), { num: Int ->
+            forFew(5, genIntSmall(), { num: Int ->
                 M.binding {
                     val a = bindInContext(CommonPool) { M.pure(num) }
                     val b = bindInContext(CommonPool) { M.pure(a + 1) }
-                    val c = bindInContext(CommonPool) { M.pure(b + 1) }
-                    yields(c)
-                }.equalUnderTheLaw(M.pure(num + 2), EQ)
+                    yields(b)
+                }.equalUnderTheLaw(M.pure(num + 1), EQ)
             })
 
     fun <F> stackSafeTestProgram(M: Monad<F>, n: Int, stopAt: Int): Free<F, Int> = M.bindingStackSafe {
