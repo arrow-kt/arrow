@@ -14,15 +14,11 @@ The program simulates the typical game scenario where we have to shoot a target 
 
 ## Requirements
 
-1. Arm a Nuke launcher 
-2. Aim toward a Target
-3. Launch a Nuke and impact the Target
+- Arm a Nuke launcher 
+- Aim toward a Target
+- Launch a Nuke and impact the Target
 
 ## Requirements
-
-1. __arm__ a __Nuke__ launcher
-2. __aim__ toward a __Target__
-3. __launch__ a __Nuke__ and __Impact__ the __target__
 
 ```kotlin:ank
 /** model */
@@ -45,14 +41,16 @@ fun aim(): Target = throw RuntimeException("RotationNeedsOil")
 fun launch(target: Target, nuke: Nuke): Impacted = Impacted
 ```
 
-As it may be observed the function signatures include no clue that when asking for `arm()` or `aim()`
+As you may have noticed the function signatures include no clue that when asking for `arm()` or `aim()`
 an exception may be thrown. 
 
-Additionally exception can be seen as GOTO statement given they interrupt the program flow by jumping back to the caller. 
-Exceptions are not consistent as throwing an exception may not survive async boundaries, that is to say that one can't rely on exceptions for error handling
-since invoking a function that is async inside a `try/catch` may not capture the exception may have been raise in another thread.
+### The issues with exceptions
 
-Because of this extreme power of stopping computation and jumping to other areas Exceptions have been abused even in core libraries to signal events.
+Exceptions can be seen as GOTO statement given they interrupt the program flow by jumping back to the caller. 
+Exceptions are not consistent as throwing an exception may not survive async boundaries, that is to say that one can't rely on exceptions for error handling
+in async code since invoking a function that is async inside a `try/catch` may not capture the exception potentially thrown in a different thread.
+
+Because of this extreme power of stopping computation and jumping to other areas, Exceptions have been abused even in core libraries to signal events.
 
 ```
 at java.lang.Throwable.fillInStackTrace(Throwable.java:-1)
@@ -85,7 +83,7 @@ try {
 }
 ```
 
-Furthermore exception are costly to create. `Throwable#fillInStackTrace` attempts to gather all stack information to present you with a meaningful stacktrace.
+Furthermore exceptions are costly to create. `Throwable#fillInStackTrace` attempts to gather all stack information to present you with a meaningful stacktrace.
 
 ```java
 public class Throwable {
@@ -98,11 +96,9 @@ public class Throwable {
 }
 ```
 
-Constructing an exception may be as costly as your current Thread stack size and platform dependent since `fillInStackTrace` calls into native code.
+Constructing an exception may be as costly as your current Thread stack size and it's also platform dependent since `fillInStackTrace` calls into native code.
 
 More info in the cost of instantiating Throwables and throwing exceptions in generals can be found in the links below.
-
-![Throwable Benchmark](custom/images/benchmark_throwable.png)
 
 > [The Hidden Performance costs of instantiating Throwables](http://normanmaurer.me/blog/2013/11/09/The-hidden-performance-costs-of-instantiating-Throwables/)
 > * New: Creating a new Throwable each time
@@ -113,8 +109,8 @@ Exceptions may be considered generally a poor choice in Functional Programming w
 
 - Modeling absence
 - Modeling known business cases that result in alternate paths 
-- Async boundaries over unprincipled APIs (callbacks)
-- When people have no access to your source code
+- Used in async boundaries over unprincipled APIs (callbacks)
+- In general when people have no access to your source code
 
 ## How do we model exceptional cases then?
 
@@ -135,8 +131,8 @@ fun aim(): Option<Target> = None
 fun launch(target: Target, nuke: Nuke): Option<Impacted> = Some(Impacted)
 ```
 
-It's easy to work with [`Option`](/docs/datatypes/option) if your lang supports monad comprehensions or special syntax.
-In Kotlin, Kategory provides monadic comprehensions for all datatypes for which a [`Monad`](/docs/typeclasses/monad) instance exists
+It's easy to work with [`Option`](/docs/datatypes/option) if your lang supports monad comprehensions or special syntax for them.
+Kategory provides monadic comprehensions for all datatypes for which a [`Monad`](/docs/typeclasses/monad) instance exists built atop corutines.
 
 ```kotlin
 fun attackOption(): Option<Impacted> =
@@ -174,7 +170,7 @@ fun launch(target: Target, nuke: Nuke): Try<Impacted> =
   Try { throw RuntimeException("MissedByMeters") }
 ```
 
-As you can see by the examples below exception are now controlled inside of `Try`.
+As you can see by the examples below exceptions are now controlled and caught inside of a `Try`.
 
 ```kotlin:ank
 arm()
@@ -191,7 +187,7 @@ val result = arm()
 result.fold({ ex -> "BOOM!: $ex"}, { "Got: $it" })
 ```
 
-Just like `Option`, Kategory also provides `Monad` instances for `Try` and we can use it exactly in the same way
+Just like it does for `Option`, Kategory also provides `Monad` instances for `Try` and we can use it exactly in the same way
 
 ```kotlin
 fun attackTry(): Try<Impacted> =
@@ -209,7 +205,7 @@ attackTry()
 While `Try` gives us the ability to control both the `Success` and `Failure` cases there is still nothing in the function signatures that indicate the type of exception.
 We are still subject to guess what the exception is using Kotlin `when` expressions or runtime lookups over the unsealed hierarchy of Throwable.
 
-It turns out that all exceptional cases our example is throwing are actually known to the system so there is no point in modeling these exceptional cases as
+It turns out that all exceptions thrown in our example are actually known to the system so there is no point in modeling these exceptional cases as
 `java.lang.Exception`
 
 We should redefine our functions to express that their result is not just a `Nuke`, `Target` or `Impact` but those potential values or other exceptional ones.
@@ -234,11 +230,11 @@ typealias RotationNeedsOil = NukeException.RotationNeedsOil
 typealias MissedByMeters = NukeException.MissedByMeters
 ```
 
-This type of definition is commonly known as an Algebraic Datat Type or a Sum Type in most FP capable langs.
+This type of definition is commonly known as an Algebraic Data Type or Sum Type in most FP capable languages.
 In Kotlin it is encoded using sealed hierarchies. We can think of sealed hierarchies as a declaration of a type and all it'
 s possible states.
 
-Once we have an ADT defined to model or known errors we can redefine our functions.
+Once we have an ADT defined to model our known errors we can redefine our functions.
 
 ```kotlin:ank
 import kategory.Either.*
@@ -249,8 +245,8 @@ fun launch(target: Target, nuke: Nuke): Either<MissedByMeters, Impacted> = Left(
 ```
 
 Kategory also provides a `Monad` instance for `Either` in the same it did for `Option` and `Try`.
-Except for the types signatures our program remains unchanged when we compute monadically over `Either`.
-All values on the left side assume th Right biased and whenever a `Left` value is found the computation short-circuits producing a result that is compatible with the function type signature.
+Except for the types signatures our program remains unchanged when we compute over `Either`.
+All values on the left side assume to be `Right` biased and whenever a `Left` value is found the computation short-circuits producing a result that is compatible with the function type signature.
 
 ```kotlin
 fun attackEither(): Either<NukeException, Impacted> =
@@ -272,7 +268,7 @@ Since Kategory supports typeclasses, emulated higher kinds and higher order abst
 
 ## MonadError
 
-[`MonadError`](/docs/typeclasses/monaderror) is a typeclass that allows us to handle error cases inside monadic context such as the ones we have seen with `Either`, `Try` and `Option`. 
+[`MonadError`](/docs/typeclasses/monaderror) is a typeclass that allows us to handle error cases inside monadic contexts such as the ones we have seen with `Either`, `Try` and `Option`. 
 Typeclasses allows us to code focusing on the behaviors and not the datatypes that implements them.
 
 Kategory provides the following `MonadError` instances for `Option`, `Try` and `Either`
