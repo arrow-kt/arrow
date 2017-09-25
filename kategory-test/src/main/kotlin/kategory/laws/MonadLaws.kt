@@ -1,6 +1,7 @@
 package kategory
 
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.matchers.include
+import io.kotlintest.matchers.shouldHave
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.experimental.newSingleThreadContext
@@ -88,16 +89,16 @@ object MonadLaws {
             forFew(5, genIntSmall(), { num: Int ->
                 M.binding {
                     val a = bindInContext(newSingleThreadContext("$num")) { pure(num + 1) }
-                    Thread.currentThread().name.contains("$num") shouldBe true
+                    Thread.currentThread().name shouldHave include("$num")
                     val b = bindInContext(newSingleThreadContext("$a")) { pure(a + 1) }
-                    Thread.currentThread().name.contains("$a") shouldBe true
+                    Thread.currentThread().name shouldHave include("$a")
                     yields(b)
                 }.equalUnderTheLaw(M.pure(num + 2), EQ)
             })
 
     fun <F> stackSafeTestProgram(M: Monad<F>, n: Int, stopAt: Int): Free<F, Int> = M.bindingStackSafe {
-        val v = M.pure(n + 1).bind()
-        val r = if (v < stopAt) stackSafeTestProgram(M, v, stopAt).bind() else M.pure(v).bind()
+        val v = pure(n + 1).bind()
+        val r = if (v < stopAt) stackSafeTestProgram(M, v, stopAt).bind() else pure(v).bind()
         yields(r)
     }
 }
