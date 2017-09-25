@@ -42,10 +42,10 @@ typealias Prism<S, A> = PPrism<S, S, A, A>
  * @param A the target of a [PPrism]
  * @param B the modified target of a [PPrism]
  */
-abstract class PPrism<S, T, A, B> {
+interface PPrism<S, T, A, B> {
 
-    abstract fun getOrModify(s: S): Either<T, A>
-    abstract fun reverseGet(b: B): T
+    fun getOrModify(s: S): Either<T, A>
+    fun reverseGet(b: B): T
 
     companion object {
 
@@ -55,7 +55,7 @@ abstract class PPrism<S, T, A, B> {
          * Invoke operator overload to create a [PPrism] of type `S` with target `A`.
          * Can also be used to construct [Prism]
          */
-        operator fun <S, T, A, B> invoke(getOrModify: (S) -> Either<T, A>, reverseGet: (B) -> T) = object : PPrism<S, T, A, B>() {
+        operator fun <S, T, A, B> invoke(getOrModify: (S) -> Either<T, A>, reverseGet: (B) -> T) = object : PPrism<S, T, A, B> {
             override fun getOrModify(s: S): Either<T, A> = getOrModify(s)
 
             override fun reverseGet(b: B): T = reverseGet(b)
@@ -77,24 +77,6 @@ abstract class PPrism<S, T, A, B> {
     fun getOption(s: S): Option<A> = getOrModify(s).toOption()
 
     /**
-     * Modify the target of a [PPrism] with an Applicative function
-     */
-    inline fun <reified F> modifyF(FA: Applicative<F> = applicative(), s: S, crossinline f: (A) -> HK<F, B>): HK<F, T> = getOrModify(s).fold(
-            FA::pure,
-            { FA.map(f(it), this::reverseGet) }
-    )
-
-    /**
-     * Modify the target of a [PPrism] with a function
-     */
-    inline fun modify(s: S, crossinline f: (A) -> B): T = getOrModify(s).fold(::identity, { a -> reverseGet(f(a)) })
-
-    /**
-     * Modify the target of a [PPrism] with a function
-     */
-    inline fun modifyOption(s: S, crossinline f: (A) -> B): Option<T> = getOption(s).map { b -> reverseGet(f(b)) }
-
-    /**
      * Set the target of a [PPrism] with a value
      */
     fun set(s: S, b: B): T = modify(s) { b }
@@ -113,21 +95,6 @@ abstract class PPrism<S, T, A, B> {
      * Check if there is no target
      */
     fun isEmpty(s: S): Boolean = !nonEmpty(s)
-
-    /**
-     * Find the target that satisfies the predicate
-     */
-    inline fun find(s: S, crossinline p: (A) -> Boolean): Option<A> = getOption(s).flatMap { a -> if (p(a)) a.some() else none() }
-
-    /**
-     * Check if there is a target and it satisfies the predicate
-     */
-    inline fun exist(s: S, crossinline p: (A) -> Boolean): Boolean = getOption(s).fold({ false }, p)
-
-    /**
-     * Check if there is no target or the target satisfies the predicate
-     */
-    inline fun all(s: S, crossinline p: (A) -> Boolean): Boolean = getOption(s).fold({ true }, p)
 
     /**
      * Create a product of the [PPrism] and a type [C]
@@ -187,7 +154,7 @@ abstract class PPrism<S, T, A, B> {
 
     operator fun <C, D> plus(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = compose(other)
 
-    operator fun <C, D> plus(other: Fold<A, C>): Fold<S, C> = compose(other)
+    operator fun <C> plus(other: Fold<A, C>): Fold<S, C> = compose(other)
 
     operator fun <C, D> plus(other: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> = compose(other)
 
@@ -222,6 +189,40 @@ abstract class PPrism<S, T, A, B> {
     }
 
 }
+
+/**
+ * Modify the target of a [PPrism] with an Applicative function
+ */
+inline fun <S, T, A, B, reified F> PPrism<S, T, A, B>.modifyF(FA: Applicative<F> = applicative(), s: S, crossinline f: (A) -> HK<F, B>): HK<F, T> = getOrModify(s).fold(
+        FA::pure,
+        { FA.map(f(it), this::reverseGet) }
+)
+
+/**
+ * Modify the target of a [PPrism] with a function
+ */
+inline fun <S, T, A, B> PPrism<S, T, A, B>.modify(s: S, crossinline f: (A) -> B): T = getOrModify(s).fold(::identity, { a -> reverseGet(f(a)) })
+
+/**
+ * Modify the target of a [PPrism] with a function
+ */
+inline fun <S, T, A, B> PPrism<S, T, A, B>.modifyOption(s: S, crossinline f: (A) -> B): Option<T> = getOption(s).map { b -> reverseGet(f(b)) }
+
+
+/**
+ * Find the target that satisfies the predicate
+ */
+inline fun <S, T, A, B> PPrism<S, T, A, B>.find(s: S, crossinline p: (A) -> Boolean): Option<A> = getOption(s).flatMap { a -> if (p(a)) a.some() else none() }
+
+/**
+ * Check if there is a target and it satisfies the predicate
+ */
+inline fun <S, T, A, B> PPrism<S, T, A, B>.exist(s: S, crossinline p: (A) -> Boolean): Boolean = getOption(s).fold({ false }, p)
+
+/**
+ * Check if there is no target or the target satisfies the predicate
+ */
+inline fun <S, T, A, B> PPrism<S, T, A, B>.all(s: S, crossinline p: (A) -> Boolean): Boolean = getOption(s).fold({ true }, p)
 
 /**
  * Create a sum of the [PPrism] and a type [C]
