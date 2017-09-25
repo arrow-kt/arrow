@@ -59,15 +59,15 @@ object MonadLaws {
     inline fun <reified F> equivalentComprehensions(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(Gen.int(), { num: Int ->
                 val aa = M.binding {
-                    val a = M.pure(num).bind()
-                    val b = M.pure(a + 1).bind()
-                    val c = M.pure(b + 1).bind()
+                    val a = pure(num).bind()
+                    val b = pure(a + 1).bind()
+                    val c = pure(b + 1).bind()
                     yields(c)
                 }
                 val bb = M.bindingStackSafe {
-                    val a = M.pure(num).bind()
-                    val b = M.pure(a + 1).bind()
-                    val c = M.pure(b + 1).bind()
+                    val a = pure(num).bind()
+                    val b = pure(a + 1).bind()
+                    val c = pure(b + 1).bind()
                     yields(c)
                 }.run(M)
                 aa.equalUnderTheLaw(bb, EQ)
@@ -77,9 +77,9 @@ object MonadLaws {
     inline fun <reified F> monadComprehensions(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(Gen.int(), { num: Int ->
                 M.binding {
-                    val a = M.pure(num).bind()
-                    val b = M.pure(a + 1).bind()
-                    val c = M.pure(b + 1).bind()
+                    val a = pure(num).bind()
+                    val b = pure(a + 1).bind()
+                    val c = pure(b + 1).bind()
                     yields(c)
                 }.equalUnderTheLaw(M.pure(num + 2), EQ)
             })
@@ -87,9 +87,9 @@ object MonadLaws {
     inline fun <reified F> monadComprehensionsBindInContext(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
             forFew(5, genIntSmall(), { num: Int ->
                 M.binding {
-                    val a = bindInContext(newSingleThreadContext("$num")) { M.pure(num + 1) }
+                    val a = bindInContext(newSingleThreadContext("$num")) { pure(num + 1) }
                     Thread.currentThread().name.contains("$num") shouldBe true
-                    val b = bindInContext(newSingleThreadContext("$a")) { M.pure(a + 1) }
+                    val b = bindInContext(newSingleThreadContext("$a")) { pure(a + 1) }
                     Thread.currentThread().name.contains("$a") shouldBe true
                     yields(b)
                 }.equalUnderTheLaw(M.pure(num + 2), EQ)

@@ -40,7 +40,6 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
                     error = exception
                     latch.countDown()
                 }
-
             }
 
     protected lateinit var returnedMonad: HK<F, A>
