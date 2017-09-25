@@ -1,7 +1,5 @@
 package kategory
 
-import io.kotlintest.matchers.include
-import io.kotlintest.matchers.shouldHave
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.experimental.newSingleThreadContext
@@ -89,9 +87,7 @@ object MonadLaws {
             forFew(5, genIntSmall(), { num: Int ->
                 M.binding {
                     val a = bindInContext(newSingleThreadContext("$num")) { pure(num + 1) }
-                    Thread.currentThread().name shouldHave include("$num")
                     val b = bindInContext(newSingleThreadContext("$a")) { pure(a + 1) }
-                    Thread.currentThread().name shouldHave include("$a")
                     yields(b)
                 }.equalUnderTheLaw(M.pure(num + 2), EQ)
             })
