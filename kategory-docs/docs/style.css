@@ -1,0 +1,25 @@
+/*
+Errno::ENOENT: No such file or directory @ rb_sysopen - style.scss
+
+Backtrace:
+/Users/israelperezglez/.rvm/gems/ruby-2.3.3@global/gems/sass-3.5.1/lib/sass/plugin/compiler.rb:454:in `read'
+/Users/israelperezglez/.rvm/gems/ruby-2.3.3@global/gems/sass-3.5.1/lib/sass/plugin/compiler.rb:454:in `update_stylesheet'
+/Users/israelperezglez/.rvm/gems/ruby-2.3.3@global/gems/sass-3.5.1/lib/sass/plugin/compiler.rb:215:in `block in update_stylesheets'
+/Users/israelperezglez/.rvm/gems/ruby-2.3.3@global/gems/sass-3.5.1/lib/sass/plugin/compiler.rb:209:in `each'
+/Users/israelperezglez/.rvm/gems/ruby-2.3.3@global/gems/sass-3.5.1/lib/sass/plugin/compiler.rb:209:in `update_stylesheets'
+/Users/israelperezglez/.rvm/gems/ruby-2.3.3@global/gems/sass-3.5.1/lib/sass/plugin/compiler.rb:294:in `watch'
+/Users/israelperezglez/.rvm/gems/ruby-2.3.3@global/gems/sass-3.5.1/lib/sass/plugin.rb:109:in `method_missing'
+/Users/israelperezglez/.rvm/gems/ruby-2.3.3@global/gems/sass-3.5.1/lib/sass/exec/sass_scss.rb:360:in `watch_or_update'
+/Users/israelperezglez/.rvm/gems/ruby-2.3.3@global/gems/sass-3.5.1/lib/sass/exec/sass_scss.rb:51:in `process_result'
+/Users/israelperezglez/.rvm/gems/ruby-2.3.3@global/gems/sass-3.5.1/lib/sass/exec/base.rb:52:in `parse'
+/Users/israelperezglez/.rvm/gems/ruby-2.3.3@global/gems/sass-3.5.1/lib/sass/exec/base.rb:19:in `parse!'
+/Users/israelperezglez/.rvm/gems/ruby-2.3.3@global/gems/sass-3.5.1/bin/sass:13:in `<top (required)>'
+/Users/israelperezglez/.rvm/gems/ruby-2.3.3/bin/sass:22:in `load'
+/Users/israelperezglez/.rvm/gems/ruby-2.3.3/bin/sass:22:in `<main>'
+/Users/israelperezglez/.rvm/gems/ruby-2.3.3/bin/ruby_executable_hooks:15:in `eval'
+/Users/israelperezglez/.rvm/gems/ruby-2.3.3/bin/ruby_executable_hooks:15:in `<main>'
+*/
+body:before {
+  white-space: pre;
+  font-family: monospace;
+  content: "Errno::ENOENT: No such file or directory @ rb_sysopen - style.scss"; }

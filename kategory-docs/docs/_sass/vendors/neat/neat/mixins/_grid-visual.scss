@@ -1,0 +1,67 @@
+@charset "UTF-8";
+/// Creates a series of guide lines using the `background-image` property on a
+/// grid container to visualise the columns and gutters of the grid.
+///
+/// @group features
+///
+/// @name Grid visual
+///
+/// @argument {color} $color
+///   The color of the guide lines created.
+///
+/// @argument {map} $grid [$neat-grid]
+///   The grid used to determine the guides
+///
+/// @example scss
+///   .element {
+///     @include grid-visual;
+///   }
+///
+/// @example css
+///   .element {
+///     background-image: linear-gradient( … ) ;
+///   }
+
+@mixin grid-visual($color: null, $grid: $neat-grid) {
+  @if not $color {
+    $color: _retrieve-neat-setting($grid, color);
+  }
+
+  $_grid-columns: _retrieve-neat-setting($grid, columns);
+  $_grid-gutter: _retrieve-neat-setting($grid, gutter);
+  $_grid-visual-object: () !default;
+  $_grid-visual:
+    $color,
+    $color $_grid-gutter,
+    transparent $_grid-gutter,
+  ;
+
+  @for $i from 1 to $_grid-columns {
+    $_grid-visual-local: (
+      #{$i}: "#{_neat-column-width($grid, $i)} + #{$_grid-gutter}",
+    );
+
+    $_grid-visual-object: map-merge($_grid-visual-object, $_grid-visual-local);
+  }
+
+  @each $stop, $location in $_grid-visual-object {
+    $_grid-visual-loop-list:
+      transparent calc(#{$location}),
+      $color calc(#{$location}),
+      $color calc(#{$location} + #{$_grid-gutter}),
+      transparent calc(#{$location} + #{$_grid-gutter}),
+    ;
+
+    $_grid-visual: _neat-append-grid-visual($_grid-visual, $_grid-visual-loop-list);
+  }
+
+  $_grid-visual-loop-list:
+      transparent calc(100% - #{$_grid-gutter}),
+      $color calc(100% - #{$_grid-gutter}),
+      $color calc(100%),
+  ;
+
+  $_grid-visual: _neat-append-grid-visual($_grid-visual, $_grid-visual-loop-list);
+
+  background-image: linear-gradient(to right, $_grid-visual);
+}

@@ -3,9 +3,11 @@ package kategory.optics
 import kategory.Applicative
 import kategory.Either
 import kategory.HK
+import kategory.Monoid
 import kategory.Option
 import kategory.Tuple2
 import kategory.flatMap
+import kategory.getOrElse
 import kategory.identity
 import kategory.left
 import kategory.none
@@ -136,7 +138,7 @@ abstract class POptional<S, T, A, B> {
     /**
      * Join two [POptional] with the same target [B]
      */
-    fun <S1, T1> choice(other: POptional<S1, T1, A, B>): POptional<Either<S, S1>, Either<T, T1>, A, B> =
+    infix fun <S1, T1> choice(other: POptional<S1, T1, A, B>): POptional<Either<S, S1>, Either<T, T1>, A, B> =
             POptional(
                     { ss -> ss.fold({ getOrModify(it).bimap({ it.left() }, ::identity) }, { other.getOrModify(it).bimap({ it.right() }, ::identity) }) },
                     { b -> { it.bimap({ s -> this.set(s, b) }, { s -> other.set(s, b) }) } }
@@ -189,6 +191,16 @@ abstract class POptional<S, T, A, B> {
     infix fun <C, D> compose(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = asSetter() compose other
 
     /**
+     * Compose a [POptional] with a [Fold]
+     */
+    infix fun <C> compose(other: Fold<A, C>): Fold<S, C> = asFold() compose other
+
+    /**
+     * Compose a [POptional] with a [PTraversal]
+     */
+    infix fun <C, D> compose(other: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> = asTraversal() compose other
+
+    /**
      * Plus operator overload to compose optionals
      */
     operator fun <C, D> plus(o: POptional<A, B, C, D>): POptional<S, T, C, D> = compose(o)
@@ -201,10 +213,21 @@ abstract class POptional<S, T, A, B> {
 
     operator fun <C, D> plus(o: PSetter<A, B, C, D>): PSetter<S, T, C, D> = compose(o)
 
+    operator fun <C> plus(o: Fold<A, C>): Fold<S, C> = compose(o)
+
+    operator fun <C, D> plus(o: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> = compose(o)
+
     /**
      * View a [POptional] as a [PSetter]
      */
     fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s, f) } }
+
+    /**
+     * View a [POptional] as a [Fold]
+     */
+    fun asFold() = object : Fold<S, A>() {
+        override fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R = getOption(s).map(f).getOrElse(M::empty)
+    }
 
     /**
      * View a [POptional] as a [PTraversal]

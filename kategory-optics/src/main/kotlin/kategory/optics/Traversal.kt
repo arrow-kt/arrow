@@ -7,14 +7,10 @@ import kategory.HK
 import kategory.Id
 import kategory.IntMonoid
 import kategory.ListKW
-import kategory.ListKWHK
-import kategory.ListKWKind
 import kategory.Monoid
 import kategory.Option
 import kategory.applicative
-import kategory.ev
 import kategory.identity
-import kategory.k
 import kategory.left
 import kategory.map
 import kategory.monoid
@@ -208,7 +204,6 @@ abstract class PTraversal<S, T, A, B> {
     /**
      * Map each target to a Monoid and combine the results
      */
-    @Suppress("UNUSED_PARAMETER")
     inline fun <reified R> foldMap(M: Monoid<R> = monoid(), s: S, crossinline f: (A) -> R): R =
             modifyF(Const.applicative(M), s, { b -> Const(f(b)) }).value()
 
@@ -340,29 +335,3 @@ inline fun <S, T, reified A, B> PTraversal<S, T, A, B>.fold(M: Monoid<A> = monoi
  * Alias for fold.
  */
 inline fun <S, T, reified A, B> PTraversal<S, T, A, B>.combineAll(M: Monoid<A> = monoid(), s: S): A = fold(M, s)
-
-@PublishedApi internal object AndMonoid : Monoid<Boolean> {
-    override fun combine(a: Boolean, b: Boolean): Boolean = a && b
-    override fun empty(): Boolean = true
-}
-
-internal sealed class First
-internal sealed class Last
-
-@PublishedApi internal fun <A> firstOptionMonoid() = object : Monoid<Const<Option<A>, First>> {
-
-    override fun empty() = Const<Option<A>, First>(Option.None)
-
-    override fun combine(a: Const<Option<A>, First>, b: Const<Option<A>, First>) =
-            if (a.value.fold({ false }, { true })) a else b
-
-}
-
-@PublishedApi internal fun <A> lastOptionMonoid() = object : Monoid<Const<Option<A>, Last>> {
-
-    override fun empty() = Const<Option<A>, Last>(Option.None)
-
-    override fun combine(a: Const<Option<A>, Last>, b: Const<Option<A>, Last>) =
-            if (b.value.fold({ false }, { true })) b else a
-
-}

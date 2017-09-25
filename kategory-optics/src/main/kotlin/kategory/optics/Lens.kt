@@ -4,6 +4,7 @@ import kategory.Applicative
 import kategory.Either
 import kategory.Functor
 import kategory.HK
+import kategory.Monoid
 import kategory.Option
 import kategory.Tuple2
 import kategory.functor
@@ -20,20 +21,20 @@ import kategory.toT
 typealias Lens<S, A> = PLens<S, S, A, A>
 
 /**
- * A [Lens] (or Functional Reference) is an optic that allows to see into a structure and
- * getting, setting or modifying the target.
+ * A [Lens] (or Functional Reference) is an optic that can focus into a structure for
+ * getting, setting or modifying the focus (target).
  *
  * A (polymorphic) [PLens] is useful when setting or modifying a value for a constructed type
  * i.e. PLens<Tuple2<Double, Int>, Tuple2<String, Int>, Double, String>
  *
  * A [PLens] can be seen as a pair of functions:
- * - `get: (S) -> A` meaning we can look into an `S` and extract an `A`
- * - `set: (B) -> (S) -> T` meaning we can look into an `S` and set a value `B` for a target `A` and obtain a modified source `T`
+ * - `get: (S) -> A` meaning we can focus into an `S` and extract an `A`
+ * - `set: (B) -> (S) -> T` meaning we can focus into an `S` and set a value `B` for a target `A` and obtain a modified source `T`
  *
  * @param S the source of a [PLens]
  * @param T the modified source of a [PLens]
- * @param A the target of a [PLens]
- * @param B the modified target of a [PLens]
+ * @param A the focus of a [PLens]
+ * @param B the modified focus of a [PLens]
  */
 abstract class PLens<S, T, A, B> {
 
@@ -64,32 +65,42 @@ abstract class PLens<S, T, A, B> {
     }
 
     /**
-     * Modify the target of s [PLens] using s function `(A) -> B`
+     * Modify the focus of s [PLens] using s function `(A) -> B`
      */
     inline fun modify(s: S, crossinline f: (A) -> B): T = set(s, f(get(s)))
 
     /**
-     * Modify the target of a [PLens] using Functor function
+     * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
+     */
+    inline fun lift(crossinline f: (A) -> B): (S) -> T = { s -> modify(s, f) }
+
+    /**
+     * Modify the focus of a [PLens] using Functor function
      */
     inline fun <reified F> modifyF(FF: Functor<F> = functor(), s: S, f: (A) -> HK<F, B>): HK<F, T> =
             FF.map(f(get(s)), { b -> set(s, b) })
 
     /**
-     * Find if the target satisfies the predicate
+     * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
+     */
+    inline fun <reified F> liftF(FF: Functor<F> = functor(), crossinline f: (A) -> HK<F, B>): (S) -> HK<F, T> = { s -> modifyF(FF, s, f) }
+
+    /**
+     * Find a focus that satisfies the predicate
      */
     inline fun find(s: S, crossinline p: (A) -> Boolean): Option<A> = get(s).let { a ->
         if (p(a)) a.some() else none()
     }
 
     /**
-     * Checks if the target of a [PLens] satisfies the predicate
+     * Verify if the focus of a [PLens] satisfies the predicate
      */
     inline fun exist(s: S, crossinline p: (A) -> Boolean): Boolean = p(get(s))
 
     /**
-     * Join two [PLens] with the same target [A]
+     * Join two [PLens] with the same focus in [A]
      */
-    fun <S1, T1> choice(other: PLens<S1, T1, A, B>): PLens<Either<S, S1>, Either<T, T1>, A, B> = PLens(
+    infix fun <S1, T1> choice(other: PLens<S1, T1, A, B>): PLens<Either<S, S1>, Either<T, T1>, A, B> = PLens(
             { ss -> ss.fold(this::get, other::get) },
             { b -> { ss -> ss.bimap({ s -> set(s, b) }, { s -> other.set(s, b) }) } }
     )
@@ -97,7 +108,7 @@ abstract class PLens<S, T, A, B> {
     /**
      * Pair two disjoint [PLens]
      */
-    fun <S1, T1, A1, B1> split(other: PLens<S1, T1, A1, B1>): PLens<Tuple2<S, S1>, Tuple2<T, T1>, Tuple2<A, A1>, Tuple2<B, B1>> =
+    infix fun <S1, T1, A1, B1> split(other: PLens<S1, T1, A1, B1>): PLens<Tuple2<S, S1>, Tuple2<T, T1>, Tuple2<A, A1>, Tuple2<B, B1>> =
             PLens(
                     { (s, c) -> get(s) toT other.get(c) },
                     { (b, b1) -> { (s, s1) -> set(s, b) toT other.set(s1, b1) } }
@@ -140,7 +151,7 @@ abstract class PLens<S, T, A, B> {
     /**
      * Compose an [PLens] with a [Getter]
      */
-    infix fun <C> compose(other: Getter<A, C>): Getter<S, C> = asGetter() composeGetter other
+    infix fun <C> compose(other: Getter<A, C>): Getter<S, C> = asGetter() compose other
 
     /**
      * Compose an [PLens] with a [PSetter]
@@ -153,12 +164,17 @@ abstract class PLens<S, T, A, B> {
     infix fun <C, D> compose(other: PPrism<A, B, C, D>): POptional<S, T, C, D> = asOptional() compose other
 
     /**
+     * Compose an [PLens] with a [Fold]
+     */
+    infix fun <C> compose(other: Fold<A, C>): Fold<S, C> = asFold() compose other
+
+    /**
      * Compose an [PLens] with a [PTraversal]
      */
     infix fun <C, D> compose(other: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> = asTraversal() compose other
 
     /**
-     * plus operator overload to compose lenses
+     * Plus operator overload to compose lenses
      */
     operator fun <C, D> plus(other: PLens<A, B, C, D>): PLens<S, T, C, D> = compose(other)
 
@@ -171,6 +187,10 @@ abstract class PLens<S, T, A, B> {
     operator fun <C, D> plus(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = compose(other)
 
     operator fun <C, D> plus(other: PPrism<A, B, C, D>): POptional<S, T, C, D> = compose(other)
+
+    operator fun <C> plus(other: Fold<A, C>): Fold<S, C> = compose(other)
+
+    operator fun <C, D> plus(other: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> = compose(other)
 
     /**
      * View [PLens] as a [Getter]
@@ -189,6 +209,13 @@ abstract class PLens<S, T, A, B> {
      * View a [PLens] as a [PSetter]
      */
     fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s, f) } }
+
+    /**
+     * View a [PLens] as a [Fold]
+     */
+    fun asFold(): Fold<S, A> = object : Fold<S, A>() {
+        override fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R = f(get(s))
+    }
 
     /**
      * View a [PLens] as a [PTraversal]

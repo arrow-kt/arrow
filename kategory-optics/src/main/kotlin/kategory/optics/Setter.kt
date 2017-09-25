@@ -68,7 +68,7 @@ abstract class PSetter<S, T, A, B> {
     /**
      * Join two [PSetter] with the same target
      */
-    fun <U, V> choice(other: PSetter<U, V, A, B>): PSetter<Either<S, U>, Either<T, V>, A, B> = PSetter { f ->
+    infix fun <U, V> choice(other: PSetter<U, V, A, B>): PSetter<Either<S, U>, Either<T, V>, A, B> = PSetter { f ->
         { su -> su.bimap({ s -> modify(s, f) }, { u -> other.modify(u, f) }) }
     }
 
@@ -100,6 +100,11 @@ abstract class PSetter<S, T, A, B> {
     infix fun <C, D> compose(other: PIso<A, B, C, D>): PSetter<S, T, C, D> = compose(other.asSetter())
 
     /**
+     * Compose a [PSetter] with a [PIso]
+     */
+    infix fun <C, D> compose(other: PTraversal<A, B, C, D>): PSetter<S, T, C, D> = compose(other.asSetter())
+
+    /**
      * Plus operator overload to compose optionals
      */
     operator fun <C, D> plus(o: PSetter<A, B, C, D>): PSetter<S, T, C, D> = compose(o)
@@ -111,5 +116,7 @@ abstract class PSetter<S, T, A, B> {
     operator fun <C, D> plus(o: PLens<A, B, C, D>): PSetter<S, T, C, D> = compose(o)
 
     operator fun <C, D> plus(o: PIso<A, B, C, D>): PSetter<S, T, C, D> = compose(o)
+
+    operator fun <C, D> plus(o: PTraversal<A, B, C, D>): PSetter<S, T, C, D> = compose(o)
 
 }

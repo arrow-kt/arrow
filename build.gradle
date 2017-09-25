@@ -38,9 +38,8 @@ buildscript {
     dependencies {
         classpath "com.github.ben-manes:gradle-versions-plugin:$gradleVersionsPluginVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-        classpath('io.kategory:ank-gradle-plugin:0.1.4') {
-            exclude group: 'io.kategory'
-        }
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath('io.kategory:ank-gradle-plugin:0.1.6')
     }
 }
 

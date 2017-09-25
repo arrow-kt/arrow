@@ -1,0 +1,69 @@
+// SIDEBAR NAV
+// -----------------------------------------------
+// -----------------------------------------------
+
+.sidebar-nav {
+    margin-top: ($base-point-grid * 3);
+
+    .sidebar-nav-item {
+        > a {
+            @include flexbox;
+            @include justify-content(space-between);
+            @include align-items(center);
+            height: ($base-point-grid * 6);
+            padding: 0 ($base-point-grid * 3);
+            @include links($white, $white, $white, $white);
+
+            &:hover {
+                text-decoration: none;
+                background: rgba($brand-tertiary, 0.3);
+            }
+
+            .fa {
+                 transition: all .3s;
+            }
+        }
+
+        &.active {
+            > a {
+                padding-left: (($base-point-grid * 3) - 4px);
+                border-left: 4px solid $brand-quaternary;
+                background: rgba($brand-tertiary, 0.5);
+
+                .fa {
+                     @include rotate(90deg);
+                }
+            }
+        }
+
+        ul {
+            display: none;
+            padding: ($base-point-grid * 2) ($base-point-grid * 3);
+            background: rgba($brand-tertiary, 0.15);
+
+            li {
+                a {
+                    @include flexbox;
+                    @include justify-content(flex-start);
+                    @include align-items(center);
+                    padding: $base-point-grid 0;
+                    font-size: 0.875rem;
+
+                    .fa {
+                        margin-right: ($base-point-grid * 1.5);
+                        font-size: 0.25rem;
+                    }
+                    @include links($white, $white, rgba($white, 0.6), rgba($white, 0.6));
+
+                    &.active {
+                        color: $brand-quaternary;
+                    }
+
+                    &:hover {
+                        text-decoration: none;
+                    }
+                }
+            }
+        }
+    }
+}

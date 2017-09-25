@@ -45,7 +45,7 @@ class GetterTest : UnitSpec() {
         }
 
         "Joining two getters together with same target should yield same result" {
-            val userTokenStringGetter = userGetter composeGetter tokenGetter
+            val userTokenStringGetter = userGetter compose tokenGetter
             val joinedGetter = tokenGetter.choice(userTokenStringGetter)
 
             forAll({ tokenValue: String ->

@@ -4,12 +4,14 @@ import kategory.Applicative
 import kategory.Either
 import kategory.Eq
 import kategory.HK
+import kategory.Monoid
 import kategory.Option
 import kategory.Tuple2
 import kategory.applicative
 import kategory.compose
 import kategory.eq
 import kategory.flatMap
+import kategory.getOrElse
 import kategory.identity
 import kategory.left
 import kategory.none
@@ -165,6 +167,16 @@ abstract class PPrism<S, T, A, B> {
     infix fun <C, D> compose(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = asSetter() compose other
 
     /**
+     * Compose a [PPrism] with a [Fold]
+     */
+    infix fun <C> compose(other: Fold<A, C>): Fold<S, C> = asFold() compose other
+
+    /**
+     * Compose a [PPrism] with a [PTraversal]
+     */
+    infix fun <C, D> compose(other: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> = asTraversal() compose other
+
+    /**
      * Plus operator overload to compose lenses
      */
     operator fun <C, D> plus(other: PPrism<A, B, C, D>): PPrism<S, T, C, D> = compose(other)
@@ -174,6 +186,10 @@ abstract class PPrism<S, T, A, B> {
     operator fun <C, D> plus(other: PIso<A, B, C, D>): PPrism<S, T, C, D> = compose(other)
 
     operator fun <C, D> plus(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = compose(other)
+
+    operator fun <C, D> plus(other: Fold<A, C>): Fold<S, C> = compose(other)
+
+    operator fun <C, D> plus(other: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> = compose(other)
 
     /**
      * View a [PPrism] as an [POptional]
@@ -187,6 +203,13 @@ abstract class PPrism<S, T, A, B> {
      * View a [PPrism] as a [PSetter]
      */
     fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s, f) } }
+
+    /**
+     * View a [PPrism] as a [Fold]
+     */
+    fun asFold(): Fold<S, A> = object : Fold<S, A>() {
+        override fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R = getOption(s).map(f).getOrElse(M::empty)
+    }
 
     /**
      * View a [PPrism] as a [PTraversal]

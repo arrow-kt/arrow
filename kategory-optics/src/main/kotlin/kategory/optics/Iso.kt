@@ -4,6 +4,7 @@ import kategory.Applicative
 import kategory.Either
 import kategory.Functor
 import kategory.HK
+import kategory.Monoid
 import kategory.Option
 import kategory.Tuple2
 import kategory.compose
@@ -164,7 +165,7 @@ abstract class PIso<S, T, A, B> {
     /**
      * Compose a [PIso] with a [Getter]
      */
-    infix fun <C> compose(other: Getter<A, C>): Getter<S, C> = asGetter() composeGetter other
+    infix fun <C> compose(other: Getter<A, C>): Getter<S, C> = asGetter() compose other
 
     /**
      * Compose a [PIso] with a [PSetter]
@@ -175,6 +176,16 @@ abstract class PIso<S, T, A, B> {
      * Compose a [PIso] with a [POptional]
      */
     infix fun <C, D> compose(other: POptional<A, B, C, D>): POptional<S, T, C, D> = asOptional() compose other
+
+    /**
+     * Compose a [PIso] with a [Fold]
+     */
+    infix fun <C> compose(other: Fold<A, C>): Fold<S, C> = asFold() compose other
+
+    /**
+     * Compose a [PIso] with a [PTraversal]
+     */
+    infix fun <C, D> compose(other: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> = asTraversal() compose other
 
     /**
      * Plus operator overload to compose lenses
@@ -188,6 +199,10 @@ abstract class PIso<S, T, A, B> {
     operator fun <C, D> plus(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = compose(other)
 
     operator fun <C, D> plus(other: POptional<A, B, C, D>): POptional<S, T, C, D> = compose(other)
+
+    operator fun <C> plus(other: Fold<A, C>): Fold<S, C> = compose(other)
+
+    operator fun <C, D> plus(other: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> = compose(other)
 
     /**
      * View a [PIso] as a [PPrism]
@@ -219,6 +234,13 @@ abstract class PIso<S, T, A, B> {
      * View a [PIso] as a [PSetter]
      */
     fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s, f) } }
+
+    /**
+     * View a [PIso] as a [Fold]
+     */
+    fun asFold(): Fold<S, A> = object : Fold<S, A>() {
+        override fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R = f(get(s))
+    }
 
     /**
      * View a [PIso] as a [PTraversal]
