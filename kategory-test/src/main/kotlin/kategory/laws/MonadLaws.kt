@@ -17,8 +17,7 @@ object MonadLaws {
                     Law("Monad Laws: monad comprehensions binding in other threads", { monadComprehensionsBindInContext(M, EQ) }),
                     Law("Monad Laws: stack-safe//unsafe monad comprehensions equivalence", { equivalentComprehensions(M, EQ) }),
                     Law("Monad Laws: stack safe", { stackSafety(5000, M, EQ) }),
-                    Law("Monad Laws: stack safe comprehensions", { stackSafetyComprehensions(5000, M, EQ) }),
-                    Law("Monad Laws: stack safe comprehensions with binding in other threads", { stackSafetyComprehensionsBindInContext(M, EQ) })
+                    Law("Monad Laws: stack safe comprehensions", { stackSafetyComprehensions(5000, M, EQ) })
             )
 
     inline fun <reified F> leftIdentity(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
@@ -99,15 +98,4 @@ object MonadLaws {
         val r = if (v < stopAt) stackSafeTestProgram(M, v, stopAt).bind() else M.pure(v).bind()
         yields(r)
     }
-
-    inline fun <reified F> stackSafetyComprehensionsBindInContext(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
-            forAll(Gen.int(), { num: Int ->
-                M.bindingStackSafe {
-                    val a = bindInContext(CommonPool) { Free.liftF(M.pure(num)) }
-                    val b = bindInContext(CommonPool) { Free.liftF(M.pure(a + 1)) }
-                    val c = bindInContext(CommonPool) { Free.liftF(M.pure(b + 1)) }
-                    yields(c)
-                }.run(M).equalUnderTheLaw(M.pure(num + 2), EQ)
-            })
-
 }

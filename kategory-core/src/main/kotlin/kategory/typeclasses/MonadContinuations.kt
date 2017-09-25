@@ -95,25 +95,6 @@ open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: C
 
     internal fun returnedMonad(): Free<F, A> = returnedMonad
 
-    protected fun bindingInContextContinuation(context: CoroutineContext): BindingInContextContinuation<Free<F, A>> =
-            object : BindingInContextContinuation<Free<F, A>> {
-                val latch: CountDownLatch = CountDownLatch(1)
-
-                override fun await() = latch.await()
-
-                override val context: CoroutineContext = context
-
-                override fun resume(value: Free<F, A>) {
-                    returnedMonad = value
-                    latch.countDown()
-                }
-
-                override fun resumeWithException(exception: Throwable) {
-                    throw exception
-                }
-
-            }
-
     suspend fun <B> HK<F, B>.bind(): B = bind { Free.liftF(this) }
 
     suspend fun <B> Free<F, B>.bind(): B = bind { this }
@@ -123,24 +104,6 @@ open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: C
         returnedMonad = m().flatMap { z ->
             c.stackLabels = labelHere
             c.resume(z)
-            returnedMonad
-        }
-        COROUTINE_SUSPENDED
-    }
-
-    open suspend fun <B> bindInContext(context: CoroutineContext = EmptyCoroutineContext, m: () -> Free<F, B>): B = suspendCoroutineOrReturn { c ->
-        val labelHere = c.stackLabels // save the whole coroutine stack labels
-        val monadCreation: suspend () -> Free<F, A> = {
-            m().flatMap { xx: B ->
-                c.stackLabels = labelHere
-                c.resume(xx)
-                returnedMonad
-            }
-        }
-        val completion = bindingInContextContinuation(context)
-        returnedMonad = Free.liftF(pure(Unit)).flatMap {
-            monadCreation.startCoroutine(completion)
-            completion.await()
             returnedMonad
         }
         COROUTINE_SUSPENDED
