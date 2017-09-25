@@ -51,7 +51,10 @@ open class MonadErrorCancellableContinuation<F, A>(ME: MonadError<F, Throwable>,
         val completion = bindingInContextContinuation(context)
         returnedMonad = flatMap(pure(Unit), {
             monadCreation.startCoroutine(completion)
-            completion.await()
+            val error = completion.await()
+            if (error != null) {
+                throw error
+            }
             returnedMonad
         })
         COROUTINE_SUSPENDED
