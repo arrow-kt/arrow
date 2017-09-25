@@ -6,7 +6,7 @@ import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
 
 interface BindingInContextContinuation<in T> : Continuation<T> {
-    fun await(): Unit
+    fun await(): Throwable?
 }
 
 @RestrictsSuspension
@@ -25,7 +25,9 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
             object : BindingInContextContinuation<HK<F, A>> {
                 val latch: CountDownLatch = CountDownLatch(1)
 
-                override fun await() = latch.await()
+                var error: Throwable? = null
+
+                override fun await() = latch.await().let { error }
 
                 override val context: CoroutineContext = context
 
@@ -35,7 +37,8 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
                 }
 
                 override fun resumeWithException(exception: Throwable) {
-                    throw exception
+                    error = exception
+                    latch.countDown()
                 }
 
             }
@@ -68,7 +71,10 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
         val completion = bindingInContextContinuation(context)
         returnedMonad = flatMap(pure(Unit), {
             monadCreation.startCoroutine(completion)
-            completion.await()
+            val error = completion.await()
+            if (error != null) {
+                throw error
+            }
             returnedMonad
         })
         COROUTINE_SUSPENDED

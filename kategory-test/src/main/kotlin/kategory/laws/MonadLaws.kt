@@ -1,9 +1,9 @@
 package kategory
 
+import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kotlinx.coroutines.experimental.CommonPool
-import kotlin.coroutines.experimental.EmptyCoroutineContext
+import kotlinx.coroutines.experimental.newSingleThreadContext
 
 object MonadLaws {
 
@@ -87,10 +87,12 @@ object MonadLaws {
     inline fun <reified F> monadComprehensionsBindInContext(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
             forFew(5, genIntSmall(), { num: Int ->
                 M.binding {
-                    val a = bindInContext(EmptyCoroutineContext) { M.pure(num) }
-                    val b = bindInContext(EmptyCoroutineContext) { M.pure(a + 1) }
+                    val a = bindInContext(newSingleThreadContext("$num")) { M.pure(num + 1) }
+                    Thread.currentThread().name.contains("$num") shouldBe true
+                    val b = bindInContext(newSingleThreadContext("$a")) { M.pure(a + 1) }
+                    Thread.currentThread().name.contains("$a") shouldBe true
                     yields(b)
-                }.equalUnderTheLaw(M.pure(num + 1), EQ)
+                }.equalUnderTheLaw(M.pure(num + 2), EQ)
             })
 
     fun <F> stackSafeTestProgram(M: Monad<F>, n: Int, stopAt: Int): Free<F, Int> = M.bindingStackSafe {
