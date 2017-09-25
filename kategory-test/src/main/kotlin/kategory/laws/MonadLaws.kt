@@ -84,7 +84,7 @@ object MonadLaws {
             })
 
     inline fun <reified F> monadComprehensionsBindInContext(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
-            forAll(Gen.int(), { num: Int ->
+            forFew(5, Gen.int(), { num: Int ->
                 M.binding {
                     val a = bindInContext(CommonPool) { M.pure(num) }
                     val b = bindInContext(CommonPool) { M.pure(a + 1) }
