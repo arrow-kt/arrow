@@ -19,11 +19,11 @@ import kategory.toT
  * @param S the source of a [Getter]
  * @param A the target of a [Getter]
  */
-abstract class Getter<S, A> {
+interface Getter<S, A> {
     /**
      * Get the target of a [Getter]
      */
-    abstract fun get(s: S): A
+    fun get(s: S): A
 
     companion object {
 
@@ -37,22 +37,10 @@ abstract class Getter<S, A> {
         /**
          * Invoke operator overload to create a [Getter] of type `S` with target `A`.
          */
-        operator fun <S, A> invoke(get: (S) -> A) = object : Getter<S, A>() {
+        operator fun <S, A> invoke(get: (S) -> A) = object : Getter<S, A> {
             override fun get(s: S): A = get(s)
         }
     }
-
-    /**
-     * Find if the target satisfies the predicate.
-     */
-    inline fun find(s: S, crossinline p: (A) -> Boolean): Option<A> = get(s).let { b ->
-            if (p(b)) b.some() else none()
-        }
-
-    /**
-     * Check if the target satisfies the predicate
-     */
-    inline fun exist(s: S, crossinline p: (A) -> Boolean): Boolean = p(get(s))
 
     /**
      * Join two [Getter] with the same target
@@ -139,3 +127,15 @@ abstract class Getter<S, A> {
     }
 
 }
+
+/**
+ * Find if the target satisfies the predicate.
+ */
+inline fun <S, A> Getter<S, A>.find(s: S, crossinline p: (A) -> Boolean): Option<A> = get(s).let { b ->
+    if (p(b)) b.some() else none()
+}
+
+/**
+ * Check if the target satisfies the predicate
+ */
+inline fun <S, A> Getter<S, A>.exist(s: S, crossinline p: (A) -> Boolean): Boolean = p(get(s))
