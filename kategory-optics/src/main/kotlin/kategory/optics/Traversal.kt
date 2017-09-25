@@ -330,9 +330,9 @@ inline fun <S, T, A, B> PTraversal<S, T, A, B>.forall(s: S, crossinline p: (A) -
 /**
  * Fold using the given [Monoid] instance.
  */
-inline fun <S, T, reified A, B> PTraversal<S, T, A, B>.fold(M: Monoid<A> = monoid(), s: S): A = foldMap(M, s, ::identity)
+inline fun <S, T, reified A, B> PTraversal<S, T, A, B>.fold(s: S, M: Monoid<A> = monoid()): A = foldMap(M, s, ::identity)
 
 /**
  * Alias for fold.
  */
-inline fun <S, T, reified A, B> PTraversal<S, T, A, B>.combineAll(M: Monoid<A> = monoid(), s: S): A = fold(M, s)
+inline fun <S, T, reified A, B> PTraversal<S, T, A, B>.combineAll(s: S, M: Monoid<A> = monoid()): A = fold(s, M)

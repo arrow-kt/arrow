@@ -208,7 +208,6 @@ inline fun <S, T, A, B> PPrism<S, T, A, B>.modify(s: S, crossinline f: (A) -> B)
  */
 inline fun <S, T, A, B> PPrism<S, T, A, B>.modifyOption(s: S, crossinline f: (A) -> B): Option<T> = getOption(s).map { b -> reverseGet(f(b)) }
 
-
 /**
  * Find the target that satisfies the predicate
  */

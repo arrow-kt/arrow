@@ -21,51 +21,51 @@ class TraversalTest : UnitSpec() {
 
     init {
 
-        testLaws(
-                TraversalLaws.laws(
-                        traversal = fromTraversable(),
-                        aGen = Gen.create { Gen.list(Gen.int()).generate().k() },
-                        bGen = Gen.int(),
-                        funcGen = genFunctionAToB(Gen.int()),
-                        EQA = Eq.any(),
-                        EQB = Eq.any()
-                ) + TraversalLaws.laws(
-                        traversal= Traversal({ it.a }, { it.b }, { a, b, _ -> a toT b }),
-                        aGen = genTuple(Gen.float(), Gen.float()),
-                        bGen = Gen.float(),
-                        funcGen = genFunctionAToB(Gen.float()),
-                        EQA = Eq.any(),
-                        EQB = Eq.any()
-                )
-        )
+        testLaws(TraversalLaws.laws(
+                traversal = fromTraversable(),
+                aGen = Gen.create { Gen.list(Gen.int()).generate().k() },
+                bGen = Gen.int(),
+                funcGen = genFunctionAToB(Gen.int()),
+                EQA = Eq.any(),
+                EQB = Eq.any()
+        ))
+
+        testLaws(TraversalLaws.laws(
+                traversal = Traversal({ it.a }, { it.b }, { a, b, _ -> a toT b }),
+                aGen = genTuple(Gen.float(), Gen.float()),
+                bGen = Gen.float(),
+                funcGen = genFunctionAToB(Gen.float()),
+                EQA = Eq.any(),
+                EQB = Eq.any()
+        ))
 
         "Getting all targets of a traversal" {
             forAll(Gen.list(Gen.int()), { ints ->
-                fromTraversable<ListKWHK, Int>().getAll(s = ints.k()) == ints.k()
+                fromTraversable<ListKWHK, Int>().getAll(ints.k()) == ints.k()
             })
         }
 
         "Folding all the values of a traversal" {
             forAll(Gen.list(Gen.int()), { ints ->
-                fromTraversable<ListKWHK, Int>().fold(s = ints.k()) == ints.sum()
+                fromTraversable<ListKWHK, Int>().fold(ints.k()) == ints.sum()
             })
         }
 
         "Combining all the values of a traversal" {
             forAll(Gen.list(Gen.int()), { ints ->
-                fromTraversable<ListKWHK, Int>().combineAll(s = ints.k()) == ints.sum()
+                fromTraversable<ListKWHK, Int>().combineAll(ints.k()) == ints.sum()
             })
         }
 
         "Finding an number larger than 10" {
             forAll(Gen.list(Gen.choose(-100, 100)), { ints ->
-                fromTraversable<ListKWHK, Int>().find(ints.k()) { it > 10 } == ints.firstOrNull { it > 10 }?.some() ?: none()
+                fromTraversable<ListKWHK, Int>().find(ints.k()) { it > 10 } == ints.firstOrNull { it > 10 }?.some() ?: none<Int>()
             })
         }
 
         "Get the length from a traversal" {
             forAll(Gen.list(Gen.int()), { ints ->
-                fromTraversable<ListKWHK, Int>().size(s = ints.k()) == ints.size
+                fromTraversable<ListKWHK, Int>().size(ints.k()) == ints.size
             })
         }
 

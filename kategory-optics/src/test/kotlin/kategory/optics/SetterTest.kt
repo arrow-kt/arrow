@@ -17,27 +17,29 @@ import org.junit.runner.RunWith
 class SetterTest : UnitSpec() {
 
     init {
-        testLaws(
-                SetterLaws.laws(
-                        setter = Setter.id(),
-                        aGen = Gen.int(),
-                        bGen = Gen.int(),
-                        funcGen = genFunctionAToB(Gen.int()),
-                        EQA = Eq.any()
-                ) + SetterLaws.laws(
-                        setter = tokenSetter,
-                        aGen = TokenGen,
-                        bGen = Gen.string(),
-                        funcGen = genFunctionAToB(Gen.string()),
-                        EQA = Eq.any()
-                ) + SetterLaws.laws(
-                        setter = Setter.fromFunctor(),
-                        aGen = genOption(TokenGen),
-                        bGen = Gen.string(),
-                        funcGen = genFunctionAToB(Gen.string()),
-                        EQA = Eq.any()
-                )
-        )
+        testLaws(SetterLaws.laws(
+                setter = Setter.id(),
+                aGen = Gen.int(),
+                bGen = Gen.int(),
+                funcGen = genFunctionAToB(Gen.int()),
+                EQA = Eq.any()
+        ))
+
+        testLaws(SetterLaws.laws(
+                setter = tokenSetter,
+                aGen = TokenGen,
+                bGen = Gen.string(),
+                funcGen = genFunctionAToB(Gen.string()),
+                EQA = Eq.any()
+        ))
+
+        testLaws(SetterLaws.laws(
+                setter = Setter.fromFunctor(),
+                aGen = genOption(TokenGen),
+                bGen = Gen.string(),
+                funcGen = genFunctionAToB(Gen.string()),
+                EQA = Eq.any()
+        ))
 
         "Joining two lenses together with same target should yield same result" {
             val userTokenStringSetter = userSetter compose tokenSetter

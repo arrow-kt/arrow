@@ -22,25 +22,25 @@ import org.junit.runner.RunWith
 class LensTest : UnitSpec() {
 
     init {
-        testLaws(
-                LensLaws.laws(
-                        lens = tokenLens,
-                        aGen = TokenGen,
-                        bGen = Gen.string(),
-                        funcGen = genFunctionAToB(Gen.string()),
-                        EQA = Eq.any(),
-                        EQB = Eq.any(),
-                        FA = Option.applicative()
-                ) +  LensLaws.laws(
-                        lens = Lens.id(),
-                        aGen = Gen.int(),
-                        bGen = Gen.int(),
-                        funcGen = genFunctionAToB(Gen.int()),
-                        EQA = Eq.any(),
-                        EQB = Eq.any(),
-                        FA = Try.applicative()
-                )
-        )
+        testLaws(LensLaws.laws(
+                lens = tokenLens,
+                aGen = TokenGen,
+                bGen = Gen.string(),
+                funcGen = genFunctionAToB(Gen.string()),
+                EQA = Eq.any(),
+                EQB = Eq.any(),
+                FA = Option.applicative()
+        ))
+
+        testLaws(LensLaws.laws(
+                lens = Lens.id(),
+                aGen = Gen.int(),
+                bGen = Gen.int(),
+                funcGen = genFunctionAToB(Gen.int()),
+                EQA = Eq.any(),
+                EQB = Eq.any(),
+                FA = Try.applicative()
+        ))
 
         "Lifting a function should yield the same result as not yielding" {
             forAll(TokenGen, Gen.string(), { token, value ->
