@@ -24,6 +24,10 @@
     <ID>LabeledExpression:ContinuationUtils.kt$this@completion</ID>
     <ID>LabeledExpression:MonoidK.kt$MonoidK.&lt;no name provided&gt;$this@MonoidK</ID>
     <ID>LabeledExpression:MonoidK.kt$MonoidK.&lt;no name provided&gt;$this@MonoidK</ID>
+    <ID>LabeledExpression:Iso.kt$PIso.&lt;no name provided&gt;$this@PIso</ID>
+    <ID>LabeledExpression:Prism.kt$PPrism.&lt;no name provided&gt;$this@PPrism</ID>
+    <ID>LabeledExpression:Traversal.kt$PTraversal.&lt;no name provided&gt;$this@PTraversal</ID>
+    <ID>LabeledExpression:Lens.kt$PLens.&lt;no name provided&gt;$this@PLens</ID>
     <ID>LabeledExpression:Fold.kt$Fold.&lt;no name provided&gt;$this@Fold</ID>
     <ID>ComplexMethod:AndThen.kt$AndThen$ @Suppress("UNCHECKED_CAST") internal fun runLoop(_success: A?, _failure: Throwable?, _isSuccess: Boolean): B</ID>
     <ID>EmptyClassBlock:Typeclass.kt$&lt;no name provided&gt; : TypeLiteral</ID>

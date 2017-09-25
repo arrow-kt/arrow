@@ -27,33 +27,35 @@ class IsoTest : UnitSpec() {
                 reverseGet = SumType::A
         )
 
-        testLaws(
-                LensLaws.laws(
-                        lens = tokenIso.asLens(),
-                        aGen = TokenGen,
-                        bGen = Gen.string(),
-                        funcGen = genFunctionAToB(Gen.string()),
-                        EQA = Eq.any(),
-                        EQB = Eq.any(),
-                        FA = NonEmptyList.applicative()
-                ) + PrismLaws.laws(
-                        prism = aIso.asPrism(),
-                        aGen = AGen,
-                        bGen = Gen.string(),
-                        funcGen = genFunctionAToB(Gen.string()),
-                        EQA = Eq.any(),
-                        EQB = Eq.any(),
-                        FA = Option.applicative()
-                ) + IsoLaws.laws(
-                        iso = tokenIso,
-                        aGen = TokenGen,
-                        bGen = Gen.string(),
-                        funcGen = genFunctionAToB(Gen.string()),
-                        EQA = Eq.any(),
-                        EQB = Eq.any(),
-                        bMonoid = StringMonoidInstance
-                )
-        )
+        testLaws(LensLaws.laws(
+                lens = tokenIso.asLens(),
+                aGen = TokenGen,
+                bGen = Gen.string(),
+                funcGen = genFunctionAToB(Gen.string()),
+                EQA = Eq.any(),
+                EQB = Eq.any(),
+                FA = NonEmptyList.applicative()
+        ))
+
+        testLaws(PrismLaws.laws(
+                prism = aIso.asPrism(),
+                aGen = AGen,
+                bGen = Gen.string(),
+                funcGen = genFunctionAToB(Gen.string()),
+                EQA = Eq.any(),
+                EQB = Eq.any(),
+                FA = Option.applicative()
+        ))
+
+        testLaws(IsoLaws.laws(
+                iso = tokenIso,
+                aGen = TokenGen,
+                bGen = Gen.string(),
+                funcGen = genFunctionAToB(Gen.string()),
+                EQA = Eq.any(),
+                EQB = Eq.any(),
+                bMonoid = StringMonoidInstance
+        ))
 
         "Creating a first pair with a type should result in the target to value" {
             val first = tokenIso.first<Int>()

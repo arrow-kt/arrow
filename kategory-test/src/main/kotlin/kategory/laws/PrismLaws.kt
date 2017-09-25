@@ -3,6 +3,8 @@ package kategory
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kategory.optics.Prism
+import kategory.optics.modify
+import kategory.optics.modifyF
 
 object PrismLaws {
 
