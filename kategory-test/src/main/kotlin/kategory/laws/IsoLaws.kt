@@ -3,6 +3,7 @@ package kategory
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kategory.optics.Iso
+import kategory.optics.modify
 
 object IsoLaws {
 
@@ -43,12 +44,12 @@ object IsoLaws {
 
     inline fun <reified A, reified B> consistentModifyModifyId(iso: Iso<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>): Unit =
             forAll(aGen, funcGen, { a, f ->
-                iso.modify(a, f).equalUnderTheLaw(iso.modifyF(Id.functor(), { Id.pure(f(it)) }, a).value(), EQA)
+                iso.modify(a, f).equalUnderTheLaw(iso.modifyF(Id.functor(), a, { Id.pure(f(it)) }).value(), EQA)
             })
 
     inline fun <reified A, reified B> consitentGetModifyId(iso: Iso<A, B>, aGen: Gen<A>, EQB: Eq<B>, bMonoid: Monoid<B>): Unit =
             forAll(aGen, { a ->
-                iso.get(a).equalUnderTheLaw(iso.modifyF(Const.applicative(bMonoid), ::Const, a).value(), EQB)
+                iso.get(a).equalUnderTheLaw(iso.modifyF(Const.applicative(bMonoid), a, ::Const).value(), EQB)
             })
 
 }
