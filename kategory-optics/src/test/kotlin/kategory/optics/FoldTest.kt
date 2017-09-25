@@ -3,9 +3,7 @@ package kategory.optics
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kategory.IntMonoid
 import kategory.ListKWHK
-import kategory.ListKWMonoidInstance
 import kategory.UnitSpec
 import kategory.k
 import kategory.none
@@ -24,20 +22,20 @@ class FoldTest : UnitSpec() {
             val select = Fold.select<List<Int>> { it.contains(1) }
 
             forAll(Gen.list(Gen.int()), { ints ->
-                select.getAll(a = ints).list.firstOrNull() ==
+                select.getAll(ints).list.firstOrNull() ==
                         ints.let { if (it.contains(1)) it else null }
             })
         }
 
         "Folding a list of ints" {
             forAll(Gen.list(Gen.int()), { ints ->
-                intFold.fold(a = ints.k()) == ints.sum()
+                intFold.fold(ints.k()) == ints.sum()
             })
         }
 
         "Folding a list should yield same result as combineAll" {
             forAll(Gen.list(Gen.int()), { ints ->
-                intFold.combineAll(a = ints.k()) == ints.sum()
+                intFold.combineAll(ints.k()) == ints.sum()
             })
         }
 
@@ -49,7 +47,7 @@ class FoldTest : UnitSpec() {
 
         "Get all targets" {
             forAll(Gen.list(Gen.int()), { ints ->
-                intFold.getAll(a = ints.k()) == ints.k()
+                intFold.getAll(ints.k()) == ints.k()
             })
         }
 

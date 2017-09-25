@@ -191,7 +191,7 @@ interface POptional<S, T, A, B> {
     /**
      * View a [POptional] as a [Fold]
      */
-    fun asFold() = object : Fold<S, A>() {
+    fun asFold() = object : Fold<S, A> {
         override fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R = getOption(s).map(f).getOrElse(M::empty)
     }
 

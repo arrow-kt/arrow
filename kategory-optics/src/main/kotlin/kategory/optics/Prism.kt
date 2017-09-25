@@ -174,7 +174,7 @@ interface PPrism<S, T, A, B> {
     /**
      * View a [PPrism] as a [Fold]
      */
-    fun asFold(): Fold<S, A> = object : Fold<S, A>() {
+    fun asFold(): Fold<S, A> = object : Fold<S, A> {
         override fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R = getOption(s).map(f).getOrElse(M::empty)
     }
 
