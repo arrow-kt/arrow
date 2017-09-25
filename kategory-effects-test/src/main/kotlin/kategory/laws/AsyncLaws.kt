@@ -5,6 +5,7 @@ import io.kotlintest.properties.forAll
 import kategory.*
 import kategory.effects.data.internal.BindingCancellationException
 import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.newSingleThreadContext
 
 object AsyncLaws {
     inline fun <reified F> laws(AC: AsyncContext<F> = asyncContext(), M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>, EQ_EITHER: Eq<HK<F, Either<Throwable, Int>>>, EQERR: Eq<HK<F, Int>> = EQ): List<Law> =
@@ -19,7 +20,8 @@ object AsyncLaws {
                     Law("Async bind: binding cancellation before flatMap", { asyncCancellationBefore(AC, M, EQ) }),
                     Law("Async bind: binding cancellation after flatMap", { asyncCancellationAfter(AC, M, EQ) }),
                     Law("Async bind: bindingInContext cancellation before flatMap", { inContextCancellationBefore(M, EQ) }),
-                    Law("Async bind: bindingInContext cancellation after flatMap", { inContextCancellationAfter(M, EQ) })
+                    Law("Async bind: bindingInContext cancellation after flatMap", { inContextCancellationAfter(M, EQ) }),
+                    Law("Async bind: bindingInContext error equivalent to raiseError", { inContextError(M, EQERR) })
             )
 
     inline fun <reified F> asyncSuccess(AC: AsyncContext<F> = asyncContext(), M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
@@ -131,5 +133,13 @@ object AsyncLaws {
                 }
                 Try { Thread.sleep(250); dispose() }.recover { throw it }
                 binding.equalUnderTheLaw(M.raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 0
+            })
+
+    inline fun <reified F> inContextError(M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
+            forFew(5, genThrowable(), { throwable: Throwable ->
+                M.bindingE {
+                    val a: Int = bindInContext(newSingleThreadContext("1")) { throw throwable }
+                    yields(a)
+                }.equalUnderTheLaw(M.raiseError(throwable), EQ)
             })
 }
