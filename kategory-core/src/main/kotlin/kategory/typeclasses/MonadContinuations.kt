@@ -58,7 +58,7 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
         COROUTINE_SUSPENDED
     }
 
-    open suspend fun <B> bindInContext(context: CoroutineContext = EmptyCoroutineContext, m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
+    open suspend fun <B> bindIn(context: CoroutineContext = EmptyCoroutineContext, m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels
         val monadCreation: suspend () -> HK<F, A> = {
             flatMap(m(), { xx: B ->

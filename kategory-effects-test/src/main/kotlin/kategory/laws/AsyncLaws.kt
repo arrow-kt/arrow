@@ -112,9 +112,9 @@ object AsyncLaws {
             forFew(5, genIntSmall(), { num: Int ->
                 val sideEffect = SideEffect()
                 val (binding, dispose) = M.bindingECancellable {
-                    val a = bindInContext(CommonPool) { Thread.sleep(500); pure(num) }
+                    val a = bindIn(CommonPool) { Thread.sleep(500); pure(num) }
                     sideEffect.increment()
-                    val b = bindInContext(CommonPool) { pure(a + 1) }
+                    val b = bindIn(CommonPool) { pure(a + 1) }
                     val c = pure(b + 1).bind()
                     yields(c)
                 }
@@ -126,9 +126,9 @@ object AsyncLaws {
             forFew(5, genIntSmall(), { num: Int ->
                 val sideEffect = SideEffect()
                 val (binding, dispose) = M.bindingECancellable {
-                    val a = bindInContext(CommonPool) { pure(num) }
+                    val a = bindIn(CommonPool) { pure(num) }
                     sideEffect.increment()
-                    val b = bindInContext(CommonPool) { Thread.sleep(500); sideEffect.increment(); pure(a + 1) }
+                    val b = bindIn(CommonPool) { Thread.sleep(500); sideEffect.increment(); pure(a + 1) }
                     yields(b)
                 }
                 Try { Thread.sleep(250); dispose() }.recover { throw it }
@@ -138,7 +138,7 @@ object AsyncLaws {
     inline fun <reified F> inContextError(M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
             forFew(5, genThrowable(), { throwable: Throwable ->
                 M.bindingE {
-                    val a: Int = bindInContext(newSingleThreadContext("1")) { throw throwable }
+                    val a: Int = bindIn(newSingleThreadContext("1")) { throw throwable }
                     yields(a)
                 }.equalUnderTheLaw(M.raiseError(throwable), EQ)
             })

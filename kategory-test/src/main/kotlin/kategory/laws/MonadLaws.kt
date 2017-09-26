@@ -86,8 +86,8 @@ object MonadLaws {
     inline fun <reified F> monadComprehensionsBindInContext(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
             forFew(5, genIntSmall(), { num: Int ->
                 M.binding {
-                    val a = bindInContext(newSingleThreadContext("$num")) { pure(num + 1) }
-                    val b = bindInContext(newSingleThreadContext("$a")) { pure(a + 1) }
+                    val a = bindIn(newSingleThreadContext("$num")) { pure(num + 1) }
+                    val b = bindIn(newSingleThreadContext("$a")) { pure(a + 1) }
                     yields(b)
                 }.equalUnderTheLaw(M.pure(num + 2), EQ)
             })
