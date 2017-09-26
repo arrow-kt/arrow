@@ -2,7 +2,6 @@ package kategory
 
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kategory.*
 
 object MonadFilterLaws {
 

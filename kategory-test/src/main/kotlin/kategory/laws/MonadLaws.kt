@@ -2,6 +2,7 @@ package kategory
 
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import kotlinx.coroutines.experimental.newSingleThreadContext
 
 object MonadLaws {
 
@@ -13,9 +14,10 @@ object MonadLaws {
                     Law("Monad Laws: kleisli right identity", { kleisliRightIdentity(M, EQ) }),
                     Law("Monad Laws: map / flatMap coherence", { mapFlatMapCoherence(M, EQ) }),
                     Law("Monad Laws: monad comprehensions", { monadComprehensions(M, EQ) }),
+                    Law("Monad Laws: monad comprehensions binding in other threads", { monadComprehensionsBindInContext(M, EQ) }),
                     Law("Monad Laws: stack-safe//unsafe monad comprehensions equivalence", { equivalentComprehensions(M, EQ) }),
-                    Law("Monad / JVM: stack safe", { stackSafety(5000, M, EQ) }),
-                    Law("Monad / JVM: stack safe comprehensions", { stackSafetyComprehensions(5000, M, EQ) })
+                    Law("Monad Laws: stack safe", { stackSafety(5000, M, EQ) }),
+                    Law("Monad Laws: stack safe comprehensions", { stackSafetyComprehensions(5000, M, EQ) })
             )
 
     inline fun <reified F> leftIdentity(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
@@ -56,15 +58,15 @@ object MonadLaws {
     inline fun <reified F> equivalentComprehensions(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(Gen.int(), { num: Int ->
                 val aa = M.binding {
-                    val a = M.pure(num).bind()
-                    val b = M.pure(a + 1).bind()
-                    val c = M.pure(b + 1).bind()
+                    val a = pure(num).bind()
+                    val b = pure(a + 1).bind()
+                    val c = pure(b + 1).bind()
                     yields(c)
                 }
                 val bb = M.bindingStackSafe {
-                    val a = M.pure(num).bind()
-                    val b = M.pure(a + 1).bind()
-                    val c = M.pure(b + 1).bind()
+                    val a = pure(num).bind()
+                    val b = pure(a + 1).bind()
+                    val c = pure(b + 1).bind()
                     yields(c)
                 }.run(M)
                 aa.equalUnderTheLaw(bb, EQ)
@@ -74,17 +76,25 @@ object MonadLaws {
     inline fun <reified F> monadComprehensions(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(Gen.int(), { num: Int ->
                 M.binding {
-                    val a = M.pure(num).bind()
-                    val b = M.pure(a + 1).bind()
-                    val c = M.pure(b + 1).bind()
+                    val a = pure(num).bind()
+                    val b = pure(a + 1).bind()
+                    val c = pure(b + 1).bind()
                     yields(c)
                 }.equalUnderTheLaw(M.pure(num + 2), EQ)
             })
 
+    inline fun <reified F> monadComprehensionsBindInContext(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
+            forFew(5, genIntSmall(), { num: Int ->
+                M.binding {
+                    val a = bindInContext(newSingleThreadContext("$num")) { pure(num + 1) }
+                    val b = bindInContext(newSingleThreadContext("$a")) { pure(a + 1) }
+                    yields(b)
+                }.equalUnderTheLaw(M.pure(num + 2), EQ)
+            })
+
     fun <F> stackSafeTestProgram(M: Monad<F>, n: Int, stopAt: Int): Free<F, Int> = M.bindingStackSafe {
-        val v = M.pure(n + 1).bind()
-        val r = if (v < stopAt) stackSafeTestProgram(M, v, stopAt).bind() else M.pure(v).bind()
+        val v = pure(n + 1).bind()
+        val r = if (v < stopAt) stackSafeTestProgram(M, v, stopAt).bind() else pure(v).bind()
         yields(r)
     }
-
 }

@@ -4,6 +4,8 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kategory.*
 import kategory.effects.data.internal.BindingCancellationException
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.newSingleThreadContext
 
 object AsyncLaws {
     inline fun <reified F> laws(AC: AsyncContext<F> = asyncContext(), M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>, EQ_EITHER: Eq<HK<F, Either<Throwable, Int>>>, EQERR: Eq<HK<F, Int>> = EQ): List<Law> =
@@ -16,7 +18,10 @@ object AsyncLaws {
                     Law("Async bind: unsafe binding failure", { asyncBindUnsafeError(AC, M, EQERR) }),
                     Law("Async bind: binding in parallel", { asyncParallelBind(AC, M, EQ) }),
                     Law("Async bind: binding cancellation before flatMap", { asyncCancellationBefore(AC, M, EQ) }),
-                    Law("Async bind: binding cancellation after flatMap", { asyncCancellationAfter(AC, M, EQ) })
+                    Law("Async bind: binding cancellation after flatMap", { asyncCancellationAfter(AC, M, EQ) }),
+                    Law("Async bind: bindingInContext cancellation before flatMap", { inContextCancellationBefore(M, EQ) }),
+                    Law("Async bind: bindingInContext cancellation after flatMap", { inContextCancellationAfter(M, EQ) }),
+                    Law("Async bind: bindingInContext error equivalent to raiseError", { inContextError(M, EQERR) })
             )
 
     inline fun <reified F> asyncSuccess(AC: AsyncContext<F> = asyncContext(), M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
@@ -70,7 +75,7 @@ object AsyncLaws {
     inline fun <reified F> asyncParallelBind(AC: AsyncContext<F> = asyncContext(), M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(genIntSmall(), genIntSmall(), genIntSmall(), { x: Int, y: Int, z: Int ->
                 val bound = M.bindingE {
-                    val value = bind { M.tupled(runAsync(AC) { x }, runAsync(AC) { y }, runAsync(AC) { z }) }
+                    val value = bind { tupled(runAsync(AC) { x }, runAsync(AC) { y }, runAsync(AC) { z }) }
                     yields(value.a + value.b + value.c)
                 }
                 bound.equalUnderTheLaw(M.pure<Int>(x + y + z), EQ)
@@ -80,10 +85,10 @@ object AsyncLaws {
             forFew(5, genIntSmall(), { num: Int ->
                 val sideEffect = SideEffect()
                 val (binding, dispose) = M.bindingECancellable {
-                    val a = runAsync(AC) { Thread.sleep(500); num }.bind()
+                    val a = bindAsync(AC) { Thread.sleep(500); num }
                     sideEffect.increment()
-                    val b = runAsync(AC) { a + 1 }.bind()
-                    val c = M.pure(b + 1).bind()
+                    val b = bindAsync(AC) { a + 1 }
+                    val c = pure(b + 1).bind()
                     yields(c)
                 }
                 Try { Thread.sleep(250); dispose() }.recover { throw it }
@@ -101,5 +106,40 @@ object AsyncLaws {
                 }
                 Try { Thread.sleep(250); dispose() }.recover { throw it }
                 binding.equalUnderTheLaw(M.raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 0
+            })
+
+    inline fun <reified F> inContextCancellationBefore(M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
+            forFew(5, genIntSmall(), { num: Int ->
+                val sideEffect = SideEffect()
+                val (binding, dispose) = M.bindingECancellable {
+                    val a = bindInContext(CommonPool) { Thread.sleep(500); pure(num) }
+                    sideEffect.increment()
+                    val b = bindInContext(CommonPool) { pure(a + 1) }
+                    val c = pure(b + 1).bind()
+                    yields(c)
+                }
+                Try { Thread.sleep(250); dispose() }.recover { throw it }
+                binding.equalUnderTheLaw(M.raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 0
+            })
+
+    inline fun <reified F> inContextCancellationAfter(M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
+            forFew(5, genIntSmall(), { num: Int ->
+                val sideEffect = SideEffect()
+                val (binding, dispose) = M.bindingECancellable {
+                    val a = bindInContext(CommonPool) { pure(num) }
+                    sideEffect.increment()
+                    val b = bindInContext(CommonPool) { Thread.sleep(500); sideEffect.increment(); pure(a + 1) }
+                    yields(b)
+                }
+                Try { Thread.sleep(250); dispose() }.recover { throw it }
+                binding.equalUnderTheLaw(M.raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 0
+            })
+
+    inline fun <reified F> inContextError(M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
+            forFew(5, genThrowable(), { throwable: Throwable ->
+                M.bindingE {
+                    val a: Int = bindInContext(newSingleThreadContext("1")) { throw throwable }
+                    yields(a)
+                }.equalUnderTheLaw(M.raiseError(throwable), EQ)
             })
 }
