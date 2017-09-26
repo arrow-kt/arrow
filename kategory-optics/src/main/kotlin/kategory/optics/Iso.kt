@@ -1,5 +1,6 @@
 package kategory.optics
 
+import kategory.Applicative
 import kategory.Either
 import kategory.Functor
 import kategory.HK
@@ -34,17 +35,17 @@ typealias Iso<S, T> = PIso<S, S, T, T>
  * @param A the target of a [PIso]
  * @param B the modified target of a [PIso]
  */
-abstract class PIso<S, T, A, B> {
+interface PIso<S, T, A, B> {
 
     /**
      * Get the target of a [PIso]
      */
-    abstract fun get(s: S): A
+    fun get(s: S): A
 
     /**
      * Get the modified source of a [PIso]
      */
-    abstract fun reverseGet(b: B): T
+    fun reverseGet(b: B): T
 
     companion object {
 
@@ -59,7 +60,7 @@ abstract class PIso<S, T, A, B> {
          * Invoke operator overload to create a [PIso] of type `S` with target `A`.
          * Can also be used to construct [Iso]
          */
-        operator fun <S, T, A, B> invoke(get: (S) -> (A), reverseGet: (B) -> T) = object : PIso<S, T, A, B>() {
+        operator fun <S, T, A, B> invoke(get: (S) -> (A), reverseGet: (B) -> T) = object : PIso<S, T, A, B> {
 
             override fun get(s: S): A = get(s)
 
@@ -68,17 +69,23 @@ abstract class PIso<S, T, A, B> {
     }
 
     /**
-     * Reverse a [PIso]: the source becomes the target and the target becomes the source
-     */
-    fun reverse(): PIso<B, A, T, S> = PIso(this::reverseGet, this::get)
-
-    /**
      * Lift a [PIso] to a Functor level
      */
-    inline fun <reified F> mapping(FF: Functor<F> = functor()): PIso<HK<F, S>, HK<F, T>, HK<F, A>, HK<F, B>> = PIso(
+    fun <F> mapping(FF: Functor<F>): PIso<HK<F, S>, HK<F, T>, HK<F, A>, HK<F, B>> = PIso(
             { fa -> FF.map(fa, this::get) },
             { fb -> FF.map(fb, this::reverseGet) }
     )
+
+    /**
+     * Modify polymorphically the target of a [PIso] with a Functor function
+     */
+    fun <F> modifyF(FF: Functor<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
+            FF.map(f(get(s)), this::reverseGet)
+
+    /**
+     * Reverse a [PIso]: the source becomes the target and the target becomes the source
+     */
+    fun reverse(): PIso<B, A, T, S> = PIso(this::reverseGet, this::get)
 
     /**
      * Find if the target satisfies the predicate
@@ -86,22 +93,6 @@ abstract class PIso<S, T, A, B> {
     fun find(s: S, p: (A) -> Boolean): Option<A> = get(s).let { aa ->
         if (p(aa)) aa.some() else none()
     }
-
-    /**
-     * Check if the target satisfies the predicate
-     */
-    inline fun exist(s: S, crossinline p: (A) -> Boolean): Boolean = p(get(s))
-
-    /**
-     * Modify polymorphically the target of a [PIso] with a function
-     */
-    inline fun modify(s: S, crossinline f: (A) -> B): T = reverseGet(f(get(s)))
-
-    /**
-     * Modify polymorphically the target of a [PIso] with a Functor function
-     */
-    inline fun <reified F> modifyF(FF: Functor<F> = functor(), f: (A) -> HK<F, B>, s: S): HK<F, T> =
-            FF.map(f(get(s)), this::reverseGet)
 
     /**
      * Set polymorphically the target of a [PIso] with a value
@@ -164,7 +155,7 @@ abstract class PIso<S, T, A, B> {
     /**
      * Compose a [PIso] with a [Getter]
      */
-    infix fun <C> compose(other: Getter<A, C>): Getter<S, C> = asGetter() composeGetter other
+    infix fun <C> compose(other: Getter<A, C>): Getter<S, C> = asGetter() compose other
 
     /**
      * Compose a [PIso] with a [PSetter]
@@ -175,6 +166,16 @@ abstract class PIso<S, T, A, B> {
      * Compose a [PIso] with a [POptional]
      */
     infix fun <C, D> compose(other: POptional<A, B, C, D>): POptional<S, T, C, D> = asOptional() compose other
+
+    /**
+     * Compose a [PIso] with a [Fold]
+     */
+    infix fun <C> compose(other: Fold<A, C>): Fold<S, C> = asFold() compose other
+
+    /**
+     * Compose a [PIso] with a [PTraversal]
+     */
+    infix fun <C, D> compose(other: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> = asTraversal() compose other
 
     /**
      * Plus operator overload to compose lenses
@@ -188,6 +189,10 @@ abstract class PIso<S, T, A, B> {
     operator fun <C, D> plus(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = compose(other)
 
     operator fun <C, D> plus(other: POptional<A, B, C, D>): POptional<S, T, C, D> = compose(other)
+
+    operator fun <C> plus(other: Fold<A, C>): Fold<S, C> = compose(other)
+
+    operator fun <C, D> plus(other: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> = compose(other)
 
     /**
      * View a [PIso] as a [PPrism]
@@ -223,7 +228,40 @@ abstract class PIso<S, T, A, B> {
     /**
      * View a [PIso] as a [Fold]
      */
-    fun asFold(): Fold<S, A> = object : Fold<S, A>() {
+    fun asFold(): Fold<S, A> = object : Fold<S, A> {
         override fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R = f(get(s))
     }
+
+    /**
+     * View a [PIso] as a [PTraversal]
+     */
+    fun asTraversal(): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
+        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
+                FA.map(f(get(s)), this@PIso::reverseGet)
+    }
+
 }
+
+/**
+ * Lift a [PIso] to a Functor level
+ */
+inline fun <S, T, A, B, reified F> PIso<S, T, A, B>.mapping(FF: Functor<F> = functor(), dummy: Unit = Unit): PIso<HK<F, S>, HK<F, T>, HK<F, A>, HK<F, B>> = PIso(
+        { fa -> FF.map(fa, this::get) },
+        { fb -> FF.map(fb, this::reverseGet) }
+)
+
+/**
+ * Check if the target satisfies the predicate
+ */
+inline fun <S, T, A, B> PIso<S, T, A, B>.exist(s: S, crossinline p: (A) -> Boolean): Boolean = p(get(s))
+
+/**
+ * Modify polymorphically the target of a [PIso] with a function
+ */
+inline fun <S, T, A, B> PIso<S, T, A, B>.modify(s: S, crossinline f: (A) -> B): T = reverseGet(f(get(s)))
+
+/**
+ * Modify polymorphically the target of a [PIso] with a Functor function
+ */
+inline fun <S, T, A, B, reified F> PIso<S, T, A, B>.modifyF(s: S, f: (A) -> HK<F, B>, FF: Functor<F> = functor()): HK<F, T> =
+        FF.map(f(get(s)), this::reverseGet)

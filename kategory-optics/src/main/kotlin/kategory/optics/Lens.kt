@@ -1,5 +1,6 @@
 package kategory.optics
 
+import kategory.Applicative
 import kategory.Either
 import kategory.Functor
 import kategory.HK
@@ -35,10 +36,10 @@ typealias Lens<S, A> = PLens<S, S, A, A>
  * @param A the focus of a [PLens]
  * @param B the modified focus of a [PLens]
  */
-abstract class PLens<S, T, A, B> {
+interface PLens<S, T, A, B> {
 
-    abstract fun get(s: S): A
-    abstract fun set(s: S, b: B): T
+    fun get(s: S): A
+    fun set(s: S, b: B): T
 
     companion object {
 
@@ -56,7 +57,7 @@ abstract class PLens<S, T, A, B> {
          * Invoke operator overload to create a [PLens] of type `S` with target `A`.
          * Can also be used to construct [Lens]
          */
-        operator fun <S, T, A, B> invoke(get: (S) -> A, set: (B) -> (S) -> T) = object : PLens<S, T, A, B>() {
+        operator fun <S, T, A, B> invoke(get: (S) -> A, set: (B) -> (S) -> T) = object : PLens<S, T, A, B> {
             override fun get(s: S): A = get(s)
 
             override fun set(s: S, b: B): T = set(b)(s)
@@ -64,37 +65,15 @@ abstract class PLens<S, T, A, B> {
     }
 
     /**
-     * Modify the focus of s [PLens] using s function `(A) -> B`
-     */
-    inline fun modify(s: S, crossinline f: (A) -> B): T = set(s, f(get(s)))
-
-    /**
-     * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
-     */
-    inline fun lift(crossinline f: (A) -> B): (S) -> T = { s -> modify(s, f) }
-
-    /**
      * Modify the focus of a [PLens] using Functor function
      */
-    inline fun <reified F> modifyF(FF: Functor<F> = functor(), s: S, f: (A) -> HK<F, B>): HK<F, T> =
-            FF.map(f(get(s)), { set(s, it) })
+    fun <F> modifyF(FF: Functor<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
+            FF.map(f(get(s)), { b -> set(s, b) })
 
     /**
      * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
      */
-    inline fun <reified F> liftF(FF: Functor<F> = functor(), crossinline f: (A) -> HK<F, B>): (S) -> HK<F, T> = { s -> modifyF(FF, s, f) }
-
-    /**
-     * Find a focus that satisfies the predicate
-     */
-    inline fun find(s: S, crossinline p: (A) -> Boolean): Option<A> = get(s).let { a ->
-        if (p(a)) a.some() else none()
-    }
-
-    /**
-     * Verify if the focus of a [PLens] satisfies the predicate
-     */
-    inline fun exist(s: S, crossinline p: (A) -> Boolean): Boolean = p(get(s))
+    fun <F> liftF(FF: Functor<F>, f: (A) -> HK<F, B>): (S) -> HK<F, T> = { s -> modifyF(FF, s, f) }
 
     /**
      * Join two [PLens] with the same focus in [A]
@@ -150,7 +129,7 @@ abstract class PLens<S, T, A, B> {
     /**
      * Compose an [PLens] with a [Getter]
      */
-    infix fun <C> compose(other: Getter<A, C>): Getter<S, C> = asGetter() composeGetter other
+    infix fun <C> compose(other: Getter<A, C>): Getter<S, C> = asGetter() compose other
 
     /**
      * Compose an [PLens] with a [PSetter]
@@ -163,7 +142,17 @@ abstract class PLens<S, T, A, B> {
     infix fun <C, D> compose(other: PPrism<A, B, C, D>): POptional<S, T, C, D> = asOptional() compose other
 
     /**
-     * plus operator overload to compose lenses
+     * Compose an [PLens] with a [Fold]
+     */
+    infix fun <C> compose(other: Fold<A, C>): Fold<S, C> = asFold() compose other
+
+    /**
+     * Compose an [PLens] with a [PTraversal]
+     */
+    infix fun <C, D> compose(other: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> = asTraversal() compose other
+
+    /**
+     * Plus operator overload to compose lenses
      */
     operator fun <C, D> plus(other: PLens<A, B, C, D>): PLens<S, T, C, D> = compose(other)
 
@@ -176,6 +165,10 @@ abstract class PLens<S, T, A, B> {
     operator fun <C, D> plus(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = compose(other)
 
     operator fun <C, D> plus(other: PPrism<A, B, C, D>): POptional<S, T, C, D> = compose(other)
+
+    operator fun <C> plus(other: Fold<A, C>): Fold<S, C> = compose(other)
+
+    operator fun <C, D> plus(other: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> = compose(other)
 
     /**
      * View [PLens] as a [Getter]
@@ -198,8 +191,49 @@ abstract class PLens<S, T, A, B> {
     /**
      * View a [PLens] as a [Fold]
      */
-    fun asFold(): Fold<S, A> = object : Fold<S, A>() {
+    fun asFold(): Fold<S, A> = object : Fold<S, A> {
         override fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R = f(get(s))
     }
 
+    /**
+     * View a [PLens] as a [PTraversal]
+     */
+    fun asTraversal(): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
+        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
+                FA.map(f(get(s)), { b -> this@PLens.set(s, b) })
+    }
+
 }
+
+/**
+ * Modify the focus of s [PLens] using s function `(A) -> B`
+ */
+inline fun <S, T, A, B> PLens<S, T, A, B>.modify(s: S, crossinline f: (A) -> B): T = set(s, f(get(s)))
+
+/**
+ * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
+ */
+inline fun <S, T, A, B> PLens<S, T, A, B>.lift(crossinline f: (A) -> B): (S) -> T = { s -> modify(s, f) }
+
+/**
+ * Modify the focus of a [PLens] using Functor function
+ */
+inline fun <S, T, A, B, reified F> PLens<S, T, A, B>.modifyF(s: S, f: (A) -> HK<F, B>, FF: Functor<F> = functor()): HK<F, T> =
+        FF.map(f(get(s)), { b -> set(s, b) })
+
+/**
+ * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
+ */
+inline fun <S, T, A, B, reified F> PLens<S, T, A, B>.liftF(FF: Functor<F> = functor(), dummy: Unit = Unit, crossinline f: (A) -> HK<F, B>): (S) -> HK<F, T> = { s -> modifyF(FF, s) { a -> f(a) } }
+
+/**
+ * Find a focus that satisfies the predicate
+ */
+inline fun <S, T, A, B> PLens<S, T, A, B>.find(s: S, crossinline p: (A) -> Boolean): Option<A> = get(s).let { a ->
+    if (p(a)) a.some() else none()
+}
+
+/**
+ * Verify if the focus of a [PLens] satisfies the predicate
+ */
+inline fun <S, T, A, B> PLens<S, T, A, B>.exist(s: S, crossinline p: (A) -> Boolean): Boolean = p(get(s))
