@@ -7,13 +7,18 @@ import kategory.Either
 import kategory.Eq
 import kategory.IsoLaws
 import kategory.LensLaws
+import kategory.Monoid
 import kategory.NonEmptyList
 import kategory.Option
 import kategory.PrismLaws
 import kategory.StringMonoidInstance
+import kategory.Tuple2
 import kategory.UnitSpec
 import kategory.applicative
+import kategory.functor
 import kategory.genFunctionAToB
+import kategory.genTuple
+import kategory.some
 import kategory.toT
 import org.junit.runner.RunWith
 
@@ -57,6 +62,18 @@ class IsoTest : UnitSpec() {
                 bMonoid = StringMonoidInstance
         ))
 
+        "Lifting a function should yield the same result as not yielding" {
+            forAll(TokenGen, Gen.string(), { token, value ->
+                tokenIso.modify(token) { value } == tokenIso.lift { value }(token)
+            })
+        }
+
+        "Lifting a function as a functor should yield the same result as not yielding" {
+            forAll(TokenGen, Gen.string(), { token, value ->
+                tokenIso.modifyF(Option.functor(), token) { value.some() } == tokenIso.liftF { value.some() }(token)
+            })
+        }
+
         "Creating a first pair with a type should result in the target to value" {
             val first = tokenIso.first<Int>()
             forAll(TokenGen, Gen.int(), { token: Token, int: Int ->
@@ -74,16 +91,16 @@ class IsoTest : UnitSpec() {
         "Creating a left with a type should result in a sum target to value" {
             val left = tokenIso.left<Int>()
             forAll(TokenGen, Gen.int(), { token: Token, int: Int ->
-                left.get(Either.Left(token)) == Either.Left(token.value)
-                left.get(Either.Right(int)) == Either.Right(int)
+                left.get(Either.Left(token)) == Either.Left(token.value) &&
+                        left.get(Either.Right(int)) == Either.Right(int)
             })
         }
 
         "Creating a right with a type should result in a sum value to target" {
             val left = tokenIso.right<Int>()
             forAll(TokenGen, Gen.int(), { token: Token, int: Int ->
-                left.get(Either.Left(int)) == Either.Left(int)
-                left.get(Either.Right(token)) == Either.Right(token.value)
+                left.get(Either.Left(int)) == Either.Left(int) &&
+                        left.get(Either.Right(token)) == Either.Right(token.value)
             })
         }
 
