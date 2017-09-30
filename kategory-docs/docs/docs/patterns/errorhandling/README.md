@@ -250,7 +250,7 @@ All values on the left side assume to be `Right` biased and whenever a `Left` va
 
 ```kotlin
 fun attackEither(): Either<NukeException, Impacted> =
-  Try.monad().binding {
+  Either.monad<NukeException>().binding {
     val nuke = arm().bind()
     val target = aim().bind()
     val impact = launch(target, nuke).bind()
