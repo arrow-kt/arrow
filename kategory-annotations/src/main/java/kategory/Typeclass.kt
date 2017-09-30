@@ -180,9 +180,9 @@ private fun instanceFromImplicitObject(t: InstanceParametrizedType): Any? {
     val allCompanionFunctions = globalInstanceProvider.methods
     val factoryFunction = allCompanionFunctions.find { it.name == "instance" }
     return if (factoryFunction != null) {
-        val values: List<Any> = factoryFunction.parameters.mapIndexedNotNull { n, p ->
-            if (Typeclass::class.java.isAssignableFrom(p.type)) {
-                val classifier = p.parameterizedType as ParameterizedType
+        val values: List<Any> = factoryFunction.parameterTypes.mapIndexedNotNull { n, p ->
+            if (Typeclass::class.java.isAssignableFrom(p)) {
+                val classifier = InstanceParametrizedType(p, p.typeParameters.toList())
                 val vType = reifyRawParameterizedType(t, classifier, n)
                 val value = instanceFromImplicitObject(vType)
                 if (value != null) registerInstance(vType, value)
