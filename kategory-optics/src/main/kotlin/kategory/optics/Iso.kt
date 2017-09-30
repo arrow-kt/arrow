@@ -22,37 +22,37 @@ import kategory.toT
 typealias Iso<S, T> = PIso<S, S, T, T>
 
 /**
- * An [Iso] is an lossless invertible optic that defines an isomorphism between a type `S` and `A`.
- * i.e. a data class and it's data represented by TupleN
+ * An [Iso] is a loss less invertible optic that defines an isomorphism between a type `S` and `A`.
+ * i.e. a data class and its properties represented by TupleN
  *
  * A (polymorphic) [PIso] is useful when setting or modifying a value for a constructed type
  * i.e. PIso<Option<Int>, Option<String>, Int?, String?>
  *
- * An [PIso] is also a valid [Lens], [Prism]
+ * An [PIso] is also a valid [PLens], [PPrism]
  *
  * @param S the source of a [PIso]
  * @param T the modified source of a [PIso]
- * @param A the target of a [PIso]
+ * @param A the focus of a [PIso]
  * @param B the modified target of a [PIso]
  */
 interface PIso<S, T, A, B> {
 
     /**
-     * Get the target of a [PIso]
+     * Get the focus of a [PIso]
      */
     fun get(s: S): A
 
     /**
-     * Get the modified source of a [PIso]
+     * Get the modified focus of a [PIso]
      */
     fun reverseGet(b: B): T
 
     companion object {
 
         /**
-         * create an [PIso] between any type and itself. id is the zero element of optics composition, for all optics o of type O (e.g. Lens, Iso, Prism, ...):
-         * o      compose Iso.id == o
-         * Iso.id composeO   o        == o (replace composeO by compose, compose, compose, ...)
+         * create an [PIso] between any type and itself.
+         * Id is the zero element of optics composition, for any optic o of type O (e.g. PLens, Prism, POptional, ...):
+         * o compose Iso.id == o
          */
         fun <S> id(): Iso<S, S> = Iso(::identity, ::identity)
 
@@ -83,19 +83,25 @@ interface PIso<S, T, A, B> {
             FF.map(f(get(s)), this::reverseGet)
 
     /**
+     * Lift a function [f] with a functor: `(A) -> HK<F, B> to the context of `S`: `(S) -> HK<F, T>`
+     */
+    fun <F> liftF(FF: Functor<F>, f: (A) -> HK<F, B>): (S) -> HK<F, T> =
+            { s -> FF.map(f(get(s)), this::reverseGet) }
+
+    /**
      * Reverse a [PIso]: the source becomes the target and the target becomes the source
      */
     fun reverse(): PIso<B, A, T, S> = PIso(this::reverseGet, this::get)
 
     /**
-     * Find if the target satisfies the predicate
+     * Find if the focus satisfies the predicate
      */
     fun find(s: S, p: (A) -> Boolean): Option<A> = get(s).let { aa ->
         if (p(aa)) aa.some() else none()
     }
 
     /**
-     * Set polymorphically the target of a [PIso] with a value
+     * Set polymorphically the focus of a [PIso] with a value
      */
     fun set(b: B): T = reverseGet(b)
 
@@ -251,17 +257,28 @@ inline fun <S, T, A, B, reified F> PIso<S, T, A, B>.mapping(FF: Functor<F> = fun
 )
 
 /**
- * Check if the target satisfies the predicate
+ * Check if the focus satisfies the predicate
  */
 inline fun <S, T, A, B> PIso<S, T, A, B>.exist(s: S, crossinline p: (A) -> Boolean): Boolean = p(get(s))
 
 /**
- * Modify polymorphically the target of a [PIso] with a function
+ * Modify polymorphically the focus of a [PIso] with a function
  */
 inline fun <S, T, A, B> PIso<S, T, A, B>.modify(s: S, crossinline f: (A) -> B): T = reverseGet(f(get(s)))
 
 /**
- * Modify polymorphically the target of a [PIso] with a Functor function
+ * Modify polymorphically the focus of a [PIso] with a function
  */
-inline fun <S, T, A, B, reified F> PIso<S, T, A, B>.modifyF(s: S, f: (A) -> HK<F, B>, FF: Functor<F> = functor()): HK<F, T> =
-        FF.map(f(get(s)), this::reverseGet)
+inline fun <S, T, A, B> PIso<S, T, A, B>.lift(crossinline f: (A) -> B): (S) -> T = { s -> reverseGet(f(get(s))) }
+
+/**
+ * Modify polymorphically the focus of a [PIso] with a Functor function
+ */
+inline fun <S, T, A, B, reified F> PIso<S, T, A, B>.modifyF(s: S, crossinline f: (A) -> HK<F, B>, FF: Functor<F> = functor()): HK<F, T> =
+        modifyF(FF, s, { a -> f(a) })
+
+/**
+ * Lift a function [f] with a functor: `(A) -> HK<F, B> to the context of `S`: `(S) -> HK<F, T>`
+ */
+inline fun <S, T, A, B, reified F> PIso<S, T, A, B>.liftF(FF: Functor<F> = functor(), dummy: Unit = Unit, crossinline f: (A) -> HK<F, B>): (S) -> HK<F, T> =
+        liftF(FF) { a -> f(a) }
