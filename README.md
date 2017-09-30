@@ -30,7 +30,7 @@ Add the dependency into project `build.gradle`
 
 ```groovy
 dependencies {
-    compile 'io.kategory:kategory:0.3.9'
+    compile 'io.kategory:kategory:0.3.10'
 }
 ```
 
