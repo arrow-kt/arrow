@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Prism
-permalink: /docs/effects/prism/
+permalink: /docs/optics/prism/
 ---
 
 ## Prism

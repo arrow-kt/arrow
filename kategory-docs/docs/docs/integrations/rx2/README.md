@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Rx2
-permalink: /docs/effects/rx2/
+permalink: /docs/integrations/rx2/
 ---
 
 ## Rx2
