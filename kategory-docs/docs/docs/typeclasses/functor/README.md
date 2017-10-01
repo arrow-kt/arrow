@@ -14,7 +14,7 @@ refers to `Option`, `List` or any other type constructor whose contents can be t
 ### Example
 
 Often times we find ourselves in situations where we need to transform the contents of some datatype. `Functor#map` allows
-us to safely compute over values under the assumption that they'll be there returning the transformation encapsulated in the same context. 
+us to safely compute over values under the assumption that they'll be there returning the transformation encapsulated in the same context.
 
 Consider both `Option` and `Try`:
 
@@ -48,9 +48,9 @@ Try { "x".toInt() }.map { it * 2 }
 none<Int>().map { it * 2 }
 ```
 
-Kategory allows abstract polymorphic code that operates over the evidence of having an instance of a typeclass available. 
-This enables programs that are not coupled to specific datatype implementations. 
-The technique demonstrated below to write polymorphic code is available for all other [Typeclasses](/docs/typeclasses) beside `Functor`.
+Kategory allows abstract polymorphic code that operates over the evidence of having an instance of a typeclass available.
+This enables programs that are not coupled to specific datatype implementations.
+The technique demonstrated below to write polymorphic code is available for all other [Typeclasses]({{ '/docs/typeclasses' | relative_url }}) beside `Functor`.
 
 ```kotlin:ank
 inline fun <reified F> multiplyBy2(fa: HK<F, Int>, FT: Functor<F> = functor()): HK<F, Int> =
@@ -58,7 +58,7 @@ inline fun <reified F> multiplyBy2(fa: HK<F, Int>, FT: Functor<F> = functor()): 
 
 multiplyBy2<OptionHK>(Option(1)) // Option(1)
 multiplyBy2<TryHK>(Try { 1 })
-``` 
+```
 
 In the example above we've defined a function that can operate over any data type for which a `Functor` instance is available.
 And then we applied `multiplyBy2` to two different datatypes for which Functor instances exist.
@@ -96,7 +96,7 @@ lifted(Option(1))
 
 #### Other combinators
 
-For a full list of other useful combinators available in `Functor` see the [`KDoc](/kdocs/typeclasses/functor)
+For a full list of other useful combinators available in `Functor` see the [KDoc](/kdocs/typeclasses/functor) 
 
 ### Syntax
 
@@ -124,8 +124,8 @@ Kategory provides [`FunctorLaws`](/docs/typeclasses/laws#functorlaws) in the for
 
 #### Creating your own `Functor` instances
 
-[Kategory already provides Functor instances for most common datatypes](#datatypes) both in Kategory and the Kotlin stdlib. 
-Often times you may find the need to provide your own for unsupported datatypes. 
+[Kategory already provides Functor instances for most common datatypes](#datatypes) both in Kategory and the Kotlin stdlib.
+Often times you may find the need to provide your own for unsupported datatypes.
 
 You may create or automatically derive instances of functor for your own datatypes which you will be able to use in the context of abstract polymorfic code
 as demonstrated in the [example](#example) above.
@@ -136,27 +136,27 @@ See [Deriving and creating custom typeclass]
 
 Thw following datatypes in Kategory provide instances that adhere to the `Functor` typeclass.
 
-- [Cofree](/docs/datatypes/cofree) 
-- [Coproduct](/docs/datatypes/coproduct)  
-- [Coyoneda](/docs/datatypes/coyoneda)
-- [Either](/docs/datatypes/either)
-- [EitherT](/docs/datatypes/eitherT)
-- [FreeApplicative](/docs/datatypes/FreeApplicative)
-- [Function1](/docs/datatypes/Function1)
-- [Ior](/docs/datatypes/Ior)
-- [Kleisli](/docs/datatypes/Kleisli)
-- [OptionT](/docs/datatypes/OptionT)
-- [StateT](/docs/datatypes/StateT)
-- [Validated](/docs/datatypes/Validated)
-- [WriterT](/docs/datatypes/WriterT)
-- [Yoneda](/docs/datatypes/Yoneda) 
-- [Const](/docs/datatypes/Const)
-- [Try](/docs/datatypes/Try)
-- [Eval](/docs/datatypes/Eval)
-- [IO](/docs/datatypes/IO)
-- [NonEmptyList](/docs/datatypes/NonEmptyList)
-- [Id](/docs/datatypes/Id)
-- [Function0](/docs/datatypes/Function0)
+- [Cofree]({{ '/docs/datatypes/cofree' | relative_url }})
+- [Coproduct]({{ '/docs/datatypes/coproduct' | relative_url }})  
+- [Coyoneda]({{ '/docs/datatypes/coyoneda' | relative_url }})
+- [Either]({{ '/docs/datatypes/either' | relative_url }})
+- [EitherT]({{ '/docs/datatypes/eitherT' | relative_url }})
+- [FreeApplicative]({{ '/docs/datatypes/FreeApplicative' | relative_url }})
+- [Function1]({{ '/docs/datatypes/Function1' | relative_url }})
+- [Ior]({{ '/docs/datatypes/Ior' | relative_url }})
+- [Kleisli]({{ '/docs/datatypes/Kleisli' | relative_url }})
+- [OptionT]({{ '/docs/datatypes/OptionT' | relative_url }})
+- [StateT]({{ '/docs/datatypes/StateT' | relative_url }})
+- [Validated]({{ '/docs/datatypes/Validated' | relative_url }})
+- [WriterT]({{ '/docs/datatypes/WriterT' | relative_url }})
+- [Yoneda]({{ '/docs/datatypes/Yoneda' | relative_url }})
+- [Const]({{ '/docs/datatypes/Const' | relative_url }})
+- [Try]({{ '/docs/datatypes/Try' | relative_url }})
+- [Eval]({{ '/docs/datatypes/Eval' | relative_url }})
+- [IO]({{ '/docs/datatypes/IO' | relative_url }})
+- [NonEmptyList]({{ '/docs/datatypes/NonEmptyList' | relative_url }})
+- [Id]({{ '/docs/datatypes/Id' | relative_url }})
+- [Function0]({{ '/docs/datatypes/Function0' | relative_url }})
 
-Additionally all instances of [`Applicative`](/docs/typeclasses/applicative), [`Monad`](/docs/_docs/typeclasses/monad) and their MTL variants implement the `Functor` typeclass directly
+Additionally all instances of [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}), [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) and their MTL variants implement the `Functor` typeclass directly
 since they are all subtypes of `Functor`
