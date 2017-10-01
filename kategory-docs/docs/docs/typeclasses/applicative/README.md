@@ -69,7 +69,7 @@ Option.applicative().ap(Option(1), Option({ n: Int -> n + 1 })) // Option(2)
 
 #### Other combinators
 
-For a full list of other useful combinators available in `Applicative` see the [`KDoc](/kdocs/typeclasses/applicative)
+For a full list of other useful combinators available in `Applicative` see the [Source][applicative_source]{:target="_blank"}
 
 ### Syntax
 
@@ -109,16 +109,17 @@ Option.applicative().map2Eval(Option(1), Eval.later { Option("x") }, { z: Tuple2
 
 ### Laws
 
-Kategory provides [`ApplicativeLaws`]({{ '/docs/typeclasses/laws#applicativelaws' | relative_url }}) in the form of test cases for internal verification of lawful instances and third party apps creating their own Applicative instances.
+Kategory provides [`ApplicativeLaws`][applicative_law_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own Applicative instances.
 
 #### Creating your own `Applicative` instances
 
-[Kategory already provides Applicative instances for most common datatypes](#datatypes) both in Kategory and the Kotlin stdlib.
-See [Deriving and creating custom typeclass] to provide your own Applicative instances for custom datatypes.
+Kategory already provides Applicative instances for most common datatypes both in Kategory and the Kotlin stdlib.
+
+[//]: See [Deriving and creating custom typeclass] to provide your own Applicative instances for custom datatypes. //TODO: commented until section is created
 
 ### Data types
 
-Thw following datatypes in Kategory provide instances that adhere to the `Applicative` typeclass.
+The following datatypes in Kategory provide instances that adhere to the `Applicative` typeclass.
 
 - [Either]({{ '/docs/datatypes/either' | relative_url }})
 - [EitherT]({{ '/docs/datatypes/eitherT' | relative_url }})
@@ -140,3 +141,7 @@ Thw following datatypes in Kategory provide instances that adhere to the `Applic
 
 Additionally all instances of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) and their MTL variants implement the `Applicative` typeclass directly
 since they are all subtypes of `Applicative`
+
+
+[applicative_source]: https://github.com/kategory/kategory/blob/master/kategory-core/src/main/kotlin/kategory/typeclasses/Applicative.kt
+[applicative_law_source]: https://github.com/kategory/kategory/blob/master/kategory-test/src/main/kotlin/kategory/laws/ApplicativeLaws.kt

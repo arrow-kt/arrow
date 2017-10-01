@@ -50,7 +50,7 @@ none<Int>().map { it * 2 }
 
 Kategory allows abstract polymorphic code that operates over the evidence of having an instance of a typeclass available.
 This enables programs that are not coupled to specific datatype implementations.
-The technique demonstrated below to write polymorphic code is available for all other [Typeclasses]({{ '/docs/typeclasses' | relative_url }}) beside `Functor`.
+The technique demonstrated below to write polymorphic code is available for all other `Typeclasses` beside `Functor`.
 
 ```kotlin:ank
 inline fun <reified F> multiplyBy2(fa: HK<F, Int>, FT: Functor<F> = functor()): HK<F, Int> =
@@ -96,7 +96,7 @@ lifted(Option(1))
 
 #### Other combinators
 
-For a full list of other useful combinators available in `Functor` see the [KDoc](/kdocs/typeclasses/functor) 
+For a full list of other useful combinators available in `Functor` see the [Source][functor_source]{:target="_blank"}
 
 ### Syntax
 
@@ -120,17 +120,17 @@ f(Option(1))
 
 ### Laws
 
-Kategory provides [`FunctorLaws`](/docs/typeclasses/laws#functorlaws) in the form of test cases for internal verification of lawful instances and third party apps creating their own Functor instances.
+Kategory provides [`FunctorLaws`][functor_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own Functor instances.
 
 #### Creating your own `Functor` instances
 
-[Kategory already provides Functor instances for most common datatypes](#datatypes) both in Kategory and the Kotlin stdlib.
+Kategory already provides Functor instances for most common datatypes both in Kategory and the Kotlin stdlib.
 Often times you may find the need to provide your own for unsupported datatypes.
 
 You may create or automatically derive instances of functor for your own datatypes which you will be able to use in the context of abstract polymorfic code
 as demonstrated in the [example](#example) above.
 
-See [Deriving and creating custom typeclass]
+See [Deriving and creating custom typeclass](#)
 
 ### Data types
 
@@ -160,3 +160,6 @@ Thw following datatypes in Kategory provide instances that adhere to the `Functo
 
 Additionally all instances of [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}), [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) and their MTL variants implement the `Functor` typeclass directly
 since they are all subtypes of `Functor`
+
+[functor_source]: https://github.com/kategory/kategory/blob/master/kategory-core/src/main/kotlin/kategory/typeclasses/Functor.kt
+[functor_laws_source]: https://github.com/kategory/kategory/blob/master/kategory-test/src/main/kotlin/kategory/laws/FunctorLaws.kt
