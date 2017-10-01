@@ -7,7 +7,7 @@ permalink: /docs/datatypes/optiont/
 ## OptionT
 
 `OptionT` also known as the `Option` monad transformer allows to compute inside the context when `Option` is nested in a different monad.
- 
+
 One issue we face with monads is that they don't compose. This can cause your code to get really hairy when trying to combine structures like `ObservableKW` and `Option`. But there's a simple solution, and we're going to explain how you can use Monad Transformers to alleviate this problem.
 
 For our purposes here, we're going to utilize a monad that serves as a container that may hold a value and where a computation can be performed.
@@ -27,8 +27,8 @@ import kategory.Option.*
 data class Country(val code: Option<String>)
 data class Address(val id: Int, val country: Option<Country>)
 data class Person(val name: String, val address: Option<Address>)
-    
-fun getCountryCode(maybePerson : Option<Person>): Option<String> = 
+
+fun getCountryCode(maybePerson : Option<Person>): Option<String> =
   maybePerson.flatMap { person ->
     person.address.flatMap { address ->
       address.country.flatMap { country ->
@@ -44,7 +44,7 @@ We can further simplify this case by using Kategory `binding` facilities
 that enables monad comprehensions for all datatypes for which a monad instance is available.
 
 ```kotlin:ank
-fun getCountryCode(maybePerson : Option<Person>): Option<String> = 
+fun getCountryCode(maybePerson : Option<Person>): Option<String> =
   Option.monad().binding {
     val person = maybePerson.bind()
     val address = person.address.bind()
@@ -61,10 +61,10 @@ Consider this simple database representation:
 ```kotlin:ank
 val personDB: Map<Int, Person> = mapOf(
   1 to Person(
-        name = "Alfredo Lambda", 
+        name = "Alfredo Lambda",
         address = Some(
           Address(
-            id = 1, 
+            id = 1,
             country = Some(
               Country(
                 code = Some("ES")
@@ -77,7 +77,7 @@ val personDB: Map<Int, Person> = mapOf(
 
 val adressDB: Map<Int, Address> = mapOf(
   1 to Address(
-    id = 1, 
+    id = 1,
     country = Some(
       Country(
         code = Some("ES")
@@ -92,16 +92,16 @@ Now we've got two new functions in the mix that are going to call a remote servi
 ```kotlin:ank
 import kategory.effects.*
 
-fun findPerson(personId : Int) : ObservableKW<Option<Person>> = 
+fun findPerson(personId : Int) : ObservableKW<Option<Person>> =
   ObservableKW.pure(Option.fromNullable(personDB.get(personId))) //mock impl for simplicity
-  
-fun findCountry(addressId : Int) : ObservableKW<Option<Country>> = 
+
+fun findCountry(addressId : Int) : ObservableKW<Option<Country>> =
   ObservableKW.pure(
     Option.fromNullable(adressDB.get(addressId)).flatMap { it.country }
   ) //mock impl for simplicity
-  
+
 ```
-    
+
 A naive implementation attempt to get to a `country.code` from a `person.id` might look something like this.
 
 ```kotlin:ank
@@ -121,29 +121,29 @@ fun getCountryCode(personId: Int) =
 val lifted = { personId: Int -> getCountryCode(personId) }
 lifted
 ```
-    
+
 
 This isn't actually what we want since the inferred return type is `ObservableKW<Option<Option<ObservableKW<Option<Option<String>>>>>>`. We can't use flatMap in this case because the nested expression does not match the return type of the expression they're contained within. This is because we're not flatMapping properly over the nested types.
- 
+
  Still not ideal. The levels of nesting are pyramidal with `flatMap` and `map` and are as deep as the number of operations that you have to perform.
 
 Let's look at how a similar implementation would look like using monad comprehensions without transformers:
 
 ```kotlin:ank
-fun getCountryCode(personId: Int): ObservableKW<Option<String>> = 
+fun getCountryCode(personId: Int): ObservableKW<Option<String>> =
       ObservableKW.monad().binding {
         val maybePerson = findPerson(personId).bind()
         val person = maybePerson.fold(
-          { ObservableKW.raiseError<Person>(NoSuchElementException("...")) }, 
+          { ObservableKW.raiseError<Person>(NoSuchElementException("...")) },
           { ObservableKW.pure(it) }
         ).bind()
         val address = person.address.fold(
-          { ObservableKW.raiseError<Address>(NoSuchElementException("...")) }, 
+          { ObservableKW.raiseError<Address>(NoSuchElementException("...")) },
           { ObservableKW.pure(it) }
         ).bind()
         val maybeCountry = findCountry(address.id).bind()
         val country = maybeCountry.fold(
-          { ObservableKW.raiseError<Country>(NoSuchElementException("...")) }, 
+          { ObservableKW.raiseError<Country>(NoSuchElementException("...")) },
           { ObservableKW.pure(it) }
         ).bind()
         yields(country.code)
@@ -207,8 +207,8 @@ import kategory.debug.*
 showInstances<OptionTKindPartial<ObservableKWHK>, Unit>()
 ```
 
-Take a look at the [`EitherT` docs](/docs/datatypes/eithert) for an alternative version of this content with the `EitherT` monad transformer
- 
+Take a look at the [`EitherT` docs]({{ '/docs/datatypes/eithert' | relative_url }}) for an alternative version of this content with the `EitherT` monad transformer
+
 ## Credits
- 
+
 Contents partially adapted from [FP for the avg Joe at the 47 Degrees blog](https://www.47deg.com/blog/fp-for-the-average-joe-part-2-scalaz-monad-transformers/)
