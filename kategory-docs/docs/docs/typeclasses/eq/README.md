@@ -15,31 +15,23 @@ It can be considered the typeclass equivatent of Java's `Object#equals`.
 
 #### eqv
 
-Compares two instances of F and returns true if they're considered equal for this instance.
+Compares two instances of `F` and returns true if they're considered equal for this instance.
 It is the opposite comparison of `neqv`.
 
 `fun eqv(a: F, b: F): Boolean`
 
-```kotlin:ank
-Option.pure(1) // Option(1)
-```
-
 #### neqv
 
-Compares two instances of F and returns true if they're not considered equal for this instance.
+Compares two instances of `F` and returns true if they're not considered equal for this instance.
 It is the opposite comparison of `eqv`.
 
 `fun neqv(a: F, b: F): Boolean`
-
-```kotlin:ank
-Option.pure(1) // Option(1)
-```
 
 ### Syntax
 
 #### HK<F, A>#eqv
 
-Lift a value into the computational context of a type constructor
+Compares two values for equality
 
 ```kotlin:ank
 1.eqv(2)
@@ -47,7 +39,7 @@ Lift a value into the computational context of a type constructor
 
 #### HK<F, A>#neqv
 
-Apply a function inside the type constructor's context
+Compares two values for inequality
 
 ```kotlin:ank
 1.neqv(2)
@@ -75,7 +67,7 @@ Eq.any().eqv(Either.right(1), Either.pure(1))
 Eq.any().eqv(IO{ 1 }, IO{ 1 })
 ```
 
-See [Deriving and creating custom typeclass] to provide your own `Eq` instances for custom datatypes.
+See [Deriving and creating custom typeclass](/kategory/docs/typeclasses) to provide your own `Eq` instances for custom datatypes.
 
 ### Data types
 
