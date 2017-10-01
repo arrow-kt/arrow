@@ -33,17 +33,9 @@ It is the opposite comparison of `eqv`.
 
 Compares two values for equality
 
-```kotlin:ank
-1.eqv(2)
-```
-
 #### HK<F, A>#neqv
 
 Compares two values for inequality
-
-```kotlin:ank
-1.neqv(2)
-```
 
 ### Laws
 
