@@ -24,7 +24,7 @@ buildscript {
         javaVersion = JavaVersion.VERSION_1_7
         kotlinTestVersion = '2.0.5'
         kotlinVersion = '1.1.51'
-        kotlinxCoroutinesVersion = '0.18'
+        kotlinxCoroutinesVersion = '0.19'
         kotlinxCollectionsImmutableVersion = '0.1'
     }
 
