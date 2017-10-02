@@ -17,7 +17,7 @@ object MonadFilterLaws {
             })
 
     inline fun <reified F> monadFilterRightEmpty(MF: MonadFilter<F> = monadFilter<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): Unit =
-            forAll(genFunctionAToB(genApplicative(Gen.int(), MF)), genConstructor(Gen.int(), cf), { f: (Int) -> HK<F, Int>, fa: HK<F, Int> ->
+            forAll(genApplicative(Gen.int(), MF), { fa: HK<F, Int> ->
                 MF.flatMap(fa, { MF.empty<Int>() }).equalUnderTheLaw(MF.empty(), EQ)
             })
 

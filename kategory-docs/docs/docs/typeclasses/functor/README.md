@@ -134,7 +134,7 @@ See [Deriving and creating custom typeclass]
 
 ### Data types
 
-Thw following datatypes in Kategory provide instances that adhere to the `Functor` typeclass.
+The following datatypes in Kategory provide instances that adhere to the `Functor` typeclass.
 
 - [Cofree](/docs/datatypes/cofree) 
 - [Coproduct](/docs/datatypes/coproduct)  
