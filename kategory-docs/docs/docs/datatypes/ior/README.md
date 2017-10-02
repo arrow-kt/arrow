@@ -71,7 +71,7 @@ fun validateUser(name: String, pass: String) =
             val username = validateUsername(name).bind()
             val password = validatePassword(pass).bind()
             yields(User(username, password))
-        }
+        }.ev()
 
 ```
 
