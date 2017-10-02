@@ -144,8 +144,8 @@ Computing over dependent values ignoring absence
 ```kotlin
 Option.monad().binding {
    val a = Option(1).bind()
-   val b = Option(1 + x).bind()
-   val c = Option(1 + y).bind()
+   val b = Option(1 + a).bind()
+   val c = Option(1 + b).bind()
    yields(a + b + c)
 }
 //Some(value=6)
