@@ -11,6 +11,12 @@ Depending on your needs this comparison can be structural -the content of the ob
 
 It can be considered the typeclass equivatent of Java's `Object#equals`.
 
+```kotlin:ank
+import kategory.*
+
+IntEqInstance.eqv(1, 2)
+```
+
 ### Main Combinators
 
 #### eqv
@@ -33,9 +39,17 @@ It is the opposite comparison of `eqv`.
 
 Compares two values for equality
 
+```kotlin:ank
+1.eqv(IntEqInstance, 2)
+```
+
 #### HK<F, A>#neqv
 
 Compares two values for inequality
+
+```kotlin:ank
+1.neqv(IntEqInstance, 2)
+```
 
 ### Laws
 
@@ -48,15 +62,13 @@ It uses kotlin's == comparison to compare any two instances.
 Note that this instance will fail on many all datatypes that contain a property or field that doesn't implement structural equality, i.e. functions, typeclasses, non-data classes
 
 ```kotlin:ank
-Eq.any().eqv(1, 2)
+// Option is a data class with a single value
+Eq.any().eqv(Option.Some(1), Option.pure(1))
 ```
 
 ```kotlin:ank
-Eq.any().eqv(Either.right(1), Either.pure(1))
-```
-
-```kotlin:ank
-Eq.any().eqv(IO{ 1 }, IO{ 1 })
+// Fails because the wrapped function is not evaluated for comparison
+Eq.any().eqv(Eval.later{ 1 }, Eval.later{ 1 })
 ```
 
 See [Deriving and creating custom typeclass](/kategory/docs/typeclasses) to provide your own `Eq` instances for custom datatypes.
