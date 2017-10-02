@@ -3,6 +3,7 @@ package kategory
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
+import kategory.laws.EqLaws
 import org.junit.runner.RunWith
 
 sealed class OpsAp<out A> : HK<OpsAp.F, A> {
@@ -34,7 +35,9 @@ class FreeApplicativeTest : UnitSpec() {
             applicative<FreeApplicativeKindPartial<OpsAp.F>>()  shouldNotBe null
         }
 
-        testLaws(ApplicativeLaws.laws(OpsAp, FreeApplicativeEq(idApInterpreter)))
+        val EQ: FreeApplicativeEq<OpsAp.F, IdHK, Int> = FreeApplicativeEq(idApInterpreter)
+        testLaws(EqLaws.laws<FreeApplicative<OpsAp.F, Int>>(EQ, { OpsAp.value(it) }))
+        testLaws(ApplicativeLaws.laws(OpsAp, EQ))
 
         "Can interpret an ADT as FreeApplicative operations" {
             val result: Tuple3<Int, Int, Int> = (1 toT 7) + -1

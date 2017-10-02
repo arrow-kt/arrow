@@ -118,7 +118,7 @@ See [Deriving and creating custom typeclass] to provide your own Applicative ins
 
 ### Data types
 
-Thw following datatypes in Kategory provide instances that adhere to the `Applicative` typeclass.
+The following datatypes in Kategory provide instances that adhere to the `Applicative` typeclass.
 
 - [Either](/docs/datatypes/either)
 - [EitherT](/docs/datatypes/eitherT)
