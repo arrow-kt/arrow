@@ -42,11 +42,11 @@ val both = ("Warning" to 3).bothIor()
 ```
 
 
-When we look at the `Monad` or `Applicative` instances of `Ior`, we can see that they actually requires a `Semigroup` instance on the left side.
-This is because `Ior` will actually accumulate failures on the left side, very similar to how the [`Validated`](/docs/datatypes/validated) data type does.
+When we look at the `Monad` or `Applicative` instances of `Ior`, we can see that they actually require a `Semigroup` instance on the left side.
+This is because `Ior` will actually accumulate failures on the left side, very similarly to how the [`Validated`](/docs/datatypes/validated) data type does.
 This means we can accumulate data on the left side while also being able to short-circuit upon the first right-side-only value.
 For example, sometimes, we might want to accumulate warnings together with a valid result and only halt the computation on a "hard error"
-Here's an example of how we might be able to do that:
+Here's an example of how we are able to do that:
 
 ```kotlin:ank
 import kategory.*
@@ -119,4 +119,12 @@ All of these conversions will discard the left side value if both are available:
 
 ```kotlin:ank
 Ior.Both("Warning", 42).toEither()
+```
+
+Available Instances:
+
+```kotlin:ank
+import kategory.debug.*
+
+showInstances<IorHK, Unit>()
 ```
