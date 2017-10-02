@@ -27,6 +27,8 @@ We would like to generate some random `Robot` instances for test data.
 Scala's standard library has a built-in `Random` class that provides a (pseudo)random number generator (RNG). Let's use it to write a method that creates robots.
 
 ```kotlin:ank:silent
+import java.util.*
+
 val rng = Random(0L)
 
 fun createRobot(): Robot {
@@ -47,6 +49,8 @@ val robot = createRobot()
 We create a single `Random` instance, which is mutated as a side-effect each time that we call `nextLong` or `nextBoolean` on it. This mutation makes it more difficult to reason about our code. Someone might come along and see that we have `rng.nextBoolean` repeated three times within a single method. They might cleverly avoid repeated code and method invocations by extracting the common code into a variable:
 
 ```kotlin:ank:silent
+import java.util.*
+
 val rng = Random(0L)
 
 fun createRobot(): Robot {
