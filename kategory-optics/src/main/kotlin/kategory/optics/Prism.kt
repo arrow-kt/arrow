@@ -6,6 +6,7 @@ import kategory.Eq
 import kategory.HK
 import kategory.Monoid
 import kategory.Option
+import kategory.PartialFunction
 import kategory.Tuple2
 import kategory.applicative
 import kategory.compose
@@ -14,6 +15,7 @@ import kategory.flatMap
 import kategory.getOrElse
 import kategory.identity
 import kategory.left
+import kategory.lift
 import kategory.none
 import kategory.right
 import kategory.some
@@ -26,21 +28,20 @@ import kategory.toT
 typealias Prism<S, A> = PPrism<S, S, A, A>
 
 /**
- * A [Prism] is a lossless invertible optic that can look into a structure and reach either no targets or exactly one target.
- * i.e. generalization of finding a target in a sum type (sealed class) Prism<SumType, SumType.SubType>
- * or safe casting Prism<Double, Int>.
+ * A [Prism] is a loss less invertible optic that can look into a structure and optionally find its focus.
+ * Mostly used for finding a focus that is only present under certain conditions i.e. list head Prism<List<Int>, Int>
  *
  * A (polymorphic) [PPrism] is useful when setting or modifying a value for a polymorphic sum type
  * i.e. PPrism<Try<Sting>, Try<Int>, String, Int>
  *
  * A [PPrism] gathers the two concepts of pattern matching and constructor and thus can be seen as a pair of functions:
- * - `getOrModify: A -> Either<A, B>` meaning we can get the target of a [PPrism] OR return the original value
- * - `reverseGet : B -> A` meaning we can construct the source type of a [PPrism] from a `B`
+ * - `getOrModify: A -> Either<A, B>` meaning it returns the focus of a [PPrism] OR the original value
+ * - `reverseGet : B -> A` meaning we can construct the source type of a [PPrism] from a focus `B`
  *
  * @param S the source of a [PPrism]
  * @param T the modified source of a [PPrism]
- * @param A the target of a [PPrism]
- * @param B the modified target of a [PPrism]
+ * @param A the focus of a [PPrism]
+ * @param B the modified focus of a [PPrism]
  */
 interface PPrism<S, T, A, B> {
 
@@ -52,7 +53,7 @@ interface PPrism<S, T, A, B> {
         fun <S> id() = Iso.id<S>().asPrism()
 
         /**
-         * Invoke operator overload to create a [PPrism] of type `S` with target `A`.
+         * Invoke operator overload to create a [PPrism] of type `S` with focus `A`.
          * Can also be used to construct [Prism]
          */
         operator fun <S, T, A, B> invoke(getOrModify: (S) -> Either<T, A>, reverseGet: (B) -> T) = object : PPrism<S, T, A, B> {
@@ -62,7 +63,25 @@ interface PPrism<S, T, A, B> {
         }
 
         /**
-         * A [PPrism] that checks for equality with a given value
+         * Invoke operator overload to create a [PPrism] of type `S` with a focus `A` where `A` is a subtype of `S`
+         * Can also be used to construct [Prism]
+         */
+        operator fun <S, A : S> invoke(getOrModify: (S) -> Either<S, A>): Prism<S, A> = Prism(
+                getOrModify = getOrModify,
+                reverseGet = ::identity
+        )
+
+        /**
+         * Invoke operator overload to create a [PPrism] of type `S` with focus `A` with a [PartialFunction]
+         * Can also be used to construct [Prism]
+         */
+        operator fun <S, A> invoke(partialFunction: PartialFunction<S, A>, reverseGet: (A) -> S): Prism<S, A> = Prism(
+                getOrModify = { s -> partialFunction.lift()(s).fold({ s.left() }, { it.right() }) },
+                reverseGet = reverseGet
+        )
+
+        /**
+         * A [PPrism] that checks for equality with a given value [a]
          */
         inline fun <reified A> only(a: A, EQA: Eq<A> = eq()): Prism<A, Unit> = Prism(
                 getOrModify = { a2 -> (if (EQA.eqv(a, a2)) a.left() else Unit.right()) },
@@ -72,7 +91,7 @@ interface PPrism<S, T, A, B> {
     }
 
     /**
-     * Modify the target of a [PPrism] with an Applicative function
+     * Modify the focus of a [PPrism] with an [Applicative] function
      */
     fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> = getOrModify(s).fold(
             FA::pure,
@@ -80,27 +99,37 @@ interface PPrism<S, T, A, B> {
     )
 
     /**
-     * Get the target or nothing if [S] does not match the target
+     * Modify the focus of a [PPrism] with an [Applicative] function
+     */
+    fun <F> liftF(FA: Applicative<F>, f: (A) -> HK<F, B>): (S) -> HK<F, T> = { s ->
+        getOrModify(s).fold(
+                FA::pure,
+                { FA.map(f(it), this::reverseGet) }
+        )
+    }
+
+    /**
+     * Get the focus or [Option.None] if focus cannot be seen
      */
     fun getOption(s: S): Option<A> = getOrModify(s).toOption()
 
     /**
-     * Set the target of a [PPrism] with a value
+     * Set the focus of a [PPrism] with a value
      */
     fun set(s: S, b: B): T = modify(s) { b }
 
     /**
-     * Set the target of a [PPrism] with a value
+     * Set the focus of a [PPrism] with a value
      */
     fun setOption(s: S, b: B): Option<T> = modifyOption(s) { b }
 
     /**
-     * Check if there is a target
+     * Check if a focus can be seen by the [PPrism]
      */
     fun nonEmpty(s: S): Boolean = getOption(s).fold({ false }, { true })
 
     /**
-     * Check if there is no target
+     * Check if no focus can be seen by the [PPrism]
      */
     fun isEmpty(s: S): Boolean = !nonEmpty(s)
 
@@ -123,12 +152,14 @@ interface PPrism<S, T, A, B> {
     /**
      * Compose a [PPrism] with another [PPrism]
      */
-    infix fun <C, D> compose(other: PPrism<A, B, C, D>): PPrism<S, T, C, D> = Prism(
-            { s -> getOrModify(s).flatMap { a -> other.getOrModify(a).bimap({ set(s, it) }, ::identity) } },
-            this::reverseGet compose other::reverseGet
+    infix fun <C, D> compose(other: PPrism<A, B, C, D>): PPrism<S, T, C, D> = PPrism(
+            getOrModify = { s -> getOrModify(s).flatMap { a -> other.getOrModify(a).bimap({ set(s, it) }, ::identity) } },
+            reverseGet = this::reverseGet compose other::reverseGet
     )
 
-    /** compose an [Iso] as an [PPrism] */
+    /**
+     * Compose an [Iso] as an [PPrism]
+     */
     fun <C, D> compose(other: PIso<A, B, C, D>): PPrism<S, T, C, D> = compose(other.asPrism())
 
     /**
@@ -199,35 +230,49 @@ interface PPrism<S, T, A, B> {
 }
 
 /**
- * Modify the target of a [PPrism] with an Applicative function
+ * Modify the focus of a [PPrism] with an [Applicative] function
  */
-inline fun <S, T, A, B, reified F> PPrism<S, T, A, B>.modifyF(s: S, crossinline f: (A) -> HK<F, B>, FA: Applicative<F> = applicative()): HK<F, T> = getOrModify(s).fold(
-        FA::pure,
-        { FA.map(f(it), this::reverseGet) }
-)
+inline fun <S, T, A, B, reified F> PPrism<S, T, A, B>.modifyF(s: S, crossinline f: (A) -> HK<F, B>, FA: Applicative<F> = applicative()): HK<F, T> =
+        modifyF(FA, s) { a -> f(a) }
 
 /**
- * Modify the target of a [PPrism] with a function
+ * Modify the focus of a [PPrism] with an [Applicative] function
+ */
+inline fun <S, T, A, B, reified F> PPrism<S, T, A, B>.liftF(FA: Applicative<F> = applicative(), dummy: Unit = Unit, crossinline f: (A) -> HK<F, B>): (S) -> HK<F, T> =
+        liftF(FA) { a -> f(a) }
+
+/**
+ * Modify the focus of a [PPrism] with a function
  */
 inline fun <S, T, A, B> PPrism<S, T, A, B>.modify(s: S, crossinline f: (A) -> B): T = getOrModify(s).fold(::identity, { a -> reverseGet(f(a)) })
 
 /**
- * Modify the target of a [PPrism] with a function
+ * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
+ */
+inline fun <S, T, A, B> PPrism<S, T, A, B>.lift(crossinline f: (A) -> B): (S) -> T = { s -> getOrModify(s).fold(::identity, { a -> reverseGet(f(a)) }) }
+
+/**
+ * Modify the focus of a [PPrism] with a function
  */
 inline fun <S, T, A, B> PPrism<S, T, A, B>.modifyOption(s: S, crossinline f: (A) -> B): Option<T> = getOption(s).map { b -> reverseGet(f(b)) }
 
 /**
- * Find the target that satisfies the predicate
+ * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> Option<T>`
+ */
+inline fun <S, T, A, B> PPrism<S, T, A, B>.liftOption(crossinline f: (A) -> B): (S) -> Option<T> = { s -> getOption(s).map { b -> reverseGet(f(b)) } }
+
+/**
+ * Find the focus that satisfies the predicate
  */
 inline fun <S, T, A, B> PPrism<S, T, A, B>.find(s: S, crossinline p: (A) -> Boolean): Option<A> = getOption(s).flatMap { a -> if (p(a)) a.some() else none() }
 
 /**
- * Check if there is a target and it satisfies the predicate
+ * Check if there is a focus and it satisfies the predicate
  */
 inline fun <S, T, A, B> PPrism<S, T, A, B>.exist(s: S, crossinline p: (A) -> Boolean): Boolean = getOption(s).fold({ false }, p)
 
 /**
- * Check if there is no target or the target satisfies the predicate
+ * Check if there is no focus or the focus satisfies the predicate
  */
 inline fun <S, T, A, B> PPrism<S, T, A, B>.all(s: S, crossinline p: (A) -> Boolean): Boolean = getOption(s).fold({ true }, p)
 
@@ -251,3 +296,4 @@ fun <S, T, A, B, C> PPrism<S, T, A, B>.right(): PPrism<Either<C, S>, Either<C, T
         { it.fold({ c -> Either.Right(c.left()) }, { s -> getOrModify(s).bimap({ it.right() }, { it.right() }) }) },
         { it.map(this::reverseGet) }
 )
+
