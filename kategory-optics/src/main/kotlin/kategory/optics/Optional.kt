@@ -5,12 +5,14 @@ import kategory.Either
 import kategory.HK
 import kategory.Monoid
 import kategory.Option
+import kategory.PartialFunction
 import kategory.Tuple2
 import kategory.applicative
 import kategory.flatMap
 import kategory.getOrElse
 import kategory.identity
 import kategory.left
+import kategory.lift
 import kategory.none
 import kategory.right
 import kategory.some
@@ -72,6 +74,15 @@ interface POptional<S, T, A, B> {
         }
 
         /**
+         * Invoke operator overload to create a [POptional] of type `S` with target `A`.
+         * Can also be used to construct [Optional]
+         */
+        operator fun <S, A> invoke(partialFunction: PartialFunction<S, A>, set: (A) -> (S) -> S): Optional<S, A> = Optional(
+                getOrModify = { s -> partialFunction.lift()(s).fold({ s.left() }, { it.right() }) },
+                set = set
+        )
+
+        /**
          * [POptional] that never sees its target
          */
         fun <A, B> void(): Optional<A, B> = Optional(
@@ -88,6 +99,13 @@ interface POptional<S, T, A, B> {
             FA::pure,
             { FA.map(f(it), { set(s, it) }) }
     )
+
+    /**
+     * Lift a function [f]: `(A) -> HK<F, B> to the context of `S`: `(S) -> HK<F, T>`
+     */
+    fun <F> liftF(FA: Applicative<F>, f: (A) -> HK<F, B>): (S) -> HK<F, T> = { s ->
+        modifyF(FA, s, f)
+    }
 
     /**
      * Get the target of a [POptional] or [Option.None] if the is not there
@@ -171,6 +189,11 @@ interface POptional<S, T, A, B> {
     infix fun <C> compose(other: Fold<A, C>): Fold<S, C> = asFold() compose other
 
     /**
+     * Compose a [POptional] with a [Fold]
+     */
+    infix fun <C> compose(other: Getter<A, C>): Fold<S, C> = asFold() compose other
+
+    /**
      * Compose a [POptional] with a [PTraversal]
      */
     infix fun <C, D> compose(other: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> = asTraversal() compose other
@@ -189,6 +212,8 @@ interface POptional<S, T, A, B> {
     operator fun <C, D> plus(o: PSetter<A, B, C, D>): PSetter<S, T, C, D> = compose(o)
 
     operator fun <C> plus(o: Fold<A, C>): Fold<S, C> = compose(o)
+
+    operator fun <C> plus(o: Getter<A, C>): Fold<S, C> = compose(o)
 
     operator fun <C, D> plus(o: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> = compose(o)
 
@@ -222,12 +247,20 @@ interface POptional<S, T, A, B> {
 inline fun <S, T, A, B> POptional<S, T, A, B>.modify(s: S, crossinline f: (A) -> B): T = getOrModify(s).fold(::identity, { a -> set(s, f(a)) })
 
 /**
- * Modify polymorphically the target of a [POptional] with an Applicative function [f]
+ * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
  */
-inline fun <S, T, A, B, reified F> POptional<S, T, A, B>.modifyF(s: S, crossinline f: (A) -> HK<F, B>, FA: Applicative<F> = applicative()): HK<F, T> = getOrModify(s).fold(
-        FA::pure,
-        { FA.map(f(it), { set(s, it) }) }
-)
+inline fun <S, T, A, B> POptional<S, T, A, B>.lift(crossinline f: (A) -> B): (S) -> T = { s -> modify(s, f) }
+
+/**
+ * Modify polymorphically the target of a [POptional] with an [Applicative] function [f]
+ */
+inline fun <S, T, A, B, reified F> POptional<S, T, A, B>.modifyF(s: S, crossinline f: (A) -> HK<F, B>, FA: Applicative<F> = applicative()): HK<F, T> =
+        modifyF(FA, s) { a -> f(a) }
+
+/**
+ * Lift a function [f]: `(A) -> HK<F, B> to the context of `S`: `(S) -> HK<F, T>` with an [Applicative] function [f]
+ */
+inline fun <S, T, A, B, reified F> POptional<S, T, A, B>.liftF(crossinline f: (A) -> HK<F, B>, FA: Applicative<F> = applicative()): (S) -> HK<F, T> = liftF(FA) { a -> f(a) }
 
 /**
  * Modify polymorphically the target of a [POptional] with a function [f]
