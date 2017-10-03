@@ -23,8 +23,8 @@ buildscript {
         gradleVersionsPluginVersion = '0.15.0'
         javaVersion = JavaVersion.VERSION_1_7
         kotlinTestVersion = '2.0.5'
-        kotlinVersion = '1.1.4-3'
-        kotlinxCoroutinesVersion = '0.18'
+        kotlinVersion = '1.1.51'
+        kotlinxCoroutinesVersion = '0.19'
         kotlinxCollectionsImmutableVersion = '0.1'
     }
 
