@@ -236,7 +236,7 @@ inline fun <S, T, A, B, reified F> PPrism<S, T, A, B>.modifyF(s: S, crossinline 
         modifyF(FA, s) { a -> f(a) }
 
 /**
- * Modify the focus of a [PPrism] with an [Applicative] function
+ * Lift a function [f]: `(A) -> HK<F, B> to the context of `S`: `(S) -> HK<F, T>` with an [Applicative] function
  */
 inline fun <S, T, A, B, reified F> PPrism<S, T, A, B>.liftF(FA: Applicative<F> = applicative(), dummy: Unit = Unit, crossinline f: (A) -> HK<F, B>): (S) -> HK<F, T> =
         liftF(FA) { a -> f(a) }
