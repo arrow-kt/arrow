@@ -171,8 +171,8 @@ options:
       - title: Iso
         url: /docs/optics/iso/
 
-      - title: Lenses
-        url: /docs/optics/lenses/
+      - title: Lens
+        url: /docs/optics/lens/
 
       - title: Optional
         url: /docs/optics/optional/
