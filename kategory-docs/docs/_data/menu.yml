@@ -180,6 +180,18 @@ options:
       - title: Prism
         url: /docs/optics/prism/
 
+      - title: Getter
+        url: /docs/optics/getter/
+
+      - title: Setter
+        url: /docs/optics/setter/
+
+      - title: Fold
+        url: /docs/optics/fold/
+
+      - title: Traversal
+        url: /docs/optics/traversal/
+
   - title: Patterns
 
     nested_options:
@@ -210,6 +222,9 @@ options:
 
       - title: Concurrency
         url: /docs/patterns/concurrency/
+
+      - title: Optics
+        url: /docs/patterns/optics/
 
   - title: Integrations
 
