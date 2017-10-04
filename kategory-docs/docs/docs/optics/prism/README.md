@@ -10,7 +10,7 @@ A `Prism` is a loss less invertible optic that can see into a structure and opti
 
 Since `Prism` has an optional focus it can be seen as a pair of functions `getOrModify` and `reverseGet`.
 
-* `getOrModify: A -> Either<A, B>` meaning we can get the target of a `Prism` OR return the original value
+* `getOrModify: A -> Either<A, B>` meaning we can get the focus of a `Prism` OR return the original value
 * `reverseGet : B -> A` meaning we can construct the source type of a `Prism` from a `B`
 
 Given a `Prism<S, A>` we can write functions that work on the focus `A` without having to worry if the focus can be seen in `S`.
