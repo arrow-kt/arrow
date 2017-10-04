@@ -88,10 +88,10 @@ class PrismTest : UnitSpec() {
         }
 
         "Checking if a prism exists with a target" {
-            forAll(SumGen, Gen.bool(), { a, bool ->
+            forAll(SumGen, SumGen, Gen.bool(), { a, other, bool ->
                 Prism.only(a, object : Eq<SumType> {
                     override fun eqv(a: SumType, b: SumType): Boolean = bool
-                }).isEmpty(a) == bool
+                }).isEmpty(other) == bool
             })
         }
 
