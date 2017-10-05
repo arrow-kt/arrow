@@ -20,7 +20,7 @@ class PrismsFileGenerator(
     private fun processElement(annotatedPrism: AnnotatedOptic): Pair<AnnotatedOptic, List<String>> =
             annotatedPrism to annotatedPrism.targets.map { target ->
                 val sourceClassName = annotatedPrism.classData.fullName.escapedClassName
-                val sourceName = annotatedPrism.type.simpleName.toString().toLowerCase()
+                val sourceName = annotatedPrism.type.simpleName.toString().decapitalize()
                 val targetClassName = target.fullName.escapedClassName
                 val targetName = target.paramName
 
