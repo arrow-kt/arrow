@@ -24,7 +24,8 @@ class OptionalTest : UnitSpec() {
                 bGen = Gen.int(),
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
-                EQB = Eq.any()
+                EQB = Eq.any(),
+                EQOptionB = Eq.any()
         ))
 
         testLaws(OptionalLaws.laws(
@@ -33,7 +34,8 @@ class OptionalTest : UnitSpec() {
                 bGen = Gen.int(),
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
-                EQB = Eq.any()
+                EQB = Eq.any(),
+                EQOptionB = Eq.any()
         ))
 
         testLaws(OptionalLaws.laws(
@@ -42,7 +44,8 @@ class OptionalTest : UnitSpec() {
                 bGen = genTuple(Gen.int(), Gen.bool()),
                 funcGen = genFunctionAToB(genTuple(Gen.int(), Gen.bool())),
                 EQA = Eq.any(),
-                EQB = Eq.any()
+                EQB = Eq.any(),
+                EQOptionB = Eq.any()
         ))
 
         testLaws(OptionalLaws.laws(
@@ -51,7 +54,8 @@ class OptionalTest : UnitSpec() {
                 bGen = genTuple(Gen.bool(), Gen.int()),
                 funcGen = genFunctionAToB(genTuple(Gen.bool(), Gen.int())),
                 EQA = Eq.any(),
-                EQB = Eq.any()
+                EQB = Eq.any(),
+                EQOptionB = Eq.any()
         ))
 
         "void should always " {
