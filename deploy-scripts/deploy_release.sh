@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 . $(dirname $0)/deploy_common.sh
 
-VERSION_PATTERN=^[0-9].[0-9].[0-9]$
+VERSION_PATTERN=^[0-9]+\.[0-9]+\.[0-9]+$
 
 echo "Deploying release '$VERSION_NAME' ..."
 
