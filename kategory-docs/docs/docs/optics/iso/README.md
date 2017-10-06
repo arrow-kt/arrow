@@ -90,6 +90,17 @@ val tupleIsoPair: Iso<Tuple2<Int, Int>, Pair<Int, Int>> = Iso(
 
 By composing `pointIsoTuple`, `pairIsoCoord` and `tupleIsoPair` (and/or reversing) we can use `Point2D`, `Tuple2<Int, Int>`, `Pair<Int, Int>` and `Coord` interchangeably as we can lift functions to the required structure.
 
+Composing an `Iso` with functions can also be useful to change input or output type of a function. In the `Iso<A?, Option<A>>` is available in `kategory-optics` as `nullableToOption()`.
+
+```kotlin
+val unknownCode: (String) -> String? = { value ->
+    "unkown $value"
+}
+
+val nullableOptionIso: Iso<String?, Option<String>> = nullableToOption()
+(unknownCode andThen nullableOptionIso::get)("Retrieve an Option")
+```
+
 ### Generating isos
 
 To avoid boilerplate, isos can be generated for a `data class` to `TupleN` with 2 to 10 parameters by the `@isos` annotation. The `Iso` will be generated in the same package as the `data class` and will be named `classnameIso()`.

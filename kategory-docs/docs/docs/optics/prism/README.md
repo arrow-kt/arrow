@@ -137,13 +137,13 @@ val networkFailurePrism: Prism<NetworkResult, NetworkResult.Failure> = networkRe
 When dealing with polymorphic sum types like `Try<A>` we can also have polymorphic prisms that allow us to polymorphically change the type of the focus of our `PPrism`. Following method is also available as `pTrySuccess<A, B>()` in the `kategory.optics` package.
 
 ```kotlin:ank
-fun <A, B> success(): PPrism<Try<A>, Try<B>, A, B> = PPrism(
+fun <A, B> trySuccess(): PPrism<Try<A>, Try<B>, A, B> = PPrism(
         getOrModify = { aTry -> aTry.fold({ Try.Failure<B>(it).left() }, { it.right() }) },
         reverseGet = { b -> Try.Success(b) }
 )
 
 val lifted: (Try<Int>) -> Try<String> = pTrySuccess<Int, String>().lift(Int::toString)
-lifed(Try.Success(5))
+lifted(Try.Success(5))
 ```
 ```kotlin:ank
 lifted(Try.Failure(ArithmeticException("/ by zero")))

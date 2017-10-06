@@ -1,6 +1,7 @@
 package kategory.optics
 
 import kategory.Option
+import kategory.andThen
 import kategory.identity
 import kategory.left
 import kategory.none
@@ -23,7 +24,7 @@ fun <A> nullableToOption(): Iso<A?, Option<A>> = pNullableToOption()
 /**
  * [PPrism] to focus into an [kategory.Option.Some]
  */
-fun <A, B> pSome(): PPrism<Option<A>, Option<B>, A, B> = PPrism(
+fun <A, B> pSomePrism(): PPrism<Option<A>, Option<B>, A, B> = PPrism(
         getOrModify = { option -> option.fold({ none<B>().left() }, { a -> a.right() }) },
         reverseGet = { b -> b.some() }
 )
@@ -31,12 +32,12 @@ fun <A, B> pSome(): PPrism<Option<A>, Option<B>, A, B> = PPrism(
 /**
  * [Prism] to focus into an [kategory.Option.Some]
  */
-fun <A> some(): Prism<Option<A>, A> = pSome()
+fun <A> somePrism(): Prism<Option<A>, A> = pSomePrism()
 
 /**
  * [Prism] to focus into an [kategory.Option.None]
  */
-fun <A> none(): Prism<Option<A>, Unit> = Prism(
+fun <A> nonePrism(): Prism<Option<A>, Unit> = Prism(
         getOrModify = { option -> option.fold({ Unit.right() }, { it.some().left() }) },
         reverseGet = { _ -> none() }
 )
