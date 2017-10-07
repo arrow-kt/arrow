@@ -71,7 +71,7 @@ interface PLens<S, T, A, B> {
             FF.map(f(get(s)), { b -> set(s, b) })
 
     /**
-     * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
+     * Lift a function [f]: `(A) -> HK<F, B> to the context of `S`: `(S) -> HK<F, T>`
      */
     fun <F> liftF(FF: Functor<F>, f: (A) -> HK<F, B>): (S) -> HK<F, T> = { s -> modifyF(FF, s, f) }
 
@@ -216,13 +216,13 @@ inline fun <S, T, A, B> PLens<S, T, A, B>.modify(s: S, crossinline f: (A) -> B):
 inline fun <S, T, A, B> PLens<S, T, A, B>.lift(crossinline f: (A) -> B): (S) -> T = { s -> modify(s, f) }
 
 /**
- * Modify the focus of a [PLens] using Functor function
+ * Modify the focus of a [PLens] using [Functor] function
  */
 inline fun <S, T, A, B, reified F> PLens<S, T, A, B>.modifyF(s: S, f: (A) -> HK<F, B>, FF: Functor<F> = functor()): HK<F, T> =
         FF.map(f(get(s)), { b -> set(s, b) })
 
 /**
- * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
+ * Lift a function [f]: `(A) -> HK<F, B> to the context of `S`: `(S) -> HK<F, T>` using [Functor] function
  */
 inline fun <S, T, A, B, reified F> PLens<S, T, A, B>.liftF(FF: Functor<F> = functor(), dummy: Unit = Unit, crossinline f: (A) -> HK<F, B>): (S) -> HK<F, T> = { s -> modifyF(FF, s) { a -> f(a) } }
 

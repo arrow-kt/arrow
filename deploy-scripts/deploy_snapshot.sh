@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 . $(dirname $0)/deploy_common.sh
 
-VERSION_PATTERN=^[0-9].[0-9].[0-9]-SNAPSHOT$
+VERSION_PATTERN=^[0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT$
 
 echo "Deploying snapshot '$VERSION_NAME' ..."
 
