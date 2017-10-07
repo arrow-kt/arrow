@@ -101,6 +101,12 @@ val nullableOptionIso: Iso<String?, Option<String>> = nullableToOption()
 (unknownCode andThen nullableOptionIso::get)("Retrieve an Option")
 ```
 
+`Iso` can be composed with all optics and composition them results in the following optics.
+
+|   | Iso | Lens | Prism |Optional | Getter | Setter | Fold | Traversal |
+| --- | --- | --- | --- |--- | --- | --- | --- | --- |
+| Iso | Iso | Lens | Prism | Optional | Getter | Setter | Fold | Traversal |
+
 ### Generating isos
 
 To avoid boilerplate, isos can be generated for a `data class` to `TupleN` with 2 to 10 parameters by the `@isos` annotation. The `Iso` will be generated in the same package as the `data class` and will be named `classnameIso()`.

@@ -159,6 +159,11 @@ interface PIso<S, T, A, B> {
     infix fun <C, D> compose(other: PLens<A, B, C, D>): PLens<S, T, C, D> = asLens() compose other
 
     /**
+     * Compose a [PIso] with a [PPrism]
+     */
+    infix fun <C, D> compose(other: PPrism<A, B, C, D>): PPrism<S, T, C, D> = asPrism() compose other
+
+    /**
      * Compose a [PIso] with a [Getter]
      */
     infix fun <C> compose(other: Getter<A, C>): Getter<S, C> = asGetter() compose other

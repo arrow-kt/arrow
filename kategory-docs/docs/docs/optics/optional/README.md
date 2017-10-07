@@ -60,7 +60,7 @@ An `Optional` instance can be manually constructed from any default or custom `I
 
 ### Composition
 
-We can compose `Optional`s to build telescopes with an optional focus. Imagine we try to retrieve a `User` his email from a backend. The result of our call is `Try<User>`. So we first want to look into try which **optionally** could be a `Try.Success` and then we want to look into `User` which optionally filled in his email.
+We can compose `Optional`s to build telescopes with an optional focus. Imagine we try to retrieve a `User` his email from a backend. The result of our call is `Try<User>`. So we first want to look into `Try` which **optionally** could be a `Try.Success` and then we want to look into `User` which optionally filled in his email.
 
 ```kotlin:ank
 data class Participant(val name: String, val email: String?)
@@ -78,15 +78,17 @@ triedEmail.getOption(Try.Success(Participant("test", "email")))
 triedEmail.getOption(Try.Failure(IllegalStateException("Something wrong with network")))
 ```
 
-`Optional` can be composed with all optics and composition them results in the following optics.
+`Optional` can be composed with all optics, resulting in the following optics.
 
-|   | Iso | Lens | Optional | Getter | Setter | Fold | Traversal |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Optional | Optional | Optional | Optional | Fold | Setter | Fold | Traversal |
+|   | Iso | Lens | Prism | Optional | Getter | Setter | Fold | Traversal |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Optional | Optional | Optional | Optional | Optional | Fold | Setter | Fold | Traversal |
 
 ### Polymorphic optional
 
-A `POptional` is very similar to [PLens](docs/optics/Lens#Plens) and [PPrism](docs/optics/Prism/Prism#PPrism) so lets see if we can combine both examples shown in their documentation. So we want to look into a `Try` and polymorphically change its content from `Tuple2<Int, String>` to `Tuple2<String, String>` and we want to do see by looking into the `Tuple2<Int, String>` and polymorphically change its first parameter from `Int` to `String`.
+A `POptional` is very similar to [PLens](docs/optics/Lens#Plens) and [PPrism](docs/optics/Prism/Prism#PPrism) so lets see if we can combine both examples shown in their documentation.
+
+Given a `PPrism` with a focus into `Success` of `Try<Tuple2<Int, String>>` that can polymorphically change its content to `Tuple2<String, String>` and a `PLens` with a focus into the `Tuple2<Int, String>` that can morph the first parameter from `Int` to `String`. We can compose them together build an `Optional` that can look into `Try` and morph the first type of the `Tuple2` within.
 
 ```kotlin:ank
 val pprism = pTrySuccess<Tuple2<Int, String>, Tuple2<String, String>>()
@@ -99,7 +101,7 @@ val lifted: (Try<Tuple2<Int, String>>) -> Try<Tuple2<String, String>> = successT
 lifted(Try.Success(5 toT "World!"))
 ```
 ```kotlin:ank
-lifted(Try.Failure(IllegalStateException("something went wrong")))
+lifted(Try.Failure<Tuple2<Int, String>>(IllegalStateException("something went wrong")))
 ```
 
 ### Laws
