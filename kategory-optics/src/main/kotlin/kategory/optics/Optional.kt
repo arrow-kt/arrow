@@ -25,19 +25,19 @@ import kategory.toT
 typealias Optional<S, A> = POptional<S, S, A, A>
 
 /**
- * An [Optional] is an optic that allows to see into a structure and getting, setting or modifying an optional target.
+ * An [Optional] is an optic that allows to see into a structure and getting, setting or modifying an optional focus.
  *
- * A (polymorphic) [POptional] is useful when setting or modifying a value for a type with a optional polymorphic target
+ * A (polymorphic) [POptional] is useful when setting or modifying a value for a type with a optional polymorphic focus
  * i.e. POptional<Ior<Int, Double>, Ior<String, Double>, Int, String>
  *
  * A [POptional] can be seen as a weaker [Lens] and [Prism] and combines their weakest functions:
- * - `set: (S, B) -> T` meaning we can look into an `S` and set a value `B` for a target `A` and obtain a modified source `T`
- * - `getOrModify: (S) -> Either<T, A>` meaning we can get the target OR return the original value
+ * - `set: (S, B) -> T` meaning we can focus into an `S` and set a value `B` for a target `A` and obtain a modified source `T`
+ * - `getOrModify: (S) -> Either<T, A>` meaning it returns the focus of a [POptional] OR the original value
  *
  * @param S the source of a [POptional]
  * @param T the modified source of a [POptional]
- * @param A the target of a [POptional]
- * @param B the modified target of a [POptional]
+ * @param A the focus of a [POptional]
+ * @param B the modified focus of a [POptional]
  */
 interface POptional<S, T, A, B> {
 
@@ -47,7 +47,7 @@ interface POptional<S, T, A, B> {
     fun set(s: S, b: B): T
 
     /**
-     * Get the target of a [POptional] or return the original value while allowing the type to change if it does not match
+     * Get the focus of a [POptional] or return the original value while allowing the type to change if it does not match
      */
     fun getOrModify(s: S): Either<T, A>
 
@@ -64,7 +64,7 @@ interface POptional<S, T, A, B> {
         )
 
         /**
-         * Invoke operator overload to create a [POptional] of type `S` with target `A`.
+         * Invoke operator overload to create a [POptional] of type `S` with focus `A`.
          * Can also be used to construct [Optional]
          */
         operator fun <S, T, A, B> invoke(getOrModify: (S) -> Either<T, A>, set: (B) -> (S) -> T): POptional<S, T, A, B> = object : POptional<S, T, A, B> {
@@ -74,7 +74,7 @@ interface POptional<S, T, A, B> {
         }
 
         /**
-         * Invoke operator overload to create a [POptional] of type `S` with target `A`.
+         * Invoke operator overload to create a [POptional] of type `S` with focus `A`.
          * Can also be used to construct [Optional]
          */
         operator fun <S, A> invoke(partialFunction: PartialFunction<S, A>, set: (A) -> (S) -> S): Optional<S, A> = Optional(
@@ -83,7 +83,7 @@ interface POptional<S, T, A, B> {
         )
 
         /**
-         * [POptional] that never sees its target
+         * [POptional] that never sees its focus
          */
         fun <A, B> void(): Optional<A, B> = Optional(
                 { it.left() },
@@ -93,7 +93,7 @@ interface POptional<S, T, A, B> {
     }
 
     /**
-     * Modify polymorphically the target of a [POptional] with an Applicative function [f]
+     * Modify the focus of a [POptional] with an Applicative function [f]
      */
     fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> = getOrModify(s).fold(
             FA::pure,
@@ -108,28 +108,28 @@ interface POptional<S, T, A, B> {
     }
 
     /**
-     * Get the target of a [POptional] or [Option.None] if the is not there
+     * Get the focus of a [POptional] or [Option.None] if the is not there
      */
     fun getOption(a: S): Option<A> = getOrModify(a).toOption()
 
     /**
-     * Set polymorphically the target of a [POptional] with a value.
+     * Set the focus of a [POptional] with a value.
      * @return [Option.None] if the [POptional] is not matching
      */
     fun setOption(s: S, b: B): Option<T> = modifiyOption(s) { b }
 
     /**
-     * Check if there is no target
+     * Check if there is no focus
      */
     fun isEmpty(s: S): Boolean = !nonEmpty(s)
 
     /**
-     * Check if there is a target
+     * Check if there is a focus
      */
     fun nonEmpty(s: S): Boolean = getOption(s).fold({ false }, { true })
 
     /**
-     * Join two [POptional] with the same target [B]
+     * Join two [POptional] with the same focus [B]
      */
     infix fun <S1, T1> choice(other: POptional<S1, T1, A, B>): POptional<Either<S, S1>, Either<T, T1>, A, B> =
             POptional(
@@ -242,7 +242,7 @@ interface POptional<S, T, A, B> {
 }
 
 /**
- * Modify polymorphically the target of a [POptional] with a function [f]
+ * Modify the focus of a [POptional] with a function [f]
  */
 inline fun <S, T, A, B> POptional<S, T, A, B>.modify(s: S, crossinline f: (A) -> B): T = getOrModify(s).fold(::identity, { a -> set(s, f(a)) })
 
@@ -252,7 +252,7 @@ inline fun <S, T, A, B> POptional<S, T, A, B>.modify(s: S, crossinline f: (A) ->
 inline fun <S, T, A, B> POptional<S, T, A, B>.lift(crossinline f: (A) -> B): (S) -> T = { s -> modify(s, f) }
 
 /**
- * Modify polymorphically the target of a [POptional] with an [Applicative] function [f]
+ * Modify the focus of a [POptional] with an [Applicative] function [f]
  */
 inline fun <S, T, A, B, reified F> POptional<S, T, A, B>.modifyF(s: S, crossinline f: (A) -> HK<F, B>, FA: Applicative<F> = applicative()): HK<F, T> =
         modifyF(FA, s) { a -> f(a) }
@@ -263,23 +263,23 @@ inline fun <S, T, A, B, reified F> POptional<S, T, A, B>.modifyF(s: S, crossinli
 inline fun <S, T, A, B, reified F> POptional<S, T, A, B>.liftF(crossinline f: (A) -> HK<F, B>, FA: Applicative<F> = applicative()): (S) -> HK<F, T> = liftF(FA) { a -> f(a) }
 
 /**
- * Modify polymorphically the target of a [POptional] with a function [f]
+ * Modify the focus of a [POptional] with a function [f]
  * @return [Option.None] if the [POptional] is not matching
  */
 inline fun <S, T, A, B> POptional<S, T, A, B>.modifiyOption(s: S, crossinline f: (A) -> B): Option<T> = getOption(s).map({ set(s, f(it)) })
 
 /**
- * Find the target that satisfies the predicate [p]
+ * Find the focus that satisfies the predicate [p]
  */
 inline fun <S, T, A, B> POptional<S, T, A, B>.find(s: S, crossinline p: (A) -> Boolean): Option<A> =
         getOption(s).flatMap { b -> if (p(b)) b.some() else none() }
 
 /**
- * Check if there is a target and it satisfies the predicate [p]
+ * Check if there is a focus and it satisfies the predicate [p]
  */
 inline fun <S, T, A, B> POptional<S, T, A, B>.exists(s: S, crossinline p: (A) -> Boolean): Boolean = getOption(s).fold({ false }, p)
 
 /**
- * Check if there is no target or the target satisfies the predicate [p]
+ * Check if there is no focus or the target satisfies the predicate [p]
  */
 inline fun <S, T, A, B> POptional<S, T, A, B>.all(s: S, crossinline p: (A) -> Boolean): Boolean = getOption(s).fold({ true }, p)

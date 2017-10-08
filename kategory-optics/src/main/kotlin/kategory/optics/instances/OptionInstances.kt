@@ -1,14 +1,11 @@
 package kategory.optics
 
 import kategory.Option
-import kategory.Try
-import kategory.Tuple2
 import kategory.identity
 import kategory.left
 import kategory.none
 import kategory.right
 import kategory.some
-import kategory.toT
 
 /**
  * [PIso] that defines the equality in the kotlin nullable structure and [kategory.Option]
