@@ -3,6 +3,8 @@ package kategory
 import kategory.Either.Left
 import kategory.Either.Right
 
+typealias IorNel<A, B> = Ior<Nel<A>, B>
+
 /**
  * Port of https://github.com/typelevel/cats/blob/v0.9.0/core/src/main/scala/cats/data/Ior.scala
  *
@@ -21,10 +23,7 @@ import kategory.Either.Right
  * [Ior]<`A`,`B`> is isomorphic to [Either]<[Either]<`A`,`B`>, [Pair]<`A`,`B`>>, but provides methods biased toward `B`
  * values, regardless of whether the `B` values appear in a [Ior.Right] or a [Ior.Both].
  * The isomorphic Either form can be accessed via the [unwrap] method.
- *
- * El primogenito de @ffgiraldez
  */
-
 @higherkind sealed class Ior<out A, out B> : IorKind<A, B> {
 
     /**
@@ -106,6 +105,9 @@ import kategory.Either.Right
 
         fun <L, A, B> tailRecM(a: A, f: (A) -> IorKind<L, Either<A, B>>, SL: Semigroup<L>): Ior<L, B> = loop(f(a).ev(), f, SL)
 
+        fun <A, B> leftNel(a: A): IorNel<A, B> = Ior.Left(Nel.of(a))
+
+        fun <A, B> bothNel(a: A, b: B): IorNel<A, B> = Ior.Both(Nel.of(a), b)
     }
 
     /**
@@ -232,20 +234,20 @@ import kategory.Either.Right
     )
 
     /**
-     * Returns a [Either.Right] containing the [Right] value or `B` if this is [Both]
+     * Returns a [Either.Right] containing the [Right] value or `B` if this is [Right] or [Both]
      * and [Either.Left] if this is a [Left].
      *
      * Example:
      * ```
      * Right(12).toEither() // Result: Either.Right(12)
      * Left(12).toEither()  // Result: Either.Left(12)
-     * Both("power", 12).toEither()  // Result: Either.Righ(12)
+     * Both("power", 12).toEither()  // Result: Either.Right(12)
      * ```
      */
     fun toEither(): Either<A, B> = fold({ Either.Left(it) }, { Either.Right(it) }, { _, b -> Either.Right(b) })
 
     /**
-     * Returns a [Option.Some] containing the [Right] value or `B` if this is [Both]
+     * Returns a [Option.Some] containing the [Right] value or `B` if this is [Right] or [Both]
      * and [Option.None] if this is a [Left].
      *
      * Example:
@@ -256,6 +258,19 @@ import kategory.Either.Right
      * ```
      */
     fun toOption(): Option<B> = fold({ Option.None }, { Option.Some(it) }, { _, b -> Option.Some(b) })
+
+    /**
+     * Returns a [Validated.Valid] containing the [Right] value or `B` if this is [Right] or [Both]
+     * and [Validated.Invalid] if this is a [Left].
+     *
+     * Example:
+     * ```
+     * Right(12).toValidated() // Result: Valid(12)
+     * Left(12).toValidated()  // Result: Invalid(12)
+     * Both(12, "power").toValidated()  // Result: Valid("power")
+     * ```
+     */
+    fun toValidated(): Validated<A, B> = fold({ Validated.Invalid(it) }, { Validated.Valid(it) }, { _, b -> Validated.Valid(b) })
 
     data class Left<out A>(val value: A) : Ior<A, Nothing>() {
         override val isRight: Boolean = false
@@ -288,7 +303,7 @@ inline fun <A, B, D> Ior<A, B>.flatMap(crossinline f: (B) -> Ior<A, D>, SA: Semi
         val fm = f(rightValue)
         when (fm) {
             is Ior.Left -> Ior.Left(SA.combine(leftValue, fm.value))
-            is Ior.Right -> Ior.Right(fm.value)
+            is Ior.Right -> Ior.Both(leftValue, fm.value)
             is Ior.Both -> Ior.Both(SA.combine(leftValue, fm.leftValue), fm.rightValue)
         }
     }
@@ -298,9 +313,9 @@ fun <A, B, D> Ior<A, B>.ap(ff: IorKind<A, (B) -> D>, SA: Semigroup<A>): Ior<A, D
 
 inline fun <A, B> Ior<A, B>.getOrElse(crossinline default: () -> B): B = fold({ default() }, { it }, { _, b -> b })
 
-fun <A, B> A.rightIor(): Ior<B, A> = Ior.Right(this)
+fun <B> B.rightIor(): Ior<Nothing, B> = Ior.Right(this)
 
-fun <A, B> A.leftIor(): Ior<A, B> = Ior.Left(this)
+fun <A> A.leftIor(): Ior<A, Nothing> = Ior.Left(this)
 
 fun <A, B> Pair<A, B>.bothIor(): Ior<A, B> = Ior.Both(this.first, this.second)
 
