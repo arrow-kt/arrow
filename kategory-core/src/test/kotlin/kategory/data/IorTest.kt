@@ -103,7 +103,17 @@ class IorTest : UnitSpec() {
             }
         }
 
-        "fromOption() should build a correct Option<Ior>" {
+        "toValidated() should convert values into a valid Validated" {
+            forAll { a: Int, b: String ->
+                {
+                    Ior.Left(a).toValidated() == Validated.Invalid(a) &&
+                            Ior.Right(b).toValidated() == Validated.Valid(b) &&
+                            Ior.Both(a, b).toValidated() == Validated.Valid(b)
+                }()
+            }
+        }
+
+        "fromOptions() should build a correct Option<Ior>" {
             forAll { a: Int, b: String ->
                 {
                     Ior.fromOptions(Option.Some(a), Option.None) == Option.Some(Ior.Left(a)) &&

@@ -19,7 +19,7 @@ data class ConnectionParams(val url: String, val port: Int)
 ```
 
 ```kotlin
-fun<A> config(key: String): Either<String, A> = TODO()
+fun <A> config(key: String): Either<String, A> = TODO()
 
 config<String>("url").flatMap { url ->
     config<Int>("port").map { ConnectionParams(url, it) }
@@ -36,7 +36,7 @@ a config can be validated separately from another field not being well-formed.
 
 Enter `Validated`.
 
-## PARALLEL VALIDATION
+## Parallel Validation
 
 Our goal is to report any and all errors across independent bits of data. For instance, when 
 we ask for several pieces of configuration, each configuration field can be validated separately 
@@ -44,7 +44,7 @@ from one another. How then do we enforce that the data we are working with is in
 We ask for both of them up front.
 
 As our running example, we will look at config parsing. Our config will be represented by a 
-`Map[String, String]`. Parsing will be handled by a `Read` type class - we provide instances only 
+`Map<String, String>`. Parsing will be handled by a `Read` type class - we provide instances only 
 for `String` and `Int` for brevity.
 
 ```kotlin:ank
@@ -83,7 +83,7 @@ sealed class ConfigError {
 ```
 
 We need a data type that can represent either a successful value (a parsed configuration), or an error. 
-It would look like the following, which cats provides in `kategory.Validated`:
+It would look like the following, which Kategory provides in `kategory.Validated`:
 
 ```kotlin
 @higherkind sealed class Validated<out E, out A> : ValidatedKind<E, A> {
@@ -100,7 +100,7 @@ Now we are ready to write our parser.
 ```kotlin:ank
 data class Config(val map: Map<String, String>) {
 
-    fun <A>parse(read: Read<A>, key: String): Validated<ConfigError, A> {
+    fun <A> parse(read: Read<A>, key: String): Validated<ConfigError, A> {
         val v = Option.fromNullable(map[key])
         return when(v) {
             is Option.Some -> {
@@ -122,7 +122,7 @@ validation if each piece is independent. How do we enforce the data is independe
 asking for all of it up front. Let's start with two pieces of data.
 
 ```kotlin
-fun <E, A, B, C>parallelValidate(v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<E, C> {
+fun <E, A, B, C> parallelValidate(v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<E, C> {
     return when {
         v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.a, v2.a))
         v1 is Validated.Valid && v2 is Validated.Invalid -> v2
@@ -135,17 +135,17 @@ fun <E, A, B, C>parallelValidate(v1: Validated<E, A>, v2: Validated<E, B>, f: (A
 
 We've run into a problem. In the case where both have errors, We want to report both. we 
 don't have a way to combine ConfigErrors. But as clients, we can change our Validated 
-values where the error can be combined, say, a `List[ConfigError]`.We are gonna use a 
-`NonEmptyList[ConfigError]`—the NonEmptyList statically guarantees we have at least one value, 
+values where the error can be combined, say, a `List<ConfigError>`.We are going to use a 
+`NonEmptyList<ConfigError>`—the NonEmptyList statically guarantees we have at least one value, 
 which aligns with the fact that if we have an Invalid, then we most certainly have at least one error. 
 This technique is so common there is a convenient method on `Validated` called `toValidatedNel`
-that turns any `Validated[E, A]` value to a `Validated[NonEmptyList[E], A]`. Additionally, the 
-type alias `ValidatedNel[E, A]` is provided.
+that turns any `Validated<E, A>` value to a `Validated<NonEmptyList<E>, A>`. Additionally, the 
+type alias `ValidatedNel<E, A>` is provided.
 
 Time to parse.
 
 ```kotlin:ank
-fun <E, A, B, C>parallelValidate
+fun <E, A, B, C> parallelValidate
         (v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<NonEmptyList<E>, C> {
     return when {
         v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.a, v2.a))
@@ -188,7 +188,7 @@ val valid = parallelValidate(
 valid
 ```
 
-## SEQUENTIAL VALIDATION
+## Sequential Validation
 
 If you do want error accumulation but occasionally run into places where sequential validation is needed, 
 then Validated provides `withEither` method to allow you to temporarily turn a Validated 
