@@ -65,7 +65,7 @@ at sun.misc.CharacterDecoder.decodeBuffer(CharacterDecoder.java:163)
 at sun.misc.CharacterDecoder.decodeBuffer(CharacterDecoder.java:194)
 ```
 
-They often lead to incorrect and dangerous code because `Throwable` is an open hierarchy where you may catch more than you originally intend to.
+They often lead to incorrect and dangerous code because `Throwable` is an open hierarchy where you may catch more than you originally intended to.
 
 ```kotlin
 try {
@@ -131,8 +131,8 @@ fun aim(): Option<Target> = None
 fun launch(target: Target, nuke: Nuke): Option<Impacted> = Some(Impacted)
 ```
 
-It's easy to work with [`Option`]({{ '/docs/datatypes/option' | relative_url }}) if your lang supports monad comprehensions or special syntax for them.
-Kategory provides monadic comprehensions for all datatypes for which a [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) instance exists built atop corutines.
+It's easy to work with [`Option`](/docs/datatypes/option) if your lang supports monad comprehensions or special syntax for them.
+Kategory provides monadic comprehensions for all datatypes for which a [`Monad`](/docs/typeclasses/monad) instance exists built atop coroutines.
 
 ```kotlin
 fun attackOption(): Option<Impacted> =
@@ -291,17 +291,18 @@ Polymorphic code in Kategory is based on emulated [`Higher Kinds`](/docs/pattern
 ```kotlin
 inline fun <reified F> arm(ME: MonadError<F, NukeException> = monadError()): HK<F, Nuke> = ME.pure(Nuke)
 inline fun <reified F> aim(ME: MonadError<F, NukeException> = monadError()): HK<F, Target> = ME.pure(Target)
-inline fun <reified F> launch(ME: MonadError<F, NukeException> = monadError()): HK<F, Impacted> = ME.raiseError(MissedByMeters(5))
+inline fun <reified F> launch(target: Target, nuke: Nuke, ME: MonadError<F, NukeException> = monadError()):
+  HK<F, Impacted> = ME.raiseError(MissedByMeters(5))
 ```
 
-We can know express the same program as before in a fully polymorphic context
+We can now express the same program as before in a fully polymorphic context
 
 ```kotlin
-inline fun <reified F> attack(ME: MonadError<F, NukeException> = monadError()): HK<F, Impacted> =
-  monadError.bindingE {
-    val nuke = arm().bind()
-    val target = aim().bind()
-    val impact = launch(target, nuke).bind()
+inline fun <reified F> attack(ME:MonadError<F, NukeException> = monadError()):HK<F, Impacted> =
+  ME.binding {
+    val nuke = arm<F>().bind()
+    val target = aim<F>().bind()
+    val impact = launch<F>(target, nuke).bind()
     yields(impact)
   }
 ```
@@ -309,12 +310,15 @@ inline fun <reified F> attack(ME: MonadError<F, NukeException> = monadError()): 
 Or since `arm()` and `bind()` are operations that do not depend on each other we don't need the monad comprehensions here and we can express our logic as:
 
 ```kotlin
-inline fun <reified F> attack(ME: MonadError<F, NukeException> = monadError()): HK<F, Impacted> =
-  ME.tupled(aim(), arm()).flatMap({ (nuke, target) -> launch(nuke, target) })
+inline fun <reified F> attack1(ME: MonadError<F, NukeException> = monadError()): HK<F, Impacted> =
+  ME.tupled(aim(), arm()).flatMap(ME, { (nuke, target) -> launch<F>(nuke, target) })
 
 val result = attack<EitherKindPartial<NukeException>>()
 result.ev()
 //Left(MissedByMeters(5))
+// or
+val result1 = attack(Either.monadError())
+result1.ev()
 ```
 
 ## Credits

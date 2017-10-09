@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 . $(dirname $0)/deploy_common.sh
 
-VERSION_PATTERN=^[0-9].[0-9].[0-9]$
+VERSION_PATTERN=^[0-9]+\.[0-9]+\.[0-9]+$
 
 echo "Deploying release '$VERSION_NAME' ..."
 
@@ -16,6 +16,6 @@ elif [ "$TRAVIS_BRANCH" != "$BRANCH" ]; then
 elif ! [ "$VERSION_NAME" =~ $VERSION_PATTERN ]; then
   fail "Failed release deployment: wrong version. Expected '$VERSION_NAME' to have pattern 'X.Y.Z'"
 else
-  ./gradlew uploadArchives
+  ./gradlew uploadArchives bintrayUpload
   echo "Release '$VERSION_NAME' deployed!"
 fi

@@ -142,6 +142,6 @@ The following datatypes in Kategory provide instances that adhere to the `Applic
 Additionally all instances of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) and their MTL variants implement the `Applicative` typeclass directly
 since they are all subtypes of `Applicative`
 
-
 [applicative_source]: https://github.com/kategory/kategory/blob/master/kategory-core/src/main/kotlin/kategory/typeclasses/Applicative.kt
 [applicative_law_source]: https://github.com/kategory/kategory/blob/master/kategory-test/src/main/kotlin/kategory/laws/ApplicativeLaws.kt
+

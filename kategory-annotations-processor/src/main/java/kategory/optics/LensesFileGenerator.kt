@@ -2,6 +2,7 @@ package kategory.optics
 
 import kategory.common.utils.fullName
 import me.eugeniomarletti.kotlin.metadata.escapedClassName
+import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 import java.io.File
 
 class LensesFileGenerator(
@@ -17,19 +18,21 @@ class LensesFileGenerator(
                         funs.joinToString(prefix = "package ${element.classData.`package`.escapedClassName}\n\n", separator = "\n")
             }.forEach { (name, fileString) -> File(generatedDir, name).writeText(fileString) }
 
+    private fun String.toUpperCamelCase(): String = split(" ").joinToString("", transform = String::capitalize)
+
     private fun processElement(annotatedOptic: AnnotatedOptic): Pair<AnnotatedOptic, List<String>> =
             annotatedOptic to annotatedOptic.targets.map { variable ->
                 val sourceClassName = annotatedOptic.classData.fullName.escapedClassName
-                val sourceName = annotatedOptic.type.simpleName.toString().toLowerCase()
+                val sourceName = annotatedOptic.type.simpleName.toString().decapitalize()
                 val targetClassName = variable.fullName
                 val targetName = variable.paramName
 
                 """
-                    |fun $sourceName${targetName.capitalize()}(): $lens<$sourceClassName, $targetClassName> = $lens(
-                    |        get = { $sourceName: $sourceClassName -> $sourceName.$targetName },
-                    |        set = { $targetName: $targetClassName ->
+                    |fun $sourceName${targetName.toUpperCamelCase()}(): $lens<$sourceClassName, $targetClassName> = $lens(
+                    |        get = { $sourceName: $sourceClassName -> $sourceName.${targetName.plusIfNotBlank(prefix = "`", postfix = "`")} },
+                    |        set = { value: $targetClassName ->
                     |            { $sourceName: $sourceClassName ->
-                    |                $sourceName.copy($targetName = $targetName)
+                    |                $sourceName.copy(${targetName.plusIfNotBlank(prefix = "`", postfix = "`")} = value)
                     |            }
                     |        }
                     |)
