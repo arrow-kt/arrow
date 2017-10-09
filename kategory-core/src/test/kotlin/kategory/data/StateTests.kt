@@ -7,7 +7,7 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class StateTests : UnitSpec() {
 
-    private val addOne = State<Int, Int>({ n -> Tuple2(n * 2, n) })
+    private val addOne = State<Int, Int> { n -> Tuple2(n * 2, n) }
 
     init {
         "addOne.run(1) should return Pair(2, 1)" {
