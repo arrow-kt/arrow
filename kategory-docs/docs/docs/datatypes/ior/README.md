@@ -22,19 +22,19 @@ We can create `Ior` values using `Ior.Left`, `Ior.Right` and `Ior.Both`:
 ```kotlin:ank
 import kategory.*
 
-val right = Ior.Right(42)
+Ior.Right(42)
 ```
 
 ```kotlin:ank
 import kategory.*
 
-val left = Ior.Left("Error")
+Ior.Left("Error")
 ```
 
 ```kotlin:ank
 import kategory.*
 
-val both = Ior.Both("Warning", 41)
+Ior.Both("Warning", 41)
 ```
 
 Kategory also offers extension functions for `Ior`, the `leftIor`, `rightIor` and `bothIor`:
@@ -42,19 +42,19 @@ Kategory also offers extension functions for `Ior`, the `leftIor`, `rightIor` an
 ```kotlin:ank
 import kategory.*
 
-val right = 3.rightIor()
+3.rightIor()
 ```
 
 ```kotlin:ank
 import kategory.*
 
-val left = "Error".leftIor()
+"Error".leftIor()
 ```
 
 ```kotlin:ank
 import kategory.*
 
-val both = ("Warning" to 3).bothIor()
+("Warning" to 3).bothIor()
 ```
 
 
@@ -125,13 +125,13 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
 ```kotlin:ank
 import kategory.*
 
-val left: IorNel<String, Int> = Ior.leftNel("Error")
+Ior.leftNel<String, Int>("Error")
 ```
 
 ```kotlin:ank
 import kategory.*
 
-val both: IorNel<String, Int> = Ior.bothNel("Warning", 41)
+Ior.bothNel("Warning", 41)
 ```
 
 
