@@ -51,15 +51,15 @@ Let's write a new version of `pop` and `push` using `State`:
 import kategory.*
 
 fun pop() = State<Stack, String>({ stack ->
-    stack.firstOrNull()?.let { Tuple2((stack - it), it) } ?:
+    stack.firstOrNull()?.let { (stack - it) toT it } ?:
             throw IllegalStateException("Stack is empty!")
 })
 
 fun push(s: String) = State<Stack, Unit>({ stack ->
-    Tuple2(ArrayList<String>(stack.size + 1).apply {
+    ArrayList<String>(stack.size + 1).apply {
         add(s)
         addAll(stack)
-    }, Unit)
+    } toT Unit
 })
 ```
 
