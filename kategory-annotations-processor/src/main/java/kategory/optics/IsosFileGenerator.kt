@@ -2,6 +2,7 @@ package kategory.optics
 
 import kategory.common.utils.fullName
 import me.eugeniomarletti.kotlin.metadata.escapedClassName
+import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 import java.io.File
 
 class IsosFileGenerator(
@@ -24,7 +25,7 @@ class IsosFileGenerator(
 
     private fun processElement(annotatedIso: AnnotatedOptic): Pair<String, String> {
         val sourceClassName = annotatedIso.classData.fullName.escapedClassName
-        val sourceName = annotatedIso.type.simpleName.toString().toLowerCase()
+        val sourceName = annotatedIso.type.simpleName.toString().decapitalize()
         val targetName = annotatedIso.targets.map(Target::fullName)
 
         return sourceName to """
@@ -39,7 +40,7 @@ class IsosFileGenerator(
     private fun isoConstructor(sourceName: String, targetTypes: List<String>) = "kategory.optics.Iso<$sourceName, ${tupleType(targetTypes)}>"
 
     private fun tupleConstructor(targetTypes: List<Target>, sourceName: String) =
-            targetTypes.joinToString(prefix = "$tuple${targetTypes.size}(", postfix = ")", transform = { "$sourceName.${it.paramName}" })
+            targetTypes.joinToString(prefix = "$tuple${targetTypes.size}(", postfix = ")", transform = { "$sourceName.${it.paramName.plusIfNotBlank(prefix = "`", postfix = "`")}" })
 
     private fun tupleType(targetTypes: List<String>) =
             targetTypes.joinToString(prefix = "$tuple${targetTypes.size}<", postfix = ">")

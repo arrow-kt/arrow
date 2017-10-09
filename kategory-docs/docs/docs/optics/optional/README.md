@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Optional
-permalink: /docs/effects/optional/
+permalink: /docs/optics/optional/
 ---
 
 ## Optional
