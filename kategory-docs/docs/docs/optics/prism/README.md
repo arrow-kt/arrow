@@ -157,3 +157,4 @@ liftSuccess(Try.Failure<Int>(ArithmeticException("/ by zero")))
 ### Laws
 
 Kategory provides [`PrismLaws`](/docs/optics/laws#prismlaws) in the form of test cases for internal verification of lawful instances and third party apps creating their own prisms.
+

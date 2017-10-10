@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Concurrency
-permalink: /docs/effects/concurrency/
+permalink: /docs/patterns/concurrency/
 ---
 
 ## Concurrency

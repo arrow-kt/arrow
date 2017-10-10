@@ -96,7 +96,7 @@ val plens = pFirstTuple2<Int, String, String>()
 
 val successTuple2: POptional<Try<Tuple2<Int, String>>, Try<Tuple2<String, String>>, Int, String> =
         pprism compose plens
-        
+
 val lifted: (Try<Tuple2<Int, String>>) -> Try<Tuple2<String, String>> = successTuple2.lift { _ -> "Hello, " }
 lifted(Try.Success(5 toT "World!"))
 ```

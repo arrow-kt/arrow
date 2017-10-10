@@ -10,7 +10,7 @@ The `Applicative` typeclass abstracts the ability to lift values and apply funct
 Examples of type constructors that can implement instances of the Applicative typeclass include `Option`, `NonEmptyList`,
 `List` and many other datatypes that include a `pure` and either `ap` function. `ap` may be derived for monadic types that include a `Monad` instance via `flatMap`.
 
-`Applicative` includes all combinators present in [`Functor`](/docs/typeclasses/functor/).
+`Applicative` includes all combinators present in [`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }}).
 
 ### Applicative Builder examples
 
@@ -28,13 +28,13 @@ fun addressService(): Option<List<String>> = Option(listOf("1 Main Street", "111
 
 This more or less illustrate the common use case of performing several independent operations where we need to get all the results together
 
-Kategory features an [Applicative Builder](/docs/patterns/applicativebuilder) that allows you to easily combine all the independent operations into one result.
+Kategory features an [Applicative Builder]({{ '/docs/patterns/applicative_builder' | relative_url }}) that allows you to easily combine all the independent operations into one result.
 
 ```kotlin:ank
 data class Profile(val name: String, val phone: Int, val address: List<String>)
 
 val r: Option<Tuple3<String, Int, List<String>>> = Option.applicative().tupled(profileService(), phoneService(), addressService()).ev()
-r.map { Profile(it.a, it.b, it.c) } 
+r.map { Profile(it.a, it.b, it.c) }
 ```
 
 The Applicative Builder also provides a `map` operations that is able to abstract over arity in the same way as `tupled`
@@ -69,7 +69,7 @@ Option.applicative().ap(Option(1), Option({ n: Int -> n + 1 })) // Option(2)
 
 #### Other combinators
 
-For a full list of other useful combinators available in `Applicative` see the [`KDoc](/kdocs/typeclasses/applicative)
+For a full list of other useful combinators available in `Applicative` see the [Source][applicative_source]{:target="_blank"}
 
 ### Syntax
 
@@ -109,34 +109,39 @@ Option.applicative().map2Eval(Option(1), Eval.later { Option("x") }, { z: Tuple2
 
 ### Laws
 
-Kategory provides [`ApplicativeLaws`](/docs/typeclasses/laws#applicativelaws) in the form of test cases for internal verification of lawful instances and third party apps creating their own Applicative instances.
+Kategory provides [`ApplicativeLaws`][applicative_law_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own Applicative instances.
 
 #### Creating your own `Applicative` instances
 
-[Kategory already provides Applicative instances for most common datatypes](#datatypes) both in Kategory and the Kotlin stdlib. 
-See [Deriving and creating custom typeclass] to provide your own Applicative instances for custom datatypes.
+Kategory already provides Applicative instances for most common datatypes both in Kategory and the Kotlin stdlib.
+
+[//]: See [Deriving and creating custom typeclass] to provide your own Applicative instances for custom datatypes. //TODO: commented until section is created
 
 ### Data types
 
 The following datatypes in Kategory provide instances that adhere to the `Applicative` typeclass.
 
-- [Either](/docs/datatypes/either)
-- [EitherT](/docs/datatypes/eitherT)
-- [FreeApplicative](/docs/datatypes/FreeApplicative)
-- [Function1](/docs/datatypes/Function1)
-- [Ior](/docs/datatypes/Ior)
-- [Kleisli](/docs/datatypes/Kleisli)
-- [OptionT](/docs/datatypes/OptionT)
-- [StateT](/docs/datatypes/StateT)
-- [Validated](/docs/datatypes/Validated)
-- [WriterT](/docs/datatypes/WriterT)
-- [Const](/docs/datatypes/Const)
-- [Try](/docs/datatypes/Try)
-- [Eval](/docs/datatypes/Eval)
-- [IO](/docs/datatypes/IO)
-- [NonEmptyList](/docs/datatypes/NonEmptyList)
-- [Id](/docs/datatypes/Id)
-- [Function0](/docs/datatypes/Function0)
+- [Either]({{ '/docs/datatypes/either' | relative_url }})
+- [EitherT]({{ '/docs/datatypes/eitherT' | relative_url }})
+- [FreeApplicative]({{ '/docs/datatypes/FreeApplicative' | relative_url }})
+- [Function1]({{ '/docs/datatypes/Function1' | relative_url }})
+- [Ior]({{ '/docs/datatypes/Ior' | relative_url }})
+- [Kleisli]({{ '/docs/datatypes/Kleisli' | relative_url }})
+- [OptionT]({{ '/docs/datatypes/OptionT' | relative_url }})
+- [StateT]({{ '/docs/datatypes/StateT' | relative_url }})
+- [Validated]({{ '/docs/datatypes/Validated' | relative_url }})
+- [WriterT]({{ '/docs/datatypes/WriterT' | relative_url }})
+- [Const]({{ '/docs/datatypes/Const' | relative_url }})
+- [Try]({{ '/docs/datatypes/Try' | relative_url }})
+- [Eval]({{ '/docs/datatypes/Eval' | relative_url }})
+- [IO]({{ '/docs/datatypes/IO' | relative_url }})
+- [NonEmptyList]({{ '/docs/datatypes/NonEmptyList' | relative_url }})
+- [Id]({{ '/docs/datatypes/Id' | relative_url }})
+- [Function0]({{ '/docs/datatypes/Function0' | relative_url }})
 
-Additionally all instances of [`Monad`](/docs/_docs/typeclasses/monad) and their MTL variants implement the `Applicative` typeclass directly
+Additionally all instances of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) and their MTL variants implement the `Applicative` typeclass directly
 since they are all subtypes of `Applicative`
+
+[applicative_source]: https://github.com/kategory/kategory/blob/master/kategory-core/src/main/kotlin/kategory/typeclasses/Applicative.kt
+[applicative_law_source]: https://github.com/kategory/kategory/blob/master/kategory-test/src/main/kotlin/kategory/laws/ApplicativeLaws.kt
+

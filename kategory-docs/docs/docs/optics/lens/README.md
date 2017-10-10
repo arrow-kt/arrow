@@ -155,4 +155,6 @@ pFirstTuple2<Int, String, String>().set(5 toT "World", "Hello, ")
 
 ### Laws
 
-Kategory provides [`LensLaws`](/docs/optics/laws#lenslaws) in the form of test cases for internal verification of lawful instances and third party apps creating their own lenses.
+Kategory provides [`LensLaws`][lenses_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own lenses.
+
+[lenses_laws_source]: https://github.com/kategory/kategory/blob/master/kategory-test/src/main/kotlin/kategory/laws/LensLaws.kt

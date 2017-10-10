@@ -4,4 +4,4 @@ title: Order
 permalink: /docs/typeclasses/order/
 ---
 
-## Eq
+## Order
