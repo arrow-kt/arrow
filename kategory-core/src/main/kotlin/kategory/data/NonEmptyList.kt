@@ -1,5 +1,7 @@
 package kategory
 
+typealias Nel<A> = NonEmptyList<A>
+
 /**
  * A List that can not be empty
  */
@@ -79,6 +81,8 @@ class NonEmptyList<out A> private constructor(
 
         return true
     }
+
+    fun show(): String = all.joinToString()
 
     override fun hashCode(): Int = all.hashCode()
 
