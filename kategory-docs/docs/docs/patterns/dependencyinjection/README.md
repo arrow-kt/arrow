@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Dependency Injection
-permalink: /docs/effects/dependency_injection/
+permalink: /docs/patterns/dependency_injection/
 ---
 
 ## Dependency Injection

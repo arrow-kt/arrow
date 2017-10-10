@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Free algebras
-permalink: /docs/effects/free_algebras/
+permalink: /docs/patterns/free_algebras/
 ---
 
 ## Free Algebras

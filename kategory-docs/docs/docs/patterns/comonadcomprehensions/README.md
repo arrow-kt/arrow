@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Comonad Comprehensions
-permalink: /docs/effects/comonad_comprehensions/
+permalink: /docs/patterns/comonad_comprehensions/
 ---
 
 ## Comonad Comprehensions

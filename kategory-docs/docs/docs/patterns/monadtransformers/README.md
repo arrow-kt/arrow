@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Monad Transformers
-permalink: /docs/effects/monad_transformers/
+permalink: /docs/patterns/monad_transformers/
 ---
 
 ## Monad Transformers

@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Polymorphic Programs
-permalink: /docs/effects/polymorphic_programs/
+permalink: /docs/patterns/polymorphic_programs/
 ---
 
 ## Polymorphic Programs

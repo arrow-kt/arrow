@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Applicative Builder
-permalink: /docs/effects/applicative_builder/
+permalink: /docs/patterns/applicative_builder/
 ---
 
 ## Applicative Builder
