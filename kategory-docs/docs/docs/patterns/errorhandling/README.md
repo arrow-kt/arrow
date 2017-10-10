@@ -14,7 +14,7 @@ The program simulates the typical game scenario where we have to shoot a target 
 
 ## Requirements
 
-- Arm a Nuke launcher 
+- Arm a Nuke launcher
 - Aim toward a Target
 - Launch a Nuke and impact the Target
 
@@ -42,11 +42,11 @@ fun launch(target: Target, nuke: Nuke): Impacted = Impacted
 ```
 
 As you may have noticed the function signatures include no clue that when asking for `arm()` or `aim()`
-an exception may be thrown. 
+an exception may be thrown.
 
 ### The issues with exceptions
 
-Exceptions can be seen as GOTO statement given they interrupt the program flow by jumping back to the caller. 
+Exceptions can be seen as GOTO statement given they interrupt the program flow by jumping back to the caller.
 Exceptions are not consistent as throwing an exception may not survive async boundaries, that is to say that one can't rely on exceptions for error handling
 in async code since invoking a function that is async inside a `try/catch` may not capture the exception potentially thrown in a different thread.
 
@@ -88,8 +88,8 @@ Furthermore exceptions are costly to create. `Throwable#fillInStackTrace` attemp
 ```java
 public class Throwable {
     /**
-    * Fills in the execution stack trace. 
-    * This method records within this Throwable object information 
+    * Fills in the execution stack trace.
+    * This method records within this Throwable object information
     * about the current state of the stack frames for the current thread.
     */
     Throwable fillInStackTrace()
@@ -108,7 +108,7 @@ More info in the cost of instantiating Throwables and throwing exceptions in gen
 Exceptions may be considered generally a poor choice in Functional Programming when:
 
 - Modeling absence
-- Modeling known business cases that result in alternate paths 
+- Modeling known business cases that result in alternate paths
 - Used in async boundaries over unprincipled APIs (callbacks)
 - In general when people have no access to your source code
 
@@ -142,7 +142,7 @@ fun attackOption(): Option<Impacted> =
     val impact = launch(target, nuke).bind()
     yields(impact)
   }.ev()
-  
+
 attackOption()
 //None
 ```
@@ -155,18 +155,18 @@ In the next example we are going to use `Try` to deal with potentially thrown ex
 
 ## Try ##
 
-We use [`Try`](/docs/datatypes/try) when we want to be defensive about a computation that may fail with a runtime exception
+We use [`Try`]({{ '/docs/datatypes/try' | relative_url }}) when we want to be defensive about a computation that may fail with a runtime exception
 
 How would our example look like implemented with `Try`?
 
 ```kotlin:ank
-fun arm(): Try<Nuke> = 
+fun arm(): Try<Nuke> =
   Try { throw RuntimeException("SystemOffline") }
-  
-fun aim(): Try<Target> = 
+
+fun aim(): Try<Target> =
   Try { throw RuntimeException("RotationNeedsOil") }
-  
-fun launch(target: Target, nuke: Nuke): Try<Impacted> = 
+
+fun launch(target: Target, nuke: Nuke): Try<Impacted> =
   Try { throw RuntimeException("MissedByMeters") }
 ```
 
@@ -197,7 +197,7 @@ fun attackTry(): Try<Impacted> =
     val impact = launch(target, nuke).bind()
     yields(impact)
   }.ev()
-  
+
 attackTry()
 //Failure(RuntimeException("SystemOffline"))
 ```
@@ -212,7 +212,7 @@ We should redefine our functions to express that their result is not just a `Nuk
 
 ## Either ##
 
-When dealing with a known alternate path we model return types as [`Either`](/docs/datatypes/either)
+When dealing with a known alternate path we model return types as [`Either`]({{ '/docs/datatypes/either' | relative_url }})
 Either represents the presence of either a `Left` value or a `Right` value.
 By convention most functional programing libraries choose `Left` as the exceptional case and `Right` as the success value.
 
@@ -264,11 +264,11 @@ attackEither()
 We have seen so far how we can use `Option`, `Try` and `Either` to handle exceptions in a purely functional way.
 
 The question now is, can we further generalize error handling and write this code in a way that is abstract from the actual datatypes that it uses.
-Since Kategory supports typeclasses, emulated higher kinds and higher order abstractions we can rewrite this in a fully polymorphic way thanks to [`MonadError`](/docs/typeclasses/monaderror)
+Since Kategory supports typeclasses, emulated higher kinds and higher order abstractions we can rewrite this in a fully polymorphic way thanks to [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }})
 
 ## MonadError
 
-[`MonadError`](/docs/typeclasses/monaderror) is a typeclass that allows us to handle error cases inside monadic contexts such as the ones we have seen with `Either`, `Try` and `Option`. 
+[`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) is a typeclass that allows us to handle error cases inside monadic contexts such as the ones we have seen with `Either`, `Try` and `Option`.
 Typeclasses allows us to code focusing on the behaviors and not the datatypes that implements them.
 
 Kategory provides the following `MonadError` instances for `Option`, `Try` and `Either`
@@ -322,7 +322,7 @@ result1.ev()
 ```
 
 ## Credits
- 
+
 Tutorial adapted from the 47 Degrees blog [`Functional Error Handling`](https://www.47deg.com/presentations/2017/02/18/Functional-error-handling/)
 
 Deck:
