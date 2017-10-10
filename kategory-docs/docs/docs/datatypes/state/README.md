@@ -13,26 +13,37 @@ permalink: /docs/datatypes/state/
 Let's build a simple Stack using an immutable data structure like Kotlin's `List`:
 
 ```kotlin:ank:silent
-typealias Stack = List<String>
+typealias Stack = Option<NonEmptyList<String>>
 ```
 
 Now we only need the push and pop methods, as follows:
 
 ```kotlin:ank:silent
-fun pop(stack: Stack): Pair<Stack, String> = stack.firstOrNull()?.let { (stack - it) to it } ?:
-        throw IllegalStateException("Stack is empty!")
+fun pop(stack: Stack) = stack.fold({
+    Option.None toT Option.None
+}, {
+    NonEmptyList.fromList(it.tail) toT it.head.some()
+})
 
-fun push(stack: Stack, s: String): Pair<Stack, Unit> =
-        ArrayList<String>(stack.size + 1).apply {
-            add(s)
-            addAll(stack)
-        } to Unit
+fun push(stack: Stack, s: String) = stack.fold({
+    NonEmptyList.of(s).some() toT Unit
+}, {
+    NonEmptyList(s, it.all).some() toT Unit
+})
 
-fun stackOperations(stack: Stack): Pair<Stack, String> {
+fun stackOperations(stack: Stack): Tuple2<Stack, Option<String>> {
     val (s1, _) = push(stack, "a")
     val (s2, _) = pop(s1)
     return pop(s2)
 }
+```
+
+```kotlin:ank
+stackOperations(NonEmptyList.of("hello", "world", "!").some())
+```
+
+```kotlin:ank
+stackOperations(NonEmptyList.of("hello").some())
 ```
 
 As you can see, since we cannot modify the immutable Stack, we need to create a new instance every time we push or pop values from it. For that same reason we have to return the newly created Stack with every operation.
@@ -50,16 +61,20 @@ Let's write a new version of `pop` and `push` using `State`:
 ```kotlin:ank:silent
 import kategory.*
 
-fun pop() = State<Stack, String>({ stack ->
-    stack.firstOrNull()?.let { (stack - it) toT it } ?:
-            throw IllegalStateException("Stack is empty!")
+fun pop() = State<Stack, Option<String>>({ stack ->
+    stack.fold({
+        Option.None toT Option.None
+    }, {
+        NonEmptyList.fromList(it.tail) toT it.head.some()
+    })
 })
 
 fun push(s: String) = State<Stack, Unit>({ stack ->
-    ArrayList<String>(stack.size + 1).apply {
-        add(s)
-        addAll(stack)
-    } toT Unit
+    stack.fold({
+        NonEmptyList.of(s).some() toT Unit
+    }, {
+        NonEmptyList(s, it.all).some() toT Unit
+    })
 })
 ```
 
@@ -78,13 +93,17 @@ fun stackOperations() = StateT.monad<IdHK, Stack>().binding {
 At this point, we have not yet interacted with any Stack; we have written instructions to operate one. We need to pass in an initial stack value, and then we actually apply our operations to it:
 
 ```kotlin:ank
-stackOperations().run(listOf("hello", "world", "!"))
+stackOperations().run(NonEmptyList.of("hello", "world", "!").some())
+```
+
+```kotlin:ank
+stackOperations().run(NonEmptyList.of("hello").some())
 ```
 
 If we only care about the resulting String and not the final state, then we can use `runA`:
 
 ```kotlin:ank
-stackOperations().runA(listOf("hello", "world", "!"))
+stackOperations().runA(NonEmptyList.of("hello", "world", "!").some())
 ```
 
 Available Instances:
