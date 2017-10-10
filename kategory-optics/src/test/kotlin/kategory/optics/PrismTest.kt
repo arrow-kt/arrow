@@ -21,53 +21,53 @@ class PrismTest : UnitSpec() {
 
     init {
         testLaws(PrismLaws.laws(
-                        prism = sumPrism,
-                        aGen = AGen,
-                        bGen = Gen.string(),
-                        funcGen = genFunctionAToB(Gen.string()),
-                        EQA = Eq.any(),
-                        EQB = Eq.any(),
-                        FA = Option.applicative()
-                ))
+                prism = sumPrism,
+                aGen = SumGen,
+                bGen = Gen.string(),
+                funcGen = genFunctionAToB(Gen.string()),
+                EQA = Eq.any(),
+                EQB = Eq.any(),
+                EQOptionB = Eq.any()
+        ))
 
         testLaws(PrismLaws.laws(
                 prism = sumPrism.first(),
-                aGen = genTuple(AGen, Gen.int()),
+                aGen = genTuple(SumGen, Gen.int()),
                 bGen = genTuple(Gen.string(), Gen.int()),
                 funcGen = genFunctionAToB(genTuple(Gen.string(), Gen.int())),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                FA = Try.applicative()
+                EQOptionB = Eq.any()
         ))
 
         testLaws(PrismLaws.laws(
                 prism = sumPrism.second(),
-                aGen = genTuple(Gen.int(), AGen),
+                aGen = genTuple(Gen.int(), SumGen),
                 bGen = genTuple(Gen.int(), Gen.string()),
                 funcGen = genFunctionAToB(genTuple(Gen.int(), Gen.string())),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                FA = Option.applicative()
+                EQOptionB = Eq.any()
         ))
 
         testLaws(PrismLaws.laws(
                 prism = sumPrism.right<SumType, SumType, String, String, Int>(),
-                aGen = genEither(Gen.int(), AGen),
+                aGen = genEither(Gen.int(), SumGen),
                 bGen = genEither(Gen.int(), Gen.string()),
                 funcGen = genFunctionAToB(genEither(Gen.int(), Gen.string())),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                FA = Try.applicative()
+                EQOptionB = Eq.any()
         ))
 
         testLaws(PrismLaws.laws(
                 prism = sumPrism.left<SumType, SumType, String, String, Int>(),
-                aGen = genEither(AGen, Gen.int()),
+                aGen = genEither(SumGen, Gen.int()),
                 bGen = genEither(Gen.string(), Gen.int()),
                 funcGen = genFunctionAToB(genEither(Gen.string(), Gen.int())),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                FA = NonEmptyList.applicative()
+                EQOptionB = Eq.any()
         ))
 
         testLaws(PrismLaws.laws(
@@ -77,7 +77,7 @@ class PrismTest : UnitSpec() {
                 funcGen = genFunctionAToB(genEither(Gen.int(), Gen.int())),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                FA = NonEmptyList.applicative()
+                EQOptionB = Eq.any()
         ))
 
         "Joining two prisms together with same target should yield same result" {

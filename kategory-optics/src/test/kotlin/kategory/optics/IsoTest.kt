@@ -7,17 +7,14 @@ import kategory.Either
 import kategory.Eq
 import kategory.IsoLaws
 import kategory.LensLaws
-import kategory.Monoid
 import kategory.NonEmptyList
 import kategory.Option
 import kategory.PrismLaws
 import kategory.StringMonoidInstance
-import kategory.Tuple2
 import kategory.UnitSpec
 import kategory.applicative
 import kategory.functor
 import kategory.genFunctionAToB
-import kategory.genTuple
 import kategory.some
 import kategory.toT
 import org.junit.runner.RunWith
@@ -49,7 +46,7 @@ class IsoTest : UnitSpec() {
                 funcGen = genFunctionAToB(Gen.string()),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                FA = Option.applicative()
+                EQOptionB = Eq.any()
         ))
 
         testLaws(IsoLaws.laws(

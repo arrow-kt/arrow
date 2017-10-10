@@ -8,7 +8,7 @@ import kategory.optics.modifyF
 
 object OptionalLaws {
 
-    inline fun <reified A, reified B> laws(optional: Optional<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQB: Eq<B>): List<Law> = listOf(
+    inline fun <reified A, reified B> laws(optional: Optional<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQB: Eq<B>, EQOptionB: Eq<Option<B>>): List<Law> = listOf(
             Law("Optional Law: set what you get", { getOptionSet(optional, aGen, EQA) }),
             Law("Optional Law: get what you get", { getGetOption(optional, aGen, bGen, EQB) }),
             Law("Optional Law: set is idempotent", { setIdempotent(optional, aGen, bGen, EQA) }),
@@ -16,7 +16,7 @@ object OptionalLaws {
             Law("Optional Law: compose modify", { composeModify(optional, aGen, funcGen, EQA) }),
             Law("Optional Law: consistent set with modify", { consistentSetModify(optional, aGen, bGen, EQA) }),
             Law("Optional Law: consistent modify with modify identity", { consistentModifyModifyId(optional, aGen, funcGen, EQA) }),
-            Law("Optional Law: consistent getOption with modify identity", { consistentGetOptionModifyId(optional, aGen, EQB) })
+            Law("Optional Law: consistent getOption with modify identity", { consistentGetOptionModifyId(optional, aGen, EQOptionB) })
     )
 
     inline fun <reified A, reified B> getOptionSet(optional: Optional<A, B>, aGen: Gen<A>, EQA: Eq<A>): Unit =
@@ -57,24 +57,16 @@ object OptionalLaws {
                 optional.modify(a, f).equalUnderTheLaw(optional.modifyF(Id.applicative(), a, { Id.pure(f(it)) }).value(), EQA)
             })
 
-    inline fun <reified A, reified B> consistentGetOptionModifyId(optional: Optional<A, B>, aGen: Gen<A>, EQB: Eq<B>): Unit {
+    inline fun <reified A, reified B> consistentGetOptionModifyId(optional: Optional<A, B>, aGen: Gen<A>, EQOptionB: Eq<Option<B>>): Unit {
         val firstMonoid = object : Monoid<FirstOption<B>> {
             override fun empty(): FirstOption<B> = FirstOption(Option.None)
             override fun combine(a: FirstOption<B>, b: FirstOption<B>): FirstOption<B> = if (a.option.fold({ false }, { true })) a else b
         }
 
         forAll(aGen, { a ->
-            val getOption = optional.getOption(a)
-
-            val modifyFId = optional.modifyF(Const.applicative(firstMonoid), a, { b ->
+            optional.modifyF(Const.applicative(firstMonoid), a, { b ->
                 Const(FirstOption(b.some()))
-            }).value().option
-
-            getOption.exists { b ->
-                modifyFId.exists {
-                    it.equalUnderTheLaw(b, EQB)
-                }
-            }
+            }).value().option.equalUnderTheLaw(optional.getOption(a), EQOptionB)
         })
     }
 
