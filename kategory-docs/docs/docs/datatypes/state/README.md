@@ -65,21 +65,21 @@ Let's write a new version of `pop` and `push` using `State`:
 ```kotlin:ank:silent
 import kategory.*
 
-fun pop() = State<Stack, Option<String>>({ stack ->
+fun pop() = State<Stack, Option<String>> { stack ->
     stack.fold({
         Option.None toT Option.None
     }, {
         Nel.fromList(it.tail) toT it.head.some()
     })
-})
+}
 
-fun push(s: String) = State<Stack, Unit>({ stack ->
+fun push(s: String) = State<Stack, Unit> { stack ->
     stack.fold({
         Nel.of(s).some() toT Unit
     }, {
         Nel(s, it.all).some() toT Unit
     })
-})
+}
 ```
 
 The `flatMap` method on `State<S, A>` lets you use the result of one `State` in a subsequent `State`. The updated state (`S`) after the first call is passed into the second call. These `flatMap` and `map` methods allow us to use `State` in for-comprehensions:
