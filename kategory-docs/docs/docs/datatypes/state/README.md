@@ -13,12 +13,16 @@ permalink: /docs/datatypes/state/
 Let's build a simple Stack using an immutable data structure like Kotlin's `List`:
 
 ```kotlin:ank:silent
+import kategory.*
+
 typealias Stack = Option<Nel<String>>
 ```
 
 Now we only need the push and pop methods, as follows:
 
 ```kotlin:ank:silent
+import kategory.*
+
 fun pop(stack: Stack) = stack.fold({
     Option.None toT Option.None
 }, {
