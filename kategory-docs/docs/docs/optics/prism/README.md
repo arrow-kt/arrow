@@ -118,6 +118,11 @@ networkInt.getOption(NetworkResult.Failure)
 ```kotlin:ank
 networkInt.getOption(NetworkResult.Success("5"))
 ```
+`Prism` can be composed with all optics but `Getter` and result in the following optics.
+
+|   | Iso | Lens | Prism |Optional | Getter | Setter | Fold | Traversal |
+| --- | --- | --- | --- |--- | --- | --- | --- | --- |
+| Prism | Prism | Optional | Prism | Optional | X | Setter | Fold | Traversal |
 
 ## Generated prisms <a id="generated-prisms"></a>
 
@@ -133,6 +138,23 @@ val networkSuccessPrism: Prism<NetworkResult, NetworkResult.Success> = networkRe
 val networkFailurePrism: Prism<NetworkResult, NetworkResult.Failure> = networkResultFailure()
 ```
 
+### Polymorphic prisms <a id="PPrism"></a>
+When dealing with polymorphic sum types like `Try<A>` we can also have polymorphic prisms that allow us to polymorphically change the type of the focus of our `PPrism`. Following method is also available as `pTrySuccess<A, B>()` in the `kategory.optics` package.
+
+```kotlin
+fun <A, B> trySuccess(): PPrism<Try<A>, Try<B>, A, B> = PPrism(
+        getOrModify = { aTry -> aTry.fold({ Try.Failure<B>(it).left() }, { it.right() }) },
+        reverseGet = { b -> Try.Success(b) }
+)
+
+val liftSuccess: (Try<Int>) -> Try<String> = pTrySuccess<Int, String>().lift(Int::toString)
+liftSuccess(Try.Success(5))
+```
+```kotlin
+liftSuccess(Try.Failure<Int>(ArithmeticException("/ by zero")))
+```
+
 ### Laws
 
 Kategory provides [`PrismLaws`](/docs/optics/laws#prismlaws) in the form of test cases for internal verification of lawful instances and third party apps creating their own prisms.
+

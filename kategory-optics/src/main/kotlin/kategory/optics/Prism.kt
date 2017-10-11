@@ -160,12 +160,17 @@ interface PPrism<S, T, A, B> {
     /**
      * Compose an [Iso] as an [PPrism]
      */
-    fun <C, D> compose(other: PIso<A, B, C, D>): PPrism<S, T, C, D> = compose(other.asPrism())
+    infix fun <C, D> compose(other: PIso<A, B, C, D>): PPrism<S, T, C, D> = compose(other.asPrism())
 
     /**
      * Compose a [PPrism] with a [POptional]
      */
     infix fun <C, D> compose(other: POptional<A, B, C, D>): POptional<S, T, C, D> = asOptional() compose other
+
+    /**
+     * Compose a [PPrism] with a [PLens]
+     */
+    infix fun <C, D> compose(other: PLens<A, B, C, D>): POptional<S, T, C, D> = asOptional() compose other
 
     /**
      * Compose a [PPrism] with a [PSetter]
@@ -188,6 +193,8 @@ interface PPrism<S, T, A, B> {
     operator fun <C, D> plus(other: PPrism<A, B, C, D>): PPrism<S, T, C, D> = compose(other)
 
     operator fun <C, D> plus(other: POptional<A, B, C, D>): POptional<S, T, C, D> = compose(other)
+
+    operator fun <C, D> plus(other: PLens<A, B, C, D>): POptional<S, T, C, D> = compose(other)
 
     operator fun <C, D> plus(other: PIso<A, B, C, D>): PPrism<S, T, C, D> = compose(other)
 
@@ -296,4 +303,3 @@ fun <S, T, A, B, C> PPrism<S, T, A, B>.right(): PPrism<Either<C, S>, Either<C, T
         { it.fold({ c -> Either.Right(c.left()) }, { s -> getOrModify(s).bimap({ it.right() }, { it.right() }) }) },
         { it.map(this::reverseGet) }
 )
-
