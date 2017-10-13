@@ -6,6 +6,7 @@ import kategory.Eq
 import kategory.LensLaws
 import kategory.Option
 import kategory.UnitSpec
+import kategory.applicative
 import kategory.genFunctionAToB
 import kategory.genNonEmptyList
 import org.junit.runner.RunWith
