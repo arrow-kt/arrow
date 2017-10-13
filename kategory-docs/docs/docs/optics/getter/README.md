@@ -12,7 +12,7 @@ It can be seen as a wrapper of a get function `(S) -> A` that can be composed wi
 Creating a `Getter` can be done by referencing a property of a data classes or by providing a function.
 
 ```kotlin:ank
-impoty kategory.optics.*
+import kategory.optics.*
 
 data class Foo(val bar: Int)
 
