@@ -37,14 +37,14 @@ val tupleGetter: Getter<Tuple<String, Int>, String> = firstTuple2<String, Int>()
 
 ## Composition
 
-Unlike a regular `get` function a `Getter` composes. Similar to a `Lens` we can compose `Getter`s to create telescopes and zoom into nested sctructures.
+Unlike a regular `get` function a `Getter` composes. Similar to a `Lens` we can compose `Getter`s to create telescopes and zoom into nested structures.
 
 ```kotlin:ank
 val firstBar: Getter<NonEmptyList<Foo>, Int> = (nelHead<Foo>() compose barGetter)
 firstBar.get(Foo(5).nel())
 ```
 
-`Getter` can be composed with `Getter`, `Iso`, `Lens` and `Fold` and the composition resulta in the following optics.
+`Getter` can be composed with `Getter`, `Iso`, `Lens` and `Fold` and the composition results in the following optics.
 
 |   | Iso | Lens | Prism |Optional | Getter | Setter | Fold | Traversal |
 | --- | --- | --- | --- |--- | --- | --- | --- | --- |
