@@ -11,17 +11,18 @@ import kategory.some
 import kategory.toT
 
 /**
- * A [Getter] is an optic that allows to see into a structure and getting a target.
+ * A [Getter] is an optic that allows to see into a structure and getting a focus.
  *
  * A [Getter] can be seen as a get function:
  * - `get: (S) -> A` meaning we can look into an `S` and get an `A`
  *
  * @param S the source of a [Getter]
- * @param A the target of a [Getter]
+ * @param A the focus of a [Getter]
  */
 interface Getter<S, A> {
+
     /**
-     * Get the target of a [Getter]
+     * Get the focus of a [Getter]
      */
     fun get(s: S): A
 
@@ -35,7 +36,7 @@ interface Getter<S, A> {
         fun <S> codiagonal(): Getter<Either<S, S>, S> = Getter { aa -> aa.fold(::identity, ::identity) }
 
         /**
-         * Invoke operator overload to create a [Getter] of type `S` with target `A`.
+         * Invoke operator overload to create a [Getter] of type `S` with focus `A`.
          */
         operator fun <S, A> invoke(get: (S) -> A) = object : Getter<S, A> {
             override fun get(s: S): A = get(s)
@@ -43,7 +44,7 @@ interface Getter<S, A> {
     }
 
     /**
-     * Join two [Getter] with the same target
+     * Join two [Getter] with the same focus
      */
     infix fun <C> choice(other: Getter<C, A>): Getter<Either<S, C>, A> = Getter { s ->
         s.fold(this::get, other::get)
@@ -99,12 +100,12 @@ interface Getter<S, A> {
     /**
      * Compose a [Getter] with a [Lens]
      */
-    infix fun <C> compose(other: Lens<A,C>): Getter<S,C> = Getter(other::get compose this::get)
+    infix fun <C> compose(other: Lens<A, C>): Getter<S, C> = Getter(other::get compose this::get)
 
     /**
      * Compose a [Getter] with a [Iso]
      */
-    infix fun <C> compose(other: Iso<A,C>): Getter<S,C> = Getter(other::get compose this::get)
+    infix fun <C> compose(other: Iso<A, C>): Getter<S, C> = Getter(other::get compose this::get)
 
     /**
      * Compose a [Getter] with a [Fold]
@@ -116,11 +117,11 @@ interface Getter<S, A> {
      */
     operator fun <C> plus(other: Getter<A, C>): Getter<S, C> = compose(other)
 
-    operator fun <C> plus(other: Lens<A,C>): Getter<S, C> = compose(other)
+    operator fun <C> plus(other: Lens<A, C>): Getter<S, C> = compose(other)
 
-    operator fun <C> plus(other: Iso<A,C>): Getter<S, C> = compose(other)
+    operator fun <C> plus(other: Iso<A, C>): Getter<S, C> = compose(other)
 
-    operator fun <C> plus(other: Fold<A,C>): Fold<S, C> = compose(other)
+    operator fun <C> plus(other: Fold<A, C>): Fold<S, C> = compose(other)
 
     fun asFold(): Fold<S, A> = object : Fold<S, A> {
         override fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R = f(get(s))
@@ -129,13 +130,13 @@ interface Getter<S, A> {
 }
 
 /**
- * Find if the target satisfies the predicate.
+ * Find if the focus satisfies the predicate.
  */
 inline fun <S, A> Getter<S, A>.find(s: S, crossinline p: (A) -> Boolean): Option<A> = get(s).let { b ->
     if (p(b)) b.some() else none()
 }
 
 /**
- * Check if the target satisfies the predicate
+ * Check if the focus satisfies the predicate
  */
 inline fun <S, A> Getter<S, A>.exist(s: S, crossinline p: (A) -> Boolean): Boolean = p(get(s))
