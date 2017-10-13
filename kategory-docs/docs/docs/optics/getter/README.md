@@ -13,6 +13,7 @@ Creating a `Getter` can be done by referencing a property of a data classes or b
 
 ```kotlin:ank
 import kategory.optics.*
+import kategory.*
 
 data class Foo(val bar: Int)
 
@@ -31,8 +32,8 @@ nonEmptyListHead<Int>().get(NonEmptyList.of(1, 2, 3, 4))
 Or from any of the optics defined in `kategory-optics` that allow to safely getting its focus.
 
 ```kotlin:ank:silent
-val headGetter: Getter<NonEmptyList<String>, String> = nelHead<String().asGetter()
-val tupleGetter: Getter<Tuple<String, Int>, String> = firstTuple2<String, Int>().asGetter()
+val headGetter: Getter<NonEmptyList<String>, String> = nelHead<String>().asGetter()
+val tupleGetter: Getter<Tuple2<String, Int>, String> = firstTuple2<String, Int>().asGetter()
 ``` 
 
 ## Composition
