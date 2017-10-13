@@ -10,7 +10,7 @@ permalink: /docs/
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 KΛTEGORY is a library for Typed Functional Programming in Kotlin.
-It includes the most popular data types, type classes and abstractions such as `Functor`, `Applicative`, `Monad` and friends empowering users to define pure FP apps and libraries built atop higher order abstractions. Use the below list to learn more about KΛTEGORY's main features.
+It includes the most popular data types, type classes and abstractions such as `Option`, `Try`, `Either`, `IO`, `Functor`, `Applicative`, `Monad` and many more empowering users to define pure FP apps and libraries built atop higher order abstractions. Use the below list to learn more about KΛTEGORY's main features.
 
 - [Documentation](http://kategory.io)
 - [Patterns](/docs/patterns/error_handling/)
@@ -19,7 +19,7 @@ It includes the most popular data types, type classes and abstractions such as `
 - [Effects](http://kategory.io/docs/effects/io/)
 - [Optics](http://kategory.io/docs/optics/iso/)
 
-# Add it to your project
+# Basic Setup
 
 Add it in your root `build.gradle` at the end of repositories.
 
@@ -28,7 +28,6 @@ allprojects {
     repositories {
         jcenter()
         maven { url 'https://kotlin.bintray.com/kotlinx' }
-        maven { url 'https://dl.bintray.com/kategory/maven/' }
     }
 }
 ```
@@ -36,9 +35,6 @@ allprojects {
 Add the dependencies into the project's `build.gradle`
 
 ```groovy
-apply plugin: 'kotlin-kapt' //optional
-apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //optional
-
 dependencies {
     compile 'io.kategory:kategory:0.3.10'
     kapt    'io.kategory:kategory-annotations-processor:0.3.10' //optional
@@ -47,10 +43,23 @@ dependencies {
 }
 ```
 
-# Additional configuration
+# Additional Setup
 
 For projects that wish to use their own `@higherkind`, `@deriving` and other meta programming facilities provided by KΛTEGORY
 the setup below is also required:
+
+Add the dependencies into the project's `build.gradle`
+
+```groovy
+apply plugin: 'kotlin-kapt' //optional
+apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //optional
+
+dependencies {
+    ...
+    kapt    'io.kategory:kategory-annotations-processor:0.3.10' //optional
+    ...
+}
+```
 
 JVM projects:
 
