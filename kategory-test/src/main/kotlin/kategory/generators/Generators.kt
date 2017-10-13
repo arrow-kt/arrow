@@ -90,3 +90,6 @@ inline fun <reified A> genTry(genA: Gen<A>, genThrowable: Gen<Throwable> = genTh
 
 fun <A> genNullable(genA: Gen<A>): Gen<A?> =
         Gen.oneOf(genA, Gen.create { null })
+
+fun <A> genNonEmptyList(genA: Gen<A>): Gen<NonEmptyList<A>> =
+        Gen.create { NonEmptyList(genA.generate(), Gen.list(genA).generate()) }
