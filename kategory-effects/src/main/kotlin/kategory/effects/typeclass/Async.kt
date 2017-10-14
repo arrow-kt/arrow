@@ -1,7 +1,6 @@
 package kategory.effects
 
 import kategory.*
-import kotlin.coroutines.experimental.startCoroutine
 
 /** An asynchronous computation that might fail. **/
 typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
