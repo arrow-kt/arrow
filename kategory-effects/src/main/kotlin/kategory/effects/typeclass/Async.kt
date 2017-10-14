@@ -29,9 +29,3 @@ inline fun <F, A> runAsyncUnsafe(AC: AsyncContext<F>, crossinline f: () -> Eithe
 
 suspend inline fun <reified F, A> (() -> Either<Throwable, A>).runAsyncUnsafe(AC: AsyncContext<F> = asyncContext()): HK<F, A> =
         runAsyncUnsafe(AC, this)
-
-fun <F, B> MonadError<F, Throwable>.bindingECancellable(M: MonadError<F, Throwable>, c: suspend MonadErrorCancellableContinuation<F, *>.() -> HK<F, B>): HK<F, B> {
-    val continuation = MonadErrorCancellableContinuation<F, B>(M)
-    c.startCoroutine(continuation, continuation)
-    return continuation.returnedMonad()
-}
