@@ -17,9 +17,9 @@ import kategory.right
 import kategory.some
 
 /**
- * A [Fold] is an optic that allows to see into structure and get multiple results.
+ * A [Fold] is an optic that allows to focus into structure and get multiple results.
  *
- * [Fold] is a generalisation of [kategory.Foldable] and is implemented in terms of foldMap.
+ * [Fold] is a generalisation of something [Foldable] and is implemented in terms of foldMap.
  *
  * @param S the source of a [Fold]
  * @param A the target of a [Fold]
@@ -166,6 +166,11 @@ interface Fold<S, A> {
     infix fun <C> compose(other: Iso<A, C>): Fold<S, C> = compose(other.asFold())
 
     /**
+     * Compose a [Fold] with a [Traversal]
+     */
+    infix fun <C> compose(other: Traversal<A, C>): Fold<S, C> = compose(other.asFold())
+
+    /**
      * Plus operator  overload to compose lenses
      */
     operator fun <C> plus(other: Fold<A, C>): Fold<S, C> = compose(other)
@@ -179,6 +184,8 @@ interface Fold<S, A> {
     operator fun <C> plus(other: Lens<A, C>): Fold<S, C> = compose(other)
 
     operator fun <C> plus(other: Iso<A, C>): Fold<S, C> = compose(other)
+
+    operator fun <C> plus(other: Traversal<A, C>): Fold<S, C> = compose(other)
 }
 
 /**
