@@ -6,8 +6,8 @@ permalink: /docs/optics/fold/
 
 ## Fold
 
-`Fold` is an optic that allows to focus into structure and get multiple results.
-It is a generalisation of something `Foldable`.
+A `Fold` is an optic that can see into a structure and get 0 to N foci.
+It is a generalisation of an instance of [`Foldable`](/docs/typeclasses/foldable).
 
 Creating a `Fold` can be done by manually defining `foldMap`.
 
@@ -44,7 +44,7 @@ nonEmptyIntFold.headOption(NonEmptyList.of(1, 2, 3, 4))
 
 ## Composition
 
-Composing `Fold` can be used for accessing nested structures to be able to see foci.
+Composing `Fold` can be used for accessing foci in nested structures.
 
 ```kotlin:ank
 val nestedNelFold: Fold<NonEmptyListKind<NonEmptyListKind<Int>>, NonEmptyListKind<Int>> = Fold.fromFoldable()
@@ -56,7 +56,7 @@ val nestedNel = NonEmptyList.of(1, 2, 3, 4).map {
 (nestedNelFold compose nonEmptyIntFold).getAll(nestedNel)
 ```
 
-`Fold` can be composed with all optics but `Setter` and result in the following optics.
+`Fold` can be composed with all optics but `Setter` and results in the following optics.
 
 |   | Iso | Lens | Prism |Optional | Getter | Setter | Fold | Traversal |
 | --- | --- | --- | --- |--- | --- | --- | --- | --- |

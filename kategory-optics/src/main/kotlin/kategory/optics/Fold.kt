@@ -19,7 +19,7 @@ import kategory.some
 /**
  * A [Fold] is an optic that allows to focus into structure and get multiple results.
  *
- * [Fold] is a generalisation of something [Foldable] and is implemented in terms of foldMap.
+ * [Fold] is a generalisation of an instance of [Foldable] and is implemented in terms of foldMap.
  *
  * @param S the source of a [Fold]
  * @param A the target of a [Fold]
