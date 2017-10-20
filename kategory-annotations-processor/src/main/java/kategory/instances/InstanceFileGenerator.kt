@@ -48,6 +48,26 @@ data class Instance(
                 ""
             }
 
+    fun typeConstraints(): String =
+            target.classOrPackageProto.typeParameters.flatMap { typeParameter ->
+                val name = target.classOrPackageProto.nameResolver.getString(typeParameter.name)
+                typeParameter.upperBoundList.map { constraint ->
+                    name to constraint
+                            .extractFullName(target.classOrPackageProto, failOnGeneric = false)
+                            .removeBackticks()
+                }
+            }.let { constraints ->
+                if (constraints.isNotEmpty()) {
+                    constraints.joinToString(
+                            prefix = " where ",
+                            separator = ", ",
+                            transform = { (a, b) -> "$a : $b" }
+                    )
+                } else {
+                    ""
+                }
+            }
+
     private val abstractFunctions: List<FunctionMapping> =
             getTypeclassReturningFunctions().fold(emptyList(), normalizeOverridenFunctions())
 
@@ -171,7 +191,7 @@ class InstanceFileGenerator(
 
     private fun genImplicitObject(i: Instance): String = """
             |object ${i.implicitObjectName} {
-            |  @JvmStatic fun ${i.expandedTypeArgs()} instance(${i.expandedArgs}): ${i.name}${i.expandedTypeArgs()} =
+            |  @JvmStatic fun ${i.expandedTypeArgs()} instance(${i.expandedArgs}): ${i.name}${i.expandedTypeArgs()}${i.typeConstraints()} =
             |    object : ${i.name}${i.expandedTypeArgs()} {
             |${i.targetImplementations}
             |    }
@@ -183,7 +203,7 @@ class InstanceFileGenerator(
                 |fun ${i.expandedTypeArgs(reified = false)} ${i.receiverTypeName}.Companion.${i.companionFactoryName}(${(i.args.map {
                 "${it.first}: ${it.second}"
             } + (if (i.args.isNotEmpty()) listOf("dummy: Unit = Unit") else emptyList())).joinToString(", ")
-            }): ${i.name}${i.expandedTypeArgs()} =
+            }): ${i.name}${i.expandedTypeArgs()}${i.typeConstraints()} =
                 |  ${i.implicitObjectName}.instance(${i.args.map { it.first }.joinToString(", ")})
                 |
                 |""".trimMargin()
@@ -193,7 +213,7 @@ class InstanceFileGenerator(
                 |inline fun ${i.expandedTypeArgs(reified = true)} ${i.receiverTypeName}.Companion.${i.companionFactoryName}(${i.args.map {
                 "${it.first}: ${it.second} = ${it.second.split(".").map { it.decapitalize() }.joinToString(".")}()"
             }.joinToString(", ")
-            }): ${i.name}${i.expandedTypeArgs()} =
+            }): ${i.name}${i.expandedTypeArgs()}${i.typeConstraints()} =
                 |  ${i.implicitObjectName}.instance(${i.args.map { it.first }.joinToString(", ")})
                 |
                 |""".trimMargin()
