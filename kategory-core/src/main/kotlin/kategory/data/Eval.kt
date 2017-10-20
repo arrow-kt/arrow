@@ -28,7 +28,12 @@ package kategory
  * overflows.
  */
 @higherkind
-@deriving(Functor::class, Applicative::class, Monad::class)
+@deriving(
+        Functor::class,
+        Applicative::class,
+        Monad::class,
+        Comonad::class,
+        Bimonad::class)
 sealed class Eval<out A> : EvalKind<A> {
 
     companion object {
@@ -241,6 +246,10 @@ sealed class Eval<out A> : EvalKind<A> {
                     override fun <S> run(s: S): Eval<B> = f(s as A).ev()
                 }
             }
+
+    fun <B> coflatMap(f: (EvalKind<A>) -> B): Eval<B> = Later { f(this) }
+
+    fun extract(): A = value()
 
     /**
      * Construct an eager Eval<A> instance. In some sense it is equivalent to using a val.
