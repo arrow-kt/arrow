@@ -49,6 +49,46 @@ fun <A, B> genTuple(genA: Gen<A>, genB: Gen<B>): Gen<Tuple2<A, B>> =
             override fun generate(): Tuple2<A, B> = Tuple2(genA.generate(), genB.generate())
         }
 
+fun <A, B, C> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>): Gen<Tuple3<A, B, C>> =
+        object : Gen<Tuple3<A, B, C>> {
+            override fun generate(): Tuple3<A, B, C> = Tuple3(genA.generate(), genB.generate(), genC.generate())
+        }
+
+fun <A, B, C, D> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>): Gen<Tuple4<A, B, C, D>> =
+        object : Gen<Tuple4<A, B, C, D>> {
+            override fun generate(): Tuple4<A, B, C, D> = Tuple4(genA.generate(), genB.generate(), genC.generate(), genD.generate())
+        }
+
+fun <A, B, C, D, E> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>): Gen<Tuple5<A, B, C, D, E>> =
+        object : Gen<Tuple5<A, B, C, D, E>> {
+            override fun generate(): Tuple5<A, B, C, D, E> = Tuple5(genA.generate(), genB.generate(), genC.generate(), genD.generate(), genE.generate())
+        }
+
+fun <A, B, C, D, E, F> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>, genF: Gen<F>): Gen<Tuple6<A, B, C, D, E, F>> =
+        object : Gen<Tuple6<A, B, C, D, E, F>> {
+            override fun generate(): Tuple6<A, B, C, D, E, F> = Tuple6(genA.generate(), genB.generate(), genC.generate(), genD.generate(), genE.generate(), genF.generate())
+        }
+
+fun <A, B, C, D, E, F, G> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>, genF: Gen<F>, genG: Gen<G>): Gen<Tuple7<A, B, C, D, E, F, G>> =
+        object : Gen<Tuple7<A, B, C, D, E, F, G>> {
+            override fun generate(): Tuple7<A, B, C, D, E, F, G> = Tuple7(genA.generate(), genB.generate(), genC.generate(), genD.generate(), genE.generate(), genF.generate(), genG.generate())
+        }
+
+fun <A, B, C, D, E, F, G, H> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>, genF: Gen<F>, genG: Gen<G>, genH: Gen<H>): Gen<Tuple8<A, B, C, D, E, F, G, H>> =
+        object : Gen<Tuple8<A, B, C, D, E, F, G, H>> {
+            override fun generate(): Tuple8<A, B, C, D, E, F, G, H> = Tuple8(genA.generate(), genB.generate(), genC.generate(), genD.generate(), genE.generate(), genF.generate(), genG.generate(), genH.generate())
+        }
+
+fun <A, B, C, D, E, F, G, H, I> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>, genF: Gen<F>, genG: Gen<G>, genH: Gen<H>, genI: Gen<I>): Gen<Tuple9<A, B, C, D, E, F, G, H, I>> =
+        object : Gen<Tuple9<A, B, C, D, E, F, G, H, I>> {
+            override fun generate(): Tuple9<A, B, C, D, E, F, G, H, I> = Tuple9(genA.generate(), genB.generate(), genC.generate(), genD.generate(), genE.generate(), genF.generate(), genG.generate(), genH.generate(), genI.generate())
+        }
+
+fun <A, B, C, D, E, F, G, H, I, J> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>, genF: Gen<F>, genG: Gen<G>, genH: Gen<H>, genI: Gen<I>, genJ: Gen<J>): Gen<Tuple10<A, B, C, D, E, F, G, H, I, J>> =
+        object : Gen<Tuple10<A, B, C, D, E, F, G, H, I, J>> {
+            override fun generate(): Tuple10<A, B, C, D, E, F, G, H, I, J> = Tuple10(genA.generate(), genB.generate(), genC.generate(), genD.generate(), genE.generate(), genF.generate(), genG.generate(), genH.generate(), genI.generate(), genJ.generate())
+        }
+
 fun genIntPredicate(): Gen<(Int) -> Boolean> =
         Gen.int().let { gen ->
             /* If you ever see two zeros in a row please contact the maintainers for a pat in the back */
@@ -83,7 +123,7 @@ inline fun <reified E, reified A> genEither(genE: Gen<E>, genA: Gen<A>): Gen<Eit
 
 inline fun <reified A> genTry(genA: Gen<A>, genThrowable: Gen<Throwable> = genThrowable()): Gen<Try<A>> = Gen.create {
     genEither(genThrowable, genA).generate().fold(
-            { throwable ->  Try.Failure<A>(throwable) },
+            { throwable -> Try.Failure<A>(throwable) },
             { a -> Try.Success(a) }
     )
 }
