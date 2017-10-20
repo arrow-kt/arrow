@@ -2,15 +2,19 @@ package kategory
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
+import kategory.Eval.Now
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class EvalTest : UnitSpec() {
+    val EQ: Eq<HK<EvalHK, Int>>  = Eq { a, b ->
+        a.ev().value() == b.ev().value()
+    }
+
     init {
 
-        testLaws(MonadLaws.laws(Eval.monad(), Eq { a, b ->
-                    a.ev().value() == b.ev().value()
-        }))
+        testLaws(MonadLaws.laws(Eval.monad(), EQ))
+        testLaws(ComonadLaws.laws(Eval.comonad(), ::Now, EQ))
 
         "should map wrapped value" {
             val sideEffect = SideEffect()
