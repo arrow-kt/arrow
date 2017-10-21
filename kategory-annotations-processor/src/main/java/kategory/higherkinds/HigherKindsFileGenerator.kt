@@ -1,9 +1,10 @@
 package kategory.higherkinds
 
-import java.io.File
 import kategory.common.Package
 import kategory.common.utils.knownError
+import kategory.common.utils.typeConstraints
 import org.jetbrains.kotlin.serialization.ProtoBuf
+import java.io.File
 import javax.lang.model.element.Name
 
 val KindPostFix = "Kind"
@@ -19,6 +20,7 @@ data class HigherKind(
     val typeArgs: List<String> = target.classOrPackageProto.typeParameters.map { target.classOrPackageProto.nameResolver.getString(it.name) }
     val expandedTypeArgs: String = target.classOrPackageProto.typeParameters.joinToString(
             separator = ", ", transform = { target.classOrPackageProto.nameResolver.getString(it.name) })
+    val typeConstraints = target.classOrPackageProto.typeConstraints()
     val name: String = "${kindName}$KindPostFix"
     val markerName = "${kindName}$HKMarkerPostFix"
 }
@@ -62,7 +64,7 @@ class HigherKindsFileGenerator(
     private fun genEv(hk: HigherKind): String =
             """
             |@Suppress("UNCHECKED_CAST")
-            |inline fun <${hk.expandedTypeArgs}> ${hk.name}<${hk.expandedTypeArgs}>.ev(): ${hk.kindName}<${hk.expandedTypeArgs}> =
+            |inline fun <${hk.expandedTypeArgs}> ${hk.name}<${hk.expandedTypeArgs}>.ev(): ${hk.kindName}<${hk.expandedTypeArgs}>${hk.typeConstraints} =
             |  this as ${hk.kindName}<${hk.expandedTypeArgs}>
         """.trimMargin()
 

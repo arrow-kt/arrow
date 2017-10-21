@@ -5,6 +5,7 @@ import kategory.common.Package
 import kategory.common.utils.ClassOrPackageDataWrapper
 import kategory.common.utils.extractFullName
 import kategory.common.utils.removeBackticks
+import kategory.common.utils.typeConstraints
 import me.eugeniomarletti.kotlin.metadata.modality
 import org.jetbrains.kotlin.serialization.ProtoBuf
 import org.jetbrains.kotlin.serialization.deserialization.TypeTable
@@ -47,6 +48,8 @@ data class Instance(
             } else {
                 ""
             }
+
+    fun typeConstraints() = target.classOrPackageProto.typeConstraints()
 
     private val abstractFunctions: List<FunctionMapping> =
             getTypeclassReturningFunctions().fold(emptyList(), normalizeOverridenFunctions())
@@ -171,7 +174,7 @@ class InstanceFileGenerator(
 
     private fun genImplicitObject(i: Instance): String = """
             |object ${i.implicitObjectName} {
-            |  @JvmStatic fun ${i.expandedTypeArgs()} instance(${i.expandedArgs}): ${i.name}${i.expandedTypeArgs()} =
+            |  @JvmStatic fun ${i.expandedTypeArgs()} instance(${i.expandedArgs}): ${i.name}${i.expandedTypeArgs()}${i.typeConstraints()} =
             |    object : ${i.name}${i.expandedTypeArgs()} {
             |${i.targetImplementations}
             |    }
@@ -183,7 +186,7 @@ class InstanceFileGenerator(
                 |fun ${i.expandedTypeArgs(reified = false)} ${i.receiverTypeName}.Companion.${i.companionFactoryName}(${(i.args.map {
                 "${it.first}: ${it.second}"
             } + (if (i.args.isNotEmpty()) listOf("dummy: Unit = Unit") else emptyList())).joinToString(", ")
-            }): ${i.name}${i.expandedTypeArgs()} =
+            }): ${i.name}${i.expandedTypeArgs()}${i.typeConstraints()} =
                 |  ${i.implicitObjectName}.instance(${i.args.map { it.first }.joinToString(", ")})
                 |
                 |""".trimMargin()
@@ -193,7 +196,7 @@ class InstanceFileGenerator(
                 |inline fun ${i.expandedTypeArgs(reified = true)} ${i.receiverTypeName}.Companion.${i.companionFactoryName}(${i.args.map {
                 "${it.first}: ${it.second} = ${it.second.split(".").map { it.decapitalize() }.joinToString(".")}()"
             }.joinToString(", ")
-            }): ${i.name}${i.expandedTypeArgs()} =
+            }): ${i.name}${i.expandedTypeArgs()}${i.typeConstraints()} =
                 |  ${i.implicitObjectName}.instance(${i.args.map { it.first }.joinToString(", ")})
                 |
                 |""".trimMargin()
