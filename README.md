@@ -1,3 +1,5 @@
+<img height="100" src="https://avatars2.githubusercontent.com/u/29458023?v=4&amp;s=200" width="100">
+
 [![Download](https://api.bintray.com/packages/kategory/maven/kategory/images/download.svg)](https://bintray.com/kategory/maven/kategory/_latestVersion)
 [![Build Status](https://travis-ci.org/kategory/kategory.svg?branch=master)](https://travis-ci.org/kategory/kategory/)
 [![Kotlin version badge](https://img.shields.io/badge/kotlin-1.1.51-blue.svg)](http://kotlinlang.org/)
