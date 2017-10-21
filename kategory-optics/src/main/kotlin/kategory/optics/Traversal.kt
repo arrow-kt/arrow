@@ -304,6 +304,11 @@ interface PTraversal<S, T, A, B> {
 
     fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s, f) } }
 
+    fun asFold(): Fold<S, A> = object : Fold<S, A> {
+        override fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R =
+            this@PTraversal.foldMap(M,s, f)
+    }
+
 }
 
 /**
