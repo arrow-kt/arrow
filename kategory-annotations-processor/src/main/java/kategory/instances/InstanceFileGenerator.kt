@@ -5,6 +5,7 @@ import kategory.common.Package
 import kategory.common.utils.ClassOrPackageDataWrapper
 import kategory.common.utils.extractFullName
 import kategory.common.utils.removeBackticks
+import kategory.common.utils.typeConstraints
 import me.eugeniomarletti.kotlin.metadata.modality
 import org.jetbrains.kotlin.serialization.ProtoBuf
 import org.jetbrains.kotlin.serialization.deserialization.TypeTable
@@ -48,25 +49,7 @@ data class Instance(
                 ""
             }
 
-    fun typeConstraints(): String =
-            target.classOrPackageProto.typeParameters.flatMap { typeParameter ->
-                val name = target.classOrPackageProto.nameResolver.getString(typeParameter.name)
-                typeParameter.upperBoundList.map { constraint ->
-                    name to constraint
-                            .extractFullName(target.classOrPackageProto, failOnGeneric = false)
-                            .removeBackticks()
-                }
-            }.let { constraints ->
-                if (constraints.isNotEmpty()) {
-                    constraints.joinToString(
-                            prefix = " where ",
-                            separator = ", ",
-                            transform = { (a, b) -> "$a : $b" }
-                    )
-                } else {
-                    ""
-                }
-            }
+    fun typeConstraints() = target.classOrPackageProto.typeConstraints()
 
     private val abstractFunctions: List<FunctionMapping> =
             getTypeclassReturningFunctions().fold(emptyList(), normalizeOverridenFunctions())
