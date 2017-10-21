@@ -8,7 +8,7 @@ permalink: /docs/optics/setter/
 
 A `Setter` is an optic that can see into a structure and set or modify its focus.
 
-It is a generalisation of `Functor#map`. Given a `Functor<F>` we can apply a function `(A) -> B` to `HK<F, A>` and get `HK<F, B>`. We can think of `HK<F, A>` as a structure `S` that has a focus `A`.
+It is a generalisation of [`Functor#map`](/docs/typeclasses/functor). Given a `Functor<F>` we can apply a function `(A) -> B` to `HK<F, A>` and get `HK<F, B>`. We can think of `HK<F, A>` as a structure `S` that has a focus `A`.
 So given a `PSetter<S, T, A, B>` we can apply a function `(A) -> B` to `S` and get `T`.
 
 - `Functor.map(fa: HK<F, A>, f: (A) -> B) -> HK<F, B>`
@@ -52,7 +52,7 @@ lift(Foo("foo"))
 
 ## Composition
 
-Unlike a regular `set` function a `Setter` composes. Similar to a `Lens` we can compose `Setter`s to focus into nested structures and set or modify a value.
+Unlike a regular `set` function a `Setter` composes. Similar to a [`Lens`](/docs/optics/lens) we can compose `Setter`s to focus into nested structures and set or modify a value.
 
 ```kotlin:ank
 data class Bar(val foo: Foo)
