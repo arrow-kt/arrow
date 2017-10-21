@@ -34,12 +34,12 @@ They allow us to write sequenced code that can be run asynchronously over multip
 
 ### Asynchronous sequences of actions
 
-The general representation of sequenced execution in code is called a `Monad`. This typeclass is a short API for sequencing code, summarised in a single function `flatMap`.
-It takes as a parameter one function to be called after the current operation completes, and that function has to return another `Monad` to continue the operation with.
+The general representation of sequenced execution in code is called a [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}). This typeclass is a short API for sequencing code, summarised in a single function `flatMap`.
+It takes as a parameter one function to be called after the current operation completes, and that function has to return another [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) to continue the operation with.
 A common renaming of `flatMap` is `andThen`. Go to the documentation page to see a deep dive on the Monad API.
 
 With knowledge of flatMap we can write sequential expressions that are ran asynchronously, even over multiple threads.
-Let's see one example using a `Monad` called `IO`, where we fetch from a database the information about the dean of university some student attends:
+Let's see one example using a [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) called [`IO`]({{ '/docs/effects/io' | relative_url }}), where we fetch from a database the information about the dean of university some student attends:
 
 ```kotlin
 val university: IO<University> = 
@@ -61,9 +61,9 @@ Computer science can bring us a construct to get the best of both styles.
 
 This feature is known with multiple names: async/await, coroutines, do notation, for comprehensions...each version contains certain unique points but all derive from the same principles.
 In Kotlin, coroutines (introduced in version 1.1 of the language) make the compiler capable of rewriting seemingly synchronous code intro asynchronous sequences.
-Kategory uses this capability of the compiler to bring you coroutines-like notation to all instances of the `Monad` typeclass.
+Kategory uses this capability of the compiler to bring you coroutines-like notation to all instances of the [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) typeclass.
 
-Every instance of `Monad` contains a method `binding` that receives a suspended function as a parameter.
+Every instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) contains a method `binding` that receives a suspended function as a parameter.
 This functions must return the last element of the sequence of operations.
 `yields()` is a helper function that takes any one value and constructs a correct return.
 Let's see a minimal example.
@@ -78,7 +78,7 @@ IO.monad().binding {
 ```
 
 Anything in the function inside `binding` can be imperative and sequential code that'll be executed when the datatype decides.
-In the case of `IO`, it is immediately run blocking the current thread using `unsafeRunSync()`. Let's expand the example by adding a second operation:
+In the case of [`IO`]({{ '/docs/effects/io' | relative_url }}), it is immediately run blocking the current thread using `unsafeRunSync()`. Let's expand the example by adding a second operation:
 
 ```kotlin
 IO.monad().binding {
@@ -88,7 +88,7 @@ IO.monad().binding {
 // Compiler error: the type of a is IO<Int>, cannot add 1 to it
 ```
 
-This is our first challenge. We've created an instance of IO that'll run a block asynchronously, and we cannot get the value from inside it.
+This is our first challenge. We've created an instance of [`IO`]({{ '/docs/effects/io' | relative_url }}) that'll run a block asynchronously, and we cannot get the value from inside it.
 From the previous snippet the first intuition would be to call `unsafeRunSync()` on `a` to get the value.
 This will block the current thread until the operation completes. What we want is to, instead, run and await until `a` completes before yielding the result.
 For that we have two flavors of the function `bind()`, which is a function only available inside the function passed to `binding()`.
@@ -130,7 +130,7 @@ val university: IO<University> =
   }
 ```
 
-And you can still write your usual imperative code in the binding block, interleaved with code that returns instances of `IO`.
+And you can still write your usual imperative code in the binding block, interleaved with code that returns instances of [`IO`]({{ '/docs/effects/io' | relative_url }}).
 
 ```kotlin
 fun getNLines(path: FilePath, count: Int): IO<List<String>> = 
@@ -149,7 +149,7 @@ While this looks like a great improvement to manually raise errors sometimes you
 
 ### Error handling in comprehensions
 
-While `Monad` represents sequential code, it doesn't account for an existing execution flow pattern: exceptions.
+While [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) represents sequential code, it doesn't account for an existing execution flow pattern: exceptions.
 Exceptions work like old goto that can happen at any point during execution and stop the current block to jump to a catch block.
 
 Let's take a somewhat common mistake and expand on it:
@@ -169,7 +169,7 @@ What would happen if the file contains 0 lines? The chain throws ArithmeticExcep
 This exception goes uncaught and finalizes the program with a crash. Knowing this we understand can do better.
 
 We can do automatic wrapping of unexpected exceptions to return them inside the operation sequence.
-For this purpose, the typeclass `MonadError` was created. It contains a version of comprehensions that automatically wraps exceptions, called `bindingE`.
+For this purpose, the typeclass [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) was created. It contains a version of comprehensions that automatically wraps exceptions, called `bindingE`.
 
 ```kotlin
 fun getLineLengthAverage(path: FilePath): IO<List<String>> = 
@@ -184,7 +184,7 @@ fun getLineLengthAverage(path: FilePath): IO<List<String>> =
 
 With a small change we get handling of exceptions even within the binding block.
 This wrapping works the same way as if we raised an error return from `getFile()` or `readLines()`, shortcircuiting and stopping the sequence early.
-Note that while most datatypes include an instance of `Monad`, `MonadError` is somewhat less common.
+Note that while most datatypes include an instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}), [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) is somewhat less common.
 
 ### What about those threads?
 
@@ -209,8 +209,8 @@ fun getLineLengthAverage(path: FilePath): IO<List<String>> =
 ```
 
 Note that `bindIn()` doesn't assure that the execution will return to the same thread where the binding started, as it depends on the implementation of the datatype.
-This means that for the previous snippet `IO` may calculate count and average on different threads than what `Option` or `Try` would.
+This means that for the previous snippet [`IO`]({{ '/docs/effects/io' | relative_url }}) may calculate count and average on different threads than what [`Option`]({{ '/docs/datatypes/option' | relative_url }}) or [`Try`]({{ '/docs/datatypes/try' | relative_url }}) would.
 
 ### What if I'd like to run multiple operations independently from each other, in a non-sequential way?
 
-You can check the section on the `Applicative Builder` pattern for them!
+You can check the section on the [Applicative Builder]({{ '/docs/patterns/applicativebuilder' | relative_url }}) pattern for them!
