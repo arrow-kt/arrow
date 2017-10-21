@@ -74,7 +74,7 @@ import kategory.effects.*
 
 IO.monad().binding {
   yields(1)
-}.unsafeRunSync()
+}.ev().unsafeRunSync()
 ```
 
 Anything in the function inside `binding` can be imperative and sequential code that'll be executed when the datatype decides.
@@ -84,7 +84,7 @@ In the case of [`IO`]({{ '/docs/effects/io' | relative_url }}), it is immediatel
 IO.monad().binding {
   val a = IO.suspend { 1 }
   yields(a + 1)
-}.unsafeRunSync()
+}.ev().unsafeRunSync()
 // Compiler error: the type of a is IO<Int>, cannot add 1 to it
 ```
 
@@ -97,14 +97,14 @@ For that we have two flavors of the function `bind()`, which is a function only 
 IO.monad().binding {
   val a = IO.suspend { 1 }.bind()
   yields(a + 1)
-}.unsafeRunSync()
+}.ev().unsafeRunSync()
 ```
 
 ```kotlin:ank
 IO.monad().binding {
   val a = bind { IO.suspend { 1 } }
   yields(a + 1)
-}.unsafeRunSync()
+}.ev().unsafeRunSync()
 ```
 
 What `bind()` does is use the rest of the sequential operations as the function you'd normally past to `flatMap`.
@@ -115,7 +115,7 @@ IO.suspend { 1 }
   .flatMap { result ->
     IO.pure(result + 1)
   }
-.unsafeRunSync()
+.ev().unsafeRunSync()
 ```
 
 With this new style we can rewrite our original example of database fetching as:
