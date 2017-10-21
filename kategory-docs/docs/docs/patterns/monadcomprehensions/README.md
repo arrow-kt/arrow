@@ -60,11 +60,13 @@ Computer science can bring us a construct to get the best of both styles.
 ### Comprehensions over coroutines
 
 This feature is known with multiple names: async/await, coroutines, do notation, for comprehensions...each version contains certain unique points but all derive from the same principles.
-In Kotlin, coroutines (introduced in version 1.1 of the language) make the compiler capable of rewriting seemingly synchronous code intro asyncronous sequences.
+In Kotlin, coroutines (introduced in version 1.1 of the language) make the compiler capable of rewriting seemingly synchronous code intro asynchronous sequences.
 Kategory uses this capability of the compiler to bring you coroutines-like notation to all instances of the `Monad` typeclass.
 
 Every instance of `Monad` contains a method `binding` that receives a suspended function as a parameter.
-This functions must return the last element of the sequence of operations. Let's see a minimal example.
+This functions must return the last element of the sequence of operations.
+`yields()` is a helper function that takes any one value and constructs a correct return.
+Let's see a minimal example.
 
 ```kotlin:ank
 import kategory.*
@@ -75,8 +77,8 @@ IO.monad().binding {
 }.unsafeRunSync()
 ```
 
-Anything in the function inside `binding` can be imperative & sequential code that'll be executed when the datatype decides.
-In the case of `IO`, it is immediately run blocking the current thread using `unsafeRunSync()`. Let's expand the example by adding a second operation.
+Anything in the function inside `binding` can be imperative and sequential code that'll be executed when the datatype decides.
+In the case of `IO`, it is immediately run blocking the current thread using `unsafeRunSync()`. Let's expand the example by adding a second operation:
 
 ```kotlin
 IO.monad().binding {
@@ -89,11 +91,18 @@ IO.monad().binding {
 This is our first challenge. We've created an instance of IO that'll run a block asynchronously, and we cannot get the value from inside it.
 From the previous snippet the first intuition would be to call `unsafeRunSync()` on `a` to get the value.
 This will block the current thread until the operation completes. What we want is to, instead, run and await until `a` completes before yielding the result.
-For that we have the `binds()`, which is a function only available inside the function passed to `binding()`.
+For that we have two flavors of the function `bind()`, which is a function only available inside the function passed to `binding()`.
 
 ```kotlin:ank
 IO.monad().binding {
   val a = IO.suspend { 1 }.bind()
+  yields(a + 1)
+}.unsafeRunSync()
+```
+
+```kotlin:ank
+IO.monad().binding {
+  val a = bind { IO.suspend { 1 } }
   yields(a + 1)
 }.unsafeRunSync()
 ```
@@ -114,7 +123,7 @@ With this new style we can rewrite our original example of database fetching as:
 ```kotlin
 val university: IO<University> = 
   IO.monad().binding {
-    val student = getStudentFromDatabase("Bob Roxx").binds()
+    val student = getStudentFromDatabase("Bob Roxx").bind()
     val university = getUniversityFromDatabase(student.universityId).bind()
     val dean = getDeanFromDatabase(university.deanId).bind()
     yields(dean)
@@ -126,8 +135,8 @@ And you can still write your usual imperative code in the binding block, interle
 ```kotlin
 fun getNLines(path: FilePath, count: Int): IO<List<String>> = 
   IO.monad().binding {
-    val file = getFile(path).binds()
-    val lines = file.readLines().binds()
+    val file = getFile(path).bind()
+    val lines = file.readLines().bind()
     if (lines.length < count) {
       IO.raiseError(RuntimeException("File has fewer lines than expected"))
     } else {
@@ -148,8 +157,8 @@ Let's take a somewhat common mistake and expand on it:
 ```kotlin
 fun getLineLengthAverage(path: FilePath): IO<List<String>> = 
   IO.monad().binding {
-    val file = getFile(path).binds()
-    val lines = file.readLines().binds()
+    val file = getFile(path).bind()
+    val lines = file.readLines().bind()
     val count = lines.map { it.length }.foldL(0) { acc, lineLength -> acc + lineLength }
     val average = count / lines.length
     yields(average)
@@ -165,8 +174,8 @@ For this purpose, the typeclass `MonadError` was created. It contains a version 
 ```kotlin
 fun getLineLengthAverage(path: FilePath): IO<List<String>> = 
   IO.monadError().bindingE {
-    val file = getFile(path).binds()
-    val lines = file.readLines().binds()
+    val file = getFile(path).bind()
+    val lines = file.readLines().bind()
     val count = lines.map { it.length }.foldL(0) { acc, lineLength -> acc + lineLength }
     val average = count / lines.length
     yields(average)
