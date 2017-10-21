@@ -13,6 +13,7 @@ The same way the typeclass [`Monad`]({{ '/docs/typeclasses/monad' | relative_url
 Examples of that can run code asynchronously are typically datatypes that can suspend effects, and delay evaluation.
 
 ```kotlin:ank
+import kategory.*
 import kategory.effects.*
 
 IO.asyncContext()
@@ -27,7 +28,7 @@ IO.asyncContext()
 
 Receives a function returning unit with a callback as a parameter.
 The function is responsible of calling the callback once it obtains a result.
-The callback accepts `Either<Throwable, A>` as possible results, where the left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution and the right side is the correct result type.
+The callback accepts `Either<Throwable, A>` as the return, where the left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution and the right side is the completion value of the operation.
 
 ### Syntax
 
