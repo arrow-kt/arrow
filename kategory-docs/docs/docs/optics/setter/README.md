@@ -76,7 +76,7 @@ val barSetter: Setter<Bar, Foo> = Setter { modifyFoo ->
 ### Polymorphic setter
 
 When dealing with polymorphic types we can also have polymorphic setters that allow us to morph the type of the focus.
-Previously we used a `Setter<ListKWKind<Int>, Int>` it was able to morph the `Int` values in the constructed type `ListKW<Int>`.
+Previously when we used a `Setter<ListKWKind<Int>, Int>` it was able to morph the `Int` values in the constructed type `ListKW<Int>`.
 With a `PSetter<ListKWKind<Int>, ListKWKind<String>, Int, String>` we can morph an `Int` value to a `String` value and thus also morph the type from `ListKW<Int>` to `ListKW<String>`.
 
 ```kotlin:ank
