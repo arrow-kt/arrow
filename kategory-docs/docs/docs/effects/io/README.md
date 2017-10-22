@@ -46,7 +46,7 @@ It runs the current IO asynchronously, calling the callback parameter on complet
 ```kotlin:ank
 IO { throw RuntimeException("Boom!") }
   .runAsync { result ->
-    result.fold({ IO { println("Error") } }, { IO { println(it) } })
+    result.fold({ IO { println("Error") } }, { IO { println(it.toString()) } })
   }
 ```
 
@@ -60,7 +60,7 @@ It runs the current IO asynchronously, calling the callback parameter on complet
 ```kotlin:ank
 IO { throw RuntimeException("Boom!") }
   .unsafeRunAsync { result ->
-    result.fold({ println("Error") }, { println(it) })
+    result.fold({ println("Error") }, { println(it.toString()) })
   }
 ```
 
@@ -220,5 +220,5 @@ You can see all the type classes `IO` implements below:
 ```kotlin:ank
 import kategory.debug.*
 
-showInstances<IOHK, Unit>()
+showInstances<IOHK, Throwable>()
 ```

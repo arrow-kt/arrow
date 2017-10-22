@@ -218,5 +218,5 @@ x.getOrElse { 7 }
 ```kotlin:ank
 import kategory.debug.*
 
-showInstances<EitherHK, Unit>()
+showInstances<EitherHK, Throwable>()
 ```
