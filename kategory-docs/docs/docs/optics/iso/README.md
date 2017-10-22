@@ -140,4 +140,6 @@ reverse
 
 ### Laws
 
-Kategory provides [`IsoLaws`](/docs/optics/laws#isolaws) in the form of test cases for internal verification of lawful instances and third party apps creating their own isos.
+Kategory provides [`IsoLaws`][iso_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own isos.
+
+[iso_laws_source]: https://github.com/kategory/kategory/blob/master/kategory-test/src/main/kotlin/kategory/laws/IsoLaws.kt

@@ -82,7 +82,7 @@ In the case of [`IO`]({{ '/docs/effects/io' | relative_url }}), it is immediatel
 
 ```kotlin
 IO.monad().binding {
-  val a = IO.suspend { 1 }
+  val a = IO.invoke { 1 }
   yields(a + 1)
 }.ev().unsafeRunSync()
 // Compiler error: the type of a is IO<Int>, cannot add 1 to it
@@ -95,14 +95,14 @@ For that we have two flavors of the function `bind()`, which is a function only 
 
 ```kotlin:ank
 IO.monad().binding {
-  val a = IO.suspend { 1 }.bind()
+  val a = IO.invoke { 1 }.bind()
   yields(a + 1)
 }.ev().unsafeRunSync()
 ```
 
 ```kotlin:ank
 IO.monad().binding {
-  val a = bind { IO.suspend { 1 } }
+  val a = bind { IO.invoke { 1 } }
   yields(a + 1)
 }.ev().unsafeRunSync()
 ```
@@ -111,7 +111,7 @@ What `bind()` does is use the rest of the sequential operations as the function 
 The equivalent code without using comprehensions would look like:
 
 ```kotlin:ank
-IO.suspend { 1 }
+IO.invoke { 1 }
   .flatMap { result ->
     IO.pure(result + 1)
   }
