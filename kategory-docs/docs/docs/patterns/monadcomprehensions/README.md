@@ -77,7 +77,7 @@ IO.monad().binding {
 }.ev().unsafeRunSync()
 ```
 
-Anything in the function inside `binding` can be imperative and sequential code that'll be executed when the datatype decides.
+Anything in the function inside `binding` can be imperative and sequential code that'll be executed when the data type decides.
 In the case of [`IO`]({{ '/docs/effects/io' | relative_url }}), it is immediately run blocking the current thread using `unsafeRunSync()`. Let's expand the example by adding a second operation:
 
 ```kotlin
@@ -147,7 +147,7 @@ fun getNLines(path: FilePath, count: Int): IO<List<String>> =
 
 While this looks like a great improvement to manually raise errors sometimes you will encounter unexpected behavior and exceptions in seemingly normal code.
 
-### Error handling in comprehensions
+### Error propagation in comprehensions
 
 While [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) represents sequential code, it doesn't account for an existing execution flow pattern: exceptions.
 Exceptions work like old goto that can happen at any point during execution and stop the current block to jump to a catch block.
@@ -166,10 +166,12 @@ fun getLineLengthAverage(path: FilePath): IO<List<String>> =
 ```
 
 What would happen if the file contains 0 lines? The chain throws ArithmeticException with a division by 0!
-This exception goes uncaught and finalizes the program with a crash. Knowing this we understand can do better.
+This exception goes uncaught and finalizes the program with a crash. Knowing this it is obvious we can do better.
 
-We can do automatic wrapping of unexpected exceptions to return them inside the operation sequence.
-For this purpose, the typeclass [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) was created. It contains a version of comprehensions that automatically wraps exceptions, called `bindingE`.
+Our next approach can do automatic wrapping of unexpected exceptions to return them inside the operation sequence.
+For this purpose, the typeclass [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) was created.
+[`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) allows us to raise and recover from errors.
+It also contains a version of comprehensions that automatically wraps exceptions, called `bindingE`.
 
 ```kotlin
 fun getLineLengthAverage(path: FilePath): IO<List<String>> = 
@@ -183,15 +185,16 @@ fun getLineLengthAverage(path: FilePath): IO<List<String>> =
 ```
 
 With a small change we get handling of exceptions even within the binding block.
-This wrapping works the same way as if we raised an error return from `getFile()` or `readLines()`, shortcircuiting and stopping the sequence early.
-Note that while most datatypes include an instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}), [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) is somewhat less common.
+This wrapping works the same way as if we raised an error as the return from `getFile()` or `readLines()`, short-circuiting and stopping the sequence early.
+
+Note that while most data types include an instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}), [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) is somewhat less common.
 
 ### What about those threads?
 
 Kategory uses the same abstraction as coroutines to group threads and other contexts of execution: `CoroutineContext`.
 There are multiple default values and wrappers for common cases in both the standard library, and the extension library [kotlinx.coroutines](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/-coroutine-dispatcher/index.html).
 
-In any `binding()` block there is a helper function `bindIn()` that takes a `CoroutineContext` as a parameter, and has to return an instance of a datatype the same way `binding()` does.
+In any `binding()` block there is a helper function `bindIn()` that takes a `CoroutineContext` as a parameter, and has to return an instance of a data type the same way `binding()` does.
 The function will cause a new coroutine to start on the `CoroutineContext` passed as a parameter to then `bind()` to await for its completion.
 
 ```kotlin
@@ -208,7 +211,7 @@ fun getLineLengthAverage(path: FilePath): IO<List<String>> =
   }
 ```
 
-Note that `bindIn()` doesn't assure that the execution will return to the same thread where the binding started, as it depends on the implementation of the datatype.
+Note that `bindIn()` doesn't assure that the execution will return to the same thread where the binding started, as it depends on the implementation of the data type.
 This means that for the previous snippet [`IO`]({{ '/docs/effects/io' | relative_url }}) may calculate count and average on different threads than what [`Option`]({{ '/docs/datatypes/option' | relative_url }}) or [`Try`]({{ '/docs/datatypes/try' | relative_url }}) would.
 
 ### What if I'd like to run multiple operations independently from each other, in a non-sequential way?
