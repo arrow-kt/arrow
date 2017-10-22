@@ -1,6 +1,7 @@
 package kategory
 
 import io.kotlintest.properties.Gen
+import io.kotlintest.properties.map
 
 inline fun <reified F, A> genApplicative(valueGen: Gen<A>, AP: Applicative<F> = applicative<F>()): Gen<HK<F, A>> =
         object : Gen<HK<F, A>> {
@@ -121,6 +122,9 @@ inline fun <reified E, reified A> genEither(genE: Gen<E>, genA: Gen<A>): Gen<Eit
                     }
         }
 
+inline fun <reified E, reified A> genValidated(genE: Gen<E>, genA: Gen<A>): Gen<Validated<E, A>> =
+        Gen.create { Validated.fromEither(genEither(genE, genA).generate()) }
+
 inline fun <reified A> genTry(genA: Gen<A>, genThrowable: Gen<Throwable> = genThrowable()): Gen<Try<A>> = Gen.create {
     genEither(genThrowable, genA).generate().fold(
             { throwable -> Try.Failure<A>(throwable) },
@@ -133,3 +137,9 @@ fun <A> genNullable(genA: Gen<A>): Gen<A?> =
 
 fun <A> genNonEmptyList(genA: Gen<A>): Gen<NonEmptyList<A>> =
         Gen.create { NonEmptyList(genA.generate(), Gen.list(genA).generate()) }
+
+fun <K, V> genMap(genK: Gen<K>, genV: Gen<V>): Gen<Map<K, V>> =
+        Gen.create { Gen.list(genK).generate().map { it to genV.generate() }.toMap() }
+
+fun <K, V> genMapKW(genK: Gen<K>, genV: Gen<V>): Gen<MapKW<K, V>> =
+        Gen.create { Gen.list(genK).generate().map { it to genV.generate() }.toMap().k() }
