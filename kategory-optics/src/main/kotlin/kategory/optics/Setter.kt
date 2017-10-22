@@ -12,7 +12,7 @@ import kategory.functor
 typealias Setter<S, A> = PSetter<S, S, A, A>
 
 /**
- * A [Setter] is an optic that allows you to see into a structure and set or modify its target.
+ * A [Setter] is an optic that allows to see into a structure and set or modify its focus.
  *
  * A (polymorphic) [PSetter] is useful when setting or modifying a value for a constructed type
  * i.e. PSetter<List<Int>, List<String>, Int, String>
@@ -100,7 +100,7 @@ interface PSetter<S, T, A, B> {
     infix fun <C, D> compose(other: PIso<A, B, C, D>): PSetter<S, T, C, D> = compose(other.asSetter())
 
     /**
-     * Compose a [PSetter] with a [PIso]
+     * Compose a [PSetter] with a [PTraversal]
      */
     infix fun <C, D> compose(other: PTraversal<A, B, C, D>): PSetter<S, T, C, D> = compose(other.asSetter())
 
@@ -119,4 +119,11 @@ interface PSetter<S, T, A, B> {
 
     operator fun <C, D> plus(o: PTraversal<A, B, C, D>): PSetter<S, T, C, D> = compose(o)
 
+}
+
+/**
+ * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
+ */
+inline fun <S, T, A, B> PSetter<S, T, A, B>.lift(crossinline f: (A) -> B): (S) -> T = { s ->
+    modify(s) { f(it) }
 }
