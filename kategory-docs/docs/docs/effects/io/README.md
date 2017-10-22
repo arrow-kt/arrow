@@ -64,7 +64,7 @@ IO { throw RuntimeException("Boom!") }
   }
 ```
 
-### unsafeRunSyncTimed
+### unsafeRunTimed
 
 To be use with SEVERE CAUTION, it runs IO synchronously and returns an `Option<A>` blocking the current thread. It requires a timeout parameter.
 If the any non-blocking operation performed inside IO lasts longer than the timeout, `unsafeRunSyncTimed` returns `Option.None`.
@@ -78,13 +78,13 @@ If your multithreaded program halts and never completes, this function call is a
 ```kotlin:ank
 IO { throw RuntimeException("Boom!") }
   .attempt()
-  .unsafeRunSyncTimed(100.milliseconds)
+  .unsafeRunTimed(100.milliseconds)
 ```
 
 ```kotlin:ank
 IO.runAsync { }
   .attempt()
-  .unsafeRunSyncTimed(100.milliseconds)
+  .unsafeRunTimed(100.milliseconds)
 ```
 
 ### unsafeRunSync
