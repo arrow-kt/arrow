@@ -22,15 +22,13 @@ class IsosFileGenerator(
                         }
                     }
 
-    private fun processElement(iso: AnnotatedOptic): Pair<String, String> {
-        return iso.sourceName to """
+    private fun processElement(iso: AnnotatedOptic): Pair<String, String> = iso.sourceName to """
             |package ${iso.classData.`package`.escapedClassName}
             |
             |fun ${iso.sourceName}Iso(): kategory.optics.Iso<${iso.sourceClassName}, ${focusType(iso)}> = Iso(
             |        get = { ${iso.sourceName}: ${iso.sourceClassName} -> ${getFunction(iso)} },
             |        reverseGet = { ${reverseGetFunction(iso)} }
             |)""".trimMargin()
-    }
 
     private fun getFunction(iso: AnnotatedOptic) =
             if (iso.hasTupleFocus) tupleConstructor(iso)
