@@ -106,4 +106,6 @@ lifted(Try.Failure<Tuple2<Int, String>>(IllegalStateException("something went wr
 
 ### Laws
 
-Kategory provides [`OptionalLaws`](/docs/optics/laws#optionallaws) in the form of test cases for internal verification of lawful instances and third party apps creating their own prisms.
+Kategory provides [`OptionalLaws`][optional_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own optionals.
+
+[optional_laws_source]: https://github.com/kategory/kategory/blob/master/kategory-test/src/main/kotlin/kategory/laws/OptionalLaws.kt

@@ -54,6 +54,12 @@ class SetterTest : UnitSpec() {
             })
         }
 
+        "Lifting a function should yield the same result as direct modify" {
+            forAll(TokenGen, Gen.string(), { token, value ->
+                tokenSetter.modify(token) { value } == tokenSetter.lift { value }(token)
+            })
+        }
+
     }
 
 }

@@ -156,5 +156,7 @@ liftSuccess(Try.Failure<Int>(ArithmeticException("/ by zero")))
 
 ### Laws
 
-Kategory provides [`PrismLaws`](/docs/optics/laws#prismlaws) in the form of test cases for internal verification of lawful instances and third party apps creating their own prisms.
+Kategory provides [`PrismLaws`][prism_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own prisms.
+
+[prism_laws_source]: https://github.com/kategory/kategory/blob/master/kategory-test/src/main/kotlin/kategory/laws/PrismLaws.kt
 
