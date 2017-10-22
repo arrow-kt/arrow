@@ -90,6 +90,23 @@ val tupleIsoPair: Iso<Tuple2<Int, Int>, Pair<Int, Int>> = Iso(
 
 By composing `pointIsoTuple`, `pairIsoCoord` and `tupleIsoPair` (and/or reversing) we can use `Point2D`, `Tuple2<Int, Int>`, `Pair<Int, Int>` and `Coord` interchangeably as we can lift functions to the required structure.
 
+Composing an `Iso` with functions can also be useful to change input or output type of a function. In the `Iso<A?, Option<A>>` is available in `kategory-optics` as `nullableToOption()`.
+
+```kotlin
+val unknownCode: (String) -> String? = { value ->
+    "unkown $value"
+}
+
+val nullableOptionIso: Iso<String?, Option<String>> = nullableToOption()
+(unknownCode andThen nullableOptionIso::get)("Retrieve an Option")
+```
+
+`Iso` can be composed with all optics and composition them results in the following optics.
+
+|   | Iso | Lens | Prism |Optional | Getter | Setter | Fold | Traversal |
+| --- | --- | --- | --- |--- | --- | --- | --- | --- |
+| Iso | Iso | Lens | Prism | Optional | Getter | Setter | Fold | Traversal |
+
 ### Generating isos
 
 To avoid boilerplate, isos can be generated for a `data class` to `TupleN` with 2 to 10 parameters by the `@isos` annotation. The `Iso` will be generated in the same package as the `data class` and will be named `classnameIso()`.
@@ -123,4 +140,6 @@ reverse
 
 ### Laws
 
-Kategory provides [`IsoLaws`](/docs/optics/laws#isolaws) in the form of test cases for internal verification of lawful instances and third party apps creating their own isos.
+Kategory provides [`IsoLaws`][iso_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own isos.
+
+[iso_laws_source]: https://github.com/kategory/kategory/blob/master/kategory-test/src/main/kotlin/kategory/laws/IsoLaws.kt

@@ -122,25 +122,25 @@ Kategory already provides Applicative instances for most common datatypes both i
 The following datatypes in Kategory provide instances that adhere to the `Applicative` typeclass.
 
 - [Either]({{ '/docs/datatypes/either' | relative_url }})
-- [EitherT]({{ '/docs/datatypes/eitherT' | relative_url }})
-- [FreeApplicative]({{ '/docs/datatypes/FreeApplicative' | relative_url }})
-- [Function1]({{ '/docs/datatypes/Function1' | relative_url }})
-- [Ior]({{ '/docs/datatypes/Ior' | relative_url }})
-- [Kleisli]({{ '/docs/datatypes/Kleisli' | relative_url }})
-- [OptionT]({{ '/docs/datatypes/OptionT' | relative_url }})
-- [StateT]({{ '/docs/datatypes/StateT' | relative_url }})
-- [Validated]({{ '/docs/datatypes/Validated' | relative_url }})
-- [WriterT]({{ '/docs/datatypes/WriterT' | relative_url }})
-- [Const]({{ '/docs/datatypes/Const' | relative_url }})
-- [Try]({{ '/docs/datatypes/Try' | relative_url }})
-- [Eval]({{ '/docs/datatypes/Eval' | relative_url }})
-- [IO]({{ '/docs/datatypes/IO' | relative_url }})
-- [NonEmptyList]({{ '/docs/datatypes/NonEmptyList' | relative_url }})
-- [Id]({{ '/docs/datatypes/Id' | relative_url }})
-- [Function0]({{ '/docs/datatypes/Function0' | relative_url }})
+- [EitherT]({{ '/docs/datatypes/eithert' | relative_url }})
+- [FreeApplicative]({{ '/docs/datatypes/freeapplicative' | relative_url }})
+- [Function1]({{ '/docs/datatypes/function1' | relative_url }})
+- [Ior]({{ '/docs/datatypes/ior' | relative_url }})
+- [Kleisli]({{ '/docs/datatypes/kleisli' | relative_url }})
+- [OptionT]({{ '/docs/datatypes/optiont' | relative_url }})
+- [StateT]({{ '/docs/datatypes/statet' | relative_url }})
+- [Validated]({{ '/docs/datatypes/validated' | relative_url }})
+- [WriterT]({{ '/docs/datatypes/writert' | relative_url }})
+- [Const]({{ '/docs/datatypes/const' | relative_url }})
+- [Try]({{ '/docs/datatypes/try' | relative_url }})
+- [Eval]({{ '/docs/datatypes/eval' | relative_url }})
+- [IO]({{ '/docs/effects/IO' | relative_url }})
+- [NonEmptyList]({{ '/docs/datatypes/nonemptylist' | relative_url }})
+- [Id]({{ '/docs/datatypes/id' | relative_url }})
+- [Function0]({{ '/docs/datatypes/function0' | relative_url }})
 
 Additionally all instances of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) and their MTL variants implement the `Applicative` typeclass directly
-since they are all subtypes of `Applicative`
+since they are all subtypes of `Applicative`.
 
 [applicative_source]: https://github.com/kategory/kategory/blob/master/kategory-core/src/main/kotlin/kategory/typeclasses/Applicative.kt
 [applicative_law_source]: https://github.com/kategory/kategory/blob/master/kategory-test/src/main/kotlin/kategory/laws/ApplicativeLaws.kt

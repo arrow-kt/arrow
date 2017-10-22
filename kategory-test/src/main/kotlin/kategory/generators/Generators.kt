@@ -80,3 +80,16 @@ inline fun <reified E, reified A> genEither(genE: Gen<E>, genA: Gen<A>): Gen<Eit
                         }
                     }
         }
+
+inline fun <reified A> genTry(genA: Gen<A>, genThrowable: Gen<Throwable> = genThrowable()): Gen<Try<A>> = Gen.create {
+    genEither(genThrowable, genA).generate().fold(
+            { throwable ->  Try.Failure<A>(throwable) },
+            { a -> Try.Success(a) }
+    )
+}
+
+fun <A> genNullable(genA: Gen<A>): Gen<A?> =
+        Gen.oneOf(genA, Gen.create { null })
+
+fun <A> genNonEmptyList(genA: Gen<A>): Gen<NonEmptyList<A>> =
+        Gen.create { NonEmptyList(genA.generate(), Gen.list(genA).generate()) }

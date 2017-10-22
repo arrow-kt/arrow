@@ -53,7 +53,7 @@ Compares two values for inequality
 
 ### Laws
 
-Kategory provides [`EqLaws`](/docs/typeclasses/laws#eqlaws) in the form of test cases for internal verification of lawful instances and third party apps creating their own `Eq` instances.
+Kategory provides [`EqLaws`]({{ '/docs/typeclasses/laws#eqlaws' | relative_url }}) in the form of test cases for internal verification of lawful instances and third party apps creating their own `Eq` instances.
 
 #### Creating your own `Eq` instances
 
@@ -71,14 +71,14 @@ Eq.any().eqv(Option.Some(1), Option.pure(1))
 Eq.any().eqv(Eval.later{ 1 }, Eval.later{ 1 })
 ```
 
-See [Deriving and creating custom typeclass](/kategory/docs/typeclasses) to provide your own `Eq` instances for custom datatypes.
+See [Deriving and creating custom typeclass]({{ '/kategory/docs/typeclasses | relative_url }}) to provide your own `Eq` instances for custom datatypes.
 
 ### Data types
 
 The following datatypes in Kategory provide instances that adhere to the `Eq` typeclass.
 
-- [Free](/docs/datatypes/free)
-- [FreeApplicative](/docs/datatypes/FreeApplicative)
+- [Free]({{ '/docs/datatypes/free' | relative_url }})
+- [FreeApplicative]({{ '/docs/datatypes/FreeApplicative' | relative_url }})
 
-Additionally all instances of [`Order`](/docs/_docs/typeclasses/order) and their MTL variants implement the `Eq` typeclass directly
+Additionally all instances of [`Order`]({{ '/docs/typeclasses/order' | relative_url }}) and their MTL variants implement the `Eq` typeclass directly
 since they are all subtypes of `Eq`

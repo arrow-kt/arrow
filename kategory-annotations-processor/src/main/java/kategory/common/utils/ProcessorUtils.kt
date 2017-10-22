@@ -97,3 +97,23 @@ fun ProtoBuf.Type.extractFullName(
         outputTypeAlias = outputTypeAlias,
         throwOnGeneric = if (!failOnGeneric) null else KnownException("Generic $implicitAnnotationName types are not yet supported", null)
     )
+
+fun ClassOrPackageDataWrapper.typeConstraints(): String =
+        typeParameters.flatMap { typeParameter ->
+            val name = nameResolver.getString(typeParameter.name)
+            typeParameter.upperBoundList.map { constraint ->
+                name to constraint
+                        .extractFullName(this, failOnGeneric = false)
+                        .removeBackticks()
+            }
+        }.let { constraints ->
+            if (constraints.isNotEmpty()) {
+                constraints.joinToString(
+                        prefix = " where ",
+                        separator = ", ",
+                        transform = { (a, b) -> "$a : $b" }
+                )
+            } else {
+                ""
+            }
+        }
