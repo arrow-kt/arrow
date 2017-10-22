@@ -228,8 +228,8 @@ class IOTest : UnitSpec() {
         }
 
         "unsafeRunTimed times out with None result" {
-            val io = IO.runAsync<Int> { }
-            val result = io.unsafeRunTimed(100.milliseconds)
+            val never = IO.runAsync<Int> { }
+            val result = never.unsafeRunTimed(100.milliseconds)
             result shouldBe Option.None
         }
 
