@@ -3,6 +3,7 @@ package kategory.data
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import kategory.*
+import kategory.laws.EqLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -21,6 +22,7 @@ class SequenceKWTest : UnitSpec() {
             monoidK<SequenceKWHK>() shouldNotBe null
             semigroup<SequenceKW<Int>>() shouldNotBe null
             monoid<SequenceKW<Int>>() shouldNotBe null
+            eq<SequenceKW<Int>>() shouldNotBe null
         }
 
         val eq: Eq<HK<SequenceKWHK, Int>> = object : Eq<HK<SequenceKWHK, Int>> {
@@ -31,5 +33,6 @@ class SequenceKWTest : UnitSpec() {
         testLaws(MonadLaws.laws(SequenceKW.monad(), eq))
         testLaws(MonoidKLaws.laws(SequenceKW.monoidK(), applicative, eq))
         testLaws(TraverseLaws.laws(SequenceKW.traverse(), applicative, { n: Int -> SequenceKW(sequenceOf(n)) }, eq))
+        testLaws(EqLaws.laws { sequenceOf(it).k() })
     }
 }
