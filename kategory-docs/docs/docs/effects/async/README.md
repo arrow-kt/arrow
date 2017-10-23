@@ -30,19 +30,69 @@ Receives a function returning unit with a callback as a parameter.
 The function is responsible of calling the callback once it obtains a result.
 The callback accepts `Either<Throwable, A>` as the return, where the left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution and the right side is the completion value of the operation.
 
+```kotlin
+IO.asyncContext()
+  .runAsync { callback: (Either<Throwable, Int>) -> Unit -> 
+    userFetcherWithCallback("1").startAsync({ user: User ->
+      callback(user.left())
+    }, { error: Exception ->
+      callback(error.right())
+    })
+  }
+```
+
+```kotlin
+IO.asyncContext()
+  .runAsync { callback: (Either<Throwable, Int>) -> Unit -> 
+    userFromDatabaseObservable().subscribe({ user: User ->
+      callback(user.left())
+    }, { error: Exception ->
+      callback(error.right())
+    })
+  }
+```
+
 ### Syntax
 
 #### (() -> A)#runAsync
 
 Runs the current function in the AsyncContext passed as a parameter.
 
-Note that there is no automatic error handling or wrapping of exceptions.
+Note that error handling or wrapping of exceptions depends on the implementation.
+
+```kotlin
+{ fibonacci(100) }.runAsync(ObservableKW.asyncContext())
+```
+
+```kotlin
+{ fibonacci(100) }.runAsync(IO.asyncContext())
+```
+
+```kotlin:ank
+{ throw RuntimeException("Boom") }
+  .runAsync(IO.asyncContext())
+  .ev().attempt().unsafeRunSync()
+```
 
 #### (() -> Either<Throwable, A>)#runAsyncUnsafe
 
 Runs the current function in the AsyncContext passed as a parameter.
 
 While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution.
+
+```kotlin
+{ fibonacci(100).left() }.runAsync(ObservableKW.asyncContext())
+```
+
+```kotlin
+{ fibonacci(100).left() }.runAsync(IO.asyncContext())
+```
+
+```kotlin:ank
+{ RuntimeException("Boom").right() }
+  .runAsync(IO.asyncContext())
+  .ev().attempt().unsafeRunSync()
+```
 
 #### binding#bindAsync
 
@@ -51,12 +101,33 @@ and then awaits for the result before continuing the execution.
 
 Note that there is no automatic error handling or wrapping of exceptions.
 
+```kotlin
+IO.monad().binding {
+  val a = bindAsync(IO.asyncContext()) { fibonacci(100) }
+  yields(a + 1)
+}.ev().unsafeRunSync()
+```
+
 #### binding#bindAsyncUnsafe
 
 While in a binding block of a Monadic Comprehension, bindAsync runs a function parameter in the AsyncContext passed as a parameter,
 and then awaits for the result before continuing the execution.
 
 While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution.
+
+```kotlin
+IO.monad().binding {
+  val a = bindAsync(IO.asyncContext()) { fibonacci(100).left() }
+  yields(a + 1)
+}.ev().unsafeRunSync()
+```
+
+```kotlin
+IO.monad().binding {
+  val a = bindAsync(IO.asyncContext()) { RuntimeException("Boom").right() }
+  yields(a + 1)
+}.ev().unsafeRunSync()
+```
 
 ### Laws
 
