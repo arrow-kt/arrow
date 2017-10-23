@@ -199,7 +199,7 @@ private fun reifyRawParameterizedType(carrier: InstanceParametrizedType, classif
             InstanceParametrizedType(classifier.rawType, listOf(carrier.actualTypeArguments[index + 1]))
         } else if (classifier.actualTypeArguments.any { it is TypeVariable<*> }) {
             val nestedTypes = resolveNestedTypes(carrier.actualTypeArguments.toList())
-            InstanceParametrizedType(classifier.rawType, nestedTypes)
+            InstanceParametrizedType(classifier.rawType, listOf(nestedTypes[index]))
         } else {
             InstanceParametrizedType(classifier, classifier.actualTypeArguments.filterNotNull())
         }
