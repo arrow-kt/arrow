@@ -19,7 +19,14 @@ import kategory.effects.*
 IO.asyncContext()
   .runAsync { callback: (Either<Throwable, Int>) -> Unit -> 
     callback(1.right()) 
-  }
+  }.ev().attempt().unsafeRunSync()
+```
+
+```kotlin:ank
+IO.asyncContext()
+  .runAsync { callback: (Either<Throwable, Int>) -> Unit -> 
+    callback(RuntimeException().left()) 
+  }.ev().attempt().unsafeRunSync()
 ```
 
 ### Main Combinators
@@ -52,11 +59,15 @@ IO.asyncContext()
   }
 ```
 
-### Syntax
+### Syntax inside Monad Comprehensions
+
+All the syntax functions are geared towards using `AsyncContext` inside [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }})
+to create blocks of code to be run asynchronously.
 
 #### (() -> A)#runAsync
 
-Runs the current function in the AsyncContext passed as a parameter.
+Runs the current function in the AsyncContext passed as a parameter. It doesn't await for its result.
+Use `bind()` on the return, or the alias `bindAsync()`.
 
 Note that error handling or wrapping of exceptions depends on the implementation.
 
@@ -68,7 +79,7 @@ Note that error handling or wrapping of exceptions depends on the implementation
 { fibonacci(100) }.runAsync(IO.asyncContext())
 ```
 
-```kotlin:ank
+```kotlin
 { throw RuntimeException("Boom") }
   .runAsync(IO.asyncContext())
   .ev().attempt().unsafeRunSync()
@@ -76,7 +87,8 @@ Note that error handling or wrapping of exceptions depends on the implementation
 
 #### (() -> Either<Throwable, A>)#runAsyncUnsafe
 
-Runs the current function in the AsyncContext passed as a parameter.
+Runs the current function in the AsyncContext passed as a parameter. It doesn't await for its result.
+Use `bind()` on the return, or the alias `bindAsyncUnsafe()`.
 
 While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution.
 
@@ -88,7 +100,7 @@ While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/d
 { fibonacci(100).left() }.runAsync(IO.asyncContext())
 ```
 
-```kotlin:ank
+```kotlin
 { RuntimeException("Boom").right() }
   .runAsync(IO.asyncContext())
   .ev().attempt().unsafeRunSync()
@@ -96,7 +108,7 @@ While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/d
 
 #### binding#bindAsync
 
-While in a binding block of a Monadic Comprehension, bindAsync runs a function parameter in the AsyncContext passed as a parameter,
+Runs a function parameter in the AsyncContext passed as a parameter,
 and then awaits for the result before continuing the execution.
 
 Note that there is no automatic error handling or wrapping of exceptions.
@@ -110,7 +122,7 @@ IO.monad().binding {
 
 #### binding#bindAsyncUnsafe
 
-While in a binding block of a Monadic Comprehension, bindAsync runs a function parameter in the AsyncContext passed as a parameter,
+Runs a function parameter in the AsyncContext passed as a parameter,
 and then awaits for the result before continuing the execution.
 
 While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution.
