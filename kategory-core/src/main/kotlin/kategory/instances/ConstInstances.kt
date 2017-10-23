@@ -61,3 +61,12 @@ interface ConstTraverseFilterInstance<X> : ConstTraverseInstance<X>, TraverseFil
     override fun <G, A, B> traverseFilter(fa: ConstKind<X, A>, f: (A) -> HK<G, Option<B>>, GA: Applicative<G>): HK<G, ConstKind<X, B>> =
             fa.ev().traverseFilter(f, GA)
 }
+
+@instance(Const::class)
+interface ConstEqInstance<A, T> : Eq<Const<A, T>> {
+
+    fun EQ(): Eq<A>
+
+    override fun eqv(a: Const<A, T>, b: Const<A, T>): Boolean =
+            EQ().eqv(a.value, b.value)
+}
