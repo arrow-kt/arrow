@@ -56,3 +56,22 @@ interface ValidatedSemigroupKInstance<E> : SemigroupK<ValidatedKindPartial<E>> {
             x.ev().combineK(y, SE())
 
 }
+
+@instance(Validated::class)
+interface ValidatedEqInstance<L, R> : Eq<Validated<L, R>> {
+
+    fun EQL(): Eq<L>
+
+    fun EQR(): Eq<R>
+
+    override fun eqv(a: Validated<L, R>, b: Validated<L, R>): Boolean = when (a) {
+        is Validated.Valid -> when (b) {
+            is Validated.Invalid -> false
+            is Validated.Valid -> EQR().eqv(a.a, b.a)
+        }
+        is Validated.Invalid -> when (b) {
+            is Validated.Invalid -> EQL().eqv(a.e, b.e)
+            is Validated.Valid -> false
+        }
+    }
+}

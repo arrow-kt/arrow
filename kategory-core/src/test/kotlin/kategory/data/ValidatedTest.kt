@@ -6,6 +6,7 @@ import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import kategory.Validated.Invalid
 import kategory.Validated.Valid
+import kategory.laws.EqLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -19,6 +20,7 @@ class ValidatedTest : UnitSpec() {
             foldable<ValidatedKindPartial<String>>() shouldNotBe null
             traverse<ValidatedKindPartial<String>>() shouldNotBe null
             applicativeError<ValidatedKindPartial<String>, String>() shouldNotBe null
+            eq<Validated<String, Int>>() shouldNotBe null
         }
 
         testLaws(ApplicativeLaws.laws(Validated.applicative(StringMonoidInstance), Eq.any()))
@@ -27,6 +29,8 @@ class ValidatedTest : UnitSpec() {
                 Validated.semigroupK(IntMonoid),
                 Validated.applicative(IntMonoid),
                 Eq.any()))
+
+        testLaws(EqLaws.laws { it.valid<String, Int>() })
 
         "fold should call function on Invalid" {
             val exception = Exception("My Exception")
