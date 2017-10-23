@@ -12,12 +12,11 @@ permalink: /docs/
 KΛTEGORY is a library for Typed Functional Programming in Kotlin.
 It includes the most popular data types, type classes and abstractions such as `Option`, `Try`, `Either`, `IO`, `Functor`, `Applicative`, `Monad` and many more empowering users to define pure FP apps and libraries built atop higher order abstractions. Use the below list to learn more about KΛTEGORY's main features.
 
-- [Documentation](http://kategory.io)
-- [Patterns](http://kategory.io/docs/patterns/error_handling/)
-- [Type classes](http://kategory.io/docs/typeclasses/functor/)
-- [Data types](http://kategory.io/docs/datatypes/option/)
-- [Effects](http://kategory.io/docs/effects/io/)
-- [Optics](http://kategory.io/docs/optics/iso/)
+- [Patterns](http://kategory.io/docs/patterns/error_handling/): approaches to day-to-day challenges using FP 
+- [Type classes](http://kategory.io/docs/typeclasses/functor/): defining behaviors for data
+- [Data types](http://kategory.io/docs/datatypes/option/): common abstractions
+- [Effects](http://kategory.io/docs/effects/io/): interfacing with external systems
+- [Optics](http://kategory.io/docs/optics/iso/): examining and modifying data structures
 
 # Basic Setup
 
