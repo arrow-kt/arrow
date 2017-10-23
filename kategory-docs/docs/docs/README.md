@@ -16,7 +16,7 @@ It includes the most popular data types, type classes and abstractions such as `
 - [Type classes](http://kategory.io/docs/typeclasses/functor/): defining behaviors for data
 - [Data types](http://kategory.io/docs/datatypes/option/): common abstractions
 - [Effects](http://kategory.io/docs/effects/io/): interfacing with external systems
-- [Optics](http://kategory.io/docs/optics/iso/): examining and modifying data structures
+- [Optics](http://kategory.io/docs/optics/iso/): inspecting and modifying data structures
 
 # Basic Setup
 
