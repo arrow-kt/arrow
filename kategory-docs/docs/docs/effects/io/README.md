@@ -32,7 +32,7 @@ Running this new IO will work over its result, rather than on the original IO co
 import kategory.*
 import kategory.effects.*
 
-IO { throw RuntimeException() }
+IO<Int> { throw RuntimeException() }
   .attempt()
 ```
 
@@ -44,7 +44,7 @@ All exceptions that would happen on the function parameter are automatically cap
 It runs the current IO asynchronously, calling the callback parameter on completion and returning its result.
 
 ```kotlin:ank
-IO { throw RuntimeException("Boom!") }
+IO<Int> { throw RuntimeException("Boom!") }
   .runAsync { result ->
     result.fold({ IO { println("Error") } }, { IO { println(it.toString()) } })
   }
@@ -58,7 +58,7 @@ This callback is assumed to never throw any internal exceptions.
 It runs the current IO asynchronously, calling the callback parameter on completion.
 
 ```kotlin:ank
-IO { throw RuntimeException("Boom!") }
+IO<Int> { throw RuntimeException("Boom!") }
   .unsafeRunAsync { result ->
     result.fold({ println("Error") }, { println(it.toString()) })
   }
@@ -76,13 +76,13 @@ If your multithreaded program deadlocks, this function call is a good suspect.
 If your multithreaded program halts and never completes, this function call is a good suspect.
 
 ```kotlin:ank
-IO { throw RuntimeException("Boom!") }
+IO<Int> { throw RuntimeException("Boom!") }
   .attempt()
   .unsafeRunTimed(100.milliseconds)
 ```
 
 ```kotlin:ank
-IO.runAsync { }
+IO.runAsync<Int> { }
   .attempt()
   .unsafeRunTimed(100.milliseconds)
 ```
@@ -98,7 +98,7 @@ If your multithreaded program deadlocks, this function call is a good suspect.
 If your multithreaded program halts and never completes, this function call is a good suspect.
 
 ```kotlin:ank
-IO { throw RuntimeException("Boom!") }
+IO<Int> { throw RuntimeException("Boom!") }
   .attempt()
   .unsafeRunSync()
 ```
@@ -128,7 +128,7 @@ IO.pure(1)
 Used to notify of errors during execution. It creates an IO that returns an existing exception.
 
 ```kotlin:ank
-IO.raiseError(RuntimeException("Boom!"))
+IO.raiseError<Int>(RuntimeException("Boom!"))
   .attempt()
   .unsafeRunSync()
 ```
@@ -145,7 +145,7 @@ IO { 1 }
 ```
 
 ```kotlin:ank
-IO { throw RuntimeException("Boom!") }
+IO<Int> { throw RuntimeException("Boom!") }
   .attempt()
   .unsafeRunSync()
 ```
@@ -184,7 +184,7 @@ It requires a function that provides a callback parameter and it expects for the
 The callback parameter has to be invoked with an `Either<Throwable, A>` once the other framework has completed its execution.
 
 ```kotlin:ank
-IO.runAsync { callback ->
+IO.runAsync<Int> { callback ->
     callback(1.right())
 }
   .attempt()
@@ -192,7 +192,7 @@ IO.runAsync { callback ->
 ```
 
 ```kotlin:ank
-IO.runAsync { callback ->
+IO.runAsync<Int> { callback ->
     callback(RuntimeException("Boom").left())
 }
   .attempt()
