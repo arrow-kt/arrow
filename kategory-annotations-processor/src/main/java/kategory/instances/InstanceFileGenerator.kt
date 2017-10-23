@@ -194,7 +194,7 @@ class InstanceFileGenerator(
     private fun genCompanionReifiedExtensions(i: Instance): String =
             """|
                 |inline fun ${i.expandedTypeArgs(reified = true)} ${i.receiverTypeName}.Companion.${i.companionFactoryName}(${i.args.map {
-                "${it.first}: ${it.second} = ${it.second.split(".").map { it.decapitalize() }.joinToString(".")}()"
+                "${it.first}: ${it.second} = ${it.second.substringBefore("<").split(".").map { it.decapitalize() }.joinToString(".")}<${it.second.substringAfter("<")}()"
             }.joinToString(", ")
             }): ${i.name}${i.expandedTypeArgs()}${i.typeConstraints()} =
                 |  ${i.implicitObjectName}.instance(${i.args.map { it.first }.joinToString(", ")})

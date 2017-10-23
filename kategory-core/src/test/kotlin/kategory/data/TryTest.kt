@@ -5,6 +5,7 @@ import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import kategory.Try.Failure
 import kategory.Try.Success
+import kategory.laws.EqLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -19,10 +20,12 @@ class TryTest : UnitSpec() {
             foldable<TryHK>() shouldNotBe null
             traverse<TryHK>() shouldNotBe null
             monadError<TryHK, Throwable>() shouldNotBe null
+            eq<Try<Int>>() shouldNotBe null
         }
 
         testLaws(MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()))
         testLaws(TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any()))
+        testLaws(EqLaws.laws { Try { it } })
 
         "invoke of any should be success" {
             Try.invoke { 1 } shouldBe Success(1)

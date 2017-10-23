@@ -32,7 +32,6 @@ class EitherTest : UnitSpec() {
         testLaws(TraverseLaws.laws(Either.traverse<Throwable>(), Either.applicative(), { it.right() }, Eq.any()))
         testLaws(SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ))
         testLaws(EqLaws.laws(eq<Either<String, Int>>(), { it.right() }))
-        testLaws(EqLaws.laws(eq<Either<String, Int>>(), { it.toString().left() }))
 
         "getOrElse should return value" {
             forAll { a: Int, b: Int ->
