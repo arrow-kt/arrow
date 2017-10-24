@@ -28,10 +28,7 @@ Note that IO objects can be run multiple times, and depending on how they are co
 Executes and defers the result into a new IO that has captured any exceptions inside `Either<Throwable, A>`.
 Running this new IO will work over its result, rather than on the original IO content where `attempt()` was called on.
 
-```kotlin:ank
-import kategory.*
-import kategory.effects.*
-
+```kotlin
 IO<Int> { throw RuntimeException() }
   .attempt()
 ```
@@ -75,13 +72,13 @@ If your multithreaded program deadlocks, this function call is a good suspect.
 
 If your multithreaded program halts and never completes, this function call is a good suspect.
 
-```kotlin:ank
+```kotlin
 IO<Int> { throw RuntimeException("Boom!") }
   .attempt()
   .unsafeRunTimed(100.milliseconds)
 ```
 
-```kotlin:ank
+```kotlin
 IO.runAsync<Int> { }
   .attempt()
   .unsafeRunTimed(100.milliseconds)
@@ -98,13 +95,13 @@ If your multithreaded program deadlocks, this function call is a good suspect.
 
 If your multithreaded program halts and never completes, this function call is a good suspect.
 
-```kotlin:ank
+```kotlin
 IO<Int> { throw RuntimeException("Boom!") }
   .attempt()
   .unsafeRunSync()
 ```
 
-```kotlin:ank
+```kotlin
 IO { 1 }
   .attempt()
   .unsafeRunSync()
@@ -119,7 +116,7 @@ Understanding the constructors is key to mastering IO.
 
 Used to wrap single values. It creates an IO that returns an existing value.
 
-```kotlin:ank
+```kotlin
 IO.pure(1)
   .unsafeRunSync()
 ```
@@ -128,7 +125,7 @@ IO.pure(1)
 
 Used to notify of errors during execution. It creates an IO that returns an existing exception.
 
-```kotlin:ank
+```kotlin
 IO.raiseError<Int>(RuntimeException("Boom!"))
   .attempt()
   .unsafeRunSync()
@@ -140,12 +137,12 @@ Generally used to wrap existing blocking functions. Creates an IO that invokes o
 
 Note that this function is evaluated every time IO is run.
 
-```kotlin:ank
+```kotlin
 IO { 1 }
   .unsafeRunSync()
 ```
 
-```kotlin:ank
+```kotlin
 IO<Int> { throw RuntimeException("Boom!") }
   .attempt()
   .unsafeRunSync()
@@ -155,13 +152,13 @@ IO<Int> { throw RuntimeException("Boom!") }
 
 Commonly used to aggregate the results of multiple independent blocking functions. Creates an IO that invokes 2-10 functions when run. Their results are accumulated on a TupleN, where N is the size.
 
-```kotlin:ank
+```kotlin
 IO.merge ({ 1 }, { 2 }, { 3 })
   .attempt()
   .unsafeRunSync()
 ```
 
-```kotlin:ank
+```kotlin
 IO.merge ({ 1 }, { 2 }, { throw RuntimeException("Boom!") })
   .attempt()
   .unsafeRunSync()
@@ -171,7 +168,7 @@ IO.merge ({ 1 }, { 2 }, { throw RuntimeException("Boom!") })
 
 Used to defer the evaluation of an existing IO.
 
-```kotlin:ank
+```kotlin
 IO.suspend { IO.pure(1) }
   .attempt()
   .unsafeRunSync()
@@ -184,7 +181,7 @@ Mainly used to integrate with existing frameworks that have asynchronous calls.
 It requires a function that provides a callback parameter and it expects for the user to start an operation using the other framework.
 The callback parameter has to be invoked with an `Either<Throwable, A>` once the other framework has completed its execution.
 
-```kotlin:ank
+```kotlin
 IO.runAsync<Int> { callback ->
     callback(1.right())
 }
@@ -192,7 +189,7 @@ IO.runAsync<Int> { callback ->
   .unsafeRunSync()
 ```
 
-```kotlin:ank
+```kotlin
 IO.runAsync<Int> { callback ->
     callback(RuntimeException("Boom").left())
 }
@@ -206,7 +203,7 @@ IO.runAsync<Int> { callback ->
 
 Puts the value `A` inside an `IO<A>` using `pure`.
 
-```kotlin:ank
+```kotlin
 1.liftIO()
   .attempt()
   .unsafeRunSync()
@@ -219,6 +216,8 @@ IO implements all the operators common to all instances of `MonadError`. Those i
 You can see all the type classes `IO` implements below:
 
 ```kotlin:ank
+import kategory.*
+import kategory.effects.*
 import kategory.debug.*
 
 showInstances<IOHK, Throwable>()
