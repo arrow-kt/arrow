@@ -40,7 +40,7 @@ interface OptionEqInstance<A> : Eq<Option<A>> {
             is None -> false
             is Some -> EQ().eqv(a.value, b.value)
         }
-        is None -> when(b) {
+        is None -> when (b) {
             is None -> true
             is Some -> false
         }
