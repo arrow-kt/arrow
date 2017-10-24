@@ -2,7 +2,6 @@ package kategory
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
-import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kategory.Either.Left
 import kategory.Either.Right
