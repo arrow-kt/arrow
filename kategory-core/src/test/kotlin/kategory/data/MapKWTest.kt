@@ -5,15 +5,11 @@ import io.kotlintest.matchers.should
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
+import kategory.laws.EqLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class MapKWTest : UnitSpec() {
-
-    val EQ: Eq<MapKWKind<String, Int>> = object : Eq<MapKWKind<String, Int>> {
-        override fun eqv(a: MapKWKind<String, Int>, b: MapKWKind<String, Int>): Boolean =
-                a.ev()["key"] == b.ev()["key"]
-    }
 
     val SG: Semigroup<Int> = object : Semigroup<Int> {
         override fun combine(a: Int, b: Int): Int =
@@ -28,6 +24,7 @@ class MapKWTest : UnitSpec() {
             traverse<MapKWHK>() shouldNotBe null
             semigroup<MapKWKind<String, Int>>() shouldNotBe null
             monoid<MapKWKind<String, Int>>() shouldNotBe null
+            eq<MapKW<String, Int>>() shouldNotBe null
         }
 
         val monoid = MapKW.monoid<String, Int>(SG)
@@ -56,6 +53,7 @@ class MapKWTest : UnitSpec() {
             }
         }
 
-        testLaws(TraverseLaws.laws(MapKW.traverse<String>(), MapKW.traverse<String>(), { a: Int -> mapOf<String, Int>("key" to a).k() }, EQ))
+        testLaws(EqLaws.laws { mapOf(it.toString() to it).k() })
+        testLaws(TraverseLaws.laws(MapKW.traverse<String>(), MapKW.traverse<String>(), { a: Int -> mapOf<String, Int>("key" to a).k() }))
     }
 }
