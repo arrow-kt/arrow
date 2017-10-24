@@ -15,7 +15,7 @@ class IOTest : UnitSpec() {
     }
 
     init {
-        //testLaws(AsyncLaws.laws(IO.asyncContext(), IO.monadError(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(IO.asyncContext(), IO.monadError(), EQ(), EQ()))
 
         "instances can be resolved implicitly" {
             functor<IOHK>() shouldNotBe null
