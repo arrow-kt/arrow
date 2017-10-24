@@ -214,6 +214,9 @@ IO.monad().binding {
       }
     yields(average)
   }
+  .ev()
+  .attempt()
+  .unsafeRunSync()
 ```
 
 ## Syntax
