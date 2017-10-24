@@ -11,7 +11,7 @@ env:
   - secure: "JyKk0p8vaccCHVSqWL+oCBCn/AG7WOZgMolGBbSsZQkOgbflISV+CBgo2WpewyompaLtkeeRhy5acGgAekVfUhkMwTK79De5U0eKPCAuHhSq8wYbwr3M++e9wAaOz9K0P3H48OZnILfgptTk082Lb+/YeANvlze+u++Fkk5S5D4N3Ofs9V7RZqo4rNMjwidGDJ5aMhTElfdb/31DirFMWBVe6mzwHeUUxFzzVk50yVVGRKpX2FKcrgfey/q7IbbEOZC1TwWMpfyjmTRWkkdkZyCsiX6Kzbxwa/o5CoQ5VP38Mddx9wRPoE4OItsw7tV7bP/nfebuRTXgoVsBUDEJbBPPEW3Gf4BopJUFhDnJy8eZrjP6VXk7g084KTEfTUSKlyBqKOdkUEa6N6kabWwJE4Bkn7+7MqAOC92BININEdgX+2l3Xx6261g7bw0SXDnk4oepm309MvvrPuCWzys7N2gUnjiGow1MqmIjgHHqCfwS0ZWP5GJKO9B5YkRqJAzByyxPV82tZgFPOnpyFALUDnZjCW+2UaX1zoFNDMU+kRdVRfVIncAQLxrlxznTecb/oM2cdWM6PLgWAz9adeWBr/X7Abknmbb6BXSXpppe+uF1r1yAgo5jUEW34jQfbqGK5ptf5NmhFN2x2JdrtqSIrVVhs/KXOlTsN3VogDop92M="
 
 script:
-  - ./gradlew clean build :kategory-docs:runAnk
+  - travis_wait 30 ./gradlew clean build :kategory-docs:runAnk
   - ./gradlew codeCoverageReport
 
 after_success:
