@@ -49,3 +49,30 @@ interface IorTraverseInstance<L> : IorFoldableInstance<L>, Traverse<IorKindParti
             fa.ev().traverse(f, GA)
 
 }
+
+@instance(Ior::class)
+interface IorEqInstance<L, R> : Eq<Ior<L, R>> {
+
+    fun EQL(): Eq<L>
+
+    fun EQR(): Eq<R>
+
+    override fun eqv(a: Ior<L, R>, b: Ior<L, R>): Boolean = when (a) {
+        is Ior.Left -> when (b) {
+            is Ior.Both -> false
+            is Ior.Right -> false
+            is Ior.Left -> EQL().eqv(a.value, b.value)
+        }
+        is Ior.Both -> when (b) {
+            is Ior.Left -> false
+            is Ior.Both -> EQL().eqv(a.leftValue, b.leftValue) && EQR().eqv(a.rightValue, b.rightValue)
+            is Ior.Right -> false
+        }
+        is Ior.Right -> when (b) {
+            is Ior.Left -> false
+            is Ior.Both -> false
+            is Ior.Right -> EQR().eqv(a.value, b.value)
+        }
+
+    }
+}

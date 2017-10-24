@@ -6,7 +6,7 @@ interface EitherFunctorInstance<L> : Functor<EitherKindPartial<L>> {
 }
 
 @instance(Either::class)
-interface EitherApplicativeInstance<L> : EitherFunctorInstance<L> , Applicative<EitherKindPartial<L>> {
+interface EitherApplicativeInstance<L> : EitherFunctorInstance<L>, Applicative<EitherKindPartial<L>> {
 
     override fun <A> pure(a: A): Either<L, A> = Either.Right(a)
 
@@ -66,3 +66,22 @@ interface EitherSemigroupKInstance<L> : SemigroupK<EitherKindPartial<L>> {
             x.ev().combineK(y)
 }
 
+@instance(Either::class)
+interface EitherEqInstance<L, R> : Eq<Either<L, R>> {
+
+    fun EQL(): Eq<L>
+
+    fun EQR(): Eq<R>
+
+    override fun eqv(a: Either<L, R>, b: Either<L, R>): Boolean = when (a) {
+        is Either.Left -> when (b) {
+            is Either.Left -> EQL().eqv(a.a, b.a)
+            is Either.Right -> false
+        }
+        is Either.Right -> when (b) {
+            is Either.Left -> false
+            is Either.Right -> EQR().eqv(a.b, b.b)
+        }
+    }
+
+}
