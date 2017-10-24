@@ -6,27 +6,27 @@ permalink: /docs/effects/io/
 
 ## IO
 
-IO is the most common data type used to represent side-effects in functional languages.
-This means IO is the data type of choice when interacting with the external environment: databases, network, operative systems, files...
+`IO` is the most common data type used to represent side-effects in functional languages.
+This means`IO`is the data type of choice when interacting with the external environment: databases, network, operative systems, files...
 
-IO is used to represent operations that can be executed lazily and are capable of failing, generally with exceptions.
-This means that code wrapped inside IO will not throw exceptions until it is run, and those exceptions can be captured inside IO for the user to check.
+`IO` is used to represent operations that can be executed lazily and are capable of failing, generally with exceptions.
+This means that code wrapped inside`IO`will not throw exceptions until it is run, and those exceptions can be captured inside`IO`for the user to check.
 
-The first challenge for someone new to effects with IO is evaluating its result. Given that IO is used to wrap operations with the environment, 
+The first challenge for someone new to effects with`IO`is evaluating its result. Given that`IO`is used to wrap operations with the environment, 
 the return value after completion is commonly used in another part of the program.
-Coming from an OOP background the simplest way to use the return value of IO is to consider it as an asynchronous operation you can register a callback for.
+Coming from an OOP background the simplest way to use the return value of`IO`is to consider it as an asynchronous operation you can register a callback for.
 
 ## Running IO
 
-IO objects can be constructed passing them functions that will not be immediately called. This is called lazy evaluation.
-Running in this context means evaluating the content of an IO object, and propagating its result in a synchronous, asynchronous, or deferred way.
+`IO` objects can be constructed passing them functions that will not be immediately called. This is called lazy evaluation.
+Running in this context means evaluating the content of an`IO`object, and propagating its result in a synchronous, asynchronous, or deferred way.
 
-Note that IO objects can be run multiple times, and depending on how they are constructed they will evaluate its content again every time they're run.
+Note that`IO`objects can be run multiple times, and depending on how they are constructed they will evaluate its content again every time they're run.
 
 ### attempt
 
-Executes and defers the result into a new IO that has captured any exceptions inside `Either<Throwable, A>`.
-Running this new IO will work over its result, rather than on the original IO content where `attempt()` was called on.
+Executes and defers the result into a new`IO`that has captured any exceptions inside `Either<Throwable, A>`.
+Running this new`IO`will work over its result, rather than on the original`IO`content where `attempt()` was called on.
 
 ```kotlin
 IO<Int> { throw RuntimeException() }
@@ -38,12 +38,12 @@ IO<Int> { throw RuntimeException() }
 Takes as a parameter a callback from a result of `Either<Throwable, A>` to a new `IO<Unit>` instance.
 All exceptions that would happen on the function parameter are automatically captured and propagated to the `IO<Unit>` return.
 
-It runs the current IO asynchronously, calling the callback parameter on completion and returning its result.
+It runs the current`IO`asynchronously, calling the callback parameter on completion and returning its result.
 
 ```kotlin
 IO<Int> { throw RuntimeException("Boom!") }
   .runAsync { result ->
-    result.fold({ IO { println("Error") } }, { IO { println(it.toString()) } })
+    result.fold({`IO`{ println("Error") } }, {`IO`{ println(it.toString()) } })
   }
 ```
 
@@ -52,7 +52,7 @@ IO<Int> { throw RuntimeException("Boom!") }
 Takes as a parameter a callback from a result of `Either<Throwable, A>`.
 This callback is assumed to never throw any internal exceptions.
 
-It runs the current IO asynchronously, calling the callback parameter on completion.
+It runs the current`IO`asynchronously, calling the callback parameter on completion.
 
 ```kotlin
 IO<Int> { throw RuntimeException("Boom!") }
@@ -63,8 +63,8 @@ IO<Int> { throw RuntimeException("Boom!") }
 
 ### unsafeRunTimed
 
-To be use with SEVERE CAUTION, it runs IO synchronously and returns an `Option<A>` blocking the current thread. It requires a timeout parameter.
-If the any non-blocking operation performed inside IO lasts longer than the timeout, `unsafeRunSyncTimed` returns `Option.None`.
+To be use with SEVERE CAUTION, it runs`IO`synchronously and returns an `Option<A>` blocking the current thread. It requires a timeout parameter.
+If the any non-blocking operation performed inside`IO`lasts longer than the timeout, `unsafeRunSyncTimed` returns `Option.None`.
 
 If your program has crashed, this function call is a good suspect. To avoid crashing use `attempt()` first.
 
@@ -86,7 +86,7 @@ IO.runAsync<Int> { }
 
 ### unsafeRunSync
 
-To be use with SEVERE CAUTION, it runs IO synchronously and returning its result blocking the current thread.
+To be use with SEVERE CAUTION, it runs`IO`synchronously and returning its result blocking the current thread.
 It generally should be used only for examples & tests.
 
 If your program has crashed, this function call is a good suspect. To avoid crashing use `attempt()` first.
@@ -109,12 +109,12 @@ IO { 1 }
 
 ## Constructors
 
-As we have seen above, the way of constructing an IO affects its behavior when run multiple times.
+As we have seen above, the way of constructing an`IO`affects its behavior when run multiple times.
 Understanding the constructors is key to mastering IO.
 
 ### pure
 
-Used to wrap single values. It creates an IO that returns an existing value.
+Used to wrap single values. It creates an`IO`that returns an existing value.
 
 ```kotlin
 IO.pure(1)
@@ -123,7 +123,7 @@ IO.pure(1)
 
 ### raiseError
 
-Used to notify of errors during execution. It creates an IO that returns an existing exception.
+Used to notify of errors during execution. It creates an`IO`that returns an existing exception.
 
 ```kotlin
 IO.raiseError<Int>(RuntimeException("Boom!"))
@@ -133,9 +133,9 @@ IO.raiseError<Int>(RuntimeException("Boom!"))
 
 ### invoke
 
-Generally used to wrap existing blocking functions. Creates an IO that invokes one lambda function when run.
+Generally used to wrap existing blocking functions. Creates an`IO`that invokes one lambda function when run.
 
-Note that this function is evaluated every time IO is run.
+Note that this function is evaluated every time`IO`is run.
 
 ```kotlin
 IO { 1 }
@@ -150,7 +150,7 @@ IO<Int> { throw RuntimeException("Boom!") }
 
 ### merge
 
-Commonly used to aggregate the results of multiple independent blocking functions. Creates an IO that invokes 2-10 functions when run. Their results are accumulated on a TupleN, where N is the size.
+Commonly used to aggregate the results of multiple independent blocking functions. Creates an`IO`that invokes 2-10 functions when run. Their results are accumulated on a TupleN, where N is the size.
 
 ```kotlin
 IO.merge ({ 1 }, { 2 }, { 3 })
@@ -195,6 +195,25 @@ IO.runAsync<Int> { callback ->
 }
   .attempt()
   .unsafeRunSync()
+```
+
+## Effect Comprehensions
+
+IO is usually best paired with [comprehensions]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) to get a cleaner syntax.
+
+```kotlin
+IO.monad().binding {
+    val file = getFile("/tmp/file.txt").bind()
+    val lines = file.readLines().bind()
+    val average = 
+      if (lines.isEmpty()) {
+        0
+      } else {
+        val count = lines.map { it.length }.foldL(0) { acc, lineLength -> acc + lineLength }
+        count / lines.length
+      }
+    yields(average)
+  }
 ```
 
 ## Syntax
