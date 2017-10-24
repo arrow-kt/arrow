@@ -29,3 +29,21 @@ interface OptionMonadErrorInstance : OptionMonadInstance, MonadError<OptionHK, U
 
     override fun <A> handleErrorWith(fa: OptionKind<A>, f: (Unit) -> OptionKind<A>): Option<A> = fa.ev().orElse({ f(Unit).ev() })
 }
+
+@instance(Option::class)
+interface OptionEqInstance<A> : Eq<Option<A>> {
+
+    fun EQ(): Eq<A>
+
+    override fun eqv(a: Option<A>, b: Option<A>): Boolean = when (a) {
+        is Some -> when (b) {
+            is None -> false
+            is Some -> EQ().eqv(a.value, b.value)
+        }
+        is None -> when (b) {
+            is None -> true
+            is Some -> false
+        }
+    }
+
+}

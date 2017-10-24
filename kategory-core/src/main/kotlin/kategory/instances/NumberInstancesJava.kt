@@ -30,6 +30,10 @@ object LongOrderInstanceImplicits {
     @JvmStatic fun instance(): LongOrderInstance = LongOrderInstance
 }
 
+object LongEqInstanceImplicits {
+    @JvmStatic fun instance(): LongEqInstance = LongEqInstance
+}
+
 object ShortMonoidInstanceImplicits {
     @JvmStatic fun instance(): ShortMonoid = ShortMonoid
 }
@@ -40,6 +44,10 @@ object ShortSemigroupInstanceImplicits {
 
 object ShortOrderInstanceImplicits {
     @JvmStatic fun instance(): ShortOrderInstance = ShortOrderInstance
+}
+
+object ShortEqInstanceImplicits {
+    @JvmStatic fun instance(): ShortEqInstance = ShortEqInstance
 }
 
 object ByteMonoidInstanceImplicits {
@@ -54,6 +62,10 @@ object ByteOrderInstanceImplicits {
     @JvmStatic fun instance(): ByteOrderInstance = ByteOrderInstance
 }
 
+object ByteEqInstanceImplicits {
+    @JvmStatic fun instance(): ByteEqInstance = ByteEqInstance
+}
+
 object DoubleMonoidInstanceImplicits {
     @JvmStatic fun instance(): DoubleMonoid = DoubleMonoid
 }
@@ -66,6 +78,10 @@ object DoubleOrderInstanceImplicits {
     @JvmStatic fun instance(): DoubleOrderInstance = DoubleOrderInstance
 }
 
+object DoubleEqInstanceImplicits {
+    @JvmStatic fun instance(): DoubleEqInstance = DoubleEqInstance
+}
+
 object FloatMonoidInstanceImplicits {
     @JvmStatic fun instance(): FloatMonoid = FloatMonoid
 }
@@ -76,4 +92,8 @@ object FloatSemigroupInstanceImplicits {
 
 object FloatOrderInstanceImplicits {
     @JvmStatic fun instance(): FloatOrderInstance = FloatOrderInstance
+}
+
+object FloatEqInstanceImplicits {
+    @JvmStatic fun instance(): FloatEqInstance = FloatEqInstance
 }

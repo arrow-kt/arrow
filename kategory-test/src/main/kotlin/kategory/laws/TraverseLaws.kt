@@ -28,7 +28,7 @@ object TraverseLaws {
         )
     */
 
-    inline fun <reified F> laws(TF: Traverse<F> = traverse<F>(), FF: Functor<F> = functor<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): List<Law> =
+    inline fun <reified F> laws(TF: Traverse<F> = traverse<F>(), FF: Functor<F> = functor<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>> = eq()): List<Law> =
             FoldableLaws.laws(TF, cf, eq<Int>()) + FunctorLaws.laws(FF, cf, EQ) + listOf(
                     Law("Traverse Laws: Identity", { identityTraverse(TF, FF, cf, EQ) }),
                     Law("Traverse Laws: Sequential composition", { sequentialComposition(TF, cf, EQ) }),
