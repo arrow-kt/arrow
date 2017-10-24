@@ -43,7 +43,7 @@ All exceptions that would happen on the function parameter are automatically cap
 
 It runs the current IO asynchronously, calling the callback parameter on completion and returning its result.
 
-```kotlin:ank
+```kotlin
 IO<Int> { throw RuntimeException("Boom!") }
   .runAsync { result ->
     result.fold({ IO { println("Error") } }, { IO { println(it.toString()) } })
@@ -57,7 +57,7 @@ This callback is assumed to never throw any internal exceptions.
 
 It runs the current IO asynchronously, calling the callback parameter on completion.
 
-```kotlin:ank
+```kotlin
 IO<Int> { throw RuntimeException("Boom!") }
   .unsafeRunAsync { result ->
     result.fold({ println("Error") }, { println(it.toString()) })
@@ -90,6 +90,7 @@ IO.runAsync<Int> { }
 ### unsafeRunSync
 
 To be use with SEVERE CAUTION, it runs IO synchronously and returning its result blocking the current thread.
+It generally should be used only for examples & tests.
 
 If your program has crashed, this function call is a good suspect. To avoid crashing use `attempt()` first.
 
