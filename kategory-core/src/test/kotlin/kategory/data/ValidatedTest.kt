@@ -23,6 +23,7 @@ class ValidatedTest : UnitSpec() {
             eq<Validated<String, Int>>() shouldNotBe null
         }
 
+        testLaws(EqLaws.laws { it.valid<String, Int>() })
         testLaws(ApplicativeLaws.laws(Validated.applicative(StringMonoidInstance), Eq.any()))
         testLaws(TraverseLaws.laws(Validated.traverse(), Validated.applicative(StringMonoidInstance), ::Valid, Eq.any()))
         testLaws(SemigroupKLaws.laws(
@@ -30,7 +31,6 @@ class ValidatedTest : UnitSpec() {
                 Validated.applicative(IntMonoid),
                 Eq.any()))
 
-        testLaws(EqLaws.laws { it.valid<String, Int>() })
 
         "fold should call function on Invalid" {
             val exception = Exception("My Exception")

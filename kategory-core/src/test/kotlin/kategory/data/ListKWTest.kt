@@ -27,10 +27,10 @@ class ListKWTest : UnitSpec() {
             eq<ListKW<Int>>() shouldNotBe null
         }
 
+        testLaws(EqLaws.laws { listOf(it).k() })
         testLaws(SemigroupKLaws.laws(ListKW.semigroupK(), applicative, Eq.any()))
         testLaws(MonoidKLaws.laws(ListKW.monoidK(), applicative, Eq.any()))
         testLaws(TraverseLaws.laws(ListKW.traverse(), applicative, { n: Int -> ListKW(listOf(n)) }, Eq.any()))
-        testLaws(EqLaws.laws { listOf(it).k() })
 
         testLaws(MonadCombineLaws.laws(ListKW.monadCombine(),
                 { n -> ListKW(listOf(n)) },

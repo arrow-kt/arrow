@@ -26,6 +26,7 @@ class NonEmptyListTest : UnitSpec() {
 
         val applicative = NonEmptyList.applicative()
 
+        testLaws(EqLaws.laws { it.nel() })
         testLaws(MonadLaws.laws(NonEmptyList.monad(), Eq.any()))
         testLaws(SemigroupKLaws.laws(
                 NonEmptyList.semigroupK(),
@@ -33,7 +34,6 @@ class NonEmptyListTest : UnitSpec() {
                 Eq.any()))
         testLaws(ComonadLaws.laws(NonEmptyList.comonad(), { NonEmptyList.of(it) }, Eq.any()))
         testLaws(TraverseLaws.laws(NonEmptyList.traverse(), applicative, { n: Int -> NonEmptyList.of(n) }, Eq.any()))
-        testLaws(EqLaws.laws { it.nel() })
 
     }
 }

@@ -25,9 +25,9 @@ class IorTest : UnitSpec() {
 
         val intIorMonad: Monad<IorKindPartial<Int>> = monad()
 
+        testLaws(EqLaws.laws(eq<Ior<String, Int>>(), { it.rightIor() }))
         testLaws(MonadLaws.laws(intIorMonad, Eq.any()))
         testLaws(TraverseLaws.laws(Ior.traverse(), Ior.applicative<Int>(), ::Right, Eq.any()))
-        testLaws(EqLaws.laws(eq<Ior<String, Int>>(), { it.rightIor() }))
 
         "bimap() should allow modify both value" {
             forAll { a: Int, b: String ->

@@ -53,7 +53,7 @@ class MapKWTest : UnitSpec() {
             }
         }
 
-        testLaws(TraverseLaws.laws(MapKW.traverse<String>(), MapKW.traverse<String>(), { a: Int -> mapOf<String, Int>("key" to a).k() }))
         testLaws(EqLaws.laws { mapOf(it.toString() to it).k() })
+        testLaws(TraverseLaws.laws(MapKW.traverse<String>(), MapKW.traverse<String>(), { a: Int -> mapOf<String, Int>("key" to a).k() }))
     }
 }

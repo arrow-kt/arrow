@@ -30,9 +30,9 @@ class SequenceKWTest : UnitSpec() {
                     a.toList() == b.toList()
         }
 
+        testLaws(EqLaws.laws { sequenceOf(it).k() })
         testLaws(MonadLaws.laws(SequenceKW.monad(), eq))
         testLaws(MonoidKLaws.laws(SequenceKW.monoidK(), applicative, eq))
         testLaws(TraverseLaws.laws(SequenceKW.traverse(), applicative, { n: Int -> SequenceKW(sequenceOf(n)) }, eq))
-        testLaws(EqLaws.laws { sequenceOf(it).k() })
     }
 }
