@@ -3,9 +3,11 @@ package kategory
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
+import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kategory.Option.None
 import kategory.Option.Some
+import kategory.laws.EqLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -23,6 +25,7 @@ class OptionTest : UnitSpec() {
             semigroup<Option<Int>>() shouldNotBe null
             monoid<Option<Int>>() shouldNotBe null
             monadError<OptionHK, Unit>() shouldNotBe null
+            eq<Option<Int>>() shouldNotBe null
         }
 
         val EQ_EITHER: Eq<HK<OptionHK, Either<Unit, Int>>> = Eq { a, b ->
@@ -39,6 +42,7 @@ class OptionTest : UnitSpec() {
                             })
         }
 
+        testLaws(EqLaws.laws(eq(), { genOption(Gen.int()).generate() }))
         //testLaws(MonadErrorLaws.laws(monadError<OptionHK, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
         testLaws(TraverseFilterLaws.laws(Option.traverseFilter(), Option.monad(), ::Some, Eq.any()))
         testLaws(MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()))

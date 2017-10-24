@@ -2,6 +2,7 @@ package kategory
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
+import kategory.laws.EqLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -23,8 +24,10 @@ class ListKWTest : UnitSpec() {
             monadCombine<ListKW<ListKWHK>>() shouldNotBe null
             functorFilter<ListKW<ListKWHK>>() shouldNotBe null
             monadFilter<ListKW<ListKWHK>>() shouldNotBe null
+            eq<ListKW<Int>>() shouldNotBe null
         }
 
+        testLaws(EqLaws.laws { listOf(it).k() })
         testLaws(SemigroupKLaws.laws(ListKW.semigroupK(), applicative, Eq.any()))
         testLaws(MonoidKLaws.laws(ListKW.monoidK(), applicative, Eq.any()))
         testLaws(TraverseLaws.laws(ListKW.traverse(), applicative, { n: Int -> ListKW(listOf(n)) }, Eq.any()))
