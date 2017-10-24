@@ -92,8 +92,8 @@ class OptikalProcessor : AbstractProcessor() {
         (element.kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isDataClass == true -> {
             val properties = getConstructorTypesNames(element).zip(getConstructorParamNames(element), ::Target)
 
-            if (properties.size < 2 || properties.size > 10)
-                knownError("${element.enclosingElement}.${element.simpleName} constructor parameters should be between 2 and 10")
+            if (properties.size > 10)
+                knownError("${element.enclosingElement}.${element.simpleName} up to 10 constructor parameters is supported")
             else
                 AnnotatedOptic(element as TypeElement, getClassData(element), properties)
         }
