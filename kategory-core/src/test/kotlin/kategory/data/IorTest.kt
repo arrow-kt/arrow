@@ -5,6 +5,7 @@ import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
 import kategory.Ior.Right
+import kategory.laws.EqLaws
 import org.junit.runner.RunWith
 
 
@@ -19,10 +20,12 @@ class IorTest : UnitSpec() {
             monad<IorKindPartial<Int>>() shouldNotBe null
             foldable<IorKindPartial<Int>>() shouldNotBe null
             traverse<IorKindPartial<Int>>() shouldNotBe null
+            eq<Ior<String, Int>>() shouldNotBe null
         }
 
         val intIorMonad: Monad<IorKindPartial<Int>> = monad()
 
+        testLaws(EqLaws.laws(eq<Ior<String, Int>>(), { it.rightIor() }))
         testLaws(MonadLaws.laws(intIorMonad, Eq.any()))
         testLaws(TraverseLaws.laws(Ior.traverse(), Ior.applicative<Int>(), ::Right, Eq.any()))
 

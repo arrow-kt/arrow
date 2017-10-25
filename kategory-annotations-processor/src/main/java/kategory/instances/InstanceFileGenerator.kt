@@ -185,7 +185,7 @@ class InstanceFileGenerator(
             """|
                 |fun ${i.expandedTypeArgs(reified = false)} ${i.receiverTypeName}.Companion.${i.companionFactoryName}(${(i.args.map {
                 "${it.first}: ${it.second}"
-            } + (if (i.args.isNotEmpty()) listOf("dummy: Unit = Unit") else emptyList())).joinToString(", ")
+            } + (if (i.args.isNotEmpty()) listOf("dummy: kotlin.Unit = kotlin.Unit") else emptyList())).joinToString(", ")
             }): ${i.name}${i.expandedTypeArgs()}${i.typeConstraints()} =
                 |  ${i.implicitObjectName}.instance(${i.args.map { it.first }.joinToString(", ")})
                 |
@@ -194,11 +194,14 @@ class InstanceFileGenerator(
     private fun genCompanionReifiedExtensions(i: Instance): String =
             """|
                 |inline fun ${i.expandedTypeArgs(reified = true)} ${i.receiverTypeName}.Companion.${i.companionFactoryName}(${i.args.map {
-                "${it.first}: ${it.second} = ${it.second.split(".").map { it.decapitalize() }.joinToString(".")}()"
+                "${it.first}: ${it.second} = ${classToTypeclassMethodCall(it.second)}"
             }.joinToString(", ")
             }): ${i.name}${i.expandedTypeArgs()}${i.typeConstraints()} =
                 |  ${i.implicitObjectName}.instance(${i.args.map { it.first }.joinToString(", ")})
                 |
                 |""".trimMargin()
+
+    private fun classToTypeclassMethodCall(typeclassWGenerics: String): String =
+            "${typeclassWGenerics.substringBefore("<").split(".").map { it.decapitalize() }.joinToString(".")}<${typeclassWGenerics.substringAfter("<")}()"
 
 }

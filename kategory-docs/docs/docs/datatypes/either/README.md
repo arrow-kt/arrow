@@ -212,3 +212,11 @@ x.contains(7)
 val x = "hello".left()
 x.getOrElse { 7 }
 ```
+
+## Instances
+
+```kotlin:ank
+import kategory.debug.*
+
+showInstances<EitherHK, Throwable>()
+```

@@ -9,7 +9,6 @@ import kategory.Tuple6
 import kategory.Tuple7
 import kategory.Tuple8
 import kategory.Tuple9
-import kategory.plus
 import kategory.toT
 
 /**

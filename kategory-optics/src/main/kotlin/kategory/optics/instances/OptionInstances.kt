@@ -1,5 +1,6 @@
 package kategory.optics
 
+import kategory.Either
 import kategory.Option
 import kategory.identity
 import kategory.left
@@ -40,3 +41,10 @@ fun <A> nonePrism(): Prism<Option<A>, Unit> = Prism(
         getOrModify = { option -> option.fold({ Unit.right() }, { it.some().left() }) },
         reverseGet = { _ -> none() }
 )
+
+fun <A, B> pOptionToEither(): PIso<Option<A>, Option<B>, Either<Unit, A>, Either<Unit, B>> = PIso(
+        get = { opt -> opt.fold({ Unit.left() }, { a -> a.right() }) },
+        reverseGet = { either -> either.fold({ none() }, { b -> b.some() }) }
+)
+
+fun <A> optionToEither(): Iso<Option<A>, Either<Unit, A>> = pOptionToEither()

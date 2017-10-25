@@ -9,3 +9,8 @@ object StringMonoidInstanceImplicits {
 object StringSemigroupInstanceImplicits {
     @JvmStatic fun instance(): StringSemigroupInstance = StringSemigroupInstance
 }
+
+object StringEqInstanceImplicits {
+    @JvmStatic
+    fun instance(): StringEqInstance = StringEqInstance
+}
