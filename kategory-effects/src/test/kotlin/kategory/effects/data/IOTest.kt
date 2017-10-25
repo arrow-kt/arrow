@@ -218,6 +218,21 @@ class IOTest : UnitSpec() {
             run shouldBe expected
         }
 
+        "invoke is called on every run call" {
+            val sideEffect = SideEffect()
+            val io = IO { sideEffect.increment(); 1 }
+            io.unsafeRunSync()
+            io.unsafeRunSync()
+
+            sideEffect.counter shouldBe 2
+        }
+
+        "unsafeRunTimed times out with None result" {
+            val never = IO.runAsync<Int> { }
+            val result = never.unsafeRunTimed(100.milliseconds)
+            result shouldBe Option.None
+        }
+
         "IO.binding should for comprehend over IO" {
             val result = IO.monad().binding {
                 val x = IO.pure(1).bind()
