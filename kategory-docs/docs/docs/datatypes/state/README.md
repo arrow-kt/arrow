@@ -10,7 +10,7 @@ permalink: /docs/datatypes/state/
 
 ## Stack
 
-Let's build a simple Stack using an immutable data structure like Kotlin's `List`:
+Let's build a simple Stack using Kategory's NonEmptyList and Option:
 
 ```kotlin:ank:silent
 import kategory.*
