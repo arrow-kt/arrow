@@ -115,7 +115,7 @@ Available Instances:
 ```kotlin:ank
 import kategory.debug.*
 
-showInstances<StateHK, Unit>()
+showInstances<StateTHK, Unit>()
 ```
 
 # Credits
