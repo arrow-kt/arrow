@@ -32,6 +32,7 @@ To wrap any existing Observable in its Kategory Wrapper counterpart you can use 
 ```kotlin:ank
 import kategory.effects.*
 import io.reactivex.*
+import io.reactivex.subjects.*
 
 val obs = Observable.fromArray(1, 2, 3, 4, 5).k()
 obs
