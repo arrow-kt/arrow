@@ -30,15 +30,15 @@ The largest quality of life improvement when using Observables in Kategory is th
 To wrap any existing Observable in its Kategory Wrapper counterpart you can use the extension function `k()`.
 
 ```kotlin:ank
-import kategory.effects.rx2.*
+import kategory.effects.*
 import io.reactivex.*
 
-val obs = Observable.from(1, 2, 3, 4, 5).k()
+val obs = Observable.fromArray(1, 2, 3, 4, 5).k()
 obs
 ```
 
 ```kotlin:ank
-val flow = Flowable.from(1, 2, 3, 4, 5).k()
+val flow = Flowable.fromArray(1, 2, 3, 4, 5).k()
 flow
 ```
 
