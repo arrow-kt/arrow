@@ -217,3 +217,27 @@ This means that for the previous snippet [`IO`]({{ '/docs/effects/io' | relative
 ### What if I'd like to run multiple operations independently from each other, in a non-sequential way?
 
 You can check the section on the [Applicative Builder]({{ '/docs/patterns/applicativebuilder' | relative_url }}) pattern for them!
+
+### Cancellation and cleanup of resources
+
+In some enviroments that have resources with their own lifecycle (i.e. Activity in Android development) retaining these values in operations that can run indefinitely may cause large memory leaks and lead to undefined behavior. As cleanup is important in these restricted environments, the function `bindingECancellable` allows for comprehensions to be finished early by throwing an `InterruptedException` at the beginning of the next `bind()` step.
+
+```kotlin
+val (binding: IO<List<User>>, unsafeCancel: Disposable) =
+  ioMonadError.bindingECancellable {
+    val userProfile = bindAsync(ioAsync) { getUserProfile("123") }
+    val friendProfiles = userProfile.friends().map { friend ->
+        bindAsync(ioAsync) { getProfile(friend.id) }
+    }
+    yields(listOf(userProfile) + friendProfiles)
+  }
+
+binding.unsafeRunAsync { result ->
+  result.fold({ println("Boom! caused by $it") }, { println(it.toString()) })
+}
+
+unsafeCancel()
+// Boom! caused by InterruptedException
+```
+
+Note that the cancellation happens on the bind() step, so any currently running operations before `bind()` will have to complete first, even those that are scheduled for threading.
