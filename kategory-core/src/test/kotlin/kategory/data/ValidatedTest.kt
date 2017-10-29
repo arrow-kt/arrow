@@ -27,7 +27,7 @@ class ValidatedTest : UnitSpec() {
         testLaws(ApplicativeLaws.laws(Validated.applicative(StringMonoidInstance), Eq.any()))
         testLaws(TraverseLaws.laws(Validated.traverse(), Validated.applicative(StringMonoidInstance), ::Valid, Eq.any()))
         testLaws(SemigroupKLaws.laws(
-                Validated.semigroupK(IntMonoid),
+                Validated.semigroupK(IntMonoid, IntMonoid),
                 Validated.applicative(IntMonoid),
                 Eq.any()))
 
@@ -98,6 +98,11 @@ class ValidatedTest : UnitSpec() {
             Invalid(13).toEither() shouldBe Either.Left(13)
         }
 
+        "toIor should return Ior.Right(value) if is Valid or Ior.Left(error) in otherwise" {
+            Valid(10).toIor() shouldBe Ior.Right(10)
+            Invalid(13).toIor() shouldBe Ior.Left(13)
+        }
+
         "toOption should return Option.Some(value) if is Valid or Option.None in otherwise" {
             Valid(10).toOption() shouldBe Option.Some(10)
             Invalid(13).toOption() shouldBe Option.None
@@ -165,7 +170,7 @@ class ValidatedTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over homogeneous Validated" {
-            Validated.applicative(StringMonoidInstance).map(
+            Validated.applicative<String>().map(
                     Valid("11th"),
                     Valid("Doctor"),
                     Valid("Who"),
@@ -173,7 +178,7 @@ class ValidatedTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over heterogeneous Validated" {
-            Validated.applicative(StringMonoidInstance).map(
+            Validated.applicative<String>().map(
                     Valid(13),
                     Valid("Doctor"),
                     Valid(false),
@@ -181,11 +186,30 @@ class ValidatedTest : UnitSpec() {
         }
 
         "Cartesian builder should build products over Invalid Validated" {
-            Validated.applicative(StringMonoidInstance).map(
+            Validated.applicative<String>().map(
                     Invalid("fail1"),
                     Invalid("fail2"),
                     Valid("Who"),
                     { "success!" }) shouldBe Invalid("fail1fail2")
+        }
+
+        "CombineK should combine Valid Validated" {
+            val valid = Valid("Who")
+
+            Validated.semigroupK<String, String>().combineK(valid, valid) shouldBe(Valid("WhoWho"))
+        }
+
+        "CombineK should combine Valid and Invalid Validated" {
+            val valid = Valid("Who")
+            val invalid = Invalid("Nope")
+
+            Validated.semigroupK<String, String>().combineK(valid, invalid) shouldBe(Invalid("Nope"))
+        }
+
+        "CombineK should combine Invalid Validated" {
+            val invalid = Invalid("Nope")
+
+            Validated.semigroupK<String, String>().combineK(invalid, invalid) shouldBe(Invalid("NopeNope"))
         }
     }
 }

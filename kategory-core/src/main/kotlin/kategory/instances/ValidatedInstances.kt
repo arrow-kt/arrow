@@ -48,12 +48,13 @@ interface ValidatedTraverseInstance<E> : ValidatedFoldableInstance<E>, Traverse<
 }
 
 @instance(Validated::class)
-interface ValidatedSemigroupKInstance<E> : SemigroupK<ValidatedKindPartial<E>> {
+interface ValidatedSemigroupKInstance<E, A> : SemigroupK<ValidatedKindPartial<E>> {
 
     fun SE(): Semigroup<E>
+    fun SA(): Semigroup<A>
 
-    override fun <B> combineK(x: ValidatedKind<E, B>, y: ValidatedKind<E, B>): Validated<E, B> =
-            x.ev().combineK(y, SE())
+    override fun <A> combineK(x: ValidatedKind<E, A>, y: ValidatedKind<E, A>): Validated<E, A> =
+            x.ev().combineK(y, SE(), SA() as Semigroup<A>)
 
 }
 

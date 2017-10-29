@@ -1,6 +1,6 @@
 package kategory
 
-typealias ValidatedNel<E, A> = Validated<NonEmptyList<E>, A>
+typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 
 /**
  * Port of https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/data/Validated.scala
@@ -58,12 +58,17 @@ typealias ValidatedNel<E, A> = Validated<NonEmptyList<E>, A>
     /**
      * Converts the value to an Either<E, A>
      */
-    fun toEither(): Either<E, A> = fold({ Either.Left(it) }, { Either.Right(it) })
+    fun toEither(): Either<E, A> = fold({ it.left() }, { it.right() })
 
     /**
      * Returns Valid values wrapped in Some, and None for Invalid values
      */
-    fun toOption(): Option<A> = fold({ Option.None }, { Option.Some(it) })
+    fun toOption(): Option<A> = fold({ none() }, { it.some() })
+
+    /**
+     * Converts the value to an Ior<E, A>
+     */
+    fun toIor(): Ior<E, A> = fold({ it.leftIor() }, { it.rightIor() })
 
     /**
      * Convert this value to a single element List if it is Valid,
@@ -153,12 +158,8 @@ fun <E, A> Validated<E, A>.orElse(default: () -> Validated<E, A>): Validated<E, 
  */
 fun <E, A, B> Validated<E, A>.ap(f: Validated<E, (A) -> B>, SE: Semigroup<E>): Validated<E, B> =
         when (this) {
-            is Validated.Valid -> {
-                f.fold({ Validated.Invalid(it) }, { Validated.Valid(it(a)) })
-            }
-            is Validated.Invalid -> {
-                f.fold({ Validated.Invalid(SE.combine(it, e)) }, { Validated.Invalid(e) })
-            }
+            is Validated.Valid -> f.fold({ Validated.Invalid(it) }, { Validated.Valid(it(a)) })
+            is Validated.Invalid -> f.fold({ Validated.Invalid(SE.combine(it, e)) }, { Validated.Invalid(e) })
         }
 
 fun <E, A> Validated<E, A>.handleLeftWith(f: (E) -> ValidatedKind<E, A>): Validated<E, A> =
@@ -182,17 +183,15 @@ fun <G, E, A, B> Validated<E, A>.traverse(f: (A) -> HK<G, B>, GA: Applicative<G>
             is Validated.Invalid -> GA.pure(this)
         }
 
-fun <E, A> Validated<E, A>.combineK(y: ValidatedKind<E, A>, SE: Semigroup<E>): Validated<E, A> {
-    val xev = this
-    val yev = y.ev()
-    return when (xev) {
-        is Validated.Valid -> xev
-        is Validated.Invalid -> when (yev) {
-            is Validated.Invalid -> Validated.Invalid(SE.combine(xev.e, yev.e))
-            is Validated.Valid -> yev
+fun <E, A> Validated<E, A>.combineK(y: ValidatedKind<E, A>, SE: Semigroup<E>, SA: Semigroup<A>): Validated<E, A> =
+        y.ev().let { that ->
+            when {
+                this is Validated.Valid && that is Validated.Valid -> Validated.Valid(SA.combine(this.a, that.a))
+                this is Validated.Invalid && that is Validated.Invalid -> Validated.Invalid(SE.combine(this.e, that.e))
+                this is Validated.Invalid -> this
+                else -> that
+            }
         }
-    }
-}
 
 fun <E, A> A.valid(): Validated<E, A> = Validated.Valid(this)
 
