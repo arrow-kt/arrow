@@ -27,7 +27,7 @@ class ValidatedTest : UnitSpec() {
         testLaws(ApplicativeLaws.laws(Validated.applicative(StringMonoidInstance), Eq.any()))
         testLaws(TraverseLaws.laws(Validated.traverse(), Validated.applicative(StringMonoidInstance), ::Valid, Eq.any()))
         testLaws(SemigroupKLaws.laws(
-                Validated.semigroupK(IntMonoid, IntMonoid),
+                Validated.semigroupK(IntMonoid),
                 Validated.applicative(IntMonoid),
                 Eq.any()))
 
@@ -196,20 +196,39 @@ class ValidatedTest : UnitSpec() {
         "CombineK should combine Valid Validated" {
             val valid = Valid("Who")
 
-            Validated.semigroupK<String, String>().combineK(valid, valid) shouldBe(Valid("WhoWho"))
+            Validated.semigroupK<String>().combineK(valid, valid) shouldBe(Valid("Who"))
         }
 
         "CombineK should combine Valid and Invalid Validated" {
             val valid = Valid("Who")
             val invalid = Invalid("Nope")
 
-            Validated.semigroupK<String, String>().combineK(valid, invalid) shouldBe(Invalid("Nope"))
+            Validated.semigroupK<String>().combineK(valid, invalid) shouldBe(Valid("Who"))
         }
 
         "CombineK should combine Invalid Validated" {
             val invalid = Invalid("Nope")
 
-            Validated.semigroupK<String, String>().combineK(invalid, invalid) shouldBe(Invalid("NopeNope"))
+            Validated.semigroupK<String>().combineK(invalid, invalid) shouldBe(Invalid("NopeNope"))
+        }
+
+        "Combine should combine Valid Validated" {
+            val valid: Validated<String, String> = Valid("Who")
+
+            valid.combine(valid) shouldBe(Valid("WhoWho"))
+        }
+
+        "Combine should combine Valid and Invalid Validated" {
+            val valid = Valid("Who")
+            val invalid = Invalid("Nope")
+
+            valid.combine(invalid) shouldBe(Invalid("Nope"))
+        }
+
+        "Combine should combine Invalid Validated" {
+            val invalid: Validated<String, String> = Invalid("Nope")
+
+            invalid.combine(invalid) shouldBe(Invalid("NopeNope"))
         }
     }
 }

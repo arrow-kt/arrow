@@ -183,7 +183,9 @@ fun <G, E, A, B> Validated<E, A>.traverse(f: (A) -> HK<G, B>, GA: Applicative<G>
             is Validated.Invalid -> GA.pure(this)
         }
 
-fun <E, A> Validated<E, A>.combineK(y: ValidatedKind<E, A>, SE: Semigroup<E>, SA: Semigroup<A>): Validated<E, A> =
+inline fun <reified E, reified A> Validated<E, A>.combine(y: ValidatedKind<E, A>,
+                                                          SE: Semigroup<E> = semigroup(),
+                                                          SA: Semigroup<A> = semigroup()): Validated<E, A> =
         y.ev().let { that ->
             when {
                 this is Validated.Valid && that is Validated.Valid -> Validated.Valid(SA.combine(this.a, that.a))
@@ -192,6 +194,18 @@ fun <E, A> Validated<E, A>.combineK(y: ValidatedKind<E, A>, SE: Semigroup<E>, SA
                 else -> that
             }
         }
+
+fun <E, A> Validated<E, A>.combineK(y: ValidatedKind<E, A>, SE: Semigroup<E>): Validated<E, A> {
+    val xev = this
+    val yev = y.ev()
+    return when (xev) {
+        is Validated.Valid -> xev
+        is Validated.Invalid -> when (yev) {
+            is Validated.Invalid -> Validated.Invalid(SE.combine(xev.e, yev.e))
+            is Validated.Valid -> yev
+        }
+    }
+}
 
 fun <E, A> A.valid(): Validated<E, A> = Validated.Valid(this)
 
