@@ -15,7 +15,7 @@ fun main(args: Array<String>) {
             "no.at.com"
     )
             .map(::validateEmail)
-//            .reduce { acc, validated -> acc.combineK(validated, semigroup()) }
+            .reduce { acc, validated -> acc.combine(validated) }
 //            .reduce(EmailValidation::plus)
 //            .all
 //            .joinToString(separator = "\n")
