@@ -142,7 +142,7 @@ val (observable, disposable) =
   }
 
 observable.value()
-  .subscribe({ Log.d("Song $it") } , { prinln("Boom! caused by $it") })
+  .subscribe({ Log.d("User $it") } , { prinln("Boom! caused by $it") })
 
 disposable()
 // Boom! caused by InterruptedException
