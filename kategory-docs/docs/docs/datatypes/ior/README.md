@@ -108,7 +108,7 @@ To extract the values, we can use the `fold` method, which expects a function fo
 ```kotlin:ank
 validateUser("john.doe", "password").fold(
         { "Error: ${it.head}" },
-        { "Success $it"},
+        { "Success $it" },
         { warnings, (name) -> "Warning: $name; The following warnings occurred: ${warnings.show()}" }
 )
 
