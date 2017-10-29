@@ -95,7 +95,6 @@ class NonEmptyList<out A> private constructor(
 
         fun <A> pure(a: A): NonEmptyList<A> = a.nel()
 
-        @Suppress("UNCHECKED_CAST")
         private tailrec fun <A, B> go(
                 buf: ArrayList<B>,
                 f: (A) -> HK<NonEmptyListHK, Either<A, B>>,
