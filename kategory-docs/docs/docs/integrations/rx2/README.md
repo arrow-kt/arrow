@@ -44,7 +44,7 @@ flow
 ```
 
 ```kotlin:ank
-val subject = PublishSubject.create().k()
+val subject = PublishSubject.create<Int>().k()
 subject
 ```
 
