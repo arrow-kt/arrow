@@ -195,6 +195,10 @@ fun <B> Option<B>.getOrElse(default: () -> B): B = fold({ default() }, { it })
  */
 fun <A, B : A> OptionKind<B>.orElse(alternative: () -> Option<B>): Option<B> = if (ev().isEmpty) alternative() else ev()
 
+fun <A : Any> A?.toOption(): Option<A> = Option.fromNullable(this)
+
+fun <A> Option<A>.toNative(): A? = this.getOrElse { null }
+
 fun <A> A.some(): Option<A> = Option.Some(this)
 
 fun <A> none(): Option<A> = Option.None
