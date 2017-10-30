@@ -43,18 +43,17 @@ class InstanceParametrizedType(val raw: Type, val typeArgs: List<Type>) : Parame
     override fun equals(other: Any?): Boolean {
         if (other is ParameterizedType) {
             // Check that information is equivalent
-            val that = other
 
-            if (this === that)
+            if (this === other)
                 return true
 
-            val thatOwner = that.ownerType
-            val thatRawType = that.rawType
+            val thatOwner = other.ownerType
+            val thatRawType = other.rawType
 
             return ownerType == thatOwner &&
                     rawType == thatRawType &&
                     Arrays.equals(actualTypeArguments, // avoid clone
-                            that.actualTypeArguments)
+                            other.actualTypeArguments)
         } else {
             return false
         }
@@ -64,7 +63,7 @@ class InstanceParametrizedType(val raw: Type, val typeArgs: List<Type>) : Parame
             hashCode(ownerType) xor
             hashCode(rawType)
 
-    fun hashCode(o: Any?): Int = o?.hashCode() ?: 0
+    private fun hashCode(o: Any?): Int = o?.hashCode() ?: 0
 
 }
 
@@ -175,7 +174,7 @@ private fun instanceFromImplicitObject(t: InstanceParametrizedType): Any? {
     } else {
         targetPackage
     }
-    val providerQualifiedName: String = "$derivationPackage.${on.simpleName.replaceFirst("HK", "")}${of.simpleName}InstanceImplicits"
+    val providerQualifiedName = "$derivationPackage.${on.simpleName.replaceFirst("HK", "")}${of.simpleName}InstanceImplicits"
     val globalInstanceProvider = Class.forName(providerQualifiedName)
     val allCompanionFunctions = globalInstanceProvider.methods
     val factoryFunction = allCompanionFunctions.find { it.name == "instance" }
