@@ -31,7 +31,8 @@ object TraversalLaws {
             forAll(aGen, funcGen, { a, f ->
                 traversal.getAll(traversal.modify(a, f))
                         .zip(traversal.getAll(a).map(f), { b1, b2 -> EQB.eqv(b1, b2) })
-                        .combineAll(object : Semigroup<Boolean> {
+                        .combineAll(object : Monoid<Boolean> {
+                            override fun empty(): Boolean = true
                             override fun combine(a: Boolean, b: Boolean): Boolean = a && b
                         })
             })
