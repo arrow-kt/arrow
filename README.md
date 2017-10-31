@@ -32,10 +32,10 @@ Add the dependencies into the project's `build.gradle`
 
 ```groovy
 dependencies {
-    compile 'io.kategory:kategory:0.3.10'
-    kapt    'io.kategory:kategory-annotations-processor:0.3.10' //optional
-    compile 'io.kategory:kategory-effects:0.3.10' //optional
-    compile 'io.kategory:kategory-optics:0.3.10' //optional
+    compile 'io.kategory:kategory:0.3.11'
+    kapt    'io.kategory:kategory-annotations-processor:0.3.11' //optional
+    compile 'io.kategory:kategory-effects:0.3.11' //optional
+    compile 'io.kategory:kategory-optics:0.3.11' //optional
 }
 ```
 
@@ -52,7 +52,7 @@ apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //optiona
 
 dependencies {
     ...
-    kapt    'io.kategory:kategory-annotations-processor:0.3.10' //optional
+    kapt    'io.kategory:kategory-annotations-processor:0.3.11' //optional
     ...
 }
 ```
