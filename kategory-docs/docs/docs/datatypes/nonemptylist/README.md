@@ -50,7 +50,7 @@ This function will validate each email and let us act on each of the Valid/Inval
             "no.at.com"
     )
             
-    emails.map(::validateEmail)
+    emails.map { validateEmail(it) }
             .reduce { acc, validated -> acc.combine(validated) }
 ```
 
@@ -81,14 +81,14 @@ fun validateEmail(email: String): EmailValidation {
 Now trying to validate the same list of emails:
 
 ```kotlin:ank
-    emails.map(::validateEmail)
+    emails.map { validateEmail(it) }
             .reduce(EmailValidation::plus)
 ```
 
 This is fine as now we have a proper message including the email, but we still can do better, let's say we want an output of one email per line, we could simply use Nel's `all` function and join with a line return:
 
 ```kotlin:ank
-    emails.map(::validateEmail)
+    emails.map { validateEmail(it) }
             .reduce(EmailValidation::plus)
             .all
             .joinToString(separator = "\n")
