@@ -17,13 +17,13 @@ Suppose that we have some data to validate, let's say an email. We could impleme
 ```kotlin:ank:silent
 import kategory.*
 
-typealias EmailValidationResult = Validated<Result, Unit>
+typealias EmailValidationResult = Validated<String, Unit>
 
 fun validateEmail(email: String): EmailValidationResult {
     fun isEmailValid(email: String): EmailValidationResult = when {
         !email.contains('@') -> "Email doesn't contain @".invalid()
         email.indexOf('@') == 0 -> "Email doesn't contain local-part".invalid()
-        else -> email.split('@').filter { !it.isBlank() }.let<List<String>, Validated<Result, Unit>> { emailParts ->
+        else -> email.split('@').filter { !it.isBlank() }.let<List<String>, Validated<String, Unit>> { emailParts ->
             when {
                 emailParts.size < 2 -> "Email doesn't contain domain".invalid()
                 emailParts.size > 2 -> "Email cannot contain more than one @".invalid()
@@ -64,7 +64,7 @@ NonEmptyList is highly connected with Validation, as it provides a nice and simp
 import kategory.*
 
 typealias EmailValidation = Nel<String>
-typealias EmailValidationResult = Validated<Result, Unit>
+typealias EmailValidationResult = Validated<String, Unit>
 
 fun validateEmail(email: String): EmailValidation {
     (...)
