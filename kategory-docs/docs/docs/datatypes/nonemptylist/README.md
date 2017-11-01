@@ -93,3 +93,11 @@ This is fine as now we have a proper message including the email, but we still c
             .all
             .joinToString(separator = "\n")
 ```
+
+## Instances
+
+```kotlin:ank
+import kategory.debug.*
+
+showInstances<NonEmptyListHK, Unit>()
+```

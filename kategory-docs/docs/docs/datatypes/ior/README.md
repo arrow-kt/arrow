@@ -156,7 +156,7 @@ import kategory.*
 Ior.Both("Warning", 41).toOption()
 ```
 
-Available Instances:
+## Instances
 
 ```kotlin:ank
 import kategory.debug.*

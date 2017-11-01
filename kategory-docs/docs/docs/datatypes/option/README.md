@@ -161,7 +161,7 @@ Option.monad().binding {
 //None
 ```
 
-Available Instances:
+## Instances
 
 ```kotlin:ank
 import kategory.debug.*
