@@ -213,7 +213,7 @@ class ValidatedTest : UnitSpec() {
         }
 
         "Combine should combine Valid Validated" {
-            val valid: Validated<String, String> = Valid("Who")
+            val valid: Validated<Unit, String> = Valid("Who")
 
             valid.combine(valid) shouldBe(Valid("WhoWho"))
         }
@@ -226,7 +226,7 @@ class ValidatedTest : UnitSpec() {
         }
 
         "Combine should combine Invalid Validated" {
-            val invalid: Validated<String, String> = Invalid("Nope")
+            val invalid: Validated<String, Unit> = Invalid("Nope")
 
             invalid.combine(invalid) shouldBe(Invalid("NopeNope"))
         }
