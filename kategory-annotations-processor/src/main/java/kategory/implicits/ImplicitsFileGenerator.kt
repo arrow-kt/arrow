@@ -43,7 +43,7 @@ class ImplicitsFileGenerator(
         val functionsToGenerateByPackage: Map<Package, List<FunctionToGenerate>> =
                 getFunctionsToGenerateByPackage(consumerFunctionGroupsByPackage, providerInvocationsByType)
 
-        val sources: List<Pair<Package, String>> = functionsToGenerateByPackage.entries.mapIndexed { counter, (`package`, functionsToGenerate) ->
+        val sources: List<Pair<Package, String>> = functionsToGenerateByPackage.entries.mapIndexed { _, (`package`, functionsToGenerate) ->
             val source: String = functionsToGenerate.joinToString(prefix = "package $`package`\n\n", separator = "\n")
             `package` to source
         }
@@ -170,7 +170,7 @@ class ImplicitsFileGenerator(
                     }
                 }.joinToString()
 
-                val argsOut: String = function.valueParameterList.map { valueParameter ->
+                val argsOut: String = function.valueParameterList.joinToString { valueParameter ->
                     extractConsumerValueParameter(valueParameter, consumersInFunction) { parameterName, consumer ->
                         if (consumer == null) parameterName
                         else {
@@ -180,7 +180,7 @@ class ImplicitsFileGenerator(
                             providerInvocationsByType[type]!!
                         }
                     }
-                }.joinToString()
+                }
 
                 "fun $prefix$escapedFunctionName($argsIn) = $escapedFunctionName($argsOut)"
             }

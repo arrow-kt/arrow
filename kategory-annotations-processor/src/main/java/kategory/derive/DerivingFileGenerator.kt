@@ -155,7 +155,7 @@ class DerivingFileGenerator(
      * Main entry point for deriving extension generation
      */
     fun generate() {
-        annotatedList.forEachIndexed { counter, c ->
+        annotatedList.forEachIndexed { _, c ->
             val elementsToGenerate = listOf(genImpl(c))
             val source: String = elementsToGenerate.joinToString(prefix = "package ${c.classOrPackageProto.`package`}\n\n", separator = "\n")
             val file = File(generatedDir, derivingAnnotationClass.simpleName + ".${c.classElement.qualifiedName}.kt")
