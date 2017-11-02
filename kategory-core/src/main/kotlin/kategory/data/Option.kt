@@ -197,7 +197,7 @@ fun <A, B : A> OptionKind<B>.orElse(alternative: () -> Option<B>): Option<B> = i
 
 fun <A : Any> A?.toOption(): Option<A> = Option.fromNullable(this)
 
-fun <A> Option<A>.toNative(): A? = this.getOrElse { null }
+fun <A> Option<A>.toNullable(): A? = this.getOrElse { null }
 
 fun <A> A.some(): Option<A> = Option.Some(this)
 
