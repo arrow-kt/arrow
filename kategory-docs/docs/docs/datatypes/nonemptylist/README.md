@@ -67,7 +67,7 @@ typealias EmailValidation = Nel<String>
 typealias EmailValidationResult = Validated<String, Unit>
 
 fun validateEmail(email: String): EmailValidation {
-    (...)
+    //(...)
 
     return isEmailValid(email)
             .fold({
