@@ -60,6 +60,31 @@ class OptionTest : UnitSpec() {
             Option.fromNullable(a) shouldBe None
         }
 
+        "toOption should work for both null and non-null values of nullable types" {
+            forAll { a: Int? ->
+                // This seems to be generating only non-null values, so it is complemented by the next test
+                val o: Option<Int> = a.toOption()
+                if (a == null) o == None else o == Some(a)
+            }
+        }
+
+        "toOption should return none for null values of nullable types" {
+            val a: Int? = null
+            a.toOption() shouldBe None
+        }
+
+        "toNullable should return null for none values" {
+            val a: Option<Int> = Option.none()
+            a.toNullable() shouldBe null
+        }
+
+        "toNullable should work for both null and non-null values of nullable types" {
+            forAll { a: Int? ->
+                // This seems to be generating only non-null values, so it is complemented by the next test
+                val o: Option<Int> = Option.some(a)
+                o.toNullable() == a
+            }
+        }
     }
 
 }
