@@ -19,13 +19,25 @@ Kategory models the absence of values through the `Option` datatype similar to h
 import kategory.*
 import kategory.Option.*
 
-val someValue: Option<String> = Some("I am wrapped in something")
+val message: String? = "I am wrapped in something"
+
+val someValue: Option<String> = Some(message)
 someValue
+
+// Or with the toOption extention
+val otherValue: Option<String> = message.toOption()
+otherValue
 ```
 
 ```kotlin:ank
 val emptyValue: Option<String> = None
 emptyValue
+
+// Or with the toOption extention
+val message: String? = null
+
+val otherValue: Option<String> = message.toOption()
+otherValue
 ```
 
 Let's write a function that may or not give us a string, thus returning `Option<String>`:
@@ -48,6 +60,22 @@ value1.getOrElse { "No value" }
 
 ```kotlin:ank
 value2.getOrElse { "No value" }
+```
+
+Using `toNullable` we can obtain a kotlin nullable value:
+```kotlin:ank:silent
+val value1 = maybeItWillReturnSomething(true)
+val value2 = maybeItWillReturnSomething(false)
+```
+
+```kotlin:ank
+val kotlinValue1: String? = value1.toNullable()
+kotlinValue1
+```
+
+```kotlin:ank
+val kotlinValue2: String? = value2.toNullable()
+kotlinValue2
 ```
 
 Checking whether option has value:
