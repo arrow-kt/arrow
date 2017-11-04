@@ -9,7 +9,8 @@ object MonadFilterLaws {
             MonadLaws.laws(MF, EQ) + FunctorFilterLaws.laws(MF, cf, EQ) + listOf(
                     Law("MonadFilter Laws: Left Empty", { monadFilterLeftEmpty(MF, EQ) }),
                     Law("MonadFilter Laws: Right Empty", { monadFilterRightEmpty(MF, cf, EQ) }),
-                    Law("MonadFilter Laws: Consistency", { monadFilterConsistency(MF, cf, EQ) }))
+                    Law("MonadFilter Laws: Consistency", { monadFilterConsistency(MF, cf, EQ) }),
+                    Law("MonadFilter Laws: Comprehension Guards", { monadFilterEmptyComprehensions(MF, EQ) }))
 
     inline fun <reified F> monadFilterLeftEmpty(MF: MonadFilter<F> = monadFilter<F>(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(genFunctionAToB(genApplicative(Gen.int(), MF)), { f: (Int) -> HK<F, Int> ->
@@ -25,4 +26,13 @@ object MonadFilterLaws {
             forAll(genFunctionAToB(Gen.bool()), genConstructor(Gen.int(), cf), { f: (Int) -> Boolean, fa: HK<F, Int> ->
                 MF.filter(fa, f).equalUnderTheLaw(fa.flatMap(MF, { a -> if (f(a)) MF.pure(a) else MF.empty() }), EQ)
             })
+
+    inline fun <reified F> monadFilterEmptyComprehensions(MF: MonadFilter<F> = monadFilter<F>(), EQ: Eq<HK<F, Int>>): Unit =
+            forAll(Gen.bool(), Gen.int(), { guard: Boolean, n: Int ->
+                MF.bindingFilter {
+                    continueIf(guard)
+                    yields(n)
+                }.equalUnderTheLaw(if (!guard) MF.empty() else MF.pure(n), EQ)
+            })
+
 }
