@@ -18,15 +18,16 @@ class WriterTTest : UnitSpec() {
             monoidK<WriterTKindPartial<ListKWHK, Int>>() shouldNotBe null
         }
 
-        testLaws(MonadLaws.laws(WriterT.monad(NonEmptyList.monad(), IntMonoid), Eq.any()))
-        testLaws(MonoidKLaws.laws(
+        testLaws(
+            MonadLaws.laws(WriterT.monad(NonEmptyList.monad(), IntMonoid), Eq.any()),
+            MonoidKLaws.laws(
                 WriterT.monoidK<ListKWHK, Int>(ListKW.monoidK()),
                 WriterT.applicative(),
                 Eq { a, b ->
                     a.ev().value == b.ev().value
-                }))
+                }),
 
-        testLaws(MonadWriterLaws.laws(WriterT.monad(Option.monad(), IntMonoid),
+            MonadWriterLaws.laws(WriterT.monad(Option.monad(), IntMonoid),
                 WriterT.monadWriter(Option.monad(), IntMonoid),
                 IntMonoid,
                 genIntSmall(),

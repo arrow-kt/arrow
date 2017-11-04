@@ -27,10 +27,12 @@ class EitherTest : UnitSpec() {
             eq<Either<String, Int>>() shouldNotBe null
         }
 
-        testLaws(EqLaws.laws(eq<Either<String, Int>>(), { it.right() }))
-        testLaws(MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()))
-        testLaws(TraverseLaws.laws(Either.traverse<Throwable>(), Either.applicative(), { it.right() }, Eq.any()))
-        testLaws(SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ))
+        testLaws(
+            EqLaws.laws(eq<Either<String, Int>>(), { it.right() }),
+            MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()),
+            TraverseLaws.laws(Either.traverse<Throwable>(), Either.applicative(), { it.right() }, Eq.any()),
+            SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ)
+        )
 
         "getOrElse should return value" {
             forAll { a: Int, b: Int ->
