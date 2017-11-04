@@ -19,17 +19,17 @@ class NonEmptyListInstancesTest : UnitSpec() {
 
     init {
 
-        testLaws(LensLaws.laws(
+        testLaws(
+            LensLaws.laws(
                 lens = nelHead(),
                 aGen = genNonEmptyList(Gen.string()),
                 bGen = Gen.string(),
                 funcGen = genFunctionAToB(Gen.string()),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                FA = Option.applicative()
-        ))
+                FA = Option.applicative()),
 
-        testLaws(IsoLaws.laws(
+            IsoLaws.laws(
                 iso = optionNelToList(),
                 aGen = genOption(genNonEmptyList(Gen.int())),
                 bGen = Gen.list(Gen.int()),
@@ -39,8 +39,8 @@ class NonEmptyListInstancesTest : UnitSpec() {
                 bMonoid = object : Monoid<List<Int>> {
                     override fun combine(a: List<Int>, b: List<Int>): List<Int> = a + b
                     override fun empty(): List<Int> = emptyList()
-                }
-        ))
+                })
+        )
 
     }
 
