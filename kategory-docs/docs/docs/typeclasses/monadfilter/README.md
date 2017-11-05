@@ -6,7 +6,7 @@ permalink: /docs/typeclasses/monadfilter/
 
 ## MonadFilter
 
-`MonadFilter` is a type class that abstract away the option of interrupting computation if a given predicate is not satisfied. 
+`MonadFilter` is a type class that abstracts away the option of interrupting computation if a given predicate is not satisfied. 
 
 All instances of `MonadFilter` provide syntax over their respective data types to comprehend monadically over their computation:
 
