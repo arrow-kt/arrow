@@ -25,27 +25,26 @@ import org.junit.runner.RunWith
 class TryInstancesTest : UnitSpec() {
     init {
 
-        testLaws(PrismLaws.laws(
+        testLaws(
+            PrismLaws.laws(
                 prism = trySuccess(),
                 aGen = genTry(Gen.int()),
                 bGen = Gen.int(),
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                EQOptionB = Eq.any()
-        ))
+                EQOptionB = Eq.any()),
 
-        testLaws(PrismLaws.laws(
+            PrismLaws.laws(
                 prism = tryFailure(),
                 aGen = genTry(Gen.int()),
                 bGen = genThrowable(),
                 funcGen = genFunctionAToB(genThrowable()),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                EQOptionB = Eq.any()
-        ))
+                EQOptionB = Eq.any()),
 
-        testLaws(IsoLaws.laws(
+            IsoLaws.laws(
                 iso = tryToEither(),
                 aGen = genTry(Gen.int()),
                 bGen = genEither(genThrowable(), Gen.int()),
@@ -57,10 +56,9 @@ class TryInstancesTest : UnitSpec() {
                             Either.applicative<Throwable>().map2(a, b) { (a, b) -> a + b }.ev()
 
                     override fun empty(): Either<Throwable, Int> = 0.right()
-                }
-        ))
+                }),
 
-        testLaws(IsoLaws.laws(
+            IsoLaws.laws(
                 iso = tryToValidated(),
                 aGen = genTry(Gen.int()),
                 bGen = genValidated(genThrowable(), Gen.int()),
@@ -85,8 +83,8 @@ class TryInstancesTest : UnitSpec() {
                             }
 
                     override fun empty() = 0.valid<Throwable, Int>()
-                }
-        ))
+                })
+        )
 
     }
 }

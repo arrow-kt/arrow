@@ -23,9 +23,11 @@ class TryTest : UnitSpec() {
             eq<Try<Int>>() shouldNotBe null
         }
 
-        testLaws(EqLaws.laws { Try { it } })
-        testLaws(MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()))
-        testLaws(TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any()))
+        testLaws(
+            EqLaws.laws { Try { it } },
+            MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()),
+            TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any())
+        )
 
         "invoke of any should be success" {
             Try.invoke { 1 } shouldBe Success(1)

@@ -21,45 +21,43 @@ class OptionalTest : UnitSpec() {
 
     init {
 
-        testLaws(OptionalLaws.laws(
+        testLaws(
+            OptionalLaws.laws(
                 optional = optionalHead,
                 aGen = Gen.list(Gen.int()),
                 bGen = Gen.int(),
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                EQOptionB = Eq.any()
-        ))
+                EQOptionB = Eq.any()),
 
-        testLaws(OptionalLaws.laws(
+            OptionalLaws.laws(
                 optional = Optional.id(),
                 aGen = Gen.int(),
                 bGen = Gen.int(),
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                EQOptionB = Eq.any()
-        ))
+                EQOptionB = Eq.any()),
 
-        testLaws(OptionalLaws.laws(
+            OptionalLaws.laws(
                 optional = optionalHead.first(),
                 aGen = genTuple(Gen.list(Gen.int()), Gen.bool()),
                 bGen = genTuple(Gen.int(), Gen.bool()),
                 funcGen = genFunctionAToB(genTuple(Gen.int(), Gen.bool())),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                EQOptionB = Eq.any()
-        ))
+                EQOptionB = Eq.any()),
 
-        testLaws(OptionalLaws.laws(
+            OptionalLaws.laws(
                 optional = optionalHead.second(),
                 aGen = genTuple(Gen.bool(), Gen.list(Gen.int())),
                 bGen = genTuple(Gen.bool(), Gen.int()),
                 funcGen = genFunctionAToB(genTuple(Gen.bool(), Gen.int())),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                EQOptionB = Eq.any()
-        ))
+                EQOptionB = Eq.any())
+        )
 
         "void should always " {
             forAll({ string: String ->

@@ -19,8 +19,10 @@ class CoproductTest : UnitSpec() {
             traverse<CoproductKindPartial<IdHK, NonEmptyListHK>>() shouldNotBe null
         }
 
-        testLaws(TraverseLaws.laws(traverse(), functor(), { Coproduct(Either.Right(Id(it))) }, EQ))
-        testLaws(ComonadLaws.laws(comonad(), { Coproduct(Either.Right(Id(it))) }, EQ))
+        testLaws(
+            TraverseLaws.laws(traverse(), functor(), { Coproduct(Either.Right(Id(it))) }, EQ),
+            ComonadLaws.laws(comonad(), { Coproduct(Either.Right(Id(it))) }, EQ)
+        )
 
     }
 }
