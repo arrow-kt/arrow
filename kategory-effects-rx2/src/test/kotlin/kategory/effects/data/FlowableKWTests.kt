@@ -49,24 +49,34 @@ class FlowableKWTests : UnitSpec() {
         testLaws(
             AsyncLaws.laws(FlowableKW.asyncContext(), FlowableKW.monadErrorFlat(), EQ(), EQ()),
             AsyncLaws.laws(FlowableKW.asyncContext(), FlowableKW.monadErrorConcat(), EQ(), EQ()),
-            AsyncLaws.laws(FlowableKW.asyncContext(), FlowableKW.monadErrorSwitch(), EQ(), EQ()),
+            AsyncLaws.laws(FlowableKW.asyncContext(), FlowableKW.monadErrorSwitch(), EQ(), EQ())
+        )
 
+        testLaws(
             AsyncLaws.laws(FlowableKW.asyncContextDrop(), FlowableKW.monadError(), EQ(), EQ()),
             AsyncLaws.laws(FlowableKW.asyncContextDrop(), FlowableKW.monadErrorConcat(), EQ(), EQ()),
-            AsyncLaws.laws(FlowableKW.asyncContextDrop(), FlowableKW.monadErrorSwitch(), EQ(), EQ()),
+            AsyncLaws.laws(FlowableKW.asyncContextDrop(), FlowableKW.monadErrorSwitch(), EQ(), EQ())
+        )
 
+        testLaws(
             AsyncLaws.laws(FlowableKW.asyncContextError(), FlowableKW.monadError(), EQ(), EQ()),
             AsyncLaws.laws(FlowableKW.asyncContextError(), FlowableKW.monadErrorConcat(), EQ(), EQ()),
-            AsyncLaws.laws(FlowableKW.asyncContextError(), FlowableKW.monadErrorSwitch(), EQ(), EQ()),
+            AsyncLaws.laws(FlowableKW.asyncContextError(), FlowableKW.monadErrorSwitch(), EQ(), EQ())
+        )
 
+        testLaws(
             AsyncLaws.laws(FlowableKW.asyncContextLatest(), FlowableKW.monadError(), EQ(), EQ()),
             AsyncLaws.laws(FlowableKW.asyncContextLatest(), FlowableKW.monadErrorConcat(), EQ(), EQ()),
-            AsyncLaws.laws(FlowableKW.asyncContextLatest(), FlowableKW.monadErrorSwitch(), EQ(), EQ()),
+            AsyncLaws.laws(FlowableKW.asyncContextLatest(), FlowableKW.monadErrorSwitch(), EQ(), EQ())
+        )
 
+        testLaws(
             AsyncLaws.laws(FlowableKW.asyncContextMissing(), FlowableKW.monadError(), EQ(), EQ()),
             AsyncLaws.laws(FlowableKW.asyncContextMissing(), FlowableKW.monadErrorConcat(), EQ(), EQ()),
-            AsyncLaws.laws(FlowableKW.asyncContextMissing(), FlowableKW.monadErrorSwitch(), EQ(), EQ()),
+            AsyncLaws.laws(FlowableKW.asyncContextMissing(), FlowableKW.monadErrorSwitch(), EQ(), EQ())
+        )
 
+        testLaws(
             FoldableLaws.laws(FlowableKW.foldable(), { FlowableKW.pure(it) }, Eq.any()),
             TraverseLaws.laws(FlowableKW.traverse(), FlowableKW.functor(), { FlowableKW.pure(it)  }, EQ())
         )
