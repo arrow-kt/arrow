@@ -10,7 +10,9 @@ class Function0Test : UnitSpec() {
     }
 
     init {
-        testLaws(MonadLaws.laws(Function0.monad(), EQ))
-        testLaws(ComonadLaws.laws(Function0.comonad(), { { it }.k() }, EQ))
+        testLaws(
+            MonadLaws.laws(Function0.monad(), EQ),
+            ComonadLaws.laws(Function0.comonad(), { { it }.k() }, EQ)
+        )
     }
 }

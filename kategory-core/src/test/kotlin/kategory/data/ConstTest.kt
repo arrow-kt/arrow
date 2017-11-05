@@ -20,8 +20,10 @@ class ConstTest : UnitSpec() {
             eq<Const<Int, String>>() shouldNotBe null
         }
 
-        testLaws(TraverseFilterLaws.laws(Const.traverseFilter(), Const.applicative(IntMonoid), { Const(it) }, Eq.any()))
-        testLaws(ApplicativeLaws.laws(Const.applicative(IntMonoid), Eq.any()))
-        testLaws(EqLaws.laws(eq<Const<Int, String>>(), { Const(it) }))
+        testLaws(
+            TraverseFilterLaws.laws(Const.traverseFilter(), Const.applicative(IntMonoid), { Const(it) }, Eq.any()),
+            ApplicativeLaws.laws(Const.applicative(IntMonoid), Eq.any()),
+            EqLaws.laws(eq<Const<Int, String>>(), { Const(it) })
+        )
     }
 }
