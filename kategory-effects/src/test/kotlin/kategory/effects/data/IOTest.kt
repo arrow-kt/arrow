@@ -42,7 +42,7 @@ class IOTest : UnitSpec() {
             val ioa = IO { throw exception }
             val result: Either<Throwable, Nothing> = ioa.attempt().unsafeRunSync()
 
-            val expected = Either.Left(exception)
+            val expected = Left(exception)
 
             result shouldBe expected
         }

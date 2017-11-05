@@ -3,8 +3,10 @@ package kategory.effects.internal
 import kategory.effects.Duration
 import kategory.Either
 import kategory.effects.IO
+import kategory.Left
 import kategory.Option
 import kategory.None
+import kategory.Right
 import kategory.Some
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
@@ -17,6 +19,7 @@ object Platform {
         return { a ->
             if (!wasCalled.getAndSet(true)) {
                 f(a)
+
             }
         }
     }
@@ -39,8 +42,8 @@ object Platform {
 
         return when (eitherRef) {
             null -> None
-            is Either.Left -> throw eitherRef.a
-            is Either.Right -> Some(eitherRef.b)
+            is Left -> throw eitherRef.a
+            is Right -> Some(eitherRef.b)
         }
     }
 }

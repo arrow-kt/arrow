@@ -22,7 +22,7 @@ sealed class IO<out A> : IOKind<A> {
         internal fun <A, B> mapDefault(t: IO<A>, f: (A) -> B): IO<B> = t.flatMap(f.andThen { Pure(it) })
 
         internal fun <A> attemptValue(): AndThen<A, IO<Either<Throwable, A>>> =
-                AndThen({ a: A -> Pure(Either.Right(a)) }, { e -> Pure(Either.Left(e)) })
+                AndThen({ a: A -> Pure(Right(a)) }, { e -> Pure(Left(e)) })
 
         operator fun <A> invoke(f: () -> A): IO<A> = suspend { Pure(f()) }
 
@@ -41,7 +41,7 @@ sealed class IO<out A> : IOKind<A> {
                         try {
                             k(callback)
                         } catch (throwable: Throwable) {
-                            callback(Either.Left(throwable))
+                            callback(Left(throwable))
                         }
                     }
                 }
@@ -58,8 +58,8 @@ sealed class IO<out A> : IOKind<A> {
         fun <A, B> tailRecM(a: A, f: (A) -> IOKind<Either<A, B>>): IO<B> =
                 f(a).ev().flatMap {
                     when (it) {
-                        is Either.Left -> tailRecM(it.a, f)
-                        is Either.Right -> IO.pure(it.b)
+                        is Left -> tailRecM(it.a, f)
+                        is Right -> IO.pure(it.b)
                     }
                 }
 
@@ -266,9 +266,9 @@ internal data class Pure<out A>(val a: A) : IO<A>() {
                 RaiseError(exception)
             }
 
-    override fun attempt(): IO<Either<Throwable, A>> = Pure(Either.Right(a))
+    override fun attempt(): IO<Either<Throwable, A>> = Pure(Right(a))
 
-    override fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit) = cb(Either.Right(a))
+    override fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit) = cb(Right(a))
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = Some(a)
 }
@@ -278,9 +278,9 @@ internal data class RaiseError<out A>(val exception: Throwable) : IO<A>() {
 
     override fun <B> flatMapTotal(f: AndThen<A, IO<B>>): IO<B> = Suspend(AndThen { f.error(exception, { RaiseError(it) }) })
 
-    override fun attempt(): IO<Either<Throwable, A>> = Pure(Either.Left(exception))
+    override fun attempt(): IO<Either<Throwable, A>> = Pure(Left(exception))
 
-    override fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit) = cb(Either.Left(exception))
+    override fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit) = cb(Left(exception))
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw exception
 }
@@ -334,11 +334,11 @@ internal data class BindAsync<E, out A>(val cont: ((Either<Throwable, E>) -> Uni
             cont { result ->
                 try {
                     when (result) {
-                        is Either.Right -> f(result.b).unsafeRunAsync(cb)
-                        is Either.Left -> f.error(result.a, { RaiseError(it) }).unsafeRunAsync(cb)
+                        is Right -> f(result.b).unsafeRunAsync(cb)
+                        is Left -> f.error(result.a, { RaiseError(it) }).unsafeRunAsync(cb)
                     }
                 } catch (throwable: Throwable) {
-                    cb(Either.Left(throwable))
+                    cb(Left(throwable))
                 }
             }
 

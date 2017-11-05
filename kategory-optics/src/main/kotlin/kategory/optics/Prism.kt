@@ -14,10 +14,12 @@ import kategory.eq
 import kategory.flatMap
 import kategory.getOrElse
 import kategory.identity
+import kategory.Left
 import kategory.left
 import kategory.lift
 import kategory.none
 import kategory.right
+import kategory.Right
 import kategory.some
 import kategory.toT
 
@@ -287,11 +289,11 @@ inline fun <S, T, A, B> PPrism<S, T, A, B>.all(s: S, crossinline p: (A) -> Boole
  * Create a sum of the [PPrism] and a type [C]
  */
 fun <S, T, A, B, C> PPrism<S, T, A, B>.left(): PPrism<Either<S, C>, Either<T, C>, Either<A, C>, Either<B, C>> = Prism(
-        { it.fold({ a -> getOrModify(a).bimap({ it.left() }, { it.left() }) }, { c -> Either.Right(c.right()) }) },
+        { it.fold({ a -> getOrModify(a).bimap({ it.left() }, { it.left() }) }, { c -> Right(c.right()) }) },
         {
             when (it) {
-                is Either.Left<B, C> -> Either.Left(reverseGet(it.a))
-                is Either.Right<B, C> -> Either.Right(it.b)
+                is Left<B, C> -> Left(reverseGet(it.a))
+                is Right<B, C> -> Right(it.b)
             }
         }
 )
@@ -300,6 +302,6 @@ fun <S, T, A, B, C> PPrism<S, T, A, B>.left(): PPrism<Either<S, C>, Either<T, C>
  * Create a sum of a type [C] and the [PPrism]
  */
 fun <S, T, A, B, C> PPrism<S, T, A, B>.right(): PPrism<Either<C, S>, Either<C, T>, Either<C, A>, Either<C, B>> = Prism(
-        { it.fold({ c -> Either.Right(c.left()) }, { s -> getOrModify(s).bimap({ it.right() }, { it.right() }) }) },
+        { it.fold({ c -> Right(c.left()) }, { s -> getOrModify(s).bimap({ it.right() }, { it.right() }) }) },
         { it.map(this::reverseGet) }
 )

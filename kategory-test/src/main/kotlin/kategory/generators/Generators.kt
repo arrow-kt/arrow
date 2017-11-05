@@ -115,8 +115,8 @@ inline fun <reified E, reified A> genEither(genE: Gen<E>, genA: Gen<A>): Gen<Eit
             override fun generate(): Either<E, A> =
                     Gen.oneOf(genE, genA).generate().let {
                         when (it) {
-                            is E -> Either.Left(it)
-                            is A -> Either.Right(it)
+                            is E -> Left(it)
+                            is A -> Right(it)
                             else -> throw IllegalStateException("genEither incorrect value $it")
                         }
                     }

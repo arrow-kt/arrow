@@ -152,10 +152,10 @@ inline fun <F, A> Foldable<F>.get(fa: HK<F, A>, idx: Long): Option<A> {
     if (idx < 0L) return None
     else {
         foldM(fa, 0L, { i, a ->
-            if (i == idx) Either.Left(a) else Either.Right(i + 1L)
+            if (i == idx) Left(a) else Right(i + 1L)
         }).let {
             return when (it) {
-                is Either.Left -> Some(it.a)
+                is Left -> Some(it.a)
                 else -> None
             }
         }

@@ -23,7 +23,7 @@ package kategory
                 OptionT(MF.tailRecM(a, {
                     MF.map(f(it).ev().value, {
                         it.fold({
-                            Either.Right<Option<B>>(None)
+                            Right<Option<B>>(None)
                         }, {
                             it.map { Some(it) }
                         })

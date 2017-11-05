@@ -94,8 +94,8 @@ class ValidatedTest : UnitSpec() {
         }
 
         "toEither should return Either.Right(value) if is Valid or Either.Left(error) in otherwise" {
-            Valid(10).toEither() shouldBe Either.Right(10)
-            Invalid(13).toEither() shouldBe Either.Left(13)
+            Valid(10).toEither() shouldBe Right(10)
+            Invalid(13).toEither() shouldBe Left(13)
         }
 
         "toIor should return Ior.Right(value) if is Valid or Ior.Left(error) in otherwise" {
@@ -146,8 +146,8 @@ class ValidatedTest : UnitSpec() {
         }
 
         "fromEither should return Valid if is Right or Failure in otherwise" {
-            Validated.fromEither(Either.Right(10)) shouldBe Valid(10)
-            Validated.fromEither(Either.Left(10)) shouldBe Invalid(10)
+            Validated.fromEither(Right(10)) shouldBe Valid(10)
+            Validated.fromEither(Left(10)) shouldBe Invalid(10)
         }
 
         "fromOption should return Valid if is Some or Invalid in otherwise" {
@@ -161,11 +161,11 @@ class ValidatedTest : UnitSpec() {
 
         "withEither should return Valid(result) if f return Right" {
             Valid(10).withEither { it.map { it + 5 } } shouldBe Valid(15)
-            Invalid(10).withEither { Either.Right(5) } shouldBe Valid(5)
+            Invalid(10).withEither { Right(5) } shouldBe Valid(5)
         }
 
         "withEither should return Invalid(result) if f return Left" {
-            Valid(10).withEither { Either.Left(5) } shouldBe Invalid(5)
+            Valid(10).withEither { Left(5) } shouldBe Invalid(5)
             Invalid(10).withEither { it } shouldBe Invalid(10)
         }
 

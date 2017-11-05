@@ -29,8 +29,8 @@ sealed class Option<out A> : OptionKind<A> {
             return when (option) {
                 is Some -> {
                     when (option.value) {
-                        is Either.Left -> tailRecM(option.value.a, f)
-                        is Either.Right -> Some(option.value.b)
+                        is Left -> tailRecM(option.value.a, f)
+                        is Right -> Some(option.value.b)
                     }
                 }
                 is None -> None

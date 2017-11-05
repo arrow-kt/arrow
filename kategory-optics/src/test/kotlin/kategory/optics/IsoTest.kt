@@ -88,16 +88,16 @@ class IsoTest : UnitSpec() {
         "Creating a left with a type should result in a sum target to value" {
             val left = tokenIso.left<Int>()
             forAll(TokenGen, Gen.int(), { token: Token, int: Int ->
-                left.get(Either.Left(token)) == Either.Left(token.value) &&
-                        left.get(Either.Right(int)) == Either.Right(int)
+                left.get(Left(token)) == Left(token.value) &&
+                        left.get(Right(int)) == Right(int)
             })
         }
 
         "Creating a right with a type should result in a sum value to target" {
             val left = tokenIso.right<Int>()
             forAll(TokenGen, Gen.int(), { token: Token, int: Int ->
-                left.get(Either.Left(int)) == Either.Left(int) &&
-                        left.get(Either.Right(token)) == Either.Right(token.value)
+                left.get(Left(int)) == Left(int) &&
+                        left.get(Right(token)) == Right(token.value)
             })
         }
 
