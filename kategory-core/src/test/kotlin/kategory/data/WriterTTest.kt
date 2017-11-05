@@ -18,15 +18,16 @@ class WriterTTest : UnitSpec() {
             monoidK<WriterTKindPartial<ListKWHK, Int>>() shouldNotBe null
         }
 
-        testLaws(MonadLaws.laws(WriterT.monad(NonEmptyList.monad(), IntMonoid), Eq.any()))
-        testLaws(MonoidKLaws.laws(
+        testLaws(
+            MonadLaws.laws(WriterT.monad(NonEmptyList.monad(), IntMonoid), Eq.any()),
+            MonoidKLaws.laws(
                 WriterT.monoidK<ListKWHK, Int>(ListKW.monoidK()),
                 WriterT.applicative(),
                 Eq { a, b ->
                     a.ev().value == b.ev().value
-                }))
+                }),
 
-        testLaws(MonadWriterLaws.laws(WriterT.monad(Option.monad(), IntMonoid),
+            MonadWriterLaws.laws(WriterT.monad(Option.monad(), IntMonoid),
                 WriterT.monadWriter(Option.monad(), IntMonoid),
                 IntMonoid,
                 genIntSmall(),
@@ -43,9 +44,9 @@ class WriterTTest : UnitSpec() {
                         optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Tuple2<Int, Int>> -> optionB.fold({ false }, { value == it }) })
                     }
                 }
-        ))
+            ),
 
-        testLaws(MonadFilterLaws.laws(WriterT.monadFilter(Option.monadFilter(), IntMonoid),
+            MonadFilterLaws.laws(WriterT.monadFilter(Option.monadFilter(), IntMonoid),
                 { WriterT(Option(Tuple2(it, it))) },
                 object : Eq<HK<WriterTKindPartial<OptionHK, Int>, Int>> {
                     override fun eqv(a: HK<WriterTKindPartial<OptionHK, Int>, Int>, b: HK<WriterTKindPartial<OptionHK, Int>, Int>): Boolean =
@@ -53,6 +54,8 @@ class WriterTTest : UnitSpec() {
                                 val optionB = a.ev().value.ev()
                                 optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Int> -> optionB.fold({ false }, { value == it }) })
                             }
-                }))
+                })
+        )
+
     }
 }

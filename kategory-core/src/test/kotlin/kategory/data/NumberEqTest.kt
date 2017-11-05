@@ -21,12 +21,14 @@ class NumberEqTest : UnitSpec() {
             eq<java.lang.Integer>() shouldNotBe null
         }
 
-        testLaws(EqLaws.laws { it.toLong() })
-        testLaws(EqLaws.laws { it })
-        testLaws(EqLaws.laws { it.toDouble() })
-        testLaws(EqLaws.laws { it.toFloat() })
-        testLaws(EqLaws.laws { it.toByte() })
-        testLaws(EqLaws.laws { it.toShort() })
+        testLaws(
+            EqLaws.laws { it.toLong() },
+            EqLaws.laws { it },
+            EqLaws.laws { it.toDouble() },
+            EqLaws.laws { it.toFloat() },
+            EqLaws.laws { it.toByte() },
+            EqLaws.laws { it.toShort() }
+        )
 
     }
 }

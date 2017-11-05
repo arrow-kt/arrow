@@ -9,12 +9,15 @@ import io.kotlintest.specs.StringSpec
  */
 abstract class UnitSpec : StringSpec() {
     
-    fun testLaws(laws: List<Law>): List<TestCase> =
-            laws.map { law: Law ->
-                val tc = TestCase(suite = rootTestSuite, name = law.name, test = law.test, config = defaultTestCaseConfig)
-                rootTestSuite.addTestCase(tc)
-                tc
-            }
+    fun testLaws(vararg laws: List<Law>): List<TestCase>{
+        val flattened = laws.flatMap { list: List<Law> ->  list.asIterable() }
+        val distinct = flattened.distinctBy { law: Law -> law.name }
+        return distinct.map { law: Law ->
+            val tc = TestCase(suite = rootTestSuite, name = law.name, test = law.test, config = defaultTestCaseConfig)
+            rootTestSuite.addTestCase(tc)
+            tc
+        }
+    }
 
     inline fun <F> Eq<F>.logged(): Eq<F> = Eq { a, b ->
         val result = this@logged.eqv(a, b)
