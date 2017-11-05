@@ -25,4 +25,13 @@ open class MonadFilterContinuation<F, A>(val MF: MonadFilter<F>, override val co
         if (!predicate) throw PredicateInterrupted
     }
 
+    /**
+     * Binds only if the given predicate matches the inner value otherwise binds into the Monad `empty()` value
+     * on `MonadFilter` instances
+     */
+    suspend fun <B> HK<F, B>.bindWithFilter(f: (B) -> Boolean): B {
+       val b: B = bind { this }
+       return if (f(b)) b else bind { MF.empty<B>() }
+    }
+
 }
