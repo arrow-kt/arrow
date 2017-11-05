@@ -42,10 +42,12 @@ class OptionTest : UnitSpec() {
                             })
         }
 
-        testLaws(EqLaws.laws(eq(), { genOption(Gen.int()).generate() }))
+        testLaws(
+            EqLaws.laws(eq(), { genOption(Gen.int()).generate() }),
         //testLaws(MonadErrorLaws.laws(monadError<OptionHK, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
-        testLaws(TraverseFilterLaws.laws(Option.traverseFilter(), Option.monad(), ::Some, Eq.any()))
-        testLaws(MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()))
+            TraverseFilterLaws.laws(Option.traverseFilter(), Option.monad(), ::Some, Eq.any()),
+            MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any())
+        )
 
         "fromNullable should work for both null and non-null values of nullable types" {
             forAll { a: Int? ->

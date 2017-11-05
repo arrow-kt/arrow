@@ -13,8 +13,10 @@ class EvalTest : UnitSpec() {
 
     init {
 
-        testLaws(MonadLaws.laws(Eval.monad(), EQ))
-        testLaws(ComonadLaws.laws(Eval.comonad(), ::Now, EQ))
+        testLaws(
+            MonadLaws.laws(Eval.monad(), EQ),
+            ComonadLaws.laws(Eval.comonad(), ::Now, EQ)
+        )
 
         "should map wrapped value" {
             val sideEffect = SideEffect()

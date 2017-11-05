@@ -29,35 +29,34 @@ class IsoTest : UnitSpec() {
                 reverseGet = SumType::A
         )
 
-        testLaws(LensLaws.laws(
+        testLaws(
+            LensLaws.laws(
                 lens = tokenIso.asLens(),
                 aGen = TokenGen,
                 bGen = Gen.string(),
                 funcGen = genFunctionAToB(Gen.string()),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                FA = NonEmptyList.applicative()
-        ))
+                FA = NonEmptyList.applicative()),
 
-        testLaws(PrismLaws.laws(
+            PrismLaws.laws(
                 prism = aIso.asPrism(),
                 aGen = AGen,
                 bGen = Gen.string(),
                 funcGen = genFunctionAToB(Gen.string()),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                EQOptionB = Eq.any()
-        ))
+                EQOptionB = Eq.any()),
 
-        testLaws(IsoLaws.laws(
+            IsoLaws.laws(
                 iso = tokenIso,
                 aGen = TokenGen,
                 bGen = Gen.string(),
                 funcGen = genFunctionAToB(Gen.string()),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                bMonoid = StringMonoidInstance
-        ))
+                bMonoid = StringMonoidInstance)
+        )
 
         "Lifting a function should yield the same result as not yielding" {
             forAll(TokenGen, Gen.string(), { token, value ->

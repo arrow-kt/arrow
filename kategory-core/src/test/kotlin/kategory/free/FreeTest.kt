@@ -47,8 +47,10 @@ class FreeTest : UnitSpec() {
         }
 
         val EQ: FreeEq<Ops.F, IdHK, Int> = FreeEq(idInterpreter)
-        testLaws(EqLaws.laws<Free<Ops.F, Int>>(EQ, { Ops.value(it) }))
-        testLaws(MonadLaws.laws(Ops, EQ))
+        testLaws(
+            EqLaws.laws<Free<Ops.F, Int>>(EQ, { Ops.value(it) }),
+            MonadLaws.laws(Ops, EQ)
+        )
 
         "Can interpret an ADT as Free operations" {
             program.foldMap(optionInterpreter, Option.monad()).ev() shouldBe Some(-30)

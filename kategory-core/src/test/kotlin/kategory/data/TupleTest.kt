@@ -23,15 +23,17 @@ class TupleTest : UnitSpec() {
             eq<Tuple10<Int, Int, Int, Int, Int, Int, Int, Int, Int, Int>>() shouldNotBe null
         }
 
-        testLaws(EqLaws.laws { Tuple2(it, it) })
-        testLaws(EqLaws.laws { Tuple3(it, it, it) })
-        testLaws(EqLaws.laws { Tuple4(it, it, it, it) })
-        testLaws(EqLaws.laws { Tuple5(it, it, it, it, it) })
-        testLaws(EqLaws.laws { Tuple6(it, it, it, it, it, it) })
-        testLaws(EqLaws.laws { Tuple7(it, it, it, it, it, it, it) })
-        testLaws(EqLaws.laws { Tuple8(it, it, it, it, it, it, it, it) })
-        testLaws(EqLaws.laws { Tuple9(it, it, it, it, it, it, it, it, it) })
-        testLaws(EqLaws.laws { Tuple10(it, it, it, it, it, it, it, it, it, it) })
+        testLaws(
+            EqLaws.laws { Tuple2(it, it) },
+            EqLaws.laws { Tuple3(it, it, it) },
+            EqLaws.laws { Tuple4(it, it, it, it) },
+            EqLaws.laws { Tuple5(it, it, it, it, it) },
+            EqLaws.laws { Tuple6(it, it, it, it, it, it) },
+            EqLaws.laws { Tuple7(it, it, it, it, it, it, it) },
+            EqLaws.laws { Tuple8(it, it, it, it, it, it, it, it) },
+            EqLaws.laws { Tuple9(it, it, it, it, it, it, it, it, it) },
+            EqLaws.laws { Tuple10(it, it, it, it, it, it, it, it, it, it) }
+        )
     }
 
 }

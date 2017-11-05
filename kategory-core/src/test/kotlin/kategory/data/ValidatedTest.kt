@@ -23,13 +23,15 @@ class ValidatedTest : UnitSpec() {
             eq<Validated<String, Int>>() shouldNotBe null
         }
 
-        testLaws(EqLaws.laws { it.valid<String, Int>() })
-        testLaws(ApplicativeLaws.laws(Validated.applicative(StringMonoidInstance), Eq.any()))
-        testLaws(TraverseLaws.laws(Validated.traverse(), Validated.applicative(StringMonoidInstance), ::Valid, Eq.any()))
-        testLaws(SemigroupKLaws.laws(
+        testLaws(
+            EqLaws.laws { it.valid<String, Int>() },
+            ApplicativeLaws.laws(Validated.applicative(StringMonoidInstance), Eq.any()),
+            TraverseLaws.laws(Validated.traverse(), Validated.applicative(StringMonoidInstance), ::Valid, Eq.any()),
+            SemigroupKLaws.laws(
                 Validated.semigroupK(IntMonoid),
                 Validated.applicative(IntMonoid),
-                Eq.any()))
+                Eq.any())
+        )
 
 
         "fold should call function on Invalid" {

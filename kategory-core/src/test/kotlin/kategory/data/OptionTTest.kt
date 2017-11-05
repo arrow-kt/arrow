@@ -32,28 +32,30 @@ class OptionTTest : UnitSpec() {
             traverseFilter<OptionTKindPartial<OptionHK>>() shouldNotBe null
         }
 
-        testLaws(MonadLaws.laws(OptionT.monad(NonEmptyList.monad()), Eq.any()))
-        testLaws(SemigroupKLaws.laws(
+        testLaws(
+            MonadLaws.laws(OptionT.monad(NonEmptyList.monad()), Eq.any()),
+            SemigroupKLaws.laws(
                 OptionT.semigroupK(Id.monad()),
                 OptionT.applicative(Id.monad()),
-                EQ()))
+                EQ()),
 
-        testLaws(MonoidKLaws.laws(
+            MonoidKLaws.laws(
                 OptionT.monoidK(Id.monad()),
                 OptionT.applicative(Id.monad()),
-                EQ()))
+                EQ()),
 
-        testLaws(FunctorFilterLaws.laws(
+            FunctorFilterLaws.laws(
                 OptionT.functorFilter(),
                 { OptionT(Id(it.some())) },
-                EQ()))
+                EQ()),
 
-        testLaws(TraverseFilterLaws.laws(
+            TraverseFilterLaws.laws(
                 OptionT.traverseFilter(),
                 OptionT.applicative(Option.monad()),
                 { OptionT(Option(it.some())) },
                 EQ(),
-                EQ_NESTED()))
+                EQ_NESTED())
+        )
 
         "toLeft for Some should build a correct EitherT" {
             forAll { a: Int, b: String ->
