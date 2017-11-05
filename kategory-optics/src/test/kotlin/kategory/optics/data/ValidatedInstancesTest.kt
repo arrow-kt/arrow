@@ -48,7 +48,7 @@ class ValidatedInstancesTest : UnitSpec() {
                 bMonoid = object : Monoid<Try<Int>> {
                     override fun combine(a: Try<Int>, b: Try<Int>) = Try.applicative().map2(a, b) { (a, b) -> a + b }.ev()
 
-                    override fun empty(): Try<Int> = Try.Success(0)
+                    override fun empty(): Try<Int> = Success(0)
                 }
         ))
 

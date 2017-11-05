@@ -127,8 +127,8 @@ inline fun <reified E, reified A> genValidated(genE: Gen<E>, genA: Gen<A>): Gen<
 
 inline fun <reified A> genTry(genA: Gen<A>, genThrowable: Gen<Throwable> = genThrowable()): Gen<Try<A>> = Gen.create {
     genEither(genThrowable, genA).generate().fold(
-            { throwable -> Try.Failure<A>(throwable) },
-            { a -> Try.Success(a) }
+            { throwable -> Failure<A>(throwable) },
+            { a -> Success(a) }
     )
 }
 
