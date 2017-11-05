@@ -8,7 +8,11 @@ import kotlin.coroutines.experimental.RestrictsSuspension
 open class MonadFilterContinuation<F, A>(val MF: MonadFilter<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
         MonadContinuation<F, A>(MF) {
 
-    object PredicateInterrupted : RuntimeException()
+    /**
+     * marker exception that interrupts the coroutine flow and gets captured
+     * to provide the monad empty value
+     */
+    private object PredicateInterrupted : RuntimeException()
 
     override fun resumeWithException(exception: Throwable) {
         when (exception) {
