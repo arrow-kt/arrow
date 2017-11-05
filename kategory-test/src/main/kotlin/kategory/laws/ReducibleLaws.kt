@@ -32,8 +32,8 @@ object ReducibleLaws {
 
     inline fun <reified F> reduceRightConsistentWithReduceRightOption(RF: Reducible<F>, crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<Option<Int>>) =
             forAll(genFunctionAAToA(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int, Int) -> Int, fa: HK<F, Int> ->
-                RF.reduceRight(fa, { a1, e2 -> Eval.Now(f(a1, e2.value())) }).map({ Option(it) }).value()
-                        .equalUnderTheLaw(RF.reduceRightOption(fa, { a1, e2 -> Eval.Now(f(a1, e2.value())) }).value(), EQ)
+                RF.reduceRight(fa, { a1, e2 -> Now(f(a1, e2.value())) }).map({ Option(it) }).value()
+                        .equalUnderTheLaw(RF.reduceRightOption(fa, { a1, e2 -> Now(f(a1, e2.value())) }).value(), EQ)
             })
 
     inline fun <reified F> reduceReduceLeftConsistent(RF: Reducible<F>, crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<Int>) =

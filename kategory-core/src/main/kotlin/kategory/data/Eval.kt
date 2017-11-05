@@ -1,5 +1,9 @@
 package kategory
 
+typealias Always<A> = Eval.Always<A>
+typealias Later<A> = Eval.Later<A>
+typealias Now<A> = Eval.Now<A>
+
 /**
  * Eval is a monad which controls evaluation of a value or a computation that produces a value.
  *
