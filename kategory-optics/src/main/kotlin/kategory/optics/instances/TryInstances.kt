@@ -17,7 +17,7 @@ fun <A, B> pTrySuccess(): PPrism<Try<A>, Try<B>, A, B> = PPrism(
 )
 
 /**
- * [Prism] to focus into an [kategory.None]
+ * [Prism] to focus into an [kategory.Option.None]
  */
 fun <A> trySuccess(): Prism<Try<A>, A> = pTrySuccess()
 

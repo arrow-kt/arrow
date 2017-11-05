@@ -100,8 +100,8 @@ package kategory
     inline fun exists(crossinline predicate: (B) -> Boolean): Boolean = fold({ false }, { predicate(it) })
 
     /**
-     * Returns a [Some] containing the [Right] value
-     * if it exists or a [None] if this is a [Left].
+     * Returns a [Option.Some] containing the [Right] value
+     * if it exists or a [Option.None] if this is a [Left].
      *
      * Example:
      * ```

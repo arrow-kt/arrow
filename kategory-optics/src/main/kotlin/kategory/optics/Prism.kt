@@ -109,7 +109,7 @@ interface PPrism<S, T, A, B> {
     }
 
     /**
-     * Get the focus or [None] if focus cannot be seen
+     * Get the focus or [Option.None] if focus cannot be seen
      */
     fun getOption(s: S): Option<A> = getOrModify(s).toOption()
 
