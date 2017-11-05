@@ -2,9 +2,8 @@ package kategory.optics
 
 import kategory.Const
 import kategory.Monoid
-import kategory.Option
-import kategory.Some
 import kategory.None
+import kategory.Option
 
 @PublishedApi internal object AndMonoid : Monoid<Boolean> {
     override fun combine(a: Boolean, b: Boolean): Boolean = a && b
