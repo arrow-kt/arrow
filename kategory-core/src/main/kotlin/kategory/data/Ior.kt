@@ -270,7 +270,7 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
      * Both(12, "power").toValidated()  // Result: Valid("power")
      * ```
      */
-    fun toValidated(): Validated<A, B> = fold({ Validated.Invalid(it) }, { Validated.Valid(it) }, { _, b -> Validated.Valid(b) })
+    fun toValidated(): Validated<A, B> = fold({ Invalid(it) }, { Valid(it) }, { _, b -> Valid(b) })
 
     data class Left<out A>(val value: A) : Ior<A, Nothing>() {
         override val isRight: Boolean = false

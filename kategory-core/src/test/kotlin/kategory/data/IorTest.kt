@@ -109,9 +109,9 @@ class IorTest : UnitSpec() {
         "toValidated() should convert values into a valid Validated" {
             forAll { a: Int, b: String ->
                 {
-                    Ior.Left(a).toValidated() == Validated.Invalid(a) &&
-                            Ior.Right(b).toValidated() == Validated.Valid(b) &&
-                            Ior.Both(a, b).toValidated() == Validated.Valid(b)
+                    Ior.Left(a).toValidated() == Invalid(a) &&
+                            Ior.Right(b).toValidated() == Valid(b) &&
+                            Ior.Both(a, b).toValidated() == Valid(b)
                 }()
             }
         }
