@@ -1,7 +1,7 @@
 package kategory
 
-import kategory.Option.Some
-import kategory.Option.None
+import kategory.Some
+import kategory.None
 
 interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F>, Typeclass {
 

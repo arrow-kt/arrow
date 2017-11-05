@@ -100,8 +100,8 @@ package kategory
     inline fun exists(crossinline predicate: (B) -> Boolean): Boolean = fold({ false }, { predicate(it) })
 
     /**
-     * Returns a [Option.Some] containing the [Right] value
-     * if it exists or a [Option.None] if this is a [Left].
+     * Returns a [Some] containing the [Right] value
+     * if it exists or a [None] if this is a [Left].
      *
      * Example:
      * ```
@@ -109,7 +109,7 @@ package kategory
      * Left(12).toOption()  // Result: None
      * ```
      */
-    fun toOption(): Option<B> = fold({ Option.None }, { Option.Some(it) })
+    fun toOption(): Option<B> = fold({ None }, { Some(it) })
 
     /**
      * The left side of the disjoint union, as opposed to the [Right] side.

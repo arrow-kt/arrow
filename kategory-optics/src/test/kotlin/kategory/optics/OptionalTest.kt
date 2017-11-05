@@ -14,6 +14,8 @@ import kategory.genTry
 import kategory.genTuple
 import kategory.left
 import kategory.right
+import kategory.None
+import kategory.Some
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -63,7 +65,7 @@ class OptionalTest : UnitSpec() {
 
         "void should always " {
             forAll({ string: String ->
-                Optional.void<String, Int>().getOption(string) == Option.None
+                Optional.void<String, Int>().getOption(string) == None
             })
         }
 

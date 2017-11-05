@@ -4,6 +4,8 @@ import kategory.effects.Duration
 import kategory.Either
 import kategory.effects.IO
 import kategory.Option
+import kategory.None
+import kategory.Some
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
 
@@ -36,9 +38,9 @@ object Platform {
         val eitherRef = ref
 
         return when (eitherRef) {
-            null -> Option.None
+            null -> None
             is Either.Left -> throw eitherRef.a
-            is Either.Right -> Option.Some(eitherRef.b)
+            is Either.Right -> Some(eitherRef.b)
         }
     }
 }

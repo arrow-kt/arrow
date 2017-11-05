@@ -1,7 +1,7 @@
 package kategory
 
-import kategory.Option.None
-import kategory.Option.Some
+import kategory.None
+import kategory.Some
 
 @instance(Option::class)
 interface OptionSemigroupInstance<A> : Semigroup<Option<A>> {
@@ -20,12 +20,12 @@ interface OptionSemigroupInstance<A> : Semigroup<Option<A>> {
 
 @instance(Option::class)
 interface OptionMonoidInstance<A> : OptionSemigroupInstance<A>, Monoid<Option<A>> {
-    override fun empty(): Option<A> = Option.None
+    override fun empty(): Option<A> = None
 }
 
 @instance(Option::class)
 interface OptionMonadErrorInstance : OptionMonadInstance, MonadError<OptionHK, Unit> {
-    override fun <A> raiseError(e: Unit): Option<A> = Option.None
+    override fun <A> raiseError(e: Unit): Option<A> = None
 
     override fun <A> handleErrorWith(fa: OptionKind<A>, f: (Unit) -> OptionKind<A>): Option<A> = fa.ev().orElse({ f(Unit).ev() })
 }

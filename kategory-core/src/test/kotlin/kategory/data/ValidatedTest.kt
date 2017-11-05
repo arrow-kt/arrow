@@ -103,9 +103,9 @@ class ValidatedTest : UnitSpec() {
             Invalid(13).toIor() shouldBe Ior.Left(13)
         }
 
-        "toOption should return Option.Some(value) if is Valid or Option.None in otherwise" {
-            Valid(10).toOption() shouldBe Option.Some(10)
-            Invalid(13).toOption() shouldBe Option.None
+        "toOption should return Some(value) if is Valid or None in otherwise" {
+            Valid(10).toOption() shouldBe Some(10)
+            Invalid(13).toOption() shouldBe None
         }
 
         "toList should return listOf(value) if is Valid or empty list in otherwise" {
@@ -151,8 +151,8 @@ class ValidatedTest : UnitSpec() {
         }
 
         "fromOption should return Valid if is Some or Invalid in otherwise" {
-            Validated.fromOption<Int, Int>(Option.Some(10)) { fail("None should not be called") } shouldBe Valid(10)
-            Validated.fromOption<Int, Int>(Option.None) { 5 } shouldBe Invalid(5)
+            Validated.fromOption<Int, Int>(Some(10)) { fail("None should not be called") } shouldBe Valid(10)
+            Validated.fromOption<Int, Int>(None) { 5 } shouldBe Invalid(5)
         }
 
         "invalidNel<E> should return a Invalid<NonEmptyList<E>>" {

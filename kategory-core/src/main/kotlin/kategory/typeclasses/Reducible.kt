@@ -31,7 +31,7 @@ interface Reducible<F> : Foldable<F>, Typeclass {
      */
     fun <A, B> reduceLeftTo(fa: HK<F, A>, f: (A) -> B, g: (B, A) -> B): B
 
-    override fun <A, B> reduceLeftToOption(fa: HK<F, A>, f: (A) -> B, g: (B, A) -> B): Option<B> = Option.Some(reduceLeftTo(fa, f, g))
+    override fun <A, B> reduceLeftToOption(fa: HK<F, A>, f: (A) -> B, g: (B, A) -> B): Option<B> = Some(reduceLeftTo(fa, f, g))
 
     /**
      * Apply f to the "initial element" of fa and lazily combine it with every other value using the
@@ -40,7 +40,7 @@ interface Reducible<F> : Foldable<F>, Typeclass {
     fun <A, B> reduceRightTo(fa: HK<F, A>, f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<B>
 
     override fun <A, B> reduceRightToOption(fa: HK<F, A>, f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<Option<B>> =
-            reduceRightTo(fa, f, g).map({ Option.Some(it) })
+            reduceRightTo(fa, f, g).map({ Some(it) })
 
     fun <A> toNonEmptyList(fa: HK<F, A>): NonEmptyList<A> =
             reduceRightTo(fa, { a -> NonEmptyList.of(a) }, { a, lnel ->
@@ -100,8 +100,8 @@ abstract class NonEmptyReducible<F, G> : Reducible<F> {
             Eval.Always({ split(fa) }).flatMap { (a, ga) ->
                 FG().reduceRightToOption(ga, f, g).flatMap { option ->
                     when (option) {
-                        is Option.Some<B> -> g(a, Eval.Now(option.value))
-                        is Option.None -> Eval.Later({ f(a) })
+                        is Some<B> -> g(a, Eval.Now(option.value))
+                        is None -> Eval.Later({ f(a) })
                     }
                 }
             }
@@ -113,7 +113,7 @@ abstract class NonEmptyReducible<F, G> : Reducible<F> {
 
     override fun <A> find(fa: HK<F, A>, f: (A) -> Boolean): Option<A> {
         val (a, ga) = split(fa)
-        return if (f(a)) Option.Some(a) else FG().find(ga, f)
+        return if (f(a)) Some(a) else FG().find(ga, f)
     }
 
     override fun <A> exists(fa: HK<F, A>, p: (A) -> Boolean): Boolean {
@@ -132,7 +132,7 @@ inline fun <reified F, reified G, A> NonEmptyReducible<F, G>.size(MB: Monoid<Lon
     return 1 + FG().size(MB, tail)
 }
 
-fun <F, G, A> NonEmptyReducible<F, G>.get(fa: HK<F, A>, idx: Long): Option<A> = if (idx == 0L) Option.Some(split(fa).a) else FG().get(split(fa).b, idx - 1L)
+fun <F, G, A> NonEmptyReducible<F, G>.get(fa: HK<F, A>, idx: Long): Option<A> = if (idx == 0L) Some(split(fa).a) else FG().get(split(fa).b, idx - 1L)
 
 inline fun <F, reified G, A, B> NonEmptyReducible<F, G>.foldM(fa: HK<F, A>, z: B, crossinline f: (B, A) -> HK<G, B>, MG: Monad<G> = monad()): HK<G, B> {
     val (a, ga) = split(fa)

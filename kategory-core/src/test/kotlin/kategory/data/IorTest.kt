@@ -79,9 +79,9 @@ class IorTest : UnitSpec() {
         "pad() should return the correct Pair of Options" {
             forAll { a: Int, b: String ->
                 {
-                    Ior.Left(a).pad() == Pair(Option.Some(a), Option.None) &&
-                            Ior.Right(b).pad() == Pair(Option.None, Option.Some(b)) &&
-                            Ior.Both(a, b).pad() == Pair(Option.Some(a), Option.Some(b))
+                    Ior.Left(a).pad() == Pair(Some(a), None) &&
+                            Ior.Right(b).pad() == Pair(None, Some(b)) &&
+                            Ior.Both(a, b).pad() == Pair(Some(a), Some(b))
                 }()
             }
         }
@@ -99,9 +99,9 @@ class IorTest : UnitSpec() {
         "toOption() should convert values into a valid Option" {
             forAll { a: Int, b: String ->
                 {
-                    Ior.Left(a).toOption() == Option.None &&
-                            Ior.Right(b).toOption() == Option.Some(b) &&
-                            Ior.Both(a, b).toOption() == Option.Some(b)
+                    Ior.Left(a).toOption() == None &&
+                            Ior.Right(b).toOption() == Some(b) &&
+                            Ior.Both(a, b).toOption() == Some(b)
                 }()
             }
         }
@@ -119,10 +119,10 @@ class IorTest : UnitSpec() {
         "fromOptions() should build a correct Option<Ior>" {
             forAll { a: Int, b: String ->
                 {
-                    Ior.fromOptions(Option.Some(a), Option.None) == Option.Some(Ior.Left(a)) &&
-                            Ior.fromOptions(Option.Some(a), Option.Some(b)) == Option.Some(Ior.Both(a, b)) &&
-                            Ior.fromOptions(Option.None, Option.Some(b)) == Option.Some(Ior.Right(b)) &&
-                            Ior.fromOptions(Option.None, Option.None) == Option.None
+                    Ior.fromOptions(Some(a), None) == Some(Ior.Left(a)) &&
+                            Ior.fromOptions(Some(a), Some(b)) == Some(Ior.Both(a, b)) &&
+                            Ior.fromOptions(None, Some(b)) == Some(Ior.Right(b)) &&
+                            Ior.fromOptions(None, None) == None
                 }()
             }
         }

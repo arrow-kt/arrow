@@ -69,18 +69,18 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
          * @param oa an element (optional) for the left side of the [Ior]
          * @param ob an element (optional) for the right side of the [Ior]
          *
-         * @return [Option.None] if both [oa] and [ob] are [Option.None]. Otherwise [Option.Some] wrapping
+         * @return [None] if both [oa] and [ob] are [None]. Otherwise [Some] wrapping
          * an [Ior.Left], [Ior.Right], or [Ior.Both] if [oa], [ob], or both are defined (respectively).
          */
 
         @JvmStatic fun <A, B> fromOptions(oa: Option<A>, ob: Option<B>): Option<Ior<A, B>> = when (oa) {
-            is Option.Some -> when (ob) {
-                is Option.Some -> Option.Some(Both(oa.value, ob.value))
-                is Option.None -> Option.Some(Left(oa.value))
+            is Some -> when (ob) {
+                is Some -> Some(Both(oa.value, ob.value))
+                is None -> Some(Left(oa.value))
             }
-            is Option.None -> when (ob) {
-                is Option.Some -> Option.Some(Right(ob.value))
-                is Option.None -> Option.None
+            is None -> when (ob) {
+                is Some -> Some(Right(ob.value))
+                is None -> None
             }
         }
 
@@ -222,15 +222,15 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
      *
      * Example:
      * ```
-     * Right(12).pad() // Result: Pair(Option.None, Option.Some(12))
-     * Left(12).pad()  // Result: Pair(Option.Some(12), Option.None)
-     * Both("power", 12).pad()  // Result: Pair(Option.Some("power"), Option.Some(12))
+     * Right(12).pad() // Result: Pair(None, Some(12))
+     * Left(12).pad()  // Result: Pair(Some(12), None)
+     * Both("power", 12).pad()  // Result: Pair(Some("power"), Some(12))
      * ```
      */
     fun pad(): Pair<Option<A>, Option<B>> = fold(
-            { Pair(Option.Some(it), Option.None) },
-            { Pair(Option.None, Option.Some(it)) },
-            { a, b -> Pair(Option.Some(a), Option.Some(b)) }
+            { Pair(Some(it), None) },
+            { Pair(None, Some(it)) },
+            { a, b -> Pair(Some(a), Some(b)) }
     )
 
     /**
@@ -247,8 +247,8 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
     fun toEither(): Either<A, B> = fold({ Either.Left(it) }, { Either.Right(it) }, { _, b -> Either.Right(b) })
 
     /**
-     * Returns a [Option.Some] containing the [Right] value or `B` if this is [Right] or [Both]
-     * and [Option.None] if this is a [Left].
+     * Returns a [Some] containing the [Right] value or `B` if this is [Right] or [Both]
+     * and [None] if this is a [Left].
      *
      * Example:
      * ```
@@ -257,7 +257,7 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
      * Both(12, "power").toOption()  // Result: Some("power")
      * ```
      */
-    fun toOption(): Option<B> = fold({ Option.None }, { Option.Some(it) }, { _, b -> Option.Some(b) })
+    fun toOption(): Option<B> = fold({ None }, { Some(it) }, { _, b -> Some(b) })
 
     /**
      * Returns a [Validated.Valid] containing the [Right] value or `B` if this is [Right] or [Both]

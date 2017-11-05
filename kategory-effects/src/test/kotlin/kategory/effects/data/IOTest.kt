@@ -88,7 +88,7 @@ class IOTest : UnitSpec() {
             val received = never.unsafeRunTimed(100.milliseconds)
             val elapsed = System.currentTimeMillis() - start
 
-            received shouldBe Option.None
+            received shouldBe None
             (elapsed >= 100) shouldBe true
         }
 
@@ -96,7 +96,7 @@ class IOTest : UnitSpec() {
             val never = IO.pure<Int?>(null)
             val received = never.unsafeRunTimed(100.milliseconds)
 
-            received shouldBe Option.Some(null)
+            received shouldBe Some(null)
         }
 
         "should return a null value from unsafeRunSync" {
@@ -230,7 +230,7 @@ class IOTest : UnitSpec() {
         "unsafeRunTimed times out with None result" {
             val never = IO.runAsync<Int> { }
             val result = never.unsafeRunTimed(100.milliseconds)
-            result shouldBe Option.None
+            result shouldBe None
         }
 
         "IO.binding should for comprehend over IO" {

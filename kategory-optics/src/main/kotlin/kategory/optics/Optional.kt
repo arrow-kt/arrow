@@ -108,13 +108,13 @@ interface POptional<S, T, A, B> {
     }
 
     /**
-     * Get the focus of a [POptional] or [Option.None] if the is not there
+     * Get the focus of a [POptional] or [None] if the is not there
      */
     fun getOption(a: S): Option<A> = getOrModify(a).toOption()
 
     /**
      * Set the focus of a [POptional] with a value.
-     * @return [Option.None] if the [POptional] is not matching
+     * @return [None] if the [POptional] is not matching
      */
     fun setOption(s: S, b: B): Option<T> = modifiyOption(s) { b }
 
@@ -264,7 +264,7 @@ inline fun <S, T, A, B, reified F> POptional<S, T, A, B>.liftF(crossinline f: (A
 
 /**
  * Modify the focus of a [POptional] with a function [f]
- * @return [Option.None] if the [POptional] is not matching
+ * @return [None] if the [POptional] is not matching
  */
 inline fun <S, T, A, B> POptional<S, T, A, B>.modifiyOption(s: S, crossinline f: (A) -> B): Option<T> = getOption(s).map({ set(s, f(it)) })
 

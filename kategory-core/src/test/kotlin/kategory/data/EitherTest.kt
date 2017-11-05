@@ -60,8 +60,8 @@ class EitherTest : UnitSpec() {
 
         "toOption should convert" {
             forAll { a: Int ->
-                Right(a).toOption() == Option.Some(a)
-                        && Left(a).toOption() == Option.None
+                Right(a).toOption() == Some(a)
+                        && Left(a).toOption() == None
             }
         }
 

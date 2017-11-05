@@ -2,8 +2,8 @@ package kategory
 
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kategory.Option.Some
-import kategory.Option.None
+import kategory.Some
+import kategory.None
 
 object TraverseFilterLaws {
 

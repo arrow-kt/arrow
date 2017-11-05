@@ -107,7 +107,7 @@ fun <B> genOption(genB: Gen<B>): Gen<Option<B>> =
         object : Gen<Option<B>> {
             val random = genIntSmall()
             override fun generate(): Option<B> =
-                    if (random.generate() % 20 == 0) Option.None else Option.pure(genB.generate())
+                    if (random.generate() % 20 == 0) None else Option.pure(genB.generate())
         }
 
 inline fun <reified E, reified A> genEither(genE: Gen<E>, genA: Gen<A>): Gen<Either<E, A>> =

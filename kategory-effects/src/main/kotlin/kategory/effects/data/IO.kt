@@ -270,7 +270,7 @@ internal data class Pure<out A>(val a: A) : IO<A>() {
 
     override fun unsafeRunAsyncTotal(cb: (Either<Throwable, A>) -> Unit) = cb(Either.Right(a))
 
-    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = Option.Some(a)
+    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = Some(a)
 }
 
 internal data class RaiseError<out A>(val exception: Throwable) : IO<A>() {

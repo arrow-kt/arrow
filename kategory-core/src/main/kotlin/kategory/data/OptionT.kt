@@ -12,9 +12,9 @@ package kategory
 
         operator fun <F, A> invoke(value: HK<F, Option<A>>): OptionT<F, A> = OptionT(value)
 
-        @JvmStatic inline fun <reified F, A> pure(a: A, AF: Applicative<F> = kategory.applicative<F>()): OptionT<F, A> = OptionT(AF.pure(Option.Some(a)))
+        @JvmStatic inline fun <reified F, A> pure(a: A, AF: Applicative<F> = kategory.applicative<F>()): OptionT<F, A> = OptionT(AF.pure(Some(a)))
 
-        @JvmStatic inline fun <reified F> none(AF: Applicative<F> = kategory.applicative<F>()): OptionT<F, Nothing> = OptionT(AF.pure(Option.None))
+        @JvmStatic inline fun <reified F> none(AF: Applicative<F> = kategory.applicative<F>()): OptionT<F, Nothing> = OptionT(AF.pure(None))
 
         @JvmStatic inline fun <reified F, A> fromOption(value: Option<A>, AF: Applicative<F> = kategory.applicative<F>()): OptionT<F, A> =
                 OptionT(AF.pure(value))
@@ -23,9 +23,9 @@ package kategory
                 OptionT(MF.tailRecM(a, {
                     MF.map(f(it).ev().value, {
                         it.fold({
-                            Either.Right<Option<B>>(Option.None)
+                            Either.Right<Option<B>>(None)
                         }, {
-                            it.map { Option.Some(it) }
+                            it.map { Some(it) }
                         })
                     })
                 }))
@@ -41,9 +41,9 @@ package kategory
     inline fun <B> flatMap(crossinline f: (A) -> OptionT<F, B>, MF: Monad<F>): OptionT<F, B> = flatMapF({ it -> f(it).value }, MF)
 
     inline fun <B> flatMapF(crossinline f: (A) -> HK<F, Option<B>>, MF: Monad<F>): OptionT<F, B> =
-            OptionT(MF.flatMap(value, { option -> option.fold({ MF.pure(Option.None) }, f) }))
+            OptionT(MF.flatMap(value, { option -> option.fold({ MF.pure(None) }, f) }))
 
-    fun <B> liftF(fa: HK<F, B>, FF: Functor<F>): OptionT<F, B> = OptionT(FF.map(fa, { Option.Some(it) }))
+    fun <B> liftF(fa: HK<F, B>, FF: Functor<F>): OptionT<F, B> = OptionT(FF.map(fa, { Some(it) }))
 
     inline fun <B> semiflatMap(crossinline f: (A) -> HK<F, B>, MF: Monad<F>): OptionT<F, B> = flatMap({ option -> liftF(f(option), MF) }, MF)
 
@@ -66,8 +66,8 @@ package kategory
     inline fun orElseF(crossinline default: () -> HK<F, Option<A>>, MF: Monad<F>): OptionT<F, A> =
             OptionT(MF.flatMap(value) {
                 when (it) {
-                    is Option.Some<A> -> MF.pure(it)
-                    is Option.None -> default()
+                    is Some<A> -> MF.pure(it)
+                    is None -> default()
                 }
             })
 
