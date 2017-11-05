@@ -19,9 +19,11 @@ class SetKWTest : UnitSpec() {
             eq<SetKW<Int>>() shouldNotBe null
         }
         
-        testLaws(EqLaws.laws { SetKW.pure(it) })
-        testLaws(SemigroupKLaws.laws(SetKW.semigroupK(), { SetKW.pure(it) }, Eq.any()))
-        testLaws(MonoidKLaws.laws(SetKW.monoidK(), { SetKW.pure(it) }, Eq.any()))
-        testLaws(FoldableLaws.laws(SetKW.foldable(), { SetKW.pure(it) }, Eq.any()))
+        testLaws(
+            EqLaws.laws { SetKW.pure(it) },
+            SemigroupKLaws.laws(SetKW.semigroupK(), { SetKW.pure(it) }, Eq.any()),
+            MonoidKLaws.laws(SetKW.monoidK(), { SetKW.pure(it) }, Eq.any()),
+            FoldableLaws.laws(SetKW.foldable(), { SetKW.pure(it) }, Eq.any())
+        )
     }
 }
