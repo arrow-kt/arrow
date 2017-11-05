@@ -31,15 +31,17 @@ class StateTTests : UnitSpec() {
             semigroupK<StateTKindPartial<NonEmptyListHK, NonEmptyListHK>>() shouldNotBe null
         }
 
-        testLaws(MonadStateLaws.laws(M, EQ, EQ_UNIT))
-        testLaws(SemigroupKLaws.laws(
+        testLaws(
+            MonadStateLaws.laws(M, EQ, EQ_UNIT),
+            SemigroupKLaws.laws(
                 StateT.semigroupK<ListKWHK, Int>(ListKW.monad(), ListKW.semigroupK()),
                 StateT.applicative<ListKWHK, Int>(ListKW.monad()),
-                EQ_LIST))
-        testLaws(MonadCombineLaws.laws(StateT.monadCombine<ListKWHK, Int>(ListKW.monadCombine()),
+                EQ_LIST),
+            MonadCombineLaws.laws(StateT.monadCombine<ListKWHK, Int>(ListKW.monadCombine()),
                 { StateT.lift(ListKW.pure(it), ListKW.monad()) },
                 { StateT.lift(ListKW.pure({ s: Int -> s * 2 }), ListKW.monad()) },
-                EQ_LIST))
+                EQ_LIST)
+        )
 
     }
 }
