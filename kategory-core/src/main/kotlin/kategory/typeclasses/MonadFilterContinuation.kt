@@ -8,7 +8,7 @@ import kotlin.coroutines.experimental.RestrictsSuspension
 open class MonadFilterContinuation<F, A>(val MF: MonadFilter<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
         MonadContinuation<F, A>(MF) {
 
-    object PredicateInterrupted: RuntimeException()
+    object PredicateInterrupted : RuntimeException()
 
     override fun resumeWithException(exception: Throwable) {
         when (exception) {
@@ -30,8 +30,8 @@ open class MonadFilterContinuation<F, A>(val MF: MonadFilter<F>, override val co
      * on `MonadFilter` instances
      */
     suspend fun <B> HK<F, B>.bindWithFilter(f: (B) -> Boolean): B {
-       val b: B = bind { this }
-       return if (f(b)) b else bind { MF.empty<B>() }
+        val b: B = bind { this }
+        return if (f(b)) b else bind { MF.empty<B>() }
     }
 
 }

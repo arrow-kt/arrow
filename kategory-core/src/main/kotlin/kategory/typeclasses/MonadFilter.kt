@@ -21,5 +21,4 @@ fun <F, B> MonadFilter<F>.bindingFilter(c: suspend MonadFilterContinuation<F, *>
     return continuation.returnedMonad()
 }
 
-
 inline fun <reified F> monadFilter(): MonadFilter<F> = instance(InstanceParametrizedType(MonadFilter::class.java, listOf(typeLiteral<F>())))
