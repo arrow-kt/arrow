@@ -51,8 +51,8 @@ fun <K, A> Map<K, A>.k(): MapKW<K, A> = MapKW(this)
 
 fun <K, A> Option<Tuple2<K, A>>.k(): MapKW<K, A> =
         when (this) {
-            is Option.Some -> mapOf(this.value).k()
-            is Option.None -> emptyMap<K, A>().k()
+            is Some -> mapOf(this.value).k()
+            is None -> emptyMap<K, A>().k()
         }
 
 fun <K, A> List<Map.Entry<K, A>>.k(): MapKW<K, A> = this.map { it.key to it.value }.toMap().k()

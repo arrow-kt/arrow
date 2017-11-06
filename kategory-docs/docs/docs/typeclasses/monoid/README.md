@@ -32,7 +32,7 @@ listOf("K", "Λ", "T", "E", "G", "O", "R", "Y").combineAll()
 ```
 
 ```kotlin:ank
-listOf<Option<Int>>(Option.Some(1), Option.Some(1)).combineAll()
+listOf<Option<Int>>(Some(1), Some(1)).combineAll()
 ```
 
 The advantage of using these type class provided methods, rather than the specific ones for each type, is that we can compose monoids to allow us to operate on more complex types, e.g.

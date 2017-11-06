@@ -24,7 +24,7 @@ Now we only need the push and pop methods, as follows:
 import kategory.*
 
 fun pop(stack: Stack) = stack.fold({
-    Option.None toT Option.None
+    None toT None
 }, {
     Nel.fromList(it.tail) toT it.head.some()
 })
@@ -67,7 +67,7 @@ import kategory.*
 
 fun pop() = State<Stack, Option<String>> { stack ->
     stack.fold({
-        Option.None toT Option.None
+        None toT None
     }, {
         Nel.fromList(it.tail) toT it.head.some()
     })

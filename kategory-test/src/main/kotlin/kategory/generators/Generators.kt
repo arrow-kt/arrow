@@ -107,7 +107,7 @@ fun <B> genOption(genB: Gen<B>): Gen<Option<B>> =
         object : Gen<Option<B>> {
             val random = genIntSmall()
             override fun generate(): Option<B> =
-                    if (random.generate() % 20 == 0) Option.None else Option.pure(genB.generate())
+                    if (random.generate() % 20 == 0) None else Option.pure(genB.generate())
         }
 
 inline fun <reified E, reified A> genEither(genE: Gen<E>, genA: Gen<A>): Gen<Either<E, A>> =
@@ -115,8 +115,8 @@ inline fun <reified E, reified A> genEither(genE: Gen<E>, genA: Gen<A>): Gen<Eit
             override fun generate(): Either<E, A> =
                     Gen.oneOf(genE, genA).generate().let {
                         when (it) {
-                            is E -> Either.Left(it)
-                            is A -> Either.Right(it)
+                            is E -> Left(it)
+                            is A -> Right(it)
                             else -> throw IllegalStateException("genEither incorrect value $it")
                         }
                     }
@@ -127,8 +127,8 @@ inline fun <reified E, reified A> genValidated(genE: Gen<E>, genA: Gen<A>): Gen<
 
 inline fun <reified A> genTry(genA: Gen<A>, genThrowable: Gen<Throwable> = genThrowable()): Gen<Try<A>> = Gen.create {
     genEither(genThrowable, genA).generate().fold(
-            { throwable -> Try.Failure<A>(throwable) },
-            { a -> Try.Success(a) }
+            { throwable -> Failure<A>(throwable) },
+            { a -> Success(a) }
     )
 }
 

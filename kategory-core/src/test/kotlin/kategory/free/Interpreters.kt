@@ -26,9 +26,9 @@ val optionInterpreter: FunctionK<Ops.F, OptionHK> = object : FunctionK<Ops.F, Op
     override fun <A> invoke(fa: HK<Ops.F, A>): Option<A> {
         val op = fa.ev()
         return when (op) {
-            is Ops.Add -> Option.Some(op.a + op.y)
-            is Ops.Subtract -> Option.Some(op.a - op.y)
-            is Ops.Value -> Option.Some(op.a)
+            is Ops.Add -> Some(op.a + op.y)
+            is Ops.Subtract -> Some(op.a - op.y)
+            is Ops.Value -> Some(op.a)
         } as Option<A>
     }
 }
@@ -36,9 +36,9 @@ val optionApInterpreter: FunctionK<OpsAp.F, OptionHK> = object : FunctionK<OpsAp
     override fun <A> invoke(fa: HK<OpsAp.F, A>): Option<A> {
         val op = fa.ev()
         return when (op) {
-            is OpsAp.Add -> Option.Some(op.a + op.y)
-            is OpsAp.Subtract -> Option.Some(op.a - op.y)
-            is OpsAp.Value -> Option.Some(op.a)
+            is OpsAp.Add -> Some(op.a + op.y)
+            is OpsAp.Subtract -> Some(op.a - op.y)
+            is OpsAp.Value -> Some(op.a)
         } as Option<A>
     }
 }

@@ -4,8 +4,8 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import kategory.Cofree.Companion.unfold
-import kategory.Option.None
-import kategory.Option.Some
+import kategory.None
+import kategory.Some
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
