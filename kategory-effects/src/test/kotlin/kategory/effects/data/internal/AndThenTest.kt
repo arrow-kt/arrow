@@ -104,8 +104,8 @@ class AndThenTest : UnitSpec() {
                 val expected = 10
                 val dummy = MyException()
 
-                val f = AndThen { n: Int -> num }
-                        .andThen(AndThen { n: Int ->
+                val f = AndThen { _: Int -> num }
+                        .andThen(AndThen { _: Int ->
                             num.toString()
                         })
                         .error(dummy, { expected.toString() })
