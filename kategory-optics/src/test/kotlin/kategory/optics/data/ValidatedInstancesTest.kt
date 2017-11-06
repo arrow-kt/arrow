@@ -23,7 +23,8 @@ class ValidatedInstancesTest : UnitSpec() {
 
     init {
 
-        testLaws(IsoLaws.laws(
+        testLaws(
+            IsoLaws.laws(
                 iso = validatedToEither(),
                 aGen = genValidated(Gen.string(), Gen.int()),
                 bGen = genEither(Gen.string(), Gen.int()),
@@ -35,10 +36,9 @@ class ValidatedInstancesTest : UnitSpec() {
 
                     override fun combine(a: Either<String, Int>, b: Either<String, Int>): Either<String, Int> =
                             Either.applicative<String>().map2(a, b) { (a, b) -> a + b }.ev()
-                }
-        ))
+                }),
 
-        testLaws(IsoLaws.laws(
+            IsoLaws.laws(
                 iso = validatedToTry(),
                 aGen = genValidated(genThrowable(), Gen.int()),
                 bGen = genTry(Gen.int()),
@@ -49,8 +49,8 @@ class ValidatedInstancesTest : UnitSpec() {
                     override fun combine(a: Try<Int>, b: Try<Int>) = Try.applicative().map2(a, b) { (a, b) -> a + b }.ev()
 
                     override fun empty(): Try<Int> = Try.Success(0)
-                }
-        ))
+                })
+        )
 
     }
 

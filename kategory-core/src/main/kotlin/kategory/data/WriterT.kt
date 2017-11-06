@@ -46,8 +46,8 @@ package kategory
                 WriterT(MF.tailRecM(a, {
                     MF.map(f(it).ev().value) {
                         when (it.b) {
-                            is Either.Left<A, B> -> Either.Left(it.b.a)
-                            is Either.Right<A, B> -> Either.Right(it.a toT it.b.b)
+                            is Left<A, B> -> Left(it.b.a)
+                            is Right<A, B> -> Right(it.a toT it.b.b)
                         }
                     }
                 }))

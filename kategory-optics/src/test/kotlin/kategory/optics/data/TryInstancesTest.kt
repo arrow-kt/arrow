@@ -17,35 +17,36 @@ import kategory.genThrowable
 import kategory.genTry
 import kategory.genValidated
 import kategory.invalid
+import kategory.Invalid
 import kategory.right
 import kategory.valid
+import kategory.Valid
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class TryInstancesTest : UnitSpec() {
     init {
 
-        testLaws(PrismLaws.laws(
+        testLaws(
+            PrismLaws.laws(
                 prism = trySuccess(),
                 aGen = genTry(Gen.int()),
                 bGen = Gen.int(),
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                EQOptionB = Eq.any()
-        ))
+                EQOptionB = Eq.any()),
 
-        testLaws(PrismLaws.laws(
+            PrismLaws.laws(
                 prism = tryFailure(),
                 aGen = genTry(Gen.int()),
                 bGen = genThrowable(),
                 funcGen = genFunctionAToB(genThrowable()),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                EQOptionB = Eq.any()
-        ))
+                EQOptionB = Eq.any()),
 
-        testLaws(IsoLaws.laws(
+            IsoLaws.laws(
                 iso = tryToEither(),
                 aGen = genTry(Gen.int()),
                 bGen = genEither(genThrowable(), Gen.int()),
@@ -57,10 +58,9 @@ class TryInstancesTest : UnitSpec() {
                             Either.applicative<Throwable>().map2(a, b) { (a, b) -> a + b }.ev()
 
                     override fun empty(): Either<Throwable, Int> = 0.right()
-                }
-        ))
+                }),
 
-        testLaws(IsoLaws.laws(
+            IsoLaws.laws(
                 iso = tryToValidated(),
                 aGen = genTry(Gen.int()),
                 bGen = genValidated(genThrowable(), Gen.int()),
@@ -70,23 +70,23 @@ class TryInstancesTest : UnitSpec() {
                 bMonoid = object : Monoid<Validated<Throwable, Int>> {
                     override fun combine(a: Validated<Throwable, Int>, b: Validated<Throwable, Int>): Validated<Throwable, Int> =
                             when (a) {
-                                is Validated.Invalid -> {
+                                is Invalid -> {
                                     when (b) {
-                                        is Validated.Invalid -> (a.e).invalid()
-                                        is Validated.Valid -> b
+                                        is Invalid -> (a.e).invalid()
+                                        is Valid -> b
                                     }
                                 }
-                                is Validated.Valid -> {
+                                is Valid -> {
                                     when (b) {
-                                        is Validated.Invalid -> b
-                                        is Validated.Valid -> (a.a + b.a).valid()
+                                        is Invalid -> b
+                                        is Valid -> (a.a + b.a).valid()
                                     }
                                 }
                             }
 
                     override fun empty() = 0.valid<Throwable, Int>()
-                }
-        ))
+                })
+        )
 
     }
 }

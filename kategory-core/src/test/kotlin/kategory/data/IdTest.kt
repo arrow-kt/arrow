@@ -18,9 +18,11 @@ class IdTest : UnitSpec() {
             eq<Id<Int>>() shouldNotBe null
         }
 
-        testLaws(EqLaws.laws { Id(it) })
-        testLaws(MonadLaws.laws(Id.monad(), Eq.any()))
-        testLaws(TraverseLaws.laws(Id.traverse(), Id.functor(), ::Id))
-        testLaws(ComonadLaws.laws(Id.comonad(), ::Id, Eq.any()))
+        testLaws(
+            EqLaws.laws { Id(it) },
+            MonadLaws.laws(Id.monad(), Eq.any()),
+            TraverseLaws.laws(Id.traverse(), Id.functor(), ::Id),
+            ComonadLaws.laws(Id.comonad(), ::Id, Eq.any())
+        )
     }
 }

@@ -98,7 +98,7 @@ data class Snippet(
         val startOffset: Int,
         val endOffset: Int,
         val code: String,
-        val result: Option<String> = Option.None)
+        val result: Option<String> = None)
 
 fun extractCodeImpl(source: String, tree: ASTNode): ListKW<Snippet> {
     val sb = mutableListOf<Snippet>()
@@ -137,7 +137,7 @@ fun compileCodeImpl(origin: File, snippets: ListKW<Snippet>, classpath: ListKW<S
         }.fold({
             throw CompilationException(cachedEngines.get(snippet.lang), snippet, it)
         }, { it })
-        val resultString = Option.fromNullable(result).fold({ Option.None }, { Option.Some("//$it") })
+        val resultString = Option.fromNullable(result).fold({ None }, { Some("//$it") })
         if (snippet.silent) snippet
         else snippet.copy(result = resultString)
     }.k()

@@ -36,12 +36,14 @@ class FreeApplicativeTest : UnitSpec() {
         }
 
         val EQ: FreeApplicativeEq<OpsAp.F, IdHK, Int> = FreeApplicativeEq(idApInterpreter)
-        testLaws(EqLaws.laws<FreeApplicative<OpsAp.F, Int>>(EQ, { OpsAp.value(it) }))
-        testLaws(ApplicativeLaws.laws(OpsAp, EQ))
+        testLaws(
+            EqLaws.laws<FreeApplicative<OpsAp.F, Int>>(EQ, { OpsAp.value(it) }),
+            ApplicativeLaws.laws(OpsAp, EQ)
+        )
 
         "Can interpret an ADT as FreeApplicative operations" {
             val result: Tuple3<Int, Int, Int> = (1 toT 7) + -1
-            program.foldMap(optionApInterpreter, Option.applicative()).ev() shouldBe Option.Some(result)
+            program.foldMap(optionApInterpreter, Option.applicative()).ev() shouldBe Some(result)
             program.foldMap(idApInterpreter, Id.applicative()).ev() shouldBe Id(result)
             program.foldMap(nonEmptyListApInterpreter, NonEmptyList.applicative()).ev() shouldBe NonEmptyList.of(result)
         }
