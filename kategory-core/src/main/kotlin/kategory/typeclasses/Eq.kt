@@ -1,8 +1,20 @@
 package kategory
 
+/**
+ * A type class used to determine equality between 2 instances of the same type [F] in a type safe way.
+ */
 interface Eq<in F> : Typeclass {
+
+    /**
+     * Compare two objects [a] and [b] of the type [F].
+     *
+     * @param a object to compare with [b]
+     * @param b object to compare with [a]
+     * @returns true if [a] and [b] are equivalent, false otherwise.
+     */
     fun eqv(a: F, b: F): Boolean
 
+    /** {@inh} */
     fun neqv(a: F, b: F): Boolean = !eqv(a, b)
 
     companion object {
