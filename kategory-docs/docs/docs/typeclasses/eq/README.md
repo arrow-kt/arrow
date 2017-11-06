@@ -63,7 +63,7 @@ Note that this instance will fail on many all datatypes that contain a property 
 
 ```kotlin:ank
 // Option is a data class with a single value
-Eq.any().eqv(Option.Some(1), Option.pure(1))
+Eq.any().eqv(Some(1), Option.pure(1))
 ```
 
 ```kotlin:ank

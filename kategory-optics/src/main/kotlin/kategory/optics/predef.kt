@@ -2,6 +2,7 @@ package kategory.optics
 
 import kategory.Const
 import kategory.Monoid
+import kategory.None
 import kategory.Option
 
 @PublishedApi internal object AndMonoid : Monoid<Boolean> {
@@ -14,7 +15,7 @@ internal sealed class Last
 
 @PublishedApi internal fun <A> firstOptionMonoid() = object : Monoid<Const<Option<A>, First>> {
 
-    override fun empty() = Const<Option<A>, First>(Option.None)
+    override fun empty() = Const<Option<A>, First>(None)
 
     override fun combine(a: Const<Option<A>, First>, b: Const<Option<A>, First>) =
             if (a.value.fold({ false }, { true })) a else b
@@ -23,7 +24,7 @@ internal sealed class Last
 
 internal fun <A> lastOptionMonoid() = object : Monoid<Const<Option<A>, Last>> {
 
-    override fun empty() = Const<Option<A>, Last>(Option.None)
+    override fun empty() = Const<Option<A>, Last>(None)
 
     override fun combine(a: Const<Option<A>, Last>, b: Const<Option<A>, Last>) =
             if (b.value.fold({ false }, { true })) b else a

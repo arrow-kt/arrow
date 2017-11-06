@@ -64,7 +64,7 @@ IO<Int> { throw RuntimeException("Boom!") }
 ### unsafeRunTimed
 
 To be use with SEVERE CAUTION, it runs `IO` synchronously and returns an `Option<A>` blocking the current thread. It requires a timeout parameter.
-If the any non-blocking operation performed inside `IO` lasts longer than the timeout, `unsafeRunSyncTimed` returns `Option.None`.
+If the any non-blocking operation performed inside `IO` lasts longer than the timeout, `unsafeRunSyncTimed` returns `None`.
 
 If your program has crashed, this function call is a good suspect. To avoid crashing use `attempt()` first.
 

@@ -1,5 +1,8 @@
 package kategory
 
+typealias Right<A, B> = Either.Right<A, B>
+typealias Left<A, B> = Either.Left<A, B>
+
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Either.scala
  *
@@ -44,16 +47,16 @@ package kategory
     fun <C> foldL(b: C, f: (C, B) -> C): C =
             this.ev().let { either ->
                 when (either) {
-                    is Either.Right -> f(b, either.b)
-                    is Either.Left -> b
+                    is Right -> f(b, either.b)
+                    is Left -> b
                 }
             }
 
     fun <C> foldR(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
             this.ev().let { either ->
                 when (either) {
-                    is Either.Right -> f(either.b, lb)
-                    is Either.Left -> lb
+                    is Right -> f(either.b, lb)
+                    is Left -> lb
                 }
             }
 
@@ -109,7 +112,7 @@ package kategory
      * Left(12).toOption()  // Result: None
      * ```
      */
-    fun toOption(): Option<B> = fold({ Option.None }, { Option.Some(it) })
+    fun toOption(): Option<B> = fold({ None }, { Some(it) })
 
     /**
      * The left side of the disjoint union, as opposed to the [Right] side.
@@ -140,12 +143,12 @@ package kategory
         tailrec fun <L, A, B> tailRecM(a: A, f: (A) -> HK<EitherKindPartial<L>, Either<A, B>>): Either<L, B> {
             val ev: Either<L, Either<A, B>> = f(a).ev()
             return when (ev) {
-                is Either.Left<L, Either<A, B>> -> ev.a.left()
-                is Either.Right<L, Either<A, B>> -> {
+                is Left<L, Either<A, B>> -> ev.a.left()
+                is Right<L, Either<A, B>> -> {
                     val b: Either<A, B> = ev.b
                     when (b) {
-                        is Either.Left<A, B> -> tailRecM(b.a, f)
-                        is Either.Right<A, B> -> b.b.right()
+                        is Left<A, B> -> tailRecM(b.a, f)
+                        is Right<A, B> -> b.b.right()
                     }
                 }
             }
@@ -159,7 +162,7 @@ package kategory
  *
  * @param f The function to bind across [Either.Right].
  */
-inline fun <A, B, C> Either<A, B>.flatMap(crossinline f: (B) -> Either<A, C>): Either<A, C> = fold({ Either.Left(it) }, { f(it) })
+inline fun <A, B, C> Either<A, B>.flatMap(crossinline f: (B) -> Either<A, C>): Either<A, C> = fold({ Left(it) }, { f(it) })
 
 /**
  * Returns the value from this [Either.Right] or the given argument if this is a [Either.Left].
@@ -189,7 +192,7 @@ inline fun <B> Either<*, B>.getOrElse(crossinline default: () -> B): B = fold({ 
  * ```
  */
 inline fun <A, B> Either<A, B>.filterOrElse(crossinline predicate: (B) -> Boolean, crossinline default: () -> A): Either<A, B> =
-        fold({ Either.Left(it) }, { if (predicate(it)) Either.Right(it) else Either.Left(default()) })
+        fold({ Left(it) }, { if (predicate(it)) Right(it) else Left(default()) })
 
 /**
  * Returns `true` if this is a [Either.Right] and its value is equal to `elem` (as determined by `==`),
@@ -210,15 +213,15 @@ fun <A, B> Either<A, B>.contains(elem: B): Boolean = fold({ false }, { it == ele
 fun <A, B, C> Either<A, B>.ap(ff: EitherKind<A, (B) -> C>): Either<A, C> = ff.flatMap { f -> map(f) }.ev()
 
 fun <G, A, B, C> Either<A, B>.traverse(f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, Either<A, C>> =
-        this.ev().fold({ GA.pure(it.left()) }, { GA.map(f(it), { Either.Right(it) }) })
+        this.ev().fold({ GA.pure(it.left()) }, { GA.map(f(it), { Right(it) }) })
 
 fun <A, B> Either<A, B>.combineK(y: EitherKind<A, B>): Either<A, B> =
         when (this) {
-            is Either.Left -> y.ev()
+            is Left -> y.ev()
             else -> this.ev()
         }
 
-fun <A> A.left(): Either<A, Nothing> = Either.Left(this)
+fun <A> A.left(): Either<A, Nothing> = Left(this)
 
-fun <A> A.right(): Either<Nothing, A> = Either.Right(this)
+fun <A> A.right(): Either<Nothing, A> = Right(this)
 

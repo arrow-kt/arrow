@@ -86,5 +86,5 @@ interface OptionTSemigroupKInstance<F> : SemigroupK<OptionTKindPartial<F>> {
 
 @instance(OptionT::class)
 interface OptionTMonoidKInstance<F> : MonoidK<OptionTKindPartial<F>>, OptionTSemigroupKInstance<F> {
-    override fun <A> empty(): OptionT<F, A> = OptionT(FF().pure(Option.None))
+    override fun <A> empty(): OptionT<F, A> = OptionT(FF().pure(None))
 }

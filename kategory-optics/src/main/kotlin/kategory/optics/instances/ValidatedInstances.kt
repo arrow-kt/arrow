@@ -3,6 +3,8 @@ package kategory.optics
 import kategory.Either
 import kategory.Try
 import kategory.Validated
+import kategory.Failure
+import kategory.Success
 
 /**
  * [PIso] that defines equality between [Validated] and [Either]
@@ -21,7 +23,7 @@ fun <A, B> validatedToEither(): Iso<Validated<A, B>, Either<A, B>> = pValidatedT
  * [PIso] that defines equality between [Validated] and [Try]
  */
 fun <A, B> pValidatedToTry(): PIso<Validated<Throwable, A>, Validated<Throwable, B>, Try<A>, Try<B>> = PIso(
-        get = { it.fold({ Try.Failure(it) }, { Try.Success(it) }) },
+        get = { it.fold({ Failure(it) }, { Success(it) }) },
         reverseGet = { Validated.fromTry(it) }
 )
 

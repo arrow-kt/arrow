@@ -60,7 +60,7 @@ An `Optional` instance can be manually constructed from any default or custom `I
 
 ### Composition
 
-We can compose `Optional`s to build telescopes with an optional focus. Imagine we try to retrieve a `User` his email from a backend. The result of our call is `Try<User>`. So we first want to look into `Try` which **optionally** could be a `Try.Success` and then we want to look into `User` which optionally filled in his email.
+We can compose `Optional`s to build telescopes with an optional focus. Imagine we try to retrieve a `User` his email from a backend. The result of our call is `Try<User>`. So we first want to look into `Try` which **optionally** could be a `Success` and then we want to look into `User` which optionally filled in his email.
 
 ```kotlin:ank
 data class Participant(val name: String, val email: String?)

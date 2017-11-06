@@ -17,8 +17,10 @@ import kategory.genThrowable
 import kategory.genTry
 import kategory.genValidated
 import kategory.invalid
+import kategory.Invalid
 import kategory.right
 import kategory.valid
+import kategory.Valid
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -68,16 +70,16 @@ class TryInstancesTest : UnitSpec() {
                 bMonoid = object : Monoid<Validated<Throwable, Int>> {
                     override fun combine(a: Validated<Throwable, Int>, b: Validated<Throwable, Int>): Validated<Throwable, Int> =
                             when (a) {
-                                is Validated.Invalid -> {
+                                is Invalid -> {
                                     when (b) {
-                                        is Validated.Invalid -> (a.e).invalid()
-                                        is Validated.Valid -> b
+                                        is Invalid -> (a.e).invalid()
+                                        is Valid -> b
                                     }
                                 }
-                                is Validated.Valid -> {
+                                is Valid -> {
                                     when (b) {
-                                        is Validated.Invalid -> b
-                                        is Validated.Valid -> (a.a + b.a).valid()
+                                        is Invalid -> b
+                                        is Valid -> (a.a + b.a).valid()
                                     }
                                 }
                             }

@@ -3,8 +3,8 @@ package kategory
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
-import kategory.Either.Left
-import kategory.Either.Right
+import kategory.Left
+import kategory.Right
 import kategory.laws.EqLaws
 import org.junit.runner.RunWith
 
@@ -62,8 +62,8 @@ class EitherTest : UnitSpec() {
 
         "toOption should convert" {
             forAll { a: Int ->
-                Right(a).toOption() == Option.Some(a)
-                        && Left(a).toOption() == Option.None
+                Right(a).toOption() == Some(a)
+                        && Left(a).toOption() == None
             }
         }
 
