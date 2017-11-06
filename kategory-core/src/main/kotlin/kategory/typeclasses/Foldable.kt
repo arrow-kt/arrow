@@ -44,11 +44,11 @@ interface Foldable<F> : Typeclass {
             }
 
     fun <A, B> reduceRightToOption(fa: HK<F, A>, f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<Option<B>> =
-            foldR(fa, Now(Option.empty())) { a, lb ->
+            foldR(fa, Eval.Now(Option.empty())) { a, lb ->
                 lb.flatMap { option ->
                     when (option) {
-                        is Some<B> -> g(a, Now(option.value)).map({ Some(it) })
-                        is None -> Later({ Some(f(a)) })
+                        is Some<B> -> g(a, Eval.Now(option.value)).map({ Some(it) })
+                        is None -> Eval.Later({ Some(f(a)) })
                     }
                 }
             }

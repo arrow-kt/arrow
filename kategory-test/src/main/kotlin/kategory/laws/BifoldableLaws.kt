@@ -21,7 +21,7 @@ object BifoldableLaws {
     inline fun <reified F> bifoldRightConsistentWithBifoldMap(BF: Bifoldable<F>, crossinline cf: (Int) -> HK2<F, Int, Int>, EQ: Eq<Int>) =
             forAll(genFunctionAToB<Int, Int>(genIntSmall()), genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf),
                     { f: (Int) -> Int, g: (Int) -> Int, fab: HK2<F, Int, Int> ->
-                        val expected = BF.bifoldRight(fab, Later({ IntMonoid.empty() }),
+                        val expected = BF.bifoldRight(fab, Eval.Later({ IntMonoid.empty() }),
                                 { a: Int, ec: Eval<Int> -> ec.map({ c -> IntMonoid.combine(f(a), c) }) },
                                 { b: Int, ec: Eval<Int> -> ec.map({ c -> IntMonoid.combine(g(b), c) }) })
                         expected.value().equalUnderTheLaw(BF.bifoldMap(fab, f, g, IntMonoid), EQ)

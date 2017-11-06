@@ -51,7 +51,7 @@ sealed class IO<out A> : IOKind<A> {
 
         fun <A> eval(eval: Eval<A>): IO<A> =
                 when (eval) {
-                    is Now -> pure(eval.value)
+                    is Eval.Now -> pure(eval.value)
                     else -> invoke { eval.value() }
                 }
 

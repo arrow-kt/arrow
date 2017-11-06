@@ -89,7 +89,7 @@ abstract class NonEmptyReducible<F, G> : Reducible<F> {
     }
 
     override fun <A, B> foldR(fa: HK<F, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            Always({ split(fa) }).flatMap { (a, ga) -> f(a, FG().foldR(ga, lb, f)) }
+            Eval.Always({ split(fa) }).flatMap { (a, ga) -> f(a, FG().foldR(ga, lb, f)) }
 
     override fun <A, B> reduceLeftTo(fa: HK<F, A>, f: (A) -> B, g: (B, A) -> B): B {
         val (a, ga) = split(fa)
@@ -97,11 +97,11 @@ abstract class NonEmptyReducible<F, G> : Reducible<F> {
     }
 
     override fun <A, B> reduceRightTo(fa: HK<F, A>, f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            Always({ split(fa) }).flatMap { (a, ga) ->
+            Eval.Always({ split(fa) }).flatMap { (a, ga) ->
                 FG().reduceRightToOption(ga, f, g).flatMap { option ->
                     when (option) {
-                        is Some<B> -> g(a, Now(option.value))
-                        is None -> Later({ f(a) })
+                        is Some<B> -> g(a, Eval.Now(option.value))
+                        is None -> Eval.Later({ f(a) })
                     }
                 }
             }

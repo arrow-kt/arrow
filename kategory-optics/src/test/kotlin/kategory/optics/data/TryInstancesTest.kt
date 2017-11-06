@@ -17,8 +17,10 @@ import kategory.genThrowable
 import kategory.genTry
 import kategory.genValidated
 import kategory.invalid
+import kategory.Invalid
 import kategory.right
 import kategory.valid
+import kategory.Valid
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

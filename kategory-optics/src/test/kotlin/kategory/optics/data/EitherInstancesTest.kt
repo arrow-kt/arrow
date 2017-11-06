@@ -10,8 +10,10 @@ import kategory.Validated
 import kategory.genEither
 import kategory.genFunctionAToB
 import kategory.genValidated
+import kategory.Invalid
 import kategory.invalid
 import kategory.valid
+import kategory.Valid
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
