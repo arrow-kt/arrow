@@ -1,6 +1,10 @@
 package io.kategory.ank
 
 import kategory.*
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.CoroutineDispatcher
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.runBlocking
 import org.intellij.markdown.MarkdownElementTypes.CODE_FENCE
 import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.ast.accept
@@ -12,9 +16,13 @@ import java.io.File
 import java.net.URL
 import java.net.URLClassLoader
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
 import javax.script.ScriptException
+import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.experimental.EmptyCoroutineContext
 
 val extensionMappings = mapOf(
         "java" to "java",
@@ -32,7 +40,7 @@ inline fun <reified F> ankMonadErrorInterpreter(ME: MonadError<F, Throwable> = m
                     is AnkOps.ReadFile -> ME.catch({ readFileImpl(op.source) })
                     is AnkOps.ParseMarkdown -> ME.catch({ parseMarkDownImpl(op.markdown) })
                     is AnkOps.ExtractCode -> ME.catch({ extractCodeImpl(op.source, op.tree) })
-                    is AnkOps.CompileCode -> ME.catch({ compileCodeImpl(op.origin, op.snippets, op.compilerArgs) })
+                    is AnkOps.CompileCode -> ME.catch({ compileCodeImpl(op.snippets, op.compilerArgs) })
                     is AnkOps.ReplaceAnkToLang -> ME.catch({ replaceAnkToLangImpl(op.compilationResults) })
                     is AnkOps.GenerateFiles -> ME.catch({ generateFilesImpl(op.candidates, op.newContents) })
                 } as HK<F, A>
@@ -69,14 +77,14 @@ fun parseMarkDownImpl(markdown: String): ASTNode =
         MarkdownParser(GFMFlavourDescriptor()).buildMarkdownTreeFromString(markdown)
 
 data class CompilationException(
-        val engine: ScriptEngine?,
+        val file: File,
         val snippet: Snippet,
         val underlying: Throwable,
         val msg: String = """
             |
             |
             |### ΛNK Compilation Error ###
-            |engine: ${engine}
+            |file: $file
             |lang: ${snippet.lang}
             |```
             |${snippet.code}
@@ -118,37 +126,58 @@ fun extractCodeImpl(source: String, tree: ASTNode): ListKW<Snippet> {
     return sb.k()
 }
 
-fun compileCodeImpl(origin: File, snippets: ListKW<Snippet>, classpath: ListKW<String>): CompiledMarkdown {
-    println(":runAnk -> Compiling: $origin")
-    val classLoader = URLClassLoader(classpath.map { URL(it) }.ev().list.toTypedArray())
-    val seManager = ScriptEngineManager(classLoader)
-    val cachedEngines: ConcurrentHashMap<String, ScriptEngine> = ConcurrentHashMap()
-    val evaledSnippets = snippets.list.map { snippet ->
-        val result = Try {
-            val engine = cachedEngines.get(snippet.lang)
-            val resolvedEngine = if (engine != null) engine else {
-                seManager.getEngineByExtension(extensionMappings.getOrDefault(snippet.lang, "kts"))!!
+
+fun compileCodeImpl(snippets: Map<File, ListKW<Snippet>>, classpath: ListKW<String>): ListKW<CompiledMarkdown> {
+    println(":runAnk -> started compilation")
+    val IOPool = object : CoroutineDispatcher() {
+        private val ioBoundPool = Executors.newFixedThreadPool(snippets.size)
+        override fun dispatch(context: CoroutineContext, block: Runnable) {
+            ioBoundPool.submit(block)
+        }
+    }
+    return runBlocking {
+        snippets.map { (file, codeBlocks) ->
+            async(IOPool) {
+                val start = System.currentTimeMillis()
+                val classLoader = URLClassLoader(classpath.map { URL(it) }.ev().list.toTypedArray())
+                val seManager = ScriptEngineManager(classLoader)
+                println(":runAnk -> START eval: $file on ${Thread.currentThread().name}")
+                val engineCache: Map<String, ScriptEngine> =
+                        codeBlocks.list
+                                .map {
+                                    it.lang to seManager.getEngineByExtension(extensionMappings.getOrDefault(it.lang, "kts"))
+                                }
+                                .distinctBy { it.first }
+                                .toMap()
+                val evaledSnippets = codeBlocks.map { snippet ->
+                    val result = Try {
+                        val engine = engineCache.k().getOrElse(
+                                snippet.lang,
+                                { throw CompilationException(file, snippet, IllegalStateException("No engine configured for `${snippet.lang}`")) })
+                        //println(":runAnk -> Eval: \n---\n${snippet.code}\n---\n")
+                        val retVal = engine.eval(snippet.code)
+                        //println(":runAnk -> result: \n---\n${retVal}\n---\n")
+                        retVal
+                    }.fold({
+                        throw CompilationException(file, snippet, it)
+                    }, { it })
+                    val resultString = Option.fromNullable(result).fold({ None }, { Some("//$it") })
+                    if (snippet.silent) snippet
+                    else snippet.copy(result = resultString)
+                }
+                val end = System.currentTimeMillis()
+                println(":runAnk -> FINISHED eval [elapsed ${end - start} ms]: $file on ${Thread.currentThread().name}")
+                CompiledMarkdown(file, evaledSnippets)
             }
-            cachedEngines.putIfAbsent(snippet.lang, resolvedEngine)
-            //println(":runAnk -> Eval: \n---\n${snippet.code}\n---\n")
-            val retVal = resolvedEngine.eval(snippet.code)
-            //println(":runAnk -> result: \n---\n${retVal}\n---\n")
-            retVal
-        }.fold({
-            throw CompilationException(cachedEngines.get(snippet.lang), snippet, it)
-        }, { it })
-        val resultString = Option.fromNullable(result).fold({ None }, { Some("//$it") })
-        if (snippet.silent) snippet
-        else snippet.copy(result = resultString)
-    }.k()
-    return CompiledMarkdown(origin, evaledSnippets)
+        }.map { it.await() }.k()
+    }
 }
 
 fun replaceAnkToLangImpl(compiledMarkdown: CompiledMarkdown): String =
         compiledMarkdown.snippets.fold(compiledMarkdown.origin.readText(), { content, snippet ->
             snippet.result.fold(
                     { content },
-                    { content.replace(snippet.fence, "```${snippet.lang}\n" +snippet.code + "\n" + it + "\n```") }
+                    { content.replace(snippet.fence, "```${snippet.lang}\n" + snippet.code + "\n" + it + "\n```") }
             )
         })
 
