@@ -185,7 +185,7 @@ class InstanceFileGenerator(
             """|
                 |fun ${i.expandedTypeArgs(reified = false)} ${i.receiverTypeName}.Companion.${i.companionFactoryName}(${(i.args.map {
                 "${it.first}: ${it.second}"
-            } + (if (i.args.isNotEmpty()) listOf("dummy: kotlin.Unit = kotlin.Unit") else emptyList())).joinToString(", ")
+            } + (if (i.args.isNotEmpty()) listOf("@Suppress(\"UNUSED_PARAMETER\") dummy: kotlin.Unit = kotlin.Unit") else emptyList())).joinToString(", ")
             }): ${i.name}${i.expandedTypeArgs()}${i.typeConstraints()} =
                 |  ${i.implicitObjectName}.instance(${i.args.map { it.first }.joinToString(", ")})
                 |
