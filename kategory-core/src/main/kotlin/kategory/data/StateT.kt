@@ -297,14 +297,14 @@ inline fun <reified F, S, A> StateTFun<F, S, A>.stateT(MF: Monad<F> = monad()): 
  * @param MF [Monad] for the context [F].
  * @param fa the value to lift.
  */
-inline fun <reified F, S, A> StateT.Companion.lift(fa: HK<F, A>, MF: Monad<F> = monad<F>()): StateT<F, S, A> = StateT(MF.pure({ s -> MF.map(fa, { a -> Tuple2(s, a) }) }))
+inline fun <reified F, S, A> StateT.Companion.lift(fa: HK<F, A>, MF: Monad<F> = monad<F>()): StateT<F, S, A> = StateT.lift(MF, fa)
 
 /**
  * Return input without modifying it.
  *
  * @param AF [Applicative] for the context [F].
  */
-inline fun <reified F, S> StateT.Companion.get(AF: Applicative<F> = applicative<F>(), dummy: Unit = Unit): StateT<F, S, S> = StateT(AF.pure({ s: S -> AF.pure(Tuple2(s, s)) }))
+inline fun <reified F, S> StateT.Companion.get(AF: Applicative<F> = applicative<F>(), dummy: Unit = Unit): StateT<F, S, S> = StateT.get(AF)
 
 /**
  * Inspect a value of the state [S] with [f] `(S) -> T` without modifying the state.
@@ -312,7 +312,7 @@ inline fun <reified F, S> StateT.Companion.get(AF: Applicative<F> = applicative<
  * @param AF [Applicative] for the context [F].
  * @param f the function applied to extrat [T] from [S].
  */
-inline fun <reified F, S, T> StateT.Companion.inspect(AF: Applicative<F> = applicative<F>(), dummy: Unit = Unit, crossinline f: (S) -> T): StateT<F, S, T> = StateT(AF.pure({ s: S -> AF.pure(Tuple2(s, f(s))) }))
+inline fun <reified F, S, T> StateT.Companion.inspect(AF: Applicative<F> = applicative<F>(), dummy: Unit = Unit, crossinline f: (S) -> T): StateT<F, S, T> = StateT.inspect(AF) { f(it) }
 
 /**
  * Modify the state with [f] `(S) -> S` and return [Unit].
@@ -336,7 +336,7 @@ inline fun <reified F, S> StateT.Companion.modifyF(AF: Applicative<F> = applicat
  * @param AF [Applicative] for the context [F].
  * @param s value to set.
  */
-inline fun <reified F, S> StateT.Companion.set(s: S, AF: Applicative<F> = applicative<F>()): StateT<F, S, Unit> = StateT(AF.pure({ _: S -> AF.pure(Tuple2(s, Unit)) }))
+inline fun <reified F, S> StateT.Companion.set(s: S, AF: Applicative<F> = applicative<F>()): StateT<F, S, Unit> = StateT.set(AF, s)
 
 /**
  * Set the state to a value [s] of type `HK<F, S>` and return [Unit].
