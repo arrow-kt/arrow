@@ -86,7 +86,7 @@ class OptionalTest : UnitSpec() {
 
         "LiftF should be consistent with modifyF" {
             forAll(Gen.list(Gen.int()), genTry(Gen.int()), { list, tryInt ->
-                val f = { i: Int -> tryInt }
+                val f = { _: Int -> tryInt }
                 optionalHead.liftF(f, Try.applicative())(list) == optionalHead.modifyF(list, f, Try.applicative())
             })
         }
