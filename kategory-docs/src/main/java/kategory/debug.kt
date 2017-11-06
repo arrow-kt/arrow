@@ -33,7 +33,7 @@ inline fun <reified F, reified E> debugInstanceLookups(): Map<KClass<out Typecla
 )
 
 inline fun <reified F, reified E> showInstances(
-        debugLookupTable: Map<KClass<out Typeclass>, () -> Typeclass> = debugInstanceLookups<F, E>()) =
+        debugLookupTable: Map<KClass<out Typeclass>, () -> Typeclass> = debugInstanceLookups<F, E>()): List<String?> =
         debugLookupTable.entries
                 .filter { Try { it.value() }.fold({ false }, { true }) }
                 .map { it.key.simpleName }
