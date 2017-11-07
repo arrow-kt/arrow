@@ -100,9 +100,9 @@ interface Order<F> : Eq<F>, Typeclass {
         }
 
         /**
-         * Construct an [Order] that defines all objects as equal for type [F].
+         * Construct an [Order] that defines all instances as equal for type [F].
          *
-         * @returns an [Order] instance wherefore all objects of type [F] are equal.
+         * @returns an [Order] instance wherefore all instances of type [F] are equal.
          */
         fun <F> allEqual(): Order<F> = object : Order<F> {
             override fun compare(a: F, b: F): Int = 0
@@ -131,7 +131,7 @@ inline fun <reified F> F.lt(O: Order<F> = order(), b: F): Boolean = O.lt(this, b
 /**
  * Syntax method for [Order.lte].
  *
- * @param O [Order] for the type [F] you want to compare by default the global instance will be used for type [F].
+ * @param O [Order] instance for the type [F] you want to compare, by default the global instance will be used for type [F].
  * @param b the object to compare with.
  * @see [Order.lte]
  */
