@@ -90,7 +90,7 @@ So what we want is a return type that represents `Either` a `StackError` or a ce
 fun _popS(): Either<StackError, StateT<IdHK, Stack, String>> = TODO()
 ```
 
-The only thing we can do is handle this with `StateT`. We want to wrap `State` with `Either`. Left to right wrap `State` `T` (with) `Either` `StateT<EitherHK`.
+The only thing we can do is handle this with `StateT`. We want to wrap `State` with `Either`.
 `EitherKindPartial` is an alias that helps us to fix `StackError` as the left type parameter for `Either<L, R>`.
 
 ```kotlin:ank
