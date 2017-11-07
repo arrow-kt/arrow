@@ -1,11 +1,12 @@
 package kategory
 
 /**
- * The [Order] type class is used to define a total ordering on some type [F] and is defined by<=.
+ * The [Order] type class is used to define a total ordering on some type [F] and is defined by being able to fully determine order between two instances.
  *
  * [Order] is a subtype of [Eq] and defines [eqv] in terms of [compare].
  *
  * @see [Eq]
+ * @see <a href="http://kategory.io/docs/typeclasses/order/">Order documentation</a>
  */
 interface Order<F> : Eq<F>, Typeclass {
 
@@ -120,6 +121,15 @@ interface Order<F> : Eq<F>, Typeclass {
 inline fun <reified F> order(): Order<F> = instance(InstanceParametrizedType(Order::class.java, listOf(typeLiteral<F>())))
 
 /**
+ * Syntax method for [Order.compare].
+ *
+ * @param O [Order] for the type [F] you want to compare by default the global instance will be used for type [F].
+ * @param b the object to compare with.
+ * @see [Order.compare]
+ */
+inline fun <reified F> F.compare(O: Order<F> = order(), b: F): Boolean = O.lt(this, b)
+
+/**
  * Syntax method for [Order.lt].
  *
  * @param O [Order] for the type [F] you want to compare by default the global instance will be used for type [F].
@@ -160,6 +170,16 @@ inline fun <reified F> F.gte(O: Order<F> = order(), b: F): Boolean = O.gte(this,
  *
  * @param F which is constraint in [Comparable] for [F].
  */
-fun <F: Comparable<F>> toOrder(): Order<F> = object : Order<F> {
+fun <F : Comparable<F>> toOrder(): Order<F> = object : Order<F> {
     override fun compare(a: F, b: F): Int = a.compareTo(b)
 }
+
+/**
+ * Returns a list of all elements sorted according to the specified [order].
+ *
+ * @param O [Order] for the type [F] you want to compare by default the global instance will be used for type [F].
+ * @returns sorted list by [O].
+ */
+inline fun <reified F> Iterable<F>.sorted(O: Order<F> = order()): List<F> = sortedWith(Comparator { o1, o2 ->
+    O.compare(o1, o2)
+})

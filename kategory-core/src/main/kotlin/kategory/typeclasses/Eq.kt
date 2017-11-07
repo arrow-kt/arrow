@@ -2,6 +2,8 @@ package kategory
 
 /**
  * A type class used to determine equality between 2 instances of the same type [F] in a type safe way.
+ *
+ * @see <a href="http://kategory.io/docs/typeclasses/eq/">Eq documentation</a>
  */
 interface Eq<in F> : Typeclass {
 
