@@ -1,7 +1,6 @@
 package io.kategory.ank
 
 import kategory.*
-import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.CoroutineDispatcher
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.runBlocking
@@ -15,14 +14,11 @@ import org.intellij.markdown.parser.MarkdownParser
 import java.io.File
 import java.net.URL
 import java.net.URLClassLoader
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
 import javax.script.ScriptException
 import kotlin.coroutines.experimental.CoroutineContext
-import kotlin.coroutines.experimental.EmptyCoroutineContext
 
 val extensionMappings = mapOf(
         "java" to "java",
@@ -125,7 +121,6 @@ fun extractCodeImpl(source: String, tree: ASTNode): ListKW<Snippet> {
     })
     return sb.k()
 }
-
 
 fun compileCodeImpl(snippets: Map<File, ListKW<Snippet>>, classpath: ListKW<String>): ListKW<CompiledMarkdown> {
     println(":runAnk -> started compilation")
