@@ -43,7 +43,7 @@ data class SortedMapKW<K: Comparable<K>, A>(val map: SortedMap<K, A>) : SortedMa
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, SortedMapKW<K, B>> =
         Foldable.iterateRight(this.map.iterator(), Eval.always { GA.pure(sortedMapOf<K, B>().k()) })({
             kv, lbuf ->
-            GA.map2Eval(f(kv.value), lbuf) { (sortedMapOf(kv.key to it.a).k() + it.b).toSortedMap().k() }
+            GA.map2Eval(f(kv.value), lbuf) { (mapOf(kv.key to it.a).k() + it.b).toSortedMap().k() }
         }).value()
 
     companion object
@@ -67,6 +67,7 @@ fun <K: Comparable<K>, A> SortedMapKW<K, A>.updated(k: K, value: A): SortedMapKW
 
     return sortedMutableMap.k()
 }
+
 fun <K, A, B> SortedMap<K, A>.foldLeft(b: SortedMap<K, B>, f: (SortedMap<K, B>, Map.Entry<K, A>) -> SortedMap<K, B>): SortedMap<K, B> {
     var result = b
     this.forEach { result = f(result, it) }

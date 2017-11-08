@@ -1,6 +1,5 @@
 package kategory
 
-
 @instance(SortedMapKW::class)
 interface SortedMapKWFunctorInstance<K: Comparable<K>> : Functor<SortedMapKWKindPartial<K>> {
     override fun <A, B> map(fa: HK<SortedMapKWKindPartial<K>, A>, f: (A) -> B): SortedMapKW<K, B> =
