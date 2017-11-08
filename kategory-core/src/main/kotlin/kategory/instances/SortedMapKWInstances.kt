@@ -1,38 +1,38 @@
 package kategory
 
 @instance(SortedMapKW::class)
-interface SortedMapKWFunctorInstance<K: Comparable<K>> : Functor<SortedMapKWKindPartial<K>> {
-    override fun <A, B> map(fa: HK<SortedMapKWKindPartial<K>, A>, f: (A) -> B): SortedMapKW<K, B> =
-            fa.ev().map(f)
+interface SortedMapKWFunctorInstance<A: Comparable<A>> : Functor<SortedMapKWKindPartial<A>> {
+    override fun <B, C> map(fb: HK<SortedMapKWKindPartial<A>, B>, f: (B) -> C): SortedMapKW<A, C> =
+            fb.ev().map(f)
 }
 
 @instance(SortedMapKW::class)
-interface SortedMapKWFoldableInstance<K: Comparable<K>> : Foldable<SortedMapKWKindPartial<K>> {
-    override fun <A, B> foldL(fa: HK<SortedMapKWKindPartial<K>, A>, b: B, f: (B, A) -> B): B =
-            fa.ev().foldL(b, f)
+interface SortedMapKWFoldableInstance<A: Comparable<A>> : Foldable<SortedMapKWKindPartial<A>> {
+    override fun <B, C> foldL(fb: HK<SortedMapKWKindPartial<A>, B>, c: C, f: (C, B) -> C): C =
+            fb.ev().foldL(c, f)
 
-    override fun <A, B> foldR(fa: HK<SortedMapKWKindPartial<K>, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            fa.ev().foldR(lb, f)
+    override fun <B, C> foldR(fb: HK<SortedMapKWKindPartial<A>, B>, lc: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
+            fb.ev().foldR(lc, f)
 }
 
 @instance(SortedMapKW::class)
-interface SortedMapKWTraverseInstance<K: Comparable<K>> : SortedMapKWFoldableInstance<K>, Traverse<SortedMapKWKindPartial<K>> {
-    override fun <G, A, B> traverse(fa: HK<SortedMapKWKindPartial<K>, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<SortedMapKWKindPartial<K>, B>> =
-            fa.ev().traverse(f, GA)
+interface SortedMapKWTraverseInstance<A: Comparable<A>> : SortedMapKWFoldableInstance<A>, Traverse<SortedMapKWKindPartial<A>> {
+    override fun <G, B, C> traverse(fb: HK<SortedMapKWKindPartial<A>, B>, f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, HK<SortedMapKWKindPartial<A>, C>> =
+            fb.ev().traverse(f, GA)
 }
 
 @instance(SortedMapKW::class)
-interface SortedMapKWSemigroupInstance<K: Comparable<K>, A> : Semigroup<SortedMapKWKind<K, A>> {
-    fun SG(): Semigroup<A>
+interface SortedMapKWSemigroupInstance<A: Comparable<A>, B> : Semigroup<SortedMapKWKind<A, B>> {
+    fun SG(): Semigroup<B>
 
-    override fun combine(a: SortedMapKWKind<K, A>, b: SortedMapKWKind<K, A>): SortedMapKWKind<K, A> =
-            if (a.ev().size < b.ev().size) a.ev().foldLeft<A> (b.ev(), { my, (k, b) ->
+    override fun combine(a: SortedMapKWKind<A, B>, b: SortedMapKWKind<A, B>): SortedMapKWKind<A, B> =
+            if (a.ev().size < b.ev().size) a.ev().foldLeft<B> (b.ev(), { my, (k, b) ->
                 my.updated(k, SG().maybeCombine(b, my[k]))
             })
-            else b.ev().foldLeft<A> (a.ev(), { my: SortedMapKW<K, A>, (k, a) -> my.updated(k, SG().maybeCombine(a, my[k])) })
+            else b.ev().foldLeft<B> (a.ev(), { my: SortedMapKW<A, B>, (k, a) -> my.updated(k, SG().maybeCombine(a, my[k])) })
 }
 
 @instance(SortedMapKW::class)
-interface SortedMapKWMonoidInstance<K: Comparable<K>, A> : SortedMapKWSemigroupInstance<K, A>, Monoid<SortedMapKWKind<K, A>> {
-    override fun empty(): SortedMapKW<K, A> = sortedMapOf<K, A>().k()
+interface SortedMapKWMonoidInstance<A: Comparable<A>, B> : SortedMapKWSemigroupInstance<A, B>, Monoid<SortedMapKWKind<A, B>> {
+    override fun empty(): SortedMapKW<A, B> = sortedMapOf<A, B>().k()
 }

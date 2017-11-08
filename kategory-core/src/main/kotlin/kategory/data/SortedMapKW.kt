@@ -3,45 +3,45 @@ package kategory
 import java.util.*
 
 @higherkind
-data class SortedMapKW<K: Comparable<K>, A>(val map: SortedMap<K, A>) : SortedMapKWKind<K, A>, SortedMap<K, A> by map {
+data class SortedMapKW<A: Comparable<A>, B>(val map: SortedMap<A, B>) : SortedMapKWKind<A, B>, SortedMap<A, B> by map {
 
-    fun <B> map(f: (A) -> B): SortedMapKW<K, B> =
+    fun <C> map(f: (B) -> C): SortedMapKW<A, C> =
             this.map.map { it.key to f(it.value) }.toMap().toSortedMap().k()
 
-    fun <B, Z> map2(fb: SortedMapKW<K, B>, f: (A, B) -> Z): SortedMapKW<K, Z> =
-            if (fb.isEmpty()) sortedMapOf<K, Z>().k()
-            else this.map.flatMap { (k, a) ->
-                fb.getOption(k).map { Tuple2(k, f(a, it)) }.k().asIterable()
+    fun <C, Z> map2(fc: SortedMapKW<A, C>, f: (B, C) -> Z): SortedMapKW<A, Z> =
+            if (fc.isEmpty()) sortedMapOf<A, Z>().k()
+            else this.map.flatMap { (a, b) ->
+                fc.getOption(a).map { Tuple2(a, f(b, it)) }.k().asIterable()
             }.k()
 
-    fun <B, Z> map2Eval(fb: Eval<SortedMapKW<K, B>>, f: (A, B) -> Z): Eval<SortedMapKW<K, Z>> =
-            if (fb.isEmpty()) Eval.now(sortedMapOf<K, Z>().k())
-            else fb.map { b -> this.map2(b, f) }
+    fun <C, Z> map2Eval(fc: Eval<SortedMapKW<A, C>>, f: (B, C) -> Z): Eval<SortedMapKW<A, Z>> =
+            if (fc.isEmpty()) Eval.now(sortedMapOf<A, Z>().k())
+            else fc.map { c -> this.map2(c, f) }
 
-    fun <B> ap(ff: SortedMapKW<K, (A) -> B>): SortedMapKW<K, B> =
+    fun <C> ap(ff: SortedMapKW<A, (B) -> C>): SortedMapKW<A, C> =
             ff.flatMap { this.map(it) }
 
-    fun <B, Z> ap2(f: SortedMapKW<K, (A, B) -> Z>, fb: SortedMapKW<K, B>): SortedMap<K, Z> =
+    fun <C, Z> ap2(f: SortedMapKW<A, (B, C) -> Z>, fc: SortedMapKW<A, C>): SortedMap<A, Z> =
             f.map.flatMap { (k, f) ->
-                this.flatMap { a -> fb.flatMap { b -> sortedMapOf(k to f(a, b)).k() } }
+                this.flatMap { a -> fc.flatMap { c -> sortedMapOf(k to f(a, c)).k() } }
                         .getOption(k).map { Tuple2(k, it) }.k().asIterable()
             }.k()
 
-    fun <B> flatMap(f: (A) -> SortedMapKW<K, B>): SortedMapKW<K, B> =
+    fun <C> flatMap(f: (B) -> SortedMapKW<A, C>): SortedMapKW<A, C> =
             this.map.flatMap { (k, v) ->
                 f(v).getOption(k).map { Tuple2(k, it) }.k().asIterable()
             }.k()
 
-    fun <B> foldR(b: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            this.map.values.iterator().iterateRight(b)(f)
+    fun <C> foldR(c: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
+            this.map.values.iterator().iterateRight(c)(f)
 
-    fun <B> foldL(b: B, f: (B, A) -> B): B = this.map.values.fold(b, f)
+    fun <C> foldL(c: C, f: (C, B) -> C): C = this.map.values.fold(c, f)
 
-    fun <B> foldLeft(b: SortedMapKW<K, B>, f: (SortedMapKW<K, B>, Tuple2<K, A>) -> SortedMapKW<K, B>): SortedMapKW<K, B> =
-            this.map.foldLeft(b) { m: SortedMap<K, B>, (k, v) -> f(m.k(), Tuple2(k, v)) }.k()
+    fun <C> foldLeft(c: SortedMapKW<A, C>, f: (SortedMapKW<A, C>, Tuple2<A, B>) -> SortedMapKW<A, C>): SortedMapKW<A, C> =
+            this.map.foldLeft(c) { m: SortedMap<A, C>, (a, b) -> f(m.k(), Tuple2(a, b)) }.k()
 
-    fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, SortedMapKW<K, B>> =
-        Foldable.iterateRight(this.map.iterator(), Eval.always { GA.pure(sortedMapOf<K, B>().k()) })({
+    fun <G, C> traverse(f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, SortedMapKW<A, C>> =
+        Foldable.iterateRight(this.map.iterator(), Eval.always { GA.pure(sortedMapOf<A, C>().k()) })({
             kv, lbuf ->
             GA.map2Eval(f(kv.value), lbuf) { (mapOf(kv.key to it.a).k() + it.b).toSortedMap().k() }
         }).value()
@@ -49,30 +49,30 @@ data class SortedMapKW<K: Comparable<K>, A>(val map: SortedMap<K, A>) : SortedMa
     companion object
 }
 
-fun <K: Comparable<K>, A> SortedMap<K, A>.k(): SortedMapKW<K, A> = SortedMapKW(this)
+fun <A: Comparable<A>, B> SortedMap<A, B>.k(): SortedMapKW<A, B> = SortedMapKW(this)
 
-fun <K: Comparable<K>, A> Option<Tuple2<K, A>>.k(): SortedMapKW<K, A> = when (this) {
+fun <A: Comparable<A>, B> Option<Tuple2<A, B>>.k(): SortedMapKW<A, B> = when (this) {
     is Some -> sortedMapOf(this.value.a to this.value.b).k()
-    is None -> sortedMapOf<K, A>().k()
+    is None -> sortedMapOf<A, B>().k()
 }
 
-fun <K: Comparable<K>, A> List<Map.Entry<K, A>>.k(): SortedMapKW<K, A> =
+fun <A: Comparable<A>, B> List<Map.Entry<A, B>>.k(): SortedMapKW<A, B> =
         this.map { it.key to it.value }.toMap().toSortedMap().k()
 
-fun <K, A> SortedMap<K, A>.getOption(k: K): Option<A> = Option.fromNullable(this[k])
+fun <A, B> SortedMap<A, B>.getOption(k: A): Option<B> = Option.fromNullable(this[k])
 
-fun <K: Comparable<K>, A> SortedMapKW<K, A>.updated(k: K, value: A): SortedMapKW<K, A> {
+fun <A: Comparable<A>, B> SortedMapKW<A, B>.updated(k: A, value: B): SortedMapKW<A, B> {
     val sortedMutableMap = this.toSortedMap()
     sortedMutableMap.put(k, value)
 
     return sortedMutableMap.k()
 }
 
-fun <K, A, B> SortedMap<K, A>.foldLeft(b: SortedMap<K, B>, f: (SortedMap<K, B>, Map.Entry<K, A>) -> SortedMap<K, B>): SortedMap<K, B> {
+fun <A, B, C> SortedMap<A, B>.foldLeft(b: SortedMap<A, C>, f: (SortedMap<A, C>, Map.Entry<A, B>) -> SortedMap<A, C>): SortedMap<A, C> {
     var result = b
     this.forEach { result = f(result, it) }
     return result
 }
 
-fun <K: Comparable<K>, A, B> SortedMap<K, A>.foldRight(b: SortedMap<K, B>, f: (Map.Entry<K, A>, SortedMap<K, B>) -> SortedMap<K, B>): SortedMap<K, B> =
-        this.entries.reversed().k().map.foldLeft(b) { x: SortedMap<K, B>, y -> f(y, x) }
+fun <A: Comparable<A>, B, C> SortedMap<A, B>.foldRight(b: SortedMap<A, C>, f: (Map.Entry<A, B>, SortedMap<A, C>) -> SortedMap<A, C>): SortedMap<A, C> =
+        this.entries.reversed().k().map.foldLeft(b) { x: SortedMap<A, C>, y -> f(y, x) }
