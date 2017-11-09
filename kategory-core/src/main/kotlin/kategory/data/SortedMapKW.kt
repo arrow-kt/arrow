@@ -51,10 +51,10 @@ data class SortedMapKW<A: Comparable<A>, B>(val map: SortedMap<A, B>) : SortedMa
 
 fun <A: Comparable<A>, B> SortedMap<A, B>.k(): SortedMapKW<A, B> = SortedMapKW(this)
 
-fun <A: Comparable<A>, B> Option<Tuple2<A, B>>.k(): SortedMapKW<A, B> = when (this) {
-    is Some -> sortedMapOf(this.value.a to this.value.b).k()
-    is None -> sortedMapOf<A, B>().k()
-}
+fun <A: Comparable<A>, B> Option<Tuple2<A, B>>.k(): SortedMapKW<A, B> = this.fold(
+        { sortedMapOf<A, B>().k() },
+        { mapEntry -> sortedMapOf<A, B>(mapEntry.a to mapEntry.b).k() }
+)
 
 fun <A: Comparable<A>, B> List<Map.Entry<A, B>>.k(): SortedMapKW<A, B> =
         this.map { it.key to it.value }.toMap().toSortedMap().k()
