@@ -14,6 +14,8 @@ import kategory.genTry
 import kategory.genTuple
 import kategory.left
 import kategory.right
+import kategory.None
+import kategory.Some
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -61,7 +63,7 @@ class OptionalTest : UnitSpec() {
 
         "void should always " {
             forAll({ string: String ->
-                Optional.void<String, Int>().getOption(string) == Option.None
+                Optional.void<String, Int>().getOption(string) == None
             })
         }
 
@@ -86,7 +88,7 @@ class OptionalTest : UnitSpec() {
 
         "LiftF should be consistent with modifyF" {
             forAll(Gen.list(Gen.int()), genTry(Gen.int()), { list, tryInt ->
-                val f = { i: Int -> tryInt }
+                val f = { _: Int -> tryInt }
                 optionalHead.liftF(f, Try.applicative())(list) == optionalHead.modifyF(list, f, Try.applicative())
             })
         }

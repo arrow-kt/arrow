@@ -18,21 +18,21 @@ package kategory
                 EitherT(MF.tailRecM(a, {
                     MF.map(f(it).ev().value) { recursionControl ->
                         when (recursionControl) {
-                            is Either.Left<L, Either<A, B>> -> Either.Right(Either.Left(recursionControl.a))
-                            is Either.Right<L, Either<A, B>> -> {
+                            is Left<L, Either<A, B>> -> Right(Left(recursionControl.a))
+                            is Right<L, Either<A, B>> -> {
                                 val b: Either<A, B> = recursionControl.b
                                 when (b) {
-                                    is Either.Left<A, B> -> Either.Left(b.a)
-                                    is Either.Right<A, B> -> Either.Right(Either.Right(b.b))
+                                    is Left<A, B> -> Left(b.a)
+                                    is Right<A, B> -> Right(Right(b.b))
                                 }
                             }
                         }
                     }
                 }))
 
-        @JvmStatic fun <F, A, B> right(b: B, MF: Applicative<F>): EitherT<F, A, B> = EitherT(MF.pure(Either.Right(b)))
+        @JvmStatic fun <F, A, B> right(b: B, MF: Applicative<F>): EitherT<F, A, B> = EitherT(MF.pure(Right(b)))
 
-        @JvmStatic fun <F, A, B> left(a: A, MF: Applicative<F>): EitherT<F, A, B> = EitherT(MF.pure(Either.Left(a)))
+        @JvmStatic fun <F, A, B> left(a: A, MF: Applicative<F>): EitherT<F, A, B> = EitherT(MF.pure(Left(a)))
 
         @JvmStatic inline fun <reified F, A, B> fromEither(value: Either<A, B>, MF: Applicative<F> = monad<F>()): EitherT<F, A, B> =
                 EitherT(MF.pure(value))
@@ -64,11 +64,11 @@ package kategory
     inline fun <C> flatMap(crossinline f: (B) -> EitherT<F, A, C>, MF: Monad<F>): EitherT<F, A, C> = flatMapF({ it -> f(it).value }, MF)
 
     inline fun <C> flatMapF(crossinline f: (B) -> HK<F, Either<A, C>>, MF: Monad<F>): EitherT<F, A, C> =
-            EitherT(MF.flatMap(value, { either -> either.fold({ MF.pure(Either.Left(it)) }, { f(it) }) }))
+            EitherT(MF.flatMap(value, { either -> either.fold({ MF.pure(Left(it)) }, { f(it) }) }))
 
     inline fun <C> cata(crossinline l: (A) -> C, crossinline r: (B) -> C, FF: Functor<F>): HK<F, C> = fold(l, r, FF)
 
-    fun <C> liftF(fa: HK<F, C>, FF: Functor<F>): EitherT<F, A, C> = EitherT(FF.map(fa, { Either.Right(it) }))
+    fun <C> liftF(fa: HK<F, C>, FF: Functor<F>): EitherT<F, A, C> = EitherT(FF.map(fa, { Right(it) }))
 
     inline fun <C> semiflatMap(crossinline f: (B) -> HK<F, C>, MF: Monad<F>): EitherT<F, A, C> = flatMap({ liftF(f(it), MF) }, MF)
 
@@ -94,8 +94,8 @@ package kategory
     fun combineK(y: EitherTKind<F, A, B>, MF: Monad<F>): EitherT<F, A, B> =
             EitherT(MF.flatMap(this.ev().value) {
                 when (it) {
-                    is Either.Left -> y.ev().value
-                    is Either.Right -> MF.pure(it)
+                    is Left -> y.ev().value
+                    is Right -> MF.pure(it)
                 }
             })
 
