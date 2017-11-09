@@ -5,6 +5,7 @@ import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
 import kategory.Ior.Right
+import kategory.laws.EqLaws
 import org.junit.runner.RunWith
 
 
@@ -19,12 +20,16 @@ class IorTest : UnitSpec() {
             monad<IorKindPartial<Int>>() shouldNotBe null
             foldable<IorKindPartial<Int>>() shouldNotBe null
             traverse<IorKindPartial<Int>>() shouldNotBe null
+            eq<Ior<String, Int>>() shouldNotBe null
         }
 
         val intIorMonad: Monad<IorKindPartial<Int>> = monad()
 
-        testLaws(MonadLaws.laws(intIorMonad, Eq.any()))
-        testLaws(TraverseLaws.laws(Ior.traverse(), Ior.applicative<Int>(), ::Right, Eq.any()))
+        testLaws(
+            EqLaws.laws(eq<Ior<String, Int>>(), { it.rightIor() }),
+            MonadLaws.laws(intIorMonad, Eq.any()),
+            TraverseLaws.laws(Ior.traverse(), Ior.applicative<Int>(), ::Right, Eq.any())
+        )
 
         "bimap() should allow modify both value" {
             forAll { a: Int, b: String ->
@@ -76,9 +81,9 @@ class IorTest : UnitSpec() {
         "pad() should return the correct Pair of Options" {
             forAll { a: Int, b: String ->
                 {
-                    Ior.Left(a).pad() == Pair(Option.Some(a), Option.None) &&
-                            Ior.Right(b).pad() == Pair(Option.None, Option.Some(b)) &&
-                            Ior.Both(a, b).pad() == Pair(Option.Some(a), Option.Some(b))
+                    Ior.Left(a).pad() == Pair(Some(a), None) &&
+                            Ior.Right(b).pad() == Pair(None, Some(b)) &&
+                            Ior.Both(a, b).pad() == Pair(Some(a), Some(b))
                 }()
             }
         }
@@ -96,9 +101,9 @@ class IorTest : UnitSpec() {
         "toOption() should convert values into a valid Option" {
             forAll { a: Int, b: String ->
                 {
-                    Ior.Left(a).toOption() == Option.None &&
-                            Ior.Right(b).toOption() == Option.Some(b) &&
-                            Ior.Both(a, b).toOption() == Option.Some(b)
+                    Ior.Left(a).toOption() == None &&
+                            Ior.Right(b).toOption() == Some(b) &&
+                            Ior.Both(a, b).toOption() == Some(b)
                 }()
             }
         }
@@ -106,9 +111,9 @@ class IorTest : UnitSpec() {
         "toValidated() should convert values into a valid Validated" {
             forAll { a: Int, b: String ->
                 {
-                    Ior.Left(a).toValidated() == Validated.Invalid(a) &&
-                            Ior.Right(b).toValidated() == Validated.Valid(b) &&
-                            Ior.Both(a, b).toValidated() == Validated.Valid(b)
+                    Ior.Left(a).toValidated() == Invalid(a) &&
+                            Ior.Right(b).toValidated() == Valid(b) &&
+                            Ior.Both(a, b).toValidated() == Valid(b)
                 }()
             }
         }
@@ -116,10 +121,10 @@ class IorTest : UnitSpec() {
         "fromOptions() should build a correct Option<Ior>" {
             forAll { a: Int, b: String ->
                 {
-                    Ior.fromOptions(Option.Some(a), Option.None) == Option.Some(Ior.Left(a)) &&
-                            Ior.fromOptions(Option.Some(a), Option.Some(b)) == Option.Some(Ior.Both(a, b)) &&
-                            Ior.fromOptions(Option.None, Option.Some(b)) == Option.Some(Ior.Right(b)) &&
-                            Ior.fromOptions(Option.None, Option.None) == Option.None
+                    Ior.fromOptions(Some(a), None) == Some(Ior.Left(a)) &&
+                            Ior.fromOptions(Some(a), Some(b)) == Some(Ior.Both(a, b)) &&
+                            Ior.fromOptions(None, Some(b)) == Some(Ior.Right(b)) &&
+                            Ior.fromOptions(None, None) == None
                 }()
             }
         }

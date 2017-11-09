@@ -60,7 +60,7 @@ An `Optional` instance can be manually constructed from any default or custom `I
 
 ### Composition
 
-We can compose `Optional`s to build telescopes with an optional focus. Imagine we try to retrieve a `User` his email from a backend. The result of our call is `Try<User>`. So we first want to look into `Try` which **optionally** could be a `Try.Success` and then we want to look into `User` which optionally filled in his email.
+We can compose `Optional`s to build telescopes with an optional focus. Imagine we try to retrieve a `User` his email from a backend. The result of our call is `Try<User>`. So we first want to look into `Try` which **optionally** could be a `Success` and then we want to look into `User` which optionally filled in his email.
 
 ```kotlin:ank
 data class Participant(val name: String, val email: String?)
@@ -106,4 +106,6 @@ lifted(Try.Failure<Tuple2<Int, String>>(IllegalStateException("something went wr
 
 ### Laws
 
-Kategory provides [`OptionalLaws`](/docs/optics/laws#optionallaws) in the form of test cases for internal verification of lawful instances and third party apps creating their own prisms.
+Kategory provides [`OptionalLaws`][optional_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own optionals.
+
+[optional_laws_source]: https://github.com/kategory/kategory/blob/master/kategory-test/src/main/kotlin/kategory/laws/OptionalLaws.kt

@@ -27,8 +27,8 @@ interface MapKWSemigroupInstance<K, A> : Semigroup<MapKWKind<K, A>> {
     fun SG(): Semigroup<A>
 
     override fun combine(a: MapKWKind<K, A>, b: MapKWKind<K, A>): MapKW<K, A> =
-            if (a.ev().size < b.ev().size) a.ev().foldLeft<A> (b.ev(), { my, (k, b) -> my.updated(k, SG().maybeCombine(b, my.get(k))) })
-            else b.ev().foldLeft<A> (a.ev(), { my, (k, a) -> my.updated(k, SG().maybeCombine(a, my.get(k))) })
+            if (a.ev().size < b.ev().size) a.ev().foldLeft<A>(b.ev(), { my, (k, b) -> my.updated(k, SG().maybeCombine(b, my.get(k))) })
+            else b.ev().foldLeft<A>(a.ev(), { my, (k, a) -> my.updated(k, SG().maybeCombine(a, my.get(k))) })
 
 }
 
@@ -36,4 +36,22 @@ interface MapKWSemigroupInstance<K, A> : Semigroup<MapKWKind<K, A>> {
 interface MapKWMonoidInstance<K, A> : MapKWSemigroupInstance<K, A>, Monoid<MapKWKind<K, A>> {
 
     override fun empty(): MapKW<K, A> = emptyMap<K, A>().k()
+}
+
+@instance(MapKW::class)
+interface MapKWEqInstance<K, A> : Eq<MapKW<K, A>> {
+
+    fun EQK(): Eq<K>
+
+    fun EQA(): Eq<A>
+
+    override fun eqv(a: MapKW<K, A>, b: MapKW<K, A>): Boolean =
+            if (SetKWEqInstanceImplicits.instance(EQK()).eqv(a.keys.k(), b.keys.k())) {
+                a.keys.map { key ->
+                    b[key]?.let {
+                        EQA().eqv(a.getValue(key), it)
+                    } ?: false
+                }.fold(true) { b1, b2 -> b1 && b2 }
+            } else false
+
 }

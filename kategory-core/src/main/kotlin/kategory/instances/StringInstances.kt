@@ -19,3 +19,12 @@ object StringMonoidInstanceImplicits {
     @JvmStatic
     fun instance(): StringMonoidInstance = StringMonoidInstance
 }
+
+object StringEqInstance : Eq<String> {
+    override fun eqv(a: String, b: String): Boolean = a == b
+}
+
+object StringEqInstanceImplicits {
+    @JvmStatic
+    fun instance(): StringEqInstance = StringEqInstance
+}

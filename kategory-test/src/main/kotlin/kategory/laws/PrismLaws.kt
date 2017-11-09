@@ -55,7 +55,7 @@ object PrismLaws {
                     override fun combine(a: Option<B>, b: Option<B>): Option<B> = a.orElse { b }
 
                     override fun empty(): Option<B> = kategory.none()
-                }), a, { Const(Option.Some(it)) }).value().equalUnderTheLaw(prism.getOption(a), EQOptionB)
+                }), a, { Const(Some(it)) }).value().equalUnderTheLaw(prism.getOption(a), EQOptionB)
             })
 
 }

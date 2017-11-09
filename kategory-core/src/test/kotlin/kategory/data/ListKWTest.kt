@@ -1,7 +1,9 @@
 package kategory
 
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
+import kategory.laws.EqLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -20,21 +22,25 @@ class ListKWTest : UnitSpec() {
             semigroup<ListKW<Int>>() shouldNotBe null
             monoid<ListKW<Int>>() shouldNotBe null
             monoidK<ListKW<ListKWHK>>() shouldNotBe null
+            monadFilter<ListKWHK>() shouldNotBe null
             monadCombine<ListKW<ListKWHK>>() shouldNotBe null
             functorFilter<ListKW<ListKWHK>>() shouldNotBe null
             monadFilter<ListKW<ListKWHK>>() shouldNotBe null
+            eq<ListKW<Int>>() shouldNotBe null
         }
 
-        testLaws(SemigroupKLaws.laws(ListKW.semigroupK(), applicative, Eq.any()))
-        testLaws(MonoidKLaws.laws(ListKW.monoidK(), applicative, Eq.any()))
-        testLaws(TraverseLaws.laws(ListKW.traverse(), applicative, { n: Int -> ListKW(listOf(n)) }, Eq.any()))
-
-        testLaws(MonadCombineLaws.laws(ListKW.monadCombine(),
+        testLaws(
+            EqLaws.laws { listOf(it).k() },
+            SemigroupKLaws.laws(ListKW.semigroupK(), applicative, Eq.any()),
+            MonoidKLaws.laws(ListKW.monoidK(), applicative, Eq.any()),
+            TraverseLaws.laws(ListKW.traverse(), applicative, { n: Int -> ListKW(listOf(n)) }, Eq.any()),
+            MonadCombineLaws.laws(ListKW.monadCombine(),
                 { n -> ListKW(listOf(n)) },
                 { n -> ListKW(listOf({ s: Int -> n * s })) },
                 object : Eq<HK<ListKWHK, Int>> {
                     override fun eqv(a: HK<ListKWHK, Int>, b: HK<ListKWHK, Int>): Boolean =
                             a.ev().list == b.ev().list
-                }))
+                })
+        )
     }
 }

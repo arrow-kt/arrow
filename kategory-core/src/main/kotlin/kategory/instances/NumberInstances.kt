@@ -26,6 +26,14 @@ object ByteOrderInstanceImplicits {
     @JvmStatic fun instance(): Order<Byte> = ByteOrderInstance
 }
 
+object ByteEqInstance: Eq<Byte> {
+    override fun eqv(a: Byte, b: Byte): Boolean = a == b
+}
+
+object ByteEqInstanceImplicits {
+    @JvmStatic fun instance(): ByteEqInstance = ByteEqInstance
+}
+
 object DoubleMonoid : Monoid<Double>, Semigroup<Double> by SGDouble {
     override fun empty(): Double = .0
 }
@@ -46,6 +54,14 @@ object DoubleOrderInstance : Order<Double> {
 
 object DoubleOrderInstanceImplicits {
     @JvmStatic fun instance(): Order<Double> = DoubleOrderInstance
+}
+
+object DoubleEqInstance: Eq<Double> {
+    override fun eqv(a: Double, b: Double): Boolean = a == b
+}
+
+object DoubleEqInstanceImplicits {
+    @JvmStatic fun instance(): DoubleEqInstance = DoubleEqInstance
 }
 
 object IntMonoid : Monoid<Int>, Semigroup<Int> by SGInt {
@@ -100,6 +116,14 @@ object LongOrderInstanceImplicits {
     @JvmStatic fun instance(): Order<Long> = LongOrderInstance
 }
 
+object LongEqInstance: Eq<Long> {
+    override fun eqv(a: Long, b: Long): Boolean = a == b
+}
+
+object LongEqInstanceImplicits {
+    @JvmStatic fun instance(): LongEqInstance = LongEqInstance
+}
+
 object ShortMonoid : Monoid<Short>, Semigroup<Short> by SGShort {
     override fun empty(): Short = 0
 }
@@ -122,6 +146,14 @@ object ShortOrderInstanceImplicits {
     @JvmStatic fun instance(): Order<Short> = ShortOrderInstance
 }
 
+object ShortEqInstance: Eq<Short> {
+    override fun eqv(a: Short, b: Short): Boolean = a == b
+}
+
+object ShortEqInstanceImplicits {
+    @JvmStatic fun instance(): ShortEqInstance = ShortEqInstance
+}
+
 object FloatMonoid : Monoid<Float>, Semigroup<Float> by SGFloat {
     override fun empty(): Float = .0f
 }
@@ -142,4 +174,12 @@ object FloatOrderInstance : Order<Float> {
 
 object FloatOrderInstanceImplicits {
     @JvmStatic fun instance(): Order<Float> = FloatOrderInstance
+}
+
+object FloatEqInstance: Eq<Float> {
+    override fun eqv(a: Float, b: Float): Boolean = a == b
+}
+
+object FloatEqInstanceImplicits {
+    @JvmStatic fun instance(): FloatEqInstance = FloatEqInstance
 }

@@ -25,9 +25,9 @@ class NonEmptyList<out A> private constructor(
 
     val size: Int = all.size
 
-    fun contains(element: @UnsafeVariance A): Boolean = (head == element).or(tail.contains(element))
+    fun contains(element: @UnsafeVariance A): Boolean = (head == element) || element in tail
 
-    fun containsAll(elements: Collection<@UnsafeVariance A>): Boolean = elements.all { contains(it) }
+    fun containsAll(elements: Collection<@UnsafeVariance A>): Boolean = elements.all(this::contains)
 
     fun isEmpty(): Boolean = false
 
@@ -90,7 +90,7 @@ class NonEmptyList<out A> private constructor(
 
     companion object {
         @JvmStatic fun <A> of(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
-        @JvmStatic fun <A> fromList(l: List<A>): Option<NonEmptyList<A>> = if (l.isEmpty()) Option.None else Option.Some(NonEmptyList(l))
+        @JvmStatic fun <A> fromList(l: List<A>): Option<NonEmptyList<A>> = if (l.isEmpty()) None else Some(NonEmptyList(l))
         @JvmStatic fun <A> fromListUnsafe(l: List<A>): NonEmptyList<A> = NonEmptyList(l)
 
         fun <A> pure(a: A): NonEmptyList<A> = a.nel()
@@ -102,15 +102,15 @@ class NonEmptyList<out A> private constructor(
                 v: NonEmptyList<Either<A, B>>) {
             val head: Either<A, B> = v.head
             when (head) {
-                is Either.Right<A, B> -> {
+                is Right<A, B> -> {
                     buf += head.b
                     val x = NonEmptyList.fromList(v.tail)
                     when (x) {
-                        is Option.Some<NonEmptyList<Either<A, B>>> -> go(buf, f, x.value)
-                        is Option.None -> Unit
+                        is Some<NonEmptyList<Either<A, B>>> -> go(buf, f, x.value)
+                        is None -> Unit
                     }
                 }
-                is Either.Left<A, B> -> go(buf, f, f(head.a).ev() + v.tail)
+                is Left<A, B> -> go(buf, f, f(head.a).ev() + v.tail)
             }
         }
 

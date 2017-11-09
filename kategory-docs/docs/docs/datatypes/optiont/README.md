@@ -22,7 +22,6 @@ So let's test this out with an example:
 
 ```kotlin:ank
 import kategory.*
-import kategory.Option.*
 
 data class Country(val code: Option<String>)
 data class Address(val id: Int, val country: Option<Country>)

@@ -3,8 +3,9 @@ package kategory
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
-import kategory.Either.Left
-import kategory.Either.Right
+import kategory.Left
+import kategory.Right
+import kategory.laws.EqLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -23,11 +24,15 @@ class EitherTest : UnitSpec() {
             traverse<EitherKindPartial<Throwable>>() shouldNotBe null
             monadError<EitherKindPartial<Throwable>, Throwable>() shouldNotBe null
             semigroupK<EitherKindPartial<Throwable>>() shouldNotBe null
+            eq<Either<String, Int>>() shouldNotBe null
         }
 
-        testLaws(MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()))
-        testLaws(TraverseLaws.laws(Either.traverse<Throwable>(), Either.applicative(), { it.right() }, Eq.any()))
-        testLaws(SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ))
+        testLaws(
+            EqLaws.laws(eq<Either<String, Int>>(), { it.right() }),
+            MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()),
+            TraverseLaws.laws(Either.traverse<Throwable>(), Either.applicative(), { it.right() }, Eq.any()),
+            SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ)
+        )
 
         "getOrElse should return value" {
             forAll { a: Int, b: Int ->
@@ -57,8 +62,8 @@ class EitherTest : UnitSpec() {
 
         "toOption should convert" {
             forAll { a: Int ->
-                Right(a).toOption() == Option.Some(a)
-                        && Left(a).toOption() == Option.None
+                Right(a).toOption() == Some(a)
+                        && Left(a).toOption() == None
             }
         }
 

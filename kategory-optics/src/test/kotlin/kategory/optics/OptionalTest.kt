@@ -14,6 +14,8 @@ import kategory.genTry
 import kategory.genTuple
 import kategory.left
 import kategory.right
+import kategory.None
+import kategory.Some
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -21,49 +23,47 @@ class OptionalTest : UnitSpec() {
 
     init {
 
-        testLaws(OptionalLaws.laws(
+        testLaws(
+            OptionalLaws.laws(
                 optional = optionalHead,
                 aGen = Gen.list(Gen.int()),
                 bGen = Gen.int(),
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                EQOptionB = Eq.any()
-        ))
+                EQOptionB = Eq.any()),
 
-        testLaws(OptionalLaws.laws(
+            OptionalLaws.laws(
                 optional = Optional.id(),
                 aGen = Gen.int(),
                 bGen = Gen.int(),
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                EQOptionB = Eq.any()
-        ))
+                EQOptionB = Eq.any()),
 
-        testLaws(OptionalLaws.laws(
+            OptionalLaws.laws(
                 optional = optionalHead.first(),
                 aGen = genTuple(Gen.list(Gen.int()), Gen.bool()),
                 bGen = genTuple(Gen.int(), Gen.bool()),
                 funcGen = genFunctionAToB(genTuple(Gen.int(), Gen.bool())),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                EQOptionB = Eq.any()
-        ))
+                EQOptionB = Eq.any()),
 
-        testLaws(OptionalLaws.laws(
+            OptionalLaws.laws(
                 optional = optionalHead.second(),
                 aGen = genTuple(Gen.bool(), Gen.list(Gen.int())),
                 bGen = genTuple(Gen.bool(), Gen.int()),
                 funcGen = genFunctionAToB(genTuple(Gen.bool(), Gen.int())),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                EQOptionB = Eq.any()
-        ))
+                EQOptionB = Eq.any())
+        )
 
         "void should always " {
             forAll({ string: String ->
-                Optional.void<String, Int>().getOption(string) == Option.None
+                Optional.void<String, Int>().getOption(string) == None
             })
         }
 
@@ -88,7 +88,7 @@ class OptionalTest : UnitSpec() {
 
         "LiftF should be consistent with modifyF" {
             forAll(Gen.list(Gen.int()), genTry(Gen.int()), { list, tryInt ->
-                val f = { i: Int -> tryInt }
+                val f = { _: Int -> tryInt }
                 optionalHead.liftF(f, Try.applicative())(list) == optionalHead.modifyF(list, f, Try.applicative())
             })
         }

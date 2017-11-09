@@ -43,7 +43,7 @@ class ImplicitsFileGenerator(
         val functionsToGenerateByPackage: Map<Package, List<FunctionToGenerate>> =
                 getFunctionsToGenerateByPackage(consumerFunctionGroupsByPackage, providerInvocationsByType)
 
-        val sources: List<Pair<Package, String>> = functionsToGenerateByPackage.entries.mapIndexed { counter, (`package`, functionsToGenerate) ->
+        val sources: List<Pair<Package, String>> = functionsToGenerateByPackage.entries.mapIndexed { _, (`package`, functionsToGenerate) ->
             val source: String = functionsToGenerate.joinToString(prefix = "package $`package`\n\n", separator = "\n")
             `package` to source
         }

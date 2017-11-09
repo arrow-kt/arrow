@@ -130,7 +130,7 @@ magic("Not a number")
 ``` 
 
 In the following exercise we pattern-match on every case the `Either` returned by `magic` can be in. 
-Note the `when` clause in the `Either.Left` - the compiler will complain if we leave that out because it knows that 
+Note the `when` clause in the `Left` - the compiler will complain if we leave that out because it knows that 
 given the type `Either[Exception, String]`, there can be inhabitants of `Left` that are not 
 `NumberFormatException` or `IllegalArgumentException`. You should also notice that we are using 
 [SmartCast](https://kotlinlang.org/docs/reference/typecasts.html#smart-casts) for accessing to `Left` and `Right`
@@ -211,4 +211,12 @@ x.contains(7)
 ```kotlin:ank
 val x = "hello".left()
 x.getOrElse { 7 }
+```
+
+## Instances
+
+```kotlin:ank
+import kategory.debug.*
+
+showInstances<EitherHK, Throwable>()
 ```

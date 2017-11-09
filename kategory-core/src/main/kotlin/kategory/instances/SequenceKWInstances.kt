@@ -11,3 +11,15 @@ interface SequenceKWMonoidInstance<A> : Monoid<SequenceKW<A>> {
 
     override fun empty(): SequenceKW<A> = emptySequence<A>().k()
 }
+
+@instance(SequenceKW::class)
+interface SequenceKWEqInstance<A> : Eq<SequenceKW<A>> {
+
+    fun EQ(): Eq<A>
+
+    override fun eqv(a: SequenceKW<A>, b: SequenceKW<A>): Boolean =
+            a.zip(b) { aa, bb -> EQ().eqv(aa, bb) }.fold(true) { acc, bool ->
+                acc && bool
+            }
+
+}

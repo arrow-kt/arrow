@@ -59,7 +59,7 @@ object OptionalLaws {
 
     inline fun <reified A, reified B> consistentGetOptionModifyId(optional: Optional<A, B>, aGen: Gen<A>, EQOptionB: Eq<Option<B>>): Unit {
         val firstMonoid = object : Monoid<FirstOption<B>> {
-            override fun empty(): FirstOption<B> = FirstOption(Option.None)
+            override fun empty(): FirstOption<B> = FirstOption(None)
             override fun combine(a: FirstOption<B>, b: FirstOption<B>): FirstOption<B> = if (a.option.fold({ false }, { true })) a else b
         }
 
