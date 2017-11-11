@@ -1,12 +1,22 @@
 package kategory
 
+typealias IndexedStateFun<F, SA, SB, A> = IndexedStateTFun<IdHK, SA, SB, A>
+typealias IndexedStateFunKind<F, SA, SB, A> = IndexedStateTFunKind<F, SA, SB, A>
+typealias IndexedStateHK = IndexedStateTHK
+typealias IndexedStateKindPartial<SA, SB> = IndexedStateTKindPartial<IdHK, SA, SB>
 typealias IndexedState<SA, SB, A> = IndexedStateT<IdHK, SA, SB, A>
 fun <SA, SB, A> IndexedState(run: (SA) -> Tuple2<SB, A>): IndexedState<SA, SB, A> = IndexedStateT(Id(run.andThen { Id(it) }))
 fun <SA, SB, A> ((SA) -> Tuple2<SB, A>).toIndexedState(): IndexedState<SA, SB, A> = IndexedState(this)
 
+typealias StateFun<F, S, A> = StateTFun<IdHK, S,A>
+typealias StateFunKind<F, S, A> = StateTFunKind<F, S, A>
+typealias StateHK = IndexedStateTHK
+typealias StateKindPartial<S> = StateTKindPartial<IdHK, S>
 typealias State<S, A> = IndexedState<S, S, A>
 fun <S, A> State(run: (S) -> Tuple2<S, A>): State<S, A> = IndexedStateT(Id(run.andThen { Id(it) }))
 fun <S, A> ((S) -> Tuple2<S, A>).toState(): State<S, A> = State(this)
+
+fun State(): StateId = StateId
 
 object StateId {
     fun <S> get(): State<S, S> = IndexedStateT.get(Id.applicative())

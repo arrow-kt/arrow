@@ -109,7 +109,7 @@ class IndexedStateT<F, SA, SB, A>(
      * Like [transform], but allows the context to change from [F] to [G].
      */
     fun <G, B, SC> transformF(MF: Monad<F>, AG: Applicative<G>, f: (HK<F, Tuple2<SB, A>>) -> HK<G, Tuple2<SC, B>>): IndexedStateT<G, SA, SC, B> = IndexedStateT(AG, run = { s ->
-        f(this@IndexedStateT.run(s, MF))
+        f(run(s, MF))
     })
 
     /**
@@ -172,9 +172,12 @@ inline fun <reified F, S> IndexedStateT.Companion.modify(AF: Applicative<F> = ap
 typealias StateTFun<F, S, A> = IndexedStateTFun<F, S, S, A>
 typealias StateTFunKind<F, S, A> = IndexedStateTFunKind<F, S, S, A>
 
+typealias StateTHK = IndexedStateTHK
 typealias StateTKind<F, S, A> = IndexedStateTKind<F, S, S, A>
 typealias StateTKindPartial<F, S> = IndexedStateTKindPartial<F, S, S>
 typealias StateT<F, S, A> = IndexedStateT<F, S, S, A>
+
+inline fun <reified F, S, A> StateT(noinline run: StateTFun<F, S, A>, MF: Applicative<F> = applicative()): StateT<F, S, A> = IndexedStateT(MF.pure(run))
 
 inline fun <reified F, S, A> StateTFunKind<F, S, A>.stateT(MF: Monad<F> = monad()): StateT<F, S, A> = StateT(this)
 
