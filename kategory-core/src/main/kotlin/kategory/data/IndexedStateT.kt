@@ -154,3 +154,28 @@ class IndexedStateT<F, SA, SB, A>(
     fun runS(s: SA, MF: Monad<F>): HK<F, SB> = MF.map(run(s, MF)) { it.a }
 
 }
+
+inline fun <reified F, SA, SB, A> IndexedStateTFunKind<F, SA, SB, A>.indexedStateT(MF: Monad<F> = monad()): IndexedStateT<F, SA, SB, A> = IndexedStateT(this)
+
+inline fun <reified F, SA, SB, A> IndexedStateTFun<F, SA, SB, A>.indexedStateT(MF: Monad<F> = monad()): IndexedStateT<F, SA, SB, A> = IndexedStateT(this, MF)
+
+inline fun <reified F, S, A> IndexedStateT.Companion.lift(fa: HK<F, A>, MF: Monad<F> = monad<F>()): StateT<F, S, A> = IndexedStateT(MF.pure({ s -> MF.map(fa, { a -> Tuple2(s, a) }) }))
+
+inline fun <reified F, S> IndexedStateT.Companion.get(AF: Applicative<F> = applicative<F>(), dummy: Unit = Unit): StateT<F, S, S> = IndexedStateT(AF.pure({ s: S -> AF.pure(Tuple2(s, s)) }))
+
+inline fun <reified F, S, T> IndexedStateT.Companion.gets(AF: Applicative<F> = applicative<F>(), dummy: Unit = Unit, crossinline f: (S) -> T): IndexedStateT<F, S, S, T> = StateT(AF.pure({ s: S -> AF.pure(Tuple2(s, f(s))) }))
+
+inline fun <reified F, S> IndexedStateT.Companion.set(s: S, AF: Applicative<F> = applicative<F>()): StateT<F, S, Unit> = IndexedStateT(AF.pure({ _: S -> AF.pure(Tuple2(s, Unit)) }))
+
+inline fun <reified F, S> IndexedStateT.Companion.modify(AF: Applicative<F> = applicative<F>(), dummy: Unit = Unit, crossinline f: (S) -> HK<F, S>): StateT<F, S, Unit> = IndexedStateT(AF.pure({ s -> AF.map(f(s)) { it toT Unit } }))
+
+typealias StateTFun<F, S, A> = IndexedStateTFun<F, S, S, A>
+typealias StateTFunKind<F, S, A> = IndexedStateTFunKind<F, S, S, A>
+
+typealias StateTKind<F, S, A> = IndexedStateTKind<F, S, S, A>
+typealias StateTKindPartial<F, S> = IndexedStateTKindPartial<F, S, S>
+typealias StateT<F, S, A> = IndexedStateT<F, S, S, A>
+
+inline fun <reified F, S, A> StateTFunKind<F, S, A>.stateT(MF: Monad<F> = monad()): StateT<F, S, A> = StateT(this)
+
+inline fun <reified F, S, A> StateTFun<F, S, A>.stateT(MF: Monad<F> = monad()): StateT<F, S, A> = StateT(this, MF)

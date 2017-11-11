@@ -7,7 +7,7 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class StateTTests : UnitSpec() {
 
-    val M: StateTMonadStateInstance<TryHK, Int> = StateT.monadState<TryHK, Int>(Try.monad())
+    val M = StateT.monadState<TryHK, Int>()
 
     val EQ: Eq<StateTKind<TryHK, Int, Int>> = Eq { a, b ->
         a.runM(1) == b.runM(1)
@@ -31,9 +31,8 @@ class StateTTests : UnitSpec() {
             semigroupK<StateTKindPartial<NonEmptyListHK, NonEmptyListHK>>() shouldNotBe null
         }
 
-        testLaws(
-            MonadStateLaws.laws(M, EQ, EQ_UNIT),
-            SemigroupKLaws.laws(
+        testLaws(MonadStateLaws.laws(M, EQ, EQ_UNIT))
+        testLaws(SemigroupKLaws.laws(
                 StateT.semigroupK<ListKWHK, Int, Int>(ListKW.monad(), ListKW.semigroupK()),
                 StateT.applicative<ListKWHK, Int>(ListKW.monad()),
                 EQ_LIST),
