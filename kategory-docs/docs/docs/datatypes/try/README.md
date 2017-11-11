@@ -59,7 +59,7 @@ try {
 However, we could use `Try` to retrieve the computation result in a much cleaner way:
 
 ```kotlin:ank
-import kategory.Try
+import kategory.*
 
 val lotteryTry = Try { getLotteryNumbers() }
 lotteryTry
@@ -68,16 +68,12 @@ lotteryTry
 By using `getOrElse` we can give a default value to return, when the computation fails, similar to what we can also do with `Option` when there is no value:
 
 ```kotlin:ank
-import kategory.getOrElse
-
 lotteryTry.getOrElse { emptyList() }
 ```
 
 We can also use `recover` which allow us to recover from a particular error (we receive the error and have to return a new value):
 
 ```kotlin:ank
-import kategory.recover
-
 lotteryTry.recover {
     if (it is NoConnectionException) emptyList()
     else throw it
@@ -87,8 +83,6 @@ lotteryTry.recover {
 Or if you have another different computation that can also fail, you can use `recoverWith` to recover from an error (as you do with `recover`, but in this case, returning a new `Try`):
 
 ```kotlin:ank
-import kategory.recoverWith
-
 enum class Source {
     CACHE, NETWORK
 }
