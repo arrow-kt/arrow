@@ -53,7 +53,7 @@ class FreeTest : UnitSpec() {
         )
 
         "Can interpret an ADT as Free operations" {
-            program.foldMap(optionInterpreter, Option.monad()).ev() shouldBe Option.Some(-30)
+            program.foldMap(optionInterpreter, Option.monad()).ev() shouldBe Some(-30)
             program.foldMap(idInterpreter, Id.monad()).ev() shouldBe Id(-30)
             program.foldMap(nonEmptyListInterpreter, NonEmptyList.monad()).ev() shouldBe NonEmptyList.of(-30)
         }

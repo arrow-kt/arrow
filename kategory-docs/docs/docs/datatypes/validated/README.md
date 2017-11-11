@@ -64,7 +64,7 @@ abstract class Read<A> {
         val intRead: Read<Int> =
             object: Read<Int>() {
                 override fun read(s: String): Option<Int> =
-                    if (s.matches(Regex("-?[0-9]+"))) Option(s.toInt()) else Option.None
+                    if (s.matches(Regex("-?[0-9]+"))) Option(s.toInt()) else None
             }
 
     }
@@ -103,14 +103,14 @@ data class Config(val map: Map<String, String>) {
     fun <A> parse(read: Read<A>, key: String): Validated<ConfigError, A> {
         val v = Option.fromNullable(map[key])
         return when(v) {
-            is Option.Some -> {
+            is Some -> {
                 val s = read.read(v.value)
                 when(s) {
-                    is Option.Some -> s.value.valid()
-                    is Option.None -> ConfigError.ParseConfig(key).invalid()
+                    is Some -> s.value.valid()
+                    is None -> ConfigError.ParseConfig(key).invalid()
                 }
             }
-            is Option.None -> Validated.Invalid(ConfigError.MissingConfig(key))
+            is None -> Validated.Invalid(ConfigError.MissingConfig(key))
         }
     }
 

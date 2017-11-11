@@ -1,5 +1,8 @@
 package kategory
 
+typealias Some<A> = Option.Some<A>
+typealias None = Option.None
+
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/Option.scala
  *
@@ -19,25 +22,25 @@ sealed class Option<out A> : OptionKind<A> {
 
     companion object {
 
-        fun <A> pure(a: A): Option<A> = Option.Some(a)
+        fun <A> pure(a: A): Option<A> = Some(a)
 
         tailrec fun <A, B> tailRecM(a: A, f: (A) -> OptionKind<Either<A, B>>): Option<B> {
             val option = f(a).ev()
             return when (option) {
-                is Option.Some -> {
+                is Some -> {
                     when (option.value) {
-                        is Either.Left -> tailRecM(option.value.a, f)
-                        is Either.Right -> Option.Some(option.value.b)
+                        is Left -> tailRecM(option.value.a, f)
+                        is Right -> Some(option.value.b)
                     }
                 }
-                is Option.None -> Option.None
+                is None -> None
             }
         }
 
         @JvmStatic
-        fun <A> fromNullable(a: A?): Option<A> = if (a != null) Option.Some(a) else Option.None
+        fun <A> fromNullable(a: A?): Option<A> = if (a != null) Some(a) else None
 
-        operator fun <A> invoke(a: A): Option<A> = Option.Some(a)
+        operator fun <A> invoke(a: A): Option<A> = Some(a)
 
         fun <A> empty(): Option<A> = None
 
@@ -65,7 +68,7 @@ sealed class Option<out A> : OptionKind<A> {
      * @param f the function to apply
      * @see flatMap
      */
-    inline fun <B> map(crossinline f: (A) -> B): Option<B> = fold({ Option.None }, { a -> Option.Some(f(a)) })
+    inline fun <B> map(crossinline f: (A) -> B): Option<B> = fold({ None }, { a -> Some(f(a)) })
 
     fun <B> ap(ff: OptionKind<(A) -> B>): Option<B> = ff.ev().flatMap { this.ev().map(it) }
 
@@ -79,7 +82,7 @@ sealed class Option<out A> : OptionKind<A> {
      * @param f the function to apply
      * @see map
      */
-    inline fun <B> flatMap(crossinline f: (A) -> OptionKind<B>): Option<B> = fold({ Option.None }, { a -> f(a) }).ev()
+    inline fun <B> flatMap(crossinline f: (A) -> OptionKind<B>): Option<B> = fold({ None }, { a -> f(a) }).ev()
 
     /**
      * Returns the result of applying $f to this $option's
@@ -92,39 +95,39 @@ sealed class Option<out A> : OptionKind<A> {
      * @param f the function to apply if nonempty.
      */
     inline fun <B> fold(crossinline ifEmpty: () -> B, crossinline f: (A) -> B): B = when (this) {
-        is Option.None -> ifEmpty()
-        is Option.Some<A> -> f(value)
+        is None -> ifEmpty()
+        is Some<A> -> f(value)
     }
 
     fun <B> foldL(b: B, f: (B, A) -> B): B =
             this.ev().let { option ->
                 when (option) {
-                    is Option.Some -> f(b, option.value)
-                    is Option.None -> b
+                    is Some -> f(b, option.value)
+                    is None -> b
                 }
             }
 
     fun <B> foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
             this.ev().let { option ->
                 when (option) {
-                    is Option.Some -> f(option.value, lb)
-                    is Option.None -> lb
+                    is Some -> f(option.value, lb)
+                    is None -> lb
                 }
             }
 
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, Option<B>> =
             this.ev().let { option ->
                 when (option) {
-                    is Option.Some -> GA.map(f(option.value), { Option.Some(it) })
-                    is Option.None -> GA.pure(Option.None)
+                    is Some -> GA.map(f(option.value), { Some(it) })
+                    is None -> GA.pure(None)
                 }
             }
 
     fun <G, B> traverseFilter(f: (A) -> HK<G, Option<B>>, GA: Applicative<G>): HK<G, Option<B>> =
             this.ev().let { option ->
                 when (option) {
-                    is Option.Some -> f(option.value)
-                    is Option.None -> GA.pure(Option.None)
+                    is Some -> f(option.value)
+                    is None -> GA.pure(None)
                 }
             }
 
@@ -134,7 +137,7 @@ sealed class Option<out A> : OptionKind<A> {
      *
      *  @param p the predicate used for testing.
      */
-    inline fun filter(crossinline p: (A) -> Boolean): Option<A> = fold({ Option.None }, { a -> if (p(a)) Option.Some(a) else Option.None })
+    inline fun filter(crossinline p: (A) -> Boolean): Option<A> = fold({ None }, { a -> if (p(a)) Some(a) else None })
 
     /**
      * Returns this $option if it is nonempty '''and''' applying the predicate $p to
@@ -142,7 +145,7 @@ sealed class Option<out A> : OptionKind<A> {
      *
      * @param p the predicate used for testing.
      */
-    inline fun filterNot(crossinline p: (A) -> Boolean): Option<A> = fold({ Option.None }, { a -> if (!p(a)) Option.Some(a) else Option.None })
+    inline fun filterNot(crossinline p: (A) -> Boolean): Option<A> = fold({ None }, { a -> if (!p(a)) Some(a) else None })
 
     /**
      * Returns false if the option is $none, true otherwise.
@@ -195,9 +198,9 @@ fun <B> Option<B>.getOrElse(default: () -> B): B = fold({ default() }, { it })
  */
 fun <A, B : A> OptionKind<B>.orElse(alternative: () -> Option<B>): Option<B> = if (ev().isEmpty) alternative() else ev()
 
-fun <A> A.some(): Option<A> = Option.Some(this)
+fun <A> A.some(): Option<A> = Some(this)
 
-fun <A> none(): Option<A> = Option.None
+fun <A> none(): Option<A> = None
 
 fun <A, L> Option<A>.toEither(ifEmpty: () -> L): Either<L, A> =
         this.fold({ ifEmpty().left() }, { it.right() })

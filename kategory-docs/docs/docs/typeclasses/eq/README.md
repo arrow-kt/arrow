@@ -9,7 +9,7 @@ permalink: /docs/typeclasses/eq/
 The `Eq` typeclass abstracts the ability to compare two instances of any object.
 Depending on your needs this comparison can be structural -the content of the object-, referential -the memory address of the object-, based on an identity -like an Id fields-, or any combination of the above.
 
-It can be considered the typeclass equivatent of Java's `Object#equals`.
+It can be considered the typeclass equivalent of Java's `Object#equals`.
 
 ```kotlin:ank
 import kategory.*
@@ -63,7 +63,7 @@ Note that this instance will fail on many all datatypes that contain a property 
 
 ```kotlin:ank
 // Option is a data class with a single value
-Eq.any().eqv(Option.Some(1), Option.pure(1))
+Eq.any().eqv(Some(1), Option.pure(1))
 ```
 
 ```kotlin:ank

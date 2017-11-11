@@ -59,11 +59,11 @@ data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A>
             if (!v.isEmpty()) {
                 val head: Either<A, B> = v.first()
                 when (head) {
-                    is Either.Right<A, B> -> {
+                    is Right<A, B> -> {
                         buf += head.b
                         go(buf, f, v.drop(1).k())
                     }
-                    is Either.Left<A, B> -> go(buf, f, (f(head.a).ev() + v.drop(1)).k())
+                    is Left<A, B> -> go(buf, f, (f(head.a).ev() + v.drop(1)).k())
                 }
             }
         }

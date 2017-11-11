@@ -124,7 +124,7 @@ When using `Option` our previous example may look like:
 
 ```kotlin:ank
 import kategory.*
-import kategory.Option.*
+
 
 fun arm(): Option<Nuke> = None
 fun aim(): Option<Target> = None
@@ -237,7 +237,7 @@ s possible states.
 Once we have an ADT defined to model our known errors we can redefine our functions.
 
 ```kotlin:ank
-import kategory.Either.*
+
 
 fun arm(): Either<SystemOffline, Nuke> = Right(Nuke)
 fun aim(): Either<RotationNeedsOil, Target> = Right(Target)

@@ -243,7 +243,7 @@ interface PTraversal<S, T, A, B> {
     fun headOption(s: S): Option<A> = foldMap(firstOptionMonoid<A>(), s, { b -> Const(b.some()) }).value
 
     /**
-     * Find the last target or [Option.None] if no targets
+     * Find the first target or [Option.None] if no targets
      */
     fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s, { b -> Const(b.some()) }).value
 

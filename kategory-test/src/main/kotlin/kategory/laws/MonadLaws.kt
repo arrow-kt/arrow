@@ -46,7 +46,7 @@ object MonadLaws {
             })
 
     inline fun <reified F> stackSafety(iterations: Int = 5000, M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit {
-        val res = M.tailRecM(0, { i -> M.pure(if (i < iterations) Either.Left(i + 1) else Either.Right(i)) })
+        val res = M.tailRecM(0, { i -> M.pure(if (i < iterations) Left(i + 1) else Right(i)) })
         res.equalUnderTheLaw(M.pure(iterations), EQ)
     }
 

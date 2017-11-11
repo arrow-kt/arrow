@@ -38,8 +38,8 @@ interface Foldable<F> : Typeclass {
     fun <A, B> reduceLeftToOption(fa: HK<F, A>, f: (A) -> B, g: (B, A) -> B): Option<B> =
             foldL(fa, Option.empty()) { option, a ->
                 when (option) {
-                    is Option.Some<B> -> Option.Some(g(option.value, a))
-                    is Option.None -> Option.Some(f(a))
+                    is Some<B> -> Some(g(option.value, a))
+                    is None -> Some(f(a))
                 }
             }
 
@@ -47,8 +47,8 @@ interface Foldable<F> : Typeclass {
             foldR(fa, Eval.Now(Option.empty())) { a, lb ->
                 lb.flatMap { option ->
                     when (option) {
-                        is Option.Some<B> -> g(a, Eval.Now(option.value)).map({ Option.Some(it) })
-                        is Option.None -> Eval.Later({ Option.Some(f(a)) })
+                        is Some<B> -> g(a, Eval.Now(option.value)).map({ Some(it) })
+                        is None -> Eval.Later({ Some(f(a)) })
                     }
                 }
             }
@@ -103,8 +103,8 @@ interface Foldable<F> : Typeclass {
      * Find the first element matching the predicate, if one exists.
      */
     fun <A> find(fa: HK<F, A>, f: (A) -> Boolean): Option<A> =
-            foldR(fa, Eval.now<Option<A>>(Option.None), { a, lb ->
-                if (f(a)) Eval.now(Option.Some(a)) else lb
+            foldR(fa, Eval.now<Option<A>>(None), { a, lb ->
+                if (f(a)) Eval.now(Some(a)) else lb
             }).value()
 
     /**
@@ -149,14 +149,14 @@ inline fun <F, reified G, A, reified B> Foldable<F>.foldMapM(fa: HK<F, A>, noinl
  * Get the element at the index of the Foldable.
  */
 inline fun <F, A> Foldable<F>.get(fa: HK<F, A>, idx: Long): Option<A> {
-    if (idx < 0L) return Option.None
+    if (idx < 0L) return None
     else {
         foldM(fa, 0L, { i, a ->
-            if (i == idx) Either.Left(a) else Either.Right(i + 1L)
+            if (i == idx) Left(a) else Right(i + 1L)
         }).let {
             return when (it) {
-                is Either.Left -> Option.Some(it.a)
-                else -> Option.None
+                is Left -> Some(it.a)
+                else -> None
             }
         }
     }
