@@ -98,6 +98,14 @@ Try { getLotteryNumbers(Source.NETWORK) }.recoverWith {
 }
 ```
 
+If you want to perform a check on a possible success, you can use `filter` to convert successful computations in failures if conditions aren't met:
+
+```kotlin:ank
+lotteryTry.filter {
+    it.size < 4
+}
+```
+
 On the other hand, when you want to handle both cases of the computation you can use `fold`. With `fold` we provide two functions, one for transforming a failure into a new value, the second one to transform the success value into a new one:
 
 ```kotlin:ank
@@ -106,7 +114,15 @@ lotteryTry.fold(
     { it.filter { it.toIntOrNull() != null } })
 ```
 
-Lastly, Kategory contains `Try` instances for many useful typeclasses that allows you to use and transform fallibale values
+Finally, as we have with `recoverWith`, we can use a version of `fold` which allows us to handle both cases with functions that return a new instance of `Try`, `transform`:
+
+```kotlin:ank
+lotteryTry.transform(
+    { Try { it.map { it.toInt() } } },
+    { Try.pure(emptyList<Int>()) })
+```
+
+Lastly, Kategory contains `Try` instances for many useful typeclasses that allows you to use and transform fallibale values:
 
 [`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }})
 
