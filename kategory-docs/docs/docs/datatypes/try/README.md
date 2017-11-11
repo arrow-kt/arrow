@@ -18,20 +18,41 @@ With just this explanation you might think that we are talking about an `Either<
 
 If we know that an operation could result in a failure, for example, because it is code from a library over which we have no control, or better yet, some method from the language itself. We can use `Try` as a substitute for the well-known `try-catch`, allowing us to rise to all its goodness.
 
-For example, if we try to parse a `String` to `Int` using the `String` method, the computation would fail with a `NumberFormatException` if the string is not a valid number:
+The following example represents the typical case when consuming Java code, where domain errors are represented with exceptions.  
 
 ```kotlin:ank
-"3".toInt()
-"nope".toInt()
+open class GeneralException: Exception()
+
+class NoConnectionException: GeneralException()
+
+class AuthorizationException: GeneralException()
+
+data class User(val id: Long, val name: String)
+
+fun checkPermissions() {
+    throw AuthorizationException()
+}
+
+fun getLotteryNumbersFromCloud(): List<User> {
+    throw NoConnectionException()
+}
+
+fun getLotteryNumbers: List<User> {
+    checkPermissions()
+    
+    return getLotteryNumbersFromCloud()
+}
 ```
 
 The traditional way to control this would be to use a `try-catch` block, as we have said before:
 
 ```kotlin:ank
 try {
-    "nope".toInt()
-} catch (exception: NumberFormatException) {
-    // string is not a number
+    getLotteryNumbers()
+} catch (e: NoConnectionException) {
+    println("You don't have connection")
+} catch (e: AuthorizationException) {
+    println("You don't have permission")
 }
 ```
 
@@ -40,54 +61,58 @@ However, we could use `Try` to retrieve the computation result in a much cleaner
 ```kotlin:ank
 import kategory.Try
 
-val intTry: Try<Int> = Try { "nope".toInt() }
-intTry
+val lotteryTry = Try { getLotteryNumbers() }
+lotteryTry
 ```
 
 By using `getOrElse` we can give a default value to return, when the computation fails, similar to what we can also do with `Option` when there is no value:
 
 ```kotlin:ank
-intTry.getOrElse { 0 }
+import kategory.getOrElse
+
+lotteryTry.getOrElse { emptyList() }
 ```
 
-We can also use `recover` and `recoverWith` which allow us to recover from a particular error (we receive the error and have to return a new value or a new `Try`, respectively):
+We can also use `recover` which allow us to recover from a particular error (we receive the error and have to return a new value):
 
 ```kotlin:ank
-intTry.recover {
-    when(it) {
-        is NumberFormatException -> 0
-        else -> 42
-    }
-}
+import kategory.recover
 
-intTry.recoverWith {
-    Try { "42".toInt() }
+lotteryTry.recover {
+    if (it is NoConnectionException) emptyList()
+    else throw it
 }
 ```
 
-On the other hand, you can use `Try` with `when` expressions to disambiguate the type:
+Or if you have another different computation that can also fail, you can use `recoverWith` to recover from an error (as you do with `recover`, but in this case, returning a new `Try`):
 
 ```kotlin:ank
-val failure: Try<Int> = Try { "nope".toInt() }
+import kategory.recoverWith
 
-val value = when(failure) {
-    is Try.Success -> failure.value
-    is Try.Failure -> 0
+enum class Source {
+    CACHE, NETWORK
 }
-value
+
+fun getLotteryNumbers(source: Source): List<User> {
+    checkPermissions()
+
+    return getLotteryNumbersFromCloud()
+}
+
+Try { getLotteryNumbers(Source.NETWORK) }.recoverWith {
+    Try { getLotteryNumbers(Source.CACHE) }
+}
 ```
+
+On the other hand, when you want to handle both cases of the computation you can use `fold`. With `fold` we provide two functions, one for transforming a failure into a new value, the second one to transform the success value into a new one:
 
 ```kotlin:ank
-val success: Try<Int> = Try { "3".toInt() }
-
-val value = when(success) {
-    is Try.Success -> success.value
-    is Try.Failure -> 0
-}
-value
+lotteryTry.fold(
+    { emptyList<String>() },
+    { it.filter { it.toIntOrNull() != null } })
 ```
 
-Kategory contains `Try` instances for many useful typeclasses that allows you to use and transform optional values
+Lastly, Kategory contains `Try` instances for many useful typeclasses that allows you to use and transform fallibale values
 
 [`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }})
 
