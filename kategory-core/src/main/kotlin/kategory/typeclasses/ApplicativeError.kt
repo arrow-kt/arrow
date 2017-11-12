@@ -9,8 +9,8 @@ interface ApplicativeError<F, E> : Applicative<F>, Typeclass {
     fun <A> handleError(fa: HK<F, A>, f: (E) -> A): HK<F, A> = handleErrorWith(fa) { pure(f(it)) }
 
     fun <A> attempt(fa: HK<F, A>): HK<F, Either<E, A>> =
-            handleErrorWith(map(fa) { Either.Right(it) }) {
-                pure(Either.Left(it))
+            handleErrorWith(map(fa) { Right(it) }) {
+                pure(Left(it))
             }
 
     fun <A> fromEither(fab: Either<E, A>): HK<F, A> = fab.fold({ raiseError<A>(it) }, { pure(it) })

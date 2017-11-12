@@ -1,5 +1,8 @@
 package kategory
 
+typealias Failure<A> = Try.Failure<A>
+typealias Success<A> = Try.Success<A>
+
 /**
  * The `Try` type represents a computation that may either result in an exception, or return a
  * successfully computed value.
@@ -17,10 +20,10 @@ sealed class Try<out A> : TryKind<A> {
 
     companion object {
 
-        fun <A> pure(a: A): Try<A> = Try.Success(a)
+        fun <A> pure(a: A): Try<A> = Success(a)
 
         fun <A, B> tailRecM(a: A, f: (A) -> TryKind<Either<A, B>>): Try<B> =
-                f(a).ev().fold({ Try.monadError().raiseError(it) }, { either -> either.fold({ tailRecM(it, f) }, { Try.Success(it) }) })
+                f(a).ev().fold({ Try.monadError().raiseError(it) }, { either -> either.fold({ tailRecM(it, f) }, { Success(it) }) })
 
         inline operator fun <A> invoke(f: () -> A): Try<A> =
                 try {
@@ -256,13 +259,13 @@ fun <B> Try<B>.getOrElse(default: () -> B): B = fold({ default() }, { it })
  * Applies the given function `f` if this is a `Failure`, otherwise returns this if this is a `Success`.
  * This is like `flatMap` for the exception.
  */
-fun <B> Try<B>.recoverWith(f: (Throwable) -> Try<B>): Try<B> = fold({ f(it) }, { Try.Success(it) })
+fun <B> Try<B>.recoverWith(f: (Throwable) -> Try<B>): Try<B> = fold({ f(it) }, { Success(it) })
 
 /**
  * Applies the given function `f` if this is a `Failure`, otherwise returns this if this is a `Success`.
  * This is like map for the exception.
  */
-fun <B> Try<B>.recover(f: (Throwable) -> B): Try<B> = fold({ Try.Success(f(it)) }, { Try.Success(it) })
+fun <B> Try<B>.recover(f: (Throwable) -> B): Try<B> = fold({ Success(f(it)) }, { Success(it) })
 
 /**
  * Completes this `Try` by applying the function `f` to this if this is of type `Failure`,

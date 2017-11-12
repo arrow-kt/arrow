@@ -11,6 +11,7 @@ import kategory.compose
 import kategory.functor
 import kategory.identity
 import kategory.none
+import kategory.Right
 import kategory.right
 import kategory.some
 import kategory.toT
@@ -209,7 +210,7 @@ interface PIso<S, T, A, B> {
      * View a [PIso] as a [PPrism]
      */
     fun asPrism(): PPrism<S, T, A, B> = PPrism(
-            { a -> Either.Right(get(a)) },
+            { a -> Right(get(a)) },
             this::reverseGet
     )
 

@@ -25,6 +25,6 @@ object FunctorFilterLaws {
                     genConstructor(Gen.int(), ff),
                     genFunctionAToB<Int, Int>(Gen.int()),
                     { fa: HK<F, Int>, f ->
-                        FFF.mapFilter(fa, { Option.Some(f(it)) }).equalUnderTheLaw(FFF.map(fa, f), EQ)
+                        FFF.mapFilter(fa, { Some(f(it)) }).equalUnderTheLaw(FFF.map(fa, f), EQ)
                     })
 }

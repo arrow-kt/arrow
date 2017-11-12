@@ -4,8 +4,8 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import kategory.Validated.Invalid
-import kategory.Validated.Valid
+import kategory.Invalid
+import kategory.Valid
 import kategory.laws.EqLaws
 import org.junit.runner.RunWith
 
@@ -96,8 +96,8 @@ class ValidatedTest : UnitSpec() {
         }
 
         "toEither should return Either.Right(value) if is Valid or Either.Left(error) in otherwise" {
-            Valid(10).toEither() shouldBe Either.Right(10)
-            Invalid(13).toEither() shouldBe Either.Left(13)
+            Valid(10).toEither() shouldBe Right(10)
+            Invalid(13).toEither() shouldBe Left(13)
         }
 
         "toIor should return Ior.Right(value) if is Valid or Ior.Left(error) in otherwise" {
@@ -105,9 +105,9 @@ class ValidatedTest : UnitSpec() {
             Invalid(13).toIor() shouldBe Ior.Left(13)
         }
 
-        "toOption should return Option.Some(value) if is Valid or Option.None in otherwise" {
-            Valid(10).toOption() shouldBe Option.Some(10)
-            Invalid(13).toOption() shouldBe Option.None
+        "toOption should return Some(value) if is Valid or None in otherwise" {
+            Valid(10).toOption() shouldBe Some(10)
+            Invalid(13).toOption() shouldBe None
         }
 
         "toList should return listOf(value) if is Valid or empty list in otherwise" {
@@ -143,18 +143,18 @@ class ValidatedTest : UnitSpec() {
         data class MyException(val msg: String) : Exception()
 
         "fromTry should return Valid if is Success or Failure in otherwise" {
-            Validated.fromTry(Try.Success(10)) shouldBe Valid(10)
-            Validated.fromTry<Int>(Try.Failure(MyException(""))) shouldBe Invalid(MyException(""))
+            Validated.fromTry(Success(10)) shouldBe Valid(10)
+            Validated.fromTry<Int>(Failure(MyException(""))) shouldBe Invalid(MyException(""))
         }
 
         "fromEither should return Valid if is Right or Failure in otherwise" {
-            Validated.fromEither(Either.Right(10)) shouldBe Valid(10)
-            Validated.fromEither(Either.Left(10)) shouldBe Invalid(10)
+            Validated.fromEither(Right(10)) shouldBe Valid(10)
+            Validated.fromEither(Left(10)) shouldBe Invalid(10)
         }
 
         "fromOption should return Valid if is Some or Invalid in otherwise" {
-            Validated.fromOption<Int, Int>(Option.Some(10)) { fail("None should not be called") } shouldBe Valid(10)
-            Validated.fromOption<Int, Int>(Option.None) { 5 } shouldBe Invalid(5)
+            Validated.fromOption<Int, Int>(Some(10)) { fail("None should not be called") } shouldBe Valid(10)
+            Validated.fromOption<Int, Int>(None) { 5 } shouldBe Invalid(5)
         }
 
         "invalidNel<E> should return a Invalid<NonEmptyList<E>>" {
@@ -163,11 +163,11 @@ class ValidatedTest : UnitSpec() {
 
         "withEither should return Valid(result) if f return Right" {
             Valid(10).withEither { it.map { it + 5 } } shouldBe Valid(15)
-            Invalid(10).withEither { Either.Right(5) } shouldBe Valid(5)
+            Invalid(10).withEither { Right(5) } shouldBe Valid(5)
         }
 
         "withEither should return Invalid(result) if f return Left" {
-            Valid(10).withEither { Either.Left(5) } shouldBe Invalid(5)
+            Valid(10).withEither { Left(5) } shouldBe Invalid(5)
             Invalid(10).withEither { it } shouldBe Invalid(10)
         }
 

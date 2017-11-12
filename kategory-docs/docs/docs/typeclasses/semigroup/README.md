@@ -44,7 +44,7 @@ Option.monoid<Int>().combine(Option(1), Option(2))
 ```
 
 ```kotlin:ank
-Option.monoid<Int>().combine(Option(1), Option.None)
+Option.monoid<Int>().combine(Option(1), None)
 ```
 
 Many of these types have methods defined directly on them, which allow for such combining, e.g. `+` on `List`, but the value of having a `Semigroup` typeclass available is that these compose.

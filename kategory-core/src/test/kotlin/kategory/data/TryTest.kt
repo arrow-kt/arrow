@@ -3,8 +3,8 @@ package kategory
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import kategory.Try.Failure
-import kategory.Try.Success
+import kategory.Failure
+import kategory.Success
 import kategory.laws.EqLaws
 import org.junit.runner.RunWith
 

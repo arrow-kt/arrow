@@ -10,8 +10,8 @@ class OptionMonoidTest : UnitSpec() {
         "should semigroup with the instance passed" {
             forAll { _: Int ->
                 val optionMonoid = Option.monoid(NonEmptyList.semigroup<Int>())
-                val seen = optionMonoid.combine(Option.None, Option.None)
-                val expected = Option.None
+                val seen = optionMonoid.combine(None, None)
+                val expected = None
 
                 expected == seen
             }
@@ -20,8 +20,8 @@ class OptionMonoidTest : UnitSpec() {
         "should semigroup with the instance passed" {
             forAll { value: Int ->
                 val optionMonoid = Option.monoid(NonEmptyList.semigroup<Int>())
-                val seen = optionMonoid.combine(Option.Some(kategory.NonEmptyList.of(value)), Option.None)
-                val expected = Option.None
+                val seen = optionMonoid.combine(Some(kategory.NonEmptyList.of(value)), None)
+                val expected = None
 
                 expected == seen
             }
@@ -30,8 +30,8 @@ class OptionMonoidTest : UnitSpec() {
         "should semigroup with the instance passed" {
             forAll { value: Int ->
                 val optionMonoid = Option.monoid(NonEmptyList.semigroup<Int>())
-                val seen = optionMonoid.combine(Option.None, Option.Some(NonEmptyList.of(value)))
-                val expected = Option.None
+                val seen = optionMonoid.combine(None, Some(NonEmptyList.of(value)))
+                val expected = None
 
                 expected == seen
             }
@@ -40,8 +40,8 @@ class OptionMonoidTest : UnitSpec() {
         "should semigroup with the instance passed" {
             forAll { value: Int ->
                 val optionMonoid = Option.monoid(NonEmptyList.semigroup<Int>())
-                val seen = optionMonoid.combine(Option.Some(NonEmptyList.of(value)), Option.Some(NonEmptyList.of(value)))
-                val expected = Option.Some(NonEmptyList.of(value, value))
+                val seen = optionMonoid.combine(Some(NonEmptyList.of(value)), Some(NonEmptyList.of(value)))
+                val expected = Some(NonEmptyList.of(value, value))
 
                 expected == seen
             }

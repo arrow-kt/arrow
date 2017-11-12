@@ -20,8 +20,8 @@ class CoproductTest : UnitSpec() {
         }
 
         testLaws(
-            TraverseLaws.laws(traverse(), functor(), { Coproduct(Either.Right(Id(it))) }, EQ),
-            ComonadLaws.laws(comonad(), { Coproduct(Either.Right(Id(it))) }, EQ)
+            TraverseLaws.laws(traverse(), functor(), { Coproduct(Right(Id(it))) }, EQ),
+            ComonadLaws.laws(comonad(), { Coproduct(Right(Id(it))) }, EQ)
         )
 
     }

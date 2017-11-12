@@ -10,8 +10,10 @@ import kategory.Validated
 import kategory.genEither
 import kategory.genFunctionAToB
 import kategory.genValidated
+import kategory.Invalid
 import kategory.invalid
 import kategory.valid
+import kategory.Valid
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -30,16 +32,16 @@ class EitherInstancesTest : UnitSpec() {
 
                     override fun combine(a: Validated<String, Int>, b: Validated<String, Int>): Validated<String, Int> =
                             when(a) {
-                                is Validated.Invalid -> {
+                                is Invalid -> {
                                     when(b) {
-                                        is Validated.Invalid -> (a.e + b.e).invalid()
-                                        is Validated.Valid -> b
+                                        is Invalid -> (a.e + b.e).invalid()
+                                        is Valid -> b
                                     }
                                 }
-                                is Validated.Valid -> {
+                                is Valid -> {
                                     when(b) {
-                                        is Validated.Invalid -> b
-                                        is Validated.Valid -> (a.a + b.a).valid()
+                                        is Invalid -> b
+                                        is Valid -> (a.a + b.a).valid()
                                     }
                                 }
                             }
