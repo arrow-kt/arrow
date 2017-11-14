@@ -31,6 +31,12 @@ class SequenceKWTest : UnitSpec() {
         }
 
         testLaws(
+            SemigroupLaws.laws(SequenceKW.semigroup(),
+                    SequenceKW(sequenceOf(1)),
+                    SequenceKW(sequenceOf(2)),
+                    SequenceKW(sequenceOf(3)),
+                    Eq.any()),
+            MonoidLaws.laws(SequenceKW.monoid(), SequenceKW(sequenceOf(1)), Eq.any()),
             EqLaws.laws { sequenceOf(it).k() },
             MonadLaws.laws(SequenceKW.monad(), eq),
             MonoidKLaws.laws(SequenceKW.monoidK(), applicative, eq),
