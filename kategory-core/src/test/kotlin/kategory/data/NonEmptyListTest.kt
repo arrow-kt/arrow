@@ -27,6 +27,11 @@ class NonEmptyListTest : UnitSpec() {
         val applicative = NonEmptyList.applicative()
 
         testLaws(
+            SemigroupLaws.laws(NonEmptyList.semigroup(),
+                NonEmptyList(1, emptyList()),
+                NonEmptyList(1, emptyList()),
+                NonEmptyList(1, emptyList()),
+                Eq.any()),
             EqLaws.laws { it.nel() },
             MonadLaws.laws(NonEmptyList.monad(), Eq.any()),
             SemigroupKLaws.laws(
