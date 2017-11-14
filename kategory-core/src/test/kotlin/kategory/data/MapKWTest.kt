@@ -27,35 +27,17 @@ class MapKWTest : UnitSpec() {
             eq<MapKW<String, Int>>() shouldNotBe null
         }
 
-        val monoid = MapKW.monoid<String, Int>(SG)
-
-        "Monoid Laws: identity" {
-            val identity = monoid.empty()
-
-            forAll { a: Int ->
-                val map = mapOf("key" to a).k()
-                monoid.combine(identity, map)["key"] == map["key"]
-            }
-
-            forAll { a: Int ->
-                val map = mapOf("key" to a).k()
-                monoid.combine(map, identity)["key"] == map["key"]
-            }
-        }
-
-        "Semigroup laws: associativity" {
-            forAll { a: Int, b: Int, c: Int ->
-                val mapA = mapOf("key" to a).k()
-                val mapB = mapOf("key" to b).k()
-                val mapC = mapOf("key" to c).k()
-
-                monoid.combine(mapA, monoid.combine(mapB, mapC)) == monoid.combine(monoid.combine(mapA, mapB), mapC)
-            }
-        }
-
         testLaws(
+            SemigroupLaws.laws(MapKW.semigroup<String, Int>(SG),
+                MapKW(mapOf("key" to 1)),
+                MapKW(mapOf("key" to 2)),
+                MapKW(mapOf("key" to 3)),
+                Eq.any()),
+            MonoidLaws.laws(MapKW.monoid<String, Int>(SG), MapKW(mapOf("key" to 1)), Eq.any()),
             EqLaws.laws { mapOf(it.toString() to it).k() },
-            TraverseLaws.laws(MapKW.traverse<String>(), MapKW.traverse<String>(), { a: Int -> mapOf<String, Int>("key" to a).k() })
+            TraverseLaws.laws(MapKW.traverse(),
+                MapKW.traverse(),
+                { a: Int -> mapOf<String, Int>("key" to a).k() })
         )
     }
 }

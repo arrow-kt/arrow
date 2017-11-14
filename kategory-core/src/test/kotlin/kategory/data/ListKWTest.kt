@@ -31,6 +31,12 @@ class ListKWTest : UnitSpec() {
 
         testLaws(
             EqLaws.laws { listOf(it).k() },
+            SemigroupLaws.laws(ListKW.semigroup(),
+                    ListKW(listOf(1)),
+                    ListKW(listOf(2)),
+                    ListKW(listOf(3)),
+                    Eq.any()),
+            MonoidLaws.laws(ListKW.monoid(), ListKW(listOf(1)), Eq.any()),
             SemigroupKLaws.laws(ListKW.semigroupK(), applicative, Eq.any()),
             MonoidKLaws.laws(ListKW.monoidK(), applicative, Eq.any()),
             TraverseLaws.laws(ListKW.traverse(), applicative, { n: Int -> ListKW(listOf(n)) }, Eq.any()),
