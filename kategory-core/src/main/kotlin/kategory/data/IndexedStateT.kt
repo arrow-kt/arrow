@@ -111,7 +111,7 @@ class IndexedStateT<F, SA, SB, A>(
          * @param AF [Applicative] for the context [F].
          * @param s value to set.
          */
-        fun <F, S> set(AF: Applicative<F>, s: S): IndexedStateT<F, S, S, Unit> = IndexedStateT(AF.pure({ _ -> AF.pure(Tuple2(s, Unit)) }))
+        fun <F, SA, SB> set(AF: Applicative<F>, s: SB): IndexedStateT<F, SA, SB, Unit> = IndexedStateT(AF.pure({ _ -> AF.pure(Tuple2(s, Unit)) }))
 
         /**
          * Set the state to a value [s] of type `HK<F, S>` and return [Unit].
@@ -119,7 +119,7 @@ class IndexedStateT<F, SA, SB, A>(
          * @param AF [Applicative] for the context [F].
          * @param s value to set.
          */
-        fun <F, S> setF(AF: Applicative<F>, s: HK<F, S>): IndexedStateT<F, S, S, Unit> = IndexedStateT(AF.pure({ _ -> AF.map(s) { Tuple2(it, Unit) } }))
+        fun <F, SA, SB> setF(AF: Applicative<F>, s: HK<F, SB>): IndexedStateT<F, SA, SB, Unit> = IndexedStateT(AF.pure({ _ -> AF.map(s) { Tuple2(it, Unit) } }))
 
         /**
          * Construct a [IndexedStateT] with a current value [a].
@@ -237,9 +237,11 @@ class IndexedStateT<F, SA, SB, A>(
                 }
             })
 
+    fun <X> imap(FF: Functor<F>, f: (SB) -> X): IndexedStateT<F, SA, X, A> = bimap(FF, f, ::identity)
+
     /**
      * Bimap the value [A] and the state [SB].
-     * 
+     *
      * @param FF [Functor] for the context [F].
      * @param f function to map state [SB] to [SC].
      * @param g function to map value [A] to [B].
@@ -262,7 +264,7 @@ class IndexedStateT<F, SA, SB, A>(
 
     /**
      * Like [transform], but allows the context to change from [F] to [G].
-     * 
+     *
      * @param MF [Monad] for the context [F].
      * @param AG [Applicative] for the context [F].
      * @param f function to transform state within context [F] to state in context [G].
@@ -290,7 +292,7 @@ class IndexedStateT<F, SA, SB, A>(
 
     /**
      * Modify the state [SB].
-     * 
+     *
      * @param FF [Functor] for the context [F].
      * @param f function to modify state [SB] to [SC].
      */
@@ -310,7 +312,7 @@ class IndexedStateT<F, SA, SB, A>(
 
     /**
      * Get the input state, without modifying the state.
-     * 
+     *
      * @param FF [Functor] for the context [F].
      */
     fun get(FF: Functor<F>): IndexedStateT<F, SA, SB, SB> = inspect(FF, ::identity)
@@ -394,7 +396,7 @@ inline fun <reified F, S, T> IndexedStateT.Companion.inspect(AF: Applicative<F> 
  * @param AF [Applicative] for the context [F].
  * @param s value to set.
  */
-inline fun <reified F, S> IndexedStateT.Companion.set(s: S, AF: Applicative<F> = applicative<F>()): StateT<F, S, Unit> = IndexedStateT.set(AF, s)
+inline fun <reified F, SA, SB> IndexedStateT.Companion.set(s: SB, AF: Applicative<F> = applicative<F>()): IndexedStateT<F, SA, SB, Unit> = IndexedStateT.set(AF, s)
 
 /**
  * Set the state to a value [s] of type `HK<F, S>` and return [Unit].
@@ -402,7 +404,7 @@ inline fun <reified F, S> IndexedStateT.Companion.set(s: S, AF: Applicative<F> =
  * @param AF [Applicative] for the context [F].
  * @param s value to set.
  */
-inline fun <reified F, S> IndexedStateT.Companion.setF(s: HK<F, S> , AF: Applicative<F> = applicative<F>()): StateT<F, S, Unit> = IndexedStateT.setF(AF, s)
+inline fun <reified F, S> IndexedStateT.Companion.setF(s: HK<F, S> , AF: Applicative<F> = applicative<F>()): IndexedStateT<F, S, S, Unit> = IndexedStateT.setF(AF, s)
 
 /**
  * Modify the state with [f] `(S) -> S` and return [Unit].
@@ -410,7 +412,7 @@ inline fun <reified F, S> IndexedStateT.Companion.setF(s: HK<F, S> , AF: Applica
  * @param AF [Applicative] for the context [F].
  * @param f the modify function to apply.
  */
-inline fun <reified F, S>  IndexedStateT.Companion.modify(AF: Applicative<F> = applicative<F>(), dummy: Unit = Unit, crossinline f: (S) -> S): StateT<F, S, Unit> = IndexedStateT.modify(AF) { f(it) }
+inline fun <reified F, S> IndexedStateT.Companion.modify(AF: Applicative<F> = applicative<F>(), dummy: Unit = Unit, crossinline f: (S) -> S): StateT<F, S, Unit> = IndexedStateT.modify(AF) { f(it) }
 
 /**
  * Modify the state with an [Applicative] function [f] `(S) -> HK<F, S>` and return [Unit].
