@@ -70,7 +70,6 @@ typealias StateFunKind<S, A> = StateTFunKind<IdHK, S, A>
  */
 typealias StateHK = IndexedStateTHK
 
-
 /**
  * Alias for StateKind
  */
@@ -130,7 +129,7 @@ object StateId {
     /**
      * Set the state to [s] and return [Unit].
      */
-    fun <S> set(s: S): State<S, Unit> = IndexedStateT.set(Id.applicative(), s)
+    fun <SA, SB> set(s: SB): IndexedState<SA, SB, Unit> = IndexedStateT.set(Id.applicative(), s)
 
     /**
      * Alias for [IndexedStateT.Companion.functor]
