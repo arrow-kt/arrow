@@ -3,10 +3,9 @@ package kategory.effects
 import kategory.*
 import kotlinx.coroutines.experimental.*
 import kotlin.coroutines.experimental.CoroutineContext
-import kotlin.coroutines.experimental.EmptyCoroutineContext
 
-fun <A> Deferred<A>.k(start: CoroutineStart = CoroutineStart.DEFAULT): DeferredKW<A> =
-        DeferredKW(this, start)
+fun <A> Deferred<A>.k(): DeferredKW<A> =
+        DeferredKW(this)
 
 fun <A> DeferredKWKind<A>.value(): Deferred<A> = this.ev().deferred
 
@@ -16,7 +15,7 @@ fun <A> DeferredKWKind<A>.value(): Deferred<A> = this.ev().deferred
         Applicative::class,
         Monad::class
 )
-data class DeferredKW<out A>(val deferred: Deferred<A>, val start: CoroutineStart = CoroutineStart.DEFAULT) : DeferredKWKind<A>, Deferred<A> by deferred {
+data class DeferredKW<out A>(val deferred: Deferred<A>) : DeferredKWKind<A>, Deferred<A> by deferred {
 
     fun <B> map(f: (A) -> B): DeferredKW<B> =
             flatMap { a: A -> pure(f(a)) }
@@ -25,9 +24,9 @@ data class DeferredKW<out A>(val deferred: Deferred<A>, val start: CoroutineStar
             flatMap { a -> fa.ev().map { ff -> ff(a) } }
 
     fun <B> flatMap(f: (A) -> DeferredKWKind<B>): DeferredKW<B> =
-            async(EmptyCoroutineContext, start) {
+            async(Unconfined, CoroutineStart.LAZY) {
                 f(await()).await()
-            }.k(start)
+            }.k()
 
     companion object {
         fun unit(): DeferredKW<Unit> =
@@ -37,7 +36,7 @@ data class DeferredKW<out A>(val deferred: Deferred<A>, val start: CoroutineStar
                 CompletableDeferred(a).k()
 
         fun <A> suspend(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.DEFAULT, a: () -> A): DeferredKW<A> =
-                async(ctx, start) { a() }.k(start)
+                async(ctx, start) { a() }.k()
 
         operator fun <A> invoke(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.DEFAULT, a: () -> A): DeferredKW<A> =
                 suspend(ctx, start, a)
@@ -58,7 +57,7 @@ data class DeferredKW<out A>(val deferred: Deferred<A>, val start: CoroutineStar
                             it.fold(this::completeExceptionally, this::complete)
                         }
                     }.await()
-                }.k(start)
+                }.k()
 
         /**
          * Starts a coroutine that'll run [Proc].
@@ -73,7 +72,7 @@ data class DeferredKW<out A>(val deferred: Deferred<A>, val start: CoroutineStar
         fun <A, B> tailRecM(a: A, f: (A) -> DeferredKWKind<Either<A, B>>): DeferredKW<B> =
                 f(a).value().let { initial: Deferred<Either<A, B>> ->
                     var current: Deferred<Either<A, B>> = initial
-                    async(EmptyCoroutineContext) {
+                    async(Unconfined, CoroutineStart.LAZY) {
                         val result: B
                         while (true) {
                             val actual: Either<A, B> = current.await()
@@ -91,9 +90,9 @@ data class DeferredKW<out A>(val deferred: Deferred<A>, val start: CoroutineStar
 }
 
 fun <A> DeferredKWKind<A>.handleErrorWith(f: (Throwable) -> DeferredKW<A>): DeferredKW<A> =
-        async(EmptyCoroutineContext, this.ev().start) {
+        async(Unconfined, CoroutineStart.LAZY) {
             Try { await() }.fold({ f(it).await() }, ::identity)
-        }.k(this.ev().start)
+        }.k()
 
 fun <A> DeferredKWKind<A>.unsafeAttemptSync(): Try<A> =
         runBlocking {
