@@ -102,4 +102,14 @@ fun <A> DeferredKWKind<A>.unsafeAttemptSync(): Try<A> =
 fun <A> DeferredKWKind<A>.unsafeRunSync(): A =
         unsafeAttemptSync().fold({ throw it }, ::identity)
 
+fun <A> DeferredKWKind<A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKW<Unit>): DeferredKW<Unit> =
+        DeferredKW(Unconfined, CoroutineStart.LAZY) {
+            unsafeRunAsync(cb.andThen { })
+        }
+
+fun <A> DeferredKWKind<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
+        async(Unconfined, CoroutineStart.LAZY) {
+            Try { await() }.fold({ cb(it.left()) }, { cb(it.right()) })
+        }.let { }
+
 suspend fun <A> DeferredKWKind<A>.await(): A = this.ev().await()
