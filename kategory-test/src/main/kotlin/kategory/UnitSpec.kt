@@ -20,10 +20,16 @@ abstract class UnitSpec : StringSpec() {
     }
 
     inline fun <F> Eq<F>.logged(): Eq<F> = Eq { a, b ->
-        val result = this@logged.eqv(a, b)
-        if (!result) {
+        try {
+            val result = this@logged.eqv(a, b)
+            if (!result) {
+                println("$a <---> $b")
+            }
+            result
+        } catch (t: Throwable) {
+            println("EXCEPTION: ${t.message}")
             println("$a <---> $b")
+            false
         }
-        result
     }
 }
