@@ -74,7 +74,7 @@ data class DeferredKW<out A>(val deferred: Deferred<A>, val start: CoroutineStar
         fun <A, B> tailRecM(a: A, f: (A) -> DeferredKWKind<Either<A, B>>): DeferredKW<B> =
                 f(a).value().let { initial: Deferred<Either<A, B>> ->
                     var current: Deferred<Either<A, B>> = initial
-                    async(initial) {
+                    async {
                         val result: B?
                         while (true) {
                             val actual: Either<A, B> = current.await()
