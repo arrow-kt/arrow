@@ -3,6 +3,7 @@ package kategory.effects
 import kategory.*
 import kotlinx.coroutines.experimental.*
 import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.experimental.EmptyCoroutineContext
 
 fun <A> Deferred<A>.k(start: CoroutineStart = CoroutineStart.DEFAULT): DeferredKW<A> =
         DeferredKW(this, start)
@@ -24,7 +25,7 @@ data class DeferredKW<out A>(val deferred: Deferred<A>, val start: CoroutineStar
             flatMap { a -> fa.ev().map { ff -> ff(a) } }
 
     fun <B> flatMap(f: (A) -> DeferredKWKind<B>): DeferredKW<B> =
-            async(start = start) {
+            async(EmptyCoroutineContext, start = start) {
                 f(await()).await()
             }.k()
 
@@ -74,7 +75,7 @@ data class DeferredKW<out A>(val deferred: Deferred<A>, val start: CoroutineStar
         fun <A, B> tailRecM(a: A, f: (A) -> DeferredKWKind<Either<A, B>>): DeferredKW<B> =
                 f(a).value().let { initial: Deferred<Either<A, B>> ->
                     var current: Deferred<Either<A, B>> = initial
-                    async {
+                    async(EmptyCoroutineContext) {
                         val result: B?
                         while (true) {
                             val actual: Either<A, B> = current.await()
