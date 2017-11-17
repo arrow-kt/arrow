@@ -164,5 +164,5 @@ import kategory.*
 import kategory.effects.*
 import kategory.debug.*
 
-showInstances<IOHK, Throwable>()
+showInstances<DeferredKWHK, Throwable>()
 ```
