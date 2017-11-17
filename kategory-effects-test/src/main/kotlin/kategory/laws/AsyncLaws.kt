@@ -106,8 +106,7 @@ object AsyncLaws {
                 }
                 Try { Thread.sleep(250); dispose() }.recover { throw it }
                 binding.equalUnderTheLaw(M.raiseError(BindingCancellationException()), EQ)
-                // FIXME(paco) DeferredKW is not a friend of Thread.sleep() and we can't use delay(), so this value ends up being 1
-                //&& sideEffect.counter == 0
+                        && sideEffect.counter == 0
             })
 
     inline fun <reified F> inContextCancellationBefore(M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
@@ -135,8 +134,7 @@ object AsyncLaws {
                 }
                 Try { Thread.sleep(250); dispose() }.recover { throw it }
                 binding.equalUnderTheLaw(M.raiseError(BindingCancellationException()), EQ)
-                // FIXME(paco) DeferredKW is not a friend of Thread.sleep() and we can't use delay(), so this value ends up being 1
-                //&& sideEffect.counter == 0
+                        && sideEffect.counter == 0
             })
 
     inline fun <reified F> inContextError(M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
