@@ -25,7 +25,7 @@ data class DeferredKW<out A>(val deferred: Deferred<A>, val start: CoroutineStar
             flatMap { a -> fa.ev().map { ff -> ff(a) } }
 
     fun <B> flatMap(f: (A) -> DeferredKWKind<B>): DeferredKW<B> =
-            async(EmptyCoroutineContext, start = start) {
+            async(EmptyCoroutineContext, start) {
                 f(await()).await()
             }.k()
 
@@ -93,7 +93,7 @@ data class DeferredKW<out A>(val deferred: Deferred<A>, val start: CoroutineStar
 }
 
 fun <A> DeferredKWKind<A>.handleErrorWith(f: (Throwable) -> DeferredKW<A>): DeferredKW<A> =
-        async(EmptyCoroutineContext, start = this.ev().start) {
+        async(EmptyCoroutineContext, this.ev().start) {
             Try { this@handleErrorWith.await() }.fold({ f(it).await() }, ::identity)
         }.k()
 
