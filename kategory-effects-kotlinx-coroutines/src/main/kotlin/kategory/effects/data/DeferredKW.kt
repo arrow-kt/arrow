@@ -74,7 +74,7 @@ data class DeferredKW<out A>(val deferred: Deferred<A>, val start: CoroutineStar
                 f(a).value().let { initial: Deferred<Either<A, B>> ->
                     var current: Deferred<Either<A, B>> = initial
                     async(EmptyCoroutineContext) {
-                        val result: B?
+                        val result: B
                         while (true) {
                             val actual: Either<A, B> = current.await()
                             if (actual is Right) {
@@ -84,7 +84,7 @@ data class DeferredKW<out A>(val deferred: Deferred<A>, val start: CoroutineStar
                                 current = f(actual.a).ev()
                             }
                         }
-                        result!!
+                        result
                     }.k()
                 }
     }
