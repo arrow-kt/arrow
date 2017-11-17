@@ -11,7 +11,7 @@ dependencies {
     compile "io.kotlintest:kotlintest:$kotlinTestVersion"
 }
 
-task printcp {
+task printcp << {
     println sourceSets.main.runtimeClasspath.each { println it }
 }
 
