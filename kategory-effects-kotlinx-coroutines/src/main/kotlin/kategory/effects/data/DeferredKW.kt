@@ -45,7 +45,6 @@ data class DeferredKW<out A>(val deferred: Deferred<A>, val start: CoroutineStar
         fun <A> failed(t: Throwable): DeferredKW<A> =
                 CompletableDeferred<A>().apply { completeExceptionally(t) }.k()
 
-
         fun <A> raiseError(t: Throwable): DeferredKW<A> =
                 failed(t)
 
@@ -71,7 +70,6 @@ data class DeferredKW<out A>(val deferred: Deferred<A>, val start: CoroutineStar
         fun <A> runAsync(fa: Proc<A>): DeferredKW<A> =
                 runAsync(DefaultDispatcher, CoroutineStart.DEFAULT, fa)
 
-
         fun <A, B> tailRecM(a: A, f: (A) -> DeferredKWKind<Either<A, B>>): DeferredKW<B> =
                 f(a).value().let { initial: Deferred<Either<A, B>> ->
                     var current: Deferred<Either<A, B>> = initial
@@ -96,7 +94,6 @@ fun <A> DeferredKWKind<A>.handleErrorWith(f: (Throwable) -> DeferredKW<A>): Defe
         async(EmptyCoroutineContext, this.ev().start) {
             Try { this@handleErrorWith.await() }.fold({ f(it).await() }, ::identity)
         }.k()
-
 
 fun <A> DeferredKWKind<A>.unsafeAttemptSync(): Try<A> =
         runBlocking {
