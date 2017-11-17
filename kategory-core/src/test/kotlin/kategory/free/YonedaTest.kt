@@ -20,13 +20,13 @@ class YonedaTest : UnitSpec() {
             functor<YonedaKindPartial<IdHK>>() shouldNotBe null
         }
 
-        testLaws(FunctorLaws.laws(F, { Yoneda.apply(kategory.Id(it)) }, EQ))
+        testLaws(FunctorLaws.laws(F, { Yoneda(kategory.Id(it)) }, EQ))
 
         "toCoyoneda should convert to an equivalent Coyoneda" {
             forAll { x: Int ->
-                val op = Yoneda.apply(Id(x.toString()))
+                val op = Yoneda(Id(x.toString()))
                 val toYoneda = op.toCoyoneda().lower(Id.functor()).ev()
-                val expected = Coyoneda.apply(Id(x), Int::toString).lower(Id.functor()).ev()
+                val expected = Coyoneda(Id(x), Int::toString).lower(Id.functor()).ev()
 
                 expected == toYoneda
             }
