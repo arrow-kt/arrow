@@ -11,7 +11,7 @@ Kategory wants to provide an abstraction over multiple concurrency frameworks, i
 Working towards this purpose, it's only natural that we'd add support for the framework Jetbrains provides over coroutines.
 This framework is called `kotlinx.coroutines`, whereas the machinery necessary to create coroutines is called `kotlin.coroutines`.
 
-The most important datatype provided by Jetbrains is `Deferred<A>`. `Deferred<A>` is an abstraction capable of returning 1 result and cancellation.
+The most important datatype provided by Jetbrains is `Deferred`. `Deferred` is an abstraction capable of returning 1 result and cancellation.
 Its constructor is called `async`, and takes one suspended execution block where you can `await()` suspended functions.
 
 ```kotlin
@@ -27,7 +27,7 @@ Does it look familiar? Yes! It's the same as our [comprehensions]({{ '/docs/patt
 
 ### Improvements over the library!
 
-Unlike [RxJava]({{ '/docs/integrations/rx2' | relative_url }}), `Deferred<A>` doesn't come with a natural set of operations for error handling and recovery,
+Unlike [RxJava]({{ '/docs/integrations/rx2' | relative_url }}), `Deferred` doesn't come with a natural set of operations for error handling and recovery,
 requiring users to use imperative try/catch blocks.
 Luckily, Kategory comes with its own set of error handling functions in its integration with [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}).
 
@@ -46,7 +46,7 @@ import kategory.effects.*
 
 val errorKategoryWrapper = async { throw RuntimeException("BOOM!") }.k()
 deferredWrapper.unsafeAttemptSync()
-// Try(RuntimeException("BOOM!"))
+// Failure(RuntimeException("BOOM!"))
 ```
 
 And how about adding some nice error recovery!
@@ -67,28 +67,56 @@ You can read more about FP architectures in the section on [Monad Transformers](
 To create a Deferred Kategory Wrapper you can invoke the constructor with any synchronous non-suspending function, the same way you'd use `async`.
 
 ```kotlin
-val deferredWrapper = DeferredKW { 1 }
-deferredWrapper.unsafeAttemptSync()
-// Success(1)
+val deferredKW = DeferredKW { throw RuntimeException("BOOM!") }
 ```
 
 To wrap any existing `Deferred` in its Kategory Wrapper counterpart you can use the extension function `k()`.
 
 ```kotlin
-val deferred = async { 1 }.k()
-deferred.unsafeAttemptSync()
-// Success(1)
+val deferredWrapped = async { throw RuntimeException("BOOM!") }.k()
 ```
 
-And you can even `await()` on the wrapper 
+All the other usual constructors like `pure()` and `runAsync()` are available too, in versions that accept different values for `CoroutineStart` and `CoroutineContext`.
+
+To unwrap the value of a `DeferredKW` we provide a synchronous method called `unsafeAttemptSync()` that returns a `Try<A>`.
 
 ```kotlin
-val deferred = async { 1 }.k()
-runBlocking { deferred.await() }
-// 1
+deferredKW.unsafeAttemptSync()
+// Failure(RuntimeException("BOOM!"))
 ```
 
-All the usual constructors like `pure()` and `runAsync()` are available too, in versions that accept different values for `CoroutineStart` and `CoroutineContext`.
+```kotlin
+deferredWrapped.unsafeAttemptSync()
+// Failure(RuntimeException("BOOM!"))
+```
+
+For unwrapping the values asynchronously you can use `unsafeRunAsync()`  and `runAsync()`.
+
+The safe version takes as a parameter a callback from a result of `Either<Throwable, A>` to a new `Deferred<Unit>` instance.
+All exceptions that would happen on the function parameter are automatically captured and propagated to the `Deferred<Unit>` return.
+
+```kotlin
+DeferredKW { throw RuntimeException("Boom!") }
+  .runAsync { result ->
+    result.fold(DeferredKW { println("Error found") }, DeferredKW { println(it.toString()) })
+  }
+// Error found
+```
+
+The unsafe version requires a callback to `Unit` and is assumed to never throw any internal exceptions.
+
+```kotlin
+DeferredKW { throw RuntimeException("Boom!") }
+  .unsafeRunAsync { result ->
+    result.fold({ println("Error found") }, { println(it.toString()) })
+  }
+// Error found
+```
+
+Note that the function `unsafeRunSync` returns a value that's not wrapped on a `Try<A>`. This means that, like `async`, this function can crash your program.
+Use it with SEVERE CAUTION.
+
+It is also posible to `await()` on the wrapper like you would on `Deferred`, but losing all the benefits of Kategory.
 
 ### Error handling & recovery
 
@@ -107,7 +135,7 @@ DeferredKW.monadError().bindingE {
 
   yield(percent)
 }.unsafeAttemptSync()
- // Try(ArithmeticException("/ by zero"))
+ // Failure(ArithmeticException("/ by zero"))
 ```
 
 Several recovery methods are provided, which you can find in the documentation for [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}).
@@ -139,7 +167,7 @@ Note that [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) pr
 Invoking this `Disposable` causes an `InterruptedException` in the chain which needs to be handled by the subscriber, similarly to what `Deferred` does.
 
 ```kotlin
-val (deferred, disposable) = 
+val (deferred, unsafeCancel) = 
   DeferredKW.monadError().bindingECancellable {
     val userProfile = DeferredKW { getUserProfile("123") }.bind()
     val friendProfiles = userProfile.friends().map { friend ->
@@ -147,12 +175,13 @@ val (deferred, disposable) =
     }
     yields(listOf(userProfile) + friendProfiles)
   }
+
+deferred.unsafeRunAsync { result ->
+  result.fold({ println("Boom! caused by $it") }, { println(it.toString()) })
+}
   
-DeferredKW { 
-    disposable()
-    yields(deferred.bind())
-}.unsafeAttemptSync()
-// Try(InterruptedException) 
+unsafeCancel()
+// Boom! caused by InterruptedException
 ```
 
 ### Instances
