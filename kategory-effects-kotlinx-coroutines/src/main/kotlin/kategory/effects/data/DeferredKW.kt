@@ -93,7 +93,7 @@ data class DeferredKW<out A>(val deferred: Deferred<A>, val start: CoroutineStar
 }
 
 fun <A> DeferredKWKind<A>.handleErrorWith(f: (Throwable) -> DeferredKW<A>): DeferredKW<A> =
-        async(start = this.ev().start) {
+        async(EmptyCoroutineContext, start = this.ev().start) {
             Try { this@handleErrorWith.await() }.fold({ f(it).await() }, ::identity)
         }.k()
 
