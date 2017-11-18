@@ -18,7 +18,7 @@ class DeferredKWTest : UnitSpec() {
     }
 
     init {
-        //testLaws(AsyncLaws.laws(DeferredKW.asyncContext(), DeferredKW.monadError(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(DeferredKW.asyncContext(), DeferredKW.monadError(), EQ(), EQ()))
 
         "instances can be resolved implicitly"{
             functor<DeferredKWHK>() shouldNotBe null
