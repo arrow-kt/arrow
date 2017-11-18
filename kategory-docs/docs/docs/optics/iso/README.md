@@ -74,7 +74,7 @@ liftF(point)
 
 By composing isos we can create additional isos without defining them. When dealing with different APIs or frameworks we frequently run into multiple equivalent but different structures like `Point2D`, `Tuple2`, `Pair`, `Coord`, etc.
 
-```kotlin:ank
+```kotlin
 data class Coord(val xAxis: Int, val yAxis: Int)
 
 val pairIsoCoord: Iso<Pair<Int, Int>, Coord> = Iso(
