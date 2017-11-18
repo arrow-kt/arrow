@@ -25,7 +25,7 @@ async {
 
 Does it look familiar? Yes! It's the same as our [comprehensions]({{ '/docs/patterns/monadcomprehensions' | relative_url }})!
 
-### Improvements over the library!
+### Improvements over the library
 
 Unlike [RxJava]({{ '/docs/integrations/rx2' | relative_url }}), `Deferred` doesn't come with a natural set of operations for error handling and recovery,
 requiring users to use imperative try/catch blocks.
@@ -62,7 +62,7 @@ in a way that feels idiomatic, while not having to worry about the semantics of 
 
 You can read more about FP architectures in the section on [Monad Transformers]({{ '/docs/patterns/monad_transformers' | relative_url }}).
 
-#### Bringing Deferred to Kategory
+### Bringing Deferred to Kategory
 
 To create a Deferred Kategory Wrapper you can invoke the constructor with any synchronous non-suspending function, the same way you'd use `async`.
 
