@@ -1,6 +1,5 @@
 package kategory
 
-
 /**
  * Alias that represent stateful computation of the form `(S) -> Tuple2<S, A>` with a result in certain context `F`.
  */
@@ -41,7 +40,7 @@ typealias StateT<F, S, A> = IndexedStateT<F, S, S, A>
  * StateT<F, S, A> is an alias for IndexedStateT<F, S, S, A>
  */
 @Suppress("FunctionName")
-inline fun <reified F, S, A> StateT(noinline run: StateTFun<F, S, A>, MF: Applicative<F> = applicative()): StateT<F, S, A> =
+inline fun <reified F, S, A> StateT(MF: Applicative<F> = applicative(), noinline run: StateTFun<F, S, A>): StateT<F, S, A> =
         IndexedStateT(MF.pure(run))
 
 /**
@@ -54,4 +53,4 @@ inline fun <reified F, S, A> StateTFunKind<F, S, A>.toStateT(MF: Monad<F> = kate
  * Alias that represents wrapped stateful computation in context `F`.
  */
 inline fun <reified F, S, A> StateTFun<F, S, A>.toStateT(MF: Monad<F> = kategory.monad()): StateT<F, S, A> =
-        StateT(this, MF)
+        StateT(MF, this)

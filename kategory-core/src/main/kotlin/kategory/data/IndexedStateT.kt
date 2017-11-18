@@ -237,7 +237,6 @@ class IndexedStateT<F, SA, SB, A>(
                 }
             })
 
-
     /**
      * Change state to [S0] given that you provide a function that proofs you can transform [S0] back into [SA].
      *

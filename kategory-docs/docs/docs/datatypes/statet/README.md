@@ -94,23 +94,23 @@ The only thing we can do is handle this with `StateT`. We want to wrap `State` w
 `EitherKindPartial` is an alias that helps us to fix `StackError` as the left type parameter for `Either<L, R>`.
 
 ```kotlin:ank
-fun popS() = StateT<EitherKindPartial<StackError>, Stack, String>(run = { stack ->
+fun popS() = StateT<EitherKindPartial<StackError>, Stack, String> { stack ->
     if (stack.isEmpty()) StackEmpty.left()
     else stack.first().let {
         stack.drop(1) toT it
     }.right()
-})
+}
 
-fun pushS(s: String) = StateT<EitherKindPartial<StackError>, Stack, Unit>(run = { stack ->
+fun pushS(s: String) = StateT<EitherKindPartial<StackError>, Stack, Unit> { stack ->
     (listOf(s, *stack.toTypedArray()) toT Unit).right()
-})
+}
 
 fun stackOperationsS(): StateT<EitherKindPartial<StackError>, Stack, String> {
-    return pushS("a").flatMap({ _ ->
-        popS().flatMap({ _ ->
+    return pushS("a").flatMap { _ ->
+        popS().flatMap { _ ->
             popS()
-        }, Either.monad())
-    }, Either.monad()).ev()
+        }
+    }.ev()
 }
 
 stackOperationsS().runM(listOf("hello", "world", "!"))
