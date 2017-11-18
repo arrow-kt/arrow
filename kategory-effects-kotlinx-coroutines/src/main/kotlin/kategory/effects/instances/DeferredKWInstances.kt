@@ -16,5 +16,5 @@ interface DeferredKWMonadErrorInstance :
 
 @instance(DeferredKW::class)
 interface DeferredKWAsyncContextInstance : AsyncContext<DeferredKWHK> {
-    override fun <A> runAsync(fa: Proc<A>): DeferredKW<A> = DeferredKW.runAsync(fa)
+    override fun <A> runAsync(fa: Proc<A>): DeferredKW<A> = DeferredKW.runAsync(fa = fa)
 }

@@ -35,11 +35,8 @@ data class DeferredKW<out A>(val deferred: Deferred<A>) : DeferredKWKind<A>, Def
         fun <A> pure(a: A): DeferredKW<A> =
                 CompletableDeferred(a).k()
 
-        fun <A> suspend(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.DEFAULT, a: () -> A): DeferredKW<A> =
-                async(ctx, start) { a() }.k()
-
         operator fun <A> invoke(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.DEFAULT, a: () -> A): DeferredKW<A> =
-                suspend(ctx, start, a)
+                async(ctx, start) { a() }.k()
 
         fun <A> failed(t: Throwable): DeferredKW<A> =
                 CompletableDeferred<A>().apply { completeExceptionally(t) }.k()
@@ -49,8 +46,12 @@ data class DeferredKW<out A>(val deferred: Deferred<A>) : DeferredKWKind<A>, Def
 
         /**
          * Starts a coroutine that'll run [Proc].
+         *
+         * Matching the behavior of [async],
+         * its [CoroutineContext] is set to [DefaultDispatcher]
+         * and its [CoroutineStart] is [CoroutineStart.DEFAULT].
          */
-        fun <A> runAsync(ctx: CoroutineContext, start: CoroutineStart, fa: Proc<A>): DeferredKW<A> =
+        fun <A> runAsync(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.DEFAULT, fa: Proc<A>): DeferredKW<A> =
                 async(ctx, start) {
                     CompletableDeferred<A>().apply {
                         fa {
@@ -58,16 +59,6 @@ data class DeferredKW<out A>(val deferred: Deferred<A>) : DeferredKWKind<A>, Def
                         }
                     }.await()
                 }.k()
-
-        /**
-         * Starts a coroutine that'll run [Proc].
-         *
-         * Matching the behavior of [async],
-         * its [CoroutineContext] is set to [DefaultDispatcher]
-         * and its [CoroutineStart] is [CoroutineStart.DEFAULT].
-         */
-        fun <A> runAsync(fa: Proc<A>): DeferredKW<A> =
-                runAsync(DefaultDispatcher, CoroutineStart.DEFAULT, fa)
 
         fun <A, B> tailRecM(a: A, f: (A) -> DeferredKWKind<Either<A, B>>): DeferredKW<B> =
                 f(a).value().let { initial: Deferred<Either<A, B>> ->
@@ -95,12 +86,10 @@ fun <A> DeferredKWKind<A>.handleErrorWith(f: (Throwable) -> DeferredKW<A>): Defe
         }.k()
 
 fun <A> DeferredKWKind<A>.unsafeAttemptSync(): Try<A> =
-        runBlocking {
-            Try { await() }
-        }
+        Try { unsafeRunSync() }
 
 fun <A> DeferredKWKind<A>.unsafeRunSync(): A =
-        unsafeAttemptSync().fold({ throw it }, ::identity)
+        runBlocking { await() }
 
 fun <A> DeferredKWKind<A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKW<Unit>): DeferredKW<Unit> =
         DeferredKW(Unconfined, CoroutineStart.DEFAULT) {
