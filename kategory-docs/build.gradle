@@ -4,6 +4,7 @@ dependencies {
     compile project(':ank-core')
     compile project(':kategory-effects')
     compile project(':kategory-effects-rx2')
+    compile project(':kategory-effects-kotlinx-coroutines')
     compile project(':kategory-optics')
     compile project(':kategory-recursion')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
