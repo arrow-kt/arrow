@@ -26,7 +26,7 @@ Add it in your root `build.gradle` at the end of repositories.
 allprojects {
     repositories {
         jcenter()
-        maven { url 'https://kotlin.bintray.com/kotlinx' }
+        maven { url 'https://dl.bintray.com/kategory/maven' }
     }
 }
 ```
