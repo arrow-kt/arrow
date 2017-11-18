@@ -36,7 +36,7 @@ data class DeferredKW<out A>(val deferred: Deferred<A>) : DeferredKWKind<A>, Def
                 CompletableDeferred(a).k()
 
         fun <A> suspend(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.DEFAULT, a: () -> A): DeferredKW<A> =
-                async(ctx, start) { a() }/* exception propagation is deferred until run */.k()
+                async(ctx, start) { a() }.k()
 
         operator fun <A> invoke(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.DEFAULT, a: () -> A): DeferredKW<A> =
                 suspend(ctx, start, a)
