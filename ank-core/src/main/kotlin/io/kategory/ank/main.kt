@@ -16,7 +16,7 @@ fun main(vararg args: String) {
                     .fold({ ex ->
                         throw ex
                     }, { files ->
-                        println("ΛNK Generated: \n\t${files.joinToString(separator = "\n\t")}")
+                        println("ΛNK Generated:\n\t${files.joinToString(separator = "\n\t")}")
                     })
         }
         else -> throw IllegalArgumentException("Required first 2 args as directory paths in this order: <required: source> <required: destination> <optional: classpath entries, one per arg..>")

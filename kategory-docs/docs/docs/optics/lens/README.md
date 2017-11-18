@@ -144,13 +144,14 @@ employeeStreetName.modify(employee, String::capitalize)
 ### Polymorphic lenses <a id="Plens"></a>
 When dealing with polymorphic product types we can also have polymorphic lenses that allow us to morph the type of the focus (and as a result the constructed type) of our `PLens`. Following method is also available as `pFirstTuple2<A, B, R>()` in the `kategory.optics` package.
 
-```kotlin:ank
+```kotlin
 fun <A, B, R> tuple2(): PLens<Tuple2<A, B>, Tuple2<R, B>, A, R> = PLens(
         { it.a },
         { r -> { ab -> r toT ab.b } }
 )
 
 pFirstTuple2<Int, String, String>().set(5 toT "World", "Hello, ")
+//Tuple2(a=Hello, , b=World)
 ```
 
 ### Laws
