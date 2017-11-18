@@ -37,20 +37,11 @@ class DeferredKWTest : UnitSpec() {
                     c
                 } == x + y + z
             })
-
         }
 
         "should complete when running a pure value with unsafeRunAsync" {
             val expected = 0
             DeferredKW.pure(expected).unsafeRunAsync { either ->
-                either.fold({ fail("") }, { it shouldBe expected })
-            }
-        }
-
-
-        "should complete when running a return value with unsafeRunAsync" {
-            val expected = 0
-            DeferredKW(Unconfined, CoroutineStart.DEFAULT) { expected }.unsafeRunAsync { either ->
                 either.fold({ fail("") }, { it shouldBe expected })
             }
         }
@@ -132,10 +123,12 @@ class DeferredKWTest : UnitSpec() {
                 val exception = MyException()
                 val ioa = DeferredKW<Int>(Unconfined, CoroutineStart.DEFAULT) { throw exception }
                 ioa.runAsync { either ->
-                    either.fold({ throw exception }, { fail("") })
-                }
+                    either.fold({ throw it }, { fail("") })
+                }.unsafeRunSync()
+                fail("Should rethrow the exception")
+            } catch (throwable: AssertionError) {
+                fail("${throwable.message}")
             } catch (throwable: Throwable) {
-                fail("Should catch any exception")
             }
         }
     }

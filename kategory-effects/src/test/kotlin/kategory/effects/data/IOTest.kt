@@ -195,10 +195,12 @@ class IOTest : UnitSpec() {
                 val exception = MyException()
                 val ioa = IO<Int> { throw exception }
                 ioa.runAsync { either ->
-                    either.fold({ throw exception }, { fail("") })
-                }
+                    either.fold({ throw it }, { fail("") })
+                }.unsafeRunSync()
+                fail("Should rethrow the exception")
+            } catch (throwable: AssertionError) {
+                fail("${throwable.message}")
             } catch (throwable: Throwable) {
-                fail("Should catch any exception")
             }
         }
 

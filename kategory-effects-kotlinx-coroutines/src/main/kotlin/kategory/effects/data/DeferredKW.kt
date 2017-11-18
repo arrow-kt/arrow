@@ -36,7 +36,7 @@ data class DeferredKW<out A>(val deferred: Deferred<A>) : DeferredKWKind<A>, Def
                 CompletableDeferred(a).k()
 
         fun <A> suspend(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.DEFAULT, a: () -> A): DeferredKW<A> =
-                async(ctx, start) { a() }.k()
+                async(ctx, start) { a() }/* exception propagation is deferred until run */.k()
 
         operator fun <A> invoke(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.DEFAULT, a: () -> A): DeferredKW<A> =
                 suspend(ctx, start, a)
@@ -103,13 +103,18 @@ fun <A> DeferredKWKind<A>.unsafeRunSync(): A =
         unsafeAttemptSync().fold({ throw it }, ::identity)
 
 fun <A> DeferredKWKind<A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKW<Unit>): DeferredKW<Unit> =
-        DeferredKW(Unconfined, CoroutineStart.LAZY) {
+        DeferredKW(Unconfined, CoroutineStart.DEFAULT) {
             unsafeRunAsync(cb.andThen { })
         }
 
 fun <A> DeferredKWKind<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
-        async(Unconfined, CoroutineStart.LAZY) {
+        async(Unconfined, CoroutineStart.DEFAULT) {
             Try { await() }.fold({ cb(it.left()) }, { cb(it.right()) })
-        }.let { }
+        }.let {
+            // Deferred swallows all exceptions. How about no.
+            it.invokeOnCompletion { a: Throwable? ->
+                if (a != null) throw a
+            }
+        }
 
 suspend fun <A> DeferredKWKind<A>.await(): A = this.ev().await()
