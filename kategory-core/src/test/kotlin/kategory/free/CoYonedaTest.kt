@@ -18,7 +18,7 @@ class CoyonedaTest : UnitSpec() {
             functor<CoyonedaKindPartial<IdHK, Int>>() shouldNotBe null
         }
 
-        testLaws(FunctorLaws.laws(Coyoneda.functor(), { Coyoneda.apply(Id(0), { it }) }, EQ))
+        testLaws(FunctorLaws.laws(Coyoneda.functor(), { Coyoneda(Id(0), { it }) }, EQ))
 
         "map should be stack-safe" {
             val loops = 10000
@@ -27,7 +27,7 @@ class CoyonedaTest : UnitSpec() {
                     if (n <= 0) acc
                     else loop(n - 1, acc.map { it + 1 })
 
-            val result = loop(loops, Coyoneda.apply(Some(0), { it })).lower(Option.functor())
+            val result = loop(loops, Coyoneda(Some(0), { it })).lower(Option.functor())
             val expected = Some(loops)
 
             expected shouldBe result
@@ -35,9 +35,9 @@ class CoyonedaTest : UnitSpec() {
 
         "toYoneda should convert to an equivalent Yoneda" {
             forAll { x: Int ->
-                val op = Coyoneda.apply(Id(x), Int::toString)
+                val op = Coyoneda(Id(x), Int::toString)
                 val toYoneda = op.toYoneda(Id.functor()).lower().ev()
-                val expected = Yoneda.apply(Id(x.toString())).lower().ev()
+                val expected = Yoneda(Id(x.toString())).lower().ev()
 
                 expected == toYoneda
             }
