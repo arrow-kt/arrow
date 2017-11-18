@@ -201,6 +201,7 @@ class IOTest : UnitSpec() {
             } catch (throwable: AssertionError) {
                 fail("${throwable.message}")
             } catch (throwable: Throwable) {
+                // Success
             }
         }
 
