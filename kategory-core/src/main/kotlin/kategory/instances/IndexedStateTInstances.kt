@@ -1,34 +1,33 @@
 package kategory
 
 @instance(IndexedStateT::class)
-interface IndexedStateTFunctorInstance<F, S> : Functor<IndexedStateTKindPartial<F, S, S>> {
+interface IndexedStateTFunctorInstance<F, SA, SB> : Functor<IndexedStateTKindPartial<F, SA, SB>> {
 
     fun FF(): Functor<F>
 
-    override fun <A, B> map(fa: IndexedStateTKind<F, S, S, A>, f: (A) -> B): IndexedStateT<F, S, S, B> =
-            fa.ev().map(f, FF())
+    override fun <A, B> map(fa: IndexedStateTKind<F, SA, SB, A>, f: (A) -> B): IndexedStateT<F, SA, SB, B> =
+            fa.ev().map(FF(), f)
 
 }
 
-//TODO review since pure only works for IndexedState<F, S, S, A> There can be no applicative for IndexedState<F, SA, SB, A>
 @instance(IndexedStateT::class)
-interface IndexedStateTApplicativeInstance<F, S> : IndexedStateTFunctorInstance<F, S>, Applicative<IndexedStateTKindPartial<F, S, S>> {
+interface IndexedStateTApplicativeInstance<F, S> : IndexedStateTFunctorInstance<F, S, S>, Applicative<IndexedStateTKindPartial<F, S, S>> {
 
     override fun FF(): Monad<F>
 
     override fun <A, B> map(fa: IndexedStateTKind<F, S, S, A>, f: (A) -> B): IndexedStateT<F, S, S, B> =
-            fa.ev().map(f, FF())
+            fa.ev().map(FF(), f)
 
     override fun <A> pure(a: A): IndexedStateT<F, S, S, A> =
             IndexedStateT.pure(FF(), a)
 
     override fun <A, B> ap(fa: IndexedStateTKind<F, S, S, A>, ff: IndexedStateTKind<F, S, S, (A) -> B>): IndexedStateT<F, S, S, B> =
-            fa.ev().ap(ff, FF())
+            fa.ev().ap(FF(), ff)
 
 }
 
 @instance(IndexedStateT::class)
-interface IndexedStateTMonadInstance<F, S> : IndexedStateTFunctorInstance<F, S>, Monad<IndexedStateTKindPartial<F, S, S>> {
+interface IndexedStateTMonadInstance<F, S> : IndexedStateTFunctorInstance<F, S, S>, Monad<IndexedStateTKindPartial<F, S, S>> {
 
     override fun FF(): Monad<F>
 
@@ -38,10 +37,10 @@ interface IndexedStateTMonadInstance<F, S> : IndexedStateTFunctorInstance<F, S>,
             IndexedStateT.tailRecM(a,f, FF())
 
     override fun <A, B> map(fa: IndexedStateTKind<F, S, S, A>, f: (A) -> B): IndexedStateT<F, S, S, B> =
-            fa.ev().map(f, FF())
+            fa.ev().map(FF(), f)
 
     override fun <A, B> flatMap(fa: IndexedStateTKind<F, S, S, A>, f: (A) -> IndexedStateTKind<F, S, S, B>): IndexedStateTKind<F, S, S, B> =
-            fa.ev().flatMap(f, FF())
+            fa.ev().flatMap(FF(), f)
 
 }
 
@@ -66,7 +65,7 @@ interface IndexedStateTSemigroupKInstance<F, SA, SB> : SemigroupK<IndexedStateTK
     fun SS(): SemigroupK<F>
 
     override fun <A> combineK(x: IndexedStateTKind<F, SA, SB, A>, y: IndexedStateTKind<F, SA, SB, A>): IndexedStateT<F, SA, SB, A> =
-            x.ev().combineK(y, MF(), SS())
+            x.ev().combineK(MF(), SS(), y)
 
 }
 
