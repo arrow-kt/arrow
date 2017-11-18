@@ -74,7 +74,7 @@ liftF(point)
 
 By composing isos we can create additional isos without defining them. When dealing with different APIs or frameworks we frequently run into multiple equivalent but different structures like `Point2D`, `Tuple2`, `Pair`, `Coord`, etc.
 
-```kotlin:ank
+```kotlin
 data class Coord(val xAxis: Int, val yAxis: Int)
 
 val pairIsoCoord: Iso<Pair<Int, Int>, Coord> = Iso(
@@ -122,7 +122,7 @@ When dealing with polymorphic equivalent structures we can create polymorphic is
 
 Given our previous structures `Tuple2<A, B>` and `Pair<A, B>` we can create a polymorphic `PIso` that represents a `get: (Tuple2<A, B>) -> Pair<A, B>` and a `reverseGet: (Tuple2<C, D) -> Pair<C, D>`.
 
-```kotlin:ank
+```kotlin
 fun <A, B, C, D> tuple2(): PIso<Tuple2<A, B>, Pair<C, D>, Pair<A, B>, Tuple2<C, D>> = PIso(
         { tuple -> tuple.a to tuple.b },
         { tuple -> tuple.a to tuple.b }
@@ -131,11 +131,12 @@ fun <A, B, C, D> tuple2(): PIso<Tuple2<A, B>, Pair<C, D>, Pair<A, B>, Tuple2<C, 
 
 Above defined `PIso` can lift a `reverse` function of `(Pair<A, B>) -> Tuple2<B, A>` to a function `(Tuple2<A, B>) -> Pair<B, A>`.
 
-```kotlin:ank
+```kotlin
 val reverseTupleAsPair: (Tuple2<Int, String>) -> Pair<String, Int> =
         tuple2<Int, String, String, Int>().lift { intStringPair -> intStringPair.second toT intStringPair.first }
 val reverse: Pair<String, Int> = reverseTupleAsPair(5 toT "five")
 reverse
+//(five, 5)
 ```
 
 ### Laws
