@@ -85,11 +85,6 @@ deferredKW.unsafeAttemptSync()
 // Failure(RuntimeException("BOOM!"))
 ```
 
-```kotlin
-deferredWrapped.unsafeAttemptSync()
-// Failure(RuntimeException("BOOM!"))
-```
-
 For unwrapping the values asynchronously you can use `unsafeRunAsync()`  and `runAsync()`.
 
 The safe version takes as a parameter a callback from a result of `Either<Throwable, A>` to a new `Deferred<Unit>` instance.
