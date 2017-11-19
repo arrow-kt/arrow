@@ -43,7 +43,7 @@ It runs the current `IO` asynchronously, calling the callback parameter on compl
 ```kotlin
 IO<Int> { throw RuntimeException("Boom!") }
   .runAsync { result ->
-    result.fold({`IO`{ println("Error") } }, {`IO`{ println(it.toString()) } })
+    result.fold({ IO { println("Error") } }, { IO { println(it.toString()) } })
   }
 ```
 

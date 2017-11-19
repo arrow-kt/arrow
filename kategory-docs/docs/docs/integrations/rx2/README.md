@@ -72,8 +72,8 @@ The library provides instances of [`MonadError`]({{ '/docs/typeclasses/monaderro
 fun <F> getSongUrlAsync(AC: AsyncContext<F> = asycContext()) =
   AC.runAsync { getSongUrl() }
 
-val songObservable: ObservableKW<Url> = getUsersAsync().ev()
-val songFlowable: FlowableKW<Url> = getUsersAsync().ev()
+val songObservable: ObservableKW<Url> = getSongUrlAsync().ev()
+val songFlowable: FlowableKW<Url> = getSongUrlAsync().ev()
 ```
 
 [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) using the method `bindingE`, with all its benefits.
@@ -99,7 +99,7 @@ getSongUrlAsync()
 When rewritten using `bindingE` it becomes. Note that any unexpected exception, like AritmeticException when totalTime is 0, is automatically caught and wrapped inside the observable. 
 
 ```kotlin
-ObservableKW.errorMonad().bindingE {
+ObservableKW.monadError().bindingE {
   val songUrl = getSongUrlAsync().bind()
   val musicPlayer = MediaPlayer.load(songUrl)
   val totalTime = musicPlayer.getTotaltime()

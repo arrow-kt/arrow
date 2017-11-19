@@ -105,7 +105,8 @@ object AsyncLaws {
                     yields(b)
                 }
                 Try { Thread.sleep(250); dispose() }.recover { throw it }
-                binding.equalUnderTheLaw(M.raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 0
+                binding.equalUnderTheLaw(M.raiseError(BindingCancellationException()), EQ)
+                        && sideEffect.counter == 0
             })
 
     inline fun <reified F> inContextCancellationBefore(M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
@@ -132,7 +133,8 @@ object AsyncLaws {
                     yields(b)
                 }
                 Try { Thread.sleep(250); dispose() }.recover { throw it }
-                binding.equalUnderTheLaw(M.raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 0
+                binding.equalUnderTheLaw(M.raiseError(BindingCancellationException()), EQ)
+                        && sideEffect.counter == 0
             })
 
     inline fun <reified F> inContextError(M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
