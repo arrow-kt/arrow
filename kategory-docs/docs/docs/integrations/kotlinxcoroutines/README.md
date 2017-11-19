@@ -85,11 +85,6 @@ deferredKW.unsafeAttemptSync()
 // Failure(RuntimeException("BOOM!"))
 ```
 
-```kotlin
-deferredWrapped.unsafeAttemptSync()
-// Failure(RuntimeException("BOOM!"))
-```
-
 For unwrapping the values asynchronously you can use `unsafeRunAsync()`  and `runAsync()`.
 
 The safe version takes as a parameter a callback from a result of `Either<Throwable, A>` to a new `Deferred<Unit>` instance.
@@ -153,7 +148,7 @@ recoveryKategoryWrapper.unsafeAttemptSync()
 whereas the later allows for any `DeferredKW` to be returned
 
 ```kotlin
-val recoveryKategoryWrapper = DeferredKW { getUserListByIdRange("potatoes") }
+val recoveryKategoryWrapper = DeferredKW { getUserListByIdRange(-1, 2) }
                                  .handleErrorWith { getUserListByIdRange(1, 3) }
 recoveryKategoryWrapper.unsafeAttemptSync()
 // Success(List(User(1), User(2), User(3)))
