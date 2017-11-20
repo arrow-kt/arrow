@@ -6,7 +6,7 @@ permalink: /docs/datatypes/try/
 
 ## Try
 
-Kategory has a lots of different types of error handling and reporting, which can make it difficult to decide which one is best for your situation. 
+Kategory has a [lots of different types of error handling and reporting](http://kategory.io/docs/patterns/error_handling/), which can make it difficult to decide which one is best for your situation. 
 
 For example, we have `Option` to model the absence of a value, or `Either` to model the return of a function as a type that may have been successful, or may have failed. 
 
