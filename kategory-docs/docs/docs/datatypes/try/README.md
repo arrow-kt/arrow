@@ -123,7 +123,7 @@ Lastly, Kategory contains `Try` instances for many useful typeclasses that allow
 
 [`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }})
 
-Transforming the value, if the computation is a success
+Transforming the value, if the computation is a success:
 
 ```kotlin:ank
 Try.functor().map(Try { "3".toInt() }, { it + 1})
@@ -131,7 +131,7 @@ Try.functor().map(Try { "3".toInt() }, { it + 1})
 
 [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }})
 
-Computing over independent values
+Computing over independent values:
 
 ```kotlin:ank
 Try.applicative().tupled(Try { "3".toInt() }, Try { "5".toInt() }, Try { "nope".toInt() })
@@ -139,7 +139,7 @@ Try.applicative().tupled(Try { "3".toInt() }, Try { "5".toInt() }, Try { "nope".
 
 [`Monad`]({{ '/docs/_docs/typeclasses/monad/' | relative_url }})
 
-Computing over dependent values ignoring failure
+Computing over dependent values ignoring failure:
 
 ```kotlin:ank
 Try.monad().binding {
