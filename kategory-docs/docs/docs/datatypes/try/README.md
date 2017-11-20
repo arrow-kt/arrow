@@ -35,7 +35,7 @@ fun getLotteryNumbersFromCloud(): List<String> {
     throw NoConnectionException()
 }
 
-fun getLotteryNumbers: List<String> {
+fun getLotteryNumbers(): List<String> {
     checkPermissions()
     
     return getLotteryNumbersFromCloud()
