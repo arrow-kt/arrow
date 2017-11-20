@@ -161,6 +161,20 @@ Try.monad().binding {
 }
 ```
 
+Computing over dependent values that are automatically lifted to the context of `Try`:
+
+```kotlin:ank
+val intTry: HK<TryHK, Int> = Try.monadError().bindingE {
+    val a = "none".toInt()
+    val b = "4".toInt()
+    val c = "5".toInt()
+
+    yields(a + b + c)
+}
+
+intTry.ev()
+```
+
 Available Instances:
 
 ```kotlin:ank
