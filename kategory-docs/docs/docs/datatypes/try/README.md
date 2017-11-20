@@ -27,17 +27,15 @@ class NoConnectionException: GeneralException()
 
 class AuthorizationException: GeneralException()
 
-data class User(val id: Long, val name: String)
-
 fun checkPermissions() {
     throw AuthorizationException()
 }
 
-fun getLotteryNumbersFromCloud(): List<User> {
+fun getLotteryNumbersFromCloud(): List<String> {
     throw NoConnectionException()
 }
 
-fun getLotteryNumbers: List<User> {
+fun getLotteryNumbers: List<String> {
     checkPermissions()
     
     return getLotteryNumbersFromCloud()
@@ -87,7 +85,7 @@ enum class Source {
     CACHE, NETWORK
 }
 
-fun getLotteryNumbers(source: Source): List<User> {
+fun getLotteryNumbers(source: Source): List<String> {
     checkPermissions()
 
     return getLotteryNumbersFromCloud()
