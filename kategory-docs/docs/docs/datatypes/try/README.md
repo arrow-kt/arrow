@@ -72,9 +72,8 @@ lotteryTry.getOrElse { emptyList() }
 We can also use `recover` which allow us to recover from a particular error (we receive the error and have to return a new value):
 
 ```kotlin:ank
-lotteryTry.recover {
-    if (it is NoConnectionException) emptyList()
-    else throw it
+lotteryTry.recover { exception ->
+    emptyList()
 }
 ```
 
