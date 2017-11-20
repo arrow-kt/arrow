@@ -69,6 +69,14 @@ By using `getOrElse` we can give a default value to return, when the computation
 lotteryTry.getOrElse { emptyList() }
 ```
 
+If you want to perform a check on a possible success, you can use `filter` to convert successful computations in failures if conditions aren't met:
+
+```kotlin:ank
+lotteryTry.filter {
+    it.size < 4
+}
+```
+
 We can also use `recover` which allow us to recover from a particular error (we receive the error and have to return a new value):
 
 ```kotlin:ank
@@ -95,15 +103,7 @@ Try { getLotteryNumbers(Source.NETWORK) }.recoverWith {
 }
 ```
 
-If you want to perform a check on a possible success, you can use `filter` to convert successful computations in failures if conditions aren't met:
-
-```kotlin:ank
-lotteryTry.filter {
-    it.size < 4
-}
-```
-
-On the other hand, when you want to handle both cases of the computation you can use `fold`. With `fold` we provide two functions, one for transforming a failure into a new value, the second one to transform the success value into a new one:
+When you want to handle both cases of the computation you can use `fold`. With `fold` we provide two functions, one for transforming a failure into a new value, the second one to transform the success value into a new one:
 
 ```kotlin:ank
 lotteryTry.fold(
@@ -111,7 +111,7 @@ lotteryTry.fold(
     { it.filter { it.toIntOrNull() != null } })
 ```
 
-Finally, as we have with `recoverWith`, we can use a version of `fold` which allows us to handle both cases with functions that return a new instance of `Try`, `transform`:
+Or, as we have with `recoverWith`, we can use a version of `fold` which allows us to handle both cases with functions that return a new instance of `Try`, `transform`:
 
 ```kotlin:ank
 lotteryTry.transform(
