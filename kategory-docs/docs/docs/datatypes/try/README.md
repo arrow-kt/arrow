@@ -141,38 +141,36 @@ Try.applicative().tupled(Try { "3".toInt() }, Try { "5".toInt() }, Try { "nope".
 
 Computing over dependent values ignoring failure:
 
-```kotlin:ank
+```kotlin
 Try.monad().binding {
     val a = Try { "3".toInt() }.bind()
     val b = Try { "4".toInt() }.bind()
     val c = Try { "5".toInt() }.bind()
 
     yields(a + b + c)
-}
+} // Success(value=12)
 ```
 
-```kotlin:ank
+```kotlin
 Try.monad().binding {
     val a = Try { "none".toInt() }.bind()
     val b = Try { "4".toInt() }.bind()
     val c = Try { "5".toInt() }.bind()
 
     yields(a + b + c)
-}
+} // Failure(exception=java.lang.NumberFormatException: For input string: "none")
 ```
 
 Computing over dependent values that are automatically lifted to the context of `Try`:
 
-```kotlin:ank
-val intTry: HK<TryHK, Int> = Try.monadError().bindingE {
+```kotlin
+Try.monadError().bindingE {
     val a = "none".toInt()
     val b = "4".toInt()
     val c = "5".toInt()
 
     yields(a + b + c)
-}
-
-intTry.ev()
+} // Failure(exception=java.lang.NumberFormatException: For input string: "none")
 ```
 
 Available Instances:
