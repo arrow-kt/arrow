@@ -216,7 +216,7 @@ This means that for the previous snippet [`IO`]({{ '/docs/effects/io' | relative
 
 ### What if I'd like to run multiple operations independently from each other, in a non-sequential way?
 
-You can check the section on the [Applicative Builder]({{ '/docs/patterns/applicativebuilder' | relative_url }}) pattern for them!
+You can check the section on the [Applicative Builder]({{ '/docs/patterns/applicative_builder' | relative_url }}) pattern for them!
 
 ### Cancellation and cleanup of resources
 
