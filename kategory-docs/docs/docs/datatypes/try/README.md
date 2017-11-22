@@ -20,7 +20,7 @@ If we know that an operation could result in a failure, for example, because it 
 
 The following example represents the typical case when consuming Java code, where domain errors are represented with exceptions.  
 
-```kotlin:ank
+```kotlin:ank:silent
 open class GeneralException: Exception()
 
 class NoConnectionException: GeneralException()
