@@ -169,10 +169,10 @@ private fun instanceFromImplicitObject(t: InstanceParametrizedType): Any? {
         else -> throw IllegalArgumentException("$firstTypeArg not a Class or ParameterizedType")
     }
     val targetPackage = on.name.substringBeforeLast(".")
-    val derivationPackage = if (targetPackage.startsWith("java.")) {
-        targetPackage.replace(".", "_")
-    } else {
-        targetPackage
+    val derivationPackage = when {
+        targetPackage.startsWith("java.") -> targetPackage.replace(".", "_")
+        targetPackage == "kotlin" -> "kotlin_"
+        else -> targetPackage
     }
     val providerQualifiedName = "$derivationPackage.${on.simpleName.replaceFirst("HK", "")}${of.simpleName}InstanceImplicits"
     val globalInstanceProvider = Class.forName(providerQualifiedName)
