@@ -1,0 +1,31 @@
+dependencies {
+    compile project(':kategory-core')
+    compile project(':kategory-effects')
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
+    compile project(':kategory-annotations')
+    kapt project(':kategory-annotations-processor')
+    kaptTest project(':kategory-annotations-processor')
+    compileOnly project(':kategory-annotations-processor')
+    annotationProcessor project(':kategory-annotations-processor')
+    testCompileOnly project(':kategory-annotations-processor')
+    testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
+    testCompile project(':kategory-effects-test')
+
+    compile "android.arch.lifecycle:extensions:1.0.0"
+}
+
+apply plugin: 'kotlin-kapt'
+//apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+apply from: rootProject.file('gradle/generated-kotlin-sources.gradle')
+
+android {
+    compileSdkVersion 27
+    buildToolsVersion '27.0.1'
+
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.0.0"
+    }
+}
