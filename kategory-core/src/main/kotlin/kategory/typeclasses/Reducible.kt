@@ -93,7 +93,7 @@ abstract class NonEmptyReducible<F, G> : Reducible<F> {
 
     override fun <A, B> reduceLeftTo(fa: HK<F, A>, f: (A) -> B, g: (B, A) -> B): B {
         val (a, ga) = split(fa)
-        return FG().foldL(ga, f(a), { b, a -> g(b, a) })
+        return FG().foldL(ga, f(a), { bb, aa -> g(bb, aa) })
     }
 
     override fun <A, B> reduceRightTo(fa: HK<F, A>, f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<B> =
