@@ -194,8 +194,10 @@ Note that while most data types include an instance of [`Monad`]({{ '/docs/typec
 Kategory uses the same abstraction as coroutines to group threads and other contexts of execution: `CoroutineContext`.
 There are multiple default values and wrappers for common cases in both the standard library, and the extension library [kotlinx.coroutines](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/-coroutine-dispatcher/index.html).
 
-In any `binding()` block there is a helper function `bindIn()` that takes a `CoroutineContext` as a parameter, and has to return an instance of a data type the same way `binding()` does.
-The function will cause a new coroutine to start on the `CoroutineContext` passed as a parameter to then `bind()` to await for its completion.
+In any `binding()` block there is a helper function `bindIn()` that takes a `CoroutineContext` as a parameter and can return any value. This value will be lifted into a data type using `pure`.
+A second version called `bindMIn()` requires returning an instance of a data type the same way `binding()` does.
+
+The functions will cause a new coroutine to start on the `CoroutineContext` passed as a parameter to then `bind()` to await for its completion.
 
 ```kotlin
 val ioThreadContext = newSingleThreadContext("IO")
@@ -203,15 +205,20 @@ val computationThreadContext = newSingleThreadContext("Computation")
 
 fun getLineLengthAverage(path: FilePath): IO<List<String>> = 
   IO.monadError().bindingE {
-    val file = bindIn(ioThreadContext) { getFile(path) }
+    
+    // Wrapping the operation into a suspended asynchronous IO then using bindMIn to bind it
+    val file = bindMIn(ioThreadContext) { IO { getFile(path) } }
+    
+    // Implicitly wrap the result of a synchronous operation into IO.pure() using bindIn
     val lines = bindIn(computationThreadContext) { file.readLines() }
+    
     val count = lines.map { it.length }.foldL(0) { acc, lineLength -> acc + lineLength }
     val average = count / lines.length
     yields(average)
   }
 ```
 
-Note that `bindIn()` doesn't assure that the execution will return to the same thread where the binding started, as it depends on the implementation of the data type.
+Note that `bindIn()` and `bindMIn()` don't assure that the execution will return to the same thread where the binding started, as it depends on the implementation of the data type.
 This means that for the previous snippet [`IO`]({{ '/docs/effects/io' | relative_url }}) may calculate count and average on different threads than what [`Option`]({{ '/docs/datatypes/option' | relative_url }}) or [`Try`]({{ '/docs/datatypes/try' | relative_url }}) would.
 
 ### What if I'd like to run multiple operations independently from each other, in a non-sequential way?
