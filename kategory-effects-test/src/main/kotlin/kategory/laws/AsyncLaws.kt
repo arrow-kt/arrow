@@ -113,9 +113,9 @@ object AsyncLaws {
             forFew(5, genIntSmall(), { num: Int ->
                 val sideEffect = SideEffect()
                 val (binding, dispose) = M.bindingECancellable {
-                    val a = bindIn(CommonPool) { Thread.sleep(500); pure(num) }
+                    val a = bindIn(CommonPool) { Thread.sleep(500); num }
                     sideEffect.increment()
-                    val b = bindIn(CommonPool) { pure(a + 1) }
+                    val b = bindIn(CommonPool) { a + 1 }
                     val c = pure(b + 1).bind()
                     yields(c)
                 }
@@ -127,9 +127,9 @@ object AsyncLaws {
             forFew(5, genIntSmall(), { num: Int ->
                 val sideEffect = SideEffect()
                 val (binding, dispose) = M.bindingECancellable {
-                    val a = bindIn(CommonPool) { pure(num) }
+                    val a = bindIn(CommonPool) { num }
                     sideEffect.increment()
-                    val b = bindIn(CommonPool) { Thread.sleep(500); sideEffect.increment(); pure(a + 1) }
+                    val b = bindIn(CommonPool) { Thread.sleep(500); sideEffect.increment(); a + 1 }
                     yields(b)
                 }
                 Try { Thread.sleep(250); dispose() }.recover { throw it }
