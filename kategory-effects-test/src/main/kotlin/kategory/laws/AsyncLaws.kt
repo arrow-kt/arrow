@@ -19,6 +19,7 @@ object AsyncLaws {
                     Law("Async bind: binding in parallel", { asyncParallelBind(AC, M, EQ) }),
                     Law("Async bind: binding cancellation before flatMap", { asyncCancellationBefore(AC, M, EQ) }),
                     Law("Async bind: binding cancellation after flatMap", { asyncCancellationAfter(AC, M, EQ) }),
+                    Law("Async bind: monad comprehensions cancellable binding in other threads equivalence", { monadErrorComprehensionsBindInContextEquivalent(M, EQ) }),
                     Law("Async bind: bindingInContext cancellation before flatMap", { inContextCancellationBefore(M, EQ) }),
                     Law("Async bind: bindingInContext cancellation after flatMap", { inContextCancellationAfter(M, EQ) }),
                     Law("Async bind: bindingInContext error equivalent to raiseError", { inContextError(M, EQERR) })
@@ -107,6 +108,21 @@ object AsyncLaws {
                 Try { Thread.sleep(250); dispose() }.recover { throw it }
                 binding.equalUnderTheLaw(M.raiseError(BindingCancellationException()), EQ)
                         && sideEffect.counter == 0
+            })
+
+    inline fun <reified F> monadErrorComprehensionsBindInContextEquivalent(M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
+            forFew(5, genIntSmall(), { num: Int ->
+                val (bindM, d1) = M.bindingECancellable {
+                    val a = bindMIn(newSingleThreadContext("$num")) { pure(num + 1) }
+                    val b = bindMIn(newSingleThreadContext("$a")) { pure(a + 1) }
+                    yields(b)
+                }
+                val (bind, d2) = M.bindingECancellable {
+                    val a = bindIn(newSingleThreadContext("$num")) { num + 1 }
+                    val b = bindIn(newSingleThreadContext("$a")) { a + 1 }
+                    yields(b)
+                }
+                bindM.equalUnderTheLaw(bind, EQ)
             })
 
     inline fun <reified F> inContextCancellationBefore(M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
