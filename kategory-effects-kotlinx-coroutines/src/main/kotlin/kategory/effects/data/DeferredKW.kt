@@ -35,6 +35,9 @@ data class DeferredKW<out A>(val deferred: Deferred<A>) : DeferredKWKind<A>, Def
         fun <A> pure(a: A): DeferredKW<A> =
                 CompletableDeferred(a).k()
 
+        fun <A> suspend(ctx: CoroutineContext = DefaultDispatcher, a: () -> DeferredKW<A>): DeferredKW<A> =
+                async(ctx, CoroutineStart.LAZY) { a().await() }.k()
+
         operator fun <A> invoke(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.DEFAULT, a: () -> A): DeferredKW<A> =
                 async(ctx, start) { a() }.k()
 
