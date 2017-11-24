@@ -8,7 +8,7 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class LiveDataKWTest : UnitSpec() {
     fun <A> EQ(): Eq<HK<LiveDataKWHK, A>> = Eq { a, b ->
-        a.value() == b.value()
+        a.value().getValue() == b.value().getValue()
     }
 
     init {
