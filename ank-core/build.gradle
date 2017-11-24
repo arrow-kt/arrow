@@ -20,8 +20,16 @@ apply from: 'generated-kotlin-sources.gradle'
 //    maven { url "http://dl.bintray.com/kategory/maven" }
 //}
 
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
+}
+
+
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$parent.ext.kotlinVersion"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
     compile "org.jetbrains:markdown:0.1.25"
     compile project(':kategory-core')
     compile "org.jetbrains.kotlin:kotlin-compiler:$parent.ext.kotlinVersion"
