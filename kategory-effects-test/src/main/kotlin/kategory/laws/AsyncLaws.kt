@@ -113,8 +113,8 @@ object AsyncLaws {
     inline fun <reified F> monadErrorComprehensionsBindInContextEquivalent(M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
             forFew(5, genIntSmall(), { num: Int ->
                 val (bindM, d1) = M.bindingECancellable {
-                    val a = bindMIn(newSingleThreadContext("$num")) { pure(num + 1) }
-                    val b = bindMIn(newSingleThreadContext("$a")) { pure(a + 1) }
+                    val a = bindInM(newSingleThreadContext("$num")) { pure(num + 1) }
+                    val b = bindInM(newSingleThreadContext("$a")) { pure(a + 1) }
                     yields(b)
                 }
                 val (bind, d2) = M.bindingECancellable {

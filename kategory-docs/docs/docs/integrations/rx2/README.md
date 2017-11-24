@@ -107,7 +107,7 @@ ObservableKW.monadError().bindingE {
   val end = PublishSubject.create<Unit>()
   Observable.interval(100, Milliseconds).takeUntil(end).bind()
 
-  val tick = bindMIn(UI) { Observable.create { musicPlayer.getCurrentTime() } }
+  val tick = bindInM(UI) { Observable.create { musicPlayer.getCurrentTime() } }
   val percent = (tick / totalTime * 100).toInt()
   if (percent >= 100) {
     end.onNext(Unit)
