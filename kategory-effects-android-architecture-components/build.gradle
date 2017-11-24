@@ -1,3 +1,5 @@
+android.defaultConfig.javaCompileOptions.annotationProcessorOptions.includeCompileClasspath = true
+
 dependencies {
     compile project(':kategory-core')
     compile project(':kategory-effects')
@@ -6,7 +8,6 @@ dependencies {
     kapt project(':kategory-annotations-processor')
     kaptTest project(':kategory-annotations-processor')
     compileOnly project(':kategory-annotations-processor')
-    annotationProcessor project(':kategory-annotations-processor')
     testCompileOnly project(':kategory-annotations-processor')
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
     testCompile project(':kategory-effects-test')
@@ -14,9 +15,9 @@ dependencies {
     compile "android.arch.lifecycle:extensions:1.0.0"
 }
 
-apply plugin: 'kotlin-kapt'
 //apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
-apply from: rootProject.file('gradle/generated-kotlin-sources.gradle')
+apply from: rootProject.file('gradle/generated-kotlin-android-sources.gradle')
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 27
@@ -27,5 +28,9 @@ android {
         targetSdkVersion 27
         versionCode 1
         versionName "1.0.0"
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
     }
 }

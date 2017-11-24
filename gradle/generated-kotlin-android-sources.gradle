@@ -1,0 +1,14 @@
+apply plugin: 'idea'
+
+idea {
+    module {
+        sourceDirs += files(
+            'build/generated/source/kapt/debug',
+            'build/generated/source/kaptKotlin/debug',
+            'build/tmp/kapt/main/kotlinGenerated')
+        generatedSourceDirs += files(
+            'build/generated/source/kapt/debug',
+            'build/generated/source/kaptKotlin/debug',
+            'build/tmp/kapt/main/kotlinGenerated')
+    }
+}
