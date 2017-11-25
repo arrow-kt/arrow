@@ -66,26 +66,16 @@ data class ObservableKW<A>(val observable: Observable<A>) : ObservableKWKind<A> 
                             emitter.onNext(it)
                             emitter.onComplete()
                         })
-
                     }
                 }.k()
 
-        fun <A, B> tailRecM(a: A, f: (A) -> ObservableKWKind<Either<A, B>>): ObservableKW<B> =
-                f(a).ev().value().let { initial ->
-                    var current: Observable<Either<A, B>> = initial
-                    Observable.create { e: ObservableEmitter<B> ->
-                        while (true) {
-                            val either: Either<A, B> = current.blockingFirst()
-                            if (either is Left) {
-                                current = f(either.a).value()
-                            } else if (either is Right) {
-                                e.onNext(either.b)
-                                e.onComplete()
-                                break
-                            }
-                        }
-                    }.k()
-                }
+        tailrec fun <A, B> tailRecM(a: A, f: (A) -> ObservableKWKind<Either<A, B>>): ObservableKW<B> {
+            val either = f(a).ev().value().blockingFirst()
+            return when (either) {
+                is Either.Left -> tailRecM(either.a, f)
+                is Either.Right -> Observable.just(either.b).k()
+            }
+        }
 
         fun monadFlat(): ObservableKWMonadInstance = ObservableKWMonadInstanceImplicits.instance()
 

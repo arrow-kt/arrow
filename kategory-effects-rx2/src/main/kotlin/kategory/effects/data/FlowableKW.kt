@@ -70,22 +70,13 @@ data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A> {
                     }
                 }, mode).k()
 
-        fun <A, B> tailRecM(a: A, f: (A) -> FlowableKWKind<Either<A, B>>): FlowableKW<B> =
-                f(a).ev().value().let { initial ->
-                    var current: Flowable<Either<A, B>> = initial
-                    Flowable.create({ e: FlowableEmitter<B> ->
-                        while (true) {
-                            val either: Either<A, B> = current.blockingFirst()
-                            if (either is Left) {
-                                current = f(either.a).value()
-                            } else if (either is Right) {
-                                e.onNext(either.b)
-                                e.onComplete()
-                                break
-                            }
-                        }
-                    }, BackpressureStrategy.BUFFER).k()
-                }
+        tailrec fun <A, B> tailRecM(a: A, f: (A) -> FlowableKWKind<Either<A, B>>): FlowableKW<B> {
+            val either = f(a).ev().value().blockingFirst()
+            return when (either) {
+                is Either.Left -> tailRecM(either.a, f)
+                is Either.Right -> Flowable.just(either.b).k()
+            }
+        }
 
         fun monadFlat(): FlowableKWMonadInstance = FlowableKWMonadInstanceImplicits.instance()
 
