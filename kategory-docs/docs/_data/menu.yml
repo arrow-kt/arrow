@@ -232,6 +232,9 @@ options:
 
       - title: Rx2
         url: /docs/integrations/rx2
+        
+      - title: kotlinx.coroutines
+        url: /docs/integrations/kotlinxcoroutines
 
   - title: Credits
     url: /credits
