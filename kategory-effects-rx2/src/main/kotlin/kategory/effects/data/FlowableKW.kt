@@ -1,7 +1,9 @@
 package kategory.effects
 
+import io.reactivex.BackpressureStrategy
+import io.reactivex.Flowable
+import io.reactivex.FlowableEmitter
 import kategory.*
-import io.reactivex.*
 
 fun <A> Flowable<A>.k(): FlowableKW<A> = FlowableKW(this)
 
@@ -69,8 +71,20 @@ data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A> {
                 }, mode).k()
 
         fun <A, B> tailRecM(a: A, f: (A) -> FlowableKWKind<Either<A, B>>): FlowableKW<B> =
-                f(a).ev().flatMap {
-                    it.fold({ tailRecM(a, f).ev() }, { pure(it).ev() })
+                f(a).ev().value().let { initial ->
+                    var current: Flowable<Either<A, B>> = initial
+                    Flowable.create({ e: FlowableEmitter<B> ->
+                        while (true) {
+                            val either: Either<A, B> = current.blockingFirst()
+                            if (either is Left) {
+                                current = f(either.a).value()
+                            } else if (either is Right) {
+                                e.onNext(either.b)
+                                e.onComplete()
+                                break
+                            }
+                        }
+                    }, BackpressureStrategy.BUFFER).k()
                 }
 
         fun monadFlat(): FlowableKWMonadInstance = FlowableKWMonadInstanceImplicits.instance()

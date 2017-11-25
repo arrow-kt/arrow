@@ -1,8 +1,8 @@
 package kategory.effects
 
-import kategory.*
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
+import kategory.*
 
 fun <A> Observable<A>.k(): ObservableKW<A> = ObservableKW(this)
 
@@ -71,8 +71,20 @@ data class ObservableKW<A>(val observable: Observable<A>) : ObservableKWKind<A> 
                 }.k()
 
         fun <A, B> tailRecM(a: A, f: (A) -> ObservableKWKind<Either<A, B>>): ObservableKW<B> =
-                f(a).ev().flatMap {
-                    it.fold({ tailRecM(a, f).ev() }, { ObservableKW.pure(it).ev() })
+                f(a).ev().value().let { initial ->
+                    var current: Observable<Either<A, B>> = initial
+                    Observable.create { e: ObservableEmitter<B> ->
+                        while (true) {
+                            val either: Either<A, B> = current.blockingFirst()
+                            if (either is Left) {
+                                current = f(either.a).value()
+                            } else if (either is Right) {
+                                e.onNext(either.b)
+                                e.onComplete()
+                                break
+                            }
+                        }
+                    }.k()
                 }
 
         fun monadFlat(): ObservableKWMonadInstance = ObservableKWMonadInstanceImplicits.instance()
