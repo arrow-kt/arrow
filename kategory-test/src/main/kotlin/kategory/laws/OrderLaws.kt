@@ -97,9 +97,11 @@ object OrderLaws {
             forAll(fGen, fGen, { x, y ->
                 val c = O.compare(x, y)
                 val m = O.max(x, y)
-                if (c < 0) m == y
-                else if (c == 0) (m == x) && (m == y)
-                else m == x
+                when {
+                    c < 0 -> m == y
+                    c == 0 -> (m == x) && (m == y)
+                    else -> m == x
+                }
             })
 
 }

@@ -12,9 +12,7 @@ fun <A> TIK<A>.ev(): TIC<A> =
 
 data class TIC<out A>(val ti: TI<A>) : TIK<A>
 
-class TIF {
-    private constructor()
-}
+class TIF private constructor()
 
 object TraverseLaws {
     // FIXME(paco): this implementation will crash the inliner. Wait for fix: https://youtrack.jetbrains.com/issue/KT-18660
