@@ -1,4 +1,5 @@
 apply plugin: 'ank-gradle-plugin'
+apply plugin: 'org.ajoberstar.git-publish'
 
 dependencies {
     compile project(':ank-core')
@@ -24,6 +25,17 @@ ank {
     target = file("${projectDir}/build/site")
     classpath = sourceSets.main.runtimeClasspath
     includeAnkCore = false
+}
+
+gitPublish {
+    repoUri = 'git@github.com:kategory/kategory.git'
+    branch = 'gh-pages'
+
+    contents {
+        from 'build/site'
+    }
+
+    commitMessage = 'update site'
 }
 
 sourceCompatibility = javaVersion

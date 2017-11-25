@@ -76,7 +76,7 @@ To wrap any existing `Deferred` in its Kategory Wrapper counterpart you can use 
 val deferredWrapped = async { throw RuntimeException("BOOM!") }.k()
 ```
 
-All the other usual constructors like `pure()` and `runAsync()` are available too, in versions that accept different values for `CoroutineStart` and `CoroutineContext`.
+All the other usual constructors like `pure()`, `suspend()`, and `runAsync()` are available too, in versions that accept different values for `CoroutineStart` and `CoroutineContext`.
 
 To unwrap the value of a `DeferredKW` we provide a synchronous method called `unsafeAttemptSync()` that returns a `Try<A>`.
 
