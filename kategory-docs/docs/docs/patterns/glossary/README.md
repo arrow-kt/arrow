@@ -13,15 +13,18 @@ TODO: expand terms and usage
 A datatype is a class that encapsulates one reusable coding pattern.
 These solutions have a canonical implementation that is generalised for all possible uses.
 
-Some common patterns expressed as datatypes are absence handling with `Option`,
-branching in code with `Either`,
-catching exceptions with `Try`,
-or interacting with the platform the program runs in using `IO`.
+Some common patterns expressed as datatypes are absence handling with [`Option`]({{ '/docs/datatypes/option' | relative_url }}),
+branching in code with [`Either`]({{ '/docs/datatypes/either' | relative_url }}),
+catching exceptions with [`Try`]({{ '/docs/datatypes/try' | relative_url }}),
+or interacting with the platform the program runs in using [`IO`]({{ '/docs/effects/io' | relative_url }}).
 
 ### Typeclasses
 
 A typeclass is an interface representing one behavior associated with a type.
-Examples of this behavior are comparison (`Eq`), composability (`Monoid`), its contents are mappable (`Functor`), or error recovery (`MonadError`).
+Examples of this behavior are comparison ([`Eq`]({{ '/docs/typeclasses/eq' | relative_url }})),
+composability ([`Monoid`]({{ '/docs/typeclasses/monoid' | relative_url }})),
+its contents are mappable ([`Functor`]({{ '/docs/typeclasses/functor' | relative_url }})),
+or error recovery ([`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }})).
 
 ```
 interface Eq<F>: Typeclass {
