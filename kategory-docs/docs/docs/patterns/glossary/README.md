@@ -121,10 +121,14 @@ Let's use the typeclass ([`Applicative`]({{ '/docs/typeclasses/applicative' | re
 ```kotlin
 interface Applicative<F>: Functor<F>, Typeclass {
   fun <A> pure(a: A): HK<F, A>
+  
+  /* ... */
 }
 
 object ListKWApplicativeInstance : ListKWFunctorInstance, Applicative<ListKWHK> {
   override fun <A> pure(a: A): HK<F, A> = listOf(a)
+  
+  /* ... */
 }
 
 inline fun <reified F> randomUserStructure(f: (Int) -> User, AP: Applicative<F> = applicative<F>()) =
