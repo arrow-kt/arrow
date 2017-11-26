@@ -71,7 +71,7 @@ Eq.any().eqv(Some(1), Option.pure(1))
 Eq.any().eqv(Eval.later{ 1 }, Eval.later{ 1 })
 ```
 
-See [Deriving and creating custom typeclass]({{ '/kategory/docs/typeclasses | relative_url }}) to provide your own `Eq` instances for custom datatypes.
+See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Order` instances for custom datatypes.
 
 ### Data types
 
