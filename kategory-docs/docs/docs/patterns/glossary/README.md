@@ -37,7 +37,6 @@ The association is done using generic parametrization rather than the usual subc
 This means that they can be implemented for any class, even those not in the current project,
 and allows us to make typeclass instances available at a global scope for the single unique type they're associated with.
 
-
 ### Instances
 
 A single implementation of a typeclass for a specific datatype or class.
