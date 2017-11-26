@@ -71,7 +71,7 @@ A type constructor is any class or interface that has at least one generic param
 So, after applying the parameter `Int` to the type constructor `ListKW<A>` it returns a `ListKW<Int>`.
 This list isn't parametrized in any generic value so it cannot be considered a type constructor anymore.
 Like functions, a type constructor with several parameters like `Either<L, R>` can be partially applied for one of them to return another type constructor,
-for example `Either<Throable, A>` or `Either<E, String>`.
+for example `Either<Throwable, A>` or `Either<E, String>`.
 
 Type constructors are useful when matched with typeclasses because they help us represent non-parametrized values.
 As type constructors is not a first class feature in Kotlin we use an interface `HK<F, A>` to represent them.
