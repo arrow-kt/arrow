@@ -101,7 +101,7 @@ You can see a function `ev()` used to access the `map()` function that already e
 This is because we need to safely downcast from `Hk<ListKWHK, A>` to `ListKW`, and `ev()` is a global function defined to do so.
 
 The function `ev()` is already defined for all datatypes in KΛTEGORY. If you're creating your own datatype that's also a type constructor and would like to create all these helper types and functions,
-you can do so simply by annotating it as @higerkind, and KΛTEGORY's annotation processor will create them for you.
+you can do so simply by annotating it as `@higerkind`, and using KΛTEGORY's [annotation processor](https://github.com/kategory/kategory#additional-setup) will create them for you.
 
 #### Using Higher Kinds and typeclasses with functions
 
