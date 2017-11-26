@@ -75,7 +75,7 @@ for example `Either<Throwable, A>` or `Either<E, String>`.
 
 Type constructors are useful when matched with typeclasses because they help us represent non-parametrized values.
 As type constructors is not a first class feature in Kotlin we use an interface `HK<F, A>` to represent them.
-HK stands for Higher Kind, which is the name of the language feature that allows working directly with type constuctors.
+HK stands for Higher Kind, which is the name of the language feature that allows working directly with type constructors.
 
 #### Higher Kinds
 
