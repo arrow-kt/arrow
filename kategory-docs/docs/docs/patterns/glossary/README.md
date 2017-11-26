@@ -23,7 +23,7 @@ or interacting with the platform the program runs in using [`IO`]({{ '/docs/effe
 A typeclass is an interface representing one behavior associated with a type.
 Examples of this behavior are comparison ([`Eq`]({{ '/docs/typeclasses/eq' | relative_url }})),
 composability ([`Monoid`]({{ '/docs/typeclasses/monoid' | relative_url }})),
-its contents are mappable ([`Functor`]({{ '/docs/typeclasses/functor' | relative_url }})),
+its contents can be mapped from one type to another ([`Functor`]({{ '/docs/typeclasses/functor' | relative_url }})),
 or error recovery ([`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }})).
 
 ```kotlin
@@ -32,8 +32,11 @@ interface Eq<F>: Typeclass {
 }
 ```
 
-What differentiates typeclasses from regular interfaces is that they are meant to be created at a global scope for a single type.
-The association is done using generic parametrization rather than the usual subclassing. This means that they can be implemented for any class, even those not in the current project.
+What differentiates typeclasses from regular interfaces is that they are meant to be implemented outside of their types.
+The association is done using generic parametrization rather than the usual subclassing.
+This means that they can be implemented for any class, even those not in the current project,
+and allows us to make typeclass instances available at a global scope for the single unique type they're associated with.
+
 
 ### Instances
 
@@ -47,7 +50,9 @@ object IntEqInstance: Eq<Int> {
 }
 ```
 
-In KΛTEGORY all typeclass instances can be looked up using a method with the same name as the typeclass.
+In KΛTEGORY all typeclass instances can be looked up in a global scope using an inlined reified method with the same name as the typeclass.
+Its generic parameter will be used for the lookup, which reinforces the concept that most typeclasses should have a single implementation per type.
+
 All the instances in the library are already registered and available in the global scope.
 If you're defining your own instances and would like for them to be discoverable in the global scope 
 you can add them by annotating them as `@instance`, and KΛTEGORY's [annotation processor](https://github.com/kategory/kategory#additional-setup) will register them for you.
@@ -63,22 +68,24 @@ eq<Int>()
 > NOTE: This approach to type constructors will be simplified if [KEEP-87](https://github.com/Kotlin/KEEP/pull/87) is approved. Go vote!
 
 A type constructor is any class or interface that has at least one generic parameter. For example, 
-`ListKW<A>` or `Option<A>`. It's called a constructor because it is similar to a function where the parameter is `A`.
-For example, applying `Int` to the type constructor `ListKW<A>` returns a `ListKW<Int>`.
-This list isn't parametrized in any generic value, so it cannot be considered a type constructor anymore.
+`ListKW<A>` or `Option<A>`. They're called constructors because they're is similar to a function where the parameter is `A`.
+So, after applying the parameter `Int` to the type constructor `ListKW<A>` it returns a `ListKW<Int>`.
+This list isn't parametrized in any generic value so it cannot be considered a type constructor anymore.
+Like functions, a type constructor with several parameters like `Either<L, R>` can be partially applied for one of them to return another type constructor,
+for example `Either<Throable, A>` or `Either<E, String>`.
 
 Type constructors are useful when matched with typeclasses because they help us represent non-parametrized values.
-As type constructors is not a first class feature in Kotlin, we use an interface `HK<F, A>` to represent them.
-HK stands for Higher Kind, which is the name of the feature that allows working with type constuctors as first class.
+As type constructors is not a first class feature in Kotlin we use an interface `HK<F, A>` to represent them.
+HK stands for Higher Kind, which is the name of the language feature that allows working directly with type constuctors.
 
 #### Higher Kinds
 
 In a Higher Kind with the shape `HK<F, A>`, if `A` is the type of the content then `F` has to be the type of the container.
-A malformed container would use the whole type constructor, duplicating the type ~~HK<Option<A>, A>~~.
-What KΛTEGORY does instead is define a surrogate type, known as the witness, that's not parametrized to represent `F`.
-These types are named same as the container, suffixed by HK, as in `OptionHK` or `ListKWHK`.
+A malformed container would use the whole type constructor, duplicating the type ~~HK\<Option\<A\>, A\>~~.
+What KΛTEGORY does instead is define a surrogate type that's not parametrized to represent `F`.
+These types are named same as the container and suffixed by HK, as in `OptionHK` or `ListKWHK`.
 
-You can read more about Higher Kinds and type constructors in [KindedJ's README](https://github.com/KindedJ/KindedJ#rationale)
+You can read more about Higher Kinds and type constructors in [KindedJ's README](https://github.com/KindedJ/KindedJ#rationale).
 
 #### Using Higher Kinds with typeclasses
 
@@ -118,7 +125,7 @@ interface Applicative<F>: Functor<F>, Typeclass {
 }
 
 object ListKWApplicativeInstance : ListKWFunctorInstance, Applicative<ListKWHK> {
-  override fun <A> pure(a: A): HK<F, A> = listOF(a)
+  override fun <A> pure(a: A): HK<F, A> = listOf(a)
 }
 
 inline fun <reified F> randomUserStructure(f: (Int) -> User, AP: Applicative<F> = applicative<F>()) =
