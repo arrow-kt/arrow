@@ -18,7 +18,7 @@ Lambda World, Cadiz, Nov '17
 
 ### Kotlin for the Pragmatic Functionalist
 
-An introduction to Kategory, and the enhances it brings to Kotlin's standard library.
+An introduction to Kategory and the enhancements it brings to Kotlin's standard library.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/s9oMED6ZikQ?rel=0" frameborder="0" allowfullscreen></iframe>
 
