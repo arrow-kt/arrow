@@ -1,6 +1,8 @@
 package kategory
 
 typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
+typealias Valid<A> = Validated.Valid<A>
+typealias Invalid<E> = Validated.Invalid<E>
 
 /**
  * Port of https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/data/Validated.scala
@@ -9,7 +11,7 @@ typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 
     companion object {
 
-        @JvmStatic fun <E, A> invalidNel(e: E): ValidatedNel<E, A> = Validated.Invalid(NonEmptyList(e, listOf()))
+        @JvmStatic fun <E, A> invalidNel(e: E): ValidatedNel<E, A> = Invalid(NonEmptyList(e, listOf()))
 
         @JvmStatic fun <E, A> validNel(a: A): ValidatedNel<E, A> = Validated.Valid(a)
 
@@ -134,11 +136,11 @@ fun <E, A> Validated<E, A>.findValid(SE: Semigroup<E>, that: () -> Validated<E, 
 
                 { e ->
                     that().fold(
-                            { ee -> Validated.Invalid(SE.combine(e, ee)) },
-                            { Validated.Valid(it) }
+                            { ee -> Invalid(SE.combine(e, ee)) },
+                            { Valid(it) }
                     )
                 },
-                { Validated.Valid(it) }
+                { Valid(it) }
         )
 
 /**
@@ -149,7 +151,7 @@ fun <E, A> Validated<E, A>.findValid(SE: Semigroup<E>, that: () -> Validated<E, 
 fun <E, A> Validated<E, A>.orElse(default: () -> Validated<E, A>): Validated<E, A> =
         fold(
                 { default() },
-                { Validated.Valid(it) }
+                { Valid(it) }
         )
 
 /**
@@ -158,29 +160,29 @@ fun <E, A> Validated<E, A>.orElse(default: () -> Validated<E, A>): Validated<E, 
  */
 fun <E, A, B> Validated<E, A>.ap(f: Validated<E, (A) -> B>, SE: Semigroup<E>): Validated<E, B> =
         when (this) {
-            is Validated.Valid -> f.fold({ Validated.Invalid(it) }, { Validated.Valid(it(a)) })
-            is Validated.Invalid -> f.fold({ Validated.Invalid(SE.combine(it, e)) }, { Validated.Invalid(e) })
+            is Valid -> f.fold({ Invalid(it) }, { Valid(it(a)) })
+            is Invalid -> f.fold({ Invalid(SE.combine(it, e)) }, { Invalid(e) })
         }
 
 fun <E, A> Validated<E, A>.handleLeftWith(f: (E) -> ValidatedKind<E, A>): Validated<E, A> =
-        fold({ f(it).ev() }, { Validated.Valid(it) })
+        fold({ f(it).ev() }, { Valid(it) })
 
 fun <E, A, B> Validated<E, A>.foldL(b: B, f: (B, A) -> B): B =
         when (this) {
-            is Validated.Valid -> f(b, this.a)
-            is Validated.Invalid -> b
+            is Valid -> f(b, this.a)
+            is Invalid -> b
         }
 
 fun <E, A, B> Validated<E, A>.foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
         when (this) {
-            is Validated.Valid -> f(this.a, lb)
-            is Validated.Invalid -> lb
+            is Valid -> f(this.a, lb)
+            is Invalid -> lb
         }
 
 fun <G, E, A, B> Validated<E, A>.traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, Validated<E, B>> =
         when (this) {
-            is Validated.Valid -> GA.map(f(this.a), { Validated.Valid(it) })
-            is Validated.Invalid -> GA.pure(this)
+            is Valid -> GA.map(f(this.a), { Valid(it) })
+            is Invalid -> GA.pure(this)
         }
 
 inline fun <reified E, reified A> Validated<E, A>.combine(y: ValidatedKind<E, A>,
@@ -188,9 +190,9 @@ inline fun <reified E, reified A> Validated<E, A>.combine(y: ValidatedKind<E, A>
                                                           SA: Semigroup<A> = semigroup()): Validated<E, A> =
         y.ev().let { that ->
             when {
-                this is Validated.Valid && that is Validated.Valid -> Validated.Valid(SA.combine(this.a, that.a))
-                this is Validated.Invalid && that is Validated.Invalid -> Validated.Invalid(SE.combine(this.e, that.e))
-                this is Validated.Invalid -> this
+                this is Valid && that is Valid -> Valid(SA.combine(this.a, that.a))
+                this is Invalid && that is Invalid -> Invalid(SE.combine(this.e, that.e))
+                this is Invalid -> this
                 else -> that
             }
         }
@@ -199,17 +201,17 @@ fun <E, A> Validated<E, A>.combineK(y: ValidatedKind<E, A>, SE: Semigroup<E>): V
     val xev = this
     val yev = y.ev()
     return when (xev) {
-        is Validated.Valid -> xev
-        is Validated.Invalid -> when (yev) {
-            is Validated.Invalid -> Validated.Invalid(SE.combine(xev.e, yev.e))
-            is Validated.Valid -> yev
+        is Valid -> xev
+        is Invalid -> when (yev) {
+            is Invalid -> Invalid(SE.combine(xev.e, yev.e))
+            is Valid -> yev
         }
     }
 }
 
-fun <E, A> A.valid(): Validated<E, A> = Validated.Valid(this)
+fun <E, A> A.valid(): Validated<E, A> = Valid(this)
 
-fun <E, A> E.invalid(): Validated<E, A> = Validated.Invalid(this)
+fun <E, A> E.invalid(): Validated<E, A> = Invalid(this)
 
 fun <E, A> A.validNel(): ValidatedNel<E, A> = Validated.validNel(this)
 

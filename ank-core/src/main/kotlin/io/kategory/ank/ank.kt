@@ -16,8 +16,7 @@ fun ank(source: File, target: File, compilerArgs: ListKW<String>) =
             val allSnippets: ListKW<ListKW<Snippet>> = parsedMarkDowns.mapIndexed { n, tree ->
                 extractCode(filesContents.list[n], tree)
             }.k().sequence().bind()
-            val compilationResults =
-                    ListKW(allSnippets.mapIndexed { n, s -> compileCode(files.list[n], s, compilerArgs) }).k().sequence().bind()
+            val compilationResults = compileCode(allSnippets.mapIndexed { n, s -> files.list[n] to s }.toMap(), compilerArgs).bind()
             val replacedResults: ListKW<String> = compilationResults.map { c -> replaceAnkToLang(c) }.k().sequence().bind()
             val resultingFiles: ListKW<File> = generateFiles(files, replacedResults).bind()
             yields(resultingFiles)

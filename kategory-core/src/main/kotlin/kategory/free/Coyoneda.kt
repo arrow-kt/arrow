@@ -18,12 +18,12 @@ private typealias AnyFunc = (Any?) -> Any?
 
     fun toYoneda(FF: Functor<F>): Yoneda<F, A> =
             object : Yoneda<F, A>() {
-                override fun <B> apply(f: (A) -> B): HK<F, B> = map(f).lower(FF)
+                override operator fun <B> invoke(f: (A) -> B): HK<F, B> = map(f).lower(FF)
             }
 
     companion object {
         @Suppress("UNCHECKED_CAST")
-        inline fun <reified U, A, B> apply(fa: HK<U, A>, noinline f: (A) -> B): Coyoneda<U, A, B> = unsafeApply(fa, listOf(f as AnyFunc))
+        inline operator fun <reified U, A, B> invoke(fa: HK<U, A>, noinline f: (A) -> B): Coyoneda<U, A, B> = unsafeApply(fa, listOf(f as AnyFunc))
 
         inline fun <reified U, A, B> unsafeApply(fa: HK<U, A>, f: List<AnyFunc>): Coyoneda<U, A, B> = Coyoneda(fa, f)
 

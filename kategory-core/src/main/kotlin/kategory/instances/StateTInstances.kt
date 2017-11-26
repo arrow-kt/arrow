@@ -45,7 +45,7 @@ interface StateTMonadStateInstance<F, S> : StateTMonadInstance<F, S>, MonadState
 
     override fun get(): StateT<F, S, S> = StateT.get(FF())
 
-    override fun set(s: S): StateT<F, S, Unit> = StateT.set(s, FF())
+    override fun set(s: S): StateT<F, S, Unit> = StateT.set(FF(), s)
 
 }
 
@@ -79,9 +79,9 @@ interface StateTMonadCombineInstance<F, S> : MonadCombine<StateTKindPartial<F, S
 interface StateTMonadErrorInstance<F, S, E> : StateTMonadInstance<F, S>, MonadError<StateTKindPartial<F, S>, E> {
     override fun FF(): MonadError<F, E>
 
-    override fun <A> raiseError(e: E): HK<StateTKindPartial<F, S>, A> = StateT.lift(FF().raiseError(e), FF())
+    override fun <A> raiseError(e: E): HK<StateTKindPartial<F, S>, A> = StateT.lift(FF(), FF().raiseError(e))
 
     override fun <A> handleErrorWith(fa: HK<StateTKindPartial<F, S>, A>, f: (E) -> HK<StateTKindPartial<F, S>, A>): StateT<F, S, A> =
-            StateT(FF().pure({ s -> FF().handleErrorWith(fa.runM(s, FF()), { e -> f(e).runM(s, FF()) }) }))
+            StateT(FF().pure({ s -> FF().handleErrorWith(fa.runM(FF(), s), { e -> f(e).runM(FF(), s) }) }))
 }
 

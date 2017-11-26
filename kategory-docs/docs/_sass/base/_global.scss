@@ -135,6 +135,29 @@ input {
     }
 }
 
+// Table
+
+table {
+  width: 100%;
+  max-width: 100%;
+
+  th,
+  td {
+    text-align: left;
+    padding: $base-point-grid;
+  }
+
+  th {
+    border-bottom: 2px solid rgba($brand-primary, 0.20);
+    font-weight: $font-semibold;
+  }
+
+  td {
+    border-bottom: 1px solid rgba($brand-primary, 0.20);
+  }
+
+}
+
 // Animations related
 // ------------------------------------------------
 [class*="indirect-injection"] {

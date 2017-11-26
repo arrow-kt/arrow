@@ -17,7 +17,6 @@ Kategory models the absence of values through the `Option` datatype similar to h
 
 ```kotlin:ank
 import kategory.*
-import kategory.Option.*
 
 val someValue: Option<String> = Some("I am wrapped in something")
 someValue

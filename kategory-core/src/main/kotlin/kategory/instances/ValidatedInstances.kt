@@ -10,7 +10,7 @@ interface ValidatedApplicativeInstance<E> : ValidatedFunctorInstance<E>, Applica
 
     fun SE(): Semigroup<E>
 
-    override fun <A> pure(a: A): Validated<E, A> = Validated.Valid(a)
+    override fun <A> pure(a: A): Validated<E, A> = Valid(a)
 
     override fun <A, B> map(fa: ValidatedKind<E, A>, f: (A) -> B): Validated<E, B> = fa.ev().map(f)
 
@@ -21,7 +21,7 @@ interface ValidatedApplicativeInstance<E> : ValidatedFunctorInstance<E>, Applica
 @instance(Validated::class)
 interface ValidatedApplicativeErrorInstance<E> : ValidatedApplicativeInstance<E>, ApplicativeError<ValidatedKindPartial<E>, E> {
 
-    override fun <A> raiseError(e: E): Validated<E, A> = Validated.Invalid(e)
+    override fun <A> raiseError(e: E): Validated<E, A> = Invalid(e)
 
     override fun <A> handleErrorWith(fa: ValidatedKind<E, A>, f: (E) -> ValidatedKind<E, A>): Validated<E, A> =
             fa.ev().handleLeftWith(f)
@@ -65,13 +65,13 @@ interface ValidatedEqInstance<L, R> : Eq<Validated<L, R>> {
     fun EQR(): Eq<R>
 
     override fun eqv(a: Validated<L, R>, b: Validated<L, R>): Boolean = when (a) {
-        is Validated.Valid -> when (b) {
-            is Validated.Invalid -> false
-            is Validated.Valid -> EQR().eqv(a.a, b.a)
+        is Valid -> when (b) {
+            is Invalid -> false
+            is Valid -> EQR().eqv(a.a, b.a)
         }
-        is Validated.Invalid -> when (b) {
-            is Validated.Invalid -> EQL().eqv(a.e, b.e)
-            is Validated.Valid -> false
+        is Invalid -> when (b) {
+            is Invalid -> EQL().eqv(a.e, b.e)
+            is Valid -> false
         }
     }
 }

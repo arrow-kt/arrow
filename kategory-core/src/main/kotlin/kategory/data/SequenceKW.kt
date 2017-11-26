@@ -55,11 +55,11 @@ data class SequenceKW<out A> constructor(val sequence: Sequence<A>) : SequenceKW
                 if (!v.isEmpty()) {
                     val head: Either<A, B> = v.first()
                     when (head) {
-                        is Either.Right<A, B> -> {
+                        is Right<A, B> -> {
                             buf += head.b
                             go(buf, f, v.drop(1).k())
                         }
-                        is Either.Left<A, B> -> {
+                        is Left<A, B> -> {
                             if (v.count() == 1)
                                 go(buf, f, (f(head.a).ev()).k())
                             else

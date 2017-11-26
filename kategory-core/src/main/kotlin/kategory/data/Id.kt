@@ -34,8 +34,8 @@ data class Id<out A>(val value: A) : IdKind<A> {
         tailrec fun <A, B> tailRecM(a: A, f: (A) -> IdKind<Either<A, B>>): Id<B> {
             val x: Either<A, B> = f(a).ev().value
             return when (x) {
-                is Either.Left<A, B> -> tailRecM(x.a, f)
-                is Either.Right<A, B> -> Id(x.b)
+                is Left<A, B> -> tailRecM(x.a, f)
+                is Right<A, B> -> Id(x.b)
             }
         }
 

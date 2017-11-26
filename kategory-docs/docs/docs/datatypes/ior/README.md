@@ -26,34 +26,24 @@ Ior.Right(42)
 ```
 
 ```kotlin:ank
-import kategory.*
-
 Ior.Left("Error")
 ```
 
 ```kotlin:ank
-import kategory.*
-
 Ior.Both("Warning", 41)
 ```
 
 Kategory also offers extension functions for `Ior`, the `leftIor`, `rightIor` and `bothIor`:
 
 ```kotlin:ank
-import kategory.*
-
 3.rightIor()
 ```
 
 ```kotlin:ank
-import kategory.*
-
 "Error".leftIor()
 ```
 
 ```kotlin:ank
-import kategory.*
-
 ("Warning" to 3).bothIor()
 ```
 
@@ -64,9 +54,7 @@ This means we can accumulate data on the left side while also being able to shor
 For example, we might want to accumulate warnings together with a valid result and only halt the computation on a "hard error"
 Here's an example of how we are able to do that:
 
-```kotlin:ank:silent
-import kategory.*
-
+```kotlin
 data class User(val name: String, val pw: String)
 
 fun validateUsername(username: String) = when {
@@ -91,68 +79,57 @@ fun validateUser(name: String, pass: String) =
 
 Now we're able to validate user data and also accumulate non-fatal warnings:
 
-```kotlin:ank
+```kotlin
 validateUser("John", "password12")
+//Right(value=User(name=John, pw=password12))
 ```
 
-```kotlin:ank
+```kotlin
 validateUser("john.doe", "password")
+//Both(leftValue=NonEmptyList(all=[Dot in name is deprecated, Password should be longer]), rightValue=User(name=john.doe, pw=password))
 ```
 
-```kotlin:ank
+```kotlin
 validateUser("jane", "short")
+//Left(value=NonEmptyList(all=[Password too short]))
 ```
 
 To extract the values, we can use the `fold` method, which expects a function for each case the `Ior` can represent:
 
-```kotlin:ank
+```kotlin
 validateUser("john.doe", "password").fold(
         { "Error: ${it.head}" },
         { "Success $it" },
         { warnings, (name) -> "Warning: $name; The following warnings occurred: ${warnings.show()}" }
 )
-
+//Warning: john.doe; The following warnings occurred: Dot in name is deprecated, Password should be longer
 ```
 Similar to [Validated](/docs/datatypes/validated), there is also a type alias for using a `NonEmptyList` on the left side.
 
 ```kotlin
-import kategory.*
-
 typealias IorNel<A, B> = Ior<Nel<A>, B>
 ```
 
-
 ```kotlin:ank
-import kategory.*
-
 Ior.leftNel<String, Int>("Error")
 ```
 
 ```kotlin:ank
-import kategory.*
-
 Ior.bothNel("Warning", 41)
 ```
-
 
 We can also convert our `Ior` to `Either`, `Validated` or `Option`.
 All of these conversions will discard the left side value if both are available:
 
 ```kotlin:ank
-import kategory.*
-
 Ior.Both("Warning", 41).toEither()
 ```
 
 ```kotlin:ank
-import kategory.*
-
 Ior.Both("Warning", 41).toValidated()
 ```
 
 ```kotlin:ank
-import kategory.*
-
 Ior.Both("Warning", 41).toOption()
 ```
 
