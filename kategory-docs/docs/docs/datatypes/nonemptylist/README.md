@@ -61,8 +61,6 @@ As you can see we just obtain an Invalid case with all the errors combined, but 
 NonEmptyList is highly connected with Validation, as it provides a nice and simple way of accumulating values for both the Valid or Invalid case. Let's see how it combines with it following the previous example:
 
 ```kotlin:ank:silent
-import kategory.*
-
 typealias EmailValidation = Nel<String>
 typealias EmailValidationResult = Validated<String, Unit>
 

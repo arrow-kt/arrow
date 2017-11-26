@@ -69,7 +69,7 @@ class NonEmptyList<out A> private constructor(
 
     fun extract(): A = this.ev().head
 
-    fun iterator(): Iterator<A> = all.iterator()
+    operator fun iterator(): Iterator<A> = all.iterator()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
