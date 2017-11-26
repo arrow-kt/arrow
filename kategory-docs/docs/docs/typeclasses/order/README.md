@@ -76,4 +76,4 @@ Since `Order` can be constructed from the same function as defined by `Comparabl
 toOrder<Char>().max('A', 'B')
 ```
 
-See [Deriving and creating custom typeclass]({{ '/kategory/docs/typeclasses | relative_url }}) to provide your own `Order` instances for custom datatypes.
+See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Order` instances for custom datatypes.
