@@ -37,5 +37,7 @@ KotlinConf, San Francisco, Nov '17
 An ongoing blog series introducing Functional Programming architectures from scratch
 
 [Kotlin Functional Programming: Does it make sense?](https://medium.com/@JorgeCastilloPr/kotlin-functional-programming-does-it-make-sense-36ad07e6bacf)
+
 [Kotlin Functional Programming I: Monad Stack](https://medium.com/@JorgeCastilloPr/kotlin-functional-programming-i-monad-stack-518d1bd8fbee)
+
 [Kotlin Functional Programming II: Monad Transformers](https://medium.com/@JorgeCastilloPr/kotlin-functional-programming-ii-monad-transformers-b1f020f14dd8)
