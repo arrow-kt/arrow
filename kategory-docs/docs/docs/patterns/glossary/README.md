@@ -68,8 +68,8 @@ For example, applying `Int` to the type constructor `ListKW<A>` returns a `ListK
 This list isn't parametrized in any generic value, so it cannot be considered a type constructor anymore.
 
 Type constructors are useful when matched with typeclasses because they help us represent non-parametrized values.
-As type constructors is not a first class feature in Kotlin, we use an interface `Hk<F, A>` to represent them.
-Hk stands for Higher Kind, which is the name of the feature that allows working with type constuctors as first class.
+As type constructors is not a first class feature in Kotlin, we use an interface `HK<F, A>` to represent them.
+HK stands for Higher Kind, which is the name of the feature that allows working with type constuctors as first class.
 
 #### Higher Kinds
 
@@ -86,13 +86,13 @@ When coupled with typeclasses, we can now define mapability using ([`Functor`]({
 
 ```kotlin
 interface Functor<F>: Typeclass {
-  fun <A, B> map(fa: Hk<F, A>, f: (A) -> B): HK<F, B>
+  fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B>
 }
 ```
 
 ```kotlin
 object ListKWFunctorInstance : Functor<ListKWHK> {
-  override fun <A, B> map(fa: Hk<ListKWHK, A>, f: (A) -> B): ListKW<B> {
+  override fun <A, B> map(fa: HK<ListKWHK, A>, f: (A) -> B): ListKW<B> {
     val list: ListKW<A> = fa.ev()
     return list.map(f)
   }
@@ -100,7 +100,7 @@ object ListKWFunctorInstance : Functor<ListKWHK> {
 ```
 
 You can see a function `ev()` used to access the `map()` function that already exists in `ListKW`.
-This is because we need to safely downcast from `Hk<ListKWHK, A>` to `ListKW`, and `ev()` is a global function defined to do so.
+This is because we need to safely downcast from `HK<ListKWHK, A>` to `ListKW`, and `ev()` is a global function defined to do so.
 
 The function `ev()` is already defined for all datatypes in KΛTEGORY. If you're creating your own datatype that's also a type constructor and would like to create all these helper types and functions,
 you can do so simply by annotating it as `@higerkind`, and using KΛTEGORY's [annotation processor](https://github.com/kategory/kategory#additional-setup) will create them for you.
