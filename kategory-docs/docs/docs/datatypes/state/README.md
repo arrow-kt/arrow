@@ -85,7 +85,7 @@ fun push(s: String) = State<Stack, Unit> { stack ->
 The `flatMap` method on `State<S, A>` lets you use the result of one `State` in a subsequent `State`. The updated state (`S`) after the first call is passed into the second call. These `flatMap` and `map` methods allow us to use `State` in for-comprehensions:
 
 ```kotlin:ank:silent
-fun stackOperations() = StateT.monad<IdHK, Stack>().binding {
+fun stackOperations() = State().monad<Stack>().binding {
     val a = push("a").bind()
     val b = pop().bind()
     val c = pop().bind()
@@ -115,7 +115,7 @@ Available Instances:
 ```kotlin:ank
 import kategory.debug.*
 
-showInstances<StateTHK, Unit>()
+showInstances<StateKindPartial<Stack>, Unit>()
 ```
 
 # Credits
