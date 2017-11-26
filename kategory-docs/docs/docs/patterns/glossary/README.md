@@ -102,9 +102,8 @@ When coupled with typeclasses, we can now define mapability using [`Functor`]({{
 interface Functor<F>: Typeclass {
   fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B>
 }
-```
 
-```kotlin
+@instance
 object ListKWFunctorInstance : Functor<ListKWHK> {
   override fun <A, B> map(fa: HK<ListKWHK, A>, f: (A) -> B): ListKW<B> {
     val list: ListKW<A> = fa.ev()
@@ -153,11 +152,11 @@ And now this function `randomUserStructure()` can be used for any datatype that 
 
 ```kotlin
 val list: ListKW<User> = randomUserStructure(::User).ev()
-// [User(342)]
+//[User(342)]
 
 val option: Option<User> = randomUserStructure(::User).ev()
-// Some(User(765))
+//Some(User(765))
 
 val either: Either<Unit, User> = randomUserStructure(::User).ev()
-// Right(User(221))
+//Right(User(221))
 ```
