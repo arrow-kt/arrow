@@ -22,8 +22,20 @@ sealed class Try<out A> : TryKind<A> {
 
         fun <A> pure(a: A): Try<A> = Success(a)
 
-        fun <A, B> tailRecM(a: A, f: (A) -> TryKind<Either<A, B>>): Try<B> =
-                f(a).ev().fold({ Try.monadError().raiseError(it) }, { either -> either.fold({ tailRecM(it, f) }, { Success(it) }) })
+        tailrec fun <A, B> tailRecM(a: A, f: (A) -> TryKind<Either<A, B>>): Try<B> {
+            val ev: Try<Either<A, B>> = f(a).ev()
+            return when (ev) {
+                is Failure -> Try.monadError().raiseError(ev.exception)
+                is Success -> {
+                    val b: Either<A, B> = ev.value
+                    when (b) {
+                        is Either.Left<A, B> -> tailRecM(b.a, f)
+                        is Either.Right<A, B> -> Success(b.b)
+                    }
+                }
+            }
+
+        }
 
         inline operator fun <A> invoke(f: () -> A): Try<A> =
                 try {
