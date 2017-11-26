@@ -106,11 +106,11 @@ fun pushS(s: String) = StateT<EitherKindPartial<StackError>, Stack, Unit> { stac
 }
 
 fun stackOperationsS(): StateT<EitherKindPartial<StackError>, Stack, String> {
-    return pushS("a").flatMap({ _ ->
-        popS().flatMap({ _ ->
+    return pushS("a").flatMap { _ ->
+        popS().flatMap { _ ->
             popS()
-        }, Either.monad())
-    }, Either.monad()).ev()
+        }
+    }.ev()
 }
 
 stackOperationsS().runM(listOf("hello", "world", "!"))
@@ -122,7 +122,7 @@ stackOperationsS().runM(listOf())
 While our code looks very similar to what we had before there are some key advantages. State management is now contained within `State` and we are dealing only with 1 monad instead of 2 nested monads so we can use monad bindings!
 
 ```kotlin:ank
-fun stackOperationsS2() = StateT .monad<EitherKindPartial<StackError>, Stack>().binding {
+fun stackOperationsS2() = StateT.monad<EitherKindPartial<StackError>, Stack>().binding<StateTKindPartial<EitherKindPartial<StackError>, Stack>, String> {
     pushS("a").bind()
     popS().bind()
     val string = popS().bind()

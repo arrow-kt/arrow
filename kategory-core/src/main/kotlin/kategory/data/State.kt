@@ -1,72 +1,85 @@
 package kategory
 
 /**
- * Convenience object to make working with `StateT<IdHK, S, A>` more elegant.
+ * Alias that represent stateful computation of the form `(S) -> Tuple2<S, A>`.
  */
-object State {
+typealias StateFun<S, A> = StateTFun<IdHK, S, A>
 
-    /**
-     * Construct a `StateT<IdHK, S, A>` from a function [run] `(S) -> Tuple2<S, A>`.
-     */
-    operator fun <S, A> invoke(run: (S) -> Tuple2<S, A>): StateT<IdHK, S, A> = StateT(Id(run.andThen { Id(it) }))
+/**
+ * Alias that represents wrapped stateful computation in context `Id`.
+ */
+typealias StateFunKind<S, A> = StateTFunKind<IdHK, S, A>
 
-    /**
-     * Lift a value of type `A` into `StateT<IdHK, S, A>`.
-     */
-    fun <S, A> lift(a: A): StateT<IdHK, S, A> = StateT.lift(Id.monad(), Id.pure(a))
+/**
+ * Alias for StateHK
+ */
+typealias StateHK = IndexedStateTHK
 
-    /**
-     * Return input without modifying it.
-     */
-    fun <S> get(): StateT<IdHK, S, S> = State { s: S -> s toT s }
+/**
+ * Alias for StateKind
+ */
+typealias StateKind<S, A> = IndexedStateKind<S, S, A>
 
-    /**
-     * Inspect a value of the state [S] with [f] `(S) -> T` without modifying the state.
-     */
-    fun <S, T> inspect(f: (S) -> T): StateT<IdHK, S, T> = State { s: S -> s toT f(s) }
+/**
+ * Alias to partially apply type parameters [S] to [IndexedState]
+ */
+typealias StateKindPartial<S> = StateTKindPartial<IdHK, S>
 
-    /**
-     * Modify the state with [f] `(S) -> S` and return [Unit].
-     */
-    fun <S> modify(f: (S) -> S): StateT<IdHK, S, Unit> = State { s: S -> f(s) toT Unit }
+/**
+ * `State<S, A>` is a stateful computation that yields a value of type `A`.
+ *
+ * @param S the state we are preforming computation upon.
+ * @param A current value of computation.
+ */
+typealias State<S, A> = IndexedState<S, S, A>
 
-    /**
-     * Set the state to [s] and return [Unit].
-     */
-    fun <S> set(s: S): StateT<IdHK, S, Unit> = State { _: S -> s toT Unit }
+/**
+ * Constructor for State.
+ * State<S, A> is an alias for IndexedStateT<IdHK, S, S, A>
+ */
+@Suppress("FunctionName")
+fun <S, A> State(run: (S) -> Tuple2<S, A>): State<S, A> = IndexedStateT(Id(run.andThen { Id(it) }))
 
-    /**
-     * Alias for [StateT.Companion.functor]
-     */
-    fun <S> functor() = StateT.functor<IdHK, S>(Id.functor(), dummy = Unit)
+/**
+ * Syntax for constructing a `StateT<IdHK, S, A>` from a function `(S) -> Tuple2<S, A>`
+ */
+fun <S, A> StateFun<S, A>.toState(): State<S, A> = State(this)
 
-    /**
-     * Alias for[StateT.Companion.applicative]
-     */
-    fun <S> applicative() = StateT.applicative<IdHK, S>(Id.monad(), dummy = Unit)
+/**
+ * Syntax for constructing a `StateT<IdHK, S, A>` from a function `(S) -> Tuple2<S, A>`
+ */
+fun <S, A> StateFunKind<S, A>.toState(): State<S, A> = State(this)
 
+/**
+ * Alias for [IndexedStateT.run] `StateT<IdHK, S, A>`
+ *
+ * @param initial state to start stateful computation.
+ */
+fun <SA, SB, A> IndexedState<SA, SB, A>.run(initial: SA): Tuple2<SB, A> = run(Id.monad(), initial).value()
+
+/**
+ * Alias for [IndexedStateT.runA] `StateT<IdHK, S, A>`
+ *
+ * @param initial state to start stateful computation.
+ */
+fun <SA, SB, A> IndexedState<SA, SB, A>.runA(initial: SA): A = run(initial).b
+
+/**
+ * Alias for [IndexedStateT.runS] `StateT<IdHK, S, A>`
+ *
+ * @param initial state to start stateful computation.
+ */
+fun <SA, SB, A> IndexedState<SA, SB, A>.runS(initial: SA): SB = run(initial).a
+
+/**
+ * Alias for StateId to make working with `StateT<IdHK, S, A>` more elegant.
+ */
+@Suppress("FunctionName")
+fun State(): StateApi = StateApi
+
+object StateApi : IndexedStateApi {
     /**
-     * Alias for [StateT.Companion.monad]
+     * Alias for [IndexedStateT.Companion.functor]
      */
-    fun <S> monad() = StateT.monad<IdHK, S>(Id.monad(), dummy = Unit)
+    fun <S> functor() = IndexedStateT.functor<IdHK, S, S>(Id.functor(), dummy = Unit)
 }
-
-/**
- * Syntax for getting a `StateT<IdHK, S, A>` from a function `(S) -> Tuple2<S, A>`
- */
-fun <S, A> ((S) -> Tuple2<S, A>).state(): StateT<IdHK, S, A> = State(this)
-
-/**
- * Alias for [StateT.run] `StateT<IdHK, S, A>`
- */
-fun <S, A> StateT<IdHK, S, A>.run(initial: S): Tuple2<S, A> = run(initial, Id.monad()).value()
-
-/**
- * Alias for [StateT.runA] `StateT<IdHK, S, A>`
- */
-fun <S, A> StateT<IdHK, S, A>.runA(s: S): A = run(s).b
-
-/**
- * Alias for [StateT.runS] `StateT<IdHK, S, A>`
- */
-fun <S, A> StateT<IdHK, S, A>.runS(s: S): S = run(s).a
