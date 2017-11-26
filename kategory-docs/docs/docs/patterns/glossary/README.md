@@ -21,7 +21,7 @@ or interacting with the platform the program runs in using [`IO`]({{ '/docs/effe
 ### Typeclasses
 
 A typeclass is an interface representing one behavior associated with a type.
-Examples of this behavior are comparison ([`Eq`]({{ '/docs/typeclasses/eq' | relative_url }})),
+Examples of this behavior are comparability ([`Eq`]({{ '/docs/typeclasses/eq' | relative_url }})),
 composability ([`Monoid`]({{ '/docs/typeclasses/monoid' | relative_url }})),
 its contents can be mapped from one type to another ([`Functor`]({{ '/docs/typeclasses/functor' | relative_url }})),
 or error recovery ([`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }})).
