@@ -48,7 +48,9 @@ object IntEqInstance: Eq<Int> {
 ```
 
 In KΛTEGORY all typeclass instances can be looked up using a method with the same name as the typeclass.
-As long as the instance is defined and exists in the global namespace the lookup will succeed.
+All the instances in the library are already registered and available in the global scope.
+If you're defining your own instances and would like for them to be discoverable in the global scope 
+you can add them by annotating them as `@instance`, and KΛTEGORY's [annotation processor](https://github.com/kategory/kategory#additional-setup) will register them for you.
 
 ```kotlin:ank
 import kategory.*
@@ -123,7 +125,7 @@ inline fun <reified F> randomUserStructure(f: (Int) -> User, AP: Applicative<F> 
   AP.pure(f(Math.random()))
 ```
 
-Remember that instances than be looked up globally
+Remember that all instances already defined in KΛTEGORY can be looked up globally
 
 ```kotlin:ank
 applicative<ListKWHK>()
@@ -139,5 +141,5 @@ val option: Option<User> = randomUserStructure(::User).ev()
 // Some(User(765))
 
 val either: Either<Unit, User> = randomUserStructure(::User).ev()
-// Right(User(341))
+// Right(User(221))
 ```
