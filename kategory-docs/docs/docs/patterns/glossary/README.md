@@ -26,7 +26,7 @@ composability ([`Monoid`]({{ '/docs/typeclasses/monoid' | relative_url }})),
 its contents are mappable ([`Functor`]({{ '/docs/typeclasses/functor' | relative_url }})),
 or error recovery ([`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }})).
 
-```
+```kotlin
 interface Eq<F>: Typeclass {
   fun eqv(a: F, b: F): Boolean
 }
@@ -42,7 +42,7 @@ Because typeclasses require generic parameters each implementation is meant to b
 
 ```kotlin
 @instance
-object EqIntInstance: Eq<Int> {
+object IntEqInstance: Eq<Int> {
   override fun eqv(a: Int, b: Int): Boolean = a == b
 }
 ```
@@ -50,6 +50,94 @@ object EqIntInstance: Eq<Int> {
 In KΛTEGORY all typeclass instances can be looked up using a method with the same name as the typeclass.
 As long as the instance is defined and exists in the global namespace the lookup will succeed.
 
+```kotlin:ank
+import kategory.*
+
+eq<Int>()
 ```
-val EQ_INT: Eq<Int> = eq()
+
+### Type constructors
+
+> NOTE: This approach to type constructors will be simplified if [KEEP-87](https://github.com/Kotlin/KEEP/pull/87) is approved. Go vote!
+
+A type constructor is any class or interface that has at least one generic parameter. For example, 
+`ListKW<A>` or `Option<A>`. It's called a constructor because it is similar to a function where the parameter is `A`.
+For example, applying `Int` to the type constructor `ListKW<A>` returns a `ListKW<Int>`.
+This list isn't parametrized in any generic value, so it cannot be considered a type constructor anymore.
+
+Type constructors are useful when matched with typeclasses because they help us represent non-parametrized values.
+As type constructors is not a first class feature in Kotlin, we use an interface `Hk<F, A>` to represent them.
+Hk stands for Higher Kind, which is the name of the feature that allows working with type constuctors as first class.
+
+#### Higher Kinds
+
+In a Higher Kind with the shape `HK<F, A>`, if `A` is the type of the content then `F` has to be the type of the container.
+A malformed container would use the whole type constructor, duplicating the type ~~HK<Option<A>, A>~~.
+What KΛTEGORY does instead is define a surrogate type, known as the witness, that's not parametrized to represent `F`.
+These types are named same as the container, suffixed by HK, as in `OptionHK` or `ListKWHK`.
+
+You can read more about Higher Kinds and type constructors in [KindedJ's README](https://github.com/KindedJ/KindedJ#rationale)
+
+#### Using Higher Kinds with typeclasses
+
+When coupled with typeclasses, we can now define mapability using ([`Functor`]({{ '/docs/typeclasses/functor' | relative_url }})) for any `ListKW`.
+
+```kotlin
+interface Functor<F>: Typeclass {
+  fun <A, B> map(fa: Hk<F, A>, f: (A) -> B): HK<F, B>
+}
+```
+
+```kotlin
+object ListKWFunctorInstance : Functor<ListKWHK> {
+  override fun <A, B> map(fa: Hk<ListKWHK, A>, f: (A) -> B): ListKW<B> {
+    val list: ListKW<A> = fa.ev()
+    return list.map(f)
+  }
+}
+```
+
+You can see a function `ev()` used to access the `map()` function that already exists in `ListKW`.
+This is because we need to safely downcast from `Hk<ListKWHK, A>` to `ListKW`, and `ev()` is a global function defined to do so.
+
+The function `ev()` is already defined for all datatypes in KΛTEGORY. If you're creating your own datatype that's also a type constructor and would like to create all these helper types and functions,
+you can do so simply by annotating it as @higerkind, and KΛTEGORY's annotation processor will create them for you.
+
+#### Using Higher Kinds and typeclasses with functions
+
+Higher kinds can also be used to represent functions that are parametrized on type constructors.
+As long as you have a typeclass that can provide you with the behavior required to use such datatypes, you're good to go!
+
+Let's use the typeclass ([`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }})), that contains the constructor function `pure()`.
+
+```kotlin
+interface Applicative<F>: Functor<F>, Typeclass {
+  fun <A> pure(a: A): HK<F, A>
+}
+
+object ListKWApplicativeInstance : ListKWFunctorInstance, Applicative<ListKWHK> {
+  override fun <A> pure(a: A): HK<F, A> = listOF(a)
+}
+
+inline fun <reified F> randomUserStructure(f: (Int) -> User, AP: Applicative<F> = applicative<F>()) =
+  AP.pure(f(Math.random()))
+```
+
+Remember that instances than be looked up globally
+
+```kotlin:ank
+applicative<ListKWHK>()
+```
+
+And now this function `randomUserStructure()` can be used for any datatype that implements ([`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }})).
+
+```kotlin
+val list: ListKW<User> = randomUserStructure(::User).ev()
+// [User(342)]
+
+val option: Option<User> = randomUserStructure(::User).ev()
+// Some(User(765))
+
+val either: Either<Unit, User> = randomUserStructure(::User).ev()
+// Right(User(341))
 ```
