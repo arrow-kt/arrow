@@ -1,7 +1,7 @@
 package kategory
 
 /**
- * Alias that represent stateful computation of the form `(S) -> Tuple2<S, A>`.
+ * Alias that represents stateful computation of the form `(S) -> Tuple2<S, A>`.
  */
 typealias StateFun<S, A> = StateTFun<IdHK, S, A>
 
