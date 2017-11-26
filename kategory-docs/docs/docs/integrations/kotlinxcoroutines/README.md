@@ -4,7 +4,7 @@ title: kotlinx.coroutines
 permalink: /docs/integrations/kotlinxcoroutines/
 ---
 
-## kotlinx.Coroutines
+## kotlinx.coroutines
 
 Kategory wants to provide an abstraction over multiple concurrency frameworks, in a way where their semantics match and they become interchangeable.
 
