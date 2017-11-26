@@ -67,13 +67,15 @@ eq<Int>()
 > NOTE: This approach to type constructors will be simplified if [KEEP-87](https://github.com/Kotlin/KEEP/pull/87) is approved. Go vote!
 
 A type constructor is any class or interface that has at least one generic parameter. For example, 
-`ListKW<A>` or `Option<A>`. They're called constructors because they're is similar to a function where the parameter is `A`.
+([`ListKW<A>`]({{ '/docs/datatypes/listkw' | relative_url }})) or ([`Option<A>`]({{ '/docs/datatypes/option' | relative_url }})).
+They're called constructors because they're similar to a factory function where the parameter is `A`, except for types.
 So, after applying the parameter `Int` to the type constructor `ListKW<A>` it returns a `ListKW<Int>`.
 This list isn't parametrized in any generic value so it cannot be considered a type constructor anymore.
-Like functions, a type constructor with several parameters like `Either<L, R>` can be partially applied for one of them to return another type constructor,
+
+Like functions, a type constructor with several parameters like ([`Either<L, R>`]({{ '/docs/datatypes/either' | relative_url }})) can be partially applied for one of them to return another type constructor,
 for example `Either<Throwable, A>` or `Either<E, String>`.
 
-Type constructors are useful when matched with typeclasses because they help us represent non-parametrized values.
+Type constructors are useful when matched with typeclasses because they help us represent instances of parametrized classes that work for all generic parameters.
 As type constructors is not a first class feature in Kotlin we use an interface `HK<F, A>` to represent them.
 HK stands for Higher Kind, which is the name of the language feature that allows working directly with type constructors.
 
@@ -83,6 +85,12 @@ In a Higher Kind with the shape `HK<F, A>`, if `A` is the type of the content th
 A malformed container would use the whole type constructor, duplicating the type ~~HK\<Option\<A\>, A\>~~.
 What KΛTEGORY does instead is define a surrogate type that's not parametrized to represent `F`.
 These types are named same as the container and suffixed by HK, as in `OptionHK` or `ListKWHK`.
+
+```kotlin
+sealed class Option<A>: HK<OptionHK, A>
+
+data class ListKW<A>(val list: List<A>): HK<ListKWHK, A>
+```
 
 You can read more about Higher Kinds and type constructors in [KindedJ's README](https://github.com/KindedJ/KindedJ#rationale).
 
