@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Blogs & Presentations
-permalink: /docs/blogs/
+permalink: /docs/quickstart/blogs/
 ---
 
 ## Blogs & Presentations

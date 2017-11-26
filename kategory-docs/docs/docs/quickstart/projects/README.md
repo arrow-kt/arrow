@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Projects & Examples
-permalink: /docs/projects/
+permalink: /docs/quickstart/projects/
 ---
 
 ## Projects & Examples

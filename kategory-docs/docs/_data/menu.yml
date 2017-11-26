@@ -1,12 +1,16 @@
 options:
   - title: Quick Start
-    url: /docs/index
 
-  - title: Blogs & Presentations
-    url: /docs/blogs
+    nested_options:
 
-  - title: Projects & Examples
-    url: /docs/projects
+      - title: Index
+        url: /docs/
+
+      - title: Blogs & Presentations
+        url: /docs/quickstart/blogs/
+
+      - title: Projects & Examples
+        url: /docs/quickstart/projects/
 
   - title: Patterns
 
@@ -240,13 +244,16 @@ options:
     nested_options:
 
       - title: Rx2
-        url: /docs/integrations/rx2
+        url: /docs/integrations/rx2/
         
       - title: kotlinx.coroutines
-        url: /docs/integrations/kotlinxcoroutines
+        url: /docs/integrations/kotlinxcoroutines/
 
-  - title: Credits
-    url: /credits
+  - title: Legal
 
-  - title: License
-    url: /license
+    nested_options:
+      - title: Credits
+        url: /docs/legal/credits/
+
+      - title: Licenses
+        url: /docs/legal/licenses/
