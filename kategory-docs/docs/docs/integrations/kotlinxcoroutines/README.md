@@ -23,7 +23,7 @@ async {
 }
 ```
 
-Does it look familiar? Yes! It's the same as our [comprehensions]({{ '/docs/patterns/monadcomprehensions' | relative_url }})!
+Does it look familiar? Yes! It's the same as our [comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }})!
 
 ### Improvements over the library
 
