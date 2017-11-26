@@ -46,15 +46,17 @@ object MonadLaws {
                 M.flatMap(fa, { M.pure(f(it)) }).equalUnderTheLaw(M.map(fa, f), EQ)
             })
 
-    inline fun <reified F> stackSafety(iterations: Int = 5000, M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit {
-        val res = M.tailRecM(0, { i -> M.pure(if (i < iterations) Left(i + 1) else Right(i)) })
-        res.equalUnderTheLaw(M.pure(iterations), EQ)
-    }
+    inline fun <reified F> stackSafety(iterations: Int = 5000, M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
+            forFew(1, Gen.oneOf(listOf(iterations))) { iter ->
+                val res = M.tailRecM(0, { i -> M.pure(if (i < iter) Left(i + 1) else Right(i)) })
+                res.equalUnderTheLaw(M.pure(iter), EQ)
+            }
 
-    inline fun <reified F> stackSafetyComprehensions(iterations: Int = 5000, M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit {
-        val res = stackSafeTestProgram(M, 0, iterations)
-        res.run(M).equalUnderTheLaw(M.pure(iterations), EQ)
-    }
+    inline fun <reified F> stackSafetyComprehensions(iterations: Int = 5000, M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
+            forFew(1, Gen.oneOf(listOf(iterations))) { iter ->
+                val res = stackSafeTestProgram(M, 0, iter)
+                res.run(M).equalUnderTheLaw(M.pure(iter), EQ)
+            }
 
     inline fun <reified F> equivalentComprehensions(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(Gen.int(), { num: Int ->
@@ -70,8 +72,8 @@ object MonadLaws {
                     val c = pure(b + 1).bind()
                     yields(c)
                 }.run(M)
-                aa.equalUnderTheLaw(bb, EQ)
-                aa.equalUnderTheLaw(M.pure(num + 2), EQ)
+                aa.equalUnderTheLaw(bb, EQ) &&
+                        aa.equalUnderTheLaw(M.pure(num + 2), EQ)
             })
 
     inline fun <reified F> monadComprehensions(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
