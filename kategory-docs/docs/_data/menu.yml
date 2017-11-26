@@ -2,84 +2,127 @@ options:
   - title: Quick Start
     url: /docs/index
 
+  - title: Blogs & Presentations
+    url: /docs/blogs
+
+  - title: Projects & Examples
+    url: /docs/projects
+
+  - title: Patterns
+
+    nested_options:
+
+      - title: Glossary
+        url: /docs/patterns/glossary/
+
+      - title: Error Handling
+        url: /docs/patterns/error_handling/
+
+      - title: Monad Comprehensions
+        url: /docs/patterns/monad_comprehensions/
+
+      - title: Comonad Comprehensions
+        url: /docs/patterns/comonad_comprehensions/
+
+      - title: Applicative Builder
+        url: /docs/patterns/applicative_builder/
+
+      - title: Polymorphic programs
+        url: /docs/patterns/polymorphic_programs/
+
+      - title: Free Algebras
+        url: /docs/patterns/free_algebras/
+
+      - title: Dependency Injection
+        url: /docs/patterns/dependency_injection/
+
+      - title: Monad Transformers
+        url: /docs/patterns/monad_transformers/
+
+      - title: Concurrency
+        url: /docs/patterns/concurrency/
+
+      - title: Optics
+        url: /docs/patterns/optics/
+
   - title: Data Types
 
     nested_options:
 
-     - title: Option
-       url: /docs/datatypes/option/
+      - title: Option
+        url: /docs/datatypes/option/
 
-     - title: OptionT
-       url: /docs/datatypes/optiont/
+      - title: Either
+        url: /docs/datatypes/either/
 
-     - title: Either
-       url: /docs/datatypes/either/
+      - title: Try
+        url: /docs/datatypes/try/
 
-     - title: EitherT
-       url: /docs/datatypes/eithert/
+      - title: Validated
+        url: /docs/datatypes/validated/
 
-     - title: Validated
-       url: /docs/datatypes/validated/
+      - title: NonEmptyList
+        url: /docs/datatypes/nonemptylist/
 
-     - title: Try
-       url: /docs/datatypes/try/
+      - title: ListKW
+        url: /docs/datatypes/listkw/
 
-     - title: Ior
-       url: /docs/datatypes/ior/
+      - title: SequenceKW
+        url: /docs/datatypes/sequencekw/
 
-     - title: Id
-       url: /docs/datatypes/id/
+      - title: SetKW
+        url: /docs/datatypes/setkw/
 
-     - title: Reader
-       url: /docs/datatypes/reader/
+      - title: Ior
+        url: /docs/datatypes/ior/
 
-     - title: Kleisli
-       url: /docs/datatypes/kleisli/
+      - title: Id
+        url: /docs/datatypes/id/
 
-     - title: State
-       url: /docs/datatypes/state/
+      - title: Reader
+        url: /docs/datatypes/reader/
 
-     - title: StateT
-       url: /docs/datatypes/statet/
+      - title: Kleisli
+        url: /docs/datatypes/kleisli/
 
-     - title: WriterT
-       url: /docs/datatypes/writert/
+      - title: State
+        url: /docs/datatypes/state/
 
-     - title: Trampoline
-       url: /docs/datatypes/trampoline/
+      - title: StateT
+        url: /docs/datatypes/statet/
 
-     - title: Coproduct
-       url: /docs/datatypes/coproduct/
+      - title: WriterT
+        url: /docs/datatypes/writert/
 
-     - title: Eval
-       url: /docs/datatypes/eval/
+      - title: Trampoline
+        url: /docs/datatypes/trampoline/
 
-     - title: NonEmptyList
-       url: /docs/datatypes/nonemptylist/
+      - title: Coproduct
+        url: /docs/datatypes/coproduct/
 
-     - title: ListKW
-       url: /docs/datatypes/listkw/
+      - title: Eval
+        url: /docs/datatypes/eval/
 
-     - title: SequenceKW
-       url: /docs/datatypes/sequencekw/
+      - title: OptionT
+        url: /docs/datatypes/optiont/
 
-     - title: SetKW
-       url: /docs/datatypes/setkw/
+      - title: EitherT
+        url: /docs/datatypes/eithert/
 
-     - title: Free
-       url: /docs/datatypes/free/
+      - title: Free
+        url: /docs/datatypes/free/
 
-     - title: FreeApplicative
-       url: /docs/datatypes/freeapplicative/
+      - title: FreeApplicative
+        url: /docs/datatypes/freeapplicative/
 
-     - title: Cofree
-       url: /docs/datatypes/cofree/
+      - title: Cofree
+        url: /docs/datatypes/cofree/
 
-     - title: Coyoneda
-       url: /docs/datatypes/coyoneda/
+      - title: Coyoneda
+        url: /docs/datatypes/coyoneda/
 
-     - title: Yoneda
-       url: /docs/datatypes/yoneda/
+      - title: Yoneda
+        url: /docs/datatypes/yoneda/
 
   - title: Type Classes
 
@@ -191,40 +234,6 @@ options:
 
       - title: Traversal
         url: /docs/optics/traversal/
-
-  - title: Patterns
-
-    nested_options:
-
-      - title: Monad Comprehensions
-        url: /docs/patterns/monad_comprehensions/
-
-      - title: Comonad Comprehensions
-        url: /docs/patterns/comonad_comprehensions/
-
-      - title: Applicative Builder
-        url: /docs/patterns/applicative_builder/
-
-      - title: Polymorphic programs
-        url: /docs/patterns/polymorphic_programs/
-
-      - title: Free Algebras
-        url: /docs/patterns/free_algebras/
-
-      - title: Error Handling
-        url: /docs/patterns/error_handling/
-
-      - title: Dependency Injection
-        url: /docs/patterns/dependency_injection/
-
-      - title: Monad Transformers
-        url: /docs/patterns/monad_transformers/
-
-      - title: Concurrency
-        url: /docs/patterns/concurrency/
-
-      - title: Optics
-        url: /docs/patterns/optics/
 
   - title: Integrations
 
