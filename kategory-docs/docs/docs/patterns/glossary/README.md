@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: Functional Programming Glossary
+title: Glossary
 permalink: /docs/patterns/glossary/
 ---
 
