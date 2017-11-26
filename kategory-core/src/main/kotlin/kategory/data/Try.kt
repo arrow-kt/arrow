@@ -22,8 +22,20 @@ sealed class Try<out A> : TryKind<A> {
 
         fun <A> pure(a: A): Try<A> = Success(a)
 
-        fun <A, B> tailRecM(a: A, f: (A) -> TryKind<Either<A, B>>): Try<B> =
-                f(a).ev().fold({ Try.monadError().raiseError(it) }, { either -> either.fold({ tailRecM(it, f) }, { Success(it) }) })
+        tailrec fun <A, B> tailRecM(a: A, f: (A) -> TryKind<Either<A, B>>): Try<B> {
+            val ev: Try<Either<A, B>> = f(a).ev()
+            return when (ev) {
+                is Failure -> Try.monadError().raiseError(ev.exception)
+                is Success -> {
+                    val b: Either<A, B> = ev.value
+                    when (b) {
+                        is Either.Left<A, B> -> tailRecM(b.a, f)
+                        is Either.Right<A, B> -> Success(b.b)
+                    }
+                }
+            }
+
+        }
 
         inline operator fun <A> invoke(f: () -> A): Try<A> =
                 try {
@@ -271,6 +283,6 @@ fun <B> Try<B>.recover(f: (Throwable) -> B): Try<B> = fold({ Success(f(it)) }, {
  * Completes this `Try` by applying the function `f` to this if this is of type `Failure`,
  * or conversely, by applying `s` if this is a `Success`.
  */
-fun <B> Try<B>.transform(s: (B) -> Try<B>, f: (Throwable) -> Try<B>): Try<B> = fold({ f(it) }, { flatMap(s) })
+fun <A, B> Try<A>.transform(s: (A) -> Try<B>, f: (Throwable) -> Try<B>): Try<B> = fold({ f(it) }, { flatMap(s) })
 
 fun <A> (() -> A).try_(): Try<A> = Try(this)

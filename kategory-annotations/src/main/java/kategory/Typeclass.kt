@@ -171,7 +171,7 @@ private fun instanceFromImplicitObject(t: InstanceParametrizedType): Any? {
     val targetPackage = on.name.substringBeforeLast(".")
     val derivationPackage = when {
         targetPackage.startsWith("java.") -> targetPackage.replace(".", "_")
-        targetPackage.startsWith("kotlin") -> targetPackage.replace("kotlin", "kategory")
+        targetPackage == "kotlin" -> "kotlin_"
         else -> targetPackage
     }
     val providerQualifiedName = "$derivationPackage.${on.simpleName.replaceFirst("HK", "")}${of.simpleName}InstanceImplicits"

@@ -1,27 +1,29 @@
-package kategory
+package kotlin_
 
-object UnitSemigroupInstance : Semigroup<Unit> {
+import kategory.Eq
+import kategory.Monoid
+import kategory.Semigroup
+
+object UnitSemigroupInstance: Semigroup<Unit> {
     override fun combine(a: Unit, b: Unit) = Unit
 }
 
 object UnitSemigroupInstanceImplicits {
-    @JvmStatic fun instance() = UnitSemigroupInstance
+    @JvmStatic fun instance(): Semigroup<Unit> = UnitSemigroupInstance
 }
 
-object UnitMonoidInstance : Monoid<Unit> {
+object UnitMonoidInstance: Monoid<Unit>, Semigroup<Unit> by UnitSemigroupInstance {
     override fun empty() = Unit
-
-    override fun combine(a: Unit, b: Unit) = Unit
 }
 
 object UnitMonoidInstanceImplicits {
-    @JvmStatic fun instance() = UnitMonoidInstance
+    @JvmStatic fun instance(): Monoid<Unit> = UnitMonoidInstance
 }
 
 object UnitEqInstance : Eq<Unit> {
-    override fun eqv(a: Unit, b: Unit) = true
+    override fun eqv(a: Unit, b: Unit): Boolean = true
 }
 
 object UnitEqInstanceImplicits {
-    @JvmStatic fun instance() = UnitEqInstance
+    @JvmStatic fun instance(): Eq<Unit> = UnitEqInstance
 }

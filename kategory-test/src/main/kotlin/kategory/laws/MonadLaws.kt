@@ -15,6 +15,7 @@ object MonadLaws {
                     Law("Monad Laws: map / flatMap coherence", { mapFlatMapCoherence(M, EQ) }),
                     Law("Monad Laws: monad comprehensions", { monadComprehensions(M, EQ) }),
                     Law("Monad Laws: monad comprehensions binding in other threads", { monadComprehensionsBindInContext(M, EQ) }),
+                    Law("Monad Laws: monad comprehensions binding in other threads equivalence", { monadComprehensionsBindInContextEquivalent(M, EQ) }),
                     Law("Monad Laws: stack-safe//unsafe monad comprehensions equivalence", { equivalentComprehensions(M, EQ) }),
                     Law("Monad Laws: stack safe", { stackSafety(5000, M, EQ) }),
                     Law("Monad Laws: stack safe comprehensions", { stackSafetyComprehensions(5000, M, EQ) })
@@ -45,15 +46,17 @@ object MonadLaws {
                 M.flatMap(fa, { M.pure(f(it)) }).equalUnderTheLaw(M.map(fa, f), EQ)
             })
 
-    inline fun <reified F> stackSafety(iterations: Int = 5000, M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit {
-        val res = M.tailRecM(0, { i -> M.pure(if (i < iterations) Left(i + 1) else Right(i)) })
-        res.equalUnderTheLaw(M.pure(iterations), EQ)
-    }
+    inline fun <reified F> stackSafety(iterations: Int = 5000, M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
+            forFew(1, Gen.oneOf(listOf(iterations))) { iter ->
+                val res = M.tailRecM(0, { i -> M.pure(if (i < iter) Left(i + 1) else Right(i)) })
+                res.equalUnderTheLaw(M.pure(iter), EQ)
+            }
 
-    inline fun <reified F> stackSafetyComprehensions(iterations: Int = 5000, M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit {
-        val res = stackSafeTestProgram(M, 0, iterations)
-        res.run(M).equalUnderTheLaw(M.pure(iterations), EQ)
-    }
+    inline fun <reified F> stackSafetyComprehensions(iterations: Int = 5000, M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
+            forFew(1, Gen.oneOf(listOf(iterations))) { iter ->
+                val res = stackSafeTestProgram(M, 0, iter)
+                res.run(M).equalUnderTheLaw(M.pure(iter), EQ)
+            }
 
     inline fun <reified F> equivalentComprehensions(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(Gen.int(), { num: Int ->
@@ -69,8 +72,8 @@ object MonadLaws {
                     val c = pure(b + 1).bind()
                     yields(c)
                 }.run(M)
-                aa.equalUnderTheLaw(bb, EQ)
-                aa.equalUnderTheLaw(M.pure(num + 2), EQ)
+                aa.equalUnderTheLaw(bb, EQ) &&
+                        aa.equalUnderTheLaw(M.pure(num + 2), EQ)
             })
 
     inline fun <reified F> monadComprehensions(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
@@ -86,10 +89,25 @@ object MonadLaws {
     inline fun <reified F> monadComprehensionsBindInContext(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
             forFew(5, genIntSmall(), { num: Int ->
                 M.binding {
-                    val a = bindIn(newSingleThreadContext("$num")) { pure(num + 1) }
-                    val b = bindIn(newSingleThreadContext("$a")) { pure(a + 1) }
+                    val a = bindIn(newSingleThreadContext("$num")) { num + 1 }
+                    val b = bindIn(newSingleThreadContext("$a")) { a + 1 }
                     yields(b)
                 }.equalUnderTheLaw(M.pure(num + 2), EQ)
+            })
+
+    inline fun <reified F> monadComprehensionsBindInContextEquivalent(M: Monad<F> = monad<F>(), EQ: Eq<HK<F, Int>>): Unit =
+            forFew(5, genIntSmall(), { num: Int ->
+                val bindM = M.binding {
+                    val a = bindInM(newSingleThreadContext("$num")) { pure(num + 1) }
+                    val b = bindInM(newSingleThreadContext("$a")) { pure(a + 1) }
+                    yields(b)
+                }
+                val bind = M.binding {
+                    val a = bindIn(newSingleThreadContext("$num")) { num + 1 }
+                    val b = bindIn(newSingleThreadContext("$a")) { a + 1 }
+                    yields(b)
+                }
+                bindM.equalUnderTheLaw(bind, EQ)
             })
 
     fun <F> stackSafeTestProgram(M: Monad<F>, n: Int, stopAt: Int): Free<F, Int> = M.bindingStackSafe {
