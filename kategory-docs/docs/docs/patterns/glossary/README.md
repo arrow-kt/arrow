@@ -67,12 +67,12 @@ eq<Int>()
 > NOTE: This approach to type constructors will be simplified if [KEEP-87](https://github.com/Kotlin/KEEP/pull/87) is approved. Go vote!
 
 A type constructor is any class or interface that has at least one generic parameter. For example, 
-([`ListKW<A>`]({{ '/docs/datatypes/listkw' | relative_url }})) or ([`Option<A>`]({{ '/docs/datatypes/option' | relative_url }})).
+[`ListKW<A>`]({{ '/docs/datatypes/listkw' | relative_url }}) or [`Option<A>`]({{ '/docs/datatypes/option' | relative_url }}).
 They're called constructors because they're similar to a factory function where the parameter is `A`, except for types.
 So, after applying the parameter `Int` to the type constructor `ListKW<A>` it returns a `ListKW<Int>`.
 This list isn't parametrized in any generic value so it cannot be considered a type constructor anymore.
 
-Like functions, a type constructor with several parameters like ([`Either<L, R>`]({{ '/docs/datatypes/either' | relative_url }})) can be partially applied for one of them to return another type constructor,
+Like functions, a type constructor with several parameters like [`Either<L, R>`]({{ '/docs/datatypes/either' | relative_url }}) can be partially applied for one of them to return another type constructor,
 for example `Either<Throwable, A>` or `Either<E, String>`.
 
 Type constructors are useful when matched with typeclasses because they help us represent instances of parametrized classes that work for all generic parameters.
@@ -96,7 +96,7 @@ You can read more about Higher Kinds and type constructors in [KindedJ's README]
 
 #### Using Higher Kinds with typeclasses
 
-When coupled with typeclasses, we can now define mapability using ([`Functor`]({{ '/docs/typeclasses/functor' | relative_url }})) for any `ListKW`.
+When coupled with typeclasses, we can now define mapability using [`Functor`]({{ '/docs/typeclasses/functor' | relative_url }}) for any `ListKW`.
 
 ```kotlin
 interface Functor<F>: Typeclass {
@@ -124,7 +124,7 @@ you can do so simply by annotating it as `@higerkind`, and using KΛTEGORY's [an
 Higher kinds can also be used to represent functions that are parametrized on type constructors.
 As long as you have a typeclass that can provide you with the behavior required to use such datatypes, you're good to go!
 
-Let's use the typeclass ([`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }})), that contains the constructor function `pure()`.
+Let's use the typeclass [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}), that contains the constructor function `pure()`.
 
 ```kotlin
 interface Applicative<F>: Functor<F>, Typeclass {
@@ -149,7 +149,7 @@ Remember that all instances already defined in KΛTEGORY can be looked up global
 applicative<ListKWHK>()
 ```
 
-And now this function `randomUserStructure()` can be used for any datatype that implements ([`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }})).
+And now this function `randomUserStructure()` can be used for any datatype that implements [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}).
 
 ```kotlin
 val list: ListKW<User> = randomUserStructure(::User).ev()
