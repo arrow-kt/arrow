@@ -29,7 +29,7 @@
     <!-- Kategory main css -->
     <link rel="stylesheet" type="text/css" href="{{ '/css/kategory.css' | relative_url }}">
 
-     {% if jekyll.environment == 'production' and site.google_analytics %} 
+     {% if jekyll.environment == 'production' and site.data.commons.google_analytics %}
         {% include _google-analytics.html %} 
      {% endif %}
 </head>
