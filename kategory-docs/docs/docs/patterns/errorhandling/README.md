@@ -4,7 +4,7 @@ title: Functional Error Handling
 permalink: /docs/patterns/error_handling/
 ---
 
-# Functional Error Handling
+## Functional Error Handling
 
 When dealing with errors in a purely functional way we try as much as we can to avoid exceptions.
 Exceptions break referential transparency and lead to bugs when callers are unaware that they may happen until it's too late at runtime.
@@ -12,13 +12,13 @@ Exceptions break referential transparency and lead to bugs when callers are unaw
 In the following example we are going to model a basic program and go over the different options we have for dealing with errors in Kategory.
 The program simulates the typical game scenario where we have to shoot a target and series of preconditions need to be met in order actually shot and hit it.
 
-## Requirements
+### Requirements
 
 - Arm a Nuke launcher
 - Aim toward a Target
 - Launch a Nuke and impact the Target
 
-## Requirements
+### Requirements
 
 ```kotlin:ank
 /** model */
@@ -31,7 +31,7 @@ fun aim(): Target = TODO()
 fun launch(target: Target, nuke: Nuke): Impacted = TODO()
 ```
 
-## Exceptions
+### Exceptions
 
 A naive implementation that uses exceptions may look like this
 
@@ -44,7 +44,7 @@ fun launch(target: Target, nuke: Nuke): Impacted = Impacted
 As you may have noticed the function signatures include no clue that when asking for `arm()` or `aim()`
 an exception may be thrown.
 
-### The issues with exceptions
+#### The issues with exceptions
 
 Exceptions can be seen as GOTO statement given they interrupt the program flow by jumping back to the caller.
 Exceptions are not consistent as throwing an exception may not survive async boundaries, that is to say that one can't rely on exceptions for error handling
@@ -112,11 +112,11 @@ Exceptions may be considered generally a poor choice in Functional Programming w
 - Used in async boundaries over unprincipled APIs (callbacks)
 - In general when people have no access to your source code
 
-## How do we model exceptional cases then?
+### How do we model exceptional cases then?
 
 Kategory provide proper datatypes and typeclasses to represent exceptional cases.
 
-## Option ##
+### Option
 
 We use [`Option`](/docs/datatypes/option) to model the potential absence of a value
 
@@ -153,7 +153,7 @@ Additionally `Option` is unable to capture exceptions so if an exception was thr
 
 In the next example we are going to use `Try` to deal with potentially thrown exceptions that are outside the control of the caller.
 
-## Try ##
+### Try
 
 We use [`Try`]({{ '/docs/datatypes/try' | relative_url }}) when we want to be defensive about a computation that may fail with a runtime exception
 
@@ -210,7 +210,7 @@ It turns out that all exceptions thrown in our example are actually known to the
 
 We should redefine our functions to express that their result is not just a `Nuke`, `Target` or `Impact` but those potential values or other exceptional ones.
 
-## Either ##
+### Either
 
 When dealing with a known alternate path we model return types as [`Either`]({{ '/docs/datatypes/either' | relative_url }})
 Either represents the presence of either a `Left` value or a `Right` value.
@@ -266,7 +266,7 @@ We have seen so far how we can use `Option`, `Try` and `Either` to handle except
 The question now is, can we further generalize error handling and write this code in a way that is abstract from the actual datatypes that it uses.
 Since Kategory supports typeclasses, emulated higher kinds and higher order abstractions we can rewrite this in a fully polymorphic way thanks to [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }})
 
-## MonadError
+### MonadError
 
 [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) is a typeclass that allows us to handle error cases inside monadic contexts such as the ones we have seen with `Either`, `Try` and `Option`.
 Typeclasses allows us to code focusing on the behaviors and not the datatypes that implements them.
@@ -321,7 +321,7 @@ val result1 = attack(Either.monadError())
 result1.ev()
 ```
 
-## Credits
+### Credits
 
 Tutorial adapted from the 47 Degrees blog [`Functional Error Handling`](https://www.47deg.com/presentations/2017/02/18/Functional-error-handling/)
 
