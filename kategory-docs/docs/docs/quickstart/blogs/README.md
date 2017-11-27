@@ -44,12 +44,12 @@ An ongoing blog series introducing Functional Programming architectures from scr
 
 ### Happy Path: Kotlin + Actors + Kategory
 
-@javipacheco creates a Proof of Concept architecture for Android using the Actor pattern and modelling the domain with [`Either`]({{ '/docs/datatypes/either' | relative_url }}).
+[@javipacheco](https://github.com/javipacheco) creates a Proof of Concept architecture for Android using the Actor pattern and modelling the domain with [`Either`]({{ '/docs/datatypes/either' | relative_url }}).
 
 [Happy Path: Kotlin + Actors + Kategory](https://medium.com/@javipacheco/happy-path-kotlin-actors-kategory-proof-of-concept-322e9099d2ea)
 
 ### Handling exceptions in Kategory
 
-@uris77 explains how to use [`Try`]({{ '/docs/datatypes/try' | relative_url }}) in real world examples.
+[@uris77](https://github.com/uris77) explains how to use [`Try`]({{ '/docs/datatypes/try' | relative_url }}) in real world examples.
 
 [Handling Kotlin Exceptions with Kategory – A Functional Approach](https://www.spantree.net/blog/2017/09/15/kotlin-exception-handling-with-kategory.html)
