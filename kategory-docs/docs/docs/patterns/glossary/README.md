@@ -96,7 +96,7 @@ You can read more about Higher Kinds and type constructors in [KindedJ's README]
 
 #### Using Higher Kinds with typeclasses
 
-When coupled with typeclasses, we can now define mapability using [`Functor`]({{ '/docs/typeclasses/functor' | relative_url }}) for any `ListKW`.
+When HKs are coupled with typeclasses it allows us to define mapability using [`Functor`]({{ '/docs/typeclasses/functor' | relative_url }}) for any content `A` inside a `ListKW`.
 
 ```kotlin
 interface Functor<F>: Typeclass {
@@ -113,7 +113,7 @@ object ListKWFunctorInstance : Functor<ListKWHK> {
 ```
 
 You can see a function `ev()` used to access the `map()` function that already exists in `ListKW`.
-This is because we need to safely downcast from `HK<ListKWHK, A>` to `ListKW`, and `ev()` is a global function defined to do so.
+This is because we need to safely downcast from `HK<ListKWHK, A>` to `ListKW<A>`, and `ev()` is a global function defined to do so.
 
 The function `ev()` is already defined for all datatypes in KΛTEGORY. If you're creating your own datatype that's also a type constructor and would like to create all these helper types and functions,
 you can do so simply by annotating it as `@higerkind`, and using KΛTEGORY's [annotation processor](https://github.com/kategory/kategory#additional-setup) will create them for you.
