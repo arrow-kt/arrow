@@ -41,3 +41,15 @@ An ongoing blog series introducing Functional Programming architectures from scr
 [Kotlin Functional Programming I: Monad Stack](https://medium.com/@JorgeCastilloPr/kotlin-functional-programming-i-monad-stack-518d1bd8fbee)
 
 [Kotlin Functional Programming II: Monad Transformers](https://medium.com/@JorgeCastilloPr/kotlin-functional-programming-ii-monad-transformers-b1f020f14dd8)
+
+### Happy Path: Kotlin + Actors + Kategory
+
+@javipacheco creates a Proof of Concept architecture for Android using the Actor pattern and modelling the domain with [`Either`]({{ '/docs/datatypes/either' | relative_url }}).
+
+https://medium.com/@javipacheco/happy-path-kotlin-actors-kategory-proof-of-concept-322e9099d2ea
+
+### Handling exceptions in Kategory
+
+@uris77 explains how to use [`Try`]({{ '/docs/datatypes/try' | relative_url }}) in real world examples.
+
+https://www.spantree.net/blog/2017/09/15/kotlin-exception-handling-with-kategory.html
