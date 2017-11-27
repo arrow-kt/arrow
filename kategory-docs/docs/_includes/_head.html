@@ -28,4 +28,8 @@
     <link rel="stylesheet" type="text/css" href="{{ '/css/highlight/atom-one-light.css' | relative_url }}">
     <!-- Kategory main css -->
     <link rel="stylesheet" type="text/css" href="{{ '/css/kategory.css' | relative_url }}">
+
+     {% if jekyll.environment == 'production' and site.data.commons.google_analytics %}
+        {% include _google-analytics.html %} 
+     {% endif %}
 </head>
