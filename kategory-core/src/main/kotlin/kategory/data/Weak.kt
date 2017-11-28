@@ -3,7 +3,7 @@ package kategory
 import java.lang.ref.WeakReference
 
 /**
- * Represents an object that can stop existing when no references to it are present. It is backed by
+ * Represents an object that can stop existing when no references to it exists. Backed by
  * a [WeakReference] instance.
  */
 @higherkind
@@ -15,11 +15,11 @@ import java.lang.ref.WeakReference
     Traverse::class,
     TraverseFilter::class,
     MonadFilter::class)
-data class Weak<out A>(internal val provider: () -> A?) : WeakKind<A> {
+data class Weak<out A>(val provider: () -> A?) : WeakKind<A> {
 
     companion object {
 
-        private val EMPTY: Weak<Nothing> = Weak({ null })
+        private val EMPTY: Weak<Nothing> = Weak { null }
 
         @Suppress("UNCHECKED_CAST")
         fun <B> emptyWeak(): Weak<B> = EMPTY
@@ -30,14 +30,23 @@ data class Weak<out A>(internal val provider: () -> A?) : WeakKind<A> {
         }
     }
 
-    fun <B> fold(fn: () -> B, f: (A) -> B): B
-        = provider()?.let(f) ?: fn()
+    inline fun <B> fold(fn: () -> B, f: (A) -> B): B = provider().let {
+        when (it) {
+            null -> fn()
+            else -> f(it)
+        }
+    }
 
-    inline fun <B> map(crossinline f: (A) -> B): Weak<B> = fold({ emptyWeak() }, { Weak(f(it)) })
+    inline fun <B> map(crossinline f: (A) -> B): Weak<B> = fold({ emptyWeak() }, { f(it).weak() })
 
     inline fun <B> flatMap(crossinline f: (A) -> Weak<B>): Weak<B> = fold({ emptyWeak() }, { a -> f(a) })
 
-    inline fun filter(crossinline p: (A) -> Boolean): Weak<A> = fold({ emptyWeak() }, { a -> if (p(a)) a.weak() else emptyWeak<A>() })
+    /**
+     * Returns this Weak as long as the provided predicate confirms the value is to be kept
+     *
+     * @param p Predicate used for testing
+     */
+    inline fun filter(crossinline p: (A) -> Boolean): Weak<A> = fold({ emptyWeak() }, { a -> if (p(a)) a.weak() else emptyWeak() })
 
 }
 
