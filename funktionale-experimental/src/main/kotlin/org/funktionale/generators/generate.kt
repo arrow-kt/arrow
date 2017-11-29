@@ -32,23 +32,23 @@ val paramDeclaration = { i: Int -> "p$i: P$i" }.memoize()
 
 val paramDeclarationWithVal = { i: Int -> "val p$i: P$i" }.memoize()
 
-fun buildCompleteParams(paramType: (Int) -> String): (Int) -> String = { i: Int -> (1..i).mapTo(arrayListOf<String>(), paramType).joinToString() }.memoize()
+fun buildCompleteParams(paramType: (Int) -> String): (Int) -> String = { i: Int -> (1..i).mapTo(arrayListOf(), paramType).joinToString() }.memoize()
 
 val completeParams = buildCompleteParams(paramType)
 
 val completeOutParams = buildCompleteParams(outParamType)
 
-val callFunction = { i: Int, paramTemplate: (Int) -> String, separator: String -> (1..i).mapTo(arrayListOf<String>(), paramTemplate).joinToString(separator = separator) }
+val callFunction = { i: Int, paramTemplate: (Int) -> String, separator: String -> (1..i).mapTo(arrayListOf(), paramTemplate).joinToString(separator = separator) }
 
 val callFunctionParams = callFunction(p2 = param)(p2 = ", ")
 
 val callFunctionParamsWithParenthesis = callFunction(p2 = paramWithParenthesis)(p2 = "")
 
-val closed = { i: Int -> (1..i).mapTo(arrayListOf<String>()) { "}" }.joinToString(separator = " ") }
+val closed = { i: Int -> (1..i).mapTo(arrayListOf()) { "}" }.joinToString(separator = " ") }
 
-val filteredParams = { i: Int, filtered: Int -> (1..i).filterNotTo(arrayListOf<Int>()) { it == filtered }.mapTo(arrayListOf<String>(), paramType).joinToString() }
+val filteredParams = { i: Int, filtered: Int -> (1..i).filterNotTo(arrayListOf()) { it == filtered }.mapTo(arrayListOf(), paramType).joinToString() }
 
-val filteredDeclaredParams = { i: Int, filtered: Int -> (1..i).filterNotTo(arrayListOf<Int>()) { it == filtered }.mapTo(arrayListOf<String>(), paramDeclaration).joinToString() }
+val filteredDeclaredParams = { i: Int, filtered: Int -> (1..i).filterNotTo(arrayListOf()) { it == filtered }.mapTo(arrayListOf(), paramDeclaration).joinToString() }
 
 fun partially() {
 
@@ -68,13 +68,13 @@ fun <${completeParams(i)}, R> ((${completeParams(i)}) -> R).partially$j(${paramD
 fun newPartially() {
 
 	val partials: (Int, Int) -> String = { i: Int, parameter: Int ->
-		(1..i).map { num ->
+		(1..i).joinToString { num ->
 			if (num == parameter) {
 				paramDeclaration(num)
 			} else {
 				"partial$num: Partial<P$num> = partial()"
 			}
-		}.joinToString()
+		}
 	}
 
 	(2..22).forEach { i ->
@@ -90,9 +90,9 @@ operator @Suppress("UNUSED_PARAMETER") fun <${completeParams(i)}, R> ((${complet
 
 fun currying() {
 
-	val returnType = { i: Int -> (1..i).mapTo(arrayListOf<String>(), paramType).joinToString(separator = ") -> (", prefix = "(", postfix = ")") }
+	val returnType = { i: Int -> (1..i).mapTo(arrayListOf(), paramType).joinToString(separator = ") -> (", prefix = "(", postfix = ")") }
 
-	val returned = { i: Int -> (1..i).mapTo(arrayListOf<String>(), paramDeclaration).joinToString(separator = " -> { ") }
+	val returned = { i: Int -> (1..i).mapTo(arrayListOf(), paramDeclaration).joinToString(separator = " -> { ") }
 
 
 	(2..22).forEach { i ->
@@ -106,9 +106,9 @@ fun <${completeParams(i)}, R> ((${completeParams(i)}) -> R).curried(): ${returnT
 
 fun uncurrying() {
 
-	val receiverType = { i: Int -> (1..i).mapTo(arrayListOf<String>(), paramType).joinToString(separator = ") -> (", prefix = "(", postfix = ")") }
+	val receiverType = { i: Int -> (1..i).mapTo(arrayListOf(), paramType).joinToString(separator = ") -> (", prefix = "(", postfix = ")") }
 
-	val returned = { i: Int -> (1..i).mapTo(arrayListOf<String>(), paramDeclaration).joinToString(separator = ", ") }
+	val returned = { i: Int -> (1..i).mapTo(arrayListOf(), paramDeclaration).joinToString(separator = ", ") }
 
 
 	(2..22).forEach { i ->
@@ -122,15 +122,15 @@ fun<${completeParams(i)}, R> (${receiverType(i)} -> R).uncurried(): (${completeP
 
 fun flip() {
 
-	val returnType = { i: Int -> (i downTo 1).mapTo(arrayListOf<String>(), paramType).joinToString(separator = ") -> (", prefix = "(", postfix = ")") }
+	val returnType = { i: Int -> (i downTo 1).mapTo(arrayListOf(), paramType).joinToString(separator = ") -> (", prefix = "(", postfix = ")") }
 
-	val returned = { i: Int -> (i downTo 1).mapTo(arrayListOf<String>(), paramDeclaration).joinToString(separator = ") -> {(", prefix = "(", postfix = ")") }
+	val returned = { i: Int -> (i downTo 1).mapTo(arrayListOf(), paramDeclaration).joinToString(separator = ") -> {(", prefix = "(", postfix = ")") }
 
 	fun receptorType(i: Int, finalType: String): String {
-		if (i > 0) {
-			return receptorType((i - 1), "Function1<P$i, $finalType>")
+		return if (i > 0) {
+			receptorType((i - 1), "Function1<P$i, $finalType>")
 		} else {
-			return finalType
+			finalType
 		}
 	}
 
@@ -145,9 +145,9 @@ public fun <${completeParams(i)}, R> ${receptorType(i, "R")}.flip(): ${returnTyp
 
 fun reverse() {
 
-	val returnType = { i: Int -> (i downTo 1).mapTo(arrayListOf<String>(), paramType).joinToString(separator = ", ", prefix = "(", postfix = ")") }
+	val returnType = { i: Int -> (i downTo 1).mapTo(arrayListOf(), paramType).joinToString(separator = ", ", prefix = "(", postfix = ")") }
 
-	val returned = { i: Int -> (i downTo 1).mapTo(arrayListOf<String>(), paramDeclaration).joinToString(separator = ", ") }
+	val returned = { i: Int -> (i downTo 1).mapTo(arrayListOf(), paramDeclaration).joinToString(separator = ", ") }
 
 
 	(2..22).forEach { i ->
@@ -159,7 +159,7 @@ fun<${completeParams(i)}, R> ((${completeParams(i)}) -> R).reverse(): ${returnTy
 }
 
 val anies = { i: Int ->
-	(1..(i + 1)).mapTo(arrayListOf<String>()) {
+	(1..(i + 1)).mapTo(arrayListOf()) {
 		"Any"
 	}.joinToString(separator = ", ")
 }
@@ -167,8 +167,8 @@ val anies = { i: Int ->
 private fun javaFunClasses(i: Int): String {
 
 
-	return (0..i).mapTo(arrayListOf<String>()) { i ->
-		"javaClass<Function$i<${anies(i)}>>()"
+	return (0..i).mapTo(arrayListOf()) { j ->
+		"javaClass<Function$j<${anies(j)}>>()"
 	}.joinToString(separator = ",\n")
 }
 
@@ -179,14 +179,14 @@ fun functionClasses() {
 }
 
 val callParamArray = { i: Int ->
-	(0..(i - 1)).mapTo(arrayListOf<String>()) {
+	(0..(i - 1)).mapTo(arrayListOf()) {
 		"args[$it]"
 	}.joinToString(separator = ", ")
 }
 
 
 fun callFunctions() {
-	println((1..22).mapTo(arrayListOf<String>()) { i ->
+	println((1..22).mapTo(arrayListOf()) { i ->
 		"$i -> (function!! as Function$i<${anies(i)}>)(${callParamArray(i)})"
 	}.joinToString(separator = "\n"))
 }

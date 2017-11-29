@@ -22,7 +22,7 @@
 
     <groupId>org.funktionale</groupId>
     <artifactId>funktionale</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
     <modules>
         <module>funktionale-collections</module>
         <module>funktionale-complement</module>
@@ -88,7 +88,7 @@
     </developers>
     <properties>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
-        <kotlin.version>1.1.2-2</kotlin.version>
+        <kotlin.version>1.2.0</kotlin.version>
     </properties>
     <dependencies>
         <dependency>

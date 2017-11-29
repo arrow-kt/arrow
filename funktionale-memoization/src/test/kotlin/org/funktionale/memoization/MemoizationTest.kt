@@ -33,8 +33,8 @@ class MemoizationTest {
         var counterA = 0
         var counterB = 0
 
-        val a = { i: Int -> counterA++ }
-        val b = { i: Int -> counterB++ }.memoize()
+        val a = { _: Int -> counterA++ }
+        val b = { _: Int -> counterB++ }.memoize()
 
 
         (1..5).forEach { a(1) }

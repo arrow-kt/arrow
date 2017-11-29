@@ -51,7 +51,7 @@ Then you can use any funKTionale module to your library
 <dependency>
     <groupId>org.funktionale</groupId>
     <artifactId>funktionale-all</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
 </dependency>
 ```
 

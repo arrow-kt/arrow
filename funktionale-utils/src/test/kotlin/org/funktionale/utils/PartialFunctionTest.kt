@@ -21,8 +21,8 @@ import org.testng.Assert.assertTrue
 import org.testng.annotations.Test
 
 class PartialFunctionTest {
-    val definetAt: (Int) -> Boolean = { it.mod(2) == 0 }
-    val body: (Int) -> String = {
+    private val definetAt: (Int) -> Boolean = { it.rem(2) == 0 }
+    private val body: (Int) -> String = {
         "is even"
     }
 
@@ -42,7 +42,7 @@ class PartialFunctionTest {
 
     @Test fun orElse() {
         val isEven = body.toPartialFunction(definetAt)
-        val isOdd = { i: Int -> "is odd" }.toPartialFunction { !definetAt(it) }
+        val isOdd = { _: Int -> "is odd" }.toPartialFunction { !definetAt(it) }
         assertEquals(listOf(1, 2, 3).map(isEven orElse isOdd), listOf("is odd", "is even", "is odd"))
     }
 
