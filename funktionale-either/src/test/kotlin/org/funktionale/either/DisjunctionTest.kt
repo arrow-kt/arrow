@@ -26,8 +26,8 @@ import org.testng.annotations.Test
 class DisjunctionTest {
 
 
-    val left = Disjunction.left(5)
-    val right = Disjunction.right("kotlin")
+    private val left = Disjunction.left(5)
+    private val right = Disjunction.right("kotlin")
 
     @Test fun get() {
         assertEquals(left.swap().get(), 5)

@@ -21,18 +21,18 @@
     <parent>
         <artifactId>funktionale</artifactId>
         <groupId>org.funktionale</groupId>
-        <version>1.1</version>
+        <version>1.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <name>Either and Disjunction Module</name>
     <artifactId>funktionale-either</artifactId>
     <packaging>jar</packaging>
-    <version>1.1</version>
+    <version>1.2</version>
     <dependencies>
         <dependency>
             <groupId>org.funktionale</groupId>
             <artifactId>funktionale-option</artifactId>
-            <version>1.1</version>
+            <version>1.2</version>
         </dependency>
     </dependencies>
     <build>
