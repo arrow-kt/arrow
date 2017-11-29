@@ -2,7 +2,6 @@ package kategory.effects
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
-import io.kotlintest.properties.Gen
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
@@ -66,8 +65,10 @@ class FlowableKWTests : UnitSpec() {
         testLaws(AsyncLaws.laws(FlowableKW.asyncContextMissing(), FlowableKW.monadErrorConcat(), EQ(), EQ()))
         testLaws(AsyncLaws.laws(FlowableKW.asyncContextMissing(), FlowableKW.monadErrorSwitch(), EQ(), EQ()))
 
-        testLaws(FoldableLaws.laws(FlowableKW.foldable(), { FlowableKW.pure(it) }, Eq.any()))
-        testLaws(TraverseLaws.laws(FlowableKW.traverse(), FlowableKW.functor(), { FlowableKW.pure(it)  }, EQ()))
+        testLaws(
+                FoldableLaws.laws(FlowableKW.foldable(), { FlowableKW.pure(it) }, Eq.any()),
+                TraverseLaws.laws(FlowableKW.traverse(), FlowableKW.functor(), { FlowableKW.pure(it) }, EQ())
+        )
 
         "Multi-thread Flowables finish correctly" {
             val value: Flowable<Long> = FlowableKW.monadErrorFlat().bindingE {

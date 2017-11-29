@@ -134,7 +134,7 @@ The following datatypes in Kategory provide instances that adhere to the `Applic
 - [Const]({{ '/docs/datatypes/const' | relative_url }})
 - [Try]({{ '/docs/datatypes/try' | relative_url }})
 - [Eval]({{ '/docs/datatypes/eval' | relative_url }})
-- [IO]({{ '/docs/effects/IO' | relative_url }})
+- [IO]({{ '/docs/effects/io' | relative_url }})
 - [NonEmptyList]({{ '/docs/datatypes/nonemptylist' | relative_url }})
 - [Id]({{ '/docs/datatypes/id' | relative_url }})
 - [Function0]({{ '/docs/datatypes/function0' | relative_url }})

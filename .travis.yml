@@ -17,3 +17,11 @@ script:
 after_success:
   - bash <(curl -s https://codecov.io/bash)
   - ./deploy-scripts/deploy.sh
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
+  local_dir: kategory-docs/build/site
+  on:
+    branch: master

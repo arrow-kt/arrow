@@ -86,7 +86,7 @@ class StateT<F, S, A>(
          *
          *
          * @param AF [Applicative] for the context [F].
-         * @param f the function applied to extrat [T] from [S].
+         * @param f the function applied to inspect [T] from [S].
          */
         fun <F, S, T> inspect(AF: Applicative<F>, f: (S) -> T): StateT<F, S, T> = StateT(AF.pure({ s -> AF.pure(Tuple2(s, f(s))) }))
 

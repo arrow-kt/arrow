@@ -141,7 +141,7 @@ Available Instances:
 ```kotlin:ank
 import kategory.debug.*
 
-showInstances<StateTHK, Unit>()
+showInstances<StateTKindPartial<EitherKindPartial<StackError>, Stack>, Unit>()
 ```
 
 Take a look at the [`EitherT` docs]({{ '/docs/datatypes/eithert' | relative_url }}) or [`OptionT` docs]({{ '/docs/datatypes/optiont' | relative_url }}) for an alternative version monad transformer for achieving different goals.

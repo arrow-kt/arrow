@@ -25,7 +25,7 @@ Observable.from(7, 4, 11, 3)
 
 The largest quality of life improvement when using Observables in Kategory is the introduction of the [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}). This library construct allows expressing asynchronous Observable sequences as synchronous code using binding/bind.
 
-#### Kategory Wrapper
+#### Kategory Wrapper
 
 To wrap any existing Observable in its Kategory Wrapper counterpart you can use the extension function `k()`.
 
@@ -107,7 +107,7 @@ ObservableKW.monadError().bindingE {
   val end = PublishSubject.create<Unit>()
   Observable.interval(100, Milliseconds).takeUntil(end).bind()
 
-  val tick = bindIn(UI) { Observable.create { musicPlayer.getCurrentTime() } }
+  val tick = bindInM(UI) { Observable.create { musicPlayer.getCurrentTime() } }
   val percent = (tick / totalTime * 100).toInt()
   if (percent >= 100) {
     end.onNext(Unit)
