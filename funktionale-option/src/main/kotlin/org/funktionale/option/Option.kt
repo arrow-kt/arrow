@@ -52,10 +52,10 @@ sealed class Option<out T> {
         p1.map { pp1 -> f(get(), pp1) }
     }
 
-    inline fun <R> fold(ifEmpty: () -> R, f: (T) -> R): R = if (isEmpty()) {
+    inline fun <R> fold(ifEmpty: () -> R, some: (T) -> R): R = if (isEmpty()) {
         ifEmpty()
     } else {
-        f(get())
+        some(get())
     }
 
     inline fun <R> flatMap(f: (T) -> Option<R>): Option<R> = if (isEmpty()) {
