@@ -26,6 +26,11 @@ import org.funktionale.utils.hashCodeForNullable
 import java.util.*
 
 sealed class Option<out T> {
+
+    companion object {
+    	fun <T> empty(): Option<T> = None
+    }
+
     abstract fun isEmpty(): Boolean
 
     fun nonEmpty(): Boolean = isDefined()

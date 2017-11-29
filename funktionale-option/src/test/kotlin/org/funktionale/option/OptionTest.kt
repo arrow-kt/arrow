@@ -24,7 +24,7 @@ import org.testng.annotations.Test
 class OptionTest {
 
     val some: Option<String> = "kotlin".toOption()
-    val none: Option<String> = null.toOption()
+    val none: Option<String> = Option.empty()
 
     @Test fun option() {
 
