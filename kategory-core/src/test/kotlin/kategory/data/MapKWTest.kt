@@ -11,11 +11,6 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class MapKWTest : UnitSpec() {
 
-    val SG: Semigroup<Int> = object : Semigroup<Int> {
-        override fun combine(a: Int, b: Int): Int =
-                a * b
-    }
-
     init {
 
         "instances can be resolved implicitly" {
@@ -28,12 +23,8 @@ class MapKWTest : UnitSpec() {
         }
 
         testLaws(
-            SemigroupLaws.laws(MapKW.semigroup<String, Int>(SG),
-                MapKW(mapOf("key" to 1)),
-                MapKW(mapOf("key" to 2)),
-                MapKW(mapOf("key" to 3)),
-                Eq.any()),
-            MonoidLaws.laws(MapKW.monoid<String, Int>(SG), MapKW(mapOf("key" to 1)), Eq.any()),
+            SemigroupLaws.laws(MapKW.semigroup(), { n -> MapKW(mapOf("key" to n)) }, Eq.any()),
+            MonoidLaws.laws(MapKW.monoid(), { n -> mapOf("key" to n).k() }, Eq.any()),
             EqLaws.laws { mapOf(it.toString() to it).k() },
             TraverseLaws.laws(MapKW.traverse(),
                 MapKW.traverse(),

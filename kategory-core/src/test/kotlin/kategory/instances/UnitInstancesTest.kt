@@ -15,8 +15,8 @@ class UnitInstancesTest : UnitSpec() {
         }
 
         testLaws(
-                MonoidLaws.laws(monoid(), Unit, eq()),
-                SemigroupLaws.laws(semigroup(), Unit, Unit, Unit, eq()),
+                MonoidLaws.laws(monoid<Unit>(), { _: Int -> Unit }, eq()),
+                SemigroupLaws.laws(semigroup<Unit>(), { _: Int -> Unit }, eq()),
                 EqLaws.laws { Unit }
         )
     }

@@ -25,17 +25,17 @@ class SortedMapKWTest : UnitSpec() {
 
 
         testLaws(
-                MonoidLaws.laws(SortedMapKW.monoid<String, Int>(), sortedMapOf("key" to 1).k(), EQ),
+                MonoidLaws.laws(SortedMapKW.monoid<String, Int>(),
+                        { n -> SortedMapKW(sortedMapOf("key" to n)) },
+                        EQ),
                 SemigroupLaws.laws(SortedMapKW.monoid<String, Int>(),
-                    sortedMapOf("key" to 1).k(),
-                    sortedMapOf("key" to 2).k(),
-                    sortedMapOf("key" to 3).k(),
-                    EQ),
+                        { n -> SortedMapKW(sortedMapOf("key" to n)) },
+                        EQ),
                 TraverseLaws.laws(
-                    SortedMapKW.traverse<String>(),
-                    SortedMapKW.traverse<String>(),
-                    { a: Int -> sortedMapOf("key" to a).k() },
-                    EQ))
+                        SortedMapKW.traverse<String>(),
+                        SortedMapKW.traverse<String>(),
+                        { a: Int -> sortedMapOf("key" to a).k() },
+                        EQ))
 
     }
 

@@ -20,12 +20,8 @@ class SetKWTest : UnitSpec() {
         }
         
         testLaws(
-            SemigroupLaws.laws(SetKW.semigroup(),
-                    SetKW(setOf(1)),
-                    SetKW(setOf(2)),
-                    SetKW(setOf(3)),
-                    Eq.any()),
-            MonoidLaws.laws(SetKW.monoid(), SetKW(setOf(1)), Eq.any()),
+            SemigroupLaws.laws(SetKW.semigroup(), { n -> SetKW.pure(n) }, Eq.any()),
+            MonoidLaws.laws(SetKW.monoid(), { n -> SetKW.pure(n) }, Eq.any()),
             EqLaws.laws { SetKW.pure(it) },
             SemigroupKLaws.laws(SetKW.semigroupK(), { SetKW.pure(it) }, Eq.any()),
             MonoidKLaws.laws(SetKW.monoidK(), { SetKW.pure(it) }, Eq.any()),

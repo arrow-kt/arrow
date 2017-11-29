@@ -43,12 +43,8 @@ class OptionTest : UnitSpec() {
         }
 
         testLaws(
-            SemigroupLaws.laws(Option.semigroup(),
-                    Option(1),
-                    Option(2),
-                    Option(3),
-                    Eq.any()),
-            MonoidLaws.laws(Option.monoid(), Option(1), Eq.any()),
+            SemigroupLaws.laws(Option.semigroup(), { n -> Option(n) }, Eq.any()),
+            MonoidLaws.laws(Option.monoid(), { n -> Option(n) }, Eq.any()),
             EqLaws.laws(eq(), { genOption(Gen.int()).generate() }),
         //testLaws(MonadErrorLaws.laws(monadError<OptionHK, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
             TraverseFilterLaws.laws(Option.traverseFilter(), Option.monad(), ::Some, Eq.any()),

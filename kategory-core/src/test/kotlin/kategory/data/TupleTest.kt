@@ -24,7 +24,7 @@ class TupleTest : UnitSpec() {
         }
 
         testLaws(
-            MonoidLaws.laws(Tuple2.monoid(), Tuple2(1, 2), Eq.any()),
+            MonoidLaws.laws(Tuple2.monoid(), { Tuple2(it ,it) }, Eq.any()),
             EqLaws.laws { Tuple2(it, it) },
             EqLaws.laws { Tuple3(it, it, it) },
             EqLaws.laws { Tuple4(it, it, it, it) },

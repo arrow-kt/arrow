@@ -28,9 +28,7 @@ class NonEmptyListTest : UnitSpec() {
 
         testLaws(
             SemigroupLaws.laws(NonEmptyList.semigroup(),
-                NonEmptyList(1, emptyList()),
-                NonEmptyList(2, emptyList()),
-                NonEmptyList(3, emptyList()),
+                { n: Int -> NonEmptyList.of(n) },
                 Eq.any()),
             EqLaws.laws { it.nel() },
             MonadLaws.laws(NonEmptyList.monad(), Eq.any()),
