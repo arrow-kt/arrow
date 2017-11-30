@@ -199,7 +199,7 @@ eitherTVal.value()
 
 So how would our function look if we implemented it with the EitherT monad transformer?
 
-```kotlin
+```kotlin:ank:compile
 fun getCountryCode(personId: Int): ObservableKW<Either<BizError, String>> =
   EitherT.monadError<ObservableKWHK, BizError>().binding {
     val person = EitherT(findPerson(personId)).bind()
