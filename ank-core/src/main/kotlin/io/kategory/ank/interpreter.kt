@@ -113,7 +113,7 @@ fun extractCodeImpl(source: String, tree: ASTNode): ListKW<Snippet> {
                 val lang = fence.takeWhile { it != ':' }.toString().replace("```", "")
                 if (fence.startsWith("```$lang$AnkBlock")) {
                     val code = fence.split("\n").drop(1).dropLast(1).joinToString("\n")
-                    sb.add(Snippet(fence.toString(), lang, fence.startsWith("```$AnkSilentBlock"), node.startOffset, node.endOffset, code))
+                    sb.add(Snippet(fence.toString(), lang, fence.startsWith("```$lang$AnkSilentBlock"), node.startOffset, node.endOffset, code))
                 }
             }
             super.visitNode(node)
