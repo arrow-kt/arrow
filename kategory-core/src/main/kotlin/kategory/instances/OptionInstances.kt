@@ -1,8 +1,5 @@
 package kategory
 
-import kategory.None
-import kategory.Some
-
 @instance(Option::class)
 interface OptionSemigroupInstance<A> : Semigroup<Option<A>> {
 
