@@ -38,7 +38,8 @@ The general representation of sequenced execution in code is called a [`Monad`](
 It takes as a parameter one function to be called after the current operation completes, and that function has to return another [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) to continue the operation with.
 A common renaming of `flatMap` is `andThen`. Go to the documentation page to see a deep dive on the Monad API.
 
-With knowledge of flatMap we can write sequential expressions that are ran asynchronously, even over multiple threads.
+With knowledge of `flatMap` we can write sequential expressions that are ran asynchronously, even over multiple threads.
+Implementations of `Monad` are available for internal types like `Try` and also integrations like [RxJava 2]({{ '/docs/integrations/rx2' | relative_url }}) and [kotlinx.coroutines]({{ '/docs/integrations/kotlinxcoroutines' | relative_url }}). 
 Let's see one example using a [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) called [`IO`]({{ '/docs/effects/io' | relative_url }}), where we fetch from a database the information about the dean of university some student attends:
 
 ```kotlin
