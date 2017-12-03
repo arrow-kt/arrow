@@ -131,8 +131,8 @@ fun aim(): Option<Target> = None
 fun launch(target: Target, nuke: Nuke): Option<Impacted> = Some(Impacted)
 ```
 
-It's easy to work with [`Option`](/docs/datatypes/option) if your lang supports monad comprehensions or special syntax for them.
-Kategory provides monadic comprehensions for all datatypes for which a [`Monad`](/docs/typeclasses/monad) instance exists built atop coroutines.
+It's easy to work with [`Option`](/docs/datatypes/option) if your lang supports [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) or special syntax for them.
+Kategory provides [monadic comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }})  for all datatypes for which a [`Monad`](/docs/typeclasses/monad) instance exists built atop coroutines.
 
 ```kotlin
 fun attackOption(): Option<Impacted> =
@@ -307,7 +307,7 @@ inline fun <reified F> attack(ME:MonadError<F, NukeException> = monadError()):HK
   }
 ```
 
-Or since `arm()` and `bind()` are operations that do not depend on each other we don't need the monad comprehensions here and we can express our logic as:
+Or since `arm()` and `bind()` are operations that do not depend on each other we don't need the [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) here and we can express our logic as:
 
 ```kotlin
 inline fun <reified F> attack1(ME: MonadError<F, NukeException> = monadError()): HK<F, Impacted> =
@@ -319,6 +319,22 @@ result.ev()
 // or
 val result1 = attack(Either.monadError())
 result1.ev()
+```
+
+Note that `MonadError` also has a function `bindingE` that automatically captures and wraps exceptions in its binding block.
+
+```kotlin
+inline fun <reified F> launchImpure(target: Target, nuke: Nuke, ME: MonadError<F, NukeException> = monadError()): Impacted {
+  throw MissedByMeters(5)
+}
+
+inline fun <reified F> attack(ME:MonadError<F, NukeException> = monadError()):HK<F, Impacted> =
+  ME.binding {
+    val nuke = arm<F>().bind()
+    val target = aim<F>().bind()
+    val impact = launchImpure<F>(target, nuke)
+    yields(impact)
+  }
 ```
 
 ### Credits
