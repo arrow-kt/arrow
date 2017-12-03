@@ -153,27 +153,41 @@ fun compileCodeImpl(snippets: Map<File, ListKW<Snippet>>, classpath: ListKW<Stri
                                 .toMap()
 
                 if (codeBlocks.find { it.compile }.nonEmpty()) {
-                    val tmpFile = createTempFile(prefix = file.nameWithoutExtension + "__", suffix = ".kts")
+                    codeBlocks.filter { it.lang != "kotlin" }
+                            .find { it.compile }
+                            ?.let {
+                                throw CompilationException(file, it, IllegalStateException("```${it.lang}:ank:compile is not supported. Use ```${it.lang}:ank or ```${it.lang}:ank:silent"))
+                            }
 
-                    val (imports, code) = codeBlocks.fold(emptySet<String>() toT emptyList<String>()) { acc, snippet ->
-                        snippet.code.lines().fold(acc) { (imports, code), line ->
-                            if (line.startsWith("import")) imports + line else code + line
-                            imports toT code
-                        }
-                    }
+                    val tmpTargetDir = createTempDir()
+                    val tmpSourceFile = createTempFile(prefix = file.nameWithoutExtension + "__", suffix = ".kts")
 
-                    tmpFile.printWriter().use {
+                    val (imports, code) = codeBlocks.filter { it.lang == "kotlin" }
+                            .fold(emptySet<String>() toT emptyList<String>()) { acc, snippet ->
+                                snippet.code.lines().fold(acc) { (imports, code), line ->
+                                    if (line.startsWith("import")) imports + line toT code
+                                    else imports toT code + line
+                                }
+                            }
+
+                    tmpSourceFile.printWriter().use {
                         it.println(imports.joinToString("\n"))
                         it.println(code.joinToString("\n"))
                     }
 
-                    val args = listOf("-Xcoroutines=enable", "-cp", classPath, "-d", file.parentFile.absolutePath, tmpFile.absolutePath).toTypedArray()
+                    val args = listOf(
+                            "-Xcoroutines=enable",
+                            "-Xskip-runtime-version-check",
+                            "-classpath", classPath,
+                            "-d", tmpTargetDir.absolutePath,
+                            tmpSourceFile.absolutePath
+                    ).toTypedArray()
 
                     //If compilation fails compiler shuts down VM. However correct output is shown in Gradle.
                     K2JVMCompiler.main(args)
 
-                    tmpFile.delete()
-                    File("${file.parentFile.absolutePath}/${tmpFile.name.replace(".kts", ".class")}").delete()
+                    tmpSourceFile.delete()
+                    tmpTargetDir.delete()
                 }
 
                 val evaledSnippets: ListKW<Snippet> = codeBlocks.map { snippet ->
