@@ -60,7 +60,7 @@ Folding a sequence,
 sequenceOf('a', 'b', 'c', 'd', 'e').k().foldL("") { x, y -> x + y }
 ```
 
-Available Instances:
+## Instances
 
 ```kotlin:ank
 import kategory.debug.*

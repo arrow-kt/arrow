@@ -213,7 +213,7 @@ fun getCountryCode(personId: Int): ObservableKW<Either<BizError, String>> =
 
 Here we no longer have to deal with the `Left` cases, and the binding to the values on the left side are already the underlying values we want to focus on instead of the potential biz error values. We have automatically `flatMapped` through the `ObservableKW` and `Either` in a single expression reducing the boilerplate and encoding the effects concerns in the type signatures.
 
-Available Instances:
+## Instances
 
 ```kotlin:ank
 import kategory.debug.*

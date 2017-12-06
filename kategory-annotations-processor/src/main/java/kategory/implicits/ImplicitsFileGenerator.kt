@@ -170,7 +170,7 @@ class ImplicitsFileGenerator(
                     }
                 }.joinToString()
 
-                val argsOut: String = function.valueParameterList.map { valueParameter ->
+                val argsOut: String = function.valueParameterList.joinToString { valueParameter ->
                     extractConsumerValueParameter(valueParameter, consumersInFunction) { parameterName, consumer ->
                         if (consumer == null) parameterName
                         else {
@@ -180,7 +180,7 @@ class ImplicitsFileGenerator(
                             providerInvocationsByType[type]!!
                         }
                     }
-                }.joinToString()
+                }
 
                 "fun $prefix$escapedFunctionName($argsIn) = $escapedFunctionName($argsOut)"
             }

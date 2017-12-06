@@ -110,7 +110,7 @@ If we only care about the resulting String and not the final state, then we can 
 stackOperations().runA(Nel.of("hello", "world", "!").some())
 ```
 
-Available Instances:
+## Instances
 
 ```kotlin:ank
 import kategory.debug.*

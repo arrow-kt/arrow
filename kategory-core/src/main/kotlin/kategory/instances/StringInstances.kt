@@ -5,8 +5,7 @@ object StringSemigroupInstance : Semigroup<String> {
 }
 
 object StringSemigroupInstanceImplicits {
-    @JvmStatic
-    fun instance(): StringSemigroupInstance = StringSemigroupInstance
+    @JvmStatic fun instance() = StringSemigroupInstance
 }
 
 object StringMonoidInstance : Monoid<String> {
@@ -16,8 +15,7 @@ object StringMonoidInstance : Monoid<String> {
 }
 
 object StringMonoidInstanceImplicits {
-    @JvmStatic
-    fun instance(): StringMonoidInstance = StringMonoidInstance
+    @JvmStatic fun instance() = StringMonoidInstance
 }
 
 object StringEqInstance : Eq<String> {
@@ -25,6 +23,5 @@ object StringEqInstance : Eq<String> {
 }
 
 object StringEqInstanceImplicits {
-    @JvmStatic
-    fun instance(): StringEqInstance = StringEqInstance
+    @JvmStatic fun instance() = StringEqInstance
 }

@@ -6,7 +6,7 @@ interface NonEmptyListSemigroupInstance<A> : Semigroup<NonEmptyList<A>> {
 }
 
 @instance(NonEmptyList::class)
-interface NonEmptyListEqInstance<A> : Eq<NonEmptyList<A>> {
+interface NonEmptyListEqInstance<in A> : Eq<NonEmptyList<A>> {
 
     fun EQ(): Eq<A>
 
