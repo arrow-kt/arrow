@@ -174,7 +174,7 @@ class InstanceFileGenerator(
 
     private fun genImplicitObject(i: Instance): String = """
             |object ${i.implicitObjectName} {
-            |  @JvmStatic fun ${i.expandedTypeArgs()} instance(${i.expandedArgs}): ${i.name}${i.expandedTypeArgs()}${i.typeConstraints()} =
+            |  fun ${i.expandedTypeArgs()} instance(${i.expandedArgs}): ${i.name}${i.expandedTypeArgs()}${i.typeConstraints()} =
             |    object : ${i.name}${i.expandedTypeArgs()} {
             |${i.targetImplementations}
             |    }

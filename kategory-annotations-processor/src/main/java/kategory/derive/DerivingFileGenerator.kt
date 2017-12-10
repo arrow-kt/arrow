@@ -136,7 +136,7 @@ class TypeclassInstanceGenerator(
             |}
             |
             |object ${instanceName}Implicits {
-            |  @JvmStatic fun instance(): $instanceName = ${receiverType}.Companion.${companionFactoryName}()
+            |  fun instance(): $instanceName = ${receiverType}.Companion.${companionFactoryName}()
             |}
             |
             |fun ${receiverType}.Companion.${companionFactoryName}(): $instanceName =
