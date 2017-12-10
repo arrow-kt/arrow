@@ -2,7 +2,6 @@ package kategory
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
-import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -10,7 +9,7 @@ class SortedMapKWTest : UnitSpec() {
 
     val EQ: Eq<HK2<SortedMapKWHK, String, Int>> = object : Eq<HK2<SortedMapKWHK, String, Int>> {
         override fun eqv(a: HK2<SortedMapKWHK, String, Int>, b: HK2<SortedMapKWHK, String, Int>): Boolean =
-            a.ev().get("key") == b.ev().get("key")
+            a.ev()["key"] == b.ev()["key"]
     }
 
     init {

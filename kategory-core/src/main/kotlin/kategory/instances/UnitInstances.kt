@@ -9,7 +9,7 @@ object UnitSemigroupInstance: Semigroup<Unit> {
 }
 
 object UnitSemigroupInstanceImplicits {
-    @JvmStatic fun instance(): Semigroup<Unit> = UnitSemigroupInstance
+    fun instance(): Semigroup<Unit> = UnitSemigroupInstance
 }
 
 object UnitMonoidInstance: Monoid<Unit>, Semigroup<Unit> by UnitSemigroupInstance {
@@ -17,7 +17,7 @@ object UnitMonoidInstance: Monoid<Unit>, Semigroup<Unit> by UnitSemigroupInstanc
 }
 
 object UnitMonoidInstanceImplicits {
-    @JvmStatic fun instance(): Monoid<Unit> = UnitMonoidInstance
+    fun instance(): Monoid<Unit> = UnitMonoidInstance
 }
 
 object UnitEqInstance : Eq<Unit> {
@@ -25,5 +25,5 @@ object UnitEqInstance : Eq<Unit> {
 }
 
 object UnitEqInstanceImplicits {
-    @JvmStatic fun instance(): Eq<Unit> = UnitEqInstance
+    fun instance(): Eq<Unit> = UnitEqInstance
 }

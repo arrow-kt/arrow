@@ -10,7 +10,7 @@ interface CoproductFunctorInstance<F, G> : Functor<CoproductKindPartial<F, G>> {
 }
 
 object CoproductFunctorInstanceImplicits {
-    @JvmStatic fun <F, G> instance(FF: Functor<F>, FG: Functor<G>): CoproductFunctorInstance<F, G> = object : CoproductFunctorInstance<F, G> {
+    fun <F, G> instance(FF: Functor<F>, FG: Functor<G>): CoproductFunctorInstance<F, G> = object : CoproductFunctorInstance<F, G> {
         override fun FF(): Functor<F> = FF
 
         override fun FG(): Functor<G> = FG
@@ -32,7 +32,7 @@ interface CoproductComonadInstance<F, G> : Comonad<CoproductKindPartial<F, G>> {
 }
 
 object CoproductComonadInstanceImplicits {
-    @JvmStatic fun <F, G> instance(CF: Comonad<F>, CG: Comonad<G>): CoproductComonadInstance<F, G> = object : CoproductComonadInstance<F, G> {
+    fun <F, G> instance(CF: Comonad<F>, CG: Comonad<G>): CoproductComonadInstance<F, G> = object : CoproductComonadInstance<F, G> {
         override fun CF(): Comonad<F> = CF
 
         override fun CG(): Comonad<G> = CG
@@ -52,7 +52,7 @@ interface CoproductFoldableInstance<F, G> : Foldable<CoproductKindPartial<F, G>>
 }
 
 object CoproductFoldableInstanceImplicits {
-    @JvmStatic fun <F, G> instance(FF: Foldable<F>, FG: Foldable<G>): CoproductFoldableInstance<F, G> = object : CoproductFoldableInstance<F, G> {
+    fun <F, G> instance(FF: Foldable<F>, FG: Foldable<G>): CoproductFoldableInstance<F, G> = object : CoproductFoldableInstance<F, G> {
         override fun FF(): Foldable<F> = FF
 
         override fun FG(): Foldable<G> = FG
@@ -75,7 +75,7 @@ interface CoproductTraverseInstance<F, G> : Traverse<CoproductKindPartial<F, G>>
 }
 
 object CoproductTraverseInstanceImplicits {
-    @JvmStatic fun <F, G> instance(TF: Traverse<F>, TG: Traverse<G>): CoproductTraverseInstance<F, G> = object : CoproductTraverseInstance<F, G> {
+    fun <F, G> instance(TF: Traverse<F>, TG: Traverse<G>): CoproductTraverseInstance<F, G> = object : CoproductTraverseInstance<F, G> {
         override fun TF(): Traverse<F> = TF
 
         override fun TG(): Traverse<G> = TG

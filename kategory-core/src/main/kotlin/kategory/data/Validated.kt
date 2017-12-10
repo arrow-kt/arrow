@@ -11,25 +11,25 @@ typealias Invalid<E> = Validated.Invalid<E>
 
     companion object {
 
-        @JvmStatic fun <E, A> invalidNel(e: E): ValidatedNel<E, A> = Invalid(NonEmptyList(e, listOf()))
+        fun <E, A> invalidNel(e: E): ValidatedNel<E, A> = Invalid(NonEmptyList(e, listOf()))
 
-        @JvmStatic fun <E, A> validNel(a: A): ValidatedNel<E, A> = Validated.Valid(a)
+        fun <E, A> validNel(a: A): ValidatedNel<E, A> = Validated.Valid(a)
 
         /**
          * Converts a `Try<A>` to a `Validated<Throwable, A>`.
          */
-        @JvmStatic fun <A> fromTry(t: Try<A>): Validated<Throwable, A> = t.fold({ Invalid(it) }, { Valid(it) })
+        fun <A> fromTry(t: Try<A>): Validated<Throwable, A> = t.fold({ Invalid(it) }, { Valid(it) })
 
         /**
          * Converts an `Either<A, B>` to an `Validated<A, B>`.
          */
-        @JvmStatic fun <E, A> fromEither(e: Either<E, A>): Validated<E, A> = e.fold({ Invalid(it) }, { Valid(it) })
+        fun <E, A> fromEither(e: Either<E, A>): Validated<E, A> = e.fold({ Invalid(it) }, { Valid(it) })
 
         /**
          * Converts an `Option<B>` to an `Validated<A, B>`, where the provided `ifNone` values is returned on
          * the invalid of the `Validated` when the specified `Option` is `None`.
          */
-        @JvmStatic fun <E, A> fromOption(o: Option<A>, ifNone: () -> E): Validated<E, A> =
+        fun <E, A> fromOption(o: Option<A>, ifNone: () -> E): Validated<E, A> =
                 o.fold(
                         { Invalid(ifNone()) },
                         { Valid(it) }

@@ -7,7 +7,7 @@ data class Duration(val amount: Long, val timeUnit: TimeUnit) {
 
     companion object {
         // Actually limited to 9223372036854775807 days, so unless you are very patient, it is unlimited ;-)
-        @JvmStatic val INFINITE = Duration(amount = Long.MAX_VALUE, timeUnit = TimeUnit.DAYS)
+        val INFINITE = Duration(amount = Long.MAX_VALUE, timeUnit = TimeUnit.DAYS)
     }
 }
 

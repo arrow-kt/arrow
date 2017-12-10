@@ -48,30 +48,30 @@ sealed class Eval<out A> : EvalKind<A> {
 
         fun <A> pure(a: A): Eval<A> = Eval.now(a)
 
-        @JvmStatic
+
         fun <A> now(a: A) = Now(a)
 
-        @JvmStatic
+
         fun <A> later(f: () -> A) = Later(f)
 
-        @JvmStatic
+
         fun <A> always(f: () -> A) = Always(f)
 
-        @JvmStatic
+
         fun <A> defer(f: () -> Eval<A>): Eval<A> = Call(f)
 
-        @JvmStatic
+
         fun raise(t: Throwable): Eval<Nothing> = defer { throw t }
 
-        @JvmStatic
+
         val Unit: Eval<Unit> = Now(kotlin.Unit)
-        @JvmStatic
+
         val True: Eval<Boolean> = Now(true)
-        @JvmStatic
+
         val False: Eval<Boolean> = Now(false)
-        @JvmStatic
+
         val Zero: Eval<Int> = Now(0)
-        @JvmStatic
+
         val One: Eval<Int> = Now(1)
 
         fun <A, B> merge(

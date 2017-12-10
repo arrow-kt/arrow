@@ -8,7 +8,6 @@ interface EitherTFunctorInstance<F, L> : Functor<EitherTKindPartial<F, L>> {
 }
 
 object EitherTFunctorInstanceImplicits {
-    @JvmStatic
     fun <F, L> instance(FF: Functor<F>): EitherTFunctorInstance<F, L> = object : EitherTFunctorInstance<F, L> {
         override fun FF(): Functor<F> = FF
     }
@@ -27,7 +26,6 @@ interface EitherTApplicativeInstance<F, L> : EitherTFunctorInstance<F, L>, Appli
 }
 
 object EitherTApplicativeInstanceImplicits {
-    @JvmStatic
     fun <F, L> instance(MF: Monad<F>): EitherTApplicativeInstance<F, L> = object : EitherTApplicativeInstance<F, L> {
         override fun FF(): Functor<F> = MF
 
@@ -41,14 +39,14 @@ interface EitherTMonadInstance<F, L> : EitherTApplicativeInstance<F, L>, Monad<E
             fa.ev().ap(ff,
                     MF())
 
-    override fun <A, B> flatMap(fa: EitherTKind<F, L, A>, f: (A) -> EitherTKind<F, L, B>): EitherT<F, L, B> = fa.ev().flatMap ({ f(it).ev() }, MF())
+    override fun <A, B> flatMap(fa: EitherTKind<F, L, A>, f: (A) -> EitherTKind<F, L, B>): EitherT<F, L, B> = fa.ev().flatMap({ f(it).ev() }, MF())
 
     override fun <A, B> tailRecM(a: A, f: (A) -> EitherTKind<F, L, Either<A, B>>): EitherT<F, L, B> =
             EitherT.tailRecM(a, f, MF())
 }
 
 object EitherTMonadInstanceImplicits {
-    @JvmStatic
+
     fun <F, L> instance(MF: Monad<F>): EitherTMonadInstance<F, L> = object : EitherTMonadInstance<F, L> {
         override fun FF(): Functor<F> = MF
 
@@ -70,7 +68,7 @@ interface EitherTMonadErrorInstance<F, L> : EitherTMonadInstance<F, L>, MonadErr
 }
 
 object EitherTMonadErrorInstanceImplicits {
-    @JvmStatic
+
     fun <F, L> instance(MF: Monad<F>): EitherTMonadErrorInstance<F, L> = object : EitherTMonadErrorInstance<F, L> {
         override fun FF(): Functor<F> = MF
 
@@ -88,7 +86,7 @@ interface EitherTFoldableInstance<F, L> : Foldable<EitherTKindPartial<F, L>> {
 }
 
 object EitherTFoldableInstanceImplicits {
-    @JvmStatic
+
     fun <F, L> instance(FF: Foldable<F>): EitherTFoldableInstance<F, L> = object : EitherTFoldableInstance<F, L> {
         override fun FFF(): Foldable<F> = FF
     }
@@ -105,7 +103,7 @@ interface EitherTTraverseInstance<F, L> : EitherTFunctorInstance<F, L>, EitherTF
 }
 
 object EitherTTraverseInstanceImplicits {
-    @JvmStatic
+
     fun <F, L> instance(TF: Traverse<F>): EitherTTraverseInstance<F, L> = object : EitherTTraverseInstance<F, L> {
         override fun FFF(): Foldable<F> = TF
 
@@ -123,7 +121,7 @@ interface EitherTSemigroupKInstance<F, L> : SemigroupK<EitherTKindPartial<F, L>>
 }
 
 object EitherTSemigroupKInstanceImplicits {
-    @JvmStatic
+
     fun <F, L> instance(MF: Monad<F>): EitherTSemigroupKInstance<F, L> = object : EitherTSemigroupKInstance<F, L> {
         override fun MF(): Monad<F> = MF
     }
