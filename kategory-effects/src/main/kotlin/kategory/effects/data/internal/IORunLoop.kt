@@ -97,13 +97,6 @@ object IORunLoop {
         } while (true)
     }
 
-    inline private fun executeSafe(crossinline f: () -> IO<Any?>): IO<Any?> =
-            try {
-                f()
-            } catch (e: Throwable) {
-                RaiseError(e)
-            }
-
     inline private fun <A> sanitizedCurrentIO(currentIO: Current?, unboxed: Any?): IO<A> =
             (currentIO ?: Pure(unboxed)) as IO<A>
 
@@ -115,7 +108,7 @@ object IORunLoop {
         }
 
         var result: IOFrame<Any?, IO<Any?>>? = null
-        var cursor = bFirst
+        var cursor: BindF? = bFirst
 
         do {
             if (cursor != null && cursor is IOFrame) {
@@ -248,6 +241,13 @@ object IORunLoop {
 
         } while (true)
     }
+
+    inline private fun executeSafe(crossinline f: () -> IO<Any?>): IO<Any?> =
+            try {
+                f()
+            } catch (e: Throwable) {
+                RaiseError(e)
+            }
 
     /**
      * Pops the next bind function from the stack, but filters out
