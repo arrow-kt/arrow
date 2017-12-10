@@ -31,7 +31,7 @@ package kategory
 
         fun <F, W> tell2(l: W, AF: Applicative<F>): WriterT<F, W, Unit> = WriterT.put2(Unit, l, AF)
 
-        inline fun <reified F, reified W, A> value(v: A, applicativeF: Applicative<F> = kategory.applicative(), monoidW: Monoid<W> = monoid()):
+        inline fun <reified F, reified W, A> value(v: A, monoidW: Monoid<W> = monoid()):
                 WriterT<F, W, A> = WriterT.put(v, monoidW.empty())
 
         inline fun <reified F, reified W, A> valueT(vf: HK<F, A>, monoidW: Monoid<W> = monoid()): WriterT<F, W, A> =

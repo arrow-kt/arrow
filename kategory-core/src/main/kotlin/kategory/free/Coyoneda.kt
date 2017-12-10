@@ -18,7 +18,8 @@ private typealias AnyFunc = (Any?) -> Any?
 
     fun toYoneda(FF: Functor<F>): Yoneda<F, A> =
             object : Yoneda<F, A>() {
-                override operator fun <B> invoke(f: (A) -> B): HK<F, B> = map(f).lower(FF)
+                override operator fun <B> invoke(f: (A) -> B): HK<F, B> =
+                        this@Coyoneda.map(f).lower(FF)
             }
 
     companion object {

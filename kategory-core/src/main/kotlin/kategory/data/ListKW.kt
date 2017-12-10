@@ -73,11 +73,6 @@ data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A>
             go(buf, f, f(a).ev())
             return ListKW(buf)
         }
-
-        fun <A> semigroup(): ListKWSemigroupInstance<A> = ListKWSemigroupInstanceImplicits.instance()
-
-        fun <A> monoid(): ListKWMonoidInstance<A> = ListKWMonoidInstanceImplicits.instance()
-
     }
 
 }

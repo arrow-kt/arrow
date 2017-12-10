@@ -8,7 +8,7 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class YonedaTest : UnitSpec() {
 
-    val F = Yoneda.functor(Id.functor())
+    val F = Yoneda.functor<IdHK>()
 
     val EQ = Eq<YonedaKind<IdHK, Int>> { a, b ->
         a.ev().lower() == b.ev().lower()
