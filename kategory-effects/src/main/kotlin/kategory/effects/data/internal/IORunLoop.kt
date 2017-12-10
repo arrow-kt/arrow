@@ -76,9 +76,7 @@ object IORunLoop {
                     currentIO = currentIO.source
                 }
                 null -> {
-                    currentIO = RaiseError(NullPointerException("Stepping on null IO"))
                 }
-
             }
 
             if (hasResult) {
@@ -138,12 +136,12 @@ object IORunLoop {
             currentIO: IO<A>,
             bFirst: BindF?,
             bRest: CallStack?,
-            register: ((Either<Throwable, Any?>) -> Unit) -> Unit): IO<A> =
+            register: Proc<Any?>): IO<A> =
             // Hitting an async boundary means we have to stop, however
             // if we had previous `flatMap` operations then we need to resume
             // the loop with the collected stack
             when {
-                bFirst != null || bRest != null && bRest.isNotEmpty() ->
+                bFirst != null || (bRest != null && bRest.isNotEmpty()) ->
                     Async { cb ->
                         val rcb = RestartCallback(cb as Callback)
                         rcb.prepare(bFirst, bRest)
@@ -229,9 +227,7 @@ object IORunLoop {
                     currentIO = currentIO.source
                 }
                 null -> {
-                    currentIO = RaiseError(NullPointerException("Stepping on null IO"))
                 }
-
             }
 
             if (hasResult) {
@@ -289,8 +285,8 @@ object IORunLoop {
             if (canCall) {
                 canCall = false
                 when (either) {
-                    is Either.Left -> loop(RaiseError(either.a), cb, this, bFirst!!, bRest!!)
-                    is Either.Right -> loop(Pure(either.b), cb, this, bFirst!!, bRest!!)
+                    is Either.Left -> loop(RaiseError(either.a), cb, this, bFirst, bRest)
+                    is Either.Right -> loop(Pure(either.b), cb, this, bFirst, bRest)
                 }
             }
         }

@@ -17,7 +17,6 @@ object Platform {
         return { a ->
             if (!wasCalled.getAndSet(true)) {
                 f(a)
-
             }
         }
     }
@@ -59,4 +58,3 @@ private class OneShotLatch : AbstractQueuedSynchronizer() {
         return true
     }
 }
-
