@@ -1,6 +1,6 @@
 package kategory
 
-@higherkind abstract class Yoneda<F, A> : YonedaKind<F, A> {
+@higherkind abstract class Yoneda<F, A> : YonedaKind<F, A>, YonedaKindedJ<F, A> {
 
     abstract operator fun <B> invoke(f: (A) -> B): HK<F, B>
 

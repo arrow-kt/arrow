@@ -3,7 +3,7 @@ package kategory
 import java.util.*
 
 @higherkind
-data class SortedMapKW<A: Comparable<A>, B>(val map: SortedMap<A, B>) : SortedMapKWKind<A, B>, SortedMap<A, B> by map {
+data class SortedMapKW<A: Comparable<A>, B>(val map: SortedMap<A, B>) : SortedMapKWKind<A, B>, SortedMapKWKindedJ<A, B>, SortedMap<A, B> by map {
 
     fun <C> map(f: (B) -> C): SortedMapKW<A, C> =
             this.map.map { it.key to f(it.value) }.toMap().toSortedMap().k()

@@ -14,7 +14,7 @@ typealias KleisliFun<F, D, A> = (D) -> HK<F, A>
  * @property run the arrow from [D] to `HK<F, A>`.
  */
 @higherkind
-class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: Unit = Unit) : KleisliKind<F, D, A> {
+class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: Unit = Unit) : KleisliKind<F, D, A>, KleisliKindedJ<F, D, A> {
 
     /**
      * Apply a function `(A) -> B` that operates within the [Kleisli] context.

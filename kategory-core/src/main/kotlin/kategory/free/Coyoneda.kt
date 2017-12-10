@@ -2,7 +2,7 @@ package kategory
 
 private typealias AnyFunc = (Any?) -> Any?
 
-@higherkind data class Coyoneda<F, P, A>(val pivot: HK<F, P>, internal val ks: List<AnyFunc>) : CoyonedaKind<F, P, A> {
+@higherkind data class Coyoneda<F, P, A>(val pivot: HK<F, P>, internal val ks: List<AnyFunc>) : CoyonedaKind<F, P, A>, CoyonedaKindedJ<F, P, A> {
 
     @Suppress("UNCHECKED_CAST")
     private val transform: (P) -> A = {

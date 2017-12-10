@@ -4,7 +4,7 @@ typealias CokleisliFun<F, A, B> = (HK<F, A>) -> B
 
 typealias CoreaderT<F, A, B> = Cokleisli<F, A, B>
 
-@higherkind data class Cokleisli<F, A, B>(val MM: Comonad<F>, val run: CokleisliFun<F, A, B>) : CokleisliKind<F, A, B> {
+@higherkind data class Cokleisli<F, A, B>(val MM: Comonad<F>, val run: CokleisliFun<F, A, B>) : CokleisliKind<F, A, B>, CokleisliKindedJ<F, A, B> {
 
     inline fun <C, D> bimap(noinline g: (D) -> A, crossinline f: (B) -> C): Cokleisli<F, D, C> = Cokleisli(MM, { f(run(MM.map(it, g))) })
 

@@ -17,6 +17,7 @@
 include ':kategory-annotations'
 include ':kategory-annotations-processor'
 include ':kategory-core'
+include ':kategory-kindedj'
 include ':kategory-test'
 include ':kategory-examples'
 include ':kategory-effects'

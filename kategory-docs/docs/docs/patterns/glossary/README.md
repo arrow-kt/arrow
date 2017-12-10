@@ -93,6 +93,7 @@ data class ListKW<A>(val list: List<A>): HK<ListKWHK, A>
 ```
 
 You can read more about Higher Kinds and type constructors in [KindedJ's README](https://github.com/KindedJ/KindedJ#rationale).
+The library currently provides a layer of integration with [KindedJ]({{ '/docs/integrations/kindedj' | relative_url }}).
 
 #### Using Higher Kinds with typeclasses
 
@@ -117,6 +118,8 @@ This is because we need to safely downcast from `HK<ListKWHK, A>` to `ListKW<A>`
 
 The function `ev()` is already defined for all datatypes in KΛTEGORY. If you're creating your own datatype that's also a type constructor and would like to create all these helper types and functions,
 you can do so simply by annotating it as `@higerkind`, and using KΛTEGORY's [annotation processor](https://github.com/kategory/kategory#additional-setup) will create them for you.
+
+Note that the annotation `@higerkind` will also generate the integration typealiases required by [KindedJ]({{ '/docs/integrations/kindedj' | relative_url }}).
 
 #### Using Higher Kinds and typeclasses with functions
 

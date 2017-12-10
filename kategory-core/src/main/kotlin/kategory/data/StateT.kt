@@ -38,7 +38,7 @@ inline fun <reified F, S, A> StateTKind<F, S, A>.runM(initial: S, MF: Monad<F> =
 @higherkind
 class StateT<F, S, A>(
         val runF: StateTFunKind<F, S, A>
-) : StateTKind<F, S, A> {
+) : StateTKind<F, S, A>, StateTKindedJ<F, S, A> {
 
     companion object {
 
