@@ -14,6 +14,7 @@
     <ID>LabeledExpression:Eval.kt$Eval.&lt;no name provided&gt;$this@Eval</ID>
     <ID>LabeledExpression:Eval.kt$Eval.Compute$break@loop</ID>
     <ID>LabeledExpression:Eval.kt$Eval.Compute$loop@ while (true) { when (curr) { is Compute -&gt; { val currComp: Compute&lt;A&gt; = curr currComp.start&lt;A&gt;().let { cc -&gt; when (cc) { is Compute -&gt; { val inStartFun: (Any?) -&gt; Eval&lt;A&gt; = { cc.run(it) } val outStartFun: (Any?) -&gt; Eval&lt;A&gt; = { currComp.run(it) } curr = cc.start&lt;A&gt;() fs = listOf(inStartFun, outStartFun) + fs } else -&gt; { curr = currComp.run(cc.value()) } } } } else -&gt; if (fs.isNotEmpty()) { curr = fs[0](curr.value()) fs = fs.drop(1) } else { break@loop } } }</ID>
+    <ID>LabeledExpression:Coyoneda.kt$Coyoneda.&lt;no name provided&gt;$this@Coyoneda</ID>
     <ID>LabeledExpression:Yoneda.kt$Yoneda.&lt;no name provided&gt;$this@Yoneda</ID>
     <ID>LabeledExpression:Composed.kt$&lt;no name provided&gt;$this@compose</ID>
     <ID>LabeledExpression:Composed.kt$&lt;no name provided&gt;$this@compose</ID>
