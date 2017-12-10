@@ -18,7 +18,7 @@ fun <A> ObservableKWKind<A>.value(): Observable<A> =
         Foldable::class,
         Traverse::class
 )
-data class ObservableKW<A>(val observable: Observable<A>) : ObservableKWKind<A> {
+data class ObservableKW<A>(val observable: Observable<A>) : ObservableKWKind<A>, ObservableKWKindedJ<A> {
     fun <B> map(f: (A) -> B): ObservableKW<B> =
             observable.map(f).k()
 

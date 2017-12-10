@@ -2,7 +2,7 @@ package kategory
 
 @Suppress("UNCHECKED_CAST") inline fun <F, W, A> WriterTKind<F, W, A>.value(): HK<F, Tuple2<W, A>> = this.ev().value
 
-@higherkind data class WriterT<F, W, A>(val value: HK<F, Tuple2<W, A>>) : WriterTKind<F, W, A> {
+@higherkind data class WriterT<F, W, A>(val value: HK<F, Tuple2<W, A>>) : WriterTKind<F, W, A>, WriterTKindedJ<F, W, A> {
 
     companion object {
 

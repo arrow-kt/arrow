@@ -8,7 +8,7 @@ import java.io.File
 import javax.lang.model.element.Name
 
 val KindPostFix = "Kind"
-val KindedJPostFix = "KindJ"
+val KindedJPostFix = "KindedJ"
 val HKMarkerPostFix = "HK"
 
 data class HigherKind(

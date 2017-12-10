@@ -2,7 +2,7 @@ package kategory
 
 typealias CofreeEval<S, A> = HK<S, Cofree<S, A>>
 
-@higherkind data class Cofree<S, A>(val FS: Functor<S>, val head: A, val tail: Eval<CofreeEval<S, A>>) : CofreeKind<S, A> {
+@higherkind data class Cofree<S, A>(val FS: Functor<S>, val head: A, val tail: Eval<CofreeEval<S, A>>) : CofreeKind<S, A>, CofreeKindedJ<S, A> {
 
     fun tailForced(): CofreeEval<S, A> = tail.value()
 
