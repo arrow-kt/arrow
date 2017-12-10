@@ -25,12 +25,12 @@ public class Convert {
         }
 
         @NotNull
-        public HK<HK<ConvertHK, F>, A> asKategory() {
+        public HK<HK<ConvertHK, F>, A> toKategory() {
             return this;
         }
 
         @NotNull
-        public io.kindedj.Hk<F, A> asKindedJ() {
+        public io.kindedj.Hk<F, A> toKindedJ() {
             return hk;
         }
     }
@@ -45,12 +45,12 @@ public class Convert {
         }
 
         @NotNull
-        public HK<F, A> asKategory() {
+        public HK<F, A> toKategory() {
             return hk;
         }
 
         @NotNull
-        public io.kindedj.Hk<io.kindedj.Hk<ConvertHK, F>, A> asKindedJ() {
+        public io.kindedj.Hk<io.kindedj.Hk<ConvertHK, F>, A> toKindedJ() {
             return this;
         }
     }

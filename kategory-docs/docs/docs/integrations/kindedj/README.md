@@ -43,10 +43,10 @@ val idj = IdJ(1)
 val id: HK2<ConvertHK, IdJHK, A> = idj.fromKindedJ()
 ```
 
-and convert it back using `convert()`:
+and convert it back using `fromKategory()`:
 
 ```kotlin
-val idj2: io.kindedj.Hk<IdJHK, A> = id.convert()
+val idj2: io.kindedj.Hk<IdJHK, A> = id.fromKategory()
 ```
 
 #### Using Kategory in KindedJ from Java
@@ -68,10 +68,10 @@ IdK idk = new IdK(1);
 Convert.FromKategoryToKindedJ<IdJHK, A> idj = Convert.toKindedJ(idk);
 ```
 
-and convert it back using `FromKategoryToKindedJ.asKategory()`:
+and convert it back using `FromKategoryToKindedJ.toKategory()`:
 
 ```
-IdJ idk2 = idj.asKategory();
+IdJ idk2 = idj.toKategory();
 ```
 
 #### How to work with the conversion layer
