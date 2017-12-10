@@ -100,31 +100,6 @@ object IORunLoop {
     inline private fun <A> sanitizedCurrentIO(currentIO: Current?, unboxed: Any?): IO<A> =
             (currentIO ?: Pure(unboxed)) as IO<A>
 
-    private fun findErrorHandlerInCallStack(bFirst: BindF?, bRest: CallStack?): IOFrame<Any?, IO<Any?>>? {
-        if (bFirst != null && bFirst is IOFrame) {
-            return bFirst
-        } else if (bRest == null) {
-            return null
-        }
-
-        var result: IOFrame<Any?, IO<Any?>>? = null
-        var cursor: BindF? = bFirst
-
-        do {
-            if (cursor != null && cursor is IOFrame) {
-                result = cursor
-                break
-            } else {
-                cursor = if (bRest.isNotEmpty()) {
-                    bRest.pop()
-                } else {
-                    break
-                }
-            }
-        } while (true)
-        return result
-    }
-
     private fun <A> suspendInAsync(
             currentIO: IO<A>,
             bFirst: BindF?,
@@ -267,6 +242,31 @@ object IORunLoop {
             } else {
                 null
             }
+
+    private fun findErrorHandlerInCallStack(bFirst: BindF?, bRest: CallStack?): IOFrame<Any?, IO<Any?>>? {
+        if (bFirst != null && bFirst is IOFrame) {
+            return bFirst
+        } else if (bRest == null) {
+            return null
+        }
+
+        var result: IOFrame<Any?, IO<Any?>>? = null
+        var cursor: BindF? = bFirst
+
+        do {
+            if (cursor != null && cursor is IOFrame) {
+                result = cursor
+                break
+            } else {
+                cursor = if (bRest.isNotEmpty()) {
+                    bRest.pop()
+                } else {
+                    break
+                }
+            }
+        } while (true)
+        return result
+    }
 
     private data class RestartCallback(val cb: Callback) : Callback {
 
