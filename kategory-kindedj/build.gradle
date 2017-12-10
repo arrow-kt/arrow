@@ -1,0 +1,17 @@
+dependencies {
+    compile project(':kategory-core')
+
+    kapt project(':kategory-annotations-processor')
+    kaptTest project(':kategory-annotations-processor')
+    compileOnly project(':kategory-annotations-processor')
+    testCompileOnly project(':kategory-annotations-processor')
+
+    testCompile project(':kategory-test')
+
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+apply from: rootProject.file('gradle/generated-kotlin-sources.gradle')
+apply plugin: 'kotlin-kapt'
