@@ -249,6 +249,9 @@ options:
       - title: kotlinx.coroutines
         url: /docs/integrations/kotlinxcoroutines/
 
+      - title: KindedJ
+        url: /docs/integrations/kindedj/
+
   - title: Legal
 
     nested_options:
