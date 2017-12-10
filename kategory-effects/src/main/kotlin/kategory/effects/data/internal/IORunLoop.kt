@@ -2,6 +2,8 @@ package kategory.effects
 
 import kategory.Either
 import kategory.effects.internal.Platform.ArrayStack
+import kategory.left
+import kategory.right
 
 private typealias Current = IO<Any?>
 private typealias BindF = (Any?) -> IO<Any?>
@@ -29,7 +31,7 @@ object IORunLoop {
                 is RaiseError -> {
                     val errorHandler: IOFrame<Any?, IO<Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
                     when (errorHandler) {
-                    // Exit case for unhandled errors
+                    // Return case for unhandled errors
                         null -> return currentIO
                         else -> {
                             val exception: Throwable = currentIO.exception
@@ -152,26 +154,100 @@ object IORunLoop {
 
     private fun loop(
             source: Current,
-            cb: (Either<Throwable, Any>) -> Unit,
+            cb: (Either<Throwable, Any?>) -> Unit,
             rcbRef: RestartCallback?,
             bFirstRef: BindF?,
             bRestRef: CallStack?): Unit {
-        TODO()
         var currentIO: Current? = source
         var bFirst: BindF? = bFirstRef
         var bRest: CallStack? = bRestRef
         var rcb: RestartCallback? = rcbRef
         // Values from Pure and Delay are unboxed in this var,
         // for code reuse between Pure and Delay
-        var hasUnboxed: Boolean = false
-        var unboxed: Any? = null
+        var hasResult: Boolean = false
+        var result: Any? = null
 
         do {
+            when (currentIO) {
+                is Pure -> {
+                    result = currentIO.a
+                    hasResult = true
+                }
+                is RaiseError -> {
+                    val errorHandler: IOFrame<Any?, IO<Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
+                    when (errorHandler) {
+                    // Return case for unhandled errors
+                        null -> {
+                            cb(currentIO.exception.left())
+                            return
+                        }
+                        else -> {
+                            val exception: Throwable = currentIO.exception
+                            currentIO = executeSafe { errorHandler.recover(exception) }
+                            bFirst = null
+                        }
+                    }
+                }
+                is Suspend -> {
+                    val thunk: () -> IO<Any?> = currentIO.thunk
+                    currentIO = executeSafe { thunk() }
+                }
+                is Delay -> {
+                    try {
+                        result = currentIO.thunk()
+                        hasResult = true
+                        currentIO = null
+                    } catch (t: Throwable) {
+                        currentIO = RaiseError(t)
+                    }
+                }
+                is Async -> {
+                    if (rcb == null) {
+                        rcb = RestartCallback(cb)
+                    }
+                    rcb.prepare(bFirst, bRest)
+                    // Return case for Async operations
+                    return currentIO.cont(rcb)
+                }
+                is Bind<*, *> -> {
+                    if (bFirst != null) {
+                        if (bRest == null) bRest = ArrayStack()
+                        bRest.push(bFirst)
+                    }
+                    bFirst = currentIO.g as BindF
+                    currentIO = currentIO.cont
+                }
+                is Map<*, *> -> {
+                    if (bFirst != null) {
+                        if (bRest == null) {
+                            bRest = ArrayStack()
+                        }
+                        bRest.push(bFirst)
+                    }
+                    bFirst = currentIO as BindF
+                    currentIO = currentIO.source
+                }
+                null -> {
+                    currentIO = RaiseError(NullPointerException("Stepping on null IO"))
+                }
 
-            // Exit case
-            val nextBind = popNextBind(bFirst, bRest)
+            }
 
-            break
+            if (hasResult) {
+
+                val nextBind: BindF? = popNextBind(bFirst, bRest)
+
+                // Return case when no there are no more binds left
+                if (nextBind == null) {
+                    cb(result.right())
+                    return
+                } else {
+                    currentIO = executeSafe { nextBind(result) }
+                    hasResult = false
+                    result = null
+                    bFirst = null
+                }
+            }
 
         } while (true)
     }

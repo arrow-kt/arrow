@@ -24,14 +24,7 @@ sealed class IO<out A> : IOKind<A> {
 
         operator fun <A> invoke(f: () -> A): IO<A> = suspend { Pure(f()) }
 
-        fun <A> suspend(f: () -> IO<A>): IO<A> =
-                Suspend {
-                    try {
-                        f()
-                    } catch (throwable: Throwable) {
-                        RaiseError(throwable)
-                    }
-                }
+        fun <A> suspend(f: () -> IO<A>): IO<A> = Suspend(f)
 
         fun <A> runAsync(k: Proc<A>): IO<A> =
                 Async { ff: (Either<Throwable, A>) -> Unit ->
