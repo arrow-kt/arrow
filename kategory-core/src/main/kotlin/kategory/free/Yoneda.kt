@@ -8,7 +8,7 @@ package kategory
 
     fun <B> map(ff: (A) -> B): Yoneda<F, B> =
             object : Yoneda<F, B>() {
-                override fun <C> invoke(f: (B) -> C): HK<F, C> = this@Yoneda({ f(ff(it)) })
+                override fun <C> invoke(f: (B) -> C): HK<F, C> = this@Yoneda { f(ff(it)) }
             }
 
     fun toCoyoneda(): Coyoneda<F, A, A> = Coyoneda(lower(), listOf({ a: Any? -> a }))

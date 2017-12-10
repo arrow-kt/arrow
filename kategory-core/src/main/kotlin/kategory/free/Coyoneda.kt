@@ -16,9 +16,10 @@ private typealias AnyFunc = (Any?) -> Any?
     @Suppress("UNCHECKED_CAST")
     fun <B> map(f: (A) -> B): Coyoneda<F, P, B> = Coyoneda(pivot, ks + f as AnyFunc)
 
-    fun toYoneda(): Yoneda<F, A> =
+    fun toYoneda(FF: Functor<F>): Yoneda<F, A> =
             object : Yoneda<F, A>() {
-                override operator fun <B> invoke(f: (A) -> B): HK<F, B> = map(f).lower()
+                override operator fun <B> invoke(f: (A) -> B): HK<F, B> =
+                        this@Coyoneda.map(f).lower(FF)
             }
 
     companion object {
