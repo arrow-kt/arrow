@@ -1,17 +1,15 @@
 package kategory.effects.internal
 
+import kategory.*
 import kategory.effects.Duration
-import kategory.Either
 import kategory.effects.IO
-import kategory.Left
-import kategory.Option
-import kategory.None
-import kategory.Right
-import kategory.Some
+import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
 
 object Platform {
+
+    class ArrayStack<A>: ArrayDeque<A>()
 
     inline fun <A> onceOnly(crossinline f: (A) -> Unit): (A) -> Unit {
         val wasCalled = AtomicBoolean(false)

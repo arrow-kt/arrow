@@ -3,7 +3,6 @@ package kategory.effects
 import kategory.*
 import kategory.Either.Left
 import kategory.Either.Right
-import kategory.effects.data.internal.IORunLoop
 import kategory.effects.internal.Platform.onceOnly
 import kategory.effects.internal.Platform.unsafeResync
 
@@ -223,18 +222,12 @@ sealed class IO<out A> : IOKind<A> {
             IORunLoop.start(this, cb)
 
     fun unsafeRunSync(): A =
-            unsafeRunTimed(Duration.INFINITE).fold({ throw IllegalArgumentException("IO execution should yield a valid result") }, { it })
+            unsafeRunTimed(Duration.INFINITE)
+                    .fold({ throw IllegalArgumentException("IO execution should yield a valid result") }, { it })
 
     fun unsafeRunTimed(limit: Duration): Option<A> = IORunLoop.step(this).unsafeRunTimedTotal(limit)
 
     internal abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
-
-    override fun toString(): String =
-            when (this) {
-                is Pure -> "IO(${this.a})"
-                is RaiseError -> "IO(throw ${this.exception})"
-                else -> super.toString()
-            }
 }
 
 internal data class Pure<out A>(val a: A) : IO<A>() {
@@ -249,7 +242,13 @@ internal data class RaiseError(val exception: Throwable) : IO<Nothing>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<Nothing> = throw exception
 }
 
-internal data class Suspend<out A>(val cont: () -> IO<A>) : IO<A>() {
+internal data class Delay<out A>(val thunk: () -> A) : IO<A>() {
+    override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
+
+    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
+}
+
+internal data class Suspend<out A>(val thunk: () -> IO<A>) : IO<A>() {
     override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
@@ -261,13 +260,15 @@ internal data class Async<out A>(val cont: Proc<A>) : IO<A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
 }
 
-internal data class Bind<E, out A>(val cont: IO<E>, val f: (E) -> IO<A>) : IO<A>() {
+internal data class Bind<E, out A>(val cont: IO<E>, val g: (E) -> IO<A>) : IO<A>() {
     override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
 }
 
-internal data class Map<E, out A>(val source: IO<E>, val g: (E) -> A, val index: Int) : IO<A>() {
+internal data class Map<E, out A>(val source: IO<E>, val g: (E) -> A, val index: Int) : IO<A>(), (E) -> IO<A> {
+    override fun invoke(value: E): IO<A> = pure(g(value))
+
     override fun <B> map(f: (A) -> B): IO<B> =
             // Allowed to do 32 map operations in sequence before
             // triggering `flatMap` in order to avoid stack overflows
