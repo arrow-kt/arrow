@@ -1,6 +1,8 @@
-package kategory
+package kategory.kindedj
 
 import io.kindedj.HkJ2
+import kategory.HK
+import kategory.HK2
 import io.kindedj.Hk as HK_J
 
 class ConvertHK private constructor()

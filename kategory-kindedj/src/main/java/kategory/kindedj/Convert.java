@@ -1,6 +1,8 @@
-package kategory;
+package kategory.kindedj;
 
 import org.jetbrains.annotations.NotNull;
+
+import kategory.HK;
 
 public class Convert {
     @NotNull
