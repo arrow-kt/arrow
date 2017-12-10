@@ -1,6 +1,8 @@
 package kategory
 
 import java.lang.IllegalArgumentException
+import java.lang.reflect.Method
+import java.lang.reflect.Modifier
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.lang.reflect.TypeVariable
@@ -179,7 +181,7 @@ private fun instanceFromImplicitObject(t: InstanceParametrizedType): Any? {
     val allCompanionFunctions = globalInstanceProvider.methods
     val factoryFunction = allCompanionFunctions.find { it.name == "instance" }
     return if (factoryFunction != null) {
-        val values: List<Any> = factoryFunction.parameterTypes.mapIndexedNotNull { n, p ->
+        val values = factoryFunction.parameterTypes.mapIndexedNotNull { n, p ->
             if (Typeclass::class.java.isAssignableFrom(p)) {
                 val classifier = InstanceParametrizedType(p, p.typeParameters.toList())
                 val vType = reifyRawParameterizedType(t, classifier, n)
@@ -187,11 +189,28 @@ private fun instanceFromImplicitObject(t: InstanceParametrizedType): Any? {
                 if (value != null) registerInstance(vType, value)
                 value
             } else null
-        }
+        }.toTypedArray()
+
         factoryFunction.isAccessible = true
-        factoryFunction.invoke(null, *values.toTypedArray())
+
+        val instance =
+                // If the function has the modifier we don't need an instance to call it.
+                if (factoryFunction.isStatic()) null
+                // Otherwise we need to obtain the singleton object in order to call the
+                // 'instance' function on it
+                else globalInstanceProvider.fields.firstOrNull { it.name == "INSTANCE" }?.get(null)
+
+        if (values.isEmpty()) {
+            factoryFunction.invoke(instance)
+        } else {
+            factoryFunction.invoke(instance, *values)
+        }
+
     } else null
 }
+
+private fun Method.isStatic() =
+        Modifier.isStatic(modifiers)
 
 private fun reifyRawParameterizedType(carrier: InstanceParametrizedType, classifier: ParameterizedType, index: Int): InstanceParametrizedType =
         if (classifier.actualTypeArguments.any { it is TypeVariable<*> } && carrier.actualTypeArguments.size > index + 1) {
@@ -204,4 +223,4 @@ private fun reifyRawParameterizedType(carrier: InstanceParametrizedType, classif
         }
 
 private fun Type.asKotlinClass(): KClass<*>? =
-        if (this is Class<*>) this.kotlin else null
+        (this as? Class<*>)?.kotlin

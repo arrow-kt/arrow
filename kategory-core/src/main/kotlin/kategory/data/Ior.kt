@@ -73,7 +73,7 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
          * an [Ior.Left], [Ior.Right], or [Ior.Both] if [oa], [ob], or both are defined (respectively).
          */
 
-        @JvmStatic fun <A, B> fromOptions(oa: Option<A>, ob: Option<B>): Option<Ior<A, B>> = when (oa) {
+        fun <A, B> fromOptions(oa: Option<A>, ob: Option<B>): Option<Ior<A, B>> = when (oa) {
             is Some -> when (ob) {
                 is Some -> Some(Both(oa.value, ob.value))
                 is None -> Some(Left(oa.value))

@@ -9,13 +9,13 @@ object ByteMonoid : Monoid<Byte>, Semigroup<Byte> by SGByte {
 }
 
 object ByteMonoidInstanceImplicits {
-    @JvmStatic fun instance(): ByteMonoid = ByteMonoid
+    fun instance(): ByteMonoid = ByteMonoid
 }
 
 private val SGByte: Semigroup<Byte> = NumberSemigroup({ one, two -> (one + two).toByte() })
 
 object ByteSemigroupInstanceImplicits {
-    @JvmStatic fun instance(): Semigroup<Byte> = SGByte
+    fun instance(): Semigroup<Byte> = SGByte
 }
 
 object ByteOrderInstance : Order<Byte> {
@@ -23,7 +23,7 @@ object ByteOrderInstance : Order<Byte> {
 }
 
 object ByteOrderInstanceImplicits {
-    @JvmStatic fun instance(): Order<Byte> = ByteOrderInstance
+    fun instance(): Order<Byte> = ByteOrderInstance
 }
 
 object ByteEqInstance: Eq<Byte> {
@@ -31,7 +31,7 @@ object ByteEqInstance: Eq<Byte> {
 }
 
 object ByteEqInstanceImplicits {
-    @JvmStatic fun instance(): ByteEqInstance = ByteEqInstance
+    fun instance(): ByteEqInstance = ByteEqInstance
 }
 
 object DoubleMonoid : Monoid<Double>, Semigroup<Double> by SGDouble {
@@ -39,13 +39,13 @@ object DoubleMonoid : Monoid<Double>, Semigroup<Double> by SGDouble {
 }
 
 object DoubleMonoidInstanceImplicits {
-    @JvmStatic fun instance(): DoubleMonoid = DoubleMonoid
+    fun instance(): DoubleMonoid = DoubleMonoid
 }
 
 private val SGDouble: Semigroup<Double> = NumberSemigroup(Double::plus)
 
 object DoubleSemigroupInstanceImplicits {
-    @JvmStatic fun instance(): Semigroup<Double> = SGDouble
+    fun instance(): Semigroup<Double> = SGDouble
 }
 
 object DoubleOrderInstance : Order<Double> {
@@ -53,7 +53,7 @@ object DoubleOrderInstance : Order<Double> {
 }
 
 object DoubleOrderInstanceImplicits {
-    @JvmStatic fun instance(): Order<Double> = DoubleOrderInstance
+    fun instance(): Order<Double> = DoubleOrderInstance
 }
 
 object DoubleEqInstance: Eq<Double> {
@@ -61,7 +61,7 @@ object DoubleEqInstance: Eq<Double> {
 }
 
 object DoubleEqInstanceImplicits {
-    @JvmStatic fun instance(): DoubleEqInstance = DoubleEqInstance
+    fun instance(): DoubleEqInstance = DoubleEqInstance
 }
 
 object IntMonoid : Monoid<Int>, Semigroup<Int> by SGInt {
@@ -69,13 +69,13 @@ object IntMonoid : Monoid<Int>, Semigroup<Int> by SGInt {
 }
 
 object IntMonoidInstanceImplicits {
-    @JvmStatic fun instance(): IntMonoid = IntMonoid
+    fun instance(): IntMonoid = IntMonoid
 }
 
 private val SGInt: Semigroup<Int> = NumberSemigroup(Int::plus)
 
 object IntSemigroupInstanceImplicits {
-    @JvmStatic fun instance(): Semigroup<Int> = SGInt
+    fun instance(): Semigroup<Int> = SGInt
 }
 
 object IntEqInstance: Eq<Int> {
@@ -83,7 +83,7 @@ object IntEqInstance: Eq<Int> {
 }
 
 object IntEqInstanceImplicits {
-    @JvmStatic fun instance(): IntEqInstance = IntEqInstance
+    fun instance(): IntEqInstance = IntEqInstance
 }
 
 object IntOrderInstance : Order<Int> {
@@ -91,7 +91,7 @@ object IntOrderInstance : Order<Int> {
 }
 
 object IntOrderInstanceImplicits {
-    @JvmStatic fun instance(): Order<Int> = IntOrderInstance
+    fun instance(): Order<Int> = IntOrderInstance
 }
 
 object LongMonoid : Monoid<Long>, Semigroup<Long> by SGLong {
@@ -99,13 +99,13 @@ object LongMonoid : Monoid<Long>, Semigroup<Long> by SGLong {
 }
 
 object LongMonoidInstanceImplicits {
-    @JvmStatic fun instance(): LongMonoid = LongMonoid
+    fun instance(): LongMonoid = LongMonoid
 }
 
 private val SGLong: Semigroup<Long> = NumberSemigroup(Long::plus)
 
 object LongSemigroupInstanceImplicits {
-    @JvmStatic fun instance(): Semigroup<Long> = SGLong
+    fun instance(): Semigroup<Long> = SGLong
 }
 
 object LongOrderInstance : Order<Long> {
@@ -113,7 +113,7 @@ object LongOrderInstance : Order<Long> {
 }
 
 object LongOrderInstanceImplicits {
-    @JvmStatic fun instance(): Order<Long> = LongOrderInstance
+    fun instance(): Order<Long> = LongOrderInstance
 }
 
 object LongEqInstance: Eq<Long> {
@@ -121,7 +121,7 @@ object LongEqInstance: Eq<Long> {
 }
 
 object LongEqInstanceImplicits {
-    @JvmStatic fun instance(): LongEqInstance = LongEqInstance
+    fun instance(): LongEqInstance = LongEqInstance
 }
 
 object ShortMonoid : Monoid<Short>, Semigroup<Short> by SGShort {
@@ -129,13 +129,13 @@ object ShortMonoid : Monoid<Short>, Semigroup<Short> by SGShort {
 }
 
 object ShortMonoidInstanceImplicits {
-    @JvmStatic fun instance(): ShortMonoid = ShortMonoid
+    fun instance(): ShortMonoid = ShortMonoid
 }
 
 private val SGShort: Semigroup<Short> = NumberSemigroup({ one, two -> (one + two).toShort() })
 
 object ShortSemigroupInstanceImplicits {
-    @JvmStatic fun instance(): Semigroup<Short> = SGShort
+    fun instance(): Semigroup<Short> = SGShort
 }
 
 object ShortOrderInstance : Order<Short> {
@@ -143,7 +143,7 @@ object ShortOrderInstance : Order<Short> {
 }
 
 object ShortOrderInstanceImplicits {
-    @JvmStatic fun instance(): Order<Short> = ShortOrderInstance
+    fun instance(): Order<Short> = ShortOrderInstance
 }
 
 object ShortEqInstance: Eq<Short> {
@@ -151,7 +151,7 @@ object ShortEqInstance: Eq<Short> {
 }
 
 object ShortEqInstanceImplicits {
-    @JvmStatic fun instance(): ShortEqInstance = ShortEqInstance
+    fun instance(): ShortEqInstance = ShortEqInstance
 }
 
 object FloatMonoid : Monoid<Float>, Semigroup<Float> by SGFloat {
@@ -159,13 +159,13 @@ object FloatMonoid : Monoid<Float>, Semigroup<Float> by SGFloat {
 }
 
 object FloatMonoidInstanceImplicits {
-    @JvmStatic fun instance(): FloatMonoid = FloatMonoid
+    fun instance(): FloatMonoid = FloatMonoid
 }
 
 private val SGFloat: Semigroup<Float> = NumberSemigroup(Float::plus)
 
 object FloatSemigroupInstanceImplicits {
-    @JvmStatic fun instance(): Semigroup<Float> = SGFloat
+    fun instance(): Semigroup<Float> = SGFloat
 }
 
 object FloatOrderInstance : Order<Float> {
@@ -173,7 +173,7 @@ object FloatOrderInstance : Order<Float> {
 }
 
 object FloatOrderInstanceImplicits {
-    @JvmStatic fun instance(): Order<Float> = FloatOrderInstance
+    fun instance(): Order<Float> = FloatOrderInstance
 }
 
 object FloatEqInstance: Eq<Float> {
@@ -181,5 +181,5 @@ object FloatEqInstance: Eq<Float> {
 }
 
 object FloatEqInstanceImplicits {
-    @JvmStatic fun instance(): FloatEqInstance = FloatEqInstance
+    fun instance(): FloatEqInstance = FloatEqInstance
 }

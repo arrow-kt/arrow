@@ -89,9 +89,9 @@ class NonEmptyList<out A> private constructor(
     override fun toString(): String = "NonEmptyList(all=$all)"
 
     companion object {
-        @JvmStatic fun <A> of(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
-        @JvmStatic fun <A> fromList(l: List<A>): Option<NonEmptyList<A>> = if (l.isEmpty()) None else Some(NonEmptyList(l))
-        @JvmStatic fun <A> fromListUnsafe(l: List<A>): NonEmptyList<A> = NonEmptyList(l)
+        fun <A> of(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
+        fun <A> fromList(l: List<A>): Option<NonEmptyList<A>> = if (l.isEmpty()) None else Some(NonEmptyList(l))
+        fun <A> fromListUnsafe(l: List<A>): NonEmptyList<A> = NonEmptyList(l)
 
         fun <A> pure(a: A): NonEmptyList<A> = a.nel()
 
