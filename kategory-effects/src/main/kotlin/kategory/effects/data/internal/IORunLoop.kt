@@ -268,7 +268,6 @@ object IORunLoop {
                 null
             }
 
-
     private data class RestartCallback(val cb: Callback) : Callback {
 
         private var canCall = false

@@ -9,7 +9,7 @@ import java.util.concurrent.locks.AbstractQueuedSynchronizer
 
 object Platform {
 
-    class ArrayStack<A>: ArrayDeque<A>()
+    class ArrayStack<A> : ArrayDeque<A>()
 
     inline fun <A> onceOnly(crossinline f: (A) -> Unit): (A) -> Unit {
         val wasCalled = AtomicBoolean(false)

@@ -199,7 +199,6 @@ sealed class IO<out A> : IOKind<A> {
                 ).ev()
     }
 
-
     abstract fun <B> map(f: (A) -> B): IO<B>
 
     fun <B> flatMap(f: (A) -> IOKind<B>): IO<B> =

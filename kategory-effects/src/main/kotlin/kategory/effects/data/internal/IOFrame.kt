@@ -17,7 +17,6 @@ interface IOFrame<in A, out R> : (A) -> R {
         fun <A> errorHandler(fe: (Throwable) -> IO<A>): IOFrame<A, IO<A>> =
                 ErrorHandler(fe)
 
-
         data class ErrorHandler<A>(val fe: (Throwable) -> IO<A>) : IOFrame<A, IO<A>> {
             override fun invoke(a: A): IO<A> = Pure(a)
 
