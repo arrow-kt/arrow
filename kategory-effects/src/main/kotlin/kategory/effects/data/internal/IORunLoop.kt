@@ -207,7 +207,8 @@ object IORunLoop {
                     }
                     rcb.prepare(bFirst, bRest)
                     // Return case for Async operations
-                    return currentIO.cont(rcb)
+                    currentIO.cont(rcb)
+                    return
                 }
                 is Bind<*, *> -> {
                     if (bFirst != null) {
