@@ -13,7 +13,7 @@ public class KatDataclassKindedJShow implements KindedJShow<Hk<ConvertHK, KatDat
 
     @Override
     public <A> String show(Hk<Hk<ConvertHK, KatDataclassHK>, A> hk) {
-        final kategory.HK<KatDataclassHK, A> cast = ConvertKt.convert(hk);
+        final kategory.HK<KatDataclassHK, A> cast = ConvertKt.toKategory(hk);
         return KatDataclassKt.show(cast);
     }
 
