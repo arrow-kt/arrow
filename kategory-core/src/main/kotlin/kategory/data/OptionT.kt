@@ -6,7 +6,7 @@ package kategory
  *
  * It may also be said that [OptionT] is a monad transformer for [Option].
  */
-@higherkind data class OptionT<F, A>(val value: HK<F, Option<A>>) : OptionTKind<F, A> {
+@higherkind data class OptionT<F, A>(val value: HK<F, Option<A>>) : OptionTKind<F, A>, OptionTKindedJ<F, A> {
 
     companion object {
 

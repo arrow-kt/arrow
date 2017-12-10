@@ -8,6 +8,7 @@ import java.io.File
 import javax.lang.model.element.Name
 
 val KindPostFix = "Kind"
+val KindedJPostFix = "KindedJ"
 val HKMarkerPostFix = "HK"
 
 data class HigherKind(
@@ -17,17 +18,19 @@ data class HigherKind(
     val tparams: List<ProtoBuf.TypeParameter> = target.classOrPackageProto.typeParameters
     val kindName: Name = target.classElement.simpleName
     val alias: String = if (tparams.size == 1) "kategory.HK" else "kategory.HK${tparams.size}"
+    val aliasJ: String = if (tparams.size == 1) "io.kindedj.Hk" else "io.kindedj.HkJ${tparams.size}"
     val typeArgs: List<String> = target.classOrPackageProto.typeParameters.map { target.classOrPackageProto.nameResolver.getString(it.name) }
     val expandedTypeArgs: String = target.classOrPackageProto.typeParameters.joinToString(
             separator = ", ", transform = { target.classOrPackageProto.nameResolver.getString(it.name) })
     val typeConstraints = target.classOrPackageProto.typeConstraints()
     val name: String = "${kindName}$KindPostFix"
+    val nameJ: String = "${kindName}$KindedJPostFix"
     val markerName = "${kindName}$HKMarkerPostFix"
 }
 
 class HigherKindsFileGenerator(
         private val generatedDir: File,
-        private val annotatedList: List<AnnotatedHigherKind>
+        annotatedList: List<AnnotatedHigherKind>
 ) {
 
     private val higherKinds: List<HigherKind> = annotatedList.map { HigherKind(it.classOrPackageProto.`package`, it) }
@@ -37,21 +40,21 @@ class HigherKindsFileGenerator(
      */
     fun generate() {
         higherKinds.forEachIndexed { _, hk ->
-            val elementsToGenerate = listOf(genKindMarker(hk), genKindTypeAliases(hk), genEv(hk))
+            val elementsToGenerate = listOf(genKindMarker(hk), genKindTypeAliases(hk), genKindedJTypeAliases(hk), genEv(hk))
             val source: String = elementsToGenerate.joinToString(prefix = "package ${hk.`package`}\n\n", separator = "\n", postfix = "\n")
             val file = File(generatedDir, higherKindsAnnotationClass.simpleName + ".${hk.target.classElement.qualifiedName}.kt")
             file.writeText(source)
         }
     }
 
-    private fun genKindTypeAliases(hk: HigherKind): String = if (hk.tparams.isEmpty()) {
-        knownError("Class must have at least one type param to derive HigherKinds")
-    } else if (hk.tparams.size <= 5) {
-        val kindAlias = "typealias ${hk.name}<${hk.expandedTypeArgs}> = ${hk.alias}<${hk.markerName}, ${hk.expandedTypeArgs}>"
-        val acc = if (hk.tparams.size == 1) kindAlias else kindAlias + "\n" + genPartiallyAppliedKinds(hk)
-        acc
-    } else {
-        knownError("HigherKinds are currently only supported up to a max of 5 type args")
+    private fun genKindTypeAliases(hk: HigherKind): String = when {
+        hk.tparams.isEmpty() -> knownError("Class must have at least one type param to derive HigherKinds")
+        hk.tparams.size <= 5 -> {
+            val kindAlias = "typealias ${hk.name}<${hk.expandedTypeArgs}> = ${hk.alias}<${hk.markerName}, ${hk.expandedTypeArgs}>"
+            val acc = if (hk.tparams.size == 1) kindAlias else kindAlias + "\n" + genPartiallyAppliedKinds(hk)
+            acc
+        }
+        else -> knownError("HigherKinds are currently only supported up to a max of 5 type args")
     }
 
     private fun genPartiallyAppliedKinds(hk: HigherKind): String {
@@ -60,6 +63,16 @@ class HigherKindsFileGenerator(
         val hkimpl = if (appliedTypeArgs.size == 1) "kategory.HK" else "kategory.HK${appliedTypeArgs.size}"
         return "typealias ${hk.name}Partial<$expandedAppliedTypeArgs> = $hkimpl<${hk.markerName}, $expandedAppliedTypeArgs>"
     }
+
+    private fun genKindedJTypeAliases(hk: HigherKind): String =
+            if (hk.tparams.size <= 5 && allInvariantParams(hk.tparams)) {
+                "typealias ${hk.nameJ}<${hk.expandedTypeArgs}> = ${hk.aliasJ}<${hk.markerName}, ${hk.expandedTypeArgs}>"
+            } else {
+                ""
+            }
+
+    private fun allInvariantParams(tparams: List<ProtoBuf.TypeParameter>): Boolean =
+            tparams.all { it.variance == ProtoBuf.TypeParameter.Variance.INV }
 
     private fun genEv(hk: HigherKind): String =
             """

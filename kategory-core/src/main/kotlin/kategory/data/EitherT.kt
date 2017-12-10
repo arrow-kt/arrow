@@ -6,7 +6,7 @@ package kategory
  *
  * It may also be said that [EitherT] is a monad transformer for [Either].
  */
-@higherkind data class EitherT<F, A, B>(val value: HK<F, Either<A, B>>) : EitherTKind<F, A, B> {
+@higherkind data class EitherT<F, A, B>(val value: HK<F, Either<A, B>>) : EitherTKind<F, A, B>, EitherTKindedJ<F, A, B> {
 
     companion object {
 

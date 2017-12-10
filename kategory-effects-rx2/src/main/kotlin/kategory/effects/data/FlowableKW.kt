@@ -17,7 +17,7 @@ fun <A> FlowableKWKind<A>.value(): Flowable<A> = this.ev().flowable
         Foldable::class,
         Traverse::class
 )
-data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A> {
+data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A>, FlowableKWKindedJ<A> {
 
     fun <B> map(f: (A) -> B): FlowableKW<B> =
             flowable.map(f).k()
