@@ -212,7 +212,6 @@ private fun instanceFromImplicitObject(t: InstanceParametrizedType): Any? {
 private fun Method.isStatic() =
         Modifier.isStatic(modifiers)
 
-
 private fun reifyRawParameterizedType(carrier: InstanceParametrizedType, classifier: ParameterizedType, index: Int): InstanceParametrizedType =
         if (classifier.actualTypeArguments.any { it is TypeVariable<*> } && carrier.actualTypeArguments.size > index + 1) {
             InstanceParametrizedType(classifier.rawType, listOf(carrier.actualTypeArguments[index + 1]))

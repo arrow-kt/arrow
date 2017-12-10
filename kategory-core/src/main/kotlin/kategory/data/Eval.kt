@@ -48,21 +48,15 @@ sealed class Eval<out A> : EvalKind<A> {
 
         fun <A> pure(a: A): Eval<A> = Eval.now(a)
 
-
         fun <A> now(a: A) = Now(a)
-
 
         fun <A> later(f: () -> A) = Later(f)
 
-
         fun <A> always(f: () -> A) = Always(f)
-
 
         fun <A> defer(f: () -> Eval<A>): Eval<A> = Call(f)
 
-
         fun raise(t: Throwable): Eval<Nothing> = defer { throw t }
-
 
         val Unit: Eval<Unit> = Now(kotlin.Unit)
 
