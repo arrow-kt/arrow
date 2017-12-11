@@ -11,7 +11,7 @@ private typealias CallStack = ArrayStack<BindF>
 private typealias Callback = (Either<Throwable, Any?>) -> Unit
 
 @Suppress("UNCHECKED_CAST")
-object IORunLoop {
+internal object IORunLoop {
     fun <A> start(source: IO<A>, cb: (Either<Throwable, A>) -> Unit): Unit =
             loop(source, cb as Callback, null, null, null)
 
