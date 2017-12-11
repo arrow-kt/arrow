@@ -76,6 +76,7 @@ object IORunLoop {
                     currentIO = currentIO.source
                 }
                 null -> {
+                    currentIO = RaiseError(NullPointerException("Stepping on null IO"))
                 }
             }
 
@@ -195,6 +196,7 @@ object IORunLoop {
                     currentIO = currentIO.source
                 }
                 null -> {
+                    currentIO = RaiseError(NullPointerException("Looping on null IO"))
                 }
             }
 
