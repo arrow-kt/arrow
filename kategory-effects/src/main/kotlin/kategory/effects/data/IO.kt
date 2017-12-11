@@ -274,6 +274,6 @@ fun <A, B> IO<A>.ap(ff: IOKind<(A) -> B>): IO<B> =
         flatMap { a -> ff.ev().map({ it(a) }) }
 
 fun <A> IO<A>.handleErrorWith(f: (Throwable) -> IOKind<A>): IO<A> =
-        attempt().flatMap { it.ev().fold(f, { IO.pure(it) }).ev() }
+        Bind(this, IOFrame.errorHandler(f))
 
 fun <A> A.liftIO(): IO<A> = IO.pure(this)
