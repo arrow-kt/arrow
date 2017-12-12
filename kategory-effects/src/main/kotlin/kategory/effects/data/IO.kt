@@ -3,6 +3,7 @@ package kategory.effects
 import kategory.*
 import kategory.Either.Left
 import kategory.Either.Right
+import kategory.effects.internal.Platform.maxStackDepthSize
 import kategory.effects.internal.Platform.onceOnly
 import kategory.effects.internal.Platform.unsafeResync
 
@@ -263,9 +264,9 @@ internal data class Map<E, out A>(val source: IO<E>, val g: (E) -> A, val index:
 
     override fun <B> map(f: (A) -> B): IO<B> =
             // Allowed to do 32 map operations in sequence before
-            // triggering `flatMap` in order to avoid stack overflows
-            if (index != 31) Map(source, g.andThen(f), index + 1)
-            else flatMap { a -> Pure(f(a)) }
+            // starting a new Map fusion in order to avoid stack overflows
+            if (index != maxStackDepthSize) Map(source, g.andThen(f), index + 1)
+            else Map(this, f, 0)
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
 }
