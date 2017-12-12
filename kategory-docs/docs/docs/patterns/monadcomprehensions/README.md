@@ -240,7 +240,7 @@ IO.monad().binding {
 //in T2 after main
 ```
 
-this is caused by `IO` suspending the function ` Thread.currentThread().name` in `a`.
+this is caused by `IO` suspending the function `Thread.currentThread().name` in `a`.
 The function isn't executed until `unsafeRunSync()` is called in the current main thread.
 The fix is trivial simply by capturing the thread name from the outer scope
 
@@ -250,7 +250,7 @@ IO.monad().binding {
       val name = Thread.currentThread().name
       IO { name } 
     }
-    val b = bindIn(tc2) { "in ${Thread.currentThread().name} after $a"}
+    val b = bindIn(tc2) { "in ${Thread.currentThread().name} after $a" }
     yields(b)
 }.ev().unsafeRunSync()
 //in T2 after T1
@@ -261,7 +261,7 @@ or making the evaluation happen eagerly
 ```kotlin
 IO.monad().binding {
     val a = bindInM(tc1){ IO.pure(Thread.currentThread().name) }
-    val b = bindIn(tc2) { "in ${Thread.currentThread().name} after $a"}
+    val b = bindIn(tc2) { "in ${Thread.currentThread().name} after $a" }
     yields(b)
 }.ev().unsafeRunSync()
 //in T2 after T1
