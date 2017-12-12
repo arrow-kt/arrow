@@ -208,7 +208,7 @@ fun getLineLengthAverage(path: FilePath): IO<List<String>> =
   IO.monadError().bindingE {
     
     // Wrapping the operation into a suspended asynchronous IO then using bindInM to bind it
-    val file = bindInM(ioThreadContext) { IO { getFile(path) } }
+    val file = bindInM(ioThreadContext) { IO.pure(getFile(path)) }
     
     // Implicitly wrap the result of a synchronous operation into IO.pure() using bindIn
     val lines = bindIn(computationThreadContext) { file.readLines() }
@@ -222,13 +222,61 @@ fun getLineLengthAverage(path: FilePath): IO<List<String>> =
 Note that `bindIn()` and `bindInM()` don't assure that the execution will return to the same thread where the binding started, as it depends on the implementation of the data type.
 This means that for the previous snippet [`IO`]({{ '/docs/effects/io' | relative_url }}) may calculate count and average on different threads than what [`Option`]({{ '/docs/datatypes/option' | relative_url }}) or [`Try`]({{ '/docs/datatypes/try' | relative_url }}) would.
 
+#### Gotchas: lazy evaluation and suspension
+
+It is important to understand that only the block inside `bindInM()` will run on a background thread.
+It could be the case that deferred operations using lambdas inside the block would only run those lambdas on the final execution thread.
+See this example:
+
+```kotlin
+val tc1 = newSingleThreadContext("T1")
+val tc2 = newSingleThreadContext("T2")
+
+IO.monad().binding {
+  val a = bindInM(tc1){ IO { Thread.currentThread().name } }
+  val b = bindIn(tc2) { "in ${Thread.currentThread().name} after $a"}
+  yields(b)
+}.ev().unsafeRunSync()
+//in T2 after main
+```
+
+this is caused by `IO` suspending the function ` Thread.currentThread().name` in `a`.
+The function isn't executed until `unsafeRunSync()` is called in the current main thread.
+The fix is trivial simply by capturing the thread name from the outer scope
+
+```kotlin
+IO.monad().binding {
+    val a = bindInM(tc1){ 
+      val name = Thread.currentThread().name
+      IO { name } 
+    }
+    val b = bindIn(tc2) { "in ${Thread.currentThread().name} after $a"}
+    yields(b)
+}.ev().unsafeRunSync()
+//in T2 after T1
+```
+
+or making the evaluation happen eagerly
+
+```kotlin
+IO.monad().binding {
+    val a = bindInM(tc1){ IO.pure(Thread.currentThread().name) }
+    val b = bindIn(tc2) { "in ${Thread.currentThread().name} after $a"}
+    yields(b)
+}.ev().unsafeRunSync()
+//in T2 after T1
+```
+
+which makes it very visual to understand that `bindIn()` is just an alias for a `bindInM()` that calls the constructor `pure()`.
+
 ### What if I'd like to run multiple operations independently from each other, in a non-sequential way?
 
 You can check the section on the [Applicative Builder]({{ '/docs/patterns/applicative_builder' | relative_url }}) pattern for them!
 
 ### Cancellation and cleanup of resources
 
-In some enviroments that have resources with their own lifecycle (i.e. Activity in Android development) retaining these values in operations that can run indefinitely may cause large memory leaks and lead to undefined behavior. As cleanup is important in these restricted environments, the function `bindingECancellable` allows for comprehensions to be finished early by throwing an `InterruptedException` at the beginning of the next `bind()` step.
+In some environments that have resources with their own lifecycle (i.e. Activity in Android development) retaining these values in operations that can run indefinitely may cause large memory leaks and lead to undefined behavior.
+As cleanup is important in these restricted environments, the function `bindingECancellable` allows for comprehensions to be finished early by throwing an `InterruptedException` at the beginning of the next `bind()` step.
 
 ```kotlin
 val (binding: IO<List<User>>, unsafeCancel: Disposable) =
@@ -248,4 +296,4 @@ unsafeCancel()
 // Boom! caused by InterruptedException
 ```
 
-Note that the cancellation happens on the bind() step, so any currently running operations before `bind()` will have to complete first, even those that are scheduled for threading.
+Note that the cancellation happens on the `bind()` step, so any currently running operations before `bind()` will have to complete first, even those that are scheduled for threading.
