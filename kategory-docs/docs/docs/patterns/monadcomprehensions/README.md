@@ -240,7 +240,7 @@ IO.monad().binding {
 //in T2 after main
 ```
 
-this is caused by `IO` suspending the function ` Thread.currentThread().name` in `a`.
+this is caused by `IO` suspending the function `Thread.currentThread().name` in `a`.
 The function isn't executed until `unsafeRunSync()` is called in the current main thread.
 The fix is trivial simply by capturing the thread name from the outer scope
 
