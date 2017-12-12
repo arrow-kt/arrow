@@ -13,7 +13,7 @@ elif [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
   fail "Failed release deployment: was pull request."
 elif [ "$TRAVIS_BRANCH" != "$BRANCH" ]; then
   fail "Failed release deployment: wrong branch. Expected '$BRANCH' but was '$TRAVIS_BRANCH'."
-elif ! [ "$VERSION_NAME" =~ $VERSION_PATTERN ]; then
+if ! [[ "$VERSION_NAME" =~ $VERSION_PATTERN ]]; then
   fail "Failed release deployment: wrong version. Expected '$VERSION_NAME' to have pattern 'X.Y.Z'"
 else
   ./gradlew uploadArchives bintrayUpload
