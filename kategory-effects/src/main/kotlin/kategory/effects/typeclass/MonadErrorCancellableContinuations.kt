@@ -42,7 +42,7 @@ open class MonadErrorCancellableContinuation<F, A>(ME: MonadError<F, Throwable>,
             flatMap(m(), { xx: B ->
                 c.stackLabels = labelHere
                 if (cancelled.get()) {
-                    throw BindingCancellationException()
+                    c.resumeWithException(BindingCancellationException())
                 }
                 c.resume(xx)
                 returnedMonad
@@ -51,10 +51,6 @@ open class MonadErrorCancellableContinuation<F, A>(ME: MonadError<F, Throwable>,
         val completion = bindingInContextContinuation(context)
         returnedMonad = flatMap(pure(Unit), {
             monadCreation.startCoroutine(completion)
-            val error = completion.await()
-            if (error != null) {
-                throw error
-            }
             returnedMonad
         })
         COROUTINE_SUSPENDED
