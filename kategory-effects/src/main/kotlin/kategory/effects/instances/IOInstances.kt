@@ -15,6 +15,18 @@ interface IOMonadErrorInstance : IOMonadInstance, MonadError<IOHK, Throwable> {
 }
 
 @instance(IO::class)
+interface IOMonadRunInstance : IOMonadErrorInstance, MonadRun<IOHK, Throwable> {
+    override fun <A> runAsync(fa: HK<IOHK, A>, cb: (Either<Throwable, A>) -> IOKind<Unit>): IO<Unit> =
+            fa.ev().runAsync(cb)
+
+    override fun <A> unsafeRunAsync(fa: HK<IOHK, A>, cb: (Either<Throwable, A>) -> Unit) =
+            fa.ev().unsafeRunAsync(cb)
+
+    override fun <A> unsafeRunSync(fa: HK<IOHK, A>): A =
+            fa.ev().unsafeRunSync()
+}
+
+@instance(IO::class)
 interface IOMonoidInstance<A> : Monoid<HK<IOHK, A>>, Semigroup<HK<IOHK, A>> {
 
     fun SM(): Monoid<A>
