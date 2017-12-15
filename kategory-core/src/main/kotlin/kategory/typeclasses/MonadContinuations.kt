@@ -1,13 +1,8 @@
 package kategory
 
-import java.util.concurrent.CountDownLatch
 import kotlin.coroutines.experimental.*
 import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
-
-interface BindingInContextContinuation<in T> : Continuation<T> {
-    fun await(): Throwable?
-}
 
 @RestrictsSuspension
 open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
@@ -21,24 +16,16 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
         throw exception
     }
 
-    protected fun bindingInContextContinuation(context: CoroutineContext): BindingInContextContinuation<HK<F, A>> =
-            object : BindingInContextContinuation<HK<F, A>> {
-                val latch: CountDownLatch = CountDownLatch(1)
-
-                var error: Throwable? = null
-
-                override fun await() = latch.await().let { error }
-
+    protected open fun bindingInContextContinuation(context: CoroutineContext): Continuation<HK<F, A>> =
+            object : Continuation<HK<F, A>> {
                 override val context: CoroutineContext = context
 
                 override fun resume(value: HK<F, A>) {
                     returnedMonad = value
-                    latch.countDown()
                 }
 
                 override fun resumeWithException(exception: Throwable) {
-                    error = exception
-                    latch.countDown()
+                    throw exception
                 }
             }
 
@@ -79,10 +66,6 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
         val completion = bindingInContextContinuation(context)
         returnedMonad = flatMap(pure(Unit), {
             monadCreation.startCoroutine(completion)
-            val error = completion.await()
-            if (error != null) {
-                throw error
-            }
             returnedMonad
         })
         COROUTINE_SUSPENDED
