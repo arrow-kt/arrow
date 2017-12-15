@@ -41,8 +41,8 @@ internal object IORunLoop {
                     }
                 }
                 is Suspend -> {
-                    val thunk: () -> IO<Any?> = currentIO.thunk
-                    currentIO = executeSafe { thunk() }
+                    val thunk: () -> IOKind<Any?> = currentIO.thunk
+                    currentIO = executeSafe { thunk().ev() }
                 }
                 is Delay -> {
                     try {
@@ -156,8 +156,8 @@ internal object IORunLoop {
                     }
                 }
                 is Suspend -> {
-                    val thunk: () -> IO<Any?> = currentIO.thunk
-                    currentIO = executeSafe { thunk() }
+                    val thunk: () -> IOKind<Any?> = currentIO.thunk
+                    currentIO = executeSafe { thunk().ev() }
                 }
                 is Delay -> {
                     try {
