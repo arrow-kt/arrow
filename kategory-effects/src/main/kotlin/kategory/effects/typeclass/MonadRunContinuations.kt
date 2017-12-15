@@ -38,7 +38,7 @@ open class MonadRunContinuation<F, A>(val MR: MonadRun<F, Throwable>, override v
         COROUTINE_SUSPENDED
     }
 
-    interface BindingInContextContinuation<F, A> : Continuation<A> {
+    interface BindingInContextContinuation<out F, A> : Continuation<A> {
         fun start()
 
         fun await(): HK<F, A>
@@ -67,14 +67,12 @@ open class MonadRunContinuation<F, A>(val MR: MonadRun<F, Throwable>, override v
                 }
             }
 
-    private fun <B> suspendUnsafeRunAsync(a: HK<F, B>): suspend () -> B {
-        return {
-            suspendCoroutineOrReturn { cc ->
-                MR.unsafeRunAsync(a, { cb ->
-                    cb.fold({ cc.resumeWithException(it) }, { cc.resume(it) })
-                })
-                COROUTINE_SUSPENDED
-            }
+    private fun <B> suspendUnsafeRunAsync(a: HK<F, B>): suspend () -> B = {
+        suspendCoroutineOrReturn { cc ->
+            MR.unsafeRunAsync(a, { cb ->
+                cb.fold({ cc.resumeWithException(it) }, { cc.resume(it) })
+            })
+            COROUTINE_SUSPENDED
         }
     }
 
