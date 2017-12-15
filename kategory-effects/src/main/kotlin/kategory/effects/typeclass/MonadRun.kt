@@ -2,7 +2,7 @@ package kategory.effects
 
 import kategory.*
 
-interface MonadRun<F, E> : AsyncContext<F>, MonadError<F, E>, Typeclass {
+interface MonadRun<F, E> : MonadError<F, E>, Typeclass {
     fun <A> unsafeRunSync(fa: HK<F, A>): A
 
     fun <A> runAsync(fa: HK<F, A>, cb: (Either<E, A>) -> HK<F, Unit>): HK<F, Unit>
