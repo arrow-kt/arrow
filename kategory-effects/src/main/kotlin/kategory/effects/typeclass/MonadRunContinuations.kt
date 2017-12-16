@@ -1,12 +1,8 @@
 package kategory.effects
 
-import kategory.HK
-import kategory.Monad
-import kategory.Tuple2
+import kategory.*
 import kategory.effects.data.internal.BindingCancellationException
 import kategory.effects.internal.stackLabels
-import kategory.tupled
-import java.util.concurrent.CountDownLatch
 import kotlin.coroutines.experimental.*
 import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
@@ -14,68 +10,120 @@ import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
 data class Fiber<out F, out A>(val binding: HK<F, A>, private val dispose: Disposable) : Disposable by dispose
 
 @RestrictsSuspension
-open class MonadRunContinuation<F, A>(val MR: MonadRun<F, Throwable>, override val context: CoroutineContext = EmptyCoroutineContext) :
-        MonadErrorCancellableContinuation<F, A>(MR) {
+open class MonadRunContinuation<F, A>(val MR: MonadRun<F, Throwable>, AC: AsyncContext<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
+        MonadErrorCancellableContinuation<F, A>(MR), MonadRun<F, Throwable> by MR, AsyncContext<F> by AC {
 
     open suspend fun <B, C> bindParallel(cc: CoroutineContext, fa: HK<F, B>, fb: HK<F, C>): Tuple2<B, C> = suspendCoroutineOrReturn { c ->
+        currentCont = c
         val labelHere = c.stackLabels
         returnedMonad = flatMap(pure(Unit)) {
             val c1: BindingInContextContinuation<F, B> = bindParallelContinuation(fa, cc)
             val c2: BindingInContextContinuation<F, C> = bindParallelContinuation(fb, cc)
 
-            c1.start()
-            c2.start()
-
-            val resultB = c1.await()
-            val resultC = c2.await()
-
-            flatMap(tupled(resultB, resultC)) {
+            bindingE {
+                c1.start().bind()
+                c2.start().bind()
+                val resultB = c1.await().bind()
+                val resultC = c2.await().bind()
                 c.stackLabels = labelHere
-                c.resume(it)
+                c.resume(resultB toT resultC)
                 returnedMonad
             }
         }
         COROUTINE_SUSPENDED
     }
 
-    interface BindingInContextContinuation<out F, A> : Continuation<A> {
-        fun start()
+    open suspend fun <B, C> bindRace(cc: CoroutineContext, fa: Fiber<F, B>, fb: Fiber<F, C>): Either<B, C> = suspendCoroutineOrReturn { c ->
+        currentCont = c
+        val labelHere = c.stackLabels
+        returnedMonad = flatMap(pure(Unit)) {
+            val c1: BindingInContextContinuation<F, B> = bindParallelContinuation(raceWith(fa.binding, { fb() }), cc)
+            val c2: BindingInContextContinuation<F, C> = bindParallelContinuation(raceWith(fb.binding, { fb() }), cc)
 
-        fun await(): HK<F, A>
+            bindingE {
+                c1.start().bind()
+                c2.start().bind()
+                val resultB = recoverCancellation(c1.await()).bind()
+                val resultC = recoverCancellation(c2.await()).bind()
+                val result: Either<B, C> = resultC.fold(
+                        {
+                            resultB.fold(
+                                    { ME.raiseError<Either<B, C>>(BindingCancellationException("All operations were cancelled")) },
+                                    { pure(it.left()) })
+                        },
+                        { pure(it.right()) }
+                ).bind()
+                c.stackLabels = labelHere
+                c.resume(result)
+                returnedMonad
+            }
+        }
+        COROUTINE_SUSPENDED
     }
 
     protected fun <B> bindParallelContinuation(fb: HK<F, B>, context: CoroutineContext): BindingInContextContinuation<F, B> =
             object : BindingInContextContinuation<F, B> {
-                override fun start() = suspendUnsafeRunAsync(fb).startCoroutine(this)
+                override fun start() = runAsync<Unit> { it(suspendUnsafeRunAsync(fb).startCoroutine(this).right()) }
 
-                var result: HK<F, B>? = null
+                var callback: ((Either<Throwable, B>) -> Unit)? = null
 
-                val latch: CountDownLatch = CountDownLatch(1)
+                var eager: Either<Throwable, B>? = null
 
-                override fun await(): HK<F, B> = latch.await().let { result!! }
+                override fun await(): HK<F, B> = runAsync { cb: (Either<Throwable, B>) -> Unit ->
+                    callback = cb
+                    val localEager = eager
+                    if (localEager != null) {
+                        cb(localEager)
+                    }
+                }
 
                 override val context: CoroutineContext = context
 
                 override fun resume(value: B) {
-                    result = pure(value)
-                    latch.countDown()
+                    val localCallback = callback
+                    if (localCallback == null) {
+                        eager = value.right()
+                    } else {
+                        localCallback(value.right())
+                    }
                 }
 
                 override fun resumeWithException(exception: Throwable) {
-                    result = raiseError(exception)
-                    latch.countDown()
+                    val localCallback = callback
+                    if (localCallback == null) {
+                        eager = exception.left()
+                    } else {
+                        localCallback(exception.left())
+                    }
                 }
             }
 
     private fun <B> suspendUnsafeRunAsync(a: HK<F, B>): suspend () -> B = {
         suspendCoroutineOrReturn { cc ->
-            MR.unsafeRunAsync(a, { cb ->
+            unsafeRunAsync(a, { cb ->
                 cb.fold({ cc.resumeWithException(it) }, { cc.resume(it) })
             })
             COROUTINE_SUSPENDED
         }
     }
 
+    private fun <B> raceWith(fa: HK<F, B>, dispose: Disposable): HK<F, B> =
+            map(fa) { dispose(); it }
+
+    private fun <B> recoverCancellation(await: HK<F, B>): HK<F, Option<B>> =
+            handleErrorWith(map(await) { it.some() }) {
+                if (it is BindingCancellationException) {
+                    pure(Option.empty())
+                } else {
+                    raiseError(it)
+                }
+            }
+
+    protected interface BindingInContextContinuation<out F, A> : Continuation<A> {
+        fun start(): HK<F, Unit>
+
+        fun await(): HK<F, A>
+    }
 }
 
 /**
@@ -93,8 +141,8 @@ open class MonadRunContinuation<F, A>(val MR: MonadRun<F, Throwable>, override v
  * If [Disposable.invoke] is called the binding result will become a lifted [BindingCancellationException].
  *
  */
-fun <F, B> MonadRun<F, Throwable>.bindingFiber(c: suspend MonadRunContinuation<F, *>.() -> HK<F, B>): Fiber<F, B> {
-    val continuation = MonadRunContinuation<F, B>(this)
+fun <F, B> MonadRun<F, Throwable>.bindingFiber(AC: AsyncContext<F>, c: suspend MonadRunContinuation<F, *>.() -> HK<F, B>): Fiber<F, B> {
+    val continuation = MonadRunContinuation<F, B>(this, AC)
     c.startCoroutine(continuation, continuation)
     return Fiber(continuation.returnedMonad(), continuation.disposable())
 }
