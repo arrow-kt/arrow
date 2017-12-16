@@ -10,8 +10,16 @@ import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
 data class Fiber<out F, out A>(val binding: HK<F, A>, private val dispose: Disposable) : Disposable by dispose
 
 @RestrictsSuspension
-open class MonadRunContinuation<F, A>(val MR: MonadRun<F, Throwable>, AC: AsyncContext<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
-        MonadErrorCancellableContinuation<F, A>(MR), MonadRun<F, Throwable> by MR, AsyncContext<F> by AC {
+open class MonadSuspendContinuation<F, A>(val MR: MonadSuspend<F, Throwable>, AC: AsyncContext<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
+        MonadErrorCancellableContinuation<F, A>(MR), MonadSuspend<F, Throwable> by MR, AsyncContext<F> by AC {
+
+    var cancellation: Disposable? = null
+
+    override fun disposable(): Disposable =
+            {
+                super.disposable()
+                cancellation?.apply { invoke() }
+            }
 
     open suspend fun <B, C> bindParallel(cc: CoroutineContext, fa: HK<F, B>, fb: HK<F, C>): Tuple2<B, C> = suspendCoroutineOrReturn { c ->
         currentCont = c
@@ -20,7 +28,7 @@ open class MonadRunContinuation<F, A>(val MR: MonadRun<F, Throwable>, AC: AsyncC
             val c1: BindingInContextContinuation<F, B> = bindParallelContinuation(fa, cc)
             val c2: BindingInContextContinuation<F, C> = bindParallelContinuation(fb, cc)
 
-            bindingE {
+            bindingECancellable {
                 c1.start().bind()
                 c2.start().bind()
                 val resultB = c1.await().bind()
@@ -28,6 +36,9 @@ open class MonadRunContinuation<F, A>(val MR: MonadRun<F, Throwable>, AC: AsyncC
                 c.stackLabels = labelHere
                 c.resume(resultB toT resultC)
                 returnedMonad
+            }.let {
+                cancellation = it.b
+                it.a
             }
         }
         COROUTINE_SUSPENDED
@@ -40,7 +51,7 @@ open class MonadRunContinuation<F, A>(val MR: MonadRun<F, Throwable>, AC: AsyncC
             val c1: BindingInContextContinuation<F, B> = bindParallelContinuation(raceWith(fa.binding, { fb() }), cc)
             val c2: BindingInContextContinuation<F, C> = bindParallelContinuation(raceWith(fb.binding, { fa() }), cc)
 
-            bindingE {
+            bindingECancellable {
                 c1.start().bind()
                 c2.start().bind()
                 val resultB = recoverCancellation(c1.await()).bind()
@@ -56,6 +67,9 @@ open class MonadRunContinuation<F, A>(val MR: MonadRun<F, Throwable>, AC: AsyncC
                 c.stackLabels = labelHere
                 c.resume(result)
                 returnedMonad
+            }.let {
+                cancellation = it.b
+                it.a
             }
         }
         COROUTINE_SUSPENDED
@@ -63,7 +77,7 @@ open class MonadRunContinuation<F, A>(val MR: MonadRun<F, Throwable>, AC: AsyncC
 
     protected fun <B> bindParallelContinuation(fb: HK<F, B>, context: CoroutineContext): BindingInContextContinuation<F, B> =
             object : BindingInContextContinuation<F, B> {
-                override fun start() = runAsync<Unit> { it(suspendUnsafeRunAsync(fb).startCoroutine(this).right()) }
+                override fun start() = invoke { suspendUnsafeRunAsync(fb).startCoroutine(this) }
 
                 var callback: ((Either<Throwable, B>) -> Unit)? = null
 
@@ -128,21 +142,18 @@ open class MonadRunContinuation<F, A>(val MR: MonadRun<F, Throwable>, AC: AsyncC
 
 /**
  * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.
- * A coroutines is initiated and inside [MonadRunContinuation] suspended yielding to [Monad.flatMap]. Once all the flatMap binds are completed
+ * A coroutines is initiated and inside [MonadSuspendContinuation] suspended yielding to [Monad.flatMap]. Once all the flatMap binds are completed
  * the underlying monad is returned from the act of executing the coroutine
  *
- * This one operates over [MonadRun] instances that can support [Throwable] in their error type automatically lifting
+ * This one operates over [MonadSuspend] instances that can support [Throwable] in their error type automatically lifting
  * errors as failed computations in their monadic context and not letting exceptions thrown as the regular monad binding does.
  *
- * This operation is cancellable by calling invoke on the [Fiber] return or its [Disposable].
+ * This operation is cancellable by calling invoke on the [Fiber].
  * If [invoke] is called the binding result will become a lifted [BindingCancellationException].
  *
- * This operation is cancellable by calling invoke on the [Disposable] return.
- * If [Disposable.invoke] is called the binding result will become a lifted [BindingCancellationException].
- *
  */
-fun <F, B> MonadRun<F, Throwable>.bindingFiber(AC: AsyncContext<F>, c: suspend MonadRunContinuation<F, *>.() -> HK<F, B>): Fiber<F, B> {
-    val continuation = MonadRunContinuation<F, B>(this, AC)
+fun <F, B> MonadSuspend<F, Throwable>.bindingFiber(AC: AsyncContext<F>, c: suspend MonadSuspendContinuation<F, *>.() -> HK<F, B>): Fiber<F, B> {
+    val continuation = MonadSuspendContinuation<F, B>(this, AC)
     c.startCoroutine(continuation, continuation)
     return Fiber(continuation.returnedMonad(), continuation.disposable())
 }
