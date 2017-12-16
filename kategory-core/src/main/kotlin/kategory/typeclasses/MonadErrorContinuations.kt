@@ -5,7 +5,7 @@ import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
 
 @RestrictsSuspension
-open class MonadErrorContinuation<F, A>(val ME: MonadError<F, Throwable>, override val context: CoroutineContext = EmptyCoroutineContext) :
+open class MonadErrorContinuation<F, A>(ME: MonadError<F, Throwable>, override val context: CoroutineContext = EmptyCoroutineContext) :
         MonadContinuation<F, A>(ME), MonadError<F, Throwable> by ME {
 
     override fun bindingInContextContinuation(context: CoroutineContext): Continuation<HK<F, A>> =
@@ -22,7 +22,7 @@ open class MonadErrorContinuation<F, A>(val ME: MonadError<F, Throwable>, overri
             }
 
     override fun resumeWithException(exception: Throwable) {
-        returnedMonad = ME.raiseError(exception)
+        returnedMonad = raiseError(exception)
     }
 
     override suspend fun <B> bindInM(context: CoroutineContext, m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
