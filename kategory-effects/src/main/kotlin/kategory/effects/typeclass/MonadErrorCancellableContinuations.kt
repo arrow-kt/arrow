@@ -3,13 +3,9 @@ package kategory.effects
 import kategory.*
 import kategory.effects.data.internal.BindingCancellationException
 import kategory.effects.internal.stackLabels
-import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.coroutines.experimental.CoroutineContext
-import kotlin.coroutines.experimental.EmptyCoroutineContext
-import kotlin.coroutines.experimental.RestrictsSuspension
+import kotlin.coroutines.experimental.*
 import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
-import kotlin.coroutines.experimental.startCoroutine
 
 typealias Disposable = () -> Unit
 
@@ -17,19 +13,21 @@ typealias Disposable = () -> Unit
 open class MonadErrorCancellableContinuation<F, A>(ME: MonadError<F, Throwable>, override val context: CoroutineContext = EmptyCoroutineContext) :
         MonadErrorContinuation<F, A>(ME) {
 
-    protected val cancelled: AtomicBoolean = AtomicBoolean(false)
+    var currentCont: Continuation<*>? = null
 
-    fun disposable(): Disposable = { cancelled.set(true) }
+    fun disposable(): Disposable = {
+        val bindingCancellationException = BindingCancellationException()
+        returnedMonad = raiseError(bindingCancellationException)
+        currentCont?.apply { resumeWithException(bindingCancellationException) }
+    }
 
     internal fun returnedMonad(): HK<F, A> = returnedMonad
 
     override suspend fun <B> bind(m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
+        currentCont = c
         val labelHere = c.stackLabels // save the whole coroutine stack labels
         returnedMonad = flatMap(m(), { x: B ->
             c.stackLabels = labelHere
-            if (cancelled.get()) {
-                throw BindingCancellationException()
-            }
             c.resume(x)
             returnedMonad
         })
@@ -37,13 +35,11 @@ open class MonadErrorCancellableContinuation<F, A>(ME: MonadError<F, Throwable>,
     }
 
     override suspend fun <B> bindInM(context: CoroutineContext, m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
+        currentCont = c
         val labelHere = c.stackLabels // save the whole coroutine stack labels
         val monadCreation: suspend () -> HK<F, A> = {
             flatMap(m(), { xx: B ->
                 c.stackLabels = labelHere
-                if (cancelled.get()) {
-                    c.resumeWithException(BindingCancellationException())
-                }
                 c.resume(xx)
                 returnedMonad
             })
