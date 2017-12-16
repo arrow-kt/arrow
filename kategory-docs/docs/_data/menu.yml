@@ -211,8 +211,8 @@ options:
       - title: Async
         url: /docs/effects/async/
 
-      - title: MonadRun
-        url: /docs/effects/monadrun/
+      - title: MonadSuspend
+        url: /docs/effects/monadsuspend/
 
   - title: Optics
 
