@@ -108,7 +108,7 @@ object MonadSuspendLaws {
             forFew(5, genIntSmall(), genIntSmall(), genThrowable(), { num1: Int, num2: Int, t: Throwable ->
                 val start = System.nanoTime()
                 val binding = M.bindingFiber(AC) {
-                    val result = bindParallel(monadRunLawsCoroutineDispatcher(), asyncFiber(M, AC, num2, 500), M.bindingFiber(AC) { raiseError<Int>(t) })
+                    val result = bindParallel(monadRunLawsCoroutineDispatcher(), asyncFiber(M, AC, num2, 500), bindingFiber(AC) { raiseError<Int>(t) })
                     yields(result.a + result.b)
                 }.binding
                 val endTime = System.nanoTime() - start
