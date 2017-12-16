@@ -37,6 +37,9 @@ sealed class IO<out A> : IOKind<A> {
                     }
                 }
 
+        fun empty(): IO<Nothing> =
+                IO.runAsync { }
+
         val unit: IO<Unit> =
                 pure(Unit)
 
