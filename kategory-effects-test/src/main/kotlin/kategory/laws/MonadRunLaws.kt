@@ -108,7 +108,7 @@ object MonadRunLaws {
                     val result = bindParallel(monadRunLawsCoroutineDispatcher, asyncFiber(M, AC, num2, 500).binding, raiseError<Int>(t))
                     yields(result.a + result.b)
                 }.binding.equalUnderTheLaw(M.raiseError(t), EQ_ERR) &&
-                        // Note that the other threads aren't cancelled
+                        // Note that the other monads aren't cancelled
                         (System.nanoTime() - start) > TimeUnit.MILLISECONDS.toNanos(500)
             })
 }
