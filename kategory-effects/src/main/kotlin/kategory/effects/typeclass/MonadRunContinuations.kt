@@ -38,7 +38,7 @@ open class MonadRunContinuation<F, A>(val MR: MonadRun<F, Throwable>, AC: AsyncC
         val labelHere = c.stackLabels
         returnedMonad = flatMap(pure(Unit)) {
             val c1: BindingInContextContinuation<F, B> = bindParallelContinuation(raceWith(fa.binding, { fb() }), cc)
-            val c2: BindingInContextContinuation<F, C> = bindParallelContinuation(raceWith(fb.binding, { fb() }), cc)
+            val c2: BindingInContextContinuation<F, C> = bindParallelContinuation(raceWith(fb.binding, { fa() }), cc)
 
             bindingE {
                 c1.start().bind()
