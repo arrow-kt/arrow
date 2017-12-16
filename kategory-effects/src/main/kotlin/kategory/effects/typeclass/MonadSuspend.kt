@@ -2,7 +2,7 @@ package kategory.effects
 
 import kategory.*
 
-interface MonadRun<F, E> : MonadError<F, E>, Typeclass {
+interface MonadSuspend<F, E> : MonadError<F, E>, Typeclass {
     fun <A> unsafeRunSync(fa: HK<F, A>): A
 
     fun <A> runAsync(fa: HK<F, A>, cb: (Either<E, A>) -> HK<F, Unit>): HK<F, Unit>
@@ -17,5 +17,5 @@ interface MonadRun<F, E> : MonadError<F, E>, Typeclass {
     fun lazy(): HK<F, Unit> = invoke { }
 }
 
-inline fun <reified F, reified E> monadRun(): MonadRun<F, E> =
-        instance(InstanceParametrizedType(MonadRun::class.java, listOf(typeLiteral<F>(), typeLiteral<E>())))
+inline fun <reified F, reified E> monadSuspend(): MonadSuspend<F, E> =
+        instance(InstanceParametrizedType(MonadSuspend::class.java, listOf(typeLiteral<F>(), typeLiteral<E>())))

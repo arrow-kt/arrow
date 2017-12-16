@@ -15,14 +15,18 @@ interface IOMonadErrorInstance : IOMonadInstance, MonadError<IOHK, Throwable> {
 }
 
 @instance(IO::class)
-interface IOMonadRunInstance : IOMonadErrorInstance, MonadRun<IOHK, Throwable> {
-    override fun <A> runAsync(fa: HK<IOHK, A>, cb: (Either<Throwable, A>) -> IOKind<Unit>): IO<Unit> =
+interface IOMonadSuspendInstance : IOMonadErrorInstance, MonadSuspend<IOHK, Throwable> {
+    override fun <A> suspend(f: () -> IOKind<A>): IOKind<A> = IO.suspend(f)
+
+    override fun <A> invoke(f: () -> A): HK<IOHK, A> = IO.invoke(f)
+
+    override fun <A> runAsync(fa: IOKind<A>, cb: (Either<Throwable, A>) -> IOKind<Unit>): IO<Unit> =
             fa.ev().runAsync(cb)
 
-    override fun <A> unsafeRunAsync(fa: HK<IOHK, A>, cb: (Either<Throwable, A>) -> Unit) =
+    override fun <A> unsafeRunAsync(fa: IOKind<A>, cb: (Either<Throwable, A>) -> Unit) =
             fa.ev().unsafeRunAsync(cb)
 
-    override fun <A> unsafeRunSync(fa: HK<IOHK, A>): A =
+    override fun <A> unsafeRunSync(fa: IOKind<A>): A =
             fa.ev().unsafeRunSync()
 }
 
