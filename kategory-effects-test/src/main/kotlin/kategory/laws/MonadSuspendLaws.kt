@@ -96,7 +96,7 @@ object MonadSuspendLaws {
             forFew(5, genIntSmall(), genIntSmall(), { num1: Int, num2: Int ->
                 val start = System.nanoTime()
                 M.bindingFiber(AC) {
-                    val result = bindParallel(monadRunLawsCoroutineDispatcher(), asyncFiber(M, AC, num1, 500).binding, asyncFiber(M, AC, num2, 100).binding)
+                    val result = bindParallel(monadRunLawsCoroutineDispatcher(), asyncFiber(M, AC, num1, 500), asyncFiber(M, AC, num2, 100))
                     yields(result.a + result.b)
                 }.binding.equalUnderTheLaw(M.pure(num1 + num2), EQ) &&
                         // Less time than the combination of both tasks
@@ -108,7 +108,7 @@ object MonadSuspendLaws {
             forFew(5, genIntSmall(), genIntSmall(), genThrowable(), { num1: Int, num2: Int, t: Throwable ->
                 val start = System.nanoTime()
                 val binding = M.bindingFiber(AC) {
-                    val result = bindParallel(monadRunLawsCoroutineDispatcher(), asyncFiber(M, AC, num2, 500).binding, raiseError<Int>(t))
+                    val result = bindParallel(monadRunLawsCoroutineDispatcher(), asyncFiber(M, AC, num2, 500), M.bindingFiber(AC) { raiseError<Int>(t) })
                     yields(result.a + result.b)
                 }.binding
                 val endTime = System.nanoTime() - start

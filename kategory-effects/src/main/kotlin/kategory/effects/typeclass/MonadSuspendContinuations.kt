@@ -21,12 +21,12 @@ open class MonadSuspendContinuation<F, A>(val MR: MonadSuspend<F, Throwable>, AC
                 cancellation?.apply { invoke() }
             }
 
-    open suspend fun <B, C> bindParallel(cc: CoroutineContext, fa: HK<F, B>, fb: HK<F, C>): Tuple2<B, C> = suspendCoroutineOrReturn { c ->
+    open suspend fun <B, C> bindParallel(cc: CoroutineContext, fa: Fiber<F, B>, fb: Fiber<F, C>): Tuple2<B, C> = suspendCoroutineOrReturn { c ->
         currentCont = c
         val labelHere = c.stackLabels
         returnedMonad = flatMap(pure(Unit)) {
-            val c1: BindingInContextContinuation<F, B> = bindParallelContinuation(fa, cc)
-            val c2: BindingInContextContinuation<F, C> = bindParallelContinuation(fb, cc)
+            val c1: BindingInContextContinuation<F, B> = bindParallelContinuation(fa.binding, cc)
+            val c2: BindingInContextContinuation<F, C> = bindParallelContinuation(fb.binding, cc)
 
             bindingECancellable {
                 c1.start().bind()
@@ -138,22 +138,4 @@ open class MonadSuspendContinuation<F, A>(val MR: MonadSuspend<F, Throwable>, AC
 
         fun await(): HK<F, A>
     }
-}
-
-/**
- * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.
- * A coroutines is initiated and inside [MonadSuspendContinuation] suspended yielding to [Monad.flatMap]. Once all the flatMap binds are completed
- * the underlying monad is returned from the act of executing the coroutine
- *
- * This one operates over [MonadSuspend] instances that can support [Throwable] in their error type automatically lifting
- * errors as failed computations in their monadic context and not letting exceptions thrown as the regular monad binding does.
- *
- * This operation is cancellable by calling invoke on the [Fiber].
- * If [invoke] is called the binding result will become a lifted [BindingCancellationException].
- *
- */
-fun <F, B> MonadSuspend<F, Throwable>.bindingFiber(AC: AsyncContext<F>, c: suspend MonadSuspendContinuation<F, *>.() -> HK<F, B>): Fiber<F, B> {
-    val continuation = MonadSuspendContinuation<F, B>(this, AC)
-    c.startCoroutine(continuation, continuation)
-    return Fiber(continuation.returnedMonad(), continuation.disposable())
 }
