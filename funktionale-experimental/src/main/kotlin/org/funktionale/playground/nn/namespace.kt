@@ -41,10 +41,7 @@ fun main(args: Array<String>) {
 
 abstract class Thing<I : Comparable<I>>
 
-class Egal : Thing<String>() {
-
-        //companion object
-}
+class Egal : Thing<String>()
 
 class Bar : Thing<Int>() {
     companion object

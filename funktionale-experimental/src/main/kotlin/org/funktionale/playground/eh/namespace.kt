@@ -128,9 +128,9 @@ fun mean(xs: Collection<Double>): Either<String, Double> = if (xs.isEmpty()) {
         Right(xs.sum() / xs.size)
     }
 
-fun main(args: Array<String>) {
-    /*val abs: (Double) -> Double = { i: Double -> Math.abs(i) }
-    val liftAbs: (Option<Double>) -> Option<Double> = abs.lift()
-    println(liftAbs((-2.0).toOption()))*/
-    //println(parseInts(listOf("1", "2", "3")))
-}
+//fun main(args: Array<String>) {
+//    /*val abs: (Double) -> Double = { i: Double -> Math.abs(i) }
+//    val liftAbs: (Option<Double>) -> Option<Double> = abs.lift()
+//    println(liftAbs((-2.0).toOption()))*/
+//    //println(parseInts(listOf("1", "2", "3")))
+//}

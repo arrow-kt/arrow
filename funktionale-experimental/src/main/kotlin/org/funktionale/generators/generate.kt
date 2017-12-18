@@ -51,7 +51,7 @@ val filteredDeclaredParams = { i: Int, filtered: Int -> (1..i).filterNotTo(array
 
 fun partially() {
 
-	(1..22).forEach { i ->
+	for (1..22).forEach { i ->
 
 		(1..i).forEach { j ->
 			println(

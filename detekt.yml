@@ -34,7 +34,7 @@ complexity:
   TooManyFunctions:
     active: false
   LabeledExpression:
-    active: true
+    active: false
 
 code-smell:
   active: true
