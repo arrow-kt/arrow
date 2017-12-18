@@ -28,7 +28,7 @@ import java.util.*
 sealed class Option<out T> {
 
     companion object {
-    	fun <T> empty(): Option<T> = None
+        fun <T> empty(): Option<T> = None
     }
 
     abstract fun isEmpty(): Boolean

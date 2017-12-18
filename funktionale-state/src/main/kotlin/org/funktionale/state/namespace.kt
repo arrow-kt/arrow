@@ -26,30 +26,30 @@ import org.funktionale.collections.prependTo
  */
 class State<S, out T>(val run: (S) -> Pair<S, T>) {
 
-	fun <R> map(f: (T) -> R): State<S, R> = flatMap { t -> pure<S, R>(f(t)) }
+    fun <R> map(f: (T) -> R): State<S, R> = flatMap { t -> pure<S, R>(f(t)) }
 
-	fun <P1, R> map(sx: State<S, P1>, f: (T, P1) -> R): State<S, R> = flatMap { t -> sx.map { x -> f(t, x) } }
+    fun <P1, R> map(sx: State<S, P1>, f: (T, P1) -> R): State<S, R> = flatMap { t -> sx.map { x -> f(t, x) } }
 
-	fun <R> flatMap(f: (T) -> State<S, R>): State<S, R> = State { s ->
-		val (s1, t) = run(s)
-		f(t).run(s1)
-	}
+    fun <R> flatMap(f: (T) -> State<S, R>): State<S, R> = State { s ->
+        val (s1, t) = run(s)
+        f(t).run(s1)
+    }
 
-	companion object {
-		fun <S, T> pure(t: T): State<S, T> = State { s -> s to t }
+    companion object {
+        fun <S, T> pure(t: T): State<S, T> = State { s -> s to t }
 
-		fun <S> get(): State<S, S> = State { s -> s to s }
+        fun <S> get(): State<S, S> = State { s -> s to s }
 
-		fun <S> set(s: S): State<S, Unit> = State { s to Unit }
+        fun <S> set(s: S): State<S, Unit> = State { s to Unit }
 
-		fun <S> modify(f: (S) -> S): State<S, Unit> = get<S>().flatMap { s: S -> set(f(s)).map { Unit } }
-	}
+        fun <S> modify(f: (S) -> S): State<S, Unit> = get<S>().flatMap { s: S -> set(f(s)).map { Unit } }
+    }
 }
 
 fun <R, S, T> List<T>.stateTraverse(f: (T) -> State<S, R>): State<S, List<R>> = foldRight(State.pure(emptyList())) { i: T, accumulator: State<S, List<R>> ->
-		f(i).map(accumulator) { head: R, tail: List<R> ->
-			head prependTo tail
-		}
-	}
+    f(i).map(accumulator) { head: R, tail: List<R> ->
+        head prependTo tail
+    }
+}
 
 fun <S, T> List<State<S, T>>.stateSequential(): State<S, List<T>> = stateTraverse { it }
