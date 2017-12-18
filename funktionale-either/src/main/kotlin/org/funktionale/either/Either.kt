@@ -91,7 +91,7 @@ fun <L, R> Pair<L, R>.toRight(): Right<L, R> = Right(this.component2())
 
 inline fun <T> eitherTry(body: () -> T): Either<Throwable, T> = try {
     Right(body())
-}  catch (t: Throwable) {
+} catch (t: Throwable) {
     Left(t)
 }
 
