@@ -19,7 +19,6 @@ package org.funktionale.generators
 import org.funktionale.memoization.memoize
 import org.funktionale.partials.invoke
 
-
 val paramType: (Int) -> String = { i: Int -> "P$i" }.memoize()
 
 val outParamType: (Int) -> String = { i: Int -> "out P$i" }.memoize()
@@ -87,13 +86,11 @@ operator @Suppress("UNUSED_PARAMETER") fun <${completeParams(i)}, R> ((${complet
 	}
 }
 
-
 fun currying() {
 
 	val returnType = { i: Int -> (1..i).mapTo(arrayListOf(), paramType).joinToString(separator = ") -> (", prefix = "(", postfix = ")") }
 
 	val returned = { i: Int -> (1..i).mapTo(arrayListOf(), paramDeclaration).joinToString(separator = " -> { ") }
-
 
 	(2..22).forEach { i ->
 		println("""
@@ -109,7 +106,6 @@ fun uncurrying() {
 	val receiverType = { i: Int -> (1..i).mapTo(arrayListOf(), paramType).joinToString(separator = ") -> (", prefix = "(", postfix = ")") }
 
 	val returned = { i: Int -> (1..i).mapTo(arrayListOf(), paramDeclaration).joinToString(separator = ", ") }
-
 
 	(2..22).forEach { i ->
 		println("""
@@ -149,7 +145,6 @@ fun reverse() {
 
 	val returned = { i: Int -> (i downTo 1).mapTo(arrayListOf(), paramDeclaration).joinToString(separator = ", ") }
 
-
 	(2..22).forEach { i ->
 		println("""
 fun<${completeParams(i)}, R> ((${completeParams(i)}) -> R).reverse(): ${returnType(i)} -> R {
@@ -164,13 +159,9 @@ val anies = { i: Int ->
 	}.joinToString(separator = ", ")
 }
 
-private fun javaFunClasses(i: Int): String {
-
-
-	return (0..i).mapTo(arrayListOf()) { j ->
+private fun javaFunClasses(i: Int): String = (0..i).mapTo(arrayListOf()) { j ->
 		"javaClass<Function$j<${anies(j)}>>()"
 	}.joinToString(separator = ",\n")
-}
 
 fun functionClasses() {
 	println("""
@@ -183,7 +174,6 @@ val callParamArray = { i: Int ->
 		"args[$it]"
 	}.joinToString(separator = ", ")
 }
-
 
 fun callFunctions() {
 	println((1..22).mapTo(arrayListOf()) { i ->
@@ -271,7 +261,4 @@ fun main(args: Array<String>) {
 	//complement()
 }
 
-
-fun <T> Set<T>.toArray(): Array<T> {
-	return toArray()
-}
+fun <T> Set<T>.toArray(): Array<T> = toArray()

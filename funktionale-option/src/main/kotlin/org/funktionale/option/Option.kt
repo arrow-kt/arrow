@@ -87,7 +87,6 @@ sealed class Option<out T> {
         if (nonEmpty()) f(get())
     }
 
-
     fun toList(): List<T> = if (isEmpty()) {
         listOf()
     } else {
@@ -155,119 +154,64 @@ fun <T> T?.toOption(): Option<T> = if (this != null) {
 
 inline fun <T> optionTry(body: () -> T): Option<T> = try {
     Some(body())
-} catch(e: Exception) {
+}  catch (e: Exception) {
     None
 }
 
 val <K, V> Map<K, V>.option: GetterOperation<K, Option<V>>
-    get () {
+    get() {
         return GetterOperationImpl { k -> this[k].toOption() }
     }
 
+fun <T> Array<out T>.firstOption(): Option<T> = firstOrNull().toOption()
 
-fun <T> Array<out T>.firstOption(): Option<T> {
-    return firstOrNull().toOption()
-}
+fun BooleanArray.firstOption(): Option<Boolean> = firstOrNull().toOption()
 
-fun BooleanArray.firstOption(): Option<Boolean> {
-    return firstOrNull().toOption()
-}
+fun ByteArray.firstOption(): Option<Byte> = firstOrNull().toOption()
 
-fun ByteArray.firstOption(): Option<Byte> {
-    return firstOrNull().toOption()
-}
+fun CharArray.firstOption(): Option<Char> = firstOrNull().toOption()
 
-fun CharArray.firstOption(): Option<Char> {
-    return firstOrNull().toOption()
-}
+fun DoubleArray.firstOption(): Option<Double> = firstOrNull().toOption()
 
-fun DoubleArray.firstOption(): Option<Double> {
-    return firstOrNull().toOption()
-}
+fun FloatArray.firstOption(): Option<Float> = firstOrNull().toOption()
 
-fun FloatArray.firstOption(): Option<Float> {
-    return firstOrNull().toOption()
-}
+fun IntArray.firstOption(): Option<Int> = firstOrNull().toOption()
 
+fun LongArray.firstOption(): Option<Long> = firstOrNull().toOption()
 
-fun IntArray.firstOption(): Option<Int> {
-    return firstOrNull().toOption()
-}
+fun ShortArray.firstOption(): Option<Short> = firstOrNull().toOption()
 
+fun <T> Iterable<T>.firstOption(): Option<T> = firstOrNull().toOption()
 
-fun LongArray.firstOption(): Option<Long> {
-    return firstOrNull().toOption()
-}
+fun <T> List<T>.firstOption(): Option<T> = firstOrNull().toOption()
 
+fun <T> Sequence<T?>.firstOption(): Option<T> = firstOrNull().toOption()
 
-fun ShortArray.firstOption(): Option<Short> {
-    return firstOrNull().toOption()
-}
+fun String.firstOption(): Option<Char> = firstOrNull().toOption()
 
-fun <T> Iterable<T>.firstOption(): Option<T> {
-    return firstOrNull().toOption()
-}
+fun <T> Array<out T>.firstOption(predicate: Predicate<T>): Option<T> = firstOrNull(predicate).toOption()
 
-fun <T> List<T>.firstOption(): Option<T> {
-    return firstOrNull().toOption()
-}
+inline fun BooleanArray.firstOption(predicate: (Boolean) -> Boolean): Option<Boolean> = firstOrNull(predicate).toOption()
 
-fun <T> Sequence<T?>.firstOption(): Option<T> {
-    return firstOrNull().toOption()
-}
+inline fun ByteArray.firstOption(predicate: (Byte) -> Boolean): Option<Byte> = firstOrNull(predicate).toOption()
 
+inline fun CharArray.firstOption(predicate: (Char) -> Boolean): Option<Char> = firstOrNull(predicate).toOption()
 
-fun String.firstOption(): Option<Char> {
-    return firstOrNull().toOption()
-}
+inline fun DoubleArray.firstOption(predicate: (Double) -> Boolean): Option<Double> = firstOrNull(predicate).toOption()
 
-fun <T> Array<out T>.firstOption(predicate: Predicate<T>): Option<T> {
-    return firstOrNull(predicate).toOption()
-}
+inline fun FloatArray.firstOption(predicate: (Float) -> Boolean): Option<Float> = firstOrNull(predicate).toOption()
 
-inline fun BooleanArray.firstOption(predicate: (Boolean) -> Boolean): Option<Boolean> {
-    return firstOrNull(predicate).toOption()
-}
+inline fun IntArray.firstOption(predicate: (Int) -> Boolean): Option<Int> = firstOrNull(predicate).toOption()
 
-inline fun ByteArray.firstOption(predicate: (Byte) -> Boolean): Option<Byte> {
-    return firstOrNull(predicate).toOption()
-}
+inline fun LongArray.firstOption(predicate: (Long) -> Boolean): Option<Long> = firstOrNull(predicate).toOption()
 
-inline fun CharArray.firstOption(predicate: (Char) -> Boolean): Option<Char> {
-    return firstOrNull(predicate).toOption()
-}
+inline fun ShortArray.firstOption(predicate: (Short) -> Boolean): Option<Short> = firstOrNull(predicate).toOption()
 
-inline fun DoubleArray.firstOption(predicate: (Double) -> Boolean): Option<Double> {
-    return firstOrNull(predicate).toOption()
-}
+fun <T> Iterable<T>.firstOption(predicate: Predicate<T>): Option<T> = firstOrNull(predicate).toOption()
 
-inline fun FloatArray.firstOption(predicate: (Float) -> Boolean): Option<Float> {
-    return firstOrNull(predicate).toOption()
-}
+fun <T> Sequence<T>.firstOption(predicate: Predicate<T>): Option<T> = firstOrNull(predicate).toOption()
 
-inline fun IntArray.firstOption(predicate: (Int) -> Boolean): Option<Int> {
-    return firstOrNull(predicate).toOption()
-}
-
-inline fun LongArray.firstOption(predicate: (Long) -> Boolean): Option<Long> {
-    return firstOrNull(predicate).toOption()
-}
-
-inline fun ShortArray.firstOption(predicate: (Short) -> Boolean): Option<Short> {
-    return firstOrNull(predicate).toOption()
-}
-
-fun <T> Iterable<T>.firstOption(predicate: Predicate<T>): Option<T> {
-    return firstOrNull(predicate).toOption()
-}
-
-fun <T> Sequence<T>.firstOption(predicate: Predicate<T>): Option<T> {
-    return firstOrNull(predicate).toOption()
-}
-
-inline fun String.firstOption(predicate: (Char) -> Boolean): Option<Char> {
-    return firstOrNull(predicate).toOption()
-}
+inline fun String.firstOption(predicate: (Char) -> Boolean): Option<Char> = firstOrNull(predicate).toOption()
 
 fun <T, R> List<T>.optionTraverse(f: (T) -> Option<R>): Option<List<R>> = foldRight(Some(emptyList())) { i: T, accumulator: Option<List<R>> ->
     f(i).map(accumulator) { head: R, tail: List<R> ->
@@ -277,12 +221,7 @@ fun <T, R> List<T>.optionTraverse(f: (T) -> Option<R>): Option<List<R>> = foldRi
 
 fun <T> List<Option<T>>.optionSequential(): Option<List<T>> = optionTraverse { it }
 
-fun <T> List<Option<T>>.flatten(): List<T> {
-    return filter { it.isDefined() }.map { it.get() }
-}
+fun <T> List<Option<T>>.flatten(): List<T> = filter { it.isDefined() }.map { it.get() }
 
-fun <P1, R> ((P1) -> R).optionLift(): (Option<P1>) -> Option<R> {
-    return { it.map(this) }
-}
-
+fun <P1, R> ((P1) -> R).optionLift(): (Option<P1>) -> Option<R> = { it.map(this) }
 

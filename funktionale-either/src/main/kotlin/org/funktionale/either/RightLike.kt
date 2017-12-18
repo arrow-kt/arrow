@@ -16,7 +16,6 @@
 
 package org.funktionale.either
 
-
 interface RightLike : EitherLike {
     override fun isLeft(): Boolean = false
     override fun isRight(): Boolean = true

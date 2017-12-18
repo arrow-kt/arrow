@@ -86,7 +86,6 @@ sealed class Try<T> {
         is Failure -> this
     }
 
-
     fun rescue(f: (Throwable) -> Try<T>): Try<T> = when (this) {
         is Success -> this
         is Failure -> try {
@@ -146,7 +145,6 @@ sealed class Try<T> {
         is Failure -> f(throwable)
     }
 
-
     class Success<T>(private val t: T) : Try<T>() {
         override fun get(): T = t
 
@@ -154,9 +152,7 @@ sealed class Try<T> {
 
         override fun isSuccess() = true
 
-        override fun toString(): String {
-            return "Success($t)"
-        }
+        override fun toString(): String = "Success($t)"
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -167,10 +163,7 @@ sealed class Try<T> {
             return true
         }
 
-        override fun hashCode(): Int {
-            return t?.hashCode() ?: 0
-        }
-
+        override fun hashCode(): Int = t?.hashCode() ?: 0
 
     }
 
@@ -183,9 +176,7 @@ sealed class Try<T> {
 
         override fun isSuccess() = false
 
-        override fun toString(): String {
-            return "Failure($throwable)"
-        }
+        override fun toString(): String = "Failure($throwable)"
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -196,10 +187,7 @@ sealed class Try<T> {
             return true
         }
 
-        override fun hashCode(): Int {
-            return throwable.hashCode()
-        }
-
+        override fun hashCode(): Int = throwable.hashCode()
 
     }
 

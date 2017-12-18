@@ -36,7 +36,6 @@ class RightProjection<out L, out R>(val e: Either<L, R>) {
         }
     }
 
-
     fun exists(predicate: (R) -> Boolean): Boolean = when (e) {
         is Right -> predicate(e.r)
         is Left -> false
@@ -76,6 +75,5 @@ fun <X, L, R> RightProjection<L, R>.flatMap(f: (R) -> Either<L, X>): Either<L, X
     is Left -> Left(e.l)
     is Right -> f(e.r)
 }
-
 
 fun <L, R, X, Y> RightProjection<L, R>.map(x: Either<L, X>, f: (R, X) -> Y): Either<L, Y> = flatMap { r -> x.right().map { xx -> f(r, xx) } }

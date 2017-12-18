@@ -16,7 +16,6 @@
 
 package org.funktionale.utils
 
-
 interface SetterOperation<in K, in V> {
     val setter: (K, V) -> Unit
 

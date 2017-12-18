@@ -35,7 +35,6 @@ class State<S, out T>(val run: (S) -> Pair<S, T>) {
 		f(t).run(s1)
 	}
 
-
 	companion object {
 		fun <S, T> pure(t: T): State<S, T> = State { s -> s to t }
 
@@ -47,12 +46,10 @@ class State<S, out T>(val run: (S) -> Pair<S, T>) {
 	}
 }
 
-fun <R, S, T> List<T>.stateTraverse(f: (T) -> State<S, R>): State<S, List<R>> {
-	return foldRight(State.pure(emptyList())) { i: T, accumulator: State<S, List<R>> ->
+fun <R, S, T> List<T>.stateTraverse(f: (T) -> State<S, R>): State<S, List<R>> = foldRight(State.pure(emptyList())) { i: T, accumulator: State<S, List<R>> ->
 		f(i).map(accumulator) { head: R, tail: List<R> ->
 			head prependTo tail
 		}
 	}
-}
 
 fun <S, T> List<State<S, T>>.stateSequential(): State<S, List<T>> = stateTraverse { it }

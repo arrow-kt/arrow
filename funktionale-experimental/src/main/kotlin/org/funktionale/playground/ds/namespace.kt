@@ -25,37 +25,19 @@ package org.funktionale.playground.ds
 
 interface FList<out T> {
     companion object {
-        fun sum(ints: FList<Int>): Int {
-            /*return when (ints) {
-                is Nil -> 0
-                is Cons -> ints.head + sum(ints.tail)
-                else -> throw IllegalArgumentException()
-            }*/
-            return foldRight(ints, 0) { x, y ->
+        fun sum(ints: FList<Int>): Int = foldRight(ints, 0) { x, y ->
                 x + y
             }
-        }
 
-        fun product(ds: FList<Double>): Double {
-            /*return when (ds) {
-                is Nil -> 1.0
-                is Cons -> if (ds.head == 0.0) 0.0 else ds.head * product(ds.tail)
-                else -> throw IllegalArgumentException()
-            }*/
-            return foldRight(ds, 1.0) { x, y ->
+        fun product(ds: FList<Double>): Double = foldRight(ds, 1.0) { x, y ->
                 x * y
             }
-        }
 
-        fun <T, R> foldRight(l: FList<T>, z: R, f: (T, R) -> R): R {
-            return when (l) {
+        fun <T, R> foldRight(l: FList<T>, z: R, f: (T, R) -> R): R = when (l) {
                 is Nil -> z
                 is Cons -> f(l.head, foldRight(l.tail, z, f))
                 else -> throw IllegalArgumentException()
             }
-        }
-
-
 
         /*fun invoke<T>(vararg members: T): FList<T> {
             return if (members.isEmpty()) {
@@ -66,7 +48,6 @@ interface FList<out T> {
         }*/
     }
 }
-
 
 object Nil : FList<Nothing>
 
@@ -105,11 +86,9 @@ interface FTree<out T> {
         1 + (Math.max(l, r))
     }
 
-
     fun <R> mapViaFold(f: (T) -> R): FTree<R> = fold({ Leaf(f(it)) }) { l: FTree<R>, r: FTree<R> ->
         Branch(l, r)
     }
-
 
 }
 
@@ -128,5 +107,4 @@ data class Branch<T>(val left: FTree<T>, val right: FTree<T>) : FTree<T>
 
 open class Foo
 open class Bar
-
 

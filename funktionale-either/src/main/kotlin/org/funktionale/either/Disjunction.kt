@@ -62,7 +62,6 @@ sealed class Disjunction<out L, out R> : EitherLike {
         is Left -> Left(value)
     }
 
-
     fun filter(predicate: (R) -> Boolean): Option<Disjunction<L, R>> = when (this) {
         is Right -> if (predicate(value)) {
             Option.Some(this)
@@ -99,7 +98,6 @@ sealed class Disjunction<out L, out R> : EitherLike {
 
         override fun toString(): String = "Disjunction.Left($value)"
 
-
     }
 
     class Right<out L, out R>(val value: R) : Disjunction<L, R>(), RightLike {
@@ -114,7 +112,6 @@ sealed class Disjunction<out L, out R> : EitherLike {
         override fun hashCode(): Int = value.hashCodeForNullable(43) { a, b -> a * b }
 
         override fun toString(): String = "Disjunction.Right($value)"
-
 
     }
 }

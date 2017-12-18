@@ -122,13 +122,11 @@ fun parseInts(a: Collection<String>): Option<Collection<Int>> {
     }
 }*/
 
-fun mean(xs:Collection<Double>): Either<String, Double> {
-    return if (xs.isEmpty()){
+fun mean(xs: Collection<Double>): Either<String, Double> = if (xs.isEmpty()) {
         Left("mean of empty list!")
     } else {
         Right(xs.sum() / xs.size)
     }
-}
 
 fun main(args: Array<String>) {
     /*val abs: (Double) -> Double = { i: Double -> Math.abs(i) }

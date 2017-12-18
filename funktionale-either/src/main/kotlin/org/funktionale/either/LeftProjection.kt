@@ -36,12 +36,10 @@ class LeftProjection<out L, out R>(val e: Either<L, R>) {
         }
     }
 
-
     fun exists(predicate: (L) -> Boolean): Boolean = when (e) {
         is Left -> predicate(e.l)
         is Right -> false
     }
-
 
     fun <X> map(f: (L) -> X): Either<X, R> = flatMap { Left<X, R>(f(it)) }
 

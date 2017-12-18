@@ -23,22 +23,17 @@ package org.funktionale.playground.nn
  * Time: 4:03 PM
  */
 
-fun nonlin(x: Double, deriv: Boolean = false): Double {
-    return if (deriv) {
+fun nonlin(x: Double, deriv: Boolean = false): Double = if (deriv) {
         x * (1 - x)
     } else {
         1 / (1 + StrictMath.exp(-x))
     }
-}
 
-fun <I : Comparable<I>, T : Thing<I>> load(thing: T, id: I): T? {
-   // id is ignored at the moment...
-   return when(thing) {
+fun <I : Comparable<I>, T : Thing<I>> load(thing: T, id: I): T? = when (thing) {
        is Any -> Egal() as T
 
        else -> null
    }
-}
 
 fun main(args: Array<String>) {
     load(Egal(),"")
@@ -46,11 +41,11 @@ fun main(args: Array<String>) {
 
 abstract class Thing<I : Comparable<I>>
 
-class Egal: Thing<String>() {
+class Egal : Thing<String>() {
 
         //companion object
 }
 
-class Bar: Thing<Int>() {
+class Bar : Thing<Int>() {
     companion object
 }

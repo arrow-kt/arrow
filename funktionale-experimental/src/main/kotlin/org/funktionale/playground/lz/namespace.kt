@@ -64,9 +64,9 @@ sealed class Stream<out T : Any> {
         return go(this, listOf()).reversed()
     }
 
-    fun toFastList(): List<T>{
+    fun toFastList(): List<T> {
         val buf = arrayListOf<T>()
-        fun go(s:Stream<T>):List<T> = when(s){
+        fun go(s: Stream<T>): List<T> = when (s) {
             is Stream.Empty -> buf
             is Stream.Cons -> {
                 buf.add(s.head())
@@ -81,21 +81,17 @@ sealed class Stream<out T : Any> {
     companion object {
         fun <T : Any> empty(): Stream<T> = Empty()
         fun <T : Any> cons(head: () -> T, tail: () -> Stream<T>): Stream<T> = Cons(head.memoize(), tail.memoize())
-        operator fun <T : Any> invoke(vararg t: T): Stream<T> {
-            return if (t.isEmpty()) {
+        operator fun <T : Any> invoke(vararg t: T): Stream<T> = if (t.isEmpty()) {
                 empty()
             } else {
                 cons({ t.first() }) { invoke(t.drop(1)) }
             }
-        }
 
-        operator fun <T : Any> invoke(t: List<T>): Stream<T> {
-            return if (t.isEmpty()) {
+        operator fun <T : Any> invoke(t: List<T>): Stream<T> = if (t.isEmpty()) {
                 empty()
             } else {
                 cons({ t.first() }) { invoke(t.drop(1)) }
             }
-        }
 
     }
 }

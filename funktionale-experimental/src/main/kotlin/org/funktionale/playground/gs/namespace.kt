@@ -23,11 +23,9 @@ package org.funktionale.playground.gs
  * Time: 10:53 PM
  */
 
-
 fun abs(n: Int): Int = if (n < 0) -n else n
 
 private fun formatAbs(x: Int) = "The absolute value of $x is ${abs(x)}"
-
 
 fun factorial_(n: Long): Long {
     var result = 1L
@@ -84,7 +82,7 @@ fun main(args: Array<String>) {
     println(formatResult("fibonnaci", 92, ::fib_))
     println(formatResult("fibonnaci", 92, ::fib))
     println(formatResult("increment", 9) { x: Int -> x + 1 })
-    println(formatResult("increment", 7) { x:Int -> x + 1 })
+    println(formatResult("increment", 7) { x: Int -> x + 1 })
     println(formatResult("increment", 7, { it + 1 }))
     println(formatResult("increment", 7) { it + 1 })
 }
