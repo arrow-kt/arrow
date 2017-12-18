@@ -16,147 +16,156 @@
 
 package org.funktionale.option
 
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.fail
+import io.kotlintest.matchers.shouldBe
+import io.kotlintest.matchers.shouldNotBe
+import kategory.UnitSpec
 import org.funktionale.option.Option.None
 import org.funktionale.option.Option.Some
-import org.testng.Assert.*
-import org.testng.annotations.Test
+import org.junit.runner.RunWith
 
-class OptionTest {
+@RunWith(KTestJUnitRunner::class)
+class OptionTest : UnitSpec() {
 
     val some: Option<String> = "kotlin".toOption()
     val none: Option<String> = Option.empty()
 
-    @Test fun option() {
+    init {
 
-        val option = some
-        when (option) {
-            is Some<String> -> {
-                assertEquals(option.get(), "kotlin")
+        "option" {
+
+            val option = some
+            when (option) {
+                is Some<String> -> {
+                    option.get() shouldBe "kotlin"
+                }
+                is None -> fail("")
             }
-            is None -> fail()
+
+            val otherOption = none
+
+            when (otherOption) {
+                is Some<String> -> fail("")
+                is None -> otherOption shouldBe None
+            }
+
         }
 
-        val otherOption = none
-
-        when (otherOption) {
-            is Some<String> -> fail()
-            is None -> assertEquals(otherOption, None)
+        "getOrElse" {
+            some.getOrElse { "java" } shouldBe "kotlin"
+            none.getOrElse { "java" } shouldBe "java"
         }
 
-    }
-
-    @Test fun getOrElse() {
-        assertEquals(some.getOrElse { "java" }, "kotlin")
-        assertEquals(none.getOrElse { "java" }, "java")
-    }
-
-    @Test fun orNull() {
-        assertNotNull(some.orNull())
-        assertNull(none.orNull())
-    }
-
-    @Test fun map() {
-        assertEquals(some.map(String::toUpperCase).get(), "KOTLIN")
-        assertEquals(none.map(String::toUpperCase), None)
-
-        assertEquals(some.map(Some(12)) { name, version -> "${name.toUpperCase()} M$version" }.get(), "KOTLIN M12")
-        assertEquals(none.map(Some(12)) { name, version -> "${name.toUpperCase()} M$version" }, None)
-    }
-
-    @Test fun fold() {
-        assertEquals(some.fold({ 0 }) { it.length }, 6)
-        assertEquals(none.fold({ 0 }) { it.length }, 0)
-    }
-
-    @Test fun flatMap() {
-        assertEquals(some.flatMap { Some(it.toUpperCase()) }.get(), "KOTLIN")
-        assertEquals(none.flatMap { Some(it.toUpperCase()) }, None)
-    }
-
-    @Test fun filter() {
-        assertEquals(some.filter { it == "java" }, None)
-        assertEquals(none.filter { it == "java" }, None)
-        assertEquals(some.filter { it.startsWith('k') }.get(), "kotlin")
-    }
-
-    @Test fun filterNot() {
-        assertEquals(some.filterNot { it == "java" }.get(), "kotlin")
-        assertEquals(none.filterNot { it == "java" }, None)
-        assertEquals(some.filterNot { it.startsWith('k') }, None)
-    }
-
-    @Test fun exists() {
-        assertTrue(some.exists { it.startsWith('k') })
-        assertFalse(none.exists { it.startsWith('k') })
-
-    }
-
-    @Test fun forEach() {
-        some.forEach {
-            assertEquals(it, "kotlin")
+        "orNull" {
+            some.orNull() shouldNotBe null
+            none.orNull() shouldBe null
         }
 
-        none.forEach {
-            fail()
-        }
-    }
+        "map" {
+            some.map(String::toUpperCase).get() shouldBe "KOTLIN"
+            none.map(String::toUpperCase) shouldBe None
 
-    @Test fun orElse() {
-        assertEquals(some.orElse { Some("java") }.get(), "kotlin")
-        assertEquals(none.orElse { Some("java") }.get(), "java")
-    }
-
-    @Test fun toList() {
-        assertEquals(some.toList(), listOf("kotlin"))
-        assertEquals(none.toList(), listOf<String>())
-    }
-
-
-    @Test fun getAsOption() {
-        val map = mapOf(1 to "uno", 2 to "dos", 4 to null)
-        assertEquals(map.option[1], Some("uno"))
-        assertEquals(map.option[3], None)
-        assertEquals(map.option[4], None)
-    }
-
-    @Test fun firstOption() {
-        val l = listOf(1, 2, 3, 4, 5, 6)
-        assertEquals(l.firstOption(), Some(1))
-        assertEquals(l.firstOption { it > 2 }, Some(3))
-    }
-
-    @Test fun optionBody() {
-        assertEquals(optionTry { "1".toInt() }, Some(1))
-        assertEquals(optionTry { "foo".toInt() }, None)
-    }
-
-    @Test fun sequential() {
-        fun parseInts(ints: List<String>): Option<List<Int>> {
-            return ints.map { optionTry { it.toInt() } }.optionSequential()
+            some.map(Some(12)) { name, version -> "${name.toUpperCase()} M$version" }.get() shouldBe "KOTLIN M12"
+            none.map(Some(12)) { name, version -> "${name.toUpperCase()} M$version" } shouldBe None
         }
 
-        assertEquals(parseInts(listOf("1", "2", "3")), Some(listOf(1, 2, 3)))
-        assertEquals(parseInts(listOf("1", "foo", "3")), None)
-    }
+        "fold" {
+            some.fold({ 0 }) { it.length } shouldBe 6
+            none.fold({ 0 }) { it.length } shouldBe 0
+        }
 
-    @Test fun and() {
-        val x = Some(2)
-        val y = Some("Foo")
-        assertEquals(x and y, Some("Foo"))
-        assertEquals(x and None, None)
-        assertEquals(None and x, None)
-        assertEquals(None and None, None)
+        "flatMap" {
+            some.flatMap { Some(it.toUpperCase()) }.get() shouldBe "KOTLIN"
+            none.flatMap { Some(it.toUpperCase()) } shouldBe None
+        }
 
-    }
+        "filter" {
+            some.filter { it == "java" } shouldBe None
+            none.filter { it == "java" } shouldBe None
+            some.filter { it.startsWith('k') }.get() shouldBe "kotlin"
+        }
 
-    @Test fun or() {
-        val x = Some(2)
-        val y = Some(100)
-        assertEquals(x or y, Some(2))
-        assertEquals(x or None, Some(2))
-        assertEquals(None or x, Some(2))
-        assertEquals(None or None, None)
+        "filterNot" {
+            some.filterNot { it == "java" }.get() shouldBe "kotlin"
+            none.filterNot { it == "java" } shouldBe None
+            some.filterNot { it.startsWith('k') } shouldBe None
+        }
 
+        "exists" {
+            some.exists { it.startsWith('k') } shouldBe true
+            none.exists { it.startsWith('k') } shouldBe false
+
+        }
+
+        "forEach" {
+            some.forEach {
+                it shouldBe "kotlin"
+            }
+
+            none.forEach {
+                fail("")
+            }
+
+        }
+
+        "orElse" {
+            some.orElse { Some("java") }.get() shouldBe "kotlin"
+            none.orElse { Some("java") }.get() shouldBe "java"
+        }
+
+        "toList" {
+            some.toList() shouldBe listOf("kotlin")
+            none.toList() shouldBe listOf<String>()
+        }
+
+
+        "getAsOption" {
+            val map = mapOf(1 to "uno", 2 to "dos", 4 to null)
+            map.option[1] shouldBe Some("uno")
+            map.option[3] shouldBe None
+            map.option[4] shouldBe None
+        }
+
+        "firstOption" {
+            val l = listOf(1, 2, 3, 4, 5, 6)
+            l.firstOption() shouldBe Some(1)
+            l.firstOption { it > 2 } shouldBe Some(3)
+        }
+
+        "optionBody" {
+            optionTry { "1".toInt() } shouldBe Some(1)
+            optionTry { "foo".toInt() } shouldBe None
+        }
+
+        "sequential" {
+            fun parseInts(ints: List<String>): Option<List<Int>> {
+                return ints.map { optionTry { it.toInt() } }.optionSequential()
+            }
+
+            parseInts(listOf("1", "2", "3")) shouldBe Some(listOf(1, 2, 3))
+            parseInts(listOf("1", "foo", "3")) shouldBe None
+        }
+
+        "and" {
+            val x = Some(2)
+            val y = Some("Foo")
+            x and y shouldBe Some("Foo")
+            x and None shouldBe None
+            None and x shouldBe None
+            None and None shouldBe None
+
+        }
+
+        "or" {
+            val x = Some(2)
+            val y = Some(100)
+            x or y shouldBe Some(2)
+            x or None shouldBe Some(2)
+            None or x shouldBe Some(2)
+            None or None shouldBe None
+
+        }
     }
 
 }
