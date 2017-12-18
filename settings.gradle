@@ -33,5 +33,8 @@ include ':funktionale-collections'
 include ':funktionale-complement'
 include ':funktionale-composition'
 include ':funktionale-currying'
+include ':funktionale-either'
+include ':funktionale-option'
+include ':funktionale-utils'
 
 rootProject.name = 'kategory-parent'
