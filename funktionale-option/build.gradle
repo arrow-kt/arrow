@@ -1,7 +1,7 @@
 dependencies {
     compile project(':kategory-core')
 
-    compile project(':funktionale-collections')
+    compile project(':arrow-syntax')
     compile project(':funktionale-utils')
 
     kapt project(':kategory-annotations-processor')

@@ -16,7 +16,7 @@
 
 package org.funktionale.either
 
-import org.funktionale.collections.prependTo
+import arrow.syntax.collections.*
 import org.funktionale.either.Either.Left
 import org.funktionale.either.Either.Right
 import org.funktionale.option.Option
