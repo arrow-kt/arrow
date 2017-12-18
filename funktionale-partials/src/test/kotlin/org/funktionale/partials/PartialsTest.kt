@@ -16,59 +16,65 @@
 
 package org.funktionale.partials
 
-import org.testng.Assert.assertEquals
-import org.testng.annotations.Test
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
+import kategory.UnitSpec
+import org.junit.runner.RunWith
 
 
-class PartialsTest {
-    @Test fun partially() {
-        val sum5ints = { a: Int, b: Int, c: Int, d: Int, e: Int -> a + b + c + d + e }
+@RunWith(KTestJUnitRunner::class)
+class PairingTest : UnitSpec() {
 
-        val sum4intsTo10 = sum5ints.partially5(10)
+    init {
+        "partially" {
+            val sum5ints = { a: Int, b: Int, c: Int, d: Int, e: Int -> a + b + c + d + e }
 
-        val sum3intsTo15 = sum4intsTo10.partially4(5)
+            val sum4intsTo10 = sum5ints.partially5(10)
 
-        val sum2intsTo17 = sum3intsTo15.partially3(2)
+            val sum3intsTo15 = sum4intsTo10.partially4(5)
 
-        assertEquals(sum2intsTo17(1, 2), 20)
+            val sum2intsTo17 = sum3intsTo15.partially3(2)
 
-        val prefixAndPostfix = { prefix: String, x: String, postfix: String -> "$prefix$x$postfix" }
+            sum2intsTo17(1, 2) shouldBe 20
 
-        val helloX = prefixAndPostfix.partially1("Hello, ").partially2("!")
+            val prefixAndPostfix = { prefix: String, x: String, postfix: String -> "$prefix$x$postfix" }
 
-        assertEquals(helloX("funKTionale"), "Hello, funKTionale!")
-    }
+            val helloX = prefixAndPostfix.partially1("Hello, ").partially2("!")
 
-    @Test fun partials() {
-        val sum5ints = { a: Int, b: Int, c: Int, d: Int, e: Int -> a + b + c + d + e }
-
-        val sum4intsTo10: (Int, Int, Int, Int) -> Int = sum5ints(p5 = 10)
-
-        val sum3intsTo15: (Int, Int, Int) -> Int = sum4intsTo10(p4 = 5)
-
-        val sum2intsTo17: (Int, Int) -> Int = sum3intsTo15(p3 = 2)
-
-        assertEquals(sum2intsTo17(1, 2), 20)
-
-        val prefixAndPostfix = { prefix: String, x: String, postfix: String -> "$prefix$x$postfix" }
-
-        val helloX: (String) -> String = prefixAndPostfix(p1 = "Hello, ")(p2 = "!")
-
-        assertEquals(helloX("funKTionale"), "Hello, funKTionale!")
-    }
-
-    @Test fun bind() {
-        var i = 0
-        fun inc(a: Int) {
-            i += a
+            helloX("funKTionale") shouldBe "Hello, funKTionale!"
         }
 
-        val binded = ::inc.bind(5)
+        "partials" {
+            val sum5ints = { a: Int, b: Int, c: Int, d: Int, e: Int -> a + b + c + d + e }
 
-        assertEquals(i, 0)
+            val sum4intsTo10: (Int, Int, Int, Int) -> Int = sum5ints(p5 = 10)
 
-        binded()
+            val sum3intsTo15: (Int, Int, Int) -> Int = sum4intsTo10(p4 = 5)
 
-        assertEquals(i, 5)
+            val sum2intsTo17: (Int, Int) -> Int = sum3intsTo15(p3 = 2)
+
+            sum2intsTo17(1, 2) shouldBe 20
+
+            val prefixAndPostfix = { prefix: String, x: String, postfix: String -> "$prefix$x$postfix" }
+
+            val helloX: (String) -> String = prefixAndPostfix(p1 = "Hello, ")(p2 = "!")
+
+            helloX("funKTionale") shouldBe "Hello, funKTionale!"
+        }
+
+        "bind" {
+            var i = 0
+            fun inc(a: Int) {
+                i += a
+            }
+
+            val binded = ::inc.bind(5)
+
+            i shouldBe 0
+
+            binded()
+
+            i shouldBe 5
+        }
     }
 }
