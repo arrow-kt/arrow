@@ -28,4 +28,7 @@ include ':kategory-recursion'
 include ':kategory-docs'
 include ':kategory-optics'
 include ':ank-core'
+
+include ':funktionale-collections'
+
 rootProject.name = 'kategory-parent'
