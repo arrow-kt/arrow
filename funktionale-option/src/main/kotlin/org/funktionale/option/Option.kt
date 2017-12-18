@@ -154,7 +154,7 @@ fun <T> T?.toOption(): Option<T> = if (this != null) {
 
 inline fun <T> optionTry(body: () -> T): Option<T> = try {
     Some(body())
-} catch (e: Exception) {
+} catch (e: Throwable) {
     None
 }
 
