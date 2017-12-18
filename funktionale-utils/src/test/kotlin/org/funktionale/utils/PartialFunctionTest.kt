@@ -16,38 +16,44 @@
 
 package org.funktionale.utils
 
-import org.testng.Assert.assertEquals
-import org.testng.Assert.assertTrue
-import org.testng.annotations.Test
 
-class PartialFunctionTest {
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
+import kategory.UnitSpec
+import org.junit.runner.RunWith
+
+@RunWith(KTestJUnitRunner::class)
+class PartialFunctionTest : UnitSpec() {
+
     private val definetAt: (Int) -> Boolean = { it.rem(2) == 0 }
     private val body: (Int) -> String = {
         "is even"
     }
 
-    @Test
-    fun partial() {
-        val isEven = PartialFunction(definetAt, body)
+    init {
 
-        assertTrue(isEven.isDefinedAt(2))
-        assertEquals(isEven(2), "is even")
-    }
+        "partial" {
+            val isEven = PartialFunction(definetAt, body)
 
-    @Test fun toPartialFunction() {
-        val isEven = body.toPartialFunction(definetAt)
-        assertTrue(isEven.isDefinedAt(2))
-        assertEquals(isEven(2), "is even")
-    }
+            (isEven.isDefinedAt(2)) shouldBe true
+            isEven(2) shouldBe "is even"
+        }
 
-    @Test fun orElse() {
-        val isEven = body.toPartialFunction(definetAt)
-        val isOdd = { _: Int -> "is odd" }.toPartialFunction { !definetAt(it) }
-        assertEquals(listOf(1, 2, 3).map(isEven orElse isOdd), listOf("is odd", "is even", "is odd"))
-    }
+        "toPartialFunction"{
+            val isEven = body.toPartialFunction(definetAt)
+            (isEven.isDefinedAt(2)) shouldBe true
+            isEven(2) shouldBe "is even"
+        }
 
-    @Test fun invokeOrElse() {
-        val isEven = body.toPartialFunction(definetAt)
-        assertEquals(listOf(1, 2, 3).map { isEven.invokeOrElse(it, "is odd") }, listOf("is odd", "is even", "is odd"))
+        "orElse" {
+            val isEven = body.toPartialFunction(definetAt)
+            val isOdd = { _: Int -> "is odd" }.toPartialFunction { !definetAt(it) }
+            listOf(1, 2, 3).map(isEven orElse isOdd) shouldBe listOf("is odd", "is even", "is odd")
+        }
+
+        "invokeOrElse" {
+            val isEven = body.toPartialFunction(definetAt)
+            listOf(1, 2, 3).map { isEven.invokeOrElse(it, "is odd") } shouldBe listOf("is odd", "is even", "is odd")
+        }
     }
 }

@@ -16,36 +16,16 @@
 
 package org.funktionale.utils
 
-import org.testng.Assert.assertEquals
-import org.testng.annotations.Test
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
+import kategory.UnitSpec
+import org.junit.runner.RunWith
 
-class UtilTest {
+@RunWith(KTestJUnitRunner::class)
+class UtilTest : UnitSpec() {
 
     private val add5 = { i: Int -> i + 5 }
     private val multiplyBy2 = { i: Int -> i * 2 }
-
-    private fun applyTwoFunctions(i: Int, firstFunction: (Int) -> Int, secondFunction: (Int) -> Int): Int {
-        val x = firstFunction(i)
-        return secondFunction(x)
-    }
-
-    @Test fun testIdentity() {
-
-        assertEquals(applyTwoFunctions(2, add5, multiplyBy2), 14)
-
-        assertEquals(applyTwoFunctions(2, add5, identity()), 7)
-
-        assertEquals(applyTwoFunctions(2, identity(), identity()), 2)
-    }
-
-    @Test fun testConstant() {
-
-        assertEquals(applyTwoFunctions(2, add5, constant(1)), 1)
-
-        val list = arrayListOf("foo", "bar", "baz")
-
-        assertEquals(list.map(constant(7)), arrayListOf(7, 7, 7))
-    }
 
     val Greeter.receive: SetterOperation<String, String>
         get() {
@@ -61,14 +41,40 @@ class UtilTest {
             }
         }
 
-    @Test fun testGetterAndSetterOperations() {
-        val greeter = Greeter()
+    private fun applyTwoFunctions(i: Int, firstFunction: (Int) -> Int, secondFunction: (Int) -> Int): Int {
+        val x = firstFunction(i)
+        return secondFunction(x)
+    }
 
-        //Test Setter
-        greeter.receive["Hola"] = "Mario"
-        assertEquals("Hola from Mario", greeter.getReceivedHello())
-        assertEquals("Hello Mario", greeter.sayHello["Mario"])
+    init {
 
+        "testIdentity" {
+
+            applyTwoFunctions(2, add5, multiplyBy2) shouldBe 14
+
+            applyTwoFunctions(2, add5, identity()) shouldBe 7
+
+            applyTwoFunctions(2, identity(), identity()) shouldBe 2
+        }
+
+        "testConstant" {
+
+            applyTwoFunctions(2, add5, constant(1)) shouldBe 1
+
+            val list = arrayListOf("foo", "bar", "baz")
+
+            list.map(constant(7)) shouldBe arrayListOf(7, 7, 7)
+        }
+
+        "testGetterAndSetterOperations" {
+            val greeter = Greeter()
+
+            //Test Setter
+            greeter.receive["Hola"] = "Mario"
+            "Hola from Mario" shouldBe greeter.getReceivedHello()
+            "Hello Mario" shouldBe greeter.sayHello["Mario"]
+
+        }
     }
 }
 
