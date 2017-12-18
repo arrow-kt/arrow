@@ -16,27 +16,33 @@
 
 package org.funktionale.pairing
 
-import org.testng.Assert
-import org.testng.annotations.Test
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
+import kategory.UnitSpec
+import org.junit.runner.RunWith
 
-class PairingTest {
-    @Test fun testPaired() {
-        val sum2ints = { x: Int, y: Int -> x + y }
+@RunWith(KTestJUnitRunner::class)
+class PairingTest : UnitSpec() {
 
-        val paired = sum2ints.paired()
-        val unpaired = paired.unpaired()
+    init {
+        "testPaired" {
+            val sum2ints = { x: Int, y: Int -> x + y }
 
-        Assert.assertEquals(sum2ints(5, 9), paired(5 to 9))
-        Assert.assertEquals(paired(5 to 9), unpaired(5, 9))
-    }
+            val paired = sum2ints.paired()
+            val unpaired = paired.unpaired()
 
-    @Test fun testTripled() {
-        val sum3ints = { x: Int, y: Int, z: Int -> x + y + z }
+            sum2ints(5, 9) shouldBe paired(5 to 9)
+            paired(5 to 9) shouldBe unpaired(5, 9)
+        }
 
-        val tripled = sum3ints.tripled()
-        val untripled = tripled.untripled()
+        "testTripled" {
+            val sum3ints = { x: Int, y: Int, z: Int -> x + y + z }
 
-        Assert.assertEquals(sum3ints(1, 2, 3), tripled(Triple(1, 2, 3)))
-        Assert.assertEquals(tripled(Triple(9, 8, 7)), untripled(9, 8, 7))
+            val tripled = sum3ints.tripled()
+            val untripled = tripled.untripled()
+
+            sum3ints(1, 2, 3) shouldBe tripled(Triple(1, 2, 3))
+            tripled(Triple(9, 8, 7)) shouldBe untripled(9, 8, 7)
+        }
     }
 }

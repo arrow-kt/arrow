@@ -36,5 +36,6 @@ include ':funktionale-currying'
 include ':funktionale-either'
 include ':funktionale-option'
 include ':funktionale-utils'
+include ':funktionale-pairing'
 
 rootProject.name = 'kategory-parent'
