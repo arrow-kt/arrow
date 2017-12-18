@@ -16,42 +16,43 @@
 
 package org.funktionale.state
 
-import org.testng.Assert.assertEquals
-import org.testng.annotations.Test
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
+import kategory.UnitSpec
+import org.junit.runner.RunWith
 
-/**
- * Created by IntelliJ IDEA.
- * @author Mario Arias
- * Date: 29/05/17
- * Time: 1:14 AM
- */
-class StateTests {
 
-	val add1 = State { n: Int -> n + 1 to n }
+@RunWith(KTestJUnitRunner::class)
+class StateTest : UnitSpec() {
 
-	@Test fun basic() {
-		assertEquals(add1.run(1), 2 to 1)
-	}
+    init {
 
-	@Test fun traverse() {
-		val ns = (0..10).toList()
-		val x = ns.stateTraverse { add1 }
-		assertEquals(x.run(0).first, 11)
-	}
+        val add1 = State { n: Int -> n + 1 to n }
 
-	@Test fun pure() {
-		val s1 = State.pure<String, Int>(1)
-		assertEquals(s1.run("foo"), "foo" to 1)
-	}
+        "basic" {
+            add1.run(1) shouldBe (2 to 1)
+        }
 
-	@Test fun get() {
-		val s1 = State.get<String>()
-		assertEquals(s1.run("foo"), "foo" to "foo")
-	}
+        "traverse" {
+            val ns = (0..10).toList()
+            val x = ns.stateTraverse { add1 }
+            x.run(0).first shouldBe 11
+        }
 
-	@Test fun modify() {
-		val s1 = State.modify<String> { "bar" }
-		val s2 = State.set("bar")
-		assertEquals(s1.run("foo"), s2.run("foo"))
-	}
+        "pure" {
+            val s1 = State.pure<String, Int>(1)
+            s1.run("foo") shouldBe ("foo" to 1)
+        }
+
+        "get" {
+            val s1 = State.get<String>()
+            s1.run("foo") shouldBe ("foo" to "foo")
+        }
+
+        "modify" {
+            val s1 = State.modify<String> { "bar" }
+            val s2 = State.set("bar")
+            s1.run("foo") shouldBe s2.run("foo")
+        }
+    }
 }
