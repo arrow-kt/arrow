@@ -17,26 +17,30 @@
 package org.funktionale.pipe
 
 import org.funktionale.utils.identity
-import org.testng.Assert.assertEquals
-import org.testng.annotations.Test
+
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
+import kategory.UnitSpec
+import org.junit.runner.RunWith
 
 
-class PipeTest {
-
+@RunWith(KTestJUnitRunner::class)
+class PipeTest : UnitSpec() {
 
     private val values = listOf(1, "String", 10.2)
     private val intFunctions = listOf({ x: Int -> x }, { x: Int -> x * x })
 
+    init {
 
+        "testPipe" {
 
-    @Test fun testPipe() {
+            values.forEach {
+                it pipe identity() shouldBe it
+            }
 
-        values.forEach {
-            assertEquals(it pipe identity() , it)
-        }
-
-        intFunctions.forEach {
-            assertEquals(it(2), 2 pipe it)
+            intFunctions.forEach {
+                it(2) shouldBe (2 pipe it)
+            }
         }
     }
 }

@@ -38,5 +38,6 @@ include ':funktionale-option'
 include ':funktionale-utils'
 include ':funktionale-pairing'
 include ':funktionale-partials'
+include ':funktionale-pipe'
 
 rootProject.name = 'kategory-parent'
