@@ -31,5 +31,6 @@ include ':ank-core'
 
 include ':funktionale-collections'
 include ':funktionale-complement'
+include ':funktionale-composition'
 
 rootProject.name = 'kategory-parent'

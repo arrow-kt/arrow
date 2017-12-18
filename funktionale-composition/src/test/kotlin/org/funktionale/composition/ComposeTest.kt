@@ -16,27 +16,52 @@
 
 package org.funktionale.composition
 
-import org.testng.Assert.assertEquals
-import org.testng.annotations.Test
 import java.util.*
 
-class ComposeTest {
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
+import kategory.UnitSpec
+import org.junit.runner.RunWith
 
-    @Test
-    fun `it should compose function correctly (andThen)`() {
-        val potato = "potato"
-        val ninja = "ninja"
-        val get = { potato }
-        val map = { word: String -> ninja + word }
-        assertEquals(ninja + potato, (get andThen map)())
+@RunWith(KTestJUnitRunner::class)
+class ComposeTest : UnitSpec() {
+
+    private val add5 = { i: Int -> i + 5 }
+    private val multiplyBy2 = { i: Int -> i * 2 }
+
+    init {
+
+        "it should compose function correctly (andThen)" {
+            val potato = "potato"
+            val ninja = "ninja"
+            val get = { potato }
+            val map = { word: String -> ninja + word }
+            ninja + potato shouldBe (get andThen map)()
+        }
+
+        "it should compose function correctly (forwardCompose)" {
+            val randomDigit = Random().nextInt()
+            val get = { randomDigit }
+            val pow = { i: Int -> i * i }
+            randomDigit * randomDigit shouldBe (get forwardCompose pow)()
+        }
+
+
+
+        "testAndThen" {
+            val add5andMultiplyBy2 = add5 andThen multiplyBy2
+            add5andMultiplyBy2(2) shouldBe 14
+        }
+
+        "testForwardCompose" {
+            val add5andMultiplyBy2 = add5 forwardCompose multiplyBy2
+            add5andMultiplyBy2(2) shouldBe 14
+        }
+
+        "testCompose" {
+            val multiplyBy2andAdd5 = add5 compose multiplyBy2
+            multiplyBy2andAdd5(2) shouldBe 9
+        }
+
     }
-
-    @Test
-    fun `it should compose function correctly (forwardCompose)`() {
-        val randomDigit = Random().nextInt()
-        val get = { randomDigit }
-        val pow = { i: Int -> i * i }
-        assertEquals(randomDigit * randomDigit, (get forwardCompose pow)())
-    }
-
 }
