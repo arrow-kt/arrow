@@ -16,53 +16,47 @@
 
 package org.funktionale.validation
 
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
+import kategory.UnitSpec
 import org.funktionale.either.Disjunction
-import org.testng.Assert.*
-import org.testng.annotations.Test
+import org.junit.runner.RunWith
 
 data class ExampleForValidation(val number: Int, val text: String)
 
-class ValidationTest {
+@RunWith(KTestJUnitRunner::class)
+class UtilTest : UnitSpec() {
 
-    @Test
-    fun validationTest() {
-        val d1 = Disjunction.right(1)
-        val d2 = Disjunction.right(2)
-        val d3 = Disjunction.right(3)
+    init {
 
-        val validation = Validation(d1, d2, d3)
-        assertFalse(validation.hasFailures)
-        assertEquals(validation.failures, listOf<String>())
-    }
+        "validationTest" {
+            val d1 = Disjunction.right(1)
+            val d2 = Disjunction.right(2)
+            val d3 = Disjunction.right(3)
 
-    @Test
-    fun validationTestWithError() {
-        val d1 = Disjunction.right(1)
-        val d2 = Disjunction.left("Not a number")
-        val d3 = Disjunction.right(3)
+            val validation = Validation(d1, d2, d3)
+            (validation.hasFailures) shouldBe false
+            validation.failures shouldBe listOf<String>()
+        }
 
-        val validation = Validation(d1, d2, d3)
-        assertTrue(validation.hasFailures)
-        assertEquals(validation.failures, listOf("Not a number"))
-    }
+        "validationTestWithError" {
+            val d1 = Disjunction.right(1)
+            val d2 = Disjunction.left("Not a number")
+            val d3 = Disjunction.right(3)
 
-    @Test
-    fun validate2Test() {
-        val r1 = Disjunction.right(1)
-        val r2 = Disjunction.right("blahblah")
-        val l1 = Disjunction.left("fail1")
-        val l2 = Disjunction.left("fail2")
-        assertEquals(
-                validate(r1, r2, ::ExampleForValidation),
-                Disjunction.right(ExampleForValidation(1, "blahblah"))
-        )
-        assertEquals(
-                validate(r1, l2, ::ExampleForValidation),
-                Disjunction.left(listOf("fail2"))
-        )
-        assertEquals(
-                validate(l1, l2, ::ExampleForValidation),
-                Disjunction.left(listOf("fail1", "fail2"))
-        )
+            val validation = Validation(d1, d2, d3)
+            (validation.hasFailures) shouldBe true
+            validation.failures shouldBe listOf("Not a number")
+        }
+
+        "validate2Test" {
+            val r1 = Disjunction.right(1)
+            val r2 = Disjunction.right("blahblah")
+            val l1 = Disjunction.left("fail1")
+            val l2 = Disjunction.left("fail2")
+            validate(r1, r2, ::ExampleForValidation) shouldBe Disjunction.right(ExampleForValidation(1, "blahblah"))
+            validate(r1, l2, ::ExampleForValidation) shouldBe Disjunction.left(listOf("fail2"))
+            validate(l1, l2, ::ExampleForValidation) shouldBe Disjunction.left(listOf("fail1", "fail2"))
+        }
     }
 }
