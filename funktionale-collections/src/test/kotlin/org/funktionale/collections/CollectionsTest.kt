@@ -16,23 +16,30 @@
 
 package org.funktionale.collections
 
-import org.testng.Assert.assertEquals
-import org.testng.annotations.Test
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
+import kategory.UnitSpec
+import org.junit.runner.RunWith
+
+@RunWith(KTestJUnitRunner::class)
+class CollectionsTests : UnitSpec() {
+
+    init {
+
+        "tail" {
+            listOf(1, 2, 3).tail() shouldBe listOf(2, 3)
+        }
+
+        "prependTo" {
+            1 prependTo listOf(2, 3) shouldBe listOf(1, 2, 3)
+        }
 
 
-class CollectionsTest {
-    @Test fun tail() {
-        assertEquals(listOf(1, 2, 3).tail(), listOf(2, 3))
-    }
+        "destructured" {
+            val (head, tail) = listOf(1, 2, 3).destructured()
+            head shouldBe 1
+            tail shouldBe listOf(2, 3)
+        }
 
-    @Test fun prependTo() {
-        assertEquals(1 prependTo listOf(2, 3), listOf(1, 2, 3))
-    }
-
-
-    @Test fun destructured() {
-        val (head, tail) = listOf(1, 2, 3).destructured()
-        assertEquals(head, 1)
-        assertEquals(tail, listOf(2, 3))
     }
 }

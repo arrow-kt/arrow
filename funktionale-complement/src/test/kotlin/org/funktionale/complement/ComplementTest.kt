@@ -16,16 +16,21 @@
 
 package org.funktionale.complement
 
-import org.testng.Assert.assertEquals
-import org.testng.annotations.Test
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
+import kategory.UnitSpec
+import org.junit.runner.RunWith
 
-class ComplementTest {
+@RunWith(KTestJUnitRunner::class)
+class ComplementTest : UnitSpec() {
 
-    @Test fun testComplement() {
-        val isEven = { x: Int -> x % 2 == 0 }
-        assertEquals(isEven(2), true)
+    init {
+        "complement" {
+            val isEven = { x: Int -> x % 2 == 0 }
+            isEven(2) shouldBe true
 
-        val notEven = isEven.complement()
-        assertEquals(notEven(2), false)
+            val notEven = isEven.complement()
+            notEven(2) shouldBe false
+        }
     }
 }

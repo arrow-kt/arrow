@@ -30,5 +30,6 @@ include ':kategory-optics'
 include ':ank-core'
 
 include ':funktionale-collections'
+include ':funktionale-complement'
 
 rootProject.name = 'kategory-parent'
