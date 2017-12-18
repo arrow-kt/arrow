@@ -166,6 +166,7 @@ class FunctionSyntaxTest : UnitSpec() {
             fun inc(a: Int) {
                 i += a
             }
+
             val binded = ::inc.bind(5)
             i shouldBe 0
             binded()

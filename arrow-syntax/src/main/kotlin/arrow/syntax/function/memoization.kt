@@ -3,119 +3,119 @@ package arrow.syntax.function
 import java.util.concurrent.ConcurrentHashMap
 
 fun <R> (() -> R).memoize(): () -> R = object : () -> R {
-        private val m = MemoizedHandler<() -> R, MemoizeKey0<R>, R>(this@memoize)
-        override fun invoke(): R = m(MemoizeKey0(0))
-    }
+    private val m = MemoizedHandler<() -> R, MemoizeKey0<R>, R>(this@memoize)
+    override fun invoke(): R = m(MemoizeKey0(0))
+}
 
 fun <P1, R> ((P1) -> R).memoize(): (P1) -> R = object : (P1) -> R {
-        private val m = MemoizedHandler<((P1) -> R), MemoizeKey1<P1, R>, R>(this@memoize)
-        override fun invoke(p1: P1) = m(MemoizeKey1(p1))
-    }
+    private val m = MemoizedHandler<((P1) -> R), MemoizeKey1<P1, R>, R>(this@memoize)
+    override fun invoke(p1: P1) = m(MemoizeKey1(p1))
+}
 
 fun <P1, P2, R> ((P1, P2) -> R).memoize(): (P1, P2) -> R = object : (P1, P2) -> R {
-        private val m = MemoizedHandler<((P1, P2) -> R), MemoizeKey2<P1, P2, R>, R>(this@memoize)
-        override fun invoke(p1: P1, p2: P2) = m(MemoizeKey2(p1, p2))
-    }
+    private val m = MemoizedHandler<((P1, P2) -> R), MemoizeKey2<P1, P2, R>, R>(this@memoize)
+    override fun invoke(p1: P1, p2: P2) = m(MemoizeKey2(p1, p2))
+}
 
 fun <P1, P2, P3, R> ((P1, P2, P3) -> R).memoize(): (P1, P2, P3) -> R = object : (P1, P2, P3) -> R {
-        private val m = MemoizedHandler<((P1, P2, P3) -> R), MemoizeKey3<P1, P2, P3, R>, R>(this@memoize)
-        override fun invoke(p1: P1, p2: P2, p3: P3) = m(MemoizeKey3(p1, p2, p3))
-    }
+    private val m = MemoizedHandler<((P1, P2, P3) -> R), MemoizeKey3<P1, P2, P3, R>, R>(this@memoize)
+    override fun invoke(p1: P1, p2: P2, p3: P3) = m(MemoizeKey3(p1, p2, p3))
+}
 
 fun <P1, P2, P3, P4, R> ((P1, P2, P3, P4) -> R).memoize(): (P1, P2, P3, P4) -> R = object : (P1, P2, P3, P4) -> R {
-        private val m = MemoizedHandler<((P1, P2, P3, P4) -> R), MemoizeKey4<P1, P2, P3, P4, R>, R>(this@memoize)
-        override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4) = m(MemoizeKey4(p1, p2, p3, p4))
-    }
+    private val m = MemoizedHandler<((P1, P2, P3, P4) -> R), MemoizeKey4<P1, P2, P3, P4, R>, R>(this@memoize)
+    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4) = m(MemoizeKey4(p1, p2, p3, p4))
+}
 
 fun <P1, P2, P3, P4, P5, R> ((P1, P2, P3, P4, P5) -> R).memoize(): (P1, P2, P3, P4, P5) -> R = object : (P1, P2, P3, P4, P5) -> R {
-        private val m = MemoizedHandler<((P1, P2, P3, P4, P5) -> R), MemoizeKey5<P1, P2, P3, P4, P5, R>, R>(this@memoize)
-        override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5) = m(MemoizeKey5(p1, p2, p3, p4, p5))
-    }
+    private val m = MemoizedHandler<((P1, P2, P3, P4, P5) -> R), MemoizeKey5<P1, P2, P3, P4, P5, R>, R>(this@memoize)
+    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5) = m(MemoizeKey5(p1, p2, p3, p4, p5))
+}
 
 fun <P1, P2, P3, P4, P5, P6, R> ((P1, P2, P3, P4, P5, P6) -> R).memoize(): (P1, P2, P3, P4, P5, P6) -> R = object : (P1, P2, P3, P4, P5, P6) -> R {
-        private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6) -> R), MemoizeKey6<P1, P2, P3, P4, P5, P6, R>, R>(this@memoize)
-        override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6) = m(MemoizeKey6(p1, p2, p3, p4, p5, p6))
-    }
+    private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6) -> R), MemoizeKey6<P1, P2, P3, P4, P5, P6, R>, R>(this@memoize)
+    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6) = m(MemoizeKey6(p1, p2, p3, p4, p5, p6))
+}
 
 fun <P1, P2, P3, P4, P5, P6, P7, R> ((P1, P2, P3, P4, P5, P6, P7) -> R).memoize(): (P1, P2, P3, P4, P5, P6, P7) -> R = object : (P1, P2, P3, P4, P5, P6, P7) -> R {
-        private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7) -> R), MemoizeKey7<P1, P2, P3, P4, P5, P6, P7, R>, R>(this@memoize)
-        override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7) = m(MemoizeKey7(p1, p2, p3, p4, p5, p6, p7))
-    }
+    private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7) -> R), MemoizeKey7<P1, P2, P3, P4, P5, P6, P7, R>, R>(this@memoize)
+    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7) = m(MemoizeKey7(p1, p2, p3, p4, p5, p6, p7))
+}
 
 fun <P1, P2, P3, P4, P5, P6, P7, P8, R> ((P1, P2, P3, P4, P5, P6, P7, P8) -> R).memoize(): (P1, P2, P3, P4, P5, P6, P7, P8) -> R = object : (P1, P2, P3, P4, P5, P6, P7, P8) -> R {
-        private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8) -> R), MemoizeKey8<P1, P2, P3, P4, P5, P6, P7, P8, R>, R>(this@memoize)
-        override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8) = m(MemoizeKey8(p1, p2, p3, p4, p5, p6, p7, p8))
-    }
+    private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8) -> R), MemoizeKey8<P1, P2, P3, P4, P5, P6, P7, P8, R>, R>(this@memoize)
+    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8) = m(MemoizeKey8(p1, p2, p3, p4, p5, p6, p7, p8))
+}
 
 fun <P1, P2, P3, P4, P5, P6, P7, P8, P9, R> ((P1, P2, P3, P4, P5, P6, P7, P8, P9) -> R).memoize(): (P1, P2, P3, P4, P5, P6, P7, P8, P9) -> R = object : (P1, P2, P3, P4, P5, P6, P7, P8, P9) -> R {
-        private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9) -> R), MemoizeKey9<P1, P2, P3, P4, P5, P6, P7, P8, P9, R>, R>(this@memoize)
-        override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9) = m(MemoizeKey9(p1, p2, p3, p4, p5, p6, p7, p8, p9))
-    }
+    private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9) -> R), MemoizeKey9<P1, P2, P3, P4, P5, P6, P7, P8, P9, R>, R>(this@memoize)
+    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9) = m(MemoizeKey9(p1, p2, p3, p4, p5, p6, p7, p8, p9))
+}
 
 fun <P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, R> ((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10) -> R).memoize(): (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10) -> R = object : (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10) -> R {
-        private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10) -> R), MemoizeKey10<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, R>, R>(this@memoize)
-        override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10) = m(MemoizeKey10(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10))
-    }
+    private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10) -> R), MemoizeKey10<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, R>, R>(this@memoize)
+    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10) = m(MemoizeKey10(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10))
+}
 
 fun <P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, R> ((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11) -> R).memoize(): (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11) -> R = object : (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11) -> R {
-        private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11) -> R), MemoizeKey11<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, R>, R>(this@memoize)
-        override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11) = m(MemoizeKey11(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11))
-    }
+    private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11) -> R), MemoizeKey11<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, R>, R>(this@memoize)
+    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11) = m(MemoizeKey11(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11))
+}
 
 fun <P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, R> ((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12) -> R).memoize(): (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12) -> R = object : (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12) -> R {
-        private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12) -> R), MemoizeKey12<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, R>, R>(this@memoize)
-        override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11, p12: P12) = m(MemoizeKey12(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12))
-    }
+    private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12) -> R), MemoizeKey12<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, R>, R>(this@memoize)
+    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11, p12: P12) = m(MemoizeKey12(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12))
+}
 
 fun <P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, R> ((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13) -> R).memoize(): (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13) -> R = object : (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13) -> R {
-        private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13) -> R), MemoizeKey13<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, R>, R>(this@memoize)
-        override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11, p12: P12, p13: P13) = m(MemoizeKey13(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13))
-    }
+    private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13) -> R), MemoizeKey13<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, R>, R>(this@memoize)
+    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11, p12: P12, p13: P13) = m(MemoizeKey13(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13))
+}
 
 fun <P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, R> ((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14) -> R).memoize(): (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14) -> R = object : (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14) -> R {
-        private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14) -> R), MemoizeKey14<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, R>, R>(this@memoize)
-        override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11, p12: P12, p13: P13, p14: P14) = m(MemoizeKey14(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14))
-    }
+    private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14) -> R), MemoizeKey14<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, R>, R>(this@memoize)
+    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11, p12: P12, p13: P13, p14: P14) = m(MemoizeKey14(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14))
+}
 
 fun <P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, R> ((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15) -> R).memoize(): (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15) -> R = object : (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15) -> R {
-        private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15) -> R), MemoizeKey15<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, R>, R>(this@memoize)
-        override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11, p12: P12, p13: P13, p14: P14, p15: P15) = m(MemoizeKey15(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15))
-    }
+    private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15) -> R), MemoizeKey15<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, R>, R>(this@memoize)
+    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11, p12: P12, p13: P13, p14: P14, p15: P15) = m(MemoizeKey15(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15))
+}
 
 fun <P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, R> ((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16) -> R).memoize(): (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16) -> R = object : (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16) -> R {
-        private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16) -> R), MemoizeKey16<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, R>, R>(this@memoize)
-        override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11, p12: P12, p13: P13, p14: P14, p15: P15, p16: P16) = m(MemoizeKey16(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16))
-    }
+    private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16) -> R), MemoizeKey16<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, R>, R>(this@memoize)
+    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11, p12: P12, p13: P13, p14: P14, p15: P15, p16: P16) = m(MemoizeKey16(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16))
+}
 
 fun <P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, R> ((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17) -> R).memoize(): (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17) -> R = object : (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17) -> R {
-        private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17) -> R), MemoizeKey17<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, R>, R>(this@memoize)
-        override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11, p12: P12, p13: P13, p14: P14, p15: P15, p16: P16, p17: P17) = m(MemoizeKey17(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17))
-    }
+    private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17) -> R), MemoizeKey17<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, R>, R>(this@memoize)
+    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11, p12: P12, p13: P13, p14: P14, p15: P15, p16: P16, p17: P17) = m(MemoizeKey17(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17))
+}
 
 fun <P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, R> ((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18) -> R).memoize(): (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18) -> R = object : (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18) -> R {
-        private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18) -> R), MemoizeKey18<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, R>, R>(this@memoize)
-        override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11, p12: P12, p13: P13, p14: P14, p15: P15, p16: P16, p17: P17, p18: P18) = m(MemoizeKey18(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18))
-    }
+    private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18) -> R), MemoizeKey18<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, R>, R>(this@memoize)
+    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11, p12: P12, p13: P13, p14: P14, p15: P15, p16: P16, p17: P17, p18: P18) = m(MemoizeKey18(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18))
+}
 
 fun <P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, R> ((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19) -> R).memoize(): (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19) -> R = object : (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19) -> R {
-        private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19) -> R), MemoizeKey19<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, R>, R>(this@memoize)
-        override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11, p12: P12, p13: P13, p14: P14, p15: P15, p16: P16, p17: P17, p18: P18, p19: P19) = m(MemoizeKey19(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19))
-    }
+    private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19) -> R), MemoizeKey19<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, R>, R>(this@memoize)
+    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11, p12: P12, p13: P13, p14: P14, p15: P15, p16: P16, p17: P17, p18: P18, p19: P19) = m(MemoizeKey19(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19))
+}
 
 fun <P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, R> ((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20) -> R).memoize(): (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20) -> R = object : (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20) -> R {
-        private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20) -> R), MemoizeKey20<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, R>, R>(this@memoize)
-        override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11, p12: P12, p13: P13, p14: P14, p15: P15, p16: P16, p17: P17, p18: P18, p19: P19, p20: P20) = m(MemoizeKey20(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20))
-    }
+    private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20) -> R), MemoizeKey20<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, R>, R>(this@memoize)
+    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11, p12: P12, p13: P13, p14: P14, p15: P15, p16: P16, p17: P17, p18: P18, p19: P19, p20: P20) = m(MemoizeKey20(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20))
+}
 
 fun <P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, R> ((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21) -> R).memoize(): (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21) -> R = object : (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21) -> R {
-        private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21) -> R), MemoizeKey21<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, R>, R>(this@memoize)
-        override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11, p12: P12, p13: P13, p14: P14, p15: P15, p16: P16, p17: P17, p18: P18, p19: P19, p20: P20, p21: P21) = m(MemoizeKey21(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21))
-    }
+    private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21) -> R), MemoizeKey21<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, R>, R>(this@memoize)
+    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11, p12: P12, p13: P13, p14: P14, p15: P15, p16: P16, p17: P17, p18: P18, p19: P19, p20: P20, p21: P21) = m(MemoizeKey21(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21))
+}
 
 fun <P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22, R> ((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22) -> R).memoize(): (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22) -> R = object : (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22) -> R {
-        private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22) -> R), MemoizeKey22<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22, R>, R>(this@memoize)
-        override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11, p12: P12, p13: P13, p14: P14, p15: P15, p16: P16, p17: P17, p18: P18, p19: P19, p20: P20, p21: P21, p22: P22) = m(MemoizeKey22(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21, p22))
-    }
+    private val m = MemoizedHandler<((P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22) -> R), MemoizeKey22<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22, R>, R>(this@memoize)
+    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, p7: P7, p8: P8, p9: P9, p10: P10, p11: P11, p12: P12, p13: P13, p14: P14, p15: P15, p16: P16, p17: P17, p18: P18, p19: P19, p20: P20, p21: P21, p22: P22) = m(MemoizeKey22(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21, p22))
+}
 
 private interface MemoizedCall<in F, out R> {
     operator fun invoke(f: F): R
@@ -216,9 +216,9 @@ private data class MemoizeKey22<out P1, out P2, out P3, out P4, out P5, out P6, 
 private class MemoizedHandler<F, in K : MemoizedCall<F, R>, out R>(val f: F) {
     private val m = ConcurrentHashMap<K, R>()
     operator fun invoke(k: K): R = m[k] ?: run({
-            val r = k(f)
-            m.putIfAbsent(k, r)
-            r
-        })
+        val r = k(f)
+        m.putIfAbsent(k, r)
+        r
+    })
 }
 
