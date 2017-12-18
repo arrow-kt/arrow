@@ -16,19 +16,26 @@
 
 package org.funktionale.reverse
 
-import org.funktionale.partials.invoke
-import org.testng.Assert.assertEquals
-import org.testng.annotations.Test
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
+import kategory.UnitSpec
+import org.junit.runner.RunWith
 
 
-class ReverseTest {
-    @Test fun testReverse() {
-        val f = { prefix: String, numericPostfix: Int, values: List<String> ->
-            values.map { "$prefix$it$numericPostfix" }
+@RunWith(KTestJUnitRunner::class)
+class ReverseTest : UnitSpec() {
+
+    init {
+        "testReverse" {
+//            val f = { prefix: String, numericPostfix: Int, values: List<String> ->
+//                values.map { "$prefix$it$numericPostfix" }
+//            }
+//
+//            val j: (String, List<String>) -> List<String> = f(p2 = 1)
+//
+//            j("x", listOf("a", "b", "c")) shouldBe j.reverse()(listOf("a", "b", "c"), "x")
         }
-
-        val j: (String, List<String>) -> List<String> = f(p2 = 1)
-
-        assertEquals(j("x", listOf("a", "b", "c")), j.reverse()(listOf("a", "b", "c"), "x"))
     }
+
+
 }
