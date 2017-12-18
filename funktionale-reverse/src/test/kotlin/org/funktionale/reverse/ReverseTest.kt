@@ -20,20 +20,23 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import kategory.UnitSpec
 import org.junit.runner.RunWith
+import org.funktionale.partials.invoke
 
 
 @RunWith(KTestJUnitRunner::class)
 class ReverseTest : UnitSpec() {
 
+    val f = { prefix: String, numericPostfix: Int, values: List<String> ->
+        values.map { "$prefix$it$numericPostfix" }
+    }
+
     init {
         "testReverse" {
-//            val f = { prefix: String, numericPostfix: Int, values: List<String> ->
-//                values.map { "$prefix$it$numericPostfix" }
-//            }
-//
-//            val j: (String, List<String>) -> List<String> = f(p2 = 1)
-//
-//            j("x", listOf("a", "b", "c")) shouldBe j.reverse()(listOf("a", "b", "c"), "x")
+
+
+            val j: (String, List<String>) -> List<String> = f(p2 = 1)
+
+            j("x", listOf("a", "b", "c")) shouldBe j.reverse()(listOf("a", "b", "c"), "x")
         }
     }
 

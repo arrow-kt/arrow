@@ -16,171 +16,187 @@
 
 package org.funktionale.tries
 
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.funktionale.tries.Try.Failure
 import org.funktionale.tries.Try.Success
-import org.testng.Assert.*
-import org.testng.annotations.Test
 
 
-class TryTest {
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.fail
+import io.kotlintest.matchers.shouldBe
+import kategory.UnitSpec
+import org.junit.runner.RunWith
+
+
+@RunWith(KTestJUnitRunner::class)
+class TryTest : UnitSpec() {
+
     val success = Try { "10".toInt() }
     val failure = Try { "NaN".toInt() }
 
-    @Test fun show() {
-        val problem = success.flatMap { x -> failure.map { y -> x / y } }
-        when (problem) {
-            is Success -> fail("This should not be possible")
-            is Failure -> println(problem)
+    init {
+
+        "show" {
+            val problem = success.flatMap { x -> failure.map { y -> x / y } }
+            when (problem) {
+                is Success -> fail("This should not be possible")
+                is Failure -> println(problem)
+            }
         }
-    }
 
-    @Test fun get() {
-        assertEquals(10, success())
-        try {
-            failure()
-            fail()
-        } catch (e: Exception) {
-            assertTrue(e is NumberFormatException)
+        "get" {
+            10 shouldBe success()
+            try {
+                failure()
+                fail("")
+            } catch (e: Exception) {
+                (e is NumberFormatException) shouldBe true
+            }
         }
-    }
 
-    @Test fun getOrElse() {
-        assertEquals(success.getOrElse { 5 }, 10)
-        assertEquals(failure.getOrElse { 5 }, 5)
-    }
+        "getOrElse" {
+            success.getOrElse { 5 } shouldBe 10
+            failure.getOrElse { 5 } shouldBe 5
+        }
 
-    @Test fun orElse() {
-        assertEquals(success.orElse { Success(5) }.get(), 10)
-        assertEquals(failure.orElse { Success(5) }.get(), 5)
-    }
+        "orElse" {
+            success.orElse { Success(5) }.get() shouldBe 10
+            failure.orElse { Success(5) }.get() shouldBe 5
+        }
 
-    @Test fun `foreach with side effect (applied on Success)`() {
-        var wasInside = false
-        success.foreach { wasInside = true }
-        assertThat(wasInside).isTrue()
-    }
+        "`foreach with side effect (applied on Success)`" {
+            var wasInside = false
+            success.foreach { wasInside = true }
+            wasInside shouldBe true
+        }
 
-    @Test fun `foreach with side effect (applied on Failure)`() {
-        var wasInside = false
-        failure.foreach { wasInside = true }
-        assertThat(wasInside).isFalse()
-    }
+        "`foreach with side effect (applied on Failure)`" {
+            var wasInside = false
+            failure.foreach { wasInside = true }
+            wasInside shouldBe false
+        }
 
-    @Test fun `foreach with exception thrown inside (applied on Success)`() {
-        assertThatThrownBy {
-            success.foreach { throw RuntimeException("thrown inside") }
-        }.hasMessage("thrown inside")
-    }
+        "`foreach with exception thrown inside (applied on Success)`" {
+            try {
+                success.foreach { throw RuntimeException("thrown inside") }
+            } catch (e: Throwable) {
+                e.message shouldBe "thrown inside"
+            }
+        }
 
-    @Test fun `foreach with exception thrown inside (applied on Failure)`() {
-        failure.foreach { throw RuntimeException("thrown inside") }
-        // and no exception should be thrown
-    }
+        "`foreach with exception thrown inside (applied on Failure)`" {
+            failure.foreach { throw RuntimeException("thrown inside") }
+            // and no exception should be thrown
+        }
 
-    @Test fun `onEach with side effect (applied on Success)`() {
-        var wasInside = false
-        success.onEach { wasInside = true }
-        assertThat(wasInside).isTrue()
-    }
+        "`onEach with side effect (applied on Success)`" {
+            var wasInside = false
+            success.onEach { wasInside = true }
+            wasInside shouldBe true
+        }
 
-    @Test fun `onEach with side effect (applied on Failure)`() {
-        var wasInside = false
-        failure.onEach { wasInside = true }
-        assertThat(wasInside).isFalse()
-    }
+        "`onEach with side effect (applied on Failure)`" {
+            var wasInside = false
+            failure.onEach { wasInside = true }
+            wasInside shouldBe false
+        }
 
-    @Test fun `onEach with exception thrown inside (applied on Success)`() {
-        assertThatThrownBy {
-            success.onEach { throw RuntimeException("thrown inside") }.get()
-        }.hasMessage("thrown inside")
-    }
+        "`onEach with exception thrown inside (applied on Success)`" {
+            try {
+                success.onEach { throw RuntimeException("thrown inside") }.get()
+            } catch (e: Throwable) {
+                e.message shouldBe "thrown inside"
+            }
+        }
 
-    @Test fun `onEach with exception thrown inside (applied on Failure)`() {
-        assertThatThrownBy {
-            failure.onEach { throw RuntimeException("thrown inside") }.get()
-        }.isInstanceOf(NumberFormatException::class.java)
-    }
+        "`onEach with exception thrown inside (applied on Failure)`" {
+            try {
+                failure.onEach { throw RuntimeException("thrown inside") }.get()
+            } catch (e: Throwable) {
+                e.javaClass shouldBe NumberFormatException::class.java
+            }
+        }
 
-    @Test fun `onEach with change of carried value (applied on Success)`() {
-        val result = success.onEach { it * 2 }.get()
-        assertThat(result).isEqualTo(10)
-    }
+        "`onEach with change of carried value (applied on Success)`" {
+            val result = success.onEach { it * 2 }.get()
+            result shouldBe 10
+        }
 
-    @Test fun `onEach with change of carried value (applied on Failure)`() {
-        assertThatThrownBy {
-            failure.onEach { it * 2 }.get()
-        }.isInstanceOf(NumberFormatException::class.java)
-    }
+        "`onEach with change of carried value (applied on Failure)`" {
+            try {
+                failure.onEach { it * 2 }.get()
+            } catch (e: Throwable) {
+                e.javaClass shouldBe NumberFormatException::class.java
+            }
+        }
 
-    @Test fun flatMap() {
-        assertEquals(success.flatMap { Success(it * 2) }.get(), 20)
-        assertTrue(failure.flatMap { Success(it * 2) }.isFailure())
-    }
+        "flatMap" {
+            success.flatMap { Success(it * 2) }.get() shouldBe 20
+            (failure.flatMap { Success(it * 2) }.isFailure()) shouldBe true
+        }
 
-    @Test fun map() {
-        assertEquals(success.map { it * 2 }.get(), 20)
-        assertTrue(failure.map { it * 2 }.isFailure())
-    }
+        "map" {
+            success.map { it * 2 }.get() shouldBe 20
+            (failure.map { it * 2 }.isFailure()) shouldBe true
+        }
 
-    @Test fun exists() {
-        assertTrue(success.exists { it > 5 })
-        assertFalse(failure.exists { it > 5 })
-    }
+        "exists" {
+            (success.exists { it > 5 }) shouldBe true
+            (failure.exists { it > 5 }) shouldBe false
+        }
 
-    @Test fun filter() {
-        assertTrue(success.filter { it > 5 }.isSuccess())
-        assertTrue(success.filter { it < 5 }.isFailure())
-        assertFalse(failure.filter { it > 5 }.isSuccess())
-    }
+        "filter" {
+            (success.filter { it > 5 }.isSuccess()) shouldBe true
+            (success.filter { it < 5 }.isFailure()) shouldBe true
+            (failure.filter { it > 5 }.isSuccess()) shouldBe false
+        }
 
-    @Test fun rescue() {
-        assertEquals(success.rescue { Success(5) }.get(), 10)
-        assertEquals(failure.rescue { Success(5) }.get(), 5)
-    }
+        "rescue" {
+            success.rescue { Success(5) }.get() shouldBe 10
+            failure.rescue { Success(5) }.get() shouldBe 5
+        }
 
-    @Test fun handle() {
-        assertEquals(success.handle { 5 }.get(), 10)
-        assertEquals(failure.handle { 5 }.get(), 5)
-    }
+        "handle" {
+            success.handle { 5 }.get() shouldBe 10
+            failure.handle { 5 }.get() shouldBe 5
+        }
 
-    @Test fun onSuccessAndOnFailure() {
-        success.onSuccess { assertEquals(it, 10) }
-                .onFailure { fail() }
-        failure.onSuccess { fail() }
-                .onFailure { }
-    }
+        "onSuccessAndOnFailure" {
+            success.onSuccess { it shouldBe 10 }
+                    .onFailure { fail("") }
+            failure.onSuccess { fail("") }
+                    .onFailure { }
+        }
 
-    @Test fun toOption() {
-        assertTrue(success.toOption().isDefined())
-        assertTrue(failure.toOption().isEmpty())
-    }
+        "toOption" {
+            (success.toOption().isDefined()) shouldBe true
+            (failure.toOption().isEmpty()) shouldBe true
+        }
 
-    @Test fun toDisjunction() {
-        assertTrue(success.toDisjunction().isRight())
-        assertTrue(failure.toDisjunction().isLeft())
-    }
+        "toDisjunction" {
+            (success.toDisjunction().isRight()) shouldBe true
+            (failure.toDisjunction().isLeft()) shouldBe true
+        }
 
-    @Test fun failed() {
-        success.failed().onFailure { assertTrue(it is UnsupportedOperationException) }
-        failure.failed().onSuccess { assertTrue(it is NumberFormatException) }
-    }
+        "failed" {
+            success.failed().onFailure { (it is UnsupportedOperationException) shouldBe true }
+            failure.failed().onSuccess { (it is NumberFormatException) shouldBe true }
+        }
 
-    @Test fun transform() {
-        assertEquals(success.transform({ Try { it.toString() } }) { Try { "NaN" } }.get(), "10")
-        assertEquals(failure.transform({ Try { it.toString() } }) { Try { "NaN" } }.get(), "NaN")
-    }
+        "transform" {
+            success.transform({ Try { it.toString() } }) { Try { "NaN" } }.get() shouldBe "10"
+            failure.transform({ Try { it.toString() } }) { Try { "NaN" } }.get() shouldBe "NaN"
+        }
 
-    @Test fun fold() {
-        assertEquals(success.fold(Int::toString) { "NaN" }, "10")
-        assertEquals(success.fold({ throw RuntimeException("Fire($it)!!") }) { "NaN" }, "NaN")
-        assertEquals(failure.fold(Int::toString) { "NaN" }, "NaN")
-    }
+        "fold" {
+            success.fold(Int::toString) { "NaN" } shouldBe "10"
+            success.fold({ throw RuntimeException("Fire($it)!!") }) { "NaN" } shouldBe "NaN"
+            failure.fold(Int::toString) { "NaN" } shouldBe "NaN"
+        }
 
-    @Test fun flatten() {
-        assertTrue(Try { success }.flatten().isSuccess())
-        assertTrue(Try { failure }.flatten().isFailure())
-        assertTrue(Try<Try<Int>> { throw RuntimeException("") }.flatten().isFailure())
+        "flatten" {
+            (Try { success }.flatten().isSuccess()) shouldBe true
+            (Try { failure }.flatten().isFailure()) shouldBe true
+            (Try<Try<Int>> { throw RuntimeException("") }.flatten().isFailure()) shouldBe true
+        }
     }
 }

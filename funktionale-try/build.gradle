@@ -1,7 +1,8 @@
 dependencies {
     compile project(':kategory-core')
     compile project(':funktionale-utils')
-    compile project(':funktionale-partials')
+    compile project(':funktionale-option')
+    compile project(':funktionale-either')
 
     kapt project(':kategory-annotations-processor')
     kaptTest project(':kategory-annotations-processor')
