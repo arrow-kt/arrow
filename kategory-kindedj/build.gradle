@@ -1,5 +1,5 @@
 dependencies {
-    compile project(':kategory-core')
+    compile project(':arrow-data')
 
     kapt project(':kategory-annotations-processor')
     kaptTest project(':kategory-annotations-processor')

@@ -1,14 +1,6 @@
 package kategory.optics
 
-import kategory.Either
-import kategory.Monoid
-import kategory.Option
-import kategory.Tuple2
-import kategory.compose
-import kategory.identity
-import kategory.none
-import kategory.some
-import kategory.toT
+import kategory.*
 
 /**
  * A [Getter] is an optic that allows to see into a structure and getting a focus.
@@ -133,7 +125,7 @@ interface Getter<S, A> {
  * Find if the focus satisfies the predicate.
  */
 inline fun <S, A> Getter<S, A>.find(s: S, crossinline p: (A) -> Boolean): Option<A> = get(s).let { b ->
-    if (p(b)) b.some() else none()
+    if (p(b)) Some(b) else None
 }
 
 /**

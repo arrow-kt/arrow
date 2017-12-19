@@ -1,9 +1,6 @@
 package kategory.optics
 
-import kategory.NonEmptyList
-import kategory.Option
-import kategory.none
-import kategory.some
+import kategory.*
 
 /**
  * [Lens] to operate on the head of a [NonEmptyList]
@@ -18,7 +15,7 @@ fun <A> nelHead(): Lens<NonEmptyList<A>, A> = Lens(
  */
 fun <A, B> pOptionNelToList(): PIso<Option<NonEmptyList<A>>, Option<NonEmptyList<B>>, List<A>, List<B>> = PIso(
         get = { optNel -> optNel.fold({ emptyList() }, { it.all }) },
-        reverseGet = { aas -> if (aas.isEmpty()) none() else NonEmptyList(aas.first(), aas.drop(1)).some() }
+        reverseGet = { aas -> if (aas.isEmpty()) None else Some(NonEmptyList(aas.first(), aas.drop(1))) }
 )
 
 /**

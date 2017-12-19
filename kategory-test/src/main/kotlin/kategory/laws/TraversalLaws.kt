@@ -18,9 +18,8 @@ object TraversalLaws {
     inline fun <reified A, reified B : Any> headOption(traversal: Traversal<A, B>, aGen: Gen<A>, EQB: Eq<B>): Unit =
             forAll(aGen, { a ->
                 traversal.headOption(a).exists { b ->
-                    (traversal.getAll(a)
-                            .firstOrNull()
-                            ?.some() ?: none())
+                    Option.fromNullable(traversal.getAll(a)
+                            .firstOrNull())
                             .exists {
                                 b.equalUnderTheLaw(it, EQB)
                             }

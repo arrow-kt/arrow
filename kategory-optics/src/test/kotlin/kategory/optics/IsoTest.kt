@@ -3,20 +3,7 @@ package kategory.optics
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kategory.Either
-import kategory.Eq
-import kategory.IsoLaws
-import kategory.LensLaws
-import kategory.NonEmptyList
-import kategory.Option
-import kategory.PrismLaws
-import kategory.StringMonoidInstance
-import kategory.UnitSpec
-import kategory.applicative
-import kategory.functor
-import kategory.genFunctionAToB
-import kategory.some
-import kategory.toT
+import kategory.*
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -66,7 +53,7 @@ class IsoTest : UnitSpec() {
 
         "Lifting a function as a functor should yield the same result as not yielding" {
             forAll(TokenGen, Gen.string(), { token, value ->
-                tokenIso.modifyF(Option.functor(), token) { value.some() } == tokenIso.liftF { value.some() }(token)
+                tokenIso.modifyF(Option.functor(), token) { Some(value) } == tokenIso.liftF { Some(value) }(token)
             })
         }
 

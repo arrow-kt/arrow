@@ -1,12 +1,6 @@
 package kategory.optics
 
-import kategory.Either
-import kategory.Option
-import kategory.identity
-import kategory.left
-import kategory.none
-import kategory.right
-import kategory.some
+import kategory.*
 
 /**
  * [PIso] that defines the equality in the kotlin nullable structure and [kategory.Option]
@@ -25,8 +19,8 @@ fun <A> nullableToOption(): Iso<A?, Option<A>> = pNullableToOption()
  * [PPrism] to focus into an [kategory.Option.Some]
  */
 fun <A, B> pSomePrism(): PPrism<Option<A>, Option<B>, A, B> = PPrism(
-        getOrModify = { option -> option.fold({ none<B>().left() }, { a -> a.right() }) },
-        reverseGet = { b -> b.some() }
+        getOrModify = { option -> option.fold({ None.left() }, { a -> a.right() }) },
+        reverseGet = { b -> Some(b) }
 )
 
 /**
@@ -38,13 +32,13 @@ fun <A> somePrism(): Prism<Option<A>, A> = pSomePrism()
  * [Prism] to focus into an [kategory.Option.None]
  */
 fun <A> nonePrism(): Prism<Option<A>, Unit> = Prism(
-        getOrModify = { option -> option.fold({ Unit.right() }, { it.some().left() }) },
-        reverseGet = { _ -> none() }
+        getOrModify = { option -> option.fold({ Unit.right() }, { Some(it).left() }) },
+        reverseGet = { _ -> None }
 )
 
 fun <A, B> pOptionToEither(): PIso<Option<A>, Option<B>, Either<Unit, A>, Either<Unit, B>> = PIso(
         get = { opt -> opt.fold({ Unit.left() }, { a -> a.right() }) },
-        reverseGet = { either -> either.fold({ none() }, { b -> b.some() }) }
+        reverseGet = { either -> either.fold({ None }, { b -> Some(b) }) }
 )
 
 fun <A> optionToEither(): Iso<Option<A>, Either<Unit, A>> = pOptionToEither()

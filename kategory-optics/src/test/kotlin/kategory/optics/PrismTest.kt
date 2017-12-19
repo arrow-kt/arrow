@@ -3,17 +3,7 @@ package kategory.optics
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kategory.Eq
-import kategory.NonEmptyList
-import kategory.Option
-import kategory.PrismLaws
-import kategory.Try
-import kategory.UnitSpec
-import kategory.applicative
-import kategory.genEither
-import kategory.genFunctionAToB
-import kategory.genTuple
-import kategory.some
+import kategory.*
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -105,7 +95,7 @@ class PrismTest : UnitSpec() {
 
         "Setting a target on a prism should set the correct target"{
             forAll(AGen, Gen.string(), { a, string ->
-                sumPrism.setOption(a, string) == a.copy(string = string).some()
+                sumPrism.setOption(a, string) == Some(a.copy(string = string))
             })
         }
 

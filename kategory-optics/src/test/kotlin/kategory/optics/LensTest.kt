@@ -3,19 +3,7 @@ package kategory.optics
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kategory.Eq
-import kategory.LensLaws
-import kategory.Option
-import kategory.Try
-import kategory.Tuple2
-import kategory.UnitSpec
-import kategory.applicative
-import kategory.functor
-import kategory.genFunctionAToB
-import kategory.left
-import kategory.right
-import kategory.some
-import kategory.toT
+import kategory.*
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -49,7 +37,7 @@ class LensTest : UnitSpec() {
 
         "Lifting a function as a functor should yield the same result as not yielding" {
             forAll(TokenGen, Gen.string(), { token, value ->
-                tokenLens.modifyF(Option.functor(), token) { value.some() } == tokenLens.liftF { value.some() }(token)
+                tokenLens.modifyF(Option.functor(), token) { Some(value) } == tokenLens.liftF { Some(value)}(token)
             })
         }
 

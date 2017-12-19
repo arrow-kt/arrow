@@ -17,10 +17,10 @@
 package org.funktionale.either
 
 import arrow.syntax.collections.*
+import kategory.Option
+import kategory.hashCodeForNullable
 import org.funktionale.either.Either.Left
 import org.funktionale.either.Either.Right
-import org.funktionale.option.Option
-import org.funktionale.utils.hashCodeForNullable
 
 sealed class Either<out L, out R> : EitherLike {
 

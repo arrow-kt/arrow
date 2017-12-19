@@ -1,20 +1,6 @@
 package kategory.optics
 
-import kategory.Const
-import kategory.Either
-import kategory.Foldable
-import kategory.HK
-import kategory.IntMonoid
-import kategory.ListKW
-import kategory.Monoid
-import kategory.Option
-import kategory.foldable
-import kategory.identity
-import kategory.left
-import kategory.monoid
-import kategory.none
-import kategory.right
-import kategory.some
+import kategory.*
 
 /**
  * A [Fold] is an optic that allows to focus into structure and get multiple results.
@@ -86,12 +72,12 @@ interface Fold<S, A> {
     /**
      * Get the first target
      */
-    fun headOption(s: S): Option<A> = foldMap(firstOptionMonoid<A>(), s, { b -> Const(b.some()) }).value
+    fun headOption(s: S): Option<A> = foldMap(firstOptionMonoid<A>(), s, { b -> Const(Some(b)) }).value
 
     /**
      * Get the last target
      */
-    fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s, { b -> Const(b.some()) }).value
+    fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s, { b -> Const(Some(b)) }).value
 
     /**
      * Fold using the given [Monoid] instance.
@@ -197,7 +183,7 @@ inline fun <S, A, reified R> Fold<S, A>.foldMap(s: S, noinline f: (A) -> R, M: M
  * Find the first element matching the predicate, if one exists.
  */
 inline fun <S, A> Fold<S, A>.find(s: S, crossinline p: (A) -> Boolean): Option<A> =
-        foldMap(firstOptionMonoid<A>(), s, { b -> (if (p(b)) Const(b.some()) else Const(none())) }).value
+        foldMap(firstOptionMonoid<A>(), s, { b -> (if (p(b)) Const(Some(b)) else Const(None)) }).value
 
 /**
  * Check whether at least one element satisfies the predicate.

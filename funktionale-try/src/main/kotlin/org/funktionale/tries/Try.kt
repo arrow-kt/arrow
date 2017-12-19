@@ -16,12 +16,12 @@
 
 package org.funktionale.tries
 
+import kategory.None
+import kategory.Option
+import kategory.Predicate
+import kategory.Some
 import org.funktionale.either.Disjunction
 import org.funktionale.either.Either
-import org.funktionale.option.Option
-import org.funktionale.option.Option.None
-import org.funktionale.option.Option.Some
-import org.funktionale.utils.Predicate
 import java.util.*
 
 /**

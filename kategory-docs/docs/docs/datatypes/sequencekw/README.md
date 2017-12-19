@@ -57,7 +57,7 @@ SequenceKW.monad().binding {
 Folding a sequence,
 
 ```kotlin:ank
-sequenceOf('a', 'b', 'c', 'd', 'e').k().foldL("") { x, y -> x + y }
+sequenceOf('a', 'b', 'c', 'd', 'e').k().foldLeft("") { x, y -> x + y }
 ```
 
 Available Instances:

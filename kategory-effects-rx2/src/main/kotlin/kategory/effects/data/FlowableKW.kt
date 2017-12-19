@@ -34,9 +34,9 @@ data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A>, Flowabl
     fun <B> switchMap(f: (A) -> FlowableKWKind<B>): FlowableKW<B> =
             flowable.switchMap { f(it).ev().flowable }.k()
 
-    fun <B> foldL(b: B, f: (B, A) -> B): B = flowable.reduce(b, f).blockingGet()
+    fun <B> foldLeft(b: B, f: (B, A) -> B): B = flowable.reduce(b, f).blockingGet()
 
-    fun <B> foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
+    fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
         fun loop(fa_p: FlowableKW<A>): Eval<B> = when {
             fa_p.flowable.isEmpty.blockingGet() -> lb
             else -> f(fa_p.flowable.blockingFirst(), Eval.defer { loop(fa_p.flowable.skip(1).k()) })
@@ -46,7 +46,7 @@ data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A>, Flowabl
     }
 
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, FlowableKW<B>> =
-            foldR(Eval.always { GA.pure(Flowable.empty<B>().k()) }) { a, eval ->
+            foldRight(Eval.always { GA.pure(Flowable.empty<B>().k()) }) { a, eval ->
                 GA.map2Eval(f(a), eval) { Flowable.concat(Flowable.just<B>(it.a), it.b.flowable).k() }
             }.value()
 

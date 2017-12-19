@@ -1,22 +1,6 @@
 package kategory.optics
 
-import kategory.Applicative
-import kategory.Either
-import kategory.HK
-import kategory.Monoid
-import kategory.Option
-import kategory.PartialFunction
-import kategory.Tuple2
-import kategory.applicative
-import kategory.flatMap
-import kategory.getOrElse
-import kategory.identity
-import kategory.left
-import kategory.lift
-import kategory.none
-import kategory.right
-import kategory.some
-import kategory.toT
+import kategory.*
 
 /**
  * [Optional] is a type alias for [POptional] which fixes the type arguments
@@ -272,7 +256,7 @@ inline fun <S, T, A, B> POptional<S, T, A, B>.modifiyOption(s: S, crossinline f:
  * Find the focus that satisfies the predicate [p]
  */
 inline fun <S, T, A, B> POptional<S, T, A, B>.find(s: S, crossinline p: (A) -> Boolean): Option<A> =
-        getOption(s).flatMap { b -> if (p(b)) b.some() else none() }
+        getOption(s).flatMap { b -> if (p(b)) Some(b) else None }
 
 /**
  * Check if there is a focus and it satisfies the predicate [p]

@@ -16,11 +16,11 @@
 
 package org.funktionale.either
 
+import kategory.None
+import kategory.Option
+import kategory.Some
 import org.funktionale.either.Either.Left
 import org.funktionale.either.Either.Right
-import org.funktionale.option.Option
-import org.funktionale.option.Option.None
-import org.funktionale.option.Option.Some
 import java.util.*
 
 class LeftProjection<out L, out R>(val e: Either<L, R>) {

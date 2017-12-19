@@ -16,7 +16,7 @@ object TraverseFilterLaws {
 
     inline fun <reified F> identityTraverseFilter(FT: TraverseFilter<F>, GA: Applicative<F> = applicative<F>(), EQ: Eq<HK<F, HK<F, Int>>> = Eq.any()) =
             forAll(genApplicative(genIntSmall(), GA), { fa: HK<F, Int> ->
-                FT.traverseFilter(fa, { it.some().pure(GA) }, GA).equalUnderTheLaw(GA.pure(fa), EQ)
+                FT.traverseFilter(fa, { Some(it).pure(GA) }, GA).equalUnderTheLaw(GA.pure(fa), EQ)
             })
 
     inline fun <reified F> filterAconsistentWithTraverseFilter(FT: TraverseFilter<F>, GA: Applicative<F> = applicative<F>(), EQ: Eq<HK<F, HK<F, Int>>> = Eq.any()) =

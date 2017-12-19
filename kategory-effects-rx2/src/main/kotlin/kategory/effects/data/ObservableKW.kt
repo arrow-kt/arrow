@@ -34,9 +34,9 @@ data class ObservableKW<A>(val observable: Observable<A>) : ObservableKWKind<A>,
     fun <B> switchMap(f: (A) -> ObservableKWKind<B>): ObservableKW<B> =
             observable.switchMap { f(it).ev().observable }.k()
 
-    fun <B> foldL(b: B, f: (B, A) -> B): B = observable.reduce(b, f).blockingGet()
+    fun <B> foldLeft(b: B, f: (B, A) -> B): B = observable.reduce(b, f).blockingGet()
 
-    fun <B> foldR(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
+    fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
         fun loop(fa_p: ObservableKW<A>): Eval<B> = when {
             fa_p.observable.isEmpty.blockingGet() -> lb
             else -> f(fa_p.observable.blockingFirst(), Eval.defer { loop(fa_p.observable.skip(1).k()) })
@@ -46,7 +46,7 @@ data class ObservableKW<A>(val observable: Observable<A>) : ObservableKWKind<A>,
     }
 
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, ObservableKW<B>> =
-            foldR(Eval.always { GA.pure(Observable.empty<B>().k()) }) { a, eval ->
+            foldRight(Eval.always { GA.pure(Observable.empty<B>().k()) }) { a, eval ->
                 GA.map2Eval(f(a), eval) { Observable.concat(Observable.just<B>(it.a), it.b.observable).k() }
             }.value()
 

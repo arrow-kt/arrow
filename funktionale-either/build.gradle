@@ -1,5 +1,6 @@
 dependencies {
-    compile project(':kategory-core')
+    compile project(':arrow-data')
+    compile project(':arrow-syntax')
 
     kapt project(':kategory-annotations-processor')
     kaptTest project(':kategory-annotations-processor')
@@ -7,8 +8,6 @@ dependencies {
     testCompileOnly project(':kategory-annotations-processor')
 
     testCompile project(':kategory-test')
-
-    compile project(':funktionale-option')
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"

@@ -1,18 +1,6 @@
 package kategory.optics
 
-import kategory.Applicative
-import kategory.Either
-import kategory.Functor
-import kategory.HK
-import kategory.Monoid
-import kategory.Option
-import kategory.Tuple2
-import kategory.functor
-import kategory.identity
-import kategory.none
-import kategory.right
-import kategory.some
-import kategory.toT
+import kategory.*
 
 /**
  * [Lens] is a type alias for [PLens] which fixes the type arguments
@@ -230,7 +218,7 @@ inline fun <S, T, A, B, reified F> PLens<S, T, A, B>.liftF(FF: Functor<F> = func
  * Find a focus that satisfies the predicate
  */
 inline fun <S, T, A, B> PLens<S, T, A, B>.find(s: S, crossinline p: (A) -> Boolean): Option<A> = get(s).let { a ->
-    if (p(a)) a.some() else none()
+    if (p(a)) Some(a) else None
 }
 
 /**

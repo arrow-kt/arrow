@@ -1,27 +1,6 @@
 package kategory.optics
 
-import kategory.Applicative
-import kategory.Either
-import kategory.Eq
-import kategory.HK
-import kategory.Monoid
-import kategory.Option
-import kategory.PartialFunction
-import kategory.Tuple2
-import kategory.applicative
-import kategory.compose
-import kategory.eq
-import kategory.flatMap
-import kategory.getOrElse
-import kategory.identity
-import kategory.Left
-import kategory.left
-import kategory.lift
-import kategory.none
-import kategory.right
-import kategory.Right
-import kategory.some
-import kategory.toT
+import kategory.*
 
 /**
  * [Prism] is a type alias for [PPrism] which fixes the type arguments
@@ -273,7 +252,7 @@ inline fun <S, T, A, B> PPrism<S, T, A, B>.liftOption(crossinline f: (A) -> B): 
 /**
  * Find the focus that satisfies the predicate
  */
-inline fun <S, T, A, B> PPrism<S, T, A, B>.find(s: S, crossinline p: (A) -> Boolean): Option<A> = getOption(s).flatMap { a -> if (p(a)) a.some() else none() }
+inline fun <S, T, A, B> PPrism<S, T, A, B>.find(s: S, crossinline p: (A) -> Boolean): Option<A> = getOption(s).flatMap { a -> if (p(a)) Some(a) else None }
 
 /**
  * Check if there is a focus and it satisfies the predicate

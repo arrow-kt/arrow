@@ -160,7 +160,7 @@ fun getLineLengthAverage(path: FilePath): IO<List<String>> =
   IO.monad().binding {
     val file = getFile(path).bind()
     val lines = file.readLines().bind()
-    val count = lines.map { it.length }.foldL(0) { acc, lineLength -> acc + lineLength }
+    val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
     val average = count / lines.length
     yields(average)
   }
@@ -179,7 +179,7 @@ fun getLineLengthAverage(path: FilePath): IO<List<String>> =
   IO.monadError().bindingE {
     val file = getFile(path).bind()
     val lines = file.readLines().bind()
-    val count = lines.map { it.length }.foldL(0) { acc, lineLength -> acc + lineLength }
+    val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
     val average = count / lines.length
     yields(average)
   }
@@ -213,7 +213,7 @@ fun getLineLengthAverage(path: FilePath): IO<List<String>> =
     // Implicitly wrap the result of a synchronous operation into IO.pure() using bindIn
     val lines = bindIn(computationThreadContext) { file.readLines() }
     
-    val count = lines.map { it.length }.foldL(0) { acc, lineLength -> acc + lineLength }
+    val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
     val average = count / lines.length
     yields(average)
   }

@@ -209,7 +209,7 @@ IO.monad().binding {
       if (lines.isEmpty()) {
         0
       } else {
-        val count = lines.map { it.length }.foldL(0) { acc, lineLength -> acc + lineLength }
+        val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
         count / lines.length
       }
     yields(average)

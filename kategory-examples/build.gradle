@@ -1,5 +1,5 @@
 dependencies {
-    compile project(':kategory-core')
+    compile project(':arrow-data')
     compile project(':kategory-effects')
     compile project(':kategory-effects-rx2')
     compile project(':kategory-effects-kotlinx-coroutines')

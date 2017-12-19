@@ -1,24 +1,6 @@
 package kategory.optics
 
-import kategory.Applicative
-import kategory.Const
-import kategory.Either
-import kategory.HK
-import kategory.Id
-import kategory.IntMonoid
-import kategory.ListKW
-import kategory.Monoid
-import kategory.Option
-import kategory.applicative
-import kategory.identity
-import kategory.left
-import kategory.map
-import kategory.monoid
-import kategory.none
-import kategory.right
-import kategory.some
-import kategory.traverse
-import kategory.value
+import kategory.*
 
 /**
  * [Traversal] is a type alias for [PTraversal] which fixes the type arguments
@@ -240,12 +222,12 @@ interface PTraversal<S, T, A, B> {
     /**
      * Find the first target or [Option.None] if no targets
      */
-    fun headOption(s: S): Option<A> = foldMap(firstOptionMonoid<A>(), s, { b -> Const(b.some()) }).value
+    fun headOption(s: S): Option<A> = foldMap(firstOptionMonoid<A>(), s, { b -> Const(Some(b)) }).value
 
     /**
      * Find the first target or [Option.None] if no targets
      */
-    fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s, { b -> Const(b.some()) }).value
+    fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s, { b -> Const(Some(b)) }).value
 
     fun <U, V> choice(other: PTraversal<U, V, A, B>): PTraversal<Either<S, U>, Either<T, V>, A, B> = object : PTraversal<Either<S, U>, Either<T, V>, A, B> {
         override fun <F> modifyF(FA: Applicative<F>, s: Either<S, U>, f: (A) -> HK<F, B>): HK<F, Either<T, V>> = s.fold(
@@ -328,8 +310,8 @@ inline fun <S, T, A, B, reified F> PTraversal<S, T, A, B>.modifyF(s: S, crossinl
  * Find the first target matching the predicate
  */
 inline fun <S, T, A, B> PTraversal<S, T, A, B>.find(s: S, crossinline p: (A) -> Boolean): Option<A> = foldMap(firstOptionMonoid<A>(), s, { a ->
-    if (p(a)) Const(a.some())
-    else Const(none())
+    if (p(a)) Const(Some(a))
+    else Const(None)
 }).value
 
 /**

@@ -1,13 +1,6 @@
 package kategory.optics
 
-import kategory.ListKW
-import kategory.NonEmptyList
-import kategory.Option
-import kategory.case
-import kategory.k
-import kategory.none
-import kategory.some
-import kategory.toT
+import kategory.*
 
 /**
  * [Optional] to safely operate on the head of a list
@@ -31,7 +24,7 @@ fun <A> listTail(): Optional<List<A>, List<A>> = Optional(
  * [PIso] that defines equality between a [List] and [Option] [NonEmptyList]
  */
 fun <A, B> pListToOptionNel(): PIso<List<A>, List<B>, Option<NonEmptyList<A>>, Option<NonEmptyList<B>>> = PIso(
-        get = { aas -> if (aas.isEmpty()) none() else NonEmptyList(aas.first(), aas.drop(1)).some() },
+        get = { aas -> if (aas.isEmpty()) None else Some(NonEmptyList(aas.first(), aas.drop(1))) },
         reverseGet = { optNel -> optNel.fold({ emptyList() }, { it.all }) }
 )
 

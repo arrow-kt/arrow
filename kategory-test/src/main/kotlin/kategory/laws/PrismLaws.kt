@@ -54,7 +54,7 @@ object PrismLaws {
                 prism.modifyF(Const.applicative(object : Monoid<Option<B>> {
                     override fun combine(a: Option<B>, b: Option<B>): Option<B> = a.orElse { b }
 
-                    override fun empty(): Option<B> = kategory.none()
+                    override fun empty(): Option<B> = None
                 }), a, { Const(Some(it)) }).value().equalUnderTheLaw(prism.getOption(a), EQOptionB)
             })
 

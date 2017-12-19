@@ -18,12 +18,12 @@ object FoldableLaws {
 
     inline fun <reified F> leftFoldConsistentWithFoldMap(FF: Foldable<F>, crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<Int>) =
             forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: HK<F, Int> ->
-                FF.foldMap(IntMonoid, fa, f).equalUnderTheLaw(FF.foldL(fa, IntMonoid.empty(), { acc, a -> IntMonoid.combine(acc, f(a)) }), EQ)
+                FF.foldMap(IntMonoid, fa, f).equalUnderTheLaw(FF.foldLeft(fa, IntMonoid.empty(), { acc, a -> IntMonoid.combine(acc, f(a)) }), EQ)
             })
 
     inline fun <reified F> rightFoldConsistentWithFoldMap(FF: Foldable<F>, crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<Int>) =
             forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: HK<F, Int> ->
-                FF.foldMap(IntMonoid, fa, f).equalUnderTheLaw(FF.foldR(fa, Eval.later { IntMonoid.empty() }, { a, lb: Eval<Int> -> lb.map { IntMonoid.combine(f(a), it) } }).value(), EQ)
+                FF.foldMap(IntMonoid, fa, f).equalUnderTheLaw(FF.foldRight(fa, Eval.later { IntMonoid.empty() }, { a, lb: Eval<Int> -> lb.map { IntMonoid.combine(f(a), it) } }).value(), EQ)
             })
 
     inline fun <reified F> existsConsistentWithFind(FF: Foldable<F>, crossinline cf: (Int) -> HK<F, Int>) =
@@ -73,7 +73,7 @@ object FoldableLaws {
 
     inline fun <reified F> foldMIdIsFoldL(FF: Foldable<F>, crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<Int>) =
             forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: HK<F, Int> ->
-                val foldL: Int = FF.foldL(fa, IntMonoid.empty(), { acc, a -> IntMonoid.combine(acc, f(a)) })
+                val foldL: Int = FF.foldLeft(fa, IntMonoid.empty(), { acc, a -> IntMonoid.combine(acc, f(a)) })
                 val foldM: Int = FF.foldM(fa, IntMonoid.empty(), { acc, a -> Id(IntMonoid.combine(acc, f(a))) }, Id.monad()).value()
                 foldM.equalUnderTheLaw(foldL, EQ)
             })

@@ -15,10 +15,10 @@
  */
 
 include ':arrow-syntax'
+include ':arrow-data'
 
 include ':kategory-annotations'
 include ':kategory-annotations-processor'
-include ':kategory-core'
 include ':kategory-kindedj'
 include ':kategory-test'
 include ':kategory-examples'
@@ -32,7 +32,6 @@ include ':kategory-optics'
 include ':ank-core'
 
 include ':funktionale-either'
-include ':funktionale-option'
 include ':funktionale-utils'
 include ':funktionale-state'
 include ':funktionale-try'

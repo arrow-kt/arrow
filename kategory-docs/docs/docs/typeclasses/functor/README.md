@@ -161,5 +161,5 @@ The following datatypes in Kategory provide instances that adhere to the `Functo
 Additionally all instances of [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}), [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) and their MTL variants implement the `Functor` typeclass directly
 since they are all subtypes of `Functor`
 
-[functor_source]: https://github.com/kategory/kategory/blob/master/kategory-core/src/main/kotlin/kategory/typeclasses/Functor.kt
+[functor_source]: https://github.com/kategory/kategory/blob/master/arrow-data/src/main/kotlin/kategory/typeclasses/Functor.kt
 [functor_laws_source]: https://github.com/kategory/kategory/blob/master/kategory-test/src/main/kotlin/kategory/laws/FunctorLaws.kt

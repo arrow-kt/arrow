@@ -65,7 +65,7 @@ object OptionalLaws {
 
         forAll(aGen, { a ->
             optional.modifyF(Const.applicative(firstMonoid), a, { b ->
-                Const(FirstOption(b.some()))
+                Const(FirstOption(Some(b)))
             }).value().option.equalUnderTheLaw(optional.getOption(a), EQOptionB)
         })
     }

@@ -3,11 +3,7 @@ package kategory.optics
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kategory.ListKWHK
-import kategory.UnitSpec
-import kategory.k
-import kategory.none
-import kategory.some
+import kategory.*
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -59,7 +55,7 @@ class FoldTest : UnitSpec() {
 
         "Find the first element matching the predicate" {
             forAll(Gen.list(Gen.choose(-100, 100)), { ints ->
-                intFold.find(ints.k()) { it > 10 } == ints.firstOrNull { it > 10 }?.some() ?: none<Int>()
+                intFold.find(ints.k()) { it > 10 } == Option.fromNullable(ints.firstOrNull { it > 10 })
             })
         }
 

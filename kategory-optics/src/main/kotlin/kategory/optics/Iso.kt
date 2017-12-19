@@ -1,20 +1,6 @@
 package kategory.optics
 
-import kategory.Applicative
-import kategory.Either
-import kategory.Functor
-import kategory.HK
-import kategory.Monoid
-import kategory.Option
-import kategory.Tuple2
-import kategory.compose
-import kategory.functor
-import kategory.identity
-import kategory.none
-import kategory.Right
-import kategory.right
-import kategory.some
-import kategory.toT
+import kategory.*
 
 /**
  * [Iso] is a type alias for [PIso] which fixes the type arguments
@@ -98,7 +84,7 @@ interface PIso<S, T, A, B> {
      * Find if the focus satisfies the predicate
      */
     fun find(s: S, p: (A) -> Boolean): Option<A> = get(s).let { aa ->
-        if (p(aa)) aa.some() else none()
+        if (p(aa)) Some(aa) else None
     }
 
     /**

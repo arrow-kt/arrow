@@ -3,16 +3,7 @@ package kategory.optics
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kategory.Eq
-import kategory.ListKWHK
-import kategory.TraversalLaws
-import kategory.UnitSpec
-import kategory.genFunctionAToB
-import kategory.genTuple
-import kategory.k
-import kategory.none
-import kategory.some
-import kategory.toT
+import kategory.*
 import org.junit.runner.RunWith
 import kategory.optics.PTraversal.Companion.fromTraversable
 
@@ -59,7 +50,7 @@ class TraversalTest : UnitSpec() {
 
         "Finding an number larger than 10" {
             forAll(Gen.list(Gen.choose(-100, 100)), { ints ->
-                fromTraversable<ListKWHK, Int, Int>().find(ints.k()) { it > 10 } == ints.firstOrNull { it > 10 }?.some() ?: none<Int>()
+                fromTraversable<ListKWHK, Int, Int>().find(ints.k()) { it > 10 } == Option.fromNullable(ints.firstOrNull { it > 10 })
             })
         }
 
