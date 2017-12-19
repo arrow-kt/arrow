@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+include ':arrow-syntax'
+
 include ':kategory-annotations'
 include ':kategory-annotations-processor'
 include ':kategory-core'
@@ -29,17 +31,9 @@ include ':kategory-docs'
 include ':kategory-optics'
 include ':ank-core'
 
-include ':funktionale-collections'
-include ':funktionale-complement'
-include ':funktionale-composition'
-include ':funktionale-currying'
 include ':funktionale-either'
 include ':funktionale-option'
 include ':funktionale-utils'
-include ':funktionale-pairing'
-include ':funktionale-partials'
-include ':funktionale-pipe'
-include ':funktionale-reverse'
 include ':funktionale-state'
 include ':funktionale-try'
 include ':funktionale-validation'

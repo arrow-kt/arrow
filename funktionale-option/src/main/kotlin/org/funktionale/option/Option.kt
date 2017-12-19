@@ -16,7 +16,7 @@
 
 package org.funktionale.option
 
-import org.funktionale.collections.prependTo
+import arrow.syntax.collections.*
 import org.funktionale.option.Option.None
 import org.funktionale.option.Option.Some
 import org.funktionale.utils.GetterOperation

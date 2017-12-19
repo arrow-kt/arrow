@@ -16,7 +16,7 @@
 
 package org.funktionale.state
 
-import org.funktionale.collections.prependTo
+import arrow.syntax.collections.*
 
 /**
  * Created by IntelliJ IDEA.

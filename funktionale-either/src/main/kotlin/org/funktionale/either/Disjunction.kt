@@ -16,7 +16,7 @@
 
 package org.funktionale.either
 
-import org.funktionale.collections.prependTo
+import arrow.syntax.collections.*
 import org.funktionale.option.Option
 import org.funktionale.utils.hashCodeForNullable
 import java.util.*
