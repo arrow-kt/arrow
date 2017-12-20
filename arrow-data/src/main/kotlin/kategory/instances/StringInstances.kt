@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 object StringSemigroupInstance : Semigroup<String> {
     override fun combine(a: String, b: String): String = "$a$b"

@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 fun <A> identity(a: A): A = a
 

@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 /**
  * Alias that represent stateful computation of the form `(S) -> Tuple2<S, A>` with a result in certain context `F`.
@@ -123,10 +123,10 @@ class StateT<F, S, A>(
         fun <F, S> setF(AF: Applicative<F>, s: HK<F, S>): StateT<F, S, Unit> = StateT(AF.pure({ _ -> AF.map(s) { Tuple2(it, Unit) } }))
 
         /**
-         * Tail recursive function that keeps calling [f]  until [kategory.Either.Right] is returned.
+         * Tail recursive function that keeps calling [f]  until [arrow.Either.Right] is returned.
          *
          * @param a initial value to start running recursive call to [f]
-         * @param f function that is called recusively until [kategory.Either.Right] is returned.
+         * @param f function that is called recusively until [arrow.Either.Right] is returned.
          * @param MF [Monad] for the context [F].
          */
         fun <F, S, A, B> tailRecM(a: A, f: (A) -> HK<StateTKindPartial<F, S>, Either<A, B>>, MF: Monad<F>): StateT<F, S, B> =

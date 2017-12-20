@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe

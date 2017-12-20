@@ -1,8 +1,8 @@
 package kotlin_
 
-import kategory.Eq
-import kategory.Monoid
-import kategory.Semigroup
+import arrow.Eq
+import arrow.Monoid
+import arrow.Semigroup
 
 object UnitSemigroupInstance: Semigroup<Unit> {
     override fun combine(a: Unit, b: Unit) = Unit

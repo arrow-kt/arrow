@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 fun <A> (() -> A).k(): Function0<A> = Function0(this)
 

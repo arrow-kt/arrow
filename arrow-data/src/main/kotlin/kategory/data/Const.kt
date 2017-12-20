@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 fun <A, T> ConstKind<A, T>.value(): A = this.ev().value
 

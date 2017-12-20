@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 interface Monoid<A> : Semigroup<A>, Typeclass {
     /**

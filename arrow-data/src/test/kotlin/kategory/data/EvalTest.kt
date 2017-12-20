@@ -1,8 +1,8 @@
-package kategory
+package arrow
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
-import kategory.Eval.Now
+import arrow.Eval.Now
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

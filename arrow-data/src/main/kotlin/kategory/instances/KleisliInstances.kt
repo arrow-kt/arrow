@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @instance(Kleisli::class)
 interface KleisliFunctorInstance<F, D> : Functor<KleisliKindPartial<F, D>> {

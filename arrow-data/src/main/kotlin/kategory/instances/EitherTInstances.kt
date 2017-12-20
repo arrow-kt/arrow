@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 interface EitherTFunctorInstance<F, L> : Functor<EitherTKindPartial<F, L>> {
 

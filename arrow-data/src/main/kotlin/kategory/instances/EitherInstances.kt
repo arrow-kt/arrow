@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @instance(Either::class)
 interface EitherFunctorInstance<L> : Functor<EitherKindPartial<L>> {

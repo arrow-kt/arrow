@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @instance(Function1::class)
 interface Function1FunctorInstance<I> : Functor<Function1KindPartial<I>> {

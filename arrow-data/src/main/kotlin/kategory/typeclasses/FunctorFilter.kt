@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 interface FunctorFilter<F> : Functor<F>, Typeclass {
 

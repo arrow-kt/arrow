@@ -17,8 +17,8 @@
 package org.funktionale.either
 
 import arrow.syntax.collections.*
-import kategory.Option
-import kategory.hashCodeForNullable
+import arrow.Option
+import arrow.hashCodeForNullable
 import org.funktionale.either.Either.Left
 import org.funktionale.either.Either.Right
 

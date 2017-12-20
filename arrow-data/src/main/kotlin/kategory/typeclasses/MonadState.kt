@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 interface MonadState<F, S> : Monad<F>, Typeclass {
 

@@ -1,7 +1,7 @@
-package kategory.instances
+package arrow.instances
 
 import io.kotlintest.KTestJUnitRunner
-import kategory.*
+import arrow.*
 import org.junit.runner.RunWith
 
 typealias OptionTNel = HK<OptionTKindPartial<NonEmptyListHK>, Int>

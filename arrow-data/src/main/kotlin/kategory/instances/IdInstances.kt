@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @instance(Id::class)
 interface IdEqInstance<A> : Eq<Id<A>> {

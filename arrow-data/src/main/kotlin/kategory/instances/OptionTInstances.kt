@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @instance(OptionT::class)
 interface OptionTFunctorInstance<F> : Functor<OptionTKindPartial<F>> {

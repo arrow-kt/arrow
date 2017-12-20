@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @instance(WriterT::class)
 interface WriterTFunctorInstance<F, W> : Functor<WriterTKindPartial<F, W>> {

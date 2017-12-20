@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @higherkind data class Coproduct<F, G, A>(val run: Either<HK<F, A>, HK<G, A>>) : CoproductKind<F, G, A>, CoproductKindedJ<F, G, A> {
 
@@ -29,10 +29,10 @@ package kategory
     companion object {
         inline operator fun <reified F, reified G, A> invoke(run: Either<HK<F, A>, HK<G, A>>): Coproduct<F, G, A> = Coproduct(run)
 
-        inline fun <reified F, reified G> comonad(CF: Comonad<F> = kategory.comonad(), CG: Comonad<G>): CoproductComonadInstance<F, G> =
+        inline fun <reified F, reified G> comonad(CF: Comonad<F> = arrow.comonad(), CG: Comonad<G>): CoproductComonadInstance<F, G> =
                 CoproductComonadInstanceImplicits.instance(CF, CG)
 
-        inline fun <reified F, reified G> functor(FF: Functor<F> = kategory.functor(), FG: Functor<G> = kategory.functor()): CoproductFunctorInstance<F, G> =
+        inline fun <reified F, reified G> functor(FF: Functor<F> = arrow.functor(), FG: Functor<G> = arrow.functor()): CoproductFunctorInstance<F, G> =
                 CoproductFunctorInstanceImplicits.instance(FF, FG)
 
         inline fun <reified F, reified G> traverse(FF: Traverse<F> = traverse<F>(), FG: Traverse<G> = traverse<G>()): CoproductTraverseInstance<F, G> =

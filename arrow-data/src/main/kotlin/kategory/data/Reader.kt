@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 /**
  * Alias that represents a computation that has a dependency on [D].

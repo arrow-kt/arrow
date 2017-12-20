@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @instance(Option::class)
 interface OptionSemigroupInstance<A> : Semigroup<Option<A>> {

@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 /**
  * Data structures that can be reduced to a summary value.

@@ -1,9 +1,9 @@
-package kategory
+package arrow
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import kategory.laws.EqLaws
+import arrow.laws.EqLaws
 import org.junit.runner.RunWith
 
 sealed class OpsAp<out A> : HK<OpsAp.F, A> {

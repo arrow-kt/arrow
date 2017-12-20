@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 typealias Failure<A> = Try.Failure<A>
 typealias Success<A> = Try.Success<A>

@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 typealias Valid<A> = Validated.Valid<A>

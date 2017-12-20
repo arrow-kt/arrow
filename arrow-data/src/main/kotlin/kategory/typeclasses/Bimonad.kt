@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 /**
  * The combination of monad and comonad

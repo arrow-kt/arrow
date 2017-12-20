@@ -16,9 +16,9 @@
 
 package org.funktionale.either
 
-import kategory.None
-import kategory.Option
-import kategory.Some
+import arrow.None
+import arrow.Option
+import arrow.Some
 import org.funktionale.either.Either.Left
 import org.funktionale.either.Either.Right
 import java.util.*

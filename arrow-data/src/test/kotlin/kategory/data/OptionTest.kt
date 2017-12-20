@@ -1,4 +1,4 @@
-package kategory.data
+package arrow.data
 
 import arrow.syntax.`try`.*
 import arrow.syntax.collections.*
@@ -8,8 +8,8 @@ import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kategory.*
-import kategory.laws.EqLaws
+import arrow.*
+import arrow.laws.EqLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

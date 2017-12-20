@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 /**
  * [EitherT]`<F, A, B>` is a light wrapper on an `F<`[Either]`<A, B>>` with some

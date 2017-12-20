@@ -1,11 +1,11 @@
-package kategory
+package arrow
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
-import kategory.Left
-import kategory.Right
-import kategory.laws.EqLaws
+import arrow.Left
+import arrow.Right
+import arrow.laws.EqLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

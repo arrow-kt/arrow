@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 abstract class PartialFunction<in A, out B> : (A) -> B {
     abstract fun isDefinedAt(a: A): Boolean

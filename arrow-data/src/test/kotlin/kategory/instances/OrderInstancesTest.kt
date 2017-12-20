@@ -1,14 +1,14 @@
-package kategory.instances
+package arrow.instances
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.Gen
-import kategory.OrderLaws
-import kategory.UnitSpec
-import kategory.genFunctionAToB
-import kategory.order
-import kategory.toOrder
+import arrow.OrderLaws
+import arrow.UnitSpec
+import arrow.genFunctionAToB
+import arrow.order
+import arrow.toOrder
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

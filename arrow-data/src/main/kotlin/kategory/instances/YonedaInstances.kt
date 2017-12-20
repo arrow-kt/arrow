@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @instance(Yoneda::class)
 interface YonedaFunctorInstance<U> : Functor<YonedaKindPartial<U>> {

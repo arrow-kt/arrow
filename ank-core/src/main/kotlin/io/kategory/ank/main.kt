@@ -1,7 +1,7 @@
 @file:JvmName("main")
-package io.kategory.ank
+package io.arrow.ank
 
-import kategory.*
+import arrow.*
 import java.io.File
 
 typealias Target<A> = Either<Throwable, A>

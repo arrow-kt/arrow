@@ -1,8 +1,8 @@
 package arrow.syntax.collections
 
 import arrow.syntax.function.toOption
-import kategory.Option
-import kategory.Some
+import arrow.Option
+import arrow.Some
 
 /**
  * Returns a list containing all elements except the first element

@@ -1,7 +1,7 @@
-package kategory
+package arrow
 
-import kategory.Either.Left
-import kategory.Either.Right
+import arrow.Either.Left
+import arrow.Either.Right
 
 typealias IorNel<A, B> = Ior<Nel<A>, B>
 

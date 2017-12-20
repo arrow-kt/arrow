@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 /**
  * MonoidK is a universal monoid which operates on kinds.

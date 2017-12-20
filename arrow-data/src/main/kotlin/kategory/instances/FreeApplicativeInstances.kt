@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @instance(FreeApplicative::class)
 interface FreeApplicativeFunctorInstance<S> : Functor<FreeApplicativeKindPartial<S>> {

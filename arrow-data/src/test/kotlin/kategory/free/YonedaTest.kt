@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
@@ -20,7 +20,7 @@ class YonedaTest : UnitSpec() {
             functor<YonedaKindPartial<IdHK>>() shouldNotBe null
         }
 
-        testLaws(FunctorLaws.laws(F, { Yoneda(kategory.Id(it)) }, EQ))
+        testLaws(FunctorLaws.laws(F, { Yoneda(arrow.Id(it)) }, EQ))
 
         "toCoyoneda should convert to an equivalent Coyoneda" {
             forAll { x: Int ->

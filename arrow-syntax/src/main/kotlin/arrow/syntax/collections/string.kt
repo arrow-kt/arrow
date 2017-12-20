@@ -1,7 +1,7 @@
 package arrow.syntax.collections
 
 import arrow.syntax.function.toOption
-import kategory.Option
+import arrow.Option
 
 fun String.firstOption(): Option<Char> = firstOrNull().toOption()
 

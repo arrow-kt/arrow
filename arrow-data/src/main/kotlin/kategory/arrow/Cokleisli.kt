@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 typealias CokleisliFun<F, A, B> = (HK<F, A>) -> B
 

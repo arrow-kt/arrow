@@ -17,7 +17,7 @@ apply from: 'generated-kotlin-sources.gradle'
 //    mavenCentral()
 //    maven { url 'https://jitpack.io' }
 //    maven { url 'http://dl.bintray.com/kotlin/kotlinx' }
-//    maven { url "http://dl.bintray.com/kategory/maven" }
+//    maven { url "http://dl.bintray.com/arrow/maven" }
 //}
 
 kotlin {
@@ -35,7 +35,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-compiler:$parent.ext.kotlinVersion"
     compile "org.jetbrains.kotlin:kotlin-script-util:$parent.ext.kotlinVersion"
     compile group: 'org.beanshell', name: 'bsh', version: '2.0b5'
-    kapt project(':kategory-annotations-processor')
+    kapt project(':arrow-annotations-processor')
 //
 //    testCompile "junit:junit:$parent.ext.junit_version"
 }

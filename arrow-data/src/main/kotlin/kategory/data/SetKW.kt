@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @higherkind
 @deriving(Foldable::class, SemigroupK::class, MonoidK::class)

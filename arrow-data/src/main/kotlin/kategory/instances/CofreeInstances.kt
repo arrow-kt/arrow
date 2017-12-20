@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @instance(Cofree::class)
 interface CofreeFunctorInstance<S> : Functor<CofreeKindPartial<S>>, Typeclass {

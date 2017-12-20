@@ -1,9 +1,9 @@
-package kategory.data
+package arrow.data
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
-import kategory.*
-import kategory.laws.ReducibleLaws
+import arrow.*
+import arrow.laws.ReducibleLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

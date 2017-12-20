@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @instance(Free::class)
 interface FreeFunctorInstance<S> : Functor<FreeKindPartial<S>> {

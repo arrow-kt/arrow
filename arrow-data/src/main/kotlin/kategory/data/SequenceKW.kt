@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 fun <A> SequenceKWKind<A>.toList(): List<A> = this.ev().sequence.toList()
 

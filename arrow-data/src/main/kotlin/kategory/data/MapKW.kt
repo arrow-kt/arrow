@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @higherkind
 data class MapKW<K, out A>(val map: Map<K, A>) : MapKWKind<K, A>, Map<K, A> by map {

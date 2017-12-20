@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 interface Alternative<F> : Applicative<F>, MonoidK<F>, Typeclass
 

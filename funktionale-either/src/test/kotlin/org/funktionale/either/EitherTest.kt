@@ -20,9 +20,9 @@ import arrow.syntax.function.toOption
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import kategory.None
-import kategory.Option
-import kategory.UnitSpec
+import arrow.None
+import arrow.Option
+import arrow.UnitSpec
 import org.funktionale.either.Either.Left
 import org.funktionale.either.Either.Right
 import org.junit.runner.RunWith

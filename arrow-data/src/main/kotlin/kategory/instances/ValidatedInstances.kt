@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @instance(Validated::class)
 interface ValidatedFunctorInstance<E> : Functor<ValidatedKindPartial<E>> {

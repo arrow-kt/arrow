@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 /**
  * Eval is a monad which controls evaluation of a value or a computation that produces a value.

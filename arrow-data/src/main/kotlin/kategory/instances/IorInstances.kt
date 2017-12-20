@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @instance(Ior::class)
 interface IorFunctorInstance<L> : Functor<IorKindPartial<L>> {

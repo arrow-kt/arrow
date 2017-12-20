@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @instance(Const::class)
 interface ConstFunctorInstance<A> : Functor<ConstKindPartial<A>> {

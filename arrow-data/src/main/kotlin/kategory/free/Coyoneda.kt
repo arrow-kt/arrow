@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 private typealias AnyFunc = (Any?) -> Any?
 

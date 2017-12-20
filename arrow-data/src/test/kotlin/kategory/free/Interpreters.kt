@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 val cofreeOptionToNel: FunctionK<CofreeKindPartial<OptionHK>, NonEmptyListHK> = object : FunctionK<CofreeKindPartial<OptionHK>, NonEmptyListHK> {
     override fun <A> invoke(fa: HK<CofreeKindPartial<OptionHK>, A>): HK<NonEmptyListHK, A> =

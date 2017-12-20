@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 /**
  * https://www.youtube.com/watch?v=wvSP5qYiz4Y

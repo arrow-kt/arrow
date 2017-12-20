@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 interface Bifoldable<F> : Typeclass {
 

@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @Suppress("UNCHECKED_CAST") inline fun <F, W, A> WriterTKind<F, W, A>.value(): HK<F, Tuple2<W, A>> = this.ev().value
 
@@ -6,19 +6,19 @@ package kategory
 
     companion object {
 
-        inline fun <reified F, reified W, A> pure(a: A, MM: Monoid<W> = monoid(), AF: Applicative<F> = kategory.applicative()) =
+        inline fun <reified F, reified W, A> pure(a: A, MM: Monoid<W> = monoid(), AF: Applicative<F> = arrow.applicative()) =
                 WriterT(AF.pure(MM.empty() toT a))
 
-        inline fun <reified F, W, A> both(w: W, a: A, MF: Monad<F> = kategory.monad()) = WriterT(MF.pure(w toT a))
+        inline fun <reified F, W, A> both(w: W, a: A, MF: Monad<F> = arrow.monad()) = WriterT(MF.pure(w toT a))
 
-        inline fun <reified F, W, A> fromTuple(z: Tuple2<W, A>, MF: Monad<F> = kategory.monad()) = WriterT(MF.pure(z))
+        inline fun <reified F, W, A> fromTuple(z: Tuple2<W, A>, MF: Monad<F> = arrow.monad()) = WriterT(MF.pure(z))
 
         operator fun <F, W, A> invoke(value: HK<F, Tuple2<W, A>>): WriterT<F, W, A> = WriterT(value)
 
-        inline fun <reified F, W, A> putT(vf: HK<F, A>, w: W, FF: Functor<F> = kategory.functor()): WriterT<F, W, A> =
+        inline fun <reified F, W, A> putT(vf: HK<F, A>, w: W, FF: Functor<F> = arrow.functor()): WriterT<F, W, A> =
                 WriterT(FF.map(vf, { v -> Tuple2(w, v) }))
 
-        inline fun <reified F, W, A> put(a: A, w: W, applicativeF: Applicative<F> = kategory.applicative()): WriterT<F, W, A> =
+        inline fun <reified F, W, A> put(a: A, w: W, applicativeF: Applicative<F> = arrow.applicative()): WriterT<F, W, A> =
                 WriterT.putT(applicativeF.pure(a), w)
 
         fun <F, W, A> putT2(vf: HK<F, A>, w: W, FF: Functor<F>): WriterT<F, W, A> =
@@ -37,7 +37,7 @@ package kategory
         inline fun <reified F, reified W, A> valueT(vf: HK<F, A>, monoidW: Monoid<W> = monoid()): WriterT<F, W, A> =
                 WriterT.putT(vf, monoidW.empty())
 
-        inline fun <reified F, W, A> empty(MMF: MonoidK<F> = kategory.monoidK()): WriterTKind<F, W, A> = WriterT(MMF.empty())
+        inline fun <reified F, W, A> empty(MMF: MonoidK<F> = arrow.monoidK()): WriterTKind<F, W, A> = WriterT(MMF.empty())
 
         fun <F, W, A> pass(fa: HK<WriterTKindPartial<F, W>, Tuple2<(W) -> W, A>>, MF: Monad<F>): WriterT<F, W, A> =
                 WriterT(MF.flatMap(fa.ev().content(MF), { tuple2FA -> MF.map(fa.ev().write(MF), { l -> Tuple2(tuple2FA.a(l), tuple2FA.b) }) }))

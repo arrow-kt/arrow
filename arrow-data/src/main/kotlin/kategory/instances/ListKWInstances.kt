@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @instance(ListKW::class)
 interface ListKWSemigroupInstance<A> : Semigroup<ListKW<A>> {

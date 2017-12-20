@@ -1,7 +1,7 @@
-package kategory
+package arrow
 
-import kategory.Some
-import kategory.None
+import arrow.Some
+import arrow.None
 
 interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F>, Typeclass {
 

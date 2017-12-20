@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 import java.util.concurrent.CountDownLatch
 import kotlin.coroutines.experimental.*

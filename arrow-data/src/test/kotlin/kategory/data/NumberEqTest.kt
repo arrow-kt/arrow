@@ -1,10 +1,10 @@
-package kategory.data
+package arrow.data
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
-import kategory.UnitSpec
-import kategory.eq
-import kategory.laws.EqLaws
+import arrow.UnitSpec
+import arrow.eq
+import arrow.laws.EqLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

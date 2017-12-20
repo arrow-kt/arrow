@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @instance(NonEmptyList::class)
 interface NonEmptyListSemigroupInstance<A> : Semigroup<NonEmptyList<A>> {

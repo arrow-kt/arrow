@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 typealias Nel<A> = NonEmptyList<A>
 

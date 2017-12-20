@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @instance(Coyoneda::class)
 interface CoyonedaFunctorInstance<F, G> : Functor<CoyonedaKindPartial<F, G>> {

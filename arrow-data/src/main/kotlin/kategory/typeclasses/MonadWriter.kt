@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 /** A monad that support monoidal accumulation (e.g. logging List<String>) */
 interface MonadWriter<F, W> : Monad<F>, Typeclass {

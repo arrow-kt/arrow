@@ -1,6 +1,6 @@
 @file:Suppress("UNUSED_PARAMETER")
 
-package kategory
+package arrow
 
 interface Applicative<F> : Functor<F>, Typeclass {
 

@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 interface CoproductFunctorInstance<F, G> : Functor<CoproductKindPartial<F, G>> {
 

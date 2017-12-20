@@ -3,12 +3,12 @@ dependencies {
     compile project(':funktionale-utils')
     compile project(':funktionale-either')
 
-    kapt project(':kategory-annotations-processor')
-    kaptTest project(':kategory-annotations-processor')
-    compileOnly project(':kategory-annotations-processor')
-    testCompileOnly project(':kategory-annotations-processor')
+    kapt project(':arrow-annotations-processor')
+    kaptTest project(':arrow-annotations-processor')
+    compileOnly project(':arrow-annotations-processor')
+    testCompileOnly project(':arrow-annotations-processor')
 
-    testCompile project(':kategory-test')
+    testCompile project(':arrow-test')
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"

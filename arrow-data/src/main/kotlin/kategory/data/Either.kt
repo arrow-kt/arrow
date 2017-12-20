@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 typealias Right<A, B> = Either.Right<A, B>
 typealias Left<A, B> = Either.Left<A, B>

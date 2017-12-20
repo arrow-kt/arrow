@@ -18,9 +18,9 @@ package org.funktionale.utils
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
-import kategory.UnitSpec
-import kategory.constant
-import kategory.identity
+import arrow.UnitSpec
+import arrow.constant
+import arrow.identity
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

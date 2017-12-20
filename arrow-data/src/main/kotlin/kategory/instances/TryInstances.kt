@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @instance(Try::class)
 interface TryMonadErrorInstance : TryMonadInstance, MonadError<TryHK, Throwable> {

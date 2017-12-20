@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 interface MonadReader<F, D> : Monad<F> {
     /** Get the environment */

@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 /**
  * Alias that represents stateful computation of the form `(S) -> Tuple2<S, A>`.

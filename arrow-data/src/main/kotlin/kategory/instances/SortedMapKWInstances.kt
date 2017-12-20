@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @instance(SortedMapKW::class)
 interface SortedMapKWFunctorInstance<A: Comparable<A>> : Functor<SortedMapKWKindPartial<A>> {

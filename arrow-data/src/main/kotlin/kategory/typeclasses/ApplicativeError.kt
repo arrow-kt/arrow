@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 interface ApplicativeError<F, E> : Applicative<F>, Typeclass {
 

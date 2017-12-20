@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 /**
  * Trampoline is often used to emulate tail recursion. The idea is to have some step code that can be trampolined itself

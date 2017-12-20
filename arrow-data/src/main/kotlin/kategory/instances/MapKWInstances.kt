@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @instance(MapKW::class)
 interface MapKWFunctorInstance<K> : Functor<MapKWKindPartial<K>> {

@@ -1,11 +1,11 @@
-package kategory
+package arrow
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import kategory.Failure
-import kategory.Success
-import kategory.laws.EqLaws
+import arrow.Failure
+import arrow.Success
+import arrow.laws.EqLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

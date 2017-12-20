@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.forAll
@@ -20,7 +20,7 @@ class OptionMonoidTest : UnitSpec() {
         "should semigroup with the instance passed" {
             forAll { value: Int ->
                 val optionMonoid = Option.monoid(NonEmptyList.semigroup<Int>())
-                val seen = optionMonoid.combine(Some(kategory.NonEmptyList.of(value)), None)
+                val seen = optionMonoid.combine(Some(arrow.NonEmptyList.of(value)), None)
                 val expected = None
 
                 expected == seen

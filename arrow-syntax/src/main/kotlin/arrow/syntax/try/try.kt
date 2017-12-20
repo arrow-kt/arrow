@@ -1,9 +1,9 @@
 package arrow.syntax.`try`
 
-import kategory.DeprecatedAmbiguity
-import kategory.None
-import kategory.Option
-import kategory.Some
+import arrow.DeprecatedAmbiguity
+import arrow.None
+import arrow.Option
+import arrow.Some
 
 @Deprecated(DeprecatedAmbiguity, ReplaceWith("Try { body }.toOption()"))
 inline fun <T> optionTry(body: () -> T): Option<T> = try {

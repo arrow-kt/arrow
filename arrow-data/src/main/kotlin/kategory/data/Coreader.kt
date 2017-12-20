@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 fun <A, B> ((A) -> B).coreader(): CoreaderT<IdHK, A, B> = Coreader(this)
 

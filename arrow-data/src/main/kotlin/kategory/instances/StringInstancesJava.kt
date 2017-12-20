@@ -1,6 +1,6 @@
 package java_lang
 
-import kategory.*
+import arrow.*
 
 object StringMonoidInstanceImplicits {
     fun instance(): StringMonoidInstance = StringMonoidInstance

@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @higherkind abstract class Yoneda<F, A> : YonedaKind<F, A>, YonedaKindedJ<F, A> {
 
@@ -14,7 +14,7 @@ package kategory
     fun toCoyoneda(): Coyoneda<F, A, A> = Coyoneda(lower(), listOf({ a: Any? -> a }))
 
     companion object {
-        inline operator fun <reified U, A> invoke(fa: HK<U, A>, FF: Functor<U> = kategory.functor()): Yoneda<U, A> =
+        inline operator fun <reified U, A> invoke(fa: HK<U, A>, FF: Functor<U> = arrow.functor()): Yoneda<U, A> =
                 object : Yoneda<U, A>() {
                     override fun <B> invoke(f: (A) -> B): HK<U, B> = FF.map(fa, f)
                 }

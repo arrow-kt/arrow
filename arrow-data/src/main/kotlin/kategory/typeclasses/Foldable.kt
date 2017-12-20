@@ -1,6 +1,6 @@
-package kategory
+package arrow
 
-import kategory.Eval.Companion.always
+import arrow.Eval.Companion.always
 
 /**
  * Data structures that can be folded to a summary value.

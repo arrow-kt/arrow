@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @instance(StateT::class)
 interface StateTFunctorInstance<F, S> : Functor<StateTKindPartial<F, S>> {

@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.EmptyCoroutineContext

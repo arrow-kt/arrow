@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 /**
  * Traverse, also known as Traversable. Traversal over a structure with an effect.

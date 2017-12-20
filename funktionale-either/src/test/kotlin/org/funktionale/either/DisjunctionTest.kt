@@ -20,8 +20,8 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import kategory.Option
-import kategory.UnitSpec
+import arrow.Option
+import arrow.UnitSpec
 import org.funktionale.either.Disjunction.Left
 import org.funktionale.either.Disjunction.Right
 import org.junit.runner.RunWith

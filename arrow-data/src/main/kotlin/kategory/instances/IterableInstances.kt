@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 fun <A: Any, B> Iterable<A>.collect(vararg cases: PartialFunction<A, B>): List<B> =
     flatMap { value: A ->

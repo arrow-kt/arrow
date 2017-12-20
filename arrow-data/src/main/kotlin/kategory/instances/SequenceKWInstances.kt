@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 @instance(SequenceKW::class)
 interface SequenceKWSemigroupInstance<A> : Semigroup<SequenceKW<A>> {

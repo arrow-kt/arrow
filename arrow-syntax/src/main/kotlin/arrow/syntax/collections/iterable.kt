@@ -1,8 +1,8 @@
 package arrow.syntax.collections
 
 import arrow.syntax.function.toOption
-import kategory.Option
-import kategory.Predicate
+import arrow.Option
+import arrow.Predicate
 
 fun <T> Iterable<T>.firstOption(): Option<T> = firstOrNull().toOption()
 

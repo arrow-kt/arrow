@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 /**
  * Alias that represents an arrow from [D] to a monadic value `HK<F, A>`
@@ -106,10 +106,10 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
         operator fun <F, D, A> invoke(run: KleisliFun<F, D, A>): Kleisli<F, D, A> = Kleisli(run, Unit)
 
         /**
-         * Tail recursive function that keeps calling [f] until [kategory.Either.Right] is returned.
+         * Tail recursive function that keeps calling [f] until [arrow.Either.Right] is returned.
          *
          * @param a initial value to start running recursive call to [f]
-         * @param f function that is called recusively until [kategory.Either.Right] is returned.
+         * @param f function that is called recusively until [arrow.Either.Right] is returned.
          * @param MF [Monad] for the context [F].
          */
         fun <F, D, A, B> tailRecM(a: A, f: (A) -> KleisliKind<F, D, Either<A, B>>, MF: Monad<F>): Kleisli<F, D, B> =

@@ -1,9 +1,9 @@
-package kategory.typeclass
+package arrow.typeclass
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.forAll
-import kategory.UnitSpec
-import kategory.combineAll
+import arrow.UnitSpec
+import arrow.combineAll
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

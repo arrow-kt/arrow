@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 fun <A> IdKind<A>.value(): A = this.ev().value
 

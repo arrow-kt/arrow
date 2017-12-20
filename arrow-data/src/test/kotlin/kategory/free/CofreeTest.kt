@@ -1,11 +1,11 @@
-package kategory
+package arrow
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import kategory.Cofree.Companion.unfold
-import kategory.None
-import kategory.Some
+import arrow.Cofree.Companion.unfold
+import arrow.None
+import arrow.Some
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

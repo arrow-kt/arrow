@@ -1,9 +1,9 @@
-package kategory.instances
+package arrow.instances
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
-import kategory.*
-import kategory.laws.EqLaws
+import arrow.*
+import arrow.laws.EqLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

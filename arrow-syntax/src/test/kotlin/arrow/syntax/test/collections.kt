@@ -18,7 +18,7 @@ package arrow.syntax.test
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
-import kategory.UnitSpec
+import arrow.UnitSpec
 import org.junit.runner.RunWith
 import arrow.syntax.collections.*
 

@@ -1,4 +1,4 @@
-package kategory
+package arrow
 
 inline fun <F, reified G, A> FreeApplicativeKind<F, A>.foldMapK(f: FunctionK<F, G>, GA: Applicative<G> = applicative<G>()): HK<G, A> =
         (this as FreeApplicative<F, A>).foldMap(f, GA)
