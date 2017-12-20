@@ -21,7 +21,6 @@ import arrow.Option
 import arrow.Some
 import org.funktionale.either.Either.Left
 import org.funktionale.either.Either.Right
-import java.util.*
 
 class RightProjection<out L, out R>(val e: Either<L, R>) {
 
