@@ -20,7 +20,6 @@ import arrow.Option
 import arrow.hashCodeForNullable
 import arrow.syntax.collections.prependTo
 
-
 sealed class Disjunction<out L, out R> : EitherLike {
 
     companion object {
