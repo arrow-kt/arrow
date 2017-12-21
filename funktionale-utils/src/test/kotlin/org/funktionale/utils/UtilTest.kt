@@ -18,7 +18,9 @@ package org.funktionale.utils
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
-import kategory.UnitSpec
+import arrow.UnitSpec
+import arrow.constant
+import arrow.identity
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -52,9 +54,9 @@ class UtilTest : UnitSpec() {
 
             applyTwoFunctions(2, add5, multiplyBy2) shouldBe 14
 
-            applyTwoFunctions(2, add5, identity()) shouldBe 7
+            applyTwoFunctions(2, add5, ::identity) shouldBe 7
 
-            applyTwoFunctions(2, identity(), identity()) shouldBe 2
+            applyTwoFunctions(2, ::identity, ::identity) shouldBe 2
         }
 
         "testConstant" {

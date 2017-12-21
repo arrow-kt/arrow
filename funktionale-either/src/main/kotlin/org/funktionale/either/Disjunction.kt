@@ -16,10 +16,9 @@
 
 package org.funktionale.either
 
-import arrow.syntax.collections.*
-import org.funktionale.option.Option
-import org.funktionale.utils.hashCodeForNullable
-import java.util.*
+import arrow.Option
+import arrow.hashCodeForNullable
+import arrow.syntax.collections.prependTo
 
 sealed class Disjunction<out L, out R> : EitherLike {
 

@@ -18,7 +18,7 @@ package org.funktionale.validation
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
-import kategory.UnitSpec
+import arrow.UnitSpec
 import org.funktionale.either.Disjunction
 import org.junit.runner.RunWith
 

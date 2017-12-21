@@ -1,6 +1,6 @@
-package io.kategory.ank
+package io.arrow.ank
 
-import kategory.*
+import arrow.*
 import kotlinx.coroutines.experimental.CoroutineDispatcher
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.runBlocking

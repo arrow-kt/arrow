@@ -1,24 +1,24 @@
 <img height="100" src="https://avatars2.githubusercontent.com/u/29458023?v=4&amp;s=200" width="100">
 
-[![Download](https://api.bintray.com/packages/kategory/maven/kategory/images/download.svg)](https://bintray.com/kategory/maven/kategory/_latestVersion)
-[![Build Status](https://travis-ci.org/kategory/kategory.svg?branch=master)](https://travis-ci.org/kategory/kategory/)
+[![Download](https://api.bintray.com/packages/arrow/maven/arrow/images/download.svg)](https://bintray.com/arrow/maven/arrow/_latestVersion)
+[![Build Status](https://travis-ci.org/arrow/arrow.svg?branch=master)](https://travis-ci.org/arrow/arrow/)
 [![Kotlin version badge](https://img.shields.io/badge/kotlin-1.2.0-blue.svg)](http://kotlinlang.org/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
-KΛTEGORY is a library for Typed Functional Programming in Kotlin.
-It includes the most popular data types, type classes and abstractions such as `Option`, `Try`, `Either`, `IO`, `Functor`, `Applicative`, `Monad` and many more empowering users to define pure FP apps and libraries built atop higher order abstractions. Use the below list to learn more about KΛTEGORY's main features.
+Λrrow is a library for Typed Functional Programming in Kotlin.
+It includes the most popular data types, type classes and abstractions such as `Option`, `Try`, `Either`, `IO`, `Functor`, `Applicative`, `Monad` and many more empowering users to define pure FP apps and libraries built atop higher order abstractions. Use the below list to learn more about Λrrow's main features.
 
-- [Documentation](http://kategory.io)
-- [Patterns](http://kategory.io/docs/patterns/glossary/): tutorials and approaches to day-to-day challenges using FP 
-- [Type classes](http://kategory.io/docs/typeclasses/functor/): defining behaviors for data
-- [Data types](http://kategory.io/docs/datatypes/option/): common abstractions
-- [Effects](http://kategory.io/docs/effects/io/): interfacing with external systems
-- [Optics](http://kategory.io/docs/optics/iso/): inspecting and modifying data structures
+- [Documentation](http://arrow.io)
+- [Patterns](http://arrow.io/docs/patterns/glossary/): tutorials and approaches to day-to-day challenges using FP 
+- [Type classes](http://arrow.io/docs/typeclasses/functor/): defining behaviors for data
+- [Data types](http://arrow.io/docs/datatypes/option/): common abstractions
+- [Effects](http://arrow.io/docs/effects/io/): interfacing with external systems
+- [Optics](http://arrow.io/docs/optics/iso/): inspecting and modifying data structures
 
 #### Curated external links
 
-- [Projects and Examples](http://kategory.io/docs/quickstart/projects/)
-- [Blogs and Presentations](http://kategory.io/docs/quickstart/blogs/)
+- [Projects and Examples](http://arrow.io/docs/quickstart/projects/)
+- [Blogs and Presentations](http://arrow.io/docs/quickstart/blogs/)
 
 # Basic Setup
 
@@ -28,7 +28,7 @@ Add it in your root `build.gradle` at the end of repositories.
 allprojects {
     repositories {
         jcenter()
-        maven { url 'https://dl.bintray.com/kategory/maven' }
+        maven { url 'https://dl.bintray.com/arrow/maven' }
     }
 }
 ```
@@ -37,16 +37,16 @@ Add the dependencies into the project's `build.gradle`
 
 ```groovy
 dependencies {
-    compile 'io.kategory:kategory:0.4.0'
-    kapt    'io.kategory:kategory-annotations-processor:0.4.0' //optional
-    compile 'io.kategory:kategory-effects:0.4.0' //optional
-    compile 'io.kategory:kategory-optics:0.4.0' //optional
+    compile 'io.arrow:arrow:0.4.0'
+    kapt    'io.arrow:arrow-annotations-processor:0.4.0' //optional
+    compile 'io.arrow:arrow-effects:0.4.0' //optional
+    compile 'io.arrow:arrow-optics:0.4.0' //optional
 }
 ```
 
 # Additional Setup
 
-For projects that wish to use their own `@higherkind`, `@deriving` and other meta programming facilities provided by KΛTEGORY
+For projects that wish to use their own `@higherkind`, `@deriving` and other meta programming facilities provided by Λrrow
 the setup below is also required:
 
 Add the dependencies into the project's `build.gradle`
@@ -57,7 +57,7 @@ apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //optiona
 
 dependencies {
     ...
-    kapt    'io.kategory:kategory-annotations-processor:0.4.0' //optional
+    kapt    'io.arrow:arrow-annotations-processor:0.4.0' //optional
     ...
 }
 ```
@@ -121,7 +121,7 @@ idea {
 
 # License
 
-    Copyright (C) 2017 The Kategory Authors
+    Copyright (C) 2017 The Arrow Authors
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

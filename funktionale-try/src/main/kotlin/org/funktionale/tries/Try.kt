@@ -16,13 +16,12 @@
 
 package org.funktionale.tries
 
+import arrow.None
+import arrow.Option
+import arrow.Predicate
+import arrow.Some
 import org.funktionale.either.Disjunction
 import org.funktionale.either.Either
-import org.funktionale.option.Option
-import org.funktionale.option.Option.None
-import org.funktionale.option.Option.Some
-import org.funktionale.utils.Predicate
-import java.util.*
 
 /**
  * Try Computation
@@ -62,7 +61,7 @@ sealed class Try<T> {
         } catch (t: Throwable) {
             Failure<X>(t)
         }
-        is Failure -> Failure<X>(throwable)
+        is Failure -> Failure(throwable)
     }
 
     fun <X> map(f: (T) -> X): Try<X> = flatMap { Success(f(it)) }
@@ -208,5 +207,5 @@ fun <T> Try(body: () -> T): Try<T> = try {
 
 fun <T> Try<Try<T>>.flatten(): Try<T> = when (this) {
     is Try.Success -> get()
-    is Try.Failure -> Try.Failure<T>(throwable)
+    is Try.Failure -> Try.Failure(throwable)
 }

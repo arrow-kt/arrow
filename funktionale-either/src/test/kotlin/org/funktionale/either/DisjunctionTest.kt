@@ -20,10 +20,10 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import kategory.UnitSpec
+import arrow.Option
+import arrow.UnitSpec
 import org.funktionale.either.Disjunction.Left
 import org.funktionale.either.Disjunction.Right
-import org.funktionale.option.Option
 import org.junit.runner.RunWith
 
 fun fail(): Nothing = fail("")

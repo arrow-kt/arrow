@@ -1,6 +1,6 @@
-package io.kategory.ank
+package io.arrow.ank
 
-import kategory.*
+import arrow.*
 import org.intellij.markdown.ast.ASTNode
 import java.io.File
 
