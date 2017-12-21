@@ -20,6 +20,7 @@ For a sum type `NetworkResult` we can create a `Prism` that has a focus into `Su
 ```kotlin:ank
 import arrow.*
 import arrow.optics.*
+import arrow.syntax.function.some
 
 sealed class NetworkResult {
     data class Success(val content: String): NetworkResult()
@@ -77,7 +78,7 @@ networkSuccessPrism.modifyF(Option.applicative(), networkResult) { success ->
 }
 ```
 ```kotlin:ank
-val liftF = networkSuccessPrism.liftF(Option.applicative()) { none() }
+val liftF = networkSuccessPrism.liftF(Option.applicative()) { None }
 liftF(networkResult)
 ```
 

@@ -64,7 +64,7 @@ Option can also be used with when statements:
 ```kotlin:ank
 val someValue: Option<Double> = Some(20.0)
 val value = when(someValue) {
-   is Some -> someValue.value
+   is Some -> someValue.t
    is None -> 0.0
 }
 value
@@ -73,7 +73,7 @@ value
 ```kotlin:ank
 val noValue: Option<Double> = None
 val value = when(noValue) {
-   is Some -> noValue.value
+   is Some -> noValue.t
    is None -> 0.0
 }
 value
@@ -111,6 +111,8 @@ noNumber.fold({ 1 }, { it * 3 })
 Arrow also adds syntax to all datatypes so you can easily lift them into the context of `Option` where needed.
 
 ```kotlin:ank
+import arrow.syntax.function.*
+
 1.some()
 ```
 

@@ -173,7 +173,7 @@ optTVal
 or
 
 ```kotlin:ank
-val optTVal = OptionT.fromOption<ObservableKWHK, Int>(1.some())
+val optTVal = OptionT.fromOption<ObservableKWHK, Int>(Some(1))
 optTVal
 ```
 

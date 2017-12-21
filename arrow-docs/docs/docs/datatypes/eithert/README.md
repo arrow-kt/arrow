@@ -46,6 +46,8 @@ typealias CountryNotFound = BizError.CountryNotFound
 We can now implement a naive lookup function to obtain the country code given a person result.
 
 ```kotlin:ank
+import arrow.syntax.function.*
+
 fun getCountryCode(maybePerson : Either<BizError, Person>): Either<BizError, String> =
   maybePerson.flatMap { person ->
     person.address.toEither({ AddressNotFound(person.id) }).flatMap { address ->

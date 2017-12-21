@@ -14,6 +14,7 @@ Let's build a simple Stack using Arrow's NonEmptyList and Option:
 
 ```kotlin:ank:silent
 import arrow.*
+import arrow.syntax.function.*
 
 typealias Stack = Option<Nel<String>>
 ```

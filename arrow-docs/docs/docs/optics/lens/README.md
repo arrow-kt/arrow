@@ -15,6 +15,7 @@ Given a simple structure `Foo` we can create a `Lens<Foo, Int>` to get, set or m
 
 ```kotlin:ank
 import arrow.optics.*
+import arrow.syntax.function.*
 
 data class Foo(val value: Int)
 

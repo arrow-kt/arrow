@@ -26,6 +26,7 @@ Both `Try` and `Option` are example datatypes that can be computed over transfor
 
 ```kotlin:ank
 import arrow.*
+import arrow.syntax.function.*
 
 Try { "1".toInt() }.map { it * 2 }
 Option(1).map { it * 2 }

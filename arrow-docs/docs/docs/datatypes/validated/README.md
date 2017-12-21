@@ -104,9 +104,9 @@ data class Config(val map: Map<String, String>) {
         val v = Option.fromNullable(map[key])
         return when(v) {
             is Some -> {
-                val s = read.read(v.value)
+                val s = read.read(v.t)
                 when(s) {
-                    is Some -> s.value.valid()
+                    is Some -> s.t.valid()
                     is None -> ConfigError.ParseConfig(key).invalid()
                 }
             }
