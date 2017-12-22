@@ -24,7 +24,7 @@ sealed class IO<out A> : IOKind<A> {
 
         operator fun <A> invoke(f: () -> A): IO<A> = suspend { Pure(f()) }
 
-        fun <A> suspend(f: () -> IO<A>): IO<A> = Suspend(f)
+        fun <A> suspend(f: () -> IOKind<A>): IO<A> = Suspend(f)
 
         fun <A> runAsync(k: Proc<A>): IO<A> =
                 Async { ff: (Either<Throwable, A>) -> Unit ->
@@ -36,6 +36,9 @@ sealed class IO<out A> : IOKind<A> {
                         }
                     }
                 }
+
+        fun empty(): IO<Nothing> =
+                IO.runAsync { }
 
         val unit: IO<Unit> =
                 pure(Unit)
@@ -207,8 +210,8 @@ sealed class IO<out A> : IOKind<A> {
     fun attempt(): IO<Either<Throwable, A>> =
             Bind(this, IOFrame.any())
 
-    fun runAsync(cb: (Either<Throwable, A>) -> IO<Unit>): IO<Unit> =
-            IO { unsafeRunAsync(cb.andThen { it.unsafeRunAsync { } }) }
+    fun runAsync(cb: (Either<Throwable, A>) -> IOKind<Unit>): IO<Unit> =
+            IO { unsafeRunAsync(cb.andThen { it.ev().unsafeRunAsync { } }) }
 
     fun unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
             IORunLoop.start(this, cb)
@@ -240,7 +243,7 @@ internal data class Delay<out A>(val thunk: () -> A) : IO<A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
 }
 
-internal data class Suspend<out A>(val thunk: () -> IO<A>) : IO<A>() {
+internal data class Suspend<out A>(val thunk: () -> IOKind<A>) : IO<A>() {
     override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")

@@ -152,3 +152,4 @@ The following datatypes in Kategory provide instances that adhere to the `AsyncC
 - [IO]({{ '/docs/effects/io' | relative_url }})
 - [ObservableKW]({{ '/docs/integrations/rx2' | relative_url }})
 - [FlowableKW]({{ '/docs/integrations/rx2' | relative_url }})
+- [DeferredKW]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }})

@@ -1,13 +1,8 @@
 package kategory
 
-import java.util.concurrent.CountDownLatch
 import kotlin.coroutines.experimental.*
 import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
-
-interface BindingInContextContinuation<in T> : Continuation<T> {
-    fun await(): Throwable?
-}
 
 @RestrictsSuspension
 open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
@@ -21,24 +16,16 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
         throw exception
     }
 
-    protected fun bindingInContextContinuation(context: CoroutineContext): BindingInContextContinuation<HK<F, A>> =
-            object : BindingInContextContinuation<HK<F, A>> {
-                val latch: CountDownLatch = CountDownLatch(1)
-
-                var error: Throwable? = null
-
-                override fun await() = latch.await().let { error }
-
+    protected open fun bindingInContextContinuation(context: CoroutineContext): Continuation<HK<F, A>> =
+            object : Continuation<HK<F, A>> {
                 override val context: CoroutineContext = context
 
                 override fun resume(value: HK<F, A>) {
                     returnedMonad = value
-                    latch.countDown()
                 }
 
                 override fun resumeWithException(exception: Throwable) {
-                    error = exception
-                    latch.countDown()
+                    throw exception
                 }
             }
 
@@ -69,20 +56,30 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
 
     open suspend fun <B> bindInM(context: CoroutineContext, m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels
-        val monadCreation: suspend () -> HK<F, A> = {
-            flatMap(m(), { xx: B ->
-                c.stackLabels = labelHere
-                c.resume(xx)
-                returnedMonad
-            })
+
+        val creation = MonadContinuation<F, A>(this, context)
+        val execution = MonadContinuation<F, A>(this, context)
+
+        val monadExecution: suspend (B) -> HK<F, A> = {
+            c.stackLabels = labelHere
+            c.resume(it)
+            returnedMonad
         }
-        val completion = bindingInContextContinuation(context)
-        returnedMonad = flatMap(pure(Unit), {
-            monadCreation.startCoroutine(completion)
-            val error = completion.await()
-            if (error != null) {
-                throw error
+        val monadCreation: suspend () -> HK<F, A> = {
+            returnedMonad = try {
+                flatMap(m(), { xx: B ->
+                    monadExecution.startCoroutine(xx, execution)
+                    returnedMonad
+                })
+            } catch (t: Throwable) {
+                c.resumeWithException(t)
+                throw t
             }
+            returnedMonad
+        }
+
+        returnedMonad = flatMap(pure(Unit), {
+            monadCreation.startCoroutine(creation)
             returnedMonad
         })
         COROUTINE_SUSPENDED

@@ -25,6 +25,9 @@ options:
       - title: Monad Comprehensions
         url: /docs/patterns/monad_comprehensions/
 
+      - title: Concurrency and Parallelization
+        url: /docs/patterns/concurrency/
+
       - title: Comonad Comprehensions
         url: /docs/patterns/comonad_comprehensions/
 
@@ -42,9 +45,6 @@ options:
 
       - title: Monad Transformers
         url: /docs/patterns/monad_transformers/
-
-      - title: Concurrency
-        url: /docs/patterns/concurrency/
 
       - title: Optics
         url: /docs/patterns/optics/
@@ -210,6 +210,9 @@ options:
 
       - title: Async
         url: /docs/effects/async/
+
+      - title: MonadSuspend
+        url: /docs/effects/monadsuspend/
 
   - title: Optics
 

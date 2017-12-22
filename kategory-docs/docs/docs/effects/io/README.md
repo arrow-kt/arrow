@@ -79,7 +79,7 @@ IO<Int> { throw RuntimeException("Boom!") }
 ```
 
 ```kotlin
-IO.runAsync<Int> { }
+IO.empty()
   .attempt()
   .unsafeRunTimed(100.milliseconds)
 ```
@@ -180,6 +180,7 @@ Mainly used to integrate with existing frameworks that have asynchronous calls.
 
 It requires a function that provides a callback parameter and it expects for the user to start an operation using the other framework.
 The callback parameter has to be invoked with an `Either<Throwable, A>` once the other framework has completed its execution.
+Note that if the callback is never called IO will run forever and not terminate unless run using `unsafeRunTimed()`.
 
 ```kotlin
 IO.runAsync<Int> { callback ->
@@ -197,9 +198,15 @@ IO.runAsync<Int> { callback ->
   .unsafeRunSync()
 ```
 
+### empty
+
+Similar to not calling the callback in `runAsync()`, it returns an IO that doesn't return any value and doesn't complete.
+Should only be used alongside `unsafeRunTimed()` as it's not cancellable.
+
 ## Effect Comprehensions
 
 `IO` is usually best paired with [comprehensions]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) to get a cleaner syntax.
+[Comprehensions]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) also enable cancellation and parallelization of IO effects.
 
 ```kotlin
 IO.monad().binding {
