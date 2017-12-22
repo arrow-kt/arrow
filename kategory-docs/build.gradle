@@ -16,8 +16,10 @@ dependencies {
     compile "io.reactivex.rxjava2:rxjava:2.1.4"
 }
 
-task printcp << {
-    println sourceSets.main.runtimeClasspath.each { println it }
+task printcp {
+    doLast {
+        println sourceSets.main.runtimeClasspath.each { println it }
+    }
 }
 
 ank {
