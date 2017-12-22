@@ -192,6 +192,22 @@ when(x) {
 
 ## ADDITIONAL SYNTAX
 
+Either can also map over the `left` value with `mapLeft` which is similar to map but applies on left instances.
+
+```kotlin:ank
+val r = Either<Int, Int> = Right(7)
+r.mapLeft{it +1}
+val l = Either<Int, Int> = Left(7)
+l.mapLeft{it + 1}
+```
+
+`Either<A, B>` can be transformed to `Either<B,A>` using the `swap()` method.
+
+```kotlin:ank
+val r = Either<String, Int> = Right(7)
+r.swap()
+```
+ 
 For using Either's syntax on arbitrary data types. 
 This will make possible to use the `left()`, `right()`, `contains()` and `getOrElse()` methods:
 

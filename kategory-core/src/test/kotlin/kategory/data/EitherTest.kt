@@ -75,5 +75,14 @@ class EitherTest : UnitSpec() {
             }
         }
 
+        "mapLeft should alter left instance only" {
+            forAll{ a: Int, b: Int ->
+                val right: Either<Int, Int> = Right(a)
+                val left: Either<Int, Int> = Left(b)
+                right.mapLeft { it + 1 } == right && left.mapLeft { it+1 } == Left(b + 1)
+            }
+        }
+
+
     }
 }

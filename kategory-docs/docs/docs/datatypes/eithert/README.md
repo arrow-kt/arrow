@@ -213,7 +213,15 @@ fun getCountryCode(personId: Int): ObservableKW<Either<BizError, String>> =
 
 Here we no longer have to deal with the `Left` cases, and the binding to the values on the left side are already the underlying values we want to focus on instead of the potential biz error values. We have automatically `flatMapped` through the `ObservableKW` and `Either` in a single expression reducing the boilerplate and encoding the effects concerns in the type signatures.
 
-Available Instances:
+## Additional syntax
+
+As `EitherT<F, A ,B>` allows to manipulate the nested `Either` structure, it provides a `mapLeft` method to map over the left element of nested Eithers.
+
+```kotlin:ank
+EitherT(Option(3)).mapLeft({it + 1}, Option.functor())
+```
+
+## Instances
 
 ```kotlin:ank
 import kategory.debug.*
