@@ -60,7 +60,7 @@ We can further simplify this case by using Kategory `binding` facilities
 that enables monad comprehensions for all datatypes for which a monad instance is available.
 
 ```kotlin:ank
-fun getCountryCode(maybePerson : Either<BizError, Person>): Either<BizError, String> =
+fun getCountryCode2(maybePerson : Either<BizError, Person>): Either<BizError, String> =
   Either.monadError<BizError>().binding {
     val person = maybePerson.bind()
     val address = person.address.toEither({ AddressNotFound(person.id) }).bind()
@@ -125,7 +125,7 @@ fun findCountry(addressId : Int) : ObservableKW<Either<BizError, Country>> =
 A naive implementation attempt to get to a `country.code` from a `person.id` might look something like this.
 
 ```kotlin:ank
-fun getCountryCode(personId: Int) =
+fun getCountryCode3(personId: Int) =
   findPerson(personId).map { maybePerson ->
     maybePerson.map { person ->
       person.address.map { address ->
@@ -138,7 +138,7 @@ fun getCountryCode(personId: Int) =
     }
   }
 
-val lifted = { personId: Int -> getCountryCode(personId) }
+val lifted = { personId: Int -> getCountryCode3(personId) }
 lifted
 ```
 
@@ -151,7 +151,7 @@ We can't use flatMap in this case because the nested expression does not match t
 Let's look at how a similar implementation would look like using monad comprehensions without transformers:
 
 ```kotlin:ank
-fun getCountryCode(personId: Int): ObservableKW<Either<BizError, String>> =
+fun getCountryCode4(personId: Int): ObservableKW<Either<BizError, String>> =
       ObservableKW.monad().binding {
         val person = findPerson(personId).bind()
         val address = person.fold (
@@ -199,8 +199,8 @@ eitherTVal.value()
 
 So how would our function look if we implemented it with the EitherT monad transformer?
 
-```kotlin
-fun getCountryCode(personId: Int): ObservableKW<Either<BizError, String>> =
+```kotlin:ank:compile
+fun getCountryCode5(personId: Int): ObservableKW<Either<BizError, String>> =
   EitherT.monadError<ObservableKWHK, BizError>().binding {
     val person = EitherT(findPerson(personId)).bind()
     val address = EitherT(ObservableKW.pure(
@@ -208,7 +208,7 @@ fun getCountryCode(personId: Int): ObservableKW<Either<BizError, String>> =
     )).bind()
     val country = EitherT(findCountry(address.id)).bind()
     yields(country.code)
-  }.value()
+  }.value().ev()
 ```
 
 Here we no longer have to deal with the `Left` cases, and the binding to the values on the left side are already the underlying values we want to focus on instead of the potential biz error values. We have automatically `flatMapped` through the `ObservableKW` and `Either` in a single expression reducing the boilerplate and encoding the effects concerns in the type signatures.

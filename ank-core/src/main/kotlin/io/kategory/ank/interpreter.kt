@@ -11,6 +11,7 @@ import org.intellij.markdown.ast.getTextInNode
 import org.intellij.markdown.ast.visitors.RecursiveVisitor
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
 import org.intellij.markdown.parser.MarkdownParser
+import org.jetbrains.kotlin.cli.jvm.K2JVMCompiler
 import java.io.File
 import java.net.URL
 import java.net.URLClassLoader
@@ -113,7 +114,7 @@ fun extractCodeImpl(source: String, tree: ASTNode): ListKW<Snippet> {
                 val lang = fence.takeWhile { it != ':' }.toString().replace("```", "")
                 if (fence.startsWith("```$lang$AnkBlock")) {
                     val code = fence.split("\n").drop(1).dropLast(1).joinToString("\n")
-                    sb.add(Snippet(fence.toString(), lang, fence.startsWith("```$AnkSilentBlock"), node.startOffset, node.endOffset, code))
+                    sb.add(Snippet(fence.toString(), lang, fence.startsWith("```$lang$AnkSilentBlock"), node.startOffset, node.endOffset, code))
                 }
             }
             super.visitNode(node)
@@ -121,6 +122,9 @@ fun extractCodeImpl(source: String, tree: ASTNode): ListKW<Snippet> {
     })
     return sb.k()
 }
+
+val Snippet.compile: Boolean
+    get() = fence.startsWith("```$lang$AnkCompileBlock")
 
 fun compileCodeImpl(snippets: Map<File, ListKW<Snippet>>, classpath: ListKW<String>): ListKW<CompiledMarkdown> {
     println(":runAnk -> started compilation")
@@ -130,6 +134,11 @@ fun compileCodeImpl(snippets: Map<File, ListKW<Snippet>>, classpath: ListKW<Stri
             ioBoundPool.submit(block)
         }
     }
+
+    val classPath: String = classpath.joinToString(separator = File.pathSeparatorChar.toString()) {
+        it.replace("file:", "")
+    }
+
     return runBlocking {
         snippets.map { (file, codeBlocks) ->
             async(IOPool) {
@@ -142,17 +151,56 @@ fun compileCodeImpl(snippets: Map<File, ListKW<Snippet>>, classpath: ListKW<Stri
                                     it.lang to seManager.getEngineByExtension(extensionMappings.getOrDefault(it.lang, "kts"))
                                 }
                                 .toMap()
+
+                if (codeBlocks.find { it.compile }.nonEmpty()) {
+                    codeBlocks.filter { it.lang != "kotlin" }
+                            .find { it.compile }
+                            ?.let {
+                                throw CompilationException(file, it, IllegalStateException("```${it.lang}:ank:compile is not supported. Use ```${it.lang}:ank or ```${it.lang}:ank:silent"))
+                            }
+
+                    val tmpTargetDir = createTempDir()
+                    val tmpSourceFile = createTempFile(prefix = file.nameWithoutExtension + "__", suffix = ".kts")
+
+                    val (imports, code) = codeBlocks.filter { it.lang == "kotlin" }
+                            .fold(emptySet<String>() toT emptyList<String>()) { acc, snippet ->
+                                snippet.code.lines().fold(acc) { (imports, code), line ->
+                                    if (line.startsWith("import")) imports + line toT code
+                                    else imports toT code + line
+                                }
+                            }
+
+                    tmpSourceFile.printWriter().use {
+                        it.println(imports.joinToString("\n"))
+                        it.println(code.joinToString("\n"))
+                    }
+
+                    val args = listOf(
+                            "-Xcoroutines=enable",
+                            "-Xskip-runtime-version-check",
+                            "-classpath", classPath,
+                            "-d", tmpTargetDir.absolutePath,
+                            tmpSourceFile.absolutePath
+                    ).toTypedArray()
+
+                    //If compilation fails compiler shuts down VM. However correct output is shown in Gradle.
+                    K2JVMCompiler.main(args)
+
+                    tmpSourceFile.delete()
+                    tmpTargetDir.delete()
+                }
+
                 val evaledSnippets: ListKW<Snippet> = codeBlocks.map { snippet ->
                     val result: Any? = Try {
                         val engine: ScriptEngine = engineCache.k().getOrElse(
                                 snippet.lang,
                                 { throw CompilationException(file, snippet, IllegalStateException("No engine configured for `${snippet.lang}`")) })
-                        engine.eval(snippet.code)
-
+                        if (!snippet.compile) engine.eval(snippet.code) else null
                     }.fold({
                         throw CompilationException(file, snippet, it)
-                    }, { it })
-                    if (snippet.silent) {
+                    }, ::identity)
+
+                    if (snippet.silent || snippet.compile) {
                         snippet
                     } else {
                         val resultString: Option<String> = Option.fromNullable(result).fold({ None }, { Some("//$it") })

@@ -6,6 +6,7 @@ import java.io.File
 
 const val AnkBlock = ":ank"
 const val AnkSilentBlock = ":ank:silent"
+const val AnkCompileBlock = ":ank:compile"
 
 fun ank(source: File, target: File, compilerArgs: ListKW<String>) =
         AnkOps.binding {
