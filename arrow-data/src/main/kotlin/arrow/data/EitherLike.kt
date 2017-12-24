@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.funktionale.either
+package arrow.data
 
 interface EitherLike {
     fun isLeft(): Boolean

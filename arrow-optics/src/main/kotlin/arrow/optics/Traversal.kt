@@ -28,7 +28,7 @@ interface PTraversal<S, T, A, B> {
 
         fun <S> codiagonal(): Traversal<Either<S, S>, S> = object : Traversal<Either<S, S>, S> {
             override fun <F> modifyF(FA: Applicative<F>, s: Either<S, S>, f: (S) -> HK<F, S>): HK<F, Either<S, S>> =
-                    s.bimap(f, f).fold({ fa -> FA.map(fa, { a -> a.left() }) }, { fa -> FA.map(fa, { a -> a.right() }) })
+                    s.bimap(f, f).fold({ fa -> FA.map(fa, { a -> Left(a) }) }, { fa -> FA.map(fa, { a -> Right(a) }) })
         }
 
         inline fun <reified T, A, B> fromTraversable(TT: arrow.Traverse<T> = traverse()) = object : PTraversal<HK<T, A>, HK<T, B>, A, B> {
@@ -231,8 +231,8 @@ interface PTraversal<S, T, A, B> {
 
     fun <U, V> choice(other: PTraversal<U, V, A, B>): PTraversal<Either<S, U>, Either<T, V>, A, B> = object : PTraversal<Either<S, U>, Either<T, V>, A, B> {
         override fun <F> modifyF(FA: Applicative<F>, s: Either<S, U>, f: (A) -> HK<F, B>): HK<F, Either<T, V>> = s.fold(
-                { a -> FA.map(this@PTraversal.modifyF(FA, a, f)) { it.left() } },
-                { u -> FA.map(other.modifyF(FA, u, f)) { it.right() } }
+                { a -> FA.map(this@PTraversal.modifyF(FA, a, f)) { Left(it) } },
+                { u -> FA.map(other.modifyF(FA, u, f)) { Right(it) } }
         )
     }
 

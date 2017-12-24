@@ -3,6 +3,8 @@ package arrow.syntax.collections
 import arrow.syntax.function.toOption
 import arrow.Option
 import arrow.Some
+import arrow.data.Disjunction
+import arrow.data.map
 
 /**
  * Returns a list containing all elements except the first element
@@ -24,3 +26,16 @@ fun <T> List<Option<T>>.optionSequential(): Option<List<T>> = optionTraverse { i
 fun <T> List<T>.firstOption(): Option<T> = firstOrNull().toOption()
 
 fun <T> List<Option<T>>.flatten(): List<T> = filter { it.isDefined() }.map { it.get() }
+
+@Deprecated("arrow.data.Either is right biased. This method will be removed in future releases")
+fun <T, L, R> List<T>.disjuntionTraverse(f: (T) -> Disjunction<L, R>): Disjunction<L, List<R>> = foldRight(Disjunction.Right(emptyList())) { i: T, accumulator: Disjunction<L, List<R>> ->
+    val disjunction = f(i)
+    when (disjunction) {
+        is Disjunction.Right -> disjunction.map(accumulator) { head: R, tail: List<R> ->
+            head prependTo tail
+        }
+        is Disjunction.Left -> Disjunction.Left(disjunction.value)
+    }
+}
+
+fun <L, R> List<Disjunction<L, R>>.disjunctionSequential(): Disjunction<L, List<R>> = disjuntionTraverse { it }

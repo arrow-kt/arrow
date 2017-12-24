@@ -15,6 +15,7 @@ Examples of that can run code asynchronously are typically datatypes that can su
 ```kotlin:ank
 import arrow.*
 import arrow.effects.*
+import arrow.syntax.either.*
 
 IO.asyncContext()
   .runAsync { callback: (Either<Throwable, Int>) -> Unit -> 

@@ -1,9 +1,7 @@
 package arrow.effects
 
-import arrow.Either
+import arrow.*
 import arrow.effects.internal.Platform.ArrayStack
-import arrow.left
-import arrow.right
 
 private typealias Current = IO<Any?>
 private typealias BindF = (Any?) -> IO<Any?>
@@ -145,7 +143,7 @@ internal object IORunLoop {
                     when (errorHandler) {
                     // Return case for unhandled errors
                         null -> {
-                            cb(currentIO.exception.left())
+                            cb(Left(currentIO.exception))
                             return
                         }
                         else -> {
@@ -206,7 +204,7 @@ internal object IORunLoop {
 
                 // Return case when no there are no more binds left
                 if (nextBind == null) {
-                    cb(result.right())
+                    cb(Right(result))
                     return
                 } else {
                     currentIO = executeSafe { nextBind(result) }

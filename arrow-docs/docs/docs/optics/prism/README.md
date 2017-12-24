@@ -21,6 +21,7 @@ For a sum type `NetworkResult` we can create a `Prism` that has a focus into `Su
 import arrow.*
 import arrow.optics.*
 import arrow.syntax.function.some
+import arrow.syntax.either.*
 
 sealed class NetworkResult {
     data class Success(val content: String): NetworkResult()

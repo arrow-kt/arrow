@@ -51,6 +51,8 @@ Luckily Arrow offers some nice solutions [`Functional Error Handling` docs]({{ '
 Now we can model our error domain with ease.
 
 ```kotlin:ank:silent
+import arrow.syntax.either.*
+
 sealed class StackError {
     object StackEmpty : StackError()
 }

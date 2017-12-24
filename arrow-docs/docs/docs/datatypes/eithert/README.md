@@ -47,6 +47,7 @@ We can now implement a naive lookup function to obtain the country code given a 
 
 ```kotlin:ank
 import arrow.syntax.function.*
+import arrow.syntax.either.*
 
 fun getCountryCode(maybePerson : Either<BizError, Person>): Either<BizError, String> =
   maybePerson.flatMap { person ->

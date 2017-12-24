@@ -1,7 +1,6 @@
 dependencies {
     compile project(':arrow-data')
     compile project(':funktionale-utils')
-    compile project(':funktionale-either')
 
     kapt project(':arrow-annotations-processor')
     kaptTest project(':arrow-annotations-processor')

@@ -1,25 +1,8 @@
-/*
- * Copyright 2013 - 2016 Mario Arias
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * 	http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+package arrow.data
 
-package org.funktionale.either
+import arrow.*
 
-import arrow.Option
-import arrow.hashCodeForNullable
-import arrow.syntax.collections.prependTo
-
+@Deprecated("arrow.data.Either is already right biased. This data type will be removed in future releases")
 sealed class Disjunction<out L, out R> : EitherLike {
 
     companion object {
@@ -138,18 +121,3 @@ fun <X, L, R> Disjunction<L, R>.flatMap(f: (R) -> Disjunction<L, X>): Disjunctio
 
 fun <L, R, X, Y> Disjunction<L, R>.map(x: Disjunction<L, X>, f: (R, X) -> Y): Disjunction<L, Y> = flatMap { r -> x.map { xx -> f(r, xx) } }
 
-fun <T, L, R> List<T>.disjuntionTraverse(f: (T) -> Disjunction<L, R>): Disjunction<L, List<R>> = foldRight(Disjunction.Right(emptyList())) { i: T, accumulator: Disjunction<L, List<R>> ->
-    val disjunction = f(i)
-    when (disjunction) {
-        is Disjunction.Right -> disjunction.map(accumulator) { head: R, tail: List<R> ->
-            head prependTo tail
-        }
-        is Disjunction.Left -> Disjunction.Left(disjunction.value)
-    }
-}
-
-fun <L, R> List<Disjunction<L, R>>.disjunctionSequential(): Disjunction<L, List<R>> = disjuntionTraverse { it }
-
-inline fun <X, T> Option<T>.toDisjunctionRight(left: () -> X): Disjunction<X, T> = toEitherRight(left).toDisjunction()
-
-inline fun <X, T> Option<T>.toDisjunctionLeft(right: () -> X): Disjunction<T, X> = toEitherLeft(right).toDisjunction()

@@ -19,7 +19,7 @@ package org.funktionale.validation
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import arrow.UnitSpec
-import org.funktionale.either.Disjunction
+import arrow.data.Disjunction
 import org.junit.runner.RunWith
 
 data class ExampleForValidation(val number: Int, val text: String)

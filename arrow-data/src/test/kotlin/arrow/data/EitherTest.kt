@@ -28,9 +28,9 @@ class EitherTest : UnitSpec() {
         }
 
         testLaws(
-            EqLaws.laws(eq<Either<String, Int>>(), { it.right() }),
+            EqLaws.laws(eq<Either<String, Int>>(), { Right(it) }),
             MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()),
-            TraverseLaws.laws(Either.traverse<Throwable>(), Either.applicative(), { it.right() }, Eq.any()),
+            TraverseLaws.laws(Either.traverse<Throwable>(), Either.applicative(), { Right(it) }, Eq.any()),
             SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ)
         )
 

@@ -1,26 +1,9 @@
 package arrow.optics
 
+import arrow.*
+import arrow.syntax.either.right
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
-import arrow.Either
-import arrow.Eq
-import arrow.IntMonoid
-import arrow.IsoLaws
-import arrow.Monoid
-import arrow.OptionMonoidInstanceImplicits
-import arrow.PrismLaws
-import arrow.UnitSpec
-import arrow.applicative
-import arrow.binding
-import arrow.ev
-import arrow.flatMap
-import arrow.genEither
-import arrow.genFunctionAToB
-import arrow.genNullable
-import arrow.genOption
-import arrow.monad
-import arrow.pure
-import arrow.right
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

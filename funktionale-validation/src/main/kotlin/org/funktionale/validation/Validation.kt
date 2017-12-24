@@ -16,7 +16,7 @@
 
 package org.funktionale.validation
 
-import org.funktionale.either.Disjunction
+import arrow.data.Disjunction
 
 class Validation<out E : Any>(vararg disjunctionSequence: Disjunction<E, *>) {
 

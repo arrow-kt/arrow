@@ -16,12 +16,8 @@
 
 package org.funktionale.tries
 
-import arrow.None
-import arrow.Option
-import arrow.Predicate
-import arrow.Some
-import org.funktionale.either.Disjunction
-import org.funktionale.either.Either
+import arrow.*
+import arrow.data.Disjunction
 
 /**
  * Try Computation

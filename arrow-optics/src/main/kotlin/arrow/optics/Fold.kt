@@ -107,7 +107,7 @@ interface Fold<S, A> {
      */
     fun <C> left(): Fold<Either<S, C>, Either<A, C>> = object : Fold<Either<S, C>, Either<A, C>> {
         override fun <R> foldMap(M: Monoid<R>, s: Either<S, C>, f: (Either<A, C>) -> R): R =
-                s.fold({ a1: S -> this@Fold.foldMap(M, a1, { b -> f(b.left()) }) }, { c -> f(c.right()) })
+                s.fold({ a1: S -> this@Fold.foldMap(M, a1, { b -> f(Left(b)) }) }, { c -> f(Right(c)) })
     }
 
     /**
@@ -115,7 +115,7 @@ interface Fold<S, A> {
      */
     fun <C> right(): Fold<Either<C, S>, Either<C, A>> = object : Fold<Either<C, S>, Either<C, A>> {
         override fun <R> foldMap(M: Monoid<R>, s: Either<C, S>, f: (Either<C, A>) -> R): R =
-                s.fold({ c -> f(c.left()) }, { a1 -> this@Fold.foldMap(M, a1, { b -> f(b.right()) }) })
+                s.fold({ c -> f(Left(c)) }, { a1 -> this@Fold.foldMap(M, a1, { b -> f(Right(b)) }) })
     }
 
     /**
