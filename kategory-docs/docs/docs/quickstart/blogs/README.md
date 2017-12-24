@@ -32,6 +32,14 @@ Introductory talk to Functional architectures to be built on top of Kategory.
 
 KotlinConf, San Francisco, Nov '17
 
+### Building a DSL... in Kotlin
+
+Make DSLs stack safe, composable and reusable under different runtime requirements thanks to Kategory.
+
+<iframe width="560" height="315" src="https://www.youtube.com/watch?v=kr8iWE4Jfhc?rel=0" frameborder="0" allowfullscreen></iframe>
+
+droidconSF, San Francisco, Nov '17
+
 ### Functional Programming in Kotlin
 
 An ongoing blog series introducing Functional Programming architectures from scratch
