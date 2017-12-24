@@ -56,7 +56,10 @@ The technique demonstrated below to write polymorphic code is available for all 
 inline fun <reified F> multiplyBy2(fa: HK<F, Int>, FT: Functor<F> = functor()): HK<F, Int> =
     FT.map(fa, { it * 2 })
 
-multiplyBy2<OptionHK>(Option(1)) // Option(1)
+multiplyBy2<OptionHK>(Option(1))
+```
+
+```kotlin:ank
 multiplyBy2<TryHK>(Try { 1 })
 ```
 
