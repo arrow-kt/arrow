@@ -1,5 +1,8 @@
 package arrow
 
+import arrow.Option.None
+import arrow.data.Disjunction
+
 typealias Failure<A> = Try.Failure<A>
 typealias Success<A> = Try.Success<A>
 
@@ -191,6 +194,9 @@ sealed class Try<out A> : TryKind<A> {
                 ).ev()
     }
 
+    @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("getOrElse { ifEmpty }"))
+    operator fun invoke() = get()
+
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, Try<B>> =
             this.ev().fold({ GA.pure(Try.raise(IllegalStateException())) }, { GA.map(f(it), { Try { it } }) })
 
@@ -209,7 +215,7 @@ sealed class Try<out A> : TryKind<A> {
     /**
      * Converts this to a `Failure` if the predicate is not satisfied.
      */
-    inline fun filter(crossinline p: (A) -> Boolean): Try<A> =
+    inline fun filter(crossinline p: Predicate<A>): Try<A> =
             fold(
                     { Failure(it) },
                     { if (p(it)) Success(it) else Failure(TryException.PredicateException("Predicate does not hold for $it")) }
@@ -222,7 +228,7 @@ sealed class Try<out A> : TryKind<A> {
     fun failed(): Try<Throwable> =
             fold(
                     { Success(it) },
-                    { Failure(TryException.UnsupportedOperationException("Success.failed")) }
+                    { Failure(TryException.UnsupportedOperationException("Success")) }
             )
 
     /**
@@ -240,15 +246,71 @@ sealed class Try<out A> : TryKind<A> {
                 }
             }
 
+    abstract fun isFailure(): Boolean
+
+    abstract fun isSuccess(): Boolean
+
+    @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("fold({ Unit }, f)"))
+    fun foreach(f: (A) -> Unit) {
+        if (isSuccess()) f(get())
+    }
+
+    @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("map { f(it); it }"))
+    fun onEach(f: (A) -> Unit): Try<A> = map {
+        f(it)
+        it
+    }
+
+    fun exists(predicate: Predicate<A>): Boolean = fold({ false }, { predicate(it) })
+
+    @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("getOrElse { ifEmpty }"))
+    abstract fun get(): A
+
+    @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("map { body(it); it }"))
+    fun onSuccess(body: (A) -> Unit): Try<A> {
+        foreach(body)
+        return this
+    }
+
+    @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("fold ({ Try { body(it); it }}, { Try.pure(it) })"))
+    fun onFailure(body: (Throwable) -> Unit): Try<A> = when (this) {
+        is Success -> this
+        is Failure -> {
+            body(exception)
+            this
+        }
+    }
+
+    fun toOption(): Option<A> = fold({ None }, { Some(it) })
+
+    fun toEither(): Either<Throwable, A> = fold({ Left(it) }, { Right(it) })
+
+    @Deprecated("arrow.data.Either is already right biased. This function will be removed in future releases", ReplaceWith("toEither()"))
+    fun toDisjunction(): Disjunction<Throwable, A> = toEither().toDisjunction()
+
     /**
      * The `Failure` type represents a computation that result in an exception.
      */
-    data class Failure<out A>(val exception: Throwable) : Try<A>()
+    data class Failure<out A>(val exception: Throwable) : Try<A>() {
+        override fun isFailure(): Boolean = true
+
+        override fun isSuccess(): Boolean = false
+
+        override fun get(): A {
+            throw exception
+        }
+    }
 
     /**
      * The `Success` type represents a computation that return a successfully computed value.
      */
-    data class Success<out A>(val value: A) : Try<A>()
+    data class Success<out A>(val value: A) : Try<A>() {
+        override fun isFailure(): Boolean = false
+
+        override fun isSuccess(): Boolean = true
+
+        override fun get(): A = value
+    }
 }
 
 sealed class TryException(override val message: String) : kotlin.Exception(message) {
@@ -267,17 +329,28 @@ fun <A, B> Try<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = 
  */
 fun <B> Try<B>.getOrElse(default: () -> B): B = fold({ default() }, { it })
 
+fun <B, A: B> Try<A>.orElse(f: () -> Try<B>): Try<B> = when (this) {
+    is Try.Success -> this
+    is Try.Failure -> f()
+}
+
 /**
  * Applies the given function `f` if this is a `Failure`, otherwise returns this if this is a `Success`.
  * This is like `flatMap` for the exception.
  */
 fun <B> Try<B>.recoverWith(f: (Throwable) -> Try<B>): Try<B> = fold({ f(it) }, { Success(it) })
 
+@Deprecated(DeprecatedAmbiguity, ReplaceWith("recoverWith(f)"))
+fun <A> Try<A>.rescue(f: (Throwable) -> Try<A>): Try<A> = recoverWith(f)
+
 /**
  * Applies the given function `f` if this is a `Failure`, otherwise returns this if this is a `Success`.
  * This is like map for the exception.
  */
 fun <B> Try<B>.recover(f: (Throwable) -> B): Try<B> = fold({ Success(f(it)) }, { Success(it) })
+
+@Deprecated(DeprecatedAmbiguity, ReplaceWith("recover(f)"))
+fun <A> Try<A>.handle(f: (Throwable) -> A): Try<A> = recover(f)
 
 /**
  * Completes this `Try` by applying the function `f` to this if this is of type `Failure`,
@@ -286,3 +359,5 @@ fun <B> Try<B>.recover(f: (Throwable) -> B): Try<B> = fold({ Success(f(it)) }, {
 fun <A, B> Try<A>.transform(s: (A) -> Try<B>, f: (Throwable) -> Try<B>): Try<B> = fold({ f(it) }, { flatMap(s) })
 
 fun <A> (() -> A).try_(): Try<A> = Try(this)
+
+fun <T> Try<Try<T>>.flatten(): Try<T> = flatMap(::identity)
