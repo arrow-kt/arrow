@@ -60,7 +60,7 @@ typealias Invalid<E> = Validated.Invalid<E>
     /**
      * Converts the value to an Either<E, A>
      */
-    fun toEither(): Either<E, A> = fold({ it.left() }, { it.right() })
+    fun toEither(): Either<E, A> = fold({ Left(it) }, { Right(it) })
 
     /**
      * Returns Valid values wrapped in Some, and None for Invalid values

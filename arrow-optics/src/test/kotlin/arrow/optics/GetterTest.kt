@@ -5,8 +5,8 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.Tuple2
 import arrow.UnitSpec
-import arrow.left
-import arrow.right
+import arrow.syntax.either.left
+import arrow.syntax.either.right
 import arrow.toT
 import org.junit.runner.RunWith
 

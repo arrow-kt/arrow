@@ -31,7 +31,7 @@ include ':arrow-docs'
 include ':arrow-optics'
 include ':ank-core'
 
-include ':funktionale-either'
+//include ':funktionale-either'
 include ':funktionale-utils'
 include ':funktionale-state'
 include ':funktionale-try'

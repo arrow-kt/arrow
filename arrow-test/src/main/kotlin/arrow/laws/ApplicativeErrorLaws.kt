@@ -33,12 +33,12 @@ object ApplicativeErrorLaws {
 
     inline fun <reified F> applicativeErrorAttemptError(AP: ApplicativeError<F, Throwable> = applicativeError<F, Throwable>(), EQ: Eq<HK<F, Either<Throwable, Int>>>): Unit =
             forAll(genThrowable(), { e: Throwable ->
-                AP.attempt(AP.raiseError<Int>(e)).equalUnderTheLaw(AP.pure(e.left()), EQ)
+                AP.attempt(AP.raiseError<Int>(e)).equalUnderTheLaw(AP.pure(Left(e)), EQ)
             })
 
     inline fun <reified F> applicativeErrorAttemptSuccess(AP: ApplicativeError<F, Throwable> = applicativeError<F, Throwable>(), EQ: Eq<HK<F, Either<Throwable, Int>>>): Unit =
             forAll(Gen.int(), { a: Int ->
-                AP.attempt(AP.pure(a)).equalUnderTheLaw(AP.pure(a.right()), EQ)
+                AP.attempt(AP.pure(a)).equalUnderTheLaw(AP.pure(Right(a)), EQ)
             })
 
     inline fun <reified F> applicativeErrorAttemptFromEitherConsistentWithPure(AP: ApplicativeError<F, Throwable> = applicativeError<F, Throwable>(), EQ: Eq<HK<F, Either<Throwable, Int>>>): Unit =

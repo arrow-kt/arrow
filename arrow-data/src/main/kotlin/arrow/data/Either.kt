@@ -1,5 +1,9 @@
 package arrow
 
+import arrow.data.Disjunction
+import arrow.data.LeftProjection
+import arrow.data.RightProjection
+
 typealias Right<A, B> = Either.Right<A, B>
 typealias Left<A, B> = Either.Left<A, B>
 
@@ -60,6 +64,12 @@ typealias Left<A, B> = Either.Left<A, B>
                 }
             }
 
+    @Deprecated("arrow.data.Either is right biased. This method will be removed in future releases")
+    fun toDisjunction(): Disjunction<A, B> = when (this) {
+        is Right -> Disjunction.Right(b)
+        is Left -> Disjunction.Left(a)
+    }
+
     /**
      * If this is a `Left`, then return the left value in `Right` or vice versa.
      *
@@ -114,6 +124,12 @@ typealias Left<A, B> = Either.Left<A, B>
      */
     fun toOption(): Option<B> = fold({ None }, { Some(it) })
 
+    @Deprecated("arrow.data.Either is right biased. This method will be removed in future releases")
+    fun left(): LeftProjection<A, B> = LeftProjection(this)
+
+    @Deprecated("arrow.data.Either is right biased. This method will be removed in future releases")
+    fun right(): RightProjection<A, B> = RightProjection(this)
+
     /**
      * The left side of the disjoint union, as opposed to the [Right] side.
      */
@@ -140,15 +156,19 @@ typealias Left<A, B> = Either.Left<A, B>
 
     companion object {
 
+        fun <L> left(left: L): Either<L, Nothing> = Left(left)
+
+        fun <R> right(right: R): Either<Nothing, R> = Right(right)
+
         tailrec fun <L, A, B> tailRecM(a: A, f: (A) -> HK<EitherKindPartial<L>, Either<A, B>>): Either<L, B> {
             val ev: Either<L, Either<A, B>> = f(a).ev()
             return when (ev) {
-                is Left<L, Either<A, B>> -> ev.a.left()
+                is Left<L, Either<A, B>> -> Left(ev.a)
                 is Right<L, Either<A, B>> -> {
                     val b: Either<A, B> = ev.b
                     when (b) {
                         is Left<A, B> -> tailRecM(b.a, f)
-                        is Right<A, B> -> b.b.right()
+                        is Right<A, B> -> Right(b.b)
                     }
                 }
             }
@@ -213,7 +233,7 @@ fun <A, B> Either<A, B>.contains(elem: B): Boolean = fold({ false }, { it == ele
 fun <A, B, C> Either<A, B>.ap(ff: EitherKind<A, (B) -> C>): Either<A, C> = ff.flatMap { f -> map(f) }.ev()
 
 fun <G, A, B, C> Either<A, B>.traverse(f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, Either<A, C>> =
-        this.ev().fold({ GA.pure(it.left()) }, { GA.map(f(it), { Right(it) }) })
+        this.ev().fold({ GA.pure(Left(it)) }, { GA.map(f(it), { Right(it) }) })
 
 fun <A, B> Either<A, B>.combineK(y: EitherKind<A, B>): Either<A, B> =
         when (this) {
@@ -221,7 +241,23 @@ fun <A, B> Either<A, B>.combineK(y: EitherKind<A, B>): Either<A, B> =
             else -> this.ev()
         }
 
-fun <A> A.left(): Either<A, Nothing> = Left(this)
+@Deprecated("arrow.data.Either is right biased. This method will be removed in future releases")
+inline fun <X, T> Option<T>.toEitherRight(left: () -> X): Either<X, T> = if (isEmpty()) {
+    Left(left())
+} else {
+    Right(get())
+}
 
-fun <A> A.right(): Either<Nothing, A> = Right(this)
+@Deprecated("arrow.data.Either is right biased. This method will be removed in future releases")
+inline fun <X, T> Option<T>.toEitherLeft(right: () -> X): Either<T, X> = if (isEmpty()) {
+    Right(right())
+} else {
+    Left(get())
+}
 
+@Deprecated(DeprecatedAmbiguity, ReplaceWith("Try { body }.toEither()"))
+inline fun <T> eitherTry(body: () -> T): Either<Throwable, T> = try {
+    Right(body())
+} catch (t: Throwable) {
+    Left(t)
+}

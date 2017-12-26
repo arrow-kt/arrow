@@ -9,8 +9,8 @@ import arrow.UnitSpec
 import arrow.genFunctionAToB
 import arrow.genOption
 import arrow.getOrElse
-import arrow.left
-import arrow.right
+import arrow.syntax.either.left
+import arrow.syntax.either.right
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

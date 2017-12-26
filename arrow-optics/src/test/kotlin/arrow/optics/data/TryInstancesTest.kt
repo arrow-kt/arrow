@@ -18,9 +18,9 @@ import arrow.genTry
 import arrow.genValidated
 import arrow.invalid
 import arrow.Invalid
-import arrow.right
 import arrow.valid
 import arrow.Valid
+import arrow.syntax.either.right
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

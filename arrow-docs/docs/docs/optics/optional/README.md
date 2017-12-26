@@ -19,6 +19,7 @@ For a structure `List<Int>` we can create an `Optional` to focus an optional hea
 ```kotlin:ank
 import arrow.*
 import arrow.optics.*
+import arrow.syntax.either.*
 
 val optionalHead: Optional<List<Int>, Int> = Optional(
     getOrModify = { list -> list.firstOrNull()?.right() ?: list.left() },

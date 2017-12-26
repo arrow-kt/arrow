@@ -5,6 +5,8 @@ import io.kotlintest.matchers.Result
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.specs.FreeSpec
 import arrow.Problem.*
+import arrow.syntax.either.left
+import arrow.syntax.either.right
 import kotlin.reflect.KClass
 
 

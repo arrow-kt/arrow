@@ -90,10 +90,10 @@ package arrow
     }
 
     fun <R> toLeft(default: () -> R, FF: Functor<F>): EitherT<F, A, R> =
-            EitherT(cata({ default().right() }, { it.left() }, FF))
+            EitherT(cata({ Right(default()) }, { Left(it) }, FF))
 
     fun <L> toRight(default: () -> L, FF: Functor<F>): EitherT<F, L, A> =
-            EitherT(cata({ default().left() }, { it.right() }, FF))
+            EitherT(cata({ Left(default()) }, { Right(it) }, FF))
 }
 
 inline fun <F, A, B> OptionT<F, A>.mapFilter(crossinline f: (A) -> Option<B>, FF: Functor<F>): OptionT<F, B> =

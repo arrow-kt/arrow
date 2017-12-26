@@ -57,7 +57,7 @@ interface PPrism<S, T, A, B> {
          * Can also be used to construct [Prism]
          */
         operator fun <S, A> invoke(partialFunction: PartialFunction<S, A>, reverseGet: (A) -> S): Prism<S, A> = Prism(
-                getOrModify = { s -> partialFunction.lift()(s).fold({ s.left() }, { it.right() }) },
+                getOrModify = { s -> partialFunction.lift()(s).fold({ Left(s) }, { Right(it) }) },
                 reverseGet = reverseGet
         )
 
@@ -65,7 +65,7 @@ interface PPrism<S, T, A, B> {
          * A [PPrism] that checks for equality with a given value [a]
          */
         inline fun <reified A> only(a: A, EQA: Eq<A> = eq()): Prism<A, Unit> = Prism(
-                getOrModify = { a2 -> (if (EQA.eqv(a, a2)) a.left() else Unit.right()) },
+                getOrModify = { a2 -> (if (EQA.eqv(a, a2)) Left(a) else Right(Unit)) },
                 reverseGet = { a }
         )
 
@@ -268,7 +268,7 @@ inline fun <S, T, A, B> PPrism<S, T, A, B>.all(s: S, crossinline p: (A) -> Boole
  * Create a sum of the [PPrism] and a type [C]
  */
 fun <S, T, A, B, C> PPrism<S, T, A, B>.left(): PPrism<Either<S, C>, Either<T, C>, Either<A, C>, Either<B, C>> = Prism(
-        { it.fold({ a -> getOrModify(a).bimap({ it.left() }, { it.left() }) }, { c -> Right(c.right()) }) },
+        { it.fold({ a -> getOrModify(a).bimap({ Left(it) }, { Left(it) }) }, { c -> Right(Right(c)) }) },
         {
             when (it) {
                 is Left<B, C> -> Left(reverseGet(it.a))
@@ -281,6 +281,6 @@ fun <S, T, A, B, C> PPrism<S, T, A, B>.left(): PPrism<Either<S, C>, Either<T, C>
  * Create a sum of a type [C] and the [PPrism]
  */
 fun <S, T, A, B, C> PPrism<S, T, A, B>.right(): PPrism<Either<C, S>, Either<C, T>, Either<C, A>, Either<C, B>> = Prism(
-        { it.fold({ c -> Right(c.left()) }, { s -> getOrModify(s).bimap({ it.right() }, { it.right() }) }) },
+        { it.fold({ c -> Right(Left(c)) }, { s -> getOrModify(s).bimap({ Right(it) }, { Right(it) }) }) },
         { it.map(this::reverseGet) }
 )

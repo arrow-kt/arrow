@@ -167,7 +167,7 @@ interface PLens<S, T, A, B> {
      * View a [PLens] as a [POptional]
      */
     fun asOptional(): POptional<S, T, A, B> = POptional(
-            { s -> get(s).right() },
+            { s -> Right(get(s)) },
             { b -> { s -> set(s, b) } }
     )
 

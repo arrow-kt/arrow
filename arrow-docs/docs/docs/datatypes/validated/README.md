@@ -195,6 +195,9 @@ then Validated provides `withEither` method to allow you to temporarily turn a V
 instance into an Either instance and apply it to a function.
 
 ```kotlin:ank
+import arrow.syntax.either.*
+
+
 fun positive(field: String, i: Int): Either<ConfigError, Int> {
     return if (i >= 0) i.right()
     else ConfigError.ParseConfig(field).left()

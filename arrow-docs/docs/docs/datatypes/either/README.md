@@ -196,6 +196,8 @@ For using Either's syntax on arbitrary data types.
 This will make possible to use the `left()`, `right()`, `contains()` and `getOrElse()` methods:
 
 ```kotlin:ank
+import arrow.syntax.either.*
+
 7.right()
 ```
 

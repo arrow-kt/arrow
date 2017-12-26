@@ -15,7 +15,7 @@ import arrow.genFunctionAToB
 import arrow.genThrowable
 import arrow.genTry
 import arrow.genValidated
-import arrow.right
+import arrow.syntax.either.right
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
