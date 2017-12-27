@@ -1,4 +1,4 @@
-package org.funktionale.validation
+package arrow.validation
 
 import arrow.Either
 import io.kotlintest.KTestJUnitRunner
