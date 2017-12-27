@@ -30,6 +30,7 @@ include ':arrow-recursion'
 include ':arrow-docs'
 include ':arrow-optics'
 include ':ank-core'
+include ':ank-gradle-plugin'
 
 include ':funktionale-either'
 include ':funktionale-utils'
