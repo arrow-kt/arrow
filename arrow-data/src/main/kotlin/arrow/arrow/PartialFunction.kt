@@ -4,7 +4,7 @@ abstract class PartialFunction<in A, out B> : (A) -> B {
     abstract fun isDefinedAt(a: A): Boolean
 }
 
-fun <A, B> PartialFunction<A, B>.orElse(f: PartialFunction<A, B>): PartialFunction<A, B> =
+infix fun <A, B> PartialFunction<A, B>.orElse(f: PartialFunction<A, B>): PartialFunction<A, B> =
         object : PartialFunction<A, B>() {
             override fun isDefinedAt(a: A): Boolean =
                     this@orElse.isDefinedAt(a) || f.isDefinedAt(a)
@@ -18,6 +18,19 @@ fun <A, B> PartialFunction<A, B>.orElse(f: PartialFunction<A, B>): PartialFuncti
 
         }
 
+fun <A, B> PartialFunction(definetAt: (A) -> Boolean, f: (A) -> B): PartialFunction<A, B> =
+        object : PartialFunction<A, B>() {
+            override fun invoke(p1: A): B {
+                if (definetAt(p1)) {
+                    return f(p1)
+                } else {
+                    throw IllegalArgumentException("Value: ($p1) isn't supported by this function")
+                }
+            }
+
+            override fun isDefinedAt(p1: A) = definetAt(p1)
+        }
+
 /**
  * Turns this partial function into a plain function returning an Option result.
  */
@@ -27,8 +40,14 @@ fun <A, B> PartialFunction<A, B>.lift(): (A) -> Option<B> = Lifted(this)
  * Applies this partial function to the given argument when it is contained in the function domain.
  * Applies fallback function where this partial function is not defined.
  */
-fun <A, B : B1, A1 : A, B1> PartialFunction<A, B>.applyOrElse(x: A1, default: (A1) -> B1): B1 =
+fun <A, B : B1, A1 : A, B1> PartialFunction<A, B>.invokeOrElse(x: A1, default: (A1) -> B1): B1 =
         if (isDefinedAt(x)) invoke(x) else default(x)
+
+fun <P1, R> PartialFunction<P1, R>.invokeOrElse(p1: P1, default: R): R = if (this.isDefinedAt(p1)) {
+    this(p1)
+} else {
+    default
+}
 
 fun <A, B, C> PartialFunction<A, B>.andThen(f: (B) -> C): PartialFunction<A, C> =
         object : PartialFunction<A, C>() {
@@ -45,5 +64,13 @@ fun <A, B> case(ff: Tuple2<(A) -> Boolean, (A) -> B>): PartialFunction<A, B> =
 infix fun <A, B> ((A) -> Boolean).then(f: (A) -> B): Tuple2<(A) -> Boolean, (A) -> B> = Tuple2(this, f)
 
 private class Lifted<A, B>(val pf: PartialFunction<A, B>) : (A) -> Option<B> {
-    override fun invoke(x: A): Option<B> = pf.andThen { Some(it) }.applyOrElse(x, { None })
+    override fun invoke(x: A): Option<B> = pf.andThen { Some(it) }.invokeOrElse(x, { None })
 }
+
+fun <A, B> ((A) -> B).toPartialFunction(definedAt: (A) -> Boolean): PartialFunction<A, B> =
+        object : PartialFunction<A, B>() {
+            override fun isDefinedAt(a: A): Boolean = definedAt(a)
+
+            override fun invoke(x: A): B = this@toPartialFunction(x)
+
+        }
