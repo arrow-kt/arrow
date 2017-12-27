@@ -71,7 +71,7 @@ subprojects { project ->
     task codeCoverageReport(type: JacocoReport) {
         reports {
             xml.enabled true
-            xml.destination "${buildDir}/reports/jacoco/report.xml"
+            xml.destination file("${buildDir}/reports/jacoco/report.xml")
             html.enabled true
             csv.enabled false
         }
