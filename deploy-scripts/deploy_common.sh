@@ -2,7 +2,7 @@
 . $(dirname $0)/deploy_functions.sh
 set -e
 
-SLUG="kategory/kategory"
+SLUG="arrow/arrow"
 JDK="oraclejdk8"
 BRANCH="master"
 VERSION_NAME=$(getProperty "VERSION_NAME")
