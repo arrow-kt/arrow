@@ -27,6 +27,10 @@ typealias Left<A, B> = Either.Left<A, B>
      */
     internal abstract val isLeft: Boolean
 
+    fun isLeft(): Boolean = isLeft
+
+    fun isRight(): Boolean = isRight
+
     /**
      * Applies `fa` if this is a [Left] or `fb` if this is a [Right].
      *
@@ -46,6 +50,12 @@ typealias Left<A, B> = Either.Left<A, B>
     inline fun <C> fold(crossinline fa: (A) -> C, crossinline fb: (B) -> C): C = when (this) {
         is Right<A, B> -> fb(b)
         is Left<A, B> -> fa(a)
+    }
+
+    @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("getOrElse { ifLeft }"))
+    fun get(): B = when (this) {
+        is Right -> b
+        is Left -> throw NoSuchElementException("Disjunction.Left")
     }
 
     fun <C> foldLeft(b: C, f: (C, B) -> C): C =
