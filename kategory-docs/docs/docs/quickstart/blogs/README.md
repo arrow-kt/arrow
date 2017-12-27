@@ -32,6 +32,14 @@ Introductory talk to Functional architectures to be built on top of Kategory.
 
 KotlinConf, San Francisco, Nov '17
 
+### Functional approach to Android architecture using Kotlin
+
+Move side effects to the edges of the system, implement a functional oriented architecture for Android apps based on purity.
+
+<iframe width="560" height="315" src="https://https://www.youtube.com/watch?v=qGef3sFAIxU?rel=0" frameborder="0" allowfullscreen></iframe>
+
+Mobilization 7, Łódź, Oct '17
+
 ### Functional Programming in Kotlin
 
 An ongoing blog series introducing Functional Programming architectures from scratch
