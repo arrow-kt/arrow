@@ -32,7 +32,6 @@ include ':arrow-optics'
 include ':ank-core'
 
 include ':funktionale-utils'
-include ':funktionale-state'
 include ':funktionale-validation'
 
 rootProject.name = 'arrow-parent'

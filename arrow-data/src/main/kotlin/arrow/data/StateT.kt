@@ -42,6 +42,9 @@ class StateT<F, S, A>(
 
     companion object {
 
+        inline fun <reified F, S, T> pure(t: T, MF: Monad<F> = monad<F>()): StateT<F, S, T> =
+                StateT { s -> MF.pure(s toT t) }
+
         /**
          * Constructor to create `StateT<F, S, A>` given a [StateTFun].
          *

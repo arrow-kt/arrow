@@ -52,6 +52,11 @@ fun <S, A> StateFun<S, A>.toState(): State<S, A> = State(this)
  */
 fun <S, A> StateFunKind<S, A>.toState(): State<S, A> = State(this)
 
+fun <S, T, P1, R> State<S, T>.map(sx: State<S, P1>, f: (T, P1) -> R): State<S, R> =
+        flatMap { t -> sx.map { x -> f(t, x) } }.ev()
+
+fun <S, T, R> State<S, T>.map(f: (T) -> R): State<S, R> = flatMap { t -> StateApi.pure<S, R>(f(t)) }.ev()
+
 /**
  * Alias for [StateT.run] `StateT<IdHK, S, A>`
  *
@@ -80,6 +85,8 @@ fun <S, A> StateT<IdHK, S, A>.runS(initial: S): S = run(initial).a
 fun State() = StateApi
 
 object StateApi {
+
+    fun <S, T> pure(t: T): State<S, T> = StateT.pure(t, Id.monad())
 
     /**
      * Return input without modifying it.
