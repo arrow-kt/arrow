@@ -16,7 +16,6 @@
 
 include ':arrow-syntax'
 include ':arrow-data'
-
 include ':arrow-annotations'
 include ':arrow-annotations-processor'
 include ':arrow-kindedj'
@@ -29,10 +28,7 @@ include ':arrow-effects-test'
 include ':arrow-recursion'
 include ':arrow-docs'
 include ':arrow-optics'
+include ':arrow-validation'
 include ':ank-core'
-
-include ':funktionale-utils'
-include ':funktionale-state'
-include ':funktionale-validation'
 
 rootProject.name = 'arrow-parent'
