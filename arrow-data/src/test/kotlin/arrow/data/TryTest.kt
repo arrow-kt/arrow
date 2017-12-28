@@ -1,12 +1,11 @@
 package arrow
 
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldNotBe
-import arrow.Failure
-import arrow.Success
 import arrow.laws.EqLaws
+import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
+import io.kotlintest.matchers.shouldBe
+import io.kotlintest.matchers.shouldEqual
+import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -71,9 +70,16 @@ class TryTest : UnitSpec() {
             Success(1).fold({ 2 }, { throw Exception() }) shouldBe 2
         }
 
+        "getOrDefault returns default if Failure" {
+            Success(1).getOrDefault { 2 } shouldBe 1
+            Failure<Int>(Exception()).getOrDefault { 2 } shouldBe 2
+        }
+
         "getOrElse returns default if Failure" {
-            Success(1).getOrElse { 2 } shouldBe 1
-            Failure<Int>(Exception()).getOrElse { 2 } shouldBe 2
+            val e: Throwable = Exception()
+
+            Success(1).getOrElse { _: Throwable -> 2 } shouldBe 1
+            Failure<Int>(e).getOrElse { (it shouldEqual e); 2 } shouldBe 2
         }
 
         "recoverWith should modify Failure entity" {
