@@ -40,7 +40,7 @@ KotlinConf, San Francisco, Nov '17
  
  droidconSF, San Francisco, Nov '17
  
- ### Functional approach to Android architecture using Kotlin
+### Functional approach to Android architecture using Kotlin
  
  Move side effects to the edges of the system, implement a functional oriented architecture for Android apps based on purity.
  
