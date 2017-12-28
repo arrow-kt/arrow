@@ -1,5 +1,5 @@
 
-Copyright (C) 2017 The Kategory Authors
+Copyright (C) 2017 The Arrow Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ A copy of Apache License 2.0 has been included at the end of this file.
 
 ------------------------------------------------------------------------
 
-Code in Kategory is derived in part from typelevel/Cats and Scalaz.
+Code in Arrow is derived in part from typelevel/Cats and Scalaz.
 
 Cats license follows:
 
@@ -75,7 +75,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ------------------------------------------------------------------------
 
-Code in Kategory Optics is derived in part from julien-truffaut/Monocle.
+Code in Arrow Optics is derived in part from julien-truffaut/Monocle.
 
 Monocle license follows:
 
@@ -513,7 +513,7 @@ Duration.kt license follows:
    See the License for the specific language governing permissions and
    limitations under the License.
 
-Code in Kategory is derived in part from frees-io/freestyle.
+Code in Arrow is derived in part from frees-io/freestyle.
 
 Freestyle license follows:
 
