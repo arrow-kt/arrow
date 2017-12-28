@@ -103,6 +103,17 @@ typealias Left<A, B> = Either.Left<A, B>
     inline fun <C> map(crossinline f: (B) -> C): Either<A, C> = fold({ Left(it) }, { Right(f(it)) })
 
     /**
+     * The given function is applied if this is a `Left`.
+     *
+     * Example:
+     * ```
+     * Right(12).mapLeft { "flower" } // Result: Right(12)
+     * Left(12).mapLeft { "flower" }  // Result: Left("flower)
+     * ```
+     */
+    inline fun <C> mapLeft(crossinline f: (A) -> C): Either<C, B> = fold({ Left(f(it)) }, { Right(it) })
+
+    /**
      * Map over Left and Right of this Either
      */
     inline fun <C, D> bimap(crossinline fa: (A) -> C, crossinline fb: (B) -> D): Either<C, D> = fold({ Left(fa(it)) }, { Right(fb(it)) })
