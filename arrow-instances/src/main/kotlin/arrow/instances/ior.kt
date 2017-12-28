@@ -1,7 +1,5 @@
 package arrow
 
-import arrow.*
-
 @instance(Ior::class)
 interface IorFunctorInstance<L> : Functor<IorKindPartial<L>> {
     override fun <A, B> map(fa: IorKind<L, A>, f: (A) -> B): Ior<L, B> = fa.ev().map(f)

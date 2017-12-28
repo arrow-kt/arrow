@@ -1,7 +1,5 @@
 package arrow
 
-import arrow.*
-
 @instance(SortedMapKW::class)
 interface SortedMapKWFunctorInstance<A : Comparable<A>> : Functor<SortedMapKWKindPartial<A>> {
     override fun <B, C> map(fb: HK<SortedMapKWKindPartial<A>, B>, f: (B) -> C): SortedMapKW<A, C> =

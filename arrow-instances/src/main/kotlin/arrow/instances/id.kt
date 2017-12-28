@@ -9,18 +9,13 @@ interface IdEqInstance<A> : Eq<Id<A>> {
             EQ().eqv(a.value, b.value)
 }
 
+@instance(Id::class)
 interface IdFunctorInstance : arrow.Functor<IdHK> {
     override fun <A, B> map(fa: arrow.IdKind<A>, f: kotlin.Function1<A, B>): arrow.Id<B> =
             fa.ev().map(f)
 }
 
-object IdFunctorInstanceImplicits {
-    fun instance(): IdFunctorInstance = arrow.Id.Companion.functor()
-}
-
-fun arrow.Id.Companion.functor(): IdFunctorInstance =
-        object : IdFunctorInstance, arrow.Functor<IdHK> {}
-
+@instance(Id::class)
 interface IdApplicativeInstance : arrow.Applicative<IdHK> {
     override fun <A, B> ap(fa: arrow.IdKind<A>, ff: arrow.IdKind<kotlin.Function1<A, B>>): arrow.Id<B> =
             fa.ev().ap(ff)
@@ -32,13 +27,7 @@ interface IdApplicativeInstance : arrow.Applicative<IdHK> {
             arrow.Id.pure(a)
 }
 
-object IdApplicativeInstanceImplicits {
-    fun instance(): IdApplicativeInstance = arrow.Id.Companion.applicative()
-}
-
-fun arrow.Id.Companion.applicative(): IdApplicativeInstance =
-        object : IdApplicativeInstance, arrow.Applicative<IdHK> {}
-
+@instance(Id::class)
 interface IdMonadInstance : arrow.Monad<IdHK> {
     override fun <A, B> ap(fa: arrow.IdKind<A>, ff: arrow.IdKind<kotlin.Function1<A, B>>): arrow.Id<B> =
             fa.ev().ap(ff)
@@ -56,13 +45,7 @@ interface IdMonadInstance : arrow.Monad<IdHK> {
             arrow.Id.pure(a)
 }
 
-object IdMonadInstanceImplicits {
-    fun instance(): IdMonadInstance = arrow.Id.Companion.monad()
-}
-
-fun arrow.Id.Companion.monad(): IdMonadInstance =
-        object : IdMonadInstance, arrow.Monad<IdHK> {}
-
+@instance(Id::class)
 interface IdComonadInstance : arrow.Comonad<IdHK> {
     override fun <A, B> coflatMap(fa: arrow.IdKind<A>, f: kotlin.Function1<arrow.IdKind<A>, B>): arrow.Id<B> =
             fa.ev().coflatMap(f)
@@ -74,13 +57,7 @@ interface IdComonadInstance : arrow.Comonad<IdHK> {
             fa.ev().map(f)
 }
 
-object IdComonadInstanceImplicits {
-    fun instance(): IdComonadInstance = arrow.Id.Companion.comonad()
-}
-
-fun arrow.Id.Companion.comonad(): IdComonadInstance =
-        object : IdComonadInstance, arrow.Comonad<IdHK> {}
-
+@instance(Id::class)
 interface IdBimonadInstance : arrow.Bimonad<IdHK> {
     override fun <A, B> ap(fa: arrow.IdKind<A>, ff: arrow.IdKind<kotlin.Function1<A, B>>): arrow.Id<B> =
             fa.ev().ap(ff)
@@ -104,13 +81,7 @@ interface IdBimonadInstance : arrow.Bimonad<IdHK> {
             fa.ev().extract()
 }
 
-object IdBimonadInstanceImplicits {
-    fun instance(): IdBimonadInstance = arrow.Id.Companion.bimonad()
-}
-
-fun arrow.Id.Companion.bimonad(): IdBimonadInstance =
-        object : IdBimonadInstance, arrow.Bimonad<IdHK> {}
-
+@instance(Id::class)
 interface IdFoldableInstance : arrow.Foldable<IdHK> {
     override fun <A, B> foldLeft(fa: arrow.IdKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.ev().foldLeft(b, f)
@@ -119,13 +90,9 @@ interface IdFoldableInstance : arrow.Foldable<IdHK> {
             fa.ev().foldRight(lb, f)
 }
 
-object IdFoldableInstanceImplicits {
-    fun instance(): IdFoldableInstance = arrow.Id.Companion.foldable()
-}
+fun <A, G, B> Id<A>.traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, Id<B>> = GA.map(f(this.ev().value), { Id(it) })
 
-fun arrow.Id.Companion.foldable(): IdFoldableInstance =
-        object : IdFoldableInstance, arrow.Foldable<IdHK> {}
-
+@instance(Id::class)
 interface IdTraverseInstance : arrow.Traverse<IdHK> {
     override fun <A, B> map(fa: arrow.IdKind<A>, f: kotlin.Function1<A, B>): arrow.Id<B> =
             fa.ev().map(f)
@@ -139,10 +106,3 @@ interface IdTraverseInstance : arrow.Traverse<IdHK> {
     override fun <A, B> foldRight(fa: arrow.IdKind<A>, lb: arrow.Eval<B>, f: kotlin.Function2<A, arrow.Eval<B>, arrow.Eval<B>>): arrow.Eval<B> =
             fa.ev().foldRight(lb, f)
 }
-
-object IdTraverseInstanceImplicits {
-    fun instance(): IdTraverseInstance = arrow.Id.Companion.traverse()
-}
-
-fun arrow.Id.Companion.traverse(): IdTraverseInstance =
-        object : IdTraverseInstance, arrow.Traverse<IdHK> {}

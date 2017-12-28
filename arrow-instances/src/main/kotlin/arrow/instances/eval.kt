@@ -1,17 +1,12 @@
 package arrow
 
+@instance(Eval::class)
 interface EvalFunctorInstance : arrow.Functor<EvalHK> {
     override fun <A, B> map(fa: arrow.EvalKind<A>, f: kotlin.Function1<A, B>): arrow.Eval<B> =
             fa.ev().map(f)
 }
 
-object EvalFunctorInstanceImplicits {
-    fun instance(): EvalFunctorInstance = arrow.Eval.Companion.functor()
-}
-
-fun arrow.Eval.Companion.functor(): EvalFunctorInstance =
-        object : EvalFunctorInstance, arrow.Functor<EvalHK> {}
-
+@instance(Eval::class)
 interface EvalApplicativeInstance : arrow.Applicative<EvalHK> {
     override fun <A, B> ap(fa: arrow.EvalKind<A>, ff: arrow.EvalKind<kotlin.Function1<A, B>>): arrow.Eval<B> =
             fa.ev().ap(ff)
@@ -23,13 +18,7 @@ interface EvalApplicativeInstance : arrow.Applicative<EvalHK> {
             arrow.Eval.pure(a)
 }
 
-object EvalApplicativeInstanceImplicits {
-    fun instance(): EvalApplicativeInstance = arrow.Eval.Companion.applicative()
-}
-
-fun arrow.Eval.Companion.applicative(): EvalApplicativeInstance =
-        object : EvalApplicativeInstance, arrow.Applicative<EvalHK> {}
-
+@instance(Eval::class)
 interface EvalMonadInstance : arrow.Monad<EvalHK> {
     override fun <A, B> ap(fa: arrow.EvalKind<A>, ff: arrow.EvalKind<kotlin.Function1<A, B>>): arrow.Eval<B> =
             fa.ev().ap(ff)
@@ -47,13 +36,7 @@ interface EvalMonadInstance : arrow.Monad<EvalHK> {
             arrow.Eval.pure(a)
 }
 
-object EvalMonadInstanceImplicits {
-    fun instance(): EvalMonadInstance = arrow.Eval.Companion.monad()
-}
-
-fun arrow.Eval.Companion.monad(): EvalMonadInstance =
-        object : EvalMonadInstance, arrow.Monad<EvalHK> {}
-
+@instance(Eval::class)
 interface EvalComonadInstance : arrow.Comonad<EvalHK> {
     override fun <A, B> coflatMap(fa: arrow.EvalKind<A>, f: kotlin.Function1<arrow.EvalKind<A>, B>): arrow.Eval<B> =
             fa.ev().coflatMap(f)
@@ -65,13 +48,7 @@ interface EvalComonadInstance : arrow.Comonad<EvalHK> {
             fa.ev().map(f)
 }
 
-object EvalComonadInstanceImplicits {
-    fun instance(): EvalComonadInstance = arrow.Eval.Companion.comonad()
-}
-
-fun arrow.Eval.Companion.comonad(): EvalComonadInstance =
-        object : EvalComonadInstance, arrow.Comonad<EvalHK> {}
-
+@instance(Eval::class)
 interface EvalBimonadInstance : arrow.Bimonad<EvalHK> {
     override fun <A, B> ap(fa: arrow.EvalKind<A>, ff: arrow.EvalKind<kotlin.Function1<A, B>>): arrow.Eval<B> =
             fa.ev().ap(ff)
@@ -94,10 +71,3 @@ interface EvalBimonadInstance : arrow.Bimonad<EvalHK> {
     override fun <A> extract(fa: arrow.EvalKind<A>): A =
             fa.ev().extract()
 }
-
-object EvalBimonadInstanceImplicits {
-    fun instance(): EvalBimonadInstance = arrow.Eval.Companion.bimonad()
-}
-
-fun arrow.Eval.Companion.bimonad(): EvalBimonadInstance =
-        object : EvalBimonadInstance, arrow.Bimonad<EvalHK> {}

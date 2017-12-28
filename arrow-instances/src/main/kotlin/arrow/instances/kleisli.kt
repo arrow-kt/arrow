@@ -1,10 +1,5 @@
 package arrow
 
-import arrow.Either
-import arrow.Kleisli
-import andThen
-import arrow.instance
-
 @instance(Kleisli::class)
 interface KleisliFunctorInstance<F, D> : Functor<KleisliKindPartial<F, D>> {
 
@@ -43,15 +38,6 @@ interface KleisliMonadInstance<F, D> : KleisliApplicativeInstance<F, D>, Monad<K
 
     override fun <A, B> tailRecM(a: A, f: (A) -> KleisliKind<F, D, Either<A, B>>): Kleisli<F, D, B> =
             Kleisli.tailRecM(a, f, FF())
-
-}
-
-@instance(Kleisli::class)
-interface KleisliMonadReaderInstance<F, D> : KleisliMonadInstance<F, D>, MonadReader<KleisliKindPartial<F, D>, D> {
-
-    override fun ask(): Kleisli<F, D, D> = Kleisli({ FF().pure(it) })
-
-    override fun <A> local(f: (D) -> D, fa: KleisliKind<F, D, A>): Kleisli<F, D, A> = fa.ev().local(f)
 
 }
 

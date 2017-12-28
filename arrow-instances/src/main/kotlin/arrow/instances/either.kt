@@ -52,6 +52,9 @@ interface EitherFoldableInstance<L> : Foldable<EitherKindPartial<L>> {
             fa.ev().foldRight(lb, f)
 }
 
+fun <G, A, B, C> Either<A, B>.traverse(f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, Either<A, C>> =
+        this.ev().fold({ GA.pure(Either.Left(it)) }, { GA.map(f(it), { Either.Right(it) }) })
+
 @instance(Either::class)
 interface EitherTraverseInstance<L> : EitherFoldableInstance<L>, Traverse<EitherKindPartial<L>> {
 

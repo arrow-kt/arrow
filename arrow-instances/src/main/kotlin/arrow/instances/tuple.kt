@@ -1,7 +1,5 @@
 package arrow
 
-import arrow.instance
-
 @instance(Tuple2::class)
 interface Tuple2MonoidInstance<A, B> : Monoid<Tuple2<A, B>> {
 

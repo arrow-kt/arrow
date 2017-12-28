@@ -1,4 +1,6 @@
-package arrow
+package java_lang
+
+import arrow.*
 
 object StringMonoidInstanceImplicits {
     fun instance(): StringMonoidInstance = StringMonoidInstance

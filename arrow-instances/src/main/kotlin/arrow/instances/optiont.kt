@@ -1,21 +1,11 @@
 package arrow
 
-import arrow.*
-
 @instance(OptionT::class)
 interface OptionTFunctorInstance<F> : Functor<OptionTKindPartial<F>> {
 
     fun FF(): Functor<F>
 
     override fun <A, B> map(fa: OptionTKind<F, A>, f: (A) -> B): OptionT<F, B> = fa.ev().map(f, FF())
-
-}
-
-@instance(OptionT::class)
-interface OptionTFunctorFilterInstance<F> : OptionTFunctorInstance<F>, FunctorFilter<OptionTKindPartial<F>> {
-
-    override fun <A, B> mapFilter(fa: OptionTKind<F, A>, f: (A) -> Option<B>): OptionT<F, B> =
-            fa.ev().mapFilter(f, FF())
 
 }
 
@@ -45,6 +35,15 @@ interface OptionTMonadInstance<F> : OptionTApplicativeInstance<F>, Monad<OptionT
 
 }
 
+fun <F, A, B> OptionT<F, A>.foldLeft(b: B, f: (B, A) -> B, FF: Foldable<F>): B = FF.compose(Option.foldable()).foldLC(value, b, f)
+
+fun <F, A, B> OptionT<F, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>): Eval<B> = FF.compose(Option.foldable()).foldRC(value, lb, f)
+
+fun <F, G, A, B> OptionT<F, A>.traverse(f: (A) -> HK<G, B>, GA: Applicative<G>, FF: Traverse<F>): HK<G, OptionT<F, B>> {
+    val fa = ComposedTraverse(FF, Option.traverse(), Option.applicative()).traverseC(value, f, GA)
+    return GA.map(fa, { OptionT(FF.map(it.unnest(), { it.ev() })) })
+}
+
 @instance(OptionT::class)
 interface OptionTFoldableInstance<F> : Foldable<OptionTKindPartial<F>> {
 
@@ -63,18 +62,6 @@ interface OptionTTraverseInstance<F> : OptionTFoldableInstance<F>, Traverse<Opti
 
     override fun <G, A, B> traverse(fa: OptionTKind<F, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, OptionT<F, B>> =
             fa.ev().traverse(f, GA, FFF())
-
-}
-
-@instance(OptionT::class)
-interface OptionTTraverseFilterInstance<F> :
-        OptionTTraverseInstance<F>,
-        TraverseFilter<OptionTKindPartial<F>> {
-
-    override fun FFF(): TraverseFilter<F>
-
-    override fun <G, A, B> traverseFilter(fa: OptionTKind<F, A>, f: (A) -> HK<G, Option<B>>, GA: Applicative<G>): HK<G, OptionT<F, B>> =
-            fa.ev().traverseFilter(f, GA, FFF())
 
 }
 

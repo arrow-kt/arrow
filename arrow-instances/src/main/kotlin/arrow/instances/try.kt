@@ -28,18 +28,13 @@ interface TryEqInstance<A> : Eq<Try<A>> {
 
 }
 
+@instance(Try::class)
 interface TryFunctorInstance : arrow.Functor<TryHK> {
     override fun <A, B> map(fa: arrow.TryKind<A>, f: kotlin.Function1<A, B>): arrow.Try<B> =
             fa.ev().map(f)
 }
 
-object TryFunctorInstanceImplicits {
-    fun instance(): TryFunctorInstance = arrow.Try.Companion.functor()
-}
-
-fun arrow.Try.Companion.functor(): TryFunctorInstance =
-        object : TryFunctorInstance, arrow.Functor<TryHK> {}
-
+@instance(Try::class)
 interface TryApplicativeInstance : arrow.Applicative<TryHK> {
     override fun <A, B> ap(fa: arrow.TryKind<A>, ff: arrow.TryKind<kotlin.Function1<A, B>>): arrow.Try<B> =
             fa.ev().ap(ff)
@@ -51,13 +46,7 @@ interface TryApplicativeInstance : arrow.Applicative<TryHK> {
             arrow.Try.pure(a)
 }
 
-object TryApplicativeInstanceImplicits {
-    fun instance(): TryApplicativeInstance = arrow.Try.Companion.applicative()
-}
-
-fun arrow.Try.Companion.applicative(): TryApplicativeInstance =
-        object : TryApplicativeInstance, arrow.Applicative<TryHK> {}
-
+@instance(Try::class)
 interface TryMonadInstance : arrow.Monad<TryHK> {
     override fun <A, B> ap(fa: arrow.TryKind<A>, ff: arrow.TryKind<kotlin.Function1<A, B>>): arrow.Try<B> =
             fa.ev().ap(ff)
@@ -75,13 +64,7 @@ interface TryMonadInstance : arrow.Monad<TryHK> {
             arrow.Try.pure(a)
 }
 
-object TryMonadInstanceImplicits {
-    fun instance(): TryMonadInstance = arrow.Try.Companion.monad()
-}
-
-fun arrow.Try.Companion.monad(): TryMonadInstance =
-        object : TryMonadInstance, arrow.Monad<TryHK> {}
-
+@instance(Try::class)
 interface TryFoldableInstance : arrow.Foldable<TryHK> {
     override fun <A> exists(fa: arrow.TryKind<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
             fa.ev().exists(p)
@@ -93,13 +76,7 @@ interface TryFoldableInstance : arrow.Foldable<TryHK> {
             fa.ev().foldRight(lb, f)
 }
 
-object TryFoldableInstanceImplicits {
-    fun instance(): TryFoldableInstance = arrow.Try.Companion.foldable()
-}
-
-fun arrow.Try.Companion.foldable(): TryFoldableInstance =
-        object : TryFoldableInstance, arrow.Foldable<TryHK> {}
-
+@instance(Try::class)
 interface TryTraverseInstance : arrow.Traverse<TryHK> {
     override fun <A, B> map(fa: arrow.TryKind<A>, f: kotlin.Function1<A, B>): arrow.Try<B> =
             fa.ev().map(f)
@@ -116,10 +93,3 @@ interface TryTraverseInstance : arrow.Traverse<TryHK> {
     override fun <A, B> foldRight(fa: arrow.TryKind<A>, lb: arrow.Eval<B>, f: kotlin.Function2<A, arrow.Eval<B>, arrow.Eval<B>>): arrow.Eval<B> =
             fa.ev().foldRight(lb, f)
 }
-
-object TryTraverseInstanceImplicits {
-    fun instance(): TryTraverseInstance = arrow.Try.Companion.traverse()
-}
-
-fun arrow.Try.Companion.traverse(): TryTraverseInstance =
-        object : TryTraverseInstance, arrow.Traverse<TryHK> {}

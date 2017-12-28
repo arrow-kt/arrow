@@ -65,7 +65,7 @@ package arrow
 
     fun reset(MM: Monoid<W>, MF: Monad<F>): WriterT<F, W, A> = mapAcc ({ MM.empty() }, MF)
 
-    inline fun <B> map(crossinline f: (A) -> B, FF: Functor<F>): WriterT<F, W, B> = WriterT(FF.map(value, { it.a toT f(it.b) }))
+    fun <B> map(f: (A) -> B, FF: Functor<F>): WriterT<F, W, B> = WriterT(FF.map(value, { it.a toT f(it.b) }))
 
     inline fun <U> mapAcc(crossinline f: (W) -> U, MF: Monad<F>): WriterT<F, U, A> = transform ({ f(it.a) toT it.b }, MF)
 

@@ -17,7 +17,7 @@ interface SetKWEqInstance<A> : Eq<SetKW<A>> {
 
     override fun eqv(a: SetKW<A>, b: SetKW<A>): Boolean =
             if (a.size == b.size) a.set.map { aa ->
-                b.find { bb -> EQ().eqv(aa, bb) }.nonEmpty()
+                b.find { bb -> EQ().eqv(aa, bb) } != null
             }.fold(true) { acc, bool ->
                 acc && bool
             }
@@ -25,6 +25,7 @@ interface SetKWEqInstance<A> : Eq<SetKW<A>> {
 
 }
 
+@instance(SetKW::class)
 interface SetKWFoldableInstance : arrow.Foldable<SetKWHK> {
     override fun <A, B> foldLeft(fa: arrow.SetKWKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.ev().foldLeft(b, f)
@@ -36,25 +37,13 @@ interface SetKWFoldableInstance : arrow.Foldable<SetKWHK> {
             fa.ev().isEmpty()
 }
 
-object SetKWFoldableInstanceImplicits {
-    fun instance(): SetKWFoldableInstance = arrow.SetKW.Companion.foldable()
-}
-
-fun arrow.SetKW.Companion.foldable(): SetKWFoldableInstance =
-        object : SetKWFoldableInstance, arrow.Foldable<SetKWHK> {}
-
+@instance(SetKW::class)
 interface SetKWSemigroupKInstance : arrow.SemigroupK<SetKWHK> {
     override fun <A> combineK(x: arrow.SetKWKind<A>, y: arrow.SetKWKind<A>): arrow.SetKW<A> =
             x.ev().combineK(y)
 }
 
-object SetKWSemigroupKInstanceImplicits {
-    fun instance(): SetKWSemigroupKInstance = arrow.SetKW.Companion.semigroupK()
-}
-
-fun arrow.SetKW.Companion.semigroupK(): SetKWSemigroupKInstance =
-        object : SetKWSemigroupKInstance, arrow.SemigroupK<SetKWHK> {}
-
+@instance(SetKW::class)
 interface SetKWMonoidKInstance : arrow.MonoidK<SetKWHK> {
     override fun <A> empty(): arrow.SetKW<A> =
             arrow.SetKW.empty()
@@ -62,10 +51,3 @@ interface SetKWMonoidKInstance : arrow.MonoidK<SetKWHK> {
     override fun <A> combineK(x: arrow.SetKWKind<A>, y: arrow.SetKWKind<A>): arrow.SetKW<A> =
             x.ev().combineK(y)
 }
-
-object SetKWMonoidKInstanceImplicits {
-    fun instance(): SetKWMonoidKInstance = arrow.SetKW.Companion.monoidK()
-}
-
-fun arrow.SetKW.Companion.monoidK(): SetKWMonoidKInstance =
-        object : SetKWMonoidKInstance, arrow.MonoidK<SetKWHK> {}
