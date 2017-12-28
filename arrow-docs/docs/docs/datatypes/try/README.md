@@ -63,7 +63,19 @@ val lotteryTry = Try { getLotteryNumbers() }
 lotteryTry
 ```
 
-By using `getOrElse` we can give a default value to return, when the computation fails, similar to what we can also do with `Option` when there is no value:
+By using `getOrDefault` we can give a default value to return, when the computation fails, similar to what we can also do with `Option` when there is no value:
+
+```kotlin:ank
+lotteryTry.getOrDefault { emptyList() }
+```
+
+If the underlying failure is useful to determine the default value, `getOrElse` can be used:
+
+```kotlin:ank
+lotteryTry.getOrElse { ex: Throwable -> emptyList() }
+```
+
+`getOrElse` can generally be used anywhere `getOrDefault` is used, ignoring the exception if it's not needed:
 
 ```kotlin:ank
 lotteryTry.getOrElse { emptyList() }
