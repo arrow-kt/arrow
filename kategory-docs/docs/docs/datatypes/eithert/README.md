@@ -218,7 +218,7 @@ Here we no longer have to deal with the `Left` cases, and the binding to the val
 As `EitherT<F, A ,B>` allows to manipulate the nested `Either` structure, it provides a `mapLeft` method to map over the left element of nested Eithers.
 
 ```kotlin:ank
-EitherT(Option(3)).mapLeft({it + 1}, Option.functor())
+EitherT(Option(3.left())).mapLeft({it + 1}, Option.functor())
 ```
 
 ## Instances
