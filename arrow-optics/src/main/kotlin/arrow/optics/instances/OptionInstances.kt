@@ -1,6 +1,7 @@
 package arrow.optics
 
 import arrow.*
+import identity
 
 /**
  * [PIso] that defines the equality in the kotlin nullable structure and [arrow.Option]

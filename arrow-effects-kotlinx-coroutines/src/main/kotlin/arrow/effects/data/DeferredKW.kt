@@ -1,5 +1,6 @@
 package arrow.effects
 
+import andThen
 import arrow.*
 import kotlinx.coroutines.experimental.*
 import kotlin.coroutines.experimental.CoroutineContext

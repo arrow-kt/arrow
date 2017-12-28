@@ -75,20 +75,6 @@ package arrow
 
     inline fun <B> subflatMap(crossinline f: (A) -> Option<B>, FF: Functor<F>): OptionT<F, B> = transform({ it.flatMap(f) }, FF)
 
-    fun <B> foldLeft(b: B, f: (B, A) -> B, FF: Foldable<F>): B = FF.compose(Option.foldable()).foldLC(value, b, f)
-
-    fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>): Eval<B> = FF.compose(Option.foldable()).foldRC(value, lb, f)
-
-    fun <G, B> traverseFilter(f: (A) -> HK<G, Option<B>>, GA: Applicative<G>, FF: Traverse<F>): HK<G, OptionT<F, B>> {
-        val fa = ComposedTraverseFilter(FF, Option.traverseFilter(), Option.applicative()).traverseFilterC(value, f, GA)
-        return GA.map(fa, { OptionT(FF.map(it.unnest(), { it.ev() })) })
-    }
-
-    fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>, FF: Traverse<F>): HK<G, OptionT<F, B>> {
-        val fa = ComposedTraverse(FF, Option.traverse(), Option.applicative()).traverseC(value, f, GA)
-        return GA.map(fa, { OptionT(FF.map(it.unnest(), { it.ev() })) })
-    }
-
     fun <R> toLeft(default: () -> R, FF: Functor<F>): EitherT<F, A, R> =
             EitherT(cata({ Right(default()) }, { Left(it) }, FF))
 

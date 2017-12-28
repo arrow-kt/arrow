@@ -1,5 +1,8 @@
 package arrow
 
+import arrow.free.instances.FreeEq
+import arrow.free.instances.FreeMonadInstance
+import arrow.instances.FreeEq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
@@ -14,7 +17,7 @@ sealed class Ops<out A> : HK<Ops.F, A> {
     data class Add(val a: Int, val y: Int) : Ops<Int>()
     data class Subtract(val a: Int, val y: Int) : Ops<Int>()
 
-    companion object : FreeMonadInstance<Ops.F> {
+    companion object : FreeMonadInstance<F> {
         fun value(n: Int): Free<Ops.F, Int> = Free.liftF(Ops.Value(n))
         fun add(n: Int, y: Int): Free<Ops.F, Int> = Free.liftF(Ops.Add(n, y))
         fun subtract(n: Int, y: Int): Free<Ops.F, Int> = Free.liftF(Ops.Subtract(n, y))

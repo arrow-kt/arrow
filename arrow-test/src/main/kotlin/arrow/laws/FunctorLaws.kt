@@ -1,5 +1,7 @@
 package arrow
 
+import andThen
+import identity
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

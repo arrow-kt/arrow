@@ -99,7 +99,7 @@ class StateT<F, S, A>(
          * @param AF [Applicative] for the context [F].
          * @param f the modify function to apply.
          */
-        fun <F, S> modify(AF: Applicative<F>, f: (S) -> S): StateT<F, S, Unit> = StateT(AF.pure({ s -> AF.map(AF.pure(f(s))) { it toT Unit } }))
+        fun <F, S> modify(AF: Applicative<F>, f: (S) -> S): StateT<F, S, Unit> = StateT(AF.pure({ s -> AF.map(AF.pure(f(s))) { Tuple2(it, Unit) } }))
 
         /**
          * Modify the state with an [Applicative] function [f] `(S) -> HK<F, S>` and return [Unit].
@@ -107,7 +107,7 @@ class StateT<F, S, A>(
          * @param AF [Applicative] for the context [F].
          * @param f the modify function to apply.
          */
-        fun <F, S> modifyF(AF: Applicative<F>, f: (S) -> HK<F, S>): StateT<F, S, Unit> = StateT(AF.pure({ s -> AF.map(f(s)) { it toT Unit } }))
+        fun <F, S> modifyF(AF: Applicative<F>, f: (S) -> HK<F, S>): StateT<F, S, Unit> = StateT(AF.pure({ s -> AF.map(f(s)) { Tuple2(it, Unit) } }))
 
         /**
          * Set the state to a value [s] and return [Unit].

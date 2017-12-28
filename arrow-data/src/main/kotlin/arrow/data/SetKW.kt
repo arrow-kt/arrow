@@ -1,7 +1,6 @@
 package arrow
 
 @higherkind
-@deriving(Foldable::class, SemigroupK::class, MonoidK::class)
 data class SetKW<out A>(val set: Set<A>) : SetKWKind<A>, Set<A> by set {
 
     fun <B> foldLeft(b: B, f: (B, A) -> B): B = this.fold(b, f)

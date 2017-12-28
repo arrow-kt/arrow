@@ -28,18 +28,6 @@ package arrow
 
     companion object {
         inline operator fun <reified F, reified G, A> invoke(run: Either<HK<F, A>, HK<G, A>>): Coproduct<F, G, A> = Coproduct(run)
-
-        inline fun <reified F, reified G> comonad(CF: Comonad<F> = arrow.comonad(), CG: Comonad<G>): CoproductComonadInstance<F, G> =
-                CoproductComonadInstanceImplicits.instance(CF, CG)
-
-        inline fun <reified F, reified G> functor(FF: Functor<F> = arrow.functor(), FG: Functor<G> = arrow.functor()): CoproductFunctorInstance<F, G> =
-                CoproductFunctorInstanceImplicits.instance(FF, FG)
-
-        inline fun <reified F, reified G> traverse(FF: Traverse<F> = traverse<F>(), FG: Traverse<G> = traverse<G>()): CoproductTraverseInstance<F, G> =
-                CoproductTraverseInstanceImplicits.instance(FF, FG)
-
-        inline fun <reified F, reified G> foldable(FF: Foldable<F> = foldable<F>(), FG: Foldable<G> = foldable<G>()): CoproductFoldableInstance<F, G> =
-                CoproductFoldableInstanceImplicits.instance(FF, FG)
     }
 
 }

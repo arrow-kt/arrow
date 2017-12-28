@@ -3,6 +3,8 @@ package arrow
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.optics.Setter
+import compose
+import identity
 
 object SetterLaws {
 

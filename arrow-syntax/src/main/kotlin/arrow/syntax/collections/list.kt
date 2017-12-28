@@ -5,8 +5,8 @@ import arrow.Option
 import arrow.Some
 import arrow.State
 import arrow.map
-import arrow.data.Disjunction
-import arrow.data.map
+import data.Disjunction
+import data.map
 
 /**
  * Returns a list containing all elements except the first element

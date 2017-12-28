@@ -1,6 +1,7 @@
 package arrow.optics
 
 import arrow.*
+import identity
 
 /**
  * [Traversal] is a type alias for [PTraversal] which fixes the type arguments

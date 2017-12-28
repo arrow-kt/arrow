@@ -1,0 +1,18 @@
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
+    compile project(':arrow-annotations')
+    compile project(':arrow-data')
+    compile project(':arrow-instances')
+    kapt project(':arrow-annotations-processor')
+    kaptTest project(':arrow-annotations-processor')
+    compileOnly project(':arrow-annotations-processor')
+    testCompileOnly project(':arrow-annotations-processor')
+    testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
+    testCompile project(':arrow-syntax')
+    testCompile project(':arrow-instances')
+    testCompile project(':arrow-test')
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+apply from: rootProject.file('gradle/generated-kotlin-sources.gradle')
+apply plugin: 'kotlin-kapt'

@@ -1,6 +1,8 @@
 package arrow.optics
 
 import arrow.*
+import compose
+import identity
 
 /**
  * [Prism] is a type alias for [PPrism] which fixes the type arguments

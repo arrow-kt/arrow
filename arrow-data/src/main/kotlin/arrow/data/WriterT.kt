@@ -7,9 +7,9 @@ package arrow
     companion object {
 
         inline fun <reified F, reified W, A> pure(a: A, MM: Monoid<W> = monoid(), AF: Applicative<F> = arrow.applicative()) =
-                WriterT(AF.pure(MM.empty() toT a))
+                WriterT(AF.pure(Tuple2(MM.empty(),a)))
 
-        inline fun <reified F, W, A> both(w: W, a: A, MF: Monad<F> = arrow.monad()) = WriterT(MF.pure(w toT a))
+        inline fun <reified F, W, A> both(w: W, a: A, MF: Monad<F> = arrow.monad()) = WriterT(MF.pure(Tuple2(w, a)))
 
         inline fun <reified F, W, A> fromTuple(z: Tuple2<W, A>, MF: Monad<F> = arrow.monad()) = WriterT(MF.pure(z))
 
@@ -45,9 +45,10 @@ package arrow
         fun <F, W, A, B> tailRecM(a: A, f: (A) -> HK<WriterTKindPartial<F, W>, Either<A, B>>, MF: Monad<F>): WriterT<F, W, B> =
                 WriterT(MF.tailRecM(a, {
                     MF.map(f(it).ev().value) {
-                        when (it.b) {
-                            is Left<A, B> -> Left(it.b.a)
-                            is Right<A, B> -> Right(it.a toT it.b.b)
+                        val value = it.b
+                        when (value) {
+                            is Either.Left<A, B> -> Either.Left(value.a)
+                            is Either.Right<A, B> -> Either.Right(it.a toT value.b)
                         }
                     }
                 }))

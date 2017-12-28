@@ -1,7 +1,10 @@
 package arrow
 
+import arrow.free.instances.FreeApplicativeApplicativeInstance
+import arrow.free.instances.FreeApplicativeEq
+import arrow.instances.FreeApplicativeApplicativeInstance
+import arrow.instances.FreeApplicativeEq
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import arrow.laws.EqLaws
 import org.junit.runner.RunWith

@@ -1,6 +1,8 @@
 package arrow.optics
 
 import arrow.*
+import compose
+import identity
 
 /**
  * [Iso] is a type alias for [PIso] which fixes the type arguments

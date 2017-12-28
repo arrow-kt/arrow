@@ -1,6 +1,7 @@
 package io.arrow.ank
 
 import arrow.*
+import arrow.free.instances.FreeMonadInstance
 import org.intellij.markdown.ast.ASTNode
 import java.io.File
 

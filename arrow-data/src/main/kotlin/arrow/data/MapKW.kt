@@ -13,7 +13,7 @@ data class MapKW<K, out A>(val map: Map<K, A>) : MapKWKind<K, A>, Map<K, A> by m
             }.k()
 
     fun <B, Z> map2Eval(fb: Eval<MapKW<K, B>>, f: (A, B) -> Z): Eval<MapKW<K, Z>> =
-            if (fb.isEmpty()) Eval.now(emptyMap<K, Z>().k())
+            if (fb.value().isEmpty()) Eval.now(emptyMap<K, Z>().k())
             else fb.map { b -> this.map2(b, f) }
 
     fun <B> ap(ff: MapKW<K, (A) -> B>): MapKW<K, B> =
@@ -74,3 +74,7 @@ fun <K, A, B> Map<K, A>.foldLeft(b: Map<K, B>, f: (Map<K, B>, Map.Entry<K, A>) -
 
 fun <K, A, B> Map<K, A>.foldRight(b: Map<K, B>, f: (Map.Entry<K, A>, Map<K, B>) -> Map<K, B>): Map<K, B> =
     this.entries.reversed().k().map.foldLeft(b) { x, y -> f(y, x) }
+
+fun <A, B> Iterator<A>.iterateRight(lb: Eval<B>): (f: (A, Eval<B>) -> Eval<B>) -> Eval<B> = Foldable.iterateRight(this, lb)
+
+fun <K, V> mapOf(vararg tuple: Tuple2<K, V>): Map<K, V> = if (tuple.isNotEmpty()) tuple.map { it.a to it.b }.toMap() else emptyMap()

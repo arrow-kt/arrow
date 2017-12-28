@@ -36,27 +36,6 @@ package arrow
 
         inline fun <reified F, A, B> fromEither(value: Either<A, B>, MF: Applicative<F> = monad<F>()): EitherT<F, A, B> =
                 EitherT(MF.pure(value))
-
-        inline fun <reified F, L> functor(FF: Functor<F> = functor<F>()): Functor<EitherTKindPartial<F, L>> =
-                EitherTFunctorInstanceImplicits.instance(FF)
-
-        inline fun <reified F, L> applicative(MF: Monad<F> = monad<F>()): Applicative<EitherTKindPartial<F, L>> =
-                EitherTApplicativeInstanceImplicits.instance(MF)
-
-        inline fun <reified F, L> monad(MF: Monad<F> = monad<F>()): Monad<EitherTKindPartial<F, L>> =
-                EitherTMonadInstanceImplicits.instance(MF)
-
-        inline fun <reified F, L> monadError(MF: Monad<F> = monad<F>()): MonadError<EitherTKindPartial<F, L>, L> =
-                EitherTMonadErrorInstanceImplicits.instance(MF)
-
-        inline fun <reified F, A> traverse(FF: Traverse<F> = traverse<F>()): Traverse<EitherTKindPartial<F, A>> =
-                EitherTTraverseInstanceImplicits.instance(FF)
-
-        inline fun <reified F, A> foldable(FF: Traverse<F> = traverse<F>()): Foldable<EitherTKindPartial<F, A>> =
-                EitherTFoldableInstanceImplicits.instance(FF)
-
-        inline fun <reified F, L> semigroupK(MF: Monad<F> = monad<F>()): SemigroupK<EitherTKindPartial<F, L>> =
-                EitherTSemigroupKInstanceImplicits.instance(MF)
     }
 
     inline fun <C> fold(crossinline l: (A) -> C, crossinline r: (B) -> C, FF: Functor<F>): HK<F, C> = FF.map(value, { either -> either.fold(l, r) })
@@ -81,15 +60,6 @@ package arrow
     inline fun <C> subflatMap(crossinline f: (B) -> Either<A, C>, FF: Functor<F>): EitherT<F, A, C> = transform({ it.flatMap(f) }, FF)
 
     fun toOptionT(FF: Functor<F>): OptionT<F, B> = OptionT(FF.map(value, { it.toOption() }))
-
-    fun <C> foldLeft(b: C, f: (C, B) -> C, FF: Foldable<F>): C = FF.compose(Either.foldable<A>()).foldLC(value, b, f)
-
-    fun <C> foldRight(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>, FF: Foldable<F>): Eval<C> = FF.compose(Either.foldable<A>()).foldRC(value, lb, f)
-
-    fun <G, C> traverse(f: (B) -> HK<G, C>, GA: Applicative<G>, FF: Traverse<F>): HK<G, EitherT<F, A, C>> {
-        val fa: HK<G, HK<Nested<F, EitherKindPartial<A>>, C>> = ComposedTraverse(FF, Either.traverse(), Either.monad<A>()).traverseC(value, f, GA)
-        return GA.map(fa, { EitherT(FF.map(it.unnest(), { it.ev() })) })
-    }
 
     fun combineK(y: EitherTKind<F, A, B>, MF: Monad<F>): EitherT<F, A, B> =
             EitherT(MF.flatMap(this.ev().value) {

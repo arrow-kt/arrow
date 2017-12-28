@@ -1,7 +1,7 @@
 package arrow
 
+import arrow.instances.collect
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

@@ -4,7 +4,8 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.optics.Optional
 import arrow.optics.modify
-import arrow.optics.modifyF
+import compose
+import identity
 
 object OptionalLaws {
 

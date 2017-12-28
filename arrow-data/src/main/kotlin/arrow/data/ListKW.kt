@@ -1,17 +1,6 @@
 package arrow
 
 @higherkind
-@deriving(
-        Functor::class,
-        Applicative::class,
-        Monad::class,
-        Foldable::class,
-        Traverse::class,
-        SemigroupK::class,
-        MonoidK::class,
-        MonadCombine::class,
-        FunctorFilter::class,
-        MonadFilter::class)
 data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A> by list {
 
     fun <B> flatMap(f: (A) -> ListKWKind<B>): ListKW<B> = this.ev().list.flatMap { f(it).ev().list }.k()
@@ -28,7 +17,7 @@ data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A>
         return Eval.defer { loop(this.ev()) }
     }
 
-    fun <B> ap(ff: ListKWKind<(A) -> B>): ListKW<B> = ff.flatMap { f -> map(f) }.ev()
+    fun <B> ap(ff: ListKWKind<(A) -> B>): ListKW<B> = ff.ev().flatMap { f -> map(f) }.ev()
 
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, ListKW<B>> =
             foldRight(Eval.always { GA.pure(emptyList<B>().k()) }) { a, eval ->

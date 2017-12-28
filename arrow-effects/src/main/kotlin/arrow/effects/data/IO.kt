@@ -1,5 +1,6 @@
 package arrow.effects
 
+import andThen
 import arrow.*
 import arrow.Either.Left
 import arrow.Either.Right

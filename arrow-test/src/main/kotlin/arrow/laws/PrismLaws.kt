@@ -4,6 +4,8 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.optics.Prism
 import arrow.optics.modify
+import compose
+import identity
 
 object PrismLaws {
 

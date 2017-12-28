@@ -6,15 +6,6 @@ typealias Nel<A> = NonEmptyList<A>
  * A List that can not be empty
  */
 @higherkind
-@deriving(
-        Functor::class,
-        Applicative::class,
-        Monad::class,
-        Comonad::class,
-        Bimonad::class,
-        Foldable::class,
-        Traverse::class,
-        SemigroupK::class)
 class NonEmptyList<out A> private constructor(
         val head: A,
         val tail: List<A>,
@@ -35,7 +26,7 @@ class NonEmptyList<out A> private constructor(
 
     fun <B> flatMap(f: (A) -> NonEmptyListKind<B>): NonEmptyList<B> = f(head).ev() + tail.flatMap { f(it).ev().all }
 
-    fun <B> ap(ff: NonEmptyListKind<(A) -> B>): NonEmptyList<B> = ff.flatMap { f -> map(f) }.ev()
+    fun <B> ap(ff: NonEmptyListKind<(A) -> B>): NonEmptyList<B> = ff.ev().flatMap { f -> map(f) }.ev()
 
     operator fun plus(l: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> = NonEmptyList(all + l.all)
 
@@ -45,11 +36,11 @@ class NonEmptyList<out A> private constructor(
 
     fun <B> foldLeft(b: B, f: (B, A) -> B): B = this.ev().tail.fold(f(b, this.ev().head), f)
 
-    fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = ListKW.foldable().foldRight(this.ev().all.k(), lb, f)
+    fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = foldable<ListKWHK>().foldRight(this.ev().all.k(), lb, f)
 
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, NonEmptyList<B>> =
             GA.map2Eval(f(this.ev().head), Eval.always {
-                ListKW.traverse().traverse(this.ev().tail.k(), f, GA)
+                traverse<ListKWHK>().traverse(this.ev().tail.k(), f, GA)
             }, {
                 NonEmptyList(it.a, it.b.ev().list)
             }).value()

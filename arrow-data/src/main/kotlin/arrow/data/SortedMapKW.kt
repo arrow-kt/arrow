@@ -15,7 +15,7 @@ data class SortedMapKW<A: Comparable<A>, B>(val map: SortedMap<A, B>) : SortedMa
             }.k()
 
     fun <C, Z> map2Eval(fc: Eval<SortedMapKW<A, C>>, f: (B, C) -> Z): Eval<SortedMapKW<A, Z>> =
-            if (fc.isEmpty()) Eval.now(sortedMapOf<A, Z>().k())
+            if (fc.value().isEmpty()) Eval.now(sortedMapOf<A, Z>().k())
             else fc.map { c -> this.map2(c, f) }
 
     fun <C> ap(ff: SortedMapKW<A, (B) -> C>): SortedMapKW<A, C> =

@@ -1,7 +1,7 @@
 package arrow.optics
 
 import io.kotlintest.properties.Gen
-import arrow.identity
+import identity
 import arrow.syntax.either.left
 import arrow.syntax.either.right
 

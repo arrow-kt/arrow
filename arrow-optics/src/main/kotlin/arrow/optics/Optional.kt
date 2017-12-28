@@ -1,6 +1,7 @@
 package arrow.optics
 
 import arrow.*
+import identity
 
 /**
  * [Optional] is a type alias for [POptional] which fixes the type arguments
