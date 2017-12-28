@@ -33,14 +33,14 @@ buildscript {
         maven { url 'https://jitpack.io' }
         maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
         maven { url "https://dl.bintray.com/jetbrains/markdown/" }
+        maven { url "https://dl.bintray.com/arrow/arrow/" }
     }
 
     dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
         classpath "com.github.ben-manes:gradle-versions-plugin:$gradleVersionsPluginVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
-        classpath('io.kategory:ank-gradle-plugin:0.1.6')
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
+        classpath('io.arrow:ank-gradle-plugin:0.1.7')
         classpath 'org.ajoberstar:gradle-git-publish:0.3.2'
     }
 }
@@ -55,6 +55,7 @@ subprojects { project ->
         maven { url 'https://kotlin.bintray.com/kotlinx' }
         maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
         maven { url "http://dl.bintray.com/kategory/maven" }
+        maven { url "http://dl.bintray.com/arrow/arrow" }
         maven { url "https://dl.bintray.com/jetbrains/markdown/" }
         maven { url 'https://jitpack.io' }
     }
@@ -91,7 +92,7 @@ subprojects { project ->
         key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
         configurations = ['archives']
         pkg {
-            repo = 'maven'
+            repo = 'arrow'
             name = project.name
             userOrg = POM_DEVELOPER_ID
             licenses = ['Apache-2.0']
