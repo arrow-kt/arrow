@@ -1,7 +1,7 @@
 dependencies {
     compile project(':arrow-data')
     compile project(':arrow-optics')
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
     compile "io.kotlintest:kotlintest:$kotlinTestVersion"
 }
