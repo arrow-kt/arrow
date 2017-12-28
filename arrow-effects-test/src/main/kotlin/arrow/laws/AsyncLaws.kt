@@ -27,12 +27,12 @@ object AsyncLaws {
 
     inline fun <reified F> asyncSuccess(AC: AsyncContext<F> = asyncContext(), M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(Gen.int(), { num: Int ->
-                AC.runAsync { ff: (Either<Throwable, Int>) -> Unit -> ff(num.right()) }.equalUnderTheLaw(M.pure<Int>(num), EQ)
+                AC.runAsync { ff: (Either<Throwable, Int>) -> Unit -> ff(Right(num)) }.equalUnderTheLaw(M.pure<Int>(num), EQ)
             })
 
     inline fun <reified F> asyncError(AC: AsyncContext<F> = asyncContext(), M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(genThrowable(), { e: Throwable ->
-                AC.runAsync { ff: (Either<Throwable, Int>) -> Unit -> ff(e.left()) }.equalUnderTheLaw(M.raiseError<Int>(e), EQ)
+                AC.runAsync { ff: (Either<Throwable, Int>) -> Unit -> ff(Left(e)) }.equalUnderTheLaw(M.raiseError<Int>(e), EQ)
             })
 
     inline fun <reified F> asyncBind(AC: AsyncContext<F> = asyncContext(), M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
@@ -57,9 +57,9 @@ object AsyncLaws {
     inline fun <reified F> asyncBindUnsafe(AC: AsyncContext<F> = asyncContext(), M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(genIntSmall(), genIntSmall(), genIntSmall(), { x: Int, y: Int, z: Int ->
                 val bound = M.bindingE {
-                    val a = bindAsyncUnsafe(AC) { x.right() }
-                    val b = bindAsyncUnsafe(AC) { (a + y).right() }
-                    val c = bindAsyncUnsafe(AC) { (b + z).right() }
+                    val a = bindAsyncUnsafe(AC) { Right(x) }
+                    val b = bindAsyncUnsafe(AC) { Right(a + y) }
+                    val c = bindAsyncUnsafe(AC) { Right(b + z) }
                     yields(c)
                 }
                 bound.equalUnderTheLaw(M.pure<Int>(x + y + z), EQ)
@@ -68,7 +68,7 @@ object AsyncLaws {
     inline fun <reified F> asyncBindUnsafeError(AC: AsyncContext<F> = asyncContext(), M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(genThrowable(), { e: Throwable ->
                 val bound: HK<F, Int> = M.bindingE {
-                    bindAsyncUnsafe(AC) { e.left() }
+                    bindAsyncUnsafe(AC) { Left(e) }
                 }
                 bound.equalUnderTheLaw(M.raiseError<Int>(e), EQ)
             })

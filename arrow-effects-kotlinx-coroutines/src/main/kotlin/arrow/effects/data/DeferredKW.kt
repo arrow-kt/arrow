@@ -104,7 +104,7 @@ fun <A> DeferredKWKind<A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKW<Unit
 
 fun <A> DeferredKWKind<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
         async(Unconfined, CoroutineStart.DEFAULT) {
-            Try { await() }.fold({ cb(it.left()) }, { cb(it.right()) })
+            Try { await() }.fold({ cb(Left(it)) }, { cb(Right(it)) })
         }.let {
             // Deferred swallows all exceptions. How about no.
             it.invokeOnCompletion { a: Throwable? ->

@@ -12,10 +12,10 @@ import arrow.applicative
 import arrow.genFunctionAToB
 import arrow.genTry
 import arrow.genTuple
-import arrow.left
-import arrow.right
 import arrow.None
 import arrow.Some
+import arrow.syntax.either.left
+import arrow.syntax.either.right
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

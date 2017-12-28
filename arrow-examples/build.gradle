@@ -1,5 +1,6 @@
 dependencies {
     compile project(':arrow-data')
+    compile project(':arrow-syntax')
     compile project(':arrow-effects')
     compile project(':arrow-effects-rx2')
     compile project(':arrow-effects-kotlinx-coroutines')

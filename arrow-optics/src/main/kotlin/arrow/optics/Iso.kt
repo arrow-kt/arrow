@@ -214,7 +214,7 @@ interface PIso<S, T, A, B> {
      * View a [PIso] as a [POptional]
      */
     fun asOptional(): POptional<S, T, A, B> = POptional(
-            { s -> get(s).right() },
+            { s -> Right(get(s)) },
             { b -> { _ -> set(b) } }
     )
 

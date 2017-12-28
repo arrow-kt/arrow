@@ -43,7 +43,7 @@ interface POptional<S, T, A, B> {
          * [POptional] that takes either [S] or [S] and strips the choice of [S].
          */
         fun <S> codiagonal(): Optional<Either<S, S>, S> = Optional(
-                { it.fold({ it.right() }, { it.right() }) },
+                { it.fold({ Right(it) }, { Right(it) }) },
                 { a -> { aa -> aa.bimap({ a }, { a }) } }
         )
 
@@ -62,7 +62,7 @@ interface POptional<S, T, A, B> {
          * Can also be used to construct [Optional]
          */
         operator fun <S, A> invoke(partialFunction: PartialFunction<S, A>, set: (A) -> (S) -> S): Optional<S, A> = Optional(
-                getOrModify = { s -> partialFunction.lift()(s).fold({ s.left() }, { it.right() }) },
+                getOrModify = { s -> partialFunction.lift()(s).fold({ Left(s) }, { Right(it) }) },
                 set = set
         )
 
@@ -70,7 +70,7 @@ interface POptional<S, T, A, B> {
          * [POptional] that never sees its focus
          */
         fun <A, B> void(): Optional<A, B> = Optional(
-                { it.left() },
+                { Left(it) },
                 { _ -> ::identity }
         )
 
@@ -117,7 +117,7 @@ interface POptional<S, T, A, B> {
      */
     infix fun <S1, T1> choice(other: POptional<S1, T1, A, B>): POptional<Either<S, S1>, Either<T, T1>, A, B> =
             POptional(
-                    { ss -> ss.fold({ getOrModify(it).bimap({ it.left() }, ::identity) }, { other.getOrModify(it).bimap({ it.right() }, ::identity) }) },
+                    { ss -> ss.fold({ getOrModify(it).bimap({ Left(it) }, ::identity) }, { other.getOrModify(it).bimap({ Right(it) }, ::identity) }) },
                     { b -> { it.bimap({ s -> this.set(s, b) }, { s -> other.set(s, b) }) } }
             )
 

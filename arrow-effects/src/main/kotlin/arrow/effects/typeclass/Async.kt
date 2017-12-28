@@ -15,9 +15,9 @@ inline fun <reified F> asyncContext(): AsyncContext<F> = instance(InstanceParame
 inline fun <F, A> runAsync(AC: AsyncContext<F>, crossinline f: () -> A): HK<F, A> =
         AC.runAsync { ff: (Either<Throwable, A>) -> Unit ->
             try {
-                ff(f().right())
+                ff(Right(f()))
             } catch (e: Throwable) {
-                ff(e.left())
+                ff(Left(e))
             }
         }
 
