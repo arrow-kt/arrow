@@ -3,6 +3,8 @@ package arrow
 import arrow.core.Id
 import arrow.core.Option
 import arrow.core.Some
+import arrow.free.Coyoneda
+import arrow.free.Yoneda
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe

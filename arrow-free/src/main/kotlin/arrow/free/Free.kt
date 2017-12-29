@@ -1,5 +1,6 @@
-package arrow
+package arrow.free
 
+import arrow.*
 import arrow.core.Either
 import arrow.core.FunctionK
 
@@ -17,16 +18,16 @@ inline fun <reified M, S, A> FreeKind<S, A>.foldMapK(f: FunctionK<S, M>, MM: Mon
         internal fun <F> functionKF(): FunctionK<F, FreeKindPartial<F>> =
                 object : FunctionK<F, FreeKindPartial<F>> {
                     override fun <A> invoke(fa: HK<F, A>): Free<F, A> =
-                            Free.liftF(fa)
+                            liftF(fa)
 
                 }
 
         internal fun <F> applicativeF(): Applicative<FreeKindPartial<F>> =
                 object : Applicative<FreeKindPartial<F>> {
-                    private val applicative: Applicative<FreeKindPartial<F>> = arrow.applicative()
+                    private val applicative: Applicative<FreeKindPartial<F>> = applicative()
 
                     override fun <A> pure(a: A): Free<F, A> =
-                            Free.pure(a)
+                            Companion.pure(a)
 
                     override fun <A, B> ap(fa: HK<FreeKindPartial<F>, A>, ff: HK<FreeKindPartial<F>, (A) -> B>): Free<F, B> {
                         return applicative.ap(fa, ff).ev()
@@ -37,16 +38,16 @@ inline fun <reified M, S, A> FreeKind<S, A>.foldMapK(f: FunctionK<S, M>, MM: Mon
     abstract fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B>
 
     data class Pure<S, out A>(val a: A) : Free<S, A>() {
-        override fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B> = Free.pure(f(a))
+        override fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B> = pure(f(a))
     }
 
     data class Suspend<S, out A>(val a: HK<S, A>) : Free<S, A>() {
-        override fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B> = Free.liftF(fs(a)).map(f)
+        override fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B> = liftF(fs(a)).map(f)
     }
 
     data class FlatMapped<S, out A, C>(val c: Free<S, C>, val f: (C) -> Free<S, A>) : Free<S, A>() {
         override fun <O, B> transform(fm: (A) -> B, fs: FunctionK<S, O>): Free<O, B> =
-                Free.FlatMapped(c.transform({ it }, fs), { c.flatMap { f(it) }.transform(fm, fs) })
+                FlatMapped(c.transform({ it }, fs), { c.flatMap { f(it) }.transform(fm, fs) })
     }
 
     override fun toString(): String = "Free(...) : toString is not stack-safe"

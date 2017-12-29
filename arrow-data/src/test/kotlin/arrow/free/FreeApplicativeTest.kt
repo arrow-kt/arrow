@@ -2,6 +2,8 @@ package arrow
 
 import arrow.core.*
 import arrow.data.NonEmptyList
+import arrow.free.FreeApplicative
+import arrow.free.foldK
 import arrow.free.instances.FreeApplicativeApplicativeInstance
 import arrow.free.instances.FreeApplicativeEq
 import arrow.instances.FreeApplicativeApplicativeInstance

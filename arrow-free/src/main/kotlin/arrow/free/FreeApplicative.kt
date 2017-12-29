@@ -1,8 +1,8 @@
-package arrow
+package arrow.free
 
-import arrow.core.FunctionK
-import arrow.data.Const
-import arrow.data.value
+import arrow.*
+import arrow.core.*
+import arrow.data.*
 import arrow.free.instances.*
 
 inline fun <F, reified G, A> FreeApplicativeKind<F, A>.foldMapK(f: FunctionK<F, G>, GA: Applicative<G> = applicative<G>()): HK<G, A> =
@@ -25,16 +25,16 @@ inline fun <reified F, A> FreeApplicativeKind<F, A>.foldK(FA: Applicative<F> = a
         internal fun <F, G> functionKF(f: FunctionK<F, G>): FunctionK<F, FreeApplicativeKindPartial<G>> =
                 object : FunctionK<F, FreeApplicativeKindPartial<G>> {
                     override fun <A> invoke(fa: HK<F, A>): FreeApplicative<G, A> =
-                            FreeApplicative.liftF(f(fa))
+                            liftF(f(fa))
 
                 }
 
         internal fun <F> applicativeF(): Applicative<FreeApplicativeKindPartial<F>> = object : Applicative<FreeApplicativeKindPartial<F>> {
             override fun <A> pure(a: A): FreeApplicative<F, A> =
-                    FreeApplicative.pure(a)
+                    Companion.pure(a)
 
             override fun <A, B> ap(fa: HK<FreeApplicativeKindPartial<F>, A>, ff: HK<FreeApplicativeKindPartial<F>, (A) -> B>): FreeApplicative<F, B> =
-                    FreeApplicative.ap(fa.ev(), ff.ev())
+                    Companion.ap(fa.ev(), ff.ev())
         }
     }
 

@@ -3,11 +3,14 @@ package arrow
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import arrow.Cofree.Companion.unfold
+import arrow.free.Cofree.Companion.unfold
 import arrow.core.*
 import arrow.data.ListKW
 import arrow.data.NonEmptyList
 import arrow.data.OptionT
+import arrow.free.Cofree
+import arrow.free.cata
+import arrow.free.cataM
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

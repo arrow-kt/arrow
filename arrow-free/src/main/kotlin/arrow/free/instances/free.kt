@@ -3,6 +3,7 @@ package arrow.free.instances
 import arrow.*
 import arrow.core.Either
 import arrow.core.FunctionK
+import arrow.free.*
 
 @instance(Free::class)
 interface FreeFunctorInstance<S> : Functor<FreeKindPartial<S>> {

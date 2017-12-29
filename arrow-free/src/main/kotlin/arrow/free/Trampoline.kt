@@ -1,7 +1,8 @@
-package arrow
+package arrow.free
 
-import arrow.core.FunctionK
-import arrow.data.invoke
+import arrow.core.*
+import arrow.data.*
+import arrow.monad
 
 /**
  * Trampoline is often used to emulate tail recursion. The idea is to have some step code that can be trampolined itself
@@ -23,4 +24,4 @@ interface TrampolineFunctions {
     fun <A> delay(a: () -> A): TrampolineF<A> = defer { done(a()) }
 }
 
-fun <A> TrampolineF<A>.runT(): A = this.foldMap(FunctionK.id(), arrow.monad<Function0HK>()).ev().invoke()
+fun <A> TrampolineF<A>.runT(): A = this.foldMap(FunctionK.id(), monad<Function0HK>()).ev().invoke()

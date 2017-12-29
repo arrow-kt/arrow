@@ -6,6 +6,7 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.data.NonEmptyList
 import arrow.data.k
+import arrow.free.Cofree
 
 val cofreeOptionToNel: FunctionK<CofreeKindPartial<OptionHK>, NonEmptyListHK> = object : FunctionK<CofreeKindPartial<OptionHK>, NonEmptyListHK> {
     override fun <A> invoke(fa: HK<CofreeKindPartial<OptionHK>, A>): HK<NonEmptyListHK, A> =

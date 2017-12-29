@@ -1,7 +1,7 @@
-package arrow
+package arrow.free
 
-import arrow.core.Eval
-import arrow.core.FunctionK
+import arrow.*
+import arrow.core.*
 
 typealias CofreeEval<S, A> = HK<S, Cofree<S, A>>
 

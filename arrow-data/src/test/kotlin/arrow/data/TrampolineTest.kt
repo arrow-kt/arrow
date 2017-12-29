@@ -1,5 +1,8 @@
 package arrow
 
+import arrow.free.Trampoline
+import arrow.free.TrampolineF
+import arrow.free.runT
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith

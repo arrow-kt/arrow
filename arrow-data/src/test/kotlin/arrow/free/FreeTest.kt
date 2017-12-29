@@ -5,6 +5,8 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.value
 import arrow.data.NonEmptyList
+import arrow.free.Free
+import arrow.free.foldMap
 import arrow.free.instances.FreeEq
 import arrow.free.instances.FreeMonadInstance
 import arrow.instances.FreeEq
@@ -24,9 +26,9 @@ sealed class Ops<out A> : HK<Ops.F, A> {
     data class Subtract(val a: Int, val y: Int) : Ops<Int>()
 
     companion object : FreeMonadInstance<F> {
-        fun value(n: Int): Free<Ops.F, Int> = Free.liftF(Ops.Value(n))
-        fun add(n: Int, y: Int): Free<Ops.F, Int> = Free.liftF(Ops.Add(n, y))
-        fun subtract(n: Int, y: Int): Free<Ops.F, Int> = Free.liftF(Ops.Subtract(n, y))
+        fun value(n: Int): Free<F, Int> = Free.liftF(Ops.Value(n))
+        fun add(n: Int, y: Int): Free<F, Int> = Free.liftF(Ops.Add(n, y))
+        fun subtract(n: Int, y: Int): Free<F, Int> = Free.liftF(Ops.Subtract(n, y))
     }
 }
 

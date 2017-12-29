@@ -1,6 +1,7 @@
 package arrow.free.instances
 
 import arrow.*
+import arrow.free.*
 
 @instance(Coyoneda::class)
 interface CoyonedaFunctorInstance<F, G> : Functor<CoyonedaKindPartial<F, G>> {

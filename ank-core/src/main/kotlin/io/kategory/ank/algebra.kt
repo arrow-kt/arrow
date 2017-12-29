@@ -3,6 +3,8 @@ package io.arrow.ank
 import arrow.*
 import arrow.core.FunctionK
 import arrow.data.ListKW
+import arrow.free.Free
+import arrow.free.foldMap
 import arrow.free.instances.FreeMonadInstance
 import org.intellij.markdown.ast.ASTNode
 import java.io.File

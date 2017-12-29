@@ -1,4 +1,7 @@
-package arrow
+package arrow.free.instances
+
+import arrow.*
+import arrow.free.*
 
 @instance(Cofree::class)
 interface CofreeFunctorInstance<S> : Functor<CofreeKindPartial<S>>, Typeclass {

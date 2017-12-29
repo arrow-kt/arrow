@@ -1,4 +1,6 @@
-package arrow
+package arrow.free
+
+import arrow.*
 
 private typealias AnyFunc = (Any?) -> Any?
 
