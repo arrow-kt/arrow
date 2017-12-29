@@ -14,6 +14,7 @@ import arrow.data.Invalid
 import arrow.invalid
 import arrow.valid
 import arrow.data.Valid
+import arrow.optics.instances.eitherToValidated
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

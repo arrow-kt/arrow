@@ -18,6 +18,10 @@ import arrow.invalid
 import arrow.data.Invalid
 import arrow.valid
 import arrow.data.Valid
+import arrow.optics.instances.tryFailure
+import arrow.optics.instances.trySuccess
+import arrow.optics.instances.tryToEither
+import arrow.optics.instances.tryToValidated
 import arrow.syntax.either.right
 import org.junit.runner.RunWith
 

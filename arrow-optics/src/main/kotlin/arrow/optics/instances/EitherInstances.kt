@@ -1,7 +1,9 @@
-package arrow.optics
+package arrow.optics.instances
 
 import arrow.core.Either
 import arrow.data.Validated
+import arrow.optics.Iso
+import arrow.optics.PIso
 import arrow.syntax.validated.invalid
 import arrow.syntax.validated.valid
 

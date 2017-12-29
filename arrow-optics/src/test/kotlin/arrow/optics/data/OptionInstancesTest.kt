@@ -3,6 +3,10 @@ package arrow.optics
 import arrow.*
 import arrow.core.Either
 import arrow.instances.IntMonoid
+import arrow.optics.instances.nonePrism
+import arrow.optics.instances.nullableToOption
+import arrow.optics.instances.optionToEither
+import arrow.optics.instances.somePrism
 import arrow.syntax.either.right
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen

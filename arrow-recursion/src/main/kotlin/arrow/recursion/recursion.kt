@@ -1,5 +1,7 @@
 package arrow
 
+import arrow.instances.ComposedFunctor
+
 typealias Algebra <F, A> = (HK<F, A>) -> A
 
 typealias AlgebraM <M, F, A> = (HK<F, A>) -> HK<M, A>

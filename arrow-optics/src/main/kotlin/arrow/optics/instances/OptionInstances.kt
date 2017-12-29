@@ -1,6 +1,10 @@
-package arrow.optics
+package arrow.optics.instances
 
 import arrow.core.*
+import arrow.optics.Iso
+import arrow.optics.PIso
+import arrow.optics.PPrism
+import arrow.optics.Prism
 
 /**
  * [PIso] that defines the equality in the kotlin nullable structure and [arrow.Option]

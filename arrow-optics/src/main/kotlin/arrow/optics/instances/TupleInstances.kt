@@ -1,4 +1,4 @@
-package arrow.optics
+package arrow.optics.instances
 
 import arrow.core.Tuple10
 import arrow.core.Tuple2
@@ -10,6 +10,10 @@ import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
 import arrow.core.toT
+import arrow.optics.Lens
+import arrow.optics.PLens
+import arrow.optics.PTraversal
+import arrow.optics.Traversal
 
 /**
  * [PLens] to focus into the first value of a [arrow.Tuple2]

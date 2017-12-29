@@ -7,6 +7,7 @@ import arrow.IsoLaws
 import arrow.Monoid
 import arrow.UnitSpec
 import arrow.genFunctionAToB
+import arrow.optics.instances.stringToList
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

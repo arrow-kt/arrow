@@ -13,6 +13,10 @@ import arrow.UnitSpec
 import arrow.genFunctionAToB
 import arrow.genNonEmptyList
 import arrow.genOption
+import arrow.optics.instances.listHead
+import arrow.optics.instances.listTail
+import arrow.optics.instances.listToListKW
+import arrow.optics.instances.listToOptionNel
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

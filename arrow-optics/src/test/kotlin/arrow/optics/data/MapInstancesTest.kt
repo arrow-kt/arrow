@@ -8,6 +8,7 @@ import arrow.UnitSpec
 import arrow.genFunctionAToB
 import arrow.genMap
 import arrow.genMapKW
+import arrow.optics.instances.mapToMapKW
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

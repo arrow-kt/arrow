@@ -10,6 +10,7 @@ import arrow.data.Try
 import arrow.UnitSpec
 import arrow.genFunctionAToB
 import arrow.genTuple
+import arrow.optics.instances.*
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

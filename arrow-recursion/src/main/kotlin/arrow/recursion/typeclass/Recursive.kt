@@ -1,5 +1,8 @@
 package arrow
 
+import arrow.instances.ComposedFunctor
+import arrow.instances.ComposedTraverse
+
 interface Recursive<F, G> : Typeclass {
     fun projectT(fg: HK<F, G>): HK<Nested<F, G>, HK<F, G>>
 

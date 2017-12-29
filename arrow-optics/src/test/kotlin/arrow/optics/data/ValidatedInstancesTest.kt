@@ -13,6 +13,8 @@ import arrow.genFunctionAToB
 import arrow.genThrowable
 import arrow.genTry
 import arrow.genValidated
+import arrow.optics.instances.validatedToEither
+import arrow.optics.instances.validatedToTry
 import arrow.syntax.either.right
 import org.junit.runner.RunWith
 
