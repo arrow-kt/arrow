@@ -94,7 +94,7 @@ data class CompilationException(
             |${underlying.message}
             |##############################
             |
-        """.trimMargin()) : ScriptException(msg), NoTr {
+        """.trimMargin()) : ScriptException(msg) {
     override fun toString(): String = msg
 }
 
