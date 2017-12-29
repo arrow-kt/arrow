@@ -23,6 +23,7 @@ So let's test this out with an example:
 
 ```kotlin:ank
 import arrow.*
+import arrow.core.*
 
 data class Country(val code: String)
 data class Address(val id: Int, val country: Option<Country>)
@@ -48,6 +49,7 @@ We can now implement a naive lookup function to obtain the country code given a 
 ```kotlin:ank
 import arrow.syntax.function.*
 import arrow.syntax.either.*
+import arrow.syntax.option.*
 
 fun getCountryCode(maybePerson : Either<BizError, Person>): Either<BizError, String> =
   maybePerson.flatMap { person ->
@@ -63,6 +65,7 @@ We can further simplify this case by using Arrow `binding` facilities
 that enables monad comprehensions for all datatypes for which a monad instance is available.
 
 ```kotlin:ank
+import arrow.typeclasses.*
 fun getCountryCode(maybePerson : Either<BizError, Person>): Either<BizError, String> =
   Either.monadError<BizError>().binding {
     val person = maybePerson.bind()
@@ -190,6 +193,8 @@ So our specialization `EitherT<ObservableKWHK, BizError, A>` is the EitherT tran
 We can now lift any value to a `EitherT<F, BizError, A>` which looks like this:
 
 ```kotlin:ank
+import arrow.syntax.applicative.*
+import arrow.data.*
 val eitherTVal = 1.pure<EitherTKindPartial<ObservableKWHK, BizError>, Int>()
 eitherTVal
 ```
