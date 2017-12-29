@@ -1,8 +1,7 @@
 package arrow.optics
 
-import arrow.core.Either
-import arrow.data.Try
-import arrow.Validated
+import arrow.core.*
+import arrow.data.*
 import arrow.data.Failure
 import arrow.data.Success
 

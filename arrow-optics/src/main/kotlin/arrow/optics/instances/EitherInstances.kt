@@ -1,8 +1,9 @@
 package arrow.optics
 
-import arrow.*
 import arrow.core.Either
-import arrow.syntax.validated.*
+import arrow.data.Validated
+import arrow.syntax.validated.invalid
+import arrow.syntax.validated.valid
 
 /**
  * [PIso] that defines the equality between [Either] and [Validated]

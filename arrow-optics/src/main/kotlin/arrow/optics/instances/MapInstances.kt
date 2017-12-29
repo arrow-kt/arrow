@@ -1,6 +1,6 @@
 package arrow.optics
 
-import arrow.data.MapKW
+import arrow.data.*
 
 /**
  * [PIso] that defines the equality between a [Map] and a [arrow.MapKW]

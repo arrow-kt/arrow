@@ -1,10 +1,8 @@
 package arrow.optics
 
 import arrow.*
-import arrow.core.Either
-import arrow.data.Failure
-import arrow.data.Success
-import arrow.data.Try
+import arrow.core.*
+import arrow.data.*
 import arrow.syntax.validated.*
 
 /**

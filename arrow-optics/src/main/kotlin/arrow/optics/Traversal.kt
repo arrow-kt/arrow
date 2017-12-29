@@ -2,9 +2,9 @@ package arrow.optics
 
 import arrow.*
 import arrow.core.*
-import arrow.data.Const
-import arrow.data.ListKW
-import arrow.instances.IntMonoid
+import arrow.data.*
+import arrow.instances.*
+import arrow.free.instances.*
 import arrow.syntax.applicative.*
 
 /**
