@@ -1,9 +1,8 @@
-package arrow
+package arrow.data
 
 import arrow.core.Id
 import arrow.core.Tuple2
 import arrow.core.value
-import arrow.data.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith

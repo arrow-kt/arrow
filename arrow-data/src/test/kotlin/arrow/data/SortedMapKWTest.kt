@@ -1,6 +1,6 @@
-package arrow
+package arrow.data
 
-import arrow.data.*
+import arrow.HK2
 import arrow.instances.monoid
 import arrow.instances.traverse
 import io.kotlintest.KTestJUnitRunner

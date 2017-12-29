@@ -1,10 +1,9 @@
-package arrow
+package arrow.data
 
 import arrow.core.EitherHK
 import arrow.core.Id
 import arrow.core.IdHK
 import arrow.core.ev
-import arrow.data.*
 import arrow.instances.monad
 import arrow.instances.monadError
 import arrow.mtl.monadReader

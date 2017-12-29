@@ -1,6 +1,5 @@
-package arrow
+package arrow.data
 
-import arrow.data.*
 import arrow.instances.applicative
 import arrow.instances.functor
 import arrow.instances.monadError

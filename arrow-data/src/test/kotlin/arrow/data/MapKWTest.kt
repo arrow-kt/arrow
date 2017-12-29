@@ -1,9 +1,5 @@
-package arrow
+package arrow.data
 
-import arrow.data.MapKW
-import arrow.data.MapKWHK
-import arrow.data.MapKWKind
-import arrow.data.k
 import arrow.instances.monoid
 import arrow.instances.traverse
 import io.kotlintest.KTestJUnitRunner

@@ -1,4 +1,4 @@
-package arrow
+package arrow.data
 
 import arrow.core.Id
 import arrow.core.IdKind

@@ -1,4 +1,4 @@
-package arrow
+package arrow.data
 
 import arrow.instances.*
 import io.kotlintest.KTestJUnitRunner

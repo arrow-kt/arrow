@@ -1,4 +1,4 @@
-package arrow
+package arrow.data
 
 import arrow.free.Trampoline
 import arrow.free.TrampolineF

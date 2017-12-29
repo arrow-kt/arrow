@@ -1,7 +1,7 @@
-package arrow
+package arrow.data
 
+import arrow.HK3
 import arrow.core.*
-import arrow.data.*
 import arrow.syntax.comonad.extract
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe

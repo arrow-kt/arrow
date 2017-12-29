@@ -1,7 +1,7 @@
-package arrow
+package arrow.data
 
+import arrow.HK
 import arrow.core.*
-import arrow.data.*
 import arrow.instances.applicative
 import arrow.instances.monad
 import arrow.instances.monoidK

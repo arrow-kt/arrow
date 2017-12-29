@@ -1,4 +1,4 @@
-package arrow
+package arrow.data
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
@@ -8,7 +8,6 @@ import arrow.core.Left
 import arrow.core.None
 import arrow.core.Right
 import arrow.core.Some
-import arrow.data.*
 import arrow.instances.*
 import arrow.syntax.applicative.map
 import arrow.syntax.validated.valid

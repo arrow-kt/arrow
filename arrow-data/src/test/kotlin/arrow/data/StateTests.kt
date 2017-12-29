@@ -1,12 +1,8 @@
-package arrow
+package arrow.data
 
 import arrow.core.Id
 import arrow.core.Tuple2
 import arrow.core.toT
-import arrow.data.State
-import arrow.data.run
-import arrow.data.runA
-import arrow.data.runS
 import arrow.instances.functor
 import arrow.syntax.collections.*
 import io.kotlintest.KTestJUnitRunner
@@ -53,18 +49,18 @@ class StateTests : UnitSpec() {
         }
 
         "pure" {
-            val s1 = State().pure<String, Int>(1)
+            val s1 = StateApi.pure<String, Int>(1)
             s1.run("foo") shouldBe ("foo" toT 1)
         }
 
         "get" {
-            val s1 = State().get<String>()
+            val s1 = StateApi.get<String>()
             s1.run("foo") shouldBe ("foo" toT "foo")
         }
 
         "modify" {
-            val s1 = State().modify<String> { "bar" }
-            val s2 = State().set("bar")
+            val s1 = StateApi.modify<String> { "bar" }
+            val s2 = StateApi.set("bar")
             s1.run("foo") shouldBe s2.run("foo")
         }
     }

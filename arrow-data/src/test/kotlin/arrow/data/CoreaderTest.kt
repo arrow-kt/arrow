@@ -1,13 +1,9 @@
-package arrow
+package arrow.data
 
 import arrow.core.Id
 import arrow.core.IdHK
 import arrow.core.IdKind
 import arrow.core.value
-import arrow.data.Cokleisli
-import arrow.data.Coreader
-import arrow.data.coreader
-import arrow.data.runId
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.forAll

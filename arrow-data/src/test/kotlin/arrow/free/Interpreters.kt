@@ -1,10 +1,8 @@
-package arrow
+package arrow.free
 
+import arrow.HK
 import arrow.core.*
 import arrow.data.*
-import arrow.free.Cofree
-import arrow.free.CofreeKindPartial
-import arrow.free.ev
 
 val cofreeOptionToNel: FunctionK<CofreeKindPartial<OptionHK>, NonEmptyListHK> = object : FunctionK<CofreeKindPartial<OptionHK>, NonEmptyListHK> {
     override fun <A> invoke(fa: HK<CofreeKindPartial<OptionHK>, A>): HK<NonEmptyListHK, A> =

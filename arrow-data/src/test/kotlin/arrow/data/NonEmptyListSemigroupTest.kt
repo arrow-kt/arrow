@@ -1,4 +1,4 @@
-package arrow
+package arrow.data
 
 import arrow.data.NonEmptyList
 import arrow.instances.semigroup

@@ -1,9 +1,6 @@
-package arrow
+package arrow.data
 
-import arrow.data.ListKW
-import arrow.data.ListKWHK
-import arrow.data.ev
-import arrow.data.k
+import arrow.HK
 import arrow.instances.applicative
 import arrow.instances.monoidK
 import arrow.instances.semigroupK

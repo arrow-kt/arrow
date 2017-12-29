@@ -1,4 +1,4 @@
-package arrow
+package arrow.instances
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe

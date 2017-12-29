@@ -1,5 +1,6 @@
-package arrow
+package arrow.data
 
+import arrow.HK2
 import arrow.core.*
 import arrow.instances.*
 import io.kotlintest.KTestJUnitRunner

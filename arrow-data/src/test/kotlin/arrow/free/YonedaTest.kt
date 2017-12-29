@@ -1,4 +1,4 @@
-package arrow
+package arrow.free
 
 import arrow.core.Id
 import arrow.core.IdHK

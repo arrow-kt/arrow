@@ -1,12 +1,12 @@
-package arrow
+package arrow.free
 
+import arrow.HK
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import arrow.free.Cofree.Companion.unfold
 import arrow.core.*
 import arrow.data.*
-import arrow.free.*
 import arrow.free.instances.comonad
 import arrow.instances.functor
 import arrow.instances.monad

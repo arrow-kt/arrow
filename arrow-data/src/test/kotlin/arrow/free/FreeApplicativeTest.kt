@@ -1,12 +1,9 @@
-package arrow
+package arrow.free
 
+import arrow.HK
 import arrow.core.*
 import arrow.data.NonEmptyList
 import arrow.data.ev
-import arrow.free.FreeApplicative
-import arrow.free.FreeApplicativeKindPartial
-import arrow.free.ev
-import arrow.free.foldK
 import arrow.free.instances.FreeApplicativeApplicativeInstance
 import arrow.free.instances.FreeApplicativeEq
 import arrow.instances.applicative

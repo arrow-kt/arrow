@@ -1,4 +1,4 @@
-package arrow
+package arrow.data
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe

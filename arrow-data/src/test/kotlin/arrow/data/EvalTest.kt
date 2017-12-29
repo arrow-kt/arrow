@@ -1,5 +1,6 @@
-package arrow
+package arrow.data
 
+import arrow.HK
 import arrow.core.Eval
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe

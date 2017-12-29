@@ -1,6 +1,6 @@
-package arrow
+package arrow.data
 
-import arrow.data.*
+import arrow.HK
 import arrow.instances.comonad
 import arrow.instances.monad
 import io.kotlintest.KTestJUnitRunner
