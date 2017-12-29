@@ -3,6 +3,7 @@ package arrow.mtl.instances
 import arrow.*
 import arrow.core.Option
 import arrow.instances.ComposedTraverse
+import arrow.mtl.TraverseFilter
 
 interface ComposedTraverseFilter<F, G> :
         TraverseFilter<Nested<F, G>>,
@@ -35,7 +36,7 @@ interface ComposedTraverseFilter<F, G> :
     }
 }
 
-inline fun <reified F, reified G> TraverseFilter<F>.compose(GT: TraverseFilter<G> = traverseFilter<G>(), GA: Applicative<G> = applicative<G>()):
+inline fun <reified F, reified G> TraverseFilter<F>.compose(GT: TraverseFilter<G> = arrow.mtl.traverseFilter<G>(), GA: Applicative<G> = applicative<G>()):
         TraverseFilter<Nested<F, G>> = object : ComposedTraverseFilter<F, G> {
     override fun FT(): Traverse<F> = this@compose
 

@@ -3,6 +3,7 @@ package arrow.mtl.instances
 import arrow.*
 import arrow.data.*
 import arrow.instances.*
+import arrow.mtl.MonadReader
 
 @instance(Function1::class)
 interface Function1MonadReaderInstance<I> : Function1MonadInstance<I>, MonadReader<Function1KindPartial<I>, I> {

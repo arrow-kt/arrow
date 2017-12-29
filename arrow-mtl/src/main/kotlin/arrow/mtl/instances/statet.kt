@@ -4,6 +4,8 @@ import arrow.*
 import arrow.core.*
 import arrow.data.*
 import arrow.instances.*
+import arrow.mtl.MonadCombine
+import arrow.mtl.MonadState
 
 @instance(StateT::class)
 interface StateTMonadStateInstance<F, S> : StateTMonadInstance<F, S>, MonadState<StateTKindPartial<F, S>, S> {

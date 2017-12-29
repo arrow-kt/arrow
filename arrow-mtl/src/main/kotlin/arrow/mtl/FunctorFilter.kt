@@ -1,5 +1,6 @@
-package arrow
+package arrow.mtl
 
+import arrow.*
 import arrow.core.*
 
 interface FunctorFilter<F> : Functor<F>, Typeclass {

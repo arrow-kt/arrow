@@ -4,6 +4,8 @@ import arrow.*
 import arrow.core.*
 import arrow.data.*
 import arrow.instances.*
+import arrow.mtl.FunctorFilter
+import arrow.mtl.TraverseFilter
 import arrow.mtl.syntax.traverseFilter
 
 @instance(OptionT::class)

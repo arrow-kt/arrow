@@ -1,7 +1,7 @@
 package arrow.recursion.instances
 
 import arrow.*
-import arrow.recursion.Fix
+import arrow.recursion.*
 import arrow.recursion.typeclass.Birecursive
 
 @instance(Fix::class)

@@ -1,6 +1,8 @@
-package arrow
+package arrow.mtl
 
+import arrow.*
 import arrow.core.*
+import arrow.instances.*
 
 interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F>, Typeclass {
 

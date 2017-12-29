@@ -3,9 +3,12 @@ package arrow.mtl.instances
 import arrow.*
 import arrow.core.*
 import arrow.data.*
+import arrow.mtl.FunctorFilter
+import arrow.mtl.MonadCombine
+import arrow.mtl.MonadFilter
 
 @instance(ListKW::class)
-interface ListKWMonadCombineInstance : arrow.MonadCombine<ListKWHK> {
+interface ListKWMonadCombineInstance : MonadCombine<ListKWHK> {
     override fun <A> empty(): ListKW<A> =
             ListKW.empty()
 
@@ -35,7 +38,7 @@ interface ListKWMonadCombineInstance : arrow.MonadCombine<ListKWHK> {
 }
 
 @instance(ListKW::class)
-interface ListKWFunctorFilterInstance : arrow.FunctorFilter<ListKWHK> {
+interface ListKWFunctorFilterInstance : FunctorFilter<ListKWHK> {
     override fun <A, B> mapFilter(fa: ListKWKind<A>, f: kotlin.Function1<A, Option<B>>): ListKW<B> =
             fa.ev().mapFilter(f)
 
@@ -44,7 +47,7 @@ interface ListKWFunctorFilterInstance : arrow.FunctorFilter<ListKWHK> {
 }
 
 @instance(ListKW::class)
-interface ListKWMonadFilterInstance : arrow.MonadFilter<ListKWHK> {
+interface ListKWMonadFilterInstance : MonadFilter<ListKWHK> {
     override fun <A> empty(): ListKW<A> =
             ListKW.empty()
 

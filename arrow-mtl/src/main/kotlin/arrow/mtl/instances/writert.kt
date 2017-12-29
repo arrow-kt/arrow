@@ -4,6 +4,8 @@ import arrow.*
 import arrow.core.*
 import arrow.data.*
 import arrow.instances.*
+import arrow.mtl.MonadFilter
+import arrow.mtl.MonadWriter
 
 @instance(WriterT::class)
 interface WriterTMonadFilterInstance<F, W> : WriterTMonadInstance<F, W>, MonadFilter<WriterTKindPartial<F, W>> {

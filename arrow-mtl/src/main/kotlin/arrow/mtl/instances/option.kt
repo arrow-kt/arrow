@@ -3,9 +3,11 @@ package arrow.mtl.instances
 import arrow.*
 import arrow.core.*
 import arrow.instances.*
+import arrow.mtl.MonadFilter
+import arrow.mtl.TraverseFilter
 
 @instance(Option::class)
-interface OptionTraverseFilterInstance : arrow.TraverseFilter<OptionHK> {
+interface OptionTraverseFilterInstance : TraverseFilter<OptionHK> {
     override fun <A> filter(fa: OptionKind<A>, f: kotlin.Function1<A, kotlin.Boolean>): Option<A> =
             fa.ev().filter(f)
 
@@ -38,7 +40,7 @@ interface OptionTraverseFilterInstance : arrow.TraverseFilter<OptionHK> {
 }
 
 @instance(Option::class)
-interface OptionMonadFilterInstance : arrow.MonadFilter<OptionHK> {
+interface OptionMonadFilterInstance : MonadFilter<OptionHK> {
     override fun <A> empty(): Option<A> =
             Option.empty()
 

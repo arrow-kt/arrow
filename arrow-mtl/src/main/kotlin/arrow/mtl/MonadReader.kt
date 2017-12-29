@@ -1,4 +1,6 @@
-package arrow
+package arrow.mtl
+
+import arrow.*
 
 interface MonadReader<F, D> : Monad<F> {
     /** Get the environment */

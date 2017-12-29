@@ -1,5 +1,6 @@
-package arrow
+package arrow.mtl
 
+import arrow.*
 import arrow.core.Tuple2
 
 /**
