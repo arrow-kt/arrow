@@ -1,2 +1,0 @@
-package arrow.mtl.syntax
-

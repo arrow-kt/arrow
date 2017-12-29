@@ -1,10 +1,9 @@
 package arrow.mtl.instances
 
 import arrow.*
-import arrow.core.toT
-import arrow.data.StateT
-import arrow.instances.StateTMonadInstance
-import arrow.instances.StateTSemigroupKInstance
+import arrow.core.*
+import arrow.data.*
+import arrow.instances.*
 
 @instance(StateT::class)
 interface StateTMonadStateInstance<F, S> : StateTMonadInstance<F, S>, MonadState<StateTKindPartial<F, S>, S> {

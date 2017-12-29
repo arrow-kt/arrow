@@ -1,7 +1,7 @@
 package arrow.mtl.instances
 
 import arrow.*
-import arrow.data.Kleisli
+import arrow.data.*
 import arrow.instances.KleisliMonadInstance
 
 @instance(Kleisli::class)

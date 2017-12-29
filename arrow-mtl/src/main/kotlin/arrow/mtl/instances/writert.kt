@@ -1,9 +1,9 @@
 package arrow.mtl.instances
 
 import arrow.*
-import arrow.core.Tuple2
-import arrow.data.WriterT
-import arrow.instances.WriterTMonadInstance
+import arrow.core.*
+import arrow.data.*
+import arrow.instances.*
 
 @instance(WriterT::class)
 interface WriterTMonadFilterInstance<F, W> : WriterTMonadInstance<F, W>, MonadFilter<WriterTKindPartial<F, W>> {
