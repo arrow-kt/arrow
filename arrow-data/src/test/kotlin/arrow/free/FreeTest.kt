@@ -1,8 +1,14 @@
 package arrow
 
+import arrow.core.Id
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.value
+import arrow.data.NonEmptyList
 import arrow.free.instances.FreeEq
 import arrow.free.instances.FreeMonadInstance
 import arrow.instances.FreeEq
+import arrow.instances.monad
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe

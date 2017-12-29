@@ -1,4 +1,6 @@
-package arrow
+package arrow.core
+
+import arrow.HK
 
 interface FunctionK<F, G> {
 

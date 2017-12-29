@@ -1,4 +1,7 @@
-package arrow
+package arrow.data
+
+import arrow.core.Eval
+import arrow.higherkind
 
 @higherkind
 data class SetKW<out A>(val set: Set<A>) : SetKWKind<A>, Set<A> by set {

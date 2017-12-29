@@ -1,10 +1,9 @@
 package arrow
 
+import arrow.core.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
-import arrow.Left
-import arrow.Right
 import arrow.laws.EqLaws
 import org.junit.runner.RunWith
 

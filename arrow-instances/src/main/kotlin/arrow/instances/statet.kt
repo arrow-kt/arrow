@@ -1,4 +1,8 @@
-package arrow
+package arrow.instances
+
+import arrow.*
+import arrow.core.*
+import arrow.data.*
 
 @instance(StateT::class)
 interface StateTFunctorInstance<F, S> : Functor<StateTKindPartial<F, S>> {
@@ -70,10 +74,10 @@ fun <S> StateApi.applicative(): Applicative<StateTKindPartial<IdHK, S>> = StateT
 /**
  * Alias for [StateT.Companion.functor]
  */
-fun <S> StateApi.functor(): Functor<StateTKindPartial<IdHK, S>> = StateT.functor<IdHK, S>(arrow.functor<arrow.IdHK>(), dummy = Unit)
+fun <S> StateApi.functor(): Functor<StateTKindPartial<IdHK, S>> = StateT.functor<IdHK, S>(arrow.functor<IdHK>(), dummy = Unit)
 
 /**
  * Alias for [StateT.Companion.monad]
  */
-fun <S> StateApi.monad(): Monad<StateTKindPartial<IdHK, S>> = StateT.monad<IdHK, S>(arrow.monad<arrow.IdHK>(), dummy = Unit)
+fun <S> StateApi.monad(): Monad<StateTKindPartial<IdHK, S>> = StateT.monad<IdHK, S>(arrow.monad<IdHK>(), dummy = Unit)
 

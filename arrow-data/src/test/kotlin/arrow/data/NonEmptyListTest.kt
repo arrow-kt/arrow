@@ -1,9 +1,10 @@
 package arrow
 
+import arrow.data.NonEmptyList
+import arrow.data.nel
+import arrow.instances.*
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import io.kotlintest.properties.forAll
 import arrow.laws.EqLaws
 import org.junit.runner.RunWith
 

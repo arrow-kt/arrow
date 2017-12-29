@@ -1,5 +1,6 @@
 package arrow
 
+import arrow.data.Cokleisli
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

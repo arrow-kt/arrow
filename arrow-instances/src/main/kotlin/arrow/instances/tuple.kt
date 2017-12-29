@@ -1,4 +1,9 @@
-package arrow
+package arrow.instances
+
+import arrow.Eq
+import arrow.Monoid
+import arrow.core.*
+import arrow.instance
 
 @instance(Tuple2::class)
 interface Tuple2MonoidInstance<A, B> : Monoid<Tuple2<A, B>> {

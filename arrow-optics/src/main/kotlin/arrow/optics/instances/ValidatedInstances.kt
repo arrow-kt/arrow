@@ -1,10 +1,10 @@
 package arrow.optics
 
-import arrow.Either
-import arrow.Try
+import arrow.core.Either
+import arrow.data.Try
 import arrow.Validated
-import arrow.Failure
-import arrow.Success
+import arrow.data.Failure
+import arrow.data.Success
 
 /**
  * [PIso] that defines equality between [Validated] and [Either]

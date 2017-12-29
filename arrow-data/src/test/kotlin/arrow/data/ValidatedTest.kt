@@ -4,8 +4,13 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import arrow.Invalid
-import arrow.Valid
+import arrow.core.Left
+import arrow.core.None
+import arrow.core.Right
+import arrow.core.Some
+import arrow.data.*
+import arrow.instances.IntMonoid
+import arrow.instances.StringMonoidInstance
 import arrow.laws.EqLaws
 import org.junit.runner.RunWith
 

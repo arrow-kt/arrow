@@ -1,5 +1,6 @@
-package arrow
+package arrow.core
 
+import arrow.higherkind
 import java.util.*
 
 /**

@@ -1,5 +1,6 @@
 package arrow
 
+import arrow.core.Option
 import kotlin.coroutines.experimental.startCoroutine
 
 interface MonadFilter<F> : Monad<F>, FunctorFilter<F>, Typeclass {

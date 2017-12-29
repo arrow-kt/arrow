@@ -1,4 +1,8 @@
-package arrow
+package arrow.instances
+
+import arrow.*
+import arrow.core.*
+import arrow.data.*
 
 interface EitherTFunctorInstance<F, L> : Functor<EitherTKindPartial<F, L>> {
 

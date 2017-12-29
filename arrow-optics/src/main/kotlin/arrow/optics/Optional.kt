@@ -1,6 +1,7 @@
 package arrow.optics
 
 import arrow.*
+import arrow.core.*
 
 /**
  * [Optional] is a type alias for [POptional] which fixes the type arguments
@@ -43,7 +44,7 @@ interface POptional<S, T, A, B> {
          * [POptional] that takes either [S] or [S] and strips the choice of [S].
          */
         fun <S> codiagonal(): Optional<Either<S, S>, S> = Optional(
-                { it.fold({ Right(it) }, { Right(it) }) },
+                { it.fold({ Either.Right(it) }, { Either.Right(it) }) },
                 { a -> { aa -> aa.bimap({ a }, { a }) } }
         )
 
@@ -62,7 +63,7 @@ interface POptional<S, T, A, B> {
          * Can also be used to construct [Optional]
          */
         operator fun <S, A> invoke(partialFunction: PartialFunction<S, A>, set: (A) -> (S) -> S): Optional<S, A> = Optional(
-                getOrModify = { s -> partialFunction.lift()(s).fold({ Left(s) }, { Right(it) }) },
+                getOrModify = { s -> partialFunction.lift()(s).fold({ Either.Left(s) }, { Either.Right(it) }) },
                 set = set
         )
 
@@ -70,7 +71,7 @@ interface POptional<S, T, A, B> {
          * [POptional] that never sees its focus
          */
         fun <A, B> void(): Optional<A, B> = Optional(
-                { Left(it) },
+                { Either.Left(it) },
                 { _ -> ::identity }
         )
 
@@ -92,13 +93,13 @@ interface POptional<S, T, A, B> {
     }
 
     /**
-     * Get the focus of a [POptional] or [None] if the is not there
+     * Get the focus of a [POptional] or [Option.None] if the is not there
      */
     fun getOption(a: S): Option<A> = getOrModify(a).toOption()
 
     /**
      * Set the focus of a [POptional] with a value.
-     * @return [None] if the [POptional] is not matching
+     * @return [Option.None] if the [POptional] is not matching
      */
     fun setOption(s: S, b: B): Option<T> = modifiyOption(s) { b }
 
@@ -117,7 +118,7 @@ interface POptional<S, T, A, B> {
      */
     infix fun <S1, T1> choice(other: POptional<S1, T1, A, B>): POptional<Either<S, S1>, Either<T, T1>, A, B> =
             POptional(
-                    { ss -> ss.fold({ getOrModify(it).bimap({ Left(it) }, ::identity) }, { other.getOrModify(it).bimap({ Right(it) }, ::identity) }) },
+                    { ss -> ss.fold({ getOrModify(it).bimap({ Either.Left(it) }, ::identity) }, { other.getOrModify(it).bimap({ Either.Right(it) }, ::identity) }) },
                     { b -> { it.bimap({ s -> this.set(s, b) }, { s -> other.set(s, b) }) } }
             )
 
@@ -248,7 +249,7 @@ inline fun <S, T, A, B, reified F> POptional<S, T, A, B>.liftF(crossinline f: (A
 
 /**
  * Modify the focus of a [POptional] with a function [f]
- * @return [None] if the [POptional] is not matching
+ * @return [Option.None] if the [POptional] is not matching
  */
 inline fun <S, T, A, B> POptional<S, T, A, B>.modifiyOption(s: S, crossinline f: (A) -> B): Option<T> = getOption(s).map({ set(s, f(it)) })
 

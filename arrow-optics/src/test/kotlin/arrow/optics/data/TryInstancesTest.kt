@@ -2,24 +2,22 @@ package arrow.optics
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
-import arrow.Either
+import arrow.core.Either
 import arrow.Eq
 import arrow.IsoLaws
 import arrow.Monoid
 import arrow.PrismLaws
 import arrow.UnitSpec
 import arrow.Validated
-import arrow.applicative
-import arrow.ev
 import arrow.genEither
 import arrow.genFunctionAToB
 import arrow.genThrowable
 import arrow.genTry
 import arrow.genValidated
 import arrow.invalid
-import arrow.Invalid
+import arrow.data.Invalid
 import arrow.valid
-import arrow.Valid
+import arrow.data.Valid
 import arrow.syntax.either.right
 import org.junit.runner.RunWith
 

@@ -1,4 +1,7 @@
-package arrow
+package arrow.data
+
+import arrow.*
+import arrow.core.*
 
 /**
  * Alias that represents a computation that has a dependency on [D].

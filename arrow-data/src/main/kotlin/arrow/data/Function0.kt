@@ -1,4 +1,7 @@
-package arrow
+package arrow.data
+
+import arrow.*
+import arrow.core.Either
 
 fun <A> (() -> A).k(): Function0<A> = Function0(this)
 
@@ -7,7 +10,7 @@ operator fun <A> Function0Kind<A>.invoke(): A = this.ev().f()
 @higherkind
 data class Function0<out A>(internal val f: () -> A) : Function0Kind<A> {
 
-    fun <B> map(f: (A) -> B): Function0<B> = Function0.pure(f(this()))
+    fun <B> map(f: (A) -> B): Function0<B> = pure(f(this()))
 
     fun <B> flatMap(ff: (A) -> Function0Kind<B>): Function0<B> = ff(f()).ev()
 

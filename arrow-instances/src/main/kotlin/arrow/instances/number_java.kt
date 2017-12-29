@@ -1,6 +1,7 @@
 package java_lang
 
 import arrow.*
+import arrow.instances.*
 
 object IntegerMonoidInstanceImplicits {
     fun instance(): IntMonoid = IntMonoid

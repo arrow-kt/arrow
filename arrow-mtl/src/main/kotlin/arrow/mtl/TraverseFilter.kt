@@ -1,7 +1,6 @@
 package arrow
 
-import arrow.Some
-import arrow.None
+import arrow.core.*
 
 interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F>, Typeclass {
 

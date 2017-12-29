@@ -1,5 +1,8 @@
 package arrow
 
+import arrow.core.FunctionK
+import arrow.data.invoke
+
 /**
  * Trampoline is often used to emulate tail recursion. The idea is to have some step code that can be trampolined itself
  * to emulate recursion. The difference with standard recursion would be that there is no need to rewind the whole stack

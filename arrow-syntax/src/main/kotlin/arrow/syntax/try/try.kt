@@ -1,6 +1,8 @@
 package arrow.syntax.`try`
 
 import arrow.*
+import arrow.core.*
+import arrow.data.Try
 import arrow.syntax.applicative.tupled
 
 @Deprecated(DeprecatedAmbiguity, ReplaceWith("Try { body }.toOption()"))

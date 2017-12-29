@@ -2,14 +2,12 @@ package arrow.optics
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
-import arrow.Either
+import arrow.core.Either
 import arrow.Eq
 import arrow.IsoLaws
 import arrow.Monoid
-import arrow.Try
+import arrow.data.Try
 import arrow.UnitSpec
-import arrow.applicative
-import arrow.ev
 import arrow.genEither
 import arrow.genFunctionAToB
 import arrow.genThrowable

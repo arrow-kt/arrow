@@ -1,5 +1,7 @@
 package arrow
 
+import arrow.core.case
+import arrow.core.then
 import arrow.instances.collect
 import io.kotlintest.KTestJUnitRunner
 import org.junit.runner.RunWith

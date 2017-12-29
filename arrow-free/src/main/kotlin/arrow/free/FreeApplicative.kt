@@ -1,5 +1,8 @@
 package arrow
 
+import arrow.core.FunctionK
+import arrow.data.Const
+import arrow.data.value
 import arrow.free.instances.*
 
 inline fun <F, reified G, A> FreeApplicativeKind<F, A>.foldMapK(f: FunctionK<F, G>, GA: Applicative<G> = applicative<G>()): HK<G, A> =

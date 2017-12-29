@@ -1,5 +1,9 @@
 package arrow
 
+import arrow.core.Eval
+import arrow.core.Id
+import arrow.core.value
+import arrow.instances.IntMonoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

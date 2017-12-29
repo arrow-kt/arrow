@@ -1,5 +1,6 @@
 package arrow
 
+import arrow.core.Tuple2
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

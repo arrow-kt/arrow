@@ -1,6 +1,8 @@
 package arrow.optics
 
 import arrow.*
+import arrow.core.Either
+import arrow.instances.IntMonoid
 import arrow.syntax.either.right
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen

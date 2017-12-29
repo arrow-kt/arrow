@@ -13,8 +13,6 @@ import arrow.UnitSpec
 import arrow.genFunctionAToB
 import arrow.genNonEmptyList
 import arrow.genOption
-import arrow.isos
-import arrow.k
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

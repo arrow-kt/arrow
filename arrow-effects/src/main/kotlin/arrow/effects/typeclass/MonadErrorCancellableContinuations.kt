@@ -1,6 +1,8 @@
 package arrow.effects
 
 import arrow.*
+import arrow.core.Tuple2
+import arrow.core.toT
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.internal.stackLabels
 import java.util.concurrent.atomic.AtomicBoolean

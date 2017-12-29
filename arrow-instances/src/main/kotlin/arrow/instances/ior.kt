@@ -1,4 +1,8 @@
-package arrow
+package arrow.instances
+
+import arrow.*
+import arrow.core.*
+import arrow.data.*
 
 @instance(Ior::class)
 interface IorFunctorInstance<L> : Functor<IorKindPartial<L>> {

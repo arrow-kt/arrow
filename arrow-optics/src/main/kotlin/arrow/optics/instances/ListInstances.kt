@@ -1,6 +1,9 @@
 package arrow.optics
 
-import arrow.*
+import arrow.core.*
+import arrow.data.ListKW
+import arrow.data.NonEmptyList
+import arrow.data.k
 
 /**
  * [Optional] to safely operate on the head of a list

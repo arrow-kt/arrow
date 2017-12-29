@@ -2,6 +2,10 @@ package arrow.instances
 
 import io.kotlintest.KTestJUnitRunner
 import arrow.*
+import arrow.core.Id
+import arrow.core.Option
+import arrow.core.Some
+import arrow.data.*
 import org.junit.runner.RunWith
 
 typealias OptionTNel = HK<OptionTKindPartial<NonEmptyListHK>, Int>

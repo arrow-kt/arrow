@@ -1,6 +1,7 @@
 package arrow
 
-import arrow.Eval.Companion.always
+import arrow.core.*
+import arrow.core.Eval.Companion.always
 
 /**
  * Data structures that can be folded to a summary value.

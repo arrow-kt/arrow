@@ -1,5 +1,7 @@
 package arrow
 
+import arrow.core.*
+
 /**
  * Data structures that can be reduced to a summary value.
  *

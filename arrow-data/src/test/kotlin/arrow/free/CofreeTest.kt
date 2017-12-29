@@ -4,8 +4,10 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import arrow.Cofree.Companion.unfold
-import arrow.None
-import arrow.Some
+import arrow.core.*
+import arrow.data.ListKW
+import arrow.data.NonEmptyList
+import arrow.data.OptionT
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

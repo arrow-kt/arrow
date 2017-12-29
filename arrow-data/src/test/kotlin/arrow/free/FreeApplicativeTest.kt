@@ -1,9 +1,12 @@
 package arrow
 
+import arrow.core.*
+import arrow.data.NonEmptyList
 import arrow.free.instances.FreeApplicativeApplicativeInstance
 import arrow.free.instances.FreeApplicativeEq
 import arrow.instances.FreeApplicativeApplicativeInstance
 import arrow.instances.FreeApplicativeEq
+import arrow.instances.applicative
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import arrow.laws.EqLaws

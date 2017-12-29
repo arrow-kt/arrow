@@ -1,4 +1,4 @@
-package arrow
+package arrow.core
 
 fun <A> identity(a: A): A = a
 

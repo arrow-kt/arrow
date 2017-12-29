@@ -1,7 +1,7 @@
 package arrow.syntax.collections
 
-import arrow.Option
-import arrow.Predicate
+import arrow.core.Option
+import arrow.core.Predicate
 import arrow.syntax.option.*
 
 fun String.firstOption(): Option<Char> = firstOrNull().toOption()

@@ -1,4 +1,8 @@
-package arrow
+package arrow.instances
+
+import arrow.*
+import arrow.core.*
+import arrow.data.*
 
 @instance(NonEmptyList::class)
 interface NonEmptyListSemigroupInstance<A> : Semigroup<NonEmptyList<A>> {
@@ -16,158 +20,158 @@ interface NonEmptyListEqInstance<A> : Eq<NonEmptyList<A>> {
             }
 }
 
-interface NonEmptyListFunctorInstance : arrow.Functor<NonEmptyListHK> {
-    override fun <A, B> map(fa: arrow.NonEmptyListKind<A>, f: kotlin.Function1<A, B>): arrow.NonEmptyList<B> =
+interface NonEmptyListFunctorInstance : Functor<NonEmptyListHK> {
+    override fun <A, B> map(fa: NonEmptyListKind<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
             fa.ev().map(f)
 }
 
 object NonEmptyListFunctorInstanceImplicits {
-    fun instance(): NonEmptyListFunctorInstance = arrow.NonEmptyList.Companion.functor()
+    fun instance(): NonEmptyListFunctorInstance = NonEmptyList.Companion.functor()
 }
 
-fun arrow.NonEmptyList.Companion.functor(): NonEmptyListFunctorInstance =
-        object : NonEmptyListFunctorInstance, arrow.Functor<NonEmptyListHK> {}
+fun NonEmptyList.Companion.functor(): NonEmptyListFunctorInstance =
+        object : NonEmptyListFunctorInstance, Functor<NonEmptyListHK> {}
 
-interface NonEmptyListApplicativeInstance : arrow.Applicative<NonEmptyListHK> {
-    override fun <A, B> ap(fa: arrow.NonEmptyListKind<A>, ff: arrow.NonEmptyListKind<kotlin.Function1<A, B>>): arrow.NonEmptyList<B> =
+interface NonEmptyListApplicativeInstance : Applicative<NonEmptyListHK> {
+    override fun <A, B> ap(fa: NonEmptyListKind<A>, ff: NonEmptyListKind<kotlin.Function1<A, B>>): NonEmptyList<B> =
             fa.ev().ap(ff)
 
-    override fun <A, B> map(fa: arrow.NonEmptyListKind<A>, f: kotlin.Function1<A, B>): arrow.NonEmptyList<B> =
+    override fun <A, B> map(fa: NonEmptyListKind<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
             fa.ev().map(f)
 
-    override fun <A> pure(a: A): arrow.NonEmptyList<A> =
-            arrow.NonEmptyList.pure(a)
+    override fun <A> pure(a: A): NonEmptyList<A> =
+            NonEmptyList.pure(a)
 }
 
 object NonEmptyListApplicativeInstanceImplicits {
-    fun instance(): NonEmptyListApplicativeInstance = arrow.NonEmptyList.Companion.applicative()
+    fun instance(): NonEmptyListApplicativeInstance = NonEmptyList.Companion.applicative()
 }
 
-fun arrow.NonEmptyList.Companion.applicative(): NonEmptyListApplicativeInstance =
-        object : NonEmptyListApplicativeInstance, arrow.Applicative<NonEmptyListHK> {}
+fun NonEmptyList.Companion.applicative(): NonEmptyListApplicativeInstance =
+        object : NonEmptyListApplicativeInstance, Applicative<NonEmptyListHK> {}
 
-interface NonEmptyListMonadInstance : arrow.Monad<NonEmptyListHK> {
-    override fun <A, B> ap(fa: arrow.NonEmptyListKind<A>, ff: arrow.NonEmptyListKind<kotlin.Function1<A, B>>): arrow.NonEmptyList<B> =
+interface NonEmptyListMonadInstance : Monad<NonEmptyListHK> {
+    override fun <A, B> ap(fa: NonEmptyListKind<A>, ff: NonEmptyListKind<kotlin.Function1<A, B>>): NonEmptyList<B> =
             fa.ev().ap(ff)
 
-    override fun <A, B> flatMap(fa: arrow.NonEmptyListKind<A>, f: kotlin.Function1<A, arrow.NonEmptyListKind<B>>): arrow.NonEmptyList<B> =
+    override fun <A, B> flatMap(fa: NonEmptyListKind<A>, f: kotlin.Function1<A, NonEmptyListKind<B>>): NonEmptyList<B> =
             fa.ev().flatMap(f)
 
-    override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, arrow.NonEmptyListKind<arrow.Either<A, B>>>): arrow.NonEmptyList<B> =
-            arrow.NonEmptyList.tailRecM(a, f)
+    override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, NonEmptyListKind<Either<A, B>>>): NonEmptyList<B> =
+            NonEmptyList.tailRecM(a, f)
 
-    override fun <A, B> map(fa: arrow.NonEmptyListKind<A>, f: kotlin.Function1<A, B>): arrow.NonEmptyList<B> =
+    override fun <A, B> map(fa: NonEmptyListKind<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
             fa.ev().map(f)
 
-    override fun <A> pure(a: A): arrow.NonEmptyList<A> =
-            arrow.NonEmptyList.pure(a)
+    override fun <A> pure(a: A): NonEmptyList<A> =
+            NonEmptyList.pure(a)
 }
 
 object NonEmptyListMonadInstanceImplicits {
-    fun instance(): NonEmptyListMonadInstance = arrow.NonEmptyList.Companion.monad()
+    fun instance(): NonEmptyListMonadInstance = NonEmptyList.Companion.monad()
 }
 
-fun arrow.NonEmptyList.Companion.monad(): NonEmptyListMonadInstance =
-        object : NonEmptyListMonadInstance, arrow.Monad<NonEmptyListHK> {}
+fun NonEmptyList.Companion.monad(): NonEmptyListMonadInstance =
+        object : NonEmptyListMonadInstance, Monad<NonEmptyListHK> {}
 
-interface NonEmptyListComonadInstance : arrow.Comonad<NonEmptyListHK> {
-    override fun <A, B> coflatMap(fa: arrow.NonEmptyListKind<A>, f: kotlin.Function1<arrow.NonEmptyListKind<A>, B>): arrow.NonEmptyList<B> =
+interface NonEmptyListComonadInstance : Comonad<NonEmptyListHK> {
+    override fun <A, B> coflatMap(fa: NonEmptyListKind<A>, f: kotlin.Function1<NonEmptyListKind<A>, B>): NonEmptyList<B> =
             fa.ev().coflatMap(f)
 
-    override fun <A> extract(fa: arrow.NonEmptyListKind<A>): A =
+    override fun <A> extract(fa: NonEmptyListKind<A>): A =
             fa.ev().extract()
 
-    override fun <A, B> map(fa: arrow.NonEmptyListKind<A>, f: kotlin.Function1<A, B>): arrow.NonEmptyList<B> =
+    override fun <A, B> map(fa: NonEmptyListKind<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
             fa.ev().map(f)
 }
 
 object NonEmptyListComonadInstanceImplicits {
-    fun instance(): NonEmptyListComonadInstance = arrow.NonEmptyList.Companion.comonad()
+    fun instance(): NonEmptyListComonadInstance = NonEmptyList.Companion.comonad()
 }
 
-fun arrow.NonEmptyList.Companion.comonad(): NonEmptyListComonadInstance =
-        object : NonEmptyListComonadInstance, arrow.Comonad<NonEmptyListHK> {}
+fun NonEmptyList.Companion.comonad(): NonEmptyListComonadInstance =
+        object : NonEmptyListComonadInstance, Comonad<NonEmptyListHK> {}
 
-interface NonEmptyListBimonadInstance : arrow.Bimonad<NonEmptyListHK> {
-    override fun <A, B> ap(fa: arrow.NonEmptyListKind<A>, ff: arrow.NonEmptyListKind<kotlin.Function1<A, B>>): arrow.NonEmptyList<B> =
+interface NonEmptyListBimonadInstance : Bimonad<NonEmptyListHK> {
+    override fun <A, B> ap(fa: NonEmptyListKind<A>, ff: NonEmptyListKind<kotlin.Function1<A, B>>): NonEmptyList<B> =
             fa.ev().ap(ff)
 
-    override fun <A, B> flatMap(fa: arrow.NonEmptyListKind<A>, f: kotlin.Function1<A, arrow.NonEmptyListKind<B>>): arrow.NonEmptyList<B> =
+    override fun <A, B> flatMap(fa: NonEmptyListKind<A>, f: kotlin.Function1<A, NonEmptyListKind<B>>): NonEmptyList<B> =
             fa.ev().flatMap(f)
 
-    override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, arrow.NonEmptyListKind<arrow.Either<A, B>>>): arrow.NonEmptyList<B> =
-            arrow.NonEmptyList.tailRecM(a, f)
+    override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, NonEmptyListKind<Either<A, B>>>): NonEmptyList<B> =
+            NonEmptyList.tailRecM(a, f)
 
-    override fun <A, B> map(fa: arrow.NonEmptyListKind<A>, f: kotlin.Function1<A, B>): arrow.NonEmptyList<B> =
+    override fun <A, B> map(fa: NonEmptyListKind<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
             fa.ev().map(f)
 
-    override fun <A> pure(a: A): arrow.NonEmptyList<A> =
-            arrow.NonEmptyList.pure(a)
+    override fun <A> pure(a: A): NonEmptyList<A> =
+            NonEmptyList.pure(a)
 
-    override fun <A, B> coflatMap(fa: arrow.NonEmptyListKind<A>, f: kotlin.Function1<arrow.NonEmptyListKind<A>, B>): arrow.NonEmptyList<B> =
+    override fun <A, B> coflatMap(fa: NonEmptyListKind<A>, f: kotlin.Function1<NonEmptyListKind<A>, B>): NonEmptyList<B> =
             fa.ev().coflatMap(f)
 
-    override fun <A> extract(fa: arrow.NonEmptyListKind<A>): A =
+    override fun <A> extract(fa: NonEmptyListKind<A>): A =
             fa.ev().extract()
 }
 
 object NonEmptyListBimonadInstanceImplicits {
-    fun instance(): NonEmptyListBimonadInstance = arrow.NonEmptyList.Companion.bimonad()
+    fun instance(): NonEmptyListBimonadInstance = NonEmptyList.Companion.bimonad()
 }
 
-fun arrow.NonEmptyList.Companion.bimonad(): NonEmptyListBimonadInstance =
-        object : NonEmptyListBimonadInstance, arrow.Bimonad<NonEmptyListHK> {}
+fun NonEmptyList.Companion.bimonad(): NonEmptyListBimonadInstance =
+        object : NonEmptyListBimonadInstance, Bimonad<NonEmptyListHK> {}
 
-interface NonEmptyListFoldableInstance : arrow.Foldable<NonEmptyListHK> {
-    override fun <A, B> foldLeft(fa: arrow.NonEmptyListKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =
+interface NonEmptyListFoldableInstance : Foldable<NonEmptyListHK> {
+    override fun <A, B> foldLeft(fa: NonEmptyListKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.ev().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: arrow.NonEmptyListKind<A>, lb: arrow.Eval<B>, f: kotlin.Function2<A, arrow.Eval<B>, arrow.Eval<B>>): arrow.Eval<B> =
+    override fun <A, B> foldRight(fa: NonEmptyListKind<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
             fa.ev().foldRight(lb, f)
 
-    override fun <A> isEmpty(fa: arrow.NonEmptyListKind<A>): kotlin.Boolean =
+    override fun <A> isEmpty(fa: NonEmptyListKind<A>): kotlin.Boolean =
             fa.ev().isEmpty()
 }
 
 object NonEmptyListFoldableInstanceImplicits {
-    fun instance(): NonEmptyListFoldableInstance = arrow.NonEmptyList.Companion.foldable()
+    fun instance(): NonEmptyListFoldableInstance = NonEmptyList.Companion.foldable()
 }
 
-fun arrow.NonEmptyList.Companion.foldable(): NonEmptyListFoldableInstance =
-        object : NonEmptyListFoldableInstance, arrow.Foldable<NonEmptyListHK> {}
+fun NonEmptyList.Companion.foldable(): NonEmptyListFoldableInstance =
+        object : NonEmptyListFoldableInstance, Foldable<NonEmptyListHK> {}
 
-interface NonEmptyListTraverseInstance : arrow.Traverse<NonEmptyListHK> {
-    override fun <A, B> map(fa: arrow.NonEmptyListKind<A>, f: kotlin.Function1<A, B>): arrow.NonEmptyList<B> =
+interface NonEmptyListTraverseInstance : Traverse<NonEmptyListHK> {
+    override fun <A, B> map(fa: NonEmptyListKind<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
             fa.ev().map(f)
 
-    override fun <G, A, B> traverse(fa: arrow.NonEmptyListKind<A>, f: kotlin.Function1<A, arrow.HK<G, B>>, GA: arrow.Applicative<G>): arrow.HK<G, arrow.NonEmptyList<B>> =
+    override fun <G, A, B> traverse(fa: NonEmptyListKind<A>, f: kotlin.Function1<A, HK<G, B>>, GA: Applicative<G>): HK<G, NonEmptyList<B>> =
             fa.ev().traverse(f, GA)
 
-    override fun <A, B> foldLeft(fa: arrow.NonEmptyListKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =
+    override fun <A, B> foldLeft(fa: NonEmptyListKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.ev().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: arrow.NonEmptyListKind<A>, lb: arrow.Eval<B>, f: kotlin.Function2<A, arrow.Eval<B>, arrow.Eval<B>>): arrow.Eval<B> =
+    override fun <A, B> foldRight(fa: NonEmptyListKind<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
             fa.ev().foldRight(lb, f)
 
-    override fun <A> isEmpty(fa: arrow.NonEmptyListKind<A>): kotlin.Boolean =
+    override fun <A> isEmpty(fa: NonEmptyListKind<A>): kotlin.Boolean =
             fa.ev().isEmpty()
 }
 
 object NonEmptyListTraverseInstanceImplicits {
-    fun instance(): NonEmptyListTraverseInstance = arrow.NonEmptyList.Companion.traverse()
+    fun instance(): NonEmptyListTraverseInstance = NonEmptyList.Companion.traverse()
 }
 
-fun arrow.NonEmptyList.Companion.traverse(): NonEmptyListTraverseInstance =
-        object : NonEmptyListTraverseInstance, arrow.Traverse<NonEmptyListHK> {}
+fun NonEmptyList.Companion.traverse(): NonEmptyListTraverseInstance =
+        object : NonEmptyListTraverseInstance, Traverse<NonEmptyListHK> {}
 
-interface NonEmptyListSemigroupKInstance : arrow.SemigroupK<NonEmptyListHK> {
-    override fun <A> combineK(x: arrow.NonEmptyListKind<A>, y: arrow.NonEmptyListKind<A>): arrow.NonEmptyList<A> =
+interface NonEmptyListSemigroupKInstance : SemigroupK<NonEmptyListHK> {
+    override fun <A> combineK(x: NonEmptyListKind<A>, y: NonEmptyListKind<A>): NonEmptyList<A> =
             x.ev().combineK(y)
 }
 
 object NonEmptyListSemigroupKInstanceImplicits {
-    fun instance(): NonEmptyListSemigroupKInstance = arrow.NonEmptyList.Companion.semigroupK()
+    fun instance(): NonEmptyListSemigroupKInstance = NonEmptyList.Companion.semigroupK()
 }
 
-fun arrow.NonEmptyList.Companion.semigroupK(): NonEmptyListSemigroupKInstance =
-        object : NonEmptyListSemigroupKInstance, arrow.SemigroupK<NonEmptyListHK> {}
+fun NonEmptyList.Companion.semigroupK(): NonEmptyListSemigroupKInstance =
+        object : NonEmptyListSemigroupKInstance, SemigroupK<NonEmptyListHK> {}

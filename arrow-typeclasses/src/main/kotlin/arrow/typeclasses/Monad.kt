@@ -1,5 +1,7 @@
 package arrow
 
+import arrow.core.Either
+import arrow.core.Eval
 import kotlin.coroutines.experimental.startCoroutine
 
 interface Monad<F> : Applicative<F>, Typeclass {

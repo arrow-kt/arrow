@@ -1,5 +1,7 @@
 package arrow
 
+import arrow.core.*
+import arrow.data.Const
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.optics.Prism

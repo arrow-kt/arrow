@@ -1,4 +1,8 @@
-package arrow
+package arrow.instances
+
+import arrow.*
+import arrow.core.*
+import arrow.data.*
 
 @instance(SetKW::class)
 interface SetKWSemigroupInstance<A> : Semigroup<SetKW<A>> {
@@ -26,28 +30,28 @@ interface SetKWEqInstance<A> : Eq<SetKW<A>> {
 }
 
 @instance(SetKW::class)
-interface SetKWFoldableInstance : arrow.Foldable<SetKWHK> {
-    override fun <A, B> foldLeft(fa: arrow.SetKWKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =
+interface SetKWFoldableInstance : Foldable<SetKWHK> {
+    override fun <A, B> foldLeft(fa: SetKWKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.ev().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: arrow.SetKWKind<A>, lb: arrow.Eval<B>, f: kotlin.Function2<A, arrow.Eval<B>, arrow.Eval<B>>): arrow.Eval<B> =
+    override fun <A, B> foldRight(fa: SetKWKind<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
             fa.ev().foldRight(lb, f)
 
-    override fun <A> isEmpty(fa: arrow.SetKWKind<A>): kotlin.Boolean =
+    override fun <A> isEmpty(fa: SetKWKind<A>): kotlin.Boolean =
             fa.ev().isEmpty()
 }
 
 @instance(SetKW::class)
-interface SetKWSemigroupKInstance : arrow.SemigroupK<SetKWHK> {
-    override fun <A> combineK(x: arrow.SetKWKind<A>, y: arrow.SetKWKind<A>): arrow.SetKW<A> =
+interface SetKWSemigroupKInstance : SemigroupK<SetKWHK> {
+    override fun <A> combineK(x: SetKWKind<A>, y: SetKWKind<A>): SetKW<A> =
             x.ev().combineK(y)
 }
 
 @instance(SetKW::class)
-interface SetKWMonoidKInstance : arrow.MonoidK<SetKWHK> {
-    override fun <A> empty(): arrow.SetKW<A> =
-            arrow.SetKW.empty()
+interface SetKWMonoidKInstance : MonoidK<SetKWHK> {
+    override fun <A> empty(): SetKW<A> =
+            SetKW.empty()
 
-    override fun <A> combineK(x: arrow.SetKWKind<A>, y: arrow.SetKWKind<A>): arrow.SetKW<A> =
+    override fun <A> combineK(x: SetKWKind<A>, y: SetKWKind<A>): SetKW<A> =
             x.ev().combineK(y)
 }

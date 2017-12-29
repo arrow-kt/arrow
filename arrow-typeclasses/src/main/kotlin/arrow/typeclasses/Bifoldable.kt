@@ -1,5 +1,7 @@
 package arrow
 
+import arrow.core.Eval
+
 interface Bifoldable<F> : Typeclass {
 
     fun <A, B, C> bifoldLeft(fab: HK2<F, A, B>, c: C, f: (C, A) -> C, g: (C, B) -> C): C

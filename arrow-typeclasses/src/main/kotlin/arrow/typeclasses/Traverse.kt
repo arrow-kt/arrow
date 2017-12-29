@@ -1,5 +1,8 @@
 package arrow
 
+import arrow.core.Id
+import arrow.core.value
+
 /**
  * Traverse, also known as Traversable. Traversal over a structure with an effect.
  */

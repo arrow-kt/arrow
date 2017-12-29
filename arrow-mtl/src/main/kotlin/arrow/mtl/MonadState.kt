@@ -1,5 +1,7 @@
 package arrow
 
+import arrow.core.Tuple2
+
 interface MonadState<F, S> : Monad<F>, Typeclass {
 
     fun <A> state(f: (S) -> Tuple2<S, A>): HK<F, A> = flatMap(get(), { s -> f(s).let { (a, b) -> map(set(a), { b }) } })

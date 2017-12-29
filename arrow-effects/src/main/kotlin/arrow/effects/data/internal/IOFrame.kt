@@ -1,6 +1,6 @@
 package arrow.effects
 
-import arrow.Either
+import arrow.core.Either
 
 internal interface IOFrame<in A, out R> : (A) -> R {
     override operator fun invoke(a: A): R

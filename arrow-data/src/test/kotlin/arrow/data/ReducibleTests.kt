@@ -3,6 +3,8 @@ package arrow.data
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import arrow.*
+import arrow.core.Tuple2
+import arrow.instances.LongMonoid
 import arrow.laws.ReducibleLaws
 import org.junit.runner.RunWith
 

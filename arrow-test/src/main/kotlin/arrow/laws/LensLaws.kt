@@ -1,5 +1,7 @@
 package arrow
 
+import arrow.core.compose
+import arrow.core.identity
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.optics.Lens

@@ -1,5 +1,7 @@
 package arrow
 
+import arrow.data.Const
+import arrow.instances.IntMonoid
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import arrow.laws.EqLaws

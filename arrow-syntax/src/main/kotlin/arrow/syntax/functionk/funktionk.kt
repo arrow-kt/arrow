@@ -1,6 +1,7 @@
 package arrow.syntax.functionk
 
 import arrow.*
+import arrow.core.FunctionK
 
 fun <F, G, H> FunctionK<F, G>.or(h: FunctionK<H, G>): FunctionK<CoproductKindPartial<F, H>, G> =
         object : FunctionK<CoproductKindPartial<F, H>, G> {

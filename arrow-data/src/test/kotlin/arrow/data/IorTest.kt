@@ -4,7 +4,11 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
-import arrow.Ior.Right
+import arrow.data.Ior.Right
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Some
+import arrow.data.*
 import arrow.laws.EqLaws
 import org.junit.runner.RunWith
 
@@ -123,7 +127,7 @@ class IorTest : UnitSpec() {
                 {
                     Ior.fromOptions(Some(a), None) == Some(Ior.Left(a)) &&
                             Ior.fromOptions(Some(a), Some(b)) == Some(Ior.Both(a, b)) &&
-                            Ior.fromOptions(None, Some(b)) == Some(Ior.Right(b)) &&
+                            Ior.fromOptions(None, Some(b)) == Some(Right(b)) &&
                             Ior.fromOptions(None, None) == None
                 }()
             }

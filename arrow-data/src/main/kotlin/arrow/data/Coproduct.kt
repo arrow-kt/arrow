@@ -1,4 +1,7 @@
-package arrow
+package arrow.data
+
+import arrow.*
+import arrow.core.*
 
 @higherkind data class Coproduct<F, G, A>(val run: Either<HK<F, A>, HK<G, A>>) : CoproductKind<F, G, A>, CoproductKindedJ<F, G, A> {
 

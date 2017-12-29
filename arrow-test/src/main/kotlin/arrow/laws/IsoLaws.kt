@@ -1,5 +1,11 @@
 package arrow
 
+import arrow.core.Id
+import arrow.core.compose
+import arrow.core.identity
+import arrow.core.value
+import arrow.data.Const
+import arrow.data.value
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.optics.Iso

@@ -1,5 +1,7 @@
 package arrow
 
+import arrow.core.Option
+
 interface Semigroup<A> : Typeclass {
     /**
      * Combine two [A] values.

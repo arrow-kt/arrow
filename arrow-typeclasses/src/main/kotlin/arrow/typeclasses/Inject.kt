@@ -1,5 +1,7 @@
 package arrow
 
+import arrow.core.FunctionK
+
 /**
  * Inject type class as described in "Data types a la carte" (Swierstra 2008).
  *

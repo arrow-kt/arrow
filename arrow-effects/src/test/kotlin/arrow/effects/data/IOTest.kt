@@ -1,6 +1,10 @@
 package arrow.effects
 
 import arrow.*
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.None
+import arrow.core.Some
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe

@@ -1,6 +1,11 @@
 package arrow.optics
 
 import arrow.*
+import arrow.core.*
+import arrow.data.Const
+import arrow.data.ListKW
+import arrow.instances.IntMonoid
+import arrow.syntax.applicative.*
 
 /**
  * [Traversal] is a type alias for [PTraversal] which fixes the type arguments
@@ -28,7 +33,7 @@ interface PTraversal<S, T, A, B> {
 
         fun <S> codiagonal(): Traversal<Either<S, S>, S> = object : Traversal<Either<S, S>, S> {
             override fun <F> modifyF(FA: Applicative<F>, s: Either<S, S>, f: (S) -> HK<F, S>): HK<F, Either<S, S>> =
-                    s.bimap(f, f).fold({ fa -> FA.map(fa, { a -> Left(a) }) }, { fa -> FA.map(fa, { a -> Right(a) }) })
+                    s.bimap(f, f).fold({ fa -> FA.map(fa, { a -> Either.Left(a) }) }, { fa -> FA.map(fa, { a -> Either.Right(a) }) })
         }
 
         inline fun <reified T, A, B> fromTraversable(TT: arrow.Traverse<T> = traverse()) = object : PTraversal<HK<T, A>, HK<T, B>, A, B> {
@@ -220,19 +225,19 @@ interface PTraversal<S, T, A, B> {
     fun nonEmpty(s: S): Boolean = !isEmpty(s)
 
     /**
-     * Find the first target or [None] if no targets
+     * Find the first target or [Option.None] if no targets
      */
     fun headOption(s: S): Option<A> = foldMap(firstOptionMonoid<A>(), s, { b -> Const(Some(b)) }).value
 
     /**
-     * Find the first target or [None] if no targets
+     * Find the first target or [Option.None] if no targets
      */
     fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s, { b -> Const(Some(b)) }).value
 
     fun <U, V> choice(other: PTraversal<U, V, A, B>): PTraversal<Either<S, U>, Either<T, V>, A, B> = object : PTraversal<Either<S, U>, Either<T, V>, A, B> {
         override fun <F> modifyF(FA: Applicative<F>, s: Either<S, U>, f: (A) -> HK<F, B>): HK<F, Either<T, V>> = s.fold(
-                { a -> FA.map(this@PTraversal.modifyF(FA, a, f)) { Left(it) } },
-                { u -> FA.map(other.modifyF(FA, u, f)) { Right(it) } }
+                { a -> FA.map(this@PTraversal.modifyF(FA, a, f)) { Either.Left(it) } },
+                { u -> FA.map(other.modifyF(FA, u, f)) { Either.Right(it) } }
         )
     }
 

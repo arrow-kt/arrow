@@ -8,7 +8,6 @@ import arrow.SetterLaws
 import arrow.UnitSpec
 import arrow.genFunctionAToB
 import arrow.genOption
-import arrow.getOrElse
 import arrow.syntax.either.left
 import arrow.syntax.either.right
 import org.junit.runner.RunWith

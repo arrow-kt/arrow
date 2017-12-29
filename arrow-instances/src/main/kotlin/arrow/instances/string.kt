@@ -1,4 +1,8 @@
-package arrow
+package arrow.instances
+
+import arrow.Eq
+import arrow.Monoid
+import arrow.Semigroup
 
 object StringSemigroupInstance : Semigroup<String> {
     override fun combine(a: String, b: String): String = "$a$b"

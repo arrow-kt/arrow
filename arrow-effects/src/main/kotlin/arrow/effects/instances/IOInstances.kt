@@ -1,6 +1,7 @@
 package arrow.effects
 
 import arrow.*
+import arrow.core.Either
 
 @instance(IO::class)
 interface IOMonadErrorInstance : IOMonadInstance, MonadError<IOHK, Throwable> {

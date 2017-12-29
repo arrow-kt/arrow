@@ -5,6 +5,8 @@ import io.kotlintest.matchers.Result
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.specs.FreeSpec
 import arrow.Problem.*
+import arrow.core.*
+import arrow.data.*
 import arrow.syntax.either.left
 import arrow.syntax.either.right
 import kotlin.reflect.KClass
@@ -56,7 +58,7 @@ class DataTypeExamples : FreeSpec() { init {
         "Applicative" {
             // Computing over independent values
             val tuple = Option.applicative().tupled(Option(1), Option("Hello"), Option(20.0))
-            tuple shouldBe Some(Tuple3(a=1, b="Hello", c=20.0))
+            tuple shouldBe Some(Tuple3(a = 1, b = "Hello", c = 20.0))
 
         }
 

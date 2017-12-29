@@ -1,7 +1,8 @@
 package arrow.mtl.instances
 
 import arrow.*
-import arrow.instances.*
+import arrow.core.Option
+import arrow.instances.ComposedTraverse
 
 interface ComposedTraverseFilter<F, G> :
         TraverseFilter<Nested<F, G>>,

@@ -1,4 +1,8 @@
-package arrow
+package arrow.instances
+
+import arrow.*
+import arrow.core.*
+import arrow.data.*
 
 @instance(SortedMapKW::class)
 interface SortedMapKWFunctorInstance<A : Comparable<A>> : Functor<SortedMapKWKindPartial<A>> {

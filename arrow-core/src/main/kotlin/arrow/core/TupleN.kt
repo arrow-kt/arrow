@@ -1,4 +1,4 @@
-package arrow
+package arrow.core
 
 data class Tuple2<out A, out B>(val a: A, val b: B) {
     fun reverse(): Tuple2<B, A> = Tuple2(b, a)

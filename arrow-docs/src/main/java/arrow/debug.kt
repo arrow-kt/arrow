@@ -2,6 +2,7 @@ package arrow.debug
 
 import kotlin.reflect.KClass
 import arrow.*
+import arrow.data.Try
 import arrow.effects.*
 
 inline fun <reified F, reified E> debugInstanceLookups(): Map<KClass<out Typeclass>, () -> Typeclass> = mapOf(

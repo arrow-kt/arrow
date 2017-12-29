@@ -1,4 +1,6 @@
-package arrow
+package arrow.data
+
+import arrow.*
 
 typealias CokleisliFun<F, A, B> = (HK<F, A>) -> B
 

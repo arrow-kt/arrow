@@ -1,5 +1,6 @@
 package arrow
 
+import arrow.core.Id
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import arrow.laws.EqLaws

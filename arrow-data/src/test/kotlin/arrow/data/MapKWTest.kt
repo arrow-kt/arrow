@@ -1,8 +1,8 @@
 package arrow
 
+import arrow.data.MapKW
+import arrow.data.k
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.should
-import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
 import arrow.laws.EqLaws

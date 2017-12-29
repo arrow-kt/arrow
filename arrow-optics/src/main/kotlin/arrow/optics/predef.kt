@@ -1,6 +1,9 @@
 package arrow.optics
 
-import arrow.*
+import arrow.data.Const
+import arrow.Monoid
+import arrow.core.None
+import arrow.core.Option
 
 @PublishedApi internal object AndMonoid : Monoid<Boolean> {
     override fun combine(a: Boolean, b: Boolean): Boolean = a && b

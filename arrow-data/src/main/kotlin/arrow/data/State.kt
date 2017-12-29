@@ -1,4 +1,7 @@
-package arrow
+package arrow.data
+
+import arrow.*
+import arrow.core.*
 
 /**
  * Alias that represents stateful computation of the form `(S) -> Tuple2<S, A>`.
@@ -53,16 +56,16 @@ fun <S, A> StateFun<S, A>.toState(): State<S, A> = State(this)
 fun <S, A> StateFunKind<S, A>.toState(): State<S, A> = State(this)
 
 fun <S, T, P1, R> State<S, T>.map(sx: State<S, P1>, f: (T, P1) -> R): State<S, R> =
-        flatMap ({ t -> sx.map { x -> f(t, x) } }, arrow.monad()).ev()
+        flatMap ({ t -> sx.map { x -> f(t, x) } }, monad()).ev()
 
-fun <S, T, R> State<S, T>.map(f: (T) -> R): State<S, R> = flatMap({ t -> StateApi.pure<S, R>(f(t)) }, arrow.monad()).ev()
+fun <S, T, R> State<S, T>.map(f: (T) -> R): State<S, R> = flatMap({ t -> StateApi.pure<S, R>(f(t)) }, monad()).ev()
 
 /**
  * Alias for [StateT.run] `StateT<IdHK, S, A>`
  *
  * @param initial state to start stateful computation.
  */
-fun <S, A> StateT<IdHK, S, A>.run(initial: S): Tuple2<S, A> = run(initial, arrow.monad()).value()
+fun <S, A> StateT<IdHK, S, A>.run(initial: S): Tuple2<S, A> = run(initial, monad()).value()
 
 /**
  * Alias for [StateT.runA] `StateT<IdHK, S, A>`
@@ -86,32 +89,32 @@ fun State() = StateApi
 
 object StateApi {
 
-    fun <S, T> pure(t: T): State<S, T> = StateT.pure(t, arrow.monad())
+    fun <S, T> pure(t: T): State<S, T> = StateT.pure(t, monad())
 
     /**
      * Return input without modifying it.
      */
-    fun <S> get(): State<S, S> = StateT.get(arrow.applicative())
+    fun <S> get(): State<S, S> = StateT.get(applicative())
 
     /**
      * Inspect a value of the state [S] with [f] `(S) -> T` without modifying the state.
      *
      * @param f the function applied to inspect [T] from [S].
      */
-    fun <S, T> inspect(f: (S) -> T): State<S, T> = StateT.inspect(arrow.applicative(), f)
+    fun <S, T> inspect(f: (S) -> T): State<S, T> = StateT.inspect(applicative(), f)
 
     /**
      * Modify the state with [f] `(S) -> S` and return [Unit].
      *
      * @param f the modify function to apply.
      */
-    fun <S> modify(f: (S) -> S): State<S, Unit> = StateT.modify(arrow.applicative(), f)
+    fun <S> modify(f: (S) -> S): State<S, Unit> = StateT.modify(applicative(), f)
 
     /**
      * Set the state to [s] and return [Unit].
      *
      * @param s value to set.
      */
-    fun <S> set(s: S): State<S, Unit> = StateT.set(arrow.applicative(), s)
+    fun <S> set(s: S): State<S, Unit> = StateT.set(applicative(), s)
 
 }

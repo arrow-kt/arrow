@@ -1,7 +1,10 @@
 package arrow.mtl.instances
 
 import arrow.*
-import arrow.mtl.syntax.traverseFilter
+import arrow.core.Option
+import arrow.data.OptionT
+import arrow.instances.OptionTFunctorInstance
+import arrow.instances.OptionTTraverseInstance
 
 @instance(OptionT::class)
 interface OptionTFunctorFilterInstance<F> : OptionTFunctorInstance<F>, FunctorFilter<OptionTKindPartial<F>> {

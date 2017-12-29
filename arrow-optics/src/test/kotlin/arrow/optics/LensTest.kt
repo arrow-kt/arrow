@@ -4,6 +4,11 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.*
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.Tuple2
+import arrow.core.toT
+import arrow.data.Try
 import arrow.syntax.either.left
 import arrow.syntax.either.right
 import org.junit.runner.RunWith
@@ -39,7 +44,7 @@ class LensTest : UnitSpec() {
 
         "Lifting a function as a functor should yield the same result as not yielding" {
             forAll(TokenGen, Gen.string(), { token, value ->
-                tokenLens.modifyF(Option.functor(), token) { Some(value) } == tokenLens.liftF { Some(value)}(token)
+                tokenLens.modifyF(Option.functor(), token) { Some(value) } == tokenLens.liftF { Some(value) }(token)
             })
         }
 

@@ -1,5 +1,8 @@
 package arrow
 
+import arrow.core.Either
+import arrow.core.FunctionK
+
 inline fun <reified M, S, A> FreeKind<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M> = monad()): HK<M, A> = (this as Free<S, A>).foldMap(f, MM)
 
 @higherkind sealed class Free<S, out A> : FreeKind<S, A> {

@@ -3,11 +3,11 @@ package arrow.optics
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import arrow.Tuple2
+import arrow.core.Tuple2
 import arrow.UnitSpec
 import arrow.syntax.either.left
 import arrow.syntax.either.right
-import arrow.toT
+import arrow.core.toT
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

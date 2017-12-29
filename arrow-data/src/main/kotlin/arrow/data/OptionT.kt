@@ -1,4 +1,7 @@
-package arrow
+package arrow.data
+
+import arrow.*
+import arrow.core.*
 
 /**
  * [OptionT]`<F, A>` is a light wrapper on an `F<`[Option]`<A>>` with some
@@ -12,11 +15,11 @@ package arrow
 
         operator fun <F, A> invoke(value: HK<F, Option<A>>): OptionT<F, A> = OptionT(value)
 
-        inline fun <reified F, A> pure(a: A, AF: Applicative<F> = arrow.applicative<F>()): OptionT<F, A> = OptionT(AF.pure(Some(a)))
+        inline fun <reified F, A> pure(a: A, AF: Applicative<F> = applicative<F>()): OptionT<F, A> = OptionT(AF.pure(Some(a)))
 
-        inline fun <reified F> none(AF: Applicative<F> = arrow.applicative<F>()): OptionT<F, Nothing> = OptionT(AF.pure(None))
+        inline fun <reified F> none(AF: Applicative<F> = applicative<F>()): OptionT<F, Nothing> = OptionT(AF.pure(None))
 
-        inline fun <reified F, A> fromOption(value: Option<A>, AF: Applicative<F> = arrow.applicative<F>()): OptionT<F, A> =
+        inline fun <reified F, A> fromOption(value: Option<A>, AF: Applicative<F> = applicative<F>()): OptionT<F, A> =
                 OptionT(AF.pure(value))
 
         fun <F, A, B> tailRecM(a: A, f: (A) -> OptionTKind<F, Either<A, B>>, MF: Monad<F>): OptionT<F, B> =

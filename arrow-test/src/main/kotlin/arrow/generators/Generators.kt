@@ -1,7 +1,8 @@
 package arrow
 
+import arrow.core.*
+import arrow.data.*
 import io.kotlintest.properties.Gen
-import io.kotlintest.properties.map
 
 inline fun <reified F, A> genApplicative(valueGen: Gen<A>, AP: Applicative<F> = applicative<F>()): Gen<HK<F, A>> =
         object : Gen<HK<F, A>> {

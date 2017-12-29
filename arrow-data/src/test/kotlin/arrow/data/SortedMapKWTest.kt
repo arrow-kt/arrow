@@ -1,5 +1,7 @@
 package arrow
 
+import arrow.data.SortedMapKW
+import arrow.data.k
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith

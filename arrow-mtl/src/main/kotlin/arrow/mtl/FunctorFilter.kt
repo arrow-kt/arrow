@@ -1,5 +1,7 @@
 package arrow
 
+import arrow.core.*
+
 interface FunctorFilter<F> : Functor<F>, Typeclass {
 
     /**

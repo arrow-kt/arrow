@@ -1,4 +1,8 @@
-package arrow
+package arrow.instances
+
+import arrow.*
+import arrow.core.*
+import arrow.data.*
 
 @instance(OptionT::class)
 interface OptionTFunctorInstance<F> : Functor<OptionTKindPartial<F>> {

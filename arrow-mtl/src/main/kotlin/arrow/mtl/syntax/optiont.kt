@@ -1,6 +1,8 @@
 package arrow.mtl.syntax
 
 import arrow.*
+import arrow.core.Option
+import arrow.data.OptionT
 import arrow.mtl.instances.ComposedTraverseFilter
 
 fun <F, G, A, B> OptionT<F, A>.traverseFilter(f: (A) -> HK<G, Option<B>>, GA: Applicative<G>, FF: Traverse<F>): HK<G, OptionT<F, B>> {

@@ -1,4 +1,6 @@
-package arrow
+package arrow.legacy
+
+import arrow.core.*
 
 @Deprecated("arrow.data.Either is already right biased. This data type will be removed in future releases")
 sealed class Disjunction<out L, out R> : EitherLike {

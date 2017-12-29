@@ -1,5 +1,9 @@
 package arrow
 
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
+
 interface ApplicativeError<F, E> : Applicative<F>, Typeclass {
 
     fun <A> raiseError(e: E): HK<F, A>

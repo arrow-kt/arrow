@@ -1,4 +1,8 @@
-package arrow
+package arrow.instances
+
+import arrow.*
+import arrow.core.*
+import arrow.data.*
 
 @instance(WriterT::class)
 interface WriterTFunctorInstance<F, W> : Functor<WriterTKindPartial<F, W>> {

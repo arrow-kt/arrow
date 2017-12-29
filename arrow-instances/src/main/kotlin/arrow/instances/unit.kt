@@ -1,4 +1,8 @@
-package arrow
+package arrow.instances
+
+import arrow.Eq
+import arrow.Monoid
+import arrow.Semigroup
 
 object UnitSemigroupInstance : Semigroup<Unit> {
     override fun combine(a: Unit, b: Unit) = Unit

@@ -1,7 +1,8 @@
 package arrow
 
+import arrow.data.ListKW
+import arrow.data.k
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import arrow.laws.EqLaws
 import org.junit.runner.RunWith

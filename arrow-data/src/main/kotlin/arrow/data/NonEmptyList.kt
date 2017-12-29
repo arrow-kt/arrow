@@ -1,4 +1,7 @@
-package arrow
+package arrow.data
+
+import arrow.*
+import arrow.core.*
 
 typealias Nel<A> = NonEmptyList<A>
 
@@ -95,7 +98,7 @@ class NonEmptyList<out A> private constructor(
             when (head) {
                 is Either.Right<A, B> -> {
                     buf += head.b
-                    val x = NonEmptyList.fromList(v.tail)
+                    val x = fromList(v.tail)
                     when (x) {
                         is Some<NonEmptyList<Either<A, B>>> -> go(buf, f, x.t)
                         is None -> Unit
@@ -108,7 +111,7 @@ class NonEmptyList<out A> private constructor(
         fun <A, B> tailRecM(a: A, f: (A) -> HK<NonEmptyListHK, Either<A, B>>): NonEmptyList<B> {
             val buf = ArrayList<B>()
             go(buf, f, f(a).ev())
-            return NonEmptyList.fromListUnsafe(buf)
+            return fromListUnsafe(buf)
         }
 
     }

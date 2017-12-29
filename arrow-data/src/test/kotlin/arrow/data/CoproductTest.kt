@@ -1,5 +1,8 @@
 package arrow
 
+import arrow.core.Id
+import arrow.core.Right
+import arrow.data.Coproduct
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith

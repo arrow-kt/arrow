@@ -1,6 +1,6 @@
-package arrow
+package arrow.legacy
 
-import arrow.*
+import arrow.core.*
 
 @Deprecated("arrow.data.Either is right biased. This data type will be removed in future releases")
 class LeftProjection<out L, out R>(val e: Either<L, R>) {

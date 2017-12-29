@@ -1,4 +1,8 @@
-package arrow
+package arrow.instances
+
+import arrow.*
+import arrow.core.*
+import arrow.data.*
 
 @instance(Kleisli::class)
 interface KleisliFunctorInstance<F, D> : Functor<KleisliKindPartial<F, D>> {

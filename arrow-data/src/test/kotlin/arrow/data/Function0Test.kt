@@ -1,5 +1,7 @@
 package arrow
 
+import arrow.data.Function0
+import arrow.data.k
 import io.kotlintest.KTestJUnitRunner
 import org.junit.runner.RunWith
 

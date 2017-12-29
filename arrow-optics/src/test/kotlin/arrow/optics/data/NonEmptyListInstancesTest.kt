@@ -6,9 +6,8 @@ import arrow.Eq
 import arrow.IsoLaws
 import arrow.LensLaws
 import arrow.Monoid
-import arrow.Option
+import arrow.core.Option
 import arrow.UnitSpec
-import arrow.applicative
 import arrow.genFunctionAToB
 import arrow.genNonEmptyList
 import arrow.genOption

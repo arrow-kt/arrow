@@ -1,9 +1,6 @@
 package arrow
 
-import arrow.instances.ByteMonoid
-import arrow.instances.DoubleMonoid
-import arrow.instances.FloatMonoid
-import arrow.instances.ShortMonoid
+import arrow.instances.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll

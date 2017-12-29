@@ -1,6 +1,10 @@
 package arrow.optics
 
 import arrow.*
+import arrow.core.*
+import arrow.data.Const
+import arrow.data.ListKW
+import arrow.instances.IntMonoid
 
 /**
  * A [Fold] is an optic that allows to focus into structure and get multiple results.
@@ -107,7 +111,7 @@ interface Fold<S, A> {
      */
     fun <C> left(): Fold<Either<S, C>, Either<A, C>> = object : Fold<Either<S, C>, Either<A, C>> {
         override fun <R> foldMap(M: Monoid<R>, s: Either<S, C>, f: (Either<A, C>) -> R): R =
-                s.fold({ a1: S -> this@Fold.foldMap(M, a1, { b -> f(Left(b)) }) }, { c -> f(Right(c)) })
+                s.fold({ a1: S -> this@Fold.foldMap(M, a1, { b -> f(Either.Left(b)) }) }, { c -> f(Either.Right(c)) })
     }
 
     /**
@@ -115,7 +119,7 @@ interface Fold<S, A> {
      */
     fun <C> right(): Fold<Either<C, S>, Either<C, A>> = object : Fold<Either<C, S>, Either<C, A>> {
         override fun <R> foldMap(M: Monoid<R>, s: Either<C, S>, f: (Either<C, A>) -> R): R =
-                s.fold({ c -> f(Left(c)) }, { a1 -> this@Fold.foldMap(M, a1, { b -> f(Right(b)) }) })
+                s.fold({ c -> f(Either.Left(c)) }, { a1 -> this@Fold.foldMap(M, a1, { b -> f(Either.Right(b)) }) })
     }
 
     /**

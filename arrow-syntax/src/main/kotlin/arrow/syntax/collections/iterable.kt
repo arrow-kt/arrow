@@ -1,10 +1,10 @@
 package arrow.syntax.collections
 
 import arrow.syntax.option.*
-import arrow.Option
-import arrow.PartialFunction
-import arrow.Predicate
-import arrow.orElse
+import arrow.core.Option
+import arrow.core.PartialFunction
+import arrow.core.Predicate
+import arrow.core.orElse
 
 fun <T> Iterable<T>.firstOption(): Option<T> = firstOrNull().toOption()
 

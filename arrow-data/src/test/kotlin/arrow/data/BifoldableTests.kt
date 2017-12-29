@@ -1,5 +1,9 @@
 package arrow
 
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.Right
+import arrow.instances.compose
 import io.kotlintest.KTestJUnitRunner
 import org.junit.runner.RunWith
 

@@ -1,5 +1,6 @@
 package arrow
 
+import arrow.data.NonEmptyList
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith

@@ -1,10 +1,16 @@
-package arrow
+package arrow.data
+
+import arrow.core.Either
+import arrow.core.andThen
+import arrow.core.compose
+import arrow.higherkind
 
 fun <I, O> ((I) -> O).k(): Function1<I, O> = Function1(this)
 
 operator fun <I, O> Function1Kind<I, O>.invoke(i: I): O = this.ev().f(i)
 
-@higherkind class Function1<I, out O>(val f: (I) -> O) : Function1Kind<I, O> {
+@higherkind
+class Function1<I, out O>(val f: (I) -> O) : Function1Kind<I, O> {
 
     fun <B> map(f: (O) -> B): Function1<I, B> = f.compose { a: I -> this.f(a) }.k()
 

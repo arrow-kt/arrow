@@ -9,6 +9,7 @@ import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.*
+import arrow.core.*
 import arrow.laws.EqLaws
 import org.junit.runner.RunWith
 

@@ -1,5 +1,6 @@
 package arrow
 
+import arrow.data.*
 import arrow.instances.StateTMonadStateInstance
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe

@@ -1,10 +1,9 @@
 package arrow
 
+import arrow.data.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import arrow.Failure
-import arrow.Success
 import arrow.laws.EqLaws
 import io.kotlintest.matchers.fail
 import org.junit.runner.RunWith

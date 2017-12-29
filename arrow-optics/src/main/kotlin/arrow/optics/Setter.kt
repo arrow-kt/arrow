@@ -1,6 +1,8 @@
 package arrow.optics
 
-import arrow.*
+import arrow.core.Either
+import arrow.Functor
+import arrow.HK
 
 /**
  * [Setter] is a type alias for [PSetter] which fixes the type arguments

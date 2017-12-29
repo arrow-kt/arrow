@@ -1,17 +1,22 @@
 package arrow.optics
 
 import arrow.*
+import arrow.core.Either
+import arrow.data.Failure
+import arrow.data.Success
+import arrow.data.Try
+import arrow.syntax.validated.*
 
 /**
  * [PPrism] to focus into an [arrow.Try.Success]
  */
 fun <A, B> pTrySuccess(): PPrism<Try<A>, Try<B>, A, B> = PPrism(
-        getOrModify = { aTry -> aTry.fold({ Left(Failure<B>(it)) }, { Right(it) }) },
+        getOrModify = { aTry -> aTry.fold({ Either.Left(Failure<B>(it)) }, { Either.Right(it) }) },
         reverseGet = { b -> Success(b) }
 )
 
 /**
- * [Prism] to focus into an [arrow.None]
+ * [Prism] to focus into an [arrow.Option.None]
  */
 fun <A> trySuccess(): Prism<Try<A>, A> = pTrySuccess()
 
@@ -19,7 +24,7 @@ fun <A> trySuccess(): Prism<Try<A>, A> = pTrySuccess()
  * [Prism] to focus into an [arrow.Try.Failure]
  */
 fun <A> tryFailure(): Prism<Try<A>, Throwable> = Prism(
-        getOrModify = { aTry -> aTry.fold({ Right(it) }, { Left(Success(it)) }) },
+        getOrModify = { aTry -> aTry.fold({ Either.Right(it) }, { Either.Left(Success(it)) }) },
         reverseGet = { throwable -> Failure(throwable) }
 )
 
@@ -27,7 +32,7 @@ fun <A> tryFailure(): Prism<Try<A>, Throwable> = Prism(
  * [PIso] that defines the equality between a [Try] and [Either] of [Throwable] and [A]
  */
 fun <A, B> pTryToEither(): PIso<Try<A>, Try<B>, Either<Throwable, A>, Either<Throwable, B>> = PIso(
-        get = { it.fold({ Left(it) }, { Right(it) }) },
+        get = { it.fold({ Either.Left(it) }, { Either.Right(it) }) },
         reverseGet = { it.fold({ Failure(it) }, { Success(it) }) }
 )
 
@@ -40,7 +45,7 @@ fun <A> tryToEither(): Iso<Try<A>, Either<Throwable, A>> = pTryToEither()
  * [PIso] that defines the equality between a [Try] and [Validated] of [Throwable] and [A]
  */
 fun <A1, A2> pTryToValidated(): PIso<Try<A1>, Try<A2>, Validated<Throwable, A1>, Validated<Throwable, A2>> = PIso(
-        get = { it.fold({ Validated.Invalid(it) }, { Validated.Valid(it) }) },
+        get = { it.fold({ it.invalid() }, { it.valid() }) },
         reverseGet = { it.fold({ Failure(it) }, { Success(it) }) }
 )
 

@@ -1,5 +1,7 @@
 package arrow
 
+import arrow.core.Tuple2
+
 /**
  * The combination of a Monad with a MonoidK
  */

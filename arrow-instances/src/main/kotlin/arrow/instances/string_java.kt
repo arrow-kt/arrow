@@ -1,6 +1,8 @@
 package java_lang
 
-import arrow.*
+import arrow.instances.StringEqInstance
+import arrow.instances.StringMonoidInstance
+import arrow.instances.StringSemigroupInstance
 
 object StringMonoidInstanceImplicits {
     fun instance(): StringMonoidInstance = StringMonoidInstance

@@ -1,4 +1,6 @@
-package arrow
+package arrow.core
+
+import arrow.higherkind
 
 /**
  * Eval is a monad which controls evaluation of a value or a computation that produces a value.
@@ -15,7 +17,6 @@ package arrow
  * immediately if it is needed again. Always will run its computation
  * every time.
  *
- * Eval supports stack-safe lazy computation via the .map and .flatMap
  * methods, which use an internal trampoline to avoid stack overflows.
  * Computation done within .map and .flatMap is always done lazily,
  * even when applied to a Now instance.
@@ -40,7 +41,7 @@ sealed class Eval<out A> : EvalKind<A> {
                     }
                 }
 
-        fun <A> pure(a: A): Eval<A> = Eval.now(a)
+        fun <A> pure(a: A): Eval<A> = now(a)
 
         fun <A> now(a: A) = Now(a)
 
@@ -74,7 +75,7 @@ sealed class Eval<out A> : EvalKind<A> {
 
     fun <B> flatMap(f: (A) -> EvalKind<B>): Eval<B> =
             when (this) {
-                is Eval.Compute<A> -> object : Compute<B>() {
+                is Compute<A> -> object : Compute<B>() {
                     override fun <S> start(): Eval<S> = (this@Eval).start()
                     override fun <S> run(s: S): Eval<B> =
                             object : Compute<B>() {
@@ -82,11 +83,11 @@ sealed class Eval<out A> : EvalKind<A> {
                                 override fun <S1> run(s1: S1): Eval<B> = f(s1 as A).ev()
                             }
                 }
-                is Eval.Call<A> -> object : Eval.Compute<B>() {
+                is Call<A> -> object : Compute<B>() {
                     override fun <S> start(): Eval<S> = this@Eval.thunk() as Eval<S>
                     override fun <S> run(s: S): Eval<B> = f(s as A).ev()
                 }
-                else -> object : Eval.Compute<B>() {
+                else -> object : Compute<B>() {
                     override fun <S> start(): Eval<S> = this@Eval as Eval<S>
                     override fun <S> run(s: S): Eval<B> = f(s as A).ev()
                 }

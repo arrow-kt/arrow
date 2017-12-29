@@ -1,5 +1,8 @@
 package arrow
 
+import arrow.core.Eval
+import arrow.core.FunctionK
+
 typealias CofreeEval<S, A> = HK<S, Cofree<S, A>>
 
 @higherkind data class Cofree<S, A>(val FS: Functor<S>, val head: A, val tail: Eval<CofreeEval<S, A>>) : CofreeKind<S, A>, CofreeKindedJ<S, A> {

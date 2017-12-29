@@ -1,5 +1,7 @@
 package arrow
 
+import arrow.core.Tuple2
+
 /**
  * The [Order] type class is used to define a total ordering on some type [F] and is defined by being able to fully determine order between two instances.
  *

@@ -4,6 +4,8 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.FlowableEmitter
 import arrow.*
+import arrow.core.Either
+import arrow.core.Eval
 
 fun <A> Flowable<A>.k(): FlowableKW<A> = FlowableKW(this)
 

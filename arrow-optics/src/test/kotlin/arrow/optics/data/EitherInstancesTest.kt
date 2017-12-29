@@ -10,10 +10,10 @@ import arrow.Validated
 import arrow.genEither
 import arrow.genFunctionAToB
 import arrow.genValidated
-import arrow.Invalid
+import arrow.data.Invalid
 import arrow.invalid
 import arrow.valid
-import arrow.Valid
+import arrow.data.Valid
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

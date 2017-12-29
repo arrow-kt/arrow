@@ -1,5 +1,7 @@
 package arrow
 
+import arrow.core.Eval
+import arrow.instances.IntMonoid
 import io.kotlintest.properties.forAll
 
 object BifoldableLaws {

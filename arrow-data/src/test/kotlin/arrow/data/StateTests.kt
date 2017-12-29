@@ -1,5 +1,12 @@
 package arrow
 
+import arrow.core.Id
+import arrow.core.Tuple2
+import arrow.core.toT
+import arrow.data.State
+import arrow.data.run
+import arrow.data.runA
+import arrow.data.runS
 import arrow.syntax.collections.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe

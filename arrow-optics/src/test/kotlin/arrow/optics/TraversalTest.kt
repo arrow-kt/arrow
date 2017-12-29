@@ -4,6 +4,9 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.*
+import arrow.core.Option
+import arrow.core.toT
+import arrow.data.k
 import org.junit.runner.RunWith
 import arrow.optics.PTraversal.Companion.fromTraversable
 

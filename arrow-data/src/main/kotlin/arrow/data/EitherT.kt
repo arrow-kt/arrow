@@ -1,4 +1,10 @@
-package arrow
+package arrow.data
+
+import arrow.*
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
+import arrow.core.flatMap
 
 /**
  * [EitherT]`<F, A, B>` is a light wrapper on an `F<`[Either]`<A, B>>` with some
@@ -57,7 +63,7 @@ package arrow
 
     inline fun <C, D> transform(crossinline f: (Either<A, B>) -> Either<C, D>, FF: Functor<F>): EitherT<F, C, D> = EitherT(FF.map(value, { f(it) }))
 
-    inline fun <C> subflatMap(crossinline f: (B) -> Either<A, C>, FF: Functor<F>): EitherT<F, A, C> = transform({ it.flatMap(f) }, FF)
+    fun <C> subflatMap(f: (B) -> Either<A, C>, FF: Functor<F>): EitherT<F, A, C> = transform({ it.flatMap(f) }, FF)
 
     fun toOptionT(FF: Functor<F>): OptionT<F, B> = OptionT(FF.map(value, { it.toOption() }))
 

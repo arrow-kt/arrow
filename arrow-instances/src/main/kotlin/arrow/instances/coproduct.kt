@@ -1,4 +1,8 @@
-package arrow
+package arrow.instances
+
+import arrow.*
+import arrow.core.*
+import arrow.data.*
 
 interface CoproductFunctorInstance<F, G> : Functor<CoproductKindPartial<F, G>> {
 
@@ -82,7 +86,7 @@ object CoproductTraverseInstanceImplicits {
     }
 }
 
-inline fun <reified F, reified G> Coproduct.Companion.comonad(CF: Comonad<F> = arrow.comonad(), CG: Comonad<G>): CoproductComonadInstance<F, G> =
+inline fun <reified F, reified G> Coproduct.Companion.comonad(CF: Comonad<F> = comonad(), CG: Comonad<G>): CoproductComonadInstance<F, G> =
         CoproductComonadInstanceImplicits.instance(CF, CG)
 
 inline fun <reified F, reified G> Coproduct.Companion.functor(FF: Functor<F> = arrow.functor(), FG: Functor<G> = arrow.functor()): CoproductFunctorInstance<F, G> =

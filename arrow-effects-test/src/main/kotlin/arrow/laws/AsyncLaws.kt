@@ -3,6 +3,11 @@ package arrow.effects
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.*
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
+import arrow.data.Try
+import arrow.data.recover
 import arrow.effects.data.internal.BindingCancellationException
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.newSingleThreadContext

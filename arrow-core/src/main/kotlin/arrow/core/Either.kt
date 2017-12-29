@@ -1,4 +1,7 @@
-package arrow
+package arrow.core
+
+import arrow.*
+import arrow.legacy.*
 
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Either.scala
@@ -41,36 +44,36 @@ package arrow
      * @return the results of applying the function
      */
     inline fun <C> fold(crossinline fa: (A) -> C, crossinline fb: (B) -> C): C = when (this) {
-        is Either.Right<A, B> -> fb(b)
-        is Either.Left<A, B> -> fa(a)
+        is Right<A, B> -> fb(b)
+        is Left<A, B> -> fa(a)
     }
 
     @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("getOrElse { ifLeft }"))
     fun get(): B = when (this) {
-        is Either.Right -> b
-        is Either.Left -> throw NoSuchElementException("Disjunction.Left")
+        is Right -> b
+        is Left -> throw NoSuchElementException("Disjunction.Left")
     }
 
     fun <C> foldLeft(b: C, f: (C, B) -> C): C =
             this.ev().let { either ->
                 when (either) {
-                    is Either.Right -> f(b, either.b)
-                    is Either.Left -> b
+                    is Right -> f(b, either.b)
+                    is Left -> b
                 }
             }
 
     fun <C> foldRight(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
             this.ev().let { either ->
                 when (either) {
-                    is Either.Right -> f(either.b, lb)
-                    is Either.Left -> lb
+                    is Right -> f(either.b, lb)
+                    is Left -> lb
                 }
             }
 
     @Deprecated("arrow.data.Either is right biased. This method will be removed in future releases")
     fun toDisjunction(): Disjunction<A, B> = when (this) {
-        is Either.Right -> Disjunction.Right(b)
-        is Either.Left -> Disjunction.Left(a)
+        is Right -> Disjunction.Right(b)
+        is Left -> Disjunction.Left(a)
     }
 
     /**
@@ -166,12 +169,12 @@ package arrow
         tailrec fun <L, A, B> tailRecM(a: A, f: (A) -> HK<EitherKindPartial<L>, Either<A, B>>): Either<L, B> {
             val ev: Either<L, Either<A, B>> = f(a).ev()
             return when (ev) {
-                is Either.Left<L, Either<A, B>> -> Left(ev.a)
-                is Either.Right<L, Either<A, B>> -> {
+                is Left<L, Either<A, B>> -> Left(ev.a)
+                is Right<L, Either<A, B>> -> {
                     val b: Either<A, B> = ev.b
                     when (b) {
-                        is Either.Left<A, B> -> tailRecM(b.a, f)
-                        is Either.Right<A, B> -> Right(b.b)
+                        is Left<A, B> -> tailRecM(b.a, f)
+                        is Right<A, B> -> Right(b.b)
                     }
                 }
             }
@@ -189,7 +192,7 @@ fun <R> Right(right: R): Either<Nothing, R> = Either.right(right)
  *
  * @param f The function to bind across [Either.Right].
  */
-inline fun <A, B, C> Either<A, B>.flatMap(crossinline f: (B) -> Either<A, C>): Either<A, C> = fold({ Left(it) }, { f(it) })
+fun <A, B, C> Either<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> = fold({ Left(it) }, { f(it) })
 
 /**
  * Returns the value from this [Either.Right] or the given argument if this is a [Either.Left].

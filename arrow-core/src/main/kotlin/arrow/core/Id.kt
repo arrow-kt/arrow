@@ -1,4 +1,6 @@
-package arrow
+package arrow.core
+
+import arrow.higherkind
 
 fun <A> IdKind<A>.value(): A = this.ev().value
 

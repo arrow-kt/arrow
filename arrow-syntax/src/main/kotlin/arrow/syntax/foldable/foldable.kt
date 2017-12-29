@@ -1,6 +1,8 @@
 package arrow.syntax.foldable
 
 import arrow.*
+import arrow.core.Eval
+import arrow.core.Option
 
 inline fun <reified F, A, B> HK<F, A>.foldLeft(FT: Foldable<F> = foldable(), b: B, noinline f: (B, A) -> B): B = FT.foldLeft(this, b, f)
 

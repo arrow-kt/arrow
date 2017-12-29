@@ -1,4 +1,8 @@
-package arrow
+package arrow.data
+
+import arrow.*
+import arrow.core.*
+import arrow.legacy.*
 
 typealias Failure<A> = Try.Failure<A>
 typealias Success<A> = Try.Success<A>
@@ -19,7 +23,7 @@ sealed class Try<out A> : TryKind<A> {
         tailrec fun <A, B> tailRecM(a: A, f: (A) -> TryKind<Either<A, B>>): Try<B> {
             val ev: Try<Either<A, B>> = f(a).ev()
             return when (ev) {
-                is Failure -> arrow.monadError<TryHK, Throwable>().raiseError<B>(ev.exception).ev()
+                is Failure -> monadError<TryHK, Throwable>().raiseError<B>(ev.exception).ev()
                 is Success -> {
                     val b: Either<A, B> = ev.value
                     when (b) {
@@ -46,14 +50,14 @@ sealed class Try<out A> : TryKind<A> {
     operator fun invoke() = get()
 
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, Try<B>> =
-            this.ev().fold({ GA.pure(Try.raise(IllegalStateException())) }, { GA.map(f(it), { Try { it } }) })
+            this.ev().fold({ GA.pure(raise(IllegalStateException())) }, { GA.map(f(it), { Try { it } }) })
 
     fun <B> ap(ff: TryKind<(A) -> B>): Try<B> = ff.ev().flatMap { f -> map(f) }.ev()
 
     /**
      * Returns the given function applied to the value from this `Success` or returns this if this is a `Failure`.
      */
-    inline fun <B> flatMap(crossinline f: (A) -> TryKind<B>): Try<B> = fold({ Try.raise(it) }, { f(it).ev() })
+    inline fun <B> flatMap(crossinline f: (A) -> TryKind<B>): Try<B> = fold({ raise(it) }, { f(it).ev() })
 
     /**
      * Maps the given function to the value from this `Success` or returns this if this is a `Failure`.

@@ -1,4 +1,7 @@
-package arrow
+package arrow.data
+
+import arrow.*
+import arrow.core.*
 
 @higherkind
 data class MapKW<K, out A>(val map: Map<K, A>) : MapKWKind<K, A>, Map<K, A> by map {
@@ -40,7 +43,7 @@ data class MapKW<K, out A>(val map: Map<K, A>) : MapKWKind<K, A>, Map<K, A> by m
             this.map.foldLeft(b) { m, (k, v) -> f(m.k(), Tuple2(k, v)) }.k()
 
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, MapKW<K, B>> =
-            Foldable.iterateRight(this.map.iterator(), Eval.always { GA.pure(emptyMap<K, B>().k()) })({ kv, lbuf ->
+            (Foldable.iterateRight(this.map.iterator(), Eval.always { GA.pure(emptyMap<K, B>().k()) }))({ kv, lbuf ->
                 GA.map2Eval(f(kv.value), lbuf) { (mapOf(kv.key to it.a).k() + it.b).k() }
             }).value()
 

@@ -1,5 +1,8 @@
 package arrow
 
+import arrow.core.Left
+import arrow.core.Right
+import arrow.data.Kleisli
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.experimental.newSingleThreadContext

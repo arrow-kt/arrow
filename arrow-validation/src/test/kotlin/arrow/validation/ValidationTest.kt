@@ -1,6 +1,6 @@
 package arrow.validation
 
-import arrow.Either
+import arrow.core.Either
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import arrow.UnitSpec

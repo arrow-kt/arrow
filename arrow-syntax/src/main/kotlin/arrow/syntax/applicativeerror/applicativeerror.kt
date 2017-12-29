@@ -1,6 +1,7 @@
 package arrow.syntax.applicativeerror
 
 import arrow.*
+import arrow.core.Either
 
 inline fun <reified F, reified E, A> A.raiseError(FT: ApplicativeError<F, E> = applicativeError(), e: E): HK<F, A> = FT.raiseError<A>(e)
 

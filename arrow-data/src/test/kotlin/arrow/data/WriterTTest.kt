@@ -1,5 +1,12 @@
 package arrow
 
+import arrow.core.Option
+import arrow.core.Tuple2
+import arrow.data.ListKW
+import arrow.data.NonEmptyList
+import arrow.data.WriterT
+import arrow.instances.IntMonoid
+import arrow.instances.monad
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith

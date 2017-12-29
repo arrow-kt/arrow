@@ -1,4 +1,8 @@
-package arrow
+package arrow.instances
+
+import arrow.*
+import arrow.core.*
+import arrow.data.*
 
 @instance(ListKW::class)
 interface ListKWSemigroupInstance<A> : Semigroup<ListKW<A>> {
@@ -23,88 +27,88 @@ interface ListKWEqInstance<A> : Eq<ListKW<A>> {
 }
 
 @instance(ListKW::class)
-interface ListKWFunctorInstance : arrow.Functor<ListKWHK> {
-    override fun <A, B> map(fa: arrow.ListKWKind<A>, f: kotlin.Function1<A, B>): arrow.ListKW<B> =
+interface ListKWFunctorInstance : Functor<ListKWHK> {
+    override fun <A, B> map(fa: ListKWKind<A>, f: kotlin.Function1<A, B>): ListKW<B> =
             fa.ev().map(f)
 }
 
 @instance(ListKW::class)
-interface ListKWApplicativeInstance : arrow.Applicative<ListKWHK> {
-    override fun <A, B> ap(fa: arrow.ListKWKind<A>, ff: arrow.ListKWKind<kotlin.Function1<A, B>>): arrow.ListKW<B> =
+interface ListKWApplicativeInstance : Applicative<ListKWHK> {
+    override fun <A, B> ap(fa: ListKWKind<A>, ff: ListKWKind<kotlin.Function1<A, B>>): ListKW<B> =
             fa.ev().ap(ff)
 
-    override fun <A, B> map(fa: arrow.ListKWKind<A>, f: kotlin.Function1<A, B>): arrow.ListKW<B> =
+    override fun <A, B> map(fa: ListKWKind<A>, f: kotlin.Function1<A, B>): ListKW<B> =
             fa.ev().map(f)
 
-    override fun <A, B, Z> map2(fa: arrow.ListKWKind<A>, fb: arrow.ListKWKind<B>, f: kotlin.Function1<arrow.Tuple2<A, B>, Z>): arrow.ListKW<Z> =
+    override fun <A, B, Z> map2(fa: ListKWKind<A>, fb: ListKWKind<B>, f: kotlin.Function1<Tuple2<A, B>, Z>): ListKW<Z> =
             fa.ev().map2(fb, f)
 
-    override fun <A> pure(a: A): arrow.ListKW<A> =
-            arrow.ListKW.pure(a)
+    override fun <A> pure(a: A): ListKW<A> =
+            ListKW.pure(a)
 }
 
 @instance(ListKW::class)
-interface ListKWMonadInstance : arrow.Monad<ListKWHK> {
-    override fun <A, B> ap(fa: arrow.ListKWKind<A>, ff: arrow.ListKWKind<kotlin.Function1<A, B>>): arrow.ListKW<B> =
+interface ListKWMonadInstance : Monad<ListKWHK> {
+    override fun <A, B> ap(fa: ListKWKind<A>, ff: ListKWKind<kotlin.Function1<A, B>>): ListKW<B> =
             fa.ev().ap(ff)
 
-    override fun <A, B> flatMap(fa: arrow.ListKWKind<A>, f: kotlin.Function1<A, arrow.ListKWKind<B>>): arrow.ListKW<B> =
+    override fun <A, B> flatMap(fa: ListKWKind<A>, f: kotlin.Function1<A, ListKWKind<B>>): ListKW<B> =
             fa.ev().flatMap(f)
 
-    override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, arrow.ListKWKind<arrow.Either<A, B>>>): arrow.ListKW<B> =
-            arrow.ListKW.tailRecM(a, f)
+    override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ListKWKind<Either<A, B>>>): ListKW<B> =
+            ListKW.tailRecM(a, f)
 
-    override fun <A, B> map(fa: arrow.ListKWKind<A>, f: kotlin.Function1<A, B>): arrow.ListKW<B> =
+    override fun <A, B> map(fa: ListKWKind<A>, f: kotlin.Function1<A, B>): ListKW<B> =
             fa.ev().map(f)
 
-    override fun <A, B, Z> map2(fa: arrow.ListKWKind<A>, fb: arrow.ListKWKind<B>, f: kotlin.Function1<arrow.Tuple2<A, B>, Z>): arrow.ListKW<Z> =
+    override fun <A, B, Z> map2(fa: ListKWKind<A>, fb: ListKWKind<B>, f: kotlin.Function1<Tuple2<A, B>, Z>): ListKW<Z> =
             fa.ev().map2(fb, f)
 
-    override fun <A> pure(a: A): arrow.ListKW<A> =
-            arrow.ListKW.pure(a)
+    override fun <A> pure(a: A): ListKW<A> =
+            ListKW.pure(a)
 }
 
 @instance(ListKW::class)
-interface ListKWFoldableInstance : arrow.Foldable<ListKWHK> {
-    override fun <A, B> foldLeft(fa: arrow.ListKWKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =
+interface ListKWFoldableInstance : Foldable<ListKWHK> {
+    override fun <A, B> foldLeft(fa: ListKWKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.ev().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: arrow.ListKWKind<A>, lb: arrow.Eval<B>, f: kotlin.Function2<A, arrow.Eval<B>, arrow.Eval<B>>): arrow.Eval<B> =
+    override fun <A, B> foldRight(fa: ListKWKind<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
             fa.ev().foldRight(lb, f)
 
-    override fun <A> isEmpty(fa: arrow.ListKWKind<A>): kotlin.Boolean =
+    override fun <A> isEmpty(fa: ListKWKind<A>): kotlin.Boolean =
             fa.ev().isEmpty()
 }
 
 @instance(ListKW::class)
-interface ListKWTraverseInstance : arrow.Traverse<ListKWHK> {
-    override fun <A, B> map(fa: arrow.ListKWKind<A>, f: kotlin.Function1<A, B>): arrow.ListKW<B> =
+interface ListKWTraverseInstance : Traverse<ListKWHK> {
+    override fun <A, B> map(fa: ListKWKind<A>, f: kotlin.Function1<A, B>): ListKW<B> =
             fa.ev().map(f)
 
-    override fun <G, A, B> traverse(fa: arrow.ListKWKind<A>, f: kotlin.Function1<A, arrow.HK<G, B>>, GA: arrow.Applicative<G>): arrow.HK<G, arrow.ListKW<B>> =
+    override fun <G, A, B> traverse(fa: ListKWKind<A>, f: kotlin.Function1<A, HK<G, B>>, GA: Applicative<G>): HK<G, ListKW<B>> =
             fa.ev().traverse(f, GA)
 
-    override fun <A, B> foldLeft(fa: arrow.ListKWKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =
+    override fun <A, B> foldLeft(fa: ListKWKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.ev().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: arrow.ListKWKind<A>, lb: arrow.Eval<B>, f: kotlin.Function2<A, arrow.Eval<B>, arrow.Eval<B>>): arrow.Eval<B> =
+    override fun <A, B> foldRight(fa: ListKWKind<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
             fa.ev().foldRight(lb, f)
 
-    override fun <A> isEmpty(fa: arrow.ListKWKind<A>): kotlin.Boolean =
+    override fun <A> isEmpty(fa: ListKWKind<A>): kotlin.Boolean =
             fa.ev().isEmpty()
 }
 
 @instance(ListKW::class)
-interface ListKWSemigroupKInstance : arrow.SemigroupK<ListKWHK> {
-    override fun <A> combineK(x: arrow.ListKWKind<A>, y: arrow.ListKWKind<A>): arrow.ListKW<A> =
+interface ListKWSemigroupKInstance : SemigroupK<ListKWHK> {
+    override fun <A> combineK(x: ListKWKind<A>, y: ListKWKind<A>): ListKW<A> =
             x.ev().combineK(y)
 }
 
 @instance(ListKW::class)
-interface ListKWMonoidKInstance : arrow.MonoidK<ListKWHK> {
-    override fun <A> empty(): arrow.ListKW<A> =
-            arrow.ListKW.empty()
+interface ListKWMonoidKInstance : MonoidK<ListKWHK> {
+    override fun <A> empty(): ListKW<A> =
+            ListKW.empty()
 
-    override fun <A> combineK(x: arrow.ListKWKind<A>, y: arrow.ListKWKind<A>): arrow.ListKW<A> =
+    override fun <A> combineK(x: ListKWKind<A>, y: ListKWKind<A>): ListKW<A> =
             x.ev().combineK(y)
 }

@@ -1,5 +1,7 @@
 package arrow
 
+import arrow.core.Option
+import arrow.core.Some
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

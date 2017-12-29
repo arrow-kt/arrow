@@ -1,5 +1,7 @@
 package arrow
 
+import arrow.core.Tuple2
+
 interface Functor<F> : Typeclass {
 
     fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B>

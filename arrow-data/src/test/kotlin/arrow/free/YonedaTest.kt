@@ -1,5 +1,6 @@
 package arrow
 
+import arrow.core.Id
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
@@ -20,7 +21,7 @@ class YonedaTest : UnitSpec() {
             functor<YonedaKindPartial<IdHK>>() shouldNotBe null
         }
 
-        testLaws(FunctorLaws.laws(F, { Yoneda(arrow.Id(it)) }, EQ))
+        testLaws(FunctorLaws.laws(F, { Yoneda(Id(it)) }, EQ))
 
         "toCoyoneda should convert to an equivalent Coyoneda" {
             forAll { x: Int ->

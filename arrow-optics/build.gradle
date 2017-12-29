@@ -1,5 +1,5 @@
 dependencies {
-    compile project(':arrow-instances')
+    compile project(':arrow-syntax')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
     testCompile project(':arrow-test')

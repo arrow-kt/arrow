@@ -1,6 +1,8 @@
-package arrow
+package arrow.instances
 
 import arrow.*
+import arrow.core.Eval
+import arrow.data.*
 
 @instance(Validated::class)
 interface ValidatedFunctorInstance<E> : Functor<ValidatedKindPartial<E>> {

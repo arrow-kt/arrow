@@ -1,4 +1,4 @@
-package arrow
+package arrow.core
 
 fun <P1, T> constant(t: T): (P1) -> T = { _: P1 -> t }
 

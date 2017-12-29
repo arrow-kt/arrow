@@ -1,7 +1,10 @@
-package arrow
+package arrow.instances
 
-import arrow.Either
-import arrow.Function1
+import arrow.Applicative
+import arrow.Functor
+import arrow.Monad
+import arrow.core.*
+import arrow.data.*
 import arrow.instance
 
 @instance(Function1::class)

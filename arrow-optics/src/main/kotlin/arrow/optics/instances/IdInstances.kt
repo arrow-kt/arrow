@@ -1,8 +1,8 @@
 package arrow.optics
 
-import arrow.Id
+import arrow.core.Id
 import arrow.IdKind
-import arrow.value
+import arrow.core.value
 
 /**
  * [PIso] that defines the equality between a [Id] wrapped type [A] and the type [A] itself.

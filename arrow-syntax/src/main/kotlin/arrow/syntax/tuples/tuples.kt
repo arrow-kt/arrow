@@ -1,6 +1,6 @@
 package arrow.syntax.tuples
 
-import arrow.*
+import arrow.core.*
 
 infix operator fun <A, B, C, D, E, F, G, H, I, J> Tuple9<A, B, C, D, E, F, G, H, I>.plus(j: J): Tuple10<A, B, C, D, E, F, G, H, I, J> =
         Tuple10(this.a, this.b, this.c, this.d, this.e, this.f, this.g, this.h, this.i, j)

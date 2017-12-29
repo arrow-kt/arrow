@@ -1,4 +1,7 @@
-package arrow
+package arrow.data
+
+import arrow.*
+import arrow.core.Option
 
 fun <A, T> ConstKind<A, T>.value(): A = this.ev().value
 
