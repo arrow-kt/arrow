@@ -1,5 +1,6 @@
-package arrow
+package arrow.recursion.typeclass
 
+import arrow.*
 import arrow.instances.ComposedFunctor
 import arrow.instances.ComposedTraverse
 

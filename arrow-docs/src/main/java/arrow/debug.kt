@@ -3,7 +3,8 @@ package arrow.debug
 import kotlin.reflect.KClass
 import arrow.*
 import arrow.data.Try
-import arrow.effects.*
+import arrow.effects.AsyncContext
+import arrow.effects.asyncContext
 
 inline fun <reified F, reified E> debugInstanceLookups(): Map<KClass<out Typeclass>, () -> Typeclass> = mapOf(
         Alternative::class to { alternative<F>() },
