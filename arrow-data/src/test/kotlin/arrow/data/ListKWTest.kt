@@ -1,7 +1,17 @@
 package arrow
 
 import arrow.data.ListKW
+import arrow.data.ListKWHK
+import arrow.data.ev
 import arrow.data.k
+import arrow.instances.applicative
+import arrow.instances.monoidK
+import arrow.instances.semigroupK
+import arrow.instances.traverse
+import arrow.mtl.functorFilter
+import arrow.mtl.instances.monadCombine
+import arrow.mtl.monadCombine
+import arrow.mtl.monadFilter
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
@@ -42,7 +52,7 @@ class ListKWTest : UnitSpec() {
                 { n -> ListKW(listOf({ s: Int -> n * s })) },
                 object : Eq<HK<ListKWHK, Int>> {
                     override fun eqv(a: HK<ListKWHK, Int>, b: HK<ListKWHK, Int>): Boolean =
-                            arrow.test.laws.ev().list == arrow.test.laws.ev().list
+                            a.ev().list == b.ev().list
                 })
         )
     }

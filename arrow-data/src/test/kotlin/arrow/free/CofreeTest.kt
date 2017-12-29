@@ -5,12 +5,12 @@ import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import arrow.free.Cofree.Companion.unfold
 import arrow.core.*
-import arrow.data.ListKW
-import arrow.data.NonEmptyList
-import arrow.data.OptionT
-import arrow.free.Cofree
-import arrow.free.cata
-import arrow.free.cataM
+import arrow.data.*
+import arrow.free.*
+import arrow.free.instances.comonad
+import arrow.instances.functor
+import arrow.instances.monad
+import arrow.instances.traverse
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
@@ -36,7 +36,7 @@ class CofreeTest : UnitSpec() {
                 if (it % 2 == 0) None else Some(it + 1)
             })
         }, Eq { a, b ->
-            arrow.test.laws.ev().run().extract() == arrow.test.laws.ev().run().extract()
+            a.ev().run().extract() == b.ev().run().extract()
         }))
 
         "tailForced should evaluate and return" {

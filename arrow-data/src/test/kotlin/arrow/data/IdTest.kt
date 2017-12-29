@@ -1,6 +1,11 @@
 package arrow
 
 import arrow.core.Id
+import arrow.core.IdKind
+import arrow.instances.comonad
+import arrow.instances.functor
+import arrow.instances.monad
+import arrow.instances.traverse
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import arrow.test.laws.EqLaws

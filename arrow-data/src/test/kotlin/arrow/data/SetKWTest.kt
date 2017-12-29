@@ -1,6 +1,10 @@
 package arrow
 
 import arrow.data.SetKW
+import arrow.data.SetKWHK
+import arrow.instances.foldable
+import arrow.instances.monoidK
+import arrow.instances.semigroupK
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import arrow.test.laws.EqLaws

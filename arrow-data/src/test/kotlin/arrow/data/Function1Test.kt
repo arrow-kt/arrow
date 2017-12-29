@@ -1,6 +1,8 @@
 package arrow
 
-import arrow.data.Function1
+import arrow.data.*
+import arrow.instances.monad
+import arrow.mtl.monadReader
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith

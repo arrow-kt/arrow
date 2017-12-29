@@ -1,14 +1,14 @@
 package arrow
 
-import arrow.core.Id
-import arrow.core.Option
-import arrow.core.Some
+import arrow.core.*
 import arrow.data.NonEmptyList
+import arrow.data.ev
 import arrow.free.Free
+import arrow.free.FreeKindPartial
+import arrow.free.ev
 import arrow.free.foldMap
 import arrow.free.instances.FreeEq
 import arrow.free.instances.FreeMonadInstance
-import arrow.instances.FreeEq
 import arrow.instances.monad
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
@@ -17,8 +17,10 @@ import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadLaws
 import arrow.typeclasses.applicative
+import arrow.typeclasses.binding
 import arrow.typeclasses.functor
 import arrow.typeclasses.monad
+import io.kotlintest.matchers.shouldBe
 
 sealed class Ops<out A> : HK<Ops.F, A> {
 
@@ -40,9 +42,17 @@ fun <A> HK<Ops.F, A>.ev(): Ops<A> = this as Ops<A>
 @RunWith(KTestJUnitRunner::class)
 class FreeTest : UnitSpec() {
 
-    private val program = arrow.test.laws.ev()
+    private val program = Ops.binding {
+        val added = Ops.add(10, 10).bind()
+        val subtracted = bind { Ops.subtract(added, 50) }
+        yields(subtracted)
+    }.ev()
 
-    private fun stackSafeTestProgram(n: Int, stopAt: Int): Free<Ops.F, Int> = arrow.test.laws.ev()
+    private fun stackSafeTestProgram(n: Int, stopAt: Int): Free<Ops.F, Int> = Ops.binding {
+        val v = Ops.add(n, 1).bind()
+        val r = bind { if (v < stopAt) stackSafeTestProgram(v, stopAt) else Free.pure(v) }
+        yields(r)
+    }.ev()
 
     init {
 
@@ -54,8 +64,8 @@ class FreeTest : UnitSpec() {
 
         val EQ: FreeEq<Ops.F, IdHK, Int> = FreeEq(idInterpreter)
         testLaws(
-            EqLaws.laws<Free<Ops.F, Int>>(EQ, { Ops.value(it) }),
-            MonadLaws.laws(Ops, EQ)
+                EqLaws.laws<Free<Ops.F, Int>>(EQ, { Ops.value(it) }),
+                MonadLaws.laws(Ops, EQ)
         )
 
         "Can interpret an ADT as Free operations" {

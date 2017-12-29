@@ -2,12 +2,16 @@ package arrow
 
 import arrow.core.*
 import arrow.data.NonEmptyList
+import arrow.data.ev
 import arrow.free.FreeApplicative
+import arrow.free.FreeApplicativeKindPartial
+import arrow.free.ev
+import arrow.free.foldK
 import arrow.free.instances.FreeApplicativeApplicativeInstance
 import arrow.free.instances.FreeApplicativeEq
-import arrow.instances.FreeApplicativeApplicativeInstance
-import arrow.instances.FreeApplicativeEq
 import arrow.instances.applicative
+import arrow.syntax.applicative.tupled
+import arrow.syntax.tuples.plus
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import arrow.test.laws.EqLaws
@@ -16,6 +20,7 @@ import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws
 import arrow.typeclasses.applicative
 import arrow.typeclasses.functor
+import io.kotlintest.matchers.shouldBe
 
 sealed class OpsAp<out A> : HK<OpsAp.F, A> {
 

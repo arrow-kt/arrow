@@ -1,12 +1,15 @@
 package arrow
 
-import arrow.core.Option
-import arrow.core.Tuple2
-import arrow.data.ListKW
-import arrow.data.NonEmptyList
-import arrow.data.WriterT
+import arrow.core.*
+import arrow.data.*
 import arrow.instances.IntMonoid
+import arrow.instances.applicative
 import arrow.instances.monad
+import arrow.instances.monoidK
+import arrow.mtl.instances.monadFilter
+import arrow.mtl.instances.monadWriter
+import arrow.mtl.monadFilter
+import arrow.mtl.monadWriter
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
@@ -48,14 +51,14 @@ class WriterTTest : UnitSpec() {
                 genIntSmall(),
                 genTuple(genIntSmall(), genIntSmall()),
                 Eq { a, b ->
-                    arrow.test.laws.ev().value.ev().let { optionA: Option<Tuple2<Int, Int>> ->
-                        val optionB = arrow.test.laws.ev().value.ev()
+                    a.ev().value.ev().let { optionA: Option<Tuple2<Int, Int>> ->
+                        val optionB = b.ev().value.ev()
                         optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Int> -> optionB.fold({ false }, { value == it }) })
                     }
                 },
                 Eq { a, b ->
-                    arrow.test.laws.ev().value.ev().let { optionA: Option<Tuple2<Int, Tuple2<Int, Int>>> ->
-                        val optionB = arrow.test.laws.ev().value.ev()
+                    a.ev().value.ev().let { optionA: Option<Tuple2<Int, Tuple2<Int, Int>>> ->
+                        val optionB = b.ev().value.ev()
                         optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Tuple2<Int, Int>> -> optionB.fold({ false }, { value == it }) })
                     }
                 }
@@ -65,8 +68,8 @@ class WriterTTest : UnitSpec() {
                 { WriterT(Option(Tuple2(it, it))) },
                 object : Eq<HK<WriterTKindPartial<OptionHK, Int>, Int>> {
                     override fun eqv(a: HK<WriterTKindPartial<OptionHK, Int>, Int>, b: HK<WriterTKindPartial<OptionHK, Int>, Int>): Boolean =
-                            arrow.test.laws.ev().value.ev().let { optionA: Option<Tuple2<Int, Int>> ->
-                                val optionB = arrow.test.laws.ev().value.ev()
+                            a.ev().value.ev().let { optionA: Option<Tuple2<Int, Int>> ->
+                                val optionB = b.ev().value.ev()
                                 optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Int> -> optionB.fold({ false }, { value == it }) })
                             }
                 })

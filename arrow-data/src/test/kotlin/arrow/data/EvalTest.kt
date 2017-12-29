@@ -3,7 +3,11 @@ package arrow
 import arrow.core.Eval
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
-import arrow.core.Eval.Now
+import arrow.core.Eval.*
+import arrow.core.EvalHK
+import arrow.core.ev
+import arrow.instances.comonad
+import arrow.instances.monad
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
@@ -14,7 +18,7 @@ import arrow.typeclasses.Eq
 @RunWith(KTestJUnitRunner::class)
 class EvalTest : UnitSpec() {
     val EQ: Eq<HK<EvalHK, Int>> = Eq { a, b ->
-        arrow.test.laws.ev().value() == arrow.test.laws.ev().value()
+        a.ev().value() == b.ev().value()
     }
 
     init {

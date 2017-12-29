@@ -2,17 +2,14 @@ package arrow.instances
 
 import io.kotlintest.KTestJUnitRunner
 import arrow.*
-import arrow.core.Id
-import arrow.core.Option
-import arrow.core.Some
+import arrow.core.*
 import arrow.data.*
+import arrow.mtl.instances.ComposedFunctorFilter
+import arrow.mtl.instances.functorFilter
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.*
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Nested
-import arrow.typeclasses.NestedType
-import arrow.typeclasses.unnest
+import arrow.typeclasses.*
 
 typealias OptionTNel = HK<OptionTKindPartial<NonEmptyListHK>, Int>
 

@@ -7,6 +7,7 @@ import arrow.data.State
 import arrow.data.run
 import arrow.data.runA
 import arrow.data.runS
+import arrow.instances.functor
 import arrow.syntax.collections.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe

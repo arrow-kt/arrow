@@ -1,7 +1,8 @@
 package arrow
 
-import arrow.data.Function0
-import arrow.data.k
+import arrow.data.*
+import arrow.instances.comonad
+import arrow.instances.monad
 import io.kotlintest.KTestJUnitRunner
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec

@@ -1,7 +1,8 @@
 package arrow
 
-import arrow.data.SortedMapKW
-import arrow.data.k
+import arrow.data.*
+import arrow.instances.monoid
+import arrow.instances.traverse
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
@@ -16,7 +17,7 @@ class SortedMapKWTest : UnitSpec() {
 
     val EQ: Eq<HK2<SortedMapKWHK, String, Int>> = object : Eq<HK2<SortedMapKWHK, String, Int>> {
         override fun eqv(a: HK2<SortedMapKWHK, String, Int>, b: HK2<SortedMapKWHK, String, Int>): Boolean =
-            arrow.test.laws.ev()["key"] == arrow.test.laws.ev()["key"]
+            a.ev()["key"] == b.ev()["key"]
     }
 
     init {

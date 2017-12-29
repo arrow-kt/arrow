@@ -1,7 +1,14 @@
 package arrow
 
+import arrow.core.IdHK
 import arrow.data.*
-import arrow.instances.StateTMonadStateInstance
+import arrow.instances.applicative
+import arrow.instances.monad
+import arrow.instances.semigroupK
+import arrow.mtl.instances.StateTMonadStateInstance
+import arrow.mtl.instances.monadCombine
+import arrow.mtl.instances.monadState
+import arrow.mtl.monadState
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith

@@ -1,6 +1,10 @@
 package arrow
 
 import arrow.core.*
+import arrow.instances.applicative
+import arrow.instances.monadError
+import arrow.instances.semigroupK
+import arrow.instances.traverse
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll

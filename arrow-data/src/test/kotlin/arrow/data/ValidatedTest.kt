@@ -9,8 +9,9 @@ import arrow.core.None
 import arrow.core.Right
 import arrow.core.Some
 import arrow.data.*
-import arrow.instances.IntMonoid
-import arrow.instances.StringMonoidInstance
+import arrow.instances.*
+import arrow.syntax.applicative.map
+import arrow.syntax.validated.valid
 import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec

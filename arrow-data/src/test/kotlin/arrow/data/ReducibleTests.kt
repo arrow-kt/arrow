@@ -5,6 +5,7 @@ import io.kotlintest.matchers.shouldBe
 import arrow.*
 import arrow.core.Tuple2
 import arrow.instances.LongMonoid
+import arrow.instances.foldable
 import arrow.test.laws.ReducibleLaws
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec

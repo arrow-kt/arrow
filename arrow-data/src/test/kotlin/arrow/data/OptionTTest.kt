@@ -1,14 +1,15 @@
 package arrow
 
-import arrow.core.Id
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
-import arrow.data.EitherT
-import arrow.data.NonEmptyList
-import arrow.data.OptionT
-import arrow.data.value
+import arrow.core.*
+import arrow.data.*
+import arrow.instances.applicative
 import arrow.instances.monad
+import arrow.instances.monoidK
+import arrow.instances.semigroupK
+import arrow.mtl.functorFilter
+import arrow.mtl.instances.functorFilter
+import arrow.mtl.instances.traverseFilter
+import arrow.mtl.traverseFilter
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.forAll
 import io.kotlintest.matchers.shouldNotBe

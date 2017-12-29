@@ -11,6 +11,7 @@ dependencies {
     testCompile project(':arrow-instances')
     testCompile project(':arrow-test')
     testCompile project(':arrow-free')
+    testCompile project(':arrow-mtl')
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

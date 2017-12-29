@@ -1,6 +1,7 @@
 package arrow
 
 import arrow.data.NonEmptyList
+import arrow.data.NonEmptyListHK
 import arrow.data.nel
 import arrow.instances.*
 import io.kotlintest.KTestJUnitRunner

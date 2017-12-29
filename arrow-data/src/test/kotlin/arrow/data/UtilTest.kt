@@ -1,7 +1,6 @@
 package arrow.data
 
 import arrow.core.*
-import identity
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith

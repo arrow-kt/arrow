@@ -1,14 +1,20 @@
 package arrow
 
+import arrow.core.EitherHK
 import arrow.core.Id
-import arrow.data.Kleisli
-import arrow.data.Try
+import arrow.core.IdHK
+import arrow.core.ev
+import arrow.data.*
+import arrow.instances.monad
+import arrow.instances.monadError
+import arrow.mtl.monadReader
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadErrorLaws
 import arrow.typeclasses.*
+import io.kotlintest.matchers.shouldBe
 
 @RunWith(KTestJUnitRunner::class)
 class KleisliTest : UnitSpec() {
@@ -31,9 +37,9 @@ class KleisliTest : UnitSpec() {
         "andThen should continue sequence" {
             val kleisli: Kleisli<IdHK, Int, Int> = Kleisli({ a: Int -> Id(a) })
 
-            arrow.test.laws.ev().value shouldBe 3
+            kleisli.andThen(Id(3), Id.monad()).run(0).ev().value shouldBe 3
 
-            arrow.test.laws.ev().value shouldBe 1
+            kleisli.andThen({ b -> Id(b + 1) }, Id.monad()).run(0).ev().value shouldBe 1
         }
     }
 }

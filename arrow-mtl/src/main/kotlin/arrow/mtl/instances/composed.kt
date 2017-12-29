@@ -2,9 +2,37 @@ package arrow.mtl.instances
 
 import arrow.*
 import arrow.core.Option
+import arrow.instances.ComposedFunctor
 import arrow.instances.ComposedTraverse
+import arrow.mtl.FunctorFilter
 import arrow.mtl.TraverseFilter
+import arrow.mtl.functorFilter
 import arrow.typeclasses.*
+
+interface ComposedFunctorFilter<F, G> : FunctorFilter<Nested<F, G>>, ComposedFunctor<F, G> {
+
+    override fun F(): Functor<F>
+
+    override fun G(): FunctorFilter<G>
+
+    override fun <A, B> mapFilter(fga: HK<Nested<F, G>, A>, f: (A) -> Option<B>): HK<Nested<F, G>, B> =
+            F().map(fga.unnest(), { G().mapFilter(it, f) }).nest()
+
+    fun <A, B> mapFilterC(fga: HK<F, HK<G, A>>, f: (A) -> Option<B>): HK<F, HK<G, B>> =
+            mapFilter(fga.nest(), f).unnest()
+
+    companion object {
+        operator fun <F, G> invoke(FF: Functor<F>, FFG: FunctorFilter<G>): ComposedFunctorFilter<F, G> =
+                object : ComposedFunctorFilter<F, G> {
+                    override fun F(): Functor<F> = FF
+
+                    override fun G(): FunctorFilter<G> = FFG
+                }
+    }
+}
+
+inline fun <reified F, reified G> Functor<F>.composeFilter(FFG: FunctorFilter<G> = functorFilter()):
+        FunctorFilter<Nested<F, G>> = ComposedFunctorFilter(this, FFG)
 
 interface ComposedTraverseFilter<F, G> :
         TraverseFilter<Nested<F, G>>,

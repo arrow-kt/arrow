@@ -1,7 +1,11 @@
 package arrow
 
 import arrow.core.Id
-import arrow.free.Yoneda
+import arrow.core.IdHK
+import arrow.core.ev
+import arrow.free.*
+import arrow.free.instances.functor
+import arrow.instances.functor
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
@@ -31,8 +35,8 @@ class YonedaTest : UnitSpec() {
         "toCoyoneda should convert to an equivalent Coyoneda" {
             forAll { x: Int ->
                 val op = Yoneda(Id(x.toString()))
-                val toYoneda = arrow.test.laws.ev()
-                val expected = arrow.test.laws.ev()
+                val toYoneda = op.toCoyoneda().lower(Id.functor()).ev()
+                val expected = Coyoneda(Id(x), Int::toString).lower(Id.functor()).ev()
 
                 expected == toYoneda
             }

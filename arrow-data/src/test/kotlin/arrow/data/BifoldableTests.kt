@@ -8,6 +8,7 @@ import arrow.test.UnitSpec
 import arrow.test.laws.BifoldableLaws
 import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Eq
+import arrow.typeclasses.binest
 
 @RunWith(KTestJUnitRunner::class)
 class BifoldableTests : UnitSpec() {

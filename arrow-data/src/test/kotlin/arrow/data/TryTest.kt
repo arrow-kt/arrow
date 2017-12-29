@@ -1,6 +1,11 @@
 package arrow
 
 import arrow.data.*
+import arrow.instances.applicative
+import arrow.instances.functor
+import arrow.instances.monadError
+import arrow.instances.traverse
+import arrow.syntax.applicative.map
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe

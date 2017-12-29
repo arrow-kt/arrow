@@ -1,7 +1,10 @@
 package arrow
 
-import arrow.data.Const
-import arrow.instances.IntMonoid
+import arrow.data.*
+import arrow.free.instances.*
+import arrow.instances.*
+import arrow.mtl.*
+import arrow.mtl.instances.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import arrow.test.laws.EqLaws

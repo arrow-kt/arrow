@@ -1,8 +1,8 @@
 package arrow
 
-import arrow.core.Id
-import arrow.core.Right
-import arrow.data.Coproduct
+import arrow.core.*
+import arrow.data.*
+import arrow.syntax.comonad.extract
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
@@ -14,7 +14,7 @@ import arrow.typeclasses.*
 @RunWith(KTestJUnitRunner::class)
 class CoproductTest : UnitSpec() {
     val EQ: Eq<HK3<CoproductHK, IdHK, IdHK, Int>> = Eq { a, b ->
-                arrow.test.laws.ev().extract() == arrow.test.laws.ev().extract()
+        a.ev().extract() == b.ev().extract()
     }
 
     init {

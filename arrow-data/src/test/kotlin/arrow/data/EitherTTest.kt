@@ -1,12 +1,12 @@
 package arrow
 
 import arrow.core.Id
+import arrow.core.IdHK
+import arrow.core.OptionHK
 import arrow.core.Right
 import arrow.data.EitherT
-import arrow.instances.applicative
-import arrow.instances.monadError
-import arrow.instances.semigroupK
-import arrow.instances.traverse
+import arrow.data.EitherTKindPartial
+import arrow.instances.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith

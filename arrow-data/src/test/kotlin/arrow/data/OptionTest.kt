@@ -10,6 +10,10 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.*
 import arrow.core.*
+import arrow.instances.monad
+import arrow.mtl.instances.monadFilter
+import arrow.mtl.instances.traverseFilter
+import arrow.mtl.traverseFilter
 import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec

@@ -9,6 +9,8 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Some
 import arrow.data.*
+import arrow.instances.applicative
+import arrow.instances.traverse
 import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec

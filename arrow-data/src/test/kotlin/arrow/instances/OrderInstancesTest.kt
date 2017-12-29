@@ -1,5 +1,6 @@
 package arrow.instances
 
+import arrow.syntax.order.toOrder
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.Gen
@@ -7,7 +8,7 @@ import arrow.test.laws.OrderLaws
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.typeclasses.order
-import arrow.toOrder
+import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

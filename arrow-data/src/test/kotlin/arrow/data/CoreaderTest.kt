@@ -1,6 +1,8 @@
 package arrow
 
 import arrow.core.Id
+import arrow.core.IdHK
+import arrow.core.IdKind
 import arrow.core.value
 import arrow.data.Cokleisli
 import arrow.data.Coreader
