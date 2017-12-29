@@ -1,11 +1,15 @@
-package arrow
+package arrow.test.laws
 
+import arrow.*
 import arrow.core.Left
 import arrow.core.Right
 import arrow.data.Kleisli
 import arrow.free.Free
 import arrow.free.bindingStackSafe
 import arrow.free.run
+import arrow.test.generators.genApplicative
+import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genIntSmall
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.experimental.newSingleThreadContext

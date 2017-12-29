@@ -1,6 +1,10 @@
-package arrow
+package arrow.test.laws
 
+import arrow.*
 import arrow.core.Either
+import arrow.test.generators.genApplicative
+import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genThrowable
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

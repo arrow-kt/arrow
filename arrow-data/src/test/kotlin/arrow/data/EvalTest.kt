@@ -6,11 +6,14 @@ import io.kotlintest.matchers.shouldBe
 import arrow.core.Eval.Now
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.concurrency.SideEffect
+import arrow.test.laws.ComonadLaws
+import arrow.test.laws.MonadLaws
 
 @RunWith(KTestJUnitRunner::class)
 class EvalTest : UnitSpec() {
     val EQ: Eq<HK<EvalHK, Int>>  = Eq { a, b ->
-        a.ev().value() == b.ev().value()
+        arrow.test.laws.ev().value() == arrow.test.laws.ev().value()
     }
 
     init {

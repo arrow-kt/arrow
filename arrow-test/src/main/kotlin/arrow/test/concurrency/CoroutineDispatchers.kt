@@ -1,4 +1,4 @@
-package arrow
+package arrow.test.concurrency
 
 import kotlinx.coroutines.experimental.CoroutineDispatcher
 import kotlinx.coroutines.experimental.asCoroutineDispatcher

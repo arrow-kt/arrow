@@ -3,13 +3,13 @@ package arrow.optics
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import arrow.Eq
-import arrow.LensLaws
+import arrow.test.laws.LensLaws
 import arrow.data.NonEmptyList
-import arrow.TraversalLaws
+import arrow.test.laws.TraversalLaws
 import arrow.data.Try
 import arrow.test.UnitSpec
-import arrow.genFunctionAToB
-import arrow.genTuple
+import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genTuple
 import arrow.optics.instances.*
 import org.junit.runner.RunWith
 

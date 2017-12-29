@@ -7,6 +7,10 @@ import arrow.*
 import arrow.core.Some
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.generators.genEither
+import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genTuple
+import arrow.test.laws.PrismLaws
 
 @RunWith(KTestJUnitRunner::class)
 class PrismTest : UnitSpec() {

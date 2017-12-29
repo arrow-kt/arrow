@@ -12,6 +12,8 @@ import io.kotlintest.matchers.shouldEqual
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.concurrency.SideEffect
+import arrow.test.laws.AsyncLaws
 
 @RunWith(KTestJUnitRunner::class)
 class IOTest : UnitSpec() {

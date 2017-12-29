@@ -3,11 +3,11 @@ package arrow.optics
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import arrow.Eq
-import arrow.IsoLaws
+import arrow.test.laws.IsoLaws
 import arrow.test.UnitSpec
-import arrow.genFunctionAToB
-import arrow.genMap
-import arrow.genMapKW
+import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genMap
+import arrow.test.generators.genMapKW
 import arrow.optics.instances.mapToMapKW
 import org.junit.runner.RunWith
 

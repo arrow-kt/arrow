@@ -14,6 +14,9 @@ import arrow.instances.StringMonoidInstance
 import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.ApplicativeLaws
+import arrow.test.laws.SemigroupKLaws
+import arrow.test.laws.TraverseLaws
 
 @RunWith(KTestJUnitRunner::class)
 class ValidatedTest : UnitSpec() {

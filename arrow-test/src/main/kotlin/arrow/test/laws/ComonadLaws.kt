@@ -1,8 +1,11 @@
-package arrow
+package arrow.test.laws
 
+import arrow.*
 import arrow.data.Cokleisli
 import arrow.syntax.comonad.extract
 import arrow.syntax.functor.map
+import arrow.test.generators.genConstructor
+import arrow.test.generators.genFunctionAToB
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

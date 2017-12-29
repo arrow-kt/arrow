@@ -1,7 +1,7 @@
 package arrow.test
 
 import arrow.Eq
-import arrow.Law
+import arrow.test.laws.Law
 import io.kotlintest.TestCase
 import io.kotlintest.specs.StringSpec
 

@@ -10,6 +10,9 @@ import arrow.instances.traverse
 import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.MonadLaws
+import arrow.test.laws.MonoidKLaws
+import arrow.test.laws.TraverseLaws
 
 @RunWith(KTestJUnitRunner::class)
 class SequenceKWTest : UnitSpec() {

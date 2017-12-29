@@ -1,5 +1,6 @@
-package arrow
+package arrow.test.laws
 
+import arrow.*
 import arrow.core.*
 import arrow.data.*
 import arrow.free.instances.applicative
@@ -7,6 +8,9 @@ import arrow.instances.*
 import arrow.syntax.foldable.foldMap
 import arrow.syntax.functor.*
 import arrow.syntax.traverse.*
+import arrow.test.generators.genConstructor
+import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genIntSmall
 import io.kotlintest.properties.forAll
 
 typealias TI<A> = Tuple2<IdKind<A>, IdKind<A>>

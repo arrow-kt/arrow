@@ -1,7 +1,11 @@
-package arrow
+package arrow.test.laws
 
+import arrow.*
 import arrow.syntax.applicative.map
 import arrow.syntax.applicative.tupled
+import arrow.test.generators.genApplicative
+import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genIntSmall
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

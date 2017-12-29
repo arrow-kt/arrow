@@ -7,6 +7,7 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.MonadErrorLaws
 
 @RunWith(KTestJUnitRunner::class)
 class KleisliTest : UnitSpec() {
@@ -29,9 +30,9 @@ class KleisliTest : UnitSpec() {
         "andThen should continue sequence" {
             val kleisli: Kleisli<IdHK, Int, Int> = Kleisli({ a: Int -> Id(a) })
 
-            kleisli.andThen(Id(3), Id.monad()).run(0).ev().value shouldBe 3
+            arrow.test.laws.ev().value shouldBe 3
 
-            kleisli.andThen({ b -> Id(b + 1) }, Id.monad()).run(0).ev().value shouldBe 1
+            arrow.test.laws.ev().value shouldBe 1
         }
     }
 }

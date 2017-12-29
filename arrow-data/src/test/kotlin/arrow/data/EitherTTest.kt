@@ -11,6 +11,9 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.MonadErrorLaws
+import arrow.test.laws.SemigroupKLaws
+import arrow.test.laws.TraverseLaws
 
 @RunWith(KTestJUnitRunner::class)
 class EitherTTest : UnitSpec() {

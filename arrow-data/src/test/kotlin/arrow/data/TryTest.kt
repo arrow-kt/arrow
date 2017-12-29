@@ -8,6 +8,8 @@ import arrow.test.laws.EqLaws
 import io.kotlintest.matchers.fail
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.MonadErrorLaws
+import arrow.test.laws.TraverseLaws
 
 @RunWith(KTestJUnitRunner::class)
 class TryTest : UnitSpec() {

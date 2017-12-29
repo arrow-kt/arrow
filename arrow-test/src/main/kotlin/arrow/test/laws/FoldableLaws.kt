@@ -1,10 +1,16 @@
-package arrow
+package arrow.test.laws
 
+import arrow.*
 import arrow.core.Eval
 import arrow.core.Id
 import arrow.core.value
 import arrow.instances.IntMonoid
 import arrow.instances.monad
+import arrow.test.concurrency.SideEffect
+import arrow.test.generators.genConstructor
+import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genIntPredicate
+import arrow.test.generators.genIntSmall
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

@@ -1,5 +1,10 @@
-package arrow
+package arrow.test.laws
 
+import arrow.Applicative
+import arrow.Eq
+import arrow.HK
+import arrow.SemigroupK
+import arrow.test.generators.genConstructor
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

@@ -8,6 +8,7 @@ import arrow.core.Some
 import arrow.data.*
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.*
 
 typealias OptionTNel = HK<OptionTKindPartial<NonEmptyListHK>, Int>
 

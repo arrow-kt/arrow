@@ -1,7 +1,11 @@
-package arrow
+package arrow.test.laws
 
+import arrow.*
 import arrow.core.Eval
 import arrow.instances.IntMonoid
+import arrow.test.generators.genConstructor
+import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genIntSmall
 import io.kotlintest.properties.forAll
 
 object BifoldableLaws {

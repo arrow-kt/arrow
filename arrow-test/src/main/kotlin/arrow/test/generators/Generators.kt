@@ -1,5 +1,8 @@
-package arrow
+package arrow.test.generators
 
+import arrow.Applicative
+import arrow.HK
+import arrow.applicative
 import arrow.core.*
 import arrow.data.*
 import io.kotlintest.properties.Gen

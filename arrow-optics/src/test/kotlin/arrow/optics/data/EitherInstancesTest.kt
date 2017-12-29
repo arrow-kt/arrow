@@ -3,13 +3,13 @@ package arrow.optics
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import arrow.Eq
-import arrow.IsoLaws
+import arrow.test.laws.IsoLaws
 import arrow.Monoid
 import arrow.test.UnitSpec
 import arrow.Validated
-import arrow.genEither
-import arrow.genFunctionAToB
-import arrow.genValidated
+import arrow.test.generators.genEither
+import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genValidated
 import arrow.data.Invalid
 import arrow.invalid
 import arrow.valid

@@ -17,6 +17,7 @@ import io.kotlintest.matchers.shouldNotBe
 import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.MonadLaws
 
 sealed class Ops<out A> : HK<Ops.F, A> {
 
@@ -38,17 +39,9 @@ fun <A> HK<Ops.F, A>.ev(): Ops<A> = this as Ops<A>
 @RunWith(KTestJUnitRunner::class)
 class FreeTest : UnitSpec() {
 
-    private val program = Ops.binding {
-        val added = Ops.add(10, 10).bind()
-        val subtracted = bind { Ops.subtract(added, 50) }
-        yields(subtracted)
-    }.ev()
+    private val program = arrow.test.laws.ev()
 
-    private fun stackSafeTestProgram(n: Int, stopAt: Int): Free<Ops.F, Int> = Ops.binding {
-        val v = Ops.add(n, 1).bind()
-        val r = bind { if (v < stopAt) stackSafeTestProgram(v, stopAt) else Free.pure(v) }
-        yields(r)
-    }.ev()
+    private fun stackSafeTestProgram(n: Int, stopAt: Int): Free<Ops.F, Int> = arrow.test.laws.ev()
 
     init {
 

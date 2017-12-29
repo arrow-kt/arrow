@@ -5,6 +5,8 @@ import arrow.data.k
 import io.kotlintest.KTestJUnitRunner
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.ComonadLaws
+import arrow.test.laws.MonadLaws
 
 @RunWith(KTestJUnitRunner::class)
 class Function0Test : UnitSpec() {

@@ -11,6 +11,8 @@ import kotlinx.coroutines.experimental.Unconfined
 import kotlinx.coroutines.experimental.runBlocking
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.generators.genIntSmall
+import arrow.test.laws.AsyncLaws
 
 @RunWith(KTestJUnitRunner::class)
 class DeferredKWTest : UnitSpec() {

@@ -4,9 +4,9 @@ import arrow.data.ListKW
 import arrow.data.k
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
-import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.*
 
 @RunWith(KTestJUnitRunner::class)
 class ListKWTest : UnitSpec() {
@@ -41,7 +41,7 @@ class ListKWTest : UnitSpec() {
                 { n -> ListKW(listOf({ s: Int -> n * s })) },
                 object : Eq<HK<ListKWHK, Int>> {
                     override fun eqv(a: HK<ListKWHK, Int>, b: HK<ListKWHK, Int>): Boolean =
-                            a.ev().list == b.ev().list
+                            arrow.test.laws.ev().list == arrow.test.laws.ev().list
                 })
         )
     }

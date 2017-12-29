@@ -4,12 +4,12 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.Eq
-import arrow.OptionalLaws
+import arrow.test.laws.OptionalLaws
 import arrow.data.Try
 import arrow.test.UnitSpec
-import arrow.genFunctionAToB
-import arrow.genTry
-import arrow.genTuple
+import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genTry
+import arrow.test.generators.genTuple
 import arrow.core.None
 import arrow.syntax.either.left
 import arrow.syntax.either.right

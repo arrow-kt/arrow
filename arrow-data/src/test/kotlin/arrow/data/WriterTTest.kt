@@ -11,6 +11,12 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.generators.genIntSmall
+import arrow.test.generators.genTuple
+import arrow.test.laws.MonadFilterLaws
+import arrow.test.laws.MonadLaws
+import arrow.test.laws.MonadWriterLaws
+import arrow.test.laws.MonoidKLaws
 
 @RunWith(KTestJUnitRunner::class)
 class WriterTTest : UnitSpec() {
@@ -41,14 +47,14 @@ class WriterTTest : UnitSpec() {
                 genIntSmall(),
                 genTuple(genIntSmall(), genIntSmall()),
                 Eq { a, b ->
-                    a.ev().value.ev().let { optionA: Option<Tuple2<Int, Int>> ->
-                        val optionB = a.ev().value.ev()
+                    arrow.test.laws.ev().value.ev().let { optionA: Option<Tuple2<Int, Int>> ->
+                        val optionB = arrow.test.laws.ev().value.ev()
                         optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Int> -> optionB.fold({ false }, { value == it }) })
                     }
                 },
                 Eq { a, b ->
-                    a.ev().value.ev().let { optionA: Option<Tuple2<Int, Tuple2<Int, Int>>> ->
-                        val optionB = a.ev().value.ev()
+                    arrow.test.laws.ev().value.ev().let { optionA: Option<Tuple2<Int, Tuple2<Int, Int>>> ->
+                        val optionB = arrow.test.laws.ev().value.ev()
                         optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Tuple2<Int, Int>> -> optionB.fold({ false }, { value == it }) })
                     }
                 }
@@ -58,8 +64,8 @@ class WriterTTest : UnitSpec() {
                 { WriterT(Option(Tuple2(it, it))) },
                 object : Eq<HK<WriterTKindPartial<OptionHK, Int>, Int>> {
                     override fun eqv(a: HK<WriterTKindPartial<OptionHK, Int>, Int>, b: HK<WriterTKindPartial<OptionHK, Int>, Int>): Boolean =
-                            a.ev().value.ev().let { optionA: Option<Tuple2<Int, Int>> ->
-                                val optionB = a.ev().value.ev()
+                            arrow.test.laws.ev().value.ev().let { optionA: Option<Tuple2<Int, Int>> ->
+                                val optionB = arrow.test.laws.ev().value.ev()
                                 optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Int> -> optionB.fold({ false }, { value == it }) })
                             }
                 })

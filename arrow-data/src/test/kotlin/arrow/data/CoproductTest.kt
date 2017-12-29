@@ -7,11 +7,13 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.ComonadLaws
+import arrow.test.laws.TraverseLaws
 
 @RunWith(KTestJUnitRunner::class)
 class CoproductTest : UnitSpec() {
     val EQ: Eq<HK3<CoproductHK, IdHK, IdHK, Int>> = Eq { a, b ->
-                a.ev().extract() == b.ev().extract()
+                arrow.test.laws.ev().extract() == arrow.test.laws.ev().extract()
     }
 
     init {

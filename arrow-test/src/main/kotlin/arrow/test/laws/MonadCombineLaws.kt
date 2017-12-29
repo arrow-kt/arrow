@@ -1,5 +1,7 @@
-package arrow
+package arrow.test.laws
 
+import arrow.Eq
+import arrow.HK
 import arrow.mtl.MonadCombine
 import arrow.mtl.monadCombine
 

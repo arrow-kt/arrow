@@ -5,9 +5,9 @@ import io.kotlintest.properties.Gen
 import arrow.Eq
 import arrow.core.Id
 import arrow.instances.IntMonoid
-import arrow.IsoLaws
+import arrow.test.laws.IsoLaws
 import arrow.test.UnitSpec
-import arrow.genFunctionAToB
+import arrow.test.generators.genFunctionAToB
 import arrow.optics.instances.idToType
 import org.junit.runner.RunWith
 

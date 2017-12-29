@@ -13,6 +13,8 @@ import arrow.free.cata
 import arrow.free.cataM
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.concurrency.SideEffect
+import arrow.test.laws.ComonadLaws
 
 @RunWith(KTestJUnitRunner::class)
 class CofreeTest : UnitSpec() {
@@ -31,7 +33,7 @@ class CofreeTest : UnitSpec() {
                 if (it % 2 == 0) None else Some(it + 1)
             })
         }, Eq { a, b ->
-            a.ev().run().extract() == b.ev().run().extract()
+            arrow.test.laws.ev().run().extract() == arrow.test.laws.ev().run().extract()
         }))
 
         "tailForced should evaluate and return" {

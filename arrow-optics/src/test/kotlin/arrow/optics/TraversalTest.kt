@@ -10,6 +10,9 @@ import arrow.data.k
 import org.junit.runner.RunWith
 import arrow.optics.PTraversal.Companion.fromTraversable
 import arrow.test.UnitSpec
+import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genTuple
+import arrow.test.laws.TraversalLaws
 
 @RunWith(KTestJUnitRunner::class)
 class TraversalTest : UnitSpec() {

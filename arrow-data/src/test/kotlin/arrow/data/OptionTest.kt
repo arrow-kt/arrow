@@ -13,6 +13,9 @@ import arrow.core.*
 import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.generators.genOption
+import arrow.test.laws.MonadFilterLaws
+import arrow.test.laws.TraverseFilterLaws
 
 @RunWith(KTestJUnitRunner::class)
 class OptionTest : UnitSpec() {

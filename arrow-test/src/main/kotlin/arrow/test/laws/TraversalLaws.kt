@@ -1,5 +1,7 @@
-package arrow
+package arrow.test.laws
 
+import arrow.Eq
+import arrow.Monoid
 import arrow.core.Option
 import arrow.core.compose
 import arrow.core.identity

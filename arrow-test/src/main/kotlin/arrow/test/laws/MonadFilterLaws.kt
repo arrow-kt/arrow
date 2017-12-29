@@ -1,9 +1,14 @@
-package arrow
+package arrow.test.laws
 
+import arrow.Eq
+import arrow.HK
 import arrow.mtl.MonadFilter
 import arrow.mtl.bindingFilter
 import arrow.mtl.monadFilter
 import arrow.syntax.monad.flatMap
+import arrow.test.generators.genApplicative
+import arrow.test.generators.genConstructor
+import arrow.test.generators.genFunctionAToB
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

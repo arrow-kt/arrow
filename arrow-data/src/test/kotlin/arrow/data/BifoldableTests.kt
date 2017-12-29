@@ -7,6 +7,7 @@ import arrow.instances.compose
 import io.kotlintest.KTestJUnitRunner
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.BifoldableLaws
 
 @RunWith(KTestJUnitRunner::class)
 class BifoldableTests : UnitSpec() {

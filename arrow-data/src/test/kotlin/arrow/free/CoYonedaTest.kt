@@ -4,13 +4,13 @@ import arrow.core.Id
 import arrow.core.Option
 import arrow.core.Some
 import arrow.free.Coyoneda
-import arrow.free.Yoneda
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.FunctorLaws
 
 @RunWith(KTestJUnitRunner::class)
 class CoyonedaTest : UnitSpec() {
@@ -42,8 +42,8 @@ class CoyonedaTest : UnitSpec() {
         "toYoneda should convert to an equivalent Yoneda" {
             forAll { x: Int ->
                 val op = Coyoneda(Id(x), Int::toString)
-                val toYoneda = op.toYoneda(Id.functor()).lower().ev()
-                val expected = Yoneda(Id(x.toString())).lower().ev()
+                val toYoneda = arrow.test.laws.ev()
+                val expected = arrow.test.laws.ev()
 
                 expected == toYoneda
             }

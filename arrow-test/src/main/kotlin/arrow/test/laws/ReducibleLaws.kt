@@ -6,6 +6,10 @@ import arrow.core.Eval
 import arrow.core.Option
 import arrow.instances.IntMonoid
 import arrow.instances.LongMonoid
+import arrow.test.generators.genConstructor
+import arrow.test.generators.genFunctionAAToA
+import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genIntSmall
 
 object ReducibleLaws {
     inline fun <reified F> laws(RF: Reducible<F> = reducible(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<Int>, EQOptionInt: Eq<Option<Int>>, EQLong: Eq<Long>): List<Law> =

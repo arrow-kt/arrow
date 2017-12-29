@@ -6,13 +6,16 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.MonoidLaws
+import arrow.test.laws.SemigroupLaws
+import arrow.test.laws.TraverseLaws
 
 @RunWith(KTestJUnitRunner::class)
 class SortedMapKWTest : UnitSpec() {
 
     val EQ: Eq<HK2<SortedMapKWHK, String, Int>> = object : Eq<HK2<SortedMapKWHK, String, Int>> {
         override fun eqv(a: HK2<SortedMapKWHK, String, Int>, b: HK2<SortedMapKWHK, String, Int>): Boolean =
-            a.ev()["key"] == b.ev()["key"]
+            arrow.test.laws.ev()["key"] == arrow.test.laws.ev()["key"]
     }
 
     init {

@@ -6,6 +6,9 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.MonadCombineLaws
+import arrow.test.laws.MonadStateLaws
+import arrow.test.laws.SemigroupKLaws
 
 @RunWith(KTestJUnitRunner::class)
 class StateTTests : UnitSpec() {

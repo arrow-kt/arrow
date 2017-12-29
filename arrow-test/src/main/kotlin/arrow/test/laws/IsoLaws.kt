@@ -1,5 +1,6 @@
-package arrow
+package arrow.test.laws
 
+import arrow.*
 import arrow.core.Id
 import arrow.core.compose
 import arrow.core.identity

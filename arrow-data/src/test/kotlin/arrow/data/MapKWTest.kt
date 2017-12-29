@@ -8,6 +8,7 @@ import io.kotlintest.properties.forAll
 import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.TraverseLaws
 
 @RunWith(KTestJUnitRunner::class)
 class MapKWTest : UnitSpec() {

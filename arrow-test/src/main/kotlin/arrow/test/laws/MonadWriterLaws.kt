@@ -1,5 +1,6 @@
-package arrow
+package arrow.test.laws
 
+import arrow.*
 import arrow.core.Tuple2
 import arrow.mtl.MonadWriter
 import io.kotlintest.properties.Gen

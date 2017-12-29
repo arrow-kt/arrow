@@ -10,15 +10,15 @@ import arrow.free.Cofree
 
 val cofreeOptionToNel: FunctionK<CofreeKindPartial<OptionHK>, NonEmptyListHK> = object : FunctionK<CofreeKindPartial<OptionHK>, NonEmptyListHK> {
     override fun <A> invoke(fa: HK<CofreeKindPartial<OptionHK>, A>): HK<NonEmptyListHK, A> =
-            fa.ev().let { c ->
+            arrow.test.laws.ev().let { c ->
                 NonEmptyList.fromListUnsafe(listOf(c.head) + c.tailForced().ev().fold({ listOf<A>() }, { invoke(it).ev().all }))
             }
 }
 
 val cofreeListToNel: FunctionK<CofreeKindPartial<ListKWHK>, NonEmptyListHK> = object : FunctionK<CofreeKindPartial<ListKWHK>, NonEmptyListHK> {
     override fun <A> invoke(fa: HK<CofreeKindPartial<ListKWHK>, A>): HK<NonEmptyListHK, A> =
-            fa.ev().let { c: Cofree<ListKWHK, A> ->
-                val all: List<Cofree<ListKWHK, A>> = c.tailForced().ev()
+            arrow.test.laws.ev().let { c: Cofree<ListKWHK, A> ->
+                val all: List<Cofree<ListKWHK, A>> = arrow.test.laws.ev()
                 val tail: List<A> = all.foldRight(listOf<A>(), { v, acc -> acc + invoke(v).ev().all })
                 val headL: List<A> = listOf(c.head)
                 NonEmptyList.fromListUnsafe(headL + tail)
@@ -27,7 +27,7 @@ val cofreeListToNel: FunctionK<CofreeKindPartial<ListKWHK>, NonEmptyListHK> = ob
 
 val optionToList: FunctionK<OptionHK, ListKWHK> = object : FunctionK<OptionHK, ListKWHK> {
     override fun <A> invoke(fa: HK<OptionHK, A>): HK<ListKWHK, A> =
-            fa.ev().fold({ listOf<A>().k() }, { listOf(it).k() })
+            arrow.test.laws.ev().fold({ listOf<A>().k() }, { listOf(it).k() })
 }
 
 val optionInterpreter: FunctionK<Ops.F, OptionHK> = object : FunctionK<Ops.F, OptionHK> {

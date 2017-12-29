@@ -1,4 +1,4 @@
-package arrow.effects
+package arrow.test.laws
 
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -8,8 +8,12 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.data.Try
 import arrow.data.recover
+import arrow.effects.*
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.syntax.applicative.tupled
+import arrow.test.concurrency.SideEffect
+import arrow.test.generators.genIntSmall
+import arrow.test.generators.genThrowable
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.newSingleThreadContext
 

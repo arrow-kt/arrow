@@ -3,9 +3,9 @@ package arrow.instances
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.Gen
-import arrow.OrderLaws
+import arrow.test.laws.OrderLaws
 import arrow.test.UnitSpec
-import arrow.genFunctionAToB
+import arrow.test.generators.genFunctionAToB
 import arrow.order
 import arrow.toOrder
 import org.junit.runner.RunWith

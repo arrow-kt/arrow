@@ -6,6 +6,9 @@ import io.kotlintest.matchers.shouldNotBe
 import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.FoldableLaws
+import arrow.test.laws.MonoidKLaws
+import arrow.test.laws.SemigroupKLaws
 
 @RunWith(KTestJUnitRunner::class)
 class SetKWTest : UnitSpec() {

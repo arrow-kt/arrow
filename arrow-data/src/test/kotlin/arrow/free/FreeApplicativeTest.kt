@@ -14,6 +14,7 @@ import io.kotlintest.matchers.shouldNotBe
 import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.ApplicativeLaws
 
 sealed class OpsAp<out A> : HK<OpsAp.F, A> {
 

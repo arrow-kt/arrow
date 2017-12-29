@@ -1,5 +1,7 @@
-package arrow
+package arrow.test.laws
 
+import arrow.Eq
+import arrow.Monoid
 import arrow.core.*
 import arrow.data.*
 import arrow.free.instances.*

@@ -8,6 +8,9 @@ import io.reactivex.subscribers.TestSubscriber
 import arrow.*
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.AsyncLaws
+import arrow.test.laws.FoldableLaws
+import arrow.test.laws.TraverseLaws
 import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)

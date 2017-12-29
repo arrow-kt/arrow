@@ -1,9 +1,14 @@
-package arrow
+package arrow.test.laws
 
+import arrow.*
 import arrow.core.Option
 import arrow.core.Some
 import arrow.mtl.FunctorFilter
 import arrow.mtl.functorFilter
+import arrow.test.generators.genConstructor
+import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genIntSmall
+import arrow.test.generators.genOption
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

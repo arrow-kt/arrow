@@ -13,6 +13,10 @@ import arrow.instances.StringMonoidInstance
 import arrow.instances.applicative
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.generators.genFunctionAToB
+import arrow.test.laws.IsoLaws
+import arrow.test.laws.LensLaws
+import arrow.test.laws.PrismLaws
 
 @RunWith(KTestJUnitRunner::class)
 class IsoTest : UnitSpec() {

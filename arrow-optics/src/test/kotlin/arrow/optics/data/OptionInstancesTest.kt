@@ -12,6 +12,12 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.generators.genEither
+import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genNullable
+import arrow.test.generators.genOption
+import arrow.test.laws.IsoLaws
+import arrow.test.laws.PrismLaws
 
 @RunWith(KTestJUnitRunner::class)
 class OptionInstancesTest : UnitSpec() {
