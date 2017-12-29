@@ -22,6 +22,7 @@ So let's test this out with an example:
 
 ```kotlin:ank
 import arrow.*
+import arrow.core.*
 
 data class Country(val code: Option<String>)
 data class Address(val id: Int, val country: Option<Country>)
@@ -43,6 +44,8 @@ We can further simplify this case by using Arrow `binding` facilities
 that enables monad comprehensions for all datatypes for which a monad instance is available.
 
 ```kotlin:ank
+import arrow.typeclasses.*
+
 fun getCountryCode(maybePerson : Option<Person>): Option<String> =
   Option.monad().binding {
     val person = maybePerson.bind()

@@ -19,6 +19,7 @@ Eval supports memoization, eager and lazy evaluation strategies
 
 ```kotlin:ank
 import arrow.*
+import arrow.core.*
 
 val eager = Eval.now(1).map { it + 1 }
 eager.value()

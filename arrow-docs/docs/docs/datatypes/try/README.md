@@ -58,6 +58,7 @@ However, we could use `Try` to retrieve the computation result in a much cleaner
 
 ```kotlin:ank
 import arrow.*
+import arrow.data.*
 
 val lotteryTry = Try { getLotteryNumbers() }
 lotteryTry
@@ -126,6 +127,8 @@ Lastly, Arrow contains `Try` instances for many useful typeclasses that allows y
 Transforming the value, if the computation is a success:
 
 ```kotlin:ank
+import arrow.typeclasses.*
+
 Try.functor().map(Try { "3".toInt() }, { it + 1})
 ```
 
@@ -134,6 +137,8 @@ Try.functor().map(Try { "3".toInt() }, { it + 1})
 Computing over independent values:
 
 ```kotlin:ank
+import arrow.syntax.applicative.*
+
 Try.applicative().tupled(Try { "3".toInt() }, Try { "5".toInt() }, Try { "nope".toInt() })
 ```
 

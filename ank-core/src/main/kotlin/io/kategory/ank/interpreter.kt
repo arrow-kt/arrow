@@ -94,7 +94,7 @@ data class CompilationException(
             |${underlying.message}
             |##############################
             |
-        """.trimMargin()) : ScriptException(msg) {
+        """.trimMargin()) : ScriptException(msg), NoTr {
     override fun toString(): String = msg
 }
 
@@ -129,45 +129,37 @@ fun extractCodeImpl(source: String, tree: ASTNode): ListKW<Snippet> {
 
 fun compileCodeImpl(snippets: Map<File, ListKW<Snippet>>, classpath: ListKW<String>): ListKW<CompiledMarkdown> {
     println(":runAnk -> started compilation")
-    val ioBoundPool = Executors.newFixedThreadPool(snippets.size)
-    val IOPool = object : CoroutineDispatcher() {
-        override fun dispatch(context: CoroutineContext, block: Runnable) {
-            ioBoundPool.submit(block)
-        }
-    }
-    return runBlocking {
-        snippets.map { (file, codeBlocks) ->
-            async(IOPool) {
-                val classLoader = URLClassLoader(classpath.map { URL(it) }.ev().list.toTypedArray())
-                val seManager = ScriptEngineManager(classLoader)
-                val engineCache: Map<String, ScriptEngine> =
-                        codeBlocks.list
-                                .distinctBy { it.lang }
-                                .map {
-                                    it.lang to seManager.getEngineByExtension(extensionMappings.getOrDefault(it.lang, "kts"))
-                                }
-                                .toMap()
-                val evaledSnippets: ListKW<Snippet> = codeBlocks.map { snippet ->
-                    val result: Any? = Try {
-                        val engine: ScriptEngine = engineCache.k().getOrElse(
-                                snippet.lang,
-                                { throw CompilationException(file, snippet, IllegalStateException("No engine configured for `${snippet.lang}`")) })
-                        engine.eval(snippet.code)
+    return snippets.map { (file, codeBlocks) ->
+        val classLoader = URLClassLoader(classpath.map { URL(it) }.ev().list.toTypedArray())
+        val seManager = ScriptEngineManager(classLoader)
+        val engineCache: Map<String, ScriptEngine> =
+                codeBlocks.list
+                        .distinctBy { it.lang }
+                        .map {
+                            it.lang to seManager.getEngineByExtension(extensionMappings.getOrDefault(it.lang, "kts"))
+                        }
+                        .toMap()
+        val evaledSnippets: ListKW<Snippet> = codeBlocks.map { snippet ->
+            val result: Any? = Try {
+                val engine: ScriptEngine = engineCache.k().getOrElse(
+                        snippet.lang,
+                        { throw CompilationException(file, snippet, IllegalStateException("No engine configured for `${snippet.lang}`")) })
+                engine.eval(snippet.code)
 
-                    }.fold({
-                        throw CompilationException(file, snippet, it)
-                    }, { it })
-                    if (snippet.silent) {
-                        snippet
-                    } else {
-                        val resultString: Option<String> = Option.fromNullable(result).fold({ None }, { Some("//$it") })
-                        snippet.copy(result = resultString)
-                    }
-                }
-                CompiledMarkdown(file, evaledSnippets)
+            }.fold({
+                val e = CompilationException(file, snippet, it)
+                println(e)
+                throw e
+            }, { it })
+            if (snippet.silent) {
+                snippet
+            } else {
+                val resultString: Option<String> = Option.fromNullable(result).fold({ None }, { Some("//$it") })
+                snippet.copy(result = resultString)
             }
-        }.map { it.await() }.k()
-    }.also { ioBoundPool.shutdownNow() }
+        }
+        CompiledMarkdown(file, evaledSnippets)
+    }.k()
 }
 
 fun replaceAnkToLangImpl(compiledMarkdown: CompiledMarkdown): String =
