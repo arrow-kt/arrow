@@ -3,7 +3,6 @@ package arrow.test.laws
 import arrow.*
 import arrow.core.*
 import arrow.data.*
-import arrow.free.instances.applicative
 import arrow.instances.*
 import arrow.syntax.foldable.foldMap
 import arrow.syntax.functor.*

@@ -1,26 +1,25 @@
 package arrow.data
 
-import arrow.syntax.`try`.*
-import arrow.syntax.collections.*
+import arrow.HK
+import arrow.core.*
+import arrow.mtl.traverseFilter
+import arrow.syntax.`try`.optionTry
+import arrow.syntax.collections.firstOption
+import arrow.syntax.collections.option
+import arrow.syntax.collections.optionSequential
+import arrow.test.UnitSpec
+import arrow.test.generators.genOption
+import arrow.test.laws.EqLaws
+import arrow.test.laws.MonadFilterLaws
+import arrow.test.laws.TraverseFilterLaws
+import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import arrow.*
-import arrow.core.*
-import arrow.instances.monad
-import arrow.mtl.instances.monadFilter
-import arrow.mtl.instances.traverseFilter
-import arrow.mtl.traverseFilter
-import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
-import arrow.test.UnitSpec
-import arrow.test.generators.genOption
-import arrow.test.laws.MonadFilterLaws
-import arrow.test.laws.TraverseFilterLaws
-import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class OptionTest : UnitSpec() {

@@ -5,6 +5,7 @@ import arrow.core.*
 import arrow.data.*
 import arrow.typeclasses.*
 
+@instance(Coproduct::class)
 interface CoproductFunctorInstance<F, G> : Functor<CoproductKindPartial<F, G>> {
 
     fun FF(): Functor<F>
@@ -14,14 +15,7 @@ interface CoproductFunctorInstance<F, G> : Functor<CoproductKindPartial<F, G>> {
     override fun <A, B> map(fa: CoproductKind<F, G, A>, f: (A) -> B): Coproduct<F, G, B> = fa.ev().map(FF(), FG(), f)
 }
 
-object CoproductFunctorInstanceImplicits {
-    fun <F, G> instance(FF: Functor<F>, FG: Functor<G>): CoproductFunctorInstance<F, G> = object : CoproductFunctorInstance<F, G> {
-        override fun FF(): Functor<F> = FF
-
-        override fun FG(): Functor<G> = FG
-    }
-}
-
+@instance(Coproduct::class)
 interface CoproductComonadInstance<F, G> : Comonad<CoproductKindPartial<F, G>> {
 
     fun CF(): Comonad<F>
@@ -36,14 +30,7 @@ interface CoproductComonadInstance<F, G> : Comonad<CoproductKindPartial<F, G>> {
 
 }
 
-object CoproductComonadInstanceImplicits {
-    fun <F, G> instance(CF: Comonad<F>, CG: Comonad<G>): CoproductComonadInstance<F, G> = object : CoproductComonadInstance<F, G> {
-        override fun CF(): Comonad<F> = CF
-
-        override fun CG(): Comonad<G> = CG
-    }
-}
-
+@instance(Coproduct::class)
 interface CoproductFoldableInstance<F, G> : Foldable<CoproductKindPartial<F, G>> {
 
     fun FF(): Foldable<F>
@@ -56,14 +43,7 @@ interface CoproductFoldableInstance<F, G> : Foldable<CoproductKindPartial<F, G>>
 
 }
 
-object CoproductFoldableInstanceImplicits {
-    fun <F, G> instance(FF: Foldable<F>, FG: Foldable<G>): CoproductFoldableInstance<F, G> = object : CoproductFoldableInstance<F, G> {
-        override fun FF(): Foldable<F> = FF
-
-        override fun FG(): Foldable<G> = FG
-    }
-}
-
+@instance(Coproduct::class)
 interface CoproductTraverseInstance<F, G> : Traverse<CoproductKindPartial<F, G>> {
 
     fun TF(): Traverse<F>
@@ -78,23 +58,3 @@ interface CoproductTraverseInstance<F, G> : Traverse<CoproductKindPartial<F, G>>
     override fun <A, B> foldRight(fa: CoproductKind<F, G, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = fa.ev().foldRight(lb, f, TF(), TG())
 
 }
-
-object CoproductTraverseInstanceImplicits {
-    fun <F, G> instance(TF: Traverse<F>, TG: Traverse<G>): CoproductTraverseInstance<F, G> = object : CoproductTraverseInstance<F, G> {
-        override fun TF(): Traverse<F> = TF
-
-        override fun TG(): Traverse<G> = TG
-    }
-}
-
-inline fun <reified F, reified G> Coproduct.Companion.comonad(CF: Comonad<F> = arrow.typeclasses.comonad(), CG: Comonad<G>): CoproductComonadInstance<F, G> =
-        CoproductComonadInstanceImplicits.instance(CF, CG)
-
-inline fun <reified F, reified G> Coproduct.Companion.functor(FF: Functor<F> = arrow.typeclasses.functor(), FG: Functor<G> = arrow.typeclasses.functor()): CoproductFunctorInstance<F, G> =
-        CoproductFunctorInstanceImplicits.instance(FF, FG)
-
-inline fun <reified F, reified G> Coproduct.Companion.traverse(FF: Traverse<F> = traverse<F>(), FG: Traverse<G> = traverse<G>()): CoproductTraverseInstance<F, G> =
-        CoproductTraverseInstanceImplicits.instance(FF, FG)
-
-inline fun <reified F, reified G> Coproduct.Companion.foldable(FF: Foldable<F> = arrow.typeclasses.foldable<F>(), FG: Foldable<G> = arrow.typeclasses.foldable<G>()): CoproductFoldableInstance<F, G> =
-        CoproductFoldableInstanceImplicits.instance(FF, FG)

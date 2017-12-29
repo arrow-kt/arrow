@@ -1,18 +1,15 @@
 package arrow.data
 
-import arrow.data.*
-import arrow.free.instances.*
-import arrow.instances.*
-import arrow.mtl.*
-import arrow.mtl.instances.*
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldNotBe
-import arrow.test.laws.EqLaws
-import org.junit.runner.RunWith
+import arrow.instances.IntMonoid
+import arrow.mtl.traverseFilter
 import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws
+import arrow.test.laws.EqLaws
 import arrow.test.laws.TraverseFilterLaws
 import arrow.typeclasses.*
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldNotBe
+import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class ConstTest : UnitSpec() {

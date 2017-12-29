@@ -4,20 +4,20 @@ import arrow.HK
 import arrow.core.*
 import arrow.data.NonEmptyList
 import arrow.data.ev
+import arrow.data.monad
 import arrow.free.instances.FreeEq
 import arrow.free.instances.FreeMonadInstance
-import arrow.instances.monad
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldNotBe
-import arrow.test.laws.EqLaws
-import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadLaws
 import arrow.typeclasses.applicative
 import arrow.typeclasses.binding
 import arrow.typeclasses.functor
 import arrow.typeclasses.monad
+import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
+import io.kotlintest.matchers.shouldNotBe
+import org.junit.runner.RunWith
 
 sealed class Ops<out A> : HK<Ops.F, A> {
 

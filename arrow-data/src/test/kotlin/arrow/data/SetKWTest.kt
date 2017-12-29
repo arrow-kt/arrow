@@ -1,19 +1,14 @@
 package arrow.data
 
-import arrow.data.SetKW
-import arrow.data.SetKWHK
-import arrow.instances.foldable
-import arrow.instances.monoidK
-import arrow.instances.semigroupK
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldNotBe
-import arrow.test.laws.EqLaws
-import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.EqLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.typeclasses.*
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldNotBe
+import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class SetKWTest : UnitSpec() {

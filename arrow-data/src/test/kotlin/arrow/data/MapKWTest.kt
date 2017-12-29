@@ -1,15 +1,13 @@
 package arrow.data
 
-import arrow.instances.monoid
-import arrow.instances.traverse
+import arrow.test.UnitSpec
+import arrow.test.laws.EqLaws
+import arrow.test.laws.TraverseLaws
+import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
-import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
-import arrow.test.UnitSpec
-import arrow.test.laws.TraverseLaws
-import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class MapKWTest : UnitSpec() {

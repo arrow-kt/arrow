@@ -3,13 +3,11 @@ package arrow.data
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.data.NonEmptyList
-import arrow.instances.monoid
-import arrow.instances.semigroup
+import arrow.core.monoid
+import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
-import arrow.test.UnitSpec
 
 @RunWith(KTestJUnitRunner::class)
 class OptionMonoidTest : UnitSpec() {

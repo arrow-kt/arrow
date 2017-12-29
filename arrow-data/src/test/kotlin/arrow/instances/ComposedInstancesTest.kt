@@ -5,7 +5,6 @@ import arrow.*
 import arrow.core.*
 import arrow.data.*
 import arrow.mtl.instances.ComposedFunctorFilter
-import arrow.mtl.instances.functorFilter
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.*

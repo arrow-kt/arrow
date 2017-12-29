@@ -29,18 +29,13 @@ interface SequenceKWEqInstance<A> : Eq<SequenceKW<A>> {
 
 }
 
+@instance(SequenceKW::class)
 interface SequenceKWFunctorInstance : Functor<SequenceKWHK> {
     override fun <A, B> map(fa: SequenceKWKind<A>, f: kotlin.Function1<A, B>): SequenceKW<B> =
             fa.ev().map(f)
 }
 
-object SequenceKWFunctorInstanceImplicits {
-    fun instance(): SequenceKWFunctorInstance = SequenceKW.Companion.functor()
-}
-
-fun SequenceKW.Companion.functor(): SequenceKWFunctorInstance =
-        object : SequenceKWFunctorInstance, Functor<SequenceKWHK> {}
-
+@instance(SequenceKW::class)
 interface SequenceKWApplicativeInstance : Applicative<SequenceKWHK> {
     override fun <A, B> ap(fa: SequenceKWKind<A>, ff: SequenceKWKind<kotlin.Function1<A, B>>): SequenceKW<B> =
             fa.ev().ap(ff)
@@ -55,13 +50,7 @@ interface SequenceKWApplicativeInstance : Applicative<SequenceKWHK> {
             SequenceKW.pure(a)
 }
 
-object SequenceKWApplicativeInstanceImplicits {
-    fun instance(): SequenceKWApplicativeInstance = SequenceKW.Companion.applicative()
-}
-
-fun SequenceKW.Companion.applicative(): SequenceKWApplicativeInstance =
-        object : SequenceKWApplicativeInstance, Applicative<SequenceKWHK> {}
-
+@instance(SequenceKW::class)
 interface SequenceKWMonadInstance : Monad<SequenceKWHK> {
     override fun <A, B> ap(fa: SequenceKWKind<A>, ff: SequenceKWKind<kotlin.Function1<A, B>>): SequenceKW<B> =
             fa.ev().ap(ff)
@@ -82,13 +71,7 @@ interface SequenceKWMonadInstance : Monad<SequenceKWHK> {
             SequenceKW.pure(a)
 }
 
-object SequenceKWMonadInstanceImplicits {
-    fun instance(): SequenceKWMonadInstance = SequenceKW.Companion.monad()
-}
-
-fun SequenceKW.Companion.monad(): SequenceKWMonadInstance =
-        object : SequenceKWMonadInstance, Monad<SequenceKWHK> {}
-
+@instance(SequenceKW::class)
 interface SequenceKWFoldableInstance : Foldable<SequenceKWHK> {
     override fun <A, B> foldLeft(fa: SequenceKWKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.ev().foldLeft(b, f)
@@ -97,13 +80,7 @@ interface SequenceKWFoldableInstance : Foldable<SequenceKWHK> {
             fa.ev().foldRight(lb, f)
 }
 
-object SequenceKWFoldableInstanceImplicits {
-    fun instance(): SequenceKWFoldableInstance = SequenceKW.Companion.foldable()
-}
-
-fun SequenceKW.Companion.foldable(): SequenceKWFoldableInstance =
-        object : SequenceKWFoldableInstance, Foldable<SequenceKWHK> {}
-
+@instance(SequenceKW::class)
 interface SequenceKWTraverseInstance : Traverse<SequenceKWHK> {
     override fun <A, B> map(fa: SequenceKWKind<A>, f: kotlin.Function1<A, B>): SequenceKW<B> =
             fa.ev().map(f)
@@ -118,25 +95,13 @@ interface SequenceKWTraverseInstance : Traverse<SequenceKWHK> {
             fa.ev().foldRight(lb, f)
 }
 
-object SequenceKWTraverseInstanceImplicits {
-    fun instance(): SequenceKWTraverseInstance = SequenceKW.Companion.traverse()
-}
-
-fun SequenceKW.Companion.traverse(): SequenceKWTraverseInstance =
-        object : SequenceKWTraverseInstance, Traverse<SequenceKWHK> {}
-
+@instance(SequenceKW::class)
 interface SequenceKWSemigroupKInstance : SemigroupK<SequenceKWHK> {
     override fun <A> combineK(x: SequenceKWKind<A>, y: SequenceKWKind<A>): SequenceKW<A> =
             x.ev().combineK(y)
 }
 
-object SequenceKWSemigroupKInstanceImplicits {
-    fun instance(): SequenceKWSemigroupKInstance = SequenceKW.Companion.semigroupK()
-}
-
-fun SequenceKW.Companion.semigroupK(): SequenceKWSemigroupKInstance =
-        object : SequenceKWSemigroupKInstance, SemigroupK<SequenceKWHK> {}
-
+@instance(SequenceKW::class)
 interface SequenceKWMonoidKInstance : MonoidK<SequenceKWHK> {
     override fun <A> empty(): SequenceKW<A> =
             SequenceKW.empty()
@@ -144,10 +109,3 @@ interface SequenceKWMonoidKInstance : MonoidK<SequenceKWHK> {
     override fun <A> combineK(x: SequenceKWKind<A>, y: SequenceKWKind<A>): SequenceKW<A> =
             x.ev().combineK(y)
 }
-
-object SequenceKWMonoidKInstanceImplicits {
-    fun instance(): SequenceKWMonoidKInstance = SequenceKW.Companion.monoidK()
-}
-
-fun SequenceKW.Companion.monoidK(): SequenceKWMonoidKInstance =
-        object : SequenceKWMonoidKInstance, MonoidK<SequenceKWHK> {}

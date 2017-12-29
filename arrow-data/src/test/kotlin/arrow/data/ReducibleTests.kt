@@ -1,15 +1,14 @@
 package arrow.data
 
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
-import arrow.*
+import arrow.HK
 import arrow.core.Tuple2
 import arrow.instances.LongMonoid
-import arrow.instances.foldable
-import arrow.test.laws.ReducibleLaws
-import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.ReducibleLaws
 import arrow.typeclasses.*
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
+import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class ReducibleTests : UnitSpec() {

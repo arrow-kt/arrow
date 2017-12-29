@@ -1,23 +1,19 @@
 package arrow.free
 
 import arrow.HK
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldNotBe
-import arrow.free.Cofree.Companion.unfold
 import arrow.core.*
 import arrow.data.*
-import arrow.free.instances.comonad
-import arrow.instances.functor
-import arrow.instances.monad
-import arrow.instances.traverse
-import org.junit.runner.RunWith
+import arrow.free.Cofree.Companion.unfold
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.comonad
 import arrow.typeclasses.functor
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
+import io.kotlintest.matchers.shouldNotBe
+import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class CofreeTest : UnitSpec() {

@@ -1,23 +1,20 @@
 package arrow.data
 
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldNotBe
-import io.kotlintest.properties.forAll
-import arrow.data.Ior.Right
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Some
 import arrow.data.*
-import arrow.instances.applicative
-import arrow.instances.traverse
-import arrow.test.laws.EqLaws
-import org.junit.runner.RunWith
+import arrow.data.Ior.Right
 import arrow.test.UnitSpec
+import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.*
-
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
+import io.kotlintest.matchers.shouldNotBe
+import io.kotlintest.properties.forAll
+import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class IorTest : UnitSpec() {

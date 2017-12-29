@@ -1,20 +1,16 @@
 package arrow.data
 
-import arrow.instances.applicative
-import arrow.instances.functor
-import arrow.instances.monadError
-import arrow.instances.traverse
 import arrow.syntax.applicative.map
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldNotBe
-import arrow.test.laws.EqLaws
-import io.kotlintest.matchers.fail
-import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadErrorLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.*
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.fail
+import io.kotlintest.matchers.shouldBe
+import io.kotlintest.matchers.shouldNotBe
+import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class TryTest : UnitSpec() {

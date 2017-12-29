@@ -1,16 +1,14 @@
 package arrow.data
 
 import arrow.HK2
-import arrow.instances.monoid
-import arrow.instances.traverse
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldNotBe
-import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.SemigroupLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.*
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldNotBe
+import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class SortedMapKWTest : UnitSpec() {

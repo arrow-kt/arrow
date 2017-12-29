@@ -1,17 +1,15 @@
 package arrow.data
 
-import arrow.data.*
-import arrow.instances.monad
 import arrow.mtl.monadReader
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldNotBe
-import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.applicative
 import arrow.typeclasses.functor
 import arrow.typeclasses.monad
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldNotBe
+import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class Function1Test : UnitSpec() {

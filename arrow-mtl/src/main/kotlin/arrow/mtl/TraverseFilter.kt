@@ -19,10 +19,6 @@ interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F>, Typeclass {
 
     override fun <A> filter(fa: HK<F, A>, f: (A) -> Boolean): HK<F, A> =
             filterA(fa, { Id(f(it)) }, Id.applicative()).value()
-
-    override fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 }
 
 inline fun <reified F, reified G, A, B> HK<F, A>.traverseFilter(

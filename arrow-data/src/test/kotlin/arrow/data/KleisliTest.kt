@@ -1,19 +1,14 @@
 package arrow.data
 
-import arrow.core.EitherHK
-import arrow.core.Id
-import arrow.core.IdHK
-import arrow.core.ev
-import arrow.instances.monad
-import arrow.instances.monadError
+import arrow.core.*
 import arrow.mtl.monadReader
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldNotBe
-import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadErrorLaws
 import arrow.typeclasses.*
+import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
+import io.kotlintest.matchers.shouldNotBe
+import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class KleisliTest : UnitSpec() {

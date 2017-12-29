@@ -1,13 +1,9 @@
 package arrow.test.laws
 
-import arrow.core.Id
-import arrow.core.compose
-import arrow.core.identity
-import arrow.core.value
+import arrow.core.*
 import arrow.data.Const
+import arrow.data.applicative
 import arrow.data.value
-import arrow.free.instances.applicative
-import arrow.instances.functor
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.optics.Iso

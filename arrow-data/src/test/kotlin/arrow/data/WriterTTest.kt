@@ -3,16 +3,9 @@ package arrow.data
 import arrow.HK
 import arrow.core.*
 import arrow.instances.IntMonoid
-import arrow.instances.applicative
 import arrow.instances.monad
-import arrow.instances.monoidK
-import arrow.mtl.instances.monadFilter
-import arrow.mtl.instances.monadWriter
 import arrow.mtl.monadFilter
 import arrow.mtl.monadWriter
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldNotBe
-import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
 import arrow.test.generators.genTuple
@@ -21,6 +14,9 @@ import arrow.test.laws.MonadLaws
 import arrow.test.laws.MonadWriterLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.typeclasses.*
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldNotBe
+import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class WriterTTest : UnitSpec() {

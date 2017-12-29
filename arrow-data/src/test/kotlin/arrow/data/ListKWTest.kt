@@ -1,20 +1,15 @@
 package arrow.data
 
 import arrow.HK
-import arrow.instances.applicative
-import arrow.instances.monoidK
-import arrow.instances.semigroupK
-import arrow.instances.traverse
 import arrow.mtl.functorFilter
-import arrow.mtl.instances.monadCombine
 import arrow.mtl.monadCombine
 import arrow.mtl.monadFilter
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldNotBe
-import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.*
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldNotBe
+import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class ListKWTest : UnitSpec() {

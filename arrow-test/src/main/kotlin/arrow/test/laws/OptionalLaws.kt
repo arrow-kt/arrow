@@ -4,8 +4,6 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import arrow.core.*
 import arrow.data.*
-import arrow.free.instances.applicative
-import arrow.instances.applicative
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.optics.*

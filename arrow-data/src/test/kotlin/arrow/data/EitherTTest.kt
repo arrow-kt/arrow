@@ -1,11 +1,6 @@
 package arrow.data
 
-import arrow.core.Id
-import arrow.core.IdHK
-import arrow.core.OptionHK
-import arrow.core.Right
-import arrow.data.EitherT
-import arrow.data.EitherTKindPartial
+import arrow.core.*
 import arrow.instances.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe

@@ -2,13 +2,13 @@ package arrow.data
 
 import arrow.core.Id
 import arrow.core.Tuple2
+import arrow.core.functor
 import arrow.core.toT
-import arrow.instances.functor
-import arrow.syntax.collections.*
+import arrow.syntax.collections.stateTraverse
+import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
-import arrow.test.UnitSpec
 
 @RunWith(KTestJUnitRunner::class)
 class StateTests : UnitSpec() {

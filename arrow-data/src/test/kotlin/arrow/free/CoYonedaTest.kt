@@ -1,18 +1,15 @@
 package arrow.free
 
 import arrow.core.*
-import arrow.free.*
-import arrow.free.instances.functor
-import arrow.instances.functor
+import arrow.test.UnitSpec
+import arrow.test.laws.FunctorLaws
+import arrow.typeclasses.Eq
+import arrow.typeclasses.functor
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
-import arrow.test.UnitSpec
-import arrow.test.laws.FunctorLaws
-import arrow.typeclasses.Eq
-import arrow.typeclasses.functor
 
 @RunWith(KTestJUnitRunner::class)
 class CoyonedaTest : UnitSpec() {
