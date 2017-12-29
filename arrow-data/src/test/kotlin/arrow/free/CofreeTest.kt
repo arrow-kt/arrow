@@ -12,6 +12,7 @@ import arrow.free.Cofree
 import arrow.free.cata
 import arrow.free.cataM
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
 
 @RunWith(KTestJUnitRunner::class)
 class CofreeTest : UnitSpec() {

@@ -2,8 +2,10 @@ package arrow
 
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import arrow.core.Some
-import arrow.core.None
+import arrow.core.*
+import arrow.mtl.*
+import arrow.syntax.applicative.*
+import arrow.syntax.functor.*
 
 object TraverseFilterLaws {
 

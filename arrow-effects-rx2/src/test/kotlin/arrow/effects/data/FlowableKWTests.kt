@@ -7,6 +7,7 @@ import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
 import arrow.*
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
 import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)

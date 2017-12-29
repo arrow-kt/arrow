@@ -124,6 +124,11 @@ abstract class NonEmptyReducible<F, G> : Reducible<F> {
     }
 }
 
+inline fun <reified F, reified G, A> NonEmptyReducible<F, G>.size(MB: Monoid<Long> = monoid(), fa: HK<F, A>): Long {
+    val (_, tail) = split(fa)
+    return 1 + FG().size(MB, tail)
+}
+
 fun <F, G, A> NonEmptyReducible<F, G>.get(fa: HK<F, A>, idx: Long): Option<A> = if (idx == 0L) Some(split(fa).a) else FG().get(split(fa).b, idx - 1L)
 
 inline fun <F, reified G, A, B> NonEmptyReducible<F, G>.foldM(fa: HK<F, A>, z: B, crossinline f: (B, A) -> HK<G, B>, MG: Monad<G> = monad()): HK<G, B> {

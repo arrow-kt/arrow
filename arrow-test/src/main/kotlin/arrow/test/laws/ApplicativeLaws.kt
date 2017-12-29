@@ -1,5 +1,7 @@
 package arrow
 
+import arrow.syntax.applicative.map
+import arrow.syntax.applicative.tupled
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

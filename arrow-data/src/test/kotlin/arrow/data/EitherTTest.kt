@@ -10,6 +10,7 @@ import arrow.instances.traverse
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
 
 @RunWith(KTestJUnitRunner::class)
 class EitherTTest : UnitSpec() {

@@ -10,6 +10,7 @@ import kotlinx.coroutines.experimental.CoroutineStart
 import kotlinx.coroutines.experimental.Unconfined
 import kotlinx.coroutines.experimental.runBlocking
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
 
 @RunWith(KTestJUnitRunner::class)
 class DeferredKWTest : UnitSpec() {

@@ -6,12 +6,12 @@ import arrow.core.identity
 import arrow.core.value
 import arrow.data.Const
 import arrow.data.value
+import arrow.free.instances.applicative
+import arrow.instances.functor
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.optics.Iso
 import arrow.optics.modify
-import compose
-import identity
 
 object IsoLaws {
 

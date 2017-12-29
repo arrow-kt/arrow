@@ -5,8 +5,9 @@ import io.kotlintest.matchers.shouldBe
 import arrow.*
 import arrow.core.Tuple2
 import arrow.instances.LongMonoid
-import arrow.laws.ReducibleLaws
+import arrow.test.laws.ReducibleLaws
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
 
 @RunWith(KTestJUnitRunner::class)
 class ReducibleTests : UnitSpec() {

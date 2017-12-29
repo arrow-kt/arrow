@@ -5,7 +5,7 @@ import io.kotlintest.properties.Gen
 import arrow.Eq
 import arrow.IsoLaws
 import arrow.SetKWMonoidInstanceImplicits
-import arrow.UnitSpec
+import arrow.test.UnitSpec
 import arrow.genFunctionAToB
 import arrow.optics.instances.setToSetKW
 import org.junit.runner.RunWith

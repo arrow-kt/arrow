@@ -6,7 +6,7 @@ import io.kotlintest.properties.forAll
 import arrow.Eq
 import arrow.OptionalLaws
 import arrow.data.Try
-import arrow.UnitSpec
+import arrow.test.UnitSpec
 import arrow.genFunctionAToB
 import arrow.genTry
 import arrow.genTuple

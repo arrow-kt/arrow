@@ -5,6 +5,7 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
 
 @RunWith(KTestJUnitRunner::class)
 class NumberMonoidTest : UnitSpec() {

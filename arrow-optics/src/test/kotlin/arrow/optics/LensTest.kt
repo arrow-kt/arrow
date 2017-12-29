@@ -12,6 +12,7 @@ import arrow.data.Try
 import arrow.syntax.either.left
 import arrow.syntax.either.right
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
 
 @RunWith(KTestJUnitRunner::class)
 class LensTest : UnitSpec() {

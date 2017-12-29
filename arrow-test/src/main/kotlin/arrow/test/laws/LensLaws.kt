@@ -6,8 +6,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.optics.Lens
 import arrow.optics.modify
-import compose
-import identity
+import arrow.syntax.foldable.exists
 
 object LensLaws {
 

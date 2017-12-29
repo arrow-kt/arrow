@@ -6,6 +6,7 @@ import io.kotlintest.properties.forAll
 import arrow.*
 import arrow.core.Some
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
 
 @RunWith(KTestJUnitRunner::class)
 class PrismTest : UnitSpec() {

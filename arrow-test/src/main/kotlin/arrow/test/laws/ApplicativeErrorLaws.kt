@@ -3,6 +3,7 @@ package arrow
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
+import arrow.syntax.applicativeerror.*
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

@@ -4,7 +4,7 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.core.Tuple2
-import arrow.UnitSpec
+import arrow.test.UnitSpec
 import arrow.syntax.either.left
 import arrow.syntax.either.right
 import arrow.core.toT

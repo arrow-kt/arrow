@@ -1,11 +1,10 @@
 package arrow.instances
 
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.Gen
 import arrow.OrderLaws
-import arrow.UnitSpec
+import arrow.test.UnitSpec
 import arrow.genFunctionAToB
 import arrow.order
 import arrow.toOrder

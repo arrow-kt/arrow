@@ -1,6 +1,8 @@
 package arrow
 
 import arrow.data.Cokleisli
+import arrow.syntax.comonad.extract
+import arrow.syntax.functor.map
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

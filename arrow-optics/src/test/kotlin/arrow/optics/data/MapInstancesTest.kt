@@ -4,7 +4,7 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import arrow.Eq
 import arrow.IsoLaws
-import arrow.UnitSpec
+import arrow.test.UnitSpec
 import arrow.genFunctionAToB
 import arrow.genMap
 import arrow.genMapKW

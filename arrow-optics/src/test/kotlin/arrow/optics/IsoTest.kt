@@ -12,6 +12,7 @@ import arrow.data.NonEmptyList
 import arrow.instances.StringMonoidInstance
 import arrow.instances.applicative
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
 
 @RunWith(KTestJUnitRunner::class)
 class IsoTest : UnitSpec() {

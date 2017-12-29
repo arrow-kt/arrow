@@ -6,6 +6,7 @@ import arrow.data.Coproduct
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
 
 @RunWith(KTestJUnitRunner::class)
 class CoproductTest : UnitSpec() {

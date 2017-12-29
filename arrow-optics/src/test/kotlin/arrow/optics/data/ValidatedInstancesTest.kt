@@ -7,7 +7,7 @@ import arrow.Eq
 import arrow.IsoLaws
 import arrow.Monoid
 import arrow.data.Try
-import arrow.UnitSpec
+import arrow.test.UnitSpec
 import arrow.genEither
 import arrow.genFunctionAToB
 import arrow.genThrowable

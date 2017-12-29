@@ -1,13 +1,12 @@
 package arrow
 
 import arrow.core.*
-import arrow.data.Const
+import arrow.data.*
+import arrow.free.instances.*
+import arrow.instances.applicative
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import arrow.optics.Optional
-import arrow.optics.modify
-import compose
-import identity
+import arrow.optics.*
 
 object OptionalLaws {
 

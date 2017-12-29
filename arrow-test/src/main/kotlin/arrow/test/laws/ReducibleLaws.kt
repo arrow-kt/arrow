@@ -1,4 +1,4 @@
-package arrow.laws
+package arrow.test.laws
 
 import io.kotlintest.properties.forAll
 import arrow.*

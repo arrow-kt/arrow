@@ -1,5 +1,7 @@
 package arrow
 
+import arrow.mtl.MonadState
+import arrow.mtl.monadState
 import io.kotlintest.properties.forAll
 
 object MonadStateLaws {

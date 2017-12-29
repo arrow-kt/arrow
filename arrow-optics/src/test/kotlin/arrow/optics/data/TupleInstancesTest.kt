@@ -7,7 +7,7 @@ import arrow.LensLaws
 import arrow.data.NonEmptyList
 import arrow.TraversalLaws
 import arrow.data.Try
-import arrow.UnitSpec
+import arrow.test.UnitSpec
 import arrow.genFunctionAToB
 import arrow.genTuple
 import arrow.optics.instances.*

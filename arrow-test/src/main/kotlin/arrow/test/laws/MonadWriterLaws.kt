@@ -1,6 +1,7 @@
 package arrow
 
 import arrow.core.Tuple2
+import arrow.mtl.MonadWriter
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

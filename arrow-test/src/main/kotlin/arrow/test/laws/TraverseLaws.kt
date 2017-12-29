@@ -1,13 +1,12 @@
 package arrow
 
-import arrow.core.Id
-import arrow.core.Tuple2
-import arrow.core.toT
-import arrow.core.value
-import arrow.data.Const
-import arrow.data.const
-import arrow.instances.ComposedApplicative
-import arrow.instances.IntMonoid
+import arrow.core.*
+import arrow.data.*
+import arrow.free.instances.applicative
+import arrow.instances.*
+import arrow.syntax.foldable.foldMap
+import arrow.syntax.functor.*
+import arrow.syntax.traverse.*
 import io.kotlintest.properties.forAll
 
 typealias TI<A> = Tuple2<IdKind<A>, IdKind<A>>

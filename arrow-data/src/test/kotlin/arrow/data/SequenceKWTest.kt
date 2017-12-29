@@ -7,8 +7,9 @@ import arrow.instances.applicative
 import arrow.instances.monad
 import arrow.instances.monoidK
 import arrow.instances.traverse
-import arrow.laws.EqLaws
+import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
 
 @RunWith(KTestJUnitRunner::class)
 class SequenceKWTest : UnitSpec() {

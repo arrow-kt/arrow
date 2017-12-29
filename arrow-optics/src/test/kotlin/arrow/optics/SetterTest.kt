@@ -5,7 +5,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.Eq
 import arrow.SetterLaws
-import arrow.UnitSpec
+import arrow.test.UnitSpec
 import arrow.genFunctionAToB
 import arrow.genOption
 import arrow.syntax.either.left

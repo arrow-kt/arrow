@@ -2,9 +2,9 @@ package arrow.data
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
-import arrow.UnitSpec
+import arrow.test.UnitSpec
 import arrow.eq
-import arrow.laws.EqLaws
+import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

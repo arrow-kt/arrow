@@ -164,6 +164,16 @@ fun <F, A> Foldable<F>.get(fa: HK<F, A>, idx: Long): Option<A> {
 }
 
 /**
+ * The size of this Foldable.
+ *
+ * This is overriden in structures that have more efficient size implementations
+ * (e.g. Vector, Set, Map).
+ *
+ * Note: will not terminate for infinite-sized collections.
+ */
+inline fun <reified F, A> Foldable<F>.size(MB: Monoid<Long> = monoid(), fa: HK<F, A>): Long = foldMap(MB, fa, { 1 })
+
+/**
  * Left associative monadic folding on F.
  *
  * The default implementation of this is based on foldL, and thus will always fold across the entire structure.

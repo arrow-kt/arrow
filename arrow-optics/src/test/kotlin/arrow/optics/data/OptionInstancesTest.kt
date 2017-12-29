@@ -11,6 +11,7 @@ import arrow.syntax.either.right
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
 
 @RunWith(KTestJUnitRunner::class)
 class OptionInstancesTest : UnitSpec() {

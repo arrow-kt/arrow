@@ -6,7 +6,7 @@ import arrow.Eq
 import arrow.core.Id
 import arrow.instances.IntMonoid
 import arrow.IsoLaws
-import arrow.UnitSpec
+import arrow.test.UnitSpec
 import arrow.genFunctionAToB
 import arrow.optics.instances.idToType
 import org.junit.runner.RunWith

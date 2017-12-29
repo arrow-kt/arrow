@@ -7,8 +7,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.optics.Traversal
 import arrow.optics.modify
-import compose
-import identity
+import arrow.syntax.monoid.combineAll
 
 object TraversalLaws {
 

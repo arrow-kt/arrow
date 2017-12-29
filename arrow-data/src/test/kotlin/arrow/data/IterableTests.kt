@@ -5,6 +5,7 @@ import arrow.core.then
 import arrow.instances.collect
 import io.kotlintest.KTestJUnitRunner
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
 
 @RunWith(KTestJUnitRunner::class)
 class IterableTests : UnitSpec() {

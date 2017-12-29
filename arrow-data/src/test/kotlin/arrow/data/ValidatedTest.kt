@@ -11,8 +11,9 @@ import arrow.core.Some
 import arrow.data.*
 import arrow.instances.IntMonoid
 import arrow.instances.StringMonoidInstance
-import arrow.laws.EqLaws
+import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
 
 @RunWith(KTestJUnitRunner::class)
 class ValidatedTest : UnitSpec() {

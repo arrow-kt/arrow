@@ -4,6 +4,7 @@ import arrow.data.Function0
 import arrow.data.k
 import io.kotlintest.KTestJUnitRunner
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
 
 @RunWith(KTestJUnitRunner::class)
 class Function0Test : UnitSpec() {

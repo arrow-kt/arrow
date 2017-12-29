@@ -9,6 +9,7 @@ import arrow.core.Right
 import arrow.data.Try
 import arrow.data.recover
 import arrow.effects.data.internal.BindingCancellationException
+import arrow.syntax.applicative.tupled
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.newSingleThreadContext
 

@@ -7,7 +7,7 @@ import arrow.Eq
 import arrow.IsoLaws
 import arrow.Monoid
 import arrow.PrismLaws
-import arrow.UnitSpec
+import arrow.test.UnitSpec
 import arrow.Validated
 import arrow.genEither
 import arrow.genFunctionAToB

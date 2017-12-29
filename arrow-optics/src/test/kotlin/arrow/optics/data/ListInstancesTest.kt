@@ -9,7 +9,7 @@ import arrow.ListKWMonoidInstanceImplicits
 import arrow.NonEmptyListSemigroupInstanceImplicits
 import arrow.OptionMonoidInstanceImplicits
 import arrow.OptionalLaws
-import arrow.UnitSpec
+import arrow.test.UnitSpec
 import arrow.genFunctionAToB
 import arrow.genNonEmptyList
 import arrow.genOption

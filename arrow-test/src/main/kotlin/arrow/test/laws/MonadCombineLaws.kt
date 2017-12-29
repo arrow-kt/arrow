@@ -1,5 +1,8 @@
 package arrow
 
+import arrow.mtl.MonadCombine
+import arrow.mtl.monadCombine
+
 object MonadCombineLaws {
 
     inline fun <reified F> laws(MCF: MonadCombine<F> = monadCombine(),

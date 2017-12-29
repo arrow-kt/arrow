@@ -9,8 +9,9 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Some
 import arrow.data.*
-import arrow.laws.EqLaws
+import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
 
 
 @RunWith(KTestJUnitRunner::class)

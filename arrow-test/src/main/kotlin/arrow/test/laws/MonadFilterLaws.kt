@@ -1,5 +1,9 @@
 package arrow
 
+import arrow.mtl.MonadFilter
+import arrow.mtl.bindingFilter
+import arrow.mtl.monadFilter
+import arrow.syntax.monad.flatMap
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

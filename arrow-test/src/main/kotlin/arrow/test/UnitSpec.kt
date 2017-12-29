@@ -1,5 +1,7 @@
-package arrow
+package arrow.test
 
+import arrow.Eq
+import arrow.Law
 import io.kotlintest.TestCase
 import io.kotlintest.specs.StringSpec
 

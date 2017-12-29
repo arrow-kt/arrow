@@ -1,13 +1,13 @@
 package arrow
 
 import arrow.core.*
-import arrow.data.Const
+import arrow.data.*
+import arrow.free.instances.applicative
+import arrow.instances.applicative
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.optics.Prism
 import arrow.optics.modify
-import compose
-import identity
 
 object PrismLaws {
 

@@ -1,9 +1,7 @@
 package arrow
 
-import andThen
 import arrow.core.andThen
 import arrow.core.identity
-import identity
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

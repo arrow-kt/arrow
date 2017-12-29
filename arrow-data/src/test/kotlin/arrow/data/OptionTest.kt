@@ -10,8 +10,9 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.*
 import arrow.core.*
-import arrow.laws.EqLaws
+import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
 
 @RunWith(KTestJUnitRunner::class)
 class OptionTest : UnitSpec() {
