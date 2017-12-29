@@ -1,14 +1,18 @@
 package io.arrow.ank
 
-import arrow.*
-import arrow.core.*
-import arrow.data.*
-import arrow.syntax.applicativeerror.*
+import arrow.HK
+import arrow.core.FunctionK
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.data.ListKW
+import arrow.data.Try
+import arrow.data.ev
+import arrow.data.k
+import arrow.syntax.applicativeerror.catch
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.monadError
-import kotlinx.coroutines.experimental.CoroutineDispatcher
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.runBlocking
+import com.github.lalyos.jfiglet.FigletFont
 import org.intellij.markdown.MarkdownElementTypes.CODE_FENCE
 import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.ast.accept
@@ -16,14 +20,12 @@ import org.intellij.markdown.ast.getTextInNode
 import org.intellij.markdown.ast.visitors.RecursiveVisitor
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
 import org.intellij.markdown.parser.MarkdownParser
+import org.jetbrains.kotlin.backend.common.descriptors.synthesizedName
 import java.io.File
 import java.net.URL
 import java.net.URLClassLoader
-import java.util.concurrent.Executors
 import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
-import javax.script.ScriptException
-import kotlin.coroutines.experimental.CoroutineContext
 
 val extensionMappings = mapOf(
         "java" to "java",
@@ -77,24 +79,28 @@ fun readFileImpl(source: File): String =
 fun parseMarkDownImpl(markdown: String): ASTNode =
         MarkdownParser(GFMFlavourDescriptor()).buildMarkdownTreeFromString(markdown)
 
+abstract class NoStackTrace(msg: String) : Throwable(msg, null, false, false)
+
+val ankErrorHeader = FigletFont.convertOneLine("classpath:/standard.flf", "ANK, Fix your docs!")
+
 data class CompilationException(
         val file: File,
         val snippet: Snippet,
         val underlying: Throwable,
         val msg: String = """
             |
+            |$ankErrorHeader
             |
-            |### ΛNK Compilation Error ###
-            |file: $file
-            |lang: ${snippet.lang}
             |```
             |${snippet.code}
             |```
             |
             |${underlying.message}
-            |##############################
             |
-        """.trimMargin()) : ScriptException(msg) {
+            |file: $file
+            |lang: ${snippet.lang}
+            |
+        """.trimMargin()) : NoStackTrace(msg) {
     override fun toString(): String = msg
 }
 
@@ -130,6 +136,7 @@ fun extractCodeImpl(source: String, tree: ASTNode): ListKW<Snippet> {
 fun compileCodeImpl(snippets: Map<File, ListKW<Snippet>>, classpath: ListKW<String>): ListKW<CompiledMarkdown> {
     println(":runAnk -> started compilation")
     return snippets.map { (file, codeBlocks) ->
+        println(":runAnk -> compiling: ${file.parentFile.name}/${file.name}")
         val classLoader = URLClassLoader(classpath.map { URL(it) }.ev().list.toTypedArray())
         val seManager = ScriptEngineManager(classLoader)
         val engineCache: Map<String, ScriptEngine> =
@@ -147,9 +154,7 @@ fun compileCodeImpl(snippets: Map<File, ListKW<Snippet>>, classpath: ListKW<Stri
                 engine.eval(snippet.code)
 
             }.fold({
-                val e = CompilationException(file, snippet, it)
-                println(e)
-                throw e
+                throw CompilationException(file, snippet, it)
             }, { it })
             if (snippet.silent) {
                 snippet
