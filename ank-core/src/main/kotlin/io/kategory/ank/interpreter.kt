@@ -1,14 +1,17 @@
 package io.arrow.ank
 
-import arrow.*
-import arrow.core.*
-import arrow.data.*
-import arrow.syntax.applicativeerror.*
+import arrow.HK
+import arrow.core.FunctionK
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.data.ListKW
+import arrow.data.Try
+import arrow.data.ev
+import arrow.data.k
+import arrow.syntax.applicativeerror.catch
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.monadError
-import kotlinx.coroutines.experimental.CoroutineDispatcher
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.runBlocking
 import org.intellij.markdown.MarkdownElementTypes.CODE_FENCE
 import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.ast.accept
@@ -19,11 +22,8 @@ import org.intellij.markdown.parser.MarkdownParser
 import java.io.File
 import java.net.URL
 import java.net.URLClassLoader
-import java.util.concurrent.Executors
 import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
-import javax.script.ScriptException
-import kotlin.coroutines.experimental.CoroutineContext
 
 val extensionMappings = mapOf(
         "java" to "java",
@@ -77,6 +77,8 @@ fun readFileImpl(source: File): String =
 fun parseMarkDownImpl(markdown: String): ASTNode =
         MarkdownParser(GFMFlavourDescriptor()).buildMarkdownTreeFromString(markdown)
 
+abstract class NoStackTrace(msg: String) : Throwable(msg, null, false, false)
+
 data class CompilationException(
         val file: File,
         val snippet: Snippet,
@@ -94,7 +96,7 @@ data class CompilationException(
             |${underlying.message}
             |##############################
             |
-        """.trimMargin()) : ScriptException(msg) {
+        """.trimMargin()) : NoStackTrace(msg) {
     override fun toString(): String = msg
 }
 
