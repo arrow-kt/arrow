@@ -31,6 +31,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$parent.ext.kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
     compile "org.jetbrains:markdown:0.1.25"
+    compile "com.github.lalyos:jfiglet:0.0.8"
     compile project(':arrow-free')
     compile project(':arrow-data')
     compile project(':arrow-syntax')
