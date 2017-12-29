@@ -20,6 +20,9 @@ So let's rewrite the example of [`State` docs]({{ '/docs/datatypes/state' | rela
 
 ```kotlin:ank:silent
 import arrow.*
+import arrow.core.*
+import arrow.data.*
+import arrow.typeclasses.*
 
 typealias Stack = List<String>
 
