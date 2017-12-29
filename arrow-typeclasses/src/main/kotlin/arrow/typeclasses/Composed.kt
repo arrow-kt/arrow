@@ -1,4 +1,7 @@
-package arrow
+package arrow.typeclasses
+
+import arrow.HK
+import arrow.HK2
 
 /**
  * https://www.youtube.com/watch?v=wvSP5qYiz4Y

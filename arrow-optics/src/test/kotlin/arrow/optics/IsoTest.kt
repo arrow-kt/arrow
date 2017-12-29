@@ -3,7 +3,6 @@ package arrow.optics
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import arrow.*
 import arrow.core.Either
 import arrow.core.Option
 import arrow.core.Some
@@ -17,6 +16,7 @@ import arrow.test.generators.genFunctionAToB
 import arrow.test.laws.IsoLaws
 import arrow.test.laws.LensLaws
 import arrow.test.laws.PrismLaws
+import arrow.typeclasses.Eq
 
 @RunWith(KTestJUnitRunner::class)
 class IsoTest : UnitSpec() {

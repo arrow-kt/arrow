@@ -1,4 +1,6 @@
-package arrow
+package arrow.typeclasses
+
+import arrow.*
 
 interface Alternative<F> : Applicative<F>, MonoidK<F>, Typeclass
 

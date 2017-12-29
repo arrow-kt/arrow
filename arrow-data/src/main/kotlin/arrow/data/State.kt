@@ -1,7 +1,8 @@
 package arrow.data
 
-import arrow.*
 import arrow.core.*
+import arrow.typeclasses.applicative
+import arrow.typeclasses.monad
 
 /**
  * Alias that represents stateful computation of the form `(S) -> Tuple2<S, A>`.

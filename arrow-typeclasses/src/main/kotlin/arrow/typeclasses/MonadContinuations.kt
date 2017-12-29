@@ -1,5 +1,6 @@
-package arrow
+package arrow.typeclasses
 
+import arrow.HK
 import java.util.concurrent.CountDownLatch
 import kotlin.coroutines.experimental.*
 import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED

@@ -3,6 +3,10 @@ package arrow.instances
 import arrow.*
 import arrow.core.*
 import arrow.data.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
 
 @instance(Kleisli::class)
 interface KleisliFunctorInstance<F, D> : Functor<KleisliKindPartial<F, D>> {

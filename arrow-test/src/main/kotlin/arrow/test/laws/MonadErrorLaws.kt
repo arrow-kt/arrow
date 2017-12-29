@@ -5,6 +5,9 @@ import arrow.core.Either
 import arrow.test.generators.genApplicative
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genThrowable
+import arrow.typeclasses.Eq
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.monadError
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

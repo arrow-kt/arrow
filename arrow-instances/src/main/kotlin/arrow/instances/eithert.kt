@@ -3,6 +3,7 @@ package arrow.instances
 import arrow.*
 import arrow.core.*
 import arrow.data.*
+import arrow.typeclasses.*
 
 interface EitherTFunctorInstance<F, L> : Functor<EitherTKindPartial<F, L>> {
 

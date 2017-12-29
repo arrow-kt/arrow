@@ -3,6 +3,8 @@ package arrow.data
 import arrow.*
 import arrow.core.*
 import arrow.legacy.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.monadError
 
 typealias Failure<A> = Try.Failure<A>
 typealias Success<A> = Try.Success<A>

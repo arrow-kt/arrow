@@ -1,4 +1,6 @@
-package arrow
+package arrow.typeclasses
+
+import arrow.*
 
 interface Monoid<A> : Semigroup<A>, Typeclass {
     /**

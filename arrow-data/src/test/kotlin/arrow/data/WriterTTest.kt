@@ -17,6 +17,7 @@ import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.MonadLaws
 import arrow.test.laws.MonadWriterLaws
 import arrow.test.laws.MonoidKLaws
+import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class WriterTTest : UnitSpec() {

@@ -7,6 +7,7 @@ import arrow.instances.*
 import arrow.mtl.FunctorFilter
 import arrow.mtl.TraverseFilter
 import arrow.mtl.syntax.traverseFilter
+import arrow.typeclasses.Applicative
 
 @instance(OptionT::class)
 interface OptionTFunctorFilterInstance<F> : OptionTFunctorInstance<F>, FunctorFilter<OptionTKindPartial<F>> {

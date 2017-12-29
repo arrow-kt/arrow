@@ -8,6 +8,7 @@ import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadErrorLaws
+import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class KleisliTest : UnitSpec() {

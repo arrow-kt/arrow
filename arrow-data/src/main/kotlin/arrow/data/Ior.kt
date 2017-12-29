@@ -2,6 +2,8 @@ package arrow.data
 
 import arrow.*
 import arrow.core.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Semigroup
 
 typealias IorNel<A, B> = Ior<Nel<A>, B>
 

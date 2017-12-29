@@ -3,9 +3,9 @@ package arrow.optics
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import arrow.core.Either
-import arrow.Eq
+import arrow.typeclasses.Eq
 import arrow.test.laws.IsoLaws
-import arrow.Monoid
+import arrow.typeclasses.Monoid
 import arrow.test.laws.PrismLaws
 import arrow.test.UnitSpec
 import arrow.Validated

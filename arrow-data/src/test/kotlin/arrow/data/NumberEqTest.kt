@@ -3,7 +3,7 @@ package arrow.data
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import arrow.test.UnitSpec
-import arrow.eq
+import arrow.typeclasses.eq
 import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
 
@@ -18,7 +18,7 @@ class NumberEqTest : UnitSpec() {
             eq<Float>() shouldNotBe null
             eq<Byte>() shouldNotBe null
             eq<Short>() shouldNotBe null
-            eq<java.lang.Integer>() shouldNotBe null
+            eq<Integer>() shouldNotBe null
         }
 
         testLaws(

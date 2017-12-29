@@ -1,7 +1,7 @@
 package arrow.optics
 
 import arrow.data.Const
-import arrow.Monoid
+import arrow.typeclasses.Monoid
 import arrow.core.None
 import arrow.core.Option
 

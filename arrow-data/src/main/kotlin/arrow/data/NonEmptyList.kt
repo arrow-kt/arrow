@@ -2,6 +2,8 @@ package arrow.data
 
 import arrow.*
 import arrow.core.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.foldable
 
 typealias Nel<A> = NonEmptyList<A>
 
@@ -43,7 +45,7 @@ class NonEmptyList<out A> private constructor(
 
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, NonEmptyList<B>> =
             GA.map2Eval(f(this.ev().head), Eval.always {
-                traverse<ListKWHK>().traverse(this.ev().tail.k(), f, GA)
+                arrow.typeclasses.traverse<ListKWHK>().traverse(this.ev().tail.k(), f, GA)
             }, {
                 NonEmptyList(it.a, it.b.ev().list)
             }).value()

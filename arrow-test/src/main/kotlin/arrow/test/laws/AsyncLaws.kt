@@ -14,6 +14,10 @@ import arrow.syntax.applicative.tupled
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.genIntSmall
 import arrow.test.generators.genThrowable
+import arrow.typeclasses.Eq
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.bindingE
+import arrow.typeclasses.monadError
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.newSingleThreadContext
 

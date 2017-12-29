@@ -1,6 +1,7 @@
 package arrow.free
 
 import arrow.*
+import arrow.typeclasses.Functor
 
 private typealias AnyFunc = (Any?) -> Any?
 

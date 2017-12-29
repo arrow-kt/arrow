@@ -1,6 +1,7 @@
 package arrow.syntax.traverse
 
 import arrow.*
+import arrow.typeclasses.*
 
 inline fun <reified F, reified G, A, B> HK<F, A>.traverse(
         FT: Traverse<F> = traverse(),

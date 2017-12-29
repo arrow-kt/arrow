@@ -1,6 +1,6 @@
 package arrow.test.laws
 
-import arrow.Eq
+import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 
 data class Law(val name: String, val test: () -> Unit)

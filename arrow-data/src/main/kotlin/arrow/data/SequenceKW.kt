@@ -4,6 +4,7 @@ import arrow.*
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Tuple2
+import arrow.typeclasses.Applicative
 
 fun <A> SequenceKWKind<A>.toList(): List<A> = this.ev().sequence.toList()
 

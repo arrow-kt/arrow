@@ -3,6 +3,9 @@ package arrow.effects
 import arrow.*
 import arrow.core.*
 import arrow.data.Try
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
 import kotlinx.coroutines.experimental.*
 import kotlin.coroutines.experimental.CoroutineContext
 

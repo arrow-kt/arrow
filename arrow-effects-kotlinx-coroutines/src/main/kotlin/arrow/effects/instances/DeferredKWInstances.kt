@@ -1,6 +1,6 @@
 package arrow.effects
 
-import arrow.MonadError
+import arrow.typeclasses.MonadError
 import arrow.instance
 
 @instance(DeferredKW::class)

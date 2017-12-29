@@ -1,6 +1,8 @@
 package arrow.free
 
 import arrow.*
+import arrow.typeclasses.Functor
+import arrow.typeclasses.functor
 
 @higherkind abstract class Yoneda<F, A> : YonedaKind<F, A>, YonedaKindedJ<F, A> {
 

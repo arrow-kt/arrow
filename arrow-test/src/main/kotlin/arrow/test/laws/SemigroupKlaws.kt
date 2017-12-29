@@ -1,9 +1,9 @@
 package arrow.test.laws
 
-import arrow.Applicative
-import arrow.Eq
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Eq
 import arrow.HK
-import arrow.SemigroupK
+import arrow.typeclasses.SemigroupK
 import arrow.test.generators.genConstructor
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll

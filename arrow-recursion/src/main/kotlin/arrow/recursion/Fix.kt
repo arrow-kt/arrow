@@ -1,6 +1,7 @@
 package arrow.recursion
 
 import arrow.*
+import arrow.typeclasses.*
 
 @higherkind data class Fix<F>(val FF: Functor<F>, val unfix: Fix<HK<F, HK<FixHK, F>>>) : FixKind<F> {
 

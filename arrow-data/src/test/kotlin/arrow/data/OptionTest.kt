@@ -16,6 +16,7 @@ import arrow.test.UnitSpec
 import arrow.test.generators.genOption
 import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.TraverseFilterLaws
+import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class OptionTest : UnitSpec() {

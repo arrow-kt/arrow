@@ -1,8 +1,8 @@
 package arrow.test.laws
 
-import arrow.Eq
-import arrow.Order
-import arrow.order
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Order
+import arrow.typeclasses.order
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

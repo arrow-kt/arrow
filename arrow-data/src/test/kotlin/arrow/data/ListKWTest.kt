@@ -7,6 +7,7 @@ import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.*
+import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class ListKWTest : UnitSpec() {

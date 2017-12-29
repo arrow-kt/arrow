@@ -1,6 +1,6 @@
 package arrow.test
 
-import arrow.Eq
+import arrow.typeclasses.Eq
 import arrow.test.laws.Law
 import io.kotlintest.TestCase
 import io.kotlintest.specs.StringSpec

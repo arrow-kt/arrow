@@ -3,6 +3,7 @@ package arrow.data
 import arrow.*
 import arrow.core.Either
 import arrow.core.Tuple2
+import arrow.typeclasses.*
 
 /**
  * Alias that represents an arrow from [D] to a monadic value `HK<F, A>`

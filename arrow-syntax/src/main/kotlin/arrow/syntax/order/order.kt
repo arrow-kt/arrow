@@ -1,6 +1,7 @@
 package arrow.syntax.order
 
-import arrow.*
+import arrow.typeclasses.Order
+import arrow.typeclasses.order
 
 /**
  * Syntax method for [Order.compare].

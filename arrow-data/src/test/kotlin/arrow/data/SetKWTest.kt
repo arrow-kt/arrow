@@ -9,6 +9,7 @@ import arrow.test.UnitSpec
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.test.laws.SemigroupKLaws
+import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class SetKWTest : UnitSpec() {

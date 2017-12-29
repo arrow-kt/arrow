@@ -6,6 +6,7 @@ import arrow.data.Try
 import arrow.effects.AsyncContext
 import arrow.effects.asyncContext
 import arrow.mtl.*
+import arrow.typeclasses.*
 
 inline fun <reified F, reified E> debugInstanceLookups(): Map<KClass<out Typeclass>, () -> Typeclass> = mapOf(
         Alternative::class to { alternative<F>() },

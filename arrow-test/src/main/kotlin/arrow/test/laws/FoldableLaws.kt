@@ -11,6 +11,10 @@ import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genIntPredicate
 import arrow.test.generators.genIntSmall
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.foldM
+import arrow.typeclasses.foldable
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

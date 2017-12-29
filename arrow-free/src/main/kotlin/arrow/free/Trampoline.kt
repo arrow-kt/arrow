@@ -2,7 +2,7 @@ package arrow.free
 
 import arrow.core.*
 import arrow.data.*
-import arrow.monad
+import arrow.typeclasses.monad
 
 /**
  * Trampoline is often used to emulate tail recursion. The idea is to have some step code that can be trampolined itself

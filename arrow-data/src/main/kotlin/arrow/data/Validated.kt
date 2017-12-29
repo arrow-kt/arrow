@@ -2,6 +2,9 @@ package arrow.data
 
 import arrow.*
 import arrow.core.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.semigroup
 
 typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 typealias Valid<A> = Validated.Valid<A>

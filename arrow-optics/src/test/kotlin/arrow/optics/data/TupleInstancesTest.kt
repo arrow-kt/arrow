@@ -2,7 +2,7 @@ package arrow.optics
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
-import arrow.Eq
+import arrow.typeclasses.Eq
 import arrow.test.laws.LensLaws
 import arrow.data.NonEmptyList
 import arrow.test.laws.TraversalLaws

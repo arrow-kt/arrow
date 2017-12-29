@@ -9,6 +9,7 @@ import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.TraverseFilterLaws
+import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class ConstTest : UnitSpec() {

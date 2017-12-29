@@ -9,6 +9,7 @@ import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
 import arrow.test.laws.TraverseLaws
+import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class CoproductTest : UnitSpec() {

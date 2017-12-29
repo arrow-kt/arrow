@@ -4,6 +4,7 @@ import arrow.*
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.toT
+import arrow.typeclasses.*
 
 @Suppress("UNCHECKED_CAST") inline fun <F, W, A> WriterTKind<F, W, A>.value(): HK<F, Tuple2<W, A>> = this.ev().value
 

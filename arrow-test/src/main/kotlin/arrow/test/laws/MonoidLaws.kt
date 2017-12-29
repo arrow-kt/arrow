@@ -1,7 +1,7 @@
 package arrow.test.laws
 
-import arrow.Eq
-import arrow.Monoid
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
 
 object MonoidLaws {
 

@@ -6,6 +6,10 @@ import arrow.syntax.comonad.extract
 import arrow.syntax.functor.map
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB
+import arrow.typeclasses.Comonad
+import arrow.typeclasses.Eq
+import arrow.typeclasses.cobinding
+import arrow.typeclasses.comonad
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

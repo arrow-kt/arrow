@@ -1,8 +1,9 @@
 package arrow.optics
 
 import arrow.core.Either
-import arrow.Functor
+import arrow.typeclasses.Functor
 import arrow.*
+import arrow.typeclasses.functor
 
 /**
  * [Setter] is a type alias for [PSetter] which fixes the type arguments

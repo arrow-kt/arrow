@@ -2,6 +2,7 @@ package arrow.instances
 
 import arrow.*
 import arrow.core.Eval
+import arrow.typeclasses.*
 
 interface ComposedFoldable<F, G> :
         Foldable<Nested<F, G>> {

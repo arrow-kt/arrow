@@ -1,9 +1,9 @@
 package io.arrow.ank
 
-import arrow.*
 import arrow.data.*
-import arrow.instances.*
 import arrow.free.*
+import arrow.instances.*
+import arrow.typeclasses.*
 import org.intellij.markdown.ast.ASTNode
 import java.io.File
 

@@ -8,6 +8,8 @@ import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.FunctorLaws
+import arrow.typeclasses.Eq
+import arrow.typeclasses.functor
 
 @RunWith(KTestJUnitRunner::class)
 class YonedaTest : UnitSpec() {

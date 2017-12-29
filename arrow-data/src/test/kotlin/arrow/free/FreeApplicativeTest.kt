@@ -3,7 +3,6 @@ package arrow
 import arrow.core.*
 import arrow.data.NonEmptyList
 import arrow.free.FreeApplicative
-import arrow.free.foldK
 import arrow.free.instances.FreeApplicativeApplicativeInstance
 import arrow.free.instances.FreeApplicativeEq
 import arrow.instances.FreeApplicativeApplicativeInstance
@@ -15,6 +14,8 @@ import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws
+import arrow.typeclasses.applicative
+import arrow.typeclasses.functor
 
 sealed class OpsAp<out A> : HK<OpsAp.F, A> {
 

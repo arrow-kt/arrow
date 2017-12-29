@@ -2,6 +2,7 @@ package arrow.data
 
 import arrow.*
 import arrow.core.*
+import arrow.typeclasses.*
 
 /**
  * Alias that represent stateful computation of the form `(S) -> Tuple2<S, A>` with a result in certain context `F`.

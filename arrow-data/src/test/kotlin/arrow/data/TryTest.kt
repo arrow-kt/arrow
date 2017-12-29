@@ -10,6 +10,7 @@ import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadErrorLaws
 import arrow.test.laws.TraverseLaws
+import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class TryTest : UnitSpec() {

@@ -1,6 +1,7 @@
 package arrow.mtl
 
 import arrow.*
+import arrow.typeclasses.Monad
 
 interface MonadReader<F, D> : Monad<F> {
     /** Get the environment */

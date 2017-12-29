@@ -2,6 +2,7 @@ package arrow
 
 import arrow.instances.ComposedFunctor
 import arrow.recursion.typeclass.Birecursive
+import arrow.typeclasses.*
 
 typealias Algebra <F, A> = (HK<F, A>) -> A
 

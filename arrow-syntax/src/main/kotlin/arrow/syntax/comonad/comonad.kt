@@ -1,6 +1,8 @@
 package arrow.syntax.comonad
 
 import arrow.*
+import arrow.typeclasses.Comonad
+import arrow.typeclasses.comonad
 
 inline fun <reified F, A, B> HK<F, A>.coflatMap(FT: Comonad<F> = comonad(), noinline f: (HK<F, A>) -> B): HK<F, B> = FT.coflatMap(this, f)
 

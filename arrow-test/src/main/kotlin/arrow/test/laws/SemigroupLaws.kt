@@ -1,7 +1,7 @@
 package arrow.test.laws
 
-import arrow.Eq
-import arrow.Semigroup
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Semigroup
 
 object SemigroupLaws {
 

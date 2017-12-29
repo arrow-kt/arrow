@@ -2,6 +2,7 @@ package arrow.instances
 
 import arrow.*
 import arrow.core.*
+import arrow.typeclasses.*
 
 @instance(Option::class)
 interface OptionSemigroupInstance<A> : Semigroup<Option<A>> {

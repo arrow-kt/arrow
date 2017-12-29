@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Option
 import arrow.core.Tuple2
+import arrow.typeclasses.Applicative
 
 @higherkind
 data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A> by list {

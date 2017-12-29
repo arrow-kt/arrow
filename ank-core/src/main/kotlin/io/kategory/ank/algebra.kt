@@ -6,6 +6,8 @@ import arrow.data.ListKW
 import arrow.free.Free
 import arrow.free.foldMap
 import arrow.free.instances.FreeMonadInstance
+import arrow.typeclasses.Monad
+import arrow.typeclasses.monad
 import org.intellij.markdown.ast.ASTNode
 import java.io.File
 

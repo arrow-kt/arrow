@@ -5,6 +5,10 @@ import arrow.core.*
 import arrow.data.Const
 import arrow.data.ListKW
 import arrow.instances.IntMonoid
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.foldable
+import arrow.typeclasses.monoid
 
 /**
  * A [Fold] is an optic that allows to focus into structure and get multiple results.

@@ -1,8 +1,8 @@
 package arrow.free
 
 import arrow.*
-import arrow.core.Either
-import arrow.core.FunctionK
+import arrow.core.*
+import arrow.typeclasses.*
 
 inline fun <reified M, S, A> FreeKind<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M> = monad()): HK<M, A> = (this as Free<S, A>).foldMap(f, MM)
 
@@ -24,7 +24,7 @@ inline fun <reified M, S, A> FreeKind<S, A>.foldMapK(f: FunctionK<S, M>, MM: Mon
 
         internal fun <F> applicativeF(): Applicative<FreeKindPartial<F>> =
                 object : Applicative<FreeKindPartial<F>> {
-                    private val applicative: Applicative<FreeKindPartial<F>> = applicative()
+                    private val applicative: Applicative<FreeKindPartial<F>> = arrow.typeclasses.applicative()
 
                     override fun <A> pure(a: A): Free<F, A> =
                             Companion.pure(a)

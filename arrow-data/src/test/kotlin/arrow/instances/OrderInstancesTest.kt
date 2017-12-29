@@ -6,7 +6,7 @@ import io.kotlintest.properties.Gen
 import arrow.test.laws.OrderLaws
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
-import arrow.order
+import arrow.typeclasses.order
 import arrow.toOrder
 import org.junit.runner.RunWith
 

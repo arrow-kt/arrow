@@ -3,7 +3,6 @@ package arrow.optics
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import arrow.*
 import arrow.core.Some
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
@@ -11,6 +10,7 @@ import arrow.test.generators.genEither
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genTuple
 import arrow.test.laws.PrismLaws
+import arrow.typeclasses.Eq
 
 @RunWith(KTestJUnitRunner::class)
 class PrismTest : UnitSpec() {

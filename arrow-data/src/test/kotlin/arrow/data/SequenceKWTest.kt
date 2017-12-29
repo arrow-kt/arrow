@@ -13,6 +13,7 @@ import arrow.test.UnitSpec
 import arrow.test.laws.MonadLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.test.laws.TraverseLaws
+import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class SequenceKWTest : UnitSpec() {

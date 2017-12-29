@@ -1,7 +1,7 @@
 package arrow.optics
 
-import arrow.*
 import arrow.core.*
+import arrow.typeclasses.Monoid
 
 /**
  * A [Getter] is an optic that allows to see into a structure and getting a focus.

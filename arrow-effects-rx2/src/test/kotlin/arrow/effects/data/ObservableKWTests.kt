@@ -5,12 +5,12 @@ import io.kotlintest.matchers.shouldNotBe
 import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
-import arrow.*
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.TraverseLaws
+import arrow.typeclasses.*
 import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)

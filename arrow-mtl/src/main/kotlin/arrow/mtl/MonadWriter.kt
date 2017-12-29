@@ -2,6 +2,7 @@ package arrow.mtl
 
 import arrow.*
 import arrow.core.Tuple2
+import arrow.typeclasses.Monad
 
 /** A monad that support monoidal accumulation (e.g. logging List<String>) */
 interface MonadWriter<F, W> : Monad<F>, Typeclass {

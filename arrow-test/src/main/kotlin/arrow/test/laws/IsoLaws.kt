@@ -1,6 +1,5 @@
 package arrow.test.laws
 
-import arrow.*
 import arrow.core.Id
 import arrow.core.compose
 import arrow.core.identity
@@ -13,6 +12,9 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.optics.Iso
 import arrow.optics.modify
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.monoid
 
 object IsoLaws {
 

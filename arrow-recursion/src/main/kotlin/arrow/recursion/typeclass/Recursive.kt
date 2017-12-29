@@ -3,6 +3,10 @@ package arrow.recursion.typeclass
 import arrow.*
 import arrow.instances.ComposedFunctor
 import arrow.instances.ComposedTraverse
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.Nested
+import arrow.typeclasses.Traverse
 
 interface Recursive<F, G> : Typeclass {
     fun projectT(fg: HK<F, G>): HK<Nested<F, G>, HK<F, G>>

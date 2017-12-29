@@ -1,8 +1,8 @@
 package arrow.instances
 
-import arrow.Applicative
-import arrow.Functor
-import arrow.Monad
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
 import arrow.core.*
 import arrow.data.*
 import arrow.instance

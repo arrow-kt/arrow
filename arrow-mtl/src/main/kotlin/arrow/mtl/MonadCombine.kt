@@ -2,6 +2,7 @@ package arrow.mtl
 
 import arrow.*
 import arrow.core.Tuple2
+import arrow.typeclasses.*
 
 /**
  * The combination of a Monad with a MonoidK

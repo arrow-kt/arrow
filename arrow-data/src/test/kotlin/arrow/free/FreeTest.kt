@@ -3,7 +3,6 @@ package arrow
 import arrow.core.Id
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.value
 import arrow.data.NonEmptyList
 import arrow.free.Free
 import arrow.free.foldMap
@@ -12,12 +11,14 @@ import arrow.free.instances.FreeMonadInstance
 import arrow.instances.FreeEq
 import arrow.instances.monad
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadLaws
+import arrow.typeclasses.applicative
+import arrow.typeclasses.functor
+import arrow.typeclasses.monad
 
 sealed class Ops<out A> : HK<Ops.F, A> {
 

@@ -1,10 +1,10 @@
 package arrow.test.laws
 
-import arrow.Eq
-import arrow.Monoid
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
 import arrow.core.*
 import arrow.data.*
-import arrow.free.instances.*
+import arrow.free.instances.applicative
 import arrow.instances.applicative
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll

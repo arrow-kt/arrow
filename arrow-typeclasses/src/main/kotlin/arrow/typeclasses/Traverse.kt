@@ -1,7 +1,7 @@
-package arrow
+package arrow.typeclasses
 
-import arrow.core.Id
-import arrow.core.value
+import arrow.*
+import arrow.core.*
 
 /**
  * Traverse, also known as Traversable. Traversal over a structure with an effect.
@@ -17,7 +17,7 @@ interface Traverse<F> : Functor<F>, Foldable<F>, Typeclass {
     fun <G, A> sequence(GA: Applicative<G>, fga: HK<F, HK<G, A>>): HK<G, HK<F, A>> = traverse(fga, { it }, GA)
 
     override fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B> =
-            traverse(fa, { Id(f(it)) }, arrow.applicative()).value()
+            traverse(fa, { Id(f(it)) }, applicative()).value()
 }
 
 inline fun <reified F, reified G, A, B> Traverse<F>.flatTraverse(fa: HK<F, A>, noinline f: (A) -> HK<G, HK<F, B>>, GA: Applicative<G> =

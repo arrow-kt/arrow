@@ -2,6 +2,7 @@ package arrow.free
 
 import arrow.*
 import arrow.core.*
+import arrow.typeclasses.*
 
 typealias CofreeEval<S, A> = HK<S, Cofree<S, A>>
 
@@ -32,7 +33,7 @@ typealias CofreeEval<S, A> = HK<S, Cofree<S, A>>
     fun extract(): A = head
 
     companion object {
-        inline fun <reified S, A> unfold(a: A, noinline f: (A) -> HK<S, A>, FS: Functor<S> = arrow.functor<S>()): Cofree<S, A> = create(a, f, FS)
+        inline fun <reified S, A> unfold(a: A, noinline f: (A) -> HK<S, A>, FS: Functor<S> = functor<S>()): Cofree<S, A> = create(a, f, FS)
 
         fun <S, A> create(a: A, f: (A) -> HK<S, A>, FS: Functor<S>): Cofree<S, A> = Cofree(FS, a, Eval.later { FS.map(f(a), { create(it, f, FS) }) })
 
@@ -40,7 +41,7 @@ typealias CofreeEval<S, A> = HK<S, Cofree<S, A>>
 }
 
 fun <F, A, B> Cofree<F, A>.cata(folder: (A, HK<F, B>) -> Eval<B>, TF: Traverse<F>): Eval<B> {
-    val ev: Eval<HK<F, B>> = TF.traverse(this.tailForced(), { it.cata(folder, TF) }, arrow.applicative()).ev()
+    val ev: Eval<HK<F, B>> = TF.traverse(this.tailForced(), { it.cata(folder, TF) }, applicative()).ev()
     return ev.flatMap { folder(extract(), it) }
 }
 

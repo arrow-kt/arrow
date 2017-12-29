@@ -2,9 +2,9 @@ package arrow.optics
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
-import arrow.Eq
+import arrow.typeclasses.Eq
 import arrow.test.laws.IsoLaws
-import arrow.Monoid
+import arrow.typeclasses.Monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.optics.instances.stringToList

@@ -1,7 +1,7 @@
 package arrow.syntax.eq
 
-import arrow.Eq
-import arrow.eq
+import arrow.typeclasses.Eq
+import arrow.typeclasses.eq
 
 /**
  * Syntax method for [Eq.eqv].

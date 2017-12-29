@@ -1,5 +1,6 @@
-package arrow
+package arrow.typeclasses
 
+import arrow.*
 import arrow.core.Either
 import arrow.core.Eval
 import kotlin.coroutines.experimental.startCoroutine

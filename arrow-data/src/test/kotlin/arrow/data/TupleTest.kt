@@ -6,6 +6,8 @@ import io.kotlintest.matchers.shouldNotBe
 import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.typeclasses.eq
+import arrow.typeclasses.monoid
 
 @RunWith(KTestJUnitRunner::class)
 class TupleTest : UnitSpec() {

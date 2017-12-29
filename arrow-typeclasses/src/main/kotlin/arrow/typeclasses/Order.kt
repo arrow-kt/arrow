@@ -1,6 +1,10 @@
-package arrow
+package arrow.typeclasses
 
+import arrow.InstanceParametrizedType
+import arrow.Typeclass
 import arrow.core.Tuple2
+import arrow.instance
+import arrow.typeLiteral
 
 /**
  * The [Order] type class is used to define a total ordering on some type [F] and is defined by being able to fully determine order between two instances.

@@ -3,6 +3,7 @@ package arrow.instances
 import arrow.*
 import arrow.core.Eval
 import arrow.data.*
+import arrow.typeclasses.*
 
 @instance(Validated::class)
 interface ValidatedFunctorInstance<E> : Functor<ValidatedKindPartial<E>> {

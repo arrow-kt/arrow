@@ -2,6 +2,7 @@ package arrow.mtl
 
 import arrow.*
 import arrow.core.Option
+import arrow.typeclasses.Monad
 import kotlin.coroutines.experimental.startCoroutine
 
 interface MonadFilter<F> : Monad<F>, FunctorFilter<F>, Typeclass {

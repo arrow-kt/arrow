@@ -2,6 +2,7 @@ package arrow.instances
 
 import arrow.*
 import arrow.core.*
+import arrow.typeclasses.*
 
 @instance(Id::class)
 interface IdEqInstance<A> : Eq<Id<A>> {

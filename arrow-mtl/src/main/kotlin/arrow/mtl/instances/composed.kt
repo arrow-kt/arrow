@@ -4,6 +4,7 @@ import arrow.*
 import arrow.core.Option
 import arrow.instances.ComposedTraverse
 import arrow.mtl.TraverseFilter
+import arrow.typeclasses.*
 
 interface ComposedTraverseFilter<F, G> :
         TraverseFilter<Nested<F, G>>,

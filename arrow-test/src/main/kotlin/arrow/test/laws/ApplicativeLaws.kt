@@ -6,6 +6,9 @@ import arrow.syntax.applicative.tupled
 import arrow.test.generators.genApplicative
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genIntSmall
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Eq
+import arrow.typeclasses.applicative
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

@@ -3,6 +3,7 @@ package arrow.instances
 import arrow.*
 import arrow.core.*
 import arrow.data.*
+import arrow.typeclasses.*
 
 interface CoproductFunctorInstance<F, G> : Functor<CoproductKindPartial<F, G>> {
 
@@ -86,14 +87,14 @@ object CoproductTraverseInstanceImplicits {
     }
 }
 
-inline fun <reified F, reified G> Coproduct.Companion.comonad(CF: Comonad<F> = comonad(), CG: Comonad<G>): CoproductComonadInstance<F, G> =
+inline fun <reified F, reified G> Coproduct.Companion.comonad(CF: Comonad<F> = arrow.typeclasses.comonad(), CG: Comonad<G>): CoproductComonadInstance<F, G> =
         CoproductComonadInstanceImplicits.instance(CF, CG)
 
-inline fun <reified F, reified G> Coproduct.Companion.functor(FF: Functor<F> = arrow.functor(), FG: Functor<G> = arrow.functor()): CoproductFunctorInstance<F, G> =
+inline fun <reified F, reified G> Coproduct.Companion.functor(FF: Functor<F> = arrow.typeclasses.functor(), FG: Functor<G> = arrow.typeclasses.functor()): CoproductFunctorInstance<F, G> =
         CoproductFunctorInstanceImplicits.instance(FF, FG)
 
 inline fun <reified F, reified G> Coproduct.Companion.traverse(FF: Traverse<F> = traverse<F>(), FG: Traverse<G> = traverse<G>()): CoproductTraverseInstance<F, G> =
         CoproductTraverseInstanceImplicits.instance(FF, FG)
 
-inline fun <reified F, reified G> Coproduct.Companion.foldable(FF: Foldable<F> = foldable<F>(), FG: Foldable<G> = foldable<G>()): CoproductFoldableInstance<F, G> =
+inline fun <reified F, reified G> Coproduct.Companion.foldable(FF: Foldable<F> = arrow.typeclasses.foldable<F>(), FG: Foldable<G> = arrow.typeclasses.foldable<G>()): CoproductFoldableInstance<F, G> =
         CoproductFoldableInstanceImplicits.instance(FF, FG)

@@ -2,6 +2,8 @@ package arrow.syntax.applicative
 
 import arrow.*
 import arrow.core.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.applicative
 
 inline fun <reified F, A> A.pure(FT: Applicative<F> = applicative()): HK<F, A> = FT.pure(this)
 

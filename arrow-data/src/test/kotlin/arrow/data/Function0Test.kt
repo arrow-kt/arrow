@@ -7,6 +7,7 @@ import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
 import arrow.test.laws.MonadLaws
+import arrow.typeclasses.Eq
 
 @RunWith(KTestJUnitRunner::class)
 class Function0Test : UnitSpec() {

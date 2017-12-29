@@ -3,7 +3,6 @@ package arrow.optics
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import arrow.*
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Tuple2
@@ -15,6 +14,7 @@ import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.laws.LensLaws
+import arrow.typeclasses.Eq
 
 @RunWith(KTestJUnitRunner::class)
 class LensTest : UnitSpec() {

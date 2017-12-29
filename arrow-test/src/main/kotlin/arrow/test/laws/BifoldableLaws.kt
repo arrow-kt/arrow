@@ -6,6 +6,9 @@ import arrow.instances.IntMonoid
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genIntSmall
+import arrow.typeclasses.Bifoldable
+import arrow.typeclasses.Eq
+import arrow.typeclasses.bifoldable
 import io.kotlintest.properties.forAll
 
 object BifoldableLaws {

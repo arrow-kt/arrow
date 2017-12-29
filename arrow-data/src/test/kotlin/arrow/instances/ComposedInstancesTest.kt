@@ -9,6 +9,10 @@ import arrow.data.*
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.*
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Nested
+import arrow.typeclasses.NestedType
+import arrow.typeclasses.unnest
 
 typealias OptionTNel = HK<OptionTKindPartial<NonEmptyListHK>, Int>
 

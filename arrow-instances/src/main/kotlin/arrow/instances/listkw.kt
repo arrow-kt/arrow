@@ -3,6 +3,7 @@ package arrow.instances
 import arrow.*
 import arrow.core.*
 import arrow.data.*
+import arrow.typeclasses.*
 
 @instance(ListKW::class)
 interface ListKWSemigroupInstance<A> : Semigroup<ListKW<A>> {

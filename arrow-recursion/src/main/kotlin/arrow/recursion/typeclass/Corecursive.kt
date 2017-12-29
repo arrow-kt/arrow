@@ -3,6 +3,7 @@ package arrow.recursion.typeclass
 import arrow.*
 import arrow.instances.ComposedFunctor
 import arrow.instances.ComposedTraverse
+import arrow.typeclasses.*
 
 interface Corecursive<F, G> : Typeclass {
     fun embedT(compFG: HK<Nested<F, G>, HK<F, G>>): HK<F, G>

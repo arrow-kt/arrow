@@ -2,7 +2,7 @@ package arrow.optics
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
-import arrow.Eq
+import arrow.typeclasses.Eq
 import arrow.core.Id
 import arrow.instances.IntMonoid
 import arrow.test.laws.IsoLaws

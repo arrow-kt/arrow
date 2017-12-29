@@ -2,6 +2,7 @@ package arrow.mtl
 
 import arrow.*
 import arrow.core.Tuple2
+import arrow.typeclasses.Monad
 
 interface MonadState<F, S> : Monad<F>, Typeclass {
 

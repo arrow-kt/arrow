@@ -15,6 +15,9 @@ import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws
+import arrow.typeclasses.Eq
+import arrow.typeclasses.comonad
+import arrow.typeclasses.functor
 
 @RunWith(KTestJUnitRunner::class)
 class CofreeTest : UnitSpec() {

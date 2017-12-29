@@ -1,4 +1,6 @@
-package arrow
+package arrow.typeclasses
+
+import arrow.*
 
 /**
  * The combination of monad and comonad

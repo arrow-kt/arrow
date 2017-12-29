@@ -3,6 +3,7 @@ package arrow.free.instances
 import arrow.*
 import arrow.core.*
 import arrow.data.*
+import arrow.typeclasses.*
 
 @instance(Const::class)
 interface ConstFunctorInstance<A> : Functor<ConstKindPartial<A>> {

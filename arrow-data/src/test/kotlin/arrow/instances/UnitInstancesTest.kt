@@ -7,6 +7,9 @@ import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.SemigroupLaws
+import arrow.typeclasses.eq
+import arrow.typeclasses.monoid
+import arrow.typeclasses.semigroup
 
 @RunWith(KTestJUnitRunner::class)
 class UnitInstancesTest : UnitSpec() {

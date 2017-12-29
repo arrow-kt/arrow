@@ -3,6 +3,7 @@ package arrow.free.instances
 import arrow.*
 import arrow.core.FunctionK
 import arrow.free.*
+import arrow.typeclasses.*
 
 @instance(FreeApplicative::class)
 interface FreeApplicativeFunctorInstance<S> : Functor<FreeApplicativeKindPartial<S>> {

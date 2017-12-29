@@ -1,6 +1,8 @@
 package arrow.syntax.functor
 
 import arrow.*
+import arrow.typeclasses.Functor
+import arrow.typeclasses.functor
 
 inline fun <reified F, A, B> HK<F, A>.map(FT : Functor<F> = functor(), noinline f: (A) -> B): HK<F, B> = FT.map(this, f)
 

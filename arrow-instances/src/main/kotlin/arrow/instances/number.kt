@@ -1,9 +1,9 @@
 package arrow.instances
 
-import arrow.Eq
-import arrow.Monoid
-import arrow.Order
-import arrow.Semigroup
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Order
+import arrow.typeclasses.Semigroup
 
 class NumberSemigroup<A : Number>(val f: (A, A) -> A) : Semigroup<A> {
     override fun combine(a: A, b: A): A = f(a, b)

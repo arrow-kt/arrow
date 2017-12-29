@@ -5,6 +5,7 @@ import arrow.core.andThen
 import arrow.core.identity
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB
+import arrow.typeclasses.*
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

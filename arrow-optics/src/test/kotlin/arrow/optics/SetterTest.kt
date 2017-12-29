@@ -3,7 +3,7 @@ package arrow.optics
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import arrow.Eq
+import arrow.typeclasses.Eq
 import arrow.test.laws.SetterLaws
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB

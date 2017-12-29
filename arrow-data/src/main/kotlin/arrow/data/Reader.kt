@@ -1,7 +1,7 @@
 package arrow.data
 
-import arrow.*
 import arrow.core.*
+import arrow.typeclasses.*
 
 /**
  * Alias that represents a computation that has a dependency on [D].
@@ -118,20 +118,20 @@ object ReaderApi {
     /**
      * Alias for[ReaderT.Companion.applicative]
      */
-    fun <D> applicative(): Applicative<ReaderKindPartial<D>> = arrow.applicative()
+    fun <D> applicative(): Applicative<ReaderKindPartial<D>> = arrow.typeclasses.applicative()
 
     /**
      * Alias for [ReaderT.Companion.functor]
      */
-    fun <D> functor(): Functor<ReaderKindPartial<D>> = arrow.functor()
+    fun <D> functor(): Functor<ReaderKindPartial<D>> = arrow.typeclasses.functor()
 
     /**
      * Alias for [ReaderT.Companion.monad]
      */
-    fun <D> monad(): Monad<ReaderKindPartial<D>> = arrow.monad()
+    fun <D> monad(): Monad<ReaderKindPartial<D>> = arrow.typeclasses.monad()
 
-    fun <D, A> pure(x: A): Reader<D, A> = ReaderT.pure(x, arrow.monad())
+    fun <D, A> pure(x: A): Reader<D, A> = ReaderT.pure(x, arrow.typeclasses.monad())
 
-    fun <D> ask(): Reader<D, D> = ReaderT.ask(arrow.monad())
+    fun <D> ask(): Reader<D, D> = ReaderT.ask(arrow.typeclasses.monad())
 
 }

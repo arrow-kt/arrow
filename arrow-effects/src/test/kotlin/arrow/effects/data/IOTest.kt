@@ -14,6 +14,7 @@ import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.AsyncLaws
+import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class IOTest : UnitSpec() {

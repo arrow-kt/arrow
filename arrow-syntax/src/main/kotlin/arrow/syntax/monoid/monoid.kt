@@ -1,6 +1,7 @@
 package arrow.syntax.monoid
 
-import arrow.*
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.monoid
 
 inline fun <reified A> A.empty(FT: Monoid<A> = monoid()): A = FT.empty()
 

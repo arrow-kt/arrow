@@ -4,6 +4,9 @@ import arrow.*
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genConstructor2
 import arrow.test.generators.genFunctionAToB
+import arrow.typeclasses.Alternative
+import arrow.typeclasses.Eq
+import arrow.typeclasses.alternative
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

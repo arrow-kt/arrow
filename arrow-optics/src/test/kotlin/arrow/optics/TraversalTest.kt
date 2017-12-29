@@ -3,7 +3,6 @@ package arrow.optics
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import arrow.*
 import arrow.core.Option
 import arrow.core.toT
 import arrow.data.k
@@ -13,6 +12,7 @@ import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genTuple
 import arrow.test.laws.TraversalLaws
+import arrow.typeclasses.Eq
 
 @RunWith(KTestJUnitRunner::class)
 class TraversalTest : UnitSpec() {

@@ -1,5 +1,6 @@
-package arrow
+package arrow.typeclasses
 
+import arrow.*
 import kotlin.coroutines.experimental.startCoroutine
 
 interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F>, Typeclass {

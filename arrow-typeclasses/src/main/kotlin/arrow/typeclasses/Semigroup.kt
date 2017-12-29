@@ -1,6 +1,10 @@
-package arrow
+package arrow.typeclasses
 
+import arrow.InstanceParametrizedType
+import arrow.Typeclass
 import arrow.core.Option
+import arrow.instance
+import arrow.typeLiteral
 
 interface Semigroup<A> : Typeclass {
     /**

@@ -1,6 +1,5 @@
 package arrow.optics
 
-import arrow.*
 import arrow.core.Either
 import arrow.instances.IntMonoid
 import arrow.optics.instances.nonePrism
@@ -18,6 +17,8 @@ import arrow.test.generators.genNullable
 import arrow.test.generators.genOption
 import arrow.test.laws.IsoLaws
 import arrow.test.laws.PrismLaws
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
 
 @RunWith(KTestJUnitRunner::class)
 class OptionInstancesTest : UnitSpec() {

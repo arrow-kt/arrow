@@ -3,9 +3,10 @@ package arrow.optics
 import arrow.*
 import arrow.core.*
 import arrow.data.*
+import arrow.free.instances.applicative
 import arrow.instances.*
-import arrow.free.instances.*
 import arrow.syntax.applicative.*
+import arrow.typeclasses.*
 
 /**
  * [Traversal] is a type alias for [PTraversal] which fixes the type arguments
@@ -36,7 +37,7 @@ interface PTraversal<S, T, A, B> {
                     s.bimap(f, f).fold({ fa -> FA.map(fa, { a -> Either.Left(a) }) }, { fa -> FA.map(fa, { a -> Either.Right(a) }) })
         }
 
-        inline fun <reified T, A, B> fromTraversable(TT: arrow.Traverse<T> = traverse()) = object : PTraversal<HK<T, A>, HK<T, B>, A, B> {
+        inline fun <reified T, A, B> fromTraversable(TT: Traverse<T> = traverse()) = object : PTraversal<HK<T, A>, HK<T, B>, A, B> {
             override fun <F> modifyF(FA: Applicative<F>, s: HK<T, A>, f: (A) -> HK<F, B>): HK<F, HK<T, B>> =
                     TT.traverse(s, f, FA)
         }

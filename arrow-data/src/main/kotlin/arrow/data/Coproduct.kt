@@ -2,6 +2,7 @@ package arrow.data
 
 import arrow.*
 import arrow.core.*
+import arrow.typeclasses.*
 
 @higherkind data class Coproduct<F, G, A>(val run: Either<HK<F, A>, HK<G, A>>) : CoproductKind<F, G, A>, CoproductKindedJ<F, G, A> {
 

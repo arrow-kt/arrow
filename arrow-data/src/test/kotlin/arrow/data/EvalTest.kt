@@ -9,10 +9,11 @@ import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws
 import arrow.test.laws.MonadLaws
+import arrow.typeclasses.Eq
 
 @RunWith(KTestJUnitRunner::class)
 class EvalTest : UnitSpec() {
-    val EQ: Eq<HK<EvalHK, Int>>  = Eq { a, b ->
+    val EQ: Eq<HK<EvalHK, Int>> = Eq { a, b ->
         arrow.test.laws.ev().value() == arrow.test.laws.ev().value()
     }
 

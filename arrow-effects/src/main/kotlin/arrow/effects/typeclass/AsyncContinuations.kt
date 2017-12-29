@@ -1,7 +1,7 @@
 package arrow.effects
 
-import arrow.*
 import arrow.core.Either
+import arrow.typeclasses.MonadContinuation
 
 suspend inline fun <reified F, A, B> MonadContinuation<F, A>.bindAsync(AC: AsyncContext<F> = asyncContext(), crossinline f: () -> B): B =
         runAsync(AC, f).bind()

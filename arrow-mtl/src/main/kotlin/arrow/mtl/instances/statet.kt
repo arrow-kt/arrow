@@ -6,6 +6,8 @@ import arrow.data.*
 import arrow.instances.*
 import arrow.mtl.MonadCombine
 import arrow.mtl.MonadState
+import arrow.typeclasses.Monad
+import arrow.typeclasses.SemigroupK
 
 @instance(StateT::class)
 interface StateTMonadStateInstance<F, S> : StateTMonadInstance<F, S>, MonadState<StateTKindPartial<F, S>, S> {

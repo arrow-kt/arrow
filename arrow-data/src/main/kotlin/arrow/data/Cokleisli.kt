@@ -1,6 +1,8 @@
 package arrow.data
 
 import arrow.*
+import arrow.typeclasses.Comonad
+import arrow.typeclasses.comonad
 
 typealias CokleisliFun<F, A, B> = (HK<F, A>) -> B
 

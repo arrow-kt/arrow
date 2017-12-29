@@ -6,6 +6,10 @@ import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadLaws
+import arrow.typeclasses.Eq
+import arrow.typeclasses.applicative
+import arrow.typeclasses.functor
+import arrow.typeclasses.monad
 
 @RunWith(KTestJUnitRunner::class)
 class Function1Test : UnitSpec() {

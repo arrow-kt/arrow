@@ -1,4 +1,9 @@
-package arrow
+package arrow.typeclasses
+
+import arrow.InstanceParametrizedType
+import arrow.Typeclass
+import arrow.instance
+import arrow.typeLiteral
 
 /**
  * A type class used to determine equality between 2 instances of the same type [F] in a type safe way.

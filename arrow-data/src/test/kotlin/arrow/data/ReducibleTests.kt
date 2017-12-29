@@ -8,6 +8,7 @@ import arrow.instances.LongMonoid
 import arrow.test.laws.ReducibleLaws
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class ReducibleTests : UnitSpec() {

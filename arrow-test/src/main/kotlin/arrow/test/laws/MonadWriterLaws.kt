@@ -3,6 +3,10 @@ package arrow.test.laws
 import arrow.*
 import arrow.core.Tuple2
 import arrow.mtl.MonadWriter
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Monad
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

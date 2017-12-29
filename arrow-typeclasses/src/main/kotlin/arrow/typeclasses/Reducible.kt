@@ -1,5 +1,6 @@
-package arrow
+package arrow.typeclasses
 
+import arrow.*
 import arrow.core.*
 
 /**

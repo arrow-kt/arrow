@@ -2,6 +2,7 @@ package arrow.optics
 
 import arrow.*
 import arrow.core.*
+import arrow.typeclasses.*
 
 /**
  * [Prism] is a type alias for [PPrism] which fixes the type arguments

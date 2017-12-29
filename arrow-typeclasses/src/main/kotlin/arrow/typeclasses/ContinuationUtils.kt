@@ -1,4 +1,4 @@
-package arrow
+package arrow.typeclasses
 
 import kotlin.coroutines.experimental.Continuation
 

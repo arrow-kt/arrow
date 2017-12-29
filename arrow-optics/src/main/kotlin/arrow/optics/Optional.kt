@@ -2,6 +2,9 @@ package arrow.optics
 
 import arrow.*
 import arrow.core.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.applicative
 
 /**
  * [Optional] is a type alias for [POptional] which fixes the type arguments

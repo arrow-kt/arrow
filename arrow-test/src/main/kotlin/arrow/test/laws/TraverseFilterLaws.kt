@@ -10,6 +10,9 @@ import arrow.syntax.functor.*
 import arrow.test.generators.genApplicative
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genIntSmall
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Eq
+import arrow.typeclasses.applicative
 
 object TraverseFilterLaws {
 

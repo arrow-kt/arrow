@@ -2,6 +2,10 @@ package arrow.optics
 
 import arrow.*
 import arrow.core.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.functor
 
 /**
  * [Iso] is a type alias for [PIso] which fixes the type arguments

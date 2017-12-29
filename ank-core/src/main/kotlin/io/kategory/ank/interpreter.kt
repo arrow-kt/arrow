@@ -4,6 +4,8 @@ import arrow.*
 import arrow.core.*
 import arrow.data.*
 import arrow.syntax.applicativeerror.*
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.monadError
 import kotlinx.coroutines.experimental.CoroutineDispatcher
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.runBlocking

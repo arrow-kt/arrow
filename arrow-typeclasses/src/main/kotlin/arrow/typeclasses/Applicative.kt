@@ -1,7 +1,8 @@
 @file:Suppress("UNUSED_PARAMETER")
 
-package arrow
+package arrow.typeclasses
 
+import arrow.*
 import arrow.core.Eval
 import arrow.core.Tuple2
 

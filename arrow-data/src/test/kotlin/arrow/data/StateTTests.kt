@@ -9,6 +9,7 @@ import arrow.test.UnitSpec
 import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonadStateLaws
 import arrow.test.laws.SemigroupKLaws
+import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class StateTTests : UnitSpec() {

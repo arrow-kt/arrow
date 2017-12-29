@@ -3,6 +3,7 @@ package arrow.instances
 import arrow.*
 import arrow.core.*
 import arrow.data.*
+import arrow.typeclasses.*
 
 @instance(MapKW::class)
 interface MapKWFunctorInstance<K> : Functor<MapKWKindPartial<K>> {

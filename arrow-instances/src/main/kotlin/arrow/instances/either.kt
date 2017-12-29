@@ -2,6 +2,7 @@ package arrow.instances
 
 import arrow.*
 import arrow.core.*
+import arrow.typeclasses.*
 
 @instance(Either::class)
 interface EitherFunctorInstance<L> : Functor<EitherKindPartial<L>> {

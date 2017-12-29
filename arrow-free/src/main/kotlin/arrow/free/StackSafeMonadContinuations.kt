@@ -1,8 +1,8 @@
 package arrow.free
 
 import arrow.HK
-import arrow.Monad
-import arrow.stackLabels
+import arrow.typeclasses.Monad
+import arrow.typeclasses.stackLabels
 import kotlin.coroutines.experimental.*
 import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn

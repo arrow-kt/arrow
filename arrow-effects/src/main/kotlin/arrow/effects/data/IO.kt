@@ -5,6 +5,9 @@ import arrow.core.*
 import arrow.core.Either.Left
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
 
 @higherkind
 @deriving(

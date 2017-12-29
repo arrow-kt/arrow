@@ -1,4 +1,6 @@
-package arrow
+package arrow.typeclasses
+
+import arrow.*
 
 /**
  * MonoidK is a universal monoid which operates on kinds.

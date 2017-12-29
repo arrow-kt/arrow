@@ -1,7 +1,7 @@
 package java_lang
 
-import arrow.*
 import arrow.instances.*
+import arrow.typeclasses.Semigroup
 
 object IntegerMonoidInstanceImplicits {
     fun instance(): IntMonoid = IntMonoid

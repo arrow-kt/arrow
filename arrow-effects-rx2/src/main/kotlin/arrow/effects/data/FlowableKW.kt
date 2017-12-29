@@ -6,6 +6,7 @@ import io.reactivex.FlowableEmitter
 import arrow.*
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.typeclasses.*
 
 fun <A> Flowable<A>.k(): FlowableKW<A> = FlowableKW(this)
 
