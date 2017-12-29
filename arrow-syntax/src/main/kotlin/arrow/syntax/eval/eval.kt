@@ -1,7 +1,7 @@
 package arrow.syntax.eval
 
-import arrow.*
 import arrow.core.*
+import arrow.instances.*
 import arrow.syntax.applicative.tupled
 
 fun <A, B> merge(

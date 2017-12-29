@@ -1,8 +1,6 @@
 package arrow.syntax.validated
 
-import arrow.data.Invalid
-import arrow.data.Valid
-import arrow.data.ValidatedNel
+import arrow.data.*
 
 fun <E, A> A.valid(): Validated<E, A> = Valid(this)
 

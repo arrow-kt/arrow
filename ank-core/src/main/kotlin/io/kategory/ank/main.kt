@@ -1,9 +1,11 @@
 @file:JvmName("main")
 package io.kategory.ank
 
-import arrow.core.Either
-import arrow.data.ListKW
-import arrow.ev
+import arrow.core.*
+import arrow.data.*
+import arrow.instances.*
+import arrow.free.*
+import io.arrow.ank.*
 import io.arrow.ank.ank
 import io.arrow.ank.ankMonadErrorInterpreter
 import java.io.File
