@@ -1,8 +1,6 @@
 package arrow.optics
 
 import arrow.*
-import compose
-import identity
 
 /**
  * A [Getter] is an optic that allows to see into a structure and getting a focus.

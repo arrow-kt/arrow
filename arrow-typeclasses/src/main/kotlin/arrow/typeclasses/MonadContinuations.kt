@@ -44,7 +44,7 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
 
     protected lateinit var returnedMonad: HK<F, A>
 
-    fun returnedMonad(): HK<F, A> = returnedMonad
+    open fun returnedMonad(): HK<F, A> = returnedMonad
 
     suspend fun <B> HK<F, B>.bind(): B = bind { this }
 

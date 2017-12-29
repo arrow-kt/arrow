@@ -105,16 +105,16 @@ interface OptionFoldableInstance : arrow.Foldable<OptionHK> {
 fun <A, G, B> Option<A>.traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, Option<B>> =
         this.ev().let { option ->
             when (option) {
-                is Option.Some -> GA.map(f(option.t), { Option.Some(it) })
-                is Option.None -> GA.pure(None)
+                is Some -> GA.map(f(option.t), { Some(it) })
+                is None -> GA.pure(None)
             }
         }
 
 fun <A, G, B> Option<A>.traverseFilter(f: (A) -> HK<G, Option<B>>, GA: Applicative<G>): HK<G, Option<B>> =
         this.ev().let { option ->
             when (option) {
-                is Option.Some -> f(option.t)
-                is Option.None -> GA.pure(None)
+                is Some -> f(option.t)
+                is None -> GA.pure(None)
             }
         }
 

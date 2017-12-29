@@ -1,6 +1,6 @@
 package arrow.syntax.collections
 
-import arrow.syntax.function.toOption
+import arrow.syntax.option.*
 import arrow.GetterOperation
 import arrow.GetterOperationImpl
 import arrow.Option

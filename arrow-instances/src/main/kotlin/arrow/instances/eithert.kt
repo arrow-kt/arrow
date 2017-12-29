@@ -59,8 +59,8 @@ interface EitherTMonadErrorInstance<F, L> : EitherTMonadInstance<F, L>, MonadErr
     override fun <A> handleErrorWith(fa: EitherTKind<F, L, A>, f: (L) -> EitherTKind<F, L, A>): EitherT<F, L, A> =
             EitherT(MF().flatMap(fa.ev().value, {
                 when (it) {
-                    is Left -> f(it.a).ev().value
-                    is Right -> MF().pure(it)
+                    is Either.Left -> f(it.a).ev().value
+                    is Either.Right -> MF().pure(it)
                 }
             }))
 

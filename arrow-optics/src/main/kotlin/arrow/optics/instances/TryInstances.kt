@@ -11,7 +11,7 @@ fun <A, B> pTrySuccess(): PPrism<Try<A>, Try<B>, A, B> = PPrism(
 )
 
 /**
- * [Prism] to focus into an [arrow.Option.None]
+ * [Prism] to focus into an [arrow.None]
  */
 fun <A> trySuccess(): Prism<Try<A>, A> = pTrySuccess()
 
@@ -40,7 +40,7 @@ fun <A> tryToEither(): Iso<Try<A>, Either<Throwable, A>> = pTryToEither()
  * [PIso] that defines the equality between a [Try] and [Validated] of [Throwable] and [A]
  */
 fun <A1, A2> pTryToValidated(): PIso<Try<A1>, Try<A2>, Validated<Throwable, A1>, Validated<Throwable, A2>> = PIso(
-        get = { it.fold({ it.invalid() }, { it.valid() }) },
+        get = { it.fold({ Validated.Invalid(it) }, { Validated.Valid(it) }) },
         reverseGet = { it.fold({ Failure(it) }, { Success(it) }) }
 )
 

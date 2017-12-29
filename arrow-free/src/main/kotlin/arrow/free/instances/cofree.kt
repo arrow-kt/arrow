@@ -1,7 +1,5 @@
 package arrow
 
-import arrow.*
-
 @instance(Cofree::class)
 interface CofreeFunctorInstance<S> : Functor<CofreeKindPartial<S>>, Typeclass {
     override fun <A, B> map(fa: CofreeKind<S, A>, f: (A) -> B): Cofree<S, B> = fa.ev().map(f)

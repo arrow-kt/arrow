@@ -264,3 +264,11 @@ fun <HKF, A, B, C, D, E, F, G, H, I, J, Z> Applicative<HKF>.map(
         lbd: (Tuple10<A, B, C, D, E, F, G, H, I, J>) -> Z): HK<HKF, Z> =
         this.map(a.product(this, b).product(this, c).product(this, d).product(this, e).product(this, f)
                 .product(this, g).product(this, h).product(this, i).product(this, j), lbd)
+
+inline fun <reified F, A, B> merge(
+        op1: () -> A,
+        op2: () -> B, AP: Applicative<F> = applicative()): HK<F, Tuple2<A, B>> =
+        AP.tupled(
+                AP.pure(op1()),
+                AP.pure(op2())
+        )

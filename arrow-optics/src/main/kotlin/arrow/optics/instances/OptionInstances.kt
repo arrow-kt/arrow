@@ -1,7 +1,6 @@
 package arrow.optics
 
 import arrow.*
-import identity
 
 /**
  * [PIso] that defines the equality in the kotlin nullable structure and [arrow.Option]
@@ -17,7 +16,7 @@ fun <A, B> pNullableToOption(): PIso<A?, B?, Option<A>, Option<B>> = PIso(
 fun <A> nullableToOption(): Iso<A?, Option<A>> = pNullableToOption()
 
 /**
- * [PPrism] to focus into an [arrow.Option.Some]
+ * [PPrism] to focus into an [arrow.Some]
  */
 fun <A, B> pSomePrism(): PPrism<Option<A>, Option<B>, A, B> = PPrism(
         getOrModify = { option -> option.fold({ Left(None) }, { a -> Right(a) }) },
@@ -25,12 +24,12 @@ fun <A, B> pSomePrism(): PPrism<Option<A>, Option<B>, A, B> = PPrism(
 )
 
 /**
- * [Prism] to focus into an [arrow.Option.Some]
+ * [Prism] to focus into an [arrow.Some]
  */
 fun <A> somePrism(): Prism<Option<A>, A> = pSomePrism()
 
 /**
- * [Prism] to focus into an [arrow.Option.None]
+ * [Prism] to focus into an [arrow.None]
  */
 fun <A> nonePrism(): Prism<Option<A>, Unit> = Prism(
         getOrModify = { option -> option.fold({ Right(Unit) }, { Left(Some(it)) }) },

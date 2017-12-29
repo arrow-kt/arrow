@@ -33,6 +33,7 @@ dependencies {
     compile "org.jetbrains:markdown:0.1.25"
     compile project(':arrow-free')
     compile project(':arrow-data')
+    compile project(':arrow-syntax')
     compile "org.jetbrains.kotlin:kotlin-compiler:$parent.ext.kotlinVersion"
     compile "org.jetbrains.kotlin:kotlin-script-util:$parent.ext.kotlinVersion"
     compile group: 'org.beanshell', name: 'bsh', version: '2.0b5'

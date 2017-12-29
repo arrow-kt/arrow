@@ -1,15 +1,12 @@
 package arrow.optics
 
-import arrow.Either
-import arrow.Validated
-import arrow.invalid
-import arrow.valid
+import arrow.*
 
 /**
  * [PIso] that defines the equality between [Either] and [Validated]
  */
 fun <A1, A2, B1, B2> pEitherToValidation(): PIso<Either<A1, B1>, Either<A2, B2>, Validated<A1, B1>, Validated<A2, B2>> = PIso(
-        get = { it.fold({ it.invalid() }, { it.valid() }) },
+        get = { it.fold({ Validated.Invalid(it) }, { Validated.Valid(it) }) },
         reverseGet = { it.toEither() }
 )
 

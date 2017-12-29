@@ -30,8 +30,8 @@ interface FreeMonadInstance<S> : FreeApplicativeInstance<S>, Monad<FreeKindParti
 
     override fun <A, B> tailRecM(a: A, f: (A) -> FreeKind<S, Either<A, B>>): Free<S, B> = f(a).ev().flatMap {
         when (it) {
-            is Left -> tailRecM(it.a, f)
-            is Right -> pure(it.b)
+            is Either.Left -> tailRecM(it.a, f)
+            is Either.Right -> pure(it.b)
         }
     }
 

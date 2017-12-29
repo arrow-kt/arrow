@@ -75,12 +75,12 @@ fun <M, S, A> Free<S, A>.foldMap(f: FunctionK<S, M>, MM: Monad<M>): HK<M, A> =
         MM.tailRecM(this) {
             val x = it.step()
             when (x) {
-                is Free.Pure<S, A> -> MM.pure(Right(x.a))
-                is Free.Suspend<S, A> -> MM.map(f(x.a), { Right(it) })
+                is Free.Pure<S, A> -> MM.pure(Either.Right(x.a))
+                is Free.Suspend<S, A> -> MM.map(f(x.a), { Either.Right(it) })
                 is Free.FlatMapped<S, A, *> -> {
                     val g = (x.f as (A) -> Free<S, A>)
                     val c = x.c as Free<S, A>
-                    MM.map(c.foldMap(f, MM), { cc -> Left(g(cc)) })
+                    MM.map(c.foldMap(f, MM), { cc -> Either.Left(g(cc)) })
                 }
             }
         }

@@ -44,11 +44,11 @@ sealed class Disjunction<out L, out R> : EitherLike {
 
     fun filter(predicate: (R) -> Boolean): Option<Disjunction<L, R>> = when (this) {
         is Right -> if (predicate(value)) {
-            Option.Some(this)
+            Some(this)
         } else {
-            Option.None
+            None
         }
-        is Left -> Option.None
+        is Left -> None
     }
 
     fun toList(): List<R> = when (this) {
@@ -57,8 +57,8 @@ sealed class Disjunction<out L, out R> : EitherLike {
     }
 
     fun toOption(): Option<R> = when (this) {
-        is Right -> Option.Some(value)
-        is Left -> Option.None
+        is Right -> Some(value)
+        is Left -> None
     }
 
     fun toEither(): Either<L, R> = when (this) {

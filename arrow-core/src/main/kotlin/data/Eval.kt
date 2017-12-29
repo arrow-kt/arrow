@@ -35,8 +35,8 @@ sealed class Eval<out A> : EvalKind<A> {
         fun <A, B> tailRecM(a: A, f: (A) -> EvalKind<Either<A, B>>): Eval<B> =
                 f(a).ev().flatMap { eval: Either<A, B> ->
                     when (eval) {
-                        is Left -> tailRecM(eval.a, f)
-                        is Right -> pure(eval.b)
+                        is Either.Left -> tailRecM(eval.a, f)
+                        is Either.Right -> pure(eval.b)
                     }
                 }
 

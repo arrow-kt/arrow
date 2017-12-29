@@ -1,8 +1,6 @@
 package arrow.free.instances
 
-import arrow.Functor
-import arrow.Yoneda
-import arrow.instance
+import arrow.*
 
 @instance(Yoneda::class)
 interface YonedaFunctorInstance<U> : Functor<YonedaKindPartial<U>> {

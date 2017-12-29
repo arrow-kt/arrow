@@ -155,7 +155,7 @@ fun <F, A> Foldable<F>.get(fa: HK<F, A>, idx: Long): Option<A> {
             if (i == idx) Left(a) else Right(i + 1L)
         }).let {
             return when (it) {
-                is Left -> Some(it.a)
+                is Either.Left -> Some(it.a)
                 else -> None
             }
         }

@@ -21,7 +21,7 @@ open class MonadErrorCancellableContinuation<F, A>(ME: MonadError<F, Throwable>,
 
     fun disposable(): Disposable = { cancelled.set(true) }
 
-    internal fun returnedMonad(): HK<F, A> = returnedMonad
+    override fun returnedMonad(): HK<F, A> = returnedMonad
 
     override suspend fun <B> bind(m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels

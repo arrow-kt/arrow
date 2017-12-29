@@ -1,7 +1,6 @@
 package arrow.optics
 
 import arrow.*
-import identity
 
 /**
  * [Traversal] is a type alias for [PTraversal] which fixes the type arguments
@@ -221,12 +220,12 @@ interface PTraversal<S, T, A, B> {
     fun nonEmpty(s: S): Boolean = !isEmpty(s)
 
     /**
-     * Find the first target or [Option.None] if no targets
+     * Find the first target or [None] if no targets
      */
     fun headOption(s: S): Option<A> = foldMap(firstOptionMonoid<A>(), s, { b -> Const(Some(b)) }).value
 
     /**
-     * Find the first target or [Option.None] if no targets
+     * Find the first target or [None] if no targets
      */
     fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s, { b -> Const(Some(b)) }).value
 

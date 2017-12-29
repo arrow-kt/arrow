@@ -147,7 +147,7 @@ class ValidatedTest : UnitSpec() {
             Validated.fromTry<Int>(Failure(MyException(""))) shouldBe Invalid(MyException(""))
         }
 
-        "fromEither should return Valid if is Right or Failure in otherwise" {
+        "fromEither should return Valid if is Either.Right or Failure in otherwise" {
             Validated.fromEither(Right(10)) shouldBe Valid(10)
             Validated.fromEither(Left(10)) shouldBe Invalid(10)
         }

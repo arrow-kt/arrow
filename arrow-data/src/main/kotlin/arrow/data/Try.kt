@@ -1,7 +1,5 @@
 package arrow
 
-import arrow.Option.None
-
 typealias Failure<A> = Try.Failure<A>
 typealias Success<A> = Try.Success<A>
 

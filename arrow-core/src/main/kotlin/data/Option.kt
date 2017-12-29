@@ -2,9 +2,6 @@ package arrow
 
 import java.util.*
 
-typealias Some<A> = Option.Some<A>
-typealias None = Option.None
-
 /**
  * Represents optional values. Instances of `Option`
  * are either an instance of $some or the object $none.
@@ -21,8 +18,8 @@ sealed class Option<out A> : OptionKind<A> {
             return when (option) {
                 is Some -> {
                     when (option.t) {
-                        is Left -> tailRecM(option.t.a, f)
-                        is Right -> Some(option.t.b)
+                        is Either.Left -> tailRecM(option.t.a, f)
+                        is Either.Right -> Some(option.t.b)
                     }
                 }
                 is None -> None
@@ -158,22 +155,22 @@ sealed class Option<out A> : OptionKind<A> {
     } else {
         value
     }
+}
 
-    object None : Option<Nothing>() {
-        override fun get() = throw NoSuchElementException("None.get")
+object None : Option<Nothing>() {
+    override fun get() = throw NoSuchElementException("None.get")
 
-        override fun isEmpty() = true
+    override fun isEmpty() = true
 
-        override fun toString(): String = "None"
-    }
+    override fun toString(): String = "None"
+}
 
-    data class Some<out T>(val t: T) : Option<T>() {
-        override fun get() = t
+data class Some<out T>(val t: T) : Option<T>() {
+    override fun get() = t
 
-        override fun isEmpty() = false
+    override fun isEmpty() = false
 
-        override fun toString(): String = "Some($t)"
-    }
+    override fun toString(): String = "Some($t)"
 }
 
 /**

@@ -1,8 +1,5 @@
 package arrow
 
-typealias Right<A, B> = Either.Right<A, B>
-typealias Left<A, B> = Either.Left<A, B>
-
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Either.scala
  *
@@ -44,36 +41,36 @@ typealias Left<A, B> = Either.Left<A, B>
      * @return the results of applying the function
      */
     inline fun <C> fold(crossinline fa: (A) -> C, crossinline fb: (B) -> C): C = when (this) {
-        is Right<A, B> -> fb(b)
-        is Left<A, B> -> fa(a)
+        is Either.Right<A, B> -> fb(b)
+        is Either.Left<A, B> -> fa(a)
     }
 
     @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("getOrElse { ifLeft }"))
     fun get(): B = when (this) {
-        is Right -> b
-        is Left -> throw NoSuchElementException("Disjunction.Left")
+        is Either.Right -> b
+        is Either.Left -> throw NoSuchElementException("Disjunction.Left")
     }
 
     fun <C> foldLeft(b: C, f: (C, B) -> C): C =
             this.ev().let { either ->
                 when (either) {
-                    is Right -> f(b, either.b)
-                    is Left -> b
+                    is Either.Right -> f(b, either.b)
+                    is Either.Left -> b
                 }
             }
 
     fun <C> foldRight(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
             this.ev().let { either ->
                 when (either) {
-                    is Right -> f(either.b, lb)
-                    is Left -> lb
+                    is Either.Right -> f(either.b, lb)
+                    is Either.Left -> lb
                 }
             }
 
     @Deprecated("arrow.data.Either is right biased. This method will be removed in future releases")
     fun toDisjunction(): Disjunction<A, B> = when (this) {
-        is Right -> Disjunction.Right(b)
-        is Left -> Disjunction.Left(a)
+        is Either.Right -> Disjunction.Right(b)
+        is Either.Left -> Disjunction.Left(a)
     }
 
     /**
@@ -119,8 +116,8 @@ typealias Left<A, B> = Either.Left<A, B>
     inline fun exists(crossinline predicate: (B) -> Boolean): Boolean = fold({ false }, { predicate(it) })
 
     /**
-     * Returns a [Option.Some] containing the [Right] value
-     * if it exists or a [Option.None] if this is a [Left].
+     * Returns a [Some] containing the [Right] value
+     * if it exists or a [None] if this is a [Left].
      *
      * Example:
      * ```
@@ -169,12 +166,12 @@ typealias Left<A, B> = Either.Left<A, B>
         tailrec fun <L, A, B> tailRecM(a: A, f: (A) -> HK<EitherKindPartial<L>, Either<A, B>>): Either<L, B> {
             val ev: Either<L, Either<A, B>> = f(a).ev()
             return when (ev) {
-                is Left<L, Either<A, B>> -> Left(ev.a)
-                is Right<L, Either<A, B>> -> {
+                is Either.Left<L, Either<A, B>> -> Left(ev.a)
+                is Either.Right<L, Either<A, B>> -> {
                     val b: Either<A, B> = ev.b
                     when (b) {
-                        is Left<A, B> -> tailRecM(b.a, f)
-                        is Right<A, B> -> Right(b.b)
+                        is Either.Left<A, B> -> tailRecM(b.a, f)
+                        is Either.Right<A, B> -> Right(b.b)
                     }
                 }
             }
@@ -182,6 +179,10 @@ typealias Left<A, B> = Either.Left<A, B>
 
     }
 }
+
+fun <L> Left(left: L): Either<L, Nothing> = Either.left(left)
+
+fun <R> Right(right: R): Either<Nothing, R> = Either.right(right)
 
 /**
  * Binds the given function across [Either.Right].
@@ -240,23 +241,9 @@ fun <A, B, C> Either<A, B>.ap(ff: EitherKind<A, (B) -> C>): Either<A, C> = ff.ev
 
 fun <A, B> Either<A, B>.combineK(y: EitherKind<A, B>): Either<A, B> =
         when (this) {
-            is Left -> y.ev()
+            is Either.Left -> y.ev()
             else -> this.ev()
         }
-
-@Deprecated("arrow.data.Either is right biased. This method will be removed in future releases")
-inline fun <X, T> Option<T>.toEitherRight(left: () -> X): Either<X, T> = if (isEmpty()) {
-    Left(left())
-} else {
-    Right(get())
-}
-
-@Deprecated("arrow.data.Either is right biased. This method will be removed in future releases")
-inline fun <X, T> Option<T>.toEitherLeft(right: () -> X): Either<T, X> = if (isEmpty()) {
-    Right(right())
-} else {
-    Left(get())
-}
 
 @Deprecated(DeprecatedAmbiguity, ReplaceWith("Try { body }.toEither()"))
 inline fun <T> eitherTry(body: () -> T): Either<Throwable, T> = try {

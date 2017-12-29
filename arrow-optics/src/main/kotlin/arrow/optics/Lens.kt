@@ -1,7 +1,6 @@
 package arrow.optics
 
 import arrow.*
-import identity
 
 /**
  * [Lens] is a type alias for [PLens] which fixes the type arguments

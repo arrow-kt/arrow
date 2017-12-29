@@ -1,6 +1,7 @@
 package io.arrow.ank
 
 import arrow.*
+import arrow.syntax.applicativeerror.*
 import kotlinx.coroutines.experimental.CoroutineDispatcher
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.runBlocking

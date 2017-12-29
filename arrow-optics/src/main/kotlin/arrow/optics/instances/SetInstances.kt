@@ -1,7 +1,6 @@
 package arrow.optics
 
-import arrow.SetKW
-import arrow.k
+import arrow.*
 
 /**
  * [PIso] that defines the equality between a [Set] and a [arrow.SetKW]

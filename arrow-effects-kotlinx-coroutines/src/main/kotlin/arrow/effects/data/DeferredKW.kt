@@ -1,6 +1,5 @@
 package arrow.effects
 
-import andThen
 import arrow.*
 import kotlinx.coroutines.experimental.*
 import kotlin.coroutines.experimental.CoroutineContext
@@ -74,10 +73,10 @@ data class DeferredKW<out A>(val deferred: Deferred<A>) : DeferredKWKind<A>, Def
                         val result: B
                         while (true) {
                             val actual: Either<A, B> = current.await()
-                            if (actual is Right) {
+                            if (actual is Either.Right) {
                                 result = actual.b
                                 break
-                            } else if (actual is Left) {
+                            } else if (actual is Either.Left) {
                                 current = f(actual.a).ev()
                             }
                         }

@@ -34,7 +34,7 @@ class DataTypeExamples : FreeSpec() { init {
             // Option can also be used with when statements:
             val msg = when (someValue) {
                 is Some -> "ok"
-                Option.None -> "ko"
+                None -> "ko"
             }
             msg shouldBe "ok"
         }

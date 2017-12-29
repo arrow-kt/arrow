@@ -39,8 +39,8 @@ object Platform {
 
         return when (eitherRef) {
             null -> None
-            is Left -> throw eitherRef.a
-            is Right -> Some(eitherRef.b)
+            is Either.Left -> throw eitherRef.a
+            is Either.Right -> Some(eitherRef.b)
         }
     }
 }

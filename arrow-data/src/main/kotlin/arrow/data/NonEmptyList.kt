@@ -93,7 +93,7 @@ class NonEmptyList<out A> private constructor(
                 v: NonEmptyList<Either<A, B>>) {
             val head: Either<A, B> = v.head
             when (head) {
-                is Right<A, B> -> {
+                is Either.Right<A, B> -> {
                     buf += head.b
                     val x = NonEmptyList.fromList(v.tail)
                     when (x) {
@@ -101,7 +101,7 @@ class NonEmptyList<out A> private constructor(
                         is None -> Unit
                     }
                 }
-                is Left<A, B> -> go(buf, f, f(head.a).ev() + v.tail)
+                is Either.Left<A, B> -> go(buf, f, f(head.a).ev() + v.tail)
             }
         }
 

@@ -18,12 +18,12 @@ package arrow
                 EitherT(MF.tailRecM(a, {
                     MF.map(f(it).ev().value) { recursionControl ->
                         when (recursionControl) {
-                            is Left<L, Either<A, B>> -> Right(Left(recursionControl.a))
-                            is Right<L, Either<A, B>> -> {
+                            is Either.Left<L, Either<A, B>> -> Right(Left(recursionControl.a))
+                            is Either.Right<L, Either<A, B>> -> {
                                 val b: Either<A, B> = recursionControl.b
                                 when (b) {
-                                    is Left<A, B> -> Left(b.a)
-                                    is Right<A, B> -> Right(Right(b.b))
+                                    is Either.Left<A, B> -> Left(b.a)
+                                    is Either.Right<A, B> -> Right(Right(b.b))
                                 }
                             }
                         }
@@ -51,7 +51,7 @@ package arrow
 
     inline fun <C> semiflatMap(crossinline f: (B) -> HK<F, C>, MF: Monad<F>): EitherT<F, A, C> = flatMap({ liftF(f(it), MF) }, MF)
 
-    inline fun <C> map(crossinline f: (B) -> C, FF: Functor<F>): EitherT<F, A, C> = EitherT(FF.map(value, { it.map(f) }))
+    fun <C> map(f: (B) -> C, FF: Functor<F>): EitherT<F, A, C> = EitherT(FF.map(value, { it.map(f) }))
 
     inline fun exists(crossinline p: (B) -> Boolean, FF: Functor<F>): HK<F, Boolean> = FF.map(value, { it.exists(p) })
 
@@ -64,8 +64,8 @@ package arrow
     fun combineK(y: EitherTKind<F, A, B>, MF: Monad<F>): EitherT<F, A, B> =
             EitherT(MF.flatMap(this.ev().value) {
                 when (it) {
-                    is Left -> y.ev().value
-                    is Right -> MF.pure(it)
+                    is Either.Left -> y.ev().value
+                    is Either.Right -> MF.pure(it)
                 }
             })
 

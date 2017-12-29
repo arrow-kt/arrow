@@ -36,8 +36,8 @@ interface EitherMonadErrorInstance<L> : EitherMonadInstance<L>, MonadError<Eithe
     override fun <A> handleErrorWith(fa: HK<EitherKindPartial<L>, A>, f: (L) -> HK<EitherKindPartial<L>, A>): Either<L, A> {
         val fea = fa.ev()
         return when (fea) {
-            is Left -> f(fea.a).ev()
-            is Right -> fea
+            is Either.Left -> f(fea.a).ev()
+            is Either.Right -> fea
         }
     }
 }
@@ -77,13 +77,13 @@ interface EitherEqInstance<L, R> : Eq<Either<L, R>> {
     fun EQR(): Eq<R>
 
     override fun eqv(a: Either<L, R>, b: Either<L, R>): Boolean = when (a) {
-        is Left -> when (b) {
-            is Left -> EQL().eqv(a.a, b.a)
-            is Right -> false
+        is Either.Left -> when (b) {
+            is Either.Left -> EQL().eqv(a.a, b.a)
+            is Either.Right -> false
         }
-        is Right -> when (b) {
-            is Left -> false
-            is Right -> EQR().eqv(a.b, b.b)
+        is Either.Right -> when (b) {
+            is Either.Left -> false
+            is Either.Right -> EQR().eqv(a.b, b.b)
         }
     }
 

@@ -1,8 +1,6 @@
 package arrow.optics
 
 import arrow.*
-import compose
-import identity
 
 /**
  * [Prism] is a type alias for [PPrism] which fixes the type arguments
@@ -92,7 +90,7 @@ interface PPrism<S, T, A, B> {
     }
 
     /**
-     * Get the focus or [Option.None] if focus cannot be seen
+     * Get the focus or [None] if focus cannot be seen
      */
     fun getOption(s: S): Option<A> = getOrModify(s).toOption()
 
@@ -273,8 +271,8 @@ fun <S, T, A, B, C> PPrism<S, T, A, B>.left(): PPrism<Either<S, C>, Either<T, C>
         { it.fold({ a -> getOrModify(a).bimap({ Left(it) }, { Left(it) }) }, { c -> Right(Right(c)) }) },
         {
             when (it) {
-                is Left<B, C> -> Left(reverseGet(it.a))
-                is Right<B, C> -> Right(it.b)
+                is Either.Left<B, C> -> Left(reverseGet(it.a))
+                is Either.Right<B, C> -> Right(it.b)
             }
         }
 )

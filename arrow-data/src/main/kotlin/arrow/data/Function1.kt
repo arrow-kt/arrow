@@ -23,8 +23,8 @@ operator fun <I, O> Function1Kind<I, O>.invoke(i: I): O = this.ev().f(i)
         tailrec private fun <I, A, B> step(a: A, t: I, fn: (A) -> Function1Kind<I, Either<A, B>>): B {
             val af = fn(a)(t)
             return when (af) {
-                is Right<A, B> -> af.b
-                is Left<A, B> -> step(af.a, t, fn)
+                is Either.Right<A, B> -> af.b
+                is Either.Left<A, B> -> step(af.a, t, fn)
             }
         }
 
