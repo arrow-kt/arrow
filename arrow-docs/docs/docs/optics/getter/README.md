@@ -22,6 +22,8 @@ val barGetter = Getter(Foo::bar)
 barGetter.get(Foo(5))
 ```
 ```kotlin:ank
+import arrow.data.*
+
 fun <T> nonEmptyListHead() = Getter<NonEmptyList<T>, T> {
     it.head
 }
@@ -32,6 +34,9 @@ nonEmptyListHead<Int>().get(NonEmptyList.of(1, 2, 3, 4))
 Or from any of the optics defined in `arrow-optics` that allow to safely getting its focus.
 
 ```kotlin:ank:silent
+import arrow.core.*
+import arrow.optics.instances.*
+
 val headGetter: Getter<NonEmptyList<String>, String> = nelHead<String>().asGetter()
 val tupleGetter: Getter<Tuple2<String, Int>, String> = firstTuple2<String, Int>().asGetter()
 ``` 

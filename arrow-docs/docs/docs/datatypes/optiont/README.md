@@ -169,6 +169,9 @@ So our specialization `OptionT<ObservableKWHK, A>` is the OptionT transformer ar
 We can now lift any value to a `OptionT<F, A>` which looks like this:
 
 ```kotlin:ank
+import arrow.syntax.applicative.*
+import arrow.data.*
+
 val optTVal = 1.pure<OptionTKindPartial<ObservableKWHK>, Int>()
 optTVal
 ```

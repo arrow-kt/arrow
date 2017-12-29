@@ -18,6 +18,7 @@ You can get a `Traversal` for any existing `Traverse`.
 ```kotlin:ank
 import arrow.*
 import arrow.optics.*
+import arrow.data.*
 
 val listTraversal: Traversal<ListKWKind<Int>, Int> = Traversal.fromTraversable()
 
@@ -34,6 +35,8 @@ listTraversal.modifyF(Try.applicative(), listOf(0, 2, 3).k()) {
 Or by using any of the constructors of `Traversal`.
 
 ```kotlin:ank
+import arrow.core.*
+
 fun <A> traversalTuple2Example(): Traversal<Tuple2<A, A>, A> = Traversal(
         get1 = { it.a },
         get2 = { it.b },
@@ -44,6 +47,8 @@ fun <A> traversalTuple2Example(): Traversal<Tuple2<A, A>, A> = Traversal(
 Arrow optics also provides a number of predefined `Traversal` optics.
 
 ```kotlin:ank
+import arrow.optics.instances.*
+
 traversalTuple2<String>().combineAll("Hello, " toT "World!")
 ```
 ```kotlin:ank

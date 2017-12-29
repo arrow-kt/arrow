@@ -26,6 +26,8 @@ Both `Try` and `Option` are example datatypes that can be computed over transfor
 
 ```kotlin:ank
 import arrow.*
+import arrow.core.*
+import arrow.data.*
 import arrow.syntax.function.*
 
 Try { "1".toInt() }.map { it * 2 }
@@ -45,6 +47,8 @@ val tryFunctor = Try.functor()
 Mapping over the empty/failed cases is always safe since the `map` operation in both Try and Option operate under the bias of those containing success values
 
 ```kotlin:ank
+import arrow.syntax.option.*
+
 Try { "x".toInt() }.map { it * 2 }
 none<Int>().map { it * 2 }
 ```
@@ -54,6 +58,8 @@ This enables programs that are not coupled to specific datatype implementations.
 The technique demonstrated below to write polymorphic code is available for all other `Typeclasses` beside `Functor`.
 
 ```kotlin:ank
+import arrow.typeclasses.*
+
 inline fun <reified F> multiplyBy2(fa: HK<F, Int>, FT: Functor<F> = functor()): HK<F, Int> =
     FT.map(fa, { it * 2 })
 

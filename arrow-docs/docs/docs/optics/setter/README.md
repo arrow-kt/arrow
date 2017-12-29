@@ -19,6 +19,7 @@ You can get a `Setter` for any existing `Functor`.
 ```kotlin:ank
 import arrow.*
 import arrow.optics.*
+import arrow.data.*
 
 val setter: Setter<ListKWKind<Int>, Int> = Setter.fromFunctor()
 setter.set(listOf(1, 2, 3, 4).k(), 5)

@@ -20,7 +20,7 @@ For a sum type `NetworkResult` we can create a `Prism` that has a focus into `Su
 ```kotlin:ank
 import arrow.*
 import arrow.optics.*
-import arrow.syntax.function.some
+import arrow.syntax.option.*
 import arrow.syntax.either.*
 
 sealed class NetworkResult {
@@ -44,6 +44,8 @@ As is clear from above `Prism` definition it gathers two concepts: pattern match
 Since sealed classes enforce a certain relationship we can omit the `reverseGet` parameter to create a `Prism` for them. 
 
 ```kotlin:ank:silent
+import arrow.core.*
+
 val networkSuccessPrism2: Prism<NetworkResult, NetworkResult.Success> = Prism { networkResult ->
     when (networkResult) {
         is NetworkResult.Success -> networkResult.right()
@@ -102,6 +104,10 @@ Nesting pattern matching blocks are tedious. We would prefer to define them sepe
 Let's imagine from our previous example we want to retrieve an `Int` from the network. We get a `Success` OR a `Failure` from the network. In case of a `Success` we want to safely cast the `String` to an `Int`.
 
 ```kotlin:ank
+import arrow.data.*
+import arrow.syntax.option.*
+import arrow.syntax.foldable.*
+
 val successToInt: Prism<NetworkResult.Success, Int> = Prism(
         partialFunction = case({ success: NetworkResult.Success -> Try { success.content.toInt() }.nonEmpty() }
                 toT { success -> success.content.toInt() }

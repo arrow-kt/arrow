@@ -20,6 +20,7 @@ In the following example we will define 3 invocations that may as well be remote
 
 ```kotlin:ank
 import arrow.*
+import arrow.core.*
 
 fun profileService(): Option<String> = Option("Alfredo Lambda")
 fun phoneService(): Option<Int> = Option(55555555)
@@ -31,6 +32,8 @@ This more or less illustrate the common use case of performing several independe
 Arrow features an [Applicative Builder]({{ '/docs/patterns/applicative_builder' | relative_url }}) that allows you to easily combine all the independent operations into one result.
 
 ```kotlin:ank
+import arrow.syntax.applicative.*
+
 data class Profile(val name: String, val phone: Int, val address: List<String>)
 
 val r: Option<Tuple3<String, Int, List<String>>> = Option.applicative().tupled(profileService(), phoneService(), addressService()).ev()

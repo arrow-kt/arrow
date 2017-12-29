@@ -30,9 +30,13 @@ val optionalHead: Optional<List<Int>, Int> = Optional(
 Our `optionalHead` allows us to operate on the head of `List<Int>` without having to worry if it is available. The `optionalHead` optic is by default available as `listHead<Int>()`
 
 ```kotlin:ank
+import arrow.optics.instances.*
+
 listHead<Int>().set(listOf(1, 3, 6), 5)
 ```
 ```kotlin:ank
+import arrow.data.*
+
 listHead<Int>().modify(listOf(1, 3, 6)) { head -> head * 5 }
 ```
 
@@ -92,6 +96,8 @@ A `POptional` is very similar to [PLens](docs/optics/Lens#Plens) and [PPrism](do
 Given a `PPrism` with a focus into `Success` of `Try<Tuple2<Int, String>>` that can polymorphically change its content to `Tuple2<String, String>` and a `PLens` with a focus into the `Tuple2<Int, String>` that can morph the first parameter from `Int` to `String`. We can compose them together build an `Optional` that can look into `Try` and morph the first type of the `Tuple2` within.
 
 ```kotlin:ank
+import arrow.core.*
+
 val pprism = pTrySuccess<Tuple2<Int, String>, Tuple2<String, String>>()
 val plens = pFirstTuple2<Int, String, String>()
 

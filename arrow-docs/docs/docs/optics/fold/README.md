@@ -13,6 +13,7 @@ Creating a `Fold` can be done by manually defining `foldMap`.
 
 ```kotlin:ank
 import arrow.*
+import arrow.typeclasses.*
 import arrow.optics.*
 
 fun <T> nullableFold(): Fold<T?, T> = object : Fold<T?, T> {
@@ -24,6 +25,8 @@ fun <T> nullableFold(): Fold<T?, T> = object : Fold<T?, T> {
 Or you can get a `Fold` from any existing `Foldable`.
 
 ```kotlin:ank:silent
+import arrow.data.*
+
 val nonEmptyIntFold: Fold<NonEmptyListKind<Int>, Int> = Fold.fromFoldable(NonEmptyList.foldable())
 ```
 
