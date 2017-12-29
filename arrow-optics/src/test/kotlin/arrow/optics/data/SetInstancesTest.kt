@@ -4,7 +4,8 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import arrow.typeclasses.Eq
 import arrow.test.laws.IsoLaws
-import arrow.SetKWMonoidInstanceImplicits
+import arrow.data.SetKWMonoidInstanceImplicits
+import arrow.data.k
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.optics.instances.setToSetKW

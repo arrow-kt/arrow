@@ -17,6 +17,7 @@ all becomes even more unwieldy when we try to compose exception-throwing procedu
 
 ```kotlin:ank
 import arrow.*
+import arrow.core.*
 
 val throwsSomeStuff: (Int) -> Double = {x -> x.toDouble()}
 val throwsOtherThings: (Double) -> String = {x -> x.toString()}

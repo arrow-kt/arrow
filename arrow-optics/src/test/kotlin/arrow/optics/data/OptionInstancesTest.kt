@@ -1,6 +1,9 @@
 package arrow.optics
 
 import arrow.core.Either
+import arrow.core.OptionMonoidInstanceImplicits
+import arrow.core.applicative
+import arrow.core.ev
 import arrow.instances.IntMonoid
 import arrow.optics.instances.nonePrism
 import arrow.optics.instances.nullableToOption

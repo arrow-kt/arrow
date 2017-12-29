@@ -7,6 +7,7 @@ import arrow.test.laws.LensLaws
 import arrow.data.NonEmptyList
 import arrow.test.laws.TraversalLaws
 import arrow.data.Try
+import arrow.data.applicative
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genTuple

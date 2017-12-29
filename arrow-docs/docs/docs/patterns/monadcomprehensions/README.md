@@ -72,6 +72,7 @@ Let's see a minimal example.
 ```kotlin:ank
 import arrow.*
 import arrow.effects.*
+import arrow.typeclasses.*
 
 IO.monad().binding {
   yields(1)

@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
+import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.experimental.CoroutineStart

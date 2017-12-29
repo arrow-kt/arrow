@@ -7,6 +7,7 @@ import arrow.test.laws.IsoLaws
 import arrow.test.laws.LensLaws
 import arrow.typeclasses.Monoid
 import arrow.core.Option
+import arrow.core.applicative
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genNonEmptyList

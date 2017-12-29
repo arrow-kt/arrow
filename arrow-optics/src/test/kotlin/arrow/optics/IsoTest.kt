@@ -1,13 +1,11 @@
 package arrow.optics
 
+import arrow.core.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import arrow.core.Either
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.toT
 import arrow.data.NonEmptyList
+import arrow.data.applicative
 import arrow.instances.StringMonoidInstance
 import arrow.instances.applicative
 import org.junit.runner.RunWith

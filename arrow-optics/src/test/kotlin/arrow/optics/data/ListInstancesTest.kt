@@ -4,10 +4,10 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import arrow.typeclasses.Eq
 import arrow.test.laws.IsoLaws
-import arrow.ListKWMonadCombineInstance
-import arrow.ListKWMonoidInstanceImplicits
-import arrow.NonEmptyListSemigroupInstanceImplicits
-import arrow.OptionMonoidInstanceImplicits
+import arrow.core.OptionMonoidInstanceImplicits
+import arrow.data.ListKWMonoidInstanceImplicits
+import arrow.data.NonEmptyListSemigroupInstanceImplicits
+import arrow.data.k
 import arrow.test.laws.OptionalLaws
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB

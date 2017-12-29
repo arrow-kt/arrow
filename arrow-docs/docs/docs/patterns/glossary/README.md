@@ -58,6 +58,7 @@ you can add them by annotating them as `@instance`, and Λrrow's [annotation pro
 
 ```kotlin:ank
 import arrow.*
+import arrow.typeclasses.*
 
 eq<Int>()
 ```
@@ -148,6 +149,8 @@ inline fun <reified F> randomUserStructure(f: (Int) -> User, AP: Applicative<F> 
 Remember that all instances already defined in Λrrow can be looked up globally
 
 ```kotlin:ank
+import arrow.data.*
+
 applicative<ListKWHK>()
 ```
 

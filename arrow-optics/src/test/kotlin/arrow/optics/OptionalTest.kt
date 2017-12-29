@@ -11,6 +11,7 @@ import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genTry
 import arrow.test.generators.genTuple
 import arrow.core.None
+import arrow.data.applicative
 import arrow.syntax.either.left
 import arrow.syntax.either.right
 import org.junit.runner.RunWith

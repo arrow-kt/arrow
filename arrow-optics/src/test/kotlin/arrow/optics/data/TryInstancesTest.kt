@@ -8,21 +8,23 @@ import arrow.test.laws.IsoLaws
 import arrow.typeclasses.Monoid
 import arrow.test.laws.PrismLaws
 import arrow.test.UnitSpec
-import arrow.Validated
+import arrow.core.applicative
+import arrow.core.ev
 import arrow.test.generators.genEither
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genThrowable
 import arrow.test.generators.genTry
 import arrow.test.generators.genValidated
-import arrow.invalid
 import arrow.data.Invalid
-import arrow.valid
 import arrow.data.Valid
+import arrow.data.Validated
 import arrow.optics.instances.tryFailure
 import arrow.optics.instances.trySuccess
 import arrow.optics.instances.tryToEither
 import arrow.optics.instances.tryToValidated
 import arrow.syntax.either.right
+import arrow.syntax.validated.invalid
+import arrow.syntax.validated.valid
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

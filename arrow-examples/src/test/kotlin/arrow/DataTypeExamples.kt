@@ -7,8 +7,10 @@ import io.kotlintest.specs.FreeSpec
 import arrow.Problem.*
 import arrow.core.*
 import arrow.data.*
+import arrow.syntax.applicative.tupled
 import arrow.syntax.either.left
 import arrow.syntax.either.right
+import arrow.typeclasses.binding
 import kotlin.reflect.KClass
 
 
