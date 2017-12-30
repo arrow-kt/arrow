@@ -35,16 +35,16 @@ KotlinConf, San Francisco, Nov '17
 ### Building a DSL... in Kotlin
  
  Make DSLs stack safe, composable and reusable under different runtime requirements thanks to Kategory.
- 
- <iframe width="560" height="315" src="https://www.youtube.com/watch?v=kr8iWE4Jfhc?rel=0" frameborder="0" allowfullscreen></iframe>
- 
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/kr8iWE4Jfhc" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+
  droidconSF, San Francisco, Nov '17
  
 ### Functional approach to Android architecture using Kotlin
  
  Move side effects to the edges of the system, implement a functional oriented architecture for Android apps based on purity.
  
- <iframe width="560" height="315" src="https://www.youtube.com/watch?v=qGef3sFAIxU?rel=0" frameborder="0" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/qGef3sFAIxU" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
  
  Mobilization 7, Łódź, Oct '17
 
