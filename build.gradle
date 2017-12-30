@@ -54,7 +54,7 @@ subprojects { project ->
         jcenter()
         maven { url 'https://kotlin.bintray.com/kotlinx' }
         maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
-        maven { url "http://dl.bintray.com/kategory/maven" }
+        maven { url "http://dl.bintray.com/arrow/maven" }
         maven { url "http://dl.bintray.com/arrow/arrow" }
         maven { url "https://dl.bintray.com/jetbrains/markdown/" }
         maven { url 'https://jitpack.io' }
@@ -92,11 +92,11 @@ subprojects { project ->
         key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
         configurations = ['archives']
         pkg {
-            repo = 'arrow'
+            repo = 'maven'
             name = project.name
             userOrg = POM_DEVELOPER_ID
             licenses = ['Apache-2.0']
-            vcsUrl = 'https://github.com/kategory/arrow.git'
+            vcsUrl = 'https://github.com/arrow-kt/arrow.git'
         }
     }
 

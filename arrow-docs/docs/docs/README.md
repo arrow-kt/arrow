@@ -13,16 +13,16 @@ permalink: /docs/
 It includes the most popular data types, type classes and abstractions such as `Option`, `Try`, `Either`, `IO`, `Functor`, `Applicative`, `Monad` and many more empowering users to define pure FP apps and libraries built atop higher order abstractions.
 Use the list below to learn more about Λrrow's main features.
 
-- [Patterns](http://kategory.io/docs/patterns/glossary/): tutorials and approaches to day-to-day challenges using FP 
-- [Type classes](http://kategory.io/docs/typeclasses/functor/): defining behaviors for data
-- [Data types](http://kategory.io/docs/datatypes/option/): common abstractions
-- [Effects](http://kategory.io/docs/effects/io/): interfacing with external systems
-- [Optics](http://kategory.io/docs/optics/iso/): inspecting and modifying data structures
+- [Patterns](http://arrow-kt.io/docs/patterns/glossary/): tutorials and approaches to day-to-day challenges using FP 
+- [Type classes](http://arrow-kt.io/docs/typeclasses/functor/): defining behaviors for data
+- [Data types](http://arrow-kt.io/docs/datatypes/option/): common abstractions
+- [Effects](http://arrow-kt.io/docs/effects/io/): interfacing with external systems
+- [Optics](http://arrow-kt.io/docs/optics/iso/): inspecting and modifying data structures
 
 #### Curated external links
 
-- [Projects and Examples](http://kategory.io/docs/quickstart/projects/)
-- [Blogs and Presentations](http://kategory.io/docs/quickstart/blogs/)
+- [Projects and Examples](http://arrow-kt.io/docs/quickstart/projects/)
+- [Blogs and Presentations](http://arrow-kt.io/docs/quickstart/blogs/)
 
 # Basic Setup
 
