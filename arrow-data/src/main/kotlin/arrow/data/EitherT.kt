@@ -63,6 +63,8 @@ import arrow.typeclasses.monad
 
     fun <C> map(f: (B) -> C, FF: Functor<F>): EitherT<F, A, C> = EitherT(FF.map(value, { it.map(f) }))
 
+    inline fun <C> mapLeft(crossinline f: (A) -> C, FF: Functor<F>): EitherT<F, C, B> = EitherT(FF.map(value, { it.mapLeft(f) }))
+
     inline fun exists(crossinline p: (B) -> Boolean, FF: Functor<F>): HK<F, Boolean> = FF.map(value, { it.exists(p) })
 
     inline fun <C, D> transform(crossinline f: (Either<A, B>) -> Either<C, D>, FF: Functor<F>): EitherT<F, C, D> = EitherT(FF.map(value, { f(it) }))

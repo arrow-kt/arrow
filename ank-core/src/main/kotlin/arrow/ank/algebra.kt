@@ -1,4 +1,4 @@
-package io.arrow.ank
+package arrow.ank
 
 import arrow.*
 import arrow.core.FunctionK

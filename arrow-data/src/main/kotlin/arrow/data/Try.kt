@@ -181,7 +181,14 @@ fun <A, B> Try<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = 
  *
  * ''Note:'': This will throw an exception if it is not a success and default throws an exception.
  */
-fun <B> Try<B>.getOrElse(default: () -> B): B = fold({ default() }, { it })
+fun <B> Try<B>.getOrDefault(default: () -> B): B = fold({ default() }, { it })
+
+/**
+ * Returns the value from this `Success` or the given `default` argument if this is a `Failure`.
+ *
+ * ''Note:'': This will throw an exception if it is not a success and default throws an exception.
+ */
+fun <B> Try<B>.getOrElse(default: (Throwable) -> B): B = fold(default, { it })
 
 fun <B, A: B> Try<A>.orElse(f: () -> Try<B>): Try<B> = when (this) {
     is Try.Success -> this

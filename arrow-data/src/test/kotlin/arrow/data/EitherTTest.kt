@@ -4,6 +4,7 @@ import arrow.core.*
 import arrow.instances.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
+import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadErrorLaws
@@ -33,6 +34,16 @@ class EitherTTest : UnitSpec() {
                 EitherT.applicative(Id.monad()),
                 Eq.any())
         )
+
+        "mapLeft should alter left instance only" {
+            forAll { i: Int, j: Int ->
+                val left: Either<Int, Int> = Left(i)
+                val right: Either<Int, Int> = Right(j)
+                EitherT(Option(left)).mapLeft({it + 1}, Option.functor()) == EitherT(Option(Left(i+1))) &&
+                        EitherT(Option(right)).mapLeft({it + 1}, Option.functor()) ==  EitherT(Option(right)) &&
+                        EitherT(Option.empty<Either<Int, Int>>()).mapLeft({it +1}, Option.functor()) == EitherT(Option.empty<Either<Int, Int>>())
+            }
+        }
 
     }
 }

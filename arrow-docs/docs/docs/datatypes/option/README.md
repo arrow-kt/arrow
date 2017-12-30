@@ -143,7 +143,7 @@ import arrow.syntax.applicative.*
 Option.applicative().tupled(Option(1), Option("Hello"), Option(20.0))
 ```
 
-[`Monad`]({{ '/docs/_docs/typeclasses/monad/' | relative_url }})
+[`Monad`]({{ '/docs/typeclasses/monad/' | relative_url }})
 
 Computing over dependent values ignoring absence
 

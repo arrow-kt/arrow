@@ -2,24 +2,6 @@ apply plugin: 'kotlin'
 apply plugin: 'kotlin-kapt'
 apply from: 'generated-kotlin-sources.gradle'
 
-//group = ext.ank_group
-//version = ext.ank_version
-//
-//sourceSets {
-//    main.java.srcDirs += 'src/main/kotlin'
-//    test.java.srcDirs += 'src/test/kotlin'
-//}
-//
-//sourceCompatibility = JavaVersion.VERSION_1_8
-//targetCompatibility = JavaVersion.VERSION_1_8
-//
-//repositories {
-//    mavenCentral()
-//    maven { url 'https://jitpack.io' }
-//    maven { url 'http://dl.bintray.com/kotlin/kotlinx' }
-//    maven { url "http://dl.bintray.com/arrow/maven" }
-//}
-
 kotlin {
     experimental {
         coroutines "enable"
@@ -36,9 +18,8 @@ dependencies {
     compile project(':arrow-syntax')
     compile "org.jetbrains.kotlin:kotlin-compiler:$parent.ext.kotlinVersion"
     compile "org.jetbrains.kotlin:kotlin-script-util:$parent.ext.kotlinVersion"
-    compile group: 'org.beanshell', name: 'bsh', version: '2.0b5'
+    compile "org.apache-extras.beanshell:bsh:2.0b6"
     kapt project(':arrow-annotations-processor')
-//
-//    testCompile "junit:junit:$parent.ext.junit_version"
 }
 
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

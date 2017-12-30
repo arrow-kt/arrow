@@ -1,7 +1,7 @@
 dependencies {
     compile project(':arrow-syntax')
     compile project(':arrow-free')
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
     testCompile project(':arrow-test')
     testCompile project(':arrow-syntax')

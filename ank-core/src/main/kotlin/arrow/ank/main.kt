@@ -1,13 +1,13 @@
 @file:JvmName("main")
-package io.kategory.ank
+package arrow.ank
 
 import arrow.core.*
 import arrow.data.*
 import arrow.instances.*
 import arrow.free.*
-import io.arrow.ank.*
-import io.arrow.ank.ank
-import io.arrow.ank.ankMonadErrorInterpreter
+import arrow.ank.*
+import arrow.ank.ank
+import arrow.ank.ankMonadErrorInterpreter
 import java.io.File
 
 typealias Target<A> = Either<Throwable, A>

@@ -33,7 +33,7 @@ functions can be thrown. Moreover, they may throw the same kind of exception
 
 How then do we communicate an error? By making it explicit in the data type we return.
 
-## EITHER VS VALIDATED
+## Either vs Validated
 
 In general, `Validated` is used to accumulate errors, while `Either` is used to short-circuit a computation 
 upon the first error. For more information, see the `Validated` vs `Either` section of the `Validated` documentation.
@@ -65,7 +65,7 @@ val left: Either<String, Int> = Either.Left("Something went wrong")
 left.flatMap{Either.Right(it + 1)}
 ``` 
 
-## USING EITHER INSTEAD OF EXCEPTIONS
+## Using Either instead of exceptions
 
 As a running example, we will have a series of functions that will parse a string into an integer, 
 take the reciprocal, and then turn the reciprocal into a string.
@@ -191,8 +191,24 @@ when(x) {
 }
 ```
 
-## ADDITIONAL SYNTAX
+## Additional Syntax
 
+Either can also map over the `left` value with `mapLeft` which is similar to map but applies on left instances.
+
+```kotlin:ank
+val r : Either<Int, Int> = Either.Right(7)
+r.mapLeft{it +1}
+val l: Either<Int, Int> = Either.Left(7)
+l.mapLeft{it + 1}
+```
+
+`Either<A, B>` can be transformed to `Either<B,A>` using the `swap()` method.
+
+```kotlin:ank
+val r: Either<String, Int> = Either.Right(7)
+r.swap()
+```
+ 
 For using Either's syntax on arbitrary data types. 
 This will make possible to use the `left()`, `right()`, `contains()` and `getOrElse()` methods:
 
@@ -215,6 +231,51 @@ x.contains(7)
 val x = "hello".left()
 x.getOrElse { 7 }
 ```
+
+Another operation is `fold`. This operation will extract the value from the Either, or provide a default if the value is `Left`
+ 
+ ```kotlin:ank
+ val x = 7.right()
+ x.fold({ 1 }, { it * 3 }) // 21
+ ```
+ 
+ ```kotlin:ank
+ val x = 7.left()
+ x.fold({ 1 }, { it * 3 }) // 1
+ ```
+ 
+ Kategory contains `Either` instances for many useful typeclasses that allows you to use and transform right values.
+ Both Option and Try don't require a type parameter with the following functions, but it is specifically used for Either.Left
+ 
+ [`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }})
+ 
+ Transforming the inner contents
+ 
+ ```kotlin:ank
+ Either.functor<Int>().map(Either.Right(1), {it + 1})
+ ```
+ 
+ [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }})
+ 
+ Computing over independent values
+ 
+ ```kotlin:ank
+ Either.applicative<Int>().tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
+ ```
+ 
+ [`Monad`]({{ '/docs/_docs/typeclasses/monad/' | relative_url }})
+ 
+ Computing over dependent values ignoring absence
+ 
+ ```kotlin
+ Either.monad<Int>().binding {
+    val a = Either.Right(1).bind()
+    val b = Either.Right(1 + a).bind()
+    val c = Either.Right(1 + b).bind()
+    yields(a + b + c)
+ }
+ // Right(b=6, dummy=kotlin.Unit)
+ ```
 
 ## Instances
 
