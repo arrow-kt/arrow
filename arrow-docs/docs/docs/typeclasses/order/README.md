@@ -24,6 +24,7 @@ Compare [a] with [b]. Returns an Int whose sign is:
 
 ```kotlin:ank
 import arrow.*
+import arrow.typeclasses.*
 
 order<Int>().compare(1, 2)
 ```
@@ -66,6 +67,8 @@ Arrow provides [`OrderLaws`]({{ '/docs/typeclasses/laws#orderlaws' | relative_ur
 Order has a constructor to create an `Order` instance from a compare function `(F, F) -> Int`.
 
 ```kotlin:ank
+import arrow.syntax.order.*
+
 val reverseOrder = Order { a: Int, b: Int -> b - a }
 1.lt(reverseOrder, 2)
 ```

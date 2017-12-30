@@ -120,6 +120,8 @@ Try { 1 }.map({ it + 1 })
 Lift a function into the functor context
 
 ```kotlin:ank
+import arrow.syntax.functor.*
+
 val f = { n: Int -> n + 1 }.lift<OptionHK, Int, Int>()
 f(Option(1))
 ```
