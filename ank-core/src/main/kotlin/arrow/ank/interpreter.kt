@@ -122,8 +122,6 @@ fun compileCodeImpl(snippets: Map<File, ListKW<Snippet>>, classpath: ListKW<Stri
     println(colored(ANSI_PURPLE, AnkHeader))
     val sortedSnippets = snippets.toList()
     val result = sortedSnippets.mapIndexed { n, (file, codeBlocks) ->
-        //pb.extraMessage = "${file.parentFile.name}/${file.name}"
-//            println("ANK compile: ${file.parentFile.name}/${file.name}")
         val pb = ProgressBarPrinter(codeBlocks.size)
         pb.setBarCharacter(colored(ANSI_PURPLE, "\u25A0"))
         pb.setBarSize(40)
@@ -153,8 +151,6 @@ fun compileCodeImpl(snippets: Map<File, ListKW<Snippet>>, classpath: ListKW<Stri
                         })
                 engine.eval(snippet.code)
                 pb.step()
-//                    pb.update(snippetIndex + 1F)
-
             }.fold({
                 println("\n\n")
                 println(colored(ANSI_RED,"ΛNK compilation failed [ ${file.parentFile.name}/${file.name} ]"))
