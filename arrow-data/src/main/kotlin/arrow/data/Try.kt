@@ -25,7 +25,7 @@ sealed class Try<out A> : TryKind<A> {
         tailrec fun <A, B> tailRecM(a: A, f: (A) -> TryKind<Either<A, B>>): Try<B> {
             val ev: Try<Either<A, B>> = f(a).ev()
             return when (ev) {
-                is Failure -> monadError<TryHK, Throwable>().raiseError<B>(ev.exception).ev()
+                is Failure -> Failure<B>(ev.exception).ev()
                 is Success -> {
                     val b: Either<A, B> = ev.value
                     when (b) {
