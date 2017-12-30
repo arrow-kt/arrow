@@ -8,7 +8,7 @@ import arrow.typeLiteral
 /**
  * A type class used to determine equality between 2 instances of the same type [F] in a type safe way.
  *
- * @see <a href="http://arrow.io/docs/typeclasses/eq/">Eq documentation</a>
+ * @see <a href="http://arrow-kt.io/docs/typeclasses/eq/">Eq documentation</a>
  */
 interface Eq<in F> : Typeclass {
 
