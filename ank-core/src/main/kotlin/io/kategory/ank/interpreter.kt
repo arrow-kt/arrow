@@ -27,7 +27,6 @@ import java.net.URLClassLoader
 import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
 
-
 val extensionMappings = mapOf(
         "java" to "java",
         "kotlin" to "kts"
@@ -101,7 +100,6 @@ data class Snippet(
         val code: String,
         val result: Option<String> = None)
 
-
 fun extractCodeImpl(source: String, tree: ASTNode): ListKW<Snippet> {
     val sb = mutableListOf<Snippet>()
     tree.accept(object : RecursiveVisitor() {
@@ -127,7 +125,7 @@ fun compileCodeImpl(snippets: Map<File, ListKW<Snippet>>, classpath: ListKW<Stri
         //pb.extraMessage = "${file.parentFile.name}/${file.name}"
 //            println("ANK compile: ${file.parentFile.name}/${file.name}")
         val pb = ProgressBarPrinter(codeBlocks.size)
-        pb.setBarCharacter(colored(ANSI_PURPLE, 	"\u25A0"))
+        pb.setBarCharacter(colored(ANSI_PURPLE, "\u25A0"))
         pb.setBarSize(40)
         pb.setEmptyCharacter("\u25A0")
         if (codeBlocks.isNotEmpty()) {
