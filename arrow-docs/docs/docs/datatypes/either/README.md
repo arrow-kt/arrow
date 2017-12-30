@@ -244,7 +244,7 @@ Another operation is `fold`. This operation will extract the value from the Eith
  x.fold({ 1 }, { it * 3 }) // 1
  ```
  
- Kategory contains `Either` instances for many useful typeclasses that allows you to use and transform right values.
+ Arrow contains `Either` instances for many useful typeclasses that allows you to use and transform right values.
  Both Option and Try don't require a type parameter with the following functions, but it is specifically used for Either.Left
  
  [`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }})
