@@ -93,4 +93,4 @@ pTraversal.modify(listOf(1, 2, 3, 4).k()) {
 
 Arrow provides [`TraversalLaws`][traversal_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own traversal.
 
-[traversal_laws_source]: https://github.com/arrow/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/TraversalLaws.kt
+[traversal_laws_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/TraversalLaws.kt

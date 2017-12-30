@@ -54,7 +54,7 @@ Its generic parameter will be used for the lookup, which reinforces the concept 
 
 All the instances in the library are already registered and available in the global scope.
 If you're defining your own instances and would like for them to be discoverable in the global scope 
-you can add them by annotating them as `@instance`, and Λrrow's [annotation processor](https://github.com/arrow/arrow#additional-setup) will register them for you.
+you can add them by annotating them as `@instance`, and Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will register them for you.
 
 ```kotlin:ank
 import arrow.*
@@ -118,7 +118,7 @@ You can see a function `ev()` used to access the `map()` function that already e
 This is because we need to safely downcast from `HK<ListKWHK, A>` to `ListKW<A>`, and `ev()` is a global function defined to do so.
 
 The function `ev()` is already defined for all datatypes in Λrrow. If you're creating your own datatype that's also a type constructor and would like to create all these helper types and functions,
-you can do so simply by annotating it as `@higerkind`, and using Λrrow's [annotation processor](https://github.com/arrow/arrow#additional-setup) will create them for you.
+you can do so simply by annotating it as `@higerkind`, and using Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create them for you.
 
 Note that the annotation `@higerkind` will also generate the integration typealiases required by [KindedJ]({{ '/docs/integrations/kindedj' | relative_url }}).
 

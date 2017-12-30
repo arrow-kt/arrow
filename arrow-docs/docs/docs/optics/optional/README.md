@@ -115,4 +115,4 @@ lifted(Try.Failure<Tuple2<Int, String>>(IllegalStateException("something went wr
 
 Arrow provides [`OptionalLaws`][optional_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own optionals.
 
-[optional_laws_source]: https://github.com/arrow/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/OptionalLaws.kt
+[optional_laws_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/OptionalLaws.kt

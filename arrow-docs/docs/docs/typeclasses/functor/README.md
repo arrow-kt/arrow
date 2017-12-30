@@ -170,5 +170,5 @@ The following datatypes in Arrow provide instances that adhere to the `Functor` 
 Additionally all instances of [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}), [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) and their MTL variants implement the `Functor` typeclass directly
 since they are all subtypes of `Functor`
 
-[functor_source]: https://github.com/arrow/arrow/blob/master/arrow-data/src/main/kotlin/arrow/typeclasses/Functor.kt
-[functor_laws_source]: https://github.com/arrow/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/FunctorLaws.kt
+[functor_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-data/src/main/kotlin/arrow/typeclasses/Functor.kt
+[functor_laws_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/FunctorLaws.kt
