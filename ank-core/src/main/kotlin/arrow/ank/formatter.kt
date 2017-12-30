@@ -1,4 +1,4 @@
-package io.kategory.ank
+package arrow.ank
 
 private fun getMaxLength(strings: List<String>): Int {
     var len = Integer.MIN_VALUE
@@ -32,7 +32,7 @@ const val ANSI_CYAN = "\u001B[36m"
 const val ANSI_WHITE = "\u001B[37m"
 
 fun colored(color: String, message: String) =
-        "$color$message$ANSI_RESET"
+        "$color$message${ANSI_RESET}"
 
 val AnkHeader =
             """

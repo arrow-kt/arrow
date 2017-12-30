@@ -13,7 +13,6 @@ import arrow.syntax.applicativeerror.catch
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.monadError
 import com.github.born2snipe.cli.ProgressBarPrinter
-import io.kategory.ank.*
 import org.intellij.markdown.MarkdownElementTypes.CODE_FENCE
 import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.ast.accept
@@ -147,13 +146,13 @@ fun compileCodeImpl(snippets: Map<File, ListKW<Snippet>>, classpath: ListKW<Stri
                                     file = file,
                                     snippet = snippet,
                                     underlying = IllegalStateException("No engine configured for `${snippet.lang}`"),
-                                    msg = colored(ANSI_RED,"ΛNK compilation failed [ ${file.parentFile.name}/${file.name} ]"))
+                                    msg = colored(ANSI_RED, "ΛNK compilation failed [ ${file.parentFile.name}/${file.name} ]"))
                         })
                 engine.eval(snippet.code)
                 pb.step()
             }.fold({
                 println("\n\n")
-                println(colored(ANSI_RED,"ΛNK compilation failed [ ${file.parentFile.name}/${file.name} ]"))
+                println(colored(ANSI_RED, "ΛNK compilation failed [ ${file.parentFile.name}/${file.name} ]"))
                 throw CompilationException(file, snippet, it, msg = "\n" + """
                     |
                     |```
