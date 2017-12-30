@@ -48,9 +48,9 @@ The traditional way to control this would be to use a `try-catch` block, as we h
 try {
     getLotteryNumbers()
 } catch (e: NoConnectionException) {
-    println("You don't have connection")
+    //...
 } catch (e: AuthorizationException) {
-    println("You don't have permission")
+    //...
 }
 ```
 

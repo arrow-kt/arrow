@@ -30,18 +30,18 @@ eager.value()
 `Eval#later` creates an Eval instance from a function deferring it's evaluation until `.value()` is invoked memoizing the computed value.
 
 ```kotlin:ank
-val lazyEvaled = Eval.later { println("expensive computation"); 1 }
+val lazyEvaled = Eval.later { "expensive computation" }
 lazyEvaled.value()
 ```
 
-`"expensive computation"` is only printed once since the results are memoized and multiple calls to `value()` will just return the cached value.
+`"expensive computation"` is only computed once since the results are memoized and multiple calls to `value()` will just return the cached value.
 
 ### always
 
 `Eval#always` creates an Eval instance from a function deferring it's evaluation until `.value()` is invoked recomputing each time `.value()` is invoked.
 
 ```kotlin:ank
-val alwaysEvaled = Eval.always { println("expensive computation"); 1 }
+val alwaysEvaled = Eval.always { "expensive computation" }
 alwaysEvaled.value()
 ```
 
