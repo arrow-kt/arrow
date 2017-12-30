@@ -121,13 +121,14 @@ fun compileCodeImpl(snippets: Map<File, ListKW<Snippet>>, classpath: ListKW<Stri
     println(colored(ANSI_PURPLE, AnkHeader))
     val sortedSnippets = snippets.toList()
     val result = sortedSnippets.mapIndexed { n, (file, codeBlocks) ->
-        val pb = ProgressBarPrinter(codeBlocks.size)
+        val pb = ProgressBarPrinter(if (codeBlocks.isEmpty()) 1 else codeBlocks.size)
         pb.setBarCharacter(colored(ANSI_PURPLE, "\u25A0"))
         pb.setBarSize(40)
         pb.setEmptyCharacter("\u25A0")
-        if (codeBlocks.isNotEmpty()) {
-            pb.println("${file.parentFile.name}/${file.name} [${n + 1} of ${snippets.size}]")
-        }
+        pb.println("${file.parentFile.name}/${file.name} [${n + 1} of ${snippets.size}]")
+
+        if (codeBlocks.isEmpty()) pb.step()
+
         val classLoader = URLClassLoader(classpath.map { URL(it) }.ev().list.toTypedArray())
         val seManager = ScriptEngineManager(classLoader)
         val engineCache: Map<String, ScriptEngine> =
