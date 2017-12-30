@@ -34,7 +34,7 @@ KotlinConf, San Francisco, Nov '17
 
 ### Building a DSL... in Kotlin
  
- Make DSLs stack safe, composable and reusable under different runtime requirements thanks to Kategory.
+ Make DSLs stack safe, composable and reusable under different runtime requirements thanks to Arrow.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/kr8iWE4Jfhc" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
 

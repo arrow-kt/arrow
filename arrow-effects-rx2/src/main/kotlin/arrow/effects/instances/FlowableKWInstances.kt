@@ -1,7 +1,7 @@
 package arrow.effects
 
 import io.reactivex.BackpressureStrategy
-import arrow.MonadError
+import arrow.typeclasses.MonadError
 import arrow.instance
 
 @instance(FlowableKW::class)

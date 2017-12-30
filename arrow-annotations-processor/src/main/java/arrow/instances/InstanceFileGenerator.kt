@@ -156,7 +156,7 @@ class InstanceFileGenerator(
         private val annotatedList: List<AnnotatedInstance>
 ) {
 
-    private val instances: List<Instance> = annotatedList.map { Instance(it.classOrPackageProto.`package`, it) }
+    private val instances: List<Instance> = annotatedList.map { Instance(it.dataType.`package`, it) }
 
     /**
      * Main entry point for deriving extension generation
@@ -164,13 +164,17 @@ class InstanceFileGenerator(
     fun generate() {
         instances.forEach {
             val elementsToGenerate: List<String> =
-                    listOf(genImplicitObject(it), genCompanionExtensions(it)) +
+                    listOf(genImports(it), genImplicitObject(it), genCompanionExtensions(it)) +
                             (if (it.args.isNotEmpty()) listOf(genCompanionReifiedExtensions(it)) else emptyList())
             val source: String = elementsToGenerate.joinToString(prefix = "package ${it.`package`}\n\n", separator = "\n", postfix = "\n")
             val file = File(generatedDir, instanceAnnotationClass.simpleName + ".${it.target.classElement.qualifiedName}.kt")
             file.writeText(source)
         }
     }
+
+    private fun genImports(i: Instance): String = """
+            |import ${i.target.classOrPackageProto.`package`}.*
+            |""".trimMargin()
 
     private fun genImplicitObject(i: Instance): String = """
             |object ${i.implicitObjectName} {

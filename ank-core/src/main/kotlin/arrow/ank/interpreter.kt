@@ -1,9 +1,18 @@
 package arrow.ank
 
-import arrow.*
-import kotlinx.coroutines.experimental.CoroutineDispatcher
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.runBlocking
+import arrow.HK
+import arrow.core.FunctionK
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.data.ListKW
+import arrow.data.Try
+import arrow.data.ev
+import arrow.data.k
+import arrow.syntax.applicativeerror.catch
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.monadError
+import com.github.born2snipe.cli.ProgressBarPrinter
 import org.intellij.markdown.MarkdownElementTypes.CODE_FENCE
 import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.ast.accept
@@ -14,11 +23,8 @@ import org.intellij.markdown.parser.MarkdownParser
 import java.io.File
 import java.net.URL
 import java.net.URLClassLoader
-import java.util.concurrent.Executors
 import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
-import javax.script.ScriptException
-import kotlin.coroutines.experimental.CoroutineContext
 
 val extensionMappings = mapOf(
         "java" to "java",
@@ -72,24 +78,13 @@ fun readFileImpl(source: File): String =
 fun parseMarkDownImpl(markdown: String): ASTNode =
         MarkdownParser(GFMFlavourDescriptor()).buildMarkdownTreeFromString(markdown)
 
+abstract class NoStackTrace(msg: String) : Throwable(msg, null, false, false)
+
 data class CompilationException(
         val file: File,
         val snippet: Snippet,
         val underlying: Throwable,
-        val msg: String = """
-            |
-            |
-            |### ΛNK Compilation Error ###
-            |file: $file
-            |lang: ${snippet.lang}
-            |```
-            |${snippet.code}
-            |```
-            |
-            |${underlying.message}
-            |##############################
-            |
-        """.trimMargin()) : ScriptException(msg) {
+        val msg: String) : NoStackTrace(msg) {
     override fun toString(): String = msg
 }
 
@@ -123,46 +118,60 @@ fun extractCodeImpl(source: String, tree: ASTNode): ListKW<Snippet> {
 }
 
 fun compileCodeImpl(snippets: Map<File, ListKW<Snippet>>, classpath: ListKW<String>): ListKW<CompiledMarkdown> {
-    println(":runAnk -> started compilation")
-    val ioBoundPool = Executors.newFixedThreadPool(snippets.size)
-    val IOPool = object : CoroutineDispatcher() {
-        override fun dispatch(context: CoroutineContext, block: Runnable) {
-            ioBoundPool.submit(block)
-        }
-    }
-    return runBlocking {
-        snippets.map { (file, codeBlocks) ->
-            async(IOPool) {
-                val classLoader = URLClassLoader(classpath.map { URL(it) }.ev().list.toTypedArray())
-                val seManager = ScriptEngineManager(classLoader)
-                val engineCache: Map<String, ScriptEngine> =
-                        codeBlocks.list
-                                .distinctBy { it.lang }
-                                .map {
-                                    it.lang to seManager.getEngineByExtension(extensionMappings.getOrDefault(it.lang, "kts"))
-                                }
-                                .toMap()
-                val evaledSnippets: ListKW<Snippet> = codeBlocks.map { snippet ->
-                    val result: Any? = Try {
-                        val engine: ScriptEngine = engineCache.k().getOrElse(
-                                snippet.lang,
-                                { throw CompilationException(file, snippet, IllegalStateException("No engine configured for `${snippet.lang}`")) })
-                        engine.eval(snippet.code)
+    println(colored(ANSI_PURPLE, AnkHeader))
+    val sortedSnippets = snippets.toList()
+    val result = sortedSnippets.mapIndexed { n, (file, codeBlocks) ->
+        val pb = ProgressBarPrinter(if (codeBlocks.isEmpty()) 1 else codeBlocks.size)
+        pb.setBarCharacter(colored(ANSI_PURPLE, "\u25A0"))
+        pb.setBarSize(40)
+        pb.setEmptyCharacter("\u25A0")
+        pb.println("${file.parentFile.name}/${file.name} [${n + 1} of ${snippets.size}]")
 
-                    }.fold({
-                        throw CompilationException(file, snippet, it)
-                    }, { it })
-                    if (snippet.silent) {
-                        snippet
-                    } else {
-                        val resultString: Option<String> = Option.fromNullable(result).fold({ None }, { Some("//$it") })
-                        snippet.copy(result = resultString)
-                    }
-                }
-                CompiledMarkdown(file, evaledSnippets)
+        if (codeBlocks.isEmpty()) pb.step()
+
+        val classLoader = URLClassLoader(classpath.map { URL(it) }.ev().list.toTypedArray())
+        val seManager = ScriptEngineManager(classLoader)
+        val engineCache: Map<String, ScriptEngine> =
+                codeBlocks.list
+                        .distinctBy { it.lang }
+                        .map {
+                            it.lang to seManager.getEngineByExtension(extensionMappings.getOrDefault(it.lang, "kts"))
+                        }
+                        .toMap()
+        val evaledSnippets: ListKW<Snippet> = codeBlocks.mapIndexed { blockIndex, snippet ->
+            val result: Any? = Try {
+                val engine: ScriptEngine = engineCache.k().getOrElse(
+                        snippet.lang,
+                        {
+                            throw CompilationException(
+                                    file = file,
+                                    snippet = snippet,
+                                    underlying = IllegalStateException("No engine configured for `${snippet.lang}`"),
+                                    msg = colored(ANSI_RED, "ΛNK compilation failed [ ${file.parentFile.name}/${file.name} ]"))
+                        })
+                engine.eval(snippet.code)
+                pb.step()
+            }.fold({
+                println("\n\n")
+                println(colored(ANSI_RED, "ΛNK compilation failed [ ${file.parentFile.name}/${file.name} ]"))
+                throw CompilationException(file, snippet, it, msg = "\n" + """
+                    |
+                    |```
+                    |${snippet.code}
+                    |```
+                    |${colored(ANSI_RED, it.localizedMessage)}
+                    """.trimMargin())
+            }, { it })
+            if (snippet.silent) {
+                snippet
+            } else {
+                val resultString: Option<String> = Option.fromNullable(result).fold({ None }, { Some("//$it") })
+                snippet.copy(result = resultString)
             }
-        }.map { it.await() }.k()
-    }.also { ioBoundPool.shutdownNow() }
+        }.k()
+        CompiledMarkdown(file, evaledSnippets)
+    }.k()
+    return result
 }
 
 fun replaceAnkToLangImpl(compiledMarkdown: CompiledMarkdown): String =

@@ -15,7 +15,12 @@
  */
 
 include ':arrow-syntax'
+include ':arrow-core'
+include ':arrow-typeclasses'
+include ':arrow-instances'
 include ':arrow-data'
+include ':arrow-free'
+include ':arrow-mtl'
 include ':arrow-annotations'
 include ':arrow-annotations-processor'
 include ':arrow-kindedj'

@@ -1,4 +1,9 @@
-package arrow
+package arrow.data
+
+import arrow.*
+import arrow.core.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Foldable
 
 @higherkind
 data class MapKW<K, out A>(val map: Map<K, A>) : MapKWKind<K, A>, Map<K, A> by map {
@@ -13,7 +18,7 @@ data class MapKW<K, out A>(val map: Map<K, A>) : MapKWKind<K, A>, Map<K, A> by m
             }.k()
 
     fun <B, Z> map2Eval(fb: Eval<MapKW<K, B>>, f: (A, B) -> Z): Eval<MapKW<K, Z>> =
-            if (fb.isEmpty()) Eval.now(emptyMap<K, Z>().k())
+            if (fb.value().isEmpty()) Eval.now(emptyMap<K, Z>().k())
             else fb.map { b -> this.map2(b, f) }
 
     fun <B> ap(ff: MapKW<K, (A) -> B>): MapKW<K, B> =
@@ -40,7 +45,7 @@ data class MapKW<K, out A>(val map: Map<K, A>) : MapKWKind<K, A>, Map<K, A> by m
             this.map.foldLeft(b) { m, (k, v) -> f(m.k(), Tuple2(k, v)) }.k()
 
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, MapKW<K, B>> =
-            Foldable.iterateRight(this.map.iterator(), Eval.always { GA.pure(emptyMap<K, B>().k()) })({ kv, lbuf ->
+            (Foldable.iterateRight(this.map.iterator(), Eval.always { GA.pure(emptyMap<K, B>().k()) }))({ kv, lbuf ->
                 GA.map2Eval(f(kv.value), lbuf) { (mapOf(kv.key to it.a).k() + it.b).k() }
             }).value()
 
@@ -74,3 +79,7 @@ fun <K, A, B> Map<K, A>.foldLeft(b: Map<K, B>, f: (Map<K, B>, Map.Entry<K, A>) -
 
 fun <K, A, B> Map<K, A>.foldRight(b: Map<K, B>, f: (Map.Entry<K, A>, Map<K, B>) -> Map<K, B>): Map<K, B> =
     this.entries.reversed().k().map.foldLeft(b) { x, y -> f(y, x) }
+
+fun <A, B> Iterator<A>.iterateRight(lb: Eval<B>): (f: (A, Eval<B>) -> Eval<B>) -> Eval<B> = Foldable.iterateRight(this, lb)
+
+fun <K, V> mapOf(vararg tuple: Tuple2<K, V>): Map<K, V> = if (tuple.isNotEmpty()) tuple.map { it.a to it.b }.toMap() else emptyMap()

@@ -8,12 +8,14 @@ kotlin {
     }
 }
 
-
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$parent.ext.kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
     compile "org.jetbrains:markdown:0.1.25"
+    compile group: 'com.github.born2snipe', name: 'cli-progress', version: '0.4'
+    compile project(':arrow-free')
     compile project(':arrow-data')
+    compile project(':arrow-syntax')
     compile "org.jetbrains.kotlin:kotlin-compiler:$parent.ext.kotlinVersion"
     compile "org.jetbrains.kotlin:kotlin-script-util:$parent.ext.kotlinVersion"
     compile "org.apache-extras.beanshell:bsh:2.0b6"

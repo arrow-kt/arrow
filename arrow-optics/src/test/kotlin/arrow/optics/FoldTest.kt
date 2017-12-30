@@ -3,8 +3,11 @@ package arrow.optics
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import arrow.*
+import arrow.core.Option
+import arrow.data.ListKWHK
+import arrow.data.k
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
 
 @RunWith(KTestJUnitRunner::class)
 class FoldTest : UnitSpec() {

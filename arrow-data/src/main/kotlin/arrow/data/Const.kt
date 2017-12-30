@@ -1,4 +1,9 @@
-package arrow
+package arrow.data
+
+import arrow.*
+import arrow.core.Option
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Semigroup
 
 fun <A, T> ConstKind<A, T>.value(): A = this.ev().value
 

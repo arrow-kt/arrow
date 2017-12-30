@@ -1,4 +1,6 @@
-package arrow
+package arrow.data
+
+import arrow.core.*
 
 fun <A, B> ((A) -> B).coreader(): CoreaderT<IdHK, A, B> = Coreader(this)
 

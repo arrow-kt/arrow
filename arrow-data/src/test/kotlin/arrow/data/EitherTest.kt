@@ -1,11 +1,16 @@
-package arrow
+package arrow.data
 
+import arrow.HK
+import arrow.core.*
+import arrow.test.UnitSpec
+import arrow.test.laws.EqLaws
+import arrow.test.laws.MonadErrorLaws
+import arrow.test.laws.SemigroupKLaws
+import arrow.test.laws.TraverseLaws
+import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
-import arrow.Left
-import arrow.Right
-import arrow.laws.EqLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

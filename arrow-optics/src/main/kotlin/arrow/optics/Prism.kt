@@ -1,6 +1,8 @@
 package arrow.optics
 
 import arrow.*
+import arrow.core.*
+import arrow.typeclasses.*
 
 /**
  * [Prism] is a type alias for [PPrism] which fixes the type arguments
@@ -57,7 +59,7 @@ interface PPrism<S, T, A, B> {
          * Can also be used to construct [Prism]
          */
         operator fun <S, A> invoke(partialFunction: PartialFunction<S, A>, reverseGet: (A) -> S): Prism<S, A> = Prism(
-                getOrModify = { s -> partialFunction.lift()(s).fold({ Left(s) }, { Right(it) }) },
+                getOrModify = { s -> partialFunction.lift()(s).fold({ Either.Left(s) }, { Either.Right(it) }) },
                 reverseGet = reverseGet
         )
 
@@ -65,7 +67,7 @@ interface PPrism<S, T, A, B> {
          * A [PPrism] that checks for equality with a given value [a]
          */
         inline fun <reified A> only(a: A, EQA: Eq<A> = eq()): Prism<A, Unit> = Prism(
-                getOrModify = { a2 -> (if (EQA.eqv(a, a2)) Left(a) else Right(Unit)) },
+                getOrModify = { a2 -> (if (EQA.eqv(a, a2)) Either.Left(a) else Either.Right(Unit)) },
                 reverseGet = { a }
         )
 
@@ -268,11 +270,11 @@ inline fun <S, T, A, B> PPrism<S, T, A, B>.all(s: S, crossinline p: (A) -> Boole
  * Create a sum of the [PPrism] and a type [C]
  */
 fun <S, T, A, B, C> PPrism<S, T, A, B>.left(): PPrism<Either<S, C>, Either<T, C>, Either<A, C>, Either<B, C>> = Prism(
-        { it.fold({ a -> getOrModify(a).bimap({ Left(it) }, { Left(it) }) }, { c -> Right(Right(c)) }) },
+        { it.fold({ a -> getOrModify(a).bimap({ Either.Left(it) }, { Either.Left(it) }) }, { c -> Either.Right(Either.Right(c)) }) },
         {
             when (it) {
-                is Left<B, C> -> Left(reverseGet(it.a))
-                is Right<B, C> -> Right(it.b)
+                is Either.Left<B, C> -> Either.Left(reverseGet(it.a))
+                is Either.Right<B, C> -> Either.Right(it.b)
             }
         }
 )
@@ -281,6 +283,6 @@ fun <S, T, A, B, C> PPrism<S, T, A, B>.left(): PPrism<Either<S, C>, Either<T, C>
  * Create a sum of a type [C] and the [PPrism]
  */
 fun <S, T, A, B, C> PPrism<S, T, A, B>.right(): PPrism<Either<C, S>, Either<C, T>, Either<C, A>, Either<C, B>> = Prism(
-        { it.fold({ c -> Right(Left(c)) }, { s -> getOrModify(s).bimap({ Right(it) }, { Right(it) }) }) },
+        { it.fold({ c -> Either.Right(Either.Left(c)) }, { s -> getOrModify(s).bimap({ Either.Right(it) }, { Either.Right(it) }) }) },
         { it.map(this::reverseGet) }
 )

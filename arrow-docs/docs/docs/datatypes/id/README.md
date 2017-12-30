@@ -11,6 +11,7 @@ It is ambient in the sense that plain pure values are values of `Id`.
 
 ```kotlin:ank
 import arrow.*
+import arrow.core.*
 
 Id("hello")
 ```

@@ -12,12 +12,17 @@ potential-bugs:
     active: false
   UnsafeCallOnNullableType:
     active: false
+  LateinitUsage:
+      active: false
 
 exceptions:
   active: true
 
 empty:
   active: true
+
+empty-blocks:
+  active: false
 
 complexity:
   active: true

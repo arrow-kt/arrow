@@ -1,9 +1,13 @@
-package arrow
+package arrow.data
 
+import arrow.core.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
-import arrow.laws.EqLaws
+import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
+import arrow.typeclasses.eq
+import arrow.typeclasses.monoid
 
 @RunWith(KTestJUnitRunner::class)
 class TupleTest : UnitSpec() {

@@ -1,6 +1,9 @@
 package arrow.effects.internal
 
-import arrow.*
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
 import arrow.effects.Duration
 import arrow.effects.IO
 import java.util.*
@@ -39,8 +42,8 @@ object Platform {
 
         return when (eitherRef) {
             null -> None
-            is Left -> throw eitherRef.a
-            is Right -> Some(eitherRef.b)
+            is Either.Left -> throw eitherRef.a
+            is Either.Right -> Some(eitherRef.b)
         }
     }
 }

@@ -1,7 +1,9 @@
-package arrow
+package arrow.data
 
-import arrow.Either.Left
-import arrow.Either.Right
+import arrow.*
+import arrow.core.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Semigroup
 
 typealias IorNel<A, B> = Ior<Nel<A>, B>
 
@@ -69,7 +71,7 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
          * @param oa an element (optional) for the left side of the [Ior]
          * @param ob an element (optional) for the right side of the [Ior]
          *
-         * @return [Option.None] if both [oa] and [ob] are [Option.None]. Otherwise [Option.Some] wrapping
+         * @return [None] if both [oa] and [ob] are [None]. Otherwise [Some] wrapping
          * an [Ior.Left], [Ior.Right], or [Ior.Both] if [oa], [ob], or both are defined (respectively).
          */
 
@@ -85,19 +87,19 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
         }
 
         private tailrec fun <L, A, B> loop(v: Ior<L, Either<A, B>>, f: (A) -> IorKind<L, Either<A, B>>, SL: Semigroup<L>): Ior<L, B> = when (v) {
-            is Ior.Left -> Ior.Left(v.value)
-            is Ior.Right -> when (v.value) {
-                is Either.Right -> Ior.Right(v.value.b)
+            is Left -> Left(v.value)
+            is Right -> when (v.value) {
+                is Either.Right -> Right(v.value.b)
                 is Either.Left -> loop(f(v.value.a).ev().ev(), f, SL)
             }
-            is Ior.Both -> when (v.rightValue) {
-                is Either.Right -> Ior.Both(v.leftValue, v.rightValue.b)
+            is Both -> when (v.rightValue) {
+                is Either.Right -> Both(v.leftValue, v.rightValue.b)
                 is Either.Left -> {
                     val fnb = f(v.rightValue.a).ev()
                     when (fnb) {
-                        is Ior.Left -> Ior.Left(SL.combine(v.leftValue, fnb.value))
-                        is Ior.Right -> loop(Ior.Both(v.leftValue, fnb.value), f, SL)
-                        is Ior.Both -> loop(Ior.Both(SL.combine(v.leftValue, fnb.leftValue), fnb.rightValue), f, SL)
+                        is Left -> Left(SL.combine(v.leftValue, fnb.value))
+                        is Right -> loop(Both(v.leftValue, fnb.value), f, SL)
+                        is Both -> loop(Both(SL.combine(v.leftValue, fnb.leftValue), fnb.rightValue), f, SL)
                     }
                 }
             }
@@ -105,9 +107,9 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
 
         fun <L, A, B> tailRecM(a: A, f: (A) -> IorKind<L, Either<A, B>>, SL: Semigroup<L>): Ior<L, B> = loop(f(a).ev(), f, SL)
 
-        fun <A, B> leftNel(a: A): IorNel<A, B> = Ior.Left(Nel.of(a))
+        fun <A, B> leftNel(a: A): IorNel<A, B> = Left(NonEmptyList.of(a))
 
-        fun <A, B> bothNel(a: A, b: B): IorNel<A, B> = Ior.Both(Nel.of(a), b)
+        fun <A, B> bothNel(a: A, b: B): IorNel<A, B> = Both(NonEmptyList.of(a), b)
     }
 
     /**
@@ -140,7 +142,7 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
             fold({ lc }, { f(it, lc) }, { _, b -> f(b, lc) })
 
     fun <G, C> traverse(f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, Ior<A, C>> =
-            fold({ GA.pure(Ior.Left(it)) }, { GA.map(f(it), { Ior.Right(it) }) }, { _, b -> GA.map(f(b), { Ior.Right(it) }) })
+            fold({ GA.pure(Left(it)) }, { GA.map(f(it), { Right(it) }) }, { _, b -> GA.map(f(b), { Right(it) }) })
 
     /**
      * The given function is applied if this is a [Right] or [Both] to `B`.
@@ -222,9 +224,9 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
      *
      * Example:
      * ```
-     * Right(12).pad() // Result: Pair(Option.None, Option.Some(12))
-     * Left(12).pad()  // Result: Pair(Option.Some(12), Option.None)
-     * Both("power", 12).pad()  // Result: Pair(Option.Some("power"), Option.Some(12))
+     * Right(12).pad() // Result: Pair(None, Some(12))
+     * Left(12).pad()  // Result: Pair(Some(12), None)
+     * Both("power", 12).pad()  // Result: Pair(Some("power"), Some(12))
      * ```
      */
     fun pad(): Pair<Option<A>, Option<B>> = fold(
@@ -247,8 +249,8 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
     fun toEither(): Either<A, B> = fold({ Either.Left(it) }, { Either.Right(it) }, { _, b -> Either.Right(b) })
 
     /**
-     * Returns a [Option.Some] containing the [Right] value or `B` if this is [Right] or [Both]
-     * and [Option.None] if this is a [Left].
+     * Returns a [Some] containing the [Right] value or `B` if this is [Right] or [Both]
+     * and [None] if this is a [Left].
      *
      * Example:
      * ```

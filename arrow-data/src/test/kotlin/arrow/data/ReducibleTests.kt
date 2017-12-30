@@ -1,9 +1,13 @@
 package arrow.data
 
+import arrow.HK
+import arrow.core.Tuple2
+import arrow.instances.LongMonoid
+import arrow.test.UnitSpec
+import arrow.test.laws.ReducibleLaws
+import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
-import arrow.*
-import arrow.laws.ReducibleLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

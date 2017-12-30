@@ -1,6 +1,11 @@
 package arrow.optics
 
 import arrow.*
+import arrow.core.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.functor
 
 /**
  * [Iso] is a type alias for [PIso] which fixes the type arguments
@@ -196,7 +201,7 @@ interface PIso<S, T, A, B> {
      * View a [PIso] as a [PPrism]
      */
     fun asPrism(): PPrism<S, T, A, B> = PPrism(
-            { a -> Right(get(a)) },
+            { a -> Either.Right(get(a)) },
             this::reverseGet
     )
 
@@ -214,7 +219,7 @@ interface PIso<S, T, A, B> {
      * View a [PIso] as a [POptional]
      */
     fun asOptional(): POptional<S, T, A, B> = POptional(
-            { s -> Right(get(s)) },
+            { s -> Either.Right(get(s)) },
             { b -> { _ -> set(b) } }
     )
 

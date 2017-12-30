@@ -22,6 +22,7 @@ So let's test this out with an example:
 
 ```kotlin:ank
 import arrow.*
+import arrow.core.*
 
 data class Country(val code: Option<String>)
 data class Address(val id: Int, val country: Option<Country>)
@@ -43,6 +44,8 @@ We can further simplify this case by using Arrow `binding` facilities
 that enables monad comprehensions for all datatypes for which a monad instance is available.
 
 ```kotlin:ank
+import arrow.typeclasses.*
+
 fun getCountryCode(maybePerson : Option<Person>): Option<String> =
   Option.monad().binding {
     val person = maybePerson.bind()
@@ -166,6 +169,9 @@ So our specialization `OptionT<ObservableKWHK, A>` is the OptionT transformer ar
 We can now lift any value to a `OptionT<F, A>` which looks like this:
 
 ```kotlin:ank
+import arrow.syntax.applicative.*
+import arrow.data.*
+
 val optTVal = 1.pure<OptionTKindPartial<ObservableKWHK>, Int>()
 optTVal
 ```

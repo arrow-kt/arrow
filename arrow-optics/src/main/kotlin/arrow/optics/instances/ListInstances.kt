@@ -1,6 +1,12 @@
-package arrow.optics
+package arrow.optics.instances
 
-import arrow.*
+import arrow.core.*
+import arrow.data.ListKW
+import arrow.data.NonEmptyList
+import arrow.data.k
+import arrow.optics.Iso
+import arrow.optics.Optional
+import arrow.optics.PIso
 
 /**
  * [Optional] to safely operate on the head of a list

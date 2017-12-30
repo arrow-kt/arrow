@@ -1,8 +1,12 @@
-package arrow
+package arrow.data
 
+import arrow.core.Id
+import arrow.core.Tuple2
+import arrow.core.value
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
 
 @RunWith(KTestJUnitRunner::class)
 class ReaderTest : UnitSpec() {

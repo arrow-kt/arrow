@@ -5,8 +5,12 @@ import io.kotlintest.matchers.Result
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.specs.FreeSpec
 import arrow.Problem.*
+import arrow.core.*
+import arrow.data.*
+import arrow.syntax.applicative.tupled
 import arrow.syntax.either.left
 import arrow.syntax.either.right
+import arrow.typeclasses.binding
 import kotlin.reflect.KClass
 
 
@@ -14,7 +18,7 @@ import kotlin.reflect.KClass
 class DataTypeExamples : FreeSpec() { init {
 
     /**
-     * Option http://arrow.io/docs/datatypes/option/
+     * Option http://arrow-kt.io/docs/datatypes/option/
      ***/
     "Option: Some or None?" - {
         val someValue: Option<Int> = Some(42)
@@ -34,7 +38,7 @@ class DataTypeExamples : FreeSpec() { init {
             // Option can also be used with when statements:
             val msg = when (someValue) {
                 is Some -> "ok"
-                Option.None -> "ko"
+                None -> "ko"
             }
             msg shouldBe "ok"
         }
@@ -56,7 +60,7 @@ class DataTypeExamples : FreeSpec() { init {
         "Applicative" {
             // Computing over independent values
             val tuple = Option.applicative().tupled(Option(1), Option("Hello"), Option(20.0))
-            tuple shouldBe Some(Tuple3(a=1, b="Hello", c=20.0))
+            tuple shouldBe Some(Tuple3(a = 1, b = "Hello", c = 20.0))
 
         }
 
@@ -82,7 +86,7 @@ class DataTypeExamples : FreeSpec() { init {
     }
 
 
-    // http://arrow.io/docs/datatypes/try/
+    // http://arrow-kt.io/docs/datatypes/try/
     "Try and recover" - {
 
         "Old school" {

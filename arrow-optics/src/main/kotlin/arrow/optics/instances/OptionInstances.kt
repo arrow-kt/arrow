@@ -1,6 +1,10 @@
-package arrow.optics
+package arrow.optics.instances
 
-import arrow.*
+import arrow.core.*
+import arrow.optics.Iso
+import arrow.optics.PIso
+import arrow.optics.PPrism
+import arrow.optics.Prism
 
 /**
  * [PIso] that defines the equality in the kotlin nullable structure and [arrow.Option]
@@ -19,7 +23,7 @@ fun <A> nullableToOption(): Iso<A?, Option<A>> = pNullableToOption()
  * [PPrism] to focus into an [arrow.Option.Some]
  */
 fun <A, B> pSomePrism(): PPrism<Option<A>, Option<B>, A, B> = PPrism(
-        getOrModify = { option -> option.fold({ Left(None) }, { a -> Right(a) }) },
+        getOrModify = { option -> option.fold({ Either.Left(None) }, { a -> Either.Right(a) }) },
         reverseGet = { b -> Some(b) }
 )
 
@@ -32,12 +36,12 @@ fun <A> somePrism(): Prism<Option<A>, A> = pSomePrism()
  * [Prism] to focus into an [arrow.Option.None]
  */
 fun <A> nonePrism(): Prism<Option<A>, Unit> = Prism(
-        getOrModify = { option -> option.fold({ Right(Unit) }, { Left(Some(it)) }) },
+        getOrModify = { option -> option.fold({ Either.Right(Unit) }, { Either.Left(Some(it)) }) },
         reverseGet = { _ -> None }
 )
 
 fun <A, B> pOptionToEither(): PIso<Option<A>, Option<B>, Either<Unit, A>, Either<Unit, B>> = PIso(
-        get = { opt -> opt.fold({ Left(Unit) }, { a -> Right(a) }) },
+        get = { opt -> opt.fold({ Either.Left(Unit) }, { a -> Either.Right(a) }) },
         reverseGet = { either -> either.fold({ None }, { b -> Some(b) }) }
 )
 

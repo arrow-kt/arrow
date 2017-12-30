@@ -21,6 +21,7 @@ We can create `Ior` values using `Ior.Left`, `Ior.Right` and `Ior.Both`:
 
 ```kotlin:ank
 import arrow.*
+import arrow.data.*
 
 Ior.Right(42)
 ```

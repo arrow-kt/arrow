@@ -1,6 +1,11 @@
 package arrow.optics
 
 import arrow.*
+import arrow.core.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.functor
 
 /**
  * [Lens] is a type alias for [PLens] which fixes the type arguments
@@ -167,7 +172,7 @@ interface PLens<S, T, A, B> {
      * View a [PLens] as a [POptional]
      */
     fun asOptional(): POptional<S, T, A, B> = POptional(
-            { s -> Right(get(s)) },
+            { s -> Either.Right(get(s)) },
             { b -> { s -> set(s, b) } }
     )
 

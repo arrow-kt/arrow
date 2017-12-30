@@ -10,7 +10,7 @@ TODO: expand
 
 #### Libraries
 
-[arrow/ΛNK](https://github.com/arrow/ank/): Compile time docs verification for Kotlin
+[arrow/ΛNK](https://github.com/arrow-kt/ank/): Compile time docs verification for Kotlin
 
 [Guardiola31337/uiagesturegen](https://github.com/Guardiola31337/uiagesturegen): UI Automator Gesture Generation DSL
 

@@ -1,13 +1,13 @@
 @file:JvmName("main")
 package arrow.ank
 
-import arrow.Either
-import arrow.ListKW
-import arrow.ev
-import arrow.monadError
+import arrow.core.*
+import arrow.data.*
+import arrow.instances.*
+import arrow.free.*
+import arrow.ank.*
 import arrow.ank.ank
 import arrow.ank.ankMonadErrorInterpreter
-import arrow.ank.run
 import java.io.File
 
 typealias Target<A> = Either<Throwable, A>

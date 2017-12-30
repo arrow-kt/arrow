@@ -1,6 +1,11 @@
-package arrow
+package arrow.data
 
-import arrow.laws.EqLaws
+import arrow.syntax.applicative.map
+import arrow.test.UnitSpec
+import arrow.test.laws.EqLaws
+import arrow.test.laws.MonadErrorLaws
+import arrow.test.laws.TraverseLaws
+import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe

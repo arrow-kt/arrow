@@ -3,6 +3,9 @@ package arrow.effects
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import arrow.*
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.typeclasses.*
 
 fun <A> Observable<A>.k(): ObservableKW<A> = ObservableKW(this)
 

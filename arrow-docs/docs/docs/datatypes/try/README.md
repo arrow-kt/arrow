@@ -6,7 +6,7 @@ permalink: /docs/datatypes/try/
 
 ## Try
 
-Arrow has [lots of different types of error handling and reporting](http://kategory.io/docs/patterns/error_handling/), which allows you to choose the best strategy for your situation. 
+Arrow has [lots of different types of error handling and reporting](http://arrow-kt.io/docs/patterns/error_handling/), which allows you to choose the best strategy for your situation. 
 
 For example, we have `Option` to model the absence of a value, or `Either` to model the return of a function as a type that may have been successful, or may have failed. 
 
@@ -48,9 +48,9 @@ The traditional way to control this would be to use a `try-catch` block, as we h
 try {
     getLotteryNumbers()
 } catch (e: NoConnectionException) {
-    println("You don't have connection")
+    //...
 } catch (e: AuthorizationException) {
-    println("You don't have permission")
+    //...
 }
 ```
 
@@ -58,6 +58,7 @@ However, we could use `Try` to retrieve the computation result in a much cleaner
 
 ```kotlin:ank
 import arrow.*
+import arrow.data.*
 
 val lotteryTry = Try { getLotteryNumbers() }
 lotteryTry
@@ -138,6 +139,8 @@ Lastly, Arrow contains `Try` instances for many useful typeclasses that allows y
 Transforming the value, if the computation is a success:
 
 ```kotlin:ank
+import arrow.typeclasses.*
+
 Try.functor().map(Try { "3".toInt() }, { it + 1})
 ```
 
@@ -146,6 +149,8 @@ Try.functor().map(Try { "3".toInt() }, { it + 1})
 Computing over independent values:
 
 ```kotlin:ank
+import arrow.syntax.applicative.*
+
 Try.applicative().tupled(Try { "3".toInt() }, Try { "5".toInt() }, Try { "nope".toInt() })
 ```
 

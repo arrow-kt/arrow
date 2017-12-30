@@ -1,4 +1,11 @@
-package arrow
+package arrow.data
+
+import arrow.*
+import arrow.core.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.applicative
 
 /**
  * [OptionT]`<F, A>` is a light wrapper on an `F<`[Option]`<A>>` with some
@@ -12,11 +19,11 @@ package arrow
 
         operator fun <F, A> invoke(value: HK<F, Option<A>>): OptionT<F, A> = OptionT(value)
 
-        inline fun <reified F, A> pure(a: A, AF: Applicative<F> = arrow.applicative<F>()): OptionT<F, A> = OptionT(AF.pure(Some(a)))
+        inline fun <reified F, A> pure(a: A, AF: Applicative<F> = applicative<F>()): OptionT<F, A> = OptionT(AF.pure(Some(a)))
 
-        inline fun <reified F> none(AF: Applicative<F> = arrow.applicative<F>()): OptionT<F, Nothing> = OptionT(AF.pure(None))
+        inline fun <reified F> none(AF: Applicative<F> = applicative<F>()): OptionT<F, Nothing> = OptionT(AF.pure(None))
 
-        inline fun <reified F, A> fromOption(value: Option<A>, AF: Applicative<F> = arrow.applicative<F>()): OptionT<F, A> =
+        inline fun <reified F, A> fromOption(value: Option<A>, AF: Applicative<F> = applicative<F>()): OptionT<F, A> =
                 OptionT(AF.pure(value))
 
         fun <F, A, B> tailRecM(a: A, f: (A) -> OptionTKind<F, Either<A, B>>, MF: Monad<F>): OptionT<F, B> =
@@ -74,20 +81,6 @@ package arrow
     inline fun <B> transform(crossinline f: (Option<A>) -> Option<B>, FF: Functor<F>): OptionT<F, B> = OptionT(FF.map(value, { f(it) }))
 
     inline fun <B> subflatMap(crossinline f: (A) -> Option<B>, FF: Functor<F>): OptionT<F, B> = transform({ it.flatMap(f) }, FF)
-
-    fun <B> foldLeft(b: B, f: (B, A) -> B, FF: Foldable<F>): B = FF.compose(Option.foldable()).foldLC(value, b, f)
-
-    fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>): Eval<B> = FF.compose(Option.foldable()).foldRC(value, lb, f)
-
-    fun <G, B> traverseFilter(f: (A) -> HK<G, Option<B>>, GA: Applicative<G>, FF: Traverse<F>): HK<G, OptionT<F, B>> {
-        val fa = ComposedTraverseFilter(FF, Option.traverseFilter(), Option.applicative()).traverseFilterC(value, f, GA)
-        return GA.map(fa, { OptionT(FF.map(it.unnest(), { it.ev() })) })
-    }
-
-    fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>, FF: Traverse<F>): HK<G, OptionT<F, B>> {
-        val fa = ComposedTraverse(FF, Option.traverse(), Option.applicative()).traverseC(value, f, GA)
-        return GA.map(fa, { OptionT(FF.map(it.unnest(), { it.ev() })) })
-    }
 
     fun <R> toLeft(default: () -> R, FF: Functor<F>): EitherT<F, A, R> =
             EitherT(cata({ Right(default()) }, { Left(it) }, FF))

@@ -4,7 +4,7 @@ import arrow.syntax.function.*
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
-import arrow.UnitSpec
+import arrow.test.UnitSpec
 import org.junit.runner.RunWith
 import java.util.*
 

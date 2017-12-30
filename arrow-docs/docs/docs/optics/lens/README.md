@@ -47,6 +47,8 @@ We can also `modify` and `lift` the focus of a `Lens` using a `Functor`
 
 ```kotlin:ank
 import arrow.*
+import arrow.core.*
+import arrow.syntax.option.*
 
 fooLens.modifyF(Option.functor(), foo) { it.some() }.ev()
 ```
@@ -159,4 +161,4 @@ pFirstTuple2<Int, String, String>().set(5 toT "World", "Hello, ")
 
 Arrow provides [`LensLaws`][lenses_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own lenses.
 
-[lenses_laws_source]: https://github.com/arrow/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/LensLaws.kt
+[lenses_laws_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/LensLaws.kt

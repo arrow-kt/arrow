@@ -1,10 +1,27 @@
 package arrow.optics
 
-import arrow.*
+import arrow.core.Either
+import arrow.core.OptionMonoidInstanceImplicits
+import arrow.core.applicative
+import arrow.core.ev
+import arrow.instances.IntMonoid
+import arrow.optics.instances.nonePrism
+import arrow.optics.instances.nullableToOption
+import arrow.optics.instances.optionToEither
+import arrow.optics.instances.somePrism
 import arrow.syntax.either.right
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
+import arrow.test.generators.genEither
+import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genNullable
+import arrow.test.generators.genOption
+import arrow.test.laws.IsoLaws
+import arrow.test.laws.PrismLaws
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
 
 @RunWith(KTestJUnitRunner::class)
 class OptionInstancesTest : UnitSpec() {

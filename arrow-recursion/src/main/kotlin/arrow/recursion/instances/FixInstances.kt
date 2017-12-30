@@ -1,4 +1,10 @@
-package arrow
+package arrow.recursion.instances
+
+import arrow.*
+import arrow.recursion.*
+import arrow.recursion.typeclass.Birecursive
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Nested
 
 @instance(Fix::class)
 interface FixInstances<F> : Birecursive<FixHK, F> {

@@ -20,6 +20,7 @@ In the following example we will define 3 invocations that may as well be remote
 
 ```kotlin:ank
 import arrow.*
+import arrow.core.*
 
 fun profileService(): Option<String> = Option("Alfredo Lambda")
 fun phoneService(): Option<Int> = Option(55555555)
@@ -31,6 +32,8 @@ This more or less illustrate the common use case of performing several independe
 Arrow features an [Applicative Builder]({{ '/docs/patterns/applicative_builder' | relative_url }}) that allows you to easily combine all the independent operations into one result.
 
 ```kotlin:ank
+import arrow.syntax.applicative.*
+
 data class Profile(val name: String, val phone: Int, val address: List<String>)
 
 val r: Option<Tuple3<String, Int, List<String>>> = Option.applicative().tupled(profileService(), phoneService(), addressService()).ev()
@@ -142,6 +145,6 @@ The following datatypes in Arrow provide instances that adhere to the `Applicati
 Additionally all instances of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) and their MTL variants implement the `Applicative` typeclass directly
 since they are all subtypes of `Applicative`.
 
-[applicative_source]: https://github.com/arrow/arrow/blob/master/arrow-data/src/main/kotlin/arrow/typeclasses/Applicative.kt
-[applicative_law_source]: https://github.com/arrow/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/ApplicativeLaws.kt
+[applicative_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-data/src/main/kotlin/arrow/typeclasses/Applicative.kt
+[applicative_law_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/ApplicativeLaws.kt
 

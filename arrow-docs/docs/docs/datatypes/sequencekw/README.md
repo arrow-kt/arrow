@@ -12,6 +12,7 @@ It can be created from Kotlin Sequence type with a convenient `k()` function.
 
 ```kotlin:ank
 import arrow.*
+import arrow.data.*
 
 sequenceOf(1, 2, 3).k()
 ```
@@ -44,6 +45,8 @@ SequenceKW.applicative().ap(sequenceOf(1, 2, 3).k(), sequenceOf({ x: Int -> x + 
 SequenceKW is a [`Monad`](/docs/_docs/typeclasses/monad/) too. For example, it can be used to model non-deterministic computations. (In a sense that the computations return an arbitrary number of results.)
 
 ```kotlin:ank
+import arrow.typeclasses.*
+
 val positive = generateSequence(1) { it + 1 }.k() // sequence of positive numbers
 val positiveEven = positive.filter { it % 2 == 0 }.k()
 

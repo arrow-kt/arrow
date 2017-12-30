@@ -1,9 +1,22 @@
-package arrow
+package arrow.free
 
+import arrow.HK
+import arrow.core.*
+import arrow.data.NonEmptyList
+import arrow.data.ev
+import arrow.data.monad
+import arrow.free.instances.FreeEq
+import arrow.free.instances.FreeMonadInstance
+import arrow.test.UnitSpec
+import arrow.test.laws.EqLaws
+import arrow.test.laws.MonadLaws
+import arrow.typeclasses.applicative
+import arrow.typeclasses.binding
+import arrow.typeclasses.functor
+import arrow.typeclasses.monad
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import arrow.laws.EqLaws
 import org.junit.runner.RunWith
 
 sealed class Ops<out A> : HK<Ops.F, A> {
@@ -14,10 +27,10 @@ sealed class Ops<out A> : HK<Ops.F, A> {
     data class Add(val a: Int, val y: Int) : Ops<Int>()
     data class Subtract(val a: Int, val y: Int) : Ops<Int>()
 
-    companion object : FreeMonadInstance<Ops.F> {
-        fun value(n: Int): Free<Ops.F, Int> = Free.liftF(Ops.Value(n))
-        fun add(n: Int, y: Int): Free<Ops.F, Int> = Free.liftF(Ops.Add(n, y))
-        fun subtract(n: Int, y: Int): Free<Ops.F, Int> = Free.liftF(Ops.Subtract(n, y))
+    companion object : FreeMonadInstance<F> {
+        fun value(n: Int): Free<F, Int> = Free.liftF(Value(n))
+        fun add(n: Int, y: Int): Free<F, Int> = Free.liftF(Add(n, y))
+        fun subtract(n: Int, y: Int): Free<F, Int> = Free.liftF(Subtract(n, y))
     }
 }
 
@@ -48,8 +61,8 @@ class FreeTest : UnitSpec() {
 
         val EQ: FreeEq<Ops.F, IdHK, Int> = FreeEq(idInterpreter)
         testLaws(
-            EqLaws.laws<Free<Ops.F, Int>>(EQ, { Ops.value(it) }),
-            MonadLaws.laws(Ops, EQ)
+                EqLaws.laws<Free<Ops.F, Int>>(EQ, { Ops.value(it) }),
+                MonadLaws.laws(Ops, EQ)
         )
 
         "Can interpret an ADT as Free operations" {

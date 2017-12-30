@@ -1,5 +1,9 @@
 package arrow
 
+import arrow.instances.ComposedFunctor
+import arrow.recursion.typeclass.Birecursive
+import arrow.typeclasses.*
+
 typealias Algebra <F, A> = (HK<F, A>) -> A
 
 typealias AlgebraM <M, F, A> = (HK<F, A>) -> HK<M, A>

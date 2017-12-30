@@ -1,5 +1,11 @@
-package arrow
+package arrow.data
 
+import arrow.HK2
+import arrow.test.UnitSpec
+import arrow.test.laws.MonoidLaws
+import arrow.test.laws.SemigroupLaws
+import arrow.test.laws.TraverseLaws
+import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith

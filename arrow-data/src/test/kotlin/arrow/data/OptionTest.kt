@@ -1,15 +1,24 @@
 package arrow.data
 
-import arrow.syntax.`try`.*
-import arrow.syntax.collections.*
+import arrow.HK
+import arrow.core.*
+import arrow.mtl.traverseFilter
+import arrow.syntax.`try`.optionTry
+import arrow.syntax.collections.firstOption
+import arrow.syntax.collections.option
+import arrow.syntax.collections.optionSequential
+import arrow.test.UnitSpec
+import arrow.test.generators.genOption
+import arrow.test.laws.EqLaws
+import arrow.test.laws.MonadFilterLaws
+import arrow.test.laws.TraverseFilterLaws
+import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import arrow.*
-import arrow.laws.EqLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

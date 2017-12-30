@@ -1,9 +1,22 @@
-package arrow
+package arrow.free
 
+import arrow.HK
+import arrow.core.*
+import arrow.data.NonEmptyList
+import arrow.data.applicative
+import arrow.data.ev
+import arrow.free.instances.FreeApplicativeApplicativeInstance
+import arrow.free.instances.FreeApplicativeEq
+import arrow.syntax.applicative.tupled
+import arrow.syntax.tuples.plus
+import arrow.test.UnitSpec
+import arrow.test.laws.ApplicativeLaws
+import arrow.test.laws.EqLaws
+import arrow.typeclasses.applicative
+import arrow.typeclasses.functor
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import arrow.laws.EqLaws
 import org.junit.runner.RunWith
 
 sealed class OpsAp<out A> : HK<OpsAp.F, A> {

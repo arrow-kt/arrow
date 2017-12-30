@@ -1,12 +1,20 @@
 package arrow.effects
 
 import arrow.*
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.None
+import arrow.core.Some
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldEqual
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
+import arrow.test.concurrency.SideEffect
+import arrow.test.laws.AsyncLaws
+import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class IOTest : UnitSpec() {

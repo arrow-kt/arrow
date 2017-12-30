@@ -124,7 +124,7 @@ When using `Option` our previous example may look like:
 
 ```kotlin:ank
 import arrow.*
-
+import arrow.core.*
 
 fun arm(): Option<Nuke> = None
 fun aim(): Option<Target> = None
@@ -135,6 +135,8 @@ It's easy to work with [`Option`](/docs/datatypes/option) if your lang supports 
 Arrow provides [monadic comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }})  for all datatypes for which a [`Monad`](/docs/typeclasses/monad) instance exists built atop coroutines.
 
 ```kotlin
+import arrow.typeclasses.*
+
 fun attackOption(): Option<Impacted> =
   Option.monad().binding {
     val nuke = arm().bind()
@@ -160,6 +162,8 @@ We use [`Try`]({{ '/docs/datatypes/try' | relative_url }}) when we want to be de
 How would our example look like implemented with `Try`?
 
 ```kotlin:ank
+import arrow.data.*
+
 fun arm(): Try<Nuke> =
   Try { throw RuntimeException("SystemOffline") }
 
@@ -237,8 +241,6 @@ s possible states.
 Once we have an ADT defined to model our known errors we can redefine our functions.
 
 ```kotlin:ank
-
-
 fun arm(): Either<SystemOffline, Nuke> = Right(Nuke)
 fun aim(): Either<RotationNeedsOil, Target> = Right(Target)
 fun launch(target: Target, nuke: Nuke): Either<MissedByMeters, Impacted> = Left(MissedByMeters(5))
@@ -274,6 +276,8 @@ Typeclasses allows us to code focusing on the behaviors and not the datatypes th
 Arrow provides the following `MonadError` instances for `Option`, `Try` and `Either`
 
 ```kotlin:ank
+import arrow.typeclasses.*
+
 monadError<OptionHK, Unit>()
 ```
 

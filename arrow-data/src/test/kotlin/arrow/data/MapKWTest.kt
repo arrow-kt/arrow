@@ -1,11 +1,12 @@
-package arrow
+package arrow.data
 
+import arrow.test.UnitSpec
+import arrow.test.laws.EqLaws
+import arrow.test.laws.TraverseLaws
+import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.should
-import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
-import arrow.laws.EqLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

@@ -20,6 +20,8 @@ When `continueIf` is satisfied the computation continues
 
 ```kotlin:ank
 import arrow.*
+import arrow.core.*
+import arrow.mtl.*
 
 Option.monadFilter().bindingFilter {
  val a = Option(1).bind()
@@ -31,6 +33,8 @@ Option.monadFilter().bindingFilter {
 ```
 
 ```kotlin:ank
+import arrow.data.*
+
 ListKW.monadFilter().bindingFilter {
  val a = listOf(1).k().bind()
  val b = listOf(1).k().bind()

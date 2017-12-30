@@ -1,6 +1,9 @@
 package arrow.effects
 
 import arrow.*
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
 
 /** An asynchronous computation that might fail. **/
 typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit

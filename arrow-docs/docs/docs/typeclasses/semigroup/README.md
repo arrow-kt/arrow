@@ -32,14 +32,20 @@ import arrow.*
 ```
 
 ```kotlin:ank
+import arrow.typeclasses.*
+
 semigroup<Int>().combine(1, 2)
 ```
 
-```kotlin:ank
+```kotlin:ank   
+import arrow.data.*
+
 ListKW.semigroup<Int>().combine(listOf(1, 2, 3).k(), listOf(4, 5, 6).k())
 ```
 
 ```kotlin:ank
+import arrow.core.*
+
 Option.monoid<Int>().combine(Option(1), Option(2))
 ```
 

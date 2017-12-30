@@ -1,21 +1,19 @@
-package arrow
+package arrow.data
+
+import arrow.*
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.Tuple2
+import arrow.typeclasses.Applicative
 
 fun <A> SequenceKWKind<A>.toList(): List<A> = this.ev().sequence.toList()
 
 @higherkind
-@deriving(
-        Functor::class,
-        Applicative::class,
-        Monad::class,
-        Foldable::class,
-        Traverse::class,
-        SemigroupK::class,
-        MonoidK::class)
 data class SequenceKW<out A> constructor(val sequence: Sequence<A>) : SequenceKWKind<A>, Sequence<A> by sequence {
 
     fun <B> flatMap(f: (A) -> SequenceKWKind<B>): SequenceKW<B> = this.ev().sequence.flatMap { f(it).ev().sequence }.k()
 
-    fun <B> ap(ff: SequenceKWKind<(A) -> B>): SequenceKW<B> = ff.flatMap { f -> map(f) }.ev()
+    fun <B> ap(ff: SequenceKWKind<(A) -> B>): SequenceKW<B> = ff.ev().flatMap { f -> map(f) }.ev()
 
     fun <B> map(f: (A) -> B): SequenceKW<B> = this.ev().sequence.map(f).k()
 
@@ -52,14 +50,14 @@ data class SequenceKW<out A> constructor(val sequence: Sequence<A>) : SequenceKW
                     buf: MutableList<B>,
                     f: (A) -> HK<SequenceKWHK, Either<A, B>>,
                     v: SequenceKW<Either<A, B>>) {
-                if (!v.isEmpty()) {
+                if (!(v.toList().isEmpty())) {
                     val head: Either<A, B> = v.first()
                     when (head) {
-                        is Right<A, B> -> {
+                        is Either.Right<A, B> -> {
                             buf += head.b
                             go(buf, f, v.drop(1).k())
                         }
-                        is Left<A, B> -> {
+                        is Either.Left<A, B> -> {
                             if (v.count() == 1)
                                 go(buf, f, (f(head.a).ev()).k())
                             else

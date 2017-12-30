@@ -1,9 +1,14 @@
-package arrow
+package arrow.data
 
+import arrow.HK
+import arrow.mtl.functorFilter
+import arrow.mtl.monadCombine
+import arrow.mtl.monadFilter
+import arrow.test.UnitSpec
+import arrow.test.laws.*
+import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import arrow.laws.EqLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

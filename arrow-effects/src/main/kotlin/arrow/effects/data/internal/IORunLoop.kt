@@ -1,6 +1,8 @@
 package arrow.effects
 
-import arrow.*
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
 import arrow.effects.internal.Platform.ArrayStack
 
 private typealias Current = IO<Any?>

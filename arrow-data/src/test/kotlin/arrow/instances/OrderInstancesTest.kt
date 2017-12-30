@@ -1,14 +1,14 @@
 package arrow.instances
 
+import arrow.syntax.order.toOrder
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.Gen
-import arrow.OrderLaws
-import arrow.UnitSpec
-import arrow.genFunctionAToB
-import arrow.order
-import arrow.toOrder
+import arrow.test.laws.OrderLaws
+import arrow.test.UnitSpec
+import arrow.test.generators.genFunctionAToB
+import arrow.typeclasses.order
+import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

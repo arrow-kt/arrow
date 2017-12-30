@@ -1,15 +1,19 @@
-package arrow.optics
+package arrow.optics.instances
 
-import arrow.Tuple10
-import arrow.Tuple2
-import arrow.Tuple3
-import arrow.Tuple4
-import arrow.Tuple5
-import arrow.Tuple6
-import arrow.Tuple7
-import arrow.Tuple8
-import arrow.Tuple9
-import arrow.toT
+import arrow.core.Tuple10
+import arrow.core.Tuple2
+import arrow.core.Tuple3
+import arrow.core.Tuple4
+import arrow.core.Tuple5
+import arrow.core.Tuple6
+import arrow.core.Tuple7
+import arrow.core.Tuple8
+import arrow.core.Tuple9
+import arrow.core.toT
+import arrow.optics.Lens
+import arrow.optics.PLens
+import arrow.optics.PTraversal
+import arrow.optics.Traversal
 
 /**
  * [PLens] to focus into the first value of a [arrow.Tuple2]

@@ -14,7 +14,9 @@ Let's build a simple Stack using Arrow's NonEmptyList and Option:
 
 ```kotlin:ank:silent
 import arrow.*
-import arrow.syntax.function.*
+import arrow.core.*
+import arrow.data.*
+import arrow.syntax.option.*
 
 typealias Stack = Option<Nel<String>>
 ```
@@ -86,6 +88,9 @@ fun push(s: String) = State<Stack, Unit> { stack ->
 The `flatMap` method on `State<S, A>` lets you use the result of one `State` in a subsequent `State`. The updated state (`S`) after the first call is passed into the second call. These `flatMap` and `map` methods allow us to use `State` in for-comprehensions:
 
 ```kotlin:ank:silent
+import arrow.typeclasses.*
+import arrow.instances.*
+
 fun stackOperations() = State().monad<Stack>().binding {
     val a = push("a").bind()
     val b = pop().bind()

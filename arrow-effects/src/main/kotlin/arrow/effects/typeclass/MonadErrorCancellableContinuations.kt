@@ -1,8 +1,12 @@
 package arrow.effects
 
 import arrow.*
+import arrow.core.Tuple2
+import arrow.core.toT
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.internal.stackLabels
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadErrorContinuation
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.EmptyCoroutineContext
@@ -21,7 +25,7 @@ open class MonadErrorCancellableContinuation<F, A>(ME: MonadError<F, Throwable>,
 
     fun disposable(): Disposable = { cancelled.set(true) }
 
-    internal fun returnedMonad(): HK<F, A> = returnedMonad
+    override fun returnedMonad(): HK<F, A> = returnedMonad
 
     override suspend fun <B> bind(m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels

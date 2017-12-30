@@ -1,5 +1,10 @@
-package arrow
+package arrow.data
 
+import arrow.core.*
+import arrow.mtl.monadReader
+import arrow.test.UnitSpec
+import arrow.test.laws.MonadErrorLaws
+import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe

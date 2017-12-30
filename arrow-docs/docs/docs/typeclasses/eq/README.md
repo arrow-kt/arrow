@@ -13,6 +13,7 @@ It can be considered the typeclass equivalent of Java's `Object#equals`.
 
 ```kotlin:ank
 import arrow.*
+import arrow.instances.*
 
 IntEqInstance.eqv(1, 2)
 ```
@@ -40,6 +41,8 @@ It is the opposite comparison of `eqv`.
 Compares two values for equality
 
 ```kotlin:ank
+import arrow.syntax.eq.*
+
 1.eqv(IntEqInstance, 2)
 ```
 
@@ -62,6 +65,9 @@ It uses kotlin's == comparison to compare any two instances.
 Note that this instance will fail on many all datatypes that contain a property or field that doesn't implement structural equality, i.e. functions, typeclasses, non-data classes
 
 ```kotlin:ank
+import arrow.core.*
+import arrow.typeclasses.*
+
 // Option is a data class with a single value
 Eq.any().eqv(Some(1), Option.pure(1))
 ```

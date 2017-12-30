@@ -1,9 +1,13 @@
-package arrow
+package arrow.data
 
+import arrow.instances.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
+import arrow.typeclasses.monoid
+import arrow.typeclasses.semigroup
 
 @RunWith(KTestJUnitRunner::class)
 class NumberMonoidTest : UnitSpec() {
@@ -22,8 +26,8 @@ class NumberMonoidTest : UnitSpec() {
             monoid<Float>() shouldNotBe null
             monoid<Byte>() shouldNotBe null
             monoid<Short>() shouldNotBe null
-            semigroup<java.lang.Integer>() shouldNotBe null
-            monoid<java.lang.Integer>() shouldNotBe null
+            semigroup<Integer>() shouldNotBe null
+            monoid<Integer>() shouldNotBe null
         }
 
         "should semigroup with the instance passed" {

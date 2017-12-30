@@ -1,9 +1,14 @@
 package arrow.data
 
+import arrow.HK
+import arrow.test.UnitSpec
+import arrow.test.laws.EqLaws
+import arrow.test.laws.MonadLaws
+import arrow.test.laws.MonoidKLaws
+import arrow.test.laws.TraverseLaws
+import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
-import arrow.*
-import arrow.laws.EqLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

@@ -1,7 +1,9 @@
-package arrow
+package arrow.data
 
-import arrow.Option.None
-import arrow.data.Disjunction
+import arrow.*
+import arrow.core.*
+import arrow.legacy.*
+import arrow.typeclasses.Applicative
 
 typealias Failure<A> = Try.Failure<A>
 typealias Success<A> = Try.Success<A>
@@ -13,12 +15,6 @@ typealias Success<A> = Try.Success<A>
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Try.scala
  */
 @higherkind
-@deriving(
-        Functor::class,
-        Applicative::class,
-        Monad::class,
-        Foldable::class,
-        Traverse::class)
 sealed class Try<out A> : TryKind<A> {
 
     companion object {
@@ -28,7 +24,7 @@ sealed class Try<out A> : TryKind<A> {
         tailrec fun <A, B> tailRecM(a: A, f: (A) -> TryKind<Either<A, B>>): Try<B> {
             val ev: Try<Either<A, B>> = f(a).ev()
             return when (ev) {
-                is Failure -> Try.monadError().raiseError(ev.exception)
+                is Failure -> Failure<B>(ev.exception).ev()
                 is Success -> {
                     val b: Either<A, B> = ev.value
                     when (b) {
@@ -49,163 +45,20 @@ sealed class Try<out A> : TryKind<A> {
 
         fun <A> raise(e: Throwable): Try<A> = Failure(e)
 
-        fun <A, B> merge(
-                op1: () -> A,
-                op2: () -> B): Try<Tuple2<A, B>> =
-                applicative().tupled(
-                        invoke(op1),
-                        invoke(op2)
-                ).ev()
-
-        fun <A, B, C> merge(
-                op1: () -> A,
-                op2: () -> B,
-                op3: () -> C): Try<Tuple3<A, B, C>> =
-                applicative().tupled(
-                        invoke(op1),
-                        invoke(op2),
-                        invoke(op3)
-                ).ev()
-
-        fun <A, B, C, D> merge(
-                op1: () -> A,
-                op2: () -> B,
-                op3: () -> C,
-                op4: () -> D): Try<Tuple4<A, B, C, D>> =
-                applicative().tupled(
-                        invoke(op1),
-                        invoke(op2),
-                        invoke(op3),
-                        invoke(op4)
-                ).ev()
-
-        fun <A, B, C, D, E> merge(
-                op1: () -> A,
-                op2: () -> B,
-                op3: () -> C,
-                op4: () -> D,
-                op5: () -> E): Try<Tuple5<A, B, C, D, E>> =
-                applicative().tupled(
-                        invoke(op1),
-                        invoke(op2),
-                        invoke(op3),
-                        invoke(op4),
-                        invoke(op5)
-                ).ev()
-
-        fun <A, B, C, D, E, F> merge(
-                op1: () -> A,
-                op2: () -> B,
-                op3: () -> C,
-                op4: () -> D,
-                op5: () -> E,
-                op6: () -> F): Try<Tuple6<A, B, C, D, E, F>> =
-                applicative().tupled(
-                        invoke(op1),
-                        invoke(op2),
-                        invoke(op3),
-                        invoke(op4),
-                        invoke(op5),
-                        invoke(op6)
-                ).ev()
-
-        fun <A, B, C, D, E, F, G> merge(
-                op1: () -> A,
-                op2: () -> B,
-                op3: () -> C,
-                op4: () -> D,
-                op5: () -> E,
-                op6: () -> F,
-                op7: () -> G): Try<Tuple7<A, B, C, D, E, F, G>> =
-                applicative().tupled(
-                        invoke(op1),
-                        invoke(op2),
-                        invoke(op3),
-                        invoke(op4),
-                        invoke(op5),
-                        invoke(op6),
-                        invoke(op7)
-                ).ev()
-
-        fun <A, B, C, D, E, F, G, H> merge(
-                op1: () -> A,
-                op2: () -> B,
-                op3: () -> C,
-                op4: () -> D,
-                op5: () -> E,
-                op6: () -> F,
-                op7: () -> G,
-                op8: () -> H): Try<Tuple8<A, B, C, D, E, F, G, H>> =
-                applicative().tupled(
-                        invoke(op1),
-                        invoke(op2),
-                        invoke(op3),
-                        invoke(op4),
-                        invoke(op5),
-                        invoke(op6),
-                        invoke(op7),
-                        invoke(op8)
-                ).ev()
-
-        fun <A, B, C, D, E, F, G, H, I> merge(
-                op1: () -> A,
-                op2: () -> B,
-                op3: () -> C,
-                op4: () -> D,
-                op5: () -> E,
-                op6: () -> F,
-                op7: () -> G,
-                op8: () -> H,
-                op9: () -> I): Try<Tuple9<A, B, C, D, E, F, G, H, I>> =
-                applicative().tupled(
-                        invoke(op1),
-                        invoke(op2),
-                        invoke(op3),
-                        invoke(op4),
-                        invoke(op5),
-                        invoke(op6),
-                        invoke(op7),
-                        invoke(op8),
-                        invoke(op9)
-                ).ev()
-
-        fun <A, B, C, D, E, F, G, H, I, J> merge(
-                op1: () -> A,
-                op2: () -> B,
-                op3: () -> C,
-                op4: () -> D,
-                op5: () -> E,
-                op6: () -> F,
-                op7: () -> G,
-                op8: () -> H,
-                op9: () -> I,
-                op10: () -> J): Try<Tuple10<A, B, C, D, E, F, G, H, I, J>> =
-                applicative().tupled(
-                        invoke(op1),
-                        invoke(op2),
-                        invoke(op3),
-                        invoke(op4),
-                        invoke(op5),
-                        invoke(op6),
-                        invoke(op7),
-                        invoke(op8),
-                        invoke(op9),
-                        invoke(op10)
-                ).ev()
     }
 
     @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("getOrElse { ifEmpty }"))
     operator fun invoke() = get()
 
     fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, Try<B>> =
-            this.ev().fold({ GA.pure(Try.raise(IllegalStateException())) }, { GA.map(f(it), { Try { it } }) })
+            this.ev().fold({ GA.pure(raise(IllegalStateException())) }, { GA.map(f(it), { Try { it } }) })
 
-    fun <B> ap(ff: TryKind<(A) -> B>): Try<B> = ff.flatMap { f -> map(f) }.ev()
+    fun <B> ap(ff: TryKind<(A) -> B>): Try<B> = ff.ev().flatMap { f -> map(f) }.ev()
 
     /**
      * Returns the given function applied to the value from this `Success` or returns this if this is a `Failure`.
      */
-    inline fun <B> flatMap(crossinline f: (A) -> TryKind<B>): Try<B> = fold({ Try.raise(it) }, { f(it).ev() })
+    inline fun <B> flatMap(crossinline f: (A) -> TryKind<B>): Try<B> = fold({ raise(it) }, { f(it).ev() })
 
     /**
      * Maps the given function to the value from this `Success` or returns this if this is a `Failure`.

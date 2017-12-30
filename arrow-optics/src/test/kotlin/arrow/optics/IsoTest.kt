@@ -1,10 +1,20 @@
 package arrow.optics
 
+import arrow.core.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import arrow.*
+import arrow.data.NonEmptyList
+import arrow.data.applicative
+import arrow.instances.StringMonoidInstance
+import arrow.instances.applicative
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
+import arrow.test.generators.genFunctionAToB
+import arrow.test.laws.IsoLaws
+import arrow.test.laws.LensLaws
+import arrow.test.laws.PrismLaws
+import arrow.typeclasses.Eq
 
 @RunWith(KTestJUnitRunner::class)
 class IsoTest : UnitSpec() {

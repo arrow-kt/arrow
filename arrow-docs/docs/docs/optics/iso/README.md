@@ -14,6 +14,7 @@ A simple structure `Point2D` is equivalent to `Tuple2<Int, Int>` so we can creat
 
 ```kotlin:ank
 import arrow.*
+import arrow.core.*
 import arrow.optics.*
 
 data class Point2D(val x: Int, val y: Int)
@@ -57,6 +58,8 @@ liftedAddFive(point)
 We can do the same with a Functor mapping
 
 ```kotlin:ank
+import arrow.data.*
+
 pointIsoTuple.modifyF(Try.functor(), point) {
     Try { (tuple.a / 2) toT (tuple.b / 2) }
 }
@@ -143,4 +146,4 @@ reverse
 
 Arrow provides [`IsoLaws`][iso_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own isos.
 
-[iso_laws_source]: https://github.com/arrow/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/IsoLaws.kt
+[iso_laws_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/IsoLaws.kt

@@ -2,13 +2,13 @@ package arrow.optics
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
-import arrow.Eq
-import arrow.Id
-import arrow.IntMonoid
-import arrow.IsoLaws
-import arrow.UnitSpec
-import arrow.genFunctionAToB
-import arrow.optics.idToType
+import arrow.typeclasses.Eq
+import arrow.core.Id
+import arrow.instances.IntMonoid
+import arrow.test.laws.IsoLaws
+import arrow.test.UnitSpec
+import arrow.test.generators.genFunctionAToB
+import arrow.optics.instances.idToType
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

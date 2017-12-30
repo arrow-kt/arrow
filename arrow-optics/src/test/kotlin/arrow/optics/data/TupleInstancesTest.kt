@@ -1,20 +1,17 @@
 package arrow.optics
 
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.Gen
-import arrow.Eq
-import arrow.LensLaws
-import arrow.NonEmptyList
-import arrow.Option
-import arrow.TraversalLaws
-import arrow.TraverseLaws
-import arrow.Try
-import arrow.UnitSpec
-import arrow.applicative
-import arrow.functor
-import arrow.genFunctionAToB
-import arrow.genTuple
+import arrow.typeclasses.Eq
+import arrow.test.laws.LensLaws
+import arrow.data.NonEmptyList
+import arrow.test.laws.TraversalLaws
+import arrow.data.Try
+import arrow.data.applicative
+import arrow.test.UnitSpec
+import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genTuple
+import arrow.optics.instances.*
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

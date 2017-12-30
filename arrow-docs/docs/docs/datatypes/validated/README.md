@@ -49,6 +49,7 @@ for `String` and `Int` for brevity.
 
 ```kotlin:ank
 import arrow.*
+import arrow.core.*
 
 abstract class Read<A> {
 
@@ -98,6 +99,9 @@ It would look like the following, which Arrow provides in `arrow.Validated`:
 Now we are ready to write our parser.
 
 ```kotlin:ank
+import arrow.data.*
+import arrow.syntax.validated.*
+
 data class Config(val map: Map<String, String>) {
 
     fun <A> parse(read: Read<A>, key: String): Validated<ConfigError, A> {

@@ -1,6 +1,6 @@
 package arrow.validation
 
-import arrow.Either
+import arrow.core.Either
 
 class Validation<out E : Any>(vararg disjunctionSequence: Either<E, *>) {
 

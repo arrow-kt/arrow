@@ -1,5 +1,10 @@
-package arrow
+package arrow.data
 
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.monoid
+import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
@@ -20,7 +25,7 @@ class OptionMonoidTest : UnitSpec() {
         "should semigroup with the instance passed" {
             forAll { value: Int ->
                 val optionMonoid = Option.monoid(NonEmptyList.semigroup<Int>())
-                val seen = optionMonoid.combine(Some(arrow.NonEmptyList.of(value)), None)
+                val seen = optionMonoid.combine(Some(NonEmptyList.of(value)), None)
                 val expected = None
 
                 expected == seen

@@ -2,19 +2,23 @@ package arrow.optics
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
-import arrow.Either
-import arrow.Eq
-import arrow.IsoLaws
-import arrow.Monoid
-import arrow.Try
-import arrow.UnitSpec
-import arrow.applicative
-import arrow.ev
-import arrow.genEither
-import arrow.genFunctionAToB
-import arrow.genThrowable
-import arrow.genTry
-import arrow.genValidated
+import arrow.core.Either
+import arrow.core.applicative
+import arrow.core.ev
+import arrow.typeclasses.Eq
+import arrow.test.laws.IsoLaws
+import arrow.typeclasses.Monoid
+import arrow.data.Try
+import arrow.data.applicative
+import arrow.data.ev
+import arrow.test.UnitSpec
+import arrow.test.generators.genEither
+import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genThrowable
+import arrow.test.generators.genTry
+import arrow.test.generators.genValidated
+import arrow.optics.instances.validatedToEither
+import arrow.optics.instances.validatedToTry
 import arrow.syntax.either.right
 import org.junit.runner.RunWith
 

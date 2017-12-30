@@ -1,13 +1,23 @@
-package arrow
+package arrow.data
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import arrow.Invalid
-import arrow.Valid
-import arrow.laws.EqLaws
+import arrow.core.Left
+import arrow.core.None
+import arrow.core.Right
+import arrow.core.Some
+import arrow.instances.*
+import arrow.syntax.applicative.map
+import arrow.syntax.validated.valid
+import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
+import arrow.test.laws.ApplicativeLaws
+import arrow.test.laws.SemigroupKLaws
+import arrow.test.laws.TraverseLaws
+import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class ValidatedTest : UnitSpec() {
@@ -147,7 +157,7 @@ class ValidatedTest : UnitSpec() {
             Validated.fromTry<Int>(Failure(MyException(""))) shouldBe Invalid(MyException(""))
         }
 
-        "fromEither should return Valid if is Right or Failure in otherwise" {
+        "fromEither should return Valid if is Either.Right or Failure in otherwise" {
             Validated.fromEither(Right(10)) shouldBe Valid(10)
             Validated.fromEither(Left(10)) shouldBe Invalid(10)
         }

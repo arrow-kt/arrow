@@ -1,12 +1,18 @@
 package arrow.optics
 
+import arrow.core.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import arrow.*
+import arrow.data.Try
+import arrow.data.applicative
 import arrow.syntax.either.left
 import arrow.syntax.either.right
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
+import arrow.test.generators.genFunctionAToB
+import arrow.test.laws.LensLaws
+import arrow.typeclasses.Eq
 
 @RunWith(KTestJUnitRunner::class)
 class LensTest : UnitSpec() {
@@ -39,7 +45,7 @@ class LensTest : UnitSpec() {
 
         "Lifting a function as a functor should yield the same result as not yielding" {
             forAll(TokenGen, Gen.string(), { token, value ->
-                tokenLens.modifyF(Option.functor(), token) { Some(value) } == tokenLens.liftF { Some(value)}(token)
+                tokenLens.modifyF(Option.functor(), token) { Some(value) } == tokenLens.liftF { Some(value) }(token)
             })
         }
 

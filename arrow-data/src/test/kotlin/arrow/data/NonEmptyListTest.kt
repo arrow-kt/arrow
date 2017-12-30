@@ -1,10 +1,11 @@
-package arrow
+package arrow.data
 
+import arrow.instances.*
+import arrow.test.UnitSpec
+import arrow.test.laws.*
+import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import io.kotlintest.properties.forAll
-import arrow.laws.EqLaws
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

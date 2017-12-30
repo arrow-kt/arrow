@@ -2,19 +2,21 @@ package arrow.optics
 
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
-import arrow.Eq
-import arrow.IsoLaws
-import arrow.ListKWMonadCombineInstance
-import arrow.ListKWMonoidInstanceImplicits
-import arrow.NonEmptyListSemigroupInstanceImplicits
-import arrow.OptionMonoidInstanceImplicits
-import arrow.OptionalLaws
-import arrow.UnitSpec
-import arrow.genFunctionAToB
-import arrow.genNonEmptyList
-import arrow.genOption
-import arrow.isos
-import arrow.k
+import arrow.typeclasses.Eq
+import arrow.test.laws.IsoLaws
+import arrow.core.OptionMonoidInstanceImplicits
+import arrow.data.ListKWMonoidInstanceImplicits
+import arrow.data.NonEmptyListSemigroupInstanceImplicits
+import arrow.data.k
+import arrow.test.laws.OptionalLaws
+import arrow.test.UnitSpec
+import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genNonEmptyList
+import arrow.test.generators.genOption
+import arrow.optics.instances.listHead
+import arrow.optics.instances.listTail
+import arrow.optics.instances.listToListKW
+import arrow.optics.instances.listToOptionNel
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

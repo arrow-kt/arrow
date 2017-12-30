@@ -1,12 +1,18 @@
-package arrow.optics
+package arrow.optics.instances
 
-import arrow.*
+import arrow.core.*
+import arrow.data.*
+import arrow.optics.Iso
+import arrow.optics.PIso
+import arrow.optics.PPrism
+import arrow.optics.Prism
+import arrow.syntax.validated.*
 
 /**
  * [PPrism] to focus into an [arrow.Try.Success]
  */
 fun <A, B> pTrySuccess(): PPrism<Try<A>, Try<B>, A, B> = PPrism(
-        getOrModify = { aTry -> aTry.fold({ Left(Failure<B>(it)) }, { Right(it) }) },
+        getOrModify = { aTry -> aTry.fold({ Either.Left(Failure<B>(it)) }, { Either.Right(it) }) },
         reverseGet = { b -> Success(b) }
 )
 
@@ -19,7 +25,7 @@ fun <A> trySuccess(): Prism<Try<A>, A> = pTrySuccess()
  * [Prism] to focus into an [arrow.Try.Failure]
  */
 fun <A> tryFailure(): Prism<Try<A>, Throwable> = Prism(
-        getOrModify = { aTry -> aTry.fold({ Right(it) }, { Left(Success(it)) }) },
+        getOrModify = { aTry -> aTry.fold({ Either.Right(it) }, { Either.Left(Success(it)) }) },
         reverseGet = { throwable -> Failure(throwable) }
 )
 
@@ -27,7 +33,7 @@ fun <A> tryFailure(): Prism<Try<A>, Throwable> = Prism(
  * [PIso] that defines the equality between a [Try] and [Either] of [Throwable] and [A]
  */
 fun <A, B> pTryToEither(): PIso<Try<A>, Try<B>, Either<Throwable, A>, Either<Throwable, B>> = PIso(
-        get = { it.fold({ Left(it) }, { Right(it) }) },
+        get = { it.fold({ Either.Left(it) }, { Either.Right(it) }) },
         reverseGet = { it.fold({ Failure(it) }, { Success(it) }) }
 )
 

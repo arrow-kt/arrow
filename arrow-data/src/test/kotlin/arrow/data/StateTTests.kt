@@ -1,5 +1,14 @@
-package arrow
+package arrow.data
 
+import arrow.HK
+import arrow.core.IdHK
+import arrow.mtl.instances.StateTMonadStateInstance
+import arrow.mtl.monadState
+import arrow.test.UnitSpec
+import arrow.test.laws.MonadCombineLaws
+import arrow.test.laws.MonadStateLaws
+import arrow.test.laws.SemigroupKLaws
+import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith

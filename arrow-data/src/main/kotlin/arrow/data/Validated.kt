@@ -1,4 +1,10 @@
-package arrow
+package arrow.data
+
+import arrow.*
+import arrow.core.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.semigroup
 
 typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 typealias Valid<A> = Validated.Valid<A>
@@ -13,7 +19,7 @@ typealias Invalid<E> = Validated.Invalid<E>
 
         fun <E, A> invalidNel(e: E): ValidatedNel<E, A> = Invalid(NonEmptyList(e, listOf()))
 
-        fun <E, A> validNel(a: A): ValidatedNel<E, A> = Validated.Valid(a)
+        fun <E, A> validNel(a: A): ValidatedNel<E, A> = Valid(a)
 
         /**
          * Converts a `Try<A>` to a `Validated<Throwable, A>`.
@@ -89,7 +95,7 @@ typealias Invalid<E> = Validated.Invalid<E>
      * Convert to an Either, apply a function, convert back. This is handy
      * when you want to use the Monadic properties of the Either type.
      */
-    fun <EE, B> withEither(f: (Either<E, A>) -> Either<EE, B>): Validated<EE, B> = Validated.fromEither(f(toEither()))
+    fun <EE, B> withEither(f: (Either<E, A>) -> Either<EE, B>): Validated<EE, B> = fromEither(f(toEither()))
 
     /**
      * Validated is a [[functor.Bifunctor]], this method applies one of the
@@ -208,11 +214,3 @@ fun <E, A> Validated<E, A>.combineK(y: ValidatedKind<E, A>, SE: Semigroup<E>): V
         }
     }
 }
-
-fun <E, A> A.valid(): Validated<E, A> = Valid(this)
-
-fun <E, A> E.invalid(): Validated<E, A> = Invalid(this)
-
-fun <E, A> A.validNel(): ValidatedNel<E, A> = Validated.validNel(this)
-
-fun <E, A> E.invalidNel(): ValidatedNel<E, A> = Validated.invalidNel(this)

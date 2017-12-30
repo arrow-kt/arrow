@@ -1,5 +1,11 @@
-package arrow
+package arrow.data
 
+import arrow.*
+import arrow.core.Eval
+import arrow.core.Option
+import arrow.core.Tuple2
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Foldable
 import java.util.*
 
 @higherkind
@@ -15,7 +21,7 @@ data class SortedMapKW<A: Comparable<A>, B>(val map: SortedMap<A, B>) : SortedMa
             }.k()
 
     fun <C, Z> map2Eval(fc: Eval<SortedMapKW<A, C>>, f: (B, C) -> Z): Eval<SortedMapKW<A, Z>> =
-            if (fc.isEmpty()) Eval.now(sortedMapOf<A, Z>().k())
+            if (fc.value().isEmpty()) Eval.now(sortedMapOf<A, Z>().k())
             else fc.map { c -> this.map2(c, f) }
 
     fun <C> ap(ff: SortedMapKW<A, (B) -> C>): SortedMapKW<A, C> =
@@ -41,7 +47,7 @@ data class SortedMapKW<A: Comparable<A>, B>(val map: SortedMap<A, B>) : SortedMa
             this.map.foldLeft(c) { m: SortedMap<A, C>, (a, b) -> f(m.k(), Tuple2(a, b)) }.k()
 
     fun <G, C> traverse(f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, SortedMapKW<A, C>> =
-        Foldable.iterateRight(this.map.iterator(), Eval.always { GA.pure(sortedMapOf<A, C>().k()) })({
+        (Foldable.iterateRight(this.map.iterator(), Eval.always { GA.pure(sortedMapOf<A, C>().k()) }))({
             kv, lbuf ->
             GA.map2Eval(f(kv.value), lbuf) { (mapOf(kv.key to it.a).k() + it.b).toSortedMap().k() }
         }).value()

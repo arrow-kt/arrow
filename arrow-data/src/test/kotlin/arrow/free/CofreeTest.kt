@@ -1,11 +1,18 @@
-package arrow
+package arrow.free
 
+import arrow.HK
+import arrow.core.*
+import arrow.data.*
+import arrow.free.Cofree.Companion.unfold
+import arrow.test.UnitSpec
+import arrow.test.concurrency.SideEffect
+import arrow.test.laws.ComonadLaws
+import arrow.typeclasses.Eq
+import arrow.typeclasses.comonad
+import arrow.typeclasses.functor
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import arrow.Cofree.Companion.unfold
-import arrow.None
-import arrow.Some
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

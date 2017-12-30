@@ -26,6 +26,8 @@ Both `Try` and `Option` are example datatypes that can be computed over transfor
 
 ```kotlin:ank
 import arrow.*
+import arrow.core.*
+import arrow.data.*
 import arrow.syntax.function.*
 
 Try { "1".toInt() }.map { it * 2 }
@@ -45,6 +47,8 @@ val tryFunctor = Try.functor()
 Mapping over the empty/failed cases is always safe since the `map` operation in both Try and Option operate under the bias of those containing success values
 
 ```kotlin:ank
+import arrow.syntax.option.*
+
 Try { "x".toInt() }.map { it * 2 }
 none<Int>().map { it * 2 }
 ```
@@ -54,6 +58,8 @@ This enables programs that are not coupled to specific datatype implementations.
 The technique demonstrated below to write polymorphic code is available for all other `Typeclasses` beside `Functor`.
 
 ```kotlin:ank
+import arrow.typeclasses.*
+
 inline fun <reified F> multiplyBy2(fa: HK<F, Int>, FT: Functor<F> = functor()): HK<F, Int> =
     FT.map(fa, { it * 2 })
 
@@ -114,6 +120,8 @@ Try { 1 }.map({ it + 1 })
 Lift a function into the functor context
 
 ```kotlin:ank
+import arrow.syntax.functor.*
+
 val f = { n: Int -> n + 1 }.lift<OptionHK, Int, Int>()
 f(Option(1))
 ```
@@ -162,5 +170,5 @@ The following datatypes in Arrow provide instances that adhere to the `Functor` 
 Additionally all instances of [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}), [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) and their MTL variants implement the `Functor` typeclass directly
 since they are all subtypes of `Functor`
 
-[functor_source]: https://github.com/arrow/arrow/blob/master/arrow-data/src/main/kotlin/arrow/typeclasses/Functor.kt
-[functor_laws_source]: https://github.com/arrow/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/FunctorLaws.kt
+[functor_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-data/src/main/kotlin/arrow/typeclasses/Functor.kt
+[functor_laws_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/FunctorLaws.kt

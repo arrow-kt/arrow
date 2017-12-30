@@ -1,9 +1,11 @@
-package arrow.optics
+package arrow.optics.instances
 
-import arrow.Either
-import arrow.Validated
-import arrow.invalid
-import arrow.valid
+import arrow.core.Either
+import arrow.data.Validated
+import arrow.optics.Iso
+import arrow.optics.PIso
+import arrow.syntax.validated.invalid
+import arrow.syntax.validated.valid
 
 /**
  * [PIso] that defines the equality between [Either] and [Validated]

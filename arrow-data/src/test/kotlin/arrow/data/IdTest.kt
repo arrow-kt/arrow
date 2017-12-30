@@ -1,9 +1,15 @@
-package arrow
+package arrow.data
 
+import arrow.core.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
-import arrow.laws.EqLaws
+import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
+import arrow.test.UnitSpec
+import arrow.test.laws.ComonadLaws
+import arrow.test.laws.MonadLaws
+import arrow.test.laws.TraverseLaws
+import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class IdTest : UnitSpec() {

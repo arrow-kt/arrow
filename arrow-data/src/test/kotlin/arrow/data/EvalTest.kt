@@ -1,13 +1,20 @@
-package arrow
+package arrow.data
 
+import arrow.HK
+import arrow.core.*
+import arrow.core.Eval.Now
+import arrow.test.UnitSpec
+import arrow.test.concurrency.SideEffect
+import arrow.test.laws.ComonadLaws
+import arrow.test.laws.MonadLaws
+import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
-import arrow.Eval.Now
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class EvalTest : UnitSpec() {
-    val EQ: Eq<HK<EvalHK, Int>>  = Eq { a, b ->
+    val EQ: Eq<HK<EvalHK, Int>> = Eq { a, b ->
         a.ev().value() == b.ev().value()
     }
 

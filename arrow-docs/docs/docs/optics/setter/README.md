@@ -19,6 +19,7 @@ You can get a `Setter` for any existing `Functor`.
 ```kotlin:ank
 import arrow.*
 import arrow.optics.*
+import arrow.data.*
 
 val setter: Setter<ListKWKind<Int>, Int> = Setter.fromFunctor()
 setter.set(listOf(1, 2, 3, 4).k(), 5)
@@ -93,4 +94,4 @@ pSetter.modify(listOf(1, 2, 3, 4).k()) {
 
 Arrow provides [`SetterLaws`][setter_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own setters.
 
-[setter_laws_source]: https://github.com/arrow/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/SetterLaws.kt
+[setter_laws_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/SetterLaws.kt
