@@ -5,7 +5,7 @@ permalink: /docs/
 ---
 
 [![Download](https://api.bintray.com/packages/arrow/maven/arrow/images/download.svg)](https://bintray.com/arrow/maven/arrow/_latestVersion)
-[![Build Status](https://travis-ci.org/arrow/arrow.svg?branch=master)](https://travis-ci.org/arrow/arrow/)
+[![Build Status](https://travis-ci.org/arrow-kt/arrow.svg?branch=master)](https://travis-ci.org/arrow-kt/arrow/)
 [![Kotlin version badge](https://img.shields.io/badge/kotlin-1.2.0-blue.svg)](http://kotlinlang.org/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
