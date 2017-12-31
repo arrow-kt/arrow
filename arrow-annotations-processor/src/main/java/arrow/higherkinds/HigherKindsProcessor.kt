@@ -28,6 +28,7 @@ class HigherKindsProcessor : AbstractProcessor() {
                 .map { element ->
                     when (element.kind) {
                         ElementKind.CLASS -> processClass(element as TypeElement)
+                        ElementKind.INTERFACE -> processClass(element as TypeElement)
                         else -> knownError("$higherKindsAnnotationName can only be used on classes")
                     }
                 }
