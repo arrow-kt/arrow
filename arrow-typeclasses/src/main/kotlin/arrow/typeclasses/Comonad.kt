@@ -9,6 +9,7 @@ import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
 /**
  * The dual of monads, used to extract values from F
  */
+@typeclass
 interface Comonad<F> : Functor<F>, Typeclass {
 
     fun <A, B> coflatMap(fa: HK<F, A>, f: (HK<F, A>) -> B): HK<F, B>
@@ -54,5 +55,3 @@ fun <F, B : Any> Comonad<F>.cobinding(c: suspend ComonadContinuation<F, *>.() ->
     c.startCoroutine(continuation, continuation)
     return continuation.returnedMonad
 }
-
-inline fun <reified F> comonad(): Comonad<F> = instance(InstanceParametrizedType(Comonad::class.java, listOf(typeLiteral<F>())))

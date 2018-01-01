@@ -3,9 +3,7 @@ package arrow.tc
 import arrow.common.Package
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.typeConstraints
-import org.jetbrains.kotlin.serialization.ProtoBuf
 import java.io.File
-import javax.lang.model.element.Name
 
 data class Typeclass(
         val `package`: Package,

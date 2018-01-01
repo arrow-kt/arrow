@@ -1,15 +1,13 @@
 package arrow.typeclasses
 
-import arrow.InstanceParametrizedType
-import arrow.Typeclass
-import arrow.instance
-import arrow.typeLiteral
+import arrow.*
 
 /**
  * A type class used to determine equality between 2 instances of the same type [F] in a type safe way.
  *
  * @see <a href="http://arrow-kt.io/docs/typeclasses/eq/">Eq documentation</a>
  */
+@typeclass
 interface Eq<in F> : Typeclass {
 
     /**
@@ -57,10 +55,3 @@ interface Eq<in F> : Typeclass {
         }
     }
 }
-
-/**
- * Method to lookup instance of [Eq] for a type [F].
- *
- * @return [Eq] instance for type [F].
- */
-inline fun <reified F> eq(): Eq<F> = instance(InstanceParametrizedType(Eq::class.java, listOf(typeLiteral<F>())))

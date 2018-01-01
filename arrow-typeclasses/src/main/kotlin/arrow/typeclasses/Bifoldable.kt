@@ -3,6 +3,7 @@ package arrow.typeclasses
 import arrow.*
 import arrow.core.Eval
 
+@typeclass
 interface Bifoldable<F> : Typeclass {
 
     fun <A, B, C> bifoldLeft(fab: HK2<F, A, B>, c: C, f: (C, A) -> C, g: (C, B) -> C): C
@@ -15,5 +16,3 @@ interface Bifoldable<F> : Typeclass {
 
 inline fun <F, A, B, reified C> Bifoldable<in F>.bifoldMap(MC: Monoid<C> = monoid(), fab: HK2<F, A, B>, noinline f: (A) -> C, noinline g: (B) -> C) =
         bifoldMap(fab, f, g, MC)
-
-inline fun <reified F> bifoldable(): Bifoldable<F> = instance(InstanceParametrizedType(Bifoldable::class.java, listOf(F::class.java)))

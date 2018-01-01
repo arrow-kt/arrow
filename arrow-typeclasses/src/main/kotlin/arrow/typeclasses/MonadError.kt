@@ -3,6 +3,7 @@ package arrow.typeclasses
 import arrow.*
 import kotlin.coroutines.experimental.startCoroutine
 
+@typeclass
 interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F>, Typeclass {
 
     fun <A> ensure(fa: HK<F, A>, error: () -> E, predicate: (A) -> Boolean): HK<F, A> =
@@ -26,6 +27,3 @@ fun <F, B> MonadError<F, Throwable>.bindingE(c: suspend MonadErrorContinuation<F
     c.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
 }
-
-inline fun <reified F, reified E> monadError(): MonadError<F, E> =
-        instance(InstanceParametrizedType(MonadError::class.java, listOf(typeLiteral<F>(), typeLiteral<E>())))

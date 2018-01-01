@@ -14,6 +14,7 @@ import arrow.core.*
  *  - reduceLeftTo(fa)(f)(g) eagerly reduces with an additional mapping function
  *  - reduceRightTo(fa)(f)(g) lazily reduces with an additional mapping function
  */
+@typeclass
 interface Reducible<F> : Foldable<F>, Typeclass {
 
     /**
@@ -67,8 +68,6 @@ inline fun <F, reified G, A> Reducible<F>.reduceK(fga: HK<F, HK<G, A>>, SGKG: Se
  */
 inline fun <F, A, reified B> Reducible<F>.reduceMap(fa: HK<F, A>, noinline f: (A) -> B, SB: Semigroup<B> = semigroup()): B =
         reduceLeftTo(fa, f, { b, a -> SB.combine(b, f(a)) })
-
-inline fun <reified F> reducible(): Reducible<F> = instance(InstanceParametrizedType(Reducible::class.java, listOf(typeLiteral<F>())))
 
 /**
  * This class defines a Reducible<F> in terms of a Foldable<G> together with a split method, F<A> -> (A, G<A>).

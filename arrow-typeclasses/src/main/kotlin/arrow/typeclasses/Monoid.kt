@@ -2,6 +2,7 @@ package arrow.typeclasses
 
 import arrow.*
 
+@typeclass
 interface Monoid<A> : Semigroup<A>, Typeclass {
     /**
      * A zero value for this A
@@ -20,5 +21,3 @@ interface Monoid<A> : Semigroup<A>, Typeclass {
             if (elems.isEmpty()) empty() else elems.reduce { a, b -> combine(a, b) }
 
 }
-
-inline fun <reified A> monoid(): Monoid<A> = instance(InstanceParametrizedType(Monoid::class.java, listOf(typeLiteral<A>())))
