@@ -6,6 +6,7 @@ import arrow.core.*
 /**
  * Traverse, also known as Traversable. Traversal over a structure with an effect.
  */
+@typeclass
 interface Traverse<F> : Functor<F>, Foldable<F>, Typeclass {
 
     /**
@@ -27,5 +28,3 @@ applicative(), FM: Monad<F> = monad()): HK<G, HK<F, B>> = GA.map(traverse(fa, f,
  * Thread all the G effects through the F structure to invert the structure from F<G<A>> to G<F<A>>.
  */
 inline fun <F, reified G, A> Traverse<F>.sequence(fga: HK<F, HK<G, A>>, GA: Applicative<G> = applicative()): HK<G, HK<F, A>> = sequence(GA, fga)
-
-inline fun <reified F> traverse(): Traverse<F> = instance(InstanceParametrizedType(Traverse::class.java, listOf(typeLiteral<F>())))

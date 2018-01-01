@@ -2,6 +2,7 @@ package arrow.typeclasses
 
 import arrow.*
 
+@typeclass
 interface SemigroupK<F> : Typeclass {
 
     /**
@@ -17,5 +18,3 @@ interface SemigroupK<F> : Typeclass {
                 combineK(a, b)
     }
 }
-
-inline fun <reified F> semigroupK(): SemigroupK<F> = instance(InstanceParametrizedType(SemigroupK::class.java, listOf(typeLiteral<F>())))

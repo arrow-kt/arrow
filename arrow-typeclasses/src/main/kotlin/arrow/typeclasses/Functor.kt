@@ -3,6 +3,7 @@ package arrow.typeclasses
 import arrow.*
 import arrow.core.Tuple2
 
+@typeclass
 interface Functor<F> : Typeclass {
 
     fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B>
@@ -25,5 +26,3 @@ interface Functor<F> : Typeclass {
 }
 
 fun <F, B, A : B> Functor<F>.widen(fa: HK<F, A>): HK<F, B> = fa
-
-inline fun <reified F> functor(): Functor<F> = instance(InstanceParametrizedType(Functor::class.java, listOf(typeLiteral<F>())))

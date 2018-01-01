@@ -5,6 +5,7 @@ import arrow.core.Option
 import arrow.typeclasses.Monad
 import kotlin.coroutines.experimental.startCoroutine
 
+@typeclass
 interface MonadFilter<F> : Monad<F>, FunctorFilter<F>, Typeclass {
 
     fun <A> empty(): HK<F, A>
@@ -23,5 +24,3 @@ fun <F, B> MonadFilter<F>.bindingFilter(c: suspend MonadFilterContinuation<F, *>
     c.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
 }
-
-inline fun <reified F> monadFilter(): MonadFilter<F> = instance(InstanceParametrizedType(MonadFilter::class.java, listOf(typeLiteral<F>())))

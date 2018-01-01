@@ -8,6 +8,7 @@ import arrow.*
  * MonoidK<F> allows two F<A> values to be combined, for any A. It also means that for any A, there
  * is an "empty" F<A> value.
  */
+@typeclass
 interface MonoidK<F> : SemigroupK<F>, Typeclass {
 
     /**
@@ -22,5 +23,3 @@ interface MonoidK<F> : SemigroupK<F>, Typeclass {
         override fun combine(a: HK<F, A>, b: HK<F, A>): HK<F, A> = this@MonoidK.combineK(a, b)
     }
 }
-
-inline fun <reified F> monoidK(): MonoidK<F> = instance(InstanceParametrizedType(MonoidK::class.java, listOf(typeLiteral<F>())))

@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Eval
 import kotlin.coroutines.experimental.startCoroutine
 
+@typeclass
 interface Monad<F> : Applicative<F>, Typeclass {
 
     fun <A, B> flatMap(fa: HK<F, A>, f: (A) -> HK<F, B>): HK<F, B>
@@ -34,5 +35,3 @@ fun <F, B> Monad<F>.binding(c: suspend MonadContinuation<F, *>.() -> HK<F, B>): 
     c.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
 }
-
-inline fun <reified F> monad(): Monad<F> = instance(InstanceParametrizedType(Monad::class.java, listOf(typeLiteral<F>())))

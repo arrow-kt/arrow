@@ -7,6 +7,7 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.applicative
 
+@typeclass
 interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F>, Typeclass {
 
     fun <G, A, B> traverseFilter(fa: HK<F, A>, f: (A) -> HK<G, Option<B>>, GA: Applicative<G>): HK<G, HK<F, B>>
@@ -25,5 +26,3 @@ inline fun <reified F, reified G, A, B> HK<F, A>.traverseFilter(
         FT: TraverseFilter<F> = traverseFilter<F>(),
         GA: Applicative<G> = applicative<G>(),
         noinline f: (A) -> HK<G, Option<B>>): HK<G, HK<F, B>> = FT.traverseFilter(this, f, GA)
-
-inline fun <reified F> traverseFilter(): TraverseFilter<F> = instance(InstanceParametrizedType(TraverseFilter::class.java, listOf(typeLiteral<F>())))
