@@ -9,11 +9,10 @@ import arrow.core.Right
 typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
 
 /** The context required to run an asynchronous computation. **/
+@typeclass
 interface AsyncContext<out F> : Typeclass {
     fun <A> runAsync(fa: Proc<A>): HK<F, A>
 }
-
-inline fun <reified F> asyncContext(): AsyncContext<F> = instance(InstanceParametrizedType(AsyncContext::class.java, listOf(typeLiteral<F>())))
 
 inline fun <F, A> runAsync(AC: AsyncContext<F>, crossinline f: () -> A): HK<F, A> =
         AC.runAsync { ff: (Either<Throwable, A>) -> Unit ->

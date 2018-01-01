@@ -14,6 +14,7 @@ import arrow.core.Eval.Companion.always
  *
  * Beyond these it provides many other useful methods related to folding over F<A> values.
  */
+@typeclass
 interface Foldable<F> : Typeclass {
 
     /**
@@ -183,5 +184,3 @@ inline fun <reified F, A> Foldable<F>.size(MB: Monoid<Long> = monoid(), fa: HK<F
  */
 inline fun <F, reified G, A, B> Foldable<F>.foldM(fa: HK<F, A>, z: B, crossinline f: (B, A) -> HK<G, B>, MG: Monad<G> = monad()): HK<G, B> =
         foldLeft(fa, MG.pure(z), { gb, a -> MG.flatMap(gb) { f(it, a) } })
-
-inline fun <reified F> foldable(): Foldable<F> = instance(InstanceParametrizedType(Foldable::class.java, listOf(typeLiteral<F>())))

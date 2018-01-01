@@ -7,6 +7,7 @@ import arrow.typeclasses.*
 /**
  * The combination of a Monad with a MonoidK
  */
+@typeclass
 interface MonadCombine<F> : MonadFilter<F>, Alternative<F>, Typeclass {
 
     fun <G, A> unite(fga: HK<F, HK<G, A>>, FG: Foldable<G>): HK<F, A> =
@@ -18,8 +19,6 @@ interface MonadCombine<F> : MonadFilter<F>, Alternative<F>, Typeclass {
         return Tuple2(asep, bsep)
     }
 }
-
-inline fun <reified F> monadCombine(): MonadCombine<F> = instance(InstanceParametrizedType(MonadCombine::class.java, listOf(typeLiteral<F>())))
 
 inline fun <F, reified G, A> MonadCombine<F>.uniteF(fga: HK<F, HK<G, A>>, FG: Foldable<G> = foldable()) = unite(fga, FG)
 

@@ -6,6 +6,7 @@ import arrow.*
 import arrow.core.Eval
 import arrow.core.Tuple2
 
+@typeclass
 interface Applicative<F> : Functor<F>, Typeclass {
 
     fun <A> pure(a: A): HK<F, A>
@@ -20,5 +21,3 @@ interface Applicative<F> : Functor<F>, Typeclass {
 
     fun <A, B, Z> map2Eval(fa: HK<F, A>, fb: Eval<HK<F, B>>, f: (Tuple2<A, B>) -> Z): Eval<HK<F, Z>> = fb.map { fc -> map2(fa, fc, f) }
 }
-
-inline fun <reified F> applicative(): Applicative<F> = instance(InstanceParametrizedType(Applicative::class.java, listOf(typeLiteral<F>())))

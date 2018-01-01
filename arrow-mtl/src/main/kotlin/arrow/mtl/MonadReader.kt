@@ -3,6 +3,7 @@ package arrow.mtl
 import arrow.*
 import arrow.typeclasses.Monad
 
+@typeclass
 interface MonadReader<F, D> : Monad<F> {
     /** Get the environment */
     fun ask(): HK<F, D>
@@ -17,6 +18,3 @@ interface MonadReader<F, D> : Monad<F> {
 inline fun <reified F, A, reified D> HK<F, A>.local(FT: MonadReader<F, D> = monadReader(), noinline f: (D) -> D): HK<F, A> = FT.local(f, this)
 
 inline fun <reified F, A, reified D> ((D) -> A).reader(FT: MonadReader<F, D> = monadReader()): HK<F, A> = FT.reader(this)
-
-inline fun <reified F, reified D> monadReader(): MonadReader<F, D> =
-        instance(InstanceParametrizedType(MonadReader::class.java, listOf(typeLiteral<F>(), typeLiteral<D>())))

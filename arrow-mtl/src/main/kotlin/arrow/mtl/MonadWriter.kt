@@ -5,6 +5,7 @@ import arrow.core.Tuple2
 import arrow.typeclasses.Monad
 
 /** A monad that support monoidal accumulation (e.g. logging List<String>) */
+@typeclass
 interface MonadWriter<F, W> : Monad<F>, Typeclass {
 
     /** Lift a writer action into the effect */
@@ -30,6 +31,3 @@ interface MonadWriter<F, W> : Monad<F>, Typeclass {
         inline fun <reified F, reified W> invoke(MWF: MonadWriter<F, W> = monadWriter()) = MWF
     }
 }
-
-inline fun <reified F, reified W> monadWriter(): MonadWriter<F, W> = instance(
-        InstanceParametrizedType(MonadWriter::class.java, listOf(typeLiteral<F>(), typeLiteral<W>())))

@@ -1,10 +1,7 @@
 package arrow.typeclasses
 
-import arrow.InstanceParametrizedType
-import arrow.Typeclass
+import arrow.*
 import arrow.core.Tuple2
-import arrow.instance
-import arrow.typeLiteral
 
 /**
  * The [Order] type class is used to define a total ordering on some type [F] and is defined by being able to fully determine order between two instances.
@@ -14,6 +11,7 @@ import arrow.typeLiteral
  * @see [Eq]
  * @see <a href="http://arrow-kt.io/docs/typeclasses/order/">Order documentation</a>
  */
+@typeclass
 interface Order<F> : Eq<F>, Typeclass {
 
     /**
@@ -118,10 +116,3 @@ interface Order<F> : Eq<F>, Typeclass {
     }
 
 }
-
-/**
- * Method to lookup instance of [Order] for a type [F].
- *
- * @return [Order] instance for type [F].
- */
-inline fun <reified F> order(): Order<F> = instance(InstanceParametrizedType(Order::class.java, listOf(typeLiteral<F>())))

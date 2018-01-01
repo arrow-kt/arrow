@@ -4,6 +4,7 @@ import arrow.*
 import arrow.core.*
 import arrow.typeclasses.Functor
 
+@typeclass
 interface FunctorFilter<F> : Functor<F>, Typeclass {
 
     /**
@@ -29,5 +30,3 @@ interface FunctorFilter<F> : Functor<F>, Typeclass {
     fun <A> filter(fa: HK<F, A>, f: (A) -> Boolean): HK<F, A> =
             mapFilter(fa, { a -> if (f(a)) Some(a) else None })
 }
-
-inline fun <reified F> functorFilter(): FunctorFilter<F> = instance(InstanceParametrizedType(FunctorFilter::class.java, listOf(typeLiteral<F>())))
