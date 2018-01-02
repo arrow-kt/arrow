@@ -33,14 +33,14 @@ buildscript {
         maven { url 'https://jitpack.io' }
         maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
         maven { url "https://dl.bintray.com/jetbrains/markdown/" }
-        maven { url "https://dl.bintray.com/arrow/arrow/" }
+        maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" }
     }
 
     dependencies {
         classpath "com.github.ben-manes:gradle-versions-plugin:$gradleVersionsPluginVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
-        classpath('io.arrow:ank-gradle-plugin:0.1.7')
+        classpath 'io.arrow:ank-gradle-plugin:0.1.7'
         classpath 'org.ajoberstar:gradle-git-publish:0.3.2'
     }
 }
@@ -54,8 +54,7 @@ subprojects { project ->
         jcenter()
         maven { url 'https://kotlin.bintray.com/kotlinx' }
         maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
-        maven { url "http://dl.bintray.com/arrow/maven" }
-        maven { url "http://dl.bintray.com/arrow/arrow" }
+        maven { url "http://dl.bintray.com/arrow-kt/arrow-kt" }
         maven { url "https://dl.bintray.com/jetbrains/markdown/" }
         maven { url 'https://jitpack.io' }
     }
