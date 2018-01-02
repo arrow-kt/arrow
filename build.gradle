@@ -15,7 +15,6 @@
  */
 
 apply from: 'detekt.gradle'
-apply plugin: 'net.researchgate.release'
 
 buildscript {
     ext {
@@ -43,7 +42,6 @@ buildscript {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
         classpath 'io.arrow:ank-gradle-plugin:0.1.7'
         classpath 'org.ajoberstar:gradle-git-publish:0.3.2'
-        classpath 'net.researchgate:gradle-release:2.6.0'
     }
 }
 
