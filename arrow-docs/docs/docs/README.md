@@ -4,7 +4,7 @@ title: Quick Start
 permalink: /docs/
 ---
 
-[![Download](https://api.bintray.com/packages/arrow/maven/arrow/images/download.svg)](https://bintray.com/arrow/maven/arrow/_latestVersion)
+[![Download](https://api.bintray.com/packages/arrow-kt/arrow-kt/arrow/images/download.svg)](https://bintray.com/arrow/maven/arrow/_latestVersion)
 [![Build Status](https://travis-ci.org/arrow-kt/arrow.svg?branch=master)](https://travis-ci.org/arrow-kt/arrow/)
 [![Kotlin version badge](https://img.shields.io/badge/kotlin-1.2.0-blue.svg)](http://kotlinlang.org/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
@@ -32,7 +32,7 @@ Add it in your root `build.gradle` at the end of repositories.
 allprojects {
     repositories {
         jcenter()
-        maven { url 'https://dl.bintray.com/arrow/maven' }
+        maven { url 'https://dl.bintray.com/arrow-kt/maven' }
     }
 }
 ```
@@ -41,10 +41,10 @@ Add the dependencies into the project's `build.gradle`
 
 ```groovy
 dependencies {
-    compile 'io.arrow:arrow:0.3.10'
-    kapt    'io.arrow:arrow-annotations-processor:0.3.10' //optional
-    compile 'io.arrow:arrow-effects:0.3.10' //optional
-    compile 'io.arrow:arrow-optics:0.3.10' //optional
+    compile 'io.arrow-kt:arrow:0.3.10'
+    kapt    'io.arrow-kt:arrow-annotations-processor:0.3.10' //optional
+    compile 'io.arrow-kt:arrow-effects:0.3.10' //optional
+    compile 'io.arrow-kt:arrow-optics:0.3.10' //optional
 }
 ```
 
@@ -61,7 +61,7 @@ apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //optiona
 
 dependencies {
     ...
-    kapt    'io.arrow:arrow-annotations-processor:0.3.10' //optional
+    kapt    'io.arrow-kt:arrow-annotations-processor:0.3.10' //optional
     ...
 }
 ```
