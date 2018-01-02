@@ -12,12 +12,6 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KClass
 
 /**
- * Marker trait that all Functional typeclasses such as Monad, Functor, etc... must implement to be considered
- * candidates to pair with global instances
- */
-interface Typeclass
-
-/**
  * A parametrized type calculated from walking up the interface chain in a Typeclass and finding other relevant
  * typeclasses that should be registered
  */
