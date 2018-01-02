@@ -2,8 +2,6 @@ package arrow.ank
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.DependencyResolutionListener
-import org.gradle.api.artifacts.ResolvableDependencies
 import org.gradle.api.tasks.JavaExec
 
 class AnkPlugin : Plugin<Project> {
