@@ -31,7 +31,6 @@ ank {
     source = file("${projectDir}/docs")
     target = file("${projectDir}/build/site")
     classpath = sourceSets.main.runtimeClasspath
-    includeAnkCore = false
 }
 
 gitPublish {
