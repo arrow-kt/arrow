@@ -11,7 +11,7 @@ class AnkPlugin : Plugin<Project> {
     companion object {
         private const val EXTENSION_NAME = "ank"
         private const val TASK_NAME = "runAnk"
-        private const val ANK_CORE_DEPENDENCY = "io.arrow-kt:ank-core:0.5.0"
+        private const val ANK_CORE_DEPENDENCY = "io.arrow-kt:ank-core:0.5.1"
     }
 
     override fun apply(target: Project) {
