@@ -35,7 +35,7 @@ ank {
 }
 
 gitPublish {
-    repoUri = 'git@github.com:arrow/arrow.git'
+    repoUri = 'git@github.com:arrow-kt/arrow.git'
     branch = 'gh-pages'
 
     contents {
