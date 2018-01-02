@@ -11,8 +11,6 @@ import java.util.Arrays
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KClass
 
-
-
 /**
  * A parametrized type calculated from walking up the interface chain in a Typeclass and finding other relevant
  * typeclasses that should be registered
