@@ -67,7 +67,7 @@ apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //optiona
 
 dependencies {
     ...
-    kapt    'io.kategory:kategory-annotations-processor:0.5.2' //optional
+    kapt    'io.arrow-kt:arrow-annotations-processor:0.5.2' //optional
     ...
 }
 ```
