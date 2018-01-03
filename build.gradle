@@ -19,7 +19,7 @@ apply from: 'detekt.gradle.kts'
 buildscript {
     ext {
         // Constants
-        gradleVersion = '4.3'
+        gradleVersion = '4.4.1'
         gradleVersionsPluginVersion = '0.17.0'
         javaVersion = JavaVersion.VERSION_1_7
         kotlinTestVersion = '2.0.7'
@@ -116,7 +116,7 @@ subprojects { project ->
 }
 
 task wrapper(type: Wrapper) {
-    distributionUrl = "https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
+    distributionUrl = "https://services.gradle.org/distributions/gradle-${project.ext.gradleVersion}-all.zip"
 }
 
 apply plugin: 'com.github.ben-manes.versions'
