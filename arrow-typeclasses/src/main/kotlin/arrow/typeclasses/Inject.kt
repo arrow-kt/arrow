@@ -9,7 +9,7 @@ import arrow.core.FunctionK
  * @see [[http://www.staff.science.uu.nl/~swier004/publications/2008-jfp.pdf]]
  */
 @typeclass
-interface Inject<F, G> : Typeclass {
+interface Inject<F, G> : TC {
 
     fun inj(): FunctionK<F, G>
 

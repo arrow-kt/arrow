@@ -15,7 +15,7 @@ import arrow.core.Eval.Companion.always
  * Beyond these it provides many other useful methods related to folding over F<A> values.
  */
 @typeclass
-interface Foldable<F> : Typeclass {
+interface Foldable<F> : TC {
 
     /**
      * Left associative fold on F using the provided function.

@@ -46,7 +46,7 @@ interface ProcessorUtils : KotlinMetadataUtils {
         val interfaces = current.classProto.supertypes(typeTable).map {
             it.extractFullName(current, failOnGeneric = false)
         }.filter {
-            it != "`arrow`.`Typeclass`"
+            it != "`arrow`.`TC`"
         }
         return when {
             interfaces.isEmpty() -> acc

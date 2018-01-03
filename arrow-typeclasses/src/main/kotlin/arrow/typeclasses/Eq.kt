@@ -8,7 +8,7 @@ import arrow.*
  * @see <a href="http://arrow-kt.io/docs/typeclasses/eq/">Eq documentation</a>
  */
 @typeclass
-interface Eq<in F> : Typeclass {
+interface Eq<in F> : TC {
 
     /**
      * Compares two instances of [F] and returns true if they're considered equal for this instance.

@@ -5,7 +5,7 @@ import arrow.core.*
 import arrow.typeclasses.Functor
 
 @typeclass
-interface FunctorFilter<F> : Functor<F>, Typeclass {
+interface FunctorFilter<F> : Functor<F>, TC {
 
     /**
      * A combined map and filter. Filtering is handled via Option instead of Boolean such that the output type B can be different than the input type A.

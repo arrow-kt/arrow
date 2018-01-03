@@ -4,7 +4,7 @@ import arrow.*
 import arrow.core.Tuple2
 
 @typeclass
-interface Functor<F> : Typeclass {
+interface Functor<F> : TC {
 
     fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B>
 

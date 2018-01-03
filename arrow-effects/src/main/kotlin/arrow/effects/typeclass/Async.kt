@@ -10,7 +10,7 @@ typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
 
 /** The context required to run an asynchronous computation. **/
 @typeclass
-interface AsyncContext<out F> : Typeclass {
+interface AsyncContext<out F> : TC {
     fun <A> runAsync(fa: Proc<A>): HK<F, A>
 }
 

@@ -15,7 +15,7 @@ import arrow.core.*
  *  - reduceRightTo(fa)(f)(g) lazily reduces with an additional mapping function
  */
 @typeclass
-interface Reducible<F> : Foldable<F>, Typeclass {
+interface Reducible<F> : Foldable<F>, TC {
 
     /**
      * Left-associative reduction on F using the function f.

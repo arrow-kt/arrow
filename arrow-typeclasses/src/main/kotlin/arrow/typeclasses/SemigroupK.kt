@@ -3,7 +3,7 @@ package arrow.typeclasses
 import arrow.*
 
 @typeclass
-interface SemigroupK<F> : Typeclass {
+interface SemigroupK<F> : TC {
 
     /**
      * Combine two F<A> values.

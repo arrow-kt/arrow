@@ -6,7 +6,7 @@ import arrow.core.Eval
 import kotlin.coroutines.experimental.startCoroutine
 
 @typeclass
-interface Monad<F> : Applicative<F>, Typeclass {
+interface Monad<F> : Applicative<F>, TC {
 
     fun <A, B> flatMap(fa: HK<F, A>, f: (A) -> HK<F, B>): HK<F, B>
 

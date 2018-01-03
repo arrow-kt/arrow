@@ -1,6 +1,6 @@
 package arrow.debug
 
-import arrow.Typeclass
+import arrow.TC
 import arrow.data.Try
 import arrow.effects.AsyncContext
 import arrow.effects.asyncContext
@@ -8,7 +8,7 @@ import arrow.mtl.*
 import arrow.typeclasses.*
 import kotlin.reflect.KClass
 
-inline fun <reified F, reified E> debugInstanceLookups(): Map<KClass<out Typeclass>, () -> Typeclass> = mapOf(
+inline fun <reified F, reified E> debugInstanceLookups(): Map<KClass<out TC>, () -> TC> = mapOf(
         Alternative::class to { alternative<F>() },
         Applicative::class to { applicative<F>() },
         ApplicativeError::class to { applicativeError<F, E>() },
@@ -37,7 +37,7 @@ inline fun <reified F, reified E> debugInstanceLookups(): Map<KClass<out Typecla
 )
 
 inline fun <reified F, reified E> showInstances(
-        debugLookupTable: Map<KClass<out Typeclass>, () -> Typeclass> = debugInstanceLookups<F, E>()): List<String?> =
+        debugLookupTable: Map<KClass<out TC>, () -> TC> = debugInstanceLookups<F, E>()): List<String?> =
         debugLookupTable.entries
                 .filter { Try { it.value() }.fold({ false }, { true }) }
                 .map { it.key.simpleName }

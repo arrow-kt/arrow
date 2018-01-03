@@ -9,7 +9,7 @@ import arrow.*
  * is an "empty" F<A> value.
  */
 @typeclass
-interface MonoidK<F> : SemigroupK<F>, Typeclass {
+interface MonoidK<F> : SemigroupK<F>, TC {
 
     /**
      * Given a type A, create an "empty" F<A> value.

@@ -3,7 +3,7 @@ package arrow.typeclasses
 import arrow.*
 
 @typeclass
-interface Monoid<A> : Semigroup<A>, Typeclass {
+interface Monoid<A> : Semigroup<A>, TC {
     /**
      * A zero value for this A
      */
