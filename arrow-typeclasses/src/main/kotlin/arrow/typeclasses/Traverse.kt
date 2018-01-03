@@ -7,7 +7,7 @@ import arrow.core.*
  * Traverse, also known as Traversable. Traversal over a structure with an effect.
  */
 @typeclass
-interface Traverse<F> : Functor<F>, Foldable<F>, Typeclass {
+interface Traverse<F> : Functor<F>, Foldable<F>, TC {
 
     /**
      * Given a function which returns a G effect, thread this effect through the running of this function on all the

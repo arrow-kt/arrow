@@ -8,7 +8,7 @@ import arrow.typeclasses.*
  * The combination of a Monad with a MonoidK
  */
 @typeclass
-interface MonadCombine<F> : MonadFilter<F>, Alternative<F>, Typeclass {
+interface MonadCombine<F> : MonadFilter<F>, Alternative<F>, TC {
 
     fun <G, A> unite(fga: HK<F, HK<G, A>>, FG: Foldable<G>): HK<F, A> =
             flatMap(fga, { ga -> FG.foldLeft(ga, empty<A>(), { acc, a -> combineK(acc, pure(a)) }) })

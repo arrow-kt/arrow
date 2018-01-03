@@ -4,7 +4,7 @@ import arrow.*
 import kotlin.coroutines.experimental.startCoroutine
 
 @typeclass
-interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F>, Typeclass {
+interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F>, TC {
 
     fun <A> ensure(fa: HK<F, A>, error: () -> E, predicate: (A) -> Boolean): HK<F, A> =
             flatMap(fa, {

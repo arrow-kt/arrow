@@ -6,7 +6,7 @@ import arrow.core.Left
 import arrow.core.Right
 
 @typeclass
-interface ApplicativeError<F, E> : Applicative<F>, Typeclass {
+interface ApplicativeError<F, E> : Applicative<F>, TC {
 
     fun <A> raiseError(e: E): HK<F, A>
 

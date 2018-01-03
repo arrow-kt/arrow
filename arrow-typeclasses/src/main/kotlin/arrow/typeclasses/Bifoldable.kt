@@ -4,7 +4,7 @@ import arrow.*
 import arrow.core.Eval
 
 @typeclass
-interface Bifoldable<F> : Typeclass {
+interface Bifoldable<F> : TC {
 
     fun <A, B, C> bifoldLeft(fab: HK2<F, A, B>, c: C, f: (C, A) -> C, g: (C, B) -> C): C
 

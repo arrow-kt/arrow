@@ -7,7 +7,7 @@ import arrow.core.Eval
 import arrow.core.Tuple2
 
 @typeclass
-interface Applicative<F> : Functor<F>, Typeclass {
+interface Applicative<F> : Functor<F>, TC {
 
     fun <A> pure(a: A): HK<F, A>
 

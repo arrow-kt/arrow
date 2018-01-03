@@ -10,7 +10,7 @@ import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
  * The dual of monads, used to extract values from F
  */
 @typeclass
-interface Comonad<F> : Functor<F>, Typeclass {
+interface Comonad<F> : Functor<F>, TC {
 
     fun <A, B> coflatMap(fa: HK<F, A>, f: (HK<F, A>) -> B): HK<F, B>
 

@@ -113,7 +113,7 @@ fun registerInstance(t: InstanceParametrizedType, value: Any): Any {
  * in the GlobalInstances map or the companion factory methods for the `on` target type
  */
 @Suppress("UNCHECKED_CAST")
-fun <T : Typeclass> instance(t: InstanceParametrizedType): T =
+fun <T : TC> instance(t: InstanceParametrizedType): T =
         if (GlobalInstances.containsKey(t)) {
             GlobalInstances.getValue(t) as T
         } else {
@@ -176,7 +176,7 @@ private fun instanceFromImplicitObject(t: InstanceParametrizedType): Any? {
     val factoryFunction = allCompanionFunctions.find { it.name == "instance" }
     return if (factoryFunction != null) {
         val values = factoryFunction.parameterTypes.mapIndexedNotNull { n, p ->
-            if (Typeclass::class.java.isAssignableFrom(p)) {
+            if (TC::class.java.isAssignableFrom(p)) {
                 val classifier = InstanceParametrizedType(p, p.typeParameters.toList())
                 val vType = reifyRawParameterizedType(t, classifier, n)
                 val value = instanceFromImplicitObject(vType)

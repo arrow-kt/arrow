@@ -2,13 +2,12 @@ package arrow.mtl
 
 import arrow.*
 import arrow.core.*
-import arrow.instances.applicative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.applicative
 
 @typeclass
-interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F>, Typeclass {
+interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F>, TC {
 
     fun <G, A, B> traverseFilter(fa: HK<F, A>, f: (A) -> HK<G, Option<B>>, GA: Applicative<G>): HK<G, HK<F, B>>
 

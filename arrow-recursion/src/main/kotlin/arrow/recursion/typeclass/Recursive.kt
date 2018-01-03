@@ -8,7 +8,7 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.Nested
 import arrow.typeclasses.Traverse
 
-interface Recursive<F, G> : Typeclass {
+interface Recursive<F, G> : TC {
     fun projectT(fg: HK<F, G>): HK<Nested<F, G>, HK<F, G>>
 
     fun <A> cata(t: HK<F, G>, f: Algebra<Nested<F, G>, A>, FF: Functor<F>, FG: Functor<G>): A =

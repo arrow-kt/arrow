@@ -6,7 +6,7 @@ import arrow.typeclasses.Monad
 
 /** A monad that support monoidal accumulation (e.g. logging List<String>) */
 @typeclass
-interface MonadWriter<F, W> : Monad<F>, Typeclass {
+interface MonadWriter<F, W> : Monad<F>, TC {
 
     /** Lift a writer action into the effect */
     fun <A> writer(aw: Tuple2<W, A>): HK<F, A>

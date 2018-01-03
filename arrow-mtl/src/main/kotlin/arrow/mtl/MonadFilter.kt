@@ -6,7 +6,7 @@ import arrow.typeclasses.Monad
 import kotlin.coroutines.experimental.startCoroutine
 
 @typeclass
-interface MonadFilter<F> : Monad<F>, FunctorFilter<F>, Typeclass {
+interface MonadFilter<F> : Monad<F>, FunctorFilter<F>, TC {
 
     fun <A> empty(): HK<F, A>
 

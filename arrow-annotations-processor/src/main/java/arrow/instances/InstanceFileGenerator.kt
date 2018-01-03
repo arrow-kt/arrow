@@ -97,7 +97,7 @@ data class Instance(
                                     val typeTable = TypeTable(current.classProto.typeTable)
                                     val isTypeClassReturnType = current.classProto.supertypes(typeTable).any {
                                         val typeName = it.extractFullName(current, failOnGeneric = false)
-                                        typeName == "`arrow`.`Typeclass`"
+                                        typeName == "`arrow`.`TC`"
                                     }
                                     if (isTypeClassReturnType)
                                         listOf(FunctionMapping(tc.nameResolver.getString(it.name), tc, it, retTypeName))
