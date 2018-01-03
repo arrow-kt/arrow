@@ -9,7 +9,7 @@ import arrow.higherkind
 import arrow.typeclasses.Applicative
 
 @higherkind
-class ListA<A>(val value: List<A>): ArrayList<A>(value), ListAKind<A> {
+class ListA<A>(val value: List<A>) : ArrayList<A>(value), ListAKind<A> {
     fun <B> flatMap(f: (A) -> ListAKind<B>): ListA<B> = this.ev().flatMap { f(it).ev() }
 
     fun <B> map(f: (A) -> B): ListA<B> = this.ev().map(f)
