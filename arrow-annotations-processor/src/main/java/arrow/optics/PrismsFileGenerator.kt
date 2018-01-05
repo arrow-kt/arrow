@@ -39,8 +39,7 @@ class PrismsFileGenerator(
     fun fileHeader(packageName: String): String =
             """package $packageName
                |
-               |import arrow.left
-               |import arrow.right
+               |import arrow.syntax.either.*
                |
                |""".trimMargin()
 
