@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-apply from: 'detekt.gradle'
+apply from: 'detekt.gradle.kts'
 
 buildscript {
     ext {
