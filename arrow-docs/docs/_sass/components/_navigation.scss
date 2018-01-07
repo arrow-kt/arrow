@@ -15,7 +15,8 @@
     .navigation-brand {
         font-family: $brand-font-family;
         font-weight: $font-medium;
-        letter-spacing: 1px;
+        text-transform: uppercase;
+        letter-spacing: 4px;
         @include bp(medium) {
             font-size: 0.875rem;
         }
