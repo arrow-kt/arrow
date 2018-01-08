@@ -188,7 +188,7 @@ sealed class Eval<out A> : EvalKind<A> {
 
         override fun value(): A {
             var curr: Eval<A> = this
-            var fs: List<(Any?) -> Eval<A>> = listOf()
+            var fs: MutableList<(Any?) -> Eval<A>> = mutableListOf()
 
             loop@ while (true) {
                 when (curr) {
@@ -200,7 +200,8 @@ sealed class Eval<out A> : EvalKind<A> {
                                     val inStartFun: (Any?) -> Eval<A> = { cc.run(it) }
                                     val outStartFun: (Any?) -> Eval<A> = { currComp.run(it) }
                                     curr = cc.start<A>()
-                                    fs = listOf(inStartFun, outStartFun) + fs
+                                    fs.add(0, outStartFun)
+                                    fs.add(0, inStartFun)
                                 }
                                 else -> {
                                     curr = currComp.run(cc.value())
@@ -211,7 +212,7 @@ sealed class Eval<out A> : EvalKind<A> {
                     else ->
                         if (fs.isNotEmpty()) {
                             curr = fs[0](curr.value())
-                            fs = fs.drop(1)
+                            fs.removeAt(0)
                         } else {
                             break@loop
                         }
