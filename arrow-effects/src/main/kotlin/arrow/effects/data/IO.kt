@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.*
 import arrow.core.*
 import arrow.core.Either.Left
+import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
 import arrow.typeclasses.Applicative
@@ -121,10 +122,10 @@ internal data class Map<E, out A>(val source: IO<E>, val g: (E) -> A, val index:
     override fun invoke(value: E): IO<A> = pure(g(value))
 
     override fun <B> map(f: (A) -> B): IO<B> =
-            // Allowed to do 32 map operations in sequence before
-            // triggering `flatMap` in order to avoid stack overflows
-            if (index != 31) Map(source, g.andThen(f), index + 1)
-            else flatMap { a -> Pure(f(a)) }
+            // Allowed to do maxStackDepthSize map operations in sequence before
+            // starting a new Map fusion in order to avoid stack overflows
+            if (index != maxStackDepthSize) Map(source, g.andThen(f), index + 1)
+            else Map(this, f, 0)
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
 }
