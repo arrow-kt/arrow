@@ -24,7 +24,7 @@ def findProperty(String key) {
 }
 
 def getReleaseRepositoryUrl() {
-    return findProperty('RELEASE_REPOSITORY_URL') ?: "https://api.bintray.com/maven/kategory/maven/"+POM_ARTIFACT_ID
+    return findProperty('RELEASE_REPOSITORY_URL') ?: "https://api.bintray.com/maven/arrow-kt/arrow-kt/"+POM_ARTIFACT_ID
 }
 
 def getSnapshotRepositoryUrl() {
