@@ -10,10 +10,16 @@ import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
 data class Fiber<out F, out A>(val binding: HK<F, A>, private val dispose: Disposable) : Disposable by dispose
 
 @RestrictsSuspension
-open class MonadSuspendContinuation<F, A>(val MR: MonadSuspend<F, Throwable>, AC: AsyncContext<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
+open class MonadSuspendContinuation<F, A>(MR: MonadSuspend<F, Throwable>, AC: AsyncContext<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
         MonadErrorCancellableContinuation<F, A>(MR), MonadSuspend<F, Throwable> by MR, AsyncContext<F> by AC {
 
-    var cancellation: Disposable? = null
+    init {
+        returnedMonad = flatMap(pure(Unit)) {
+            returnedMonad()
+        }
+    }
+
+    private var cancellation: Disposable? = null
 
     override fun disposable(): Disposable =
             {
@@ -21,35 +27,46 @@ open class MonadSuspendContinuation<F, A>(val MR: MonadSuspend<F, Throwable>, AC
                 cancellation?.apply { invoke() }
             }
 
-    open suspend fun <B, C> bindParallel(cc: CoroutineContext, fa: Fiber<F, B>, fb: Fiber<F, C>): Tuple2<B, C> = suspendCoroutineOrReturn { c ->
+    private fun ct() = Thread.currentThread().name
+
+    open suspend fun <B, C> bindParallel(fa: Fiber<F, B>, fb: Fiber<F, C>): Tuple2<B, C> = suspendCoroutineOrReturn { c ->
         currentCont = c
         val labelHere = c.stackLabels
-        returnedMonad = flatMap(pure(Unit)) {
-            val c1: BindingInContextContinuation<F, B> = bindParallelContinuation(fa.binding, cc)
-            val c2: BindingInContextContinuation<F, C> = bindParallelContinuation(fb.binding, cc)
+        println("MS start parallel ${ct()}")
 
-            bindingECancellable {
-                c1.start().bind()
-                c2.start().bind()
-                val resultB = c1.await().bind()
-                val resultC = c2.await().bind()
-                c.stackLabels = labelHere
-                c.resume(resultB toT resultC)
-                returnedMonad
-            }.let {
-                cancellation = it.b
-                it.a
+        val c1: BindingInContextContinuation<F, B> = bindParallelContinuation(fa.binding, context)
+        val c2: BindingInContextContinuation<F, C> = bindParallelContinuation(fb.binding, context)
+
+        returnedMonad = bindingECancellable {
+            println("MS before lazy ${ct()}")
+            lazy().bind()
+            c1.start().bind()
+            c2.start().bind()
+            val resultB = bindInM(context) { println("MS await c1 ${ct()}"); c1.await() }
+            val resultC = bindInM(context) { println("MS await c2 ${ct()}"); c2.await() }
+            c.stackLabels = labelHere
+            println("MS resume ${ct()}")
+            c.resume(resultB toT resultC)
+            returnedMonad
+            println("MS flatMap lazy end ${ct()}")
+            returnedMonad
+        }.let {
+            cancellation = {
+                it.b()
+                fa()
+                fb()
             }
+            it.a
         }
         COROUTINE_SUSPENDED
     }
 
-    open suspend fun <B, C> bindRace(cc: CoroutineContext, fa: Fiber<F, B>, fb: Fiber<F, C>): Either<B, C> = suspendCoroutineOrReturn { c ->
+    open suspend fun <B, C> bindRace(fa: Fiber<F, B>, fb: Fiber<F, C>): Either<B, C> = suspendCoroutineOrReturn { c ->
         currentCont = c
         val labelHere = c.stackLabels
-        returnedMonad = flatMap(pure(Unit)) {
-            val c1: BindingInContextContinuation<F, B> = bindParallelContinuation(raceWith(fa.binding, { fb() }), cc)
-            val c2: BindingInContextContinuation<F, C> = bindParallelContinuation(raceWith(fb.binding, { fa() }), cc)
+        returnedMonad = flatMap(lazy()) {
+            val c1: BindingInContextContinuation<F, B> = bindParallelContinuation(raceWith(fa.binding, { fb() }), context)
+            val c2: BindingInContextContinuation<F, C> = bindParallelContinuation(raceWith(fb.binding, { fa() }), context)
 
             bindingECancellable {
                 c1.start().bind()
@@ -59,7 +76,7 @@ open class MonadSuspendContinuation<F, A>(val MR: MonadSuspend<F, Throwable>, AC
                 val result: Either<B, C> = resultC.fold(
                         {
                             resultB.fold(
-                                    { ME.raiseError<Either<B, C>>(BindingCancellationException("All operations were cancelled")) },
+                                    { raiseError<Either<B, C>>(BindingCancellationException("All operations were cancelled")) },
                                     { pure(it.left()) })
                         },
                         { pure(it.right()) }
@@ -68,7 +85,11 @@ open class MonadSuspendContinuation<F, A>(val MR: MonadSuspend<F, Throwable>, AC
                 c.resume(result)
                 returnedMonad
             }.let {
-                cancellation = it.b
+                cancellation = {
+                    it.b()
+                    fa()
+                    fb()
+                }
                 it.a
             }
         }

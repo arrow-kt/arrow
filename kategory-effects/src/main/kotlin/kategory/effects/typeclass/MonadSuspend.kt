@@ -2,6 +2,7 @@ package kategory.effects
 
 import kategory.*
 import kategory.effects.data.internal.BindingCancellationException
+import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.startCoroutine
 
 interface MonadSuspend<F, E> : MonadError<F, E>, Typeclass {
@@ -31,8 +32,8 @@ interface MonadSuspend<F, E> : MonadError<F, E>, Typeclass {
  * If [invoke] is called the binding result will become a lifted [BindingCancellationException].
  *
  */
-fun <F, B> MonadSuspend<F, Throwable>.bindingFiber(AC: AsyncContext<F>, c: suspend MonadSuspendContinuation<F, *>.() -> HK<F, B>): Fiber<F, B> {
-    val continuation = MonadSuspendContinuation<F, B>(this, AC)
+fun <F, B> MonadSuspend<F, Throwable>.bindingFiber(AC: AsyncContext<F>, cc: CoroutineContext, c: suspend MonadSuspendContinuation<F, *>.() -> HK<F, B>): Fiber<F, B> {
+    val continuation = MonadSuspendContinuation<F, B>(this, AC, cc)
     c.startCoroutine(continuation, continuation)
     return Fiber(continuation.returnedMonad(), continuation.disposable())
 }

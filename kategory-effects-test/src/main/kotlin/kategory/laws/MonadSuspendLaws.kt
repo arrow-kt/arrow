@@ -8,24 +8,23 @@ import java.util.concurrent.TimeUnit
 
 object MonadSuspendLaws {
     inline fun <reified F> laws(M: MonadSuspend<F, Throwable> = monadSuspend<F, Throwable>(), AC: AsyncContext<F> = asyncContext(), EQ: Eq<HK<F, Int>>, EQ_EITHER: Eq<HK<F, Either<Throwable, Int>>>, EQERR: Eq<HK<F, Int>> = EQ): List<Law> =
-            AsyncLaws.laws(AC, M, EQERR, EQ_EITHER, EQ) +
+            //AsyncLaws.laws(AC, M, EQERR, EQ_EITHER, EQ) +
                     listOf(
-                            Law("MonadRun Laws: sync/async equivalence", { asyncSyncEquivalence(M, AC) }),
-                            Law("MonadRun Laws: async safe/unsafe equivalence", { asyncUnsafeEquivalence(M, AC) }),
-                            Law("MonadRun Laws: runAsync should capture exceptions", { runAsyncSafety(M, AC, EQERR) }),
-                            Law("MonadRun Laws: runAsync should propagate caught exceptions", { runAsyncUnSafety(M, AC, EQERR) }),
-                            Law("MonadRun Laws: unsafeRunAsync should capture exceptions", { unsafeRunAsyncSafety(M, AC, EQERR) }),
-                            Law("MonadRun Laws: unsafeRunSync should throw", { unsafeRunSyncSafety(M, AC, EQERR) }),
-                            Law("MonadRun bind: bindParallel runs blocks in parallel", { bindParallel(M, AC, EQ) }),
-                            Law("MonadRun bind: bindParallel fails on raiseError", { bindParallelError(M, AC, EQERR) }),
-                            Law("MonadRun bind: bindRace cancels the losing side", { bindRace(M, AC) }),
-                            Law("MonadRun bind: bindRace works equally on either side", { bindRaceCommutativity(M, AC) }))
+                            Law("MonadSuspend Laws: sync/async equivalence", { asyncSyncEquivalence(M, AC) }),
+                            Law("MonadSuspend Laws: async safe/unsafe equivalence", { asyncUnsafeEquivalence(M, AC) }),
+                            Law("MonadSuspend Laws: runAsync should capture exceptions", { runAsyncSafety(M, AC, EQERR) }),
+                            Law("MonadSuspend Laws: runAsync should propagate caught exceptions", { runAsyncUnSafety(M, AC, EQERR) }),
+                            Law("MonadSuspend Laws: unsafeRunAsync should capture exceptions", { unsafeRunAsyncSafety(M, AC, EQERR) }),
+                            Law("MonadSuspend Laws: unsafeRunSync should throw", { unsafeRunSyncSafety(M, AC, EQERR) }),
+                            Law("MonadSuspend bind: bindParallel runs blocks in parallel", { bindParallel(M, AC, EQ) }),
+                            Law("MonadSuspend bind: bindParallel fails on raiseError", { bindParallelError(M, AC, EQERR) }),
+                            Law("MonadSuspend bind: bindRace cancels the losing side", { bindRace(M, AC) }),
+                            Law("MonadSuspend bind: bindRace works equally on either side", { bindRaceCommutativity(M, AC) }))
 
-    fun monadRunLawsCoroutineDispatcher() = newCoroutineDispatcher("MonadRunLawsCoroutineDispatcher")
+    val monadRunLawsCoroutineDispatcher = newCoroutineDispatcher("MonadRunLawsCoroutineDispatcher")
 
     fun <F> asyncFiber(M: MonadSuspend<F, Throwable>, AC: AsyncContext<F>, name: Int, delay: Int): Fiber<F, Int> =
-            M.bindingFiber(AC) {
-                M.lazy().bind()
+            M.bindingFiber(AC, monadRunLawsCoroutineDispatcher) {
                 val a = bindIn(newSingleThreadContext("MonadRunLaws $name")) {
                     Thread.sleep(delay.toLong())
                     name
@@ -95,8 +94,8 @@ object MonadSuspendLaws {
     inline fun <reified F> bindParallel(M: MonadSuspend<F, Throwable> = monadSuspend<F, Throwable>(), AC: AsyncContext<F> = asyncContext(), EQ: Eq<HK<F, Int>>): Unit =
             forFew(5, genIntSmall(), genIntSmall(), { num1: Int, num2: Int ->
                 val start = System.nanoTime()
-                M.bindingFiber(AC) {
-                    val result = bindParallel(monadRunLawsCoroutineDispatcher(), asyncFiber(M, AC, num1, 500), asyncFiber(M, AC, num2, 100))
+                M.bindingFiber(AC, monadRunLawsCoroutineDispatcher) {
+                    val result = bindParallel(asyncFiber(M, AC, num1, 500), asyncFiber(M, AC, num2, 100))
                     yields(result.a + result.b)
                 }.binding.equalUnderTheLaw(M.pure(num1 + num2), EQ) &&
                         // Less time than the combination of both tasks
@@ -107,8 +106,8 @@ object MonadSuspendLaws {
     inline fun <reified F> bindParallelError(M: MonadSuspend<F, Throwable> = monadSuspend<F, Throwable>(), AC: AsyncContext<F> = asyncContext(), EQ_ERR: Eq<HK<F, Int>>): Unit =
             forFew(5, genIntSmall(), genIntSmall(), genThrowable(), { num1: Int, num2: Int, t: Throwable ->
                 val start = System.nanoTime()
-                val binding = M.bindingFiber(AC) {
-                    val result = bindParallel(monadRunLawsCoroutineDispatcher(), asyncFiber(M, AC, num2, 500), bindingFiber(AC) { raiseError<Int>(t) })
+                val binding = M.bindingFiber(AC, monadRunLawsCoroutineDispatcher) {
+                    val result = bindParallel(asyncFiber(M, AC, num2, 500), bindingFiber(AC, monadRunLawsCoroutineDispatcher) { raiseError<Int>(t) })
                     yields(result.a + result.b)
                 }.binding
                 val endTime = System.nanoTime() - start
@@ -120,8 +119,8 @@ object MonadSuspendLaws {
     inline fun <reified F> bindRace(M: MonadSuspend<F, Throwable> = monadSuspend<F, Throwable>(), AC: AsyncContext<F> = asyncContext()): Unit =
             forFew(5, genIntSmall(), genIntSmall(), { num1: Int, num2: Int ->
                 val start = System.nanoTime()
-                val result: Either<Int, Int> = M.unsafeRunSync(M.bindingFiber(AC) {
-                    val result = bindRace(monadRunLawsCoroutineDispatcher(), asyncFiber(M, AC, num1, 5000), asyncFiber(M, AC, num2, 100))
+                val result: Either<Int, Int> = M.unsafeRunSync(M.bindingFiber(AC, monadRunLawsCoroutineDispatcher) {
+                    val result = bindRace(asyncFiber(M, AC, num1, 5000), asyncFiber(M, AC, num2, 100))
                     yields(result)
                 }.binding)
                 val expected = num2.right()
@@ -134,12 +133,12 @@ object MonadSuspendLaws {
     inline fun <reified F> bindRaceCommutativity(M: MonadSuspend<F, Throwable> = monadSuspend<F, Throwable>(), AC: AsyncContext<F> = asyncContext()): Unit =
             forFew(5, genIntSmall(), genIntSmall(), { num1: Int, num2: Int ->
                 val start = System.nanoTime()
-                val victoryFirst = M.unsafeRunSync(M.bindingFiber(AC) {
-                    val result = bindRace(monadRunLawsCoroutineDispatcher(), asyncFiber(M, AC, num1, 500), asyncFiber(M, AC, num2, 100))
+                val victoryFirst = M.unsafeRunSync(M.bindingFiber(AC, monadRunLawsCoroutineDispatcher) {
+                    val result = bindRace(asyncFiber(M, AC, num1, 500), asyncFiber(M, AC, num2, 100))
                     yields(result)
                 }.binding).fold({ Int.MIN_VALUE }, { it })
-                val victorySecond = M.unsafeRunSync(M.bindingFiber(AC) {
-                    val result = bindRace(monadRunLawsCoroutineDispatcher(), asyncFiber(M, AC, num2, 100), asyncFiber(M, AC, num1, 500))
+                val victorySecond = M.unsafeRunSync(M.bindingFiber(AC, monadRunLawsCoroutineDispatcher) {
+                    val result = bindRace(asyncFiber(M, AC, num2, 100), asyncFiber(M, AC, num1, 500))
                     yields(result)
                 }.binding).fold({ it }, { Int.MAX_VALUE })
 
