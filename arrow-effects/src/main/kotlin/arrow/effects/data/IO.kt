@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.*
 import arrow.core.*
 import arrow.core.Either.Left
+import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
 import arrow.typeclasses.Applicative
