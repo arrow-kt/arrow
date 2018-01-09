@@ -9,7 +9,12 @@ data class Duration(val amount: Long, val timeUnit: TimeUnit) {
         // Actually limited to 9223372036854775807 days, so unless you are very patient, it is unlimited ;-)
         val INFINITE = Duration(amount = Long.MAX_VALUE, timeUnit = TimeUnit.DAYS)
     }
+
+    operator fun times(i: Int) = Duration(amount * i, timeUnit)
+
 }
+
+operator fun Int.times(d: Duration) = d * this
 
 val Long.days: Duration
     get() = Duration(this, TimeUnit.DAYS)
