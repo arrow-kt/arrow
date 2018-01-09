@@ -6,6 +6,7 @@ import arrow.typeclasses.applicative
 import arrow.core.*
 import arrow.data.*
 import io.kotlintest.properties.Gen
+import java.util.concurrent.TimeUnit
 
 inline fun <reified F, A> genApplicative(valueGen: Gen<A>, AP: Applicative<F> = applicative<F>()): Gen<HK<F, A>> =
         object : Gen<HK<F, A>> {
@@ -147,3 +148,12 @@ fun <K, V> genMap(genK: Gen<K>, genV: Gen<V>): Gen<Map<K, V>> =
 
 fun <K, V> genMapKW(genK: Gen<K>, genV: Gen<V>): Gen<MapKW<K, V>> =
         Gen.create { Gen.list(genK).generate().map { it to genV.generate() }.toMap().k() }
+
+class TimeUnitGen : Gen<TimeUnit> {
+
+    companion object {
+        val units = TimeUnit.values()
+    }
+
+    override fun generate(): TimeUnit = units[Gen.choose(0, units.size -1).generate()]
+}

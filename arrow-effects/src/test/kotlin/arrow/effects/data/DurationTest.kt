@@ -2,6 +2,7 @@ package arrow.effects.data
 
 import arrow.effects.Duration
 import arrow.test.UnitSpec
+import arrow.test.generators.TimeUnitGen
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -24,13 +25,4 @@ class DurationTest : UnitSpec() {
         }
     }
 
-}
-
-private class TimeUnitGen : Gen<TimeUnit> {
-
-    companion object {
-        val units = TimeUnit.values()
-    }
-
-    override fun generate(): TimeUnit = units[Gen.choose(0, units.size -1).generate()]
 }
