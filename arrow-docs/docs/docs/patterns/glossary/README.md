@@ -137,7 +137,7 @@ interface Applicative<F>: Functor<F>, Typeclass {
 }
 
 object ListKWApplicativeInstance : ListKWFunctorInstance, Applicative<ListKWHK> {
-  override fun <A> pure(a: A): HK<F, A> = listOf(a)
+  override fun <A> pure(a: A): HK<ListKWHK, A> = listOf(a)
   
   /* ... */
 }
