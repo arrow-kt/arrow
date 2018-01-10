@@ -2,12 +2,11 @@ package arrow.effects.data
 
 import arrow.effects.Duration
 import arrow.test.UnitSpec
-import arrow.test.generators.TimeUnitGen
+import arrow.test.generators.genIntSmall
+import arrow.test.generators.genTimeUnit
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
-import java.util.concurrent.TimeUnit
 
 /**
  *
@@ -17,9 +16,9 @@ class DurationTest : UnitSpec() {
 
     init {
         "plus should be commutative" {
-            forAll(Gen.long(), TimeUnitGen(), Gen.long(), TimeUnitGen()) { i: Long, u: TimeUnit, j: Long, v: TimeUnit ->
-                val a = Duration(i, u)
-                val b = Duration(j, v)
+            forAll(genIntSmall(), genTimeUnit(), genIntSmall(), genTimeUnit()) { i, u, j, v ->
+                val a = Duration(i.toLong(), u)
+                val b = Duration(j.toLong(), v)
                 a + b == b + a
             }
         }

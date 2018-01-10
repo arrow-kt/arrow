@@ -149,11 +149,8 @@ fun <K, V> genMap(genK: Gen<K>, genV: Gen<V>): Gen<Map<K, V>> =
 fun <K, V> genMapKW(genK: Gen<K>, genV: Gen<V>): Gen<MapKW<K, V>> =
         Gen.create { Gen.list(genK).generate().map { it to genV.generate() }.toMap().k() }
 
-class TimeUnitGen : Gen<TimeUnit> {
-
-    companion object {
-        val units = TimeUnit.values()
-    }
-
-    override fun generate(): TimeUnit = units[Gen.choose(0, units.size -1).generate()]
+fun genTimeUnit(): Gen<TimeUnit> = object : Gen<TimeUnit> {
+    val units = TimeUnit.values()
+    val random = Gen.choose(0, units.size -1)
+    override fun generate(): TimeUnit = units[random.generate()]
 }
