@@ -14,7 +14,7 @@ class LensesFileGenerator(
 
     fun generate() = annotatedList.map(this::processElement)
             .map { (element, funs) ->
-                "${lensesAnnotationClass.simpleName}.${element.type.simpleName.toString().toLowerCase()}.kt" to
+                "${lensesAnnotationClass.simpleName}.${element.classData.`package`}.${element.type.simpleName.toString().toLowerCase()}.kt" to
                         funs.joinToString(prefix = "package ${element.classData.`package`.escapedClassName}\n\n", separator = "\n")
             }.forEach { (name, fileString) -> File(generatedDir, name).writeText(fileString) }
 
