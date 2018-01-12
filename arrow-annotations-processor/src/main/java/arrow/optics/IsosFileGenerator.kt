@@ -16,13 +16,13 @@ class IsosFileGenerator(
 
     private fun buildIsos(optics: Collection<AnnotatedOptic>) =
             optics.map(this::processElement)
-                    .forEach { (name, funString) ->
-                        File(generatedDir, isosAnnotationClass.simpleName + ".$name.kt").printWriter().use { w ->
+                    .forEach { (element, funString) ->
+                        File(generatedDir, "${isosAnnotationClass.simpleName}.${element.classData.`package`}.${element.sourceName}.kt").printWriter().use { w ->
                             w.println(funString)
                         }
                     }
 
-    private fun processElement(iso: AnnotatedOptic): Pair<String, String> = iso.sourceName to """
+    private fun processElement(iso: AnnotatedOptic): Pair<AnnotatedOptic, String> = iso to """
             |package ${iso.classData.`package`.escapedClassName}
             |
             |fun ${iso.sourceName}Iso(): arrow.optics.Iso<${iso.sourceClassName}, ${focusType(iso)}> = arrow.optics.Iso(

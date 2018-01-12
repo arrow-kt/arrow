@@ -13,7 +13,7 @@ class PrismsFileGenerator(
 
     fun generate() = annotatedList.map(this::processElement)
             .map { (element, funs) ->
-                "${prismsAnnotationClass.simpleName}.${element.type.simpleName.toString().toLowerCase()}.kt" to
+                "${prismsAnnotationClass.simpleName}.${element.classData.`package`}.${element.type.simpleName.toString().toLowerCase()}.kt" to
                         funs.joinToString(prefix = fileHeader(element.classData.`package`.escapedClassName), separator = "\n\n")
             }.forEach { (name, fileString) -> File(generatedDir, name).writeText(fileString) }
 
