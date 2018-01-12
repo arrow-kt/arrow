@@ -149,8 +149,9 @@ fun compileCodeImpl(snippets: Map<File, ListKW<Snippet>>, classpath: ListKW<Stri
                                     underlying = IllegalStateException("No engine configured for `${snippet.lang}`"),
                                     msg = colored(ANSI_RED, "ΛNK compilation failed [ ${file.parentFile.name}/${file.name} ]"))
                         })
-                engine.eval(snippet.code)
+                val result = engine.eval(snippet.code)
                 pb.step()
+                result
             }.fold({
                 println("\n\n")
                 println(colored(ANSI_RED, "ΛNK compilation failed [ ${file.parentFile.name}/${file.name} ]"))
