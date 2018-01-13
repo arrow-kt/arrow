@@ -1,0 +1,36 @@
+// SIDEBAR
+// -----------------------------------------------
+// -----------------------------------------------
+.sidebar-brand {
+    height: ($base-point-grid * 11);
+    padding: 0 ($base-point-grid * 3);
+    background: rgba($brand-tertiary, 0.4);
+    @include flexbox;
+    @include justify-content(flex-start);
+    @include align-items(center);
+    font-family: $brand-font-family;
+    font-size: 1.063rem;
+    font-weight: $font-medium;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: $white;
+
+    img {
+        margin-right: ($base-point-grid * 2);
+    }
+
+    a {
+        margin-left: ($base-point-grid * 6);
+        @include links($white, $white, $white, $white);
+
+        &:hover {
+            text-decoration: none;
+        }
+
+        &.brand {
+            margin-left: 0px;
+            align-items: center;
+            display: flex;
+        }
+    }
+}

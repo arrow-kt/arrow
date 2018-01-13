@@ -1,0 +1,72 @@
+// VARIABLES
+// -----------------------------------------------
+// -----------------------------------------------
+
+@font-face {
+    font-family: 'monoidregular';
+    src: url('../fonts/monoid-regular.eot');
+    src: url('../fonts/monoid-regular.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/monoid-regular.woff2') format('woff2'),
+         url('../fonts/monoid-regular.woff') format('woff'),
+         url('../fonts/monoid-regular.ttf') format('truetype'),
+         url('../fonts/monoid-regular.svg#monoidregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@import url('https://fonts.googleapis.com/css?family=Titillium+Web:400,600');
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700');
+
+// Colors
+$brand-primary: #193E88;
+$brand-secondary: #526795;
+$brand-tertiary: #4B74E5;
+$brand-quaternary: #61A8FF;
+$brand-quinary: #00B5E2;
+$white: #fff;
+
+$link-color: $brand-tertiary;
+
+$feature-typeclasses: #2F5DC1;
+$feature-datatypess: #557FE8;
+$feature-patterns: #61A8FF;
+$feature-integrations: #00B5E2;
+
+// Typography
+$base-font-family: 'Titillium Web', sans-serif;
+$brand-font-family: 'Source Sans Pro', sans-serif;
+$code-font-family: 'monoidregular', monospace;
+$header-font-color: $brand-primary;
+$base-font-color: $brand-secondary;
+
+$font-regular: 400;
+$font-medium: 500;
+$font-semibold: 600;
+$font-bold: 700;
+
+$em-base: 16px !global;
+$base-font-size: $em-base;
+$base-line-height: 1.6;
+
+// Sizes
+$base-point-grid: 8px;
+
+// Animations
+$base-duration: 350ms;
+$base-timing: ease;
+
+// Grid
+
+$bp-small: 480px;
+$bp-medium: 768px;
+$bp-large: 992px;
+$bp-xlarge: 1130px;
+
+$base-grid: (
+    columns: 12,
+    gutter: 32px,
+);
+
+// Box Shadow
+$box-shadow-item: rgba($brand-primary, 0.10) 0 0 20px;

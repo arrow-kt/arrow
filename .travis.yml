@@ -5,15 +5,18 @@ dist: trusty
 jdk:
   - oraclejdk8
 
-env:
-  global:
-  - secure: "SX86BVEoAzDPnsRR5mj8frVRCCkbaR+50JcOHD9etQQOzFLRWC2FPrU0qV5EIopGGDs3yi17b69tQXg2OYJgWOJaDi53f2iR6R+XZ7lcv/tWsNal/dRvID1dCwNWw62p2jpNy9PZnCj+HCS1G8GSUSTKxrdak1wKMDumL6D8f2VoPYVuI3erXW+on7N1OeH/O1y0rH6WEVlxrS3nzeD6lGm6unFYlWS79s1xQvCD0u9CvOqzR2OVLdmNaXbhDT0KD0j1gUHwolEUHJrKfF1I7oWZrMj/ehgwvidBjuLBRFPTE+jDxdQMwPffgIKAwUTAql7KMsMH+JEN5uWCd+NzkRObpcz4xTmUfzKxfN075py9RHAnoilPSoI89I36GWl/91t2Yh9Ehb+5eGfqBRPXoBnRCs8eq2xXCpCwOJbaCkr8axnCXeDiX0SKjGhSblzcFjA4XLTgA69N91BdlRxToFq5l/g2xizVQxnauqiTRUleTQoybf4pM0ywXriKjb50FmeZbn/vkWc4fLPb9OEBjHOtEQ5blUZ4h4frEUGqTt5SziG6UqxWZxqoNye2qEezXAgQI1x/ke5Pr2QQNbWLZrNdfC3QGsEVMVGkHNHw+96vOOnIoMNtaub5nkxU4am1FCsLX7NTeD8IrpwqmIV/mMmMSl1qNxqsumNhBlmca4g="
-  - secure: "JyKk0p8vaccCHVSqWL+oCBCn/AG7WOZgMolGBbSsZQkOgbflISV+CBgo2WpewyompaLtkeeRhy5acGgAekVfUhkMwTK79De5U0eKPCAuHhSq8wYbwr3M++e9wAaOz9K0P3H48OZnILfgptTk082Lb+/YeANvlze+u++Fkk5S5D4N3Ofs9V7RZqo4rNMjwidGDJ5aMhTElfdb/31DirFMWBVe6mzwHeUUxFzzVk50yVVGRKpX2FKcrgfey/q7IbbEOZC1TwWMpfyjmTRWkkdkZyCsiX6Kzbxwa/o5CoQ5VP38Mddx9wRPoE4OItsw7tV7bP/nfebuRTXgoVsBUDEJbBPPEW3Gf4BopJUFhDnJy8eZrjP6VXk7g084KTEfTUSKlyBqKOdkUEa6N6kabWwJE4Bkn7+7MqAOC92BININEdgX+2l3Xx6261g7bw0SXDnk4oepm309MvvrPuCWzys7N2gUnjiGow1MqmIjgHHqCfwS0ZWP5GJKO9B5YkRqJAzByyxPV82tZgFPOnpyFALUDnZjCW+2UaX1zoFNDMU+kRdVRfVIncAQLxrlxznTecb/oM2cdWM6PLgWAz9adeWBr/X7Abknmbb6BXSXpppe+uF1r1yAgo5jUEW34jQfbqGK5ptf5NmhFN2x2JdrtqSIrVVhs/KXOlTsN3VogDop92M="
-
 script:
-  - ./gradlew clean build :kategory-docs:runAnk
+  - ./gradlew clean build :arrow-docs:runAnk
   - ./gradlew codeCoverageReport
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
   - ./deploy-scripts/deploy.sh
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  local_dir: arrow-docs/build/site
+  on:
+    branch: master

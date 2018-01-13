@@ -1,0 +1,22 @@
+<!-- Jquery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<!-- Highlight -->
+<script src="{{ '/js/highlight.pack.js' | relative_url }}"></script>
+<script>
+hljs.configure({
+    languages:['kotlin']
+    });
+    hljs.initHighlighting();
+</script>
+<!-- Touch gesture support -->
+<script src="{{ '/js/hammer.min.js' | relative_url }}"></script>
+<!-- Custom scripts for this template -->
+<script src="{{ '/js/functions.js' | relative_url }}"></script>
+
+<!-- Gitter -->
+<script>
+  ((window.gitter = {}).chat = {}).options = {
+    room: 'arrow-kt/Lobby'
+  };
+</script>
+<script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>
