@@ -1,16 +1,16 @@
 package arrow.effects
 
+import arrow.test.UnitSpec
+import arrow.test.laws.AsyncLaws
+import arrow.test.laws.FoldableLaws
+import arrow.test.laws.TraverseLaws
+import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
 import org.junit.runner.RunWith
-import arrow.test.UnitSpec
-import arrow.test.laws.AsyncLaws
-import arrow.test.laws.FoldableLaws
-import arrow.test.laws.TraverseLaws
-import arrow.typeclasses.*
 import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
@@ -77,7 +77,7 @@ class ObservableKWTest : UnitSpec() {
             val value: Observable<Long> = ObservableKW.monadErrorFlat().bindingE {
                 val a = Observable.timer(2, TimeUnit.SECONDS).k().bind()
                 nextThread = Thread.currentThread()
-                val b = Observable.just(a).observeOn(Schedulers.io()).k().bind()
+                val b = Observable.just(a).observeOn(Schedulers.newThread()).k().bind()
                 yields(b)
             }.value()
             val test: TestObserver<Long> = value.test()
