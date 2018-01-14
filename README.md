@@ -1,6 +1,6 @@
 <img height="100" src="https://avatars2.githubusercontent.com/u/29458023?v=4&amp;s=200" width="100">
 
-[![Download](https://api.bintray.com/packages/arrow-kt/arrow-kt/arrow/images/download.svg)](https://bintray.com/arrow-kt/arrow-kt/)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
 [![Build Status](https://travis-ci.org/arrow-kt/arrow.svg?branch=master)](https://travis-ci.org/arrow-kt/arrow/)
 [![Kotlin version badge](https://img.shields.io/badge/kotlin-1.2.0-blue.svg)](http://kotlinlang.org/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
@@ -21,17 +21,6 @@ It includes the most popular data types, type classes and abstractions such as `
 - [Blogs and Presentations](http://arrow-kt.io/docs/quickstart/blogs/)
 
 # Basic Setup
-
-Add it in your root `build.gradle` at the end of repositories.
-
-```groovy
-allprojects {
-    repositories {
-        jcenter()
-        maven { url 'https://dl.bintray.com/arrow-kt/arrow-kt' }
-    }
-}
-```
 
 Add the dependencies into the project's `build.gradle`
 
