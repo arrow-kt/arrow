@@ -1,8 +1,9 @@
 package arrow.data
 
-import arrow.*
+import arrow.HK
 import arrow.core.*
-import arrow.legacy.*
+import arrow.higherkind
+import arrow.legacy.Disjunction
 import arrow.typeclasses.Applicative
 
 typealias Failure<A> = Try.Failure<A>
@@ -108,7 +109,7 @@ sealed class Try<out A> : TryKind<A> {
         if (isSuccess()) f(get())
     }
 
-    @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("map { f(it); it }"))
+    @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("onSuccess(f)"))
     fun onEach(f: (A) -> Unit): Try<A> = map {
         f(it)
         it
@@ -119,20 +120,16 @@ sealed class Try<out A> : TryKind<A> {
     @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("getOrElse { ifEmpty }"))
     abstract fun get(): A
 
-    @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("map { body(it); it }"))
-    fun onSuccess(body: (A) -> Unit): Try<A> {
-        foreach(body)
-        return this
+    fun onSuccess(body: (A) -> Unit): Try<A> = map {
+        body(it)
+        it
     }
 
-    @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("fold ({ Try { body(it); it }}, { Try.pure(it) })"))
-    fun onFailure(body: (Throwable) -> Unit): Try<A> = when (this) {
-        is Success -> this
-        is Failure -> {
-            body(exception)
-            this
-        }
-    }
+    fun onFailure(body: (Throwable) -> Unit): Try<A> =
+            fold({
+                body(it)
+                Try.raise(it)
+            }, { Try.pure(it) })
 
     fun toOption(): Option<A> = fold({ None }, { Some(it) })
 
