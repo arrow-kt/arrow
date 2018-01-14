@@ -25,7 +25,6 @@ data class Typeclass(
             } else {
                 ""
             }
-    val typeConstraints = target.classOrPackageProto.typeConstraints()
     val name: String = clazz.nameResolver.getString(clazz.classProto.fqName).replace("/", ".")
     val simpleName = name.substringAfterLast(".")
 }

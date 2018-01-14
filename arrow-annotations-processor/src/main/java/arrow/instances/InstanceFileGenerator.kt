@@ -2,10 +2,8 @@ package arrow.instances
 
 import java.io.File
 import arrow.common.Package
-import arrow.common.utils.ClassOrPackageDataWrapper
-import arrow.common.utils.extractFullName
-import arrow.common.utils.removeBackticks
-import arrow.common.utils.typeConstraints
+import arrow.common.messager.logW
+import arrow.common.utils.*
 import me.eugeniomarletti.kotlin.metadata.modality
 import org.jetbrains.kotlin.serialization.ProtoBuf
 import org.jetbrains.kotlin.serialization.deserialization.TypeTable

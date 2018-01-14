@@ -1,5 +1,6 @@
 package arrow.common.utils
 
+import arrow.common.messager.logW
 import arrow.implicits.implicitAnnotationName
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
 import me.eugeniomarletti.kotlin.metadata.KotlinMetadata
@@ -39,6 +40,8 @@ interface ProcessorUtils : KotlinMetadataUtils {
         getFunctionOrNull(methodElement, nameResolver, functionList)
             ?: knownError("Can't find annotated method ${methodElement.jvmMethodSignature}")
 
+    private fun kindedRex() = "(?i)Kind<(.)>".toRegex()
+
     fun recurseTypeclassInterfaces(
             current: ClassOrPackageDataWrapper.Class,
             typeTable: TypeTable,
@@ -46,17 +49,22 @@ interface ProcessorUtils : KotlinMetadataUtils {
         val interfaces = current.classProto.supertypes(typeTable).map {
             it.extractFullName(current, failOnGeneric = false)
         }.filter {
-            it != "`arrow`.`TC`"
+            val isKinded = it.removeBackticks() == "arrow.typeclasses.SemigroupKind<A>"
+            it != "`arrow`.`TC`" && !isKinded
         }
         return when {
             interfaces.isEmpty() -> acc
             else -> {
                 interfaces.flatMap { i ->
-                    val className = i.removeBackticks().substringBefore("<")
-                    val typeClassElement = elementUtils.getTypeElement(className)
-                    val parentInterface = getClassOrPackageDataWrapper(typeClassElement)
-                    val newAcc = acc + parentInterface
-                    recurseTypeclassInterfaces(parentInterface as ClassOrPackageDataWrapper.Class, typeTable, newAcc)
+                    try {
+                        val className = i.removeBackticks().substringBefore("<")
+                        val typeClassElement = elementUtils.getTypeElement(className)
+                        val parentInterface = getClassOrPackageDataWrapper(typeClassElement)
+                        val newAcc = acc + parentInterface
+                        recurseTypeclassInterfaces(parentInterface as ClassOrPackageDataWrapper.Class, typeTable, newAcc)
+                    } catch (_: Throwable) {
+                        emptyList<ClassOrPackageDataWrapper>()
+                    }
                 }
             }
         }
