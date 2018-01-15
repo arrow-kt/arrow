@@ -150,7 +150,8 @@ import arrow.legacy.*
     /**
      * The left side of the disjoint union, as opposed to the [Right] side.
      */
-    data class Left<out A, out B>(val a: A) : Either<A, B>() {
+    @Suppress("DataClassPrivateConstructor")
+    data class Left<out A, out B> private constructor(val a: A) : Either<A, B>() {
         override val isLeft = true
         override val isRight = false
 
@@ -162,7 +163,8 @@ import arrow.legacy.*
     /**
      * The right side of the disjoint union, as opposed to the [Left] side.
      */
-    data class Right<out A, out B>(val b: B) : Either<A, B>() {
+    @Suppress("DataClassPrivateConstructor")
+    data class Right<out A, out B> private constructor(val b: B) : Either<A, B>() {
         override val isLeft = false
         override val isRight = true
 
