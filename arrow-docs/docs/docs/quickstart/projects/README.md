@@ -6,7 +6,9 @@ permalink: /docs/quickstart/projects/
 
 ## Projects & Examples
 
-TODO: expand
+Note for proggitors: These are example projects.
+
+The documentation for the API is <---- that way clicking on the other buttons.
 
 #### Libraries
 
