@@ -8,7 +8,7 @@ permalink: /docs/quickstart/projects/
 
 Note for proggitors: These are example projects.
 
-The documentation for the API is <---- that way clicking on the other buttons.
+The documentation and examples of the API are <---- that way clicking on the other buttons.
 
 #### Libraries
 
