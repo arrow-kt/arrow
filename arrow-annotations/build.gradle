@@ -1,0 +1,8 @@
+apply plugin: 'kotlin'
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    compile "io.kindedj:kindedj:1.1.0"
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
