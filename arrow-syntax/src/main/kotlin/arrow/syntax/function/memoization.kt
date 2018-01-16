@@ -215,6 +215,6 @@ private data class MemoizeKey22<out P1, out P2, out P3, out P4, out P5, out P6, 
 
 private class MemoizedHandler<F, in K : MemoizedCall<F, R>, out R>(val f: F) {
     private val m = newConcurrentMap<K, R>()
-    operator fun invoke(k: K): R = m[k] ?: run({ m.putSafely(k, k(f)) })
+    operator fun invoke(k: K): R = m[k] ?: run { m.putSafely(k, k(f)) }
 }
 
