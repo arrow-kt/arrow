@@ -1,6 +1,6 @@
 package arrow.syntax.function
 
-import java.util.concurrent.ConcurrentHashMap
+import arrow.syntax.internal.Platform.newConcurrentMap
 
 fun <R> (() -> R).memoize(): () -> R = object : () -> R {
     private val m = MemoizedHandler<() -> R, MemoizeKey0<R>, R>(this@memoize)
@@ -214,11 +214,9 @@ private data class MemoizeKey22<out P1, out P2, out P3, out P4, out P5, out P6, 
 }
 
 private class MemoizedHandler<F, in K : MemoizedCall<F, R>, out R>(val f: F) {
-    private val m = ConcurrentHashMap<K, R>()
+    private val m = newConcurrentMap<K, R>()
     operator fun invoke(k: K): R = m[k] ?: run({
-        val r = k(f)
-        m.putIfAbsent(k, r)
-        r
+        m[k].let { it ?: k(f).also { m[k] = it } }
     })
 }
 
