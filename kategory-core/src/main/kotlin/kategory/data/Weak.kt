@@ -39,7 +39,7 @@ data class Weak<out A>(val provider: () -> A?) : WeakKind<A> {
 
     inline fun <B> map(crossinline f: (A) -> B): Weak<B> = fold({ emptyWeak() }, { f(it).weak() })
 
-    inline fun <B> flatMap(crossinline f: (A) -> Weak<B>): Weak<B> = fold({ emptyWeak() }, { a -> f(a) })
+    inline fun <B> flatMap(crossinline f: (A) -> WeakKind<B>): Weak<B> = fold({ emptyWeak() }, { a -> f(a).ev() })
 
     /**
      * Returns this Weak as long as the provided predicate confirms the value is to be kept
