@@ -4,7 +4,9 @@ title: Quick Start
 permalink: /docs/
 ---
 
-[![Download](https://api.bintray.com/packages/arrow-kt/arrow-kt/arrow/images/download.svg)](https://bintray.com/arrow-kt/arrow-kt/)
+NOTE: The docs are currently at around 50% completion. They're the present priority project, and you can track the progress on the github issue [#311](https://github.com/arrow-kt/arrow/issues/311).
+
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
 [![Build Status](https://travis-ci.org/arrow-kt/arrow.svg?branch=master)](https://travis-ci.org/arrow-kt/arrow/)
 [![Kotlin version badge](https://img.shields.io/badge/kotlin-1.2.0-blue.svg)](http://kotlinlang.org/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
@@ -26,17 +28,6 @@ Use the list below to learn more about Λrrow's main features.
 
 # Basic Setup
 
-Add it in your root `build.gradle` at the end of repositories.
-
-```groovy
-allprojects {
-    repositories {
-        jcenter()
-        maven { url 'https://dl.bintray.com/arrow-kt/arrow-kt' }
-    }
-}
-```
-
 Add the dependencies into the project's `build.gradle`
 
 ```groovy
@@ -50,6 +41,7 @@ dependencies {
     compile 'io.arrow-kt:arrow-mtl:0.5.5' //optional
     compile 'io.arrow-kt:arrow-effects:0.5.5' //optional
     compile 'io.arrow-kt:arrow-effects-rx2:0.5.5' //optional
+    compile 'io.arrow-kt:arrow-effects-kotlinx-coroutines:0.5.5' //optional
     compile 'io.arrow-kt:arrow-optics:0.5.5' //optional
 }
 ```

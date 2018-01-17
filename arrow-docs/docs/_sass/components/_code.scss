@@ -19,3 +19,21 @@ p {
     font-size: 0.875rem;
     box-shadow: $box-shadow-item;
 }
+
+.hljs {
+  display: block;
+  overflow-x: auto;
+  color: #383a42;
+  background: #fafafa;
+}
+
+.hljs-doctag,
+.hljs-keyword,
+.hljs-formula {
+  color: #4172DD;
+}
+
+.hljs-built_in,
+.hljs-class .hljs-title {
+  color: #F28B2D;
+}
