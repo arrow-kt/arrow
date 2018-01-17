@@ -2,48 +2,47 @@ package arrow.typeclasses
 
 import arrow.*
 
-
 /**
- * A type class used to get a textual representation for an instance of type [F] in a type safe way.
+ * A type class used to get a textual representation for an instance of type [A] in a type safe way.
  *
  */
 @typeclass
-interface Show<in F> : TC {
+interface Show<in A> : TC {
 
     /**
-     * Given an object [a] of type [F] it returns its textual representation.
+     * Given an object [a] of type [A] it returns its textual representation.
      *
-     * @param a object of type [F].
+     * @param a object of type [A].
      * @returns a [String] representing [a].
      */
-    fun show(a: F): String
+    fun show(a: A): String
 
     companion object {
 
         /**
-         * Construct a [Show] instance from a function `(F) -> String`
+         * Construct a [Show] instance from a function `(A) -> String`
          *
-         * @param fshow function that defines a textual representation for type [F].
+         * @param fshow function that defines a textual representation for type [A].
          * @returns a [Show] instance that is defined by the [fshow] function.
          */
-        operator inline fun <F> invoke(crossinline fshow: (F) -> String): Show<F> = object : Show<F> {
-            override fun show(a: F): String =
+        operator inline fun <A> invoke(crossinline fshow: (A) -> String): Show<A> = object : Show<A> {
+            override fun show(a: A): String =
                     fshow(a)
         }
 
         /**
          * Construct a [Show] instance using object `toString`.
          *
-         * @param a object of type [F].
-         * @returns a [Show] instance that is defined by the [F] `toString` method.
+         * @param a object of type [A].
+         * @returns a [Show] instance that is defined by the [A] `toString` method.
          */
-        fun <F> fromToString(a: F): Show<F> = object : Show<F> {
-            override fun show(a: F): String =
+        fun <A> fromToString(a: A): Show<A> = object : Show<A> {
+            override fun show(a: A): String =
                     a.toString()
         }
 
         /**
-         * Retrieve a [Show] that defines the textual representation as toString() for type [F].
+         * Retrieve a [Show] that defines the textual representation as toString() for type [A].
          */
         fun any(): Show<Any?> = ShowAny
 
