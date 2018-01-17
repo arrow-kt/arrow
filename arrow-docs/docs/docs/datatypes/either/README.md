@@ -232,6 +232,16 @@ val x = "hello".left()
 x.getOrElse { 7 }
 ```
 
+For creating Either instance based on a predicate, use `Either.cond()` method : 
+
+```kotlin:ank
+Either.cond(true, { 42 }, { "Error" })
+```
+
+```kotlin:ank
+Either.cond(false, { 42 }, { "Error" })
+```
+
 Another operation is `fold`. This operation will extract the value from the Either, or provide a default if the value is `Left`
  
  ```kotlin:ank

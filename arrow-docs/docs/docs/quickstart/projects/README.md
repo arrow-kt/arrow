@@ -6,7 +6,7 @@ permalink: /docs/quickstart/projects/
 
 ## Projects & Examples
 
-TODO: expand
+Note: This section keeps on growing! Keep an eye on it from time to time.
 
 #### Libraries
 

@@ -35,6 +35,7 @@ dependencies {
     compile 'io.arrow-kt:arrow-mtl:0.5.5' //optional
     compile 'io.arrow-kt:arrow-effects:0.5.5' //optional
     compile 'io.arrow-kt:arrow-effects-rx2:0.5.5' //optional
+    compile 'io.arrow-kt:arrow-effects-kotlinx-coroutines:0.5.5' //optional
     compile 'io.arrow-kt:arrow-optics:0.5.5' //optional
 }
 ```
