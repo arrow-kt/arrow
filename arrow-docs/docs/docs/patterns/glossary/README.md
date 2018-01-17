@@ -6,7 +6,7 @@ permalink: /docs/patterns/glossary/
 
 ## Functional Programming Glossary
 
-TODO: expand terms and usage
+Note: This section keeps on growing! Keep an eye on it from time to time.
 
 ### Datatypes
 
