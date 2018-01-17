@@ -6,9 +6,7 @@ permalink: /docs/quickstart/projects/
 
 ## Projects & Examples
 
-Note for proggitors: These are example projects.
-
-The documentation and examples of the API are <---- that way clicking on the other buttons.
+Note: This section keeps on growing! Keep an eye on it from time to time.
 
 #### Libraries
 
