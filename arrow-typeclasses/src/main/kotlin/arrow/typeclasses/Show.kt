@@ -33,10 +33,9 @@ interface Show<in A> : TC {
         /**
          * Construct a [Show] instance using object `toString`.
          *
-         * @param a object of type [A].
          * @returns a [Show] instance that is defined by the [A] `toString` method.
          */
-        fun <A> fromToString(a: A): Show<A> = object : Show<A> {
+        fun <A> fromToString(): Show<A> = object : Show<A> {
             override fun show(a: A): String =
                     a.toString()
         }
