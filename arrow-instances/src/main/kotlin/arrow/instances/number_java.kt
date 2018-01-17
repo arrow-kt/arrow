@@ -1,7 +1,6 @@
 package java_lang
 
 import arrow.instances.*
-import arrow.instances.LongShowInstanceImplicits
 import arrow.typeclasses.Semigroup
 
 object IntegerMonoidInstanceImplicits {
