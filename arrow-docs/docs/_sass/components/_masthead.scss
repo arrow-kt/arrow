@@ -93,5 +93,16 @@
                 background: rgba($brand-tertiary, 0.6);
             }
         }
+
+        .masthead-stars {
+          margin-top: $base-point-grid;
+            transform: translateZ(103px);
+            transform-style: preserve-3d;
+
+            a {
+              color: $white;
+              text-decoration: none;
+            }
+        }
     }
 }

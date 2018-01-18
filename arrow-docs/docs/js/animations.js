@@ -2,6 +2,15 @@
 // by this way avoiding any FOUC problems. Since jQuery is on the page we
 // take advantage of it.
 $(window).on("load", function() {
+
+    // Function to load GitHub stats, which expects a DOM element with 'stars' as id
+    (function loadGitHubStats() {
+        var gitHubAPI = "https://api.github.com/repos/arrow-kt/arrow?callback=?";
+        $.getJSON(gitHubAPI).done(function(data) {
+            $('#stars').text(data.data.stargazers_count);
+        });
+    })();
+
     // General injection duration
     var injectionDuration = 300;
 
