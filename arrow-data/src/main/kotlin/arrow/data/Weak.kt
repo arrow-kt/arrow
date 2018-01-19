@@ -1,20 +1,14 @@
-package kategory
+package arrow.data
 
 import java.lang.ref.WeakReference
+import arrow.*
+import arrow.core.*
 
 /**
  * Represents an object that can stop existing when no references to it exists. Backed by
- * a [WeakReference] instance.
+ * a [WeakReference] instance. In a similar fashion to [Option] this allows
  */
 @higherkind
-@deriving(
-    Functor::class,
-    Applicative::class,
-    Monad::class,
-    Foldable::class,
-    Traverse::class,
-    TraverseFilter::class,
-    MonadFilter::class)
 data class Weak<out A>(val provider: () -> A?) : WeakKind<A> {
 
     companion object {
