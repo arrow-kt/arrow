@@ -11,6 +11,7 @@ import arrow.test.UnitSpec
 import arrow.test.generators.genOption
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadFilterLaws
+import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseFilterLaws
 import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
@@ -40,6 +41,7 @@ class OptionTest : UnitSpec() {
             monoid<Option<Int>>() shouldNotBe null
             monadError<OptionHK, Unit>() shouldNotBe null
             eq<Option<Int>>() shouldNotBe null
+            show<Option<Int>>() shouldNotBe null
         }
 
         val EQ_EITHER: Eq<HK<OptionHK, Either<Unit, Int>>> = Eq { a, b ->
@@ -58,6 +60,7 @@ class OptionTest : UnitSpec() {
 
         testLaws(
                 EqLaws.laws(eq(), { genOption(Gen.int()).generate() }),
+                ShowLaws.laws(show(), eq(), { it }),
                 //testLaws(MonadErrorLaws.laws(monadError<OptionHK, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
                 TraverseFilterLaws.laws(Option.traverseFilter(), Option.monad(), ::Some, Eq.any()),
                 MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any())

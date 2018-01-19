@@ -50,6 +50,12 @@ interface OptionEqInstance<A> : Eq<Option<A>> {
 }
 
 @instance(Option::class)
+interface OptionShowInstance<A>: Show<Option<A>> {
+    override fun show(a: Option<A>): String =
+            a.toString()
+}
+
+@instance(Option::class)
 interface OptionFunctorInstance : Functor<OptionHK> {
     override fun <A, B> map(fa: OptionKind<A>, f: kotlin.Function1<A, B>): Option<B> =
             fa.ev().map(f)
