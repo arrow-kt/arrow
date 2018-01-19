@@ -18,6 +18,7 @@ import io.kotlintest.specs.StringSpec
  * The [Functor] typeclass abstracts the ability to map over the computational context of a type constructor.
  *
  * Examples of type constructors that can implement instances of the Functor typeclass include [Option], [NonEmptyList], [List] and many other datatypes that include a map function with the shape `fun F<B>.map(f: (A) -> B): F<B>` where `F` refers to [Option], [List] or any other type constructor whose contents can be transformed.
+ *
  * **/
 
 
