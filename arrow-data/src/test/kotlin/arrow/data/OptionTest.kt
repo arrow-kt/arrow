@@ -61,7 +61,7 @@ class OptionTest : UnitSpec() {
 
         testLaws(
                 EqLaws.laws(eq(), { genOption(Gen.int()).generate() }),
-                ShowLaws.laws(show(), eq(), { Some(it) }),
+                ShowLaws.laws(show(), eq(), { it.some() }),
                 //testLaws(MonadErrorLaws.laws(monadError<OptionHK, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
                 TraverseFilterLaws.laws(Option.traverseFilter(), Option.monad(), ::Some, Eq.any()),
                 MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any())
