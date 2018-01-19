@@ -3,10 +3,7 @@ package arrow.data
 import arrow.HK
 import arrow.core.*
 import arrow.test.UnitSpec
-import arrow.test.laws.EqLaws
-import arrow.test.laws.MonadErrorLaws
-import arrow.test.laws.SemigroupKLaws
-import arrow.test.laws.TraverseLaws
+import arrow.test.laws.*
 import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
@@ -30,10 +27,12 @@ class EitherTest : UnitSpec() {
             monadError<EitherKindPartial<Throwable>, Throwable>() shouldNotBe null
             semigroupK<EitherKindPartial<Throwable>>() shouldNotBe null
             eq<Either<String, Int>>() shouldNotBe null
+            show<Either<String, Int>>() shouldNotBe null
         }
 
         testLaws(
             EqLaws.laws(eq<Either<String, Int>>(), { Right(it) }),
+            ShowLaws.laws { Right(it) },
             MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()),
             TraverseLaws.laws(Either.traverse<Throwable>(), Either.applicative(), { Right(it) }, Eq.any()),
             SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ)
