@@ -7,6 +7,7 @@ import arrow.syntax.`try`.optionTry
 import arrow.syntax.collections.firstOption
 import arrow.syntax.collections.option
 import arrow.syntax.collections.optionSequential
+import arrow.syntax.option.some
 import arrow.test.UnitSpec
 import arrow.test.generators.genOption
 import arrow.test.laws.EqLaws
@@ -60,7 +61,7 @@ class OptionTest : UnitSpec() {
 
         testLaws(
                 EqLaws.laws(eq(), { genOption(Gen.int()).generate() }),
-                ShowLaws.laws(show(), eq(), { it }),
+                ShowLaws.laws(show(), eq(), { Some(it) }),
                 //testLaws(MonadErrorLaws.laws(monadError<OptionHK, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
                 TraverseFilterLaws.laws(Option.traverseFilter(), Option.monad(), ::Some, Eq.any()),
                 MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any())

@@ -50,7 +50,7 @@ interface OptionEqInstance<A> : Eq<Option<A>> {
 }
 
 @instance(Option::class)
-interface OptionShowInstance<A>: Show<Option<A>> {
+interface OptionShowInstance<A> : Show<Option<A>> {
     override fun show(a: Option<A>): String =
             a.toString()
 }

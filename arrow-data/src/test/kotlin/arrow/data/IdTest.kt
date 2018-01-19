@@ -24,7 +24,7 @@ class IdTest : UnitSpec() {
 
         testLaws(
             EqLaws.laws { Id(it) },
-            ShowLaws.laws { it },
+            ShowLaws.laws { Id(it) },
             MonadLaws.laws(Id.monad(), Eq.any()),
             TraverseLaws.laws(Id.traverse(), Id.functor(), ::Id),
             ComonadLaws.laws(Id.comonad(), ::Id, Eq.any())
