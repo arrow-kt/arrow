@@ -93,7 +93,7 @@ All exceptions that would happen on the function parameter are automatically cap
 ```kotlin
 DeferredKW { throw RuntimeException("Boom!") }
   .runAsync { result ->
-    result.fold(DeferredKW { println("Error found") }, DeferredKW { println(it.toString()) })
+    result.fold({ DeferredKW { println("Error found") } }, { res -> DeferredKW { println(res.toString()) } })
   }
 // Error found
 ```

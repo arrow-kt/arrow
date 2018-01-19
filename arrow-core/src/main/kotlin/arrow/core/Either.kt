@@ -150,24 +150,26 @@ import arrow.legacy.*
     /**
      * The left side of the disjoint union, as opposed to the [Right] side.
      */
-    data class Left<out A, out B>(val a: A, private val dummy: Unit) : Either<A, B>() {
+    @Suppress("DataClassPrivateConstructor")
+    data class Left<out A, out B> @PublishedApi internal constructor(val a: A) : Either<A, B>() {
         override val isLeft = true
         override val isRight = false
 
         companion object {
-            inline operator fun <A> invoke(a: A): Either<A, Nothing> = Left(a, Unit)
+            inline operator fun <A> invoke(a: A): Either<A, Nothing> = Left(a)
         }
     }
 
     /**
      * The right side of the disjoint union, as opposed to the [Left] side.
      */
-    data class Right<out A, out B>(val b: B, private val dummy: Unit) : Either<A, B>() {
+    @Suppress("DataClassPrivateConstructor")
+    data class Right<out A, out B> @PublishedApi internal constructor(val b: B) : Either<A, B>() {
         override val isLeft = false
         override val isRight = true
 
         companion object {
-            inline operator fun <B> invoke(b: B): Either<Nothing, B> = Right(b, Unit)
+            inline operator fun <B> invoke(b: B): Either<Nothing, B> = Right(b)
         }
     }
 
@@ -190,6 +192,8 @@ import arrow.legacy.*
                 }
             }
         }
+
+        fun <L, R> cond(test: Boolean, r: () -> R, l: () -> L): Either<L, R> = if (test) right(r()) else left(l())
 
     }
 }
