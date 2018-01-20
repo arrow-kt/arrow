@@ -18,7 +18,7 @@ Observable.from(7, 4, 11, 3)
   .toList()
   .subscribeOn(Schedulers.computation())
   .blockingFirst()
-// [8, 20, 24]
+//[8, 20, 24]
 ```
 
 ### Integration with your existing Observable chains
