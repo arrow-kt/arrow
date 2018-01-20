@@ -58,7 +58,7 @@ data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A>, Flowabl
             }.value()
 
     fun runAsync(cb: (Either<Throwable, A>) -> FlowableKWKind<Unit>): FlowableKW<Unit> =
-            FlowableKW { flowable.subscribe({ cb(Right(it)) }, { cb(Left(it)) }).let { } }
+            flowable.flatMap { cb(Right(it)).value() }.onErrorResumeNext(io.reactivex.functions.Function { cb(Left(it)).value() }).k()
 
     companion object {
         fun <A> pure(a: A): FlowableKW<A> =

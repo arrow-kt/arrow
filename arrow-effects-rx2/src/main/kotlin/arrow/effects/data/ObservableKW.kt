@@ -57,7 +57,7 @@ data class ObservableKW<A>(val observable: Observable<A>) : ObservableKWKind<A>,
             }.value()
 
     fun runAsync(cb: (Either<Throwable, A>) -> ObservableKWKind<Unit>): ObservableKW<Unit> =
-            ObservableKW.invoke { observable.subscribe({ cb(Right(it)) }, { cb(Left(it)) }).let { } }
+            observable.flatMap { cb(Right(it)).value() }.onErrorResumeNext(io.reactivex.functions.Function { cb(Left(it)).value() }).k()
 
     companion object {
         fun <A> pure(a: A): ObservableKW<A> =
