@@ -238,8 +238,8 @@ class IOTest : UnitSpec() {
             sideEffect.counter shouldBe 2
         }
 
-        "unsafeRunTimed times out with None result" {
-            val never = IO.async<Int> { }
+        "unsafeRunTimed times out never() with None result" {
+            val never = IO.async().never<Int>().ev()
             val result = never.unsafeRunTimed(100.milliseconds)
             result shouldBe None
         }
