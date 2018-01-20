@@ -11,7 +11,6 @@ dependencies {
     testCompileOnly project(':arrow-annotations-processor')
 
     testCompile project(':arrow-test')
-    testCompile project(':arrow-effects-test')
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"

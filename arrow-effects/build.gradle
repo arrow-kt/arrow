@@ -7,7 +7,7 @@ dependencies {
     compileOnly project(':arrow-annotations-processor')
     testCompileOnly project(':arrow-annotations-processor')
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
-    testCompile project(':arrow-effects-test')
+    testCompile project(':arrow-test')
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
