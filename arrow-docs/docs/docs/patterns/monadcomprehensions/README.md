@@ -199,7 +199,7 @@ There are multiple default values and wrappers for common cases in both the stan
 In any `binding()` block there is a helper function `bindIn()` that takes a `CoroutineContext` as a parameter and can return any value. This value will be lifted into a data type using `pure`.
 A second version called `bindInM()` requires returning an instance of a data type the same way `binding()` does.
 
-The functions will cause a new coroutine to start on the `CoroutineContext` passed as a parameter to then `bind()` to await for its completion.
+The functions will cause a new coroutine to start on the `CoroutineContext` passed as a parameter to then `bind()` to await for its completion in a non-blocking way.
 
 ```kotlin
 val ioThreadContext = newSingleThreadContext("IO")
@@ -209,7 +209,7 @@ fun getLineLengthAverage(path: FilePath): IO<List<String>> =
   IO.monadError().bindingE {
     
     // Wrapping the operation into a suspended asynchronous IO then using bindInM to bind it
-    val file = bindInM(ioThreadContext) { IO.pure(getFile(path)) }
+    val file = bindInM(ioThreadContext) { IO { getFile(path) } }
     
     // Implicitly wrap the result of a synchronous operation into IO.pure() using bindIn
     val lines = bindIn(computationThreadContext) { file.readLines() }
@@ -219,56 +219,6 @@ fun getLineLengthAverage(path: FilePath): IO<List<String>> =
     yields(average)
   }
 ```
-
-Note that `bindIn()` and `bindInM()` don't assure that the execution will return to the same thread where the binding started, as it depends on the implementation of the data type.
-This means that for the previous snippet [`IO`]({{ '/docs/effects/io' | relative_url }}) may calculate count and average on different threads than what [`Option`]({{ '/docs/datatypes/option' | relative_url }}) or [`Try`]({{ '/docs/datatypes/try' | relative_url }}) would.
-
-#### Gotchas: lazy evaluation and suspension
-
-It is important to understand that only the block inside `bindInM()` will run on a background thread.
-It could be the case that deferred operations using lambdas inside the block would only run those lambdas on the final execution thread.
-See this example:
-
-```kotlin
-val tc1 = newSingleThreadContext("T1")
-val tc2 = newSingleThreadContext("T2")
-
-IO.monad().binding {
-  val a = bindInM(tc1){ IO { Thread.currentThread().name } }
-  val b = bindIn(tc2) { "in ${Thread.currentThread().name} after $a"}
-  yields(b)
-}.ev().unsafeRunSync()
-//in T2 after main
-```
-
-this is caused by `IO` suspending the function `Thread.currentThread().name` in `a`.
-The function isn't executed until `unsafeRunSync()` is called in the current main thread.
-The fix is trivial simply by capturing the thread name from the outer scope
-
-```kotlin
-IO.monad().binding {
-    val a = bindInM(tc1){ 
-      val name = Thread.currentThread().name
-      IO { name } 
-    }
-    val b = bindIn(tc2) { "in ${Thread.currentThread().name} after $a" }
-    yields(b)
-}.ev().unsafeRunSync()
-//in T2 after T1
-```
-
-or making the evaluation happen eagerly
-
-```kotlin
-IO.monad().binding {
-    val a = bindInM(tc1){ IO.pure(Thread.currentThread().name) }
-    val b = bindIn(tc2) { "in ${Thread.currentThread().name} after $a" }
-    yields(b)
-}.ev().unsafeRunSync()
-//in T2 after T1
-```
-
-which makes it very visual to understand that `bindIn()` is just an alias for a `bindInM()` that calls the constructor `pure()`.
 
 ### What if I'd like to run multiple operations independently from each other, in a non-sequential way?
 
