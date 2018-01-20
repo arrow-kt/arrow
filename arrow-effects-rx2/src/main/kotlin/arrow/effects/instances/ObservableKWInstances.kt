@@ -15,7 +15,6 @@ interface ObservableKWMonadErrorInstance :
             fa.handleErrorWith { f(it).ev() }
 }
 
-
 @instance(ObservableKW::class)
 interface ObservableKWSyncInstance :
         ObservableKWMonadErrorInstance,
