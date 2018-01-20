@@ -1,32 +1,37 @@
 package arrow.effects
 
-import arrow.*
+import arrow.HK
+import arrow.TC
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
+import arrow.typeclass
 
 /** An asynchronous computation that might fail. **/
 typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
 
-/** The context required to run an asynchronous computation. **/
+/** The context required to run an asynchronous computation that may fail. **/
 @typeclass
-interface AsyncContext<out F> : TC {
-    fun <A> runAsync(fa: Proc<A>): HK<F, A>
+interface Async<F> : Sync<F>, TC {
+    fun <A> async(fa: Proc<A>): HK<F, A>
+
+    fun <A> never(): HK<F, A> =
+            async { }
+
+    override operator fun <A> invoke(fa: () -> A): HK<F, A> =
+            async { ff: (Either<Throwable, A>) -> Unit ->
+                try {
+                    ff(Right(fa()))
+                } catch (e: Throwable) {
+                    ff(Left(e))
+                }
+            }
+
+    fun <A> deferUnsafe(f: () -> Either<Throwable, A>): HK<F, A> =
+            async { ff: (Either<Throwable, A>) -> Unit -> ff(f()) }
 }
 
-inline fun <F, A> runAsync(AC: AsyncContext<F>, crossinline f: () -> A): HK<F, A> =
-        AC.runAsync { ff: (Either<Throwable, A>) -> Unit ->
-            try {
-                ff(Right(f()))
-            } catch (e: Throwable) {
-                ff(Left(e))
-            }
-        }
+inline fun <reified F, A> (() -> A).defer(AC: Async<F> = async()): HK<F, A> = AC(this)
 
-suspend inline fun <reified F, A> (() -> A).runAsync(AC: AsyncContext<F> = asyncContext()): HK<F, A> = runAsync(AC, this)
-
-inline fun <F, A> runAsyncUnsafe(AC: AsyncContext<F>, crossinline f: () -> Either<Throwable, A>): HK<F, A> =
-        AC.runAsync { ff: (Either<Throwable, A>) -> Unit -> ff(f()) }
-
-suspend inline fun <reified F, A> (() -> Either<Throwable, A>).runAsyncUnsafe(AC: AsyncContext<F> = asyncContext()): HK<F, A> =
-        runAsyncUnsafe(AC, this)
+inline fun <reified F, A> (() -> Either<Throwable, A>).deferUnsafe(AC: Async<F> = async()): HK<F, A> =
+        AC.deferUnsafe(this)
