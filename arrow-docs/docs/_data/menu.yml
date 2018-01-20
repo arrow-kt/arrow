@@ -208,8 +208,14 @@ options:
       - title: IO
         url: /docs/effects/io/
 
+      - title: Sync
+        url: /docs/effects/sync/
+
       - title: Async
         url: /docs/effects/async/
+
+      - title: Effect
+        url: /docs/effects/effect/
 
   - title: Optics
 
