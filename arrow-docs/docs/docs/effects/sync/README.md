@@ -6,7 +6,7 @@ permalink: /docs/effects/sync/
 
 ## Sync
 
-`Sync` is a typeclass representing suspension of execution via functions, allowing for asyncronous and lazy computations.
+`Sync` is a typeclass representing suspension of execution via functions, allowing for asynchronous and lazy computations.
 
 `Sync` includes all combinators present in [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}).
 
@@ -23,7 +23,7 @@ IO.sync().invoke { 1 }
 As it captures exceptions, `invoke()` is the simplest way of wrapping existing synchronous APIs.
 
 ```kotlin
-fun <F> getSongUrlAsync(SC: Sync<F> = asycContext()) =
+fun <F> getSongUrlAsync(SC: Sync<F> = sync()) =
   SC { getSongUrl() }
 
 val songIO: IO<Url> = getSongUrlAsync().ev()
@@ -71,14 +71,26 @@ lazyResult
 //Print: lazy
 ```
 
+#### deferUnsafe
+
+Takes as a parameter a function that returns `Either<Throwable, A>`.
+The left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution.
+This function is assumed to never throw any internal exceptions.
+
+```kotlin
+IO.async()
+  .deferUnsafe { throw RuntimeException() }
+  .unsafeRunSync()
+// ERROR!! The program crashes
+```
+
+> deferUnsafe() exists for performance purposes when throwing can be avoided.
+
 ### Syntax
 
 #### (() -> A)#defer
 
-Runs the current function in the Async passed as a parameter. It doesn't await for its result.
-Use `bind()` on the return, or the alias `bindAsync()`.
-
-All exceptions are wrapped.
+Wraps the current function in the Sync passed as a parameter. All exceptions are wrapped.
 
 ```kotlin
 { fibonacci(100) }.defer(ObservableKW.sync())
@@ -92,6 +104,26 @@ All exceptions are wrapped.
 { throw RuntimeException("Boom") }
   .defer(IO.sync())
   .ev().attempt().unsafeRunAsync { }
+```
+
+#### (() -> Either<Throwable, A>)#deferUnsafe
+
+Runs the current function in the `Sync` passed as a parameter.
+
+While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution.
+
+```kotlin
+{ fibonacci(100).left() }.deferUnsafe(ObservableKW.sync())
+```
+
+```kotlin
+{ fibonacci(100).left() }.deferUnsafe(IO.sync())
+```
+
+```kotlin
+{ RuntimeException("Boom").right() }
+  .deferUnsafe(IO.sync())
+  .ev().attempt().unsafeRunSync()
 ```
 
 ### Data types

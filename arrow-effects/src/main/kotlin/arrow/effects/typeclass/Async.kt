@@ -15,10 +15,4 @@ interface Async<F> : Sync<F>, TC {
 
     fun <A> never(): HK<F, A> =
             async { }
-
-    fun <A> deferUnsafe(f: () -> Either<Throwable, A>): HK<F, A> =
-            async { ff: (Either<Throwable, A>) -> Unit -> ff(f()) }
 }
-
-inline fun <reified F, A> (() -> Either<Throwable, A>).deferUnsafe(AC: Async<F> = async()): HK<F, A> =
-        AC.deferUnsafe(this)

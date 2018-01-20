@@ -78,51 +78,13 @@ IO.async()
 // ERROR!! The program blocks the current thread forever.
 ```
 
-> never() exists to test datatypes that can handle non-termination. For example, IO has unsafeRunTimed.
+> never() exists to test datatypes that can handle non-termination.
+For example, IO has unsafeRunTimed that runs never() safely.
 
-#### deferUnsafe
-
-Takes as a parameter a function that returns `Either<Throwable, A>`.
-The left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution.
-This function is assumed to never throw any internal exceptions.
-
-Use with *SEVERE CAUTION*.
-
-```kotlin
-IO.async()
-  .deferUnsafe { throw RuntimeException() }
-  .unsafeRunSync()
-// ERROR!! The program crashes
-```
-
-> deferUnsafe() exists for performance purposes when throwing can be avoided.
-
-### Syntax
+### Syntax available inside Monad Comprehensions
 
 All the syntax functions are geared towards using `Async` inside [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }})
 to create blocks of code to be run asynchronously.
-
-#### (() -> Either<Throwable, A>)#deferUnsafe
-
-Runs the current function in the Async passed as a parameter.
-
-While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution.
-
-```kotlin
-{ fibonacci(100).left() }.deferUnsafe(ObservableKW.async())
-```
-
-```kotlin
-{ fibonacci(100).left() }.deferUnsafe(IO.async())
-```
-
-```kotlin
-{ RuntimeException("Boom").right() }
-  .deferUnsafe(IO.async())
-  .ev().attempt().unsafeRunSync()
-```
-
-### Syntax only available inside Monad Comprehensions
 
 #### binding#bindAsync
 
