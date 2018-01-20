@@ -15,8 +15,8 @@ interface Sync<F> : MonadError<F, Throwable>, TC {
             suspend {
                 try {
                     pure(fa())
-                } catch (e: Exception) {
-                    raiseError<A>(e)
+                } catch (t: Throwable) {
+                    raiseError<A>(t)
                 }
             }
 
