@@ -1,11 +1,13 @@
 package arrow.effects
 
-import io.reactivex.Observable
-import io.reactivex.ObservableEmitter
-import arrow.*
+import arrow.HK
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.deriving
+import arrow.higherkind
 import arrow.typeclasses.*
+import io.reactivex.Observable
+import io.reactivex.ObservableEmitter
 
 fun <A> Observable<A>.k(): ObservableKW<A> = ObservableKW(this)
 
@@ -17,7 +19,6 @@ fun <A> ObservableKWKind<A>.value(): Observable<A> =
         Functor::class,
         Applicative::class,
         Monad::class,
-        AsyncContext::class,
         Foldable::class,
         Traverse::class
 )
@@ -59,6 +60,9 @@ data class ObservableKW<A>(val observable: Observable<A>) : ObservableKWKind<A>,
 
         fun <A> raiseError(t: Throwable): ObservableKW<A> =
                 Observable.error<A>(t).k()
+
+        fun <A> suspend(fa: () -> ObservableKWKind<A>): ObservableKW<A> =
+                Observable.defer { fa().value() }.k()
 
         fun <A> runAsync(fa: Proc<A>): ObservableKW<A> =
                 Observable.create { emitter: ObservableEmitter<A> ->

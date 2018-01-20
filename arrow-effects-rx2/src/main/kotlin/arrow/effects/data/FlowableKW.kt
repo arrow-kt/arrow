@@ -1,12 +1,14 @@
 package arrow.effects
 
+import arrow.HK
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.deriving
+import arrow.higherkind
+import arrow.typeclasses.*
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.FlowableEmitter
-import arrow.*
-import arrow.core.Either
-import arrow.core.Eval
-import arrow.typeclasses.*
 
 fun <A> Flowable<A>.k(): FlowableKW<A> = FlowableKW(this)
 
@@ -60,6 +62,9 @@ data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A>, Flowabl
         fun <A> raiseError(t: Throwable): FlowableKW<A> =
                 Flowable.error<A>(t).k()
 
+        fun <A> suspend(fa: () -> FlowableKWKind<A>): FlowableKW<A> =
+                Flowable.defer { fa().value() }.k()
+
         fun <A> runAsync(fa: Proc<A>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableKW<A> =
                 Flowable.create({ emitter: FlowableEmitter<A> ->
                     fa { either: Either<Throwable, A> ->
@@ -105,21 +110,57 @@ data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A>, Flowabl
                     fa.ev().switchMap { f(it).ev() }
         }
 
-        fun asyncContextBuffer(): FlowableKWAsyncContextInstance = FlowableKWAsyncContextInstanceImplicits.instance()
+        fun syncBuffer(): FlowableKWSyncInstance = FlowableKWSyncInstanceImplicits.instance()
 
-        fun asyncContextDrop(): FlowableKWAsyncContextInstance = object : FlowableKWAsyncContextInstance {
+        fun syncDrop(): FlowableKWSyncInstance = object : FlowableKWSyncInstance {
             override fun BS(): BackpressureStrategy = BackpressureStrategy.DROP
         }
 
-        fun asyncContextError(): FlowableKWAsyncContextInstance = object : FlowableKWAsyncContextInstance {
+        fun syncError(): FlowableKWSyncInstance = object : FlowableKWSyncInstance {
             override fun BS(): BackpressureStrategy = BackpressureStrategy.ERROR
         }
 
-        fun asyncContextLatest(): FlowableKWAsyncContextInstance = object : FlowableKWAsyncContextInstance {
+        fun syncLatest(): FlowableKWSyncInstance = object : FlowableKWSyncInstance {
             override fun BS(): BackpressureStrategy = BackpressureStrategy.LATEST
         }
 
-        fun asyncContextMissing(): FlowableKWAsyncContextInstance = object : FlowableKWAsyncContextInstance {
+        fun syncMissing(): FlowableKWSyncInstance = object : FlowableKWSyncInstance {
+            override fun BS(): BackpressureStrategy = BackpressureStrategy.MISSING
+        }
+
+        fun asyncBuffer(): FlowableKWAsyncInstance = FlowableKWAsyncInstanceImplicits.instance()
+
+        fun asyncDrop(): FlowableKWAsyncInstance = object : FlowableKWAsyncInstance {
+            override fun BS(): BackpressureStrategy = BackpressureStrategy.DROP
+        }
+
+        fun asyncError(): FlowableKWAsyncInstance = object : FlowableKWAsyncInstance {
+            override fun BS(): BackpressureStrategy = BackpressureStrategy.ERROR
+        }
+
+        fun asyncLatest(): FlowableKWAsyncInstance = object : FlowableKWAsyncInstance {
+            override fun BS(): BackpressureStrategy = BackpressureStrategy.LATEST
+        }
+
+        fun asyncMissing(): FlowableKWAsyncInstance = object : FlowableKWAsyncInstance {
+            override fun BS(): BackpressureStrategy = BackpressureStrategy.MISSING
+        }
+
+        fun effectBuffer(): FlowableKWEffectInstance = FlowableKWEffectInstanceImplicits.instance()
+
+        fun effectDrop(): FlowableKWEffectInstance = object : FlowableKWEffectInstance {
+            override fun BS(): BackpressureStrategy = BackpressureStrategy.DROP
+        }
+
+        fun effectError(): FlowableKWEffectInstance = object : FlowableKWEffectInstance {
+            override fun BS(): BackpressureStrategy = BackpressureStrategy.ERROR
+        }
+
+        fun effectLatest(): FlowableKWEffectInstance = object : FlowableKWEffectInstance {
+            override fun BS(): BackpressureStrategy = BackpressureStrategy.LATEST
+        }
+
+        fun effectMissing(): FlowableKWEffectInstance = object : FlowableKWEffectInstance {
             override fun BS(): BackpressureStrategy = BackpressureStrategy.MISSING
         }
     }
