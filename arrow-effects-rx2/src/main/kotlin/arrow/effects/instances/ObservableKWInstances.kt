@@ -36,5 +36,5 @@ interface ObservableKWEffectInstance :
         ObservableKWAsyncInstance,
         Effect<ObservableKWHK> {
     override fun <A> runAsync(fa: ObservableKWKind<A>, cb: (Either<Throwable, A>) -> ObservableKWKind<Unit>): ObservableKW<Unit> =
-            TODO()
+            fa.ev().runAsync(cb)
 }

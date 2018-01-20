@@ -3,6 +3,8 @@ package arrow.effects
 import arrow.HK
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.Left
+import arrow.core.Right
 import arrow.deriving
 import arrow.higherkind
 import arrow.typeclasses.*
@@ -54,12 +56,18 @@ data class ObservableKW<A>(val observable: Observable<A>) : ObservableKWKind<A>,
                 GA.map2Eval(f(a), eval) { Observable.concat(Observable.just<B>(it.a), it.b.observable).k() }
             }.value()
 
+    fun runAsync(cb: (Either<Throwable, A>) -> ObservableKWKind<Unit>): ObservableKW<Unit> =
+            ObservableKW.invoke { observable.subscribe({ cb(Right(it)) }, { cb(Left(it)) }).let { } }
+
     companion object {
         fun <A> pure(a: A): ObservableKW<A> =
                 Observable.just(a).k()
 
         fun <A> raiseError(t: Throwable): ObservableKW<A> =
                 Observable.error<A>(t).k()
+
+        operator fun <A> invoke(fa: () -> A): ObservableKW<A> =
+                suspend { pure(fa()) }
 
         fun <A> suspend(fa: () -> ObservableKWKind<A>): ObservableKW<A> =
                 Observable.defer { fa().value() }.k()

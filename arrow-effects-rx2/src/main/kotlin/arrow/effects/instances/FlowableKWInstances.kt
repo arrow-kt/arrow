@@ -1,9 +1,9 @@
 package arrow.effects
 
 import arrow.core.Either
-import io.reactivex.BackpressureStrategy
-import arrow.typeclasses.MonadError
 import arrow.instance
+import arrow.typeclasses.MonadError
+import io.reactivex.BackpressureStrategy
 
 @instance(FlowableKW::class)
 interface FlowableKWMonadErrorInstance :
@@ -31,7 +31,7 @@ interface FlowableKWAsyncInstance :
         FlowableKWSyncInstance,
         Async<FlowableKWHK> {
     override fun <A> async(fa: Proc<A>): FlowableKW<A> =
-            FlowableKW.runAsync(fa, BS())
+            FlowableKW.async(fa, BS())
 }
 
 @instance(FlowableKW::class)
@@ -39,5 +39,5 @@ interface FlowableKWEffectInstance :
         FlowableKWAsyncInstance,
         Effect<FlowableKWHK> {
     override fun <A> runAsync(fa: FlowableKWKind<A>, cb: (Either<Throwable, A>) -> FlowableKWKind<Unit>): FlowableKW<Unit> =
-            TODO()
+            fa.ev().runAsync(cb)
 }

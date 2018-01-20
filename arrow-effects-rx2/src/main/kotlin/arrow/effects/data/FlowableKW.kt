@@ -3,6 +3,8 @@ package arrow.effects
 import arrow.HK
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.Left
+import arrow.core.Right
 import arrow.deriving
 import arrow.higherkind
 import arrow.typeclasses.*
@@ -55,6 +57,9 @@ data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A>, Flowabl
                 GA.map2Eval(f(a), eval) { Flowable.concat(Flowable.just<B>(it.a), it.b.flowable).k() }
             }.value()
 
+    fun runAsync(cb: (Either<Throwable, A>) -> FlowableKWKind<Unit>): FlowableKW<Unit> =
+            FlowableKW { flowable.subscribe({ cb(Right(it)) }, { cb(Left(it)) }).let { } }
+
     companion object {
         fun <A> pure(a: A): FlowableKW<A> =
                 Flowable.just(a).k()
@@ -62,10 +67,13 @@ data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A>, Flowabl
         fun <A> raiseError(t: Throwable): FlowableKW<A> =
                 Flowable.error<A>(t).k()
 
+        operator fun <A> invoke(fa: () -> A): FlowableKW<A> =
+                suspend { pure(fa()) }
+
         fun <A> suspend(fa: () -> FlowableKWKind<A>): FlowableKW<A> =
                 Flowable.defer { fa().value() }.k()
 
-        fun <A> runAsync(fa: Proc<A>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableKW<A> =
+        fun <A> async(fa: Proc<A>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableKW<A> =
                 Flowable.create({ emitter: FlowableEmitter<A> ->
                     fa { either: Either<Throwable, A> ->
                         either.fold({
