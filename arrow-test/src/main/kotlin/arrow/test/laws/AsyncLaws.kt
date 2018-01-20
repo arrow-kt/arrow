@@ -36,7 +36,7 @@ object AsyncLaws {
                     Law("Async bind: monad comprehensions cancellable binding in other threads equivalence", { monadErrorComprehensionsBindInContextEquivalent(M, EQ) }),
                     Law("Async bind: bindingInContext cancellation before flatMap", { inContextCancellationBefore(M, EQ) }),
                     Law("Async bind: bindingInContext cancellation after flatMap", { inContextCancellationAfter(M, EQ) }),
-                    Law("Async bind: bindingInContext error equivalent to raiseError", { inContextError(M, EQERR) })
+                    Law("Async bind: bindingInContext throw equivalent to raiseError", { inContextErrorThrow(M, EQERR) })
             )
 
     inline fun <reified F> asyncSuccess(AC: AsyncContext<F> = asyncContext(), M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
@@ -167,7 +167,7 @@ object AsyncLaws {
                         && sideEffect.counter == 0
             })
 
-    inline fun <reified F> inContextError(M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
+    inline fun <reified F> inContextErrorThrow(M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<HK<F, Int>>): Unit =
             forFew(5, genThrowable(), { throwable: Throwable ->
                 M.bindingE {
                     val a: Int = bindIn(newSingleThreadContext("1")) { throw throwable }
