@@ -35,24 +35,6 @@ IO.async()
 
 ### Main Combinators
 
-#### invoke
-
-Receives a function returning `A`. The instance is responsible of evaluating the function lazily.
-
-```kotlin
-IO.async().invoke { 1 }
-```
-
-As it captures exceptions, `invoke()` is the simplest way of wrapping existing synchronous APIs.
-
-```kotlin
-fun <F> getSongUrlAsync(AC: Async<F> = asycContext()) =
-  AC { getSongUrl() }
-
-val songIO: IO<Url> = getSongUrlAsync().ev()
-val songDeferred: DeferredKW<Url> = getSongUrlAsync().ev()
-```
-
 #### async
 
 Receives a function returning `Unit` with a callback as a parameter.
@@ -120,27 +102,6 @@ IO.async()
 All the syntax functions are geared towards using `Async` inside [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }})
 to create blocks of code to be run asynchronously.
 
-#### (() -> A)#defer
-
-Runs the current function in the Async passed as a parameter. It doesn't await for its result.
-Use `bind()` on the return, or the alias `bindAsync()`.
-
-All exceptions are wrapped.
-
-```kotlin
-{ fibonacci(100) }.defer(ObservableKW.async())
-```
-
-```kotlin
-{ fibonacci(100) }.defer(IO.async())
-```
-
-```kotlin
-{ throw RuntimeException("Boom") }
-  .defer(IO.async())
-  .ev().attempt().async()
-```
-
 #### (() -> Either<Throwable, A>)#deferUnsafe
 
 Runs the current function in the Async passed as a parameter.
@@ -148,16 +109,16 @@ Runs the current function in the Async passed as a parameter.
 While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution.
 
 ```kotlin
-{ fibonacci(100).left() }.runAsync(ObservableKW.async())
+{ fibonacci(100).left() }.deferUnsafe(ObservableKW.async())
 ```
 
 ```kotlin
-{ fibonacci(100).left() }.runAsync(IO.async())
+{ fibonacci(100).left() }.deferUnsafe(IO.async())
 ```
 
 ```kotlin
 { RuntimeException("Boom").right() }
-  .runAsync(IO.async())
+  .deferUnsafe(IO.async())
   .ev().attempt().unsafeRunSync()
 ```
 
