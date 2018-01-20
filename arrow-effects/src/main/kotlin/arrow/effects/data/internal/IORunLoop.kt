@@ -5,7 +5,7 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.effects.internal.Platform.ArrayStack
 
-private typealias Current = IO<Any?>
+private typealias Current = IOKind<Any?>
 private typealias BindF = (Any?) -> IO<Any?>
 private typealias CallStack = ArrayStack<BindF>
 private typealias Callback = (Either<Throwable, Any?>) -> Unit
@@ -24,11 +24,11 @@ internal object IORunLoop {
 
         do {
             when (currentIO) {
-                is Pure -> {
+                is IO.Pure -> {
                     result = currentIO.a
                     hasResult = true
                 }
-                is RaiseError -> {
+                is IO.RaiseError -> {
                     val errorHandler: IOFrame<Any?, IO<Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
                     when (errorHandler) {
                     // Return case for unhandled errors
@@ -40,24 +40,24 @@ internal object IORunLoop {
                         }
                     }
                 }
-                is Suspend -> {
-                    val thunk: () -> IO<Any?> = currentIO.thunk
+                is IO.Suspend -> {
+                    val thunk: () -> IOKind<Any?> = currentIO.thunk
                     currentIO = executeSafe { thunk() }
                 }
-                is Delay -> {
+                is IO.Delay -> {
                     try {
                         result = currentIO.thunk()
                         hasResult = true
                         currentIO = null
                     } catch (t: Throwable) {
-                        currentIO = RaiseError(t)
+                        currentIO = IO.RaiseError(t)
                     }
                 }
-                is Async -> {
+                is IO.Async -> {
                     // Return case for Async operations
                     return suspendInAsync(currentIO as IO<A>, bFirst, bRest, currentIO.cont)
                 }
-                is Bind<*, *> -> {
+                is IO.Bind<*, *> -> {
                     if (bFirst != null) {
                         if (bRest == null) bRest = ArrayStack()
                         bRest.push(bFirst)
@@ -65,7 +65,7 @@ internal object IORunLoop {
                     bFirst = currentIO.g as BindF
                     currentIO = currentIO.cont
                 }
-                is Map<*, *> -> {
+                is IO.Map<*, *> -> {
                     if (bFirst != null) {
                         if (bRest == null) {
                             bRest = ArrayStack()
@@ -76,7 +76,7 @@ internal object IORunLoop {
                     currentIO = currentIO.source
                 }
                 null -> {
-                    currentIO = RaiseError(NullPointerException("Stepping on null IO"))
+                    currentIO = IO.RaiseError(NullPointerException("Stepping on null IO"))
                 }
             }
 
@@ -99,7 +99,7 @@ internal object IORunLoop {
     }
 
     inline private fun <A> sanitizedCurrentIO(currentIO: Current?, unboxed: Any?): IO<A> =
-            (currentIO ?: Pure(unboxed)) as IO<A>
+            (currentIO ?: IO.Pure(unboxed)) as IO<A>
 
     private fun <A> suspendInAsync(
             currentIO: IO<A>,
@@ -111,7 +111,7 @@ internal object IORunLoop {
             // the loop with the collected stack
             when {
                 bFirst != null || (bRest != null && bRest.isNotEmpty()) ->
-                    Async { cb ->
+                    IO.Async { cb ->
                         val rcb = RestartCallback(cb as Callback)
                         rcb.prepare(bFirst, bRest)
                         register(rcb)
@@ -136,11 +136,11 @@ internal object IORunLoop {
 
         do {
             when (currentIO) {
-                is Pure -> {
+                is IO.Pure -> {
                     result = currentIO.a
                     hasResult = true
                 }
-                is RaiseError -> {
+                is IO.RaiseError -> {
                     val errorHandler: IOFrame<Any?, IO<Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
                     when (errorHandler) {
                     // Return case for unhandled errors
@@ -155,20 +155,20 @@ internal object IORunLoop {
                         }
                     }
                 }
-                is Suspend -> {
-                    val thunk: () -> IO<Any?> = currentIO.thunk
+                is IO.Suspend -> {
+                    val thunk: () -> IOKind<Any?> = currentIO.thunk
                     currentIO = executeSafe { thunk() }
                 }
-                is Delay -> {
+                is IO.Delay -> {
                     try {
                         result = currentIO.thunk()
                         hasResult = true
                         currentIO = null
                     } catch (t: Throwable) {
-                        currentIO = RaiseError(t)
+                        currentIO = IO.RaiseError(t)
                     }
                 }
-                is Async -> {
+                is IO.Async -> {
                     if (rcb == null) {
                         rcb = RestartCallback(cb)
                     }
@@ -177,7 +177,7 @@ internal object IORunLoop {
                     currentIO.cont(rcb)
                     return
                 }
-                is Bind<*, *> -> {
+                is IO.Bind<*, *> -> {
                     if (bFirst != null) {
                         if (bRest == null) bRest = ArrayStack()
                         bRest.push(bFirst)
@@ -185,7 +185,7 @@ internal object IORunLoop {
                     bFirst = currentIO.g as BindF
                     currentIO = currentIO.cont
                 }
-                is Map<*, *> -> {
+                is IO.Map<*, *> -> {
                     if (bFirst != null) {
                         if (bRest == null) {
                             bRest = ArrayStack()
@@ -196,7 +196,7 @@ internal object IORunLoop {
                     currentIO = currentIO.source
                 }
                 null -> {
-                    currentIO = RaiseError(NullPointerException("Looping on null IO"))
+                    currentIO = IO.RaiseError(NullPointerException("Looping on null IO"))
                 }
             }
 
@@ -219,11 +219,11 @@ internal object IORunLoop {
         } while (true)
     }
 
-    inline private fun executeSafe(crossinline f: () -> IO<Any?>): IO<Any?> =
+    inline private fun executeSafe(crossinline f: () -> IOKind<Any?>): IO<Any?> =
             try {
-                f()
+                f().ev()
             } catch (e: Throwable) {
-                RaiseError(e)
+                IO.RaiseError(e)
             }
 
     /**
@@ -286,8 +286,8 @@ internal object IORunLoop {
             if (canCall) {
                 canCall = false
                 when (either) {
-                    is Either.Left -> loop(RaiseError(either.a), cb, this, bFirst, bRest)
-                    is Either.Right -> loop(Pure(either.b), cb, this, bFirst, bRest)
+                    is Either.Left -> loop(IO.RaiseError(either.a), cb, this, bFirst, bRest)
+                    is Either.Right -> loop(IO.Pure(either.b), cb, this, bFirst, bRest)
                 }
             }
         }
