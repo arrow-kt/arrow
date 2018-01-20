@@ -64,13 +64,13 @@ subject.value()
 
 ### Observable comprehensions
 
-The library provides instances of [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) and [`AsyncContext`]({{ '/docs/effects/async' | relative_url }}).
+The library provides instances of [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) and [`Async`]({{ '/docs/effects/async' | relative_url }}).
 
-[`AsyncContext`]({{ '/docs/effects/async' | relative_url }}) allows you to generify over datatypes that can run asynchronous code. You can use it with `ObservableKW` and `FlowableKW`.
+[`Async`]({{ '/docs/effects/async' | relative_url }}) allows you to generify over datatypes that can run asynchronous code. You can use it with `ObservableKW` and `FlowableKW`.
 
 ```kotlin
-fun <F> getSongUrlAsync(AC: AsyncContext<F> = asycContext()) =
-  AC.runAsync { getSongUrl() }
+fun <F> getSongUrlAsync(AC: Async<F> = asycContext()) =
+  AC { getSongUrl() }
 
 val songObservable: ObservableKW<Url> = getSongUrlAsync().ev()
 val songFlowable: FlowableKW<Url> = getSongUrlAsync().ev()

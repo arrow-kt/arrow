@@ -1,6 +1,6 @@
 package arrow.effects
 
-import arrow.*
+import arrow.HK
 import arrow.core.Tuple2
 import arrow.core.toT
 import arrow.effects.data.internal.BindingCancellationException
