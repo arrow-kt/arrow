@@ -28,6 +28,16 @@ Use the list below to learn more about Λrrow's main features.
 
 # Basic Setup
 
+Add it in your root `build.gradle` at the end of repositories.
+
+```groovy
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+```
+
 Add the dependencies into the project's `build.gradle`
 
 ```groovy
