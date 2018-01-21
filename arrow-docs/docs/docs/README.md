@@ -42,17 +42,17 @@ Add the dependencies into the project's `build.gradle`
 
 ```groovy
 dependencies {
-    compile 'io.arrow-kt:arrow-core:0.5.5'
-    compile 'io.arrow-kt:arrow-typeclasses:0.5.5' 
-    compile 'io.arrow-kt:arrow-instances:0.5.5' 
-    kapt    'io.arrow-kt:arrow-annotations-processor:0.5.5' 
+    compile 'io.arrow-kt:arrow-core:0.6.0'
+    compile 'io.arrow-kt:arrow-typeclasses:0.6.0' 
+    compile 'io.arrow-kt:arrow-instances:0.6.0' 
+    kapt    'io.arrow-kt:arrow-annotations-processor:0.6.0' 
     
-    compile 'io.arrow-kt:arrow-free:0.5.5' //optional
-    compile 'io.arrow-kt:arrow-mtl:0.5.5' //optional
-    compile 'io.arrow-kt:arrow-effects:0.5.5' //optional
-    compile 'io.arrow-kt:arrow-effects-rx2:0.5.5' //optional
-    compile 'io.arrow-kt:arrow-effects-kotlinx-coroutines:0.5.5' //optional
-    compile 'io.arrow-kt:arrow-optics:0.5.5' //optional
+    compile 'io.arrow-kt:arrow-free:0.6.0' //optional
+    compile 'io.arrow-kt:arrow-mtl:0.6.0' //optional
+    compile 'io.arrow-kt:arrow-effects:0.6.0' //optional
+    compile 'io.arrow-kt:arrow-effects-rx2:0.6.0' //optional
+    compile 'io.arrow-kt:arrow-effects-kotlinx-coroutines:0.6.0' //optional
+    compile 'io.arrow-kt:arrow-optics:0.6.0' //optional
 }
 ```
 
@@ -69,7 +69,7 @@ apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //optiona
 
 dependencies {
     ...
-    kapt    'io.arrow-kt:arrow-annotations-processor:0.5.5' //optional
+    kapt    'io.arrow-kt:arrow-annotations-processor:0.6.0' //optional
     ...
 }
 ```
