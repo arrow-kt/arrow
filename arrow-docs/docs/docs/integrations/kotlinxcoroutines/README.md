@@ -163,7 +163,7 @@ Invoking this `Disposable` causes an `BindingCancellationException` in the chain
 
 ```kotlin
 val (deferred, unsafeCancel) = 
-  DeferredKW.monadError().bindingCatchCancellable {
+  DeferredKW.sync().bindingCancellable {
     val userProfile = DeferredKW { getUserProfile("123") }.bind()
     val friendProfiles = userProfile.friends().map { friend ->
         DeferredKW { getProfile(friend.id) }.bind()

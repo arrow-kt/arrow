@@ -136,7 +136,7 @@ Invoking this `Disposable` causes an `BindingCancellationException` in the chain
 
 ```kotlin
 val (observable, disposable) = 
-  ObservableKW.monadError().bindingCatchCancellable {
+  ObservableKW.sync().bindingCancellable {
     val userProfile = Observable.create { getUserProfile("123") }
     val friendProfiles = userProfile.friends().map { friend ->
         bindAsync(observableAsync) { getProfile(friend.id) }
