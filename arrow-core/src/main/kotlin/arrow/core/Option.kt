@@ -1,7 +1,6 @@
 package arrow.core
 
 import arrow.higherkind
-import java.util.*
 
 /**
  * Represents optional values. Instances of `Option`
