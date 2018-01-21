@@ -1,14 +1,14 @@
 ---
 layout: docs
 title: Sync
-permalink: /docs/effects/sync/
+permalink: /docs/effects/monadsuspend/
 ---
 
 ## Sync
 
-`Sync` is a typeclass representing suspension of execution via functions, allowing for asynchronous and lazy computations.
+`MonadSuspend` is a typeclass representing suspension of execution via functions, allowing for asynchronous and lazy computations.
 
-`Sync` includes all combinators present in [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}).
+`MonadSuspend` includes all combinators present in [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}).
 
 ### Main Combinators
 
@@ -17,13 +17,13 @@ permalink: /docs/effects/sync/
 Receives a function returning `A`. The instance is responsible of evaluating the function lazily.
 
 ```kotlin
-IO.sync().invoke { 1 }
+IO.monadSuspend().invoke { 1 }
 ```
 
 As it captures exceptions, `invoke()` is the simplest way of wrapping existing synchronous APIs.
 
 ```kotlin
-fun <F> getSongUrlAsync(SC: Sync<F> = sync()) =
+fun <F> getSongUrlAsync(SC: MonadSuspend<F> = monadSuspend()) =
   SC { getSongUrl() }
 
 val songIO: IO<Url> = getSongUrlAsync().ev()
@@ -35,7 +35,7 @@ val songDeferred: DeferredKW<Url> = getSongUrlAsync().ev()
 Receives a function returning `HK<F, A>`. The instance is responsible of creating and running the returned datatype lazily.
 
 ```kotlin
-IO.sync().suspend { IO.pure(1) }
+IO.monadSuspend().suspend { IO.pure(1) }
 ```
 
 This can be used to wrap synchronous APIs that already return the expected datatype, forcing them to be run lazily.
@@ -46,7 +46,7 @@ Suspends a function returning `Unit`.
 Useful in cases like [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) where you'd want to defer the start of the comprehension until the datatype is run without needing to use suspend.
 
 ```kotlin
-val SC = IO.sync()
+val SC = IO.monadSuspend()
 
 val result = SC.binding {
   println("Print: now")
@@ -117,46 +117,46 @@ While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/d
 Wraps the current function in the Sync passed as a parameter. All exceptions are wrapped.
 
 ```kotlin
-{ fibonacci(100) }.defer(ObservableKW.sync())
+{ fibonacci(100) }.defer(ObservableKW.monadSuspend())
 ```
 
 ```kotlin
-{ fibonacci(100) }.defer(IO.sync())
+{ fibonacci(100) }.defer(IO.monadSuspend())
 ```
 
 ```kotlin
 { throw RuntimeException("Boom") }
-  .defer(IO.sync())
+  .defer(IO.monadSuspend())
   .ev().attempt().unsafeRunAsync { }
 ```
 
 #### (() -> Either<Throwable, A>)#deferUnsafe
 
-Runs the current function in the `Sync` passed as a parameter.
+Runs the current function in the `MonadSuspend` passed as a parameter.
 
 While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution.
 
 ```kotlin
-{ fibonacci(100).left() }.deferUnsafe(ObservableKW.sync())
+{ fibonacci(100).left() }.deferUnsafe(ObservableKW.monadSuspend())
 ```
 
 ```kotlin
-{ fibonacci(100).left() }.deferUnsafe(IO.sync())
+{ fibonacci(100).left() }.deferUnsafe(IO.monadSuspend())
 ```
 
 ```kotlin
 { RuntimeException("Boom").right() }
-  .deferUnsafe(IO.sync())
+  .deferUnsafe(IO.monadSuspend())
   .ev().attempt().unsafeRunSync()
 ```
 
 ### Laws
 
-Arrow provides [`SyncLaws`]({{ '/docs/typeclasses/laws#synclaws' | relative_url }}) in the form of test cases for internal verification of lawful instances and third party apps creating their own `Sync` instances.
+Arrow provides [`SyncLaws`]({{ '/docs/typeclasses/laws#synclaws' | relative_url }}) in the form of test cases for internal verification of lawful instances and third party apps creating their own `MonadSuspend` instances.
 
 ### Data types
 
-The following datatypes in Arrow provide instances that adhere to the `Sync` typeclass.
+The following datatypes in Arrow provide instances that adhere to the `MonadSuspend` typeclass.
 
 - [IO]({{ '/docs/effects/io' | relative_url }})
 - [ObservableKW]({{ '/docs/integrations/rx2' | relative_url }})

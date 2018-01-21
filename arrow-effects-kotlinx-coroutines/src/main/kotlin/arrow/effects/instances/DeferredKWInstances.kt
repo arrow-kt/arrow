@@ -17,7 +17,7 @@ interface DeferredKWMonadErrorInstance :
 }
 
 @instance(DeferredKW::class)
-interface DeferredKWSyncInstance : DeferredKWMonadErrorInstance, Sync<DeferredKWHK> {
+interface DeferredKWSyncInstance : DeferredKWMonadErrorInstance, MonadSuspend<DeferredKWHK> {
     override fun <A> suspend(fa: () -> DeferredKWKind<A>): DeferredKW<A> =
             DeferredKW.suspend(fa = fa)
 }

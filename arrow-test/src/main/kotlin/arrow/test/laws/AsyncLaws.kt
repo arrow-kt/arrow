@@ -13,7 +13,7 @@ import io.kotlintest.properties.forAll
 
 object AsyncLaws {
     inline fun <reified F> laws(AC: Async<F> = async(), EQ: Eq<HK<F, Int>>, EQ_EITHER: Eq<HK<F, Either<Throwable, Int>>>, EQERR: Eq<HK<F, Int>> = EQ): List<Law> =
-            SyncLaws.laws(AC, EQERR, EQ_EITHER, EQ) + listOf(
+            MonadSuspendLaws.laws(AC, EQERR, EQ_EITHER, EQ) + listOf(
                     Law("Async Laws: success equivalence", { asyncSuccess(AC, EQ) }),
                     Law("Async Laws: error equivalence", { asyncError(AC, EQERR) })
             )

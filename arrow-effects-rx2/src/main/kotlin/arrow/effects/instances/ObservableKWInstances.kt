@@ -18,7 +18,7 @@ interface ObservableKWMonadErrorInstance :
 @instance(ObservableKW::class)
 interface ObservableKWSyncInstance :
         ObservableKWMonadErrorInstance,
-        Sync<ObservableKWHK> {
+        MonadSuspend<ObservableKWHK> {
     override fun <A> suspend(fa: () -> ObservableKWKind<A>): ObservableKW<A> =
             ObservableKW.suspend(fa)
 }

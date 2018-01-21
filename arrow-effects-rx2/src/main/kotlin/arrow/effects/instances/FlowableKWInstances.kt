@@ -19,7 +19,7 @@ interface FlowableKWMonadErrorInstance :
 @instance(FlowableKW::class)
 interface FlowableKWSyncInstance :
         FlowableKWMonadErrorInstance,
-        Sync<FlowableKWHK> {
+        MonadSuspend<FlowableKWHK> {
     override fun <A> suspend(fa: () -> FlowableKWKind<A>): FlowableKW<A> =
             FlowableKW.suspend(fa)
 

@@ -20,7 +20,7 @@ interface IOMonadErrorInstance : IOMonadInstance, MonadError<IOHK, Throwable> {
 }
 
 @instance(IO::class)
-interface IOSyncInstance : IOMonadErrorInstance, Sync<IOHK> {
+interface IOSyncInstance : IOMonadErrorInstance, MonadSuspend<IOHK> {
     override fun <A> suspend(fa: () -> IOKind<A>): IO<A> =
             IO.suspend(fa)
 

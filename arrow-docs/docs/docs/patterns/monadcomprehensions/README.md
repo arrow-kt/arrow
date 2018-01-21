@@ -221,7 +221,7 @@ fun getLineLengthAverage(path: FilePath): IO<List<String>> =
 Note that `bindIn()`assures that the execution will return to the same thread where the binding started after the `bindIn` block executes.
 
 There is also a version of `bindIn` called `bindDeferredIn` that allows deferred construction.
-It's available for `bindingCancellable` comprehensions over instances of [`Sync`]({{ '/docs/effects/sync' | relative_url }}).
+It's available for `bindingCancellable` comprehensions over instances of [`MonadSuspend`]({{ '/docs/effects/monadsuspend' | relative_url }}).
 
 ### What if I'd like to run multiple operations independently from each other, in a non-sequential way?
 
@@ -230,7 +230,7 @@ You can check the section on the [Applicative Builder]({{ '/docs/patterns/applic
 ### Cancellation and cleanup of resources
 
 In some environments that have resources with their own lifecycle (i.e. Activity in Android development) retaining these values in operations that can run indefinitely may cause large memory leaks and lead to undefined behavior.
-As cleanup is important in these restricted environments, any instance of [`Sync`]({{ '/docs/effects/sync' | relative_url }}) provides the function `bindingCancellable`, which allows for comprehensions to be finished early by throwing an `BindingCancellationException` at the beginning of the next `bind()` step.
+As cleanup is important in these restricted environments, any instance of [`MonadSuspend`]({{ '/docs/effects/monadsuspend' | relative_url }}) provides the function `bindingCancellable`, which allows for comprehensions to be finished early by throwing an `BindingCancellationException` at the beginning of the next `bind()` step.
 
 ```kotlin
 val (binding: IO<List<User>>, unsafeCancel: Disposable) =
