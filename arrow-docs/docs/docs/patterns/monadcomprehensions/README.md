@@ -218,8 +218,7 @@ fun getLineLengthAverage(path: FilePath): IO<List<String>> =
   }
 ```
 
-Note that `bindIn()` and `bindInM()` don't assure that the execution will return to the same thread where the binding started, as it depends on the implementation of the data type.
-This means that for the previous snippet [`IO`]({{ '/docs/effects/io' | relative_url }}) may calculate count and average on different threads than what [`Option`]({{ '/docs/datatypes/option' | relative_url }}) or [`Try`]({{ '/docs/datatypes/try' | relative_url }}) would.
+Note that `bindIn()`assures that the execution will return to the same thread where the binding started after the `bindIn` block executes.
 
 ### What if I'd like to run multiple operations independently from each other, in a non-sequential way?
 
