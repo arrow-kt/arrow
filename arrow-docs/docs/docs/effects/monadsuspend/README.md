@@ -4,7 +4,7 @@ title: Sync
 permalink: /docs/effects/monadsuspend/
 ---
 
-## Sync
+## MonadSuspend
 
 `MonadSuspend` is a typeclass representing suspension of execution via functions, allowing for asynchronous and lazy computations.
 
