@@ -18,11 +18,16 @@ Inherited from [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | re
 It lifts an exception into the computational context of a type constructor.
 
 ```kotlin:ank
-Either.monadError().raiseError(RuntimeException("Paco"))
+import arrow.*
+import arrow.core.*
+
+Either.monadError<Throwable>().raiseError<Int>(RuntimeException("Paco"))
 ```
 
 ```kotlin:ank
-IO.monadError().raiseError(RuntimeException("Paco"))
+import arrow.effects.*
+
+IO.monadError().raiseError<Int>(RuntimeException("Paco"))
 ```
 
 #### ensure
@@ -30,9 +35,9 @@ IO.monadError().raiseError(RuntimeException("Paco"))
 Tests a predicate against the object, and if it fails it executes a function to create an error.
 
 ```kotlin:ank
-val ME = Either.monadError()
+val ME = Either.monadError<Throwable>()
 
-val either: Either<String, Int> = Either.Right(1)
+val either: Either<Throwable, Int> = Either.Right(1)
 
 ME.ensure(either, { RuntimeException("Failed predicate") }, { it > 0 })
 ```
