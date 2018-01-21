@@ -4,6 +4,7 @@ dependencies {
     compile project(':arrow-effects')
     compile project(':arrow-effects-rx2')
     compile project(':arrow-effects-kotlinx-coroutines')
+    compile project(':arrow-optics')
 
     kapt project(':arrow-annotations-processor')
     kaptTest project(':arrow-annotations-processor')

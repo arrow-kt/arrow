@@ -28,11 +28,14 @@ class OptikalProcessor : AbstractProcessor() {
 
     private val annotatedIsos = mutableListOf<AnnotatedOptic>()
 
+    private val annotatedOptional = mutableListOf<AnnotatedOptic>()
+
     override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
     override fun getSupportedAnnotationTypes() = setOf(
             lensesAnnotationClass.canonicalName,
             prismsAnnotationClass.canonicalName,
-            isosAnnotationClass.canonicalName
+            isosAnnotationClass.canonicalName,
+            optionalAnnotationClass.canonicalName
     )
 
     override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
@@ -48,11 +51,16 @@ class OptikalProcessor : AbstractProcessor() {
                 .getElementsAnnotatedWith(isosAnnotationClass)
                 .map(this::evalAnnotatedIsoElement)
 
+        annotatedOptional += roundEnv
+                .getElementsAnnotatedWith(optionalAnnotationClass)
+                .map(this::evalAnnotatedElement)
+
         if (roundEnv.processingOver()) {
             val generatedDir = File(this.generatedDir!!, "").also { it.mkdirs() }
             LensesFileGenerator(annotatedLenses, generatedDir).generate()
             PrismsFileGenerator(annotatedPrisms, generatedDir).generate()
             IsosFileGenerator(annotatedIsos, generatedDir).generate()
+            OptionalFileGenerator(annotatedOptional, generatedDir).generate()
         }
     }
 
