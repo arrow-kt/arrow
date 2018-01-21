@@ -31,7 +31,7 @@ IO.async()
   }.ev().attempt().unsafeRunSync()
 ```
 
-`Async` includes all combinators present in [`Sync`]({{ '/docs/effects/sync/' | relative_url }}).
+`Async` includes all combinators present in [`MonadSuspend`]({{ '/docs/effects/monadsuspend/' | relative_url }}).
 
 ### Main Combinators
 

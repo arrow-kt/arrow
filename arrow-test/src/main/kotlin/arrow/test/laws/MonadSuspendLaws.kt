@@ -6,10 +6,10 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.data.Try
 import arrow.data.recover
-import arrow.effects.Sync
+import arrow.effects.MonadSuspend
 import arrow.effects.bindingCancellable
 import arrow.effects.data.internal.BindingCancellationException
-import arrow.effects.sync
+import arrow.effects.monadSuspend
 import arrow.syntax.applicative.tupled
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.genIntSmall
@@ -19,8 +19,8 @@ import io.kotlintest.properties.forAll
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.newSingleThreadContext
 
-object SyncLaws {
-    inline fun <reified F> laws(SC: Sync<F> = sync(), EQ: Eq<HK<F, Int>>, EQ_EITHER: Eq<HK<F, Either<Throwable, Int>>>, EQERR: Eq<HK<F, Int>> = EQ): List<Law> =
+object MonadSuspendLaws {
+    inline fun <reified F> laws(SC: MonadSuspend<F> = monadSuspend(), EQ: Eq<HK<F, Int>>, EQ_EITHER: Eq<HK<F, Either<Throwable, Int>>>, EQERR: Eq<HK<F, Int>> = EQ): List<Law> =
             MonadErrorLaws.laws(SC, EQERR, EQ_EITHER, EQ) + listOf(
                     Law("Sync bind: binding blocks", { asyncBind(SC, EQ) }),
                     Law("Sync bind: binding failure", { asyncBindError(SC, EQERR) }),
@@ -35,7 +35,7 @@ object SyncLaws {
                     Law("Sync bind: monad comprehensions binding in other threads equivalence", { monadComprehensionsBindInContextEquivalent(SC, EQ) })
             )
 
-    inline fun <reified F> asyncBind(SC: Sync<F> = sync(), EQ: Eq<HK<F, Int>>): Unit =
+    inline fun <reified F> asyncBind(SC: MonadSuspend<F> = monadSuspend(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(genIntSmall(), genIntSmall(), genIntSmall(), { x: Int, y: Int, z: Int ->
                 val (bound, dispose) = SC.bindingCancellable {
                     val a = bindDefer { x }
@@ -46,7 +46,7 @@ object SyncLaws {
                 bound.equalUnderTheLaw(SC.pure<Int>(x + y + z), EQ)
             })
 
-    inline fun <reified F> asyncBindError(SC: Sync<F> = sync(), EQ: Eq<HK<F, Int>>): Unit =
+    inline fun <reified F> asyncBindError(SC: MonadSuspend<F> = monadSuspend(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(genThrowable(), { e: Throwable ->
                 val (bound: HK<F, Int>, cancel) = SC.bindingCancellable<F, Int> {
                     bindDefer { throw e }
@@ -54,7 +54,7 @@ object SyncLaws {
                 bound.equalUnderTheLaw(SC.raiseError<Int>(e), EQ)
             })
 
-    inline fun <reified F> asyncBindUnsafe(SC: Sync<F> = sync(), EQ: Eq<HK<F, Int>>): Unit =
+    inline fun <reified F> asyncBindUnsafe(SC: MonadSuspend<F> = monadSuspend(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(genIntSmall(), genIntSmall(), genIntSmall(), { x: Int, y: Int, z: Int ->
                 val (bound, dispose) = SC.bindingCancellable {
                     val a = bindDeferUnsafe { Right(x) }
@@ -65,7 +65,7 @@ object SyncLaws {
                 bound.equalUnderTheLaw(SC.pure<Int>(x + y + z), EQ)
             })
 
-    inline fun <reified F> asyncBindUnsafeError(SC: Sync<F> = sync(), EQ: Eq<HK<F, Int>>): Unit =
+    inline fun <reified F> asyncBindUnsafeError(SC: MonadSuspend<F> = monadSuspend(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(genThrowable(), { e: Throwable ->
                 val (bound: HK<F, Int>, dispose) = SC.bindingCancellable<F, Int> {
                     bindDeferUnsafe { Left(e) }
@@ -73,7 +73,7 @@ object SyncLaws {
                 bound.equalUnderTheLaw(SC.raiseError<Int>(e), EQ)
             })
 
-    inline fun <reified F> asyncParallelBind(SC: Sync<F> = sync(), EQ: Eq<HK<F, Int>>): Unit =
+    inline fun <reified F> asyncParallelBind(SC: MonadSuspend<F> = monadSuspend(), EQ: Eq<HK<F, Int>>): Unit =
             forAll(genIntSmall(), genIntSmall(), genIntSmall(), { x: Int, y: Int, z: Int ->
                 val (bound, dispose) = SC.bindingCancellable {
                     val value = bind { tupled(SC { x }, SC { y }, SC { z }) }
@@ -82,7 +82,7 @@ object SyncLaws {
                 bound.equalUnderTheLaw(SC.pure<Int>(x + y + z), EQ)
             })
 
-    inline fun <reified F> asyncCancellationBefore(SC: Sync<F> = sync(), EQ: Eq<HK<F, Int>>): Unit =
+    inline fun <reified F> asyncCancellationBefore(SC: MonadSuspend<F> = monadSuspend(), EQ: Eq<HK<F, Int>>): Unit =
             forFew(5, genIntSmall(), { num: Int ->
                 val sideEffect = SideEffect()
                 val (binding, dispose) = SC.bindingCancellable {
@@ -96,7 +96,7 @@ object SyncLaws {
                 binding.equalUnderTheLaw(SC.raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 0
             })
 
-    inline fun <reified F> asyncCancellationAfter(SC: Sync<F> = sync(), EQ: Eq<HK<F, Int>>): Unit =
+    inline fun <reified F> asyncCancellationAfter(SC: MonadSuspend<F> = monadSuspend(), EQ: Eq<HK<F, Int>>): Unit =
             forFew(5, genIntSmall(), { num: Int ->
                 val sideEffect = SideEffect()
                 val (binding, dispose) = SC.bindingCancellable {
@@ -110,7 +110,7 @@ object SyncLaws {
                         && sideEffect.counter == 0
             })
 
-    inline fun <reified F> inContextCancellationBefore(SC: Sync<F> = sync(), EQ: Eq<HK<F, Int>>): Unit =
+    inline fun <reified F> inContextCancellationBefore(SC: MonadSuspend<F> = monadSuspend(), EQ: Eq<HK<F, Int>>): Unit =
             forFew(5, genIntSmall(), { num: Int ->
                 val sideEffect = SideEffect()
                 val (binding, dispose) = SC.bindingCancellable {
@@ -124,7 +124,7 @@ object SyncLaws {
                 binding.equalUnderTheLaw(SC.raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 0
             })
 
-    inline fun <reified F> inContextCancellationAfter(SC: Sync<F> = sync(), EQ: Eq<HK<F, Int>>): Unit =
+    inline fun <reified F> inContextCancellationAfter(SC: MonadSuspend<F> = monadSuspend(), EQ: Eq<HK<F, Int>>): Unit =
             forFew(5, genIntSmall(), { num: Int ->
                 val sideEffect = SideEffect()
                 val (binding, dispose) = SC.bindingCancellable {
@@ -138,7 +138,7 @@ object SyncLaws {
                         && sideEffect.counter == 0
             })
 
-    inline fun <reified F> inContextErrorThrow(SC: Sync<F> = sync(), EQ: Eq<HK<F, Int>>): Unit =
+    inline fun <reified F> inContextErrorThrow(SC: MonadSuspend<F> = monadSuspend(), EQ: Eq<HK<F, Int>>): Unit =
             forFew(5, genThrowable(), { throwable: Throwable ->
                 SC.bindingCancellable {
                     val a: Int = bindIn(newSingleThreadContext("1")) { throw throwable }
@@ -146,7 +146,7 @@ object SyncLaws {
                 }.a.equalUnderTheLaw(SC.raiseError(throwable), EQ)
             })
 
-    inline fun <reified F> monadComprehensionsBindInContextEquivalent(SC: Sync<F> = sync<F>(), EQ: Eq<HK<F, Int>>): Unit =
+    inline fun <reified F> monadComprehensionsBindInContextEquivalent(SC: MonadSuspend<F> = monadSuspend(), EQ: Eq<HK<F, Int>>): Unit =
             forFew(5, genIntSmall(), { num: Int ->
                 val bindM = SC.bindingCancellable {
                     val a = bindDeferIn(newSingleThreadContext("$num")) { num + 1 }

@@ -44,7 +44,9 @@ class FlowableKWTests : UnitSpec() {
             applicative<FlowableKWHK>() shouldNotBe null
             monad<FlowableKWHK>() shouldNotBe null
             monadError<FlowableKWHK, Unit>() shouldNotBe null
+            monadSuspend<FlowableKWHK>() shouldNotBe null
             async<FlowableKWHK>() shouldNotBe null
+            effect<FlowableKWHK>() shouldNotBe null
             foldable<FlowableKWHK>() shouldNotBe null
             traverse<FlowableKWHK>() shouldNotBe null
         }

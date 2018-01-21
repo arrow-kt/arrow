@@ -158,12 +158,12 @@ recoveryArrowWrapper.unsafeAttemptSync()
 
 `DeferredKW` created with `bindingCatch` behave the same way regular `Deferred` do, including cancellation by disposing the subscription.
 
-Note that [`Sync`]({{ '/docs/effects/sync' | relative_url }}) provides an alternative to `bindingCatch` called `bindingCancellable` returning a `arrow.Disposable`.
+Note that [`MonadSuspend`]({{ '/docs/effects/monadsuspend' | relative_url }}) provides an alternative to `bindingCatch` called `bindingCancellable` returning a `arrow.Disposable`.
 Invoking this `Disposable` causes an `BindingCancellationException` in the chain which needs to be handled by the subscriber, similarly to what `Deferred` does.
 
 ```kotlin
 val (deferred, unsafeCancel) = 
-  DeferredKW.sync().bindingCancellable {
+  DeferredKW.monadSuspend().bindingCancellable {
     val userProfile = DeferredKW { getUserProfile("123") }.bind()
     val friendProfiles = userProfile.friends().map { friend ->
         DeferredKW { getProfile(friend.id) }.bind()
