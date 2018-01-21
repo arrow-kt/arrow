@@ -27,7 +27,9 @@ class IOTest : UnitSpec() {
             applicative<IOHK>() shouldNotBe null
             monad<IOHK>() shouldNotBe null
             monadError<IOHK, Throwable>() shouldNotBe null
+            monadSuspend<IOHK>() shouldNotBe null
             async<IOHK>() shouldNotBe null
+            effect<IOHK>() shouldNotBe null
             semigroup<IOKind<Int>>() shouldNotBe null
             monoid<IOKind<Int>>() shouldNotBe null
         }
