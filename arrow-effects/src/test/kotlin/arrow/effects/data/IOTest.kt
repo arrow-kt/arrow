@@ -1,10 +1,7 @@
 package arrow.effects
 
 import arrow.HK
-import arrow.core.Either
-import arrow.core.Left
-import arrow.core.None
-import arrow.core.Some
+import arrow.core.*
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.AsyncLaws
@@ -19,7 +16,7 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class IOTest : UnitSpec() {
     fun <A> EQ(): Eq<HK<IOHK, A>> = Eq { a, b ->
-        a.ev().attempt().unsafeRunSync() == b.ev().attempt().unsafeRunSync()
+        Option.eq(Eq.any()).eqv(a.ev().attempt().unsafeRunTimed(60.seconds), b.ev().attempt().unsafeRunTimed(60.seconds))
     }
 
     init {
