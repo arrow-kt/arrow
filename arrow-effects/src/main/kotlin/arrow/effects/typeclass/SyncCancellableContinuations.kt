@@ -16,8 +16,8 @@ import kotlin.coroutines.experimental.startCoroutine
 typealias Disposable = () -> Unit
 
 @RestrictsSuspension
-open class AsyncCancellableContinuation<F, A>(val AC: Async<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
-        MonadErrorContinuation<F, A>(AC) {
+open class SyncCancellableContinuation<F, A>(val SC: Sync<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
+        MonadErrorContinuation<F, A>(SC) {
 
     protected val cancelled: AtomicBoolean = AtomicBoolean(false)
 
@@ -25,11 +25,11 @@ open class AsyncCancellableContinuation<F, A>(val AC: Async<F>, override val con
 
     override fun returnedMonad(): HK<F, A> = returnedMonad
 
-    suspend fun <B> bindAsync(f: () -> B): B =
-            AC(f).bind()
+    suspend fun <B> bindDefer(f: () -> B): B =
+            SC(f).bind()
 
-    suspend fun <B> bindAsyncUnsafe(f: () -> Either<Throwable, B>): B =
-            AC.deferUnsafe(f).bind()
+    suspend fun <B> bindDeferUnsafe(f: () -> Either<Throwable, B>): B =
+            SC.deferUnsafe(f).bind()
 
     override suspend fun <B> bind(m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels
