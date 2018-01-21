@@ -173,11 +173,11 @@ This exception goes uncaught and finalizes the program with a crash. Knowing thi
 Our next approach can do automatic wrapping of unexpected exceptions to return them inside the operation sequence.
 For this purpose, the typeclass [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) was created.
 [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) allows us to raise and recover from errors.
-It also contains a version of comprehensions that automatically wraps exceptions, called `bindingE`.
+It also contains a version of comprehensions that automatically wraps exceptions, called `bindingCatch`.
 
 ```kotlin
 fun getLineLengthAverage(path: FilePath): IO<List<String>> = 
-  IO.monadError().bindingE {
+  IO.monadError().bindingCatch {
     val file = getFile(path).bind()
     val lines = file.readLines().bind()
     val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
@@ -196,8 +196,8 @@ Note that while most data types include an instance of [`Monad`]({{ '/docs/typec
 Arrow uses the same abstraction as coroutines to group threads and other contexts of execution: `CoroutineContext`.
 There are multiple default values and wrappers for common cases in both the standard library, and the extension library [kotlinx.coroutines](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/-coroutine-dispatcher/index.html).
 
-In any `binding()` block there is a helper function `bindIn()` that takes a `CoroutineContext` as a parameter and can return any value. This value will be lifted into a data type using `pure`.
-A second version called `bindInM()` requires returning an instance of a data type the same way `binding()` does.
+In any `binding()` block there is a helper function `bindIn()` that takes a `CoroutineContext` as a parameter and can return any value.
+This value will be lifted into a data type using `pure()`.
 
 The functions will cause a new coroutine to start on the `CoroutineContext` passed as a parameter to then `bind()` to await for its completion.
 
@@ -206,12 +206,10 @@ val ioThreadContext = newSingleThreadContext("IO")
 val computationThreadContext = newSingleThreadContext("Computation")
 
 fun getLineLengthAverage(path: FilePath): IO<List<String>> = 
-  IO.monadError().bindingE {
-    
-    // Wrapping the operation into a suspended asynchronous IO then using bindInM to bind it
-    val file = bindInM(ioThreadContext) { IO.pure(getFile(path)) }
+  IO.monadError().bindingCatch {
     
     // Implicitly wrap the result of a synchronous operation into IO.pure() using bindIn
+    val file = bindIn(ioThreadContext) { getFile(path) }    
     val lines = bindIn(computationThreadContext) { file.readLines() }
     
     val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
@@ -220,55 +218,10 @@ fun getLineLengthAverage(path: FilePath): IO<List<String>> =
   }
 ```
 
-Note that `bindIn()` and `bindInM()` don't assure that the execution will return to the same thread where the binding started, as it depends on the implementation of the data type.
-This means that for the previous snippet [`IO`]({{ '/docs/effects/io' | relative_url }}) may calculate count and average on different threads than what [`Option`]({{ '/docs/datatypes/option' | relative_url }}) or [`Try`]({{ '/docs/datatypes/try' | relative_url }}) would.
+Note that `bindIn()`assures that the execution will return to the same thread where the binding started after the `bindIn` block executes.
 
-#### Gotchas: lazy evaluation and suspension
-
-It is important to understand that only the block inside `bindInM()` will run on a background thread.
-It could be the case that deferred operations using lambdas inside the block would only run those lambdas on the final execution thread.
-See this example:
-
-```kotlin
-val tc1 = newSingleThreadContext("T1")
-val tc2 = newSingleThreadContext("T2")
-
-IO.monad().binding {
-  val a = bindInM(tc1){ IO { Thread.currentThread().name } }
-  val b = bindIn(tc2) { "in ${Thread.currentThread().name} after $a"}
-  yields(b)
-}.ev().unsafeRunSync()
-//in T2 after main
-```
-
-this is caused by `IO` suspending the function `Thread.currentThread().name` in `a`.
-The function isn't executed until `unsafeRunSync()` is called in the current main thread.
-The fix is trivial simply by capturing the thread name from the outer scope
-
-```kotlin
-IO.monad().binding {
-    val a = bindInM(tc1){ 
-      val name = Thread.currentThread().name
-      IO { name } 
-    }
-    val b = bindIn(tc2) { "in ${Thread.currentThread().name} after $a" }
-    yields(b)
-}.ev().unsafeRunSync()
-//in T2 after T1
-```
-
-or making the evaluation happen eagerly
-
-```kotlin
-IO.monad().binding {
-    val a = bindInM(tc1){ IO.pure(Thread.currentThread().name) }
-    val b = bindIn(tc2) { "in ${Thread.currentThread().name} after $a" }
-    yields(b)
-}.ev().unsafeRunSync()
-//in T2 after T1
-```
-
-which makes it very visual to understand that `bindIn()` is just an alias for a `bindInM()` that calls the constructor `pure()`.
+There is also a version of `bindIn` called `bindDeferredIn` that allows deferred construction.
+It's available for `bindingCancellable` comprehensions over instances of [`Sync`]({{ '/docs/effects/sync' | relative_url }}).
 
 ### What if I'd like to run multiple operations independently from each other, in a non-sequential way?
 
@@ -277,11 +230,11 @@ You can check the section on the [Applicative Builder]({{ '/docs/patterns/applic
 ### Cancellation and cleanup of resources
 
 In some environments that have resources with their own lifecycle (i.e. Activity in Android development) retaining these values in operations that can run indefinitely may cause large memory leaks and lead to undefined behavior.
-As cleanup is important in these restricted environments, the function `bindingECancellable` allows for comprehensions to be finished early by throwing an `InterruptedException` at the beginning of the next `bind()` step.
+As cleanup is important in these restricted environments, any instance of [`Sync`]({{ '/docs/effects/sync' | relative_url }}) provides the function `bindingCancellable`, which allows for comprehensions to be finished early by throwing an `BindingCancellationException` at the beginning of the next `bind()` step.
 
 ```kotlin
 val (binding: IO<List<User>>, unsafeCancel: Disposable) =
-  ioMonadError.bindingECancellable {
+  ioSync.bindingCancellable {
     val userProfile = bindAsync(ioAsync) { getUserProfile("123") }
     val friendProfiles = userProfile.friends().map { friend ->
         bindAsync(ioAsync) { getProfile(friend.id) }
@@ -294,7 +247,7 @@ binding.unsafeRunAsync { result ->
 }
 
 unsafeCancel()
-// Boom! caused by InterruptedException
+// Boom! caused by BindingCancellationException
 ```
 
 Note that the cancellation happens on the `bind()` step, so any currently running operations before `bind()` will have to complete first, even those that are scheduled for threading.

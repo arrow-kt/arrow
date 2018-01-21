@@ -76,7 +76,7 @@ val songObservable: ObservableKW<Url> = getSongUrlAsync().ev()
 val songFlowable: FlowableKW<Url> = getSongUrlAsync().ev()
 ```
 
-[`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) using the method `bindingE`, with all its benefits.
+[`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) using the method `bindingCatch`, with all its benefits.
 
 Let's take an example and convert it to a comprehension. We'll create an observable that loads a song from a remote location, and then reports the current play % every 100 milliseconds until the percentage reaches 100%:
 
@@ -96,10 +96,10 @@ getSongUrlAsync()
   }
 ```
 
-When rewritten using `bindingE` it becomes. Note that any unexpected exception, like AritmeticException when totalTime is 0, is automatically caught and wrapped inside the observable. 
+When rewritten using `bindingCatch` it becomes:
 
 ```kotlin
-ObservableKW.monadError().bindingE {
+ObservableKW.monadError().bindingCatch {
   val songUrl = getSongUrlAsync().bind()
   val musicPlayer = MediaPlayer.load(songUrl)
   val totalTime = musicPlayer.getTotaltime()
@@ -107,7 +107,7 @@ ObservableKW.monadError().bindingE {
   val end = PublishSubject.create<Unit>()
   Observable.interval(100, Milliseconds).takeUntil(end).bind()
 
-  val tick = bindInM(UI) { Observable.create { musicPlayer.getCurrentTime() } }
+  val tick = bindIn(UI) { musicPlayer.getCurrentTime() }
   val percent = (tick / totalTime * 100).toInt()
   if (percent >= 100) {
     end.onNext(Unit)
@@ -117,9 +117,11 @@ ObservableKW.monadError().bindingE {
 }.ev()
 ```
 
+Note that any unexpected exception, like AritmeticException when totalTime is 0, is automatically caught and wrapped inside the observable. 
+
 ### Subscription and cancellation
 
-Observables created with `bindingE` behave the same way regular observables do, including cancellation by disposing the subscription.
+Observables created with comprehensions like `bindingCatch` behave the same way regular observables do, including cancellation by disposing the subscription.
 
 ```kotlin
 val disposable = 
@@ -129,11 +131,12 @@ val disposable =
 disposable.dispose()
 ```
 
-Note that [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) provides an alternative to `bindingE` called `bindingECancellable` returning a `arrow.Disposable`. Invoking this `Disposable` causes an `InterruptedException` in the chain which needs to be handled by the subscriber. This behavior is similar to cancelling an `rx.Single`.
+Note that [`Sync`]({{ '/docs/effects/sync' | relative_url }}) provides an alternative to `bindingCatch` called `bindingCancellable` returning a `arrow.Disposable`.
+Invoking this `Disposable` causes an `BindingCancellationException` in the chain which needs to be handled by the subscriber, similarly to what `Deferred` does.
 
 ```kotlin
 val (observable, disposable) = 
-  ObservableKW.monadError().bindingECancellable {
+  ObservableKW.sync().bindingCancellable {
     val userProfile = Observable.create { getUserProfile("123") }
     val friendProfiles = userProfile.friends().map { friend ->
         bindAsync(observableAsync) { getProfile(friend.id) }
@@ -145,5 +148,5 @@ observable.value()
   .subscribe({ Log.d("User $it") } , { prinln("Boom! caused by $it") })
 
 disposable()
-// Boom! caused by InterruptedException
+// Boom! caused by BindingCancellationException
 ```

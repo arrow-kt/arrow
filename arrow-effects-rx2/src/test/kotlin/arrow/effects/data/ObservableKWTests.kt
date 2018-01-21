@@ -51,9 +51,9 @@ class ObservableKWTest : UnitSpec() {
             traverse<ObservableKWHK>() shouldNotBe null
         }
 
-        testLaws(AsyncLaws.laws(ObservableKW.async(), ObservableKW.monadErrorFlat(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(ObservableKW.async(), ObservableKW.monadErrorConcat(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(ObservableKW.async(), ObservableKW.monadErrorSwitch(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(ObservableKW.async(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(ObservableKW.async(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(ObservableKW.async(), EQ(), EQ()))
 
         testLaws(
                 FoldableLaws.laws(ObservableKW.foldable(), { ObservableKW.pure(it) }, Eq.any()),
@@ -61,7 +61,7 @@ class ObservableKWTest : UnitSpec() {
         )
 
         "Multi-thread Observables finish correctly" {
-            val value: Observable<Long> = ObservableKW.monadErrorFlat().bindingE {
+            val value: Observable<Long> = ObservableKW.monadErrorFlat().bindingCatch {
                 val a = Observable.timer(2, TimeUnit.SECONDS).k().bind()
                 yields(a)
             }.value()
@@ -74,7 +74,7 @@ class ObservableKWTest : UnitSpec() {
         "Multi-thread Observables should run on their required threads" {
             val originalThread: Thread = Thread.currentThread()
             var nextThread: Thread? = null
-            val value: Observable<Long> = ObservableKW.monadErrorFlat().bindingE {
+            val value: Observable<Long> = ObservableKW.monadErrorFlat().bindingCatch {
                 val a = Observable.timer(2, TimeUnit.SECONDS).k().bind()
                 nextThread = Thread.currentThread()
                 val b = Observable.just(a).observeOn(Schedulers.newThread()).k().bind()
@@ -88,7 +88,7 @@ class ObservableKWTest : UnitSpec() {
         }
 
         "Observable cancellation forces binding to cancel without completing too" {
-            val value: Observable<Long> = ObservableKW.monadErrorFlat().bindingE {
+            val value: Observable<Long> = ObservableKW.monadErrorFlat().bindingCatch {
                 val a = Observable.timer(3, TimeUnit.SECONDS).k().bind()
                 yields(a)
             }.value()

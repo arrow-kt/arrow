@@ -1,6 +1,8 @@
 package arrow.typeclasses
 
-import arrow.*
+import arrow.HK
+import arrow.TC
+import arrow.typeclass
 import kotlin.coroutines.experimental.startCoroutine
 
 @typeclass
@@ -15,14 +17,14 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F>, TC {
 }
 
 /**
- * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.
- * A coroutines is initiated and inside [MonadErrorContinuation] suspended yielding to [Monad.flatMap]. Once all the flatMap binds are completed
+ * Entry point for monad bindings which enables for comprehensions. The underlying implementation is based on coroutines.
+ * A coroutine is initiated and suspended inside [MonadErrorContinuation] yielding to [Monad.flatMap]. Once all the flatMap binds are completed
  * the underlying monad is returned from the act of executing the coroutine
  *
  * This one operates over [MonadError] instances that can support [Throwable] in their error type automatically lifting
  * errors as failed computations in their monadic context and not letting exceptions thrown as the regular monad binding does.
  */
-fun <F, B> MonadError<F, Throwable>.bindingE(c: suspend MonadErrorContinuation<F, *>.() -> HK<F, B>): HK<F, B> {
+fun <F, B> MonadError<F, Throwable>.bindingCatch(c: suspend MonadErrorContinuation<F, *>.() -> HK<F, B>): HK<F, B> {
     val continuation = MonadErrorContinuation<F, B>(this)
     c.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()

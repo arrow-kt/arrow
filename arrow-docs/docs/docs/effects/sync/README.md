@@ -86,6 +86,30 @@ IO.async()
 
 > deferUnsafe() exists for performance purposes when throwing can be avoided.
 
+### Comprehensions
+
+#### bindindCancellable
+
+It starts a [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) that allows for cancellation and suspension in separate threads.
+
+#### bindindCancellable#bindDefer
+
+Binds the function parameter by wrapping the result in `pure()`.
+
+Exceptions are wrapped in `raiseError()`.
+
+#### bindindCancellable#bindDeferIn
+
+Executes the function parameter in a separate `CoroutineContext` and wraps the result in `pure()`.
+
+Exceptions are wrapped in `raiseError()`.
+
+#### bindindCancellable#bindDeferUnsafe
+
+Binds the function parameter by wrapping the result in `pure()`.
+
+While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution.
+
 ### Syntax
 
 #### (() -> A)#defer
@@ -125,6 +149,10 @@ While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/d
   .deferUnsafe(IO.sync())
   .ev().attempt().unsafeRunSync()
 ```
+
+### Laws
+
+Arrow provides [`SyncLaws`]({{ '/docs/typeclasses/laws#synclaws' | relative_url }}) in the form of test cases for internal verification of lawful instances and third party apps creating their own `Sync` instances.
 
 ### Data types
 

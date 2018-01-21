@@ -44,6 +44,9 @@ sealed class IO<out A> : IOKind<A> {
         val unit: IO<Unit> =
                 pure(Unit)
 
+        val lazy: IO<Unit> =
+                invoke { }
+
         fun <A> eval(eval: Eval<A>): IO<A> =
                 when (eval) {
                     is Eval.Now -> pure(eval.value)
