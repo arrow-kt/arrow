@@ -51,7 +51,7 @@ ME.ensure(either, { RuntimeException("Failed predicate") }, { it < 0 })
 
 ### Comprehensions
 
-#### bindindCatch
+#### bindingCatch
 
 It starts a [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) that wraps any exception thrown in the block inside `raiseError()`.
 
