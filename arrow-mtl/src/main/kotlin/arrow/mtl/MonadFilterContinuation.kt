@@ -16,6 +16,8 @@ open class MonadFilterContinuation<F, A>(val MF: MonadFilter<F>, override val co
      */
     private object PredicateInterrupted : RuntimeException()
 
+    internal fun returnedMonad(): HK<F, A> = returnedMonad
+
     override fun resumeWithException(exception: Throwable) {
         when (exception) {
             is PredicateInterrupted -> returnedMonad = MF.empty()

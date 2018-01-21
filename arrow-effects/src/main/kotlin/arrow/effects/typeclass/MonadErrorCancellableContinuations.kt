@@ -5,15 +5,13 @@ import arrow.core.Tuple2
 import arrow.core.toT
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.internal.stackLabels
+import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadErrorContinuation
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.coroutines.experimental.CoroutineContext
-import kotlin.coroutines.experimental.EmptyCoroutineContext
-import kotlin.coroutines.experimental.RestrictsSuspension
+import kotlin.coroutines.experimental.*
 import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
-import kotlin.coroutines.experimental.startCoroutine
 
 typealias Disposable = () -> Unit
 
@@ -23,11 +21,19 @@ open class MonadErrorCancellableContinuation<F, A>(ME: MonadError<F, Throwable>,
 
     protected val cancelled: AtomicBoolean = AtomicBoolean(false)
 
-    fun disposable(): Disposable = { cancelled.set(true) }
+    var currentCont: Continuation<*>? = null
 
-    override fun returnedMonad(): HK<F, A> = returnedMonad
+    open fun disposable(): Disposable = {
+        val bindingCancellationException = BindingCancellationException()
+        returnedMonad = raiseError(bindingCancellationException)
+        currentCont?.apply { resumeWithException(bindingCancellationException) }
+        cancelled.set(true)
+    }
+
+    internal fun returnedMonad(): HK<F, A> = returnedMonad
 
     override suspend fun <B> bind(m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
+        currentCont = c
         val labelHere = c.stackLabels // save the whole coroutine stack labels
         returnedMonad = flatMap(m(), { x: B ->
             c.stackLabels = labelHere
@@ -41,25 +47,49 @@ open class MonadErrorCancellableContinuation<F, A>(ME: MonadError<F, Throwable>,
     }
 
     override suspend fun <B> bindInM(context: CoroutineContext, m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
+        currentCont = c
         val labelHere = c.stackLabels // save the whole coroutine stack labels
-        val monadCreation: suspend () -> HK<F, A> = {
-            flatMap(m(), { xx: B ->
-                c.stackLabels = labelHere
-                if (cancelled.get()) {
-                    throw BindingCancellationException()
-                }
-                c.resume(xx)
-                returnedMonad
-            })
+
+        val creation = MonadContinuation<F, A>(this, context)
+        val execution = MonadContinuation<F, A>(this, context)
+
+        val monadExecution: suspend (B) -> HK<F, A> = {
+            c.stackLabels = labelHere
+            if (cancelled.get()) {
+                val exception = BindingCancellationException()
+                c.resumeWithException(exception)
+                throw exception
+            }
+            c.resume(it)
+            returnedMonad
         }
-        val completion = bindingInContextContinuation(context)
-        returnedMonad = flatMap(pure(Unit), {
-            monadCreation.startCoroutine(completion)
-            val error = completion.await()
-            if (error != null) {
-                throw error
+        val monadCreation: suspend () -> HK<F, A> = {
+            returnedMonad = try {
+                flatMap(m(), { xx: B ->
+                    monadExecution.startCoroutine(xx, execution)
+                    if (cancelled.get()) {
+                        val exception = BindingCancellationException()
+                        c.resumeWithException(exception)
+                        raiseError(exception)
+                    } else {
+                        returnedMonad
+                    }
+                })
+            } catch (t: Throwable) {
+                raiseError(t)
             }
             returnedMonad
+        }
+
+        returnedMonad = flatMap(pure(Unit), {
+            monadCreation.startCoroutine(creation)
+            if (cancelled.get()) {
+                val exception = BindingCancellationException()
+                c.resumeWithException(exception)
+                raiseError(exception)
+            } else {
+                returnedMonad
+            }
         })
         COROUTINE_SUSPENDED
     }
