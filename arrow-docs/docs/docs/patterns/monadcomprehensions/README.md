@@ -220,6 +220,9 @@ fun getLineLengthAverage(path: FilePath): IO<List<String>> =
 
 Note that `bindIn()`assures that the execution will return to the same thread where the binding started after the `bindIn` block executes.
 
+There is also a version of `bindIn` called `bindDeferredIn` that allows deferred construction.
+It's available for `bindingCancellable` comprehensions over instances of [`Sync`]({{ '/docs/effects/sync' | relative_url }}).
+
 ### What if I'd like to run multiple operations independently from each other, in a non-sequential way?
 
 You can check the section on the [Applicative Builder]({{ '/docs/patterns/applicative_builder' | relative_url }}) pattern for them!
