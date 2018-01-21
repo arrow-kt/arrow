@@ -115,11 +115,11 @@ It is also posible to `await()` on the wrapper like you would on `Deferred`, but
 
 ### Error handling & recovery
 
-[`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) using the method `bindingE`, with all its benefits.
+[`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) using the method `bindingCatch`, with all its benefits.
 These benefits include capturing all exceptions that happen inside the block.
 
 ```kotlin
-DeferredKW.monadError().bindingE {
+DeferredKW.monadError().bindingCatch {
   val songUrl = getSongUrlAsync().bind()
   val musicPlayer = MediaPlayer.load(songUrl)
   val totalTime = musicPlayer.getTotaltime() // Oh oh, total time is 0
@@ -156,14 +156,14 @@ recoveryArrowWrapper.unsafeAttemptSync()
 
 ### Subscription and cancellation
 
-`DeferredKW` created with `bindingE` behave the same way regular `Deferred` do, including cancellation by disposing the subscription.
+`DeferredKW` created with `bindingCatch` behave the same way regular `Deferred` do, including cancellation by disposing the subscription.
 
-Note that [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) provides an alternative to `bindingE` called `bindingECancellable` returning a `arrow.Disposable`.
-Invoking this `Disposable` causes an `InterruptedException` in the chain which needs to be handled by the subscriber, similarly to what `Deferred` does.
+Note that [`Sync`]({{ '/docs/effects/sync' | relative_url }}) provides an alternative to `bindingCatch` called `bindingCancellable` returning a `arrow.Disposable`.
+Invoking this `Disposable` causes an `BindingCancellationException` in the chain which needs to be handled by the subscriber, similarly to what `Deferred` does.
 
 ```kotlin
 val (deferred, unsafeCancel) = 
-  DeferredKW.monadError().bindingECancellable {
+  DeferredKW.monadError().bindingCatchCancellable {
     val userProfile = DeferredKW { getUserProfile("123") }.bind()
     val friendProfiles = userProfile.friends().map { friend ->
         DeferredKW { getProfile(friend.id) }.bind()
@@ -176,7 +176,7 @@ deferred.unsafeRunAsync { result ->
 }
   
 unsafeCancel()
-// Boom! caused by InterruptedException
+// Boom! caused by BindingCancellationException
 ```
 
 ### Instances
