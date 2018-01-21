@@ -16,16 +16,16 @@ interface ObservableKWMonadErrorInstance :
 }
 
 @instance(ObservableKW::class)
-interface ObservableKWSyncInstance :
+interface ObservableKWMonadSuspendInstance :
         ObservableKWMonadErrorInstance,
-        Sync<ObservableKWHK> {
+        MonadSuspend<ObservableKWHK> {
     override fun <A> suspend(fa: () -> ObservableKWKind<A>): ObservableKW<A> =
             ObservableKW.suspend(fa)
 }
 
 @instance(ObservableKW::class)
 interface ObservableKWAsyncInstance :
-        ObservableKWSyncInstance,
+        ObservableKWMonadSuspendInstance,
         Async<ObservableKWHK> {
     override fun <A> async(fa: Proc<A>): ObservableKW<A> =
             ObservableKW.runAsync(fa)

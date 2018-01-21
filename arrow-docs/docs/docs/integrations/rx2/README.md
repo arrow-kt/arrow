@@ -131,12 +131,12 @@ val disposable =
 disposable.dispose()
 ```
 
-Note that [`Sync`]({{ '/docs/effects/sync' | relative_url }}) provides an alternative to `bindingCatch` called `bindingCancellable` returning a `arrow.Disposable`.
+Note that [`MonadSuspend`]({{ '/docs/effects/monadsuspend' | relative_url }}) provides an alternative to `bindingCatch` called `bindingCancellable` returning a `arrow.Disposable`.
 Invoking this `Disposable` causes an `BindingCancellationException` in the chain which needs to be handled by the subscriber, similarly to what `Deferred` does.
 
 ```kotlin
 val (observable, disposable) = 
-  ObservableKW.sync().bindingCancellable {
+  ObservableKW.monadSuspend().bindingCancellable {
     val userProfile = Observable.create { getUserProfile("123") }
     val friendProfiles = userProfile.friends().map { friend ->
         bindAsync(observableAsync) { getProfile(friend.id) }

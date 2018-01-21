@@ -29,7 +29,9 @@ class DeferredKWTest : UnitSpec() {
             applicative<DeferredKWHK>() shouldNotBe null
             monad<DeferredKWHK>() shouldNotBe null
             monadError<DeferredKWHK, Throwable>() shouldNotBe null
+            monadSuspend<DeferredKWHK>() shouldNotBe null
             async<DeferredKWHK>() shouldNotBe null
+            effect<DeferredKWHK>() shouldNotBe null
         }
 
         "DeferredKW is awaitable" {

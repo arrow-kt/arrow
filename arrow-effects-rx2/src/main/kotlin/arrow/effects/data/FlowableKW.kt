@@ -118,21 +118,21 @@ data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A>, Flowabl
                     fa.ev().switchMap { f(it).ev() }
         }
 
-        fun syncBuffer(): FlowableKWSyncInstance = FlowableKWSyncInstanceImplicits.instance()
+        fun syncBuffer(): FlowableKWMonadSuspendInstance = FlowableKWMonadSuspendInstanceImplicits.instance()
 
-        fun syncDrop(): FlowableKWSyncInstance = object : FlowableKWSyncInstance {
+        fun syncDrop(): FlowableKWMonadSuspendInstance = object : FlowableKWMonadSuspendInstance {
             override fun BS(): BackpressureStrategy = BackpressureStrategy.DROP
         }
 
-        fun syncError(): FlowableKWSyncInstance = object : FlowableKWSyncInstance {
+        fun syncError(): FlowableKWMonadSuspendInstance = object : FlowableKWMonadSuspendInstance {
             override fun BS(): BackpressureStrategy = BackpressureStrategy.ERROR
         }
 
-        fun syncLatest(): FlowableKWSyncInstance = object : FlowableKWSyncInstance {
+        fun syncLatest(): FlowableKWMonadSuspendInstance = object : FlowableKWMonadSuspendInstance {
             override fun BS(): BackpressureStrategy = BackpressureStrategy.LATEST
         }
 
-        fun syncMissing(): FlowableKWSyncInstance = object : FlowableKWSyncInstance {
+        fun syncMissing(): FlowableKWMonadSuspendInstance = object : FlowableKWMonadSuspendInstance {
             override fun BS(): BackpressureStrategy = BackpressureStrategy.MISSING
         }
 
