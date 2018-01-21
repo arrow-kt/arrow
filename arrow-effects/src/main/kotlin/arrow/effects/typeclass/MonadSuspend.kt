@@ -37,7 +37,7 @@ inline fun <reified F, A> (() -> Either<Throwable, A>).deferUnsafe(SC: MonadSusp
 
 /**
  * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.
- * A coroutines is initiated and inside [SyncCancellableContinuation] suspended yielding to [Monad.flatMap]. Once all the flatMap binds are completed
+ * A coroutines is initiated and inside [MonadSuspendCancellableContinuation] suspended yielding to [Monad.flatMap]. Once all the flatMap binds are completed
  * the underlying monad is returned from the act of executing the coroutine
  *
  * This one operates over [MonadError] instances that can support [Throwable] in their error type automatically lifting
@@ -46,8 +46,8 @@ inline fun <reified F, A> (() -> Either<Throwable, A>).deferUnsafe(SC: MonadSusp
  * This operation is cancellable by calling invoke on the [Disposable] return.
  * If [Disposable.invoke] is called the binding result will become a lifted [BindingCancellationException].
  */
-fun <F, B> MonadSuspend<F>.bindingCancellable(c: suspend SyncCancellableContinuation<F, *>.() -> HK<F, B>): Tuple2<HK<F, B>, Disposable> {
-    val continuation = SyncCancellableContinuation<F, B>(this)
+fun <F, B> MonadSuspend<F>.bindingCancellable(c: suspend MonadSuspendCancellableContinuation<F, *>.() -> HK<F, B>): Tuple2<HK<F, B>, Disposable> {
+    val continuation = MonadSuspendCancellableContinuation<F, B>(this)
     c.startCoroutine(continuation, continuation)
     return continuation.returnedMonad() toT continuation.disposable()
 }
