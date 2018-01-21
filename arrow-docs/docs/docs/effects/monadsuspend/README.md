@@ -152,7 +152,7 @@ While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/d
 
 ### Laws
 
-Arrow provides [`SyncLaws`]({{ '/docs/typeclasses/laws#synclaws' | relative_url }}) in the form of test cases for internal verification of lawful instances and third party apps creating their own `MonadSuspend` instances.
+Arrow provides [`MonadSuspendLaws`]({{ '/docs/typeclasses/laws#monadsuspendlaws' | relative_url }}) in the form of test cases for internal verification of lawful instances and third party apps creating their own `MonadSuspend` instances.
 
 ### Data types
 
