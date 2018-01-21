@@ -1,6 +1,10 @@
 package arrow.effects
 
-import arrow.*
+import arrow.HK
+import arrow.test.UnitSpec
+import arrow.test.generators.genIntSmall
+import arrow.test.laws.AsyncLaws
+import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
@@ -10,10 +14,6 @@ import kotlinx.coroutines.experimental.CoroutineStart
 import kotlinx.coroutines.experimental.Unconfined
 import kotlinx.coroutines.experimental.runBlocking
 import org.junit.runner.RunWith
-import arrow.test.UnitSpec
-import arrow.test.generators.genIntSmall
-import arrow.test.laws.AsyncLaws
-import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class DeferredKWTest : UnitSpec() {
@@ -22,14 +22,14 @@ class DeferredKWTest : UnitSpec() {
     }
 
     init {
-        testLaws(AsyncLaws.laws(DeferredKW.asyncContext(), DeferredKW.monadError(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(DeferredKW.async(), DeferredKW.monadError(), EQ(), EQ()))
 
         "instances can be resolved implicitly"{
             functor<DeferredKWHK>() shouldNotBe null
             applicative<DeferredKWHK>() shouldNotBe null
             monad<DeferredKWHK>() shouldNotBe null
             monadError<DeferredKWHK, Throwable>() shouldNotBe null
-            asyncContext<DeferredKWHK>() shouldNotBe null
+            async<DeferredKWHK>() shouldNotBe null
         }
 
         "DeferredKW is awaitable" {

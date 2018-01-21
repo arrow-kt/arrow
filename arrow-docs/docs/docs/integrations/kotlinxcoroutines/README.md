@@ -76,7 +76,7 @@ To wrap any existing `Deferred` in its Arrow Wrapper counterpart you can use the
 val deferredWrapped = async { throw RuntimeException("BOOM!") }.k()
 ```
 
-All the other usual constructors like `pure()`, `suspend()`, and `runAsync()` are available too, in versions that accept different values for `CoroutineStart` and `CoroutineContext`.
+All the other usual constructors like `pure()`, `suspend()`, and `async()` are available too, in versions that accept different values for `CoroutineStart` and `CoroutineContext`.
 
 To unwrap the value of a `DeferredKW` we provide a synchronous method called `unsafeAttemptSync()` that returns a `Try<A>`.
 

@@ -1,7 +1,8 @@
 package arrow.effects
 
-import arrow.*
+import arrow.HK
 import arrow.core.Either
+import arrow.instance
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
@@ -16,6 +17,27 @@ interface IOMonadErrorInstance : IOMonadInstance, MonadError<IOHK, Throwable> {
 
     override fun <A> raiseError(e: Throwable): IO<A> =
             IO.raiseError(e)
+}
+
+@instance(IO::class)
+interface IOSyncInstance : IOMonadErrorInstance, Sync<IOHK> {
+    override fun <A> suspend(fa: () -> IOKind<A>): IO<A> =
+            IO.suspend(fa)
+}
+
+@instance(IO::class)
+interface IOAsyncInstance : IOSyncInstance, Async<IOHK> {
+    override fun <A> async(fa: Proc<A>): IO<A> =
+            IO.async(fa)
+
+    override fun <A> invoke(fa: () -> A): IO<A> =
+            IO.invoke(fa)
+}
+
+@instance(IO::class)
+interface IOEffectInstance : IOAsyncInstance, Effect<IOHK> {
+    override fun <A> runAsync(fa: HK<IOHK, A>, cb: (Either<Throwable, A>) -> IOKind<Unit>): IO<Unit> =
+            fa.ev().runAsync(cb)
 }
 
 @instance(IO::class)

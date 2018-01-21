@@ -46,14 +46,14 @@ class ObservableKWTest : UnitSpec() {
             applicative<ObservableKWHK>() shouldNotBe null
             monad<ObservableKWHK>() shouldNotBe null
             monadError<ObservableKWHK, Unit>() shouldNotBe null
-            asyncContext<ObservableKWHK>() shouldNotBe null
+            async<ObservableKWHK>() shouldNotBe null
             foldable<ObservableKWHK>() shouldNotBe null
             traverse<ObservableKWHK>() shouldNotBe null
         }
 
-        testLaws(AsyncLaws.laws(ObservableKW.asyncContext(), ObservableKW.monadErrorFlat(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(ObservableKW.asyncContext(), ObservableKW.monadErrorConcat(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(ObservableKW.asyncContext(), ObservableKW.monadErrorSwitch(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(ObservableKW.async(), ObservableKW.monadErrorFlat(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(ObservableKW.async(), ObservableKW.monadErrorConcat(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(ObservableKW.async(), ObservableKW.monadErrorSwitch(), EQ(), EQ()))
 
         testLaws(
                 FoldableLaws.laws(ObservableKW.foldable(), { ObservableKW.pure(it) }, Eq.any()),
