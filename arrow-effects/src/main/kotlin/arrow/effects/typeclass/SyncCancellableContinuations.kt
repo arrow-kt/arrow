@@ -5,7 +5,7 @@ import arrow.core.Either
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.internal.stackLabels
 import arrow.typeclasses.MonadErrorContinuation
-import arrow.typeclasses.binding
+import arrow.typeclasses.bindingCatch
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.EmptyCoroutineContext
@@ -30,7 +30,7 @@ open class SyncCancellableContinuation<F, A>(val SC: Sync<F>, override val conte
             SC(f).bind()
 
     suspend fun <B> bindDeferIn(context: CoroutineContext, f: () -> B): B =
-            SC.suspend { binding { yields(bindIn(context, f)) } }.bind()
+            SC.suspend { SC.bindingCatch { yields(bindIn(context, f)) } }.bind()
 
     suspend fun <B> bindDeferUnsafe(f: () -> Either<Throwable, B>): B =
             SC.deferUnsafe(f).bind()
