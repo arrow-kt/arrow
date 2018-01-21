@@ -31,7 +31,8 @@ object SyncLaws {
                     Law("Sync bind: binding cancellation after flatMap", { asyncCancellationAfter(SC, EQ) }),
                     Law("Sync bind: bindingInContext cancellation before flatMap", { inContextCancellationBefore(SC, EQ) }),
                     Law("Sync bind: bindingInContext cancellation after flatMap", { inContextCancellationAfter(SC, EQ) }),
-                    Law("Sync bind: bindingInContext throw equivalent to raiseError", { inContextErrorThrow(SC, EQERR) })
+                    Law("Sync bind: bindingInContext throw equivalent to raiseError", { inContextErrorThrow(SC, EQERR) }),
+                    Law("Sync bind: monad comprehensions binding in other threads equivalence", { monadComprehensionsBindInContextEquivalent(SC, EQ) })
             )
 
     inline fun <reified F> asyncBind(SC: Sync<F> = sync(), EQ: Eq<HK<F, Int>>): Unit =
@@ -143,5 +144,20 @@ object SyncLaws {
                     val a: Int = bindIn(newSingleThreadContext("1")) { throw throwable }
                     yields(a)
                 }.a.equalUnderTheLaw(SC.raiseError(throwable), EQ)
+            })
+
+    inline fun <reified F> monadComprehensionsBindInContextEquivalent(SC: Sync<F> = sync<F>(), EQ: Eq<HK<F, Int>>): Unit =
+            forFew(5, genIntSmall(), { num: Int ->
+                val bindM = SC.bindingCancellable {
+                    val a = bindDeferIn(newSingleThreadContext("$num")) { num + 1 }
+                    val b = bindDeferIn(newSingleThreadContext("$a")) { a + 1 }
+                    yields(b)
+                }
+                val bind = SC.bindingCancellable {
+                    val a = bindIn(newSingleThreadContext("$num")) { num + 1 }
+                    val b = bindIn(newSingleThreadContext("$a")) { a + 1 }
+                    yields(b)
+                }
+                bindM.a.equalUnderTheLaw(bind.a, EQ)
             })
 }
