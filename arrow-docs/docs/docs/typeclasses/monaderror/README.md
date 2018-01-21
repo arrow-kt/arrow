@@ -6,11 +6,14 @@ permalink: /docs/typeclasses/monaderror/
 
 ## MonadError
 
-WIP
+MonadError is the typeclase used to explicitly represent errors during sequential execution.
+These errors can come in the form of `Throwable`, `Exception`, or any other type hierarchy of the user's choice.
+
+`MonadError` extends from [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}), which is already used to represent errors in independent computations. This way all the methods `ApplicativeError` provides to handle recovery from errors are also available.
 
 ### Main Combinators
 
-`MonadError` inherits all the combinators available in [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}) and [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}).
+`MonadError` inherits all the combinators available in [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}) and [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}). It also adds one of its own.
 
 #### raiseError
 
