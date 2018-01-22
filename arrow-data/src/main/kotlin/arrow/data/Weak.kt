@@ -1,11 +1,6 @@
 package arrow.data
 
-import arrow.core.Either
-import arrow.core.Either.Left
-import arrow.core.Either.Right
-import arrow.core.Eval
-import arrow.core.Option
-import arrow.core.Predicate
+import arrow.core.*
 import arrow.higherkind
 import java.lang.ref.WeakReference
 
@@ -28,13 +23,14 @@ data class Weak<out A>(internal val provider: () -> A?) : WeakKind<A> {
             return Weak { reference.get() }
         }
 
-        fun <A, B> tailRectM(a: A, f: (A) -> WeakKind<Either<A, B>>): Weak<B> = f(a).ev()
-                .flatMap {
-                    when (it) {
-                        is Left -> tailRectM(it.a, f)
-                        is Right -> it.b.weak()
-                    }
-                }
+        tailrec fun <A, B> tailRectM(a: A, f: (A) -> WeakKind<Either<A, B>>): Weak<B> {
+            val value: Either<A, B>? = f(a).ev().provider()
+            return when (value) {
+                null -> emptyWeak()
+                is Either.Left -> tailRectM(value.a, f)
+                is Either.Right -> value.b.weak()
+            }
+        }
     }
 
     fun asOption(): Option<A> = Option.fromNullable(provider())
