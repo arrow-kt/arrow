@@ -44,7 +44,7 @@ Because typeclasses require generic parameters each implementation is meant to b
 
 ```kotlin
 @instance
-object IntEqInstance: Eq<Int> {
+interface IntEqInstance: Eq<Int> {
   override fun eqv(a: Int, b: Int): Boolean = a == b
 }
 ```

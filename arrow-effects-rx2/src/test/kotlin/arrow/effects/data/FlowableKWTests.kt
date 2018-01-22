@@ -44,30 +44,32 @@ class FlowableKWTests : UnitSpec() {
             applicative<FlowableKWHK>() shouldNotBe null
             monad<FlowableKWHK>() shouldNotBe null
             monadError<FlowableKWHK, Unit>() shouldNotBe null
-            asyncContext<FlowableKWHK>() shouldNotBe null
+            monadSuspend<FlowableKWHK>() shouldNotBe null
+            async<FlowableKWHK>() shouldNotBe null
+            effect<FlowableKWHK>() shouldNotBe null
             foldable<FlowableKWHK>() shouldNotBe null
             traverse<FlowableKWHK>() shouldNotBe null
         }
 
-        testLaws(AsyncLaws.laws(FlowableKW.asyncContext(), FlowableKW.monadErrorFlat(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableKW.asyncContext(), FlowableKW.monadErrorConcat(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableKW.asyncContext(), FlowableKW.monadErrorSwitch(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableKW.async(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableKW.async(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableKW.async(), EQ(), EQ()))
 
-        testLaws(AsyncLaws.laws(FlowableKW.asyncContextDrop(), FlowableKW.monadError(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableKW.asyncContextDrop(), FlowableKW.monadErrorConcat(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableKW.asyncContextDrop(), FlowableKW.monadErrorSwitch(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableKW.asyncDrop(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableKW.asyncDrop(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableKW.asyncDrop(), EQ(), EQ()))
 
-        testLaws(AsyncLaws.laws(FlowableKW.asyncContextError(), FlowableKW.monadError(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableKW.asyncContextError(), FlowableKW.monadErrorConcat(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableKW.asyncContextError(), FlowableKW.monadErrorSwitch(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableKW.asyncError(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableKW.asyncError(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableKW.asyncError(), EQ(), EQ()))
 
-        testLaws(AsyncLaws.laws(FlowableKW.asyncContextLatest(), FlowableKW.monadError(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableKW.asyncContextLatest(), FlowableKW.monadErrorConcat(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableKW.asyncContextLatest(), FlowableKW.monadErrorSwitch(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableKW.asyncLatest(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableKW.asyncLatest(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableKW.asyncLatest(), EQ(), EQ()))
 
-        testLaws(AsyncLaws.laws(FlowableKW.asyncContextMissing(), FlowableKW.monadError(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableKW.asyncContextMissing(), FlowableKW.monadErrorConcat(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableKW.asyncContextMissing(), FlowableKW.monadErrorSwitch(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableKW.asyncMissing(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableKW.asyncMissing(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableKW.asyncMissing(), EQ(), EQ()))
 
         testLaws(
                 FoldableLaws.laws(FlowableKW.foldable(), { FlowableKW.pure(it) }, Eq.any()),
@@ -75,7 +77,7 @@ class FlowableKWTests : UnitSpec() {
         )
 
         "Multi-thread Flowables finish correctly" {
-            val value: Flowable<Long> = FlowableKW.monadErrorFlat().bindingE {
+            val value: Flowable<Long> = FlowableKW.monadErrorFlat().bindingCatch {
                 val a = Flowable.timer(2, TimeUnit.SECONDS).k().bind()
                 yields(a)
             }.value()
@@ -87,7 +89,7 @@ class FlowableKWTests : UnitSpec() {
         "Multi-thread Observables should run on their required threads" {
             val originalThread: Thread = Thread.currentThread()
             var nextThread: Thread? = null
-            val value: Flowable<Long> = FlowableKW.monadErrorFlat().bindingE {
+            val value: Flowable<Long> = FlowableKW.monadErrorFlat().bindingCatch {
                 val a = Flowable.timer(2, TimeUnit.SECONDS).k().bind()
                 nextThread = Thread.currentThread()
                 val b = Flowable.just(a).observeOn(Schedulers.newThread()).k().bind()
@@ -101,7 +103,7 @@ class FlowableKWTests : UnitSpec() {
         }
 
         "Flowable cancellation forces binding to cancel without completing too" {
-            val value: Flowable<Long> = FlowableKW.monadErrorFlat().bindingE {
+            val value: Flowable<Long> = FlowableKW.monadErrorFlat().bindingCatch {
                 val a = Flowable.timer(3, TimeUnit.SECONDS).k().bind()
                 yields(a)
             }.value()

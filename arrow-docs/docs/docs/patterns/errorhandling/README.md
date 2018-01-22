@@ -325,7 +325,7 @@ val result1 = attack(Either.monadError())
 result1.ev()
 ```
 
-Note that `MonadError` also has a function `bindingE` that automatically captures and wraps exceptions in its binding block.
+Note that `MonadError` also has a function `bindingCatch` that automatically captures and wraps exceptions in its binding block.
 
 ```kotlin
 inline fun <reified F> launchImpure(target: Target, nuke: Nuke, ME: MonadError<F, NukeException> = monadError()): Impacted {

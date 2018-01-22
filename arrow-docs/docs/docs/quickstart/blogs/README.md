@@ -6,7 +6,7 @@ permalink: /docs/quickstart/blogs/
 
 ## Blogs & Presentations
 
-TODO: expand
+A selection of external links to some of the content created by maintainers and users.
 
 ### Functional Programming in Kotlin with Arrow
 

@@ -52,7 +52,8 @@ Option.applicative().map(profileService(), phoneService(), addressService(), { (
 
 #### pure
 
-Lifts a value into the computational context of a type constructor
+A constructor function.
+It lifts a value into the computational context of a type constructor.
 
 `fun <A> pure(a: A): HK<F, A>`
 

@@ -1,8 +1,9 @@
 package arrow.effects
 
-import arrow.*
 import arrow.core.*
 import arrow.data.Try
+import arrow.deriving
+import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
@@ -29,7 +30,7 @@ data class DeferredKW<out A>(val deferred: Deferred<A>) : DeferredKWKind<A>, Def
             flatMap { a -> fa.ev().map { ff -> ff(a) } }
 
     fun <B> flatMap(f: (A) -> DeferredKWKind<B>): DeferredKW<B> =
-            async(Unconfined, CoroutineStart.LAZY) {
+            kotlinx.coroutines.experimental.async(Unconfined, CoroutineStart.LAZY) {
                 f(await()).await()
             }.k()
 
@@ -40,14 +41,14 @@ data class DeferredKW<out A>(val deferred: Deferred<A>) : DeferredKWKind<A>, Def
         fun <A> pure(a: A): DeferredKW<A> =
                 CompletableDeferred(a).k()
 
-        fun <A> suspend(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.LAZY, a: suspend () -> A): DeferredKW<A> =
-                async(ctx, start) { a() }.k()
+        fun <A> suspend(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.LAZY, f: suspend () -> A): DeferredKW<A> =
+                kotlinx.coroutines.experimental.async(ctx, start) { f() }.k()
 
-        fun <A> suspend(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.LAZY, a: () -> DeferredKW<A>): DeferredKW<A> =
-                async(ctx, start) { a().await() }.k()
+        fun <A> suspend(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.LAZY, fa: () -> DeferredKWKind<A>): DeferredKW<A> =
+                kotlinx.coroutines.experimental.async(ctx, start) { fa().await() }.k()
 
-        operator fun <A> invoke(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.DEFAULT, a: () -> A): DeferredKW<A> =
-                async(ctx, start) { a() }.k()
+        operator fun <A> invoke(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.DEFAULT, f: () -> A): DeferredKW<A> =
+                kotlinx.coroutines.experimental.async(ctx, start) { f() }.k()
 
         fun <A> failed(t: Throwable): DeferredKW<A> =
                 CompletableDeferred<A>().apply { completeExceptionally(t) }.k()
@@ -62,8 +63,8 @@ data class DeferredKW<out A>(val deferred: Deferred<A>) : DeferredKWKind<A>, Def
          * its [CoroutineContext] is set to [DefaultDispatcher]
          * and its [CoroutineStart] is [CoroutineStart.DEFAULT].
          */
-        fun <A> runAsync(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.DEFAULT, fa: Proc<A>): DeferredKW<A> =
-                async(ctx, start) {
+        fun <A> async(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.DEFAULT, fa: Proc<A>): DeferredKW<A> =
+                kotlinx.coroutines.experimental.async(ctx, start) {
                     CompletableDeferred<A>().apply {
                         fa {
                             it.fold(this::completeExceptionally, this::complete)
@@ -74,7 +75,7 @@ data class DeferredKW<out A>(val deferred: Deferred<A>) : DeferredKWKind<A>, Def
         fun <A, B> tailRecM(a: A, f: (A) -> DeferredKWKind<Either<A, B>>): DeferredKW<B> =
                 f(a).value().let { initial: Deferred<Either<A, B>> ->
                     var current: Deferred<Either<A, B>> = initial
-                    async(Unconfined, CoroutineStart.LAZY) {
+                    kotlinx.coroutines.experimental.async(Unconfined, CoroutineStart.LAZY) {
                         val result: B
                         while (true) {
                             val actual: Either<A, B> = current.await()
@@ -102,7 +103,7 @@ fun <A> DeferredKWKind<A>.unsafeAttemptSync(): Try<A> =
 fun <A> DeferredKWKind<A>.unsafeRunSync(): A =
         runBlocking { await() }
 
-fun <A> DeferredKWKind<A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKW<Unit>): DeferredKW<Unit> =
+fun <A> DeferredKWKind<A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKWKind<Unit>): DeferredKW<Unit> =
         DeferredKW(Unconfined, CoroutineStart.DEFAULT) {
             unsafeRunAsync(cb.andThen { })
         }

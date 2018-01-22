@@ -32,9 +32,9 @@ class TryTest : UnitSpec() {
         }
 
         testLaws(
-            EqLaws.laws { Try { it } },
-            MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()),
-            TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any())
+                EqLaws.laws { Try { it } },
+                MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()),
+                TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any())
         )
 
         "invoke of any should be success" {
@@ -136,7 +136,9 @@ class TryTest : UnitSpec() {
             val problem = success.flatMap { x -> failure.map { y -> x / y } }
             when (problem) {
                 is Success -> fail("This should not be possible")
-                is Failure -> println(problem)
+                is Failure -> {
+                    // Success
+                }
             }
         }
 
