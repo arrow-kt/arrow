@@ -28,6 +28,8 @@ Use the list below to learn more about Λrrow's main features.
 
 # Basic Setup
 
+Make sure to have the latest version of Java 1.8 installed.
+
 Add it in your root `build.gradle` at the end of repositories.
 
 ```groovy
