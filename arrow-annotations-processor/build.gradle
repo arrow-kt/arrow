@@ -6,12 +6,12 @@ apply plugin: 'kotlin-kapt'
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlinVersion"
     compile project(':arrow-annotations')
-    compile 'me.eugeniomarletti:kotlin-metadata:1.2.0'
-    compileOnly 'com.google.auto.service:auto-service:1.0-rc3'
-    kapt 'com.google.auto.service:auto-service:1.0-rc3'
+    compile 'me.eugeniomarletti:kotlin-metadata:1.2.1'
+    compileOnly 'com.google.auto.service:auto-service:1.0-rc4'
+    kapt 'com.google.auto.service:auto-service:1.0-rc4'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile "com.google.testing.compile:compile-testing:0.6"
+    testCompile "com.google.testing.compile:compile-testing:0.13"
     testCompile fileTree(dir: './src/test/libs', includes: ['*.jar'])
     testCompile files(Jvm.current().getToolsJar())
 }

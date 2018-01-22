@@ -2,8 +2,10 @@ package arrow.debug
 
 import arrow.TC
 import arrow.data.Try
-import arrow.effects.AsyncContext
-import arrow.effects.asyncContext
+import arrow.effects.Async
+import arrow.effects.Effect
+import arrow.effects.MonadSuspend
+import arrow.effects.async
 import arrow.mtl.*
 import arrow.typeclasses.*
 import kotlin.reflect.KClass
@@ -33,7 +35,9 @@ inline fun <reified F, reified E> debugInstanceLookups(): Map<KClass<out TC>, ()
         SemigroupK::class to { semigroupK<F>() },
         Traverse::class to { traverse<F>() },
         TraverseFilter::class to { traverse<F>() },
-        AsyncContext::class to { asyncContext<F>() }
+        MonadSuspend::class to { async<F>() },
+        Async::class to { async<F>() },
+        Effect::class to { async<F>() }
 )
 
 inline fun <reified F, reified E> showInstances(

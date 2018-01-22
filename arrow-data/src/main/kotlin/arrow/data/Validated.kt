@@ -1,7 +1,8 @@
 package arrow.data
 
-import arrow.*
+import arrow.HK
 import arrow.core.*
+import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.semigroup
@@ -172,12 +173,6 @@ fun <E, A, B> Validated<E, A>.ap(f: Validated<E, (A) -> B>, SE: Semigroup<E>): V
 
 fun <E, A> Validated<E, A>.handleLeftWith(f: (E) -> ValidatedKind<E, A>): Validated<E, A> =
         fold({ f(it).ev() }, { Valid(it) })
-
-fun <E, A, B> Validated<E, A>.foldLeft(b: B, f: (B, A) -> B): B =
-        when (this) {
-            is Valid -> f(b, this.a)
-            is Invalid -> b
-        }
 
 fun <E, A, B> Validated<E, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
         when (this) {

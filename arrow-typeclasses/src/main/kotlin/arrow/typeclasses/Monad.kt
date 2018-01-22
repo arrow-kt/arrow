@@ -1,8 +1,10 @@
 package arrow.typeclasses
 
-import arrow.*
+import arrow.HK
+import arrow.TC
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.typeclass
 import kotlin.coroutines.experimental.startCoroutine
 
 @typeclass
@@ -26,8 +28,8 @@ interface Monad<F> : Applicative<F>, TC {
 }
 
 /**
- * Entry point for monad bindings which enables for comprehension. The underlying impl is based on coroutines.
- * A coroutine is initiated and inside [MonadContinuation] suspended yielding to [flatMap]. Once all the flatMap binds are completed
+ * Entry point for monad bindings which enables for comprehension. The underlying implementation is based on coroutines.
+ * A coroutine is initiated and suspended inside [MonadErrorContinuation] yielding to [Monad.flatMap]. Once all the flatMap binds are completed
  * the underlying monad is returned from the act of executing the coroutine
  */
 fun <F, B> Monad<F>.binding(c: suspend MonadContinuation<F, *>.() -> HK<F, B>): HK<F, B> {
