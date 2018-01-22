@@ -1,15 +1,20 @@
 package arrow.data
 
+import arrow.core.Either
+import arrow.core.Either.Left
+import arrow.core.Either.Right
+import arrow.core.Eval
+import arrow.core.Option
+import arrow.core.Predicate
+import arrow.higherkind
 import java.lang.ref.WeakReference
-import arrow.*
-import arrow.core.*
 
 /**
- * Represents an object that can stop existing when no references to it exists. Backed by
+ * Represents an object that **can** stop existing when no references to it are made. Backed by
  * a [WeakReference] instance. In a similar fashion to [Option] this allows
  */
 @higherkind
-data class Weak<out A>(val provider: () -> A?) : WeakKind<A> {
+data class Weak<out A>(internal val provider: () -> A?) : WeakKind<A> {
 
     companion object {
 
@@ -22,14 +27,19 @@ data class Weak<out A>(val provider: () -> A?) : WeakKind<A> {
             val reference = WeakReference(a)
             return Weak { reference.get() }
         }
+
+        fun <A, B> tailRectM(a: A, f: (A) -> WeakKind<Either<A, B>>): Weak<B> = f(a).ev()
+                .flatMap {
+                    when (it) {
+                        is Left -> tailRectM(it.a, f)
+                        is Right -> it.b.weak()
+                    }
+                }
     }
 
-    inline fun <B> fold(fn: () -> B, f: (A) -> B): B = provider().let {
-        when (it) {
-            null -> fn()
-            else -> f(it)
-        }
-    }
+    fun asOption(): Option<A> = Option.fromNullable(provider())
+
+    inline fun <B> fold(fn: () -> B, f: (A) -> B): B = asOption().fold(fn, f)
 
     inline fun <B> map(crossinline f: (A) -> B): Weak<B> = fold({ emptyWeak() }, { f(it).weak() })
 
@@ -42,6 +52,19 @@ data class Weak<out A>(val provider: () -> A?) : WeakKind<A> {
      */
     inline fun filter(crossinline p: (A) -> Boolean): Weak<A> = fold({ emptyWeak() }, { a -> if (p(a)) a.weak() else emptyWeak() })
 
+    fun <B> ap(ff: WeakKind<(A) -> B>): Weak<B> = ff.ev().flatMap { f -> map(f) }.ev()
+
+    fun exists(predicate: Predicate<A>): Boolean = fold({ false }, { predicate(it) })
+
+    fun <B> foldLeft(b: B, f: (B, A) -> B): B = ev().fold({ b }, { f(b, it) })
+
+    fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = ev().fold({ lb }, { f(it, lb) })
+
+    fun forall(predicate: Predicate<A>): Boolean = fold({ false }, { predicate(it) })
+
+    fun isEmpty(): Boolean = fold({ true }, { false })
+
+    fun nonEmpty(): Boolean = fold({ false }, { true })
 }
 
 /**
@@ -59,3 +82,5 @@ fun <B> Weak<B>.getOrElse(fallback: () -> B): B = fold({ fallback() }, { it })
 fun <A, B : A> WeakKind<B>.orElse(fallback: () -> Weak<B>): Weak<B> = ev().provider()?.let { ev() } ?: fallback()
 
 fun <A> A.weak(): Weak<A> = Weak(this)
+
+fun <A> Option<A>.asWeak(): Weak<A> = fold({ Weak.emptyWeak() }, { it.weak() })
