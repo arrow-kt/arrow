@@ -9,22 +9,22 @@ import java.lang.ref.WeakReference
  * a [WeakReference] instance. In a similar fashion to [Option] this allows
  */
 @higherkind
-data class Weak<out A>(internal val provider: () -> A?) : WeakKind<A> {
+class Weak<out A> private constructor(private val source: Eval<A?>) : WeakKind<A> {
 
     companion object {
 
-        private val EMPTY: Weak<Nothing> = Weak { null }
+        private val EMPTY: Weak<Nothing> = Weak(Eval.pure(null))
 
         @Suppress("UNCHECKED_CAST")
         fun <B> emptyWeak(): Weak<B> = EMPTY
 
         operator fun <A> invoke(a: A): Weak<A> {
             val reference = WeakReference(a)
-            return Weak { reference.get() }
+            return Weak(Eval.always { reference.get() })// { reference.get() }
         }
 
         tailrec fun <A, B> tailRectM(a: A, f: (A) -> WeakKind<Either<A, B>>): Weak<B> {
-            val value: Either<A, B>? = f(a).ev().provider()
+            val value: Either<A, B>? = f(a).ev().source.value()
             return when (value) {
                 null -> emptyWeak()
                 is Either.Left -> tailRectM(value.a, f)
@@ -33,7 +33,7 @@ data class Weak<out A>(internal val provider: () -> A?) : WeakKind<A> {
         }
     }
 
-    fun asOption(): Option<A> = Option.fromNullable(provider())
+    fun asOption(): Option<A> = Option.fromNullable(source.value())
 
     inline fun <B> fold(fn: () -> B, f: (A) -> B): B = asOption().fold(fn, f)
 
@@ -68,14 +68,14 @@ data class Weak<out A>(internal val provider: () -> A?) : WeakKind<A> {
  *
  * @param fallback provides a new value if we have lost the current one.
  */
-fun <B> Weak<B>.getOrElse(fallback: () -> B): B = fold({ fallback() }, { it })
+fun <B> WeakKind<B>.getOrElse(fallback: () -> B): B = ev().fold({ fallback() }, { it })
 
 /**
  * Returns this Weak instance if present or an alternative.
  *
  * @param fallback provides a new value if we have lost the current one.
  */
-fun <A, B : A> WeakKind<B>.orElse(fallback: () -> Weak<B>): Weak<B> = ev().provider()?.let { ev() } ?: fallback()
+fun <A, B : A> WeakKind<B>.orElse(fallback: () -> Weak<B>): Weak<B> = ev().asOption().orNull()?.weak() ?: fallback()
 
 fun <A> A.weak(): Weak<A> = Weak(this)
 
