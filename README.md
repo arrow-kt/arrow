@@ -22,7 +22,7 @@ It includes the most popular data types, type classes and abstractions such as `
 
 # Basic Setup
 
-Make sure to have the latest version of Java 1.8 installed.
+Make sure to have the latest version of JDK 1.8 installed.
 
 Add it in your root `build.gradle` at the end of repositories.
 
