@@ -79,4 +79,4 @@ IdJ idk2 = idj.toArrow();
 It is important to understand that the integration with KindedJ works at a level of genericity where values inside one of the intermediate representations cannot be accessed directly.
 It's required to use the constructs inside Arrow or the 3rd party lib implementing KindedJ to be able to use functions like `map` or `flatMap`.
 
-Further integration in KindedJ of typeclasses such as [typeclasses]({{ '/docs/patterns/glossary' | relative_url }}) is in the KindedJ org's roadmap.
+Further integration in KindedJ of constructs such as [typeclasses]({{ '/docs/patterns/glossary' | relative_url }}) is in the KindedJ org's roadmap.
