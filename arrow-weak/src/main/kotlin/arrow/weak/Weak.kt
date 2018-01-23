@@ -1,4 +1,4 @@
-package arrow.data
+package arrow.weak
 
 import arrow.core.*
 import arrow.higherkind
@@ -92,7 +92,7 @@ fun <B> WeakKind<B>.getOrElse(fallback: () -> B): B = ev().fold({ fallback() }, 
  *
  * @param fallback provides a new value if we have lost the current one.
  */
-fun <A, B : A> WeakKind<B>.orElse(fallback: () -> Weak<B>): Weak<B> = ev().fold({ fallback() }, { Weak(it) })
+fun <A, B : A> WeakKind<B>.orElse(fallback: () -> Weak<B>): Weak<B> = ev().fold({ fallback() }, { arrow.weak.Weak(it) })
 
 /**
  * Creates a new Weak instance. Alias of [Weak.invoke].

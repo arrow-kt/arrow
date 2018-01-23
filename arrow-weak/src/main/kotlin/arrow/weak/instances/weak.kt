@@ -1,8 +1,8 @@
-package arrow.instances
+package arrow.weak.instances
 
 import arrow.HK
 import arrow.core.*
-import arrow.data.*
+import arrow.weak.*
 import arrow.instance
 import arrow.typeclasses.*
 

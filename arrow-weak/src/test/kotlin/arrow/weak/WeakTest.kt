@@ -1,4 +1,4 @@
-package arrow.data
+package arrow.weak
 
 import arrow.HK
 import io.kotlintest.KTestJUnitRunner
