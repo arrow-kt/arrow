@@ -64,13 +64,13 @@ subject.value()
 
 ### Observable comprehensions
 
-The library provides instances of [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) and [`Async`]({{ '/docs/effects/async' | relative_url }}).
+The library provides instances of [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) and [`MonadSuspend`]({{ '/docs/effects/monadsuspend' | relative_url }}).
 
-[`Async`]({{ '/docs/effects/async' | relative_url }}) allows you to generify over datatypes that can run asynchronous code. You can use it with `ObservableKW` and `FlowableKW`.
+[`MonadSuspend`]({{ '/docs/effects/async' | relative_url }}) allows you to generify over datatypes that can run asynchronous code. You can use it with `ObservableKW` and `FlowableKW`.
 
 ```kotlin
-fun <F> getSongUrlAsync(AC: Async<F> = asycContext()) =
-  AC { getSongUrl() }
+fun <F> getSongUrlAsync(MS: MonadSuspend<F> = monadSuspend()) =
+  MS { getSongUrl() }
 
 val songObservable: ObservableKW<Url> = getSongUrlAsync().ev()
 val songFlowable: FlowableKW<Url> = getSongUrlAsync().ev()
@@ -117,7 +117,7 @@ ObservableKW.monadError().bindingCatch {
 }.ev()
 ```
 
-Note that any unexpected exception, like AritmeticException when totalTime is 0, is automatically caught and wrapped inside the observable. 
+Note that any unexpected exception, like `AritmeticException` when `totalTime` is 0, is automatically caught and wrapped inside the observable. 
 
 ### Subscription and cancellation
 
