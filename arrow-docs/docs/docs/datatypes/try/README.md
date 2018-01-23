@@ -181,7 +181,7 @@ Try.monad().binding {
 Computing over dependent values that are automatically lifted to the context of `Try`:
 
 ```kotlin
-Try.monadError().bindingE {
+Try.monadError().bindingCatch {
     val a = "none".toInt()
     val b = "4".toInt()
     val c = "5".toInt()
