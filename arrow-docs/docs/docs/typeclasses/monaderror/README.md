@@ -28,6 +28,8 @@ Either.monadError<Throwable>().raiseError<Int>(RuntimeException("Paco"))
 ```
 
 ```kotlin:ank
+import arrow.data.*
+
 Try.monadError().raiseError<Int>(RuntimeException("Paco"))
 ```
 
