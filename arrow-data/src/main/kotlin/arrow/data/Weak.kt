@@ -9,14 +9,23 @@ import java.lang.ref.WeakReference
  * Backed by a [WeakReference] instance. In a similar fashion to [Option] this forces the consumer to check whether the
  * object is still valid.
  *
+ * We have several ways to create a new [Weak] instance:
  *
+ *  - `Weak(object)`: Creates an instance with a weak reference to the provided object
+ *  - `object.weak()`: An alias for the previous method
+ *  - `Weak.emptyWeak()`: Represents an instance that will never exist. Used for operations and tests.
+ *
+ *  At the time of usage we can either apply functional operators or unwrap it in two forms:
+ *
+ *   - `weakObject.eval`: [Eval] property that provides an [Option] with the result or lack thereof.
+ *   - `weakObject.option()`: to get the [Option] directly.
  */
 @higherkind
-class Weak<out A> private constructor(private val source: Eval<Option<A>>) : WeakKind<A> {
+class Weak<out A> private constructor(val eval: Eval<Option<A>>) : WeakKind<A> {
 
     companion object {
 
-        private val EMPTY: Weak<Nothing> = Weak(Eval.pure(Option.empty()))
+        private val EMPTY: Weak<Nothing> = Weak(Eval.now(Option.empty()))
 
         @Suppress("UNCHECKED_CAST")
         fun <B> emptyWeak(): Weak<B> = EMPTY
@@ -27,11 +36,11 @@ class Weak<out A> private constructor(private val source: Eval<Option<A>>) : Wea
         }
 
         tailrec fun <A, B> tailRectM(a: A, f: (A) -> WeakKind<Either<A, B>>): Weak<B> {
-            val value: Option<Either<A, B>> = f(a).ev().source.value()
-            return when (value) {
-                None -> emptyWeak()
+            val option: Option<Either<A, B>> = f(a).ev().option()
+            return when (option) {
+                is None -> emptyWeak()
                 is Some -> {
-                    val either = value.t
+                    val either = option.t
                     when (either) {
                         is Either.Left -> tailRectM(either.a, f)
                         is Either.Right -> either.b.weak()
@@ -41,9 +50,7 @@ class Weak<out A> private constructor(private val source: Eval<Option<A>>) : Wea
         }
     }
 
-    fun option(): Option<A> = eval().value()
-
-    fun eval(): Eval<Option<A>> = source
+    fun option(): Option<A> = eval.value()
 
     inline fun <B> fold(fn: () -> B, f: (A) -> B): B = option().fold(fn, f)
 
