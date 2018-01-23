@@ -29,7 +29,7 @@ fun addressService(): Option<List<String>> = Option(listOf("1 Main Street", "111
 
 This more or less illustrate the common use case of performing several independent operations where we need to get all the results together
 
-Arrow features an [Applicative Builder]({{ '/docs/patterns/applicative_builder' | relative_url }}) that allows you to easily combine all the independent operations into one result.
+The module arrow-syntax features several methods related to [Applicative Builders]({{ '/docs/patterns/applicative_builder' | relative_url }}) that allow you to easily combine all the independent operations into one result.
 
 ```kotlin:ank
 import arrow.syntax.applicative.*

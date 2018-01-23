@@ -47,6 +47,7 @@ dependencies {
     compile 'io.arrow-kt:arrow-core:0.6.0'
     compile 'io.arrow-kt:arrow-typeclasses:0.6.0' 
     compile 'io.arrow-kt:arrow-instances:0.6.0' 
+    compile 'io.arrow-kt:arrow-syntax:0.6.0'
     kapt    'io.arrow-kt:arrow-annotations-processor:0.6.0' 
     
     compile 'io.arrow-kt:arrow-free:0.6.0' //optional

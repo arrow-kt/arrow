@@ -174,7 +174,7 @@ IO.suspend { IO.pure(1) }
   .unsafeRunSync()
 ```
 
-### runAsync
+### async
 
 Mainly used to integrate with existing frameworks that have asynchronous calls.
 
@@ -183,7 +183,7 @@ The callback parameter has to be invoked with an `Either<Throwable, A>` once the
 Note that if the callback is never called IO will run forever and not terminate unless run using `unsafeRunTimed()`.
 
 ```kotlin
-IO.runAsync<Int> { callback ->
+IO.async<Int> { callback ->
     callback(1.right())
 }
   .attempt()
@@ -191,7 +191,7 @@ IO.runAsync<Int> { callback ->
 ```
 
 ```kotlin
-IO.runAsync<Int> { callback ->
+IO.async<Int> { callback ->
     callback(RuntimeException("Boom").left())
 }
   .attempt()
