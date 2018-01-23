@@ -5,41 +5,51 @@ import arrow.higherkind
 import java.lang.ref.WeakReference
 
 /**
- * Represents an object that **can** stop existing when no references to it are made. Backed by
- * a [WeakReference] instance. In a similar fashion to [Option] this allows
+ * Represents an object that **can** stop existing (recycled by the Garbage Collector) when is no longer referenced.
+ * Backed by a [WeakReference] instance. In a similar fashion to [Option] this forces the consumer to check whether the
+ * object is still valid.
+ *
+ *
  */
 @higherkind
-class Weak<out A> private constructor(private val source: Eval<A?>) : WeakKind<A> {
+class Weak<out A> private constructor(private val source: Eval<Option<A>>) : WeakKind<A> {
 
     companion object {
 
-        private val EMPTY: Weak<Nothing> = Weak(Eval.pure(null))
+        private val EMPTY: Weak<Nothing> = Weak(Eval.pure(Option.empty()))
 
         @Suppress("UNCHECKED_CAST")
         fun <B> emptyWeak(): Weak<B> = EMPTY
 
         operator fun <A> invoke(a: A): Weak<A> {
             val reference = WeakReference(a)
-            return Weak(Eval.always { reference.get() })// { reference.get() }
+            return Weak(Eval.always { Option.fromNullable(reference.get()) })// { reference.get() }
         }
 
         tailrec fun <A, B> tailRectM(a: A, f: (A) -> WeakKind<Either<A, B>>): Weak<B> {
-            val value: Either<A, B>? = f(a).ev().source.value()
+            val value: Option<Either<A, B>> = f(a).ev().source.value()
             return when (value) {
-                null -> emptyWeak()
-                is Either.Left -> tailRectM(value.a, f)
-                is Either.Right -> value.b.weak()
+                None -> emptyWeak()
+                is Some -> {
+                    val either = value.t
+                    when (either) {
+                        is Either.Left -> tailRectM(either.a, f)
+                        is Either.Right -> either.b.weak()
+                    }
+                }
             }
         }
     }
 
-    fun asOption(): Option<A> = Option.fromNullable(source.value())
+    fun option(): Option<A> = eval().value()
 
-    inline fun <B> fold(fn: () -> B, f: (A) -> B): B = asOption().fold(fn, f)
+    fun eval(): Eval<Option<A>> = source
+
+    inline fun <B> fold(fn: () -> B, f: (A) -> B): B = option().fold(fn, f)
 
     inline fun <B> map(crossinline f: (A) -> B): Weak<B> = fold({ emptyWeak() }, { f(it).weak() })
 
-    inline fun <B> flatMap(crossinline f: (A) -> WeakKind<B>): Weak<B> = fold({ emptyWeak() }, { a -> f(a).ev() })
+    inline fun <B> flatMap(crossinline f: (A) -> WeakKind<B>): Weak<B> = fold({ emptyWeak() }, { f(it).ev() })
 
     /**
      * Returns this Weak as long as the provided predicate confirms the value is to be kept
@@ -75,8 +85,9 @@ fun <B> WeakKind<B>.getOrElse(fallback: () -> B): B = ev().fold({ fallback() }, 
  *
  * @param fallback provides a new value if we have lost the current one.
  */
-fun <A, B : A> WeakKind<B>.orElse(fallback: () -> Weak<B>): Weak<B> = ev().asOption().orNull()?.weak() ?: fallback()
+fun <A, B : A> WeakKind<B>.orElse(fallback: () -> Weak<B>): Weak<B> = ev().fold({ fallback() }, { Weak(it) })
 
+/**
+ * Creates a new Weak instance. Alias of [Weak.invoke].
+ */
 fun <A> A.weak(): Weak<A> = Weak(this)
-
-fun <A> Option<A>.asWeak(): Weak<A> = fold({ Weak.emptyWeak() }, { it.weak() })

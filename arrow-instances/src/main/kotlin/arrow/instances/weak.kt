@@ -11,7 +11,7 @@ interface WeakEqInstance<A> : Eq<Weak<A>> {
 
     fun EQ(): Eq<A>
 
-    override fun eqv(a: Weak<A>, b: Weak<A>): Boolean = a.asOption() == b.asOption()
+    override fun eqv(a: Weak<A>, b: Weak<A>): Boolean = a.option() == b.option()
 
 }
 
@@ -74,7 +74,7 @@ interface WeakFoldableInstance : Foldable<WeakHK> {
 }
 
 fun <A, G, B> Weak<A>.traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, Weak<B>> =
-    ev().asOption().fold({ GA.pure(Weak.emptyWeak()) }, { GA.map(f(it), { Weak(it) }) })
+    ev().option().fold({ GA.pure(Weak.emptyWeak()) }, { GA.map(f(it), { Weak(it) }) })
 
 @instance(Weak::class)
 interface WeakTraverseInstance : Traverse<WeakHK> {
