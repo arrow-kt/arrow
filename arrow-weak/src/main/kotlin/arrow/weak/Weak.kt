@@ -2,7 +2,7 @@ package arrow.weak
 
 import arrow.core.*
 import arrow.higherkind
-import java.lang.ref.WeakReference
+import arrow.weak.internal.WeakRef
 
 /**
  * Represents an object that **can** stop existing (recycled by the Garbage Collector) when is no longer referenced.
@@ -31,7 +31,7 @@ class Weak<out A> private constructor(val eval: Eval<Option<A>>) : WeakKind<A> {
         fun <B> emptyWeak(): Weak<B> = EMPTY
 
         operator fun <A> invoke(a: A): Weak<A> {
-            val reference = WeakReference(a)
+            val reference = WeakRef(a)
             return Weak(Eval.always { Option.fromNullable(reference.get()) })// { reference.get() }
         }
 
@@ -92,7 +92,7 @@ fun <B> WeakKind<B>.getOrElse(fallback: () -> B): B = ev().fold({ fallback() }, 
  *
  * @param fallback provides a new value if we have lost the current one.
  */
-fun <A, B : A> WeakKind<B>.orElse(fallback: () -> Weak<B>): Weak<B> = ev().fold({ fallback() }, { arrow.weak.Weak(it) })
+fun <A, B : A> WeakKind<B>.orElse(fallback: () -> Weak<B>): Weak<B> = ev().fold({ fallback() }, { it.weak() })
 
 /**
  * Creates a new Weak instance. Alias of [Weak.invoke].
