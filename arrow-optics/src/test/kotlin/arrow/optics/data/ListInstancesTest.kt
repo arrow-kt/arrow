@@ -1,13 +1,19 @@
 package arrow.optics
 
+import arrow.core.Option
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import arrow.typeclasses.Eq
 import arrow.test.laws.IsoLaws
 import arrow.core.OptionMonoidInstanceImplicits
+import arrow.core.monoid
+import arrow.data.ListKW
 import arrow.data.ListKWMonoidInstanceImplicits
+import arrow.data.NonEmptyList
 import arrow.data.NonEmptyListSemigroupInstanceImplicits
 import arrow.data.k
+import arrow.data.monoid
+import arrow.data.semigroup
 import arrow.test.laws.OptionalLaws
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
@@ -24,42 +30,43 @@ class ListInstancesTest : UnitSpec() {
 
     init {
 
-        testLaws(
-            OptionalLaws.laws(
-                optional = listHead(),
-                aGen = Gen.list(Gen.int()),
-                bGen = Gen.int(),
-                funcGen = genFunctionAToB(Gen.int()),
-                EQA = Eq.any(),
-                EQB = Eq.any(),
-                EQOptionB = Eq.any()),
 
-            OptionalLaws.laws(
-                optional = listTail(),
-                aGen = Gen.list(Gen.int()),
-                bGen = Gen.list(Gen.int()),
-                funcGen = genFunctionAToB(Gen.list(Gen.int())),
-                EQA = Eq.any(),
-                EQB = Eq.any(),
-                EQOptionB = Eq.any()),
+        testLaws(OptionalLaws.laws(
+                    optional = listHead(),
+                    aGen = Gen.list(Gen.int()),
+                    bGen = Gen.int(),
+                    funcGen = genFunctionAToB(Gen.int()),
+                    EQA = Eq.any(),
+                    EQOptionB = Eq.any()
+        ))
 
-            IsoLaws.laws(
+        testLaws(OptionalLaws.laws(
+                    optional = listTail(),
+                    aGen = Gen.list(Gen.int()),
+                    bGen = Gen.list(Gen.int()),
+                    funcGen = genFunctionAToB(Gen.list(Gen.int())),
+                    EQA = Eq.any(),
+                    EQOptionB = Eq.any()
+        ))
+
+        testLaws(IsoLaws.laws(
                 iso = listToOptionNel(),
                 aGen = Gen.list(Gen.int()),
                 bGen = genOption(genNonEmptyList(Gen.int())),
                 funcGen = genFunctionAToB(genOption(genNonEmptyList(Gen.int()))),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                bMonoid = OptionMonoidInstanceImplicits.instance(NonEmptyListSemigroupInstanceImplicits.instance<Int>())),
+                bMonoid = Option.monoid(NonEmptyList.semigroup<Int>())
+        ))
 
-            IsoLaws.laws(
+        testLaws(IsoLaws.laws(
                 iso = listToListKW(),
                 aGen = Gen.list(Gen.int()),
                 bGen = Gen.create { Gen.list(Gen.int()).generate().k() },
                 funcGen = genFunctionAToB(Gen.create { Gen.list(Gen.int()).generate().k() }),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                bMonoid = ListKWMonoidInstanceImplicits.instance())
+                bMonoid = ListKW.monoid())
         )
 
     }
