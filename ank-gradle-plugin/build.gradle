@@ -2,7 +2,7 @@ apply plugin: 'java-gradle-plugin'
 apply plugin: 'kotlin'
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$parent.ext.kotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$parent.ext.kotlinVersion"
     testCompile 'junit:junit:4.12'
 }
 
