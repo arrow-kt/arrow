@@ -12,8 +12,11 @@ import arrow.test.generators.genTry
 import arrow.test.generators.genTuple
 import arrow.core.None
 import arrow.data.applicative
+import arrow.optics.instances.listElementPositionOptional
+import arrow.optics.instances.nullableOptional
 import arrow.syntax.either.left
 import arrow.syntax.either.right
+import arrow.test.generators.genNullable
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -22,6 +25,25 @@ class OptionalTest : UnitSpec() {
     init {
 
         testLaws(
+
+            OptionalLaws.laws(
+                optional = listElementPositionOptional(50),
+                aGen = Gen.list(Gen.int()),
+                bGen = Gen.int(),
+                funcGen = genFunctionAToB(Gen.int()),
+                EQA = Eq.any(),
+                EQB = Eq.any(),
+                EQOptionB = Eq.any()),
+
+            OptionalLaws.laws(
+                optional = nullableOptional(),
+                aGen = genNullable(Gen.int()),
+                bGen = Gen.int(),
+                funcGen = genFunctionAToB(Gen.int()),
+                EQA = Eq.any(),
+                EQB = Eq.any(),
+                EQOptionB = Eq.any()),
+
             OptionalLaws.laws(
                 optional = optionalHead,
                 aGen = Gen.list(Gen.int()),
