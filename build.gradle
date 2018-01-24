@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-apply from: 'detekt.gradle.kts'
-
 buildscript {
     ext {
         // Constants
@@ -49,6 +47,7 @@ subprojects { project ->
 
     group = GROUP
     version = VERSION_NAME
+apply from: 'detekt.gradle.kts'
 
     repositories {
         jcenter()
