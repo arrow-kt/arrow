@@ -35,7 +35,7 @@ class OptikalProcessor : AbstractProcessor() {
             lensesAnnotationClass.canonicalName,
             prismsAnnotationClass.canonicalName,
             isosAnnotationClass.canonicalName,
-            optionalAnnotationClass.canonicalName
+            optionalsAnnotationClass.canonicalName
     )
 
     override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
@@ -52,7 +52,7 @@ class OptikalProcessor : AbstractProcessor() {
                 .map(this::evalAnnotatedIsoElement)
 
         annotatedOptional += roundEnv
-                .getElementsAnnotatedWith(optionalAnnotationClass)
+                .getElementsAnnotatedWith(optionalsAnnotationClass)
                 .map(this::evalAnnotatedElement)
 
         if (roundEnv.processingOver()) {

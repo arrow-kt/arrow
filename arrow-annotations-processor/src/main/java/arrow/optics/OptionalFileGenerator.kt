@@ -15,7 +15,7 @@ class OptionalFileGenerator(
     fun generate() = annotatedList.map(this::processElement)
             .filter { it.second.joinToString(separator = "").isNotEmpty() }
             .map { (element, funs) ->
-                "${optionalAnnotationClass.simpleName}.${element.classData.`package`}.${element.type.simpleName.toString().toLowerCase()}.kt" to
+                "${optionalsAnnotationClass.simpleName}.${element.classData.`package`}.${element.type.simpleName.toString().toLowerCase()}.kt" to
                         funs.joinToString(prefix = fileHeader(element.classData.`package`.escapedClassName), separator = "\n")
             }.forEach { (name, fileString) -> File(generatedDir, name).writeText(fileString) }
 
@@ -62,10 +62,8 @@ class OptionalFileGenerator(
 
     fun fileHeader(packageName: String): String =
             """package $packageName
-               |
                |import arrow.syntax.either.*
                |import arrow.syntax.option.toOption
-               |
                |""".trimMargin()
 
 }
