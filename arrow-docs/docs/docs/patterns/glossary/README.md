@@ -44,7 +44,7 @@ Because typeclasses require generic parameters each implementation is meant to b
 
 ```kotlin
 @instance
-object IntEqInstance: Eq<Int> {
+interface IntEqInstance: Eq<Int> {
   override fun eqv(a: Int, b: Int): Boolean = a == b
 }
 ```
@@ -106,7 +106,7 @@ interface Functor<F>: Typeclass {
 }
 
 @instance
-object ListKWFunctorInstance : Functor<ListKWHK> {
+interface ListKWFunctorInstance : Functor<ListKWHK> {
   override fun <A, B> map(fa: HK<ListKWHK, A>, f: (A) -> B): ListKW<B> {
     val list: ListKW<A> = fa.ev()
     return list.map(f)

@@ -1,6 +1,6 @@
 package arrow.test.laws
 
-import arrow.*
+import arrow.HK
 import arrow.core.Either
 import arrow.test.generators.genApplicative
 import arrow.test.generators.genFunctionAToB
@@ -28,5 +28,4 @@ object MonadErrorLaws {
             forAll(genApplicative(Gen.int(), M), genThrowable(), genFunctionAToB<Int, Boolean>(Gen.bool()), { fa: HK<F, Int>, e: Throwable, p: (Int) -> Boolean ->
                 M.ensure(fa, { e }, p).equalUnderTheLaw(M.flatMap(fa, { a -> if (p(a)) M.pure(a) else M.raiseError(e) }), EQ)
             })
-
 }

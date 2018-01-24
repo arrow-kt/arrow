@@ -208,8 +208,8 @@ options:
       - title: IO
         url: /docs/effects/io/
 
-      - title: Sync
-        url: /docs/effects/sync/
+      - title: MonadSuspend
+        url: /docs/effects/monadsuspend/
 
       - title: Async
         url: /docs/effects/async/
