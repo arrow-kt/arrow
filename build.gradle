@@ -43,12 +43,9 @@ buildscript {
     }
 }
 
-subprojects { project ->
-
-    group = GROUP
-    version = VERSION_NAME
 apply from: 'detekt.gradle.kts'
 
+allprojects {
     repositories {
         jcenter()
         maven { url 'https://kotlin.bintray.com/kotlinx' }
@@ -57,10 +54,15 @@ apply from: 'detekt.gradle.kts'
         maven { url "https://dl.bintray.com/jetbrains/markdown/" }
         maven { url 'https://jitpack.io' }
     }
+}
+
+subprojects { project ->
+
+    group = GROUP
+    version = VERSION_NAME
 
     apply plugin: 'kotlin'
     apply plugin: 'jacoco'
-
 
     archivesBaseName = POM_ARTIFACT_ID
 
@@ -112,6 +114,34 @@ apply from: 'detekt.gradle.kts'
 
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
+}
+
+configurations {
+    buildableProjects
+}
+
+dependencies {
+    buildableProjects(subprojects)
+}
+
+tasks.create('repl') {
+    final classpathConfig = rootProject.buildscript.configurations.getByName("classpath")
+    final buildableProjectsConfig = configurations.getByName('buildableProjects')
+    dependsOn(buildableProjectsConfig)
+    doFirst {
+        javaexec {
+            classpath(
+                classpathConfig.resolvedConfiguration.resolvedArtifacts.findAll {
+                    it.moduleVersion.id.group == 'org.jetbrains.kotlin'
+                }.collect {
+                    it.file
+                }
+            )
+            main = "org.jetbrains.kotlin.cli.jvm.K2JVMCompiler"
+            standardInput = System.in
+            args("-cp", buildableProjectsConfig.files.join(':'))
+        }
+    }
 }
 
 task wrapper(type: Wrapper) {
