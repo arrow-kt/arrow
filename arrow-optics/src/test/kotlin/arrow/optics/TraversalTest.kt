@@ -23,25 +23,25 @@ class TraversalTest : UnitSpec() {
 
     init {
 
-        testLaws(
-                TraversalLaws.laws(
+        testLaws(TraversalLaws.laws(
                         traversal = fromTraversable(),
                         aGen = Gen.create { Gen.list(Gen.int()).generate().k() },
                         bGen = Gen.int(),
                         funcGen = genFunctionAToB(Gen.int()),
                         EQA = Eq.any(),
                         EQOptionB = Option.eq(Eq.any()),
-                        EQListB = ListKW.eq(Eq.any())),
+                        EQListB = ListKW.eq(Eq.any())
+        ))
 
-                TraversalLaws.laws(
+        testLaws(TraversalLaws.laws(
                         traversal = Traversal({ it.a }, { it.b }, { a, b, _ -> a toT b }),
                         aGen = genTuple(Gen.float(), Gen.float()),
                         bGen = Gen.float(),
                         funcGen = genFunctionAToB(Gen.float()),
                         EQA = Eq.any(),
                         EQOptionB = Option.eq(Eq.any()),
-                        EQListB = ListKW.eq(Eq.any()))
-        )
+                        EQListB = ListKW.eq(Eq.any())
+        ))
 
         "Getting all targets of a traversal" {
             forAll(Gen.list(Gen.int()), { ints ->
