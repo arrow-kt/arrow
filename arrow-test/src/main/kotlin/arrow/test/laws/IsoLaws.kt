@@ -10,11 +10,12 @@ import arrow.optics.Iso
 import arrow.optics.modify
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.eq
 import arrow.typeclasses.monoid
 
 object IsoLaws {
 
-    inline fun <reified A, reified B> laws(iso: Iso<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQB: Eq<B>, bMonoid: Monoid<B> = monoid()): List<Law> = listOf(
+    inline fun <reified A, reified B> laws(iso: Iso<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A> = eq(), EQB: Eq<B> = eq(), bMonoid: Monoid<B> = monoid()): List<Law> = listOf(
             Law("Iso Law: round trip one way", { roundTripOneWay(iso, aGen, EQA) }),
             Law("Iso Law: round trip other way", { roundTripOtherWay(iso, bGen, EQB) }),
             Law("Iso Law: modify identity is identity", { modifyIdentity(iso, aGen, EQA) }),
