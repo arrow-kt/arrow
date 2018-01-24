@@ -4,10 +4,7 @@ import arrow.core.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import arrow.data.NonEmptyList
-import arrow.data.applicative
 import arrow.instances.StringMonoidInstance
-import arrow.instances.applicative
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
@@ -27,32 +24,32 @@ class IsoTest : UnitSpec() {
         )
 
         testLaws(
-            LensLaws.laws(
-                lens = tokenIso.asLens(),
-                aGen = TokenGen,
-                bGen = Gen.string(),
-                funcGen = genFunctionAToB(Gen.string()),
-                EQA = Eq.any(),
-                EQB = Eq.any(),
-                FA = NonEmptyList.applicative()),
+                LensLaws.laws(
+                        lens = tokenIso.asLens(),
+                        aGen = TokenGen,
+                        bGen = Gen.string(),
+                        funcGen = genFunctionAToB(Gen.string()),
+                        EQA = Eq.any(),
+                        EQB = Eq.any(),
+                        MB = StringMonoidInstance),
 
-            PrismLaws.laws(
-                prism = aIso.asPrism(),
-                aGen = AGen,
-                bGen = Gen.string(),
-                funcGen = genFunctionAToB(Gen.string()),
-                EQA = Eq.any(),
-                EQB = Eq.any(),
-                EQOptionB = Eq.any()),
+                PrismLaws.laws(
+                        prism = aIso.asPrism(),
+                        aGen = AGen,
+                        bGen = Gen.string(),
+                        funcGen = genFunctionAToB(Gen.string()),
+                        EQA = Eq.any(),
+                        EQB = Eq.any(),
+                        EQOptionB = Eq.any()),
 
-            IsoLaws.laws(
-                iso = tokenIso,
-                aGen = TokenGen,
-                bGen = Gen.string(),
-                funcGen = genFunctionAToB(Gen.string()),
-                EQA = Eq.any(),
-                EQB = Eq.any(),
-                bMonoid = StringMonoidInstance)
+                IsoLaws.laws(
+                        iso = tokenIso,
+                        aGen = TokenGen,
+                        bGen = Gen.string(),
+                        funcGen = genFunctionAToB(Gen.string()),
+                        EQA = Eq.any(),
+                        EQB = Eq.any(),
+                        bMonoid = StringMonoidInstance)
         )
 
         "Lifting a function should yield the same result as not yielding" {
