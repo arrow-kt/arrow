@@ -1,11 +1,12 @@
 package arrow.optics
 
+import arrow.data.SetKW
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import arrow.typeclasses.Eq
 import arrow.test.laws.IsoLaws
-import arrow.data.SetKWMonoidInstanceImplicits
 import arrow.data.k
+import arrow.data.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.optics.instances.setToSetKW
@@ -23,7 +24,7 @@ class SetInstancesTest : UnitSpec() {
                 funcGen = genFunctionAToB(Gen.create { Gen.set(Gen.int()).generate().k() }),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                bMonoid = SetKWMonoidInstanceImplicits.instance()
+                bMonoid = SetKW.monoid()
         ))
 
     }
