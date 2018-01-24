@@ -9,7 +9,7 @@ kotlin {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$parent.ext.kotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$parent.ext.kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
     compile "org.jetbrains:markdown:0.1.25"
     compile group: 'com.github.born2snipe', name: 'cli-progress', version: '0.4'
