@@ -2,6 +2,7 @@ package arrow.data
 
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
+import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
@@ -26,6 +27,7 @@ class MapKWTest : UnitSpec() {
             semigroup<MapKWKind<String, Int>>() shouldNotBe null
             monoid<MapKWKind<String, Int>>() shouldNotBe null
             eq<MapKW<String, Int>>() shouldNotBe null
+            show<MapKW<String, Int>>() shouldNotBe null
         }
 
         val monoid = MapKW.monoid<String, Int>(SG)
@@ -56,6 +58,7 @@ class MapKWTest : UnitSpec() {
 
         testLaws(
             EqLaws.laws { mapOf(it.toString() to it).k() },
+            ShowLaws.laws { mapOf(it.toString() to it).k() },
             TraverseLaws.laws(MapKW.traverse<String>(), MapKW.traverse<String>(), { a: Int -> mapOf<String, Int>("key" to a).k() })
         )
     }

@@ -32,10 +32,12 @@ class ListKWTest : UnitSpec() {
             functorFilter<ListKW<ListKWHK>>() shouldNotBe null
             monadFilter<ListKW<ListKWHK>>() shouldNotBe null
             eq<ListKW<Int>>() shouldNotBe null
+            show<ListKW<Int>>() shouldNotBe null
         }
 
         testLaws(
             EqLaws.laws { listOf(it).k() },
+            ShowLaws.laws { listOf(it).k() },
             SemigroupKLaws.laws(ListKW.semigroupK(), applicative, Eq.any()),
             MonoidKLaws.laws(ListKW.monoidK(), applicative, Eq.any()),
             TraverseLaws.laws(ListKW.traverse(), applicative, { n: Int -> ListKW(listOf(n)) }, Eq.any()),

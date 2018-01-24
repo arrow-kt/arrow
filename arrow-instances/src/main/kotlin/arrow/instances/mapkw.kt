@@ -60,3 +60,9 @@ interface MapKWEqInstance<K, A> : Eq<MapKW<K, A>> {
             } else false
 
 }
+
+@instance(MapKW::class)
+interface MapKWShowInstance<K, A> : Show<MapKW<K, A>> {
+    override fun show(a: MapKW<K, A>): String =
+            a.toString()
+}

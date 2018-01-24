@@ -28,6 +28,12 @@ interface ListKWEqInstance<A> : Eq<ListKW<A>> {
 }
 
 @instance(ListKW::class)
+interface ListKWShowInstance<A> : Show<ListKW<A>> {
+    override fun show(a: ListKW<A>): String =
+            a.toString()
+}
+
+@instance(ListKW::class)
 interface ListKWFunctorInstance : Functor<ListKWHK> {
     override fun <A, B> map(fa: ListKWKind<A>, f: kotlin.Function1<A, B>): ListKW<B> =
             fa.ev().map(f)
