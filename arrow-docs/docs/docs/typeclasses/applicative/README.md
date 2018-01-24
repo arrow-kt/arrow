@@ -22,9 +22,9 @@ In the following example we will define 3 invocations that may as well be remote
 import arrow.*
 import arrow.core.*
 
-fun profileService(): Option<String> = Option("Alfredo Lambda")
-fun phoneService(): Option<Int> = Option(55555555)
-fun addressService(): Option<List<String>> = Option(listOf("1 Main Street", "11130", "NYC"))
+fun profileService(): Option<String> = Some("Alfredo Lambda")
+fun phoneService(): Option<Int> = Some(55555555)
+fun addressService(): Option<List<String>> = Some(listOf("1 Main Street", "11130", "NYC"))
 ```
 
 This more or less illustrate the common use case of performing several independent operations where we need to get all the results together
@@ -58,7 +58,7 @@ It lifts a value into the computational context of a type constructor.
 `fun <A> pure(a: A): HK<F, A>`
 
 ```kotlin:ank
-Option.pure(1) // Option(1)
+Option.pure(1) // Some(1)
 ```
 
 #### ap
@@ -68,7 +68,7 @@ Apply a function inside the type constructor's context
 `fun <A, B> ap(fa: HK<F, A>, ff: HK<F, (A) -> B>): HK<F, B>`
 
 ```kotlin:ank
-Option.applicative().ap(Option(1), Option({ n: Int -> n + 1 })) // Option(2)
+Option.applicative().ap(Some(1), Some({ n: Int -> n + 1 })) // Some(2)
 ```
 
 #### Other combinators
@@ -90,7 +90,7 @@ Lift a value into the computational context of a type constructor
 Apply a function inside the type constructor's context
 
 ```kotlin:ank
-Option(1).ap(Option({ n: Int -> n + 1 }))
+Some(1).ap(Some({ n: Int -> n + 1 }))
 ```
 
 #### HK<F, A>#map2
@@ -98,7 +98,7 @@ Option(1).ap(Option({ n: Int -> n + 1 }))
 Map 2 values inside the type constructor context and apply a function to their cartesian product
 
 ```kotlin:ank
-Option.applicative().map2(Option(1), Option("x"), { z: Tuple2<Int, String> ->  "${z.a}${z.b}" })
+Option.applicative().map2(Some(1), Some("x"), { z: Tuple2<Int, String> ->  "${z.a}${z.b}" })
 ```
 
 #### HK<F, A>#map2Eval
@@ -107,7 +107,7 @@ Lazily map 2 values inside the type constructor context and apply a function to 
 Computation happens when `.value()` is invoked.
 
 ```kotlin:ank
-Option.applicative().map2Eval(Option(1), Eval.later { Option("x") }, { z: Tuple2<Int, String> ->  "${z.a}${z.b}" }).value()
+Option.applicative().map2Eval(Some(1), Eval.later { Some("x") }, { z: Tuple2<Int, String> ->  "${z.a}${z.b}" }).value()
 ```
 
 
