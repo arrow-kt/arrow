@@ -39,7 +39,6 @@ class IsoTest : UnitSpec() {
                         bGen = Gen.string(),
                         funcGen = genFunctionAToB(Gen.string()),
                         EQA = Eq.any(),
-                        EQB = Eq.any(),
                         EQOptionB = Eq.any()),
 
                 IsoLaws.laws(
