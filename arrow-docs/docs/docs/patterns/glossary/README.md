@@ -179,7 +179,7 @@ Let's use the typeclass [`Applicative`]({{ '/docs/typeclasses/applicative' | rel
 ```kotlin
 interface Applicative<F>: Functor<F>, Typeclass {
 
-  // Lifts a value to the current datatype
+  // Constructs the current datatype with a value of type A inside
   fun <A> pure(a: A): HK<F, A>
   
   /* ... */
