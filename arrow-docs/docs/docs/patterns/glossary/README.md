@@ -58,7 +58,7 @@ Its generic parameter will be used for the lookup, which reinforces the concept 
 
 All the instances in the library are already registered and available in the global scope.
 If you're defining your own instances and would like for them to be discoverable in the global scope 
-you can add them by annotating them as `@instance`, and Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will register them for you.
+you can add them by annotating them as `@instance`, and Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will register them for you. The interface has to have all required methods defined by default implementations, and be named after the datatype + typeclass + the word `Instance`.
 
 ```kotlin:ank
 import arrow.*
@@ -156,7 +156,7 @@ interface ListKWFunctorInstance : Functor<ListKWHK> {
 }
 ```
 
-This interface extends `Functor` for the value `F` of `ListKW`. We use an annotation processor `@instance` to generate an object out of an interface with all the default methods already defined, and to add that method to the global typeclass instance lookup. The interface has to be named after the datatype + typeclass + the word `Instance`.
+This interface extends `Functor` for the value `F` of `ListKW`. We use an annotation processor `@instance` to generate an object out of an interface with all the default methods already defined, and to add that method to the global typeclass instance lookup. See that we respect the naming convention of datatype + typeclass + the word `Instance`.
 
 ```kotlin
 @instance
