@@ -134,6 +134,7 @@ Now that we have a way of representing generic constructors for any type, we can
 Let's take as an example a typeclass that specifies how to map the contents of any container `F`. This typeclass that comes from computer science is called a [`Functor`]({{ '/docs/typeclasses/functor' | relative_url }}).
 
 ```kotlin
+@typeclass
 interface Functor<F>: TC {
   fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B>
 }
@@ -180,7 +181,8 @@ Higher kinds are also used to model functions that require for a datatype to imp
 Let's use the typeclass [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}), that contains the constructor function `pure()`.
 
 ```kotlin
-interface Applicative<F>: Functor<F>, Typeclass {
+@typeclass
+interface Applicative<F>: Functor<F>, TC {
 
   // Constructs the current datatype with a value of type A inside
   fun <A> pure(a: A): HK<F, A>
