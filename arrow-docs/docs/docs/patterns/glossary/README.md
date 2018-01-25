@@ -75,7 +75,7 @@ A type constructor is any class or interface that has at least one generic param
 [`ListKW<A>`]({{ '/docs/datatypes/listkw' | relative_url }}) or [`Option<A>`]({{ '/docs/datatypes/option' | relative_url }}).
 They're called constructors because they're similar to a factory function where the parameter is `A`, except for types.
 So, after applying the parameter `Int` to the type constructor `ListKW<A>` it returns a `ListKW<Int>`.
-This list isn't parametrized in any generic value so it cannot be considered a type constructor anymore.
+As `ListKW<Int>` isn't parametrized in any generic value so it cannot be considered a type constructor anymore.
 
 Like functions, a type constructor with several parameters like [`Either<L, R>`]({{ '/docs/datatypes/either' | relative_url }}) can be partially applied for one of them to return another type constructor,
 for example `Either<Throwable, A>` or `Either<E, String>`.
