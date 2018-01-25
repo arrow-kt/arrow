@@ -20,7 +20,7 @@ or interacting with the platform the program runs in using [`IO`]({{ '/docs/effe
 
 ### Typeclasses
 
-A typeclass is a specification for one behavior associated with a single type. This behavior is checked by a test suite called the "laws" for that typeclass.
+A typeclass is a specification for one behavior associated with a single type. This behavior is checked by a test suite called the "laws" for that typeclass. These test suites are available in the package arrow-tests.
 
 What differentiates typeclasses from regular OOP inheritance is that typeclasses are meant to be implemented outside of their types.
 The association is done using generic parametrization rather than the usual subclassing by implementing the interface.
@@ -32,7 +32,10 @@ composability ([`Monoid`]({{ '/docs/typeclasses/monoid' | relative_url }})),
 its contents can be mapped from one type to another ([`Functor`]({{ '/docs/typeclasses/functor' | relative_url }})),
 or error recovery ([`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }})).
 
+To define a fully featured typeclass in Λrrow you use an interface that extends from `TC`, and use the annotation `@typeclass` to generate all boilerplate related to global lookup, which is explained below. The annotation and interface to extend have different names to avoid collision.
+
 ```kotlin
+@typeclass
 interface Eq<F>: TC {
   fun eqv(a: F, b: F): Boolean
 }
