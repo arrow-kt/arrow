@@ -24,7 +24,7 @@ fun <A> listElementPositionOptional(position: Int): Optional<List<A>, A> = Optio
 fun <A> listElementOptional(predicate: Predicate<A>): Optional<List<A>, A> = Optional(
         getOrModify = { l -> l.find(predicate)?.right() ?: l.left() },
         set = { e -> { l ->
-            val location = l.first(predicate)
+            val location = l.firstOrNull(predicate)
             l.mapIndexed { index: Int, value: A ->  if (index == location) e else value }
         } }
 )

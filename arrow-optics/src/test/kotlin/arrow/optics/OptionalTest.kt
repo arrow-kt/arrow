@@ -1,49 +1,56 @@
 package arrow.optics
 
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
-import arrow.test.laws.OptionalLaws
-import arrow.data.Try
-import arrow.test.UnitSpec
-import arrow.test.generators.genFunctionAToB
-import arrow.test.generators.genTry
-import arrow.test.generators.genTuple
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.eq
+import arrow.data.Try
 import arrow.data.applicative
+import arrow.optics.instances.listElementOptional
 import arrow.optics.instances.listElementPositionOptional
 import arrow.optics.instances.nullableOptional
 import arrow.syntax.either.left
 import arrow.syntax.either.right
+import arrow.test.UnitSpec
+import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genNullable
+import arrow.test.generators.genTry
+import arrow.test.generators.genTuple
+import arrow.test.laws.OptionalLaws
 import arrow.typeclasses.Eq
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.properties.Gen
+import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
+import java.util.*
 
 @RunWith(KTestJUnitRunner::class)
 class OptionalTest : UnitSpec() {
 
     init {
 
-        OptionalLaws.laws(
+        testLaws(OptionalLaws.laws(
+                optional = listElementOptional({ it == 0.toByte() }),
+                aGen = Gen.list(byte()),
+                bGen = byte(),
+                funcGen = genFunctionAToB(byte()),
+                EQA = Eq.any(),
+                EQOptionB = Eq.any()))
+
+        testLaws(OptionalLaws.laws(
                 optional = listElementPositionOptional(50),
                 aGen = Gen.list(Gen.int()),
                 bGen = Gen.int(),
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
-                EQB = Eq.any(),
-                EQOptionB = Eq.any()),
+                EQOptionB = Eq.any()))
 
-        OptionalLaws.laws(
+        testLaws(OptionalLaws.laws(
                 optional = nullableOptional(),
                 aGen = genNullable(Gen.int()),
                 bGen = Gen.int(),
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
-                EQB = Eq.any(),
-                EQOptionB = Eq.any()),
-
+                EQOptionB = Eq.any()))
 
         testLaws(OptionalLaws.laws(
                 optional = optionalHead,
@@ -154,6 +161,15 @@ class OptionalTest : UnitSpec() {
             })
         }
 
+    }
+
+    fun byte() = object : Gen<Byte> {
+        val RANDOM = Random()
+        override fun generate(): Byte {
+            val arr = ByteArray(1)
+            RANDOM.nextBytes(arr)
+            return arr[0]
+        }
     }
 
 }
