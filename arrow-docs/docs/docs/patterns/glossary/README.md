@@ -73,21 +73,23 @@ eq<Int>()
 
 A type constructor is any class or interface that has at least one generic parameter. For example, 
 [`ListKW<A>`]({{ '/docs/datatypes/listkw' | relative_url }}) or [`Option<A>`]({{ '/docs/datatypes/option' | relative_url }}).
-They're called constructors because they're similar to a factory function where the parameter is `A`, except for types.
-So, after applying the parameter `Int` to the type constructor `ListKW<A>` it returns a `ListKW<Int>`.
-As `ListKW<Int>` isn't parametrized in any generic value so it cannot be considered a type constructor anymore.
+They're called constructors because they're similar to a factory function where the parameter is `A`, except type constructors work only for types.
+So, we could say that after applying the parameter `Int` to the type constructor `ListKW<A>` it returns a `ListKW<Int>`.
+As `ListKW<Int>` isn't parametrized in any generic value it is not considered a type constructor anymore, just a regular type.
 
-Like functions, a type constructor with several parameters like [`Either<L, R>`]({{ '/docs/datatypes/either' | relative_url }}) can be partially applied for one of them to return another type constructor,
-for example `Either<Throwable, A>` or `Either<E, String>`.
+Like functions, a type constructor with several parameters like [`Either<L, R>`]({{ '/docs/datatypes/either' | relative_url }}) can be partially applied for one of them to return another type constructor with one fewer parameter,
+for example applying `Throwable` to the left side yields `Either<Throwable, A>`, or applying `String` to the right side resuls in `Either<E, String>`.
 
-Type constructors are useful when matched with typeclasses because they help us represent instances of parametrized classes that work for all generic parameters.
-As type constructors is not a first class feature in Kotlin we use an interface `HK<F, A>` to represent them.
+Type constructors are useful when matched with typeclasses because they help us represent instances of parametrized classes -the containers- that work for all generic parameters -the content-.
+As type constructors is not a first class feature in Kotlin, Λrrow uses an interface `HK<F, A>` to represent them.
 HK stands for Higher Kind, which is the name of the language feature that allows working directly with type constructors.
 
 #### Higher Kinds
 
 In a Higher Kind with the shape `HK<F, A>`, if `A` is the type of the content then `F` has to be the type of the container.
-A malformed container would use the whole type constructor, duplicating the type ~~HK\<Option\<A\>, A\>~~.
+
+A malformed Higher Kind would use the whole type constructor to define the container, duplicating the type of the content ~~`HK\<Option\<A\>, A\>`~~. This representation presents a number of issues when working with partially applied types.
+
 What Λrrow does instead is define a surrogate type that's not parametrized to represent `F`.
 These types are named same as the container and suffixed by HK, as in `OptionHK` or `ListKWHK`.
 
