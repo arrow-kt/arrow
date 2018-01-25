@@ -149,7 +149,7 @@ interface ListKWFunctorInstance : Functor<ListKWHK> {
 }
 ```
 
-We use an annotation processor `@instance` to generate an object out of an interface with all the default methods defined. The interface is named after the datatype + typeclass + the word `Instance`. This interface extends `Functor` for the value `F` of `ListKW`.
+This interface extends `Functor` for the value `F` of `ListKW`. We use an annotation processor `@instance` to generate an object out of an interface with all the default methods already defined, and to add that method to the global typeclass instance lookup. The interface has to be named after the datatype + typeclass + the word `Instance`.
 
 ```kotlin
 @instance
