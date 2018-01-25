@@ -20,22 +20,26 @@ or interacting with the platform the program runs in using [`IO`]({{ '/docs/effe
 
 ### Typeclasses
 
-A typeclass is an interface representing one behavior associated with a type.
-Examples of this behavior are comparability ([`Eq`]({{ '/docs/typeclasses/eq' | relative_url }})),
+A typeclass is a specification for one behavior associated with a single type. This behavior is checked by a test suite called the "laws" for that typeclass. These test suites are available in the package arrow-tests.
+
+What differentiates typeclasses from regular OOP inheritance is that typeclasses are meant to be implemented outside of their types.
+The association is done using generic parametrization rather than the usual subclassing by implementing the interface.
+This means that they can be implemented for any class, even those not in the current project,
+and allows us to make typeclass instances for a datatype available at a global scope for the single unique type they're associated with.
+
+Examples of these behaviors are comparability ([`Eq`]({{ '/docs/typeclasses/eq' | relative_url }})),
 composability ([`Monoid`]({{ '/docs/typeclasses/monoid' | relative_url }})),
 its contents can be mapped from one type to another ([`Functor`]({{ '/docs/typeclasses/functor' | relative_url }})),
 or error recovery ([`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }})).
 
+To define a fully featured typeclass in Λrrow you use an interface that extends from `TC`, and use the annotation `@typeclass` to generate all boilerplate related to global lookup, which is explained below. The annotation and interface to extend have different names to avoid collision.
+
 ```kotlin
-interface Eq<F>: Typeclass {
+@typeclass
+interface Eq<F>: TC {
   fun eqv(a: F, b: F): Boolean
 }
 ```
-
-What differentiates typeclasses from regular interfaces is that they are meant to be implemented outside of their types.
-The association is done using generic parametrization rather than the usual subclassing.
-This means that they can be implemented for any class, even those not in the current project,
-and allows us to make typeclass instances available at a global scope for the single unique type they're associated with.
 
 ### Instances
 
@@ -54,7 +58,7 @@ Its generic parameter will be used for the lookup, which reinforces the concept 
 
 All the instances in the library are already registered and available in the global scope.
 If you're defining your own instances and would like for them to be discoverable in the global scope 
-you can add them by annotating them as `@instance`, and Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will register them for you.
+you can add them by annotating them as `@instance`, and Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will register them for you. The interface has to have all required methods defined by default implementations, and be named after the datatype + typeclass + the word `Instance`.
 
 ```kotlin:ank
 import arrow.*
@@ -69,21 +73,23 @@ eq<Int>()
 
 A type constructor is any class or interface that has at least one generic parameter. For example, 
 [`ListKW<A>`]({{ '/docs/datatypes/listkw' | relative_url }}) or [`Option<A>`]({{ '/docs/datatypes/option' | relative_url }}).
-They're called constructors because they're similar to a factory function where the parameter is `A`, except for types.
-So, after applying the parameter `Int` to the type constructor `ListKW<A>` it returns a `ListKW<Int>`.
-This list isn't parametrized in any generic value so it cannot be considered a type constructor anymore.
+They're called constructors because they're similar to a factory function where the parameter is `A`, except type constructors work only for types.
+So, we could say that after applying the parameter `Int` to the type constructor `ListKW<A>` it returns a `ListKW<Int>`.
+As `ListKW<Int>` isn't parametrized in any generic value it is not considered a type constructor anymore, just a regular type.
 
-Like functions, a type constructor with several parameters like [`Either<L, R>`]({{ '/docs/datatypes/either' | relative_url }}) can be partially applied for one of them to return another type constructor,
-for example `Either<Throwable, A>` or `Either<E, String>`.
+Like functions, a type constructor with several parameters like [`Either<L, R>`]({{ '/docs/datatypes/either' | relative_url }}) can be partially applied for one of them to return another type constructor with one fewer parameter,
+for example applying `Throwable` to the left side yields `Either<Throwable, A>`, or applying `String` to the right side resuls in `Either<E, String>`.
 
-Type constructors are useful when matched with typeclasses because they help us represent instances of parametrized classes that work for all generic parameters.
-As type constructors is not a first class feature in Kotlin we use an interface `HK<F, A>` to represent them.
+Type constructors are useful when matched with typeclasses because they help us represent instances of parametrized classes -the containers- that work for all generic parameters -the content-.
+As type constructors is not a first class feature in Kotlin, Λrrow uses an interface `HK<F, A>` to represent them.
 HK stands for Higher Kind, which is the name of the language feature that allows working directly with type constructors.
 
 #### Higher Kinds
 
 In a Higher Kind with the shape `HK<F, A>`, if `A` is the type of the content then `F` has to be the type of the container.
-A malformed container would use the whole type constructor, duplicating the type ~~HK\<Option\<A\>, A\>~~.
+
+A malformed Higher Kind would use the whole type constructor to define the container, duplicating the type of the content ~~`HK<Option<A>, A>`~~. This incorrect representation has large a number of issues when working with partially applied types and nested types.
+
 What Λrrow does instead is define a surrogate type that's not parametrized to represent `F`.
 These types are named same as the container and suffixed by HK, as in `OptionHK` or `ListKWHK`.
 
@@ -130,7 +136,8 @@ Now that we have a way of representing generic constructors for any type, we can
 Let's take as an example a typeclass that specifies how to map the contents of any container `F`. This typeclass that comes from computer science is called a [`Functor`]({{ '/docs/typeclasses/functor' | relative_url }}).
 
 ```kotlin
-interface Functor<F>: Typeclass {
+@typeclass
+interface Functor<F>: TC {
   fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B>
 }
 ```
@@ -149,7 +156,7 @@ interface ListKWFunctorInstance : Functor<ListKWHK> {
 }
 ```
 
-This interface extends `Functor` for the value `F` of `ListKW`. We use an annotation processor `@instance` to generate an object out of an interface with all the default methods already defined, and to add that method to the global typeclass instance lookup. The interface has to be named after the datatype + typeclass + the word `Instance`.
+This interface extends `Functor` for the value `F` of `ListKW`. We use an annotation processor `@instance` to generate an object out of an interface with all the default methods already defined, and to add that method to the global typeclass instance lookup. See that we respect the naming convention of datatype + typeclass + the word `Instance`.
 
 ```kotlin
 @instance
@@ -176,9 +183,10 @@ Higher kinds are also used to model functions that require for a datatype to imp
 Let's use the typeclass [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}), that contains the constructor function `pure()`.
 
 ```kotlin
-interface Applicative<F>: Functor<F>, Typeclass {
+@typeclass
+interface Applicative<F>: Functor<F>, TC {
 
-  // Lifts a value to the current datatype
+  // Constructs the current datatype with a value of type A inside
   fun <A> pure(a: A): HK<F, A>
   
   /* ... */
