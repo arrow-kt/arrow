@@ -99,8 +99,29 @@ class ListKWHK private constructor()
 data class ListKW<A>(val list: List<A>): HK<ListKWHK, A>
 ```
 
-You can read more about Higher Kinds and type constructors in [KindedJ's README](https://github.com/KindedJ/KindedJ#rationale).
-The library currently provides a layer of integration with [KindedJ]({{ '/docs/integrations/kindedj' | relative_url }}).
+As `ListKW<A>` is the only existing implementation of `HK<ListKWHK, A>`, we can define an extension function on `HK<ListKWHK, A>` to do the downcasting safely for us. This function by convention is called `ev()` (evidence or evaluate).
+
+```kotlin
+fun HK<ListKWHK, A>.ev() = this as ListKW<A>
+```
+
+This way we have can to convert from `ListKW<A>` to `HK<ListKWHK, A>` via simple subclassing and from `HK<ListKWHK, A>` to `ListKW<A>` using the function `ev()`. Being able to define extension functions that work for partially applied generics is a feature from Kotlin that's not available in Java. You can define `fun HK<OptionHK, A>.ev()` and `fun HK<ListKWHK, A>.ev()` and the compiler can smartly decide which one you're trying to use. If it can't it means there's an ambiguity you should fix!
+
+The function `ev()` is already defined for all datatypes in Λrrow. If you're creating your own datatype that's also a type constructor and would like to create all these helper types and functions,
+you can do so simply by annotating it as `@higerkind` and the Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create them for you.
+
+```kotlin
+@higherkind
+data class ListKW<A>(val list: List<A>): ListKWKind<A>
+
+// Generates the following code:
+//
+// class ListKWHK private constructor()
+// typealias ListKWKind<A> = HK<ListKWHK, A>
+// fun ListKWKind<A>.ev() = this as ListKW<A>
+```
+
+Note that the annotation `@higerkind` will also generate the integration typealiases required by [KindedJ]({{ '/docs/integrations/kindedj' | relative_url }}) as long as the datatype is invariant. You can read more about sharing Higher Kinds and type constructors across JVM libraries in [KindedJ's README](https://github.com/KindedJ/KindedJ#rationale).
 
 #### Using Higher Kinds with typeclasses
 
@@ -141,28 +162,12 @@ The signature of `map` once the types have been replaced takes a parameter `HK<L
 override fun <A, B> map(fa: HK<ListKWHK, A>, f: (A) -> B): ListKW<B>
 ```
 
-The implementation is short. On the first line we downcast `HK<ListKWHK, A>` to `ListKW<A>`. As `ListKW<A>` is the only existing implementation of `HK<ListKWHK, A>`, we can define an extension function on `HK<ListKWHK, A>` to do the downcasting safely for us. This function by convention is called `ev()` (evidence or evaluate). Once the value has been downcasted, the implementation of map inside the `ListKW<A>` we have obtained already implements the expected behavior of map.
+The implementation is short. On the first line we downcast `HK<ListKWHK, A>` to `ListKW<A>` using `ev()`. Once the value has been downcasted, the implementation of map inside the `ListKW<A>` we have obtained already implements the expected behavior of map.
 
 ```kotlin
 val list: ListKW<A> = fa.ev()
 return list.map(f)
 ```
-
-The function `ev()` is already defined for all datatypes in Λrrow. If you're creating your own datatype that's also a type constructor and would like to create all these helper types and functions,
-you can do so simply by annotating it as `@higerkind` and the Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create them for you.
-
-```kotlin
-@higherkind
-data class ListKW<A>(val list: List<A>): ListKWKind<A>
-
-// Generates the following code:
-//
-// class ListKWHK private constructor()
-// typealias ListKWKind<A> = HK<ListKWHK, A>
-// fun ListKWKind<A>.ev() = this as ListKW<A>
-```
-
-Note that the annotation `@higerkind` will also generate the integration typealiases required by [KindedJ]({{ '/docs/integrations/kindedj' | relative_url }}) as long as the datatype is invariant.
 
 #### Using Higher Kinds and typeclasses with functions
 
