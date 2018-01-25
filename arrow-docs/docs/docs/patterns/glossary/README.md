@@ -130,9 +130,23 @@ interface ListKWFunctorInstance : Functor<ListKWHK> {
 
 We use an annotation processor `@instance` to generate an object out of an interface with all the default methods defined. The interface is named after the datatype + typeclass + the word `Instance`. This interface extends `Functor` for the value `F` of `ListKW`.
 
+```kotlin
+@instance
+interface ListKWFunctorInstance : Functor<ListKWHK>
+```
+
 The signature of `map` once the types have been replaced takes a parameter `HK<ListKWHK, A>`, which is the receiver, and a mapping function from `A` to `B`. This means that map will work for all instances of `ListKW<A>` for whatever the value of `A` can be.
 
-The implementation is short. On the first line we downcast `HK<ListKWHK, A>` to `ListKW<A>`. As `ListKW<A>` is the only available implementation of `HK<ListKWHK, A>`, we can define an extension function on `HK<ListKWHK, A>` to do the downcasting safely for us. This function by convention is called `ev()` (evidence or evaluate). Once the value has been downcasted, the implementation of map inside the `ListKW<A>` we have obtained already implements this typeclass. 
+```kotlin
+override fun <A, B> map(fa: HK<ListKWHK, A>, f: (A) -> B): ListKW<B>
+```
+
+The implementation is short. On the first line we downcast `HK<ListKWHK, A>` to `ListKW<A>`. As `ListKW<A>` is the only existing implementation of `HK<ListKWHK, A>`, we can define an extension function on `HK<ListKWHK, A>` to do the downcasting safely for us. This function by convention is called `ev()` (evidence or evaluate). Once the value has been downcasted, the implementation of map inside the `ListKW<A>` we have obtained already implements the expected behavior of map.
+
+```kotlin
+val list: ListKW<A> = fa.ev()
+return list.map(f)
+```
 
 The function `ev()` is already defined for all datatypes in Λrrow. If you're creating your own datatype that's also a type constructor and would like to create all these helper types and functions,
 you can do so simply by annotating it as `@higerkind` and the Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create them for you.
@@ -152,38 +166,39 @@ Note that the annotation `@higerkind` will also generate the integration typeali
 
 #### Using Higher Kinds and typeclasses with functions
 
-Higher kinds can also be used to represent functions that are parametrized on type constructors.
-As long as you have a typeclass that can provide you with the behavior required to use such datatypes, you're good to go!
+Higher kinds are also used to model functions that require for a datatype to implement a typeclass. This way you can create functions that abstract behavior (defined by a typeclass) and allow callers to define which datatype they'd like to apply it to.
 
 Let's use the typeclass [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}), that contains the constructor function `pure()`.
 
 ```kotlin
 interface Applicative<F>: Functor<F>, Typeclass {
+
+  // Lifts a value to the current datatype
   fun <A> pure(a: A): HK<F, A>
   
   /* ... */
 }
 ```
 
-And lets create a single instance of `Applicative` where our `F` is `ListKW`.
+Once we have this typeclass behavior define we can now write a function that's parametrized for any `F` that has one instance of `Applicative`. The function uses the constructor `pure` to create a value of type `HK<F, User>`, effectively generifying on the container.
+
+```kotlin
+inline fun <reified F> randomUserStructure(f: (Int) -> User, AP: Applicative<F> = applicative<F>()): HK<F, User> =
+  AP.pure(f(Math.random()))
+```
+
+Now lets create a simple example instance of `Applicative` where our `F` is `ListKW`. This implementation of a `pure` constructor is trivial for lists, as it just requires wrapping the value.
 
 ```kotlin
 @instance
 interface ListKWApplicativeInstance : Applicative<ListKWHK> {
-  override fun <A> pure(a: A): HK<ListKWHK, A> = listOf(a)
+  override fun <A> pure(a: A): HK<ListKWHK, A> = ListKW(listOf(a))
   
   /* ... */
 }
 ```
 
-So we can now define a function that's parametrized for any `F` that has one instance of `Applicative`.
-
-```kotlin
-inline fun <reified F> randomUserStructure(f: (Int) -> User, AP: Applicative<F> = applicative<F>()) =
-  AP.pure(f(Math.random()))
-```
-
-And now this function `randomUserStructure()` can be used for any datatype that implements [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}).
+And now we can show how this function `randomUserStructure()` can be used for any datatype that implements [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}).
 
 ```kotlin
 val list = randomUserStructure(::User, ListKW.applicative()).ev()
@@ -200,7 +215,7 @@ val either = randomUserStructure(::User, Either.applicative<Unit>()).ev()
 //Right(User(221))
 ```
 
-But now, remember that all instances already defined in Λrrow can be looked up globally!! That means that whenever asking for a typeclass you can ask for a default value that'll be looked up globally based on its type:
+Passing the instance in every function call seems like a burden. But, remember that all instances already defined in Λrrow can be looked up globally!! That means that whenever asking for any instance you can ask for a default value that'll be looked up globally based on its type:
 
 ```kotlin:ank
 import arrow.data.*
@@ -226,4 +241,4 @@ val option: Option<User> = randomUserStructure(::User).ev()
 //Some(User(765))
 ```
 
-This system of looking up global instances and allowing manual overrides will be simplified when the feature request [KEEP-87](https://github.com/Kotlin/KEEP/pull/87) is implemented into the language.
+This system of looking up global instances and allowing manual overrides has several pitfalls and can and will be simplified when the feature request [KEEP-87](https://github.com/Kotlin/KEEP/pull/87) is implemented into the language.
