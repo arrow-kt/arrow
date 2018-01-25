@@ -88,7 +88,13 @@ What Λrrow does instead is define a surrogate type that's not parametrized to r
 These types are named same as the container and suffixed by HK, as in `OptionHK` or `ListKWHK`.
 
 ```kotlin
+class OptionHK private constructor()
+
 sealed class Option<A>: HK<OptionHK, A>
+```
+
+```kotlin
+class ListKWHK private constructor()
 
 data class ListKW<A>(val list: List<A>): HK<ListKWHK, A>
 ```
@@ -98,13 +104,21 @@ The library currently provides a layer of integration with [KindedJ]({{ '/docs/i
 
 #### Using Higher Kinds with typeclasses
 
-When HKs are coupled with typeclasses it allows us to define mapability using [`Functor`]({{ '/docs/typeclasses/functor' | relative_url }}) for any content `A` inside a `ListKW`.
+Now that we have a way of representing generic constructors for any type, we can write typeclasses that are parametrised for containers.
+
+Let's take as an example a typeclass that specifies how to map the contents of any container `F`. This typeclass that comes from computer science is called a [`Functor`]({{ '/docs/typeclasses/functor' | relative_url }}).
 
 ```kotlin
 interface Functor<F>: Typeclass {
   fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B>
 }
+```
 
+See how the class is parametrized on the container `F`, and the function is parametrized to the content `A`. This way we can have a single representation that works for all mappings from `A` to `B`.
+
+Let's define an instance of `Functor` for the datatype `ListKW`, our own wrapper for lists.
+
+```kotlin
 @instance
 interface ListKWFunctorInstance : Functor<ListKWHK> {
   override fun <A, B> map(fa: HK<ListKWHK, A>, f: (A) -> B): ListKW<B> {
@@ -114,13 +128,27 @@ interface ListKWFunctorInstance : Functor<ListKWHK> {
 }
 ```
 
-You can see a function `ev()` used to access the `map()` function that already exists in `ListKW`.
-This is because we need to safely downcast from `HK<ListKWHK, A>` to `ListKW<A>`, and `ev()` is a global function defined to do so.
+We use an annotation processor `@instance` to generate an object out of an interface with all the default methods defined. The interface is named after the datatype + typeclass + the word `Instance`. This interface extends `Functor` for the value `F` of `ListKW`.
+
+The signature of `map` once the types have been replaced takes a parameter `HK<ListKWHK, A>`, which is the receiver, and a mapping function from `A` to `B`. This means that map will work for all instances of `ListKW<A>` for whatever the value of `A` can be.
+
+The implementation is short. On the first line we downcast `HK<ListKWHK, A>` to `ListKW<A>`. As `ListKW<A>` is the only available implementation of `HK<ListKWHK, A>`, we can define an extension function on `HK<ListKWHK, A>` to do the downcasting safely for us. This function by convention is called `ev()` (evidence or evaluate). Once the value has been downcasted, the implementation of map inside the `ListKW<A>` we have obtained already implements this typeclass. 
 
 The function `ev()` is already defined for all datatypes in Λrrow. If you're creating your own datatype that's also a type constructor and would like to create all these helper types and functions,
-you can do so simply by annotating it as `@higerkind`, and using Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create them for you.
+you can do so simply by annotating it as `@higerkind` and the Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create them for you.
 
-Note that the annotation `@higerkind` will also generate the integration typealiases required by [KindedJ]({{ '/docs/integrations/kindedj' | relative_url }}).
+```kotlin
+@higherkind
+data class ListKW<A>(val list: List<A>): ListKWKind<A>
+
+// Generates the following code:
+//
+// class ListKWHK private constructor()
+// typealias ListKWKind<A> = HK<ListKWHK, A>
+// fun ListKWKind<A>.ev() = this as ListKW<A>
+```
+
+Note that the annotation `@higerkind` will also generate the integration typealiases required by [KindedJ]({{ '/docs/integrations/kindedj' | relative_url }}) as long as the datatype is invariant.
 
 #### Using Higher Kinds and typeclasses with functions
 
@@ -135,18 +163,44 @@ interface Applicative<F>: Functor<F>, Typeclass {
   
   /* ... */
 }
+```
 
-object ListKWApplicativeInstance : ListKWFunctorInstance, Applicative<ListKWHK> {
+And lets create a single instance of `Applicative` where our `F` is `ListKW`.
+
+```kotlin
+@instance
+interface ListKWApplicativeInstance : Applicative<ListKWHK> {
   override fun <A> pure(a: A): HK<ListKWHK, A> = listOf(a)
   
   /* ... */
 }
+```
 
+So we can now define a function that's parametrized for any `F` that has one instance of `Applicative`.
+
+```kotlin
 inline fun <reified F> randomUserStructure(f: (Int) -> User, AP: Applicative<F> = applicative<F>()) =
   AP.pure(f(Math.random()))
 ```
 
-Remember that all instances already defined in Λrrow can be looked up globally
+And now this function `randomUserStructure()` can be used for any datatype that implements [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}).
+
+```kotlin
+val list = randomUserStructure(::User, ListKW.applicative()).ev()
+//[User(342)]
+```
+
+```kotlin
+val option = randomUserStructure(::User, Option.applicative()).ev()
+//Some(User(765))
+```
+
+```kotlin
+val either = randomUserStructure(::User, Either.applicative<Unit>()).ev()
+//Right(User(221))
+```
+
+But now, remember that all instances already defined in Λrrow can be looked up globally!! That means that whenever asking for a typeclass you can ask for a default value that'll be looked up globally based on its type:
 
 ```kotlin:ank
 import arrow.data.*
@@ -154,15 +208,22 @@ import arrow.data.*
 applicative<ListKWHK>()
 ```
 
-And now this function `randomUserStructure()` can be used for any datatype that implements [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}).
+```kotlin:ank
+import arrow.core.*
+
+applicative<OptionHK>()
+```
+
+This means that we can define the functions without passing the second parameter as long as we tell the compiler what type we're expecting the function to return.
 
 ```kotlin
 val list: ListKW<User> = randomUserStructure(::User).ev()
 //[User(342)]
+```
 
+```kotlin
 val option: Option<User> = randomUserStructure(::User).ev()
 //Some(User(765))
-
-val either: Either<Unit, User> = randomUserStructure(::User).ev()
-//Right(User(221))
 ```
+
+This system of looking up global instances and allowing manual overrides will be simplified when the feature request [KEEP-87](https://github.com/Kotlin/KEEP/pull/87) is implemented into the language.
