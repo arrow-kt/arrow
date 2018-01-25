@@ -20,8 +20,14 @@ or interacting with the platform the program runs in using [`IO`]({{ '/docs/effe
 
 ### Typeclasses
 
-A typeclass is an interface representing one behavior associated with a type.
-Examples of this behavior are comparability ([`Eq`]({{ '/docs/typeclasses/eq' | relative_url }})),
+A typeclass is a specification for one behavior associated with a single type. This behavior is checked by a test suite called the "laws" for that typeclass.
+
+What differentiates typeclasses from regular OOP inheritance is that typeclasses are meant to be implemented outside of their types.
+The association is done using generic parametrization rather than the usual subclassing by implementing the interface.
+This means that they can be implemented for any class, even those not in the current project,
+and allows us to make typeclass instances for a datatype available at a global scope for the single unique type they're associated with.
+
+Examples of these behaviors are comparability ([`Eq`]({{ '/docs/typeclasses/eq' | relative_url }})),
 composability ([`Monoid`]({{ '/docs/typeclasses/monoid' | relative_url }})),
 its contents can be mapped from one type to another ([`Functor`]({{ '/docs/typeclasses/functor' | relative_url }})),
 or error recovery ([`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }})).
@@ -31,11 +37,6 @@ interface Eq<F>: Typeclass {
   fun eqv(a: F, b: F): Boolean
 }
 ```
-
-What differentiates typeclasses from regular interfaces is that they are meant to be implemented outside of their types.
-The association is done using generic parametrization rather than the usual subclassing.
-This means that they can be implemented for any class, even those not in the current project,
-and allows us to make typeclass instances available at a global scope for the single unique type they're associated with.
 
 ### Instances
 
