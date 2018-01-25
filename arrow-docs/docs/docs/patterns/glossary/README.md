@@ -88,7 +88,7 @@ HK stands for Higher Kind, which is the name of the language feature that allows
 
 In a Higher Kind with the shape `HK<F, A>`, if `A` is the type of the content then `F` has to be the type of the container.
 
-A malformed Higher Kind would use the whole type constructor to define the container, duplicating the type of the content ~~`HK<Option<A>, A>`~~. This representation presents a number of issues when working with partially applied types.
+A malformed Higher Kind would use the whole type constructor to define the container, duplicating the type of the content ~~`HK<Option<A>, A>`~~. This incorrect representation has large a number of issues when working with partially applied types and nested types.
 
 What Λrrow does instead is define a surrogate type that's not parametrized to represent `F`.
 These types are named same as the container and suffixed by HK, as in `OptionHK` or `ListKWHK`.
