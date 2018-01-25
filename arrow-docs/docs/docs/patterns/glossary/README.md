@@ -33,7 +33,7 @@ its contents can be mapped from one type to another ([`Functor`]({{ '/docs/typec
 or error recovery ([`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }})).
 
 ```kotlin
-interface Eq<F>: Typeclass {
+interface Eq<F>: TC {
   fun eqv(a: F, b: F): Boolean
 }
 ```
@@ -131,7 +131,7 @@ Now that we have a way of representing generic constructors for any type, we can
 Let's take as an example a typeclass that specifies how to map the contents of any container `F`. This typeclass that comes from computer science is called a [`Functor`]({{ '/docs/typeclasses/functor' | relative_url }}).
 
 ```kotlin
-interface Functor<F>: Typeclass {
+interface Functor<F>: TC {
   fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B>
 }
 ```
