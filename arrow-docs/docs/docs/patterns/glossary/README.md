@@ -180,7 +180,7 @@ interface Applicative<F>: Functor<F>, Typeclass {
 }
 ```
 
-Once we have this typeclass behavior define we can now write a function that's parametrized for any `F` that has one instance of `Applicative`. The function uses the constructor `pure` to create a value of type `HK<F, User>`, effectively generifying on the container.
+Once we have this typeclass behavior define we can now write a function that's parametrized for any `F` that has one instance of `Applicative`. The function uses the constructor `pure` to create a value of type `HK<F, User>`, effectively generifying the return on any container `F`.
 
 ```kotlin
 inline fun <reified F> randomUserStructure(f: (Int) -> User, AP: Applicative<F> = applicative<F>()): HK<F, User> =
@@ -198,7 +198,7 @@ interface ListKWApplicativeInstance : Applicative<ListKWHK> {
 }
 ```
 
-And now we can show how this function `randomUserStructure()` can be used for any datatype that implements [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}).
+And now we can show how this function `randomUserStructure()` can be used for any datatype that implements [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}). As the function returns a value `HK<F, User>` the caller is responsible of calling `ev()` to downcast it to the expected value.
 
 ```kotlin
 val list = randomUserStructure(::User, ListKW.applicative()).ev()
@@ -229,7 +229,7 @@ import arrow.core.*
 applicative<OptionHK>()
 ```
 
-This means that we can define the functions without passing the second parameter as long as we tell the compiler what type we're expecting the function to return.
+So, because `randomUserStructure` provides a default value for [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}) that's looked up globally, we can call it without passing the second parameter as long as we tell the compiler what type we're expecting the function to return.
 
 ```kotlin
 val list: ListKW<User> = randomUserStructure(::User).ev()
