@@ -5,12 +5,9 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import arrow.typeclasses.Eq
 import arrow.test.laws.IsoLaws
-import arrow.core.OptionMonoidInstanceImplicits
 import arrow.core.monoid
 import arrow.data.ListKW
-import arrow.data.ListKWMonoidInstanceImplicits
 import arrow.data.NonEmptyList
-import arrow.data.NonEmptyListSemigroupInstanceImplicits
 import arrow.data.k
 import arrow.data.monoid
 import arrow.data.semigroup
@@ -19,10 +16,6 @@ import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genNonEmptyList
 import arrow.test.generators.genOption
-import arrow.optics.instances.listHead
-import arrow.optics.instances.listTail
-import arrow.optics.instances.listToListKW
-import arrow.optics.instances.listToOptionNel
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

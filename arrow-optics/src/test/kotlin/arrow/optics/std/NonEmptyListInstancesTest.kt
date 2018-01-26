@@ -11,8 +11,6 @@ import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genNonEmptyList
 import arrow.test.generators.genOption
-import arrow.optics.instances.nelHead
-import arrow.optics.instances.optionNelToList
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
