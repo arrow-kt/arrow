@@ -119,6 +119,7 @@ class FlowableKWTests : UnitSpec() {
         }
     }
 
+    // FIXME(paco): remove if this hasn't triggered in a while - 26 Jan 18
     private infix fun String.shouldNotBeElseLogged(b: String) {
         try {
             this shouldNotBe b
