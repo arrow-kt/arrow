@@ -97,7 +97,7 @@ class FlowableKWTests : UnitSpec() {
             }.value()
             val test: TestSubscriber<Long> = value.test()
             val lastThread: Thread = test.awaitDone(5, TimeUnit.SECONDS).lastThread()
-            val nextThread  = (threadRef?.name ?: "")
+            val nextThread = (threadRef?.name ?: "")
 
             nextThread shouldNotBeElseLogged originalThread.name
             lastThread.name shouldNotBeElseLogged originalThread.name
@@ -119,7 +119,6 @@ class FlowableKWTests : UnitSpec() {
         }
     }
 
-    // FIXME(paco): remove if this hasn't triggered in a while - 26 Jan 18
     private infix fun String.shouldNotBeElseLogged(b: String) {
         try {
             this shouldNotBe b
