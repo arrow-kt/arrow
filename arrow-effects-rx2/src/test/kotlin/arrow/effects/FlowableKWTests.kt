@@ -90,7 +90,7 @@ class FlowableKWTests : UnitSpec() {
             val originalThread: Thread = Thread.currentThread()
             var threadRef: Thread? = null
             val value: Flowable<Long> = FlowableKW.monadErrorFlat().bindingCatch {
-                val a = Flowable.timer(2, TimeUnit.SECONDS).k().bind()
+                val a = Flowable.timer(2, TimeUnit.SECONDS, Schedulers.newThread()).k().bind()
                 threadRef = Thread.currentThread()
                 val b = Flowable.just(a).observeOn(Schedulers.newThread()).k().bind()
                 yields(b)
