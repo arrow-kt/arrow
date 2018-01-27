@@ -15,7 +15,7 @@ import arrow.typeclasses.Traverse
  *
  * @param S source of [Traversal]
  * @param I index that uniquely identifies every focus of the [Traversal]
- * @param A focus of that is supposed to be unique for a given pair [S] and [I]
+ * @param A focus that is supposed to be unique for a given pair [S] and [I]
  */
 @typeclass
 interface FilterIndex<S, I, A> : TC {
