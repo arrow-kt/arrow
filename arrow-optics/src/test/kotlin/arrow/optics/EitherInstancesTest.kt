@@ -32,15 +32,15 @@ class EitherInstancesTest : UnitSpec() {
                     override fun empty() = 0.valid<String, Int>()
 
                     override fun combine(a: Validated<String, Int>, b: Validated<String, Int>): Validated<String, Int> =
-                            when(a) {
+                            when (a) {
                                 is Invalid -> {
-                                    when(b) {
+                                    when (b) {
                                         is Invalid -> (a.e + b.e).invalid()
                                         is Valid -> b
                                     }
                                 }
                                 is Valid -> {
-                                    when(b) {
+                                    when (b) {
                                         is Invalid -> b
                                         is Valid -> (a.a + b.a).valid()
                                     }
