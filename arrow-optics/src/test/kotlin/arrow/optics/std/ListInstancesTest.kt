@@ -23,7 +23,6 @@ class ListInstancesTest : UnitSpec() {
 
     init {
 
-
         testLaws(OptionalLaws.laws(
                     optional = listHead(),
                     aGen = Gen.list(Gen.int()),
