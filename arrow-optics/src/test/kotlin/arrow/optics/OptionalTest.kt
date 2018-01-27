@@ -31,14 +31,6 @@ class OptionalTest : UnitSpec() {
     init {
 
         testLaws(OptionalLaws.laws(
-                optional = listElementOptional({ it == 0.toByte() }),
-                aGen = Gen.list(byte()),
-                bGen = byte(),
-                funcGen = genFunctionAToB(byte()),
-                EQA = Eq.any(),
-                EQOptionB = Eq.any()))
-
-        testLaws(OptionalLaws.laws(
                 optional = listElementPositionOptional(50),
                 aGen = Gen.list(Gen.int()),
                 bGen = Gen.int(),
@@ -172,14 +164,4 @@ class OptionalTest : UnitSpec() {
         }
 
     }
-
-    fun byte() = object : Gen<Byte> {
-        val RANDOM = Random()
-        override fun generate(): Byte {
-            val arr = ByteArray(1)
-            RANDOM.nextBytes(arr)
-            return arr[0]
-        }
-    }
-
 }
