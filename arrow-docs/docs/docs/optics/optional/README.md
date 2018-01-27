@@ -89,6 +89,16 @@ triedEmail.getOption(Try.Failure(IllegalStateException("Something wrong with net
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Optional | Optional | Optional | Optional | Optional | Fold | Setter | Fold | Traversal |
 
+### Generating optional
+
+To avoid boilerplate, optionals can be generated for `A?` and `Option<A>` fields for a `data class`. The `Optionals` will be generated in the same package as `data class` and will have `Optional` suffix.
+
+```kotlin
+@optionals data class Point2D(val x: Int, val y: Int, val color: Int?)
+
+val optional: Optional<Point2D, Int> = point2dColorOptional()
+```
+
 ### Polymorphic optional
 
 A `POptional` is very similar to [PLens](docs/optics/Lens#Plens) and [PPrism](docs/optics/Prism/Prism#PPrism) so lets see if we can combine both examples shown in their documentation.
