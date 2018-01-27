@@ -8,7 +8,7 @@ import arrow.syntax.option.toOption
 
 fun <A> optionOptional(): Optional<Option<A>, A> = Optional(
         getOrModify = { a -> a.fold({ a.left() }, { it.right() }) },
-        set = { a -> { it.fold({ Option.empty() }, { a.toOption() }) }}
+        set = { a -> { it.fold({ Option.empty() }, { a.toOption() }) } }
 )
 
 fun <A> nullableOptional(): Optional<A?, A> = Optional(

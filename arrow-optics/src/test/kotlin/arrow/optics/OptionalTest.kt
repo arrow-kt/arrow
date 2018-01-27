@@ -8,11 +8,13 @@ import arrow.data.applicative
 import arrow.optics.instances.listElementOptional
 import arrow.optics.instances.listElementPositionOptional
 import arrow.optics.instances.nullableOptional
+import arrow.optics.instances.optionOptional
 import arrow.syntax.either.left
 import arrow.syntax.either.right
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genNullable
+import arrow.test.generators.genOption
 import arrow.test.generators.genTry
 import arrow.test.generators.genTuple
 import arrow.test.laws.OptionalLaws
@@ -47,6 +49,14 @@ class OptionalTest : UnitSpec() {
         testLaws(OptionalLaws.laws(
                 optional = nullableOptional(),
                 aGen = genNullable(Gen.int()),
+                bGen = Gen.int(),
+                funcGen = genFunctionAToB(Gen.int()),
+                EQA = Eq.any(),
+                EQOptionB = Eq.any()))
+
+        testLaws(OptionalLaws.laws(
+                optional = optionOptional(),
+                aGen = genOption(Gen.int()),
                 bGen = Gen.int(),
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
