@@ -3,13 +3,14 @@ package arrow.data
 import arrow.HK
 import arrow.core.*
 import arrow.core.Eval.Now
+import arrow.syntax.collections.prependTo
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
-import arrow.test.laws.ComonadLaws
-import arrow.test.laws.MonadLaws
+import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.matchers.*
+import io.kotlintest.properties.*
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -129,6 +130,62 @@ class EvalTest : UnitSpec() {
             sideEffect.counter shouldBe 0
             flatMapped.value() shouldBe -1
             sideEffect.counter shouldBe limit + 1
+        }
+
+        "stack safety stress test" {
+            forAll(DeepEval.gen) { d: DeepEval ->
+                try {
+                    d.eval.value()
+                    true
+                } catch (e: StackOverflowError) {
+                    fail("stack overflowed with eval-depth ${DeepEval.maxDepth}")
+                }
+            }
+        }
+    }
+
+    private data class DeepEval(val eval: Eval<Int>) {
+        sealed class O {
+            data class Map(val f: (Int) -> Int) : O()
+            data class FlatMap(val f: (Int) -> Eval<Int>) : O()
+            class Memoize : O()
+            class Defer : O()
+
+            companion object {
+                val gen = Gen.oneOf(
+                        Gen.create { O.Map { it + 1 } },
+                        Gen.create { O.FlatMap { Eval.Now(it) } },
+                        Gen.create { O.Memoize() },
+                        Gen.create { O.Defer() }
+                )
+            }
+        }
+
+        companion object {
+            const val maxDepth = 10000
+
+            fun build(leaf: () -> Eval<Int>, os: List<O>) = run {
+                tailrec fun step(i: Int, leaf: () -> Eval<Int>, cbs: MutableList<(Eval<Int>) -> Eval<Int>>): Eval<Int> =
+                        if (i >= os.size) {
+                            cbs.fold(leaf()) { e, f -> f(e) }
+                        } else {
+                            val o = os[i]
+                            when (o) {
+                                is O.Defer -> Eval.defer { step(i + 1, leaf, cbs) }
+                                is O.Memoize -> step(i + 1, leaf, cbs.also { it.add(0) { e: Eval<Int> -> e.memoize() }})
+                                is O.Map -> step(i + 1, leaf, cbs.also { it.add(0) { e: Eval<Int> -> e.map(o.f) }})
+                                is O.FlatMap -> step(i + 1, leaf, cbs.also { it.add(0) { e: Eval<Int> -> e.flatMap(o.f) }})
+                            }
+                        }
+
+                step(0, leaf, mutableListOf())
+            }
+
+            val gen = Gen.create {
+                val leaf = { Eval.Now(0) }
+                val eval = build(leaf, (0 until maxDepth).map { O.gen.generate() })
+                DeepEval(eval)
+            }
         }
     }
 
