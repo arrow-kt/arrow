@@ -5,7 +5,6 @@ import arrow.core.Option
 import arrow.core.eq
 import arrow.data.Try
 import arrow.data.applicative
-import arrow.optics.instances.listElementOptional
 import arrow.optics.instances.listElementPositionOptional
 import arrow.optics.instances.nullableOptional
 import arrow.optics.instances.optionOptional
