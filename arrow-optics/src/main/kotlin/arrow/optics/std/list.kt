@@ -4,9 +4,8 @@ import arrow.core.*
 import arrow.data.ListKW
 import arrow.data.NonEmptyList
 import arrow.data.k
-import arrow.optics.Iso
-import arrow.optics.Optional
-import arrow.optics.PIso
+import arrow.syntax.either.left
+import arrow.syntax.either.right
 
 /**
  * [Optional] to safely operate on the head of a list
@@ -15,6 +14,14 @@ fun <A> listHead(): Optional<List<A>, A> = Optional(
         partialFunction = case({ list: List<A> -> list.isNotEmpty() }
                 toT { list: List<A> -> list.first() }),
         set = { newHead -> { list -> list.mapIndexed { index, value -> if (index == 0) newHead else value } } }
+)
+
+/**
+ * [Optional] to safely operate on a certain index of a list
+ */
+fun <A> listElementPositionOptional(position: Int): Optional<List<A>, A> = Optional(
+        getOrModify = { l -> l.getOrNull(position)?.right() ?: l.left() },
+        set = { e -> { l -> l.mapIndexed { index: Int, value: A -> if (index == position) e else value } } }
 )
 
 /**
