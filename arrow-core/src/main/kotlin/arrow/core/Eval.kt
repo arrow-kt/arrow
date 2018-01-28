@@ -49,7 +49,7 @@ sealed class Eval<out A> : EvalKind<A> {
 
         fun <A> always(f: () -> A) = Always(f)
 
-        fun <A> defer(f: () -> Eval<A>): Eval<A> = Call(f)
+        fun <A> defer(f: () -> Eval<A>): Eval<A> = Defer(f)
 
         fun raise(t: Throwable): Eval<Nothing> = defer { throw t }
 
@@ -75,19 +75,19 @@ sealed class Eval<out A> : EvalKind<A> {
 
     fun <B> flatMap(f: (A) -> EvalKind<B>): Eval<B> =
             when (this) {
-                is Compute<A> -> object : Compute<B>() {
+                is FlatMap<A> -> object : FlatMap<B>() {
                     override fun <S> start(): Eval<S> = (this@Eval).start()
                     override fun <S> run(s: S): Eval<B> =
-                            object : Compute<B>() {
+                            object : FlatMap<B>() {
                                 override fun <S1> start(): Eval<S1> = (this@Eval).run(s) as Eval<S1>
                                 override fun <S1> run(s1: S1): Eval<B> = f(s1 as A).ev()
                             }
                 }
-                is Call<A> -> object : Compute<B>() {
+                is Defer<A> -> object : FlatMap<B>() {
                     override fun <S> start(): Eval<S> = this@Eval.thunk() as Eval<S>
                     override fun <S> run(s: S): Eval<B> = f(s as A).ev()
                 }
-                else -> object : Compute<B>() {
+                else -> object : FlatMap<B>() {
                     override fun <S> start(): Eval<S> = this@Eval as Eval<S>
                     override fun <S> run(s: S): Eval<B> = f(s as A).ev()
                 }
@@ -140,11 +140,11 @@ sealed class Eval<out A> : EvalKind<A> {
     }
 
     /**
-     * Call is a type of Eval<A> that is used to defer computations which produce Eval<A>.
+     * Defer is a type of Eval<A> that is used to defer computations which produce Eval<A>.
      *
-     * Users should not instantiate Call instances themselves. Instead, they will be automatically created when needed.
+     * Users should not instantiate Defer instances themselves. Instead, they will be automatically created when needed.
      */
-    data class Call<out A>(val thunk: () -> Eval<A>) : Eval<A>() {
+    data class Defer<out A>(val thunk: () -> Eval<A>) : Eval<A>() {
         override fun memoize(): Eval<A> = Later { value() }
         override fun value(): A = collapse(this).value()
 
@@ -154,9 +154,9 @@ sealed class Eval<out A> : EvalKind<A> {
              */
             tailrec fun <A> collapse(fa: Eval<A>): Eval<A> =
                     when (fa) {
-                        is Call -> collapse(fa.thunk())
-                        is Compute ->
-                            object : Compute<A>() {
+                        is Defer -> collapse(fa.thunk())
+                        is FlatMap ->
+                            object : FlatMap<A>() {
                                 override fun <S> start(): Eval<S> = fa.start()
                                 override fun <S> run(s: S): Eval<A> = collapse1(fa.run(s))
                             }
@@ -169,16 +169,16 @@ sealed class Eval<out A> : EvalKind<A> {
     }
 
     /**
-     * Compute is a type of Eval<A> that is used to chain computations involving .map and .flatMap. Along with
+     * FlatMap is a type of Eval<A> that is used to chain computations involving .map and .flatMap. Along with
      * Eval#flatMap. It implements the trampoline that guarantees stack-safety.
      *
-     * Users should not instantiate Compute instances themselves. Instead, they will be automatically created when
+     * Users should not instantiate FlatMap instances themselves. Instead, they will be automatically created when
      * needed.
      *
      * Unlike a traditional trampoline, the internal workings of the trampoline are not exposed. This allows a slightly
      * more efficient implementation of the .value method.
      */
-    internal abstract class Compute<out A> : Eval<A>() {
+    internal abstract class FlatMap<out A> : Eval<A>() {
 
         abstract fun <S> start(): Eval<S>
 
@@ -192,11 +192,11 @@ sealed class Eval<out A> : EvalKind<A> {
 
             loop@ while (true) {
                 when (curr) {
-                    is Compute -> {
-                        val currComp: Compute<A> = curr
+                    is FlatMap -> {
+                        val currComp: FlatMap<A> = curr
                         currComp.start<A>().let { cc ->
                             when (cc) {
-                                is Compute -> {
+                                is FlatMap -> {
                                     val inStartFun: (Any?) -> Eval<A> = { cc.run(it) }
                                     val outStartFun: (Any?) -> Eval<A> = { currComp.run(it) }
                                     curr = cc.start<A>()
