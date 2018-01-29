@@ -221,10 +221,8 @@ interface POptional<S, T, A, B> {
      * View a [POptional] as a [PTraversal]
      */
     fun asTraversal(): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
-        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> = getOrModify(s).fold(
-                FA::pure,
-                { FA.map(f(it), { b -> set(s, b) }) }
-        )
+        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
+                this@POptional.modifyF(FA, s, f)
     }
 
 }
