@@ -22,6 +22,12 @@ interface NonEmptyListEqInstance<A> : Eq<NonEmptyList<A>> {
 }
 
 @instance(NonEmptyList::class)
+interface NonEmptyListShowInstance<A> : Show<NonEmptyList<A>> {
+    override fun show(a: NonEmptyList<A>): String =
+            a.toString()
+}
+
+@instance(NonEmptyList::class)
 interface NonEmptyListFunctorInstance : Functor<NonEmptyListHK> {
     override fun <A, B> map(fa: NonEmptyListKind<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
             fa.ev().map(f)

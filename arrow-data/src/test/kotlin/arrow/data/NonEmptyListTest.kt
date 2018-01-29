@@ -23,12 +23,14 @@ class NonEmptyListTest : UnitSpec() {
             semigroupK<NonEmptyListHK>() shouldNotBe null
             semigroup<NonEmptyList<Int>>() shouldNotBe null
             eq<NonEmptyList<Int>>() shouldNotBe null
+            show<NonEmptyList<Int>>() shouldNotBe null
         }
 
         val applicative = NonEmptyList.applicative()
 
         testLaws(
             EqLaws.laws { it.nel() },
+            ShowLaws.laws { it.nel() },
             MonadLaws.laws(NonEmptyList.monad(), Eq.any()),
             SemigroupKLaws.laws(
                 NonEmptyList.semigroupK(),
