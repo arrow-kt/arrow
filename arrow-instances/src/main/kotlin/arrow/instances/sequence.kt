@@ -30,6 +30,12 @@ interface SequenceKWEqInstance<A> : Eq<SequenceKW<A>> {
 }
 
 @instance(SequenceKW::class)
+interface SequenceKWShowInstance<A> : Show<SequenceKW<A>> {
+    override fun show(a: SequenceKW<A>): String =
+            a.toString()
+}
+
+@instance(SequenceKW::class)
 interface SequenceKWFunctorInstance : Functor<SequenceKWHK> {
     override fun <A, B> map(fa: SequenceKWKind<A>, f: kotlin.Function1<A, B>): SequenceKW<B> =
             fa.ev().map(f)

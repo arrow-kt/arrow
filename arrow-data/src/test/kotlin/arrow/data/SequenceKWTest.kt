@@ -2,10 +2,7 @@ package arrow.data
 
 import arrow.HK
 import arrow.test.UnitSpec
-import arrow.test.laws.EqLaws
-import arrow.test.laws.MonadLaws
-import arrow.test.laws.MonoidKLaws
-import arrow.test.laws.TraverseLaws
+import arrow.test.laws.*
 import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
@@ -28,6 +25,7 @@ class SequenceKWTest : UnitSpec() {
             semigroup<SequenceKW<Int>>() shouldNotBe null
             monoid<SequenceKW<Int>>() shouldNotBe null
             eq<SequenceKW<Int>>() shouldNotBe null
+            show<SequenceKW<Int>>() shouldNotBe null
         }
 
         val eq: Eq<HK<SequenceKWHK, Int>> = object : Eq<HK<SequenceKWHK, Int>> {
@@ -37,6 +35,7 @@ class SequenceKWTest : UnitSpec() {
 
         testLaws(
             EqLaws.laws { sequenceOf(it).k() },
+            ShowLaws.laws(show(), eq) { sequenceOf(it).k() },
             MonadLaws.laws(SequenceKW.monad(), eq),
             MonoidKLaws.laws(SequenceKW.monoidK(), applicative, eq),
             TraverseLaws.laws(SequenceKW.traverse(), applicative, { n: Int -> SequenceKW(sequenceOf(n)) }, eq)
