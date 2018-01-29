@@ -31,6 +31,12 @@ interface SetKWEqInstance<A> : Eq<SetKW<A>> {
 }
 
 @instance(SetKW::class)
+interface SetKWShowInstance<A> : Show<SetKW<A>> {
+    override fun show(a: SetKW<A>): String =
+            a.toString()
+}
+
+@instance(SetKW::class)
 interface SetKWFoldableInstance : Foldable<SetKWHK> {
     override fun <A, B> foldLeft(fa: SetKWKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.ev().foldLeft(b, f)

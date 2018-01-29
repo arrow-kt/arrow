@@ -1,10 +1,7 @@
 package arrow.data
 
 import arrow.test.UnitSpec
-import arrow.test.laws.EqLaws
-import arrow.test.laws.FoldableLaws
-import arrow.test.laws.MonoidKLaws
-import arrow.test.laws.SemigroupKLaws
+import arrow.test.laws.*
 import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
@@ -22,10 +19,12 @@ class SetKWTest : UnitSpec() {
             semigroup<SetKW<Int>>() shouldNotBe null
             monoid<SetKW<Int>>() shouldNotBe null
             eq<SetKW<Int>>() shouldNotBe null
+            show<SetKW<Int>>() shouldNotBe null
         }
         
         testLaws(
             EqLaws.laws { SetKW.pure(it) },
+            ShowLaws.laws { SetKW.pure(it) },
             SemigroupKLaws.laws(SetKW.semigroupK(), { SetKW.pure(it) }, Eq.any()),
             MonoidKLaws.laws(SetKW.monoidK(), { SetKW.pure(it) }, Eq.any()),
             FoldableLaws.laws(SetKW.foldable(), { SetKW.pure(it) }, Eq.any())
