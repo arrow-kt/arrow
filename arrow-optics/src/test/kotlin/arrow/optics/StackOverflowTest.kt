@@ -7,7 +7,7 @@ import arrow.data.k
 import arrow.syntax.either.left
 import arrow.syntax.either.right
 import arrow.test.UnitSpec
-import org.assertj.core.api.Assertions.assertThat
+import io.kotlintest.matchers.shouldBe
 
 class StackOverflowTest: UnitSpec() {
 
@@ -40,7 +40,7 @@ class StackOverflowTest: UnitSpec() {
 
             val aActual = o.modify(a, {it.toUpperCase()})
 
-            assertThat(aActual).isEqualTo(aExpected)
+            aActual shouldBe aExpected
 
         }
 
