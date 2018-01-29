@@ -33,9 +33,14 @@ class SequenceKWTest : UnitSpec() {
                     a.toList() == b.toList()
         }
 
+        val show: Show<HK<SequenceKWHK, Int>> = object : Show<HK<SequenceKWHK, Int>> {
+            override fun show(a: HK<SequenceKWHK, Int>): String =
+                    a.toList().toString()
+        }
+
         testLaws(
             EqLaws.laws { sequenceOf(it).k() },
-            ShowLaws.laws(show(), eq) { sequenceOf(it).k() },
+            ShowLaws.laws(show, eq) { sequenceOf(it).k() },
             MonadLaws.laws(SequenceKW.monad(), eq),
             MonoidKLaws.laws(SequenceKW.monoidK(), applicative, eq),
             TraverseLaws.laws(SequenceKW.traverse(), applicative, { n: Int -> SequenceKW(sequenceOf(n)) }, eq)
