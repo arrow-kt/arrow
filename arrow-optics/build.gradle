@@ -3,6 +3,7 @@ dependencies {
     compile project(':arrow-free')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
+    testCompile "org.assertj:assertj-core:3.9.0"
     testCompile project(':arrow-test')
     testCompile project(':arrow-syntax')
 
