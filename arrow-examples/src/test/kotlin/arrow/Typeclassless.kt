@@ -34,13 +34,15 @@ class TypeclasslessExamples : FreeSpec() {
     // Easy to write syntaxis with fake typeclass
 
     interface Identity<F> {
-        fun <A> identify(a: HK<F, A>): HK<F, A> = a
+        fun <A> identify(a: HK<F, A>): HK<F, A> =
+                a
     }
 
     interface IdentifySyntax<F> {
         fun ID(): Identity<F>
 
-        fun <A> HK<F, A>.identify(): HK<F, A> = ID().identify(this)
+        fun <A> HK<F, A>.identify(): HK<F, A> =
+                ID().identify(this)
     }
 
     fun <F> Identity<F>.s() =
@@ -58,11 +60,14 @@ class TypeclasslessExamples : FreeSpec() {
 
     // Trivial Identify and Applicative instances
 
-    val ID_LIST: Identity<ListKWHK> = object : Identity<ListKWHK> {}
+    val ID_LIST: Identity<ListKWHK> =
+            object : Identity<ListKWHK> {}
 
-    val AP = ListKW.applicative()
+    val AP =
+            ListKW.applicative()
 
-    val ALL_SYNTAX = allSyntax(AP, ID_LIST)
+    val ALL_SYNTAX =
+            allSyntax(AP, ID_LIST)
 
 
     // Client code on functions
@@ -94,10 +99,10 @@ class TypeclasslessExamples : FreeSpec() {
     }
 
     class Child<F>(ALL_SYNTAX: ApplicativeAndIdentifySyntax<F>) : Parent<F>(ALL_SYNTAX, null) {
-        fun inChild() = insideClass()
+        fun insideClassFromChild() = insideClass()
     }
 
-    // How to run it!
+    // How to use it!
 
     init {
         val expected = listOf(1).k()
@@ -121,7 +126,7 @@ class TypeclasslessExamples : FreeSpec() {
 
             parent.insideClassNested() shouldBe expected
 
-            child.inChild() shouldBe expected
+            child.insideClassFromChild() shouldBe expected
         }
 
         // FIXME:  Eldritch horror
