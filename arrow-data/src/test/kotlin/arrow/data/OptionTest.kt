@@ -137,8 +137,14 @@ class OptionTest : UnitSpec() {
 
         "exists" {
             some.exists { it.startsWith('k') } shouldBe true
+            some.exists { it.startsWith('j') } shouldBe false
             none.exists { it.startsWith('k') } shouldBe false
+        }
 
+        "forall" {
+            some.forall { it.startsWith('k') } shouldBe true
+            some.forall { it.startsWith('j') } shouldBe false
+            none.forall { it.startsWith('k') } shouldBe true
         }
 
         "forEach" {
