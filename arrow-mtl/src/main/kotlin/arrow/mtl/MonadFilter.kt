@@ -1,7 +1,9 @@
 package arrow.mtl
 
-import arrow.*
+import arrow.HK
+import arrow.TC
 import arrow.core.Option
+import arrow.typeclass
 import arrow.typeclasses.Monad
 import kotlin.coroutines.experimental.startCoroutine
 
@@ -19,8 +21,9 @@ interface MonadFilter<F> : Monad<F>, FunctorFilter<F>, TC {
  * A coroutine is initiated and inside [MonadContinuation] suspended yielding to [flatMap]. Once all the flatMap binds are completed
  * the underlying monad is returned from the act of executing the coroutine
  */
-fun <F, B> MonadFilter<F>.bindingFilter(c: suspend MonadFilterContinuation<F, *>.() -> HK<F, B>): HK<F, B> {
+fun <F, B> MonadFilter<F>.bindingFilter(c: suspend MonadFilterContinuation<F, *>.() -> B): HK<F, B> {
     val continuation = MonadFilterContinuation<F, B>(this)
-    c.startCoroutine(continuation, continuation)
+    val wrapReturn: suspend MonadFilterContinuation<F, *>.() -> HK<F, B> = { pure(c()) }
+    wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
 }

@@ -37,9 +37,11 @@ open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: C
         COROUTINE_SUSPENDED
     }
 
-    infix fun <B> yields(b: B): Free<F, B> = yields { b }
+    @Deprecated("Yielding in comprehensions isn't required anymore", ReplaceWith("b"))
+    infix fun <B> yields(b: B): B = b
 
-    infix fun <B> yields(b: () -> B): Free<F, B> = Free.liftF(pure(b()))
+    @Deprecated("Yielding in comprehensions isn't required anymore", ReplaceWith("b"))
+    infix fun <B> yields(b: () -> B): B = b()
 }
 
 /**
@@ -50,9 +52,10 @@ open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: C
  * This combinator ultimately returns computations lifting to [Free] to automatically for comprehend in a stack-safe way
  * over any stack-unsafe monads.
  */
-fun <F, B> Monad<F>.bindingStackSafe(c: suspend StackSafeMonadContinuation<F, *>.() -> Free<F, B>):
+fun <F, B> Monad<F>.bindingStackSafe(c: suspend StackSafeMonadContinuation<F, *>.() -> B):
         Free<F, B> {
     val continuation = StackSafeMonadContinuation<F, B>(this)
-    c.startCoroutine(continuation, continuation)
+    val wrapReturn: suspend StackSafeMonadContinuation<F, *>.() -> Free<F, B> = { Free.pure(c()) }
+    wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
 }
