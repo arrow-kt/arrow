@@ -119,18 +119,18 @@ sealed class Option<out A> : OptionKind<A> {
      */
     inline fun exists(crossinline predicate: Predicate<A>): Boolean = fold({ false }, { a -> predicate(a) })
 
-    @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("fold({ Unit }, f)"))
-    inline fun forEach(f: (A) -> Unit) {
-        if (nonEmpty()) f(get())
-    }
-
     /**
      * Returns true if this option is empty '''or''' the predicate
      * $p returns true when applied to this $option's value.
      *
      * @param p the predicate to test
      */
-    inline fun forall(crossinline p: (A) -> Boolean): Boolean = exists(p)
+    inline fun forall(crossinline p: Predicate<A>): Boolean = fold({ true }, p)
+
+    @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("fold({ Unit }, f)"))
+    inline fun forEach(f: (A) -> Unit) {
+        if (nonEmpty()) f(get())
+    }
 
     fun <B> foldLeft(b: B, f: (B, A) -> B): B =
             this.ev().let { option ->
