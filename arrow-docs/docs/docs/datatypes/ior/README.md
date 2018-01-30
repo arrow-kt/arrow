@@ -74,7 +74,7 @@ fun validateUser(name: String, pass: String) =
         Ior.monad<Nel<String>>().binding {
             val username = validateUsername(name).bind()
             val password = validatePassword(pass).bind()
-            yields(User(username, password))
+            User(username, password)
         }.ev()
 ```
 

@@ -168,7 +168,7 @@ val (deferred, unsafeCancel) =
     val friendProfiles = userProfile.friends().map { friend ->
         DeferredKW { getProfile(friend.id) }.bind()
     }
-    yields(listOf(userProfile) + friendProfiles)
+    listOf(userProfile) + friendProfiles
   }
 
 deferred.unsafeRunAsync { result ->
