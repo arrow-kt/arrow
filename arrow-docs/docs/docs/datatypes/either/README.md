@@ -266,13 +266,13 @@ the need to handle `Either.Right` case.
 As an example we want to map an `Either<Int, Throwable>` to a proper HTTP status code:
 
 ```kotlin:ank
-val r: Either<Int, Throwable> = Either.Left(NumberFormatException())
+val r: Either<Throwable, Int> = Either.Left(NumberFormatException())
 val httpStatusCode = r.getOrHandle {
-  when(it) {
-      is NumberFormatException -> 400
-      else 500
-  }
-}
+	when(it) {
+		is NumberFormatException -> 400
+		else -> 500
+	}
+} // 400
 ```
  
  Arrow contains `Either` instances for many useful typeclasses that allows you to use and transform right values.
