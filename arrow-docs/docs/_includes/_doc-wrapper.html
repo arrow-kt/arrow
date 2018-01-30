@@ -5,4 +5,7 @@
     <div class="doc-content">
         {{content}}
     </div>
+    {% if page.video %}
+      {% include _media-wrapper.html id=page.video %}
+    {% endif %}
 </div>

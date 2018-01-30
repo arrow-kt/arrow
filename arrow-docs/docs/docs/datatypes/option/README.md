@@ -2,6 +2,7 @@
 layout: docs
 title: Option
 permalink: /docs/datatypes/option/
+video: IL5XzaCMKpQ
 ---
 
 ## Option
