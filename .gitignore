@@ -122,5 +122,4 @@ reports/
 
 .DS_Store
 
-build/
 target/

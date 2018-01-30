@@ -6,11 +6,11 @@ apply plugin: 'kotlin-kapt'
 
 dependencies {
     compile project(':arrow-annotations')
-    compile project(':arrow-annotations-processor')
     compile project(":arrow-data")
     //To invoke kapt
     kapt 'com.google.auto.service:auto-service:1.0-rc4'
 
+    testCompile project(':arrow-annotations-processor')
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile "com.google.testing.compile:compile-testing:0.13"
     testCompile fileTree(dir: './src/test/libs', includes: ['*.jar'])
