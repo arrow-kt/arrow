@@ -11,7 +11,7 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Traverse
 
 /**
- * Typeclass that defines a [Traversal] for a structure [S] to all its foci [A] whose index [I] satisfies the predicate.
+ * [FilterIndex] provides a [Traversal] that can be for a structure [S] with all its foci [A] whose index [I] satisfies a predicate.
  *
  * @param S source of [Traversal]
  * @param I index that uniquely identifies every focus of the [Traversal]
@@ -71,4 +71,4 @@ inline fun <reified S, A> FilterIndex.Companion.fromTraverse(traverse: Traverse<
 /**
  * Filter the foci [A] of a [Traversal] with the predicate [p] given an instance [FilterIndex] [FI].
  */
-inline fun <reified S, reified I, reified A> FilterIndex.Companion.filterIndex(FI: FilterIndex<S, I, A> = filterIndex(), dummy: Unit = Unit ,noinline p: Predicate<I>): Traversal<S, A> = FilterIndex.filterIndex(FI, p)
+inline fun <reified S, reified I, reified A> FilterIndex.Companion.filterIndex(FI: FilterIndex<S, I, A> = filterIndex(), dummy: Unit = Unit, noinline p: Predicate<I>): Traversal<S, A> = FilterIndex.filterIndex(FI, p)
