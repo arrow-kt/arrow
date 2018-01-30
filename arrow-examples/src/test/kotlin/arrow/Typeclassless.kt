@@ -1,8 +1,12 @@
 package arrow
 
-import arrow.TypeclasslessExamples.One.thing3
-import arrow.TypeclasslessExamples.Two.thing4
-import arrow.data.*
+import arrow.TypeclasslessExamples.ScopeOne.inScopeOne
+import arrow.TypeclasslessExamples.ScopeTwo.withAll
+import arrow.TypeclasslessExamples.ScopeTwo.withApplicative
+import arrow.data.ListKW
+import arrow.data.ListKWHK
+import arrow.data.applicative
+import arrow.data.k
 import arrow.typeclasses.Applicative
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.specs.FreeSpec
@@ -11,7 +15,7 @@ class TypeclasslessExamples : FreeSpec() {
 
     // Syntaxis
 
-    interface ApplicativeSyntaxis<F> {
+    interface ApplicativeSyntax<F> {
         fun AP(): Applicative<F>
 
         fun <A> A.pure(): HK<F, A> =
@@ -22,52 +26,102 @@ class TypeclasslessExamples : FreeSpec() {
     }
 
     fun <F> Applicative<F>.s() =
-            object : ApplicativeSyntaxis<F> {
+            object : ApplicativeSyntax<F> {
                 override fun AP(): Applicative<F> =
                         this@s
             }
 
     // Easy to write syntaxis with fake typeclass
 
-    interface IdentifySyntaxis<F> {
-        fun <A> HK<F, A>.identify(): HK<F, A>
+    interface Identity<F> {
+        fun <A> identify(a: HK<F, A>): HK<F, A> = a
     }
+
+    interface IdentifySyntax<F> {
+        fun ID(): Identity<F>
+
+        fun <A> HK<F, A>.identify(): HK<F, A> = ID().identify(this)
+    }
+
+    fun <F> Identity<F>.s() =
+            object : IdentifySyntax<F> {
+                override fun ID(): Identity<F> =
+                        this@s
+            }
 
     // Combined typeclass requirements
 
-    interface ApplicativeAndIdentifySyntaxis<F> : ApplicativeSyntaxis<F>, IdentifySyntaxis<F>
+    interface ApplicativeAndIdentifySyntax<F> : ApplicativeSyntax<F>, IdentifySyntax<F>
 
-    fun <F> funversable(AP: Applicative<F>, ID: IdentifySyntaxis<F>): ApplicativeAndIdentifySyntaxis<F> =
-            (object : ApplicativeAndIdentifySyntaxis<F>, ApplicativeSyntaxis<F> by AP.s(), IdentifySyntaxis<F> by ID {})
+    fun <F> allSyntax(AP: Applicative<F>, ID: Identity<F>): ApplicativeAndIdentifySyntax<F> =
+            (object : ApplicativeAndIdentifySyntax<F>, ApplicativeSyntax<F> by AP.s(), IdentifySyntax<F> by ID.s() {})
 
-    // Trivial Identify instance
+    // Trivial Identify and Applicative instances
 
-    val ID_LIST = object : IdentifySyntaxis<ListKWHK> {
-        override fun <A> HK<ListKWHK, A>.identify(): HK<ListKWHK, A> =
-                this.ev()
-    }
+    val ID_LIST: Identity<ListKWHK> = object : Identity<ListKWHK> {}
 
-    // Client code
+    val AP = ListKW.applicative()
 
-    object One {
-        fun <F> ApplicativeSyntaxis<F>.thing3(): HK<F, Int> =
+    val ALL_SYNTAX = allSyntax(AP, ID_LIST)
+
+
+    // Client code on functions
+
+    object ScopeOne {
+        fun <F> ApplicativeSyntax<F>.inScopeOne(): HK<F, Int> =
                 1.pure()
     }
 
-    object Two {
-        fun <F> IdentifySyntaxis<F>.thing(a: HK<F, Int>): HK<F, Int> =
+    object ScopeTwo {
+        fun <F> IdentifySyntax<F>.withIdentify(a: HK<F, Int>): HK<F, Int> =
                 a.identify()
 
-        fun <F> ApplicativeSyntaxis<F>.thing2(): HK<F, Int> =
-                1.pure().map { thing3() }.map { 1 }
+        fun <F> ApplicativeSyntax<F>.withApplicative(): HK<F, Int> =
+                1.pure().map { inScopeOne() }.map { 1 }
 
-        fun <F> ApplicativeAndIdentifySyntaxis<F>.thing4(): HK<F, Int> =
-                thing(thing2()).identify()
+        fun <F> ApplicativeAndIdentifySyntax<F>.withAll(): HK<F, Int> =
+                withIdentify(withApplicative()).identify().map { it }
     }
 
+    // It only works on classes if they extend the syntax, although it's inheritable!
+
+    open class Parent<F>(ALL_SYNTAX: ApplicativeAndIdentifySyntax<F>, val nest: Parent<F>?) : ApplicativeAndIdentifySyntax<F> by ALL_SYNTAX {
+        fun inClass() = withAll()
+
+        fun ApplicativeAndIdentifySyntax<F>.insideClass() = withApplicative()
+
+        fun insideClassNested() = nest?.insideClass() ?: insideClass()
+    }
+
+    class Child<F>(ALL_SYNTAX: ApplicativeAndIdentifySyntax<F>) : Parent<F>(ALL_SYNTAX, null) {
+        fun inChild() = insideClass()
+    }
+
+    // How to run it!
+
     init {
-        "Injection typeclassless style" {
-            funversable(ListKW.applicative(), ID_LIST).thing4() shouldBe listOf(1).k()
+        val expected = listOf(1).k()
+
+        "Injection typeclassless style for functions" {
+            ALL_SYNTAX.inScopeOne() shouldBe expected
+
+            ALL_SYNTAX.withApplicative() shouldBe expected
+
+            ALL_SYNTAX.withAll() shouldBe expected
+        }
+
+        "Injection typeclassless for classes" {
+            val child = Child(ALL_SYNTAX)
+
+            val parent = Parent(ALL_SYNTAX, child)
+
+            parent.inClass() shouldBe expected
+
+            parent.run { insideClass() } shouldBe expected
+
+            parent.insideClassNested() shouldBe expected
+
+            child.inChild() shouldBe expected
         }
 
         // FIXME:  Eldritch horror
@@ -75,7 +129,7 @@ class TypeclasslessExamples : FreeSpec() {
             fun <A, R> toFun(f: A.() -> R): (A) -> R =
                     f
 
-            toFun<ApplicativeAndIdentifySyntaxis<ListKWHK>, HK<ListKWHK, Int>> { thing4() }(funversable(ListKW.applicative(), ID_LIST))
+            toFun<ApplicativeAndIdentifySyntax<ListKWHK>, HK<ListKWHK, Int>> { withAll() }(ALL_SYNTAX) shouldBe expected
         }
     }
 }
