@@ -221,6 +221,18 @@ fun <A, B, C> Either<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> = fold(
 inline fun <B> Either<*, B>.getOrElse(crossinline default: () -> B): B = fold({ default() }, { it })
 
 /**
+ * Returns the value from this [Either.Right] or allows clients to transform [Either.Left] to [Either.Right] while providing access to
+ * the value of [Either.Left].
+ *
+ * Example:
+ * ```
+ * Right(12).getOrHandle { 17 } // Result: 12
+ * Left(12).getOrHandle { it + 5 } // Result: 17
+ * ```
+ */
+inline fun <A, B> Either<A, B>.getOrHandle(crossinline default: (A) -> B): B = fold({ default(it) }, { it })
+
+/**
  * * Returns [Either.Right] with the existing value of [Either.Right] if this is a [Either.Right] and the given predicate
  * holds for the right value.
  * * Returns `Left(default)` if this is a [Either.Right] and the given predicate does not

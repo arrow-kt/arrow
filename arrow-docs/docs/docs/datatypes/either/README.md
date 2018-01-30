@@ -210,7 +210,7 @@ r.swap()
 ```
  
 For using Either's syntax on arbitrary data types. 
-This will make possible to use the `left()`, `right()`, `contains()` and `getOrElse()` methods:
+This will make possible to use the `left()`, `right()`, `contains()`, `getOrElse()` and `getOrHandle()` methods:
 
 ```kotlin:ank
 import arrow.syntax.either.*
@@ -230,6 +230,11 @@ x.contains(7)
 ```kotlin:ank
 val x = "hello".left()
 x.getOrElse { 7 }
+```
+
+```kotlin:ank
+val x = "hello".left()
+x.getOrHandle { "$it world!" }
 ```
 
 For creating Either instance based on a predicate, use `Either.cond()` method : 
@@ -253,6 +258,22 @@ Another operation is `fold`. This operation will extract the value from the Eith
  val x = 7.left()
  x.fold({ 1 }, { it * 3 }) // 1
  ```
+ 
+The `getOrHandle()` operation allows the transformation of an `Either.Left` value to a `Either.Right` using 
+the value of `Left`. This can be useful when a mapping to a single result type is required like `fold()` but without
+the need to handle `Either.Right` case.
+
+As an example we want to map an `Either<Int, Throwable>` to a proper HTTP status code:
+
+```kotlin:ank
+val r: Either<Int, Throwable> = Either.Left(NumberFormatException())
+val httpStatusCode = r.getOrHandle {
+  when(it) {
+      is NumberFormatException -> 400
+      else 500
+  }
+}
+```
  
  Arrow contains `Either` instances for many useful typeclasses that allows you to use and transform right values.
  Both Option and Try don't require a type parameter with the following functions, but it is specifically used for Either.Left
