@@ -8,12 +8,13 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.optics.Prism
 import arrow.optics.modify
+import arrow.syntax.option.some
 
 object PrismLaws {
 
-    inline fun <reified A, reified B> laws(prism: Prism<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQB: Eq<B>, EQOptionB: Eq<Option<B>>): List<Law> = listOf(
+    inline fun <reified A, reified B> laws(prism: Prism<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQOptionB: Eq<Option<B>>): List<Law> = listOf(
             Law("Prism law: partial round trip one way", { partialRoundTripOneWay(prism, aGen, EQA) }),
-            Law("Prism law: round trip other way", { roundTripOtherWay(prism, bGen, EQB) }),
+            Law("Prism law: round trip other way", { roundTripOtherWay(prism, bGen, EQOptionB) }),
             Law("Prism law: modify identity", { modifyIdentity(prism, aGen, EQA) }),
             Law("Prism law: compose modify", { composeModify(prism, aGen, funcGen, EQA) }),
             Law("Prism law: consistent set modify", { consistentSetModify(prism, aGen, bGen, EQA) }),
@@ -23,14 +24,14 @@ object PrismLaws {
 
     inline fun <reified A, reified B> partialRoundTripOneWay(prism: Prism<A, B>, aGen: Gen<A>, EQA: Eq<A>): Unit =
             forAll(aGen, { a ->
-                prism.getOrModify(a).fold(::identity, prism::reverseGet).equalUnderTheLaw(a, EQA)
+                prism.getOrModify(a).fold(::identity, prism::reverseGet)
+                        .equalUnderTheLaw(a, EQA)
             })
 
-    inline fun <reified A, reified B> roundTripOtherWay(prism: Prism<A, B>, bGen: Gen<B>, EQB: Eq<B>): Unit =
+    inline fun <reified A, reified B> roundTripOtherWay(prism: Prism<A, B>, bGen: Gen<B>, EQOptionB: Eq<Option<B>>): Unit =
             forAll(bGen, { b ->
-                prism.getOption(prism.reverseGet(b)).exists {
-                    it.equalUnderTheLaw(b, EQB)
-                }
+                prism.getOption(prism.reverseGet(b))
+                        .equalUnderTheLaw(b.some(), EQOptionB)
             })
 
     inline fun <reified A, reified B> modifyIdentity(prism: Prism<A, B>, aGen: Gen<A>, EQA: Eq<A>): Unit =
