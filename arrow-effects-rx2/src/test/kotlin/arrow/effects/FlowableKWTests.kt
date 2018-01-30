@@ -88,18 +88,20 @@ class FlowableKWTests : UnitSpec() {
 
         "Multi-thread Observables should run on their required threads" {
             val originalThread: Thread = Thread.currentThread()
-            var nextThread: Thread? = null
+            var threadRef: Thread? = null
             val value: Flowable<Long> = FlowableKW.monadErrorFlat().bindingCatch {
-                val a = Flowable.timer(2, TimeUnit.SECONDS).k().bind()
-                nextThread = Thread.currentThread()
+                val a = Flowable.timer(2, TimeUnit.SECONDS, Schedulers.newThread()).k().bind()
+                threadRef = Thread.currentThread()
                 val b = Flowable.just(a).observeOn(Schedulers.newThread()).k().bind()
                 yields(b)
             }.value()
             val test: TestSubscriber<Long> = value.test()
             val lastThread: Thread = test.awaitDone(5, TimeUnit.SECONDS).lastThread()
-            nextThread shouldNotBe originalThread
-            lastThread shouldNotBe originalThread
-            lastThread shouldNotBe nextThread
+            val nextThread = (threadRef?.name ?: "")
+
+            nextThread shouldNotBeElseLogged originalThread.name
+            lastThread.name shouldNotBeElseLogged originalThread.name
+            lastThread.name shouldNotBeElseLogged nextThread
         }
 
         "Flowable cancellation forces binding to cancel without completing too" {
@@ -114,6 +116,16 @@ class FlowableKWTests : UnitSpec() {
             }.test()
             test.awaitTerminalEvent(5, TimeUnit.SECONDS)
             test.assertNotTerminated().assertNotComplete().assertNoErrors().assertNoValues()
+        }
+    }
+
+    // FIXME(paco): remove if this hasn't triggered in a while - 26 Jan 18
+    private infix fun String.shouldNotBeElseLogged(b: String) {
+        try {
+            this shouldNotBe b
+        } catch (t: Throwable) {
+            println("$this  <---->  $b")
+            throw t
         }
     }
 }
