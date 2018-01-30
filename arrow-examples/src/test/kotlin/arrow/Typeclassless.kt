@@ -13,27 +13,13 @@ import io.kotlintest.specs.FreeSpec
 
 class TypeclasslessExamples : FreeSpec() {
 
-    // Syntaxis
+    ///////////////////////////////////
+    //// BUILDING THE MACHINERY
+    ///////////////////////////////////
 
-    interface ApplicativeSyntax<F> {
-        fun AP(): Applicative<F>
+    // Complete example of syntax using a simple fake typeclass
 
-        fun <A> A.pure(): HK<F, A> =
-                AP().pure(this)
-
-        fun <A, B> HK<F, A>.map(f: (A) -> B): HK<F, B> =
-                AP().map(this, f)
-    }
-
-    fun <F> Applicative<F>.s() =
-            object : ApplicativeSyntax<F> {
-                override fun AP(): Applicative<F> =
-                        this@s
-            }
-
-    // Easy to write syntaxis with fake typeclass
-
-    interface Identity<F> {
+    interface Identity<F>: TC {
         fun <A> identify(a: HK<F, A>): HK<F, A> =
                 a
     }
@@ -51,14 +37,37 @@ class TypeclasslessExamples : FreeSpec() {
                         this@s
             }
 
-    // Combined typeclass requirements
+    // Syntax for existing typeclass
+
+    interface ApplicativeSyntax<F> {
+        fun AP(): Applicative<F>
+
+        fun <A> A.pure(): HK<F, A> =
+                AP().pure(this)
+
+        fun <A, B> HK<F, A>.map(f: (A) -> B): HK<F, B> =
+                AP().map(this, f)
+    }
+
+    fun <F> Applicative<F>.s() =
+            object : ApplicativeSyntax<F> {
+                override fun AP(): Applicative<F> =
+                        this@s
+            }
+
+    // How to define a requirement on multiple typeclasses
 
     interface ApplicativeAndIdentifySyntax<F> : ApplicativeSyntax<F>, IdentifySyntax<F>
 
     fun <F> allSyntax(AP: Applicative<F>, ID: Identity<F>): ApplicativeAndIdentifySyntax<F> =
             object : ApplicativeAndIdentifySyntax<F>, ApplicativeSyntax<F> by AP.s(), IdentifySyntax<F> by ID.s() {}
 
-    // Trivial Identify and Applicative instances
+
+    ///////////////////////////////////
+    //// DEFINING OUR DEPENDENCIES
+    ///////////////////////////////////
+
+    // Define some trivial instances for Identify and Applicative
 
     val ID_LIST: Identity<ListKWHK> =
             object : Identity<ListKWHK> {}
@@ -70,7 +79,7 @@ class TypeclasslessExamples : FreeSpec() {
             allSyntax(AP, ID_LIST)
 
 
-    // Client code on functions
+    // Functions depending on syntax
 
     object ScopeOne {
         fun <F> ApplicativeSyntax<F>.inScopeOne(): HK<F, Int> =
@@ -88,7 +97,7 @@ class TypeclasslessExamples : FreeSpec() {
                 withIdentify(withApplicative()).identify().map { it }
     }
 
-    // It only works on classes if they extend the syntax, although it's inheritable!
+    // It only works inside classes if they extend the syntax, although it's inheritable!
 
     open class Parent<F>(ALL_SYNTAX: ApplicativeAndIdentifySyntax<F>, val nest: Parent<F>?) : ApplicativeAndIdentifySyntax<F> by ALL_SYNTAX {
         fun inClass() = withAll()
@@ -102,7 +111,9 @@ class TypeclasslessExamples : FreeSpec() {
         fun insideClassFromChild() = insideClass()
     }
 
-    // How to use it!
+    ///////////////////////////////////
+    //// USING TYPECLASSLESS STYLE!
+    ///////////////////////////////////
 
     init {
         val expected = listOf(1).k()
@@ -115,7 +126,7 @@ class TypeclasslessExamples : FreeSpec() {
             ALL_SYNTAX.withAll() shouldBe expected
         }
 
-        "Injection typeclassless for classes" {
+        "Injection typeclassless style for classes" {
             val child = Child(ALL_SYNTAX)
 
             val parent = Parent(ALL_SYNTAX, child)
