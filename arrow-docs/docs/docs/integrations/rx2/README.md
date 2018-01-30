@@ -113,7 +113,7 @@ ObservableKW.monadError().bindingCatch {
     end.onNext(Unit)
   }
 
-  yield(percent)
+  percent
 }.ev()
 ```
 

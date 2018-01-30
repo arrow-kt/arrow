@@ -128,7 +128,7 @@ DeferredKW.monadError().bindingCatch {
 
   val percent = (timelineClick / totalTime * 100).toInt()
 
-  yield(percent)
+  percent
 }.unsafeAttemptSync()
  // Failure(ArithmeticException("/ by zero"))
 ```

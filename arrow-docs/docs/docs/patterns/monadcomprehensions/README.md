@@ -66,7 +66,6 @@ Arrow uses this capability of the compiler to bring you coroutines-like notation
 
 Every instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) contains a method `binding` that receives a suspended function as a parameter.
 This functions must return the last element of the sequence of operations.
-`yields()` is a helper function that takes any one value and constructs a correct return.
 Let's see a minimal example.
 
 ```kotlin:ank
