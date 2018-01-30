@@ -47,6 +47,14 @@ class EitherTest : UnitSpec() {
 
         }
 
+        "getOrHandle should return value" {
+            forAll { a: Int, b: Int ->
+                Right(a).getOrHandle { b } == a
+                        && Left(a).getOrHandle { it + b } == a + b
+            }
+
+        }
+
         "filterOrElse should filters value" {
             forAll { a: Int, b: Int ->
                     val left: Either<Int, Int> = Left(a)
