@@ -3,6 +3,7 @@
 // -----------------------------------------------
 
 .doc-content {
+    position: relative;
     padding: ($base-point-grid * 4);
     font-size: 1.125rem;
     h1,
@@ -42,5 +43,27 @@
 
     .browser {
         margin-top: ($base-point-grid * 3);
+    }
+
+    .button-video {
+      padding: $base-point-grid ($base-point-grid * 4);
+      position: absolute;
+      right: ($base-point-grid * 3);
+      top: ($base-point-grid * 6);
+      font-size: 1.063rem;
+      color: #fff;
+      background: $brand-tertiary;
+      z-index: 10;
+
+      &:hover {
+        text-decoration: none;
+        background: lighten($brand-tertiary, 5%);
+        padding-top: 8px;
+      }
+
+      i {
+        margin-right: 6px;
+        font-size: 1.125rem;
+      }
     }
 }
