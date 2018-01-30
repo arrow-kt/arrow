@@ -99,15 +99,6 @@ idea {
 
 Android projects:
 
-`build.gradle`
-```groovy
-sourceSets {
-    main.java.srcDirs += 'src/main/kotlin'
-    debug.java.srcDirs += 'build/generated/source/kaptKotlin/debug'
-    release.java.srcDirs += 'build/generated/source/kaptKotlin/release'
-}
-```
-
 `gradle/generated-kotlin-sources.gradle`
 ```groovy
 apply plugin: 'idea'
