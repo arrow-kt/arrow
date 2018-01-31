@@ -1,17 +1,31 @@
 package arrow.instances
 
-import arrow.*
-import arrow.core.*
+import arrow.HK
+import arrow.core.Either
+import arrow.core.Eval
 import arrow.data.*
+import arrow.instance
 import arrow.typeclasses.*
 
 @instance(Try::class)
-interface TryMonadErrorInstance : TryMonadInstance, MonadError<TryHK, Throwable> {
+interface TryApplicativeErrorInstance : TryApplicativeInstance, ApplicativeError<TryHK, Throwable> {
 
     override fun <A> raiseError(e: Throwable): Try<A> = Failure(e)
 
     override fun <A> handleErrorWith(fa: TryKind<A>, f: (Throwable) -> TryKind<A>): Try<A> = fa.ev().recoverWith { f(it).ev() }
 
+}
+
+@instance(Try::class)
+interface TryMonadErrorInstance : TryApplicativeErrorInstance, TryMonadInstance, MonadError<TryHK, Throwable> {
+    override fun <A, B> ap(fa: TryKind<A>, ff: TryKind<(A) -> B>): Try<B> =
+            super<TryMonadInstance>.ap(fa, ff).ev()
+
+    override fun <A, B> map(fa: TryKind<A>, f: (A) -> B): Try<B> =
+            super<TryMonadInstance>.map(fa, f).ev()
+
+    override fun <A> pure(a: A): Try<A> =
+            super<TryMonadInstance>.pure(a).ev()
 }
 
 @instance(Try::class)

@@ -10,10 +10,11 @@ import io.kotlintest.properties.forAll
 import arrow.optics.Traversal
 import arrow.optics.modify
 import arrow.syntax.collections.firstOption
+import arrow.typeclasses.eq
 
 object TraversalLaws {
 
-    inline fun <reified A, reified B : Any> laws(traversal: Traversal<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQOptionB: Eq<Option<B>>, EQListB: Eq<ListKW<B>>) = listOf(
+    inline fun <reified A, reified B : Any> laws(traversal: Traversal<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A> = eq(), EQOptionB: Eq<Option<B>> = eq(), EQListB: Eq<ListKW<B>> = eq()) = listOf(
             Law("Traversal law: head option", { headOption(traversal, aGen, EQOptionB) }),
             Law("Traversal law: modify get all", { modifyGetAll(traversal, aGen, funcGen, EQListB) }),
             Law("Traversal law: set is idempotent", { setIdempotent(traversal, aGen, bGen, EQA) }),

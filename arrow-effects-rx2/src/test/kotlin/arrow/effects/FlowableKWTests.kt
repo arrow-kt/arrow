@@ -43,6 +43,7 @@ class FlowableKWTests : UnitSpec() {
             functor<FlowableKWHK>() shouldNotBe null
             applicative<FlowableKWHK>() shouldNotBe null
             monad<FlowableKWHK>() shouldNotBe null
+            applicativeError<FlowableKWHK, Unit>() shouldNotBe null
             monadError<FlowableKWHK, Unit>() shouldNotBe null
             monadSuspend<FlowableKWHK>() shouldNotBe null
             async<FlowableKWHK>() shouldNotBe null

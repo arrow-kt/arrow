@@ -303,7 +303,7 @@ val httpStatusCode = r.getOrHandle {
     val a = Either.Right(1).bind()
     val b = Either.Right(1 + a).bind()
     val c = Either.Right(1 + b).bind()
-    yields(a + b + c)
+    a + b + c
  }
  // Right(b=6, dummy=kotlin.Unit)
  ```
