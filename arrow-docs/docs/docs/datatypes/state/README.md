@@ -96,7 +96,7 @@ fun stackOperations() = State().monad<Stack>().binding {
     val b = pop().bind()
     val c = pop().bind()
 
-    yields(c)
+    c
 }.ev()
 ```
 

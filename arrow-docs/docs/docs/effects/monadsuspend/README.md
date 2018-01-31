@@ -51,7 +51,7 @@ val SC = IO.monadSuspend()
 val result = SC.binding {
   println("Print: now")
   val result = pure(1).bind()
-  yields(result + 1)
+  result + 1
 }
 
 //Print: now
@@ -60,7 +60,7 @@ val lazyResult = SC.binding {
   SC.lazy().bind()
   println("Print: lazy")
   val result = eagerIO().bind()
-  yields(result + 1)
+  result + 1
 }
 
 //Nothing here!

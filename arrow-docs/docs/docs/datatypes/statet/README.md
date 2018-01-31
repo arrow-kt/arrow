@@ -131,7 +131,7 @@ fun stackOperationsS2() = StateT .monad<EitherKindPartial<StackError>, Stack>().
     pushS("a").bind()
     popS().bind()
     val string = popS().bind()
-    yields(string)
+    string
 }.ev()
 
 stackOperationsS2().runM(listOf("hello", "world", "!"))
