@@ -28,7 +28,7 @@ interface FlowableKWMonadErrorInstance :
     override fun <A, B> map(fa: FlowableKWKind<A>, f: (A) -> B): FlowableKW<B> =
             super<FlowableKWMonadInstance>.map(fa, f)
 
-    override fun <A> pure(a: A): FlowableKW<A>  =
+    override fun <A> pure(a: A): FlowableKW<A> =
             super<FlowableKWMonadInstance>.pure(a)
 }
 

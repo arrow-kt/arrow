@@ -35,8 +35,6 @@ interface KleisliApplicativeInstance<F, D> : KleisliFunctorInstance<F, D>, Appli
             Kleisli({ FF().product(fa.ev().run(it), fb.ev().run(it)) })
 }
 
-
-
 @instance(Kleisli::class)
 interface KleisliMonadInstance<F, D> : KleisliApplicativeInstance<F, D>, Monad<KleisliKindPartial<F, D>> {
 
