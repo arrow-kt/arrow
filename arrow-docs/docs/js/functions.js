@@ -13,7 +13,7 @@
         // Show and hide the sidebar
         $(".button-video").click(function(e) {
             e.preventDefault();
-            $("#video-panel").toggleClass("toggled");
+            $("#video-panel").slideToggle("toggled");
         });
 
         // Touch interactions on the sidebar
