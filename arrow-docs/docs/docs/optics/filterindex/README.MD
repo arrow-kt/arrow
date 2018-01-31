@@ -33,7 +33,7 @@ val filter: Traversal<ListKWKind<String>, String> = filterIndexStringByIndex.fil
 filter.getAll(listOf("H", "He", "Hel", "Hell", "Hello").k())
 ```
 
-Arrow provides some instances like `ListKW` indexed by index position.
+Arrow provides `FilterIndex` instances for some of its datatypes that can be filtered by index, like `ListKW` and `MapKW`. You can look them up by calling `FilterIndex.filterIndex()`.
 
 ```kotlin:ank
 FilterIndex.filterIndex<ListKWKind<Int>, Int, Int> { index -> index % 2 == 0 }
