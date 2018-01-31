@@ -131,6 +131,7 @@ options:
   - title: Type Classes
 
     nested_options:
+
       - title: Eq
         url: /docs/typeclasses/eq/
 
@@ -260,6 +261,7 @@ options:
   - title: Legal
 
     nested_options:
+
       - title: Credits
         url: /docs/legal/credits/
 
