@@ -7,11 +7,18 @@ permalink: /docs/typeclasses/applicativeerror/
 ## ApplicativeError
 
 ApplicativeError is the typeclase used to explicitly represent errors during independent computations.
-These errors can come in the form of `Throwable`, `Exception`, or any other type hierarchy of the user's choice.
+It is parametrized to an error type `E`, which means the datatype has at least a "success" and a "failure" version.
+
+These errors can come in the form of `Throwable`, `Exception`, or any other type that is more relevant to the domain;
+like for example a sealed class UserNotFoundReason that contains 3 inheritors.
+
+Some of the datatypes Λrrow provides can have these error types already fixed.
+That's the case of [`Try<A>`]({{ '/docs/datatypes/try' | relative_url }}) has its error type fixed to `Throwable`.
+Other datatypes like [`Either<E, A>`]({{ '/docs/datatypes/either' | relative_url }}) allow for the user to apply their error type of choice.
 
 ### Main Combinators
 
-`ApplicativeError` inherits all the combinators available in [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}) and [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}). It also adds one of its own.
+`ApplicativeError` inherits all the combinators available in [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}). It also adds one of its own.
 
 #### raiseError
 
