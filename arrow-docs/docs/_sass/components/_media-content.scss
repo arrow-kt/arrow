@@ -5,8 +5,6 @@
   .video-panel {
     display: none;
     max-width: 800px;
-    text-align: center;
-    margin: 0 auto;
 
     &.toggled {
       display: block;
@@ -55,6 +53,8 @@
           text-decoration: none;
           background: lighten($brand-tertiary, 5%);
           box-shadow: 0px 0px 20px rgba($brand-secondary, 0.5);
+          color: #fff;
+          cursor: pointer;
       }
 
       i {
