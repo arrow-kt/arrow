@@ -63,7 +63,7 @@ val failure: Either<Throwable, Int> = Either.Left(RuntimeException("Boom!"))
 AE_EITHER.handleErrorWith(failure, { t -> Either.Right(0) })
 ```
 
-##### handleError
+#### handleError
 
 Similar to `handleErrorWith`, except the function can return any regular value. This value will be wrapped and used as a return.
 
@@ -75,7 +75,7 @@ AE_EITHER.handleError(success, { t -> 0 })
 AE_EITHER.handleError(failure, { t -> 0 })
 ```
 
-##### attempt
+#### attempt
 
 Maps the current content of the datatype to an [`Either<E, A>`]({{ '/docs/datatypes/either' | relative_url }}), recovering from any previous error state.
 
@@ -95,7 +95,7 @@ val fail = Try { "nope".toInt() }
 AE_TRY.attempt(fail)
 ```
 
-##### fromEither
+#### fromEither
 
 Constructor function from an [`Either<E, A>`]({{ '/docs/datatypes/either' | relative_url }}) to the current datatype.
 
@@ -107,7 +107,7 @@ AE_TRY.fromEither(Either.Right(1))
 AE_TRY.fromEither(Either.Left(RuntimeException("Boom")))
 ```
 
-##### catch
+#### catch
 
 Constructor function. It takes two function parameters. The first is a generator function from `() -> A`. The second is an error mapping function from `(Throwable) -> E`.
 `catch()` runs the generator function to generate a success datatype, and if it throws an exception it uses the error mapping function to create a new failure datatype.
