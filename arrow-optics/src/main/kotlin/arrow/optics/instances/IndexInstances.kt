@@ -1,6 +1,5 @@
 package arrow.optics.instances
 
-import arrow.core.toT
 import arrow.data.ListKW
 import arrow.data.ListKWKind
 import arrow.data.MapKW
@@ -8,19 +7,14 @@ import arrow.data.MapKWKind
 import arrow.data.NonEmptyList
 import arrow.data.NonEmptyListKind
 import arrow.data.SequenceKW
-import arrow.data.SequenceKWHK
 import arrow.data.SequenceKWKind
 import arrow.data.ev
 import arrow.data.k
-import arrow.data.traverse
-import arrow.data.updated
 import arrow.instance
 import arrow.optics.Optional
 import arrow.optics.POptional
-import arrow.optics.Traversal
 import arrow.optics.listToListKW
 import arrow.optics.stringToList
-import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
 import arrow.optics.typeclasses.index
 import arrow.syntax.either.left

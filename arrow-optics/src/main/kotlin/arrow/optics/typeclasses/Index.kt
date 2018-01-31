@@ -6,7 +6,7 @@ import arrow.optics.Optional
 import arrow.typeclass
 
 /**
- * Typeclass that defines an [Optional] for a structure [S] to focus in [A] at given index [I].
+ * [Index] provides an [Optional] for a structure [S] to focus in [A] at a given index [I].
  *
  * @param S source of [Optional]
  * @param I index
@@ -41,9 +41,9 @@ interface Index<S, I, A> : TC {
 /**
  * Lift an instance of [Index] using an [Iso].
  */
-inline fun <reified S, reified A, reified I, reified B> Index.Companion.fromIso(iso: Iso<S, A>,  ID: Index<A, I, B> = index()):  Index<S, I, B> = Index.fromIso(ID, iso)
+inline fun <reified S, reified A, reified I, reified B> Index.Companion.fromIso(iso: Iso<S, A>,  ID: Index<A, I, B> = arrow.optics.typeclasses.index()):  Index<S, I, B> = Index.fromIso(ID, iso)
 
 /**
  * Get an [Optional] for an index [i] given an [Index].
  */
-inline fun <reified S, reified I, reified A> Index.Companion.index(i: I, ID: Index<S, I, A> = index()): Optional<S, A> = ID.index(i)
+inline fun <reified S, reified I, reified A> Index.Companion.index(i: I, ID: Index<S, I, A> = arrow.optics.typeclasses.index()): Optional<S, A> = ID.index(i)

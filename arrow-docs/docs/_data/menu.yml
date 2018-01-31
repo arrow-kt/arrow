@@ -248,6 +248,9 @@ options:
       - title: FilterIndex
         url: /docs/optics/filterindex/
 
+      - title: Index
+        url: /docs/optics/index/
+
   - title: Integrations
 
     nested_options:

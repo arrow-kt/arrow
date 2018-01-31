@@ -11,7 +11,7 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Traverse
 
 /**
- * [FilterIndex] provides a [Traversal] that can be for a structure [S] with all its foci [A] whose index [I] satisfies a predicate.
+ * [FilterIndex] provides a [Traversal] for a structure [S] with all its foci [A] whose index [I] satisfies a predicate.
  *
  * @param S source of [Traversal]
  * @param I index that uniquely identifies every focus of the [Traversal]
