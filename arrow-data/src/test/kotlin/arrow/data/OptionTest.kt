@@ -38,6 +38,7 @@ class OptionTest : UnitSpec() {
             traverseFilter<OptionHK>() shouldNotBe null
             semigroup<Option<Int>>() shouldNotBe null
             monoid<Option<Int>>() shouldNotBe null
+            applicativeError<OptionHK, Unit>() shouldNotBe null
             monadError<OptionHK, Unit>() shouldNotBe null
             eq<Option<Int>>() shouldNotBe null
         }

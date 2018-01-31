@@ -2,18 +2,34 @@ package arrow.effects
 
 import arrow.core.Either
 import arrow.instance
+import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.MonadError
 import io.reactivex.BackpressureStrategy
 
 @instance(FlowableKW::class)
-interface FlowableKWMonadErrorInstance :
-        FlowableKWMonadInstance,
-        MonadError<FlowableKWHK, Throwable> {
+interface FlowableKWApplicativeErrorInstance :
+        FlowableKWApplicativeInstance,
+        ApplicativeError<FlowableKWHK, Throwable> {
     override fun <A> raiseError(e: Throwable): FlowableKW<A> =
             FlowableKW.raiseError(e)
 
     override fun <A> handleErrorWith(fa: FlowableKWKind<A>, f: (Throwable) -> FlowableKWKind<A>): FlowableKW<A> =
             fa.handleErrorWith { f(it).ev() }
+}
+
+@instance(FlowableKW::class)
+interface FlowableKWMonadErrorInstance :
+        FlowableKWApplicativeErrorInstance,
+        FlowableKWMonadInstance,
+        MonadError<FlowableKWHK, Throwable> {
+    override fun <A, B> ap(fa: FlowableKWKind<A>, ff: FlowableKWKind<(A) -> B>): FlowableKW<B> =
+            super<FlowableKWMonadInstance>.ap(fa, ff)
+
+    override fun <A, B> map(fa: FlowableKWKind<A>, f: (A) -> B): FlowableKW<B> =
+            super<FlowableKWMonadInstance>.map(fa, f)
+
+    override fun <A> pure(a: A): FlowableKW<A> =
+            super<FlowableKWMonadInstance>.pure(a)
 }
 
 @instance(FlowableKW::class)

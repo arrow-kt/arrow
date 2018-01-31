@@ -26,6 +26,7 @@ class IOTest : UnitSpec() {
             functor<IOHK>() shouldNotBe null
             applicative<IOHK>() shouldNotBe null
             monad<IOHK>() shouldNotBe null
+            applicativeError<IOHK, Throwable>() shouldNotBe null
             monadError<IOHK, Throwable>() shouldNotBe null
             monadSuspend<IOHK>() shouldNotBe null
             async<IOHK>() shouldNotBe null

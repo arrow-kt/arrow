@@ -1,12 +1,14 @@
 package arrow.instances
 
-import arrow.*
-import arrow.core.*
-import arrow.data.*
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadError
+import arrow.core.Either
+import arrow.core.Tuple2
+import arrow.core.andThen
+import arrow.data.Kleisli
+import arrow.data.KleisliKind
+import arrow.data.KleisliKindPartial
+import arrow.data.ev
+import arrow.instance
+import arrow.typeclasses.*
 
 @instance(Kleisli::class)
 interface KleisliFunctorInstance<F, D> : Functor<KleisliKindPartial<F, D>> {
@@ -50,13 +52,17 @@ interface KleisliMonadInstance<F, D> : KleisliApplicativeInstance<F, D>, Monad<K
 }
 
 @instance(Kleisli::class)
-interface KleisliMonadErrorInstance<F, D, E> : MonadError<KleisliKindPartial<F, D>, E>, KleisliMonadInstance<F, D> {
+interface KleisliApplicativeErrorInstance<F, D, E> : ApplicativeError<KleisliKindPartial<F, D>, E>, KleisliApplicativeInstance<F, D> {
 
     override fun FF(): MonadError<F, E>
 
     override fun <A> handleErrorWith(fa: KleisliKind<F, D, A>, f: (E) -> KleisliKind<F, D, A>): Kleisli<F, D, A> =
             fa.ev().handleErrorWith(f, FF())
 
-    override fun <A> raiseError(e: E): Kleisli<F, D, A> = Kleisli.raiseError(e, FF())
+    override fun <A> raiseError(e: E): Kleisli<F, D, A> =
+            Kleisli.raiseError(e, FF())
 
 }
+
+@instance(Kleisli::class)
+interface KleisliMonadErrorInstance<F, D, E> : KleisliApplicativeErrorInstance<F, D, E>, MonadError<KleisliKindPartial<F, D>, E>, KleisliMonadInstance<F, D>

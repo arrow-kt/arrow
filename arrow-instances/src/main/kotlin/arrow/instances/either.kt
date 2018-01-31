@@ -1,7 +1,8 @@
 package arrow.instances
 
-import arrow.*
+import arrow.HK
 import arrow.core.*
+import arrow.instance
 import arrow.typeclasses.*
 
 @instance(Either::class)
@@ -33,7 +34,7 @@ interface EitherMonadInstance<L> : EitherApplicativeInstance<L>, Monad<EitherKin
 }
 
 @instance(Either::class)
-interface EitherMonadErrorInstance<L> : EitherMonadInstance<L>, MonadError<EitherKindPartial<L>, L> {
+interface EitherApplicativeErrorInstance<L> : EitherApplicativeInstance<L>, ApplicativeError<EitherKindPartial<L>, L> {
 
     override fun <A> raiseError(e: L): Either<L, A> = Left(e)
 
@@ -45,6 +46,9 @@ interface EitherMonadErrorInstance<L> : EitherMonadInstance<L>, MonadError<Eithe
         }
     }
 }
+
+@instance(Either::class)
+interface EitherMonadErrorInstance<L> : EitherApplicativeErrorInstance<L>, EitherMonadInstance<L>, MonadError<EitherKindPartial<L>, L>
 
 @instance(Either::class)
 interface EitherFoldableInstance<L> : Foldable<EitherKindPartial<L>> {
