@@ -40,7 +40,7 @@ open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: C
     @Deprecated("Yielding in comprehensions isn't required anymore", ReplaceWith("b"))
     infix fun <B> yields(b: B): B = b
 
-    @Deprecated("Yielding in comprehensions isn't required anymore", ReplaceWith("b"))
+    @Deprecated("Yielding in comprehensions isn't required anymore", ReplaceWith("b()"))
     infix fun <B> yields(b: () -> B): B = b()
 }
 

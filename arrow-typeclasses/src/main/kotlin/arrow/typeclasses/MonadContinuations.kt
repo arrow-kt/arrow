@@ -86,6 +86,6 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
     @Deprecated("Yielding in comprehensions isn't required anymore", ReplaceWith("b"))
     fun <B> yields(b: B): B = b
 
-    @Deprecated("Yielding in comprehensions isn't required anymore", ReplaceWith("b"))
+    @Deprecated("Yielding in comprehensions isn't required anymore", ReplaceWith("b()"))
     fun <B> yields(b: () -> B): B = b()
 }
