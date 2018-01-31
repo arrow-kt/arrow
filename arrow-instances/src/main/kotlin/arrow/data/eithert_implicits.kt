@@ -1,6 +1,6 @@
 package arrow.data
 
-import arrow.*
+import arrow.HK
 import arrow.core.*
 import arrow.instances.*
 import arrow.typeclasses.*
@@ -22,6 +22,15 @@ object EitherTApplicativeInstanceImplicits {
 object EitherTMonadInstanceImplicits {
 
     fun <F, L> instance(MF: Monad<F>): EitherTMonadInstance<F, L> = object : EitherTMonadInstance<F, L> {
+        override fun FF(): Functor<F> = MF
+
+        override fun MF(): Monad<F> = MF
+    }
+}
+
+object EitherTApplicativeErrorInstanceImplicits {
+
+    fun <F, L> instance(MF: Monad<F>): EitherTApplicativeErrorInstance<F, L> = object : EitherTApplicativeErrorInstance<F, L> {
         override fun FF(): Functor<F> = MF
 
         override fun MF(): Monad<F> = MF
@@ -79,6 +88,9 @@ inline fun <reified F, L> EitherT.Companion.applicative(MF: Monad<F> = monad<F>(
 
 inline fun <reified F, L> EitherT.Companion.monad(MF: Monad<F> = monad<F>()): Monad<EitherTKindPartial<F, L>> =
         EitherTMonadInstanceImplicits.instance(MF)
+
+inline fun <reified F, L> EitherT.Companion.applicativeError(MF: Monad<F> = monad<F>()): ApplicativeError<EitherTKindPartial<F, L>, L> =
+        EitherTApplicativeErrorInstanceImplicits.instance(MF)
 
 inline fun <reified F, L> EitherT.Companion.monadError(MF: Monad<F> = monad<F>()): MonadError<EitherTKindPartial<F, L>, L> =
         EitherTMonadErrorInstanceImplicits.instance(MF)

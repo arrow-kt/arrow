@@ -1,7 +1,8 @@
 package arrow.instances
 
-import arrow.*
+import arrow.HK
 import arrow.core.*
+import arrow.instance
 import arrow.typeclasses.*
 
 @instance(Option::class)
@@ -13,9 +14,9 @@ interface OptionSemigroupInstance<A> : Semigroup<Option<A>> {
             when (a) {
                 is Some<A> -> when (b) {
                     is Some<A> -> Some(SG().combine(a.t, b.t))
-                    is None -> b
+                    None -> b
                 }
-                is None -> a
+                None -> a
             }
 }
 
@@ -25,10 +26,22 @@ interface OptionMonoidInstance<A> : OptionSemigroupInstance<A>, Monoid<Option<A>
 }
 
 @instance(Option::class)
-interface OptionMonadErrorInstance : OptionMonadInstance, MonadError<OptionHK, Unit> {
+interface OptionApplicativeErrorInstance : OptionApplicativeInstance, ApplicativeError<OptionHK, Unit> {
     override fun <A> raiseError(e: Unit): Option<A> = None
 
     override fun <A> handleErrorWith(fa: OptionKind<A>, f: (Unit) -> OptionKind<A>): Option<A> = fa.ev().orElse({ f(Unit).ev() })
+}
+
+@instance(Option::class)
+interface OptionMonadErrorInstance : OptionApplicativeErrorInstance, OptionMonadInstance, MonadError<OptionHK, Unit> {
+    override fun <A, B> ap(fa: OptionKind<A>, ff: OptionKind<(A) -> B>): Option<B> =
+            super<OptionMonadInstance>.ap(fa, ff)
+
+    override fun <A, B> map(fa: OptionKind<A>, f: (A) -> B): Option<B> =
+            super<OptionMonadInstance>.map(fa, f)
+
+    override fun <A> pure(a: A): Option<A> =
+            super<OptionMonadInstance>.pure(a)
 }
 
 @instance(Option::class)
@@ -38,11 +51,11 @@ interface OptionEqInstance<A> : Eq<Option<A>> {
 
     override fun eqv(a: Option<A>, b: Option<A>): Boolean = when (a) {
         is Some -> when (b) {
-            is None -> false
+            None -> false
             is Some -> EQ().eqv(a.t, b.t)
         }
-        is None -> when (b) {
-            is None -> true
+        None -> when (b) {
+            None -> true
             is Some -> false
         }
     }
@@ -118,7 +131,7 @@ fun <A, G, B> Option<A>.traverseFilter(f: (A) -> HK<G, Option<B>>, GA: Applicati
         this.ev().let { option ->
             when (option) {
                 is Some -> f(option.t)
-                is None -> GA.pure(None)
+                None -> GA.pure(None)
             }
         }
 
