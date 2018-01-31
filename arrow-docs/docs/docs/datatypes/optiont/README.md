@@ -52,7 +52,7 @@ fun getCountryCode(maybePerson : Option<Person>): Option<String> =
     val address = person.address.bind()
     val country = address.country.bind()
     val code = country.code.bind()
-    yields(code)
+    code
   }.ev()
 ```
 
@@ -148,7 +148,7 @@ fun getCountryCode(personId: Int): ObservableKW<Option<String>> =
           { ObservableKW.raiseError<Country>(NoSuchElementException("...")) },
           { ObservableKW.pure(it) }
         ).bind()
-        yields(country.code)
+        country.code
       }.ev()
 ```
 
@@ -198,7 +198,7 @@ fun getCountryCode(personId: Int): ObservableKW<Option<String>> =
     val address = OptionT(ObservableKW.pure(person.address)).bind()
     val country = OptionT(findCountry(address.id)).bind()
     val code = OptionT(ObservableKW.pure(country.code)).bind()
-    yields(code)
+    code
   }.value().ev()
 ```
 

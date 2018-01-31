@@ -14,7 +14,6 @@ import arrow.instances.StringMonoidInstance
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genTuple
-import arrow.optics.instances.*
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

@@ -3,6 +3,9 @@
         <a target="_blank" href="{{site.data.commons.github_repository}}/edit/master/arrow-docs/docs{{page.url | replace: '_', ''}}README.md"><i class="fa fa-pencil"></i> Edit</a>
     </div>
     <div class="doc-content">
-        {{content}}
+      {% if page.video %}
+        {% include _media-wrapper.html id=page.video %}
+      {% endif %}
+      {{content}}
     </div>
 </div>

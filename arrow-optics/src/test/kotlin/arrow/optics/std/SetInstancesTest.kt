@@ -1,29 +1,31 @@
 package arrow.optics
 
+import arrow.data.SetKW
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import arrow.typeclasses.Eq
-import arrow.core.Id
-import arrow.instances.IntMonoid
 import arrow.test.laws.IsoLaws
+import arrow.data.k
+import arrow.data.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
-import arrow.optics.instances.idToType
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class IdInstancesTest : UnitSpec() {
+class SetInstancesTest : UnitSpec() {
 
     init {
+
         testLaws(IsoLaws.laws(
-                iso = idToType(),
-                aGen = Gen.create { Id(Gen.int().generate()) },
-                bGen = Gen.int(),
-                funcGen = genFunctionAToB(Gen.int()),
+                iso = setToSetKW(),
+                aGen = Gen.set(Gen.int()),
+                bGen = Gen.create { Gen.set(Gen.int()).generate().k() },
+                funcGen = genFunctionAToB(Gen.create { Gen.set(Gen.int()).generate().k() }),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                bMonoid = IntMonoid
+                bMonoid = SetKW.monoid()
         ))
+
     }
 
 }

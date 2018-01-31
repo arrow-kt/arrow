@@ -71,7 +71,7 @@ fun getCountryCode(maybePerson : Either<BizError, Person>): Either<BizError, Str
     val person = maybePerson.bind()
     val address = person.address.toEither({ AddressNotFound(person.id) }).bind()
     val country = address.country.toEither({ CountryNotFound(address.id) }).bind()
-    yields(country.code)
+    country.code
   }.ev()
 ```
 
@@ -172,7 +172,7 @@ fun getCountryCode(personId: Int): ObservableKW<Either<BizError, String>> =
             { it.left() },
             { it.code.right() }
         )
-        yields(code)
+        code
       }.ev()
 ```
 
@@ -215,7 +215,7 @@ fun getCountryCode(personId: Int): ObservableKW<Either<BizError, String>> =
       person.address.toEither { AddressNotFound(personId) }
     )).bind()
     val country = EitherT(findCountry(address.id)).bind()
-    yields(country.code)
+    country.code
   }.value()
 ```
 
