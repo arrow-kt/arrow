@@ -83,12 +83,16 @@ Maps the current content of the datatype to an [`Either<E, A>`]({{ '/docs/dataty
 val AE_TRY = Try.applicativeError()
 
 val pass = Try { "3".toInt() }
+pass
+```
 
+```kotlin:ank
 AE_TRY.attempt(pass)
 ```
 
 ```kotlin:ank
 val fail = Try { "nope".toInt() }
+fail
 ```
 
 ```kotlin:ank
