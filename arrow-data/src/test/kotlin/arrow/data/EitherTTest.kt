@@ -22,6 +22,7 @@ class EitherTTest : UnitSpec() {
             monad<EitherTKindPartial<OptionHK, Throwable>>() shouldNotBe null
             foldable<EitherTKindPartial<OptionHK, Throwable>>() shouldNotBe null
             traverse<EitherTKindPartial<OptionHK, Throwable>>() shouldNotBe null
+            applicativeError<EitherTKindPartial<OptionHK, Throwable>, Throwable>() shouldNotBe null
             monadError<EitherTKindPartial<OptionHK, Throwable>, Throwable>() shouldNotBe null
             semigroupK<EitherTKindPartial<OptionHK, Throwable>>() shouldNotBe null
         }

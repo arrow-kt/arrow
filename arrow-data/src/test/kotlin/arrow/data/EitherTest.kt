@@ -27,6 +27,7 @@ class EitherTest : UnitSpec() {
             monad<EitherKindPartial<Throwable>>() shouldNotBe null
             foldable<EitherKindPartial<Throwable>>() shouldNotBe null
             traverse<EitherKindPartial<Throwable>>() shouldNotBe null
+            applicativeError<EitherKindPartial<Throwable>, Throwable>() shouldNotBe null
             monadError<EitherKindPartial<Throwable>, Throwable>() shouldNotBe null
             semigroupK<EitherKindPartial<Throwable>>() shouldNotBe null
             eq<Either<String, Int>>() shouldNotBe null
