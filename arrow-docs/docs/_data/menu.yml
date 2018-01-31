@@ -131,6 +131,29 @@ options:
   - title: Type Classes
 
     nested_options:
+      - title: Eq
+        url: /docs/typeclasses/eq/
+
+      - title: Order
+        url: /docs/typeclasses/order/
+
+      - title: Semigroup
+        url: /docs/typeclasses/semigroup/
+
+      - title: Monoid
+        url: /docs/typeclasses/monoid/
+
+      - title: Foldable
+        url: /docs/typeclasses/foldable/
+
+      - title: Bifoldable
+        url: /docs/typeclasses/bifoldable/
+
+      - title: Traverse
+        url: /docs/typeclasses/traverse/
+
+      - title: TraverseFilter
+        url: /docs/typeclasses/traversefilter/
 
       - title: Functor
         url: /docs/typeclasses/functor/
@@ -143,15 +166,6 @@ options:
 
       - title: ApplicativeError
         url: /docs/typeclasses/applicativeerror/
-
-      - title: Foldable
-        url: /docs/typeclasses/foldable/
-
-      - title: Traverse
-        url: /docs/typeclasses/traverse/
-
-      - title: TraverseFilter
-        url: /docs/typeclasses/traversefilter/
 
       - title: Monad
         url: /docs/typeclasses/monad/
@@ -174,32 +188,17 @@ options:
       - title: MonadError
         url: /docs/typeclasses/monaderror/
 
-      - title: Semigroup
-        url: /docs/typeclasses/semigroup/
+      - title: Comonad
+        url: /docs/typeclasses/comonad/
 
-      - title: Monoid
-        url: /docs/typeclasses/monoid/
+      - title: Bimonad
+        url: /docs/typeclasses/bimonad/
 
       - title: SemigroupK
         url: /docs/typeclasses/semigroupk/
 
       - title: MonoidK
         url: /docs/typeclasses/monoidk/
-
-      - title: Bifoldable
-        url: /docs/typeclasses/bifoldable/
-
-      - title: Bimonad
-        url: /docs/typeclasses/bimonad/
-
-      - title: Comonad
-        url: /docs/typeclasses/comonad/
-
-      - title: Order
-        url: /docs/typeclasses/order/
-
-      - title: Eq
-        url: /docs/typeclasses/eq/
 
   - title: Effects
 
