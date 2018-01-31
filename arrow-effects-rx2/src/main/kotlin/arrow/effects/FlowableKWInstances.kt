@@ -19,7 +19,7 @@ interface FlowableKWApplicativeErrorInstance :
 
 @instance(FlowableKW::class)
 interface FlowableKWMonadErrorInstance :
-        FlowableKWApplicativeInstance,
+        FlowableKWApplicativeErrorInstance,
         FlowableKWMonadInstance,
         MonadError<FlowableKWHK, Throwable> {
     override fun <A, B> ap(fa: FlowableKWKind<A>, ff: FlowableKWKind<(A) -> B>): FlowableKW<B> =
