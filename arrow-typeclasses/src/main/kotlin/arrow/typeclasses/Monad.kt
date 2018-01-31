@@ -32,8 +32,9 @@ interface Monad<F> : Applicative<F>, TC {
  * A coroutine is initiated and suspended inside [MonadErrorContinuation] yielding to [Monad.flatMap]. Once all the flatMap binds are completed
  * the underlying monad is returned from the act of executing the coroutine
  */
-fun <F, B> Monad<F>.binding(c: suspend MonadContinuation<F, *>.() -> HK<F, B>): HK<F, B> {
+fun <F, B> Monad<F>.binding(c: suspend MonadContinuation<F, *>.() -> B): HK<F, B> {
     val continuation = MonadContinuation<F, B>(this)
-    c.startCoroutine(continuation, continuation)
+    val wrapReturn: suspend MonadContinuation<F, *>.() -> HK<F, B> = { pure(c()) }
+    wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
 }

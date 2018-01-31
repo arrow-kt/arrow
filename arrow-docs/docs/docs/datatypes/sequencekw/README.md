@@ -53,7 +53,7 @@ val positiveEven = positive.filter { it % 2 == 0 }.k()
 SequenceKW.monad().binding {
    val p = positive.bind()
    val pe = positiveEven.bind()
-   yields(p + pe)
+   p + pe
 }.ev().take(5).toList()
 ```
 
