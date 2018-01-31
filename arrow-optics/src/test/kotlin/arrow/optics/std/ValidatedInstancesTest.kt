@@ -17,8 +17,6 @@ import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genThrowable
 import arrow.test.generators.genTry
 import arrow.test.generators.genValidated
-import arrow.optics.instances.validatedToEither
-import arrow.optics.instances.validatedToTry
 import arrow.syntax.either.right
 import org.junit.runner.RunWith
 

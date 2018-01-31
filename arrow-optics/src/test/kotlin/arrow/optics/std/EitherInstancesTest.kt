@@ -12,7 +12,6 @@ import arrow.test.generators.genValidated
 import arrow.data.Invalid
 import arrow.data.Valid
 import arrow.data.Validated
-import arrow.optics.instances.eitherToValidated
 import arrow.syntax.validated.invalid
 import arrow.syntax.validated.valid
 import org.junit.runner.RunWith

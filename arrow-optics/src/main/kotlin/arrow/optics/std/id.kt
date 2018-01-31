@@ -1,4 +1,4 @@
-package arrow.optics.instances
+package arrow.optics
 
 import arrow.core.Id
 import arrow.core.IdKind

@@ -154,3 +154,12 @@ fun genTimeUnit(): Gen<TimeUnit> = object : Gen<TimeUnit> {
     val random = Gen.choose(0, units.size -1)
     override fun generate(): TimeUnit = units[random.generate()]
 }
+
+fun <A> genListKW(genA: Gen<A>): Gen<ListKW<A>> =
+        Gen.create { Gen.list(genA).generate().k() }
+
+fun <A> genSequenceKW(genA: Gen<A>): Gen<SequenceKW<A>> =
+        Gen.create { Gen.list(genA).generate().asSequence().k() }
+
+fun genChars(): Gen<Char> =
+        Gen.oneOf(('A'..'Z') + ('a'..'z') + ('0'..'9') + "!@#$%%^&*()_-~`,<.?/:;}{][±§".toList())
