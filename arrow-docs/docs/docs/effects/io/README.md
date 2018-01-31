@@ -214,7 +214,7 @@ IO.monad().binding {
         val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
         count / lines.length
       }
-    yields(average)
+    average
   }
   .ev()
   .attempt()

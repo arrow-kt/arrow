@@ -1,4 +1,4 @@
-package arrow.optics.instances
+package arrow.optics
 
 import arrow.core.Tuple10
 import arrow.core.Tuple2

@@ -1,8 +1,11 @@
 package arrow.instances
 
-import arrow.*
-import arrow.core.*
+import arrow.HK
+import arrow.core.Either
+import arrow.core.IdHK
+import arrow.core.Tuple2
 import arrow.data.*
+import arrow.instance
 import arrow.typeclasses.*
 
 @instance(StateT::class)
@@ -58,7 +61,7 @@ interface StateTSemigroupKInstance<F, S> : SemigroupK<StateTKindPartial<F, S>> {
 }
 
 @instance(StateT::class)
-interface StateTMonadErrorInstance<F, S, E> : StateTMonadInstance<F, S>, MonadError<StateTKindPartial<F, S>, E> {
+interface StateTApplicativeErrorInstance<F, S, E> : StateTApplicativeInstance<F, S>, ApplicativeError<StateTKindPartial<F, S>, E> {
     override fun FF(): MonadError<F, E>
 
     override fun <A> raiseError(e: E): HK<StateTKindPartial<F, S>, A> = StateT.lift(FF(), FF().raiseError(e))
@@ -66,6 +69,9 @@ interface StateTMonadErrorInstance<F, S, E> : StateTMonadInstance<F, S>, MonadEr
     override fun <A> handleErrorWith(fa: HK<StateTKindPartial<F, S>, A>, f: (E) -> HK<StateTKindPartial<F, S>, A>): StateT<F, S, A> =
             StateT(FF().pure({ s -> FF().handleErrorWith(fa.runM(FF(), s), { e -> f(e).runM(FF(), s) }) }))
 }
+
+@instance(StateT::class)
+interface StateTMonadErrorInstance<F, S, E> : StateTApplicativeErrorInstance<F, S, E>, StateTMonadInstance<F, S>, MonadError<StateTKindPartial<F, S>, E>
 
 /**
  * Alias for[StateT.Companion.applicative]

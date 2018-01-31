@@ -1,10 +1,9 @@
-package arrow.optics.instances
+package arrow.optics
 
 import arrow.core.*
-import arrow.optics.Iso
-import arrow.optics.PIso
-import arrow.optics.PPrism
-import arrow.optics.Prism
+import arrow.syntax.either.left
+import arrow.syntax.either.right
+import arrow.syntax.option.toOption
 
 /**
  * [PIso] that defines the equality in the kotlin nullable structure and [arrow.Option]
@@ -40,9 +39,31 @@ fun <A> nonePrism(): Prism<Option<A>, Unit> = Prism(
         reverseGet = { _ -> None }
 )
 
+/**
+ * [Iso] that defines the equality between and [arrow.Option] and [arrow.Either]
+ */
 fun <A, B> pOptionToEither(): PIso<Option<A>, Option<B>, Either<Unit, A>, Either<Unit, B>> = PIso(
         get = { opt -> opt.fold({ Either.Left(Unit) }, { a -> Either.Right(a) }) },
         reverseGet = { either -> either.fold({ None }, { b -> Some(b) }) }
 )
 
+/**
+ * [Iso] that defines the equality between and [arrow.Option] and [arrow.Either]
+ */
 fun <A> optionToEither(): Iso<Option<A>, Either<Unit, A>> = pOptionToEither()
+
+/**
+ * [Optional] to safely operate on value inside an [arrow.Option]
+ */
+fun <A> optionOptional(): Optional<Option<A>, A> = Optional(
+        getOrModify = { a -> a.fold({ a.left() }, { it.right() }) },
+        set = { a -> { it.fold({ Option.empty() }, { a.toOption() }) } }
+)
+
+/**
+ * [Optional] to safely operate on a nullable value.
+ */
+fun <A> nullableOptional(): Optional<A?, A> = Optional(
+        getOrModify = { a -> a?.right() ?: a.left() },
+        set = { a -> { if (it != null) a else null } }
+)

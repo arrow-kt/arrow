@@ -142,7 +142,7 @@ fun attackOption(): Option<Impacted> =
     val nuke = arm().bind()
     val target = aim().bind()
     val impact = launch(target, nuke).bind()
-    yields(impact)
+    impact
   }.ev()
 
 attackOption()
@@ -199,7 +199,7 @@ fun attackTry(): Try<Impacted> =
     val nuke = arm().bind()
     val target = aim().bind()
     val impact = launch(target, nuke).bind()
-    yields(impact)
+    impact
   }.ev()
 
 attackTry()
@@ -256,7 +256,7 @@ fun attackEither(): Either<NukeException, Impacted> =
     val nuke = arm().bind()
     val target = aim().bind()
     val impact = launch(target, nuke).bind()
-    yields(impact)
+    impact
   }.ev()
 
 attackEither()
@@ -307,7 +307,7 @@ inline fun <reified F> attack(ME:MonadError<F, NukeException> = monadError()):HK
     val nuke = arm<F>().bind()
     val target = aim<F>().bind()
     val impact = launch<F>(target, nuke).bind()
-    yields(impact)
+    impact
   }
 ```
 
@@ -337,7 +337,7 @@ inline fun <reified F> attack(ME:MonadError<F, NukeException> = monadError()):HK
     val nuke = arm<F>().bind()
     val target = aim<F>().bind()
     val impact = launchImpure<F>(target, nuke)
-    yields(impact)
+    impact
   }
 ```
 

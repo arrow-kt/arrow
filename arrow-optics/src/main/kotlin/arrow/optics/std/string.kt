@@ -1,6 +1,4 @@
-package arrow.optics.instances
-
-import arrow.optics.Iso
+package arrow.optics
 
 /**
  * [Iso] that defines equality between String and [List] of [Char]

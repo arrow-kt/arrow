@@ -96,7 +96,7 @@ Note that there is no automatic error handling or wrapping of exceptions.
 ```kotlin
 IO.monad().binding {
   val a = bindAsync(IO.async()) { fibonacci(100) }
-  yields(a + 1)
+  a + 1
 }.ev().unsafeRunSync()
 ```
 
@@ -110,14 +110,14 @@ While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/d
 ```kotlin
 IO.monad().binding {
   val a = bindAsync(IO.async()) { fibonacci(100).left() }
-  yields(a + 1)
+  a + 1
 }.ev().unsafeRunSync()
 ```
 
 ```kotlin
 IO.monad().binding {
   val a = bindAsync(IO.async()) { RuntimeException("Boom").right() }
-  yields(a + 1)
+  a + 1
 }.ev().unsafeRunSync()
 ```
 

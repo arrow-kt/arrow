@@ -245,6 +245,9 @@ options:
       - title: Traversal
         url: /docs/optics/traversal/
 
+      - title: FilterIndex
+        url: /docs/optics/filterindex/
+
   - title: Integrations
 
     nested_options:

@@ -3,12 +3,13 @@ package arrow.effects
 import arrow.HK
 import arrow.core.Either
 import arrow.instance
+import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 
 @instance(IO::class)
-interface IOMonadErrorInstance : IOMonadInstance, MonadError<IOHK, Throwable> {
+interface IOApplicativeErrorInstance : IOApplicativeInstance, ApplicativeError<IOHK, Throwable> {
     override fun <A> attempt(fa: IOKind<A>): IO<Either<Throwable, A>> =
             fa.ev().attempt()
 
@@ -17,6 +18,18 @@ interface IOMonadErrorInstance : IOMonadInstance, MonadError<IOHK, Throwable> {
 
     override fun <A> raiseError(e: Throwable): IO<A> =
             IO.raiseError(e)
+}
+
+@instance(IO::class)
+interface IOMonadErrorInstance : IOApplicativeErrorInstance, IOMonadInstance, MonadError<IOHK, Throwable> {
+    override fun <A, B> ap(fa: IOKind<A>, ff: IOKind<(A) -> B>): IO<B> =
+            super<IOMonadInstance>.ap(fa, ff).ev()
+
+    override fun <A, B> map(fa: IOKind<A>, f: (A) -> B): IO<B> =
+            super<IOMonadInstance>.map(fa, f)
+
+    override fun <A> pure(a: A): IO<A> =
+            super<IOMonadInstance>.pure(a)
 }
 
 @instance(IO::class)

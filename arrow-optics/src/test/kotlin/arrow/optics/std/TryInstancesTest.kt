@@ -18,10 +18,6 @@ import arrow.test.generators.genValidated
 import arrow.data.Invalid
 import arrow.data.Valid
 import arrow.data.Validated
-import arrow.optics.instances.tryFailure
-import arrow.optics.instances.trySuccess
-import arrow.optics.instances.tryToEither
-import arrow.optics.instances.tryToValidated
 import arrow.syntax.either.right
 import arrow.syntax.validated.invalid
 import arrow.syntax.validated.valid

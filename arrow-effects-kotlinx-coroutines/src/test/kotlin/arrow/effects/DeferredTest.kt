@@ -28,6 +28,7 @@ class DeferredKWTest : UnitSpec() {
             functor<DeferredKWHK>() shouldNotBe null
             applicative<DeferredKWHK>() shouldNotBe null
             monad<DeferredKWHK>() shouldNotBe null
+            applicativeError<DeferredKWHK, Throwable>() shouldNotBe null
             monadError<DeferredKWHK, Throwable>() shouldNotBe null
             monadSuspend<DeferredKWHK>() shouldNotBe null
             async<DeferredKWHK>() shouldNotBe null
