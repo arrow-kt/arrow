@@ -4,11 +4,8 @@
     </div>
     <div class="doc-content">
       {% if page.video %}
-      <a  href="#media-content" class="button-video"><i class="fa fa-youtube-play"></i> Show video</a>
+        {% include _media-wrapper.html id=page.video %}
       {% endif %}
       {{content}}
     </div>
-    {% if page.video %}
-      {% include _media-wrapper.html id=page.video %}
-    {% endif %}
 </div>

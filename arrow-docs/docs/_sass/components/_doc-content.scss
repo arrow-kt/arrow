@@ -46,37 +46,4 @@
         margin-top: ($base-point-grid * 3);
     }
 
-    .button-video {
-        padding: $base-point-grid ($base-point-grid * 4);
-        position: absolute;
-        right: ($base-point-grid * 3);
-        top: ($base-point-grid * 6);
-        font-size: 1.063rem;
-        color: #fff;
-        background: $brand-tertiary;
-        box-shadow: 0px 0px 20px rgba($brand-secondary, 0.3);
-        z-index: 10;
-        
-        @include bp(large) {
-          @include grid-column(12, $base-grid);
-            position: relative;
-            display: block;
-            top: 0;
-            right: 0;
-            margin-bottom: 20px;
-            margin-left: 0;
-            width: 100%;
-        }
-
-        &:hover {
-            text-decoration: none;
-            background: lighten($brand-tertiary, 5%);
-            box-shadow: 0px 0px 20px rgba($brand-secondary, 0.5);
-        }
-
-        i {
-            margin-right: 6px;
-            font-size: 1.125rem;
-        }
-    }
 }

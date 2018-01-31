@@ -10,6 +10,12 @@
             $("#wrapper").toggleClass("toggled");
         });
 
+        // Show and hide the sidebar
+        $(".button-video").click(function(e) {
+            e.preventDefault();
+            $("#video-panel").toggleClass("toggled");
+        });
+
         // Touch interactions on the sidebar
         var sidebarWrapperEl = document.getElementById('sidebar-wrapper');
         // create a simple instance, by default it only adds horizontal recognizers
@@ -29,7 +35,7 @@
         /**
          * This function generates the “unrolling” of the secction by adding
          * some classes to the element and applying a jQuery slide action
-         * 
+         *
          * @param el The DOM element on which to perform the action
          * @param speed The desired speed to slide up/down the section
          */
