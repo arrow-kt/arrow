@@ -119,7 +119,7 @@ Arrow provides [`ApplicativeLaws`][applicative_law_source]{:target="_blank"} in 
 
 Arrow already provides Applicative instances for most common datatypes both in Arrow and the Kotlin stdlib.
 
-[//]: See [Deriving and creating custom typeclass] to provide your own Applicative instances for custom datatypes. //TODO: commented until section is created
+See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own Applicative instances for custom datatypes.
 
 ### Data types
 
