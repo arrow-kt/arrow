@@ -4,8 +4,6 @@ import arrow.core.*
 import arrow.data.ListKW
 import arrow.data.NonEmptyList
 import arrow.data.k
-import arrow.syntax.either.left
-import arrow.syntax.either.right
 
 /**
  * [Optional] to safely operate on the head of a list

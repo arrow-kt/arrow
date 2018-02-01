@@ -41,7 +41,7 @@ interface Index<S, I, A> : TC {
 /**
  * Lift an instance of [Index] using an [Iso].
  */
-inline fun <reified S, reified A, reified I, reified B> Index.Companion.fromIso(iso: Iso<S, A>,  ID: Index<A, I, B> = arrow.optics.typeclasses.index()):  Index<S, I, B> = Index.fromIso(ID, iso)
+inline fun <reified S, reified A, reified I, reified B> Index.Companion.fromIso(iso: Iso<S, A>, ID: Index<A, I, B> = arrow.optics.typeclasses.index()): Index<S, I, B> = Index.fromIso(ID, iso)
 
 /**
  * Get an [Optional] for an index [i] given an [Index].
