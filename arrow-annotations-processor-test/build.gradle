@@ -12,7 +12,7 @@ dependencies {
 
     testCompile project(':arrow-annotations-processor')
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile "com.google.testing.compile:compile-testing:0.13"
+    testCompile "com.google.testing.compile:compile-testing:0.15"
     testCompile fileTree(dir: './src/test/libs', includes: ['*.jar'])
     testCompile project(":arrow-data")
     testCompile project(":arrow-syntax")
