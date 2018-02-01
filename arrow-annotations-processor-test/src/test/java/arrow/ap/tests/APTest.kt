@@ -20,12 +20,10 @@ open class APTest: StringSpec() {
         vararg processor: AnnotationProcessor
     ) {
 
-        processor.forEach {
+        processor.forEach { (name, source, dest, proc, error) ->
 
             val stubs = Paths.get("", "build", "tmp", "kapt3", "stubs", "main", "arrow", "ap", "objects").toFile()
             val expectedDir = Paths.get("", "src", "test", "resources", "arrow", "ap", "objects").toFile()
-
-            val (name, source, dest, proc, error) = it
 
             if (dest == null && error == null) {
                 throw Exception("Destination file and error cannot be both null")
