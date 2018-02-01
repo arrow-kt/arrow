@@ -17,14 +17,6 @@ fun <A> listHead(): Optional<List<A>, A> = Optional(
 )
 
 /**
- * [Optional] to safely operate on a certain index of a list
- */
-fun <A> listElementPositionOptional(position: Int): Optional<List<A>, A> = Optional(
-        getOrModify = { l -> l.getOrNull(position)?.right() ?: l.left() },
-        set = { e -> { l -> l.mapIndexed { index: Int, value: A -> if (index == position) e else value } } }
-)
-
-/**
  * [Optional] to safely operate on the tail of a list
  */
 fun <A> listTail(): Optional<List<A>, List<A>> = Optional(

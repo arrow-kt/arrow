@@ -26,14 +26,6 @@ class OptionalTest : UnitSpec() {
     init {
 
         testLaws(OptionalLaws.laws(
-                optional = listElementPositionOptional(50),
-                aGen = Gen.list(Gen.int()),
-                bGen = Gen.int(),
-                funcGen = genFunctionAToB(Gen.int()),
-                EQA = Eq.any(),
-                EQOptionB = Eq.any()))
-
-        testLaws(OptionalLaws.laws(
                 optional = nullableOptional(),
                 aGen = genNullable(Gen.int()),
                 bGen = Gen.int(),
