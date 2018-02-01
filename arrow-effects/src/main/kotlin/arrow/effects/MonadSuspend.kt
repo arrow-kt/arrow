@@ -46,8 +46,9 @@ inline fun <reified F, A> (() -> Either<Throwable, A>).deferUnsafe(SC: MonadSusp
  * This operation is cancellable by calling invoke on the [Disposable] return.
  * If [Disposable.invoke] is called the binding result will become a lifted [BindingCancellationException].
  */
-fun <F, B> MonadSuspend<F>.bindingCancellable(c: suspend MonadSuspendCancellableContinuation<F, *>.() -> HK<F, B>): Tuple2<HK<F, B>, Disposable> {
+fun <F, B> MonadSuspend<F>.bindingCancellable(c: suspend MonadSuspendCancellableContinuation<F, *>.() -> B): Tuple2<HK<F, B>, Disposable> {
     val continuation = MonadSuspendCancellableContinuation<F, B>(this)
-    c.startCoroutine(continuation, continuation)
+    val wrapReturn: suspend MonadSuspendCancellableContinuation<F, *>.() -> HK<F, B> = { pure(c()) }
+    wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad() toT continuation.disposable()
 }

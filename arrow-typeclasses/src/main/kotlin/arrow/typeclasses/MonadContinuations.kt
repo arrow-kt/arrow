@@ -83,7 +83,9 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
         COROUTINE_SUSPENDED
     }
 
-    infix fun <B> yields(b: B): HK<F, B> = yields { b }
+    @Deprecated("Yielding in comprehensions isn't required anymore", ReplaceWith("b"))
+    fun <B> yields(b: B): B = b
 
-    infix fun <B> yields(b: () -> B): HK<F, B> = pure(b())
+    @Deprecated("Yielding in comprehensions isn't required anymore", ReplaceWith("b()"))
+    fun <B> yields(b: () -> B): B = b()
 }
