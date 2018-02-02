@@ -4,10 +4,15 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.core.Tuple2
+import arrow.core.getOrElse
 import arrow.test.UnitSpec
 import arrow.syntax.either.left
 import arrow.syntax.either.right
 import arrow.core.toT
+import arrow.data.k
+import arrow.syntax.collections.firstOption
+import arrow.syntax.foldable.combineAll
+import arrow.syntax.option.some
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -19,6 +24,54 @@ class GetterTest : UnitSpec() {
         val tokenGetter = tokenIso.asGetter()
         val length = Getter<String, Int> { it.length }
         val upper = Getter<String, String> { it.toUpperCase() }
+
+        "asFold should behave as valid Fold: size" {
+            forAll(TokenGen) { token ->
+                tokenGetter.asFold().size(token) == 1
+            }
+        }
+
+        "asFold should behave as valid Fold: nonEmpty" {
+            forAll(TokenGen) { token ->
+                tokenGetter.asFold().nonEmpty(token)
+            }
+        }
+
+        "asFold should behave as valid Fold: isEmpty" {
+            forAll(TokenGen) { token ->
+                !tokenGetter.asFold().isEmpty(token)
+            }
+        }
+
+        "asFold should behave as valid Fold: getAll" {
+            forAll(TokenGen) { token ->
+                tokenGetter.asFold().getAll(token) == listOf(token.value).k()
+            }
+        }
+
+        "asFold should behave as valid Fold: combineAll" {
+            forAll(TokenGen) { token ->
+                tokenGetter.asFold().combineAll(token) == token.value
+            }
+        }
+
+        "asFold should behave as valid Fold: fold" {
+            forAll(TokenGen) { token ->
+                tokenGetter.asFold().fold(token) == token.value
+            }
+        }
+
+        "asFold should behave as valid Fold: headOption" {
+            forAll(TokenGen) { token ->
+                tokenGetter.asFold().headOption(token) == token.value.some()
+            }
+        }
+
+        "asFold should behave as valid Fold: lastOption" {
+            forAll(TokenGen) { token ->
+                tokenGetter.asFold().lastOption(token) == token.value.some()
+            }
+        }
 
         "Getting the target should always yield the exact result" {
             forAll({ value: String ->
