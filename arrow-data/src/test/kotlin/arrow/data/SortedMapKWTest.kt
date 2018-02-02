@@ -4,6 +4,7 @@ import arrow.HK2
 import arrow.test.UnitSpec
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.SemigroupLaws
+import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
@@ -26,10 +27,12 @@ class SortedMapKWTest : UnitSpec() {
             traverse<SortedMapKWHK>() shouldNotBe null
             semigroup<SortedMapKWKind<String, Int>>() shouldNotBe null
             monoid<SortedMapKWKind<String, Int>>() shouldNotBe null
+            show<SortedMapKWKind<String, Int>>() shouldNotBe null
         }
 
 
         testLaws(
+                ShowLaws.laws(show(), EQ) { sortedMapOf("key" to 1).k() },
                 MonoidLaws.laws(SortedMapKW.monoid<String, Int>(), sortedMapOf("key" to 1).k(), EQ),
                 SemigroupLaws.laws(SortedMapKW.monoid<String, Int>(),
                     sortedMapOf("key" to 1).k(),
