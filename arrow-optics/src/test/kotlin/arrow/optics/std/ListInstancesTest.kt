@@ -15,6 +15,7 @@ import arrow.test.laws.OptionalLaws
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genNonEmptyList
+import arrow.test.generators.genNullable
 import arrow.test.generators.genOption
 import org.junit.runner.RunWith
 
@@ -60,6 +61,23 @@ class ListInstancesTest : UnitSpec() {
                 EQB = Eq.any(),
                 bMonoid = ListKW.monoid())
         )
+
+        testLaws(OptionalLaws.laws(
+                optional = nullableOptional(),
+                aGen = genNullable(Gen.int()),
+                bGen = Gen.int(),
+                funcGen = genFunctionAToB(Gen.int()),
+                EQA = Eq.any(),
+                EQOptionB = Eq.any()))
+
+        testLaws(OptionalLaws.laws(
+                optional = optionOptional(),
+                aGen = genOption(Gen.int()),
+                bGen = Gen.int(),
+                funcGen = genFunctionAToB(Gen.int()),
+                EQA = Eq.any(),
+                EQOptionB = Eq.any()))
+
 
     }
 
