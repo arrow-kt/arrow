@@ -21,7 +21,6 @@ class GetterTest : UnitSpec() {
     init {
 
         val userGetter = userIso.asGetter()
-        val tokenGetter = tokenIso.asGetter()
         val length = Getter<String, Int> { it.length }
         val upper = Getter<String, String> { it.toUpperCase() }
 
