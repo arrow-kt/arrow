@@ -4,6 +4,7 @@ import arrow.syntax.applicative.map
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadErrorLaws
+import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
@@ -29,10 +30,12 @@ class TryTest : UnitSpec() {
             traverse<TryHK>() shouldNotBe null
             monadError<TryHK, Throwable>() shouldNotBe null
             eq<Try<Int>>() shouldNotBe null
+            show<Try<Int>>() shouldNotBe null
         }
 
         testLaws(
                 EqLaws.laws { Try { it } },
+                ShowLaws.laws { Try { it } },
                 MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()),
                 TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any())
         )

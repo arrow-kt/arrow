@@ -34,6 +34,12 @@ interface TryEqInstance<A> : Eq<Try<A>> {
 }
 
 @instance(Try::class)
+interface TryShowInstance<A> : Show<Try<A>> {
+    override fun show(a: Try<A>): String =
+            a.toString()
+}
+
+@instance(Try::class)
 interface TryFunctorInstance : Functor<TryHK> {
     override fun <A, B> map(fa: TryKind<A>, f: kotlin.Function1<A, B>): Try<B> =
             fa.ev().map(f)
