@@ -36,7 +36,7 @@ val integers = setOf(-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5).k()
 ```
 SetKW derives the following typeclasses:
 
-[`Semigroup`](/docs/typeclasses/semigroupk/):
+[`Semigroup`](/docs/typeclasses/semigroup/) and [`SemigroupK`](/docs/typeclasses/semigroupk/):
 ```kotlin:ank
 val uniqueNaturalNumbers_1 = oldNumbers.combineK(evenNumbers.combineK(integers))
 uniqueNaturalNumbers_1
@@ -45,15 +45,26 @@ uniqueNaturalNumbers_1
 val uniqueNaturalNumbers_2 = oldNumbers.combineK(evenNumbers).combineK(integers)
 uniqueNaturalNumbers_2
 ```
+[`Monoid`](/docs/typeclasses/monoid/) and [`MonoidK`](/docs/typeclasses/monoidk/):
+```kotlin:ank
+val sum_3 = SetKW.monoid<Int>().combine(uniqueNaturalNumbers_1, SetKW.empty()).foldLeft(0){sum, number -> sum + (number * number)}
+sum_3
+```kotlin:ank
+val sum_4 = SetKW.monoid<Int>().combine(SetKW.empty(), uniqueNaturalNumbers_1).foldLeft(0){sum, number -> sum + (number * number)}
+sum_4
+```
+```kotlin:ank
+sum_3 == sum_4
+```
 [`Foldable`](/docs/typeclasses/foldable/):
 ```kotlin:ank
 val sum_1 = uniqueNaturalNumbers_1.foldLeft(0){sum, number -> sum + (number * number)}
-val sum_2 = uniqueNaturalNumbers_2.foldLeft(0){sum, number -> sum + (number * number)}
-sum_1 == sum_2
+sum_1
 ```
-[`Monoid`](/docs/typeclasses/monoidk/):
 ```kotlin:ank
-val sum_3 = SetKW.monoid<Int>().combine(uniqueNaturalNumbers_1, SetKW.empty()).foldLeft(0){sum, number -> sum + (number * number)}
-val sum_4 = SetKW.monoid<Int>().combine(SetKW.empty(), uniqueNaturalNumbers_1).foldLeft(0){sum, number -> sum + (number * number)}
-sum_3 == sum_4
+val sum_2 = uniqueNaturalNumbers_2.foldLeft(0){sum, number -> sum + (number * number)}
+sum_2
+```
+```kotlin:ank
+sum_1 == sum_2
 ```
