@@ -1,23 +1,14 @@
 package arrow.optics.instances
 
 import arrow.core.Option
-import arrow.core.toT
-import arrow.data.ListKW
-import arrow.data.ListKWHK
-import arrow.data.ListKWKind
 import arrow.data.MapKW
 import arrow.data.SetKW
 import arrow.data.ev
 import arrow.data.getOption
 import arrow.data.k
-import arrow.data.traverse
 import arrow.instance
 import arrow.optics.Lens
-import arrow.optics.Traversal
 import arrow.optics.typeclasses.At
-import arrow.optics.typeclasses.FilterIndex
-import arrow.syntax.collections.firstOption
-import arrow.syntax.option.toOption
 
 @instance(MapKW::class)
 interface MapKWAtInstance<K, V> : At<MapKW<K, V>, K, Option<V>> {
