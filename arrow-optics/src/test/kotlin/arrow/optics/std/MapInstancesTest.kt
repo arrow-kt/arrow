@@ -8,6 +8,7 @@ import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genMap
 import arrow.test.generators.genMapKW
+import arrow.test.generators.genSetKW
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -18,9 +19,15 @@ class MapInstancesTest : UnitSpec() {
                 iso = mapToMapKW(),
                 aGen = genMap(Gen.string(), Gen.int()),
                 bGen = genMapKW(Gen.string(), Gen.int()),
-                funcGen = genFunctionAToB(genMapKW(Gen.string(), Gen.int())),
-                EQA = Eq.any(),
-                EQB = Eq.any()
+                funcGen = genFunctionAToB(genMapKW(Gen.string(), Gen.int()))
+        ))
+
+        testLaws(IsoLaws.laws(
+                iso = mapKWToSetKW(),
+                aGen = genMapKW(Gen.string(), Gen.create { Unit }),
+                bGen = genSetKW(Gen.string()),
+                funcGen = genFunctionAToB(genSetKW(Gen.string())),
+                EQA = Eq.any()
         ))
     }
 
