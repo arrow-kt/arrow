@@ -49,6 +49,7 @@ uniqueNaturalNumbers_2
 ```kotlin:ank
 val sum_3 = SetKW.monoid<Int>().combine(uniqueNaturalNumbers_1, SetKW.empty()).foldLeft(0){sum, number -> sum + (number * number)}
 sum_3
+```
 ```kotlin:ank
 val sum_4 = SetKW.monoid<Int>().combine(SetKW.empty(), uniqueNaturalNumbers_1).foldLeft(0){sum, number -> sum + (number * number)}
 sum_4
