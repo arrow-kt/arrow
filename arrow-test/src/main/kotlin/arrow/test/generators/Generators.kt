@@ -5,7 +5,6 @@ import arrow.HK
 import arrow.typeclasses.applicative
 import arrow.core.*
 import arrow.data.*
-import com.sun.org.apache.bcel.internal.generic.GETFIELD
 import io.kotlintest.properties.Gen
 import java.util.concurrent.TimeUnit
 
@@ -165,5 +164,7 @@ fun <A> genSequenceKW(genA: Gen<A>): Gen<SequenceKW<A>> =
 fun genChars(): Gen<Char> =
         Gen.oneOf(('A'..'Z') + ('a'..'z') + ('0'..'9') + "!@#$%%^&*()_-~`,<.?/:;}{][±§".toList())
 
-fun <A> genSetKW(genA: Gen<A>): Gen<SetKW<A>> =
-        Gen.create { Gen.set(genA).generate().k() }
+fun <A> genSetKW(genA: Gen<A>): Gen<SetKW<A>> {
+    val genSetA = Gen.set(genA)
+    return Gen.create { genSetA.generate().k() }
+}
