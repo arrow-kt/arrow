@@ -151,7 +151,7 @@ fun <K, V> genMapKW(genK: Gen<K>, genV: Gen<V>): Gen<MapKW<K, V>> =
 
 fun genTimeUnit(): Gen<TimeUnit> = object : Gen<TimeUnit> {
     val units = TimeUnit.values()
-    val random = Gen.choose(0, units.size -1)
+    val random = Gen.choose(0, units.size - 1)
     override fun generate(): TimeUnit = units[random.generate()]
 }
 
@@ -163,3 +163,8 @@ fun <A> genSequenceKW(genA: Gen<A>): Gen<SequenceKW<A>> =
 
 fun genChars(): Gen<Char> =
         Gen.oneOf(('A'..'Z') + ('a'..'z') + ('0'..'9') + "!@#$%%^&*()_-~`,<.?/:;}{][±§".toList())
+
+fun <A> genSetKW(genA: Gen<A>): Gen<SetKW<A>> {
+    val genSetA = Gen.set(genA)
+    return Gen.create { genSetA.generate().k() }
+}

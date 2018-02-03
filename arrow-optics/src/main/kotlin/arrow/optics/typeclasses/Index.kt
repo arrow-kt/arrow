@@ -6,17 +6,17 @@ import arrow.optics.Optional
 import arrow.typeclass
 
 /**
- * [Index] provides an [Optional] for a structure [S] to focus in [A] at a given index [I].
+ * [Index] provides an [Optional] for a structure [S] to focus in an optional [A] at a given index [I].
  *
  * @param S source of [Optional]
  * @param I index
- * @param A target of [Optional], [A] is supposed to be unique for a given pair [S] and [I].
+ * @param A focus of [Optional], [A] is supposed to be unique for a given pair [S] and [I].
  */
 @typeclass
 interface Index<S, I, A> : TC {
 
     /**
-     * Get the focus [A] for a structure [S] at index [i].
+     * Get [Optional] focus [A] for a structure [S] at index [i].
      */
     fun index(i: I): Optional<S, A>
 

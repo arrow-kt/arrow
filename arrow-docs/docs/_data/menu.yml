@@ -245,11 +245,14 @@ options:
       - title: Traversal
         url: /docs/optics/traversal/
 
-      - title: FilterIndex
-        url: /docs/optics/filterindex/
+      - title: At
+        url: /docs/optics/at/
 
       - title: Index
         url: /docs/optics/index/
+
+      - title: FilterIndex
+        url: /docs/optics/filterindex/
 
   - title: Integrations
 
