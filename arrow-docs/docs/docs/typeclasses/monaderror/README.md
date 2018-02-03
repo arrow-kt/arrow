@@ -7,9 +7,10 @@ permalink: /docs/typeclasses/monaderror/
 ## MonadError
 
 MonadError is the typeclass used to explicitly represent errors during sequential execution.
+It is parametrized to an error type `E`, which means the datatype has at least a "success" and a "failure" version.
 These errors can come in the form of `Throwable`, `Exception`, or any other type hierarchy of the user's choice.
 
-`MonadError` extends from [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}), which is already used to represent errors in independent computations. This way all the methods `ApplicativeError` provides to handle recovery from errors are also available.
+`MonadError` extends from [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}), which is already used to represent errors in independent computations. This way all the methods [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}) provides to handle recovery from errors are also available in `MonadError`.
 
 ### Main Combinators
 
