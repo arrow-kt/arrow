@@ -13,7 +13,7 @@ These errors can come in the form of `Throwable`, `Exception`, or any other type
 like for example a sealed class UserNotFoundReason that contains 3 inheritors.
 
 Some of the datatypes Λrrow provides can have these error types already fixed.
-That's the case of [`Try<A>`]({{ '/docs/datatypes/try' | relative_url }}) has its error type fixed to `Throwable`.
+That's the case of [`Try<A>`]({{ '/docs/datatypes/try' | relative_url }}), which has its error type fixed to `Throwable`.
 Other datatypes like [`Either<E, A>`]({{ '/docs/datatypes/either' | relative_url }}) allow for the user to apply their error type of choice.
 
 ### Main Combinators

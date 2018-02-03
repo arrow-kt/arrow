@@ -171,6 +171,9 @@ options:
       - title: Monad
         url: /docs/typeclasses/monad/
 
+      - title: MonadError
+        url: /docs/typeclasses/monaderror/
+
       - title: MonadFilter
         url: /docs/typeclasses/monadfilter/
 
@@ -185,9 +188,6 @@ options:
 
       - title: MonadCombine
         url: /docs/typeclasses/monadcombine/
-
-      - title: MonadError
-        url: /docs/typeclasses/monaderror/
 
       - title: Comonad
         url: /docs/typeclasses/comonad/
@@ -245,11 +245,14 @@ options:
       - title: Traversal
         url: /docs/optics/traversal/
 
-      - title: FilterIndex
-        url: /docs/optics/filterindex/
+      - title: At
+        url: /docs/optics/at/
 
       - title: Index
         url: /docs/optics/index/
+
+      - title: FilterIndex
+        url: /docs/optics/filterindex/
 
   - title: Integrations
 
