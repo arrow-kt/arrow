@@ -17,20 +17,20 @@ Datatypes work over themselves, never directly over the values defined by its ge
 #### Example
 
 `Option<A>` is a datatype that represents absence.
-It has one generic parameter `A`, representing the type of the values that `Option` can contain.
-`Option` can be specialized for any type `A` because it does not affect its behavior.
+It has one generic parameter `A`, representing the type of the values that `Option` may contain.
+`Option` can be specialized for any type `A` because this type does not affect its behavior.
 `Option` behaves the same for `Int`, `String` or `DomainUserClass`.
 
 The implementation of `Option` is a sealed class with two subtypes: an object `None` and a data class `Some`.
 `Some` represents presence of the value and thus it has one field containing it, and `None` represents absence.
 
-All operations over `Option` have to take into account absence,
-so there is a function `fold` which takes a continuation function per case: presence or absence.
-The implementation of `fold()` is a simple `when` to check whether `this` is a `Some` or a `None` and apply the appropriate continuation function.
-Whether `Option` works differently for `String` or `Int` or absence is up to the user.
+All operations over `Option` have to take into account presence or absence,
+so there is a function `fold()` that takes a continuation function per case, `() -> B` and `(A) -> B`.
+The implementation of `fold()` is a simple `when` that checks whether `this` is a `None` or a `Some<A>`, and it applies the appropriate continuation function.
 
-All other functions provided by option are implemented by using `fold()`, making for idiomatic helper functions like `getOrNull`, `getOrElse`, or `map`.
-Feel free to explore the implementation of `Option` and other datatypes to discover their behavior!
+All other functions provided by `Option` are implemented by using `fold()`, making for idiomatic helper functions like `getOrNull`, `getOrElse`, or `map`. These functions work for any value of `A` and `B`. This way, what `Option` does for each individual case of `String`, `Int` or absence is up to the functions passed by the user.
+
+Feel free to explore the [implementation of `Option`](https://github.com/arrow-kt/arrow/blob/master/arrow-core/src/main/kotlin/arrow/core/Option.kt) and other datatypes to discover their behavior!
 
 ### Datatypes in Arrow
 
