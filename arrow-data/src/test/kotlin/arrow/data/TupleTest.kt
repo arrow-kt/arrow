@@ -33,9 +33,9 @@ class TupleTest : UnitSpec() {
         }
 
         testLaws(
-                MonadLaws.laws(Tuple2.monad(), Eq.any()),
-                ComonadLaws.laws(Tuple2.comonad(), { Tuple2.pure(it) }, Eq.any()),
-                TraverseLaws.laws(Tuple2.traverse(), Tuple2.functor(), { Tuple2.pure(it) }, Eq.any()),
+                MonadLaws.laws(Tuple2.monad<Int>(), Eq.any()),
+                ComonadLaws.laws(Tuple2.comonad(), { 0 toT it }, Eq.any()),
+                TraverseLaws.laws(Tuple2.traverse(), Tuple2.functor(), { 0 toT it }, Eq.any()),
                 EqLaws.laws { Tuple2(it, it) },
                 EqLaws.laws { Tuple3(it, it, it) },
                 EqLaws.laws { Tuple4(it, it, it, it) },
