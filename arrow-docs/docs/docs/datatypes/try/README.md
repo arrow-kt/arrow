@@ -164,7 +164,7 @@ Try.monad().binding {
     val b = Try { "4".toInt() }.bind()
     val c = Try { "5".toInt() }.bind()
 
-    yields(a + b + c)
+    a + b + c
 } // Success(value=12)
 ```
 
@@ -174,7 +174,7 @@ Try.monad().binding {
     val b = Try { "4".toInt() }.bind()
     val c = Try { "5".toInt() }.bind()
 
-    yields(a + b + c)
+    a + b + c
 } // Failure(exception=java.lang.NumberFormatException: For input string: "none")
 ```
 
@@ -186,7 +186,7 @@ Try.monadError().bindingCatch {
     val b = "4".toInt()
     val c = "5".toInt()
 
-    yields(a + b + c)
+    a + b + c
 } // Failure(exception=java.lang.NumberFormatException: For input string: "none")
 ```
 

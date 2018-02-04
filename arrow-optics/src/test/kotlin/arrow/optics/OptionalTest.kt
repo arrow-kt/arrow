@@ -5,9 +5,6 @@ import arrow.core.Option
 import arrow.core.eq
 import arrow.data.Try
 import arrow.data.applicative
-import arrow.optics.instances.listElementPositionOptional
-import arrow.optics.instances.nullableOptional
-import arrow.optics.instances.optionOptional
 import arrow.syntax.either.left
 import arrow.syntax.either.right
 import arrow.test.UnitSpec
@@ -22,20 +19,11 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
-import java.util.*
 
 @RunWith(KTestJUnitRunner::class)
 class OptionalTest : UnitSpec() {
 
     init {
-
-        testLaws(OptionalLaws.laws(
-                optional = listElementPositionOptional(50),
-                aGen = Gen.list(Gen.int()),
-                bGen = Gen.int(),
-                funcGen = genFunctionAToB(Gen.int()),
-                EQA = Eq.any(),
-                EQOptionB = Eq.any()))
 
         testLaws(OptionalLaws.laws(
                 optional = nullableOptional(),

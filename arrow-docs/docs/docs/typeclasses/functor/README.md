@@ -139,7 +139,7 @@ Often times you may find the need to provide your own for unsupported datatypes.
 You may create or automatically derive instances of functor for your own datatypes which you will be able to use in the context of abstract polymorfic code
 as demonstrated in the [example](#example) above.
 
-See [Deriving and creating custom typeclass](#)
+See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }})
 
 ### Data types
 

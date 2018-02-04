@@ -19,7 +19,7 @@ import arrow.typeclasses.monoid
 
 object LensLaws {
 
-    inline fun <reified A, reified B> laws(lens: Lens<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A> = eq(), EQB: Eq<B>, MB: Monoid<B> = monoid()) = listOf(
+    inline fun <reified A, reified B> laws(lens: Lens<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A> = eq(), EQB: Eq<B> = eq(), MB: Monoid<B> = monoid()) = listOf(
             Law("Lens law: get set", { lensGetSet(lens, aGen, EQA) }),
             Law("Lens law: set get", { lensSetGet(lens, aGen, bGen, EQB) }),
             Law("Lens law: is set idempotent", { lensSetIdempotent(lens, aGen, bGen, EQA) }),

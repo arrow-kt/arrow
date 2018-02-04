@@ -25,7 +25,7 @@ A typeclass is a specification for one behavior associated with a single type. T
 What differentiates typeclasses from regular OOP inheritance is that typeclasses are meant to be implemented outside of their types.
 The association is done using generic parametrization rather than the usual subclassing by implementing the interface.
 This means that they can be implemented for any class, even those not in the current project,
-and allows us to make typeclass instances for a datatype available at a global scope for the single unique type they're associated with.
+and allows us to make available at the global scope any one implementation of a typeclasses for the single unique type they're associated with.
 
 Examples of these behaviors are comparability ([`Eq`]({{ '/docs/typeclasses/eq' | relative_url }})),
 composability ([`Monoid`]({{ '/docs/typeclasses/monoid' | relative_url }})),

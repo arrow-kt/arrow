@@ -113,7 +113,7 @@ ObservableKW.monadError().bindingCatch {
     end.onNext(Unit)
   }
 
-  yield(percent)
+  percent
 }.ev()
 ```
 
@@ -141,7 +141,7 @@ val (observable, disposable) =
     val friendProfiles = userProfile.friends().map { friend ->
         bindAsync(observableAsync) { getProfile(friend.id) }
     }
-    yields(listOf(userProfile) + friendProfiles)
+    listOf(userProfile) + friendProfiles
   }
 
 observable.value()

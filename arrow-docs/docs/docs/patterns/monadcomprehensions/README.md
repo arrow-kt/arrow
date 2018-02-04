@@ -66,7 +66,6 @@ Arrow uses this capability of the compiler to bring you coroutines-like notation
 
 Every instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) contains a method `binding` that receives a suspended function as a parameter.
 This functions must return the last element of the sequence of operations.
-`yields()` is a helper function that takes any one value and constructs a correct return.
 Let's see a minimal example.
 
 ```kotlin:ank
@@ -75,7 +74,7 @@ import arrow.effects.*
 import arrow.typeclasses.*
 
 IO.monad().binding {
-  yields(1)
+  1
 }.ev().unsafeRunSync()
 ```
 
@@ -85,7 +84,7 @@ In the case of [`IO`]({{ '/docs/effects/io' | relative_url }}), it is immediatel
 ```kotlin
 IO.monad().binding {
   val a = IO.invoke { 1 }
-  yields(a + 1)
+  a + 1
 }.ev().unsafeRunSync()
 // Compiler error: the type of a is IO<Int>, cannot add 1 to it
 ```
@@ -98,14 +97,14 @@ For that we have two flavors of the function `bind()`, which is a function only 
 ```kotlin:ank
 IO.monad().binding {
   val a = IO.invoke { 1 }.bind()
-  yields(a + 1)
+  a + 1
 }.ev().unsafeRunSync()
 ```
 
 ```kotlin:ank
 IO.monad().binding {
   val a = bind { IO.invoke { 1 } }
-  yields(a + 1)
+  a + 1
 }.ev().unsafeRunSync()
 ```
 
@@ -128,7 +127,7 @@ val university: IO<University> =
     val student = getStudentFromDatabase("Bob Roxx").bind()
     val university = getUniversityFromDatabase(student.universityId).bind()
     val dean = getDeanFromDatabase(university.deanId).bind()
-    yields(dean)
+    dean
   }
 ```
 
@@ -142,7 +141,7 @@ fun getNLines(path: FilePath, count: Int): IO<List<String>> =
     if (lines.length < count) {
       IO.raiseError(RuntimeException("File has fewer lines than expected"))
     } else {
-      yields(lines.take(count))
+      lines.take(count)
     }
   }
 ```
@@ -163,7 +162,7 @@ fun getLineLengthAverage(path: FilePath): IO<List<String>> =
     val lines = file.readLines().bind()
     val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
     val average = count / lines.length
-    yields(average)
+    average
   }
 ```
 
@@ -182,7 +181,7 @@ fun getLineLengthAverage(path: FilePath): IO<List<String>> =
     val lines = file.readLines().bind()
     val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
     val average = count / lines.length
-    yields(average)
+    average
   }
 ```
 
@@ -214,7 +213,7 @@ fun getLineLengthAverage(path: FilePath): IO<List<String>> =
     
     val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
     val average = count / lines.length
-    yields(average)
+    average
   }
 ```
 
@@ -239,7 +238,7 @@ val (binding: IO<List<User>>, unsafeCancel: Disposable) =
     val friendProfiles = userProfile.friends().map { friend ->
         bindAsync(ioAsync) { getProfile(friend.id) }
     }
-    yields(listOf(userProfile) + friendProfiles)
+    listOf(userProfile) + friendProfiles
   }
 
 binding.unsafeRunAsync { result ->
