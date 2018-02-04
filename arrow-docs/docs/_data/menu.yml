@@ -77,6 +77,12 @@ options:
       - title: SetKW
         url: /docs/datatypes/setkw/
 
+      - title: MapKW
+        url: /docs/datatypes/mapkw/
+
+      - title: SortedMapKW
+        url: /docs/datatypes/sortedmapkw/
+
       - title: Ior
         url: /docs/datatypes/ior/
 

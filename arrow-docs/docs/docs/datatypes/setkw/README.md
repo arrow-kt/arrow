@@ -69,3 +69,11 @@ sum_2
 ```kotlin:ank
 sum_1 == sum_2
 ```
+
+Available Instances:
+
+```kotlin:ank
+import arrow.debug.*
+
+showInstances<SetKWHK, Unit>()
+```
