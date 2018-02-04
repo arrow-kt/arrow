@@ -33,11 +33,8 @@ class TupleTest : UnitSpec() {
         }
 
         testLaws(
-                FunctorLaws.laws(Tuple2.functor(), { Tuple2.pure(it) }, Eq.any()),
-                ApplicativeLaws.laws(Tuple2.applicative(), Eq.any()),
                 MonadLaws.laws(Tuple2.monad(), Eq.any()),
                 ComonadLaws.laws(Tuple2.comonad(), { Tuple2.pure(it) }, Eq.any()),
-                FoldableLaws.laws(Tuple2.foldable(), { Tuple2.pure(it) }, Eq.any()),
                 TraverseLaws.laws(Tuple2.traverse(), Tuple2.functor(), { Tuple2.pure(it) }, Eq.any()),
                 EqLaws.laws { Tuple2(it, it) },
                 EqLaws.laws { Tuple3(it, it, it) },
