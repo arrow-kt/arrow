@@ -266,6 +266,8 @@ options:
 
   - title: Free
 
+    nested_options:
+
       - title: Free
         url: /docs/free/free/
 
