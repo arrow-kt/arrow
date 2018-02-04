@@ -38,7 +38,7 @@ buildscript {
         classpath "com.github.ben-manes:gradle-versions-plugin:$gradleVersionsPluginVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
-        classpath 'io.arrow-kt:ank-gradle-plugin:0.5.1'
+        classpath 'io.arrow-kt:ank-gradle-plugin:0.6.1'
         classpath 'org.ajoberstar:gradle-git-publish:0.3.2'
     }
 }
@@ -94,7 +94,7 @@ subprojects { project ->
         key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
         configurations = ['archives']
         pkg {
-            repo = 'maven'
+            repo = 'arrow-kt'
             name = project.name
             userOrg = POM_DEVELOPER_ID
             licenses = ['Apache-2.0']
