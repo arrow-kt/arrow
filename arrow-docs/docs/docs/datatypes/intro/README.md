@@ -122,10 +122,6 @@ TBD
 
 - [`Coreader`]({{ '/docs/datatypes/coreader/' | relative_url }})
 
-#### Validation
-
-- [`Validation`] - it represents aggregating multiple calculations that can fail, and it also aggregates the errors
-
 #### Effects
 
 All effects are different implementations of the same abstraction: lazy execution of code that can move to other threads and cause exceptions. 
