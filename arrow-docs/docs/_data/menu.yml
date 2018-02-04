@@ -53,6 +53,9 @@ options:
 
     nested_options:
 
+      - title: Intro
+        url: /docs/datatypes/intro/
+
       - title: Option
         url: /docs/datatypes/option/
 
@@ -119,24 +122,12 @@ options:
       - title: EitherT
         url: /docs/datatypes/eithert/
 
-      - title: Free
-        url: /docs/datatypes/free/
-
-      - title: FreeApplicative
-        url: /docs/datatypes/freeapplicative/
-
-      - title: Cofree
-        url: /docs/datatypes/cofree/
-
-      - title: Coyoneda
-        url: /docs/datatypes/coyoneda/
-
-      - title: Yoneda
-        url: /docs/datatypes/yoneda/
-
   - title: Type Classes
 
     nested_options:
+
+      - title: Intro
+        url: /docs/typeclasses/intro/
 
       - title: Eq
         url: /docs/typeclasses/eq/
@@ -272,6 +263,23 @@ options:
 
       - title: KindedJ
         url: /docs/integrations/kindedj/
+
+  - title: Free
+
+      - title: Free
+        url: /docs/free/free/
+
+      - title: FreeApplicative
+        url: /docs/free/freeapplicative/
+
+      - title: Cofree
+        url: /docs/free/cofree/
+
+      - title: Yoneda
+        url: /docs/free/yoneda/
+
+      - title: Coyoneda
+        url: /docs/free/coyoneda/
 
   - title: Legal
 
