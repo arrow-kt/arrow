@@ -27,7 +27,7 @@ class WeakTest : UnitSpec() {
         }
 
         testLaws(
-            EqLaws.laws { Weak(it) },
+            EqLaws.laws { Weak(it) }
             // FIXME(pablisco) - Disabled due to flakyness
             //MonadLaws.laws(Weak.monad(), EQ)
         )
