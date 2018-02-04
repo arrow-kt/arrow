@@ -14,3 +14,7 @@ annotation class prisms
 @Retention(SOURCE)
 @Target(CLASS)
 annotation class isos
+
+@Retention(SOURCE)
+@Target(CLASS)
+annotation class optionals

@@ -4,6 +4,7 @@ dependencies {
     compile project(':arrow-effects')
     compile project(':arrow-effects-rx2')
     compile project(':arrow-effects-kotlinx-coroutines')
+    compile project(':arrow-optics')
 
     kapt project(':arrow-annotations-processor')
     kaptTest project(':arrow-annotations-processor')
@@ -12,7 +13,7 @@ dependencies {
 
     testCompile project(':arrow-test')
 
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
 }
 
