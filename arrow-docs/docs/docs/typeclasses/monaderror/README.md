@@ -6,7 +6,7 @@ permalink: /docs/typeclasses/monaderror/
 
 ## MonadError
 
-MonadError is the typeclase used to explicitly represent errors during sequential execution.
+MonadError is the typeclass used to explicitly represent errors during sequential execution.
 It is parametrized to an error type `E`, which means the datatype has at least a "success" and a "failure" version.
 These errors can come in the form of `Throwable`, `Exception`, or any other type hierarchy of the user's choice.
 
