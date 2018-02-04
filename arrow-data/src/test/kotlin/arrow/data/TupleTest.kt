@@ -20,7 +20,7 @@ class TupleTest : UnitSpec() {
             foldable<Tuple2<Int, Int>>() shouldNotBe null
             traverse<Tuple2<Int, Int>>() shouldNotBe null
             monoid<Tuple2<Int, Int>>() shouldNotBe null
-            
+
             eq<Tuple2<Int, Int>>() shouldNotBe null
             eq<Tuple3<Int, Int, Int>>() shouldNotBe null
             eq<Tuple4<Int, Int, Int, Int>>() shouldNotBe null
@@ -32,23 +32,22 @@ class TupleTest : UnitSpec() {
             eq<Tuple10<Int, Int, Int, Int, Int, Int, Int, Int, Int, Int>>() shouldNotBe null
         }
 
-        testLaws(FunctorLaws.laws(Tuple2.functor(), { Tuple2.pure(it) }, Eq.any()))
-        testLaws(ApplicativeLaws.laws(Tuple2.applicative(), Eq.any()))
-        testLaws(MonadLaws.laws(Tuple2.monad(), Eq.any()))
-        testLaws(ComonadLaws.laws(Tuple2.comonad(), { Tuple2.pure(it) }, Eq.any()))
-        testLaws(FoldableLaws.laws(Tuple2.foldable(), { Tuple2.pure(it) }, Eq.any()))
-        testLaws(TraverseLaws.laws(Tuple2.traverse(), Tuple2.functor(), { Tuple2.pure(it) }, Eq.any()))
         testLaws(
-            EqLaws.laws { Tuple2(it, it) },
-            EqLaws.laws { Tuple3(it, it, it) },
-            EqLaws.laws { Tuple4(it, it, it, it) },
-            EqLaws.laws { Tuple5(it, it, it, it, it) },
-            EqLaws.laws { Tuple6(it, it, it, it, it, it) },
-            EqLaws.laws { Tuple7(it, it, it, it, it, it, it) },
-            EqLaws.laws { Tuple8(it, it, it, it, it, it, it, it) },
-            EqLaws.laws { Tuple9(it, it, it, it, it, it, it, it, it) },
-            EqLaws.laws { Tuple10(it, it, it, it, it, it, it, it, it, it) }
+                FunctorLaws.laws(Tuple2.functor(), { Tuple2.pure(it) }, Eq.any()),
+                ApplicativeLaws.laws(Tuple2.applicative(), Eq.any()),
+                MonadLaws.laws(Tuple2.monad(), Eq.any()),
+                ComonadLaws.laws(Tuple2.comonad(), { Tuple2.pure(it) }, Eq.any()),
+                FoldableLaws.laws(Tuple2.foldable(), { Tuple2.pure(it) }, Eq.any()),
+                TraverseLaws.laws(Tuple2.traverse(), Tuple2.functor(), { Tuple2.pure(it) }, Eq.any()),
+                EqLaws.laws { Tuple2(it, it) },
+                EqLaws.laws { Tuple3(it, it, it) },
+                EqLaws.laws { Tuple4(it, it, it, it) },
+                EqLaws.laws { Tuple5(it, it, it, it, it) },
+                EqLaws.laws { Tuple6(it, it, it, it, it, it) },
+                EqLaws.laws { Tuple7(it, it, it, it, it, it, it) },
+                EqLaws.laws { Tuple8(it, it, it, it, it, it, it, it) },
+                EqLaws.laws { Tuple9(it, it, it, it, it, it, it, it, it) },
+                EqLaws.laws { Tuple10(it, it, it, it, it, it, it, it, it, it) }
         )
     }
-
 }
