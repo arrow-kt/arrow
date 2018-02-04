@@ -3,17 +3,33 @@ package arrow.effects
 import arrow.HK
 import arrow.core.Either
 import arrow.instance
+import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.MonadError
 
 @instance(DeferredKW::class)
-interface DeferredKWMonadErrorInstance :
-        DeferredKWMonadInstance,
-        MonadError<DeferredKWHK, Throwable> {
+interface DeferredKWApplicativeErrorInstance :
+        DeferredKWApplicativeInstance,
+        ApplicativeError<DeferredKWHK, Throwable> {
     override fun <A> raiseError(e: Throwable): DeferredKW<A> =
             DeferredKW.raiseError(e)
 
     override fun <A> handleErrorWith(fa: DeferredKWKind<A>, f: (Throwable) -> DeferredKWKind<A>): DeferredKW<A> =
             fa.handleErrorWith { f(it).ev() }
+}
+
+@instance(DeferredKW::class)
+interface DeferredKWMonadErrorInstance :
+        DeferredKWApplicativeErrorInstance,
+        DeferredKWMonadInstance,
+        MonadError<DeferredKWHK, Throwable> {
+    override fun <A, B> ap(fa: DeferredKWKind<A>, ff: DeferredKWKind<(A) -> B>): DeferredKW<B> =
+            super<DeferredKWMonadInstance>.ap(fa, ff)
+
+    override fun <A, B> map(fa: DeferredKWKind<A>, f: (A) -> B): DeferredKW<B> =
+            super<DeferredKWMonadInstance>.map(fa, f)
+
+    override fun <A> pure(a: A): DeferredKW<A> =
+            super<DeferredKWMonadInstance>.pure(a)
 }
 
 @instance(DeferredKW::class)

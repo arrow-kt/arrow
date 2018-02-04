@@ -2,6 +2,7 @@
 layout: docs
 title: Option
 permalink: /docs/datatypes/option/
+video: 5SFTbphderE
 ---
 
 ## Option
@@ -152,7 +153,7 @@ Option.monad().binding {
    val a = Some(1).bind()
    val b = Some(1 + a).bind()
    val c = Some(1 + b).bind()
-   yields(a + b + c)
+   a + b + c
 }
 //Some(value=6)
 ```
@@ -162,7 +163,7 @@ Option.monad().binding {
    val x = none<Int>().bind()
    val y = Some(1 + x).bind()
    val z = Some(1 + y).bind()
-   yields(x + y + z)
+   x + y + z
 }
 //None
 ```

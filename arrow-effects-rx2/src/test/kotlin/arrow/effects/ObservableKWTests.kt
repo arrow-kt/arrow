@@ -45,6 +45,7 @@ class ObservableKWTest : UnitSpec() {
             functor<ObservableKWHK>() shouldNotBe null
             applicative<ObservableKWHK>() shouldNotBe null
             monad<ObservableKWHK>() shouldNotBe null
+            applicativeError<ObservableKWHK, Unit>() shouldNotBe null
             monadError<ObservableKWHK, Unit>() shouldNotBe null
             monadSuspend<ObservableKWHK>() shouldNotBe null
             async<ObservableKWHK>() shouldNotBe null
