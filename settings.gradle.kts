@@ -35,7 +35,5 @@ include(":arrow-recursion")
 include(":arrow-docs")
 include(":arrow-optics")
 include(":arrow-validation")
-include(":ank-core")
-include(":ank-gradle-plugin")
 
 rootProject.name = "arrow-parent"

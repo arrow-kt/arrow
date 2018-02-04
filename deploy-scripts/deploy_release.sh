@@ -16,6 +16,6 @@ elif [ "$TRAVIS_BRANCH" != "$BRANCH" ]; then
 elif ! [[ "$VERSION_NAME" =~ $VERSION_PATTERN ]]; then
   fail "Failed release deployment: wrong version. Expected '$VERSION_NAME' to have pattern 'X.Y.Z'"
 else
-  ./gradlew uploadArchives bintrayUpload
+  ./gradlew uploadArchives
   echo "Release '$VERSION_NAME' deployed!"
 fi
