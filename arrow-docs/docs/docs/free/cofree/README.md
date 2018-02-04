@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Cofree
-permalink: /docs/datatypes/cofree/
+permalink: /docs/free/cofree/
 ---
 
 ## Cofree
