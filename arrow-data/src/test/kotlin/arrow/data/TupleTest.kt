@@ -3,17 +3,22 @@ package arrow.data
 import arrow.core.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
-import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
-import arrow.typeclasses.eq
-import arrow.typeclasses.monoid
+import arrow.test.laws.*
+import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class TupleTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
+            functor<Tuple2<Int, Int>>() shouldNotBe null
+            applicative<Tuple2<Int, Int>>() shouldNotBe null
+            monad<Tuple2<Int, Int>>() shouldNotBe null
+            comonad<Tuple2<Int, Int>>() shouldNotBe null
+            foldable<Tuple2<Int, Int>>() shouldNotBe null
+            traverse<Tuple2<Int, Int>>() shouldNotBe null
             monoid<Tuple2<Int, Int>>() shouldNotBe null
             
             eq<Tuple2<Int, Int>>() shouldNotBe null
@@ -27,6 +32,12 @@ class TupleTest : UnitSpec() {
             eq<Tuple10<Int, Int, Int, Int, Int, Int, Int, Int, Int, Int>>() shouldNotBe null
         }
 
+        testLaws(FunctorLaws.laws(Tuple2.functor(), { Tuple2.pure(it) }, Eq.any()))
+        testLaws(ApplicativeLaws.laws(Tuple2.applicative(), Eq.any()))
+        testLaws(MonadLaws.laws(Tuple2.monad(), Eq.any()))
+        testLaws(ComonadLaws.laws(Tuple2.comonad(), { Tuple2.pure(it) }, Eq.any()))
+        testLaws(FoldableLaws.laws(Tuple2.foldable(), { Tuple2.pure(it) }, Eq.any()))
+        testLaws(TraverseLaws.laws(Tuple2.traverse(), Tuple2.functor(), { Tuple2.pure(it) }, Eq.any()))
         testLaws(
             EqLaws.laws { Tuple2(it, it) },
             EqLaws.laws { Tuple3(it, it, it) },

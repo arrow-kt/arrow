@@ -1,8 +1,30 @@
 package arrow.core
 
-data class Tuple2<out A, out B>(val a: A, val b: B) {
+import arrow.*
+
+@higherkind
+data class Tuple2<out A, out B>(val a: A, val b: B) : Tuple2Kind<A, B> {
+    fun <C> map(f: (B) -> C) = a toT f(b)
+    fun <C> ap(f: Tuple2Kind<*, (B) -> C>) = map(f.ev().b)
+    fun <C> flatMap(f: (B) -> Tuple2Kind<@UnsafeVariance A, C>) = f(b).ev()
+    fun <C> coflatMap(f: (Tuple2Kind<A, B>) -> C): Tuple2<A, C> = a toT f(this)
+    fun extract() = b
+    fun <C> foldL(b: C, f: (C, B) -> C) = f(b, this.b)
+    fun <C> foldR(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>) = f(b, lb)
+
     fun reverse(): Tuple2<B, A> = Tuple2(b, a)
-    companion object
+
+    companion object {
+        fun <A> pure(a: A) = null toT a
+
+        tailrec fun <A, B> tailRecM(a: A, f: (A) -> Tuple2Kind<*, Either<A, B>>): Tuple2<*, B> {
+            val b = f(a).ev().b
+            return when (b) {
+                is Either.Left -> tailRecM(b.a, f)
+                is Either.Right -> Tuple2.pure(b.b)
+            }
+        }
+    }
 }
 
 data class Tuple3<out A, out B, out C>(val a: A, val b: B, val c: C) {
