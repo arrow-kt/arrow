@@ -15,7 +15,7 @@ data class Tuple2<out A, out B>(val a: A, val b: B) : Tuple2Kind<A, B> {
     fun reverse(): Tuple2<B, A> = Tuple2(b, a)
 
     companion object {
-        fun <A> pure(a: A) = null toT a
+        fun <A> pure(a: A): Tuple2<Nothing?, A> = null toT a
 
         tailrec fun <A, B> tailRecM(a: A, f: (A) -> Tuple2Kind<*, Either<A, B>>): Tuple2<*, B> {
             val b = f(a).ev().b
