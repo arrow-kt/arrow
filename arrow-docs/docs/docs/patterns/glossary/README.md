@@ -18,9 +18,13 @@ branching in code with [`Either`]({{ '/docs/datatypes/either' | relative_url }})
 catching exceptions with [`Try`]({{ '/docs/datatypes/try' | relative_url }}),
 or interacting with the platform the program runs in using [`IO`]({{ '/docs/effects/io' | relative_url }}).
 
+You can read more about all the [datatypes]({{ '/docs/datatypes/intro' | relative_url }}) that Arrow provides in its [section of the docs]({{ '/docs/datatypes/intro' | relative_url }}).
+
 ### Typeclasses
 
-A typeclass is a specification for one behavior associated with a single type. This behavior is checked by a test suite called the "laws" for that typeclass. These test suites are available in the package arrow-tests.
+A typeclass is a specification for one behavior associated with a single type.
+This behavior is checked by a test suite called the "laws" for that typeclass.
+These test suites are available in the package arrow-tests.
 
 What differentiates typeclasses from regular OOP inheritance is that typeclasses are meant to be implemented outside of their types.
 The association is done using generic parametrization rather than the usual subclassing by implementing the interface.
@@ -31,6 +35,8 @@ Examples of these behaviors are comparability ([`Eq`]({{ '/docs/typeclasses/eq' 
 composability ([`Monoid`]({{ '/docs/typeclasses/monoid' | relative_url }})),
 its contents can be mapped from one type to another ([`Functor`]({{ '/docs/typeclasses/functor' | relative_url }})),
 or error recovery ([`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }})).
+
+You can read more about all the [typeclasses]({{ '/docs/typeclasses/intro' | relative_url }}) that Arrow provides in its [section of the docs]({{ '/docs/typeclasses/intro' | relative_url }}).
 
 To define a fully featured typeclass in Λrrow you use an interface that extends from `TC`, and use the annotation `@typeclass` to generate all boilerplate related to global lookup, which is explained below. The annotation and interface to extend have different names to avoid collision.
 
