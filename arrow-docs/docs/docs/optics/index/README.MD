@@ -6,11 +6,11 @@ permalink: /docs/optics/index/
 
 ## Index
 
-`Index` provides an [Optional]({{ '/docs/optics/optional' | relative_url }}) for a structure `S` to focus in `A` at a given index `I`.
+`Index` provides an [Optional]({{ '/docs/optics/optional' | relative_url }}) for a structure `S` to focus in optional `A` at a given index `I`.
 
 ### Example
 
-If for a structure `S` the focus `A` can be indexed by `I` then `Index` can create an `Optional` with focus at `S` for a given index `I`.
+If for a structure `S` the optionally focus `A` can be indexed by `I` then `Index` can create an `Optional` with focus at `S` for a given index `I`.
 We can use that `Optional` to safely operate on that focus `S` i.e. operating on items in a `List` based on the index position.
 
 ```kotlin:ank
