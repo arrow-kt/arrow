@@ -80,7 +80,7 @@ class ObservableKWTest : UnitSpec() {
             val value: Observable<Long> = ObservableKW.monadErrorFlat().bindingCatch {
                 val a = Observable.timer(2, TimeUnit.SECONDS, Schedulers.newThread()).k().bind()
                 threadRef = Thread.currentThread()
-                val b = Observable.just(a).observeOn(Schedulers.newThread()).k().bind()
+                val b = Observable.just(a).observeOn(Schedulers.io()).k().bind()
                 yields(b)
             }.value()
             val test: TestObserver<Long> = value.test()
