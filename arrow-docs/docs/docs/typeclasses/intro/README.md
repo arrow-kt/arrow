@@ -80,11 +80,11 @@ We will list them by their hierarchy.
 
 Effects provides a hierarchy of typeclasses for lazy and asynchronous execution.
 
-- [`MonadSuspend`]({{ '/docs/typeclasses/monadsuspend/' | relative_url }}) - can evaluate functions lazily
+- [`MonadSuspend`]({{ '/docs/effects/monadsuspend/' | relative_url }}) - can evaluate functions lazily
 
-- [`Async`]({{ '/docs/typeclasses/async/' | relative_url }}) - can be created using an asynchronous callback function
+- [`Async`]({{ '/docs/effects/async/' | relative_url }}) - can be created using an asynchronous callback function
 
-- [`Effect`]({{ '/docs/typeclasses/effect/' | relative_url }}) - can extract a value from an asynchronous function
+- [`Effect`]({{ '/docs/effects/effect/' | relative_url }}) - can extract a value from an asynchronous function
 
 #### MTL
 
