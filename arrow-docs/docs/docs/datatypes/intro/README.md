@@ -75,7 +75,7 @@ Data contains the bulk of the datatypes provided by Arrow. We can separate them 
 
 - [`Kleisli`]({{ '/docs/datatypes/kleisli/' | relative_url }}) - similar to Dependency Injection and Inversion of Control, it represents a calculation with a dependency on an external context
 
-- [`Reader`]({{ '/docs/datatypes/reader/' | relative_url }}) - same as kleisli but tied to a single datatype
+- [`Reader`]({{ '/docs/datatypes/reader/' | relative_url }}) - same as kleisli but operating over the `Id` datatype
 
 - [`Writer`]({{ '/docs/datatypes/writert/' | relative_url }}) - represents calculations that carry over one extra aggregated value, generally a logger or reporter
 
