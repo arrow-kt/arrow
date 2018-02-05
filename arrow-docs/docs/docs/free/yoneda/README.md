@@ -1,9 +1,9 @@
 ---
 layout: docs
-title: SortedMapKW
-permalink: /docs/datatypes/sortedmapkw/
+title: Yoneda
+permalink: /docs/free/yoneda/
 ---
 
-## SortedMapKW
+## Yoneda
 
 TODO. Meanwhile you can find a short description in the [intro to datatypes]({{ '/docs/datatypes/intro/' | relative_url }}).

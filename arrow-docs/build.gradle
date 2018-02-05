@@ -2,7 +2,7 @@ apply plugin: 'ank-gradle-plugin'
 apply plugin: 'org.ajoberstar.git-publish'
 
 dependencies {
-    compile project(':ank-core')
+    compile 'io.arrow-kt:ank-core:0.6.1'
     compile project(':arrow-syntax')
     compile project(':arrow-effects')
     compile project(':arrow-effects-rx2')
