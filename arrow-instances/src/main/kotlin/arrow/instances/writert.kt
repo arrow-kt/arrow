@@ -1,8 +1,13 @@
 package arrow.instances
 
-import arrow.*
-import arrow.core.*
-import arrow.data.*
+import arrow.HK
+import arrow.core.Either
+import arrow.core.toT
+import arrow.data.WriterT
+import arrow.data.WriterTKind
+import arrow.data.WriterTKindPartial
+import arrow.data.ev
+import arrow.instance
 import arrow.typeclasses.*
 
 @instance(WriterT::class)
@@ -31,6 +36,10 @@ interface WriterTApplicativeInstance<F, W> : Applicative<WriterTKindPartial<F, W
 
 @instance(WriterT::class)
 interface WriterTMonadInstance<F, W> : WriterTApplicativeInstance<F, W>, Monad<WriterTKindPartial<F, W>> {
+
+    override fun <A, B> map(fa: WriterTKind<F, W, A>, f: (A) -> B): WriterT<F, W, B> =
+            fa.ev().map({ f(it) }, FF())
+
     override fun <A, B> flatMap(fa: WriterTKind<F, W, A>, f: (A) -> HK<WriterTKindPartial<F, W>, B>): WriterT<F, W, B> =
             fa.ev().flatMap({ f(it).ev() }, MM(), FF())
 
