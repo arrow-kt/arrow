@@ -116,7 +116,7 @@ A transformer is a special kind of datatype that allows combining two datatypes 
 
 ##### Codata
 
-TBD
+TODO
 
 - [`Cokleisli`]({{ '/docs/datatypes/cokleisli/' | relative_url }})
 
