@@ -24,7 +24,7 @@ It has one generic parameter `A`, representing the type of the values that `Opti
 The implementation of `Option<A>` is a sealed class with two subtypes: an object `None` and a data class `Some<A>`.
 `Some<A>` represents presence of the value and thus it has one field containing it, and `None` represents absence.
 
-All operations over `Option` have to take into account presence or absence,
+All operations over `Option` have to take into account absence or presence,
 so there is a function `fold()` that takes a continuation function per case, `() -> B` and `(A) -> B`.
 The implementation of `fold()` is a simple `when` that checks whether `this` is a `None` or a `Some<A>`, and it applies the appropriate continuation function.
 
