@@ -139,9 +139,9 @@ They are more general than the other datatypes as they combine the abstractions 
 
 - [`Free`]({{ '/docs/free/free/' | relative_url }})
 
-- [`FreeApplicative`]({{ '/docs/effects/io/' | relative_url }})
+- [`FreeApplicative`]({{ '/docs/effects/freeapplicative/' | relative_url }})
 
-- [`FreeApplicative`]({{ '/docs/free/cofree/' | relative_url }})
+- [`Cofree`]({{ '/docs/free/cofree/' | relative_url }})
 
 - [`Yoneda`]({{ '/docs/free/yoneda/' | relative_url }})
 
