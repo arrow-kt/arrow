@@ -110,11 +110,9 @@ class TypeclassFileGenerator(
 
     private val typeclasses: List<Typeclass> = annotatedList.map { Typeclass(it.classOrPackageProto.`package`, it) }
 
-    private fun functionSignatures(typeClass: Typeclass): List<SyntaxFunctionSignature> {
-        return typeClass.target.classOrPackageProto.functionList.map {
+    private fun functionSignatures(typeClass: Typeclass): List<SyntaxFunctionSignature> = typeClass.target.classOrPackageProto.functionList.map {
             SyntaxFunctionSignature.from("arrow.HK", typeClass, it)
         }.filter { it.hkArgs == HKArgs.First }
-    }
 
     /**
      * Main entry point for higher kinds extension generation
