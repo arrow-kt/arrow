@@ -37,6 +37,8 @@ interface StateTApplicativeInstance<F, S> : StateTFunctorInstance<F, S>, Applica
 @instance(StateT::class)
 interface StateTMonadInstance<F, S> : StateTApplicativeInstance<F, S>, Monad<StateTKindPartial<F, S>> {
 
+    override fun <A, B> map(fa: StateTKind<F, S, A>, f: (A) -> B): StateT<F, S, B> = fa.ev().map(f, FF())
+
     override fun <A, B> flatMap(fa: StateTKind<F, S, A>, f: (A) -> StateTKind<F, S, B>): StateT<F, S, B> =
             fa.ev().flatMap(f, FF())
 
