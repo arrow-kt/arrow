@@ -1,9 +1,9 @@
 ---
 layout: docs
-title: SortedMapKW
-permalink: /docs/datatypes/sortedmapkw/
+title: FreeApplicative
+permalink: /docs/free/freeapplicative/
 ---
 
-## SortedMapKW
+## FreeApplicative
 
 TODO. Meanwhile you can find a short description in the [intro to datatypes]({{ '/docs/datatypes/intro/' | relative_url }}).

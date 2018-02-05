@@ -6,7 +6,7 @@ import arrow.higherkind
 @higherkind
 data class SetKW<out A>(val set: Set<A>) : SetKWKind<A>, Set<A> by set {
 
-    fun <B> foldLeft(b: B, f: (B, A) -> B): B = this.fold(b, f)
+    fun <B> foldLeft(b: B, f: (B, A) -> B): B = fold(b, f)
 
     fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
         fun loop(fa_p: SetKW<A>): Eval<B> = when {
@@ -20,7 +20,9 @@ data class SetKW<out A>(val set: Set<A>) : SetKWKind<A>, Set<A> by set {
 
         fun <A> pure(a: A): SetKW<A> = setOf(a).k()
 
-        fun <A> empty(): SetKW<A> = emptySet<A>().k()
+        fun empty(): SetKW<Nothing> = empty
+
+        private val empty = emptySet<Nothing>().k()
 
     }
 }

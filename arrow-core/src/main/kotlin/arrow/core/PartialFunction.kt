@@ -18,17 +18,17 @@ infix fun <A, B> PartialFunction<A, B>.orElse(f: PartialFunction<A, B>): Partial
 
         }
 
-fun <A, B> PartialFunction(definetAt: (A) -> Boolean, f: (A) -> B): PartialFunction<A, B> =
+fun <A, B> PartialFunction(definedAt: (A) -> Boolean, f: (A) -> B): PartialFunction<A, B> =
         object : PartialFunction<A, B>() {
             override fun invoke(p1: A): B {
-                if (definetAt(p1)) {
+                if (definedAt(p1)) {
                     return f(p1)
                 } else {
                     throw IllegalArgumentException("Value: ($p1) isn't supported by this function")
                 }
             }
 
-            override fun isDefinedAt(p1: A) = definetAt(p1)
+            override fun isDefinedAt(a: A) = definedAt(a)
         }
 
 /**
@@ -59,13 +59,7 @@ private class Lifted<A, B>(val pf: PartialFunction<A, B>) : (A) -> Option<B> {
     override fun invoke(x: A): Option<B> = pf.andThen { Some(it) }.invokeOrElse(x, { None })
 }
 
-fun <A, B> ((A) -> B).toPartialFunction(definedAt: (A) -> Boolean): PartialFunction<A, B> =
-        object : PartialFunction<A, B>() {
-            override fun isDefinedAt(a: A): Boolean = definedAt(a)
-
-            override fun invoke(x: A): B = this@toPartialFunction(x)
-
-        }
+fun <A, B> ((A) -> B).toPartialFunction(definedAt: (A) -> Boolean): PartialFunction<A, B> = PartialFunction(definedAt, this)
 
 fun <A, B> case(ff: Tuple2<(A) -> Boolean, (A) -> B>): PartialFunction<A, B> =
         object : PartialFunction<A, B>() {
