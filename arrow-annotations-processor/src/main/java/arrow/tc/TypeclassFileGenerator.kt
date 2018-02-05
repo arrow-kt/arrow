@@ -66,7 +66,7 @@ data class SyntaxFunctionSignature(
             when (hkArgs) {
                 is HKArgs.None -> ""
                 is HKArgs.First -> {
-                    val thisArgs = listOf("this" to "") + args.drop(1).dropLast(1)
+                    val thisArgs = listOf("this" to "") + args.drop(2)
                     "${typeClass.simpleName.decapitalize()}.__name__(${thisArgs.joinToString(", ") { it.first }})"
                 }
                 is HKArgs.Unknown -> "${typeClass.simpleName.decapitalize()}.$name(${args.joinToString(", ") { it.first }})"
@@ -78,11 +78,13 @@ data class SyntaxFunctionSignature(
             val nameResolver = typeClass.clazz.nameResolver
             val typeParams = f.typeParameterList.map { nameResolver.getString(it.name) }
             val typeClassAbstractKind = nameResolver.getString(typeClass.clazz.typeParameters[0].name)
-            val args = f.valueParameterList.map {
+            val argsC = f.valueParameterList.map {
                 val argName = nameResolver.getString(it.name)
                 val argType = it.type.extractFullName(typeClass.clazz, failOnGeneric = false)
                 argName to argType
-            } + listOf("dummy" to "Unit = Unit")
+            }
+            val dummyErasureArg = listOf("dummy" to "Unit = Unit")
+            val args = if (argsC.isEmpty()) dummyErasureArg else listOf(argsC[0]) + dummyErasureArg + argsC.drop(1)
             val abstractReturnType = f.returnType.extractFullName(typeClass.clazz, failOnGeneric = false)
             val isAbstract = f.modality == ProtoBuf.Modality.ABSTRACT
             return SyntaxFunctionSignature(
