@@ -12,6 +12,8 @@ interface Monad<F> : Applicative<F>, TC {
 
     fun <A, B> flatMap(fa: HK<F, A>, f: (A) -> HK<F, B>): HK<F, B>
 
+    override fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B> = flatMap(fa, { a -> pure(f(a)) })
+
     override fun <A, B> ap(fa: HK<F, A>, ff: HK<F, (A) -> B>): HK<F, B> = flatMap(ff, { f -> map(fa, f) })
 
     fun <A> flatten(ffa: HK<F, HK<F, A>>): HK<F, A> = flatMap(ffa, { it })
