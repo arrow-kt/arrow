@@ -135,7 +135,7 @@ They are more general than the other datatypes as they combine the abstractions 
 
 #### Free
 
-[Free]({{ '/docs/patterns/free_algebras/' | relative_url }}) is a general abstraction to represent [Domain Specific Languages]([Free]({{ '/docs/patterns/free_algebras/' | relative_url }})) that can be interpreted using Effects.
+[Free]({{ '/docs/patterns/free_algebras/' | relative_url }}) is a general abstraction to represent [Domain Specific Languages]({{ '/docs/patterns/free_algebras/' | relative_url }}) that can be interpreted using Effects.
 
 - [`Free`]({{ '/docs/free/free/' | relative_url }})
 
