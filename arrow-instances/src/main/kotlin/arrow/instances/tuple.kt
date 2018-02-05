@@ -7,21 +7,35 @@ import arrow.typeclasses.*
 
 @instance(Tuple2::class)
 interface Tuple2FunctorInstance<F> : Functor<Tuple2KindPartial<F>> {
-    override fun <A, B> map(fa: Tuple2Kind<F, A>, f: (A) -> B) = fa.ev().map(f)
+    override fun <A, B> map(fa: Tuple2Kind<F, A>, f: (A) -> B) =
+            fa.ev().map(f)
 }
 
 @instance(Tuple2::class)
 interface Tuple2ApplicativeInstance<F> : Tuple2FunctorInstance<F>, Applicative<Tuple2KindPartial<F>> {
     fun MF(): Monoid<F>
-    override fun <A, B> map(fa: Tuple2Kind<F, A>, f: (A) -> B) = fa.ev().map(f)
-    override fun <A, B> ap(fa: Tuple2Kind<F, A>, ff: Tuple2Kind<F, (A) -> B>) = fa.ev().ap(ff.ev())
-    override fun <A> pure(a: A) = MF().empty() toT a
+
+    override fun <A, B> map(fa: Tuple2Kind<F, A>, f: (A) -> B) =
+            fa.ev().map(f)
+
+    override fun <A, B> ap(fa: Tuple2Kind<F, A>, ff: Tuple2Kind<F, (A) -> B>) =
+            fa.ev().ap(ff.ev())
+
+    override fun <A> pure(a: A) =
+            MF().empty() toT a
 }
 
 @instance(Tuple2::class)
 interface Tuple2MonadInstance<F> : Tuple2ApplicativeInstance<F>, Monad<Tuple2KindPartial<F>> {
-    override fun <A, B> ap(fa: Tuple2Kind<F, A>, ff: Tuple2Kind<F, (A) -> B>) = fa.ev().ap(ff)
-    override fun <A, B> flatMap(fa: Tuple2Kind<F, A>, f: (A) -> Tuple2Kind<F, B>) = fa.ev().flatMap { f(it).ev() }
+    override fun <A, B> map(fa: Tuple2Kind<F, A>, f: (A) -> B) =
+            fa.ev().map(f)
+
+    override fun <A, B> ap(fa: Tuple2Kind<F, A>, ff: Tuple2Kind<F, (A) -> B>) =
+            fa.ev().ap(ff)
+
+    override fun <A, B> flatMap(fa: Tuple2Kind<F, A>, f: (A) -> Tuple2Kind<F, B>) =
+            fa.ev().flatMap { f(it).ev() }
+
     override tailrec fun <A, B> tailRecM(a: A, f: (A) -> Tuple2Kind<F, Either<A, B>>): Tuple2<F, B> {
         val b = f(a).ev().b
         return when (b) {
@@ -33,19 +47,26 @@ interface Tuple2MonadInstance<F> : Tuple2ApplicativeInstance<F>, Monad<Tuple2Kin
 
 @instance(Tuple2::class)
 interface Tuple2ComonadInstance<F> : Tuple2FunctorInstance<F>, Comonad<Tuple2KindPartial<F>> {
-    override fun <A, B> coflatMap(fa: Tuple2Kind<F, A>, f: (Tuple2Kind<F, A>) -> B) = fa.ev().coflatMap(f)
-    override fun <A> extract(fa: Tuple2Kind<F, A>) = fa.ev().extract()
+    override fun <A, B> coflatMap(fa: Tuple2Kind<F, A>, f: (Tuple2Kind<F, A>) -> B) =
+            fa.ev().coflatMap(f)
+
+    override fun <A> extract(fa: Tuple2Kind<F, A>) =
+            fa.ev().extract()
 }
 
 @instance(Tuple2::class)
 interface Tuple2FoldableInstance<F> : Foldable<Tuple2KindPartial<F>> {
-    override fun <A, B> foldLeft(fa: Tuple2Kind<F, A>, b: B, f: (B, A) -> B) = fa.ev().foldL(b, f)
-    override fun <A, B> foldRight(fa: Tuple2Kind<F, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>) = fa.ev().foldR(lb, f)
+    override fun <A, B> foldLeft(fa: Tuple2Kind<F, A>, b: B, f: (B, A) -> B) =
+            fa.ev().foldL(b, f)
+
+    override fun <A, B> foldRight(fa: Tuple2Kind<F, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>) =
+            fa.ev().foldR(lb, f)
 }
 
 @instance(Tuple2::class)
 interface Tuple2TraverseInstance<F> : Tuple2FoldableInstance<F>, Traverse<Tuple2KindPartial<F>> {
-    override fun <G, A, B> traverse(fa: Tuple2Kind<F, A>, f: (A) -> HK<G, B>, GA: Applicative<G>) = fa.ev().run { GA.map(f(b), a::toT) }
+    override fun <G, A, B> traverse(fa: Tuple2Kind<F, A>, f: (A) -> HK<G, B>, GA: Applicative<G>) =
+            fa.ev().run { GA.map(f(b), a::toT) }
 }
 
 @instance(Tuple2::class)
