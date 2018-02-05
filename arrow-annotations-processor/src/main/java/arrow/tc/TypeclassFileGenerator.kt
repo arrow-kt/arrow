@@ -49,7 +49,7 @@ data class SyntaxFunctionSignature(
 ) {
 
     fun generate(): String {
-        val typeParamsS = tparams.joinToString(prefix = "<`", separator = "`, `", postfix = "`>")
+        val typeParamsS = if (tparams.isEmpty()) "" else tparams.joinToString(prefix = "<`", separator = "`, `", postfix = "`>")
         val argsS = args.drop(1).map { "${it.first}: ${it.second}" }.joinToString(prefix = "(`", separator = "`, `", postfix = "`)")
         return """|fun $typeParamsS ${receiver()}__name__$argsS: $retType =
                   |    ${implBody()}""".removeBackticks().replace("__name__", "`$name`").trimMargin()
@@ -59,17 +59,20 @@ data class SyntaxFunctionSignature(
             when (hkArgs) {
                 is HKArgs.None -> ""
                 is HKArgs.First -> "${args[0].second}."
-                is HKArgs.Unknown -> ""
+                is HKArgs.Unknown -> "${args[0].second}."
             }
 
     fun implBody(): String =
             when (hkArgs) {
-                is HKArgs.None -> ""
+                is HKArgs.None -> "${typeClass.simpleName.decapitalize()}.__name__(${args.drop(2).joinToString(", ")})"
                 is HKArgs.First -> {
                     val thisArgs = listOf("this" to "") + args.drop(2)
                     "${typeClass.simpleName.decapitalize()}.__name__(${thisArgs.joinToString(", ") { it.first }})"
                 }
-                is HKArgs.Unknown -> "${typeClass.simpleName.decapitalize()}.$name(${args.joinToString(", ") { it.first }})"
+                is HKArgs.Unknown -> {
+                    val thisArgs = listOf("this" to "") + args.drop(2)
+                    "${typeClass.simpleName.decapitalize()}.__name__(${thisArgs.joinToString(", ") { it.first }})"
+                }
             }
 
     companion object {
@@ -84,7 +87,16 @@ data class SyntaxFunctionSignature(
                 argName to argType
             }
             val dummyErasureArg = listOf("dummy" to "Unit = Unit")
-            val args = if (argsC.isEmpty()) dummyErasureArg else listOf(argsC[0]) + dummyErasureArg + argsC.drop(1)
+            val hkArgs = when {
+                f.valueParameterList.isEmpty() -> HKArgs.None
+                nameResolver.getString(f.getValueParameter(0).type.className).startsWith("arrow/HK") -> HKArgs.First
+                else -> HKArgs.Unknown
+            }
+            val args = when (hkArgs) {
+                HKArgs.None -> dummyErasureArg
+                    HKArgs.First -> listOf(argsC[0]) + dummyErasureArg + argsC.drop(1)
+                    HKArgs.Unknown -> listOf(argsC[0]) + dummyErasureArg + argsC.drop(1)
+            }
             val abstractReturnType = f.returnType.extractFullName(typeClass.clazz, failOnGeneric = false)
             val isAbstract = f.modality == ProtoBuf.Modality.ABSTRACT
             return SyntaxFunctionSignature(
@@ -93,11 +105,7 @@ data class SyntaxFunctionSignature(
                     name = nameResolver.getString(f.name),
                     args = args,
                     retType = abstractReturnType,
-                    hkArgs = when {
-                        f.valueParameterList.isEmpty() -> HKArgs.None
-                        nameResolver.getString(f.getValueParameter(0).type.className).startsWith("arrow/HK") -> HKArgs.First
-                        else -> HKArgs.Unknown
-                    },
+                    hkArgs = hkArgs,
                     receiverType = receiverType,
                     isAbstract = isAbstract
             )
@@ -114,7 +122,7 @@ class TypeclassFileGenerator(
 
     private fun functionSignatures(typeClass: Typeclass): List<SyntaxFunctionSignature> = typeClass.target.classOrPackageProto.functionList.map {
             SyntaxFunctionSignature.from("arrow.HK", typeClass, it)
-        }.filter { it.hkArgs == HKArgs.First }
+        }
 
     /**
      * Main entry point for higher kinds extension generation
