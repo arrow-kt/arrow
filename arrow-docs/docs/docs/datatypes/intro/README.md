@@ -21,8 +21,8 @@ It has one generic parameter `A`, representing the type of the values that `Opti
 `Option` can be specialized for any type `A` because this type does not affect its behavior.
 `Option` behaves the same for `Int`, `String` or `DomainUserClass`.
 
-The implementation of `Option` is a sealed class with two subtypes: an object `None` and a data class `Some`.
-`Some` represents presence of the value and thus it has one field containing it, and `None` represents absence.
+The implementation of `Option<A>` is a sealed class with two subtypes: an object `None` and a data class `Some<A>`.
+`Some<A>` represents presence of the value and thus it has one field containing it, and `None` represents absence.
 
 All operations over `Option` have to take into account presence or absence,
 so there is a function `fold()` that takes a continuation function per case, `() -> B` and `(A) -> B`.
