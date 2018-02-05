@@ -1,10 +1,13 @@
 package arrow.data
 
 import arrow.core.*
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
-import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.should
+import io.kotlintest.matchers.shouldBe
+import io.kotlintest.matchers.shouldThrow
+import io.kotlintest.matchers.startWith
+import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class PartialFunctionTests : UnitSpec() {
@@ -49,6 +52,15 @@ class PartialFunctionTests : UnitSpec() {
         "invokeOrElse" {
             val isEven = body.toPartialFunction(definetAt)
             listOf(1, 2, 3).map { isEven.invokeOrElse(it, "is odd") } shouldBe listOf("is odd", "is even", "is odd")
+        }
+
+        "Throw IAE" {
+            val upper = { s: String? -> s!!.toUpperCase() }.toPartialFunction { s -> s != null }
+            upper("one") shouldBe "ONE"
+            val iae = shouldThrow<IllegalArgumentException> {
+                upper(null)
+            }
+            iae.message!! should startWith("Value: (null)")
         }
 
     }
