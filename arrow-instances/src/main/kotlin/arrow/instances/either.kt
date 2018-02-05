@@ -24,6 +24,8 @@ interface EitherApplicativeInstance<L> : EitherFunctorInstance<L>, Applicative<E
 @instance(Either::class)
 interface EitherMonadInstance<L> : EitherApplicativeInstance<L>, Monad<EitherKindPartial<L>> {
 
+    override fun <A, B> map(fa: EitherKind<L, A>, f: (A) -> B): Either<L, B> = fa.ev().map(f)
+
     override fun <A, B> ap(fa: EitherKind<L, A>, ff: EitherKind<L, (A) -> B>): Either<L, B> =
             fa.ev().ap(ff)
 

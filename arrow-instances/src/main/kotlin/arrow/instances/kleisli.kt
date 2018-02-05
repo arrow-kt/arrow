@@ -40,6 +40,9 @@ interface KleisliMonadInstance<F, D> : KleisliApplicativeInstance<F, D>, Monad<K
 
     override fun FF(): Monad<F>
 
+    override fun <A, B> map(fa: KleisliKind<F, D, A>, f: (A) -> B): Kleisli<F, D, B> =
+            fa.ev().map(f, FF())
+
     override fun <A, B> flatMap(fa: KleisliKind<F, D, A>, f: (A) -> KleisliKind<F, D, B>): Kleisli<F, D, B> =
             fa.ev().flatMap(f.andThen { it.ev() }, FF())
 
