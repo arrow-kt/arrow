@@ -1,7 +1,7 @@
 package arrow.free
 
+import arrow.core.ForId
 import arrow.core.Id
-import arrow.core.IdHK
 import arrow.core.ev
 import arrow.core.functor
 import arrow.test.UnitSpec
@@ -16,16 +16,16 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class YonedaTest : UnitSpec() {
 
-    val F = Yoneda.functor<IdHK>()
+    val F = Yoneda.functor<ForId>()
 
-    val EQ = Eq<YonedaKind<IdHK, Int>> { a, b ->
+    val EQ = Eq<YonedaKind<ForId, Int>> { a, b ->
         a.ev().lower() == b.ev().lower()
     }
 
     init {
 
         "instances can be resolved implicitly" {
-            functor<YonedaKindPartial<IdHK>>() shouldNotBe null
+            functor<YonedaKindPartial<ForId>>() shouldNotBe null
         }
 
         testLaws(FunctorLaws.laws(F, { Yoneda(Id(it)) }, EQ))

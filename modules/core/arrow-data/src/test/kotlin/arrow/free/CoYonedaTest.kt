@@ -13,14 +13,14 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class CoyonedaTest : UnitSpec() {
-    val EQ: Eq<CoyonedaKind<IdHK, Int, Int>> = Eq { a, b ->
+    val EQ: Eq<CoyonedaKind<ForId, Int, Int>> = Eq { a, b ->
         a.ev().lower(Id.functor()) == b.ev().lower(Id.functor())
     }
 
     init {
 
         "instances can be resolved implicitly" {
-            functor<CoyonedaKindPartial<IdHK, Int>>() shouldNotBe null
+            functor<CoyonedaKindPartial<ForId, Int>>() shouldNotBe null
         }
 
         testLaws(FunctorLaws.laws(Coyoneda.functor(), { Coyoneda(Id(0), { it }) }, EQ))
@@ -28,7 +28,7 @@ class CoyonedaTest : UnitSpec() {
         "map should be stack-safe" {
             val loops = 10000
 
-            tailrec fun loop(n: Int, acc: Coyoneda<OptionHK, Int, Int>): Coyoneda<OptionHK, Int, Int> =
+            tailrec fun loop(n: Int, acc: Coyoneda<ForOption, Int, Int>): Coyoneda<ForOption, Int, Int> =
                     if (n <= 0) acc
                     else loop(n - 1, acc.map { it + 1 })
 

@@ -45,10 +45,10 @@ data class SequenceKW<out A> constructor(val sequence: Sequence<A>) : SequenceKW
 
         fun <A> empty(): SequenceKW<A> = emptySequence<A>().k()
 
-        fun <A, B> tailRecM(a: A, f: (A) -> HK<SequenceKWHK, Either<A, B>>): SequenceKW<B> {
+        fun <A, B> tailRecM(a: A, f: (A) -> HK<ForSequenceKW, Either<A, B>>): SequenceKW<B> {
             tailrec fun <A, B> go(
                     buf: MutableList<B>,
-                    f: (A) -> HK<SequenceKWHK, Either<A, B>>,
+                    f: (A) -> HK<ForSequenceKW, Either<A, B>>,
                     v: SequenceKW<Either<A, B>>) {
                 if (!(v.toList().isEmpty())) {
                     val head: Either<A, B> = v.first()

@@ -2,7 +2,6 @@ package arrow.data
 
 import arrow.HK
 import arrow.core.*
-import arrow.instances.monad
 import arrow.mtl.functorFilter
 import arrow.mtl.traverseFilter
 import arrow.test.UnitSpec
@@ -24,20 +23,20 @@ class OptionTTest : UnitSpec() {
         a.value() == b.value()
     }
 
-    val NELM: Monad<NonEmptyListHK> = monad<NonEmptyListHK>()
+    val NELM: Monad<ForNonEmptyList> = monad<ForNonEmptyList>()
 
     init {
 
         "instances can be resolved implicitly" {
-            functor<OptionTKindPartial<NonEmptyListHK>>() shouldNotBe null
-            applicative<OptionTKindPartial<NonEmptyListHK>>() shouldNotBe null
-            monad<OptionTKindPartial<NonEmptyListHK>>() shouldNotBe null
-            foldable<OptionTKindPartial<NonEmptyListHK>>() shouldNotBe null
-            traverse<OptionTKindPartial<NonEmptyListHK>>() shouldNotBe null
-            semigroupK<OptionTKindPartial<ListKWHK>>() shouldNotBe null
-            monoidK<OptionTKindPartial<ListKWHK>>() shouldNotBe null
-            functorFilter<OptionTKindPartial<ListKWHK>>() shouldNotBe null
-            traverseFilter<OptionTKindPartial<OptionHK>>() shouldNotBe null
+            functor<OptionTKindPartial<ForNonEmptyList>>() shouldNotBe null
+            applicative<OptionTKindPartial<ForNonEmptyList>>() shouldNotBe null
+            monad<OptionTKindPartial<ForNonEmptyList>>() shouldNotBe null
+            foldable<OptionTKindPartial<ForNonEmptyList>>() shouldNotBe null
+            traverse<OptionTKindPartial<ForNonEmptyList>>() shouldNotBe null
+            semigroupK<OptionTKindPartial<ForListKW>>() shouldNotBe null
+            monoidK<OptionTKindPartial<ForListKW>>() shouldNotBe null
+            functorFilter<OptionTKindPartial<ForListKW>>() shouldNotBe null
+            traverseFilter<OptionTKindPartial<ForOption>>() shouldNotBe null
         }
 
         testLaws(
@@ -67,25 +66,25 @@ class OptionTTest : UnitSpec() {
 
         "toLeft for Some should build a correct EitherT" {
             forAll { a: Int, b: String ->
-                OptionT.fromOption<NonEmptyListHK, Int>(Some(a)).toLeft({ b }, NELM) == EitherT.left<NonEmptyListHK, Int, String>(a, applicative())
+                OptionT.fromOption<ForNonEmptyList, Int>(Some(a)).toLeft({ b }, NELM) == EitherT.left<ForNonEmptyList, Int, String>(a, applicative())
             }
         }
 
         "toLeft for None should build a correct EitherT" {
             forAll { a: Int, b: String ->
-                OptionT.fromOption<NonEmptyListHK, Int>(None).toLeft({ b }, NELM) == EitherT.right<NonEmptyListHK, Int, String>(b, applicative())
+                OptionT.fromOption<ForNonEmptyList, Int>(None).toLeft({ b }, NELM) == EitherT.right<ForNonEmptyList, Int, String>(b, applicative())
             }
         }
 
         "toRight for Some should build a correct EitherT" {
             forAll { a: Int, b: String ->
-                OptionT.fromOption<NonEmptyListHK, String>(Some(b)).toRight({ a }, NELM) == EitherT.right<NonEmptyListHK, Int, String>(b, applicative())
+                OptionT.fromOption<ForNonEmptyList, String>(Some(b)).toRight({ a }, NELM) == EitherT.right<ForNonEmptyList, Int, String>(b, applicative())
             }
         }
 
         "toRight for None should build a correct EitherT" {
             forAll { a: Int, b: String ->
-                OptionT.fromOption<NonEmptyListHK, String>(None).toRight({ a }, NELM) == EitherT.left<NonEmptyListHK, Int, String>(a, applicative())
+                OptionT.fromOption<ForNonEmptyList, String>(None).toRight({ a }, NELM) == EitherT.left<ForNonEmptyList, Int, String>(a, applicative())
             }
         }
 

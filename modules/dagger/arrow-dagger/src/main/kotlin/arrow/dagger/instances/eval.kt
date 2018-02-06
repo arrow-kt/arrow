@@ -9,18 +9,18 @@ import dagger.Provides
 class EvalInstances {
 
     @Provides
-    fun evalFunctor(): Functor<EvalHK> = Eval.functor()
+    fun evalFunctor(): Functor<ForEval> = Eval.functor()
 
     @Provides
-    fun evalApplicative(): Applicative<EvalHK> = Eval.applicative()
+    fun evalApplicative(): Applicative<ForEval> = Eval.applicative()
 
     @Provides
-    fun evalMonad(): Monad<EvalHK> = Eval.monad()
+    fun evalMonad(): Monad<ForEval> = Eval.monad()
 
     @Provides
-    fun evalComonad(): Comonad<EvalHK> = Eval.comonad()
+    fun evalComonad(): Comonad<ForEval> = Eval.comonad()
 
     @Provides
-    fun evalBimonad(): Bimonad<EvalHK> = Eval.bimonad()
+    fun evalBimonad(): Bimonad<ForEval> = Eval.bimonad()
 
 }

@@ -9,7 +9,7 @@ import io.reactivex.BackpressureStrategy
 @instance(FlowableKW::class)
 interface FlowableKWApplicativeErrorInstance :
         FlowableKWApplicativeInstance,
-        ApplicativeError<FlowableKWHK, Throwable> {
+        ApplicativeError<ForFlowableKW, Throwable> {
     override fun <A> raiseError(e: Throwable): FlowableKW<A> =
             FlowableKW.raiseError(e)
 
@@ -21,7 +21,7 @@ interface FlowableKWApplicativeErrorInstance :
 interface FlowableKWMonadErrorInstance :
         FlowableKWApplicativeErrorInstance,
         FlowableKWMonadInstance,
-        MonadError<FlowableKWHK, Throwable> {
+        MonadError<ForFlowableKW, Throwable> {
     override fun <A, B> ap(fa: FlowableKWKind<A>, ff: FlowableKWKind<(A) -> B>): FlowableKW<B> =
             super<FlowableKWMonadInstance>.ap(fa, ff)
 
@@ -35,7 +35,7 @@ interface FlowableKWMonadErrorInstance :
 @instance(FlowableKW::class)
 interface FlowableKWMonadSuspendInstance :
         FlowableKWMonadErrorInstance,
-        MonadSuspend<FlowableKWHK> {
+        MonadSuspend<ForFlowableKW> {
     override fun <A> suspend(fa: () -> FlowableKWKind<A>): FlowableKW<A> =
             FlowableKW.suspend(fa)
 
@@ -45,7 +45,7 @@ interface FlowableKWMonadSuspendInstance :
 @instance(FlowableKW::class)
 interface FlowableKWAsyncInstance :
         FlowableKWMonadSuspendInstance,
-        Async<FlowableKWHK> {
+        Async<ForFlowableKW> {
     override fun <A> async(fa: Proc<A>): FlowableKW<A> =
             FlowableKW.async(fa, BS())
 }
@@ -53,7 +53,7 @@ interface FlowableKWAsyncInstance :
 @instance(FlowableKW::class)
 interface FlowableKWEffectInstance :
         FlowableKWAsyncInstance,
-        Effect<FlowableKWHK> {
+        Effect<ForFlowableKW> {
     override fun <A> runAsync(fa: FlowableKWKind<A>, cb: (Either<Throwable, A>) -> FlowableKWKind<Unit>): FlowableKW<Unit> =
             fa.ev().runAsync(cb)
 }

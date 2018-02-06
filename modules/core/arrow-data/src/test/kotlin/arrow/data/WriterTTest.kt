@@ -23,19 +23,19 @@ class WriterTTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            functor<WriterTKindPartial<IdHK, Int>>() shouldNotBe null
-            applicative<WriterTKindPartial<IdHK, Int>>() shouldNotBe null
-            monad<WriterTKindPartial<IdHK, Int>>() shouldNotBe null
-            monadFilter<WriterTKindPartial<OptionHK, Int>>() shouldNotBe null
-            monadWriter<WriterTKindPartial<OptionHK, Int>, Int>() shouldNotBe null
-            semigroupK<WriterTKindPartial<ListKWHK, Int>>() shouldNotBe null
-            monoidK<WriterTKindPartial<ListKWHK, Int>>() shouldNotBe null
+            functor<WriterTKindPartial<ForId, Int>>() shouldNotBe null
+            applicative<WriterTKindPartial<ForId, Int>>() shouldNotBe null
+            monad<WriterTKindPartial<ForId, Int>>() shouldNotBe null
+            monadFilter<WriterTKindPartial<ForOption, Int>>() shouldNotBe null
+            monadWriter<WriterTKindPartial<ForOption, Int>, Int>() shouldNotBe null
+            semigroupK<WriterTKindPartial<ForListKW, Int>>() shouldNotBe null
+            monoidK<WriterTKindPartial<ForListKW, Int>>() shouldNotBe null
         }
 
         testLaws(
             MonadLaws.laws(WriterT.monad(NonEmptyList.monad(), IntMonoid), Eq.any()),
             MonoidKLaws.laws(
-                WriterT.monoidK<ListKWHK, Int>(ListKW.monoidK()),
+                WriterT.monoidK<ForListKW, Int>(ListKW.monoidK()),
                 WriterT.applicative(),
                 Eq { a, b ->
                     a.ev().value == b.ev().value
@@ -62,8 +62,8 @@ class WriterTTest : UnitSpec() {
 
             MonadFilterLaws.laws(WriterT.monadFilter(Option.monadFilter(), IntMonoid),
                 { WriterT(Option(Tuple2(it, it))) },
-                object : Eq<HK<WriterTKindPartial<OptionHK, Int>, Int>> {
-                    override fun eqv(a: HK<WriterTKindPartial<OptionHK, Int>, Int>, b: HK<WriterTKindPartial<OptionHK, Int>, Int>): Boolean =
+                object : Eq<HK<WriterTKindPartial<ForOption, Int>, Int>> {
+                    override fun eqv(a: HK<WriterTKindPartial<ForOption, Int>, Int>, b: HK<WriterTKindPartial<ForOption, Int>, Int>): Boolean =
                             a.ev().value.ev().let { optionA: Option<Tuple2<Int, Int>> ->
                                 val optionB = b.ev().value.ev()
                                 optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Int> -> optionB.fold({ false }, { value == it }) })

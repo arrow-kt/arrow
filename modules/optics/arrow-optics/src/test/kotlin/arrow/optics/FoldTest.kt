@@ -14,8 +14,8 @@ class FoldTest : UnitSpec() {
 
     init {
 
-        val intFold = Fold.fromFoldable<ListKWHK, Int>()
-        val stringFold = Fold.fromFoldable<ListKWHK, String>()
+        val intFold = Fold.fromFoldable<ForListKW, Int>()
+        val stringFold = Fold.fromFoldable<ForListKW, String>()
 
         "Fold select a list that contains one" {
             val select = Fold.select<List<Int>> { it.contains(1) }

@@ -5,13 +5,13 @@ import arrow.core.*
 import arrow.typeclasses.*
 
 @instance(Eval::class)
-interface EvalFunctorInstance : Functor<EvalHK> {
+interface EvalFunctorInstance : Functor<ForEval> {
     override fun <A, B> map(fa: EvalKind<A>, f: kotlin.Function1<A, B>): Eval<B> =
             fa.ev().map(f)
 }
 
 @instance(Eval::class)
-interface EvalApplicativeInstance : Applicative<EvalHK> {
+interface EvalApplicativeInstance : Applicative<ForEval> {
     override fun <A, B> ap(fa: EvalKind<A>, ff: EvalKind<kotlin.Function1<A, B>>): Eval<B> =
             fa.ev().ap(ff)
 
@@ -23,7 +23,7 @@ interface EvalApplicativeInstance : Applicative<EvalHK> {
 }
 
 @instance(Eval::class)
-interface EvalMonadInstance : Monad<EvalHK> {
+interface EvalMonadInstance : Monad<ForEval> {
     override fun <A, B> ap(fa: EvalKind<A>, ff: EvalKind<kotlin.Function1<A, B>>): Eval<B> =
             fa.ev().ap(ff)
 
@@ -41,7 +41,7 @@ interface EvalMonadInstance : Monad<EvalHK> {
 }
 
 @instance(Eval::class)
-interface EvalComonadInstance : Comonad<EvalHK> {
+interface EvalComonadInstance : Comonad<ForEval> {
     override fun <A, B> coflatMap(fa: EvalKind<A>, f: kotlin.Function1<EvalKind<A>, B>): Eval<B> =
             fa.ev().coflatMap(f)
 
@@ -53,7 +53,7 @@ interface EvalComonadInstance : Comonad<EvalHK> {
 }
 
 @instance(Eval::class)
-interface EvalBimonadInstance : Bimonad<EvalHK> {
+interface EvalBimonadInstance : Bimonad<ForEval> {
     override fun <A, B> ap(fa: EvalKind<A>, ff: EvalKind<kotlin.Function1<A, B>>): Eval<B> =
             fa.ev().ap(ff)
 

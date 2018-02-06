@@ -18,20 +18,20 @@ class SequenceKWTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            functor<SequenceKWHK>() shouldNotBe null
-            applicative<SequenceKWHK>() shouldNotBe null
-            monad<SequenceKWHK>() shouldNotBe null
-            foldable<SequenceKWHK>() shouldNotBe null
-            traverse<SequenceKWHK>() shouldNotBe null
-            semigroupK<SequenceKWHK>() shouldNotBe null
-            monoidK<SequenceKWHK>() shouldNotBe null
+            functor<ForSequenceKW>() shouldNotBe null
+            applicative<ForSequenceKW>() shouldNotBe null
+            monad<ForSequenceKW>() shouldNotBe null
+            foldable<ForSequenceKW>() shouldNotBe null
+            traverse<ForSequenceKW>() shouldNotBe null
+            semigroupK<ForSequenceKW>() shouldNotBe null
+            monoidK<ForSequenceKW>() shouldNotBe null
             semigroup<SequenceKW<Int>>() shouldNotBe null
             monoid<SequenceKW<Int>>() shouldNotBe null
             eq<SequenceKW<Int>>() shouldNotBe null
         }
 
-        val eq: Eq<HK<SequenceKWHK, Int>> = object : Eq<HK<SequenceKWHK, Int>> {
-            override fun eqv(a: HK<SequenceKWHK, Int>, b: HK<SequenceKWHK, Int>): Boolean =
+        val eq: Eq<HK<ForSequenceKW, Int>> = object : Eq<HK<ForSequenceKW, Int>> {
+            override fun eqv(a: HK<ForSequenceKW, Int>, b: HK<ForSequenceKW, Int>): Boolean =
                     a.toList() == b.toList()
         }
 

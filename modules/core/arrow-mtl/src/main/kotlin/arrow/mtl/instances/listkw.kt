@@ -8,7 +8,7 @@ import arrow.mtl.MonadCombine
 import arrow.mtl.MonadFilter
 
 @instance(ListKW::class)
-interface ListKWMonadCombineInstance : MonadCombine<ListKWHK> {
+interface ListKWMonadCombineInstance : MonadCombine<ForListKW> {
     override fun <A> empty(): ListKW<A> =
             ListKW.empty()
 
@@ -38,7 +38,7 @@ interface ListKWMonadCombineInstance : MonadCombine<ListKWHK> {
 }
 
 @instance(ListKW::class)
-interface ListKWFunctorFilterInstance : FunctorFilter<ListKWHK> {
+interface ListKWFunctorFilterInstance : FunctorFilter<ForListKW> {
     override fun <A, B> mapFilter(fa: ListKWKind<A>, f: kotlin.Function1<A, Option<B>>): ListKW<B> =
             fa.ev().mapFilter(f)
 
@@ -47,7 +47,7 @@ interface ListKWFunctorFilterInstance : FunctorFilter<ListKWHK> {
 }
 
 @instance(ListKW::class)
-interface ListKWMonadFilterInstance : MonadFilter<ListKWHK> {
+interface ListKWMonadFilterInstance : MonadFilter<ForListKW> {
     override fun <A> empty(): ListKW<A> =
             ListKW.empty()
 

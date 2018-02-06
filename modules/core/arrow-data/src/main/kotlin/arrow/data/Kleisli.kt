@@ -1,8 +1,9 @@
 package arrow.data
 
-import arrow.*
+import arrow.HK
 import arrow.core.Either
 import arrow.core.Tuple2
+import arrow.higherkind
 import arrow.typeclasses.*
 
 /**
@@ -169,7 +170,7 @@ typealias ReaderTFun<F, D, A> = KleisliFun<F, D, A>
  *
  * @see KleisliHK
  */
-typealias ReaderTHK = KleisliHK
+typealias ForReaderT = ForKleisli
 
 /**
  * Alias ReaderTKind for [KleisliKind]

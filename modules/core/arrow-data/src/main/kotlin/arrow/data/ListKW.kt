@@ -50,7 +50,7 @@ data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A>
         @Suppress("UNCHECKED_CAST")
         private tailrec fun <A, B> go(
                 buf: ArrayList<B>,
-                f: (A) -> HK<ListKWHK, Either<A, B>>,
+                f: (A) -> HK<ForListKW, Either<A, B>>,
                 v: ListKW<Either<A, B>>) {
             if (!v.isEmpty()) {
                 val head: Either<A, B> = v.first()
@@ -64,7 +64,7 @@ data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A>
             }
         }
 
-        fun <A, B> tailRecM(a: A, f: (A) -> HK<ListKWHK, Either<A, B>>): ListKW<B> {
+        fun <A, B> tailRecM(a: A, f: (A) -> HK<ForListKW, Either<A, B>>): ListKW<B> {
             val buf = ArrayList<B>()
             go(buf, f, f(a).ev())
             return ListKW(buf)

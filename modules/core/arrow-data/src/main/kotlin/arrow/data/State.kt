@@ -7,27 +7,27 @@ import arrow.typeclasses.monad
 /**
  * Alias that represents stateful computation of the form `(S) -> Tuple2<S, A>`.
  */
-typealias StateFun<S, A> = StateTFun<IdHK, S, A>
+typealias StateFun<S, A> = StateTFun<ForId, S, A>
 
 /**
  * Alias that represents wrapped stateful computation in context `Id`.
  */
-typealias StateFunKind<S, A> = StateTFunKind<IdHK, S, A>
+typealias StateFunKind<S, A> = StateTFunKind<ForId, S, A>
 
 /**
  * Alias for StateHK
  */
-typealias StateHK = StateTHK
+typealias ForState = ForStateT
 
 /**
  * Alias for StateKind
  */
-typealias StateKind<S, A> = StateTKind<IdHK, S, A>
+typealias StateKind<S, A> = StateTKind<ForId, S, A>
 
 /**
  * Alias to partially apply type parameters [S] to [State]
  */
-typealias StateKindPartial<S> = StateTKindPartial<IdHK, S>
+typealias StateKindPartial<S> = StateTKindPartial<ForId, S>
 
 /**
  * `State<S, A>` is a stateful computation that yields a value of type `A`.
@@ -35,11 +35,11 @@ typealias StateKindPartial<S> = StateTKindPartial<IdHK, S>
  * @param S the state we are preforming computation upon.
  * @param A current value of computation.
  */
-typealias State<S, A> = StateT<IdHK, S, A>
+typealias State<S, A> = StateT<ForId, S, A>
 
 /**
  * Constructor for State.
- * State<S, A> is an alias for IndexedStateT<IdHK, S, S, A>
+ * State<S, A> is an alias for IndexedStateT<ForId, S, S, A>
  *
  * @param run the stateful function to wrap with [State].
  */
@@ -47,12 +47,12 @@ typealias State<S, A> = StateT<IdHK, S, A>
 fun <S, A> State(run: (S) -> Tuple2<S, A>): State<S, A> = StateT(Id(run.andThen { Id(it) }))
 
 /**
- * Syntax for constructing a `StateT<IdHK, S, A>` from a function `(S) -> Tuple2<S, A>`
+ * Syntax for constructing a `StateT<ForId, S, A>` from a function `(S) -> Tuple2<S, A>`
  */
 fun <S, A> StateFun<S, A>.toState(): State<S, A> = State(this)
 
 /**
- * Syntax for constructing a `StateT<IdHK, S, A>` from a function `(S) -> Tuple2<S, A>`
+ * Syntax for constructing a `StateT<ForId, S, A>` from a function `(S) -> Tuple2<S, A>`
  */
 fun <S, A> StateFunKind<S, A>.toState(): State<S, A> = State(this)
 
@@ -62,28 +62,28 @@ fun <S, T, P1, R> State<S, T>.map(sx: State<S, P1>, f: (T, P1) -> R): State<S, R
 fun <S, T, R> State<S, T>.map(f: (T) -> R): State<S, R> = flatMap({ t -> StateApi.pure<S, R>(f(t)) }, monad()).ev()
 
 /**
- * Alias for [StateT.run] `StateT<IdHK, S, A>`
+ * Alias for [StateT.run] `StateT<ForId, S, A>`
  *
  * @param initial state to start stateful computation.
  */
-fun <S, A> StateT<IdHK, S, A>.run(initial: S): Tuple2<S, A> = run(initial, monad()).value()
+fun <S, A> StateT<ForId, S, A>.run(initial: S): Tuple2<S, A> = run(initial, monad()).value()
 
 /**
- * Alias for [StateT.runA] `StateT<IdHK, S, A>`
+ * Alias for [StateT.runA] `StateT<ForId, S, A>`
  *
  * @param initial state to start stateful computation.
  */
-fun <S, A> StateT<IdHK, S, A>.runA(initial: S): A = run(initial).b
+fun <S, A> StateT<ForId, S, A>.runA(initial: S): A = run(initial).b
 
 /**
- * Alias for [StateT.runS] `StateT<IdHK, S, A>`
+ * Alias for [StateT.runS] `StateT<ForId, S, A>`
  *
  * @param initial state to start stateful computation.
  */
-fun <S, A> StateT<IdHK, S, A>.runS(initial: S): S = run(initial).a
+fun <S, A> StateT<ForId, S, A>.runS(initial: S): S = run(initial).a
 
 /**
- * Alias for StateId to make working with `StateT<IdHK, S, A>` more elegant.
+ * Alias for StateId to make working with `StateT<ForId, S, A>` more elegant.
  */
 @Suppress("FunctionName")
 fun State() = StateApi

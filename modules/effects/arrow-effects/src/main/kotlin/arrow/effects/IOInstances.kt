@@ -9,7 +9,7 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 
 @instance(IO::class)
-interface IOApplicativeErrorInstance : IOApplicativeInstance, ApplicativeError<IOHK, Throwable> {
+interface IOApplicativeErrorInstance : IOApplicativeInstance, ApplicativeError<ForIO, Throwable> {
     override fun <A> attempt(fa: IOKind<A>): IO<Either<Throwable, A>> =
             fa.ev().attempt()
 
@@ -21,7 +21,7 @@ interface IOApplicativeErrorInstance : IOApplicativeInstance, ApplicativeError<I
 }
 
 @instance(IO::class)
-interface IOMonadErrorInstance : IOApplicativeErrorInstance, IOMonadInstance, MonadError<IOHK, Throwable> {
+interface IOMonadErrorInstance : IOApplicativeErrorInstance, IOMonadInstance, MonadError<ForIO, Throwable> {
     override fun <A, B> ap(fa: IOKind<A>, ff: IOKind<(A) -> B>): IO<B> =
             super<IOMonadInstance>.ap(fa, ff).ev()
 
@@ -33,7 +33,7 @@ interface IOMonadErrorInstance : IOApplicativeErrorInstance, IOMonadInstance, Mo
 }
 
 @instance(IO::class)
-interface IOMonadSuspendInstance : IOMonadErrorInstance, MonadSuspend<IOHK> {
+interface IOMonadSuspendInstance : IOMonadErrorInstance, MonadSuspend<ForIO> {
     override fun <A> suspend(fa: () -> IOKind<A>): IO<A> =
             IO.suspend(fa)
 
@@ -41,7 +41,7 @@ interface IOMonadSuspendInstance : IOMonadErrorInstance, MonadSuspend<IOHK> {
 }
 
 @instance(IO::class)
-interface IOAsyncInstance : IOMonadSuspendInstance, Async<IOHK> {
+interface IOAsyncInstance : IOMonadSuspendInstance, Async<ForIO> {
     override fun <A> async(fa: Proc<A>): IO<A> =
             IO.async(fa)
 
@@ -50,13 +50,13 @@ interface IOAsyncInstance : IOMonadSuspendInstance, Async<IOHK> {
 }
 
 @instance(IO::class)
-interface IOEffectInstance : IOAsyncInstance, Effect<IOHK> {
-    override fun <A> runAsync(fa: HK<IOHK, A>, cb: (Either<Throwable, A>) -> IOKind<Unit>): IO<Unit> =
+interface IOEffectInstance : IOAsyncInstance, Effect<ForIO> {
+    override fun <A> runAsync(fa: HK<ForIO, A>, cb: (Either<Throwable, A>) -> IOKind<Unit>): IO<Unit> =
             fa.ev().runAsync(cb)
 }
 
 @instance(IO::class)
-interface IOMonoidInstance<A> : Monoid<HK<IOHK, A>>, Semigroup<HK<IOHK, A>> {
+interface IOMonoidInstance<A> : Monoid<HK<ForIO, A>>, Semigroup<HK<ForIO, A>> {
 
     fun SM(): Monoid<A>
 
@@ -67,7 +67,7 @@ interface IOMonoidInstance<A> : Monoid<HK<IOHK, A>>, Semigroup<HK<IOHK, A>> {
 }
 
 @instance(IO::class)
-interface IOSemigroupInstance<A> : Semigroup<HK<IOHK, A>> {
+interface IOSemigroupInstance<A> : Semigroup<HK<ForIO, A>> {
 
     fun SG(): Semigroup<A>
 

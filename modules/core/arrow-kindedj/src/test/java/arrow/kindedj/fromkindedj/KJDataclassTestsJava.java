@@ -17,7 +17,7 @@ public class KJDataclassTestsJava {
 
     @Test
     public void hk1CanBeConvertedToArrow() {
-        final Convert.FromKindedJToArrow<KJDataclassHK, Integer> hkKindedJ = Convert.fromKindedJ(kinded);
+        final Convert.FromKindedJToArrow<ForKJDataclass, Integer> hkKindedJ = Convert.fromKindedJ(kinded);
         assertEquals(KJDataclassKindedJShow.INSTANCE.show(kinded), KJDataclassArrowShow.INSTANCE.show(hkKindedJ));
     }
 }

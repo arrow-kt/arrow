@@ -15,7 +15,7 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class IOTest : UnitSpec() {
-    fun <A> EQ(): Eq<HK<IOHK, A>> = Eq { a, b ->
+    fun <A> EQ(): Eq<HK<ForIO, A>> = Eq { a, b ->
         Option.eq(Eq.any()).eqv(a.ev().attempt().unsafeRunTimed(60.seconds), b.ev().attempt().unsafeRunTimed(60.seconds))
     }
 
@@ -23,14 +23,14 @@ class IOTest : UnitSpec() {
         testLaws(AsyncLaws.laws(IO.async(), EQ(), EQ()))
 
         "instances can be resolved implicitly" {
-            functor<IOHK>() shouldNotBe null
-            applicative<IOHK>() shouldNotBe null
-            monad<IOHK>() shouldNotBe null
-            applicativeError<IOHK, Throwable>() shouldNotBe null
-            monadError<IOHK, Throwable>() shouldNotBe null
-            monadSuspend<IOHK>() shouldNotBe null
-            async<IOHK>() shouldNotBe null
-            effect<IOHK>() shouldNotBe null
+            functor<ForIO>() shouldNotBe null
+            applicative<ForIO>() shouldNotBe null
+            monad<ForIO>() shouldNotBe null
+            applicativeError<ForIO, Throwable>() shouldNotBe null
+            monadError<ForIO, Throwable>() shouldNotBe null
+            monadSuspend<ForIO>() shouldNotBe null
+            async<ForIO>() shouldNotBe null
+            effect<ForIO>() shouldNotBe null
             semigroup<IOKind<Int>>() shouldNotBe null
             monoid<IOKind<Int>>() shouldNotBe null
         }

@@ -17,7 +17,7 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class DeferredKWTest : UnitSpec() {
-    fun <A> EQ(): Eq<HK<DeferredKWHK, A>> = Eq { a, b ->
+    fun <A> EQ(): Eq<HK<ForDeferredKW, A>> = Eq { a, b ->
         a.unsafeAttemptSync() == b.unsafeAttemptSync()
     }
 
@@ -25,14 +25,14 @@ class DeferredKWTest : UnitSpec() {
         testLaws(AsyncLaws.laws(DeferredKW.async(), EQ(), EQ()))
 
         "instances can be resolved implicitly"{
-            functor<DeferredKWHK>() shouldNotBe null
-            applicative<DeferredKWHK>() shouldNotBe null
-            monad<DeferredKWHK>() shouldNotBe null
-            applicativeError<DeferredKWHK, Throwable>() shouldNotBe null
-            monadError<DeferredKWHK, Throwable>() shouldNotBe null
-            monadSuspend<DeferredKWHK>() shouldNotBe null
-            async<DeferredKWHK>() shouldNotBe null
-            effect<DeferredKWHK>() shouldNotBe null
+            functor<ForDeferredKW>() shouldNotBe null
+            applicative<ForDeferredKW>() shouldNotBe null
+            monad<ForDeferredKW>() shouldNotBe null
+            applicativeError<ForDeferredKW, Throwable>() shouldNotBe null
+            monadError<ForDeferredKW, Throwable>() shouldNotBe null
+            monadSuspend<ForDeferredKW>() shouldNotBe null
+            async<ForDeferredKW>() shouldNotBe null
+            effect<ForDeferredKW>() shouldNotBe null
         }
 
         "DeferredKW is awaitable" {

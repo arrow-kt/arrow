@@ -2,7 +2,7 @@ package arrow.instances
 
 import arrow.HK
 import arrow.core.Either
-import arrow.core.IdHK
+import arrow.core.ForId
 import arrow.core.Tuple2
 import arrow.data.*
 import arrow.instance
@@ -78,15 +78,15 @@ interface StateTMonadErrorInstance<F, S, E> : StateTApplicativeErrorInstance<F, 
 /**
  * Alias for[StateT.Companion.applicative]
  */
-fun <S> StateApi.applicative(): Applicative<StateTKindPartial<IdHK, S>> = StateT.applicative<IdHK, S>(arrow.typeclasses.monad<IdHK>(), dummy = Unit)
+fun <S> StateApi.applicative(): Applicative<StateTKindPartial<ForId, S>> = StateT.applicative<ForId, S>(arrow.typeclasses.monad<ForId>(), dummy = Unit)
 
 /**
  * Alias for [StateT.Companion.functor]
  */
-fun <S> StateApi.functor(): Functor<StateTKindPartial<IdHK, S>> = StateT.functor<IdHK, S>(arrow.typeclasses.functor<IdHK>(), dummy = Unit)
+fun <S> StateApi.functor(): Functor<StateTKindPartial<ForId, S>> = StateT.functor<ForId, S>(arrow.typeclasses.functor<ForId>(), dummy = Unit)
 
 /**
  * Alias for [StateT.Companion.monad]
  */
-fun <S> StateApi.monad(): Monad<StateTKindPartial<IdHK, S>> = StateT.monad<IdHK, S>(arrow.typeclasses.monad<IdHK>(), dummy = Unit)
+fun <S> StateApi.monad(): Monad<StateTKindPartial<ForId, S>> = StateT.monad<ForId, S>(arrow.typeclasses.monad<ForId>(), dummy = Unit)
 

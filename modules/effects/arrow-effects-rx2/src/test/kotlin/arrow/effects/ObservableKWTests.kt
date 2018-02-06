@@ -42,16 +42,16 @@ class ObservableKWTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            functor<ObservableKWHK>() shouldNotBe null
-            applicative<ObservableKWHK>() shouldNotBe null
-            monad<ObservableKWHK>() shouldNotBe null
-            applicativeError<ObservableKWHK, Unit>() shouldNotBe null
-            monadError<ObservableKWHK, Unit>() shouldNotBe null
-            monadSuspend<ObservableKWHK>() shouldNotBe null
-            async<ObservableKWHK>() shouldNotBe null
-            effect<ObservableKWHK>() shouldNotBe null
-            foldable<ObservableKWHK>() shouldNotBe null
-            traverse<ObservableKWHK>() shouldNotBe null
+            functor<ForObservableKW>() shouldNotBe null
+            applicative<ForObservableKW>() shouldNotBe null
+            monad<ForObservableKW>() shouldNotBe null
+            applicativeError<ForObservableKW, Unit>() shouldNotBe null
+            monadError<ForObservableKW, Unit>() shouldNotBe null
+            monadSuspend<ForObservableKW>() shouldNotBe null
+            async<ForObservableKW>() shouldNotBe null
+            effect<ForObservableKW>() shouldNotBe null
+            foldable<ForObservableKW>() shouldNotBe null
+            traverse<ForObservableKW>() shouldNotBe null
         }
 
         testLaws(AsyncLaws.laws(ObservableKW.async(), EQ(), EQ()))

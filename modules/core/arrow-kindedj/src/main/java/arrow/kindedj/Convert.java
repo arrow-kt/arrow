@@ -15,7 +15,7 @@ public class Convert {
         return new FromArrowToKindedJ<>(hk);
     }
 
-    public static class FromKindedJToArrow<F, A> implements HK<HK<ConvertHK, F>, A> {
+    public static class FromKindedJToArrow<F, A> implements HK<HK<ForConvert, F>, A> {
 
         @NotNull
         private final io.kindedj.Hk<F, A> hk;
@@ -25,7 +25,7 @@ public class Convert {
         }
 
         @NotNull
-        public HK<HK<ConvertHK, F>, A> toArrow() {
+        public HK<HK<ForConvert, F>, A> toArrow() {
             return this;
         }
 
@@ -35,7 +35,7 @@ public class Convert {
         }
     }
 
-    public static class FromArrowToKindedJ<F, A> implements io.kindedj.Hk<io.kindedj.Hk<ConvertHK, F>, A> {
+    public static class FromArrowToKindedJ<F, A> implements io.kindedj.Hk<io.kindedj.Hk<ForConvert, F>, A> {
 
         @NotNull
         private final HK<F, A> hk;
@@ -50,7 +50,7 @@ public class Convert {
         }
 
         @NotNull
-        public io.kindedj.Hk<io.kindedj.Hk<ConvertHK, F>, A> toKindedJ() {
+        public io.kindedj.Hk<io.kindedj.Hk<ForConvert, F>, A> toKindedJ() {
             return this;
         }
     }

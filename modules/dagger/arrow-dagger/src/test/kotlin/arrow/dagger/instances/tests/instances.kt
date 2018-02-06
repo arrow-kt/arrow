@@ -1,9 +1,9 @@
 package arrow.dagger.instances.tests
 
 import arrow.core.EitherKindPartial
-import arrow.core.EvalHK
-import arrow.core.IdHK
-import arrow.core.OptionHK
+import arrow.core.ForEval
+import arrow.core.ForId
+import arrow.core.ForOption
 import arrow.dagger.instances.*
 import arrow.data.*
 import arrow.typeclasses.*
@@ -12,22 +12,22 @@ import dagger.Module
 import javax.inject.Singleton
 
 @Module
-class LocalCoproductInstances : CoproductInstances<OptionHK, ListKWHK>()
+class LocalCoproductInstances : CoproductInstances<ForOption, ForListKW>()
 
 @Module
 class LocalEitherInstances : EitherInstances<Unit>()
 
 @Module
-class LocalEitherTInstances : EitherTInstances<OptionHK, Unit>()
+class LocalEitherTInstances : EitherTInstances<ForOption, Unit>()
 
 @Module
-class LocalOptionTTInstances : OptionTInstances<OptionHK>()
+class LocalOptionTTInstances : OptionTInstances<ForOption>()
 
 @Module
-class LocalFunction1Instances : Function1Instances<OptionHK>()
+class LocalFunction1Instances : Function1Instances<ForOption>()
 
 @Module
-class LocalKleisliInstances : KleisliInstances<OptionHK, Unit>()
+class LocalKleisliInstances : KleisliInstances<ForOption, Unit>()
 
 @Module
 class LocalMapKWInstances : MapKWInstances<String>()
@@ -36,10 +36,10 @@ class LocalMapKWInstances : MapKWInstances<String>()
 class LocalSortedMapKWInstances : SortedMapKWInstances<String>()
 
 @Module
-class LocalStateTInstances : StateTInstances<OptionHK, Unit>()
+class LocalStateTInstances : StateTInstances<ForOption, Unit>()
 
-typealias F = OptionHK
-typealias G = ListKWHK
+typealias F = ForOption
+typealias G = ForListKW
 typealias L = Unit
 typealias D = Unit
 typealias S = Unit
@@ -82,47 +82,47 @@ interface Runtime {
     fun eitherTFoldable(): Foldable<EitherTKindPartial<F, L>>
     fun eitherTTraverse(): Traverse<EitherTKindPartial<F, L>>
     fun eitherTSemigroupK(): SemigroupK<EitherTKindPartial<F, L>>
-    fun evalFunctor(): Functor<EvalHK>
-    fun evalApplicative(): Applicative<EvalHK>
-    fun evalMonad(): Monad<EvalHK>
-    fun evalComonad(): Comonad<EvalHK>
-    fun evalBimonad(): Bimonad<EvalHK>
-    fun function0Functor(): Functor<Function0HK>
-    fun function0Applicative(): Applicative<Function0HK>
-    fun function0Monad(): Monad<Function0HK>
-    fun function0Comonad(): Comonad<Function0HK>
-    fun function0Bimonad(): Bimonad<Function0HK>
+    fun evalFunctor(): Functor<ForEval>
+    fun evalApplicative(): Applicative<ForEval>
+    fun evalMonad(): Monad<ForEval>
+    fun evalComonad(): Comonad<ForEval>
+    fun evalBimonad(): Bimonad<ForEval>
+    fun function0Functor(): Functor<ForFunction0>
+    fun function0Applicative(): Applicative<ForFunction0>
+    fun function0Monad(): Monad<ForFunction0>
+    fun function0Comonad(): Comonad<ForFunction0>
+    fun function0Bimonad(): Bimonad<ForFunction0>
     fun function1Functor(): Functor<Function1KindPartial<F>>
     fun function1Applicative(): Applicative<Function1KindPartial<F>>
     fun function1Monad(): Monad<Function1KindPartial<F>>
-    fun idFunctor(): Functor<IdHK>
-    fun idApplicative(): Applicative<IdHK>
-    fun idMonad(): Monad<IdHK>
-    fun idComonad(): Comonad<IdHK>
-    fun idBimonad(): Bimonad<IdHK>
+    fun idFunctor(): Functor<ForId>
+    fun idApplicative(): Applicative<ForId>
+    fun idMonad(): Monad<ForId>
+    fun idComonad(): Comonad<ForId>
+    fun idBimonad(): Bimonad<ForId>
     fun kleisliFunctor(): Functor<KleisliKindPartial<F, D>>
     fun kleisliApplicative(): Applicative<KleisliKindPartial<F, D>>
     fun kleisliMonad(): Monad<KleisliKindPartial<F, D>>
     fun kleisliApplicativeError(): ApplicativeError<KleisliKindPartial<F, D>, D>
     fun kleisliMonadError(): MonadError<KleisliKindPartial<F, D>, D>
-    fun listKWFunctor(): Functor<ListKWHK>
-    fun listKWApplicative(): Applicative<ListKWHK>
-    fun listKWMonad(): Monad<ListKWHK>
-    fun listKWFoldable(): Foldable<ListKWHK>
-    fun listKWTraverse(): Traverse<ListKWHK>
-    fun listKWSemigroupK(): SemigroupK<ListKWHK>
-    fun listKWMonoidK(): MonoidK<ListKWHK>
+    fun listKWFunctor(): Functor<ForListKW>
+    fun listKWApplicative(): Applicative<ForListKW>
+    fun listKWMonad(): Monad<ForListKW>
+    fun listKWFoldable(): Foldable<ForListKW>
+    fun listKWTraverse(): Traverse<ForListKW>
+    fun listKWSemigroupK(): SemigroupK<ForListKW>
+    fun listKWMonoidK(): MonoidK<ForListKW>
     fun mapKWFunctor(): Functor<MapKWKindPartial<K>>
     fun mapKWFoldable(): Foldable<MapKWKindPartial<K>>
     fun mapKWTraverse(): Traverse<MapKWKindPartial<K>>
-    fun nonEmptyListFunctor(): Functor<NonEmptyListHK>
-    fun nonEmptyListApplicative(): Applicative<NonEmptyListHK>
-    fun nonEmptyListMonad(): Monad<NonEmptyListHK>
-    fun nonEmptyListFoldable(): Foldable<NonEmptyListHK>
-    fun nonEmptyListTraverse(): Traverse<NonEmptyListHK>
-    fun nonEmptyListSemigroupK(): SemigroupK<NonEmptyListHK>
-    fun nonEmptyListComonad(): Comonad<NonEmptyListHK>
-    fun nonEmptyListBimonad(): Bimonad<NonEmptyListHK>
+    fun nonEmptyListFunctor(): Functor<ForNonEmptyList>
+    fun nonEmptyListApplicative(): Applicative<ForNonEmptyList>
+    fun nonEmptyListMonad(): Monad<ForNonEmptyList>
+    fun nonEmptyListFoldable(): Foldable<ForNonEmptyList>
+    fun nonEmptyListTraverse(): Traverse<ForNonEmptyList>
+    fun nonEmptyListSemigroupK(): SemigroupK<ForNonEmptyList>
+    fun nonEmptyListComonad(): Comonad<ForNonEmptyList>
+    fun nonEmptyListBimonad(): Bimonad<ForNonEmptyList>
     fun byteSemigroup(): Semigroup<Byte>
     fun byteMonoid(): Monoid<Byte>
     fun byteOrder(): Order<Byte>
@@ -147,12 +147,12 @@ interface Runtime {
     fun floatMonoid(): Monoid<Float>
     fun floatOrder(): Order<Float>
     fun floatEq(): Eq<@JvmSuppressWildcards Float>
-    fun optionFunctor(): Functor<OptionHK>
-    fun optionApplicative(): Applicative<OptionHK>
-    fun optionMonad(): Monad<OptionHK>
-    fun optionMonadError(): MonadError<OptionHK, Unit>
-    fun optionFoldable(): Foldable<OptionHK>
-    fun optionTraverse(): Traverse<OptionHK>
+    fun optionFunctor(): Functor<ForOption>
+    fun optionApplicative(): Applicative<ForOption>
+    fun optionMonad(): Monad<ForOption>
+    fun optionMonadError(): MonadError<ForOption, Unit>
+    fun optionFoldable(): Foldable<ForOption>
+    fun optionTraverse(): Traverse<ForOption>
     fun optionTFunctor(): Functor<OptionTKindPartial<F>>
     fun optionTApplicative(): Applicative<OptionTKindPartial<F>>
     fun optionTMonad(): Monad<OptionTKindPartial<F>>
@@ -160,16 +160,16 @@ interface Runtime {
     fun optionTTraverse(): Traverse<OptionTKindPartial<F>>
     fun optionTSemigroupK(): SemigroupK<OptionTKindPartial<F>>
     fun optionTMonoidK(): MonoidK<OptionTKindPartial<F>>
-    fun sequenceKWFunctor(): Functor<SequenceKWHK>
-    fun sequenceKWApplicative(): Applicative<SequenceKWHK>
-    fun sequenceKWMonad(): Monad<SequenceKWHK>
-    fun sequenceKWFoldable(): Foldable<SequenceKWHK>
-    fun sequenceKWTraverse(): Traverse<SequenceKWHK>
-    fun sequenceKWMonoidK(): MonoidK<SequenceKWHK>
-    fun sequenceKWSemigroupK(): SemigroupK<SequenceKWHK>
-    fun setKWFoldable(): Foldable<SetKWHK>
-    fun setKWMonoidK(): MonoidK<SetKWHK>
-    fun setKWSemigroupK(): SemigroupK<SetKWHK>
+    fun sequenceKWFunctor(): Functor<ForSequenceKW>
+    fun sequenceKWApplicative(): Applicative<ForSequenceKW>
+    fun sequenceKWMonad(): Monad<ForSequenceKW>
+    fun sequenceKWFoldable(): Foldable<ForSequenceKW>
+    fun sequenceKWTraverse(): Traverse<ForSequenceKW>
+    fun sequenceKWMonoidK(): MonoidK<ForSequenceKW>
+    fun sequenceKWSemigroupK(): SemigroupK<ForSequenceKW>
+    fun setKWFoldable(): Foldable<ForSetKW>
+    fun setKWMonoidK(): MonoidK<ForSetKW>
+    fun setKWSemigroupK(): SemigroupK<ForSetKW>
     fun sortedMapKWFunctor(): Functor<SortedMapKWKindPartial<K>>
     fun sortedMapKWFoldable(): Foldable<SortedMapKWKindPartial<K>>
     fun sortedMapKWTraverse(): Traverse<SortedMapKWKindPartial<K>>
@@ -181,12 +181,12 @@ interface Runtime {
     fun stringSemigroup(): Semigroup<String>
     fun stringMonoid(): Monoid<String>
     fun stringEq(): Eq<@JvmSuppressWildcards String>
-    fun tryFunctor(): Functor<TryHK>
-    fun tryApplicative(): Applicative<TryHK>
-    fun tryMonad(): Monad<TryHK>
-    fun tryMonadError(): MonadError<TryHK, Throwable>
-    fun tryFoldable(): Foldable<TryHK>
-    fun tryTraverse(): Traverse<TryHK>
+    fun tryFunctor(): Functor<ForTry>
+    fun tryApplicative(): Applicative<ForTry>
+    fun tryMonad(): Monad<ForTry>
+    fun tryMonadError(): MonadError<ForTry, Throwable>
+    fun tryFoldable(): Foldable<ForTry>
+    fun tryTraverse(): Traverse<ForTry>
 }
 
 object Arrow {

@@ -11,17 +11,17 @@ import arrow.typeclasses.monad
  * returned as the overall result value for the whole function chain. That means Trampoline emulates what tail recursion
  * does.
  */
-typealias TrampolineF<A> = Free<Function0HK, A>
+typealias TrampolineF<A> = Free<ForFunction0, A>
 
 object Trampoline : TrampolineFunctions
 
 interface TrampolineFunctions {
 
-    fun <A> done(a: A): TrampolineF<A> = Free.pure<Function0HK, A>(a)
+    fun <A> done(a: A): TrampolineF<A> = Free.pure<ForFunction0, A>(a)
 
     fun <A> defer(a: () -> TrampolineF<A>): TrampolineF<A> = Free.defer(a)
 
     fun <A> delay(a: () -> A): TrampolineF<A> = defer { done(a()) }
 }
 
-fun <A> TrampolineF<A>.runT(): A = this.foldMap(FunctionK.id(), monad<Function0HK>()).ev().invoke()
+fun <A> TrampolineF<A>.runT(): A = this.foldMap(FunctionK.id(), monad<ForFunction0>()).ev().invoke()

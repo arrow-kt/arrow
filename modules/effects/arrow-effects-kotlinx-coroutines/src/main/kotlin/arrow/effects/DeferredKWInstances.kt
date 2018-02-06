@@ -9,7 +9,7 @@ import arrow.typeclasses.MonadError
 @instance(DeferredKW::class)
 interface DeferredKWApplicativeErrorInstance :
         DeferredKWApplicativeInstance,
-        ApplicativeError<DeferredKWHK, Throwable> {
+        ApplicativeError<ForDeferredKW, Throwable> {
     override fun <A> raiseError(e: Throwable): DeferredKW<A> =
             DeferredKW.raiseError(e)
 
@@ -21,7 +21,7 @@ interface DeferredKWApplicativeErrorInstance :
 interface DeferredKWMonadErrorInstance :
         DeferredKWApplicativeErrorInstance,
         DeferredKWMonadInstance,
-        MonadError<DeferredKWHK, Throwable> {
+        MonadError<ForDeferredKW, Throwable> {
     override fun <A, B> ap(fa: DeferredKWKind<A>, ff: DeferredKWKind<(A) -> B>): DeferredKW<B> =
             super<DeferredKWMonadInstance>.ap(fa, ff)
 
@@ -33,13 +33,13 @@ interface DeferredKWMonadErrorInstance :
 }
 
 @instance(DeferredKW::class)
-interface DeferredKWMonadSuspendInstance : DeferredKWMonadErrorInstance, MonadSuspend<DeferredKWHK> {
+interface DeferredKWMonadSuspendInstance : DeferredKWMonadErrorInstance, MonadSuspend<ForDeferredKW> {
     override fun <A> suspend(fa: () -> DeferredKWKind<A>): DeferredKW<A> =
             DeferredKW.suspend(fa = fa)
 }
 
 @instance(DeferredKW::class)
-interface DeferredKWAsyncInstance : DeferredKWMonadSuspendInstance, Async<DeferredKWHK> {
+interface DeferredKWAsyncInstance : DeferredKWMonadSuspendInstance, Async<ForDeferredKW> {
     override fun <A> async(fa: Proc<A>): DeferredKW<A> =
             DeferredKW.async(fa = fa)
 
@@ -48,7 +48,7 @@ interface DeferredKWAsyncInstance : DeferredKWMonadSuspendInstance, Async<Deferr
 }
 
 @instance(DeferredKW::class)
-interface DeferredKWEffectInstance : DeferredKWAsyncInstance, Effect<DeferredKWHK> {
-    override fun <A> runAsync(fa: HK<DeferredKWHK, A>, cb: (Either<Throwable, A>) -> DeferredKWKind<Unit>): DeferredKW<Unit> =
+interface DeferredKWEffectInstance : DeferredKWAsyncInstance, Effect<ForDeferredKW> {
+    override fun <A> runAsync(fa: HK<ForDeferredKW, A>, cb: (Either<Throwable, A>) -> DeferredKWKind<Unit>): DeferredKW<Unit> =
             fa.ev().runAsync(cb)
 }

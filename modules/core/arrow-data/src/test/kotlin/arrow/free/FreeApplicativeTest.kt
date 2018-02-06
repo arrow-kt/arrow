@@ -48,7 +48,7 @@ class FreeApplicativeTest : UnitSpec() {
             applicative<FreeApplicativeKindPartial<OpsAp.F>>()  shouldNotBe null
         }
 
-        val EQ: FreeApplicativeEq<OpsAp.F, IdHK, Int> = FreeApplicativeEq(idApInterpreter)
+        val EQ: FreeApplicativeEq<OpsAp.F, ForId, Int> = FreeApplicativeEq(idApInterpreter)
         testLaws(
             EqLaws.laws<FreeApplicative<OpsAp.F, Int>>(EQ, { OpsAp.value(it) }),
             ApplicativeLaws.laws(OpsAp, EQ)

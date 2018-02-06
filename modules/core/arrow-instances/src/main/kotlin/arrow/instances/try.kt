@@ -8,7 +8,7 @@ import arrow.instance
 import arrow.typeclasses.*
 
 @instance(Try::class)
-interface TryApplicativeErrorInstance : TryApplicativeInstance, ApplicativeError<TryHK, Throwable> {
+interface TryApplicativeErrorInstance : TryApplicativeInstance, ApplicativeError<ForTry, Throwable> {
 
     override fun <A> raiseError(e: Throwable): Try<A> = Failure(e)
 
@@ -17,7 +17,7 @@ interface TryApplicativeErrorInstance : TryApplicativeInstance, ApplicativeError
 }
 
 @instance(Try::class)
-interface TryMonadErrorInstance : TryApplicativeErrorInstance, TryMonadInstance, MonadError<TryHK, Throwable> {
+interface TryMonadErrorInstance : TryApplicativeErrorInstance, TryMonadInstance, MonadError<ForTry, Throwable> {
     override fun <A, B> ap(fa: TryKind<A>, ff: TryKind<(A) -> B>): Try<B> =
             super<TryMonadInstance>.ap(fa, ff).ev()
 
@@ -48,13 +48,13 @@ interface TryEqInstance<A> : Eq<Try<A>> {
 }
 
 @instance(Try::class)
-interface TryFunctorInstance : Functor<TryHK> {
+interface TryFunctorInstance : Functor<ForTry> {
     override fun <A, B> map(fa: TryKind<A>, f: kotlin.Function1<A, B>): Try<B> =
             fa.ev().map(f)
 }
 
 @instance(Try::class)
-interface TryApplicativeInstance : Applicative<TryHK> {
+interface TryApplicativeInstance : Applicative<ForTry> {
     override fun <A, B> ap(fa: TryKind<A>, ff: TryKind<kotlin.Function1<A, B>>): Try<B> =
             fa.ev().ap(ff)
 
@@ -66,7 +66,7 @@ interface TryApplicativeInstance : Applicative<TryHK> {
 }
 
 @instance(Try::class)
-interface TryMonadInstance : Monad<TryHK> {
+interface TryMonadInstance : Monad<ForTry> {
     override fun <A, B> ap(fa: TryKind<A>, ff: TryKind<kotlin.Function1<A, B>>): Try<B> =
             fa.ev().ap(ff)
 
@@ -84,7 +84,7 @@ interface TryMonadInstance : Monad<TryHK> {
 }
 
 @instance(Try::class)
-interface TryFoldableInstance : Foldable<TryHK> {
+interface TryFoldableInstance : Foldable<ForTry> {
     override fun <A> exists(fa: TryKind<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
             fa.ev().exists(p)
 
@@ -96,7 +96,7 @@ interface TryFoldableInstance : Foldable<TryHK> {
 }
 
 @instance(Try::class)
-interface TryTraverseInstance : Traverse<TryHK> {
+interface TryTraverseInstance : Traverse<ForTry> {
     override fun <A, B> map(fa: TryKind<A>, f: kotlin.Function1<A, B>): Try<B> =
             fa.ev().map(f)
 

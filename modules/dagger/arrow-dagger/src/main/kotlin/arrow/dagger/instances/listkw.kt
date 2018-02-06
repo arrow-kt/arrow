@@ -9,24 +9,24 @@ import dagger.Provides
 class ListKWInstances {
 
     @Provides
-    fun listKWFunctor(): Functor<ListKWHK> = ListKW.functor()
+    fun listKWFunctor(): Functor<ForListKW> = ListKW.functor()
 
     @Provides
-    fun listKWApplicative(): Applicative<ListKWHK> = ListKW.applicative()
+    fun listKWApplicative(): Applicative<ForListKW> = ListKW.applicative()
 
     @Provides
-    fun listKWMonad(): Monad<ListKWHK> = ListKW.monad()
+    fun listKWMonad(): Monad<ForListKW> = ListKW.monad()
 
     @Provides
-    fun listKWFoldable(): Foldable<ListKWHK> = ListKW.foldable()
+    fun listKWFoldable(): Foldable<ForListKW> = ListKW.foldable()
 
     @Provides
-    fun listKWTraverse(): Traverse<ListKWHK> = ListKW.traverse()
+    fun listKWTraverse(): Traverse<ForListKW> = ListKW.traverse()
 
     @Provides
-    fun listKWSemigroupK(): SemigroupK<ListKWHK> = ListKW.semigroupK()
+    fun listKWSemigroupK(): SemigroupK<ForListKW> = ListKW.semigroupK()
 
     @Provides
-    fun listKWMonoidK(): MonoidK<ListKWHK> = ListKW.monoidK()
+    fun listKWMonoidK(): MonoidK<ForListKW> = ListKW.monoidK()
 
 }

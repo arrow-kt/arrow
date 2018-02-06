@@ -30,13 +30,13 @@ interface SequenceKWEqInstance<A> : Eq<SequenceKW<A>> {
 }
 
 @instance(SequenceKW::class)
-interface SequenceKWFunctorInstance : Functor<SequenceKWHK> {
+interface SequenceKWFunctorInstance : Functor<ForSequenceKW> {
     override fun <A, B> map(fa: SequenceKWKind<A>, f: kotlin.Function1<A, B>): SequenceKW<B> =
             fa.ev().map(f)
 }
 
 @instance(SequenceKW::class)
-interface SequenceKWApplicativeInstance : Applicative<SequenceKWHK> {
+interface SequenceKWApplicativeInstance : Applicative<ForSequenceKW> {
     override fun <A, B> ap(fa: SequenceKWKind<A>, ff: SequenceKWKind<kotlin.Function1<A, B>>): SequenceKW<B> =
             fa.ev().ap(ff)
 
@@ -51,7 +51,7 @@ interface SequenceKWApplicativeInstance : Applicative<SequenceKWHK> {
 }
 
 @instance(SequenceKW::class)
-interface SequenceKWMonadInstance : Monad<SequenceKWHK> {
+interface SequenceKWMonadInstance : Monad<ForSequenceKW> {
     override fun <A, B> ap(fa: SequenceKWKind<A>, ff: SequenceKWKind<kotlin.Function1<A, B>>): SequenceKW<B> =
             fa.ev().ap(ff)
 
@@ -72,7 +72,7 @@ interface SequenceKWMonadInstance : Monad<SequenceKWHK> {
 }
 
 @instance(SequenceKW::class)
-interface SequenceKWFoldableInstance : Foldable<SequenceKWHK> {
+interface SequenceKWFoldableInstance : Foldable<ForSequenceKW> {
     override fun <A, B> foldLeft(fa: SequenceKWKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.ev().foldLeft(b, f)
 
@@ -81,7 +81,7 @@ interface SequenceKWFoldableInstance : Foldable<SequenceKWHK> {
 }
 
 @instance(SequenceKW::class)
-interface SequenceKWTraverseInstance : Traverse<SequenceKWHK> {
+interface SequenceKWTraverseInstance : Traverse<ForSequenceKW> {
     override fun <A, B> map(fa: SequenceKWKind<A>, f: kotlin.Function1<A, B>): SequenceKW<B> =
             fa.ev().map(f)
 
@@ -96,13 +96,13 @@ interface SequenceKWTraverseInstance : Traverse<SequenceKWHK> {
 }
 
 @instance(SequenceKW::class)
-interface SequenceKWSemigroupKInstance : SemigroupK<SequenceKWHK> {
+interface SequenceKWSemigroupKInstance : SemigroupK<ForSequenceKW> {
     override fun <A> combineK(x: SequenceKWKind<A>, y: SequenceKWKind<A>): SequenceKW<A> =
             x.ev().combineK(y)
 }
 
 @instance(SequenceKW::class)
-interface SequenceKWMonoidKInstance : MonoidK<SequenceKWHK> {
+interface SequenceKWMonoidKInstance : MonoidK<ForSequenceKW> {
     override fun <A> empty(): SequenceKW<A> =
             SequenceKW.empty()
 

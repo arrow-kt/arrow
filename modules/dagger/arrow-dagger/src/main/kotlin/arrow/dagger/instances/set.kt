@@ -13,13 +13,13 @@ import javax.inject.Inject
 class SetKWInstances {
 
     @Provides
-    fun setKWFoldable(): Foldable<SetKWHK> = SetKW.foldable()
+    fun setKWFoldable(): Foldable<ForSetKW> = SetKW.foldable()
 
     @Provides
-    fun setKWMonoidK(): MonoidK<SetKWHK> = SetKW.monoidK()
+    fun setKWMonoidK(): MonoidK<ForSetKW> = SetKW.monoidK()
 
     @Provides
-    fun setKWSemigroupK(): SemigroupK<SetKWHK> = SetKW.semigroupK()
+    fun setKWSemigroupK(): SemigroupK<ForSetKW> = SetKW.semigroupK()
 
 }
 

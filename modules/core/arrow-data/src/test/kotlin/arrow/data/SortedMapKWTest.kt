@@ -13,17 +13,17 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class SortedMapKWTest : UnitSpec() {
 
-    val EQ: Eq<HK2<SortedMapKWHK, String, Int>> = object : Eq<HK2<SortedMapKWHK, String, Int>> {
-        override fun eqv(a: HK2<SortedMapKWHK, String, Int>, b: HK2<SortedMapKWHK, String, Int>): Boolean =
+    val EQ: Eq<HK2<ForSortedMapKW, String, Int>> = object : Eq<HK2<ForSortedMapKW, String, Int>> {
+        override fun eqv(a: HK2<ForSortedMapKW, String, Int>, b: HK2<ForSortedMapKW, String, Int>): Boolean =
             a.ev()["key"] == b.ev()["key"]
     }
 
     init {
 
         "instances can be resolved implicitly" {
-            functor<SortedMapKWHK>() shouldNotBe null
-            foldable<SortedMapKWHK>() shouldNotBe null
-            traverse<SortedMapKWHK>() shouldNotBe null
+            functor<ForSortedMapKW>() shouldNotBe null
+            foldable<ForSortedMapKW>() shouldNotBe null
+            traverse<ForSortedMapKW>() shouldNotBe null
             semigroup<SortedMapKWKind<String, Int>>() shouldNotBe null
             monoid<SortedMapKWKind<String, Int>>() shouldNotBe null
         }

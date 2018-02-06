@@ -20,9 +20,9 @@ class MapKWTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            functor<MapKWHK>() shouldNotBe null
-            foldable<MapKWHK>() shouldNotBe null
-            traverse<MapKWHK>() shouldNotBe null
+            functor<ForMapKW>() shouldNotBe null
+            foldable<ForMapKW>() shouldNotBe null
+            traverse<ForMapKW>() shouldNotBe null
             semigroup<MapKWKind<String, Int>>() shouldNotBe null
             monoid<MapKWKind<String, Int>>() shouldNotBe null
             eq<MapKW<String, Int>>() shouldNotBe null

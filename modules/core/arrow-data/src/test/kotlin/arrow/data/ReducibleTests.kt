@@ -13,10 +13,10 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class ReducibleTests : UnitSpec() {
     init {
-        val nonEmptyReducible = object : NonEmptyReducible<NonEmptyListHK, ListKWHK>() {
-            override fun FG(): Foldable<ListKWHK> = ListKW.foldable()
+        val nonEmptyReducible = object : NonEmptyReducible<ForNonEmptyList, ForListKW>() {
+            override fun FG(): Foldable<ForListKW> = ListKW.foldable()
 
-            override fun <A> split(fa: HK<NonEmptyListHK, A>): Tuple2<A, HK<ListKWHK, A>> = Tuple2(fa.ev().head, ListKW(fa.ev().tail))
+            override fun <A> split(fa: HK<ForNonEmptyList, A>): Tuple2<A, HK<ForListKW, A>> = Tuple2(fa.ev().head, ListKW(fa.ev().tail))
         }
 
         testLaws(ReducibleLaws.laws(

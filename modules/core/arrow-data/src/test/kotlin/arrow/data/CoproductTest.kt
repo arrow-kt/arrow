@@ -13,17 +13,17 @@ import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class CoproductTest : UnitSpec() {
-    val EQ: Eq<HK3<CoproductHK, IdHK, IdHK, Int>> = Eq { a, b ->
+    val EQ: Eq<HK3<ForCoproduct, ForId, ForId, Int>> = Eq { a, b ->
         a.ev().extract() == b.ev().extract()
     }
 
     init {
 
         "instances can be resolved implicitly" {
-            functor<CoproductKindPartial<IdHK, NonEmptyListHK>>() shouldNotBe null
-            comonad<CoproductKindPartial<IdHK, NonEmptyListHK>>()  shouldNotBe null
-            foldable<CoproductKindPartial<IdHK, NonEmptyListHK>>() shouldNotBe null
-            traverse<CoproductKindPartial<IdHK, NonEmptyListHK>>() shouldNotBe null
+            functor<CoproductKindPartial<ForId, ForNonEmptyList>>() shouldNotBe null
+            comonad<CoproductKindPartial<ForId, ForNonEmptyList>>()  shouldNotBe null
+            foldable<CoproductKindPartial<ForId, ForNonEmptyList>>() shouldNotBe null
+            traverse<CoproductKindPartial<ForId, ForNonEmptyList>>() shouldNotBe null
         }
 
         testLaws(

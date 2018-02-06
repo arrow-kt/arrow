@@ -40,16 +40,16 @@ class FlowableKWTests : UnitSpec() {
 
     init {
         "instances can be resolved implicitly" {
-            functor<FlowableKWHK>() shouldNotBe null
-            applicative<FlowableKWHK>() shouldNotBe null
-            monad<FlowableKWHK>() shouldNotBe null
-            applicativeError<FlowableKWHK, Unit>() shouldNotBe null
-            monadError<FlowableKWHK, Unit>() shouldNotBe null
-            monadSuspend<FlowableKWHK>() shouldNotBe null
-            async<FlowableKWHK>() shouldNotBe null
-            effect<FlowableKWHK>() shouldNotBe null
-            foldable<FlowableKWHK>() shouldNotBe null
-            traverse<FlowableKWHK>() shouldNotBe null
+            functor<ForFlowableKW>() shouldNotBe null
+            applicative<ForFlowableKW>() shouldNotBe null
+            monad<ForFlowableKW>() shouldNotBe null
+            applicativeError<ForFlowableKW, Unit>() shouldNotBe null
+            monadError<ForFlowableKW, Unit>() shouldNotBe null
+            monadSuspend<ForFlowableKW>() shouldNotBe null
+            async<ForFlowableKW>() shouldNotBe null
+            effect<ForFlowableKW>() shouldNotBe null
+            foldable<ForFlowableKW>() shouldNotBe null
+            traverse<ForFlowableKW>() shouldNotBe null
         }
 
         testLaws(AsyncLaws.laws(FlowableKW.async(), EQ(), EQ()))

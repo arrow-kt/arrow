@@ -21,11 +21,11 @@ class CofreeTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            functor<CofreeKindPartial<OptionHK>>() shouldNotBe null
-            comonad<CofreeKindPartial<OptionHK>>() shouldNotBe null
+            functor<CofreeKindPartial<ForOption>>() shouldNotBe null
+            comonad<CofreeKindPartial<ForOption>>() shouldNotBe null
         }
 
-        testLaws(ComonadLaws.laws(Cofree.comonad<OptionHK>(), {
+        testLaws(ComonadLaws.laws(Cofree.comonad<ForOption>(), {
             val sideEffect = SideEffect()
             unfold(sideEffect.counter, {
                 sideEffect.increment()
@@ -37,7 +37,7 @@ class CofreeTest : UnitSpec() {
 
         "tailForced should evaluate and return" {
             val sideEffect = SideEffect()
-            val start: Cofree<IdHK, Int> = unfold(sideEffect.counter, { sideEffect.increment(); Id(it + 1) })
+            val start: Cofree<ForId, Int> = unfold(sideEffect.counter, { sideEffect.increment(); Id(it + 1) })
             sideEffect.counter shouldBe 0
             start.tailForced()
             sideEffect.counter shouldBe 1
@@ -45,7 +45,7 @@ class CofreeTest : UnitSpec() {
 
         "runTail should run once and return" {
             val sideEffect = SideEffect()
-            val start: Cofree<IdHK, Int> = unfold(sideEffect.counter, { sideEffect.increment(); Id(it) })
+            val start: Cofree<ForId, Int> = unfold(sideEffect.counter, { sideEffect.increment(); Id(it) })
             sideEffect.counter shouldBe 0
             start.runTail()
             sideEffect.counter shouldBe 1
@@ -53,7 +53,7 @@ class CofreeTest : UnitSpec() {
 
         "run should fold until completion" {
             val sideEffect = SideEffect()
-            val start: Cofree<OptionHK, Int> = unfold(sideEffect.counter, {
+            val start: Cofree<ForOption, Int> = unfold(sideEffect.counter, {
                 sideEffect.increment()
                 if (it == 5) None else Some(it + 1)
             })
@@ -67,7 +67,7 @@ class CofreeTest : UnitSpec() {
             try {
                 val limit = 10000
                 val counter = SideEffect()
-                val startThousands: Cofree<OptionHK, Int> = unfold(counter.counter, {
+                val startThousands: Cofree<ForOption, Int> = unfold(counter.counter, {
                     counter.increment()
                     if (it == limit) None else Some(it + 1)
                 })
@@ -80,7 +80,7 @@ class CofreeTest : UnitSpec() {
 
         "run with an stack-safe monad should not blow up the stack" {
             val counter = SideEffect()
-            val startThousands: Cofree<EvalHK, Int> = unfold(counter.counter, {
+            val startThousands: Cofree<ForEval, Int> = unfold(counter.counter, {
                 counter.increment()
                 Eval.now(it + 1)
             })
@@ -88,11 +88,11 @@ class CofreeTest : UnitSpec() {
             counter.counter shouldBe 1
         }
 
-        val startHundred: Cofree<OptionHK, Int> = unfold(0, { if (it == 100) None else Some(it + 1) }, Option.functor())
+        val startHundred: Cofree<ForOption, Int> = unfold(0, { if (it == 100) None else Some(it + 1) }, Option.functor())
 
         "mapBranchingRoot should modify the value of the functor" {
-            val mapped = startHundred.mapBranchingRoot(object : FunctionK<OptionHK, OptionHK> {
-                override fun <A> invoke(fa: HK<OptionHK, A>): HK<OptionHK, A> =
+            val mapped = startHundred.mapBranchingRoot(object : FunctionK<ForOption, ForOption> {
+                override fun <A> invoke(fa: HK<ForOption, A>): HK<ForOption, A> =
                         None
             })
             val expected = NonEmptyList.of(0)
@@ -108,7 +108,7 @@ class CofreeTest : UnitSpec() {
         }
 
         "cata should traverse the structure" {
-            val cata: NonEmptyList<Int> = startHundred.cata<OptionHK, Int, NonEmptyList<Int>>(
+            val cata: NonEmptyList<Int> = startHundred.cata<ForOption, Int, NonEmptyList<Int>>(
                     { i, lb -> Eval.now(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) },
                     Option.traverse()
             ).value()
@@ -118,11 +118,11 @@ class CofreeTest : UnitSpec() {
             cata shouldBe expected
         }
 
-        val startTwoThousand: Cofree<OptionHK, Int> = unfold(0, { if (it == 2000) None else Some(it + 1) }, Option.functor())
+        val startTwoThousand: Cofree<ForOption, Int> = unfold(0, { if (it == 2000) None else Some(it + 1) }, Option.functor())
 
         "cata with an stack-unsafe monad should blow up the stack" {
             try {
-                startTwoThousand.cata<OptionHK, Int, NonEmptyList<Int>>(
+                startTwoThousand.cata<ForOption, Int, NonEmptyList<Int>>(
                         { i, lb -> Eval.now(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) },
                         Option.traverse()
                 ).value()
@@ -133,11 +133,11 @@ class CofreeTest : UnitSpec() {
         }
 
         "cataM should traverse the structure in a stack-safe way on a monad" {
-            val folder: (Int, HK<OptionHK, NonEmptyList<Int>>) -> EvalOption<NonEmptyList<Int>> = { i, lb ->
+            val folder: (Int, HK<ForOption, NonEmptyList<Int>>) -> EvalOption<NonEmptyList<Int>> = { i, lb ->
                 if (i <= 2000) OptionT.pure(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) else OptionT.none()
             }
-            val inclusion = object : FunctionK<EvalHK, EvalOptionF> {
-                override fun <A> invoke(fa: HK<EvalHK, A>): HK<EvalOptionF, A> =
+            val inclusion = object : FunctionK<ForEval, EvalOptionF> {
+                override fun <A> invoke(fa: HK<ForEval, A>): HK<EvalOptionF, A> =
                         OptionT(fa.ev().map { Some(it) })
             }
             val cataHundred = startTwoThousand.cataM(folder, inclusion, Option.traverse(), OptionT.monad(Eval.monad())).ev().value.ev().value()
@@ -151,6 +151,6 @@ class CofreeTest : UnitSpec() {
     }
 }
 
-typealias EvalOption<A> = OptionTKind<EvalHK, A>
+typealias EvalOption<A> = OptionTKind<ForEval, A>
 
-typealias EvalOptionF = OptionTKindPartial<EvalHK>
+typealias EvalOptionF = OptionTKindPartial<ForEval>

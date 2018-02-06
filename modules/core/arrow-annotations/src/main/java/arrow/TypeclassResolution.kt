@@ -96,7 +96,7 @@ data class TypeClassInstanceNotFound(val type: Type)
 /**
  * Allow users to register custom instances when they don't use auto derivation or they don't provide naming conventions
  * for instance discovery via convention name. ex.
- * interface OptionFunctorInstance : Functor<OptionHK> {
+ * interface OptionFunctorInstance : Functor<ForOption> {
  *   companion object {
  *     fun instance(): OptionHKFunctorInstance = object : OptionHKFunctorInstance {}
  *   }

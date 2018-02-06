@@ -8,7 +8,7 @@ import arrow.mtl.*
 import arrow.typeclasses.*
 
 @instance(Option::class)
-interface OptionTraverseFilterInstance : TraverseFilter<OptionHK> {
+interface OptionTraverseFilterInstance : TraverseFilter<ForOption> {
     override fun <A> filter(fa: OptionKind<A>, f: kotlin.Function1<A, kotlin.Boolean>): Option<A> =
             fa.ev().filter(f)
 
@@ -41,7 +41,7 @@ interface OptionTraverseFilterInstance : TraverseFilter<OptionHK> {
 }
 
 @instance(Option::class)
-interface OptionMonadFilterInstance : MonadFilter<OptionHK> {
+interface OptionMonadFilterInstance : MonadFilter<ForOption> {
     override fun <A> empty(): Option<A> =
             Option.empty()
 

@@ -28,13 +28,13 @@ interface ListKWEqInstance<A> : Eq<ListKW<A>> {
 }
 
 @instance(ListKW::class)
-interface ListKWFunctorInstance : Functor<ListKWHK> {
+interface ListKWFunctorInstance : Functor<ForListKW> {
     override fun <A, B> map(fa: ListKWKind<A>, f: kotlin.Function1<A, B>): ListKW<B> =
             fa.ev().map(f)
 }
 
 @instance(ListKW::class)
-interface ListKWApplicativeInstance : Applicative<ListKWHK> {
+interface ListKWApplicativeInstance : Applicative<ForListKW> {
     override fun <A, B> ap(fa: ListKWKind<A>, ff: ListKWKind<kotlin.Function1<A, B>>): ListKW<B> =
             fa.ev().ap(ff)
 
@@ -49,7 +49,7 @@ interface ListKWApplicativeInstance : Applicative<ListKWHK> {
 }
 
 @instance(ListKW::class)
-interface ListKWMonadInstance : Monad<ListKWHK> {
+interface ListKWMonadInstance : Monad<ForListKW> {
     override fun <A, B> ap(fa: ListKWKind<A>, ff: ListKWKind<kotlin.Function1<A, B>>): ListKW<B> =
             fa.ev().ap(ff)
 
@@ -70,7 +70,7 @@ interface ListKWMonadInstance : Monad<ListKWHK> {
 }
 
 @instance(ListKW::class)
-interface ListKWFoldableInstance : Foldable<ListKWHK> {
+interface ListKWFoldableInstance : Foldable<ForListKW> {
     override fun <A, B> foldLeft(fa: ListKWKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.ev().foldLeft(b, f)
 
@@ -82,7 +82,7 @@ interface ListKWFoldableInstance : Foldable<ListKWHK> {
 }
 
 @instance(ListKW::class)
-interface ListKWTraverseInstance : Traverse<ListKWHK> {
+interface ListKWTraverseInstance : Traverse<ForListKW> {
     override fun <A, B> map(fa: ListKWKind<A>, f: kotlin.Function1<A, B>): ListKW<B> =
             fa.ev().map(f)
 
@@ -100,13 +100,13 @@ interface ListKWTraverseInstance : Traverse<ListKWHK> {
 }
 
 @instance(ListKW::class)
-interface ListKWSemigroupKInstance : SemigroupK<ListKWHK> {
+interface ListKWSemigroupKInstance : SemigroupK<ForListKW> {
     override fun <A> combineK(x: ListKWKind<A>, y: ListKWKind<A>): ListKW<A> =
             x.ev().combineK(y)
 }
 
 @instance(ListKW::class)
-interface ListKWMonoidKInstance : MonoidK<ListKWHK> {
+interface ListKWMonoidKInstance : MonoidK<ForListKW> {
     override fun <A> empty(): ListKW<A> =
             ListKW.empty()
 

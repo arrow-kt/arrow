@@ -18,19 +18,19 @@ class ListKWTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            functor<ListKWHK>() shouldNotBe null
-            applicative<ListKWHK>() shouldNotBe null
-            monad<ListKWHK>() shouldNotBe null
-            foldable<ListKWHK>() shouldNotBe null
-            traverse<ListKWHK>() shouldNotBe null
-            semigroupK<ListKWHK>() shouldNotBe null
+            functor<ForListKW>() shouldNotBe null
+            applicative<ForListKW>() shouldNotBe null
+            monad<ForListKW>() shouldNotBe null
+            foldable<ForListKW>() shouldNotBe null
+            traverse<ForListKW>() shouldNotBe null
+            semigroupK<ForListKW>() shouldNotBe null
             semigroup<ListKW<Int>>() shouldNotBe null
             monoid<ListKW<Int>>() shouldNotBe null
-            monoidK<ListKW<ListKWHK>>() shouldNotBe null
-            monadFilter<ListKWHK>() shouldNotBe null
-            monadCombine<ListKW<ListKWHK>>() shouldNotBe null
-            functorFilter<ListKW<ListKWHK>>() shouldNotBe null
-            monadFilter<ListKW<ListKWHK>>() shouldNotBe null
+            monoidK<ListKW<ForListKW>>() shouldNotBe null
+            monadFilter<ForListKW>() shouldNotBe null
+            monadCombine<ListKW<ForListKW>>() shouldNotBe null
+            functorFilter<ListKW<ForListKW>>() shouldNotBe null
+            monadFilter<ListKW<ForListKW>>() shouldNotBe null
             eq<ListKW<Int>>() shouldNotBe null
         }
 
@@ -42,8 +42,8 @@ class ListKWTest : UnitSpec() {
             MonadCombineLaws.laws(ListKW.monadCombine(),
                 { n -> ListKW(listOf(n)) },
                 { n -> ListKW(listOf({ s: Int -> n * s })) },
-                object : Eq<HK<ListKWHK, Int>> {
-                    override fun eqv(a: HK<ListKWHK, Int>, b: HK<ListKWHK, Int>): Boolean =
+                object : Eq<HK<ForListKW, Int>> {
+                    override fun eqv(a: HK<ForListKW, Int>, b: HK<ForListKW, Int>): Boolean =
                             a.ev().list == b.ev().list
                 })
         )

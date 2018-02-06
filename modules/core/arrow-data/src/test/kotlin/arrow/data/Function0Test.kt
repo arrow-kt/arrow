@@ -10,7 +10,7 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class Function0Test : UnitSpec() {
-    val EQ: Eq<HK<Function0HK, Int>> = Eq { a, b ->
+    val EQ: Eq<HK<ForFunction0, Int>> = Eq { a, b ->
         a() == b()
     }
 

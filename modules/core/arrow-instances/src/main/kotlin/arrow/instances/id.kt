@@ -14,13 +14,13 @@ interface IdEqInstance<A> : Eq<Id<A>> {
 }
 
 @instance(Id::class)
-interface IdFunctorInstance : Functor<IdHK> {
+interface IdFunctorInstance : Functor<ForId> {
     override fun <A, B> map(fa: IdKind<A>, f: kotlin.Function1<A, B>): Id<B> =
             fa.ev().map(f)
 }
 
 @instance(Id::class)
-interface IdApplicativeInstance : Applicative<IdHK> {
+interface IdApplicativeInstance : Applicative<ForId> {
     override fun <A, B> ap(fa: IdKind<A>, ff: IdKind<kotlin.Function1<A, B>>): Id<B> =
             fa.ev().ap(ff)
 
@@ -32,37 +32,7 @@ interface IdApplicativeInstance : Applicative<IdHK> {
 }
 
 @instance(Id::class)
-interface IdMonadInstance : Monad<IdHK> {
-    override fun <A, B> ap(fa: IdKind<A>, ff: IdKind<kotlin.Function1<A, B>>): Id<B> =
-            fa.ev().ap(ff)
-
-    override fun <A, B> flatMap(fa: IdKind<A>, f: kotlin.Function1<A, IdKind<B>>): Id<B> =
-            fa.ev().flatMap(f)
-
-    override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, IdKind<Either<A, B>>>): Id<B> =
-            Id.tailRecM(a, f)
-
-    override fun <A, B> map(fa: IdKind<A>, f: kotlin.Function1<A, B>): Id<B> =
-            fa.ev().map(f)
-
-    override fun <A> pure(a: A): Id<A> =
-            Id.pure(a)
-}
-
-@instance(Id::class)
-interface IdComonadInstance : Comonad<IdHK> {
-    override fun <A, B> coflatMap(fa: IdKind<A>, f: kotlin.Function1<IdKind<A>, B>): Id<B> =
-            fa.ev().coflatMap(f)
-
-    override fun <A> extract(fa: IdKind<A>): A =
-            fa.ev().extract()
-
-    override fun <A, B> map(fa: IdKind<A>, f: kotlin.Function1<A, B>): Id<B> =
-            fa.ev().map(f)
-}
-
-@instance(Id::class)
-interface IdBimonadInstance : Bimonad<IdHK> {
+interface IdMonadInstance : Monad<ForId> {
     override fun <A, B> ap(fa: IdKind<A>, ff: IdKind<kotlin.Function1<A, B>>): Id<B> =
             fa.ev().ap(ff)
 
@@ -77,6 +47,36 @@ interface IdBimonadInstance : Bimonad<IdHK> {
 
     override fun <A> pure(a: A): Id<A> =
             Id.pure(a)
+}
+
+@instance(Id::class)
+interface IdComonadInstance : Comonad<ForId> {
+    override fun <A, B> coflatMap(fa: IdKind<A>, f: kotlin.Function1<IdKind<A>, B>): Id<B> =
+            fa.ev().coflatMap(f)
+
+    override fun <A> extract(fa: IdKind<A>): A =
+            fa.ev().extract()
+
+    override fun <A, B> map(fa: IdKind<A>, f: kotlin.Function1<A, B>): Id<B> =
+            fa.ev().map(f)
+}
+
+@instance(Id::class)
+interface IdBimonadInstance : Bimonad<ForId> {
+    override fun <A, B> ap(fa: IdKind<A>, ff: IdKind<kotlin.Function1<A, B>>): Id<B> =
+            fa.ev().ap(ff)
+
+    override fun <A, B> flatMap(fa: IdKind<A>, f: kotlin.Function1<A, IdKind<B>>): Id<B> =
+            fa.ev().flatMap(f)
+
+    override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, IdKind<Either<A, B>>>): Id<B> =
+            Id.tailRecM(a, f)
+
+    override fun <A, B> map(fa: IdKind<A>, f: kotlin.Function1<A, B>): Id<B> =
+            fa.ev().map(f)
+
+    override fun <A> pure(a: A): Id<A> =
+            Id.pure(a)
 
     override fun <A, B> coflatMap(fa: IdKind<A>, f: kotlin.Function1<IdKind<A>, B>): Id<B> =
             fa.ev().coflatMap(f)
@@ -86,7 +86,7 @@ interface IdBimonadInstance : Bimonad<IdHK> {
 }
 
 @instance(Id::class)
-interface IdFoldableInstance : Foldable<IdHK> {
+interface IdFoldableInstance : Foldable<ForId> {
     override fun <A, B> foldLeft(fa: IdKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.ev().foldLeft(b, f)
 
@@ -97,7 +97,7 @@ interface IdFoldableInstance : Foldable<IdHK> {
 fun <A, G, B> Id<A>.traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, Id<B>> = GA.map(f(this.ev().value), { Id(it) })
 
 @instance(Id::class)
-interface IdTraverseInstance : Traverse<IdHK> {
+interface IdTraverseInstance : Traverse<ForId> {
     override fun <A, B> map(fa: IdKind<A>, f: kotlin.Function1<A, B>): Id<B> =
             fa.ev().map(f)
 

@@ -59,7 +59,7 @@ class FreeTest : UnitSpec() {
             monad<FreeKindPartial<OpsAp.F>>()  shouldNotBe null
         }
 
-        val EQ: FreeEq<Ops.F, IdHK, Int> = FreeEq(idInterpreter)
+        val EQ: FreeEq<Ops.F, ForId, Int> = FreeEq(idInterpreter)
         testLaws(
                 EqLaws.laws<Free<Ops.F, Int>>(EQ, { Ops.value(it) }),
                 MonadLaws.laws(Ops, EQ)

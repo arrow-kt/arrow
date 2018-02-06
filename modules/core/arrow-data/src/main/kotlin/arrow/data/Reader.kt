@@ -13,31 +13,31 @@ typealias ReaderFun<D, A> = (D) -> A
  *
  * @see ReaderTHK
  */
-typealias ReaderHK = ReaderTHK
+typealias ForReader = ForReaderT
 
 /**
  * Alias ReaderKind for [ReaderTKind]
  *
  * @see ReaderTKind
  */
-typealias ReaderKind<D, A> = ReaderTKind<IdHK, D, A>
+typealias ReaderKind<D, A> = ReaderTKind<ForId, D, A>
 
 /**
  * Alias to partially apply type parameter [D] to [Reader].
  *
  * @see ReaderTKindPartial
  */
-typealias ReaderKindPartial<D> = ReaderTKindPartial<IdHK, D>
+typealias ReaderKindPartial<D> = ReaderTKindPartial<ForId, D>
 
 /**
  * [Reader] represents a computation that has a dependency on [D].
- * `Reader<D, A>` is an alias for `ReaderT<IdHK, D, A>` and `Kleisli<IdHK, D, A>`.
+ * `Reader<D, A>` is an alias for `ReaderT<ForId, D, A>` and `Kleisli<ForId, D, A>`.
  *
  * @param D the dependency or environment we depend on.
  * @param A resulting type of the computation.
  * @see ReaderT
  */
-typealias Reader<D, A> = ReaderT<IdHK, D, A>
+typealias Reader<D, A> = ReaderT<ForId, D, A>
 
 /**
  * Constructor for [Reader].

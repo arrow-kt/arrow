@@ -1,14 +1,14 @@
 package arrow.data
 
+import arrow.core.ForId
 import arrow.core.Id
-import arrow.core.IdHK
 import arrow.core.IdKind
 import arrow.core.value
+import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
-import arrow.test.UnitSpec
 
 @RunWith(KTestJUnitRunner::class)
 class CoreaderTest : UnitSpec() {
@@ -55,7 +55,7 @@ class CoreaderTest : UnitSpec() {
         }
 
         "andThen should continue sequence" {
-            val cokleisli: Cokleisli<IdHK, Int, Int> = Cokleisli({ it.value() })
+            val cokleisli: Cokleisli<ForId, Int, Int> = Cokleisli({ it.value() })
 
             cokleisli.andThen(Id(3)).run(Id(0)) shouldBe 3
 

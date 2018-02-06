@@ -16,9 +16,9 @@ class SetKWTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            foldable<SetKWHK>() shouldNotBe null
-            semigroupK<SetKWHK>() shouldNotBe null
-            monoidK<SetKWHK>() shouldNotBe null
+            foldable<ForSetKW>() shouldNotBe null
+            semigroupK<ForSetKW>() shouldNotBe null
+            monoidK<ForSetKW>() shouldNotBe null
             semigroup<SetKW<Int>>() shouldNotBe null
             monoid<SetKW<Int>>() shouldNotBe null
             eq<SetKW<Int>>() shouldNotBe null

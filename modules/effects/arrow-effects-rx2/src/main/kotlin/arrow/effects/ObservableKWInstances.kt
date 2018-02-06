@@ -8,7 +8,7 @@ import arrow.typeclasses.MonadError
 @instance(ObservableKW::class)
 interface ObservableKWApplicativeErrorInstance :
         ObservableKWApplicativeInstance,
-        ApplicativeError<ObservableKWHK, Throwable> {
+        ApplicativeError<ForObservableKW, Throwable> {
     override fun <A> raiseError(e: Throwable): ObservableKW<A> =
             ObservableKW.raiseError(e)
 
@@ -20,7 +20,7 @@ interface ObservableKWApplicativeErrorInstance :
 interface ObservableKWMonadErrorInstance :
         ObservableKWApplicativeErrorInstance,
         ObservableKWMonadInstance,
-        MonadError<ObservableKWHK, Throwable> {
+        MonadError<ForObservableKW, Throwable> {
     override fun <A, B> ap(fa: ObservableKWKind<A>, ff: ObservableKWKind<(A) -> B>): ObservableKW<B> =
             super<ObservableKWMonadInstance>.ap(fa, ff)
 
@@ -34,7 +34,7 @@ interface ObservableKWMonadErrorInstance :
 @instance(ObservableKW::class)
 interface ObservableKWMonadSuspendInstance :
         ObservableKWMonadErrorInstance,
-        MonadSuspend<ObservableKWHK> {
+        MonadSuspend<ForObservableKW> {
     override fun <A> suspend(fa: () -> ObservableKWKind<A>): ObservableKW<A> =
             ObservableKW.suspend(fa)
 }
@@ -42,7 +42,7 @@ interface ObservableKWMonadSuspendInstance :
 @instance(ObservableKW::class)
 interface ObservableKWAsyncInstance :
         ObservableKWMonadSuspendInstance,
-        Async<ObservableKWHK> {
+        Async<ForObservableKW> {
     override fun <A> async(fa: Proc<A>): ObservableKW<A> =
             ObservableKW.runAsync(fa)
 }
@@ -50,7 +50,7 @@ interface ObservableKWAsyncInstance :
 @instance(ObservableKW::class)
 interface ObservableKWEffectInstance :
         ObservableKWAsyncInstance,
-        Effect<ObservableKWHK> {
+        Effect<ForObservableKW> {
     override fun <A> runAsync(fa: ObservableKWKind<A>, cb: (Either<Throwable, A>) -> ObservableKWKind<Unit>): ObservableKW<Unit> =
             fa.ev().runAsync(cb)
 }

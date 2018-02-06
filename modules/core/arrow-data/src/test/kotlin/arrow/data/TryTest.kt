@@ -22,13 +22,13 @@ class TryTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            functor<TryHK>() shouldNotBe null
-            applicative<TryHK>() shouldNotBe null
-            monad<TryHK>() shouldNotBe null
-            foldable<TryHK>() shouldNotBe null
-            traverse<TryHK>() shouldNotBe null
-            applicativeError<TryHK, Throwable>() shouldNotBe null
-            monadError<TryHK, Throwable>() shouldNotBe null
+            functor<ForTry>() shouldNotBe null
+            applicative<ForTry>() shouldNotBe null
+            monad<ForTry>() shouldNotBe null
+            foldable<ForTry>() shouldNotBe null
+            traverse<ForTry>() shouldNotBe null
+            applicativeError<ForTry, Throwable>() shouldNotBe null
+            monadError<ForTry, Throwable>() shouldNotBe null
             eq<Try<Int>>() shouldNotBe null
         }
 

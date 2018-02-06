@@ -69,8 +69,8 @@ class TypeclasslessExamples : FreeSpec() {
 
     // Define some trivial instances for Identify and Applicative
 
-    val ID_LIST: Identity<ListKWHK> =
-            object : Identity<ListKWHK> {}
+    val ID_LIST: Identity<ForListKW> =
+            object : Identity<ForListKW> {}
 
     val AP =
             ListKW.applicative()
@@ -145,7 +145,7 @@ class TypeclasslessExamples : FreeSpec() {
             fun <A, R> toFun(f: A.() -> R): (A) -> R =
                     f
 
-            toFun<ApplicativeAndIdentifySyntax<ListKWHK>, HK<ListKWHK, Int>> { withAll() }(ALL_SYNTAX) shouldBe expected
+            toFun<ApplicativeAndIdentifySyntax<ForListKW>, HK<ForListKW, Int>> { withAll() }(ALL_SYNTAX) shouldBe expected
         }
     }
 }

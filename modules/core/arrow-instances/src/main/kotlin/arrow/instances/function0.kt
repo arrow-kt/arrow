@@ -6,13 +6,13 @@ import arrow.data.*
 import arrow.typeclasses.*
 
 @instance(Function0::class)
-interface Function0FunctorInstance : Functor<Function0HK> {
+interface Function0FunctorInstance : Functor<ForFunction0> {
     override fun <A, B> map(fa: Function0Kind<A>, f: kotlin.Function1<A, B>): Function0<B> =
             fa.ev().map(f)
 }
 
 @instance(Function0::class)
-interface Function0ApplicativeInstance : Applicative<Function0HK> {
+interface Function0ApplicativeInstance : Applicative<ForFunction0> {
     override fun <A, B> ap(fa: Function0Kind<A>, ff: Function0Kind<kotlin.Function1<A, B>>): Function0<B> =
             fa.ev().ap(ff)
 
@@ -24,7 +24,7 @@ interface Function0ApplicativeInstance : Applicative<Function0HK> {
 }
 
 @instance(Function0::class)
-interface Function0MonadInstance : Monad<Function0HK> {
+interface Function0MonadInstance : Monad<ForFunction0> {
     override fun <A, B> ap(fa: Function0Kind<A>, ff: Function0Kind<kotlin.Function1<A, B>>): Function0<B> =
             fa.ev().ap(ff)
 
@@ -42,7 +42,7 @@ interface Function0MonadInstance : Monad<Function0HK> {
 }
 
 @instance(Function0::class)
-interface Function0ComonadInstance : Comonad<Function0HK> {
+interface Function0ComonadInstance : Comonad<ForFunction0> {
     override fun <A, B> coflatMap(fa: Function0Kind<A>, f: kotlin.Function1<Function0Kind<A>, B>): Function0<B> =
             fa.ev().coflatMap(f)
 
@@ -54,7 +54,7 @@ interface Function0ComonadInstance : Comonad<Function0HK> {
 }
 
 @instance(Function0::class)
-interface Function0BimonadInstance : Bimonad<Function0HK> {
+interface Function0BimonadInstance : Bimonad<ForFunction0> {
     override fun <A, B> ap(fa: Function0Kind<A>, ff: Function0Kind<kotlin.Function1<A, B>>): Function0<B> =
             fa.ev().ap(ff)
 

@@ -45,7 +45,7 @@ fun <F, A, B> Cofree<F, A>.cata(folder: (A, HK<F, B>) -> Eval<B>, TF: Traverse<F
     return ev.flatMap { folder(extract(), it) }
 }
 
-fun <F, M, A, B> Cofree<F, A>.cataM(folder: (A, HK<F, B>) -> HK<M, B>, inclusion: FunctionK<EvalHK, M>, TF: Traverse<F>, MM: Monad<M>): HK<M, B> {
+fun <F, M, A, B> Cofree<F, A>.cataM(folder: (A, HK<F, B>) -> HK<M, B>, inclusion: FunctionK<ForEval, M>, TF: Traverse<F>, MM: Monad<M>): HK<M, B> {
     fun loop(ev: Cofree<F, A>): Eval<HK<M, B>> {
         val looped: HK<M, HK<F, B>> = TF.traverse(ev.tailForced(), { MM.flatten(inclusion(Eval.defer { loop(it) })) }, MM)
         val folded: HK<M, B> = MM.flatMap(looped) { fb -> folder(ev.head, fb) }

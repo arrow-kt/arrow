@@ -26,14 +26,14 @@ interface OptionMonoidInstance<A> : OptionSemigroupInstance<A>, Monoid<Option<A>
 }
 
 @instance(Option::class)
-interface OptionApplicativeErrorInstance : OptionApplicativeInstance, ApplicativeError<OptionHK, Unit> {
+interface OptionApplicativeErrorInstance : OptionApplicativeInstance, ApplicativeError<ForOption, Unit> {
     override fun <A> raiseError(e: Unit): Option<A> = None
 
     override fun <A> handleErrorWith(fa: OptionKind<A>, f: (Unit) -> OptionKind<A>): Option<A> = fa.ev().orElse({ f(Unit).ev() })
 }
 
 @instance(Option::class)
-interface OptionMonadErrorInstance : OptionApplicativeErrorInstance, OptionMonadInstance, MonadError<OptionHK, Unit> {
+interface OptionMonadErrorInstance : OptionApplicativeErrorInstance, OptionMonadInstance, MonadError<ForOption, Unit> {
     override fun <A, B> ap(fa: OptionKind<A>, ff: OptionKind<(A) -> B>): Option<B> =
             super<OptionMonadInstance>.ap(fa, ff)
 
@@ -63,13 +63,13 @@ interface OptionEqInstance<A> : Eq<Option<A>> {
 }
 
 @instance(Option::class)
-interface OptionFunctorInstance : Functor<OptionHK> {
+interface OptionFunctorInstance : Functor<ForOption> {
     override fun <A, B> map(fa: OptionKind<A>, f: kotlin.Function1<A, B>): Option<B> =
             fa.ev().map(f)
 }
 
 @instance(Option::class)
-interface OptionApplicativeInstance : Applicative<OptionHK> {
+interface OptionApplicativeInstance : Applicative<ForOption> {
     override fun <A, B> ap(fa: OptionKind<A>, ff: OptionKind<kotlin.Function1<A, B>>): Option<B> =
             fa.ev().ap(ff)
 
@@ -81,7 +81,7 @@ interface OptionApplicativeInstance : Applicative<OptionHK> {
 }
 
 @instance(Option::class)
-interface OptionMonadInstance : Monad<OptionHK> {
+interface OptionMonadInstance : Monad<ForOption> {
     override fun <A, B> ap(fa: OptionKind<A>, ff: OptionKind<kotlin.Function1<A, B>>): Option<B> =
             fa.ev().ap(ff)
 
@@ -99,7 +99,7 @@ interface OptionMonadInstance : Monad<OptionHK> {
 }
 
 @instance(Option::class)
-interface OptionFoldableInstance : Foldable<OptionHK> {
+interface OptionFoldableInstance : Foldable<ForOption> {
     override fun <A> exists(fa: OptionKind<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
             fa.ev().exists(p)
 
@@ -136,7 +136,7 @@ fun <A, G, B> Option<A>.traverseFilter(f: (A) -> HK<G, Option<B>>, GA: Applicati
         }
 
 @instance(Option::class)
-interface OptionTraverseInstance : Traverse<OptionHK> {
+interface OptionTraverseInstance : Traverse<ForOption> {
     override fun <A, B> map(fa: OptionKind<A>, f: kotlin.Function1<A, B>): Option<B> =
             fa.ev().map(f)
 
