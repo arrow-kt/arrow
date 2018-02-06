@@ -1,22 +1,22 @@
 package arrow.optics
 
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
 import arrow.core.Option
 import arrow.core.eq
 import arrow.core.toT
+import arrow.data.ForListKW
 import arrow.data.ListKW
-import arrow.data.ListKWHK
 import arrow.data.eq
 import arrow.data.k
-import org.junit.runner.RunWith
 import arrow.optics.PTraversal.Companion.fromTraversable
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genTuple
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.properties.Gen
+import io.kotlintest.properties.forAll
+import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class TraversalTest : UnitSpec() {

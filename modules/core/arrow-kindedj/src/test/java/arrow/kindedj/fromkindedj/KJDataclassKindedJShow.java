@@ -11,6 +11,6 @@ public class KJDataclassKindedJShow implements KindedJShow<ForKJDataclass> {
 
     @Override
     public <A> String show(Hk<ForKJDataclass, A> hk) {
-        return KJDataclassHK.show(hk);
+        return ForKJDataclass.show(hk);
     }
 }

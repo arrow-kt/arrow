@@ -1,18 +1,18 @@
 package arrow.kindedj.fromarrow;
 
-import io.kindedj.Hk;
-import arrow.kindedj.ConvertHK;
 import arrow.kindedj.ConvertKt;
-import arrow.kindedj.KatDataclassHK;
+import arrow.kindedj.ForConvert;
+import arrow.kindedj.ForKatDataclass;
 import arrow.kindedj.KatDataclassKt;
 import arrow.kindedj.KindedJShow;
+import io.kindedj.Hk;
 
-public class KatDataclassKindedJShow implements KindedJShow<Hk<ForConvert, KatDataclassHK>> {
+public class KatDataclassKindedJShow implements KindedJShow<Hk<ForConvert, ForKatDataclass>> {
     private KatDataclassKindedJShow() {
     }
 
     @Override
-    public <A> String show(Hk<Hk<ForConvert, KatDataclassHK>, A> hk) {
+    public <A> String show(Hk<Hk<ForConvert, ForKatDataclass>, A> hk) {
         final arrow.HK<ForKatDataclass, A> cast = ConvertKt.toArrow(hk);
         return KatDataclassKt.show(cast);
     }

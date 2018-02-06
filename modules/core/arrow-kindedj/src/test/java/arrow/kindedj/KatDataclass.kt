@@ -2,7 +2,7 @@ package arrow.kindedj
 
 import arrow.HK as HK_K
 
-class KatDataclassHK private constructor()
+class ForKatDataclass private constructor()
 
 fun <A> HK_K<ForKatDataclass, A>.show(): String = (this as KatDataclass1<A>).a.toString()
 

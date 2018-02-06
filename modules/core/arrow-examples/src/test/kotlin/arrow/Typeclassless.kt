@@ -3,8 +3,8 @@ package arrow
 import arrow.TypeclasslessExamples.ScopeOne.inScopeOne
 import arrow.TypeclasslessExamples.ScopeTwo.withAll
 import arrow.TypeclasslessExamples.ScopeTwo.withApplicative
+import arrow.data.ForListKW
 import arrow.data.ListKW
-import arrow.data.ListKWHK
 import arrow.data.applicative
 import arrow.data.k
 import arrow.typeclasses.Applicative

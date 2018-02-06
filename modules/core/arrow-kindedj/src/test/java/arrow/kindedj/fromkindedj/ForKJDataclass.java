@@ -2,8 +2,8 @@ package arrow.kindedj.fromkindedj;
 
 import io.kindedj.Hk;
 
-public class KJDataclassHK {
-    private KJDataclassHK() {
+public class ForKJDataclass {
+    private ForKJDataclass() {
     }
 
     public static <A> String show(Hk<ForKJDataclass, A> hk) {

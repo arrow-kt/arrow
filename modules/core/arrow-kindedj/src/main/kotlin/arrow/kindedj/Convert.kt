@@ -1,11 +1,11 @@
 package arrow.kindedj
 
-import io.kindedj.HkJ2
 import arrow.HK
 import arrow.HK2
+import io.kindedj.HkJ2
 import io.kindedj.Hk as HK_J
 
-class ConvertHK private constructor()
+class ForConvert private constructor()
 
 @Suppress("UNCHECKED_CAST")
 fun <F, A> HK2<ForConvert, F, A>.fromArrow(): HK_J<F, A> = (this as Convert.FromKindedJToArrow<F, A>).toKindedJ()

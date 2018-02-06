@@ -6,7 +6,7 @@ import org.junit.runners.JUnit4;
 
 import arrow.kindedj.Convert;
 import arrow.kindedj.KJDataclassArrowShow;
-import arrow.kindedj.fromkindedj.KJDataclassHK.KJDataclass1;
+import arrow.kindedj.fromkindedj.ForKJDataclass.KJDataclass1;
 
 import static org.junit.Assert.assertEquals;
 
