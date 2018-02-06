@@ -1,6 +1,8 @@
 package arrow.optics
 
-class BoundSetter<S, A>(private val value: S, private val setter: Setter<S, A>) {
+import arrow.core.Option
+
+class BoundSetter<S, A>(val value: S, val setter: Setter<S, A>) {
 
     fun <T> compose(other: Setter<A, T>)    = BoundSetter(value, setter + other)
     fun <T> compose(other: Optional<A, T>)  = BoundSetter(value, setter + other)
@@ -15,3 +17,8 @@ class BoundSetter<S, A>(private val value: S, private val setter: Setter<S, A>) 
 }
 
 fun <T> T.setter() = BoundSetter(this, Setter.id())
+
+val <T, A> BoundSetter<T, A?>.nullable get(): BoundSetter<T, A> = compose(nullableOptional())
+
+val <T, A> BoundSetter<T, Option<A>>.some get(): BoundSetter<T, A> = compose(optionOptional())
+
