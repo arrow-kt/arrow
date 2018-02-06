@@ -8,6 +8,7 @@ import arrow.data.Ior.Right
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadLaws
+import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
@@ -28,12 +29,14 @@ class IorTest : UnitSpec() {
             foldable<IorKindPartial<Int>>() shouldNotBe null
             traverse<IorKindPartial<Int>>() shouldNotBe null
             eq<Ior<String, Int>>() shouldNotBe null
+            show<Ior<String, Int>>() shouldNotBe null
         }
 
         val intIorMonad: Monad<IorKindPartial<Int>> = monad()
 
         testLaws(
             EqLaws.laws(eq<Ior<String, Int>>(), { it.rightIor() }),
+            ShowLaws.laws(show<Ior<String, Int>>(), eq<Ior<String, Int>>()) { it.rightIor() },
             MonadLaws.laws(intIorMonad, Eq.any()),
             TraverseLaws.laws(Ior.traverse(), Ior.applicative<Int>(), ::Right, Eq.any())
         )
