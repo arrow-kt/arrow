@@ -1,7 +1,8 @@
 package arrow.instances
 
-import arrow.*
+import arrow.HK
 import arrow.core.*
+import arrow.instance
 import arrow.typeclasses.*
 
 @instance(Either::class)
@@ -23,6 +24,8 @@ interface EitherApplicativeInstance<L> : EitherFunctorInstance<L>, Applicative<E
 @instance(Either::class)
 interface EitherMonadInstance<L> : EitherApplicativeInstance<L>, Monad<EitherKindPartial<L>> {
 
+    override fun <A, B> map(fa: EitherKind<L, A>, f: (A) -> B): Either<L, B> = fa.ev().map(f)
+
     override fun <A, B> ap(fa: EitherKind<L, A>, ff: EitherKind<L, (A) -> B>): Either<L, B> =
             fa.ev().ap(ff)
 
@@ -33,7 +36,7 @@ interface EitherMonadInstance<L> : EitherApplicativeInstance<L>, Monad<EitherKin
 }
 
 @instance(Either::class)
-interface EitherMonadErrorInstance<L> : EitherMonadInstance<L>, MonadError<EitherKindPartial<L>, L> {
+interface EitherApplicativeErrorInstance<L> : EitherApplicativeInstance<L>, ApplicativeError<EitherKindPartial<L>, L> {
 
     override fun <A> raiseError(e: L): Either<L, A> = Left(e)
 
@@ -45,6 +48,9 @@ interface EitherMonadErrorInstance<L> : EitherMonadInstance<L>, MonadError<Eithe
         }
     }
 }
+
+@instance(Either::class)
+interface EitherMonadErrorInstance<L> : EitherApplicativeErrorInstance<L>, EitherMonadInstance<L>, MonadError<EitherKindPartial<L>, L>
 
 @instance(Either::class)
 interface EitherFoldableInstance<L> : Foldable<EitherKindPartial<L>> {

@@ -40,6 +40,7 @@ class OptionTest : UnitSpec() {
             traverseFilter<OptionHK>() shouldNotBe null
             semigroup<Option<Int>>() shouldNotBe null
             monoid<Option<Int>>() shouldNotBe null
+            applicativeError<OptionHK, Unit>() shouldNotBe null
             monadError<OptionHK, Unit>() shouldNotBe null
             eq<Option<Int>>() shouldNotBe null
             show<Option<Int>>() shouldNotBe null
@@ -141,8 +142,14 @@ class OptionTest : UnitSpec() {
 
         "exists" {
             some.exists { it.startsWith('k') } shouldBe true
+            some.exists { it.startsWith('j') } shouldBe false
             none.exists { it.startsWith('k') } shouldBe false
+        }
 
+        "forall" {
+            some.forall { it.startsWith('k') } shouldBe true
+            some.forall { it.startsWith('j') } shouldBe false
+            none.forall { it.startsWith('k') } shouldBe true
         }
 
         "forEach" {

@@ -4,8 +4,8 @@ import arrow.core.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import arrow.data.Try
-import arrow.data.applicative
+import arrow.instances.IntMonoid
+import arrow.instances.StringMonoidInstance
 import arrow.syntax.either.left
 import arrow.syntax.either.right
 import org.junit.runner.RunWith
@@ -18,24 +18,25 @@ import arrow.typeclasses.Eq
 class LensTest : UnitSpec() {
 
     init {
-        testLaws(
-            LensLaws.laws(
+        testLaws(LensLaws.laws(
                 lens = tokenLens,
                 aGen = TokenGen,
                 bGen = Gen.string(),
                 funcGen = genFunctionAToB(Gen.string()),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                FA = Option.applicative()),
-            LensLaws.laws(
+                MB = StringMonoidInstance
+        ))
+
+        testLaws(LensLaws.laws(
                 lens = Lens.id(),
                 aGen = Gen.int(),
                 bGen = Gen.int(),
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                FA = Try.applicative())
-        )
+                MB = IntMonoid
+        ))
 
         "Lifting a function should yield the same result as not yielding" {
             forAll(TokenGen, Gen.string(), { token, value ->

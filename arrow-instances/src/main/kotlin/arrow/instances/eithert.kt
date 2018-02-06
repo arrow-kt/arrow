@@ -1,7 +1,9 @@
 package arrow.instances
 
-import arrow.*
-import arrow.core.*
+import arrow.HK
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.Left
 import arrow.data.*
 import arrow.typeclasses.*
 
@@ -26,9 +28,10 @@ interface EitherTApplicativeInstance<F, L> : EitherTFunctorInstance<F, L>, Appli
 
 interface EitherTMonadInstance<F, L> : EitherTApplicativeInstance<F, L>, Monad<EitherTKindPartial<F, L>> {
 
+    override fun <A, B> map(fa: EitherTKind<F, L, A>, f: (A) -> B): EitherT<F, L, B> = fa.ev().map({ f(it) }, MF())
+
     override fun <A, B> ap(fa: EitherTKind<F, L, A>, ff: EitherTKind<F, L, (A) -> B>): EitherT<F, L, B> =
-            fa.ev().ap(ff,
-                    MF())
+            fa.ev().ap(ff, MF())
 
     override fun <A, B> flatMap(fa: EitherTKind<F, L, A>, f: (A) -> EitherTKind<F, L, B>): EitherT<F, L, B> = fa.ev().flatMap({ f(it).ev() }, MF())
 
@@ -36,7 +39,7 @@ interface EitherTMonadInstance<F, L> : EitherTApplicativeInstance<F, L>, Monad<E
             EitherT.tailRecM(a, f, MF())
 }
 
-interface EitherTMonadErrorInstance<F, L> : EitherTMonadInstance<F, L>, MonadError<EitherTKindPartial<F, L>, L> {
+interface EitherTApplicativeErrorInstance<F, L> : EitherTApplicativeInstance<F, L>, ApplicativeError<EitherTKindPartial<F, L>, L> {
 
     override fun <A> handleErrorWith(fa: EitherTKind<F, L, A>, f: (L) -> EitherTKind<F, L, A>): EitherT<F, L, A> =
             EitherT(MF().flatMap(fa.ev().value, {
@@ -48,6 +51,8 @@ interface EitherTMonadErrorInstance<F, L> : EitherTMonadInstance<F, L>, MonadErr
 
     override fun <A> raiseError(e: L): EitherT<F, L, A> = EitherT(MF().pure(Left(e)))
 }
+
+interface EitherTMonadErrorInstance<F, L> : EitherTApplicativeErrorInstance<F, L>, EitherTMonadInstance<F, L>, MonadError<EitherTKindPartial<F, L>, L>
 
 interface EitherTFoldableInstance<F, L> : Foldable<EitherTKindPartial<F, L>> {
 

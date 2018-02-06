@@ -28,6 +28,7 @@ class TryTest : UnitSpec() {
             monad<TryHK>() shouldNotBe null
             foldable<TryHK>() shouldNotBe null
             traverse<TryHK>() shouldNotBe null
+            applicativeError<TryHK, Throwable>() shouldNotBe null
             monadError<TryHK, Throwable>() shouldNotBe null
             eq<Try<Int>>() shouldNotBe null
             show<Try<Int>>() shouldNotBe null

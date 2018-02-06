@@ -2,6 +2,7 @@
 layout: docs
 title: Option
 permalink: /docs/datatypes/option/
+video: 5SFTbphderE
 ---
 
 ## Option
@@ -130,7 +131,7 @@ Transforming the inner contents
 ```kotlin:ank
 import arrow.typeclasses.*
 
-Option.functor().map(Option(1), { it + 1 })
+Option.functor().map(Some(1), { it + 1 })
 ```
 
 [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }})
@@ -140,7 +141,7 @@ Computing over independent values
 ```kotlin:ank
 import arrow.syntax.applicative.*
 
-Option.applicative().tupled(Option(1), Option("Hello"), Option(20.0))
+Option.applicative().tupled(Some(1), Some("Hello"), Some(20.0))
 ```
 
 [`Monad`]({{ '/docs/typeclasses/monad/' | relative_url }})
@@ -149,10 +150,10 @@ Computing over dependent values ignoring absence
 
 ```kotlin
 Option.monad().binding {
-   val a = Option(1).bind()
-   val b = Option(1 + a).bind()
-   val c = Option(1 + b).bind()
-   yields(a + b + c)
+   val a = Some(1).bind()
+   val b = Some(1 + a).bind()
+   val c = Some(1 + b).bind()
+   a + b + c
 }
 //Some(value=6)
 ```
@@ -160,9 +161,9 @@ Option.monad().binding {
 ```kotlin
 Option.monad().binding {
    val x = none<Int>().bind()
-   val y = Option(1 + x).bind()
-   val z = Option(1 + y).bind()
-   yields(x + y + z)
+   val y = Some(1 + x).bind()
+   val z = Some(1 + y).bind()
+   x + y + z
 }
 //None
 ```

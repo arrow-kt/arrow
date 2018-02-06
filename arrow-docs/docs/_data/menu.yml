@@ -53,6 +53,9 @@ options:
 
     nested_options:
 
+      - title: Intro
+        url: /docs/datatypes/intro/
+
       - title: Option
         url: /docs/datatypes/option/
 
@@ -76,6 +79,12 @@ options:
 
       - title: SetKW
         url: /docs/datatypes/setkw/
+
+      - title: MapKW
+        url: /docs/datatypes/mapkw/
+
+      - title: SortedMapKW
+        url: /docs/datatypes/sortedmapkw/
 
       - title: Ior
         url: /docs/datatypes/ior/
@@ -113,24 +122,36 @@ options:
       - title: EitherT
         url: /docs/datatypes/eithert/
 
-      - title: Free
-        url: /docs/datatypes/free/
-
-      - title: FreeApplicative
-        url: /docs/datatypes/freeapplicative/
-
-      - title: Cofree
-        url: /docs/datatypes/cofree/
-
-      - title: Coyoneda
-        url: /docs/datatypes/coyoneda/
-
-      - title: Yoneda
-        url: /docs/datatypes/yoneda/
-
   - title: Type Classes
 
     nested_options:
+
+      - title: Intro
+        url: /docs/typeclasses/intro/
+
+      - title: Eq
+        url: /docs/typeclasses/eq/
+
+      - title: Order
+        url: /docs/typeclasses/order/
+
+      - title: Semigroup
+        url: /docs/typeclasses/semigroup/
+
+      - title: Monoid
+        url: /docs/typeclasses/monoid/
+
+      - title: Foldable
+        url: /docs/typeclasses/foldable/
+
+      - title: Bifoldable
+        url: /docs/typeclasses/bifoldable/
+
+      - title: Traverse
+        url: /docs/typeclasses/traverse/
+
+      - title: TraverseFilter
+        url: /docs/typeclasses/traversefilter/
 
       - title: Functor
         url: /docs/typeclasses/functor/
@@ -144,17 +165,11 @@ options:
       - title: ApplicativeError
         url: /docs/typeclasses/applicativeerror/
 
-      - title: Foldable
-        url: /docs/typeclasses/foldable/
-
-      - title: Traverse
-        url: /docs/typeclasses/traverse/
-
-      - title: TraverseFilter
-        url: /docs/typeclasses/traversefilter/
-
       - title: Monad
         url: /docs/typeclasses/monad/
+
+      - title: MonadError
+        url: /docs/typeclasses/monaderror/
 
       - title: MonadFilter
         url: /docs/typeclasses/monadfilter/
@@ -171,35 +186,17 @@ options:
       - title: MonadCombine
         url: /docs/typeclasses/monadcombine/
 
-      - title: MonadError
-        url: /docs/typeclasses/monaderror/
+      - title: Comonad
+        url: /docs/typeclasses/comonad/
 
-      - title: Semigroup
-        url: /docs/typeclasses/semigroup/
-
-      - title: Monoid
-        url: /docs/typeclasses/monoid/
+      - title: Bimonad
+        url: /docs/typeclasses/bimonad/
 
       - title: SemigroupK
         url: /docs/typeclasses/semigroupk/
 
       - title: MonoidK
         url: /docs/typeclasses/monoidk/
-
-      - title: Bifoldable
-        url: /docs/typeclasses/bifoldable/
-
-      - title: Bimonad
-        url: /docs/typeclasses/bimonad/
-
-      - title: Comonad
-        url: /docs/typeclasses/comonad/
-
-      - title: Order
-        url: /docs/typeclasses/order/
-
-      - title: Eq
-        url: /docs/typeclasses/eq/
 
   - title: Effects
 
@@ -245,6 +242,15 @@ options:
       - title: Traversal
         url: /docs/optics/traversal/
 
+      - title: At
+        url: /docs/optics/at/
+
+      - title: Index
+        url: /docs/optics/index/
+
+      - title: FilterIndex
+        url: /docs/optics/filterindex/
+
   - title: Integrations
 
     nested_options:
@@ -258,9 +264,29 @@ options:
       - title: KindedJ
         url: /docs/integrations/kindedj/
 
+  - title: Free
+
+    nested_options:
+
+      - title: Free
+        url: /docs/free/free/
+
+      - title: FreeApplicative
+        url: /docs/free/freeapplicative/
+
+      - title: Cofree
+        url: /docs/free/cofree/
+
+      - title: Yoneda
+        url: /docs/free/yoneda/
+
+      - title: Coyoneda
+        url: /docs/free/coyoneda/
+
   - title: Legal
 
     nested_options:
+
       - title: Credits
         url: /docs/legal/credits/
 

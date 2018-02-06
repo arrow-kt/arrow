@@ -10,8 +10,8 @@ It includes the most popular data types, type classes and abstractions such as `
 
 - [Documentation](http://arrow-kt.io)
 - [Patterns](http://arrow-kt.io/docs/patterns/glossary/): tutorials and approaches to day-to-day challenges using FP 
-- [Type classes](http://arrow-kt.io/docs/typeclasses/functor/): defining behaviors for data
-- [Data types](http://arrow-kt.io/docs/datatypes/option/): common abstractions
+- [Type classes](http://arrow-kt.io/docs/typeclasses/intro/): defining behaviors for data
+- [Data types](http://arrow-kt.io/docs/datatypes/intro/): common abstractions
 - [Effects](http://arrow-kt.io/docs/effects/io/): interfacing with external systems
 - [Optics](http://arrow-kt.io/docs/optics/iso/): inspecting and modifying data structures
 
@@ -38,18 +38,19 @@ Add the dependencies into the project's `build.gradle`
 
 ```groovy
 dependencies {
-    compile 'io.arrow-kt:arrow-core:0.6.0'
-    compile 'io.arrow-kt:arrow-typeclasses:0.6.0' 
-    compile 'io.arrow-kt:arrow-instances:0.6.0'
-    compile 'io.arrow-kt:arrow-syntax:0.6.0'
-    kapt    'io.arrow-kt:arrow-annotations-processor:0.6.0' 
+    compile 'io.arrow-kt:arrow-core:0.6.1'
+    compile 'io.arrow-kt:arrow-typeclasses:0.6.1' 
+    compile 'io.arrow-kt:arrow-data:0.6.1' 
+    compile 'io.arrow-kt:arrow-instances:0.6.1'
+    compile 'io.arrow-kt:arrow-syntax:0.6.1'
+    kapt    'io.arrow-kt:arrow-annotations-processor:0.6.1' 
     
-    compile 'io.arrow-kt:arrow-free:0.6.0' //optional
-    compile 'io.arrow-kt:arrow-mtl:0.6.0' //optional
-    compile 'io.arrow-kt:arrow-effects:0.6.0' //optional
-    compile 'io.arrow-kt:arrow-effects-rx2:0.6.0' //optional
-    compile 'io.arrow-kt:arrow-effects-kotlinx-coroutines:0.6.0' //optional
-    compile 'io.arrow-kt:arrow-optics:0.6.0' //optional
+    compile 'io.arrow-kt:arrow-free:0.6.1' //optional
+    compile 'io.arrow-kt:arrow-mtl:0.6.1' //optional
+    compile 'io.arrow-kt:arrow-effects:0.6.1' //optional
+    compile 'io.arrow-kt:arrow-effects-rx2:0.6.1' //optional
+    compile 'io.arrow-kt:arrow-effects-kotlinx-coroutines:0.6.1' //optional
+    compile 'io.arrow-kt:arrow-optics:0.6.1' //optional
 }
 ```
 
@@ -66,7 +67,7 @@ apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //optiona
 
 dependencies {
     ...
-    kapt    'io.arrow-kt:arrow-annotations-processor:0.6.0' //optional
+    kapt    'io.arrow-kt:arrow-annotations-processor:0.6.1' //optional
     ...
 }
 ```
@@ -92,15 +93,6 @@ idea {
 ```
 
 Android projects:
-
-`build.gradle`
-```groovy
-sourceSets {
-    main.java.srcDirs += 'src/main/kotlin'
-    debug.java.srcDirs += 'build/generated/source/kaptKotlin/debug'
-    release.java.srcDirs += 'build/generated/source/kaptKotlin/release'
-}
-```
 
 `gradle/generated-kotlin-sources.gradle`
 ```groovy

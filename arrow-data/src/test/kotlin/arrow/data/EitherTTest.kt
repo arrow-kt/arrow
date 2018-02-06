@@ -1,16 +1,15 @@
 package arrow.data
 
 import arrow.core.*
-import arrow.instances.*
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldNotBe
-import io.kotlintest.properties.forAll
-import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadErrorLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.*
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldNotBe
+import io.kotlintest.properties.forAll
+import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class EitherTTest : UnitSpec() {
@@ -22,6 +21,7 @@ class EitherTTest : UnitSpec() {
             monad<EitherTKindPartial<OptionHK, Throwable>>() shouldNotBe null
             foldable<EitherTKindPartial<OptionHK, Throwable>>() shouldNotBe null
             traverse<EitherTKindPartial<OptionHK, Throwable>>() shouldNotBe null
+            applicativeError<EitherTKindPartial<OptionHK, Throwable>, Throwable>() shouldNotBe null
             monadError<EitherTKindPartial<OptionHK, Throwable>, Throwable>() shouldNotBe null
             semigroupK<EitherTKindPartial<OptionHK, Throwable>>() shouldNotBe null
         }

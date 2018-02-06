@@ -21,7 +21,7 @@ data class Foo(val value: Int)
 
 val fooLens: Lens<Foo, Int> = Lens(
     get = { foo -> foo.value },
-    set = { value -> { foo -> foo.copy(value= value) } }
+    set = { value -> { foo -> foo.copy(value = value) } }
 )
 
 val foo = Foo(5)

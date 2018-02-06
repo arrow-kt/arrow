@@ -23,6 +23,7 @@ class KleisliTest : UnitSpec() {
             applicative<KleisliKindPartial<IdHK, Int>>() shouldNotBe null
             monad<KleisliKindPartial<IdHK, Int>>() shouldNotBe null
             monadReader<KleisliKindPartial<IdHK, Int>, Int>() shouldNotBe null
+            applicativeError<KleisliKindPartial<EitherHK, Int>, Throwable>() shouldNotBe null
             monadError<KleisliKindPartial<EitherHK, Int>, Throwable>() shouldNotBe null
         }
 

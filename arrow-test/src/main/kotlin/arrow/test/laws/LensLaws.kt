@@ -1,26 +1,33 @@
 package arrow.test.laws
 
-import arrow.typeclasses.Applicative
+import arrow.core.Id
 import arrow.typeclasses.Eq
 import arrow.core.compose
+import arrow.core.functor
 import arrow.core.identity
+import arrow.core.value
+import arrow.data.Const
+import arrow.data.applicative
+import arrow.data.value
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.optics.Lens
 import arrow.optics.modify
-import arrow.syntax.foldable.exists
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.eq
+import arrow.typeclasses.monoid
 
 object LensLaws {
 
-    inline fun <reified A, reified B, reified F> laws(lens: Lens<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQB: Eq<B>, FA: Applicative<F>) = listOf(
+    inline fun <reified A, reified B> laws(lens: Lens<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A> = eq(), EQB: Eq<B> = eq(), MB: Monoid<B> = monoid()) = listOf(
             Law("Lens law: get set", { lensGetSet(lens, aGen, EQA) }),
             Law("Lens law: set get", { lensSetGet(lens, aGen, bGen, EQB) }),
             Law("Lens law: is set idempotent", { lensSetIdempotent(lens, aGen, bGen, EQA) }),
             Law("Lens law: modify identity", { lensModifyIdentity(lens, aGen, EQA) }),
             Law("Lens law: compose modify", { lensComposeModify(lens, aGen, funcGen, EQA) }),
             Law("Lens law: consistent set modify", { lensConsistentSetModify(lens, aGen, bGen, EQA) }),
-            Law("Lens law: consistent modify modify id", { lensConsistentModifyModifyId(lens, aGen, funcGen, EQA, FA) }),
-            Law("Lens law: consistent get modify id", { lensConsistentGetModifyid(lens, aGen, EQB, FA) })
+            Law("Lens law: consistent modify modify id", { lensConsistentModifyModifyId(lens, aGen, funcGen, EQA) }),
+            Law("Lens law: consistent get modify id", { lensConsistentGetModifyid(lens, aGen, EQB, MB) })
     )
 
     inline fun <reified A, reified B> lensGetSet(lens: Lens<A, B>, aGen: Gen<A>, EQA: Eq<A>) =
@@ -53,18 +60,16 @@ object LensLaws {
                 lens.set(a, b).equalUnderTheLaw(lens.modify(a) { b }, EQA)
             })
 
-    inline fun <reified A, reified B, reified F> lensConsistentModifyModifyId(lens: Lens<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, FA: Applicative<F>) =
+    inline fun <reified A, reified B> lensConsistentModifyModifyId(lens: Lens<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>) =
             forAll(aGen, funcGen, { a, f ->
-                lens.modifyF(FA, a, { FA.pure(f(it)) }).exists {
-                    it.equalUnderTheLaw(lens.modify(a, f), EQA)
-                }
+                lens.modify(a, f)
+                        .equalUnderTheLaw(lens.modifyF(Id.functor(), a, { Id.pure(f(it)) }).value(), EQA)
             })
 
-    inline fun <reified A, reified B, reified F> lensConsistentGetModifyid(lens: Lens<A, B>, aGen: Gen<A>, EQB: Eq<B>, FA: Applicative<F>) =
+    inline fun <reified A, reified B> lensConsistentGetModifyid(lens: Lens<A, B>, aGen: Gen<A>, EQB: Eq<B>, MA: Monoid<B>) =
             forAll(aGen, { a ->
-                lens.modifyF(FA, a, { FA.pure(it) }).exists {
-                    lens.get(it).equalUnderTheLaw(lens.get(a), EQB)
-                }
+                lens.get(a)
+                        .equalUnderTheLaw(lens.modifyF(Const.applicative(MA), a, ::Const).value(), EQB)
             })
 
 }
