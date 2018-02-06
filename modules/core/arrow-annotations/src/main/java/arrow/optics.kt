@@ -18,3 +18,7 @@ annotation class isos
 @Retention(SOURCE)
 @Target(CLASS)
 annotation class optionals
+
+@Retention(SOURCE)
+@Target(CLASS)
+annotation class bounded
