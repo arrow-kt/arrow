@@ -9,7 +9,7 @@ import javax.lang.model.element.Name
 
 val KindPostFix = "Kind"
 val KindedJPostFix = "KindedJ"
-val HKMarkerPostFix = "HK"
+val HKMarkerPreFix = "For"
 
 data class HigherKind(
         val `package`: Package,
@@ -25,7 +25,7 @@ data class HigherKind(
     val typeConstraints = target.classOrPackageProto.typeConstraints()
     val name: String = "${kindName}$KindPostFix"
     val nameJ: String = "${kindName}$KindedJPostFix"
-    val markerName = "${kindName}$HKMarkerPostFix"
+    val markerName = "$HKMarkerPreFix${kindName}"
 }
 
 class HigherKindsFileGenerator(

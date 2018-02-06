@@ -3,7 +3,7 @@ package arrow.derive
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.extractFullName
 import arrow.common.utils.removeBackticks
-import arrow.higherkinds.HKMarkerPostFix
+import arrow.higherkinds.HKMarkerPreFix
 import arrow.higherkinds.KindPostFix
 import me.eugeniomarletti.kotlin.metadata.modality
 import org.jetbrains.kotlin.serialization.ProtoBuf
@@ -90,7 +90,7 @@ class TypeclassInstanceGenerator(
 
     val receiverSimpleName: String = receiverType.substringAfterLast(".")
 
-    val receiverName: String = "$receiverSimpleName$HKMarkerPostFix"
+    val receiverName: String = "$HKMarkerPreFix$receiverSimpleName"
 
     val typeClassFQName: String =
             typeClass.nameResolver.getString(typeClass.classProto.fqName).replace("/", ".")
