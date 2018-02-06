@@ -1,13 +1,8 @@
 package arrow
 
 import java.lang.IllegalArgumentException
-import java.lang.reflect.Method
-import java.lang.reflect.Modifier
-import java.lang.reflect.ParameterizedType
-import java.lang.reflect.Type
-import java.lang.reflect.TypeVariable
-import java.lang.reflect.WildcardType
-import java.util.Arrays
+import java.lang.reflect.*
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KClass
 
@@ -98,7 +93,7 @@ data class TypeClassInstanceNotFound(val type: Type)
  * for instance discovery via convention name. ex.
  * interface OptionFunctorInstance : Functor<ForOption> {
  *   companion object {
- *     fun instance(): OptionHKFunctorInstance = object : OptionHKFunctorInstance {}
+ *     fun instance(): ForOptionFunctorInstance = object : ForOptionFunctorInstance {}
  *   }
  * }
  */
@@ -170,7 +165,7 @@ private fun instanceFromImplicitObject(t: InstanceParametrizedType): Any? {
         targetPackage == "kotlin" -> "kotlin_"
         else -> targetPackage
     }
-    val providerQualifiedName = "$derivationPackage.${on.simpleName.replaceFirst("HK", "")}${of.simpleName}InstanceImplicits"
+    val providerQualifiedName = "$derivationPackage.${on.simpleName.replaceFirst("For", "")}${of.simpleName}InstanceImplicits"
     val globalInstanceProvider = Class.forName(providerQualifiedName)
     val allCompanionFunctions = globalInstanceProvider.methods
     val factoryFunction = allCompanionFunctions.find { it.name == "instance" }
