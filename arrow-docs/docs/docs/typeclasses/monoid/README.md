@@ -31,7 +31,7 @@ StringMonoid.empty()
 ```kotlin:ank
 import arrow.syntax.monoid.*
 
-listOf("K", "Λ", "T", "E", "G", "O", "R", "Y").combineAll()
+listOf("Λ", "R", "R", "O", "W").combineAll()
 ```
 
 ```kotlin:ank
