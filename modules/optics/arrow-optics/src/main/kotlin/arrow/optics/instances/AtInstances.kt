@@ -1,8 +1,8 @@
 package arrow.optics.instances
 
 import arrow.core.Option
-import arrow.data.MapKW
-import arrow.data.SetKW
+import arrow.data.MapK
+import arrow.data.SetK
 import arrow.data.reify
 import arrow.data.getOption
 import arrow.data.k
@@ -10,9 +10,9 @@ import arrow.instance
 import arrow.optics.Lens
 import arrow.optics.typeclasses.At
 
-@instance(MapKW::class)
-interface MapKWAtInstance<K, V> : At<MapKW<K, V>, K, Option<V>> {
-    override fun at(i: K): Lens<MapKW<K, V>, Option<V>> = Lens(
+@instance(MapK::class)
+interface MapKAtInstance<K, V> : At<MapK<K, V>, K, Option<V>> {
+    override fun at(i: K): Lens<MapK<K, V>, Option<V>> = Lens(
             get = { it.reify().getOption(i) },
             set = { optV ->
                 { map ->
@@ -26,9 +26,9 @@ interface MapKWAtInstance<K, V> : At<MapKW<K, V>, K, Option<V>> {
     )
 }
 
-@instance(SetKW::class)
-interface SetKWAtInstance<A> : At<SetKW<A>, A, Boolean> {
-    override fun at(i: A): Lens<SetKW<A>, Boolean> = Lens(
+@instance(SetK::class)
+interface SetKAtInstance<A> : At<SetK<A>, A, Boolean> {
+    override fun at(i: A): Lens<SetK<A>, Boolean> = Lens(
             get = { it.contains(i) },
             set = { b -> { (if (b) it + i else it - i).k() } }
     )

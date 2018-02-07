@@ -6,54 +6,54 @@ import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.MonadError
 import io.reactivex.BackpressureStrategy
 
-@instance(FlowableKW::class)
-interface FlowableKWApplicativeErrorInstance :
-        FlowableKWApplicativeInstance,
-        ApplicativeError<ForFlowableKW, Throwable> {
-    override fun <A> raiseError(e: Throwable): FlowableKW<A> =
-            FlowableKW.raiseError(e)
+@instance(FlowableK::class)
+interface FlowableKApplicativeErrorInstance :
+        FlowableKApplicativeInstance,
+        ApplicativeError<ForFlowableK, Throwable> {
+    override fun <A> raiseError(e: Throwable): FlowableK<A> =
+            FlowableK.raiseError(e)
 
-    override fun <A> handleErrorWith(fa: FlowableKWOf<A>, f: (Throwable) -> FlowableKWOf<A>): FlowableKW<A> =
+    override fun <A> handleErrorWith(fa: FlowableKOf<A>, f: (Throwable) -> FlowableKOf<A>): FlowableK<A> =
             fa.handleErrorWith { f(it).reify() }
 }
 
-@instance(FlowableKW::class)
-interface FlowableKWMonadErrorInstance :
-        FlowableKWApplicativeErrorInstance,
-        FlowableKWMonadInstance,
-        MonadError<ForFlowableKW, Throwable> {
-    override fun <A, B> ap(fa: FlowableKWOf<A>, ff: FlowableKWOf<(A) -> B>): FlowableKW<B> =
-            super<FlowableKWMonadInstance>.ap(fa, ff)
+@instance(FlowableK::class)
+interface FlowableKMonadErrorInstance :
+        FlowableKApplicativeErrorInstance,
+        FlowableKMonadInstance,
+        MonadError<ForFlowableK, Throwable> {
+    override fun <A, B> ap(fa: FlowableKOf<A>, ff: FlowableKOf<(A) -> B>): FlowableK<B> =
+            super<FlowableKMonadInstance>.ap(fa, ff)
 
-    override fun <A, B> map(fa: FlowableKWOf<A>, f: (A) -> B): FlowableKW<B> =
-            super<FlowableKWMonadInstance>.map(fa, f)
+    override fun <A, B> map(fa: FlowableKOf<A>, f: (A) -> B): FlowableK<B> =
+            super<FlowableKMonadInstance>.map(fa, f)
 
-    override fun <A> pure(a: A): FlowableKW<A> =
-            super<FlowableKWMonadInstance>.pure(a)
+    override fun <A> pure(a: A): FlowableK<A> =
+            super<FlowableKMonadInstance>.pure(a)
 }
 
-@instance(FlowableKW::class)
-interface FlowableKWMonadSuspendInstance :
-        FlowableKWMonadErrorInstance,
-        MonadSuspend<ForFlowableKW> {
-    override fun <A> suspend(fa: () -> FlowableKWOf<A>): FlowableKW<A> =
-            FlowableKW.suspend(fa)
+@instance(FlowableK::class)
+interface FlowableKMonadSuspendInstance :
+        FlowableKMonadErrorInstance,
+        MonadSuspend<ForFlowableK> {
+    override fun <A> suspend(fa: () -> FlowableKOf<A>): FlowableK<A> =
+            FlowableK.suspend(fa)
 
     fun BS(): BackpressureStrategy = BackpressureStrategy.BUFFER
 }
 
-@instance(FlowableKW::class)
-interface FlowableKWAsyncInstance :
-        FlowableKWMonadSuspendInstance,
-        Async<ForFlowableKW> {
-    override fun <A> async(fa: Proc<A>): FlowableKW<A> =
-            FlowableKW.async(fa, BS())
+@instance(FlowableK::class)
+interface FlowableKAsyncInstance :
+        FlowableKMonadSuspendInstance,
+        Async<ForFlowableK> {
+    override fun <A> async(fa: Proc<A>): FlowableK<A> =
+            FlowableK.async(fa, BS())
 }
 
-@instance(FlowableKW::class)
-interface FlowableKWEffectInstance :
-        FlowableKWAsyncInstance,
-        Effect<ForFlowableKW> {
-    override fun <A> runAsync(fa: FlowableKWOf<A>, cb: (Either<Throwable, A>) -> FlowableKWOf<Unit>): FlowableKW<Unit> =
+@instance(FlowableK::class)
+interface FlowableKEffectInstance :
+        FlowableKAsyncInstance,
+        Effect<ForFlowableK> {
+    override fun <A> runAsync(fa: FlowableKOf<A>, cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Unit> =
             fa.reify().runAsync(cb)
 }

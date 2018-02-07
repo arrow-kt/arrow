@@ -28,14 +28,14 @@ class WriterTTest : UnitSpec() {
             monad<WriterTPartialOf<ForId, Int>>() shouldNotBe null
             monadFilter<WriterTPartialOf<ForOption, Int>>() shouldNotBe null
             monadWriter<WriterTPartialOf<ForOption, Int>, Int>() shouldNotBe null
-            semigroupK<WriterTPartialOf<ForListKW, Int>>() shouldNotBe null
-            monoidK<WriterTPartialOf<ForListKW, Int>>() shouldNotBe null
+            semigroupK<WriterTPartialOf<ForListK, Int>>() shouldNotBe null
+            monoidK<WriterTPartialOf<ForListK, Int>>() shouldNotBe null
         }
 
         testLaws(
             MonadLaws.laws(WriterT.monad(NonEmptyList.monad(), IntMonoid), Eq.any()),
             MonoidKLaws.laws(
-                WriterT.monoidK<ForListKW, Int>(ListKW.monoidK()),
+                WriterT.monoidK<ForListK, Int>(ListK.monoidK()),
                 WriterT.applicative(),
                 Eq { a, b ->
                     a.reify().value == b.reify().value

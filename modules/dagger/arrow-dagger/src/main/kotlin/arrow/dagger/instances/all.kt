@@ -6,12 +6,12 @@ import dagger.Module
     EvalInstances::class,
     Function0Instances::class,
     IdInstances::class,
-    ListKWInstances::class,
+    ListKInstances::class,
     NonEmptyListInstances::class,
     NumberInstances::class,
     OptionInstances::class,
-    SequenceKWInstances::class,
-    SetKWInstances::class,
+    SequenceKInstances::class,
+    SetKInstances::class,
     StringInstances::class,
     TryInstances::class
 ])

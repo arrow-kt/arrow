@@ -3,8 +3,8 @@ package arrow.optics
 import arrow.core.Option
 import arrow.core.eq
 import arrow.core.toT
-import arrow.data.ForListKW
-import arrow.data.ListKW
+import arrow.data.ForListK
+import arrow.data.ListK
 import arrow.data.eq
 import arrow.data.k
 import arrow.optics.PTraversal.Companion.fromTraversable
@@ -30,7 +30,7 @@ class TraversalTest : UnitSpec() {
                         funcGen = genFunctionAToB(Gen.int()),
                         EQA = Eq.any(),
                         EQOptionB = Option.eq(Eq.any()),
-                        EQListB = ListKW.eq(Eq.any())
+                        EQListB = ListK.eq(Eq.any())
         ))
 
         testLaws(TraversalLaws.laws(
@@ -40,36 +40,36 @@ class TraversalTest : UnitSpec() {
                         funcGen = genFunctionAToB(Gen.float()),
                         EQA = Eq.any(),
                         EQOptionB = Option.eq(Eq.any()),
-                        EQListB = ListKW.eq(Eq.any())
+                        EQListB = ListK.eq(Eq.any())
         ))
 
         "Getting all targets of a traversal" {
             forAll(Gen.list(Gen.int()), { ints ->
-                fromTraversable<ForListKW, Int, Int>().getAll(ints.k()) == ints.k()
+                fromTraversable<ForListK, Int, Int>().getAll(ints.k()) == ints.k()
             })
         }
 
         "Folding all the values of a traversal" {
             forAll(Gen.list(Gen.int()), { ints ->
-                fromTraversable<ForListKW, Int, Int>().fold(ints.k()) == ints.sum()
+                fromTraversable<ForListK, Int, Int>().fold(ints.k()) == ints.sum()
             })
         }
 
         "Combining all the values of a traversal" {
             forAll(Gen.list(Gen.int()), { ints ->
-                fromTraversable<ForListKW, Int, Int>().combineAll(ints.k()) == ints.sum()
+                fromTraversable<ForListK, Int, Int>().combineAll(ints.k()) == ints.sum()
             })
         }
 
         "Finding an number larger than 10" {
             forAll(Gen.list(Gen.choose(-100, 100)), { ints ->
-                fromTraversable<ForListKW, Int, Int>().find(ints.k()) { it > 10 } == Option.fromNullable(ints.firstOrNull { it > 10 })
+                fromTraversable<ForListK, Int, Int>().find(ints.k()) { it > 10 } == Option.fromNullable(ints.firstOrNull { it > 10 })
             })
         }
 
         "Get the length from a traversal" {
             forAll(Gen.list(Gen.int()), { ints ->
-                fromTraversable<ForListKW, Int, Int>().size(ints.k()) == ints.size
+                fromTraversable<ForListK, Int, Int>().size(ints.k()) == ints.size
             })
         }
 

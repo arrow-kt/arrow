@@ -5,107 +5,107 @@ import arrow.core.*
 import arrow.data.*
 import arrow.typeclasses.*
 
-@instance(SequenceKW::class)
-interface SequenceKWSemigroupInstance<A> : Semigroup<SequenceKW<A>> {
-    override fun combine(a: SequenceKW<A>, b: SequenceKW<A>): SequenceKW<A> = (a + b).k()
+@instance(SequenceK::class)
+interface SequenceKSemigroupInstance<A> : Semigroup<SequenceK<A>> {
+    override fun combine(a: SequenceK<A>, b: SequenceK<A>): SequenceK<A> = (a + b).k()
 }
 
-@instance(SequenceKW::class)
-interface SequenceKWMonoidInstance<A> : Monoid<SequenceKW<A>> {
-    override fun combine(a: SequenceKW<A>, b: SequenceKW<A>): SequenceKW<A> = (a + b).k()
+@instance(SequenceK::class)
+interface SequenceKMonoidInstance<A> : Monoid<SequenceK<A>> {
+    override fun combine(a: SequenceK<A>, b: SequenceK<A>): SequenceK<A> = (a + b).k()
 
-    override fun empty(): SequenceKW<A> = emptySequence<A>().k()
+    override fun empty(): SequenceK<A> = emptySequence<A>().k()
 }
 
-@instance(SequenceKW::class)
-interface SequenceKWEqInstance<A> : Eq<SequenceKW<A>> {
+@instance(SequenceK::class)
+interface SequenceKEqInstance<A> : Eq<SequenceK<A>> {
 
     fun EQ(): Eq<A>
 
-    override fun eqv(a: SequenceKW<A>, b: SequenceKW<A>): Boolean =
+    override fun eqv(a: SequenceK<A>, b: SequenceK<A>): Boolean =
             a.zip(b) { aa, bb -> EQ().eqv(aa, bb) }.fold(true) { acc, bool ->
                 acc && bool
             }
 
 }
 
-@instance(SequenceKW::class)
-interface SequenceKWFunctorInstance : Functor<ForSequenceKW> {
-    override fun <A, B> map(fa: SequenceKWOf<A>, f: kotlin.Function1<A, B>): SequenceKW<B> =
+@instance(SequenceK::class)
+interface SequenceKFunctorInstance : Functor<ForSequenceK> {
+    override fun <A, B> map(fa: SequenceKOf<A>, f: kotlin.Function1<A, B>): SequenceK<B> =
             fa.reify().map(f)
 }
 
-@instance(SequenceKW::class)
-interface SequenceKWApplicativeInstance : Applicative<ForSequenceKW> {
-    override fun <A, B> ap(fa: SequenceKWOf<A>, ff: SequenceKWOf<kotlin.Function1<A, B>>): SequenceKW<B> =
+@instance(SequenceK::class)
+interface SequenceKApplicativeInstance : Applicative<ForSequenceK> {
+    override fun <A, B> ap(fa: SequenceKOf<A>, ff: SequenceKOf<kotlin.Function1<A, B>>): SequenceK<B> =
             fa.reify().ap(ff)
 
-    override fun <A, B> map(fa: SequenceKWOf<A>, f: kotlin.Function1<A, B>): SequenceKW<B> =
+    override fun <A, B> map(fa: SequenceKOf<A>, f: kotlin.Function1<A, B>): SequenceK<B> =
             fa.reify().map(f)
 
-    override fun <A, B, Z> map2(fa: SequenceKWOf<A>, fb: SequenceKWOf<B>, f: kotlin.Function1<Tuple2<A, B>, Z>): SequenceKW<Z> =
+    override fun <A, B, Z> map2(fa: SequenceKOf<A>, fb: SequenceKOf<B>, f: kotlin.Function1<Tuple2<A, B>, Z>): SequenceK<Z> =
             fa.reify().map2(fb, f)
 
-    override fun <A> pure(a: A): SequenceKW<A> =
-            SequenceKW.pure(a)
+    override fun <A> pure(a: A): SequenceK<A> =
+            SequenceK.pure(a)
 }
 
-@instance(SequenceKW::class)
-interface SequenceKWMonadInstance : Monad<ForSequenceKW> {
-    override fun <A, B> ap(fa: SequenceKWOf<A>, ff: SequenceKWOf<kotlin.Function1<A, B>>): SequenceKW<B> =
+@instance(SequenceK::class)
+interface SequenceKMonadInstance : Monad<ForSequenceK> {
+    override fun <A, B> ap(fa: SequenceKOf<A>, ff: SequenceKOf<kotlin.Function1<A, B>>): SequenceK<B> =
             fa.reify().ap(ff)
 
-    override fun <A, B> flatMap(fa: SequenceKWOf<A>, f: kotlin.Function1<A, SequenceKWOf<B>>): SequenceKW<B> =
+    override fun <A, B> flatMap(fa: SequenceKOf<A>, f: kotlin.Function1<A, SequenceKOf<B>>): SequenceK<B> =
             fa.reify().flatMap(f)
 
-    override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, SequenceKWOf<Either<A, B>>>): SequenceKW<B> =
-            SequenceKW.tailRecM(a, f)
+    override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, SequenceKOf<Either<A, B>>>): SequenceK<B> =
+            SequenceK.tailRecM(a, f)
 
-    override fun <A, B> map(fa: SequenceKWOf<A>, f: kotlin.Function1<A, B>): SequenceKW<B> =
+    override fun <A, B> map(fa: SequenceKOf<A>, f: kotlin.Function1<A, B>): SequenceK<B> =
             fa.reify().map(f)
 
-    override fun <A, B, Z> map2(fa: SequenceKWOf<A>, fb: SequenceKWOf<B>, f: kotlin.Function1<Tuple2<A, B>, Z>): SequenceKW<Z> =
+    override fun <A, B, Z> map2(fa: SequenceKOf<A>, fb: SequenceKOf<B>, f: kotlin.Function1<Tuple2<A, B>, Z>): SequenceK<Z> =
             fa.reify().map2(fb, f)
 
-    override fun <A> pure(a: A): SequenceKW<A> =
-            SequenceKW.pure(a)
+    override fun <A> pure(a: A): SequenceK<A> =
+            SequenceK.pure(a)
 }
 
-@instance(SequenceKW::class)
-interface SequenceKWFoldableInstance : Foldable<ForSequenceKW> {
-    override fun <A, B> foldLeft(fa: SequenceKWOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
+@instance(SequenceK::class)
+interface SequenceKFoldableInstance : Foldable<ForSequenceK> {
+    override fun <A, B> foldLeft(fa: SequenceKOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.reify().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: SequenceKWOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
+    override fun <A, B> foldRight(fa: SequenceKOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
             fa.reify().foldRight(lb, f)
 }
 
-@instance(SequenceKW::class)
-interface SequenceKWTraverseInstance : Traverse<ForSequenceKW> {
-    override fun <A, B> map(fa: SequenceKWOf<A>, f: kotlin.Function1<A, B>): SequenceKW<B> =
+@instance(SequenceK::class)
+interface SequenceKTraverseInstance : Traverse<ForSequenceK> {
+    override fun <A, B> map(fa: SequenceKOf<A>, f: kotlin.Function1<A, B>): SequenceK<B> =
             fa.reify().map(f)
 
-    override fun <G, A, B> traverse(fa: SequenceKWOf<A>, f: kotlin.Function1<A, Kind<G, B>>, GA: Applicative<G>): Kind<G, SequenceKW<B>> =
+    override fun <G, A, B> traverse(fa: SequenceKOf<A>, f: kotlin.Function1<A, Kind<G, B>>, GA: Applicative<G>): Kind<G, SequenceK<B>> =
             fa.reify().traverse(f, GA)
 
-    override fun <A, B> foldLeft(fa: SequenceKWOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
+    override fun <A, B> foldLeft(fa: SequenceKOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.reify().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: SequenceKWOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
+    override fun <A, B> foldRight(fa: SequenceKOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
             fa.reify().foldRight(lb, f)
 }
 
-@instance(SequenceKW::class)
-interface SequenceKWSemigroupKInstance : SemigroupK<ForSequenceKW> {
-    override fun <A> combineK(x: SequenceKWOf<A>, y: SequenceKWOf<A>): SequenceKW<A> =
+@instance(SequenceK::class)
+interface SequenceKSemigroupKInstance : SemigroupK<ForSequenceK> {
+    override fun <A> combineK(x: SequenceKOf<A>, y: SequenceKOf<A>): SequenceK<A> =
             x.reify().combineK(y)
 }
 
-@instance(SequenceKW::class)
-interface SequenceKWMonoidKInstance : MonoidK<ForSequenceKW> {
-    override fun <A> empty(): SequenceKW<A> =
-            SequenceKW.empty()
+@instance(SequenceK::class)
+interface SequenceKMonoidKInstance : MonoidK<ForSequenceK> {
+    override fun <A> empty(): SequenceK<A> =
+            SequenceK.empty()
 
-    override fun <A> combineK(x: SequenceKWOf<A>, y: SequenceKWOf<A>): SequenceKW<A> =
+    override fun <A> combineK(x: SequenceKOf<A>, y: SequenceKOf<A>): SequenceK<A> =
             x.reify().combineK(y)
 }

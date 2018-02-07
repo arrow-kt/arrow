@@ -41,11 +41,11 @@ class NonEmptyList<out A> private constructor(
 
     fun <B> foldLeft(b: B, f: (B, A) -> B): B = this.reify().tail.fold(f(b, this.reify().head), f)
 
-    fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = foldable<ForListKW>().foldRight(this.reify().all.k(), lb, f)
+    fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = foldable<ForListK>().foldRight(this.reify().all.k(), lb, f)
 
     fun <G, B> traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, NonEmptyList<B>> =
             GA.map2Eval(f(this.reify().head), Eval.always {
-                arrow.typeclasses.traverse<ForListKW>().traverse(this.reify().tail.k(), f, GA)
+                arrow.typeclasses.traverse<ForListK>().traverse(this.reify().tail.k(), f, GA)
             }, {
                 NonEmptyList(it.a, it.b.reify().list)
             }).value()

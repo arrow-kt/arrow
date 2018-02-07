@@ -1,9 +1,9 @@
 ---
 layout: docs
-title: SortedMapKW
-permalink: /docs/datatypes/sortedmapkw/
+title: ListK
+permalink: /docs/datatypes/listK/
 ---
 
-## SortedMapKW
+## ListK
 
 TODO. Meanwhile you can find a short description in the [intro to datatypes]({{ '/docs/datatypes/intro/' | relative_url }}).

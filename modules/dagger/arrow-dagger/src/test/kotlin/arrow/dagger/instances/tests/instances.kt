@@ -12,7 +12,7 @@ import dagger.Module
 import javax.inject.Singleton
 
 @Module
-class LocalCoproductInstances : CoproductInstances<ForOption, ForListKW>()
+class LocalCoproductInstances : CoproductInstances<ForOption, ForListK>()
 
 @Module
 class LocalEitherInstances : EitherInstances<Unit>()
@@ -30,16 +30,16 @@ class LocalFunction1Instances : Function1Instances<ForOption>()
 class LocalKleisliInstances : KleisliInstances<ForOption, Unit>()
 
 @Module
-class LocalMapKWInstances : MapKWInstances<String>()
+class LocalMapKInstances : MapKInstances<String>()
 
 @Module
-class LocalSortedMapKWInstances : SortedMapKWInstances<String>()
+class LocalSortedMapKInstances : SortedMapKInstances<String>()
 
 @Module
 class LocalStateTInstances : StateTInstances<ForOption, Unit>()
 
 typealias F = ForOption
-typealias G = ForListKW
+typealias G = ForListK
 typealias L = Unit
 typealias D = Unit
 typealias S = Unit
@@ -58,9 +58,9 @@ typealias K = String
     LocalEitherTInstances::class,
     LocalFunction1Instances::class,
     LocalKleisliInstances::class,
-    LocalMapKWInstances::class,
+    LocalMapKInstances::class,
     LocalOptionTTInstances::class,
-    LocalSortedMapKWInstances::class,
+    LocalSortedMapKInstances::class,
     LocalStateTInstances::class
 ])
 interface Runtime {
@@ -105,16 +105,16 @@ interface Runtime {
     fun kleisliMonad(): Monad<KleisliPartialOf<F, D>>
     fun kleisliApplicativeError(): ApplicativeError<KleisliPartialOf<F, D>, D>
     fun kleisliMonadError(): MonadError<KleisliPartialOf<F, D>, D>
-    fun listKWFunctor(): Functor<ForListKW>
-    fun listKWApplicative(): Applicative<ForListKW>
-    fun listKWMonad(): Monad<ForListKW>
-    fun listKWFoldable(): Foldable<ForListKW>
-    fun listKWTraverse(): Traverse<ForListKW>
-    fun listKWSemigroupK(): SemigroupK<ForListKW>
-    fun listKWMonoidK(): MonoidK<ForListKW>
-    fun mapKWFunctor(): Functor<MapKWPartialOf<K>>
-    fun mapKWFoldable(): Foldable<MapKWPartialOf<K>>
-    fun mapKWTraverse(): Traverse<MapKWPartialOf<K>>
+    fun listKFunctor(): Functor<ForListK>
+    fun listKApplicative(): Applicative<ForListK>
+    fun listKMonad(): Monad<ForListK>
+    fun listKFoldable(): Foldable<ForListK>
+    fun listKTraverse(): Traverse<ForListK>
+    fun listKSemigroupK(): SemigroupK<ForListK>
+    fun listKMonoidK(): MonoidK<ForListK>
+    fun mapKFunctor(): Functor<MapKPartialOf<K>>
+    fun mapKFoldable(): Foldable<MapKPartialOf<K>>
+    fun mapKTraverse(): Traverse<MapKPartialOf<K>>
     fun nonEmptyListFunctor(): Functor<ForNonEmptyList>
     fun nonEmptyListApplicative(): Applicative<ForNonEmptyList>
     fun nonEmptyListMonad(): Monad<ForNonEmptyList>
@@ -160,19 +160,19 @@ interface Runtime {
     fun optionTTraverse(): Traverse<OptionTPartialOf<F>>
     fun optionTSemigroupK(): SemigroupK<OptionTPartialOf<F>>
     fun optionTMonoidK(): MonoidK<OptionTPartialOf<F>>
-    fun sequenceKWFunctor(): Functor<ForSequenceKW>
-    fun sequenceKWApplicative(): Applicative<ForSequenceKW>
-    fun sequenceKWMonad(): Monad<ForSequenceKW>
-    fun sequenceKWFoldable(): Foldable<ForSequenceKW>
-    fun sequenceKWTraverse(): Traverse<ForSequenceKW>
-    fun sequenceKWMonoidK(): MonoidK<ForSequenceKW>
-    fun sequenceKWSemigroupK(): SemigroupK<ForSequenceKW>
-    fun setKWFoldable(): Foldable<ForSetKW>
-    fun setKWMonoidK(): MonoidK<ForSetKW>
-    fun setKWSemigroupK(): SemigroupK<ForSetKW>
-    fun sortedMapKWFunctor(): Functor<SortedMapKWPartialOf<K>>
-    fun sortedMapKWFoldable(): Foldable<SortedMapKWPartialOf<K>>
-    fun sortedMapKWTraverse(): Traverse<SortedMapKWPartialOf<K>>
+    fun sequenceKFunctor(): Functor<ForSequenceK>
+    fun sequenceKApplicative(): Applicative<ForSequenceK>
+    fun sequenceKMonad(): Monad<ForSequenceK>
+    fun sequenceKFoldable(): Foldable<ForSequenceK>
+    fun sequenceKTraverse(): Traverse<ForSequenceK>
+    fun sequenceKMonoidK(): MonoidK<ForSequenceK>
+    fun sequenceKSemigroupK(): SemigroupK<ForSequenceK>
+    fun setKFoldable(): Foldable<ForSetK>
+    fun setKMonoidK(): MonoidK<ForSetK>
+    fun setKSemigroupK(): SemigroupK<ForSetK>
+    fun sortedMapKFunctor(): Functor<SortedMapKPartialOf<K>>
+    fun sortedMapKFoldable(): Foldable<SortedMapKPartialOf<K>>
+    fun sortedMapKTraverse(): Traverse<SortedMapKPartialOf<K>>
     fun stateTFunctor(): Functor<StateTPartialOf<F, S>>
     fun stateTApplicative(): Applicative<StateTPartialOf<F, S>>
     fun stateTMonad(): Monad<StateTPartialOf<F, S>>

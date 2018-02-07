@@ -26,8 +26,8 @@ class StateTTests : UnitSpec() {
         a.runM(1, Try.monad()) == b.runM(1, Try.monad())
     }
 
-    val EQ_LIST: Eq<Kind<StateTPartialOf<ForListKW, Int>, Int>> = Eq { a, b ->
-        a.runM(1, ListKW.monad()) == b.runM(1, ListKW.monad())
+    val EQ_LIST: Eq<Kind<StateTPartialOf<ForListK, Int>, Int>> = Eq { a, b ->
+        a.runM(1, ListK.monad()) == b.runM(1, ListK.monad())
     }
 
     init {
@@ -43,12 +43,12 @@ class StateTTests : UnitSpec() {
         testLaws(
             MonadStateLaws.laws(M, EQ, EQ_UNIT),
             SemigroupKLaws.laws(
-                StateT.semigroupK<ForListKW, Int>(ListKW.monad(), ListKW.semigroupK()),
-                StateT.applicative<ForListKW, Int>(ListKW.monad()),
+                StateT.semigroupK<ForListK, Int>(ListK.monad(), ListK.semigroupK()),
+                StateT.applicative<ForListK, Int>(ListK.monad()),
                 EQ_LIST),
-            MonadCombineLaws.laws(StateT.monadCombine<ForListKW, Int>(ListKW.monadCombine()),
-                { StateT.lift(ListKW.pure(it), ListKW.monad()) },
-                { StateT.lift(ListKW.pure({ s: Int -> s * 2 }), ListKW.monad()) },
+            MonadCombineLaws.laws(StateT.monadCombine<ForListK, Int>(ListK.monadCombine()),
+                { StateT.lift(ListK.pure(it), ListK.monad()) },
+                { StateT.lift(ListK.pure({ s: Int -> s * 2 }), ListK.monad()) },
                 EQ_LIST)
         )
 

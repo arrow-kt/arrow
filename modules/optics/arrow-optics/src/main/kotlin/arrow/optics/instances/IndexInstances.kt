@@ -4,32 +4,32 @@ import arrow.data.*
 import arrow.instance
 import arrow.optics.Optional
 import arrow.optics.POptional
-import arrow.optics.listToListKW
+import arrow.optics.listToListK
 import arrow.optics.stringToList
 import arrow.optics.typeclasses.Index
 import arrow.optics.typeclasses.index
 import arrow.syntax.either.left
 import arrow.syntax.either.right
 
-@instance(ListKW::class)
-interface ListKWIndexInstance<A> : Index<ListKWOf<A>, Int, A> {
-    override fun index(i: Int): Optional<ListKWOf<A>, A> = POptional(
+@instance(ListK::class)
+interface ListKIndexInstance<A> : Index<ListKOf<A>, Int, A> {
+    override fun index(i: Int): Optional<ListKOf<A>, A> = POptional(
             getOrModify = { it.reify().getOrNull(i)?.right() ?: it.reify().left() },
             set = { a -> { l -> l.reify().mapIndexed { index: Int, aa: A -> if (index == i) a else aa }.k() } }
     )
 }
 
-@instance(MapKW::class)
-interface MapKWIndexInstance<K, V> : Index<MapKWOf<K, V>, K, V> {
-    override fun index(i: K): Optional<MapKWOf<K, V>, V> = POptional(
+@instance(MapK::class)
+interface MapKIndexInstance<K, V> : Index<MapKOf<K, V>, K, V> {
+    override fun index(i: K): Optional<MapKOf<K, V>, V> = POptional(
             getOrModify = { it.reify()[i]?.right() ?: it.left() },
             set = { v -> { m -> m.reify().mapValues { (k, vv) -> if (k == i) v else vv }.k() } }
     )
 }
 
-@instance(SequenceKW::class)
-interface SequenceKWIndexInstance<A> : Index<SequenceKWOf<A>, Int, A> {
-    override fun index(i: Int): Optional<SequenceKWOf<A>, A> = POptional(
+@instance(SequenceK::class)
+interface SequenceKIndexInstance<A> : Index<SequenceKOf<A>, Int, A> {
+    override fun index(i: Int): Optional<SequenceKOf<A>, A> = POptional(
             getOrModify = { it.reify().sequence.elementAtOrNull(i)?.right() ?: it.reify().left() },
             set = { a -> { it.reify().mapIndexed { index, aa -> if (index == i) a else aa }.k() } }
     )
@@ -38,7 +38,7 @@ interface SequenceKWIndexInstance<A> : Index<SequenceKWOf<A>, Int, A> {
 object StringIndexInstance : Index<String, Int, Char> {
 
     override fun index(i: Int): Optional<String, Char> =
-            stringToList compose listToListKW() compose index<ListKW<Char>, Int, Char>().index(i)
+            stringToList compose listToListK() compose index<ListK<Char>, Int, Char>().index(i)
 }
 
 object StringIndexInstanceImplicits {

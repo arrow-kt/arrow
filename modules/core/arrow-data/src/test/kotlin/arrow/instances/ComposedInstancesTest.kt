@@ -18,7 +18,7 @@ class ComposedInstancesTest : UnitSpec() {
         a.unnest().reify() == b.unnest().reify()
     }
 
-    val EQ_LKW_OPTION: Eq<NestedType<ForListKW, ForOption, Int>> = Eq { a, b ->
+    val EQ_LK_OPTION: Eq<NestedType<ForListK, ForOption, Int>> = Eq { a, b ->
         a.unnest().reify() == b.unnest().reify()
     }
 
@@ -42,8 +42,8 @@ class ComposedInstancesTest : UnitSpec() {
             ApplicativeLaws.laws(ComposedApplicative(Option.applicative(), NonEmptyList.applicative()), EQ_OPTION_NEL),
             FoldableLaws.laws(ComposedFoldable(Option.foldable(), NonEmptyList.foldable()), cf, Eq.any()),
             TraverseLaws.laws(ComposedTraverse(Option.traverse(), NonEmptyList.traverse(), NonEmptyList.applicative()), ComposedFunctor.invoke(Option.functor(), NonEmptyList.functor()), cf, EQ_OPTION_NEL),
-            SemigroupKLaws.laws(ComposedSemigroupK<ForListKW, ForOption>(ListKW.semigroupK()), ComposedApplicative(ListKW.applicative(), Option.applicative()), EQ_LKW_OPTION),
-            MonoidKLaws.laws(ComposedMonoidK<ForListKW, ForOption>(ListKW.monoidK()), ComposedApplicative(ListKW.applicative(), Option.applicative()), EQ_LKW_OPTION)
+            SemigroupKLaws.laws(ComposedSemigroupK<ForListK, ForOption>(ListK.semigroupK()), ComposedApplicative(ListK.applicative(), Option.applicative()), EQ_LK_OPTION),
+            MonoidKLaws.laws(ComposedMonoidK<ForListK, ForOption>(ListK.monoidK()), ComposedApplicative(ListK.applicative(), Option.applicative()), EQ_LK_OPTION)
         )
     }
 }

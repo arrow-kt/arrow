@@ -5,52 +5,52 @@ import arrow.instance
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.MonadError
 
-@instance(ObservableKW::class)
-interface ObservableKWApplicativeErrorInstance :
-        ObservableKWApplicativeInstance,
-        ApplicativeError<ForObservableKW, Throwable> {
-    override fun <A> raiseError(e: Throwable): ObservableKW<A> =
-            ObservableKW.raiseError(e)
+@instance(ObservableK::class)
+interface ObservableKApplicativeErrorInstance :
+        ObservableKApplicativeInstance,
+        ApplicativeError<ForObservableK, Throwable> {
+    override fun <A> raiseError(e: Throwable): ObservableK<A> =
+            ObservableK.raiseError(e)
 
-    override fun <A> handleErrorWith(fa: ObservableKWOf<A>, f: (Throwable) -> ObservableKWOf<A>): ObservableKW<A> =
+    override fun <A> handleErrorWith(fa: ObservableKOf<A>, f: (Throwable) -> ObservableKOf<A>): ObservableK<A> =
             fa.handleErrorWith { f(it).reify() }
 }
 
-@instance(ObservableKW::class)
-interface ObservableKWMonadErrorInstance :
-        ObservableKWApplicativeErrorInstance,
-        ObservableKWMonadInstance,
-        MonadError<ForObservableKW, Throwable> {
-    override fun <A, B> ap(fa: ObservableKWOf<A>, ff: ObservableKWOf<(A) -> B>): ObservableKW<B> =
-            super<ObservableKWMonadInstance>.ap(fa, ff)
+@instance(ObservableK::class)
+interface ObservableKMonadErrorInstance :
+        ObservableKApplicativeErrorInstance,
+        ObservableKMonadInstance,
+        MonadError<ForObservableK, Throwable> {
+    override fun <A, B> ap(fa: ObservableKOf<A>, ff: ObservableKOf<(A) -> B>): ObservableK<B> =
+            super<ObservableKMonadInstance>.ap(fa, ff)
 
-    override fun <A, B> map(fa: ObservableKWOf<A>, f: (A) -> B): ObservableKW<B> =
-            super<ObservableKWMonadInstance>.map(fa, f)
+    override fun <A, B> map(fa: ObservableKOf<A>, f: (A) -> B): ObservableK<B> =
+            super<ObservableKMonadInstance>.map(fa, f)
 
-    override fun <A> pure(a: A): ObservableKW<A> =
-            super<ObservableKWMonadInstance>.pure(a)
+    override fun <A> pure(a: A): ObservableK<A> =
+            super<ObservableKMonadInstance>.pure(a)
 }
 
-@instance(ObservableKW::class)
-interface ObservableKWMonadSuspendInstance :
-        ObservableKWMonadErrorInstance,
-        MonadSuspend<ForObservableKW> {
-    override fun <A> suspend(fa: () -> ObservableKWOf<A>): ObservableKW<A> =
-            ObservableKW.suspend(fa)
+@instance(ObservableK::class)
+interface ObservableKMonadSuspendInstance :
+        ObservableKMonadErrorInstance,
+        MonadSuspend<ForObservableK> {
+    override fun <A> suspend(fa: () -> ObservableKOf<A>): ObservableK<A> =
+            ObservableK.suspend(fa)
 }
 
-@instance(ObservableKW::class)
-interface ObservableKWAsyncInstance :
-        ObservableKWMonadSuspendInstance,
-        Async<ForObservableKW> {
-    override fun <A> async(fa: Proc<A>): ObservableKW<A> =
-            ObservableKW.runAsync(fa)
+@instance(ObservableK::class)
+interface ObservableKAsyncInstance :
+        ObservableKMonadSuspendInstance,
+        Async<ForObservableK> {
+    override fun <A> async(fa: Proc<A>): ObservableK<A> =
+            ObservableK.runAsync(fa)
 }
 
-@instance(ObservableKW::class)
-interface ObservableKWEffectInstance :
-        ObservableKWAsyncInstance,
-        Effect<ForObservableKW> {
-    override fun <A> runAsync(fa: ObservableKWOf<A>, cb: (Either<Throwable, A>) -> ObservableKWOf<Unit>): ObservableKW<Unit> =
+@instance(ObservableK::class)
+interface ObservableKEffectInstance :
+        ObservableKAsyncInstance,
+        Effect<ForObservableK> {
+    override fun <A> runAsync(fa: ObservableKOf<A>, cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Unit> =
             fa.reify().runAsync(cb)
 }

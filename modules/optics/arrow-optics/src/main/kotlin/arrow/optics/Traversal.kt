@@ -202,7 +202,7 @@ interface PTraversal<S, T, A, B> {
     /**
      * Get all foci of the [PTraversal]
      */
-    fun getAll(s: S): ListKW<A> = foldMap(ListKW.monoid(), s, { ListKW(listOf(it)) })
+    fun getAll(s: S): ListK<A> = foldMap(ListK.monoid(), s, { ListK(listOf(it)) })
 
     /**
      * Set polymorphically the target of a [PTraversal] with a value

@@ -146,7 +146,7 @@ fun <A> genNonEmptyList(genA: Gen<A>): Gen<NonEmptyList<A>> =
 fun <K, V> genMap(genK: Gen<K>, genV: Gen<V>): Gen<Map<K, V>> =
         Gen.create { Gen.list(genK).generate().map { it to genV.generate() }.toMap() }
 
-fun <K, V> genMapKW(genK: Gen<K>, genV: Gen<V>): Gen<MapKW<K, V>> =
+fun <K, V> genMapK(genK: Gen<K>, genV: Gen<V>): Gen<MapK<K, V>> =
         Gen.create { Gen.list(genK).generate().map { it to genV.generate() }.toMap().k() }
 
 fun genTimeUnit(): Gen<TimeUnit> = object : Gen<TimeUnit> {
@@ -155,16 +155,16 @@ fun genTimeUnit(): Gen<TimeUnit> = object : Gen<TimeUnit> {
     override fun generate(): TimeUnit = units[random.generate()]
 }
 
-fun <A> genListKW(genA: Gen<A>): Gen<ListKW<A>> =
+fun <A> genListK(genA: Gen<A>): Gen<ListK<A>> =
         Gen.create { Gen.list(genA).generate().k() }
 
-fun <A> genSequenceKW(genA: Gen<A>): Gen<SequenceKW<A>> =
+fun <A> genSequenceK(genA: Gen<A>): Gen<SequenceK<A>> =
         Gen.create { Gen.list(genA).generate().asSequence().k() }
 
 fun genChars(): Gen<Char> =
         Gen.oneOf(('A'..'Z') + ('a'..'z') + ('0'..'9') + "!@#$%%^&*()_-~`,<.?/:;}{][±§".toList())
 
-fun <A> genSetKW(genA: Gen<A>): Gen<SetKW<A>> {
+fun <A> genSetK(genA: Gen<A>): Gen<SetK<A>> {
     val genSetA = Gen.set(genA)
     return Gen.create { genSetA.generate().k() }
 }

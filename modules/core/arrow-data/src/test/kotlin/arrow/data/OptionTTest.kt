@@ -33,9 +33,9 @@ class OptionTTest : UnitSpec() {
             monad<OptionTPartialOf<ForNonEmptyList>>() shouldNotBe null
             foldable<OptionTPartialOf<ForNonEmptyList>>() shouldNotBe null
             traverse<OptionTPartialOf<ForNonEmptyList>>() shouldNotBe null
-            semigroupK<OptionTPartialOf<ForListKW>>() shouldNotBe null
-            monoidK<OptionTPartialOf<ForListKW>>() shouldNotBe null
-            functorFilter<OptionTPartialOf<ForListKW>>() shouldNotBe null
+            semigroupK<OptionTPartialOf<ForListK>>() shouldNotBe null
+            monoidK<OptionTPartialOf<ForListK>>() shouldNotBe null
+            functorFilter<OptionTPartialOf<ForListK>>() shouldNotBe null
             traverseFilter<OptionTPartialOf<ForOption>>() shouldNotBe null
         }
 

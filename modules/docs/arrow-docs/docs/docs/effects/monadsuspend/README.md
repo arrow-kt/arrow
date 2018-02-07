@@ -27,7 +27,7 @@ fun <F> getSongUrlAsync(SC: MonadSuspend<F> = monadSuspend()) =
   SC { getSongUrl() }
 
 val songIO: IO<Url> = getSongUrlAsync().reify()
-val songDeferred: DeferredKW<Url> = getSongUrlAsync().reify()
+val songDeferred: DeferredK<Url> = getSongUrlAsync().reify()
 ```
 
 #### suspend
@@ -117,7 +117,7 @@ While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/d
 Wraps the current function in the Sync passed as a parameter. All exceptions are wrapped.
 
 ```kotlin
-{ fibonacci(100) }.defer(ObservableKW.monadSuspend())
+{ fibonacci(100) }.defer(ObservableK.monadSuspend())
 ```
 
 ```kotlin
@@ -137,7 +137,7 @@ Runs the current function in the `MonadSuspend` passed as a parameter.
 While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution.
 
 ```kotlin
-{ fibonacci(100).left() }.deferUnsafe(ObservableKW.monadSuspend())
+{ fibonacci(100).left() }.deferUnsafe(ObservableK.monadSuspend())
 ```
 
 ```kotlin
@@ -159,6 +159,6 @@ Arrow provides [`MonadSuspendLaws`]({{ '/docs/typeclasses/laws#monadsuspendlaws'
 The following datatypes in Arrow provide instances that adhere to the `MonadSuspend` typeclass.
 
 - [IO]({{ '/docs/effects/io' | relative_url }})
-- [ObservableKW]({{ '/docs/integrations/rx2' | relative_url }})
-- [FlowableKW]({{ '/docs/integrations/rx2' | relative_url }})
-- [DeferredKW]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }})
+- [ObservableK]({{ '/docs/integrations/rx2' | relative_url }})
+- [FlowableK]({{ '/docs/integrations/rx2' | relative_url }})
+- [DeferredK]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }})

@@ -20,7 +20,7 @@ import arrow.*
 import arrow.optics.*
 import arrow.data.*
 
-val listTraversal: Traversal<ListKWOf<Int>, Int> = Traversal.fromTraversable()
+val listTraversal: Traversal<ListKOf<Int>, Int> = Traversal.fromTraversable()
 
 listTraversal.modifyF(Try.applicative(), listOf(1, 2, 3).k()) {
     Try { it / 2 }
@@ -60,7 +60,7 @@ traversalTuple10<Int>().getAll(Tuple10(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
 Composing `Traversal` can be used for accessing and modifying foci in nested structures.
 
 ```kotlin:ank
-val listOfPairTraversal: Traversal<ListKWOf<Tuple2<String, String>>, Tuple2<String, String>> = Traversal.fromTraversable()
+val listOfPairTraversal: Traversal<ListKOf<Tuple2<String, String>>, Tuple2<String, String>> = Traversal.fromTraversable()
 val nestedInts = listOfPairTraversal compose traversalTuple2()
 
 nestedInts.fold(listOf("Hello, " toT "World ", "from " toT "nested structures!").k())
@@ -75,11 +75,11 @@ nestedInts.fold(listOf("Hello, " toT "World ", "from " toT "nested structures!")
 ### Polymorphic Traversal
 
 When dealing with polymorphic types we can also have polymorphic `Traversel`s that allow us to morph the type of the foci.
-Previously we used a `Traversal<ListKWOf<Int>, Int>`, it was able to morph the `Int` values in the constructed type `ListKW<Int>`.
-With a `PTraversal<ListKWOf<Int>, ListKWOf<String>, Int, String>` we can morph an `Int` to a `String` and thus also morph the type from `ListKW<Int>` to `ListKW<String>`.
+Previously we used a `Traversal<ListKOf<Int>, Int>`, it was able to morph the `Int` values in the constructed type `ListK<Int>`.
+With a `PTraversal<ListKOf<Int>, ListKOf<String>, Int, String>` we can morph an `Int` to a `String` and thus also morph the type from `ListK<Int>` to `ListK<String>`.
 
 ```kotlin:ank
-val pTraversal: PTraversal<ListKWOf<Int>, ListKWOf<String>, Int, String> = PTraversal.fromTraversable()
+val pTraversal: PTraversal<ListKOf<Int>, ListKOf<String>, Int, String> = PTraversal.fromTraversable()
 
 pTraversal.set(listOf(1, 2, 3, 4).k(), "Constant")
 ```

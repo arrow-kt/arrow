@@ -100,8 +100,8 @@ class CofreeTest : UnitSpec() {
         }
 
         "mapBranchingS/T should recur over S and T respectively" {
-            val mappedS = startHundred.mapBranchingS(optionToList, ListKW.functor())
-            val mappedT = startHundred.mapBranchingT(optionToList, ListKW.functor())
+            val mappedS = startHundred.mapBranchingS(optionToList, ListK.functor())
+            val mappedT = startHundred.mapBranchingT(optionToList, ListK.functor())
             val expected = NonEmptyList.fromListUnsafe((0..100).toList())
             cofreeListToNel(mappedS) shouldBe expected
             cofreeListToNel(mappedT) shouldBe expected

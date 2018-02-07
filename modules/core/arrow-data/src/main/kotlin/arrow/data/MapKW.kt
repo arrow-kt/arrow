@@ -6,32 +6,32 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Foldable
 
 @higherkind
-data class MapKW<K, out A>(val map: Map<K, A>) : MapKWOf<K, A>, Map<K, A> by map {
+data class MapK<K, out A>(val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> by map {
 
-    fun <B> map(f: (A) -> B): MapKW<K, B> = this.map.map { it.key to f(it.value) }.toMap().k()
+    fun <B> map(f: (A) -> B): MapK<K, B> = this.map.map { it.key to f(it.value) }.toMap().k()
 
-    fun <B, Z> map2(fb: MapKW<K, B>, f: (A, B) -> Z): MapKW<K, Z> =
+    fun <B, Z> map2(fb: MapK<K, B>, f: (A, B) -> Z): MapK<K, Z> =
             if (fb.isEmpty()) emptyMap<K, Z>().k()
             else this.map.flatMap {
                 (k, a) ->
                 fb.getOption(k).map { Tuple2(k, f(a, it)) }.k().asIterable()
             }.k()
 
-    fun <B, Z> map2Eval(fb: Eval<MapKW<K, B>>, f: (A, B) -> Z): Eval<MapKW<K, Z>> =
+    fun <B, Z> map2Eval(fb: Eval<MapK<K, B>>, f: (A, B) -> Z): Eval<MapK<K, Z>> =
             if (fb.value().isEmpty()) Eval.now(emptyMap<K, Z>().k())
             else fb.map { b -> this.map2(b, f) }
 
-    fun <B> ap(ff: MapKW<K, (A) -> B>): MapKW<K, B> =
+    fun <B> ap(ff: MapK<K, (A) -> B>): MapK<K, B> =
             ff.flatMap { this.map(it) }
 
-    fun <B, Z> ap2(f: MapKW<K, (A, B) -> Z>, fb: MapKW<K, B>): Map<K, Z> =
+    fun <B, Z> ap2(f: MapK<K, (A, B) -> Z>, fb: MapK<K, B>): Map<K, Z> =
             f.map.flatMap {
                 (k, f) ->
                 this.flatMap { a -> fb.flatMap { b -> mapOf(Tuple2(k, f(a, b))).k() } }
                         .getOption(k).map { Tuple2(k, it) }.k().asIterable()
             }.k()
 
-    fun <B> flatMap(f: (A) -> MapKW<K, B>): MapKW<K, B> =
+    fun <B> flatMap(f: (A) -> MapK<K, B>): MapK<K, B> =
             this.map.flatMap {
                 (k, v) ->
                 f(v).getOption(k).map { Tuple2(k, it) }.k().asIterable()
@@ -41,10 +41,10 @@ data class MapKW<K, out A>(val map: Map<K, A>) : MapKWOf<K, A>, Map<K, A> by map
 
     fun <B> foldLeft(b: B, f: (B, A) -> B): B = this.map.values.fold(b, f)
 
-    fun <B> foldLeft(b: MapKW<K, B>, f: (MapKW<K, B>, Tuple2<K, A>) -> MapKW<K, B>): MapKW<K, B> =
+    fun <B> foldLeft(b: MapK<K, B>, f: (MapK<K, B>, Tuple2<K, A>) -> MapK<K, B>): MapK<K, B> =
             this.map.foldLeft(b) { m, (k, v) -> f(m.k(), Tuple2(k, v)) }.k()
 
-    fun <G, B> traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, MapKW<K, B>> =
+    fun <G, B> traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, MapK<K, B>> =
             (Foldable.iterateRight(this.map.iterator(), Eval.always { GA.pure(emptyMap<K, B>().k()) }))({ kv, lbuf ->
                 GA.map2Eval(f(kv.value), lbuf) { (mapOf(kv.key to it.a).k() + it.b).k() }
             }).value()
@@ -52,19 +52,19 @@ data class MapKW<K, out A>(val map: Map<K, A>) : MapKWOf<K, A>, Map<K, A> by map
     companion object
 }
 
-fun <K, A> Map<K, A>.k(): MapKW<K, A> = MapKW(this)
+fun <K, A> Map<K, A>.k(): MapK<K, A> = MapK(this)
 
-fun <K, A> Option<Tuple2<K, A>>.k(): MapKW<K, A> =
+fun <K, A> Option<Tuple2<K, A>>.k(): MapK<K, A> =
         when (this) {
             is Some -> mapOf(this.t).k()
             is None -> emptyMap<K, A>().k()
         }
 
-fun <K, A> List<Map.Entry<K, A>>.k(): MapKW<K, A> = this.map { it.key to it.value }.toMap().k()
+fun <K, A> List<Map.Entry<K, A>>.k(): MapK<K, A> = this.map { it.key to it.value }.toMap().k()
 
 fun <K, A> Map<K, A>.getOption(k: K): Option<A> = Option.fromNullable(this[k])
 
-fun <K, A> MapKW<K, A>.updated(k: K, value: A): MapKW<K, A> {
+fun <K, A> MapK<K, A>.updated(k: K, value: A): MapK<K, A> {
     val mutableMap = this.toMutableMap()
     mutableMap.put(k, value)
 

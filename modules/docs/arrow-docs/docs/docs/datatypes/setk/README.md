@@ -1,12 +1,12 @@
 ---
 layout: docs
-title: SetKW
-permalink: /docs/datatypes/setkw/
+title: SetK
+permalink: /docs/datatypes/setK/
 ---
 
-## SetKW
+## SetK
 
-SetKW(Kinded Wrapper) is a higher kinded wrapper around the the Set collection interface. 
+SetK(Kinded Wrapper) is a higher kinded wrapper around the the Set collection interface. 
 
 It can be created from the Kotlin Set type with a convient `k()` function.
 
@@ -21,11 +21,11 @@ setOf(1, 2, 5, 3, 2).k()
 It can also be initialized with the following:
 
 ```kotlin:ank
-SetKW(setOf(1, 2, 5, 3, 2))
+SetK(setOf(1, 2, 5, 3, 2))
 ```
 or
 ```kotlin:ank
-SetKW.pure(1)
+SetK.pure(1)
 ```
 
 given the following:
@@ -34,7 +34,7 @@ val oldNumbers = setOf( -11, 1, 3, 5, 7, 9).k()
 val evenNumbers = setOf(-2, 4, 6, 8, 10).k()
 val integers = setOf(-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5).k()
 ```
-SetKW derives the following typeclasses:
+SetK derives the following typeclasses:
 
 [`Semigroup`](/docs/typeclasses/semigroup/) and [`SemigroupK`](/docs/typeclasses/semigroupk/):
 
@@ -48,7 +48,7 @@ evenNumbers.combineK(integers).combineK(oldNumbers)
 
 [`Monoid`](/docs/typeclasses/monoid/) and [`MonoidK`](/docs/typeclasses/monoidk/):
 ```kotlin:ank
-SetKW.monoidK().combineK(numbers, SetKW.empty())
+SetK.monoidK().combineK(numbers, SetK.empty())
 ```
 
 [`Foldable`](/docs/typeclasses/foldable/):
@@ -61,5 +61,5 @@ Available Instances:
 ```kotlin:ank
 import arrow.debug.*
 
-showInstances<ForSetKW, Unit>()
+showInstances<ForSetK, Unit>()
 ```

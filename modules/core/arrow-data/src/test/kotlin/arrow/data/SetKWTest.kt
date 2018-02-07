@@ -11,24 +11,24 @@ import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class SetKWTest : UnitSpec() {
+class SetKTest : UnitSpec() {
 
     init {
 
         "instances can be resolved implicitly" {
-            foldable<ForSetKW>() shouldNotBe null
-            semigroupK<ForSetKW>() shouldNotBe null
-            monoidK<ForSetKW>() shouldNotBe null
-            semigroup<SetKW<Int>>() shouldNotBe null
-            monoid<SetKW<Int>>() shouldNotBe null
-            eq<SetKW<Int>>() shouldNotBe null
+            foldable<ForSetK>() shouldNotBe null
+            semigroupK<ForSetK>() shouldNotBe null
+            monoidK<ForSetK>() shouldNotBe null
+            semigroup<SetK<Int>>() shouldNotBe null
+            monoid<SetK<Int>>() shouldNotBe null
+            eq<SetK<Int>>() shouldNotBe null
         }
         
         testLaws(
-            EqLaws.laws { SetKW.pure(it) },
-            SemigroupKLaws.laws(SetKW.semigroupK(), { SetKW.pure(it) }, Eq.any()),
-            MonoidKLaws.laws(SetKW.monoidK(), { SetKW.pure(it) }, Eq.any()),
-            FoldableLaws.laws(SetKW.foldable(), { SetKW.pure(it) }, Eq.any())
+            EqLaws.laws { SetK.pure(it) },
+            SemigroupKLaws.laws(SetK.semigroupK(), { SetK.pure(it) }, Eq.any()),
+            MonoidKLaws.laws(SetK.monoidK(), { SetK.pure(it) }, Eq.any()),
+            FoldableLaws.laws(SetK.foldable(), { SetK.pure(it) }, Eq.any())
         )
     }
 }

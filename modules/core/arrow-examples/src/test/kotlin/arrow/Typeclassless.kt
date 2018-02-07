@@ -3,8 +3,8 @@ package arrow
 import arrow.TypeclasslessExamples.ScopeOne.inScopeOne
 import arrow.TypeclasslessExamples.ScopeTwo.withAll
 import arrow.TypeclasslessExamples.ScopeTwo.withApplicative
-import arrow.data.ForListKW
-import arrow.data.ListKW
+import arrow.data.ForListK
+import arrow.data.ListK
 import arrow.data.applicative
 import arrow.data.k
 import arrow.typeclasses.Applicative
@@ -69,11 +69,11 @@ class TypeclasslessExamples : FreeSpec() {
 
     // Define some trivial instances for Identify and Applicative
 
-    val ID_LIST: Identity<ForListKW> =
-            object : Identity<ForListKW> {}
+    val ID_LIST: Identity<ForListK> =
+            object : Identity<ForListK> {}
 
     val AP =
-            ListKW.applicative()
+            ListK.applicative()
 
     val ALL_SYNTAX =
             allSyntax(AP, ID_LIST)
@@ -145,7 +145,7 @@ class TypeclasslessExamples : FreeSpec() {
             fun <A, R> toFun(f: A.() -> R): (A) -> R =
                     f
 
-            toFun<ApplicativeAndIdentifySyntax<ForListKW>, Kind<ForListKW, Int>> { withAll() }(ALL_SYNTAX) shouldBe expected
+            toFun<ApplicativeAndIdentifySyntax<ForListK>, Kind<ForListK, Int>> { withAll() }(ALL_SYNTAX) shouldBe expected
         }
     }
 }

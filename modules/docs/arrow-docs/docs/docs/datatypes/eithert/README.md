@@ -9,15 +9,15 @@ permalink: /docs/datatypes/eithert/
 
 `EitherT` also known as the `Either` monad transformer allows to compute inside the context when `Either` is nested in a different monad.
 
-One issue we face with monads is that they don't compose. This can cause your code to get really hairy when trying to combine structures like `ObservableKW` and `Either`. But there's a simple solution, and we're going to explain how you can use Monad Transformers to alleviate this problem.
+One issue we face with monads is that they don't compose. This can cause your code to get really hairy when trying to combine structures like `ObservableK` and `Either`. But there's a simple solution, and we're going to explain how you can use Monad Transformers to alleviate this problem.
 
 For our purposes here, we're going to utilize a monad that serves as a container that may hold a value and where a computation can be performed.
 
-Given that both `ObservableKW<A>` and `Either<L, A>` would be examples of datatypes that provide instances for the `Monad` typeclasses.
+Given that both `ObservableK<A>` and `Either<L, A>` would be examples of datatypes that provide instances for the `Monad` typeclasses.
 
-Because [monads don't compose](http://tonymorris.github.io/blog/posts/monads-do-not-compose/), we may end up with nested structures such as `ObservableKW<Either<BizError, ObservableKW<Either<BizError, A>>>` when using `ObservableKW` and `Either` together. Using Monad Transformers can help us to reduce this boilerplate.
+Because [monads don't compose](http://tonymorris.github.io/blog/posts/monads-do-not-compose/), we may end up with nested structures such as `ObservableK<Either<BizError, ObservableK<Either<BizError, A>>>` when using `ObservableK` and `Either` together. Using Monad Transformers can help us to reduce this boilerplate.
 
-In the most basic of scenarios, we'll only be dealing with one monad at a time making our lives nice and easy. However, it's not uncommon to get into scenarios where some function calls will return `ObservableKW<A>`, and others will return `Either<BizError, A>`.
+In the most basic of scenarios, we'll only be dealing with one monad at a time making our lives nice and easy. However, it's not uncommon to get into scenarios where some function calls will return `ObservableK<A>`, and others will return `Either<BizError, A>`.
 
 So let's test this out with an example:
 
@@ -109,18 +109,18 @@ val adressDB: Map<Int, Address> = mapOf(
 )
 ```
 
-Now we've got two new functions in the mix that are going to call a remote service, and they return a `ObservableKW`. This is common in most APIs that handle loading asynchronously.
+Now we've got two new functions in the mix that are going to call a remote service, and they return a `ObservableK`. This is common in most APIs that handle loading asynchronously.
 
 ```kotlin:ank
 import arrow.effects.*
 
-fun findPerson(personId : Int) : ObservableKW<Either<BizError, Person>> =
-  ObservableKW.pure(
+fun findPerson(personId : Int) : ObservableK<Either<BizError, Person>> =
+  ObservableK.pure(
     Option.fromNullable(personDB.get(personId)).toEither { PersonNotFound(personId) }
   ) //mock impl for simplicity
 
-fun findCountry(addressId : Int) : ObservableKW<Either<BizError, Country>> =
-  ObservableKW.pure(
+fun findCountry(addressId : Int) : ObservableK<Either<BizError, Country>> =
+  ObservableK.pure(
     Option.fromNullable(adressDB.get(addressId))
       .flatMap { it.country }
       .toEither { CountryNotFound(addressId) }
@@ -157,15 +157,15 @@ We can't use flatMap in this case because the nested expression does not match t
 Let's look at how a similar implementation would look like using monad comprehensions without transformers:
 
 ```kotlin:ank
-fun getCountryCode(personId: Int): ObservableKW<Either<BizError, String>> =
-      ObservableKW.monad().binding {
+fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
+      ObservableK.monad().binding {
         val person = findPerson(personId).bind()
         val address = person.fold (
           { it.left() },
           { it.address.toEither { AddressNotFound(personId) } }
         )
         val maybeCountry = address.fold(
-          { ObservableKW.pure(it.left()) },
+          { ObservableK.pure(it.left()) },
           { findCountry(it.id) }
         ).bind()
         val code = maybeCountry.fold(
@@ -176,9 +176,9 @@ fun getCountryCode(personId: Int): ObservableKW<Either<BizError, String>> =
       }.reify()
 ```
 
-While we've got the logic working now, we're in a situation where we're forced to deal with the `Left cases`. We also have a ton of boilerplate type conversion with `fold`. The type conversion is necessary because in a monad comprehension you can only use a type of Monad. If we start with `ObservableKW`, we have to stay in it’s monadic context by lifting anything we compute sequentially to a `ObservableKW` whether or not it's async.
+While we've got the logic working now, we're in a situation where we're forced to deal with the `Left cases`. We also have a ton of boilerplate type conversion with `fold`. The type conversion is necessary because in a monad comprehension you can only use a type of Monad. If we start with `ObservableK`, we have to stay in it’s monadic context by lifting anything we compute sequentially to a `ObservableK` whether or not it's async.
 
-This is a commonly encountered problem, especially in the context of async services. So how can we reconcile the fact that we're mixing `Either` and `ObservableKW`?
+This is a commonly encountered problem, especially in the context of async services. So how can we reconcile the fact that we're mixing `Either` and `ObservableK`?
 
 ### Monad Transformers to the Rescue!
 
@@ -188,18 +188,18 @@ from Arrow to express the effect of potential known controled biz error inside o
 `EitherT` has the form of `EitherT<F, L, A>`.
 
 This means that for any monad `F` surrounding an `Either<L, A>` we can obtain an `EitherT<F, L, A>`.
-So our specialization `EitherT<ForObservableKW, BizError, A>` is the EitherT transformer around values that are of `ObservableKW<Either<BizError, A>>`.
+So our specialization `EitherT<ForObservableK, BizError, A>` is the EitherT transformer around values that are of `ObservableK<Either<BizError, A>>`.
 
 We can now lift any value to a `EitherT<F, BizError, A>` which looks like this:
 
 ```kotlin:ank
 import arrow.syntax.applicative.*
 import arrow.data.*
-val eitherTVal = 1.pure<EitherTPartialOf<ForObservableKW, BizError>, Int>()
+val eitherTVal = 1.pure<EitherTPartialOf<ForObservableK, BizError>, Int>()
 eitherTVal
 ```
 
-And back to the `ObservableKW<Either<BizError, A>>` running the transformer
+And back to the `ObservableK<Either<BizError, A>>` running the transformer
 
 ```kotlin:ank
 eitherTVal.value()
@@ -208,10 +208,10 @@ eitherTVal.value()
 So how would our function look if we implemented it with the EitherT monad transformer?
 
 ```kotlin
-fun getCountryCode(personId: Int): ObservableKW<Either<BizError, String>> =
-  EitherT.monadError<ForObservableKW, BizError>().binding {
+fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
+  EitherT.monadError<ForObservableK, BizError>().binding {
     val person = EitherT(findPerson(personId)).bind()
-    val address = EitherT(ObservableKW.pure(
+    val address = EitherT(ObservableK.pure(
       person.address.toEither { AddressNotFound(personId) }
     )).bind()
     val country = EitherT(findCountry(address.id)).bind()
@@ -219,7 +219,7 @@ fun getCountryCode(personId: Int): ObservableKW<Either<BizError, String>> =
   }.value()
 ```
 
-Here we no longer have to deal with the `Left` cases, and the binding to the values on the left side are already the underlying values we want to focus on instead of the potential biz error values. We have automatically `flatMapped` through the `ObservableKW` and `Either` in a single expression reducing the boilerplate and encoding the effects concerns in the type signatures.
+Here we no longer have to deal with the `Left` cases, and the binding to the values on the left side are already the underlying values we want to focus on instead of the potential biz error values. We have automatically `flatMapped` through the `ObservableK` and `Either` in a single expression reducing the boilerplate and encoding the effects concerns in the type signatures.
 
 ## Additional syntax
 
@@ -234,7 +234,7 @@ EitherT(Option(3.left())).mapLeft({it + 1}, Option.functor())
 ```kotlin:ank
 import arrow.debug.*
 
-showInstances<EitherTPartialOf<ForObservableKW, BizError>, BizError>()
+showInstances<EitherTPartialOf<ForObservableK, BizError>, BizError>()
 ```
 
 Take a look at the [`OptionT` docs]({{ '/docs/datatypes/optiont' | relative_url }}) for an alternative version of this content with the `OptionT` monad transformer

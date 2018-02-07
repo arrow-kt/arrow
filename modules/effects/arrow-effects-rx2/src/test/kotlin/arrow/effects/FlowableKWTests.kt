@@ -14,10 +14,10 @@ import org.junit.runner.RunWith
 import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
-class FlowableKWTests : UnitSpec() {
+class FlowableKTests : UnitSpec() {
 
-    fun <T> EQ(): Eq<FlowableKWOf<T>> = object : Eq<FlowableKWOf<T>> {
-        override fun eqv(a: FlowableKWOf<T>, b: FlowableKWOf<T>): Boolean =
+    fun <T> EQ(): Eq<FlowableKOf<T>> = object : Eq<FlowableKOf<T>> {
+        override fun eqv(a: FlowableKOf<T>, b: FlowableKOf<T>): Boolean =
                 try {
                     a.value().blockingFirst() == b.value().blockingFirst()
                 } catch (throwable: Throwable) {
@@ -40,45 +40,45 @@ class FlowableKWTests : UnitSpec() {
 
     init {
         "instances can be resolved implicitly" {
-            functor<ForFlowableKW>() shouldNotBe null
-            applicative<ForFlowableKW>() shouldNotBe null
-            monad<ForFlowableKW>() shouldNotBe null
-            applicativeError<ForFlowableKW, Unit>() shouldNotBe null
-            monadError<ForFlowableKW, Unit>() shouldNotBe null
-            monadSuspend<ForFlowableKW>() shouldNotBe null
-            async<ForFlowableKW>() shouldNotBe null
-            effect<ForFlowableKW>() shouldNotBe null
-            foldable<ForFlowableKW>() shouldNotBe null
-            traverse<ForFlowableKW>() shouldNotBe null
+            functor<ForFlowableK>() shouldNotBe null
+            applicative<ForFlowableK>() shouldNotBe null
+            monad<ForFlowableK>() shouldNotBe null
+            applicativeError<ForFlowableK, Unit>() shouldNotBe null
+            monadError<ForFlowableK, Unit>() shouldNotBe null
+            monadSuspend<ForFlowableK>() shouldNotBe null
+            async<ForFlowableK>() shouldNotBe null
+            effect<ForFlowableK>() shouldNotBe null
+            foldable<ForFlowableK>() shouldNotBe null
+            traverse<ForFlowableK>() shouldNotBe null
         }
 
-        testLaws(AsyncLaws.laws(FlowableKW.async(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableKW.async(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableKW.async(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
 
-        testLaws(AsyncLaws.laws(FlowableKW.asyncDrop(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableKW.asyncDrop(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableKW.asyncDrop(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
 
-        testLaws(AsyncLaws.laws(FlowableKW.asyncError(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableKW.asyncError(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableKW.asyncError(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
 
-        testLaws(AsyncLaws.laws(FlowableKW.asyncLatest(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableKW.asyncLatest(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableKW.asyncLatest(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
 
-        testLaws(AsyncLaws.laws(FlowableKW.asyncMissing(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableKW.asyncMissing(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableKW.asyncMissing(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
 
         testLaws(
-                FoldableLaws.laws(FlowableKW.foldable(), { FlowableKW.pure(it) }, Eq.any()),
-                TraverseLaws.laws(FlowableKW.traverse(), FlowableKW.functor(), { FlowableKW.pure(it) }, EQ())
+                FoldableLaws.laws(FlowableK.foldable(), { FlowableK.pure(it) }, Eq.any()),
+                TraverseLaws.laws(FlowableK.traverse(), FlowableK.functor(), { FlowableK.pure(it) }, EQ())
         )
 
         "Multi-thread Flowables finish correctly" {
-            val value: Flowable<Long> = FlowableKW.monadErrorFlat().bindingCatch {
+            val value: Flowable<Long> = FlowableK.monadErrorFlat().bindingCatch {
                 val a = Flowable.timer(2, TimeUnit.SECONDS).k().bind()
                 yields(a)
             }.value()
@@ -90,7 +90,7 @@ class FlowableKWTests : UnitSpec() {
         "Multi-thread Observables should run on their required threads" {
             val originalThread: Thread = Thread.currentThread()
             var threadRef: Thread? = null
-            val value: Flowable<Long> = FlowableKW.monadErrorFlat().bindingCatch {
+            val value: Flowable<Long> = FlowableK.monadErrorFlat().bindingCatch {
                 val a = Flowable.timer(2, TimeUnit.SECONDS, Schedulers.newThread()).k().bind()
                 threadRef = Thread.currentThread()
                 val b = Flowable.just(a).observeOn(Schedulers.newThread()).k().bind()
@@ -106,7 +106,7 @@ class FlowableKWTests : UnitSpec() {
         }
 
         "Flowable cancellation forces binding to cancel without completing too" {
-            val value: Flowable<Long> = FlowableKW.monadErrorFlat().bindingCatch {
+            val value: Flowable<Long> = FlowableK.monadErrorFlat().bindingCatch {
                 val a = Flowable.timer(3, TimeUnit.SECONDS).k().bind()
                 yields(a)
             }.value()

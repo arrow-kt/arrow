@@ -1,8 +1,8 @@
 package arrow.optics
 
 import arrow.core.Either
-import arrow.data.ListKW
-import arrow.data.ListKWKind
+import arrow.data.ListK
+import arrow.data.ListKOf
 import arrow.data.k
 import arrow.syntax.either.left
 import arrow.syntax.either.right
@@ -83,16 +83,16 @@ class StackOverflowTest: UnitSpec() {
     }
 
     fun <A> listToTraversal(): Traversal<List<A>, A> {
-        val listTraversal: Traversal<ListKWOf<A>, A> = Traversal.fromTraversable()
-        return listToListKW2<A>() + listTraversal
+        val listTraversal: Traversal<ListKOf<A>, A> = Traversal.fromTraversable()
+        return listToListK2<A>() + listTraversal
     }
 
-    fun <A, B> pListToListKW2(): PIso<List<A>, List<B>, ListKWOf<A>, ListKWOf<B>> = PIso(
+    fun <A, B> pListToListK2(): PIso<List<A>, List<B>, ListKOf<A>, ListKOf<B>> = PIso(
             get = { it.k() },
-            reverseGet = { (it as ListKW<B>).list }
+            reverseGet = { (it as ListK<B>).list }
     )
 
-    fun <A> listToListKW2(): Iso<List<A>, ListKWOf<A>> = pListToListKW2()
+    fun <A> listToListK2(): Iso<List<A>, ListKOf<A>> = pListToListK2()
 
 
 }

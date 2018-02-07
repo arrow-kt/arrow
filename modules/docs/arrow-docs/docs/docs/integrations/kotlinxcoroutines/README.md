@@ -67,7 +67,7 @@ You can read more about FP architectures in the section on [Monad Transformers](
 To create a Deferred Arrow Wrapper you can invoke the constructor with any synchronous non-suspending function, the same way you'd use `async`.
 
 ```kotlin
-val deferredKW = DeferredKW { throw RuntimeException("BOOM!") }
+val deferredK = DeferredK { throw RuntimeException("BOOM!") }
 ```
 
 To wrap any existing `Deferred` in its Arrow Wrapper counterpart you can use the extension function `k()`.
@@ -78,10 +78,10 @@ val deferredWrapped = async { throw RuntimeException("BOOM!") }.k()
 
 All the other usual constructors like `pure()`, `suspend()`, and `async()` are available too, in versions that accept different values for `CoroutineStart` and `CoroutineContext`.
 
-To unwrap the value of a `DeferredKW` we provide a synchronous method called `unsafeAttemptSync()` that returns a `Try<A>`.
+To unwrap the value of a `DeferredK` we provide a synchronous method called `unsafeAttemptSync()` that returns a `Try<A>`.
 
 ```kotlin
-deferredKW.unsafeAttemptSync()
+deferredK.unsafeAttemptSync()
 // Failure(RuntimeException("BOOM!"))
 ```
 
@@ -91,9 +91,9 @@ The safe version takes as a parameter a callback from a result of `Either<Throwa
 All exceptions that would happen on the function parameter are automatically captured and propagated to the `Deferred<Unit>` return.
 
 ```kotlin
-DeferredKW { throw RuntimeException("Boom!") }
+DeferredK { throw RuntimeException("Boom!") }
   .runAsync { result ->
-    result.fold({ DeferredKW { println("Error found") } }, { res -> DeferredKW { println(res.toString()) } })
+    result.fold({ DeferredK { println("Error found") } }, { res -> DeferredK { println(res.toString()) } })
   }
 // Error found
 ```
@@ -101,7 +101,7 @@ DeferredKW { throw RuntimeException("Boom!") }
 The unsafe version requires a callback to `Unit` and is assumed to never throw any internal exceptions.
 
 ```kotlin
-DeferredKW { throw RuntimeException("Boom!") }
+DeferredK { throw RuntimeException("Boom!") }
   .unsafeRunAsync { result ->
     result.fold({ println("Error found") }, { println(it.toString()) })
   }
@@ -119,7 +119,7 @@ It is also posible to `await()` on the wrapper like you would on `Deferred`, but
 These benefits include capturing all exceptions that happen inside the block.
 
 ```kotlin
-DeferredKW.monadError().bindingCatch {
+DeferredK.monadError().bindingCatch {
   val songUrl = getSongUrlAsync().bind()
   val musicPlayer = MediaPlayer.load(songUrl)
   val totalTime = musicPlayer.getTotaltime() // Oh oh, total time is 0
@@ -139,16 +139,16 @@ The most common ones are `handleError` and `handleErrorWith`.
 The former allows you to return a single value from a faulty block
 
 ```kotlin
-val recoveryArrowWrapper = DeferredKW { getUserListByIdRange(-1, 2) }
+val recoveryArrowWrapper = DeferredK { getUserListByIdRange(-1, 2) }
                                  .handleError { listOf() }
 recoveryArrowWrapper.unsafeAttemptSync()
 // Success(List())
 ```
 
-whereas the later allows for any `DeferredKW` to be returned
+whereas the later allows for any `DeferredK` to be returned
 
 ```kotlin
-val recoveryArrowWrapper = DeferredKW { getUserListByIdRange(-1, 2) }
+val recoveryArrowWrapper = DeferredK { getUserListByIdRange(-1, 2) }
                                  .handleErrorWith { getUserListByIdRange(1, 3) }
 recoveryArrowWrapper.unsafeAttemptSync()
 // Success(List(User(1), User(2), User(3)))
@@ -156,17 +156,17 @@ recoveryArrowWrapper.unsafeAttemptSync()
 
 ### Subscription and cancellation
 
-`DeferredKW` created with `bindingCatch` behave the same way regular `Deferred` do, including cancellation by disposing the subscription.
+`DeferredK` created with `bindingCatch` behave the same way regular `Deferred` do, including cancellation by disposing the subscription.
 
 Note that [`MonadSuspend`]({{ '/docs/effects/monadsuspend' | relative_url }}) provides an alternative to `bindingCatch` called `bindingCancellable` returning a `arrow.Disposable`.
 Invoking this `Disposable` causes an `BindingCancellationException` in the chain which needs to be handled by the subscriber, similarly to what `Deferred` does.
 
 ```kotlin
 val (deferred, unsafeCancel) = 
-  DeferredKW.monadSuspend().bindingCancellable {
-    val userProfile = DeferredKW { getUserProfile("123") }.bind()
+  DeferredK.monadSuspend().bindingCancellable {
+    val userProfile = DeferredK { getUserProfile("123") }.bind()
     val friendProfiles = userProfile.friends().map { friend ->
-        DeferredKW { getProfile(friend.id) }.bind()
+        DeferredK { getProfile(friend.id) }.bind()
     }
     listOf(userProfile) + friendProfiles
   }
@@ -181,12 +181,12 @@ unsafeCancel()
 
 ### Instances
 
-You can see all the type classes `DeferredKW` implements below:
+You can see all the type classes `DeferredK` implements below:
 
 ```kotlin:ank
 import arrow.*
 import arrow.effects.*
 import arrow.debug.*
 
-showInstances<ForDeferredKW, Throwable>()
+showInstances<ForDeferredK, Throwable>()
 ```

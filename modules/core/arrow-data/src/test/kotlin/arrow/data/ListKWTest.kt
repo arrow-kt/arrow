@@ -12,38 +12,38 @@ import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class ListKWTest : UnitSpec() {
-    val applicative = ListKW.applicative()
+class ListKTest : UnitSpec() {
+    val applicative = ListK.applicative()
 
     init {
 
         "instances can be resolved implicitly" {
-            functor<ForListKW>() shouldNotBe null
-            applicative<ForListKW>() shouldNotBe null
-            monad<ForListKW>() shouldNotBe null
-            foldable<ForListKW>() shouldNotBe null
-            traverse<ForListKW>() shouldNotBe null
-            semigroupK<ForListKW>() shouldNotBe null
-            semigroup<ListKW<Int>>() shouldNotBe null
-            monoid<ListKW<Int>>() shouldNotBe null
-            monoidK<ListKW<ForListKW>>() shouldNotBe null
-            monadFilter<ForListKW>() shouldNotBe null
-            monadCombine<ListKW<ForListKW>>() shouldNotBe null
-            functorFilter<ListKW<ForListKW>>() shouldNotBe null
-            monadFilter<ListKW<ForListKW>>() shouldNotBe null
-            eq<ListKW<Int>>() shouldNotBe null
+            functor<ForListK>() shouldNotBe null
+            applicative<ForListK>() shouldNotBe null
+            monad<ForListK>() shouldNotBe null
+            foldable<ForListK>() shouldNotBe null
+            traverse<ForListK>() shouldNotBe null
+            semigroupK<ForListK>() shouldNotBe null
+            semigroup<ListK<Int>>() shouldNotBe null
+            monoid<ListK<Int>>() shouldNotBe null
+            monoidK<ListK<ForListK>>() shouldNotBe null
+            monadFilter<ForListK>() shouldNotBe null
+            monadCombine<ListK<ForListK>>() shouldNotBe null
+            functorFilter<ListK<ForListK>>() shouldNotBe null
+            monadFilter<ListK<ForListK>>() shouldNotBe null
+            eq<ListK<Int>>() shouldNotBe null
         }
 
         testLaws(
             EqLaws.laws { listOf(it).k() },
-            SemigroupKLaws.laws(ListKW.semigroupK(), applicative, Eq.any()),
-            MonoidKLaws.laws(ListKW.monoidK(), applicative, Eq.any()),
-            TraverseLaws.laws(ListKW.traverse(), applicative, { n: Int -> ListKW(listOf(n)) }, Eq.any()),
-            MonadCombineLaws.laws(ListKW.monadCombine(),
-                { n -> ListKW(listOf(n)) },
-                { n -> ListKW(listOf({ s: Int -> n * s })) },
-                object : Eq<Kind<ForListKW, Int>> {
-                    override fun eqv(a: Kind<ForListKW, Int>, b: Kind<ForListKW, Int>): Boolean =
+            SemigroupKLaws.laws(ListK.semigroupK(), applicative, Eq.any()),
+            MonoidKLaws.laws(ListK.monoidK(), applicative, Eq.any()),
+            TraverseLaws.laws(ListK.traverse(), applicative, { n: Int -> ListK(listOf(n)) }, Eq.any()),
+            MonadCombineLaws.laws(ListK.monadCombine(),
+                { n -> ListK(listOf(n)) },
+                { n -> ListK(listOf({ s: Int -> n * s })) },
+                object : Eq<Kind<ForListK, Int>> {
+                    override fun eqv(a: Kind<ForListK, Int>, b: Kind<ForListK, Int>): Boolean =
                             a.reify().list == b.reify().list
                 })
         )

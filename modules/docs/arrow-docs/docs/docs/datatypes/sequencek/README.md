@@ -1,12 +1,12 @@
 ---
 layout: docs
-title: SequenceKW
-permalink: /docs/datatypes/sequencekw/
+title: SequenceK
+permalink: /docs/datatypes/sequenceK/
 ---
 
-## SequenceKW
+## SequenceK
 
-SequenceKW implements lazy lists representing lazily-evaluated ordered sequence of homogenous values.
+SequenceK implements lazy lists representing lazily-evaluated ordered sequence of homogenous values.
 
 It can be created from Kotlin Sequence type with a convenient `k()` function.
 
@@ -17,7 +17,7 @@ import arrow.data.*
 sequenceOf(1, 2, 3).k()
 ```
 
-SequenceKW derives many useful typeclasses. For instance, it has a [`SemigroupK`](/docs/typeclasses/semigroupk/) instance.
+SequenceK derives many useful typeclasses. For instance, it has a [`SemigroupK`](/docs/typeclasses/semigroupk/) instance.
 
 ```kotlin:ank
 val hello = sequenceOf('h', 'e', 'l', 'l', 'o').k()
@@ -39,10 +39,10 @@ fibonacci.map { it * 2 }.takeWhile { it < 10 }.toList()
 
 Applying a sequence of functions to a sequence:
 ```kotlin:ank
-SequenceKW.applicative().ap(sequenceOf(1, 2, 3).k(), sequenceOf({ x: Int -> x + 1}, { x: Int -> x * 2}).k()).toList()
+SequenceK.applicative().ap(sequenceOf(1, 2, 3).k(), sequenceOf({ x: Int -> x + 1}, { x: Int -> x * 2}).k()).toList()
 ```
 
-SequenceKW is a [`Monad`](/docs/_docs/typeclasses/monad/) too. For example, it can be used to model non-deterministic computations. (In a sense that the computations return an arbitrary number of results.)
+SequenceK is a [`Monad`](/docs/_docs/typeclasses/monad/) too. For example, it can be used to model non-deterministic computations. (In a sense that the computations return an arbitrary number of results.)
 
 ```kotlin:ank
 import arrow.typeclasses.*
@@ -50,7 +50,7 @@ import arrow.typeclasses.*
 val positive = generateSequence(1) { it + 1 }.k() // sequence of positive numbers
 val positiveEven = positive.filter { it % 2 == 0 }.k()
 
-SequenceKW.monad().binding {
+SequenceK.monad().binding {
    val p = positive.bind()
    val pe = positiveEven.bind()
    p + pe
@@ -68,5 +68,5 @@ Available Instances:
 ```kotlin:ank
 import arrow.debug.*
 
-showInstances<ForSequenceKW, Unit>()
+showInstances<ForSequenceK, Unit>()
 ```

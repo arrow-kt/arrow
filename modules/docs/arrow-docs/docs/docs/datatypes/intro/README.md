@@ -86,15 +86,15 @@ Data contains the bulk of the datatypes provided by Arrow. We can separate them 
 
 These types wrap over some of Kotlin's collections and functions to give them capabilities related to [typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}) provided by Arrow.
 
-- [`ListKW`]({{ '/docs/datatypes/listkw/' | relative_url }})
+- [`ListK`]({{ '/docs/datatypes/listK/' | relative_url }})
 
-- [`SequenceKW`]({{ '/docs/datatypes/sequencekw/' | relative_url }})
+- [`SequenceK`]({{ '/docs/datatypes/sequenceK/' | relative_url }})
 
-- [`SetKW`]({{ '/docs/datatypes/setkw/' | relative_url }})
+- [`SetK`]({{ '/docs/datatypes/setK/' | relative_url }})
 
-- [`MapKW`]({{ '/docs/datatypes/mapkw/' | relative_url }}) 
+- [`MapK`]({{ '/docs/datatypes/mapK/' | relative_url }}) 
 
-- [`SortedMapKW`]({{ '/docs/datatypes/sortedmapkw/' | relative_url }})
+- [`SortedMapK`]({{ '/docs/datatypes/sortedmapK/' | relative_url }})
 
 - [`Function0`]({{ '/docs/datatypes/function0/' | relative_url }})
 

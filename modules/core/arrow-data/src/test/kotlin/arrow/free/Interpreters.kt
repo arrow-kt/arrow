@@ -11,18 +11,18 @@ val cofreeOptionToNel: FunctionK<CofreePartialOf<ForOption>, ForNonEmptyList> = 
             }
 }
 
-val cofreeListToNel: FunctionK<CofreePartialOf<ForListKW>, ForNonEmptyList> = object : FunctionK<CofreePartialOf<ForListKW>, ForNonEmptyList> {
-    override fun <A> invoke(fa: Kind<CofreePartialOf<ForListKW>, A>): Kind<ForNonEmptyList, A> =
-            fa.reify().let { c: Cofree<ForListKW, A> ->
-                val all: List<Cofree<ForListKW, A>> = c.tailForced().reify()
+val cofreeListToNel: FunctionK<CofreePartialOf<ForListK>, ForNonEmptyList> = object : FunctionK<CofreePartialOf<ForListK>, ForNonEmptyList> {
+    override fun <A> invoke(fa: Kind<CofreePartialOf<ForListK>, A>): Kind<ForNonEmptyList, A> =
+            fa.reify().let { c: Cofree<ForListK, A> ->
+                val all: List<Cofree<ForListK, A>> = c.tailForced().reify()
                 val tail: List<A> = all.foldRight(listOf<A>(), { v, acc -> acc + invoke(v).reify().all })
                 val headL: List<A> = listOf(c.head)
                 NonEmptyList.fromListUnsafe(headL + tail)
             }
 }
 
-val optionToList: FunctionK<ForOption, ForListKW> = object : FunctionK<ForOption, ForListKW> {
-    override fun <A> invoke(fa: Kind<ForOption, A>): Kind<ForListKW, A> =
+val optionToList: FunctionK<ForOption, ForListK> = object : FunctionK<ForOption, ForListK> {
+    override fun <A> invoke(fa: Kind<ForOption, A>): Kind<ForListK, A> =
             fa.reify().fold({ listOf<A>().k() }, { listOf(it).k() })
 }
 
