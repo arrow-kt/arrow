@@ -7,22 +7,22 @@ import arrow.typeclasses.*
 
 @instance(SortedMapKW::class)
 interface SortedMapKWFunctorInstance<A : Comparable<A>> : Functor<SortedMapKWKindPartial<A>> {
-    override fun <B, C> map(fb: HK<SortedMapKWKindPartial<A>, B>, f: (B) -> C): SortedMapKW<A, C> =
+    override fun <B, C> map(fb: Kind<SortedMapKWKindPartial<A>, B>, f: (B) -> C): SortedMapKW<A, C> =
             fb.ev().map(f)
 }
 
 @instance(SortedMapKW::class)
 interface SortedMapKWFoldableInstance<A : Comparable<A>> : Foldable<SortedMapKWKindPartial<A>> {
-    override fun <B, C> foldLeft(fb: HK<SortedMapKWKindPartial<A>, B>, c: C, f: (C, B) -> C): C =
+    override fun <B, C> foldLeft(fb: Kind<SortedMapKWKindPartial<A>, B>, c: C, f: (C, B) -> C): C =
             fb.ev().foldLeft(c, f)
 
-    override fun <B, C> foldRight(fb: HK<SortedMapKWKindPartial<A>, B>, lc: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
+    override fun <B, C> foldRight(fb: Kind<SortedMapKWKindPartial<A>, B>, lc: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
             fb.ev().foldRight(lc, f)
 }
 
 @instance(SortedMapKW::class)
 interface SortedMapKWTraverseInstance<A : Comparable<A>> : SortedMapKWFoldableInstance<A>, Traverse<SortedMapKWKindPartial<A>> {
-    override fun <G, B, C> traverse(fb: HK<SortedMapKWKindPartial<A>, B>, f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, HK<SortedMapKWKindPartial<A>, C>> =
+    override fun <G, B, C> traverse(fb: Kind<SortedMapKWKindPartial<A>, B>, f: (B) -> Kind<G, C>, GA: Applicative<G>): Kind<G, Kind<SortedMapKWKindPartial<A>, C>> =
             fb.ev().traverse(f, GA)
 }
 

@@ -50,7 +50,7 @@ sealed class Try<out A> : TryKind<A> {
     @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("getOrElse { ifEmpty }"))
     operator fun invoke() = get()
 
-    fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, Try<B>> =
+    fun <G, B> traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Try<B>> =
             this.ev().fold({ GA.pure(raise(IllegalStateException())) }, { GA.map(f(it), { Try { it } }) })
 
     fun <B> ap(ff: TryKind<(A) -> B>): Try<B> = ff.ev().flatMap { f -> map(f) }.ev()

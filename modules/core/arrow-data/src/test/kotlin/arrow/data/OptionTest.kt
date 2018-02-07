@@ -1,6 +1,6 @@
 package arrow.data
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.*
 import arrow.mtl.traverseFilter
 import arrow.syntax.`try`.optionTry
@@ -43,7 +43,7 @@ class OptionTest : UnitSpec() {
             eq<Option<Int>>() shouldNotBe null
         }
 
-        val EQ_EITHER: Eq<HK<ForOption, Either<Unit, Int>>> = Eq { a, b ->
+        val EQ_EITHER: Eq<Kind<ForOption, Either<Unit, Int>>> = Eq { a, b ->
             a.ev().fold(
                     { b.ev().fold({ true }, { false }) },
                     { eitherA: Either<Unit, Int> ->

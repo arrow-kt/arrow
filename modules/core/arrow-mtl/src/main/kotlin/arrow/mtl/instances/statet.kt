@@ -27,7 +27,7 @@ interface StateTMonadCombineInstance<F, S> : MonadCombine<StateTKindPartial<F, S
 
     override fun SS(): SemigroupK<F> = MC()
 
-    override fun <A> empty(): HK<StateTKindPartial<F, S>, A> = liftT(MC().empty())
+    override fun <A> empty(): Kind<StateTKindPartial<F, S>, A> = liftT(MC().empty())
 
-    fun <A> liftT(ma: HK<F, A>): StateT<F, S, A> = StateT(FF().pure({ s: S -> FF().map(ma, { a: A -> s toT a }) }))
+    fun <A> liftT(ma: Kind<F, A>): StateT<F, S, A> = StateT(FF().pure({ s: S -> FF().map(ma, { a: A -> s toT a }) }))
 }

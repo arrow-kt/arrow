@@ -1,6 +1,6 @@
 package arrow.data
 
-import arrow.HK
+import arrow.Kind
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadLaws
@@ -30,8 +30,8 @@ class SequenceKWTest : UnitSpec() {
             eq<SequenceKW<Int>>() shouldNotBe null
         }
 
-        val eq: Eq<HK<ForSequenceKW, Int>> = object : Eq<HK<ForSequenceKW, Int>> {
-            override fun eqv(a: HK<ForSequenceKW, Int>, b: HK<ForSequenceKW, Int>): Boolean =
+        val eq: Eq<Kind<ForSequenceKW, Int>> = object : Eq<Kind<ForSequenceKW, Int>> {
+            override fun eqv(a: Kind<ForSequenceKW, Int>, b: Kind<ForSequenceKW, Int>): Boolean =
                     a.toList() == b.toList()
         }
 

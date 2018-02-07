@@ -19,7 +19,7 @@ interface ValidatedApplicativeInstance<E> : ValidatedFunctorInstance<E>, Applica
 
     override fun <A, B> map(fa: ValidatedKind<E, A>, f: (A) -> B): Validated<E, B> = fa.ev().map(f)
 
-    override fun <A, B> ap(fa: ValidatedKind<E, A>, ff: HK<ValidatedKindPartial<E>, (A) -> B>): Validated<E, B> = fa.ev().ap(ff.ev(), SE())
+    override fun <A, B> ap(fa: ValidatedKind<E, A>, ff: Kind<ValidatedKindPartial<E>, (A) -> B>): Validated<E, B> = fa.ev().ap(ff.ev(), SE())
 
 }
 
@@ -47,7 +47,7 @@ interface ValidatedFoldableInstance<E> : Foldable<ValidatedKindPartial<E>> {
 @instance(Validated::class)
 interface ValidatedTraverseInstance<E> : ValidatedFoldableInstance<E>, Traverse<ValidatedKindPartial<E>> {
 
-    override fun <G, A, B> traverse(fa: HK<ValidatedKindPartial<E>, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, Validated<E, B>> =
+    override fun <G, A, B> traverse(fa: Kind<ValidatedKindPartial<E>, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Validated<E, B>> =
             fa.ev().traverse(f, GA)
 
 }

@@ -293,16 +293,16 @@ Let's now rewrite our program as a polymorphic function that will work over any 
 Polymorphic code in Arrow is based on emulated [`Higher Kinds`](/docs/patterns/polymorphicprograms) as described in [Lightweight higher-kinded polymorphism](https://www.cl.cam.ac.uk/~jdy22/papers/lightweight-higher-kinded-polymorphism.pdf) and applied to Kotlin, a lang which does not yet support Higher Kinded Types.
 
 ```kotlin
-inline fun <reified F> arm(ME: MonadError<F, NukeException> = monadError()): HK<F, Nuke> = ME.pure(Nuke)
-inline fun <reified F> aim(ME: MonadError<F, NukeException> = monadError()): HK<F, Target> = ME.pure(Target)
+inline fun <reified F> arm(ME: MonadError<F, NukeException> = monadError()): Kind<F, Nuke> = ME.pure(Nuke)
+inline fun <reified F> aim(ME: MonadError<F, NukeException> = monadError()): Kind<F, Target> = ME.pure(Target)
 inline fun <reified F> launch(target: Target, nuke: Nuke, ME: MonadError<F, NukeException> = monadError()):
-  HK<F, Impacted> = ME.raiseError(MissedByMeters(5))
+  Kind<F, Impacted> = ME.raiseError(MissedByMeters(5))
 ```
 
 We can now express the same program as before in a fully polymorphic context
 
 ```kotlin
-inline fun <reified F> attack(ME:MonadError<F, NukeException> = monadError()):HK<F, Impacted> =
+inline fun <reified F> attack(ME:MonadError<F, NukeException> = monadError()):Kind<F, Impacted> =
   ME.binding {
     val nuke = arm<F>().bind()
     val target = aim<F>().bind()
@@ -314,7 +314,7 @@ inline fun <reified F> attack(ME:MonadError<F, NukeException> = monadError()):HK
 Or since `arm()` and `bind()` are operations that do not depend on each other we don't need the [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) here and we can express our logic as:
 
 ```kotlin
-inline fun <reified F> attack1(ME: MonadError<F, NukeException> = monadError()): HK<F, Impacted> =
+inline fun <reified F> attack1(ME: MonadError<F, NukeException> = monadError()): Kind<F, Impacted> =
   ME.tupled(aim(), arm()).flatMap(ME, { (nuke, target) -> launch<F>(nuke, target) })
 
 val result = attack<EitherKindPartial<NukeException>>()
@@ -332,7 +332,7 @@ inline fun <reified F> launchImpure(target: Target, nuke: Nuke, ME: MonadError<F
   throw MissedByMeters(5)
 }
 
-inline fun <reified F> attack(ME:MonadError<F, NukeException> = monadError()):HK<F, Impacted> =
+inline fun <reified F> attack(ME:MonadError<F, NukeException> = monadError()):Kind<F, Impacted> =
   ME.binding {
     val nuke = arm<F>().bind()
     val target = aim<F>().bind()

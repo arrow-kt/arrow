@@ -1,6 +1,6 @@
 package arrow.free
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.*
 import arrow.data.NonEmptyList
 import arrow.data.applicative
@@ -19,7 +19,7 @@ import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 
-sealed class OpsAp<out A> : HK<OpsAp.F, A> {
+sealed class OpsAp<out A> : Kind<OpsAp.F, A> {
 
     class F private constructor()
 
@@ -34,7 +34,7 @@ sealed class OpsAp<out A> : HK<OpsAp.F, A> {
     }
 }
 
-fun <A> HK<OpsAp.F, A>.ev(): OpsAp<A> = this as OpsAp<A>
+fun <A> Kind<OpsAp.F, A>.ev(): OpsAp<A> = this as OpsAp<A>
 
 @RunWith(KTestJUnitRunner::class)
 class FreeApplicativeTest : UnitSpec() {

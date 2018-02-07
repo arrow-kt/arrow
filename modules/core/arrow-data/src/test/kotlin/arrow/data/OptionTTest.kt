@@ -1,6 +1,6 @@
 package arrow.data
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.*
 import arrow.mtl.functorFilter
 import arrow.mtl.traverseFilter
@@ -15,11 +15,11 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class OptionTTest : UnitSpec() {
 
-    fun <A> EQ(): Eq<HK<OptionTKindPartial<A>, Int>> = Eq { a, b ->
+    fun <A> EQ(): Eq<Kind<OptionTKindPartial<A>, Int>> = Eq { a, b ->
         a.value() == b.value()
     }
 
-    fun <A> EQ_NESTED(): Eq<HK<OptionTKindPartial<A>, HK<OptionTKindPartial<A>, Int>>> = Eq { a, b ->
+    fun <A> EQ_NESTED(): Eq<Kind<OptionTKindPartial<A>, Kind<OptionTKindPartial<A>, Int>>> = Eq { a, b ->
         a.value() == b.value()
     }
 

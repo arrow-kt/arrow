@@ -1,6 +1,6 @@
 package arrow.mtl.instances
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.Option
 import arrow.data.Const
 import arrow.data.ConstKind
@@ -16,6 +16,6 @@ interface ConstTraverseFilterInstance<X> : ConstTraverseInstance<X>, TraverseFil
 
     override fun <T, U> map(fa: ConstKind<X, T>, f: (T) -> U): Const<X, U> = fa.ev().retag()
 
-    override fun <G, A, B> traverseFilter(fa: ConstKind<X, A>, f: (A) -> HK<G, Option<B>>, GA: Applicative<G>): HK<G, ConstKind<X, B>> =
+    override fun <G, A, B> traverseFilter(fa: ConstKind<X, A>, f: (A) -> Kind<G, Option<B>>, GA: Applicative<G>): Kind<G, ConstKind<X, B>> =
             fa.ev().traverseFilter(f, GA)
 }

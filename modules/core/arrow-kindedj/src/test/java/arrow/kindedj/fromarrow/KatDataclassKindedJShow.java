@@ -13,7 +13,7 @@ public class KatDataclassKindedJShow implements KindedJShow<Hk<ForConvert, ForKa
 
     @Override
     public <A> String show(Hk<Hk<ForConvert, ForKatDataclass>, A> hk) {
-        final arrow.HK<ForKatDataclass, A> cast = ConvertKt.toArrow(hk);
+        final arrow.Kind<ForKatDataclass, A> cast = ConvertKt.toArrow(hk);
         return KatDataclassKt.show(cast);
     }
 

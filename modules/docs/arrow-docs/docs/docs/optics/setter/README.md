@@ -8,10 +8,10 @@ permalink: /docs/optics/setter/
 
 A `Setter` is an optic that can see into a structure and set or modify its focus.
 
-It is a generalisation of [`Functor#map`](/docs/typeclasses/functor). Given a `Functor<F>` we can apply a function `(A) -> B` to `HK<F, A>` and get `HK<F, B>`. We can think of `HK<F, A>` as a structure `S` that has a focus `A`.
+It is a generalisation of [`Functor#map`](/docs/typeclasses/functor). Given a `Functor<F>` we can apply a function `(A) -> B` to `Kind<F, A>` and get `Kind<F, B>`. We can think of `Kind<F, A>` as a structure `S` that has a focus `A`.
 So given a `PSetter<S, T, A, B>` we can apply a function `(A) -> B` to `S` and get `T`.
 
-- `Functor.map(fa: HK<F, A>, f: (A) -> B) -> HK<F, B>`
+- `Functor.map(fa: Kind<F, A>, f: (A) -> B) -> Kind<F, B>`
 - `PSetter.modify(s: S, f: (A) -> B): T`
 
 You can get a `Setter` for any existing `Functor`.

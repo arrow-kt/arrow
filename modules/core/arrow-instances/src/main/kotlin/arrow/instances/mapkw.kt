@@ -7,22 +7,22 @@ import arrow.typeclasses.*
 
 @instance(MapKW::class)
 interface MapKWFunctorInstance<K> : Functor<MapKWKindPartial<K>> {
-    override fun <A, B> map(fa: HK<MapKWKindPartial<K>, A>, f: (A) -> B): MapKW<K, B> = fa.ev().map(f)
+    override fun <A, B> map(fa: Kind<MapKWKindPartial<K>, A>, f: (A) -> B): MapKW<K, B> = fa.ev().map(f)
 }
 
 @instance(MapKW::class)
 interface MapKWFoldableInstance<K> : Foldable<MapKWKindPartial<K>> {
 
-    override fun <A, B> foldLeft(fa: HK<MapKWKindPartial<K>, A>, b: B, f: (B, A) -> B): B = fa.ev().foldLeft(b, f)
+    override fun <A, B> foldLeft(fa: Kind<MapKWKindPartial<K>, A>, b: B, f: (B, A) -> B): B = fa.ev().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: HK<MapKWKindPartial<K>, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+    override fun <A, B> foldRight(fa: Kind<MapKWKindPartial<K>, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
             fa.ev().foldRight(lb, f)
 }
 
 @instance(MapKW::class)
 interface MapKWTraverseInstance<K> : MapKWFoldableInstance<K>, Traverse<MapKWKindPartial<K>> {
 
-    override fun <G, A, B> traverse(fa: HK<MapKWKindPartial<K>, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<MapKWKindPartial<K>, B>> =
+    override fun <G, A, B> traverse(fa: Kind<MapKWKindPartial<K>, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Kind<MapKWKindPartial<K>, B>> =
             fa.ev().traverse(f, GA)
 }
 

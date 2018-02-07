@@ -7,11 +7,11 @@ permalink: /docs/optics/traversal/
 ## Traversal
 A `Traversal` is an optic that can see into a structure and get, set or modify 0 to N foci.
 
-It is a generalization of [`Traverse#traverse`](/docs/typeclasses/traverse). Given a `Traverse<F>` we can apply a function `(A) -> HK<G, B>` to `HK<F, A>` and get `HK<G, HK<F, B>>`.
-We can think of `HK<F, A>` as a structure `S` that has a focus `A`. So given a `PTraversal<S, T, A, B>` we can apply a function `(A) -> HK<F, B>` to `S` and get `HK<F, T>`.
+It is a generalization of [`Traverse#traverse`](/docs/typeclasses/traverse). Given a `Traverse<F>` we can apply a function `(A) -> Kind<G, B>` to `Kind<F, A>` and get `Kind<G, Kind<F, B>>`.
+We can think of `Kind<F, A>` as a structure `S` that has a focus `A`. So given a `PTraversal<S, T, A, B>` we can apply a function `(A) -> Kind<F, B>` to `S` and get `Kind<F, T>`.
 
- - `Traverse.traverse(fa: HK<F, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<F, B>>`
- - `PTraversal.modifyF(s: S, f: (A) -> HK<F, B>, GA: Applicative<F>): HK<F, T>`
+ - `Traverse.traverse(fa: Kind<F, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Kind<F, B>>`
+ - `PTraversal.modifyF(s: S, f: (A) -> Kind<F, B>, GA: Applicative<F>): Kind<F, T>`
 
 You can get a `Traversal` for any existing `Traverse`.
 

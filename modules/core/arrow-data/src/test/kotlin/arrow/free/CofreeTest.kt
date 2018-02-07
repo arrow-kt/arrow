@@ -1,6 +1,6 @@
 package arrow.free
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.*
 import arrow.data.*
 import arrow.free.Cofree.Companion.unfold
@@ -92,7 +92,7 @@ class CofreeTest : UnitSpec() {
 
         "mapBranchingRoot should modify the value of the functor" {
             val mapped = startHundred.mapBranchingRoot(object : FunctionK<ForOption, ForOption> {
-                override fun <A> invoke(fa: HK<ForOption, A>): HK<ForOption, A> =
+                override fun <A> invoke(fa: Kind<ForOption, A>): Kind<ForOption, A> =
                         None
             })
             val expected = NonEmptyList.of(0)
@@ -133,11 +133,11 @@ class CofreeTest : UnitSpec() {
         }
 
         "cataM should traverse the structure in a stack-safe way on a monad" {
-            val folder: (Int, HK<ForOption, NonEmptyList<Int>>) -> EvalOption<NonEmptyList<Int>> = { i, lb ->
+            val folder: (Int, Kind<ForOption, NonEmptyList<Int>>) -> EvalOption<NonEmptyList<Int>> = { i, lb ->
                 if (i <= 2000) OptionT.pure(NonEmptyList(i, lb.ev().fold({ emptyList<Int>() }, { it.all }))) else OptionT.none()
             }
             val inclusion = object : FunctionK<ForEval, EvalOptionF> {
-                override fun <A> invoke(fa: HK<ForEval, A>): HK<EvalOptionF, A> =
+                override fun <A> invoke(fa: Kind<ForEval, A>): Kind<EvalOptionF, A> =
                         OptionT(fa.ev().map { Some(it) })
             }
             val cataHundred = startTwoThousand.cataM(folder, inclusion, Option.traverse(), OptionT.monad(Eval.monad())).ev().value.ev().value()

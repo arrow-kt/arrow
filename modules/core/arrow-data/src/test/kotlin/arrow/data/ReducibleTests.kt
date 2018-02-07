@@ -1,6 +1,6 @@
 package arrow.data
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.Tuple2
 import arrow.instances.LongMonoid
 import arrow.test.UnitSpec
@@ -16,7 +16,7 @@ class ReducibleTests : UnitSpec() {
         val nonEmptyReducible = object : NonEmptyReducible<ForNonEmptyList, ForListKW>() {
             override fun FG(): Foldable<ForListKW> = ListKW.foldable()
 
-            override fun <A> split(fa: HK<ForNonEmptyList, A>): Tuple2<A, HK<ForListKW, A>> = Tuple2(fa.ev().head, ListKW(fa.ev().tail))
+            override fun <A> split(fa: Kind<ForNonEmptyList, A>): Tuple2<A, Kind<ForListKW, A>> = Tuple2(fa.ev().head, ListKW(fa.ev().tail))
         }
 
         testLaws(ReducibleLaws.laws(

@@ -179,7 +179,7 @@ import arrow.legacy.*
 
         fun <R> right(right: R): Either<Nothing, R> = Right(right)
 
-        tailrec fun <L, A, B> tailRecM(a: A, f: (A) -> HK<EitherKindPartial<L>, Either<A, B>>): Either<L, B> {
+        tailrec fun <L, A, B> tailRecM(a: A, f: (A) -> Kind<EitherKindPartial<L>, Either<A, B>>): Either<L, B> {
             val ev: Either<L, Either<A, B>> = f(a).ev()
             return when (ev) {
                 is Left<L, Either<A, B>> -> Left(ev.a)

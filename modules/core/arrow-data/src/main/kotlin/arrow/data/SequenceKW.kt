@@ -27,7 +27,7 @@ data class SequenceKW<out A> constructor(val sequence: Sequence<A>) : SequenceKW
         return Eval.defer { loop(this.ev()) }
     }
 
-    fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, SequenceKW<B>> =
+    fun <G, B> traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, SequenceKW<B>> =
             foldRight(Eval.always { GA.pure(emptySequence<B>().k()) }) { a, eval ->
                 GA.map2Eval(f(a), eval) { (sequenceOf(it.a) + it.b).k() }
             }.value()
@@ -45,10 +45,10 @@ data class SequenceKW<out A> constructor(val sequence: Sequence<A>) : SequenceKW
 
         fun <A> empty(): SequenceKW<A> = emptySequence<A>().k()
 
-        fun <A, B> tailRecM(a: A, f: (A) -> HK<ForSequenceKW, Either<A, B>>): SequenceKW<B> {
+        fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForSequenceKW, Either<A, B>>): SequenceKW<B> {
             tailrec fun <A, B> go(
                     buf: MutableList<B>,
-                    f: (A) -> HK<ForSequenceKW, Either<A, B>>,
+                    f: (A) -> Kind<ForSequenceKW, Either<A, B>>,
                     v: SequenceKW<Either<A, B>>) {
                 if (!(v.toList().isEmpty())) {
                     val head: Either<A, B> = v.first()

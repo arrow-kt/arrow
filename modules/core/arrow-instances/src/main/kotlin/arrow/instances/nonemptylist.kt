@@ -110,7 +110,7 @@ interface NonEmptyListTraverseInstance : Traverse<ForNonEmptyList> {
     override fun <A, B> map(fa: NonEmptyListKind<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
             fa.ev().map(f)
 
-    override fun <G, A, B> traverse(fa: NonEmptyListKind<A>, f: kotlin.Function1<A, HK<G, B>>, GA: Applicative<G>): HK<G, NonEmptyList<B>> =
+    override fun <G, A, B> traverse(fa: NonEmptyListKind<A>, f: kotlin.Function1<A, Kind<G, B>>, GA: Applicative<G>): Kind<G, NonEmptyList<B>> =
             fa.ev().traverse(f, GA)
 
     override fun <A, B> foldLeft(fa: NonEmptyListKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =

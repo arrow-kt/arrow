@@ -32,7 +32,7 @@ val songDeferred: DeferredKW<Url> = getSongUrlAsync().ev()
 
 #### suspend
 
-Receives a function returning `HK<F, A>`. The instance is responsible of creating and running the returned datatype lazily.
+Receives a function returning `Kind<F, A>`. The instance is responsible of creating and running the returned datatype lazily.
 
 ```kotlin
 IO.monadSuspend().suspend { IO.pure(1) }

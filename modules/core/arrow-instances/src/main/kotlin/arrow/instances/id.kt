@@ -94,14 +94,14 @@ interface IdFoldableInstance : Foldable<ForId> {
             fa.ev().foldRight(lb, f)
 }
 
-fun <A, G, B> Id<A>.traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, Id<B>> = GA.map(f(this.ev().value), { Id(it) })
+fun <A, G, B> Id<A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Id<B>> = GA.map(f(this.ev().value), { Id(it) })
 
 @instance(Id::class)
 interface IdTraverseInstance : Traverse<ForId> {
     override fun <A, B> map(fa: IdKind<A>, f: kotlin.Function1<A, B>): Id<B> =
             fa.ev().map(f)
 
-    override fun <G, A, B> traverse(fa: IdKind<A>, f: kotlin.Function1<A, HK<G, B>>, GA: Applicative<G>): HK<G, Id<B>> =
+    override fun <G, A, B> traverse(fa: IdKind<A>, f: kotlin.Function1<A, Kind<G, B>>, GA: Applicative<G>): Kind<G, Id<B>> =
             fa.ev().traverse(f, GA)
 
     override fun <A, B> foldLeft(fa: IdKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =

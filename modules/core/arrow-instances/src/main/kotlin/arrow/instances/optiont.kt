@@ -46,7 +46,7 @@ fun <F, A, B> OptionT<F, A>.foldLeft(b: B, f: (B, A) -> B, FF: Foldable<F>): B =
 
 fun <F, A, B> OptionT<F, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>): Eval<B> = FF.compose(Option.foldable()).foldRC(value, lb, f)
 
-fun <F, G, A, B> OptionT<F, A>.traverse(f: (A) -> HK<G, B>, GA: Applicative<G>, FF: Traverse<F>): HK<G, OptionT<F, B>> {
+fun <F, G, A, B> OptionT<F, A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>, FF: Traverse<F>): Kind<G, OptionT<F, B>> {
     val fa = ComposedTraverse(FF, Option.traverse(), Option.applicative()).traverseC(value, f, GA)
     return GA.map(fa, { OptionT(FF.map(it.unnest(), { it.ev() })) })
 }
@@ -67,7 +67,7 @@ interface OptionTTraverseInstance<F> : OptionTFoldableInstance<F>, Traverse<Opti
 
     override fun FFF(): Traverse<F>
 
-    override fun <G, A, B> traverse(fa: OptionTKind<F, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, OptionT<F, B>> =
+    override fun <G, A, B> traverse(fa: OptionTKind<F, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, OptionT<F, B>> =
             fa.ev().traverse(f, GA, FFF())
 
 }

@@ -36,7 +36,7 @@ It is the opposite comparison of `eqv`.
 
 ### Syntax
 
-#### HK<F, A>#eqv
+#### Kind<F, A>#eqv
 
 Compares two values for equality
 
@@ -46,7 +46,7 @@ import arrow.syntax.eq.*
 1.eqv(IntEqInstance, 2)
 ```
 
-#### HK<F, A>#neqv
+#### Kind<F, A>#neqv
 
 Compares two values for inequality
 

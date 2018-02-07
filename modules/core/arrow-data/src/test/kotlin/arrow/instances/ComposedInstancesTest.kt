@@ -1,6 +1,6 @@
 package arrow.instances
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.*
 import arrow.data.*
 import arrow.mtl.instances.ComposedFunctorFilter
@@ -10,7 +10,7 @@ import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import org.junit.runner.RunWith
 
-typealias OptionTNel = HK<OptionTKindPartial<ForNonEmptyList>, Int>
+typealias OptionTNel = Kind<OptionTKindPartial<ForNonEmptyList>, Int>
 
 @RunWith(KTestJUnitRunner::class)
 class ComposedInstancesTest : UnitSpec() {
@@ -33,7 +33,7 @@ class ComposedInstancesTest : UnitSpec() {
                         })
             }
 
-    val cf: (Int) -> HK<Nested<ForOption, ForNonEmptyList>, Int> = { Some(it.nel()).nest() }
+    val cf: (Int) -> Kind<Nested<ForOption, ForNonEmptyList>, Int> = { Some(it.nel()).nest() }
 
     init {
         testLaws(

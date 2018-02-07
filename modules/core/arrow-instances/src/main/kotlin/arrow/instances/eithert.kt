@@ -1,6 +1,6 @@
 package arrow.instances
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Left
@@ -58,9 +58,9 @@ interface EitherTFoldableInstance<F, L> : Foldable<EitherTKindPartial<F, L>> {
 
     fun FFF(): Foldable<F>
 
-    override fun <B, C> foldLeft(fa: HK<EitherTKindPartial<F, L>, B>, b: C, f: (C, B) -> C): C = fa.ev().foldLeft(b, f, FFF())
+    override fun <B, C> foldLeft(fa: Kind<EitherTKindPartial<F, L>, B>, b: C, f: (C, B) -> C): C = fa.ev().foldLeft(b, f, FFF())
 
-    override fun <B, C> foldRight(fa: HK<EitherTKindPartial<F, L>, B>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> = fa.ev().foldRight(lb, f, FFF())
+    override fun <B, C> foldRight(fa: Kind<EitherTKindPartial<F, L>, B>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> = fa.ev().foldRight(lb, f, FFF())
 }
 
 interface EitherTTraverseInstance<F, L> : EitherTFunctorInstance<F, L>, EitherTFoldableInstance<F, L>, Traverse<EitherTKindPartial<F, L>> {
@@ -69,7 +69,7 @@ interface EitherTTraverseInstance<F, L> : EitherTFunctorInstance<F, L>, EitherTF
 
     override fun <A, B> map(fa: EitherTKind<F, L, A>, f: (A) -> B): EitherT<F, L, B> = fa.ev().map({ f(it) }, TF())
 
-    override fun <G, B, C> traverse(fa: EitherTKind<F, L, B>, f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, EitherT<F, L, C>> =
+    override fun <G, B, C> traverse(fa: EitherTKind<F, L, B>, f: (B) -> Kind<G, C>, GA: Applicative<G>): Kind<G, EitherT<F, L, C>> =
             fa.ev().traverse(f, GA, TF())
 }
 

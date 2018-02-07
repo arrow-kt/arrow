@@ -7,13 +7,13 @@ import arrow.typeclasses.Monad
 @typeclass
 interface MonadState<F, S> : Monad<F>, TC {
 
-    fun <A> state(f: (S) -> Tuple2<S, A>): HK<F, A> = flatMap(get(), { s -> f(s).let { (a, b) -> map(set(a), { b }) } })
+    fun <A> state(f: (S) -> Tuple2<S, A>): Kind<F, A> = flatMap(get(), { s -> f(s).let { (a, b) -> map(set(a), { b }) } })
 
-    fun get(): HK<F, S>
+    fun get(): Kind<F, S>
 
-    fun set(s: S): HK<F, Unit>
+    fun set(s: S): Kind<F, Unit>
 
-    fun modify(f: (S) -> S): HK<F, Unit> = flatMap(get(), { s -> set(f(s)) })
+    fun modify(f: (S) -> S): Kind<F, Unit> = flatMap(get(), { s -> set(f(s)) })
 
-    fun <A> inspect(f: (S) -> A): HK<F, A> = map(get(), f)
+    fun <A> inspect(f: (S) -> A): Kind<F, A> = map(get(), f)
 }

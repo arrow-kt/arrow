@@ -1,6 +1,6 @@
 package arrow.effects
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.Either
 import arrow.instance
 import arrow.typeclasses.ApplicativeError
@@ -51,12 +51,12 @@ interface IOAsyncInstance : IOMonadSuspendInstance, Async<ForIO> {
 
 @instance(IO::class)
 interface IOEffectInstance : IOAsyncInstance, Effect<ForIO> {
-    override fun <A> runAsync(fa: HK<ForIO, A>, cb: (Either<Throwable, A>) -> IOKind<Unit>): IO<Unit> =
+    override fun <A> runAsync(fa: Kind<ForIO, A>, cb: (Either<Throwable, A>) -> IOKind<Unit>): IO<Unit> =
             fa.ev().runAsync(cb)
 }
 
 @instance(IO::class)
-interface IOMonoidInstance<A> : Monoid<HK<ForIO, A>>, Semigroup<HK<ForIO, A>> {
+interface IOMonoidInstance<A> : Monoid<Kind<ForIO, A>>, Semigroup<Kind<ForIO, A>> {
 
     fun SM(): Monoid<A>
 
@@ -67,7 +67,7 @@ interface IOMonoidInstance<A> : Monoid<HK<ForIO, A>>, Semigroup<HK<ForIO, A>> {
 }
 
 @instance(IO::class)
-interface IOSemigroupInstance<A> : Semigroup<HK<ForIO, A>> {
+interface IOSemigroupInstance<A> : Semigroup<Kind<ForIO, A>> {
 
     fun SG(): Semigroup<A>
 

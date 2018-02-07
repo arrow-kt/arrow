@@ -60,13 +60,13 @@ interface PLens<S, T, A, B> {
     /**
      * Modify the focus of a [PLens] using Functor function
      */
-    fun <F> modifyF(FF: Functor<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
+    fun <F> modifyF(FF: Functor<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> =
             FF.map(f(get(s)), { b -> set(s, b) })
 
     /**
-     * Lift a function [f]: `(A) -> HK<F, B> to the context of `S`: `(S) -> HK<F, T>`
+     * Lift a function [f]: `(A) -> Kind<F, B> to the context of `S`: `(S) -> Kind<F, T>`
      */
-    fun <F> liftF(FF: Functor<F>, f: (A) -> HK<F, B>): (S) -> HK<F, T> = { s -> modifyF(FF, s, f) }
+    fun <F> liftF(FF: Functor<F>, f: (A) -> Kind<F, B>): (S) -> Kind<F, T> = { s -> modifyF(FF, s, f) }
 
     /**
      * Join two [PLens] with the same focus in [A]
@@ -192,7 +192,7 @@ interface PLens<S, T, A, B> {
      * View a [PLens] as a [PTraversal]
      */
     fun asTraversal(): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
-        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
+        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> =
                 FA.map(f(get(s)), { b -> this@PLens.set(s, b) })
     }
 
@@ -211,13 +211,13 @@ inline fun <S, T, A, B> PLens<S, T, A, B>.lift(crossinline f: (A) -> B): (S) -> 
 /**
  * Modify the focus of a [PLens] using [Functor] function
  */
-inline fun <S, T, A, B, reified F> PLens<S, T, A, B>.modifyF(s: S, f: (A) -> HK<F, B>, FF: Functor<F> = functor()): HK<F, T> =
+inline fun <S, T, A, B, reified F> PLens<S, T, A, B>.modifyF(s: S, f: (A) -> Kind<F, B>, FF: Functor<F> = functor()): Kind<F, T> =
         FF.map(f(get(s)), { b -> set(s, b) })
 
 /**
- * Lift a function [f]: `(A) -> HK<F, B> to the context of `S`: `(S) -> HK<F, T>` using [Functor] function
+ * Lift a function [f]: `(A) -> Kind<F, B> to the context of `S`: `(S) -> Kind<F, T>` using [Functor] function
  */
-inline fun <S, T, A, B, reified F> PLens<S, T, A, B>.liftF(FF: Functor<F> = functor(), dummy: Unit = Unit, crossinline f: (A) -> HK<F, B>): (S) -> HK<F, T> = { s -> modifyF(FF, s) { a -> f(a) } }
+inline fun <S, T, A, B, reified F> PLens<S, T, A, B>.liftF(FF: Functor<F> = functor(), dummy: Unit = Unit, crossinline f: (A) -> Kind<F, B>): (S) -> Kind<F, T> = { s -> modifyF(FF, s) { a -> f(a) } }
 
 /**
  * Find a focus that satisfies the predicate

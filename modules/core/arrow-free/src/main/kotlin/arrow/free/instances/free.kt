@@ -41,8 +41,8 @@ interface FreeMonadInstance<S> : FreeApplicativeInstance<S>, Monad<FreeKindParti
 
 }
 
-data class FreeEq<F, G, A>(private val interpreter: FunctionK<F, G>, private val MG: Monad<G>) : Eq<HK<FreeKindPartial<F>, A>> {
-    override fun eqv(a: HK<FreeKindPartial<F>, A>, b: HK<FreeKindPartial<F>, A>): Boolean = a.ev().foldMap(interpreter, MG) == b.ev().foldMap(interpreter, MG)
+data class FreeEq<F, G, A>(private val interpreter: FunctionK<F, G>, private val MG: Monad<G>) : Eq<Kind<FreeKindPartial<F>, A>> {
+    override fun eqv(a: Kind<FreeKindPartial<F>, A>, b: Kind<FreeKindPartial<F>, A>): Boolean = a.ev().foldMap(interpreter, MG) == b.ev().foldMap(interpreter, MG)
 
     companion object {
         inline operator fun <F, reified G, A> invoke(interpreter: FunctionK<F, G>, MG: Monad<G> = monad(), dummy: Unit = Unit): FreeEq<F, G, A> =

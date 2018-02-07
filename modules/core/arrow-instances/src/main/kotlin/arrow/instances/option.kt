@@ -1,6 +1,6 @@
 package arrow.instances
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.*
 import arrow.instance
 import arrow.typeclasses.*
@@ -119,7 +119,7 @@ interface OptionFoldableInstance : Foldable<ForOption> {
             fa.ev().nonEmpty()
 }
 
-fun <A, G, B> Option<A>.traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, Option<B>> =
+fun <A, G, B> Option<A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Option<B>> =
         this.ev().let { option ->
             when (option) {
                 is Some -> GA.map(f(option.t), { Some(it) })
@@ -127,7 +127,7 @@ fun <A, G, B> Option<A>.traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, 
             }
         }
 
-fun <A, G, B> Option<A>.traverseFilter(f: (A) -> HK<G, Option<B>>, GA: Applicative<G>): HK<G, Option<B>> =
+fun <A, G, B> Option<A>.traverseFilter(f: (A) -> Kind<G, Option<B>>, GA: Applicative<G>): Kind<G, Option<B>> =
         this.ev().let { option ->
             when (option) {
                 is Some -> f(option.t)
@@ -140,7 +140,7 @@ interface OptionTraverseInstance : Traverse<ForOption> {
     override fun <A, B> map(fa: OptionKind<A>, f: kotlin.Function1<A, B>): Option<B> =
             fa.ev().map(f)
 
-    override fun <G, A, B> traverse(fa: OptionKind<A>, f: kotlin.Function1<A, HK<G, B>>, GA: Applicative<G>): HK<G, Option<B>> =
+    override fun <G, A, B> traverse(fa: OptionKind<A>, f: kotlin.Function1<A, Kind<G, B>>, GA: Applicative<G>): Kind<G, Option<B>> =
             fa.ev().traverse(f, GA)
 
     override fun <A> exists(fa: OptionKind<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =

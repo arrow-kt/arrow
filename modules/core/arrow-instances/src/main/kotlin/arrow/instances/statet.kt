@@ -1,6 +1,6 @@
 package arrow.instances
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.ForId
 import arrow.core.Tuple2
@@ -66,9 +66,9 @@ interface StateTSemigroupKInstance<F, S> : SemigroupK<StateTKindPartial<F, S>> {
 interface StateTApplicativeErrorInstance<F, S, E> : StateTApplicativeInstance<F, S>, ApplicativeError<StateTKindPartial<F, S>, E> {
     override fun FF(): MonadError<F, E>
 
-    override fun <A> raiseError(e: E): HK<StateTKindPartial<F, S>, A> = StateT.lift(FF(), FF().raiseError(e))
+    override fun <A> raiseError(e: E): Kind<StateTKindPartial<F, S>, A> = StateT.lift(FF(), FF().raiseError(e))
 
-    override fun <A> handleErrorWith(fa: HK<StateTKindPartial<F, S>, A>, f: (E) -> HK<StateTKindPartial<F, S>, A>): StateT<F, S, A> =
+    override fun <A> handleErrorWith(fa: Kind<StateTKindPartial<F, S>, A>, f: (E) -> Kind<StateTKindPartial<F, S>, A>): StateT<F, S, A> =
             StateT(FF().pure({ s -> FF().handleErrorWith(fa.runM(FF(), s), { e -> f(e).runM(FF(), s) }) }))
 }
 

@@ -1,6 +1,6 @@
 package arrow.data
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.*
 import arrow.instances.IntMonoid
 import arrow.instances.monad
@@ -62,8 +62,8 @@ class WriterTTest : UnitSpec() {
 
             MonadFilterLaws.laws(WriterT.monadFilter(Option.monadFilter(), IntMonoid),
                 { WriterT(Option(Tuple2(it, it))) },
-                object : Eq<HK<WriterTKindPartial<ForOption, Int>, Int>> {
-                    override fun eqv(a: HK<WriterTKindPartial<ForOption, Int>, Int>, b: HK<WriterTKindPartial<ForOption, Int>, Int>): Boolean =
+                object : Eq<Kind<WriterTKindPartial<ForOption, Int>, Int>> {
+                    override fun eqv(a: Kind<WriterTKindPartial<ForOption, Int>, Int>, b: Kind<WriterTKindPartial<ForOption, Int>, Int>): Boolean =
                             a.ev().value.ev().let { optionA: Option<Tuple2<Int, Int>> ->
                                 val optionB = b.ev().value.ev()
                                 optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Int> -> optionB.fold({ false }, { value == it }) })

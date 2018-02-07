@@ -1,6 +1,6 @@
 package arrow.instances
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.*
 import arrow.instance
 import arrow.typeclasses.*
@@ -31,7 +31,7 @@ interface EitherMonadInstance<L> : EitherApplicativeInstance<L>, Monad<EitherKin
 
     override fun <A, B> flatMap(fa: EitherKind<L, A>, f: (A) -> EitherKind<L, B>): Either<L, B> = fa.ev().flatMap { f(it).ev() }
 
-    override fun <A, B> tailRecM(a: A, f: (A) -> HK<EitherKindPartial<L>, Either<A, B>>): Either<L, B> =
+    override fun <A, B> tailRecM(a: A, f: (A) -> Kind<EitherKindPartial<L>, Either<A, B>>): Either<L, B> =
             Either.tailRecM(a, f)
 }
 
@@ -40,7 +40,7 @@ interface EitherApplicativeErrorInstance<L> : EitherApplicativeInstance<L>, Appl
 
     override fun <A> raiseError(e: L): Either<L, A> = Left(e)
 
-    override fun <A> handleErrorWith(fa: HK<EitherKindPartial<L>, A>, f: (L) -> HK<EitherKindPartial<L>, A>): Either<L, A> {
+    override fun <A> handleErrorWith(fa: Kind<EitherKindPartial<L>, A>, f: (L) -> Kind<EitherKindPartial<L>, A>): Either<L, A> {
         val fea = fa.ev()
         return when (fea) {
             is Either.Left -> f(fea.a).ev()
@@ -55,20 +55,20 @@ interface EitherMonadErrorInstance<L> : EitherApplicativeErrorInstance<L>, Eithe
 @instance(Either::class)
 interface EitherFoldableInstance<L> : Foldable<EitherKindPartial<L>> {
 
-    override fun <A, B> foldLeft(fa: HK<EitherKindPartial<L>, A>, b: B, f: (B, A) -> B): B =
+    override fun <A, B> foldLeft(fa: Kind<EitherKindPartial<L>, A>, b: B, f: (B, A) -> B): B =
             fa.ev().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: HK<EitherKindPartial<L>, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+    override fun <A, B> foldRight(fa: Kind<EitherKindPartial<L>, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
             fa.ev().foldRight(lb, f)
 }
 
-fun <G, A, B, C> Either<A, B>.traverse(f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, Either<A, C>> =
+fun <G, A, B, C> Either<A, B>.traverse(f: (B) -> Kind<G, C>, GA: Applicative<G>): Kind<G, Either<A, C>> =
         this.ev().fold({ GA.pure(Either.Left(it)) }, { GA.map(f(it), { Either.Right(it) }) })
 
 @instance(Either::class)
 interface EitherTraverseInstance<L> : EitherFoldableInstance<L>, Traverse<EitherKindPartial<L>> {
 
-    override fun <G, A, B> traverse(fa: HK<EitherKindPartial<L>, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<EitherKindPartial<L>, B>> =
+    override fun <G, A, B> traverse(fa: Kind<EitherKindPartial<L>, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Kind<EitherKindPartial<L>, B>> =
             fa.ev().traverse(f, GA)
 }
 

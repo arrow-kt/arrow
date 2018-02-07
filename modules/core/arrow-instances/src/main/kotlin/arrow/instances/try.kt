@@ -1,6 +1,6 @@
 package arrow.instances
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.data.*
@@ -100,7 +100,7 @@ interface TryTraverseInstance : Traverse<ForTry> {
     override fun <A, B> map(fa: TryKind<A>, f: kotlin.Function1<A, B>): Try<B> =
             fa.ev().map(f)
 
-    override fun <G, A, B> traverse(fa: TryKind<A>, f: kotlin.Function1<A, HK<G, B>>, GA: Applicative<G>): HK<G, Try<B>> =
+    override fun <G, A, B> traverse(fa: TryKind<A>, f: kotlin.Function1<A, Kind<G, B>>, GA: Applicative<G>): Kind<G, Try<B>> =
             fa.ev().traverse(f, GA)
 
     override fun <A> exists(fa: TryKind<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =

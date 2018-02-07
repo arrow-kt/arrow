@@ -141,7 +141,7 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
     fun <C> foldRight(lc: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
             fold({ lc }, { f(it, lc) }, { _, b -> f(b, lc) })
 
-    fun <G, C> traverse(f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, Ior<A, C>> =
+    fun <G, C> traverse(f: (B) -> Kind<G, C>, GA: Applicative<G>): Kind<G, Ior<A, C>> =
             fold({ GA.pure(Left(it)) }, { GA.map(f(it), { Right(it) }) }, { _, b -> GA.map(f(b), { Right(it) }) })
 
     /**

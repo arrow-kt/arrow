@@ -1,6 +1,6 @@
 package arrow.data
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.*
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
@@ -15,7 +15,7 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class EitherTest : UnitSpec() {
-    val EQ: Eq<HK<EitherKindPartial<ForId>, Int>> = Eq { a, b ->
+    val EQ: Eq<Kind<EitherKindPartial<ForId>, Int>> = Eq { a, b ->
         a.ev() == b.ev()
     }
 

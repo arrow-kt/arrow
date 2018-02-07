@@ -1,6 +1,6 @@
 package arrow.effects
 
-import arrow.HK
+import arrow.Kind
 import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
 import arrow.test.laws.AsyncLaws
@@ -17,7 +17,7 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class DeferredKWTest : UnitSpec() {
-    fun <A> EQ(): Eq<HK<ForDeferredKW, A>> = Eq { a, b ->
+    fun <A> EQ(): Eq<Kind<ForDeferredKW, A>> = Eq { a, b ->
         a.unsafeAttemptSync() == b.unsafeAttemptSync()
     }
 

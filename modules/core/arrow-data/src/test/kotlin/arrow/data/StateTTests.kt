@@ -1,6 +1,6 @@
 package arrow.data
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.ForId
 import arrow.mtl.instances.StateTMonadStateInstance
 import arrow.mtl.monadState
@@ -26,7 +26,7 @@ class StateTTests : UnitSpec() {
         a.runM(1, Try.monad()) == b.runM(1, Try.monad())
     }
 
-    val EQ_LIST: Eq<HK<StateTKindPartial<ForListKW, Int>, Int>> = Eq { a, b ->
+    val EQ_LIST: Eq<Kind<StateTKindPartial<ForListKW, Int>, Int>> = Eq { a, b ->
         a.runM(1, ListKW.monad()) == b.runM(1, ListKW.monad())
     }
 

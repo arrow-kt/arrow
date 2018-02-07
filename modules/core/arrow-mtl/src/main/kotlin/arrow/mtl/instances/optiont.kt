@@ -24,7 +24,7 @@ interface OptionTTraverseFilterInstance<F> :
 
     override fun FFF(): TraverseFilter<F>
 
-    override fun <G, A, B> traverseFilter(fa: OptionTKind<F, A>, f: (A) -> HK<G, Option<B>>, GA: Applicative<G>): HK<G, OptionT<F, B>> =
+    override fun <G, A, B> traverseFilter(fa: OptionTKind<F, A>, f: (A) -> Kind<G, Option<B>>, GA: Applicative<G>): Kind<G, OptionT<F, B>> =
             fa.ev().traverseFilter(f, GA, FFF())
 
 }

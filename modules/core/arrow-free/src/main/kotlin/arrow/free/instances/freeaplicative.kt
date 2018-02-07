@@ -20,8 +20,8 @@ interface FreeApplicativeApplicativeInstance<S> : FreeApplicativeFunctorInstance
     override fun <A, B> map(fa: FreeApplicativeKind<S, A>, f: (A) -> B): FreeApplicative<S, B> = fa.ev().map(f)
 }
 
-data class FreeApplicativeEq<F, G, A>(private val interpreter: FunctionK<F, G>, private val MG: Monad<G>) : Eq<HK<FreeApplicativeKindPartial<F>, A>> {
-    override fun eqv(a: HK<FreeApplicativeKindPartial<F>, A>, b: HK<FreeApplicativeKindPartial<F>, A>): Boolean =
+data class FreeApplicativeEq<F, G, A>(private val interpreter: FunctionK<F, G>, private val MG: Monad<G>) : Eq<Kind<FreeApplicativeKindPartial<F>, A>> {
+    override fun eqv(a: Kind<FreeApplicativeKindPartial<F>, A>, b: Kind<FreeApplicativeKindPartial<F>, A>): Boolean =
             a.ev().foldMap(interpreter, MG) == b.ev().foldMap(interpreter, MG)
 
     companion object {

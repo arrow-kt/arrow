@@ -4,7 +4,7 @@ import arrow.*
 import arrow.core.*
 import arrow.typeclasses.*
 
-typealias CofreeEval<S, A> = HK<S, Cofree<S, A>>
+typealias CofreeEval<S, A> = Kind<S, Cofree<S, A>>
 
 @higherkind data class Cofree<S, A>(val FS: Functor<S>, val head: A, val tail: Eval<CofreeEval<S, A>>) : CofreeKind<S, A>, CofreeKindedJ<S, A> {
 
@@ -33,22 +33,22 @@ typealias CofreeEval<S, A> = HK<S, Cofree<S, A>>
     fun extract(): A = head
 
     companion object {
-        inline fun <reified S, A> unfold(a: A, noinline f: (A) -> HK<S, A>, FS: Functor<S> = arrow.typeclasses.functor<S>()): Cofree<S, A> = create(a, f, FS)
+        inline fun <reified S, A> unfold(a: A, noinline f: (A) -> Kind<S, A>, FS: Functor<S> = arrow.typeclasses.functor<S>()): Cofree<S, A> = create(a, f, FS)
 
-        fun <S, A> create(a: A, f: (A) -> HK<S, A>, FS: Functor<S>): Cofree<S, A> = Cofree(FS, a, Eval.later { FS.map(f(a), { create(it, f, FS) }) })
+        fun <S, A> create(a: A, f: (A) -> Kind<S, A>, FS: Functor<S>): Cofree<S, A> = Cofree(FS, a, Eval.later { FS.map(f(a), { create(it, f, FS) }) })
 
     }
 }
 
-fun <F, A, B> Cofree<F, A>.cata(folder: (A, HK<F, B>) -> Eval<B>, TF: Traverse<F>): Eval<B> {
-    val ev: Eval<HK<F, B>> = TF.traverse(this.tailForced(), { it.cata(folder, TF) }, applicative()).ev()
+fun <F, A, B> Cofree<F, A>.cata(folder: (A, Kind<F, B>) -> Eval<B>, TF: Traverse<F>): Eval<B> {
+    val ev: Eval<Kind<F, B>> = TF.traverse(this.tailForced(), { it.cata(folder, TF) }, applicative()).ev()
     return ev.flatMap { folder(extract(), it) }
 }
 
-fun <F, M, A, B> Cofree<F, A>.cataM(folder: (A, HK<F, B>) -> HK<M, B>, inclusion: FunctionK<ForEval, M>, TF: Traverse<F>, MM: Monad<M>): HK<M, B> {
-    fun loop(ev: Cofree<F, A>): Eval<HK<M, B>> {
-        val looped: HK<M, HK<F, B>> = TF.traverse(ev.tailForced(), { MM.flatten(inclusion(Eval.defer { loop(it) })) }, MM)
-        val folded: HK<M, B> = MM.flatMap(looped) { fb -> folder(ev.head, fb) }
+fun <F, M, A, B> Cofree<F, A>.cataM(folder: (A, Kind<F, B>) -> Kind<M, B>, inclusion: FunctionK<ForEval, M>, TF: Traverse<F>, MM: Monad<M>): Kind<M, B> {
+    fun loop(ev: Cofree<F, A>): Eval<Kind<M, B>> {
+        val looped: Kind<M, Kind<F, B>> = TF.traverse(ev.tailForced(), { MM.flatten(inclusion(Eval.defer { loop(it) })) }, MM)
+        val folded: Kind<M, B> = MM.flatMap(looped) { fb -> folder(ev.head, fb) }
         return Eval.now(folded)
     }
     return MM.flatten(inclusion(loop(this)))

@@ -1,6 +1,6 @@
 package arrow.instances
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.data.*
@@ -44,9 +44,9 @@ interface IorMonadInstance<L> : IorApplicativeInstance<L>, Monad<IorKindPartial<
 @instance(Ior::class)
 interface IorFoldableInstance<L> : Foldable<IorKindPartial<L>> {
 
-    override fun <B, C> foldLeft(fa: HK<HK<ForIor, L>, B>, b: C, f: (C, B) -> C): C = fa.ev().foldLeft(b, f)
+    override fun <B, C> foldLeft(fa: Kind<Kind<ForIor, L>, B>, b: C, f: (C, B) -> C): C = fa.ev().foldLeft(b, f)
 
-    override fun <B, C> foldRight(fa: HK<HK<ForIor, L>, B>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
+    override fun <B, C> foldRight(fa: Kind<Kind<ForIor, L>, B>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
             fa.ev().foldRight(lb, f)
 
 }
@@ -54,7 +54,7 @@ interface IorFoldableInstance<L> : Foldable<IorKindPartial<L>> {
 @instance(Ior::class)
 interface IorTraverseInstance<L> : IorFoldableInstance<L>, Traverse<IorKindPartial<L>> {
 
-    override fun <G, B, C> traverse(fa: IorKind<L, B>, f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, Ior<L, C>> =
+    override fun <G, B, C> traverse(fa: IorKind<L, B>, f: (B) -> Kind<G, C>, GA: Applicative<G>): Kind<G, Ior<L, C>> =
             fa.ev().traverse(f, GA)
 
 }

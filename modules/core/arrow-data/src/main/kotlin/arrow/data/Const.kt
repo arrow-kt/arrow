@@ -12,9 +12,9 @@ fun <A, T> ConstKind<A, T>.value(): A = this.ev().value
     @Suppress("UNCHECKED_CAST")
     fun <U> retag(): Const<A, U> = this as Const<A, U>
 
-    fun <F, U> traverse(f: (T) -> HK<F, U>, FA: Applicative<F>): HK<F, Const<A, U>> = FA.pure(retag())
+    fun <F, U> traverse(f: (T) -> Kind<F, U>, FA: Applicative<F>): Kind<F, Const<A, U>> = FA.pure(retag())
 
-    fun <F, U> traverseFilter(f: (T) -> HK<F, Option<U>>, FA: Applicative<F>): HK<F, Const<A, U>> = FA.pure(retag())
+    fun <F, U> traverseFilter(f: (T) -> Kind<F, Option<U>>, FA: Applicative<F>): Kind<F, Const<A, U>> = FA.pure(retag())
 
     companion object {
         fun <A, T> pure(a: A): Const<A, T> = Const(a)

@@ -1,6 +1,6 @@
 package arrow.effects
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.Either
 import arrow.instance
 import arrow.typeclasses.ApplicativeError
@@ -49,6 +49,6 @@ interface DeferredKWAsyncInstance : DeferredKWMonadSuspendInstance, Async<ForDef
 
 @instance(DeferredKW::class)
 interface DeferredKWEffectInstance : DeferredKWAsyncInstance, Effect<ForDeferredKW> {
-    override fun <A> runAsync(fa: HK<ForDeferredKW, A>, cb: (Either<Throwable, A>) -> DeferredKWKind<Unit>): DeferredKW<Unit> =
+    override fun <A> runAsync(fa: Kind<ForDeferredKW, A>, cb: (Either<Throwable, A>) -> DeferredKWKind<Unit>): DeferredKW<Unit> =
             fa.ev().runAsync(cb)
 }

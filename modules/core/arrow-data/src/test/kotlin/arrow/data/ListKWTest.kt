@@ -1,6 +1,6 @@
 package arrow.data
 
-import arrow.HK
+import arrow.Kind
 import arrow.mtl.functorFilter
 import arrow.mtl.monadCombine
 import arrow.mtl.monadFilter
@@ -42,8 +42,8 @@ class ListKWTest : UnitSpec() {
             MonadCombineLaws.laws(ListKW.monadCombine(),
                 { n -> ListKW(listOf(n)) },
                 { n -> ListKW(listOf({ s: Int -> n * s })) },
-                object : Eq<HK<ForListKW, Int>> {
-                    override fun eqv(a: HK<ForListKW, Int>, b: HK<ForListKW, Int>): Boolean =
+                object : Eq<Kind<ForListKW, Int>> {
+                    override fun eqv(a: Kind<ForListKW, Int>, b: Kind<ForListKW, Int>): Boolean =
                             a.ev().list == b.ev().list
                 })
         )

@@ -44,7 +44,7 @@ data class MapKW<K, out A>(val map: Map<K, A>) : MapKWKind<K, A>, Map<K, A> by m
     fun <B> foldLeft(b: MapKW<K, B>, f: (MapKW<K, B>, Tuple2<K, A>) -> MapKW<K, B>): MapKW<K, B> =
             this.map.foldLeft(b) { m, (k, v) -> f(m.k(), Tuple2(k, v)) }.k()
 
-    fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, MapKW<K, B>> =
+    fun <G, B> traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, MapKW<K, B>> =
             (Foldable.iterateRight(this.map.iterator(), Eval.always { GA.pure(emptyMap<K, B>().k()) }))({ kv, lbuf ->
                 GA.map2Eval(f(kv.value), lbuf) { (mapOf(kv.key to it.a).k() + it.b).k() }
             }).value()

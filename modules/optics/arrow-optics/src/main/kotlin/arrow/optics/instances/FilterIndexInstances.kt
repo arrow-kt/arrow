@@ -37,7 +37,7 @@ interface SequenceKWFilterIndexInstance<A> : FilterIndex<SequenceKWKind<A>, Int,
 interface MapKWFilterIndexInstance<K, V> : FilterIndex<MapKWKind<K, V>, K, V> {
 
     override fun filter(p: (K) -> Boolean): Traversal<MapKWKind<K, V>, V> = object : Traversal<MapKWKind<K, V>, V> {
-        override fun <F> modifyF(FA: Applicative<F>, s: HK<HK<ForMapKW, K>, V>, f: (V) -> HK<F, V>): HK<F, HK<HK<ForMapKW, K>, V>> =
+        override fun <F> modifyF(FA: Applicative<F>, s: Kind<Kind<ForMapKW, K>, V>, f: (V) -> Kind<F, V>): Kind<F, Kind<Kind<ForMapKW, K>, V>> =
                 ListKW.traverse().traverse(s.ev().map.toList().k(), { (k, v) ->
                     FA.map(if (p(k)) f(v) else FA.pure(v)) {
                         k to it

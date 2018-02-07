@@ -1,6 +1,6 @@
 package arrow.data
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.*
 import arrow.instances.*
 import arrow.typeclasses.*
@@ -50,8 +50,8 @@ fun <F, A, B, C> EitherT<F, A, B>.foldLeft(b: C, f: (C, B) -> C, FF: Foldable<F>
 
 fun <F, A, B, C> EitherT<F, A, B>.foldRight(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>, FF: Foldable<F>): Eval<C> = FF.compose(Either.foldable<A>()).foldRC(value, lb, f)
 
-fun <F, A, B, G, C> EitherT<F, A, B>. traverse(f: (B) -> HK<G, C>, GA: Applicative<G>, FF: Traverse<F>): HK<G, EitherT<F, A, C>> {
-    val fa: HK<G, HK<Nested<F, EitherKindPartial<A>>, C>> = ComposedTraverse(FF, Either.traverse(), Either.monad<A>()).traverseC(value, f, GA)
+fun <F, A, B, G, C> EitherT<F, A, B>. traverse(f: (B) -> Kind<G, C>, GA: Applicative<G>, FF: Traverse<F>): Kind<G, EitherT<F, A, C>> {
+    val fa: Kind<G, Kind<Nested<F, EitherKindPartial<A>>, C>> = ComposedTraverse(FF, Either.traverse(), Either.monad<A>()).traverseC(value, f, GA)
     return GA.map(fa, { EitherT(FF.map(it.unnest(), { it.ev() })) })
 }
 

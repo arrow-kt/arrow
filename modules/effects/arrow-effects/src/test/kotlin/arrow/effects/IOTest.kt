@@ -1,6 +1,6 @@
 package arrow.effects
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.*
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
@@ -15,7 +15,7 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class IOTest : UnitSpec() {
-    fun <A> EQ(): Eq<HK<ForIO, A>> = Eq { a, b ->
+    fun <A> EQ(): Eq<Kind<ForIO, A>> = Eq { a, b ->
         Option.eq(Eq.any()).eqv(a.ev().attempt().unsafeRunTimed(60.seconds), b.ev().attempt().unsafeRunTimed(60.seconds))
     }
 

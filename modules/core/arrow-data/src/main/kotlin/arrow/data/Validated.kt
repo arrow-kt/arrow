@@ -1,6 +1,6 @@
 package arrow.data
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.*
 import arrow.higherkind
 import arrow.typeclasses.Applicative
@@ -180,7 +180,7 @@ fun <E, A, B> Validated<E, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>)
             is Invalid -> lb
         }
 
-fun <G, E, A, B> Validated<E, A>.traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, Validated<E, B>> =
+fun <G, E, A, B> Validated<E, A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Validated<E, B>> =
         when (this) {
             is Valid -> GA.map(f(this.a), { Valid(it) })
             is Invalid -> GA.pure(this)

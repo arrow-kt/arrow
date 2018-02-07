@@ -1,8 +1,8 @@
 package arrow.kindedj
 
-import arrow.HK
+import arrow.Kind
 
 object KatDataclassArrowShow : ArrowShow<ForKatDataclass> {
-    override fun <A> show(hk: HK<ForKatDataclass, A>): String =
+    override fun <A> show(hk: Kind<ForKatDataclass, A>): String =
             hk.show()
 }

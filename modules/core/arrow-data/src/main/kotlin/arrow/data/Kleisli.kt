@@ -1,23 +1,23 @@
 package arrow.data
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.higherkind
 import arrow.typeclasses.*
 
 /**
- * Alias that represents an arrow from [D] to a monadic value `HK<F, A>`
+ * Alias that represents an arrow from [D] to a monadic value `Kind<F, A>`
  */
-typealias KleisliFun<F, D, A> = (D) -> HK<F, A>
+typealias KleisliFun<F, D, A> = (D) -> Kind<F, A>
 
 /**
- * [Kleisli] represents an arrow from [D] to a monadic value `HK<F, A>`.
+ * [Kleisli] represents an arrow from [D] to a monadic value `Kind<F, A>`.
  *
  * @param F the context of the result.
  * @param D the dependency or environment we depend on.
  * @param A resulting type of the computation.
- * @property run the arrow from [D] to `HK<F, A>`.
+ * @property run the arrow from [D] to `Kind<F, A>`.
  */
 @higherkind
 class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: Unit = Unit) : KleisliKind<F, D, A>, KleisliKindedJ<F, D, A> {
@@ -82,15 +82,15 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
      * @param f the function to apply.
      * @param MF [Monad] for the context [F].
      */
-    fun <B> andThen(f: (A) -> HK<F, B>, MF: Monad<F>): Kleisli<F, D, B> = Kleisli { MF.flatMap(run(it), f) }
+    fun <B> andThen(f: (A) -> Kind<F, B>, MF: Monad<F>): Kleisli<F, D, B> = Kleisli { MF.flatMap(run(it), f) }
 
     /**
-     * Set the end of the arrow to `HK<F, B>` after running the computation.
+     * Set the end of the arrow to `Kind<F, B>` after running the computation.
      *
      * @param fb the new end of the arrow.
      * @param MF [Monad] for the context [F].
      */
-    fun <B> andThen(fb: HK<F, B>, MF: Monad<F>): Kleisli<F, D, B> = andThen({ fb }, MF)
+    fun <B> andThen(fb: Kind<F, B>, MF: Monad<F>): Kleisli<F, D, B> = andThen({ fb }, MF)
 
     /**
      * Handle error within context of [F] given a [MonadError] is defined for [F].
@@ -107,7 +107,7 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
         /**
          * Constructor to create `Kleisli<F, D, A>` given a [KleisliFun].
          *
-         * @param run the arrow from [D] to a monadic value `HK<F, A>`
+         * @param run the arrow from [D] to a monadic value `Kind<F, A>`
          */
         operator fun <F, D, A> invoke(run: KleisliFun<F, D, A>): Kleisli<F, D, A> = Kleisli(run, Unit)
 

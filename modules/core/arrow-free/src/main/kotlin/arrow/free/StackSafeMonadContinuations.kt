@@ -1,6 +1,6 @@
 package arrow.free
 
-import arrow.HK
+import arrow.Kind
 import arrow.typeclasses.Monad
 import arrow.typeclasses.stackLabels
 import kotlin.coroutines.experimental.*
@@ -23,7 +23,7 @@ open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: C
 
     internal fun returnedMonad(): Free<F, A> = returnedMonad
 
-    suspend fun <B> HK<F, B>.bind(): B = bind { Free.liftF(this) }
+    suspend fun <B> Kind<F, B>.bind(): B = bind { Free.liftF(this) }
 
     suspend fun <B> Free<F, B>.bind(): B = bind { this }
 

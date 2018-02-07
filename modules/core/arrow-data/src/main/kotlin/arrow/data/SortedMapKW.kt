@@ -46,7 +46,7 @@ data class SortedMapKW<A: Comparable<A>, B>(val map: SortedMap<A, B>) : SortedMa
     fun <C> foldLeft(c: SortedMapKW<A, C>, f: (SortedMapKW<A, C>, Tuple2<A, B>) -> SortedMapKW<A, C>): SortedMapKW<A, C> =
             this.map.foldLeft(c) { m: SortedMap<A, C>, (a, b) -> f(m.k(), Tuple2(a, b)) }.k()
 
-    fun <G, C> traverse(f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, SortedMapKW<A, C>> =
+    fun <G, C> traverse(f: (B) -> Kind<G, C>, GA: Applicative<G>): Kind<G, SortedMapKW<A, C>> =
         (Foldable.iterateRight(this.map.iterator(), Eval.always { GA.pure(sortedMapOf<A, C>().k()) }))({
             kv, lbuf ->
             GA.map2Eval(f(kv.value), lbuf) { (mapOf(kv.key to it.a).k() + it.b).toSortedMap().k() }

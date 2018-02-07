@@ -19,7 +19,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object FoldableLaws {
-    inline fun <reified F> laws(FF: Foldable<F> = foldable<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<Int>): List<Law> =
+    inline fun <reified F> laws(FF: Foldable<F> = foldable<F>(), crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>): List<Law> =
             listOf(
                     Law("Foldable Laws: Left fold consistent with foldMap", { leftFoldConsistentWithFoldMap(FF, cf, EQ) }),
                     Law("Foldable Laws: Right fold consistent with foldMap", { rightFoldConsistentWithFoldMap(FF, cf, EQ) }),
@@ -31,23 +31,23 @@ object FoldableLaws {
                     Law("Foldable Laws: FoldM for Id is equivalent to fold left", { foldMIdIsFoldL(FF, cf, EQ) })
             )
 
-    inline fun <reified F> leftFoldConsistentWithFoldMap(FF: Foldable<F>, crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<Int>) =
-            forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: HK<F, Int> ->
+    inline fun <reified F> leftFoldConsistentWithFoldMap(FF: Foldable<F>, crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>) =
+            forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: Kind<F, Int> ->
                 FF.foldMap(IntMonoid, fa, f).equalUnderTheLaw(FF.foldLeft(fa, IntMonoid.empty(), { acc, a -> IntMonoid.combine(acc, f(a)) }), EQ)
             })
 
-    inline fun <reified F> rightFoldConsistentWithFoldMap(FF: Foldable<F>, crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<Int>) =
-            forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: HK<F, Int> ->
+    inline fun <reified F> rightFoldConsistentWithFoldMap(FF: Foldable<F>, crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>) =
+            forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: Kind<F, Int> ->
                 FF.foldMap(IntMonoid, fa, f).equalUnderTheLaw(FF.foldRight(fa, Eval.later { IntMonoid.empty() }, { a, lb: Eval<Int> -> lb.map { IntMonoid.combine(f(a), it) } }).value(), EQ)
             })
 
-    inline fun <reified F> existsConsistentWithFind(FF: Foldable<F>, crossinline cf: (Int) -> HK<F, Int>) =
-            forAll(genIntPredicate(), genConstructor(Gen.int(), cf), { f: (Int) -> Boolean, fa: HK<F, Int> ->
+    inline fun <reified F> existsConsistentWithFind(FF: Foldable<F>, crossinline cf: (Int) -> Kind<F, Int>) =
+            forAll(genIntPredicate(), genConstructor(Gen.int(), cf), { f: (Int) -> Boolean, fa: Kind<F, Int> ->
                 FF.exists(fa, f).equalUnderTheLaw(FF.find(fa, f).fold({ false }, { true }), Eq.any())
             })
 
-    inline fun <reified F> existsIsLazy(FF: Foldable<F>, crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<Int>) =
-            forAll(genConstructor(Gen.int(), cf), { fa: HK<F, Int> ->
+    inline fun <reified F> existsIsLazy(FF: Foldable<F>, crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>) =
+            forAll(genConstructor(Gen.int(), cf), { fa: Kind<F, Int> ->
                 val sideEffect = SideEffect()
                 FF.exists(fa, { _ ->
                     sideEffect.increment()
@@ -57,8 +57,8 @@ object FoldableLaws {
                 sideEffect.counter.equalUnderTheLaw(expected, EQ)
             })
 
-    inline fun <reified F> forAllIsLazy(FF: Foldable<F>, crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<Int>) =
-            forAll(genConstructor(Gen.int(), cf), { fa: HK<F, Int> ->
+    inline fun <reified F> forAllIsLazy(FF: Foldable<F>, crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>) =
+            forAll(genConstructor(Gen.int(), cf), { fa: Kind<F, Int> ->
                 val sideEffect = SideEffect()
                 FF.forall(fa, { _ ->
                     sideEffect.increment()
@@ -68,8 +68,8 @@ object FoldableLaws {
                 sideEffect.counter.equalUnderTheLaw(expected, EQ)
             })
 
-    inline fun <reified F> forallConsistentWithExists(FF: Foldable<F>, crossinline cf: (Int) -> HK<F, Int>) =
-            forAll(genIntPredicate(), genConstructor(Gen.int(), cf), { f: (Int) -> Boolean, fa: HK<F, Int> ->
+    inline fun <reified F> forallConsistentWithExists(FF: Foldable<F>, crossinline cf: (Int) -> Kind<F, Int>) =
+            forAll(genIntPredicate(), genConstructor(Gen.int(), cf), { f: (Int) -> Boolean, fa: Kind<F, Int> ->
                 if (FF.forall(fa, f)) {
                     val negationExists = FF.exists(fa, { a -> !(f(a)) })
                     // if p is true for all elements, then there cannot be an element for which
@@ -81,13 +81,13 @@ object FoldableLaws {
                 } else true
             })
 
-    inline fun <reified F> forallReturnsTrueIfEmpty(FF: Foldable<F>, crossinline cf: (Int) -> HK<F, Int>) =
-            forAll(genIntPredicate(), genConstructor(Gen.int(), cf), { f: (Int) -> Boolean, fa: HK<F, Int> ->
+    inline fun <reified F> forallReturnsTrueIfEmpty(FF: Foldable<F>, crossinline cf: (Int) -> Kind<F, Int>) =
+            forAll(genIntPredicate(), genConstructor(Gen.int(), cf), { f: (Int) -> Boolean, fa: Kind<F, Int> ->
                 !FF.isEmpty(fa) || FF.forall(fa, f)
             })
 
-    inline fun <reified F> foldMIdIsFoldL(FF: Foldable<F>, crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<Int>) =
-            forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: HK<F, Int> ->
+    inline fun <reified F> foldMIdIsFoldL(FF: Foldable<F>, crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>) =
+            forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: Kind<F, Int> ->
                 val foldL: Int = FF.foldLeft(fa, IntMonoid.empty(), { acc, a -> IntMonoid.combine(acc, f(a)) })
                 val foldM: Int = FF.foldM(fa, IntMonoid.empty(), { acc, a -> Id(IntMonoid.combine(acc, f(a))) }, Id.monad()).value()
                 foldM.equalUnderTheLaw(foldL, EQ)

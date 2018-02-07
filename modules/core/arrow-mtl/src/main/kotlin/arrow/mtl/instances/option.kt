@@ -12,13 +12,13 @@ interface OptionTraverseFilterInstance : TraverseFilter<ForOption> {
     override fun <A> filter(fa: OptionKind<A>, f: kotlin.Function1<A, kotlin.Boolean>): Option<A> =
             fa.ev().filter(f)
 
-    override fun <G, A, B> traverseFilter(fa: OptionKind<A>, f: kotlin.Function1<A, arrow.HK<G, Option<B>>>, GA: Applicative<G>): arrow.HK<G, Option<B>> =
+    override fun <G, A, B> traverseFilter(fa: OptionKind<A>, f: kotlin.Function1<A, arrow.Kind<G, Option<B>>>, GA: Applicative<G>): arrow.Kind<G, Option<B>> =
             fa.ev().traverseFilter(f, GA)
 
     override fun <A, B> map(fa: OptionKind<A>, f: kotlin.Function1<A, B>): Option<B> =
             fa.ev().map(f)
 
-    override fun <G, A, B> traverse(fa: OptionKind<A>, f: kotlin.Function1<A, arrow.HK<G, B>>, GA: Applicative<G>): arrow.HK<G, Option<B>> =
+    override fun <G, A, B> traverse(fa: OptionKind<A>, f: kotlin.Function1<A, arrow.Kind<G, B>>, GA: Applicative<G>): arrow.Kind<G, Option<B>> =
             fa.ev().traverse(f, GA)
 
     override fun <A> exists(fa: OptionKind<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =

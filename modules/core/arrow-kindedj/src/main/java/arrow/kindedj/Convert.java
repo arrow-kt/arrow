@@ -11,11 +11,11 @@ public class Convert {
     }
 
     @NotNull
-    public static <F, A> FromArrowToKindedJ<F, A> toKindedJ(@NotNull HK<F, A> hk) {
+    public static <F, A> FromArrowToKindedJ<F, A> toKindedJ(@NotNull Kind<F, A> hk) {
         return new FromArrowToKindedJ<>(hk);
     }
 
-    public static class FromKindedJToArrow<F, A> implements HK<HK<ForConvert, F>, A> {
+    public static class FromKindedJToArrow<F, A> implements Kind<Kind<ForConvert, F>, A> {
 
         @NotNull
         private final io.kindedj.Hk<F, A> hk;
@@ -25,7 +25,7 @@ public class Convert {
         }
 
         @NotNull
-        public HK<HK<ForConvert, F>, A> toArrow() {
+        public Kind<Kind<ForConvert, F>, A> toArrow() {
             return this;
         }
 
@@ -38,14 +38,14 @@ public class Convert {
     public static class FromArrowToKindedJ<F, A> implements io.kindedj.Hk<io.kindedj.Hk<ForConvert, F>, A> {
 
         @NotNull
-        private final HK<F, A> hk;
+        private final Kind<F, A> hk;
 
-        FromArrowToKindedJ(@NotNull HK<F, A> hk) {
+        FromArrowToKindedJ(@NotNull Kind<F, A> hk) {
             this.hk = hk;
         }
 
         @NotNull
-        public HK<F, A> toArrow() {
+        public Kind<F, A> toArrow() {
             return hk;
         }
 

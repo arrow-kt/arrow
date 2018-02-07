@@ -1,6 +1,6 @@
 package arrow.data
 
-import arrow.HK2
+import arrow.Kind2
 import arrow.test.UnitSpec
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.SemigroupLaws
@@ -13,8 +13,8 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class SortedMapKWTest : UnitSpec() {
 
-    val EQ: Eq<HK2<ForSortedMapKW, String, Int>> = object : Eq<HK2<ForSortedMapKW, String, Int>> {
-        override fun eqv(a: HK2<ForSortedMapKW, String, Int>, b: HK2<ForSortedMapKW, String, Int>): Boolean =
+    val EQ: Eq<Kind2<ForSortedMapKW, String, Int>> = object : Eq<Kind2<ForSortedMapKW, String, Int>> {
+        override fun eqv(a: Kind2<ForSortedMapKW, String, Int>, b: Kind2<ForSortedMapKW, String, Int>): Boolean =
             a.ev()["key"] == b.ev()["key"]
     }
 

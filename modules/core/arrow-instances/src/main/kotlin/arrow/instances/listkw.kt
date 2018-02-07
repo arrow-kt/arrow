@@ -86,7 +86,7 @@ interface ListKWTraverseInstance : Traverse<ForListKW> {
     override fun <A, B> map(fa: ListKWKind<A>, f: kotlin.Function1<A, B>): ListKW<B> =
             fa.ev().map(f)
 
-    override fun <G, A, B> traverse(fa: ListKWKind<A>, f: kotlin.Function1<A, HK<G, B>>, GA: Applicative<G>): HK<G, ListKW<B>> =
+    override fun <G, A, B> traverse(fa: ListKWKind<A>, f: kotlin.Function1<A, Kind<G, B>>, GA: Applicative<G>): Kind<G, ListKW<B>> =
             fa.ev().traverse(f, GA)
 
     override fun <A, B> foldLeft(fa: ListKWKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =

@@ -1,6 +1,6 @@
 package arrow.instances
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.toT
 import arrow.data.WriterT
@@ -27,7 +27,7 @@ interface WriterTApplicativeInstance<F, W> : Applicative<WriterTKindPartial<F, W
     override fun <A> pure(a: A): WriterTKind<F, W, A> =
             WriterT(FF().pure(MM().empty() toT a))
 
-    override fun <A, B> ap(fa: WriterTKind<F, W, A>, ff: HK<WriterTKindPartial<F, W>, (A) -> B>): WriterT<F, W, B> =
+    override fun <A, B> ap(fa: WriterTKind<F, W, A>, ff: Kind<WriterTKindPartial<F, W>, (A) -> B>): WriterT<F, W, B> =
             fa.ev().ap(ff, MM(), FF())
 
     override fun <A, B> map(fa: WriterTKind<F, W, A>, f: (A) -> B): WriterT<F, W, B> =
@@ -40,13 +40,13 @@ interface WriterTMonadInstance<F, W> : WriterTApplicativeInstance<F, W>, Monad<W
     override fun <A, B> map(fa: WriterTKind<F, W, A>, f: (A) -> B): WriterT<F, W, B> =
             fa.ev().map({ f(it) }, FF())
 
-    override fun <A, B> flatMap(fa: WriterTKind<F, W, A>, f: (A) -> HK<WriterTKindPartial<F, W>, B>): WriterT<F, W, B> =
+    override fun <A, B> flatMap(fa: WriterTKind<F, W, A>, f: (A) -> Kind<WriterTKindPartial<F, W>, B>): WriterT<F, W, B> =
             fa.ev().flatMap({ f(it).ev() }, MM(), FF())
 
-    override fun <A, B> tailRecM(a: A, f: (A) -> HK<WriterTKindPartial<F, W>, Either<A, B>>): WriterT<F, W, B> =
+    override fun <A, B> tailRecM(a: A, f: (A) -> Kind<WriterTKindPartial<F, W>, Either<A, B>>): WriterT<F, W, B> =
             WriterT.tailRecM(a, f, FF())
 
-    override fun <A, B> ap(fa: WriterTKind<F, W, A>, ff: HK<WriterTKindPartial<F, W>, (A) -> B>): WriterT<F, W, B> =
+    override fun <A, B> ap(fa: WriterTKind<F, W, A>, ff: Kind<WriterTKindPartial<F, W>, (A) -> B>): WriterT<F, W, B> =
             fa.ev().ap(ff, MM(), FF())
 }
 

@@ -43,7 +43,7 @@ class NonEmptyList<out A> private constructor(
 
     fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = foldable<ForListKW>().foldRight(this.ev().all.k(), lb, f)
 
-    fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, NonEmptyList<B>> =
+    fun <G, B> traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, NonEmptyList<B>> =
             GA.map2Eval(f(this.ev().head), Eval.always {
                 arrow.typeclasses.traverse<ForListKW>().traverse(this.ev().tail.k(), f, GA)
             }, {
@@ -94,7 +94,7 @@ class NonEmptyList<out A> private constructor(
         @Suppress("UNCHECKED_CAST")
         private tailrec fun <A, B> go(
                 buf: ArrayList<B>,
-                f: (A) -> HK<ForNonEmptyList, Either<A, B>>,
+                f: (A) -> Kind<ForNonEmptyList, Either<A, B>>,
                 v: NonEmptyList<Either<A, B>>) {
             val head: Either<A, B> = v.head
             when (head) {
@@ -110,7 +110,7 @@ class NonEmptyList<out A> private constructor(
             }
         }
 
-        fun <A, B> tailRecM(a: A, f: (A) -> HK<ForNonEmptyList, Either<A, B>>): NonEmptyList<B> {
+        fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForNonEmptyList, Either<A, B>>): NonEmptyList<B> {
             val buf = ArrayList<B>()
             go(buf, f, f(a).ev())
             return fromListUnsafe(buf)

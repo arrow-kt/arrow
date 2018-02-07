@@ -1,6 +1,6 @@
 package arrow.data
 
-import arrow.HK3
+import arrow.Kind3
 import arrow.core.*
 import arrow.syntax.comonad.extract
 import io.kotlintest.KTestJUnitRunner
@@ -13,7 +13,7 @@ import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class CoproductTest : UnitSpec() {
-    val EQ: Eq<HK3<ForCoproduct, ForId, ForId, Int>> = Eq { a, b ->
+    val EQ: Eq<Kind3<ForCoproduct, ForId, ForId, Int>> = Eq { a, b ->
         a.ev().extract() == b.ev().extract()
     }
 

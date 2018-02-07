@@ -1,6 +1,6 @@
 package arrow.effects
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Left
@@ -52,7 +52,7 @@ data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A>, Flowabl
         return Eval.defer { loop(this) }
     }
 
-    fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, FlowableKW<B>> =
+    fun <G, B> traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, FlowableKW<B>> =
             foldRight(Eval.always { GA.pure(Flowable.empty<B>().k()) }) { a, eval ->
                 GA.map2Eval(f(a), eval) { Flowable.concat(Flowable.just<B>(it.a), it.b.flowable).k() }
             }.value()

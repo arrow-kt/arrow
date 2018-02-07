@@ -38,7 +38,7 @@ interface ConstTraverseInstance<X> : ConstFoldableInstance<X>, Traverse<ConstKin
 
     override fun <T, U> map(fa: ConstKind<X, T>, f: (T) -> U): Const<X, U> = fa.ev().retag()
 
-    override fun <G, A, B> traverse(fa: ConstKind<X, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, ConstKind<X, B>> =
+    override fun <G, A, B> traverse(fa: ConstKind<X, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, ConstKind<X, B>> =
             fa.ev().traverse(f, GA)
 }
 

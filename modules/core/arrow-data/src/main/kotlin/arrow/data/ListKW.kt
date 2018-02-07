@@ -26,7 +26,7 @@ data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A>
 
     fun <B> ap(ff: ListKWKind<(A) -> B>): ListKW<B> = ff.ev().flatMap { f -> map(f) }.ev()
 
-    fun <G, B> traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, ListKW<B>> =
+    fun <G, B> traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, ListKW<B>> =
             foldRight(Eval.always { GA.pure(emptyList<B>().k()) }) { a, eval ->
                 GA.map2Eval(f(a), eval) { (listOf(it.a) + it.b).k() }
             }.value()
@@ -50,7 +50,7 @@ data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A>
         @Suppress("UNCHECKED_CAST")
         private tailrec fun <A, B> go(
                 buf: ArrayList<B>,
-                f: (A) -> HK<ForListKW, Either<A, B>>,
+                f: (A) -> Kind<ForListKW, Either<A, B>>,
                 v: ListKW<Either<A, B>>) {
             if (!v.isEmpty()) {
                 val head: Either<A, B> = v.first()
@@ -64,7 +64,7 @@ data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A>
             }
         }
 
-        fun <A, B> tailRecM(a: A, f: (A) -> HK<ForListKW, Either<A, B>>): ListKW<B> {
+        fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForListKW, Either<A, B>>): ListKW<B> {
             val buf = ArrayList<B>()
             go(buf, f, f(a).ev())
             return ListKW(buf)
