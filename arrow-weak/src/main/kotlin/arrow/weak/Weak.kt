@@ -86,7 +86,6 @@ inline fun <A, B> WeakKind<A>.flatMap(crossinline f: (A) -> WeakKind<B>): Weak<B
  */
 inline fun <A> WeakKind<A>.filter(predicate: Predicate<A>): Weak<A> = ev().fold({ Weak.emptyWeak() }, { a -> if (predicate(a)) a.weak() else Weak.emptyWeak() })
 
-
 /**
  * Returns true if the subject is in memory and passes the provided predicate
  */
