@@ -6,14 +6,14 @@ import arrow.core.Eval
 import arrow.core.Tuple2
 import arrow.typeclasses.Applicative
 
-fun <A> SequenceKWKind<A>.toList(): List<A> = this.reify().sequence.toList()
+fun <A> SequenceKWOf<A>.toList(): List<A> = this.reify().sequence.toList()
 
 @higherkind
-data class SequenceKW<out A> constructor(val sequence: Sequence<A>) : SequenceKWKind<A>, Sequence<A> by sequence {
+data class SequenceKW<out A> constructor(val sequence: Sequence<A>) : SequenceKWOf<A>, Sequence<A> by sequence {
 
-    fun <B> flatMap(f: (A) -> SequenceKWKind<B>): SequenceKW<B> = this.reify().sequence.flatMap { f(it).reify().sequence }.k()
+    fun <B> flatMap(f: (A) -> SequenceKWOf<B>): SequenceKW<B> = this.reify().sequence.flatMap { f(it).reify().sequence }.k()
 
-    fun <B> ap(ff: SequenceKWKind<(A) -> B>): SequenceKW<B> = ff.reify().flatMap { f -> map(f) }.reify()
+    fun <B> ap(ff: SequenceKWOf<(A) -> B>): SequenceKW<B> = ff.reify().flatMap { f -> map(f) }.reify()
 
     fun <B> map(f: (A) -> B): SequenceKW<B> = this.reify().sequence.map(f).k()
 
@@ -32,7 +32,7 @@ data class SequenceKW<out A> constructor(val sequence: Sequence<A>) : SequenceKW
                 GA.map2Eval(f(a), eval) { (sequenceOf(it.a) + it.b).k() }
             }.value()
 
-    fun <B, Z> map2(fb: SequenceKWKind<B>, f: (Tuple2<A, B>) -> Z): SequenceKW<Z> =
+    fun <B, Z> map2(fb: SequenceKWOf<B>, f: (Tuple2<A, B>) -> Z): SequenceKW<Z> =
             this.reify().flatMap { a ->
                 fb.reify().map { b ->
                     f(Tuple2(a, b))
@@ -75,6 +75,6 @@ data class SequenceKW<out A> constructor(val sequence: Sequence<A>) : SequenceKW
     }
 }
 
-fun <A> SequenceKW<A>.combineK(y: SequenceKWKind<A>): SequenceKW<A> = (this.sequence + y.reify().sequence).k()
+fun <A> SequenceKW<A>.combineK(y: SequenceKWOf<A>): SequenceKW<A> = (this.sequence + y.reify().sequence).k()
 
 fun <A> Sequence<A>.k(): SequenceKW<A> = SequenceKW(this)

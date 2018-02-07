@@ -29,11 +29,11 @@ import arrow.higherkind
  * overflows.
  */
 @higherkind
-sealed class Eval<out A> : EvalKind<A> {
+sealed class Eval<out A> : EvalOf<A> {
 
     companion object {
 
-        fun <A, B> tailRecM(a: A, f: (A) -> EvalKind<Either<A, B>>): Eval<B> =
+        fun <A, B> tailRecM(a: A, f: (A) -> EvalOf<Either<A, B>>): Eval<B> =
                 f(a).reify().flatMap { eval: Either<A, B> ->
                     when (eval) {
                         is Either.Left -> tailRecM(eval.a, f)
@@ -157,9 +157,9 @@ sealed class Eval<out A> : EvalKind<A> {
 
     fun <B> map(f: (A) -> B): Eval<B> = flatMap { a -> Now(f(a)) }
 
-    fun <B> ap(ff: EvalKind<(A) -> B>): Eval<B> = ff.reify().flatMap { f -> map(f) }.reify()
+    fun <B> ap(ff: EvalOf<(A) -> B>): Eval<B> = ff.reify().flatMap { f -> map(f) }.reify()
 
-    fun <B> flatMap(f: (A) -> EvalKind<B>): Eval<B> =
+    fun <B> flatMap(f: (A) -> EvalOf<B>): Eval<B> =
             when (this) {
                 is FlatMap<A> -> object : FlatMap<B>() {
                     override fun <S> start(): Eval<S> = (this@Eval).start()
@@ -179,7 +179,7 @@ sealed class Eval<out A> : EvalKind<A> {
                 }
             }
 
-    fun <B> coflatMap(f: (EvalKind<A>) -> B): Eval<B> = Later { f(this) }
+    fun <B> coflatMap(f: (EvalOf<A>) -> B): Eval<B> = Later { f(this) }
 
     fun extract(): A = value()
 

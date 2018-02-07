@@ -124,13 +124,13 @@ you can do so simply by annotating it as `@higerkind` and the Λrrow's [annotati
 
 ```kotlin
 @higherkind
-data class ListKW<A>(val list: List<A>): ListKWKind<A>
+data class ListKW<A>(val list: List<A>): ListKWOf<A>
 
 // Generates the following code:
 //
 // class ListKWHK private constructor()
-// typealias ListKWKind<A> = Kind<ListKWHK, A>
-// fun ListKWKind<A>.reify() = this as ListKW<A>
+// typealias ListKWOf<A> = Kind<ListKWHK, A>
+// fun ListKWOf<A>.reify() = this as ListKW<A>
 ```
 
 Note that the annotation `@higerkind` will also generate the integration typealiases required by [KindedJ]({{ '/docs/integrations/kindedj' | relative_url }}) as long as the datatype is invariant. You can read more about sharing Higher Kinds and type constructors across JVM libraries in [KindedJ's README](https://github.com/KindedJ/KindedJ#rationale).

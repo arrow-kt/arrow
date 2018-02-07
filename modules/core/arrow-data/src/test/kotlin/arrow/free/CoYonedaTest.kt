@@ -13,14 +13,14 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class CoyonedaTest : UnitSpec() {
-    val EQ: Eq<CoyonedaKind<ForId, Int, Int>> = Eq { a, b ->
+    val EQ: Eq<CoyonedaOf<ForId, Int, Int>> = Eq { a, b ->
         a.reify().lower(Id.functor()) == b.reify().lower(Id.functor())
     }
 
     init {
 
         "instances can be resolved implicitly" {
-            functor<CoyonedaKindPartial<ForId, Int>>() shouldNotBe null
+            functor<CoyonedaPartialOf<ForId, Int>>() shouldNotBe null
         }
 
         testLaws(FunctorLaws.laws(Coyoneda.functor(), { Coyoneda(Id(0), { it }) }, EQ))

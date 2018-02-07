@@ -16,7 +16,7 @@ import arrow.typeclasses.monad
  *
  * It may also be said that [EitherT] is a monad transformer for [Either].
  */
-@higherkind data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTKind<F, A, B>, EitherTKindedJ<F, A, B> {
+@higherkind data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, B>, EitherTKindedJ<F, A, B> {
 
     companion object {
 
@@ -24,7 +24,7 @@ import arrow.typeclasses.monad
 
         fun <F, A, B> pure(b: B, MF: Applicative<F>): EitherT<F, A, B> = right(b, MF)
 
-        fun <F, L, A, B> tailRecM(a: A, f: (A) -> EitherTKind<F, L, Either<A, B>>, MF: Monad<F>): EitherT<F, L, B> =
+        fun <F, L, A, B> tailRecM(a: A, f: (A) -> EitherTOf<F, L, Either<A, B>>, MF: Monad<F>): EitherT<F, L, B> =
                 EitherT(MF.tailRecM(a, {
                     MF.map(f(it).reify().value) { recursionControl ->
                         when (recursionControl) {
@@ -73,7 +73,7 @@ import arrow.typeclasses.monad
 
     fun toOptionT(FF: Functor<F>): OptionT<F, B> = OptionT(FF.map(value, { it.toOption() }))
 
-    fun combineK(y: EitherTKind<F, A, B>, MF: Monad<F>): EitherT<F, A, B> =
+    fun combineK(y: EitherTOf<F, A, B>, MF: Monad<F>): EitherT<F, A, B> =
             EitherT(MF.flatMap(this.reify().value) {
                 when (it) {
                     is Either.Left -> y.reify().value
@@ -81,7 +81,7 @@ import arrow.typeclasses.monad
                 }
             })
 
-    fun <C> ap(ff: EitherTKind<F, A, (B) -> C>, MF: Monad<F>): EitherT<F, A, C> = ff.reify().flatMap ({ f -> map(f, MF) }, MF)
+    fun <C> ap(ff: EitherTOf<F, A, (B) -> C>, MF: Monad<F>): EitherT<F, A, C> = ff.reify().flatMap ({ f -> map(f, MF) }, MF)
 }
 
-fun <F, A, B> EitherTKind<F, A, B>.value(): Kind<F, Either<A, B>> = this.reify().value
+fun <F, A, B> EitherTOf<F, A, B>.value(): Kind<F, Either<A, B>> = this.reify().value

@@ -23,13 +23,13 @@ class WriterTTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            functor<WriterTKindPartial<ForId, Int>>() shouldNotBe null
-            applicative<WriterTKindPartial<ForId, Int>>() shouldNotBe null
-            monad<WriterTKindPartial<ForId, Int>>() shouldNotBe null
-            monadFilter<WriterTKindPartial<ForOption, Int>>() shouldNotBe null
-            monadWriter<WriterTKindPartial<ForOption, Int>, Int>() shouldNotBe null
-            semigroupK<WriterTKindPartial<ForListKW, Int>>() shouldNotBe null
-            monoidK<WriterTKindPartial<ForListKW, Int>>() shouldNotBe null
+            functor<WriterTPartialOf<ForId, Int>>() shouldNotBe null
+            applicative<WriterTPartialOf<ForId, Int>>() shouldNotBe null
+            monad<WriterTPartialOf<ForId, Int>>() shouldNotBe null
+            monadFilter<WriterTPartialOf<ForOption, Int>>() shouldNotBe null
+            monadWriter<WriterTPartialOf<ForOption, Int>, Int>() shouldNotBe null
+            semigroupK<WriterTPartialOf<ForListKW, Int>>() shouldNotBe null
+            monoidK<WriterTPartialOf<ForListKW, Int>>() shouldNotBe null
         }
 
         testLaws(
@@ -62,8 +62,8 @@ class WriterTTest : UnitSpec() {
 
             MonadFilterLaws.laws(WriterT.monadFilter(Option.monadFilter(), IntMonoid),
                 { WriterT(Option(Tuple2(it, it))) },
-                object : Eq<Kind<WriterTKindPartial<ForOption, Int>, Int>> {
-                    override fun eqv(a: Kind<WriterTKindPartial<ForOption, Int>, Int>, b: Kind<WriterTKindPartial<ForOption, Int>, Int>): Boolean =
+                object : Eq<Kind<WriterTPartialOf<ForOption, Int>, Int>> {
+                    override fun eqv(a: Kind<WriterTPartialOf<ForOption, Int>, Int>, b: Kind<WriterTPartialOf<ForOption, Int>, Int>): Boolean =
                             a.reify().value.reify().let { optionA: Option<Tuple2<Int, Int>> ->
                                 val optionB = b.reify().value.reify()
                                 optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Int> -> optionB.fold({ false }, { value == it }) })

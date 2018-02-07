@@ -21,8 +21,8 @@ class CofreeTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            functor<CofreeKindPartial<ForOption>>() shouldNotBe null
-            comonad<CofreeKindPartial<ForOption>>() shouldNotBe null
+            functor<CofreePartialOf<ForOption>>() shouldNotBe null
+            comonad<CofreePartialOf<ForOption>>() shouldNotBe null
         }
 
         testLaws(ComonadLaws.laws(Cofree.comonad<ForOption>(), {
@@ -151,6 +151,6 @@ class CofreeTest : UnitSpec() {
     }
 }
 
-typealias EvalOption<A> = OptionTKind<ForEval, A>
+typealias EvalOption<A> = OptionTOf<ForEval, A>
 
-typealias EvalOptionF = OptionTKindPartial<ForEval>
+typealias EvalOptionF = OptionTPartialOf<ForEval>

@@ -12,7 +12,7 @@ interface ObservableKWApplicativeErrorInstance :
     override fun <A> raiseError(e: Throwable): ObservableKW<A> =
             ObservableKW.raiseError(e)
 
-    override fun <A> handleErrorWith(fa: ObservableKWKind<A>, f: (Throwable) -> ObservableKWKind<A>): ObservableKW<A> =
+    override fun <A> handleErrorWith(fa: ObservableKWOf<A>, f: (Throwable) -> ObservableKWOf<A>): ObservableKW<A> =
             fa.handleErrorWith { f(it).reify() }
 }
 
@@ -21,10 +21,10 @@ interface ObservableKWMonadErrorInstance :
         ObservableKWApplicativeErrorInstance,
         ObservableKWMonadInstance,
         MonadError<ForObservableKW, Throwable> {
-    override fun <A, B> ap(fa: ObservableKWKind<A>, ff: ObservableKWKind<(A) -> B>): ObservableKW<B> =
+    override fun <A, B> ap(fa: ObservableKWOf<A>, ff: ObservableKWOf<(A) -> B>): ObservableKW<B> =
             super<ObservableKWMonadInstance>.ap(fa, ff)
 
-    override fun <A, B> map(fa: ObservableKWKind<A>, f: (A) -> B): ObservableKW<B> =
+    override fun <A, B> map(fa: ObservableKWOf<A>, f: (A) -> B): ObservableKW<B> =
             super<ObservableKWMonadInstance>.map(fa, f)
 
     override fun <A> pure(a: A): ObservableKW<A> =
@@ -35,7 +35,7 @@ interface ObservableKWMonadErrorInstance :
 interface ObservableKWMonadSuspendInstance :
         ObservableKWMonadErrorInstance,
         MonadSuspend<ForObservableKW> {
-    override fun <A> suspend(fa: () -> ObservableKWKind<A>): ObservableKW<A> =
+    override fun <A> suspend(fa: () -> ObservableKWOf<A>): ObservableKW<A> =
             ObservableKW.suspend(fa)
 }
 
@@ -51,6 +51,6 @@ interface ObservableKWAsyncInstance :
 interface ObservableKWEffectInstance :
         ObservableKWAsyncInstance,
         Effect<ForObservableKW> {
-    override fun <A> runAsync(fa: ObservableKWKind<A>, cb: (Either<Throwable, A>) -> ObservableKWKind<Unit>): ObservableKW<Unit> =
+    override fun <A> runAsync(fa: ObservableKWOf<A>, cb: (Either<Throwable, A>) -> ObservableKWOf<Unit>): ObservableKW<Unit> =
             fa.reify().runAsync(cb)
 }

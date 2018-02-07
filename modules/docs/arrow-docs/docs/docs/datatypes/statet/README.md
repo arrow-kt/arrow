@@ -99,18 +99,18 @@ The only thing we can do is handle this with `StateT`. We want to wrap `State` w
 `EitherKindPartial` is an alias that helps us to fix `StackError` as the left type parameter for `Either<L, R>`.
 
 ```kotlin:ank
-fun popS() = StateT<EitherKindPartial<StackError>, Stack, String> { stack ->
+fun popS() = StateT<EitherPartialOf<StackError>, Stack, String> { stack ->
     if (stack.isEmpty()) StackEmpty.left()
     else stack.first().let {
         stack.drop(1) toT it
     }.right()
 }
 
-fun pushS(s: String) = StateT<EitherKindPartial<StackError>, Stack, Unit> { stack ->
+fun pushS(s: String) = StateT<EitherPartialOf<StackError>, Stack, Unit> { stack ->
     (listOf(s, *stack.toTypedArray()) toT Unit).right()
 }
 
-fun stackOperationsS(): StateT<EitherKindPartial<StackError>, Stack, String> {
+fun stackOperationsS(): StateT<EitherPartialOf<StackError>, Stack, String> {
     return pushS("a").flatMap({ _ ->
         popS().flatMap({ _ ->
             popS()
@@ -127,7 +127,7 @@ stackOperationsS().runM(listOf())
 While our code looks very similar to what we had before there are some key advantages. State management is now contained within `State` and we are dealing only with 1 monad instead of 2 nested monads so we can use monad bindings!
 
 ```kotlin:ank
-fun stackOperationsS2() = StateT .monad<EitherKindPartial<StackError>, Stack>().binding {
+fun stackOperationsS2() = StateT .monad<EitherPartialOf<StackError>, Stack>().binding {
     pushS("a").bind()
     popS().bind()
     val string = popS().bind()
@@ -146,7 +146,7 @@ Available Instances:
 ```kotlin:ank
 import arrow.debug.*
 
-showInstances<StateTKindPartial<EitherKindPartial<StackError>, Stack>, Unit>()
+showInstances<StateTPartialOf<EitherPartialOf<StackError>, Stack>, Unit>()
 ```
 
 Take a look at the [`EitherT` docs]({{ '/docs/datatypes/eithert' | relative_url }}) or [`OptionT` docs]({{ '/docs/datatypes/optiont' | relative_url }}) for an alternative version monad transformer for achieving different goals.

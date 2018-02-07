@@ -83,16 +83,16 @@ class StackOverflowTest: UnitSpec() {
     }
 
     fun <A> listToTraversal(): Traversal<List<A>, A> {
-        val listTraversal: Traversal<ListKWKind<A>, A> = Traversal.fromTraversable()
+        val listTraversal: Traversal<ListKWOf<A>, A> = Traversal.fromTraversable()
         return listToListKW2<A>() + listTraversal
     }
 
-    fun <A, B> pListToListKW2(): PIso<List<A>, List<B>, ListKWKind<A>, ListKWKind<B>> = PIso(
+    fun <A, B> pListToListKW2(): PIso<List<A>, List<B>, ListKWOf<A>, ListKWOf<B>> = PIso(
             get = { it.k() },
             reverseGet = { (it as ListKW<B>).list }
     )
 
-    fun <A> listToListKW2(): Iso<List<A>, ListKWKind<A>> = pListToListKW2()
+    fun <A> listToListKW2(): Iso<List<A>, ListKWOf<A>> = pListToListKW2()
 
 
 }

@@ -15,21 +15,21 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class EitherTest : UnitSpec() {
-    val EQ: Eq<Kind<EitherKindPartial<ForId>, Int>> = Eq { a, b ->
+    val EQ: Eq<Kind<EitherPartialOf<ForId>, Int>> = Eq { a, b ->
         a.reify() == b.reify()
     }
 
     init {
 
         "instances can be resolved implicitly" {
-            functor<EitherKindPartial<Throwable>>() shouldNotBe null
-            applicative<EitherKindPartial<Throwable>>() shouldNotBe null
-            monad<EitherKindPartial<Throwable>>() shouldNotBe null
-            foldable<EitherKindPartial<Throwable>>() shouldNotBe null
-            traverse<EitherKindPartial<Throwable>>() shouldNotBe null
-            applicativeError<EitherKindPartial<Throwable>, Throwable>() shouldNotBe null
-            monadError<EitherKindPartial<Throwable>, Throwable>() shouldNotBe null
-            semigroupK<EitherKindPartial<Throwable>>() shouldNotBe null
+            functor<EitherPartialOf<Throwable>>() shouldNotBe null
+            applicative<EitherPartialOf<Throwable>>() shouldNotBe null
+            monad<EitherPartialOf<Throwable>>() shouldNotBe null
+            foldable<EitherPartialOf<Throwable>>() shouldNotBe null
+            traverse<EitherPartialOf<Throwable>>() shouldNotBe null
+            applicativeError<EitherPartialOf<Throwable>, Throwable>() shouldNotBe null
+            monadError<EitherPartialOf<Throwable>, Throwable>() shouldNotBe null
+            semigroupK<EitherPartialOf<Throwable>>() shouldNotBe null
             eq<Either<String, Int>>() shouldNotBe null
         }
 

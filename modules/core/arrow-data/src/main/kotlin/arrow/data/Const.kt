@@ -5,9 +5,9 @@ import arrow.core.Option
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Semigroup
 
-fun <A, T> ConstKind<A, T>.value(): A = this.reify().value
+fun <A, T> ConstOf<A, T>.value(): A = this.reify().value
 
-@higherkind data class Const<out A, out T>(val value: A) : ConstKind<A, T> {
+@higherkind data class Const<out A, out T>(val value: A) : ConstOf<A, T> {
 
     @Suppress("UNCHECKED_CAST")
     fun <U> retag(): Const<A, U> = this as Const<A, U>
@@ -21,8 +21,8 @@ fun <A, T> ConstKind<A, T>.value(): A = this.reify().value
     }
 }
 
-fun <A, T> ConstKind<A, T>.combine(that: ConstKind<A, T>, SG: Semigroup<A>): Const<A, T> = Const(SG.combine(this.value(), that.value()))
+fun <A, T> ConstOf<A, T>.combine(that: ConstOf<A, T>, SG: Semigroup<A>): Const<A, T> = Const(SG.combine(this.value(), that.value()))
 
-fun <A, T, U> ConstKind<A, T>.ap(ff: ConstKind<A, (T) -> U>, SG: Semigroup<A>): Const<A, U> = ff.reify().retag<U>().combine(this.reify().retag(), SG)
+fun <A, T, U> ConstOf<A, T>.ap(ff: ConstOf<A, (T) -> U>, SG: Semigroup<A>): Const<A, U> = ff.reify().retag<U>().combine(this.reify().retag(), SG)
 
 fun <A> A.const(): Const<A, Nothing> = Const(this)

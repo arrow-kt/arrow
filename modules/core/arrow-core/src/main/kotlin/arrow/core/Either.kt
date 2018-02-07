@@ -9,7 +9,7 @@ import arrow.legacy.*
  * Represents a value of one of two possible types (a disjoint union.)
  * An instance of Either is either an instance of [Left] or [Right].
  */
-@higherkind sealed class Either<out A, out B> : EitherKind<A, B> {
+@higherkind sealed class Either<out A, out B> : EitherOf<A, B> {
 
     /**
      * Returns `true` if this is a [Right], `false` otherwise.
@@ -179,7 +179,7 @@ import arrow.legacy.*
 
         fun <R> right(right: R): Either<Nothing, R> = Right(right)
 
-        tailrec fun <L, A, B> tailRecM(a: A, f: (A) -> Kind<EitherKindPartial<L>, Either<A, B>>): Either<L, B> {
+        tailrec fun <L, A, B> tailRecM(a: A, f: (A) -> Kind<EitherPartialOf<L>, Either<A, B>>): Either<L, B> {
             val ev: Either<L, Either<A, B>> = f(a).reify()
             return when (ev) {
                 is Left<L, Either<A, B>> -> Left(ev.a)
@@ -267,9 +267,9 @@ inline fun <A, B> Either<A, B>.filterOrElse(crossinline predicate: (B) -> Boolea
  */
 fun <A, B> Either<A, B>.contains(elem: B): Boolean = fold({ false }, { it == elem })
 
-fun <A, B, C> Either<A, B>.ap(ff: EitherKind<A, (B) -> C>): Either<A, C> = ff.reify().flatMap { f -> map(f) }.reify()
+fun <A, B, C> Either<A, B>.ap(ff: EitherOf<A, (B) -> C>): Either<A, C> = ff.reify().flatMap { f -> map(f) }.reify()
 
-fun <A, B> Either<A, B>.combineK(y: EitherKind<A, B>): Either<A, B> =
+fun <A, B> Either<A, B>.combineK(y: EitherOf<A, B>): Either<A, B> =
         when (this) {
             is Either.Left -> y.reify()
             else -> this.reify()

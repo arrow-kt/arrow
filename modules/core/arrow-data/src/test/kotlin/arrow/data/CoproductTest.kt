@@ -20,10 +20,10 @@ class CoproductTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            functor<CoproductKindPartial<ForId, ForNonEmptyList>>() shouldNotBe null
-            comonad<CoproductKindPartial<ForId, ForNonEmptyList>>()  shouldNotBe null
-            foldable<CoproductKindPartial<ForId, ForNonEmptyList>>() shouldNotBe null
-            traverse<CoproductKindPartial<ForId, ForNonEmptyList>>() shouldNotBe null
+            functor<CoproductPartialOf<ForId, ForNonEmptyList>>() shouldNotBe null
+            comonad<CoproductPartialOf<ForId, ForNonEmptyList>>()  shouldNotBe null
+            foldable<CoproductPartialOf<ForId, ForNonEmptyList>>() shouldNotBe null
+            traverse<CoproductPartialOf<ForId, ForNonEmptyList>>() shouldNotBe null
         }
 
         testLaws(

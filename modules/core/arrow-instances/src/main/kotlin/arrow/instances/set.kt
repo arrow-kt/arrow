@@ -32,19 +32,19 @@ interface SetKWEqInstance<A> : Eq<SetKW<A>> {
 
 @instance(SetKW::class)
 interface SetKWFoldableInstance : Foldable<ForSetKW> {
-    override fun <A, B> foldLeft(fa: SetKWKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =
+    override fun <A, B> foldLeft(fa: SetKWOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.reify().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: SetKWKind<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
+    override fun <A, B> foldRight(fa: SetKWOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
             fa.reify().foldRight(lb, f)
 
-    override fun <A> isEmpty(fa: SetKWKind<A>): kotlin.Boolean =
+    override fun <A> isEmpty(fa: SetKWOf<A>): kotlin.Boolean =
             fa.reify().isEmpty()
 }
 
 @instance(SetKW::class)
 interface SetKWSemigroupKInstance : SemigroupK<ForSetKW> {
-    override fun <A> combineK(x: SetKWKind<A>, y: SetKWKind<A>): SetKW<A> =
+    override fun <A> combineK(x: SetKWOf<A>, y: SetKWOf<A>): SetKW<A> =
             x.reify().combineK(y)
 }
 
@@ -53,6 +53,6 @@ interface SetKWMonoidKInstance : MonoidK<ForSetKW> {
     override fun <A> empty(): SetKW<A> =
             SetKW.empty()
 
-    override fun <A> combineK(x: SetKWKind<A>, y: SetKWKind<A>): SetKW<A> =
+    override fun <A> combineK(x: SetKWOf<A>, y: SetKWOf<A>): SetKW<A> =
             x.reify().combineK(y)
 }

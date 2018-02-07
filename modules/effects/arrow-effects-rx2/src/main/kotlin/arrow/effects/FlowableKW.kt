@@ -14,7 +14,7 @@ import io.reactivex.FlowableEmitter
 
 fun <A> Flowable<A>.k(): FlowableKW<A> = FlowableKW(this)
 
-fun <A> FlowableKWKind<A>.value(): Flowable<A> = this.reify().flowable
+fun <A> FlowableKWOf<A>.value(): Flowable<A> = this.reify().flowable
 
 @higherkind
 @deriving(
@@ -24,21 +24,21 @@ fun <A> FlowableKWKind<A>.value(): Flowable<A> = this.reify().flowable
         Foldable::class,
         Traverse::class
 )
-data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A>, FlowableKWKindedJ<A> {
+data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWOf<A>, FlowableKWKindedJ<A> {
 
     fun <B> map(f: (A) -> B): FlowableKW<B> =
             flowable.map(f).k()
 
-    fun <B> ap(fa: FlowableKWKind<(A) -> B>): FlowableKW<B> =
+    fun <B> ap(fa: FlowableKWOf<(A) -> B>): FlowableKW<B> =
             flatMap { a -> fa.reify().map { ff -> ff(a) } }
 
-    fun <B> flatMap(f: (A) -> FlowableKWKind<B>): FlowableKW<B> =
+    fun <B> flatMap(f: (A) -> FlowableKWOf<B>): FlowableKW<B> =
             flowable.flatMap { f(it).reify().flowable }.k()
 
-    fun <B> concatMap(f: (A) -> FlowableKWKind<B>): FlowableKW<B> =
+    fun <B> concatMap(f: (A) -> FlowableKWOf<B>): FlowableKW<B> =
             flowable.concatMap { f(it).reify().flowable }.k()
 
-    fun <B> switchMap(f: (A) -> FlowableKWKind<B>): FlowableKW<B> =
+    fun <B> switchMap(f: (A) -> FlowableKWOf<B>): FlowableKW<B> =
             flowable.switchMap { f(it).reify().flowable }.k()
 
     fun <B> foldLeft(b: B, f: (B, A) -> B): B = flowable.reduce(b, f).blockingGet()
@@ -57,7 +57,7 @@ data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A>, Flowabl
                 GA.map2Eval(f(a), eval) { Flowable.concat(Flowable.just<B>(it.a), it.b.flowable).k() }
             }.value()
 
-    fun runAsync(cb: (Either<Throwable, A>) -> FlowableKWKind<Unit>): FlowableKW<Unit> =
+    fun runAsync(cb: (Either<Throwable, A>) -> FlowableKWOf<Unit>): FlowableKW<Unit> =
             flowable.flatMap { cb(Right(it)).value() }.onErrorResumeNext(io.reactivex.functions.Function { cb(Left(it)).value() }).k()
 
     companion object {
@@ -70,7 +70,7 @@ data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A>, Flowabl
         operator fun <A> invoke(fa: () -> A): FlowableKW<A> =
                 suspend { pure(fa()) }
 
-        fun <A> suspend(fa: () -> FlowableKWKind<A>): FlowableKW<A> =
+        fun <A> suspend(fa: () -> FlowableKWOf<A>): FlowableKW<A> =
                 Flowable.defer { fa().value() }.k()
 
         fun <A> async(fa: Proc<A>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableKW<A> =
@@ -86,7 +86,7 @@ data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A>, Flowabl
                     }
                 }, mode).k()
 
-        tailrec fun <A, B> tailRecM(a: A, f: (A) -> FlowableKWKind<Either<A, B>>): FlowableKW<B> {
+        tailrec fun <A, B> tailRecM(a: A, f: (A) -> FlowableKWOf<Either<A, B>>): FlowableKW<B> {
             val either = f(a).reify().value().blockingFirst()
             return when (either) {
                 is Either.Left -> tailRecM(either.a, f)
@@ -97,24 +97,24 @@ data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A>, Flowabl
         fun monadFlat(): FlowableKWMonadInstance = FlowableKWMonadInstanceImplicits.instance()
 
         fun monadConcat(): FlowableKWMonadInstance = object : FlowableKWMonadInstance {
-            override fun <A, B> flatMap(fa: FlowableKWKind<A>, f: (A) -> FlowableKWKind<B>): FlowableKW<B> =
+            override fun <A, B> flatMap(fa: FlowableKWOf<A>, f: (A) -> FlowableKWOf<B>): FlowableKW<B> =
                     fa.reify().concatMap { f(it).reify() }
         }
 
         fun monadSwitch(): FlowableKWMonadInstance = object : FlowableKWMonadInstance {
-            override fun <A, B> flatMap(fa: FlowableKWKind<A>, f: (A) -> FlowableKWKind<B>): FlowableKW<B> =
+            override fun <A, B> flatMap(fa: FlowableKWOf<A>, f: (A) -> FlowableKWOf<B>): FlowableKW<B> =
                     fa.reify().switchMap { f(it).reify() }
         }
 
         fun monadErrorFlat(): FlowableKWMonadErrorInstance = FlowableKWMonadErrorInstanceImplicits.instance()
 
         fun monadErrorConcat(): FlowableKWMonadErrorInstance = object : FlowableKWMonadErrorInstance {
-            override fun <A, B> flatMap(fa: FlowableKWKind<A>, f: (A) -> FlowableKWKind<B>): FlowableKW<B> =
+            override fun <A, B> flatMap(fa: FlowableKWOf<A>, f: (A) -> FlowableKWOf<B>): FlowableKW<B> =
                     fa.reify().concatMap { f(it).reify() }
         }
 
         fun monadErrorSwitch(): FlowableKWMonadErrorInstance = object : FlowableKWMonadErrorInstance {
-            override fun <A, B> flatMap(fa: FlowableKWKind<A>, f: (A) -> FlowableKWKind<B>): FlowableKW<B> =
+            override fun <A, B> flatMap(fa: FlowableKWOf<A>, f: (A) -> FlowableKWOf<B>): FlowableKW<B> =
                     fa.reify().switchMap { f(it).reify() }
         }
 
@@ -174,5 +174,5 @@ data class FlowableKW<A>(val flowable: Flowable<A>) : FlowableKWKind<A>, Flowabl
     }
 }
 
-fun <A> FlowableKWKind<A>.handleErrorWith(function: (Throwable) -> FlowableKW<A>): FlowableKW<A> =
+fun <A> FlowableKWOf<A>.handleErrorWith(function: (Throwable) -> FlowableKW<A>): FlowableKW<A> =
         this.reify().flowable.onErrorResumeNext { t: Throwable -> function(t).flowable }.k()

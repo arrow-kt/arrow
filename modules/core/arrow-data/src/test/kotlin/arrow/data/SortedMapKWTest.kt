@@ -24,8 +24,8 @@ class SortedMapKWTest : UnitSpec() {
             functor<ForSortedMapKW>() shouldNotBe null
             foldable<ForSortedMapKW>() shouldNotBe null
             traverse<ForSortedMapKW>() shouldNotBe null
-            semigroup<SortedMapKWKind<String, Int>>() shouldNotBe null
-            monoid<SortedMapKWKind<String, Int>>() shouldNotBe null
+            semigroup<SortedMapKWOf<String, Int>>() shouldNotBe null
+            monoid<SortedMapKWOf<String, Int>>() shouldNotBe null
         }
 
 

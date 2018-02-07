@@ -1,10 +1,12 @@
 package arrow.mtl.syntax
 
-import arrow.*
-import arrow.core.*
-import arrow.data.*
-import arrow.instances.applicative
-import arrow.mtl.instances.*
+import arrow.Kind
+import arrow.core.Option
+import arrow.core.applicative
+import arrow.core.reify
+import arrow.core.traverseFilter
+import arrow.data.OptionT
+import arrow.mtl.instances.ComposedTraverseFilter
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.unnest

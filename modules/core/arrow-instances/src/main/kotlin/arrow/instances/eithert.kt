@@ -7,41 +7,41 @@ import arrow.core.Left
 import arrow.data.*
 import arrow.typeclasses.*
 
-interface EitherTFunctorInstance<F, L> : Functor<EitherTKindPartial<F, L>> {
+interface EitherTFunctorInstance<F, L> : Functor<EitherTPartialOf<F, L>> {
 
     fun FF(): Functor<F>
 
-    override fun <A, B> map(fa: EitherTKind<F, L, A>, f: (A) -> B): EitherT<F, L, B> = fa.reify().map({ f(it) }, FF())
+    override fun <A, B> map(fa: EitherTOf<F, L, A>, f: (A) -> B): EitherT<F, L, B> = fa.reify().map({ f(it) }, FF())
 }
 
-interface EitherTApplicativeInstance<F, L> : EitherTFunctorInstance<F, L>, Applicative<EitherTKindPartial<F, L>> {
+interface EitherTApplicativeInstance<F, L> : EitherTFunctorInstance<F, L>, Applicative<EitherTPartialOf<F, L>> {
 
     fun MF(): Monad<F>
 
     override fun <A> pure(a: A): EitherT<F, L, A> = EitherT.pure(a, MF())
 
-    override fun <A, B> map(fa: EitherTKind<F, L, A>, f: (A) -> B): EitherT<F, L, B> = fa.reify().map({ f(it) }, MF())
+    override fun <A, B> map(fa: EitherTOf<F, L, A>, f: (A) -> B): EitherT<F, L, B> = fa.reify().map({ f(it) }, MF())
 
-    override fun <A, B> ap(fa: EitherTKind<F, L, A>, ff: EitherTKind<F, L, (A) -> B>): EitherT<F, L, B> =
+    override fun <A, B> ap(fa: EitherTOf<F, L, A>, ff: EitherTOf<F, L, (A) -> B>): EitherT<F, L, B> =
             fa.reify().ap(ff, MF())
 }
 
-interface EitherTMonadInstance<F, L> : EitherTApplicativeInstance<F, L>, Monad<EitherTKindPartial<F, L>> {
+interface EitherTMonadInstance<F, L> : EitherTApplicativeInstance<F, L>, Monad<EitherTPartialOf<F, L>> {
 
-    override fun <A, B> map(fa: EitherTKind<F, L, A>, f: (A) -> B): EitherT<F, L, B> = fa.reify().map({ f(it) }, MF())
+    override fun <A, B> map(fa: EitherTOf<F, L, A>, f: (A) -> B): EitherT<F, L, B> = fa.reify().map({ f(it) }, MF())
 
-    override fun <A, B> ap(fa: EitherTKind<F, L, A>, ff: EitherTKind<F, L, (A) -> B>): EitherT<F, L, B> =
+    override fun <A, B> ap(fa: EitherTOf<F, L, A>, ff: EitherTOf<F, L, (A) -> B>): EitherT<F, L, B> =
             fa.reify().ap(ff, MF())
 
-    override fun <A, B> flatMap(fa: EitherTKind<F, L, A>, f: (A) -> EitherTKind<F, L, B>): EitherT<F, L, B> = fa.reify().flatMap({ f(it).reify() }, MF())
+    override fun <A, B> flatMap(fa: EitherTOf<F, L, A>, f: (A) -> EitherTOf<F, L, B>): EitherT<F, L, B> = fa.reify().flatMap({ f(it).reify() }, MF())
 
-    override fun <A, B> tailRecM(a: A, f: (A) -> EitherTKind<F, L, Either<A, B>>): EitherT<F, L, B> =
+    override fun <A, B> tailRecM(a: A, f: (A) -> EitherTOf<F, L, Either<A, B>>): EitherT<F, L, B> =
             EitherT.tailRecM(a, f, MF())
 }
 
-interface EitherTApplicativeErrorInstance<F, L> : EitherTApplicativeInstance<F, L>, ApplicativeError<EitherTKindPartial<F, L>, L> {
+interface EitherTApplicativeErrorInstance<F, L> : EitherTApplicativeInstance<F, L>, ApplicativeError<EitherTPartialOf<F, L>, L> {
 
-    override fun <A> handleErrorWith(fa: EitherTKind<F, L, A>, f: (L) -> EitherTKind<F, L, A>): EitherT<F, L, A> =
+    override fun <A> handleErrorWith(fa: EitherTOf<F, L, A>, f: (L) -> EitherTOf<F, L, A>): EitherT<F, L, A> =
             EitherT(MF().flatMap(fa.reify().value, {
                 when (it) {
                     is Either.Left -> f(it.a).reify().value
@@ -52,30 +52,30 @@ interface EitherTApplicativeErrorInstance<F, L> : EitherTApplicativeInstance<F, 
     override fun <A> raiseError(e: L): EitherT<F, L, A> = EitherT(MF().pure(Left(e)))
 }
 
-interface EitherTMonadErrorInstance<F, L> : EitherTApplicativeErrorInstance<F, L>, EitherTMonadInstance<F, L>, MonadError<EitherTKindPartial<F, L>, L>
+interface EitherTMonadErrorInstance<F, L> : EitherTApplicativeErrorInstance<F, L>, EitherTMonadInstance<F, L>, MonadError<EitherTPartialOf<F, L>, L>
 
-interface EitherTFoldableInstance<F, L> : Foldable<EitherTKindPartial<F, L>> {
+interface EitherTFoldableInstance<F, L> : Foldable<EitherTPartialOf<F, L>> {
 
     fun FFF(): Foldable<F>
 
-    override fun <B, C> foldLeft(fa: Kind<EitherTKindPartial<F, L>, B>, b: C, f: (C, B) -> C): C = fa.reify().foldLeft(b, f, FFF())
+    override fun <B, C> foldLeft(fa: Kind<EitherTPartialOf<F, L>, B>, b: C, f: (C, B) -> C): C = fa.reify().foldLeft(b, f, FFF())
 
-    override fun <B, C> foldRight(fa: Kind<EitherTKindPartial<F, L>, B>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> = fa.reify().foldRight(lb, f, FFF())
+    override fun <B, C> foldRight(fa: Kind<EitherTPartialOf<F, L>, B>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> = fa.reify().foldRight(lb, f, FFF())
 }
 
-interface EitherTTraverseInstance<F, L> : EitherTFunctorInstance<F, L>, EitherTFoldableInstance<F, L>, Traverse<EitherTKindPartial<F, L>> {
+interface EitherTTraverseInstance<F, L> : EitherTFunctorInstance<F, L>, EitherTFoldableInstance<F, L>, Traverse<EitherTPartialOf<F, L>> {
 
     fun TF(): Traverse<F>
 
-    override fun <A, B> map(fa: EitherTKind<F, L, A>, f: (A) -> B): EitherT<F, L, B> = fa.reify().map({ f(it) }, TF())
+    override fun <A, B> map(fa: EitherTOf<F, L, A>, f: (A) -> B): EitherT<F, L, B> = fa.reify().map({ f(it) }, TF())
 
-    override fun <G, B, C> traverse(fa: EitherTKind<F, L, B>, f: (B) -> Kind<G, C>, GA: Applicative<G>): Kind<G, EitherT<F, L, C>> =
+    override fun <G, B, C> traverse(fa: EitherTOf<F, L, B>, f: (B) -> Kind<G, C>, GA: Applicative<G>): Kind<G, EitherT<F, L, C>> =
             fa.reify().traverse(f, GA, TF())
 }
 
-interface EitherTSemigroupKInstance<F, L> : SemigroupK<EitherTKindPartial<F, L>> {
+interface EitherTSemigroupKInstance<F, L> : SemigroupK<EitherTPartialOf<F, L>> {
     fun MF(): Monad<F>
 
-    override fun <A> combineK(x: EitherTKind<F, L, A>, y: EitherTKind<F, L, A>): EitherT<F, L, A> =
+    override fun <A> combineK(x: EitherTOf<F, L, A>, y: EitherTOf<F, L, A>): EitherT<F, L, A> =
             x.reify().combineK(y, MF())
 }

@@ -21,7 +21,7 @@ import arrow.data.*
 import arrow.optics.typeclasses.*
 import arrow.syntax.option.*
 
-val mapAt = At.at<MapKWKind<Int, String>, Int, Option<String>>(2)
+val mapAt = At.at<MapKWOf<Int, String>, Int, Option<String>>(2)
 
 val map = mapOf(
             1 to "one",

@@ -10,9 +10,9 @@ import arrow.typeclasses.Nested
 interface FixInstances<F> : Birecursive<ForFix, F> {
     fun FF(): Functor<F>
 
-    override fun projectT(fg: FixKind<F>): Kind<Nested<ForFix, F>, FixKind<F>> =
+    override fun projectT(fg: FixOf<F>): Kind<Nested<ForFix, F>, FixOf<F>> =
             fg.reify().projectT()
 
-    override fun embedT(compFG: Kind<Nested<ForFix, F>, FixKind<F>>): FixKind<F> =
+    override fun embedT(compFG: Kind<Nested<ForFix, F>, FixOf<F>>): FixOf<F> =
             Fix.embedT(compFG, FF())
 }

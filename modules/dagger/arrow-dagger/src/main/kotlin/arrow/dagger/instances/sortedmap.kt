@@ -1,6 +1,6 @@
 package arrow.dagger.instances
 
-import arrow.data.SortedMapKWKindPartial
+import arrow.data.SortedMapKWPartialOf
 import arrow.instances.*
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
@@ -14,13 +14,13 @@ import javax.inject.Inject
 abstract class SortedMapKWInstances<K : Comparable<K>> {
 
     @Provides
-    fun sortedMapKWFunctor(ev: DaggerSortedMapKWFunctorInstance<K>): Functor<SortedMapKWKindPartial<K>> = ev
+    fun sortedMapKWFunctor(ev: DaggerSortedMapKWFunctorInstance<K>): Functor<SortedMapKWPartialOf<K>> = ev
 
     @Provides
-    fun sortedMapKWFoldable(ev: DaggerSortedMapKWFoldableInstance<K>): Foldable<SortedMapKWKindPartial<K>> = ev
+    fun sortedMapKWFoldable(ev: DaggerSortedMapKWFoldableInstance<K>): Foldable<SortedMapKWPartialOf<K>> = ev
 
     @Provides
-    fun sortedMapKWTraverse(ev: DaggerSortedMapKWTraverseInstance<K>): Traverse<SortedMapKWKindPartial<K>> = ev
+    fun sortedMapKWTraverse(ev: DaggerSortedMapKWTraverseInstance<K>): Traverse<SortedMapKWPartialOf<K>> = ev
 
 }
 

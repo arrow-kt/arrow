@@ -28,7 +28,7 @@ val filterIndexStringByIndex = FilterIndex.fromTraverse<ListKWHK, String>({ list
 Given a `FilterIndex` instance we can create a `Traversal` that filters out the foci that do not match the predicate.
 
 ```kotlin:ank
-val filter: Traversal<ListKWKind<String>, String> = filterIndexStringByIndex.filter { length -> length > 3 }
+val filter: Traversal<ListKWOf<String>, String> = filterIndexStringByIndex.filter { length -> length > 3 }
 
 filter.getAll(listOf("H", "He", "Hel", "Hell", "Hello").k())
 ```
@@ -36,7 +36,7 @@ filter.getAll(listOf("H", "He", "Hel", "Hell", "Hello").k())
 Arrow provides `FilterIndex` instances for some common datatypes both in Arrow and the Kotlin stdlib that can be filtered by index, like `ListKW` and `MapKW`. You can look them up by calling `FilterIndex.filterIndex()`.
 
 ```kotlin:ank
-FilterIndex.filterIndex<ListKWKind<Int>, Int, Int> { index -> index % 2 == 0 }
+FilterIndex.filterIndex<ListKWOf<Int>, Int, Int> { index -> index % 2 == 0 }
             .getAll(listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).k())
 ```
 

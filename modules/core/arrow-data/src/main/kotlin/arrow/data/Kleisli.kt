@@ -20,7 +20,7 @@ typealias KleisliFun<F, D, A> = (D) -> Kind<F, A>
  * @property run the arrow from [D] to `Kind<F, A>`.
  */
 @higherkind
-class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: Unit = Unit) : KleisliKind<F, D, A>, KleisliKindedJ<F, D, A> {
+class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: Unit = Unit) : KleisliOf<F, D, A>, KleisliKindedJ<F, D, A> {
 
     /**
      * Apply a function `(A) -> B` that operates within the [Kleisli] context.
@@ -28,7 +28,7 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
      * @param ff function with the [Kleisli] context.
      * @param AF [Applicative] for the context [F].
      */
-    fun <B> ap(ff: KleisliKind<F, D, (A) -> B>, AF: Applicative<F>): Kleisli<F, D, B> =
+    fun <B> ap(ff: KleisliOf<F, D, (A) -> B>, AF: Applicative<F>): Kleisli<F, D, B> =
             Kleisli { AF.ap(run(it), ff.reify().run(it)) }
 
     /**
@@ -98,7 +98,7 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
      * @param f function to handle error.
      * @param ME [MonadError] for the context [F].
      */
-    fun <E> handleErrorWith(f: (E) -> KleisliKind<F, D, A>, ME: MonadError<F, E>): Kleisli<F, D, A> = Kleisli {
+    fun <E> handleErrorWith(f: (E) -> KleisliOf<F, D, A>, ME: MonadError<F, E>): Kleisli<F, D, A> = Kleisli {
         ME.handleErrorWith(run(it), { e: E -> f(e).reify().run(it) })
     }
 
@@ -118,7 +118,7 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
          * @param f function that is called recusively until [arrow.Either.Right] is returned.
          * @param MF [Monad] for the context [F].
          */
-        fun <F, D, A, B> tailRecM(a: A, f: (A) -> KleisliKind<F, D, Either<A, B>>, MF: Monad<F>): Kleisli<F, D, B> =
+        fun <F, D, A, B> tailRecM(a: A, f: (A) -> KleisliOf<F, D, Either<A, B>>, MF: Monad<F>): Kleisli<F, D, B> =
                 Kleisli { b -> MF.tailRecM(a, { f(it).reify().run(b) }) }
 
         /**
@@ -177,14 +177,14 @@ typealias ForReaderT = ForKleisli
  *
  * @see KleisliKind
  */
-typealias ReaderTKind<F, D, A> = KleisliKind<F, D, A>
+typealias ReaderTOf<F, D, A> = KleisliOf<F, D, A>
 
 /**
  * Alias to partially apply type parameter [F] and [D] to [ReaderT].
  *
  * @see KleisliKindPartial
  */
-typealias ReaderTKindPartial<F, D> = KleisliKindPartial<F, D>
+typealias ReaderTPartialOf<F, D> = KleisliPartialOf<F, D>
 
 /**
  * [Reader] represents a computation that has a dependency on [D] with a result within context [F].

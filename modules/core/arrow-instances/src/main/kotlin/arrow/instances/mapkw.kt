@@ -6,39 +6,39 @@ import arrow.data.*
 import arrow.typeclasses.*
 
 @instance(MapKW::class)
-interface MapKWFunctorInstance<K> : Functor<MapKWKindPartial<K>> {
-    override fun <A, B> map(fa: Kind<MapKWKindPartial<K>, A>, f: (A) -> B): MapKW<K, B> = fa.reify().map(f)
+interface MapKWFunctorInstance<K> : Functor<MapKWPartialOf<K>> {
+    override fun <A, B> map(fa: Kind<MapKWPartialOf<K>, A>, f: (A) -> B): MapKW<K, B> = fa.reify().map(f)
 }
 
 @instance(MapKW::class)
-interface MapKWFoldableInstance<K> : Foldable<MapKWKindPartial<K>> {
+interface MapKWFoldableInstance<K> : Foldable<MapKWPartialOf<K>> {
 
-    override fun <A, B> foldLeft(fa: Kind<MapKWKindPartial<K>, A>, b: B, f: (B, A) -> B): B = fa.reify().foldLeft(b, f)
+    override fun <A, B> foldLeft(fa: Kind<MapKWPartialOf<K>, A>, b: B, f: (B, A) -> B): B = fa.reify().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: Kind<MapKWKindPartial<K>, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+    override fun <A, B> foldRight(fa: Kind<MapKWPartialOf<K>, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
             fa.reify().foldRight(lb, f)
 }
 
 @instance(MapKW::class)
-interface MapKWTraverseInstance<K> : MapKWFoldableInstance<K>, Traverse<MapKWKindPartial<K>> {
+interface MapKWTraverseInstance<K> : MapKWFoldableInstance<K>, Traverse<MapKWPartialOf<K>> {
 
-    override fun <G, A, B> traverse(fa: Kind<MapKWKindPartial<K>, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Kind<MapKWKindPartial<K>, B>> =
+    override fun <G, A, B> traverse(fa: Kind<MapKWPartialOf<K>, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Kind<MapKWPartialOf<K>, B>> =
             fa.reify().traverse(f, GA)
 }
 
 @instance(MapKW::class)
-interface MapKWSemigroupInstance<K, A> : Semigroup<MapKWKind<K, A>> {
+interface MapKWSemigroupInstance<K, A> : Semigroup<MapKWOf<K, A>> {
 
     fun SG(): Semigroup<A>
 
-    override fun combine(a: MapKWKind<K, A>, b: MapKWKind<K, A>): MapKW<K, A> =
+    override fun combine(a: MapKWOf<K, A>, b: MapKWOf<K, A>): MapKW<K, A> =
             if (a.reify().size < b.reify().size) a.reify().foldLeft<A>(b.reify(), { my, (k, b) -> my.updated(k, SG().maybeCombine(b, my.get(k))) })
             else b.reify().foldLeft<A>(a.reify(), { my, (k, a) -> my.updated(k, SG().maybeCombine(a, my.get(k))) })
 
 }
 
 @instance(MapKW::class)
-interface MapKWMonoidInstance<K, A> : MapKWSemigroupInstance<K, A>, Monoid<MapKWKind<K, A>> {
+interface MapKWMonoidInstance<K, A> : MapKWSemigroupInstance<K, A>, Monoid<MapKWOf<K, A>> {
 
     override fun empty(): MapKW<K, A> = emptyMap<K, A>().k()
 }

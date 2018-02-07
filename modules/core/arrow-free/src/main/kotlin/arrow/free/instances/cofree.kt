@@ -6,15 +6,15 @@ import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
 
 @instance(Cofree::class)
-interface CofreeFunctorInstance<S> : Functor<CofreeKindPartial<S>>, TC {
-    override fun <A, B> map(fa: CofreeKind<S, A>, f: (A) -> B): Cofree<S, B> = fa.reify().map(f)
+interface CofreeFunctorInstance<S> : Functor<CofreePartialOf<S>>, TC {
+    override fun <A, B> map(fa: CofreeOf<S, A>, f: (A) -> B): Cofree<S, B> = fa.reify().map(f)
 }
 
 @instance(Cofree::class)
-interface CofreeComonadInstance<S> : CofreeFunctorInstance<S>, Comonad<CofreeKindPartial<S>>, TC {
-    override fun <A, B> coflatMap(fa: CofreeKind<S, A>, f: (CofreeKind<S, A>) -> B): Cofree<S, B> = fa.reify().coflatMap(f)
+interface CofreeComonadInstance<S> : CofreeFunctorInstance<S>, Comonad<CofreePartialOf<S>>, TC {
+    override fun <A, B> coflatMap(fa: CofreeOf<S, A>, f: (CofreeOf<S, A>) -> B): Cofree<S, B> = fa.reify().coflatMap(f)
 
-    override fun <A> extract(fa: CofreeKind<S, A>): A = fa.reify().extract()
+    override fun <A> extract(fa: CofreeOf<S, A>): A = fa.reify().extract()
 
-    override fun <A> duplicate(fa: CofreeKind<S, A>): Kind<CofreeKindPartial<S>, Cofree<S, A>> = fa.reify().duplicate()
+    override fun <A> duplicate(fa: CofreeOf<S, A>): Kind<CofreePartialOf<S>, Cofree<S, A>> = fa.reify().duplicate()
 }

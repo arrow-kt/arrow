@@ -4,7 +4,7 @@ import arrow.core.Eval
 import arrow.higherkind
 
 @higherkind
-data class SetKW<out A>(val set: Set<A>) : SetKWKind<A>, Set<A> by set {
+data class SetKW<out A>(val set: Set<A>) : SetKWOf<A>, Set<A> by set {
 
     fun <B> foldLeft(b: B, f: (B, A) -> B): B = fold(b, f)
 
@@ -27,6 +27,6 @@ data class SetKW<out A>(val set: Set<A>) : SetKWKind<A>, Set<A> by set {
     }
 }
 
-fun <A> SetKW<A>.combineK(y: SetKWKind<A>): SetKW<A> = (this.set + y.reify().set).k()
+fun <A> SetKW<A>.combineK(y: SetKWOf<A>): SetKW<A> = (this.set + y.reify().set).k()
 
 fun <A> Set<A>.k(): SetKW<A> = SetKW(this)

@@ -13,7 +13,7 @@ import arrow.test.generators.genIntSmall
 import arrow.typeclasses.*
 import io.kotlintest.properties.forAll
 
-typealias TI<A> = Tuple2<IdKind<A>, IdKind<A>>
+typealias TI<A> = Tuple2<IdOf<A>, IdOf<A>>
 
 typealias TIK<A> = Kind<TIF, A>
 

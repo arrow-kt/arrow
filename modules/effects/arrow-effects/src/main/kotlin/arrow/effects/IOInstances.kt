@@ -10,10 +10,10 @@ import arrow.typeclasses.Semigroup
 
 @instance(IO::class)
 interface IOApplicativeErrorInstance : IOApplicativeInstance, ApplicativeError<ForIO, Throwable> {
-    override fun <A> attempt(fa: IOKind<A>): IO<Either<Throwable, A>> =
+    override fun <A> attempt(fa: IOOf<A>): IO<Either<Throwable, A>> =
             fa.reify().attempt()
 
-    override fun <A> handleErrorWith(fa: IOKind<A>, f: (Throwable) -> IOKind<A>): IO<A> =
+    override fun <A> handleErrorWith(fa: IOOf<A>, f: (Throwable) -> IOOf<A>): IO<A> =
             fa.reify().handleErrorWith(f)
 
     override fun <A> raiseError(e: Throwable): IO<A> =
@@ -22,10 +22,10 @@ interface IOApplicativeErrorInstance : IOApplicativeInstance, ApplicativeError<F
 
 @instance(IO::class)
 interface IOMonadErrorInstance : IOApplicativeErrorInstance, IOMonadInstance, MonadError<ForIO, Throwable> {
-    override fun <A, B> ap(fa: IOKind<A>, ff: IOKind<(A) -> B>): IO<B> =
+    override fun <A, B> ap(fa: IOOf<A>, ff: IOOf<(A) -> B>): IO<B> =
             super<IOMonadInstance>.ap(fa, ff).reify()
 
-    override fun <A, B> map(fa: IOKind<A>, f: (A) -> B): IO<B> =
+    override fun <A, B> map(fa: IOOf<A>, f: (A) -> B): IO<B> =
             super<IOMonadInstance>.map(fa, f)
 
     override fun <A> pure(a: A): IO<A> =
@@ -34,7 +34,7 @@ interface IOMonadErrorInstance : IOApplicativeErrorInstance, IOMonadInstance, Mo
 
 @instance(IO::class)
 interface IOMonadSuspendInstance : IOMonadErrorInstance, MonadSuspend<ForIO> {
-    override fun <A> suspend(fa: () -> IOKind<A>): IO<A> =
+    override fun <A> suspend(fa: () -> IOOf<A>): IO<A> =
             IO.suspend(fa)
 
     override fun lazy(): IO<Unit> = IO.lazy
@@ -51,7 +51,7 @@ interface IOAsyncInstance : IOMonadSuspendInstance, Async<ForIO> {
 
 @instance(IO::class)
 interface IOEffectInstance : IOAsyncInstance, Effect<ForIO> {
-    override fun <A> runAsync(fa: Kind<ForIO, A>, cb: (Either<Throwable, A>) -> IOKind<Unit>): IO<Unit> =
+    override fun <A> runAsync(fa: Kind<ForIO, A>, cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Unit> =
             fa.reify().runAsync(cb)
 }
 
@@ -60,7 +60,7 @@ interface IOMonoidInstance<A> : Monoid<Kind<ForIO, A>>, Semigroup<Kind<ForIO, A>
 
     fun SM(): Monoid<A>
 
-    override fun combine(a: IOKind<A>, b: IOKind<A>): IO<A> =
+    override fun combine(a: IOOf<A>, b: IOOf<A>): IO<A> =
             a.reify().flatMap { a1: A -> b.reify().map { a2: A -> SM().combine(a1, a2) } }
 
     override fun empty(): IO<A> = IO.pure(SM().empty())
@@ -71,6 +71,6 @@ interface IOSemigroupInstance<A> : Semigroup<Kind<ForIO, A>> {
 
     fun SG(): Semigroup<A>
 
-    override fun combine(a: IOKind<A>, b: IOKind<A>): IO<A> =
+    override fun combine(a: IOOf<A>, b: IOOf<A>): IO<A> =
             a.reify().flatMap { a1: A -> b.reify().map { a2: A -> SG().combine(a1, a2) } }
 }

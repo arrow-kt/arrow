@@ -19,7 +19,7 @@ Datatypes work over themselves, never directly over the values defined by its ge
 `Option<A>` is a datatype that represents absence.
 It has one generic parameter `A`, representing the type of the values that `Option` may contain.
 `Option` can be specialized for any type `A` because this type does not affect its behavior.
-`Option` behaves the same for `Int`, `String` or `DomainUserClass`. To indicate that `Option` is a [type constructor]({{ '/docs/patterns/glossary/' | relative_url }}) for all values of `A` it implements `OptionKind<A>`, which is a typealias of `Kind<OptionHK, A>`.
+`Option` behaves the same for `Int`, `String` or `DomainUserClass`. To indicate that `Option` is a [type constructor]({{ '/docs/patterns/glossary/' | relative_url }}) for all values of `A` it implements `OptionOf<A>`, which is a typealias of `Kind<OptionHK, A>`.
 
 The implementation of `Option<A>` is a sealed class with two subtypes: an object `None` and a data class `Some<A>`.
 `Some<A>` represents presence of the value and thus it has one field containing it, and `None` represents absence.

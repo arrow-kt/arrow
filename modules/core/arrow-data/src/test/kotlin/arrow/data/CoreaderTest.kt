@@ -2,7 +2,7 @@ package arrow.data
 
 import arrow.core.ForId
 import arrow.core.Id
-import arrow.core.IdKind
+import arrow.core.IdOf
 import arrow.core.value
 import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
@@ -43,7 +43,7 @@ class CoreaderTest : UnitSpec() {
 
         "contramapValue" {
             forAll { num: Int ->
-                Coreader<Int, Int>({ it -> it * 2 }).contramapValue { a: IdKind<Int> -> Id(a.value() * 3) }
+                Coreader<Int, Int>({ it -> it * 2 }).contramapValue { a: IdOf<Int> -> Id(a.value() * 3) }
                         .runId(num) == num * 6
             }
         }
@@ -59,7 +59,7 @@ class CoreaderTest : UnitSpec() {
 
             cokleisli.andThen(Id(3)).run(Id(0)) shouldBe 3
 
-            cokleisli.andThen(Cokleisli({ a: IdKind<Int> -> a.value() + 1 })).run(Id(0)) shouldBe 1
+            cokleisli.andThen(Cokleisli({ a: IdOf<Int> -> a.value() + 1 })).run(Id(0)) shouldBe 1
         }
     }
 }

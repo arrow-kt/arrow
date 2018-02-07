@@ -12,7 +12,7 @@ typealias StateFun<S, A> = StateTFun<ForId, S, A>
 /**
  * Alias that represents wrapped stateful computation in context `Id`.
  */
-typealias StateFunKind<S, A> = StateTFunKind<ForId, S, A>
+typealias StateFunOf<S, A> = StateTFunOf<ForId, S, A>
 
 /**
  * Alias for StateHK
@@ -22,12 +22,12 @@ typealias ForState = ForStateT
 /**
  * Alias for StateKind
  */
-typealias StateKind<S, A> = StateTKind<ForId, S, A>
+typealias StateOf<S, A> = StateTOf<ForId, S, A>
 
 /**
  * Alias to partially apply type parameters [S] to [State]
  */
-typealias StateKindPartial<S> = StateTKindPartial<ForId, S>
+typealias StatePartialOf<S> = StateTPartialOf<ForId, S>
 
 /**
  * `State<S, A>` is a stateful computation that yields a value of type `A`.
@@ -54,7 +54,7 @@ fun <S, A> StateFun<S, A>.toState(): State<S, A> = State(this)
 /**
  * Syntax for constructing a `StateT<ForId, S, A>` from a function `(S) -> Tuple2<S, A>`
  */
-fun <S, A> StateFunKind<S, A>.toState(): State<S, A> = State(this)
+fun <S, A> StateFunOf<S, A>.toState(): State<S, A> = State(this)
 
 fun <S, T, P1, R> State<S, T>.map(sx: State<S, P1>, f: (T, P1) -> R): State<S, R> =
         flatMap ({ t -> sx.map { x -> f(t, x) } }, monad()).reify()

@@ -286,7 +286,7 @@ monadError<TryHK, Throwable>()
 ```
 
 ```kotlin:ank
-monadError<EitherKindPartial<NukeException>, NukeException>()
+monadError<EitherPartialOf<NukeException>, NukeException>()
 ```
 
 Let's now rewrite our program as a polymorphic function that will work over any datatype for which a `MonadError` instance exists.
@@ -317,7 +317,7 @@ Or since `arm()` and `bind()` are operations that do not depend on each other we
 inline fun <reified F> attack1(ME: MonadError<F, NukeException> = monadError()): Kind<F, Impacted> =
   ME.tupled(aim(), arm()).flatMap(ME, { (nuke, target) -> launch<F>(nuke, target) })
 
-val result = attack<EitherKindPartial<NukeException>>()
+val result = attack<EitherPartialOf<NukeException>>()
 result.reify()
 //Left(MissedByMeters(5))
 // or

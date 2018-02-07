@@ -6,7 +6,7 @@ import arrow.typeclasses.*
 
 typealias CofreeEval<S, A> = Kind<S, Cofree<S, A>>
 
-@higherkind data class Cofree<S, A>(val FS: Functor<S>, val head: A, val tail: Eval<CofreeEval<S, A>>) : CofreeKind<S, A>, CofreeKindedJ<S, A> {
+@higherkind data class Cofree<S, A>(val FS: Functor<S>, val head: A, val tail: Eval<CofreeEval<S, A>>) : CofreeOf<S, A>, CofreeKindedJ<S, A> {
 
     fun tailForced(): CofreeEval<S, A> = tail.value()
 

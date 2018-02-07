@@ -5,15 +5,15 @@ import arrow.core.*
 import arrow.data.*
 import arrow.typeclasses.*
 
-inline fun <F, reified G, A> FreeApplicativeKind<F, A>.foldMapK(f: FunctionK<F, G>, GA: Applicative<G> = applicative<G>()): Kind<G, A> =
+inline fun <F, reified G, A> FreeApplicativeOf<F, A>.foldMapK(f: FunctionK<F, G>, GA: Applicative<G> = applicative<G>()): Kind<G, A> =
         (this as FreeApplicative<F, A>).foldMap(f, GA)
 
-inline fun <reified F, A> FreeApplicativeKind<F, A>.foldK(FA: Applicative<F> = applicative<F>()): Kind<F, A> = (this as FreeApplicative<F, A>).fold(FA)
+inline fun <reified F, A> FreeApplicativeOf<F, A>.foldK(FA: Applicative<F> = applicative<F>()): Kind<F, A> = (this as FreeApplicative<F, A>).fold(FA)
 
 /**
  * See [https://github.com/edmundnoble/cats/blob/6454b4f8b7c5cefd15d8198fa7d52e46e2f45fea/docs/src/main/tut/datatypes/freeapplicative.md]
  */
-@higherkind sealed class FreeApplicative<F, out A> : FreeApplicativeKind<F, A> {
+@higherkind sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
 
     companion object {
         fun <F, A> pure(a: A): FreeApplicative<F, A> = Pure(a)
@@ -22,18 +22,18 @@ inline fun <reified F, A> FreeApplicativeKind<F, A>.foldK(FA: Applicative<F> = a
 
         fun <F, A> liftF(fa: Kind<F, A>): FreeApplicative<F, A> = Lift(fa)
 
-        internal fun <F, G> functionKF(f: FunctionK<F, G>): FunctionK<F, FreeApplicativeKindPartial<G>> =
-                object : FunctionK<F, FreeApplicativeKindPartial<G>> {
+        internal fun <F, G> functionKF(f: FunctionK<F, G>): FunctionK<F, FreeApplicativePartialOf<G>> =
+                object : FunctionK<F, FreeApplicativePartialOf<G>> {
                     override fun <A> invoke(fa: Kind<F, A>): FreeApplicative<G, A> =
                             liftF(f(fa))
 
                 }
 
-        internal fun <F> applicativeF(): Applicative<FreeApplicativeKindPartial<F>> = object : Applicative<FreeApplicativeKindPartial<F>> {
+        internal fun <F> applicativeF(): Applicative<FreeApplicativePartialOf<F>> = object : Applicative<FreeApplicativePartialOf<F>> {
             override fun <A> pure(a: A): FreeApplicative<F, A> =
                     Companion.pure(a)
 
-            override fun <A, B> ap(fa: Kind<FreeApplicativeKindPartial<F>, A>, ff: Kind<FreeApplicativeKindPartial<F>, (A) -> B>): FreeApplicative<F, B> =
+            override fun <A, B> ap(fa: Kind<FreeApplicativePartialOf<F>, A>, ff: Kind<FreeApplicativePartialOf<F>, (A) -> B>): FreeApplicative<F, B> =
                     Companion.ap(fa.reify(), ff.reify())
         }
     }
@@ -54,11 +54,11 @@ inline fun <reified F, A> FreeApplicativeKind<F, A>.foldK(FA: Applicative<F> = a
 
     fun <G> compile(f: FunctionK<F, G>): FreeApplicative<G, A> = foldMap(functionKF(f), applicativeF()).reify()
 
-    fun <G> flatCompile(f: FunctionK<F, FreeApplicativeKindPartial<G>>, GFA: Applicative<FreeApplicativeKindPartial<G>>): FreeApplicative<G, A> =
+    fun <G> flatCompile(f: FunctionK<F, FreeApplicativePartialOf<G>>, GFA: Applicative<FreeApplicativePartialOf<G>>): FreeApplicative<G, A> =
             foldMap(f, GFA).reify()
 
-    inline fun <reified M> analyze(f: FunctionK<F, ConstKindPartial<M>>, MM: Monoid<M>): M =
-            foldMap(object : FunctionK<F, ConstKindPartial<M>> {
+    inline fun <reified M> analyze(f: FunctionK<F, ConstPartialOf<M>>, MM: Monoid<M>): M =
+            foldMap(object : FunctionK<F, ConstPartialOf<M>> {
                 override fun <A> invoke(fa: Kind<F, A>): Const<M, A> = f(fa).reify()
             }, Const.applicative(MM)).value()
 

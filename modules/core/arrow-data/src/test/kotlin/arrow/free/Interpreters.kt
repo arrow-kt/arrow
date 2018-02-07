@@ -4,15 +4,15 @@ import arrow.Kind
 import arrow.core.*
 import arrow.data.*
 
-val cofreeOptionToNel: FunctionK<CofreeKindPartial<ForOption>, ForNonEmptyList> = object : FunctionK<CofreeKindPartial<ForOption>, ForNonEmptyList> {
-    override fun <A> invoke(fa: Kind<CofreeKindPartial<ForOption>, A>): Kind<ForNonEmptyList, A> =
+val cofreeOptionToNel: FunctionK<CofreePartialOf<ForOption>, ForNonEmptyList> = object : FunctionK<CofreePartialOf<ForOption>, ForNonEmptyList> {
+    override fun <A> invoke(fa: Kind<CofreePartialOf<ForOption>, A>): Kind<ForNonEmptyList, A> =
             fa.reify().let { c ->
                 NonEmptyList.fromListUnsafe(listOf(c.head) + c.tailForced().reify().fold({ listOf<A>() }, { invoke(it).reify().all }))
             }
 }
 
-val cofreeListToNel: FunctionK<CofreeKindPartial<ForListKW>, ForNonEmptyList> = object : FunctionK<CofreeKindPartial<ForListKW>, ForNonEmptyList> {
-    override fun <A> invoke(fa: Kind<CofreeKindPartial<ForListKW>, A>): Kind<ForNonEmptyList, A> =
+val cofreeListToNel: FunctionK<CofreePartialOf<ForListKW>, ForNonEmptyList> = object : FunctionK<CofreePartialOf<ForListKW>, ForNonEmptyList> {
+    override fun <A> invoke(fa: Kind<CofreePartialOf<ForListKW>, A>): Kind<ForNonEmptyList, A> =
             fa.reify().let { c: Cofree<ForListKW, A> ->
                 val all: List<Cofree<ForListKW, A>> = c.tailForced().reify()
                 val tail: List<A> = all.foldRight(listOf<A>(), { v, acc -> acc + invoke(v).reify().all })

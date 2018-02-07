@@ -7,16 +7,16 @@ import arrow.higherkind
 
 fun <I, O> ((I) -> O).k(): Function1<I, O> = Function1(this)
 
-operator fun <I, O> Function1Kind<I, O>.invoke(i: I): O = this.reify().f(i)
+operator fun <I, O> Function1Of<I, O>.invoke(i: I): O = this.reify().f(i)
 
 @higherkind
-class Function1<I, out O>(val f: (I) -> O) : Function1Kind<I, O> {
+class Function1<I, out O>(val f: (I) -> O) : Function1Of<I, O> {
 
     fun <B> map(f: (O) -> B): Function1<I, B> = f.compose { a: I -> this.f(a) }.k()
 
-    fun <B> flatMap(f: (O) -> Function1Kind<I, B>): Function1<I, B> = { p: I -> f(this.f(p))(p) }.k()
+    fun <B> flatMap(f: (O) -> Function1Of<I, B>): Function1<I, B> = { p: I -> f(this.f(p))(p) }.k()
 
-    fun <B> ap(ff: Function1Kind<I, (O) -> B>): Function1<I, B> = ff.reify().flatMap { f -> map(f) }.reify()
+    fun <B> ap(ff: Function1Of<I, (O) -> B>): Function1<I, B> = ff.reify().flatMap { f -> map(f) }.reify()
 
     fun local(f: (I) -> I): Function1<I, O> = f.andThen { this(it) }.k()
 
@@ -26,7 +26,7 @@ class Function1<I, out O>(val f: (I) -> O) : Function1Kind<I, O> {
 
         fun <I, A> pure(a: A): Function1<I, A> = { _: I -> a }.k()
 
-        tailrec private fun <I, A, B> step(a: A, t: I, fn: (A) -> Function1Kind<I, Either<A, B>>): B {
+        tailrec private fun <I, A, B> step(a: A, t: I, fn: (A) -> Function1Of<I, Either<A, B>>): B {
             val af = fn(a)(t)
             return when (af) {
                 is Either.Right<A, B> -> af.b
@@ -34,6 +34,6 @@ class Function1<I, out O>(val f: (I) -> O) : Function1Kind<I, O> {
             }
         }
 
-        fun <I, A, B> tailRecM(a: A, f: (A) -> Function1Kind<I, Either<A, B>>): Function1<I, B> = { t: I -> step(a, t, f) }.k()
+        fun <I, A, B> tailRecM(a: A, f: (A) -> Function1Of<I, Either<A, B>>): Function1<I, B> = { t: I -> step(a, t, f) }.k()
     }
 }

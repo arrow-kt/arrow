@@ -172,7 +172,7 @@ We can now lift any value to a `OptionT<F, A>` which looks like this:
 import arrow.syntax.applicative.*
 import arrow.data.*
 
-val optTVal = 1.pure<OptionTKindPartial<ObservableKWHK>, Int>()
+val optTVal = 1.pure<OptionTPartialOf<ObservableKWHK>, Int>()
 optTVal
 ```
 
@@ -209,7 +209,7 @@ Available Instances:
 ```kotlin:ank
 import arrow.debug.*
 
-showInstances<OptionTKindPartial<ObservableKWHK>, Unit>()
+showInstances<OptionTPartialOf<ObservableKWHK>, Unit>()
 ```
 
 Take a look at the [`EitherT` docs]({{ '/docs/datatypes/eithert' | relative_url }}) for an alternative version of this content with the `EitherT` monad transformer

@@ -15,11 +15,11 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class OptionTTest : UnitSpec() {
 
-    fun <A> EQ(): Eq<Kind<OptionTKindPartial<A>, Int>> = Eq { a, b ->
+    fun <A> EQ(): Eq<Kind<OptionTPartialOf<A>, Int>> = Eq { a, b ->
         a.value() == b.value()
     }
 
-    fun <A> EQ_NESTED(): Eq<Kind<OptionTKindPartial<A>, Kind<OptionTKindPartial<A>, Int>>> = Eq { a, b ->
+    fun <A> EQ_NESTED(): Eq<Kind<OptionTPartialOf<A>, Kind<OptionTPartialOf<A>, Int>>> = Eq { a, b ->
         a.value() == b.value()
     }
 
@@ -28,15 +28,15 @@ class OptionTTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            functor<OptionTKindPartial<ForNonEmptyList>>() shouldNotBe null
-            applicative<OptionTKindPartial<ForNonEmptyList>>() shouldNotBe null
-            monad<OptionTKindPartial<ForNonEmptyList>>() shouldNotBe null
-            foldable<OptionTKindPartial<ForNonEmptyList>>() shouldNotBe null
-            traverse<OptionTKindPartial<ForNonEmptyList>>() shouldNotBe null
-            semigroupK<OptionTKindPartial<ForListKW>>() shouldNotBe null
-            monoidK<OptionTKindPartial<ForListKW>>() shouldNotBe null
-            functorFilter<OptionTKindPartial<ForListKW>>() shouldNotBe null
-            traverseFilter<OptionTKindPartial<ForOption>>() shouldNotBe null
+            functor<OptionTPartialOf<ForNonEmptyList>>() shouldNotBe null
+            applicative<OptionTPartialOf<ForNonEmptyList>>() shouldNotBe null
+            monad<OptionTPartialOf<ForNonEmptyList>>() shouldNotBe null
+            foldable<OptionTPartialOf<ForNonEmptyList>>() shouldNotBe null
+            traverse<OptionTPartialOf<ForNonEmptyList>>() shouldNotBe null
+            semigroupK<OptionTPartialOf<ForListKW>>() shouldNotBe null
+            monoidK<OptionTPartialOf<ForListKW>>() shouldNotBe null
+            functorFilter<OptionTPartialOf<ForListKW>>() shouldNotBe null
+            traverseFilter<OptionTPartialOf<ForOption>>() shouldNotBe null
         }
 
         testLaws(

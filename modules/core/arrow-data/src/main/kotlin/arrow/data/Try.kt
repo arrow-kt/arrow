@@ -15,13 +15,13 @@ typealias Success<A> = Try.Success<A>
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Try.scala
  */
 @higherkind
-sealed class Try<out A> : TryKind<A> {
+sealed class Try<out A> : TryOf<A> {
 
     companion object {
 
         fun <A> pure(a: A): Try<A> = Success(a)
 
-        tailrec fun <A, B> tailRecM(a: A, f: (A) -> TryKind<Either<A, B>>): Try<B> {
+        tailrec fun <A, B> tailRecM(a: A, f: (A) -> TryOf<Either<A, B>>): Try<B> {
             val ev: Try<Either<A, B>> = f(a).reify()
             return when (ev) {
                 is Failure -> Failure<B>(ev.exception).reify()
@@ -53,12 +53,12 @@ sealed class Try<out A> : TryKind<A> {
     fun <G, B> traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Try<B>> =
             this.reify().fold({ GA.pure(raise(IllegalStateException())) }, { GA.map(f(it), { Try { it } }) })
 
-    fun <B> ap(ff: TryKind<(A) -> B>): Try<B> = ff.reify().flatMap { f -> map(f) }.reify()
+    fun <B> ap(ff: TryOf<(A) -> B>): Try<B> = ff.reify().flatMap { f -> map(f) }.reify()
 
     /**
      * Returns the given function applied to the value from this `Success` or returns this if this is a `Failure`.
      */
-    inline fun <B> flatMap(crossinline f: (A) -> TryKind<B>): Try<B> = fold({ raise(it) }, { f(it).reify() })
+    inline fun <B> flatMap(crossinline f: (A) -> TryOf<B>): Try<B> = fold({ raise(it) }, { f(it).reify() })
 
     /**
      * Maps the given function to the value from this `Success` or returns this if this is a `Failure`.

@@ -12,7 +12,7 @@ typealias StateTFun<F, S, A> = (S) -> Kind<F, Tuple2<S, A>>
 /**
  * Alias that represents wrapped stateful computation in context `F`.
  */
-typealias StateTFunKind<F, S, A> = Kind<F, StateTFun<F, S, A>>
+typealias StateTFunOf<F, S, A> = Kind<F, StateTFun<F, S, A>>
 
 /**
  * Run the stateful computation within the context `F`.
@@ -20,7 +20,7 @@ typealias StateTFunKind<F, S, A> = Kind<F, StateTFun<F, S, A>>
  * @param MF [Monad] for the context [F]
  * @param s initial state to run stateful computation
  */
-fun <F, S, A> StateTKind<F, S, A>.runM(MF: Monad<F>, initial: S): Kind<F, Tuple2<S, A>> = reify().run(initial, MF)
+fun <F, S, A> StateTOf<F, S, A>.runM(MF: Monad<F>, initial: S): Kind<F, Tuple2<S, A>> = reify().run(initial, MF)
 
 /**
  * Run the stateful computation within the context `F`.
@@ -28,11 +28,11 @@ fun <F, S, A> StateTKind<F, S, A>.runM(MF: Monad<F>, initial: S): Kind<F, Tuple2
  * @param s initial state to run stateful computation
  * @param MF [Monad] for the context [F]
  */
-inline fun <reified F, S, A> StateTKind<F, S, A>.runM(initial: S, MF: Monad<F> = monad()): Kind<F, Tuple2<S, A>> = reify().run(initial, MF)
+inline fun <reified F, S, A> StateTOf<F, S, A>.runM(initial: S, MF: Monad<F> = monad()): Kind<F, Tuple2<S, A>> = reify().run(initial, MF)
 
 /**
  * `StateT<F, S, A>` is a stateful computation within a context `F` yielding
- * a value of type `A`. i.e. StateT<EitherPartialKind<E>, S, A> = Either<E, State<S, A>>
+ * a value of type `A`. i.e. StateT<EitherPartialOf<E>, S, A> = Either<E, State<S, A>>
  *
  * @param F the context that wraps the stateful computation.
  * @param S the state we are preforming computation upon.
@@ -41,8 +41,8 @@ inline fun <reified F, S, A> StateTKind<F, S, A>.runM(initial: S, MF: Monad<F> =
  */
 @higherkind
 class StateT<F, S, A>(
-        val runF: StateTFunKind<F, S, A>
-) : StateTKind<F, S, A>, StateTKindedJ<F, S, A> {
+        val runF: StateTFunOf<F, S, A>
+) : StateTOf<F, S, A>, StateTKindedJ<F, S, A> {
 
     companion object {
 
@@ -70,7 +70,7 @@ class StateT<F, S, A>(
          *
          * @param runF the function to wrap within [StateT].
          */
-        fun <F, S, A> invokeF(runF: StateTFunKind<F, S, A>): StateT<F, S, A> = StateT(runF)
+        fun <F, S, A> invokeF(runF: StateTFunOf<F, S, A>): StateT<F, S, A> = StateT(runF)
 
         /**
          * Lift a value of type `A` into `StateT<F, S, A>`.
@@ -136,7 +136,7 @@ class StateT<F, S, A>(
          * @param f function that is called recusively until [arrow.Either.Right] is returned.
          * @param MF [Monad] for the context [F].
          */
-        fun <F, S, A, B> tailRecM(a: A, f: (A) -> Kind<StateTKindPartial<F, S>, Either<A, B>>, MF: Monad<F>): StateT<F, S, B> =
+        fun <F, S, A, B> tailRecM(a: A, f: (A) -> Kind<StateTPartialOf<F, S>, Either<A, B>>, MF: Monad<F>): StateT<F, S, B> =
                 StateT(MF.pure({ s: S ->
                     MF.tailRecM(Tuple2(s, a), { (s, a0) ->
                         MF.map(f(a0).runM(MF, s)) { (s, ab) ->
@@ -192,7 +192,7 @@ class StateT<F, S, A>(
      * @param ff function with the [StateT] context.
      * @param MF [Monad] for the context [F].
      */
-    fun <B> ap(ff: StateTKind<F, S, (A) -> B>, MF: Monad<F>): StateT<F, S, B> =
+    fun <B> ap(ff: StateTOf<F, S, (A) -> B>, MF: Monad<F>): StateT<F, S, B> =
             ff.reify().map2(this, { f, a -> f(a) }, MF)
 
     /**
@@ -209,7 +209,7 @@ class StateT<F, S, A>(
      * @param fas the function to apply.
      * @param MF [Monad] for the context [F].
      */
-    fun <B> flatMap(fas: (A) -> StateTKind<F, S, B>, MF: Monad<F>): StateT<F, S, B> =
+    fun <B> flatMap(fas: (A) -> StateTOf<F, S, B>, MF: Monad<F>): StateT<F, S, B> =
             invokeF(
                     MF.map(runF) { sfsa ->
                         sfsa.andThen { fsa ->
@@ -256,7 +256,7 @@ class StateT<F, S, A>(
      * @param MF [Monad] for the context [F].
      * @param SF [SemigroupK] for [F].
      */
-    fun combineK(y: StateTKind<F, S, A>, MF: Monad<F>, SF: SemigroupK<F>): StateT<F, S, A> =
+    fun combineK(y: StateTOf<F, S, A>, MF: Monad<F>, SF: SemigroupK<F>): StateT<F, S, A> =
             StateT(MF.pure({ s -> SF.combineK(run(s, MF), y.reify().run(s, MF)) }))
 
     /**
@@ -289,7 +289,7 @@ class StateT<F, S, A>(
  *
  * @param MF [Monad] for the context [F].
  */
-inline fun <reified F, S, A> StateTFunKind<F, S, A>.stateT(MF: Monad<F> = monad()): StateT<F, S, A> = StateT(this)
+inline fun <reified F, S, A> StateTFunOf<F, S, A>.stateT(MF: Monad<F> = monad()): StateT<F, S, A> = StateT(this)
 
 /**
  * Wrap the function with [StateT].

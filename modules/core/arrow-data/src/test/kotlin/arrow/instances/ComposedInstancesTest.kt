@@ -10,7 +10,7 @@ import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import org.junit.runner.RunWith
 
-typealias OptionTNel = Kind<OptionTKindPartial<ForNonEmptyList>, Int>
+typealias OptionTNel = Kind<OptionTPartialOf<ForNonEmptyList>, Int>
 
 @RunWith(KTestJUnitRunner::class)
 class ComposedInstancesTest : UnitSpec() {
@@ -22,7 +22,7 @@ class ComposedInstancesTest : UnitSpec() {
         a.unnest().reify() == b.unnest().reify()
     }
 
-    val EQ_OPTIONT_ID_NEL: Eq<NestedType<OptionTKindPartial<ForId>, OptionTKindPartial<ForNonEmptyList>, Int>> =
+    val EQ_OPTIONT_ID_NEL: Eq<NestedType<OptionTPartialOf<ForId>, OptionTPartialOf<ForNonEmptyList>, Int>> =
             Eq { a, b ->
                 a.unnest().value().value().fold(
                         { b.unnest().value().value().isEmpty() },

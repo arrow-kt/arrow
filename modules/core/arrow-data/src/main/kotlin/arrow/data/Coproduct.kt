@@ -4,7 +4,7 @@ import arrow.*
 import arrow.core.*
 import arrow.typeclasses.*
 
-@higherkind data class Coproduct<F, G, A>(val run: Either<Kind<F, A>, Kind<G, A>>) : CoproductKind<F, G, A>, CoproductKindedJ<F, G, A> {
+@higherkind data class Coproduct<F, G, A>(val run: Either<Kind<F, A>, Kind<G, A>>) : CoproductOf<F, G, A>, CoproductKindedJ<F, G, A> {
 
     fun <B> map(CF: Functor<F>, CG: Functor<G>, f: (A) -> B): Coproduct<F, G, B> = Coproduct(run.bimap(CF.lift(f), CG.lift(f)))
 

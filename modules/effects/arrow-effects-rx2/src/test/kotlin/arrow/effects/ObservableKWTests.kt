@@ -16,8 +16,8 @@ import java.util.concurrent.TimeUnit
 @RunWith(KTestJUnitRunner::class)
 class ObservableKWTest : UnitSpec() {
 
-    fun <T> EQ(): Eq<ObservableKWKind<T>> = object : Eq<ObservableKWKind<T>> {
-        override fun eqv(a: ObservableKWKind<T>, b: ObservableKWKind<T>): Boolean =
+    fun <T> EQ(): Eq<ObservableKWOf<T>> = object : Eq<ObservableKWOf<T>> {
+        override fun eqv(a: ObservableKWOf<T>, b: ObservableKWOf<T>): Boolean =
                 try {
                     a.value().blockingFirst() == b.value().blockingFirst()
                 } catch (throwable: Throwable) {

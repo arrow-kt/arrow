@@ -4,7 +4,7 @@ import arrow.*
 import arrow.typeclasses.Functor
 import arrow.typeclasses.functor
 
-@higherkind abstract class Yoneda<F, A> : YonedaKind<F, A>, YonedaKindedJ<F, A> {
+@higherkind abstract class Yoneda<F, A> : YonedaOf<F, A>, YonedaKindedJ<F, A> {
 
     abstract operator fun <B> invoke(f: (A) -> B): Kind<F, B>
 

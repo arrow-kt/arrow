@@ -1,6 +1,6 @@
 package arrow.dagger.instances
 
-import arrow.data.MapKWKindPartial
+import arrow.data.MapKWPartialOf
 import arrow.instances.*
 import arrow.typeclasses.*
 import dagger.Module
@@ -11,13 +11,13 @@ import javax.inject.Inject
 abstract class MapKWInstances<L> {
 
     @Provides
-    fun mapKWFunctor(ev: DaggerMapKWFunctorInstance<L>): Functor<MapKWKindPartial<L>> = ev
+    fun mapKWFunctor(ev: DaggerMapKWFunctorInstance<L>): Functor<MapKWPartialOf<L>> = ev
 
     @Provides
-    fun mapKWFoldable(ev: DaggerMapKWFoldableInstance<L>): Foldable<MapKWKindPartial<L>> = ev
+    fun mapKWFoldable(ev: DaggerMapKWFoldableInstance<L>): Foldable<MapKWPartialOf<L>> = ev
 
     @Provides
-    fun mapKWTraverse(ev: DaggerMapKWTraverseInstance<L>): Traverse<MapKWKindPartial<L>> = ev
+    fun mapKWTraverse(ev: DaggerMapKWTraverseInstance<L>): Traverse<MapKWPartialOf<L>> = ev
 
 }
 

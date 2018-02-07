@@ -13,7 +13,7 @@ interface DeferredKWApplicativeErrorInstance :
     override fun <A> raiseError(e: Throwable): DeferredKW<A> =
             DeferredKW.raiseError(e)
 
-    override fun <A> handleErrorWith(fa: DeferredKWKind<A>, f: (Throwable) -> DeferredKWKind<A>): DeferredKW<A> =
+    override fun <A> handleErrorWith(fa: DeferredKWOf<A>, f: (Throwable) -> DeferredKWOf<A>): DeferredKW<A> =
             fa.handleErrorWith { f(it).reify() }
 }
 
@@ -22,10 +22,10 @@ interface DeferredKWMonadErrorInstance :
         DeferredKWApplicativeErrorInstance,
         DeferredKWMonadInstance,
         MonadError<ForDeferredKW, Throwable> {
-    override fun <A, B> ap(fa: DeferredKWKind<A>, ff: DeferredKWKind<(A) -> B>): DeferredKW<B> =
+    override fun <A, B> ap(fa: DeferredKWOf<A>, ff: DeferredKWOf<(A) -> B>): DeferredKW<B> =
             super<DeferredKWMonadInstance>.ap(fa, ff)
 
-    override fun <A, B> map(fa: DeferredKWKind<A>, f: (A) -> B): DeferredKW<B> =
+    override fun <A, B> map(fa: DeferredKWOf<A>, f: (A) -> B): DeferredKW<B> =
             super<DeferredKWMonadInstance>.map(fa, f)
 
     override fun <A> pure(a: A): DeferredKW<A> =
@@ -34,7 +34,7 @@ interface DeferredKWMonadErrorInstance :
 
 @instance(DeferredKW::class)
 interface DeferredKWMonadSuspendInstance : DeferredKWMonadErrorInstance, MonadSuspend<ForDeferredKW> {
-    override fun <A> suspend(fa: () -> DeferredKWKind<A>): DeferredKW<A> =
+    override fun <A> suspend(fa: () -> DeferredKWOf<A>): DeferredKW<A> =
             DeferredKW.suspend(fa = fa)
 }
 
@@ -49,6 +49,6 @@ interface DeferredKWAsyncInstance : DeferredKWMonadSuspendInstance, Async<ForDef
 
 @instance(DeferredKW::class)
 interface DeferredKWEffectInstance : DeferredKWAsyncInstance, Effect<ForDeferredKW> {
-    override fun <A> runAsync(fa: Kind<ForDeferredKW, A>, cb: (Either<Throwable, A>) -> DeferredKWKind<Unit>): DeferredKW<Unit> =
+    override fun <A> runAsync(fa: Kind<ForDeferredKW, A>, cb: (Either<Throwable, A>) -> DeferredKWOf<Unit>): DeferredKW<Unit> =
             fa.reify().runAsync(cb)
 }

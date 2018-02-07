@@ -16,7 +16,7 @@ import arrow.typeclasses.Monad
         Functor::class,
         Applicative::class,
         Monad::class)
-sealed class IO<out A> : IOKind<A> {
+sealed class IO<out A> : IOOf<A> {
 
     companion object {
 
@@ -24,11 +24,11 @@ sealed class IO<out A> : IOKind<A> {
 
         fun <A> raiseError(e: Throwable): IO<A> = RaiseError(e)
 
-        internal fun <A, B> mapDefault(t: IOKind<A>, f: (A) -> B): IO<B> = Map(t, f, 0)
+        internal fun <A, B> mapDefault(t: IOOf<A>, f: (A) -> B): IO<B> = Map(t, f, 0)
 
         operator fun <A> invoke(f: () -> A): IO<A> = suspend { Pure(f()) }
 
-        fun <A> suspend(f: () -> IOKind<A>): IO<A> = Suspend(f)
+        fun <A> suspend(f: () -> IOOf<A>): IO<A> = Suspend(f)
 
         fun <A> async(k: Proc<A>): IO<A> =
                 Async { ff: (Either<Throwable, A>) -> Unit ->
@@ -53,7 +53,7 @@ sealed class IO<out A> : IOKind<A> {
                     else -> invoke { eval.value() }
                 }
 
-        fun <A, B> tailRecM(a: A, f: (A) -> IOKind<Either<A, B>>): IO<B> =
+        fun <A, B> tailRecM(a: A, f: (A) -> IOOf<Either<A, B>>): IO<B> =
                 f(a).reify().flatMap {
                     when (it) {
                         is Either.Left -> tailRecM(it.a, f)
@@ -64,13 +64,13 @@ sealed class IO<out A> : IOKind<A> {
 
     abstract fun <B> map(f: (A) -> B): IO<B>
 
-    fun <B> flatMap(f: (A) -> IOKind<B>): IO<B> =
+    fun <B> flatMap(f: (A) -> IOOf<B>): IO<B> =
             Bind(this, { f(it).reify() })
 
     fun attempt(): IO<Either<Throwable, A>> =
             Bind(this, IOFrame.any())
 
-    fun runAsync(cb: (Either<Throwable, A>) -> IOKind<Unit>): IO<Unit> =
+    fun runAsync(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Unit> =
             IO { unsafeRunAsync(cb.andThen { it.reify().unsafeRunAsync { } }) }
 
     fun unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
@@ -102,7 +102,7 @@ sealed class IO<out A> : IOKind<A> {
         override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
     }
 
-    internal data class Suspend<out A>(val thunk: () -> IOKind<A>) : IO<A>() {
+    internal data class Suspend<out A>(val thunk: () -> IOOf<A>) : IO<A>() {
         override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
 
         override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
@@ -120,7 +120,7 @@ sealed class IO<out A> : IOKind<A> {
         override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
     }
 
-    internal data class Map<E, out A>(val source: IOKind<E>, val g: (E) -> A, val index: Int) : IO<A>(), (E) -> IO<A> {
+    internal data class Map<E, out A>(val source: IOOf<E>, val g: (E) -> A, val index: Int) : IO<A>(), (E) -> IO<A> {
         override fun invoke(value: E): IO<A> = pure(g(value))
 
         override fun <B> map(f: (A) -> B): IO<B> =
@@ -133,10 +133,10 @@ sealed class IO<out A> : IOKind<A> {
     }
 }
 
-fun <A, B> IO<A>.ap(ff: IOKind<(A) -> B>): IO<B> =
+fun <A, B> IO<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
         flatMap { a -> ff.reify().map({ it(a) }) }
 
-fun <A> IO<A>.handleErrorWith(f: (Throwable) -> IOKind<A>): IO<A> =
+fun <A> IO<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
         IO.Bind(this, IOFrame.errorHandler(f))
 
 fun <A> A.liftIO(): IO<A> = IO.pure(this)

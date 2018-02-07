@@ -13,7 +13,7 @@ import arrow.typeclasses.applicative
  *
  * It may also be said that [OptionT] is a monad transformer for [Option].
  */
-@higherkind data class OptionT<F, A>(val value: Kind<F, Option<A>>) : OptionTKind<F, A>, OptionTKindedJ<F, A> {
+@higherkind data class OptionT<F, A>(val value: Kind<F, Option<A>>) : OptionTOf<F, A>, OptionTKindedJ<F, A> {
 
     companion object {
 
@@ -26,7 +26,7 @@ import arrow.typeclasses.applicative
         inline fun <reified F, A> fromOption(value: Option<A>, AF: Applicative<F> = applicative<F>()): OptionT<F, A> =
                 OptionT(AF.pure(value))
 
-        fun <F, A, B> tailRecM(a: A, f: (A) -> OptionTKind<F, Either<A, B>>, MF: Monad<F>): OptionT<F, B> =
+        fun <F, A, B> tailRecM(a: A, f: (A) -> OptionTOf<F, Either<A, B>>, MF: Monad<F>): OptionT<F, B> =
                 OptionT(MF.tailRecM(a, {
                     MF.map(f(it).reify().value, {
                         it.fold({
@@ -43,7 +43,7 @@ import arrow.typeclasses.applicative
 
     inline fun <B> cata(crossinline default: () -> B, crossinline f: (A) -> B, FF: Functor<F>): Kind<F, B> = fold(default, f, FF)
 
-    fun <B> ap(ff: OptionTKind<F, (A) -> B>, MF: Monad<F>): OptionT<F, B> = ff.reify().flatMap({ f -> map(f, MF) }, MF)
+    fun <B> ap(ff: OptionTOf<F, (A) -> B>, MF: Monad<F>): OptionT<F, B> = ff.reify().flatMap({ f -> map(f, MF) }, MF)
 
     inline fun <B> flatMap(crossinline f: (A) -> OptionT<F, B>, MF: Monad<F>): OptionT<F, B> = flatMapF({ it -> f(it).value }, MF)
 
@@ -92,4 +92,4 @@ import arrow.typeclasses.applicative
 inline fun <F, A, B> OptionT<F, A>.mapFilter(crossinline f: (A) -> Option<B>, FF: Functor<F>): OptionT<F, B> =
         OptionT(FF.map(value, { it.flatMap(f) }))
 
-fun <F, A> OptionTKind<F, A>.value(): Kind<F, Option<A>> = this.reify().value
+fun <F, A> OptionTOf<F, A>.value(): Kind<F, Option<A>> = this.reify().value

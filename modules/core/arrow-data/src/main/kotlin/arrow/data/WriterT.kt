@@ -7,9 +7,9 @@ import arrow.core.toT
 import arrow.higherkind
 import arrow.typeclasses.*
 
-@Suppress("UNCHECKED_CAST") inline fun <F, W, A> WriterTKind<F, W, A>.value(): Kind<F, Tuple2<W, A>> = this.reify().value
+@Suppress("UNCHECKED_CAST") inline fun <F, W, A> WriterTOf<F, W, A>.value(): Kind<F, Tuple2<W, A>> = this.reify().value
 
-@higherkind data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTKind<F, W, A>, WriterTKindedJ<F, W, A> {
+@higherkind data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTOf<F, W, A>, WriterTKindedJ<F, W, A> {
 
     companion object {
 
@@ -44,12 +44,12 @@ import arrow.typeclasses.*
         inline fun <reified F, reified W, A> valueT(vf: Kind<F, A>, monoidW: Monoid<W> = monoid()): WriterT<F, W, A> =
                 putT(vf, monoidW.empty())
 
-        inline fun <reified F, W, A> empty(MMF: MonoidK<F> = monoidK()): WriterTKind<F, W, A> = WriterT(MMF.empty())
+        inline fun <reified F, W, A> empty(MMF: MonoidK<F> = monoidK()): WriterTOf<F, W, A> = WriterT(MMF.empty())
 
-        fun <F, W, A> pass(fa: Kind<WriterTKindPartial<F, W>, Tuple2<(W) -> W, A>>, MF: Monad<F>): WriterT<F, W, A> =
+        fun <F, W, A> pass(fa: Kind<WriterTPartialOf<F, W>, Tuple2<(W) -> W, A>>, MF: Monad<F>): WriterT<F, W, A> =
                 WriterT(MF.flatMap(fa.reify().content(MF), { tuple2FA -> MF.map(fa.reify().write(MF), { l -> Tuple2(tuple2FA.a(l), tuple2FA.b) }) }))
 
-        fun <F, W, A, B> tailRecM(a: A, f: (A) -> Kind<WriterTKindPartial<F, W>, Either<A, B>>, MF: Monad<F>): WriterT<F, W, B> =
+        fun <F, W, A, B> tailRecM(a: A, f: (A) -> Kind<WriterTPartialOf<F, W>, Either<A, B>>, MF: Monad<F>): WriterT<F, W, B> =
                 WriterT(MF.tailRecM(a, {
                     MF.map(f(it).reify().value) {
                         val value = it.b
@@ -63,7 +63,7 @@ import arrow.typeclasses.*
 
     fun tell(w: W, SG: Semigroup<W>, MF: Monad<F>): WriterT<F, W, A> = mapAcc ({ SG.combine(it, w) }, MF)
 
-    fun listen(MF: Monad<F>): Kind<WriterTKindPartial<F, W>, Tuple2<W, A>> =
+    fun listen(MF: Monad<F>): Kind<WriterTPartialOf<F, W>, Tuple2<W, A>> =
             WriterT(MF.flatMap(content(MF), { a -> MF.map(write(MF), { l -> Tuple2(l, Tuple2(l, a)) }) }))
 
     fun content(FF: Functor<F>): Kind<F, A> = FF.map(value, { it.b })
@@ -80,7 +80,7 @@ import arrow.typeclasses.*
 
     fun swap(MF: Monad<F>): WriterT<F, A, W> = transform({ it.b toT it.a }, MF)
 
-    fun <B> ap(ff: WriterTKind<F, W, (A) -> B>, SG: Semigroup<W>, MF: Monad<F>): WriterT<F, W, B> =
+    fun <B> ap(ff: WriterTOf<F, W, (A) -> B>, SG: Semigroup<W>, MF: Monad<F>): WriterT<F, W, B> =
             ff.reify().flatMap({ map(it, MF) }, SG, MF)
 
     inline fun <B> flatMap(crossinline f: (A) -> WriterT<F, W, B>, SG: Semigroup<W>, MF: Monad<F>): WriterT<F, W, B> =
@@ -94,6 +94,6 @@ import arrow.typeclasses.*
 
     inline fun <B> subflatMap(crossinline f: (A) -> Tuple2<W, B>, MF: Monad<F>): WriterT<F, W, B> = transform({ f(it.b) }, MF)
 
-    fun combineK(y: WriterTKind<F, W, A>, SF: SemigroupK<F>): WriterT<F, W, A> =
+    fun combineK(y: WriterTOf<F, W, A>, SF: SemigroupK<F>): WriterT<F, W, A> =
             WriterT(SF.combineK(value, y.reify().value))
 }

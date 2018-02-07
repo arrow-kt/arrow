@@ -16,20 +16,20 @@ class EitherTTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            functor<EitherTKindPartial<ForOption, Throwable>>() shouldNotBe null
-            applicative<EitherTKindPartial<ForOption, Throwable>>() shouldNotBe null
-            monad<EitherTKindPartial<ForOption, Throwable>>() shouldNotBe null
-            foldable<EitherTKindPartial<ForOption, Throwable>>() shouldNotBe null
-            traverse<EitherTKindPartial<ForOption, Throwable>>() shouldNotBe null
-            applicativeError<EitherTKindPartial<ForOption, Throwable>, Throwable>() shouldNotBe null
-            monadError<EitherTKindPartial<ForOption, Throwable>, Throwable>() shouldNotBe null
-            semigroupK<EitherTKindPartial<ForOption, Throwable>>() shouldNotBe null
+            functor<EitherTPartialOf<ForOption, Throwable>>() shouldNotBe null
+            applicative<EitherTPartialOf<ForOption, Throwable>>() shouldNotBe null
+            monad<EitherTPartialOf<ForOption, Throwable>>() shouldNotBe null
+            foldable<EitherTPartialOf<ForOption, Throwable>>() shouldNotBe null
+            traverse<EitherTPartialOf<ForOption, Throwable>>() shouldNotBe null
+            applicativeError<EitherTPartialOf<ForOption, Throwable>, Throwable>() shouldNotBe null
+            monadError<EitherTPartialOf<ForOption, Throwable>, Throwable>() shouldNotBe null
+            semigroupK<EitherTPartialOf<ForOption, Throwable>>() shouldNotBe null
         }
 
         testLaws(
             MonadErrorLaws.laws(EitherT.monadError<ForId, Throwable>(Id.monad()), Eq.any(), Eq.any()),
             TraverseLaws.laws(EitherT.traverse<ForId, Int>(), EitherT.applicative(), { EitherT(Id(Right(it))) }, Eq.any()),
-            SemigroupKLaws.laws<EitherTKindPartial<ForId, Int>>(
+            SemigroupKLaws.laws<EitherTPartialOf<ForId, Int>>(
                 EitherT.semigroupK(Id.monad()),
                 EitherT.applicative(Id.monad()),
                 Eq.any())

@@ -14,7 +14,7 @@ typealias Nel<A> = NonEmptyList<A>
 class NonEmptyList<out A> private constructor(
         val head: A,
         val tail: List<A>,
-        val all: List<A>) : NonEmptyListKind<A> {
+        val all: List<A>) : NonEmptyListOf<A> {
 
     constructor(head: A, tail: List<A>) : this(head, tail, listOf(head) + tail)
     private constructor(list: List<A>) : this(list[0], list.drop(1), list)
@@ -29,9 +29,9 @@ class NonEmptyList<out A> private constructor(
 
     fun <B> map(f: (A) -> B): NonEmptyList<B> = NonEmptyList(f(head), tail.map(f))
 
-    fun <B> flatMap(f: (A) -> NonEmptyListKind<B>): NonEmptyList<B> = f(head).reify() + tail.flatMap { f(it).reify().all }
+    fun <B> flatMap(f: (A) -> NonEmptyListOf<B>): NonEmptyList<B> = f(head).reify() + tail.flatMap { f(it).reify().all }
 
-    fun <B> ap(ff: NonEmptyListKind<(A) -> B>): NonEmptyList<B> = ff.reify().flatMap { f -> map(f) }.reify()
+    fun <B> ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> = ff.reify().flatMap { f -> map(f) }.reify()
 
     operator fun plus(l: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> = NonEmptyList(all + l.all)
 
@@ -50,7 +50,7 @@ class NonEmptyList<out A> private constructor(
                 NonEmptyList(it.a, it.b.reify().list)
             }).value()
 
-    fun <B> coflatMap(f: (NonEmptyListKind<A>) -> B): NonEmptyList<B> {
+    fun <B> coflatMap(f: (NonEmptyListOf<A>) -> B): NonEmptyList<B> {
         val buf = mutableListOf<B>()
         tailrec fun consume(list: List<A>): List<B> =
                 if (list.isEmpty()) {
@@ -121,4 +121,4 @@ class NonEmptyList<out A> private constructor(
 
 fun <A> A.nel(): NonEmptyList<A> = NonEmptyList.of(this)
 
-fun <A> NonEmptyList<A>.combineK(y: NonEmptyListKind<A>): NonEmptyList<A> = this.plus(y.reify())
+fun <A> NonEmptyList<A>.combineK(y: NonEmptyListOf<A>): NonEmptyList<A> = this.plus(y.reify())

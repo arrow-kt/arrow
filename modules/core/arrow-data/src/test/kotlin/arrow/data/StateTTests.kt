@@ -18,26 +18,26 @@ class StateTTests : UnitSpec() {
 
     val M: StateTMonadStateInstance<ForTry, Int> = StateT.monadState<ForTry, Int>(Try.monad())
 
-    val EQ: Eq<StateTKind<ForTry, Int, Int>> = Eq { a, b ->
+    val EQ: Eq<StateTOf<ForTry, Int, Int>> = Eq { a, b ->
         a.runM(1, Try.monad()) == b.runM(1, Try.monad())
     }
 
-    val EQ_UNIT: Eq<StateTKind<ForTry, Int, Unit>> = Eq { a, b ->
+    val EQ_UNIT: Eq<StateTOf<ForTry, Int, Unit>> = Eq { a, b ->
         a.runM(1, Try.monad()) == b.runM(1, Try.monad())
     }
 
-    val EQ_LIST: Eq<Kind<StateTKindPartial<ForListKW, Int>, Int>> = Eq { a, b ->
+    val EQ_LIST: Eq<Kind<StateTPartialOf<ForListKW, Int>, Int>> = Eq { a, b ->
         a.runM(1, ListKW.monad()) == b.runM(1, ListKW.monad())
     }
 
     init {
 
         "instances can be resolved implicitly" {
-            functor<StateTKindPartial<ForId, Int>>() shouldNotBe null
-            applicative<StateTKindPartial<ForId, Int>>() shouldNotBe null
-            monad<StateTKindPartial<ForId, Int>>() shouldNotBe null
-            monadState<StateTKindPartial<ForId, Int>, Int>() shouldNotBe null
-            semigroupK<StateTKindPartial<ForNonEmptyList, ForNonEmptyList>>() shouldNotBe null
+            functor<StateTPartialOf<ForId, Int>>() shouldNotBe null
+            applicative<StateTPartialOf<ForId, Int>>() shouldNotBe null
+            monad<StateTPartialOf<ForId, Int>>() shouldNotBe null
+            monadState<StateTPartialOf<ForId, Int>, Int>() shouldNotBe null
+            semigroupK<StateTPartialOf<ForNonEmptyList, ForNonEmptyList>>() shouldNotBe null
         }
 
         testLaws(

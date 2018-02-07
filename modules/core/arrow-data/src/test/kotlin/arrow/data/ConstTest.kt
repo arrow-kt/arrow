@@ -16,13 +16,13 @@ class ConstTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            functor<ConstKindPartial<Int>>() shouldNotBe null
-            applicative<ConstKindPartial<Int>>() shouldNotBe null
-            foldable<ConstKindPartial<Int>>() shouldNotBe null
-            traverse<ConstKindPartial<Int>>() shouldNotBe null
-            traverseFilter<ConstKindPartial<Int>>() shouldNotBe null
-            semigroup<ConstKind<Int, Int>>() shouldNotBe null
-            monoid<ConstKind<Int, Int>>() shouldNotBe null
+            functor<ConstPartialOf<Int>>() shouldNotBe null
+            applicative<ConstPartialOf<Int>>() shouldNotBe null
+            foldable<ConstPartialOf<Int>>() shouldNotBe null
+            traverse<ConstPartialOf<Int>>() shouldNotBe null
+            traverseFilter<ConstPartialOf<Int>>() shouldNotBe null
+            semigroup<ConstOf<Int, Int>>() shouldNotBe null
+            monoid<ConstOf<Int, Int>>() shouldNotBe null
             eq<Const<Int, String>>() shouldNotBe null
         }
 

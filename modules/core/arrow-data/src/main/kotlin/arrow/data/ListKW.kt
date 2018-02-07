@@ -8,9 +8,9 @@ import arrow.core.Tuple2
 import arrow.typeclasses.Applicative
 
 @higherkind
-data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A> by list {
+data class ListKW<out A> constructor(val list: List<A>) : ListKWOf<A>, List<A> by list {
 
-    fun <B> flatMap(f: (A) -> ListKWKind<B>): ListKW<B> = this.reify().list.flatMap { f(it).reify().list }.k()
+    fun <B> flatMap(f: (A) -> ListKWOf<B>): ListKW<B> = this.reify().list.flatMap { f(it).reify().list }.k()
 
     fun <B> map(f: (A) -> B): ListKW<B> = this.reify().list.map(f).k()
 
@@ -24,14 +24,14 @@ data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A>
         return Eval.defer { loop(this.reify()) }
     }
 
-    fun <B> ap(ff: ListKWKind<(A) -> B>): ListKW<B> = ff.reify().flatMap { f -> map(f) }.reify()
+    fun <B> ap(ff: ListKWOf<(A) -> B>): ListKW<B> = ff.reify().flatMap { f -> map(f) }.reify()
 
     fun <G, B> traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, ListKW<B>> =
             foldRight(Eval.always { GA.pure(emptyList<B>().k()) }) { a, eval ->
                 GA.map2Eval(f(a), eval) { (listOf(it.a) + it.b).k() }
             }.value()
 
-    fun <B, Z> map2(fb: ListKWKind<B>, f: (Tuple2<A, B>) -> Z): ListKW<Z> =
+    fun <B, Z> map2(fb: ListKWOf<B>, f: (Tuple2<A, B>) -> Z): ListKW<Z> =
             this.reify().flatMap { a ->
                 fb.reify().map { b ->
                     f(Tuple2(a, b))
@@ -73,6 +73,6 @@ data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A>
 
 }
 
-fun <A> ListKW<A>.combineK(y: ListKWKind<A>): ListKW<A> = (this.list + y.reify().list).k()
+fun <A> ListKW<A>.combineK(y: ListKWOf<A>): ListKW<A> = (this.list + y.reify().list).k()
 
 fun <A> List<A>.k(): ListKW<A> = ListKW(this)

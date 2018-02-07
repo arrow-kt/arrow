@@ -18,14 +18,14 @@ class YonedaTest : UnitSpec() {
 
     val F = Yoneda.functor<ForId>()
 
-    val EQ = Eq<YonedaKind<ForId, Int>> { a, b ->
+    val EQ = Eq<YonedaOf<ForId, Int>> { a, b ->
         a.reify().lower() == b.reify().lower()
     }
 
     init {
 
         "instances can be resolved implicitly" {
-            functor<YonedaKindPartial<ForId>>() shouldNotBe null
+            functor<YonedaPartialOf<ForId>>() shouldNotBe null
         }
 
         testLaws(FunctorLaws.laws(F, { Yoneda(Id(it)) }, EQ))

@@ -31,8 +31,8 @@ class IOTest : UnitSpec() {
             monadSuspend<ForIO>() shouldNotBe null
             async<ForIO>() shouldNotBe null
             effect<ForIO>() shouldNotBe null
-            semigroup<IOKind<Int>>() shouldNotBe null
-            monoid<IOKind<Int>>() shouldNotBe null
+            semigroup<IOOf<Int>>() shouldNotBe null
+            monoid<IOOf<Int>>() shouldNotBe null
         }
 
         "should defer evaluation until run" {

@@ -121,7 +121,7 @@ Available Instances:
 ```kotlin:ank
 import arrow.debug.*
 
-showInstances<StateKindPartial<Stack>, Unit>()
+showInstances<StatePartialOf<Stack>, Unit>()
 ```
 
 # Credits

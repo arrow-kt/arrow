@@ -12,19 +12,19 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class KleisliTest : UnitSpec() {
-    private fun <A> EQ(): Eq<KleisliKind<ForTry, Int, A>> = Eq { a, b ->
+    private fun <A> EQ(): Eq<KleisliOf<ForTry, Int, A>> = Eq { a, b ->
         a.reify().run(1) == b.reify().run(1)
     }
 
     init {
 
         "instances can be resolved implicitly" {
-            functor<KleisliKindPartial<ForId, Int>>() shouldNotBe null
-            applicative<KleisliKindPartial<ForId, Int>>() shouldNotBe null
-            monad<KleisliKindPartial<ForId, Int>>() shouldNotBe null
-            monadReader<KleisliKindPartial<ForId, Int>, Int>() shouldNotBe null
-            applicativeError<KleisliKindPartial<ForEither, Int>, Throwable>() shouldNotBe null
-            monadError<KleisliKindPartial<ForEither, Int>, Throwable>() shouldNotBe null
+            functor<KleisliPartialOf<ForId, Int>>() shouldNotBe null
+            applicative<KleisliPartialOf<ForId, Int>>() shouldNotBe null
+            monad<KleisliPartialOf<ForId, Int>>() shouldNotBe null
+            monadReader<KleisliPartialOf<ForId, Int>, Int>() shouldNotBe null
+            applicativeError<KleisliPartialOf<ForEither, Int>, Throwable>() shouldNotBe null
+            monadError<KleisliPartialOf<ForEither, Int>, Throwable>() shouldNotBe null
         }
 
         testLaws(MonadErrorLaws.laws(Kleisli.monadError<ForTry, Int, Throwable>(Try.monadError()), EQ(), EQ()))

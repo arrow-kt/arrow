@@ -6,7 +6,7 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Foldable
 
 @higherkind
-data class MapKW<K, out A>(val map: Map<K, A>) : MapKWKind<K, A>, Map<K, A> by map {
+data class MapKW<K, out A>(val map: Map<K, A>) : MapKWOf<K, A>, Map<K, A> by map {
 
     fun <B> map(f: (A) -> B): MapKW<K, B> = this.map.map { it.key to f(it.value) }.toMap().k()
 

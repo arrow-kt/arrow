@@ -54,9 +54,9 @@ class FreeTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            functor<FreeKindPartial<OpsAp.F>>() shouldNotBe null
-            applicative<FreeKindPartial<OpsAp.F>>()  shouldNotBe null
-            monad<FreeKindPartial<OpsAp.F>>()  shouldNotBe null
+            functor<FreePartialOf<OpsAp.F>>() shouldNotBe null
+            applicative<FreePartialOf<OpsAp.F>>()  shouldNotBe null
+            monad<FreePartialOf<OpsAp.F>>()  shouldNotBe null
         }
 
         val EQ: FreeEq<Ops.F, ForId, Int> = FreeEq(idInterpreter)

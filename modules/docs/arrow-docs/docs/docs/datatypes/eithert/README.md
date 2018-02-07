@@ -195,7 +195,7 @@ We can now lift any value to a `EitherT<F, BizError, A>` which looks like this:
 ```kotlin:ank
 import arrow.syntax.applicative.*
 import arrow.data.*
-val eitherTVal = 1.pure<EitherTKindPartial<ObservableKWHK, BizError>, Int>()
+val eitherTVal = 1.pure<EitherTPartialOf<ObservableKWHK, BizError>, Int>()
 eitherTVal
 ```
 
@@ -234,7 +234,7 @@ EitherT(Option(3.left())).mapLeft({it + 1}, Option.functor())
 ```kotlin:ank
 import arrow.debug.*
 
-showInstances<EitherTKindPartial<ObservableKWHK, BizError>, BizError>()
+showInstances<EitherTPartialOf<ObservableKWHK, BizError>, BizError>()
 ```
 
 Take a look at the [`OptionT` docs]({{ '/docs/datatypes/optiont' | relative_url }}) for an alternative version of this content with the `OptionT` monad transformer

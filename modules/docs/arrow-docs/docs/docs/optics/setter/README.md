@@ -21,7 +21,7 @@ import arrow.*
 import arrow.optics.*
 import arrow.data.*
 
-val setter: Setter<ListKWKind<Int>, Int> = Setter.fromFunctor()
+val setter: Setter<ListKWOf<Int>, Int> = Setter.fromFunctor()
 setter.set(listOf(1, 2, 3, 4).k(), 5)
 ```
 ```kotlin:ank
@@ -77,11 +77,11 @@ val barSetter: Setter<Bar, Foo> = Setter { modifyFoo ->
 ### Polymorphic setter
 
 When dealing with polymorphic types we can also have polymorphic setters that allow us to morph the type of the focus.
-Previously when we used a `Setter<ListKWKind<Int>, Int>` it was able to morph the `Int` values in the constructed type `ListKW<Int>`.
-With a `PSetter<ListKWKind<Int>, ListKWKind<String>, Int, String>` we can morph an `Int` value to a `String` value and thus also morph the type from `ListKW<Int>` to `ListKW<String>`.
+Previously when we used a `Setter<ListKWOf<Int>, Int>` it was able to morph the `Int` values in the constructed type `ListKW<Int>`.
+With a `PSetter<ListKWOf<Int>, ListKWOf<String>, Int, String>` we can morph an `Int` value to a `String` value and thus also morph the type from `ListKW<Int>` to `ListKW<String>`.
 
 ```kotlin:ank
-val pSetter: PSetter<ListKWKind<Int>, ListKWKind<String>, Int, String> = PSetter.fromFunctor()
+val pSetter: PSetter<ListKWOf<Int>, ListKWOf<String>, Int, String> = PSetter.fromFunctor()
 pSetter.set(listOf(1, 2, 3, 4).k(), "Constant")
 ```
 ```kotlin:ank

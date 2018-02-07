@@ -26,7 +26,7 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
  * values, regardless of whether the `B` values appear in a [Ior.Right] or a [Ior.Both].
  * The isomorphic Either form can be accessed via the [unwrap] method.
  */
-@higherkind sealed class Ior<out A, out B> : IorKind<A, B> {
+@higherkind sealed class Ior<out A, out B> : IorOf<A, B> {
 
     /**
      * Returns `true` if this is a [Right], `false` otherwise.
@@ -86,7 +86,7 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
             }
         }
 
-        private tailrec fun <L, A, B> loop(v: Ior<L, Either<A, B>>, f: (A) -> IorKind<L, Either<A, B>>, SL: Semigroup<L>): Ior<L, B> = when (v) {
+        private tailrec fun <L, A, B> loop(v: Ior<L, Either<A, B>>, f: (A) -> IorOf<L, Either<A, B>>, SL: Semigroup<L>): Ior<L, B> = when (v) {
             is Left -> Left(v.value)
             is Right -> when (v.value) {
                 is Either.Right -> Right(v.value.b)
@@ -105,7 +105,7 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
             }
         }
 
-        fun <L, A, B> tailRecM(a: A, f: (A) -> IorKind<L, Either<A, B>>, SL: Semigroup<L>): Ior<L, B> = loop(f(a).reify(), f, SL)
+        fun <L, A, B> tailRecM(a: A, f: (A) -> IorOf<L, Either<A, B>>, SL: Semigroup<L>): Ior<L, B> = loop(f(a).reify(), f, SL)
 
         fun <A, B> leftNel(a: A): IorNel<A, B> = Left(NonEmptyList.of(a))
 
@@ -311,7 +311,7 @@ inline fun <A, B, D> Ior<A, B>.flatMap(crossinline f: (B) -> Ior<A, D>, SA: Semi
     }
 }
 
-fun <A, B, D> Ior<A, B>.ap(ff: IorKind<A, (B) -> D>, SA: Semigroup<A>): Ior<A, D> = ff.reify().flatMap({ f -> map(f) }, SA)
+fun <A, B, D> Ior<A, B>.ap(ff: IorOf<A, (B) -> D>, SA: Semigroup<A>): Ior<A, D> = ff.reify().flatMap({ f -> map(f) }, SA)
 
 inline fun <A, B> Ior<A, B>.getOrElse(crossinline default: () -> B): B = fold({ default() }, { it }, { _, b -> b })
 

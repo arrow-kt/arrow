@@ -14,7 +14,7 @@ typealias Invalid<E> = Validated.Invalid<E>
 /**
  * Port of https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/data/Validated.scala
  */
-@higherkind sealed class Validated<out E, out A> : ValidatedKind<E, A> {
+@higherkind sealed class Validated<out E, out A> : ValidatedOf<E, A> {
 
     companion object {
 
@@ -171,7 +171,7 @@ fun <E, A, B> Validated<E, A>.ap(f: Validated<E, (A) -> B>, SE: Semigroup<E>): V
             is Invalid -> f.fold({ Invalid(SE.combine(it, e)) }, { Invalid(e) })
         }
 
-fun <E, A> Validated<E, A>.handleLeftWith(f: (E) -> ValidatedKind<E, A>): Validated<E, A> =
+fun <E, A> Validated<E, A>.handleLeftWith(f: (E) -> ValidatedOf<E, A>): Validated<E, A> =
         fold({ f(it).reify() }, { Valid(it) })
 
 fun <E, A, B> Validated<E, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
@@ -186,7 +186,7 @@ fun <G, E, A, B> Validated<E, A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<
             is Invalid -> GA.pure(this)
         }
 
-inline fun <reified E, reified A> Validated<E, A>.combine(y: ValidatedKind<E, A>,
+inline fun <reified E, reified A> Validated<E, A>.combine(y: ValidatedOf<E, A>,
                                                           SE: Semigroup<E> = semigroup(),
                                                           SA: Semigroup<A> = semigroup()): Validated<E, A> =
         y.reify().let { that ->
@@ -198,7 +198,7 @@ inline fun <reified E, reified A> Validated<E, A>.combine(y: ValidatedKind<E, A>
             }
         }
 
-fun <E, A> Validated<E, A>.combineK(y: ValidatedKind<E, A>, SE: Semigroup<E>): Validated<E, A> {
+fun <E, A> Validated<E, A>.combineK(y: ValidatedOf<E, A>, SE: Semigroup<E>): Validated<E, A> {
     val xev = this
     val yev = y.reify()
     return when (xev) {

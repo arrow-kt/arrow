@@ -4,9 +4,9 @@ import arrow.*
 import arrow.core.*
 import arrow.typeclasses.*
 
-inline fun <reified M, S, A> FreeKind<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M> = monad()): Kind<M, A> = (this as Free<S, A>).foldMap(f, MM)
+inline fun <reified M, S, A> FreeOf<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M> = monad()): Kind<M, A> = (this as Free<S, A>).foldMap(f, MM)
 
-@higherkind sealed class Free<S, out A> : FreeKind<S, A> {
+@higherkind sealed class Free<S, out A> : FreeOf<S, A> {
 
     companion object {
         fun <S, A> pure(a: A): Free<S, A> = Pure(a)
@@ -15,21 +15,21 @@ inline fun <reified M, S, A> FreeKind<S, A>.foldMapK(f: FunctionK<S, M>, MM: Mon
 
         fun <S, A> defer(value: () -> Free<S, A>): Free<S, A> = pure<S, Unit>(Unit).flatMap { _ -> value() }
 
-        internal fun <F> functionKF(): FunctionK<F, FreeKindPartial<F>> =
-                object : FunctionK<F, FreeKindPartial<F>> {
+        internal fun <F> functionKF(): FunctionK<F, FreePartialOf<F>> =
+                object : FunctionK<F, FreePartialOf<F>> {
                     override fun <A> invoke(fa: Kind<F, A>): Free<F, A> =
                             liftF(fa)
 
                 }
 
-        internal fun <F> applicativeF(): Applicative<FreeKindPartial<F>> =
-                object : Applicative<FreeKindPartial<F>> {
-                    private val applicative: Applicative<FreeKindPartial<F>> = arrow.typeclasses.applicative()
+        internal fun <F> applicativeF(): Applicative<FreePartialOf<F>> =
+                object : Applicative<FreePartialOf<F>> {
+                    private val applicative: Applicative<FreePartialOf<F>> = arrow.typeclasses.applicative()
 
                     override fun <A> pure(a: A): Free<F, A> =
                             Companion.pure(a)
 
-                    override fun <A, B> ap(fa: Kind<FreeKindPartial<F>, A>, ff: Kind<FreeKindPartial<F>, (A) -> B>): Free<F, B> {
+                    override fun <A, B> ap(fa: Kind<FreePartialOf<F>, A>, ff: Kind<FreePartialOf<F>, (A) -> B>): Free<F, B> {
                         return applicative.ap(fa, ff).reify()
                     }
                 }
@@ -57,7 +57,7 @@ fun <S, A, B> Free<S, A>.map(f: (A) -> B): Free<S, B> = flatMap { Free.Pure<S, B
 
 fun <S, A, B> Free<S, A>.flatMap(f: (A) -> Free<S, B>): Free<S, B> = Free.FlatMapped(this, f)
 
-fun <S, A, B> Free<S, A>.ap(ff: FreeKind<S, (A) -> B>): Free<S, B> = ff.reify().flatMap { f -> map(f) }.reify()
+fun <S, A, B> Free<S, A>.ap(ff: FreeOf<S, (A) -> B>): Free<S, B> = ff.reify().flatMap { f -> map(f) }.reify()
 
 @Suppress("UNCHECKED_CAST")
 tailrec fun <S, A> Free<S, A>.step(): Free<S, A> =
@@ -93,4 +93,4 @@ fun <S, A> A.free(): Free<S, A> = Free.pure<S, A>(this)
 
 fun <F, A> Free<F, A>.run(M: Monad<F>): Kind<F, A> = this.foldMap(FunctionK.id(), M)
 
-fun <F, A> FreeKind<F, A>.runK(M: Monad<F>): Kind<F, A> = this.reify().foldMap(FunctionK.id(), M)
+fun <F, A> FreeOf<F, A>.runK(M: Monad<F>): Kind<F, A> = this.reify().foldMap(FunctionK.id(), M)
