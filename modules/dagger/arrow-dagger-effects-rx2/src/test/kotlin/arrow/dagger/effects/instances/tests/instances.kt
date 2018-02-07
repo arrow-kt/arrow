@@ -16,22 +16,22 @@ import javax.inject.Singleton
     ArrowEffectsRx2Instances::class
 ])
 interface Runtime {
-    fun observableKWFunctor(): Functor<ObservableKWHK>
-    fun observableKWApplicative(): Applicative<ObservableKWHK>
-    fun observableKWApplicativeError(): ApplicativeError<ObservableKWHK, Throwable>
-    fun observableKWMonad(): Monad<ObservableKWHK>
-    fun observableKWMonadError(): MonadError<ObservableKWHK, Throwable>
-    fun observableKWMonadSuspend(): MonadSuspend<ObservableKWHK>
-    fun observableKWAsync(): Async<ObservableKWHK>
-    fun observableKWEffect(): Effect<ObservableKWHK>
-    fun flowableKWFunctor(): Functor<FlowableKWHK>
-    fun flowableKWApplicative(): Applicative<FlowableKWHK>
-    fun flowableKWApplicativeError(): ApplicativeError<FlowableKWHK, Throwable>
-    fun flowableKWMonad(): Monad<FlowableKWHK>
-    fun flowableKWMonadError(): MonadError<FlowableKWHK, Throwable>
-    fun flowableKWMonadSuspend(): MonadSuspend<FlowableKWHK>
-    fun flowableKWAsync(): Async<FlowableKWHK>
-    fun flowableKWEffect(): Effect<FlowableKWHK>
+    fun observableKWFunctor(): Functor<ForObservableK>
+    fun observableKWApplicative(): Applicative<ForObservableK>
+    fun observableKWApplicativeError(): ApplicativeError<ForObservableK, Throwable>
+    fun observableKWMonad(): Monad<ForObservableK>
+    fun observableKWMonadError(): MonadError<ForObservableK, Throwable>
+    fun observableKWMonadSuspend(): MonadSuspend<ForObservableK>
+    fun observableKWAsync(): Async<ForObservableK>
+    fun observableKWEffect(): Effect<ForObservableK>
+    fun flowableKWFunctor(): Functor<ForFlowableK>
+    fun flowableKWApplicative(): Applicative<ForFlowableK>
+    fun flowableKWApplicativeError(): ApplicativeError<ForFlowableK, Throwable>
+    fun flowableKWMonad(): Monad<ForFlowableK>
+    fun flowableKWMonadError(): MonadError<ForFlowableK, Throwable>
+    fun flowableKWMonadSuspend(): MonadSuspend<ForFlowableK>
+    fun flowableKWAsync(): Async<ForFlowableK>
+    fun flowableKWEffect(): Effect<ForFlowableK>
 }
 
 object Arrow {
