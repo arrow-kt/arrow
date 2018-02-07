@@ -251,6 +251,9 @@ options:
       - title: FilterIndex
         url: /docs/optics/filterindex/
 
+      - title: Each
+        url: /docs/optics/each/
+
   - title: Integrations
 
     nested_options:

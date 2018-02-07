@@ -36,7 +36,10 @@ interface PTraversal<S, T, A, B> {
                     s.bimap(f, f).fold({ fa -> FA.map(fa, { a -> Either.Left(a) }) }, { fa -> FA.map(fa, { a -> Either.Right(a) }) })
         }
 
-        inline fun <reified T, A, B> fromTraversable(TT: Traverse<T> = traverse()) = object : PTraversal<HK<T, A>, HK<T, B>, A, B> {
+        /**
+         * Construct a [PTraversal] from a [Traverse] instance.
+         */
+        fun <T, A, B> fromTraversable(TT: Traverse<T>) = object : PTraversal<HK<T, A>, HK<T, B>, A, B> {
             override fun <F> modifyF(FA: Applicative<F>, s: HK<T, A>, f: (A) -> HK<F, B>): HK<F, HK<T, B>> =
                     TT.traverse(s, f, FA)
         }
@@ -305,6 +308,10 @@ interface PTraversal<S, T, A, B> {
 
 }
 
+/**
+ * Construct a [PTraversal] from a [Traverse] instance.
+ */
+inline fun <reified T, A, B> PTraversal.Companion.fromTraversable(TT: Traverse<T> = traverse(), dummy: Unit = Unit) = PTraversal.Companion.fromTraversable<T, A, B>(TT)
 /**
  * Modify polymorphically the target of a [PTraversal] with an Applicative function
  */

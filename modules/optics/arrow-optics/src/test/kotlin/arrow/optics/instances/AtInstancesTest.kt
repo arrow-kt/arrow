@@ -1,14 +1,12 @@
 package arrow.optics.instances
 
 import arrow.core.Option
-import arrow.data.ListKW
 import arrow.data.MapKW
 import arrow.data.SetKW
 import arrow.optics.AndMonoid
 import arrow.optics.typeclasses.at
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
-import arrow.test.generators.genListKW
 import arrow.test.generators.genMapKW
 import arrow.test.generators.genOption
 import arrow.test.generators.genSetKW
