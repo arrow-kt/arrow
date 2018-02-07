@@ -2,7 +2,7 @@ package arrow.kindedj;
 
 import org.jetbrains.annotations.NotNull;
 
-import arrow.HK;
+import arrow.Kind;
 
 public class Convert {
     @NotNull

@@ -1,6 +1,6 @@
 package arrow.kindedj
 
-import arrow.HK as HK_K
+import arrow.Kind as HK_K
 
 class ForKatDataclass private constructor()
 
