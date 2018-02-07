@@ -89,6 +89,14 @@ project(":arrow-optics").projectDir = file("modules/optics/arrow-optics")
 include(":arrow-dagger")
 project(":arrow-dagger").projectDir = file("modules/dagger/arrow-dagger")
 
+include(":arrow-dagger-effects")
+project(":arrow-dagger-effects").projectDir = file("modules/dagger/arrow-dagger-effects")
+
+include(":arrow-dagger-effects-rx2")
+project(":arrow-dagger-effects-rx2").projectDir = file("modules/dagger/arrow-dagger-effects-rx2")
+
+include(":arrow-dagger-effects-kotlinx-coroutines")
+project(":arrow-dagger-effects-kotlinx-coroutines").projectDir = file("modules/dagger/arrow-dagger-effects-kotlinx-coroutines")
 
 
 rootProject.name = "arrow-parent"
