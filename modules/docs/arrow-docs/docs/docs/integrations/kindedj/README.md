@@ -24,13 +24,13 @@ It uses an integration construct called `Convert`, alongside several extension f
 
 #### Using KindedJ in Arrow from Kotlin
 
-Using the conversion layer we're capable of using an intermediate representation of any KindedJ datatype generically by converting it into a `HK2<ConvertHK, F, A>`,
+Using the conversion layer we're capable of using an intermediate representation of any KindedJ datatype generically by converting it into a `Kind2<ForConvert, F, A>`,
 where F is the [original representation of the container]({{ '/docs/patterns/glossary' | relative_url }}).
 
 Let's see an example of a Java class defined by a third party:
 
 ```java
-class IdJ<A> implements io.kindedj.Hk<IdJHK, A> {
+class IdJ<A> implements io.kindedj.Hk<ForIdJ, A> {
     public A a;
 }
 ```
@@ -40,18 +40,18 @@ You can convert it to Arrow using the extension function `fromKindedJ()`:
 ```kotlin
 val idj = IdJ(1)
 
-val id: HK2<ConvertHK, IdJHK, A> = idj.fromKindedJ()
+val id: Kind2<ForConvert, ForIdJ, A> = idj.fromKindedJ()
 ```
 
 and convert it back using `fromArrow()`:
 
 ```kotlin
-val idj2: io.kindedj.Hk<IdJHK, A> = id.fromArrow()
+val idj2: io.kindedj.Hk<ForIdJ, A> = id.fromArrow()
 ```
 
 #### Using Arrow in KindedJ from Java
 
-Using the conversion layer we're capable of using an intermediate representation of any Arrow datatype generically by converting it into a `io.kindedj.Hk2<ConvertHK, F, A>`,
+Using the conversion layer we're capable of using an intermediate representation of any Arrow datatype generically by converting it into a `io.kindedj.Hk2<ForConvert, F, A>`,
 where F is the [original representation of the container]({{ '/docs/patterns/glossary' | relative_url }}). Note that the typealias `io.kindedj.Hk2` is only available in Kotlin.
 
 Let's see an example using our type [`Id`]({{ '/docs/datatypes/id' | relative_url }}):
@@ -65,7 +65,7 @@ You can convert it to Arrow using the conversion class `Convert.FromArrowToKinde
 ```java
 IdK idk = new IdK(1);
 
-Convert.FromArrowToKindedJ<IdJHK, A> idj = Convert.toKindedJ(idk);
+Convert.FromArrowToKindedJ<ForIdJ, A> idj = Convert.toKindedJ(idk);
 ```
 
 and convert it back using `FromArrowToKindedJ.toArrow()`:

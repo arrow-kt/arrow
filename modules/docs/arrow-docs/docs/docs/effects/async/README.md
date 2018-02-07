@@ -21,14 +21,14 @@ import arrow.syntax.either.*
 IO.async()
   .async { callback: (Either<Throwable, Int>) -> Unit -> 
     callback(1.right()) 
-  }.ev().attempt().unsafeRunSync()
+  }.reify().attempt().unsafeRunSync()
 ```
 
 ```kotlin:ank
 IO.async()
   .async { callback: (Either<Throwable, Int>) -> Unit -> 
     callback(RuntimeException().left()) 
-  }.ev().attempt().unsafeRunSync()
+  }.reify().attempt().unsafeRunSync()
 ```
 
 `Async` includes all combinators present in [`MonadSuspend`]({{ '/docs/effects/monadsuspend/' | relative_url }}).
@@ -97,7 +97,7 @@ Note that there is no automatic error handling or wrapping of exceptions.
 IO.monad().binding {
   val a = bindAsync(IO.async()) { fibonacci(100) }
   a + 1
-}.ev().unsafeRunSync()
+}.reify().unsafeRunSync()
 ```
 
 #### binding#bindAsyncUnsafe
@@ -111,14 +111,14 @@ While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/d
 IO.monad().binding {
   val a = bindAsync(IO.async()) { fibonacci(100).left() }
   a + 1
-}.ev().unsafeRunSync()
+}.reify().unsafeRunSync()
 ```
 
 ```kotlin
 IO.monad().binding {
   val a = bindAsync(IO.async()) { RuntimeException("Boom").right() }
   a + 1
-}.ev().unsafeRunSync()
+}.reify().unsafeRunSync()
 ```
 
 ### Laws
@@ -130,6 +130,6 @@ Arrow provides [`AsyncLaws`]({{ '/docs/typeclasses/laws#asynclaws' | relative_ur
 The following datatypes in Arrow provide instances that adhere to the `Async` typeclass.
 
 - [IO]({{ '/docs/effects/io' | relative_url }})
-- [ObservableKW]({{ '/docs/integrations/rx2' | relative_url }})
-- [FlowableKW]({{ '/docs/integrations/rx2' | relative_url }})
-- [DeferredKW]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }})
+- [ObservableK]({{ '/docs/integrations/rx2' | relative_url }})
+- [FlowableK]({{ '/docs/integrations/rx2' | relative_url }})
+- [DeferredK]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }})

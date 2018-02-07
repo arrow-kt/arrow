@@ -1,8 +1,8 @@
 package arrow.free
 
+import arrow.core.ForId
 import arrow.core.Id
-import arrow.core.IdHK
-import arrow.core.ev
+import arrow.core.reify
 import arrow.core.functor
 import arrow.test.UnitSpec
 import arrow.test.laws.FunctorLaws
@@ -16,16 +16,16 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class YonedaTest : UnitSpec() {
 
-    val F = Yoneda.functor<IdHK>()
+    val F = Yoneda.functor<ForId>()
 
-    val EQ = Eq<YonedaKind<IdHK, Int>> { a, b ->
-        a.ev().lower() == b.ev().lower()
+    val EQ = Eq<YonedaOf<ForId, Int>> { a, b ->
+        a.reify().lower() == b.reify().lower()
     }
 
     init {
 
         "instances can be resolved implicitly" {
-            functor<YonedaKindPartial<IdHK>>() shouldNotBe null
+            functor<YonedaPartialOf<ForId>>() shouldNotBe null
         }
 
         testLaws(FunctorLaws.laws(F, { Yoneda(Id(it)) }, EQ))
@@ -33,8 +33,8 @@ class YonedaTest : UnitSpec() {
         "toCoyoneda should convert to an equivalent Coyoneda" {
             forAll { x: Int ->
                 val op = Yoneda(Id(x.toString()))
-                val toYoneda = op.toCoyoneda().lower(Id.functor()).ev()
-                val expected = Coyoneda(Id(x), Int::toString).lower(Id.functor()).ev()
+                val toYoneda = op.toCoyoneda().lower(Id.functor()).reify()
+                val expected = Coyoneda(Id(x), Int::toString).lower(Id.functor()).reify()
 
                 expected == toYoneda
             }

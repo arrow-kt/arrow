@@ -13,31 +13,31 @@ typealias ReaderFun<D, A> = (D) -> A
  *
  * @see ReaderTHK
  */
-typealias ReaderHK = ReaderTHK
+typealias ForReader = ForReaderT
 
 /**
  * Alias ReaderKind for [ReaderTKind]
  *
  * @see ReaderTKind
  */
-typealias ReaderKind<D, A> = ReaderTKind<IdHK, D, A>
+typealias ReaderOf<D, A> = ReaderTOf<ForId, D, A>
 
 /**
  * Alias to partially apply type parameter [D] to [Reader].
  *
  * @see ReaderTKindPartial
  */
-typealias ReaderKindPartial<D> = ReaderTKindPartial<IdHK, D>
+typealias ReaderPartialOf<D> = ReaderTPartialOf<ForId, D>
 
 /**
  * [Reader] represents a computation that has a dependency on [D].
- * `Reader<D, A>` is an alias for `ReaderT<IdHK, D, A>` and `Kleisli<IdHK, D, A>`.
+ * `Reader<D, A>` is an alias for `ReaderT<ForId, D, A>` and `Kleisli<ForId, D, A>`.
  *
  * @param D the dependency or environment we depend on.
  * @param A resulting type of the computation.
  * @see ReaderT
  */
-typealias Reader<D, A> = ReaderT<IdHK, D, A>
+typealias Reader<D, A> = ReaderT<ForId, D, A>
 
 /**
  * Constructor for [Reader].
@@ -80,7 +80,7 @@ fun <D, A, B> Reader<D, A>.flatMap(f: (A) -> Reader<D, B>): Reader<D, B> = flatM
  *
  * @param ff function that maps [A] to [B] within the [Reader] context.
  */
-fun <D, A, B> Reader<D, A>.ap(ff: ReaderKind<D, (A) -> B>): Reader<D, B> = ap(ff, applicative())
+fun <D, A, B> Reader<D, A>.ap(ff: ReaderOf<D, (A) -> B>): Reader<D, B> = ap(ff, applicative())
 
 /**
  * Zip with another [Reader].
@@ -118,17 +118,17 @@ object ReaderApi {
     /**
      * Alias for[ReaderT.Companion.applicative]
      */
-    fun <D> applicative(): Applicative<ReaderKindPartial<D>> = arrow.typeclasses.applicative()
+    fun <D> applicative(): Applicative<ReaderPartialOf<D>> = arrow.typeclasses.applicative()
 
     /**
      * Alias for [ReaderT.Companion.functor]
      */
-    fun <D> functor(): Functor<ReaderKindPartial<D>> = arrow.typeclasses.functor()
+    fun <D> functor(): Functor<ReaderPartialOf<D>> = arrow.typeclasses.functor()
 
     /**
      * Alias for [ReaderT.Companion.monad]
      */
-    fun <D> monad(): Monad<ReaderKindPartial<D>> = arrow.typeclasses.monad()
+    fun <D> monad(): Monad<ReaderPartialOf<D>> = arrow.typeclasses.monad()
 
     fun <D, A> pure(x: A): Reader<D, A> = ReaderT.pure(x, arrow.typeclasses.monad())
 

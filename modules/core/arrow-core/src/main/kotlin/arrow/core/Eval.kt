@@ -29,12 +29,12 @@ import arrow.higherkind
  * overflows.
  */
 @higherkind
-sealed class Eval<out A> : EvalKind<A> {
+sealed class Eval<out A> : EvalOf<A> {
 
     companion object {
 
-        fun <A, B> tailRecM(a: A, f: (A) -> EvalKind<Either<A, B>>): Eval<B> =
-                f(a).ev().flatMap { eval: Either<A, B> ->
+        fun <A, B> tailRecM(a: A, f: (A) -> EvalOf<Either<A, B>>): Eval<B> =
+                f(a).reify().flatMap { eval: Either<A, B> ->
                     when (eval) {
                         is Either.Left -> tailRecM(eval.a, f)
                         is Either.Right -> pure(eval.b)
@@ -157,29 +157,29 @@ sealed class Eval<out A> : EvalKind<A> {
 
     fun <B> map(f: (A) -> B): Eval<B> = flatMap { a -> Now(f(a)) }
 
-    fun <B> ap(ff: EvalKind<(A) -> B>): Eval<B> = ff.ev().flatMap { f -> map(f) }.ev()
+    fun <B> ap(ff: EvalOf<(A) -> B>): Eval<B> = ff.reify().flatMap { f -> map(f) }.reify()
 
-    fun <B> flatMap(f: (A) -> EvalKind<B>): Eval<B> =
+    fun <B> flatMap(f: (A) -> EvalOf<B>): Eval<B> =
             when (this) {
                 is FlatMap<A> -> object : FlatMap<B>() {
                     override fun <S> start(): Eval<S> = (this@Eval).start()
                     override fun <S> run(s: S): Eval<B> =
                             object : FlatMap<B>() {
                                 override fun <S1> start(): Eval<S1> = (this@Eval).run(s) as Eval<S1>
-                                override fun <S1> run(s1: S1): Eval<B> = f(s1 as A).ev()
+                                override fun <S1> run(s1: S1): Eval<B> = f(s1 as A).reify()
                             }
                 }
                 is Defer<A> -> object : FlatMap<B>() {
                     override fun <S> start(): Eval<S> = this@Eval.thunk() as Eval<S>
-                    override fun <S> run(s: S): Eval<B> = f(s as A).ev()
+                    override fun <S> run(s: S): Eval<B> = f(s as A).reify()
                 }
                 else -> object : FlatMap<B>() {
                     override fun <S> start(): Eval<S> = this@Eval as Eval<S>
-                    override fun <S> run(s: S): Eval<B> = f(s as A).ev()
+                    override fun <S> run(s: S): Eval<B> = f(s as A).reify()
                 }
             }
 
-    fun <B> coflatMap(f: (EvalKind<A>) -> B): Eval<B> = Later { f(this) }
+    fun <B> coflatMap(f: (EvalOf<A>) -> B): Eval<B> = Later { f(this) }
 
     fun extract(): A = value()
 

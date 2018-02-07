@@ -7,14 +7,14 @@ import arrow.higherkind
  * are either an instance of $some or the object $none.
  */
 @higherkind
-sealed class Option<out A> : OptionKind<A> {
+sealed class Option<out A> : OptionOf<A> {
 
     companion object {
 
         fun <A> pure(a: A): Option<A> = Some(a)
 
-        tailrec fun <A, B> tailRecM(a: A, f: (A) -> OptionKind<Either<A, B>>): Option<B> {
-            val option = f(a).ev()
+        tailrec fun <A, B> tailRecM(a: A, f: (A) -> OptionOf<Either<A, B>>): Option<B> {
+            val option = f(a).reify()
             return when (option) {
                 is Some -> {
                     when (option.t) {
@@ -89,9 +89,9 @@ sealed class Option<out A> : OptionKind<A> {
      * @param f the function to apply
      * @see map
      */
-    inline fun <B> flatMap(crossinline f: (A) -> OptionKind<B>): Option<B> = fold({ None }, { a -> f(a) }).ev()
+    inline fun <B> flatMap(crossinline f: (A) -> OptionOf<B>): Option<B> = fold({ None }, { a -> f(a) }).reify()
 
-    fun <B> ap(ff: OptionKind<(A) -> B>): Option<B> = ff.ev().flatMap { this.ev().map(it) }
+    fun <B> ap(ff: OptionOf<(A) -> B>): Option<B> = ff.reify().flatMap { this.reify().map(it) }
 
     /**
      * Returns this $option if it is nonempty '''and''' applying the predicate $p to
@@ -133,7 +133,7 @@ sealed class Option<out A> : OptionKind<A> {
     }
 
     fun <B> foldLeft(b: B, f: (B, A) -> B): B =
-            this.ev().let { option ->
+            this.reify().let { option ->
                 when (option) {
                     is Some -> f(b, option.t)
                     is None -> b
@@ -141,7 +141,7 @@ sealed class Option<out A> : OptionKind<A> {
             }
 
     fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            this.ev().let { option ->
+            this.reify().let { option ->
                 when (option) {
                     is Some -> f(option.t, lb)
                     is None -> lb
@@ -187,10 +187,10 @@ fun <T> Option<T>.getOrElse(default: () -> T): T = fold({ default() }, { it })
  *
  * @param alternative the default option if this is empty.
  */
-fun <A, B : A> OptionKind<B>.orElse(alternative: () -> Option<B>): Option<B> = if (ev().isEmpty()) alternative() else ev()
+fun <A, B : A> OptionOf<B>.orElse(alternative: () -> Option<B>): Option<B> = if (reify().isEmpty()) alternative() else reify()
 
-infix fun <T> OptionKind<T>.or(value: Option<T>): Option<T> = if (ev().isEmpty()) {
+infix fun <T> OptionOf<T>.or(value: Option<T>): Option<T> = if (reify().isEmpty()) {
     value
 } else {
-    ev()
+    reify()
 }

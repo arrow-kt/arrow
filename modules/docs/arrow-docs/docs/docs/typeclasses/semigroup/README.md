@@ -40,7 +40,7 @@ semigroup<Int>().combine(1, 2)
 ```kotlin:ank   
 import arrow.data.*
 
-ListKW.semigroup<Int>().combine(listOf(1, 2, 3).k(), listOf(4, 5, 6).k())
+ListK.semigroup<Int>().combine(listOf(1, 2, 3).k(), listOf(4, 5, 6).k())
 ```
 
 ```kotlin:ank

@@ -1,6 +1,6 @@
 package arrow.effects
 
-import arrow.HK
+import arrow.Kind
 import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
 import arrow.test.laws.AsyncLaws
@@ -16,31 +16,31 @@ import kotlinx.coroutines.experimental.runBlocking
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class DeferredKWTest : UnitSpec() {
-    fun <A> EQ(): Eq<HK<DeferredKWHK, A>> = Eq { a, b ->
+class DeferredKTest : UnitSpec() {
+    fun <A> EQ(): Eq<Kind<ForDeferredK, A>> = Eq { a, b ->
         a.unsafeAttemptSync() == b.unsafeAttemptSync()
     }
 
     init {
-        testLaws(AsyncLaws.laws(DeferredKW.async(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(DeferredK.async(), EQ(), EQ()))
 
         "instances can be resolved implicitly"{
-            functor<DeferredKWHK>() shouldNotBe null
-            applicative<DeferredKWHK>() shouldNotBe null
-            monad<DeferredKWHK>() shouldNotBe null
-            applicativeError<DeferredKWHK, Throwable>() shouldNotBe null
-            monadError<DeferredKWHK, Throwable>() shouldNotBe null
-            monadSuspend<DeferredKWHK>() shouldNotBe null
-            async<DeferredKWHK>() shouldNotBe null
-            effect<DeferredKWHK>() shouldNotBe null
+            functor<ForDeferredK>() shouldNotBe null
+            applicative<ForDeferredK>() shouldNotBe null
+            monad<ForDeferredK>() shouldNotBe null
+            applicativeError<ForDeferredK, Throwable>() shouldNotBe null
+            monadError<ForDeferredK, Throwable>() shouldNotBe null
+            monadSuspend<ForDeferredK>() shouldNotBe null
+            async<ForDeferredK>() shouldNotBe null
+            effect<ForDeferredK>() shouldNotBe null
         }
 
-        "DeferredKW is awaitable" {
+        "DeferredK is awaitable" {
             forAll(genIntSmall(), genIntSmall(), genIntSmall(), { x: Int, y: Int, z: Int ->
                 runBlocking {
-                    val a = DeferredKW { x }.await()
-                    val b = DeferredKW { y + a }.await()
-                    val c = DeferredKW { z + b }.await()
+                    val a = DeferredK { x }.await()
+                    val b = DeferredK { y + a }.await()
+                    val c = DeferredK { z + b }.await()
                     c
                 } == x + y + z
             })
@@ -48,7 +48,7 @@ class DeferredKWTest : UnitSpec() {
 
         "should complete when running a pure value with unsafeRunAsync" {
             val expected = 0
-            DeferredKW.pure(expected).unsafeRunAsync { either ->
+            DeferredK.pure(expected).unsafeRunAsync { either ->
                 either.fold({ fail("") }, { it shouldBe expected })
             }
         }
@@ -56,7 +56,7 @@ class DeferredKWTest : UnitSpec() {
         class MyException : Exception()
 
         "should return an error when running an exception with unsafeRunAsync" {
-            DeferredKW.raiseError<Int>(MyException()).unsafeRunAsync { either ->
+            DeferredK.raiseError<Int>(MyException()).unsafeRunAsync { either ->
                 either.fold({
                     when (it) {
                         is MyException -> {
@@ -69,7 +69,7 @@ class DeferredKWTest : UnitSpec() {
 
         "should return exceptions within main block with unsafeRunAsync" {
             val exception = MyException()
-            val ioa = DeferredKW<Int>(Unconfined, CoroutineStart.DEFAULT) { throw exception }
+            val ioa = DeferredK<Int>(Unconfined, CoroutineStart.DEFAULT) { throw exception }
             ioa.unsafeRunAsync { either ->
                 either.fold({ it shouldBe exception }, { fail("") })
             }
@@ -78,7 +78,7 @@ class DeferredKWTest : UnitSpec() {
         "should not catch exceptions within run block with unsafeRunAsync" {
             try {
                 val exception = MyException()
-                val ioa = DeferredKW<Int>(Unconfined, CoroutineStart.DEFAULT) { throw exception }
+                val ioa = DeferredK<Int>(Unconfined, CoroutineStart.DEFAULT) { throw exception }
                 ioa.unsafeRunAsync { either ->
                     either.fold({ throw exception }, { fail("") })
                 }
@@ -91,25 +91,25 @@ class DeferredKWTest : UnitSpec() {
 
         "should complete when running a pure value with runAsync" {
             val expected = 0
-            DeferredKW.pure(expected).runAsync { either ->
-                either.fold({ fail("") }, { DeferredKW { it shouldBe expected } })
+            DeferredK.pure(expected).runAsync { either ->
+                either.fold({ fail("") }, { DeferredK { it shouldBe expected } })
             }
         }
 
 
         "should complete when running a return value with runAsync" {
             val expected = 0
-            DeferredKW(Unconfined, CoroutineStart.DEFAULT) { expected }.runAsync { either ->
-                either.fold({ fail("") }, { DeferredKW { it shouldBe expected } })
+            DeferredK(Unconfined, CoroutineStart.DEFAULT) { expected }.runAsync { either ->
+                either.fold({ fail("") }, { DeferredK { it shouldBe expected } })
             }
         }
 
         "should return an error when running an exception with runAsync" {
-            DeferredKW.raiseError<Int>(MyException()).runAsync { either ->
+            DeferredK.raiseError<Int>(MyException()).runAsync { either ->
                 either.fold({
                     when (it) {
                         is MyException -> {
-                            DeferredKW { }
+                            DeferredK { }
                         }
                         else -> fail("Should only throw MyException")
                     }
@@ -119,16 +119,16 @@ class DeferredKWTest : UnitSpec() {
 
         "should return exceptions within main block with runAsync" {
             val exception = MyException()
-            val ioa = DeferredKW<Int>(Unconfined, CoroutineStart.DEFAULT) { throw exception }
+            val ioa = DeferredK<Int>(Unconfined, CoroutineStart.DEFAULT) { throw exception }
             ioa.runAsync { either ->
-                either.fold({ DeferredKW { it shouldBe exception } }, { fail("") })
+                either.fold({ DeferredK { it shouldBe exception } }, { fail("") })
             }
         }
 
         "should catch exceptions within run block with runAsync" {
             try {
                 val exception = MyException()
-                val ioa = DeferredKW<Int>(Unconfined, CoroutineStart.DEFAULT) { throw exception }
+                val ioa = DeferredK<Int>(Unconfined, CoroutineStart.DEFAULT) { throw exception }
                 ioa.runAsync { either ->
                     either.fold({ throw it }, { fail("") })
                 }.unsafeRunSync()

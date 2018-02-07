@@ -83,15 +83,15 @@ interface POptional<S, T, A, B> {
     /**
      * Modify the focus of a [POptional] with an Applicative function [f]
      */
-    fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> = getOrModify(s).fold(
+    fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = getOrModify(s).fold(
             FA::pure,
             { FA.map(f(it), { set(s, it) }) }
     )
 
     /**
-     * Lift a function [f]: `(A) -> HK<F, B> to the context of `S`: `(S) -> HK<F, T>`
+     * Lift a function [f]: `(A) -> Kind<F, B> to the context of `S`: `(S) -> Kind<F, T>`
      */
-    fun <F> liftF(FA: Applicative<F>, f: (A) -> HK<F, B>): (S) -> HK<F, T> = { s ->
+    fun <F> liftF(FA: Applicative<F>, f: (A) -> Kind<F, B>): (S) -> Kind<F, T> = { s ->
         modifyF(FA, s, f)
     }
 
@@ -221,7 +221,7 @@ interface POptional<S, T, A, B> {
      * View a [POptional] as a [PTraversal]
      */
     fun asTraversal(): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
-        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
+        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> =
                 this@POptional.modifyF(FA, s, f)
     }
 
@@ -240,13 +240,13 @@ inline fun <S, T, A, B> POptional<S, T, A, B>.lift(crossinline f: (A) -> B): (S)
 /**
  * Modify the focus of a [POptional] with an [Applicative] function [f]
  */
-inline fun <S, T, A, B, reified F> POptional<S, T, A, B>.modifyF(s: S, crossinline f: (A) -> HK<F, B>, FA: Applicative<F> = applicative()): HK<F, T> =
+inline fun <S, T, A, B, reified F> POptional<S, T, A, B>.modifyF(s: S, crossinline f: (A) -> Kind<F, B>, FA: Applicative<F> = applicative()): Kind<F, T> =
         modifyF(FA, s) { a -> f(a) }
 
 /**
- * Lift a function [f]: `(A) -> HK<F, B> to the context of `S`: `(S) -> HK<F, T>` with an [Applicative] function [f]
+ * Lift a function [f]: `(A) -> Kind<F, B> to the context of `S`: `(S) -> Kind<F, T>` with an [Applicative] function [f]
  */
-inline fun <S, T, A, B, reified F> POptional<S, T, A, B>.liftF(crossinline f: (A) -> HK<F, B>, FA: Applicative<F> = applicative()): (S) -> HK<F, T> = liftF(FA) { a -> f(a) }
+inline fun <S, T, A, B, reified F> POptional<S, T, A, B>.liftF(crossinline f: (A) -> Kind<F, B>, FA: Applicative<F> = applicative()): (S) -> Kind<F, T> = liftF(FA) { a -> f(a) }
 
 /**
  * Modify the focus of a [POptional] with a function [f]

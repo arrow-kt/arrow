@@ -1,6 +1,6 @@
 package arrow.dagger.instances
 
-import arrow.data.WriterTKindPartial
+import arrow.data.WriterTPartialOf
 import arrow.instances.*
 import arrow.typeclasses.*
 import dagger.Module
@@ -11,19 +11,19 @@ import javax.inject.Inject
 abstract class WriterTInstances<F, W> {
 
     @Provides
-    fun writerTFunctor(ev: DaggerWriterTFunctorInstance<F, W>): Functor<WriterTKindPartial<F, W>> = ev
+    fun writerTFunctor(ev: DaggerWriterTFunctorInstance<F, W>): Functor<WriterTPartialOf<F, W>> = ev
 
     @Provides
-    fun writerTApplicative(ev: DaggerWriterTApplicativeInstance<F, W>): Applicative<WriterTKindPartial<F, W>> = ev
+    fun writerTApplicative(ev: DaggerWriterTApplicativeInstance<F, W>): Applicative<WriterTPartialOf<F, W>> = ev
 
     @Provides
-    fun writerTMonad(ev: DaggerWriterTMonadInstance<F, W>): Monad<WriterTKindPartial<F, W>> = ev
+    fun writerTMonad(ev: DaggerWriterTMonadInstance<F, W>): Monad<WriterTPartialOf<F, W>> = ev
 
     @Provides
-    fun writerTSemigroupK(ev: DaggerWriterTSemigroupKInstance<F, W>): SemigroupK<WriterTKindPartial<F, W>> = ev
+    fun writerTSemigroupK(ev: DaggerWriterTSemigroupKInstance<F, W>): SemigroupK<WriterTPartialOf<F, W>> = ev
 
     @Provides
-    fun writerTMonoidK(ev: DaggerWriterTSemigroupKInstance<F, W>): SemigroupK<WriterTKindPartial<F, W>> = ev
+    fun writerTMonoidK(ev: DaggerWriterTSemigroupKInstance<F, W>): SemigroupK<WriterTPartialOf<F, W>> = ev
 
 }
 

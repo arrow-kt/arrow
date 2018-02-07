@@ -1,16 +1,16 @@
 package arrow.test.generators
 
 import arrow.typeclasses.Applicative
-import arrow.HK
+import arrow.Kind
 import arrow.typeclasses.applicative
 import arrow.core.*
 import arrow.data.*
 import io.kotlintest.properties.Gen
 import java.util.concurrent.TimeUnit
 
-inline fun <reified F, A> genApplicative(valueGen: Gen<A>, AP: Applicative<F> = applicative<F>()): Gen<HK<F, A>> =
-        object : Gen<HK<F, A>> {
-            override fun generate(): HK<F, A> =
+inline fun <reified F, A> genApplicative(valueGen: Gen<A>, AP: Applicative<F> = applicative<F>()): Gen<Kind<F, A>> =
+        object : Gen<Kind<F, A>> {
+            override fun generate(): Kind<F, A> =
                     AP.pure(valueGen.generate())
         }
 
@@ -35,15 +35,15 @@ fun genThrowable(): Gen<Throwable> = object : Gen<Throwable> {
             Gen.oneOf(listOf(RuntimeException(), NoSuchElementException(), IllegalArgumentException())).generate()
 }
 
-inline fun <F, A> genConstructor(valueGen: Gen<A>, crossinline cf: (A) -> HK<F, A>): Gen<HK<F, A>> =
-        object : Gen<HK<F, A>> {
-            override fun generate(): HK<F, A> =
+inline fun <F, A> genConstructor(valueGen: Gen<A>, crossinline cf: (A) -> Kind<F, A>): Gen<Kind<F, A>> =
+        object : Gen<Kind<F, A>> {
+            override fun generate(): Kind<F, A> =
                     cf(valueGen.generate())
         }
 
-inline fun <F, A, B> genConstructor2(valueGen: Gen<A>, crossinline ff: (A) -> HK<F, (A) -> B>): Gen<HK<F, (A) -> B>> =
-        object : Gen<HK<F, (A) -> B>> {
-            override fun generate(): HK<F, (A) -> B> =
+inline fun <F, A, B> genConstructor2(valueGen: Gen<A>, crossinline ff: (A) -> Kind<F, (A) -> B>): Gen<Kind<F, (A) -> B>> =
+        object : Gen<Kind<F, (A) -> B>> {
+            override fun generate(): Kind<F, (A) -> B> =
                     ff(valueGen.generate())
         }
 
@@ -146,7 +146,7 @@ fun <A> genNonEmptyList(genA: Gen<A>): Gen<NonEmptyList<A>> =
 fun <K, V> genMap(genK: Gen<K>, genV: Gen<V>): Gen<Map<K, V>> =
         Gen.create { Gen.list(genK).generate().map { it to genV.generate() }.toMap() }
 
-fun <K, V> genMapKW(genK: Gen<K>, genV: Gen<V>): Gen<MapKW<K, V>> =
+fun <K, V> genMapK(genK: Gen<K>, genV: Gen<V>): Gen<MapK<K, V>> =
         Gen.create { Gen.list(genK).generate().map { it to genV.generate() }.toMap().k() }
 
 fun genTimeUnit(): Gen<TimeUnit> = object : Gen<TimeUnit> {
@@ -155,16 +155,16 @@ fun genTimeUnit(): Gen<TimeUnit> = object : Gen<TimeUnit> {
     override fun generate(): TimeUnit = units[random.generate()]
 }
 
-fun <A> genListKW(genA: Gen<A>): Gen<ListKW<A>> =
+fun <A> genListK(genA: Gen<A>): Gen<ListK<A>> =
         Gen.create { Gen.list(genA).generate().k() }
 
-fun <A> genSequenceKW(genA: Gen<A>): Gen<SequenceKW<A>> =
+fun <A> genSequenceK(genA: Gen<A>): Gen<SequenceK<A>> =
         Gen.create { Gen.list(genA).generate().asSequence().k() }
 
 fun genChars(): Gen<Char> =
         Gen.oneOf(('A'..'Z') + ('a'..'z') + ('0'..'9') + "!@#$%%^&*()_-~`,<.?/:;}{][±§".toList())
 
-fun <A> genSetKW(genA: Gen<A>): Gen<SetKW<A>> {
+fun <A> genSetK(genA: Gen<A>): Gen<SetK<A>> {
     val genSetA = Gen.set(genA)
     return Gen.create { genSetA.generate().k() }
 }

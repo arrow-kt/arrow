@@ -1,6 +1,6 @@
 package arrow.data
 
-import arrow.HK3
+import arrow.Kind3
 import arrow.core.*
 import arrow.syntax.comonad.extract
 import io.kotlintest.KTestJUnitRunner
@@ -13,17 +13,17 @@ import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class CoproductTest : UnitSpec() {
-    val EQ: Eq<HK3<CoproductHK, IdHK, IdHK, Int>> = Eq { a, b ->
-        a.ev().extract() == b.ev().extract()
+    val EQ: Eq<Kind3<ForCoproduct, ForId, ForId, Int>> = Eq { a, b ->
+        a.reify().extract() == b.reify().extract()
     }
 
     init {
 
         "instances can be resolved implicitly" {
-            functor<CoproductKindPartial<IdHK, NonEmptyListHK>>() shouldNotBe null
-            comonad<CoproductKindPartial<IdHK, NonEmptyListHK>>()  shouldNotBe null
-            foldable<CoproductKindPartial<IdHK, NonEmptyListHK>>() shouldNotBe null
-            traverse<CoproductKindPartial<IdHK, NonEmptyListHK>>() shouldNotBe null
+            functor<CoproductPartialOf<ForId, ForNonEmptyList>>() shouldNotBe null
+            comonad<CoproductPartialOf<ForId, ForNonEmptyList>>()  shouldNotBe null
+            foldable<CoproductPartialOf<ForId, ForNonEmptyList>>() shouldNotBe null
+            traverse<CoproductPartialOf<ForId, ForNonEmptyList>>() shouldNotBe null
         }
 
         testLaws(

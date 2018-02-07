@@ -8,10 +8,10 @@ permalink: /docs/optics/setter/
 
 A `Setter` is an optic that can see into a structure and set or modify its focus.
 
-It is a generalisation of [`Functor#map`](/docs/typeclasses/functor). Given a `Functor<F>` we can apply a function `(A) -> B` to `HK<F, A>` and get `HK<F, B>`. We can think of `HK<F, A>` as a structure `S` that has a focus `A`.
+It is a generalisation of [`Functor#map`](/docs/typeclasses/functor). Given a `Functor<F>` we can apply a function `(A) -> B` to `Kind<F, A>` and get `Kind<F, B>`. We can think of `Kind<F, A>` as a structure `S` that has a focus `A`.
 So given a `PSetter<S, T, A, B>` we can apply a function `(A) -> B` to `S` and get `T`.
 
-- `Functor.map(fa: HK<F, A>, f: (A) -> B) -> HK<F, B>`
+- `Functor.map(fa: Kind<F, A>, f: (A) -> B) -> Kind<F, B>`
 - `PSetter.modify(s: S, f: (A) -> B): T`
 
 You can get a `Setter` for any existing `Functor`.
@@ -21,7 +21,7 @@ import arrow.*
 import arrow.optics.*
 import arrow.data.*
 
-val setter: Setter<ListKWKind<Int>, Int> = Setter.fromFunctor()
+val setter: Setter<ListKOf<Int>, Int> = Setter.fromFunctor()
 setter.set(listOf(1, 2, 3, 4).k(), 5)
 ```
 ```kotlin:ank
@@ -77,11 +77,11 @@ val barSetter: Setter<Bar, Foo> = Setter { modifyFoo ->
 ### Polymorphic setter
 
 When dealing with polymorphic types we can also have polymorphic setters that allow us to morph the type of the focus.
-Previously when we used a `Setter<ListKWKind<Int>, Int>` it was able to morph the `Int` values in the constructed type `ListKW<Int>`.
-With a `PSetter<ListKWKind<Int>, ListKWKind<String>, Int, String>` we can morph an `Int` value to a `String` value and thus also morph the type from `ListKW<Int>` to `ListKW<String>`.
+Previously when we used a `Setter<ListKOf<Int>, Int>` it was able to morph the `Int` values in the constructed type `ListK<Int>`.
+With a `PSetter<ListKOf<Int>, ListKOf<String>, Int, String>` we can morph an `Int` value to a `String` value and thus also morph the type from `ListK<Int>` to `ListK<String>`.
 
 ```kotlin:ank
-val pSetter: PSetter<ListKWKind<Int>, ListKWKind<String>, Int, String> = PSetter.fromFunctor()
+val pSetter: PSetter<ListKOf<Int>, ListKOf<String>, Int, String> = PSetter.fromFunctor()
 pSetter.set(listOf(1, 2, 3, 4).k(), "Constant")
 ```
 ```kotlin:ank

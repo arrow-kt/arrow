@@ -5,40 +5,40 @@ import arrow.core.*
 import arrow.data.*
 import arrow.typeclasses.*
 import arrow.optics.Traversal
-import arrow.optics.listToListKW
+import arrow.optics.listToListK
 import arrow.optics.stringToList
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.filterIndex
 
-@instance(ListKW::class)
-interface ListKWFilterIndexInstance<A> : FilterIndex<ListKWKind<A>, Int, A> {
-    override fun filter(p: (Int) -> Boolean): Traversal<ListKWKind<A>, A> = FilterIndex.fromTraverse<ListKWHK, A>({ aas ->
-        aas.ev().mapIndexed { index, a -> a toT index }.k()
-    }, ListKW.traverse()).filter(p)
+@instance(ListK::class)
+interface ListKFilterIndexInstance<A> : FilterIndex<ListKOf<A>, Int, A> {
+    override fun filter(p: (Int) -> Boolean): Traversal<ListKOf<A>, A> = FilterIndex.fromTraverse<ForListK, A>({ aas ->
+        aas.reify().mapIndexed { index, a -> a toT index }.k()
+    }, ListK.traverse()).filter(p)
 }
 
 @instance(NonEmptyList::class)
-interface NonEmptyListFilterIndexInstance<A> : FilterIndex<NonEmptyListKind<A>, Int, A> {
-    override fun filter(p: (Int) -> Boolean): Traversal<NonEmptyListKind<A>, A> = FilterIndex.fromTraverse<NonEmptyListHK, A>({ aas ->
-        aas.ev().all.mapIndexed { index, a -> a toT index }.let {
+interface NonEmptyListFilterIndexInstance<A> : FilterIndex<NonEmptyListOf<A>, Int, A> {
+    override fun filter(p: (Int) -> Boolean): Traversal<NonEmptyListOf<A>, A> = FilterIndex.fromTraverse<ForNonEmptyList, A>({ aas ->
+        aas.reify().all.mapIndexed { index, a -> a toT index }.let {
             NonEmptyList.fromListUnsafe(it)
         }
     }, NonEmptyList.traverse()).filter(p)
 }
 
-@instance(SequenceKW::class)
-interface SequenceKWFilterIndexInstance<A> : FilterIndex<SequenceKWKind<A>, Int, A> {
-    override fun filter(p: (Int) -> Boolean): Traversal<SequenceKWKind<A>, A> = FilterIndex.fromTraverse<SequenceKWHK, A>({ aas ->
-        aas.ev().mapIndexed { index, a -> a toT index }.k()
-    }, SequenceKW.traverse()).filter(p)
+@instance(SequenceK::class)
+interface SequenceKFilterIndexInstance<A> : FilterIndex<SequenceKOf<A>, Int, A> {
+    override fun filter(p: (Int) -> Boolean): Traversal<SequenceKOf<A>, A> = FilterIndex.fromTraverse<ForSequenceK, A>({ aas ->
+        aas.reify().mapIndexed { index, a -> a toT index }.k()
+    }, SequenceK.traverse()).filter(p)
 }
 
-@instance(MapKW::class)
-interface MapKWFilterIndexInstance<K, V> : FilterIndex<MapKWKind<K, V>, K, V> {
+@instance(MapK::class)
+interface MapKFilterIndexInstance<K, V> : FilterIndex<MapKOf<K, V>, K, V> {
 
-    override fun filter(p: (K) -> Boolean): Traversal<MapKWKind<K, V>, V> = object : Traversal<MapKWKind<K, V>, V> {
-        override fun <F> modifyF(FA: Applicative<F>, s: HK<HK<MapKWHK, K>, V>, f: (V) -> HK<F, V>): HK<F, HK<HK<MapKWHK, K>, V>> =
-                ListKW.traverse().traverse(s.ev().map.toList().k(), { (k, v) ->
+    override fun filter(p: (K) -> Boolean): Traversal<MapKOf<K, V>, V> = object : Traversal<MapKOf<K, V>, V> {
+        override fun <F> modifyF(FA: Applicative<F>, s: Kind<Kind<ForMapK, K>, V>, f: (V) -> Kind<F, V>): Kind<F, Kind<Kind<ForMapK, K>, V>> =
+                ListK.traverse().traverse(s.reify().map.toList().k(), { (k, v) ->
                     FA.map(if (p(k)) f(v) else FA.pure(v)) {
                         k to it
                     }
@@ -53,7 +53,7 @@ interface MapKWFilterIndexInstance<K, V> : FilterIndex<MapKWKind<K, V>, K, V> {
 
 object StringFilterIndexInstance : FilterIndex<String, Int, Char> {
     override fun filter(p: (Int) -> Boolean): Traversal<String, Char> =
-            stringToList compose listToListKW() compose filterIndex<ListKW<Char>, Int, Char>().filter(p)
+            stringToList compose listToListK() compose filterIndex<ListK<Char>, Int, Char>().filter(p)
 }
 
 object StringFilterIndexInstanceImplicits {

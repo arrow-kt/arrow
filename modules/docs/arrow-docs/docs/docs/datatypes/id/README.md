@@ -30,5 +30,5 @@ Available Instances:
 ```kotlin:ank
 import arrow.debug.*
 
-showInstances<IdHK, Unit>()
+showInstances<ForId, Unit>()
 ```

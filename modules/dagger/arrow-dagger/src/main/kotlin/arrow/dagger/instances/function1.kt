@@ -1,8 +1,12 @@
 package arrow.dagger.instances
 
-import arrow.data.Function1KindPartial
-import arrow.instances.*
-import arrow.typeclasses.*
+import arrow.data.Function1PartialOf
+import arrow.instances.Function1ApplicativeInstance
+import arrow.instances.Function1FunctorInstance
+import arrow.instances.Function1MonadInstance
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
 import dagger.Module
 import dagger.Provides
 import javax.inject.Inject
@@ -11,13 +15,13 @@ import javax.inject.Inject
 abstract class Function1Instances<F> {
 
     @Provides
-    fun function1Functor(ev: DaggerFunction1FunctorInstance<F>): Functor<Function1KindPartial<F>> = ev
+    fun function1Functor(ev: DaggerFunction1FunctorInstance<F>): Functor<Function1PartialOf<F>> = ev
 
     @Provides
-    fun function1Applicative(ev: DaggerFunction1ApplicativeInstance<F>): Applicative<Function1KindPartial<F>> = ev
+    fun function1Applicative(ev: DaggerFunction1ApplicativeInstance<F>): Applicative<Function1PartialOf<F>> = ev
 
     @Provides
-    fun function1Monad(ev: DaggerFunction1MonadInstance<F>): Monad<Function1KindPartial<F>> = ev
+    fun function1Monad(ev: DaggerFunction1MonadInstance<F>): Monad<Function1PartialOf<F>> = ev
 
 }
 

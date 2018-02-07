@@ -3,7 +3,7 @@ package arrow.optics
 import arrow.core.Either
 import arrow.core.Option
 import arrow.core.applicative
-import arrow.core.ev
+import arrow.core.reify
 import arrow.core.monoid
 import arrow.instances.IntMonoid
 import arrow.syntax.either.right
@@ -62,7 +62,7 @@ class OptionInstancesTest : UnitSpec() {
                 EQB = Eq.any(),
                 bMonoid = object : Monoid<Either<Unit, Int>> {
                     override fun combine(a: Either<Unit, Int>, b: Either<Unit, Int>): Either<Unit, Int> =
-                            Either.applicative<Unit>().map2(a, b) { (a, b) -> a + b }.ev()
+                            Either.applicative<Unit>().map2(a, b) { (a, b) -> a + b }.reify()
 
                     override fun empty(): Either<Unit, Int> = 0.right()
                 }

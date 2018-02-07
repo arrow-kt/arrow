@@ -17,8 +17,8 @@ object MonadWriterLaws {
                                            MOW: Monoid<W> = monoid<W>(),
                                            genW: Gen<W>,
                                            genTupleWA: Gen<Tuple2<W, Int>>,
-                                           EqInt: Eq<HK<F, Int>>,
-                                           EqTupleWA: Eq<HK<F, Tuple2<W, Int>>>): List<Law> =
+                                           EqInt: Eq<Kind<F, Int>>,
+                                           EqTupleWA: Eq<Kind<F, Tuple2<W, Int>>>): List<Law> =
 
             MonadLaws.laws(MF, EqInt) + listOf(
                     Law("Monad Writer Laws: writer pure", { monadWriterWriterPure(MW, MOW, EqInt) }),
@@ -28,7 +28,7 @@ object MonadWriterLaws {
 
     inline fun <reified F, reified W> monadWriterWriterPure(MW: MonadWriter<F, W>,
                                                             MOW: Monoid<W> = monoid<W>(),
-                                                            EQ: Eq<HK<F, Int>>): Unit {
+                                                            EQ: Eq<Kind<F, Int>>): Unit {
         forAll(Gen.int(), { a: Int ->
             MW.writer(Tuple2(MOW.empty(), a)).equalUnderTheLaw(MW.pure(a), EQ)
         })
@@ -44,7 +44,7 @@ object MonadWriterLaws {
 
     inline fun <reified F, reified W> monadWriterListenPure(MW: MonadWriter<F, W>,
                                                             MOW: Monoid<W> = monoid<W>(),
-                                                            EqTupleWA: Eq<HK<F, Tuple2<W, Int>>>): Unit {
+                                                            EqTupleWA: Eq<Kind<F, Tuple2<W, Int>>>): Unit {
         forAll(Gen.int(), { a: Int ->
             MW.listen(MW.pure(a)).equalUnderTheLaw(MW.pure(Tuple2(MOW.empty(), a)), EqTupleWA)
         })
@@ -52,7 +52,7 @@ object MonadWriterLaws {
 
     fun <F, W> monadWriterListenWriter(genTupleWA: Gen<Tuple2<W, Int>>,
                                        MW: MonadWriter<F, W>,
-                                       EqTupleWA: Eq<HK<F, Tuple2<W, Int>>>): Unit {
+                                       EqTupleWA: Eq<Kind<F, Tuple2<W, Int>>>): Unit {
         forAll(genTupleWA, { tupleWA: Tuple2<W, Int> ->
             MW.listen(MW.writer(tupleWA)).equalUnderTheLaw(MW.map(MW.tell(tupleWA.a), { tupleWA }), EqTupleWA)
         })

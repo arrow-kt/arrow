@@ -8,15 +8,15 @@ permalink: /docs/datatypes/optiont/
 
 `OptionT` also known as the `Option` monad transformer allows to compute inside the context when `Option` is nested in a different monad.
 
-One issue we face with monads is that they don't compose. This can cause your code to get really hairy when trying to combine structures like `ObservableKW` and `Option`. But there's a simple solution, and we're going to explain how you can use Monad Transformers to alleviate this problem.
+One issue we face with monads is that they don't compose. This can cause your code to get really hairy when trying to combine structures like `ObservableK` and `Option`. But there's a simple solution, and we're going to explain how you can use Monad Transformers to alleviate this problem.
 
 For our purposes here, we're going to utilize a monad that serves as a container that may hold a value and where a computation can be performed.
 
-Given that both `ObservableKW<A>` and `Option<A>` would be examples of datatypes that provide instances for the `Monad` typeclasses.
+Given that both `ObservableK<A>` and `Option<A>` would be examples of datatypes that provide instances for the `Monad` typeclasses.
 
-Because [monads don't compose](http://tonymorris.github.io/blog/posts/monads-do-not-compose/), we may end up with nested structures such as `ObservableKW<Option<ObservableKW<Option<A>>>` when using `ObservableKW` and `Option` together. Using Monad Transformers can help us to reduce this boilerplate.
+Because [monads don't compose](http://tonymorris.github.io/blog/posts/monads-do-not-compose/), we may end up with nested structures such as `ObservableK<Option<ObservableK<Option<A>>>` when using `ObservableK` and `Option` together. Using Monad Transformers can help us to reduce this boilerplate.
 
-In the most basic of scenarios, we'll only be dealing with one monad at a time making our lives nice and easy. However, it's not uncommon to get into scenarios where some function calls will return `ObservableKW<A>`, and others will return `Option<A>`.
+In the most basic of scenarios, we'll only be dealing with one monad at a time making our lives nice and easy. However, it's not uncommon to get into scenarios where some function calls will return `ObservableK<A>`, and others will return `Option<A>`.
 
 So let's test this out with an example:
 
@@ -53,7 +53,7 @@ fun getCountryCode(maybePerson : Option<Person>): Option<String> =
     val country = address.country.bind()
     val code = country.code.bind()
     code
-  }.ev()
+  }.reify()
 ```
 
 Alright, a piece of cake right? That's because we were dealing with a simple type `Option`. But here's where things can get more complicated. Let's introduce another monad in the middle of the computation. For example what happens when we need to load a person by id, then their address and country to obtain the country code from a remote service?
@@ -89,16 +89,16 @@ val adressDB: Map<Int, Address> = mapOf(
 )
 ```
 
-Now we've got two new functions in the mix that are going to call a remote service, and they return a `ObservableKW`. This is common in most APIs that handle loading asynchronously.
+Now we've got two new functions in the mix that are going to call a remote service, and they return a `ObservableK`. This is common in most APIs that handle loading asynchronously.
 
 ```kotlin:ank
 import arrow.effects.*
 
-fun findPerson(personId : Int) : ObservableKW<Option<Person>> =
-  ObservableKW.pure(Option.fromNullable(personDB.get(personId))) //mock impl for simplicity
+fun findPerson(personId : Int) : ObservableK<Option<Person>> =
+  ObservableK.pure(Option.fromNullable(personDB.get(personId))) //mock impl for simplicity
 
-fun findCountry(addressId : Int) : ObservableKW<Option<Country>> =
-  ObservableKW.pure(
+fun findCountry(addressId : Int) : ObservableK<Option<Country>> =
+  ObservableK.pure(
     Option.fromNullable(adressDB.get(addressId)).flatMap { it.country }
   ) //mock impl for simplicity
 
@@ -125,36 +125,36 @@ lifted
 ```
 
 
-This isn't actually what we want since the inferred return type is `ObservableKW<Option<Option<ObservableKW<Option<Option<String>>>>>>`. We can't use flatMap in this case because the nested expression does not match the return type of the expression they're contained within. This is because we're not flatMapping properly over the nested types.
+This isn't actually what we want since the inferred return type is `ObservableK<Option<Option<ObservableK<Option<Option<String>>>>>>`. We can't use flatMap in this case because the nested expression does not match the return type of the expression they're contained within. This is because we're not flatMapping properly over the nested types.
 
  Still not ideal. The levels of nesting are pyramidal with `flatMap` and `map` and are as deep as the number of operations that you have to perform.
 
 Let's look at how a similar implementation would look like using monad comprehensions without transformers:
 
 ```kotlin:ank
-fun getCountryCode(personId: Int): ObservableKW<Option<String>> =
-      ObservableKW.monad().binding {
+fun getCountryCode(personId: Int): ObservableK<Option<String>> =
+      ObservableK.monad().binding {
         val maybePerson = findPerson(personId).bind()
         val person = maybePerson.fold(
-          { ObservableKW.raiseError<Person>(NoSuchElementException("...")) },
-          { ObservableKW.pure(it) }
+          { ObservableK.raiseError<Person>(NoSuchElementException("...")) },
+          { ObservableK.pure(it) }
         ).bind()
         val address = person.address.fold(
-          { ObservableKW.raiseError<Address>(NoSuchElementException("...")) },
-          { ObservableKW.pure(it) }
+          { ObservableK.raiseError<Address>(NoSuchElementException("...")) },
+          { ObservableK.pure(it) }
         ).bind()
         val maybeCountry = findCountry(address.id).bind()
         val country = maybeCountry.fold(
-          { ObservableKW.raiseError<Country>(NoSuchElementException("...")) },
-          { ObservableKW.pure(it) }
+          { ObservableK.raiseError<Country>(NoSuchElementException("...")) },
+          { ObservableK.pure(it) }
         ).bind()
         country.code
-      }.ev()
+      }.reify()
 ```
 
-While we've got the logic working now, we're in a situation where we're forced to deal with the `None cases`. We also have a ton of boilerplate type conversion with `fold`. The type conversion is necessary because in a monad comprehension you can only use a type of Monad. If we start with `ObservableKW`, we have to stay in it’s monadic context by lifting anything we compute sequentially to a `ObservableKW` whether or not it's async.
+While we've got the logic working now, we're in a situation where we're forced to deal with the `None cases`. We also have a ton of boilerplate type conversion with `fold`. The type conversion is necessary because in a monad comprehension you can only use a type of Monad. If we start with `ObservableK`, we have to stay in it’s monadic context by lifting anything we compute sequentially to a `ObservableK` whether or not it's async.
 
-This is a commonly encountered problem, especially in the context of async services. So how can we reconcile the fact that we're mixing `Option` and `ObservableKW`?
+This is a commonly encountered problem, especially in the context of async services. So how can we reconcile the fact that we're mixing `Option` and `ObservableK`?
 
 ### Monad Transformers to the Rescue!
 
@@ -164,7 +164,7 @@ from Arrow to express the effect of potential absence inside our async computati
 `OptionT` has the form of `OptionT<F, A>`.
 
 This means that for any monad `F` surrounding an `Option<A>` we can obtain an `OptionT<F, A>`.
-So our specialization `OptionT<ObservableKWHK, A>` is the OptionT transformer around values that are of `ObservableKW<Option<A>>`.
+So our specialization `OptionT<ForObservableK, A>` is the OptionT transformer around values that are of `ObservableK<Option<A>>`.
 
 We can now lift any value to a `OptionT<F, A>` which looks like this:
 
@@ -172,18 +172,18 @@ We can now lift any value to a `OptionT<F, A>` which looks like this:
 import arrow.syntax.applicative.*
 import arrow.data.*
 
-val optTVal = 1.pure<OptionTKindPartial<ObservableKWHK>, Int>()
+val optTVal = 1.pure<OptionTPartialOf<ForObservableK>, Int>()
 optTVal
 ```
 
 or
 
 ```kotlin:ank
-val optTVal = OptionT.fromOption<ObservableKWHK, Int>(Some(1))
+val optTVal = OptionT.fromOption<ForObservableK, Int>(Some(1))
 optTVal
 ```
 
-And back to the `ObservableKW<Option<A>>` running the transformer
+And back to the `ObservableK<Option<A>>` running the transformer
 
 ```kotlin:ank
 optTVal.value()
@@ -192,24 +192,24 @@ optTVal.value()
 So how would our function look if we implemented it with the OptionT monad transformer?
 
 ```kotlin
-fun getCountryCode(personId: Int): ObservableKW<Option<String>> =
-  OptionT.monad<ObservableKWHK>().binding {
+fun getCountryCode(personId: Int): ObservableK<Option<String>> =
+  OptionT.monad<ForObservableK>().binding {
     val person = OptionT(findPerson(personId)).bind()
-    val address = OptionT(ObservableKW.pure(person.address)).bind()
+    val address = OptionT(ObservableK.pure(person.address)).bind()
     val country = OptionT(findCountry(address.id)).bind()
-    val code = OptionT(ObservableKW.pure(country.code)).bind()
+    val code = OptionT(ObservableK.pure(country.code)).bind()
     code
-  }.value().ev()
+  }.value().reify()
 ```
 
-Here we no longer have to deal with the `None` cases, and the binding to the values on the left side are already the underlying values we want to focus on instead of the optional values. We have automatically `flatMapped` through the `ObservableKW` and `Option` in a single expression reducing the boilerplate and encoding the effects concerns in the type signatures.
+Here we no longer have to deal with the `None` cases, and the binding to the values on the left side are already the underlying values we want to focus on instead of the optional values. We have automatically `flatMapped` through the `ObservableK` and `Option` in a single expression reducing the boilerplate and encoding the effects concerns in the type signatures.
 
 Available Instances:
 
 ```kotlin:ank
 import arrow.debug.*
 
-showInstances<OptionTKindPartial<ObservableKWHK>, Unit>()
+showInstances<OptionTPartialOf<ForObservableK>, Unit>()
 ```
 
 Take a look at the [`EitherT` docs]({{ '/docs/datatypes/eithert' | relative_url }}) for an alternative version of this content with the `EitherT` monad transformer

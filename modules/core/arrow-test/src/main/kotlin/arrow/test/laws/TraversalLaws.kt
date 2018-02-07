@@ -4,7 +4,7 @@ import arrow.typeclasses.Eq
 import arrow.core.Option
 import arrow.core.compose
 import arrow.core.identity
-import arrow.data.ListKW
+import arrow.data.ListK
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.optics.Traversal
@@ -14,7 +14,7 @@ import arrow.typeclasses.eq
 
 object TraversalLaws {
 
-    inline fun <reified A, reified B : Any> laws(traversal: Traversal<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A> = eq(), EQOptionB: Eq<Option<B>> = eq(), EQListB: Eq<ListKW<B>> = eq()) = listOf(
+    inline fun <reified A, reified B : Any> laws(traversal: Traversal<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A> = eq(), EQOptionB: Eq<Option<B>> = eq(), EQListB: Eq<ListK<B>> = eq()) = listOf(
             Law("Traversal law: head option", { headOption(traversal, aGen, EQOptionB) }),
             Law("Traversal law: modify get all", { modifyGetAll(traversal, aGen, funcGen, EQListB) }),
             Law("Traversal law: set is idempotent", { setIdempotent(traversal, aGen, bGen, EQA) }),
@@ -28,7 +28,7 @@ object TraversalLaws {
                         .equalUnderTheLaw(traversal.getAll(a).firstOption(), EQOptionB)
             })
 
-    inline fun <reified A, reified B> modifyGetAll(traversal: Traversal<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQListB: Eq<ListKW<B>>): Unit =
+    inline fun <reified A, reified B> modifyGetAll(traversal: Traversal<A, B>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQListB: Eq<ListK<B>>): Unit =
             forAll(aGen, funcGen, { a, f ->
                 traversal.getAll(traversal.modify(a, f))
                         .equalUnderTheLaw(traversal.getAll(a).map(f), EQListB)

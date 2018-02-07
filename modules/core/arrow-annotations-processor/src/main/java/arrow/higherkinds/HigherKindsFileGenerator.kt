@@ -7,9 +7,9 @@ import org.jetbrains.kotlin.serialization.ProtoBuf
 import java.io.File
 import javax.lang.model.element.Name
 
-val KindPostFix = "Kind"
+val KindPostFix = "Of"
 val KindedJPostFix = "KindedJ"
-val HKMarkerPostFix = "HK"
+val HKMarkerPreFix = "For"
 
 data class HigherKind(
         val `package`: Package,
@@ -17,7 +17,7 @@ data class HigherKind(
 ) {
     val tparams: List<ProtoBuf.TypeParameter> = target.classOrPackageProto.typeParameters
     val kindName: Name = target.classElement.simpleName
-    val alias: String = if (tparams.size == 1) "arrow.HK" else "arrow.HK${tparams.size}"
+    val alias: String = if (tparams.size == 1) "arrow.Kind" else "arrow.Kind${tparams.size}"
     val aliasJ: String = if (tparams.size == 1) "io.kindedj.Hk" else "io.kindedj.HkJ${tparams.size}"
     val typeArgs: List<String> = target.classOrPackageProto.typeParameters.map { target.classOrPackageProto.nameResolver.getString(it.name) }
     val expandedTypeArgs: String = target.classOrPackageProto.typeParameters.joinToString(
@@ -25,7 +25,7 @@ data class HigherKind(
     val typeConstraints = target.classOrPackageProto.typeConstraints()
     val name: String = "${kindName}$KindPostFix"
     val nameJ: String = "${kindName}$KindedJPostFix"
-    val markerName = "${kindName}$HKMarkerPostFix"
+    val markerName = "$HKMarkerPreFix${kindName}"
 }
 
 class HigherKindsFileGenerator(
@@ -60,8 +60,8 @@ class HigherKindsFileGenerator(
     private fun genPartiallyAppliedKinds(hk: HigherKind): String {
         val appliedTypeArgs = hk.typeArgs.dropLast(1)
         val expandedAppliedTypeArgs = appliedTypeArgs.joinToString(", ")
-        val hkimpl = if (appliedTypeArgs.size == 1) "arrow.HK" else "arrow.HK${appliedTypeArgs.size}"
-        return "typealias ${hk.name}Partial<$expandedAppliedTypeArgs> = $hkimpl<${hk.markerName}, $expandedAppliedTypeArgs>"
+        val hkimpl = if (appliedTypeArgs.size == 1) "arrow.Kind" else "arrow.Kind${appliedTypeArgs.size}"
+        return "typealias ${hk.name.replace("Of$".toRegex(), { "PartialOf" })}<$expandedAppliedTypeArgs> = $hkimpl<${hk.markerName}, $expandedAppliedTypeArgs>"
     }
 
     private fun genKindedJTypeAliases(hk: HigherKind): String =
@@ -77,7 +77,7 @@ class HigherKindsFileGenerator(
     private fun genEv(hk: HigherKind): String =
             """
             |@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-            |inline fun <${hk.expandedTypeArgs}> ${hk.name}<${hk.expandedTypeArgs}>.ev(): ${hk.kindName}<${hk.expandedTypeArgs}>${hk.typeConstraints} =
+            |inline fun <${hk.expandedTypeArgs}> ${hk.name}<${hk.expandedTypeArgs}>.reify(): ${hk.kindName}<${hk.expandedTypeArgs}>${hk.typeConstraints} =
             |  this as ${hk.kindName}<${hk.expandedTypeArgs}>
         """.trimMargin()
 

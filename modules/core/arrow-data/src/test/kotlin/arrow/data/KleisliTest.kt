@@ -12,29 +12,29 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class KleisliTest : UnitSpec() {
-    private fun <A> EQ(): Eq<KleisliKind<TryHK, Int, A>> = Eq { a, b ->
-        a.ev().run(1) == b.ev().run(1)
+    private fun <A> EQ(): Eq<KleisliOf<ForTry, Int, A>> = Eq { a, b ->
+        a.reify().run(1) == b.reify().run(1)
     }
 
     init {
 
         "instances can be resolved implicitly" {
-            functor<KleisliKindPartial<IdHK, Int>>() shouldNotBe null
-            applicative<KleisliKindPartial<IdHK, Int>>() shouldNotBe null
-            monad<KleisliKindPartial<IdHK, Int>>() shouldNotBe null
-            monadReader<KleisliKindPartial<IdHK, Int>, Int>() shouldNotBe null
-            applicativeError<KleisliKindPartial<EitherHK, Int>, Throwable>() shouldNotBe null
-            monadError<KleisliKindPartial<EitherHK, Int>, Throwable>() shouldNotBe null
+            functor<KleisliPartialOf<ForId, Int>>() shouldNotBe null
+            applicative<KleisliPartialOf<ForId, Int>>() shouldNotBe null
+            monad<KleisliPartialOf<ForId, Int>>() shouldNotBe null
+            monadReader<KleisliPartialOf<ForId, Int>, Int>() shouldNotBe null
+            applicativeError<KleisliPartialOf<ForEither, Int>, Throwable>() shouldNotBe null
+            monadError<KleisliPartialOf<ForEither, Int>, Throwable>() shouldNotBe null
         }
 
-        testLaws(MonadErrorLaws.laws(Kleisli.monadError<TryHK, Int, Throwable>(Try.monadError()), EQ(), EQ()))
+        testLaws(MonadErrorLaws.laws(Kleisli.monadError<ForTry, Int, Throwable>(Try.monadError()), EQ(), EQ()))
 
         "andThen should continue sequence" {
-            val kleisli: Kleisli<IdHK, Int, Int> = Kleisli({ a: Int -> Id(a) })
+            val kleisli: Kleisli<ForId, Int, Int> = Kleisli({ a: Int -> Id(a) })
 
-            kleisli.andThen(Id(3), Id.monad()).run(0).ev().value shouldBe 3
+            kleisli.andThen(Id(3), Id.monad()).run(0).reify().value shouldBe 3
 
-            kleisli.andThen({ b -> Id(b + 1) }, Id.monad()).run(0).ev().value shouldBe 1
+            kleisli.andThen({ b -> Id(b + 1) }, Id.monad()).run(0).reify().value shouldBe 1
         }
     }
 }

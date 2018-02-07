@@ -1,6 +1,6 @@
 package arrow.dagger.instances
 
-import arrow.data.StateTKindPartial
+import arrow.data.StateTPartialOf
 import arrow.instances.StateTApplicativeInstance
 import arrow.instances.StateTFunctorInstance
 import arrow.instances.StateTMonadErrorInstance
@@ -14,19 +14,19 @@ import javax.inject.Inject
 abstract class StateTInstances<F, S> {
 
     @Provides
-    fun stateTFunctor(ev: DaggerStateTFunctorInstance<F, S>): Functor<StateTKindPartial<F, S>> = ev
+    fun stateTFunctor(ev: DaggerStateTFunctorInstance<F, S>): Functor<StateTPartialOf<F, S>> = ev
 
     @Provides
-    fun stateTApplicative(ev: DaggerStateTApplicativeInstance<F, S>): Applicative<StateTKindPartial<F, S>> = ev
+    fun stateTApplicative(ev: DaggerStateTApplicativeInstance<F, S>): Applicative<StateTPartialOf<F, S>> = ev
 
     @Provides
-    fun stateTMonad(ev: DaggerStateTMonadInstance<F, S>): Monad<StateTKindPartial<F, S>> = ev
+    fun stateTMonad(ev: DaggerStateTMonadInstance<F, S>): Monad<StateTPartialOf<F, S>> = ev
 
     @Provides
-    fun stateTApplicativeError(ev: DaggerStateTMonadErrorInstance<F, S>): ApplicativeError<StateTKindPartial<F, S>, S> = ev
+    fun stateTApplicativeError(ev: DaggerStateTMonadErrorInstance<F, S>): ApplicativeError<StateTPartialOf<F, S>, S> = ev
 
     @Provides
-    fun stateTMonadError(ev: DaggerStateTMonadErrorInstance<F, S>): MonadError<StateTKindPartial<F, S>, S> = ev
+    fun stateTMonadError(ev: DaggerStateTMonadErrorInstance<F, S>): MonadError<StateTPartialOf<F, S>, S> = ev
 }
 
 class DaggerStateTFunctorInstance<F, L> @Inject constructor(val FF: Functor<F>) : StateTFunctorInstance<F, L> {

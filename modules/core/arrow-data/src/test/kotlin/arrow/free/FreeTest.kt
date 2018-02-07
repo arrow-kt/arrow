@@ -1,9 +1,9 @@
 package arrow.free
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.*
 import arrow.data.NonEmptyList
-import arrow.data.ev
+import arrow.data.reify
 import arrow.data.monad
 import arrow.free.instances.FreeEq
 import arrow.free.instances.FreeMonadInstance
@@ -19,7 +19,7 @@ import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 
-sealed class Ops<out A> : HK<Ops.F, A> {
+sealed class Ops<out A> : Kind<Ops.F, A> {
 
     class F private constructor()
 
@@ -34,7 +34,7 @@ sealed class Ops<out A> : HK<Ops.F, A> {
     }
 }
 
-fun <A> HK<Ops.F, A>.ev(): Ops<A> = this as Ops<A>
+fun <A> Kind<Ops.F, A>.reify(): Ops<A> = this as Ops<A>
 
 @RunWith(KTestJUnitRunner::class)
 class FreeTest : UnitSpec() {
@@ -43,32 +43,32 @@ class FreeTest : UnitSpec() {
         val added = Ops.add(10, 10).bind()
         val subtracted = bind { Ops.subtract(added, 50) }
         yields(subtracted)
-    }.ev()
+    }.reify()
 
     private fun stackSafeTestProgram(n: Int, stopAt: Int): Free<Ops.F, Int> = Ops.binding {
         val v = Ops.add(n, 1).bind()
         val r = bind { if (v < stopAt) stackSafeTestProgram(v, stopAt) else Free.pure(v) }
         yields(r)
-    }.ev()
+    }.reify()
 
     init {
 
         "instances can be resolved implicitly" {
-            functor<FreeKindPartial<OpsAp.F>>() shouldNotBe null
-            applicative<FreeKindPartial<OpsAp.F>>()  shouldNotBe null
-            monad<FreeKindPartial<OpsAp.F>>()  shouldNotBe null
+            functor<FreePartialOf<OpsAp.F>>() shouldNotBe null
+            applicative<FreePartialOf<OpsAp.F>>()  shouldNotBe null
+            monad<FreePartialOf<OpsAp.F>>()  shouldNotBe null
         }
 
-        val EQ: FreeEq<Ops.F, IdHK, Int> = FreeEq(idInterpreter)
+        val EQ: FreeEq<Ops.F, ForId, Int> = FreeEq(idInterpreter)
         testLaws(
                 EqLaws.laws<Free<Ops.F, Int>>(EQ, { Ops.value(it) }),
                 MonadLaws.laws(Ops, EQ)
         )
 
         "Can interpret an ADT as Free operations" {
-            program.foldMap(optionInterpreter, Option.monad()).ev() shouldBe Some(-30)
-            program.foldMap(idInterpreter, Id.monad()).ev() shouldBe Id(-30)
-            program.foldMap(nonEmptyListInterpreter, NonEmptyList.monad()).ev() shouldBe NonEmptyList.of(-30)
+            program.foldMap(optionInterpreter, Option.monad()).reify() shouldBe Some(-30)
+            program.foldMap(idInterpreter, Id.monad()).reify() shouldBe Id(-30)
+            program.foldMap(nonEmptyListInterpreter, NonEmptyList.monad()).reify() shouldBe NonEmptyList.of(-30)
         }
 
         "foldMap is stack safe" {

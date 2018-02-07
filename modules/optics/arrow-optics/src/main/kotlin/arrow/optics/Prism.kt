@@ -76,7 +76,7 @@ interface PPrism<S, T, A, B> {
     /**
      * Modify the focus of a [PPrism] with an [Applicative] function
      */
-    fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> = getOrModify(s).fold(
+    fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = getOrModify(s).fold(
             FA::pure,
             { FA.map(f(it), this::reverseGet) }
     )
@@ -84,7 +84,7 @@ interface PPrism<S, T, A, B> {
     /**
      * Modify the focus of a [PPrism] with an [Applicative] function
      */
-    fun <F> liftF(FA: Applicative<F>, f: (A) -> HK<F, B>): (S) -> HK<F, T> = { s ->
+    fun <F> liftF(FA: Applicative<F>, f: (A) -> Kind<F, B>): (S) -> Kind<F, T> = { s ->
         getOrModify(s).fold(
                 FA::pure,
                 { FA.map(f(it), this::reverseGet) }
@@ -211,7 +211,7 @@ interface PPrism<S, T, A, B> {
      * View a [PPrism] as a [PTraversal]
      */
     fun asTraversal(): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
-        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> = getOrModify(s).fold(
+        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = getOrModify(s).fold(
                 FA::pure,
                 { FA.map(f(it), this@PPrism::reverseGet) }
         )
@@ -222,13 +222,13 @@ interface PPrism<S, T, A, B> {
 /**
  * Modify the focus of a [PPrism] with an [Applicative] function
  */
-inline fun <S, T, A, B, reified F> PPrism<S, T, A, B>.modifyF(s: S, crossinline f: (A) -> HK<F, B>, FA: Applicative<F> = applicative()): HK<F, T> =
+inline fun <S, T, A, B, reified F> PPrism<S, T, A, B>.modifyF(s: S, crossinline f: (A) -> Kind<F, B>, FA: Applicative<F> = applicative()): Kind<F, T> =
         modifyF(FA, s) { a -> f(a) }
 
 /**
- * Lift a function [f]: `(A) -> HK<F, B> to the context of `S`: `(S) -> HK<F, T>` with an [Applicative] function
+ * Lift a function [f]: `(A) -> Kind<F, B> to the context of `S`: `(S) -> Kind<F, T>` with an [Applicative] function
  */
-inline fun <S, T, A, B, reified F> PPrism<S, T, A, B>.liftF(FA: Applicative<F> = applicative(), dummy: Unit = Unit, crossinline f: (A) -> HK<F, B>): (S) -> HK<F, T> =
+inline fun <S, T, A, B, reified F> PPrism<S, T, A, B>.liftF(FA: Applicative<F> = applicative(), dummy: Unit = Unit, crossinline f: (A) -> Kind<F, B>): (S) -> Kind<F, T> =
         liftF(FA) { a -> f(a) }
 
 /**

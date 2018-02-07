@@ -75,7 +75,7 @@ fun validateUser(name: String, pass: String) =
             val username = validateUsername(name).bind()
             val password = validatePassword(pass).bind()
             User(username, password)
-        }.ev()
+        }.reify()
 ```
 
 Now we're able to validate user data and also accumulate non-fatal warnings:
@@ -139,7 +139,7 @@ Available Instances:
 ```kotlin:ank
 import arrow.debug.*
 
-showInstances<IorHK, Unit>()
+showInstances<ForIor, Unit>()
 ```
 
 # Credits

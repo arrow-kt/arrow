@@ -9,18 +9,18 @@ import dagger.Provides
 class IdInstances {
 
     @Provides
-    fun idFunctor(): Functor<IdHK> = Id.functor()
+    fun idFunctor(): Functor<ForId> = Id.functor()
 
     @Provides
-    fun idApplicative(): Applicative<IdHK> = Id.applicative()
+    fun idApplicative(): Applicative<ForId> = Id.applicative()
 
     @Provides
-    fun idMonad(): Monad<IdHK> = Id.monad()
+    fun idMonad(): Monad<ForId> = Id.monad()
 
     @Provides
-    fun idComonad(): Comonad<IdHK> = Id.comonad()
+    fun idComonad(): Comonad<ForId> = Id.comonad()
 
     @Provides
-    fun idBimonad(): Bimonad<IdHK> = Id.bimonad()
+    fun idBimonad(): Bimonad<ForId> = Id.bimonad()
 
 }
