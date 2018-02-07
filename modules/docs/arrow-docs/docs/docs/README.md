@@ -1,4 +1,10 @@
-<img height="100" src="https://avatars2.githubusercontent.com/u/29458023?v=4&amp;s=200" width="100">
+---
+layout: docs
+title: Quick Start
+permalink: /docs/
+---
+
+NOTE: The docs are currently at around 50% completion. They're the present priority project, and you can track the progress on the github issue [#311](https://github.com/arrow-kt/arrow/issues/311).
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
 [![Build Status](https://travis-ci.org/arrow-kt/arrow.svg?branch=master)](https://travis-ci.org/arrow-kt/arrow/)
@@ -6,9 +12,9 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 Λrrow is a library for Typed Functional Programming in Kotlin.
-It includes the most popular data types, type classes and abstractions such as `Option`, `Try`, `Either`, `IO`, `Functor`, `Applicative`, `Monad` and many more empowering users to define pure FP apps and libraries built atop higher order abstractions. Use the below list to learn more about Λrrow's main features.
+It includes the most popular data types, type classes and abstractions such as `Option`, `Try`, `Either`, `IO`, `Functor`, `Applicative`, `Monad` and many more empowering users to define pure FP apps and libraries built atop higher order abstractions.
+Use the list below to learn more about Λrrow's main features.
 
-- [Documentation](http://arrow-kt.io)
 - [Patterns](http://arrow-kt.io/docs/patterns/glossary/): tutorials and approaches to day-to-day challenges using FP 
 - [Type classes](http://arrow-kt.io/docs/typeclasses/intro/): defining behaviors for data
 - [Data types](http://arrow-kt.io/docs/datatypes/intro/): common abstractions
@@ -40,8 +46,8 @@ Add the dependencies into the project's `build.gradle`
 dependencies {
     compile 'io.arrow-kt:arrow-core:0.6.1'
     compile 'io.arrow-kt:arrow-typeclasses:0.6.1' 
+    compile 'io.arrow-kt:arrow-instances:0.6.1' 
     compile 'io.arrow-kt:arrow-data:0.6.1' 
-    compile 'io.arrow-kt:arrow-instances:0.6.1'
     compile 'io.arrow-kt:arrow-syntax:0.6.1'
     kapt    'io.arrow-kt:arrow-annotations-processor:0.6.1' 
     
@@ -119,20 +125,3 @@ idea {
     }
 }
 ```
-
-# License
-
-    Copyright (C) 2017 The Arrow Authors
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-
