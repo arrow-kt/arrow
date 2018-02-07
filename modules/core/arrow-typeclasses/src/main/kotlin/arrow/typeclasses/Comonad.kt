@@ -12,11 +12,11 @@ import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
 @typeclass
 interface Comonad<F> : Functor<F>, TC {
 
-    fun <A, B> coflatMap(fa: HK<F, A>, f: (HK<F, A>) -> B): HK<F, B>
+    fun <A, B> coflatMap(fa: Kind<F, A>, f: (Kind<F, A>) -> B): Kind<F, B>
 
-    fun <A> extract(fa: HK<F, A>): A
+    fun <A> extract(fa: Kind<F, A>): A
 
-    fun <A> duplicate(fa: HK<F, A>): HK<F, HK<F, A>> = coflatMap(fa, { it })
+    fun <A> duplicate(fa: Kind<F, A>): Kind<F, Kind<F, A>> = coflatMap(fa, { it })
 }
 
 @RestrictsSuspension
@@ -32,11 +32,11 @@ open class ComonadContinuation<F, A : Any>(val CM: Comonad<F>, override val cont
 
     internal lateinit var returnedMonad: A
 
-    suspend fun <B> HK<F, B>.extract(): B = extract { this }
+    suspend fun <B> Kind<F, B>.extract(): B = extract { this }
 
-    suspend fun <B> extract(m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
+    suspend fun <B> extract(m: () -> Kind<F, B>): B = suspendCoroutineOrReturn { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels
-        returnedMonad = CM.extract(CM.coflatMap(m(), { x: HK<F, B> ->
+        returnedMonad = CM.extract(CM.coflatMap(m(), { x: Kind<F, B> ->
             c.stackLabels = labelHere
             c.resume(CM.extract(x))
             returnedMonad

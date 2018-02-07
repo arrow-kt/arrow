@@ -60,11 +60,11 @@ The technique demonstrated below to write polymorphic code is available for all 
 ```kotlin:ank
 import arrow.typeclasses.*
 
-inline fun <reified F> multiplyBy2(fa: HK<F, Int>, FT: Functor<F> = functor()): HK<F, Int> =
+inline fun <reified F> multiplyBy2(fa: Kind<F, Int>, FT: Functor<F> = functor()): Kind<F, Int> =
     FT.map(fa, { it * 2 })
 
-multiplyBy2<OptionHK>(Option(1)) // Option(1)
-multiplyBy2<TryHK>(Try { 1 })
+multiplyBy2<ForOption>(Option(1)) // Option(1)
+multiplyBy2<ForTry>(Try { 1 })
 ```
 
 In the example above we've defined a function that can operate over any data type for which a `Functor` instance is available.
@@ -84,7 +84,7 @@ users provide their own provided there is typeclass instances for their datatype
 
 Transforms the inner contents
 
-`fun <A, B> map(fa: HK<F, A>, f: (A) -> B): HK<F, B>`
+`fun <A, B> map(fa: Kind<F, A>, f: (A) -> B): Kind<F, B>`
 
 ```kotlin:ank
 optionFunctor.map(Option(1), { it + 1 })
@@ -94,7 +94,7 @@ optionFunctor.map(Option(1), { it + 1 })
 
 Lift a function to the Functor context so it can be applied over values of the implementing datatype
 
-`fun <A, B> lift(f: (A) -> B): (HK<F, A>) -> HK<F, B>`
+`fun <A, B> lift(f: (A) -> B): (Kind<F, A>) -> Kind<F, B>`
 
 ```kotlin:ank
 val lifted = optionFunctor.lift({ n: Int -> n + 1 })
@@ -107,7 +107,7 @@ For a full list of other useful combinators available in `Functor` see the [Sour
 
 ### Syntax
 
-#### HK<F, A>#map
+#### Kind<F, A>#map
 
 Maps over any higher kinded type constructor for which a functor instance is found
 
@@ -122,7 +122,7 @@ Lift a function into the functor context
 ```kotlin:ank
 import arrow.syntax.functor.*
 
-val f = { n: Int -> n + 1 }.lift<OptionHK, Int, Int>()
+val f = { n: Int -> n + 1 }.lift<ForOption, Int, Int>()
 f(Option(1))
 ```
 

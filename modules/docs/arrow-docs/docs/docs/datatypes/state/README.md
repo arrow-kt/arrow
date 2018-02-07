@@ -97,7 +97,7 @@ fun stackOperations() = State().monad<Stack>().binding {
     val c = pop().bind()
 
     c
-}.ev()
+}.reify()
 ```
 
 At this point, we have not yet interacted with any Stack; we have written instructions to operate one. We need to pass in an initial stack value, and then we actually apply our operations to it:
@@ -121,7 +121,7 @@ Available Instances:
 ```kotlin:ank
 import arrow.debug.*
 
-showInstances<StateKindPartial<Stack>, Unit>()
+showInstances<StatePartialOf<Stack>, Unit>()
 ```
 
 # Credits

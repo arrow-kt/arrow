@@ -1,15 +1,13 @@
 package arrow.optics
 
 import arrow.core.Id
-import arrow.core.IdKind
+import arrow.core.IdOf
 import arrow.core.value
-import arrow.optics.Iso
-import arrow.optics.PIso
 
 /**
  * [PIso] that defines the equality between a [Id] wrapped type [A] and the type [A] itself.
  */
-fun <A, B> pIdToType(): PIso<IdKind<A>, IdKind<B>, A, B> = PIso(
+fun <A, B> pIdToType(): PIso<IdOf<A>, IdOf<B>, A, B> = PIso(
         get = { it.value() },
         reverseGet = ::Id
 )
@@ -17,4 +15,4 @@ fun <A, B> pIdToType(): PIso<IdKind<A>, IdKind<B>, A, B> = PIso(
 /**
  * [Iso] that defines the equality between a [Id] wrapped type [A] and the type [A] itself.
  */
-fun <A> idToType(): Iso<IdKind<A>, A> = pIdToType()
+fun <A> idToType(): Iso<IdOf<A>, A> = pIdToType()

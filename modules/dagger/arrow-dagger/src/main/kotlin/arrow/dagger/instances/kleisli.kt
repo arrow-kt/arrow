@@ -1,7 +1,10 @@
 package arrow.dagger.instances
 
-import arrow.data.KleisliKindPartial
-import arrow.instances.*
+import arrow.data.KleisliPartialOf
+import arrow.instances.KleisliApplicativeInstance
+import arrow.instances.KleisliFunctorInstance
+import arrow.instances.KleisliMonadErrorInstance
+import arrow.instances.KleisliMonadInstance
 import arrow.typeclasses.*
 import dagger.Module
 import dagger.Provides
@@ -11,19 +14,19 @@ import javax.inject.Inject
 abstract class KleisliInstances<F, D> {
 
     @Provides
-    fun kleisliFunctor(ev: DaggerKleisliFunctorInstance<F, D>): Functor<KleisliKindPartial<F, D>> = ev
+    fun kleisliFunctor(ev: DaggerKleisliFunctorInstance<F, D>): Functor<KleisliPartialOf<F, D>> = ev
 
     @Provides
-    fun kleisliApplicative(ev: DaggerKleisliApplicativeInstance<F, D>): Applicative<KleisliKindPartial<F, D>> = ev
+    fun kleisliApplicative(ev: DaggerKleisliApplicativeInstance<F, D>): Applicative<KleisliPartialOf<F, D>> = ev
 
     @Provides
-    fun kleisliMonad(ev: DaggerKleisliMonadInstance<F, D>): Monad<KleisliKindPartial<F, D>> = ev
+    fun kleisliMonad(ev: DaggerKleisliMonadInstance<F, D>): Monad<KleisliPartialOf<F, D>> = ev
 
     @Provides
-    fun kleisliApplicativeError(ev: DaggerKleisliMonadErrorInstance<F, D>): ApplicativeError<KleisliKindPartial<F, D>, D> = ev
+    fun kleisliApplicativeError(ev: DaggerKleisliMonadErrorInstance<F, D>): ApplicativeError<KleisliPartialOf<F, D>, D> = ev
 
     @Provides
-    fun kleisliMonadError(ev: DaggerKleisliMonadErrorInstance<F, D>): MonadError<KleisliKindPartial<F, D>, D> = ev
+    fun kleisliMonadError(ev: DaggerKleisliMonadErrorInstance<F, D>): MonadError<KleisliPartialOf<F, D>, D> = ev
 }
 
 class DaggerKleisliFunctorInstance<F, L> @Inject constructor(val FF: Functor<F>) : KleisliFunctorInstance<F, L> {

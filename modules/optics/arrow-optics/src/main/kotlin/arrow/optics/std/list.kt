@@ -1,7 +1,7 @@
 package arrow.optics
 
 import arrow.core.*
-import arrow.data.ListKW
+import arrow.data.ListK
 import arrow.data.NonEmptyList
 import arrow.data.k
 
@@ -37,14 +37,14 @@ fun <A, B> pListToOptionNel(): PIso<List<A>, List<B>, Option<NonEmptyList<A>>, O
 fun <A> listToOptionNel(): Iso<List<A>, Option<NonEmptyList<A>>> = pListToOptionNel()
 
 /**
- * [PIso] that defines the equality between a [List] and a [ListKW]
+ * [PIso] that defines the equality between a [List] and a [ListK]
  */
-fun <A, B> pListToListKW(): PIso<List<A>, List<B>, ListKW<A>, ListKW<B>> = PIso(
+fun <A, B> pListToListK(): PIso<List<A>, List<B>, ListK<A>, ListK<B>> = PIso(
         get = { it.k() },
         reverseGet = { it.list }
 )
 
 /**
- * [Iso] that defines the equality between a [List] and a [ListKW]
+ * [Iso] that defines the equality between a [List] and a [ListK]
  */
-fun <A> listToListKW(): Iso<List<A>, ListKW<A>> = pListToListKW()
+fun <A> listToListK(): Iso<List<A>, ListK<A>> = pListToListK()

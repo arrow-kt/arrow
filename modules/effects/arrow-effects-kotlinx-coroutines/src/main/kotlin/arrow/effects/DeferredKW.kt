@@ -10,10 +10,10 @@ import arrow.typeclasses.Monad
 import kotlinx.coroutines.experimental.*
 import kotlin.coroutines.experimental.CoroutineContext
 
-fun <A> Deferred<A>.k(): DeferredKW<A> =
-        DeferredKW(this)
+fun <A> Deferred<A>.k(): DeferredK<A> =
+        DeferredK(this)
 
-fun <A> DeferredKWKind<A>.value(): Deferred<A> = this.ev().deferred
+fun <A> DeferredKOf<A>.value(): Deferred<A> = this.reify().deferred
 
 @higherkind
 @deriving(
@@ -21,39 +21,39 @@ fun <A> DeferredKWKind<A>.value(): Deferred<A> = this.ev().deferred
         Applicative::class,
         Monad::class
 )
-data class DeferredKW<out A>(val deferred: Deferred<A>) : DeferredKWKind<A>, Deferred<A> by deferred {
+data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferred<A> by deferred {
 
-    fun <B> map(f: (A) -> B): DeferredKW<B> =
+    fun <B> map(f: (A) -> B): DeferredK<B> =
             flatMap { a: A -> pure(f(a)) }
 
-    fun <B> ap(fa: DeferredKWKind<(A) -> B>): DeferredKW<B> =
-            flatMap { a -> fa.ev().map { ff -> ff(a) } }
+    fun <B> ap(fa: DeferredKOf<(A) -> B>): DeferredK<B> =
+            flatMap { a -> fa.reify().map { ff -> ff(a) } }
 
-    fun <B> flatMap(f: (A) -> DeferredKWKind<B>): DeferredKW<B> =
+    fun <B> flatMap(f: (A) -> DeferredKOf<B>): DeferredK<B> =
             kotlinx.coroutines.experimental.async(Unconfined, CoroutineStart.LAZY) {
                 f(await()).await()
             }.k()
 
     companion object {
-        fun unit(): DeferredKW<Unit> =
+        fun unit(): DeferredK<Unit> =
                 CompletableDeferred(Unit).k()
 
-        fun <A> pure(a: A): DeferredKW<A> =
+        fun <A> pure(a: A): DeferredK<A> =
                 CompletableDeferred(a).k()
 
-        fun <A> suspend(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.LAZY, f: suspend () -> A): DeferredKW<A> =
+        fun <A> suspend(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.LAZY, f: suspend () -> A): DeferredK<A> =
                 kotlinx.coroutines.experimental.async(ctx, start) { f() }.k()
 
-        fun <A> suspend(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.LAZY, fa: () -> DeferredKWKind<A>): DeferredKW<A> =
+        fun <A> suspend(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.LAZY, fa: () -> DeferredKOf<A>): DeferredK<A> =
                 kotlinx.coroutines.experimental.async(ctx, start) { fa().await() }.k()
 
-        operator fun <A> invoke(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.DEFAULT, f: () -> A): DeferredKW<A> =
+        operator fun <A> invoke(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.DEFAULT, f: () -> A): DeferredK<A> =
                 kotlinx.coroutines.experimental.async(ctx, start) { f() }.k()
 
-        fun <A> failed(t: Throwable): DeferredKW<A> =
+        fun <A> failed(t: Throwable): DeferredK<A> =
                 CompletableDeferred<A>().apply { completeExceptionally(t) }.k()
 
-        fun <A> raiseError(t: Throwable): DeferredKW<A> =
+        fun <A> raiseError(t: Throwable): DeferredK<A> =
                 failed(t)
 
         /**
@@ -63,7 +63,7 @@ data class DeferredKW<out A>(val deferred: Deferred<A>) : DeferredKWKind<A>, Def
          * its [CoroutineContext] is set to [DefaultDispatcher]
          * and its [CoroutineStart] is [CoroutineStart.DEFAULT].
          */
-        fun <A> async(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.DEFAULT, fa: Proc<A>): DeferredKW<A> =
+        fun <A> async(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.DEFAULT, fa: Proc<A>): DeferredK<A> =
                 kotlinx.coroutines.experimental.async(ctx, start) {
                     CompletableDeferred<A>().apply {
                         fa {
@@ -72,7 +72,7 @@ data class DeferredKW<out A>(val deferred: Deferred<A>) : DeferredKWKind<A>, Def
                     }.await()
                 }.k()
 
-        fun <A, B> tailRecM(a: A, f: (A) -> DeferredKWKind<Either<A, B>>): DeferredKW<B> =
+        fun <A, B> tailRecM(a: A, f: (A) -> DeferredKOf<Either<A, B>>): DeferredK<B> =
                 f(a).value().let { initial: Deferred<Either<A, B>> ->
                     var current: Deferred<Either<A, B>> = initial
                     kotlinx.coroutines.experimental.async(Unconfined, CoroutineStart.LAZY) {
@@ -83,7 +83,7 @@ data class DeferredKW<out A>(val deferred: Deferred<A>) : DeferredKWKind<A>, Def
                                 result = actual.b
                                 break
                             } else if (actual is Either.Left) {
-                                current = f(actual.a).ev()
+                                current = f(actual.a).reify()
                             }
                         }
                         result
@@ -92,23 +92,23 @@ data class DeferredKW<out A>(val deferred: Deferred<A>) : DeferredKWKind<A>, Def
     }
 }
 
-fun <A> DeferredKWKind<A>.handleErrorWith(f: (Throwable) -> DeferredKW<A>): DeferredKW<A> =
+fun <A> DeferredKOf<A>.handleErrorWith(f: (Throwable) -> DeferredK<A>): DeferredK<A> =
         async(Unconfined, CoroutineStart.LAZY) {
             Try { await() }.fold({ f(it).await() }, ::identity)
         }.k()
 
-fun <A> DeferredKWKind<A>.unsafeAttemptSync(): Try<A> =
+fun <A> DeferredKOf<A>.unsafeAttemptSync(): Try<A> =
         Try { unsafeRunSync() }
 
-fun <A> DeferredKWKind<A>.unsafeRunSync(): A =
+fun <A> DeferredKOf<A>.unsafeRunSync(): A =
         runBlocking { await() }
 
-fun <A> DeferredKWKind<A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKWKind<Unit>): DeferredKW<Unit> =
-        DeferredKW(Unconfined, CoroutineStart.DEFAULT) {
+fun <A> DeferredKOf<A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Unit> =
+        DeferredK(Unconfined, CoroutineStart.DEFAULT) {
             unsafeRunAsync(cb.andThen { })
         }
 
-fun <A> DeferredKWKind<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
+fun <A> DeferredKOf<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
         async(Unconfined, CoroutineStart.DEFAULT) {
             Try { await() }.fold({ cb(Left(it)) }, { cb(Right(it)) })
         }.let {
@@ -118,4 +118,4 @@ fun <A> DeferredKWKind<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Un
             }
         }
 
-suspend fun <A> DeferredKWKind<A>.await(): A = this.ev().await()
+suspend fun <A> DeferredKOf<A>.await(): A = this.reify().await()

@@ -4,33 +4,33 @@ import arrow.*
 import arrow.core.*
 import arrow.typeclasses.*
 
-inline fun <reified M, S, A> FreeKind<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M> = monad()): HK<M, A> = (this as Free<S, A>).foldMap(f, MM)
+inline fun <reified M, S, A> FreeOf<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M> = monad()): Kind<M, A> = (this as Free<S, A>).foldMap(f, MM)
 
-@higherkind sealed class Free<S, out A> : FreeKind<S, A> {
+@higherkind sealed class Free<S, out A> : FreeOf<S, A> {
 
     companion object {
         fun <S, A> pure(a: A): Free<S, A> = Pure(a)
 
-        fun <S, A> liftF(fa: HK<S, A>): Free<S, A> = Suspend(fa)
+        fun <S, A> liftF(fa: Kind<S, A>): Free<S, A> = Suspend(fa)
 
         fun <S, A> defer(value: () -> Free<S, A>): Free<S, A> = pure<S, Unit>(Unit).flatMap { _ -> value() }
 
-        internal fun <F> functionKF(): FunctionK<F, FreeKindPartial<F>> =
-                object : FunctionK<F, FreeKindPartial<F>> {
-                    override fun <A> invoke(fa: HK<F, A>): Free<F, A> =
+        internal fun <F> functionKF(): FunctionK<F, FreePartialOf<F>> =
+                object : FunctionK<F, FreePartialOf<F>> {
+                    override fun <A> invoke(fa: Kind<F, A>): Free<F, A> =
                             liftF(fa)
 
                 }
 
-        internal fun <F> applicativeF(): Applicative<FreeKindPartial<F>> =
-                object : Applicative<FreeKindPartial<F>> {
-                    private val applicative: Applicative<FreeKindPartial<F>> = arrow.typeclasses.applicative()
+        internal fun <F> applicativeF(): Applicative<FreePartialOf<F>> =
+                object : Applicative<FreePartialOf<F>> {
+                    private val applicative: Applicative<FreePartialOf<F>> = arrow.typeclasses.applicative()
 
                     override fun <A> pure(a: A): Free<F, A> =
                             Companion.pure(a)
 
-                    override fun <A, B> ap(fa: HK<FreeKindPartial<F>, A>, ff: HK<FreeKindPartial<F>, (A) -> B>): Free<F, B> {
-                        return applicative.ap(fa, ff).ev()
+                    override fun <A, B> ap(fa: Kind<FreePartialOf<F>, A>, ff: Kind<FreePartialOf<F>, (A) -> B>): Free<F, B> {
+                        return applicative.ap(fa, ff).reify()
                     }
                 }
     }
@@ -41,7 +41,7 @@ inline fun <reified M, S, A> FreeKind<S, A>.foldMapK(f: FunctionK<S, M>, MM: Mon
         override fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B> = pure(f(a))
     }
 
-    data class Suspend<S, out A>(val a: HK<S, A>) : Free<S, A>() {
+    data class Suspend<S, out A>(val a: Kind<S, A>) : Free<S, A>() {
         override fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B> = liftF(fs(a)).map(f)
     }
 
@@ -57,7 +57,7 @@ fun <S, A, B> Free<S, A>.map(f: (A) -> B): Free<S, B> = flatMap { Free.Pure<S, B
 
 fun <S, A, B> Free<S, A>.flatMap(f: (A) -> Free<S, B>): Free<S, B> = Free.FlatMapped(this, f)
 
-fun <S, A, B> Free<S, A>.ap(ff: FreeKind<S, (A) -> B>): Free<S, B> = ff.ev().flatMap { f -> map(f) }.ev()
+fun <S, A, B> Free<S, A>.ap(ff: FreeOf<S, (A) -> B>): Free<S, B> = ff.reify().flatMap { f -> map(f) }.reify()
 
 @Suppress("UNCHECKED_CAST")
 tailrec fun <S, A> Free<S, A>.step(): Free<S, A> =
@@ -75,7 +75,7 @@ tailrec fun <S, A> Free<S, A>.step(): Free<S, A> =
         }
 
 @Suppress("UNCHECKED_CAST")
-fun <M, S, A> Free<S, A>.foldMap(f: FunctionK<S, M>, MM: Monad<M>): HK<M, A> =
+fun <M, S, A> Free<S, A>.foldMap(f: FunctionK<S, M>, MM: Monad<M>): Kind<M, A> =
         MM.tailRecM(this) {
             val x = it.step()
             when (x) {
@@ -91,6 +91,6 @@ fun <M, S, A> Free<S, A>.foldMap(f: FunctionK<S, M>, MM: Monad<M>): HK<M, A> =
 
 fun <S, A> A.free(): Free<S, A> = Free.pure<S, A>(this)
 
-fun <F, A> Free<F, A>.run(M: Monad<F>): HK<F, A> = this.foldMap(FunctionK.id(), M)
+fun <F, A> Free<F, A>.run(M: Monad<F>): Kind<F, A> = this.foldMap(FunctionK.id(), M)
 
-fun <F, A> FreeKind<F, A>.runK(M: Monad<F>): HK<F, A> = this.ev().foldMap(FunctionK.id(), M)
+fun <F, A> FreeOf<F, A>.runK(M: Monad<F>): Kind<F, A> = this.reify().foldMap(FunctionK.id(), M)

@@ -1,6 +1,6 @@
 package arrow.data
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.*
 import arrow.core.Eval.Now
 import arrow.syntax.collections.prependTo
@@ -15,8 +15,8 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class EvalTest : UnitSpec() {
-    val EQ: Eq<HK<EvalHK, Int>> = Eq { a, b ->
-        a.ev().value() == b.ev().value()
+    val EQ: Eq<Kind<ForEval, Int>> = Eq { a, b ->
+        a.reify().value() == b.reify().value()
     }
 
     init {

@@ -1,74 +1,76 @@
 package arrow.mtl.instances
 
-import arrow.*
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Option
+import arrow.core.Tuple2
 import arrow.data.*
+import arrow.instance
 import arrow.mtl.FunctorFilter
 import arrow.mtl.MonadCombine
 import arrow.mtl.MonadFilter
 
-@instance(ListKW::class)
-interface ListKWMonadCombineInstance : MonadCombine<ListKWHK> {
-    override fun <A> empty(): ListKW<A> =
-            ListKW.empty()
+@instance(ListK::class)
+interface ListKMonadCombineInstance : MonadCombine<ForListK> {
+    override fun <A> empty(): ListK<A> =
+            ListK.empty()
 
-    override fun <A, B> mapFilter(fa: ListKWKind<A>, f: kotlin.Function1<A, Option<B>>): ListKW<B> =
-            fa.ev().mapFilter(f)
+    override fun <A, B> mapFilter(fa: ListKOf<A>, f: kotlin.Function1<A, Option<B>>): ListK<B> =
+            fa.reify().mapFilter(f)
 
-    override fun <A, B> ap(fa: ListKWKind<A>, ff: ListKWKind<kotlin.Function1<A, B>>): ListKW<B> =
-            fa.ev().ap(ff)
+    override fun <A, B> ap(fa: ListKOf<A>, ff: ListKOf<kotlin.Function1<A, B>>): ListK<B> =
+            fa.reify().ap(ff)
 
-    override fun <A, B> flatMap(fa: ListKWKind<A>, f: kotlin.Function1<A, ListKWKind<B>>): ListKW<B> =
-            fa.ev().flatMap(f)
+    override fun <A, B> flatMap(fa: ListKOf<A>, f: kotlin.Function1<A, ListKOf<B>>): ListK<B> =
+            fa.reify().flatMap(f)
 
-    override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ListKWKind<Either<A, B>>>): ListKW<B> =
-            ListKW.tailRecM(a, f)
+    override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ListKOf<Either<A, B>>>): ListK<B> =
+            ListK.tailRecM(a, f)
 
-    override fun <A, B> map(fa: ListKWKind<A>, f: kotlin.Function1<A, B>): ListKW<B> =
-            fa.ev().map(f)
+    override fun <A, B> map(fa: ListKOf<A>, f: kotlin.Function1<A, B>): ListK<B> =
+            fa.reify().map(f)
 
-    override fun <A, B, Z> map2(fa: ListKWKind<A>, fb: ListKWKind<B>, f: kotlin.Function1<Tuple2<A, B>, Z>): ListKW<Z> =
-            fa.ev().map2(fb, f)
+    override fun <A, B, Z> map2(fa: ListKOf<A>, fb: ListKOf<B>, f: kotlin.Function1<Tuple2<A, B>, Z>): ListK<Z> =
+            fa.reify().map2(fb, f)
 
-    override fun <A> pure(a: A): ListKW<A> =
-            ListKW.pure(a)
+    override fun <A> pure(a: A): ListK<A> =
+            ListK.pure(a)
 
-    override fun <A> combineK(x: ListKWKind<A>, y: ListKWKind<A>): ListKW<A> =
-            x.ev().combineK(y)
+    override fun <A> combineK(x: ListKOf<A>, y: ListKOf<A>): ListK<A> =
+            x.reify().combineK(y)
 }
 
-@instance(ListKW::class)
-interface ListKWFunctorFilterInstance : FunctorFilter<ListKWHK> {
-    override fun <A, B> mapFilter(fa: ListKWKind<A>, f: kotlin.Function1<A, Option<B>>): ListKW<B> =
-            fa.ev().mapFilter(f)
+@instance(ListK::class)
+interface ListKFunctorFilterInstance : FunctorFilter<ForListK> {
+    override fun <A, B> mapFilter(fa: ListKOf<A>, f: kotlin.Function1<A, Option<B>>): ListK<B> =
+            fa.reify().mapFilter(f)
 
-    override fun <A, B> map(fa: ListKWKind<A>, f: kotlin.Function1<A, B>): ListKW<B> =
-            fa.ev().map(f)
+    override fun <A, B> map(fa: ListKOf<A>, f: kotlin.Function1<A, B>): ListK<B> =
+            fa.reify().map(f)
 }
 
-@instance(ListKW::class)
-interface ListKWMonadFilterInstance : MonadFilter<ListKWHK> {
-    override fun <A> empty(): ListKW<A> =
-            ListKW.empty()
+@instance(ListK::class)
+interface ListKMonadFilterInstance : MonadFilter<ForListK> {
+    override fun <A> empty(): ListK<A> =
+            ListK.empty()
 
-    override fun <A, B> mapFilter(fa: ListKWKind<A>, f: kotlin.Function1<A, Option<B>>): ListKW<B> =
-            fa.ev().mapFilter(f)
+    override fun <A, B> mapFilter(fa: ListKOf<A>, f: kotlin.Function1<A, Option<B>>): ListK<B> =
+            fa.reify().mapFilter(f)
 
-    override fun <A, B> ap(fa: ListKWKind<A>, ff: ListKWKind<kotlin.Function1<A, B>>): ListKW<B> =
-            fa.ev().ap(ff)
+    override fun <A, B> ap(fa: ListKOf<A>, ff: ListKOf<kotlin.Function1<A, B>>): ListK<B> =
+            fa.reify().ap(ff)
 
-    override fun <A, B> flatMap(fa: ListKWKind<A>, f: kotlin.Function1<A, ListKWKind<B>>): ListKW<B> =
-            fa.ev().flatMap(f)
+    override fun <A, B> flatMap(fa: ListKOf<A>, f: kotlin.Function1<A, ListKOf<B>>): ListK<B> =
+            fa.reify().flatMap(f)
 
-    override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ListKWKind<Either<A, B>>>): ListKW<B> =
-            ListKW.tailRecM(a, f)
+    override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ListKOf<Either<A, B>>>): ListK<B> =
+            ListK.tailRecM(a, f)
 
-    override fun <A, B> map(fa: ListKWKind<A>, f: kotlin.Function1<A, B>): ListKW<B> =
-            fa.ev().map(f)
+    override fun <A, B> map(fa: ListKOf<A>, f: kotlin.Function1<A, B>): ListK<B> =
+            fa.reify().map(f)
 
-    override fun <A, B, Z> map2(fa: ListKWKind<A>, fb: ListKWKind<B>, f: kotlin.Function1<Tuple2<A, B>, Z>): ListKW<Z> =
-            fa.ev().map2(fb, f)
+    override fun <A, B, Z> map2(fa: ListKOf<A>, fb: ListKOf<B>, f: kotlin.Function1<Tuple2<A, B>, Z>): ListK<Z> =
+            fa.reify().map2(fb, f)
 
-    override fun <A> pure(a: A): ListKW<A> =
-            ListKW.pure(a)
+    override fun <A> pure(a: A): ListK<A> =
+            ListK.pure(a)
 }

@@ -1,6 +1,6 @@
 package arrow.data
 
-import arrow.HK2
+import arrow.Kind2
 import arrow.test.UnitSpec
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.SemigroupLaws
@@ -11,34 +11,34 @@ import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class SortedMapKWTest : UnitSpec() {
+class SortedMapKTest : UnitSpec() {
 
-    val EQ: Eq<HK2<SortedMapKWHK, String, Int>> = object : Eq<HK2<SortedMapKWHK, String, Int>> {
-        override fun eqv(a: HK2<SortedMapKWHK, String, Int>, b: HK2<SortedMapKWHK, String, Int>): Boolean =
-            a.ev()["key"] == b.ev()["key"]
+    val EQ: Eq<Kind2<ForSortedMapK, String, Int>> = object : Eq<Kind2<ForSortedMapK, String, Int>> {
+        override fun eqv(a: Kind2<ForSortedMapK, String, Int>, b: Kind2<ForSortedMapK, String, Int>): Boolean =
+            a.reify()["key"] == b.reify()["key"]
     }
 
     init {
 
         "instances can be resolved implicitly" {
-            functor<SortedMapKWHK>() shouldNotBe null
-            foldable<SortedMapKWHK>() shouldNotBe null
-            traverse<SortedMapKWHK>() shouldNotBe null
-            semigroup<SortedMapKWKind<String, Int>>() shouldNotBe null
-            monoid<SortedMapKWKind<String, Int>>() shouldNotBe null
+            functor<ForSortedMapK>() shouldNotBe null
+            foldable<ForSortedMapK>() shouldNotBe null
+            traverse<ForSortedMapK>() shouldNotBe null
+            semigroup<SortedMapKOf<String, Int>>() shouldNotBe null
+            monoid<SortedMapKOf<String, Int>>() shouldNotBe null
         }
 
 
         testLaws(
-                MonoidLaws.laws(SortedMapKW.monoid<String, Int>(), sortedMapOf("key" to 1).k(), EQ),
-                SemigroupLaws.laws(SortedMapKW.monoid<String, Int>(),
+                MonoidLaws.laws(SortedMapK.monoid<String, Int>(), sortedMapOf("key" to 1).k(), EQ),
+                SemigroupLaws.laws(SortedMapK.monoid<String, Int>(),
                     sortedMapOf("key" to 1).k(),
                     sortedMapOf("key" to 2).k(),
                     sortedMapOf("key" to 3).k(),
                     EQ),
                 TraverseLaws.laws(
-                    SortedMapKW.traverse<String>(),
-                    SortedMapKW.traverse<String>(),
+                    SortedMapK.traverse<String>(),
+                    SortedMapK.traverse<String>(),
                     { a: Int -> sortedMapOf("key" to a).k() },
                     EQ))
 

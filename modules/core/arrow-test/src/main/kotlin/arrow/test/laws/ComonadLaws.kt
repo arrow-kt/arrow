@@ -15,7 +15,7 @@ import io.kotlintest.properties.forAll
 
 object ComonadLaws {
 
-    inline fun <reified F> laws(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): List<Law> =
+    inline fun <reified F> laws(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
             FunctorLaws.laws(CM, cf, EQ) + listOf(
                     Law("Comonad Laws: duplicate then extract is identity", { duplicateThenExtractIsId(CM, cf, EQ) }),
                     Law("Comonad Laws: duplicate then map into extract is identity", { duplicateThenMapExtractIsId(CM, cf, EQ) }),
@@ -27,43 +27,43 @@ object ComonadLaws {
                     Law("Comonad Laws: cobinding", { cobinding(CM, cf, EQ) })
             )
 
-    inline fun <reified F> duplicateThenExtractIsId(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): Unit =
-            forAll(genConstructor(Gen.int(), cf), { fa: HK<F, Int> ->
+    inline fun <reified F> duplicateThenExtractIsId(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
+            forAll(genConstructor(Gen.int(), cf), { fa: Kind<F, Int> ->
                 CM.duplicate(fa).extract(CM).equalUnderTheLaw(fa, EQ)
             })
 
-    inline fun <reified F> duplicateThenMapExtractIsId(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): Unit =
-            forAll(genConstructor(Gen.int(), cf), { fa: HK<F, Int> ->
+    inline fun <reified F> duplicateThenMapExtractIsId(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
+            forAll(genConstructor(Gen.int(), cf), { fa: Kind<F, Int> ->
                 CM.duplicate(fa).map(CM) { it.extract(CM) }.equalUnderTheLaw(fa, EQ)
             })
 
-    inline fun <reified F> mapAndCoflatmapCoherence(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): Unit =
-            forAll(genConstructor(Gen.int(), cf), genFunctionAToB(Gen.int()), { fa: HK<F, Int>, f: (Int) -> Int ->
+    inline fun <reified F> mapAndCoflatmapCoherence(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
+            forAll(genConstructor(Gen.int(), cf), genFunctionAToB(Gen.int()), { fa: Kind<F, Int>, f: (Int) -> Int ->
                 CM.map(fa, f).equalUnderTheLaw(CM.coflatMap(fa, { f(it.extract(CM)) }), EQ)
             })
 
-    inline fun <reified F> comonadLeftIdentity(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): Unit =
-            forAll(genConstructor(Gen.int(), cf), { fa: HK<F, Int> ->
+    inline fun <reified F> comonadLeftIdentity(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
+            forAll(genConstructor(Gen.int(), cf), { fa: Kind<F, Int> ->
                 CM.coflatMap(fa, { it.extract(CM) }).equalUnderTheLaw(fa, EQ)
             })
 
-    inline fun <reified F> comonadRightIdentity(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): Unit =
-            forAll(genConstructor(Gen.int(), cf), genFunctionAToB(genConstructor(Gen.int(), cf)), { fa: HK<F, Int>, f: (HK<F, Int>) -> HK<F, Int> ->
+    inline fun <reified F> comonadRightIdentity(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
+            forAll(genConstructor(Gen.int(), cf), genFunctionAToB(genConstructor(Gen.int(), cf)), { fa: Kind<F, Int>, f: (Kind<F, Int>) -> Kind<F, Int> ->
                 CM.coflatMap(fa, f).extract(CM).equalUnderTheLaw(f(fa), EQ)
             })
 
-    inline fun <reified F> cokleisliLeftIdentity(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): Unit =
-            forAll(genConstructor(Gen.int(), cf), genFunctionAToB(genConstructor(Gen.int(), cf)), { fa: HK<F, Int>, f: (HK<F, Int>) -> HK<F, Int> ->
-                Cokleisli(CM, { hk: HK<F, Int> -> CM.extract(hk) }).andThen(Cokleisli(CM, f)).run(fa).equalUnderTheLaw(f(fa), EQ)
+    inline fun <reified F> cokleisliLeftIdentity(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
+            forAll(genConstructor(Gen.int(), cf), genFunctionAToB(genConstructor(Gen.int(), cf)), { fa: Kind<F, Int>, f: (Kind<F, Int>) -> Kind<F, Int> ->
+                Cokleisli(CM, { hk: Kind<F, Int> -> CM.extract(hk) }).andThen(Cokleisli(CM, f)).run(fa).equalUnderTheLaw(f(fa), EQ)
             })
 
-    inline fun <reified F> cokleisliRightIdentity(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): Unit =
-            forAll(genConstructor(Gen.int(), cf), genFunctionAToB(genConstructor(Gen.int(), cf)), { fa: HK<F, Int>, f: (HK<F, Int>) -> HK<F, Int> ->
-                Cokleisli(CM, f).andThen(Cokleisli(CM, { hk: HK<F, HK<F, Int>> -> CM.extract(hk) })).run(fa).equalUnderTheLaw(f(fa), EQ)
+    inline fun <reified F> cokleisliRightIdentity(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
+            forAll(genConstructor(Gen.int(), cf), genFunctionAToB(genConstructor(Gen.int(), cf)), { fa: Kind<F, Int>, f: (Kind<F, Int>) -> Kind<F, Int> ->
+                Cokleisli(CM, f).andThen(Cokleisli(CM, { hk: Kind<F, Kind<F, Int>> -> CM.extract(hk) })).run(fa).equalUnderTheLaw(f(fa), EQ)
             })
 
-    inline fun <reified F> cobinding(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> HK<F, Int>, EQ: Eq<HK<F, Int>>): Unit =
-            forAll(genConstructor(Gen.int(), cf), { fa: HK<F, Int> ->
+    inline fun <reified F> cobinding(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
+            forAll(genConstructor(Gen.int(), cf), { fa: Kind<F, Int> ->
                 CM.cobinding {
                     val x = fa.extract(CM)
                     val y = extract { CM.map(fa, { it + x }) }

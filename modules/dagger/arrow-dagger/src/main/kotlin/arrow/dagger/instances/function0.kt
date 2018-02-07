@@ -9,19 +9,19 @@ import dagger.Provides
 class Function0Instances {
 
     @Provides
-    fun function0Functor(): Functor<Function0HK> = Function0.functor()
+    fun function0Functor(): Functor<ForFunction0> = Function0.functor()
 
     @Provides
-    fun function0Applicative(): Applicative<Function0HK> = Function0.applicative()
+    fun function0Applicative(): Applicative<ForFunction0> = Function0.applicative()
 
     @Provides
-    fun function0Monad(): Monad<Function0HK> = Function0.monad()
+    fun function0Monad(): Monad<ForFunction0> = Function0.monad()
 
     @Provides
-    fun function0Comonad(): Comonad<Function0HK> = Function0.comonad()
+    fun function0Comonad(): Comonad<ForFunction0> = Function0.comonad()
 
     @Provides
-    fun function0Bimonad(): Bimonad<Function0HK> = Function0.bimonad()
+    fun function0Bimonad(): Bimonad<ForFunction0> = Function0.bimonad()
 
 }
 

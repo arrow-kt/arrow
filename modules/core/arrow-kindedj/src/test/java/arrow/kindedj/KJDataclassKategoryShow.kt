@@ -1,9 +1,9 @@
 package arrow.kindedj
 
-import arrow.HK
-import arrow.kindedj.fromkindedj.KJDataclassHK
+import arrow.Kind
+import arrow.kindedj.fromkindedj.ForKJDataclass
 
-object KJDataclassArrowShow : ArrowShow<HK<ConvertHK, KJDataclassHK>> {
-    override fun <A> show(hk: HK<HK<ConvertHK, KJDataclassHK>, A>): String =
-            KJDataclassHK.show(hk.fromArrow())
+object KJDataclassArrowShow : ArrowShow<Kind<ForConvert, ForKJDataclass>> {
+    override fun <A> show(hk: Kind<Kind<ForConvert, ForKJDataclass>, A>): String =
+            ForKJDataclass.show(hk.fromArrow())
 }

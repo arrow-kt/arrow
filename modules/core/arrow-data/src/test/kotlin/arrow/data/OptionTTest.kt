@@ -1,8 +1,7 @@
 package arrow.data
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.*
-import arrow.instances.monad
 import arrow.mtl.functorFilter
 import arrow.mtl.traverseFilter
 import arrow.test.UnitSpec
@@ -16,28 +15,28 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class OptionTTest : UnitSpec() {
 
-    fun <A> EQ(): Eq<HK<OptionTKindPartial<A>, Int>> = Eq { a, b ->
+    fun <A> EQ(): Eq<Kind<OptionTPartialOf<A>, Int>> = Eq { a, b ->
         a.value() == b.value()
     }
 
-    fun <A> EQ_NESTED(): Eq<HK<OptionTKindPartial<A>, HK<OptionTKindPartial<A>, Int>>> = Eq { a, b ->
+    fun <A> EQ_NESTED(): Eq<Kind<OptionTPartialOf<A>, Kind<OptionTPartialOf<A>, Int>>> = Eq { a, b ->
         a.value() == b.value()
     }
 
-    val NELM: Monad<NonEmptyListHK> = monad<NonEmptyListHK>()
+    val NELM: Monad<ForNonEmptyList> = monad<ForNonEmptyList>()
 
     init {
 
         "instances can be resolved implicitly" {
-            functor<OptionTKindPartial<NonEmptyListHK>>() shouldNotBe null
-            applicative<OptionTKindPartial<NonEmptyListHK>>() shouldNotBe null
-            monad<OptionTKindPartial<NonEmptyListHK>>() shouldNotBe null
-            foldable<OptionTKindPartial<NonEmptyListHK>>() shouldNotBe null
-            traverse<OptionTKindPartial<NonEmptyListHK>>() shouldNotBe null
-            semigroupK<OptionTKindPartial<ListKWHK>>() shouldNotBe null
-            monoidK<OptionTKindPartial<ListKWHK>>() shouldNotBe null
-            functorFilter<OptionTKindPartial<ListKWHK>>() shouldNotBe null
-            traverseFilter<OptionTKindPartial<OptionHK>>() shouldNotBe null
+            functor<OptionTPartialOf<ForNonEmptyList>>() shouldNotBe null
+            applicative<OptionTPartialOf<ForNonEmptyList>>() shouldNotBe null
+            monad<OptionTPartialOf<ForNonEmptyList>>() shouldNotBe null
+            foldable<OptionTPartialOf<ForNonEmptyList>>() shouldNotBe null
+            traverse<OptionTPartialOf<ForNonEmptyList>>() shouldNotBe null
+            semigroupK<OptionTPartialOf<ForListK>>() shouldNotBe null
+            monoidK<OptionTPartialOf<ForListK>>() shouldNotBe null
+            functorFilter<OptionTPartialOf<ForListK>>() shouldNotBe null
+            traverseFilter<OptionTPartialOf<ForOption>>() shouldNotBe null
         }
 
         testLaws(
@@ -67,25 +66,25 @@ class OptionTTest : UnitSpec() {
 
         "toLeft for Some should build a correct EitherT" {
             forAll { a: Int, b: String ->
-                OptionT.fromOption<NonEmptyListHK, Int>(Some(a)).toLeft({ b }, NELM) == EitherT.left<NonEmptyListHK, Int, String>(a, applicative())
+                OptionT.fromOption<ForNonEmptyList, Int>(Some(a)).toLeft({ b }, NELM) == EitherT.left<ForNonEmptyList, Int, String>(a, applicative())
             }
         }
 
         "toLeft for None should build a correct EitherT" {
             forAll { a: Int, b: String ->
-                OptionT.fromOption<NonEmptyListHK, Int>(None).toLeft({ b }, NELM) == EitherT.right<NonEmptyListHK, Int, String>(b, applicative())
+                OptionT.fromOption<ForNonEmptyList, Int>(None).toLeft({ b }, NELM) == EitherT.right<ForNonEmptyList, Int, String>(b, applicative())
             }
         }
 
         "toRight for Some should build a correct EitherT" {
             forAll { a: Int, b: String ->
-                OptionT.fromOption<NonEmptyListHK, String>(Some(b)).toRight({ a }, NELM) == EitherT.right<NonEmptyListHK, Int, String>(b, applicative())
+                OptionT.fromOption<ForNonEmptyList, String>(Some(b)).toRight({ a }, NELM) == EitherT.right<ForNonEmptyList, Int, String>(b, applicative())
             }
         }
 
         "toRight for None should build a correct EitherT" {
             forAll { a: Int, b: String ->
-                OptionT.fromOption<NonEmptyListHK, String>(None).toRight({ a }, NELM) == EitherT.left<NonEmptyListHK, Int, String>(a, applicative())
+                OptionT.fromOption<ForNonEmptyList, String>(None).toRight({ a }, NELM) == EitherT.left<ForNonEmptyList, Int, String>(a, applicative())
             }
         }
 

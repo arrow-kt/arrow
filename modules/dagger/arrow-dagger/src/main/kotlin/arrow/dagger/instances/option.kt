@@ -9,21 +9,21 @@ import dagger.Provides
 class OptionInstances {
 
     @Provides
-    fun optionFunctor(): Functor<OptionHK> = Option.functor()
+    fun optionFunctor(): Functor<ForOption> = Option.functor()
 
     @Provides
-    fun optionApplicative(): Applicative<OptionHK> = Option.applicative()
+    fun optionApplicative(): Applicative<ForOption> = Option.applicative()
 
     @Provides
-    fun optionMonad(): Monad<OptionHK> = Option.monad()
+    fun optionMonad(): Monad<ForOption> = Option.monad()
 
     @Provides
-    fun optionMonadError(): MonadError<OptionHK, Unit> = Option.monadError()
+    fun optionMonadError(): MonadError<ForOption, Unit> = Option.monadError()
 
     @Provides
-    fun optionFoldable(): Foldable<OptionHK> = Option.foldable()
+    fun optionFoldable(): Foldable<ForOption> = Option.foldable()
 
     @Provides
-    fun optionTraverse(): Traverse<OptionHK> = Option.traverse()
+    fun optionTraverse(): Traverse<ForOption> = Option.traverse()
 
 }

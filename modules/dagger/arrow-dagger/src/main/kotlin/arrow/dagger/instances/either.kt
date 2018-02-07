@@ -1,6 +1,6 @@
 package arrow.dagger.instances
 
-import arrow.core.EitherKindPartial
+import arrow.core.EitherPartialOf
 import arrow.instances.*
 import arrow.typeclasses.*
 import dagger.Module
@@ -11,22 +11,22 @@ import javax.inject.Inject
 abstract class EitherInstances<L> {
 
     @Provides
-    fun eitherFunctor(ev: DaggerEitherFunctorInstance<L>): Functor<EitherKindPartial<L>> = ev
+    fun eitherFunctor(ev: DaggerEitherFunctorInstance<L>): Functor<EitherPartialOf<L>> = ev
 
     @Provides
-    fun eitherApplicative(ev: DaggerEitherApplicativeInstance<L>): Applicative<EitherKindPartial<L>> = ev
+    fun eitherApplicative(ev: DaggerEitherApplicativeInstance<L>): Applicative<EitherPartialOf<L>> = ev
 
     @Provides
-    fun eitherMonad(ev: DaggerEitherMonadInstance<L>): Monad<EitherKindPartial<L>> = ev
+    fun eitherMonad(ev: DaggerEitherMonadInstance<L>): Monad<EitherPartialOf<L>> = ev
 
     @Provides
-    fun eitherFoldable(ev: DaggerEitherFoldableInstance<L>): Foldable<EitherKindPartial<L>> = ev
+    fun eitherFoldable(ev: DaggerEitherFoldableInstance<L>): Foldable<EitherPartialOf<L>> = ev
 
     @Provides
-    fun eitherTraverse(ev: DaggerEitherTraverseInstance<L>): Traverse<EitherKindPartial<L>> = ev
+    fun eitherTraverse(ev: DaggerEitherTraverseInstance<L>): Traverse<EitherPartialOf<L>> = ev
 
     @Provides
-    fun eitherSemigroupK(ev: DaggerEitherSemigroupKInstance<L>): SemigroupK<EitherKindPartial<L>> = ev
+    fun eitherSemigroupK(ev: DaggerEitherSemigroupKInstance<L>): SemigroupK<EitherPartialOf<L>> = ev
 
 }
 

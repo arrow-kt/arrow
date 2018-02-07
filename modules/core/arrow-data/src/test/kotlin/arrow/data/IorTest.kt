@@ -22,15 +22,15 @@ class IorTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            functor<IorKindPartial<Int>>() shouldNotBe null
-            applicative<IorKindPartial<Int>>() shouldNotBe null
-            monad<IorKindPartial<Int>>() shouldNotBe null
-            foldable<IorKindPartial<Int>>() shouldNotBe null
-            traverse<IorKindPartial<Int>>() shouldNotBe null
+            functor<IorPartialOf<Int>>() shouldNotBe null
+            applicative<IorPartialOf<Int>>() shouldNotBe null
+            monad<IorPartialOf<Int>>() shouldNotBe null
+            foldable<IorPartialOf<Int>>() shouldNotBe null
+            traverse<IorPartialOf<Int>>() shouldNotBe null
             eq<Ior<String, Int>>() shouldNotBe null
         }
 
-        val intIorMonad: Monad<IorKindPartial<Int>> = monad()
+        val intIorMonad: Monad<IorPartialOf<Int>> = monad()
 
         testLaws(
             EqLaws.laws(eq<Ior<String, Int>>(), { it.rightIor() }),

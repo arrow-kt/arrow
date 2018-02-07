@@ -26,7 +26,7 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
  * values, regardless of whether the `B` values appear in a [Ior.Right] or a [Ior.Both].
  * The isomorphic Either form can be accessed via the [unwrap] method.
  */
-@higherkind sealed class Ior<out A, out B> : IorKind<A, B> {
+@higherkind sealed class Ior<out A, out B> : IorOf<A, B> {
 
     /**
      * Returns `true` if this is a [Right], `false` otherwise.
@@ -86,16 +86,16 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
             }
         }
 
-        private tailrec fun <L, A, B> loop(v: Ior<L, Either<A, B>>, f: (A) -> IorKind<L, Either<A, B>>, SL: Semigroup<L>): Ior<L, B> = when (v) {
+        private tailrec fun <L, A, B> loop(v: Ior<L, Either<A, B>>, f: (A) -> IorOf<L, Either<A, B>>, SL: Semigroup<L>): Ior<L, B> = when (v) {
             is Left -> Left(v.value)
             is Right -> when (v.value) {
                 is Either.Right -> Right(v.value.b)
-                is Either.Left -> loop(f(v.value.a).ev().ev(), f, SL)
+                is Either.Left -> loop(f(v.value.a).reify().reify(), f, SL)
             }
             is Both -> when (v.rightValue) {
                 is Either.Right -> Both(v.leftValue, v.rightValue.b)
                 is Either.Left -> {
-                    val fnb = f(v.rightValue.a).ev()
+                    val fnb = f(v.rightValue.a).reify()
                     when (fnb) {
                         is Left -> Left(SL.combine(v.leftValue, fnb.value))
                         is Right -> loop(Both(v.leftValue, fnb.value), f, SL)
@@ -105,7 +105,7 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
             }
         }
 
-        fun <L, A, B> tailRecM(a: A, f: (A) -> IorKind<L, Either<A, B>>, SL: Semigroup<L>): Ior<L, B> = loop(f(a).ev(), f, SL)
+        fun <L, A, B> tailRecM(a: A, f: (A) -> IorOf<L, Either<A, B>>, SL: Semigroup<L>): Ior<L, B> = loop(f(a).reify(), f, SL)
 
         fun <A, B> leftNel(a: A): IorNel<A, B> = Left(NonEmptyList.of(a))
 
@@ -141,7 +141,7 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
     fun <C> foldRight(lc: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
             fold({ lc }, { f(it, lc) }, { _, b -> f(b, lc) })
 
-    fun <G, C> traverse(f: (B) -> HK<G, C>, GA: Applicative<G>): HK<G, Ior<A, C>> =
+    fun <G, C> traverse(f: (B) -> Kind<G, C>, GA: Applicative<G>): Kind<G, Ior<A, C>> =
             fold({ GA.pure(Left(it)) }, { GA.map(f(it), { Right(it) }) }, { _, b -> GA.map(f(b), { Right(it) }) })
 
     /**
@@ -311,7 +311,7 @@ inline fun <A, B, D> Ior<A, B>.flatMap(crossinline f: (B) -> Ior<A, D>, SA: Semi
     }
 }
 
-fun <A, B, D> Ior<A, B>.ap(ff: IorKind<A, (B) -> D>, SA: Semigroup<A>): Ior<A, D> = ff.ev().flatMap({ f -> map(f) }, SA)
+fun <A, B, D> Ior<A, B>.ap(ff: IorOf<A, (B) -> D>, SA: Semigroup<A>): Ior<A, D> = ff.reify().flatMap({ f -> map(f) }, SA)
 
 inline fun <A, B> Ior<A, B>.getOrElse(crossinline default: () -> B): B = fold({ default() }, { it }, { _, b -> b })
 

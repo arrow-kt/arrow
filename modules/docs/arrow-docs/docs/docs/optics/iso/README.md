@@ -66,7 +66,7 @@ pointIsoTuple.modifyF(Try.functor(), point) {
 ```
 
 ```kotlin:ank
-val liftF: (Point2D) -> TryKind<Point2D> = pointIsoTuple.liftF(Try.functor()) {
+val liftF: (Point2D) -> TryOf<Point2D> = pointIsoTuple.liftF(Try.functor()) {
     Try { (tuple.a / 2) toT (tuple.b / 0) }
 }
 

@@ -1,7 +1,7 @@
 package arrow.mtl.syntax
 
-import arrow.mtl.MonadReader
 import arrow.data.ReaderApi
-import arrow.data.ReaderKindPartial
+import arrow.data.ReaderPartialOf
+import arrow.mtl.MonadReader
 
-inline fun <reified D> ReaderApi.monadReader(): MonadReader<ReaderKindPartial<D>, D> = arrow.mtl.monadReader()
+inline fun <reified D> ReaderApi.monadReader(): MonadReader<ReaderPartialOf<D>, D> = arrow.mtl.monadReader()

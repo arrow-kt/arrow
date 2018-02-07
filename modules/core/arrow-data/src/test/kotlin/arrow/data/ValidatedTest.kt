@@ -25,11 +25,11 @@ class ValidatedTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            functor<ValidatedKindPartial<String>>() shouldNotBe null
-            applicative<ValidatedKindPartial<String>>() shouldNotBe null
-            foldable<ValidatedKindPartial<String>>() shouldNotBe null
-            traverse<ValidatedKindPartial<String>>() shouldNotBe null
-            applicativeError<ValidatedKindPartial<String>, String>() shouldNotBe null
+            functor<ValidatedPartialOf<String>>() shouldNotBe null
+            applicative<ValidatedPartialOf<String>>() shouldNotBe null
+            foldable<ValidatedPartialOf<String>>() shouldNotBe null
+            traverse<ValidatedPartialOf<String>>() shouldNotBe null
+            applicativeError<ValidatedPartialOf<String>, String>() shouldNotBe null
             eq<Validated<String, Int>>() shouldNotBe null
         }
 

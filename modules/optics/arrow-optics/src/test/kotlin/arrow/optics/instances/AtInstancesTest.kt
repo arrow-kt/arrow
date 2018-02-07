@@ -1,17 +1,17 @@
 package arrow.optics.instances
 
 import arrow.core.Option
-import arrow.data.ListKW
-import arrow.data.MapKW
-import arrow.data.SetKW
+import arrow.data.ListK
+import arrow.data.MapK
+import arrow.data.SetK
 import arrow.optics.AndMonoid
 import arrow.optics.typeclasses.at
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
-import arrow.test.generators.genListKW
-import arrow.test.generators.genMapKW
+import arrow.test.generators.genListK
+import arrow.test.generators.genMapK
 import arrow.test.generators.genOption
-import arrow.test.generators.genSetKW
+import arrow.test.generators.genSetK
 import arrow.test.laws.LensLaws
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
@@ -24,20 +24,20 @@ class AtInstanceTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            at<MapKW<String, Int>, String, Option<Int>>() shouldNotBe null
-            at<SetKW<String>, String, Boolean>() shouldNotBe null
+            at<MapK<String, Int>, String, Option<Int>>() shouldNotBe null
+            at<SetK<String>, String, Boolean>() shouldNotBe null
         }
 
         testLaws(LensLaws.laws(
-                lens = at<MapKW<String, Int>, String, Option<Int>>().at(Gen.string().generate()),
-                aGen = genMapKW(Gen.string(), Gen.int()),
+                lens = at<MapK<String, Int>, String, Option<Int>>().at(Gen.string().generate()),
+                aGen = genMapK(Gen.string(), Gen.int()),
                 bGen = genOption(Gen.int()),
                 funcGen = genFunctionAToB(genOption(Gen.int()))
         ))
 
         testLaws(LensLaws.laws(
-                lens = at<SetKW<String>, String, Boolean>().at(Gen.string().generate()),
-                aGen = genSetKW(Gen.string()),
+                lens = at<SetK<String>, String, Boolean>().at(Gen.string().generate()),
+                aGen = genSetK(Gen.string()),
                 bGen = Gen.bool(),
                 funcGen = genFunctionAToB(Gen.bool()),
                 MB = AndMonoid

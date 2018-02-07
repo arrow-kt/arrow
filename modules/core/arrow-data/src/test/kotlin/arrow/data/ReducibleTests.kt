@@ -1,6 +1,6 @@
 package arrow.data
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.Tuple2
 import arrow.instances.LongMonoid
 import arrow.test.UnitSpec
@@ -13,10 +13,10 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class ReducibleTests : UnitSpec() {
     init {
-        val nonEmptyReducible = object : NonEmptyReducible<NonEmptyListHK, ListKWHK>() {
-            override fun FG(): Foldable<ListKWHK> = ListKW.foldable()
+        val nonEmptyReducible = object : NonEmptyReducible<ForNonEmptyList, ForListK>() {
+            override fun FG(): Foldable<ForListK> = ListK.foldable()
 
-            override fun <A> split(fa: HK<NonEmptyListHK, A>): Tuple2<A, HK<ListKWHK, A>> = Tuple2(fa.ev().head, ListKW(fa.ev().tail))
+            override fun <A> split(fa: Kind<ForNonEmptyList, A>): Tuple2<A, Kind<ForListK, A>> = Tuple2(fa.reify().head, ListK(fa.reify().tail))
         }
 
         testLaws(ReducibleLaws.laws(

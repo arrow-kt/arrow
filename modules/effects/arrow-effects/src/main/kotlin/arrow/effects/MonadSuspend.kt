@@ -1,6 +1,6 @@
 package arrow.effects
 
-import arrow.HK
+import arrow.Kind
 import arrow.TC
 import arrow.core.Either
 import arrow.core.Tuple2
@@ -13,9 +13,9 @@ import kotlin.coroutines.experimental.startCoroutine
 /** The context required to defer evaluating a safe computation. **/
 @typeclass
 interface MonadSuspend<F> : MonadError<F, Throwable>, TC {
-    fun <A> suspend(fa: () -> HK<F, A>): HK<F, A>
+    fun <A> suspend(fa: () -> Kind<F, A>): Kind<F, A>
 
-    operator fun <A> invoke(fa: () -> A): HK<F, A> =
+    operator fun <A> invoke(fa: () -> A): Kind<F, A> =
             suspend {
                 try {
                     pure(fa())
@@ -24,15 +24,15 @@ interface MonadSuspend<F> : MonadError<F, Throwable>, TC {
                 }
             }
 
-    fun lazy(): HK<F, Unit> = invoke { }
+    fun lazy(): Kind<F, Unit> = invoke { }
 
-    fun <A> deferUnsafe(f: () -> Either<Throwable, A>): HK<F, A> =
+    fun <A> deferUnsafe(f: () -> Either<Throwable, A>): Kind<F, A> =
             suspend { f().fold({ raiseError<A>(it) }, { pure(it) }) }
 }
 
-inline fun <reified F, A> (() -> A).defer(SC: MonadSuspend<F> = monadSuspend()): HK<F, A> = SC(this)
+inline fun <reified F, A> (() -> A).defer(SC: MonadSuspend<F> = monadSuspend()): Kind<F, A> = SC(this)
 
-inline fun <reified F, A> (() -> Either<Throwable, A>).deferUnsafe(SC: MonadSuspend<F> = monadSuspend()): HK<F, A> =
+inline fun <reified F, A> (() -> Either<Throwable, A>).deferUnsafe(SC: MonadSuspend<F> = monadSuspend()): Kind<F, A> =
         SC.deferUnsafe(this)
 
 /**
@@ -46,9 +46,9 @@ inline fun <reified F, A> (() -> Either<Throwable, A>).deferUnsafe(SC: MonadSusp
  * This operation is cancellable by calling invoke on the [Disposable] return.
  * If [Disposable.invoke] is called the binding result will become a lifted [BindingCancellationException].
  */
-fun <F, B> MonadSuspend<F>.bindingCancellable(c: suspend MonadSuspendCancellableContinuation<F, *>.() -> B): Tuple2<HK<F, B>, Disposable> {
+fun <F, B> MonadSuspend<F>.bindingCancellable(c: suspend MonadSuspendCancellableContinuation<F, *>.() -> B): Tuple2<Kind<F, B>, Disposable> {
     val continuation = MonadSuspendCancellableContinuation<F, B>(this)
-    val wrapReturn: suspend MonadSuspendCancellableContinuation<F, *>.() -> HK<F, B> = { pure(c()) }
+    val wrapReturn: suspend MonadSuspendCancellableContinuation<F, *>.() -> Kind<F, B> = { pure(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad() toT continuation.disposable()
 }
