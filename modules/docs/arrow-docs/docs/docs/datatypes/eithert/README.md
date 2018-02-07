@@ -188,14 +188,14 @@ from Arrow to express the effect of potential known controled biz error inside o
 `EitherT` has the form of `EitherT<F, L, A>`.
 
 This means that for any monad `F` surrounding an `Either<L, A>` we can obtain an `EitherT<F, L, A>`.
-So our specialization `EitherT<ObservableKWHK, BizError, A>` is the EitherT transformer around values that are of `ObservableKW<Either<BizError, A>>`.
+So our specialization `EitherT<ForObservableKW, BizError, A>` is the EitherT transformer around values that are of `ObservableKW<Either<BizError, A>>`.
 
 We can now lift any value to a `EitherT<F, BizError, A>` which looks like this:
 
 ```kotlin:ank
 import arrow.syntax.applicative.*
 import arrow.data.*
-val eitherTVal = 1.pure<EitherTPartialOf<ObservableKWHK, BizError>, Int>()
+val eitherTVal = 1.pure<EitherTPartialOf<ForObservableKW, BizError>, Int>()
 eitherTVal
 ```
 
@@ -209,7 +209,7 @@ So how would our function look if we implemented it with the EitherT monad trans
 
 ```kotlin
 fun getCountryCode(personId: Int): ObservableKW<Either<BizError, String>> =
-  EitherT.monadError<ObservableKWHK, BizError>().binding {
+  EitherT.monadError<ForObservableKW, BizError>().binding {
     val person = EitherT(findPerson(personId)).bind()
     val address = EitherT(ObservableKW.pure(
       person.address.toEither { AddressNotFound(personId) }
@@ -234,7 +234,7 @@ EitherT(Option(3.left())).mapLeft({it + 1}, Option.functor())
 ```kotlin:ank
 import arrow.debug.*
 
-showInstances<EitherTPartialOf<ObservableKWHK, BizError>, BizError>()
+showInstances<EitherTPartialOf<ForObservableKW, BizError>, BizError>()
 ```
 
 Take a look at the [`OptionT` docs]({{ '/docs/datatypes/optiont' | relative_url }}) for an alternative version of this content with the `OptionT` monad transformer

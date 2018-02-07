@@ -71,7 +71,7 @@ odd(100000).value()
 ```kotlin:ank
 import arrow.debug.*
 
-showInstances<EvalHK, Unit>()
+showInstances<ForEval, Unit>()
 ```
  
 # Credits

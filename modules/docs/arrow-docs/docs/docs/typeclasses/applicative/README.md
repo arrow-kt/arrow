@@ -82,7 +82,7 @@ For a full list of other useful combinators available in `Applicative` see the [
 Lift a value into the computational context of a type constructor
 
 ```kotlin:ank
-1.pure<OptionHK, Int>()
+1.pure<ForOption, Int>()
 ```
 
 #### Kind<F, A>#ap

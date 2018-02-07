@@ -11,7 +11,7 @@ These solutions have a canonical implementation that is generalised for all poss
 
 A datatype is implemented by a data class, or a sealed hierarchy of data classes and objects.
 These datatypes are generalised by having one or several generic parameters,
-and to become a [type constructor]({{ '/docs/patterns/glossary/' | relative_url }}) they implement the interface [`HK`]({{ '/docs/patterns/glossary/' | relative_url }}) for these generic parameters.
+and to become a [type constructor]({{ '/docs/patterns/glossary/' | relative_url }}) they implement the interface [`Kind`]({{ '/docs/patterns/glossary/' | relative_url }}) for these generic parameters.
 Datatypes work over themselves, never directly over the values defined by its generic parameters.
 
 #### Example
@@ -19,7 +19,7 @@ Datatypes work over themselves, never directly over the values defined by its ge
 `Option<A>` is a datatype that represents absence.
 It has one generic parameter `A`, representing the type of the values that `Option` may contain.
 `Option` can be specialized for any type `A` because this type does not affect its behavior.
-`Option` behaves the same for `Int`, `String` or `DomainUserClass`. To indicate that `Option` is a [type constructor]({{ '/docs/patterns/glossary/' | relative_url }}) for all values of `A` it implements `OptionOf<A>`, which is a typealias of `Kind<OptionHK, A>`.
+`Option` behaves the same for `Int`, `String` or `DomainUserClass`. To indicate that `Option` is a [type constructor]({{ '/docs/patterns/glossary/' | relative_url }}) for all values of `A` it implements `OptionOf<A>`, which is a typealias of `Kind<ForOption, A>`.
 
 The implementation of `Option<A>` is a sealed class with two subtypes: an object `None` and a data class `Some<A>`.
 `Some<A>` represents presence of the value and thus it has one field containing it, and `None` represents absence.

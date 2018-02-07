@@ -88,7 +88,7 @@ for example applying `Throwable` to the left side yields `Either<Throwable, A>`,
 
 Type constructors are useful when matched with typeclasses because they help us represent instances of parametrized classes -the containers- that work for all generic parameters -the content-.
 As type constructors is not a first class feature in Kotlin, Λrrow uses an interface `Kind<F, A>` to represent them.
-HK stands for Higher Kind, which is the name of the language feature that allows working directly with type constructors.
+Kind stands for Higher Kind, which is the name of the language feature that allows working directly with type constructors.
 
 #### Higher Kinds
 
@@ -97,27 +97,27 @@ In a Higher Kind with the shape `Kind<F, A>`, if `A` is the type of the content 
 A malformed Higher Kind would use the whole type constructor to define the container, duplicating the type of the content ~~`Kind<Option<A>, A>`~~. This incorrect representation has large a number of issues when working with partially applied types and nested types.
 
 What Λrrow does instead is define a surrogate type that's not parametrized to represent `F`.
-These types are named same as the container and suffixed by HK, as in `OptionHK` or `ListKWHK`.
+These types are named same as the container and prefixed by For, as in `ForOption` or `ForListKW`.
 
 ```kotlin
-class OptionHK private constructor()
+class ForOption private constructor()
 
-sealed class Option<A>: Kind<OptionHK, A>
+sealed class Option<A>: Kind<ForOption, A>
 ```
 
 ```kotlin
-class ListKWHK private constructor()
+class ForListKW private constructor()
 
-data class ListKW<A>(val list: List<A>): Kind<ListKWHK, A>
+data class ListKW<A>(val list: List<A>): Kind<ForListKW, A>
 ```
 
-As `ListKW<A>` is the only existing implementation of `Kind<ListKWHK, A>`, we can define an extension function on `Kind<ListKWHK, A>` to do the downcasting safely for us. This function by convention is called `reify()` (evidence or evaluate).
+As `ListKW<A>` is the only existing implementation of `Kind<ForListKW, A>`, we can define an extension function on `Kind<ForListKW, A>` to do the downcasting safely for us. This function by convention is called `reify()` (evidence or evaluate).
 
-```kotlin
-fun Kind<ListKWHK, A>.reify() = this as ListKW<A>
+```ForListKW
+fun Kind<ForListKW, A>.reify() = this as ListKW<A>
 ```
 
-This way we have can to convert from `ListKW<A>` to `Kind<ListKWHK, A>` via simple subclassing and from `Kind<ListKWHK, A>` to `ListKW<A>` using the function `reify()`. Being able to define extension functions that work for partially applied generics is a feature from Kotlin that's not available in Java. You can define `fun Kind<OptionHK, A>.reify()` and `fun Kind<ListKWHK, A>.reify()` and the compiler can smartly decide which one you're trying to use. If it can't it means there's an ambiguity you should fix!
+This way we have can to convert from `ListKW<A>` to `Kind<ForListKW, A>` via simple subclassing and from `Kind<ForListKW, A>` to `ListKW<A>` using the function `reify()`. Being able to define extension functions that work for partially applied generics is a feature from Kotlin that's not available in Java. You can define `fun Kind<ForOption, A>.reify()` and `fun Kind<ForListKW, A>.reify()` and the compiler can smartly decide which one you're trying to use. If it can't it means there's an ambiguity you should fix!
 
 The function `reify()` is already defined for all datatypes in Λrrow. If you're creating your own datatype that's also a type constructor and would like to create all these helper types and functions,
 you can do so simply by annotating it as `@higerkind` and the Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create them for you.
@@ -128,8 +128,8 @@ data class ListKW<A>(val list: List<A>): ListKWOf<A>
 
 // Generates the following code:
 //
-// class ListKWHK private constructor()
-// typealias ListKWOf<A> = Kind<ListKWHK, A>
+// class ForListKW private constructor()
+// typealias ListKWOf<A> = Kind<ForListKW, A>
 // fun ListKWOf<A>.reify() = this as ListKW<A>
 ```
 
@@ -154,8 +154,8 @@ Let's define an instance of `Functor` for the datatype `ListKW`, our own wrapper
 
 ```kotlin
 @instance
-interface ListKWFunctorInstance : Functor<ListKWHK> {
-  override fun <A, B> map(fa: Kind<ListKWHK, A>, f: (A) -> B): ListKW<B> {
+interface ListKWFunctorInstance : Functor<ForListKW> {
+  override fun <A, B> map(fa: Kind<ForListKW, A>, f: (A) -> B): ListKW<B> {
     val list: ListKW<A> = fa.reify()
     return list.map(f)
   }
@@ -166,16 +166,16 @@ This interface extends `Functor` for the value `F` of `ListKW`. We use an annota
 
 ```kotlin
 @instance
-interface ListKWFunctorInstance : Functor<ListKWHK>
+interface ListKWFunctorInstance : Functor<ForListKW>
 ```
 
-The signature of `map` once the types have been replaced takes a parameter `Kind<ListKWHK, A>`, which is the receiver, and a mapping function from `A` to `B`. This means that map will work for all instances of `ListKW<A>` for whatever the value of `A` can be.
+The signature of `map` once the types have been replaced takes a parameter `Kind<ForListKW, A>`, which is the receiver, and a mapping function from `A` to `B`. This means that map will work for all instances of `ListKW<A>` for whatever the value of `A` can be.
 
 ```kotlin
-override fun <A, B> map(fa: Kind<ListKWHK, A>, f: (A) -> B): ListKW<B>
+override fun <A, B> map(fa: Kind<ForListKW, A>, f: (A) -> B): ListKW<B>
 ```
 
-The implementation is short. On the first line we downcast `Kind<ListKWHK, A>` to `ListKW<A>` using `reify()`. Once the value has been downcasted, the implementation of map inside the `ListKW<A>` we have obtained already implements the expected behavior of map.
+The implementation is short. On the first line we downcast `Kind<ForListKW, A>` to `ListKW<A>` using `reify()`. Once the value has been downcasted, the implementation of map inside the `ListKW<A>` we have obtained already implements the expected behavior of map.
 
 ```kotlin
 val list: ListKW<A> = fa.reify()
@@ -210,8 +210,8 @@ Now lets create a simple example instance of `Applicative` where our `F` is `Lis
 
 ```kotlin
 @instance
-interface ListKWApplicativeInstance : Applicative<ListKWHK> {
-  override fun <A> pure(a: A): Kind<ListKWHK, A> = ListKW(listOf(a))
+interface ListKWApplicativeInstance : Applicative<ForListKW> {
+  override fun <A> pure(a: A): Kind<ForListKW, A> = ListKW(listOf(a))
   
   /* ... */
 }
@@ -239,13 +239,13 @@ Passing the instance in every function call seems like a burden. But, remember t
 ```kotlin:ank
 import arrow.data.*
 
-applicative<ListKWHK>()
+applicative<ForListKW>()
 ```
 
 ```kotlin:ank
 import arrow.core.*
 
-applicative<OptionHK>()
+applicative<ForOption>()
 ```
 
 So, because `randomUserStructure` provides a default value for [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}) that's looked up globally, we can call it without passing the second parameter as long as we tell the compiler what type we're expecting the function to return.

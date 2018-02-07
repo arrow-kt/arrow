@@ -164,7 +164,7 @@ from Arrow to express the effect of potential absence inside our async computati
 `OptionT` has the form of `OptionT<F, A>`.
 
 This means that for any monad `F` surrounding an `Option<A>` we can obtain an `OptionT<F, A>`.
-So our specialization `OptionT<ObservableKWHK, A>` is the OptionT transformer around values that are of `ObservableKW<Option<A>>`.
+So our specialization `OptionT<ForObservableKW, A>` is the OptionT transformer around values that are of `ObservableKW<Option<A>>`.
 
 We can now lift any value to a `OptionT<F, A>` which looks like this:
 
@@ -172,14 +172,14 @@ We can now lift any value to a `OptionT<F, A>` which looks like this:
 import arrow.syntax.applicative.*
 import arrow.data.*
 
-val optTVal = 1.pure<OptionTPartialOf<ObservableKWHK>, Int>()
+val optTVal = 1.pure<OptionTPartialOf<ForObservableKW>, Int>()
 optTVal
 ```
 
 or
 
 ```kotlin:ank
-val optTVal = OptionT.fromOption<ObservableKWHK, Int>(Some(1))
+val optTVal = OptionT.fromOption<ForObservableKW, Int>(Some(1))
 optTVal
 ```
 
@@ -193,7 +193,7 @@ So how would our function look if we implemented it with the OptionT monad trans
 
 ```kotlin
 fun getCountryCode(personId: Int): ObservableKW<Option<String>> =
-  OptionT.monad<ObservableKWHK>().binding {
+  OptionT.monad<ForObservableKW>().binding {
     val person = OptionT(findPerson(personId)).bind()
     val address = OptionT(ObservableKW.pure(person.address)).bind()
     val country = OptionT(findCountry(address.id)).bind()
@@ -209,7 +209,7 @@ Available Instances:
 ```kotlin:ank
 import arrow.debug.*
 
-showInstances<OptionTPartialOf<ObservableKWHK>, Unit>()
+showInstances<OptionTPartialOf<ForObservableKW>, Unit>()
 ```
 
 Take a look at the [`EitherT` docs]({{ '/docs/datatypes/eithert' | relative_url }}) for an alternative version of this content with the `EitherT` monad transformer

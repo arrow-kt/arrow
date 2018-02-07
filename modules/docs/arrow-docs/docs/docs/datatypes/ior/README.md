@@ -139,7 +139,7 @@ Available Instances:
 ```kotlin:ank
 import arrow.debug.*
 
-showInstances<IorHK, Unit>()
+showInstances<ForIor, Unit>()
 ```
 
 # Credits

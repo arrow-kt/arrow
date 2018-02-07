@@ -188,5 +188,5 @@ import arrow.*
 import arrow.effects.*
 import arrow.debug.*
 
-showInstances<DeferredKWHK, Throwable>()
+showInstances<ForDeferredKW, Throwable>()
 ```

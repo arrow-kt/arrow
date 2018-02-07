@@ -61,5 +61,5 @@ Available Instances:
 ```kotlin:ank
 import arrow.debug.*
 
-showInstances<SetKWHK, Unit>()
+showInstances<ForSetKW, Unit>()
 ```

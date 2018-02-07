@@ -92,7 +92,7 @@ Let's refactor our manual state management in the form of `(S) -> Tuple2<S, A>` 
 So what we want is a return type that represents `Either` a `StackError` or a certain `State` of `Stack.` When working with `State` we don't pass around `Stack` anymore, so there is no parameter to check if the `Stack` is empty.
 
 ```kotlin:ank:silent
-fun _popS(): Either<StackError, StateT<IdHK, Stack, String>> = TODO()
+fun _popS(): Either<StackError, StateT<ForId, Stack, String>> = TODO()
 ```
 
 The only thing we can do is handle this with `StateT`. We want to wrap `State` with `Either`.

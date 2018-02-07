@@ -244,5 +244,5 @@ import arrow.*
 import arrow.effects.*
 import arrow.debug.*
 
-showInstances<IOHK, Throwable>()
+showInstances<ForIO, Throwable>()
 ```

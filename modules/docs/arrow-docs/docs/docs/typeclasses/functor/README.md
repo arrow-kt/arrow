@@ -63,8 +63,8 @@ import arrow.typeclasses.*
 inline fun <reified F> multiplyBy2(fa: Kind<F, Int>, FT: Functor<F> = functor()): Kind<F, Int> =
     FT.map(fa, { it * 2 })
 
-multiplyBy2<OptionHK>(Option(1)) // Option(1)
-multiplyBy2<TryHK>(Try { 1 })
+multiplyBy2<ForOption>(Option(1)) // Option(1)
+multiplyBy2<ForTry>(Try { 1 })
 ```
 
 In the example above we've defined a function that can operate over any data type for which a `Functor` instance is available.
@@ -122,7 +122,7 @@ Lift a function into the functor context
 ```kotlin:ank
 import arrow.syntax.functor.*
 
-val f = { n: Int -> n + 1 }.lift<OptionHK, Int, Int>()
+val f = { n: Int -> n + 1 }.lift<ForOption, Int, Int>()
 f(Option(1))
 ```
 
