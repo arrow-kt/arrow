@@ -6,30 +6,30 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-class ObservableKWInstances {
+class ObservableKInstances {
 
     @Provides
-    fun observableKWFunctor(): Functor<ObservableKWHK> = ObservableKW.functor()
+    fun observableKFunctor(): Functor<ForObservableK> = ObservableK.functor()
 
     @Provides
-    fun observableKWApplicative(): Applicative<ObservableKWHK> = ObservableKW.applicative()
+    fun observableKApplicative(): Applicative<ForObservableK> = ObservableK.applicative()
 
     @Provides
-    fun observableKWApplicativeError(): ApplicativeError<ObservableKWHK, Throwable> = ObservableKW.applicativeError()
+    fun observableKApplicativeError(): ApplicativeError<ForObservableK, Throwable> = ObservableK.applicativeError()
 
     @Provides
-    fun observableKWMonad(): Monad<ObservableKWHK> = ObservableKW.monad()
+    fun observableKMonad(): Monad<ForObservableK> = ObservableK.monad()
 
     @Provides
-    fun observableKWMonadError(): MonadError<ObservableKWHK, Throwable> = ObservableKW.monadError()
+    fun observableKMonadError(): MonadError<ForObservableK, Throwable> = ObservableK.monadError()
 
     @Provides
-    fun observableKWMonadSuspend(): MonadSuspend<ObservableKWHK> = ObservableKW.monadSuspend()
+    fun observableKMonadSuspend(): MonadSuspend<ForObservableK> = ObservableK.monadSuspend()
 
     @Provides
-    fun observableKWAsync(): Async<ObservableKWHK> = ObservableKW.async()
+    fun observableKAsync(): Async<ForObservableK> = ObservableK.async()
 
     @Provides
-    fun observableKWEffect(): Effect<ObservableKWHK> = ObservableKW.effect()
+    fun observableKEffect(): Effect<ForObservableK> = ObservableK.effect()
 
 }

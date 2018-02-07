@@ -6,30 +6,30 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-class FlowableKWInstances {
+class FlowableKInstances {
 
     @Provides
-    fun flowableKWFunctor(): Functor<FlowableKWHK> = FlowableKW.functor()
+    fun flowableKFunctor(): Functor<ForFlowableK> = FlowableK.functor()
 
     @Provides
-    fun flowableKWApplicative(): Applicative<FlowableKWHK> = FlowableKW.applicative()
+    fun flowableKApplicative(): Applicative<ForFlowableK> = FlowableK.applicative()
 
     @Provides
-    fun flowableKWApplicativeError(): ApplicativeError<FlowableKWHK, Throwable> = FlowableKW.applicativeError()
+    fun flowableKApplicativeError(): ApplicativeError<ForFlowableK, Throwable> = FlowableK.applicativeError()
 
     @Provides
-    fun flowableKWMonad(): Monad<FlowableKWHK> = FlowableKW.monad()
+    fun flowableKMonad(): Monad<ForFlowableK> = FlowableK.monad()
 
     @Provides
-    fun flowableKWMonadError(): MonadError<FlowableKWHK, Throwable> = FlowableKW.monadError()
+    fun flowableKMonadError(): MonadError<ForFlowableK, Throwable> = FlowableK.monadError()
 
     @Provides
-    fun flowableKWMonadSuspend(): MonadSuspend<FlowableKWHK> = FlowableKW.monadSuspend()
+    fun flowableKMonadSuspend(): MonadSuspend<ForFlowableK> = FlowableK.monadSuspend()
 
     @Provides
-    fun flowableKWAsync(): Async<FlowableKWHK> = FlowableKW.async()
+    fun flowableKAsync(): Async<ForFlowableK> = FlowableK.async()
 
     @Provides
-    fun flowableKWEffect(): Effect<FlowableKWHK> = FlowableKW.effect()
+    fun flowableKEffect(): Effect<ForFlowableK> = FlowableK.effect()
 
 }

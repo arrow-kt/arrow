@@ -6,30 +6,30 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-class DeferredKWInstances {
+class DeferredKInstances {
 
     @Provides
-    fun deferredKWFunctor(): Functor<DeferredKWHK> = DeferredKW.functor()
+    fun deferredKFunctor(): Functor<ForDeferredK> = DeferredK.functor()
 
     @Provides
-    fun deferredKWApplicative(): Applicative<DeferredKWHK> = DeferredKW.applicative()
+    fun deferredKApplicative(): Applicative<ForDeferredK> = DeferredK.applicative()
 
     @Provides
-    fun deferredKWApplicativeError(): ApplicativeError<DeferredKWHK, Throwable> = DeferredKW.applicativeError()
+    fun deferredKApplicativeError(): ApplicativeError<ForDeferredK, Throwable> = DeferredK.applicativeError()
 
     @Provides
-    fun deferredKWMonad(): Monad<DeferredKWHK> = DeferredKW.monad()
+    fun deferredKMonad(): Monad<ForDeferredK> = DeferredK.monad()
 
     @Provides
-    fun deferredKWMonadError(): MonadError<DeferredKWHK, Throwable> = DeferredKW.monadError()
+    fun deferredKMonadError(): MonadError<ForDeferredK, Throwable> = DeferredK.monadError()
 
     @Provides
-    fun deferredKWMonadSuspend(): MonadSuspend<DeferredKWHK> = DeferredKW.monadSuspend()
+    fun deferredKMonadSuspend(): MonadSuspend<ForDeferredK> = DeferredK.monadSuspend()
 
     @Provides
-    fun deferredKWAsync(): Async<DeferredKWHK> = DeferredKW.async()
+    fun deferredKAsync(): Async<ForDeferredK> = DeferredK.async()
 
     @Provides
-    fun deferredKWEffect(): Effect<DeferredKWHK> = DeferredKW.effect()
+    fun deferredKEffect(): Effect<ForDeferredK> = DeferredK.effect()
 
 }
