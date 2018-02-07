@@ -18,7 +18,7 @@ class InstanceParametrizedType(val raw: Type, val typeArgs: List<Type>) : Parame
             if (typeArgsAreParameterized()) {
                 val firstTypeArg = typeArgs[0]
                 when (firstTypeArg) {
-                    is ParameterizedType -> firstTypeArg.rawType == HK::class.java
+                    is ParameterizedType -> firstTypeArg.rawType == Kind::class.java
                     else -> false
                 }
             } else false

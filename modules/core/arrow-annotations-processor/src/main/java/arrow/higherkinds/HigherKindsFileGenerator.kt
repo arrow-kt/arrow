@@ -17,7 +17,7 @@ data class HigherKind(
 ) {
     val tparams: List<ProtoBuf.TypeParameter> = target.classOrPackageProto.typeParameters
     val kindName: Name = target.classElement.simpleName
-    val alias: String = if (tparams.size == 1) "arrow.HK" else "arrow.HK${tparams.size}"
+    val alias: String = if (tparams.size == 1) "arrow.Kind" else "arrow.Kind${tparams.size}"
     val aliasJ: String = if (tparams.size == 1) "io.kindedj.Hk" else "io.kindedj.HkJ${tparams.size}"
     val typeArgs: List<String> = target.classOrPackageProto.typeParameters.map { target.classOrPackageProto.nameResolver.getString(it.name) }
     val expandedTypeArgs: String = target.classOrPackageProto.typeParameters.joinToString(
@@ -60,7 +60,7 @@ class HigherKindsFileGenerator(
     private fun genPartiallyAppliedKinds(hk: HigherKind): String {
         val appliedTypeArgs = hk.typeArgs.dropLast(1)
         val expandedAppliedTypeArgs = appliedTypeArgs.joinToString(", ")
-        val hkimpl = if (appliedTypeArgs.size == 1) "arrow.HK" else "arrow.HK${appliedTypeArgs.size}"
+        val hkimpl = if (appliedTypeArgs.size == 1) "arrow.Kind" else "arrow.Kind${appliedTypeArgs.size}"
         return "typealias ${hk.name}Partial<$expandedAppliedTypeArgs> = $hkimpl<${hk.markerName}, $expandedAppliedTypeArgs>"
     }
 
