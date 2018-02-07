@@ -13,7 +13,7 @@ interface ObservableKWApplicativeErrorInstance :
             ObservableKW.raiseError(e)
 
     override fun <A> handleErrorWith(fa: ObservableKWKind<A>, f: (Throwable) -> ObservableKWKind<A>): ObservableKW<A> =
-            fa.handleErrorWith { f(it).ev() }
+            fa.handleErrorWith { f(it).reify() }
 }
 
 @instance(ObservableKW::class)
@@ -52,5 +52,5 @@ interface ObservableKWEffectInstance :
         ObservableKWAsyncInstance,
         Effect<ForObservableKW> {
     override fun <A> runAsync(fa: ObservableKWKind<A>, cb: (Either<Throwable, A>) -> ObservableKWKind<Unit>): ObservableKW<Unit> =
-            fa.ev().runAsync(cb)
+            fa.reify().runAsync(cb)
 }

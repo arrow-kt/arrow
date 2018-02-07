@@ -29,7 +29,7 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
      * @param AF [Applicative] for the context [F].
      */
     fun <B> ap(ff: KleisliKind<F, D, (A) -> B>, AF: Applicative<F>): Kleisli<F, D, B> =
-            Kleisli { AF.ap(run(it), ff.ev().run(it)) }
+            Kleisli { AF.ap(run(it), ff.reify().run(it)) }
 
     /**
      * Map the end of the arrow [A] to [B] given a function [f].
@@ -99,7 +99,7 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
      * @param ME [MonadError] for the context [F].
      */
     fun <E> handleErrorWith(f: (E) -> KleisliKind<F, D, A>, ME: MonadError<F, E>): Kleisli<F, D, A> = Kleisli {
-        ME.handleErrorWith(run(it), { e: E -> f(e).ev().run(it) })
+        ME.handleErrorWith(run(it), { e: E -> f(e).reify().run(it) })
     }
 
     companion object {
@@ -119,7 +119,7 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
          * @param MF [Monad] for the context [F].
          */
         fun <F, D, A, B> tailRecM(a: A, f: (A) -> KleisliKind<F, D, Either<A, B>>, MF: Monad<F>): Kleisli<F, D, B> =
-                Kleisli { b -> MF.tailRecM(a, { f(it).ev().run(b) }) }
+                Kleisli { b -> MF.tailRecM(a, { f(it).reify().run(b) }) }
 
         /**
          * Create an arrow for a value of [A].

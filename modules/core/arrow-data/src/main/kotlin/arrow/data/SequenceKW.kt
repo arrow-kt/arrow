@@ -6,25 +6,25 @@ import arrow.core.Eval
 import arrow.core.Tuple2
 import arrow.typeclasses.Applicative
 
-fun <A> SequenceKWKind<A>.toList(): List<A> = this.ev().sequence.toList()
+fun <A> SequenceKWKind<A>.toList(): List<A> = this.reify().sequence.toList()
 
 @higherkind
 data class SequenceKW<out A> constructor(val sequence: Sequence<A>) : SequenceKWKind<A>, Sequence<A> by sequence {
 
-    fun <B> flatMap(f: (A) -> SequenceKWKind<B>): SequenceKW<B> = this.ev().sequence.flatMap { f(it).ev().sequence }.k()
+    fun <B> flatMap(f: (A) -> SequenceKWKind<B>): SequenceKW<B> = this.reify().sequence.flatMap { f(it).reify().sequence }.k()
 
-    fun <B> ap(ff: SequenceKWKind<(A) -> B>): SequenceKW<B> = ff.ev().flatMap { f -> map(f) }.ev()
+    fun <B> ap(ff: SequenceKWKind<(A) -> B>): SequenceKW<B> = ff.reify().flatMap { f -> map(f) }.reify()
 
-    fun <B> map(f: (A) -> B): SequenceKW<B> = this.ev().sequence.map(f).k()
+    fun <B> map(f: (A) -> B): SequenceKW<B> = this.reify().sequence.map(f).k()
 
-    fun <B> foldLeft(b: B, f: (B, A) -> B): B = this.ev().fold(b, f)
+    fun <B> foldLeft(b: B, f: (B, A) -> B): B = this.reify().fold(b, f)
 
     fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
         fun loop(fa_p: SequenceKW<A>): Eval<B> = when {
             fa_p.sequence.none() -> lb
             else -> f(fa_p.first(), Eval.defer { loop(fa_p.drop(1).k()) })
         }
-        return Eval.defer { loop(this.ev()) }
+        return Eval.defer { loop(this.reify()) }
     }
 
     fun <G, B> traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, SequenceKW<B>> =
@@ -33,11 +33,11 @@ data class SequenceKW<out A> constructor(val sequence: Sequence<A>) : SequenceKW
             }.value()
 
     fun <B, Z> map2(fb: SequenceKWKind<B>, f: (Tuple2<A, B>) -> Z): SequenceKW<Z> =
-            this.ev().flatMap { a ->
-                fb.ev().map { b ->
+            this.reify().flatMap { a ->
+                fb.reify().map { b ->
                     f(Tuple2(a, b))
                 }
-            }.ev()
+            }.reify()
 
     companion object {
 
@@ -59,22 +59,22 @@ data class SequenceKW<out A> constructor(val sequence: Sequence<A>) : SequenceKW
                         }
                         is Either.Left<A, B> -> {
                             if (v.count() == 1)
-                                go(buf, f, (f(head.a).ev()).k())
+                                go(buf, f, (f(head.a).reify()).k())
                             else
-                                go(buf, f, (f(head.a).ev() + v.drop(1)).k())
+                                go(buf, f, (f(head.a).reify() + v.drop(1)).k())
                         }
                     }
                 }
             }
 
             val buf = mutableListOf<B>()
-            go(buf, f, f(a).ev())
+            go(buf, f, f(a).reify())
             return SequenceKW(buf.asSequence())
         }
 
     }
 }
 
-fun <A> SequenceKW<A>.combineK(y: SequenceKWKind<A>): SequenceKW<A> = (this.sequence + y.ev().sequence).k()
+fun <A> SequenceKW<A>.combineK(y: SequenceKWKind<A>): SequenceKW<A> = (this.sequence + y.reify().sequence).k()
 
 fun <A> Sequence<A>.k(): SequenceKW<A> = SequenceKW(this)

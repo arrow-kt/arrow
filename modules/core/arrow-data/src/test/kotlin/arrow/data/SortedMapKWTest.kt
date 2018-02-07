@@ -15,7 +15,7 @@ class SortedMapKWTest : UnitSpec() {
 
     val EQ: Eq<Kind2<ForSortedMapKW, String, Int>> = object : Eq<Kind2<ForSortedMapKW, String, Int>> {
         override fun eqv(a: Kind2<ForSortedMapKW, String, Int>, b: Kind2<ForSortedMapKW, String, Int>): Boolean =
-            a.ev()["key"] == b.ev()["key"]
+            a.reify()["key"] == b.reify()["key"]
     }
 
     init {

@@ -14,7 +14,7 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class CoyonedaTest : UnitSpec() {
     val EQ: Eq<CoyonedaKind<ForId, Int, Int>> = Eq { a, b ->
-        a.ev().lower(Id.functor()) == b.ev().lower(Id.functor())
+        a.reify().lower(Id.functor()) == b.reify().lower(Id.functor())
     }
 
     init {
@@ -41,8 +41,8 @@ class CoyonedaTest : UnitSpec() {
         "toYoneda should convert to an equivalent Yoneda" {
             forAll { x: Int ->
                 val op = Coyoneda(Id(x), Int::toString)
-                val toYoneda = op.toYoneda(Id.functor()).lower().ev()
-                val expected = Yoneda(Id(x.toString())).lower().ev()
+                val toYoneda = op.toYoneda(Id.functor()).lower().reify()
+                val expected = Yoneda(Id(x.toString())).lower().reify()
 
                 expected == toYoneda
             }

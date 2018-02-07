@@ -21,7 +21,7 @@ internal interface IOFrame<in A, out R> : (A) -> R {
         internal data class ErrorHandler<A>(val fe: (Throwable) -> IOKind<A>) : IOFrame<A, IO<A>> {
             override fun invoke(a: A): IO<A> = Pure(a)
 
-            override fun recover(e: Throwable): IO<A> = fe(e).ev()
+            override fun recover(e: Throwable): IO<A> = fe(e).reify()
         }
 
         @Suppress("UNCHECKED_CAST")

@@ -13,7 +13,7 @@ import kotlin.coroutines.experimental.CoroutineContext
 fun <A> Deferred<A>.k(): DeferredKW<A> =
         DeferredKW(this)
 
-fun <A> DeferredKWKind<A>.value(): Deferred<A> = this.ev().deferred
+fun <A> DeferredKWKind<A>.value(): Deferred<A> = this.reify().deferred
 
 @higherkind
 @deriving(
@@ -27,7 +27,7 @@ data class DeferredKW<out A>(val deferred: Deferred<A>) : DeferredKWKind<A>, Def
             flatMap { a: A -> pure(f(a)) }
 
     fun <B> ap(fa: DeferredKWKind<(A) -> B>): DeferredKW<B> =
-            flatMap { a -> fa.ev().map { ff -> ff(a) } }
+            flatMap { a -> fa.reify().map { ff -> ff(a) } }
 
     fun <B> flatMap(f: (A) -> DeferredKWKind<B>): DeferredKW<B> =
             kotlinx.coroutines.experimental.async(Unconfined, CoroutineStart.LAZY) {
@@ -83,7 +83,7 @@ data class DeferredKW<out A>(val deferred: Deferred<A>) : DeferredKWKind<A>, Def
                                 result = actual.b
                                 break
                             } else if (actual is Either.Left) {
-                                current = f(actual.a).ev()
+                                current = f(actual.a).reify()
                             }
                         }
                         result
@@ -118,4 +118,4 @@ fun <A> DeferredKWKind<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Un
             }
         }
 
-suspend fun <A> DeferredKWKind<A>.await(): A = this.ev().await()
+suspend fun <A> DeferredKWKind<A>.await(): A = this.reify().await()

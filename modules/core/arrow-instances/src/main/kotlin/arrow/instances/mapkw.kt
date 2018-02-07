@@ -7,23 +7,23 @@ import arrow.typeclasses.*
 
 @instance(MapKW::class)
 interface MapKWFunctorInstance<K> : Functor<MapKWKindPartial<K>> {
-    override fun <A, B> map(fa: Kind<MapKWKindPartial<K>, A>, f: (A) -> B): MapKW<K, B> = fa.ev().map(f)
+    override fun <A, B> map(fa: Kind<MapKWKindPartial<K>, A>, f: (A) -> B): MapKW<K, B> = fa.reify().map(f)
 }
 
 @instance(MapKW::class)
 interface MapKWFoldableInstance<K> : Foldable<MapKWKindPartial<K>> {
 
-    override fun <A, B> foldLeft(fa: Kind<MapKWKindPartial<K>, A>, b: B, f: (B, A) -> B): B = fa.ev().foldLeft(b, f)
+    override fun <A, B> foldLeft(fa: Kind<MapKWKindPartial<K>, A>, b: B, f: (B, A) -> B): B = fa.reify().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: Kind<MapKWKindPartial<K>, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            fa.ev().foldRight(lb, f)
+            fa.reify().foldRight(lb, f)
 }
 
 @instance(MapKW::class)
 interface MapKWTraverseInstance<K> : MapKWFoldableInstance<K>, Traverse<MapKWKindPartial<K>> {
 
     override fun <G, A, B> traverse(fa: Kind<MapKWKindPartial<K>, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Kind<MapKWKindPartial<K>, B>> =
-            fa.ev().traverse(f, GA)
+            fa.reify().traverse(f, GA)
 }
 
 @instance(MapKW::class)
@@ -32,8 +32,8 @@ interface MapKWSemigroupInstance<K, A> : Semigroup<MapKWKind<K, A>> {
     fun SG(): Semigroup<A>
 
     override fun combine(a: MapKWKind<K, A>, b: MapKWKind<K, A>): MapKW<K, A> =
-            if (a.ev().size < b.ev().size) a.ev().foldLeft<A>(b.ev(), { my, (k, b) -> my.updated(k, SG().maybeCombine(b, my.get(k))) })
-            else b.ev().foldLeft<A>(a.ev(), { my, (k, a) -> my.updated(k, SG().maybeCombine(a, my.get(k))) })
+            if (a.reify().size < b.reify().size) a.reify().foldLeft<A>(b.reify(), { my, (k, b) -> my.updated(k, SG().maybeCombine(b, my.get(k))) })
+            else b.reify().foldLeft<A>(a.reify(), { my, (k, a) -> my.updated(k, SG().maybeCombine(a, my.get(k))) })
 
 }
 

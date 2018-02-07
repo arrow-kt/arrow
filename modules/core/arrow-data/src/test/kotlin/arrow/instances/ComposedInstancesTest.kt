@@ -15,11 +15,11 @@ typealias OptionTNel = Kind<OptionTKindPartial<ForNonEmptyList>, Int>
 @RunWith(KTestJUnitRunner::class)
 class ComposedInstancesTest : UnitSpec() {
     val EQ_OPTION_NEL: Eq<NestedType<ForOption, ForNonEmptyList, Int>> = Eq { a, b ->
-        a.unnest().ev() == b.unnest().ev()
+        a.unnest().reify() == b.unnest().reify()
     }
 
     val EQ_LKW_OPTION: Eq<NestedType<ForListKW, ForOption, Int>> = Eq { a, b ->
-        a.unnest().ev() == b.unnest().ev()
+        a.unnest().reify() == b.unnest().reify()
     }
 
     val EQ_OPTIONT_ID_NEL: Eq<NestedType<OptionTKindPartial<ForId>, OptionTKindPartial<ForNonEmptyList>, Int>> =
@@ -27,7 +27,7 @@ class ComposedInstancesTest : UnitSpec() {
                 a.unnest().value().value().fold(
                         { b.unnest().value().value().isEmpty() },
                         { optionA: OptionTNel ->
-                            b.unnest().value().value().ev().fold(
+                            b.unnest().value().value().reify().fold(
                                     { false },
                                     { it.value() == optionA.value() })
                         })

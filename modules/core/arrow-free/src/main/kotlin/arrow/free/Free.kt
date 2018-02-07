@@ -30,7 +30,7 @@ inline fun <reified M, S, A> FreeKind<S, A>.foldMapK(f: FunctionK<S, M>, MM: Mon
                             Companion.pure(a)
 
                     override fun <A, B> ap(fa: Kind<FreeKindPartial<F>, A>, ff: Kind<FreeKindPartial<F>, (A) -> B>): Free<F, B> {
-                        return applicative.ap(fa, ff).ev()
+                        return applicative.ap(fa, ff).reify()
                     }
                 }
     }
@@ -57,7 +57,7 @@ fun <S, A, B> Free<S, A>.map(f: (A) -> B): Free<S, B> = flatMap { Free.Pure<S, B
 
 fun <S, A, B> Free<S, A>.flatMap(f: (A) -> Free<S, B>): Free<S, B> = Free.FlatMapped(this, f)
 
-fun <S, A, B> Free<S, A>.ap(ff: FreeKind<S, (A) -> B>): Free<S, B> = ff.ev().flatMap { f -> map(f) }.ev()
+fun <S, A, B> Free<S, A>.ap(ff: FreeKind<S, (A) -> B>): Free<S, B> = ff.reify().flatMap { f -> map(f) }.reify()
 
 @Suppress("UNCHECKED_CAST")
 tailrec fun <S, A> Free<S, A>.step(): Free<S, A> =
@@ -93,4 +93,4 @@ fun <S, A> A.free(): Free<S, A> = Free.pure<S, A>(this)
 
 fun <F, A> Free<F, A>.run(M: Monad<F>): Kind<F, A> = this.foldMap(FunctionK.id(), M)
 
-fun <F, A> FreeKind<F, A>.runK(M: Monad<F>): Kind<F, A> = this.ev().foldMap(FunctionK.id(), M)
+fun <F, A> FreeKind<F, A>.runK(M: Monad<F>): Kind<F, A> = this.reify().foldMap(FunctionK.id(), M)

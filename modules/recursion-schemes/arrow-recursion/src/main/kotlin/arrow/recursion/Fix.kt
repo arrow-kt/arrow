@@ -13,7 +13,7 @@ import arrow.typeclasses.*
                 embedT(compFG.unnest(), FF)
 
         inline fun <F> embedT(compFG: Kind<Nested<ForFix, F>, FixKind<F>>, FF: Functor<F>): FixKind<F> =
-                Fix(FF, compFG.unnest().ev())
+                Fix(FF, compFG.unnest().reify())
 
     }
 }

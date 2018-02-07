@@ -6,7 +6,7 @@ import arrow.core.toT
 import arrow.data.WriterT
 import arrow.data.WriterTKind
 import arrow.data.WriterTKindPartial
-import arrow.data.ev
+import arrow.data.reify
 import arrow.instance
 import arrow.typeclasses.*
 
@@ -14,7 +14,7 @@ import arrow.typeclasses.*
 interface WriterTFunctorInstance<F, W> : Functor<WriterTKindPartial<F, W>> {
     fun FF(): Functor<F>
 
-    override fun <A, B> map(fa: WriterTKind<F, W, A>, f: (A) -> B): WriterT<F, W, B> = fa.ev().map({ f(it) }, FF())
+    override fun <A, B> map(fa: WriterTKind<F, W, A>, f: (A) -> B): WriterT<F, W, B> = fa.reify().map({ f(it) }, FF())
 }
 
 @instance(WriterT::class)
@@ -28,26 +28,26 @@ interface WriterTApplicativeInstance<F, W> : Applicative<WriterTKindPartial<F, W
             WriterT(FF().pure(MM().empty() toT a))
 
     override fun <A, B> ap(fa: WriterTKind<F, W, A>, ff: Kind<WriterTKindPartial<F, W>, (A) -> B>): WriterT<F, W, B> =
-            fa.ev().ap(ff, MM(), FF())
+            fa.reify().ap(ff, MM(), FF())
 
     override fun <A, B> map(fa: WriterTKind<F, W, A>, f: (A) -> B): WriterT<F, W, B> =
-            fa.ev().map({ f(it) }, FF())
+            fa.reify().map({ f(it) }, FF())
 }
 
 @instance(WriterT::class)
 interface WriterTMonadInstance<F, W> : WriterTApplicativeInstance<F, W>, Monad<WriterTKindPartial<F, W>> {
 
     override fun <A, B> map(fa: WriterTKind<F, W, A>, f: (A) -> B): WriterT<F, W, B> =
-            fa.ev().map({ f(it) }, FF())
+            fa.reify().map({ f(it) }, FF())
 
     override fun <A, B> flatMap(fa: WriterTKind<F, W, A>, f: (A) -> Kind<WriterTKindPartial<F, W>, B>): WriterT<F, W, B> =
-            fa.ev().flatMap({ f(it).ev() }, MM(), FF())
+            fa.reify().flatMap({ f(it).reify() }, MM(), FF())
 
     override fun <A, B> tailRecM(a: A, f: (A) -> Kind<WriterTKindPartial<F, W>, Either<A, B>>): WriterT<F, W, B> =
             WriterT.tailRecM(a, f, FF())
 
     override fun <A, B> ap(fa: WriterTKind<F, W, A>, ff: Kind<WriterTKindPartial<F, W>, (A) -> B>): WriterT<F, W, B> =
-            fa.ev().ap(ff, MM(), FF())
+            fa.reify().ap(ff, MM(), FF())
 }
 
 @instance(WriterT::class)
@@ -56,7 +56,7 @@ interface WriterTSemigroupKInstance<F, W> : SemigroupK<WriterTKindPartial<F, W>>
     fun SS(): SemigroupK<F>
 
     override fun <A> combineK(x: WriterTKind<F, W, A>, y: WriterTKind<F, W, A>): WriterT<F, W, A> =
-            x.ev().combineK(y, SS())
+            x.reify().combineK(y, SS())
 }
 
 @instance(WriterT::class)

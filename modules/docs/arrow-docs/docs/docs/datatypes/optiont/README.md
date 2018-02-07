@@ -53,7 +53,7 @@ fun getCountryCode(maybePerson : Option<Person>): Option<String> =
     val country = address.country.bind()
     val code = country.code.bind()
     code
-  }.ev()
+  }.reify()
 ```
 
 Alright, a piece of cake right? That's because we were dealing with a simple type `Option`. But here's where things can get more complicated. Let's introduce another monad in the middle of the computation. For example what happens when we need to load a person by id, then their address and country to obtain the country code from a remote service?
@@ -149,7 +149,7 @@ fun getCountryCode(personId: Int): ObservableKW<Option<String>> =
           { ObservableKW.pure(it) }
         ).bind()
         country.code
-      }.ev()
+      }.reify()
 ```
 
 While we've got the logic working now, we're in a situation where we're forced to deal with the `None cases`. We also have a ton of boilerplate type conversion with `fold`. The type conversion is necessary because in a monad comprehension you can only use a type of Monad. If we start with `ObservableKW`, we have to stay in it’s monadic context by lifting anything we compute sequentially to a `ObservableKW` whether or not it's async.
@@ -199,7 +199,7 @@ fun getCountryCode(personId: Int): ObservableKW<Option<String>> =
     val country = OptionT(findCountry(address.id)).bind()
     val code = OptionT(ObservableKW.pure(country.code)).bind()
     code
-  }.value().ev()
+  }.value().reify()
 ```
 
 Here we no longer have to deal with the `None` cases, and the binding to the values on the left side are already the underlying values we want to focus on instead of the optional values. We have automatically `flatMapped` through the `ObservableKW` and `Option` in a single expression reducing the boilerplate and encoding the effects concerns in the type signatures.

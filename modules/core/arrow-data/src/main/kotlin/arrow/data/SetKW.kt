@@ -27,6 +27,6 @@ data class SetKW<out A>(val set: Set<A>) : SetKWKind<A>, Set<A> by set {
     }
 }
 
-fun <A> SetKW<A>.combineK(y: SetKWKind<A>): SetKW<A> = (this.set + y.ev().set).k()
+fun <A> SetKW<A>.combineK(y: SetKWKind<A>): SetKW<A> = (this.set + y.reify().set).k()
 
 fun <A> Set<A>.k(): SetKW<A> = SetKW(this)

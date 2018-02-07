@@ -14,7 +14,7 @@ interface FlowableKWApplicativeErrorInstance :
             FlowableKW.raiseError(e)
 
     override fun <A> handleErrorWith(fa: FlowableKWKind<A>, f: (Throwable) -> FlowableKWKind<A>): FlowableKW<A> =
-            fa.handleErrorWith { f(it).ev() }
+            fa.handleErrorWith { f(it).reify() }
 }
 
 @instance(FlowableKW::class)
@@ -55,5 +55,5 @@ interface FlowableKWEffectInstance :
         FlowableKWAsyncInstance,
         Effect<ForFlowableKW> {
     override fun <A> runAsync(fa: FlowableKWKind<A>, cb: (Either<Throwable, A>) -> FlowableKWKind<Unit>): FlowableKW<Unit> =
-            fa.ev().runAsync(cb)
+            fa.reify().runAsync(cb)
 }

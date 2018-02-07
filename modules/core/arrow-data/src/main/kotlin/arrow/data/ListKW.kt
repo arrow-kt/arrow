@@ -10,21 +10,21 @@ import arrow.typeclasses.Applicative
 @higherkind
 data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A> by list {
 
-    fun <B> flatMap(f: (A) -> ListKWKind<B>): ListKW<B> = this.ev().list.flatMap { f(it).ev().list }.k()
+    fun <B> flatMap(f: (A) -> ListKWKind<B>): ListKW<B> = this.reify().list.flatMap { f(it).reify().list }.k()
 
-    fun <B> map(f: (A) -> B): ListKW<B> = this.ev().list.map(f).k()
+    fun <B> map(f: (A) -> B): ListKW<B> = this.reify().list.map(f).k()
 
-    fun <B> foldLeft(b: B, f: (B, A) -> B): B = this.ev().fold(b, f)
+    fun <B> foldLeft(b: B, f: (B, A) -> B): B = this.reify().fold(b, f)
 
     fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
         fun loop(fa_p: ListKW<A>): Eval<B> = when {
             fa_p.list.isEmpty() -> lb
-            else -> f(fa_p.ev().list.first(), Eval.defer { loop(fa_p.list.drop(1).k()) })
+            else -> f(fa_p.reify().list.first(), Eval.defer { loop(fa_p.list.drop(1).k()) })
         }
-        return Eval.defer { loop(this.ev()) }
+        return Eval.defer { loop(this.reify()) }
     }
 
-    fun <B> ap(ff: ListKWKind<(A) -> B>): ListKW<B> = ff.ev().flatMap { f -> map(f) }.ev()
+    fun <B> ap(ff: ListKWKind<(A) -> B>): ListKW<B> = ff.reify().flatMap { f -> map(f) }.reify()
 
     fun <G, B> traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, ListKW<B>> =
             foldRight(Eval.always { GA.pure(emptyList<B>().k()) }) { a, eval ->
@@ -32,11 +32,11 @@ data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A>
             }.value()
 
     fun <B, Z> map2(fb: ListKWKind<B>, f: (Tuple2<A, B>) -> Z): ListKW<Z> =
-            this.ev().flatMap { a ->
-                fb.ev().map { b ->
+            this.reify().flatMap { a ->
+                fb.reify().map { b ->
                     f(Tuple2(a, b))
                 }
-            }.ev()
+            }.reify()
 
     fun <B> mapFilter(f: (A) -> Option<B>): ListKW<B> =
             flatMap({ a -> f(a).fold({ empty<B>() }, { pure(it) }) })
@@ -59,20 +59,20 @@ data class ListKW<out A> constructor(val list: List<A>) : ListKWKind<A>, List<A>
                         buf += head.b
                         go(buf, f, v.drop(1).k())
                     }
-                    is Either.Left<A, B> -> go(buf, f, (f(head.a).ev() + v.drop(1)).k())
+                    is Either.Left<A, B> -> go(buf, f, (f(head.a).reify() + v.drop(1)).k())
                 }
             }
         }
 
         fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForListKW, Either<A, B>>): ListKW<B> {
             val buf = ArrayList<B>()
-            go(buf, f, f(a).ev())
+            go(buf, f, f(a).reify())
             return ListKW(buf)
         }
     }
 
 }
 
-fun <A> ListKW<A>.combineK(y: ListKWKind<A>): ListKW<A> = (this.list + y.ev().list).k()
+fun <A> ListKW<A>.combineK(y: ListKWKind<A>): ListKW<A> = (this.list + y.reify().list).k()
 
 fun <A> List<A>.k(): ListKW<A> = ListKW(this)

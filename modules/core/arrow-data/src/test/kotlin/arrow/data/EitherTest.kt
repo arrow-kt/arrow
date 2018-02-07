@@ -16,7 +16,7 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class EitherTest : UnitSpec() {
     val EQ: Eq<Kind<EitherKindPartial<ForId>, Int>> = Eq { a, b ->
-        a.ev() == b.ev()
+        a.reify() == b.reify()
     }
 
     init {

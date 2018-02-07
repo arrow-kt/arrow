@@ -54,7 +54,7 @@ SequenceKW.monad().binding {
    val p = positive.bind()
    val pe = positiveEven.bind()
    p + pe
-}.ev().take(5).toList()
+}.reify().take(5).toList()
 ```
 
 Folding a sequence,

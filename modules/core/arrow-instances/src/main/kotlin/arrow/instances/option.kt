@@ -29,7 +29,7 @@ interface OptionMonoidInstance<A> : OptionSemigroupInstance<A>, Monoid<Option<A>
 interface OptionApplicativeErrorInstance : OptionApplicativeInstance, ApplicativeError<ForOption, Unit> {
     override fun <A> raiseError(e: Unit): Option<A> = None
 
-    override fun <A> handleErrorWith(fa: OptionKind<A>, f: (Unit) -> OptionKind<A>): Option<A> = fa.ev().orElse({ f(Unit).ev() })
+    override fun <A> handleErrorWith(fa: OptionKind<A>, f: (Unit) -> OptionKind<A>): Option<A> = fa.reify().orElse({ f(Unit).reify() })
 }
 
 @instance(Option::class)
@@ -65,16 +65,16 @@ interface OptionEqInstance<A> : Eq<Option<A>> {
 @instance(Option::class)
 interface OptionFunctorInstance : Functor<ForOption> {
     override fun <A, B> map(fa: OptionKind<A>, f: kotlin.Function1<A, B>): Option<B> =
-            fa.ev().map(f)
+            fa.reify().map(f)
 }
 
 @instance(Option::class)
 interface OptionApplicativeInstance : Applicative<ForOption> {
     override fun <A, B> ap(fa: OptionKind<A>, ff: OptionKind<kotlin.Function1<A, B>>): Option<B> =
-            fa.ev().ap(ff)
+            fa.reify().ap(ff)
 
     override fun <A, B> map(fa: OptionKind<A>, f: kotlin.Function1<A, B>): Option<B> =
-            fa.ev().map(f)
+            fa.reify().map(f)
 
     override fun <A> pure(a: A): Option<A> =
             Option.pure(a)
@@ -83,16 +83,16 @@ interface OptionApplicativeInstance : Applicative<ForOption> {
 @instance(Option::class)
 interface OptionMonadInstance : Monad<ForOption> {
     override fun <A, B> ap(fa: OptionKind<A>, ff: OptionKind<kotlin.Function1<A, B>>): Option<B> =
-            fa.ev().ap(ff)
+            fa.reify().ap(ff)
 
     override fun <A, B> flatMap(fa: OptionKind<A>, f: kotlin.Function1<A, OptionKind<B>>): Option<B> =
-            fa.ev().flatMap(f)
+            fa.reify().flatMap(f)
 
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, OptionKind<Either<A, B>>>): Option<B> =
             Option.tailRecM(a, f)
 
     override fun <A, B> map(fa: OptionKind<A>, f: kotlin.Function1<A, B>): Option<B> =
-            fa.ev().map(f)
+            fa.reify().map(f)
 
     override fun <A> pure(a: A): Option<A> =
             Option.pure(a)
@@ -101,26 +101,26 @@ interface OptionMonadInstance : Monad<ForOption> {
 @instance(Option::class)
 interface OptionFoldableInstance : Foldable<ForOption> {
     override fun <A> exists(fa: OptionKind<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
-            fa.ev().exists(p)
+            fa.reify().exists(p)
 
     override fun <A, B> foldLeft(fa: OptionKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =
-            fa.ev().foldLeft(b, f)
+            fa.reify().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: OptionKind<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
-            fa.ev().foldRight(lb, f)
+            fa.reify().foldRight(lb, f)
 
     override fun <A> forall(fa: OptionKind<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
-            fa.ev().forall(p)
+            fa.reify().forall(p)
 
     override fun <A> isEmpty(fa: OptionKind<A>): kotlin.Boolean =
-            fa.ev().isEmpty()
+            fa.reify().isEmpty()
 
     override fun <A> nonEmpty(fa: OptionKind<A>): kotlin.Boolean =
-            fa.ev().nonEmpty()
+            fa.reify().nonEmpty()
 }
 
 fun <A, G, B> Option<A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Option<B>> =
-        this.ev().let { option ->
+        this.reify().let { option ->
             when (option) {
                 is Some -> GA.map(f(option.t), { Some(it) })
                 is None -> GA.pure(None)
@@ -128,7 +128,7 @@ fun <A, G, B> Option<A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind
         }
 
 fun <A, G, B> Option<A>.traverseFilter(f: (A) -> Kind<G, Option<B>>, GA: Applicative<G>): Kind<G, Option<B>> =
-        this.ev().let { option ->
+        this.reify().let { option ->
             when (option) {
                 is Some -> f(option.t)
                 None -> GA.pure(None)
@@ -138,26 +138,26 @@ fun <A, G, B> Option<A>.traverseFilter(f: (A) -> Kind<G, Option<B>>, GA: Applica
 @instance(Option::class)
 interface OptionTraverseInstance : Traverse<ForOption> {
     override fun <A, B> map(fa: OptionKind<A>, f: kotlin.Function1<A, B>): Option<B> =
-            fa.ev().map(f)
+            fa.reify().map(f)
 
     override fun <G, A, B> traverse(fa: OptionKind<A>, f: kotlin.Function1<A, Kind<G, B>>, GA: Applicative<G>): Kind<G, Option<B>> =
-            fa.ev().traverse(f, GA)
+            fa.reify().traverse(f, GA)
 
     override fun <A> exists(fa: OptionKind<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
-            fa.ev().exists(p)
+            fa.reify().exists(p)
 
     override fun <A, B> foldLeft(fa: OptionKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =
-            fa.ev().foldLeft(b, f)
+            fa.reify().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: OptionKind<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
-            fa.ev().foldRight(lb, f)
+            fa.reify().foldRight(lb, f)
 
     override fun <A> forall(fa: OptionKind<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
-            fa.ev().forall(p)
+            fa.reify().forall(p)
 
     override fun <A> isEmpty(fa: OptionKind<A>): kotlin.Boolean =
-            fa.ev().isEmpty()
+            fa.reify().isEmpty()
 
     override fun <A> nonEmpty(fa: OptionKind<A>): kotlin.Boolean =
-            fa.ev().nonEmpty()
+            fa.reify().nonEmpty()
 }

@@ -57,9 +57,9 @@ fun <S, A> StateFun<S, A>.toState(): State<S, A> = State(this)
 fun <S, A> StateFunKind<S, A>.toState(): State<S, A> = State(this)
 
 fun <S, T, P1, R> State<S, T>.map(sx: State<S, P1>, f: (T, P1) -> R): State<S, R> =
-        flatMap ({ t -> sx.map { x -> f(t, x) } }, monad()).ev()
+        flatMap ({ t -> sx.map { x -> f(t, x) } }, monad()).reify()
 
-fun <S, T, R> State<S, T>.map(f: (T) -> R): State<S, R> = flatMap({ t -> StateApi.pure<S, R>(f(t)) }, monad()).ev()
+fun <S, T, R> State<S, T>.map(f: (T) -> R): State<S, R> = flatMap({ t -> StateApi.pure<S, R>(f(t)) }, monad()).reify()
 
 /**
  * Alias for [StateT.run] `StateT<ForId, S, A>`

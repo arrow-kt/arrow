@@ -34,7 +34,7 @@ inline fun <reified F, A> FreeApplicativeKind<F, A>.foldK(FA: Applicative<F> = a
                     Companion.pure(a)
 
             override fun <A, B> ap(fa: Kind<FreeApplicativeKindPartial<F>, A>, ff: Kind<FreeApplicativeKindPartial<F>, (A) -> B>): FreeApplicative<F, B> =
-                    Companion.ap(fa.ev(), ff.ev())
+                    Companion.ap(fa.reify(), ff.reify())
         }
     }
 
@@ -52,17 +52,17 @@ inline fun <reified F, A> FreeApplicativeKind<F, A>.foldK(FA: Applicative<F> = a
 
     fun fold(FA: Applicative<F>): Kind<F, A> = foldMap(FunctionK.id(), FA)
 
-    fun <G> compile(f: FunctionK<F, G>): FreeApplicative<G, A> = foldMap(functionKF(f), applicativeF()).ev()
+    fun <G> compile(f: FunctionK<F, G>): FreeApplicative<G, A> = foldMap(functionKF(f), applicativeF()).reify()
 
     fun <G> flatCompile(f: FunctionK<F, FreeApplicativeKindPartial<G>>, GFA: Applicative<FreeApplicativeKindPartial<G>>): FreeApplicative<G, A> =
-            foldMap(f, GFA).ev()
+            foldMap(f, GFA).reify()
 
     inline fun <reified M> analyze(f: FunctionK<F, ConstKindPartial<M>>, MM: Monoid<M>): M =
             foldMap(object : FunctionK<F, ConstKindPartial<M>> {
-                override fun <A> invoke(fa: Kind<F, A>): Const<M, A> = f(fa).ev()
+                override fun <A> invoke(fa: Kind<F, A>): Const<M, A> = f(fa).reify()
             }, Const.applicative(MM)).value()
 
-    fun monad(): Free<F, A> = foldMap(Free.functionKF(), Free.applicativeF()).ev()
+    fun monad(): Free<F, A> = foldMap(Free.functionKF(), Free.applicativeF()).reify()
 
     // Beware: smart code
     @Suppress("UNCHECKED_CAST")

@@ -12,20 +12,20 @@ interface TryApplicativeErrorInstance : TryApplicativeInstance, ApplicativeError
 
     override fun <A> raiseError(e: Throwable): Try<A> = Failure(e)
 
-    override fun <A> handleErrorWith(fa: TryKind<A>, f: (Throwable) -> TryKind<A>): Try<A> = fa.ev().recoverWith { f(it).ev() }
+    override fun <A> handleErrorWith(fa: TryKind<A>, f: (Throwable) -> TryKind<A>): Try<A> = fa.reify().recoverWith { f(it).reify() }
 
 }
 
 @instance(Try::class)
 interface TryMonadErrorInstance : TryApplicativeErrorInstance, TryMonadInstance, MonadError<ForTry, Throwable> {
     override fun <A, B> ap(fa: TryKind<A>, ff: TryKind<(A) -> B>): Try<B> =
-            super<TryMonadInstance>.ap(fa, ff).ev()
+            super<TryMonadInstance>.ap(fa, ff).reify()
 
     override fun <A, B> map(fa: TryKind<A>, f: (A) -> B): Try<B> =
-            super<TryMonadInstance>.map(fa, f).ev()
+            super<TryMonadInstance>.map(fa, f).reify()
 
     override fun <A> pure(a: A): Try<A> =
-            super<TryMonadInstance>.pure(a).ev()
+            super<TryMonadInstance>.pure(a).reify()
 }
 
 @instance(Try::class)
@@ -50,16 +50,16 @@ interface TryEqInstance<A> : Eq<Try<A>> {
 @instance(Try::class)
 interface TryFunctorInstance : Functor<ForTry> {
     override fun <A, B> map(fa: TryKind<A>, f: kotlin.Function1<A, B>): Try<B> =
-            fa.ev().map(f)
+            fa.reify().map(f)
 }
 
 @instance(Try::class)
 interface TryApplicativeInstance : Applicative<ForTry> {
     override fun <A, B> ap(fa: TryKind<A>, ff: TryKind<kotlin.Function1<A, B>>): Try<B> =
-            fa.ev().ap(ff)
+            fa.reify().ap(ff)
 
     override fun <A, B> map(fa: TryKind<A>, f: kotlin.Function1<A, B>): Try<B> =
-            fa.ev().map(f)
+            fa.reify().map(f)
 
     override fun <A> pure(a: A): Try<A> =
             Try.pure(a)
@@ -68,16 +68,16 @@ interface TryApplicativeInstance : Applicative<ForTry> {
 @instance(Try::class)
 interface TryMonadInstance : Monad<ForTry> {
     override fun <A, B> ap(fa: TryKind<A>, ff: TryKind<kotlin.Function1<A, B>>): Try<B> =
-            fa.ev().ap(ff)
+            fa.reify().ap(ff)
 
     override fun <A, B> flatMap(fa: TryKind<A>, f: kotlin.Function1<A, TryKind<B>>): Try<B> =
-            fa.ev().flatMap(f)
+            fa.reify().flatMap(f)
 
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, TryKind<Either<A, B>>>): Try<B> =
             Try.tailRecM(a, f)
 
     override fun <A, B> map(fa: TryKind<A>, f: kotlin.Function1<A, B>): Try<B> =
-            fa.ev().map(f)
+            fa.reify().map(f)
 
     override fun <A> pure(a: A): Try<A> =
             Try.pure(a)
@@ -86,29 +86,29 @@ interface TryMonadInstance : Monad<ForTry> {
 @instance(Try::class)
 interface TryFoldableInstance : Foldable<ForTry> {
     override fun <A> exists(fa: TryKind<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
-            fa.ev().exists(p)
+            fa.reify().exists(p)
 
     override fun <A, B> foldLeft(fa: TryKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =
-            fa.ev().foldLeft(b, f)
+            fa.reify().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: TryKind<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
-            fa.ev().foldRight(lb, f)
+            fa.reify().foldRight(lb, f)
 }
 
 @instance(Try::class)
 interface TryTraverseInstance : Traverse<ForTry> {
     override fun <A, B> map(fa: TryKind<A>, f: kotlin.Function1<A, B>): Try<B> =
-            fa.ev().map(f)
+            fa.reify().map(f)
 
     override fun <G, A, B> traverse(fa: TryKind<A>, f: kotlin.Function1<A, Kind<G, B>>, GA: Applicative<G>): Kind<G, Try<B>> =
-            fa.ev().traverse(f, GA)
+            fa.reify().traverse(f, GA)
 
     override fun <A> exists(fa: TryKind<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
-            fa.ev().exists(p)
+            fa.reify().exists(p)
 
     override fun <A, B> foldLeft(fa: TryKind<A>, b: B, f: kotlin.Function2<B, A, B>): B =
-            fa.ev().foldLeft(b, f)
+            fa.reify().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: TryKind<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
-            fa.ev().foldRight(lb, f)
+            fa.reify().foldRight(lb, f)
 }

@@ -38,7 +38,7 @@ class WriterTTest : UnitSpec() {
                 WriterT.monoidK<ForListKW, Int>(ListKW.monoidK()),
                 WriterT.applicative(),
                 Eq { a, b ->
-                    a.ev().value == b.ev().value
+                    a.reify().value == b.reify().value
                 }),
 
             MonadWriterLaws.laws(WriterT.monad(Option.monad(), IntMonoid),
@@ -47,14 +47,14 @@ class WriterTTest : UnitSpec() {
                 genIntSmall(),
                 genTuple(genIntSmall(), genIntSmall()),
                 Eq { a, b ->
-                    a.ev().value.ev().let { optionA: Option<Tuple2<Int, Int>> ->
-                        val optionB = b.ev().value.ev()
+                    a.reify().value.reify().let { optionA: Option<Tuple2<Int, Int>> ->
+                        val optionB = b.reify().value.reify()
                         optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Int> -> optionB.fold({ false }, { value == it }) })
                     }
                 },
                 Eq { a, b ->
-                    a.ev().value.ev().let { optionA: Option<Tuple2<Int, Tuple2<Int, Int>>> ->
-                        val optionB = b.ev().value.ev()
+                    a.reify().value.reify().let { optionA: Option<Tuple2<Int, Tuple2<Int, Int>>> ->
+                        val optionB = b.reify().value.reify()
                         optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Tuple2<Int, Int>> -> optionB.fold({ false }, { value == it }) })
                     }
                 }
@@ -64,8 +64,8 @@ class WriterTTest : UnitSpec() {
                 { WriterT(Option(Tuple2(it, it))) },
                 object : Eq<Kind<WriterTKindPartial<ForOption, Int>, Int>> {
                     override fun eqv(a: Kind<WriterTKindPartial<ForOption, Int>, Int>, b: Kind<WriterTKindPartial<ForOption, Int>, Int>): Boolean =
-                            a.ev().value.ev().let { optionA: Option<Tuple2<Int, Int>> ->
-                                val optionB = b.ev().value.ev()
+                            a.reify().value.reify().let { optionA: Option<Tuple2<Int, Int>> ->
+                                val optionB = b.reify().value.reify()
                                 optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Int> -> optionB.fold({ false }, { value == it }) })
                             }
                 })

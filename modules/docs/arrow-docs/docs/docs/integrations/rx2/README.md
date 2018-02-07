@@ -72,8 +72,8 @@ The library provides instances of [`MonadError`]({{ '/docs/typeclasses/monaderro
 fun <F> getSongUrlAsync(MS: MonadSuspend<F> = monadSuspend()) =
   MS { getSongUrl() }
 
-val songObservable: ObservableKW<Url> = getSongUrlAsync().ev()
-val songFlowable: FlowableKW<Url> = getSongUrlAsync().ev()
+val songObservable: ObservableKW<Url> = getSongUrlAsync().reify()
+val songFlowable: FlowableKW<Url> = getSongUrlAsync().reify()
 ```
 
 [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) using the method `bindingCatch`, with all its benefits.
@@ -114,7 +114,7 @@ ObservableKW.monadError().bindingCatch {
   }
 
   percent
-}.ev()
+}.reify()
 ```
 
 Note that any unexpected exception, like `AritmeticException` when `totalTime` is 0, is automatically caught and wrapped inside the observable. 

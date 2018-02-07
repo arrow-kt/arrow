@@ -52,7 +52,7 @@ fun <F, A, B, C> EitherT<F, A, B>.foldRight(lb: Eval<C>, f: (B, Eval<C>) -> Eval
 
 fun <F, A, B, G, C> EitherT<F, A, B>. traverse(f: (B) -> Kind<G, C>, GA: Applicative<G>, FF: Traverse<F>): Kind<G, EitherT<F, A, C>> {
     val fa: Kind<G, Kind<Nested<F, EitherKindPartial<A>>, C>> = ComposedTraverse(FF, Either.traverse(), Either.monad<A>()).traverseC(value, f, GA)
-    return GA.map(fa, { EitherT(FF.map(it.unnest(), { it.ev() })) })
+    return GA.map(fa, { EitherT(FF.map(it.unnest(), { it.reify() })) })
 }
 
 object EitherTFoldableInstanceImplicits {

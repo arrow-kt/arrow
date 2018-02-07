@@ -7,7 +7,7 @@ import arrow.typeclasses.*
 
 @instance(Either::class)
 interface EitherFunctorInstance<L> : Functor<EitherKindPartial<L>> {
-    override fun <A, B> map(fa: EitherKind<L, A>, f: (A) -> B): Either<L, B> = fa.ev().map(f)
+    override fun <A, B> map(fa: EitherKind<L, A>, f: (A) -> B): Either<L, B> = fa.reify().map(f)
 }
 
 @instance(Either::class)
@@ -15,21 +15,21 @@ interface EitherApplicativeInstance<L> : EitherFunctorInstance<L>, Applicative<E
 
     override fun <A> pure(a: A): Either<L, A> = Right(a)
 
-    override fun <A, B> map(fa: EitherKind<L, A>, f: (A) -> B): Either<L, B> = fa.ev().map(f)
+    override fun <A, B> map(fa: EitherKind<L, A>, f: (A) -> B): Either<L, B> = fa.reify().map(f)
 
     override fun <A, B> ap(fa: EitherKind<L, A>, ff: EitherKind<L, (A) -> B>): Either<L, B> =
-            fa.ev().ap(ff)
+            fa.reify().ap(ff)
 }
 
 @instance(Either::class)
 interface EitherMonadInstance<L> : EitherApplicativeInstance<L>, Monad<EitherKindPartial<L>> {
 
-    override fun <A, B> map(fa: EitherKind<L, A>, f: (A) -> B): Either<L, B> = fa.ev().map(f)
+    override fun <A, B> map(fa: EitherKind<L, A>, f: (A) -> B): Either<L, B> = fa.reify().map(f)
 
     override fun <A, B> ap(fa: EitherKind<L, A>, ff: EitherKind<L, (A) -> B>): Either<L, B> =
-            fa.ev().ap(ff)
+            fa.reify().ap(ff)
 
-    override fun <A, B> flatMap(fa: EitherKind<L, A>, f: (A) -> EitherKind<L, B>): Either<L, B> = fa.ev().flatMap { f(it).ev() }
+    override fun <A, B> flatMap(fa: EitherKind<L, A>, f: (A) -> EitherKind<L, B>): Either<L, B> = fa.reify().flatMap { f(it).reify() }
 
     override fun <A, B> tailRecM(a: A, f: (A) -> Kind<EitherKindPartial<L>, Either<A, B>>): Either<L, B> =
             Either.tailRecM(a, f)
@@ -41,9 +41,9 @@ interface EitherApplicativeErrorInstance<L> : EitherApplicativeInstance<L>, Appl
     override fun <A> raiseError(e: L): Either<L, A> = Left(e)
 
     override fun <A> handleErrorWith(fa: Kind<EitherKindPartial<L>, A>, f: (L) -> Kind<EitherKindPartial<L>, A>): Either<L, A> {
-        val fea = fa.ev()
+        val fea = fa.reify()
         return when (fea) {
-            is Either.Left -> f(fea.a).ev()
+            is Either.Left -> f(fea.a).reify()
             is Either.Right -> fea
         }
     }
@@ -56,27 +56,27 @@ interface EitherMonadErrorInstance<L> : EitherApplicativeErrorInstance<L>, Eithe
 interface EitherFoldableInstance<L> : Foldable<EitherKindPartial<L>> {
 
     override fun <A, B> foldLeft(fa: Kind<EitherKindPartial<L>, A>, b: B, f: (B, A) -> B): B =
-            fa.ev().foldLeft(b, f)
+            fa.reify().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: Kind<EitherKindPartial<L>, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            fa.ev().foldRight(lb, f)
+            fa.reify().foldRight(lb, f)
 }
 
 fun <G, A, B, C> Either<A, B>.traverse(f: (B) -> Kind<G, C>, GA: Applicative<G>): Kind<G, Either<A, C>> =
-        this.ev().fold({ GA.pure(Either.Left(it)) }, { GA.map(f(it), { Either.Right(it) }) })
+        this.reify().fold({ GA.pure(Either.Left(it)) }, { GA.map(f(it), { Either.Right(it) }) })
 
 @instance(Either::class)
 interface EitherTraverseInstance<L> : EitherFoldableInstance<L>, Traverse<EitherKindPartial<L>> {
 
     override fun <G, A, B> traverse(fa: Kind<EitherKindPartial<L>, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Kind<EitherKindPartial<L>, B>> =
-            fa.ev().traverse(f, GA)
+            fa.reify().traverse(f, GA)
 }
 
 @instance(Either::class)
 interface EitherSemigroupKInstance<L> : SemigroupK<EitherKindPartial<L>> {
 
     override fun <A> combineK(x: EitherKind<L, A>, y: EitherKind<L, A>): Either<L, A> =
-            x.ev().combineK(y)
+            x.reify().combineK(y)
 }
 
 @instance(Either::class)

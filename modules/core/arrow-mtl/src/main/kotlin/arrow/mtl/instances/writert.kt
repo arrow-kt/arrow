@@ -18,10 +18,10 @@ interface WriterTMonadFilterInstance<F, W> : WriterTMonadInstance<F, W>, MonadFi
 interface WriterTMonadWriterInstance<F, W> : MonadWriter<WriterTKindPartial<F, W>, W>, WriterTMonadInstance<F, W> {
 
     override fun <A> listen(fa: WriterTKind<F, W, A>): Kind<WriterTKindPartial<F, W>, Tuple2<W, A>> =
-            WriterT(FF().flatMap(fa.ev().content(FF()), { a -> FF().map(fa.ev().write(FF()), { l -> Tuple2(l, Tuple2(l, a)) }) }))
+            WriterT(FF().flatMap(fa.reify().content(FF()), { a -> FF().map(fa.reify().write(FF()), { l -> Tuple2(l, Tuple2(l, a)) }) }))
 
     override fun <A> pass(fa: Kind<WriterTKindPartial<F, W>, Tuple2<(W) -> W, A>>): WriterT<F, W, A> =
-            WriterT(FF().flatMap(fa.ev().content(FF()), { tuple2FA -> FF().map(fa.ev().write(FF()), { l -> Tuple2(tuple2FA.a(l), tuple2FA.b) }) }))
+            WriterT(FF().flatMap(fa.reify().content(FF()), { tuple2FA -> FF().map(fa.reify().write(FF()), { l -> Tuple2(tuple2FA.a(l), tuple2FA.b) }) }))
 
     override fun <A> writer(aw: Tuple2<W, A>): WriterT<F, W, A> = WriterT.put2(aw.b, aw.a, FF())
 

@@ -44,7 +44,7 @@ class ListKWTest : UnitSpec() {
                 { n -> ListKW(listOf({ s: Int -> n * s })) },
                 object : Eq<Kind<ForListKW, Int>> {
                     override fun eqv(a: Kind<ForListKW, Int>, b: Kind<ForListKW, Int>): Boolean =
-                            a.ev().list == b.ev().list
+                            a.reify().list == b.reify().list
                 })
         )
     }

@@ -13,7 +13,7 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class KleisliTest : UnitSpec() {
     private fun <A> EQ(): Eq<KleisliKind<ForTry, Int, A>> = Eq { a, b ->
-        a.ev().run(1) == b.ev().run(1)
+        a.reify().run(1) == b.reify().run(1)
     }
 
     init {
@@ -32,9 +32,9 @@ class KleisliTest : UnitSpec() {
         "andThen should continue sequence" {
             val kleisli: Kleisli<ForId, Int, Int> = Kleisli({ a: Int -> Id(a) })
 
-            kleisli.andThen(Id(3), Id.monad()).run(0).ev().value shouldBe 3
+            kleisli.andThen(Id(3), Id.monad()).run(0).reify().value shouldBe 3
 
-            kleisli.andThen({ b -> Id(b + 1) }, Id.monad()).run(0).ev().value shouldBe 1
+            kleisli.andThen({ b -> Id(b + 1) }, Id.monad()).run(0).reify().value shouldBe 1
         }
     }
 }

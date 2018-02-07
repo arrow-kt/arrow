@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.data.NonEmptyList
 import arrow.data.applicative
-import arrow.data.ev
+import arrow.data.reify
 import arrow.free.instances.FreeApplicativeApplicativeInstance
 import arrow.free.instances.FreeApplicativeEq
 import arrow.syntax.applicative.tupled
@@ -34,12 +34,12 @@ sealed class OpsAp<out A> : Kind<OpsAp.F, A> {
     }
 }
 
-fun <A> Kind<OpsAp.F, A>.ev(): OpsAp<A> = this as OpsAp<A>
+fun <A> Kind<OpsAp.F, A>.reify(): OpsAp<A> = this as OpsAp<A>
 
 @RunWith(KTestJUnitRunner::class)
 class FreeApplicativeTest : UnitSpec() {
 
-    private val program = OpsAp.tupled(OpsAp.value(1), OpsAp.add(3, 4), OpsAp.subtract(3, 4)).ev()
+    private val program = OpsAp.tupled(OpsAp.value(1), OpsAp.add(3, 4), OpsAp.subtract(3, 4)).reify()
 
     init {
 
@@ -56,9 +56,9 @@ class FreeApplicativeTest : UnitSpec() {
 
         "Can interpret an ADT as FreeApplicative operations" {
             val result: Tuple3<Int, Int, Int> = (1 toT 7) + -1
-            program.foldMap(optionApInterpreter, Option.applicative()).ev() shouldBe Some(result)
-            program.foldMap(idApInterpreter, Id.applicative()).ev() shouldBe Id(result)
-            program.foldMap(nonEmptyListApInterpreter, NonEmptyList.applicative()).ev() shouldBe NonEmptyList.of(result)
+            program.foldMap(optionApInterpreter, Option.applicative()).reify() shouldBe Some(result)
+            program.foldMap(idApInterpreter, Id.applicative()).reify() shouldBe Id(result)
+            program.foldMap(nonEmptyListApInterpreter, NonEmptyList.applicative()).reify() shouldBe NonEmptyList.of(result)
         }
 
         "fold is stack safe" {

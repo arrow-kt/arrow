@@ -111,15 +111,15 @@ class ListKWHK private constructor()
 data class ListKW<A>(val list: List<A>): Kind<ListKWHK, A>
 ```
 
-As `ListKW<A>` is the only existing implementation of `Kind<ListKWHK, A>`, we can define an extension function on `Kind<ListKWHK, A>` to do the downcasting safely for us. This function by convention is called `ev()` (evidence or evaluate).
+As `ListKW<A>` is the only existing implementation of `Kind<ListKWHK, A>`, we can define an extension function on `Kind<ListKWHK, A>` to do the downcasting safely for us. This function by convention is called `reify()` (evidence or evaluate).
 
 ```kotlin
-fun Kind<ListKWHK, A>.ev() = this as ListKW<A>
+fun Kind<ListKWHK, A>.reify() = this as ListKW<A>
 ```
 
-This way we have can to convert from `ListKW<A>` to `Kind<ListKWHK, A>` via simple subclassing and from `Kind<ListKWHK, A>` to `ListKW<A>` using the function `ev()`. Being able to define extension functions that work for partially applied generics is a feature from Kotlin that's not available in Java. You can define `fun Kind<OptionHK, A>.ev()` and `fun Kind<ListKWHK, A>.ev()` and the compiler can smartly decide which one you're trying to use. If it can't it means there's an ambiguity you should fix!
+This way we have can to convert from `ListKW<A>` to `Kind<ListKWHK, A>` via simple subclassing and from `Kind<ListKWHK, A>` to `ListKW<A>` using the function `reify()`. Being able to define extension functions that work for partially applied generics is a feature from Kotlin that's not available in Java. You can define `fun Kind<OptionHK, A>.reify()` and `fun Kind<ListKWHK, A>.reify()` and the compiler can smartly decide which one you're trying to use. If it can't it means there's an ambiguity you should fix!
 
-The function `ev()` is already defined for all datatypes in Λrrow. If you're creating your own datatype that's also a type constructor and would like to create all these helper types and functions,
+The function `reify()` is already defined for all datatypes in Λrrow. If you're creating your own datatype that's also a type constructor and would like to create all these helper types and functions,
 you can do so simply by annotating it as `@higerkind` and the Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create them for you.
 
 ```kotlin
@@ -130,7 +130,7 @@ data class ListKW<A>(val list: List<A>): ListKWKind<A>
 //
 // class ListKWHK private constructor()
 // typealias ListKWKind<A> = Kind<ListKWHK, A>
-// fun ListKWKind<A>.ev() = this as ListKW<A>
+// fun ListKWKind<A>.reify() = this as ListKW<A>
 ```
 
 Note that the annotation `@higerkind` will also generate the integration typealiases required by [KindedJ]({{ '/docs/integrations/kindedj' | relative_url }}) as long as the datatype is invariant. You can read more about sharing Higher Kinds and type constructors across JVM libraries in [KindedJ's README](https://github.com/KindedJ/KindedJ#rationale).
@@ -156,7 +156,7 @@ Let's define an instance of `Functor` for the datatype `ListKW`, our own wrapper
 @instance
 interface ListKWFunctorInstance : Functor<ListKWHK> {
   override fun <A, B> map(fa: Kind<ListKWHK, A>, f: (A) -> B): ListKW<B> {
-    val list: ListKW<A> = fa.ev()
+    val list: ListKW<A> = fa.reify()
     return list.map(f)
   }
 }
@@ -175,10 +175,10 @@ The signature of `map` once the types have been replaced takes a parameter `Kind
 override fun <A, B> map(fa: Kind<ListKWHK, A>, f: (A) -> B): ListKW<B>
 ```
 
-The implementation is short. On the first line we downcast `Kind<ListKWHK, A>` to `ListKW<A>` using `ev()`. Once the value has been downcasted, the implementation of map inside the `ListKW<A>` we have obtained already implements the expected behavior of map.
+The implementation is short. On the first line we downcast `Kind<ListKWHK, A>` to `ListKW<A>` using `reify()`. Once the value has been downcasted, the implementation of map inside the `ListKW<A>` we have obtained already implements the expected behavior of map.
 
 ```kotlin
-val list: ListKW<A> = fa.ev()
+val list: ListKW<A> = fa.reify()
 return list.map(f)
 ```
 
@@ -217,20 +217,20 @@ interface ListKWApplicativeInstance : Applicative<ListKWHK> {
 }
 ```
 
-And now we can show how this function `randomUserStructure()` can be used for any datatype that implements [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}). As the function returns a value `Kind<F, User>` the caller is responsible of calling `ev()` to downcast it to the expected value.
+And now we can show how this function `randomUserStructure()` can be used for any datatype that implements [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}). As the function returns a value `Kind<F, User>` the caller is responsible of calling `reify()` to downcast it to the expected value.
 
 ```kotlin
-val list = randomUserStructure(::User, ListKW.applicative()).ev()
+val list = randomUserStructure(::User, ListKW.applicative()).reify()
 //[User(342)]
 ```
 
 ```kotlin
-val option = randomUserStructure(::User, Option.applicative()).ev()
+val option = randomUserStructure(::User, Option.applicative()).reify()
 //Some(User(765))
 ```
 
 ```kotlin
-val either = randomUserStructure(::User, Either.applicative<Unit>()).ev()
+val either = randomUserStructure(::User, Either.applicative<Unit>()).reify()
 //Right(User(221))
 ```
 
@@ -251,12 +251,12 @@ applicative<OptionHK>()
 So, because `randomUserStructure` provides a default value for [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}) that's looked up globally, we can call it without passing the second parameter as long as we tell the compiler what type we're expecting the function to return.
 
 ```kotlin
-val list: ListKW<User> = randomUserStructure(::User).ev()
+val list: ListKW<User> = randomUserStructure(::User).reify()
 //[User(342)]
 ```
 
 ```kotlin
-val option: Option<User> = randomUserStructure(::User).ev()
+val option: Option<User> = randomUserStructure(::User).reify()
 //Some(User(765))
 ```
 

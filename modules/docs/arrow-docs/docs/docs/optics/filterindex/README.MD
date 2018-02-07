@@ -19,7 +19,7 @@ import arrow.optics.*
 import arrow.optics.typeclasses.*
 
 val filterIndexStringByIndex = FilterIndex.fromTraverse<ListKWHK, String>({ list ->
-    list.ev().map {
+    list.reify().map {
         it toT it.length
     }
 }, ListKW.traverse())

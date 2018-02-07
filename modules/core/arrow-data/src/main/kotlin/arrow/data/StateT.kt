@@ -20,7 +20,7 @@ typealias StateTFunKind<F, S, A> = Kind<F, StateTFun<F, S, A>>
  * @param MF [Monad] for the context [F]
  * @param s initial state to run stateful computation
  */
-fun <F, S, A> StateTKind<F, S, A>.runM(MF: Monad<F>, initial: S): Kind<F, Tuple2<S, A>> = ev().run(initial, MF)
+fun <F, S, A> StateTKind<F, S, A>.runM(MF: Monad<F>, initial: S): Kind<F, Tuple2<S, A>> = reify().run(initial, MF)
 
 /**
  * Run the stateful computation within the context `F`.
@@ -28,7 +28,7 @@ fun <F, S, A> StateTKind<F, S, A>.runM(MF: Monad<F>, initial: S): Kind<F, Tuple2
  * @param s initial state to run stateful computation
  * @param MF [Monad] for the context [F]
  */
-inline fun <reified F, S, A> StateTKind<F, S, A>.runM(initial: S, MF: Monad<F> = monad()): Kind<F, Tuple2<S, A>> = ev().run(initial, MF)
+inline fun <reified F, S, A> StateTKind<F, S, A>.runM(initial: S, MF: Monad<F> = monad()): Kind<F, Tuple2<S, A>> = reify().run(initial, MF)
 
 /**
  * `StateT<F, S, A>` is a stateful computation within a context `F` yielding
@@ -193,7 +193,7 @@ class StateT<F, S, A>(
      * @param MF [Monad] for the context [F].
      */
     fun <B> ap(ff: StateTKind<F, S, (A) -> B>, MF: Monad<F>): StateT<F, S, B> =
-            ff.ev().map2(this, { f, a -> f(a) }, MF)
+            ff.reify().map2(this, { f, a -> f(a) }, MF)
 
     /**
      * Create a product of the value types of [StateT].
@@ -257,7 +257,7 @@ class StateT<F, S, A>(
      * @param SF [SemigroupK] for [F].
      */
     fun combineK(y: StateTKind<F, S, A>, MF: Monad<F>, SF: SemigroupK<F>): StateT<F, S, A> =
-            StateT(MF.pure({ s -> SF.combineK(run(s, MF), y.ev().run(s, MF)) }))
+            StateT(MF.pure({ s -> SF.combineK(run(s, MF), y.reify().run(s, MF)) }))
 
     /**
      * Run the stateful computation within the context `F`.

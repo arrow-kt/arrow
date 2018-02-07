@@ -172,7 +172,7 @@ fun <E, A, B> Validated<E, A>.ap(f: Validated<E, (A) -> B>, SE: Semigroup<E>): V
         }
 
 fun <E, A> Validated<E, A>.handleLeftWith(f: (E) -> ValidatedKind<E, A>): Validated<E, A> =
-        fold({ f(it).ev() }, { Valid(it) })
+        fold({ f(it).reify() }, { Valid(it) })
 
 fun <E, A, B> Validated<E, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
         when (this) {
@@ -189,7 +189,7 @@ fun <G, E, A, B> Validated<E, A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<
 inline fun <reified E, reified A> Validated<E, A>.combine(y: ValidatedKind<E, A>,
                                                           SE: Semigroup<E> = semigroup(),
                                                           SA: Semigroup<A> = semigroup()): Validated<E, A> =
-        y.ev().let { that ->
+        y.reify().let { that ->
             when {
                 this is Valid && that is Valid -> Valid(SA.combine(this.a, that.a))
                 this is Invalid && that is Invalid -> Invalid(SE.combine(this.e, that.e))
@@ -200,7 +200,7 @@ inline fun <reified E, reified A> Validated<E, A>.combine(y: ValidatedKind<E, A>
 
 fun <E, A> Validated<E, A>.combineK(y: ValidatedKind<E, A>, SE: Semigroup<E>): Validated<E, A> {
     val xev = this
-    val yev = y.ev()
+    val yev = y.reify()
     return when (xev) {
         is Valid -> xev
         is Invalid -> when (yev) {

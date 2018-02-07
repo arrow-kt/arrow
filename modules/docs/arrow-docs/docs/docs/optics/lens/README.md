@@ -50,7 +50,7 @@ import arrow.*
 import arrow.core.*
 import arrow.syntax.option.*
 
-fooLens.modifyF(Option.functor(), foo) { it.some() }.ev()
+fooLens.modifyF(Option.functor(), foo) { it.some() }.reify()
 ```
 
 ```kotlin:ank

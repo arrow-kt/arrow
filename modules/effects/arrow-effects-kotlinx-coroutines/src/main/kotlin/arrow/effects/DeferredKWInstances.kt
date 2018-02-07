@@ -14,7 +14,7 @@ interface DeferredKWApplicativeErrorInstance :
             DeferredKW.raiseError(e)
 
     override fun <A> handleErrorWith(fa: DeferredKWKind<A>, f: (Throwable) -> DeferredKWKind<A>): DeferredKW<A> =
-            fa.handleErrorWith { f(it).ev() }
+            fa.handleErrorWith { f(it).reify() }
 }
 
 @instance(DeferredKW::class)
@@ -50,5 +50,5 @@ interface DeferredKWAsyncInstance : DeferredKWMonadSuspendInstance, Async<ForDef
 @instance(DeferredKW::class)
 interface DeferredKWEffectInstance : DeferredKWAsyncInstance, Effect<ForDeferredKW> {
     override fun <A> runAsync(fa: Kind<ForDeferredKW, A>, cb: (Either<Throwable, A>) -> DeferredKWKind<Unit>): DeferredKW<Unit> =
-            fa.ev().runAsync(cb)
+            fa.reify().runAsync(cb)
 }

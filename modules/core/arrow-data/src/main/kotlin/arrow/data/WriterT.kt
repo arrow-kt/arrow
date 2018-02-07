@@ -1,12 +1,13 @@
 package arrow.data
 
-import arrow.*
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.toT
+import arrow.higherkind
 import arrow.typeclasses.*
 
-@Suppress("UNCHECKED_CAST") inline fun <F, W, A> WriterTKind<F, W, A>.value(): Kind<F, Tuple2<W, A>> = this.ev().value
+@Suppress("UNCHECKED_CAST") inline fun <F, W, A> WriterTKind<F, W, A>.value(): Kind<F, Tuple2<W, A>> = this.reify().value
 
 @higherkind data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTKind<F, W, A>, WriterTKindedJ<F, W, A> {
 
@@ -46,11 +47,11 @@ import arrow.typeclasses.*
         inline fun <reified F, W, A> empty(MMF: MonoidK<F> = monoidK()): WriterTKind<F, W, A> = WriterT(MMF.empty())
 
         fun <F, W, A> pass(fa: Kind<WriterTKindPartial<F, W>, Tuple2<(W) -> W, A>>, MF: Monad<F>): WriterT<F, W, A> =
-                WriterT(MF.flatMap(fa.ev().content(MF), { tuple2FA -> MF.map(fa.ev().write(MF), { l -> Tuple2(tuple2FA.a(l), tuple2FA.b) }) }))
+                WriterT(MF.flatMap(fa.reify().content(MF), { tuple2FA -> MF.map(fa.reify().write(MF), { l -> Tuple2(tuple2FA.a(l), tuple2FA.b) }) }))
 
         fun <F, W, A, B> tailRecM(a: A, f: (A) -> Kind<WriterTKindPartial<F, W>, Either<A, B>>, MF: Monad<F>): WriterT<F, W, B> =
                 WriterT(MF.tailRecM(a, {
-                    MF.map(f(it).ev().value) {
+                    MF.map(f(it).reify().value) {
                         val value = it.b
                         when (value) {
                             is Either.Left<A, B> -> Either.Left(value.a)
@@ -80,7 +81,7 @@ import arrow.typeclasses.*
     fun swap(MF: Monad<F>): WriterT<F, A, W> = transform({ it.b toT it.a }, MF)
 
     fun <B> ap(ff: WriterTKind<F, W, (A) -> B>, SG: Semigroup<W>, MF: Monad<F>): WriterT<F, W, B> =
-            ff.ev().flatMap({ map(it, MF) }, SG, MF)
+            ff.reify().flatMap({ map(it, MF) }, SG, MF)
 
     inline fun <B> flatMap(crossinline f: (A) -> WriterT<F, W, B>, SG: Semigroup<W>, MF: Monad<F>): WriterT<F, W, B> =
             WriterT(MF.flatMap(value, { value -> MF.map(f(value.b).value, { SG.combine(it.a, value.a) toT it.b }) }))
@@ -94,5 +95,5 @@ import arrow.typeclasses.*
     inline fun <B> subflatMap(crossinline f: (A) -> Tuple2<W, B>, MF: Monad<F>): WriterT<F, W, B> = transform({ f(it.b) }, MF)
 
     fun combineK(y: WriterTKind<F, W, A>, SF: SemigroupK<F>): WriterT<F, W, A> =
-            WriterT(SF.combineK(value, y.ev().value))
+            WriterT(SF.combineK(value, y.reify().value))
 }

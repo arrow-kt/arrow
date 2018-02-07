@@ -13,7 +13,7 @@ interface StateTFunctorInstance<F, S> : Functor<StateTKindPartial<F, S>> {
 
     fun FF(): Functor<F>
 
-    override fun <A, B> map(fa: StateTKind<F, S, A>, f: (A) -> B): StateT<F, S, B> = fa.ev().map(f, FF())
+    override fun <A, B> map(fa: StateTKind<F, S, A>, f: (A) -> B): StateT<F, S, B> = fa.reify().map(f, FF())
 
 }
 
@@ -22,31 +22,31 @@ interface StateTApplicativeInstance<F, S> : StateTFunctorInstance<F, S>, Applica
 
     override fun FF(): Monad<F>
 
-    override fun <A, B> map(fa: StateTKind<F, S, A>, f: (A) -> B): StateT<F, S, B> = fa.ev().map(f, FF())
+    override fun <A, B> map(fa: StateTKind<F, S, A>, f: (A) -> B): StateT<F, S, B> = fa.reify().map(f, FF())
 
     override fun <A> pure(a: A): StateT<F, S, A> = StateT(FF().pure({ s: S -> FF().pure(Tuple2(s, a)) }))
 
     override fun <A, B> ap(fa: StateTKind<F, S, A>, ff: StateTKind<F, S, (A) -> B>): StateT<F, S, B> =
-            fa.ev().ap(ff, FF())
+            fa.reify().ap(ff, FF())
 
     override fun <A, B> product(fa: StateTKind<F, S, A>, fb: StateTKind<F, S, B>): StateT<F, S, Tuple2<A, B>> =
-            fa.ev().product(fb.ev(), FF())
+            fa.reify().product(fb.reify(), FF())
 
 }
 
 @instance(StateT::class)
 interface StateTMonadInstance<F, S> : StateTApplicativeInstance<F, S>, Monad<StateTKindPartial<F, S>> {
 
-    override fun <A, B> map(fa: StateTKind<F, S, A>, f: (A) -> B): StateT<F, S, B> = fa.ev().map(f, FF())
+    override fun <A, B> map(fa: StateTKind<F, S, A>, f: (A) -> B): StateT<F, S, B> = fa.reify().map(f, FF())
 
     override fun <A, B> flatMap(fa: StateTKind<F, S, A>, f: (A) -> StateTKind<F, S, B>): StateT<F, S, B> =
-            fa.ev().flatMap(f, FF())
+            fa.reify().flatMap(f, FF())
 
     override fun <A, B> tailRecM(a: A, f: (A) -> StateTKind<F, S, Either<A, B>>): StateT<F, S, B> =
             StateT.tailRecM(a, f, FF())
 
     override fun <A, B> ap(fa: StateTKind<F, S, A>, ff: StateTKind<F, S, (A) -> B>): StateT<F, S, B> =
-            ff.ev().map2(fa.ev(), { f, a -> f(a) }, FF())
+            ff.reify().map2(fa.reify(), { f, a -> f(a) }, FF())
 
 }
 
@@ -58,7 +58,7 @@ interface StateTSemigroupKInstance<F, S> : SemigroupK<StateTKindPartial<F, S>> {
     fun SS(): SemigroupK<F>
 
     override fun <A> combineK(x: StateTKind<F, S, A>, y: StateTKind<F, S, A>): StateT<F, S, A> =
-            x.ev().combineK(y, FF(), SS())
+            x.reify().combineK(y, FF(), SS())
 
 }
 

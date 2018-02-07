@@ -11,10 +11,10 @@ import arrow.typeclasses.Semigroup
 @instance(IO::class)
 interface IOApplicativeErrorInstance : IOApplicativeInstance, ApplicativeError<ForIO, Throwable> {
     override fun <A> attempt(fa: IOKind<A>): IO<Either<Throwable, A>> =
-            fa.ev().attempt()
+            fa.reify().attempt()
 
     override fun <A> handleErrorWith(fa: IOKind<A>, f: (Throwable) -> IOKind<A>): IO<A> =
-            fa.ev().handleErrorWith(f)
+            fa.reify().handleErrorWith(f)
 
     override fun <A> raiseError(e: Throwable): IO<A> =
             IO.raiseError(e)
@@ -23,7 +23,7 @@ interface IOApplicativeErrorInstance : IOApplicativeInstance, ApplicativeError<F
 @instance(IO::class)
 interface IOMonadErrorInstance : IOApplicativeErrorInstance, IOMonadInstance, MonadError<ForIO, Throwable> {
     override fun <A, B> ap(fa: IOKind<A>, ff: IOKind<(A) -> B>): IO<B> =
-            super<IOMonadInstance>.ap(fa, ff).ev()
+            super<IOMonadInstance>.ap(fa, ff).reify()
 
     override fun <A, B> map(fa: IOKind<A>, f: (A) -> B): IO<B> =
             super<IOMonadInstance>.map(fa, f)
@@ -52,7 +52,7 @@ interface IOAsyncInstance : IOMonadSuspendInstance, Async<ForIO> {
 @instance(IO::class)
 interface IOEffectInstance : IOAsyncInstance, Effect<ForIO> {
     override fun <A> runAsync(fa: Kind<ForIO, A>, cb: (Either<Throwable, A>) -> IOKind<Unit>): IO<Unit> =
-            fa.ev().runAsync(cb)
+            fa.reify().runAsync(cb)
 }
 
 @instance(IO::class)
@@ -61,7 +61,7 @@ interface IOMonoidInstance<A> : Monoid<Kind<ForIO, A>>, Semigroup<Kind<ForIO, A>
     fun SM(): Monoid<A>
 
     override fun combine(a: IOKind<A>, b: IOKind<A>): IO<A> =
-            a.ev().flatMap { a1: A -> b.ev().map { a2: A -> SM().combine(a1, a2) } }
+            a.reify().flatMap { a1: A -> b.reify().map { a2: A -> SM().combine(a1, a2) } }
 
     override fun empty(): IO<A> = IO.pure(SM().empty())
 }
@@ -72,5 +72,5 @@ interface IOSemigroupInstance<A> : Semigroup<Kind<ForIO, A>> {
     fun SG(): Semigroup<A>
 
     override fun combine(a: IOKind<A>, b: IOKind<A>): IO<A> =
-            a.ev().flatMap { a1: A -> b.ev().map { a2: A -> SG().combine(a1, a2) } }
+            a.reify().flatMap { a1: A -> b.reify().map { a2: A -> SG().combine(a1, a2) } }
 }

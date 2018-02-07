@@ -72,7 +72,7 @@ fun getCountryCode(maybePerson : Either<BizError, Person>): Either<BizError, Str
     val address = person.address.toEither({ AddressNotFound(person.id) }).bind()
     val country = address.country.toEither({ CountryNotFound(address.id) }).bind()
     country.code
-  }.ev()
+  }.reify()
 ```
 
 Alright, a piece of cake right? That's because we were dealing with a simple type `Either`. But here's where things can get more complicated. Let's introduce another monad in the middle of the computation. For example what happens when we need to load a person by id, then their address and country to obtain the country code from a remote service?
@@ -173,7 +173,7 @@ fun getCountryCode(personId: Int): ObservableKW<Either<BizError, String>> =
             { it.code.right() }
         )
         code
-      }.ev()
+      }.reify()
 ```
 
 While we've got the logic working now, we're in a situation where we're forced to deal with the `Left cases`. We also have a ton of boilerplate type conversion with `fold`. The type conversion is necessary because in a monad comprehension you can only use a type of Monad. If we start with `ObservableKW`, we have to stay in it’s monadic context by lifting anything we compute sequentially to a `ObservableKW` whether or not it's async.

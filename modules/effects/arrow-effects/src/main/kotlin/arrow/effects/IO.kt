@@ -54,7 +54,7 @@ sealed class IO<out A> : IOKind<A> {
                 }
 
         fun <A, B> tailRecM(a: A, f: (A) -> IOKind<Either<A, B>>): IO<B> =
-                f(a).ev().flatMap {
+                f(a).reify().flatMap {
                     when (it) {
                         is Either.Left -> tailRecM(it.a, f)
                         is Either.Right -> IO.pure(it.b)
@@ -65,13 +65,13 @@ sealed class IO<out A> : IOKind<A> {
     abstract fun <B> map(f: (A) -> B): IO<B>
 
     fun <B> flatMap(f: (A) -> IOKind<B>): IO<B> =
-            Bind(this, { f(it).ev() })
+            Bind(this, { f(it).reify() })
 
     fun attempt(): IO<Either<Throwable, A>> =
             Bind(this, IOFrame.any())
 
     fun runAsync(cb: (Either<Throwable, A>) -> IOKind<Unit>): IO<Unit> =
-            IO { unsafeRunAsync(cb.andThen { it.ev().unsafeRunAsync { } }) }
+            IO { unsafeRunAsync(cb.andThen { it.reify().unsafeRunAsync { } }) }
 
     fun unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
             IORunLoop.start(this, cb)
@@ -134,7 +134,7 @@ sealed class IO<out A> : IOKind<A> {
 }
 
 fun <A, B> IO<A>.ap(ff: IOKind<(A) -> B>): IO<B> =
-        flatMap { a -> ff.ev().map({ it(a) }) }
+        flatMap { a -> ff.reify().map({ it(a) }) }
 
 fun <A> IO<A>.handleErrorWith(f: (Throwable) -> IOKind<A>): IO<A> =
         IO.Bind(this, IOFrame.errorHandler(f))

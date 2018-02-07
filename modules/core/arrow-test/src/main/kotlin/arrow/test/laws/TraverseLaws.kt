@@ -18,7 +18,7 @@ typealias TI<A> = Tuple2<IdKind<A>, IdKind<A>>
 typealias TIK<A> = Kind<TIF, A>
 
 @Suppress("UNCHECKED_CAST")
-fun <A> TIK<A>.ev(): TIC<A> =
+fun <A> TIK<A>.reify(): TIC<A> =
         this as TIC<A>
 
 data class TIC<out A>(val ti: TI<A>) : TIK<A>
@@ -54,7 +54,7 @@ object TraverseLaws {
 
     inline fun <reified F> sequentialComposition(FT: Traverse<F>, crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>) =
             forAll(genFunctionAToB<Int, Kind<ForId, Int>>(genConstructor(genIntSmall(), ::Id)), genFunctionAToB<Int, Kind<ForId, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf), { f: (Int) -> Kind<ForId, Int>, g: (Int) -> Kind<ForId, Int>, fha: Kind<F, Int> ->
-                val fa = fha.traverse(FT, Id.applicative(), f).ev()
+                val fa = fha.traverse(FT, Id.applicative(), f).reify()
                 val composed = Id.functor().map(fa, { it.traverse(FT, Id.applicative(), g) }).value.value()
                 val expected = fha.traverse(FT, ComposedApplicative(Id.applicative(), Id.applicative()), { a: Int -> Id.functor().map(f(a), g).nest() }).unnest().value().value()
                 composed.equalUnderTheLaw(expected, EQ)
@@ -68,8 +68,8 @@ object TraverseLaws {
 
 
                     override fun <A, B> ap(fa: Kind<TIF, A>, ff: Kind<TIF, (A) -> B>): Kind<TIF, B> {
-                        val (fam, fan) = fa.ev().ti
-                        val (fm, fn) = ff.ev().ti
+                        val (fam, fan) = fa.reify().ti
+                        val (fm, fn) = ff.reify().ti
                         return TIC(Id.applicative().ap(fam, fm) toT Id.applicative().ap(fan, fn))
                     }
 
@@ -79,7 +79,7 @@ object TraverseLaws {
                     EQ.eqv(a.a.value(), b.a.value()) && EQ.eqv(a.b.value(), b.b.value())
                 }
 
-                val seen: TI<Kind<F, Int>> = FT.traverse(fha, { TIC(f(it) toT g(it)) }, TIA).ev().ti
+                val seen: TI<Kind<F, Int>> = FT.traverse(fha, { TIC(f(it) toT g(it)) }, TIA).reify().ti
                 val expected: TI<Kind<F, Int>> = TIC(FT.traverse(fha, f, Id.applicative()) toT FT.traverse(fha, g, Id.applicative())).ti
 
                 seen.equalUnderTheLaw(expected, TIEQ)
