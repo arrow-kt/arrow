@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.serialization.ProtoBuf
 import java.io.File
 import javax.lang.model.element.Name
 
-val KindPostFix = "Kind"
+val KindPostFix = "Of"
 val KindedJPostFix = "KindedJ"
 val HKMarkerPreFix = "For"
 
