@@ -17,6 +17,6 @@ deploy:
   provider: pages
   skip_cleanup: true
   github_token: $GITHUB_TOKEN
-  local_dir: arrow-docs/build/site
+  local_dir: modules/docs/arrow-docs/build/site
   on:
     branch: master
