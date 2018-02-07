@@ -38,7 +38,8 @@ or error recovery ([`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_u
 
 You can read more about all the [typeclasses]({{ '/docs/typeclasses/intro' | relative_url }}) that Arrow provides in its [section of the docs]({{ '/docs/typeclasses/intro' | relative_url }}).
 
-To define a fully featured typeclass in Λrrow you use an interface that extends from `TC`, and use the annotation `@typeclass` to generate all boilerplate related to global lookup, which is explained below. The annotation and interface to extend have different names to avoid collision.
+To define a fully featured typeclass in Λrrow you use an interface that extends from `TC`, and use the annotation `@typeclass` to generate all boilerplate related to global lookup, which is explained below.
+The annotation and interface to extend have different names to avoid collision.
 
 ```kotlin
 @typeclass
@@ -84,7 +85,7 @@ So, we could say that after applying the parameter `Int` to the type constructor
 As `ListKW<Int>` isn't parametrized in any generic value it is not considered a type constructor anymore, just a regular type.
 
 Like functions, a type constructor with several parameters like [`Either<L, R>`]({{ '/docs/datatypes/either' | relative_url }}) can be partially applied for one of them to return another type constructor with one fewer parameter,
-for example applying `Throwable` to the left side yields `Either<Throwable, A>`, or applying `String` to the right side resuls in `Either<E, String>`.
+for example applying `Throwable` to the left side yields `Either<Throwable, A>`, or applying `String` to the right side results in `Either<E, String>`.
 
 Type constructors are useful when matched with typeclasses because they help us represent instances of parametrized classes -the containers- that work for all generic parameters -the content-.
 As type constructors is not a first class feature in Kotlin, Λrrow uses an interface `Kind<F, A>` to represent them.
@@ -94,7 +95,8 @@ Kind stands for Higher Kind, which is the name of the language feature that allo
 
 In a Higher Kind with the shape `Kind<F, A>`, if `A` is the type of the content then `F` has to be the type of the container.
 
-A malformed Higher Kind would use the whole type constructor to define the container, duplicating the type of the content ~~`Kind<Option<A>, A>`~~. This incorrect representation has large a number of issues when working with partially applied types and nested types.
+A malformed Higher Kind would use the whole type constructor to define the container, duplicating the type of the content ~~`Kind<Option<A>, A>`~~.
+This incorrect representation has large a number of issues when working with partially applied types and nested types.
 
 What Λrrow does instead is define a surrogate type that's not parametrized to represent `F`.
 These types are named same as the container and prefixed by For, as in `ForOption` or `ForListKW`.
@@ -111,13 +113,17 @@ class ForListKW private constructor()
 data class ListKW<A>(val list: List<A>): Kind<ForListKW, A>
 ```
 
-As `ListKW<A>` is the only existing implementation of `Kind<ForListKW, A>`, we can define an extension function on `Kind<ForListKW, A>` to do the downcasting safely for us. This function by convention is called `reify()` (evidence or evaluate).
+As `ListKW<A>` is the only existing implementation of `Kind<ForListKW, A>`, we can define an extension function on `Kind<ForListKW, A>` to do the downcasting safely for us.
+This function by convention is called `reify()`, as in, convert something from generic into concrete.
 
 ```ForListKW
 fun Kind<ForListKW, A>.reify() = this as ListKW<A>
 ```
 
-This way we have can to convert from `ListKW<A>` to `Kind<ForListKW, A>` via simple subclassing and from `Kind<ForListKW, A>` to `ListKW<A>` using the function `reify()`. Being able to define extension functions that work for partially applied generics is a feature from Kotlin that's not available in Java. You can define `fun Kind<ForOption, A>.reify()` and `fun Kind<ForListKW, A>.reify()` and the compiler can smartly decide which one you're trying to use. If it can't it means there's an ambiguity you should fix!
+This way we have can to convert from `ListKW<A>` to `Kind<ForListKW, A>` via simple subclassing and from `Kind<ForListKW, A>` to `ListKW<A>` using the function `reify()`.
+Being able to define extension functions that work for partially applied generics is a feature from Kotlin that's not available in Java.
+You can define `fun Kind<ForOption, A>.reify()` and `fun Kind<ForListKW, A>.reify()` and the compiler can smartly decide which one you're trying to use.
+If it can't it means there's an ambiguity you should fix!
 
 The function `reify()` is already defined for all datatypes in Λrrow. If you're creating your own datatype that's also a type constructor and would like to create all these helper types and functions,
 you can do so simply by annotating it as `@higerkind` and the Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create them for you.
