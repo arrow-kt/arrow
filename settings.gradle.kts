@@ -76,8 +76,8 @@ project(":arrow-recursion").projectDir = file("modules/recursion-schemes/arrow-r
 
 /** Docs **/
 
-//include(":arrow-docs")
-//project(":arrow-docs").projectDir = file("modules/docs/arrow-docs")
+include(":arrow-docs")
+project(":arrow-docs").projectDir = file("modules/docs/arrow-docs")
 
 /** Optics **/
 
