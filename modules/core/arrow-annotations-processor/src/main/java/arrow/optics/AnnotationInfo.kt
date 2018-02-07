@@ -1,6 +1,6 @@
 package arrow.optics
 
-import arrow.bounded
+import arrow.syntax
 import arrow.isos
 import arrow.lenses
 import arrow.optionals
@@ -26,7 +26,7 @@ val optionalsAnnotationClass = optionalsAnnotationKClass.java
 val optionalsAnnotationName = "@" + optionalsAnnotationClass.simpleName
 val optionalsAnnotationTarget = "data class"
 
-val boundAnnotationKClass = bounded::class
+val boundAnnotationKClass = syntax::class
 val boundAnnotationClass = boundAnnotationKClass.java
 val boundAnnotationName = "@" + boundAnnotationClass.simpleName
 val boundAnnotationTarget = "data class"

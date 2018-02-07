@@ -4,12 +4,12 @@ import arrow.common.utils.fullName
 import me.eugeniomarletti.kotlin.metadata.escapedClassName
 import java.io.File
 
-class BoundLensGenerator(
+class BoundSetterGenerator(
         private val annotatedList: Collection<AnnotatedOptic>,
         private val generatedDir: File
 ) {
 
-    private val boundLens = "arrow.optics.BoundSetter"
+    private val boundSetter = "arrow.optics.syntax.BoundSetter"
 
     fun generate() = annotatedList.map(this::processElement)
             .map { (element, funs) ->
@@ -27,7 +27,7 @@ class BoundLensGenerator(
                 val targetName = variable.paramName
 
                 """
-                    |val <T> $boundLens<T, $sourceClassName>.$targetName: $boundLens<T, $targetClassName> get() = this.compose($sourceName${targetName.toUpperCamelCase()}())
+                    |inline val <T> $boundSetter<T, $sourceClassName>.$targetName: $boundSetter<T, $targetClassName> get() = this.compose($sourceName${targetName.toUpperCamelCase()}())
                     """.trimMargin()
             }
 

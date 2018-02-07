@@ -21,4 +21,4 @@ annotation class optionals
 
 @Retention(SOURCE)
 @Target(CLASS)
-annotation class bounded
+annotation class syntax
