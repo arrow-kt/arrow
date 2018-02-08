@@ -63,7 +63,7 @@ class NonEmptyList<out A> private constructor(
         return NonEmptyList(f(this), consume(this.extract().tail))
     }
 
-    fun extract(): A = this.extract().head
+    fun extractM(): A = this.extract().head
 
     fun iterator(): Iterator<A> = all.iterator()
 

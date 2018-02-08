@@ -181,7 +181,7 @@ sealed class Eval<out A> : EvalOf<A> {
 
     fun <B> coflatMap(f: (EvalOf<A>) -> B): Eval<B> = Later { f(this) }
 
-    fun extract(): A = value()
+    fun extractM(): A = value()
 
     /**
      * Construct an eager Eval<A> instance. In some sense it is equivalent to using a val.

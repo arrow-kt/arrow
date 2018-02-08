@@ -17,7 +17,7 @@ data class Id<out A>(val value: A) : IdOf<A> {
 
     fun <B> coflatMap(f: (IdOf<A>) -> B): Id<B> = this.extract().map({ f(this) })
 
-    fun extract(): A = this.extract().value
+    fun extractM(): A = this.extract().value
 
     fun <B> ap(ff: IdOf<(A) -> B>): Id<B> = ff.extract().flatMap { f -> map(f) }.extract()
 

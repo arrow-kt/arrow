@@ -1,6 +1,6 @@
 package arrow.test.laws
 
-import arrow.*
+import arrow.Kind
 import arrow.data.Cokleisli
 import arrow.syntax.comonad.extractM
 import arrow.syntax.functor.map
@@ -29,27 +29,27 @@ object ComonadLaws {
 
     inline fun <reified F> duplicateThenExtractIsId(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), cf), { fa: Kind<F, Int> ->
-                CM.duplicate(fa).extract(CM).equalUnderTheLaw(fa, EQ)
+                CM.duplicate(fa).extractM(CM).equalUnderTheLaw(fa, EQ)
             })
 
     inline fun <reified F> duplicateThenMapExtractIsId(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), cf), { fa: Kind<F, Int> ->
-                CM.duplicate(fa).map(CM) { it.extract(CM) }.equalUnderTheLaw(fa, EQ)
+                CM.duplicate(fa).map(CM) { it.extractM(CM) }.equalUnderTheLaw(fa, EQ)
             })
 
     inline fun <reified F> mapAndCoflatmapCoherence(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), cf), genFunctionAToB(Gen.int()), { fa: Kind<F, Int>, f: (Int) -> Int ->
-                CM.map(fa, f).equalUnderTheLaw(CM.coflatMap(fa, { f(it.extract(CM)) }), EQ)
+                CM.map(fa, f).equalUnderTheLaw(CM.coflatMap(fa, { f(it.extractM(CM)) }), EQ)
             })
 
     inline fun <reified F> comonadLeftIdentity(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), cf), { fa: Kind<F, Int> ->
-                CM.coflatMap(fa, { it.extract(CM) }).equalUnderTheLaw(fa, EQ)
+                CM.coflatMap(fa, { it.extractM(CM) }).equalUnderTheLaw(fa, EQ)
             })
 
     inline fun <reified F> comonadRightIdentity(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), cf), genFunctionAToB(genConstructor(Gen.int(), cf)), { fa: Kind<F, Int>, f: (Kind<F, Int>) -> Kind<F, Int> ->
-                CM.coflatMap(fa, f).extract(CM).equalUnderTheLaw(f(fa), EQ)
+                CM.coflatMap(fa, f).extractM(CM).equalUnderTheLaw(f(fa), EQ)
             })
 
     inline fun <reified F> cokleisliLeftIdentity(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
@@ -65,7 +65,7 @@ object ComonadLaws {
     inline fun <reified F> cobinding(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), cf), { fa: Kind<F, Int> ->
                 CM.cobinding {
-                    val x = fa.extract(CM)
+                    val x = fa.extractM(CM)
                     val y = extract { CM.map(fa, { it + x }) }
                     CM.map(fa, { x + y })
                 }.equalUnderTheLaw(CM.map(fa, { it * 3 }), EQ)

@@ -1,7 +1,7 @@
 package arrow.instances
 
-import arrow.*
 import arrow.core.*
+import arrow.instance
 import arrow.typeclasses.*
 
 @instance(Eval::class)
@@ -45,8 +45,8 @@ interface EvalComonadInstance : Comonad<ForEval> {
     override fun <A, B> coflatMap(fa: EvalOf<A>, f: kotlin.Function1<EvalOf<A>, B>): Eval<B> =
             fa.extract().coflatMap(f)
 
-    override fun <A> extract(fa: EvalOf<A>): A =
-            fa.extract().extract()
+    override fun <A> extractM(fa: EvalOf<A>): A =
+            fa.extract().extractM()
 
     override fun <A, B> map(fa: EvalOf<A>, f: kotlin.Function1<A, B>): Eval<B> =
             fa.extract().map(f)
@@ -72,6 +72,6 @@ interface EvalBimonadInstance : Bimonad<ForEval> {
     override fun <A, B> coflatMap(fa: EvalOf<A>, f: kotlin.Function1<EvalOf<A>, B>): Eval<B> =
             fa.extract().coflatMap(f)
 
-    override fun <A> extract(fa: EvalOf<A>): A =
-            fa.extract().extract()
+    override fun <A> extractM(fa: EvalOf<A>): A =
+            fa.extract().extractM()
 }

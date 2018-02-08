@@ -3,6 +3,7 @@ package arrow.mtl.instances
 import arrow.data.Function1
 import arrow.data.Function1Of
 import arrow.data.Function1PartialOf
+import arrow.data.extract
 import arrow.instance
 import arrow.instances.Function1MonadInstance
 import arrow.mtl.MonadReader

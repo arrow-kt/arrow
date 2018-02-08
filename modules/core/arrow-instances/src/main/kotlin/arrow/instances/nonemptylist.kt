@@ -1,8 +1,10 @@
 package arrow.instances
 
-import arrow.*
-import arrow.core.*
+import arrow.Kind
+import arrow.core.Either
+import arrow.core.Eval
 import arrow.data.*
+import arrow.instance
 import arrow.typeclasses.*
 
 @instance(NonEmptyList::class)
@@ -62,8 +64,8 @@ interface NonEmptyListComonadInstance : Comonad<ForNonEmptyList> {
     override fun <A, B> coflatMap(fa: NonEmptyListOf<A>, f: kotlin.Function1<NonEmptyListOf<A>, B>): NonEmptyList<B> =
             fa.extract().coflatMap(f)
 
-    override fun <A> extract(fa: NonEmptyListOf<A>): A =
-            fa.extract().extract()
+    override fun <A> extractM(fa: NonEmptyListOf<A>): A =
+            fa.extract().extractM()
 
     override fun <A, B> map(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
             fa.extract().map(f)
@@ -89,8 +91,8 @@ interface NonEmptyListBimonadInstance : Bimonad<ForNonEmptyList> {
     override fun <A, B> coflatMap(fa: NonEmptyListOf<A>, f: kotlin.Function1<NonEmptyListOf<A>, B>): NonEmptyList<B> =
             fa.extract().coflatMap(f)
 
-    override fun <A> extract(fa: NonEmptyListOf<A>): A =
-            fa.extract().extract()
+    override fun <A> extractM(fa: NonEmptyListOf<A>): A =
+            fa.extract().extractM()
 }
 
 @instance(NonEmptyList::class)

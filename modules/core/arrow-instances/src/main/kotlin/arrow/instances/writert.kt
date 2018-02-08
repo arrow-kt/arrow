@@ -6,6 +6,7 @@ import arrow.core.toT
 import arrow.data.WriterT
 import arrow.data.WriterTOf
 import arrow.data.WriterTPartialOf
+import arrow.data.extract
 import arrow.instance
 import arrow.typeclasses.*
 

@@ -3,6 +3,7 @@ package arrow.mtl.syntax
 import arrow.Kind
 import arrow.core.Option
 import arrow.core.applicative
+import arrow.core.extract
 import arrow.core.traverseFilter
 import arrow.data.OptionT
 import arrow.mtl.instances.ComposedTraverseFilter

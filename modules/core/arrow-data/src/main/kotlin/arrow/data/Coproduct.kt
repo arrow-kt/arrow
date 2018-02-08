@@ -1,7 +1,8 @@
 package arrow.data
 
-import arrow.*
+import arrow.Kind
 import arrow.core.*
+import arrow.higherkind
 import arrow.typeclasses.*
 
 @higherkind data class Coproduct<F, G, A>(val run: Either<Kind<F, A>, Kind<G, A>>) : CoproductOf<F, G, A>, CoproductKindedJ<F, G, A> {
@@ -14,7 +15,7 @@ import arrow.typeclasses.*
                     { CG.coflatMap(it, { f(Coproduct(Right(it))) }) }
             ))
 
-    fun extract(CF: Comonad<F>, CG: Comonad<G>): A = run.fold({ CF.extractM(it) }, { CG.extractM(it) })
+    fun extractM(CF: Comonad<F>, CG: Comonad<G>): A = run.fold({ CF.extractM(it) }, { CG.extractM(it) })
 
     fun <H> fold(f: FunctionK<F, H>, g: FunctionK<G, H>): Kind<H, A> = run.fold({ f(it) }, { g(it) })
 
