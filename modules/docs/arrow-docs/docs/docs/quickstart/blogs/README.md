@@ -75,4 +75,4 @@ An ongoing blog series introducing Functional Programming architectures from scr
 [@msya](https://github.com/msya) explains how to use various optics and type classes in Arrow. He discusses optics such as 
 [`Lens`]({{ '/docs/optics/lens' | relative_url }}) and [`Iso`]({{ '/docs/optics/iso' | relative_url }}). He also goes over the purpose for type classes and how [KEEP-87](https://github.com/Kotlin/KEEP/pull/87) will make it easier to implement them.
 
-[Funtional Programming with Arrow](https://speakerdeck.com/heyitsmohit/functional-programming-with-arrow)
+[Functional Programming with Arrow](https://speakerdeck.com/heyitsmohit/functional-programming-with-arrow)
