@@ -14,6 +14,7 @@ import arrow.test.UnitSpec
 import arrow.test.generators.genEither
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genTuple
+import arrow.test.laws.OptionalLaws
 import arrow.test.laws.PrismLaws
 import arrow.test.laws.SetterLaws
 import arrow.test.laws.TraversalLaws
@@ -43,6 +44,14 @@ class PrismTest : UnitSpec() {
 
                 TraversalLaws.laws(
                         traversal = sumPrism.asTraversal(),
+                        aGen = SumGen,
+                        bGen = Gen.string(),
+                        funcGen = genFunctionAToB(Gen.string()),
+                        EQA = Eq.any()
+                ),
+
+                OptionalLaws.laws(
+                        optional = sumPrism.asOptional(),
                         aGen = SumGen,
                         bGen = Gen.string(),
                         funcGen = genFunctionAToB(Gen.string()),

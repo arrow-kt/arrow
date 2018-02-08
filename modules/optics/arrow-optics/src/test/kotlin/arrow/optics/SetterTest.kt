@@ -44,54 +44,6 @@ class SetterTest : UnitSpec() {
                 EQA = Eq.any()
         ))
 
-        "asFold should behave as valid Fold: size" {
-            forAll(SumGen) { sum: SumType ->
-                sumPrism.asFold().size(sum) == sumPrism.getOption(sum).map { 1 }.getOrElse { 0 }
-            }
-        }
-
-        "asFold should behave as valid Fold: nonEmpty" {
-            forAll(SumGen) { sum: SumType ->
-                sumPrism.asFold().nonEmpty(sum) == sumPrism.getOption(sum).nonEmpty()
-            }
-        }
-
-        "asFold should behave as valid Fold: isEmpty" {
-            forAll(SumGen) { sum: SumType ->
-                sumPrism.asFold().isEmpty(sum) == sumPrism.getOption(sum).isEmpty()
-            }
-        }
-
-        "asFold should behave as valid Fold: getAll" {
-            forAll(SumGen) { sum: SumType ->
-                sumPrism.asFold().getAll(sum) == sumPrism.getOption(sum).toList().k()
-            }
-        }
-
-        "asFold should behave as valid Fold: combineAll" {
-            forAll(SumGen) { sum: SumType ->
-                sumPrism.asFold().combineAll(sum) == sumPrism.getOption(sum).combineAll()
-            }
-        }
-
-        "asFold should behave as valid Fold: fold" {
-            forAll(SumGen) { sum: SumType ->
-                sumPrism.asFold().fold(sum) == sumPrism.getOption(sum).combineAll()
-            }
-        }
-
-        "asFold should behave as valid Fold: headOption" {
-            forAll(SumGen) { sum: SumType ->
-                sumPrism.asFold().headOption(sum) == sumPrism.getOption(sum)
-            }
-        }
-
-        "asFold should behave as valid Fold: lastOption" {
-            forAll(SumGen) { sum: SumType ->
-                sumPrism.asFold().lastOption(sum) == sumPrism.getOption(sum)
-            }
-        }
-
         "Joining two lenses together with same target should yield same result" {
             val userTokenStringSetter = userSetter compose tokenSetter
             val joinedSetter = tokenSetter.choice(userTokenStringSetter)
