@@ -9,6 +9,8 @@ import arrow.data.ListK
 import arrow.data.ListKOf
 import arrow.data.MapK
 import arrow.data.MapKPartialOf
+import arrow.data.Try
+import arrow.data.TryOf
 import arrow.data.traverse
 import arrow.instance
 import arrow.optics.Traversal
@@ -37,4 +39,10 @@ interface MapKEachInstance<K> : Each<MapKPartialOf<K>, K> {
 interface OptionEachInstance<A> : Each<OptionOf<A>, A> {
     override fun each(): Traversal<OptionOf<A>, A> =
             Traversal.fromTraversable(Option.traverse())
+}
+
+@instance(Try::class)
+interface TryEachInstance<A> : Each<TryOf<A>, A> {
+    override fun each(): Traversal<TryOf<A>, A> =
+            Traversal.fromTraversable(Try.traverse())
 }

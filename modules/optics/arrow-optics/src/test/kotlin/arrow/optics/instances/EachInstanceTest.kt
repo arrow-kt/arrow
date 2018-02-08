@@ -5,6 +5,7 @@ import arrow.core.EitherPartialOf
 import arrow.core.Option
 import arrow.data.ListK
 import arrow.data.MapK
+import arrow.data.Try
 import arrow.optics.typeclasses.each
 import arrow.test.UnitSpec
 import arrow.test.generators.genEither
@@ -12,6 +13,7 @@ import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genListK
 import arrow.test.generators.genMapK
 import arrow.test.generators.genOption
+import arrow.test.generators.genTry
 import arrow.test.laws.TraversalLaws
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
@@ -27,6 +29,7 @@ class EachInstanceTest : UnitSpec() {
             each<ListK<String>, String>() shouldNotBe null
             each<MapK<Int, String>, String>() shouldNotBe null
             each<Option<String>, String>() shouldNotBe null
+            each<Try<String>, String>() shouldNotBe null
         }
 
         testLaws(TraversalLaws.laws(
@@ -53,6 +56,13 @@ class EachInstanceTest : UnitSpec() {
         testLaws(TraversalLaws.laws(
                 traversal = each<Option<String>, String>().each(),
                 aGen = genOption(Gen.string()),
+                bGen = Gen.string(),
+                funcGen = genFunctionAToB(Gen.string())
+        ))
+
+        testLaws(TraversalLaws.laws(
+                traversal = each<Try<String>, String>().each(),
+                aGen = genTry(Gen.string()),
                 bGen = Gen.string(),
                 funcGen = genFunctionAToB(Gen.string())
         ))

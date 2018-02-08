@@ -41,5 +41,6 @@ The following datatypes in Arrow provide instances that adhere to the `Each` typ
 
 - [MapKW]({{ '/docs/datatypes/mapkw' | relative_url }})
 - [ListKW]({{ '/docs/datatypes/listkw' | relative_url }})
-- [Either]({{ '/docs/datatypes/either' | relative_url }})
 - [Option]({{ '/docs/datatypes/option' | relative_url }})
+- [Try]({{ '/docs/datatypes/try' | relative_url }})
+- [Either]({{ '/docs/datatypes/either' | relative_url }})
