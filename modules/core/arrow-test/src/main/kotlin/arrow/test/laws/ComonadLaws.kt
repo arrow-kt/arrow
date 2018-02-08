@@ -54,12 +54,12 @@ object ComonadLaws {
 
     inline fun <reified F> cokleisliLeftIdentity(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), cf), genFunctionAToB(genConstructor(Gen.int(), cf)), { fa: Kind<F, Int>, f: (Kind<F, Int>) -> Kind<F, Int> ->
-                Cokleisli(CM, { hk: Kind<F, Int> -> CM.extract(hk) }).andThen(Cokleisli(CM, f)).run(fa).equalUnderTheLaw(f(fa), EQ)
+                Cokleisli(CM, { hk: Kind<F, Int> -> CM.extractM(hk) }).andThen(Cokleisli(CM, f)).run(fa).equalUnderTheLaw(f(fa), EQ)
             })
 
     inline fun <reified F> cokleisliRightIdentity(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), cf), genFunctionAToB(genConstructor(Gen.int(), cf)), { fa: Kind<F, Int>, f: (Kind<F, Int>) -> Kind<F, Int> ->
-                Cokleisli(CM, f).andThen(Cokleisli(CM, { hk: Kind<F, Kind<F, Int>> -> CM.extract(hk) })).run(fa).equalUnderTheLaw(f(fa), EQ)
+                Cokleisli(CM, f).andThen(Cokleisli(CM, { hk: Kind<F, Kind<F, Int>> -> CM.extractM(hk) })).run(fa).equalUnderTheLaw(f(fa), EQ)
             })
 
     inline fun <reified F> cobinding(CM: Comonad<F> = comonad<F>(), crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
