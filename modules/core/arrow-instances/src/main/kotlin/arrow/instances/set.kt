@@ -33,19 +33,19 @@ interface SetKEqInstance<A> : Eq<SetK<A>> {
 @instance(SetK::class)
 interface SetKFoldableInstance : Foldable<ForSetK> {
     override fun <A, B> foldLeft(fa: SetKOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
-            fa.reify().foldLeft(b, f)
+            fa.extract().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: SetKOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
-            fa.reify().foldRight(lb, f)
+            fa.extract().foldRight(lb, f)
 
     override fun <A> isEmpty(fa: SetKOf<A>): kotlin.Boolean =
-            fa.reify().isEmpty()
+            fa.extract().isEmpty()
 }
 
 @instance(SetK::class)
 interface SetKSemigroupKInstance : SemigroupK<ForSetK> {
     override fun <A> combineK(x: SetKOf<A>, y: SetKOf<A>): SetK<A> =
-            x.reify().combineK(y)
+            x.extract().combineK(y)
 }
 
 @instance(SetK::class)
@@ -54,5 +54,5 @@ interface SetKMonoidKInstance : MonoidK<ForSetK> {
             SetK.empty()
 
     override fun <A> combineK(x: SetKOf<A>, y: SetKOf<A>): SetK<A> =
-            x.reify().combineK(y)
+            x.extract().combineK(y)
 }

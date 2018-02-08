@@ -15,37 +15,37 @@ interface ListKMonadCombineInstance : MonadCombine<ForListK> {
             ListK.empty()
 
     override fun <A, B> mapFilter(fa: ListKOf<A>, f: kotlin.Function1<A, Option<B>>): ListK<B> =
-            fa.reify().mapFilter(f)
+            fa.extract().mapFilter(f)
 
     override fun <A, B> ap(fa: ListKOf<A>, ff: ListKOf<kotlin.Function1<A, B>>): ListK<B> =
-            fa.reify().ap(ff)
+            fa.extract().ap(ff)
 
     override fun <A, B> flatMap(fa: ListKOf<A>, f: kotlin.Function1<A, ListKOf<B>>): ListK<B> =
-            fa.reify().flatMap(f)
+            fa.extract().flatMap(f)
 
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ListKOf<Either<A, B>>>): ListK<B> =
             ListK.tailRecM(a, f)
 
     override fun <A, B> map(fa: ListKOf<A>, f: kotlin.Function1<A, B>): ListK<B> =
-            fa.reify().map(f)
+            fa.extract().map(f)
 
     override fun <A, B, Z> map2(fa: ListKOf<A>, fb: ListKOf<B>, f: kotlin.Function1<Tuple2<A, B>, Z>): ListK<Z> =
-            fa.reify().map2(fb, f)
+            fa.extract().map2(fb, f)
 
     override fun <A> pure(a: A): ListK<A> =
             ListK.pure(a)
 
     override fun <A> combineK(x: ListKOf<A>, y: ListKOf<A>): ListK<A> =
-            x.reify().combineK(y)
+            x.extract().combineK(y)
 }
 
 @instance(ListK::class)
 interface ListKFunctorFilterInstance : FunctorFilter<ForListK> {
     override fun <A, B> mapFilter(fa: ListKOf<A>, f: kotlin.Function1<A, Option<B>>): ListK<B> =
-            fa.reify().mapFilter(f)
+            fa.extract().mapFilter(f)
 
     override fun <A, B> map(fa: ListKOf<A>, f: kotlin.Function1<A, B>): ListK<B> =
-            fa.reify().map(f)
+            fa.extract().map(f)
 }
 
 @instance(ListK::class)
@@ -54,22 +54,22 @@ interface ListKMonadFilterInstance : MonadFilter<ForListK> {
             ListK.empty()
 
     override fun <A, B> mapFilter(fa: ListKOf<A>, f: kotlin.Function1<A, Option<B>>): ListK<B> =
-            fa.reify().mapFilter(f)
+            fa.extract().mapFilter(f)
 
     override fun <A, B> ap(fa: ListKOf<A>, ff: ListKOf<kotlin.Function1<A, B>>): ListK<B> =
-            fa.reify().ap(ff)
+            fa.extract().ap(ff)
 
     override fun <A, B> flatMap(fa: ListKOf<A>, f: kotlin.Function1<A, ListKOf<B>>): ListK<B> =
-            fa.reify().flatMap(f)
+            fa.extract().flatMap(f)
 
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ListKOf<Either<A, B>>>): ListK<B> =
             ListK.tailRecM(a, f)
 
     override fun <A, B> map(fa: ListKOf<A>, f: kotlin.Function1<A, B>): ListK<B> =
-            fa.reify().map(f)
+            fa.extract().map(f)
 
     override fun <A, B, Z> map2(fa: ListKOf<A>, fb: ListKOf<B>, f: kotlin.Function1<Tuple2<A, B>, Z>): ListK<Z> =
-            fa.reify().map2(fb, f)
+            fa.extract().map2(fb, f)
 
     override fun <A> pure(a: A): ListK<A> =
             ListK.pure(a)

@@ -62,7 +62,7 @@ class OptionInstancesTest : UnitSpec() {
                 EQB = Eq.any(),
                 bMonoid = object : Monoid<Either<Unit, Int>> {
                     override fun combine(a: Either<Unit, Int>, b: Either<Unit, Int>): Either<Unit, Int> =
-                            Either.applicative<Unit>().map2(a, b) { (a, b) -> a + b }.reify()
+                            Either.applicative<Unit>().map2(a, b) { (a, b) -> a + b }.extract()
 
                     override fun empty(): Either<Unit, Int> = 0.right()
                 }

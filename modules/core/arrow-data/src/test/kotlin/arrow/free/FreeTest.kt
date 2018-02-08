@@ -34,7 +34,7 @@ sealed class Ops<out A> : Kind<Ops.F, A> {
     }
 }
 
-fun <A> Kind<Ops.F, A>.reify(): Ops<A> = this as Ops<A>
+fun <A> Kind<Ops.F, A>.extract(): Ops<A> = this as Ops<A>
 
 @RunWith(KTestJUnitRunner::class)
 class FreeTest : UnitSpec() {
@@ -43,13 +43,13 @@ class FreeTest : UnitSpec() {
         val added = Ops.add(10, 10).bind()
         val subtracted = bind { Ops.subtract(added, 50) }
         yields(subtracted)
-    }.reify()
+    }.extract()
 
     private fun stackSafeTestProgram(n: Int, stopAt: Int): Free<Ops.F, Int> = Ops.binding {
         val v = Ops.add(n, 1).bind()
         val r = bind { if (v < stopAt) stackSafeTestProgram(v, stopAt) else Free.pure(v) }
         yields(r)
-    }.reify()
+    }.extract()
 
     init {
 
@@ -66,9 +66,9 @@ class FreeTest : UnitSpec() {
         )
 
         "Can interpret an ADT as Free operations" {
-            program.foldMap(optionInterpreter, Option.monad()).reify() shouldBe Some(-30)
-            program.foldMap(idInterpreter, Id.monad()).reify() shouldBe Id(-30)
-            program.foldMap(nonEmptyListInterpreter, NonEmptyList.monad()).reify() shouldBe NonEmptyList.of(-30)
+            program.foldMap(optionInterpreter, Option.monad()).extract() shouldBe Some(-30)
+            program.foldMap(idInterpreter, Id.monad()).extract() shouldBe Id(-30)
+            program.foldMap(nonEmptyListInterpreter, NonEmptyList.monad()).extract() shouldBe NonEmptyList.of(-30)
         }
 
         "foldMap is stack safe" {

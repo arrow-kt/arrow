@@ -37,7 +37,7 @@ class ValidatedInstancesTest : UnitSpec() {
                     override fun empty() = 0.right()
 
                     override fun combine(a: Either<String, Int>, b: Either<String, Int>): Either<String, Int> =
-                            Either.applicative<String>().map2(a, b) { (a, b) -> a + b }.reify()
+                            Either.applicative<String>().map2(a, b) { (a, b) -> a + b }.extract()
                 }),
 
             IsoLaws.laws(
@@ -48,7 +48,7 @@ class ValidatedInstancesTest : UnitSpec() {
                 EQA = Eq.any(),
                 EQB = Eq.any(),
                 bMonoid = object : Monoid<Try<Int>> {
-                    override fun combine(a: Try<Int>, b: Try<Int>) = Try.applicative().map2(a, b) { (a, b) -> a + b }.reify()
+                    override fun combine(a: Try<Int>, b: Try<Int>) = Try.applicative().map2(a, b) { (a, b) -> a + b }.extract()
 
                     override fun empty(): Try<Int> = Try.Success(0)
                 })

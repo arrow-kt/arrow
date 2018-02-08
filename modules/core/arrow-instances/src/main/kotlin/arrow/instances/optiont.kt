@@ -10,7 +10,7 @@ interface OptionTFunctorInstance<F> : Functor<OptionTPartialOf<F>> {
 
     fun FF(): Functor<F>
 
-    override fun <A, B> map(fa: OptionTOf<F, A>, f: (A) -> B): OptionT<F, B> = fa.reify().map(f, FF())
+    override fun <A, B> map(fa: OptionTOf<F, A>, f: (A) -> B): OptionT<F, B> = fa.extract().map(f, FF())
 
 }
 
@@ -21,21 +21,21 @@ interface OptionTApplicativeInstance<F> : OptionTFunctorInstance<F>, Applicative
 
     override fun <A> pure(a: A): OptionT<F, A> = OptionT(FF().pure(Option(a)))
 
-    override fun <A, B> map(fa: OptionTOf<F, A>, f: (A) -> B): OptionT<F, B> = fa.reify().map(f, FF())
+    override fun <A, B> map(fa: OptionTOf<F, A>, f: (A) -> B): OptionT<F, B> = fa.extract().map(f, FF())
 
     override fun <A, B> ap(fa: OptionTOf<F, A>, ff: OptionTOf<F, (A) -> B>): OptionT<F, B> =
-            fa.reify().ap(ff, FF())
+            fa.extract().ap(ff, FF())
 }
 
 @instance(OptionT::class)
 interface OptionTMonadInstance<F> : OptionTApplicativeInstance<F>, Monad<OptionTPartialOf<F>> {
 
-    override fun <A, B> map(fa: OptionTOf<F, A>, f: (A) -> B): OptionT<F, B> = fa.reify().map(f, FF())
+    override fun <A, B> map(fa: OptionTOf<F, A>, f: (A) -> B): OptionT<F, B> = fa.extract().map(f, FF())
 
-    override fun <A, B> flatMap(fa: OptionTOf<F, A>, f: (A) -> OptionTOf<F, B>): OptionT<F, B> = fa.reify().flatMap({ f(it).reify() }, FF())
+    override fun <A, B> flatMap(fa: OptionTOf<F, A>, f: (A) -> OptionTOf<F, B>): OptionT<F, B> = fa.extract().flatMap({ f(it).extract() }, FF())
 
     override fun <A, B> ap(fa: OptionTOf<F, A>, ff: OptionTOf<F, (A) -> B>): OptionT<F, B> =
-            fa.reify().ap(ff, FF())
+            fa.extract().ap(ff, FF())
 
     override fun <A, B> tailRecM(a: A, f: (A) -> OptionTOf<F, Either<A, B>>): OptionT<F, B> =
             OptionT.tailRecM(a, f, FF())
@@ -48,7 +48,7 @@ fun <F, A, B> OptionT<F, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, F
 
 fun <F, G, A, B> OptionT<F, A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>, FF: Traverse<F>): Kind<G, OptionT<F, B>> {
     val fa = ComposedTraverse(FF, Option.traverse(), Option.applicative()).traverseC(value, f, GA)
-    return GA.map(fa, { OptionT(FF.map(it.unnest(), { it.reify() })) })
+    return GA.map(fa, { OptionT(FF.map(it.unnest(), { it.extract() })) })
 }
 
 @instance(OptionT::class)
@@ -56,9 +56,9 @@ interface OptionTFoldableInstance<F> : Foldable<OptionTPartialOf<F>> {
 
     fun FFF(): Foldable<F>
 
-    override fun <A, B> foldLeft(fa: OptionTOf<F, A>, b: B, f: (B, A) -> B): B = fa.reify().foldLeft(b, f, FFF())
+    override fun <A, B> foldLeft(fa: OptionTOf<F, A>, b: B, f: (B, A) -> B): B = fa.extract().foldLeft(b, f, FFF())
 
-    override fun <A, B> foldRight(fa: OptionTOf<F, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = fa.reify().foldRight(lb, f, FFF())
+    override fun <A, B> foldRight(fa: OptionTOf<F, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = fa.extract().foldRight(lb, f, FFF())
 
 }
 
@@ -68,7 +68,7 @@ interface OptionTTraverseInstance<F> : OptionTFoldableInstance<F>, Traverse<Opti
     override fun FFF(): Traverse<F>
 
     override fun <G, A, B> traverse(fa: OptionTOf<F, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, OptionT<F, B>> =
-            fa.reify().traverse(f, GA, FFF())
+            fa.extract().traverse(f, GA, FFF())
 
 }
 
@@ -77,7 +77,7 @@ interface OptionTSemigroupKInstance<F> : SemigroupK<OptionTPartialOf<F>> {
 
     fun FF(): Monad<F>
 
-    override fun <A> combineK(x: OptionTOf<F, A>, y: OptionTOf<F, A>): OptionT<F, A> = x.reify().orElse({ y.reify() }, FF())
+    override fun <A> combineK(x: OptionTOf<F, A>, y: OptionTOf<F, A>): OptionT<F, A> = x.extract().orElse({ y.extract() }, FF())
 }
 
 @instance(OptionT::class)

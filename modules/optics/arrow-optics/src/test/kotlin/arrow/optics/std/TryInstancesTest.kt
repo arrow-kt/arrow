@@ -54,7 +54,7 @@ class TryInstancesTest : UnitSpec() {
                 EQB = Eq.any(),
                 bMonoid = object : Monoid<Either<Throwable, Int>> {
                     override fun combine(a: Either<Throwable, Int>, b: Either<Throwable, Int>): Either<Throwable, Int> =
-                            Either.applicative<Throwable>().map2(a, b) { (a, b) -> a + b }.reify()
+                            Either.applicative<Throwable>().map2(a, b) { (a, b) -> a + b }.extract()
 
                     override fun empty(): Either<Throwable, Int> = 0.right()
                 }

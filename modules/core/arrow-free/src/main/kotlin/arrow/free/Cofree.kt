@@ -41,7 +41,7 @@ typealias CofreeEval<S, A> = Kind<S, Cofree<S, A>>
 }
 
 fun <F, A, B> Cofree<F, A>.cata(folder: (A, Kind<F, B>) -> Eval<B>, TF: Traverse<F>): Eval<B> {
-    val ev: Eval<Kind<F, B>> = TF.traverse(this.tailForced(), { it.cata(folder, TF) }, applicative()).reify()
+    val ev: Eval<Kind<F, B>> = TF.traverse(this.tailForced(), { it.cata(folder, TF) }, applicative()).extract()
     return ev.flatMap { folder(extract(), it) }
 }
 

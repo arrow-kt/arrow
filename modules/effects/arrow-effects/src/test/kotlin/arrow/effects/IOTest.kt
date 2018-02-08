@@ -16,7 +16,7 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class IOTest : UnitSpec() {
     fun <A> EQ(): Eq<Kind<ForIO, A>> = Eq { a, b ->
-        Option.eq(Eq.any()).eqv(a.reify().attempt().unsafeRunTimed(60.seconds), b.reify().attempt().unsafeRunTimed(60.seconds))
+        Option.eq(Eq.any()).eqv(a.extract().attempt().unsafeRunTimed(60.seconds), b.extract().attempt().unsafeRunTimed(60.seconds))
     }
 
     init {
@@ -249,7 +249,7 @@ class IOTest : UnitSpec() {
                 val x = IO.pure(1).bind()
                 val y = bind { IO { x + 1 } }
                 yields(y)
-            }.reify()
+            }.extract()
             result.unsafeRunSync() shouldBe 2
         }
     }

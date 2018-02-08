@@ -14,8 +14,8 @@ import arrow.typeclasses.Applicative
 @instance(Const::class)
 interface ConstTraverseFilterInstance<X> : ConstTraverseInstance<X>, TraverseFilter<ConstPartialOf<X>> {
 
-    override fun <T, U> map(fa: ConstOf<X, T>, f: (T) -> U): Const<X, U> = fa.reify().retag()
+    override fun <T, U> map(fa: ConstOf<X, T>, f: (T) -> U): Const<X, U> = fa.extract().retag()
 
     override fun <G, A, B> traverseFilter(fa: ConstOf<X, A>, f: (A) -> Kind<G, Option<B>>, GA: Applicative<G>): Kind<G, ConstOf<X, B>> =
-            fa.reify().traverseFilter(f, GA)
+            fa.extract().traverseFilter(f, GA)
 }

@@ -26,7 +26,7 @@ import arrow.typeclasses.monad
 
         fun <F, L, A, B> tailRecM(a: A, f: (A) -> EitherTOf<F, L, Either<A, B>>, MF: Monad<F>): EitherT<F, L, B> =
                 EitherT(MF.tailRecM(a, {
-                    MF.map(f(it).reify().value) { recursionControl ->
+                    MF.map(f(it).extract().value) { recursionControl ->
                         when (recursionControl) {
                             is Either.Left<L, Either<A, B>> -> Right(Left(recursionControl.a))
                             is Either.Right<L, Either<A, B>> -> {
@@ -74,14 +74,14 @@ import arrow.typeclasses.monad
     fun toOptionT(FF: Functor<F>): OptionT<F, B> = OptionT(FF.map(value, { it.toOption() }))
 
     fun combineK(y: EitherTOf<F, A, B>, MF: Monad<F>): EitherT<F, A, B> =
-            EitherT(MF.flatMap(this.reify().value) {
+            EitherT(MF.flatMap(this.extract().value) {
                 when (it) {
-                    is Either.Left -> y.reify().value
+                    is Either.Left -> y.extract().value
                     is Either.Right -> MF.pure(it)
                 }
             })
 
-    fun <C> ap(ff: EitherTOf<F, A, (B) -> C>, MF: Monad<F>): EitherT<F, A, C> = ff.reify().flatMap ({ f -> map(f, MF) }, MF)
+    fun <C> ap(ff: EitherTOf<F, A, (B) -> C>, MF: Monad<F>): EitherT<F, A, C> = ff.extract().flatMap ({ f -> map(f, MF) }, MF)
 }
 
-fun <F, A, B> EitherTOf<F, A, B>.value(): Kind<F, Either<A, B>> = this.reify().value
+fun <F, A, B> EitherTOf<F, A, B>.value(): Kind<F, Either<A, B>> = this.extract().value

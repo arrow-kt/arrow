@@ -7,7 +7,7 @@ import arrow.typeclasses.*
 
 @instance(Const::class)
 interface ConstFunctorInstance<A> : Functor<ConstPartialOf<A>> {
-    override fun <T, U> map(fa: ConstOf<A, T>, f: (T) -> U): Const<A, U> = fa.reify().retag()
+    override fun <T, U> map(fa: ConstOf<A, T>, f: (T) -> U): Const<A, U> = fa.extract().retag()
 }
 
 @instance(Const::class)
@@ -15,11 +15,11 @@ interface ConstApplicativeInstance<A> : Applicative<ConstPartialOf<A>> {
 
     fun MA(): Monoid<A>
 
-    override fun <T, U> map(fa: ConstOf<A, T>, f: (T) -> U): Const<A, U> = fa.reify().retag()
+    override fun <T, U> map(fa: ConstOf<A, T>, f: (T) -> U): Const<A, U> = fa.extract().retag()
 
     override fun <T> pure(a: T): Const<A, T> = object : ConstMonoidInstance<A, T> {
         override fun SA(): Monoid<A> = MA()
-    }.empty().reify()
+    }.empty().extract()
 
     override fun <T, U> ap(fa: ConstOf<A, T>, ff: ConstOf<A, (T) -> U>): Const<A, U> = fa.ap(ff, MA())
 }
@@ -36,10 +36,10 @@ interface ConstFoldableInstance<A> : Foldable<ConstPartialOf<A>> {
 @instance(Const::class)
 interface ConstTraverseInstance<X> : ConstFoldableInstance<X>, Traverse<ConstPartialOf<X>> {
 
-    override fun <T, U> map(fa: ConstOf<X, T>, f: (T) -> U): Const<X, U> = fa.reify().retag()
+    override fun <T, U> map(fa: ConstOf<X, T>, f: (T) -> U): Const<X, U> = fa.extract().retag()
 
     override fun <G, A, B> traverse(fa: ConstOf<X, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, ConstOf<X, B>> =
-            fa.reify().traverse(f, GA)
+            fa.extract().traverse(f, GA)
 }
 
 @instance(Const::class)

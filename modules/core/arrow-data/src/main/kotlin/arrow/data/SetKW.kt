@@ -27,6 +27,6 @@ data class SetK<out A>(val set: Set<A>) : SetKOf<A>, Set<A> by set {
     }
 }
 
-fun <A> SetK<A>.combineK(y: SetKOf<A>): SetK<A> = (this.set + y.reify().set).k()
+fun <A> SetK<A>.combineK(y: SetKOf<A>): SetK<A> = (this.set + y.extract().set).k()
 
 fun <A> Set<A>.k(): SetK<A> = SetK(this)

@@ -9,7 +9,7 @@ import arrow.typeclasses.*
 
 @instance(Ior::class)
 interface IorFunctorInstance<L> : Functor<IorPartialOf<L>> {
-    override fun <A, B> map(fa: IorOf<L, A>, f: (A) -> B): Ior<L, B> = fa.reify().map(f)
+    override fun <A, B> map(fa: IorOf<L, A>, f: (A) -> B): Ior<L, B> = fa.extract().map(f)
 }
 
 @instance(Ior::class)
@@ -19,22 +19,22 @@ interface IorApplicativeInstance<L> : IorFunctorInstance<L>, Applicative<IorPart
 
     override fun <A> pure(a: A): Ior<L, A> = Ior.Right(a)
 
-    override fun <A, B> map(fa: IorOf<L, A>, f: (A) -> B): Ior<L, B> = fa.reify().map(f)
+    override fun <A, B> map(fa: IorOf<L, A>, f: (A) -> B): Ior<L, B> = fa.extract().map(f)
 
     override fun <A, B> ap(fa: IorOf<L, A>, ff: IorOf<L, (A) -> B>): Ior<L, B> =
-            fa.reify().ap(ff, SL())
+            fa.extract().ap(ff, SL())
 }
 
 @instance(Ior::class)
 interface IorMonadInstance<L> : IorApplicativeInstance<L>, Monad<IorPartialOf<L>> {
 
-    override fun <A, B> map(fa: IorOf<L, A>, f: (A) -> B): Ior<L, B> = fa.reify().map(f)
+    override fun <A, B> map(fa: IorOf<L, A>, f: (A) -> B): Ior<L, B> = fa.extract().map(f)
 
     override fun <A, B> flatMap(fa: IorOf<L, A>, f: (A) -> IorOf<L, B>): Ior<L, B> =
-            fa.reify().flatMap({ f(it).reify() }, SL())
+            fa.extract().flatMap({ f(it).extract() }, SL())
 
     override fun <A, B> ap(fa: IorOf<L, A>, ff: IorOf<L, (A) -> B>): Ior<L, B> =
-            fa.reify().ap(ff, SL())
+            fa.extract().ap(ff, SL())
 
     override fun <A, B> tailRecM(a: A, f: (A) -> IorOf<L, Either<A, B>>): Ior<L, B> =
             Ior.tailRecM(a, f, SL())
@@ -44,10 +44,10 @@ interface IorMonadInstance<L> : IorApplicativeInstance<L>, Monad<IorPartialOf<L>
 @instance(Ior::class)
 interface IorFoldableInstance<L> : Foldable<IorPartialOf<L>> {
 
-    override fun <B, C> foldLeft(fa: Kind<Kind<ForIor, L>, B>, b: C, f: (C, B) -> C): C = fa.reify().foldLeft(b, f)
+    override fun <B, C> foldLeft(fa: Kind<Kind<ForIor, L>, B>, b: C, f: (C, B) -> C): C = fa.extract().foldLeft(b, f)
 
     override fun <B, C> foldRight(fa: Kind<Kind<ForIor, L>, B>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
-            fa.reify().foldRight(lb, f)
+            fa.extract().foldRight(lb, f)
 
 }
 
@@ -55,7 +55,7 @@ interface IorFoldableInstance<L> : Foldable<IorPartialOf<L>> {
 interface IorTraverseInstance<L> : IorFoldableInstance<L>, Traverse<IorPartialOf<L>> {
 
     override fun <G, B, C> traverse(fa: IorOf<L, B>, f: (B) -> Kind<G, C>, GA: Applicative<G>): Kind<G, Ior<L, C>> =
-            fa.reify().traverse(f, GA)
+            fa.extract().traverse(f, GA)
 
 }
 

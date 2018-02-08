@@ -32,7 +32,7 @@ class CofreeTest : UnitSpec() {
                 if (it % 2 == 0) None else Some(it + 1)
             })
         }, Eq { a, b ->
-            a.reify().run().extract() == b.reify().run().extract()
+            a.extract().run().extract() == b.extract().run().extract()
         }))
 
         "tailForced should evaluate and return" {
@@ -109,7 +109,7 @@ class CofreeTest : UnitSpec() {
 
         "cata should traverse the structure" {
             val cata: NonEmptyList<Int> = startHundred.cata<ForOption, Int, NonEmptyList<Int>>(
-                    { i, lb -> Eval.now(NonEmptyList(i, lb.reify().fold({ emptyList<Int>() }, { it.all }))) },
+                    { i, lb -> Eval.now(NonEmptyList(i, lb.extract().fold({ emptyList<Int>() }, { it.all }))) },
                     Option.traverse()
             ).value()
 
@@ -123,7 +123,7 @@ class CofreeTest : UnitSpec() {
         "cata with an stack-unsafe monad should blow up the stack" {
             try {
                 startTwoThousand.cata<ForOption, Int, NonEmptyList<Int>>(
-                        { i, lb -> Eval.now(NonEmptyList(i, lb.reify().fold({ emptyList<Int>() }, { it.all }))) },
+                        { i, lb -> Eval.now(NonEmptyList(i, lb.extract().fold({ emptyList<Int>() }, { it.all }))) },
                         Option.traverse()
                 ).value()
                 throw AssertionError("Run should overflow on a stack-unsafe monad")
@@ -134,15 +134,15 @@ class CofreeTest : UnitSpec() {
 
         "cataM should traverse the structure in a stack-safe way on a monad" {
             val folder: (Int, Kind<ForOption, NonEmptyList<Int>>) -> EvalOption<NonEmptyList<Int>> = { i, lb ->
-                if (i <= 2000) OptionT.pure(NonEmptyList(i, lb.reify().fold({ emptyList<Int>() }, { it.all }))) else OptionT.none()
+                if (i <= 2000) OptionT.pure(NonEmptyList(i, lb.extract().fold({ emptyList<Int>() }, { it.all }))) else OptionT.none()
             }
             val inclusion = object : FunctionK<ForEval, EvalOptionF> {
                 override fun <A> invoke(fa: Kind<ForEval, A>): Kind<EvalOptionF, A> =
-                        OptionT(fa.reify().map { Some(it) })
+                        OptionT(fa.extract().map { Some(it) })
             }
-            val cataHundred = startTwoThousand.cataM(folder, inclusion, Option.traverse(), OptionT.monad(Eval.monad())).reify().value.reify().value()
+            val cataHundred = startTwoThousand.cataM(folder, inclusion, Option.traverse(), OptionT.monad(Eval.monad())).extract().value.extract().value()
             val newCof = Cofree(Option.functor(), 2001, Eval.now(Some(startTwoThousand)))
-            val cataHundredOne = newCof.cataM(folder, inclusion, Option.traverse(), OptionT.monad(Eval.monad())).reify().value.reify().value()
+            val cataHundredOne = newCof.cataM(folder, inclusion, Option.traverse(), OptionT.monad(Eval.monad())).extract().value.extract().value()
 
             cataHundred shouldBe Some(NonEmptyList.fromListUnsafe((0..2000).toList()))
             cataHundredOne shouldBe None
