@@ -69,3 +69,13 @@ An ongoing blog series introducing Functional Programming architectures from scr
 [@uris77](https://github.com/uris77) explains how to use [`Try`]({{ '/docs/datatypes/try' | relative_url }}) in real world examples.
 
 [Handling Kotlin Exceptions with Arrow – A Functional Approach](https://www.spantree.net/blog/2017/09/15/kotlin-exception-handling-with-kategory.html)
+
+### Optics and Type Classes in Arrow
+
+[@msya](https://github.com/msya) explains how to use various optics and type classes in Arrow. He discusses optics such as 
+[`Lens`]({{ '/docs/optics/lens' | relative_url }}) and [`Iso`]({{ '/docs/optics/iso' | relative_url }}). He also goes over the purpose for type classes and how [KEEP-87](https://github.com/Kotlin/KEEP/pull/87) will make it easier to implement them.
+
+Kotlin Brooklyn Meetup, Jan ’18 - version 0.6.1
+
+[Functional Programming with Arrow](https://speakerdeck.com/heyitsmohit/functional-programming-with-arrow)
+
