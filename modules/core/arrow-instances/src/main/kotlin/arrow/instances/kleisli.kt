@@ -6,7 +6,6 @@ import arrow.core.andThen
 import arrow.data.Kleisli
 import arrow.data.KleisliOf
 import arrow.data.KleisliPartialOf
-import arrow.data.reify
 import arrow.instance
 import arrow.typeclasses.*
 

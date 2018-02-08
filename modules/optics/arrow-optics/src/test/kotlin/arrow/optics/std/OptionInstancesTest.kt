@@ -3,7 +3,7 @@ package arrow.optics
 import arrow.core.Either
 import arrow.core.Option
 import arrow.core.applicative
-import arrow.core.reify
+import arrow.*.extract
 import arrow.core.monoid
 import arrow.instances.IntMonoid
 import arrow.syntax.either.right

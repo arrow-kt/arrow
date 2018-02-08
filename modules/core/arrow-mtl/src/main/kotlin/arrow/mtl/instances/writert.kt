@@ -5,7 +5,6 @@ import arrow.core.Tuple2
 import arrow.data.WriterT
 import arrow.data.WriterTOf
 import arrow.data.WriterTPartialOf
-import arrow.data.reify
 import arrow.instance
 import arrow.instances.WriterTMonadInstance
 import arrow.mtl.MonadFilter

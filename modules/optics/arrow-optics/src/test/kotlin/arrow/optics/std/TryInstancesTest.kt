@@ -9,7 +9,7 @@ import arrow.typeclasses.Monoid
 import arrow.test.laws.PrismLaws
 import arrow.test.UnitSpec
 import arrow.core.applicative
-import arrow.core.reify
+import arrow.*.extract
 import arrow.test.generators.genEither
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genThrowable

@@ -5,7 +5,6 @@ import arrow.core.Option
 import arrow.data.Const
 import arrow.data.ConstOf
 import arrow.data.ConstPartialOf
-import arrow.data.reify
 import arrow.free.instances.ConstTraverseInstance
 import arrow.instance
 import arrow.mtl.TraverseFilter

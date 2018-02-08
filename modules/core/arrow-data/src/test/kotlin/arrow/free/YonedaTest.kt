@@ -2,7 +2,7 @@ package arrow.free
 
 import arrow.core.ForId
 import arrow.core.Id
-import arrow.core.reify
+import arrow.*.extract
 import arrow.core.functor
 import arrow.test.UnitSpec
 import arrow.test.laws.FunctorLaws

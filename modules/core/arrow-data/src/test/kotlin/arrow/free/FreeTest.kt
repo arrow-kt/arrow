@@ -3,7 +3,7 @@ package arrow.free
 import arrow.Kind
 import arrow.core.*
 import arrow.data.NonEmptyList
-import arrow.data.reify
+import arrow.*.extract
 import arrow.data.monad
 import arrow.free.instances.FreeEq
 import arrow.free.instances.FreeMonadInstance

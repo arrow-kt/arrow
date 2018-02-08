@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.data.NonEmptyList
 import arrow.data.applicative
-import arrow.data.reify
+import arrow.*.extract
 import arrow.free.instances.FreeApplicativeApplicativeInstance
 import arrow.free.instances.FreeApplicativeEq
 import arrow.syntax.applicative.tupled
