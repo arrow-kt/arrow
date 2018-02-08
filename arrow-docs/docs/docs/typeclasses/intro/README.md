@@ -34,6 +34,10 @@ We will list them by their hierarchy.
 
 - [`Alternative`]({{ '/docs/typeclasses/alternative/' | relative_url }}) - has an structure that contains either of two values
 
+##### Show
+
+- [`Show`]({{ '/docs/typeclasses/show/' | relative_url }}) - literal representation of an object
+
 ##### Eq
 
 - [`Eq`]({{ '/docs/typeclasses/eq/' | relative_url }}) - structural equality between two objects

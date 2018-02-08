@@ -129,6 +129,9 @@ options:
       - title: Intro
         url: /docs/typeclasses/intro/
 
+      - title: Show
+        url: /docs/typeclasses/show/
+
       - title: Eq
         url: /docs/typeclasses/eq/
 
