@@ -4,13 +4,13 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import arrow.core.Either
 import arrow.core.applicative
-import arrow.*.extract
+import arrow.extract
 import arrow.typeclasses.Eq
 import arrow.test.laws.IsoLaws
 import arrow.typeclasses.Monoid
 import arrow.data.Try
 import arrow.data.applicative
-import arrow.*.extract
+import arrow.extract
 import arrow.test.UnitSpec
 import arrow.test.generators.genEither
 import arrow.test.generators.genFunctionAToB

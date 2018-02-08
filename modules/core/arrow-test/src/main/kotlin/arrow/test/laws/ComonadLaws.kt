@@ -2,7 +2,7 @@ package arrow.test.laws
 
 import arrow.*
 import arrow.data.Cokleisli
-import arrow.syntax.comonad.extract
+import arrow.syntax.comonad.extractM
 import arrow.syntax.functor.map
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB

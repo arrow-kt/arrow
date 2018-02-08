@@ -2,7 +2,7 @@ package arrow.data
 
 import arrow.Kind3
 import arrow.core.*
-import arrow.syntax.comonad.extract
+import arrow.syntax.comonad.extractM
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
