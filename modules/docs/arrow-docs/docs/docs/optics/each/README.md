@@ -17,14 +17,14 @@ import arrow.data.*
 import arrow.optics.*
 import arrow.optics.typeclasses.*
 
-val each: Each<ListKWKind<Int>, Int> = Each.fromTraverse(ListKW.traverse())
+val each: Each<ListKOf<Int>, Int> = Each.fromTraverse(ListK.traverse())
 
-val listTraversal: Traversal<ListKWKind<Int>, Int> = each.each()
+val listTraversal: Traversal<ListKOf<Int>, Int> = each.each()
 
 listTraversal.lastOption(listOf(1, 2, 3).k())
 ```
 ```kotlin:ank
-listTraversal.lastOption(ListKW.empty())
+listTraversal.lastOption(ListK.empty())
 ```
 
 #### Creating your own `Each` instances
@@ -39,8 +39,8 @@ See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | rela
 
 The following datatypes in Arrow provide instances that adhere to the `Each` typeclass.
 
-- [MapKW]({{ '/docs/datatypes/mapkw' | relative_url }})
-- [ListKW]({{ '/docs/datatypes/listkw' | relative_url }})
+- [MapK]({{ '/docs/datatypes/mapk' | relative_url }})
+- [ListK]({{ '/docs/datatypes/listk' | relative_url }})
 - [Option]({{ '/docs/datatypes/option' | relative_url }})
 - [Try]({{ '/docs/datatypes/try' | relative_url }})
 - [Either]({{ '/docs/datatypes/either' | relative_url }})
