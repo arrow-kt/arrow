@@ -51,7 +51,7 @@ sealed class Try<out A> : TryOf<A> {
     operator fun invoke() = get()
 
     fun <G, B> traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Try<B>> =
-            this.reify().fold({ GA.pure(raise(IllegalStateException())) }, { GA.map(f(it), { Try { it } }) })
+            this.reify().fold({ GA.pure(raise(it)) }, { GA.map(f(it), { Try { it } }) })
 
     fun <B> ap(ff: TryOf<(A) -> B>): Try<B> = ff.reify().flatMap { f -> map(f) }.reify()
 
