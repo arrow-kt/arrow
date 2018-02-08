@@ -4,8 +4,8 @@ import arrow.*
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.comonad
 
-inline fun <reified F, A, B> HK<F, A>.coflatMap(FT: Comonad<F> = comonad(), noinline f: (HK<F, A>) -> B): HK<F, B> = FT.coflatMap(this, f)
+inline fun <reified F, A, B> Kind<F, A>.coflatMap(FT: Comonad<F> = comonad(), noinline f: (Kind<F, A>) -> B): Kind<F, B> = FT.coflatMap(this, f)
 
-inline fun <reified F, A> HK<F, A>.extract(FT: Comonad<F> = comonad()): A = FT.extract(this)
+inline fun <reified F, A> Kind<F, A>.extract(FT: Comonad<F> = comonad()): A = FT.extract(this)
 
-inline fun <reified F, A> HK<F, A>.duplicate(FT: Comonad<F> = comonad()): HK<F, HK<F, A>> = FT.duplicate(this)
+inline fun <reified F, A> Kind<F, A>.duplicate(FT: Comonad<F> = comonad()): Kind<F, Kind<F, A>> = FT.duplicate(this)

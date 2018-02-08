@@ -36,7 +36,7 @@ import arrow.syntax.applicative.*
 
 data class Profile(val name: String, val phone: Int, val address: List<String>)
 
-val r: Option<Tuple3<String, Int, List<String>>> = Option.applicative().tupled(profileService(), phoneService(), addressService()).ev()
+val r: Option<Tuple3<String, Int, List<String>>> = Option.applicative().tupled(profileService(), phoneService(), addressService()).reify()
 r.map { Profile(it.a, it.b, it.c) }
 ```
 
@@ -55,7 +55,7 @@ Option.applicative().map(profileService(), phoneService(), addressService(), { (
 A constructor function.
 It lifts a value into the computational context of a type constructor.
 
-`fun <A> pure(a: A): HK<F, A>`
+`fun <A> pure(a: A): Kind<F, A>`
 
 ```kotlin:ank
 Option.pure(1) // Some(1)
@@ -65,7 +65,7 @@ Option.pure(1) // Some(1)
 
 Apply a function inside the type constructor's context
 
-`fun <A, B> ap(fa: HK<F, A>, ff: HK<F, (A) -> B>): HK<F, B>`
+`fun <A, B> ap(fa: Kind<F, A>, ff: Kind<F, (A) -> B>): Kind<F, B>`
 
 ```kotlin:ank
 Option.applicative().ap(Some(1), Some({ n: Int -> n + 1 })) // Some(2)
@@ -77,15 +77,15 @@ For a full list of other useful combinators available in `Applicative` see the [
 
 ### Syntax
 
-#### HK<F, A>#pure
+#### Kind<F, A>#pure
 
 Lift a value into the computational context of a type constructor
 
 ```kotlin:ank
-1.pure<OptionHK, Int>()
+1.pure<ForOption, Int>()
 ```
 
-#### HK<F, A>#ap
+#### Kind<F, A>#ap
 
 Apply a function inside the type constructor's context
 
@@ -93,7 +93,7 @@ Apply a function inside the type constructor's context
 Some(1).ap(Some({ n: Int -> n + 1 }))
 ```
 
-#### HK<F, A>#map2
+#### Kind<F, A>#map2
 
 Map 2 values inside the type constructor context and apply a function to their cartesian product
 
@@ -101,7 +101,7 @@ Map 2 values inside the type constructor context and apply a function to their c
 Option.applicative().map2(Some(1), Some("x"), { z: Tuple2<Int, String> ->  "${z.a}${z.b}" })
 ```
 
-#### HK<F, A>#map2Eval
+#### Kind<F, A>#map2Eval
 
 Lazily map 2 values inside the type constructor context and apply a function to their cartesian product.
 Computation happens when `.value()` is invoked.

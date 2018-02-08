@@ -13,14 +13,14 @@ class NonEmptyListTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            functor<NonEmptyListHK>() shouldNotBe null
-            applicative<NonEmptyListHK>() shouldNotBe null
-            monad<NonEmptyListHK>() shouldNotBe null
-            bimonad<NonEmptyListHK>() shouldNotBe null
-            comonad<NonEmptyListHK>() shouldNotBe null
-            foldable<NonEmptyListHK>() shouldNotBe null
-            traverse<NonEmptyListHK>() shouldNotBe null
-            semigroupK<NonEmptyListHK>() shouldNotBe null
+            functor<ForNonEmptyList>() shouldNotBe null
+            applicative<ForNonEmptyList>() shouldNotBe null
+            monad<ForNonEmptyList>() shouldNotBe null
+            bimonad<ForNonEmptyList>() shouldNotBe null
+            comonad<ForNonEmptyList>() shouldNotBe null
+            foldable<ForNonEmptyList>() shouldNotBe null
+            traverse<ForNonEmptyList>() shouldNotBe null
+            semigroupK<ForNonEmptyList>() shouldNotBe null
             semigroup<NonEmptyList<Int>>() shouldNotBe null
             eq<NonEmptyList<Int>>() shouldNotBe null
         }

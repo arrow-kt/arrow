@@ -50,11 +50,11 @@ import arrow.*
 import arrow.core.*
 import arrow.syntax.option.*
 
-fooLens.modifyF(Option.functor(), foo) { it.some() }.ev()
+fooLens.modifyF(Option.functor(), foo) { it.some() }.reify()
 ```
 
 ```kotlin:ank
-val liftF: (Foo) -> OptionKind<Foo> = fooLens.liftF(Option.functor()) { (it + 1).some() }
+val liftF: (Foo) -> OptionOf<Foo> = fooLens.liftF(Option.functor()) { (it + 1).some() }
 liftF(foo)
 ```
 

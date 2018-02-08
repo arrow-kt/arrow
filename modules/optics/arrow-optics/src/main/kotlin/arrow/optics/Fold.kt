@@ -3,7 +3,7 @@ package arrow.optics
 import arrow.*
 import arrow.core.*
 import arrow.data.Const
-import arrow.data.ListKW
+import arrow.data.ListK
 import arrow.instances.IntMonoid
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Monoid
@@ -51,8 +51,8 @@ interface Fold<S, A> {
         /**
          * Create a [Fold] from a [arrow.Foldable]
          */
-        inline fun <reified F, S> fromFoldable(Foldable: Foldable<F> = foldable()) = object : Fold<HK<F, S>, S> {
-            override fun <R> foldMap(M: Monoid<R>, s: HK<F, S>, f: (S) -> R): R = Foldable.foldMap(M, s, f)
+        inline fun <reified F, S> fromFoldable(Foldable: Foldable<F> = foldable()) = object : Fold<Kind<F, S>, S> {
+            override fun <R> foldMap(M: Monoid<R>, s: Kind<F, S>, f: (S) -> R): R = Foldable.foldMap(M, s, f)
         }
 
     }
@@ -100,7 +100,7 @@ interface Fold<S, A> {
     /**
      * Get all targets of the [Fold]
      */
-    fun getAll(M: Monoid<ListKW<A>>, s: S): ListKW<A> = foldMap(M, s, { ListKW.pure(it) })
+    fun getAll(M: Monoid<ListK<A>>, s: S): ListK<A> = foldMap(M, s, { ListK.pure(it) })
 
     /**
      * Join two [Fold] with the same target
@@ -213,4 +213,4 @@ inline fun <S, reified A> Fold<S, A>.combineAll(s: S, M: Monoid<A> = monoid()): 
 /**
  * Get all targets of the [Fold]
  */
-inline fun <S, reified A> Fold<S, A>.getAll(s: S, M: Monoid<ListKW<A>> = monoid()): ListKW<A> = foldMap(M, s, { ListKW.pure(it) })
+inline fun <S, reified A> Fold<S, A>.getAll(s: S, M: Monoid<ListK<A>> = monoid()): ListK<A> = foldMap(M, s, { ListK.pure(it) })

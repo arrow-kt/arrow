@@ -1,6 +1,6 @@
 package arrow.data
 
-import arrow.HK
+import arrow.Kind
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
 import arrow.test.laws.MonadLaws
@@ -10,7 +10,7 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class Function0Test : UnitSpec() {
-    val EQ: Eq<HK<Function0HK, Int>> = Eq { a, b ->
+    val EQ: Eq<Kind<ForFunction0, Int>> = Eq { a, b ->
         a() == b()
     }
 

@@ -66,14 +66,14 @@ subject.value()
 
 The library provides instances of [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) and [`MonadSuspend`]({{ '/docs/effects/monadsuspend' | relative_url }}).
 
-[`MonadSuspend`]({{ '/docs/effects/async' | relative_url }}) allows you to generify over datatypes that can run asynchronous code. You can use it with `ObservableKW` and `FlowableKW`.
+[`MonadSuspend`]({{ '/docs/effects/async' | relative_url }}) allows you to generify over datatypes that can run asynchronous code. You can use it with `ObservableK` and `FlowableK`.
 
 ```kotlin
 fun <F> getSongUrlAsync(MS: MonadSuspend<F> = monadSuspend()) =
   MS { getSongUrl() }
 
-val songObservable: ObservableKW<Url> = getSongUrlAsync().ev()
-val songFlowable: FlowableKW<Url> = getSongUrlAsync().ev()
+val songObservable: ObservableK<Url> = getSongUrlAsync().reify()
+val songFlowable: FlowableK<Url> = getSongUrlAsync().reify()
 ```
 
 [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) using the method `bindingCatch`, with all its benefits.
@@ -99,7 +99,7 @@ getSongUrlAsync()
 When rewritten using `bindingCatch` it becomes:
 
 ```kotlin
-ObservableKW.monadError().bindingCatch {
+ObservableK.monadError().bindingCatch {
   val songUrl = getSongUrlAsync().bind()
   val musicPlayer = MediaPlayer.load(songUrl)
   val totalTime = musicPlayer.getTotaltime()
@@ -114,7 +114,7 @@ ObservableKW.monadError().bindingCatch {
   }
 
   percent
-}.ev()
+}.reify()
 ```
 
 Note that any unexpected exception, like `AritmeticException` when `totalTime` is 0, is automatically caught and wrapped inside the observable. 
@@ -136,7 +136,7 @@ Invoking this `Disposable` causes an `BindingCancellationException` in the chain
 
 ```kotlin
 val (observable, disposable) = 
-  ObservableKW.monadSuspend().bindingCancellable {
+  ObservableK.monadSuspend().bindingCancellable {
     val userProfile = Observable.create { getUserProfile("123") }
     val friendProfiles = userProfile.friends().map { friend ->
         bindAsync(observableAsync) { getProfile(friend.id) }

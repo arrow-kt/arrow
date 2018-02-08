@@ -5,17 +5,17 @@ import arrow.optics.Iso
 import arrow.optics.PIso
 
 /**
- * [PIso] that defines the equality between a [Map] and a [arrow.MapKW]
+ * [PIso] that defines the equality between a [Map] and a [arrow.MapK]
  */
-fun <K, A, B> pMapToMapKW(): PIso<Map<K, A>, Map<K, B>, MapKW<K, A>, MapKW<K, B>> = PIso(
+fun <K, A, B> pMapToMapK(): PIso<Map<K, A>, Map<K, B>, MapK<K, A>, MapK<K, B>> = PIso(
         get = { it.k() },
         reverseGet = { it.map }
 )
 
 /**
- * [Iso] that defines the equality between a [Map] and a [arrow.MapKW]
+ * [Iso] that defines the equality between a [Map] and a [arrow.MapK]
  */
-fun <K, A> mapToMapKW(): Iso<Map<K, A>, MapKW<K, A>> = pMapToMapKW()
+fun <K, A> mapToMapK(): Iso<Map<K, A>, MapK<K, A>> = pMapToMapK()
 
 /**
  * [Iso] that defines the equality between a Unit value [Map] and a [Set] with its keys

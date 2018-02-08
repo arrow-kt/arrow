@@ -1,19 +1,19 @@
 package arrow.optics.instances
 
-import arrow.data.ListKW
-import arrow.data.MapKW
+import arrow.data.ListK
+import arrow.data.MapK
 import arrow.data.NonEmptyList
-import arrow.data.SequenceKW
+import arrow.data.SequenceK
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.filterIndex
 import arrow.test.UnitSpec
 import arrow.test.generators.genChars
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genIntSmall
-import arrow.test.generators.genListKW
-import arrow.test.generators.genMapKW
+import arrow.test.generators.genListK
+import arrow.test.generators.genMapK
 import arrow.test.generators.genNonEmptyList
-import arrow.test.generators.genSequenceKW
+import arrow.test.generators.genSequenceK
 import arrow.test.laws.TraversalLaws
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
@@ -26,16 +26,16 @@ class FilterIndexInstanceTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            filterIndex<ListKW<String>, Int, String>() shouldNotBe null
+            filterIndex<ListK<String>, Int, String>() shouldNotBe null
             filterIndex<NonEmptyList<String>, Int, String>() shouldNotBe null
-            filterIndex<SequenceKW<Char>, Int, Char>() shouldNotBe null
-            filterIndex<MapKW<Char, Int>, String, Int>() shouldNotBe null
+            filterIndex<SequenceK<Char>, Int, Char>() shouldNotBe null
+            filterIndex<MapK<Char, Int>, String, Int>() shouldNotBe null
             filterIndex<String, Int, Char>() shouldNotBe null
         }
 
         testLaws(TraversalLaws.laws(
-                traversal = FilterIndex.filterIndex<ListKW<String>, Int, String> { true },
-                aGen = genListKW(Gen.string()),
+                traversal = FilterIndex.filterIndex<ListK<String>, Int, String> { true },
+                aGen = genListK(Gen.string()),
                 bGen = Gen.string(),
                 funcGen = genFunctionAToB(Gen.string())
         ))
@@ -48,15 +48,15 @@ class FilterIndexInstanceTest : UnitSpec() {
         ))
 
         testLaws(TraversalLaws.laws(
-                traversal =  FilterIndex.filterIndex<SequenceKW<Char>, Int, Char> { true },
-                aGen = genSequenceKW(genChars()),
+                traversal =  FilterIndex.filterIndex<SequenceK<Char>, Int, Char> { true },
+                aGen = genSequenceK(genChars()),
                 bGen = genChars(),
                 funcGen = genFunctionAToB(genChars())
         ))
 
         testLaws(TraversalLaws.laws(
-                traversal = FilterIndex.filterIndex<MapKW<Char, Int>, Char, Int> { true },
-                aGen = genMapKW(genChars(), genIntSmall()),
+                traversal = FilterIndex.filterIndex<MapK<Char, Int>, Char, Int> { true },
+                aGen = genMapK(genChars(), genIntSmall()),
                 bGen = Gen.int(),
                 funcGen = genFunctionAToB(Gen.int())
         ))

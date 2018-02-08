@@ -314,5 +314,5 @@ val httpStatusCode = r.getOrHandle {
 ```kotlin:ank
 import arrow.debug.*
 
-showInstances<EitherHK, Throwable>()
+showInstances<ForEither, Throwable>()
 ```

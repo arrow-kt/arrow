@@ -1,34 +1,34 @@
 package arrow.free
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.*
 import arrow.data.*
 
-val cofreeOptionToNel: FunctionK<CofreeKindPartial<OptionHK>, NonEmptyListHK> = object : FunctionK<CofreeKindPartial<OptionHK>, NonEmptyListHK> {
-    override fun <A> invoke(fa: HK<CofreeKindPartial<OptionHK>, A>): HK<NonEmptyListHK, A> =
-            fa.ev().let { c ->
-                NonEmptyList.fromListUnsafe(listOf(c.head) + c.tailForced().ev().fold({ listOf<A>() }, { invoke(it).ev().all }))
+val cofreeOptionToNel: FunctionK<CofreePartialOf<ForOption>, ForNonEmptyList> = object : FunctionK<CofreePartialOf<ForOption>, ForNonEmptyList> {
+    override fun <A> invoke(fa: Kind<CofreePartialOf<ForOption>, A>): Kind<ForNonEmptyList, A> =
+            fa.reify().let { c ->
+                NonEmptyList.fromListUnsafe(listOf(c.head) + c.tailForced().reify().fold({ listOf<A>() }, { invoke(it).reify().all }))
             }
 }
 
-val cofreeListToNel: FunctionK<CofreeKindPartial<ListKWHK>, NonEmptyListHK> = object : FunctionK<CofreeKindPartial<ListKWHK>, NonEmptyListHK> {
-    override fun <A> invoke(fa: HK<CofreeKindPartial<ListKWHK>, A>): HK<NonEmptyListHK, A> =
-            fa.ev().let { c: Cofree<ListKWHK, A> ->
-                val all: List<Cofree<ListKWHK, A>> = c.tailForced().ev()
-                val tail: List<A> = all.foldRight(listOf<A>(), { v, acc -> acc + invoke(v).ev().all })
+val cofreeListToNel: FunctionK<CofreePartialOf<ForListK>, ForNonEmptyList> = object : FunctionK<CofreePartialOf<ForListK>, ForNonEmptyList> {
+    override fun <A> invoke(fa: Kind<CofreePartialOf<ForListK>, A>): Kind<ForNonEmptyList, A> =
+            fa.reify().let { c: Cofree<ForListK, A> ->
+                val all: List<Cofree<ForListK, A>> = c.tailForced().reify()
+                val tail: List<A> = all.foldRight(listOf<A>(), { v, acc -> acc + invoke(v).reify().all })
                 val headL: List<A> = listOf(c.head)
                 NonEmptyList.fromListUnsafe(headL + tail)
             }
 }
 
-val optionToList: FunctionK<OptionHK, ListKWHK> = object : FunctionK<OptionHK, ListKWHK> {
-    override fun <A> invoke(fa: HK<OptionHK, A>): HK<ListKWHK, A> =
-            fa.ev().fold({ listOf<A>().k() }, { listOf(it).k() })
+val optionToList: FunctionK<ForOption, ForListK> = object : FunctionK<ForOption, ForListK> {
+    override fun <A> invoke(fa: Kind<ForOption, A>): Kind<ForListK, A> =
+            fa.reify().fold({ listOf<A>().k() }, { listOf(it).k() })
 }
 
-val optionInterpreter: FunctionK<Ops.F, OptionHK> = object : FunctionK<Ops.F, OptionHK> {
-    override fun <A> invoke(fa: HK<Ops.F, A>): Option<A> {
-        val op = fa.ev()
+val optionInterpreter: FunctionK<Ops.F, ForOption> = object : FunctionK<Ops.F, ForOption> {
+    override fun <A> invoke(fa: Kind<Ops.F, A>): Option<A> {
+        val op = fa.reify()
         return when (op) {
             is Ops.Add -> Some(op.a + op.y)
             is Ops.Subtract -> Some(op.a - op.y)
@@ -36,9 +36,9 @@ val optionInterpreter: FunctionK<Ops.F, OptionHK> = object : FunctionK<Ops.F, Op
         } as Option<A>
     }
 }
-val optionApInterpreter: FunctionK<OpsAp.F, OptionHK> = object : FunctionK<OpsAp.F, OptionHK> {
-    override fun <A> invoke(fa: HK<OpsAp.F, A>): Option<A> {
-        val op = fa.ev()
+val optionApInterpreter: FunctionK<OpsAp.F, ForOption> = object : FunctionK<OpsAp.F, ForOption> {
+    override fun <A> invoke(fa: Kind<OpsAp.F, A>): Option<A> {
+        val op = fa.reify()
         return when (op) {
             is OpsAp.Add -> Some(op.a + op.y)
             is OpsAp.Subtract -> Some(op.a - op.y)
@@ -46,9 +46,9 @@ val optionApInterpreter: FunctionK<OpsAp.F, OptionHK> = object : FunctionK<OpsAp
         } as Option<A>
     }
 }
-val nonEmptyListInterpreter: FunctionK<Ops.F, NonEmptyListHK> = object : FunctionK<Ops.F, NonEmptyListHK> {
-    override fun <A> invoke(fa: HK<Ops.F, A>): NonEmptyList<A> {
-        val op = fa.ev()
+val nonEmptyListInterpreter: FunctionK<Ops.F, ForNonEmptyList> = object : FunctionK<Ops.F, ForNonEmptyList> {
+    override fun <A> invoke(fa: Kind<Ops.F, A>): NonEmptyList<A> {
+        val op = fa.reify()
         return when (op) {
             is Ops.Add -> NonEmptyList.of(op.a + op.y)
             is Ops.Subtract -> NonEmptyList.of(op.a - op.y)
@@ -56,9 +56,9 @@ val nonEmptyListInterpreter: FunctionK<Ops.F, NonEmptyListHK> = object : Functio
         } as NonEmptyList<A>
     }
 }
-val nonEmptyListApInterpreter: FunctionK<OpsAp.F, NonEmptyListHK> = object : FunctionK<OpsAp.F, NonEmptyListHK> {
-    override fun <A> invoke(fa: HK<OpsAp.F, A>): NonEmptyList<A> {
-        val op = fa.ev()
+val nonEmptyListApInterpreter: FunctionK<OpsAp.F, ForNonEmptyList> = object : FunctionK<OpsAp.F, ForNonEmptyList> {
+    override fun <A> invoke(fa: Kind<OpsAp.F, A>): NonEmptyList<A> {
+        val op = fa.reify()
         return when (op) {
             is OpsAp.Add -> NonEmptyList.of(op.a + op.y)
             is OpsAp.Subtract -> NonEmptyList.of(op.a - op.y)
@@ -66,9 +66,9 @@ val nonEmptyListApInterpreter: FunctionK<OpsAp.F, NonEmptyListHK> = object : Fun
         } as NonEmptyList<A>
     }
 }
-val idInterpreter: FunctionK<Ops.F, IdHK> = object : FunctionK<Ops.F, IdHK> {
-    override fun <A> invoke(fa: HK<Ops.F, A>): Id<A> {
-        val op = fa.ev()
+val idInterpreter: FunctionK<Ops.F, ForId> = object : FunctionK<Ops.F, ForId> {
+    override fun <A> invoke(fa: Kind<Ops.F, A>): Id<A> {
+        val op = fa.reify()
         return when (op) {
             is Ops.Add -> Id(op.a + op.y)
             is Ops.Subtract -> Id(op.a - op.y)
@@ -76,9 +76,9 @@ val idInterpreter: FunctionK<Ops.F, IdHK> = object : FunctionK<Ops.F, IdHK> {
         } as Id<A>
     }
 }
-val idApInterpreter: FunctionK<OpsAp.F, IdHK> = object : FunctionK<OpsAp.F, IdHK> {
-    override fun <A> invoke(fa: HK<OpsAp.F, A>): Id<A> {
-        val op = fa.ev()
+val idApInterpreter: FunctionK<OpsAp.F, ForId> = object : FunctionK<OpsAp.F, ForId> {
+    override fun <A> invoke(fa: Kind<OpsAp.F, A>): Id<A> {
+        val op = fa.reify()
         return when (op) {
             is OpsAp.Add -> Id(op.a + op.y)
             is OpsAp.Subtract -> Id(op.a - op.y)

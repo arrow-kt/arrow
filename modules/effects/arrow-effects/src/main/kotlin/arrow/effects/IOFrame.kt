@@ -15,13 +15,13 @@ internal interface IOFrame<in A, out R> : (A) -> R {
             }
 
     companion object {
-        fun <A> errorHandler(fe: (Throwable) -> IOKind<A>): IOFrame<A, IO<A>> =
+        fun <A> errorHandler(fe: (Throwable) -> IOOf<A>): IOFrame<A, IO<A>> =
                 ErrorHandler(fe)
 
-        internal data class ErrorHandler<A>(val fe: (Throwable) -> IOKind<A>) : IOFrame<A, IO<A>> {
+        internal data class ErrorHandler<A>(val fe: (Throwable) -> IOOf<A>) : IOFrame<A, IO<A>> {
             override fun invoke(a: A): IO<A> = Pure(a)
 
-            override fun recover(e: Throwable): IO<A> = fe(e).ev()
+            override fun recover(e: Throwable): IO<A> = fe(e).reify()
         }
 
         @Suppress("UNCHECKED_CAST")

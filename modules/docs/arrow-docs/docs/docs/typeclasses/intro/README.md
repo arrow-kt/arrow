@@ -118,6 +118,6 @@ The Monad Template Library module gives more specialized version of existing typ
 
 - [`Corecursive`]({{ '/docs/typeclasses/corecursive/' | relative_url }}) - traverses a structure forwards from the starting case
 
-- [`Recursive`]({{ '/docs/typeclasses/recursive/' | relative_url }}) - traverses a structure backwards from the base case
+- [`Recursive`]({{ '/docs/typeclasses/recursive/' | relative_url }}) - traverses a structure bacKards from the base case
 
 - [`Birecursive`]({{ '/docs/typeclasses/birecursive/' | relative_url }}) - it is both recursive and corecursive

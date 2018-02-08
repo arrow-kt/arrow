@@ -1,6 +1,6 @@
 package arrow.typeclasses
 
-import arrow.HK
+import arrow.Kind
 import java.util.concurrent.CountDownLatch
 import kotlin.coroutines.experimental.*
 import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
@@ -12,9 +12,9 @@ interface BindingInContextContinuation<in T> : Continuation<T> {
 
 @RestrictsSuspension
 open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
-        Continuation<HK<F, A>>, Monad<F> by M {
+        Continuation<Kind<F, A>>, Monad<F> by M {
 
-    override fun resume(value: HK<F, A>) {
+    override fun resume(value: Kind<F, A>) {
         returnedMonad = value
     }
 
@@ -22,8 +22,8 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
         throw exception
     }
 
-    protected fun bindingInContextContinuation(context: CoroutineContext): BindingInContextContinuation<HK<F, A>> =
-            object : BindingInContextContinuation<HK<F, A>> {
+    protected fun bindingInContextContinuation(context: CoroutineContext): BindingInContextContinuation<Kind<F, A>> =
+            object : BindingInContextContinuation<Kind<F, A>> {
                 val latch: CountDownLatch = CountDownLatch(1)
 
                 var error: Throwable? = null
@@ -32,7 +32,7 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
 
                 override val context: CoroutineContext = context
 
-                override fun resume(value: HK<F, A>) {
+                override fun resume(value: Kind<F, A>) {
                     returnedMonad = value
                     latch.countDown()
                 }
@@ -43,16 +43,16 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
                 }
             }
 
-    protected lateinit var returnedMonad: HK<F, A>
+    protected lateinit var returnedMonad: Kind<F, A>
 
-    open fun returnedMonad(): HK<F, A> = returnedMonad
+    open fun returnedMonad(): Kind<F, A> = returnedMonad
 
-    suspend fun <B> HK<F, B>.bind(): B = bind { this }
+    suspend fun <B> Kind<F, B>.bind(): B = bind { this }
 
     suspend fun <B> (() -> B).bindIn(context: CoroutineContext): B =
             bindIn(context, this)
 
-    open suspend fun <B> bind(m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
+    open suspend fun <B> bind(m: () -> Kind<F, B>): B = suspendCoroutineOrReturn { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels
         returnedMonad = flatMap(m(), { x: B ->
             c.stackLabels = labelHere
@@ -64,7 +64,7 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
 
     open suspend fun <B> bindIn(context: CoroutineContext, m: () -> B): B = suspendCoroutineOrReturn { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels
-        val monadCreation: suspend () -> HK<F, A> = {
+        val monadCreation: suspend () -> Kind<F, A> = {
             flatMap(pure(m()), { xx: B ->
                 c.stackLabels = labelHere
                 c.resume(xx)

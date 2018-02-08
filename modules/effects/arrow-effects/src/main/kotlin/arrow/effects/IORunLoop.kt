@@ -5,7 +5,7 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.effects.internal.Platform.ArrayStack
 
-private typealias Current = IOKind<Any?>
+private typealias Current = IOOf<Any?>
 private typealias BindF = (Any?) -> IO<Any?>
 private typealias CallStack = ArrayStack<BindF>
 private typealias Callback = (Either<Throwable, Any?>) -> Unit
@@ -41,7 +41,7 @@ internal object IORunLoop {
                     }
                 }
                 is IO.Suspend -> {
-                    val thunk: () -> IOKind<Any?> = currentIO.thunk
+                    val thunk: () -> IOOf<Any?> = currentIO.thunk
                     currentIO = executeSafe { thunk() }
                 }
                 is IO.Delay -> {
@@ -156,7 +156,7 @@ internal object IORunLoop {
                     }
                 }
                 is IO.Suspend -> {
-                    val thunk: () -> IOKind<Any?> = currentIO.thunk
+                    val thunk: () -> IOOf<Any?> = currentIO.thunk
                     currentIO = executeSafe { thunk() }
                 }
                 is IO.Delay -> {
@@ -219,9 +219,9 @@ internal object IORunLoop {
         } while (true)
     }
 
-    inline private fun executeSafe(crossinline f: () -> IOKind<Any?>): IO<Any?> =
+    inline private fun executeSafe(crossinline f: () -> IOOf<Any?>): IO<Any?> =
             try {
-                f().ev()
+                f().reify()
             } catch (e: Throwable) {
                 IO.RaiseError(e)
             }

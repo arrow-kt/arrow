@@ -1,6 +1,6 @@
 package arrow.mtl
 
-import arrow.HK
+import arrow.Kind
 import arrow.typeclasses.MonadContinuation
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.EmptyCoroutineContext
@@ -35,7 +35,7 @@ open class MonadFilterContinuation<F, A>(val MF: MonadFilter<F>, override val co
      * Binds only if the given predicate matches the inner value otherwise binds into the Monad `empty()` value
      * on `MonadFilter` instances
      */
-    suspend fun <B> HK<F, B>.bindWithFilter(f: (B) -> Boolean): B {
+    suspend fun <B> Kind<F, B>.bindWithFilter(f: (B) -> Boolean): B {
         val b: B = bind { this }
         return if (f(b)) b else bind { MF.empty<B>() }
     }

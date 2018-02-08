@@ -1,6 +1,6 @@
 package arrow.effects
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.*
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
@@ -15,24 +15,24 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class IOTest : UnitSpec() {
-    fun <A> EQ(): Eq<HK<IOHK, A>> = Eq { a, b ->
-        Option.eq(Eq.any()).eqv(a.ev().attempt().unsafeRunTimed(60.seconds), b.ev().attempt().unsafeRunTimed(60.seconds))
+    fun <A> EQ(): Eq<Kind<ForIO, A>> = Eq { a, b ->
+        Option.eq(Eq.any()).eqv(a.reify().attempt().unsafeRunTimed(60.seconds), b.reify().attempt().unsafeRunTimed(60.seconds))
     }
 
     init {
         testLaws(AsyncLaws.laws(IO.async(), EQ(), EQ()))
 
         "instances can be resolved implicitly" {
-            functor<IOHK>() shouldNotBe null
-            applicative<IOHK>() shouldNotBe null
-            monad<IOHK>() shouldNotBe null
-            applicativeError<IOHK, Throwable>() shouldNotBe null
-            monadError<IOHK, Throwable>() shouldNotBe null
-            monadSuspend<IOHK>() shouldNotBe null
-            async<IOHK>() shouldNotBe null
-            effect<IOHK>() shouldNotBe null
-            semigroup<IOKind<Int>>() shouldNotBe null
-            monoid<IOKind<Int>>() shouldNotBe null
+            functor<ForIO>() shouldNotBe null
+            applicative<ForIO>() shouldNotBe null
+            monad<ForIO>() shouldNotBe null
+            applicativeError<ForIO, Throwable>() shouldNotBe null
+            monadError<ForIO, Throwable>() shouldNotBe null
+            monadSuspend<ForIO>() shouldNotBe null
+            async<ForIO>() shouldNotBe null
+            effect<ForIO>() shouldNotBe null
+            semigroup<IOOf<Int>>() shouldNotBe null
+            monoid<IOOf<Int>>() shouldNotBe null
         }
 
         "should defer evaluation until run" {
@@ -249,7 +249,7 @@ class IOTest : UnitSpec() {
                 val x = IO.pure(1).bind()
                 val y = bind { IO { x + 1 } }
                 yields(y)
-            }.ev()
+            }.reify()
             result.unsafeRunSync() shouldBe 2
         }
     }

@@ -1,16 +1,16 @@
 package arrow.optics.instances
 
 import arrow.core.Either
-import arrow.core.EitherKindPartial
+import arrow.core.EitherPartialOf
 import arrow.core.Option
-import arrow.data.ListKW
-import arrow.data.MapKW
+import arrow.data.ListK
+import arrow.data.MapK
 import arrow.optics.typeclasses.each
 import arrow.test.UnitSpec
 import arrow.test.generators.genEither
 import arrow.test.generators.genFunctionAToB
-import arrow.test.generators.genListKW
-import arrow.test.generators.genMapKW
+import arrow.test.generators.genListK
+import arrow.test.generators.genMapK
 import arrow.test.generators.genOption
 import arrow.test.laws.TraversalLaws
 import io.kotlintest.KTestJUnitRunner
@@ -23,9 +23,9 @@ class EachInstanceTest : UnitSpec() {
 
     init {
         "instances can be resolved implicitly" {
-            each<EitherKindPartial<String>, String>() shouldNotBe null
-            each<ListKW<String>, String>() shouldNotBe null
-            each<MapKW<Int, String>, String>() shouldNotBe null
+            each<EitherPartialOf<String>, String>() shouldNotBe null
+            each<ListK<String>, String>() shouldNotBe null
+            each<MapK<Int, String>, String>() shouldNotBe null
             each<Option<String>, String>() shouldNotBe null
         }
 
@@ -37,15 +37,15 @@ class EachInstanceTest : UnitSpec() {
         ))
 
         testLaws(TraversalLaws.laws(
-                traversal = each<ListKW<String>, String>().each(),
-                aGen = genListKW(Gen.string()),
+                traversal = each<ListK<String>, String>().each(),
+                aGen = genListK(Gen.string()),
                 bGen = Gen.string(),
                 funcGen = genFunctionAToB(Gen.string())
         ))
 
         testLaws(TraversalLaws.laws(
-                traversal = each<MapKW<Int, String>, String>().each(),
-                aGen = genMapKW(Gen.int(), Gen.string()),
+                traversal = each<MapK<Int, String>, String>().each(),
+                aGen = genMapK(Gen.int(), Gen.string()),
                 bGen = Gen.string(),
                 funcGen = genFunctionAToB(Gen.string())
         ))

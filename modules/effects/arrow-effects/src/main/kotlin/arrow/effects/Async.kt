@@ -1,6 +1,6 @@
 package arrow.effects
 
-import arrow.HK
+import arrow.Kind
 import arrow.TC
 import arrow.core.Either
 import arrow.typeclass
@@ -11,8 +11,8 @@ typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
 /** The context required to run an asynchronous computation that may fail. **/
 @typeclass
 interface Async<F> : MonadSuspend<F>, TC {
-    fun <A> async(fa: Proc<A>): HK<F, A>
+    fun <A> async(fa: Proc<A>): Kind<F, A>
 
-    fun <A> never(): HK<F, A> =
+    fun <A> never(): Kind<F, A> =
             async { }
 }

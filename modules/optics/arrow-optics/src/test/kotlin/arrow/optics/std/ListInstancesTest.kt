@@ -6,7 +6,7 @@ import io.kotlintest.properties.Gen
 import arrow.typeclasses.Eq
 import arrow.test.laws.IsoLaws
 import arrow.core.monoid
-import arrow.data.ListKW
+import arrow.data.ListK
 import arrow.data.NonEmptyList
 import arrow.data.k
 import arrow.data.monoid
@@ -52,13 +52,13 @@ class ListInstancesTest : UnitSpec() {
         ))
 
         testLaws(IsoLaws.laws(
-                iso = listToListKW(),
+                iso = listToListK(),
                 aGen = Gen.list(Gen.int()),
                 bGen = Gen.create { Gen.list(Gen.int()).generate().k() },
                 funcGen = genFunctionAToB(Gen.create { Gen.list(Gen.int()).generate().k() }),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                bMonoid = ListKW.monoid())
+                bMonoid = ListK.monoid())
         )
 
     }

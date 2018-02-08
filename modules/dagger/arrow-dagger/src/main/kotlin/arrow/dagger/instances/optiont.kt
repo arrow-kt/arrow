@@ -1,6 +1,6 @@
 package arrow.dagger.instances
 
-import arrow.data.OptionTKindPartial
+import arrow.data.OptionTPartialOf
 import arrow.instances.*
 import arrow.typeclasses.*
 import dagger.Module
@@ -11,25 +11,25 @@ import javax.inject.Inject
 abstract class OptionTInstances<F> {
 
     @Provides
-    fun optionTFunctor(ev: DaggerOptionTFunctorInstance<F>): Functor<OptionTKindPartial<F>> = ev
+    fun optionTFunctor(ev: DaggerOptionTFunctorInstance<F>): Functor<OptionTPartialOf<F>> = ev
 
     @Provides
-    fun optionTApplicative(ev: DaggerOptionTApplicativeInstance<F>): Applicative<OptionTKindPartial<F>> = ev
+    fun optionTApplicative(ev: DaggerOptionTApplicativeInstance<F>): Applicative<OptionTPartialOf<F>> = ev
 
     @Provides
-    fun optionTMonad(ev: DaggerOptionTMonadInstance<F>): Monad<OptionTKindPartial<F>> = ev
+    fun optionTMonad(ev: DaggerOptionTMonadInstance<F>): Monad<OptionTPartialOf<F>> = ev
 
     @Provides
-    fun optionTFoldable(ev: DaggerOptionTFoldableInstance<F>): Foldable<OptionTKindPartial<F>> = ev
+    fun optionTFoldable(ev: DaggerOptionTFoldableInstance<F>): Foldable<OptionTPartialOf<F>> = ev
 
     @Provides
-    fun optionTTraverse(ev: DaggerOptionTTraverseInstance<F>): Traverse<OptionTKindPartial<F>> = ev
+    fun optionTTraverse(ev: DaggerOptionTTraverseInstance<F>): Traverse<OptionTPartialOf<F>> = ev
 
     @Provides
-    fun optionTSemigroupK(ev: DaggerOptionTSemigroupKInstance<F>): SemigroupK<OptionTKindPartial<F>> = ev
+    fun optionTSemigroupK(ev: DaggerOptionTSemigroupKInstance<F>): SemigroupK<OptionTPartialOf<F>> = ev
 
     @Provides
-    fun optionTMonoidK(ev: DaggerOptionTMonoidKInstance<F>): MonoidK<OptionTKindPartial<F>> = ev
+    fun optionTMonoidK(ev: DaggerOptionTMonoidKInstance<F>): MonoidK<OptionTPartialOf<F>> = ev
 
 }
 

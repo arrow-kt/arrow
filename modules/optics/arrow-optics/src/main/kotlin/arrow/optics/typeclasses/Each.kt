@@ -1,6 +1,6 @@
 package arrow.optics.typeclasses
 
-import arrow.HK
+import arrow.Kind
 import arrow.TC
 import arrow.optics.Iso
 import arrow.optics.Traversal
@@ -33,8 +33,8 @@ interface Each<S, A> : TC {
         /**
          * Create an instance of [Each] from a [Traverse].
          */
-        fun <S, A> fromTraverse(T: Traverse<S>): Each<HK<S, A>, A> = object : Each<HK<S, A>, A> {
-            override fun each(): Traversal<HK<S, A>, A> = Traversal.fromTraversable(T)
+        fun <S, A> fromTraverse(T: Traverse<S>): Each<Kind<S, A>, A> = object : Each<Kind<S, A>, A> {
+            override fun each(): Traversal<Kind<S, A>, A> = Traversal.fromTraversable(T)
         }
     }
 
@@ -43,7 +43,7 @@ interface Each<S, A> : TC {
 /**
  * Create an instance of [Each] from a [Traverse].
  */
-inline fun <reified S, A> Each.Companion.fromTraverse(T: Traverse<S>, dummy: Unit = Unit) = object : Each<HK<S, A>, A> {
-    override fun each(): Traversal<HK<S, A>, A> = Traversal.fromTraversable(T)
+inline fun <reified S, A> Each.Companion.fromTraverse(T: Traverse<S>, dummy: Unit = Unit) = object : Each<Kind<S, A>, A> {
+    override fun each(): Traversal<Kind<S, A>, A> = Traversal.fromTraversable(T)
 
 }

@@ -26,21 +26,21 @@ typealias Traversal<S, A> = PTraversal<S, S, A, A>
  */
 interface PTraversal<S, T, A, B> {
 
-    fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T>
+    fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T>
 
     companion object {
         fun <S> id() = Iso.id<S>().asTraversal()
 
         fun <S> codiagonal(): Traversal<Either<S, S>, S> = object : Traversal<Either<S, S>, S> {
-            override fun <F> modifyF(FA: Applicative<F>, s: Either<S, S>, f: (S) -> HK<F, S>): HK<F, Either<S, S>> =
+            override fun <F> modifyF(FA: Applicative<F>, s: Either<S, S>, f: (S) -> Kind<F, S>): Kind<F, Either<S, S>> =
                     s.bimap(f, f).fold({ fa -> FA.map(fa, { a -> Either.Left(a) }) }, { fa -> FA.map(fa, { a -> Either.Right(a) }) })
         }
 
         /**
          * Construct a [PTraversal] from a [Traverse] instance.
          */
-        fun <T, A, B> fromTraversable(TT: Traverse<T>) = object : PTraversal<HK<T, A>, HK<T, B>, A, B> {
-            override fun <F> modifyF(FA: Applicative<F>, s: HK<T, A>, f: (A) -> HK<F, B>): HK<F, HK<T, B>> =
+        fun <T, A, B> fromTraversable(TT: Traverse<T>) = object : PTraversal<Kind<T, A>, Kind<T, B>, A, B> {
+            override fun <F> modifyF(FA: Applicative<F>, s: Kind<T, A>, f: (A) -> Kind<F, B>): Kind<F, Kind<T, B>> =
                     TT.traverse(s, f, FA)
         }
 
@@ -53,7 +53,7 @@ interface PTraversal<S, T, A, B> {
          * [PTraversal] constructor from multiple getters of the same source.
          */
         operator fun <S, T, A, B> invoke(get1: (S) -> A, get2: (S) -> A, set: (B, B, S) -> T): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
-            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
+            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> =
                     FA.map(
                             f(get1(s)), f(get2(s)),
                             { (b1, b2) -> set(b1, b2, s) }
@@ -65,7 +65,7 @@ interface PTraversal<S, T, A, B> {
                 get2: (S) -> A,
                 get3: (S) -> A,
                 set: (B, B, B, S) -> T): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
-            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
+            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> =
                     FA.map(
                             f(get1(s)), f(get2(s)), f(get3(s)),
                             { (b1, b2, b3) -> set(b1, b2, b3, s) }
@@ -78,7 +78,7 @@ interface PTraversal<S, T, A, B> {
                 get3: (S) -> A,
                 get4: (S) -> A,
                 set: (B, B, B, B, S) -> T): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
-            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
+            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> =
                     FA.map(
                             f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)),
                             { (b1, b2, b3, b4) -> set(b1, b2, b3, b4, s) }
@@ -92,7 +92,7 @@ interface PTraversal<S, T, A, B> {
                 get4: (S) -> A,
                 get5: (S) -> A,
                 set: (B, B, B, B, B, S) -> T): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
-            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
+            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> =
                     FA.map(
                             f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)),
                             { (b1, b2, b3, b4, b5) -> set(b1, b2, b3, b4, b5, s) }
@@ -107,7 +107,7 @@ interface PTraversal<S, T, A, B> {
                 get5: (S) -> A,
                 get6: (S) -> A,
                 set: (B, B, B, B, B, B, S) -> T): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
-            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
+            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> =
                     FA.map(
                             f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)),
                             { (b1, b2, b3, b4, b5, b6) -> set(b1, b2, b3, b4, b5, b6, s) }
@@ -123,7 +123,7 @@ interface PTraversal<S, T, A, B> {
                 get6: (S) -> A,
                 get7: (S) -> A,
                 set: (B, B, B, B, B, B, B, S) -> T): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
-            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
+            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> =
                     FA.map(
                             f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)),
                             { (b1, b2, b3, b4, b5, b6, b7) -> set(b1, b2, b3, b4, b5, b6, b7, s) }
@@ -140,7 +140,7 @@ interface PTraversal<S, T, A, B> {
                 get7: (S) -> A,
                 get8: (S) -> A,
                 set: (B, B, B, B, B, B, B, B, S) -> T): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
-            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
+            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> =
                     FA.map(
                             f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), f(get8(s)),
                             { (b1, b2, b3, b4, b5, b6, b7, b8) -> set(b1, b2, b3, b4, b5, b6, b7, b8, s) }
@@ -158,7 +158,7 @@ interface PTraversal<S, T, A, B> {
                 get8: (S) -> A,
                 get9: (S) -> A,
                 set: (B, B, B, B, B, B, B, B, B, S) -> T): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
-            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
+            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> =
                     FA.map(
                             f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), f(get8(s)), f(get9(s)),
                             { (b1, b2, b3, b4, b5, b6, b7, b8, b9) -> set(b1, b2, b3, b4, b5, b6, b7, b8, b9, s) }
@@ -177,7 +177,7 @@ interface PTraversal<S, T, A, B> {
                 get9: (S) -> A,
                 get10: (S) -> A,
                 set: (B, B, B, B, B, B, B, B, B, B, S) -> T): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
-            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
+            override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> =
                     FA.map(
                             f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), f(get8(s)), f(get9(s)), f(get10(s)),
                             { (b1, b2, b3, b4, b5, b6, b7, b8, b9, b10) -> set(b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, s) }
@@ -205,7 +205,7 @@ interface PTraversal<S, T, A, B> {
     /**
      * Get all foci of the [PTraversal]
      */
-    fun getAll(s: S): ListKW<A> = foldMap(ListKW.monoid(), s, { ListKW(listOf(it)) })
+    fun getAll(s: S): ListK<A> = foldMap(ListK.monoid(), s, { ListK(listOf(it)) })
 
     /**
      * Set polymorphically the target of a [PTraversal] with a value
@@ -238,7 +238,7 @@ interface PTraversal<S, T, A, B> {
     fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s, { b -> Const(Some(b)) }).value
 
     fun <U, V> choice(other: PTraversal<U, V, A, B>): PTraversal<Either<S, U>, Either<T, V>, A, B> = object : PTraversal<Either<S, U>, Either<T, V>, A, B> {
-        override fun <F> modifyF(FA: Applicative<F>, s: Either<S, U>, f: (A) -> HK<F, B>): HK<F, Either<T, V>> = s.fold(
+        override fun <F> modifyF(FA: Applicative<F>, s: Either<S, U>, f: (A) -> Kind<F, B>): Kind<F, Either<T, V>> = s.fold(
                 { a -> FA.map(this@PTraversal.modifyF(FA, a, f)) { Either.Left(it) } },
                 { u -> FA.map(other.modifyF(FA, u, f)) { Either.Right(it) } }
         )
@@ -248,7 +248,7 @@ interface PTraversal<S, T, A, B> {
      * Compose a [PTraversal] with a [PTraversal]
      */
     infix fun <C, D> compose(other: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> = object : PTraversal<S, T, C, D> {
-        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (C) -> HK<F, D>): HK<F, T> =
+        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (C) -> Kind<F, D>): Kind<F, T> =
                 this@PTraversal.modifyF(FA, s, { b -> other.modifyF(FA, b, f) })
     }
 
@@ -315,7 +315,7 @@ inline fun <reified T, A, B> PTraversal.Companion.fromTraversable(TT: Traverse<T
 /**
  * Modify polymorphically the target of a [PTraversal] with an Applicative function
  */
-inline fun <S, T, A, B, reified F> PTraversal<S, T, A, B>.modifyF(s: S, crossinline f: (A) -> HK<F, B>, AF: Applicative<F> = applicative()): HK<F, T> =
+inline fun <S, T, A, B, reified F> PTraversal<S, T, A, B>.modifyF(s: S, crossinline f: (A) -> Kind<F, B>, AF: Applicative<F> = applicative()): Kind<F, T> =
         modifyF(AF, s) { a -> f(a) }
 
 /**

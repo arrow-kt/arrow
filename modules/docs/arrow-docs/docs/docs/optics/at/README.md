@@ -13,7 +13,7 @@ permalink: /docs/optics/at/
 If for a structure `S` the focus `A` can be indexed by `I` then `At` can create an `Lens` with focus at `S` for a given index `I`.
 We can use that `Lens` to operate on that focus `S` to get, set and modify the focus at a given index `I`.
 
-A `MapKW<Int, String>` can be indexed by its keys `Int` but not for every index an entry can be found.
+A `MapK<Int, String>` can be indexed by its keys `Int` but not for every index an entry can be found.
 
 ```kotlin:ank
 import arrow.core.*
@@ -21,7 +21,7 @@ import arrow.data.*
 import arrow.optics.typeclasses.*
 import arrow.syntax.option.*
 
-val mapAt = At.at<MapKWKind<Int, String>, Int, Option<String>>(2)
+val mapAt = At.at<MapKOf<Int, String>, Int, Option<String>>(2)
 
 val map = mapOf(
             1 to "one",
@@ -50,5 +50,5 @@ See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | rela
 
 The following datatypes in Arrow provide instances that adhere to the `At` typeclass.
 
-- [SetKW]({{ '/docs/datatypes/setkw' | relative_url }})
-- [MapKW]({{ '/docs/datatypes/mapkw' | relative_url }})
+- [SetK]({{ '/docs/datatypes/setK' | relative_url }})
+- [MapK]({{ '/docs/datatypes/mapK' | relative_url }})

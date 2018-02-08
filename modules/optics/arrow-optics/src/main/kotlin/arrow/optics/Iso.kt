@@ -63,7 +63,7 @@ interface PIso<S, T, A, B> {
     /**
      * Lift a [PIso] to a Functor level
      */
-    fun <F> mapping(FF: Functor<F>): PIso<HK<F, S>, HK<F, T>, HK<F, A>, HK<F, B>> = PIso(
+    fun <F> mapping(FF: Functor<F>): PIso<Kind<F, S>, Kind<F, T>, Kind<F, A>, Kind<F, B>> = PIso(
             { fa -> FF.map(fa, this::get) },
             { fb -> FF.map(fb, this::reverseGet) }
     )
@@ -71,13 +71,13 @@ interface PIso<S, T, A, B> {
     /**
      * Modify polymorphically the target of a [PIso] with a Functor function
      */
-    fun <F> modifyF(FF: Functor<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
+    fun <F> modifyF(FF: Functor<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> =
             FF.map(f(get(s)), this::reverseGet)
 
     /**
-     * Lift a function [f] with a functor: `(A) -> HK<F, B> to the context of `S`: `(S) -> HK<F, T>`
+     * Lift a function [f] with a functor: `(A) -> Kind<F, B> to the context of `S`: `(S) -> Kind<F, T>`
      */
-    fun <F> liftF(FF: Functor<F>, f: (A) -> HK<F, B>): (S) -> HK<F, T> =
+    fun <F> liftF(FF: Functor<F>, f: (A) -> Kind<F, B>): (S) -> Kind<F, T> =
             { s -> FF.map(f(get(s)), this::reverseGet) }
 
     /**
@@ -239,7 +239,7 @@ interface PIso<S, T, A, B> {
      * View a [PIso] as a [PTraversal]
      */
     fun asTraversal(): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
-        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> HK<F, B>): HK<F, T> =
+        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> =
                 FA.map(f(get(s)), this@PIso::reverseGet)
     }
 
@@ -248,7 +248,7 @@ interface PIso<S, T, A, B> {
 /**
  * Lift a [PIso] to a Functor level
  */
-inline fun <S, T, A, B, reified F> PIso<S, T, A, B>.mapping(FF: Functor<F> = functor(), dummy: Unit = Unit): PIso<HK<F, S>, HK<F, T>, HK<F, A>, HK<F, B>> = PIso(
+inline fun <S, T, A, B, reified F> PIso<S, T, A, B>.mapping(FF: Functor<F> = functor(), dummy: Unit = Unit): PIso<Kind<F, S>, Kind<F, T>, Kind<F, A>, Kind<F, B>> = PIso(
         { fa -> FF.map(fa, this::get) },
         { fb -> FF.map(fb, this::reverseGet) }
 )
@@ -271,11 +271,11 @@ inline fun <S, T, A, B> PIso<S, T, A, B>.lift(crossinline f: (A) -> B): (S) -> T
 /**
  * Modify polymorphically the focus of a [PIso] with a Functor function
  */
-inline fun <S, T, A, B, reified F> PIso<S, T, A, B>.modifyF(s: S, crossinline f: (A) -> HK<F, B>, FF: Functor<F> = functor()): HK<F, T> =
+inline fun <S, T, A, B, reified F> PIso<S, T, A, B>.modifyF(s: S, crossinline f: (A) -> Kind<F, B>, FF: Functor<F> = functor()): Kind<F, T> =
         modifyF(FF, s, { a -> f(a) })
 
 /**
- * Lift a function [f] with a functor: `(A) -> HK<F, B> to the context of `S`: `(S) -> HK<F, T>`
+ * Lift a function [f] with a functor: `(A) -> Kind<F, B> to the context of `S`: `(S) -> Kind<F, T>`
  */
-inline fun <S, T, A, B, reified F> PIso<S, T, A, B>.liftF(FF: Functor<F> = functor(), dummy: Unit = Unit, crossinline f: (A) -> HK<F, B>): (S) -> HK<F, T> =
+inline fun <S, T, A, B, reified F> PIso<S, T, A, B>.liftF(FF: Functor<F> = functor(), dummy: Unit = Unit, crossinline f: (A) -> Kind<F, B>): (S) -> Kind<F, T> =
         liftF(FF) { a -> f(a) }

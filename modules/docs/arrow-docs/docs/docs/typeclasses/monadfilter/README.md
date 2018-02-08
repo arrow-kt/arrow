@@ -14,7 +14,7 @@ All instances of `MonadFilter` provide syntax over their respective data types t
 
 Binding over `MonadFilter` instances with `bindingFilter` brings into scope the `continueIf` guard that requires a `Boolean` predicate as value. If the predicate is `true` the computation will continue and if the predicate returns `false` the computation is short-circuited returning monad filter instance `empty()` value. 
 
-In the example below we demonstrate monadic comprehension over the `MonadFilter` instances for both `Option` and `ListKW` since both data types can provide a safe `empty` value. 
+In the example below we demonstrate monadic comprehension over the `MonadFilter` instances for both `Option` and `ListK` since both data types can provide a safe `empty` value. 
 
 When `continueIf` is satisfied the computation continues
 
@@ -35,7 +35,7 @@ Option.monadFilter().bindingFilter {
 ```kotlin:ank
 import arrow.data.*
 
-ListKW.monadFilter().bindingFilter {
+ListK.monadFilter().bindingFilter {
  val a = listOf(1).k().bind()
  val b = listOf(1).k().bind()
  val c = a + b
@@ -57,7 +57,7 @@ Option.monadFilter().bindingFilter {
 ```
 
 ```kotlin:ank
-ListKW.monadFilter().bindingFilter {
+ListK.monadFilter().bindingFilter {
  val a = listOf(1).k().bind()
  val b = listOf(1).k().bind()
  val c = a + b
@@ -81,7 +81,7 @@ Option.monadFilter().bindingFilter {
 ```
 
 ```kotlin:ank
-ListKW.monadFilter().bindingFilter {
+ListK.monadFilter().bindingFilter {
  val a = listOf(1).k().bind()
  val b = listOf(1).k().bindWithFilter { it == a } //continues
  a + b
@@ -99,7 +99,7 @@ Option.monadFilter().bindingFilter {
 ```   
 
 ```kotlin:ank
-ListKW.monadFilter().bindingFilter {
+ListK.monadFilter().bindingFilter {
  val a = listOf(0).k().bind()
  val b = listOf(1).k().bindWithFilter { it == a } //short circuits because a is 0
  a + b
