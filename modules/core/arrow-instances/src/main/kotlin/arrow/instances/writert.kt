@@ -6,7 +6,7 @@ import arrow.core.toT
 import arrow.data.WriterT
 import arrow.data.WriterTOf
 import arrow.data.WriterTPartialOf
-import arrow.data.reify
+import arrow.data.extract
 import arrow.instance
 import arrow.typeclasses.*
 
@@ -14,7 +14,7 @@ import arrow.typeclasses.*
 interface WriterTFunctorInstance<F, W> : Functor<WriterTPartialOf<F, W>> {
     fun FF(): Functor<F>
 
-    override fun <A, B> map(fa: WriterTOf<F, W, A>, f: (A) -> B): WriterT<F, W, B> = fa.reify().map({ f(it) }, FF())
+    override fun <A, B> map(fa: WriterTOf<F, W, A>, f: (A) -> B): WriterT<F, W, B> = fa.extract().map({ f(it) }, FF())
 }
 
 @instance(WriterT::class)
@@ -28,26 +28,26 @@ interface WriterTApplicativeInstance<F, W> : Applicative<WriterTPartialOf<F, W>>
             WriterT(FF().pure(MM().empty() toT a))
 
     override fun <A, B> ap(fa: WriterTOf<F, W, A>, ff: Kind<WriterTPartialOf<F, W>, (A) -> B>): WriterT<F, W, B> =
-            fa.reify().ap(ff, MM(), FF())
+            fa.extract().ap(ff, MM(), FF())
 
     override fun <A, B> map(fa: WriterTOf<F, W, A>, f: (A) -> B): WriterT<F, W, B> =
-            fa.reify().map({ f(it) }, FF())
+            fa.extract().map({ f(it) }, FF())
 }
 
 @instance(WriterT::class)
 interface WriterTMonadInstance<F, W> : WriterTApplicativeInstance<F, W>, Monad<WriterTPartialOf<F, W>> {
 
     override fun <A, B> map(fa: WriterTOf<F, W, A>, f: (A) -> B): WriterT<F, W, B> =
-            fa.reify().map({ f(it) }, FF())
+            fa.extract().map({ f(it) }, FF())
 
     override fun <A, B> flatMap(fa: WriterTOf<F, W, A>, f: (A) -> Kind<WriterTPartialOf<F, W>, B>): WriterT<F, W, B> =
-            fa.reify().flatMap({ f(it).reify() }, MM(), FF())
+            fa.extract().flatMap({ f(it).extract() }, MM(), FF())
 
     override fun <A, B> tailRecM(a: A, f: (A) -> Kind<WriterTPartialOf<F, W>, Either<A, B>>): WriterT<F, W, B> =
             WriterT.tailRecM(a, f, FF())
 
     override fun <A, B> ap(fa: WriterTOf<F, W, A>, ff: Kind<WriterTPartialOf<F, W>, (A) -> B>): WriterT<F, W, B> =
-            fa.reify().ap(ff, MM(), FF())
+            fa.extract().ap(ff, MM(), FF())
 }
 
 @instance(WriterT::class)
@@ -56,7 +56,7 @@ interface WriterTSemigroupKInstance<F, W> : SemigroupK<WriterTPartialOf<F, W>> {
     fun SS(): SemigroupK<F>
 
     override fun <A> combineK(x: WriterTOf<F, W, A>, y: WriterTOf<F, W, A>): WriterT<F, W, A> =
-            x.reify().combineK(y, SS())
+            x.extract().combineK(y, SS())
 }
 
 @instance(WriterT::class)

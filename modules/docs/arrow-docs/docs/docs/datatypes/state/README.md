@@ -97,7 +97,7 @@ fun stackOperations() = State().monad<Stack>().binding {
     val c = pop().bind()
 
     c
-}.reify()
+}.extract()
 ```
 
 At this point, we have not yet interacted with any Stack; we have written instructions to operate one. We need to pass in an initial stack value, and then we actually apply our operations to it:

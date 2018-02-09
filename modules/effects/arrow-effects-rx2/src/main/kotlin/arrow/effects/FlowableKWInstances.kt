@@ -14,7 +14,7 @@ interface FlowableKApplicativeErrorInstance :
             FlowableK.raiseError(e)
 
     override fun <A> handleErrorWith(fa: FlowableKOf<A>, f: (Throwable) -> FlowableKOf<A>): FlowableK<A> =
-            fa.handleErrorWith { f(it).reify() }
+            fa.handleErrorWith { f(it).extract() }
 }
 
 @instance(FlowableK::class)
@@ -55,5 +55,5 @@ interface FlowableKEffectInstance :
         FlowableKAsyncInstance,
         Effect<ForFlowableK> {
     override fun <A> runAsync(fa: FlowableKOf<A>, cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Unit> =
-            fa.reify().runAsync(cb)
+            fa.extract().runAsync(cb)
 }

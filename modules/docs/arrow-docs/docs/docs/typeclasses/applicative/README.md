@@ -36,7 +36,7 @@ import arrow.syntax.applicative.*
 
 data class Profile(val name: String, val phone: Int, val address: List<String>)
 
-val r: Option<Tuple3<String, Int, List<String>>> = Option.applicative().tupled(profileService(), phoneService(), addressService()).reify()
+val r: Option<Tuple3<String, Int, List<String>>> = Option.applicative().tupled(profileService(), phoneService(), addressService()).extract()
 r.map { Profile(it.a, it.b, it.c) }
 ```
 
