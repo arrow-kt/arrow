@@ -14,7 +14,7 @@ A rundown of all the features included in the library.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/IL5XzaCMKpQ?rel=0" frameborder="0" allowfullscreen></iframe>
 
-Lambda World, Cadiz, Nov '17
+Lambda World, Cadiz, Nov '17 - version 0.3.11
 
 ### Kotlin for the Pragmatic Functionalist
 
@@ -22,7 +22,7 @@ An introduction to Arrow and the enhancements it brings to Kotlin's standard lib
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/s9oMED6ZikQ?rel=0" frameborder="0" allowfullscreen></iframe>
 
-KotlinConf, San Francisco, Nov '17
+KotlinConf, San Francisco, Nov '17 - version 0.3.11
 
 ### Architectures Using Functional Programming Concepts
 
@@ -30,7 +30,7 @@ Introductory talk to Functional architectures to be built on top of Arrow.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/qI1ctQ0293o?rel=0" frameborder="0" allowfullscreen></iframe>
 
-KotlinConf, San Francisco, Nov '17
+KotlinConf, San Francisco, Nov '17 - version 0.3.11
 
 ### Building a DSL... in Kotlin
  
@@ -38,7 +38,7 @@ KotlinConf, San Francisco, Nov '17
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/kr8iWE4Jfhc" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
 
- droidconSF, San Francisco, Nov '17
+ droidconSF, San Francisco, Nov '17 - version 0.3.11
  
 ### Functional approach to Android architecture using Kotlin
  
@@ -46,7 +46,7 @@ KotlinConf, San Francisco, Nov '17
  
 <iframe width="560" height="315" src="https://www.youtube.com/embed/qGef3sFAIxU" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
  
- Mobilization 7, Łódź, Oct '17
+ Mobilization 7, Łódź, Oct '17 - version 0.3.11
 
 ### Functional Programming in Kotlin
 
@@ -69,3 +69,13 @@ An ongoing blog series introducing Functional Programming architectures from scr
 [@uris77](https://github.com/uris77) explains how to use [`Try`]({{ '/docs/datatypes/try' | relative_url }}) in real world examples.
 
 [Handling Kotlin Exceptions with Arrow – A Functional Approach](https://www.spantree.net/blog/2017/09/15/kotlin-exception-handling-with-kategory.html)
+
+### Optics and Type Classes in Arrow
+
+[@msya](https://github.com/msya) explains how to use various optics and type classes in Arrow. He discusses optics such as 
+[`Lens`]({{ '/docs/optics/lens' | relative_url }}) and [`Iso`]({{ '/docs/optics/iso' | relative_url }}). He also goes over the purpose for type classes and how [KEEP-87](https://github.com/Kotlin/KEEP/pull/87) will make it easier to implement them.
+
+Kotlin Brooklyn Meetup, Jan ’18 - version 0.6.1
+
+[Functional Programming with Arrow](https://speakerdeck.com/heyitsmohit/functional-programming-with-arrow)
+
