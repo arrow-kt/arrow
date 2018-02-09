@@ -57,7 +57,7 @@ Arrow allows abstract polymorphic code that operates over the evidence of having
 This enables programs that are not coupled to specific datatype implementations.
 The technique demonstrated below to write polymorphic code is available for all other `Typeclasses` beside `Functor`.
 
-```kotlin:ank
+```kotlin
 import arrow.typeclasses.*
 
 inline fun <reified F> multiplyBy2(fa: Kind<F, Int>, FT: Functor<F> = functor()): Kind<F, Int> =
@@ -66,8 +66,8 @@ inline fun <reified F> multiplyBy2(fa: Kind<F, Int>, FT: Functor<F> = functor())
 multiplyBy2<ForOption>(Option(1))
 ```
 
-```kotlin:ank
-multiplyBy2<ForTry>(Try.pure(1), tryFunctor)
+```kotlin
+multiplyBy2<ForTry>(Try.pure(1))
 ```
 
 In the example above we've defined a function that can operate over any data type for which a `Functor` instance is available.
