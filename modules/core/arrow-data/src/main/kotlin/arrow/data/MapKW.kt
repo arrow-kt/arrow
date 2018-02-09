@@ -64,12 +64,7 @@ fun <K, A> List<Map.Entry<K, A>>.k(): MapK<K, A> = this.map { it.key to it.value
 
 fun <K, A> Map<K, A>.getOption(k: K): Option<A> = Option.fromNullable(this[k])
 
-fun <K, A> MapK<K, A>.updated(k: K, value: A): MapK<K, A> {
-    val mutableMap = this.toMutableMap()
-    mutableMap.put(k, value)
-
-    return mutableMap.toMap().k()
-}
+fun <K, A> MapK<K, A>.updated(k: K, value: A): MapK<K, A> = (map + (k to value)).k()
 
 fun <K, A, B> Map<K, A>.foldLeft(b: Map<K, B>, f: (Map<K, B>, Map.Entry<K, A>) -> Map<K, B>): Map<K, B> {
     var result = b
