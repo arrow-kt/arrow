@@ -116,7 +116,7 @@ data class ListK<A>(val list: List<A>): Kind<ForListK, A>
 As `ListK<A>` is the only existing implementation of `Kind<ForListK, A>`, we can define an extension function on `Kind<ForListK, A>` to do the downcasting safely for us.
 This function by convention is called `extract()`, as in, convert something from generic into concrete.
 
-```ForListK
+```kotlin
 fun Kind<ForListK, A>.extract() = this as ListK<A>
 ```
 
@@ -125,7 +125,7 @@ Being able to define extension functions that work for partially applied generic
 You can define `fun Kind<ForOption, A>.extract()` and `fun Kind<ForListK, A>.extract()` and the compiler can smartly decide which one you're trying to use.
 If it can't it means there's an ambiguity you should fix!
 
-The function `extract()` is already defined for all datatypes in Λrrow. If you're creating your own datatype that's also a type constructor and would like to create all these helper types and functions,
+The function `extract()` is already defined for all datatypes in Λrrow, alongside a typealias for its `Kind<F, A>` specialization done by suffixing the type with Of, as in `ListKOf<A>` or `OptionOf<A>`. If you're creating your own datatype that's also a type constructor and would like to create all these helper types and functions,
 you can do so simply by annotating it as `@higerkind` and the Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create them for you.
 
 ```kotlin
