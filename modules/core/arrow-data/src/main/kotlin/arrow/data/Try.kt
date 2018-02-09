@@ -22,9 +22,9 @@ sealed class Try<out A> : TryOf<A> {
         fun <A> pure(a: A): Try<A> = Success(a)
 
         tailrec fun <A, B> tailRecM(a: A, f: (A) -> TryOf<Either<A, B>>): Try<B> {
-            val ev: Try<Either<A, B>> = f(a).reify()
+            val ev: Try<Either<A, B>> = f(a).extract()
             return when (ev) {
-                is Failure -> Failure<B>(ev.exception).reify()
+                is Failure -> Failure<B>(ev.exception).extract()
                 is Success -> {
                     val b: Either<A, B> = ev.value
                     when (b) {
@@ -51,14 +51,14 @@ sealed class Try<out A> : TryOf<A> {
     operator fun invoke() = get()
 
     fun <G, B> traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Try<B>> =
-            this.reify().fold({ GA.pure(raise(it)) }, { GA.map(f(it), { Try { it } }) })
+            this.extract().fold({ GA.pure(raise(it)) }, { GA.map(f(it), { Try { it } }) })
 
-    fun <B> ap(ff: TryOf<(A) -> B>): Try<B> = ff.reify().flatMap { f -> map(f) }.reify()
+    fun <B> ap(ff: TryOf<(A) -> B>): Try<B> = ff.extract().flatMap { f -> map(f) }.extract()
 
     /**
      * Returns the given function applied to the value from this `Success` or returns this if this is a `Failure`.
      */
-    inline fun <B> flatMap(crossinline f: (A) -> TryOf<B>): Try<B> = fold({ raise(it) }, { f(it).reify() })
+    inline fun <B> flatMap(crossinline f: (A) -> TryOf<B>): Try<B> = fold({ raise(it) }, { f(it).extract() })
 
     /**
      * Maps the given function to the value from this `Success` or returns this if this is a `Failure`.
@@ -171,9 +171,9 @@ sealed class TryException(override val message: String) : kotlin.Exception(messa
     data class UnsupportedOperationException(override val message: String) : TryException(message)
 }
 
-fun <A, B> Try<A>.foldLeft(b: B, f: (B, A) -> B): B = this.reify().fold({ b }, { f(b, it) })
+fun <A, B> Try<A>.foldLeft(b: B, f: (B, A) -> B): B = this.extract().fold({ b }, { f(b, it) })
 
-fun <A, B> Try<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = this.reify().fold({ lb }, { f(it, lb) })
+fun <A, B> Try<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = this.extract().fold({ lb }, { f(it, lb) })
 
 /**
  * Returns the value from this `Success` or the given `default` argument if this is a `Failure`.

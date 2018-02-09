@@ -1,8 +1,15 @@
 package arrow.free
 
-import arrow.*
-import arrow.core.*
-import arrow.typeclasses.*
+import arrow.Kind
+import arrow.core.Eval
+import arrow.core.ForEval
+import arrow.core.FunctionK
+import arrow.core.extract
+import arrow.higherkind
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.Traverse
+import arrow.typeclasses.applicative
 
 typealias CofreeEval<S, A> = Kind<S, Cofree<S, A>>
 
@@ -30,7 +37,7 @@ typealias CofreeEval<S, A> = Kind<S, Cofree<S, A>>
 
     fun run(): Cofree<S, A> = Cofree(FS, head, Eval.now(tail.map { FS.map(it, { it.run() }) }.value()))
 
-    fun extract(): A = head
+    fun extractM(): A = head
 
     companion object {
         inline fun <reified S, A> unfold(a: A, noinline f: (A) -> Kind<S, A>, FS: Functor<S> = arrow.typeclasses.functor<S>()): Cofree<S, A> = create(a, f, FS)
@@ -41,8 +48,8 @@ typealias CofreeEval<S, A> = Kind<S, Cofree<S, A>>
 }
 
 fun <F, A, B> Cofree<F, A>.cata(folder: (A, Kind<F, B>) -> Eval<B>, TF: Traverse<F>): Eval<B> {
-    val ev: Eval<Kind<F, B>> = TF.traverse(this.tailForced(), { it.cata(folder, TF) }, applicative()).reify()
-    return ev.flatMap { folder(extract(), it) }
+    val ev: Eval<Kind<F, B>> = TF.traverse(this.tailForced(), { it.cata(folder, TF) }, applicative()).extract()
+    return ev.flatMap { folder(extractM(), it) }
 }
 
 fun <F, M, A, B> Cofree<F, A>.cataM(folder: (A, Kind<F, B>) -> Kind<M, B>, inclusion: FunctionK<ForEval, M>, TF: Traverse<F>, MM: Monad<M>): Kind<M, B> {

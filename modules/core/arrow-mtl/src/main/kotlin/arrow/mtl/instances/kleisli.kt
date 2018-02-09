@@ -10,6 +10,6 @@ interface KleisliMonadReaderInstance<F, D> : KleisliMonadInstance<F, D>, MonadRe
 
     override fun ask(): Kleisli<F, D, D> = Kleisli({ FF().pure(it) })
 
-    override fun <A> local(f: (D) -> D, fa: KleisliOf<F, D, A>): Kleisli<F, D, A> = fa.reify().local(f)
+    override fun <A> local(f: (D) -> D, fa: KleisliOf<F, D, A>): Kleisli<F, D, A> = fa.extract().local(f)
 
 }

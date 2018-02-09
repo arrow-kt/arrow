@@ -10,7 +10,7 @@ fun <A, B> merge(
         Eval.applicative().tupled(
                 Eval.later(op1),
                 Eval.later(op2)
-        ).reify()
+        ).extract()
 
 fun <A, B, C> merge(
         op1: () -> A,
@@ -20,7 +20,7 @@ fun <A, B, C> merge(
                 Eval.later(op1),
                 Eval.later(op2),
                 Eval.later(op3)
-        ).reify()
+        ).extract()
 
 fun <A, B, C, D> merge(
         op1: () -> A,
@@ -32,7 +32,7 @@ fun <A, B, C, D> merge(
                 Eval.later(op2),
                 Eval.later(op3),
                 Eval.later(op4)
-        ).reify()
+        ).extract()
 
 fun <A, B, C, D, E> merge(
         op1: () -> A,
@@ -46,7 +46,7 @@ fun <A, B, C, D, E> merge(
                 Eval.later(op3),
                 Eval.later(op4),
                 Eval.later(op5)
-        ).reify()
+        ).extract()
 
 fun <A, B, C, D, E, F> merge(
         op1: () -> A,
@@ -62,7 +62,7 @@ fun <A, B, C, D, E, F> merge(
                 Eval.later(op4),
                 Eval.later(op5),
                 Eval.later(op6)
-        ).reify()
+        ).extract()
 
 fun <A, B, C, D, E, F, G> merge(
         op1: () -> A,
@@ -80,7 +80,7 @@ fun <A, B, C, D, E, F, G> merge(
                 Eval.later(op5),
                 Eval.later(op6),
                 Eval.later(op7)
-        ).reify()
+        ).extract()
 
 fun <A, B, C, D, E, F, G, H> merge(
         op1: () -> A,
@@ -100,7 +100,7 @@ fun <A, B, C, D, E, F, G, H> merge(
                 Eval.later(op6),
                 Eval.later(op7),
                 Eval.later(op8)
-        ).reify()
+        ).extract()
 
 fun <A, B, C, D, E, F, G, H, I> merge(
         op1: () -> A,
@@ -122,7 +122,7 @@ fun <A, B, C, D, E, F, G, H, I> merge(
                 Eval.later(op7),
                 Eval.later(op8),
                 Eval.later(op9)
-        ).reify()
+        ).extract()
 
 fun <A, B, C, D, E, F, G, H, I, J> merge(
         op1: () -> A,
@@ -146,4 +146,4 @@ fun <A, B, C, D, E, F, G, H, I, J> merge(
                 Eval.later(op8),
                 Eval.later(op9),
                 Eval.later(op10)
-        ).reify()
+        ).extract()

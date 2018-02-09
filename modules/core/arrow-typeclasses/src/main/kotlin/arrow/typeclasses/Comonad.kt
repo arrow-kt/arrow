@@ -1,6 +1,8 @@
 package arrow.typeclasses
 
-import arrow.*
+import arrow.Kind
+import arrow.TC
+import arrow.typeclass
 import java.io.Serializable
 import kotlin.coroutines.experimental.*
 import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
@@ -14,7 +16,7 @@ interface Comonad<F> : Functor<F>, TC {
 
     fun <A, B> coflatMap(fa: Kind<F, A>, f: (Kind<F, A>) -> B): Kind<F, B>
 
-    fun <A> extract(fa: Kind<F, A>): A
+    fun <A> extractM(fa: Kind<F, A>): A
 
     fun <A> duplicate(fa: Kind<F, A>): Kind<F, Kind<F, A>> = coflatMap(fa, { it })
 }
@@ -36,9 +38,9 @@ open class ComonadContinuation<F, A : Any>(val CM: Comonad<F>, override val cont
 
     suspend fun <B> extract(m: () -> Kind<F, B>): B = suspendCoroutineOrReturn { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels
-        returnedMonad = CM.extract(CM.coflatMap(m(), { x: Kind<F, B> ->
+        returnedMonad = CM.extractM(CM.coflatMap(m(), { x: Kind<F, B> ->
             c.stackLabels = labelHere
-            c.resume(CM.extract(x))
+            c.resume(CM.extractM(x))
             returnedMonad
         }))
         COROUTINE_SUSPENDED

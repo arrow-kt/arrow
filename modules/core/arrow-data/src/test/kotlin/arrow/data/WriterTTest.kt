@@ -38,7 +38,7 @@ class WriterTTest : UnitSpec() {
                 WriterT.monoidK<ForListK, Int>(ListK.monoidK()),
                 WriterT.applicative(),
                 Eq { a, b ->
-                    a.reify().value == b.reify().value
+                    a.extract().value == b.extract().value
                 }),
 
             MonadWriterLaws.laws(WriterT.monad(Option.monad(), IntMonoid),
@@ -47,14 +47,14 @@ class WriterTTest : UnitSpec() {
                 genIntSmall(),
                 genTuple(genIntSmall(), genIntSmall()),
                 Eq { a, b ->
-                    a.reify().value.reify().let { optionA: Option<Tuple2<Int, Int>> ->
-                        val optionB = b.reify().value.reify()
+                    a.extract().value.extract().let { optionA: Option<Tuple2<Int, Int>> ->
+                        val optionB = b.extract().value.extract()
                         optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Int> -> optionB.fold({ false }, { value == it }) })
                     }
                 },
                 Eq { a, b ->
-                    a.reify().value.reify().let { optionA: Option<Tuple2<Int, Tuple2<Int, Int>>> ->
-                        val optionB = b.reify().value.reify()
+                    a.extract().value.extract().let { optionA: Option<Tuple2<Int, Tuple2<Int, Int>>> ->
+                        val optionB = b.extract().value.extract()
                         optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Tuple2<Int, Int>> -> optionB.fold({ false }, { value == it }) })
                     }
                 }
@@ -64,8 +64,8 @@ class WriterTTest : UnitSpec() {
                 { WriterT(Option(Tuple2(it, it))) },
                 object : Eq<Kind<WriterTPartialOf<ForOption, Int>, Int>> {
                     override fun eqv(a: Kind<WriterTPartialOf<ForOption, Int>, Int>, b: Kind<WriterTPartialOf<ForOption, Int>, Int>): Boolean =
-                            a.reify().value.reify().let { optionA: Option<Tuple2<Int, Int>> ->
-                                val optionB = b.reify().value.reify()
+                            a.extract().value.extract().let { optionA: Option<Tuple2<Int, Int>> ->
+                                val optionB = b.extract().value.extract()
                                 optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Int> -> optionB.fold({ false }, { value == it }) })
                             }
                 })
