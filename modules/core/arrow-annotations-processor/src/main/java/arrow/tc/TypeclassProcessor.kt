@@ -50,10 +50,7 @@ class TypeclassesProcessor : AbstractProcessor() {
         val syntax = element.annotationMirrors.flatMap { am ->
             am.elementValues.entries.filter {
                 "syntax" == it.key.simpleName.toString()
-            }.map {
-                        logW("${it.key.simpleName} = ${it.value}")
-                        it.value.toString().toBoolean()
-                    }
+            }.map { it.value.toString().toBoolean() }
         }.firstOrNull() ?: true
         return AnnotatedTypeclass(element, proto, superTypes, syntax)
     }
