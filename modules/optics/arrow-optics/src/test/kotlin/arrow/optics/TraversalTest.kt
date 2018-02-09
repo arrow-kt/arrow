@@ -29,7 +29,7 @@ class TraversalTest : UnitSpec() {
 
         testLaws(
                 TraversalLaws.laws(
-                        traversal = fromTraversable(),
+                        traversal = Traversal.fromTraversable(),
                         aGen = genListK(Gen.int()),
                         bGen = Gen.int(),
                         funcGen = genFunctionAToB(Gen.int()),
@@ -39,7 +39,7 @@ class TraversalTest : UnitSpec() {
                 ),
 
                 SetterLaws.laws(
-                        setter = fromTraversable<ForListK, Int, Int>().asSetter(),
+                        setter = Traversal.fromTraversable<ForListK, Int, Int>().asSetter(),
                         aGen = genListK(Gen.int()),
                         bGen = Gen.int(),
                         funcGen = genFunctionAToB(Gen.int())
@@ -55,49 +55,49 @@ class TraversalTest : UnitSpec() {
 
         "asFold should behave as valid Fold: size" {
             forAll(genListK(Gen.int())) { ints ->
-                fromTraversable<ForListK, Int, Int>().asFold().size(ints) == ints.size
+                Traversal.fromTraversable<ForListK, Int, Int>().asFold().size(ints) == ints.size
             }
         }
 
         "asFold should behave as valid Fold: nonEmpty" {
             forAll(genListK(Gen.int())) { ints ->
-                fromTraversable<ForListK, Int, Int>().asFold().nonEmpty(ints) == ints.isNotEmpty()
+                Traversal.fromTraversable<ForListK, Int, Int>().asFold().nonEmpty(ints) == ints.isNotEmpty()
             }
         }
 
         "asFold should behave as valid Fold: isEmpty" {
             forAll(genListK(Gen.int())) { ints ->
-                fromTraversable<ForListK, Int, Int>().asFold().isEmpty(ints) == ints.isEmpty()
+                Traversal.fromTraversable<ForListK, Int, Int>().asFold().isEmpty(ints) == ints.isEmpty()
             }
         }
 
         "asFold should behave as valid Fold: getAll" {
             forAll(genListK(Gen.int())) { ints ->
-                fromTraversable<ForListK, Int, Int>().asFold().getAll(ints) == ints.k()
+                Traversal.fromTraversable<ForListK, Int, Int>().asFold().getAll(ints) == ints.k()
             }
         }
 
         "asFold should behave as valid Fold: combineAll" {
             forAll(genListK(Gen.int())) { ints ->
-                fromTraversable<ForListK, Int, Int>().asFold().combineAll(ints) == ints.sum()
+                Traversal.fromTraversable<ForListK, Int, Int>().asFold().combineAll(ints) == ints.sum()
             }
         }
 
         "asFold should behave as valid Fold: fold" {
             forAll(genListK(Gen.int())) { ints ->
-                fromTraversable<ForListK, Int, Int>().asFold().fold(ints) == ints.sum()
+                Traversal.fromTraversable<ForListK, Int, Int>().asFold().fold(ints) == ints.sum()
             }
         }
 
         "asFold should behave as valid Fold: headOption" {
             forAll(genListK(Gen.int())) { ints ->
-                fromTraversable<ForListK, Int, Int>().asFold().headOption(ints) == ints.firstOption()
+                Traversal.fromTraversable<ForListK, Int, Int>().asFold().headOption(ints) == ints.firstOption()
             }
         }
 
         "asFold should behave as valid Fold: lastOption" {
             forAll(genListK(Gen.int())) { ints ->
-                fromTraversable<ForListK, Int, Int>().asFold().lastOption(ints) == ints.lastOrNull()?.toOption()
+                Traversal.fromTraversable<ForListK, Int, Int>().asFold().lastOption(ints) == ints.lastOrNull()?.toOption()
             }
         }
 
