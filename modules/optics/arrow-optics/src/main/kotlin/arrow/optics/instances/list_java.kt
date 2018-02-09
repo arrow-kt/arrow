@@ -1,33 +1,34 @@
 package java_util
 
 import arrow.Kind
-import arrow.core.Predicate
 import arrow.core.toT
 import arrow.data.ListK
 import arrow.data.k
 import arrow.data.traverse
+import arrow.optics.Optional
+import arrow.optics.POptional
 import arrow.optics.Traversal
+import arrow.optics.typeclasses.Each
 import arrow.optics.typeclasses.FilterIndex
+import arrow.optics.typeclasses.Index
+import arrow.syntax.either.left
+import arrow.syntax.either.right
 import arrow.typeclasses.Applicative
 
-interface MapFilterIndexInstance<K, V> : FilterIndex<Map<K, V>, K, V> {
-    override fun filter(p: Predicate<K>) = object : Traversal<Map<K, V>, V> {
-        override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> =
-                ListK.traverse().traverse(s.toList().k(), { (k, v) ->
-                    FA.map(if (p(k)) f(v) else FA.pure(v)) {
-                        k to it
-                    }
-                }, FA).let {
+interface ListEachInstance<A> : Each<List<A>, A> {
+    override fun each() = object : Traversal<List<A>, A> {
+        override fun <F> modifyF(FA: Applicative<F>, s: List<A>, f: (A) -> Kind<F, A>): Kind<F, List<A>> =
+                ListK.traverse().traverse(s.k(), f, FA).let {
                     FA.map(it) {
-                        it.toMap()
+                        it.list
                     }
                 }
     }
 }
 
-object MapFilterIndexInstanceImplicits {
+object ListEachInstanceImplicits {
     @JvmStatic
-    fun <K, V> instance(): FilterIndex<Map<K, V>, K, V> = object : MapFilterIndexInstance<K, V> {}
+    fun <A> instance(): Each<List<A>, A> = object : ListEachInstance<A> {}
 }
 
 interface ListFilterIndexInstance<A> : FilterIndex<List<A>, Int, A> {
@@ -46,4 +47,16 @@ interface ListFilterIndexInstance<A> : FilterIndex<List<A>, Int, A> {
 object ListFilterIndexInstanceImplicits {
     @JvmStatic
     fun <A> instance(): FilterIndex<List<A>, Int, A> = object : ListFilterIndexInstance<A> {}
+}
+
+interface ListIndexInstance<A> : Index<List<A>, Int, A> {
+    override fun index(i: Int): Optional<List<A>, A> = POptional(
+            getOrModify = { it.getOrNull(i)?.right() ?: it.left() },
+            set = { a -> { l -> l.mapIndexed { index: Int, aa: A -> if (index == i) a else aa } } }
+    )
+}
+
+object ListIndexInstanceImplicits {
+    @JvmStatic
+    fun <A> instance(): Index<List<A>, Int, A> = object : ListIndexInstance<A> {}
 }
