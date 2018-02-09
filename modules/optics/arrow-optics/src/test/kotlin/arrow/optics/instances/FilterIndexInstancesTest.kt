@@ -15,6 +15,7 @@ import arrow.test.generators.genMapK
 import arrow.test.generators.genNonEmptyList
 import arrow.test.generators.genSequenceK
 import arrow.test.laws.TraversalLaws
+import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.Gen
@@ -27,9 +28,11 @@ class FilterIndexInstanceTest : UnitSpec() {
 
         "instances can be resolved implicitly" {
             filterIndex<ListK<String>, Int, String>() shouldNotBe null
+            filterIndex<List<String>, Int, String>() shouldNotBe null
             filterIndex<NonEmptyList<String>, Int, String>() shouldNotBe null
             filterIndex<SequenceK<Char>, Int, Char>() shouldNotBe null
             filterIndex<MapK<Char, Int>, String, Int>() shouldNotBe null
+            filterIndex<Map<Char, Int>, String, Int>() shouldNotBe null
             filterIndex<String, Int, Char>() shouldNotBe null
         }
 
@@ -38,6 +41,14 @@ class FilterIndexInstanceTest : UnitSpec() {
                 aGen = genListK(Gen.string()),
                 bGen = Gen.string(),
                 funcGen = genFunctionAToB(Gen.string())
+        ))
+
+        testLaws(TraversalLaws.laws(
+                traversal = FilterIndex.filterIndex<List<String>, Int, String> { true },
+                aGen = Gen.list(Gen.string()),
+                bGen = Gen.string(),
+                funcGen = genFunctionAToB(Gen.string()),
+                EQA = Eq.any()
         ))
 
         testLaws(TraversalLaws.laws(
@@ -59,6 +70,14 @@ class FilterIndexInstanceTest : UnitSpec() {
                 aGen = genMapK(genChars(), genIntSmall()),
                 bGen = Gen.int(),
                 funcGen = genFunctionAToB(Gen.int())
+        ))
+
+        testLaws(TraversalLaws.laws(
+                traversal = FilterIndex.filterIndex<Map<Char, Int>, Char, Int> { true },
+                aGen = genMapK(genChars(), genIntSmall()),
+                bGen = Gen.int(),
+                funcGen = genFunctionAToB(Gen.int()),
+                EQA = Eq.any()
         ))
 
         testLaws(TraversalLaws.laws(
