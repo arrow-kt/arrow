@@ -3,12 +3,27 @@ package arrow.tc
 import arrow.common.Package
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.extractFullName
+import arrow.common.utils.fullName
 import arrow.common.utils.removeBackticks
-import arrow.common.utils.typeConstraints
 import arrow.derive.HKArgs
 import me.eugeniomarletti.kotlin.metadata.modality
 import org.jetbrains.kotlin.serialization.ProtoBuf
 import java.io.File
+
+fun ClassOrPackageDataWrapper.expandedTypeArgs(reified: Boolean = false): String =
+        if (typeParameters.isNotEmpty()) {
+            typeParameters.joinToString(
+                    prefix = "<",
+                    separator = ", ",
+                    transform = {
+                        val name = nameResolver.getString(it.name)
+                        if (reified) "reified $name" else name
+                    },
+                    postfix = ">"
+            )
+        } else {
+            ""
+        }
 
 data class Typeclass(
         val `package`: Package,
@@ -17,21 +32,8 @@ data class Typeclass(
     val clazz = target.classOrPackageProto as ClassOrPackageDataWrapper.Class
     val typeArgs: List<String> = target.classOrPackageProto.typeParameters.map { target.classOrPackageProto.nameResolver.getString(it.name) }
     fun expandedTypeArgs(reified: Boolean = false): String =
-            if (target.classOrPackageProto.typeParameters.isNotEmpty()) {
-                target.classOrPackageProto.typeParameters.joinToString(
-                        prefix = "<",
-                        separator = ", ",
-                        transform = {
-                            val name = target.classOrPackageProto.nameResolver.getString(it.name)
-                            if (reified) "reified $name" else name
-                        },
-                        postfix = ">"
-                )
-            } else {
-                ""
-            }
+            target.classOrPackageProto.expandedTypeArgs(reified)
 
-    val typeConstraints = target.classOrPackageProto.typeConstraints()
     val name: String = clazz.nameResolver.getString(clazz.classProto.fqName).replace("/", ".")
     val simpleName = name.substringAfterLast(".")
 }
@@ -50,7 +52,12 @@ data class SyntaxFunctionSignature(
 
     fun generate(): String {
         val typeParamsS = if (tparams.isEmpty()) "" else tparams.joinToString(prefix = "<`", separator = "`, `", postfix = "`>")
-        val argsS = args.drop(1).map { "${it.first}: ${it.second}" }.joinToString(prefix = "(`", separator = "`, `", postfix = "`)")
+        val argsS = when (hkArgs) {
+            is HKArgs.None -> "(dummy: Unit = Unit)"
+            else -> args.drop(1).map {
+                "${it.first}: ${it.second}"
+            }.joinToString(prefix = "(`", separator = "`, `", postfix = "`)")
+        }
         return """|fun $typeParamsS ${receiver()}__name__$argsS: $retType =
                   |    ${implBody()}""".removeBackticks().replace("__name__", "`$name`").trimMargin()
     }
@@ -64,14 +71,14 @@ data class SyntaxFunctionSignature(
 
     fun implBody(): String =
             when (hkArgs) {
-                is HKArgs.None -> "${typeClass.simpleName.decapitalize()}.__name__(${args.drop(2).joinToString(", ")})"
+                is HKArgs.None -> "this@${typeClass.simpleName}Syntax.${typeClass.simpleName.decapitalize()}().__name__(${args.drop(2).joinToString(", ")})"
                 is HKArgs.First -> {
                     val thisArgs = listOf("this" to "") + args.drop(2)
-                    "${typeClass.simpleName.decapitalize()}.__name__(${thisArgs.joinToString(", ") { it.first }})"
+                    "this@${typeClass.simpleName}Syntax.${typeClass.simpleName.decapitalize()}().__name__(${thisArgs.joinToString(", ") { it.first }})"
                 }
                 is HKArgs.Unknown -> {
                     val thisArgs = listOf("this" to "") + args.drop(2)
-                    "${typeClass.simpleName.decapitalize()}.__name__(${thisArgs.joinToString(", ") { it.first }})"
+                    "this@${typeClass.simpleName}Syntax.${typeClass.simpleName.decapitalize()}().__name__(${thisArgs.joinToString(", ") { it.first }})"
                 }
             }
 
@@ -80,7 +87,6 @@ data class SyntaxFunctionSignature(
         fun from(receiverType: String, typeClass: Typeclass, f: ProtoBuf.Function): SyntaxFunctionSignature {
             val nameResolver = typeClass.clazz.nameResolver
             val typeParams = f.typeParameterList.map { nameResolver.getString(it.name) }
-            val typeClassAbstractKind = nameResolver.getString(typeClass.clazz.typeParameters[0].name)
             val argsC = f.valueParameterList.map {
                 val argName = nameResolver.getString(it.name)
                 val argType = it.type.extractFullName(typeClass.clazz, failOnGeneric = false)
@@ -94,8 +100,8 @@ data class SyntaxFunctionSignature(
             }
             val args = when (hkArgs) {
                 HKArgs.None -> dummyErasureArg
-                    HKArgs.First -> listOf(argsC[0]) + dummyErasureArg + argsC.drop(1)
-                    HKArgs.Unknown -> listOf(argsC[0]) + dummyErasureArg + argsC.drop(1)
+                HKArgs.First -> listOf(argsC[0]) + dummyErasureArg + argsC.drop(1)
+                HKArgs.Unknown -> listOf(argsC[0]) + dummyErasureArg + argsC.drop(1)
             }
             val abstractReturnType = f.returnType.extractFullName(typeClass.clazz, failOnGeneric = false)
             val isAbstract = f.modality == ProtoBuf.Modality.ABSTRACT
@@ -118,18 +124,30 @@ class TypeclassFileGenerator(
         annotatedList: List<AnnotatedTypeclass>
 ) {
 
-    private val typeclasses: List<Typeclass> = annotatedList.map { Typeclass(it.classOrPackageProto.`package`, it) }
+    private val typeclasses: List<Typeclass> = annotatedList.map {
+        Typeclass(it.classOrPackageProto.`package`, it)
+    }
 
     private fun functionSignatures(typeClass: Typeclass): List<SyntaxFunctionSignature> = typeClass.target.classOrPackageProto.functionList.map {
-            SyntaxFunctionSignature.from("arrow.HK", typeClass, it)
+        SyntaxFunctionSignature.from("arrow.HK", typeClass, it)
+    }
+
+    private fun removeOverrides(tc: Typeclass, functions: List<SyntaxFunctionSignature>): List<SyntaxFunctionSignature> {
+        val superFunctionNames = tc.target.superTypes.flatMap { c ->
+            c.functionList.map { c.nameResolver.getString(it.name) }
         }
+        return functions.fold(emptyList()) { acc, f ->
+            val discard = superFunctionNames.any { it == f.name }
+            if (discard) acc else acc + listOf(f)
+        }
+    }
 
     /**
      * Main entry point for higher kinds extension generation
      */
     fun generate() {
         typeclasses.forEachIndexed { _, tc ->
-            val elementsToGenerate = listOf(genLookup(tc), genSyntax(tc))
+            val elementsToGenerate = if (tc.target.syntax) listOf(genLookup(tc), genSyntax(tc)) else listOf(genLookup(tc))
             val source: String = elementsToGenerate.joinToString(prefix = "package ${tc.`package`}\n\n", separator = "\n", postfix = "\n")
             val file = File(generatedDir, typeClassAnnotationClass.simpleName + ".${tc.target.classElement.qualifiedName}.kt")
             file.writeText(source)
@@ -151,12 +169,20 @@ class TypeclassFileGenerator(
     }
 
     private fun genSyntax(tc: Typeclass): String {
-        val delegatedFunctions: List<String> = functionSignatures(tc).map { it.generate() }
-
+        val delegatedFunctions: List<String> = removeOverrides(tc, functionSignatures(tc)).map { it.generate() }
+        val (superTypes, overrides) = if (tc.target.superTypes.isEmpty()) "" to "" else {
+            val extends = tc.target.superTypes[0]
+            val superName = extends.fullName.replace("/", ".")
+            val simpleSuperName = superName.substringAfterLast(".")
+            ": ${superName}Syntax${extends.expandedTypeArgs(false)}" to
+                    "override fun ${simpleSuperName.decapitalize()}() : $superName ${extends.expandedTypeArgs(false)} = ${tc.simpleName.decapitalize()}()"
+        }
         return """
-            |interface ${tc.simpleName}Syntax${tc.expandedTypeArgs(false)} {
+            |interface ${tc.simpleName}Syntax${tc.expandedTypeArgs(false)} $superTypes {
             |
-            |  val ${tc.simpleName.decapitalize()}: ${tc.simpleName}${tc.expandedTypeArgs(false)}
+            |  fun ${tc.simpleName.decapitalize()}(): ${tc.simpleName}${tc.expandedTypeArgs(false)}
+            |
+            |  $overrides
             |
             |  ${delegatedFunctions.joinToString("\n\n  ")}
             |}

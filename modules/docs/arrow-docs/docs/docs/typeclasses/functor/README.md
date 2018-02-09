@@ -63,7 +63,10 @@ import arrow.typeclasses.*
 inline fun <reified F> multiplyBy2(fa: Kind<F, Int>, FT: Functor<F> = functor()): Kind<F, Int> =
     FT.map(fa, { it * 2 })
 
-multiplyBy2<ForOption>(Option(1)) // Option(1)
+multiplyBy2<ForOption>(Option(1))
+```
+
+```kotlin:ank
 multiplyBy2<ForTry>(Try { 1 })
 ```
 

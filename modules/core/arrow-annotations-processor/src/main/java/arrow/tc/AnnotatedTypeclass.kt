@@ -5,4 +5,6 @@ import javax.lang.model.element.TypeElement
 
 class AnnotatedTypeclass(
         val classElement: TypeElement,
-        val classOrPackageProto: ClassOrPackageDataWrapper)
+        val classOrPackageProto: ClassOrPackageDataWrapper,
+        val superTypes: List<ClassOrPackageDataWrapper.Class>,
+        val syntax : Boolean)

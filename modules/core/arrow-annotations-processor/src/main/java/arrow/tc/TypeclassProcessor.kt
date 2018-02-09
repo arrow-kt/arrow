@@ -1,8 +1,10 @@
 package arrow.tc
 
-import com.google.auto.service.AutoService
 import arrow.common.utils.AbstractProcessor
+import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.knownError
+import com.google.auto.service.AutoService
+import org.jetbrains.kotlin.serialization.deserialization.TypeTable
 import java.io.File
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
@@ -40,8 +42,16 @@ class TypeclassesProcessor : AbstractProcessor() {
     }
 
     private fun processClass(element: TypeElement): AnnotatedTypeclass {
-        val proto = getClassOrPackageDataWrapper(element)
-        return AnnotatedTypeclass(element, proto)
+        val proto = getClassOrPackageDataWrapper(element) as ClassOrPackageDataWrapper.Class
+        val typeTable = TypeTable(proto.classProto.typeTable)
+        val superTypes: List<ClassOrPackageDataWrapper.Class> =
+                recurseTypeclassInterfaces(proto, typeTable, emptyList()).map { it as ClassOrPackageDataWrapper.Class }
+        val syntax = element.annotationMirrors.flatMap { am ->
+            am.elementValues.entries.filter {
+                "syntax" == it.key.simpleName.toString()
+            }.map { it.value.toString().toBoolean() }
+        }.firstOrNull() ?: true
+        return AnnotatedTypeclass(element, proto, superTypes, syntax)
     }
 
 }
