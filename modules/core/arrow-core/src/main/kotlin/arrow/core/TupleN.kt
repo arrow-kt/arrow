@@ -3,20 +3,20 @@ package arrow.core
 import arrow.*
 
 @higherkind
-data class Tuple2<out A, out B>(val a: A, val b: B) : Tuple2Kind<A, B> {
+data class Tuple2<out A, out B>(val a: A, val b: B) : Tuple2Of<A, B> {
     fun <C> map(f: (B) -> C) =
             a toT f(b)
 
-    fun <C> ap(f: Tuple2Kind<*, (B) -> C>) =
-            map(f.ev().b)
+    fun <C> ap(f: Tuple2Of<*, (B) -> C>) =
+            map(f.extract().b)
 
-    fun <C> flatMap(f: (B) -> Tuple2Kind<@UnsafeVariance A, C>) =
-            f(b).ev()
+    fun <C> flatMap(f: (B) -> Tuple2Of<@UnsafeVariance A, C>) =
+            f(b).extract()
 
-    fun <C> coflatMap(f: (Tuple2Kind<A, B>) -> C) =
+    fun <C> coflatMap(f: (Tuple2Of<A, B>) -> C) =
             a toT f(this)
 
-    fun extract() =
+    fun extractM() =
             b
 
     fun <C> foldL(b: C, f: (C, B) -> C) =
