@@ -55,7 +55,7 @@ import arrow.legacy.*
     }
 
     fun <C> foldLeft(b: C, f: (C, B) -> C): C =
-            this.reify().let { either ->
+            this.extract().let { either ->
                 when (either) {
                     is Right -> f(b, either.b)
                     is Left -> b
@@ -63,7 +63,7 @@ import arrow.legacy.*
             }
 
     fun <C> foldRight(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
-            this.reify().let { either ->
+            this.extract().let { either ->
                 when (either) {
                     is Right -> f(either.b, lb)
                     is Left -> lb
@@ -180,7 +180,7 @@ import arrow.legacy.*
         fun <R> right(right: R): Either<Nothing, R> = Right(right)
 
         tailrec fun <L, A, B> tailRecM(a: A, f: (A) -> Kind<EitherPartialOf<L>, Either<A, B>>): Either<L, B> {
-            val ev: Either<L, Either<A, B>> = f(a).reify()
+            val ev: Either<L, Either<A, B>> = f(a).extract()
             return when (ev) {
                 is Left<L, Either<A, B>> -> Left(ev.a)
                 is Right<L, Either<A, B>> -> {
@@ -267,12 +267,12 @@ inline fun <A, B> Either<A, B>.filterOrElse(crossinline predicate: (B) -> Boolea
  */
 fun <A, B> Either<A, B>.contains(elem: B): Boolean = fold({ false }, { it == elem })
 
-fun <A, B, C> Either<A, B>.ap(ff: EitherOf<A, (B) -> C>): Either<A, C> = ff.reify().flatMap { f -> map(f) }.reify()
+fun <A, B, C> Either<A, B>.ap(ff: EitherOf<A, (B) -> C>): Either<A, C> = ff.extract().flatMap { f -> map(f) }.extract()
 
 fun <A, B> Either<A, B>.combineK(y: EitherOf<A, B>): Either<A, B> =
         when (this) {
-            is Either.Left -> y.reify()
-            else -> this.reify()
+            is Either.Left -> y.extract()
+            else -> this.extract()
         }
 
 @Deprecated(DeprecatedAmbiguity, ReplaceWith("Try { body }.toEither()"))

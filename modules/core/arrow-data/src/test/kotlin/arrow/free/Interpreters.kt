@@ -6,16 +6,16 @@ import arrow.data.*
 
 val cofreeOptionToNel: FunctionK<CofreePartialOf<ForOption>, ForNonEmptyList> = object : FunctionK<CofreePartialOf<ForOption>, ForNonEmptyList> {
     override fun <A> invoke(fa: Kind<CofreePartialOf<ForOption>, A>): Kind<ForNonEmptyList, A> =
-            fa.reify().let { c ->
-                NonEmptyList.fromListUnsafe(listOf(c.head) + c.tailForced().reify().fold({ listOf<A>() }, { invoke(it).reify().all }))
+            fa.extract().let { c ->
+                NonEmptyList.fromListUnsafe(listOf(c.head) + c.tailForced().extract().fold({ listOf<A>() }, { invoke(it).extract().all }))
             }
 }
 
 val cofreeListToNel: FunctionK<CofreePartialOf<ForListK>, ForNonEmptyList> = object : FunctionK<CofreePartialOf<ForListK>, ForNonEmptyList> {
     override fun <A> invoke(fa: Kind<CofreePartialOf<ForListK>, A>): Kind<ForNonEmptyList, A> =
-            fa.reify().let { c: Cofree<ForListK, A> ->
-                val all: List<Cofree<ForListK, A>> = c.tailForced().reify()
-                val tail: List<A> = all.foldRight(listOf<A>(), { v, acc -> acc + invoke(v).reify().all })
+            fa.extract().let { c: Cofree<ForListK, A> ->
+                val all: List<Cofree<ForListK, A>> = c.tailForced().extract()
+                val tail: List<A> = all.foldRight(listOf<A>(), { v, acc -> acc + invoke(v).extract().all })
                 val headL: List<A> = listOf(c.head)
                 NonEmptyList.fromListUnsafe(headL + tail)
             }
@@ -23,12 +23,12 @@ val cofreeListToNel: FunctionK<CofreePartialOf<ForListK>, ForNonEmptyList> = obj
 
 val optionToList: FunctionK<ForOption, ForListK> = object : FunctionK<ForOption, ForListK> {
     override fun <A> invoke(fa: Kind<ForOption, A>): Kind<ForListK, A> =
-            fa.reify().fold({ listOf<A>().k() }, { listOf(it).k() })
+            fa.extract().fold({ listOf<A>().k() }, { listOf(it).k() })
 }
 
 val optionInterpreter: FunctionK<Ops.F, ForOption> = object : FunctionK<Ops.F, ForOption> {
     override fun <A> invoke(fa: Kind<Ops.F, A>): Option<A> {
-        val op = fa.reify()
+        val op = fa.extract()
         return when (op) {
             is Ops.Add -> Some(op.a + op.y)
             is Ops.Subtract -> Some(op.a - op.y)
@@ -38,7 +38,7 @@ val optionInterpreter: FunctionK<Ops.F, ForOption> = object : FunctionK<Ops.F, F
 }
 val optionApInterpreter: FunctionK<OpsAp.F, ForOption> = object : FunctionK<OpsAp.F, ForOption> {
     override fun <A> invoke(fa: Kind<OpsAp.F, A>): Option<A> {
-        val op = fa.reify()
+        val op = fa.extract()
         return when (op) {
             is OpsAp.Add -> Some(op.a + op.y)
             is OpsAp.Subtract -> Some(op.a - op.y)
@@ -48,7 +48,7 @@ val optionApInterpreter: FunctionK<OpsAp.F, ForOption> = object : FunctionK<OpsA
 }
 val nonEmptyListInterpreter: FunctionK<Ops.F, ForNonEmptyList> = object : FunctionK<Ops.F, ForNonEmptyList> {
     override fun <A> invoke(fa: Kind<Ops.F, A>): NonEmptyList<A> {
-        val op = fa.reify()
+        val op = fa.extract()
         return when (op) {
             is Ops.Add -> NonEmptyList.of(op.a + op.y)
             is Ops.Subtract -> NonEmptyList.of(op.a - op.y)
@@ -58,7 +58,7 @@ val nonEmptyListInterpreter: FunctionK<Ops.F, ForNonEmptyList> = object : Functi
 }
 val nonEmptyListApInterpreter: FunctionK<OpsAp.F, ForNonEmptyList> = object : FunctionK<OpsAp.F, ForNonEmptyList> {
     override fun <A> invoke(fa: Kind<OpsAp.F, A>): NonEmptyList<A> {
-        val op = fa.reify()
+        val op = fa.extract()
         return when (op) {
             is OpsAp.Add -> NonEmptyList.of(op.a + op.y)
             is OpsAp.Subtract -> NonEmptyList.of(op.a - op.y)
@@ -68,7 +68,7 @@ val nonEmptyListApInterpreter: FunctionK<OpsAp.F, ForNonEmptyList> = object : Fu
 }
 val idInterpreter: FunctionK<Ops.F, ForId> = object : FunctionK<Ops.F, ForId> {
     override fun <A> invoke(fa: Kind<Ops.F, A>): Id<A> {
-        val op = fa.reify()
+        val op = fa.extract()
         return when (op) {
             is Ops.Add -> Id(op.a + op.y)
             is Ops.Subtract -> Id(op.a - op.y)
@@ -78,7 +78,7 @@ val idInterpreter: FunctionK<Ops.F, ForId> = object : FunctionK<Ops.F, ForId> {
 }
 val idApInterpreter: FunctionK<OpsAp.F, ForId> = object : FunctionK<OpsAp.F, ForId> {
     override fun <A> invoke(fa: Kind<OpsAp.F, A>): Id<A> {
-        val op = fa.reify()
+        val op = fa.extract()
         return when (op) {
             is OpsAp.Add -> Id(op.a + op.y)
             is OpsAp.Subtract -> Id(op.a - op.y)

@@ -15,7 +15,7 @@ class SortedMapKTest : UnitSpec() {
 
     val EQ: Eq<Kind2<ForSortedMapK, String, Int>> = object : Eq<Kind2<ForSortedMapK, String, Int>> {
         override fun eqv(a: Kind2<ForSortedMapK, String, Int>, b: Kind2<ForSortedMapK, String, Int>): Boolean =
-            a.reify()["key"] == b.reify()["key"]
+            a.extract()["key"] == b.extract()["key"]
     }
 
     init {

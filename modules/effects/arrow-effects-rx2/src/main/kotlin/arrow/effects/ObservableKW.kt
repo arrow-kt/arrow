@@ -14,7 +14,7 @@ import io.reactivex.ObservableEmitter
 fun <A> Observable<A>.k(): ObservableK<A> = ObservableK(this)
 
 fun <A> ObservableKOf<A>.value(): Observable<A> =
-        this.reify().observable
+        this.extract().observable
 
 @higherkind
 @deriving(
@@ -29,16 +29,16 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
             observable.map(f).k()
 
     fun <B> ap(fa: ObservableKOf<(A) -> B>): ObservableK<B> =
-            flatMap { a -> fa.reify().map { ff -> ff(a) } }
+            flatMap { a -> fa.extract().map { ff -> ff(a) } }
 
     fun <B> flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
-            observable.flatMap { f(it).reify().observable }.k()
+            observable.flatMap { f(it).extract().observable }.k()
 
     fun <B> concatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
-            observable.concatMap { f(it).reify().observable }.k()
+            observable.concatMap { f(it).extract().observable }.k()
 
     fun <B> switchMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
-            observable.switchMap { f(it).reify().observable }.k()
+            observable.switchMap { f(it).extract().observable }.k()
 
     fun <B> foldLeft(b: B, f: (B, A) -> B): B = observable.reduce(b, f).blockingGet()
 
@@ -85,7 +85,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
                 }.k()
 
         tailrec fun <A, B> tailRecM(a: A, f: (A) -> ObservableKOf<Either<A, B>>): ObservableK<B> {
-            val either = f(a).reify().value().blockingFirst()
+            val either = f(a).extract().value().blockingFirst()
             return when (either) {
                 is Either.Left -> tailRecM(either.a, f)
                 is Either.Right -> Observable.just(either.b).k()
@@ -96,27 +96,27 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
 
         fun monadConcat(): ObservableKMonadInstance = object : ObservableKMonadInstance {
             override fun <A, B> flatMap(fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
-                    fa.reify().concatMap { f(it).reify() }
+                    fa.extract().concatMap { f(it).extract() }
         }
 
         fun monadSwitch(): ObservableKMonadInstance = object : ObservableKMonadErrorInstance {
             override fun <A, B> flatMap(fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
-                    fa.reify().switchMap { f(it).reify() }
+                    fa.extract().switchMap { f(it).extract() }
         }
 
         fun monadErrorFlat(): ObservableKMonadErrorInstance = ObservableKMonadErrorInstanceImplicits.instance()
 
         fun monadErrorConcat(): ObservableKMonadErrorInstance = object : ObservableKMonadErrorInstance {
             override fun <A, B> flatMap(fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
-                    fa.reify().concatMap { f(it).reify() }
+                    fa.extract().concatMap { f(it).extract() }
         }
 
         fun monadErrorSwitch(): ObservableKMonadErrorInstance = object : ObservableKMonadErrorInstance {
             override fun <A, B> flatMap(fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
-                    fa.reify().switchMap { f(it).reify() }
+                    fa.extract().switchMap { f(it).extract() }
         }
     }
 }
 
 fun <A> ObservableKOf<A>.handleErrorWith(function: (Throwable) -> ObservableK<A>): ObservableK<A> =
-        this.reify().observable.onErrorResumeNext { t: Throwable -> function(t).observable }.k()
+        this.extract().observable.onErrorResumeNext { t: Throwable -> function(t).observable }.k()

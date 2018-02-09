@@ -1,23 +1,19 @@
 package arrow.optics
 
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.properties.Gen
 import arrow.core.Either
 import arrow.core.applicative
-import arrow.core.reify
-import arrow.typeclasses.Eq
-import arrow.test.laws.IsoLaws
-import arrow.typeclasses.Monoid
+import arrow.core.extract
 import arrow.data.Try
 import arrow.data.applicative
-import arrow.data.reify
-import arrow.test.UnitSpec
-import arrow.test.generators.genEither
-import arrow.test.generators.genFunctionAToB
-import arrow.test.generators.genThrowable
-import arrow.test.generators.genTry
-import arrow.test.generators.genValidated
+import arrow.data.extract
 import arrow.syntax.either.right
+import arrow.test.UnitSpec
+import arrow.test.generators.*
+import arrow.test.laws.IsoLaws
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -37,7 +33,7 @@ class ValidatedInstancesTest : UnitSpec() {
                     override fun empty() = 0.right()
 
                     override fun combine(a: Either<String, Int>, b: Either<String, Int>): Either<String, Int> =
-                            Either.applicative<String>().map2(a, b) { (a, b) -> a + b }.reify()
+                            Either.applicative<String>().map2(a, b) { (a, b) -> a + b }.extract()
                 }),
 
             IsoLaws.laws(
@@ -48,7 +44,7 @@ class ValidatedInstancesTest : UnitSpec() {
                 EQA = Eq.any(),
                 EQB = Eq.any(),
                 bMonoid = object : Monoid<Try<Int>> {
-                    override fun combine(a: Try<Int>, b: Try<Int>) = Try.applicative().map2(a, b) { (a, b) -> a + b }.reify()
+                    override fun combine(a: Try<Int>, b: Try<Int>) = Try.applicative().map2(a, b) { (a, b) -> a + b }.extract()
 
                     override fun empty(): Try<Int> = Try.Success(0)
                 })

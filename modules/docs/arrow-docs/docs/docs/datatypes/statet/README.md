@@ -115,7 +115,7 @@ fun stackOperationsS(): StateT<EitherPartialOf<StackError>, Stack, String> {
         popS().flatMap({ _ ->
             popS()
         }, Either.monad())
-    }, Either.monad()).reify()
+    }, Either.monad()).extract()
 }
 
 stackOperationsS().runM(listOf("hello", "world", "!"))
@@ -132,7 +132,7 @@ fun stackOperationsS2() = StateT .monad<EitherPartialOf<StackError>, Stack>().bi
     popS().bind()
     val string = popS().bind()
     string
-}.reify()
+}.extract()
 
 stackOperationsS2().runM(listOf("hello", "world", "!"))
 ```

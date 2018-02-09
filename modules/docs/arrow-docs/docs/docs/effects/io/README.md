@@ -216,7 +216,7 @@ IO.monad().binding {
       }
     average
   }
-  .reify()
+  .extract()
   .attempt()
   .unsafeRunSync()
 ```
