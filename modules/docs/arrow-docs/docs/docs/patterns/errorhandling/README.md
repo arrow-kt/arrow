@@ -143,7 +143,7 @@ fun attackOption(): Option<Impacted> =
     val target = aim().bind()
     val impact = launch(target, nuke).bind()
     impact
-  }.reify()
+  }.extract()
 
 attackOption()
 //None
@@ -200,7 +200,7 @@ fun attackTry(): Try<Impacted> =
     val target = aim().bind()
     val impact = launch(target, nuke).bind()
     impact
-  }.reify()
+  }.extract()
 
 attackTry()
 //Failure(RuntimeException("SystemOffline"))
@@ -257,7 +257,7 @@ fun attackEither(): Either<NukeException, Impacted> =
     val target = aim().bind()
     val impact = launch(target, nuke).bind()
     impact
-  }.reify()
+  }.extract()
 
 attackEither()
 //Left(MissedByMeters(5))
@@ -318,11 +318,11 @@ inline fun <reified F> attack1(ME: MonadError<F, NukeException> = monadError()):
   ME.tupled(aim(), arm()).flatMap(ME, { (nuke, target) -> launch<F>(nuke, target) })
 
 val result = attack<EitherPartialOf<NukeException>>()
-result.reify()
+result.extract()
 //Left(MissedByMeters(5))
 // or
 val result1 = attack(Either.monadError())
-result1.reify()
+result1.extract()
 ```
 
 Note that `MonadError` also has a function `bindingCatch` that automatically captures and wraps exceptions in its binding block.

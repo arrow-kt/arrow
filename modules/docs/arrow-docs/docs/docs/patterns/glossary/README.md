@@ -114,18 +114,18 @@ data class ListK<A>(val list: List<A>): Kind<ForListK, A>
 ```
 
 As `ListK<A>` is the only existing implementation of `Kind<ForListK, A>`, we can define an extension function on `Kind<ForListK, A>` to do the downcasting safely for us.
-This function by convention is called `reify()`, as in, convert something from generic into concrete.
+This function by convention is called `extract()`, as in, convert something from generic into concrete.
 
 ```ForListK
-fun Kind<ForListK, A>.reify() = this as ListK<A>
+fun Kind<ForListK, A>.extract() = this as ListK<A>
 ```
 
-This way we have can to convert from `ListK<A>` to `Kind<ForListK, A>` via simple subclassing and from `Kind<ForListK, A>` to `ListK<A>` using the function `reify()`.
+This way we have can to convert from `ListK<A>` to `Kind<ForListK, A>` via simple subclassing and from `Kind<ForListK, A>` to `ListK<A>` using the function `extract()`.
 Being able to define extension functions that work for partially applied generics is a feature from Kotlin that's not available in Java.
-You can define `fun Kind<ForOption, A>.reify()` and `fun Kind<ForListK, A>.reify()` and the compiler can smartly decide which one you're trying to use.
+You can define `fun Kind<ForOption, A>.extract()` and `fun Kind<ForListK, A>.extract()` and the compiler can smartly decide which one you're trying to use.
 If it can't it means there's an ambiguity you should fix!
 
-The function `reify()` is already defined for all datatypes in Λrrow. If you're creating your own datatype that's also a type constructor and would like to create all these helper types and functions,
+The function `extract()` is already defined for all datatypes in Λrrow. If you're creating your own datatype that's also a type constructor and would like to create all these helper types and functions,
 you can do so simply by annotating it as `@higerkind` and the Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create them for you.
 
 ```kotlin
@@ -136,7 +136,7 @@ data class ListK<A>(val list: List<A>): ListKOf<A>
 //
 // class ForListK private constructor()
 // typealias ListKOf<A> = Kind<ForListK, A>
-// fun ListKOf<A>.reify() = this as ListK<A>
+// fun ListKOf<A>.extract() = this as ListK<A>
 ```
 
 Note that the annotation `@higerkind` will also generate the integration typealiases required by [KindedJ]({{ '/docs/integrations/kindedj' | relative_url }}) as long as the datatype is invariant. You can read more about sharing Higher Kinds and type constructors across JVM libraries in [KindedJ's README](https://github.com/KindedJ/KindedJ#rationale).
@@ -162,7 +162,7 @@ Let's define an instance of `Functor` for the datatype `ListK`, our own wrapper 
 @instance
 interface ListKFunctorInstance : Functor<ForListK> {
   override fun <A, B> map(fa: Kind<ForListK, A>, f: (A) -> B): ListK<B> {
-    val list: ListK<A> = fa.reify()
+    val list: ListK<A> = fa.extract()
     return list.map(f)
   }
 }
@@ -181,10 +181,10 @@ The signature of `map` once the types have been replaced takes a parameter `Kind
 override fun <A, B> map(fa: Kind<ForListK, A>, f: (A) -> B): ListK<B>
 ```
 
-The implementation is short. On the first line we downcast `Kind<ForListK, A>` to `ListK<A>` using `reify()`. Once the value has been downcasted, the implementation of map inside the `ListK<A>` we have obtained already implements the expected behavior of map.
+The implementation is short. On the first line we downcast `Kind<ForListK, A>` to `ListK<A>` using `extract()`. Once the value has been downcasted, the implementation of map inside the `ListK<A>` we have obtained already implements the expected behavior of map.
 
 ```kotlin
-val list: ListK<A> = fa.reify()
+val list: ListK<A> = fa.extract()
 return list.map(f)
 ```
 
@@ -223,20 +223,20 @@ interface ListKApplicativeInstance : Applicative<ForListK> {
 }
 ```
 
-And now we can show how this function `randomUserStructure()` can be used for any datatype that implements [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}). As the function returns a value `Kind<F, User>` the caller is responsible of calling `reify()` to downcast it to the expected value.
+And now we can show how this function `randomUserStructure()` can be used for any datatype that implements [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}). As the function returns a value `Kind<F, User>` the caller is responsible of calling `extract()` to downcast it to the expected value.
 
 ```kotlin
-val list = randomUserStructure(::User, ListK.applicative()).reify()
+val list = randomUserStructure(::User, ListK.applicative()).extract()
 //[User(342)]
 ```
 
 ```kotlin
-val option = randomUserStructure(::User, Option.applicative()).reify()
+val option = randomUserStructure(::User, Option.applicative()).extract()
 //Some(User(765))
 ```
 
 ```kotlin
-val either = randomUserStructure(::User, Either.applicative<Unit>()).reify()
+val either = randomUserStructure(::User, Either.applicative<Unit>()).extract()
 //Right(User(221))
 ```
 
@@ -257,12 +257,12 @@ applicative<ForOption>()
 So, because `randomUserStructure` provides a default value for [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}) that's looked up globally, we can call it without passing the second parameter as long as we tell the compiler what type we're expecting the function to return.
 
 ```kotlin
-val list: ListK<User> = randomUserStructure(::User).reify()
+val list: ListK<User> = randomUserStructure(::User).extract()
 //[User(342)]
 ```
 
 ```kotlin
-val option: Option<User> = randomUserStructure(::User).reify()
+val option: Option<User> = randomUserStructure(::User).extract()
 //Some(User(765))
 ```
 

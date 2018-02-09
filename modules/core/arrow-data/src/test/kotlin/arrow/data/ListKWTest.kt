@@ -44,7 +44,7 @@ class ListKTest : UnitSpec() {
                 { n -> ListK(listOf({ s: Int -> n * s })) },
                 object : Eq<Kind<ForListK, Int>> {
                     override fun eqv(a: Kind<ForListK, Int>, b: Kind<ForListK, Int>): Boolean =
-                            a.reify().list == b.reify().list
+                            a.extract().list == b.extract().list
                 })
         )
     }

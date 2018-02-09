@@ -1,26 +1,22 @@
 package arrow.optics
 
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.properties.Gen
 import arrow.core.Either
-import arrow.typeclasses.Eq
-import arrow.test.laws.IsoLaws
-import arrow.typeclasses.Monoid
-import arrow.test.laws.PrismLaws
-import arrow.test.UnitSpec
 import arrow.core.applicative
-import arrow.core.reify
-import arrow.test.generators.genEither
-import arrow.test.generators.genFunctionAToB
-import arrow.test.generators.genThrowable
-import arrow.test.generators.genTry
-import arrow.test.generators.genValidated
+import arrow.core.extract
 import arrow.data.Invalid
 import arrow.data.Valid
 import arrow.data.Validated
 import arrow.syntax.either.right
 import arrow.syntax.validated.invalid
 import arrow.syntax.validated.valid
+import arrow.test.UnitSpec
+import arrow.test.generators.*
+import arrow.test.laws.IsoLaws
+import arrow.test.laws.PrismLaws
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -54,7 +50,7 @@ class TryInstancesTest : UnitSpec() {
                 EQB = Eq.any(),
                 bMonoid = object : Monoid<Either<Throwable, Int>> {
                     override fun combine(a: Either<Throwable, Int>, b: Either<Throwable, Int>): Either<Throwable, Int> =
-                            Either.applicative<Throwable>().map2(a, b) { (a, b) -> a + b }.reify()
+                            Either.applicative<Throwable>().map2(a, b) { (a, b) -> a + b }.extract()
 
                     override fun empty(): Either<Throwable, Int> = 0.right()
                 }

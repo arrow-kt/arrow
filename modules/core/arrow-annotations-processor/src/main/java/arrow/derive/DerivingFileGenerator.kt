@@ -46,7 +46,7 @@ data class FunctionSignature(
     fun implBody(): String =
             when (hkArgs) {
                 HKArgs.None -> "${receiverType}.${name}()"
-                HKArgs.First -> "${args[0].first}.reify().${name}(${args.drop(1).joinToString(", ") { it.first }})"
+                HKArgs.First -> "${args[0].first}.extract().${name}(${args.drop(1).joinToString(", ") { it.first }})"
                 HKArgs.Unknown -> "${receiverType}.${name}(${args.joinToString(", ") { it.first }})"
             }
 
