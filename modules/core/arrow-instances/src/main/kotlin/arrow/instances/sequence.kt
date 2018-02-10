@@ -30,6 +30,12 @@ interface SequenceKEqInstance<A> : Eq<SequenceK<A>> {
 }
 
 @instance(SequenceK::class)
+interface SequenceKShowInstance<A> : Show<SequenceK<A>> {
+    override fun show(a: SequenceK<A>): String =
+            a.toString()
+}
+
+@instance(SequenceK::class)
 interface SequenceKFunctorInstance : Functor<ForSequenceK> {
     override fun <A, B> map(fa: SequenceKOf<A>, f: kotlin.Function1<A, B>): SequenceK<B> =
             fa.extract().map(f)

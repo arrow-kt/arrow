@@ -31,6 +31,12 @@ interface SetKEqInstance<A> : Eq<SetK<A>> {
 }
 
 @instance(SetK::class)
+interface SetKShowInstance<A> : Show<SetK<A>> {
+    override fun show(a: SetK<A>): String =
+            a.toString()
+}
+
+@instance(SetK::class)
 interface SetKFoldableInstance : Foldable<ForSetK> {
     override fun <A, B> foldLeft(fa: SetKOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.extract().foldLeft(b, f)
