@@ -4,9 +4,6 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.data.NonEmptyList
-import arrow.optics.Iso
-import arrow.optics.Lens
-import arrow.optics.PIso
 
 /**
  * [Lens] to operate on the head of a [NonEmptyList]

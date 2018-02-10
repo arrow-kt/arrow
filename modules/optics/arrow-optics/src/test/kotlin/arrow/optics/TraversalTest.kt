@@ -8,9 +8,13 @@ import arrow.data.ListK
 import arrow.data.eq
 import arrow.data.k
 import arrow.optics.PTraversal.Companion.fromTraversable
+import arrow.syntax.collections.firstOption
+import arrow.syntax.option.toOption
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genListK
 import arrow.test.generators.genTuple
+import arrow.test.laws.SetterLaws
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
@@ -23,25 +27,79 @@ class TraversalTest : UnitSpec() {
 
     init {
 
-        testLaws(TraversalLaws.laws(
+        testLaws(
+                TraversalLaws.laws(
                         traversal = Traversal.fromTraversable(),
-                        aGen = Gen.create { Gen.list(Gen.int()).generate().k() },
+                        aGen = genListK(Gen.int()),
                         bGen = Gen.int(),
                         funcGen = genFunctionAToB(Gen.int()),
                         EQA = Eq.any(),
                         EQOptionB = Option.eq(Eq.any()),
                         EQListB = ListK.eq(Eq.any())
-        ))
+                ),
+
+                SetterLaws.laws(
+                        setter = Traversal.fromTraversable<ForListK, Int, Int>().asSetter(),
+                        aGen = genListK(Gen.int()),
+                        bGen = Gen.int(),
+                        funcGen = genFunctionAToB(Gen.int())
+                )
+        )
 
         testLaws(TraversalLaws.laws(
-                        traversal = Traversal({ it.a }, { it.b }, { a, b, _ -> a toT b }),
-                        aGen = genTuple(Gen.float(), Gen.float()),
-                        bGen = Gen.float(),
-                        funcGen = genFunctionAToB(Gen.float()),
-                        EQA = Eq.any(),
-                        EQOptionB = Option.eq(Eq.any()),
-                        EQListB = ListK.eq(Eq.any())
+                traversal = Traversal({ it.a }, { it.b }, { a, b, _ -> a toT b }),
+                aGen = genTuple(Gen.float(), Gen.float()),
+                bGen = Gen.float(),
+                funcGen = genFunctionAToB(Gen.float())
         ))
+
+        "asFold should behave as valid Fold: size" {
+            forAll(genListK(Gen.int())) { ints ->
+                Traversal.fromTraversable<ForListK, Int, Int>().asFold().size(ints) == ints.size
+            }
+        }
+
+        "asFold should behave as valid Fold: nonEmpty" {
+            forAll(genListK(Gen.int())) { ints ->
+                Traversal.fromTraversable<ForListK, Int, Int>().asFold().nonEmpty(ints) == ints.isNotEmpty()
+            }
+        }
+
+        "asFold should behave as valid Fold: isEmpty" {
+            forAll(genListK(Gen.int())) { ints ->
+                Traversal.fromTraversable<ForListK, Int, Int>().asFold().isEmpty(ints) == ints.isEmpty()
+            }
+        }
+
+        "asFold should behave as valid Fold: getAll" {
+            forAll(genListK(Gen.int())) { ints ->
+                Traversal.fromTraversable<ForListK, Int, Int>().asFold().getAll(ints) == ints.k()
+            }
+        }
+
+        "asFold should behave as valid Fold: combineAll" {
+            forAll(genListK(Gen.int())) { ints ->
+                Traversal.fromTraversable<ForListK, Int, Int>().asFold().combineAll(ints) == ints.sum()
+            }
+        }
+
+        "asFold should behave as valid Fold: fold" {
+            forAll(genListK(Gen.int())) { ints ->
+                Traversal.fromTraversable<ForListK, Int, Int>().asFold().fold(ints) == ints.sum()
+            }
+        }
+
+        "asFold should behave as valid Fold: headOption" {
+            forAll(genListK(Gen.int())) { ints ->
+                Traversal.fromTraversable<ForListK, Int, Int>().asFold().headOption(ints) == ints.firstOption()
+            }
+        }
+
+        "asFold should behave as valid Fold: lastOption" {
+            forAll(genListK(Gen.int())) { ints ->
+                Traversal.fromTraversable<ForListK, Int, Int>().asFold().lastOption(ints) == ints.lastOrNull()?.toOption()
+            }
+        }
 
         "Getting all targets of a traversal" {
             forAll(Gen.list(Gen.int()), { ints ->

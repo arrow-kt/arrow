@@ -4,26 +4,60 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import arrow.core.Some
+import arrow.core.getOrElse
+import arrow.data.k
+import arrow.prisms
+import arrow.syntax.collections.firstOption
+import arrow.syntax.foldable.combineAll
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.generators.genEither
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genTuple
+import arrow.test.laws.OptionalLaws
 import arrow.test.laws.PrismLaws
+import arrow.test.laws.SetterLaws
+import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
 
 @RunWith(KTestJUnitRunner::class)
 class PrismTest : UnitSpec() {
 
     init {
-        testLaws(PrismLaws.laws(
-                prism = sumPrism,
-                aGen = SumGen,
-                bGen = Gen.string(),
-                funcGen = genFunctionAToB(Gen.string()),
-                EQA = Eq.any(),
-                EQOptionB = Eq.any()
-        ))
+        testLaws(
+                PrismLaws.laws(
+                        prism = sumPrism,
+                        aGen = SumGen,
+                        bGen = Gen.string(),
+                        funcGen = genFunctionAToB(Gen.string()),
+                        EQA = Eq.any(),
+                        EQOptionB = Eq.any()
+                ),
+
+                SetterLaws.laws(
+                        setter = sumPrism.asSetter(),
+                        aGen = SumGen,
+                        bGen = Gen.string(),
+                        funcGen = genFunctionAToB(Gen.string()),
+                        EQA = Eq.any()
+                ),
+
+                TraversalLaws.laws(
+                        traversal = sumPrism.asTraversal(),
+                        aGen = SumGen,
+                        bGen = Gen.string(),
+                        funcGen = genFunctionAToB(Gen.string()),
+                        EQA = Eq.any()
+                ),
+
+                OptionalLaws.laws(
+                        optional = sumPrism.asOptional(),
+                        aGen = SumGen,
+                        bGen = Gen.string(),
+                        funcGen = genFunctionAToB(Gen.string()),
+                        EQA = Eq.any()
+                )
+        )
 
         testLaws(PrismLaws.laws(
                 prism = sumPrism.first(),
@@ -69,6 +103,54 @@ class PrismTest : UnitSpec() {
                 EQA = Eq.any(),
                 EQOptionB = Eq.any()
         ))
+
+        "asFold should behave as valid Fold: size" {
+            forAll(SumGen) { sum: SumType ->
+                sumPrism.asFold().size(sum) == sumPrism.getOption(sum).map { 1 }.getOrElse { 0 }
+            }
+        }
+
+        "asFold should behave as valid Fold: nonEmpty" {
+            forAll(SumGen) { sum: SumType ->
+                sumPrism.asFold().nonEmpty(sum) == sumPrism.getOption(sum).nonEmpty()
+            }
+        }
+
+        "asFold should behave as valid Fold: isEmpty" {
+            forAll(SumGen) { sum: SumType ->
+                sumPrism.asFold().isEmpty(sum) == sumPrism.getOption(sum).isEmpty()
+            }
+        }
+
+        "asFold should behave as valid Fold: getAll" {
+            forAll(SumGen) { sum: SumType ->
+                sumPrism.asFold().getAll(sum) == sumPrism.getOption(sum).toList().k()
+            }
+        }
+
+        "asFold should behave as valid Fold: combineAll" {
+            forAll(SumGen) { sum: SumType ->
+                sumPrism.asFold().combineAll(sum) == sumPrism.getOption(sum).combineAll()
+            }
+        }
+
+        "asFold should behave as valid Fold: fold" {
+            forAll(SumGen) { sum: SumType ->
+                sumPrism.asFold().fold(sum) == sumPrism.getOption(sum).combineAll()
+            }
+        }
+
+        "asFold should behave as valid Fold: headOption" {
+            forAll(SumGen) { sum: SumType ->
+                sumPrism.asFold().headOption(sum) == sumPrism.getOption(sum)
+            }
+        }
+
+        "asFold should behave as valid Fold: lastOption" {
+            forAll(SumGen) { sum: SumType ->
+                sumPrism.asFold().lastOption(sum) == sumPrism.getOption(sum)
+            }
+        }
 
         "Joining two prisms together with same target should yield same result" {
             forAll(SumGen, { a ->
