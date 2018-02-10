@@ -19,11 +19,13 @@ class IdTest : UnitSpec() {
             foldable<IdOf<Int>>() shouldNotBe null
             traverse<IdOf<Int>>() shouldNotBe null
             eq<Id<Int>>() shouldNotBe null
+            hash<Id<Int>>() shouldNotBe null
             show<Id<Int>>() shouldNotBe null
         }
 
         testLaws(
             EqLaws.laws { Id(it) },
+            HashLaws.laws { Id(it) },
             ShowLaws.laws { Id(it) },
             MonadLaws.laws(Id.monad(), Eq.any()),
             TraverseLaws.laws(Id.traverse(), Id.functor(), ::Id),

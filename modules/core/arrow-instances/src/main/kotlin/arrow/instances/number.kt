@@ -36,6 +36,16 @@ object ByteEqInstanceImplicits {
     fun instance(): ByteEqInstance = ByteEqInstance
 }
 
+object ByteHashInstance : Hash<Byte>, Eq<Byte> {
+    override fun eqv(a: Byte, b: Byte): Boolean = ByteEqInstance.eqv(a, b)
+
+    override fun hash(a: Byte): Int = a.hashCode()
+}
+
+object ByteHashInstanceImplicits {
+    fun instance(): ByteHashInstance = ByteHashInstance
+}
+
 object ByteShowInstance : Show<Byte> {
     override fun show(a: Byte): String = a.toString()
 }
@@ -74,6 +84,16 @@ object DoubleEqInstanceImplicits {
     fun instance(): DoubleEqInstance = DoubleEqInstance
 }
 
+object DoubleHashInstance : Hash<Double>, Eq<Double> {
+    override fun eqv(a: Double, b: Double): Boolean = DoubleEqInstance.eqv(a, b)
+
+    override fun hash(a: Double): Int = a.hashCode()
+}
+
+object DoubleHashInstanceImplicits {
+    fun instance(): DoubleHashInstance = DoubleHashInstance
+}
+
 object DoubleShowInstance : Show<Double> {
     override fun show(a: Double): String = a.toString()
 }
@@ -102,6 +122,16 @@ object IntEqInstance : Eq<Int> {
 
 object IntEqInstanceImplicits {
     fun instance(): IntEqInstance = IntEqInstance
+}
+
+object IntHashInstance : Hash<Int>, Eq<Int> {
+    override fun eqv(a: Int, b: Int): Boolean = IntEqInstance.eqv(a, b)
+
+    override fun hash(a: Int): Int = a.hashCode()
+}
+
+object IntHashInstanceImplicits {
+    fun instance(): IntHashInstance = IntHashInstance
 }
 
 object IntShowInstance : Show<Int> {
@@ -150,6 +180,16 @@ object LongEqInstanceImplicits {
     fun instance(): LongEqInstance = LongEqInstance
 }
 
+object LongHashInstance : Hash<Long> {
+    override fun eqv(a: Long, b: Long): Boolean = LongEqInstance.eqv(a, b)
+
+    override fun hash(a: Long): Int = a.hashCode()
+}
+
+object LongHashInstanceImplicits {
+    fun instance(): LongHashInstance = LongHashInstance
+}
+
 object LongShowInstance : Show<Long> {
     override fun show(a: Long): String = a.toString()
 }
@@ -188,6 +228,16 @@ object ShortEqInstanceImplicits {
     fun instance(): ShortEqInstance = ShortEqInstance
 }
 
+object ShortHashInstance : Hash<Short>, Eq<Short> {
+    override fun eqv(a: Short, b: Short): Boolean = ShortHashInstance.eqv(a, b)
+
+    override fun hash(a: Short): Int = a.hashCode()
+}
+
+object ShortHashInstanceImplicits {
+    fun instance(): ShortHashInstance = ShortHashInstance
+}
+
 object ShortShowInstance : Show<Short> {
     override fun show(a: Short): String = a.toString()
 }
@@ -224,6 +274,16 @@ object FloatEqInstance : Eq<Float> {
 
 object FloatEqInstanceImplicits {
     fun instance(): FloatEqInstance = FloatEqInstance
+}
+
+object FloatHashInstance : Hash<Float>, Eq<Float> {
+    override fun eqv(a: Float, b: Float): Boolean = FloatHashInstance.eqv(a, b)
+
+    override fun hash(a: Float): Int = a.hashCode()
+}
+
+object FloatHashInstanceImplicits {
+    fun instance(): FloatHashInstance = FloatHashInstance
 }
 
 object FloatShowInstance : Show<Float> {

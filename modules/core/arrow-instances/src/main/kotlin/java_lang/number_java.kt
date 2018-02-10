@@ -15,6 +15,10 @@ object IntegerEqInstanceImplicits {
     fun instance(): IntEqInstance = IntEqInstance
 }
 
+object IntegerHashInstanceImplicits {
+    fun instance(): IntHashInstance = IntHashInstance
+}
+
 object IntegerShowInstanceImplicits {
     fun instance(): IntShowInstance = IntShowInstance
 }
@@ -39,6 +43,10 @@ object LongEqInstanceImplicits {
     fun instance(): LongEqInstance = LongEqInstance
 }
 
+object LongHashInstanceImplicits {
+    fun instance(): LongHashInstance = LongHashInstance
+}
+
 object LongShowInstanceImplicits {
     fun instance(): LongShowInstance = LongShowInstance
 }
@@ -57,6 +65,10 @@ object ShortOrderInstanceImplicits {
 
 object ShortEqInstanceImplicits {
     fun instance(): ShortEqInstance = ShortEqInstance
+}
+
+object ShortHashInstanceImplicits {
+    fun instance(): ShortHashInstance = ShortHashInstance
 }
 
 object ShortShowInstanceImplicits {
@@ -79,6 +91,10 @@ object ByteEqInstanceImplicits {
     fun instance(): ByteEqInstance = ByteEqInstance
 }
 
+object ByteHashInstanceImplicits {
+    fun instance(): ByteHashInstance = ByteHashInstance
+}
+
 object ByteShowInstanceImplicits {
     fun instance(): ByteShowInstance = ByteShowInstance
 }
@@ -99,6 +115,10 @@ object DoubleEqInstanceImplicits {
     fun instance(): DoubleEqInstance = DoubleEqInstance
 }
 
+object DoubleHashInstanceImplicits {
+    fun instance(): DoubleHashInstance = DoubleHashInstance
+}
+
 object DoubleShowInstanceImplicits {
     fun instance(): DoubleShowInstance = DoubleShowInstance
 }
@@ -117,6 +137,10 @@ object FloatOrderInstanceImplicits {
 
 object FloatEqInstanceImplicits {
     fun instance(): FloatEqInstance = FloatEqInstance
+}
+
+object FloatHashInstanceImplicits {
+    fun instance(): FloatHashInstance = FloatHashInstance
 }
 
 object FloatShowInstanceImplicits {
