@@ -81,10 +81,25 @@ See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | rela
 
 ### Data types
 
-The following datatypes in Arrow provide instances that adhere to the `Eq` typeclass.
+Most of the datatypes in Arrow provide instances adhere to the `Eq` typeclass.
 
-- [Free]({{ '/docs/datatypes/free' | relative_url }})
-- [FreeApplicative]({{ '/docs/datatypes/FreeApplicative' | relative_url }})
+- [`Id`]({{ '/docs/datatypes/id/' | relative_url }})
+- [`Option`]({{ '/docs/datatypes/option/' | relative_url }})
+- [`Either`]({{ '/docs/datatypes/either/' | relative_url }})
+- [`Eval`]({{ '/docs/datatypes/eval/' | relative_url }})
+- `TupleN` - a heterogeneous grouping of 2-9 values without creating a named class
+- [`NonEmptyList`]({{ '/docs/datatypes/nonemptylist/' | relative_url }})
+- [`Ior`]({{ '/docs/datatypes/ior/' | relative_url }})
+- [`Const`]({{ '/docs/datatypes/const/' | relative_url }})
+- [`Coproduct`]({{ '/docs/datatypes/coproduct/' | relative_url }})
+- [`Try`]({{ '/docs/datatypes/try/' | relative_url }})
+- [`Validated`]({{ '/docs/datatypes/validated/' | relative_url }}) - returns the result of aggregating multiple calculations that can fail, and it also aggregates the errors
+- [`Free`]({{ '/docs/datatypes/free' | relative_url }})
+- [`FreeApplicative`]({{ '/docs/datatypes/FreeApplicative' | relative_url }})
+- [`ListK`]({{ '/docs/datatypes/listK/' | relative_url }})
+- [`SequenceK`]({{ '/docs/datatypes/sequenceK/' | relative_url }})
+- [`SetK`]({{ '/docs/datatypes/setK/' | relative_url }})
+- [`MapK`]({{ '/docs/datatypes/mapK/' | relative_url }}) 
+- [`SortedMapK`]({{ '/docs/datatypes/sortedmapK/' | relative_url }})
 
-Additionally all instances of [`Order`]({{ '/docs/typeclasses/order' | relative_url }}) and their MTL variants implement the `Eq` typeclass directly
-since they are all subtypes of `Eq`
+Additionally all instances of [`Order`]({{ '/docs/typeclasses/order' | relative_url }}) and their MTL variants implement the `Eq` typeclass directly since they are all subtypes of `Eq`
