@@ -13,7 +13,7 @@ interface ObservableKApplicativeErrorInstance :
             ObservableK.raiseError(e)
 
     override fun <A> handleErrorWith(fa: ObservableKOf<A>, f: (Throwable) -> ObservableKOf<A>): ObservableK<A> =
-            fa.handleErrorWith { f(it).extract() }
+            fa.handleErrorWith { f(it).fix() }
 }
 
 @instance(ObservableK::class)
@@ -52,5 +52,5 @@ interface ObservableKEffectInstance :
         ObservableKAsyncInstance,
         Effect<ForObservableK> {
     override fun <A> runAsync(fa: ObservableKOf<A>, cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Unit> =
-            fa.extract().runAsync(cb)
+            fa.fix().runAsync(cb)
 }

@@ -221,7 +221,7 @@ internal object IORunLoop {
 
     inline private fun executeSafe(crossinline f: () -> IOOf<Any?>): IO<Any?> =
             try {
-                f().extract()
+                f().fix()
             } catch (e: Throwable) {
                 IO.RaiseError(e)
             }

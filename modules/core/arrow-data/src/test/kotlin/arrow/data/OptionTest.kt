@@ -47,10 +47,10 @@ class OptionTest : UnitSpec() {
         }
 
         val EQ_EITHER: Eq<Kind<ForOption, Either<Unit, Int>>> = Eq { a, b ->
-            a.extract().fold(
-                    { b.extract().fold({ true }, { false }) },
+            a.fix().fold(
+                    { b.fix().fold({ true }, { false }) },
                     { eitherA: Either<Unit, Int> ->
-                        b.extract().fold(
+                        b.fix().fold(
                                 { false },
                                 { eitherB: Either<Unit, Int> ->
                                     eitherA.fold(

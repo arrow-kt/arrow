@@ -32,16 +32,16 @@ interface NonEmptyListShowInstance<A> : Show<NonEmptyList<A>> {
 @instance(NonEmptyList::class)
 interface NonEmptyListFunctorInstance : Functor<ForNonEmptyList> {
     override fun <A, B> map(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
-            fa.extract().map(f)
+            fa.fix().map(f)
 }
 
 @instance(NonEmptyList::class)
 interface NonEmptyListApplicativeInstance : Applicative<ForNonEmptyList> {
     override fun <A, B> ap(fa: NonEmptyListOf<A>, ff: NonEmptyListOf<kotlin.Function1<A, B>>): NonEmptyList<B> =
-            fa.extract().ap(ff)
+            fa.fix().ap(ff)
 
     override fun <A, B> map(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
-            fa.extract().map(f)
+            fa.fix().map(f)
 
     override fun <A> pure(a: A): NonEmptyList<A> =
             NonEmptyList.pure(a)
@@ -50,16 +50,16 @@ interface NonEmptyListApplicativeInstance : Applicative<ForNonEmptyList> {
 @instance(NonEmptyList::class)
 interface NonEmptyListMonadInstance : Monad<ForNonEmptyList> {
     override fun <A, B> ap(fa: NonEmptyListOf<A>, ff: NonEmptyListOf<kotlin.Function1<A, B>>): NonEmptyList<B> =
-            fa.extract().ap(ff)
+            fa.fix().ap(ff)
 
     override fun <A, B> flatMap(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, NonEmptyListOf<B>>): NonEmptyList<B> =
-            fa.extract().flatMap(f)
+            fa.fix().flatMap(f)
 
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, NonEmptyListOf<Either<A, B>>>): NonEmptyList<B> =
             NonEmptyList.tailRecM(a, f)
 
     override fun <A, B> map(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
-            fa.extract().map(f)
+            fa.fix().map(f)
 
     override fun <A> pure(a: A): NonEmptyList<A> =
             NonEmptyList.pure(a)
@@ -68,71 +68,71 @@ interface NonEmptyListMonadInstance : Monad<ForNonEmptyList> {
 @instance(NonEmptyList::class)
 interface NonEmptyListComonadInstance : Comonad<ForNonEmptyList> {
     override fun <A, B> coflatMap(fa: NonEmptyListOf<A>, f: kotlin.Function1<NonEmptyListOf<A>, B>): NonEmptyList<B> =
-            fa.extract().coflatMap(f)
+            fa.fix().coflatMap(f)
 
-    override fun <A> extractM(fa: NonEmptyListOf<A>): A =
-            fa.extract().extractM()
+    override fun <A> extract(fa: NonEmptyListOf<A>): A =
+            fa.fix().extract()
 
     override fun <A, B> map(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
-            fa.extract().map(f)
+            fa.fix().map(f)
 }
 
 @instance(NonEmptyList::class)
 interface NonEmptyListBimonadInstance : Bimonad<ForNonEmptyList> {
     override fun <A, B> ap(fa: NonEmptyListOf<A>, ff: NonEmptyListOf<kotlin.Function1<A, B>>): NonEmptyList<B> =
-            fa.extract().ap(ff)
+            fa.fix().ap(ff)
 
     override fun <A, B> flatMap(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, NonEmptyListOf<B>>): NonEmptyList<B> =
-            fa.extract().flatMap(f)
+            fa.fix().flatMap(f)
 
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, NonEmptyListOf<Either<A, B>>>): NonEmptyList<B> =
             NonEmptyList.tailRecM(a, f)
 
     override fun <A, B> map(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
-            fa.extract().map(f)
+            fa.fix().map(f)
 
     override fun <A> pure(a: A): NonEmptyList<A> =
             NonEmptyList.pure(a)
 
     override fun <A, B> coflatMap(fa: NonEmptyListOf<A>, f: kotlin.Function1<NonEmptyListOf<A>, B>): NonEmptyList<B> =
-            fa.extract().coflatMap(f)
+            fa.fix().coflatMap(f)
 
-    override fun <A> extractM(fa: NonEmptyListOf<A>): A =
-            fa.extract().extractM()
+    override fun <A> extract(fa: NonEmptyListOf<A>): A =
+            fa.fix().extract()
 }
 
 @instance(NonEmptyList::class)
 interface NonEmptyListFoldableInstance : Foldable<ForNonEmptyList> {
     override fun <A, B> foldLeft(fa: NonEmptyListOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
-            fa.extract().foldLeft(b, f)
+            fa.fix().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: NonEmptyListOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
-            fa.extract().foldRight(lb, f)
+            fa.fix().foldRight(lb, f)
 
     override fun <A> isEmpty(fa: NonEmptyListOf<A>): kotlin.Boolean =
-            fa.extract().isEmpty()
+            fa.fix().isEmpty()
 }
 
 @instance(NonEmptyList::class)
 interface NonEmptyListTraverseInstance : Traverse<ForNonEmptyList> {
     override fun <A, B> map(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
-            fa.extract().map(f)
+            fa.fix().map(f)
 
     override fun <G, A, B> traverse(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, Kind<G, B>>, GA: Applicative<G>): Kind<G, NonEmptyList<B>> =
-            fa.extract().traverse(f, GA)
+            fa.fix().traverse(f, GA)
 
     override fun <A, B> foldLeft(fa: NonEmptyListOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
-            fa.extract().foldLeft(b, f)
+            fa.fix().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: NonEmptyListOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
-            fa.extract().foldRight(lb, f)
+            fa.fix().foldRight(lb, f)
 
     override fun <A> isEmpty(fa: NonEmptyListOf<A>): kotlin.Boolean =
-            fa.extract().isEmpty()
+            fa.fix().isEmpty()
 }
 
 @instance(NonEmptyList::class)
 interface NonEmptyListSemigroupKInstance : SemigroupK<ForNonEmptyList> {
     override fun <A> combineK(x: NonEmptyListOf<A>, y: NonEmptyListOf<A>): NonEmptyList<A> =
-            x.extract().combineK(y)
+            x.fix().combineK(y)
 }

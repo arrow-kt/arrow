@@ -2,7 +2,7 @@ package arrow.data
 
 import arrow.Kind3
 import arrow.core.*
-import arrow.syntax.comonad.extractM
+import arrow.syntax.comonad.extract
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
@@ -14,7 +14,7 @@ import arrow.typeclasses.*
 @RunWith(KTestJUnitRunner::class)
 class CoproductTest : UnitSpec() {
     val EQ: Eq<Kind3<ForCoproduct, ForId, ForId, Int>> = Eq { a, b ->
-        a.extract().extract() == b.extract().extract()
+        a.fix().fix() == b.fix().fix()
     }
 
     init {

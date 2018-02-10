@@ -14,7 +14,7 @@ import io.reactivex.FlowableEmitter
 
 fun <A> Flowable<A>.k(): FlowableK<A> = FlowableK(this)
 
-fun <A> FlowableKOf<A>.value(): Flowable<A> = this.extract().flowable
+fun <A> FlowableKOf<A>.value(): Flowable<A> = this.fix().flowable
 
 @higherkind
 @deriving(
@@ -30,16 +30,16 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
             flowable.map(f).k()
 
     fun <B> ap(fa: FlowableKOf<(A) -> B>): FlowableK<B> =
-            flatMap { a -> fa.extract().map { ff -> ff(a) } }
+            flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
     fun <B> flatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
-            flowable.flatMap { f(it).extract().flowable }.k()
+            flowable.flatMap { f(it).fix().flowable }.k()
 
     fun <B> concatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
-            flowable.concatMap { f(it).extract().flowable }.k()
+            flowable.concatMap { f(it).fix().flowable }.k()
 
     fun <B> switchMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
-            flowable.switchMap { f(it).extract().flowable }.k()
+            flowable.switchMap { f(it).fix().flowable }.k()
 
     fun <B> foldLeft(b: B, f: (B, A) -> B): B = flowable.reduce(b, f).blockingGet()
 
@@ -87,7 +87,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
                 }, mode).k()
 
         tailrec fun <A, B> tailRecM(a: A, f: (A) -> FlowableKOf<Either<A, B>>): FlowableK<B> {
-            val either = f(a).extract().value().blockingFirst()
+            val either = f(a).fix().value().blockingFirst()
             return when (either) {
                 is Either.Left -> tailRecM(either.a, f)
                 is Either.Right -> Flowable.just(either.b).k()
@@ -98,24 +98,24 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
 
         fun monadConcat(): FlowableKMonadInstance = object : FlowableKMonadInstance {
             override fun <A, B> flatMap(fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
-                    fa.extract().concatMap { f(it).extract() }
+                    fa.fix().concatMap { f(it).fix() }
         }
 
         fun monadSwitch(): FlowableKMonadInstance = object : FlowableKMonadInstance {
             override fun <A, B> flatMap(fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
-                    fa.extract().switchMap { f(it).extract() }
+                    fa.fix().switchMap { f(it).fix() }
         }
 
         fun monadErrorFlat(): FlowableKMonadErrorInstance = FlowableKMonadErrorInstanceImplicits.instance()
 
         fun monadErrorConcat(): FlowableKMonadErrorInstance = object : FlowableKMonadErrorInstance {
             override fun <A, B> flatMap(fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
-                    fa.extract().concatMap { f(it).extract() }
+                    fa.fix().concatMap { f(it).fix() }
         }
 
         fun monadErrorSwitch(): FlowableKMonadErrorInstance = object : FlowableKMonadErrorInstance {
             override fun <A, B> flatMap(fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
-                    fa.extract().switchMap { f(it).extract() }
+                    fa.fix().switchMap { f(it).fix() }
         }
 
         fun syncBuffer(): FlowableKMonadSuspendInstance = FlowableKMonadSuspendInstanceImplicits.instance()
@@ -175,4 +175,4 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
 }
 
 fun <A> FlowableKOf<A>.handleErrorWith(function: (Throwable) -> FlowableK<A>): FlowableK<A> =
-        this.extract().flowable.onErrorResumeNext { t: Throwable -> function(t).flowable }.k()
+        this.fix().flowable.onErrorResumeNext { t: Throwable -> function(t).flowable }.k()

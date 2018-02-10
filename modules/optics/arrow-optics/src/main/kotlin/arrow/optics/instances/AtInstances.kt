@@ -9,7 +9,7 @@ import arrow.optics.typeclasses.At
 @instance(MapK::class)
 interface MapKAtInstance<K, V> : At<MapK<K, V>, K, Option<V>> {
     override fun at(i: K): Lens<MapK<K, V>, Option<V>> = Lens(
-            get = { it.extract().getOption(i) },
+            get = { it.fix().getOption(i) },
             set = { optV ->
                 { map ->
                     optV.fold({

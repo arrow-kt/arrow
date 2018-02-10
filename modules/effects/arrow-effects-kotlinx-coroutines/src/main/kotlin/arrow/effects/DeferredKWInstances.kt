@@ -14,7 +14,7 @@ interface DeferredKApplicativeErrorInstance :
             DeferredK.raiseError(e)
 
     override fun <A> handleErrorWith(fa: DeferredKOf<A>, f: (Throwable) -> DeferredKOf<A>): DeferredK<A> =
-            fa.handleErrorWith { f(it).extract() }
+            fa.handleErrorWith { f(it).fix() }
 }
 
 @instance(DeferredK::class)
@@ -50,5 +50,5 @@ interface DeferredKAsyncInstance : DeferredKMonadSuspendInstance, Async<ForDefer
 @instance(DeferredK::class)
 interface DeferredKEffectInstance : DeferredKAsyncInstance, Effect<ForDeferredK> {
     override fun <A> runAsync(fa: Kind<ForDeferredK, A>, cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Unit> =
-            fa.extract().runAsync(cb)
+            fa.fix().runAsync(cb)
 }

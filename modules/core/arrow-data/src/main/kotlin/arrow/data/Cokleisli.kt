@@ -21,7 +21,7 @@ typealias CoreaderT<F, A, B> = Cokleisli<F, A, B>
     fun <D> compose(a: Cokleisli<F, D, A>): Cokleisli<F, D, B> = Cokleisli(MM, { run(MM.coflatMap(it, a.run)) })
 
     @JvmName("andThenK")
-    fun <C> andThen(a: Kind<F, C>): Cokleisli<F, A, C> = Cokleisli(MM, { MM.extractM(a) })
+    fun <C> andThen(a: Kind<F, C>): Cokleisli<F, A, C> = Cokleisli(MM, { MM.extract(a) })
 
     fun <C> andThen(a: Cokleisli<F, B, C>): Cokleisli<F, A, C> = a.compose(this)
 
@@ -32,6 +32,6 @@ typealias CoreaderT<F, A, B> = Cokleisli<F, A, B>
 
         inline fun <reified F, A, B> pure(b: B, MF: Comonad<F> = comonad<F>()): Cokleisli<F, A, B> = Cokleisli(MF, { b })
 
-        inline fun <reified F, B> ask(MF: Comonad<F> = comonad<F>()): Cokleisli<F, B, B> = Cokleisli(MF, { MF.extractM(it) })
+        inline fun <reified F, B> ask(MF: Comonad<F> = comonad<F>()): Cokleisli<F, B, B> = Cokleisli(MF, { MF.extract(it) })
     }
 }

@@ -34,7 +34,7 @@ sealed class Eval<out A> : EvalOf<A> {
     companion object {
 
         fun <A, B> tailRecM(a: A, f: (A) -> EvalOf<Either<A, B>>): Eval<B> =
-                f(a).extract().flatMap { eval: Either<A, B> ->
+                f(a).fix().flatMap { eval: Either<A, B> ->
                     when (eval) {
                         is Either.Left -> tailRecM(eval.a, f)
                         is Either.Right -> pure(eval.b)
@@ -157,7 +157,7 @@ sealed class Eval<out A> : EvalOf<A> {
 
     fun <B> map(f: (A) -> B): Eval<B> = flatMap { a -> Now(f(a)) }
 
-    fun <B> ap(ff: EvalOf<(A) -> B>): Eval<B> = ff.extract().flatMap { f -> map(f) }.extract()
+    fun <B> ap(ff: EvalOf<(A) -> B>): Eval<B> = ff.fix().flatMap { f -> map(f) }.fix()
 
     fun <B> flatMap(f: (A) -> EvalOf<B>): Eval<B> =
             when (this) {
@@ -166,22 +166,22 @@ sealed class Eval<out A> : EvalOf<A> {
                     override fun <S> run(s: S): Eval<B> =
                             object : FlatMap<B>() {
                                 override fun <S1> start(): Eval<S1> = (this@Eval).run(s) as Eval<S1>
-                                override fun <S1> run(s1: S1): Eval<B> = f(s1 as A).extract()
+                                override fun <S1> run(s1: S1): Eval<B> = f(s1 as A).fix()
                             }
                 }
                 is Defer<A> -> object : FlatMap<B>() {
                     override fun <S> start(): Eval<S> = this@Eval.thunk() as Eval<S>
-                    override fun <S> run(s: S): Eval<B> = f(s as A).extract()
+                    override fun <S> run(s: S): Eval<B> = f(s as A).fix()
                 }
                 else -> object : FlatMap<B>() {
                     override fun <S> start(): Eval<S> = this@Eval as Eval<S>
-                    override fun <S> run(s: S): Eval<B> = f(s as A).extract()
+                    override fun <S> run(s: S): Eval<B> = f(s as A).fix()
                 }
             }
 
     fun <B> coflatMap(f: (EvalOf<A>) -> B): Eval<B> = Later { f(this) }
 
-    fun extractM(): A = value()
+    fun extract(): A = value()
 
     /**
      * Construct an eager Eval<A> instance. In some sense it is equivalent to using a val.
