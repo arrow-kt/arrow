@@ -41,3 +41,9 @@ interface SortedMapKSemigroupInstance<A : Comparable<A>, B> : Semigroup<SortedMa
 interface SortedMapKMonoidInstance<A : Comparable<A>, B> : SortedMapKSemigroupInstance<A, B>, Monoid<SortedMapKOf<A, B>> {
     override fun empty(): SortedMapK<A, B> = sortedMapOf<A, B>().k()
 }
+
+@instance(SortedMapK::class)
+interface SortedMapKShowInstance<A : Comparable<A>, B> : Show<SortedMapKOf<A, B>> {
+    override fun show(a: SortedMapKOf<A, B>): String =
+            a.toString()
+}

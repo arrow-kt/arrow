@@ -15,6 +15,12 @@ interface IdEqInstance<A> : Eq<Id<A>> {
 }
 
 @instance(Id::class)
+interface IdShowInstance<A> : Show<Id<A>> {
+    override fun show(a: Id<A>): String =
+            Show.fromToString<Id<A>>().show(a)
+}
+
+@instance(Id::class)
 interface IdFunctorInstance : Functor<ForId> {
     override fun <A, B> map(fa: IdOf<A>, f: kotlin.Function1<A, B>): Id<B> =
             fa.extract().map(f)

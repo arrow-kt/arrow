@@ -1,9 +1,6 @@
 package arrow.instances
 
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Order
-import arrow.typeclasses.Semigroup
+import arrow.typeclasses.*
 
 class NumberSemigroup<A : Number>(val f: (A, A) -> A) : Semigroup<A> {
     override fun combine(a: A, b: A): A = f(a, b)
@@ -39,6 +36,14 @@ object ByteEqInstanceImplicits {
     fun instance(): ByteEqInstance = ByteEqInstance
 }
 
+object ByteShowInstance : Show<Byte> {
+    override fun show(a: Byte): String = a.toString()
+}
+
+object ByteShowInstanceImplicits {
+    fun instance(): ByteShowInstance = ByteShowInstance
+}
+
 object DoubleMonoid : Monoid<Double>, Semigroup<Double> by SGDouble {
     override fun empty(): Double = .0
 }
@@ -69,6 +74,14 @@ object DoubleEqInstanceImplicits {
     fun instance(): DoubleEqInstance = DoubleEqInstance
 }
 
+object DoubleShowInstance : Show<Double> {
+    override fun show(a: Double): String = a.toString()
+}
+
+object DoubleShowInstanceImplicits {
+    fun instance(): DoubleShowInstance = DoubleShowInstance
+}
+
 object IntMonoid : Monoid<Int>, Semigroup<Int> by SGInt {
     override fun empty(): Int = 0
 }
@@ -89,6 +102,14 @@ object IntEqInstance : Eq<Int> {
 
 object IntEqInstanceImplicits {
     fun instance(): IntEqInstance = IntEqInstance
+}
+
+object IntShowInstance : Show<Int> {
+    override fun show(a: Int): String = a.toString()
+}
+
+object IntShowInstanceImplicits {
+    fun instance(): IntShowInstance = IntShowInstance
 }
 
 object IntOrderInstance : Order<Int> {
@@ -129,6 +150,14 @@ object LongEqInstanceImplicits {
     fun instance(): LongEqInstance = LongEqInstance
 }
 
+object LongShowInstance : Show<Long> {
+    override fun show(a: Long): String = a.toString()
+}
+
+object LongShowInstanceImplicits {
+    fun instance(): LongShowInstance = LongShowInstance
+}
+
 object ShortMonoid : Monoid<Short>, Semigroup<Short> by SGShort {
     override fun empty(): Short = 0
 }
@@ -159,6 +188,14 @@ object ShortEqInstanceImplicits {
     fun instance(): ShortEqInstance = ShortEqInstance
 }
 
+object ShortShowInstance : Show<Short> {
+    override fun show(a: Short): String = a.toString()
+}
+
+object ShortShowInstanceImplicits {
+    fun instance(): ShortShowInstance = ShortShowInstance
+}
+
 object FloatMonoid : Monoid<Float>, Semigroup<Float> by SGFloat {
     override fun empty(): Float = .0f
 }
@@ -187,4 +224,12 @@ object FloatEqInstance : Eq<Float> {
 
 object FloatEqInstanceImplicits {
     fun instance(): FloatEqInstance = FloatEqInstance
+}
+
+object FloatShowInstance : Show<Float> {
+    override fun show(a: Float): String = a.toString()
+}
+
+object FloatShowInstanceImplicits {
+    fun instance(): FloatShowInstance = FloatShowInstance
 }

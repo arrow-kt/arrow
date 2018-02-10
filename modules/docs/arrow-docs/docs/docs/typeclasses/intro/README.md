@@ -34,6 +34,10 @@ We will list them by their hierarchy.
 
 - [`Alternative`]({{ '/docs/typeclasses/alternative/' | relative_url }}) - has an structure that contains either of two values
 
+##### Show
+
+- [`Show`]({{ '/docs/typeclasses/show/' | relative_url }}) - literal representation of an object
+
 ##### Eq
 
 - [`Eq`]({{ '/docs/typeclasses/eq/' | relative_url }}) - structural equality between two objects
@@ -118,6 +122,6 @@ The Monad Template Library module gives more specialized version of existing typ
 
 - [`Corecursive`]({{ '/docs/typeclasses/corecursive/' | relative_url }}) - traverses a structure forwards from the starting case
 
-- [`Recursive`]({{ '/docs/typeclasses/recursive/' | relative_url }}) - traverses a structure bacKards from the base case
+- [`Recursive`]({{ '/docs/typeclasses/recursive/' | relative_url }}) - traverses a structure backwards from the base case
 
 - [`Birecursive`]({{ '/docs/typeclasses/birecursive/' | relative_url }}) - it is both recursive and corecursive
