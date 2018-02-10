@@ -2,10 +2,7 @@ package arrow.data
 
 import arrow.Kind
 import arrow.test.UnitSpec
-import arrow.test.laws.EqLaws
-import arrow.test.laws.MonadLaws
-import arrow.test.laws.MonoidKLaws
-import arrow.test.laws.TraverseLaws
+import arrow.test.laws.*
 import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
@@ -28,6 +25,7 @@ class SequenceKTest : UnitSpec() {
             semigroup<SequenceK<Int>>() shouldNotBe null
             monoid<SequenceK<Int>>() shouldNotBe null
             eq<SequenceK<Int>>() shouldNotBe null
+            show<SequenceK<Int>>() shouldNotBe null
         }
 
         val eq: Eq<Kind<ForSequenceK, Int>> = object : Eq<Kind<ForSequenceK, Int>> {
@@ -35,8 +33,14 @@ class SequenceKTest : UnitSpec() {
                     a.toList() == b.toList()
         }
 
+        val show: Show<Kind<ForSequenceK, Int>> = object : Show<Kind<ForSequenceK, Int>> {
+            override fun show(a: Kind<ForSequenceK, Int>): String =
+                    a.toList().toString()
+        }
+
         testLaws(
             EqLaws.laws { sequenceOf(it).k() },
+            ShowLaws.laws(show, eq) { sequenceOf(it).k() },
             MonadLaws.laws(SequenceK.monad(), eq),
             MonoidKLaws.laws(SequenceK.monoidK(), applicative, eq),
             TraverseLaws.laws(SequenceK.traverse(), applicative, { n: Int -> SequenceK(sequenceOf(n)) }, eq)
