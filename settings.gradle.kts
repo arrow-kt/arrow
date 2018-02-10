@@ -58,6 +58,9 @@ project(":arrow-validation").projectDir = file("modules/core/arrow-validation")
 include(":arrow-examples")
 project(":arrow-examples").projectDir = file("modules/core/arrow-examples")
 
+include(":arrow-weak")
+project(":arrow-weak").projectDir = file("modules/core/arrow-weak")
+
 /** Effects **/
 
 include(":arrow-effects")

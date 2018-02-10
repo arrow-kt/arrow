@@ -1,6 +1,5 @@
 package arrow.weak
 
-import arrow.HK
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import arrow.test.laws.EqLaws
@@ -11,7 +10,7 @@ import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class WeakTest : UnitSpec() {
-    val EQ: Eq<HK<WeakHK, Int>> = Eq { a, b ->
+    val EQ: Eq<Kind<WeakHK, Int>> = Eq { a, b ->
         a.ev().getOrElse { -1 } == b.ev().getOrElse { -2 }
     }
 
