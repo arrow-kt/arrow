@@ -4,6 +4,7 @@ import io.kotlintest.properties.Gen
 import arrow.core.identity
 import arrow.syntax.either.left
 import arrow.syntax.either.right
+import arrow.typeclasses.Eq
 
 sealed class SumType {
     data class A(val string: String) : SumType()
@@ -56,7 +57,13 @@ internal val userSetter: Setter<User, Token> = Setter { s ->
     { user -> user.copy(token = s(user.token)) }
 }
 
-internal data class Token(val value: String)
+internal data class Token(val value: String) {
+    companion object {
+        fun eq() = object : Eq<Token> {
+            override fun eqv(a: Token, b: Token): Boolean = a == b
+        }
+    }
+}
 internal object TokenGen : Gen<Token> {
     override fun generate() = Token(Gen.string().generate())
 }
@@ -65,6 +72,8 @@ internal data class User(val token: Token)
 internal object UserGen : Gen<User> {
     override fun generate() = User(TokenGen.generate())
 }
+
+internal val tokenGetter: Getter<Token, String> = Getter(Token::value)
 
 internal val userLens: Lens<User, Token> = Lens(
         { user: User -> user.token },

@@ -1,6 +1,7 @@
 package arrow.optics
 
 import arrow.core.*
+import arrow.data.k
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -8,25 +9,55 @@ import arrow.instances.IntMonoid
 import arrow.instances.StringMonoidInstance
 import arrow.syntax.either.left
 import arrow.syntax.either.right
+import arrow.syntax.option.some
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.laws.LensLaws
+import arrow.test.laws.OptionalLaws
+import arrow.test.laws.SetterLaws
+import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
 
 @RunWith(KTestJUnitRunner::class)
 class LensTest : UnitSpec() {
 
     init {
-        testLaws(LensLaws.laws(
-                lens = tokenLens,
-                aGen = TokenGen,
-                bGen = Gen.string(),
-                funcGen = genFunctionAToB(Gen.string()),
-                EQA = Eq.any(),
-                EQB = Eq.any(),
-                MB = StringMonoidInstance
-        ))
+        testLaws(
+                LensLaws.laws(
+                        lens = tokenLens,
+                        aGen = TokenGen,
+                        bGen = Gen.string(),
+                        funcGen = genFunctionAToB(Gen.string()),
+                        EQA = Eq.any(),
+                        EQB = Eq.any(),
+                        MB = StringMonoidInstance
+                ),
+
+                TraversalLaws.laws(
+                        traversal = tokenLens.asTraversal(),
+                        aGen = TokenGen,
+                        bGen = Gen.string(),
+                        funcGen = genFunctionAToB(Gen.string()),
+                        EQA = Token.eq()
+                ),
+
+                OptionalLaws.laws(
+                        optional = tokenLens.asOptional(),
+                        aGen = TokenGen,
+                        bGen = Gen.string(),
+                        funcGen = genFunctionAToB(Gen.string()),
+                        EQA = Token.eq()
+                ),
+
+                SetterLaws.laws(
+                        setter = tokenLens.asSetter(),
+                        aGen = TokenGen,
+                        bGen = Gen.string(),
+                        funcGen = genFunctionAToB(Gen.string()),
+                        EQA = Token.eq()
+                )
+        )
 
         testLaws(LensLaws.laws(
                 lens = Lens.id(),
@@ -37,6 +68,72 @@ class LensTest : UnitSpec() {
                 EQB = Eq.any(),
                 MB = IntMonoid
         ))
+
+        "asFold should behave as valid Fold: size" {
+            forAll(TokenGen) { token ->
+                tokenLens.asFold().size(token) == 1
+            }
+        }
+
+        "asFold should behave as valid Fold: nonEmpty" {
+            forAll(TokenGen) { token ->
+                tokenLens.asFold().nonEmpty(token)
+            }
+        }
+
+        "asFold should behave as valid Fold: isEmpty" {
+            forAll(TokenGen) { token ->
+                !tokenLens.asFold().isEmpty(token)
+            }
+        }
+
+        "asFold should behave as valid Fold: getAll" {
+            forAll(TokenGen) { token ->
+                tokenLens.asFold().getAll(token) == listOf(token.value).k()
+            }
+        }
+
+        "asFold should behave as valid Fold: combineAll" {
+            forAll(TokenGen) { token ->
+                tokenLens.asFold().combineAll(token) == token.value
+            }
+        }
+
+        "asFold should behave as valid Fold: fold" {
+            forAll(TokenGen) { token ->
+                tokenLens.asFold().fold(token) == token.value
+            }
+        }
+
+        "asFold should behave as valid Fold: headOption" {
+            forAll(TokenGen) { token ->
+                tokenLens.asFold().headOption(token) == token.value.some()
+            }
+        }
+
+        "asFold should behave as valid Fold: lastOption" {
+            forAll(TokenGen) { token ->
+                tokenLens.asFold().lastOption(token) == token.value.some()
+            }
+        }
+
+        "asGetter should behave as valid Getter: get" {
+            forAll(TokenGen) { token ->
+                tokenLens.asGetter().get(token) ==  tokenGetter.get(token)
+            }
+        }
+
+        "asGetter should behave as valid Getter: find" {
+            forAll(TokenGen, genFunctionAToB<String, Boolean>(Gen.bool())) { token, p ->
+                tokenLens.asGetter().find(token, p) == tokenGetter.find(token, p)
+            }
+        }
+
+        "asGetter should behave as valid Getter: exist" {
+            forAll(TokenGen, genFunctionAToB<String, Boolean>(Gen.bool())) { token, p ->
+                tokenLens.asGetter().exist(token, p) == tokenGetter.exist(token, p)
+            }
+        }
 
         "Lifting a function should yield the same result as not yielding" {
             forAll(TokenGen, Gen.string(), { token, value ->
