@@ -21,14 +21,14 @@ import arrow.syntax.either.*
 IO.async()
   .async { callback: (Either<Throwable, Int>) -> Unit -> 
     callback(1.right()) 
-  }.extract().attempt().unsafeRunSync()
+  }.fix().attempt().unsafeRunSync()
 ```
 
 ```kotlin:ank
 IO.async()
   .async { callback: (Either<Throwable, Int>) -> Unit -> 
     callback(RuntimeException().left()) 
-  }.extract().attempt().unsafeRunSync()
+  }.fix().attempt().unsafeRunSync()
 ```
 
 `Async` includes all combinators present in [`MonadSuspend`]({{ '/docs/effects/monadsuspend/' | relative_url }}).
@@ -97,7 +97,7 @@ Note that there is no automatic error handling or wrapping of exceptions.
 IO.monad().binding {
   val a = bindAsync(IO.async()) { fibonacci(100) }
   a + 1
-}.extract().unsafeRunSync()
+}.fix().unsafeRunSync()
 ```
 
 #### binding#bindAsyncUnsafe
@@ -111,14 +111,14 @@ While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/d
 IO.monad().binding {
   val a = bindAsync(IO.async()) { fibonacci(100).left() }
   a + 1
-}.extract().unsafeRunSync()
+}.fix().unsafeRunSync()
 ```
 
 ```kotlin
 IO.monad().binding {
   val a = bindAsync(IO.async()) { RuntimeException("Boom").right() }
   a + 1
-}.extract().unsafeRunSync()
+}.fix().unsafeRunSync()
 ```
 
 ### Laws
