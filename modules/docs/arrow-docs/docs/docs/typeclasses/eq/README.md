@@ -81,7 +81,7 @@ See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | rela
 
 ### Data types
 
-Most of the datatypes in Arrow provide instances adhere to the `Eq` typeclass.
+Most of the datatypes in Arrow that are not related to functions provide instances of the `Eq` typeclass.
 
 - [`Id`]({{ '/docs/datatypes/id/' | relative_url }})
 - [`Option`]({{ '/docs/datatypes/option/' | relative_url }})
