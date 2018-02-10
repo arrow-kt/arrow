@@ -28,6 +28,12 @@ interface ListKEqInstance<A> : Eq<ListK<A>> {
 }
 
 @instance(ListK::class)
+interface ListKShowInstance<A> : Show<ListK<A>> {
+    override fun show(a: ListK<A>): String =
+            a.toString()
+}
+
+@instance(ListK::class)
 interface ListKFunctorInstance : Functor<ForListK> {
     override fun <A, B> map(fa: ListKOf<A>, f: kotlin.Function1<A, B>): ListK<B> =
             fa.extract().map(f)
