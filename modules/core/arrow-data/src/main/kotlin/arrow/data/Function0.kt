@@ -18,7 +18,7 @@ data class Function0<out A>(internal val f: () -> A) : Function0Of<A> {
 
     fun <B> ap(ff: Function0Of<(A) -> B>): Function0<B> = ff.fix().flatMap { f -> map(f) }.fix()
 
-    fun extractM(): A = f()
+    fun extract(): A = f()
 
     companion object {
 

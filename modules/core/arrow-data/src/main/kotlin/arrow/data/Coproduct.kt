@@ -15,7 +15,7 @@ import arrow.typeclasses.*
                     { CG.coflatMap(it, { f(Coproduct(Right(it))) }) }
             ))
 
-    fun extractM(CF: Comonad<F>, CG: Comonad<G>): A = run.fold({ CF.extractM(it) }, { CG.extractM(it) })
+    fun extract(CF: Comonad<F>, CG: Comonad<G>): A = run.fold({ CF.extract(it) }, { CG.extract(it) })
 
     fun <H> fold(f: FunctionK<F, H>, g: FunctionK<G, H>): Kind<H, A> = run.fold({ f(it) }, { g(it) })
 

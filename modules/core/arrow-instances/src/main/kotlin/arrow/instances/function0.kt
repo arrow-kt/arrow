@@ -46,8 +46,8 @@ interface Function0ComonadInstance : Comonad<ForFunction0> {
     override fun <A, B> coflatMap(fa: Function0Of<A>, f: kotlin.Function1<Function0Of<A>, B>): Function0<B> =
             fa.fix().coflatMap(f)
 
-    override fun <A> extractM(fa: Function0Of<A>): A =
-            fa.fix().extractM()
+    override fun <A> extract(fa: Function0Of<A>): A =
+            fa.fix().extract()
 
     override fun <A, B> map(fa: Function0Of<A>, f: kotlin.Function1<A, B>): Function0<B> =
             fa.fix().map(f)
@@ -73,6 +73,6 @@ interface Function0BimonadInstance : Bimonad<ForFunction0> {
     override fun <A, B> coflatMap(fa: Function0Of<A>, f: kotlin.Function1<Function0Of<A>, B>): Function0<B> =
             fa.fix().coflatMap(f)
 
-    override fun <A> extractM(fa: Function0Of<A>): A =
-            fa.fix().extractM()
+    override fun <A> extract(fa: Function0Of<A>): A =
+            fa.fix().extract()
 }

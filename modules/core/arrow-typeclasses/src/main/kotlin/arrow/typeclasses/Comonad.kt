@@ -16,7 +16,7 @@ interface Comonad<F> : Functor<F>, TC {
 
     fun <A, B> coflatMap(fa: Kind<F, A>, f: (Kind<F, A>) -> B): Kind<F, B>
 
-    fun <A> extractM(fa: Kind<F, A>): A
+    fun <A> extract(fa: Kind<F, A>): A
 
     fun <A> duplicate(fa: Kind<F, A>): Kind<F, Kind<F, A>> = coflatMap(fa, { it })
 }
@@ -38,9 +38,9 @@ open class ComonadContinuation<F, A : Any>(val CM: Comonad<F>, override val cont
 
     suspend fun <B> extract(m: () -> Kind<F, B>): B = suspendCoroutineOrReturn { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels
-        returnedMonad = CM.extractM(CM.coflatMap(m(), { x: Kind<F, B> ->
+        returnedMonad = CM.extract(CM.coflatMap(m(), { x: Kind<F, B> ->
             c.stackLabels = labelHere
-            c.resume(CM.extractM(x))
+            c.resume(CM.extract(x))
             returnedMonad
         }))
         COROUTINE_SUSPENDED

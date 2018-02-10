@@ -70,8 +70,8 @@ interface NonEmptyListComonadInstance : Comonad<ForNonEmptyList> {
     override fun <A, B> coflatMap(fa: NonEmptyListOf<A>, f: kotlin.Function1<NonEmptyListOf<A>, B>): NonEmptyList<B> =
             fa.fix().coflatMap(f)
 
-    override fun <A> extractM(fa: NonEmptyListOf<A>): A =
-            fa.fix().extractM()
+    override fun <A> extract(fa: NonEmptyListOf<A>): A =
+            fa.fix().extract()
 
     override fun <A, B> map(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
             fa.fix().map(f)
@@ -97,8 +97,8 @@ interface NonEmptyListBimonadInstance : Bimonad<ForNonEmptyList> {
     override fun <A, B> coflatMap(fa: NonEmptyListOf<A>, f: kotlin.Function1<NonEmptyListOf<A>, B>): NonEmptyList<B> =
             fa.fix().coflatMap(f)
 
-    override fun <A> extractM(fa: NonEmptyListOf<A>): A =
-            fa.fix().extractM()
+    override fun <A> extract(fa: NonEmptyListOf<A>): A =
+            fa.fix().extract()
 }
 
 @instance(NonEmptyList::class)

@@ -51,8 +51,8 @@ interface Tuple2ComonadInstance<F> : Tuple2FunctorInstance<F>, Comonad<Tuple2Par
     override fun <A, B> coflatMap(fa: Tuple2Of<F, A>, f: (Tuple2Of<F, A>) -> B) =
             fa.fix().coflatMap(f)
 
-    override fun <A> extractM(fa: Tuple2Of<F, A>) =
-            fa.fix().extractM()
+    override fun <A> extract(fa: Tuple2Of<F, A>) =
+            fa.fix().extract()
 }
 
 @instance(Tuple2::class)

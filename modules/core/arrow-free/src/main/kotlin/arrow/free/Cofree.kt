@@ -37,7 +37,7 @@ typealias CofreeEval<S, A> = Kind<S, Cofree<S, A>>
 
     fun run(): Cofree<S, A> = Cofree(FS, head, Eval.now(tail.map { FS.map(it, { it.run() }) }.value()))
 
-    fun extractM(): A = head
+    fun extract(): A = head
 
     companion object {
         inline fun <reified S, A> unfold(a: A, noinline f: (A) -> Kind<S, A>, FS: Functor<S> = arrow.typeclasses.functor<S>()): Cofree<S, A> = create(a, f, FS)
@@ -49,7 +49,7 @@ typealias CofreeEval<S, A> = Kind<S, Cofree<S, A>>
 
 fun <F, A, B> Cofree<F, A>.cata(folder: (A, Kind<F, B>) -> Eval<B>, TF: Traverse<F>): Eval<B> {
     val ev: Eval<Kind<F, B>> = TF.traverse(this.tailForced(), { it.cata(folder, TF) }, applicative()).fix()
-    return ev.flatMap { folder(extractM(), it) }
+    return ev.flatMap { folder(extract(), it) }
 }
 
 fun <F, M, A, B> Cofree<F, A>.cataM(folder: (A, Kind<F, B>) -> Kind<M, B>, inclusion: FunctionK<ForEval, M>, TF: Traverse<F>, MM: Monad<M>): Kind<M, B> {

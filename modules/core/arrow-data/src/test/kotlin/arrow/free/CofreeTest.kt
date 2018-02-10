@@ -60,7 +60,7 @@ class CofreeTest : UnitSpec() {
             sideEffect.counter shouldBe 0
             start.run()
             sideEffect.counter shouldBe 6
-            start.extractM() shouldBe 0
+            start.extract() shouldBe 0
         }
 
         "run with an stack-unsafe monad should blow up the stack" {

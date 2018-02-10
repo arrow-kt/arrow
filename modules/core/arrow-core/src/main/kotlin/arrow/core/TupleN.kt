@@ -16,7 +16,7 @@ data class Tuple2<out A, out B>(val a: A, val b: B) : Tuple2Of<A, B> {
     fun <C> coflatMap(f: (Tuple2Of<A, B>) -> C) =
             a toT f(this)
 
-    fun extractM() =
+    fun extract() =
             b
 
     fun <C> foldL(b: C, f: (C, B) -> C) =

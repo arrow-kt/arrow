@@ -1,8 +1,9 @@
 package arrow.instances
 
-import arrow.*
-import arrow.core.*
+import arrow.Kind
+import arrow.core.Eval
 import arrow.data.*
+import arrow.instance
 import arrow.typeclasses.*
 
 @instance(SortedMapK::class)
@@ -13,17 +14,17 @@ interface SortedMapKFunctorInstance<A : Comparable<A>> : Functor<SortedMapKParti
 
 @instance(SortedMapK::class)
 interface SortedMapKFoldableInstance<A : Comparable<A>> : Foldable<SortedMapKPartialOf<A>> {
-    override fun <B, C> foldLeft(fb: Kind<SortedMapKPartialOf<A>, B>, c: C, f: (C, B) -> C): C =
-            fb.fix().foldLeft(c, f)
+    override fun <B, C> foldLeft(fa: Kind<SortedMapKPartialOf<A>, B>, b: C, f: (C, B) -> C): C =
+            fa.fix().foldLeft(b, f)
 
-    override fun <B, C> foldRight(fb: Kind<SortedMapKPartialOf<A>, B>, lc: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
-            fb.fix().foldRight(lc, f)
+    override fun <B, C> foldRight(fa: Kind<SortedMapKPartialOf<A>, B>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
+            fa.fix().foldRight(lb, f)
 }
 
 @instance(SortedMapK::class)
 interface SortedMapKTraverseInstance<A : Comparable<A>> : SortedMapKFoldableInstance<A>, Traverse<SortedMapKPartialOf<A>> {
-    override fun <G, B, C> traverse(fb: Kind<SortedMapKPartialOf<A>, B>, f: (B) -> Kind<G, C>, GA: Applicative<G>): Kind<G, Kind<SortedMapKPartialOf<A>, C>> =
-            fb.fix().traverse(f, GA)
+    override fun <G, B, C> traverse(fa: Kind<SortedMapKPartialOf<A>, B>, f: (B) -> Kind<G, C>, GA: Applicative<G>): Kind<G, Kind<SortedMapKPartialOf<A>, C>> =
+            fa.fix().traverse(f, GA)
 }
 
 @instance(SortedMapK::class)
