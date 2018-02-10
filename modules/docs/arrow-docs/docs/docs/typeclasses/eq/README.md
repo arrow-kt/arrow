@@ -87,13 +87,13 @@ Most of the datatypes in Arrow that are not related to functions provide instanc
 - [`Option`]({{ '/docs/datatypes/option/' | relative_url }})
 - [`Either`]({{ '/docs/datatypes/either/' | relative_url }})
 - [`Eval`]({{ '/docs/datatypes/eval/' | relative_url }})
-- `TupleN` - a heterogeneous grouping of 2-9 values without creating a named class
+- `TupleN`
 - [`NonEmptyList`]({{ '/docs/datatypes/nonemptylist/' | relative_url }})
 - [`Ior`]({{ '/docs/datatypes/ior/' | relative_url }})
 - [`Const`]({{ '/docs/datatypes/const/' | relative_url }})
 - [`Coproduct`]({{ '/docs/datatypes/coproduct/' | relative_url }})
 - [`Try`]({{ '/docs/datatypes/try/' | relative_url }})
-- [`Validated`]({{ '/docs/datatypes/validated/' | relative_url }}) - returns the result of aggregating multiple calculations that can fail, and it also aggregates the errors
+- [`Validated`]({{ '/docs/datatypes/validated/' | relative_url }})
 - [`Free`]({{ '/docs/datatypes/free' | relative_url }})
 - [`FreeApplicative`]({{ '/docs/datatypes/FreeApplicative' | relative_url }})
 - [`ListK`]({{ '/docs/datatypes/listK/' | relative_url }})
