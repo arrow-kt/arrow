@@ -2,7 +2,7 @@ package arrow.optics
 
 import arrow.core.Option
 import arrow.core.eq
-import arrow.data.ListKW
+import arrow.data.ListK
 import arrow.data.eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
@@ -48,7 +48,7 @@ class TupleInstancesTest : UnitSpec() {
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
                 EQOptionB = Option.eq(Eq.any()),
-                EQListB = ListKW.eq(Eq.any())
+                EQListB = ListK.eq(Eq.any())
         ))
 
         testLaws(TraversalLaws.laws(
@@ -58,7 +58,7 @@ class TupleInstancesTest : UnitSpec() {
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
                 EQOptionB = Option.eq(Eq.any()),
-                EQListB = ListKW.eq(Eq.any())
+                EQListB = ListK.eq(Eq.any())
         ))
 
         testLaws(TraversalLaws.laws(
@@ -68,7 +68,7 @@ class TupleInstancesTest : UnitSpec() {
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
                 EQOptionB = Option.eq(Eq.any()),
-                EQListB = ListKW.eq(Eq.any())
+                EQListB = ListK.eq(Eq.any())
         ))
 
         testLaws(TraversalLaws.laws(
@@ -78,7 +78,7 @@ class TupleInstancesTest : UnitSpec() {
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
                 EQOptionB = Option.eq(Eq.any()),
-                EQListB = ListKW.eq(Eq.any())
+                EQListB = ListK.eq(Eq.any())
         ))
 
         testLaws(TraversalLaws.laws(
@@ -88,7 +88,7 @@ class TupleInstancesTest : UnitSpec() {
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
                 EQOptionB = Option.eq(Eq.any()),
-                EQListB = ListKW.eq(Eq.any())
+                EQListB = ListK.eq(Eq.any())
         ))
 
         testLaws(TraversalLaws.laws(
@@ -98,7 +98,7 @@ class TupleInstancesTest : UnitSpec() {
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
                 EQOptionB = Option.eq(Eq.any()),
-                EQListB = ListKW.eq(Eq.any())
+                EQListB = ListK.eq(Eq.any())
         ))
 
         testLaws(TraversalLaws.laws(
@@ -108,7 +108,7 @@ class TupleInstancesTest : UnitSpec() {
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
                 EQOptionB = Option.eq(Eq.any()),
-                EQListB = ListKW.eq(Eq.any())
+                EQListB = ListK.eq(Eq.any())
         ))
 
         testLaws(TraversalLaws.laws(
@@ -118,7 +118,7 @@ class TupleInstancesTest : UnitSpec() {
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
                 EQOptionB = Option.eq(Eq.any()),
-                EQListB = ListKW.eq(Eq.any())
+                EQListB = ListK.eq(Eq.any())
         ))
 
         testLaws(TraversalLaws.laws(
@@ -128,7 +128,7 @@ class TupleInstancesTest : UnitSpec() {
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
                 EQOptionB = Option.eq(Eq.any()),
-                EQListB = ListKW.eq(Eq.any())
+                EQListB = ListK.eq(Eq.any())
         ))
 
     }

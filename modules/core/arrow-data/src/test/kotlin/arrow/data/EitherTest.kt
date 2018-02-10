@@ -1,12 +1,9 @@
 package arrow.data
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.*
 import arrow.test.UnitSpec
-import arrow.test.laws.EqLaws
-import arrow.test.laws.MonadErrorLaws
-import arrow.test.laws.SemigroupKLaws
-import arrow.test.laws.TraverseLaws
+import arrow.test.laws.*
 import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
@@ -15,26 +12,28 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class EitherTest : UnitSpec() {
-    val EQ: Eq<HK<EitherKindPartial<IdHK>, Int>> = Eq { a, b ->
-        a.ev() == b.ev()
+    val EQ: Eq<Kind<EitherPartialOf<ForId>, Int>> = Eq { a, b ->
+        a.fix() == b.fix()
     }
 
     init {
 
         "instances can be resolved implicitly" {
-            functor<EitherKindPartial<Throwable>>() shouldNotBe null
-            applicative<EitherKindPartial<Throwable>>() shouldNotBe null
-            monad<EitherKindPartial<Throwable>>() shouldNotBe null
-            foldable<EitherKindPartial<Throwable>>() shouldNotBe null
-            traverse<EitherKindPartial<Throwable>>() shouldNotBe null
-            applicativeError<EitherKindPartial<Throwable>, Throwable>() shouldNotBe null
-            monadError<EitherKindPartial<Throwable>, Throwable>() shouldNotBe null
-            semigroupK<EitherKindPartial<Throwable>>() shouldNotBe null
+            functor<EitherPartialOf<Throwable>>() shouldNotBe null
+            applicative<EitherPartialOf<Throwable>>() shouldNotBe null
+            monad<EitherPartialOf<Throwable>>() shouldNotBe null
+            foldable<EitherPartialOf<Throwable>>() shouldNotBe null
+            traverse<EitherPartialOf<Throwable>>() shouldNotBe null
+            applicativeError<EitherPartialOf<Throwable>, Throwable>() shouldNotBe null
+            monadError<EitherPartialOf<Throwable>, Throwable>() shouldNotBe null
+            semigroupK<EitherPartialOf<Throwable>>() shouldNotBe null
             eq<Either<String, Int>>() shouldNotBe null
+            show<Either<String, Int>>() shouldNotBe null
         }
 
         testLaws(
             EqLaws.laws(eq<Either<String, Int>>(), { Right(it) }),
+            ShowLaws.laws(show<Either<String, Int>>(), eq<Either<String, Int>>(), { Right(it) }),
             MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()),
             TraverseLaws.laws(Either.traverse<Throwable>(), Either.applicative(), { Right(it) }, Eq.any()),
             SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ)

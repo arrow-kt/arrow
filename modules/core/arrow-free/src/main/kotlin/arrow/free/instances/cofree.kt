@@ -1,20 +1,25 @@
 package arrow.free.instances
 
-import arrow.*
-import arrow.free.*
+import arrow.Kind
+import arrow.TC
+import arrow.free.Cofree
+import arrow.free.CofreeOf
+import arrow.free.CofreePartialOf
+import arrow.free.fix
+import arrow.instance
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
 
 @instance(Cofree::class)
-interface CofreeFunctorInstance<S> : Functor<CofreeKindPartial<S>>, TC {
-    override fun <A, B> map(fa: CofreeKind<S, A>, f: (A) -> B): Cofree<S, B> = fa.ev().map(f)
+interface CofreeFunctorInstance<S> : Functor<CofreePartialOf<S>>, TC {
+    override fun <A, B> map(fa: CofreeOf<S, A>, f: (A) -> B): Cofree<S, B> = fa.fix().map(f)
 }
 
 @instance(Cofree::class)
-interface CofreeComonadInstance<S> : CofreeFunctorInstance<S>, Comonad<CofreeKindPartial<S>>, TC {
-    override fun <A, B> coflatMap(fa: CofreeKind<S, A>, f: (CofreeKind<S, A>) -> B): Cofree<S, B> = fa.ev().coflatMap(f)
+interface CofreeComonadInstance<S> : CofreeFunctorInstance<S>, Comonad<CofreePartialOf<S>>, TC {
+    override fun <A, B> coflatMap(fa: CofreeOf<S, A>, f: (CofreeOf<S, A>) -> B): Cofree<S, B> = fa.fix().coflatMap(f)
 
-    override fun <A> extract(fa: CofreeKind<S, A>): A = fa.ev().extract()
+    override fun <A> extract(fa: CofreeOf<S, A>): A = fa.fix().extract()
 
-    override fun <A> duplicate(fa: CofreeKind<S, A>): HK<CofreeKindPartial<S>, Cofree<S, A>> = fa.ev().duplicate()
+    override fun <A> duplicate(fa: CofreeOf<S, A>): Kind<CofreePartialOf<S>, Cofree<S, A>> = fa.fix().duplicate()
 }

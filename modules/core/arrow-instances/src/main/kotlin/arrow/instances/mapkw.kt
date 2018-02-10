@@ -5,53 +5,53 @@ import arrow.core.*
 import arrow.data.*
 import arrow.typeclasses.*
 
-@instance(MapKW::class)
-interface MapKWFunctorInstance<K> : Functor<MapKWKindPartial<K>> {
-    override fun <A, B> map(fa: HK<MapKWKindPartial<K>, A>, f: (A) -> B): MapKW<K, B> = fa.ev().map(f)
+@instance(MapK::class)
+interface MapKFunctorInstance<K> : Functor<MapKPartialOf<K>> {
+    override fun <A, B> map(fa: Kind<MapKPartialOf<K>, A>, f: (A) -> B): MapK<K, B> = fa.fix().map(f)
 }
 
-@instance(MapKW::class)
-interface MapKWFoldableInstance<K> : Foldable<MapKWKindPartial<K>> {
+@instance(MapK::class)
+interface MapKFoldableInstance<K> : Foldable<MapKPartialOf<K>> {
 
-    override fun <A, B> foldLeft(fa: HK<MapKWKindPartial<K>, A>, b: B, f: (B, A) -> B): B = fa.ev().foldLeft(b, f)
+    override fun <A, B> foldLeft(fa: Kind<MapKPartialOf<K>, A>, b: B, f: (B, A) -> B): B = fa.fix().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: HK<MapKWKindPartial<K>, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            fa.ev().foldRight(lb, f)
+    override fun <A, B> foldRight(fa: Kind<MapKPartialOf<K>, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+            fa.fix().foldRight(lb, f)
 }
 
-@instance(MapKW::class)
-interface MapKWTraverseInstance<K> : MapKWFoldableInstance<K>, Traverse<MapKWKindPartial<K>> {
+@instance(MapK::class)
+interface MapKTraverseInstance<K> : MapKFoldableInstance<K>, Traverse<MapKPartialOf<K>> {
 
-    override fun <G, A, B> traverse(fa: HK<MapKWKindPartial<K>, A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, HK<MapKWKindPartial<K>, B>> =
-            fa.ev().traverse(f, GA)
+    override fun <G, A, B> traverse(fa: Kind<MapKPartialOf<K>, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Kind<MapKPartialOf<K>, B>> =
+            fa.fix().traverse(f, GA)
 }
 
-@instance(MapKW::class)
-interface MapKWSemigroupInstance<K, A> : Semigroup<MapKWKind<K, A>> {
+@instance(MapK::class)
+interface MapKSemigroupInstance<K, A> : Semigroup<MapKOf<K, A>> {
 
     fun SG(): Semigroup<A>
 
-    override fun combine(a: MapKWKind<K, A>, b: MapKWKind<K, A>): MapKW<K, A> =
-            if (a.ev().size < b.ev().size) a.ev().foldLeft<A>(b.ev(), { my, (k, b) -> my.updated(k, SG().maybeCombine(b, my.get(k))) })
-            else b.ev().foldLeft<A>(a.ev(), { my, (k, a) -> my.updated(k, SG().maybeCombine(a, my.get(k))) })
+    override fun combine(a: MapKOf<K, A>, b: MapKOf<K, A>): MapK<K, A> =
+            if (a.fix().size < b.fix().size) a.fix().foldLeft<A>(b.fix(), { my, (k, b) -> my.updated(k, SG().maybeCombine(b, my.get(k))) })
+            else b.fix().foldLeft<A>(a.fix(), { my, (k, a) -> my.updated(k, SG().maybeCombine(a, my.get(k))) })
 
 }
 
-@instance(MapKW::class)
-interface MapKWMonoidInstance<K, A> : MapKWSemigroupInstance<K, A>, Monoid<MapKWKind<K, A>> {
+@instance(MapK::class)
+interface MapKMonoidInstance<K, A> : MapKSemigroupInstance<K, A>, Monoid<MapKOf<K, A>> {
 
-    override fun empty(): MapKW<K, A> = emptyMap<K, A>().k()
+    override fun empty(): MapK<K, A> = emptyMap<K, A>().k()
 }
 
-@instance(MapKW::class)
-interface MapKWEqInstance<K, A> : Eq<MapKW<K, A>> {
+@instance(MapK::class)
+interface MapKEqInstance<K, A> : Eq<MapK<K, A>> {
 
     fun EQK(): Eq<K>
 
     fun EQA(): Eq<A>
 
-    override fun eqv(a: MapKW<K, A>, b: MapKW<K, A>): Boolean =
-            if (SetKWEqInstanceImplicits.instance(EQK()).eqv(a.keys.k(), b.keys.k())) {
+    override fun eqv(a: MapK<K, A>, b: MapK<K, A>): Boolean =
+            if (SetKEqInstanceImplicits.instance(EQK()).eqv(a.keys.k(), b.keys.k())) {
                 a.keys.map { key ->
                     b[key]?.let {
                         EQA().eqv(a.getValue(key), it)
@@ -59,4 +59,10 @@ interface MapKWEqInstance<K, A> : Eq<MapKW<K, A>> {
                 }.fold(true) { b1, b2 -> b1 && b2 }
             } else false
 
+}
+
+@instance(MapK::class)
+interface MapKShowInstance<K, A> : Show<MapK<K, A>> {
+    override fun show(a: MapK<K, A>): String =
+            a.toString()
 }

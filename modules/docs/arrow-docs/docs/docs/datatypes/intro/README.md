@@ -11,7 +11,7 @@ These solutions have a canonical implementation that is generalised for all poss
 
 A datatype is implemented by a data class, or a sealed hierarchy of data classes and objects.
 These datatypes are generalised by having one or several generic parameters,
-and to become a [type constructor]({{ '/docs/patterns/glossary/' | relative_url }}) they implement the interface [`HK`]({{ '/docs/patterns/glossary/' | relative_url }}) for these generic parameters.
+and to become a [type constructor]({{ '/docs/patterns/glossary/' | relative_url }}) they implement the interface [`Kind`]({{ '/docs/patterns/glossary/' | relative_url }}) for these generic parameters.
 Datatypes work over themselves, never directly over the values defined by its generic parameters.
 
 #### Example
@@ -19,7 +19,8 @@ Datatypes work over themselves, never directly over the values defined by its ge
 `Option<A>` is a datatype that represents absence.
 It has one generic parameter `A`, representing the type of the values that `Option` may contain.
 `Option` can be specialized for any type `A` because this type does not affect its behavior.
-`Option` behaves the same for `Int`, `String` or `DomainUserClass`. To indicate that `Option` is a [type constructor]({{ '/docs/patterns/glossary/' | relative_url }}) for all values of `A` it implements `OptionKind<A>`, which is a typealias of `HK<OptionHK, A>`.
+`Option` behaves the same for `Int`, `String` or `DomainUserClass`.
+To indicate that `Option` is a [type constructor]({{ '/docs/patterns/glossary/' | relative_url }}) for all values of `A` it implements `OptionOf<A>`, which is a typealias of `Kind<ForOption, A>`.
 
 The implementation of `Option<A>` is a sealed class with two subtypes: an object `None` and a data class `Some<A>`.
 `Some<A>` represents presence of the value and thus it has one field containing it, and `None` represents absence.
@@ -30,7 +31,7 @@ The implementation of `fold()` is a simple `when` that checks whether `this` is 
 
 All other functions provided by `Option` are implemented by using `fold()`, making for idiomatic helper functions like `getOrNull`, `getOrElse`, or `map`. These functions work for any value of `A` and `B`. This way, what `Option` does for each individual case of `String`, `Int` or absence is up to the functions passed by the user.
 
-Feel free to explore the [implementation of `Option`](https://github.com/arrow-kt/arrow/blob/master/arrow-core/src/main/kotlin/arrow/core/Option.kt) and other datatypes to discover their behavior!
+Feel free to explore the [implementation of `Option`](https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-core/src/main/kotlin/arrow/core/Option.kt) and [other datatypes](https://github.com/arrow-kt/arrow/tree/master/modules/core/arrow-data/src/main/kotlin/arrow/data) to discover their behavior!
 
 ### Datatypes in Arrow
 
@@ -85,15 +86,15 @@ Data contains the bulk of the datatypes provided by Arrow. We can separate them 
 
 These types wrap over some of Kotlin's collections and functions to give them capabilities related to [typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}) provided by Arrow.
 
-- [`ListKW`]({{ '/docs/datatypes/listkw/' | relative_url }})
+- [`ListK`]({{ '/docs/datatypes/listK/' | relative_url }})
 
-- [`SequenceKW`]({{ '/docs/datatypes/sequencekw/' | relative_url }})
+- [`SequenceK`]({{ '/docs/datatypes/sequenceK/' | relative_url }})
 
-- [`SetKW`]({{ '/docs/datatypes/setkw/' | relative_url }})
+- [`SetK`]({{ '/docs/datatypes/setK/' | relative_url }})
 
-- [`MapKW`]({{ '/docs/datatypes/mapkw/' | relative_url }}) 
+- [`MapK`]({{ '/docs/datatypes/mapK/' | relative_url }}) 
 
-- [`SortedMapKW`]({{ '/docs/datatypes/sortedmapkw/' | relative_url }})
+- [`SortedMapK`]({{ '/docs/datatypes/sortedmapK/' | relative_url }})
 
 - [`Function0`]({{ '/docs/datatypes/function0/' | relative_url }})
 

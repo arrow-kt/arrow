@@ -6,27 +6,27 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-class SequenceKWInstances {
+class SequenceKInstances {
 
     @Provides
-    fun sequenceKWFunctor(): Functor<SequenceKWHK> = SequenceKW.functor()
+    fun sequenceKFunctor(): Functor<ForSequenceK> = SequenceK.functor()
 
     @Provides
-    fun sequenceKWApplicative(): Applicative<SequenceKWHK> = SequenceKW.applicative()
+    fun sequenceKApplicative(): Applicative<ForSequenceK> = SequenceK.applicative()
 
     @Provides
-    fun sequenceKWMonad(): Monad<SequenceKWHK> = SequenceKW.monad()
+    fun sequenceKMonad(): Monad<ForSequenceK> = SequenceK.monad()
 
     @Provides
-    fun sequenceKWFoldable(): Foldable<SequenceKWHK> = SequenceKW.foldable()
+    fun sequenceKFoldable(): Foldable<ForSequenceK> = SequenceK.foldable()
 
     @Provides
-    fun sequenceKWTraverse(): Traverse<SequenceKWHK> = SequenceKW.traverse()
+    fun sequenceKTraverse(): Traverse<ForSequenceK> = SequenceK.traverse()
 
     @Provides
-    fun sequenceKWMonoidK(): MonoidK<SequenceKWHK> = SequenceKW.monoidK()
+    fun sequenceKMonoidK(): MonoidK<ForSequenceK> = SequenceK.monoidK()
 
     @Provides
-    fun sequenceKWSemigroupK(): SemigroupK<SequenceKWHK> = SequenceKW.semigroupK()
+    fun sequenceKSemigroupK(): SemigroupK<ForSequenceK> = SequenceK.semigroupK()
 
 }

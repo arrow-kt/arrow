@@ -47,7 +47,7 @@ This is also true if we define our own instances. As an example, let's use `Fold
 ```kotlin:ank
 import arrow.data.*
 
-ListKW.foldable().foldMap(
+ListK.foldable().foldMap(
   monoid<Int>(),
   listOf(1, 2, 3, 4, 5).k(),
   ::identity
@@ -55,7 +55,7 @@ ListKW.foldable().foldMap(
 ```
 
 ```kotlin:ank
-ListKW.foldable().foldMap(
+ListK.foldable().foldMap(
   monoid<String>(),
   listOf(1, 2, 3, 4, 5).k(),
   { it.toString() }
@@ -83,7 +83,7 @@ import arrow.instances.*
 
 val M = monoidTuple(IntMonoid, StringMonoid)
 val list = listOf(1, 1).k()
-ListKW.foldable().foldMap(M, list, { n: Int -> 
+ListK.foldable().foldMap(M, list, { n: Int -> 
    Tuple2(n, n.toString()) 
 })
 ```

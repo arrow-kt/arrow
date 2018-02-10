@@ -18,7 +18,7 @@ typealias Setter<S, A> = PSetter<S, S, A, A>
  * i.e. PSetter<List<Int>, List<String>, Int, String>
  *
  * A [PSetter] is a generalisation of a [arrow.Functor].
- * Functor::map   (fa: HK<F, A>, f: (A) -> B): HK<F, B>
+ * Functor::map   (fa: Kind<F, A>, f: (A) -> B): Kind<F, B>
  * PSetter::modify(s: S,         f: (A) -> B): T
  *
  * @param S the source of a [PSetter]
@@ -60,8 +60,8 @@ interface PSetter<S, T, A, B> {
         /**
          * Create a [PSetter] from a [arrow.Functor]
          */
-        inline fun <reified F, A, B> fromFunctor(FF: Functor<F> = functor()): PSetter<HK<F, A>, HK<F, B>, A, B> = PSetter { f ->
-            { fs: HK<F, A> -> FF.map(fs, f) }
+        inline fun <reified F, A, B> fromFunctor(FF: Functor<F> = functor()): PSetter<Kind<F, A>, Kind<F, B>, A, B> = PSetter { f ->
+            { fs: Kind<F, A> -> FF.map(fs, f) }
         }
     }
 

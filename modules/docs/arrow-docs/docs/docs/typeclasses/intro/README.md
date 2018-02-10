@@ -34,6 +34,10 @@ We will list them by their hierarchy.
 
 - [`Alternative`]({{ '/docs/typeclasses/alternative/' | relative_url }}) - has an structure that contains either of two values
 
+##### Show
+
+- [`Show`]({{ '/docs/typeclasses/show/' | relative_url }}) - literal representation of an object
+
 ##### Eq
 
 - [`Eq`]({{ '/docs/typeclasses/eq/' | relative_url }}) - structural equality between two objects
@@ -106,11 +110,13 @@ The Monad Template Library module gives more specialized version of existing typ
 
 #### Optics
 
-- [`At`]({{ '/docs/typeclasses/at/' | relative_url }})
+- [`At`]({{ '/docs/typeclasses/at/' | relative_url }}) - provides a [`Lens`]({{ '/docs/optics/lens/' | relative_url }}) for a structure with an indexable focus.
 
-- [`FilterIndex`]({{ '/docs/typeclasses/filterindex/' | relative_url }})
+- [`FilterIndex`]({{ '/docs/typeclasses/filterindex/' | relative_url }}) - provides a [`Traversal`]({{ '/docs/optics/traversal/' | relative_url }}) for a structure with indexable foci that satisfy a predicate.
 
-- [`Index`]({{ '/docs/typeclasses/index/' | relative_url }})
+- [`Index`]({{ '/docs/typeclasses/index/' | relative_url }}) - provides an [`Optional`]({{ '/docs/optics/optional/' | relative_url }}) for a structure with an indexable optional focus.
+
+- [`Each`]({{ '/docs/typeclasses/each/' | relative_url }}) - provides a [`Traversal`]({{ '/docs/optics/traversal/' | relative_url }}).
 
 #### Recursion
 

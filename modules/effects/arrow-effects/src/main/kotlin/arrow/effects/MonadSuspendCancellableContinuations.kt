@@ -1,6 +1,6 @@
 package arrow.effects
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.Either
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.internal.stackLabels
@@ -24,7 +24,7 @@ open class MonadSuspendCancellableContinuation<F, A>(SC: MonadSuspend<F>, overri
 
     fun disposable(): Disposable = { cancelled.set(true) }
 
-    override fun returnedMonad(): HK<F, A> = returnedMonad
+    override fun returnedMonad(): Kind<F, A> = returnedMonad
 
     suspend fun <B> bindDefer(f: () -> B): B =
             invoke(f).bind()
@@ -35,7 +35,7 @@ open class MonadSuspendCancellableContinuation<F, A>(SC: MonadSuspend<F>, overri
     suspend fun <B> bindDeferUnsafe(f: () -> Either<Throwable, B>): B =
             deferUnsafe(f).bind()
 
-    override suspend fun <B> bind(m: () -> HK<F, B>): B = suspendCoroutineOrReturn { c ->
+    override suspend fun <B> bind(m: () -> Kind<F, B>): B = suspendCoroutineOrReturn { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels
         returnedMonad = flatMap(m(), { x: B ->
             c.stackLabels = labelHere
@@ -50,7 +50,7 @@ open class MonadSuspendCancellableContinuation<F, A>(SC: MonadSuspend<F>, overri
 
     override suspend fun <B> bindIn(context: CoroutineContext, m: () -> B): B = suspendCoroutineOrReturn { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels
-        val monadCreation: suspend () -> HK<F, A> = {
+        val monadCreation: suspend () -> Kind<F, A> = {
             val datatype = try {
                 pure(m())
             } catch (t: Throwable) {

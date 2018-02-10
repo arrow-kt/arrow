@@ -87,7 +87,7 @@ We need a data type that can represent either a successful value (a parsed confi
 It would look like the following, which Arrow provides in `arrow.Validated`:
 
 ```kotlin
-@higherkind sealed class Validated<out E, out A> : ValidatedKind<E, A> {
+@higherkind sealed class Validated<out E, out A> : ValidatedOf<E, A> {
 
     data class Valid<out A>(val a: A) : Validated<Nothing, A>()
 
@@ -222,5 +222,5 @@ houseNumber
 ```kotlin:ank
 import arrow.debug.*
 
-showInstances<ValidatedKindPartial<String>, Unit>()
+showInstances<ValidatedPartialOf<String>, Unit>()
 ```

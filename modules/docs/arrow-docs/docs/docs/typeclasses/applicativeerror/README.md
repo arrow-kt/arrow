@@ -45,7 +45,7 @@ IO.applicativeError().raiseError<Int>(RuntimeException("Paco"))
 
 #### handleErrorWith
 
-This method requires a function that creates a new datatype from an error, `(E) -> HK<F, A>`. This function is used as a catch + recover clause for the current instance, allowing it to return a new computation after a failure.
+This method requires a function that creates a new datatype from an error, `(E) -> Kind<F, A>`. This function is used as a catch + recover clause for the current instance, allowing it to return a new computation after a failure.
 
 If [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) has `flatMap` to allow mapping the value inside a *successful* datatype into a new datatype, you can think of `handleErrorWith` as a way that allows you to map the value of a *failed datatype into a new datatype. 
 
@@ -139,6 +139,6 @@ The following datatypes in Arrow provide instances that adhere to the `Applicati
 - [EitherT]({{ '/docs/datatypes/eithert' | relative_url }})
 - [StateT]({{ '/docs/datatypes/statet' | relative_url }})
 - [IO]({{ '/docs/effects/io' | relative_url }})
-- [ObservableKW]({{ '/docs/integrations/rx2' | relative_url }})
-- [FlowableKW]({{ '/docs/integrations/rx2' | relative_url }})
-- [DeferredKW]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }})
+- [ObservableK]({{ '/docs/integrations/rx2' | relative_url }})
+- [FlowableK]({{ '/docs/integrations/rx2' | relative_url }})
+- [DeferredK]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }})

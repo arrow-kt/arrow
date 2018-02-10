@@ -17,7 +17,7 @@ We can use that `Optional` to safely operate on that focus `S` i.e. operating on
 import arrow.data.*
 import arrow.optics.typeclasses.*
 
-val thirdListItemOptional = Index.index<ListKWKind<String>, Int, String>(3)
+val thirdListItemOptional = Index.index<ListKOf<String>, Int, String>(3)
 
 thirdListItemOptional.set(listOf("0", "1", "2", "3").k(), "newValue")
 ```
@@ -30,7 +30,7 @@ thirdListItemOptional.setOption(listOf("0", "1", "2").k(), "newValue")
 
 #### Creating your own `Index` instances
 
-Arrow provides `Index` instances for some common datatypes both in Arrow and the Kotlin stdlib that can be indexed, like `ListKW` and `MapKW`.
+Arrow provides `Index` instances for some common datatypes both in Arrow and the Kotlin stdlib that can be indexed, like `ListK` and `MapK`.
 You can look them up by calling `Index.index()`.
 
 You may create instances of `Index` for your own datatypes which you will be able to use as demonstrated in the [example](#example) above.
@@ -43,6 +43,6 @@ The following datatypes in Arrow provide instances that adhere to the `Index` ty
 
 - [String]
 - [NonEmptyList]({{ '/docs/datatypes/nonemptylist' | relative_url }})
-- [ListKW]({{ '/docs/datatypes/listkw' | relative_url }})
-- [SequenceKW]({{ '/docs/datatypes/sequencekw' | relative_url }})
-- [MapKW]({{ '/docs/datatypes/mapkw' | relative_url }})
+- [ListK]({{ '/docs/datatypes/listK' | relative_url }})
+- [SequenceK]({{ '/docs/datatypes/sequenceK' | relative_url }})
+- [MapK]({{ '/docs/datatypes/mapK' | relative_url }})

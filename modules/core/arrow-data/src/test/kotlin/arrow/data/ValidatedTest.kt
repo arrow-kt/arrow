@@ -11,12 +11,9 @@ import arrow.core.Some
 import arrow.instances.*
 import arrow.syntax.applicative.map
 import arrow.syntax.validated.valid
-import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
-import arrow.test.laws.ApplicativeLaws
-import arrow.test.laws.SemigroupKLaws
-import arrow.test.laws.TraverseLaws
+import arrow.test.laws.*
 import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
@@ -25,16 +22,18 @@ class ValidatedTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            functor<ValidatedKindPartial<String>>() shouldNotBe null
-            applicative<ValidatedKindPartial<String>>() shouldNotBe null
-            foldable<ValidatedKindPartial<String>>() shouldNotBe null
-            traverse<ValidatedKindPartial<String>>() shouldNotBe null
-            applicativeError<ValidatedKindPartial<String>, String>() shouldNotBe null
+            functor<ValidatedPartialOf<String>>() shouldNotBe null
+            applicative<ValidatedPartialOf<String>>() shouldNotBe null
+            foldable<ValidatedPartialOf<String>>() shouldNotBe null
+            traverse<ValidatedPartialOf<String>>() shouldNotBe null
+            applicativeError<ValidatedPartialOf<String>, String>() shouldNotBe null
             eq<Validated<String, Int>>() shouldNotBe null
+            show<Validated<String, Int>>() shouldNotBe null
         }
 
         testLaws(
             EqLaws.laws { it.valid<String, Int>() },
+            ShowLaws.laws { it.valid<String, Int>() },
             ApplicativeLaws.laws(Validated.applicative(StringMonoidInstance), Eq.any()),
             TraverseLaws.laws(Validated.traverse(), Validated.applicative(StringMonoidInstance), ::Valid, Eq.any()),
             SemigroupKLaws.laws(

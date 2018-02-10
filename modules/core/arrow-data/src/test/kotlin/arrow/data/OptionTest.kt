@@ -1,16 +1,18 @@
 package arrow.data
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.*
 import arrow.mtl.traverseFilter
 import arrow.syntax.`try`.optionTry
 import arrow.syntax.collections.firstOption
 import arrow.syntax.collections.option
 import arrow.syntax.collections.optionSequential
+import arrow.syntax.option.some
 import arrow.test.UnitSpec
 import arrow.test.generators.genOption
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadFilterLaws
+import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseFilterLaws
 import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
@@ -30,24 +32,25 @@ class OptionTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            functor<OptionHK>() shouldNotBe null
-            applicative<OptionHK>() shouldNotBe null
-            monad<OptionHK>() shouldNotBe null
-            foldable<OptionHK>() shouldNotBe null
-            traverse<OptionHK>() shouldNotBe null
-            traverseFilter<OptionHK>() shouldNotBe null
+            functor<ForOption>() shouldNotBe null
+            applicative<ForOption>() shouldNotBe null
+            monad<ForOption>() shouldNotBe null
+            foldable<ForOption>() shouldNotBe null
+            traverse<ForOption>() shouldNotBe null
+            traverseFilter<ForOption>() shouldNotBe null
             semigroup<Option<Int>>() shouldNotBe null
             monoid<Option<Int>>() shouldNotBe null
-            applicativeError<OptionHK, Unit>() shouldNotBe null
-            monadError<OptionHK, Unit>() shouldNotBe null
+            applicativeError<ForOption, Unit>() shouldNotBe null
+            monadError<ForOption, Unit>() shouldNotBe null
             eq<Option<Int>>() shouldNotBe null
+            show<Option<Int>>() shouldNotBe null
         }
 
-        val EQ_EITHER: Eq<HK<OptionHK, Either<Unit, Int>>> = Eq { a, b ->
-            a.ev().fold(
-                    { b.ev().fold({ true }, { false }) },
+        val EQ_EITHER: Eq<Kind<ForOption, Either<Unit, Int>>> = Eq { a, b ->
+            a.fix().fold(
+                    { b.fix().fold({ true }, { false }) },
                     { eitherA: Either<Unit, Int> ->
-                        b.ev().fold(
+                        b.fix().fold(
                                 { false },
                                 { eitherB: Either<Unit, Int> ->
                                     eitherA.fold(
@@ -59,7 +62,8 @@ class OptionTest : UnitSpec() {
 
         testLaws(
                 EqLaws.laws(eq(), { genOption(Gen.int()).generate() }),
-                //testLaws(MonadErrorLaws.laws(monadError<OptionHK, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
+                ShowLaws.laws(show(), eq(), { it.some() }),
+                //testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
                 TraverseFilterLaws.laws(Option.traverseFilter(), Option.monad(), ::Some, Eq.any()),
                 MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any())
         )

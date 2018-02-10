@@ -4,6 +4,7 @@ import arrow.syntax.applicative.map
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadErrorLaws
+import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
@@ -22,18 +23,20 @@ class TryTest : UnitSpec() {
     init {
 
         "instances can be resolved implicitly" {
-            functor<TryHK>() shouldNotBe null
-            applicative<TryHK>() shouldNotBe null
-            monad<TryHK>() shouldNotBe null
-            foldable<TryHK>() shouldNotBe null
-            traverse<TryHK>() shouldNotBe null
-            applicativeError<TryHK, Throwable>() shouldNotBe null
-            monadError<TryHK, Throwable>() shouldNotBe null
+            functor<ForTry>() shouldNotBe null
+            applicative<ForTry>() shouldNotBe null
+            monad<ForTry>() shouldNotBe null
+            foldable<ForTry>() shouldNotBe null
+            traverse<ForTry>() shouldNotBe null
+            applicativeError<ForTry, Throwable>() shouldNotBe null
+            monadError<ForTry, Throwable>() shouldNotBe null
             eq<Try<Int>>() shouldNotBe null
+            show<Try<Int>>() shouldNotBe null
         }
 
         testLaws(
                 EqLaws.laws { Try { it } },
+                ShowLaws.laws { Try { it } },
                 MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()),
                 TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any())
         )

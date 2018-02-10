@@ -1,30 +1,35 @@
 package arrow.dagger.instances
 
 import arrow.data.*
-import arrow.instances.SetKWEqInstance
-import arrow.instances.SetKWMonoidInstance
-import arrow.instances.SetKWSemigroupInstance
-import arrow.typeclasses.*
-import dagger.*
-import javax.inject.*
+import arrow.instances.SetKEqInstance
+import arrow.instances.SetKMonoidInstance
+import arrow.instances.SetKSemigroupInstance
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.MonoidK
+import arrow.typeclasses.SemigroupK
+import dagger.Module
+import dagger.Provides
 import javax.inject.Inject
 
 @Module
-class SetKWInstances {
+class SetKInstances {
 
     @Provides
-    fun setKWFoldable(): Foldable<SetKWHK> = SetKW.foldable()
+    fun setKFoldable(): Foldable<ForSetK> = SetK.foldable()
 
     @Provides
-    fun setKWMonoidK(): MonoidK<SetKWHK> = SetKW.monoidK()
+    fun setKMonoidK(): MonoidK<ForSetK> = SetK.monoidK()
 
     @Provides
-    fun setKWSemigroupK(): SemigroupK<SetKWHK> = SetKW.semigroupK()
+    fun setKSemigroupK(): SemigroupK<ForSetK> = SetK.semigroupK()
 
 }
 
-class DaggerSetKWSemigroupInstance<A> : SetKWSemigroupInstance<A>
-class DaggerSetKWMonoidInstance<A> : SetKWMonoidInstance<A>
-class DaggerSetKWEqInstance<A> @Inject constructor(val eqA: Eq<A>) : SetKWEqInstance<A> {
+class DaggerSetKSemigroupInstance<A> : SetKSemigroupInstance<A>
+
+class DaggerSetKMonoidInstance<A> : SetKMonoidInstance<A>
+
+class DaggerSetKEqInstance<A> @Inject constructor(val eqA: Eq<A>) : SetKEqInstance<A> {
     override fun EQ(): Eq<A> = eqA
 }

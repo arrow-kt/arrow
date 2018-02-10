@@ -1,6 +1,6 @@
 package arrow.dagger.instances
 
-import arrow.data.*
+import arrow.data.EitherTPartialOf
 import arrow.instances.*
 import arrow.typeclasses.*
 import dagger.Module
@@ -11,28 +11,28 @@ import javax.inject.Inject
 abstract class EitherTInstances<F, L> {
 
     @Provides
-    fun eitherTFunctor(ev: DaggerEitherTFunctorInstance<F, L>): Functor<EitherTKindPartial<F, L>> = ev
+    fun eitherTFunctor(ev: DaggerEitherTFunctorInstance<F, L>): Functor<EitherTPartialOf<F, L>> = ev
 
     @Provides
-    fun eitherTApplicative(ev: DaggerEitherTApplicativeInstance<F, L>): Applicative<EitherTKindPartial<F, L>> = ev
+    fun eitherTApplicative(ev: DaggerEitherTApplicativeInstance<F, L>): Applicative<EitherTPartialOf<F, L>> = ev
 
     @Provides
-    fun eitherTMonad(ev: DaggerEitherTMonadInstance<F, L>): Monad<EitherTKindPartial<F, L>> = ev
+    fun eitherTMonad(ev: DaggerEitherTMonadInstance<F, L>): Monad<EitherTPartialOf<F, L>> = ev
 
     @Provides
-    fun eitherTApplicativeError(ev: DaggerEitherTMonadErrorInstance<F, L>): ApplicativeError<EitherTKindPartial<F, L>, L> = ev
+    fun eitherTApplicativeError(ev: DaggerEitherTMonadErrorInstance<F, L>): ApplicativeError<EitherTPartialOf<F, L>, L> = ev
 
     @Provides
-    fun eitherTMonadError(ev: DaggerEitherTMonadErrorInstance<F, L>): MonadError<EitherTKindPartial<F, L>, L> = ev
+    fun eitherTMonadError(ev: DaggerEitherTMonadErrorInstance<F, L>): MonadError<EitherTPartialOf<F, L>, L> = ev
 
     @Provides
-    fun eitherTFoldable(ev: DaggerEitherTFoldableInstance<F, L>): Foldable<EitherTKindPartial<F, L>> = ev
+    fun eitherTFoldable(ev: DaggerEitherTFoldableInstance<F, L>): Foldable<EitherTPartialOf<F, L>> = ev
 
     @Provides
-    fun eitherTTraverse(ev: DaggerEitherTTraverseInstance<F, L>): Traverse<EitherTKindPartial<F, L>> = ev
+    fun eitherTTraverse(ev: DaggerEitherTTraverseInstance<F, L>): Traverse<EitherTPartialOf<F, L>> = ev
 
     @Provides
-    fun eitherTSemigroupK(ev: DaggerEitherTSemigroupKInstance<F, L>): SemigroupK<EitherTKindPartial<F, L>> = ev
+    fun eitherTSemigroupK(ev: DaggerEitherTSemigroupKInstance<F, L>): SemigroupK<EitherTPartialOf<F, L>> = ev
 
 }
 

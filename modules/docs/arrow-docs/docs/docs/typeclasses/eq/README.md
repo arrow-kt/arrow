@@ -36,7 +36,7 @@ It is the opposite comparison of `eqv`.
 
 ### Syntax
 
-#### HK<F, A>#eqv
+#### Kind<F, A>#eqv
 
 Compares two values for equality
 
@@ -46,7 +46,7 @@ import arrow.syntax.eq.*
 1.eqv(IntEqInstance, 2)
 ```
 
-#### HK<F, A>#neqv
+#### Kind<F, A>#neqv
 
 Compares two values for inequality
 
@@ -81,10 +81,25 @@ See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | rela
 
 ### Data types
 
-The following datatypes in Arrow provide instances that adhere to the `Eq` typeclass.
+Most of the datatypes in Arrow that are not related to functions provide instances of the `Eq` typeclass.
 
-- [Free]({{ '/docs/datatypes/free' | relative_url }})
-- [FreeApplicative]({{ '/docs/datatypes/FreeApplicative' | relative_url }})
+- [`Id`]({{ '/docs/datatypes/id/' | relative_url }})
+- [`Option`]({{ '/docs/datatypes/option/' | relative_url }})
+- [`Either`]({{ '/docs/datatypes/either/' | relative_url }})
+- [`Eval`]({{ '/docs/datatypes/eval/' | relative_url }})
+- `TupleN`
+- [`NonEmptyList`]({{ '/docs/datatypes/nonemptylist/' | relative_url }})
+- [`Ior`]({{ '/docs/datatypes/ior/' | relative_url }})
+- [`Const`]({{ '/docs/datatypes/const/' | relative_url }})
+- [`Coproduct`]({{ '/docs/datatypes/coproduct/' | relative_url }})
+- [`Try`]({{ '/docs/datatypes/try/' | relative_url }})
+- [`Validated`]({{ '/docs/datatypes/validated/' | relative_url }})
+- [`Free`]({{ '/docs/datatypes/free' | relative_url }})
+- [`FreeApplicative`]({{ '/docs/datatypes/FreeApplicative' | relative_url }})
+- [`ListK`]({{ '/docs/datatypes/listK/' | relative_url }})
+- [`SequenceK`]({{ '/docs/datatypes/sequenceK/' | relative_url }})
+- [`SetK`]({{ '/docs/datatypes/setK/' | relative_url }})
+- [`MapK`]({{ '/docs/datatypes/mapK/' | relative_url }}) 
+- [`SortedMapK`]({{ '/docs/datatypes/sortedmapK/' | relative_url }})
 
-Additionally all instances of [`Order`]({{ '/docs/typeclasses/order' | relative_url }}) and their MTL variants implement the `Eq` typeclass directly
-since they are all subtypes of `Eq`
+Additionally all instances of [`Order`]({{ '/docs/typeclasses/order' | relative_url }}) and their MTL variants implement the `Eq` typeclass directly since they are all subtypes of `Eq`

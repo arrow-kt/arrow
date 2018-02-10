@@ -1,6 +1,6 @@
 package arrow.instances
 
-import arrow.data.*
+import arrow.data.ValidatedPartialOf
 import arrow.typeclasses.*
 import dagger.Module
 import dagger.Provides
@@ -10,19 +10,19 @@ import javax.inject.Inject
 abstract class ValidatedInstances<L> {
 
     @Provides
-    fun validatedFunctor(ev: DaggerValidatedFunctorInstance<L>): Functor<ValidatedKindPartial<L>> = ev
+    fun validatedFunctor(ev: DaggerValidatedFunctorInstance<L>): Functor<ValidatedPartialOf<L>> = ev
 
     @Provides
-    fun validatedApplicative(ev: DaggerValidatedApplicativeInstance<L>): Applicative<ValidatedKindPartial<L>> = ev
+    fun validatedApplicative(ev: DaggerValidatedApplicativeInstance<L>): Applicative<ValidatedPartialOf<L>> = ev
 
     @Provides
-    fun validatedFoldable(ev: DaggerValidatedFoldableInstance<L>): Foldable<ValidatedKindPartial<L>> = ev
+    fun validatedFoldable(ev: DaggerValidatedFoldableInstance<L>): Foldable<ValidatedPartialOf<L>> = ev
 
     @Provides
-    fun validatedTraverse(ev: DaggerValidatedTraverseInstance<L>): Traverse<ValidatedKindPartial<L>> = ev
+    fun validatedTraverse(ev: DaggerValidatedTraverseInstance<L>): Traverse<ValidatedPartialOf<L>> = ev
 
     @Provides
-    fun validatedSemigroupK(ev: DaggerValidatedSemigroupKInstance<L>): SemigroupK<ValidatedKindPartial<L>> = ev
+    fun validatedSemigroupK(ev: DaggerValidatedSemigroupKInstance<L>): SemigroupK<ValidatedPartialOf<L>> = ev
 
 }
 

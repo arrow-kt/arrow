@@ -1,34 +1,33 @@
 package arrow.data
 
 import arrow.test.UnitSpec
-import arrow.test.laws.EqLaws
-import arrow.test.laws.FoldableLaws
-import arrow.test.laws.MonoidKLaws
-import arrow.test.laws.SemigroupKLaws
+import arrow.test.laws.*
 import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class SetKWTest : UnitSpec() {
+class SetKTest : UnitSpec() {
 
     init {
 
         "instances can be resolved implicitly" {
-            foldable<SetKWHK>() shouldNotBe null
-            semigroupK<SetKWHK>() shouldNotBe null
-            monoidK<SetKWHK>() shouldNotBe null
-            semigroup<SetKW<Int>>() shouldNotBe null
-            monoid<SetKW<Int>>() shouldNotBe null
-            eq<SetKW<Int>>() shouldNotBe null
+            foldable<ForSetK>() shouldNotBe null
+            semigroupK<ForSetK>() shouldNotBe null
+            monoidK<ForSetK>() shouldNotBe null
+            semigroup<SetK<Int>>() shouldNotBe null
+            monoid<SetK<Int>>() shouldNotBe null
+            eq<SetK<Int>>() shouldNotBe null
+            show<SetK<Int>>() shouldNotBe null
         }
         
         testLaws(
-            EqLaws.laws { SetKW.pure(it) },
-            SemigroupKLaws.laws(SetKW.semigroupK(), { SetKW.pure(it) }, Eq.any()),
-            MonoidKLaws.laws(SetKW.monoidK(), { SetKW.pure(it) }, Eq.any()),
-            FoldableLaws.laws(SetKW.foldable(), { SetKW.pure(it) }, Eq.any())
+            EqLaws.laws { SetK.pure(it) },
+            ShowLaws.laws { SetK.pure(it) },
+            SemigroupKLaws.laws(SetK.semigroupK(), { SetK.pure(it) }, Eq.any()),
+            MonoidKLaws.laws(SetK.monoidK(), { SetK.pure(it) }, Eq.any()),
+            FoldableLaws.laws(SetK.foldable(), { SetK.pure(it) }, Eq.any())
         )
     }
 }

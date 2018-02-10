@@ -71,20 +71,20 @@ options:
       - title: NonEmptyList
         url: /docs/datatypes/nonemptylist/
 
-      - title: ListKW
-        url: /docs/datatypes/listkw/
+      - title: ListK
+        url: /docs/datatypes/listK/
 
-      - title: SequenceKW
-        url: /docs/datatypes/sequencekw/
+      - title: SequenceK
+        url: /docs/datatypes/sequenceK/
 
-      - title: SetKW
-        url: /docs/datatypes/setkw/
+      - title: SetK
+        url: /docs/datatypes/setK/
 
-      - title: MapKW
-        url: /docs/datatypes/mapkw/
+      - title: MapK
+        url: /docs/datatypes/mapK/
 
-      - title: SortedMapKW
-        url: /docs/datatypes/sortedmapkw/
+      - title: SortedMapK
+        url: /docs/datatypes/sortedmapK/
 
       - title: Ior
         url: /docs/datatypes/ior/
@@ -128,6 +128,9 @@ options:
 
       - title: Intro
         url: /docs/typeclasses/intro/
+
+      - title: Show
+        url: /docs/typeclasses/show/
 
       - title: Eq
         url: /docs/typeclasses/eq/
@@ -250,6 +253,9 @@ options:
 
       - title: FilterIndex
         url: /docs/optics/filterindex/
+
+      - title: Each
+        url: /docs/optics/each/
 
   - title: Integrations
 

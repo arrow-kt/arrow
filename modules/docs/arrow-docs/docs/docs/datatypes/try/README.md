@@ -195,6 +195,6 @@ Available Instances:
 ```kotlin:ank
 import arrow.debug.*
 
-showInstances<TryHK, Unit>()
+showInstances<ForTry, Unit>()
 ```
 

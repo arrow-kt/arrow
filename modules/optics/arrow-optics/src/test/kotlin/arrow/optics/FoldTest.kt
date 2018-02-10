@@ -1,21 +1,21 @@
 package arrow.optics
 
+import arrow.core.Option
+import arrow.data.ForListK
+import arrow.data.k
+import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import arrow.core.Option
-import arrow.data.ListKWHK
-import arrow.data.k
 import org.junit.runner.RunWith
-import arrow.test.UnitSpec
 
 @RunWith(KTestJUnitRunner::class)
 class FoldTest : UnitSpec() {
 
     init {
 
-        val intFold = Fold.fromFoldable<ListKWHK, Int>()
-        val stringFold = Fold.fromFoldable<ListKWHK, String>()
+        val intFold = Fold.fromFoldable<ForListK, Int>()
+        val stringFold = Fold.fromFoldable<ForListK, String>()
 
         "Fold select a list that contains one" {
             val select = Fold.select<List<Int>> { it.contains(1) }

@@ -6,7 +6,7 @@ import io.kotlintest.properties.Gen
 import arrow.typeclasses.Eq
 import arrow.test.laws.IsoLaws
 import arrow.core.monoid
-import arrow.data.ListKW
+import arrow.data.ListK
 import arrow.data.NonEmptyList
 import arrow.data.k
 import arrow.data.monoid
@@ -15,6 +15,7 @@ import arrow.test.laws.OptionalLaws
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genNonEmptyList
+import arrow.test.generators.genNullable
 import arrow.test.generators.genOption
 import org.junit.runner.RunWith
 
@@ -52,14 +53,31 @@ class ListInstancesTest : UnitSpec() {
         ))
 
         testLaws(IsoLaws.laws(
-                iso = listToListKW(),
+                iso = listToListK(),
                 aGen = Gen.list(Gen.int()),
                 bGen = Gen.create { Gen.list(Gen.int()).generate().k() },
                 funcGen = genFunctionAToB(Gen.create { Gen.list(Gen.int()).generate().k() }),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                bMonoid = ListKW.monoid())
+                bMonoid = ListK.monoid())
         )
+
+        testLaws(OptionalLaws.laws(
+                optional = nullableOptional(),
+                aGen = genNullable(Gen.int()),
+                bGen = Gen.int(),
+                funcGen = genFunctionAToB(Gen.int()),
+                EQA = Eq.any(),
+                EQOptionB = Eq.any()))
+
+        testLaws(OptionalLaws.laws(
+                optional = optionOptional(),
+                aGen = genOption(Gen.int()),
+                bGen = Gen.int(),
+                funcGen = genFunctionAToB(Gen.int()),
+                EQA = Eq.any(),
+                EQOptionB = Eq.any()))
+
 
     }
 

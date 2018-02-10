@@ -3,8 +3,8 @@ package arrow
 import arrow.TypeclasslessExamples.ScopeOne.inScopeOne
 import arrow.TypeclasslessExamples.ScopeTwo.withAll
 import arrow.TypeclasslessExamples.ScopeTwo.withApplicative
-import arrow.data.ListKW
-import arrow.data.ListKWHK
+import arrow.data.ForListK
+import arrow.data.ListK
 import arrow.data.applicative
 import arrow.data.k
 import arrow.typeclasses.Applicative
@@ -20,14 +20,14 @@ class TypeclasslessExamples : FreeSpec() {
     // Complete example of syntax using a simple fake typeclass
 
     interface Identity<F>: TC {
-        fun <A> identify(a: HK<F, A>): HK<F, A> =
+        fun <A> identify(a: Kind<F, A>): Kind<F, A> =
                 a
     }
 
     interface IdentifySyntax<F> {
         fun ID(): Identity<F>
 
-        fun <A> HK<F, A>.identify(): HK<F, A> =
+        fun <A> Kind<F, A>.identify(): Kind<F, A> =
                 ID().identify(this)
     }
 
@@ -42,10 +42,10 @@ class TypeclasslessExamples : FreeSpec() {
     interface ApplicativeSyntax<F> {
         fun AP(): Applicative<F>
 
-        fun <A> A.pure(): HK<F, A> =
+        fun <A> A.pure(): Kind<F, A> =
                 AP().pure(this)
 
-        fun <A, B> HK<F, A>.map(f: (A) -> B): HK<F, B> =
+        fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> =
                 AP().map(this, f)
     }
 
@@ -69,11 +69,11 @@ class TypeclasslessExamples : FreeSpec() {
 
     // Define some trivial instances for Identify and Applicative
 
-    val ID_LIST: Identity<ListKWHK> =
-            object : Identity<ListKWHK> {}
+    val ID_LIST: Identity<ForListK> =
+            object : Identity<ForListK> {}
 
     val AP =
-            ListKW.applicative()
+            ListK.applicative()
 
     val ALL_SYNTAX =
             allSyntax(AP, ID_LIST)
@@ -82,18 +82,18 @@ class TypeclasslessExamples : FreeSpec() {
     // Functions depending on syntax
 
     object ScopeOne {
-        fun <F> ApplicativeSyntax<F>.inScopeOne(): HK<F, Int> =
+        fun <F> ApplicativeSyntax<F>.inScopeOne(): Kind<F, Int> =
                 1.pure()
     }
 
     object ScopeTwo {
-        fun <F> IdentifySyntax<F>.withIdentify(a: HK<F, Int>): HK<F, Int> =
+        fun <F> IdentifySyntax<F>.withIdentify(a: Kind<F, Int>): Kind<F, Int> =
                 a.identify()
 
-        fun <F> ApplicativeSyntax<F>.withApplicative(): HK<F, Int> =
+        fun <F> ApplicativeSyntax<F>.withApplicative(): Kind<F, Int> =
                 1.pure().map { inScopeOne() }.map { 1 }
 
-        fun <F> ApplicativeAndIdentifySyntax<F>.withAll(): HK<F, Int> =
+        fun <F> ApplicativeAndIdentifySyntax<F>.withAll(): Kind<F, Int> =
                 withIdentify(withApplicative()).identify().map { it }
     }
 
@@ -145,7 +145,7 @@ class TypeclasslessExamples : FreeSpec() {
             fun <A, R> toFun(f: A.() -> R): (A) -> R =
                     f
 
-            toFun<ApplicativeAndIdentifySyntax<ListKWHK>, HK<ListKWHK, Int>> { withAll() }(ALL_SYNTAX) shouldBe expected
+            toFun<ApplicativeAndIdentifySyntax<ForListK>, Kind<ForListK, Int>> { withAll() }(ALL_SYNTAX) shouldBe expected
         }
     }
 }

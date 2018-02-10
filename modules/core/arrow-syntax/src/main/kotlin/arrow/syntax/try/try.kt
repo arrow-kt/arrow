@@ -1,8 +1,9 @@
 package arrow.syntax.`try`
 
 import arrow.core.*
-import arrow.data.*
-import arrow.instances.applicative
+import arrow.data.Try
+import arrow.data.applicative
+import arrow.data.fix
 import arrow.syntax.applicative.tupled
 
 @Deprecated(DeprecatedAmbiguity, ReplaceWith("Try { body }.toOption()"))
@@ -18,7 +19,7 @@ fun <A, B> merge(
         Try.applicative().tupled(
                 Try.invoke(op1),
                 Try.invoke(op2)
-        ).ev()
+        ).fix()
 
 fun <A, B, C> merge(
         op1: () -> A,
@@ -28,7 +29,7 @@ fun <A, B, C> merge(
                 Try.invoke(op1),
                 Try.invoke(op2),
                 Try.invoke(op3)
-        ).ev()
+        ).fix()
 
 fun <A, B, C, D> merge(
         op1: () -> A,
@@ -40,7 +41,7 @@ fun <A, B, C, D> merge(
                 Try.invoke(op2),
                 Try.invoke(op3),
                 Try.invoke(op4)
-        ).ev()
+        ).fix()
 
 fun <A, B, C, D, E> merge(
         op1: () -> A,
@@ -54,7 +55,7 @@ fun <A, B, C, D, E> merge(
                 Try.invoke(op3),
                 Try.invoke(op4),
                 Try.invoke(op5)
-        ).ev()
+        ).fix()
 
 fun <A, B, C, D, E, F> merge(
         op1: () -> A,
@@ -70,7 +71,7 @@ fun <A, B, C, D, E, F> merge(
                 Try.invoke(op4),
                 Try.invoke(op5),
                 Try.invoke(op6)
-        ).ev()
+        ).fix()
 
 fun <A, B, C, D, E, F, G> merge(
         op1: () -> A,
@@ -88,7 +89,7 @@ fun <A, B, C, D, E, F, G> merge(
                 Try.invoke(op5),
                 Try.invoke(op6),
                 Try.invoke(op7)
-        ).ev()
+        ).fix()
 
 fun <A, B, C, D, E, F, G, H> merge(
         op1: () -> A,
@@ -108,7 +109,7 @@ fun <A, B, C, D, E, F, G, H> merge(
                 Try.invoke(op6),
                 Try.invoke(op7),
                 Try.invoke(op8)
-        ).ev()
+        ).fix()
 
 fun <A, B, C, D, E, F, G, H, I> merge(
         op1: () -> A,
@@ -130,7 +131,7 @@ fun <A, B, C, D, E, F, G, H, I> merge(
                 Try.invoke(op7),
                 Try.invoke(op8),
                 Try.invoke(op9)
-        ).ev()
+        ).fix()
 
 fun <A, B, C, D, E, F, G, H, I, J> merge(
         op1: () -> A,
@@ -154,4 +155,4 @@ fun <A, B, C, D, E, F, G, H, I, J> merge(
                 Try.invoke(op8),
                 Try.invoke(op9),
                 Try.invoke(op10)
-        ).ev()
+        ).fix()

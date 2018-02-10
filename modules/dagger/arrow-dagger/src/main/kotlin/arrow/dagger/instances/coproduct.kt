@@ -1,8 +1,14 @@
 package arrow.dagger.instances
 
-import arrow.data.*
-import arrow.instances.*
-import arrow.typeclasses.*
+import arrow.data.CoproductPartialOf
+import arrow.instances.CoproductComonadInstance
+import arrow.instances.CoproductFoldableInstance
+import arrow.instances.CoproductFunctorInstance
+import arrow.instances.CoproductTraverseInstance
+import arrow.typeclasses.Comonad
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Traverse
 import dagger.Module
 import dagger.Provides
 import javax.inject.Inject
@@ -11,16 +17,16 @@ import javax.inject.Inject
 abstract class CoproductInstances<F, G> {
 
     @Provides
-    fun coproductFunctor(ev: DaggerCoproductFunctorInstance<F, G>): Functor<CoproductKindPartial<F, G>> = ev
+    fun coproductFunctor(ev: DaggerCoproductFunctorInstance<F, G>): Functor<CoproductPartialOf<F, G>> = ev
 
     @Provides
-    fun coproductComonad(ev: DaggerCoproductComonadInstance<F, G>): Comonad<CoproductKindPartial<F, G>> = ev
+    fun coproductComonad(ev: DaggerCoproductComonadInstance<F, G>): Comonad<CoproductPartialOf<F, G>> = ev
 
     @Provides
-    fun coproductFoldable(ev: DaggerCoproductFoldableInstance<F, G>): Foldable<CoproductKindPartial<F, G>> = ev
+    fun coproductFoldable(ev: DaggerCoproductFoldableInstance<F, G>): Foldable<CoproductPartialOf<F, G>> = ev
 
     @Provides
-    fun coproductTraverse(ev: DaggerCoproductTraverseInstance<F, G>): Traverse<CoproductKindPartial<F, G>> = ev
+    fun coproductTraverse(ev: DaggerCoproductTraverseInstance<F, G>): Traverse<CoproductPartialOf<F, G>> = ev
 
 }
 

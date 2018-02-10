@@ -1,16 +1,9 @@
 package arrow.common.utils
 
 import arrow.implicits.implicitAnnotationName
-import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
-import me.eugeniomarletti.kotlin.metadata.KotlinMetadata
-import me.eugeniomarletti.kotlin.metadata.KotlinMetadataUtils
-import me.eugeniomarletti.kotlin.metadata.KotlinPackageMetadata
-import me.eugeniomarletti.kotlin.metadata.extractFullName
-import me.eugeniomarletti.kotlin.metadata.getPropertyOrNull
-import me.eugeniomarletti.kotlin.metadata.getValueParameterOrNull
+import me.eugeniomarletti.kotlin.metadata.*
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmMethodSignature
-import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
-import me.eugeniomarletti.kotlin.metadata.modality
+import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.java.MethodElement
 import org.jetbrains.kotlin.serialization.ProtoBuf
 import org.jetbrains.kotlin.serialization.deserialization.TypeTable
 import org.jetbrains.kotlin.serialization.deserialization.supertypes
@@ -32,12 +25,18 @@ interface ProcessorUtils : KotlinMetadataUtils {
 
     fun getClassOrPackageDataWrapper(classElement: TypeElement): ClassOrPackageDataWrapper {
         val metadata = classElement.kotlinMetadata ?: knownError("These annotations can only be used in Kotlin")
-        return metadata.asClassOrPackageDataWrapper(classElement) ?: knownError("This annotation can't be used on this element")
+        return metadata.asClassOrPackageDataWrapper(classElement)
+                ?: knownError("This annotation can't be used on this element")
     }
 
+    fun TypeElement.methods(): List<MethodElement> =
+            enclosedElements.map { if (it is MethodElement) it as MethodElement else null }.filterNotNull()
+
     fun ClassOrPackageDataWrapper.getFunction(methodElement: ExecutableElement) =
-        getFunctionOrNull(methodElement, nameResolver, functionList)
-            ?: knownError("Can't find annotated method ${methodElement.jvmMethodSignature}")
+            getFunctionOrNull(methodElement, nameResolver, functionList)
+                    ?: knownError("Can't find annotated method ${methodElement.jvmMethodSignature}")
+
+    fun ProtoBuf.Function.overrides(o: ProtoBuf.Function): Boolean = false
 
     fun recurseTypeclassInterfaces(
             current: ClassOrPackageDataWrapper.Class,
@@ -46,8 +45,8 @@ interface ProcessorUtils : KotlinMetadataUtils {
         val interfaces = current.classProto.supertypes(typeTable).map {
             it.extractFullName(current, failOnGeneric = false)
         }.filter {
-            it != "`arrow`.`TC`"
-        }
+                    it != "`arrow`.`TC`"
+                }
         return when {
             interfaces.isEmpty() -> acc
             else -> {
@@ -67,11 +66,12 @@ fun String.removeBackticks() = this.replace("`", "")
 
 fun knownError(message: String, element: Element? = null): Nothing = throw KnownException(message, element)
 
-val ProtoBuf.Class.Kind.isCompanionOrObject get() = when (this) {
-    ProtoBuf.Class.Kind.OBJECT,
-    ProtoBuf.Class.Kind.COMPANION_OBJECT -> true
-    else -> false
-}
+val ProtoBuf.Class.Kind.isCompanionOrObject
+    get() = when (this) {
+        ProtoBuf.Class.Kind.OBJECT,
+        ProtoBuf.Class.Kind.COMPANION_OBJECT -> true
+        else -> false
+    }
 
 val ProtoBuf.Class.isSealed
     get() = modality == ProtoBuf.Modality.SEALED
@@ -80,23 +80,23 @@ val ClassOrPackageDataWrapper.Class.fullName: String
     get() = nameResolver.getName(classProto.fqName).asString()
 
 fun ClassOrPackageDataWrapper.getParameter(function: ProtoBuf.Function, parameterElement: VariableElement) =
-    getValueParameterOrNull(nameResolver, function, parameterElement)
-        ?: knownError("Can't find annotated parameter ${parameterElement.simpleName} in ${function.getJvmMethodSignature(nameResolver)}")
+        getValueParameterOrNull(nameResolver, function, parameterElement)
+                ?: knownError("Can't find annotated parameter ${parameterElement.simpleName} in ${function.getJvmMethodSignature(nameResolver)}")
 
 fun ClassOrPackageDataWrapper.getPropertyOrNull(methodElement: ExecutableElement) =
-    getPropertyOrNull(methodElement, nameResolver, this::propertyList)
+        getPropertyOrNull(methodElement, nameResolver, this::propertyList)
 
 fun ProtoBuf.Type.extractFullName(
-    classData: ClassOrPackageDataWrapper,
-    outputTypeAlias: Boolean = true,
-    failOnGeneric: Boolean = true
+        classData: ClassOrPackageDataWrapper,
+        outputTypeAlias: Boolean = true,
+        failOnGeneric: Boolean = true
 ): String =
-    extractFullName(
-        nameResolver = classData.nameResolver,
-        getTypeParameter = { classData.getTypeParameter(it)!! },
-        outputTypeAlias = outputTypeAlias,
-        throwOnGeneric = if (!failOnGeneric) null else KnownException("Generic $implicitAnnotationName types are not yet supported", null)
-    )
+        extractFullName(
+                nameResolver = classData.nameResolver,
+                getTypeParameter = { classData.getTypeParameter(it)!! },
+                outputTypeAlias = outputTypeAlias,
+                throwOnGeneric = if (!failOnGeneric) null else KnownException("Generic $implicitAnnotationName types are not yet supported", null)
+        )
 
 fun ClassOrPackageDataWrapper.typeConstraints(): String =
         typeParameters.flatMap { typeParameter ->
@@ -107,13 +107,14 @@ fun ClassOrPackageDataWrapper.typeConstraints(): String =
                         .removeBackticks()
             }
         }.let { constraints ->
-            if (constraints.isNotEmpty()) {
-                constraints.joinToString(
-                        prefix = " where ",
-                        separator = ", ",
-                        transform = { (a, b) -> "$a : $b" }
-                )
-            } else {
-                ""
-            }
-        }
+                    if (constraints.isNotEmpty()) {
+                        constraints.joinToString(
+                                prefix = " where ",
+                                separator = ", ",
+                                transform = { (a, b) -> "$a : $b" }
+                        )
+                    } else {
+                        ""
+                    }
+                }
+

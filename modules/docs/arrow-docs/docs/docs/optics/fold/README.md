@@ -27,7 +27,7 @@ Or you can get a `Fold` from any existing `Foldable`.
 ```kotlin:ank:silent
 import arrow.data.*
 
-val nonEmptyIntFold: Fold<NonEmptyListKind<Int>, Int> = Fold.fromFoldable(NonEmptyList.foldable())
+val nonEmptyIntFold: Fold<NonEmptyListOf<Int>, Int> = Fold.fromFoldable(NonEmptyList.foldable())
 ```
 
 `Fold` has a similar API as `Foldable` but because it's defined in terms of `foldMap` there are no associative fold functions available.
@@ -50,7 +50,7 @@ nonEmptyIntFold.headOption(NonEmptyList.of(1, 2, 3, 4))
 Composing `Fold` can be used for accessing foci in nested structures.
 
 ```kotlin:ank
-val nestedNelFold: Fold<NonEmptyListKind<NonEmptyListKind<Int>>, NonEmptyListKind<Int>> = Fold.fromFoldable()
+val nestedNelFold: Fold<NonEmptyListOf<NonEmptyListOf<Int>>, NonEmptyListOf<Int>> = Fold.fromFoldable()
 
 val nestedNel = NonEmptyList.of(1, 2, 3, 4).map {
     NonEmptyList.of(it, it)

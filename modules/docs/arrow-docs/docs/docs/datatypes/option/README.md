@@ -173,7 +173,7 @@ Available Instances:
 ```kotlin:ank
 import arrow.debug.*
 
-showInstances<OptionHK, Unit>()
+showInstances<ForOption, Unit>()
 ```
 
 # Credits
