@@ -7,23 +7,23 @@ import arrow.typeclasses.*
 
 @instance(MapK::class)
 interface MapKFunctorInstance<K> : Functor<MapKPartialOf<K>> {
-    override fun <A, B> map(fa: Kind<MapKPartialOf<K>, A>, f: (A) -> B): MapK<K, B> = fa.extract().map(f)
+    override fun <A, B> map(fa: Kind<MapKPartialOf<K>, A>, f: (A) -> B): MapK<K, B> = fa.fix().map(f)
 }
 
 @instance(MapK::class)
 interface MapKFoldableInstance<K> : Foldable<MapKPartialOf<K>> {
 
-    override fun <A, B> foldLeft(fa: Kind<MapKPartialOf<K>, A>, b: B, f: (B, A) -> B): B = fa.extract().foldLeft(b, f)
+    override fun <A, B> foldLeft(fa: Kind<MapKPartialOf<K>, A>, b: B, f: (B, A) -> B): B = fa.fix().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: Kind<MapKPartialOf<K>, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            fa.extract().foldRight(lb, f)
+            fa.fix().foldRight(lb, f)
 }
 
 @instance(MapK::class)
 interface MapKTraverseInstance<K> : MapKFoldableInstance<K>, Traverse<MapKPartialOf<K>> {
 
     override fun <G, A, B> traverse(fa: Kind<MapKPartialOf<K>, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Kind<MapKPartialOf<K>, B>> =
-            fa.extract().traverse(f, GA)
+            fa.fix().traverse(f, GA)
 }
 
 @instance(MapK::class)
@@ -32,8 +32,8 @@ interface MapKSemigroupInstance<K, A> : Semigroup<MapKOf<K, A>> {
     fun SG(): Semigroup<A>
 
     override fun combine(a: MapKOf<K, A>, b: MapKOf<K, A>): MapK<K, A> =
-            if (a.extract().size < b.extract().size) a.extract().foldLeft<A>(b.extract(), { my, (k, b) -> my.updated(k, SG().maybeCombine(b, my.get(k))) })
-            else b.extract().foldLeft<A>(a.extract(), { my, (k, a) -> my.updated(k, SG().maybeCombine(a, my.get(k))) })
+            if (a.fix().size < b.fix().size) a.fix().foldLeft<A>(b.fix(), { my, (k, b) -> my.updated(k, SG().maybeCombine(b, my.get(k))) })
+            else b.fix().foldLeft<A>(a.fix(), { my, (k, a) -> my.updated(k, SG().maybeCombine(a, my.get(k))) })
 
 }
 

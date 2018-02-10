@@ -34,7 +34,7 @@ open class ComonadContinuation<F, A : Any>(val CM: Comonad<F>, override val cont
 
     internal lateinit var returnedMonad: A
 
-    suspend fun <B> Kind<F, B>.extract(): B = extract { this }
+    suspend fun <B> Kind<F, B>.fix(): B = extract { this }
 
     suspend fun <B> extract(m: () -> Kind<F, B>): B = suspendCoroutineOrReturn { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels

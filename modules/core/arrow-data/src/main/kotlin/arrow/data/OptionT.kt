@@ -28,7 +28,7 @@ import arrow.typeclasses.applicative
 
         fun <F, A, B> tailRecM(a: A, f: (A) -> OptionTOf<F, Either<A, B>>, MF: Monad<F>): OptionT<F, B> =
                 OptionT(MF.tailRecM(a, {
-                    MF.map(f(it).extract().value, {
+                    MF.map(f(it).fix().value, {
                         it.fold({
                             Right<Option<B>>(None)
                         }, {
@@ -43,7 +43,7 @@ import arrow.typeclasses.applicative
 
     inline fun <B> cata(crossinline default: () -> B, crossinline f: (A) -> B, FF: Functor<F>): Kind<F, B> = fold(default, f, FF)
 
-    fun <B> ap(ff: OptionTOf<F, (A) -> B>, MF: Monad<F>): OptionT<F, B> = ff.extract().flatMap({ f -> map(f, MF) }, MF)
+    fun <B> ap(ff: OptionTOf<F, (A) -> B>, MF: Monad<F>): OptionT<F, B> = ff.fix().flatMap({ f -> map(f, MF) }, MF)
 
     inline fun <B> flatMap(crossinline f: (A) -> OptionT<F, B>, MF: Monad<F>): OptionT<F, B> = flatMapF({ it -> f(it).value }, MF)
 
@@ -92,4 +92,4 @@ import arrow.typeclasses.applicative
 inline fun <F, A, B> OptionT<F, A>.mapFilter(crossinline f: (A) -> Option<B>, FF: Functor<F>): OptionT<F, B> =
         OptionT(FF.map(value, { it.flatMap(f) }))
 
-fun <F, A> OptionTOf<F, A>.value(): Kind<F, Option<A>> = this.extract().value
+fun <F, A> OptionTOf<F, A>.value(): Kind<F, Option<A>> = this.fix().value

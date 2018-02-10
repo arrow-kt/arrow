@@ -2,7 +2,7 @@ package arrow.optics
 
 import arrow.core.Either
 import arrow.core.applicative
-import arrow.core.extract
+import arrow.core.fix
 import arrow.data.Invalid
 import arrow.data.Valid
 import arrow.data.Validated
@@ -50,7 +50,7 @@ class TryInstancesTest : UnitSpec() {
                 EQB = Eq.any(),
                 bMonoid = object : Monoid<Either<Throwable, Int>> {
                     override fun combine(a: Either<Throwable, Int>, b: Either<Throwable, Int>): Either<Throwable, Int> =
-                            Either.applicative<Throwable>().map2(a, b) { (a, b) -> a + b }.extract()
+                            Either.applicative<Throwable>().map2(a, b) { (a, b) -> a + b }.fix()
 
                     override fun empty(): Either<Throwable, Int> = 0.right()
                 }

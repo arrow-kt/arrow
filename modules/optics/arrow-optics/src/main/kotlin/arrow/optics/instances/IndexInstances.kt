@@ -14,24 +14,24 @@ import arrow.syntax.either.right
 @instance(ListK::class)
 interface ListKIndexInstance<A> : Index<ListKOf<A>, Int, A> {
     override fun index(i: Int): Optional<ListKOf<A>, A> = POptional(
-            getOrModify = { it.extract().getOrNull(i)?.right() ?: it.extract().left() },
-            set = { a -> { l -> l.extract().mapIndexed { index: Int, aa: A -> if (index == i) a else aa }.k() } }
+            getOrModify = { it.fix().getOrNull(i)?.right() ?: it.fix().left() },
+            set = { a -> { l -> l.fix().mapIndexed { index: Int, aa: A -> if (index == i) a else aa }.k() } }
     )
 }
 
 @instance(MapK::class)
 interface MapKIndexInstance<K, V> : Index<MapKOf<K, V>, K, V> {
     override fun index(i: K): Optional<MapKOf<K, V>, V> = POptional(
-            getOrModify = { it.extract()[i]?.right() ?: it.left() },
-            set = { v -> { m -> m.extract().mapValues { (k, vv) -> if (k == i) v else vv }.k() } }
+            getOrModify = { it.fix()[i]?.right() ?: it.left() },
+            set = { v -> { m -> m.fix().mapValues { (k, vv) -> if (k == i) v else vv }.k() } }
     )
 }
 
 @instance(SequenceK::class)
 interface SequenceKIndexInstance<A> : Index<SequenceKOf<A>, Int, A> {
     override fun index(i: Int): Optional<SequenceKOf<A>, A> = POptional(
-            getOrModify = { it.extract().sequence.elementAtOrNull(i)?.right() ?: it.extract().left() },
-            set = { a -> { it.extract().mapIndexed { index, aa -> if (index == i) a else aa }.k() } }
+            getOrModify = { it.fix().sequence.elementAtOrNull(i)?.right() ?: it.fix().left() },
+            set = { a -> { it.fix().mapIndexed { index, aa -> if (index == i) a else aa }.k() } }
     )
 }
 
@@ -51,12 +51,12 @@ interface NonEmptyListIndexInstance<A> : Index<NonEmptyListOf<A>, Int, A> {
 
     override fun index(i: Int): Optional<NonEmptyListOf<A>, A> = POptional(
             getOrModify = { l ->
-                l.extract().all.getOrNull(i)?.right() ?: l.extract().left()
+                l.fix().all.getOrNull(i)?.right() ?: l.fix().left()
             },
             set = { a ->
                 { l ->
                     NonEmptyList.fromListUnsafe(
-                            l.extract().all.mapIndexed { index: Int, aa: A -> if (index == i) a else aa }
+                            l.fix().all.mapIndexed { index: Int, aa: A -> if (index == i) a else aa }
                     )
                 }
             }

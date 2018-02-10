@@ -29,9 +29,9 @@ class NonEmptyList<out A> private constructor(
 
     fun <B> map(f: (A) -> B): NonEmptyList<B> = NonEmptyList(f(head), tail.map(f))
 
-    fun <B> flatMap(f: (A) -> NonEmptyListOf<B>): NonEmptyList<B> = f(head).extract() + tail.flatMap { f(it).extract().all }
+    fun <B> flatMap(f: (A) -> NonEmptyListOf<B>): NonEmptyList<B> = f(head).fix() + tail.flatMap { f(it).fix().all }
 
-    fun <B> ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> = ff.extract().flatMap { f -> map(f) }.extract()
+    fun <B> ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> = ff.fix().flatMap { f -> map(f) }.fix()
 
     operator fun plus(l: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> = NonEmptyList(all + l.all)
 
@@ -39,15 +39,15 @@ class NonEmptyList<out A> private constructor(
 
     operator fun plus(a: @UnsafeVariance A): NonEmptyList<A> = NonEmptyList(all + a)
 
-    fun <B> foldLeft(b: B, f: (B, A) -> B): B = this.extract().tail.fold(f(b, this.extract().head), f)
+    fun <B> foldLeft(b: B, f: (B, A) -> B): B = this.fix().tail.fold(f(b, this.fix().head), f)
 
-    fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = foldable<ForListK>().foldRight(this.extract().all.k(), lb, f)
+    fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = foldable<ForListK>().foldRight(this.fix().all.k(), lb, f)
 
     fun <G, B> traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, NonEmptyList<B>> =
-            GA.map2Eval(f(this.extract().head), Eval.always {
-                arrow.typeclasses.traverse<ForListK>().traverse(this.extract().tail.k(), f, GA)
+            GA.map2Eval(f(this.fix().head), Eval.always {
+                arrow.typeclasses.traverse<ForListK>().traverse(this.fix().tail.k(), f, GA)
             }, {
-                NonEmptyList(it.a, it.b.extract().list)
+                NonEmptyList(it.a, it.b.fix().list)
             }).value()
 
     fun <B> coflatMap(f: (NonEmptyListOf<A>) -> B): NonEmptyList<B> {
@@ -60,10 +60,10 @@ class NonEmptyList<out A> private constructor(
                     buf += f(NonEmptyList(list[0], tail))
                     consume(tail)
                 }
-        return NonEmptyList(f(this), consume(this.extract().tail))
+        return NonEmptyList(f(this), consume(this.fix().tail))
     }
 
-    fun extractM(): A = this.extract().head
+    fun extractM(): A = this.fix().head
 
     fun iterator(): Iterator<A> = all.iterator()
 
@@ -106,13 +106,13 @@ class NonEmptyList<out A> private constructor(
                         is None -> Unit
                     }
                 }
-                is Either.Left<A, B> -> go(buf, f, f(head.a).extract() + v.tail)
+                is Either.Left<A, B> -> go(buf, f, f(head.a).fix() + v.tail)
             }
         }
 
         fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForNonEmptyList, Either<A, B>>): NonEmptyList<B> {
             val buf = ArrayList<B>()
-            go(buf, f, f(a).extract())
+            go(buf, f, f(a).fix())
             return fromListUnsafe(buf)
         }
 
@@ -121,4 +121,4 @@ class NonEmptyList<out A> private constructor(
 
 fun <A> A.nel(): NonEmptyList<A> = NonEmptyList.of(this)
 
-fun <A> NonEmptyList<A>.combineK(y: NonEmptyListOf<A>): NonEmptyList<A> = this.plus(y.extract())
+fun <A> NonEmptyList<A>.combineK(y: NonEmptyListOf<A>): NonEmptyList<A> = this.plus(y.fix())

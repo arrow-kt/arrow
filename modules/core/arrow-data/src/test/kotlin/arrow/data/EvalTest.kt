@@ -16,7 +16,7 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class EvalTest : UnitSpec() {
     val EQ: Eq<Kind<ForEval, Int>> = Eq { a, b ->
-        a.extract().value() == b.extract().value()
+        a.fix().value() == b.fix().value()
     }
 
     init {

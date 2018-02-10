@@ -14,7 +14,7 @@ import arrow.typeclasses.*
 @RunWith(KTestJUnitRunner::class)
 class CoproductTest : UnitSpec() {
     val EQ: Eq<Kind3<ForCoproduct, ForId, ForId, Int>> = Eq { a, b ->
-        a.extract().extract() == b.extract().extract()
+        a.fix().fix() == b.fix().fix()
     }
 
     init {

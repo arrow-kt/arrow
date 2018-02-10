@@ -75,7 +75,7 @@ fun validateUser(name: String, pass: String) =
             val username = validateUsername(name).bind()
             val password = validatePassword(pass).bind()
             User(username, password)
-        }.extract()
+        }.fix()
 ```
 
 Now we're able to validate user data and also accumulate non-fatal warnings:

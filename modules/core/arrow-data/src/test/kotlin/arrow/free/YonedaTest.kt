@@ -2,7 +2,7 @@ package arrow.free
 
 import arrow.core.ForId
 import arrow.core.Id
-import arrow.core.extract
+import arrow.core.fix
 import arrow.core.functor
 import arrow.test.UnitSpec
 import arrow.test.laws.FunctorLaws
@@ -19,7 +19,7 @@ class YonedaTest : UnitSpec() {
     val F = Yoneda.functor<ForId>()
 
     val EQ = Eq<YonedaOf<ForId, Int>> { a, b ->
-        a.extract().lower() == b.extract().lower()
+        a.fix().lower() == b.fix().lower()
     }
 
     init {
@@ -33,8 +33,8 @@ class YonedaTest : UnitSpec() {
         "toCoyoneda should convert to an equivalent Coyoneda" {
             forAll { x: Int ->
                 val op = Yoneda(Id(x.toString()))
-                val toYoneda = op.toCoyoneda().lower(Id.functor()).extract()
-                val expected = Coyoneda(Id(x), Int::toString).lower(Id.functor()).extract()
+                val toYoneda = op.toCoyoneda().lower(Id.functor()).fix()
+                val expected = Coyoneda(Id(x), Int::toString).lower(Id.functor()).fix()
 
                 expected == toYoneda
             }

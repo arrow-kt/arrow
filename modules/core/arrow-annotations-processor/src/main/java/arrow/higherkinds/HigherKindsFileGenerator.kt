@@ -77,7 +77,7 @@ class HigherKindsFileGenerator(
     private fun genEv(hk: HigherKind): String =
             """
             |@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-            |inline fun <${hk.expandedTypeArgs}> ${hk.name}<${hk.expandedTypeArgs}>.extract(): ${hk.kindName}<${hk.expandedTypeArgs}>${hk.typeConstraints} =
+            |inline fun <${hk.expandedTypeArgs}> ${hk.name}<${hk.expandedTypeArgs}>.fix(): ${hk.kindName}<${hk.expandedTypeArgs}>${hk.typeConstraints} =
             |  this as ${hk.kindName}<${hk.expandedTypeArgs}>
         """.trimMargin()
 

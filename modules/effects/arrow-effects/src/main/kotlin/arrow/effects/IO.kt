@@ -54,7 +54,7 @@ sealed class IO<out A> : IOOf<A> {
                 }
 
         fun <A, B> tailRecM(a: A, f: (A) -> IOOf<Either<A, B>>): IO<B> =
-                f(a).extract().flatMap {
+                f(a).fix().flatMap {
                     when (it) {
                         is Either.Left -> tailRecM(it.a, f)
                         is Either.Right -> IO.pure(it.b)
@@ -65,13 +65,13 @@ sealed class IO<out A> : IOOf<A> {
     abstract fun <B> map(f: (A) -> B): IO<B>
 
     fun <B> flatMap(f: (A) -> IOOf<B>): IO<B> =
-            Bind(this, { f(it).extract() })
+            Bind(this, { f(it).fix() })
 
     fun attempt(): IO<Either<Throwable, A>> =
             Bind(this, IOFrame.any())
 
     fun runAsync(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Unit> =
-            IO { unsafeRunAsync(cb.andThen { it.extract().unsafeRunAsync { } }) }
+            IO { unsafeRunAsync(cb.andThen { it.fix().unsafeRunAsync { } }) }
 
     fun unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
             IORunLoop.start(this, cb)
@@ -134,7 +134,7 @@ sealed class IO<out A> : IOOf<A> {
 }
 
 fun <A, B> IO<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
-        flatMap { a -> ff.extract().map({ it(a) }) }
+        flatMap { a -> ff.fix().map({ it(a) }) }
 
 fun <A> IO<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
         IO.Bind(this, IOFrame.errorHandler(f))

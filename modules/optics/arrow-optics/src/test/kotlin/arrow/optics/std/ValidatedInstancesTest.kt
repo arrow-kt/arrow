@@ -2,10 +2,10 @@ package arrow.optics
 
 import arrow.core.Either
 import arrow.core.applicative
-import arrow.core.extract
+import arrow.core.fix
 import arrow.data.Try
 import arrow.data.applicative
-import arrow.data.extract
+import arrow.data.fix
 import arrow.syntax.either.right
 import arrow.test.UnitSpec
 import arrow.test.generators.*
@@ -33,7 +33,7 @@ class ValidatedInstancesTest : UnitSpec() {
                     override fun empty() = 0.right()
 
                     override fun combine(a: Either<String, Int>, b: Either<String, Int>): Either<String, Int> =
-                            Either.applicative<String>().map2(a, b) { (a, b) -> a + b }.extract()
+                            Either.applicative<String>().map2(a, b) { (a, b) -> a + b }.fix()
                 }),
 
             IsoLaws.laws(
@@ -44,7 +44,7 @@ class ValidatedInstancesTest : UnitSpec() {
                 EQA = Eq.any(),
                 EQB = Eq.any(),
                 bMonoid = object : Monoid<Try<Int>> {
-                    override fun combine(a: Try<Int>, b: Try<Int>) = Try.applicative().map2(a, b) { (a, b) -> a + b }.extract()
+                    override fun combine(a: Try<Int>, b: Try<Int>) = Try.applicative().map2(a, b) { (a, b) -> a + b }.fix()
 
                     override fun empty(): Try<Int> = Try.Success(0)
                 })
