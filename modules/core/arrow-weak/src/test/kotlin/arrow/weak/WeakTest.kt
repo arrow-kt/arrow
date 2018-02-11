@@ -10,18 +10,18 @@ import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class WeakTest : UnitSpec() {
-    val EQ: Eq<Kind<WeakHK, Int>> = Eq { a, b ->
-        a.ev().getOrElse { -1 } == b.ev().getOrElse { -2 }
+    val EQ: Eq<WeakOf<Int>> = Eq { a, b ->
+        a.fix().getOrElse { -1 } == b.fix().getOrElse { -2 }
     }
 
     init {
 
         "instances can be resolved implicitly" {
-            functor<WeakKind<Int>>() shouldNotBe null
-            applicative<WeakKind<Int>>() shouldNotBe null
-            monad<WeakKind<Int>>() shouldNotBe null
-            foldable<WeakKind<Int>>() shouldNotBe null
-            traverse<WeakKind<Int>>() shouldNotBe null
+            functor<ForWeak>() shouldNotBe null
+            applicative<ForWeak>() shouldNotBe null
+            monad<ForWeak>() shouldNotBe null
+            foldable<ForWeak>() shouldNotBe null
+            traverse<ForWeak>() shouldNotBe null
             eq<Weak<Int>>() shouldNotBe null
         }
 

@@ -1,6 +1,6 @@
 package arrow.weak.instances
 
-import arrow.HK
+import arrow.Kind
 import arrow.core.*
 import arrow.weak.*
 import arrow.instance
@@ -16,89 +16,89 @@ interface WeakEqInstance<A> : Eq<Weak<A>> {
 }
 
 @instance(Weak::class)
-interface WeakFunctorInstance : Functor<WeakHK> {
-    override fun <A, B> map(fa: WeakKind<A>, f: kotlin.Function1<A, B>): Weak<B> =
-        fa.ev().map(f)
+interface WeakFunctorInstance : Functor<ForWeak> {
+    override fun <A, B> map(fa: WeakOf<A>, f: kotlin.Function1<A, B>): Weak<B> =
+        fa.fix().map(f)
 }
 
 @instance(Weak::class)
-interface WeakApplicativeInstance : Applicative<WeakHK> {
+interface WeakApplicativeInstance : Applicative<ForWeak> {
 
-    override fun <A, B> ap(fa: HK<WeakHK, A>, ff: HK<WeakHK, (A) -> B>): HK<WeakHK, B> =
-        fa.ev().ap(ff)
+    override fun <A, B> ap(fa: WeakOf<A>, ff: WeakOf<(A) -> B>): Weak<B> =
+        fa.fix().ap(ff)
 
-    override fun <A> pure(a: A): HK<WeakHK, A> =
+    override fun <A> pure(a: A): WeakOf<A> =
         Weak(a)
 
-    override fun <A, B> map(fa: HK<WeakHK, A>, f: (A) -> B): HK<WeakHK, B> =
-        fa.ev().map(f)
+    override fun <A, B> map(fa: WeakOf<A>, f: (A) -> B): Weak<B> =
+        fa.fix().map(f)
 
 }
 
 @instance(Weak::class)
-interface WeakMonadInstance : Monad<WeakHK> {
+interface WeakMonadInstance : Monad<ForWeak> {
 
-    override fun <A, B> ap(fa: HK<WeakHK, A>, ff: HK<WeakHK, (A) -> B>): HK<WeakHK, B> =
-        fa.ev().ap(ff)
+    override fun <A, B> ap(fa: WeakOf<A>, ff: WeakOf<(A) -> B>): Weak<B> =
+        fa.fix().ap(ff)
 
-    override fun <A, B> flatMap(fa: HK<WeakHK, A>, f: (A) -> HK<WeakHK, B>): HK<WeakHK, B> =
-        fa.ev().flatMap(f)
+    override fun <A, B> flatMap(fa: Kind<ForWeak, A>, f: (A) -> Kind<ForWeak, B>): Kind<ForWeak, B> =
+        fa.fix().flatMap(f)
 
-    override fun <A, B> tailRecM(a: A, f: (A) -> HK<WeakHK, Either<A, B>>): HK<WeakHK, B> =
+    override fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForWeak, Either<A, B>>): Kind<ForWeak, B> =
         Weak.tailRectM(a, f)
 
-    override fun <A> pure(a: A): HK<WeakHK, A> =
+    override fun <A> pure(a: A): WeakOf<A> =
         Weak(a)
 
 }
 
 @instance(Weak::class)
-interface WeakFoldableInstance : Foldable<WeakHK> {
-    override fun <A> exists(fa: WeakKind<A>, p: Predicate<A>): Boolean =
-        fa.ev().exists(p)
+interface WeakFoldableInstance : Foldable<ForWeak> {
+    override fun <A> exists(fa: WeakOf<A>, p: Predicate<A>): Boolean =
+        fa.fix().exists(p)
 
-    override fun <A, B> foldLeft(fa: WeakKind<A>, b: B, f: (B, A) -> B): B =
-        fa.ev().foldLeft(b, f)
+    override fun <A, B> foldLeft(fa: WeakOf<A>, b: B, f: (B, A) -> B): B =
+        fa.fix().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: WeakKind<A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-        fa.ev().foldRight(lb, f)
+    override fun <A, B> foldRight(fa: WeakOf<A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+        fa.fix().foldRight(lb, f)
 
-    override fun <A> forall(fa: WeakKind<A>, p: Predicate<A>): Boolean =
-        fa.ev().forall(p)
+    override fun <A> forall(fa: WeakOf<A>, p: Predicate<A>): Boolean =
+        fa.fix().forall(p)
 
-    override fun <A> isEmpty(fa: WeakKind<A>): Boolean =
-        fa.ev().isEmpty()
+    override fun <A> isEmpty(fa: WeakOf<A>): Boolean =
+        fa.fix().isEmpty()
 
-    override fun <A> nonEmpty(fa: WeakKind<A>): Boolean =
-        fa.ev().nonEmpty()
+    override fun <A> nonEmpty(fa: WeakOf<A>): Boolean =
+        fa.fix().nonEmpty()
 }
 
-fun <A, G, B> Weak<A>.traverse(f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, Weak<B>> =
-    ev().option().fold({ GA.pure(Weak.emptyWeak()) }, { GA.map(f(it), { Weak(it) }) })
+fun <A, G, B> Weak<A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Weak<B>> =
+    fix().option().fold({ GA.pure(Weak.emptyWeak()) }, { GA.map(f(it), { Weak(it) }) })
 
 @instance(Weak::class)
-interface WeakTraverseInstance : Traverse<WeakHK> {
-    override fun <A, B> map(fa: WeakKind<A>, f: (A) -> B): Weak<B> =
-        fa.ev().map(f)
+interface WeakTraverseInstance : Traverse<ForWeak> {
+    override fun <A, B> map(fa: WeakOf<A>, f: (A) -> B): Weak<B> =
+        fa.fix().map(f)
 
-    override fun <G, A, B> traverse(fa: WeakKind<A>, f: (A) -> HK<G, B>, GA: Applicative<G>): HK<G, Weak<B>> =
-        fa.ev().traverse(f, GA)
+    override fun <G, A, B> traverse(fa: WeakOf<A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Weak<B>> =
+        fa.fix().traverse(f, GA)
 
-    override fun <A> exists(fa: WeakKind<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
-        fa.ev().exists(p)
+    override fun <A> exists(fa: WeakOf<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
+        fa.fix().exists(p)
 
-    override fun <A, B> foldLeft(fa: WeakKind<A>, b: B, f: (B, A) -> B): B =
-        fa.ev().foldLeft(b, f)
+    override fun <A, B> foldLeft(fa: WeakOf<A>, b: B, f: (B, A) -> B): B =
+        fa.fix().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: WeakKind<A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-        fa.ev().foldRight(lb, f)
+    override fun <A, B> foldRight(fa: WeakOf<A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+        fa.fix().foldRight(lb, f)
 
-    override fun <A> forall(fa: WeakKind<A>, p: Predicate<A>): Boolean =
-        fa.ev().forall(p)
+    override fun <A> forall(fa: WeakOf<A>, p: Predicate<A>): Boolean =
+        fa.fix().forall(p)
 
-    override fun <A> isEmpty(fa: WeakKind<A>): Boolean =
-        fa.ev().isEmpty()
+    override fun <A> isEmpty(fa: WeakOf<A>): Boolean =
+        fa.fix().isEmpty()
 
-    override fun <A> nonEmpty(fa: WeakKind<A>): Boolean =
-        fa.ev().nonEmpty()
+    override fun <A> nonEmpty(fa: WeakOf<A>): Boolean =
+        fa.fix().nonEmpty()
 }
