@@ -9,13 +9,11 @@ import arrow.effects.internal.Platform.unsafeResync
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
 
 @higherkind
 @deriving(
         Functor::class,
-        Applicative::class,
-        Monad::class)
+        Applicative::class)
 sealed class IO<out A> : IOOf<A> {
 
     companion object {
@@ -124,8 +122,8 @@ sealed class IO<out A> : IOOf<A> {
         override fun invoke(value: E): IO<A> = pure(g(value))
 
         override fun <B> map(f: (A) -> B): IO<B> =
-                // Allowed to do maxStackDepthSize map operations in sequence before
-                // starting a new Map fusion in order to avoid stack overflows
+        // Allowed to do maxStackDepthSize map operations in sequence before
+        // starting a new Map fusion in order to avoid stack overflows
                 if (index != maxStackDepthSize) Map(source, g.andThen(f), index + 1)
                 else Map(this, f, 0)
 
