@@ -7,8 +7,8 @@ import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.RestrictsSuspension
 
 @RestrictsSuspension
-open class MonadErrorBlockingContinuation<F, E, A>(val ME: MonadError<F, E>, latch: Awaitable<Kind<F, A>>, override val context: CoroutineContext, private val convertError: (Throwable) -> E) :
-        MonadBlockingContinuation<F, A>(ME, latch, context), MonadError<F, E> by ME {
+open class MonadErrorBlockingContinuation<F, E, A>(ME: MonadError<F, E>, latch: Awaitable<Kind<F, A>>, override val context: CoroutineContext, private val convertError: (Throwable) -> E) :
+        MonadBlockingContinuation<F, A>(ME, latch, context), MonadError<F, E> by ME, BindingCatchContinuation<F, E, A> {
 
     override fun returnedMonad(): Kind<F, A> =
             awaitBlocking().fold({ raiseError(convertError(it)) }, { result -> flatMap(returnedMonad, { result }) })

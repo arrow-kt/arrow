@@ -7,6 +7,7 @@ import kotlin.coroutines.experimental.RestrictsSuspension
 
 @RestrictsSuspension
 interface BindingContinuation<F, A> : Monad<F>, Continuation<Kind<F, A>> {
+
     suspend fun <B> bind(m: () -> Kind<F, B>): B
 
     suspend fun <B> Kind<F, B>.bind(): B = bind { this }

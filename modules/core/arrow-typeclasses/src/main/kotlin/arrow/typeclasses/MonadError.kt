@@ -5,6 +5,7 @@ import arrow.TC
 import arrow.core.Either
 import arrow.core.identity
 import arrow.typeclass
+import arrow.typeclasses.continuations.BindingCatchContinuation
 import arrow.typeclasses.continuations.MonadErrorBlockingContinuation
 import arrow.typeclasses.internal.Platform
 import kotlin.coroutines.experimental.CoroutineContext
@@ -28,7 +29,7 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F>, TC {
      * This one operates over [MonadError] instances that can support [Throwable] in their error type automatically lifting
      * errors as failed computations in their monadic context and not letting exceptions thrown as the regular monad binding does.
      */
-    fun <B> bindingCatch(cc: CoroutineContext = EmptyCoroutineContext, catch: (Throwable) -> E, c: suspend MonadErrorBlockingContinuation<F, E, *>.() -> B): Kind<F, B> {
+    fun <B> bindingCatch(cc: CoroutineContext = EmptyCoroutineContext, catch: (Throwable) -> E, c: suspend BindingCatchContinuation<F, E, *>.() -> B): Kind<F, B> {
         val continuation = MonadErrorBlockingContinuation<F, E, B>(this, Platform.awaitableLatch(), cc, catch)
         val coro: suspend () -> Kind<F, B> = { pure(c(continuation)).also { continuation.resolve(Either.right(it)) } }
         coro.startCoroutine(continuation)
@@ -36,5 +37,5 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F>, TC {
     }
 }
 
-fun <F, B>  MonadError<F, Throwable>.bindingCatch(cc: CoroutineContext = EmptyCoroutineContext, c: suspend MonadErrorBlockingContinuation<F, Throwable, *>.() -> B): Kind<F, B> =
+fun <F, B>  MonadError<F, Throwable>.bindingCatch(cc: CoroutineContext = EmptyCoroutineContext, c: suspend BindingCatchContinuation<F, Throwable, *>.() -> B): Kind<F, B> =
         bindingCatch(cc, ::identity, c)
