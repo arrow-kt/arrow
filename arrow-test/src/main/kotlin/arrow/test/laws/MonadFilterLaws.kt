@@ -41,7 +41,7 @@ object MonadFilterLaws {
             forAll(Gen.bool(), Gen.int(), { guard: Boolean, n: Int ->
                 MF.bindingFilter {
                     continueIf(guard)
-                    yields(n)
+                    n
                 }.equalUnderTheLaw(if (!guard) MF.empty() else MF.pure(n), EQ)
             })
 
@@ -49,7 +49,7 @@ object MonadFilterLaws {
             forAll(Gen.bool(), Gen.int(), { guard: Boolean, n: Int ->
                 MF.bindingFilter {
                     val x = MF.pure(n).bindWithFilter { _ -> guard }
-                    yields(x)
+                    x
                 }.equalUnderTheLaw(if (!guard) MF.empty() else MF.pure(n), EQ)
             })
 

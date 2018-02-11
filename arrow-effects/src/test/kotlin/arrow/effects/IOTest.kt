@@ -248,7 +248,7 @@ class IOTest : UnitSpec() {
             val result = IO.monad().binding {
                 val x = IO.pure(1).bind()
                 val y = bind { IO { x + 1 } }
-                yields(y)
+                y
             }.ev()
             result.unsafeRunSync() shouldBe 2
         }

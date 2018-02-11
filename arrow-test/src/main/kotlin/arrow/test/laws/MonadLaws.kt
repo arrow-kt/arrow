@@ -77,13 +77,13 @@ object MonadLaws {
                     val a = pure(num).bind()
                     val b = pure(a + 1).bind()
                     val c = pure(b + 1).bind()
-                    yields(c)
+                    c
                 }
                 val bb = M.bindingStackSafe {
                     val a = pure(num).bind()
                     val b = pure(a + 1).bind()
                     val c = pure(b + 1).bind()
-                    yields(c)
+                    c
                 }.run(M)
                 aa.equalUnderTheLaw(bb, EQ) &&
                         aa.equalUnderTheLaw(M.pure(num + 2), EQ)
@@ -95,7 +95,7 @@ object MonadLaws {
                     val a = pure(num).bind()
                     val b = pure(a + 1).bind()
                     val c = pure(b + 1).bind()
-                    yields(c)
+                    c
                 }.equalUnderTheLaw(M.pure(num + 2), EQ)
             })
 
@@ -104,13 +104,13 @@ object MonadLaws {
                 M.binding {
                     val a = bindIn(newSingleThreadContext("$num")) { num + 1 }
                     val b = bindIn(newSingleThreadContext("$a")) { a + 1 }
-                    yields(b)
+                    b
                 }.equalUnderTheLaw(M.pure(num + 2), EQ)
             })
 
     fun <F> stackSafeTestProgram(M: Monad<F>, n: Int, stopAt: Int): Free<F, Int> = M.bindingStackSafe {
         val v = pure(n + 1).bind()
         val r = if (v < stopAt) stackSafeTestProgram(M, v, stopAt).bind() else pure(v).bind()
-        yields(r)
+        r
     }
 }

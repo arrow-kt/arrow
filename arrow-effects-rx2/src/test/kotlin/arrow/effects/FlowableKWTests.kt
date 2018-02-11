@@ -80,7 +80,7 @@ class FlowableKWTests : UnitSpec() {
         "Multi-thread Flowables finish correctly" {
             val value: Flowable<Long> = FlowableKW.monadErrorFlat().bindingCatch {
                 val a = Flowable.timer(2, TimeUnit.SECONDS).k().bind()
-                yields(a)
+                a
             }.value()
             val test: TestSubscriber<Long> = value.test()
             test.awaitDone(5, TimeUnit.SECONDS)
@@ -94,7 +94,7 @@ class FlowableKWTests : UnitSpec() {
                 val a = Flowable.timer(2, TimeUnit.SECONDS, Schedulers.newThread()).k().bind()
                 threadRef = Thread.currentThread()
                 val b = Flowable.just(a).observeOn(Schedulers.newThread()).k().bind()
-                yields(b)
+                b
             }.value()
             val test: TestSubscriber<Long> = value.test()
             val lastThread: Thread = test.awaitDone(5, TimeUnit.SECONDS).lastThread()
@@ -108,7 +108,7 @@ class FlowableKWTests : UnitSpec() {
         "Flowable cancellation forces binding to cancel without completing too" {
             val value: Flowable<Long> = FlowableKW.monadErrorFlat().bindingCatch {
                 val a = Flowable.timer(3, TimeUnit.SECONDS).k().bind()
-                yields(a)
+                a
             }.value()
             val test: TestSubscriber<Long> = value.doOnSubscribe { subscription ->
                 Flowable.timer(1, TimeUnit.SECONDS).subscribe {
