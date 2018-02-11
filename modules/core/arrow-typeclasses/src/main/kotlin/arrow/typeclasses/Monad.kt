@@ -5,6 +5,10 @@ import arrow.TC
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.typeclass
+import arrow.typeclasses.continuations.MonadBlockingContinuation
+import arrow.typeclasses.internal.Platform
+import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.experimental.EmptyCoroutineContext
 import kotlin.coroutines.experimental.startCoroutine
 
 @typeclass
@@ -27,16 +31,17 @@ interface Monad<F> : Applicative<F>, TC {
     fun <A, B> forEffect(fa: Kind<F, A>, fb: Kind<F, B>): Kind<F, A> = flatMap(fa, { a -> map(fb, { a }) })
 
     fun <A, B> forEffectEval(fa: Kind<F, A>, fb: Eval<Kind<F, B>>): Kind<F, A> = flatMap(fa, { a -> map(fb.value(), { a }) })
-}
 
-/**
- * Entry point for monad bindings which enables for comprehension. The underlying implementation is based on coroutines.
- * A coroutine is initiated and suspended inside [MonadErrorContinuation] yielding to [Monad.flatMap]. Once all the flatMap binds are completed
- * the underlying monad is returned from the act of executing the coroutine
- */
-fun <F, B> Monad<F>.binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> {
-    val continuation = MonadContinuation<F, B>(this)
-    val wrapReturn: suspend MonadContinuation<F, *>.() -> Kind<F, B> = { pure(c()) }
-    wrapReturn.startCoroutine(continuation, continuation)
-    return continuation.returnedMonad()
+    /**
+     * Entry point for monad bindings which enables for comprehension. The underlying implementation is based on coroutines.
+     * A coroutine is initiated and suspended inside [MonadErrorContinuation] yielding to [Monad.flatMap]. Once all the flatMap binds are completed
+     * the underlying monad is returned from the act of executing the coroutine
+     */
+    fun <B> binding(cc: CoroutineContext = EmptyCoroutineContext, c: suspend MonadBlockingContinuation<F, *>.() -> B): Kind<F, B> {
+        val continuation = MonadBlockingContinuation<F, B>(this, Platform.awaitableLatch(), cc)
+        val coro: suspend () -> Kind<F, B> = { pure(c(continuation)).also { continuation.resolve(Either.right(it)) } }
+        coro.startCoroutine(continuation)
+        return continuation.returnedMonad()
+    }
+
 }

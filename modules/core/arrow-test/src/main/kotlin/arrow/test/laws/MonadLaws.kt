@@ -12,7 +12,6 @@ import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genIntSmall
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monad
-import arrow.typeclasses.binding
 import arrow.typeclasses.monad
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -102,8 +101,8 @@ object MonadLaws {
     inline fun <reified F> monadComprehensionsBindInContext(M: Monad<F> = monad<F>(), EQ: Eq<Kind<F, Int>>): Unit =
             forFew(5, genIntSmall(), { num: Int ->
                 M.binding {
-                    val a = bindIn(newSingleThreadContext("$num")) { num + 1 }
-                    val b = bindIn(newSingleThreadContext("$a")) { a + 1 }
+                    val a = binding(newSingleThreadContext("$num")) { num + 1 }.bind()
+                    val b = binding(newSingleThreadContext("$a")) { a + 1 }.bind()
                     yields(b)
                 }.equalUnderTheLaw(M.pure(num + 2), EQ)
             })
