@@ -1,4 +1,4 @@
-package arrow.effects.data.internal
+package arrow.effects.continuations
 
 import java.util.concurrent.CancellationException as JavaCancellationException
 
