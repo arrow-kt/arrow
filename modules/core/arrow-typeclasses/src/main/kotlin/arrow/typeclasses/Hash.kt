@@ -35,16 +35,18 @@ interface Hash<in F> : Eq<F>, TC {
         }
 
         /**
-         * Construct a [Hash] instance by using the universal `hashCode` function
-         * and the universal equality relation.
+         * Retrieve a [Hash] instance that defines the hash function as `hashCode`
+         * and the equivalence relation as `==`,  for type [F].
          *
-         * @returns a [Hash] instance that is defined by the [A] `hashCode` method.
+         * @returns a [Hash] instance with the universal `hashCode` function and the universal equality relation.
          */
-        fun <F> fromUniversalHashCode(): Hash<F> = object : Hash<F> {
-            override fun hash(a: F): Int =
-                    a!!.hashCode()
+        fun any(): Hash<Any> = HashAny
 
-            override fun eqv(a: F, b: F): Boolean = a == b
+        private object HashAny : Hash<Any> {
+            override fun hash(a: Any): Int =
+                    a.hashCode()
+
+            override fun eqv(a: Any, b: Any): Boolean = a == b
         }
     }
 }

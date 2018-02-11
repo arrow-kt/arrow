@@ -17,7 +17,7 @@ interface IdEqInstance<A> : Eq<Id<A>> {
 @instance(Id::class)
 interface IdHashInstance<A> : IdEqInstance<A>, Hash<Id<A>> {
     override fun hash(a: Id<A>): Int =
-            Hash.fromUniversalHashCode<Id<A>>().hash(a)
+            Hash.any().hash(a)
 }
 
 @instance(Id::class)
