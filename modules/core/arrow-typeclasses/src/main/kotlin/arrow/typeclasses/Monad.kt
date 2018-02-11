@@ -5,6 +5,7 @@ import arrow.TC
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.typeclass
+import arrow.typeclasses.continuations.BindingContinuation
 import arrow.typeclasses.continuations.MonadBlockingContinuation
 import arrow.typeclasses.internal.Platform
 import kotlin.coroutines.experimental.CoroutineContext
@@ -37,7 +38,7 @@ interface Monad<F> : Applicative<F>, TC {
      * A coroutine is initiated and suspended inside [MonadErrorContinuation] yielding to [Monad.flatMap]. Once all the flatMap binds are completed
      * the underlying monad is returned from the act of executing the coroutine
      */
-    fun <B> binding(cc: CoroutineContext = EmptyCoroutineContext, c: suspend MonadBlockingContinuation<F, *>.() -> B): Kind<F, B> {
+    fun <B> binding(cc: CoroutineContext = EmptyCoroutineContext, c: suspend BindingContinuation<F>.() -> B): Kind<F, B> {
         val continuation = MonadBlockingContinuation<F, B>(this, Platform.awaitableLatch(), cc)
         val coro: suspend () -> Kind<F, B> = { pure(c(continuation)).also { continuation.resolve(Either.right(it)) } }
         coro.startCoroutine(continuation)
