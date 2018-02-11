@@ -6,6 +6,7 @@ import arrow.common.utils.extractFullName
 import arrow.common.utils.fullName
 import arrow.common.utils.removeBackticks
 import arrow.derive.HKArgs
+import me.eugeniomarletti.kotlin.metadata.isSuspendType
 import me.eugeniomarletti.kotlin.metadata.modality
 import org.jetbrains.kotlin.serialization.ProtoBuf
 import java.io.File
@@ -53,10 +54,10 @@ data class SyntaxFunctionSignature(
     fun generate(): String {
         val typeParamsS = if (tparams.isEmpty()) "" else tparams.joinToString(prefix = "<`", separator = "`, `", postfix = "`>")
         val argsS = when (hkArgs) {
-            is HKArgs.None -> "(dummy: Unit = Unit)"
-            else -> args.drop(1).map {
+            HKArgs.None -> "(dummy: Unit = Unit)"
+            else -> args.drop(1).joinToString(prefix = "(`", separator = "`, `", postfix = "`)") {
                 "${it.first}: ${it.second}"
-            }.joinToString(prefix = "(`", separator = "`, `", postfix = "`)")
+            }
         }
         return """|fun $typeParamsS ${receiver()}__name__$argsS: $retType =
                   |    ${implBody()}""".removeBackticks().replace("__name__", "`$name`").trimMargin()
@@ -89,7 +90,11 @@ data class SyntaxFunctionSignature(
             val typeParams = f.typeParameterList.map { nameResolver.getString(it.name) }
             val argsC = f.valueParameterList.map {
                 val argName = nameResolver.getString(it.name)
-                val argType = it.type.extractFullName(typeClass.clazz, failOnGeneric = false)
+                val argType = if (it.type.isSuspendType) {
+                    extractSuspendedArgType(it, typeClass)
+                } else {
+                    it.type.extractFullName(typeClass.clazz, failOnGeneric = false)
+                }
                 argName to argType
             }
             val dummyErasureArg = listOf("dummy" to "Unit = Unit")
@@ -115,6 +120,17 @@ data class SyntaxFunctionSignature(
                     receiverType = receiverType,
                     isAbstract = isAbstract
             )
+        }
+
+        // At this point the suspended parameter has already been rewritten and needs to be reverted
+        private fun extractSuspendedArgType(it: ProtoBuf.ValueParameter, typeClass: Typeclass): String {
+            // The argument list contains: the parameters, the result wrapped in a Continuation<R>, and a new return Any?
+            val argumentList = it.type.argumentList
+            // Extract the parameters
+            val parameters = argumentList.dropLast(2).joinToString(separator = ", ") { it.type.extractFullName(typeClass.clazz, failOnGeneric = false) }
+            // Extract the return type R from the Continuation<R>
+            val result = argumentList.dropLast(1).last().type.argumentList.joinToString { it.type.extractFullName(typeClass.clazz, failOnGeneric = false) }
+            return "suspend ($parameters) -> $result"
         }
     }
 }
