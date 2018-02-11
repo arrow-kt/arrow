@@ -2,11 +2,13 @@ package arrow.data
 
 import arrow.HK2
 import arrow.test.UnitSpec
-import arrow.test.laws.*
+import arrow.test.laws.EqLaws
+import arrow.test.laws.MonoidLaws
+import arrow.test.laws.SemigroupLaws
+import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
-import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -36,8 +38,8 @@ class MapKWTest : UnitSpec() {
         testLaws(
                 EqLaws.laws { mapOf(it.toString() to it).k() },
                 TraverseLaws.laws(MapKW.traverse(), MapKW.traverse(), { a: Int -> mapOf("key" to a).k() }),
-                MonoidLaws.laws(MapKW.monoid<String, Int>(), mapOf("key" to 1).k(), EQ),
-                SemigroupLaws.laws(MapKW.monoid<String, Int>(),
+                MonoidLaws.laws(MapKW.monoid(), mapOf("key" to 1).k(), EQ),
+                SemigroupLaws.laws(MapKW.monoid(),
                         mapOf("key" to 1).k(),
                         mapOf("key" to 2).k(),
                         mapOf("key" to 3).k(),
