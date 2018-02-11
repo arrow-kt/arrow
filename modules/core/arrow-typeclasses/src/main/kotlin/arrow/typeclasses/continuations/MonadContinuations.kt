@@ -5,13 +5,12 @@ import arrow.core.Either
 import arrow.typeclasses.Awaitable
 import arrow.typeclasses.Monad
 import arrow.typeclasses.stackLabels
-import kotlin.coroutines.experimental.Continuation
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
 
-open class MonadBlockingContinuation<F, A>(M: Monad<F>, private val latch: Awaitable<Kind<F, A>>, override val context: CoroutineContext) :
-        Continuation<Kind<F, A>>, Monad<F> by M, Awaitable<Kind<F, A>> by latch, BindingContinuation<F> {
+open class MonadBlockingContinuation<F, A>(M: Monad<F>, latch: Awaitable<Kind<F, A>>, override val context: CoroutineContext) :
+        Monad<F> by M, Awaitable<Kind<F, A>> by latch, BindingContinuation<F, A> {
 
     override fun resume(value: Kind<F, A>) {
         returnedMonad = value
