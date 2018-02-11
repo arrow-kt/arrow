@@ -1,9 +1,8 @@
 package arrow.data
 
+import arrow.HK2
 import arrow.test.UnitSpec
-import arrow.test.laws.EqLaws
-import arrow.test.laws.MapKWLaws
-import arrow.test.laws.TraverseLaws
+import arrow.test.laws.*
 import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
@@ -16,6 +15,11 @@ class MapKWTest : UnitSpec() {
     val SG: Semigroup<Int> = object : Semigroup<Int> {
         override fun combine(a: Int, b: Int): Int =
                 a * b
+    }
+
+    val EQ: Eq<HK2<MapKWHK, String, Int>> = object : Eq<HK2<MapKWHK, String, Int>> {
+        override fun eqv(a: HK2<MapKWHK, String, Int>, b: HK2<MapKWHK, String, Int>): Boolean =
+                a.ev()["key"] == b.ev()["key"]
     }
 
     init {
@@ -32,7 +36,12 @@ class MapKWTest : UnitSpec() {
         testLaws(
                 EqLaws.laws { mapOf(it.toString() to it).k() },
                 TraverseLaws.laws(MapKW.traverse(), MapKW.traverse(), { a: Int -> mapOf("key" to a).k() }),
-                MapKWLaws.laws(MapKW.monoid(SG), Gen.string(), Gen.int())
+                MonoidLaws.laws(MapKW.monoid<String, Int>(), mapOf("key" to 1).k(), EQ),
+                SemigroupLaws.laws(MapKW.monoid<String, Int>(),
+                        mapOf("key" to 1).k(),
+                        mapOf("key" to 2).k(),
+                        mapOf("key" to 3).k(),
+                        EQ)
         )
     }
 }
