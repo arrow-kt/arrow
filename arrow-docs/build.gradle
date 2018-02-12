@@ -17,7 +17,7 @@ dependencies {
     compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
     compile "io.kotlintest:kotlintest:$kotlinTestVersion"
 
-    compile 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.19.3'
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
     compile "io.reactivex.rxjava2:rxjava:2.1.4"
 }
 
