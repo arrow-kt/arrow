@@ -66,6 +66,9 @@ project(":arrow-effects").projectDir = file("modules/effects/arrow-effects")
 include(":arrow-effects-rx2")
 project(":arrow-effects-rx2").projectDir = file("modules/effects/arrow-effects-rx2")
 
+include(":arrow-effects-reactor")
+project(":arrow-effects-reactor").projectDir = file("modules/effects/arrow-effects-reactor")
+
 include(":arrow-effects-kotlinx-coroutines")
 project(":arrow-effects-kotlinx-coroutines").projectDir = file("modules/effects/arrow-effects-kotlinx-coroutines")
 
