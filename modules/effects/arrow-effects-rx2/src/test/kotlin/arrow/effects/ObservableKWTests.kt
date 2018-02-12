@@ -54,11 +54,8 @@ class ObservableKTest : UnitSpec() {
             traverse<ForObservableK>() shouldNotBe null
         }
 
-        testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
-
         testLaws(
+                AsyncLaws.laws(ObservableK.async(), EQ(), EQ()),
                 FoldableLaws.laws(ObservableK.foldable(), { ObservableK.pure(it) }, Eq.any()),
                 TraverseLaws.laws(ObservableK.traverse(), ObservableK.functor(), { ObservableK.pure(it) }, EQ())
         )
