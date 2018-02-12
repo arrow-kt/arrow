@@ -1,17 +1,18 @@
 package arrow.weak
 
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldNotBe
-import arrow.test.laws.EqLaws
-import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadLaws
 import arrow.typeclasses.*
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldNotBe
+import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class WeakTest : UnitSpec() {
-    val EQ: Eq<WeakOf<Int>> = Eq { a, b ->
-        a.fix().getOrElse { -1 } == b.fix().getOrElse { -2 }
+
+    private val EQ: Eq<WeakOf<Int>> = Eq { a, b ->
+        a.fix().option() == b.fix().option()
     }
 
     init {
@@ -26,9 +27,8 @@ class WeakTest : UnitSpec() {
         }
 
         testLaws(
-            EqLaws.laws { Weak(it) }
-            // FIXME(pablisco) - Disabled due to flakyness
-            //MonadLaws.laws(Weak.monad(), EQ)
+            EqLaws.laws { Weak(it) },
+            MonadLaws.laws(Weak.monad(), EQ)
         )
     }
 }

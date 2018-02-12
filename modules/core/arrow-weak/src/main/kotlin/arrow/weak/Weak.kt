@@ -18,7 +18,7 @@ import arrow.weak.internal.WeakRef
  *  At the time of usage we can either apply functional operators or unwrap it in two forms:
  *
  *   - `weakObject.eval`: [Eval] property that provides an [Option] with the result or lack thereof.
- *   - `weakObject.option()`: to get the [Option] directly.
+ *   - `weakObject.option()`: to get the [Option] instance directly.
  *
  *
  *   Basically, this is a Schrodinger's cat box.
