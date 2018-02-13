@@ -46,4 +46,20 @@
         margin-top: ($base-point-grid * 3);
     }
 
+    .header-link {
+      float: left;
+      font-size: 1.4rem;
+      line-height: 1;
+      margin-left: -24px;
+      margin-top: 10px;
+      opacity: 0;
+      transition: opacity $base-duration $base-timing;
+    }
+
+    h1:hover, h2:hover, h3:hover, h4:hover, h5:hover, h6:hover {
+        .header-link {
+            opacity: 1;
+        }
+    }
+
 }
