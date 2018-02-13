@@ -46,4 +46,21 @@
         margin-top: ($base-point-grid * 3);
     }
 
+    .header-link {
+      float: left;
+      font-size: 20px;
+      line-height: 1;
+      margin-left: -20px;
+      margin-top: 15px;
+      opacity: 0;
+      padding-right: 0;
+      transition: opacity 0.2s ease, color 0.2s ease;
+    }
+
+    h1:hover, h2:hover, h3:hover, h4:hover, h5:hover, h6:hover {
+        .header-link {
+            opacity: 1;
+        }
+    }
+
 }
