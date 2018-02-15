@@ -2,15 +2,16 @@
 layout: docs
 title: Try
 permalink: /docs/datatypes/try/
+video: XavztYVMUqI
 ---
 
 ## Try
 
-Arrow has [lots of different types of error handling and reporting](http://arrow-kt.io/docs/patterns/error_handling/), which allows you to choose the best strategy for your situation. 
+Arrow has [lots of different types of error handling and reporting](http://arrow-kt.io/docs/patterns/error_handling/), which allows you to choose the best strategy for your situation.
 
-For example, we have `Option` to model the absence of a value, or `Either` to model the return of a function as a type that may have been successful, or may have failed. 
+For example, we have `Option` to model the absence of a value, or `Either` to model the return of a function as a type that may have been successful, or may have failed.
 
-On the other hand, we have `Try`, which represents a computation that can result in an `A` result (as long as the computation is successful) or in an exception if something has gone wrong. 
+On the other hand, we have `Try`, which represents a computation that can result in an `A` result (as long as the computation is successful) or in an exception if something has gone wrong.
 
 That is, there are only two possible implementations of `Try`: a `Try` instance where the operation has been successful, which is represented as `Success<A>`; or a `Try` instance where the computation has failed with a `Throwable`, which is represented as `Failure<A>`.
 
@@ -37,7 +38,7 @@ fun getLotteryNumbersFromCloud(): List<String> {
 
 fun getLotteryNumbers(): List<String> {
     checkPermissions()
-    
+
     return getLotteryNumbersFromCloud()
 }
 ```
@@ -197,4 +198,3 @@ import arrow.debug.*
 
 showInstances<ForTry, Unit>()
 ```
-
