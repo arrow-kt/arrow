@@ -10,6 +10,10 @@ import arrow.typeclasses.functor
  * and restricts the [PSetter] to monomorphic updates.
  */
 typealias Setter<S, A> = PSetter<S, S, A, A>
+typealias ForSetter = ForPSetter
+typealias SetterOf<S, A> = PSetterOf<S, S, A, A>
+typealias SetterPartialOf<S> = Kind<ForSetter, S>
+typealias SetterKindedJ<S, A> = PSetterKindedJ<S, S, A, A>
 
 /**
  * A [Setter] is an optic that allows to see into a structure and set or modify its focus.
@@ -26,7 +30,8 @@ typealias Setter<S, A> = PSetter<S, S, A, A>
  * @param A the target of a [PSetter]
  * @param B the modified target of a [PSetter]
  */
-interface PSetter<S, T, A, B> {
+@higherkind
+interface PSetter<S, T, A, B> : PSetterOf<S, T, A, B> {
 
     /**
      * Modify polymorphically the target of a [PSetter] with a function
