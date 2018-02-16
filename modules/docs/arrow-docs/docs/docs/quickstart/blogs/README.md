@@ -79,3 +79,13 @@ Kotlin Brooklyn Meetup, Jan ’18 - version 0.6.1
 
 [Functional Programming with Arrow](https://speakerdeck.com/heyitsmohit/functional-programming-with-arrow)
 
+### Android Functional Validation
+
+[@dcampogiani](https://github.com/dcampogiani) explores some data types in Arrow and uses them to validate a form on Android.
+
+* [Introduction](http://danielecampogiani.com/blog/2018/02/android-functional-validation-1-intro/)
+* [Option](http://danielecampogiani.com/blog/2018/02/android-functional-validation-2-option/)
+* [Either](http://danielecampogiani.com/blog/2018/02/android-functional-validation-3-either/)
+* [Validated](http://danielecampogiani.com/blog/2018/02/android-functional-validation-4-validated/)
+
+Dec ’17 - kategory version 0.3.11

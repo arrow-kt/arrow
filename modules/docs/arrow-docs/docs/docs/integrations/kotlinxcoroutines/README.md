@@ -16,10 +16,10 @@ Its constructor is called `async`, and takes one suspended execution block where
 
 ```kotlin
 async {
-  val user = getUserById("123").await()
-      val friendProfiles = userProfile.friends().map { friend ->
-         getProfile(friend.id).await()
-      }
+  val userProfile = getProfile("userId").await()
+  val friendProfiles = userProfile.friends().map { friend ->
+     getProfile(friend.id).await()
+  }
 }
 ```
 
