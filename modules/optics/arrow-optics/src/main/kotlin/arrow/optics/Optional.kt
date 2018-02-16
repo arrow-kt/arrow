@@ -11,6 +11,10 @@ import arrow.typeclasses.applicative
  * and restricts the [POptional] to monomorphic updates.
  */
 typealias Optional<S, A> = POptional<S, S, A, A>
+typealias ForOptional = ForPOptional
+typealias OptionalOf<S, A> = POptionalOf<S, S, A, A>
+typealias OptionalPartialOf<S> = Kind<ForOptional, S>
+typealias OptionalKindedJ<S, A> = POptionalKindedJ<S, S, A, A>
 
 /**
  * An [Optional] is an optic that allows to see into a structure and getting, setting or modifying an optional focus.
@@ -27,7 +31,8 @@ typealias Optional<S, A> = POptional<S, S, A, A>
  * @param A the focus of a [POptional]
  * @param B the modified focus of a [POptional]
  */
-interface POptional<S, T, A, B> {
+@higherkind
+interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
 
     /**
      * Get the modified source of a [POptional]
