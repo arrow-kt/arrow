@@ -5,7 +5,7 @@ import arrow.core.Option
 import arrow.core.Predicate
 import arrow.data.ListK
 import arrow.data.MapK
-import arrow.data.extract
+import arrow.data.fix
 import arrow.data.getOption
 import arrow.data.k
 import arrow.data.traverse
@@ -47,7 +47,7 @@ interface MapKEachInstance<K, V> : Each<Map<K, V>, V> {
         override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> =
                 MapK.traverse<K>().traverse(s.k(), f, FA).let {
                     FA.map(it) {
-                        it.extract().map
+                        it.fix().map
                     }
                 }
 

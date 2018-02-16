@@ -4,7 +4,7 @@ import arrow.core.toT
 import arrow.data.ForSequenceK
 import arrow.data.SequenceK
 import arrow.data.SequenceKOf
-import arrow.data.extract
+import arrow.data.fix
 import arrow.data.k
 import arrow.data.traverse
 import arrow.instance
@@ -19,14 +19,14 @@ import arrow.syntax.either.right
 @instance(SequenceK::class)
 interface SequenceKFilterIndexInstance<A> : FilterIndex<SequenceKOf<A>, Int, A> {
     override fun filter(p: (Int) -> Boolean): Traversal<SequenceKOf<A>, A> = FilterIndex.fromTraverse<ForSequenceK, A>({ aas ->
-        aas.extract().mapIndexed { index, a -> a toT index }.k()
+        aas.fix().mapIndexed { index, a -> a toT index }.k()
     }, SequenceK.traverse()).filter(p)
 }
 
 @instance(SequenceK::class)
 interface SequenceKIndexInstance<A> : Index<SequenceKOf<A>, Int, A> {
     override fun index(i: Int): Optional<SequenceKOf<A>, A> = POptional(
-            getOrModify = { it.extract().sequence.elementAtOrNull(i)?.right() ?: it.extract().left() },
-            set = { a -> { it.extract().mapIndexed { index, aa -> if (index == i) a else aa }.k() } }
+            getOrModify = { it.fix().sequence.elementAtOrNull(i)?.right() ?: it.fix().left() },
+            set = { a -> { it.fix().mapIndexed { index, aa -> if (index == i) a else aa }.k() } }
     )
 }

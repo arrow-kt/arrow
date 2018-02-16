@@ -4,7 +4,7 @@ import arrow.core.toT
 import arrow.data.ForNonEmptyList
 import arrow.data.NonEmptyList
 import arrow.data.NonEmptyListOf
-import arrow.data.extract
+import arrow.data.fix
 import arrow.data.traverse
 import arrow.instance
 import arrow.optics.Optional
@@ -18,7 +18,7 @@ import arrow.syntax.either.right
 @instance(NonEmptyList::class)
 interface NonEmptyListFilterIndexInstance<A> : FilterIndex<NonEmptyListOf<A>, Int, A> {
     override fun filter(p: (Int) -> Boolean): Traversal<NonEmptyListOf<A>, A> = FilterIndex.fromTraverse<ForNonEmptyList, A>({ aas ->
-        aas.extract().all.mapIndexed { index, a -> a toT index }.let {
+        aas.fix().all.mapIndexed { index, a -> a toT index }.let {
             NonEmptyList.fromListUnsafe(it)
         }
     }, NonEmptyList.traverse()).filter(p)
@@ -29,12 +29,12 @@ interface NonEmptyListIndexInstance<A> : Index<NonEmptyListOf<A>, Int, A> {
 
     override fun index(i: Int): Optional<NonEmptyListOf<A>, A> = POptional(
             getOrModify = { l ->
-                l.extract().all.getOrNull(i)?.right() ?: l.extract().left()
+                l.fix().all.getOrNull(i)?.right() ?: l.fix().left()
             },
             set = { a ->
                 { l ->
                     NonEmptyList.fromListUnsafe(
-                            l.extract().all.mapIndexed { index: Int, aa: A -> if (index == i) a else aa }
+                            l.fix().all.mapIndexed { index: Int, aa: A -> if (index == i) a else aa }
                     )
                 }
             }
