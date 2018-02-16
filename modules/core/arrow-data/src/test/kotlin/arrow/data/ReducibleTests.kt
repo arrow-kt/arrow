@@ -16,7 +16,7 @@ class ReducibleTests : UnitSpec() {
         val nonEmptyReducible = object : NonEmptyReducible<ForNonEmptyList, ForListK>() {
             override fun FG(): Foldable<ForListK> = ListK.foldable()
 
-            override fun <A> split(fa: Kind<ForNonEmptyList, A>): Tuple2<A, Kind<ForListK, A>> = Tuple2(fa.extract().head, ListK(fa.extract().tail))
+            override fun <A> split(fa: Kind<ForNonEmptyList, A>): Tuple2<A, Kind<ForListK, A>> = Tuple2(fa.fix().head, ListK(fa.fix().tail))
         }
 
         testLaws(ReducibleLaws.laws(

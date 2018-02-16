@@ -1,6 +1,7 @@
 package arrow.optics
 
 import arrow.core.getOrElse
+import arrow.data.k
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -11,12 +12,14 @@ import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genOption
 import arrow.syntax.either.left
 import arrow.syntax.either.right
+import arrow.syntax.foldable.combineAll
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class SetterTest : UnitSpec() {
 
     init {
+
         testLaws(SetterLaws.laws(
                 setter = Setter.id(),
                 aGen = Gen.int(),

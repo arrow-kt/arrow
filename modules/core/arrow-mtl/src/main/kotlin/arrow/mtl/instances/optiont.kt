@@ -15,7 +15,7 @@ import arrow.typeclasses.Applicative
 interface OptionTFunctorFilterInstance<F> : OptionTFunctorInstance<F>, FunctorFilter<OptionTPartialOf<F>> {
 
     override fun <A, B> mapFilter(fa: OptionTOf<F, A>, f: (A) -> Option<B>): OptionT<F, B> =
-            fa.extract().mapFilter(f, FF())
+            fa.fix().mapFilter(f, FF())
 
 }
 
@@ -27,6 +27,6 @@ interface OptionTTraverseFilterInstance<F> :
     override fun FFF(): TraverseFilter<F>
 
     override fun <G, A, B> traverseFilter(fa: OptionTOf<F, A>, f: (A) -> Kind<G, Option<B>>, GA: Applicative<G>): Kind<G, OptionT<F, B>> =
-            fa.extract().traverseFilter(f, GA, FFF())
+            fa.fix().traverseFilter(f, GA, FFF())
 
 }

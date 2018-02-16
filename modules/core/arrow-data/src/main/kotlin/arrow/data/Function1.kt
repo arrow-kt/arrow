@@ -7,7 +7,7 @@ import arrow.higherkind
 
 fun <I, O> ((I) -> O).k(): Function1<I, O> = Function1(this)
 
-operator fun <I, O> Function1Of<I, O>.invoke(i: I): O = this.extract().f(i)
+operator fun <I, O> Function1Of<I, O>.invoke(i: I): O = this.fix().f(i)
 
 @higherkind
 class Function1<I, out O>(val f: (I) -> O) : Function1Of<I, O> {
@@ -16,7 +16,7 @@ class Function1<I, out O>(val f: (I) -> O) : Function1Of<I, O> {
 
     fun <B> flatMap(f: (O) -> Function1Of<I, B>): Function1<I, B> = { p: I -> f(this.f(p))(p) }.k()
 
-    fun <B> ap(ff: Function1Of<I, (O) -> B>): Function1<I, B> = ff.extract().flatMap { f -> map(f) }.extract()
+    fun <B> ap(ff: Function1Of<I, (O) -> B>): Function1<I, B> = ff.fix().flatMap { f -> map(f) }.fix()
 
     fun local(f: (I) -> I): Function1<I, O> = f.andThen { this(it) }.k()
 

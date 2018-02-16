@@ -13,7 +13,7 @@ interface StateTFunctorInstance<F, S> : Functor<StateTPartialOf<F, S>> {
 
     fun FF(): Functor<F>
 
-    override fun <A, B> map(fa: StateTOf<F, S, A>, f: (A) -> B): StateT<F, S, B> = fa.extract().map(f, FF())
+    override fun <A, B> map(fa: StateTOf<F, S, A>, f: (A) -> B): StateT<F, S, B> = fa.fix().map(f, FF())
 
 }
 
@@ -22,31 +22,31 @@ interface StateTApplicativeInstance<F, S> : StateTFunctorInstance<F, S>, Applica
 
     override fun FF(): Monad<F>
 
-    override fun <A, B> map(fa: StateTOf<F, S, A>, f: (A) -> B): StateT<F, S, B> = fa.extract().map(f, FF())
+    override fun <A, B> map(fa: StateTOf<F, S, A>, f: (A) -> B): StateT<F, S, B> = fa.fix().map(f, FF())
 
     override fun <A> pure(a: A): StateT<F, S, A> = StateT(FF().pure({ s: S -> FF().pure(Tuple2(s, a)) }))
 
     override fun <A, B> ap(fa: StateTOf<F, S, A>, ff: StateTOf<F, S, (A) -> B>): StateT<F, S, B> =
-            fa.extract().ap(ff, FF())
+            fa.fix().ap(ff, FF())
 
     override fun <A, B> product(fa: StateTOf<F, S, A>, fb: StateTOf<F, S, B>): StateT<F, S, Tuple2<A, B>> =
-            fa.extract().product(fb.extract(), FF())
+            fa.fix().product(fb.fix(), FF())
 
 }
 
 @instance(StateT::class)
 interface StateTMonadInstance<F, S> : StateTApplicativeInstance<F, S>, Monad<StateTPartialOf<F, S>> {
 
-    override fun <A, B> map(fa: StateTOf<F, S, A>, f: (A) -> B): StateT<F, S, B> = fa.extract().map(f, FF())
+    override fun <A, B> map(fa: StateTOf<F, S, A>, f: (A) -> B): StateT<F, S, B> = fa.fix().map(f, FF())
 
     override fun <A, B> flatMap(fa: StateTOf<F, S, A>, f: (A) -> StateTOf<F, S, B>): StateT<F, S, B> =
-            fa.extract().flatMap(f, FF())
+            fa.fix().flatMap(f, FF())
 
     override fun <A, B> tailRecM(a: A, f: (A) -> StateTOf<F, S, Either<A, B>>): StateT<F, S, B> =
             StateT.tailRecM(a, f, FF())
 
     override fun <A, B> ap(fa: StateTOf<F, S, A>, ff: StateTOf<F, S, (A) -> B>): StateT<F, S, B> =
-            ff.extract().map2(fa.extract(), { f, a -> f(a) }, FF())
+            ff.fix().map2(fa.fix(), { f, a -> f(a) }, FF())
 
 }
 
@@ -58,7 +58,7 @@ interface StateTSemigroupKInstance<F, S> : SemigroupK<StateTPartialOf<F, S>> {
     fun SS(): SemigroupK<F>
 
     override fun <A> combineK(x: StateTOf<F, S, A>, y: StateTOf<F, S, A>): StateT<F, S, A> =
-            x.extract().combineK(y, FF(), SS())
+            x.fix().combineK(y, FF(), SS())
 
 }
 

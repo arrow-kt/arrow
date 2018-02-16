@@ -26,8 +26,8 @@ As it captures exceptions, `invoke()` is the simplest way of wrapping existing s
 fun <F> getSongUrlAsync(SC: MonadSuspend<F> = monadSuspend()) =
   SC { getSongUrl() }
 
-val songIO: IO<Url> = getSongUrlAsync().extract()
-val songDeferred: DeferredK<Url> = getSongUrlAsync().extract()
+val songIO: IO<Url> = getSongUrlAsync().fix()
+val songDeferred: DeferredK<Url> = getSongUrlAsync().fix()
 ```
 
 #### suspend
@@ -127,7 +127,7 @@ Wraps the current function in the Sync passed as a parameter. All exceptions are
 ```kotlin
 { throw RuntimeException("Boom") }
   .defer(IO.monadSuspend())
-  .extract().attempt().unsafeRunAsync { }
+  .fix().attempt().unsafeRunAsync { }
 ```
 
 #### (() -> Either<Throwable, A>)#deferUnsafe
@@ -147,7 +147,7 @@ While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/d
 ```kotlin
 { RuntimeException("Boom").right() }
   .deferUnsafe(IO.monadSuspend())
-  .extract().attempt().unsafeRunSync()
+  .fix().attempt().unsafeRunSync()
 ```
 
 ### Laws

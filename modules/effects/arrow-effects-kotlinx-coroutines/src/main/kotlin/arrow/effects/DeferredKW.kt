@@ -13,7 +13,7 @@ import kotlin.coroutines.experimental.CoroutineContext
 fun <A> Deferred<A>.k(): DeferredK<A> =
         DeferredK(this)
 
-fun <A> DeferredKOf<A>.value(): Deferred<A> = this.extract().deferred
+fun <A> DeferredKOf<A>.value(): Deferred<A> = this.fix().deferred
 
 @higherkind
 @deriving(
@@ -27,7 +27,7 @@ data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferre
             flatMap { a: A -> pure(f(a)) }
 
     fun <B> ap(fa: DeferredKOf<(A) -> B>): DeferredK<B> =
-            flatMap { a -> fa.extract().map { ff -> ff(a) } }
+            flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
     fun <B> flatMap(f: (A) -> DeferredKOf<B>): DeferredK<B> =
             kotlinx.coroutines.experimental.async(Unconfined, CoroutineStart.LAZY) {
@@ -83,7 +83,7 @@ data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferre
                                 result = actual.b
                                 break
                             } else if (actual is Either.Left) {
-                                current = f(actual.a).extract()
+                                current = f(actual.a).fix()
                             }
                         }
                         result
@@ -118,4 +118,4 @@ fun <A> DeferredKOf<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit 
             }
         }
 
-suspend fun <A> DeferredKOf<A>.await(): A = this.extract().await()
+suspend fun <A> DeferredKOf<A>.await(): A = this.fix().await()
