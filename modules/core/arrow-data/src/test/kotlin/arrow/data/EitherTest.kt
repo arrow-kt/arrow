@@ -28,11 +28,13 @@ class EitherTest : UnitSpec() {
             monadError<EitherPartialOf<Throwable>, Throwable>() shouldNotBe null
             semigroupK<EitherPartialOf<Throwable>>() shouldNotBe null
             eq<Either<String, Int>>() shouldNotBe null
+            hash<Either<String, Int>>() shouldNotBe null
             show<Either<String, Int>>() shouldNotBe null
         }
 
         testLaws(
             EqLaws.laws(eq<Either<String, Int>>(), { Right(it) }),
+            HashLaws.laws(hash<Either<String, Int>>(), eq<Either<String, Int>>(), { Right(it) }),
             ShowLaws.laws(show<Either<String, Int>>(), eq<Either<String, Int>>(), { Right(it) }),
             MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()),
             TraverseLaws.laws(Either.traverse<Throwable>(), Either.applicative(), { Right(it) }, Eq.any()),

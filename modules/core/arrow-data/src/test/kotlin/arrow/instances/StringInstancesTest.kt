@@ -5,7 +5,9 @@ import io.kotlintest.matchers.shouldNotBe
 import arrow.test.laws.EqLaws
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import arrow.test.laws.HashLaws
 import arrow.typeclasses.eq
+import arrow.typeclasses.hash
 import arrow.typeclasses.monoid
 import arrow.typeclasses.semigroup
 
@@ -16,8 +18,10 @@ class StringInstancesTest : UnitSpec() {
             semigroup<String>() shouldNotBe null
             monoid<String>() shouldNotBe null
             eq<String>() shouldNotBe null
+            hash<String>() shouldNotBe null
         }
 
         testLaws(EqLaws.laws { it.toString() })
+        testLaws(HashLaws.laws { it.toString() })
     }
 }

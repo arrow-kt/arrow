@@ -187,6 +187,7 @@ interface Runtime {
     fun stringSemigroup(): Semigroup<String>
     fun stringMonoid(): Monoid<String>
     fun stringEq(): Eq<@JvmSuppressWildcards String>
+    fun stringHash(): Hash<String>
     fun tryFunctor(): Functor<ForTry>
     fun tryApplicative(): Applicative<ForTry>
     fun tryMonad(): Monad<ForTry>
