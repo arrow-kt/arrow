@@ -170,10 +170,11 @@ private fun instanceFromImplicitObject(t: InstanceParametrizedType): Any? {
     val allCompanionFunctions = globalInstanceProvider.methods
     val factoryFunction = allCompanionFunctions.find { it.name == "instance" }
     return if (factoryFunction != null) {
+        val totalTypeSize = factoryFunction.parameterTypes.size
         val values = factoryFunction.parameterTypes.mapIndexedNotNull { n, p ->
             if (TC::class.java.isAssignableFrom(p)) {
                 val classifier = InstanceParametrizedType(p, p.typeParameters.toList())
-                val vType = reifyRawParameterizedType(t, classifier, n)
+                val vType = reifyRawParameterizedType(t, classifier, n, totalTypeSize)
                 val value = instanceFromImplicitObject(vType)
                 if (value != null) registerInstance(vType, value)
                 value
@@ -201,15 +202,15 @@ private fun instanceFromImplicitObject(t: InstanceParametrizedType): Any? {
 private fun Method.isStatic() =
         Modifier.isStatic(modifiers)
 
-private fun reifyRawParameterizedType(carrier: InstanceParametrizedType, classifier: ParameterizedType, index: Int): InstanceParametrizedType =
+private fun reifyRawParameterizedType(carrier: InstanceParametrizedType, classifier: ParameterizedType, index: Int, totalTypeSize: Int): InstanceParametrizedType =
         if (classifier.actualTypeArguments.any { it is TypeVariable<*> } && carrier.actualTypeArguments.size > index + 1) {
             InstanceParametrizedType(classifier.rawType, listOf(carrier.actualTypeArguments[index + 1]))
         } else if (classifier.actualTypeArguments.any { it is TypeVariable<*> }) {
             val nestedTypes = resolveNestedTypes(carrier.actualTypeArguments.toList())
-            if (index < nestedTypes.size)
-                InstanceParametrizedType(classifier.rawType, listOf(nestedTypes[index]))
+            if (totalTypeSize > nestedTypes.size)
+                InstanceParametrizedType(classifier.rawType, listOf(nestedTypes[index.div(nestedTypes.size)]))
             else
-                InstanceParametrizedType(classifier.rawType, nestedTypes)
+                InstanceParametrizedType(classifier.rawType, listOf(nestedTypes[index]))
         } else {
             InstanceParametrizedType(classifier, classifier.actualTypeArguments.filterNotNull())
         }
