@@ -17,6 +17,13 @@ interface Monad<F> : Applicative<F>, TC {
 
     fun <A, B> flatMap(fa: Kind<F, A>, f: (A) -> Kind<F, B>): Kind<F, B>
 
+    fun <A, B> flatMapIn(cc: CoroutineContext, fa: Kind<F, A>, f: (A) -> Kind<F, B>): Kind<F, B> {
+        val continuation = MonadBlockingContinuation<F, B>(this, Platform.awaitableLatch(), cc)
+        val coro: suspend () -> Kind<F, B> = { flatMap(fa, f).also { continuation.resolve(Either.right(it)) } }
+        coro.startCoroutine(continuation)
+        return continuation.returnedMonad()
+    }
+
     override fun <A, B> map(fa: Kind<F, A>, f: (A) -> B): Kind<F, B> = flatMap(fa, { a -> pure(f(a)) })
 
     override fun <A, B> ap(fa: Kind<F, A>, ff: Kind<F, (A) -> B>): Kind<F, B> = flatMap(ff, { f -> map(fa, f) })
