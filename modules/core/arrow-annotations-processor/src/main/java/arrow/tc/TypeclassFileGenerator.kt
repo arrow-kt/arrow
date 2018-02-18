@@ -168,23 +168,38 @@ class TypeclassFileGenerator(
             |""".trimMargin()
     }
 
+    fun List<String>.renderExtendsClause(): String =
+            if (isEmpty()) "" else ": " + joinToString(separator = ", ")
+
+    fun List<String>.renderOverrides(): String =
+            if (isEmpty()) "" else joinToString(separator = "\n\n  ")
+
     private fun genSyntax(tc: Typeclass): String {
         val delegatedFunctions: List<String> = removeOverrides(tc, functionSignatures(tc)).map { it.generate() }
-        val (superTypes, overrides) = if (tc.target.superTypes.isEmpty()) "" to "" else {
-            val extends = tc.target.superTypes[0]
+        val superTypes: List<String> = tc.target.superTypes.map { extends ->
+            val superName = extends.fullName.replace("/", ".")
+            "${superName}Syntax${extends.expandedTypeArgs(false)}"
+        }
+        val overrides: List<String> = tc.target.superTypes.map { extends ->
             val superName = extends.fullName.replace("/", ".")
             val simpleSuperName = superName.substringAfterLast(".")
-            ": ${superName}Syntax${extends.expandedTypeArgs(false)}" to
-                    "override fun ${simpleSuperName.decapitalize()}() : $superName ${extends.expandedTypeArgs(false)} = ${tc.simpleName.decapitalize()}()"
+            "override fun ${simpleSuperName.decapitalize()}() : $superName ${extends.expandedTypeArgs(false)} = ${tc.simpleName.decapitalize()}()"
+        }
+        val diamondOverrides: List<String> = tc.target.diamondTypes.map { extends ->
+            val superName = extends.fullName.replace("/", ".")
+            val simpleSuperName = superName.substringAfterLast(".")
+            "override fun ${simpleSuperName.decapitalize()}() : $superName ${extends.expandedTypeArgs(false)} = ${tc.simpleName.decapitalize()}()"
         }
         return """
-            |interface ${tc.simpleName}Syntax${tc.expandedTypeArgs(false)} $superTypes {
+            |interface ${tc.simpleName}Syntax${tc.expandedTypeArgs(false)} ${superTypes.renderExtendsClause()} {
             |
             |  fun ${tc.simpleName.decapitalize()}(): ${tc.simpleName}${tc.expandedTypeArgs(false)}
             |
-            |  $overrides
+            |  ${overrides.renderOverrides()}
             |
-            |  ${delegatedFunctions.joinToString("\n\n  ")}
+            |  ${diamondOverrides.renderOverrides()}
+            |
+            |  ${delegatedFunctions.renderOverrides()}
             |}
             |""".trimMargin()
     }
