@@ -9,6 +9,7 @@ import arrow.effects.internal.Platform.unsafeResync
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
+import kotlin.coroutines.experimental.CoroutineContext
 
 @higherkind
 @deriving(
@@ -65,6 +66,9 @@ sealed class IO<out A> : IOOf<A> {
     fun <B> flatMap(f: (A) -> IOOf<B>): IO<B> =
             Bind(this, { f(it).fix() })
 
+    fun <B> flatMapIn(cc: CoroutineContext, f: (A) -> IOOf<B>): IO<B> =
+            BindIn(this, { f(it).fix() }, cc)
+
     fun attempt(): IO<Either<Throwable, A>> =
             Bind(this, IOFrame.any())
 
@@ -113,6 +117,12 @@ sealed class IO<out A> : IOOf<A> {
     }
 
     internal data class Bind<E, out A>(val cont: IO<E>, val g: (E) -> IO<A>) : IO<A>() {
+        override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
+
+        override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
+    }
+
+    internal data class BindIn<E, out A>(val cont: IO<E>, val g: (E) -> IO<A>, val cc: CoroutineContext) : IO<A>() {
         override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
 
         override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
