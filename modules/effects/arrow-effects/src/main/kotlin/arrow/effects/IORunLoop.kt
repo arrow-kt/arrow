@@ -4,6 +4,11 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.effects.internal.Platform.ArrayStack
+import arrow.typeclasses.continuations.MonadErrorBlockingContinuation
+import arrow.typeclasses.internal.Platform
+import kotlin.coroutines.experimental.Continuation
+import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.experimental.startCoroutine
 
 private typealias Current = IOOf<Any?>
 private typealias BindF = (Any?) -> IO<Any?>
@@ -63,6 +68,21 @@ internal object IORunLoop {
                         bRest.push(bFirst)
                     }
                     bFirst = currentIO.g as BindF
+                    currentIO = currentIO.cont
+                }
+                is IO.BindIn<*, *> -> {
+                    if (bFirst != null) {
+                        if (bRest == null) bRest = ArrayStack()
+                        bRest.push(bFirst)
+                    }
+                    val currentG = currentIO.g as BindF
+                    val currentCC = currentIO.cc
+                    bFirst = {
+                        val continuation = MonadErrorBlockingContinuation<ForIO, Throwable, Any?>(IO.monadError(), Platform.awaitableLatch(), currentCC, { it })
+                        val func: suspend (Any?) -> IO<Any?> = { currentG(result).also { continuation.resolve(Either.Right(it)) } }
+                        func.startCoroutine(continuation, continuation)
+                        continuation.returnedMonad().fix()
+                    }
                     currentIO = currentIO.cont
                 }
                 is IO.Map<*, *> -> {
@@ -185,6 +205,24 @@ internal object IORunLoop {
                     bFirst = currentIO.g as BindF
                     currentIO = currentIO.cont
                 }
+                is IO.BindIn<*, *> -> {
+                    if (bFirst != null) {
+                        if (bRest == null) bRest = ArrayStack()
+                        bRest.push(bFirst)
+                    }
+                    val localCurrent = currentIO
+
+                    val currentCC = localCurrent.cc
+
+                    val localCont = currentIO.cont
+
+                    bFirst = localCurrent.g as BindF
+
+                    currentIO = IO.async { cc ->
+                        loop(localCont, cc.asyncCallback(currentCC), null, null, null)
+                    }
+
+                }
                 is IO.Map<*, *> -> {
                     if (bFirst != null) {
                         if (bRest == null) {
@@ -219,7 +257,7 @@ internal object IORunLoop {
         } while (true)
     }
 
-    inline private fun executeSafe(crossinline f: () -> IOOf<Any?>): IO<Any?> =
+    private inline fun executeSafe(crossinline f: () -> IOOf<Any?>): IO<Any?> =
             try {
                 f().fix()
             } catch (e: Throwable) {
@@ -298,6 +336,25 @@ internal object IORunLoop {
                         is RestartCallback -> cb
                         else -> RestartCallback(cb)
                     }
+        }
+    }
+
+    private fun <T> ((Either<Throwable, T>) -> Unit).asyncCallback(currentCC: CoroutineContext): (Either<Throwable, T>) -> Unit {
+        return { result ->
+            val func: suspend () -> Unit = { this(result) }
+
+            val normalResume: Continuation<Unit> = object : Continuation<Unit> {
+                override val context: CoroutineContext
+                    get() = currentCC
+
+                override fun resume(value: Unit) {}
+
+                override fun resumeWithException(exception: Throwable) {
+                    this@asyncCallback(Either.left(exception))
+                }
+            }
+
+            func.startCoroutine(normalResume)
         }
     }
 }
