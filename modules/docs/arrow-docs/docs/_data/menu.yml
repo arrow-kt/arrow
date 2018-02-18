@@ -1,0 +1,300 @@
+options:
+  - title: Quick Start
+
+    nested_options:
+
+      - title: Index
+        url: /docs/
+
+      - title: Blogs & Presentations
+        url: /docs/quickstart/blogs/
+
+      - title: Projects & Examples
+        url: /docs/quickstart/projects/
+
+  - title: Patterns
+
+    nested_options:
+
+      - title: Glossary
+        url: /docs/patterns/glossary/
+
+      - title: Error Handling
+        url: /docs/patterns/error_handling/
+
+      - title: Monad Comprehensions
+        url: /docs/patterns/monad_comprehensions/
+
+      - title: Comonad Comprehensions
+        url: /docs/patterns/comonad_comprehensions/
+
+      - title: Applicative Builder
+        url: /docs/patterns/applicative_builder/
+
+      - title: Polymorphic programs
+        url: /docs/patterns/polymorphic_programs/
+
+      - title: Free Algebras
+        url: /docs/patterns/free_algebras/
+
+      - title: Dependency Injection
+        url: /docs/patterns/dependency_injection/
+
+      - title: Monad Transformers
+        url: /docs/patterns/monad_transformers/
+
+      - title: Concurrency
+        url: /docs/patterns/concurrency/
+
+      - title: Optics
+        url: /docs/patterns/optics/
+
+  - title: Data Types
+
+    nested_options:
+
+      - title: Intro
+        url: /docs/datatypes/intro/
+
+      - title: Option
+        url: /docs/datatypes/option/
+
+      - title: Either
+        url: /docs/datatypes/either/
+
+      - title: Try
+        url: /docs/datatypes/try/
+
+      - title: Validated
+        url: /docs/datatypes/validated/
+
+      - title: NonEmptyList
+        url: /docs/datatypes/nonemptylist/
+
+      - title: ListK
+        url: /docs/datatypes/listK/
+
+      - title: SequenceK
+        url: /docs/datatypes/sequenceK/
+
+      - title: SetK
+        url: /docs/datatypes/setK/
+
+      - title: MapK
+        url: /docs/datatypes/mapK/
+
+      - title: SortedMapK
+        url: /docs/datatypes/sortedmapK/
+
+      - title: Ior
+        url: /docs/datatypes/ior/
+
+      - title: Id
+        url: /docs/datatypes/id/
+
+      - title: Reader
+        url: /docs/datatypes/reader/
+
+      - title: Kleisli
+        url: /docs/datatypes/kleisli/
+
+      - title: State
+        url: /docs/datatypes/state/
+
+      - title: StateT
+        url: /docs/datatypes/statet/
+
+      - title: WriterT
+        url: /docs/datatypes/writert/
+
+      - title: Trampoline
+        url: /docs/datatypes/trampoline/
+
+      - title: Coproduct
+        url: /docs/datatypes/coproduct/
+
+      - title: Eval
+        url: /docs/datatypes/eval/
+
+      - title: OptionT
+        url: /docs/datatypes/optiont/
+
+      - title: EitherT
+        url: /docs/datatypes/eithert/
+
+  - title: Type Classes
+
+    nested_options:
+
+      - title: Intro
+        url: /docs/typeclasses/intro/
+
+      - title: Show
+        url: /docs/typeclasses/show/
+
+      - title: Eq
+        url: /docs/typeclasses/eq/
+
+      - title: Order
+        url: /docs/typeclasses/order/
+
+      - title: Semigroup
+        url: /docs/typeclasses/semigroup/
+
+      - title: Monoid
+        url: /docs/typeclasses/monoid/
+
+      - title: Foldable
+        url: /docs/typeclasses/foldable/
+
+      - title: Bifoldable
+        url: /docs/typeclasses/bifoldable/
+
+      - title: Traverse
+        url: /docs/typeclasses/traverse/
+
+      - title: TraverseFilter
+        url: /docs/typeclasses/traversefilter/
+
+      - title: Functor
+        url: /docs/typeclasses/functor/
+
+      - title: FunctorFilter
+        url: /docs/typeclasses/functorfilter/
+
+      - title: Applicative
+        url: /docs/typeclasses/applicative/
+
+      - title: ApplicativeError
+        url: /docs/typeclasses/applicativeerror/
+
+      - title: Monad
+        url: /docs/typeclasses/monad/
+
+      - title: MonadError
+        url: /docs/typeclasses/monaderror/
+
+      - title: MonadFilter
+        url: /docs/typeclasses/monadfilter/
+
+      - title: MonadReader
+        url: /docs/typeclasses/monadreader/
+
+      - title: MonadWriter
+        url: /docs/typeclasses/monadwriter/
+
+      - title: MonadState
+        url: /docs/typeclasses/monadstate/
+
+      - title: MonadCombine
+        url: /docs/typeclasses/monadcombine/
+
+      - title: Comonad
+        url: /docs/typeclasses/comonad/
+
+      - title: Bimonad
+        url: /docs/typeclasses/bimonad/
+
+      - title: SemigroupK
+        url: /docs/typeclasses/semigroupk/
+
+      - title: MonoidK
+        url: /docs/typeclasses/monoidk/
+
+  - title: Effects
+
+    nested_options:
+
+      - title: IO
+        url: /docs/effects/io/
+
+      - title: MonadSuspend
+        url: /docs/effects/monadsuspend/
+
+      - title: Async
+        url: /docs/effects/async/
+
+      - title: Effect
+        url: /docs/effects/effect/
+
+  - title: Optics
+
+    nested_options:
+
+      - title: Iso
+        url: /docs/optics/iso/
+
+      - title: Lens
+        url: /docs/optics/lens/
+
+      - title: Optional
+        url: /docs/optics/optional/
+
+      - title: Prism
+        url: /docs/optics/prism/
+
+      - title: Getter
+        url: /docs/optics/getter/
+
+      - title: Setter
+        url: /docs/optics/setter/
+
+      - title: Fold
+        url: /docs/optics/fold/
+
+      - title: Traversal
+        url: /docs/optics/traversal/
+
+      - title: At
+        url: /docs/optics/at/
+
+      - title: Index
+        url: /docs/optics/index/
+
+      - title: FilterIndex
+        url: /docs/optics/filterindex/
+
+      - title: Each
+        url: /docs/optics/each/
+
+  - title: Integrations
+
+    nested_options:
+
+      - title: Rx2
+        url: /docs/integrations/rx2/
+        
+      - title: kotlinx.coroutines
+        url: /docs/integrations/kotlinxcoroutines/
+
+      - title: KindedJ
+        url: /docs/integrations/kindedj/
+
+  - title: Free
+
+    nested_options:
+
+      - title: Free
+        url: /docs/free/free/
+
+      - title: FreeApplicative
+        url: /docs/free/freeapplicative/
+
+      - title: Cofree
+        url: /docs/free/cofree/
+
+      - title: Yoneda
+        url: /docs/free/yoneda/
+
+      - title: Coyoneda
+        url: /docs/free/coyoneda/
+
+  - title: Legal
+
+    nested_options:
+
+      - title: Credits
+        url: /docs/legal/credits/
+
+      - title: Licenses
+        url: /docs/legal/licenses/
