@@ -9,7 +9,6 @@ import arrow.typeclasses.MonadError
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.continuations.BindingCatchContinuation
-import arrow.typeclasses.continuations.BindingContinuation
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.startCoroutine
 
@@ -33,16 +32,8 @@ interface IOMonadInstance : IOApplicativeInstance, arrow.typeclasses.Monad<ForIO
     override fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForIO, Either<A, B>>): IO<B> =
             IO.tailRecM(a, f)
 
-    override fun <B> binding(cc: CoroutineContext, c: suspend BindingContinuation<ForIO, *>.() -> B): IO<B> =
-            IO.async { cont ->
-                val continuation = IOContinuation(cont, cc)
-                val coro: suspend () -> IO<B> = {
-                    val value = c(continuation)
-                    cont(Either.right(value))
-                    IO.pure(value)
-                }
-                coro.startCoroutine(continuation)
-            }
+    override fun <A, B> flatMapIn(cc: CoroutineContext, fa: Kind<ForIO, A>, f: (A) -> Kind<ForIO, B>): Kind<ForIO, B> =
+            fa.fix().flatMapIn(cc, f)
 
     override fun <A, B> ap(fa: IOOf<A>, ff: IOOf<(A) -> B>): IO<B> {
         return super<IOApplicativeInstance>.ap(fa, ff)
