@@ -15,6 +15,7 @@ import arrow.test.generators.genMapK
 import arrow.test.generators.genOption
 import arrow.test.generators.genTry
 import arrow.test.laws.TraversalLaws
+import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.Gen
@@ -27,7 +28,9 @@ class EachInstanceTest : UnitSpec() {
         "instances can be resolved implicitly" {
             each<EitherPartialOf<String>, String>() shouldNotBe null
             each<ListK<String>, String>() shouldNotBe null
+            each<List<String>, String>() shouldNotBe null
             each<MapK<Int, String>, String>() shouldNotBe null
+            each<Map<Int, String>, String>() shouldNotBe null
             each<Option<String>, String>() shouldNotBe null
             each<Try<String>, String>() shouldNotBe null
         }
@@ -47,10 +50,26 @@ class EachInstanceTest : UnitSpec() {
         ))
 
         testLaws(TraversalLaws.laws(
+                traversal = each<List<String>, String>().each(),
+                aGen = Gen.list(Gen.string()),
+                bGen = Gen.string(),
+                funcGen = genFunctionAToB(Gen.string()),
+                EQA = Eq.any()
+        ))
+
+        testLaws(TraversalLaws.laws(
                 traversal = each<MapK<Int, String>, String>().each(),
                 aGen = genMapK(Gen.int(), Gen.string()),
                 bGen = Gen.string(),
                 funcGen = genFunctionAToB(Gen.string())
+        ))
+
+        testLaws(TraversalLaws.laws(
+                traversal = each<Map<Int, String>, String>().each(),
+                aGen = Gen.map(Gen.int(), Gen.string()),
+                bGen = Gen.string(),
+                funcGen = genFunctionAToB(Gen.string()),
+                EQA = Eq.any()
         ))
 
         testLaws(TraversalLaws.laws(

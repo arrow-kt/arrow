@@ -13,6 +13,7 @@ import arrow.test.generators.genMapK
 import arrow.test.generators.genNonEmptyList
 import arrow.test.generators.genSequenceK
 import arrow.test.laws.OptionalLaws
+import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.Gen
@@ -25,9 +26,11 @@ class IndexInstanceTest : UnitSpec() {
 
         "instances can be resolved implicitly" {
             index<ListK<String>, Int, String>() shouldNotBe null
+            index<List<String>, Int, String>() shouldNotBe null
             index<NonEmptyList<String>, Int, String>() shouldNotBe null
             index<SequenceK<Char>, Int, Char>() shouldNotBe null
             index<MapK<Char, Int>, String, Int>() shouldNotBe null
+            index<Map<Char, Int>, String, Int>() shouldNotBe null
             index<String, Int, Char>() shouldNotBe null
         }
 
@@ -36,6 +39,14 @@ class IndexInstanceTest : UnitSpec() {
                 aGen = genListK(Gen.string()),
                 bGen = Gen.string(),
                 funcGen = genFunctionAToB(Gen.string())
+        ))
+
+        testLaws(OptionalLaws.laws(
+                optional = index<List<String>, Int, String>().index(5),
+                aGen = Gen.list(Gen.string()),
+                bGen = Gen.string(),
+                funcGen = genFunctionAToB(Gen.string()),
+                EQA = Eq.any()
         ))
 
         testLaws(OptionalLaws.laws(
@@ -57,6 +68,14 @@ class IndexInstanceTest : UnitSpec() {
                 aGen = genMapK(Gen.string(), Gen.int()),
                 bGen = Gen.int(),
                 funcGen = genFunctionAToB(Gen.int())
+        ))
+
+        testLaws(OptionalLaws.laws(
+                optional = index<Map<String, Int>, String, Int>().index(Gen.string().generate()),
+                aGen = Gen.map(Gen.string(), Gen.int()),
+                bGen = Gen.int(),
+                funcGen = genFunctionAToB(Gen.int()),
+                EQA = Eq.any()
         ))
 
         testLaws(OptionalLaws.laws(
