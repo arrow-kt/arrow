@@ -10,10 +10,8 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 import reactor.core.publisher.Flux
-import reactor.test.StepVerifier
 import reactor.test.test
 import java.time.Duration
-import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
 class FluxKTest : UnitSpec() {
@@ -68,7 +66,21 @@ class FluxKTest : UnitSpec() {
                 yields(a)
             }.value()
 
-            value.test().expectComplete().verify()
+            value.test()
+                    .expectNext(0)
+                    .verifyComplete()
+        }
+
+        "Flux cancellation forces binding to cancel without completing too" {
+            val value = FluxK.monadErrorFlat().bindingCatch {
+                val a = Flux.just(0).delayElements(Duration.ofSeconds(3)).k().bind()
+                a
+            }.value()
+
+            val test = value.doOnSubscribe { subscription -> Flux.just(0).delayElements(Duration.ofSeconds(1)).subscribe { subscription.cancel() } }.test()
+            test
+                    .expectNextCount(0)
+                    .verifyComplete()
         }
 
     }
