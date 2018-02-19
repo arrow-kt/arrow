@@ -70,7 +70,7 @@ class DataTypeExamples : FreeSpec() { init {
                 val a = Option(1).bind()
                 val b = Option(1 + a).bind()
                 val c = Option(1 + b).bind()
-                yields(a + b + c)
+                a + b + c
             }
             six shouldBe Some(6)
 
@@ -78,7 +78,7 @@ class DataTypeExamples : FreeSpec() { init {
                 val a = Option(1).bind()
                 val b = noneValue.bind()
                 val c = Option(1 + b).bind()
-                yields(a + b + c)
+                a + b + c
             }
             none shouldBe None
         }

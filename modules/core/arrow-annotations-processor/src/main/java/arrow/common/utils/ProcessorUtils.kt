@@ -38,6 +38,21 @@ interface ProcessorUtils : KotlinMetadataUtils {
 
     fun ProtoBuf.Function.overrides(o: ProtoBuf.Function): Boolean = false
 
+    fun ClassOrPackageDataWrapper.Class.declaredTypeClassInterfaces(
+            typeTable: TypeTable): List<ClassOrPackageDataWrapper> {
+        val interfaces = this.classProto.supertypes(typeTable).map {
+            it.extractFullName(this, failOnGeneric = false)
+        }.filter {
+                    it != "`arrow`.`TC`"
+                }
+        return interfaces.map { i ->
+            val className = i.removeBackticks().substringBefore("<")
+            val typeClassElement = elementUtils.getTypeElement(className)
+            val parentInterface = getClassOrPackageDataWrapper(typeClassElement)
+            parentInterface as ClassOrPackageDataWrapper.Class
+        }
+    }
+
     fun recurseTypeclassInterfaces(
             current: ClassOrPackageDataWrapper.Class,
             typeTable: TypeTable,
