@@ -41,7 +41,7 @@ object MonadSuspendLaws {
                     val a = bindDefer { x }
                     val b = bindDefer { a + y }
                     val c = bindDefer { b + z }
-                    yields(c)
+                    c
                 }
                 bound.equalUnderTheLaw(SC.pure<Int>(x + y + z), EQ)
             })
@@ -60,7 +60,7 @@ object MonadSuspendLaws {
                     val a = bindDeferUnsafe { Right(x) }
                     val b = bindDeferUnsafe { Right(a + y) }
                     val c = bindDeferUnsafe { Right(b + z) }
-                    yields(c)
+                    c
                 }
                 bound.equalUnderTheLaw(SC.pure<Int>(x + y + z), EQ)
             })
@@ -77,7 +77,7 @@ object MonadSuspendLaws {
             forAll(genIntSmall(), genIntSmall(), genIntSmall(), { x: Int, y: Int, z: Int ->
                 val (bound, dispose) = SC.bindingCancellable {
                     val value = bind { tupled(SC { x }, SC { y }, SC { z }) }
-                    yields(value.a + value.b + value.c)
+                    value.a + value.b + value.c
                 }
                 bound.equalUnderTheLaw(SC.pure<Int>(x + y + z), EQ)
             })
@@ -90,7 +90,7 @@ object MonadSuspendLaws {
                     sideEffect.increment()
                     val b = bindDefer { a + 1 }
                     val c = pure(b + 1).bind()
-                    yields(c)
+                    c
                 }
                 Try { Thread.sleep(250); dispose() }.recover { throw it }
                 binding.equalUnderTheLaw(SC.raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 0
@@ -103,7 +103,7 @@ object MonadSuspendLaws {
                     val a = bindDefer { num }
                     sideEffect.increment()
                     val b = bindDefer { Thread.sleep(500); sideEffect.increment(); a + 1 }
-                    yields(b)
+                    b
                 }
                 Try { Thread.sleep(250); dispose() }.recover { throw it }
                 binding.equalUnderTheLaw(SC.raiseError(BindingCancellationException()), EQ)
@@ -118,7 +118,7 @@ object MonadSuspendLaws {
                     sideEffect.increment()
                     val b = bindIn(CommonPool) { a + 1 }
                     val c = pure(b + 1).bind()
-                    yields(c)
+                    c
                 }
                 Try { Thread.sleep(250); dispose() }.recover { throw it }
                 binding.equalUnderTheLaw(SC.raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 0
@@ -131,7 +131,7 @@ object MonadSuspendLaws {
                     val a = bindIn(CommonPool) { num }
                     sideEffect.increment()
                     val b = bindIn(CommonPool) { Thread.sleep(500); sideEffect.increment(); a + 1 }
-                    yields(b)
+                    b
                 }
                 Try { Thread.sleep(250); dispose() }.recover { throw it }
                 binding.equalUnderTheLaw(SC.raiseError(BindingCancellationException()), EQ)
@@ -142,7 +142,7 @@ object MonadSuspendLaws {
             forFew(5, genThrowable(), { throwable: Throwable ->
                 SC.bindingCancellable {
                     val a: Int = bindIn(newSingleThreadContext("1")) { throw throwable }
-                    yields(a)
+                    a
                 }.a.equalUnderTheLaw(SC.raiseError(throwable), EQ)
             })
 
@@ -151,12 +151,12 @@ object MonadSuspendLaws {
                 val bindM = SC.bindingCancellable {
                     val a = bindDeferIn(newSingleThreadContext("$num")) { num + 1 }
                     val b = bindDeferIn(newSingleThreadContext("$a")) { a + 1 }
-                    yields(b)
+                    b
                 }
                 val bind = SC.bindingCancellable {
                     val a = bindIn(newSingleThreadContext("$num")) { num + 1 }
                     val b = bindIn(newSingleThreadContext("$a")) { a + 1 }
-                    yields(b)
+                    b
                 }
                 bindM.a.equalUnderTheLaw(bind.a, EQ)
             })

@@ -1,6 +1,7 @@
 package arrow.optics
 
 import arrow.core.*
+import arrow.higherkind
 import arrow.typeclasses.Monoid
 
 /**
@@ -12,7 +13,8 @@ import arrow.typeclasses.Monoid
  * @param S the source of a [Getter]
  * @param A the focus of a [Getter]
  */
-interface Getter<S, A> {
+@higherkind
+interface Getter<S, A> : GetterOf<S, A> {
 
     /**
      * Get the focus of a [Getter]
