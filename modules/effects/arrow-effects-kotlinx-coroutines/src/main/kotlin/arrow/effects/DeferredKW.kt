@@ -1,7 +1,7 @@
 package arrow.effects
 
 import arrow.core.*
-import arrow.data.Try
+import arrow.core.Try
 import arrow.deriving
 import arrow.higherkind
 import arrow.typeclasses.Applicative
