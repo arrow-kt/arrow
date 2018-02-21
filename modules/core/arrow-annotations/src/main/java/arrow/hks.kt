@@ -1,6 +1,6 @@
 package arrow
 
-interface Kind<out F, out A>
+interface Kind<F, out A>
 
 typealias Kind2<F, A, B> = Kind<Kind<F, A>, B>
 
