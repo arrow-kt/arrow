@@ -6,7 +6,7 @@ jdk:
   - oraclejdk8
 
 script:
-#  - ./gradlew clean build :arrow-docs:runAnk
+  - ./gradlew clean build :arrow-docs:runAnk
   - ./gradlew codeCoverageReport
 
 after_success:
