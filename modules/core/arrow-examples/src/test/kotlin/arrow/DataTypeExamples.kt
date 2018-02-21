@@ -119,7 +119,7 @@ class DataTypeExamples : FreeSpec() { init {
             val gain = Try { playLottery(99) }
             gain.recover { 0 } shouldBe Try.Success(0)
 
-            gain.recoverWith { Try { playLottery(42)} } shouldBe Try.Success(1000)
+            gain.recoverWith { Try { playLottery(42) } } shouldBe Try.Success(1000)
         }
 
         "Fold" {

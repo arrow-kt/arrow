@@ -1,9 +1,7 @@
 package arrow.instances
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Eval
-import arrow.data.*
+import arrow.core.*
 import arrow.instance
 import arrow.typeclasses.*
 
@@ -100,6 +98,9 @@ interface TryFoldableInstance : Foldable<ForTry> {
     override fun <A, B> foldRight(fa: TryOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
             fa.fix().foldRight(lb, f)
 }
+
+fun <A, B, G> Try<A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Try<B>> =
+        this.fix().fold({ GA.pure(Try.raise(it)) }, { GA.map(f(it), { Try { it } }) })
 
 @instance(Try::class)
 interface TryTraverseInstance : Traverse<ForTry> {

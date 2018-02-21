@@ -4,8 +4,8 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
-import arrow.data.Try
-import arrow.data.recover
+import arrow.core.Try
+import arrow.core.recover
 import arrow.effects.MonadSuspend
 import arrow.effects.bindingCancellable
 import arrow.effects.data.internal.BindingCancellationException

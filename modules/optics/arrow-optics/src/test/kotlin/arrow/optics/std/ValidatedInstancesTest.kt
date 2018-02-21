@@ -3,9 +3,8 @@ package arrow.optics
 import arrow.core.Either
 import arrow.core.applicative
 import arrow.core.fix
-import arrow.data.Try
+import arrow.core.Try
 import arrow.data.applicative
-import arrow.data.fix
 import arrow.syntax.either.right
 import arrow.test.UnitSpec
 import arrow.test.generators.*

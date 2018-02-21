@@ -1,5 +1,6 @@
 package arrow.data
 
+import arrow.core.*
 import arrow.syntax.applicative.map
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws

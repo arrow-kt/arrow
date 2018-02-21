@@ -1,9 +1,7 @@
-package arrow.data
+package arrow.core
 
 import arrow.*
-import arrow.core.*
 import arrow.legacy.*
-import arrow.typeclasses.Applicative
 
 typealias Failure<A> = Try.Failure<A>
 typealias Success<A> = Try.Success<A>
@@ -49,9 +47,6 @@ sealed class Try<out A> : TryOf<A> {
 
     @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("getOrElse { ifEmpty }"))
     operator fun invoke() = get()
-
-    fun <G, B> traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Try<B>> =
-            this.fix().fold({ GA.pure(raise(it)) }, { GA.map(f(it), { Try { it } }) })
 
     fun <B> ap(ff: TryOf<(A) -> B>): Try<B> = ff.fix().flatMap { f -> map(f) }.fix()
 
