@@ -1,8 +1,8 @@
 package arrow.optics.instances
 
-import arrow.data.Try
-import arrow.data.TryOf
-import arrow.data.traverse
+import arrow.core.Try
+import arrow.core.TryOf
+import arrow.core.traverse
 import arrow.instance
 import arrow.optics.Traversal
 import arrow.optics.typeclasses.Each

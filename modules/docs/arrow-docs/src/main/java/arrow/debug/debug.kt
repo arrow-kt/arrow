@@ -1,7 +1,7 @@
 package arrow.debug
 
 import arrow.TC
-import arrow.data.Try
+import arrow.core.Try
 import arrow.effects.Async
 import arrow.effects.Effect
 import arrow.effects.MonadSuspend
