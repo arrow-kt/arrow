@@ -40,7 +40,7 @@ NonEmptyList.of(1, 2, 3, 4, 5).head
 
 ## foldLeft
 
-Whe we fold with turn a `NonEmptyList< A >` into `B` by providing a __seed__ value and a __function__ that carries the state on each iteration over the elements of the list.
+When we fold over a `NonEmptyList`, we turn a `NonEmptyList< A >` into `B` by providing a __seed__ value and a __function__ that carries the state on each iteration over the elements of the list.
 The first argument is a function that addresses the __seed value__, this can be any object of any type which will then become the resulting typed value.
 The second argument is a function that takes the current state and element in the iteration and returns the new state after transformations have been applied.
 
