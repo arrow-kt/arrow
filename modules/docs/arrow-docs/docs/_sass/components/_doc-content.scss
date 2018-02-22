@@ -53,6 +53,13 @@
             margin-bottom: 14px;
         }
     }
+    
+    hr {
+        border: none;
+        height: 1px;
+        width: 100%;
+        background: rgba($brand-secondary, 0.25);
+    }
 
     .header-link {
       float: left;
