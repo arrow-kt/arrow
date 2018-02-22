@@ -45,6 +45,14 @@
     .browser {
         margin-top: ($base-point-grid * 3);
     }
+    
+    ul {
+        padding-left: 24px;
+        li {
+            list-style: circle;
+            margin-bottom: 14px;
+        }
+    }
 
     .header-link {
       float: left;
