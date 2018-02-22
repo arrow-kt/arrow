@@ -162,7 +162,6 @@ We use [`Try`]({{ '/docs/datatypes/try' | relative_url }}) when we want to be de
 How would our example look like implemented with `Try`?
 
 ```kotlin:ank
-import arrow.data.*
 
 fun arm(): Try<Nuke> =
   Try { throw RuntimeException("SystemOffline") }
