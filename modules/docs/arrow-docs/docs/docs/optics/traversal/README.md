@@ -18,6 +18,7 @@ You can get a `Traversal` for any existing `Traverse`.
 ```kotlin:ank
 import arrow.*
 import arrow.optics.*
+import arrow.core.*
 import arrow.data.*
 
 val listTraversal: Traversal<ListKOf<Int>, Int> = Traversal.fromTraversable()

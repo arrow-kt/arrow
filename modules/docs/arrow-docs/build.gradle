@@ -2,7 +2,9 @@ apply plugin: 'ank-gradle-plugin'
 apply plugin: 'org.ajoberstar.git-publish'
 
 dependencies {
-    compile 'io.arrow-kt:ank-core:0.6.2-SNAPSHOT'
+    compile ('io.arrow-kt:ank-core:0.6.2-SNAPSHOT') {
+        exclude group: 'io.arrow-kt', module: 'macroing-cel4j-artifact'
+    }
     compile project(':arrow-data')
     compile project(':arrow-core')
     compile project(':arrow-syntax')
