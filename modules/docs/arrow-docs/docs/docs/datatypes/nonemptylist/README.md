@@ -2,6 +2,7 @@
 layout: docs
 title: NonEmptyList
 permalink: /docs/datatypes/nonemptylist/
+video: TC6IzE61OyE
 ---
 
 ## NonEmptyList
