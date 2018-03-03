@@ -1,0 +1,108 @@
+// MASTHEAD
+// -----------------------------------------------
+// -----------------------------------------------
+
+#masthead {
+    padding: ($base-point-grid * 22) 0;
+    text-align: center;
+    background-repeat: repeat-x, repeat-x;
+    background-position: top center, bottom center;
+    background-color: $brand-primary;
+    position: relative;
+
+    @include bp(large) {
+        padding-bottom: ($base-point-grid * 12);
+    }
+
+    .masthead-background {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      overflow-x: hidden;
+      &.background {
+        top: 0;
+        opacity: 0.5;
+      }
+      &.top {
+        top: 0;
+        background-image: url("../img/header-background-top.svg");
+        background-repeat: repeat-x, repeat-x;
+        background-position: top center;
+      }
+      &.bottom {
+        bottom: 0;
+        position: absolute;
+        background-image: url("../img/header-background-bottom.svg");
+        background-repeat: repeat-x, repeat-x;
+        background-position: bottom center;
+      }
+    }
+
+    .masthead-inner {
+        @include grid-column(8, $base-grid);
+        @include grid-push(2);
+        @include bp(large) {
+             @include grid-column(12, $base-grid);
+        }
+
+        perspective: 1000px;
+        transform-style: preserve-3d;
+        transform: rotateX(0deg) rotateY(0deg);
+
+        .masthead-brand {
+            min-width: 103px;
+            height: auto;
+            transform: translateZ(103px);
+            transform-style: preserve-3d;
+        }
+
+        .masthead-title {
+            margin-top: ($base-point-grid * 2);
+            font-size: 3rem;
+            font-weight: $font-regular;
+            line-height: 1.2;
+            color: $white;
+
+            transform: translateZ(60px);
+            transform-style: preserve-3d;
+
+            @include bp(large) {
+                font-size: 2rem;
+            }
+        }
+
+        .masthead-button {
+            display: inline-block;
+            margin-top: ($base-point-grid * 3);
+            padding: ($base-point-grid * 2) ($base-point-grid * 5);
+            font-size: 0.875rem;
+            font-weight: $font-semibold;
+            text-transform: uppercase;
+            background: $brand-tertiary;
+            color: $white;
+
+            transform: translateZ(96px);
+            transform-style: preserve-3d;
+
+            &:active,
+            &:focus,
+            &:hover {
+                text-decoration: none;
+                background: rgba($brand-tertiary, 0.6);
+            }
+        }
+
+        .masthead-stars {
+          margin-top: $base-point-grid;
+            transform: translateZ(103px);
+            transform-style: preserve-3d;
+
+            a {
+              color: $white;
+              text-decoration: none;
+            }
+        }
+    }
+}

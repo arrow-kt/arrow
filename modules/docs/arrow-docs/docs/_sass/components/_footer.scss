@@ -1,0 +1,44 @@
+// FOOTER
+// -----------------------------------------------
+// -----------------------------------------------
+
+#footer {
+    padding: ($base-point-grid * 4) 0;
+    font-size: 0.875rem;
+    color: $brand-primary;
+
+    p {
+        @include grid-column(6, $base-grid);
+        @include bp(large) {
+            @include grid-column(12, $base-grid);
+            margin-bottom: $base-point-grid;
+            text-align: center;
+        }
+
+        a {
+            font-family: $brand-font-family;
+            font-weight: $font-medium;
+
+            &:first-child {
+              text-transform: uppercase;
+              letter-spacing: 2px;
+            }
+        }
+    }
+
+    ul.footer-navigation-menu {
+        @include grid-column(6, $base-grid);
+        @include flexbox;
+        @include justify-content(flex-end);
+        @include bp(large) {
+            @include grid-column(12, $base-grid);
+            @include justify-content(center);
+        }
+
+        .footer-navigation-menu-item {
+            &:nth-child(-n+2) {
+                margin-right: ($base-point-grid * 2);
+            }
+        }
+    }
+}
