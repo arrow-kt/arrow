@@ -50,7 +50,7 @@ include(":arrow-kindedj")
 project(":arrow-kindedj").projectDir = file("modules/core/arrow-kindedj")
 
 include(":arrow-generic")
-project(":arrow-generic").projectDir = file("modules/core/arrow-kindedj")
+project(":arrow-generic").projectDir = file("modules/core/arrow-generic")
 
 include(":arrow-test")
 project(":arrow-test").projectDir = file("modules/core/arrow-test")
