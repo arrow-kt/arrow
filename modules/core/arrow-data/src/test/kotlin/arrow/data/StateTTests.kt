@@ -2,6 +2,9 @@ package arrow.data
 
 import arrow.Kind
 import arrow.core.ForId
+import arrow.core.ForTry
+import arrow.core.Try
+import arrow.core.monad
 import arrow.mtl.instances.StateTMonadStateInstance
 import arrow.mtl.monadState
 import arrow.test.UnitSpec
@@ -16,7 +19,7 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class StateTTests : UnitSpec() {
 
-    val M: StateTMonadStateInstance<ForTry, Int> = StateT.monadState<ForTry, Int>(Try.monad())
+    val M: StateTMonadStateInstance<ForTry, Int> = StateT.monadState(Try.monad())
 
     val EQ: Eq<StateTOf<ForTry, Int, Int>> = Eq { a, b ->
         a.runM(1, Try.monad()) == b.runM(1, Try.monad())

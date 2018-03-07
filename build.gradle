@@ -152,3 +152,7 @@ task wrapper(type: Wrapper) {
 }
 
 apply plugin: 'com.github.ben-manes.versions'
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}

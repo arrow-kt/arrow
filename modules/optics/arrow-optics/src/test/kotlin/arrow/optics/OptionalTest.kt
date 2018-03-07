@@ -1,12 +1,6 @@
 package arrow.optics
 
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.eq
-import arrow.core.foldable
-import arrow.core.getOrElse
-import arrow.data.Try
-import arrow.data.applicative
+import arrow.core.*
 import arrow.data.k
 import arrow.syntax.collections.firstOption
 import arrow.syntax.either.left

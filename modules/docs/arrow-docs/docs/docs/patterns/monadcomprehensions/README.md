@@ -139,7 +139,7 @@ fun getNLines(path: FilePath, count: Int): IO<List<String>> =
     val file = getFile(path).bind()
     val lines = file.readLines().bind()
     if (lines.length < count) {
-      IO.raiseError(RuntimeException("File has fewer lines than expected"))
+      IO.raiseError(RuntimeException("File has fewer lines than expected")).bind()
     } else {
       lines.take(count)
     }

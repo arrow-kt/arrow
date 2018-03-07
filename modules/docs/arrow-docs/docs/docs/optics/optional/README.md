@@ -18,6 +18,7 @@ For a structure `List<Int>` we can create an `Optional` to focus an optional hea
 
 ```kotlin:ank
 import arrow.*
+import arrow.core.*
 import arrow.optics.*
 import arrow.syntax.either.*
 
@@ -35,8 +36,6 @@ import arrow.optics.instances.*
 listHead<Int>().set(listOf(1, 3, 6), 5)
 ```
 ```kotlin:ank
-import arrow.data.*
-
 listHead<Int>().modify(listOf(1, 3, 6)) { head -> head * 5 }
 ```
 

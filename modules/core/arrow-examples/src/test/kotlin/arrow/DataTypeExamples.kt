@@ -70,7 +70,7 @@ class DataTypeExamples : FreeSpec() { init {
                 val a = Option(1).bind()
                 val b = Option(1 + a).bind()
                 val c = Option(1 + b).bind()
-                yields(a + b + c)
+                a + b + c
             }
             six shouldBe Some(6)
 
@@ -78,7 +78,7 @@ class DataTypeExamples : FreeSpec() { init {
                 val a = Option(1).bind()
                 val b = noneValue.bind()
                 val c = Option(1 + b).bind()
-                yields(a + b + c)
+                a + b + c
             }
             none shouldBe None
         }
@@ -119,7 +119,7 @@ class DataTypeExamples : FreeSpec() { init {
             val gain = Try { playLottery(99) }
             gain.recover { 0 } shouldBe Try.Success(0)
 
-            gain.recoverWith { Try { playLottery(42)} } shouldBe Try.Success(1000)
+            gain.recoverWith { Try { playLottery(42) } } shouldBe Try.Success(1000)
         }
 
         "Fold" {

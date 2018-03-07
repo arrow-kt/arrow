@@ -1,6 +1,6 @@
 package arrow.dagger.instances
 
-import arrow.data.*
+import arrow.core.*
 import arrow.typeclasses.*
 import dagger.Module
 import dagger.Provides

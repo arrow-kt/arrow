@@ -2,13 +2,14 @@
 layout: docs
 title: Validated
 permalink: /docs/datatypes/validated/
+video: ONwoUsHBJHg
 ---
 
 ## Validated
 
-Imagine you are filling out a web form to sign up for an account. You input your username and 
-password and submit. Response comes back saying your username can't have dashes in it, 
-so you make some changes and resubmit. Can't have special characters either. Change, resubmit. 
+Imagine you are filling out a web form to sign up for an account. You input your username and
+password and submit. Response comes back saying your username can't have dashes in it,
+so you make some changes and resubmit. Can't have special characters either. Change, resubmit.
 Passwords need to have at least one capital letter. Change, resubmit. Password needs to have at least one number.
 
 Or perhaps you're reading from a configuration file. One could imagine the configuration library
@@ -26,25 +27,25 @@ config<String>("url").flatMap { url ->
 }
 ```
 
-You run your program and it says key "url" not found, turns out the key was "endpoint". So 
+You run your program and it says key "url" not found, turns out the key was "endpoint". So
 you change your code and re-run. Now it says the "port" key was not a well-formed integer.
 
-It would be nice to have all of these errors reported simultaneously. That the username can't 
-have dashes can be validated separately from it not having special characters, as well as 
-from the password needing to have certain requirements. A misspelled (or missing) field in 
+It would be nice to have all of these errors reported simultaneously. That the username can't
+have dashes can be validated separately from it not having special characters, as well as
+from the password needing to have certain requirements. A misspelled (or missing) field in
 a config can be validated separately from another field not being well-formed.
 
 Enter `Validated`.
 
 ## Parallel Validation
 
-Our goal is to report any and all errors across independent bits of data. For instance, when 
-we ask for several pieces of configuration, each configuration field can be validated separately 
-from one another. How then do we enforce that the data we are working with is independent? 
+Our goal is to report any and all errors across independent bits of data. For instance, when
+we ask for several pieces of configuration, each configuration field can be validated separately
+from one another. How then do we enforce that the data we are working with is independent?
 We ask for both of them up front.
 
-As our running example, we will look at config parsing. Our config will be represented by a 
-`Map<String, String>`. Parsing will be handled by a `Read` type class - we provide instances only 
+As our running example, we will look at config parsing. Our config will be represented by a
+`Map<String, String>`. Parsing will be handled by a `Read` type class - we provide instances only
 for `String` and `Int` for brevity.
 
 ```kotlin:ank
@@ -73,7 +74,7 @@ abstract class Read<A> {
 }
 ```
 
-Then we enumerate our errors—when asking for a config value, one of two things can go wrong: 
+Then we enumerate our errors—when asking for a config value, one of two things can go wrong:
 the field is missing, or it is not well-formed with regards to the expected type.
 
 ```kotlin:ank
@@ -83,7 +84,7 @@ sealed class ConfigError {
 }
 ```
 
-We need a data type that can represent either a successful value (a parsed configuration), or an error. 
+We need a data type that can represent either a successful value (a parsed configuration), or an error.
 It would look like the following, which Arrow provides in `arrow.Validated`:
 
 ```kotlin
@@ -92,7 +93,7 @@ It would look like the following, which Arrow provides in `arrow.Validated`:
     data class Valid<out A>(val a: A) : Validated<Nothing, A>()
 
     data class Invalid<out E>(val e: E) : Validated<E, Nothing>()
-    
+
 }
 ```
 
@@ -121,8 +122,8 @@ data class Config(val map: Map<String, String>) {
 }
 ```
 
-Everything is in place to write the parallel validator. Recall that we can only do parallel 
-validation if each piece is independent. How do we enforce the data is independent? By 
+Everything is in place to write the parallel validator. Recall that we can only do parallel
+validation if each piece is independent. How do we enforce the data is independent? By
 asking for all of it up front. Let's start with two pieces of data.
 
 ```kotlin
@@ -137,13 +138,13 @@ fun <E, A, B, C> parallelValidate(v1: Validated<E, A>, v2: Validated<E, B>, f: (
 }
 ```
 
-We've run into a problem. In the case where both have errors, We want to report both. we 
-don't have a way to combine ConfigErrors. But as clients, we can change our Validated 
-values where the error can be combined, say, a `List<ConfigError>`.We are going to use a 
-`NonEmptyList<ConfigError>`—the NonEmptyList statically guarantees we have at least one value, 
-which aligns with the fact that if we have an Invalid, then we most certainly have at least one error. 
+We've run into a problem. In the case where both have errors, We want to report both. we
+don't have a way to combine ConfigErrors. But as clients, we can change our Validated
+values where the error can be combined, say, a `List<ConfigError>`.We are going to use a
+`NonEmptyList<ConfigError>`—the NonEmptyList statically guarantees we have at least one value,
+which aligns with the fact that if we have an Invalid, then we most certainly have at least one error.
 This technique is so common there is a convenient method on `Validated` called `toValidatedNel`
-that turns any `Validated<E, A>` value to a `Validated<NonEmptyList<E>, A>`. Additionally, the 
+that turns any `Validated<E, A>` value to a `Validated<NonEmptyList<E>, A>`. Additionally, the
 type alias `ValidatedNel<E, A>` is provided.
 
 Time to parse.
@@ -176,8 +177,8 @@ val valid = parallelValidate(
 }
 valid
 ```
-    
-But what happens when having one or more errors? They are accumulated in a `NonEmptyList` wrapped in 
+
+But what happens when having one or more errors? They are accumulated in a `NonEmptyList` wrapped in
 an `Invalid` instance.
 
 ```kotlin:ank
@@ -194,8 +195,8 @@ valid
 
 ## Sequential Validation
 
-If you do want error accumulation but occasionally run into places where sequential validation is needed, 
-then Validated provides `withEither` method to allow you to temporarily turn a Validated 
+If you do want error accumulation but occasionally run into places where sequential validation is needed,
+then Validated provides `withEither` method to allow you to temporarily turn a Validated
 instance into an Either instance and apply it to a function.
 
 ```kotlin:ank
