@@ -2,6 +2,7 @@
 layout: docs
 title: Intro to datatypes
 permalink: /docs/typeclasses/intro/
+video: 3y9KI7XWXSY
 ---
 
 ## Typeclasses
