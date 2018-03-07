@@ -49,7 +49,7 @@ class HigherKindsFileGenerator(
 
     private fun genKindTypeAliases(hk: HigherKind): String = when {
         hk.tparams.isEmpty() -> knownError("Class must have at least one type param to derive HigherKinds")
-        hk.tparams.size <= 5 -> {
+        hk.tparams.size <= 22 -> {
             val kindAlias = "typealias ${hk.name}<${hk.expandedTypeArgs}> = ${hk.alias}<${hk.markerName}, ${hk.expandedTypeArgs}>"
             val acc = if (hk.tparams.size == 1) kindAlias else kindAlias + "\n" + genPartiallyAppliedKinds(hk)
             acc

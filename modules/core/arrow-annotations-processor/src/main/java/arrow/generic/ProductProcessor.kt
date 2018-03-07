@@ -1,7 +1,9 @@
 package arrow.generic
 
+import arrow.common.messager.logW
 import com.google.auto.service.AutoService
 import arrow.common.utils.AbstractProcessor
+import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.asClassOrPackageDataWrapper
 import arrow.common.utils.knownError
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
@@ -44,12 +46,14 @@ class ProductProcessor : AbstractProcessor() {
 
     private fun evalAnnotatedProductElement(element: Element): AnnotatedGeneric = when {
         (element.kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isDataClass == true -> {
-            val properties = getConstructorTypesNames(element).zip(getConstructorParamNames(element), ::Target)
-
-            if (properties.size > 10)
-                knownError("${element.enclosingElement}.${element.simpleName} up to 10 constructor parameters is supported")
+            val elementClassData = getClassData(element)
+            val paramNames = getConstructorParamNames(element)
+            val typeNames = getConstructorTypesNames(element)
+            val properties = paramNames.zip(typeNames).map { Target(it.second,it.first) }
+            if (properties.size > 22)
+                knownError("${element.enclosingElement}.${element.simpleName} up to 22 constructor parameters is supported")
             else
-                AnnotatedGeneric(element as TypeElement, getClassData(element), properties)
+                AnnotatedGeneric(element as TypeElement, elementClassData, properties)
         }
 
         else -> knownError(productAnnotationError(element, productAnnotationName, productAnnotationTarget))

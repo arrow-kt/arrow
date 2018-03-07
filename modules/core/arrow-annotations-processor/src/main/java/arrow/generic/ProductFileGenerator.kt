@@ -22,41 +22,28 @@ class ProductFileGenerator(
                         }
                     }
 
-    /*
-    //fun Person.tupled(): Tuple2<String, Int> =
-//        Tuple2(this.name, this.age)
-
-
-
-fun ${product.sourceName}Product(): arrow.products.Product<${product.sourceClassName}, ${focusType(product)}> = arrow.products.Product(
-            |        get = { ${product.sourceName}: ${product.sourceClassName} -> ${getFunction(product)} },
-            |        reverseGet = { ${reverseGetFunction(product)} }
-            |)
-
-
-
-            //interface PersonGenericSyntax<F> : ApplicativeSyntax<F> {
-//
-//    fun Kind<F, Tuple2<String, Int>>.toPerson(): Kind<F, Person> =
-//            this.map { Person.fromTuple(it) }
-//
-//    fun Person.Companion.from(a: Kind<F, String>, b: Kind<F, Int>): Kind<F, Person> =
-//            applicative().tupled(a, b).toPerson()
-//
-//}
-     */
-
     private fun processElement(product: AnnotatedGeneric): Pair<AnnotatedGeneric, String> = product to """
             |package ${product.classData.`package`.escapedClassName}
             |
             |import arrow.syntax.applicative.*
             |import arrow.core.toT
             |
+            |fun ${product.sourceClassName}.combine(other: ${product.sourceClassName}): ${product.sourceClassName} =
+            |  this + other
+            |
+            |operator fun ${product.sourceClassName}.plus(other: ${product.sourceClassName}): ${product.sourceClassName} =
+            |  arrow.typeclasses.semigroup<${product.sourceClassName}>().combine(this, other)
+            |
             |fun ${product.sourceClassName}.tupled(): ${focusType(product)} =
             |  ${tupleConstructor(product)}
             |
             |fun ${product.sourceClassName}.tupledLabelled(): ${labelledFocusType(product)} =
             |  ${product.targets.joinToString(" toT ") { """("${it.paramName}" toT ${it.paramName})""" }}
+            |
+            |fun <B> ${product.sourceClassName}.foldLabelled(f: ${product.targetNames.joinToString(prefix = "(", separator = ", ", postfix = ")") { "arrow.core.Tuple2<kotlin.String, $it>" }} -> B): B {
+            |  val t = tupledLabelled()
+            |  return f(${(0 until product.focusSize).joinToString(", ") { "t.${letters[it]}" }})
+            |}
             |
             |fun ${focusType(product)}.to${product.sourceSimpleName}(): ${product.sourceClassName} =
             |  ${classConstructorFromTuple(product.sourceClassName, product.focusSize)}
@@ -69,7 +56,80 @@ fun ${product.sourceName}Product(): arrow.products.Product<${product.sourceClass
             |    applicative().tupled(${product.targets.joinToString(", ") { it.paramName }}).to${product.sourceSimpleName}()
             |}
             |
+            |interface ${product.sourceSimpleName}SemigroupInstance : arrow.typeclasses.Semigroup<${product.sourceClassName}> {
+            |  fun tupleSemigroup(): arrow.typeclasses.Semigroup<${focusType(product)}>
+            |  override fun combine(a: ${product.sourceClassName}, b: ${product.sourceClassName}): ${product.sourceClassName} =
+            |    tupleSemigroup().combine(a.tupled(), b.tupled()).to${product.sourceSimpleName}()
+            |}
+            |
+            |object ${product.sourceSimpleName}SemigroupInstanceImplicits {
+            |  fun instance(tupleSemigroup: arrow.typeclasses.Semigroup<${focusType(product)}>): ${product.sourceSimpleName}SemigroupInstance =
+            |    object : ${product.sourceSimpleName}SemigroupInstance {
+            |      override fun tupleSemigroup(): arrow.typeclasses.Semigroup<${focusType(product)}> =
+            |        tupleSemigroup
+            |    }
+            |}
+            |
+            |interface ${product.sourceSimpleName}MonoidInstance : ${product.sourceSimpleName}SemigroupInstance, arrow.typeclasses.Monoid<${product.sourceClassName}> {
+            |  fun tupleMonoid(): arrow.typeclasses.Monoid<${focusType(product)}>
+            |  override fun tupleSemigroup(): arrow.typeclasses.Semigroup<${focusType(product)}> = tupleMonoid()
+            |  override fun empty(): ${product.sourceClassName} =
+            |    tupleMonoid().empty().to${product.sourceSimpleName}()
+            |}
+            |
+            |object ${product.sourceSimpleName}MonoidInstanceImplicits {
+            |  fun instance(tupleMonoid: arrow.typeclasses.Monoid<${focusType(product)}>): ${product.sourceSimpleName}MonoidInstance =
+            |    object : ${product.sourceSimpleName}MonoidInstance {
+            |      override fun tupleMonoid(): arrow.typeclasses.Monoid<${focusType(product)}> =
+            |        tupleMonoid
+            |    }
+            |}
+            |
+            |interface ${product.sourceSimpleName}EqInstance : arrow.typeclasses.Eq<${product.sourceClassName}> {
+            |  override fun eqv(a: ${product.sourceClassName}, b: ${product.sourceClassName}): Boolean =
+            |    a == b
+            |}
+            |
+            |object ${product.sourceSimpleName}EqInstanceImplicits {
+            |  fun instance(): ${product.sourceSimpleName}EqInstance =
+            |    object : ${product.sourceSimpleName}EqInstance {}
+            |}
+            |
+            |interface ${product.sourceSimpleName}OrderInstance : arrow.typeclasses.Order<${product.sourceClassName}> {
+            |  fun tupleOrder(): arrow.typeclasses.Order<${focusType(product)}>
+            |  override fun eqv(a: ${product.sourceClassName}, b: ${product.sourceClassName}): Boolean =
+            |    a == b
+            |  override fun compare(a: ${product.sourceClassName}, b: ${product.sourceClassName}): Int =
+            |    tupleOrder().compare(a.tupled(), b.tupled())
+            |}
+            |
+            |object ${product.sourceSimpleName}OrderInstanceImplicits {
+            |  fun instance(tupleOrder: arrow.typeclasses.Order<${focusType(product)}>): ${product.sourceSimpleName}OrderInstance =
+            |    object : ${product.sourceSimpleName}OrderInstance {
+            |      override fun tupleOrder(): arrow.typeclasses.Order<${focusType(product)}> = tupleOrder
+            |    }
+            |}
+            |
+            |interface ${product.sourceSimpleName}ShowInstance : arrow.typeclasses.Show<${product.sourceClassName}> {
+            |  override fun show(a: ${product.sourceClassName}): String =
+            |    a.toString()
+            |}
+            |
+            |object ${product.sourceSimpleName}ShowInstanceImplicits {
+            |  fun instance(): ${product.sourceSimpleName}ShowInstance =
+            |    object : ${product.sourceSimpleName}ShowInstance {}
+            |}
+            |
             |""".trimMargin()
+
+    /**
+    a + b	a.plus(b)
+    a - b	a.minus(b)
+    a * b	a.times(b)
+    a / b	a.div(b)
+    a % b	a.rem(b), a.mod(b) (deprecated)
+    a..b	a.rangeTo(b)
+     */
 
 //    private fun getFunction(product: AnnotatedGeneric) =
 //            if (product.hasTupleFocus) tupleConstructor(product)
