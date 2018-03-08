@@ -6,7 +6,6 @@ import arrow.deriving
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
 import kotlinx.coroutines.experimental.*
 import kotlin.coroutines.experimental.CoroutineContext
 
@@ -18,8 +17,7 @@ fun <A> DeferredKOf<A>.value(): Deferred<A> = this.fix().deferred
 @higherkind
 @deriving(
         Functor::class,
-        Applicative::class,
-        Monad::class
+        Applicative::class
 )
 data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferred<A> by deferred {
 

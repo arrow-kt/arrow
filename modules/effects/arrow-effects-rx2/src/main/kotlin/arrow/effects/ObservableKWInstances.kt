@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.effects.continuations.EffectContinuation
 import arrow.instance
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.continuations.BindingCatchContinuation
 import arrow.typeclasses.continuations.BindingContinuation
@@ -21,21 +22,21 @@ interface ObservableKApplicativeErrorInstance :
 }
 
 @instance(ObservableK::class)
-interface ObservableKMonadInstance : arrow.typeclasses.Monad<ForObservableK> {
-    override fun <A, B> ap(fa: arrow.effects.ObservableKOf<A>, ff: arrow.effects.ObservableKOf<kotlin.Function1<A, B>>): arrow.effects.ObservableK<B> =
+interface ObservableKMonadInstance : Monad<ForObservableK> {
+    override fun <A, B> ap(fa: ObservableKOf<A>, ff: ObservableKOf<kotlin.Function1<A, B>>): ObservableK<B> =
             fa.fix().ap(ff)
 
-    override fun <A, B> flatMap(fa: arrow.effects.ObservableKOf<A>, f: kotlin.Function1<A, arrow.effects.ObservableKOf<B>>): arrow.effects.ObservableK<B> =
+    override fun <A, B> flatMap(fa: ObservableKOf<A>, f: kotlin.Function1<A, ObservableKOf<B>>): ObservableK<B> =
             fa.fix().flatMap(f)
 
-    override fun <A, B> map(fa: arrow.effects.ObservableKOf<A>, f: kotlin.Function1<A, B>): arrow.effects.ObservableK<B> =
+    override fun <A, B> map(fa: ObservableKOf<A>, f: kotlin.Function1<A, B>): ObservableK<B> =
             fa.fix().map(f)
 
-    override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, arrow.effects.ObservableKOf<arrow.core.Either<A, B>>>): arrow.effects.ObservableK<B> =
-            arrow.effects.ObservableK.tailRecM(a, f)
+    override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ObservableKOf<arrow.core.Either<A, B>>>): ObservableK<B> =
+            ObservableK.tailRecM(a, f)
 
-    override fun <A> pure(a: A): arrow.effects.ObservableK<A> =
-            arrow.effects.ObservableK.pure(a)
+    override fun <A> pure(a: A): ObservableK<A> =
+            ObservableK.pure(a)
 
     override fun <B> binding(cc: CoroutineContext, c: suspend BindingContinuation<ForObservableK, *>.() -> B): ObservableK<B> =
             EffectContinuation.bindingIn(ObservableK.effect(), cc, c).fix()
