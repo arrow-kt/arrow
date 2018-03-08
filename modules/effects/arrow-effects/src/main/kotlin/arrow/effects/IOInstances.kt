@@ -44,9 +44,6 @@ interface IOMonadInstance : IOApplicativeInstance, Monad<ForIO> {
 
 @instance(IO::class)
 interface IOMonadErrorInstance : IOApplicativeErrorInstance, IOMonadInstance, MonadError<ForIO, Throwable> {
-    override fun <B> bindingCatch(cc: CoroutineContext, catch: (Throwable) -> Throwable, c: suspend BindingCatchContinuation<ForIO, Throwable, *>.() -> B): Kind<ForIO, B> =
-            EffectContinuation.bindingCatchIn(IO.effect(), catch, cc, c)
-
     override fun <A, B> ap(fa: IOOf<A>, ff: IOOf<(A) -> B>): IO<B> =
             super<IOMonadInstance>.ap(fa, ff).fix()
 
@@ -55,6 +52,9 @@ interface IOMonadErrorInstance : IOApplicativeErrorInstance, IOMonadInstance, Mo
 
     override fun <A> pure(a: A): IO<A> =
             super<IOMonadInstance>.pure(a)
+
+    override fun <B> bindingCatch(cc: CoroutineContext, catch: (Throwable) -> Throwable, c: suspend BindingCatchContinuation<ForIO, Throwable, *>.() -> B): Kind<ForIO, B> =
+            EffectContinuation.bindingCatchIn(IO.effect(), catch, cc, c)
 }
 
 @instance(IO::class)
