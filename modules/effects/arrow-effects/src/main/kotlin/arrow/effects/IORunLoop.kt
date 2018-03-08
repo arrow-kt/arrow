@@ -4,8 +4,6 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.effects.internal.Platform.ArrayStack
-import arrow.typeclasses.continuations.MonadErrorBlockingContinuation
-import arrow.typeclasses.internal.Platform
 import kotlin.coroutines.experimental.Continuation
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.startCoroutine
@@ -75,15 +73,17 @@ internal object IORunLoop {
                         if (bRest == null) bRest = ArrayStack()
                         bRest.push(bFirst)
                     }
-                    val currentG = currentIO.g as BindF
-                    val currentCC = currentIO.cc
-                    bFirst = {
-                        val continuation = MonadErrorBlockingContinuation<ForIO, Throwable, Any?>(IO.monadError(), Platform.awaitableLatch(), currentCC, { it })
-                        val func: suspend (Any?) -> IO<Any?> = { currentG(result).also { continuation.resolve(Either.Right(it)) } }
-                        func.startCoroutine(continuation, continuation)
-                        continuation.returnedMonad().fix()
+                    val localCurrent = currentIO
+
+                    val currentCC = localCurrent.cc
+
+                    val localCont = currentIO.cont
+
+                    bFirst = localCurrent.g as BindF
+
+                    currentIO = IO.async { cc ->
+                        loop(localCont, cc.asyncCallback(currentCC), null, null, null)
                     }
-                    currentIO = currentIO.cont
                 }
                 is IO.Map<*, *> -> {
                     if (bFirst != null) {

@@ -1,9 +1,11 @@
 package arrow.typeclasses
 
-import arrow.*
+import arrow.Kind
+import arrow.TC
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
+import arrow.typeclass
 
 @typeclass
 interface ApplicativeError<F, E> : Applicative<F>, TC {
@@ -13,6 +15,8 @@ interface ApplicativeError<F, E> : Applicative<F>, TC {
     fun <A> handleErrorWith(fa: Kind<F, A>, f: (E) -> Kind<F, A>): Kind<F, A>
 
     fun <A> handleError(fa: Kind<F, A>, f: (E) -> A): Kind<F, A> = handleErrorWith(fa) { pure(f(it)) }
+
+    fun <A> mapError(fa: Kind<F, A>, f: (E) -> E): Kind<F, A> = handleErrorWith(fa) { raiseError(f(it)) }
 
     fun <A> attempt(fa: Kind<F, A>): Kind<F, Either<E, A>> =
             handleErrorWith(map(fa) { Right(it) }) {
