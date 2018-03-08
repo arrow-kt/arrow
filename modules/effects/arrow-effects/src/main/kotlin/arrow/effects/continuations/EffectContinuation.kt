@@ -10,7 +10,7 @@ import kotlin.coroutines.experimental.EmptyCoroutineContext
 import kotlin.coroutines.experimental.startCoroutine
 import kotlin.coroutines.experimental.suspendCoroutine
 
-class EffectContinuation<F, A>(EF: Effect<F>, val bindInContext: CoroutineContext) :
+class EffectContinuation<F, A>(EF: Effect<F>, val catch: (Throwable) -> Throwable, val bindInContext: CoroutineContext) :
         BindingCatchContinuation<F, Throwable, A>, Effect<F> by EF {
 
     override val context: CoroutineContext = EmptyCoroutineContext
@@ -20,7 +20,7 @@ class EffectContinuation<F, A>(EF: Effect<F>, val bindInContext: CoroutineContex
     }
 
     override fun resumeWithException(exception: Throwable) {
-        returnedMonad = raiseError(exception)
+        returnedMonad = raiseError(catch(exception))
     }
 
     protected lateinit var returnedMonad: Kind<F, A>
@@ -38,16 +38,11 @@ class EffectContinuation<F, A>(EF: Effect<F>, val bindInContext: CoroutineContex
 
     companion object {
         fun <F, A> bindingIn(EF: Effect<F>, cc: CoroutineContext, c: suspend BindingContinuation<F, *>.() -> A) =
-                EF.flatMapIn(cc, EF.invoke {}) {
-                    val continuation = EffectContinuation<F, A>(EF, cc)
-                    val coro: suspend () -> Kind<F, A> = { EF.pure(c(continuation)) }
-                    coro.startCoroutine(continuation)
-                    continuation.returnedMonad()
-                }
+                bindingCatchIn(EF, { it }, cc, c)
 
         fun <F, A> bindingCatchIn(EF: Effect<F>, catch: (Throwable) -> Throwable, cc: CoroutineContext, c: suspend BindingCatchContinuation<F, Throwable, *>.() -> A) =
                 EF.flatMapIn(cc, EF.invoke {}) {
-                    val continuation = EffectContinuation<F, A>(EF, cc)
+                    val continuation = EffectContinuation<F, A>(EF, catch, cc)
                     val coro: suspend () -> Kind<F, A> = { EF.pure(c(continuation)) }
                     coro.startCoroutine(continuation)
                     EF.mapError(continuation.returnedMonad(), catch)
