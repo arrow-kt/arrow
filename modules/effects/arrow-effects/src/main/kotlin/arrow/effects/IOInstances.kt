@@ -38,8 +38,8 @@ interface IOMonadInstance : IOApplicativeInstance, Monad<ForIO> {
     override fun <A, B> map(fa: IOOf<A>, f: (A) -> B): IO<B> =
             super<IOApplicativeInstance>.map(fa, f)
 
-    override fun <B> binding(cc: CoroutineContext, c: suspend BindingContinuation<ForIO, *>.() -> B): Kind<ForIO, B> =
-            EffectContinuation.bindingIn(IO.effect(), cc, c)
+    override fun <B> binding(cc: CoroutineContext, c: suspend BindingContinuation<ForIO, *>.() -> B): IO<B> =
+            EffectContinuation.bindingIn(IO.effect(), cc, c).fix()
 }
 
 @instance(IO::class)
@@ -53,8 +53,8 @@ interface IOMonadErrorInstance : IOApplicativeErrorInstance, IOMonadInstance, Mo
     override fun <A> pure(a: A): IO<A> =
             super<IOMonadInstance>.pure(a)
 
-    override fun <B> bindingCatch(cc: CoroutineContext, catch: (Throwable) -> Throwable, c: suspend BindingCatchContinuation<ForIO, Throwable, *>.() -> B): Kind<ForIO, B> =
-            EffectContinuation.bindingCatchIn(IO.effect(), catch, cc, c)
+    override fun <B> bindingCatch(cc: CoroutineContext, catch: (Throwable) -> Throwable, c: suspend BindingCatchContinuation<ForIO, Throwable, *>.() -> B): IO<B> =
+            EffectContinuation.bindingCatchIn(IO.effect(), catch, cc, c).fix()
 }
 
 @instance(IO::class)
