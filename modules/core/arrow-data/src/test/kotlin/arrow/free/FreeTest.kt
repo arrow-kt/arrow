@@ -11,7 +11,6 @@ import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadLaws
 import arrow.typeclasses.applicative
-import arrow.typeclasses.binding
 import arrow.typeclasses.functor
 import arrow.typeclasses.monad
 import io.kotlintest.KTestJUnitRunner
