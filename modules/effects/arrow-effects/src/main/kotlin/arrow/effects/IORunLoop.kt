@@ -126,9 +126,9 @@ internal object IORunLoop {
             bFirst: BindF?,
             bRest: CallStack?,
             register: Proc<Any?>): IO<A> =
-            // Hitting an async boundary means we have to stop, however
-            // if we had previous `flatMap` operations then we need to resume
-            // the loop with the collected stack
+    // Hitting an async boundary means we have to stop, however
+    // if we had previous `flatMap` operations then we need to resume
+    // the loop with the collected stack
             when {
                 bFirst != null || (bRest != null && bRest.isNotEmpty()) ->
                     IO.Async { cb ->
@@ -339,22 +339,21 @@ internal object IORunLoop {
         }
     }
 
-    private fun <T> ((Either<Throwable, T>) -> Unit).asyncCallback(currentCC: CoroutineContext): (Either<Throwable, T>) -> Unit {
-        return { result ->
-            val func: suspend () -> Unit = { this(result) }
+    private fun <T> ((Either<Throwable, T>) -> Unit).asyncCallback(currentCC: CoroutineContext): (Either<Throwable, T>) -> Unit =
+            { result ->
+                val func: suspend () -> Unit = { this(result) }
 
-            val normalResume: Continuation<Unit> = object : Continuation<Unit> {
-                override val context: CoroutineContext
-                    get() = currentCC
+                val normalResume: Continuation<Unit> = object : Continuation<Unit> {
+                    override val context: CoroutineContext
+                        get() = currentCC
 
-                override fun resume(value: Unit) {}
+                    override fun resume(value: Unit) {}
 
-                override fun resumeWithException(exception: Throwable) {
-                    this@asyncCallback(Either.left(exception))
+                    override fun resumeWithException(exception: Throwable) {
+                        this@asyncCallback(Either.left(exception))
+                    }
                 }
-            }
 
-            func.startCoroutine(normalResume)
-        }
-    }
+                func.startCoroutine(normalResume)
+            }
 }
