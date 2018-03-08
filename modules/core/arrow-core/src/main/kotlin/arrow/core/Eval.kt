@@ -82,7 +82,7 @@ sealed class Eval<out A> : EvalOf<A> {
 
         private fun <A> evaluate(e: Eval<A>): A = run {
             var curr: Eval<Any?> = e
-            var fs: MutableList<(Any?) -> Eval<Any?>> = mutableListOf()
+            val fs: MutableList<(Any?) -> Eval<Any?>> = mutableListOf()
 
             fun addToMemo(m: Memoize<Any?>): (Any?) -> Eval<Any?> = {
                 m.result = Some(it)
