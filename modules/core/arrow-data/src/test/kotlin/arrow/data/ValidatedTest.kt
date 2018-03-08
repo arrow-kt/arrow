@@ -1,13 +1,10 @@
 package arrow.data
 
+import arrow.core.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import arrow.core.Left
-import arrow.core.None
-import arrow.core.Right
-import arrow.core.Some
 import arrow.instances.*
 import arrow.syntax.applicative.map
 import arrow.syntax.validated.valid

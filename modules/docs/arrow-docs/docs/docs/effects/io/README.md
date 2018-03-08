@@ -79,7 +79,7 @@ IO<Int> { throw RuntimeException("Boom!") }
 ```
 
 ```kotlin
-IO.runAsync<Int> { }
+IO.async<Int> { }
   .attempt()
   .unsafeRunTimed(100.milliseconds)
 ```

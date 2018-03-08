@@ -2,10 +2,6 @@ package arrow.optics
 
 import arrow.core.*
 import arrow.data.*
-import arrow.optics.Iso
-import arrow.optics.PIso
-import arrow.optics.PPrism
-import arrow.optics.Prism
 import arrow.syntax.validated.*
 
 /**

@@ -1,9 +1,6 @@
 package arrow.dagger.instances.tests
 
-import arrow.core.EitherPartialOf
-import arrow.core.ForEval
-import arrow.core.ForId
-import arrow.core.ForOption
+import arrow.core.*
 import arrow.dagger.instances.*
 import arrow.data.*
 import arrow.typeclasses.*

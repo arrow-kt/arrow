@@ -68,7 +68,7 @@ We will list them by their hierarchy.
 
 - [`Monoid`]({{ '/docs/typeclasses/monoid/' | relative_url }}) - combinable objects have an empty value
 
-- [`MonoidK`]({{ '/docs/typeclasses/monoidk/' | relative_url }}) - datatypes have an empty value
+- [`MonoidK`]({{ '/docs/typeclasses/monoidk/' | relative_url }}) - combinable datatypes have an empty value
 
 ##### Foldable
 

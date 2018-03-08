@@ -2,6 +2,7 @@ package arrow.tc
 
 import arrow.common.utils.AbstractProcessor
 import arrow.common.utils.ClassOrPackageDataWrapper
+import arrow.common.utils.fullName
 import arrow.common.utils.knownError
 import com.google.auto.service.AutoService
 import org.jetbrains.kotlin.serialization.deserialization.TypeTable
@@ -45,13 +46,18 @@ class TypeclassesProcessor : AbstractProcessor() {
         val proto = getClassOrPackageDataWrapper(element) as ClassOrPackageDataWrapper.Class
         val typeTable = TypeTable(proto.classProto.typeTable)
         val superTypes: List<ClassOrPackageDataWrapper.Class> =
-                recurseTypeclassInterfaces(proto, typeTable, emptyList()).map { it as ClassOrPackageDataWrapper.Class }
+                proto.declaredTypeClassInterfaces(typeTable).map { it as ClassOrPackageDataWrapper.Class }
+        val superTypesExtensions: List<ClassOrPackageDataWrapper.Class> = superTypes.flatMap { sp ->
+            val superTypeTable = TypeTable(sp.classProto.typeTable)
+            recurseTypeclassInterfaces(sp, superTypeTable, emptyList()).map { it as ClassOrPackageDataWrapper.Class }
+        }
+        val diamondTypes: List<ClassOrPackageDataWrapper.Class> = superTypesExtensions.distinctBy { it.fullName }
         val syntax = element.annotationMirrors.flatMap { am ->
             am.elementValues.entries.filter {
                 "syntax" == it.key.simpleName.toString()
             }.map { it.value.toString().toBoolean() }
         }.firstOrNull() ?: true
-        return AnnotatedTypeclass(element, proto, superTypes, syntax)
+        return AnnotatedTypeclass(element, proto, superTypes, diamondTypes, syntax)
     }
 
 }

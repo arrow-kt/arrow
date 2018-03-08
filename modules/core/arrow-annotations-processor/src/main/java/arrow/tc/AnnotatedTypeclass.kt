@@ -7,4 +7,5 @@ class AnnotatedTypeclass(
         val classElement: TypeElement,
         val classOrPackageProto: ClassOrPackageDataWrapper,
         val superTypes: List<ClassOrPackageDataWrapper.Class>,
+        val diamondTypes: List<ClassOrPackageDataWrapper.Class>,
         val syntax : Boolean)

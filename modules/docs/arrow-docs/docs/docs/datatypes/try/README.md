@@ -59,7 +59,7 @@ However, we could use `Try` to retrieve the computation result in a much cleaner
 
 ```kotlin:ank
 import arrow.*
-import arrow.data.*
+import arrow.core.*
 
 val lotteryTry = Try { getLotteryNumbers() }
 lotteryTry
