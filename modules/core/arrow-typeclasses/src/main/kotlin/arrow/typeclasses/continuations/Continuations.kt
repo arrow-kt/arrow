@@ -1,7 +1,6 @@
 package arrow.typeclasses
 
 import arrow.core.Either
-import kotlin.coroutines.experimental.Continuation
 import kotlin.coroutines.experimental.suspendCoroutine
 
 interface Awaitable<A> {
@@ -14,8 +13,4 @@ interface Awaitable<A> {
     suspend fun await(): A = suspendCoroutine { cc ->
         awaitNonBlocking({ cc.resumeWithException(it) }, { cc.resume(it) })
     }
-}
-
-interface BindingInContextContinuation<in T> : Continuation<T> {
-    fun await(): Throwable?
 }
