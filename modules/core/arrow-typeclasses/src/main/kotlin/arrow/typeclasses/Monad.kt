@@ -42,8 +42,8 @@ interface Monad<F> : Applicative<F>, TC {
 
     /**
      * Entry point for monad bindings which enables for comprehension. The underlying implementation is based on coroutines.
-     * A coroutine is initiated and suspended inside [MonadErrorContinuation] yielding to [Monad.flatMap]. Once all the flatMap binds are completed
-     * the underlying monad is returned from the act of executing the coroutine
+     * A coroutine is initiated and suspended inside [BindingContinuation] yielding to [Monad.flatMap] or [Monad.flatMapIn].
+     * Once all the binds are completed the underlying data type is returned from the act of executing the coroutine.
      */
     fun <B> binding(cc: CoroutineContext = EmptyCoroutineContext, c: suspend BindingContinuation<F, *>.() -> B): Kind<F, B> {
         val continuation = MonadBlockingContinuation<F, B>(this, Platform.awaitableLatch(), cc)

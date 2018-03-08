@@ -22,12 +22,11 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F>, TC {
             })
 
     /**
-     * Entry point for monad bindings which enables for comprehensions. The underlying implementation is based on coroutines.
-     * A coroutine is initiated and suspended inside [MonadErrorBlockingContinuation] yielding to [Monad.flatMap]. Once all the flatMap binds are completed
-     * the underlying monad is returned from the act of executing the coroutine
+     * Entry point for monad bindings which enables for comprehension. The underlying implementation is based on coroutines.
+     * A coroutine is initiated and suspended inside [BindingCatchContinuation] yielding to [Monad.flatMap] or [Monad.flatMapIn].
+     * Once all the binds are completed the underlying data type is returned from the act of executing the coroutine.
      *
-     * This one operates over [MonadError] instances that can support [Throwable] in their error type automatically lifting
-     * errors as failed computations in their monadic context and not letting exceptions thrown as the regular monad binding does.
+     * These for comprehensions enable working for any error [E] as long as a conversion function from any [Throwable].
      */
     fun <B> bindingCatch(cc: CoroutineContext = EmptyCoroutineContext, catch: (Throwable) -> E, c: suspend BindingCatchContinuation<F, E, *>.() -> B): Kind<F, B> {
         val continuation = MonadErrorBlockingContinuation<F, E, B>(this, Platform.awaitableLatch(), cc, catch)
