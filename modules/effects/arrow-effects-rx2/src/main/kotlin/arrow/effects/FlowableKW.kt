@@ -7,7 +7,10 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.deriving
 import arrow.higherkind
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Traverse
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.FlowableEmitter
@@ -20,7 +23,6 @@ fun <A> FlowableKOf<A>.value(): Flowable<A> = this.fix().flowable
 @deriving(
         Functor::class,
         Applicative::class,
-        Monad::class,
         Foldable::class,
         Traverse::class
 )

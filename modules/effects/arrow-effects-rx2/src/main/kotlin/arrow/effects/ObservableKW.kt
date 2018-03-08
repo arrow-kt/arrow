@@ -20,7 +20,6 @@ fun <A> ObservableKOf<A>.value(): Observable<A> =
 @deriving(
         Functor::class,
         Applicative::class,
-        Monad::class,
         Foldable::class,
         Traverse::class
 )

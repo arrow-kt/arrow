@@ -1,9 +1,13 @@
 package arrow.effects
 
 import arrow.core.Either
+import arrow.effects.continuations.EffectContinuation
 import arrow.instance
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.MonadError
+import arrow.typeclasses.continuations.BindingCatchContinuation
+import arrow.typeclasses.continuations.BindingContinuation
+import kotlin.coroutines.experimental.CoroutineContext
 
 @instance(ObservableK::class)
 interface ObservableKApplicativeErrorInstance :
@@ -14,6 +18,27 @@ interface ObservableKApplicativeErrorInstance :
 
     override fun <A> handleErrorWith(fa: ObservableKOf<A>, f: (Throwable) -> ObservableKOf<A>): ObservableK<A> =
             fa.handleErrorWith { f(it).fix() }
+}
+
+@instance(ObservableK::class)
+interface ObservableKMonadInstance : arrow.typeclasses.Monad<ForObservableK> {
+    override fun <A, B> ap(fa: arrow.effects.ObservableKOf<A>, ff: arrow.effects.ObservableKOf<kotlin.Function1<A, B>>): arrow.effects.ObservableK<B> =
+            fa.fix().ap(ff)
+
+    override fun <A, B> flatMap(fa: arrow.effects.ObservableKOf<A>, f: kotlin.Function1<A, arrow.effects.ObservableKOf<B>>): arrow.effects.ObservableK<B> =
+            fa.fix().flatMap(f)
+
+    override fun <A, B> map(fa: arrow.effects.ObservableKOf<A>, f: kotlin.Function1<A, B>): arrow.effects.ObservableK<B> =
+            fa.fix().map(f)
+
+    override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, arrow.effects.ObservableKOf<arrow.core.Either<A, B>>>): arrow.effects.ObservableK<B> =
+            arrow.effects.ObservableK.tailRecM(a, f)
+
+    override fun <A> pure(a: A): arrow.effects.ObservableK<A> =
+            arrow.effects.ObservableK.pure(a)
+
+    override fun <B> binding(cc: CoroutineContext, c: suspend BindingContinuation<ForObservableK, *>.() -> B): ObservableK<B> =
+            EffectContinuation.bindingIn(ObservableK.effect(), cc, c).fix()
 }
 
 @instance(ObservableK::class)
@@ -29,6 +54,9 @@ interface ObservableKMonadErrorInstance :
 
     override fun <A> pure(a: A): ObservableK<A> =
             super<ObservableKMonadInstance>.pure(a)
+
+    override fun <B> bindingCatch(cc: CoroutineContext, catch: (Throwable) -> Throwable, c: suspend BindingCatchContinuation<ForObservableK, Throwable, *>.() -> B): ObservableK<B> =
+            EffectContinuation.bindingCatchIn(ObservableK.effect(), catch, cc, c).fix()
 }
 
 @instance(ObservableK::class)
