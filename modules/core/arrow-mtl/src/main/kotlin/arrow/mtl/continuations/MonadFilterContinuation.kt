@@ -31,5 +31,4 @@ open class MonadFilterContinuation<F, A>(MF: MonadFilter<F>, latch: Awaitable<Ki
         val b: B = bind { this }
         return if (f(b)) b else bind { empty<B>() }
     }
-
 }

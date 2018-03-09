@@ -32,5 +32,4 @@ interface MonadFilter<F> : Monad<F>, FunctorFilter<F>, TC {
         coro.startCoroutine(continuation)
         return continuation.returnedMonad()
     }
-
 }
