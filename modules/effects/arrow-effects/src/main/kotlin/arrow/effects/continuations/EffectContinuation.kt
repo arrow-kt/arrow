@@ -1,6 +1,7 @@
 package arrow.effects.continuations
 
 import arrow.Kind
+import arrow.core.identity
 import arrow.effects.Effect
 import arrow.typeclasses.continuations.BindingCatchContinuation
 import arrow.typeclasses.continuations.BindingContinuation
@@ -38,7 +39,7 @@ class EffectContinuation<F, A>(EF: Effect<F>, val catch: (Throwable) -> Throwabl
 
     companion object {
         fun <F, A> bindingIn(EF: Effect<F>, cc: CoroutineContext, c: suspend BindingContinuation<F, *>.() -> A) =
-                bindingCatchIn(EF, { it }, cc, c)
+                bindingCatchIn(EF, ::identity, cc, c)
 
         fun <F, A> bindingCatchIn(EF: Effect<F>, catch: (Throwable) -> Throwable, cc: CoroutineContext, c: suspend BindingCatchContinuation<F, Throwable, *>.() -> A) =
                 EF.flatMapIn(cc, EF.invoke {}) {
