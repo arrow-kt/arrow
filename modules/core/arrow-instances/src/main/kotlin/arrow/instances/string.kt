@@ -1,6 +1,7 @@
 package arrow.instances
 
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 
@@ -31,4 +32,15 @@ object StringEqInstance : Eq<String> {
 object StringEqInstanceImplicits {
 
     fun instance(): StringEqInstance = StringEqInstance
+}
+
+object StringHashInstance : Eq<String>, Hash<String> {
+    override fun eqv(a: String, b: String): Boolean = StringEqInstance.eqv(a, b)
+
+    override fun hash(a: String): Int = a.hashCode()
+}
+
+object StringHashInstanceImplicits {
+
+    fun instance(): StringHashInstance = StringHashInstance
 }

@@ -2,12 +2,10 @@ package arrow.dagger.instances
 
 import arrow.data.*
 import arrow.instances.SetKEqInstance
+import arrow.instances.SetKHashInstance
 import arrow.instances.SetKMonoidInstance
 import arrow.instances.SetKSemigroupInstance
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.MonoidK
-import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.*
 import dagger.Module
 import dagger.Provides
 import javax.inject.Inject
@@ -32,4 +30,8 @@ class DaggerSetKMonoidInstance<A> : SetKMonoidInstance<A>
 
 class DaggerSetKEqInstance<A> @Inject constructor(val eqA: Eq<A>) : SetKEqInstance<A> {
     override fun EQ(): Eq<A> = eqA
+}
+
+class DaggerSetKHashInstance<A> @Inject constructor(val hashA: Hash<A>) : SetKHashInstance<A> {
+    override fun HS(): Hash<A> = hashA
 }

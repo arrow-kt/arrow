@@ -100,6 +100,23 @@ interface EitherEqInstance<L, R> : Eq<Either<L, R>> {
 }
 
 @instance(Either::class)
+interface EitherHashInstance<L, R> : EitherEqInstance<L, R>, Hash<Either<L, R>> {
+
+    override fun EQL(): Eq<L>
+
+    override fun EQR(): Eq<R>
+
+    fun HSL(): Hash<L>
+
+    fun HSR(): Hash<R>
+
+    override fun hash(a: Either<L, R>): Int = when (a) {
+        is Either.Left -> HSL().hash(a.a).hashCode()
+        is Either.Right -> HSR().hash(a.b).hashCode()
+    }
+}
+
+@instance(Either::class)
 interface EitherShowInstance<L, R> : Show<Either<L, R>> {
     override fun show(a: Either<L, R>): String =
             a.toString()

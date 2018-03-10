@@ -19,11 +19,13 @@ class SetKTest : UnitSpec() {
             semigroup<SetK<Int>>() shouldNotBe null
             monoid<SetK<Int>>() shouldNotBe null
             eq<SetK<Int>>() shouldNotBe null
+            hash<SetK<Int>>() shouldNotBe null
             show<SetK<Int>>() shouldNotBe null
         }
         
         testLaws(
             EqLaws.laws { SetK.pure(it) },
+            HashLaws.laws { SetK.pure(it) },
             ShowLaws.laws { SetK.pure(it) },
             SemigroupKLaws.laws(SetK.semigroupK(), { SetK.pure(it) }, Eq.any()),
             MonoidKLaws.laws(SetK.monoidK(), { SetK.pure(it) }, Eq.any()),

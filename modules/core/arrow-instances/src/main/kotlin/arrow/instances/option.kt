@@ -63,6 +63,19 @@ interface OptionEqInstance<A> : Eq<Option<A>> {
 }
 
 @instance(Option::class)
+interface OptionHashInstance<A> : OptionEqInstance<A>, Hash<Option<A>> {
+
+    fun HS(): Hash<A>
+
+    override fun EQ(): Eq<A> = HS()
+
+    override fun hash(a: Option<A>): Int = when (a) {
+        None -> None.hashCode()
+        is Some -> HS().hash(a.t).hashCode()
+    }
+}
+
+@instance(Option::class)
 interface OptionShowInstance<A> : Show<Option<A>> {
     override fun show(a: Option<A>): String =
             a.toString()

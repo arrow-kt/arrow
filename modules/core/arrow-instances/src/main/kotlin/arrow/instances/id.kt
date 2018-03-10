@@ -15,6 +15,12 @@ interface IdEqInstance<A> : Eq<Id<A>> {
 }
 
 @instance(Id::class)
+interface IdHashInstance<A> : IdEqInstance<A>, Hash<Id<A>> {
+    override fun hash(a: Id<A>): Int =
+            Hash.any().hash(a)
+}
+
+@instance(Id::class)
 interface IdShowInstance<A> : Show<Id<A>> {
     override fun show(a: Id<A>): String =
             Show.fromToString<Id<A>>().show(a)

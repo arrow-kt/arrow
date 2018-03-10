@@ -31,6 +31,16 @@ interface SetKEqInstance<A> : Eq<SetK<A>> {
 }
 
 @instance(SetK::class)
+interface SetKHashInstance<A> : SetKEqInstance<A>, Hash<SetK<A>> {
+
+    override fun EQ(): Eq<A> = HS()
+
+    fun HS(): Hash<A>
+
+    override fun hash(a: SetK<A>): Int = a.hashCode()
+}
+
+@instance(SetK::class)
 interface SetKShowInstance<A> : Show<SetK<A>> {
     override fun show(a: SetK<A>): String =
             a.toString()

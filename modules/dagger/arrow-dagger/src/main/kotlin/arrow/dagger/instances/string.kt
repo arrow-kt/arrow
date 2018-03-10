@@ -1,9 +1,11 @@
 package arrow.dagger.instances
 
 import arrow.instances.StringEqInstance
+import arrow.instances.StringHashInstance
 import arrow.instances.StringMonoidInstance
 import arrow.instances.StringSemigroupInstance
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import dagger.Module
@@ -20,4 +22,7 @@ class StringInstances {
 
     @Provides
     fun stringEq(): Eq<String> = StringEqInstance
+
+    @Provides
+    fun stringHash(): Hash<String> = StringHashInstance
 }
