@@ -66,9 +66,9 @@ class ProductTest : UnitSpec() {
         }
 
         "Show instance defaults to .toString()" {
-            val showInstance: Show<Person> = show()
+            val showInstance: arrow.typeclasses.Show<Person> = show()
             val syntax = object : ShowSyntax<Person> {
-                override fun show(): Show<Person> = showInstance
+                override fun show(): arrow.typeclasses.Show<Person> = showInstance
             }
             forAll(personGen(), {
                 with(syntax) {
@@ -84,12 +84,37 @@ class ProductTest : UnitSpec() {
             })
         }
 
-        "Semigroup instance" {
-            val instance: arrow.typeclasses.Semigroup<Person> = semigroup()
+        "Semigroup combine" {
             forAll(personGen(), personGen(), { a, b ->
-                instance.combine(a, b) == Person(a.name + b.name, a.age + b.age)
+                semigroup<Person>().combine(a, b) == Person(a.name + b.name, a.age + b.age)
             })
         }
+
+        "Semigroup + syntax" {
+            forAll(personGen(), personGen(), { a, b ->
+                a + b == Person(a.name + b.name, a.age + b.age)
+            })
+        }
+
+        "Monoid empty" {
+            forAll(personGen(), personGen(), { a, b ->
+                monoid<Person>().empty() == Person("", 0)
+            })
+        }
+
+        "Monoid empty syntax" {
+            forAll(personGen(), personGen(), { a, b ->
+                emptyPerson() == Person("", 0)
+            })
+        }
+
+        "Order" {
+            forAll(personGen(), personGen(), { a, b ->
+                order<Tuple2<String, Int>>().compare(a.tupled(), b.tupled()) == order<Person>().compare(a, b)
+            })
+        }
+
+        //TODO look at typeclassless encoding to see if it's better than runtime lookups in these cases
 
 //        testLaws(
 //                TraverseFilterLaws.laws(Const.traverseFilter(), Const.applicative(IntMonoid), { Const(it) }, Eq.any()),

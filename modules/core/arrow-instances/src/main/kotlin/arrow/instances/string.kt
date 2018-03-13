@@ -1,8 +1,6 @@
 package arrow.instances
 
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
+import arrow.typeclasses.*
 
 object StringSemigroupInstance : Semigroup<String> {
     override fun combine(a: String, b: String): String = "$a$b"
@@ -28,7 +26,22 @@ object StringEqInstance : Eq<String> {
     override fun eqv(a: String, b: String): Boolean = a == b
 }
 
-object StringEqInstanceImplicits {
+object StringOrderInstance : Order<String> {
+    override fun compare(a: String, b: String): Int = a.compareTo(b)
+}
 
+object StringShowInstance : Show<String> {
+    override fun show(a: String): String = a
+}
+
+object StringEqInstanceImplicits {
     fun instance(): StringEqInstance = StringEqInstance
+}
+
+object StringOrderInstanceImplicits {
+    fun instance(): StringOrderInstance = StringOrderInstance
+}
+
+object StringShowInstanceImplicits {
+    fun instance(): StringShowInstance = StringShowInstance
 }

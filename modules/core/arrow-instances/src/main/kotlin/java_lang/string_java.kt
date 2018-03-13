@@ -1,8 +1,6 @@
 package java_lang
 
-import arrow.instances.StringEqInstance
-import arrow.instances.StringMonoidInstance
-import arrow.instances.StringSemigroupInstance
+import arrow.instances.*
 
 object StringMonoidInstanceImplicits {
     fun instance(): StringMonoidInstance = StringMonoidInstance
@@ -13,6 +11,13 @@ object StringSemigroupInstanceImplicits {
 }
 
 object StringEqInstanceImplicits {
-
     fun instance(): StringEqInstance = StringEqInstance
+}
+
+object StringOrderInstanceImplicits {
+    fun instance(): StringOrderInstance = StringOrderInstance
+}
+
+object StringShowInstanceImplicits {
+    fun instance(): StringShowInstance = StringShowInstance
 }
