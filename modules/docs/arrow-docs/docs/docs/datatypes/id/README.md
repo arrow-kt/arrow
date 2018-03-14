@@ -2,7 +2,6 @@
 layout: docs
 title: Id
 permalink: /docs/datatypes/id/
-video: gt9k7tTiUnI
 ---
 
 ## Id
