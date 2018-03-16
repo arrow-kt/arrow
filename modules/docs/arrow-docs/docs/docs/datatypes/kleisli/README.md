@@ -12,12 +12,15 @@ or a `Either<String, Int>`, without having functions take an `Option` or `Either
 For example we have the function `String.toInt()` which can throw a `NumberFormatException` and 
 we want to do a safe conversion like this:
 
-```kotlin:ank
- val optionIntKleisli = Kleisli { str: String ->
-    if (str.toCharArray().all { it.isDigit() }) Some(str.toInt()) else None
-  }
+```kotlin:ank:silent
+import arrow.core.*
+import arrow.data.Kleisli
 
-  fun String.safeToInt(): Option<Int> {
+val optionIntKleisli = Kleisli { str: String ->
+  if (str.toCharArray().all { it.isDigit() }) Some(str.toInt()) else None
+}
+
+fun String.safeToInt(): Option<Int> {
   return optionIntKleisli.run(this).ev()
 }
 ```
