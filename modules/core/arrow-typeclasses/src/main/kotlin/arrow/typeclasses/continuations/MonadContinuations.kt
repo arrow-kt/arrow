@@ -71,8 +71,8 @@ class MonadNonBlockingContinuation<F, A>(M: Monad<F>) :
     }
 
     companion object {
-        fun <F, A> binding(M: Monad<F>, cc: CoroutineContext, c: suspend BindingContinuation<F, *>.() -> A): Kind<F, A> =
-                M.flatMapIn(M.pure(Unit), cc) {
+        fun <F, A> binding(M: Monad<F>, context: CoroutineContext, c: suspend BindingContinuation<F, *>.() -> A): Kind<F, A> =
+                M.flatMapIn(M.pure(Unit), context) {
                     val continuation = MonadNonBlockingContinuation<F, A>(M)
                     val coro: suspend () -> Kind<F, A> = { M.pure(c(continuation)) }
                     coro.startCoroutine(continuation)

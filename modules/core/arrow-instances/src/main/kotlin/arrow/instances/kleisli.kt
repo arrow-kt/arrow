@@ -1,5 +1,6 @@
 package arrow.instances
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.data.Kleisli
@@ -8,6 +9,8 @@ import arrow.data.KleisliPartialOf
 import arrow.data.fix
 import arrow.instance
 import arrow.typeclasses.*
+import arrow.typeclasses.continuations.BindingContinuation
+import arrow.typeclasses.continuations.MonadNonBlockingContinuation
 import kotlin.coroutines.experimental.CoroutineContext
 
 @instance(Kleisli::class)
@@ -55,6 +58,8 @@ interface KleisliMonadInstance<F, D> : KleisliApplicativeInstance<F, D>, Monad<K
     override fun <A, B> tailRecM(a: A, f: (A) -> KleisliOf<F, D, Either<A, B>>): Kleisli<F, D, B> =
             Kleisli.tailRecM(a, f, FF())
 
+    override fun <B> binding(context: CoroutineContext, c: suspend BindingContinuation<KleisliPartialOf<F, D>, *>.() -> B): Kind<KleisliPartialOf<F, D>, B> =
+            MonadNonBlockingContinuation.binding(this, context, c)
 }
 
 @instance(Kleisli::class)
