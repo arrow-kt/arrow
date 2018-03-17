@@ -7,6 +7,7 @@ import arrow.typeclass
 import arrow.typeclasses.continuations.BindingCatchContinuation
 import arrow.typeclasses.continuations.MonadErrorBlockingContinuation
 import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.experimental.EmptyCoroutineContext
 
 @typeclass
 interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F>, TC {
@@ -24,9 +25,9 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F>, TC {
      *
      * These for comprehensions enable working for any error [E] as long as a conversion function from any [Throwable].
      */
-    fun <B> bindingCatch(catch: (Throwable) -> E, context: CoroutineContext, c: suspend BindingCatchContinuation<F, E, *>.() -> B): Kind<F, B> =
+    fun <B> bindingCatch(context: CoroutineContext = EmptyCoroutineContext, catch: (Throwable) -> E, c: suspend BindingCatchContinuation<F, E, *>.() -> B): Kind<F, B> =
             MonadErrorBlockingContinuation.bindingCatch(this, catch, context) { pure(c(it)) }
 }
 
 fun <F, B> MonadError<F, Throwable>.bindingCatch(context: CoroutineContext, c: suspend BindingCatchContinuation<F, Throwable, *>.() -> B): Kind<F, B> =
-        bindingCatch(::identity, context, c)
+        bindingCatch(context, ::identity, c)
