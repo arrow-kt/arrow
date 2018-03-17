@@ -9,11 +9,11 @@ private val completionField by lazy { coroutineImplClass.getDeclaredField("compl
 
 private var <T> Continuation<T>.label
     get() = labelField.get(this)
-    set(value) = labelField.set(this@label, value)
+    set(value) = labelField.set(this, value)
 
 private var <T> Continuation<T>.completion: Continuation<*>?
     get() = completionField.get(this) as Continuation<*>
-    set(value) = completionField.set(this@completion, value)
+    set(value) = completionField.set(this, value)
 
 var <T> Continuation<T>.stackLabels: List<Any>
     get() = if (coroutineImplClass.isInstance(this)) listOf(label) + completion?.stackLabels.orEmpty() else emptyList()
