@@ -13,3 +13,5 @@ fun newCoroutineDispatcher(name: String): CoroutineDispatcher =
                 this.name = name
             }
         }).asCoroutineDispatcher()
+
+fun threadName(): String = Thread.currentThread().name
