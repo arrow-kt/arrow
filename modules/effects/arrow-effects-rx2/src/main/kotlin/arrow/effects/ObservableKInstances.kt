@@ -1,10 +1,15 @@
 package arrow.effects
 
 import arrow.core.Either
+import arrow.core.identity
+import arrow.effects.continuations.AsyncContinuation
 import arrow.instance
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
+import arrow.typeclasses.continuations.BindingCatchContinuation
+import arrow.typeclasses.continuations.BindingContinuation
+import kotlin.coroutines.experimental.CoroutineContext
 
 @instance(ObservableK::class)
 interface ObservableKApplicativeErrorInstance :
@@ -33,6 +38,9 @@ interface ObservableKMonadInstance : Monad<ForObservableK> {
 
     override fun <A> pure(a: A): ObservableK<A> =
             ObservableK.pure(a)
+
+    override fun <B> binding(context: CoroutineContext, c: suspend BindingContinuation<ForObservableK, *>.() -> B): ObservableK<B> =
+            AsyncContinuation.binding(::identity, ObservableK.async(), context, c).fix()
 }
 
 @instance(ObservableK::class)
@@ -48,6 +56,9 @@ interface ObservableKMonadErrorInstance :
 
     override fun <A> pure(a: A): ObservableK<A> =
             super<ObservableKMonadInstance>.pure(a)
+
+    override fun <B> bindingCatch(catch: (Throwable) -> Throwable, context: CoroutineContext, c: suspend BindingCatchContinuation<ForObservableK, Throwable, *>.() -> B): ObservableK<B> =
+            AsyncContinuation.binding(::identity, ObservableK.async(), context, c).fix()
 }
 
 @instance(ObservableK::class)
@@ -67,6 +78,12 @@ interface ObservableKAsyncInstance :
         Async<ForObservableK, Throwable> {
     override fun <A> async(fa: Proc<A>): ObservableK<A> =
             ObservableK.runAsync(fa)
+
+    override fun <B> binding(context: CoroutineContext, c: suspend BindingContinuation<ForObservableK, *>.() -> B): ObservableK<B> =
+            super<ObservableKMonadSuspendInstance>.binding(context, c)
+
+    override fun <B> bindingCatch(catch: (Throwable) -> Throwable, context: CoroutineContext, c: suspend BindingCatchContinuation<ForObservableK, Throwable, *>.() -> B): ObservableK<B> =
+            super<ObservableKMonadSuspendInstance>.bindingCatch(catch, context, c)
 }
 
 @instance(ObservableK::class)

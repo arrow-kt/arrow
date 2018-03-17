@@ -2,8 +2,12 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.identity
+import arrow.effects.continuations.AsyncContinuation
 import arrow.instance
 import arrow.typeclasses.*
+import arrow.typeclasses.continuations.BindingCatchContinuation
+import arrow.typeclasses.continuations.BindingContinuation
 import kotlin.coroutines.experimental.CoroutineContext
 
 @instance(IO::class)
@@ -34,6 +38,9 @@ interface IOMonadInstance : IOApplicativeInstance, Monad<ForIO> {
 
     override fun <A, B> map(fa: IOOf<A>, f: (A) -> B): IO<B> =
             super<IOApplicativeInstance>.map(fa, f)
+
+    override fun <B> binding(context: CoroutineContext, c: suspend BindingContinuation<ForIO, *>.() -> B): IO<B> =
+            AsyncContinuation.binding(::identity, IO.async(), context, c).fix()
 }
 
 @instance(IO::class)
@@ -46,6 +53,9 @@ interface IOMonadErrorInstance : IOApplicativeErrorInstance, IOMonadInstance, Mo
 
     override fun <A> pure(a: A): IO<A> =
             super<IOMonadInstance>.pure(a)
+
+    override fun <B> bindingCatch(catch: (Throwable) -> Throwable, context: CoroutineContext, c: suspend BindingCatchContinuation<ForIO, Throwable, *>.() -> B): IO<B> =
+            AsyncContinuation.binding(catch, IO.async(), context, c).fix()
 }
 
 @instance(IO::class)
@@ -66,6 +76,12 @@ interface IOAsyncInstance : IOMonadSuspendInstance, Async<ForIO, Throwable> {
 
     override fun <A> invoke(fa: () -> A): IO<A> =
             IO.invoke(fa)
+
+    override fun <B> binding(context: CoroutineContext, c: suspend BindingContinuation<ForIO, *>.() -> B): IO<B> =
+            super<IOMonadSuspendInstance>.binding(context, c)
+
+    override fun <B> bindingCatch(catch: (Throwable) -> Throwable, context: CoroutineContext, c: suspend BindingCatchContinuation<ForIO, Throwable, *>.() -> B): IO<B> =
+            super<IOMonadSuspendInstance>.bindingCatch(catch, context, c)
 }
 
 @instance(IO::class)

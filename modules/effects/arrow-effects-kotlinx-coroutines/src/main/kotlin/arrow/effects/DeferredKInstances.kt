@@ -2,10 +2,14 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.identity
+import arrow.effects.continuations.AsyncContinuation
 import arrow.instance
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
+import arrow.typeclasses.continuations.BindingCatchContinuation
+import arrow.typeclasses.continuations.BindingContinuation
 import kotlin.coroutines.experimental.CoroutineContext
 
 @instance(DeferredK::class)
@@ -38,6 +42,9 @@ interface DeferredKMonadInstance : Monad<ForDeferredK> {
 
     override fun <A> pure(a: A): DeferredK<A> =
             DeferredK.pure(a)
+
+    override fun <B> binding(context: CoroutineContext, c: suspend BindingContinuation<ForDeferredK, *>.() -> B): DeferredK<B> =
+            AsyncContinuation.binding(::identity, DeferredK.async(), context, c).fix()
 }
 
 @instance(DeferredK::class)
@@ -53,6 +60,9 @@ interface DeferredKMonadErrorInstance :
 
     override fun <A> pure(a: A): DeferredK<A> =
             super<DeferredKMonadInstance>.pure(a)
+
+    override fun <B> bindingCatch(catch: (Throwable) -> Throwable, context: CoroutineContext, c: suspend BindingCatchContinuation<ForDeferredK, Throwable, *>.() -> B): DeferredK<B> =
+            AsyncContinuation.binding(catch, DeferredK.async(), context, c).fix()
 }
 
 @instance(DeferredK::class)
@@ -71,6 +81,12 @@ interface DeferredKAsyncInstance : DeferredKMonadSuspendInstance, Async<ForDefer
 
     override fun <A> invoke(fa: () -> A): DeferredK<A> =
             DeferredK.invoke(f = fa)
+
+    override fun <B> binding(context: CoroutineContext, c: suspend BindingContinuation<ForDeferredK, *>.() -> B): DeferredK<B> =
+            super<DeferredKMonadSuspendInstance>.binding(context, c)
+
+    override fun <B> bindingCatch(catch: (Throwable) -> Throwable, context: CoroutineContext, c: suspend BindingCatchContinuation<ForDeferredK, Throwable, *>.() -> B): DeferredK<B> =
+            super<DeferredKMonadSuspendInstance>.bindingCatch(catch, context, c)
 }
 
 @instance(DeferredK::class)

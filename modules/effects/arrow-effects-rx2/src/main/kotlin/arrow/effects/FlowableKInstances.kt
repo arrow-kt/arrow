@@ -1,11 +1,16 @@
 package arrow.effects
 
 import arrow.core.Either
+import arrow.core.identity
+import arrow.effects.continuations.AsyncContinuation
 import arrow.instance
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
+import arrow.typeclasses.continuations.BindingCatchContinuation
+import arrow.typeclasses.continuations.BindingContinuation
 import io.reactivex.BackpressureStrategy
+import kotlin.coroutines.experimental.CoroutineContext
 
 @instance(FlowableK::class)
 interface FlowableKApplicativeErrorInstance :
@@ -34,6 +39,9 @@ interface FlowableKMonadInstance : Monad<ForFlowableK> {
 
     override fun <A> pure(a: A): FlowableK<A> =
             FlowableK.pure(a)
+
+    override fun <B> binding(context: CoroutineContext, c: suspend BindingContinuation<ForFlowableK, *>.() -> B): FlowableK<B> =
+            AsyncContinuation.binding(::identity, FlowableK.async(), context, c).fix()
 }
 
 @instance(FlowableK::class)
@@ -49,6 +57,9 @@ interface FlowableKMonadErrorInstance :
 
     override fun <A> pure(a: A): FlowableK<A> =
             super<FlowableKMonadInstance>.pure(a)
+
+    override fun <B> bindingCatch(catch: (Throwable) -> Throwable, context: CoroutineContext, c: suspend BindingCatchContinuation<ForFlowableK, Throwable, *>.() -> B): FlowableK<B> =
+            AsyncContinuation.binding(::identity, FlowableK.async(), context, c).fix()
 }
 
 @instance(FlowableK::class)
@@ -70,6 +81,12 @@ interface FlowableKAsyncInstance :
         Async<ForFlowableK, Throwable> {
     override fun <A> async(fa: Proc<A>): FlowableK<A> =
             FlowableK.async(fa, BS())
+
+    override fun <B> binding(context: CoroutineContext, c: suspend BindingContinuation<ForFlowableK, *>.() -> B): FlowableK<B> =
+            super<FlowableKMonadSuspendInstance>.binding(context, c)
+
+    override fun <B> bindingCatch(catch: (Throwable) -> Throwable, context: CoroutineContext, c: suspend BindingCatchContinuation<ForFlowableK, Throwable, *>.() -> B): FlowableK<B> =
+            super<FlowableKMonadSuspendInstance>.bindingCatch(catch, context, c)
 }
 
 @instance(FlowableK::class)
