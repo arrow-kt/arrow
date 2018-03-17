@@ -32,7 +32,7 @@ import kotlin.coroutines.experimental.startCoroutine
  * overflows.
  */
 
-fun <A> EvalOf<A>.value() = this.fix().value()
+operator fun <A> EvalOf<A>.invoke() = this.fix().value()
 
 @higherkind
 sealed class Eval<out A> : EvalOf<A> {
@@ -221,6 +221,8 @@ sealed class Eval<out A> : EvalOf<A> {
     fun <B> coflatMap(f: (EvalOf<A>) -> B): Eval<B> = Later { f(this) }
 
     fun extract(): A = value()
+
+    operator fun invoke(): A = value()
 
     /**
      * Construct an eager Eval<A> instance. In some sense it is equivalent to using a val.
