@@ -222,8 +222,6 @@ sealed class Eval<out A> : EvalOf<A> {
 
     fun extract(): A = value()
 
-    operator fun invoke(): A = value()
-
     /**
      * Construct an eager Eval<A> instance. In some sense it is equivalent to using a val.
      *
@@ -294,14 +292,10 @@ sealed class Eval<out A> : EvalOf<A> {
     }
 
     /**
-     * FlatMap is a type of Eval<A> that is used to chain computations involving .map and .flatMap. Along with
-     * Eval#flatMap. It implements the trampoline that guarantees stack-safety.
+     * FlatMapIn is a type of Eval<A> that is used to chain computations involving .map and .flatMap in other CoroutineContext.
      *
-     * Users should not instantiate FlatMap instances themselves. Instead, they will be automatically created when
+     * Users should not instantiate FlatMapIn instances themselves. Instead, they will be automatically created when
      * needed.
-     *
-     * Unlike a traditional trampoline, the internal workings of the trampoline are not exposed. This allows a slightly
-     * more efficient implementation of the .value method.
      */
     internal abstract class FlatMapIn<out A>(val context: CoroutineContext) : FlatMap<A>()
 
