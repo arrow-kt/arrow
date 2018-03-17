@@ -21,12 +21,10 @@ data class Function0<out A>(internal val f: () -> A) : Function0Of<A> {
 
     fun <B> flatMapIn(context: CoroutineContext, ff: (A) -> Function0Of<B>): Function0<B> =
             {
-                val sus: suspend () -> B = {
-                    ff(f())()
-                }
+                val sus: suspend () -> B = { ff(f())() }
                 val cont = Platform.awaitableContinuation<B>(context)
                 sus.startCoroutine(cont)
-                cont.awaitBlocking().fold({ throw  it }, ::identity)
+                cont.awaitBlocking().fold({ throw it }, ::identity)
             }.k()
 
     fun <B> coflatMap(f: (Function0Of<A>) -> B): Function0<B> = { f(this) }.k()

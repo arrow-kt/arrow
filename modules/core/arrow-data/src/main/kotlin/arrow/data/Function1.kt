@@ -22,12 +22,10 @@ class Function1<I, out O>(val f: (I) -> O) : Function1Of<I, O> {
 
     fun <B> flatMapIn(context: CoroutineContext, f: (O) -> Function1Of<I, B>): Function1<I, B> =
             { p: I ->
-                val sus: suspend () -> B = {
-                    f(this.f(p))(p)
-                }
+                val sus: suspend () -> B = { f(this.f(p))(p) }
                 val cont = Platform.awaitableContinuation<B>(context)
                 sus.startCoroutine(cont)
-                cont.awaitBlocking().fold({ throw  it }, ::identity)
+                cont.awaitBlocking().fold({ throw it }, ::identity)
             }.k()
 
     fun <B> ap(ff: Function1Of<I, (O) -> B>): Function1<I, B> = ff.fix().flatMap { f -> map(f) }.fix()
