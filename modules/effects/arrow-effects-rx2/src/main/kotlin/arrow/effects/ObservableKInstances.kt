@@ -135,7 +135,7 @@ interface ObservableKAsyncInstance :
         ObservableKMonadSuspendInstance,
         Async<ForObservableK, Throwable> {
     override fun <A> async(fa: Proc<A>): ObservableK<A> =
-            ObservableK.runAsync(fa)
+            ObservableK.async(fa)
 
     override fun <B> binding(context: CoroutineContext, c: suspend BindingContinuation<ForObservableK, *>.() -> B): ObservableK<B> =
             super<ObservableKMonadSuspendInstance>.binding(context, c)
