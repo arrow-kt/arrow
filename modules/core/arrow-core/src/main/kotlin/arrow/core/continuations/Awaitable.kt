@@ -16,4 +16,4 @@ interface Awaitable<A> {
     }
 }
 
-interface AwaitableContinuation<A>: Awaitable<A>, Continuation<A>
+interface AwaitableContinuation<A> : Awaitable<A>, Continuation<A>
