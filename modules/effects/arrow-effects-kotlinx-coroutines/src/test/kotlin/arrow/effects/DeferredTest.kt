@@ -30,9 +30,9 @@ class DeferredKTest : UnitSpec() {
             monad<ForDeferredK>() shouldNotBe null
             applicativeError<ForDeferredK, Throwable>() shouldNotBe null
             monadError<ForDeferredK, Throwable>() shouldNotBe null
-            monadSuspend<ForDeferredK>() shouldNotBe null
-            async<ForDeferredK>() shouldNotBe null
-            effect<ForDeferredK>() shouldNotBe null
+            monadSuspend<ForDeferredK, Throwable>() shouldNotBe null
+            async<ForDeferredK, Throwable>() shouldNotBe null
+            effect<ForDeferredK, Throwable>() shouldNotBe null
         }
 
         "DeferredK is awaitable" {
