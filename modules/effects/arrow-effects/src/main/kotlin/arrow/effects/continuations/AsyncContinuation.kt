@@ -10,7 +10,6 @@ import kotlin.coroutines.experimental.suspendCoroutine
 
 class AsyncContinuation<F, E, A>(AS: Async<F, E>, val catchF: (Throwable) -> E, val bindInContext: CoroutineContext) :
         BindingAsyncContinuation<F, E, A>, Async<F, E> by AS {
-
     override val context: CoroutineContext = EmptyCoroutineContext
 
     override fun resume(value: Kind<F, A>) {
@@ -35,10 +34,7 @@ class AsyncContinuation<F, E, A>(AS: Async<F, E>, val catchF: (Throwable) -> E, 
     }
 
     companion object {
-        fun <F, E, A> bindingIn(AS: Async<F, E>, cc: CoroutineContext, c: suspend BindingAsyncContinuation<F, E, *>.() -> A): Kind<F, A> =
-                bindingCatchIn(AS::catch, AS, cc, c)
-
-        fun <F, E, A> bindingCatchIn(catch: (Throwable) -> E, AS: Async<F, E>, cc: CoroutineContext, c: suspend BindingAsyncContinuation<F, E, *>.() -> A): Kind<F, A> =
+        fun <F, E, A> binding(catch: (Throwable) -> E, AS: Async<F, E>, cc: CoroutineContext, c: suspend BindingAsyncContinuation<F, E, *>.() -> A): Kind<F, A> =
                 AS.flatMapIn(cc, AS.invoke {}) {
                     val continuation = AsyncContinuation<F, E, A>(AS, catch, cc)
                     val coro: suspend () -> Kind<F, A> = { AS.pure(c(continuation)) }

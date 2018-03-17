@@ -24,13 +24,13 @@ interface Async<F, E> : MonadSuspend<F, E>, TC {
             async { }
 
     override fun <B> binding(c: suspend BindingContinuation<F, *>.() -> B): Kind<F, B> =
-            AsyncContinuation.bindingIn(this, EmptyCoroutineContext, c)
+            AsyncContinuation.binding(::catch, this, EmptyCoroutineContext, c)
 
     override fun <B> bindingCatch(catch: (Throwable) -> E, c: suspend BindingCatchContinuation<F, E, *>.() -> B): Kind<F, B> =
-            AsyncContinuation.bindingCatchIn(catch, this, EmptyCoroutineContext, c)
+            AsyncContinuation.binding(catch, this, EmptyCoroutineContext, c)
 
     fun <B> bindingAsync(cc: CoroutineContext, c: suspend BindingAsyncContinuation<F, E, *>.() -> B): Kind<F, B> =
-            AsyncContinuation.bindingCatchIn(::catch, this, cc, c)
+            AsyncContinuation.binding(::catch, this, cc, c)
 }
 
 interface AsyncSyntax<F, E> : MonadSuspendSyntax<F, E> {
