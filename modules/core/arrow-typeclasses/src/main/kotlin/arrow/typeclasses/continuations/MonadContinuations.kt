@@ -37,7 +37,7 @@ open class MonadBlockingContinuation<F, A>(M: Monad<F>, latch: Awaitable<Kind<F,
     }
 
     companion object {
-        fun <F, B> binding(M: Monad<F>, context: CoroutineContext = EmptyCoroutineContext, c: suspend (BindingContinuation<F, *>) -> Kind<F, B>): Kind<F, B> {
+        fun <F, B> binding(M: Monad<F>, context: CoroutineContext, c: suspend (BindingContinuation<F, *>) -> Kind<F, B>): Kind<F, B> {
             val continuation = MonadBlockingContinuation<F, B>(M, Platform.awaitableLatch(), context)
             c.startCoroutine(continuation, continuation)
             return continuation.returnedMonad()
