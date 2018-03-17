@@ -31,6 +31,9 @@ import kotlin.coroutines.experimental.startCoroutine
  * Eval instance -- this can defeat the trampolining and lead to stack
  * overflows.
  */
+
+fun <A> EvalOf<A>.value() = this.fix().value()
+
 @higherkind
 sealed class Eval<out A> : EvalOf<A> {
 
