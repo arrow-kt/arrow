@@ -16,7 +16,8 @@ object MonadErrorLaws {
     inline fun <reified F> laws(M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQERR: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>, EQ: Eq<Kind<F, Int>> = EQERR): List<Law> =
             MonadLaws.laws(M, EQ) + ApplicativeErrorLaws.laws(M, EQERR, EQ_EITHER, EQ) + listOf(
                     Law("Monad Error Laws: left zero", { monadErrorLeftZero(M, EQERR) }),
-                    Law("Monad Error Laws: ensure consistency", { monadErrorEnsureConsistency(M, EQERR) })
+                    Law("Monad Error Laws: ensure consistency", { monadErrorEnsureConsistency(M, EQERR) }),
+                    Law("Monad Error Laws: monad comprehension catches errors", { monadComprehensionCatch(M, EQERR) })
             )
 
     inline fun <reified F> monadErrorLeftZero(M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<Kind<F, Int>>): Unit =
@@ -27,5 +28,14 @@ object MonadErrorLaws {
     inline fun <reified F> monadErrorEnsureConsistency(M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genApplicative(Gen.int(), M), genThrowable(), genFunctionAToB<Int, Boolean>(Gen.bool()), { fa: Kind<F, Int>, e: Throwable, p: (Int) -> Boolean ->
                 M.ensure(fa, { e }, p).equalUnderTheLaw(M.flatMap(fa, { a -> if (p(a)) M.pure(a) else M.raiseError(e) }), EQ)
+            })
+
+    inline fun <reified F> monadComprehensionCatch(ME: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<Kind<F, Int>>): Unit =
+            forAll(Gen.int(), genThrowable(), { num: Int, t: Throwable ->
+                ME.binding {
+                    val a = ME.pure(num).bind()
+                    throw t
+                    a
+                }.equalUnderTheLaw(ME.raiseError(t), EQ)
             })
 }
