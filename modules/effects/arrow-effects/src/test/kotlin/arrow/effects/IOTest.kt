@@ -28,9 +28,9 @@ class IOTest : UnitSpec() {
             monad<ForIO>() shouldNotBe null
             applicativeError<ForIO, Throwable>() shouldNotBe null
             monadError<ForIO, Throwable>() shouldNotBe null
-            monadSuspend<ForIO>() shouldNotBe null
-            async<ForIO>() shouldNotBe null
-            effect<ForIO>() shouldNotBe null
+            monadSuspend<ForIO, Throwable>() shouldNotBe null
+            async<ForIO, Throwable>() shouldNotBe null
+            effect<ForIO, Throwable>() shouldNotBe null
             semigroup<IOOf<Int>>() shouldNotBe null
             monoid<IOOf<Int>>() shouldNotBe null
         }
