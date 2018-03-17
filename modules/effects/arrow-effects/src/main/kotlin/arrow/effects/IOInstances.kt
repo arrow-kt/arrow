@@ -54,7 +54,7 @@ interface IOMonadErrorInstance : IOApplicativeErrorInstance, IOMonadInstance, Mo
     override fun <A> pure(a: A): IO<A> =
             super<IOMonadInstance>.pure(a)
 
-    override fun <B> bindingCatch(catch: (Throwable) -> Throwable, context: CoroutineContext, c: suspend BindingCatchContinuation<ForIO, Throwable, *>.() -> B): IO<B> =
+    override fun <B> bindingCatch(context: CoroutineContext, catch: (Throwable) -> Throwable, c: suspend BindingCatchContinuation<ForIO, Throwable, *>.() -> B): IO<B> =
             AsyncContinuation.binding(catch, IO.async(), context, c).fix()
 }
 
@@ -80,8 +80,8 @@ interface IOAsyncInstance : IOMonadSuspendInstance, Async<ForIO, Throwable> {
     override fun <B> binding(context: CoroutineContext, c: suspend BindingContinuation<ForIO, *>.() -> B): IO<B> =
             super<IOMonadSuspendInstance>.binding(context, c)
 
-    override fun <B> bindingCatch(catch: (Throwable) -> Throwable, context: CoroutineContext, c: suspend BindingCatchContinuation<ForIO, Throwable, *>.() -> B): IO<B> =
-            super<IOMonadSuspendInstance>.bindingCatch(catch, context, c)
+    override fun <B> bindingCatch(context: CoroutineContext, catch: (Throwable) -> Throwable, c: suspend BindingCatchContinuation<ForIO, Throwable, *>.() -> B): IO<B> =
+            super<IOMonadSuspendInstance>.bindingCatch(context, catch, c)
 }
 
 @instance(IO::class)

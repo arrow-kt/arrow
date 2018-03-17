@@ -24,7 +24,7 @@ interface Async<F, E> : MonadSuspend<F, E>, TC {
     override fun <B> binding(context: CoroutineContext, c: suspend BindingContinuation<F, *>.() -> B): Kind<F, B> =
             AsyncContinuation.binding(::catch, this, context, c)
 
-    override fun <B> bindingCatch(catch: (Throwable) -> E, context: CoroutineContext, c: suspend BindingCatchContinuation<F, E, *>.() -> B): Kind<F, B> =
+    override fun <B> bindingCatch(context: CoroutineContext, catch: (Throwable) -> E, c: suspend BindingCatchContinuation<F, E, *>.() -> B): Kind<F, B> =
             AsyncContinuation.binding(catch, this, context, c)
 
 }

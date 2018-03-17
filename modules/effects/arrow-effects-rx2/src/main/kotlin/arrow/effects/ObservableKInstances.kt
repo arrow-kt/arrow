@@ -61,7 +61,7 @@ interface ObservableKMonadErrorInstance :
     override fun <A> pure(a: A): ObservableK<A> =
             super<ObservableKMonadInstance>.pure(a)
 
-    override fun <B> bindingCatch(catch: (Throwable) -> Throwable, context: CoroutineContext, c: suspend BindingCatchContinuation<ForObservableK, Throwable, *>.() -> B): ObservableK<B> =
+    override fun <B> bindingCatch(context: CoroutineContext, catch: (Throwable) -> Throwable, c: suspend BindingCatchContinuation<ForObservableK, Throwable, *>.() -> B): ObservableK<B> =
             AsyncContinuation.binding(::identity, ObservableK.async(), context, c).fix()
 }
 
@@ -86,8 +86,8 @@ interface ObservableKAsyncInstance :
     override fun <B> binding(context: CoroutineContext, c: suspend BindingContinuation<ForObservableK, *>.() -> B): ObservableK<B> =
             super<ObservableKMonadSuspendInstance>.binding(context, c)
 
-    override fun <B> bindingCatch(catch: (Throwable) -> Throwable, context: CoroutineContext, c: suspend BindingCatchContinuation<ForObservableK, Throwable, *>.() -> B): ObservableK<B> =
-            super<ObservableKMonadSuspendInstance>.bindingCatch(catch, context, c)
+    override fun <B> bindingCatch(context: CoroutineContext, catch: (Throwable) -> Throwable, c: suspend BindingCatchContinuation<ForObservableK, Throwable, *>.() -> B): ObservableK<B> =
+            super<ObservableKMonadSuspendInstance>.bindingCatch(context, catch, c)
 }
 
 @instance(ObservableK::class)

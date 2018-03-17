@@ -61,7 +61,7 @@ interface DeferredKMonadErrorInstance :
     override fun <A> pure(a: A): DeferredK<A> =
             super<DeferredKMonadInstance>.pure(a)
 
-    override fun <B> bindingCatch(catch: (Throwable) -> Throwable, context: CoroutineContext, c: suspend BindingCatchContinuation<ForDeferredK, Throwable, *>.() -> B): DeferredK<B> =
+    override fun <B> bindingCatch(context: CoroutineContext, catch: (Throwable) -> Throwable, c: suspend BindingCatchContinuation<ForDeferredK, Throwable, *>.() -> B): DeferredK<B> =
             AsyncContinuation.binding(catch, DeferredK.async(), context, c).fix()
 }
 
@@ -85,8 +85,8 @@ interface DeferredKAsyncInstance : DeferredKMonadSuspendInstance, Async<ForDefer
     override fun <B> binding(context: CoroutineContext, c: suspend BindingContinuation<ForDeferredK, *>.() -> B): DeferredK<B> =
             super<DeferredKMonadSuspendInstance>.binding(context, c)
 
-    override fun <B> bindingCatch(catch: (Throwable) -> Throwable, context: CoroutineContext, c: suspend BindingCatchContinuation<ForDeferredK, Throwable, *>.() -> B): DeferredK<B> =
-            super<DeferredKMonadSuspendInstance>.bindingCatch(catch, context, c)
+    override fun <B> bindingCatch(context: CoroutineContext, catch: (Throwable) -> Throwable, c: suspend BindingCatchContinuation<ForDeferredK, Throwable, *>.() -> B): DeferredK<B> =
+            super<DeferredKMonadSuspendInstance>.bindingCatch(context, catch, c)
 }
 
 @instance(DeferredK::class)

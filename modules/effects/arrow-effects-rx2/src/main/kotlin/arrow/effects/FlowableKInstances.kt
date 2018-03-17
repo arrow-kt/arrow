@@ -62,7 +62,7 @@ interface FlowableKMonadErrorInstance :
     override fun <A> pure(a: A): FlowableK<A> =
             super<FlowableKMonadInstance>.pure(a)
 
-    override fun <B> bindingCatch(catch: (Throwable) -> Throwable, context: CoroutineContext, c: suspend BindingCatchContinuation<ForFlowableK, Throwable, *>.() -> B): FlowableK<B> =
+    override fun <B> bindingCatch(context: CoroutineContext, catch: (Throwable) -> Throwable, c: suspend BindingCatchContinuation<ForFlowableK, Throwable, *>.() -> B): FlowableK<B> =
             AsyncContinuation.binding(::identity, FlowableK.async(), context, c).fix()
 }
 
@@ -89,8 +89,8 @@ interface FlowableKAsyncInstance :
     override fun <B> binding(context: CoroutineContext, c: suspend BindingContinuation<ForFlowableK, *>.() -> B): FlowableK<B> =
             super<FlowableKMonadSuspendInstance>.binding(context, c)
 
-    override fun <B> bindingCatch(catch: (Throwable) -> Throwable, context: CoroutineContext, c: suspend BindingCatchContinuation<ForFlowableK, Throwable, *>.() -> B): FlowableK<B> =
-            super<FlowableKMonadSuspendInstance>.bindingCatch(catch, context, c)
+    override fun <B> bindingCatch(context: CoroutineContext, catch: (Throwable) -> Throwable, c: suspend BindingCatchContinuation<ForFlowableK, Throwable, *>.() -> B): FlowableK<B> =
+            super<FlowableKMonadSuspendInstance>.bindingCatch(context, catch, c)
 }
 
 @instance(FlowableK::class)
