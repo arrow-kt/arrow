@@ -344,8 +344,7 @@ internal object IORunLoop {
                 val func: suspend () -> Unit = { this(result) }
 
                 val normalResume: Continuation<Unit> = object : Continuation<Unit> {
-                    override val context: CoroutineContext
-                        get() = currentCC
+                    override val context: CoroutineContext = currentCC
 
                     override fun resume(value: Unit) {}
 

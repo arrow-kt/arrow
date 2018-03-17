@@ -4,13 +4,11 @@ import arrow.Kind
 import arrow.TC
 import arrow.core.Either
 import arrow.effects.continuations.AsyncContinuation
-import arrow.effects.continuations.BindingAsyncContinuation
 import arrow.typeclass
 import arrow.typeclasses.*
 import arrow.typeclasses.continuations.BindingCatchContinuation
 import arrow.typeclasses.continuations.BindingContinuation
 import kotlin.coroutines.experimental.CoroutineContext
-import kotlin.coroutines.experimental.EmptyCoroutineContext
 
 /** An asynchronous computation that might fail. **/
 typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
@@ -23,14 +21,12 @@ interface Async<F, E> : MonadSuspend<F, E>, TC {
     fun <A> never(): Kind<F, A> =
             async { }
 
-    override fun <B> binding(c: suspend BindingContinuation<F, *>.() -> B): Kind<F, B> =
-            AsyncContinuation.binding(::catch, this, EmptyCoroutineContext, c)
+    override fun <B> binding(context: CoroutineContext, c: suspend BindingContinuation<F, *>.() -> B): Kind<F, B> =
+            AsyncContinuation.binding(::catch, this, context, c)
 
-    override fun <B> bindingCatch(catch: (Throwable) -> E, c: suspend BindingCatchContinuation<F, E, *>.() -> B): Kind<F, B> =
-            AsyncContinuation.binding(catch, this, EmptyCoroutineContext, c)
+    override fun <B> bindingCatch(catch: (Throwable) -> E, context: CoroutineContext, c: suspend BindingCatchContinuation<F, E, *>.() -> B): Kind<F, B> =
+            AsyncContinuation.binding(catch, this, context, c)
 
-    fun <B> bindingAsync(cc: CoroutineContext, c: suspend BindingAsyncContinuation<F, E, *>.() -> B): Kind<F, B> =
-            AsyncContinuation.binding(::catch, this, cc, c)
 }
 
 interface AsyncSyntax<F, E> : MonadSuspendSyntax<F, E> {
