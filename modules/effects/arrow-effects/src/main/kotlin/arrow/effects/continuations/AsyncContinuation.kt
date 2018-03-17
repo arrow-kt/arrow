@@ -1,18 +1,15 @@
 package arrow.effects.continuations
 
 import arrow.Kind
-import arrow.core.identity
-import arrow.effects.Effect
-import arrow.typeclasses.continuations.BindingCatchContinuation
-import arrow.typeclasses.continuations.BindingContinuation
+import arrow.effects.Async
 import arrow.typeclasses.stackLabels
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.EmptyCoroutineContext
 import kotlin.coroutines.experimental.startCoroutine
 import kotlin.coroutines.experimental.suspendCoroutine
 
-class EffectContinuation<F, A>(EF: Effect<F>, val catch: (Throwable) -> Throwable, val bindInContext: CoroutineContext) :
-        BindingCatchContinuation<F, Throwable, A>, Effect<F> by EF {
+class AsyncContinuation<F, E, A>(AS: Async<F, E>, val catchF: (Throwable) -> E, val bindInContext: CoroutineContext) :
+        BindingAsyncContinuation<F, E, A>, Async<F, E> by AS {
 
     override val context: CoroutineContext = EmptyCoroutineContext
 
@@ -21,7 +18,7 @@ class EffectContinuation<F, A>(EF: Effect<F>, val catch: (Throwable) -> Throwabl
     }
 
     override fun resumeWithException(exception: Throwable) {
-        returnedMonad = raiseError(catch(exception))
+        returnedMonad = raiseError(catchF(exception))
     }
 
     protected lateinit var returnedMonad: Kind<F, A>
@@ -38,15 +35,15 @@ class EffectContinuation<F, A>(EF: Effect<F>, val catch: (Throwable) -> Throwabl
     }
 
     companion object {
-        fun <F, A> bindingIn(EF: Effect<F>, cc: CoroutineContext, c: suspend BindingContinuation<F, *>.() -> A) =
-                bindingCatchIn(EF, ::identity, cc, c)
+        fun <F, E, A> bindingIn(AS: Async<F, E>, cc: CoroutineContext, c: suspend BindingAsyncContinuation<F, E, *>.() -> A): Kind<F, A> =
+                bindingCatchIn(AS::catch, AS, cc, c)
 
-        fun <F, A> bindingCatchIn(EF: Effect<F>, catch: (Throwable) -> Throwable, cc: CoroutineContext, c: suspend BindingCatchContinuation<F, Throwable, *>.() -> A) =
-                EF.flatMapIn(cc, EF.invoke {}) {
-                    val continuation = EffectContinuation<F, A>(EF, catch, cc)
-                    val coro: suspend () -> Kind<F, A> = { EF.pure(c(continuation)) }
+        fun <F, E, A> bindingCatchIn(catch: (Throwable) -> E, AS: Async<F, E>, cc: CoroutineContext, c: suspend BindingAsyncContinuation<F, E, *>.() -> A): Kind<F, A> =
+                AS.flatMapIn(cc, AS.invoke {}) {
+                    val continuation = AsyncContinuation<F, E, A>(AS, catch, cc)
+                    val coro: suspend () -> Kind<F, A> = { AS.pure(c(continuation)) }
                     coro.startCoroutine(continuation)
-                    EF.mapError(continuation.returnedMonad(), catch)
+                    continuation.returnedMonad()
                 }
     }
 }

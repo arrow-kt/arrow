@@ -16,22 +16,22 @@ import javax.inject.Singleton
     ArrowEffectsRx2Instances::class
 ])
 interface Runtime {
-    fun observableKWFunctor(): Functor<ForObservableK>
-    fun observableKWApplicative(): Applicative<ForObservableK>
-    fun observableKWApplicativeError(): ApplicativeError<ForObservableK, Throwable>
-    fun observableKWMonad(): Monad<ForObservableK>
-    fun observableKWMonadError(): MonadError<ForObservableK, Throwable>
-    fun observableKWMonadSuspend(): MonadSuspend<ForObservableK>
-    fun observableKWAsync(): Async<ForObservableK>
-    fun observableKWEffect(): Effect<ForObservableK>
-    fun flowableKWFunctor(): Functor<ForFlowableK>
-    fun flowableKWApplicative(): Applicative<ForFlowableK>
-    fun flowableKWApplicativeError(): ApplicativeError<ForFlowableK, Throwable>
-    fun flowableKWMonad(): Monad<ForFlowableK>
-    fun flowableKWMonadError(): MonadError<ForFlowableK, Throwable>
-    fun flowableKWMonadSuspend(): MonadSuspend<ForFlowableK>
-    fun flowableKWAsync(): Async<ForFlowableK>
-    fun flowableKWEffect(): Effect<ForFlowableK>
+    fun observableKFunctor(): Functor<ForObservableK>
+    fun observableKApplicative(): Applicative<ForObservableK>
+    fun observableKApplicativeError(): ApplicativeError<ForObservableK, Throwable>
+    fun observableKMonad(): Monad<ForObservableK>
+    fun observableKMonadError(): MonadError<ForObservableK, Throwable>
+    fun observableKMonadSuspend(): MonadSuspend<ForObservableK, Throwable>
+    fun observableKAsync(): Async<ForObservableK, Throwable>
+    fun observableKEffect(): Effect<ForObservableK, Throwable>
+    fun flowableKFunctor(): Functor<ForFlowableK>
+    fun flowableKApplicative(): Applicative<ForFlowableK>
+    fun flowableKApplicativeError(): ApplicativeError<ForFlowableK, Throwable>
+    fun flowableKMonad(): Monad<ForFlowableK>
+    fun flowableKMonadError(): MonadError<ForFlowableK, Throwable>
+    fun flowableKMonadSuspend(): MonadSuspend<ForFlowableK, Throwable>
+    fun flowableKAsync(): Async<ForFlowableK, Throwable>
+    fun flowableKEffect(): Effect<ForFlowableK, Throwable>
 }
 
 object Arrow {

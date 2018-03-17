@@ -45,8 +45,8 @@ interface Monad<F> : Applicative<F>, TC {
      * A coroutine is initiated and suspended inside [BindingContinuation] yielding to [Monad.flatMap] or [Monad.flatMapIn].
      * Once all the binds are completed the underlying data type is returned from the act of executing the coroutine.
      */
-    fun <B> binding(cc: CoroutineContext = EmptyCoroutineContext, c: suspend BindingContinuation<F, *>.() -> B): Kind<F, B> {
-        val continuation = MonadBlockingContinuation<F, B>(this, Platform.awaitableLatch(), cc)
+    fun <B> binding(c: suspend BindingContinuation<F, *>.() -> B): Kind<F, B> {
+        val continuation = MonadBlockingContinuation<F, B>(this, Platform.awaitableLatch(), EmptyCoroutineContext)
         val coro: suspend () -> Kind<F, B> = { pure(c(continuation)).also { continuation.resolve(Either.right(it)) } }
         coro.startCoroutine(continuation)
         return continuation.returnedMonad()

@@ -24,12 +24,12 @@ class FlowableKInstances {
     fun flowableKMonadError(): MonadError<ForFlowableK, Throwable> = FlowableK.monadError()
 
     @Provides
-    fun flowableKMonadSuspend(): MonadSuspend<ForFlowableK> = FlowableK.monadSuspend()
+    fun flowableKMonadSuspend(): MonadSuspend<ForFlowableK, Throwable> = FlowableK.monadSuspend()
 
     @Provides
-    fun flowableKAsync(): Async<ForFlowableK> = FlowableK.async()
+    fun flowableKAsync(): Async<ForFlowableK, Throwable> = FlowableK.async()
 
     @Provides
-    fun flowableKEffect(): Effect<ForFlowableK> = FlowableK.effect()
+    fun flowableKEffect(): Effect<ForFlowableK, Throwable> = FlowableK.effect()
 
 }

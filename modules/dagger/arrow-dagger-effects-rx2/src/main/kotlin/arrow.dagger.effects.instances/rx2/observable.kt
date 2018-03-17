@@ -24,12 +24,12 @@ class ObservableKInstances {
     fun observableKMonadError(): MonadError<ForObservableK, Throwable> = ObservableK.monadError()
 
     @Provides
-    fun observableKMonadSuspend(): MonadSuspend<ForObservableK> = ObservableK.monadSuspend()
+    fun observableKMonadSuspend(): MonadSuspend<ForObservableK, Throwable> = ObservableK.monadSuspend()
 
     @Provides
-    fun observableKAsync(): Async<ForObservableK> = ObservableK.async()
+    fun observableKAsync(): Async<ForObservableK, Throwable> = ObservableK.async()
 
     @Provides
-    fun observableKEffect(): Effect<ForObservableK> = ObservableK.effect()
+    fun observableKEffect(): Effect<ForObservableK, Throwable> = ObservableK.effect()
 
 }

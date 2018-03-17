@@ -1,15 +1,11 @@
 package arrow.effects
 
 import arrow.core.Either
-import arrow.effects.continuations.EffectContinuation
 import arrow.instance
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
-import arrow.typeclasses.continuations.BindingCatchContinuation
-import arrow.typeclasses.continuations.BindingContinuation
 import io.reactivex.BackpressureStrategy
-import kotlin.coroutines.experimental.CoroutineContext
 
 @instance(FlowableK::class)
 interface FlowableKApplicativeErrorInstance :
@@ -38,9 +34,6 @@ interface FlowableKMonadInstance : Monad<ForFlowableK> {
 
     override fun <A> pure(a: A): FlowableK<A> =
             FlowableK.pure(a)
-
-    override fun <B> binding(cc: CoroutineContext, c: suspend BindingContinuation<ForFlowableK, *>.() -> B): FlowableK<B> =
-            EffectContinuation.bindingIn(FlowableK.effect(), cc, c).fix()
 }
 
 @instance(FlowableK::class)
@@ -56,17 +49,17 @@ interface FlowableKMonadErrorInstance :
 
     override fun <A> pure(a: A): FlowableK<A> =
             super<FlowableKMonadInstance>.pure(a)
-
-    override fun <B> bindingCatch(cc: CoroutineContext, catch: (Throwable) -> Throwable, c: suspend BindingCatchContinuation<ForFlowableK, Throwable, *>.() -> B): FlowableK<B> =
-            EffectContinuation.bindingCatchIn(FlowableK.effect(), catch, cc, c).fix()
 }
 
 @instance(FlowableK::class)
 interface FlowableKMonadSuspendInstance :
         FlowableKMonadErrorInstance,
-        MonadSuspend<ForFlowableK> {
-    override fun <A> suspend(fa: () -> FlowableKOf<A>): FlowableK<A> =
-            FlowableK.suspend(fa)
+        MonadSuspend<ForFlowableK, Throwable> {
+    override fun catch(catch: Throwable): Throwable =
+            catch
+
+    override fun <A> defer(fa: () -> FlowableKOf<A>): FlowableK<A> =
+            FlowableK.defer(fa)
 
     fun BS(): BackpressureStrategy = BackpressureStrategy.BUFFER
 }
@@ -74,7 +67,7 @@ interface FlowableKMonadSuspendInstance :
 @instance(FlowableK::class)
 interface FlowableKAsyncInstance :
         FlowableKMonadSuspendInstance,
-        Async<ForFlowableK> {
+        Async<ForFlowableK, Throwable> {
     override fun <A> async(fa: Proc<A>): FlowableK<A> =
             FlowableK.async(fa, BS())
 }
@@ -82,7 +75,7 @@ interface FlowableKAsyncInstance :
 @instance(FlowableK::class)
 interface FlowableKEffectInstance :
         FlowableKAsyncInstance,
-        Effect<ForFlowableK> {
+        Effect<ForFlowableK, Throwable> {
     override fun <A> runAsync(fa: FlowableKOf<A>, cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Unit> =
             fa.fix().runAsync(cb)
 }

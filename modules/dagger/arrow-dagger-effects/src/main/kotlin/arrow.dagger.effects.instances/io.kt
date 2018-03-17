@@ -25,13 +25,13 @@ class IOInstances {
     fun ioMonadError(): MonadError<ForIO, Throwable> = IO.monadError()
 
     @Provides
-    fun ioMonadSuspend(): MonadSuspend<ForIO> = IO.monadSuspend()
+    fun ioMonadSuspend(): MonadSuspend<ForIO, Throwable> = IO.monadSuspend()
 
     @Provides
-    fun ioAsync(): Async<ForIO> = IO.async()
+    fun ioAsync(): Async<ForIO, Throwable> = IO.async()
 
     @Provides
-    fun ioEffect(): Effect<ForIO> = IO.effect()
+    fun ioEffect(): Effect<ForIO, Throwable> = IO.effect()
 
 }
 

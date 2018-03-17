@@ -2,11 +2,8 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.effects.continuations.EffectContinuation
 import arrow.instance
 import arrow.typeclasses.*
-import arrow.typeclasses.continuations.BindingCatchContinuation
-import arrow.typeclasses.continuations.BindingContinuation
 import kotlin.coroutines.experimental.CoroutineContext
 
 @instance(IO::class)
@@ -29,7 +26,7 @@ interface IOMonadInstance : IOApplicativeInstance, Monad<ForIO> {
     override fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForIO, Either<A, B>>): IO<B> =
             IO.tailRecM(a, f)
 
-    override fun <A, B> flatMapIn(cc: CoroutineContext, fa: Kind<ForIO, A>, f: (A) -> Kind<ForIO, B>): Kind<ForIO, B> =
+    override fun <A, B> flatMapIn(cc: CoroutineContext, fa: Kind<ForIO, A>, f: (A) -> Kind<ForIO, B>): IO<B> =
             fa.fix().flatMapIn(cc, f)
 
     override fun <A, B> ap(fa: IOOf<A>, ff: IOOf<(A) -> B>): IO<B> =
@@ -37,9 +34,6 @@ interface IOMonadInstance : IOApplicativeInstance, Monad<ForIO> {
 
     override fun <A, B> map(fa: IOOf<A>, f: (A) -> B): IO<B> =
             super<IOApplicativeInstance>.map(fa, f)
-
-    override fun <B> binding(cc: CoroutineContext, c: suspend BindingContinuation<ForIO, *>.() -> B): IO<B> =
-            EffectContinuation.bindingIn(IO.effect(), cc, c).fix()
 }
 
 @instance(IO::class)
@@ -52,21 +46,21 @@ interface IOMonadErrorInstance : IOApplicativeErrorInstance, IOMonadInstance, Mo
 
     override fun <A> pure(a: A): IO<A> =
             super<IOMonadInstance>.pure(a)
-
-    override fun <B> bindingCatch(cc: CoroutineContext, catch: (Throwable) -> Throwable, c: suspend BindingCatchContinuation<ForIO, Throwable, *>.() -> B): IO<B> =
-            EffectContinuation.bindingCatchIn(IO.effect(), catch, cc, c).fix()
 }
 
 @instance(IO::class)
-interface IOMonadSuspendInstance : IOMonadErrorInstance, MonadSuspend<ForIO> {
-    override fun <A> suspend(fa: () -> IOOf<A>): IO<A> =
+interface IOMonadSuspendInstance : IOMonadErrorInstance, MonadSuspend<ForIO, Throwable> {
+    override fun catch(catch: Throwable): Throwable =
+            catch
+
+    override fun <A> defer(fa: () -> IOOf<A>): IO<A> =
             IO.suspend(fa)
 
     override fun lazy(): IO<Unit> = IO.lazy
 }
 
 @instance(IO::class)
-interface IOAsyncInstance : IOMonadSuspendInstance, Async<ForIO> {
+interface IOAsyncInstance : IOMonadSuspendInstance, Async<ForIO, Throwable> {
     override fun <A> async(fa: Proc<A>): IO<A> =
             IO.async(fa)
 
@@ -75,7 +69,7 @@ interface IOAsyncInstance : IOMonadSuspendInstance, Async<ForIO> {
 }
 
 @instance(IO::class)
-interface IOEffectInstance : IOAsyncInstance, Effect<ForIO> {
+interface IOEffectInstance : IOAsyncInstance, Effect<ForIO, Throwable> {
     override fun <A> runAsync(fa: Kind<ForIO, A>, cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Unit> =
             fa.fix().runAsync(cb)
 }

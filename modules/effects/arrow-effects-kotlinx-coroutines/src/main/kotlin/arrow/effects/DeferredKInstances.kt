@@ -2,13 +2,10 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.effects.continuations.EffectContinuation
 import arrow.instance
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
-import arrow.typeclasses.continuations.BindingCatchContinuation
-import arrow.typeclasses.continuations.BindingContinuation
 import kotlin.coroutines.experimental.CoroutineContext
 
 @instance(DeferredK::class)
@@ -30,6 +27,9 @@ interface DeferredKMonadInstance : Monad<ForDeferredK> {
     override fun <A, B> flatMap(fa: DeferredKOf<A>, f: kotlin.Function1<A, DeferredKOf<B>>): DeferredK<B> =
             fa.fix().flatMap(f)
 
+    override fun <A, B> flatMapIn(cc: CoroutineContext, fa: Kind<ForDeferredK, A>, f: (A) -> Kind<ForDeferredK, B>): DeferredK<B> =
+            fa.fix().flatMapIn(cc, f)
+
     override fun <A, B> map(fa: DeferredKOf<A>, f: kotlin.Function1<A, B>): DeferredK<B> =
             fa.fix().map(f)
 
@@ -38,9 +38,6 @@ interface DeferredKMonadInstance : Monad<ForDeferredK> {
 
     override fun <A> pure(a: A): DeferredK<A> =
             DeferredK.pure(a)
-
-    override fun <B> binding(cc: CoroutineContext, c: suspend BindingContinuation<ForDeferredK, *>.() -> B): DeferredK<B> =
-            EffectContinuation.bindingIn(DeferredK.effect(), cc, c).fix()
 }
 
 @instance(DeferredK::class)
@@ -56,19 +53,19 @@ interface DeferredKMonadErrorInstance :
 
     override fun <A> pure(a: A): DeferredK<A> =
             super<DeferredKMonadInstance>.pure(a)
-
-    override fun <B> bindingCatch(cc: CoroutineContext, catch: (Throwable) -> Throwable, c: suspend BindingCatchContinuation<ForDeferredK, Throwable, *>.() -> B): DeferredK<B> =
-            EffectContinuation.bindingCatchIn(DeferredK.effect(), catch, cc, c).fix()
 }
 
 @instance(DeferredK::class)
-interface DeferredKMonadSuspendInstance : DeferredKMonadErrorInstance, MonadSuspend<ForDeferredK> {
-    override fun <A> suspend(fa: () -> DeferredKOf<A>): DeferredK<A> =
-            DeferredK.suspend(fa = fa)
+interface DeferredKMonadSuspendInstance : DeferredKMonadErrorInstance, MonadSuspend<ForDeferredK, Throwable> {
+    override fun catch(catch: Throwable): Throwable =
+            catch
+
+    override fun <A> defer(fa: () -> DeferredKOf<A>): DeferredK<A> =
+            DeferredK.defer(fa = fa)
 }
 
 @instance(DeferredK::class)
-interface DeferredKAsyncInstance : DeferredKMonadSuspendInstance, Async<ForDeferredK> {
+interface DeferredKAsyncInstance : DeferredKMonadSuspendInstance, Async<ForDeferredK, Throwable> {
     override fun <A> async(fa: Proc<A>): DeferredK<A> =
             DeferredK.async(fa = fa)
 
@@ -77,7 +74,7 @@ interface DeferredKAsyncInstance : DeferredKMonadSuspendInstance, Async<ForDefer
 }
 
 @instance(DeferredK::class)
-interface DeferredKEffectInstance : DeferredKAsyncInstance, Effect<ForDeferredK> {
+interface DeferredKEffectInstance : DeferredKAsyncInstance, Effect<ForDeferredK, Throwable> {
     override fun <A> runAsync(fa: Kind<ForDeferredK, A>, cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Unit> =
             fa.fix().runAsync(cb)
 }

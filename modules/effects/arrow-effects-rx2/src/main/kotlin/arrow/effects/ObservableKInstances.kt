@@ -1,14 +1,10 @@
 package arrow.effects
 
 import arrow.core.Either
-import arrow.effects.continuations.EffectContinuation
 import arrow.instance
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
-import arrow.typeclasses.continuations.BindingCatchContinuation
-import arrow.typeclasses.continuations.BindingContinuation
-import kotlin.coroutines.experimental.CoroutineContext
 
 @instance(ObservableK::class)
 interface ObservableKApplicativeErrorInstance :
@@ -37,9 +33,6 @@ interface ObservableKMonadInstance : Monad<ForObservableK> {
 
     override fun <A> pure(a: A): ObservableK<A> =
             ObservableK.pure(a)
-
-    override fun <B> binding(cc: CoroutineContext, c: suspend BindingContinuation<ForObservableK, *>.() -> B): ObservableK<B> =
-            EffectContinuation.bindingIn(ObservableK.effect(), cc, c).fix()
 }
 
 @instance(ObservableK::class)
@@ -55,23 +48,23 @@ interface ObservableKMonadErrorInstance :
 
     override fun <A> pure(a: A): ObservableK<A> =
             super<ObservableKMonadInstance>.pure(a)
-
-    override fun <B> bindingCatch(cc: CoroutineContext, catch: (Throwable) -> Throwable, c: suspend BindingCatchContinuation<ForObservableK, Throwable, *>.() -> B): ObservableK<B> =
-            EffectContinuation.bindingCatchIn(ObservableK.effect(), catch, cc, c).fix()
 }
 
 @instance(ObservableK::class)
 interface ObservableKMonadSuspendInstance :
         ObservableKMonadErrorInstance,
-        MonadSuspend<ForObservableK> {
-    override fun <A> suspend(fa: () -> ObservableKOf<A>): ObservableK<A> =
-            ObservableK.suspend(fa)
+        MonadSuspend<ForObservableK, Throwable> {
+    override fun catch(catch: Throwable): Throwable =
+            catch
+
+    override fun <A> defer(fa: () -> ObservableKOf<A>): ObservableK<A> =
+            ObservableK.defer(fa)
 }
 
 @instance(ObservableK::class)
 interface ObservableKAsyncInstance :
         ObservableKMonadSuspendInstance,
-        Async<ForObservableK> {
+        Async<ForObservableK, Throwable> {
     override fun <A> async(fa: Proc<A>): ObservableK<A> =
             ObservableK.runAsync(fa)
 }
@@ -79,7 +72,7 @@ interface ObservableKAsyncInstance :
 @instance(ObservableK::class)
 interface ObservableKEffectInstance :
         ObservableKAsyncInstance,
-        Effect<ForObservableK> {
+        Effect<ForObservableK, Throwable> {
     override fun <A> runAsync(fa: ObservableKOf<A>, cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Unit> =
             fa.fix().runAsync(cb)
 }

@@ -2,8 +2,8 @@ package arrow.dagger.instances.tests
 
 import arrow.dagger.effects.instances.coroutines.ArrowEffectsCoroutinesInstances
 import arrow.effects.Async
-import arrow.effects.ForDeferredK
 import arrow.effects.Effect
+import arrow.effects.ForDeferredK
 import arrow.effects.MonadSuspend
 import arrow.typeclasses.*
 import dagger.Component
@@ -19,14 +19,14 @@ import javax.inject.Singleton
     ArrowEffectsCoroutinesInstances::class
 ])
 interface Runtime {
-    fun deferredKWFunctor(): Functor<ForDeferredK>
-    fun deferredKWApplicative(): Applicative<ForDeferredK>
-    fun deferredKWApplicativeError(): ApplicativeError<ForDeferredK, Throwable>
-    fun deferredKWMonad(): Monad<ForDeferredK>
-    fun deferredKWMonadError(): MonadError<ForDeferredK, Throwable>
-    fun deferredKWMonadSuspend(): MonadSuspend<ForDeferredK>
-    fun deferredKWAsync(): Async<ForDeferredK>
-    fun deferredKWEffect(): Effect<ForDeferredK>
+    fun deferredKFunctor(): Functor<ForDeferredK>
+    fun deferredKApplicative(): Applicative<ForDeferredK>
+    fun deferredKApplicativeError(): ApplicativeError<ForDeferredK, Throwable>
+    fun deferredKMonad(): Monad<ForDeferredK>
+    fun deferredKMonadError(): MonadError<ForDeferredK, Throwable>
+    fun deferredKMonadSuspend(): MonadSuspend<ForDeferredK, Throwable>
+    fun deferredKAsync(): Async<ForDeferredK, Throwable>
+    fun deferredKEffect(): Effect<ForDeferredK, Throwable>
 }
 
 object Arrow {

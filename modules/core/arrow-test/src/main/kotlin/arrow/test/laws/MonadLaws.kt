@@ -15,7 +15,6 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.monad
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kotlinx.coroutines.experimental.newSingleThreadContext
 
 object MonadLaws {
 
@@ -101,8 +100,8 @@ object MonadLaws {
     inline fun <reified F> monadComprehensionsBindInContext(M: Monad<F> = monad<F>(), EQ: Eq<Kind<F, Int>>): Unit =
             forFew(5, genIntSmall(), { num: Int ->
                 M.binding {
-                    val a = binding(newSingleThreadContext("$num")) { num + 1 }.bind()
-                    val b = binding(newSingleThreadContext("$a")) { a + 1 }.bind()
+                    val a = binding() { num + 1 }.bind()
+                    val b = binding() { a + 1 }.bind()
                     b
                 }.equalUnderTheLaw(M.pure(num + 2), EQ)
             })
