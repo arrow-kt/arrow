@@ -45,8 +45,14 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
     fun <B> concatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
             flowable.concatMap { f(it).fix().flowable }.k()
 
+    fun <B> concatMapIn(context: CoroutineContext, f: (A) -> FlowableKOf<B>): FlowableK<B> =
+            flowable.observeOn(context.asScheduler()).concatMap { f(it).fix().flowable }.k()
+
     fun <B> switchMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
             flowable.switchMap { f(it).fix().flowable }.k()
+
+    fun <B> switchMapIn(context: CoroutineContext, f: (A) -> FlowableKOf<B>): FlowableK<B> =
+            flowable.observeOn(context.asScheduler()).switchMap { f(it).fix().flowable }.k()
 
     fun <B> foldLeft(b: B, f: (B, A) -> B): B = flowable.reduce(b, f).blockingGet()
 
@@ -123,60 +129,6 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
         fun monadErrorSwitch(): FlowableKMonadErrorInstance = object : FlowableKMonadErrorInstance {
             override fun <A, B> flatMap(fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
                     fa.fix().switchMap { f(it).fix() }
-        }
-
-        fun syncBuffer(): FlowableKMonadSuspendInstance = FlowableKMonadSuspendInstanceImplicits.instance()
-
-        fun syncDrop(): FlowableKMonadSuspendInstance = object : FlowableKMonadSuspendInstance {
-            override fun BS(): BackpressureStrategy = BackpressureStrategy.DROP
-        }
-
-        fun syncError(): FlowableKMonadSuspendInstance = object : FlowableKMonadSuspendInstance {
-            override fun BS(): BackpressureStrategy = BackpressureStrategy.ERROR
-        }
-
-        fun syncLatest(): FlowableKMonadSuspendInstance = object : FlowableKMonadSuspendInstance {
-            override fun BS(): BackpressureStrategy = BackpressureStrategy.LATEST
-        }
-
-        fun syncMissing(): FlowableKMonadSuspendInstance = object : FlowableKMonadSuspendInstance {
-            override fun BS(): BackpressureStrategy = BackpressureStrategy.MISSING
-        }
-
-        fun asyncBuffer(): FlowableKAsyncInstance = FlowableKAsyncInstanceImplicits.instance()
-
-        fun asyncDrop(): FlowableKAsyncInstance = object : FlowableKAsyncInstance {
-            override fun BS(): BackpressureStrategy = BackpressureStrategy.DROP
-        }
-
-        fun asyncError(): FlowableKAsyncInstance = object : FlowableKAsyncInstance {
-            override fun BS(): BackpressureStrategy = BackpressureStrategy.ERROR
-        }
-
-        fun asyncLatest(): FlowableKAsyncInstance = object : FlowableKAsyncInstance {
-            override fun BS(): BackpressureStrategy = BackpressureStrategy.LATEST
-        }
-
-        fun asyncMissing(): FlowableKAsyncInstance = object : FlowableKAsyncInstance {
-            override fun BS(): BackpressureStrategy = BackpressureStrategy.MISSING
-        }
-
-        fun effectBuffer(): FlowableKEffectInstance = FlowableKEffectInstanceImplicits.instance()
-
-        fun effectDrop(): FlowableKEffectInstance = object : FlowableKEffectInstance {
-            override fun BS(): BackpressureStrategy = BackpressureStrategy.DROP
-        }
-
-        fun effectError(): FlowableKEffectInstance = object : FlowableKEffectInstance {
-            override fun BS(): BackpressureStrategy = BackpressureStrategy.ERROR
-        }
-
-        fun effectLatest(): FlowableKEffectInstance = object : FlowableKEffectInstance {
-            override fun BS(): BackpressureStrategy = BackpressureStrategy.LATEST
-        }
-
-        fun effectMissing(): FlowableKEffectInstance = object : FlowableKEffectInstance {
-            override fun BS(): BackpressureStrategy = BackpressureStrategy.MISSING
         }
     }
 }

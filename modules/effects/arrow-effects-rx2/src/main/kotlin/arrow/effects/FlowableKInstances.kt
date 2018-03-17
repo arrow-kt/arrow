@@ -48,6 +48,24 @@ interface FlowableKMonadInstance : Monad<ForFlowableK> {
             AsyncContinuation.binding(::identity, FlowableK.async(), context, c).fix()
 }
 
+fun FlowableK.Companion.monadFlat(): FlowableKMonadInstance = FlowableKMonadInstanceImplicits.instance()
+
+fun FlowableK.Companion.monadConcat(): FlowableKMonadInstance = object : FlowableKMonadInstance {
+    override fun <A, B> flatMap(fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
+            fa.fix().concatMap { f(it).fix() }
+
+    override fun <A, B> flatMapIn(context: CoroutineContext, fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
+            fa.fix().concatMapIn(context) { f(it).fix() }
+}
+
+fun FlowableK.Companion.monadSwitch(): FlowableKMonadInstance = object : FlowableKMonadErrorInstance {
+    override fun <A, B> flatMap(fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
+            fa.fix().switchMap { f(it).fix() }
+
+    override fun <A, B> flatMapIn(context: CoroutineContext, fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
+            fa.fix().switchMapIn(context) { f(it).fix() }
+}
+
 @instance(FlowableK::class)
 interface FlowableKMonadErrorInstance :
         FlowableKApplicativeErrorInstance,
@@ -66,17 +84,53 @@ interface FlowableKMonadErrorInstance :
             AsyncContinuation.binding(::identity, FlowableK.async(), context, c).fix()
 }
 
+fun FlowableK.Companion.monadErrorFlat(): FlowableKMonadErrorInstance = FlowableKMonadErrorInstanceImplicits.instance()
+
+fun FlowableK.Companion.monadErrorConcat(): FlowableKMonadErrorInstance = object : FlowableKMonadErrorInstance {
+    override fun <A, B> flatMap(fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
+            fa.fix().concatMap { f(it).fix() }
+
+    override fun <A, B> flatMapIn(context: CoroutineContext, fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
+            fa.fix().concatMapIn(context) { f(it).fix() }
+}
+
+fun FlowableK.Companion.monadErrorSwitch(): FlowableKMonadErrorInstance = object : FlowableKMonadErrorInstance {
+    override fun <A, B> flatMap(fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
+            fa.fix().switchMap { f(it).fix() }
+
+    override fun <A, B> flatMapIn(context: CoroutineContext, fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
+            fa.fix().switchMapIn(context) { f(it).fix() }
+}
+
 @instance(FlowableK::class)
 interface FlowableKMonadSuspendInstance :
         FlowableKMonadErrorInstance,
         MonadSuspend<ForFlowableK, Throwable> {
+    fun BS(): BackpressureStrategy = BackpressureStrategy.BUFFER
+
     override fun catch(catch: Throwable): Throwable =
             catch
 
     override fun <A> defer(fa: () -> FlowableKOf<A>): FlowableK<A> =
             FlowableK.defer(fa)
+}
 
-    fun BS(): BackpressureStrategy = BackpressureStrategy.BUFFER
+fun FlowableK.Companion.monadSuspendFlat(): FlowableKMonadSuspendInstance = FlowableKMonadSuspendInstanceImplicits.instance()
+
+fun FlowableK.Companion.monadSuspendConcat(): FlowableKMonadSuspendInstance = object : FlowableKMonadSuspendInstance {
+    override fun <A, B> flatMap(fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
+            fa.fix().concatMap { f(it).fix() }
+
+    override fun <A, B> flatMapIn(context: CoroutineContext, fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
+            fa.fix().concatMapIn(context) { f(it).fix() }
+}
+
+fun FlowableK.Companion.monadSuspendSwitch(): FlowableKMonadSuspendInstance = object : FlowableKMonadSuspendInstance {
+    override fun <A, B> flatMap(fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
+            fa.fix().switchMap { f(it).fix() }
+
+    override fun <A, B> flatMapIn(context: CoroutineContext, fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
+            fa.fix().switchMapIn(context) { f(it).fix() }
 }
 
 @instance(FlowableK::class)
@@ -93,10 +147,46 @@ interface FlowableKAsyncInstance :
             super<FlowableKMonadSuspendInstance>.bindingCatch(context, catch, c)
 }
 
+fun FlowableK.Companion.asyncFlat(): FlowableKAsyncInstance = FlowableKAsyncInstanceImplicits.instance()
+
+fun FlowableK.Companion.asyncConcat(): FlowableKAsyncInstance = object : FlowableKAsyncInstance {
+    override fun <A, B> flatMap(fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
+            fa.fix().concatMap { f(it).fix() }
+
+    override fun <A, B> flatMapIn(context: CoroutineContext, fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
+            fa.fix().concatMapIn(context) { f(it).fix() }
+}
+
+fun FlowableK.Companion.asyncSwitch(): FlowableKAsyncInstance = object : FlowableKAsyncInstance {
+    override fun <A, B> flatMap(fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
+            fa.fix().switchMap { f(it).fix() }
+
+    override fun <A, B> flatMapIn(context: CoroutineContext, fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
+            fa.fix().switchMapIn(context) { f(it).fix() }
+}
+
 @instance(FlowableK::class)
 interface FlowableKEffectInstance :
         FlowableKAsyncInstance,
         Effect<ForFlowableK, Throwable> {
     override fun <A> runAsync(fa: FlowableKOf<A>, cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Unit> =
             fa.fix().runAsync(cb)
+}
+
+fun FlowableK.Companion.effectFlat(): FlowableKEffectInstance = FlowableKEffectInstanceImplicits.instance()
+
+fun FlowableK.Companion.effectConcat(): FlowableKEffectInstance = object : FlowableKEffectInstance {
+    override fun <A, B> flatMap(fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
+            fa.fix().concatMap { f(it).fix() }
+
+    override fun <A, B> flatMapIn(context: CoroutineContext, fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
+            fa.fix().concatMapIn(context) { f(it).fix() }
+}
+
+fun FlowableK.Companion.effectSwitch(): FlowableKEffectInstance = object : FlowableKEffectInstance {
+    override fun <A, B> flatMap(fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
+            fa.fix().switchMap { f(it).fix() }
+
+    override fun <A, B> flatMapIn(context: CoroutineContext, fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
+            fa.fix().switchMapIn(context) { f(it).fix() }
 }

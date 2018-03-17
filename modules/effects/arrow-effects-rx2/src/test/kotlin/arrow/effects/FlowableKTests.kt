@@ -45,32 +45,16 @@ class FlowableKTests : UnitSpec() {
             monad<ForFlowableK>() shouldNotBe null
             applicativeError<ForFlowableK, Unit>() shouldNotBe null
             monadError<ForFlowableK, Unit>() shouldNotBe null
-            monadSuspend<ForFlowableK>() shouldNotBe null
-            async<ForFlowableK>() shouldNotBe null
-            effect<ForFlowableK>() shouldNotBe null
+            monadSuspend<ForFlowableK, Throwable>() shouldNotBe null
+            async<ForFlowableK, Throwable>() shouldNotBe null
+            effect<ForFlowableK, Throwable>() shouldNotBe null
             foldable<ForFlowableK>() shouldNotBe null
             traverse<ForFlowableK>() shouldNotBe null
         }
 
         testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
-
-        testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
-
-        testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
-
-        testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
-
-        testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableK.asyncConcat(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(FlowableK.asyncSwitch(), EQ(), EQ()))
 
         testLaws(
                 FoldableLaws.laws(FlowableK.foldable(), { FlowableK.pure(it) }, Eq.any()),
