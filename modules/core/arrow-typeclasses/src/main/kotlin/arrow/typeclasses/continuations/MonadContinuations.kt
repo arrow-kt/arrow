@@ -75,7 +75,7 @@ class EvalContinuation<A>(M: Monad<ForEval>) :
 
     companion object {
         fun <A> binding(M: Monad<ForEval>, cc: CoroutineContext, c: suspend BindingContinuation<ForEval, *>.() -> A): Eval<A> =
-                Eval.Unit.flatMapIn(cc) {
+                Eval.always { }.flatMapIn(cc) {
                     val continuation = EvalContinuation<A>(M)
                     val coro: suspend () -> Eval<A> = { Eval.pure(c(continuation)) }
                     coro.startCoroutine(continuation)
