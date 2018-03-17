@@ -1,8 +1,13 @@
 package arrow.free
 
-import arrow.*
-import arrow.core.*
-import arrow.typeclasses.*
+import arrow.Kind
+import arrow.core.Either
+import arrow.core.FunctionK
+import arrow.higherkind
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Monad
+import arrow.typeclasses.monad
+import kotlin.coroutines.experimental.CoroutineContext
 
 inline fun <reified M, S, A> FreeOf<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M> = monad()): Kind<M, A> = (this as Free<S, A>).foldMap(f, MM)
 
@@ -55,7 +60,12 @@ inline fun <reified M, S, A> FreeOf<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad
 
 fun <S, A, B> Free<S, A>.map(f: (A) -> B): Free<S, B> = flatMap { Free.Pure<S, B>(f(it)) }
 
-fun <S, A, B> Free<S, A>.flatMap(f: (A) -> Free<S, B>): Free<S, B> = Free.FlatMapped(this, f)
+fun <S, A, B> Free<S, A>.flatMap(f: (A) -> Free<S, B>): Free<S, B> =
+        Free.FlatMapped(this, f)
+
+fun <S, A, B> Free<S, A>.flatMapIn(context: CoroutineContext, f: (A) -> Free<S, B>): Free<S, B> =
+        // TODO(paco): flatMapIn for Free
+        Free.FlatMapped(this, f)
 
 fun <S, A, B> Free<S, A>.ap(ff: FreeOf<S, (A) -> B>): Free<S, B> = ff.fix().flatMap { f -> map(f) }.fix()
 

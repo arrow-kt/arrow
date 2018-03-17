@@ -31,7 +31,7 @@ interface ObservableKMonadInstance : Monad<ForObservableK> {
     override fun <A, B> flatMap(fa: ObservableKOf<A>, f: kotlin.Function1<A, ObservableKOf<B>>): ObservableK<B> =
             fa.fix().flatMap(f)
 
-    override fun <A, B> flatMapIn(context: CoroutineContext, fa: Kind<ForObservableK, A>, f: (A) -> Kind<ForObservableK, B>): Kind<ForObservableK, B> =
+    override fun <A, B> flatMapIn(fa: Kind<ForObservableK, A>, context: CoroutineContext, f: (A) -> Kind<ForObservableK, B>): Kind<ForObservableK, B> =
             fa.fix().flatMapIn(context, f)
 
     override fun <A, B> map(fa: ObservableKOf<A>, f: kotlin.Function1<A, B>): ObservableK<B> =
@@ -53,7 +53,7 @@ fun ObservableK.Companion.monadConcat(): ObservableKMonadInstance = object : Obs
     override fun <A, B> flatMap(fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
             fa.fix().concatMap { f(it).fix() }
 
-    override fun <A, B> flatMapIn(context: CoroutineContext, fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
+    override fun <A, B> flatMapIn(fa: Kind<ForObservableK, A>, context: CoroutineContext, f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
             fa.fix().concatMapIn(context) { f(it).fix() }
 }
 
@@ -61,7 +61,7 @@ fun ObservableK.Companion.monadSwitch(): ObservableKMonadInstance = object : Obs
     override fun <A, B> flatMap(fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
             fa.fix().switchMap { f(it).fix() }
 
-    override fun <A, B> flatMapIn(context: CoroutineContext, fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
+    override fun <A, B> flatMapIn(fa: Kind<ForObservableK, A>, context: CoroutineContext, f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
             fa.fix().switchMapIn(context) { f(it).fix() }
 }
 
@@ -89,7 +89,7 @@ fun ObservableK.Companion.monadErrorConcat(): ObservableKMonadErrorInstance = ob
     override fun <A, B> flatMap(fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
             fa.fix().concatMap { f(it).fix() }
 
-    override fun <A, B> flatMapIn(context: CoroutineContext, fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
+    override fun <A, B> flatMapIn(fa: Kind<ForObservableK, A>, context: CoroutineContext, f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
             fa.fix().concatMapIn(context) { f(it).fix() }
 }
 
@@ -97,7 +97,7 @@ fun ObservableK.Companion.monadErrorSwitch(): ObservableKMonadErrorInstance = ob
     override fun <A, B> flatMap(fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
             fa.fix().switchMap { f(it).fix() }
 
-    override fun <A, B> flatMapIn(context: CoroutineContext, fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
+    override fun <A, B> flatMapIn(fa: Kind<ForObservableK, A>, context: CoroutineContext, f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
             fa.fix().switchMapIn(context) { f(it).fix() }
 }
 
@@ -118,7 +118,7 @@ fun ObservableK.Companion.monadSuspendConcat(): ObservableKMonadSuspendInstance 
     override fun <A, B> flatMap(fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
             fa.fix().concatMap { f(it).fix() }
 
-    override fun <A, B> flatMapIn(context: CoroutineContext, fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
+    override fun <A, B> flatMapIn(fa: Kind<ForObservableK, A>, context: CoroutineContext, f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
             fa.fix().concatMapIn(context) { f(it).fix() }
 }
 
@@ -126,7 +126,7 @@ fun ObservableK.Companion.monadSuspendSwitch(): ObservableKMonadSuspendInstance 
     override fun <A, B> flatMap(fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
             fa.fix().switchMap { f(it).fix() }
 
-    override fun <A, B> flatMapIn(context: CoroutineContext, fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
+    override fun <A, B> flatMapIn(fa: Kind<ForObservableK, A>, context: CoroutineContext, f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
             fa.fix().switchMapIn(context) { f(it).fix() }
 }
 
@@ -150,7 +150,7 @@ fun ObservableK.Companion.asyncConcat(): ObservableKAsyncInstance = object : Obs
     override fun <A, B> flatMap(fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
             fa.fix().concatMap { f(it).fix() }
 
-    override fun <A, B> flatMapIn(context: CoroutineContext, fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
+    override fun <A, B> flatMapIn(fa: Kind<ForObservableK, A>, context: CoroutineContext, f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
             fa.fix().concatMapIn(context) { f(it).fix() }
 }
 
@@ -158,7 +158,7 @@ fun ObservableK.Companion.asyncSwitch(): ObservableKAsyncInstance = object : Obs
     override fun <A, B> flatMap(fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
             fa.fix().switchMap { f(it).fix() }
 
-    override fun <A, B> flatMapIn(context: CoroutineContext, fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
+    override fun <A, B> flatMapIn(fa: Kind<ForObservableK, A>, context: CoroutineContext, f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
             fa.fix().switchMapIn(context) { f(it).fix() }
 }
 
@@ -176,7 +176,7 @@ fun ObservableK.Companion.effectConcat(): ObservableKEffectInstance = object : O
     override fun <A, B> flatMap(fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
             fa.fix().concatMap { f(it).fix() }
 
-    override fun <A, B> flatMapIn(context: CoroutineContext, fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
+    override fun <A, B> flatMapIn(fa: Kind<ForObservableK, A>, context: CoroutineContext, f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
             fa.fix().concatMapIn(context) { f(it).fix() }
 }
 
@@ -184,6 +184,6 @@ fun ObservableK.Companion.effectSwitch(): ObservableKEffectInstance = object : O
     override fun <A, B> flatMap(fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
             fa.fix().switchMap { f(it).fix() }
 
-    override fun <A, B> flatMapIn(context: CoroutineContext, fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
+    override fun <A, B> flatMapIn(fa: Kind<ForObservableK, A>, context: CoroutineContext, f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
             fa.fix().switchMapIn(context) { f(it).fix() }
 }

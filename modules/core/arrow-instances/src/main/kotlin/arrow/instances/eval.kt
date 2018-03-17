@@ -5,7 +5,7 @@ import arrow.core.*
 import arrow.instance
 import arrow.typeclasses.*
 import arrow.typeclasses.continuations.BindingContinuation
-import arrow.typeclasses.continuations.EvalContinuation
+import arrow.typeclasses.continuations.MonadNonBlockingContinuation
 import kotlin.coroutines.experimental.CoroutineContext
 
 @instance(Eval::class)
@@ -34,7 +34,7 @@ interface EvalMonadInstance : Monad<ForEval> {
     override fun <A, B> flatMap(fa: EvalOf<A>, f: kotlin.Function1<A, EvalOf<B>>): Eval<B> =
             fa.fix().flatMap(f)
 
-    override fun <A, B> flatMapIn(context: CoroutineContext, fa: Kind<ForEval, A>, f: (A) -> Kind<ForEval, B>): Eval<B> =
+    override fun <A, B> flatMapIn(fa: Kind<ForEval, A>, context: CoroutineContext, f: (A) -> Kind<ForEval, B>): Eval<B> =
             fa.fix().flatMapIn(context, f)
 
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, EvalOf<Either<A, B>>>): Eval<B> =
@@ -47,7 +47,7 @@ interface EvalMonadInstance : Monad<ForEval> {
             Eval.pure(a)
 
     override fun <B> binding(context: CoroutineContext, c: suspend BindingContinuation<ForEval, *>.() -> B): Kind<ForEval, B> =
-            EvalContinuation.binding(this, context, c)
+            MonadNonBlockingContinuation.binding(this, context, c)
 }
 
 @instance(Eval::class)

@@ -31,7 +31,7 @@ interface DeferredKMonadInstance : Monad<ForDeferredK> {
     override fun <A, B> flatMap(fa: DeferredKOf<A>, f: kotlin.Function1<A, DeferredKOf<B>>): DeferredK<B> =
             fa.fix().flatMap(f)
 
-    override fun <A, B> flatMapIn(cc: CoroutineContext, fa: Kind<ForDeferredK, A>, f: (A) -> Kind<ForDeferredK, B>): DeferredK<B> =
+    override fun <A, B> flatMapIn(fa: Kind<ForDeferredK, A>, cc: CoroutineContext, f: (A) -> Kind<ForDeferredK, B>): DeferredK<B> =
             fa.fix().flatMapIn(cc, f)
 
     override fun <A, B> map(fa: DeferredKOf<A>, f: kotlin.Function1<A, B>): DeferredK<B> =

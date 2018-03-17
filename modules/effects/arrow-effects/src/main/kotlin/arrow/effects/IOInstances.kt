@@ -30,7 +30,7 @@ interface IOMonadInstance : IOApplicativeInstance, Monad<ForIO> {
     override fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForIO, Either<A, B>>): IO<B> =
             IO.tailRecM(a, f)
 
-    override fun <A, B> flatMapIn(cc: CoroutineContext, fa: Kind<ForIO, A>, f: (A) -> Kind<ForIO, B>): IO<B> =
+    override fun <A, B> flatMapIn(fa: Kind<ForIO, A>, cc: CoroutineContext, f: (A) -> Kind<ForIO, B>): IO<B> =
             fa.fix().flatMapIn(cc, f)
 
     override fun <A, B> ap(fa: IOOf<A>, ff: IOOf<(A) -> B>): IO<B> =

@@ -2,9 +2,6 @@ package arrow.typeclasses.continuations
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.Eval
-import arrow.core.ForEval
-import arrow.core.fix
 import arrow.typeclasses.Awaitable
 import arrow.typeclasses.Monad
 import arrow.typeclasses.internal.Platform
@@ -48,11 +45,11 @@ open class MonadBlockingContinuation<F, A>(M: Monad<F>, latch: Awaitable<Kind<F,
     }
 }
 
-class EvalContinuation<A>(M: Monad<ForEval>) :
-        BindingContinuation<ForEval, A>, Monad<ForEval> by M {
+class MonadNonBlockingContinuation<F, A>(M: Monad<F>) :
+        BindingContinuation<F, A>, Monad<F> by M {
     override val context: CoroutineContext = EmptyCoroutineContext
 
-    override fun resume(value: Kind<ForEval, A>) {
+    override fun resume(value: Kind<F, A>) {
         returnedMonad = value
     }
 
@@ -60,13 +57,13 @@ class EvalContinuation<A>(M: Monad<ForEval>) :
         throw exception
     }
 
-    protected lateinit var returnedMonad: Kind<ForEval, A>
+    protected lateinit var returnedMonad: Kind<F, A>
 
-    fun returnedMonad(): Kind<ForEval, A> = returnedMonad
+    fun returnedMonad(): Kind<F, A> = returnedMonad
 
-    override suspend fun <B> bind(m: () -> Kind<ForEval, B>): B = suspendCoroutine { c ->
+    override suspend fun <B> bind(m: () -> Kind<F, B>): B = suspendCoroutine { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels
-        returnedMonad = m().fix().flatMap { x: B ->
+        returnedMonad = flatMap(m()) { x: B ->
             c.stackLabels = labelHere
             c.resume(x)
             returnedMonad
@@ -74,12 +71,12 @@ class EvalContinuation<A>(M: Monad<ForEval>) :
     }
 
     companion object {
-        fun <A> binding(M: Monad<ForEval>, cc: CoroutineContext, c: suspend BindingContinuation<ForEval, *>.() -> A): Eval<A> =
-                Eval.always { }.flatMapIn(cc) {
-                    val continuation = EvalContinuation<A>(M)
-                    val coro: suspend () -> Eval<A> = { Eval.pure(c(continuation)) }
+        fun <F, A> binding(M: Monad<F>, cc: CoroutineContext, c: suspend BindingContinuation<F, *>.() -> A): Kind<F, A> =
+                M.flatMapIn(M.pure(Unit), cc) {
+                    val continuation = MonadNonBlockingContinuation<F, A>(M)
+                    val coro: suspend () -> Kind<F, A> = { M.pure(c(continuation)) }
                     coro.startCoroutine(continuation)
                     continuation.returnedMonad()
-                }.fix()
+                }
     }
 }

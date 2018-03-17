@@ -26,7 +26,7 @@ class AsyncContinuation<F, E, A>(AS: Async<F, E>, val catchF: (Throwable) -> E, 
 
     override suspend fun <B> bind(m: () -> Kind<F, B>): B = suspendCoroutine { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels
-        returnedMonad = flatMapIn(bindInContext, m(), { x: B ->
+        returnedMonad = flatMapIn(m(), bindInContext, { x: B ->
             c.stackLabels = labelHere
             c.resume(x)
             returnedMonad
@@ -35,7 +35,7 @@ class AsyncContinuation<F, E, A>(AS: Async<F, E>, val catchF: (Throwable) -> E, 
 
     companion object {
         fun <F, E, A> binding(catch: (Throwable) -> E, AS: Async<F, E>, cc: CoroutineContext, c: suspend BindingAsyncContinuation<F, E, *>.() -> A): Kind<F, A> =
-                AS.flatMapIn(cc, AS.invoke {}) {
+                AS.flatMapIn(AS.invoke {}, cc) {
                     val continuation = AsyncContinuation<F, E, A>(AS, catch, cc)
                     val coro: suspend () -> Kind<F, A> = { AS.pure(c(continuation)) }
                     coro.startCoroutine(continuation)

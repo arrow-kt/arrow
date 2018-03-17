@@ -15,7 +15,7 @@ interface Monad<F> : Applicative<F>, TC {
 
     fun <A, B> flatMap(fa: Kind<F, A>, f: (A) -> Kind<F, B>): Kind<F, B>
 
-    fun <A, B> flatMapIn(context: CoroutineContext, fa: Kind<F, A>, f: (A) -> Kind<F, B>): Kind<F, B> =
+    fun <A, B> flatMapIn(fa: Kind<F, A>, context: CoroutineContext, f: (A) -> Kind<F, B>): Kind<F, B> =
         MonadBlockingContinuation.binding(this, context) { flatMap(fa, f) }
 
     override fun <A, B> map(fa: Kind<F, A>, f: (A) -> B): Kind<F, B> = flatMap(fa, { a -> pure(f(a)) })

@@ -3,7 +3,11 @@ package arrow.data
 import arrow.core.Either
 import arrow.core.andThen
 import arrow.core.compose
+import arrow.core.identity
 import arrow.higherkind
+import arrow.typeclasses.internal.Platform
+import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.experimental.startCoroutine
 
 fun <I, O> ((I) -> O).k(): Function1<I, O> = Function1(this)
 
@@ -15,6 +19,16 @@ class Function1<I, out O>(val f: (I) -> O) : Function1Of<I, O> {
     fun <B> map(f: (O) -> B): Function1<I, B> = f.compose { a: I -> this.f(a) }.k()
 
     fun <B> flatMap(f: (O) -> Function1Of<I, B>): Function1<I, B> = { p: I -> f(this.f(p))(p) }.k()
+
+    fun <B> flatMapIn(context: CoroutineContext, f: (O) -> Function1Of<I, B>): Function1<I, B> =
+            { p: I ->
+                val sus: suspend () -> B = {
+                    f(this.f(p))(p)
+                }
+                val cont = Platform.awaitableContinuation<B>(context)
+                sus.startCoroutine(cont)
+                cont.awaitBlocking().fold({ throw  it }, ::identity)
+            }.k()
 
     fun <B> ap(ff: Function1Of<I, (O) -> B>): Function1<I, B> = ff.fix().flatMap { f -> map(f) }.fix()
 

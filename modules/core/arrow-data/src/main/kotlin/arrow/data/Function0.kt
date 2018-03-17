@@ -1,7 +1,12 @@
 package arrow.data
 
-import arrow.*
+import arrow.Kind
 import arrow.core.Either
+import arrow.core.identity
+import arrow.higherkind
+import arrow.typeclasses.internal.Platform
+import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.experimental.startCoroutine
 
 fun <A> (() -> A).k(): Function0<A> = Function0(this)
 
@@ -13,6 +18,16 @@ data class Function0<out A>(internal val f: () -> A) : Function0Of<A> {
     fun <B> map(f: (A) -> B): Function0<B> = pure(f(this()))
 
     fun <B> flatMap(ff: (A) -> Function0Of<B>): Function0<B> = ff(f()).fix()
+
+    fun <B> flatMapIn(context: CoroutineContext, ff: (A) -> Function0Of<B>): Function0<B> =
+            {
+                val sus: suspend () -> B = {
+                    ff(f())()
+                }
+                val cont = Platform.awaitableContinuation<B>(context)
+                sus.startCoroutine(cont)
+                cont.awaitBlocking().fold({ throw  it }, ::identity)
+            }.k()
 
     fun <B> coflatMap(f: (Function0Of<A>) -> B): Function0<B> = { f(this) }.k()
 

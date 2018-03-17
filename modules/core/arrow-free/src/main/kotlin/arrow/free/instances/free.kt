@@ -1,10 +1,14 @@
 package arrow.free.instances
 
-import arrow.*
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.FunctionK
 import arrow.free.*
+import arrow.instance
 import arrow.typeclasses.*
+import arrow.typeclasses.continuations.BindingContinuation
+import arrow.typeclasses.continuations.MonadNonBlockingContinuation
+import kotlin.coroutines.experimental.CoroutineContext
 
 @instance(Free::class)
 interface FreeFunctorInstance<S> : Functor<FreePartialOf<S>> {
@@ -30,7 +34,11 @@ interface FreeMonadInstance<S> : FreeApplicativeInstance<S>, Monad<FreePartialOf
     override fun <A, B> ap(fa: FreeOf<S, A>, ff: FreeOf<S, (A) -> B>): Free<S, B> =
             fa.fix().ap(ff.fix())
 
-    override fun <A, B> flatMap(fa: FreeOf<S, A>, f: (A) -> FreeOf<S, B>): Free<S, B> = fa.fix().flatMap { f(it).fix() }
+    override fun <A, B> flatMap(fa: FreeOf<S, A>, f: (A) -> FreeOf<S, B>): Free<S, B> =
+            fa.fix().flatMap { f(it).fix() }
+
+    override fun <A, B> flatMapIn(fa: FreeOf<S, A>, context: CoroutineContext, f: (A) -> FreeOf<S, B>): Free<S, B> =
+            fa.fix().flatMapIn(context) { f(it).fix() }
 
     override fun <A, B> tailRecM(a: A, f: (A) -> FreeOf<S, Either<A, B>>): Free<S, B> = f(a).fix().flatMap {
         when (it) {
@@ -39,6 +47,8 @@ interface FreeMonadInstance<S> : FreeApplicativeInstance<S>, Monad<FreePartialOf
         }
     }
 
+    override fun <B> binding(context: CoroutineContext, c: suspend BindingContinuation<FreePartialOf<S>, *>.() -> B): Kind<FreePartialOf<S>, B> =
+            MonadNonBlockingContinuation.binding(this, context, c)
 }
 
 data class FreeEq<F, G, A>(private val interpreter: FunctionK<F, G>, private val MG: Monad<G>) : Eq<Kind<FreePartialOf<F>, A>> {
