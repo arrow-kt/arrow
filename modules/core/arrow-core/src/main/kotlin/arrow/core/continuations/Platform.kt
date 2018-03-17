@@ -4,7 +4,9 @@ import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.toT
 import arrow.typeclasses.Awaitable
+import arrow.typeclasses.AwaitableContinuation
 import java.util.concurrent.CountDownLatch
+import kotlin.coroutines.experimental.CoroutineContext
 
 object Platform {
     fun <A> awaitableLatch(): Awaitable<A> = object : Awaitable<A> {
@@ -43,4 +45,17 @@ object Platform {
             return result!!
         }
     }
+
+    fun <A> awaitableContinuation(context: CoroutineContext): AwaitableContinuation<A> =
+            object : AwaitableContinuation<A>, Awaitable<A> by awaitableLatch() {
+                override val context: CoroutineContext = context
+
+                override fun resume(value: A) {
+                    resolve(Either.Right(value))
+                }
+
+                override fun resumeWithException(exception: Throwable) {
+                    resolve(Either.Left(exception))
+                }
+            }
 }

@@ -1,6 +1,9 @@
 package arrow.core
 
 import arrow.higherkind
+import arrow.typeclasses.internal.Platform
+import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.experimental.startCoroutine
 
 /**
  * Eval is a monad which controls evaluation of a value or a computation that produces a value.
@@ -91,6 +94,19 @@ sealed class Eval<out A> : EvalOf<A> {
 
             loop@ while (true) {
                 when (curr) {
+                    is FlatMapIn -> {
+                        val currComp = curr as FlatMapIn<A>
+                        val func: suspend () -> A = {
+                            evaluate(object : FlatMap<A>() {
+                                override fun <S> start(): Eval<S> = currComp.start()
+
+                                override fun <S> run(s: S): Eval<A> = currComp.run(s)
+                            })
+                        }
+                        val awaitableContinuation = Platform.awaitableContinuation<A>(currComp.context)
+                        func.startCoroutine(awaitableContinuation)
+                        return awaitableContinuation.awaitBlocking().fold({ throw it }, ::identity)
+                    }
                     is FlatMap -> {
                         val currComp = curr as FlatMap<A>
                         currComp.start<A>().let { cc ->
@@ -179,6 +195,26 @@ sealed class Eval<out A> : EvalOf<A> {
                 }
             }
 
+    fun <B> flatMapIn(context: CoroutineContext, f: (A) -> EvalOf<B>): Eval<B> =
+            when (this) {
+                is FlatMap<A> -> object : FlatMapIn<B>(context) {
+                    override fun <S> start(): Eval<S> = (this@Eval).start()
+                    override fun <S> run(s: S): Eval<B> =
+                            object : FlatMap<B>() {
+                                override fun <S1> start(): Eval<S1> = (this@Eval).run(s) as Eval<S1>
+                                override fun <S1> run(s1: S1): Eval<B> = f(s1 as A).fix()
+                            }
+                }
+                is Defer<A> -> object : FlatMapIn<B>(context) {
+                    override fun <S> start(): Eval<S> = this@Eval.thunk() as Eval<S>
+                    override fun <S> run(s: S): Eval<B> = f(s as A).fix()
+                }
+                else -> object : FlatMapIn<B>(context) {
+                    override fun <S> start(): Eval<S> = this@Eval as Eval<S>
+                    override fun <S> run(s: S): Eval<B> = f(s as A).fix()
+                }
+            }
+
     fun <B> coflatMap(f: (EvalOf<A>) -> B): Eval<B> = Later { f(this) }
 
     fun extract(): A = value()
@@ -251,6 +287,18 @@ sealed class Eval<out A> : EvalOf<A> {
         override fun memoize(): Eval<A> = Memoize(this)
         override fun value(): A = evaluate(this)
     }
+
+    /**
+     * FlatMap is a type of Eval<A> that is used to chain computations involving .map and .flatMap. Along with
+     * Eval#flatMap. It implements the trampoline that guarantees stack-safety.
+     *
+     * Users should not instantiate FlatMap instances themselves. Instead, they will be automatically created when
+     * needed.
+     *
+     * Unlike a traditional trampoline, the internal workings of the trampoline are not exposed. This allows a slightly
+     * more efficient implementation of the .value method.
+     */
+    internal abstract class FlatMapIn<out A>(val context: CoroutineContext) : FlatMap<A>()
 
     /**
      * Memoize is a type of Eval<A> that is used to memoize an eval value. Unlike Later, Memoize exposes its cache,
