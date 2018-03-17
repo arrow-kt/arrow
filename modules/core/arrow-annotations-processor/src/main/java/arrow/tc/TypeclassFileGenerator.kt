@@ -66,8 +66,8 @@ data class SyntaxFunctionSignature(
     fun receiver(): String =
             when (hkArgs) {
                 is HKArgs.None -> ""
-                is HKArgs.First -> "${args[0].second}."
-                is HKArgs.Unknown -> "${args[0].second}."
+                is HKArgs.First -> "(${args[0].second})."
+                is HKArgs.Unknown -> "(${args[0].second})."
             }
 
     fun implBody(): String =
