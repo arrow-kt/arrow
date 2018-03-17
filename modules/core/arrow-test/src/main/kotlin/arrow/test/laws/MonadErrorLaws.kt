@@ -2,12 +2,12 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.identity
 import arrow.test.generators.genApplicative
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genThrowable
 import arrow.typeclasses.Eq
 import arrow.typeclasses.MonadError
+import arrow.typeclasses.bindingCatch
 import arrow.typeclasses.monadError
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -33,7 +33,7 @@ object MonadErrorLaws {
 
     inline fun <reified F> monadComprehensionCatch(ME: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<Kind<F, Int>>): Unit =
             forAll(Gen.int(), genThrowable(), { num: Int, t: Throwable ->
-                ME.bindingCatch(::identity) {
+                ME.bindingCatch {
                     val a = ME.pure(num).bind()
                     throw t
                     a

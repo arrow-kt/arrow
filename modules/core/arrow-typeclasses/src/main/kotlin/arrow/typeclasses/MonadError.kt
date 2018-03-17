@@ -29,5 +29,5 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F>, TC {
             MonadErrorBlockingContinuation.bindingCatch(this, catch, context) { pure(c(it)) }
 }
 
-fun <F, B> MonadError<F, Throwable>.bindingCatch(context: CoroutineContext, c: suspend BindingCatchContinuation<F, Throwable, *>.() -> B): Kind<F, B> =
+fun <F, B> MonadError<F, Throwable>.bindingCatch(context: CoroutineContext = EmptyCoroutineContext, c: suspend BindingCatchContinuation<F, Throwable, *>.() -> B): Kind<F, B> =
         bindingCatch(context, ::identity, c)
