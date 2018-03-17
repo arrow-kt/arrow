@@ -13,6 +13,10 @@ There are two different factors that play into evaluation: memoization and lazin
 
 Eval supports memoization, eager and lazy evaluation strategies
 
+### invoke
+
+The operator `Eval#invoke` forces evaluation for the current eval. It is aliased to `value()` and `extract()`.
+
 ### now
 
 `Eval#now` creates an Eval instance from an already constructed value but still defers evaluation when chaining expressions with `map` and `flatMap`
@@ -22,7 +26,7 @@ import arrow.*
 import arrow.core.*
 
 val eager = Eval.now(1).map { it + 1 }
-eager.value()
+eager()
 ```
 
 ### later
@@ -31,7 +35,7 @@ eager.value()
 
 ```kotlin:ank
 val lazyEvaled = Eval.later { "expensive computation" }
-lazyEvaled.value()
+lazyEvaled()
 ```
 
 `"expensive computation"` is only computed once since the results are memoized and multiple calls to `value()` will just return the cached value.
@@ -42,7 +46,7 @@ lazyEvaled.value()
 
 ```kotlin:ank
 val alwaysEvaled = Eval.always { "expensive computation" }
-alwaysEvaled.value()
+alwaysEvaled()
 ```
 
 ### Stack safety
