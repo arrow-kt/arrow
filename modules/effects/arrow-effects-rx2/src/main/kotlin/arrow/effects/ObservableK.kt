@@ -44,8 +44,14 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
     fun <B> concatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
             observable.concatMap { f(it).fix().observable }.k()
 
+    fun <B> concatMapIn(context: CoroutineContext, f: (A) -> ObservableKOf<B>): ObservableK<B> =
+            observable.observeOn(context.asScheduler()).concatMap { f(it).fix().observable }.k()
+
     fun <B> switchMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
             observable.switchMap { f(it).fix().observable }.k()
+
+    fun <B> switchMapIn(context: CoroutineContext, f: (A) -> ObservableKOf<B>): ObservableK<B> =
+            observable.observeOn(context.asScheduler()).switchMap { f(it).fix().observable }.k()
 
     fun <B> foldLeft(b: B, f: (B, A) -> B): B = observable.reduce(b, f).blockingGet()
 
@@ -97,30 +103,6 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
                 is Either.Left -> tailRecM(either.a, f)
                 is Either.Right -> Observable.just(either.b).k()
             }
-        }
-
-        fun monadFlat(): ObservableKMonadInstance = ObservableKMonadInstanceImplicits.instance()
-
-        fun monadConcat(): ObservableKMonadInstance = object : ObservableKMonadInstance {
-            override fun <A, B> flatMap(fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
-                    fa.fix().concatMap { f(it).fix() }
-        }
-
-        fun monadSwitch(): ObservableKMonadInstance = object : ObservableKMonadErrorInstance {
-            override fun <A, B> flatMap(fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
-                    fa.fix().switchMap { f(it).fix() }
-        }
-
-        fun monadErrorFlat(): ObservableKMonadErrorInstance = ObservableKMonadErrorInstanceImplicits.instance()
-
-        fun monadErrorConcat(): ObservableKMonadErrorInstance = object : ObservableKMonadErrorInstance {
-            override fun <A, B> flatMap(fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
-                    fa.fix().concatMap { f(it).fix() }
-        }
-
-        fun monadErrorSwitch(): ObservableKMonadErrorInstance = object : ObservableKMonadErrorInstance {
-            override fun <A, B> flatMap(fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
-                    fa.fix().switchMap { f(it).fix() }
         }
     }
 }

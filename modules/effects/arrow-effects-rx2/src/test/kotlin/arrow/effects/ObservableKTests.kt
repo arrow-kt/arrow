@@ -47,16 +47,16 @@ class ObservableKTest : UnitSpec() {
             monad<ForObservableK>() shouldNotBe null
             applicativeError<ForObservableK, Unit>() shouldNotBe null
             monadError<ForObservableK, Unit>() shouldNotBe null
-            monadSuspend<ForObservableK>() shouldNotBe null
-            async<ForObservableK>() shouldNotBe null
-            effect<ForObservableK>() shouldNotBe null
+            monadSuspend<ForObservableK, Throwable>() shouldNotBe null
+            async<ForObservableK, Throwable>() shouldNotBe null
+            effect<ForObservableK, Throwable>() shouldNotBe null
             foldable<ForObservableK>() shouldNotBe null
             traverse<ForObservableK>() shouldNotBe null
         }
 
         testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(ObservableK.asyncConcat(), EQ(), EQ()))
+        testLaws(AsyncLaws.laws(ObservableK.asyncSwitch(), EQ(), EQ()))
 
         testLaws(
                 FoldableLaws.laws(ObservableK.foldable(), { ObservableK.pure(it) }, Eq.any()),
