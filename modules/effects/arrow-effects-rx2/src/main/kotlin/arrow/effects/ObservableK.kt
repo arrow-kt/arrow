@@ -6,10 +6,15 @@ import arrow.core.Eval
 import arrow.core.Left
 import arrow.core.Right
 import arrow.deriving
+import arrow.effects.ContextScheduler.asScheduler
 import arrow.higherkind
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Traverse
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
+import kotlin.coroutines.experimental.CoroutineContext
 
 fun <A> Observable<A>.k(): ObservableK<A> = ObservableK(this)
 
@@ -32,6 +37,9 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
 
     fun <B> flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
             observable.flatMap { f(it).fix().observable }.k()
+
+    fun <B> flatMapIn(context: CoroutineContext, f: (A) -> ObservableKOf<B>): ObservableK<B> =
+            observable.observeOn(context.asScheduler()).flatMap { f(it).fix().observable }.k()
 
     fun <B> concatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
             observable.concatMap { f(it).fix().observable }.k()

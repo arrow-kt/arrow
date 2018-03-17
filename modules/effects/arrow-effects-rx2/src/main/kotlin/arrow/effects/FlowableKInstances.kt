@@ -1,5 +1,6 @@
 package arrow.effects
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.identity
 import arrow.effects.continuations.AsyncContinuation
@@ -30,6 +31,9 @@ interface FlowableKMonadInstance : Monad<ForFlowableK> {
 
     override fun <A, B> flatMap(fa: FlowableKOf<A>, f: kotlin.Function1<A, FlowableKOf<B>>): FlowableK<B> =
             fa.fix().flatMap(f)
+
+    override fun <A, B> flatMapIn(context: CoroutineContext, fa: Kind<ForFlowableK, A>, f: (A) -> Kind<ForFlowableK, B>): Kind<ForFlowableK, B> =
+            fa.fix().flatMapIn(context, f)
 
     override fun <A, B> map(fa: FlowableKOf<A>, f: kotlin.Function1<A, B>): FlowableK<B> =
             fa.fix().map(f)

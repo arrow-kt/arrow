@@ -6,6 +6,7 @@ import arrow.core.Eval
 import arrow.core.Left
 import arrow.core.Right
 import arrow.deriving
+import arrow.effects.ContextScheduler.asScheduler
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Foldable
@@ -14,6 +15,7 @@ import arrow.typeclasses.Traverse
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.FlowableEmitter
+import kotlin.coroutines.experimental.CoroutineContext
 
 fun <A> Flowable<A>.k(): FlowableK<A> = FlowableK(this)
 
@@ -36,6 +38,9 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
 
     fun <B> flatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
             flowable.flatMap { f(it).fix().flowable }.k()
+
+    fun <B> flatMapIn(context: CoroutineContext, f: (A) -> FlowableKOf<B>): FlowableK<B> =
+            flowable.observeOn(context.asScheduler()).flatMap { f(it).fix().flowable }.k()
 
     fun <B> concatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
             flowable.concatMap { f(it).fix().flowable }.k()
