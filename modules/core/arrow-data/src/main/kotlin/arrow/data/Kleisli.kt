@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.higherkind
 import arrow.typeclasses.*
+import kotlin.coroutines.experimental.CoroutineContext
 
 /**
  * Alias that represents an arrow from [D] to a monadic value `Kind<F, A>`
@@ -48,6 +49,20 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
     fun <B> flatMap(f: (A) -> Kleisli<F, D, B>, MF: Monad<F>): Kleisli<F, D, B> =
             Kleisli { d ->
                 MF.flatMap(run(d)) { a -> f(a).run(d) }
+            }
+
+    /**
+     * FlatMap the end of the arrow [A] to another [Kleisli] arrow for the same start [D] and context [F]
+     * in the context [CoroutineContext].
+     *
+     * @param f the function to flatmap.
+     * @param MF [Monad] for the context [F].
+     */
+    fun <B> flatMapIn(context: CoroutineContext, f: (A) -> Kleisli<F, D, B>, MF: Monad<F>): Kleisli<F, D, B> =
+            Kleisli { d ->
+                MF.flatMapIn(run(d), context) { a ->
+                    f(a).run(d)
+                }
             }
 
     /**

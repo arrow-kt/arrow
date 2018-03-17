@@ -2,13 +2,13 @@ package arrow.instances
 
 import arrow.core.Either
 import arrow.core.Tuple2
-import arrow.core.andThen
 import arrow.data.Kleisli
 import arrow.data.KleisliOf
 import arrow.data.KleisliPartialOf
 import arrow.data.fix
 import arrow.instance
 import arrow.typeclasses.*
+import kotlin.coroutines.experimental.CoroutineContext
 
 @instance(Kleisli::class)
 interface KleisliFunctorInstance<F, D> : Functor<KleisliPartialOf<F, D>> {
@@ -44,7 +44,10 @@ interface KleisliMonadInstance<F, D> : KleisliApplicativeInstance<F, D>, Monad<K
             fa.fix().map(f, FF())
 
     override fun <A, B> flatMap(fa: KleisliOf<F, D, A>, f: (A) -> KleisliOf<F, D, B>): Kleisli<F, D, B> =
-            fa.fix().flatMap(f.andThen { it.fix() }, FF())
+            fa.fix().flatMap({ f(it).fix() }, FF())
+
+    override fun <A, B> flatMapIn(fa: KleisliOf<F, D, A>, context: CoroutineContext, f: (A) -> KleisliOf<F, D, B>): Kleisli<F, D, B> =
+            fa.fix().flatMapIn(context, { f(it).fix() }, FF())
 
     override fun <A, B> ap(fa: KleisliOf<F, D, A>, ff: KleisliOf<F, D, (A) -> B>): Kleisli<F, D, B> =
             fa.fix().ap(ff, FF())
