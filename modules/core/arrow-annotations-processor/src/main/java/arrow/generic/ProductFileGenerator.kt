@@ -4,7 +4,9 @@ import me.eugeniomarletti.kotlin.metadata.escapedClassName
 import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 import java.io.File
 
-sealed class DerivedTypeClass(val type: String)
+sealed class DerivedTypeClass(val type: String) {
+    fun factory(): String = "${type.substringBeforeLast(".")}.${type.substringAfterLast(".").decapitalize()}"
+}
 object Semigroup: DerivedTypeClass("arrow.typeclasses.Semigroup")
 object Monoid: DerivedTypeClass("arrow.typeclasses.Monoid")
 object Eq: DerivedTypeClass("arrow.typeclasses.Eq")
@@ -22,7 +24,7 @@ class ProductFileGenerator(
 
     fun generate() {
         buildProduct(annotatedList)
-        buildInstances(annotatedList)
+        //buildInstances(annotatedList)
     }
 
     private fun buildProduct(products: Collection<AnnotatedGeneric>) =
@@ -71,7 +73,7 @@ class ProductFileGenerator(
             |  ${tupleConstructor(product)}
             |
             |fun ${product.sourceClassName}.tupledLabelled(): ${labelledFocusType(product)} =
-            |  ${product.targets.joinToString(" toT ") { """("${it.paramName}" toT ${it.paramName})""" }}
+            |  ${product.targets.joinToString(prefix = "arrow.core.Tuple${product.focusSize}(", postfix = ")") { """("${it.paramName}" toT ${it.paramName})""" }}
             |
             |fun <B> ${product.sourceClassName}.foldLabelled(f: ${product.targetNames.joinToString(prefix = "(", separator = ", ", postfix = ")") { "arrow.core.Tuple2<kotlin.String, $it>" }} -> B): B {
             |  val t = tupledLabelled()
@@ -89,24 +91,32 @@ class ProductFileGenerator(
             |    applicative().tupled(${product.targets.joinToString(", ") { it.paramName }}).to${product.sourceSimpleName}()
             |}
             |
-            |interface ${product.sourceSimpleName}SemigroupInstance : arrow.typeclasses.Semigroup<${product.sourceClassName}> {
-            |  override fun combine(a: ${product.sourceClassName}, b: ${product.sourceClassName}): ${product.sourceClassName} =
-            |    arrow.typeclasses.semigroup<${focusType(product)}>().combine(a.tupled(), b.tupled()).to${product.sourceSimpleName}()
+            |object ${product.sourceSimpleName}SemigroupInstance : arrow.typeclasses.Semigroup<${product.sourceClassName}> {
+            |  override fun combine(a: ${product.sourceClassName}, b: ${product.sourceClassName}): ${product.sourceClassName} {
+            |    val (${product.types().joinToString(", ") { "x$it" }}) = a
+            |    val (${product.types().joinToString(", ") { "y$it" }}) = b
+            |    return ${product.sourceClassName}(${product.types().zip(product.targetNames).joinToString(", ") { "${Semigroup.factory()}<${it.second}>().combine(x${it.first}, y${it.first})" }})
+            |  }
             |}
             |
             |object ${product.sourceSimpleName}SemigroupInstanceImplicits {
-            |  fun instance(): ${product.sourceSimpleName}SemigroupInstance =
-            |    object : ${product.sourceSimpleName}SemigroupInstance {}
+            |  fun instance(): ${product.sourceSimpleName}SemigroupInstance = ${product.sourceSimpleName}SemigroupInstance
             |}
             |
-            |interface ${product.sourceSimpleName}MonoidInstance : ${product.sourceSimpleName}SemigroupInstance, arrow.typeclasses.Monoid<${product.sourceClassName}> {
+            |object ${product.sourceSimpleName}MonoidInstance : arrow.typeclasses.Monoid<${product.sourceClassName}> {
+            |
+            |  override fun combine(a: ${product.sourceClassName}, b: ${product.sourceClassName}): ${product.sourceClassName} {
+            |    val (${product.types().joinToString(", ") { "x$it" }}) = a
+            |    val (${product.types().joinToString(", ") { "y$it" }}) = b
+            |    return ${product.sourceClassName}(${product.types().zip(product.targetNames).joinToString(", ") { "${Monoid.factory()}<${it.second}>().combine(x${it.first}, y${it.first})" }})
+            |  }
+            |
             |  override fun empty(): ${product.sourceClassName} =
-            |    arrow.typeclasses.monoid<${focusType(product)}>().empty().to${product.sourceSimpleName}()
+            |    ${product.sourceClassName}(${product.types().zip(product.targetNames).joinToString(", ") { "${Monoid.factory()}<${it.second}>().empty()" }})
             |}
             |
             |object ${product.sourceSimpleName}MonoidInstanceImplicits {
-            |  fun instance(): ${product.sourceSimpleName}MonoidInstance =
-            |    object : ${product.sourceSimpleName}MonoidInstance {}
+            |  fun instance(): ${product.sourceSimpleName}MonoidInstance = ${product.sourceSimpleName}MonoidInstance
             |}
             |
             |interface ${product.sourceSimpleName}EqInstance : arrow.typeclasses.Eq<${product.sourceClassName}> {
@@ -117,16 +127,6 @@ class ProductFileGenerator(
             |object ${product.sourceSimpleName}EqInstanceImplicits {
             |  fun instance(): ${product.sourceSimpleName}EqInstance =
             |    object : ${product.sourceSimpleName}EqInstance {}
-            |}
-            |
-            |interface ${product.sourceSimpleName}OrderInstance : arrow.typeclasses.Order<${product.sourceClassName}> {
-            |  override fun compare(a: ${product.sourceClassName}, b: ${product.sourceClassName}): Int =
-            |    arrow.typeclasses.order<${focusType(product)}>().compare(a.tupled(), b.tupled())
-            |}
-            |
-            |object ${product.sourceSimpleName}OrderInstanceImplicits {
-            |  fun instance(): ${product.sourceSimpleName}OrderInstance =
-            |    object : ${product.sourceSimpleName}OrderInstance {}
             |}
             |
             |interface ${product.sourceSimpleName}ShowInstance : arrow.typeclasses.Show<${product.sourceClassName}> {
@@ -165,6 +165,19 @@ class ProductFileGenerator(
     private fun AnnotatedGeneric.types(): List<String> =
             (0 until focusSize).toList().map { letters[it].toString().capitalize() }
 
+    private fun AnnotatedGeneric.arityConcreteInstanceProviders(tc: DerivedTypeClass): String =
+            targetNames.mapIndexed { i, t -> i to t }.joinToString("\n  ") { "fun ${tc.type.substringAfterLast(".")[0]}${letters[it.first].toString().capitalize()}(): ${tc.type}<${it.second}>" }
+
+    private fun AnnotatedGeneric.arityConcreteInstanceInjections(tc: DerivedTypeClass): String =
+            targetNames.mapIndexed { i, t -> i to t }.joinToString(", ") {
+                "val ${tc.type.substringAfterLast(".")[0]}${letters[it.first].toString().capitalize()}: ${tc.type}<${it.second}>"
+            }
+
+    private fun AnnotatedGeneric.arityConcreteInstanceImplementations(tc: DerivedTypeClass): String =
+            targetNames.mapIndexed { i, t -> i to t }.joinToString("\n      ") {
+                "override fun ${tc.type.substringAfterLast(".")[0]}${letters[it.first].toString().capitalize()}(): ${tc.type}<${it.second}> = ${"${tc.type.substringBeforeLast(".")}.${tc.type.substringAfterLast(".").decapitalize()}"}()"
+            }
+
     private fun AnnotatedGeneric.arityInstanceProviders(tc: DerivedTypeClass): String =
             types().joinToString("\n  ") { "fun ${tc.type.substringAfterLast(".")[0]}$it(): ${tc.type}<$it>" }
 
@@ -176,6 +189,12 @@ class ProductFileGenerator(
 
     private fun AnnotatedGeneric.expandedTypeArgs(): String =
             types().joinToString(", ")
+
+    private fun AnnotatedGeneric.isRecursive(name: String): Boolean =
+            sourceClassName in name
+
+    private fun AnnotatedGeneric.foldRecursive(name: String, ifNotRecursive: () -> String, ifRecursive:() -> String): String =
+            if (isRecursive(name)) ifRecursive() else ifNotRecursive()
 
     private fun semigroupTupleNInstance(product: AnnotatedGeneric): String =
             if (product.hasTupleFocus)
@@ -317,38 +336,3 @@ class ProductFileGenerator(
             else ""
 }
 
-/*
-
-@instance(Tuple2::class)
-interface Tuple2MonoidInstance<A, B> : Monoid<Tuple2<A, B>> {
-
-    fun MA(): Monoid<A>
-
-    fun MB(): Monoid<B>
-
-    override fun empty(): Tuple2<A, B> = Tuple2(MA().empty(), MB().empty())
-
-    override fun combine(a: Tuple2<A, B>, b: Tuple2<A, B>): Tuple2<A, B> {
-        val (xa, xb) = a
-        val (ya, yb) = b
-        return Tuple2(MA().combine(xa, ya), MB().combine(xb, yb))
-    }
-}
-
-@instance(Tuple2::class)
-interface Tuple2EqInstance<A, B> : Eq<Tuple2<A, B>> {
-
-    fun EQA(): Eq<A>
-
-    fun EQB(): Eq<B>
-
-    override fun eqv(a: Tuple2<A, B>, b: Tuple2<A, B>): Boolean =
-            EQA().eqv(a.a, b.a) && EQB().eqv(a.b, b.b)
-}
-
-@instance(Tuple2::class)
-interface Tuple2ShowInstance<A, B> : Show<Tuple2<A, B>> {
-    override fun show(a: Tuple2<A, B>): String =
-            a.toString()
-}
- */

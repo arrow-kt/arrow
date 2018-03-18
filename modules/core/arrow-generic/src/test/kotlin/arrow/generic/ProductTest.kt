@@ -3,28 +3,34 @@ package arrow.generic
 import arrow.Kind
 import arrow.core.*
 import arrow.product
+import arrow.syntax.option.some
 import arrow.test.UnitSpec
+import arrow.test.laws.EqLaws
+import arrow.test.laws.MonoidLaws
+import arrow.test.laws.SemigroupLaws
+import arrow.test.laws.ShowLaws
 import arrow.typeclasses.*
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Order
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
 @product
-data class Person(val name: String, val age: Int)
+data class Person(val name: String, val age: Int, val related: Option<Person>)
 
 fun personGen(): Gen<Person> = with(Gen) {
     create {
-        Person(string().generate(), int().generate())
+        Person(
+                string().generate(),
+                int().generate(),
+                oneOf(listOf(None, Some(Person(string().generate(), int().generate(), None)))).generate()
+        )
     }
 }
 
-fun tuple2Gen(): Gen<Tuple2<String, Int>> = with(Gen) {
+fun tuple3Gen(): Gen<Tuple3<String, Int, Option<Person>>> = with(Gen) {
     create {
-        Tuple2(string().generate(), int().generate())
+        Tuple3(string().generate(), int().generate(), personGen().generate().some())
     }
 }
 
@@ -41,26 +47,30 @@ class ProductTest : UnitSpec() {
 
         ".tupled()" {
             forAll(personGen(), {
-                it.tupled() == it.name toT it.age
+                it.tupled() == Tuple3(it.name, it.age, it.related)
             })
         }
 
         ".toPerson()" {
-            forAll(tuple2Gen(), {
-                it.toPerson() == Person(it.a, it.b)
+            forAll(tuple3Gen(), {
+                it.toPerson() == Person(it.a, it.b, it.c)
             })
         }
 
         ".tupledLabelled()" {
             forAll(personGen(), {
-                it.tupledLabelled() == ("name" toT it.name) toT ("age" toT it.age)
+                it.tupledLabelled() == Tuple3(
+                        "name" toT it.name,
+                        "age" toT it.age,
+                        "related" toT it.related
+                )
             })
         }
 
         "Applicative Syntax" {
-            forAll(Gen.string(), Gen.int(), { a, b ->
+            forAll(Gen.string(), Gen.int(), personGen(), { a, b, c ->
                 with(personSyntax(Option.applicative())) {
-                    mapToPerson(Option(a), Option(b)) == Some(Person(a, b))
+                    mapToPerson(Option(a), Option(b), c.some().some()) == Some(Person(a, b, c.some()))
                 }
             })
         }
@@ -86,41 +96,53 @@ class ProductTest : UnitSpec() {
 
         "Semigroup combine" {
             forAll(personGen(), personGen(), { a, b ->
-                semigroup<Person>().combine(a, b) == Person(a.name + b.name, a.age + b.age)
+                semigroup<Person>().combine(a, b) == Person(
+                        a.name + b.name,
+                        a.age + b.age,
+                        a.related.flatMap { ap -> b.related.map { bp -> ap + bp } }
+                )
             })
         }
 
         "Semigroup + syntax" {
             forAll(personGen(), personGen(), { a, b ->
-                a + b == Person(a.name + b.name, a.age + b.age)
+                a + b == Person(
+                        a.name + b.name,
+                        a.age + b.age,
+                        a.related.flatMap { ap -> b.related.map { bp -> ap + bp } }
+                )
             })
         }
 
         "Monoid empty" {
             forAll(personGen(), personGen(), { a, b ->
-                monoid<Person>().empty() == Person("", 0)
+                monoid<Person>().empty() == Person("", 0, None)
             })
         }
 
         "Monoid empty syntax" {
             forAll(personGen(), personGen(), { a, b ->
-                emptyPerson() == Person("", 0)
-            })
-        }
-
-        "Order" {
-            forAll(personGen(), personGen(), { a, b ->
-                order<Tuple2<String, Int>>().compare(a.tupled(), b.tupled()) == order<Person>().compare(a, b)
+                emptyPerson() == Person("", 0, None)
             })
         }
 
         //TODO look at typeclassless encoding to see if it's better than runtime lookups in these cases
-
-//        testLaws(
-//                TraverseFilterLaws.laws(Const.traverseFilter(), Const.applicative(IntMonoid), { Const(it) }, Eq.any()),
-//                ApplicativeLaws.laws(Const.applicative(IntMonoid), Eq.any()),
-//                EqLaws.laws(eq<Const<Int, String>>(), { Const(it) }),
-//                ShowLaws.laws(show<Const<Int, String>>(), eq<Const<Int, String>>(), { Const(it) })
-//        )
+        with(Gen) {
+            testLaws(
+                    EqLaws.laws(eq(), { personGen().generate().copy(age = it) }),
+                    SemigroupLaws.laws(
+                            semigroup(),
+                            personGen().generate(),
+                            personGen().generate(),
+                            personGen().generate(),
+                            eq()
+                    ),
+                    MonoidLaws.laws(
+                            monoid(),
+                            personGen().generate(),
+                            eq()
+                    )
+            )
+        }
     }
 }
