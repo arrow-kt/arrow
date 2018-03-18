@@ -63,6 +63,9 @@ class ProductFileGenerator(
             |fun ${product.sourceClassName}.combine(other: ${product.sourceClassName}): ${product.sourceClassName} =
             |  this + other
             |
+            |fun List<${product.sourceClassName}>.combineAll(): ${product.sourceClassName} =
+            |  this.reduce { a, b -> a + b }
+            |
             |operator fun ${product.sourceClassName}.plus(other: ${product.sourceClassName}): ${product.sourceClassName} =
             |  arrow.typeclasses.semigroup<${product.sourceClassName}>().combine(this, other)
             |
@@ -83,13 +86,8 @@ class ProductFileGenerator(
             |fun ${focusType(product)}.to${product.sourceSimpleName}(): ${product.sourceClassName} =
             |  ${classConstructorFromTuple(product.sourceClassName, product.focusSize)}
             |
-            |interface ${product.sourceSimpleName}ApplicativeSyntax<F> : arrow.typeclasses.ApplicativeSyntax<F> {
-            |  fun arrow.Kind<F, ${focusType(product)}>.to${product.sourceSimpleName}(): arrow.Kind<F, ${product.sourceClassName}> =
-            |    this.map { it.to${product.sourceSimpleName}() }
-            |
-            |  fun mapTo${product.sourceSimpleName}${kindedProperties("F", product)}: arrow.Kind<F, ${product.sourceClassName}> =
-            |    applicative().tupled(${product.targets.joinToString(", ") { it.paramName }}).to${product.sourceSimpleName}()
-            |}
+            |inline fun <reified F> arrow.typeclasses.Applicative<F>.mapTo${product.sourceSimpleName}${kindedProperties("F", product)}: arrow.Kind<F, ${product.sourceClassName}> =
+            |    this.map(tupled(${product.targets.joinToString(", ") { it.paramName }}), { it.to${product.sourceSimpleName}() })
             |
             |object ${product.sourceSimpleName}SemigroupInstance : arrow.typeclasses.Semigroup<${product.sourceClassName}> {
             |  override fun combine(a: ${product.sourceClassName}, b: ${product.sourceClassName}): ${product.sourceClassName} {

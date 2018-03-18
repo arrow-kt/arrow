@@ -2,7 +2,11 @@ package arrow.generic
 
 import arrow.Kind
 import arrow.core.*
+import arrow.effects.IO
+import arrow.effects.applicative
 import arrow.product
+import arrow.syntax.applicative.pure
+import arrow.syntax.monoid.combineAll
 import arrow.syntax.option.some
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
@@ -37,8 +41,10 @@ fun tuple3Gen(): Gen<Tuple3<String, Int, Option<Person>>> = with(Gen) {
 inline fun <reified F, A> Gen<A>.generateIn(applicative: Applicative<F> = applicative<F>()): Gen<Kind<F, A>> =
         Gen.create { applicative.pure(this.generate()) }
 
-inline fun <reified F> personSyntax(applicative: Applicative<F> = applicative<F>()): PersonApplicativeSyntax<F> = object : PersonApplicativeSyntax<F> {
-    override fun applicative(): Applicative<F> = applicative
+inline fun <reified F> Applicative<F>.testPersonApplicative() {
+    forAll(Gen.string(), Gen.int(), personGen(), { a, b, c ->
+        mapToPerson(pure(a), pure(b), pure(c.some())) == pure(Person(a, b, c.some()))
+    })
 }
 
 @RunWith(KTestJUnitRunner::class)
@@ -67,12 +73,17 @@ class ProductTest : UnitSpec() {
             })
         }
 
-        "Applicative Syntax" {
-            forAll(Gen.string(), Gen.int(), personGen(), { a, b, c ->
-                with(personSyntax(Option.applicative())) {
-                    mapToPerson(Option(a), Option(b), c.some().some()) == Some(Person(a, b, c.some()))
-                }
+        "List<@product>.combineAll()" {
+            forAll(Gen.list(personGen()), {
+                it.combineAll() == it.reduce { a, b -> a + b }
             })
+        }
+
+
+
+        "Applicative Syntax" {
+            Option.applicative().testPersonApplicative()
+            Try.applicative().testPersonApplicative()
         }
 
         "Show instance defaults to .toString()" {
