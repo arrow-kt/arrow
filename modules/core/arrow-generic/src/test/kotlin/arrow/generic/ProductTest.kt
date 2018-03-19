@@ -2,8 +2,8 @@ package arrow.generic
 
 import arrow.Kind
 import arrow.core.*
-import arrow.effects.IO
-import arrow.effects.applicative
+import arrow.effects.*
+import arrow.instances.OptionApplicativeInstance
 import arrow.product
 import arrow.syntax.applicative.pure
 import arrow.syntax.monoid.combineAll
@@ -47,6 +47,11 @@ inline fun <reified F> Applicative<F>.testPersonApplicative() {
     })
 }
 
+inline fun <reified F, A> Applicative<F>.let(f: ApplicativeSyntax<F>.() -> A): A =
+        f(object : ApplicativeSyntax<F> {
+            override fun applicative(): Applicative<F> = this@let
+        })
+
 @RunWith(KTestJUnitRunner::class)
 class ProductTest : UnitSpec() {
     init {
@@ -84,6 +89,10 @@ class ProductTest : UnitSpec() {
         "Applicative Syntax" {
             Option.applicative().testPersonApplicative()
             Try.applicative().testPersonApplicative()
+
+            val result: Kind<ForOption, Int> = Option.applicative().let {
+                1.pure()
+            }.fix()
         }
 
         "Show instance defaults to .toString()" {
@@ -157,3 +166,5 @@ class ProductTest : UnitSpec() {
         }
     }
 }
+
+fun IntRange.Companion.test(): String = ""

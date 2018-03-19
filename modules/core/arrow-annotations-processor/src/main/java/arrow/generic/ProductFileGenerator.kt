@@ -7,12 +7,13 @@ import java.io.File
 sealed class DerivedTypeClass(val type: String) {
     fun factory(): String = "${type.substringBeforeLast(".")}.${type.substringAfterLast(".").decapitalize()}"
 }
-object Semigroup: DerivedTypeClass("arrow.typeclasses.Semigroup")
-object Monoid: DerivedTypeClass("arrow.typeclasses.Monoid")
-object Eq: DerivedTypeClass("arrow.typeclasses.Eq")
-object Order: DerivedTypeClass("arrow.typeclasses.Order")
-object Show: DerivedTypeClass("arrow.typeclasses.Show")
-object Hash: DerivedTypeClass("arrow.typeclasses.Hash")
+
+object Semigroup : DerivedTypeClass("arrow.typeclasses.Semigroup")
+object Monoid : DerivedTypeClass("arrow.typeclasses.Monoid")
+object Eq : DerivedTypeClass("arrow.typeclasses.Eq")
+object Order : DerivedTypeClass("arrow.typeclasses.Order")
+object Show : DerivedTypeClass("arrow.typeclasses.Show")
+object Hash : DerivedTypeClass("arrow.typeclasses.Hash")
 
 class ProductFileGenerator(
         private val annotatedList: Collection<AnnotatedGeneric>,
@@ -20,6 +21,7 @@ class ProductFileGenerator(
 ) {
 
     private val tuple = "arrow.core.Tuple"
+    private val hlist = "arrow.generic.HList"
     private val letters = ('a'..'j').toList()
 
     fun generate() {
@@ -74,6 +76,15 @@ class ProductFileGenerator(
             |
             |fun ${product.sourceClassName}.tupled(): ${focusType(product)} =
             |  ${tupleConstructor(product)}
+            |
+            |fun ${product.sourceClassName}.toHList(): ${focusHListType(product)} =
+            |  ${hListConstructor(product)}
+            |
+            |fun ${focusHListType(product)}.to${product.sourceSimpleName}(): ${product.sourceClassName} =
+            |  ${classConstructorFromHList(product.sourceClassName, product.focusSize)}
+            |
+            |fun ${product.sourceClassName}.toHListLabelled(): ${labelledHListFocusType(product)} =
+            |  ${product.targets.joinToString(prefix = "arrow.generic.hListOf(", postfix = ")") { """("${it.paramName}" toT ${it.paramName})""" }}
             |
             |fun ${product.sourceClassName}.tupledLabelled(): ${labelledFocusType(product)} =
             |  ${product.targets.joinToString(prefix = "arrow.core.Tuple${product.focusSize}(", postfix = ")") { """("${it.paramName}" toT ${it.paramName})""" }}
@@ -141,6 +152,9 @@ class ProductFileGenerator(
     private fun tupleConstructor(product: AnnotatedGeneric): String =
             product.targets.joinToString(prefix = "$tuple${product.focusSize}(", postfix = ")", transform = { "this.${it.paramName.plusIfNotBlank(prefix = "`", postfix = "`")}" })
 
+    private fun hListConstructor(product: AnnotatedGeneric): String =
+            product.targets.joinToString(prefix = "arrow.generic.hListOf(", postfix = ")", transform = { "this.${it.paramName.plusIfNotBlank(prefix = "`", postfix = "`")}" })
+
     private fun labelledFocusType(product: AnnotatedGeneric): String =
             if (product.hasTupleFocus) product.targetNames.map { "${tuple}2<String, $it>" }.joinToString(prefix = "$tuple${product.targets.size}<", postfix = ">")
             else product.targetNames.first()
@@ -149,8 +163,21 @@ class ProductFileGenerator(
             if (product.hasTupleFocus) product.targetNames.joinToString(prefix = "$tuple${product.targets.size}<", postfix = ">")
             else product.targetNames.first()
 
+    private fun focusHListType(product: AnnotatedGeneric): String =
+            product.targetNames.joinToString(prefix = "$hlist${product.targets.size}<", postfix = ">")
+
+    private fun labelledHListFocusType(product: AnnotatedGeneric): String =
+            product.targetNames.map { "${tuple}2<String, $it>" }.joinToString(prefix = "$hlist${product.targets.size}<", postfix = ">")
+
     private fun classConstructorFromTuple(sourceClassName: String, propertiesSize: Int): String =
             (0 until propertiesSize).joinToString(prefix = "$sourceClassName(", postfix = ")", transform = { "this.${letters[it]}" })
+
+    private fun classConstructorFromHList(sourceClassName: String, propertiesSize: Int): String =
+            (0 until propertiesSize).joinToString(prefix = "$sourceClassName(", postfix = ")", transform = {
+                "this." + (0 until it).fold("") { acc, n ->
+                    acc + "tail."
+                } + "head"
+            })
 
     private fun kindedProperties(prefix: String, product: AnnotatedGeneric): String =
             product.targets.map { it.paramName }.zip(product.targetNames).joinToString(
@@ -191,7 +218,7 @@ class ProductFileGenerator(
     private fun AnnotatedGeneric.isRecursive(name: String): Boolean =
             sourceClassName in name
 
-    private fun AnnotatedGeneric.foldRecursive(name: String, ifNotRecursive: () -> String, ifRecursive:() -> String): String =
+    private fun AnnotatedGeneric.foldRecursive(name: String, ifNotRecursive: () -> String, ifRecursive: () -> String): String =
             if (isRecursive(name)) ifRecursive() else ifNotRecursive()
 
     private fun semigroupTupleNInstance(product: AnnotatedGeneric): String =
