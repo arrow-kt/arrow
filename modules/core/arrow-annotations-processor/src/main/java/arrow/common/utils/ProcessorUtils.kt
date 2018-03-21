@@ -1,6 +1,5 @@
 package arrow.common.utils
 
-import arrow.implicits.implicitAnnotationName
 import me.eugeniomarletti.kotlin.metadata.*
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmMethodSignature
 import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.java.MethodElement
@@ -110,7 +109,7 @@ fun ProtoBuf.Type.extractFullName(
                 nameResolver = classData.nameResolver,
                 getTypeParameter = { classData.getTypeParameter(it)!! },
                 outputTypeAlias = outputTypeAlias,
-                throwOnGeneric = if (!failOnGeneric) null else KnownException("Generic $implicitAnnotationName types are not yet supported", null)
+                throwOnGeneric = if (!failOnGeneric) null else KnownException("Generic implicit types are not yet supported", null)
         )
 
 fun ClassOrPackageDataWrapper.typeConstraints(): String =
