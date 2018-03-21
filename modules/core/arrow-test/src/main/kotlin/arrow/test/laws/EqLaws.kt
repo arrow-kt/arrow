@@ -1,28 +1,27 @@
 package arrow.test.laws
 
+import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import arrow.typeclasses.Eq
-import arrow.typeclasses.eq
 
 object EqLaws {
 
-    inline fun <reified F> laws(EQ: Eq<F> = eq<F>(), noinline cf: (Int) -> F): List<Law> =
+    inline fun <reified F> laws(EQ: Eq<F>, noinline cf: (Int) -> F): List<Law> =
             listOf(
-                    Law("Eq Laws: identity", { identityEquality(EQ, cf) }),
-                    Law("Eq Laws: commutativity", { commutativeEquality(EQ, cf) })
+                    Law("Eq Laws: identity", { EQ.identityEquality(cf) }),
+                    Law("Eq Laws: commutativity", { EQ.commutativeEquality(cf) })
             )
 
-    inline fun <reified F> identityEquality(EQ: Eq<F> = eq(), crossinline cf: (Int) -> F): Unit =
+    inline fun <reified F> Eq<F>.identityEquality(crossinline cf: (Int) -> F): Unit =
             forAll(Gen.int(), { int: Int ->
                 val a = cf(int)
-                EQ.eqv(a, a) == EQ.eqv(a, a)
+                a.eqv(a) == a.eqv(a)
             })
 
-    inline fun <reified F> commutativeEquality(EQ: Eq<F> = eq(), crossinline cf: (Int) -> F): Unit =
+    inline fun <reified F> Eq<F>.commutativeEquality(crossinline cf: (Int) -> F): Unit =
             forAll(Gen.int(), { int: Int ->
                 val a = cf(int)
                 val b = cf(int)
-                EQ.eqv(a, b) == EQ.eqv(b, a)
+                a.eqv(b) == b.eqv(a)
             })
 }
