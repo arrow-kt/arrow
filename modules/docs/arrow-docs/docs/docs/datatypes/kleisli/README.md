@@ -14,14 +14,14 @@ we want to do a safe conversion like this:
 
 ```kotlin:ank:silent
 import arrow.core.*
-import arrow.data.Kleisli
+import arrow.data.*
 
 val optionIntKleisli = Kleisli { str: String ->
   if (str.toCharArray().all { it.isDigit() }) Some(str.toInt()) else None
 }
 
 fun String.safeToInt(): Option<Int> {
-  return optionIntKleisli.run(this).ev()
+  return optionIntKleisli.run(this).fix()
 }
 ```
 
@@ -29,23 +29,28 @@ Then when we use the function we have an `Option<Int>`
 
 ```kotlin:ank
 "a".safeToInt()
+```
+```kotlin:ank
 "1".safeToInt()
 ```
 
 ## Functions
 
-#### Run and Ev
-The most common function you will probably use is `run()` to execute the `Kleisli` and `ev()` to get the result in the monadic context.
-
 #### Local
 This function allows doing a conversion inside the Kleisli to the original input value before the Kleisli will be executed, creating a Kleisli with the input type of the conversion
 
 ```kotlin:ank
-optionIntKleisli.local { optStr :Option<String> -> optStr.getOrElse { "" } }
+optionIntKleisli.local { optStr :Option<String> -> optStr.getOrElse { "0" } }.run(None)
 ```
 
 #### Map
+The `map` function transform the `Kleisli` output value.
 
+```kotlin:ank
+import arrow.syntax.functor.map
+
+optionIntKleisli.map { output -> output + 1 }.fix().run("1")
+```
 
 #### FlatMap
 
