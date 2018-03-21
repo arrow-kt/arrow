@@ -16,9 +16,6 @@
 
 /** Core **/
 
-include(":arrow-syntax")
-project(":arrow-syntax").projectDir = file("modules/core/arrow-syntax")
-
 include(":arrow-core")
 project(":arrow-core").projectDir = file("modules/core/arrow-core")
 
