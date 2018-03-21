@@ -1,5 +1,4 @@
 import org.gradle.internal.jvm.Jvm
-import org.gradle.api.GradleException
 
 apply plugin: 'kotlin'
 apply plugin: 'kotlin-kapt'
@@ -15,7 +14,6 @@ dependencies {
     testCompile "com.google.testing.compile:compile-testing:0.15"
     testCompile fileTree(dir: './src/test/libs', includes: ['*.jar'])
     testCompile project(":arrow-data")
-    testCompile project(":arrow-syntax")
     testCompile project(":arrow-optics")
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
     def toolsJar = Jvm.current().getToolsJar()

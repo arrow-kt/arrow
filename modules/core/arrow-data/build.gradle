@@ -7,7 +7,6 @@ dependencies {
     compileOnly project(':arrow-annotations-processor')
     testCompileOnly project(':arrow-annotations-processor')
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
-    testCompile project(':arrow-syntax')
     testCompile project(':arrow-instances')
     testCompile project(':arrow-test')
     testCompile project(':arrow-free')
