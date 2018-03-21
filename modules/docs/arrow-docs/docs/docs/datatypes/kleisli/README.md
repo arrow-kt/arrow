@@ -53,12 +53,42 @@ optionIntKleisli.map { output -> output + 1 }.fix().run("1")
 ```
 
 #### FlatMap
+`flatMap` is useful to map the `Kleisli` output into another kleisli
 
+```kotlin:ank
+import arrow.data.fix
 
-#### Zip
+val optionDoubleKleisli = Kleisli { str: String ->
+  if (str.toCharArray().all { it.isDigit() }) Some(str.toDouble()) else None
+}
+  
+optionIntKleisli.flatMap({optionDoubleKleisli},Option.monad()).fix().run("1")
+```
 
 
 #### AndThen
+You can use `andThen` to compose with another kleisli
 
+```kotlin:ank
+import arrow.data.fix
+
+val optionFromOptionKleisli = Kleisli { number: Int ->
+   Some(number+1)
+}
+  
+optionIntKleisli.andThen(optionFromOptionKleisli,Option.monad()).fix().run("1")
+```
+
+with another function
+
+```kotlin:ank
+optionIntKleisli.andThen({number: Int -> Some(number+1)}, Option.monad()).fix().run("1")
+```
+
+or to replace the `Kleisli` result
+
+```kotlin:ank
+optionIntKleisli.andThen(Some(0), Option.monad()).fix().run("1")
+```
 
 
