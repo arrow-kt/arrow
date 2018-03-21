@@ -81,17 +81,11 @@ sealed class Try<out A> : TryOf<A> {
 
     /**
      * Applies `fa` if this is a `Failure` or `fb` if this is a `Success`.
-     * If `fb` is initially applied and throws an exception,
-     * then `fa` is applied with this exception.
      */
     inline fun <B> fold(fa: (Throwable) -> B, fb: (A) -> B): B =
             when (this) {
                 is Failure -> fa(exception)
-                is Success -> try {
-                    fb(value)
-                } catch (e: Throwable) {
-                    fa(e)
-                }
+                is Success -> fb(value)
             }
 
     abstract fun isFailure(): Boolean
