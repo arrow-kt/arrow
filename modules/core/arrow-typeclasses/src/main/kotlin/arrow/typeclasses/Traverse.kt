@@ -1,7 +1,10 @@
 package arrow.typeclasses
 
-import arrow.*
-import arrow.core.*
+import arrow.Kind
+import arrow.core.ForId
+import arrow.core.Id
+import arrow.core.fix
+import arrow.core.value
 
 /**
  * Traverse, also known as Traversable. Traversal over a structure with an effect.
@@ -12,18 +15,33 @@ interface Traverse<F> : Functor<F>, Foldable<F> {
      * Given a function which returns a G effect, thread this effect through the running of this function on all the
      * values in F, returning an F<B> in a G context.
      */
-    fun <G, A, B> traverse(fa: Kind<F, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Kind<F, B>>
+    fun <G, A, B> Applicative<G>.traverse(fa: Kind<F, A>, f: (A) -> Kind<G, B>): Kind<G, Kind<F, B>>
 
-    fun <G, A> sequence(GA: Applicative<G>, fga: Kind<F, Kind<G, A>>): Kind<G, Kind<F, A>> = traverse(fga, { it }, GA)
+    /**
+     * Thread all the G effects through the F structure to invert the structure from F<G<A>> to G<F<A>>.
+     */
+    fun <G, A> Applicative<G>.sequence(fga: Kind<F, Kind<G, A>>): Kind<G, Kind<F, A>> = traverse(fga) { it }
 
     override fun <A, B> map(fa: Kind<F, A>, f: (A) -> B): Kind<F, B> =
-            traverse(fa, { Id(f(it)) }, applicative()).value()
+            IdApplicative.traverse(fa, { Id(f(it)) }).value()
+
+    fun <G, A, B> FlatTraverse<F, G>.flatTraverse(fa: Kind<F, A>, f: (A) -> Kind<G, Kind<F, B>>): Kind<G, Kind<F, B>> =
+            AG().run { map(traverse(fa, f)) { MF().run { flatten(it) } } }
 }
 
-inline fun <reified F, reified G, A, B> Traverse<F>.flatTraverse(fa: Kind<F, A>, noinline f: (A) -> Kind<G, Kind<F, B>>, GA: Applicative<G> =
-applicative(), FM: Monad<F> = monad()): Kind<G, Kind<F, B>> = GA.map(traverse(fa, f, GA), { FM.flatten(it) })
+interface FlatTraverse<F, G> {
+    fun MF(): Monad<F>
 
-/**
- * Thread all the G effects through the F structure to invert the structure from F<G<A>> to G<F<A>>.
- */
-inline fun <F, reified G, A> Traverse<F>.sequence(fga: Kind<F, Kind<G, A>>, GA: Applicative<G> = applicative()): Kind<G, Kind<F, A>> = sequence(GA, fga)
+    fun AG(): Applicative<G>
+}
+
+private val IdApplicative = object : Applicative<ForId> {
+    override fun <A> pure(a: A): Kind<ForId, A> =
+            Id(a)
+
+    override fun <A, B> ap(fa: Kind<ForId, A>, ff: Kind<ForId, (A) -> B>): Kind<ForId, B> =
+            fa.fix().ap(ff)
+
+    override fun <A, B> map(fa: Kind<ForId, A>, f: (A) -> B): Kind<ForId, B> =
+            fa.fix().map(f)
+}

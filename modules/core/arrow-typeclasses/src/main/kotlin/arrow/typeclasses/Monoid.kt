@@ -9,12 +9,12 @@ interface Monoid<A> : Semigroup<A> {
     /**
      * Combine a collection of [A] values.
      */
-    fun combineAll(elems: Collection<A>): A =
-            if (elems.isEmpty()) empty() else elems.reduce { a, b -> combine(a, b) }
+    fun Collection<A>.combineAll(): A =
+            if (isEmpty()) empty() else reduce { a, b -> a.combine(b) }
+
+    /**
+     * Combine an array of [A] values.
+     */
+    fun combineAll(vararg elems: A): A = elems.asList().combineAll()
 
 }
-
-/**
- * Combine an array of [A] values.
- */
-fun <A> Monoid<A>.combineAll(vararg elems: A): A = combineAll(elems.asList())

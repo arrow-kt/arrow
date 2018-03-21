@@ -1,6 +1,6 @@
 package arrow.typeclasses
 
-import arrow.*
+import arrow.Kind
 import arrow.core.*
 
 /**
@@ -14,7 +14,7 @@ import arrow.core.*
  *  - reduceLeftTo(fa)(f)(g) eagerly reduces with an additional mapping function
  *  - reduceRightTo(fa)(f)(g) lazily reduces with an additional mapping function
  */
-interface Reducible<F> : Foldable<F> {
+interface Reducible<in F> : Foldable<F> {
 
     /**
      * Left-associative reduction on F using the function f.
@@ -48,36 +48,37 @@ interface Reducible<F> : Foldable<F> {
     override fun <A> isEmpty(fa: Kind<F, A>): Boolean = false
 
     override fun <A> nonEmpty(fa: Kind<F, A>): Boolean = true
+
+    /**
+     * Reduce a F<A> value using the given Semigroup<A>.
+     */
+    fun <A> Semigroup<A>.reduce(fa: Kind<F, A>): A = reduceLeft(fa, { a, b -> a.combine(b) })
+
+    /**
+     * Reduce a F<G<A>> value using SemigroupK<G>, a universal semigroup for G<_>.
+     *
+     * This method is a generalization of reduce.
+     */
+    fun <G, A> SemigroupK<G>.reduceK(fga: Kind<F, Kind<G, A>>): Kind<G, A> = this.algebra<A>().reduce(fga)
+
+    /**
+     * Apply f to each element of fa and combine them using the given Semigroup<B>.
+     */
+    fun <A, B> Semigroup<B>.reduceMap(fa: Kind<F, A>, f: (A) -> B): B =
+            reduceLeftTo(fa, f, { b, a -> b.combine(f(a)) })
+
 }
-
-/**
- * Reduce a F<A> value using the given Semigroup<A>.
- */
-inline fun <F, reified A> Reducible<F>.reduce(fa: Kind<F, A>, SA: Semigroup<A> = semigroup()): A = reduceLeft(fa, { a, b -> SA.combine(a, b) })
-
-/**
- * Reduce a F<G<A>> value using SemigroupK<G>, a universal semigroup for G<_>.
- *
- * This method is a generalization of reduce.
- */
-inline fun <F, reified G, A> Reducible<F>.reduceK(fga: Kind<F, Kind<G, A>>, SGKG: SemigroupK<G> = semigroupK()): Kind<G, A> = reduce(fga, SGKG.algebra())
-
-/**
- * Apply f to each element of fa and combine them using the given Semigroup<B>.
- */
-inline fun <F, A, reified B> Reducible<F>.reduceMap(fa: Kind<F, A>, noinline f: (A) -> B, SB: Semigroup<B> = semigroup()): B =
-        reduceLeftTo(fa, f, { b, a -> SB.combine(b, f(a)) })
 
 /**
  * This class defines a Reducible<F> in terms of a Foldable<G> together with a split method, F<A> -> (A, G<A>).
  *
  * This class can be used on any type where the first value (A) and the "rest" of the values (G<A>) can be easily found.
  */
-abstract class NonEmptyReducible<F, G> : Reducible<F> {
+interface NonEmptyReducible<in F, G> : Reducible<F> {
 
-    abstract fun FG(): Foldable<G>
+    fun FG(): Foldable<G>
 
-    abstract fun <A> split(fa: Kind<F, A>): Tuple2<A, Kind<G, A>>
+    fun <A> split(fa: Kind<F, A>): Tuple2<A, Kind<G, A>>
 
     override fun <A, B> foldLeft(fa: Kind<F, A>, b: B, f: (B, A) -> B): B {
         val (a, ga) = split(fa)
@@ -102,9 +103,9 @@ abstract class NonEmptyReducible<F, G> : Reducible<F> {
                 }
             }
 
-    override fun <A> fold(ma: Monoid<A>, fa: Kind<F, A>): A {
+    override fun <A> Monoid<A>.fold(fa: Kind<F, A>): A {
         val (a, ga) = split(fa)
-        return ma.combine(a, FG().fold(ma, ga))
+        return a.combine(FG().run { fold(ga) })
     }
 
     override fun <A> find(fa: Kind<F, A>, f: (A) -> Boolean): Option<A> {
@@ -121,16 +122,23 @@ abstract class NonEmptyReducible<F, G> : Reducible<F> {
         val (a, ga) = split(fa)
         return p(a) && FG().forall(ga, p)
     }
-}
 
-inline fun <reified F, reified G, A> NonEmptyReducible<F, G>.size(MB: Monoid<Long> = monoid(), fa: Kind<F, A>): Long {
-    val (_, tail) = split(fa)
-    return 1 + FG().size(MB, tail)
-}
+    override fun <A> Monoid<Long>.size(fa: Kind<F, A>): Long {
+        val (_, tail) = split(fa)
+        return 1 + FG().run { size(tail) }
+    }
 
-fun <F, G, A> NonEmptyReducible<F, G>.get(fa: Kind<F, A>, idx: Long): Option<A> = if (idx == 0L) Some(split(fa).a) else FG().get(split(fa).b, idx - 1L)
+    fun <A> Monad<Kind<ForEither, A>>.get(fa: Kind<F, A>, idx: Long): Option<A> =
+            if (idx == 0L)
+                Some(split(fa).a)
+            else
+                getObject().get(split(fa).b, idx - 1L)
 
-inline fun <F, reified G, A, B> NonEmptyReducible<F, G>.foldM(fa: Kind<F, A>, z: B, crossinline f: (B, A) -> Kind<G, B>, MG: Monad<G> = monad()): Kind<G, B> {
-    val (a, ga) = split(fa)
-    return MG.flatMap(f(z, a), { FG().foldM(ga, it, f) })
+    private inline fun <A> Monad<Kind<ForEither, A>>.getObject() =
+            object : Monad<Kind<ForEither, A>> by this, Foldable<G> by FG() {}
+
+    fun <A, B> Monad<G>.foldM_(fa: Kind<F, A>, z: B, f: (B, A) -> Kind<G, B>): Kind<G, B> {
+        val (a, ga) = split(fa)
+        return flatMap(f(z, a), { FG().run { foldM(ga, it, f) } })
+    }
 }
