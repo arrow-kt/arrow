@@ -14,7 +14,7 @@ we want to do a safe conversion like this:
 
 ```kotlin:ank:silent
 import arrow.core.*
-import arrow.data.*
+import arrow.data.Kleisli
 
 val optionIntKleisli = Kleisli { str: String ->
   if (str.toCharArray().all { it.isDigit() }) Some(str.toInt()) else None
@@ -41,6 +41,21 @@ This function allows doing a conversion inside the Kleisli to the original input
 
 ```kotlin:ank
 optionIntKleisli.local { optStr :Option<String> -> optStr.getOrElse { "0" } }.run(None)
+```
+
+#### Ap
+The `ap` function transform the `Kleisli` into another `Kleisli` with a function as a output value.
+
+```kotlin:ank
+import arrow.data.fix
+
+val intToDouble = {number:Int -> number.toDouble()}
+
+val optionIntDoubleKleisli = Kleisli { str: String ->
+  if (str.toCharArray().all { it.isDigit() }) Some(intToDouble) else None
+}
+  
+optionIntKleisli.ap(optionIntDoubleKleisli,Option.applicative()).fix().run("1")
 ```
 
 #### Map
