@@ -1,14 +1,11 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import arrow.TC
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.typeclass
 import kotlin.coroutines.experimental.startCoroutine
 
-@typeclass
-interface Monad<F> : Applicative<F>, TC {
+interface Monad<F> : Applicative<F> {
 
     fun <A, B> flatMap(fa: Kind<F, A>, f: (A) -> Kind<F, B>): Kind<F, B>
 

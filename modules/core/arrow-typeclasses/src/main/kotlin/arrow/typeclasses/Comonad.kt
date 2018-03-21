@@ -1,8 +1,6 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import arrow.TC
-import arrow.typeclass
 import java.io.Serializable
 import kotlin.coroutines.experimental.*
 import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
@@ -11,8 +9,7 @@ import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
 /**
  * The dual of monads, used to extract values from F
  */
-@typeclass
-interface Comonad<F> : Functor<F>, TC {
+interface Comonad<F> : Functor<F> {
 
     fun <A, B> coflatMap(fa: Kind<F, A>, f: (Kind<F, A>) -> B): Kind<F, B>
 

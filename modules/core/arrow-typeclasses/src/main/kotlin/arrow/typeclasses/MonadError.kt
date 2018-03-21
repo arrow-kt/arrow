@@ -1,12 +1,9 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import arrow.TC
-import arrow.typeclass
 import kotlin.coroutines.experimental.startCoroutine
 
-@typeclass
-interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F>, TC {
+interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
 
     fun <A> ensure(fa: Kind<F, A>, error: () -> E, predicate: (A) -> Boolean): Kind<F, A> =
             flatMap(fa, {

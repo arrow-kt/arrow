@@ -1,13 +1,10 @@
 package arrow.typeclasses
 
-import arrow.*
-
 /**
  * A type class used to get a textual representation for an instance of type [A] in a type safe way.
  *
  */
-@typeclass
-interface Show<in A> : TC {
+interface Show<in A> {
 
     /**
      * Given an object [a] of type [A] it returns its textual representation.

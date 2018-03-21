@@ -1,10 +1,8 @@
 package arrow.typeclasses
 
-import arrow.*
 import arrow.core.Option
 
-@typeclass
-interface Semigroup<A> : TC {
+interface Semigroup<A> {
     /**
      * Combine two [A] values.
      */

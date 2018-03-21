@@ -1,6 +1,5 @@
 package arrow.typeclasses
 
-import arrow.*
 import arrow.core.Tuple2
 
 /**
@@ -11,8 +10,7 @@ import arrow.core.Tuple2
  * @see [Eq]
  * @see <a href="http://arrow-kt.io/docs/typeclasses/order/">Order documentation</a>
  */
-@typeclass
-interface Order<F> : Eq<F>, TC {
+interface Order<F> : Eq<F> {
 
     /**
      * Compare [a] with [b]. Returns an Int whose sign is:

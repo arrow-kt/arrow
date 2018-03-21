@@ -2,12 +2,11 @@
 
 package arrow.typeclasses
 
-import arrow.*
+import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Tuple2
 
-@typeclass
-interface Applicative<F> : Functor<F>, TC {
+interface Applicative<F> : Functor<F> {
 
     fun <A> pure(a: A): Kind<F, A>
 

@@ -1,9 +1,8 @@
 package arrow.typeclasses
 
-import arrow.*
+import arrow.Kind
 
-@typeclass
-interface SemigroupK<F> : TC {
+interface SemigroupK<F> {
 
     /**
      * Combine two F<A> values.

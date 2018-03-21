@@ -3,8 +3,7 @@ package arrow.typeclasses
 import arrow.*
 import arrow.core.Tuple2
 
-@typeclass
-interface Functor<F> : TC {
+interface Functor<F> {
 
     fun <A, B> map(fa: Kind<F, A>, f: (A) -> B): Kind<F, B>
 
