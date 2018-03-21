@@ -139,13 +139,5 @@ class TypeclasslessExamples : FreeSpec() {
 
             child.insideClassFromChild() shouldBe expected
         }
-
-        // FIXME:  Eldritch horror
-        "Transform receiver to regular function" {
-            fun <A, R> toFun(f: A.() -> R): (A) -> R =
-                    f
-
-            toFun<ApplicativeAndIdentifySyntax<ForListK>, Kind<ForListK, Int>> { withAll() }(ALL_SYNTAX) shouldBe expected
-        }
     }
 }
