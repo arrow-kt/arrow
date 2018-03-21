@@ -10,8 +10,8 @@ interface IdEqInstance<A> : Eq<Id<A>> {
 
     fun EQ(): Eq<A>
 
-    override fun eqv(a: Id<A>, b: Id<A>): Boolean =
-            EQ().eqv(a.value, b.value)
+    override fun Id<A>.eqv(b: Id<A>): Boolean =
+            EQ().run { value.eqv(b.value) }
 }
 
 @instance(Id::class)

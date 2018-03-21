@@ -66,21 +66,21 @@ interface IorEqInstance<L, R> : Eq<Ior<L, R>> {
 
     fun EQR(): Eq<R>
 
-    override fun eqv(a: Ior<L, R>, b: Ior<L, R>): Boolean = when (a) {
+    override fun Ior<L, R>.eqv(b: Ior<L, R>): Boolean = when (this) {
         is Ior.Left -> when (b) {
             is Ior.Both -> false
             is Ior.Right -> false
-            is Ior.Left -> EQL().eqv(a.value, b.value)
+            is Ior.Left -> EQL().run { value.eqv(b.value) }
         }
         is Ior.Both -> when (b) {
             is Ior.Left -> false
-            is Ior.Both -> EQL().eqv(a.leftValue, b.leftValue) && EQR().eqv(a.rightValue, b.rightValue)
+            is Ior.Both -> EQL().run { leftValue.eqv(b.leftValue) } && EQR().run { rightValue.eqv(b.rightValue) }
             is Ior.Right -> false
         }
         is Ior.Right -> when (b) {
             is Ior.Left -> false
             is Ior.Both -> false
-            is Ior.Right -> EQR().eqv(a.value, b.value)
+            is Ior.Right -> EQR().run { value.eqv(b.value) }
         }
 
     }

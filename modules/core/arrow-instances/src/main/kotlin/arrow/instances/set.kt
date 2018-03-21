@@ -20,9 +20,9 @@ interface SetKEqInstance<A> : Eq<SetK<A>> {
 
     fun EQ(): Eq<A>
 
-    override fun eqv(a: SetK<A>, b: SetK<A>): Boolean =
-            if (a.size == b.size) a.set.map { aa ->
-                b.find { bb -> EQ().eqv(aa, bb) } != null
+    override fun SetK<A>.eqv(b: SetK<A>): Boolean =
+            if (size == b.size) set.map { aa ->
+                b.find { bb -> EQ().run { aa.eqv(bb) } } != null
             }.fold(true) { acc, bool ->
                 acc && bool
             }

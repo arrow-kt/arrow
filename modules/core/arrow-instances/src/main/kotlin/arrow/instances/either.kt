@@ -80,20 +80,20 @@ interface EitherSemigroupKInstance<L> : SemigroupK<EitherPartialOf<L>> {
 }
 
 @instance(Either::class)
-interface EitherEqInstance<L, R> : Eq<Either<L, R>> {
+interface EitherEqInstance<in L, in R> : Eq<Either<L, R>> {
 
     fun EQL(): Eq<L>
 
     fun EQR(): Eq<R>
 
-    override fun eqv(a: Either<L, R>, b: Either<L, R>): Boolean = when (a) {
+    override fun Either<L, R>.eqv(b: Either<L, R>): Boolean = when (this) {
         is Either.Left -> when (b) {
-            is Either.Left -> EQL().eqv(a.a, b.a)
+            is Either.Left -> EQL().run { a.eqv(b.a) }
             is Either.Right -> false
         }
         is Either.Right -> when (b) {
             is Either.Left -> false
-            is Either.Right -> EQR().eqv(a.b, b.b)
+            is Either.Right -> EQR().run { this@eqv.b.eqv(b.b) }
         }
     }
 

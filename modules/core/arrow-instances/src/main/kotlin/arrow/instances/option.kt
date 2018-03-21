@@ -49,10 +49,10 @@ interface OptionEqInstance<A> : Eq<Option<A>> {
 
     fun EQ(): Eq<A>
 
-    override fun eqv(a: Option<A>, b: Option<A>): Boolean = when (a) {
+    override fun Option<A>.eqv(b: Option<A>): Boolean = when (this) {
         is Some -> when (b) {
             None -> false
-            is Some -> EQ().eqv(a.t, b.t)
+            is Some -> EQ().run { t.eqv(b.t) }
         }
         None -> when (b) {
             None -> true

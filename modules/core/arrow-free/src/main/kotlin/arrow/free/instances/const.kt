@@ -65,8 +65,8 @@ interface ConstEqInstance<A, T> : Eq<Const<A, T>> {
 
     fun EQ(): Eq<A>
 
-    override fun eqv(a: Const<A, T>, b: Const<A, T>): Boolean =
-            EQ().eqv(a.value, b.value)
+    override fun Const<A, T>.eqv(b: Const<A, T>): Boolean =
+            EQ().run { value.eqv(b.value) }
 }
 
 @instance(Const::class)

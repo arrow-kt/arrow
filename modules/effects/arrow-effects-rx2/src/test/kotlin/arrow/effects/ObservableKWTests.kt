@@ -17,12 +17,12 @@ import java.util.concurrent.TimeUnit
 class ObservableKTest : UnitSpec() {
 
     fun <T> EQ(): Eq<ObservableKOf<T>> = object : Eq<ObservableKOf<T>> {
-        override fun eqv(a: ObservableKOf<T>, b: ObservableKOf<T>): Boolean =
+        fun ObservableKOf<T>.eqv(b: Any): ObservableKOf<T> =
                 try {
-                    a.value().blockingFirst() == b.value().blockingFirst()
+                    this.value().blockingFirst() == b.value().blockingFirst()
                 } catch (throwable: Throwable) {
                     val errA = try {
-                        a.value().blockingFirst()
+                        this.value().blockingFirst()
                         throw IllegalArgumentException()
                     } catch (err: Throwable) {
                         err

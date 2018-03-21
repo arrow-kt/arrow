@@ -25,7 +25,7 @@ object StringMonoidInstanceImplicits {
 }
 
 object StringEqInstance : Eq<String> {
-    override fun eqv(a: String, b: String): Boolean = a == b
+    override fun String.eqv(b: String): Boolean = this == b
 }
 
 object StringEqInstanceImplicits {

@@ -13,82 +13,82 @@ import arrow.core.Tuple2
 interface Order<F> : Eq<F> {
 
     /**
-     * Compare [a] with [b]. Returns an Int whose sign is:
+     * Compare [this@compare] with [b]. Returns an Int whose sign is:
      * - negative if `x < y`
      * - zero     if `x = y`
      * - positive if `x > y`
      *
-     * @param a object to compare with [b]
-     * @param b object to compare with [a]
-     * @returns zero objects are equal, a negative number if [a] is less than [b], or a positive number if [a] greater than [b].
+     * @param this@compare object to compare with [b]
+     * @param b object to compare with [this@compare]
+     * @returns zero objects are equal, a negative number if [this@compare] is less than [b], or a positive number if [this@compare] greater than [b].
      */
-    fun compare(a: F, b: F): Int
+    fun F.compare(b: F): Int
 
     /** @see [Eq.eqv] */
-    override fun eqv(a: F, b: F): Boolean = compare(a, b) == 0
+    override fun F.eqv(b: F): Boolean = this.compare(b) == 0
 
     /**
-     * Check if [a] is `lower than` [b]
+     * Check if [this@lt] is `lower than` [b]
      *
-     * @param a object to compare with [b]
-     * @param b object to compare with [a]
-     * @returns true if [a] is `lower than` [b] and false otherwise
+     * @param this@lt object to compare with [b]
+     * @param b object to compare with [this@lt]
+     * @returns true if [this@lt] is `lower than` [b] and false otherwise
      */
-    fun lt(a: F, b: F): Boolean = compare(a, b) < 0
+    fun F.lt(b: F): Boolean = compare(b) < 0
 
     /**
-     * Check if [a] is `lower than or equal to` [b]
+     * Check if [this@lte] is `lower than or equal to` [b]
      *
-     * @param a object to compare with [b]
-     * @param b object to compare with [a]
-     * @returns true if [a] is `lower than or equal to` [b] and false otherwise
+     * @param this@lte object to compare with [b]
+     * @param b object to compare with [this@lte]
+     * @returns true if [this@lte] is `lower than or equal to` [b] and false otherwise
      */
-    fun lte(a: F, b: F): Boolean = compare(a, b) <= 0
+    fun F.lte(b: F): Boolean = compare(b) <= 0
 
     /**
-     * Check if [a] is `greater than` [b]
+     * Check if [this@gt] is `greater than` [b]
      *
-     * @param a object to compare with [b]
-     * @param b object to compare with [a]
-     * @returns true if [a] is `greater than` [b] and false otherwise
+     * @param this@gt object to compare with [b]
+     * @param b object to compare with [this@gt]
+     * @returns true if [this@gt] is `greater than` [b] and false otherwise
      */
-    fun gt(a: F, b: F): Boolean = compare(a, b) > 0
+    fun F.gt(b: F): Boolean = compare(b) > 0
 
     /**
-     * Check if [a] is `greater than or equal to` [b]
+     * Check if [this@gte] is `greater than or equal to` [b]
      *
-     * @param a object to compare with [b]
-     * @param b object to compare with [a]
-     * @returns true if [a] is `greater than or equal to` [b] and false otherwise
+     * @param this@gte object to compare with [b]
+     * @param b object to compare with [this@gte]
+     * @returns true if [this@gte] is `greater than or equal to` [b] and false otherwise
      */
-    fun gte(a: F, b: F): Boolean = compare(a, b) >= 0
+    fun F.gte(b: F): Boolean = compare(b) >= 0
 
     /**
-     * Determines the maximum of [a] and [b] in terms of order.
+     * Determines the maximum of [this@max] and [b] in terms of order.
      *
-     * @param a object to compare with [b]
-     * @param b object to compare with [a]
-     * @returns the maximum [a] if it is greater than [b] or [b] otherwise
+     * @param this@max object to compare with [b]
+     * @param b object to compare with [this@max]
+     * @returns the maximum [this@max] if it is greater than [b] or [b] otherwise
      */
-    fun max(a: F, b: F): F = if (gt(a, b)) a else b
+    fun F.max(b: F): F = if (gt(b)) this else b
 
     /**
-     * Determines the minimum of [a] and [b] in terms of order.
+     * Determines the minimum of [this@min] and [b] in terms of order.
      *
-     * @param a object to compare with [b]
-     * @param b object to compare with [a]
-     * @returns the minimum [a] if it is less than [b] or [b] otherwise
+     * @param this@min object to compare with [b]
+     * @param b object to compare with [this@min]
+     * @returns the minimum [this@min] if it is less than [b] or [b] otherwise
      */
-    fun min(a: F, b: F): F = if (lt(a, b)) a else b
+    fun F.min(b: F): F = if (lt(b)) this else b
 
     /**
-     * Sorts [a] and [b] in terms of order.
+     * Sorts [this@sort] and [b] in terms of order.
      *
-     * @param a object to compare with [b]
-     * @param b object to compare with [a]
-     * @returns a sorted [Tuple2] of [a] and [b].
+     * @param this@sort object to compare with [b]
+     * @param b object to compare with [this@sort]
+     * @returns a sorted [Tuple2] of [this@sort] and [b].
      */
-    fun sort(a: F, b: F): Tuple2<F, F> = if (gte(a, b)) Tuple2(a, b) else Tuple2(b, a)
+    fun F.sort(b: F): Tuple2<F, F> = if (gte(b)) Tuple2(this, b) else Tuple2(b, this)
 
     companion object {
 
@@ -99,7 +99,7 @@ interface Order<F> : Eq<F> {
          * @returns an [Order] instance that is defined by the [compare] function.
          */
         inline operator fun <F> invoke(crossinline compare: (F, F) -> Int): Order<F> = object : Order<F> {
-            override fun compare(a: F, b: F): Int = compare(a, b)
+            override fun F.compare(b: F): Int = compare(this, b)
         }
 
         /**
@@ -108,7 +108,7 @@ interface Order<F> : Eq<F> {
          * @returns an [Order] instance wherefore all instances of type [F] are equal.
          */
         fun <F> allEqual(): Order<F> = object : Order<F> {
-            override fun compare(a: F, b: F): Int = 0
+            override fun F.compare(b: F): Int = 0
         }
 
     }

@@ -3,7 +3,7 @@ package arrow.instances
 import arrow.typeclasses.Eq
 
 object BooleanEqInstance : Eq<Boolean> {
-    override fun eqv(a: Boolean, b: Boolean): Boolean = a == b
+    override fun Boolean.eqv(b: Boolean): Boolean = this == b
 }
 
 object BooleanEqInstanceImplicits {

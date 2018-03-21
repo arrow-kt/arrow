@@ -6,7 +6,6 @@ import io.kotlintest.properties.forAll
 import arrow.core.Some
 import arrow.core.getOrElse
 import arrow.data.k
-import arrow.prisms
 import arrow.syntax.collections.firstOption
 import arrow.syntax.foldable.combineAll
 import org.junit.runner.RunWith
@@ -162,7 +161,7 @@ class PrismTest : UnitSpec() {
         "Checking if a prism exists with a target" {
             forAll(SumGen, SumGen, Gen.bool(), { a, other, bool ->
                 Prism.only(a, object : Eq<SumType> {
-                    override fun eqv(a: SumType, b: SumType): Boolean = bool
+                    override fun SumType.eqv(b: SumType): Boolean = bool
                 }).isEmpty(other) == bool
             })
         }

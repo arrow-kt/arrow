@@ -50,11 +50,11 @@ interface MapKEqInstance<K, A> : Eq<MapK<K, A>> {
 
     fun EQA(): Eq<A>
 
-    override fun eqv(a: MapK<K, A>, b: MapK<K, A>): Boolean =
-            if (SetKEqInstanceImplicits.instance(EQK()).eqv(a.keys.k(), b.keys.k())) {
-                a.keys.map { key ->
+    override fun MapK<K, A>.eqv(b: MapK<K, A>): Boolean =
+            if (SetKEqInstanceImplicits.instance(EQK()).eqv(keys.k(), b.keys.k())) {
+                keys.map { key ->
                     b[key]?.let {
-                        EQA().eqv(a.getValue(key), it)
+                        EQA().run { getValue(key).eqv(it) }
                     } ?: false
                 }.fold(true) { b1, b2 -> b1 && b2 }
             } else false

@@ -17,8 +17,8 @@ interface NonEmptyListEqInstance<A> : Eq<NonEmptyList<A>> {
 
     fun EQ(): Eq<A>
 
-    override fun eqv(a: NonEmptyList<A>, b: NonEmptyList<A>): Boolean =
-            a.all.zip(b.all) { aa, bb -> EQ().eqv(aa, bb) }.fold(true) { acc, bool ->
+    override fun NonEmptyList<A>.eqv(b: NonEmptyList<A>): Boolean =
+            all.zip(b.all) { aa, bb -> EQ().run { aa.eqv(bb) } }.fold(true) { acc, bool ->
                 acc && bool
             }
 }

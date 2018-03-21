@@ -69,13 +69,13 @@ interface ValidatedEqInstance<L, R> : Eq<Validated<L, R>> {
 
     fun EQR(): Eq<R>
 
-    override fun eqv(a: Validated<L, R>, b: Validated<L, R>): Boolean = when (a) {
+    override fun Validated<L, R>.eqv(b: Validated<L, R>): Boolean = when (this) {
         is Valid -> when (b) {
             is Invalid -> false
-            is Valid -> EQR().eqv(a.a, b.a)
+            is Valid -> EQR().run { a.eqv(b.a) }
         }
         is Invalid -> when (b) {
-            is Invalid -> EQL().eqv(a.e, b.e)
+            is Invalid -> EQL().run { e.eqv(b.e) }
             is Valid -> false
         }
     }

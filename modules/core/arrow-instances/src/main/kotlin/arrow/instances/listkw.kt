@@ -20,11 +20,10 @@ interface ListKEqInstance<A> : Eq<ListK<A>> {
 
     fun EQ(): Eq<A>
 
-    override fun eqv(a: ListK<A>, b: ListK<A>): Boolean =
-            a.zip(b) { aa, bb -> EQ().eqv(aa, bb) }.fold(true) { acc, bool ->
+    override fun ListK<A>.eqv(b: ListK<A>): Boolean =
+            zip(b) { aa, bb -> EQ().run { aa.eqv(bb) } }.fold(true) { acc, bool ->
                 acc && bool
             }
-
 }
 
 @instance(ListK::class)

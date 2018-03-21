@@ -10,20 +10,20 @@ interface Eq<in F> {
     /**
      * Compares two instances of [F] and returns true if they're considered equal for this instance.
      *
-     * @param a object to compare with [b]
-     * @param b object to compare with [a]
-     * @returns true if [a] and [b] are equivalent, false otherwise.
+     * @param this@eqv object to compare with [b]
+     * @param b object to compare with [this@eqv]
+     * @returns true if [this@eqv] and [b] are equivalent, false otherwise.
      */
-    fun eqv(a: F, b: F): Boolean
+    fun F.eqv(b: F): Boolean
 
     /**
      * Compares two instances of [F] and returns true if they're considered not equal for this instance.
      *
-     * @param a object to compare with [b]
-     * @param b object to compare with [a]
-     * @returns false if [a] and [b] are equivalent, true otherwise.
+     * @param this@neqv object to compare with [b]
+     * @param b object to compare with [this@neqv]
+     * @returns false if [this@neqv] and [b] are equivalent, true otherwise.
      */
-    fun neqv(a: F, b: F): Boolean = !eqv(a, b)
+    fun F.neqv(b: F): Boolean = !eqv(b)
 
     companion object {
 
@@ -34,8 +34,8 @@ interface Eq<in F> {
          * @returns an [Eq] instance that is defined by the [feqv] function.
          */
         inline operator fun <F> invoke(crossinline feqv: (F, F) -> Boolean): Eq<F> = object : Eq<F> {
-            override fun eqv(a: F, b: F): Boolean =
-                    feqv(a, b)
+            override fun F.eqv(b: F): Boolean =
+                    feqv(this, b)
         }
 
         /**
@@ -46,9 +46,9 @@ interface Eq<in F> {
         fun any(): Eq<Any?> = EqAny
 
         private object EqAny : Eq<Any?> {
-            override fun eqv(a: Any?, b: Any?): Boolean = a == b
+            override fun Any?.eqv(b: Any?): Boolean = this == b
 
-            override fun neqv(a: Any?, b: Any?): Boolean = a != b
+            override fun Any?.neqv(b: Any?): Boolean = this != b
         }
     }
 }

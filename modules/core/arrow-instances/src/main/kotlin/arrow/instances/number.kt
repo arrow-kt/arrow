@@ -21,7 +21,7 @@ object ByteSemigroupInstanceImplicits {
 }
 
 object ByteOrderInstance : Order<Byte> {
-    override fun compare(a: Byte, b: Byte): Int = a.compareTo(b)
+    override fun Byte.compare(b: Byte): Int = compareTo(b)
 }
 
 object ByteOrderInstanceImplicits {
@@ -29,7 +29,7 @@ object ByteOrderInstanceImplicits {
 }
 
 object ByteEqInstance : Eq<Byte> {
-    override fun eqv(a: Byte, b: Byte): Boolean = a == b
+    override fun Byte.eqv(b: Byte): Boolean = this == b
 }
 
 object ByteEqInstanceImplicits {
@@ -59,7 +59,7 @@ object DoubleSemigroupInstanceImplicits {
 }
 
 object DoubleOrderInstance : Order<Double> {
-    override fun compare(a: Double, b: Double): Int = a.compareTo(b)
+    override fun Double.compare(b: Double): Int = compareTo(b)
 }
 
 object DoubleOrderInstanceImplicits {
@@ -67,7 +67,7 @@ object DoubleOrderInstanceImplicits {
 }
 
 object DoubleEqInstance : Eq<Double> {
-    override fun eqv(a: Double, b: Double): Boolean = a == b
+    override fun Double.eqv(b: Double): Boolean = this == b
 }
 
 object DoubleEqInstanceImplicits {
@@ -97,7 +97,7 @@ object IntSemigroupInstanceImplicits {
 }
 
 object IntEqInstance : Eq<Int> {
-    override fun eqv(a: Int, b: Int): Boolean = a == b
+    override fun Int.eqv(b: Int): Boolean = this == b
 }
 
 object IntEqInstanceImplicits {
@@ -113,7 +113,7 @@ object IntShowInstanceImplicits {
 }
 
 object IntOrderInstance : Order<Int> {
-    override fun compare(a: Int, b: Int): Int = a.compareTo(b)
+    override fun Int.compare(b: Int): Int = compareTo(b)
 }
 
 object IntOrderInstanceImplicits {
@@ -135,7 +135,7 @@ object LongSemigroupInstanceImplicits {
 }
 
 object LongOrderInstance : Order<Long> {
-    override fun compare(a: Long, b: Long): Int = a.compareTo(b)
+    override fun Long.compare(b: Long): Int = compareTo(b)
 }
 
 object LongOrderInstanceImplicits {
@@ -143,7 +143,7 @@ object LongOrderInstanceImplicits {
 }
 
 object LongEqInstance : Eq<Long> {
-    override fun eqv(a: Long, b: Long): Boolean = a == b
+    override fun Long.eqv(b: Long): Boolean = this == b
 }
 
 object LongEqInstanceImplicits {
@@ -173,7 +173,7 @@ object ShortSemigroupInstanceImplicits {
 }
 
 object ShortOrderInstance : Order<Short> {
-    override fun compare(a: Short, b: Short): Int = a.compareTo(b)
+    override fun Short.compare(b: Short): Int = compareTo(b)
 }
 
 object ShortOrderInstanceImplicits {
@@ -181,7 +181,7 @@ object ShortOrderInstanceImplicits {
 }
 
 object ShortEqInstance : Eq<Short> {
-    override fun eqv(a: Short, b: Short): Boolean = a == b
+    override fun Short.eqv(b: Short): Boolean = this == b
 }
 
 object ShortEqInstanceImplicits {
@@ -211,7 +211,7 @@ object FloatSemigroupInstanceImplicits {
 }
 
 object FloatOrderInstance : Order<Float> {
-    override fun compare(a: Float, b: Float): Int = a.compareTo(b)
+    override fun Float.compare(b: Float): Int = compareTo(b)
 }
 
 object FloatOrderInstanceImplicits {
@@ -219,7 +219,7 @@ object FloatOrderInstanceImplicits {
 }
 
 object FloatEqInstance : Eq<Float> {
-    override fun eqv(a: Float, b: Float): Boolean = a == b
+    override fun Float.eqv(b: Float): Boolean = this == b
 }
 
 object FloatEqInstanceImplicits {

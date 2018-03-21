@@ -60,7 +60,7 @@ internal val userSetter: Setter<User, Token> = Setter { s ->
 internal data class Token(val value: String) {
     companion object {
         fun eq() = object : Eq<Token> {
-            override fun eqv(a: Token, b: Token): Boolean = a == b
+            override fun Token.eqv(b: Token): Boolean = this == b
         }
     }
 }
