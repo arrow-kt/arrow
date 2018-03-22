@@ -6,8 +6,8 @@ import arrow.data.*
 import arrow.instance
 import arrow.instances.OptionTFunctorInstance
 import arrow.instances.OptionTTraverseInstance
-import arrow.mtl.FunctorFilter
-import arrow.mtl.TraverseFilter
+import arrow.mtl.typeclasses.FunctorFilter
+import arrow.mtl.typeclasses.TraverseFilter
 import arrow.mtl.syntax.traverseFilter
 import arrow.typeclasses.Applicative
 
@@ -26,7 +26,7 @@ interface OptionTTraverseFilterInstance<F> :
 
     override fun FFF(): TraverseFilter<F>
 
-    override fun <G, A, B> traverseFilter(fa: OptionTOf<F, A>, f: (A) -> Kind<G, Option<B>>, GA: Applicative<G>): Kind<G, OptionT<F, B>> =
+    override fun <G, A, B> traverseFilter(GA: Applicative<G>, fa: Kind<OptionTPartialOf<F>, A>, f: (A) -> Kind<G, Option<B>>): Kind<G, OptionT<F, B>> =
             fa.fix().traverseFilter(f, GA, FFF())
 
 }

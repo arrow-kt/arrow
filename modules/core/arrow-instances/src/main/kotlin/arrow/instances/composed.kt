@@ -99,7 +99,7 @@ interface ComposedSemigroupK<F, G> : SemigroupK<Nested<F, G>> {
     }
 }
 
-inline fun <F, G> SemigroupK<F>.compose(): SemigroupK<Nested<F, G>> = object : ComposedSemigroupK<F, G> {
+fun <F, G> SemigroupK<F>.compose(): SemigroupK<Nested<F, G>> = object : ComposedSemigroupK<F, G> {
     override fun F(): SemigroupK<F> = this@compose
 }
 

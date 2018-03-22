@@ -6,7 +6,7 @@ import arrow.data.Function1PartialOf
 import arrow.data.fix
 import arrow.instance
 import arrow.instances.Function1MonadInstance
-import arrow.mtl.MonadReader
+import arrow.mtl.typeclasses.MonadReader
 
 @instance(Function1::class)
 interface Function1MonadReaderInstance<I> : Function1MonadInstance<I>, MonadReader<Function1PartialOf<I>, I> {

@@ -1,9 +1,8 @@
-package arrow.mtl
+package arrow.mtl.typeclasses
 
-import arrow.*
+import arrow.Kind
 import arrow.typeclasses.Monad
 
-@typeclass
 interface MonadReader<F, D> : Monad<F> {
     /** Get the environment */
     fun ask(): Kind<F, D>
@@ -14,7 +13,3 @@ interface MonadReader<F, D> : Monad<F> {
     /** Retrieves a function of the environment */
     fun <A> reader(f: (D) -> A): Kind<F, A> = map(ask(), f)
 }
-
-inline fun <reified F, A, reified D> Kind<F, A>.local(FT: MonadReader<F, D> = monadReader(), noinline f: (D) -> D): Kind<F, A> = FT.local(f, this)
-
-inline fun <reified F, A, reified D> ((D) -> A).reader(FT: MonadReader<F, D> = monadReader()): Kind<F, A> = FT.reader(this)

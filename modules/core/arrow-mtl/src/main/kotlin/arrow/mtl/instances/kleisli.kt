@@ -1,9 +1,12 @@
 package arrow.mtl.instances
 
-import arrow.*
-import arrow.data.*
+import arrow.data.Kleisli
+import arrow.data.KleisliOf
+import arrow.data.KleisliPartialOf
+import arrow.data.fix
+import arrow.instance
 import arrow.instances.KleisliMonadInstance
-import arrow.mtl.MonadReader
+import arrow.mtl.typeclasses.MonadReader
 
 @instance(Kleisli::class)
 interface KleisliMonadReaderInstance<F, D> : KleisliMonadInstance<F, D>, MonadReader<KleisliPartialOf<F, D>, D> {

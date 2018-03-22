@@ -1,11 +1,10 @@
-package arrow.mtl
+package arrow.mtl.typeclasses
 
-import arrow.*
+import arrow.Kind
 import arrow.core.Tuple2
 import arrow.typeclasses.Monad
 
-@typeclass
-interface MonadState<F, S> : Monad<F>, TC {
+interface MonadState<F, S> : Monad<F> {
 
     fun <A> state(f: (S) -> Tuple2<S, A>): Kind<F, A> = flatMap(get(), { s -> f(s).let { (a, b) -> map(set(a), { b }) } })
 

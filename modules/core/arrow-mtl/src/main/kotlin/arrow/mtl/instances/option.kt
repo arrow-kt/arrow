@@ -1,11 +1,12 @@
 package arrow.mtl.instances
 
+import arrow.Kind
 import arrow.core.*
 import arrow.instance
 import arrow.instances.traverse
 import arrow.instances.traverseFilter
-import arrow.mtl.MonadFilter
-import arrow.mtl.TraverseFilter
+import arrow.mtl.typeclasses.MonadFilter
+import arrow.mtl.typeclasses.TraverseFilter
 import arrow.typeclasses.Applicative
 
 @instance(Option::class)
@@ -13,14 +14,14 @@ interface OptionTraverseFilterInstance : TraverseFilter<ForOption> {
     override fun <A> filter(fa: OptionOf<A>, f: kotlin.Function1<A, kotlin.Boolean>): Option<A> =
             fa.fix().filter(f)
 
-    override fun <G, A, B> traverseFilter(fa: OptionOf<A>, f: kotlin.Function1<A, arrow.Kind<G, Option<B>>>, GA: Applicative<G>): arrow.Kind<G, Option<B>> =
+    override fun <G, A, B> traverseFilter(GA: Applicative<G>, fa: Kind<ForOption, A>, f: (A) -> Kind<G, Option<B>>): arrow.Kind<G, Option<B>> =
             fa.fix().traverseFilter(f, GA)
 
     override fun <A, B> map(fa: OptionOf<A>, f: kotlin.Function1<A, B>): Option<B> =
             fa.fix().map(f)
 
-    override fun <G, A, B> traverse(fa: OptionOf<A>, f: kotlin.Function1<A, arrow.Kind<G, B>>, GA: Applicative<G>): arrow.Kind<G, Option<B>> =
-            fa.fix().traverse(f, GA)
+    override fun <G, A, B> Applicative<G>.traverse(fa: Kind<ForOption, A>, f: (A) -> Kind<G, B>): arrow.Kind<G, Option<B>> =
+            fa.fix().traverse(f, this)
 
     override fun <A> exists(fa: OptionOf<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
             fa.fix().exists(p)

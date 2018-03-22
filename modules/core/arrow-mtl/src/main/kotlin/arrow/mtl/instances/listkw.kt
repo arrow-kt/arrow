@@ -5,9 +5,9 @@ import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.data.*
 import arrow.instance
-import arrow.mtl.FunctorFilter
-import arrow.mtl.MonadCombine
-import arrow.mtl.MonadFilter
+import arrow.mtl.typeclasses.FunctorFilter
+import arrow.mtl.typeclasses.MonadCombine
+import arrow.mtl.typeclasses.MonadFilter
 
 @instance(ListK::class)
 interface ListKMonadCombineInstance : MonadCombine<ForListK> {

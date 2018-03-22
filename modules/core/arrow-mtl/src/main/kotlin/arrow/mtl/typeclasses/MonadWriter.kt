@@ -1,12 +1,11 @@
-package arrow.mtl
+package arrow.mtl.typeclasses
 
-import arrow.*
+import arrow.Kind
 import arrow.core.Tuple2
 import arrow.typeclasses.Monad
 
 /** A monad that support monoidal accumulation (e.g. logging List<String>) */
-@typeclass
-interface MonadWriter<F, W> : Monad<F>, TC {
+interface MonadWriter<F, W> : Monad<F> {
 
     /** Lift a writer action into the effect */
     fun <A> writer(aw: Tuple2<W, A>): Kind<F, A>
@@ -25,9 +24,4 @@ interface MonadWriter<F, W> : Monad<F>, TC {
 
     /** Modify the accumulator */
     fun <A> censor(fa: Kind<F, A>, f: (W) -> W): Kind<F, A> = flatMap(listen(fa)) { writer(Tuple2(f(it.a), it.b)) }
-
-    companion object {
-
-        inline fun <reified F, reified W> invoke(MWF: MonadWriter<F, W> = monadWriter()) = MWF
-    }
 }

@@ -1,4 +1,4 @@
-package arrow.mtl
+package arrow.mtl.typeclasses
 
 import arrow.Kind
 import arrow.typeclasses.MonadContinuation

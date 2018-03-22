@@ -1,14 +1,11 @@
-package arrow.mtl
+package arrow.mtl.typeclasses
 
 import arrow.Kind
-import arrow.TC
 import arrow.core.Option
-import arrow.typeclass
 import arrow.typeclasses.Monad
 import kotlin.coroutines.experimental.startCoroutine
 
-@typeclass
-interface MonadFilter<F> : Monad<F>, FunctorFilter<F>, TC {
+interface MonadFilter<F> : Monad<F>, FunctorFilter<F> {
 
     fun <A> empty(): Kind<F, A>
 

@@ -7,8 +7,8 @@ import arrow.data.StateTPartialOf
 import arrow.instance
 import arrow.instances.StateTMonadInstance
 import arrow.instances.StateTSemigroupKInstance
-import arrow.mtl.MonadCombine
-import arrow.mtl.MonadState
+import arrow.mtl.typeclasses.MonadCombine
+import arrow.mtl.typeclasses.MonadState
 import arrow.typeclasses.Monad
 import arrow.typeclasses.SemigroupK
 
