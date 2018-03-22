@@ -2,6 +2,10 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.Effect
+import arrow.effects.typeclasses.MonadSuspend
+import arrow.effects.typeclasses.Proc
 import arrow.instance
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.MonadError
@@ -60,8 +64,8 @@ interface IOMonoidInstance<A> : Monoid<Kind<ForIO, A>>, Semigroup<Kind<ForIO, A>
 
     fun SM(): Monoid<A>
 
-    override fun combine(a: IOOf<A>, b: IOOf<A>): IO<A> =
-            a.fix().flatMap { a1: A -> b.fix().map { a2: A -> SM().combine(a1, a2) } }
+    override fun IOOf<A>.combine(b: IOOf<A>): IO<A> =
+            fix().flatMap { a1: A -> b.fix().map { a2: A -> SM().run { a1.combine(a2) } } }
 
     override fun empty(): IO<A> = IO.pure(SM().empty())
 }
@@ -71,6 +75,6 @@ interface IOSemigroupInstance<A> : Semigroup<Kind<ForIO, A>> {
 
     fun SG(): Semigroup<A>
 
-    override fun combine(a: IOOf<A>, b: IOOf<A>): IO<A> =
-            a.fix().flatMap { a1: A -> b.fix().map { a2: A -> SG().combine(a1, a2) } }
+    override fun IOOf<A>.combine(b: IOOf<A>): IO<A> =
+            fix().flatMap { a1: A -> b.fix().map { a2: A -> SG().run { a1.combine(a2) } } }
 }

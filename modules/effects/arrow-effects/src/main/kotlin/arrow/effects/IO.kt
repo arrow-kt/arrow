@@ -6,6 +6,8 @@ import arrow.deriving
 import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
+import arrow.effects.typeclasses.Duration
+import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
