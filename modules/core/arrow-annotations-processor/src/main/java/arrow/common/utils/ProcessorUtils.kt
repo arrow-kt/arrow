@@ -59,14 +59,14 @@ interface ProcessorUtils : KotlinMetadataUtils {
         val interfaces = current.classProto.supertypes(typeTable).map {
             it.extractFullName(current, failOnGeneric = false)
         }.filter {
-                    it != "`arrow`.`TC`"
-                }
+            it != "`kotlin`.`Any`"
+        }
         return when {
             interfaces.isEmpty() -> acc
             else -> {
                 interfaces.flatMap { i ->
                     val className = i.removeBackticks().substringBefore("<")
-                    val typeClassElement = elementUtils.getTypeElement(className)
+                    val typeClassElement = elementUtils.getTypeElement(className) ?: knownError("Could not find typeclass $className")
                     val parentInterface = getClassOrPackageDataWrapper(typeClassElement)
                     val newAcc = acc + parentInterface
                     recurseTypeclassInterfaces(parentInterface as ClassOrPackageDataWrapper.Class, typeTable, newAcc)
