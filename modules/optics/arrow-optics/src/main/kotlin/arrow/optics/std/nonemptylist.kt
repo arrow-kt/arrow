@@ -2,7 +2,6 @@ package arrow.optics
 
 import arrow.core.*
 import arrow.data.NonEmptyList
-import arrow.data.NonEmptyListOf
 import arrow.data.fix
 
 /**

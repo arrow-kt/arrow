@@ -18,7 +18,7 @@ data class Coproduct<F, G, A>(val run: Either<Kind<F, A>, Kind<G, A>>) : Coprodu
             ))
 
     fun extract(CF: Comonad<F>, CG: Comonad<G>): A =
-            run.fold({ CF.run{ it.extract() } }, { CG.run { it.extract() } })
+            run.fold({ CF.run { it.extract() } }, { CG.run { it.extract() } })
 
     fun <H> fold(f: FunctionK<F, H>, g: FunctionK<G, H>): Kind<H, A> =
             run.fold({ f(it) }, { g(it) })

@@ -2,7 +2,6 @@ package arrow.optics
 
 import arrow.core.*
 import arrow.data.Validated
-import arrow.data.ValidatedOf
 import arrow.data.fix
 
 /**

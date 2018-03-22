@@ -1,7 +1,6 @@
 package arrow.optics
 
 import arrow.core.Id
-import arrow.core.IdOf
 import arrow.core.value
 
 /**
