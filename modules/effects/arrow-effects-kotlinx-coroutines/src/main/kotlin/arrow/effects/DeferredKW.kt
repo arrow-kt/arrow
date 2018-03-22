@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.core.*
 import arrow.core.Try
 import arrow.deriving
+import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor

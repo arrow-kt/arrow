@@ -2,6 +2,10 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.Effect
+import arrow.effects.typeclasses.MonadSuspend
+import arrow.effects.typeclasses.Proc
 import arrow.instance
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.MonadError
