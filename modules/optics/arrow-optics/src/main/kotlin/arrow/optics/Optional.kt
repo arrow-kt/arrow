@@ -1,16 +1,17 @@
 package arrow.optics
 
-import arrow.*
+import arrow.Kind
 import arrow.core.*
+import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monoid
-import arrow.typeclasses.applicative
 
 /**
  * [Optional] is a type alias for [POptional] which fixes the type arguments
  * and restricts the [POptional] to monomorphic updates.
  */
 typealias Optional<S, A> = POptional<S, S, A, A>
+
 typealias ForOptional = ForPOptional
 typealias OptionalOf<S, A> = POptionalOf<S, S, A, A>
 typealias OptionalPartialOf<S> = Kind<ForOptional, S>
@@ -230,47 +231,35 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
                 this@POptional.modifyF(FA, s, f)
     }
 
+    /**
+     * Modify the focus of a [POptional] with a function [f]
+     */
+    fun modify(s: S, f: (A) -> B): T = getOrModify(s).fold(::identity, { a -> set(s, f(a)) })
+
+    /**
+     * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
+     */
+    fun lift(f: (A) -> B): (S) -> T = { s -> modify(s, f) }
+
+    /**
+     * Modify the focus of a [POptional] with a function [f]
+     * @return [Option.None] if the [POptional] is not matching
+     */
+    fun modifiyOption(s: S, f: (A) -> B): Option<T> = getOption(s).map({ set(s, f(it)) })
+
+    /**
+     * Find the focus that satisfies the predicate [p]
+     */
+    fun find(s: S, p: (A) -> Boolean): Option<A> =
+            getOption(s).flatMap { b -> if (p(b)) Some(b) else None }
+
+    /**
+     * Check if there is a focus and it satisfies the predicate [p]
+     */
+    fun exists(s: S, p: (A) -> Boolean): Boolean = getOption(s).fold({ false }, p)
+
+    /**
+     * Check if there is no focus or the target satisfies the predicate [p]
+     */
+    fun all(s: S, p: (A) -> Boolean): Boolean = getOption(s).fold({ true }, p)
 }
-
-/**
- * Modify the focus of a [POptional] with a function [f]
- */
-inline fun <S, T, A, B> POptional<S, T, A, B>.modify(s: S, crossinline f: (A) -> B): T = getOrModify(s).fold(::identity, { a -> set(s, f(a)) })
-
-/**
- * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
- */
-inline fun <S, T, A, B> POptional<S, T, A, B>.lift(crossinline f: (A) -> B): (S) -> T = { s -> modify(s, f) }
-
-/**
- * Modify the focus of a [POptional] with an [Applicative] function [f]
- */
-inline fun <S, T, A, B, reified F> POptional<S, T, A, B>.modifyF(s: S, crossinline f: (A) -> Kind<F, B>, FA: Applicative<F> = applicative()): Kind<F, T> =
-        modifyF(FA, s) { a -> f(a) }
-
-/**
- * Lift a function [f]: `(A) -> Kind<F, B> to the context of `S`: `(S) -> Kind<F, T>` with an [Applicative] function [f]
- */
-inline fun <S, T, A, B, reified F> POptional<S, T, A, B>.liftF(crossinline f: (A) -> Kind<F, B>, FA: Applicative<F> = applicative()): (S) -> Kind<F, T> = liftF(FA) { a -> f(a) }
-
-/**
- * Modify the focus of a [POptional] with a function [f]
- * @return [Option.None] if the [POptional] is not matching
- */
-inline fun <S, T, A, B> POptional<S, T, A, B>.modifiyOption(s: S, crossinline f: (A) -> B): Option<T> = getOption(s).map({ set(s, f(it)) })
-
-/**
- * Find the focus that satisfies the predicate [p]
- */
-inline fun <S, T, A, B> POptional<S, T, A, B>.find(s: S, crossinline p: (A) -> Boolean): Option<A> =
-        getOption(s).flatMap { b -> if (p(b)) Some(b) else None }
-
-/**
- * Check if there is a focus and it satisfies the predicate [p]
- */
-inline fun <S, T, A, B> POptional<S, T, A, B>.exists(s: S, crossinline p: (A) -> Boolean): Boolean = getOption(s).fold({ false }, p)
-
-/**
- * Check if there is no focus or the target satisfies the predicate [p]
- */
-inline fun <S, T, A, B> POptional<S, T, A, B>.all(s: S, crossinline p: (A) -> Boolean): Boolean = getOption(s).fold({ true }, p)

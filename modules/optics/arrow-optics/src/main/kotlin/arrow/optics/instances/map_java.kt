@@ -1,25 +1,16 @@
 package java_util
 
 import arrow.Kind
+import arrow.core.Left
 import arrow.core.Option
 import arrow.core.Predicate
-import arrow.data.ListK
-import arrow.data.MapK
-import arrow.data.fix
-import arrow.data.getOption
-import arrow.data.k
-import arrow.data.traverse
-import arrow.optics.Lens
-import arrow.optics.Optional
-import arrow.optics.PLens
-import arrow.optics.POptional
-import arrow.optics.Traversal
+import arrow.core.Right
+import arrow.data.*
+import arrow.optics.*
 import arrow.optics.typeclasses.At
 import arrow.optics.typeclasses.Each
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
-import arrow.syntax.either.left
-import arrow.syntax.either.right
 import arrow.typeclasses.Applicative
 
 interface MapAtInstance<K, V> : At<Map<K, V>, K, Option<V>> {
@@ -35,58 +26,60 @@ interface MapAtInstance<K, V> : At<Map<K, V>, K, Option<V>> {
                 }
             }
     )
-}
 
-object MapAtInstanceImplicits {
-    @JvmStatic
-    fun <K, V> instance(): At<Map<K, V>, K, Option<V>> = object : MapAtInstance<K, V> {}
-}
-
-interface MapKEachInstance<K, V> : Each<Map<K, V>, V> {
-    override fun each() = object : Traversal<Map<K, V>, V> {
-        override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> =
-                MapK.traverse<K>().traverse(s.k(), f, FA).let {
-                    FA.map(it) {
-                        it.fix().map
-                    }
-                }
-
+    companion object {
+        operator fun <K, V> invoke() = object : MapAtInstance<K, V> {}
     }
 }
 
-object MapEachInstanceImplicits {
-    @JvmStatic
-    fun <K, V> instance(): Each<Map<K, V>, V> = object : MapKEachInstance<K, V> {}
+interface MapEachInstance<K, V> : Each<Map<K, V>, V> {
+    override fun each() = object : Traversal<Map<K, V>, V> {
+        override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> =
+                MapK.traverse<K>().run { FA.traverse(s.k(), f) }
+                        .let {
+                            FA.map(it) {
+                                it.fix().map
+                            }
+                        }
+
+    }
+
+    companion object {
+        operator fun <K, V> invoke() = object : MapEachInstance<K, V> {}
+    }
 }
 
 interface MapFilterIndexInstance<K, V> : FilterIndex<Map<K, V>, K, V> {
     override fun filter(p: Predicate<K>) = object : Traversal<Map<K, V>, V> {
         override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> =
-                ListK.traverse().traverse(s.toList().k(), { (k, v) ->
-                    FA.map(if (p(k)) f(v) else FA.pure(v)) {
-                        k to it
-                    }
-                }, FA).let {
-                    FA.map(it) {
-                        it.toMap()
+                ListK.traverse().run {
+                    FA.run {
+                        traverse(s.toList().k(), { (k, v) ->
+                            FA.map(if (p(k)) f(v) else FA.pure(v)) {
+                                k to it
+                            }
+                        })
                     }
                 }
+                        .let {
+                            FA.map(it) {
+                                it.toMap()
+                            }
+                        }
     }
-}
 
-object MapFilterIndexInstanceImplicits {
-    @JvmStatic
-    fun <K, V> instance(): FilterIndex<Map<K, V>, K, V> = object : MapFilterIndexInstance<K, V> {}
+    companion object {
+        operator fun <K, V> invoke() = object : MapFilterIndexInstance<K, V> {}
+    }
 }
 
 interface MapIndexInstance<K, V> : Index<Map<K, V>, K, V> {
     override fun index(i: K): Optional<Map<K, V>, V> = POptional(
-            getOrModify = { it[i]?.right() ?: it.left() },
+            getOrModify = { it[i]?.let(::Right) ?: it.let(::Left) },
             set = { v -> { m -> m.mapValues { (k, vv) -> if (k == i) v else vv } } }
     )
-}
 
-object MapIndexInstanceImplicits {
-    @JvmStatic
-    fun <K, V> instance(): Index<Map<K, V>, K, V> = object : MapIndexInstance<K, V> {}
+    companion object {
+        operator fun <K, V> invoke() = object : MapIndexInstance<K, V> {}
+    }
 }

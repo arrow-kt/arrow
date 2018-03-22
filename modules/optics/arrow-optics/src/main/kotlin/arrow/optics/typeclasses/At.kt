@@ -1,12 +1,10 @@
 package arrow.optics.typeclasses
 
-import arrow.TC
 import arrow.core.None
 import arrow.core.Option
 import arrow.optics.Iso
 import arrow.optics.Lens
 import arrow.optics.lift
-import arrow.typeclass
 
 /**
  * [At] provides a [Lens] for a structure [S] to focus in [A] at a given index [I].
@@ -15,8 +13,7 @@ import arrow.typeclass
  * @param I index that uniquely identifies the focus of the [Lens]
  * @param A focus that is supposed to be unique for a given pair [S] and [I].
  */
-@typeclass
-interface At<S, I, A> : TC {
+interface At<S, I, A> {
 
     /**
      * Get a [Lens] for a structure [S] with focus in [A] at index [i].
@@ -39,16 +36,6 @@ interface At<S, I, A> : TC {
     }
 
 }
-
-/**
- * Get an [At] for an index [i] given an [Index].
- */
-inline fun <reified S, reified I, reified A> At.Companion.at(i: I, AT: At<S, I, A> = arrow.optics.typeclasses.at()): Lens<S, A> = AT.at(i)
-
-/**
- * Lift an instance of [At] using an [Iso].
- */
-inline fun <reified S, reified U, reified I, reified A> At.Companion.fromIso(iso: Iso<S, U>, AT: At<U, I, A> = arrow.optics.typeclasses.at()) = At.fromIso(AT, iso)
 
 /**
  * Delete a value associated with a key in a Map-like container

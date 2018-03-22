@@ -1,11 +1,13 @@
 package arrow.optics
 
-import arrow.*
+import arrow.Kind
 import arrow.core.*
 import arrow.data.*
-import arrow.instances.*
-import arrow.syntax.applicative.*
-import arrow.typeclasses.*
+import arrow.higherkind
+import arrow.instances.IntMonoid
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Traverse
 
 /**
  * [Traversal] is a type alias for [PTraversal] which fixes the type arguments
@@ -46,7 +48,7 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
          */
         fun <T, A, B> fromTraversable(TT: Traverse<T>) = object : PTraversal<Kind<T, A>, Kind<T, B>, A, B> {
             override fun <F> modifyF(FA: Applicative<F>, s: Kind<T, A>, f: (A) -> Kind<F, B>): Kind<F, Kind<T, B>> =
-                    TT.traverse(s, f, FA)
+                    TT.run { FA.traverse(s, f) }
         }
 
         /**
@@ -311,55 +313,44 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
                 this@PTraversal.foldMap(M, s, f)
     }
 
+    /**
+     * Find the first target matching the predicate
+     */
+    fun find(s: S, p: (A) -> Boolean): Option<A> = foldMap(firstOptionMonoid<A>(), s, { a ->
+        if (p(a)) Const(Some(a))
+        else Const(None)
+    }).value
+
+    /**
+     * Map each target to a Monoid and combine the results
+     */
+    fun <R> foldMap(s: S, f: (A) -> R, M: Monoid<R>): R =
+            modifyF(Const.applicative(M), s, { b -> Const(f(b)) }).value()
+
+    /**
+     * Modify polymorphically the target of a [PTraversal] with a function [f]
+     */
+    fun modify(s: S, f: (A) -> B): T = modifyF(Id.applicative(), s, { b -> Id(f(b)) }).value()
+
+    /**
+     * Check whether at least one element satisfies the predicate.
+     *
+     * If there are no elements, the result is false.
+     */
+    fun exist(s: S, p: (A) -> Boolean): Boolean = find(s, p).fold({ false }, { true })
+
+    /**
+     * Check if forall targets satisfy the predicate
+     */
+    fun forall(s: S, p: (A) -> Boolean): Boolean = foldMap(s, p, AndMonoid)
+
+    /**
+     * Fold using the given [Monoid] instance.
+     */
+    fun fold(s: S, M: Monoid<A>): A = foldMap(s, ::identity, M)
+
+    /**
+     * Alias for fold.
+     */
+    fun combineAll(s: S, M: Monoid<A>): A = fold(s, M)
 }
-
-/**
- * Construct a [PTraversal] from a [Traverse] instance.
- */
-inline fun <reified T, A, B> PTraversal.Companion.fromTraversable(TT: Traverse<T> = traverse(), dummy: Unit = Unit) = PTraversal.Companion.fromTraversable<T, A, B>(TT)
-/**
- * Modify polymorphically the target of a [PTraversal] with an Applicative function
- */
-inline fun <S, T, A, B, reified F> PTraversal<S, T, A, B>.modifyF(s: S, crossinline f: (A) -> Kind<F, B>, AF: Applicative<F> = applicative()): Kind<F, T> =
-        modifyF(AF, s) { a -> f(a) }
-
-/**
- * Find the first target matching the predicate
- */
-inline fun <S, T, A, B> PTraversal<S, T, A, B>.find(s: S, crossinline p: (A) -> Boolean): Option<A> = foldMap(firstOptionMonoid<A>(), s, { a ->
-    if (p(a)) Const(Some(a))
-    else Const(None)
-}).value
-
-/**
- * Map each target to a Monoid and combine the results
- */
-inline fun <S, T, A, B, reified R> PTraversal<S, T, A, B>.foldMap(s: S, crossinline f: (A) -> R, M: Monoid<R> = monoid()): R =
-        modifyF(Const.applicative(M), s, { b -> Const(f(b)) }).value()
-
-/**
- * Modify polymorphically the target of a [PTraversal] with a function [f]
- */
-inline fun <S, T, A, B> PTraversal<S, T, A, B>.modify(s: S, crossinline f: (A) -> B): T = modifyF(Id.applicative(), s, { b -> Id(f(b)) }).value()
-
-/**
- * Check whether at least one element satisfies the predicate.
- *
- * If there are no elements, the result is false.
- */
-inline fun <S, T, A, B> PTraversal<S, T, A, B>.exist(s: S, crossinline p: (A) -> Boolean): Boolean = find(s, p).fold({ false }, { true })
-
-/**
- * Check if forall targets satisfy the predicate
- */
-inline fun <S, T, A, B> PTraversal<S, T, A, B>.forall(s: S, crossinline p: (A) -> Boolean): Boolean = foldMap(s, p, AndMonoid)
-
-/**
- * Fold using the given [Monoid] instance.
- */
-inline fun <S, T, reified A, B> PTraversal<S, T, A, B>.fold(s: S, M: Monoid<A> = monoid()): A = foldMap(s, ::identity, M)
-
-/**
- * Alias for fold.
- */
-inline fun <S, T, reified A, B> PTraversal<S, T, A, B>.combineAll(s: S, M: Monoid<A> = monoid()): A = fold(s, M)

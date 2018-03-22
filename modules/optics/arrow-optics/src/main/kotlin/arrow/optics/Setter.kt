@@ -1,15 +1,16 @@
 package arrow.optics
 
+import arrow.Kind
 import arrow.core.Either
+import arrow.higherkind
 import arrow.typeclasses.Functor
-import arrow.*
-import arrow.typeclasses.functor
 
 /**
  * [Setter] is a type alias for [PSetter] which fixes the type arguments
  * and restricts the [PSetter] to monomorphic updates.
  */
 typealias Setter<S, A> = PSetter<S, S, A, A>
+
 typealias ForSetter = ForPSetter
 typealias SetterOf<S, A> = PSetterOf<S, S, A, A>
 typealias SetterPartialOf<S> = Kind<ForSetter, S>
@@ -65,7 +66,7 @@ interface PSetter<S, T, A, B> : PSetterOf<S, T, A, B> {
         /**
          * Create a [PSetter] from a [arrow.Functor]
          */
-        inline fun <reified F, A, B> fromFunctor(FF: Functor<F> = functor()): PSetter<Kind<F, A>, Kind<F, B>, A, B> = PSetter { f ->
+        fun <F, A, B> fromFunctor(FF: Functor<F>): PSetter<Kind<F, A>, Kind<F, B>, A, B> = PSetter { f ->
             { fs: Kind<F, A> -> FF.map(fs, f) }
         }
     }

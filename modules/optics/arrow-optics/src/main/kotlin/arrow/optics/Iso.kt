@@ -1,17 +1,18 @@
 package arrow.optics
 
-import arrow.*
+import arrow.Kind
 import arrow.core.*
+import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monoid
-import arrow.typeclasses.functor
 
 /**
  * [Iso] is a type alias for [PIso] which fixes the type arguments
  * and restricts the [PIso] to monomorphic updates.
  */
 typealias Iso<S, A> = PIso<S, S, A, A>
+
 typealias ForIso = ForPIso
 typealias IsoOf<S, A> = PIsoOf<S, S, A, A>
 typealias IsoPartialOf<S> = Kind<ForIso, S>
@@ -248,39 +249,33 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
                 FA.map(f(get(s)), this@PIso::reverseGet)
     }
 
+    /**
+     * Lift a [PIso] to a Functor level
+     */
+    fun <F> mapping(FF: Functor<F>, dummy: Unit = Unit): PIso<Kind<F, S>, Kind<F, T>, Kind<F, A>, Kind<F, B>> = PIso(
+            { fa -> FF.map(fa, this::get) },
+            { fb -> FF.map(fb, this::reverseGet) }
+    )
+
+    /**
+     * Check if the focus satisfies the predicate
+     */
+    fun exist(s: S, p: (A) -> Boolean): Boolean = p(get(s))
+
+    /**
+     * Modify polymorphically the focus of a [PIso] with a function
+     */
+    fun modify(s: S, f: (A) -> B): T = reverseGet(f(get(s)))
+
+    /**
+     * Modify polymorphically the focus of a [PIso] with a function
+     */
+    fun lift(f: (A) -> B): (S) -> T = { s -> reverseGet(f(get(s))) }
+
+    /**
+     * Lift a function [f] with a functor: `(A) -> Kind<F, B> to the context of `S`: `(S) -> Kind<F, T>`
+     */
+    fun <F> liftF(FF: Functor<F>, dummy: Unit = Unit, f: (A) -> Kind<F, B>): (S) -> Kind<F, T> =
+            liftF(FF) { a -> f(a) }
+
 }
-
-/**
- * Lift a [PIso] to a Functor level
- */
-inline fun <S, T, A, B, reified F> PIso<S, T, A, B>.mapping(FF: Functor<F> = functor(), dummy: Unit = Unit): PIso<Kind<F, S>, Kind<F, T>, Kind<F, A>, Kind<F, B>> = PIso(
-        { fa -> FF.map(fa, this::get) },
-        { fb -> FF.map(fb, this::reverseGet) }
-)
-
-/**
- * Check if the focus satisfies the predicate
- */
-inline fun <S, T, A, B> PIso<S, T, A, B>.exist(s: S, crossinline p: (A) -> Boolean): Boolean = p(get(s))
-
-/**
- * Modify polymorphically the focus of a [PIso] with a function
- */
-inline fun <S, T, A, B> PIso<S, T, A, B>.modify(s: S, crossinline f: (A) -> B): T = reverseGet(f(get(s)))
-
-/**
- * Modify polymorphically the focus of a [PIso] with a function
- */
-inline fun <S, T, A, B> PIso<S, T, A, B>.lift(crossinline f: (A) -> B): (S) -> T = { s -> reverseGet(f(get(s))) }
-
-/**
- * Modify polymorphically the focus of a [PIso] with a Functor function
- */
-inline fun <S, T, A, B, reified F> PIso<S, T, A, B>.modifyF(s: S, crossinline f: (A) -> Kind<F, B>, FF: Functor<F> = functor()): Kind<F, T> =
-        modifyF(FF, s, { a -> f(a) })
-
-/**
- * Lift a function [f] with a functor: `(A) -> Kind<F, B> to the context of `S`: `(S) -> Kind<F, T>`
- */
-inline fun <S, T, A, B, reified F> PIso<S, T, A, B>.liftF(FF: Functor<F> = functor(), dummy: Unit = Unit, crossinline f: (A) -> Kind<F, B>): (S) -> Kind<F, T> =
-        liftF(FF) { a -> f(a) }

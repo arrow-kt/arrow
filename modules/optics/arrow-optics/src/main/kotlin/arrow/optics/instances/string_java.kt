@@ -3,13 +3,14 @@ package java_lang
 import arrow.optics.instances.StringFilterIndexInstance
 import arrow.optics.instances.StringIndexInstance
 
-object StringFilterIndexInstanceImplicits {
-    @JvmStatic
-    fun instance(): StringFilterIndexInstance = StringFilterIndexInstance
+interface StringFilterIndexInstance {
+    companion object {
+        operator fun invoke() = StringFilterIndexInstance
+    }
 }
 
-object StringIndexInstanceImplicits {
-    @JvmStatic
-    fun instance(): StringIndexInstance = StringIndexInstance
+interface StringIndexInstance {
+    companion object {
+        operator fun invoke() = StringIndexInstance
+    }
 }
-

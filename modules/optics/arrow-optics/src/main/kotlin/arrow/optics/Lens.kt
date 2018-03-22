@@ -1,17 +1,18 @@
 package arrow.optics
 
-import arrow.*
+import arrow.Kind
 import arrow.core.*
+import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monoid
-import arrow.typeclasses.functor
 
 /**
  * [Lens] is a type alias for [PLens] which fixes the type arguments
  * and restricts the [PLens] to monomorphic updates.
  */
 typealias Lens<S, A> = PLens<S, S, A, A>
+
 typealias ForLens = ForPLens
 typealias LensOf<S, A> = PLensOf<S, S, A, A>
 typealias LensPartialOf<S> = Kind<ForLens, S>
@@ -201,37 +202,31 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
                 FA.map(f(get(s)), { b -> this@PLens.set(s, b) })
     }
 
+    /**
+     * Modify the focus of s [PLens] using s function `(A) -> B`
+     */
+    fun modify(s: S, f: (A) -> B): T = set(s, f(get(s)))
+
+    /**
+     * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
+     */
+    fun lift(f: (A) -> B): (S) -> T = { s -> modify(s, f) }
+
+    /**
+     * Lift a function [f]: `(A) -> Kind<F, B> to the context of `S`: `(S) -> Kind<F, T>` using [Functor] function
+     */
+    fun <F> liftF(FF: Functor<F>, dummy: Unit = Unit, f: (A) -> Kind<F, B>): (S) -> Kind<F, T> = { s -> modifyF(FF, s) { a -> f(a) } }
+
+    /**
+     * Find a focus that satisfies the predicate
+     */
+    fun find(s: S, p: (A) -> Boolean): Option<A> = get(s).let { a ->
+        if (p(a)) Some(a) else None
+    }
+
+    /**
+     * Verify if the focus of a [PLens] satisfies the predicate
+     */
+    fun exist(s: S, p: (A) -> Boolean): Boolean = p(get(s))
+
 }
-
-/**
- * Modify the focus of s [PLens] using s function `(A) -> B`
- */
-inline fun <S, T, A, B> PLens<S, T, A, B>.modify(s: S, crossinline f: (A) -> B): T = set(s, f(get(s)))
-
-/**
- * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
- */
-inline fun <S, T, A, B> PLens<S, T, A, B>.lift(crossinline f: (A) -> B): (S) -> T = { s -> modify(s, f) }
-
-/**
- * Modify the focus of a [PLens] using [Functor] function
- */
-inline fun <S, T, A, B, reified F> PLens<S, T, A, B>.modifyF(s: S, f: (A) -> Kind<F, B>, FF: Functor<F> = functor()): Kind<F, T> =
-        FF.map(f(get(s)), { b -> set(s, b) })
-
-/**
- * Lift a function [f]: `(A) -> Kind<F, B> to the context of `S`: `(S) -> Kind<F, T>` using [Functor] function
- */
-inline fun <S, T, A, B, reified F> PLens<S, T, A, B>.liftF(FF: Functor<F> = functor(), dummy: Unit = Unit, crossinline f: (A) -> Kind<F, B>): (S) -> Kind<F, T> = { s -> modifyF(FF, s) { a -> f(a) } }
-
-/**
- * Find a focus that satisfies the predicate
- */
-inline fun <S, T, A, B> PLens<S, T, A, B>.find(s: S, crossinline p: (A) -> Boolean): Option<A> = get(s).let { a ->
-    if (p(a)) Some(a) else None
-}
-
-/**
- * Verify if the focus of a [PLens] satisfies the predicate
- */
-inline fun <S, T, A, B> PLens<S, T, A, B>.exist(s: S, crossinline p: (A) -> Boolean): Boolean = p(get(s))

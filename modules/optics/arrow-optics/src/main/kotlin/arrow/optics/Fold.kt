@@ -1,14 +1,15 @@
 package arrow.optics
 
-import arrow.*
+import arrow.Kind
 import arrow.core.*
 import arrow.data.Const
 import arrow.data.ListK
+import arrow.data.ListKOf
+import arrow.data.fix
+import arrow.higherkind
 import arrow.instances.IntMonoid
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Monoid
-import arrow.typeclasses.foldable
-import arrow.typeclasses.monoid
 
 /**
  * A [Fold] is an optic that allows to focus into structure and get multiple results.
@@ -52,8 +53,8 @@ interface Fold<S, A> : FoldOf<S, A> {
         /**
          * Create a [Fold] from a [arrow.Foldable]
          */
-        inline fun <reified F, S> fromFoldable(Foldable: Foldable<F> = foldable()) = object : Fold<Kind<F, S>, S> {
-            override fun <R> foldMap(M: Monoid<R>, s: Kind<F, S>, f: (S) -> R): R = Foldable.foldMap(M, s, f)
+        fun <F, S> fromFoldable(foldable: Foldable<F>) = object : Fold<Kind<F, S>, S> {
+            override fun <R> foldMap(M: Monoid<R>, s: Kind<F, S>, f: (S) -> R): R = foldable.run { M.foldMap(s, f) }
         }
 
     }
@@ -181,37 +182,37 @@ interface Fold<S, A> : FoldOf<S, A> {
     operator fun <C> plus(other: Iso<A, C>): Fold<S, C> = compose(other)
 
     operator fun <C> plus(other: Traversal<A, C>): Fold<S, C> = compose(other)
+
+    /**
+     * Map each target to a type R and use a Monoid to fold the results
+     */
+    fun <R> foldMap(s: S, f: (A) -> R, M: Monoid<R>): R = foldMap(M, s) { a -> f(a) }
+
+    /**
+     * Find the first element matching the predicate, if one exists.
+     */
+    fun find(s: S, p: (A) -> Boolean): Option<A> =
+            foldMap(firstOptionMonoid<A>(), s, { b -> (if (p(b)) Const(Some(b)) else Const(None)) }).value
+
+    /**
+     * Check whether at least one element satisfies the predicate.
+     *
+     * If there are no elements, the result is false.
+     */
+    fun exists(s: S, p: (A) -> Boolean): Boolean = find(s, p).fold({ false }, { true })
+
+    /**
+     * Fold using the given [Monoid] instance.
+     */
+    fun fold(s: S, M: Monoid<A>): A = foldMap(M, s, ::identity)
+
+    /**
+     * Alias for fold.
+     */
+    fun combineAll(s: S, M: Monoid<A>): A = foldMap(M, s, ::identity)
+
+    /**
+     * Get all targets of the [Fold]
+     */
+    fun getAll(s: S, M: Monoid<ListKOf<A>>): ListK<A> = foldMap(M, s, { ListK.pure(it) }).fix()
 }
-
-/**
- * Map each target to a type R and use a Monoid to fold the results
- */
-inline fun <S, A, reified R> Fold<S, A>.foldMap(s: S, noinline f: (A) -> R, M: Monoid<R> = monoid()): R = foldMap(M, s) { a -> f(a) }
-
-/**
- * Find the first element matching the predicate, if one exists.
- */
-inline fun <S, A> Fold<S, A>.find(s: S, crossinline p: (A) -> Boolean): Option<A> =
-        foldMap(firstOptionMonoid<A>(), s, { b -> (if (p(b)) Const(Some(b)) else Const(None)) }).value
-
-/**
- * Check whether at least one element satisfies the predicate.
- *
- * If there are no elements, the result is false.
- */
-inline fun <S, A> Fold<S, A>.exists(s: S, crossinline p: (A) -> Boolean): Boolean = find(s, p).fold({ false }, { true })
-
-/**
- * Fold using the given [Monoid] instance.
- */
-inline fun <S, reified A> Fold<S, A>.fold(s: S, M: Monoid<A> = monoid()): A = foldMap(M, s, ::identity)
-
-/**
- * Alias for fold.
- */
-inline fun <S, reified A> Fold<S, A>.combineAll(s: S, M: Monoid<A> = monoid()): A = foldMap(M, s, ::identity)
-
-/**
- * Get all targets of the [Fold]
- */
-inline fun <S, reified A> Fold<S, A>.getAll(s: S, M: Monoid<ListK<A>> = monoid()): ListK<A> = foldMap(M, s, { ListK.pure(it) })

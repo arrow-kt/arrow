@@ -1,10 +1,8 @@
 package arrow.optics.typeclasses
 
 import arrow.Kind
-import arrow.TC
 import arrow.optics.Iso
 import arrow.optics.Traversal
-import arrow.typeclass
 import arrow.typeclasses.Traverse
 
 /**
@@ -13,8 +11,7 @@ import arrow.typeclasses.Traverse
  * @param S source of the [Traversal].
  * @param A focus of [Traversal].
  */
-@typeclass
-interface Each<S, A> : TC {
+interface Each<S, A> {
 
     /**
      * Get a [Traversal] for a structure [S] with focus in [A].
@@ -37,13 +34,5 @@ interface Each<S, A> : TC {
             override fun each(): Traversal<Kind<S, A>, A> = Traversal.fromTraversable(T)
         }
     }
-
-}
-
-/**
- * Create an instance of [Each] from a [Traverse].
- */
-inline fun <reified S, A> Each.Companion.fromTraverse(T: Traverse<S>, dummy: Unit = Unit) = object : Each<Kind<S, A>, A> {
-    override fun each(): Traversal<Kind<S, A>, A> = Traversal.fromTraversable(T)
 
 }
