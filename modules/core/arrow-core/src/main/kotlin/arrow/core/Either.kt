@@ -1,7 +1,12 @@
 package arrow.core
 
-import arrow.*
-import arrow.legacy.*
+import arrow.Kind
+import arrow.core.Either.Left
+import arrow.core.Either.Right
+import arrow.higherkind
+import arrow.legacy.Disjunction
+import arrow.legacy.LeftProjection
+import arrow.legacy.RightProjection
 
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Either.scala
@@ -96,7 +101,8 @@ import arrow.legacy.*
      * Left(12).map { "flower" }  // Result: Left(12)
      * ```
      */
-    inline fun <C> map(crossinline f: (B) -> C): Either<A, C> = fold({ Left(it) }, { Right(f(it)) })
+    inline fun <C> map(crossinline f: (B) -> C): Either<A, C> =
+            fold({ Left(it) }, { Right(f(it)) })
 
     /**
      * The given function is applied if this is a `Left`.
@@ -107,12 +113,14 @@ import arrow.legacy.*
      * Left(12).mapLeft { "flower" }  // Result: Left("flower)
      * ```
      */
-    inline fun <C> mapLeft(crossinline f: (A) -> C): Either<C, B> = fold({ Left(f(it)) }, { Right(it) })
+    inline fun <C> mapLeft(crossinline f: (A) -> C): Either<C, B> =
+            fold({ Left(f(it)) }, { Right(it) })
 
     /**
      * Map over Left and Right of this Either
      */
-    inline fun <C, D> bimap(crossinline fa: (A) -> C, crossinline fb: (B) -> D): Either<C, D> = fold({ Left(fa(it)) }, { Right(fb(it)) })
+    inline fun <C, D> bimap(crossinline fa: (A) -> C, crossinline fb: (B) -> D): Either<C, D> =
+            fold({ Left(fa(it)) }, { Right(fb(it)) })
 
     /**
      * Returns `false` if [Left] or returns the result of the application of
@@ -127,7 +135,8 @@ import arrow.legacy.*
      * left.exists { it > 10 }      // Result: false
      * ```
      */
-    inline fun exists(crossinline predicate: (B) -> Boolean): Boolean = fold({ false }, { predicate(it) })
+    inline fun exists(crossinline predicate: (B) -> Boolean): Boolean =
+            fold({ false }, { predicate(it) })
 
     /**
      * Returns a [Some] containing the [Right] value
@@ -139,7 +148,8 @@ import arrow.legacy.*
      * Left(12).toOption()  // Result: None
      * ```
      */
-    fun toOption(): Option<B> = fold({ None }, { Some(it) })
+    fun toOption(): Option<B> =
+            fold({ None }, { Some(it) })
 
     @Deprecated("arrow.data.Either is right biased. This method will be removed in future releases")
     fun left(): LeftProjection<A, B> = LeftProjection(this)

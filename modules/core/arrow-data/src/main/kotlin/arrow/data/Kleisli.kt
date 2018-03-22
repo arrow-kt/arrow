@@ -4,7 +4,10 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.higherkind
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
 
 /**
  * Alias that represents an arrow from [D] to a monadic value `Kind<F, A>`
@@ -127,14 +130,14 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
          * @param x value of [A].
          * @param AF [Applicative] for context [F].
          */
-        inline fun <reified F, D, A> pure(x: A, AF: Applicative<F> = applicative<F>()): Kleisli<F, D, A> = Kleisli { _ -> AF.pure(x) }
+        inline fun <F, D, A> pure(x: A, AF: Applicative<F>): Kleisli<F, D, A> = Kleisli { _ -> AF.pure(x) }
 
         /**
          * Ask an arrow from [D] to [D].
          *
          * @param AF [Applicative] for context [F].
          */
-        inline fun <reified F, D> ask(AF: Applicative<F> = applicative<F>()): Kleisli<F, D, D> = Kleisli { AF.pure(it) }
+        inline fun <F, D> ask(AF: Applicative<F>): Kleisli<F, D, D> = Kleisli { AF.pure(it) }
 
         /**
          * Raise an error [E].

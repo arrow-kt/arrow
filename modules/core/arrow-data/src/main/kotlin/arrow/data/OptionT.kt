@@ -1,11 +1,11 @@
 package arrow.data
 
-import arrow.*
+import arrow.Kind
 import arrow.core.*
+import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
-import arrow.typeclasses.applicative
 
 /**
  * [OptionT]`<F, A>` is a light wrapper on an `F<`[Option]`<A>>` with some
@@ -13,17 +13,18 @@ import arrow.typeclasses.applicative
  *
  * It may also be said that [OptionT] is a monad transformer for [Option].
  */
-@higherkind data class OptionT<F, A>(val value: Kind<F, Option<A>>) : OptionTOf<F, A>, OptionTKindedJ<F, A> {
+@higherkind
+data class OptionT<F, A>(val value: Kind<F, Option<A>>) : OptionTOf<F, A>, OptionTKindedJ<F, A> {
 
     companion object {
 
         operator fun <F, A> invoke(value: Kind<F, Option<A>>): OptionT<F, A> = OptionT(value)
 
-        inline fun <reified F, A> pure(a: A, AF: Applicative<F> = applicative<F>()): OptionT<F, A> = OptionT(AF.pure(Some(a)))
+        inline fun <reified F, A> pure(a: A, AF: Applicative<F>): OptionT<F, A> = OptionT(AF.pure(Some(a)))
 
-        inline fun <reified F> none(AF: Applicative<F> = applicative<F>()): OptionT<F, Nothing> = OptionT(AF.pure(None))
+        inline fun <reified F> none(AF: Applicative<F>): OptionT<F, Nothing> = OptionT(AF.pure(None))
 
-        inline fun <reified F, A> fromOption(value: Option<A>, AF: Applicative<F> = applicative<F>()): OptionT<F, A> =
+        inline fun <reified F, A> fromOption(value: Option<A>, AF: Applicative<F>): OptionT<F, A> =
                 OptionT(AF.pure(value))
 
         fun <F, A, B> tailRecM(a: A, f: (A) -> OptionTOf<F, Either<A, B>>, MF: Monad<F>): OptionT<F, B> =

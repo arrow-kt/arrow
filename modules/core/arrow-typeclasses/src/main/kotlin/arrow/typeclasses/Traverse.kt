@@ -1,10 +1,9 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import arrow.core.ForId
 import arrow.core.Id
-import arrow.core.fix
 import arrow.core.value
+import arrow.typeclasses.internal.IdMonad
 
 /**
  * Traverse, also known as Traversable. Traversal over a structure with an effect.
@@ -23,7 +22,7 @@ interface Traverse<F> : Functor<F>, Foldable<F> {
     fun <G, A> Applicative<G>.sequence(fga: Kind<F, Kind<G, A>>): Kind<G, Kind<F, A>> = traverse(fga) { it }
 
     override fun <A, B> map(fa: Kind<F, A>, f: (A) -> B): Kind<F, B> =
-            IdApplicative.traverse(fa, { Id(f(it)) }).value()
+            IdMonad.traverse(fa, { Id(f(it)) }).value()
 
     fun <G, A, B> FlatTraverse<F, G>.flatTraverse(fa: Kind<F, A>, f: (A) -> Kind<G, Kind<F, B>>): Kind<G, Kind<F, B>> =
             AG().run { map(traverse(fa, f)) { MF().run { flatten(it) } } }
@@ -33,15 +32,4 @@ interface FlatTraverse<F, G> {
     fun MF(): Monad<F>
 
     fun AG(): Applicative<G>
-}
-
-private val IdApplicative = object : Applicative<ForId> {
-    override fun <A> pure(a: A): Kind<ForId, A> =
-            Id(a)
-
-    override fun <A, B> ap(fa: Kind<ForId, A>, ff: Kind<ForId, (A) -> B>): Kind<ForId, B> =
-            fa.fix().ap(ff)
-
-    override fun <A, B> map(fa: Kind<ForId, A>, f: (A) -> B): Kind<ForId, B> =
-            fa.fix().map(f)
 }

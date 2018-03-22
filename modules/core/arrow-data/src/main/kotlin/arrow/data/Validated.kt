@@ -5,7 +5,6 @@ import arrow.core.*
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Semigroup
-import arrow.typeclasses.semigroup
 
 typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 typealias Valid<A> = Validated.Valid<A>
@@ -14,7 +13,8 @@ typealias Invalid<E> = Validated.Invalid<E>
 /**
  * Port of https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/data/Validated.scala
  */
-@higherkind sealed class Validated<out E, out A> : ValidatedOf<E, A> {
+@higherkind
+sealed class Validated<out E, out A> : ValidatedOf<E, A> {
 
     companion object {
 
@@ -73,11 +73,6 @@ typealias Invalid<E> = Validated.Invalid<E>
      * Returns Valid values wrapped in Some, and None for Invalid values
      */
     fun toOption(): Option<A> = fold({ None }, { Some(it) })
-
-    /**
-     * Converts the value to an Ior<E, A>
-     */
-    fun toIor(): Ior<E, A> = fold({ it.leftIor() }, { it.rightIor() })
 
     /**
      * Convert this value to a single element List if it is Valid,
@@ -143,7 +138,7 @@ fun <E, A> Validated<E, A>.findValid(SE: Semigroup<E>, that: () -> Validated<E, 
 
                 { e ->
                     that().fold(
-                            { ee -> Invalid(SE.combine(e, ee)) },
+                            { ee -> Invalid(SE.run { e.combine(ee) }) },
                             { Valid(it) }
                     )
                 },
@@ -168,7 +163,7 @@ fun <E, A> Validated<E, A>.orElse(default: () -> Validated<E, A>): Validated<E, 
 fun <E, A, B> Validated<E, A>.ap(f: Validated<E, (A) -> B>, SE: Semigroup<E>): Validated<E, B> =
         when (this) {
             is Valid -> f.fold({ Invalid(it) }, { Valid(it(a)) })
-            is Invalid -> f.fold({ Invalid(SE.combine(it, e)) }, { Invalid(e) })
+            is Invalid -> f.fold({ Invalid(SE.run { it.combine(e) }) }, { Invalid(e) })
         }
 
 fun <E, A> Validated<E, A>.handleLeftWith(f: (E) -> ValidatedOf<E, A>): Validated<E, A> =
@@ -186,13 +181,13 @@ fun <G, E, A, B> Validated<E, A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<
             is Invalid -> GA.pure(this)
         }
 
-inline fun <reified E, reified A> Validated<E, A>.combine(y: ValidatedOf<E, A>,
-                                                          SE: Semigroup<E> = semigroup(),
-                                                          SA: Semigroup<A> = semigroup()): Validated<E, A> =
+inline fun <E, A> Validated<E, A>.combine(y: ValidatedOf<E, A>,
+                                          SE: Semigroup<E>,
+                                          SA: Semigroup<A>): Validated<E, A> =
         y.fix().let { that ->
             when {
-                this is Valid && that is Valid -> Valid(SA.combine(this.a, that.a))
-                this is Invalid && that is Invalid -> Invalid(SE.combine(this.e, that.e))
+                this is Valid && that is Valid -> Valid(SA.run { a.combine(that.a) })
+                this is Invalid && that is Invalid -> Invalid(SE.run { e.combine(that.e) })
                 this is Invalid -> this
                 else -> that
             }
@@ -204,8 +199,13 @@ fun <E, A> Validated<E, A>.combineK(y: ValidatedOf<E, A>, SE: Semigroup<E>): Val
     return when (xev) {
         is Valid -> xev
         is Invalid -> when (yev) {
-            is Invalid -> Invalid(SE.combine(xev.e, yev.e))
+            is Invalid -> Invalid(SE.run { xev.e.combine(yev.e) })
             is Valid -> yev
         }
     }
 }
+
+/**
+ * Converts the value to an Ior<E, A>
+ */
+fun <E, A> Validated<E, A>.toIor(): Ior<E, A> = fold({ Ior.Left(it) }, { Ior.Right(it) })

@@ -1,8 +1,8 @@
 package arrow.data
 
-import arrow.*
+import arrow.Kind
+import arrow.higherkind
 import arrow.typeclasses.Comonad
-import arrow.typeclasses.comonad
 
 typealias CokleisliFun<F, A, B> = (Kind<F, A>) -> B
 
@@ -28,10 +28,10 @@ typealias CoreaderT<F, A, B> = Cokleisli<F, A, B>
     inline fun <C> flatMap(crossinline f: (B) -> Cokleisli<F, A, C>): Cokleisli<F, A, C> = Cokleisli(MM, { f(run(it)).run(it) })
 
     companion object {
-        inline operator fun <reified F, A, B> invoke(noinline run: (Kind<F, A>) -> B, MF: Comonad<F> = comonad<F>()): Cokleisli<F, A, B> = Cokleisli(MF, run)
+        inline operator fun <reified F, A, B> invoke(MF: Comonad<F>, noinline run: (Kind<F, A>) -> B): Cokleisli<F, A, B> = Cokleisli(MF, run)
 
-        inline fun <reified F, A, B> pure(b: B, MF: Comonad<F> = comonad<F>()): Cokleisli<F, A, B> = Cokleisli(MF, { b })
+        inline fun <reified F, A, B> pure(MF: Comonad<F>, b: B): Cokleisli<F, A, B> = Cokleisli(MF, { b })
 
-        inline fun <reified F, B> ask(MF: Comonad<F> = comonad<F>()): Cokleisli<F, B, B> = Cokleisli(MF, { MF.extract(it) })
+        inline fun <reified F, B> ask(MF: Comonad<F>): Cokleisli<F, B, B> = Cokleisli(MF, { MF.extract(it) })
     }
 }

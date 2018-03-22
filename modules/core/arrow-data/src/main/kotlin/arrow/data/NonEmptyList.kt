@@ -1,9 +1,10 @@
 package arrow.data
 
-import arrow.*
+import arrow.Kind
 import arrow.core.*
+import arrow.higherkind
 import arrow.typeclasses.Applicative
-import arrow.typeclasses.foldable
+import arrow.typeclasses.Traverse
 
 typealias Nel<A> = NonEmptyList<A>
 
@@ -41,11 +42,12 @@ class NonEmptyList<out A> private constructor(
 
     fun <B> foldLeft(b: B, f: (B, A) -> B): B = this.fix().tail.fold(f(b, this.fix().head), f)
 
-    fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = foldable<ForListK>().foldRight(this.fix().all.k(), lb, f)
+    fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+            ListKTraverse.foldRight(this.fix().all.k(), lb, f)
 
-    fun <G, B> traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, NonEmptyList<B>> =
-            GA.map2Eval(f(this.fix().head), Eval.always {
-                arrow.typeclasses.traverse<ForListK>().traverse(this.fix().tail.k(), f, GA)
+    fun <G, B> Applicative<G>.traverse(f: (A) -> Kind<G, B>): Kind<G, NonEmptyList<B>> =
+            map2Eval(f(fix().head), Eval.always {
+                ListKTraverse.run { traverse(fix().tail.k(), f) }
             }, {
                 NonEmptyList(it.a, it.b.fix().list)
             }).value()
@@ -122,3 +124,20 @@ class NonEmptyList<out A> private constructor(
 fun <A> A.nel(): NonEmptyList<A> = NonEmptyList.of(this)
 
 fun <A> NonEmptyList<A>.combineK(y: NonEmptyListOf<A>): NonEmptyList<A> = this.plus(y.fix())
+
+private val ListKTraverse: Traverse<ForListK> = object : Traverse<ForListK> {
+    override fun <A, B> map(fa: ListKOf<A>, f: kotlin.Function1<A, B>): ListK<B> =
+            fa.fix().map(f)
+
+    override fun <G, A, B> Applicative<G>.traverse(fa: ListKOf<A>, f: kotlin.Function1<A, Kind<G, B>>): Kind<G, ListK<B>> =
+            fa.fix().traverse(f, this)
+
+    override fun <A, B> foldLeft(fa: ListKOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
+            fa.fix().foldLeft(b, f)
+
+    override fun <A, B> foldRight(fa: ListKOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
+            fa.fix().foldRight(lb, f)
+
+    override fun <A> isEmpty(fa: ListKOf<A>): kotlin.Boolean =
+            fa.fix().isEmpty()
+}

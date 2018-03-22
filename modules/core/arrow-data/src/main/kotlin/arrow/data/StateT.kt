@@ -1,8 +1,12 @@
 package arrow.data
 
-import arrow.*
+import arrow.Kind
 import arrow.core.*
-import arrow.typeclasses.*
+import arrow.higherkind
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.SemigroupK
 
 /**
  * Alias that represent stateful computation of the form `(S) -> Tuple2<S, A>` with a result in certain context `F`.
@@ -28,7 +32,7 @@ fun <F, S, A> StateTOf<F, S, A>.runM(MF: Monad<F>, initial: S): Kind<F, Tuple2<S
  * @param s initial state to run stateful computation
  * @param MF [Monad] for the context [F]
  */
-inline fun <reified F, S, A> StateTOf<F, S, A>.runM(initial: S, MF: Monad<F> = monad()): Kind<F, Tuple2<S, A>> = fix().run(initial, MF)
+inline fun <F, S, A> StateTOf<F, S, A>.runM(initial: S, MF: Monad<F>): Kind<F, Tuple2<S, A>> = fix().run(initial, MF)
 
 /**
  * `StateT<F, S, A>` is a stateful computation within a context `F` yielding
@@ -46,16 +50,8 @@ class StateT<F, S, A>(
 
     companion object {
 
-        inline fun <reified F, S, T> pure(t: T, MF: Monad<F> = monad<F>()): StateT<F, S, T> =
-                StateT { s -> MF.pure(s toT t) }
-
-        /**
-         * Constructor to create `StateT<F, S, A>` given a [StateTFun].
-         *
-         * @param run the stateful function to wrap with [StateT].
-         * @param MF [Monad] for the context [F].
-         */
-        inline operator fun <reified F, S, A> invoke(noinline run: StateTFun<F, S, A>, MF: Monad<F> = monad<F>()): StateT<F, S, A> = StateT(MF.pure(run))
+        inline fun <F, S, T> pure(MF: Monad<F>, t: T): StateT<F, S, T> =
+                StateT(MF) { s -> MF.pure(s toT t) }
 
         /**
          * Constructor to create `StateT<F, S, A>` given a [StateTFun].
@@ -63,7 +59,7 @@ class StateT<F, S, A>(
          * @param MF [Monad] for the context [F].
          * @param run the stateful function to wrap with [StateT].
          */
-        inline operator fun <reified F, S, A> invoke(MF: Monad<F> = monad<F>(), noinline run: StateTFun<F, S, A>): StateT<F, S, A> = StateT(MF.pure(run))
+        inline operator fun <F, S, A> invoke(MF: Monad<F>, noinline run: StateTFun<F, S, A>): StateT<F, S, A> = StateT(MF.pure(run))
 
         /**
          * Alias for constructor [StateT].
@@ -136,7 +132,7 @@ class StateT<F, S, A>(
          * @param f function that is called recusively until [arrow.Either.Right] is returned.
          * @param MF [Monad] for the context [F].
          */
-        fun <F, S, A, B> tailRecM(a: A, f: (A) -> Kind<StateTPartialOf<F, S>, Either<A, B>>, MF: Monad<F>): StateT<F, S, B> =
+        fun <F, S, A, B> tailRecM(MF: Monad<F>, a: A, f: (A) -> Kind<StateTPartialOf<F, S>, Either<A, B>>): StateT<F, S, B> =
                 StateT(MF.pure({ s: S ->
                     MF.tailRecM(Tuple2(s, a), { (s, a0) ->
                         MF.map(f(a0).runM(MF, s)) { (s, ab) ->
@@ -289,14 +285,14 @@ class StateT<F, S, A>(
  *
  * @param MF [Monad] for the context [F].
  */
-inline fun <reified F, S, A> StateTFunOf<F, S, A>.stateT(MF: Monad<F> = monad()): StateT<F, S, A> = StateT(this)
+inline fun <F, S, A> StateTFunOf<F, S, A>.stateT(MF: Monad<F>): StateT<F, S, A> = StateT(this)
 
 /**
  * Wrap the function with [StateT].
  *
  * @param MF [Monad] for the context [F].
  */
-inline fun <reified F, S, A> StateTFun<F, S, A>.stateT(MF: Monad<F> = monad()): StateT<F, S, A> = StateT(this, MF)
+inline fun <F, S, A> StateTFun<F, S, A>.stateT(MF: Monad<F>): StateT<F, S, A> = StateT(MF, this)
 
 /**
  * Lift a value of type `A` into `StateT<F, S, A>`.
@@ -304,14 +300,14 @@ inline fun <reified F, S, A> StateTFun<F, S, A>.stateT(MF: Monad<F> = monad()): 
  * @param MF [Monad] for the context [F].
  * @param fa the value to lift.
  */
-inline fun <reified F, S, A> StateT.Companion.lift(fa: Kind<F, A>, MF: Monad<F> = monad<F>()): StateT<F, S, A> = lift(MF, fa)
+inline fun <F, S, A> StateT.Companion.lift(fa: Kind<F, A>, MF: Monad<F>): StateT<F, S, A> = lift(MF, fa)
 
 /**
  * Return input without modifying it.
  *
  * @param AF [Applicative] for the context [F].
  */
-inline fun <reified F, S> StateT.Companion.get(AF: Applicative<F> = applicative<F>(), dummy: Unit = Unit): StateT<F, S, S> = get(AF)
+inline fun <F, S> StateT.Companion.get(AF: Applicative<F>, dummy: Unit = Unit): StateT<F, S, S> = get(AF)
 
 /**
  * Inspect a value of the state [S] with [f] `(S) -> T` without modifying the state.
@@ -319,7 +315,7 @@ inline fun <reified F, S> StateT.Companion.get(AF: Applicative<F> = applicative<
  * @param AF [Applicative] for the context [F].
  * @param f the function applied to extrat [T] from [S].
  */
-inline fun <reified F, S, T> StateT.Companion.inspect(AF: Applicative<F> = applicative<F>(), dummy: Unit = Unit, crossinline f: (S) -> T): StateT<F, S, T> = inspect(AF) { f(it) }
+inline fun <F, S, T> StateT.Companion.inspect(AF: Applicative<F>, dummy: Unit = Unit, crossinline f: (S) -> T): StateT<F, S, T> = inspect(AF) { f(it) }
 
 /**
  * Modify the state with [f] `(S) -> S` and return [Unit].
@@ -327,7 +323,7 @@ inline fun <reified F, S, T> StateT.Companion.inspect(AF: Applicative<F> = appli
  * @param AF [Applicative] for the context [F].
  * @param f the modify function to apply.
  */
-inline fun <reified F, S> StateT.Companion.modify(AF: Applicative<F> = applicative<F>(), dummy: Unit = Unit, crossinline f: (S) -> S): StateT<F, S, Unit> = modify(AF) { f(it) }
+inline fun <F, S> StateT.Companion.modify(AF: Applicative<F>, dummy: Unit = Unit, crossinline f: (S) -> S): StateT<F, S, Unit> = modify(AF) { f(it) }
 
 /**
  * Modify the state with an [Applicative] function [f] `(S) -> Kind<F, S>` and return [Unit].
@@ -335,7 +331,7 @@ inline fun <reified F, S> StateT.Companion.modify(AF: Applicative<F> = applicati
  * @param AF [Applicative] for the context [F].
  * @param f the modify function to apply.
  */
-inline fun <reified F, S> StateT.Companion.modifyF(AF: Applicative<F> = applicative<F>(), dummy: Unit = Unit, crossinline f: (S) -> Kind<F, S>): StateT<F, S, Unit> = modifyF(AF) { f(it) }
+inline fun <F, S> StateT.Companion.modifyF(AF: Applicative<F>, dummy: Unit = Unit, crossinline f: (S) -> Kind<F, S>): StateT<F, S, Unit> = modifyF(AF) { f(it) }
 
 /**
  * Set the state to a value [s] and return [Unit].
@@ -343,7 +339,7 @@ inline fun <reified F, S> StateT.Companion.modifyF(AF: Applicative<F> = applicat
  * @param AF [Applicative] for the context [F].
  * @param s value to set.
  */
-inline fun <reified F, S> StateT.Companion.set(s: S, AF: Applicative<F> = applicative<F>()): StateT<F, S, Unit> = set(AF, s)
+inline fun <F, S> StateT.Companion.set(s: S, AF: Applicative<F>): StateT<F, S, Unit> = set(AF, s)
 
 /**
  * Set the state to a value [s] of type `Kind<F, S>` and return [Unit].
@@ -351,4 +347,4 @@ inline fun <reified F, S> StateT.Companion.set(s: S, AF: Applicative<F> = applic
  * @param AF [Applicative] for the context [F].
  * @param s value to set.
  */
-inline fun <reified F, S> StateT.Companion.set(s: Kind<F, S>, AF: Applicative<F> = applicative<F>()): StateT<F, S, Unit> = setF(AF, s)
+inline fun <F, S> StateT.Companion.set(s: Kind<F, S>, AF: Applicative<F>): StateT<F, S, Unit> = setF(AF, s)

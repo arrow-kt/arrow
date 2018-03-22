@@ -32,8 +32,5 @@ data class Id<out A>(val value: A) : IdOf<A> {
         }
 
         fun <A> pure(a: A): Id<A> = Id(a)
-
     }
-
 }
-

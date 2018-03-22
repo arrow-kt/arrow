@@ -1,14 +1,14 @@
 package arrow.data
 
-import arrow.*
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.flatMap
+import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
-import arrow.typeclasses.monad
 
 /**
  * [EitherT]`<F, A, B>` is a light wrapper on an `F<`[Either]`<A, B>>` with some
@@ -44,8 +44,8 @@ import arrow.typeclasses.monad
 
         fun <F, A, B> left(a: A, MF: Applicative<F>): EitherT<F, A, B> = EitherT(MF.pure(Left(a)))
 
-        inline fun <reified F, A, B> fromEither(value: Either<A, B>, MF: Applicative<F> = monad<F>()): EitherT<F, A, B> =
-                EitherT(MF.pure(value))
+        inline fun <reified F, A, B> Applicative<F>.fromEither(value: Either<A, B>): EitherT<F, A, B> =
+                EitherT(pure(value))
     }
 
     inline fun <C> fold(crossinline l: (A) -> C, crossinline r: (B) -> C, FF: Functor<F>): Kind<F, C> = FF.map(value, { either -> either.fold(l, r) })

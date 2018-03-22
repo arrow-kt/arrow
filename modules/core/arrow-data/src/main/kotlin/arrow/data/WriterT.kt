@@ -7,44 +7,46 @@ import arrow.core.toT
 import arrow.higherkind
 import arrow.typeclasses.*
 
-@Suppress("UNCHECKED_CAST") inline fun <F, W, A> WriterTOf<F, W, A>.value(): Kind<F, Tuple2<W, A>> = this.fix().value
+@Suppress("UNCHECKED_CAST")
+inline fun <F, W, A> WriterTOf<F, W, A>.value(): Kind<F, Tuple2<W, A>> = this.fix().value
 
-@higherkind data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTOf<F, W, A>, WriterTKindedJ<F, W, A> {
+@higherkind
+data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTOf<F, W, A>, WriterTKindedJ<F, W, A> {
 
     companion object {
 
-        inline fun <reified F, reified W, A> pure(a: A, MM: Monoid<W> = monoid(), AF: Applicative<F> = applicative()) =
+        fun <F, W, A> pure(MM: Monoid<W>, AF: Applicative<F>, a: A) =
                 WriterT(AF.pure(Tuple2(MM.empty(), a)))
 
-        inline fun <reified F, W, A> both(w: W, a: A, MF: Monad<F> = monad()) = WriterT(MF.pure(Tuple2(w, a)))
+        fun <F, W, A> both(MF: Monad<F>, w: W, a: A) = WriterT(MF.pure(Tuple2(w, a)))
 
-        inline fun <reified F, W, A> fromTuple(z: Tuple2<W, A>, MF: Monad<F> = monad()) = WriterT(MF.pure(z))
+        fun <F, W, A> fromTuple(MF: Monad<F>, z: Tuple2<W, A>) = WriterT(MF.pure(z))
 
         operator fun <F, W, A> invoke(value: Kind<F, Tuple2<W, A>>): WriterT<F, W, A> = WriterT(value)
 
-        inline fun <reified F, W, A> putT(vf: Kind<F, A>, w: W, FF: Functor<F> = functor()): WriterT<F, W, A> =
+        fun <F, W, A> putT(FF: Functor<F>, vf: Kind<F, A>, w: W): WriterT<F, W, A> =
                 WriterT(FF.map(vf, { v -> Tuple2(w, v) }))
 
-        inline fun <reified F, W, A> put(a: A, w: W, applicativeF: Applicative<F> = applicative()): WriterT<F, W, A> =
-                putT(applicativeF.pure(a), w)
+        fun <F, W, A> put(AF: Applicative<F>, a: A, w: W): WriterT<F, W, A> =
+                putT(AF, AF.pure(a), w)
 
-        fun <F, W, A> putT2(vf: Kind<F, A>, w: W, FF: Functor<F>): WriterT<F, W, A> =
+        fun <F, W, A> putT2(FF: Functor<F>, vf: Kind<F, A>, w: W): WriterT<F, W, A> =
                 WriterT(FF.map(vf, { v -> Tuple2(w, v) }))
 
-        fun <F, W, A> put2(a: A, w: W, AF: Applicative<F>): WriterT<F, W, A> =
-                putT2(AF.pure(a), w, AF)
+        fun <F, W, A> put2(AF: Applicative<F>, a: A, w: W): WriterT<F, W, A> =
+                putT2(AF, AF.pure(a), w)
 
-        inline fun <reified F, W> tell(l: W): WriterT<F, W, Unit> = put(Unit, l)
+        fun <F, W> tell(AF: Applicative<F>, l: W): WriterT<F, W, Unit> = put(AF, Unit, l)
 
-        fun <F, W> tell2(l: W, AF: Applicative<F>): WriterT<F, W, Unit> = put2(Unit, l, AF)
+        fun <F, W> tell2(AF: Applicative<F>, l: W): WriterT<F, W, Unit> = put2(AF, Unit, l)
 
-        inline fun <reified F, reified W, A> value(v: A, monoidW: Monoid<W> = monoid()):
-                WriterT<F, W, A> = put(v, monoidW.empty())
+        fun <F, W, A> value(AF: Applicative<F>, monoidW: Monoid<W>, v: A):
+                WriterT<F, W, A> = put(AF, v, monoidW.empty())
 
-        inline fun <reified F, reified W, A> valueT(vf: Kind<F, A>, monoidW: Monoid<W> = monoid()): WriterT<F, W, A> =
-                putT(vf, monoidW.empty())
+        fun <F, W, A> valueT(AF: Applicative<F>, monoidW: Monoid<W>, vf: Kind<F, A>): WriterT<F, W, A> =
+                putT(AF, vf, monoidW.empty())
 
-        inline fun <reified F, W, A> empty(MMF: MonoidK<F> = monoidK()): WriterTOf<F, W, A> = WriterT(MMF.empty())
+        fun <F, W, A> empty(MMF: MonoidK<F>): WriterTOf<F, W, A> = WriterT(MMF.empty())
 
         fun <F, W, A> pass(fa: Kind<WriterTPartialOf<F, W>, Tuple2<(W) -> W, A>>, MF: Monad<F>): WriterT<F, W, A> =
                 WriterT(MF.flatMap(fa.fix().content(MF), { tuple2FA -> MF.map(fa.fix().write(MF), { l -> Tuple2(tuple2FA.a(l), tuple2FA.b) }) }))
@@ -61,7 +63,7 @@ import arrow.typeclasses.*
                 }))
     }
 
-    fun tell(w: W, SG: Semigroup<W>, MF: Monad<F>): WriterT<F, W, A> = mapAcc ({ SG.combine(it, w) }, MF)
+    fun tell(w: W, SG: Semigroup<W>, MF: Monad<F>): WriterT<F, W, A> = mapAcc({ SG.run { it.combine(w) } }, MF)
 
     fun listen(MF: Monad<F>): Kind<WriterTPartialOf<F, W>, Tuple2<W, A>> =
             WriterT(MF.flatMap(content(MF), { a -> MF.map(write(MF), { l -> Tuple2(l, Tuple2(l, a)) }) }))
@@ -70,13 +72,13 @@ import arrow.typeclasses.*
 
     fun write(FF: Functor<F>): Kind<F, W> = FF.map(value, { it.a })
 
-    fun reset(MM: Monoid<W>, MF: Monad<F>): WriterT<F, W, A> = mapAcc ({ MM.empty() }, MF)
+    fun reset(MM: Monoid<W>, MF: Monad<F>): WriterT<F, W, A> = mapAcc({ MM.empty() }, MF)
 
     fun <B> map(f: (A) -> B, FF: Functor<F>): WriterT<F, W, B> = WriterT(FF.map(value, { it.a toT f(it.b) }))
 
-    inline fun <U> mapAcc(crossinline f: (W) -> U, MF: Monad<F>): WriterT<F, U, A> = transform ({ f(it.a) toT it.b }, MF)
+    inline fun <U> mapAcc(crossinline f: (W) -> U, MF: Monad<F>): WriterT<F, U, A> = transform({ f(it.a) toT it.b }, MF)
 
-    inline fun <C, U> bimap(crossinline g: (W) -> U, crossinline f: (A) -> C, MF: Monad<F>): WriterT<F, U, C> = transform ({ g(it.a) toT f(it.b) }, MF)
+    inline fun <C, U> bimap(crossinline g: (W) -> U, crossinline f: (A) -> C, MF: Monad<F>): WriterT<F, U, C> = transform({ g(it.a) toT f(it.b) }, MF)
 
     fun swap(MF: Monad<F>): WriterT<F, A, W> = transform({ it.b toT it.a }, MF)
 
@@ -84,7 +86,7 @@ import arrow.typeclasses.*
             ff.fix().flatMap({ map(it, MF) }, SG, MF)
 
     inline fun <B> flatMap(crossinline f: (A) -> WriterT<F, W, B>, SG: Semigroup<W>, MF: Monad<F>): WriterT<F, W, B> =
-            WriterT(MF.flatMap(value, { value -> MF.map(f(value.b).value, { SG.combine(it.a, value.a) toT it.b }) }))
+            WriterT(MF.flatMap(value, { value -> MF.map(f(value.b).value, { SG.run { it.a.combine(value.a) } toT it.b }) }))
 
     inline fun <B, U> transform(crossinline f: (Tuple2<W, A>) -> Tuple2<U, B>, MF: Monad<F>): WriterT<F, U, B> = WriterT(MF.flatMap(value, { MF.pure(f(it)) }))
 
