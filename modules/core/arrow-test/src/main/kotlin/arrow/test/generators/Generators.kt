@@ -1,14 +1,13 @@
 package arrow.test.generators
 
-import arrow.typeclasses.Applicative
 import arrow.Kind
-import arrow.typeclasses.applicative
 import arrow.core.*
 import arrow.data.*
+import arrow.typeclasses.Applicative
 import io.kotlintest.properties.Gen
 import java.util.concurrent.TimeUnit
 
-inline fun <reified F, A> genApplicative(valueGen: Gen<A>, AP: Applicative<F> = applicative<F>()): Gen<Kind<F, A>> =
+fun <F, A> genApplicative(valueGen: Gen<A>, AP: Applicative<F>): Gen<Kind<F, A>> =
         object : Gen<Kind<F, A>> {
             override fun generate(): Kind<F, A> =
                     AP.pure(valueGen.generate())

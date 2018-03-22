@@ -7,7 +7,7 @@ import io.kotlintest.properties.forAll
 
 object OrderLaws {
 
-    inline fun <reified F> laws(O: Order<F>, fGen: Gen<F>, funcGen: Gen<(F) -> F>): List<Law> =
+    inline fun <F> laws(O: Order<F>, fGen: Gen<F>, funcGen: Gen<(F) -> F>): List<Law> =
             EqLaws.laws(O, { fGen.generate() }) + listOf(
                     Law("Order law: reflexivity equality", { O.reflexitivityEq(fGen) }),
                     Law("Order law: symmetry equality", { O.symmetryEq(fGen) }),
@@ -25,68 +25,68 @@ object OrderLaws {
                     Law("Order law: max order", { O.maxOrder(fGen) })
             )
 
-    inline fun <reified F> Order<F>.reflexitivityEq(fGen: Gen<F>) =
+    fun <F> Order<F>.reflexitivityEq(fGen: Gen<F>) =
             forAll(fGen, { x ->
                 x.equalUnderTheLaw(x, this)
             })
 
-    inline fun <reified F> Order<F>.symmetryEq(fGen: Gen<F>) =
+    fun <F> Order<F>.symmetryEq(fGen: Gen<F>) =
             forAll(fGen, fGen, { x, y ->
                 x.eqv(y).equalUnderTheLaw(y.eqv(x), Eq.any())
             })
 
-    inline fun <reified F> Order<F>.antisymmetryEq(fGen: Gen<F>, funcGen: Gen<(F) -> F>) =
+    fun <F> Order<F>.antisymmetryEq(fGen: Gen<F>, funcGen: Gen<(F) -> F>) =
             forAll(fGen, fGen, funcGen, { x, y, f ->
                 !x.eqv(y) || f(x).eqv(f(y))
             })
 
-    inline fun <reified F> Order<F>.transitivityEq(fGen: Gen<F>) =
+    fun <F> Order<F>.transitivityEq(fGen: Gen<F>) =
             forAll(fGen, fGen, fGen, { x, y, z ->
                 !(x.eqv(y) && y.eqv(z)) || x.eqv(z)
             })
 
-    inline fun <reified F> Order<F>.reflexivityPartialOrder(fGen: Gen<F>) =
+    fun <F> Order<F>.reflexivityPartialOrder(fGen: Gen<F>) =
             forAll(fGen, { x ->
                 x.lte(x)
             })
 
-    inline fun <reified F> Order<F>.antisymmetryPartialOrder(fGen: Gen<F>) =
+    fun <F> Order<F>.antisymmetryPartialOrder(fGen: Gen<F>) =
             forAll(fGen, fGen, { x, y ->
                 !(x.lte(y) && y.lte(x)) || x.eqv(y)
             })
 
-    inline fun <reified F> Order<F>.transitivityPartialOrder(fGen: Gen<F>) =
+    fun <F> Order<F>.transitivityPartialOrder(fGen: Gen<F>) =
             forAll(fGen, fGen, fGen, { x, y, z ->
                 !(x.lte(y) && y.lte(x)) || x.lte(z)
             })
 
-    inline fun <reified F> Order<F>.greaterThanOrEqualPartialOrder(fGen: Gen<F>) =
+    fun <F> Order<F>.greaterThanOrEqualPartialOrder(fGen: Gen<F>) =
             forAll(fGen, fGen, { x, y ->
                 x.lte(y) == y.gte(x)
             })
 
-    inline fun <reified F> Order<F>.lesserThanPartialOrder(fGen: Gen<F>) =
+    fun <F> Order<F>.lesserThanPartialOrder(fGen: Gen<F>) =
             forAll(fGen, fGen, { x, y ->
                 x.lt(y) == (x.lte(y) && x.neqv(y))
             })
 
-    inline fun <reified F> Order<F>.greaterThanPartialOrder(fGen: Gen<F>) =
+    fun <F> Order<F>.greaterThanPartialOrder(fGen: Gen<F>) =
             forAll(fGen, fGen, { x, y ->
                 x.lt(y) == y.gt(x)
             })
 
-    inline fun <reified F> Order<F>.totalityOrder(fGen: Gen<F>) =
+    fun <F> Order<F>.totalityOrder(fGen: Gen<F>) =
             forAll(fGen, fGen, { x, y ->
                 x.lte(y) || y.lte(x)
             })
 
-    inline fun <reified F> Order<F>.compareOrder(fGen: Gen<F>) =
+    fun <F> Order<F>.compareOrder(fGen: Gen<F>) =
             forAll(fGen, fGen, { x, y ->
                 val c = x.compare(y)
                 ((c < 0) == x.lt(y)) && ((c == 0) == x.eqv(y)) && ((c > 0) == x.gt(y))
             })
 
-    inline fun <reified F> Order<F>.minOrder(fGen: Gen<F>) =
+    fun <F> Order<F>.minOrder(fGen: Gen<F>) =
             forAll(fGen, fGen, { x, y ->
                 val c = x.compare(y)
                 val m = x.min(y)
@@ -95,7 +95,7 @@ object OrderLaws {
                 else m == y
             })
 
-    inline fun <reified F> Order<F>.maxOrder(fGen: Gen<F>) =
+    fun <F> Order<F>.maxOrder(fGen: Gen<F>) =
             forAll(fGen, fGen, { x, y ->
                 val c = x.compare(y)
                 val m = x.max(y)

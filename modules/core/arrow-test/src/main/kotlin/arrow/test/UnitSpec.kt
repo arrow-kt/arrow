@@ -1,7 +1,7 @@
 package arrow.test
 
-import arrow.typeclasses.Eq
 import arrow.test.laws.Law
+import arrow.typeclasses.Eq
 import io.kotlintest.TestCase
 import io.kotlintest.specs.StringSpec
 
@@ -22,7 +22,7 @@ abstract class UnitSpec : StringSpec() {
 
     inline fun <F> Eq<F>.logged(): Eq<F> = Eq { a, b ->
         try {
-            val result = this@logged.eqv(a, b)
+            val result = a.eqv(b)
             if (!result) {
                 println("$a <---> $b")
             }

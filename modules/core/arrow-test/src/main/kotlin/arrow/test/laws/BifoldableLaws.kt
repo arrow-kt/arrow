@@ -1,6 +1,6 @@
 package arrow.test.laws
 
-import arrow.*
+import arrow.Kind2
 import arrow.core.Eval
 import arrow.instances.IntMonoid
 import arrow.test.generators.genConstructor
@@ -8,31 +8,34 @@ import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genIntSmall
 import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Eq
-import arrow.typeclasses.bifoldable
 import io.kotlintest.properties.forAll
 
 object BifoldableLaws {
-    inline fun <reified F> laws(BF: Bifoldable<F> = bifoldable<F>(), crossinline cf: (Int) -> Kind2<F, Int, Int>, EQ: Eq<Int>): List<Law> =
+    inline fun <F> laws(BF: Bifoldable<F>, noinline cf: (Int) -> Kind2<F, Int, Int>, EQ: Eq<Int>): List<Law> =
             listOf(
-                    Law("Bifoldable Laws: Left bifold consistent with BifoldMap", { bifoldLeftConsistentWithBifoldMap(BF, cf, EQ) }),
-                    Law("Bifoldable Laws: Right bifold consistent with BifoldMap", { bifoldRightConsistentWithBifoldMap(BF, cf, EQ) })
+                    Law("Bifoldable Laws: Left bifold consistent with BifoldMap", { BF.bifoldLeftConsistentWithBifoldMap(cf, EQ) }),
+                    Law("Bifoldable Laws: Right bifold consistent with BifoldMap", { BF.bifoldRightConsistentWithBifoldMap(cf, EQ) })
             )
 
-    inline fun <reified F> bifoldLeftConsistentWithBifoldMap(BF: Bifoldable<F>, crossinline cf: (Int) -> Kind2<F, Int, Int>, EQ: Eq<Int>) =
+    fun <F> Bifoldable<F>.bifoldLeftConsistentWithBifoldMap(cf: (Int) -> Kind2<F, Int, Int>, EQ: Eq<Int>) =
             forAll(genFunctionAToB<Int, Int>(genIntSmall()), genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf),
                     { f: (Int) -> Int, g: (Int) -> Int, fab: Kind2<F, Int, Int> ->
-                        val expected = BF.bifoldLeft(fab, IntMonoid.empty(),
-                                { c: Int, a: Int -> IntMonoid.combine(c, f(a)) },
-                                { c: Int, b: Int -> IntMonoid.combine(c, g(b)) })
-                        expected.equalUnderTheLaw(BF.bifoldMap(fab, f, g, IntMonoid), EQ)
+                        with(IntMonoid) {
+                            val expected = bifoldLeft(fab, IntMonoid.empty(),
+                                    { c: Int, a: Int -> c.combine(f(a)) },
+                                    { c: Int, b: Int -> c.combine(g(b)) })
+                            expected.equalUnderTheLaw(bifoldMap(fab, f, g), EQ)
+                        }
                     })
 
-    inline fun <reified F> bifoldRightConsistentWithBifoldMap(BF: Bifoldable<F>, crossinline cf: (Int) -> Kind2<F, Int, Int>, EQ: Eq<Int>) =
+    fun <F> Bifoldable<F>.bifoldRightConsistentWithBifoldMap(cf: (Int) -> Kind2<F, Int, Int>, EQ: Eq<Int>) =
             forAll(genFunctionAToB<Int, Int>(genIntSmall()), genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf),
                     { f: (Int) -> Int, g: (Int) -> Int, fab: Kind2<F, Int, Int> ->
-                        val expected = BF.bifoldRight(fab, Eval.Later({ IntMonoid.empty() }),
-                                { a: Int, ec: Eval<Int> -> ec.map({ c -> IntMonoid.combine(f(a), c) }) },
-                                { b: Int, ec: Eval<Int> -> ec.map({ c -> IntMonoid.combine(g(b), c) }) })
-                        expected.value().equalUnderTheLaw(BF.bifoldMap(fab, f, g, IntMonoid), EQ)
+                        with(IntMonoid) {
+                            val expected = bifoldRight(fab, Eval.Later({ IntMonoid.empty() }),
+                                    { a: Int, ec: Eval<Int> -> ec.map({ c -> f(a).combine(c) }) },
+                                    { b: Int, ec: Eval<Int> -> ec.map({ c -> g(b).combine(c) }) })
+                            expected.value().equalUnderTheLaw(bifoldMap(fab, f, g), EQ)
+                        }
                     })
 }

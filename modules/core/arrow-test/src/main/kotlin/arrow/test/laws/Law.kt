@@ -5,8 +5,8 @@ import io.kotlintest.properties.Gen
 
 data class Law(val name: String, val test: () -> Unit)
 
-inline fun <reified A> A.equalUnderTheLaw(b: A, eq: Eq<A>): Boolean =
-        eq.eqv(this, b)
+inline fun <A> A.equalUnderTheLaw(b: A, eq: Eq<A>): Boolean =
+        eq.run { eqv(b) }
 
 fun <A> forFew(amount: Int, gena: Gen<A>, fn: (a: A) -> Boolean): Unit {
     for (k in 0..amount) {
@@ -29,7 +29,6 @@ fun <A, B> forFew(amount: Int, gena: Gen<A>, genb: Gen<B>, fn: (a: A, b: B) -> B
     }
 }
 
-
 fun <A, B, C> forFew(amount: Int, gena: Gen<A>, genb: Gen<B>, genc: Gen<C>, fn: (a: A, b: B, c: C) -> Boolean): Unit {
     for (k in 0..amount) {
         val a = gena.generate()
@@ -41,7 +40,6 @@ fun <A, B, C> forFew(amount: Int, gena: Gen<A>, genb: Gen<B>, genc: Gen<C>, fn: 
         }
     }
 }
-
 
 fun <A, B, C, D> forFew(amount: Int, gena: Gen<A>, genb: Gen<B>, genc: Gen<C>, gend: Gen<D>, fn: (a: A, b: B, c: C, d: D) -> Boolean): Unit {
     for (k in 0..amount) {
@@ -63,7 +61,7 @@ fun <A, B, C, D, E> forFew(amount: Int, gena: Gen<A>, genb: Gen<B>, genc: Gen<C>
         val c = genc.generate()
         val d = gend.generate()
         val e = gene.generate()
-        val passed = fn(a, b, c, d , e)
+        val passed = fn(a, b, c, d, e)
         if (!passed) {
             throw AssertionError("Property failed for\n$a\n$b\n$c\n$d\$e)")
         }

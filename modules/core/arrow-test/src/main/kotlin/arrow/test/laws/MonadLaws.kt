@@ -13,104 +13,103 @@ import arrow.test.generators.genIntSmall
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monad
 import arrow.typeclasses.binding
-import arrow.typeclasses.monad
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.experimental.newSingleThreadContext
 
 object MonadLaws {
 
-    inline fun <reified F> laws(M: Monad<F> = monad<F>(), EQ: Eq<Kind<F, Int>>): List<Law> =
+    inline fun <F> laws(M: Monad<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
             ApplicativeLaws.laws(M, EQ) + listOf(
-                    Law("Monad Laws: left identity", { leftIdentity(M, EQ) }),
-                    Law("Monad Laws: right identity", { rightIdentity(M, EQ) }),
-                    Law("Monad Laws: kleisli left identity", { kleisliLeftIdentity(M, EQ) }),
-                    Law("Monad Laws: kleisli right identity", { kleisliRightIdentity(M, EQ) }),
-                    Law("Monad Laws: map / flatMap coherence", { mapFlatMapCoherence(M, EQ) }),
-                    Law("Monad Laws: monad comprehensions", { monadComprehensions(M, EQ) }),
-                    Law("Monad Laws: monad comprehensions binding in other threads", { monadComprehensionsBindInContext(M, EQ) }),
-                    Law("Monad Laws: stack-safe//unsafe monad comprehensions equivalence", { equivalentComprehensions(M, EQ) }),
-                    Law("Monad Laws: stack safe", { stackSafety(5000, M, EQ) }),
-                    Law("Monad Laws: stack safe comprehensions", { stackSafetyComprehensions(5000, M, EQ) })
+                    Law("Monad Laws: left identity", { M.leftIdentity(EQ) }),
+                    Law("Monad Laws: right identity", { M.rightIdentity(EQ) }),
+                    Law("Monad Laws: kleisli left identity", { M.kleisliLeftIdentity(EQ) }),
+                    Law("Monad Laws: kleisli right identity", { M.kleisliRightIdentity(EQ) }),
+                    Law("Monad Laws: map / flatMap coherence", { M.mapFlatMapCoherence(EQ) }),
+                    Law("Monad Laws: monad comprehensions", { M.monadComprehensions(EQ) }),
+                    Law("Monad Laws: monad comprehensions binding in other threads", { M.monadComprehensionsBindInContext(EQ) }),
+                    Law("Monad Laws: stack-safe//unsafe monad comprehensions equivalence", { M.equivalentComprehensions(EQ) }),
+                    Law("Monad Laws: stack safe", { M.stackSafety(5000, EQ) }),
+                    Law("Monad Laws: stack safe comprehensions", { M.stackSafetyComprehensions(5000, EQ) })
             )
 
-    inline fun <reified F> leftIdentity(M: Monad<F> = monad<F>(), EQ: Eq<Kind<F, Int>>): Unit =
-            forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), M)), Gen.int(), { f: (Int) -> Kind<F, Int>, a: Int ->
-                M.flatMap(M.pure(a), f).equalUnderTheLaw(f(a), EQ)
+    fun <F> Monad<F>.leftIdentity(EQ: Eq<Kind<F, Int>>): Unit =
+            forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), this)), Gen.int(), { f: (Int) -> Kind<F, Int>, a: Int ->
+                flatMap(pure(a), f).equalUnderTheLaw(f(a), EQ)
             })
 
-    inline fun <reified F> rightIdentity(M: Monad<F> = monad<F>(), EQ: Eq<Kind<F, Int>>): Unit =
-            forAll(genApplicative(Gen.int(), M), { fa: Kind<F, Int> ->
-                M.flatMap(fa, { M.pure(it) }).equalUnderTheLaw(fa, EQ)
+    fun <F> Monad<F>.rightIdentity(EQ: Eq<Kind<F, Int>>): Unit =
+            forAll(genApplicative(Gen.int(), this), { fa: Kind<F, Int> ->
+                flatMap(fa, { pure(it) }).equalUnderTheLaw(fa, EQ)
             })
 
-    inline fun <reified F> kleisliLeftIdentity(M: Monad<F> = monad<F>(), EQ: Eq<Kind<F, Int>>): Unit =
-            forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), M)), Gen.int(), { f: (Int) -> Kind<F, Int>, a: Int ->
-                (Kleisli({ n: Int -> M.pure(n) }).andThen(Kleisli(f), M).run(a).equalUnderTheLaw(f(a), EQ))
+    fun <F> Monad<F>.kleisliLeftIdentity(EQ: Eq<Kind<F, Int>>): Unit =
+            forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), this)), Gen.int(), { f: (Int) -> Kind<F, Int>, a: Int ->
+                (Kleisli({ n: Int -> pure(n) }).andThen(Kleisli(f), this).run(a).equalUnderTheLaw(f(a), EQ))
             })
 
-    inline fun <reified F> kleisliRightIdentity(M: Monad<F> = monad<F>(), EQ: Eq<Kind<F, Int>>): Unit =
-            forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), M)), Gen.int(), { f: (Int) -> Kind<F, Int>, a: Int ->
-                (Kleisli(f).andThen(Kleisli({ n: Int -> M.pure(n) }), M).run(a).equalUnderTheLaw(f(a), EQ))
+    fun <F> Monad<F>.kleisliRightIdentity(EQ: Eq<Kind<F, Int>>): Unit =
+            forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), this)), Gen.int(), { f: (Int) -> Kind<F, Int>, a: Int ->
+                (Kleisli(f).andThen(Kleisli({ n: Int -> pure(n) }), this).run(a).equalUnderTheLaw(f(a), EQ))
             })
 
-    inline fun <reified F> mapFlatMapCoherence(M: Monad<F> = monad<F>(), EQ: Eq<Kind<F, Int>>): Unit =
-            forAll(genFunctionAToB<Int, Int>(Gen.int()), genApplicative(Gen.int(), M), { f: (Int) -> Int, fa: Kind<F, Int> ->
-                M.flatMap(fa, { M.pure(f(it)) }).equalUnderTheLaw(M.map(fa, f), EQ)
+    fun <F> Monad<F>.mapFlatMapCoherence(EQ: Eq<Kind<F, Int>>): Unit =
+            forAll(genFunctionAToB<Int, Int>(Gen.int()), genApplicative(Gen.int(), this), { f: (Int) -> Int, fa: Kind<F, Int> ->
+                flatMap(fa, { pure(f(it)) }).equalUnderTheLaw(map(fa, f), EQ)
             })
 
-    inline fun <reified F> stackSafety(iterations: Int = 5000, M: Monad<F> = monad<F>(), EQ: Eq<Kind<F, Int>>): Unit =
+    fun <F> Monad<F>.stackSafety(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit =
             forFew(1, Gen.oneOf(listOf(iterations))) { iter ->
-                val res = M.tailRecM(0, { i -> M.pure(if (i < iter) Left(i + 1) else Right(i)) })
-                res.equalUnderTheLaw(M.pure(iter), EQ)
+                val res = tailRecM(0, { i -> pure(if (i < iter) Left(i + 1) else Right(i)) })
+                res.equalUnderTheLaw(pure(iter), EQ)
             }
 
-    inline fun <reified F> stackSafetyComprehensions(iterations: Int = 5000, M: Monad<F> = monad<F>(), EQ: Eq<Kind<F, Int>>): Unit =
+    fun <F> Monad<F>.stackSafetyComprehensions(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit =
             forFew(1, Gen.oneOf(listOf(iterations))) { iter ->
-                val res = stackSafeTestProgram(M, 0, iter)
-                res.run(M).equalUnderTheLaw(M.pure(iter), EQ)
+                val res = stackSafeTestProgram(0, iter)
+                res.run(this).equalUnderTheLaw(pure(iter), EQ)
             }
 
-    inline fun <reified F> equivalentComprehensions(M: Monad<F> = monad<F>(), EQ: Eq<Kind<F, Int>>): Unit =
+    fun <F> Monad<F>.equivalentComprehensions(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(Gen.int(), { num: Int ->
-                val aa = M.binding {
+                val aa = binding {
                     val a = pure(num).bind()
                     val b = pure(a + 1).bind()
                     val c = pure(b + 1).bind()
                     c
                 }
-                val bb = M.bindingStackSafe {
+                val bb = bindingStackSafe {
                     val a = pure(num).bind()
                     val b = pure(a + 1).bind()
                     val c = pure(b + 1).bind()
                     c
-                }.run(M)
+                }.run(this)
                 aa.equalUnderTheLaw(bb, EQ) &&
-                        aa.equalUnderTheLaw(M.pure(num + 2), EQ)
+                        aa.equalUnderTheLaw(pure(num + 2), EQ)
             })
 
-    inline fun <reified F> monadComprehensions(M: Monad<F> = monad<F>(), EQ: Eq<Kind<F, Int>>): Unit =
+    fun <F> Monad<F>.monadComprehensions(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(Gen.int(), { num: Int ->
-                M.binding {
+                binding {
                     val a = pure(num).bind()
                     val b = pure(a + 1).bind()
                     val c = pure(b + 1).bind()
                     c
-                }.equalUnderTheLaw(M.pure(num + 2), EQ)
+                }.equalUnderTheLaw(pure(num + 2), EQ)
             })
 
-    inline fun <reified F> monadComprehensionsBindInContext(M: Monad<F> = monad<F>(), EQ: Eq<Kind<F, Int>>): Unit =
+    fun <F> Monad<F>.monadComprehensionsBindInContext(EQ: Eq<Kind<F, Int>>): Unit =
             forFew(5, genIntSmall(), { num: Int ->
-                M.binding {
+                binding {
                     val a = bindIn(newSingleThreadContext("$num")) { num + 1 }
                     val b = bindIn(newSingleThreadContext("$a")) { a + 1 }
                     b
-                }.equalUnderTheLaw(M.pure(num + 2), EQ)
+                }.equalUnderTheLaw(pure(num + 2), EQ)
             })
 
-    fun <F> stackSafeTestProgram(M: Monad<F>, n: Int, stopAt: Int): Free<F, Int> = M.bindingStackSafe {
-        val v = pure(n + 1).bind()
-        val r = if (v < stopAt) stackSafeTestProgram(M, v, stopAt).bind() else pure(v).bind()
+    fun <F> arrow.typeclasses.Monad<F>.stackSafeTestProgram(n: kotlin.Int, stopAt: kotlin.Int): Free<F, Int> = bindingStackSafe {
+        val v = this.pure(n + 1).bind()
+        val r = if (v < stopAt) stackSafeTestProgram(v, stopAt).bind() else this.pure(v).bind()
         r
     }
 }

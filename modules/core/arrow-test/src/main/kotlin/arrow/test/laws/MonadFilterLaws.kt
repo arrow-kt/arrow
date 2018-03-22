@@ -1,56 +1,54 @@
 package arrow.test.laws
 
-import arrow.typeclasses.Eq
 import arrow.Kind
-import arrow.mtl.MonadFilter
-import arrow.mtl.bindingFilter
-import arrow.mtl.monadFilter
-import arrow.syntax.monad.flatMap
+import arrow.mtl.typeclasses.MonadFilter
+import arrow.mtl.typeclasses.bindingFilter
 import arrow.test.generators.genApplicative
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB
+import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object MonadFilterLaws {
 
-    inline fun <reified F> laws(MF: MonadFilter<F> = monadFilter<F>(), crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
+    inline fun <F> laws(MF: MonadFilter<F>, noinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
             MonadLaws.laws(MF, EQ) + FunctorFilterLaws.laws(MF, cf, EQ) + listOf(
-                    Law("MonadFilter Laws: Left Empty", { monadFilterLeftEmpty(MF, EQ) }),
-                    Law("MonadFilter Laws: Right Empty", { monadFilterRightEmpty(MF, EQ) }),
-                    Law("MonadFilter Laws: Consistency", { monadFilterConsistency(MF, cf, EQ) }),
-                    Law("MonadFilter Laws: Comprehension Guards", { monadFilterEmptyComprehensions(MF, EQ) }),
-                    Law("MonadFilter Laws: Comprehension bindWithFilter Guards", { monadFilterBindWithFilterComprehensions(MF, EQ) }))
+                    Law("MonadFilter Laws: Left Empty", { MF.monadFilterLeftEmpty(EQ) }),
+                    Law("MonadFilter Laws: Right Empty", { MF.monadFilterRightEmpty(EQ) }),
+                    Law("MonadFilter Laws: Consistency", { MF.monadFilterConsistency(cf, EQ) }),
+                    Law("MonadFilter Laws: Comprehension Guards", { MF.monadFilterEmptyComprehensions(EQ) }),
+                    Law("MonadFilter Laws: Comprehension bindWithFilter Guards", { MF.monadFilterBindWithFilterComprehensions(EQ) }))
 
-    inline fun <reified F> monadFilterLeftEmpty(MF: MonadFilter<F> = monadFilter<F>(), EQ: Eq<Kind<F, Int>>): Unit =
-            forAll(genFunctionAToB(genApplicative(Gen.int(), MF)), { f: (Int) -> Kind<F, Int> ->
-                MF.empty<Int>().flatMap(MF, f).equalUnderTheLaw(MF.empty(), EQ)
+    fun <F> MonadFilter<F>.monadFilterLeftEmpty(EQ: Eq<Kind<F, Int>>): Unit =
+            forAll(genFunctionAToB(genApplicative(Gen.int(), this)), { f: (Int) -> Kind<F, Int> ->
+                flatMap(empty(), f).equalUnderTheLaw(empty(), EQ)
             })
 
-    inline fun <reified F> monadFilterRightEmpty(MF: MonadFilter<F> = monadFilter<F>(), EQ: Eq<Kind<F, Int>>): Unit =
-            forAll(genApplicative(Gen.int(), MF), { fa: Kind<F, Int> ->
-                MF.flatMap(fa, { MF.empty<Int>() }).equalUnderTheLaw(MF.empty(), EQ)
+    fun <F> MonadFilter<F>.monadFilterRightEmpty(EQ: Eq<Kind<F, Int>>): Unit =
+            forAll(genApplicative(Gen.int(), this), { fa: Kind<F, Int> ->
+                flatMap(fa, { empty<Int>() }).equalUnderTheLaw(empty(), EQ)
             })
 
-    inline fun <reified F> monadFilterConsistency(MF: MonadFilter<F> = monadFilter<F>(), crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
+    fun <F> MonadFilter<F>.monadFilterConsistency(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genFunctionAToB(Gen.bool()), genConstructor(Gen.int(), cf), { f: (Int) -> Boolean, fa: Kind<F, Int> ->
-                MF.filter(fa, f).equalUnderTheLaw(fa.flatMap(MF, { a -> if (f(a)) MF.pure(a) else MF.empty() }), EQ)
+                filter(fa, f).equalUnderTheLaw(flatMap(fa, { a -> if (f(a)) pure(a) else empty() }), EQ)
             })
 
-    inline fun <reified F> monadFilterEmptyComprehensions(MF: MonadFilter<F> = monadFilter<F>(), EQ: Eq<Kind<F, Int>>): Unit =
+    fun <F> MonadFilter<F>.monadFilterEmptyComprehensions(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(Gen.bool(), Gen.int(), { guard: Boolean, n: Int ->
-                MF.bindingFilter {
+                bindingFilter {
                     continueIf(guard)
                     n
-                }.equalUnderTheLaw(if (!guard) MF.empty() else MF.pure(n), EQ)
+                }.equalUnderTheLaw(if (!guard) empty() else pure(n), EQ)
             })
 
-    inline fun <reified F> monadFilterBindWithFilterComprehensions(MF: MonadFilter<F> = monadFilter<F>(), EQ: Eq<Kind<F, Int>>): Unit =
+    fun <F> MonadFilter<F>.monadFilterBindWithFilterComprehensions(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(Gen.bool(), Gen.int(), { guard: Boolean, n: Int ->
-                MF.bindingFilter {
-                    val x = MF.pure(n).bindWithFilter { _ -> guard }
+                bindingFilter {
+                    val x = this@monadFilterBindWithFilterComprehensions.pure(n).bindWithFilter { _ -> guard }
                     x
-                }.equalUnderTheLaw(if (!guard) MF.empty() else MF.pure(n), EQ)
+                }.equalUnderTheLaw(if (!guard) empty() else pure(n), EQ)
             })
 
 }
