@@ -1,6 +1,5 @@
 package arrow.instances
 
-import java.io.File
 import arrow.common.Package
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.extractFullName
@@ -9,7 +8,7 @@ import arrow.common.utils.typeConstraints
 import me.eugeniomarletti.kotlin.metadata.modality
 import org.jetbrains.kotlin.serialization.ProtoBuf
 import org.jetbrains.kotlin.serialization.deserialization.TypeTable
-import org.jetbrains.kotlin.serialization.deserialization.supertypes
+import java.io.File
 
 data class FunctionMapping(
         val name: String,
@@ -86,6 +85,8 @@ data class Instance(
             (target.superTypes + listOf(target.classOrPackageProto)).flatMap { tc ->
                 tc.functionList
                         .filter { it.modality == ProtoBuf.Modality.ABSTRACT }
+                        // FIXME(paco): number of parameters and naming convention, used to be based off the TC interface
+                        .filter { it.valueParameterCount == 0 && it.returnType.extractFullName(tc, failOnGeneric = false).contains("typeclass") }
                         .flatMap {
                             val retTypeName = it.returnType.extractFullName(tc, failOnGeneric = false).removeBackticks().substringBefore("<")
                             val retType = target.processor.elementUtils.getTypeElement(
@@ -93,16 +94,7 @@ data class Instance(
                             )
                             when {
                                 retType != null -> {
-                                    val current = target.processor.getClassOrPackageDataWrapper(retType) as ClassOrPackageDataWrapper.Class
-                                    val typeTable = TypeTable(current.classProto.typeTable)
-                                    val isTypeClassReturnType = current.classProto.supertypes(typeTable).any {
-                                        val typeName = it.extractFullName(current, failOnGeneric = false)
-                                        typeName == "`arrow`.`TC`"
-                                    }
-                                    if (isTypeClassReturnType)
-                                        listOf(FunctionMapping(tc.nameResolver.getString(it.name), tc, it, retTypeName))
-                                    else
-                                        emptyList()
+                                    listOf(FunctionMapping(tc.nameResolver.getString(it.name), tc, it, retTypeName))
                                 }
                                 else -> emptyList()
                             }
@@ -164,8 +156,7 @@ class InstanceFileGenerator(
     fun generate() {
         instances.forEach {
             val elementsToGenerate: List<String> =
-                    listOf(genImports(it), genImplicitObject(it), genCompanionExtensions(it)) +
-                            (if (it.args.isNotEmpty()) listOf(genCompanionReifiedExtensions(it)) else emptyList())
+                    listOf(genImports(it), genCompanionExtensions(it))
             val source: String = elementsToGenerate.joinToString(prefix = "package ${it.`package`}\n\n", separator = "\n", postfix = "\n")
             val file = File(generatedDir, instanceAnnotationClass.simpleName + ".${it.target.classElement.qualifiedName}.kt")
             file.writeText(source)
@@ -176,36 +167,15 @@ class InstanceFileGenerator(
             |import ${i.target.classOrPackageProto.`package`}.*
             |""".trimMargin()
 
-    private fun genImplicitObject(i: Instance): String = """
-            |object ${i.implicitObjectName} {
-            |  fun ${i.expandedTypeArgs()} instance(${i.expandedArgs}): ${i.name}${i.expandedTypeArgs()}${i.typeConstraints()} =
-            |    object : ${i.name}${i.expandedTypeArgs()} {
-            |${i.targetImplementations}
-            |    }
-            |}
-            |""".trimMargin()
-
     private fun genCompanionExtensions(i: Instance): String =
             """|
                 |fun ${i.expandedTypeArgs(reified = false)} ${i.receiverTypeName}.Companion.${i.companionFactoryName}(${(i.args.map {
                 "${it.first}: ${it.second}"
             } + (if (i.args.isNotEmpty()) listOf("@Suppress(\"UNUSED_PARAMETER\") dummy: kotlin.Unit = kotlin.Unit") else emptyList())).joinToString(", ")
             }): ${i.name}${i.expandedTypeArgs()}${i.typeConstraints()} =
-                |  ${i.implicitObjectName}.instance(${i.args.map { it.first }.joinToString(", ")})
+                |    object : ${i.name}${i.expandedTypeArgs()} {
+                |${i.targetImplementations}
+                |    }
                 |
                 |""".trimMargin()
-
-    private fun genCompanionReifiedExtensions(i: Instance): String =
-            """|
-                |inline fun ${i.expandedTypeArgs(reified = true)} ${i.receiverTypeName}.Companion.${i.companionFactoryName}(${i.args.map {
-                "${it.first}: ${it.second} = ${classToTypeclassMethodCall(it.second)}"
-            }.joinToString(", ")
-            }): ${i.name}${i.expandedTypeArgs()}${i.typeConstraints()} =
-                |  ${i.implicitObjectName}.instance(${i.args.map { it.first }.joinToString(", ")})
-                |
-                |""".trimMargin()
-
-    private fun classToTypeclassMethodCall(typeclassWGenerics: String): String =
-            "${typeclassWGenerics.substringBefore("<").split(".").map { it.decapitalize() }.joinToString(".")}<${typeclassWGenerics.substringAfter("<")}()"
-
 }

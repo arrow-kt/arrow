@@ -45,9 +45,9 @@ data class FunctionSignature(
 
     fun implBody(): String =
             when (hkArgs) {
-                HKArgs.None -> "${receiverType}.${name}()"
-                HKArgs.First -> "${args[0].first}.fix().${name}(${args.drop(1).joinToString(", ") { it.first }})"
-                HKArgs.Unknown -> "${receiverType}.${name}(${args.joinToString(", ") { it.first }})"
+                HKArgs.None -> "$receiverType.$name()"
+                HKArgs.First -> "${args[0].first}.fix().$name(${args.drop(1).joinToString(", ") { it.first }})"
+                HKArgs.Unknown -> "$receiverType.$name(${args.joinToString(", ") { it.first }})"
             }
 
     companion object {
@@ -131,16 +131,16 @@ class TypeclassInstanceGenerator(
     fun generate(): String {
         val tArgs = tparamsAsSeenFromReceiver.joinToString(", ")
         return """
-            |interface $instanceName : ${typeClassFQName}<$tArgs> {
+            |interface $instanceName : $typeClassFQName<$tArgs> {
             |  ${delegatedFunctions.joinToString("\n\n  ")}
             |}
             |
             |object ${instanceName}Implicits {
-            |  fun instance(): $instanceName = ${receiverType}.Companion.${companionFactoryName}()
+            |  fun instance(): $instanceName = $receiverType.Companion.$companionFactoryName()
             |}
             |
-            |fun ${receiverType}.Companion.${companionFactoryName}(): $instanceName =
-            |  object : $instanceName, ${typeClassFQName}<$tArgs> {}
+            |fun $receiverType.Companion.$companionFactoryName(): $instanceName =
+            |  object : $instanceName, $typeClassFQName<$tArgs> {}
             |
         """.removeBackticks().trimMargin()
     }
