@@ -9,7 +9,9 @@ import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.beTheSameInstanceAs
 import io.kotlintest.matchers.fail
+import io.kotlintest.matchers.should
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldEqual
 import org.junit.runner.RunWith
@@ -65,8 +67,14 @@ class TryTest : UnitSpec() {
             Success(1).fold({ 2 }, { 3 }) shouldBe 3
         }
 
-        "fold should call left function on Success with exception" {
-            Success(1).fold({ 2 }, { throw Exception() }) shouldBe 2
+        "fold should propagate exception from Success with exception" {
+            Exception().let { ex ->
+                try {
+                    Success(1).fold({ 2 }, { throw ex })
+                } catch (e: Exception) {
+                    ex should beTheSameInstanceAs(e)
+                }
+            }
         }
 
         "getOrDefault returns default if Failure" {
