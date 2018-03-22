@@ -2,7 +2,6 @@
 layout: docs
 title: ListK
 permalink: /docs/datatypes/listK/
-video: QDMI_7qtPGg
 ---
 
 ## ListK
