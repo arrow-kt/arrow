@@ -83,10 +83,12 @@ data class Instance(
             (target.superTypes + listOf(target.classOrPackageProto)).flatMap { tc ->
                 tc.functionList
                         .filter { it.modality == ProtoBuf.Modality.ABSTRACT }
+                        .map { it to it.returnType.extractFullName(tc, failOnGeneric = false).removeBackticks() }
                         // FIXME(paco): number of parameters and naming convention, used to be based off the TC interface
-                        .filter { it.valueParameterCount == 0 && it.returnType.extractFullName(tc, failOnGeneric = false).contains("typeclass") }
-                        .flatMap {
-                            val retTypeName = it.returnType.extractFullName(tc, failOnGeneric = false).removeBackticks().substringBefore("<")
+                        .filter { (it, name) -> it.valueParameterCount == 0 && name.contains("typeclass") }
+                        .distinctBy { (_, name) -> name }
+                        .flatMap { (it, name) ->
+                            val retTypeName = name.substringBefore("<")
                             val retType = target.processor.elementUtils.getTypeElement(retTypeName)
                             when {
                                 retType != null -> {
