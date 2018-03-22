@@ -1,6 +1,6 @@
 package arrow.dagger.effects.instances
 
-import arrow.effects.*
+import arrow.effects.typeclasses.*
 import javax.inject.Inject
 
 class DaggerMonadSuspendSyntaxInstance<F> @Inject constructor(val monadSuspend: MonadSuspend<F>) : MonadSuspendSyntax<F> {

@@ -14,16 +14,16 @@ interface MapKFunctorInstance<K> : Functor<MapKPartialOf<K>> {
 @instance(MapK::class)
 interface MapKFoldableInstance<K> : Foldable<MapKPartialOf<K>> {
 
-    override fun <A, B> foldLeft(fa: Kind<MapKPartialOf<K>, A>, b: B, f: (B, A) -> B): B = fa.fix().foldLeft(b, f)
+    override fun <A, B> foldLeft(fa: MapKOf<K, A>, b: B, f: (B, A) -> B): B = fa.fix().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: Kind<MapKPartialOf<K>, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+    override fun <A, B> foldRight(fa: MapKOf<K, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
             fa.fix().foldRight(lb, f)
 }
 
 @instance(MapK::class)
 interface MapKTraverseInstance<K> : MapKFoldableInstance<K>, Traverse<MapKPartialOf<K>> {
 
-    override fun <G, A, B> Applicative<G>.traverse(fa: Kind<MapKPartialOf<K>, A>, f: (A) -> Kind<G, B>): Kind<G, Kind<MapKPartialOf<K>, B>> =
+    override fun <G, A, B> Applicative<G>.traverse(fa: MapKOf<K, A>, f: (A) -> Kind<G, B>): Kind<G, MapKOf<K, B>> =
             fa.fix().traverse(f, this)
 }
 
