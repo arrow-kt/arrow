@@ -1,8 +1,7 @@
 package arrow.optics
 
 import arrow.core.*
-import arrow.instances.IntMonoid
-import arrow.syntax.either.right
+import arrow.instances.IntMonoidInstance
 import arrow.test.UnitSpec
 import arrow.test.generators.genEither
 import arrow.test.generators.genFunctionAToB
@@ -46,7 +45,7 @@ class OptionInstancesTest : UnitSpec() {
                 EQA = Eq.any(),
                 EQB = Eq.any(),
                 funcGen = genFunctionAToB(genOption(Gen.int())),
-                bMonoid = Option.monoid(IntMonoid)
+                bMonoid = Option.monoid(IntMonoidInstance)
         ))
 
         testLaws(IsoLaws.laws(
@@ -57,10 +56,10 @@ class OptionInstancesTest : UnitSpec() {
                 EQA = Eq.any(),
                 EQB = Eq.any(),
                 bMonoid = object : Monoid<Either<Unit, Int>> {
-                    override fun combine(a: Either<Unit, Int>, b: Either<Unit, Int>): Either<Unit, Int> =
-                            Either.applicative<Unit>().map2(a, b) { (a, b) -> a + b }.fix()
+                    override fun Either<Unit, Int>.combine(b: Either<Unit, Int>): Either<Unit, Int> =
+                            Either.applicative<Unit>().map2(this, b) { (a, b) -> a + b }.fix()
 
-                    override fun empty(): Either<Unit, Int> = 0.right()
+                    override fun empty(): Either<Unit, Int> = Right(0)
                 }
         ))
 

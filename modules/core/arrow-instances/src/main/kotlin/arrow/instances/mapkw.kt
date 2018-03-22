@@ -28,11 +28,11 @@ interface MapKTraverseInstance<K> : MapKFoldableInstance<K>, Traverse<MapKPartia
 }
 
 @instance(MapK::class)
-interface MapKSemigroupInstance<K, A> : Semigroup<MapKOf<K, A>> {
+interface MapKSemigroupInstance<K, A> : Semigroup<MapK<K, A>> {
 
     fun SG(): Semigroup<A>
 
-    override fun MapKOf<K, A>.combine(b: MapKOf<K, A>): MapK<K, A> = with(SG()) {
+    override fun MapK<K, A>.combine(b: MapK<K, A>): MapK<K, A> = with(SG()) {
         if (fix().size < b.fix().size) fix().foldLeft<A>(b.fix(), { my, (k, b) -> my.updated(k, b.maybeCombine(my[k])) })
         else b.fix().foldLeft<A>(fix(), { my, (k, a) -> my.updated(k, a.maybeCombine(my[k])) })
     }
@@ -40,7 +40,7 @@ interface MapKSemigroupInstance<K, A> : Semigroup<MapKOf<K, A>> {
 }
 
 @instance(MapK::class)
-interface MapKMonoidInstance<K, A> : MapKSemigroupInstance<K, A>, Monoid<MapKOf<K, A>> {
+interface MapKMonoidInstance<K, A> : MapKSemigroupInstance<K, A>, Monoid<MapK<K, A>> {
 
     override fun empty(): MapK<K, A> = emptyMap<K, A>().k()
 }

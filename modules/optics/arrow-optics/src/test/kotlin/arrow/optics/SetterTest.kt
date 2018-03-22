@@ -1,18 +1,14 @@
 package arrow.optics
 
-import arrow.core.getOrElse
-import arrow.data.k
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
-import arrow.typeclasses.Eq
-import arrow.test.laws.SetterLaws
+import arrow.core.*
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genOption
-import arrow.syntax.either.left
-import arrow.syntax.either.right
-import arrow.syntax.foldable.combineAll
+import arrow.test.laws.SetterLaws
+import arrow.typeclasses.Eq
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.properties.Gen
+import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -37,8 +33,8 @@ class SetterTest : UnitSpec() {
         ))
 
         testLaws(SetterLaws.laws(
-                setter = Setter.fromFunctor(),
-                aGen = genOption(TokenGen),
+                setter = Setter.fromFunctor<ForOption, String, String>(Option.functor()),
+                aGen = genOption(Gen.string()),
                 bGen = Gen.string(),
                 funcGen = genFunctionAToB(Gen.string()),
                 EQA = Eq.any()
@@ -52,8 +48,8 @@ class SetterTest : UnitSpec() {
             val user = User(token)
 
             forAll({ value: String ->
-                joinedSetter.set(token.left(), value).swap().getOrElse { Token("Wrong value") }.value ==
-                        joinedSetter.set(user.right(), value).getOrElse { User(Token("Wrong value")) }.token.value
+                joinedSetter.set(token.let(::Left), value).swap().getOrElse { Token("Wrong value") }.value ==
+                        joinedSetter.set(user.let(::Right), value).getOrElse { User(Token("Wrong value")) }.token.value
             })
         }
 
@@ -62,7 +58,5 @@ class SetterTest : UnitSpec() {
                 tokenSetter.modify(token) { value } == tokenSetter.lift { value }(token)
             })
         }
-
     }
-
 }

@@ -4,8 +4,6 @@ import arrow.Kind
 import arrow.core.*
 import arrow.data.Const
 import arrow.data.ListK
-import arrow.data.ListKOf
-import arrow.data.fix
 import arrow.higherkind
 import arrow.instances.IntMonoidInstance
 import arrow.typeclasses.Foldable
@@ -184,11 +182,6 @@ interface Fold<S, A> : FoldOf<S, A> {
     operator fun <C> plus(other: Traversal<A, C>): Fold<S, C> = compose(other)
 
     /**
-     * Map each target to a type R and use a Monoid to fold the results
-     */
-    fun <R> foldMap(s: S, f: (A) -> R, M: Monoid<R>): R = foldMap(M, s) { a -> f(a) }
-
-    /**
      * Find the first element matching the predicate, if one exists.
      */
     fun find(s: S, p: (A) -> Boolean): Option<A> =
@@ -200,19 +193,4 @@ interface Fold<S, A> : FoldOf<S, A> {
      * If there are no elements, the result is false.
      */
     fun exists(s: S, p: (A) -> Boolean): Boolean = find(s, p).fold({ false }, { true })
-
-    /**
-     * Fold using the given [Monoid] instance.
-     */
-    fun fold(s: S, M: Monoid<A>): A = foldMap(M, s, ::identity)
-
-    /**
-     * Alias for fold.
-     */
-    fun combineAll(s: S, M: Monoid<A>): A = foldMap(M, s, ::identity)
-
-    /**
-     * Get all targets of the [Fold]
-     */
-    fun getAll(s: S, M: Monoid<ListKOf<A>>): ListK<A> = foldMap(M, s, { ListK.pure(it) }).fix()
 }

@@ -1,18 +1,14 @@
 package arrow.optics
 
+import arrow.core.*
+import arrow.data.ListK
+import arrow.data.k
+import arrow.data.monoid
+import arrow.instances.StringMonoidInstance
+import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import arrow.core.Tuple2
-import arrow.core.getOrElse
-import arrow.test.UnitSpec
-import arrow.syntax.either.left
-import arrow.syntax.either.right
-import arrow.core.toT
-import arrow.data.k
-import arrow.syntax.collections.firstOption
-import arrow.syntax.foldable.combineAll
-import arrow.syntax.option.some
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -24,70 +20,76 @@ class GetterTest : UnitSpec() {
         val length = Getter<String, Int> { it.length }
         val upper = Getter<String, String> { it.toUpperCase() }
 
-        "asFold should behave as valid Fold: size" {
-            forAll(TokenGen) { token ->
-                tokenGetter.asFold().size(token) == 1
+        with(tokenGetter.asFold()) {
+
+            "asFold should behave as valid Fold: size" {
+                forAll(TokenGen) { token ->
+                    size(token) == 1
+                }
+            }
+
+            "asFold should behave as valid Fold: nonEmpty" {
+                forAll(TokenGen) { token ->
+                    nonEmpty(token)
+                }
+            }
+
+            "asFold should behave as valid Fold: isEmpty" {
+                forAll(TokenGen) { token ->
+                    !isEmpty(token)
+                }
+            }
+
+            "asFold should behave as valid Fold: getAll" {
+                forAll(TokenGen) { token ->
+                    getAll(ListK.monoid(), token) == listOf(token.value).k()
+                }
+            }
+
+            "asFold should behave as valid Fold: combineAll" {
+                forAll(TokenGen) { token ->
+                    combineAll(StringMonoidInstance, token) == token.value
+                }
+            }
+
+            "asFold should behave as valid Fold: fold" {
+                forAll(TokenGen) { token ->
+                    fold(StringMonoidInstance, token) == token.value
+                }
+            }
+
+            "asFold should behave as valid Fold: headOption" {
+                forAll(TokenGen) { token ->
+                    headOption(token) == Some(token.value)
+                }
+            }
+
+            "asFold should behave as valid Fold: lastOption" {
+                forAll(TokenGen) { token ->
+                    lastOption(token) == Some(token.value)
+                }
             }
         }
 
-        "asFold should behave as valid Fold: nonEmpty" {
-            forAll(TokenGen) { token ->
-                tokenGetter.asFold().nonEmpty(token)
+        with(tokenGetter) {
+
+            "Getting the target should always yield the exact result" {
+                forAll({ value: String ->
+                    get(Token(value)) == value
+                })
             }
-        }
 
-        "asFold should behave as valid Fold: isEmpty" {
-            forAll(TokenGen) { token ->
-                !tokenGetter.asFold().isEmpty(token)
+            "Finding a target using a predicate within a Getter should be wrapped in the correct option result" {
+                forAll({ value: String, predicate: Boolean ->
+                    find(Token(value)) { predicate }.fold({ false }, { true }) == predicate
+                })
             }
-        }
 
-        "asFold should behave as valid Fold: getAll" {
-            forAll(TokenGen) { token ->
-                tokenGetter.asFold().getAll(token) == listOf(token.value).k()
+            "Checking existence of a target should always result in the same result as predicate" {
+                forAll({ value: String, predicate: Boolean ->
+                    exist(Token(value)) { predicate } == predicate
+                })
             }
-        }
-
-        "asFold should behave as valid Fold: combineAll" {
-            forAll(TokenGen) { token ->
-                tokenGetter.asFold().combineAll(token) == token.value
-            }
-        }
-
-        "asFold should behave as valid Fold: fold" {
-            forAll(TokenGen) { token ->
-                tokenGetter.asFold().fold(token) == token.value
-            }
-        }
-
-        "asFold should behave as valid Fold: headOption" {
-            forAll(TokenGen) { token ->
-                tokenGetter.asFold().headOption(token) == token.value.some()
-            }
-        }
-
-        "asFold should behave as valid Fold: lastOption" {
-            forAll(TokenGen) { token ->
-                tokenGetter.asFold().lastOption(token) == token.value.some()
-            }
-        }
-
-        "Getting the target should always yield the exact result" {
-            forAll({ value: String ->
-                tokenGetter.get(Token(value)) == value
-            })
-        }
-
-        "Finding a target using a predicate within a Getter should be wrapped in the correct option result" {
-            forAll({ value: String, predicate: Boolean ->
-                tokenGetter.find(Token(value)) { predicate }.fold({ false }, { true }) == predicate
-            })
-        }
-
-        "Checking existence of a target should always result in the same result as predicate" {
-            forAll({ value: String, predicate: Boolean ->
-                tokenGetter.exist(Token(value)) { predicate } == predicate
-            })
         }
 
         "Zipping two lenses should yield a tuple of the targets" {
@@ -103,7 +105,7 @@ class GetterTest : UnitSpec() {
             forAll({ tokenValue: String ->
                 val token = Token(tokenValue)
                 val user = User(token)
-                joinedGetter.get(token.left()) == joinedGetter.get(user.right())
+                joinedGetter.get(Left(token)) == joinedGetter.get(Right(user))
             })
         }
 

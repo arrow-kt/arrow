@@ -1,12 +1,12 @@
 package arrow.optics
 
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.properties.Gen
-import arrow.typeclasses.Eq
-import arrow.test.laws.IsoLaws
-import arrow.typeclasses.Monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
+import arrow.test.laws.IsoLaws
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -22,7 +22,7 @@ class StringInstancesTest : UnitSpec() {
                 EQA = Eq.any(),
                 EQB = Eq.any(),
                 bMonoid = object : Monoid<List<Char>> {
-                    override fun combine(a: List<Char>, b: List<Char>): List<Char> = a + b
+                    override fun List<Char>.combine(b: List<Char>): List<Char> = this + b
                     override fun empty(): List<Char> = emptyList()
                 }
         ))

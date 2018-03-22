@@ -343,14 +343,4 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
      * Check if forall targets satisfy the predicate
      */
     fun forall(s: S, p: (A) -> Boolean): Boolean = foldMap(s, p, AndMonoid)
-
-    /**
-     * Fold using the given [Monoid] instance.
-     */
-    fun fold(s: S, M: Monoid<A>): A = foldMap(s, ::identity, M)
-
-    /**
-     * Alias for fold.
-     */
-    fun combineAll(s: S, M: Monoid<A>): A = fold(s, M)
 }

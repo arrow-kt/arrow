@@ -28,11 +28,10 @@ interface ListEachInstance<A> : Each<List<A>, A> {
                     }
                 }
     }
-}
 
-object ListEachInstanceImplicits {
-    @JvmStatic
-    fun <A> instance(): Each<List<A>, A> = object : ListEachInstance<A> {}
+    companion object {
+        operator fun <A> invoke() = object : ListEachInstance<A> {}
+    }
 }
 
 interface ListFilterIndexInstance<A> : FilterIndex<List<A>, Int, A> {
@@ -51,11 +50,10 @@ interface ListFilterIndexInstance<A> : FilterIndex<List<A>, Int, A> {
                     }
                 }
     }
-}
 
-object ListFilterIndexInstanceImplicits {
-    @JvmStatic
-    fun <A> instance(): FilterIndex<List<A>, Int, A> = object : ListFilterIndexInstance<A> {}
+    companion object {
+        operator fun <A> invoke() = object : ListFilterIndexInstance<A> {}
+    }
 }
 
 interface ListIndexInstance<A> : Index<List<A>, Int, A> {
@@ -63,9 +61,8 @@ interface ListIndexInstance<A> : Index<List<A>, Int, A> {
             getOrModify = { it.getOrNull(i)?.let(::Right) ?: it.let(::Left) },
             set = { a -> { l -> l.mapIndexed { index: Int, aa: A -> if (index == i) a else aa } } }
     )
-}
 
-object ListIndexInstanceImplicits {
-    @JvmStatic
-    fun <A> instance(): Index<List<A>, Int, A> = object : ListIndexInstance<A> {}
+    companion object {
+        operator fun <A> invoke() = object : ListIndexInstance<A> {}
+    }
 }
