@@ -15,7 +15,7 @@ class OptionMonoidTest : UnitSpec() {
         "should semigroup with the instance passed" {
             forAll { _: Int ->
                 val optionMonoid = Option.monoid(NonEmptyList.semigroup<Int>())
-                val seen = optionMonoid.combine(None, None)
+                val seen = optionMonoid.run { None.combine(None) }
                 val expected = None
 
                 expected == seen
@@ -25,7 +25,7 @@ class OptionMonoidTest : UnitSpec() {
         "should semigroup with the instance passed" {
             forAll { value: Int ->
                 val optionMonoid = Option.monoid(NonEmptyList.semigroup<Int>())
-                val seen = optionMonoid.combine(Some(NonEmptyList.of(value)), None)
+                val seen = optionMonoid.run { Some(NonEmptyList.of(value)).combine(None) }
                 val expected = None
 
                 expected == seen
@@ -35,7 +35,7 @@ class OptionMonoidTest : UnitSpec() {
         "should semigroup with the instance passed" {
             forAll { value: Int ->
                 val optionMonoid = Option.monoid(NonEmptyList.semigroup<Int>())
-                val seen = optionMonoid.combine(None, Some(NonEmptyList.of(value)))
+                val seen = optionMonoid.run { None.combine(Some(NonEmptyList.of(value))) }
                 val expected = None
 
                 expected == seen
@@ -45,7 +45,7 @@ class OptionMonoidTest : UnitSpec() {
         "should semigroup with the instance passed" {
             forAll { value: Int ->
                 val optionMonoid = Option.monoid(NonEmptyList.semigroup<Int>())
-                val seen = optionMonoid.combine(Some(NonEmptyList.of(value)), Some(NonEmptyList.of(value)))
+                val seen = optionMonoid.run { Some(NonEmptyList.of(value)).combine(Some(NonEmptyList.of(value))) }
                 val expected = Some(NonEmptyList.of(value, value))
 
                 expected == seen

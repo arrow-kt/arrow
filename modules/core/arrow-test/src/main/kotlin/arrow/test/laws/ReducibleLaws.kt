@@ -3,8 +3,8 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Option
-import arrow.instances.IntMonoid
-import arrow.instances.LongMonoid
+import arrow.instances.IntMonoidInstance
+import arrow.instances.LongMonoidInstance
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAAToA
 import arrow.test.generators.genFunctionAToB
@@ -26,21 +26,21 @@ object ReducibleLaws {
 
     fun <F> Reducible<F>.reduceLeftToConsistentWithReduceMap(cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>) =
             forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: Kind<F, Int> ->
-                with(IntMonoid) {
+                with(IntMonoidInstance) {
                     reduceMap(fa, f).equalUnderTheLaw(reduceLeftTo(fa, f, { b, a -> b.combine(f(a)) }), EQ)
                 }
             })
 
     fun <F> Reducible<F>.reduceRightToConsistentWithReduceMap(cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>) =
             forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: Kind<F, Int> ->
-                with(IntMonoid) {
+                with(IntMonoidInstance) {
                     reduceMap(fa, f).equalUnderTheLaw(reduceRightTo(fa, f, { a, eb -> eb.map({ f(a).combine(it) }) }).value(), EQ)
                 }
             })
 
     fun <F> Reducible<F>.reduceRightToConsistentWithReduceRightToOption(cf: (Int) -> Kind<F, Int>, EQ: Eq<Option<Int>>) =
             forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: Kind<F, Int> ->
-                with(IntMonoid) {
+                with(IntMonoidInstance) {
                     reduceRightToOption(fa, f, { a, eb -> eb.map({ f(a).combine(it) }) }).value()
                             .equalUnderTheLaw(reduceRightTo(fa, f, { a, eb -> eb.map({ f(a).combine(it) }) }).map({ Option(it) }).value(), EQ)
                 }
@@ -54,14 +54,14 @@ object ReducibleLaws {
 
     fun <F> Reducible<F>.reduceReduceLeftConsistent(cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>) =
             forAll(genConstructor(genIntSmall(), cf), { fa: Kind<F, Int> ->
-                with(IntMonoid) {
+                with(IntMonoidInstance) {
                     reduce(fa).equalUnderTheLaw(reduceLeft(fa, { a1, a2 -> a1.combine(a2) }), EQ)
                 }
             })
 
     fun <F> Reducible<F>.sizeConsistent(cf: (Int) -> Kind<F, Int>, EQ: Eq<Long>) =
             forAll(genConstructor(genIntSmall(), cf), { fa: Kind<F, Int> ->
-                with(LongMonoid) {
+                with(LongMonoidInstance) {
                     size(fa).equalUnderTheLaw(reduceMap(fa) { 1L }, EQ)
                 }
             })

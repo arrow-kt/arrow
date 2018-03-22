@@ -4,7 +4,6 @@ import arrow.core.Id
 import arrow.core.Tuple2
 import arrow.core.functor
 import arrow.core.toT
-import arrow.syntax.collections.stateTraverse
 import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
@@ -40,12 +39,6 @@ class StateTests : UnitSpec() {
 
         "basic" {
             add1.run(1) shouldBe (2 toT 1)
-        }
-
-        "traverse" {
-            val ns = (0..10).toList()
-            val x = ns.stateTraverse { add1 }
-            x.run(0).a shouldBe 11
         }
 
         "pure" {

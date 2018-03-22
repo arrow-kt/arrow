@@ -181,9 +181,9 @@ fun <G, E, A, B> Validated<E, A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<
             is Invalid -> GA.pure(this)
         }
 
-inline fun <E, A> Validated<E, A>.combine(y: ValidatedOf<E, A>,
-                                          SE: Semigroup<E>,
-                                          SA: Semigroup<A>): Validated<E, A> =
+inline fun <E, A> Validated<E, A>.combine(SE: Semigroup<E>,
+                                          SA: Semigroup<A>,
+                                          y: ValidatedOf<E, A>): Validated<E, A> =
         y.fix().let { that ->
             when {
                 this is Valid && that is Valid -> Valid(SA.run { a.combine(that.a) })
@@ -193,7 +193,7 @@ inline fun <E, A> Validated<E, A>.combine(y: ValidatedOf<E, A>,
             }
         }
 
-fun <E, A> Validated<E, A>.combineK(y: ValidatedOf<E, A>, SE: Semigroup<E>): Validated<E, A> {
+fun <E, A> Validated<E, A>.combineK(SE: Semigroup<E>, y: ValidatedOf<E, A>): Validated<E, A> {
     val xev = this
     val yev = y.fix()
     return when (xev) {

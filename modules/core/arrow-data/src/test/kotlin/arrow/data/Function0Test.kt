@@ -16,8 +16,8 @@ class Function0Test : UnitSpec() {
 
     init {
         testLaws(
-            MonadLaws.laws(Function0.monad(), EQ),
-            ComonadLaws.laws(Function0.comonad(), { { it }.k() }, EQ)
+                MonadLaws.laws(Function0.monad(), EQ),
+                ComonadLaws.laws(Function0.comonad(), { { it }.k() }, EQ)
         )
     }
 }

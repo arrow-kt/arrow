@@ -1,10 +1,10 @@
 package arrow.data
 
 import arrow.core.*
+import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
-import arrow.test.UnitSpec
 
 @RunWith(KTestJUnitRunner::class)
 class UtilTest : UnitSpec() {
@@ -63,7 +63,6 @@ class UtilTest : UnitSpec() {
     }
 }
 
-
 class Greeter {
 
     var hello: String? = null
@@ -81,7 +80,6 @@ class Greeter {
     fun sayHelloTo(name: String): String {
         return "Hello $name"
     }
-
 
 }
 

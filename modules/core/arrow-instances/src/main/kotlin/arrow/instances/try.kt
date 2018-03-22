@@ -31,14 +31,15 @@ interface TryEqInstance<A> : Eq<Try<A>> {
 
     fun EQA(): Eq<A>
 
+    fun EQT(): Eq<Throwable>
+
     override fun Try<A>.eqv(b: Try<A>): Boolean = when (this) {
         is Success -> when (b) {
             is Failure -> false
             is Success -> EQA().run { value.eqv(b.value) }
         }
         is Failure -> when (b) {
-        //currently not supported by implicit resolution to have implicit that does not occur in type params
-            is Failure -> exception == b.exception
+            is Failure -> EQT().run { exception.eqv(b.exception) }
             is Success -> false
         }
     }

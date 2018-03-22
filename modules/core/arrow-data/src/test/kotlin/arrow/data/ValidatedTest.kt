@@ -1,41 +1,35 @@
 package arrow.data
 
 import arrow.core.*
+import arrow.instances.*
+import arrow.test.UnitSpec
+import arrow.test.laws.*
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Semigroup
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldNotBe
-import arrow.instances.*
-import arrow.syntax.applicative.map
-import arrow.syntax.validated.valid
 import org.junit.runner.RunWith
-import arrow.test.UnitSpec
-import arrow.test.laws.*
-import arrow.typeclasses.*
 
 @RunWith(KTestJUnitRunner::class)
 class ValidatedTest : UnitSpec() {
 
     init {
 
-        "instances can be resolved implicitly" {
-            functor<ValidatedPartialOf<String>>() shouldNotBe null
-            applicative<ValidatedPartialOf<String>>() shouldNotBe null
-            foldable<ValidatedPartialOf<String>>() shouldNotBe null
-            traverse<ValidatedPartialOf<String>>() shouldNotBe null
-            applicativeError<ValidatedPartialOf<String>, String>() shouldNotBe null
-            eq<Validated<String, Int>>() shouldNotBe null
-            show<Validated<String, Int>>() shouldNotBe null
-        }
+        val EQ = Validated.eq(StringEqInstance, IntEqInstance)
+
+        val VAL_AP = Validated.applicative<String>(StringMonoidInstance)
+
+        val VAL_SGK = Validated.semigroupK<String>(StringMonoidInstance)
 
         testLaws(
-            EqLaws.laws { it.valid<String, Int>() },
-            ShowLaws.laws { it.valid<String, Int>() },
+            EqLaws.laws(EQ) { Valid(it) },
+            ShowLaws.laws(Validated.show(), EQ) { Valid(it) },
             ApplicativeLaws.laws(Validated.applicative(StringMonoidInstance), Eq.any()),
             TraverseLaws.laws(Validated.traverse(), Validated.applicative(StringMonoidInstance), ::Valid, Eq.any()),
             SemigroupKLaws.laws(
-                Validated.semigroupK(IntMonoid),
-                Validated.applicative(IntMonoid),
+                Validated.semigroupK(IntMonoidInstance),
+                Validated.applicative(IntMonoidInstance),
                 Eq.any())
         )
 
@@ -107,8 +101,8 @@ class ValidatedTest : UnitSpec() {
         }
 
         "toIor should return Ior.Right(value) if is Valid or Ior.Left(error) in otherwise" {
-            Valid(10).toIor() shouldBe Ior.Right(10)
-            Invalid(13).toIor() shouldBe Ior.Left(13)
+            Valid(10).toIor() shouldBe Ior.Right<Int, Int>(10)
+            Invalid(13).toIor() shouldBe Ior.Left<Int, Int>(13)
         }
 
         "toOption should return Some(value) if is Valid or None in otherwise" {
@@ -126,9 +120,7 @@ class ValidatedTest : UnitSpec() {
             Invalid(13).toValidatedNel() shouldBe Invalid(NonEmptyList(13, listOf()))
         }
 
-        val plusIntSemigroup: Semigroup<Int> = object : Semigroup<Int> {
-            override fun combine(a: Int, b: Int): Int = a + b
-        }
+        val plusIntSemigroup: Semigroup<Int> = IntSemigroupInstance
 
         "findValid should return the first Valid value or combine or Invalid values in otherwise" {
             Valid(10).findValid(plusIntSemigroup, { fail("None should not be called") }) shouldBe Valid(10)
@@ -177,66 +169,71 @@ class ValidatedTest : UnitSpec() {
             Invalid(10).withEither { it } shouldBe Invalid(10)
         }
 
-        "Cartesian builder should build products over homogeneous Validated" {
-            Validated.applicative<String>().map(
-                    Valid("11th"),
-                    Valid("Doctor"),
-                    Valid("Who"),
-                    { (a, b, c) -> "$a $b $c" }) shouldBe Valid("11th Doctor Who")
+        with (VAL_AP) {
+
+            "Cartesian builder should build products over homogeneous Validated" {
+                VAL_AP.map(
+                        Valid("11th"),
+                        Valid("Doctor"),
+                        Valid("Who"),
+                        { (a, b, c) -> "$a $b $c" }) shouldBe Valid("11th Doctor Who")
+            }
+
+            "Cartesian builder should build products over heterogeneous Validated" {
+                VAL_AP.map(
+                        Valid(13),
+                        Valid("Doctor"),
+                        Valid(false),
+                        { (a, b, c) -> "${a}th $b is $c" }) shouldBe Valid("13th Doctor is false")
+            }
+
+            "Cartesian builder should build products over Invalid Validated" {
+                VAL_AP.map(
+                        Invalid("fail1"),
+                        Invalid("fail2"),
+                        Valid("Who"),
+                        { "success!" }) shouldBe Invalid("fail1fail2")
+            }
         }
 
-        "Cartesian builder should build products over heterogeneous Validated" {
-            Validated.applicative<String>().map(
-                    Valid(13),
-                    Valid("Doctor"),
-                    Valid(false),
-                    { (a, b, c) -> "${a}th $b is $c" }) shouldBe Valid("13th Doctor is false")
-        }
+        with (VAL_SGK) {
+            "CombineK should combine Valid Validated" {
+                val valid = Valid("Who")
 
-        "Cartesian builder should build products over Invalid Validated" {
-            Validated.applicative<String>().map(
-                    Invalid("fail1"),
-                    Invalid("fail2"),
-                    Valid("Who"),
-                    { "success!" }) shouldBe Invalid("fail1fail2")
-        }
+                VAL_SGK.combineK(valid, valid) shouldBe (Valid("Who"))
+            }
 
-        "CombineK should combine Valid Validated" {
-            val valid = Valid("Who")
+            "CombineK should combine Valid and Invalid Validated" {
+                val valid = Valid("Who")
+                val invalid = Invalid("Nope")
 
-            Validated.semigroupK<String>().combineK(valid, valid) shouldBe(Valid("Who"))
-        }
+                VAL_SGK.combineK(valid, invalid) shouldBe (Valid("Who"))
+            }
 
-        "CombineK should combine Valid and Invalid Validated" {
-            val valid = Valid("Who")
-            val invalid = Invalid("Nope")
+            "CombineK should combine Invalid Validated" {
+                val invalid = Invalid("Nope")
 
-            Validated.semigroupK<String>().combineK(valid, invalid) shouldBe(Valid("Who"))
-        }
-
-        "CombineK should combine Invalid Validated" {
-            val invalid = Invalid("Nope")
-
-            Validated.semigroupK<String>().combineK(invalid, invalid) shouldBe(Invalid("NopeNope"))
+                VAL_SGK.combineK(invalid, invalid) shouldBe (Invalid("NopeNope"))
+            }
         }
 
         "Combine should combine Valid Validated" {
             val valid: Validated<String, String> = Valid("Who")
 
-            valid.combine(valid) shouldBe(Valid("WhoWho"))
+            valid.combine(StringMonoidInstance, StringMonoidInstance, valid) shouldBe(Valid("WhoWho"))
         }
 
         "Combine should combine Valid and Invalid Validated" {
             val valid = Valid("Who")
             val invalid = Invalid("Nope")
 
-            valid.combine(invalid) shouldBe(Invalid("Nope"))
+            valid.combine(StringMonoidInstance, StringMonoidInstance, invalid) shouldBe(Invalid("Nope"))
         }
 
         "Combine should combine Invalid Validated" {
             val invalid: Validated<String, String> = Invalid("Nope")
 
-            invalid.combine(invalid) shouldBe(Invalid("NopeNope"))
+            invalid.combine(StringMonoidInstance, StringMonoidInstance, invalid) shouldBe(Invalid("NopeNope"))
         }
     }
 }

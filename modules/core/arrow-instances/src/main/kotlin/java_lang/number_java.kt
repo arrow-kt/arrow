@@ -4,11 +4,11 @@ import arrow.instances.*
 import arrow.typeclasses.Semigroup
 
 object IntegerMonoidInstanceImplicits {
-    fun instance(): IntMonoid = IntMonoid
+    fun instance(): IntMonoidInstance = IntMonoidInstance
 }
 
 object IntegerSemigroupInstanceImplicits {
-    fun instance(): Semigroup<Int> = IntMonoid
+    fun instance(): Semigroup<Int> = IntMonoidInstance
 }
 
 object IntegerEqInstanceImplicits {
@@ -24,11 +24,11 @@ object IntegerOrderInstanceImplicits {
 }
 
 object LongMonoidInstanceImplicits {
-    fun instance(): LongMonoid = LongMonoid
+    fun instance(): LongMonoidInstance = LongMonoidInstance
 }
 
 object LongSemigroupInstanceImplicits {
-    fun instance(): Semigroup<Long> = LongMonoid
+    fun instance(): Semigroup<Long> = LongMonoidInstance
 }
 
 object LongOrderInstanceImplicits {
@@ -64,11 +64,11 @@ object ShortShowInstanceImplicits {
 }
 
 object ByteMonoidInstanceImplicits {
-    fun instance(): ByteMonoid = ByteMonoid
+    fun instance(): ByteMonoidInstance = ByteMonoidInstance
 }
 
 object ByteSemigroupInstanceImplicits {
-    fun instance(): Semigroup<Byte> = ByteMonoid
+    fun instance(): Semigroup<Byte> = ByteMonoidInstance
 }
 
 object ByteOrderInstanceImplicits {

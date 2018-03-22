@@ -19,19 +19,19 @@ interface ListKMonoidInstance<A> : ListKSemigroupInstance<A>, Monoid<ListK<A>> {
 }
 
 @instance(ListK::class)
-interface ListKEqInstance<A> : Eq<ListK<A>> {
+interface ListKEqInstance<A> : Eq<ListKOf<A>> {
 
     fun EQ(): Eq<A>
 
-    override fun ListK<A>.eqv(b: ListK<A>): Boolean =
-            zip(b) { aa, bb -> EQ().run { aa.eqv(bb) } }.fold(true) { acc, bool ->
+    override fun ListKOf<A>.eqv(b: ListKOf<A>): Boolean =
+            fix().zip(b) { aa, bb -> EQ().run { aa.eqv(bb) } }.fold(true) { acc, bool ->
                 acc && bool
             }
 }
 
 @instance(ListK::class)
-interface ListKShowInstance<A> : Show<ListK<A>> {
-    override fun show(a: ListK<A>): String =
+interface ListKShowInstance<A> : Show<ListKOf<A>> {
+    override fun show(a: ListKOf<A>): String =
             a.toString()
 }
 

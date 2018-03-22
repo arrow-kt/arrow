@@ -59,7 +59,7 @@ interface ValidatedSemigroupKInstance<E> : SemigroupK<ValidatedPartialOf<E>> {
     fun SE(): Semigroup<E>
 
     override fun <B> combineK(x: ValidatedOf<E, B>, y: ValidatedOf<E, B>): Validated<E, B> =
-            x.fix().combineK(y, SE())
+            x.fix().combineK(SE(), y)
 
 }
 
