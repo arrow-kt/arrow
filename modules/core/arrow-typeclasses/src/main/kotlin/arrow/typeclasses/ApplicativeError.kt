@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
+import arrow.core.identity
 
 interface ApplicativeError<F, E> : Applicative<F> {
 
@@ -26,4 +27,7 @@ interface ApplicativeError<F, E> : Applicative<F> {
             } catch (t: Throwable) {
                 raiseError<A>(recover(t))
             }
+
+    fun <A> ApplicativeError<F, Throwable>.catch(f: () -> A): Kind<F, A> =
+            catch(f, ::identity)
 }
