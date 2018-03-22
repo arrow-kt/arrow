@@ -1,7 +1,11 @@
 package arrow.dagger.effects.instances.tests
 
 import arrow.dagger.effects.instances.rx2.ArrowEffectsRx2Instances
-import arrow.effects.*
+import arrow.effects.ForFlowableK
+import arrow.effects.ForObservableK
+import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.Effect
+import arrow.effects.typeclasses.MonadSuspend
 import arrow.typeclasses.*
 import dagger.Component
 import javax.inject.Singleton
