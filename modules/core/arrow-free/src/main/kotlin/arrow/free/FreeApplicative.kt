@@ -1,7 +1,7 @@
 package arrow.free
 
 import arrow.Kind
-import arrow.core.FunctionK
+import arrow.typeclasses.FunctionK
 import arrow.data.*
 import arrow.higherkind
 import arrow.typeclasses.Applicative

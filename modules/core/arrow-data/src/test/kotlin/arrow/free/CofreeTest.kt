@@ -8,11 +8,9 @@ import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
-import arrow.typeclasses.comonad
-import arrow.typeclasses.functor
+import arrow.typeclasses.FunctionK
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -20,14 +18,9 @@ class CofreeTest : UnitSpec() {
 
     init {
 
-        "instances can be resolved implicitly" {
-            functor<CofreePartialOf<ForOption>>() shouldNotBe null
-            comonad<CofreePartialOf<ForOption>>() shouldNotBe null
-        }
-
         testLaws(ComonadLaws.laws(Cofree.comonad<ForOption>(), {
             val sideEffect = SideEffect()
-            unfold(sideEffect.counter, {
+            unfold(Option.functor(), sideEffect.counter, {
                 sideEffect.increment()
                 if (it % 2 == 0) None else Some(it + 1)
             })
@@ -37,7 +30,7 @@ class CofreeTest : UnitSpec() {
 
         "tailForced should evaluate and return" {
             val sideEffect = SideEffect()
-            val start: Cofree<ForId, Int> = unfold(sideEffect.counter, { sideEffect.increment(); Id(it + 1) })
+            val start: Cofree<ForId, Int> = unfold(Id.functor(), sideEffect.counter, { sideEffect.increment(); Id(it + 1) })
             sideEffect.counter shouldBe 0
             start.tailForced()
             sideEffect.counter shouldBe 1
@@ -45,7 +38,7 @@ class CofreeTest : UnitSpec() {
 
         "runTail should run once and return" {
             val sideEffect = SideEffect()
-            val start: Cofree<ForId, Int> = unfold(sideEffect.counter, { sideEffect.increment(); Id(it) })
+            val start: Cofree<ForId, Int> = unfold(Id.functor(), sideEffect.counter, { sideEffect.increment(); Id(it) })
             sideEffect.counter shouldBe 0
             start.runTail()
             sideEffect.counter shouldBe 1
@@ -53,7 +46,7 @@ class CofreeTest : UnitSpec() {
 
         "run should fold until completion" {
             val sideEffect = SideEffect()
-            val start: Cofree<ForOption, Int> = unfold(sideEffect.counter, {
+            val start: Cofree<ForOption, Int> = unfold(Option.functor(), sideEffect.counter, {
                 sideEffect.increment()
                 if (it == 5) None else Some(it + 1)
             })
@@ -67,7 +60,7 @@ class CofreeTest : UnitSpec() {
             try {
                 val limit = 10000
                 val counter = SideEffect()
-                val startThousands: Cofree<ForOption, Int> = unfold(counter.counter, {
+                val startThousands: Cofree<ForOption, Int> = unfold(Option.functor(), counter.counter, {
                     counter.increment()
                     if (it == limit) None else Some(it + 1)
                 })
@@ -80,7 +73,7 @@ class CofreeTest : UnitSpec() {
 
         "run with an stack-safe monad should not blow up the stack" {
             val counter = SideEffect()
-            val startThousands: Cofree<ForEval, Int> = unfold(counter.counter, {
+            val startThousands: Cofree<ForEval, Int> = unfold(Eval.functor(), counter.counter, {
                 counter.increment()
                 Eval.now(it + 1)
             })
@@ -88,7 +81,7 @@ class CofreeTest : UnitSpec() {
             counter.counter shouldBe 1
         }
 
-        val startHundred: Cofree<ForOption, Int> = unfold(0, { if (it == 100) None else Some(it + 1) }, Option.functor())
+        val startHundred: Cofree<ForOption, Int> = unfold(Option.functor(), 0, { if (it == 100) None else Some(it + 1) })
 
         "mapBranchingRoot should modify the value of the functor" {
             val mapped = startHundred.mapBranchingRoot(object : FunctionK<ForOption, ForOption> {
@@ -108,7 +101,7 @@ class CofreeTest : UnitSpec() {
         }
 
         "cata should traverse the structure" {
-            val cata: NonEmptyList<Int> = startHundred.cata<ForOption, Int, NonEmptyList<Int>>(
+            val cata: NonEmptyList<Int> = startHundred.cata<NonEmptyList<Int>>(
                     { i, lb -> Eval.now(NonEmptyList(i, lb.fix().fold({ emptyList<Int>() }, { it.all }))) },
                     Option.traverse()
             ).value()
@@ -118,34 +111,39 @@ class CofreeTest : UnitSpec() {
             cata shouldBe expected
         }
 
-        val startTwoThousand: Cofree<ForOption, Int> = unfold(0, { if (it == 2000) None else Some(it + 1) }, Option.functor())
+        val startTwoThousand: Cofree<ForOption, Int> = unfold(Option.functor(), 0, { if (it == 2000) None else Some(it + 1) })
 
-        "cata with an stack-unsafe monad should blow up the stack" {
-            try {
-                startTwoThousand.cata<ForOption, Int, NonEmptyList<Int>>(
-                        { i, lb -> Eval.now(NonEmptyList(i, lb.fix().fold({ emptyList<Int>() }, { it.all }))) },
-                        Option.traverse()
-                ).value()
-                throw AssertionError("Run should overflow on a stack-unsafe monad")
-            } catch (e: StackOverflowError) {
-                // Expected. For stack safety use cataM instead
+        with(startTwoThousand) {
+            "cata with an stack-unsafe monad should blow up the stack" {
+                try {
+                    cata<NonEmptyList<Int>>(
+                            { i, lb -> Eval.now(NonEmptyList(i, lb.fix().fold({ emptyList<Int>() }, { it.all }))) },
+                            Option.traverse()
+                    ).value()
+                    throw AssertionError("Run should overflow on a stack-unsafe monad")
+                } catch (e: StackOverflowError) {
+                    // Expected. For stack safety use cataM instead
+                }
             }
-        }
 
-        "cataM should traverse the structure in a stack-safe way on a monad" {
-            val folder: (Int, Kind<ForOption, NonEmptyList<Int>>) -> EvalOption<NonEmptyList<Int>> = { i, lb ->
-                if (i <= 2000) OptionT.pure(NonEmptyList(i, lb.fix().fold({ emptyList<Int>() }, { it.all }))) else OptionT.none()
-            }
-            val inclusion = object : FunctionK<ForEval, EvalOptionF> {
-                override fun <A> invoke(fa: Kind<ForEval, A>): Kind<EvalOptionF, A> =
-                        OptionT(fa.fix().map { Some(it) })
-            }
-            val cataHundred = startTwoThousand.cataM(folder, inclusion, Option.traverse(), OptionT.monad(Eval.monad())).fix().value.fix().value()
-            val newCof = Cofree(Option.functor(), 2001, Eval.now(Some(startTwoThousand)))
-            val cataHundredOne = newCof.cataM(folder, inclusion, Option.traverse(), OptionT.monad(Eval.monad())).fix().value.fix().value()
+            "cataM should traverse the structure in a stack-safe way on a monad" {
+                val folder: (Int, Kind<ForOption, NonEmptyList<Int>>) -> EvalOption<NonEmptyList<Int>> = { i, lb ->
+                    if (i <= 2000)
+                        OptionT.pure(NonEmptyList(i, lb.fix().fold({ emptyList<Int>() }, { it.all })), Eval.applicative())
+                    else
+                        OptionT.none(Eval.applicative())
+                }
+                val inclusion = object : FunctionK<ForEval, EvalOptionF> {
+                    override fun <A> invoke(fa: Kind<ForEval, A>): Kind<EvalOptionF, A> =
+                            OptionT(fa.fix().map { Some(it) })
+                }
+                val cataHundred = cataM(folder, inclusion, Option.traverse(), OptionT.monad(Eval.monad())).fix().value.fix().value()
+                val newCof = Cofree(Option.functor(), 2001, Eval.now(Some(startTwoThousand)))
+                val cataHundredOne = newCof.cataM(folder, inclusion, Option.traverse(), OptionT.monad(Eval.monad())).fix().value.fix().value()
 
-            cataHundred shouldBe Some(NonEmptyList.fromListUnsafe((0..2000).toList()))
-            cataHundredOne shouldBe None
+                cataHundred shouldBe Some(NonEmptyList.fromListUnsafe((0..2000).toList()))
+                cataHundredOne shouldBe None
+            }
         }
 
     }

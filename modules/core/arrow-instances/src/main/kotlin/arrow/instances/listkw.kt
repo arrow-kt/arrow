@@ -24,7 +24,7 @@ interface ListKEqInstance<A> : Eq<ListKOf<A>> {
     fun EQ(): Eq<A>
 
     override fun ListKOf<A>.eqv(b: ListKOf<A>): Boolean =
-            fix().zip(b) { aa, bb -> EQ().run { aa.eqv(bb) } }.fold(true) { acc, bool ->
+            fix().zip(b.fix()) { aa, bb -> EQ().run { aa.eqv(bb) } }.fold(true) { acc, bool ->
                 acc && bool
             }
 }

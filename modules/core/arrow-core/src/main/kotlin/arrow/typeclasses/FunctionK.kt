@@ -1,4 +1,4 @@
-package arrow.core
+package arrow.typeclasses
 
 import arrow.Kind
 

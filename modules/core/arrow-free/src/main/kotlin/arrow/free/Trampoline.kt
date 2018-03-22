@@ -1,6 +1,6 @@
 package arrow.free
 
-import arrow.core.FunctionK
+import arrow.typeclasses.FunctionK
 import arrow.data.*
 
 /**

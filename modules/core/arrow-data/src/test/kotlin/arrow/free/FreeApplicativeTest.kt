@@ -7,16 +7,11 @@ import arrow.data.applicative
 import arrow.data.fix
 import arrow.free.instances.FreeApplicativeApplicativeInstance
 import arrow.free.instances.FreeApplicativeEq
-import arrow.syntax.applicative.tupled
-import arrow.syntax.tuples.plus
 import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.EqLaws
-import arrow.typeclasses.applicative
-import arrow.typeclasses.functor
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 
 sealed class OpsAp<out A> : Kind<OpsAp.F, A> {
@@ -43,19 +38,15 @@ class FreeApplicativeTest : UnitSpec() {
 
     init {
 
-        "instances can be resolved implicitly" {
-            functor<FreeApplicativePartialOf<OpsAp.F>>() shouldNotBe null
-            applicative<FreeApplicativePartialOf<OpsAp.F>>()  shouldNotBe null
-        }
+        val EQ: FreeApplicativeEq<OpsAp.F, ForId, Int> = FreeApplicative.eq(idApInterpreter, Id.monad())
 
-        val EQ: FreeApplicativeEq<OpsAp.F, ForId, Int> = FreeApplicativeEq(idApInterpreter)
         testLaws(
             EqLaws.laws<FreeApplicative<OpsAp.F, Int>>(EQ, { OpsAp.value(it) }),
             ApplicativeLaws.laws(OpsAp, EQ)
         )
 
         "Can interpret an ADT as FreeApplicative operations" {
-            val result: Tuple3<Int, Int, Int> = (1 toT 7) + -1
+            val result: Tuple3<Int, Int, Int> = Tuple3(1, 7, -1)
             program.foldMap(optionApInterpreter, Option.applicative()).fix() shouldBe Some(result)
             program.foldMap(idApInterpreter, Id.applicative()).fix() shouldBe Id(result)
             program.foldMap(nonEmptyListApInterpreter, NonEmptyList.applicative()).fix() shouldBe NonEmptyList.of(result)
@@ -66,9 +57,9 @@ class FreeApplicativeTest : UnitSpec() {
             val start = 333
             val r = FreeApplicative.liftF(NonEmptyList.of(start))
             val rr = (1..loops).toList().fold(r, { v, _ -> v.ap(FreeApplicative.liftF(NonEmptyList.of({ a: Int -> a + 1 }))) })
-            rr.foldK() shouldBe NonEmptyList.of(start + loops)
+            rr.foldK(NonEmptyList.applicative()) shouldBe NonEmptyList.of(start + loops)
             val rx = (1..loops).toList().foldRight(r, { _, v -> v.ap(FreeApplicative.liftF(NonEmptyList.of({ a: Int -> a + 1 }))) })
-            rx.foldK() shouldBe NonEmptyList.of(start + loops)
+            rx.foldK(NonEmptyList.applicative()) shouldBe NonEmptyList.of(start + loops)
         }
     }
 }

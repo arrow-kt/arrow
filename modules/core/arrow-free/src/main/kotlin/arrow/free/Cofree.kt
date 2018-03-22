@@ -3,6 +3,7 @@ package arrow.free
 import arrow.Kind
 import arrow.core.*
 import arrow.higherkind
+import arrow.typeclasses.FunctionK
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Traverse

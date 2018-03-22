@@ -7,9 +7,7 @@ import arrow.core.functor
 import arrow.test.UnitSpec
 import arrow.test.laws.FunctorLaws
 import arrow.typeclasses.Eq
-import arrow.typeclasses.functor
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
@@ -24,15 +22,11 @@ class YonedaTest : UnitSpec() {
 
     init {
 
-        "instances can be resolved implicitly" {
-            functor<YonedaPartialOf<ForId>>() shouldNotBe null
-        }
-
-        testLaws(FunctorLaws.laws(F, { Yoneda(Id(it)) }, EQ))
+        testLaws(FunctorLaws.laws(F, { Yoneda(Id(it), Id.functor()) }, EQ))
 
         "toCoyoneda should convert to an equivalent Coyoneda" {
             forAll { x: Int ->
-                val op = Yoneda(Id(x.toString()))
+                val op = Yoneda(Id(x.toString()), Id.functor())
                 val toYoneda = op.toCoyoneda().lower(Id.functor()).fix()
                 val expected = Coyoneda(Id(x), Int::toString).lower(Id.functor()).fix()
 

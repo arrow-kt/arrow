@@ -2,7 +2,7 @@ package arrow.free
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.FunctionK
+import arrow.typeclasses.FunctionK
 import arrow.higherkind
 import arrow.typeclasses.Monad
 

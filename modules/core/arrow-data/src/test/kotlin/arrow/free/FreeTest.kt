@@ -10,13 +10,9 @@ import arrow.free.instances.FreeMonadInstance
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadLaws
-import arrow.typeclasses.applicative
 import arrow.typeclasses.binding
-import arrow.typeclasses.functor
-import arrow.typeclasses.monad
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 
 sealed class Ops<out A> : Kind<Ops.F, A> {
@@ -53,13 +49,7 @@ class FreeTest : UnitSpec() {
 
     init {
 
-        "instances can be resolved implicitly" {
-            functor<FreePartialOf<OpsAp.F>>() shouldNotBe null
-            applicative<FreePartialOf<OpsAp.F>>()  shouldNotBe null
-            monad<FreePartialOf<OpsAp.F>>()  shouldNotBe null
-        }
-
-        val EQ: FreeEq<Ops.F, ForId, Int> = FreeEq(idInterpreter)
+        val EQ: FreeEq<Ops.F, ForId, Int> = Free.eq(idInterpreter, Id.monad())
         testLaws(
                 EqLaws.laws<Free<Ops.F, Int>>(EQ, { Ops.value(it) }),
                 MonadLaws.laws(Ops, EQ)

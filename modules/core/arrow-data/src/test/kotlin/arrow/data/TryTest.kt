@@ -22,7 +22,7 @@ class TryTest : UnitSpec() {
 
     init {
 
-        val EQ = Try.eq(IntEqInstance)
+        val EQ = Try.eq(Eq { a, b -> a::class == b::class }, IntEqInstance)
 
         testLaws(
                 EqLaws.laws(EQ) { Try { it } },

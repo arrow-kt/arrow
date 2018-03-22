@@ -3,14 +3,16 @@ package arrow.data
 import arrow.Kind
 import arrow.core.*
 import arrow.core.Eval.Now
-import arrow.syntax.collections.prependTo
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
-import arrow.test.laws.*
+import arrow.test.laws.ComonadLaws
+import arrow.test.laws.MonadLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.*
-import io.kotlintest.properties.*
+import io.kotlintest.matchers.fail
+import io.kotlintest.matchers.shouldBe
+import io.kotlintest.properties.Gen
+import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -22,8 +24,8 @@ class EvalTest : UnitSpec() {
     init {
 
         testLaws(
-            MonadLaws.laws(Eval.monad(), EQ),
-            ComonadLaws.laws(Eval.comonad(), ::Now, EQ)
+                MonadLaws.laws(Eval.monad(), EQ),
+                ComonadLaws.laws(Eval.comonad(), ::Now, EQ)
         )
 
         "should map wrapped value" {
@@ -172,9 +174,9 @@ class EvalTest : UnitSpec() {
                             val o = os[i]
                             when (o) {
                                 is O.Defer -> Eval.defer { step(i + 1, leaf, cbs) }
-                                is O.Memoize -> step(i + 1, leaf, cbs.also { it.add(0) { e: Eval<Int> -> e.memoize() }})
-                                is O.Map -> step(i + 1, leaf, cbs.also { it.add(0) { e: Eval<Int> -> e.map(o.f) }})
-                                is O.FlatMap -> step(i + 1, leaf, cbs.also { it.add(0) { e: Eval<Int> -> e.flatMap(o.f) }})
+                                is O.Memoize -> step(i + 1, leaf, cbs.also { it.add(0) { e: Eval<Int> -> e.memoize() } })
+                                is O.Map -> step(i + 1, leaf, cbs.also { it.add(0) { e: Eval<Int> -> e.map(o.f) } })
+                                is O.FlatMap -> step(i + 1, leaf, cbs.also { it.add(0) { e: Eval<Int> -> e.flatMap(o.f) } })
                             }
                         }
 
