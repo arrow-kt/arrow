@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
 class FlowableKTests : UnitSpec() {
 
     fun <T> EQ(): Eq<FlowableKOf<T>> = object : Eq<FlowableKOf<T>> {
-        fun FlowableKOf<T>.eqv(b: FlowableKOf<T>): Boolean =
+        override fun FlowableKOf<T>.eqv(b: FlowableKOf<T>): Boolean =
                 try {
                     this.value().blockingFirst() == b.value().blockingFirst()
                 } catch (throwable: Throwable) {

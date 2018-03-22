@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
 class ObservableKTest : UnitSpec() {
 
     fun <T> EQ(): Eq<ObservableKOf<T>> = object : Eq<ObservableKOf<T>> {
-        fun ObservableKOf<T>.eqv(b: Any): ObservableKOf<T> =
+        override fun ObservableKOf<T>.eqv(b: ObservableKOf<T>): Boolean =
                 try {
                     this.value().blockingFirst() == b.value().blockingFirst()
                 } catch (throwable: Throwable) {

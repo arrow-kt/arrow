@@ -5,9 +5,9 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Left
 import arrow.core.Right
-import arrow.deriving
+import arrow.effects.typeclasses.Proc
 import arrow.higherkind
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.FlowableEmitter
@@ -17,13 +17,6 @@ fun <A> Flowable<A>.k(): FlowableK<A> = FlowableK(this)
 fun <A> FlowableKOf<A>.value(): Flowable<A> = this.fix().flowable
 
 @higherkind
-@deriving(
-        Functor::class,
-        Applicative::class,
-        Monad::class,
-        Foldable::class,
-        Traverse::class
-)
 data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKindedJ<A> {
 
     fun <B> map(f: (A) -> B): FlowableK<B> =
@@ -94,7 +87,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
             }
         }
 
-        fun monadFlat(): FlowableKMonadInstance = FlowableKMonadInstanceImplicits.instance()
+        fun monadFlat(): FlowableKMonadInstance = monad()
 
         fun monadConcat(): FlowableKMonadInstance = object : FlowableKMonadInstance {
             override fun <A, B> flatMap(fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
@@ -106,7 +99,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
                     fa.fix().switchMap { f(it).fix() }
         }
 
-        fun monadErrorFlat(): FlowableKMonadErrorInstance = FlowableKMonadErrorInstanceImplicits.instance()
+        fun monadErrorFlat(): FlowableKMonadErrorInstance = monadError()
 
         fun monadErrorConcat(): FlowableKMonadErrorInstance = object : FlowableKMonadErrorInstance {
             override fun <A, B> flatMap(fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
@@ -118,25 +111,25 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
                     fa.fix().switchMap { f(it).fix() }
         }
 
-        fun syncBuffer(): FlowableKMonadSuspendInstance = FlowableKMonadSuspendInstanceImplicits.instance()
+        fun monadSuspendBuffer(): FlowableKMonadSuspendInstance = monadSuspend()
 
-        fun syncDrop(): FlowableKMonadSuspendInstance = object : FlowableKMonadSuspendInstance {
+        fun monadSuspendDrop(): FlowableKMonadSuspendInstance = object : FlowableKMonadSuspendInstance {
             override fun BS(): BackpressureStrategy = BackpressureStrategy.DROP
         }
 
-        fun syncError(): FlowableKMonadSuspendInstance = object : FlowableKMonadSuspendInstance {
+        fun monadSuspendError(): FlowableKMonadSuspendInstance = object : FlowableKMonadSuspendInstance {
             override fun BS(): BackpressureStrategy = BackpressureStrategy.ERROR
         }
 
-        fun syncLatest(): FlowableKMonadSuspendInstance = object : FlowableKMonadSuspendInstance {
+        fun monadSuspendLatest(): FlowableKMonadSuspendInstance = object : FlowableKMonadSuspendInstance {
             override fun BS(): BackpressureStrategy = BackpressureStrategy.LATEST
         }
 
-        fun syncMissing(): FlowableKMonadSuspendInstance = object : FlowableKMonadSuspendInstance {
+        fun monadSuspendMissing(): FlowableKMonadSuspendInstance = object : FlowableKMonadSuspendInstance {
             override fun BS(): BackpressureStrategy = BackpressureStrategy.MISSING
         }
 
-        fun asyncBuffer(): FlowableKAsyncInstance = FlowableKAsyncInstanceImplicits.instance()
+        fun asyncBuffer(): FlowableKAsyncInstance = async()
 
         fun asyncDrop(): FlowableKAsyncInstance = object : FlowableKAsyncInstance {
             override fun BS(): BackpressureStrategy = BackpressureStrategy.DROP
@@ -154,7 +147,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
             override fun BS(): BackpressureStrategy = BackpressureStrategy.MISSING
         }
 
-        fun effectBuffer(): FlowableKEffectInstance = FlowableKEffectInstanceImplicits.instance()
+        fun effectBuffer(): FlowableKEffectInstance = effect()
 
         fun effectDrop(): FlowableKEffectInstance = object : FlowableKEffectInstance {
             override fun BS(): BackpressureStrategy = BackpressureStrategy.DROP

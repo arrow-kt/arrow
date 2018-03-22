@@ -5,9 +5,9 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Left
 import arrow.core.Right
-import arrow.deriving
+import arrow.effects.typeclasses.Proc
 import arrow.higherkind
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 
@@ -17,13 +17,7 @@ fun <A> ObservableKOf<A>.value(): Observable<A> =
         this.fix().observable
 
 @higherkind
-@deriving(
-        Functor::class,
-        Applicative::class,
-        Monad::class,
-        Foldable::class,
-        Traverse::class
-)
+
 data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, ObservableKKindedJ<A> {
     fun <B> map(f: (A) -> B): ObservableK<B> =
             observable.map(f).k()
@@ -92,7 +86,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
             }
         }
 
-        fun monadFlat(): ObservableKMonadInstance = ObservableKMonadInstanceImplicits.instance()
+        fun monadFlat(): ObservableKMonadInstance = monad()
 
         fun monadConcat(): ObservableKMonadInstance = object : ObservableKMonadInstance {
             override fun <A, B> flatMap(fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
@@ -104,7 +98,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
                     fa.fix().switchMap { f(it).fix() }
         }
 
-        fun monadErrorFlat(): ObservableKMonadErrorInstance = ObservableKMonadErrorInstanceImplicits.instance()
+        fun monadErrorFlat(): ObservableKMonadErrorInstance = monadError()
 
         fun monadErrorConcat(): ObservableKMonadErrorInstance = object : ObservableKMonadErrorInstance {
             override fun <A, B> flatMap(fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
