@@ -28,8 +28,8 @@ interface StateTApplicativeInstance<F, S> : StateTFunctorInstance<F, S>, Applica
     override fun <A, B> ap(fa: StateTOf<F, S, A>, ff: StateTOf<F, S, (A) -> B>): StateT<F, S, B> =
             fa.fix().ap(ff, FF())
 
-    override fun <A, B> product(fa: StateTOf<F, S, A>, fb: StateTOf<F, S, B>): StateT<F, S, Tuple2<A, B>> =
-            fa.fix().product(fb.fix(), FF())
+    override fun <A, B> arrow.Kind<arrow.data.StateTPartialOf<F, S>, A>.product(fb: arrow.Kind<arrow.data.StateTPartialOf<F, S>, B>): StateT<F, S, Tuple2<A, B>> =
+            this@product.fix().product(fb.fix(), this@StateTApplicativeInstance.FF())
 
 }
 

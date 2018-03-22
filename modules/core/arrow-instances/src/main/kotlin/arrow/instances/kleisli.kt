@@ -1,5 +1,6 @@
 package arrow.instances
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.andThen
@@ -31,8 +32,8 @@ interface KleisliApplicativeInstance<F, D> : KleisliFunctorInstance<F, D>, Appli
     override fun <A, B> ap(fa: KleisliOf<F, D, A>, ff: KleisliOf<F, D, (A) -> B>): Kleisli<F, D, B> =
             fa.fix().ap(ff, FF())
 
-    override fun <A, B> product(fa: KleisliOf<F, D, A>, fb: KleisliOf<F, D, B>): Kleisli<F, D, Tuple2<A, B>> =
-            Kleisli({ FF().product(fa.fix().run(it), fb.fix().run(it)) })
+    override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.product(fb: Kind<KleisliPartialOf<F, D>, B>): Kleisli<F, D, Tuple2<A, B>> =
+            Kleisli({ FF().run { fix().run(it).product(fb.fix().run(it)) } })
 }
 
 @instance(Kleisli::class)
