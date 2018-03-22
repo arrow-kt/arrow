@@ -1,10 +1,14 @@
 package arrow.free.instances
 
-import arrow.*
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.FunctionK
 import arrow.free.*
-import arrow.typeclasses.*
+import arrow.instance
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
 
 @instance(Free::class)
 interface FreeFunctorInstance<S> : Functor<FreePartialOf<S>> {
@@ -42,10 +46,10 @@ interface FreeMonadInstance<S> : FreeApplicativeInstance<S>, Monad<FreePartialOf
 }
 
 data class FreeEq<F, G, A>(private val interpreter: FunctionK<F, G>, private val MG: Monad<G>) : Eq<Kind<FreePartialOf<F>, A>> {
-    override fun eqv(a: Kind<FreePartialOf<F>, A>, b: Kind<FreePartialOf<F>, A>): Boolean = a.fix().foldMap(interpreter, MG) == b.fix().foldMap(interpreter, MG)
+    override fun Kind<FreePartialOf<F>, A>.eqv(b: Kind<FreePartialOf<F>, A>): Boolean = fix().foldMap(interpreter, MG) == b.fix().foldMap(interpreter, MG)
 
     companion object {
-        inline operator fun <F, reified G, A> invoke(interpreter: FunctionK<F, G>, MG: Monad<G> = monad(), dummy: Unit = Unit): FreeEq<F, G, A> =
+        operator fun <F, G, A> invoke(interpreter: FunctionK<F, G>, MG: Monad<G>): FreeEq<F, G, A> =
                 FreeEq(interpreter, MG)
     }
 }

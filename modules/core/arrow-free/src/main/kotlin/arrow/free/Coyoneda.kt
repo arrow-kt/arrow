@@ -1,11 +1,13 @@
 package arrow.free
 
-import arrow.*
+import arrow.Kind
+import arrow.higherkind
 import arrow.typeclasses.Functor
 
 private typealias AnyFunc = (Any?) -> Any?
 
-@higherkind data class Coyoneda<F, P, A>(val pivot: Kind<F, P>, internal val ks: List<AnyFunc>) : CoyonedaOf<F, P, A>, CoyonedaKindedJ<F, P, A> {
+@higherkind
+data class Coyoneda<F, P, A>(val pivot: Kind<F, P>, internal val ks: List<AnyFunc>) : CoyonedaOf<F, P, A>, CoyonedaKindedJ<F, P, A> {
 
     @Suppress("UNCHECKED_CAST")
     private val transform: (P) -> A = {

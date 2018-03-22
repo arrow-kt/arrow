@@ -1,9 +1,16 @@
 package arrow.free.instances
 
-import arrow.*
+import arrow.Kind
 import arrow.core.FunctionK
-import arrow.free.*
-import arrow.typeclasses.*
+import arrow.free.FreeApplicative
+import arrow.free.FreeApplicativeOf
+import arrow.free.FreeApplicativePartialOf
+import arrow.free.fix
+import arrow.instance
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
 
 @instance(FreeApplicative::class)
 interface FreeApplicativeFunctorInstance<S> : Functor<FreeApplicativePartialOf<S>> {
@@ -21,11 +28,11 @@ interface FreeApplicativeApplicativeInstance<S> : FreeApplicativeFunctorInstance
 }
 
 data class FreeApplicativeEq<F, G, A>(private val interpreter: FunctionK<F, G>, private val MG: Monad<G>) : Eq<Kind<FreeApplicativePartialOf<F>, A>> {
-    override fun eqv(a: Kind<FreeApplicativePartialOf<F>, A>, b: Kind<FreeApplicativePartialOf<F>, A>): Boolean =
-            a.fix().foldMap(interpreter, MG) == b.fix().foldMap(interpreter, MG)
+    override fun Kind<FreeApplicativePartialOf<F>, A>.eqv(b: Kind<FreeApplicativePartialOf<F>, A>): Boolean =
+            fix().foldMap(interpreter, MG) == b.fix().foldMap(interpreter, MG)
 
     companion object {
-        inline operator fun <F, reified G, A> invoke(interpreter: FunctionK<F, G>, MG: Monad<G> = monad(), dummy: Unit = Unit): FreeApplicativeEq<F, G, A> =
+        operator fun <F, G, A> invoke(interpreter: FunctionK<F, G>, MG: Monad<G>): FreeApplicativeEq<F, G, A> =
                 FreeApplicativeEq(interpreter, MG)
     }
 }

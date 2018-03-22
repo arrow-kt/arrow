@@ -1,19 +1,22 @@
 package arrow.free
 
-import arrow.*
-import arrow.core.*
+import arrow.Kind
+import arrow.core.FunctionK
 import arrow.data.*
-import arrow.typeclasses.*
+import arrow.higherkind
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Monoid
 
-inline fun <F, reified G, A> FreeApplicativeOf<F, A>.foldMapK(f: FunctionK<F, G>, GA: Applicative<G> = applicative<G>()): Kind<G, A> =
+inline fun <F, reified G, A> FreeApplicativeOf<F, A>.foldMapK(f: FunctionK<F, G>, GA: Applicative<G>): Kind<G, A> =
         (this as FreeApplicative<F, A>).foldMap(f, GA)
 
-inline fun <reified F, A> FreeApplicativeOf<F, A>.foldK(FA: Applicative<F> = applicative<F>()): Kind<F, A> = (this as FreeApplicative<F, A>).fold(FA)
+inline fun <reified F, A> FreeApplicativeOf<F, A>.foldK(FA: Applicative<F>): Kind<F, A> = (this as FreeApplicative<F, A>).fold(FA)
 
 /**
  * See [https://github.com/edmundnoble/cats/blob/6454b4f8b7c5cefd15d8198fa7d52e46e2f45fea/docs/src/main/tut/datatypes/freeapplicative.md]
  */
-@higherkind sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
+@higherkind
+sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
 
     companion object {
         fun <F, A> pure(a: A): FreeApplicative<F, A> = Pure(a)
@@ -62,7 +65,8 @@ inline fun <reified F, A> FreeApplicativeOf<F, A>.foldK(FA: Applicative<F> = app
                 override fun <A> invoke(fa: Kind<F, A>): Const<M, A> = f(fa).fix()
             }, Const.applicative(MM)).value()
 
-    fun monad(): Free<F, A> = foldMap(Free.functionKF(), Free.applicativeF()).fix()
+    // FIXME(paco) Free.applicativeF is broken
+    //fun monad(): Free<F, A> = foldMap(Free.functionKF(), Free.applicativeF()).fix()
 
     // Beware: smart code
     @Suppress("UNCHECKED_CAST")

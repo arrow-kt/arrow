@@ -1,12 +1,15 @@
 package arrow.free
 
-import arrow.*
-import arrow.core.*
-import arrow.typeclasses.*
+import arrow.Kind
+import arrow.core.Either
+import arrow.core.FunctionK
+import arrow.higherkind
+import arrow.typeclasses.Monad
 
-inline fun <reified M, S, A> FreeOf<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M> = monad()): Kind<M, A> = (this as Free<S, A>).foldMap(f, MM)
+inline fun <reified M, S, A> FreeOf<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M>): Kind<M, A> = (this as Free<S, A>).foldMap(f, MM)
 
-@higherkind sealed class Free<S, out A> : FreeOf<S, A> {
+@higherkind
+sealed class Free<S, out A> : FreeOf<S, A> {
 
     companion object {
         fun <S, A> pure(a: A): Free<S, A> = Pure(a)
@@ -22,6 +25,7 @@ inline fun <reified M, S, A> FreeOf<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad
 
                 }
 
+        /* FIXME(paco) lookup is broken, not sure what this was meant to do
         internal fun <F> applicativeF(): Applicative<FreePartialOf<F>> =
                 object : Applicative<FreePartialOf<F>> {
                     private val applicative: Applicative<FreePartialOf<F>> = arrow.typeclasses.applicative()
@@ -29,10 +33,9 @@ inline fun <reified M, S, A> FreeOf<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad
                     override fun <A> pure(a: A): Free<F, A> =
                             Companion.pure(a)
 
-                    override fun <A, B> ap(fa: Kind<FreePartialOf<F>, A>, ff: Kind<FreePartialOf<F>, (A) -> B>): Free<F, B> {
-                        return applicative.ap(fa, ff).fix()
-                    }
-                }
+                    override fun <A, B> ap(fa: Kind<FreePartialOf<F>, A>, ff: Kind<FreePartialOf<F>, (A) -> B>): Free<F, B> =
+                            applicative.ap(fa, ff).fix()
+                }*/
     }
 
     abstract fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B>

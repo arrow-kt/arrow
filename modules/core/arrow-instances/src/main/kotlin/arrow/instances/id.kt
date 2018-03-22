@@ -61,8 +61,8 @@ interface IdComonadInstance : Comonad<ForId> {
     override fun <A, B> coflatMap(fa: IdOf<A>, f: kotlin.Function1<IdOf<A>, B>): Id<B> =
             fa.fix().coflatMap(f)
 
-    override fun <A> extract(fa: IdOf<A>): A =
-            fa.fix().extract()
+    override fun <A> Kind<ForId, A>.extract(): A =
+            fix().extract()
 
     override fun <A, B> map(fa: IdOf<A>, f: kotlin.Function1<A, B>): Id<B> =
             fa.fix().map(f)
@@ -88,8 +88,8 @@ interface IdBimonadInstance : Bimonad<ForId> {
     override fun <A, B> coflatMap(fa: IdOf<A>, f: kotlin.Function1<IdOf<A>, B>): Id<B> =
             fa.fix().coflatMap(f)
 
-    override fun <A> extract(fa: IdOf<A>): A =
-            fa.fix().extract()
+    override fun <A> Kind<ForId, A>.extract(): A =
+            fix().extract()
 }
 
 @instance(Id::class)

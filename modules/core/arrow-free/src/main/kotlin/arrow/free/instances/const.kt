@@ -1,8 +1,9 @@
 package arrow.free.instances
 
-import arrow.*
-import arrow.core.*
+import arrow.Kind
+import arrow.core.Eval
 import arrow.data.*
+import arrow.instance
 import arrow.typeclasses.*
 
 @instance(Const::class)
@@ -38,8 +39,8 @@ interface ConstTraverseInstance<X> : ConstFoldableInstance<X>, Traverse<ConstPar
 
     override fun <T, U> map(fa: ConstOf<X, T>, f: (T) -> U): Const<X, U> = fa.fix().retag()
 
-    override fun <G, A, B> traverse(fa: ConstOf<X, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, ConstOf<X, B>> =
-            fa.fix().traverse(f, GA)
+    override fun <G, A, B> Applicative<G>.traverse(fa: ConstOf<X, A>, f: (A) -> Kind<G, B>): Kind<G, ConstOf<X, B>> =
+            fa.fix().traverse(f, this)
 }
 
 @instance(Const::class)
@@ -47,7 +48,7 @@ interface ConstSemigroupInstance<A, T> : Semigroup<ConstOf<A, T>> {
 
     fun SA(): Semigroup<A>
 
-    override fun combine(a: ConstOf<A, T>, b: ConstOf<A, T>): Const<A, T> = a.combine(b, SA())
+    override fun ConstOf<A, T>.combine(b: ConstOf<A, T>): Const<A, T> = combine(b, SA())
 
 }
 
