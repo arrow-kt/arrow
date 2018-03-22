@@ -22,8 +22,6 @@ data class Instance(
 ) {
     val name = target.classElement.simpleName
 
-    val implicitObjectName: String = "${name}Implicits"
-
     val receiverTypeName = target.dataType.nameResolver.getString(target.dataType.classProto.fqName).replace("/", ".")
 
     val receiverTypeSimpleName = receiverTypeName.substringAfterLast(".")
@@ -89,9 +87,7 @@ data class Instance(
                         .filter { it.valueParameterCount == 0 && it.returnType.extractFullName(tc, failOnGeneric = false).contains("typeclass") }
                         .flatMap {
                             val retTypeName = it.returnType.extractFullName(tc, failOnGeneric = false).removeBackticks().substringBefore("<")
-                            val retType = target.processor.elementUtils.getTypeElement(
-                                    it.returnType.extractFullName(tc, failOnGeneric = false).removeBackticks().substringBefore("<")
-                            )
+                            val retType = target.processor.elementUtils.getTypeElement(retTypeName)
                             when {
                                 retType != null -> {
                                     listOf(FunctionMapping(tc.nameResolver.getString(it.name), tc, it, retTypeName))
@@ -129,10 +125,6 @@ data class Instance(
         val retType = func.returnType.extractFullName(tc, failOnGeneric = false)
         name to retType.removeBackticks()
     }
-
-    val expandedArgs: String = args.joinToString(separator = ", ", transform = {
-        "${it.first}: ${it.second}"
-    })
 
     val targetImplementations = args.joinToString(
             separator = "\n",
