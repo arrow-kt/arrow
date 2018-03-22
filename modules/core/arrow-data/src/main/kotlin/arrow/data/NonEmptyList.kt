@@ -45,12 +45,13 @@ class NonEmptyList<out A> private constructor(
     fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
             ListKTraverse.foldRight(this.fix().all.k(), lb, f)
 
-    fun <G, B> Applicative<G>.traverse(f: (A) -> Kind<G, B>): Kind<G, NonEmptyList<B>> =
+    fun <G, B> traverse(AG: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, NonEmptyList<B>> = with (AG) {
             map2Eval(f(fix().head), Eval.always {
                 ListKTraverse.run { traverse(fix().tail.k(), f) }
             }, {
                 NonEmptyList(it.a, it.b.fix().list)
             }).value()
+    }
 
     fun <B> coflatMap(f: (NonEmptyListOf<A>) -> B): NonEmptyList<B> {
         val buf = mutableListOf<B>()

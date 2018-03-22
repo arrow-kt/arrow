@@ -10,13 +10,13 @@ interface OptionSemigroupInstance<A> : Semigroup<Option<A>> {
 
     fun SG(): Semigroup<A>
 
-    override fun combine(a: Option<A>, b: Option<A>): Option<A> =
-            when (a) {
+    override fun Option<A>.combine(b: Option<A>): Option<A> =
+            when (this) {
                 is Some<A> -> when (b) {
-                    is Some<A> -> Some(SG().combine(a.t, b.t))
+                    is Some<A> -> Some(SG().run { t.combine(b.t) })
                     None -> b
                 }
-                None -> a
+                None -> this
             }
 }
 
@@ -146,8 +146,8 @@ interface OptionTraverseInstance : Traverse<ForOption> {
     override fun <A, B> map(fa: OptionOf<A>, f: kotlin.Function1<A, B>): Option<B> =
             fa.fix().map(f)
 
-    override fun <G, A, B> traverse(fa: OptionOf<A>, f: kotlin.Function1<A, Kind<G, B>>, GA: Applicative<G>): Kind<G, Option<B>> =
-            fa.fix().traverse(f, GA)
+    override fun <G, A, B> Applicative<G>.traverse(fa: Kind<ForOption, A>, f: (A) -> Kind<G, B>): Kind<G, Option<B>> =
+            fa.fix().traverse(f, this)
 
     override fun <A> exists(fa: OptionOf<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
             fa.fix().exists(p)

@@ -67,8 +67,8 @@ interface Tuple2FoldableInstance<F> : Foldable<Tuple2PartialOf<F>> {
 
 @instance(Tuple2::class)
 interface Tuple2TraverseInstance<F> : Tuple2FoldableInstance<F>, Traverse<Tuple2PartialOf<F>> {
-    override fun <G, A, B> traverse(fa: Tuple2Of<F, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>) =
-            fa.fix().run { GA.map(f(b), a::toT) }
+    override fun <G, A, B> Applicative<G>.traverse(fa: Kind<Tuple2PartialOf<F>, A>, f: (A) -> Kind<G, B>) =
+            fa.fix().run { map(f(b), a::toT) }
 }
 
 @instance(Tuple2::class)
@@ -80,10 +80,10 @@ interface Tuple2MonoidInstance<A, B> : Monoid<Tuple2<A, B>> {
 
     override fun empty(): Tuple2<A, B> = Tuple2(MA().empty(), MB().empty())
 
-    override fun combine(a: Tuple2<A, B>, b: Tuple2<A, B>): Tuple2<A, B> {
-        val (xa, xb) = a
+    override fun Tuple2<A, B>.combine(b: Tuple2<A, B>): Tuple2<A, B> {
+        val (xa, xb) = this
         val (ya, yb) = b
-        return Tuple2(MA().combine(xa, ya), MB().combine(xb, yb))
+        return Tuple2(MA().run { xa.combine(ya) }, MB().run { xb.combine(yb) })
     }
 }
 

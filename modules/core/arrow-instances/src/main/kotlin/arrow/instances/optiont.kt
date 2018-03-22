@@ -1,8 +1,12 @@
 package arrow.instances
 
-import arrow.*
+import arrow.Kind
 import arrow.core.*
-import arrow.data.*
+import arrow.data.OptionT
+import arrow.data.OptionTOf
+import arrow.data.OptionTPartialOf
+import arrow.data.fix
+import arrow.instance
 import arrow.typeclasses.*
 
 @instance(OptionT::class)
@@ -67,8 +71,8 @@ interface OptionTTraverseInstance<F> : OptionTFoldableInstance<F>, Traverse<Opti
 
     override fun FFF(): Traverse<F>
 
-    override fun <G, A, B> traverse(fa: OptionTOf<F, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, OptionT<F, B>> =
-            fa.fix().traverse(f, GA, FFF())
+    override fun <G, A, B> Applicative<G>.traverse(fa: OptionTOf<F, A>, f: (A) -> Kind<G, B>): Kind<G, OptionT<F, B>> =
+            fa.fix().traverse(f, this, FFF())
 
 }
 

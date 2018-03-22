@@ -1,8 +1,9 @@
 package arrow.instances
 
-import arrow.*
-import arrow.core.*
+import arrow.Kind
+import arrow.core.Eval
 import arrow.data.*
+import arrow.instance
 import arrow.typeclasses.*
 
 @instance(MapK::class)
@@ -22,8 +23,8 @@ interface MapKFoldableInstance<K> : Foldable<MapKPartialOf<K>> {
 @instance(MapK::class)
 interface MapKTraverseInstance<K> : MapKFoldableInstance<K>, Traverse<MapKPartialOf<K>> {
 
-    override fun <G, A, B> traverse(fa: Kind<MapKPartialOf<K>, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Kind<MapKPartialOf<K>, B>> =
-            fa.fix().traverse(f, GA)
+    override fun <G, A, B> Applicative<G>.traverse(fa: Kind<MapKPartialOf<K>, A>, f: (A) -> Kind<G, B>): Kind<G, Kind<MapKPartialOf<K>, B>> =
+            fa.fix().traverse(f, this)
 }
 
 @instance(MapK::class)
@@ -31,9 +32,10 @@ interface MapKSemigroupInstance<K, A> : Semigroup<MapKOf<K, A>> {
 
     fun SG(): Semigroup<A>
 
-    override fun combine(a: MapKOf<K, A>, b: MapKOf<K, A>): MapK<K, A> =
-            if (a.fix().size < b.fix().size) a.fix().foldLeft<A>(b.fix(), { my, (k, b) -> my.updated(k, SG().maybeCombine(b, my.get(k))) })
-            else b.fix().foldLeft<A>(a.fix(), { my, (k, a) -> my.updated(k, SG().maybeCombine(a, my.get(k))) })
+    override fun MapKOf<K, A>.combine(b: MapKOf<K, A>): MapK<K, A> = with(SG()) {
+        if (fix().size < b.fix().size) fix().foldLeft<A>(b.fix(), { my, (k, b) -> my.updated(k, b.maybeCombine(my[k])) })
+        else b.fix().foldLeft<A>(fix(), { my, (k, a) -> my.updated(k, a.maybeCombine(my[k])) })
+    }
 
 }
 
@@ -51,7 +53,7 @@ interface MapKEqInstance<K, A> : Eq<MapK<K, A>> {
     fun EQA(): Eq<A>
 
     override fun MapK<K, A>.eqv(b: MapK<K, A>): Boolean =
-            if (SetKEqInstanceImplicits.instance(EQK()).eqv(keys.k(), b.keys.k())) {
+            if (SetK.eq(EQK()).run { keys.k().eqv(b.keys.k()) }) {
                 keys.map { key ->
                     b[key]?.let {
                         EQA().run { getValue(key).eqv(it) }

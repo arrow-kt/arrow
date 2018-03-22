@@ -2,7 +2,6 @@ package arrow.instances
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.ForId
 import arrow.core.Tuple2
 import arrow.data.*
 import arrow.instance
@@ -43,7 +42,7 @@ interface StateTMonadInstance<F, S> : StateTApplicativeInstance<F, S>, Monad<Sta
             fa.fix().flatMap(f, FF())
 
     override fun <A, B> tailRecM(a: A, f: (A) -> StateTOf<F, S, Either<A, B>>): StateT<F, S, B> =
-            StateT.tailRecM(a, f, FF())
+            StateT.tailRecM(FF(), a, f)
 
     override fun <A, B> ap(fa: StateTOf<F, S, A>, ff: StateTOf<F, S, (A) -> B>): StateT<F, S, B> =
             ff.fix().map2(fa.fix(), { f, a -> f(a) }, FF())
@@ -75,6 +74,7 @@ interface StateTApplicativeErrorInstance<F, S, E> : StateTApplicativeInstance<F,
 @instance(StateT::class)
 interface StateTMonadErrorInstance<F, S, E> : StateTApplicativeErrorInstance<F, S, E>, StateTMonadInstance<F, S>, MonadError<StateTPartialOf<F, S>, E>
 
+/* FIXME(paco)
 /**
  * Alias for[StateT.Companion.applicative]
  */
@@ -89,4 +89,4 @@ fun <S> StateApi.functor(): Functor<StateTPartialOf<ForId, S>> = StateT.functor<
  * Alias for [StateT.Companion.monad]
  */
 fun <S> StateApi.monad(): Monad<StateTPartialOf<ForId, S>> = StateT.monad<ForId, S>(arrow.typeclasses.monad<ForId>(), dummy = Unit)
-
+*/

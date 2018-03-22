@@ -23,19 +23,19 @@ interface SortedMapKFoldableInstance<A : Comparable<A>> : Foldable<SortedMapKPar
 
 @instance(SortedMapK::class)
 interface SortedMapKTraverseInstance<A : Comparable<A>> : SortedMapKFoldableInstance<A>, Traverse<SortedMapKPartialOf<A>> {
-    override fun <G, B, C> traverse(fa: Kind<SortedMapKPartialOf<A>, B>, f: (B) -> Kind<G, C>, GA: Applicative<G>): Kind<G, Kind<SortedMapKPartialOf<A>, C>> =
-            fa.fix().traverse(f, GA)
+    override fun <G, B, C> Applicative<G>.traverse(fa: Kind<SortedMapKPartialOf<A>, B>, f: (B) -> Kind<G, C>): Kind<G, Kind<SortedMapKPartialOf<A>, C>> =
+            fa.fix().traverse(f, this)
 }
 
 @instance(SortedMapK::class)
 interface SortedMapKSemigroupInstance<A : Comparable<A>, B> : Semigroup<SortedMapKOf<A, B>> {
     fun SG(): Semigroup<B>
 
-    override fun combine(a: SortedMapKOf<A, B>, b: SortedMapKOf<A, B>): SortedMapKOf<A, B> =
-            if (a.fix().size < b.fix().size) a.fix().foldLeft<B>(b.fix(), { my, (k, b) ->
-                my.updated(k, SG().maybeCombine(b, my[k]))
+    override fun SortedMapKOf<A, B>.combine(b: SortedMapKOf<A, B>): SortedMapKOf<A, B> =
+            if (this.fix().size < b.fix().size) this.fix().foldLeft<B>(b.fix(), { my, (k, b) ->
+                my.updated(k, SG().run { b.maybeCombine(my[k]) })
             })
-            else b.fix().foldLeft<B>(a.fix(), { my: SortedMapK<A, B>, (k, a) -> my.updated(k, SG().maybeCombine(a, my[k])) })
+            else b.fix().foldLeft<B>(this.fix(), { my: SortedMapK<A, B>, (k, a) -> my.updated(k, SG().run { a.maybeCombine(my[k]) }) })
 }
 
 @instance(SortedMapK::class)

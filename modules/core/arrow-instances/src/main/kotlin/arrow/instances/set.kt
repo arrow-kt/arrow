@@ -1,13 +1,13 @@
 package arrow.instances
 
-import arrow.*
-import arrow.core.*
+import arrow.core.Eval
 import arrow.data.*
+import arrow.instance
 import arrow.typeclasses.*
 
 @instance(SetK::class)
 interface SetKSemigroupInstance<A> : Semigroup<SetK<A>> {
-    override fun combine(a: SetK<A>, b: SetK<A>): SetK<A> = (a + b).k()
+    override fun SetK<A>.combine(b: SetK<A>): SetK<A> = (this + b).k()
 }
 
 @instance(SetK::class)

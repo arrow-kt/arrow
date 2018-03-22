@@ -1,8 +1,9 @@
 package arrow.instances
 
-import arrow.*
+import arrow.Kind
 import arrow.core.Eval
 import arrow.data.*
+import arrow.instance
 import arrow.typeclasses.*
 
 @instance(Validated::class)
@@ -47,8 +48,8 @@ interface ValidatedFoldableInstance<E> : Foldable<ValidatedPartialOf<E>> {
 @instance(Validated::class)
 interface ValidatedTraverseInstance<E> : ValidatedFoldableInstance<E>, Traverse<ValidatedPartialOf<E>> {
 
-    override fun <G, A, B> traverse(fa: Kind<ValidatedPartialOf<E>, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Validated<E, B>> =
-            fa.fix().traverse(f, GA)
+    override fun <G, A, B> Applicative<G>.traverse(fa: Kind<ValidatedPartialOf<E>, A>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> =
+            fa.fix().traverse(f, this)
 
 }
 

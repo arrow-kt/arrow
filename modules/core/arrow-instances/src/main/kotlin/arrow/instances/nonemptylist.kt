@@ -9,7 +9,7 @@ import arrow.typeclasses.*
 
 @instance(NonEmptyList::class)
 interface NonEmptyListSemigroupInstance<A> : Semigroup<NonEmptyList<A>> {
-    override fun combine(a: NonEmptyList<A>, b: NonEmptyList<A>): NonEmptyList<A> = a + b
+    override fun NonEmptyList<A>.combine(b: NonEmptyList<A>): NonEmptyList<A> = this + b
 }
 
 @instance(NonEmptyList::class)
@@ -118,8 +118,8 @@ interface NonEmptyListTraverseInstance : Traverse<ForNonEmptyList> {
     override fun <A, B> map(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
             fa.fix().map(f)
 
-    override fun <G, A, B> traverse(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, Kind<G, B>>, GA: Applicative<G>): Kind<G, NonEmptyList<B>> =
-            fa.fix().traverse(f, GA)
+    override fun <G, A, B> Applicative<G>.traverse(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, Kind<G, B>>): Kind<G, NonEmptyList<B>> =
+            fa.fix().traverse(this, f)
 
     override fun <A, B> foldLeft(fa: NonEmptyListOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)

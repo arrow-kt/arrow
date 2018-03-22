@@ -1,13 +1,16 @@
 package arrow.instances
 
-import arrow.*
-import arrow.core.*
+import arrow.Kind
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.Tuple2
 import arrow.data.*
+import arrow.instance
 import arrow.typeclasses.*
 
 @instance(ListK::class)
 interface ListKSemigroupInstance<A> : Semigroup<ListK<A>> {
-    override fun combine(a: ListK<A>, b: ListK<A>): ListK<A> = (a + b).k()
+    override fun ListK<A>.combine(b: ListK<A>): ListK<A> = (this + b).k()
 }
 
 @instance(ListK::class)
@@ -91,8 +94,8 @@ interface ListKTraverseInstance : Traverse<ForListK> {
     override fun <A, B> map(fa: ListKOf<A>, f: kotlin.Function1<A, B>): ListK<B> =
             fa.fix().map(f)
 
-    override fun <G, A, B> traverse(fa: ListKOf<A>, f: kotlin.Function1<A, Kind<G, B>>, GA: Applicative<G>): Kind<G, ListK<B>> =
-            fa.fix().traverse(f, GA)
+    override fun <G, A, B> Applicative<G>.traverse(fa: ListKOf<A>, f: kotlin.Function1<A, Kind<G, B>>): Kind<G, ListK<B>> =
+            fa.fix().traverse(f, this)
 
     override fun <A, B> foldLeft(fa: ListKOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)

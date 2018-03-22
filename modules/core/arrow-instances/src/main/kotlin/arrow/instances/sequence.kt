@@ -1,18 +1,21 @@
 package arrow.instances
 
-import arrow.*
-import arrow.core.*
+import arrow.Kind
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.Tuple2
 import arrow.data.*
+import arrow.instance
 import arrow.typeclasses.*
 
 @instance(SequenceK::class)
 interface SequenceKSemigroupInstance<A> : Semigroup<SequenceK<A>> {
-    override fun combine(a: SequenceK<A>, b: SequenceK<A>): SequenceK<A> = (a + b).k()
+    override fun SequenceK<A>.combine(b: SequenceK<A>): SequenceK<A> = (this + b).k()
 }
 
 @instance(SequenceK::class)
 interface SequenceKMonoidInstance<A> : Monoid<SequenceK<A>> {
-    override fun combine(a: SequenceK<A>, b: SequenceK<A>): SequenceK<A> = (a + b).k()
+    override fun SequenceK<A>.combine(b: SequenceK<A>): SequenceK<A> = (this + b).k()
 
     override fun empty(): SequenceK<A> = emptySequence<A>().k()
 }
@@ -91,8 +94,8 @@ interface SequenceKTraverseInstance : Traverse<ForSequenceK> {
     override fun <A, B> map(fa: SequenceKOf<A>, f: kotlin.Function1<A, B>): SequenceK<B> =
             fa.fix().map(f)
 
-    override fun <G, A, B> traverse(fa: SequenceKOf<A>, f: kotlin.Function1<A, Kind<G, B>>, GA: Applicative<G>): Kind<G, SequenceK<B>> =
-            fa.fix().traverse(f, GA)
+    override fun <G, A, B> Applicative<G>.traverse(fa: SequenceKOf<A>, f: kotlin.Function1<A, Kind<G, B>>): Kind<G, SequenceK<B>> =
+            fa.fix().traverse(f, this)
 
     override fun <A, B> foldLeft(fa: SequenceKOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)

@@ -108,8 +108,8 @@ interface IdTraverseInstance : Traverse<ForId> {
     override fun <A, B> map(fa: IdOf<A>, f: kotlin.Function1<A, B>): Id<B> =
             fa.fix().map(f)
 
-    override fun <G, A, B> traverse(fa: IdOf<A>, f: kotlin.Function1<A, Kind<G, B>>, GA: Applicative<G>): Kind<G, Id<B>> =
-            fa.fix().traverse(f, GA)
+    override fun <G, A, B> Applicative<G>.traverse(fa: Kind<ForId, A>, f: (A) -> Kind<G, B>): Kind<G, Id<B>> =
+            fa.fix().traverse(f, this)
 
     override fun <A, B> foldLeft(fa: IdOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)

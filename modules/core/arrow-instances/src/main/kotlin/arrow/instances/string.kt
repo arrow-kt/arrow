@@ -5,7 +5,7 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 
 object StringSemigroupInstance : Semigroup<String> {
-    override fun combine(a: String, b: String): String = "$a$b"
+    override fun String.combine(b: String): String = "${this}$b"
 }
 
 object StringSemigroupInstanceImplicits {
@@ -16,7 +16,7 @@ object StringSemigroupInstanceImplicits {
 object StringMonoidInstance : Monoid<String> {
     override fun empty(): String = ""
 
-    override fun combine(a: String, b: String): String = StringSemigroupInstance.combine(a, b)
+    override fun String.combine(b: String): String = StringSemigroupInstance.run { combine(b) }
 }
 
 object StringMonoidInstanceImplicits {

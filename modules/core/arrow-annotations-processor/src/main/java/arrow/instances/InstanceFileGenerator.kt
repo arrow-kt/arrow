@@ -75,7 +75,7 @@ data class Instance(
                             ignore -> acc
                             else -> acc + listOf(func)
                         }
-                    } //
+                    }
                 }
             }
 

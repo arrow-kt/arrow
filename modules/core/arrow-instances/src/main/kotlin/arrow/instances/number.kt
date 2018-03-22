@@ -3,7 +3,7 @@ package arrow.instances
 import arrow.typeclasses.*
 
 class NumberSemigroup<A : Number>(val f: (A, A) -> A) : Semigroup<A> {
-    override fun combine(a: A, b: A): A = f(a, b)
+    override fun A.combine(b: A): A = f(this, b)
 }
 
 object ByteMonoid : Monoid<Byte>, Semigroup<Byte> by SGByte {
