@@ -4,7 +4,8 @@ import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.TraverseLaws
-import arrow.typeclasses.*
+import arrow.typeclasses.Eq
+import arrow.typeclasses.bindingCatch
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import io.reactivex.Observable
@@ -41,22 +42,10 @@ class ObservableKTest : UnitSpec() {
 
     init {
 
-        "instances can be resolved implicitly" {
-            functor<ForObservableK>() shouldNotBe null
-            applicative<ForObservableK>() shouldNotBe null
-            monad<ForObservableK>() shouldNotBe null
-            applicativeError<ForObservableK, Unit>() shouldNotBe null
-            monadError<ForObservableK, Unit>() shouldNotBe null
-            monadSuspend<ForObservableK>() shouldNotBe null
-            async<ForObservableK>() shouldNotBe null
-            effect<ForObservableK>() shouldNotBe null
-            foldable<ForObservableK>() shouldNotBe null
-            traverse<ForObservableK>() shouldNotBe null
-        }
-
         testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
+        // FIXME(paco) #691
+        //testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
+        //testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
 
         testLaws(
                 FoldableLaws.laws(ObservableK.foldable(), { ObservableK.pure(it) }, Eq.any()),

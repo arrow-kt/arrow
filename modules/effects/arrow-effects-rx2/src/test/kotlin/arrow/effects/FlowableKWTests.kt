@@ -4,7 +4,8 @@ import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.TraverseLaws
-import arrow.typeclasses.*
+import arrow.typeclasses.Eq
+import arrow.typeclasses.bindingCatch
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import io.reactivex.Flowable
@@ -39,38 +40,31 @@ class FlowableKTests : UnitSpec() {
     }
 
     init {
-        "instances can be resolved implicitly" {
-            functor<ForFlowableK>() shouldNotBe null
-            applicative<ForFlowableK>() shouldNotBe null
-            monad<ForFlowableK>() shouldNotBe null
-            applicativeError<ForFlowableK, Unit>() shouldNotBe null
-            monadError<ForFlowableK, Unit>() shouldNotBe null
-            monadSuspend<ForFlowableK>() shouldNotBe null
-            async<ForFlowableK>() shouldNotBe null
-            effect<ForFlowableK>() shouldNotBe null
-            foldable<ForFlowableK>() shouldNotBe null
-            traverse<ForFlowableK>() shouldNotBe null
-        }
 
         testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
+        // FIXME(paco) #691
+        //testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
+        //testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
 
         testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
+        // FIXME(paco) #691
+        //testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
+        //testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
 
         testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
+        // FIXME(paco) #691
+        //testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
+        //testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
 
         testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
+        // FIXME(paco) #691
+        //testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
+        //testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
 
         testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
-        testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
+        // FIXME(paco) #691
+        //testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
+        //testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
 
         testLaws(
                 FoldableLaws.laws(FlowableK.foldable(), { FlowableK.pure(it) }, Eq.any()),

@@ -2,38 +2,33 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.*
+import arrow.effects.typeclasses.milliseconds
+import arrow.effects.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.AsyncLaws
-import arrow.typeclasses.*
+import arrow.typeclasses.Eq
+import arrow.typeclasses.binding
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldEqual
-import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class IOTest : UnitSpec() {
-    fun <A> EQ(): Eq<Kind<ForIO, A>> = Eq { a, b ->
-        Option.eq(Eq.any()).eqv(a.fix().attempt().unsafeRunTimed(60.seconds), b.fix().attempt().unsafeRunTimed(60.seconds))
+    val EQ_OPTION = Option.eq(Eq.any())
+
+    fun <A> EQ(): Eq<Kind<ForIO, A>> {
+        return Eq { a, b ->
+            EQ_OPTION.run {
+                a.fix().attempt().unsafeRunTimed(60.seconds).eqv(b.fix().attempt().unsafeRunTimed(60.seconds))
+            }
+        }
     }
 
     init {
         testLaws(AsyncLaws.laws(IO.async(), EQ(), EQ()))
-
-        "instances can be resolved implicitly" {
-            functor<ForIO>() shouldNotBe null
-            applicative<ForIO>() shouldNotBe null
-            monad<ForIO>() shouldNotBe null
-            applicativeError<ForIO, Throwable>() shouldNotBe null
-            monadError<ForIO, Throwable>() shouldNotBe null
-            monadSuspend<ForIO>() shouldNotBe null
-            async<ForIO>() shouldNotBe null
-            effect<ForIO>() shouldNotBe null
-            semigroup<IOOf<Int>>() shouldNotBe null
-            monoid<IOOf<Int>>() shouldNotBe null
-        }
 
         "should defer evaluation until run" {
             var run = false

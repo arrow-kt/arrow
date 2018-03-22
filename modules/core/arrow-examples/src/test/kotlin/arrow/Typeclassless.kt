@@ -19,7 +19,7 @@ class TypeclasslessExamples : FreeSpec() {
 
     // Complete example of syntax using a simple fake typeclass
 
-    interface Identity<F>: TC {
+    interface Identity<F> {
         fun <A> identify(a: Kind<F, A>): Kind<F, A> =
                 a
     }

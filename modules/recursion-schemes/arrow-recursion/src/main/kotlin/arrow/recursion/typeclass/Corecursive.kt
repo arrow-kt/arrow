@@ -5,7 +5,7 @@ import arrow.instances.ComposedFunctor
 import arrow.instances.ComposedTraverse
 import arrow.typeclasses.*
 
-interface Corecursive<F, G> : TC {
+interface Corecursive<F, G> {
     fun embedT(compFG: Kind<Nested<F, G>, Kind<F, G>>): Kind<F, G>
 
     fun <A> ana(a: A, f: Coalgebra<Nested<F, G>, A>, FF: Functor<F>, FG: Functor<G>): Kind<F, G> =
