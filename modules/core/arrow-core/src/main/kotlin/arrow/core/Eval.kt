@@ -159,6 +159,7 @@ sealed class Eval<out A> : EvalOf<A> {
 
     fun <B> ap(ff: EvalOf<(A) -> B>): Eval<B> = ff.fix().flatMap { f -> map(f) }.fix()
 
+    @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
     fun <B> flatMap(f: (A) -> EvalOf<B>): Eval<B> =
             when (this) {
                 is FlatMap<A> -> object : FlatMap<B>() {
