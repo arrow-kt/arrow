@@ -1,0 +1,39 @@
+// Code
+// -----------------------------------------------
+// -----------------------------------------------
+
+p, ul {
+    code {
+        background: #fff;
+        font-family: $code-font-family;
+        padding: 0 $base-point-grid;
+        font-size: 0.8125rem;
+        @include border-radius (3px);
+    }
+}
+
+.hljs {
+    padding: ($base-point-grid * 3);
+    background: $white;
+    font-family: $code-font-family;
+    font-size: 0.875rem;
+    box-shadow: $box-shadow-item;
+}
+
+.hljs {
+  display: block;
+  overflow-x: auto;
+  color: #383a42;
+  background: #fafafa;
+}
+
+.hljs-doctag,
+.hljs-keyword,
+.hljs-formula {
+  color: #4172DD;
+}
+
+.hljs-built_in,
+.hljs-class .hljs-title {
+  color: #F28B2D;
+}

@@ -22,12 +22,14 @@ buildscript {
         javaVersion = JavaVersion.VERSION_1_7
         kotlinTestVersion = '2.0.7'
         kotlinVersion = '1.2.20'
+        daggerVersion = '2.5'
         kotlinxCoroutinesVersion = '0.21.2'
         kotlinxCollectionsImmutableVersion = '0.1'
     }
 
     repositories {
         jcenter()
+        maven { url 'https://oss.jfrog.org/oss-snapshot-local/' }
         maven { url 'https://jitpack.io' }
         maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
         maven { url "https://dl.bintray.com/jetbrains/markdown/" }
@@ -38,7 +40,7 @@ buildscript {
         classpath "com.github.ben-manes:gradle-versions-plugin:$gradleVersionsPluginVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
-        classpath 'io.arrow-kt:ank-gradle-plugin:0.5.1'
+        classpath 'io.arrow-kt:ank-gradle-plugin:0.6.2-SNAPSHOT'
         classpath 'org.ajoberstar:gradle-git-publish:0.3.2'
     }
 }
@@ -48,6 +50,7 @@ apply from: 'detekt.gradle.kts'
 allprojects {
     repositories {
         jcenter()
+        maven { url 'https://oss.jfrog.org/oss-snapshot-local/' }
         maven { url 'https://kotlin.bintray.com/kotlinx' }
         maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
         maven { url "http://dl.bintray.com/arrow-kt/arrow-kt" }
@@ -94,7 +97,7 @@ subprojects { project ->
         key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
         configurations = ['archives']
         pkg {
-            repo = 'maven'
+            repo = 'arrow-kt'
             name = project.name
             userOrg = POM_DEVELOPER_ID
             licenses = ['Apache-2.0']
@@ -149,3 +152,7 @@ task wrapper(type: Wrapper) {
 }
 
 apply plugin: 'com.github.ben-manes.versions'
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
