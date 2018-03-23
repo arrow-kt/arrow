@@ -14,7 +14,7 @@ import arrow.core.*
  *  - reduceLeftTo(fa)(f)(g) eagerly reduces with an additional mapping function
  *  - reduceRightTo(fa)(f)(g) lazily reduces with an additional mapping function
  */
-interface Reducible<in F> : Foldable<F> {
+interface Reducible<F> : Foldable<F> {
 
     /**
      * Left-associative reduction on F using the function f.
@@ -74,7 +74,7 @@ interface Reducible<in F> : Foldable<F> {
  *
  * This class can be used on any type where the first value (A) and the "rest" of the values (G<A>) can be easily found.
  */
-interface NonEmptyReducible<in F, G> : Reducible<F> {
+interface NonEmptyReducible<F, G> : Reducible<F> {
 
     fun FG(): Foldable<G>
 
