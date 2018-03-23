@@ -152,7 +152,7 @@ import arrow.legacy.*
      */
     @Suppress("DataClassPrivateConstructor")
     data class Left<out A, out B> @PublishedApi internal constructor(val a: A) : Either<A, B>() {
-        override val isLeft 
+        override val isLeft
             get() = true
         override val isRight
             get() = false
@@ -167,7 +167,7 @@ import arrow.legacy.*
      */
     @Suppress("DataClassPrivateConstructor")
     data class Right<out A, out B> @PublishedApi internal constructor(val b: B) : Either<A, B>() {
-        override val isLeft 
+        override val isLeft
             get() = false
         override val isRight
             get() = true
