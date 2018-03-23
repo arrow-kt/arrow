@@ -228,7 +228,7 @@ val either = Either.applicative<Unit>().randomUserStructure(::User).fix()
 
 Passing the instance in every function call seems like a burden. So, because `randomUserStructure` is an extension function for [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}) we can omit the implicit parameter as long as we are within the scope of an Applicative instance. You can use the standard functions `with` and `run` for this.
 
-```
+```kotlin
 with (ListK.applicative()) {
     // Lots of Kotlin here
 
@@ -239,7 +239,7 @@ with (ListK.applicative()) {
 // [User(342)]
 ```
 
-```
+```kotlin
 Option.applicative().run { 
     tupled(randomUserStructure(::User), randomUserStructure(::User))
 }
@@ -248,7 +248,7 @@ Option.applicative().run {
 
 To make the typeclass scope available to a whole class you can use simple delegation, like this:
 
-```
+```kotlin
 class UserFetcher<F>(AP: Applicative<F>): Applicative<F> by AP {
 
     fun genUser() = randomUserStructure(::User)
