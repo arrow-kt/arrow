@@ -34,7 +34,8 @@ interface FreeMonadInstance<S> : FreeApplicativeInstance<S>, Monad<FreePartialOf
     override fun <A, B> Kind<FreePartialOf<S>, A>.ap(ff: Kind<FreePartialOf<S>, (A) -> B>): Free<S, B> =
             fix().ap(null, ff)
 
-    override fun <A, B> Kind<FreePartialOf<S>, A>.flatMap(f: (A) -> Kind<FreePartialOf<S>, B>): Free<S, B> = fix().flatMap { f(it).fix() }
+    override fun <A, B> Kind<FreePartialOf<S>, A>.flatMap(f: (A) -> Kind<FreePartialOf<S>, B>): Free<S, B> =
+            fix().flatMap(null) { f(it).fix() }
 
     override fun <A, B> tailRecM(a: A, f: (A) -> FreeOf<S, Either<A, B>>): Free<S, B> = f(a).fix().flatMap {
         when (it) {

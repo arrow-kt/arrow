@@ -22,7 +22,7 @@ object MonadFilterLaws {
 
     fun <F> MonadFilter<F>.monadFilterLeftEmpty(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genFunctionAToB(genApplicative(Gen.int(), this)), { f: (Int) -> Kind<F, Int> ->
-                empty().flatMap(f).equalUnderTheLaw(empty(), EQ)
+                empty<Int>().flatMap(f).equalUnderTheLaw(empty(), EQ)
             })
 
     fun <F> MonadFilter<F>.monadFilterRightEmpty(EQ: Eq<Kind<F, Int>>): Unit =

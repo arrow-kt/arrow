@@ -49,7 +49,9 @@ class FreeTest : UnitSpec() {
 
     init {
 
-        val EQ: FreeEq<Ops.F, ForId, Int> = Free.eq(idInterpreter, Id.monad())
+        val IdMonad = Id.monad()
+
+        val EQ: FreeEq<Ops.F, ForId, Int> = Free.eq(idInterpreter, IdMonad)
         testLaws(
                 EqLaws.laws<Free<Ops.F, Int>>(EQ, { Ops.value(it) }),
                 MonadLaws.laws(Ops, EQ)
@@ -57,14 +59,14 @@ class FreeTest : UnitSpec() {
 
         "Can interpret an ADT as Free operations" {
             program.foldMap(optionInterpreter, Option.monad()).fix() shouldBe Some(-30)
-            program.foldMap(idInterpreter, Id.monad()).fix() shouldBe Id(-30)
+            program.foldMap(idInterpreter, IdMonad).fix() shouldBe Id(-30)
             program.foldMap(nonEmptyListInterpreter, NonEmptyList.monad()).fix() shouldBe NonEmptyList.of(-30)
         }
 
         "foldMap is stack safe" {
             val n = 50000
             val hugeProg = stackSafeTestProgram(0, n)
-            hugeProg.foldMap(idInterpreter, Id.monad()).value() shouldBe n
+            hugeProg.foldMap(idInterpreter, IdMonad).value() shouldBe n
         }
 
     }
