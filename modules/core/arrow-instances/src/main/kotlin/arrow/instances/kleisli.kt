@@ -66,7 +66,6 @@ interface KleisliApplicativeErrorInstance<F, D, E> : ApplicativeError<KleisliPar
 @instance(Kleisli::class)
 interface KleisliMonadErrorInstance<F, D, E> : KleisliApplicativeErrorInstance<F, D, E>, MonadError<KleisliPartialOf<F, D>, E>, KleisliMonadInstance<F, D>
 
-
 /**
  * Alias for [Kleisli] for [Id]
  */
