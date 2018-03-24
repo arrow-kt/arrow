@@ -12,8 +12,9 @@ import arrow.typeclasses.Foldable
  */
 interface MonadCombine<F> : MonadFilter<F>, Alternative<F> {
 
-    fun <G, A> Kind<F, Kind<G, A>>.unite(FG: Foldable<G>): Kind<F, A> =
-            this.flatMap({ ga -> FG.foldLeft(ga, empty<A>(), { acc, a -> combineK(acc, pure(a)) }) })
+    fun <G, A> Kind<F, Kind<G, A>>.unite(FG: Foldable<G>): Kind<F, A> = FG.run {
+        flatMap({ ga -> foldLeft(ga, empty<A>(), { acc, a -> combineK(acc, pure(a)) }) })
+    }
 
     fun <G, A, B> Kind<F, Kind2<G, A, B>>.separate(BFG: Bifoldable<G>): Tuple2<Kind<F, A>, Kind<F, B>> {
         val asep = this.flatMap({ gab -> BFG.run { algebra<A>().bifoldMap(gab, { pure(it) }, { _ -> empty() }) } })

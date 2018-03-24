@@ -16,8 +16,8 @@ data class Coproduct<F, G, A>(val run: Either<Kind<F, A>, Kind<G, A>>) : Coprodu
 
     fun <B> coflatMap(CF: Comonad<F>, CG: Comonad<G>, f: (Coproduct<F, G, A>) -> B): Coproduct<F, G, B> =
             Coproduct(run.bimap(
-                    { CF.coflatMap(it, { f(Coproduct(Left(it))) }) },
-                    { CG.coflatMap(it, { f(Coproduct(Right(it))) }) }
+                    { CF.run { coflatMap(it, { f(Coproduct(Left(it))) }) } },
+                    { CG.run { coflatMap(it, { f(Coproduct(Right(it))) }) } }
             ))
 
     fun extract(CF: Comonad<F>, CG: Comonad<G>): A =
@@ -27,7 +27,7 @@ data class Coproduct<F, G, A>(val run: Either<Kind<F, A>, Kind<G, A>>) : Coprodu
             run.fold({ f(it) }, { g(it) })
 
     fun <B> foldLeft(b: B, f: (B, A) -> B, FF: Foldable<F>, FG: Foldable<G>): B =
-            run.fold({ FF.foldLeft(it, b, f) }, { FG.foldLeft(it, b, f) })
+            run.fold({ FF.run { foldLeft(it, b, f) } }, { FG.run { foldLeft(it, b, f) } })
 
     fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>, FG: Foldable<G>): Eval<B> =
             run.fold({ FF.foldRight(it, lb, f) }, { FG.foldRight(it, lb, f) })

@@ -80,28 +80,29 @@ interface NonEmptyReducible<F, G> : Reducible<F> {
 
     fun <A> split(fa: Kind<F, A>): Tuple2<A, Kind<G, A>>
 
-    override fun <A, B> foldLeft(fa: Kind<F, A>, b: B, f: (B, A) -> B): B {
+    override fun <A, B> foldLeft(fa: Kind<F, A>, b: B, f: (B, A) -> B): B = FG().run {
         val (a, ga) = split(fa)
-        return FG().foldLeft(ga, f(b, a), f)
+        foldLeft(ga, f(b, a), f)
     }
 
     override fun <A, B> foldRight(fa: Kind<F, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
             Eval.Always({ split(fa) }).flatMap { (a, ga) -> f(a, FG().foldRight(ga, lb, f)) }
 
-    override fun <A, B> Kind<F, A>.reduceLeftTo(f: (A) -> B, g: (B, A) -> B): B {
-        val (a, ga) = split(this)
-        return FG().foldLeft(ga, f(a), { bb, aa -> g(bb, aa) })
+    override fun <A, B> Kind<F, A>.reduceLeftTo(f: (A) -> B, g: (B, A) -> B): B = FG().run {
+        val (a, ga) = split(this@reduceLeftTo)
+        foldLeft(ga, f(a), { bb, aa -> g(bb, aa) })
     }
 
-    override fun <A, B> Kind<F, A>.reduceRightTo(f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            Eval.Always({ split(this) }).flatMap { (a, ga) ->
-                FG().reduceRightToOption(ga, f, g).flatMap { option ->
-                    when (option) {
-                        is Some<B> -> g(a, Eval.Now(option.t))
-                        is None -> Eval.Later({ f(a) })
-                    }
+    override fun <A, B> Kind<F, A>.reduceRightTo(f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<B> = FG().run {
+        Eval.Always({ split(this@reduceRightTo) }).flatMap { (a, ga) ->
+            reduceRightToOption(ga, f, g).flatMap { option ->
+                when (option) {
+                    is Some<B> -> g(a, Eval.Now(option.t))
+                    is None -> Eval.Later({ f(a) })
                 }
             }
+        }
+    }
 
     override fun <A> Monoid<A>.fold(fa: Kind<F, A>): A {
         val (a, ga) = split(fa)

@@ -33,12 +33,12 @@ interface ComposedFoldable<F, G> :
     fun GF(): Foldable<G>
 
     override fun <A, B> foldLeft(fa: Kind<Nested<F, G>, A>, b: B, f: (B, A) -> B): B =
-            FF().foldLeft(fa.unnest(), b, { bb, aa -> GF().foldLeft(aa, bb, f) })
+            FF().run { foldLeft(fa.unnest(), b, { bb, aa -> GF().run { foldLeft(aa, bb, f) } }) }
 
     fun <A, B> foldLC(fa: Kind<F, Kind<G, A>>, b: B, f: (B, A) -> B): B = foldLeft(fa.nest(), b, f)
 
     override fun <A, B> foldRight(fa: Kind<Nested<F, G>, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            FF().foldRight(fa.unnest(), lb, { laa, lbb -> GF().foldRight(laa, lbb, f) })
+            FF().run { foldRight(fa.unnest(), lb, { laa, lbb -> GF().run { foldRight(laa, lbb, f) } }) }
 
     fun <A, B> foldRC(fa: Kind<F, Kind<G, A>>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = foldRight(fa.nest(), lb, f)
 
