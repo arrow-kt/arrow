@@ -57,10 +57,10 @@ data class FunctionSignature(
             val typeClassAbstractKind = typeClass.nameResolver.getString(typeClass.typeParameters[0].name)
             val args = f.valueParameterList.map {
                 val argName = typeClass.nameResolver.getString(it.name)
-                val argType = it.type.extractFullName(typeClass, failOnGeneric = false)
+                val argType = it.type.extractFullName(typeClass)
                 argName to argAsSeenFromReceiver(typeClassAbstractKind, argType, receiverType)
             }
-            val abstractReturnType = f.returnType.extractFullName(typeClass, failOnGeneric = false)
+            val abstractReturnType = f.returnType.extractFullName(typeClass)
             val concreteType = retTypeAsSeenFromReceiver(typeClassAbstractKind, abstractReturnType, receiverType)
             val isAbstract = f.modality == ProtoBuf.Modality.ABSTRACT
             return FunctionSignature(

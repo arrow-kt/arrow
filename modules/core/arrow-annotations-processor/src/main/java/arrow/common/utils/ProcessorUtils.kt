@@ -29,7 +29,7 @@ interface ProcessorUtils : KotlinMetadataUtils {
     }
 
     fun TypeElement.methods(): List<MethodElement> =
-            enclosedElements.map { if (it is MethodElement) it as MethodElement else null }.filterNotNull()
+            enclosedElements.mapNotNull { if (it is MethodElement) it as MethodElement else null }
 
     fun ClassOrPackageDataWrapper.getFunction(methodElement: ExecutableElement) =
             getFunctionOrNull(methodElement, nameResolver, functionList)
@@ -40,7 +40,7 @@ interface ProcessorUtils : KotlinMetadataUtils {
     fun ClassOrPackageDataWrapper.Class.declaredTypeClassInterfaces(
             typeTable: TypeTable): List<ClassOrPackageDataWrapper> {
         val interfaces = this.classProto.supertypes(typeTable).map {
-            it.extractFullName(this, failOnGeneric = false)
+            it.extractFullName(this)
         }.filter {
                     it != "`arrow`.`TC`"
                 }
@@ -57,7 +57,7 @@ interface ProcessorUtils : KotlinMetadataUtils {
             typeTable: TypeTable,
             acc: List<ClassOrPackageDataWrapper>): List<ClassOrPackageDataWrapper> {
         val interfaces = current.classProto.supertypes(typeTable).map {
-            it.extractFullName(current, failOnGeneric = false)
+            it.extractFullName(current)
         }.filter {
             it != "`kotlin`.`Any`"
         }
@@ -102,14 +102,13 @@ fun ClassOrPackageDataWrapper.getPropertyOrNull(methodElement: ExecutableElement
 
 fun ProtoBuf.Type.extractFullName(
         classData: ClassOrPackageDataWrapper,
-        outputTypeAlias: Boolean = true,
-        failOnGeneric: Boolean = true
+        outputTypeAlias: Boolean = true
 ): String =
         extractFullName(
                 nameResolver = classData.nameResolver,
                 getTypeParameter = { classData.getTypeParameter(it)!! },
                 outputTypeAlias = outputTypeAlias,
-                throwOnGeneric = if (!failOnGeneric) null else KnownException("Generic implicit types are not yet supported", null)
+                throwOnGeneric = null
         )
 
 fun ClassOrPackageDataWrapper.typeConstraints(): String =
@@ -117,7 +116,7 @@ fun ClassOrPackageDataWrapper.typeConstraints(): String =
             val name = nameResolver.getString(typeParameter.name)
             typeParameter.upperBoundList.map { constraint ->
                 name to constraint
-                        .extractFullName(this, failOnGeneric = false)
+                        .extractFullName(this)
                         .removeBackticks()
             }
         }.let { constraints ->
