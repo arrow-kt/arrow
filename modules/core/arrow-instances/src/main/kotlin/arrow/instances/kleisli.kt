@@ -55,8 +55,8 @@ interface KleisliApplicativeErrorInstance<F, D, E> : ApplicativeError<KleisliPar
 
     override fun FF(): MonadError<F, E>
 
-    override fun <A> handleErrorWith(fa: KleisliOf<F, D, A>, f: (E) -> KleisliOf<F, D, A>): Kleisli<F, D, A> =
-            fa.fix().handleErrorWith(f, FF())
+    override fun <A> Kind<KleisliPartialOf<F, D>, A>.handleErrorWith(f: (E) -> Kind<KleisliPartialOf<F, D>, A>): Kleisli<F, D, A> =
+            fix().handleErrorWith(f, FF())
 
     override fun <A> raiseError(e: E): Kleisli<F, D, A> =
             Kleisli.raiseError(e, FF())

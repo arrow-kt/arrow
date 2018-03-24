@@ -30,32 +30,32 @@ object ApplicativeErrorLaws {
 
     fun <F> ApplicativeError<F, Throwable>.applicativeErrorHandle(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genFunctionAToB<Throwable, Int>(Gen.int()), genThrowable(), { f: (Throwable) -> Int, e: Throwable ->
-                handleError(raiseError<Int>(e), f).equalUnderTheLaw(pure(f(e)), EQ)
+                raiseError<Int>(e).handleError(f).equalUnderTheLaw(pure(f(e)), EQ)
             })
 
     fun <F> ApplicativeError<F, Throwable>.applicativeErrorHandleWith(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genFunctionAToB<Throwable, Kind<F, Int>>(genApplicative(Gen.int(), this)), genThrowable(), { f: (Throwable) -> Kind<F, Int>, e: Throwable ->
-                handleErrorWith(raiseError<Int>(e), f).equalUnderTheLaw(f(e), EQ)
+                raiseError<Int>(e).handleErrorWith(f).equalUnderTheLaw(f(e), EQ)
             })
 
     fun <F> ApplicativeError<F, Throwable>.applicativeErrorHandleWithPure(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genFunctionAToB<Throwable, Kind<F, Int>>(genApplicative(Gen.int(), this)), Gen.int(), { f: (Throwable) -> Kind<F, Int>, a: Int ->
-                handleErrorWith(pure(a), f).equalUnderTheLaw(pure(a), EQ)
+                pure(a).handleErrorWith(f).equalUnderTheLaw(pure(a), EQ)
             })
 
     fun <F> ApplicativeError<F, Throwable>.applicativeErrorAttemptError(EQ: Eq<Kind<F, Either<Throwable, Int>>>): Unit =
             forAll(genThrowable(), { e: Throwable ->
-                attempt(raiseError<Int>(e)).equalUnderTheLaw(pure(Left(e)), EQ)
+                raiseError<Int>(e).attempt().equalUnderTheLaw(pure(Left(e)), EQ)
             })
 
     fun <F> ApplicativeError<F, Throwable>.applicativeErrorAttemptSuccess(EQ: Eq<Kind<F, Either<Throwable, Int>>>): Unit =
             forAll(Gen.int(), { a: Int ->
-                attempt(pure(a)).equalUnderTheLaw(pure(Right(a)), EQ)
+                pure(a).attempt().equalUnderTheLaw(pure(Right(a)), EQ)
             })
 
     fun <F> ApplicativeError<F, Throwable>.applicativeErrorAttemptFromEitherConsistentWithPure(EQ: Eq<Kind<F, Either<Throwable, Int>>>): Unit =
             forAll(genEither(genThrowable(), Gen.int()), { either: Either<Throwable, Int> ->
-                attempt(fromEither(either)).equalUnderTheLaw(pure(either), EQ)
+                fromEither(either).attempt().equalUnderTheLaw(pure(either), EQ)
             })
 
     fun <F> ApplicativeError<F, Throwable>.applicativeErrorCatch(EQ: Eq<Kind<F, Int>>): Unit =

@@ -14,11 +14,11 @@ import arrow.typeclasses.Semigroup
 
 @instance(IO::class)
 interface IOApplicativeErrorInstance : IOApplicativeInstance, ApplicativeError<ForIO, Throwable> {
-    override fun <A> attempt(fa: IOOf<A>): IO<Either<Throwable, A>> =
-            fa.fix().attempt()
+    override fun <A> Kind<ForIO, A>.attempt(): IO<Either<Throwable, A>> =
+            fix().attempt()
 
-    override fun <A> handleErrorWith(fa: IOOf<A>, f: (Throwable) -> IOOf<A>): IO<A> =
-            fa.fix().handleErrorWith(f)
+    override fun <A> Kind<ForIO, A>.handleErrorWith(f: (Throwable) -> Kind<ForIO, A>): IO<A> =
+            fix().handleErrorWith(f)
 
     override fun <A> raiseError(e: Throwable): IO<A> =
             IO.raiseError(e)
@@ -55,8 +55,8 @@ interface IOAsyncInstance : IOMonadSuspendInstance, Async<ForIO> {
 
 @instance(IO::class)
 interface IOEffectInstance : IOAsyncInstance, Effect<ForIO> {
-    override fun <A> runAsync(fa: Kind<ForIO, A>, cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Unit> =
-            fa.fix().runAsync(cb)
+    override fun <A> Kind<ForIO, A>.runAsync(cb: (Either<Throwable, A>) -> Kind<ForIO, Unit>): IO<Unit> =
+            fix().runAsync(cb)
 }
 
 @instance(IO::class)

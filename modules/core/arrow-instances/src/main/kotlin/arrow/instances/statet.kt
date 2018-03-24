@@ -67,8 +67,8 @@ interface StateTApplicativeErrorInstance<F, S, E> : StateTApplicativeInstance<F,
 
     override fun <A> raiseError(e: E): Kind<StateTPartialOf<F, S>, A> = StateT.lift(FF(), FF().raiseError(e))
 
-    override fun <A> handleErrorWith(fa: Kind<StateTPartialOf<F, S>, A>, f: (E) -> Kind<StateTPartialOf<F, S>, A>): StateT<F, S, A> =
-            StateT(FF().pure({ s -> FF().handleErrorWith(fa.runM(FF(), s), { e -> f(e).runM(FF(), s) }) }))
+    override fun <A> Kind<StateTPartialOf<F, S>, A>.handleErrorWith(f: (E) -> Kind<StateTPartialOf<F, S>, A>): StateT<F, S, A> =
+            StateT(FF().pure({ s -> FF().run { runM(FF(), s).handleErrorWith({ e -> f(e).runM(FF(), s) }) } }))
 }
 
 @instance(StateT::class)

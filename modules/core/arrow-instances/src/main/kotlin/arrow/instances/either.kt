@@ -40,8 +40,8 @@ interface EitherApplicativeErrorInstance<L> : EitherApplicativeInstance<L>, Appl
 
     override fun <A> raiseError(e: L): Either<L, A> = Left(e)
 
-    override fun <A> handleErrorWith(fa: Kind<EitherPartialOf<L>, A>, f: (L) -> Kind<EitherPartialOf<L>, A>): Either<L, A> {
-        val fea = fa.fix()
+    override fun <A> Kind<EitherPartialOf<L>, A>.handleErrorWith(f: (L) -> Kind<EitherPartialOf<L>, A>): Either<L, A> {
+        val fea = fix()
         return when (fea) {
             is Either.Left -> f(fea.a).fix()
             is Either.Right -> fea

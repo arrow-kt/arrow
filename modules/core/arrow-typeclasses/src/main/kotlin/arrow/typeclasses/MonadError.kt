@@ -5,8 +5,8 @@ import kotlin.coroutines.experimental.startCoroutine
 
 interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
 
-    fun <A> ensure(fa: Kind<F, A>, error: () -> E, predicate: (A) -> Boolean): Kind<F, A> =
-            flatMap(fa, {
+    fun <A> Kind<F, A>.ensure(error: () -> E, predicate: (A) -> Boolean): Kind<F, A> =
+            flatMap(this, {
                 if (predicate(it)) pure(it)
                 else raiseError(error())
             })

@@ -29,7 +29,7 @@ interface OptionMonoidInstance<A> : OptionSemigroupInstance<A>, Monoid<Option<A>
 interface OptionApplicativeErrorInstance : OptionApplicativeInstance, ApplicativeError<ForOption, Unit> {
     override fun <A> raiseError(e: Unit): Option<A> = None
 
-    override fun <A> handleErrorWith(fa: OptionOf<A>, f: (Unit) -> OptionOf<A>): Option<A> = fa.fix().orElse({ f(Unit).fix() })
+    override fun <A> Kind<ForOption, A>.handleErrorWith(f: (Unit) -> Kind<ForOption, A>): Option<A> = fix().orElse({ f(Unit).fix() })
 }
 
 @instance(Option::class)

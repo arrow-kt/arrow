@@ -102,7 +102,7 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
      * @param ME [MonadError] for the context [F].
      */
     fun <E> handleErrorWith(f: (E) -> KleisliOf<F, D, A>, ME: MonadError<F, E>): Kleisli<F, D, A> = Kleisli {
-        ME.handleErrorWith(run(it), { e: E -> f(e).fix().run(it) })
+        ME.run{ run(it).handleErrorWith({ e: E -> f(e).fix().run(it) }) }
     }
 
     companion object {

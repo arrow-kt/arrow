@@ -10,12 +10,12 @@ interface ApplicativeError<F, E> : Applicative<F> {
 
     fun <A> raiseError(e: E): Kind<F, A>
 
-    fun <A> handleErrorWith(fa: Kind<F, A>, f: (E) -> Kind<F, A>): Kind<F, A>
+    fun <A> Kind<F, A>.handleErrorWith(f: (E) -> Kind<F, A>): Kind<F, A>
 
-    fun <A> handleError(fa: Kind<F, A>, f: (E) -> A): Kind<F, A> = handleErrorWith(fa) { pure(f(it)) }
+    fun <A> Kind<F, A>.handleError(f: (E) -> A): Kind<F, A> = handleErrorWith { pure(f(it)) }
 
-    fun <A> attempt(fa: Kind<F, A>): Kind<F, Either<E, A>> =
-            handleErrorWith(map(fa) { Right(it) }) {
+    fun <A> Kind<F, A>.attempt(): Kind<F, Either<E, A>> =
+            map(this) { Right(it) }.handleErrorWith {
                 pure(Left(it))
             }
 

@@ -10,7 +10,7 @@ interface TryApplicativeErrorInstance : TryApplicativeInstance, ApplicativeError
 
     override fun <A> raiseError(e: Throwable): Try<A> = Failure(e)
 
-    override fun <A> handleErrorWith(fa: TryOf<A>, f: (Throwable) -> TryOf<A>): Try<A> = fa.fix().recoverWith { f(it).fix() }
+    override fun <A> Kind<ForTry, A>.handleErrorWith(f: (Throwable) -> Kind<ForTry, A>): Try<A> = fix().recoverWith { f(it).fix() }
 
 }
 

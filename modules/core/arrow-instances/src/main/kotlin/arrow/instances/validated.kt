@@ -29,8 +29,8 @@ interface ValidatedApplicativeErrorInstance<E> : ValidatedApplicativeInstance<E>
 
     override fun <A> raiseError(e: E): Validated<E, A> = Invalid(e)
 
-    override fun <A> handleErrorWith(fa: ValidatedOf<E, A>, f: (E) -> ValidatedOf<E, A>): Validated<E, A> =
-            fa.fix().handleLeftWith(f)
+    override fun <A> Kind<ValidatedPartialOf<E>, A>.handleErrorWith(f: (E) -> Kind<ValidatedPartialOf<E>, A>): Validated<E, A> =
+            fix().handleLeftWith(f)
 
 }
 
