@@ -1,10 +1,10 @@
 package arrow.free
 
 import arrow.Kind
-import arrow.typeclasses.FunctionK
 import arrow.data.*
 import arrow.higherkind
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.FunctionK
 import arrow.typeclasses.Monoid
 
 inline fun <F, reified G, A> FreeApplicativeOf<F, A>.foldMapK(f: FunctionK<F, G>, GA: Applicative<G>): Kind<G, A> =
@@ -65,8 +65,8 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
                 override fun <A> invoke(fa: Kind<F, A>): Const<M, A> = f(fa).fix()
             }, Const.applicative(MM)).value()
 
-    // FIXME(paco) Free.applicativeF is broken
-    //fun monad(): Free<F, A> = foldMap(Free.functionKF(), Free.applicativeF()).fix()
+    fun monad(ap: Applicative<FreePartialOf<F>>): Free<F, A> =
+            foldMap(Free.functionKF(), Free.applicativeF(ap)).fix()
 
     // Beware: smart code
     @Suppress("UNCHECKED_CAST")
