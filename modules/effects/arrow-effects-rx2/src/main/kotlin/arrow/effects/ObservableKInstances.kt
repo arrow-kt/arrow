@@ -78,7 +78,7 @@ interface ObservableKApplicativeErrorInstance :
             ObservableK.raiseError(e)
 
     override fun <A> ObservableKOf<A>.handleErrorWith(f: (Throwable) -> ObservableKOf<A>): ObservableK<A> =
-            fix().handleErrorWith { f(it).fix() }
+            fix().handleErrorWith(null) { f(it).fix() }
 }
 
 @instance(ObservableK::class)
@@ -89,7 +89,7 @@ interface ObservableKMonadErrorInstance :
             ObservableK.raiseError(e)
 
     override fun <A> ObservableKOf<A>.handleErrorWith(f: (Throwable) -> ObservableKOf<A>): ObservableK<A> =
-            fix().handleErrorWith { f(it).fix() }
+            fix().handleErrorWith(null) { f(it).fix() }
 }
 
 @instance(ObservableK::class)
