@@ -2,8 +2,6 @@ package arrow.mtl.instances
 
 import arrow.Kind
 import arrow.core.Option
-import arrow.instances.ComposedFunctor
-import arrow.instances.ComposedTraverse
 import arrow.mtl.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.TraverseFilter
 import arrow.typeclasses.*
