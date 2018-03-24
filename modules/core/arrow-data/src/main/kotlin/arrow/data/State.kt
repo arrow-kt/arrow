@@ -1,5 +1,6 @@
 package arrow.data
 
+import arrow.collections.prependTo
 import arrow.core.*
 import arrow.typeclasses.internal.IdMonad
 
@@ -117,3 +118,11 @@ object StateApi {
      */
     fun <S> set(s: S): State<S, Unit> = StateT.set(IdMonad, s)
 }
+
+fun <R, S, T> List<T>.stateTraverse(f: (T) -> State<S, R>): State<S, List<R>> = foldRight(StateApi.pure(emptyList())) { i: T, accumulator: State<S, List<R>> ->
+    f(i).map(accumulator, ({ head: R, tail: List<R> ->
+        head prependTo tail
+    }))
+}
+
+fun <S, T> List<State<S, T>>.stateSequential(): State<S, List<T>> = stateTraverse { it }
