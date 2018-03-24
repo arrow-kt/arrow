@@ -11,11 +11,11 @@ import arrow.typeclasses.Applicative
 
 @instance(Option::class)
 interface OptionTraverseFilterInstance : TraverseFilter<ForOption> {
-    override fun <A> filter(fa: OptionOf<A>, f: kotlin.Function1<A, kotlin.Boolean>): Option<A> =
-            fa.fix().filter(f)
+    override fun <A> Kind<ForOption, A>.filter(f: (A) -> Boolean): Option<A> =
+            fix().filter(f)
 
-    override fun <G, A, B> traverseFilter(GA: Applicative<G>, fa: Kind<ForOption, A>, f: (A) -> Kind<G, Option<B>>): arrow.Kind<G, Option<B>> =
-            fa.fix().traverseFilter(f, GA)
+    override fun <G, A, B> Applicative<G>.traverseFilter(fa: Kind<ForOption, A>, f: (A) -> Kind<G, Option<B>>): arrow.Kind<G, Option<B>> =
+            fa.fix().traverseFilter(f, this)
 
     override fun <A, B> map(fa: OptionOf<A>, f: kotlin.Function1<A, B>): Option<B> =
             fa.fix().map(f)
@@ -47,8 +47,8 @@ interface OptionMonadFilterInstance : MonadFilter<ForOption> {
     override fun <A> empty(): Option<A> =
             Option.empty()
 
-    override fun <A, B> ap(fa: OptionOf<A>, ff: OptionOf<kotlin.Function1<A, B>>): Option<B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<ForOption, A>.ap(ff: Kind<ForOption, (A) -> B>): Option<B> =
+            fix().ap(ff)
 
     override fun <A, B> flatMap(fa: OptionOf<A>, f: kotlin.Function1<A, OptionOf<B>>): Option<B> =
             fa.fix().flatMap(f)
@@ -62,6 +62,6 @@ interface OptionMonadFilterInstance : MonadFilter<ForOption> {
     override fun <A> pure(a: A): Option<A> =
             Option.pure(a)
 
-    override fun <A> filter(fa: OptionOf<A>, f: kotlin.Function1<A, kotlin.Boolean>): Option<A> =
-            fa.fix().filter(f)
+    override fun <A> Kind<ForOption, A>.filter(f: (A) -> Boolean): Option<A> =
+            fix().filter(f)
 }

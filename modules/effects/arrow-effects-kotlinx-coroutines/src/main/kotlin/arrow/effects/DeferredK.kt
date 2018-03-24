@@ -1,13 +1,8 @@
 package arrow.effects
 
 import arrow.core.*
-import arrow.core.Try
-import arrow.deriving
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
 import kotlinx.coroutines.experimental.*
 import kotlin.coroutines.experimental.CoroutineContext
 
@@ -17,11 +12,6 @@ fun <A> Deferred<A>.k(): DeferredK<A> =
 fun <A> DeferredKOf<A>.value(): Deferred<A> = this.fix().deferred
 
 @higherkind
-@deriving(
-        Functor::class,
-        Applicative::class,
-        Monad::class
-)
 data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferred<A> by deferred {
 
     fun <B> map(f: (A) -> B): DeferredK<B> =
@@ -93,7 +83,7 @@ data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferre
     }
 }
 
-fun <A> DeferredKOf<A>.handleErrorWith(f: (Throwable) -> DeferredK<A>): DeferredK<A> =
+fun <A> DeferredKOf<A>.handleErrorWith(dummy: Unit? = null, f: (Throwable) -> DeferredK<A>): DeferredK<A> =
         async(Unconfined, CoroutineStart.LAZY) {
             Try { await() }.fold({ f(it).await() }, ::identity)
         }.k()

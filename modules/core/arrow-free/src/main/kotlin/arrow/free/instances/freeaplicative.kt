@@ -21,8 +21,8 @@ interface FreeApplicativeFunctorInstance<S> : Functor<FreeApplicativePartialOf<S
 interface FreeApplicativeApplicativeInstance<S> : FreeApplicativeFunctorInstance<S>, Applicative<FreeApplicativePartialOf<S>> {
     override fun <A> pure(a: A): FreeApplicative<S, A> = FreeApplicative.pure(a)
 
-    override fun <A, B> ap(fa: FreeApplicativeOf<S, A>, ff: FreeApplicativeOf<S, (A) -> B>): FreeApplicative<S, B> =
-            fa.fix().ap(ff.fix())
+    override fun <A, B> Kind<FreeApplicativePartialOf<S>, A>.ap(ff: Kind<FreeApplicativePartialOf<S>, (A) -> B>): FreeApplicative<S, B> =
+            fix().ap(ff.fix())
 
     override fun <A, B> map(fa: FreeApplicativeOf<S, A>, f: (A) -> B): FreeApplicative<S, B> = fa.fix().map(f)
 }

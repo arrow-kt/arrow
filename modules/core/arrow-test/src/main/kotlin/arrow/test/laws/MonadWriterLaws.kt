@@ -41,14 +41,14 @@ object MonadWriterLaws {
     fun <F, W> MonadWriter<F, W>.monadWriterListenPure(MOW: Monoid<W>,
                                                                              EqTupleWA: Eq<Kind<F, Tuple2<W, Int>>>): Unit {
         forAll(Gen.int(), { a: Int ->
-            listen(pure(a)).equalUnderTheLaw(pure(Tuple2(MOW.empty(), a)), EqTupleWA)
+            pure(a).listen().equalUnderTheLaw(pure(Tuple2(MOW.empty(), a)), EqTupleWA)
         })
     }
 
     fun <F, W> MonadWriter<F, W>.monadWriterListenWriter(genTupleWA: Gen<Tuple2<W, Int>>,
                                                                                EqTupleWA: Eq<Kind<F, Tuple2<W, Int>>>): Unit {
         forAll(genTupleWA, { tupleWA: Tuple2<W, Int> ->
-            listen(writer(tupleWA)).equalUnderTheLaw(map(tell(tupleWA.a), { tupleWA }), EqTupleWA)
+            writer(tupleWA).listen().equalUnderTheLaw(map(tell(tupleWA.a), { tupleWA }), EqTupleWA)
         })
     }
 }

@@ -24,7 +24,7 @@ interface MapKFoldableInstance<K> : Foldable<MapKPartialOf<K>> {
 interface MapKTraverseInstance<K> : MapKFoldableInstance<K>, Traverse<MapKPartialOf<K>> {
 
     override fun <G, A, B> Applicative<G>.traverse(fa: MapKOf<K, A>, f: (A) -> Kind<G, B>): Kind<G, MapKOf<K, B>> =
-            fa.fix().traverse(f, this)
+            fa.fix().traverse(this, f)
 }
 
 @instance(MapK::class)

@@ -9,16 +9,16 @@ interface Applicative<F> : Functor<F> {
 
     fun <A> pure(a: A): Kind<F, A>
 
-    fun <A, B> ap(fa: Kind<F, A>, ff: Kind<F, (A) -> B>): Kind<F, B>
+    fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B>
 
     fun <A, B> Kind<F, A>.product(fb: Kind<F, B>): Kind<F, Tuple2<A, B>> =
-            ap(fb, map(this) { a: A -> { b: B -> Tuple2(a, b) } })
+            fb.ap(map(this) { a: A -> { b: B -> Tuple2(a, b) } })
 
-    override fun <A, B> map(fa: Kind<F, A>, f: (A) -> B): Kind<F, B> = ap(fa, pure(f))
+    override fun <A, B> map(fa: Kind<F, A>, f: (A) -> B): Kind<F, B> = fa.ap(pure(f))
 
-    fun <A, B, Z> map2(fa: Kind<F, A>, fb: Kind<F, B>, f: (Tuple2<A, B>) -> Z): Kind<F, Z> = map(fa.product(fb), f)
+    fun <A, B, Z> Kind<F, A>.map2(fb: Kind<F, B>, f: (Tuple2<A, B>) -> Z): Kind<F, Z> = map(product(fb), f)
 
-    fun <A, B, Z> map2Eval(fa: Kind<F, A>, fb: Eval<Kind<F, B>>, f: (Tuple2<A, B>) -> Z): Eval<Kind<F, Z>> = fb.map { fc -> map2(fa, fc, f) }
+    fun <A, B, Z> Kind<F, A>.map2Eval(fb: Eval<Kind<F, B>>, f: (Tuple2<A, B>) -> Z): Eval<Kind<F, Z>> = fb.map { fc -> map2(fc, f) }
 
     fun <A, B, Z> Kind<F, Tuple2<A, B>>.product(
             other: Kind<F, Z>,

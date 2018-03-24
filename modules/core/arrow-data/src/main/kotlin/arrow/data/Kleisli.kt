@@ -32,7 +32,7 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
      * @param AF [Applicative] for the context [F].
      */
     fun <B> ap(ff: KleisliOf<F, D, (A) -> B>, AF: Applicative<F>): Kleisli<F, D, B> =
-            Kleisli { AF.ap(run(it), ff.fix().run(it)) }
+            AF.run { Kleisli { run(it).ap(ff.fix().run(it)) } }
 
     /**
      * Map the end of the arrow [A] to [B] given a function [f].

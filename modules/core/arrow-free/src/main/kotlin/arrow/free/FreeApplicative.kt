@@ -36,8 +36,8 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
             override fun <A> pure(a: A): FreeApplicative<F, A> =
                     Companion.pure(a)
 
-            override fun <A, B> ap(fa: Kind<FreeApplicativePartialOf<F>, A>, ff: Kind<FreeApplicativePartialOf<F>, (A) -> B>): FreeApplicative<F, B> =
-                    Companion.ap(fa.fix(), ff.fix())
+            override fun <A, B> Kind<FreeApplicativePartialOf<F>, A>.ap(ff: Kind<FreeApplicativePartialOf<F>, (A) -> B>): FreeApplicative<F, B> =
+                    Companion.ap(fix(), ff.fix())
         }
     }
 
@@ -106,7 +106,7 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
                     fns = fns.drop(1)
                     fnsLength -= 1
 
-                    var res = GA.ap(argT, fn.gab)
+                    var res = GA.run { argT.ap(fn.gab) }
 
                     if (fn.remaining > 1) {
                         fns = listOf(CurriedFunction(res as Kind<G, (Any?) -> Any?>, fn.remaining - 1)) + fns
@@ -120,7 +120,7 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
                                 fn = fns.first()
                                 fns = fns.drop(1)
                                 fnsLength -= 1
-                                res = GA.ap(res, fn.gab)
+                                res = GA.run { res.ap(fn.gab) }
 
                                 if (fn.remaining > 1) {
                                     fns = listOf(CurriedFunction(res as Kind<G, (Any?) -> Any?>, fn.remaining - 1)) + fns

@@ -43,14 +43,14 @@ interface ListKFunctorInstance : Functor<ForListK> {
 
 @instance(ListK::class)
 interface ListKApplicativeInstance : Applicative<ForListK> {
-    override fun <A, B> ap(fa: ListKOf<A>, ff: ListKOf<kotlin.Function1<A, B>>): ListK<B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
+            fix().ap(ff)
 
     override fun <A, B> map(fa: ListKOf<A>, f: kotlin.Function1<A, B>): ListK<B> =
             fa.fix().map(f)
 
-    override fun <A, B, Z> map2(fa: ListKOf<A>, fb: ListKOf<B>, f: kotlin.Function1<Tuple2<A, B>, Z>): ListK<Z> =
-            fa.fix().map2(fb, f)
+    override fun <A, B, Z> Kind<ForListK, A>.map2(fb: Kind<ForListK, B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
+            fix().map2(fb, f)
 
     override fun <A> pure(a: A): ListK<A> =
             ListK.pure(a)
@@ -58,8 +58,8 @@ interface ListKApplicativeInstance : Applicative<ForListK> {
 
 @instance(ListK::class)
 interface ListKMonadInstance : Monad<ForListK> {
-    override fun <A, B> ap(fa: ListKOf<A>, ff: ListKOf<kotlin.Function1<A, B>>): ListK<B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
+            fix().ap(ff)
 
     override fun <A, B> flatMap(fa: ListKOf<A>, f: kotlin.Function1<A, ListKOf<B>>): ListK<B> =
             fa.fix().flatMap(f)
@@ -70,8 +70,8 @@ interface ListKMonadInstance : Monad<ForListK> {
     override fun <A, B> map(fa: ListKOf<A>, f: kotlin.Function1<A, B>): ListK<B> =
             fa.fix().map(f)
 
-    override fun <A, B, Z> map2(fa: ListKOf<A>, fb: ListKOf<B>, f: kotlin.Function1<Tuple2<A, B>, Z>): ListK<Z> =
-            fa.fix().map2(fb, f)
+    override fun <A, B, Z> Kind<ForListK, A>.map2(fb: Kind<ForListK, B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
+            fix().map2(fb, f)
 
     override fun <A> pure(a: A): ListK<A> =
             ListK.pure(a)
@@ -95,7 +95,7 @@ interface ListKTraverseInstance : Traverse<ForListK> {
             fa.fix().map(f)
 
     override fun <G, A, B> Applicative<G>.traverse(fa: ListKOf<A>, f: kotlin.Function1<A, Kind<G, B>>): Kind<G, ListK<B>> =
-            fa.fix().traverse(f, this)
+            fa.fix().traverse(this, f)
 
     override fun <A, B> foldLeft(fa: ListKOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)

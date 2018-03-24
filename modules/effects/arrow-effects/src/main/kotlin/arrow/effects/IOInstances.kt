@@ -7,10 +7,40 @@ import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.MonadSuspend
 import arrow.effects.typeclasses.Proc
 import arrow.instance
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.MonadError
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
+import arrow.typeclasses.*
+
+@instance(IO::class)
+interface IOFunctorInstance : Functor<ForIO> {
+    override fun <A, B> map(fa: IOOf<A>, f: (A) -> B): IO<B> =
+            fa.fix().map(f)
+}
+
+@instance(IO::class)
+interface IOApplicativeInstance : Applicative<ForIO> {
+    override fun <A, B> map(fa: IOOf<A>, f: (A) -> B): IO<B> =
+            fa.fix().map(f)
+
+    override fun <A> pure(a: A): IO<A> =
+            IO.pure(a)
+
+    override fun <A, B> Kind<ForIO, A>.ap(ff: IOOf<(A) -> B>): IO<B> =
+            fix().ap(null, ff)
+}
+
+@instance(IO::class)
+interface IOMonadInstance : Monad<ForIO> {
+    override fun <A, B> flatMap(fa: IOOf<A>, f: kotlin.Function1<A, IOOf<B>>): IO<B> =
+            fa.fix().flatMap(f)
+
+    override fun <A, B> map(fa: IOOf<A>, f: kotlin.Function1<A, B>): IO<B> =
+            fa.fix().map(f)
+
+    override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, IOOf<arrow.core.Either<A, B>>>): IO<B> =
+            IO.tailRecM(a, f)
+
+    override fun <A> pure(a: A): IO<A> =
+            IO.pure(a)
+}
 
 @instance(IO::class)
 interface IOApplicativeErrorInstance : IOApplicativeInstance, ApplicativeError<ForIO, Throwable> {
@@ -18,22 +48,22 @@ interface IOApplicativeErrorInstance : IOApplicativeInstance, ApplicativeError<F
             fix().attempt()
 
     override fun <A> Kind<ForIO, A>.handleErrorWith(f: (Throwable) -> Kind<ForIO, A>): IO<A> =
-            fix().handleErrorWith(f)
+            fix().handleErrorWith(null, f)
 
     override fun <A> raiseError(e: Throwable): IO<A> =
             IO.raiseError(e)
 }
 
 @instance(IO::class)
-interface IOMonadErrorInstance : IOApplicativeErrorInstance, IOMonadInstance, MonadError<ForIO, Throwable> {
-    override fun <A, B> ap(fa: IOOf<A>, ff: IOOf<(A) -> B>): IO<B> =
-            super<IOMonadInstance>.ap(fa, ff).fix()
+interface IOMonadErrorInstance : IOMonadInstance, MonadError<ForIO, Throwable> {
+    override fun <A> Kind<ForIO, A>.attempt(): IO<Either<Throwable, A>> =
+            fix().attempt()
 
-    override fun <A, B> map(fa: IOOf<A>, f: (A) -> B): IO<B> =
-            super<IOMonadInstance>.map(fa, f)
+    override fun <A> Kind<ForIO, A>.handleErrorWith(f: (Throwable) -> Kind<ForIO, A>): IO<A> =
+            fix().handleErrorWith(null, f)
 
-    override fun <A> pure(a: A): IO<A> =
-            super<IOMonadInstance>.pure(a)
+    override fun <A> raiseError(e: Throwable): IO<A> =
+            IO.raiseError(e)
 }
 
 @instance(IO::class)

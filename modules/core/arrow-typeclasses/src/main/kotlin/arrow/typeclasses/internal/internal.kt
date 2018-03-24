@@ -11,8 +11,8 @@ val IdMonad: Monad<ForId> = object : Monad<ForId> {
     override fun <A> pure(a: A): Kind<ForId, A> =
             Id(a)
 
-    override fun <A, B> ap(fa: Kind<ForId, A>, ff: Kind<ForId, (A) -> B>): Kind<ForId, B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<ForId, A>.ap(ff: Kind<ForId, (A) -> B>): Kind<ForId, B> =
+            fix().ap(ff)
 
     override fun <A, B> map(fa: Kind<ForId, A>, f: (A) -> B): Kind<ForId, B> =
             fa.fix().map(f)

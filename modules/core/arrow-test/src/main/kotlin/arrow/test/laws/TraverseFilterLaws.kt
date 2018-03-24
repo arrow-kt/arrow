@@ -23,11 +23,11 @@ object TraverseFilterLaws {
 
     fun <F> TraverseFilter<F>.identityTraverseFilter(GA: Applicative<F>, EQ: Eq<Kind<F, Kind<F, Int>>> = Eq.any()) =
             forAll(genApplicative(genIntSmall(), GA), { fa: Kind<F, Int> ->
-                traverseFilter(GA, fa, { GA.pure(Some(it)) }).equalUnderTheLaw(GA.pure(fa), EQ)
+                GA.traverseFilter(fa, { GA.pure(Some(it)) }).equalUnderTheLaw(GA.pure(fa), EQ)
             })
 
     fun <F> TraverseFilter<F>.filterAconsistentWithTraverseFilter(GA: Applicative<F>, EQ: Eq<Kind<F, Kind<F, Int>>> = Eq.any()) =
             forAll(genApplicative(genIntSmall(), GA), genFunctionAToB(genApplicative(Gen.bool(), GA)), { fa: Kind<F, Int>, f: (Int) -> Kind<F, Boolean> ->
-                filterA(fa, f, GA).equalUnderTheLaw(traverseFilter(GA, fa, { a -> map(f(a)) { b: Boolean -> if (b) Some(a) else None } }), EQ)
+                fa.filterA(f, GA).equalUnderTheLaw(GA.traverseFilter(fa, { a -> map(f(a)) { b: Boolean -> if (b) Some(a) else None } }), EQ)
             })
 }

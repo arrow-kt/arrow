@@ -45,13 +45,17 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
         return Eval.defer { loop(this) }
     }
 
-    fun <G, B> traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, FlowableK<B>> =
-            foldRight(Eval.always { GA.pure(Flowable.empty<B>().k()) }) { a, eval ->
-                GA.map2Eval(f(a), eval) { Flowable.concat(Flowable.just<B>(it.a), it.b.flowable).k() }
-            }.value()
+    fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, FlowableK<B>> = GA.run {
+        foldRight(Eval.always { pure(Flowable.empty<B>().k()) }) { a, eval ->
+            f(a).map2Eval(eval) { Flowable.concat(Flowable.just<B>(it.a), it.b.flowable).k() }
+        }.value()
+    }
 
     fun runAsync(cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Unit> =
             flowable.flatMap { cb(Right(it)).value() }.onErrorResumeNext(io.reactivex.functions.Function { cb(Left(it)).value() }).k()
+
+    fun handleErrorWith(function: (Throwable) -> FlowableK<A>): FlowableK<A> =
+            flowable.onErrorResumeNext { t: Throwable -> function(t).flowable }.k()
 
     companion object {
         fun <A> pure(a: A): FlowableK<A> =
@@ -166,6 +170,3 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
         }
     }
 }
-
-fun <A> FlowableKOf<A>.handleErrorWith(function: (Throwable) -> FlowableK<A>): FlowableK<A> =
-        this.fix().flowable.onErrorResumeNext { t: Throwable -> function(t).flowable }.k()

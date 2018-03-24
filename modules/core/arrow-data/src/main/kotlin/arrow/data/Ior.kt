@@ -302,21 +302,21 @@ sealed class Ior<A, B> : IorOf<A, B> {
             ff.fix().flatMap(SG) { f -> map(f) }
 
     data class Left<A, B>(val value: A) : Ior<A, B>() {
-        override val isRight: Boolean = false
-        override val isLeft: Boolean = true
-        override val isBoth: Boolean = false
+        override val isRight: Boolean get() = false
+        override val isLeft: Boolean get() = true
+        override val isBoth: Boolean get() = false
     }
 
     data class Right<A, B>(val value: B) : Ior<A, B>() {
-        override val isRight: Boolean = true
-        override val isLeft: Boolean = false
-        override val isBoth: Boolean = false
+        override val isRight: Boolean get() = true
+        override val isLeft: Boolean get() = false
+        override val isBoth: Boolean get()  = false
     }
 
     data class Both<A, B>(val leftValue: A, val rightValue: B) : Ior<A, B>() {
-        override val isRight: Boolean = false
-        override val isLeft: Boolean = false
-        override val isBoth: Boolean = true
+        override val isRight: Boolean get() = false
+        override val isLeft: Boolean get() = false
+        override val isBoth: Boolean get() = true
     }
 }
 

@@ -20,8 +20,8 @@ interface Tuple2ApplicativeInstance<F> : Tuple2FunctorInstance<F>, Applicative<T
     override fun <A, B> map(fa: Tuple2Of<F, A>, f: (A) -> B) =
             fa.fix().map(f)
 
-    override fun <A, B> ap(fa: Tuple2Of<F, A>, ff: Tuple2Of<F, (A) -> B>) =
-            fa.fix().ap(ff.fix())
+    override fun <A, B> Kind<Tuple2PartialOf<F>, A>.ap(ff: Kind<Tuple2PartialOf<F>, (A) -> B>) =
+            fix().ap(ff.fix())
 
     override fun <A> pure(a: A) =
             MF().empty() toT a
@@ -32,8 +32,8 @@ interface Tuple2MonadInstance<F> : Tuple2ApplicativeInstance<F>, Monad<Tuple2Par
     override fun <A, B> map(fa: Tuple2Of<F, A>, f: (A) -> B) =
             fa.fix().map(f)
 
-    override fun <A, B> ap(fa: Tuple2Of<F, A>, ff: Tuple2Of<F, (A) -> B>) =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<Tuple2PartialOf<F>, A>.ap(ff: Kind<Tuple2PartialOf<F>, (A) -> B>) =
+            fix().ap(ff)
 
     override fun <A, B> flatMap(fa: Tuple2Of<F, A>, f: (A) -> Tuple2Of<F, B>) =
             fa.fix().flatMap { f(it).fix() }

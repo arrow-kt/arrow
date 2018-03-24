@@ -8,27 +8,31 @@ import arrow.typeclasses.*
 
 @instance(Free::class)
 interface FreeFunctorInstance<S> : Functor<FreePartialOf<S>> {
-    override fun <A, B> map(fa: FreeOf<S, A>, f: (A) -> B): Free<S, B> = fa.fix().map(f)
+
+    override fun <A, B> map(fa: FreeOf<S, A>, f: (A) -> B): Free<S, B> =
+            fa.fix().map(null, f)
 }
 
 @instance(Free::class)
 interface FreeApplicativeInstance<S> : FreeFunctorInstance<S>, Applicative<FreePartialOf<S>> {
+
     override fun <A> pure(a: A): Free<S, A> = Free.pure(a)
 
-    override fun <A, B> map(fa: FreeOf<S, A>, f: (A) -> B): Free<S, B> = fa.fix().map(f)
+    override fun <A, B> map(fa: FreeOf<S, A>, f: (A) -> B): Free<S, B> =
+            fa.fix().map(null, f)
 
-    override fun <A, B> ap(fa: FreeOf<S, A>, ff: FreeOf<S, (A) -> B>): Free<S, B> =
-            fa.fix().ap(ff.fix())
-
+    override fun <A, B> Kind<FreePartialOf<S>, A>.ap(ff: Kind<FreePartialOf<S>, (A) -> B>): Free<S, B> =
+            fix().ap(null, ff)
 }
 
 @instance(Free::class)
 interface FreeMonadInstance<S> : FreeApplicativeInstance<S>, Monad<FreePartialOf<S>> {
 
-    override fun <A, B> map(fa: FreeOf<S, A>, f: (A) -> B): Free<S, B> = fa.fix().map(f)
+    override fun <A, B> map(fa: FreeOf<S, A>, f: (A) -> B): Free<S, B> =
+            fa.fix().map(null, f)
 
-    override fun <A, B> ap(fa: FreeOf<S, A>, ff: FreeOf<S, (A) -> B>): Free<S, B> =
-            fa.fix().ap(ff.fix())
+    override fun <A, B> Kind<FreePartialOf<S>, A>.ap(ff: Kind<FreePartialOf<S>, (A) -> B>): Free<S, B> =
+            fix().ap(null, ff)
 
     override fun <A, B> flatMap(fa: FreeOf<S, A>, f: (A) -> FreeOf<S, B>): Free<S, B> = fa.fix().flatMap { f(it).fix() }
 
@@ -38,7 +42,6 @@ interface FreeMonadInstance<S> : FreeApplicativeInstance<S>, Monad<FreePartialOf
             is Either.Right -> pure(it.b)
         }
     }
-
 }
 
 @instance(Free::class)

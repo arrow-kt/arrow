@@ -22,16 +22,16 @@ interface EitherTApplicativeInstance<F, L> : EitherTFunctorInstance<F, L>, Appli
 
     override fun <A, B> map(fa: EitherTOf<F, L, A>, f: (A) -> B): EitherT<F, L, B> = fa.fix().map({ f(it) }, MF())
 
-    override fun <A, B> ap(fa: EitherTOf<F, L, A>, ff: EitherTOf<F, L, (A) -> B>): EitherT<F, L, B> =
-            fa.fix().ap(ff, MF())
+    override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.ap(ff: Kind<EitherTPartialOf<F, L>, (A) -> B>): EitherT<F, L, B> =
+            fix().ap(ff, MF())
 }
 
 interface EitherTMonadInstance<F, L> : EitherTApplicativeInstance<F, L>, Monad<EitherTPartialOf<F, L>> {
 
     override fun <A, B> map(fa: EitherTOf<F, L, A>, f: (A) -> B): EitherT<F, L, B> = fa.fix().map({ f(it) }, MF())
 
-    override fun <A, B> ap(fa: EitherTOf<F, L, A>, ff: EitherTOf<F, L, (A) -> B>): EitherT<F, L, B> =
-            fa.fix().ap(ff, MF())
+    override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.ap(ff: Kind<EitherTPartialOf<F, L>, (A) -> B>): EitherT<F, L, B> =
+            fix().ap(ff, MF())
 
     override fun <A, B> flatMap(fa: EitherTOf<F, L, A>, f: (A) -> EitherTOf<F, L, B>): EitherT<F, L, B> = fa.fix().flatMap({ f(it).fix() }, MF())
 

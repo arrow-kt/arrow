@@ -46,7 +46,7 @@ class NonEmptyList<out A> private constructor(
             ListKTraverse.foldRight(this.fix().all.k(), lb, f)
 
     fun <G, B> traverse(AG: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, NonEmptyList<B>> = with (AG) {
-            map2Eval(f(fix().head), Eval.always {
+            f(fix().head).map2Eval(Eval.always {
                 ListKTraverse.run { traverse(fix().tail.k(), f) }
             }, {
                 NonEmptyList(it.a, it.b.fix().list)
@@ -131,7 +131,7 @@ private val ListKTraverse: Traverse<ForListK> = object : Traverse<ForListK> {
             fa.fix().map(f)
 
     override fun <G, A, B> Applicative<G>.traverse(fa: ListKOf<A>, f: kotlin.Function1<A, Kind<G, B>>): Kind<G, ListK<B>> =
-            fa.fix().traverse(f, this)
+            fa.fix().traverse(this, f)
 
     override fun <A, B> foldLeft(fa: ListKOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)

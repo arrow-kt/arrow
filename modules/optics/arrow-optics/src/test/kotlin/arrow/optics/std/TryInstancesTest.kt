@@ -48,7 +48,7 @@ class TryInstancesTest : UnitSpec() {
                 EQB = Eq.any(),
                 bMonoid = object : Monoid<Either<Throwable, Int>> {
                     override fun Either<Throwable, Int>.combine(b: Either<Throwable, Int>): Either<Throwable, Int> =
-                            Either.applicative<Throwable>().map2(this, b) { (a, b) -> a + b }.fix()
+                            Either.applicative<Throwable>().run { this@combine.map2(b) { (a, b) -> a + b }.fix() }
 
                     override fun empty(): Either<Throwable, Int> = Right(0)
                 }

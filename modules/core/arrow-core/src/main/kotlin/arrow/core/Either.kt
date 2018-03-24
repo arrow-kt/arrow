@@ -221,7 +221,7 @@ fun <R> Right(right: R): Either<Nothing, R> = Either.right(right)
  *
  * @param f The function to bind across [Either.Right].
  */
-fun <A, B, C> Either<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> = fold({ Left(it) }, { f(it) })
+fun <A, B, C> Either<A, B>.flatMap(dummy: Unit? = null, f: (B) -> Either<A, C>): Either<A, C> = fold({ Left(it) }, { f(it) })
 
 /**
  * Returns the value from this [Either.Right] or the given argument if this is a [Either.Left].
@@ -281,7 +281,7 @@ inline fun <A, B> Either<A, B>.filterOrElse(crossinline predicate: (B) -> Boolea
  */
 fun <A, B> Either<A, B>.contains(elem: B): Boolean = fold({ false }, { it == elem })
 
-fun <A, B, C> Either<A, B>.ap(ff: EitherOf<A, (B) -> C>): Either<A, C> = ff.fix().flatMap { f -> map(f) }.fix()
+fun <A, B, C> Either<A, B>.ap(dummy: Unit? = null, ff: EitherOf<A, (B) -> C>): Either<A, C> = ff.fix().flatMap { f -> map(f) }.fix()
 
 fun <A, B> Either<A, B>.combineK(y: EitherOf<A, B>): Either<A, B> =
         when (this) {

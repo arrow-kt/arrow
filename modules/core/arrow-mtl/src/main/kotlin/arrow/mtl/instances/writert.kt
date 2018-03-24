@@ -21,11 +21,11 @@ interface WriterTMonadFilterInstance<F, W> : WriterTMonadInstance<F, W>, MonadFi
 @instance(WriterT::class)
 interface WriterTMonadWriterInstance<F, W> : MonadWriter<WriterTPartialOf<F, W>, W>, WriterTMonadInstance<F, W> {
 
-    override fun <A> listen(fa: WriterTOf<F, W, A>): Kind<WriterTPartialOf<F, W>, Tuple2<W, A>> =
-            WriterT(FF().flatMap(fa.fix().content(FF()), { a -> FF().map(fa.fix().write(FF()), { l -> Tuple2(l, Tuple2(l, a)) }) }))
+    override fun <A> Kind<WriterTPartialOf<F, W>, A>.listen(): Kind<WriterTPartialOf<F, W>, Tuple2<W, A>> =
+            WriterT(FF().flatMap(fix().content(FF()), { a -> FF().map(fix().write(FF()), { l -> Tuple2(l, Tuple2(l, a)) }) }))
 
-    override fun <A> pass(fa: Kind<WriterTPartialOf<F, W>, Tuple2<(W) -> W, A>>): WriterT<F, W, A> =
-            WriterT(FF().flatMap(fa.fix().content(FF()), { tuple2FA -> FF().map(fa.fix().write(FF()), { l -> Tuple2(tuple2FA.a(l), tuple2FA.b) }) }))
+    override fun <A> Kind<WriterTPartialOf<F, W>, Tuple2<(W) -> W, A>>.pass(): WriterT<F, W, A> =
+            WriterT(FF().flatMap(fix().content(FF()), { tuple2FA -> FF().map(fix().write(FF()), { l -> Tuple2(tuple2FA.a(l), tuple2FA.b) }) }))
 
     override fun <A> writer(aw: Tuple2<W, A>): WriterT<F, W, A> = WriterT.put2(FF(), aw.b, aw.a)
 

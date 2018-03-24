@@ -8,22 +8,21 @@ import arrow.typeclasses.*
 @instance(Try::class)
 interface TryApplicativeErrorInstance : TryApplicativeInstance, ApplicativeError<ForTry, Throwable> {
 
-    override fun <A> raiseError(e: Throwable): Try<A> = Failure(e)
+    override fun <A> raiseError(e: Throwable): Try<A> =
+            Failure(e)
 
-    override fun <A> Kind<ForTry, A>.handleErrorWith(f: (Throwable) -> Kind<ForTry, A>): Try<A> = fix().recoverWith { f(it).fix() }
+    override fun <A> Kind<ForTry, A>.handleErrorWith(f: (Throwable) -> Kind<ForTry, A>): Try<A> =
+            fix().recoverWith { f(it).fix() }
 
 }
 
 @instance(Try::class)
-interface TryMonadErrorInstance : TryApplicativeErrorInstance, TryMonadInstance, MonadError<ForTry, Throwable> {
-    override fun <A, B> ap(fa: TryOf<A>, ff: TryOf<(A) -> B>): Try<B> =
-            super<TryMonadInstance>.ap(fa, ff).fix()
+interface TryMonadErrorInstance : TryMonadInstance, MonadError<ForTry, Throwable> {
+    override fun <A> raiseError(e: Throwable): Try<A> =
+            Failure(e)
 
-    override fun <A, B> map(fa: TryOf<A>, f: (A) -> B): Try<B> =
-            super<TryMonadInstance>.map(fa, f).fix()
-
-    override fun <A> pure(a: A): Try<A> =
-            super<TryMonadInstance>.pure(a).fix()
+    override fun <A> Kind<ForTry, A>.handleErrorWith(f: (Throwable) -> Kind<ForTry, A>): Try<A> =
+            fix().recoverWith { f(it).fix() }
 }
 
 @instance(Try::class)
@@ -60,8 +59,8 @@ interface TryFunctorInstance : Functor<ForTry> {
 
 @instance(Try::class)
 interface TryApplicativeInstance : Applicative<ForTry> {
-    override fun <A, B> ap(fa: TryOf<A>, ff: TryOf<kotlin.Function1<A, B>>): Try<B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<ForTry, A>.ap(ff: Kind<ForTry, (A) -> B>): Try<B> =
+            fix().ap(ff)
 
     override fun <A, B> map(fa: TryOf<A>, f: kotlin.Function1<A, B>): Try<B> =
             fa.fix().map(f)
@@ -72,8 +71,8 @@ interface TryApplicativeInstance : Applicative<ForTry> {
 
 @instance(Try::class)
 interface TryMonadInstance : Monad<ForTry> {
-    override fun <A, B> ap(fa: TryOf<A>, ff: TryOf<kotlin.Function1<A, B>>): Try<B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<ForTry, A>.ap(ff: Kind<ForTry, (A) -> B>): Try<B> =
+            fix().ap(ff)
 
     override fun <A, B> flatMap(fa: TryOf<A>, f: kotlin.Function1<A, TryOf<B>>): Try<B> =
             fa.fix().flatMap(f)

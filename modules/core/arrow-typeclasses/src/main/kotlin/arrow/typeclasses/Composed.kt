@@ -169,14 +169,15 @@ interface ComposedApplicative<F, G> : Applicative<Nested<F, G>>, ComposedFunctor
 
     override fun G(): Applicative<G>
 
-    override fun <A, B> map(fa: Kind<Nested<F, G>, A>, f: (A) -> B): Kind<Nested<F, G>, B> = ap(fa, pure(f))
+    override fun <A, B> map(fa: Kind<Nested<F, G>, A>, f: (A) -> B): Kind<Nested<F, G>, B> =
+            fa.ap(pure(f))
 
     override fun <A> pure(a: A): Kind<Nested<F, G>, A> = F().pure(G().pure(a)).nest()
 
-    override fun <A, B> ap(fa: Kind<Nested<F, G>, A>, ff: Kind<Nested<F, G>, (A) -> B>):
-            Kind<Nested<F, G>, B> = F().ap(fa.unnest(), F().map(ff.unnest(), { gfa: Kind<G, (A) -> B> -> { ga: Kind<G, A> -> G().ap(ga, gfa) } })).nest()
+    override fun <A, B> Kind<Nested<F, G>, A>.ap(ff: Kind<Nested<F, G>, (A) -> B>): Kind<Nested<F, G>, B> =
+            F().run { unnest().ap(F().map(ff.unnest(), { gfa: Kind<G, (A) -> B> -> { ga: Kind<G, A> -> G().run { ga.ap(gfa) } } })) }.nest()
 
-    fun <A, B> apC(fa: Kind<F, Kind<G, A>>, ff: Kind<F, Kind<G, (A) -> B>>): Kind<F, Kind<G, B>> = ap(fa.nest(), ff.nest()).unnest()
+    fun <A, B> apC(fa: Kind<F, Kind<G, A>>, ff: Kind<F, Kind<G, (A) -> B>>): Kind<F, Kind<G, B>> = fa.nest().ap(ff.nest()).unnest()
 
     companion object {
         operator fun <F, G> invoke(FF: Applicative<F>, GF: Applicative<G>)

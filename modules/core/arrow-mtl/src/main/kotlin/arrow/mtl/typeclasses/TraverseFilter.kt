@@ -7,14 +7,14 @@ import arrow.typeclasses.Traverse
 
 interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F> {
 
-    fun <G, A, B> traverseFilter(GA: Applicative<G>, fa: Kind<F, A>, f: (A) -> Kind<G, Option<B>>): Kind<G, Kind<F, B>>
+    fun <G, A, B> Applicative<G>.traverseFilter(fa: Kind<F, A>, f: (A) -> Kind<G, Option<B>>): Kind<G, Kind<F, B>>
 
-    override fun <A, B> mapFilter(fa: Kind<F, A>, f: (A) -> Option<B>): Kind<F, B> =
-            traverseFilter(Id.applicative(), fa, { Id(f(it)) }).value()
+    override fun <A, B> Kind<F, A>.mapFilter(f: (A) -> Option<B>): Kind<F, B> =
+            Id.applicative().traverseFilter(this@mapFilter, { Id(f(it)) }).value()
 
-    fun <G, A> filterA(fa: Kind<F, A>, f: (A) -> Kind<G, Boolean>, GA: Applicative<G>): Kind<G, Kind<F, A>> =
-            traverseFilter(GA, fa, { a -> GA.map(f(a), { b -> if (b) Some(a) else None }) })
+    fun <G, A> Kind<F, A>.filterA(f: (A) -> Kind<G, Boolean>, GA: Applicative<G>): Kind<G, Kind<F, A>> =
+            GA.traverseFilter(this, { a -> GA.map(f(a), { b -> if (b) Some(a) else None }) })
 
-    override fun <A> filter(fa: Kind<F, A>, f: (A) -> Boolean): Kind<F, A> =
-            filterA(fa, { Id(f(it)) }, Id.applicative()).value()
+    override fun <A> Kind<F, A>.filter(f: (A) -> Boolean): Kind<F, A> =
+            this.filterA({ Id(f(it)) }, Id.applicative()).value()
 }

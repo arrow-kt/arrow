@@ -13,8 +13,8 @@ interface EvalFunctorInstance : Functor<ForEval> {
 
 @instance(Eval::class)
 interface EvalApplicativeInstance : Applicative<ForEval> {
-    override fun <A, B> ap(fa: EvalOf<A>, ff: EvalOf<kotlin.Function1<A, B>>): Eval<B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<ForEval, A>.ap(ff: Kind<ForEval, (A) -> B>): Eval<B> =
+            fix().ap(ff)
 
     override fun <A, B> map(fa: EvalOf<A>, f: kotlin.Function1<A, B>): Eval<B> =
             fa.fix().map(f)
@@ -25,8 +25,8 @@ interface EvalApplicativeInstance : Applicative<ForEval> {
 
 @instance(Eval::class)
 interface EvalMonadInstance : Monad<ForEval> {
-    override fun <A, B> ap(fa: EvalOf<A>, ff: EvalOf<kotlin.Function1<A, B>>): Eval<B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<ForEval, A>.ap(ff: Kind<ForEval, (A) -> B>): Eval<B> =
+            fix().ap(ff)
 
     override fun <A, B> flatMap(fa: EvalOf<A>, f: kotlin.Function1<A, EvalOf<B>>): Eval<B> =
             fa.fix().flatMap(f)
@@ -55,8 +55,8 @@ interface EvalComonadInstance : Comonad<ForEval> {
 
 @instance(Eval::class)
 interface EvalBimonadInstance : Bimonad<ForEval> {
-    override fun <A, B> ap(fa: EvalOf<A>, ff: EvalOf<kotlin.Function1<A, B>>): Eval<B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<ForEval, A>.ap(ff: Kind<ForEval, (A) -> B>): Eval<B> =
+            fix().ap(ff)
 
     override fun <A, B> flatMap(fa: EvalOf<A>, f: kotlin.Function1<A, EvalOf<B>>): Eval<B> =
             fa.fix().flatMap(f)

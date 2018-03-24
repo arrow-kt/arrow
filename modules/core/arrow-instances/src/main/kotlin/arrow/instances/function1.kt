@@ -1,5 +1,6 @@
 package arrow.instances
 
+import arrow.Kind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
@@ -22,8 +23,8 @@ interface Function1ApplicativeInstance<I> : Function1FunctorInstance<I>, Applica
     override fun <A, B> map(fa: Function1Of<I, A>, f: (A) -> B): Function1<I, B> =
             fa.fix().map(f)
 
-    override fun <A, B> ap(fa: Function1Of<I, A>, ff: Function1Of<I, (A) -> B>): Function1<I, B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<Function1PartialOf<I>, A>.ap(ff: Kind<Function1PartialOf<I>, (A) -> B>): Function1<I, B> =
+            fix().ap(ff)
 }
 
 @instance(Function1::class)
@@ -32,8 +33,8 @@ interface Function1MonadInstance<I> : Function1ApplicativeInstance<I>, Monad<Fun
     override fun <A, B> map(fa: Function1Of<I, A>, f: (A) -> B): Function1<I, B> =
             fa.fix().map(f)
 
-    override fun <A, B> ap(fa: Function1Of<I, A>, ff: Function1Of<I, (A) -> B>): Function1<I, B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<Function1PartialOf<I>, A>.ap(ff: Kind<Function1PartialOf<I>, (A) -> B>): Function1<I, B> =
+            fix().ap(ff)
 
     override fun <A, B> flatMap(fa: Function1Of<I, A>, f: (A) -> Function1Of<I, B>): Function1<I, B> =
             fa.fix().flatMap(f)

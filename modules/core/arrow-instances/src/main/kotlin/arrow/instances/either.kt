@@ -17,8 +17,8 @@ interface EitherApplicativeInstance<L> : EitherFunctorInstance<L>, Applicative<E
 
     override fun <A, B> map(fa: EitherOf<L, A>, f: (A) -> B): Either<L, B> = fa.fix().map(f)
 
-    override fun <A, B> ap(fa: EitherOf<L, A>, ff: EitherOf<L, (A) -> B>): Either<L, B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<EitherPartialOf<L>, A>.ap(ff: Kind<EitherPartialOf<L>, (A) -> B>): Either<L, B> =
+            fix().ap(null, ff)
 }
 
 @instance(Either::class)
@@ -26,10 +26,11 @@ interface EitherMonadInstance<L> : EitherApplicativeInstance<L>, Monad<EitherPar
 
     override fun <A, B> map(fa: EitherOf<L, A>, f: (A) -> B): Either<L, B> = fa.fix().map(f)
 
-    override fun <A, B> ap(fa: EitherOf<L, A>, ff: EitherOf<L, (A) -> B>): Either<L, B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<EitherPartialOf<L>, A>.ap(ff: Kind<EitherPartialOf<L>, (A) -> B>): Either<L, B> =
+            fix().ap(null, ff)
 
-    override fun <A, B> flatMap(fa: EitherOf<L, A>, f: (A) -> EitherOf<L, B>): Either<L, B> = fa.fix().flatMap { f(it).fix() }
+    override fun <A, B> flatMap(fa: EitherOf<L, A>, f: (A) -> EitherOf<L, B>): Either<L, B> =
+            fa.fix().flatMap(null) { f(it).fix() }
 
     override fun <A, B> tailRecM(a: A, f: (A) -> Kind<EitherPartialOf<L>, Either<A, B>>): Either<L, B> =
             Either.tailRecM(a, f)

@@ -1,7 +1,7 @@
 package arrow.mtl.instances
 
+import arrow.Kind
 import arrow.data.Kleisli
-import arrow.data.KleisliOf
 import arrow.data.KleisliPartialOf
 import arrow.data.fix
 import arrow.instance
@@ -13,6 +13,6 @@ interface KleisliMonadReaderInstance<F, D> : KleisliMonadInstance<F, D>, MonadRe
 
     override fun ask(): Kleisli<F, D, D> = Kleisli({ FF().pure(it) })
 
-    override fun <A> local(f: (D) -> D, fa: KleisliOf<F, D, A>): Kleisli<F, D, A> = fa.fix().local(f)
+    override fun <A> Kind<KleisliPartialOf<F, D>, A>.local(f: (D) -> D): Kleisli<F, D, A> = fix().local(f)
 
 }

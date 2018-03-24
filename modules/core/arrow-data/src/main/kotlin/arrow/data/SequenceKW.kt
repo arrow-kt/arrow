@@ -1,9 +1,10 @@
 package arrow.data
 
-import arrow.*
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Tuple2
+import arrow.higherkind
 import arrow.typeclasses.Applicative
 
 fun <A> SequenceKOf<A>.toList(): List<A> = this.fix().sequence.toList()
@@ -27,10 +28,11 @@ data class SequenceK<out A> constructor(val sequence: Sequence<A>) : SequenceKOf
         return Eval.defer { loop(this.fix()) }
     }
 
-    fun <G, B> traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, SequenceK<B>> =
-            foldRight(Eval.always { GA.pure(emptySequence<B>().k()) }) { a, eval ->
-                GA.map2Eval(f(a), eval) { (sequenceOf(it.a) + it.b).k() }
-            }.value()
+    fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, SequenceK<B>> = GA.run {
+        foldRight(Eval.always { pure(emptySequence<B>().k()) }) { a, eval ->
+            f(a).map2Eval(eval) { (sequenceOf(it.a) + it.b).k() }
+        }.value()
+    }
 
     fun <B, Z> map2(fb: SequenceKOf<B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
             this.fix().flatMap { a ->

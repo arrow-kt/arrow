@@ -22,7 +22,7 @@ interface ConstApplicativeInstance<A> : Applicative<ConstPartialOf<A>> {
         override fun SA(): Monoid<A> = MA()
     }.empty().fix()
 
-    override fun <T, U> ap(fa: ConstOf<A, T>, ff: ConstOf<A, (T) -> U>): Const<A, U> = fa.ap(ff, MA())
+    override fun <T, U> Kind<ConstPartialOf<A>, T>.ap(ff: Kind<ConstPartialOf<A>, (T) -> U>): Const<A, U> = ap(ff, MA())
 }
 
 @instance(Const::class)

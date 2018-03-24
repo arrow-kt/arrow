@@ -7,7 +7,8 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.FunctionK
 import arrow.typeclasses.Monad
 
-inline fun <reified M, S, A> FreeOf<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M>): Kind<M, A> = (this as Free<S, A>).foldMap(f, MM)
+inline fun <reified M, S, A> FreeOf<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M>): Kind<M, A> =
+        (this as Free<S, A>).foldMap(f, MM)
 
 @higherkind
 sealed class Free<S, out A> : FreeOf<S, A> {
@@ -32,8 +33,8 @@ sealed class Free<S, out A> : FreeOf<S, A> {
                     override fun <A> pure(a: A): Free<F, A> =
                             Companion.pure(a)
 
-                    override fun <A, B> ap(fa: Kind<FreePartialOf<F>, A>, ff: Kind<FreePartialOf<F>, (A) -> B>): Free<F, B> =
-                            applicative.ap(fa, ff).fix()
+                    override fun <A, B> Kind<FreePartialOf<F>, A>.ap(ff: Kind<FreePartialOf<F>, (A) -> B>): Free<F, B> =
+                            applicative.run { ap(ff).fix() }
                 }
     }
 
@@ -44,7 +45,7 @@ sealed class Free<S, out A> : FreeOf<S, A> {
     }
 
     data class Suspend<S, out A>(val a: Kind<S, A>) : Free<S, A>() {
-        override fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B> = liftF(fs(a)).map(f)
+        override fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B> = liftF(fs(a)).map(f = f)
     }
 
     data class FlatMapped<S, out A, C>(val c: Free<S, C>, val fm: (C) -> Free<S, A>) : Free<S, A>() {
@@ -55,11 +56,11 @@ sealed class Free<S, out A> : FreeOf<S, A> {
     override fun toString(): String = "Free(...) : toString is not stack-safe"
 }
 
-fun <S, A, B> Free<S, A>.map(f: (A) -> B): Free<S, B> = flatMap { Free.Pure<S, B>(f(it)) }
+fun <S, A, B> Free<S, A>.map(dummy: Unit? = null, f: (A) -> B): Free<S, B> = flatMap { Free.Pure<S, B>(f(it)) }
 
-fun <S, A, B> Free<S, A>.flatMap(f: (A) -> Free<S, B>): Free<S, B> = Free.FlatMapped(this, f)
+fun <S, A, B> Free<S, A>.flatMap(dummy: Unit? = null, f: (A) -> Free<S, B>): Free<S, B> = Free.FlatMapped(this, f)
 
-fun <S, A, B> Free<S, A>.ap(ff: FreeOf<S, (A) -> B>): Free<S, B> = ff.fix().flatMap { f -> map(f) }.fix()
+fun <S, A, B> Free<S, A>.ap(dummy: Unit? = null, ff: FreeOf<S, (A) -> B>): Free<S, B> = ff.fix().flatMap { f -> map(f =  f) }.fix()
 
 @Suppress("UNCHECKED_CAST")
 tailrec fun <S, A> Free<S, A>.step(): Free<S, A> =
@@ -67,7 +68,7 @@ tailrec fun <S, A> Free<S, A>.step(): Free<S, A> =
             val g = this.fm as (A) -> Free<S, A>
             val c = this.c.c as Free<S, A>
             val f = this.c.fm as (A) -> Free<S, A>
-            c.flatMap { cc -> f(cc).flatMap(g) }.step()
+            c.flatMap { cc -> f(cc).flatMap(f = g) }.step()
         } else if (this is Free.FlatMapped<S, A, *> && this.c is Free.Pure<S, *>) {
             val a = this.c.a as A
             val f = this.fm as (A) -> Free<S, A>

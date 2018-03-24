@@ -12,11 +12,11 @@ interface ComposedFunctorFilter<F, G> : FunctorFilter<Nested<F, G>>, ComposedFun
 
     override fun G(): FunctorFilter<G>
 
-    override fun <A, B> mapFilter(fa: Kind<Nested<F, G>, A>, f: (A) -> Option<B>): Kind<Nested<F, G>, B> =
-            F().map(fa.unnest(), { G().mapFilter(it, f) }).nest()
+    override fun <A, B> Kind<Nested<F, G>, A>.mapFilter(f: (A) -> Option<B>): Kind<Nested<F, G>, B> =
+            this@ComposedFunctorFilter.F().map(unnest(), { this@ComposedFunctorFilter.G().run { it.mapFilter(f) } }).nest()
 
     fun <A, B> mapFilterC(fga: Kind<F, Kind<G, A>>, f: (A) -> Option<B>): Kind<F, Kind<G, B>> =
-            mapFilter(fga.nest(), f).unnest()
+            fga.nest().mapFilter(f).unnest()
 
     companion object {
         operator fun <F, G> invoke(FF: Functor<F>, FFG: FunctorFilter<G>): ComposedFunctorFilter<F, G> =
@@ -38,11 +38,11 @@ interface ComposedTraverseFilter<F, G> :
 
     override fun GA(): Applicative<G>
 
-    override fun <H, A, B> traverseFilter(GA: Applicative<H>, fa: Kind<Nested<F, G>, A>, f: (A) -> Kind<H, Option<B>>): Kind<H, Kind<Nested<F, G>, B>> =
-            GA.map(FT().run { GA.traverse(fa.unnest(), { ga -> GT().traverseFilter(GA, ga, f) }) }, { it.nest() })
+    override fun <H, A, B> Applicative<H>.traverseFilter(fa: Kind<Nested<F, G>, A>, f: (A) -> Kind<H, Option<B>>): Kind<H, Kind<Nested<F, G>, B>> =
+            map(FT().run { traverse(fa.unnest(), { ga -> GT().run { this@traverseFilter.traverseFilter(ga, f) } }) }, { it.nest() })
 
     fun <H, A, B> traverseFilterC(fa: Kind<F, Kind<G, A>>, f: (A) -> Kind<H, Option<B>>, HA: Applicative<H>): Kind<H, Kind<Nested<F, G>, B>> =
-            traverseFilter(HA, fa.nest(), f)
+            HA.traverseFilter(fa.nest(), f)
 
     companion object {
         operator fun <F, G> invoke(

@@ -26,7 +26,7 @@ object FunctorFilterLaws {
                     genFunctionAToB<Int, Option<Int>>(genOption(genIntSmall())),
                     genFunctionAToB<Int, Option<Int>>(genOption(genIntSmall())),
                     { fa: Kind<F, Int>, f, g ->
-                        mapFilter(mapFilter(fa, f), g).equalUnderTheLaw(mapFilter(fa, { a -> f(a).flatMap(g) }), EQ)
+                        fa.mapFilter(f).mapFilter(g).equalUnderTheLaw(fa.mapFilter({ a -> f(a).flatMap(g) }), EQ)
                     })
 
     fun <F> FunctorFilter<F>.mapFilterMapConsistency(ff: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
@@ -34,6 +34,6 @@ object FunctorFilterLaws {
                     genConstructor(Gen.int(), ff),
                     genFunctionAToB<Int, Int>(Gen.int()),
                     { fa: Kind<F, Int>, f ->
-                        mapFilter(fa, { Some(f(it)) }).equalUnderTheLaw(map(fa, f), EQ)
+                        fa.mapFilter({ Some(f(it)) }).equalUnderTheLaw(map(fa, f), EQ)
                     })
 }

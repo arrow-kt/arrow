@@ -32,7 +32,7 @@ object MonadFilterLaws {
 
     fun <F> MonadFilter<F>.monadFilterConsistency(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genFunctionAToB(Gen.bool()), genConstructor(Gen.int(), cf), { f: (Int) -> Boolean, fa: Kind<F, Int> ->
-                filter(fa, f).equalUnderTheLaw(flatMap(fa, { a -> if (f(a)) pure(a) else empty() }), EQ)
+                fa.filter(f).equalUnderTheLaw(flatMap(fa, { a -> if (f(a)) pure(a) else empty() }), EQ)
             })
 
     fun <F> MonadFilter<F>.monadFilterEmptyComprehensions(EQ: Eq<Kind<F, Int>>): Unit =

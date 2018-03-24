@@ -22,7 +22,7 @@ object AlternativeLaws {
 
     fun <F> Alternative<F>.alternativeRightAbsorption(cff: (Int) -> Kind<F, (Int) -> Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor2(Gen.int(), cff), { fa: Kind<F, (Int) -> Int> ->
-                ap(empty(), fa).equalUnderTheLaw(empty(), EQ)
+                empty<Int>().ap(fa).equalUnderTheLaw(empty(), EQ)
             })
 
     fun <F> Alternative<F>.alternativeLeftDistributivity(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
@@ -36,6 +36,6 @@ object AlternativeLaws {
                                                           EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), cf), genConstructor2(Gen.int(), cff), genConstructor2(Gen.int(), cff),
                     { fa: Kind<F, Int>, ff: Kind<F, (Int) -> Int>, fg: Kind<F, (Int) -> Int> ->
-                        ap(fa, combineK(ff, fg)).equalUnderTheLaw(combineK(ap(fa, ff), ap(fa, fg)), EQ)
+                        fa.ap(combineK(ff, fg)).equalUnderTheLaw(combineK(fa.ap(ff), fa.ap(fg)), EQ)
                     })
 }

@@ -28,8 +28,8 @@ interface IdFunctorInstance : Functor<ForId> {
 
 @instance(Id::class)
 interface IdApplicativeInstance : Applicative<ForId> {
-    override fun <A, B> ap(fa: IdOf<A>, ff: IdOf<kotlin.Function1<A, B>>): Id<B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<ForId, A>.ap(ff: Kind<ForId, (A) -> B>): Id<B> =
+            fix().ap(ff)
 
     override fun <A, B> map(fa: IdOf<A>, f: kotlin.Function1<A, B>): Id<B> =
             fa.fix().map(f)
@@ -40,8 +40,8 @@ interface IdApplicativeInstance : Applicative<ForId> {
 
 @instance(Id::class)
 interface IdMonadInstance : Monad<ForId> {
-    override fun <A, B> ap(fa: IdOf<A>, ff: IdOf<kotlin.Function1<A, B>>): Id<B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<ForId, A>.ap(ff: Kind<ForId, (A) -> B>): Id<B> =
+            fix().ap(ff)
 
     override fun <A, B> flatMap(fa: IdOf<A>, f: kotlin.Function1<A, IdOf<B>>): Id<B> =
             fa.fix().flatMap(f)
@@ -70,8 +70,8 @@ interface IdComonadInstance : Comonad<ForId> {
 
 @instance(Id::class)
 interface IdBimonadInstance : Bimonad<ForId> {
-    override fun <A, B> ap(fa: IdOf<A>, ff: IdOf<kotlin.Function1<A, B>>): Id<B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<ForId, A>.ap(ff: Kind<ForId, (A) -> B>): Id<B> =
+            fix().ap(ff)
 
     override fun <A, B> flatMap(fa: IdOf<A>, f: kotlin.Function1<A, IdOf<B>>): Id<B> =
             fa.fix().flatMap(f)

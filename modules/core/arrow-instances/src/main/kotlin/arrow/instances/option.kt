@@ -27,21 +27,20 @@ interface OptionMonoidInstance<A> : OptionSemigroupInstance<A>, Monoid<Option<A>
 
 @instance(Option::class)
 interface OptionApplicativeErrorInstance : OptionApplicativeInstance, ApplicativeError<ForOption, Unit> {
-    override fun <A> raiseError(e: Unit): Option<A> = None
+    override fun <A> raiseError(e: Unit): Option<A> =
+            None
 
-    override fun <A> Kind<ForOption, A>.handleErrorWith(f: (Unit) -> Kind<ForOption, A>): Option<A> = fix().orElse({ f(Unit).fix() })
+    override fun <A> Kind<ForOption, A>.handleErrorWith(f: (Unit) -> Kind<ForOption, A>): Option<A> =
+            fix().orElse({ f(Unit).fix() })
 }
 
 @instance(Option::class)
-interface OptionMonadErrorInstance : OptionApplicativeErrorInstance, OptionMonadInstance, MonadError<ForOption, Unit> {
-    override fun <A, B> ap(fa: OptionOf<A>, ff: OptionOf<(A) -> B>): Option<B> =
-            super<OptionMonadInstance>.ap(fa, ff)
+interface OptionMonadErrorInstance : OptionMonadInstance, MonadError<ForOption, Unit> {
+    override fun <A> raiseError(e: Unit): Kind<ForOption, A> =
+            None
 
-    override fun <A, B> map(fa: OptionOf<A>, f: (A) -> B): Option<B> =
-            super<OptionMonadInstance>.map(fa, f)
-
-    override fun <A> pure(a: A): Option<A> =
-            super<OptionMonadInstance>.pure(a)
+    override fun <A> Kind<ForOption, A>.handleErrorWith(f: (Unit) -> Kind<ForOption, A>): Option<A> =
+            fix().orElse({ f(Unit).fix() })
 }
 
 @instance(Option::class)
@@ -76,8 +75,8 @@ interface OptionFunctorInstance : Functor<ForOption> {
 
 @instance(Option::class)
 interface OptionApplicativeInstance : Applicative<ForOption> {
-    override fun <A, B> ap(fa: OptionOf<A>, ff: OptionOf<kotlin.Function1<A, B>>): Option<B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<ForOption, A>.ap(ff: Kind<ForOption, (A) -> B>): Option<B> =
+            fix().ap(ff)
 
     override fun <A, B> map(fa: OptionOf<A>, f: kotlin.Function1<A, B>): Option<B> =
             fa.fix().map(f)
@@ -88,8 +87,8 @@ interface OptionApplicativeInstance : Applicative<ForOption> {
 
 @instance(Option::class)
 interface OptionMonadInstance : Monad<ForOption> {
-    override fun <A, B> ap(fa: OptionOf<A>, ff: OptionOf<kotlin.Function1<A, B>>): Option<B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<ForOption, A>.ap(ff: Kind<ForOption, (A) -> B>): Option<B> =
+            fix().ap(ff)
 
     override fun <A, B> flatMap(fa: OptionOf<A>, f: kotlin.Function1<A, OptionOf<B>>): Option<B> =
             fa.fix().flatMap(f)

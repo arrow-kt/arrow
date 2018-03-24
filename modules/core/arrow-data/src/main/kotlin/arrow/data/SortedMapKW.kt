@@ -1,9 +1,10 @@
 package arrow.data
 
-import arrow.*
+import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Option
 import arrow.core.Tuple2
+import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Foldable
 import java.util.*
@@ -46,11 +47,11 @@ data class SortedMapK<A: Comparable<A>, B>(val map: SortedMap<A, B>) : SortedMap
     fun <C> foldLeft(c: SortedMapK<A, C>, f: (SortedMapK<A, C>, Tuple2<A, B>) -> SortedMapK<A, C>): SortedMapK<A, C> =
             this.map.foldLeft(c) { m: SortedMap<A, C>, (a, b) -> f(m.k(), Tuple2(a, b)) }.k()
 
-    fun <G, C> traverse(f: (B) -> Kind<G, C>, GA: Applicative<G>): Kind<G, SortedMapK<A, C>> =
-        (Foldable.iterateRight(this.map.iterator(), Eval.always { GA.pure(sortedMapOf<A, C>().k()) }))({
-            kv, lbuf ->
-            GA.map2Eval(f(kv.value), lbuf) { (mapOf(kv.key to it.a).k() + it.b).toSortedMap().k() }
+    fun <G, C> traverse(f: (B) -> Kind<G, C>, GA: Applicative<G>): Kind<G, SortedMapK<A, C>> = GA.run {
+        (Foldable.iterateRight(map.iterator(), Eval.always { pure(sortedMapOf<A, C>().k()) }))({ kv, lbuf ->
+            f(kv.value).map2Eval(lbuf) { (mapOf(kv.key to it.a).k() + it.b).toSortedMap().k() }
         }).value()
+    }
 
     companion object
 }

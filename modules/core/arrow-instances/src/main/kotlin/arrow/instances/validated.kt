@@ -20,7 +20,7 @@ interface ValidatedApplicativeInstance<E> : ValidatedFunctorInstance<E>, Applica
 
     override fun <A, B> map(fa: ValidatedOf<E, A>, f: (A) -> B): Validated<E, B> = fa.fix().map(f)
 
-    override fun <A, B> ap(fa: ValidatedOf<E, A>, ff: Kind<ValidatedPartialOf<E>, (A) -> B>): Validated<E, B> = fa.fix().ap(ff.fix(), SE())
+    override fun <A, B> Kind<ValidatedPartialOf<E>, A>.ap(ff: Kind<ValidatedPartialOf<E>, (A) -> B>): Validated<E, B> = fix().ap(ff.fix(), SE())
 
 }
 

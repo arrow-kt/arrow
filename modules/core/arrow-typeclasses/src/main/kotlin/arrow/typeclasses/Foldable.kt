@@ -91,8 +91,9 @@ interface Foldable<F> {
      * This method is primarily useful when G<_> represents an action or effect, and the specific A aspect of G<A> is
      * not otherwise needed.
      */
-    fun <G, A, B> traverse_(ag: Applicative<G>, fa: Kind<F, A>, f: (A) -> Kind<G, B>): Kind<G, Unit> =
-            foldRight(fa, always { ag.pure(Unit) }, { a, acc -> ag.map2Eval(f(a), acc) { Unit } }).value()
+    fun <G, A, B> traverse_(GA: Applicative<G>, fa: Kind<F, A>, f: (A) -> Kind<G, B>): Kind<G, Unit> = GA.run {
+        foldRight(fa, always { pure(Unit) }, { a, acc -> f(a).map2Eval(acc) { Unit } }).value()
+    }
 
     /**
      * Sequence F<G<A>> using Applicative<G>.

@@ -46,14 +46,14 @@ interface SequenceKFunctorInstance : Functor<ForSequenceK> {
 
 @instance(SequenceK::class)
 interface SequenceKApplicativeInstance : Applicative<ForSequenceK> {
-    override fun <A, B> ap(fa: SequenceKOf<A>, ff: SequenceKOf<kotlin.Function1<A, B>>): SequenceK<B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<ForSequenceK, A>.ap(ff: Kind<ForSequenceK, (A) -> B>): SequenceK<B> =
+            fix().ap(ff)
 
     override fun <A, B> map(fa: SequenceKOf<A>, f: kotlin.Function1<A, B>): SequenceK<B> =
             fa.fix().map(f)
 
-    override fun <A, B, Z> map2(fa: SequenceKOf<A>, fb: SequenceKOf<B>, f: kotlin.Function1<Tuple2<A, B>, Z>): SequenceK<Z> =
-            fa.fix().map2(fb, f)
+    override fun <A, B, Z> Kind<ForSequenceK, A>.map2(fb: Kind<ForSequenceK, B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
+            fix().map2(fb, f)
 
     override fun <A> pure(a: A): SequenceK<A> =
             SequenceK.pure(a)
@@ -61,8 +61,8 @@ interface SequenceKApplicativeInstance : Applicative<ForSequenceK> {
 
 @instance(SequenceK::class)
 interface SequenceKMonadInstance : Monad<ForSequenceK> {
-    override fun <A, B> ap(fa: SequenceKOf<A>, ff: SequenceKOf<kotlin.Function1<A, B>>): SequenceK<B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<ForSequenceK, A>.ap(ff: Kind<ForSequenceK, (A) -> B>): SequenceK<B> =
+            fix().ap(ff)
 
     override fun <A, B> flatMap(fa: SequenceKOf<A>, f: kotlin.Function1<A, SequenceKOf<B>>): SequenceK<B> =
             fa.fix().flatMap(f)
@@ -73,8 +73,8 @@ interface SequenceKMonadInstance : Monad<ForSequenceK> {
     override fun <A, B> map(fa: SequenceKOf<A>, f: kotlin.Function1<A, B>): SequenceK<B> =
             fa.fix().map(f)
 
-    override fun <A, B, Z> map2(fa: SequenceKOf<A>, fb: SequenceKOf<B>, f: kotlin.Function1<Tuple2<A, B>, Z>): SequenceK<Z> =
-            fa.fix().map2(fb, f)
+    override fun <A, B, Z> Kind<ForSequenceK, A>.map2(fb: Kind<ForSequenceK, B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
+            fix().map2(fb, f)
 
     override fun <A> pure(a: A): SequenceK<A> =
             SequenceK.pure(a)
@@ -95,7 +95,7 @@ interface SequenceKTraverseInstance : Traverse<ForSequenceK> {
             fa.fix().map(f)
 
     override fun <G, A, B> Applicative<G>.traverse(fa: SequenceKOf<A>, f: kotlin.Function1<A, Kind<G, B>>): Kind<G, SequenceK<B>> =
-            fa.fix().traverse(f, this)
+            fa.fix().traverse(this, f)
 
     override fun <A, B> foldLeft(fa: SequenceKOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)

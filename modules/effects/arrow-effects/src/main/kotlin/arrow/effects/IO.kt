@@ -2,22 +2,14 @@ package arrow.effects
 
 import arrow.core.*
 import arrow.core.Either.Left
-import arrow.deriving
 import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
 import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
 
 @higherkind
-@deriving(
-        Functor::class,
-        Applicative::class,
-        Monad::class)
 sealed class IO<out A> : IOOf<A> {
 
     companion object {
@@ -135,10 +127,10 @@ sealed class IO<out A> : IOOf<A> {
     }
 }
 
-fun <A, B> IO<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
+fun <A, B> IO<A>.ap(dummy: Unit? = null, ff: IOOf<(A) -> B>): IO<B> =
         flatMap { a -> ff.fix().map({ it(a) }) }
 
-fun <A> IO<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
+fun <A> IO<A>.handleErrorWith(dummy: Unit? = null, f: (Throwable) -> IOOf<A>): IO<A> =
         IO.Bind(this, IOFrame.errorHandler(f))
 
 fun <A> A.liftIO(): IO<A> = IO.pure(this)

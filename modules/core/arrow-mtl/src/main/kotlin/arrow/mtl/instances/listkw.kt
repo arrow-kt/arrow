@@ -1,5 +1,6 @@
 package arrow.mtl.instances
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Option
 import arrow.core.Tuple2
@@ -14,11 +15,11 @@ interface ListKMonadCombineInstance : MonadCombine<ForListK> {
     override fun <A> empty(): ListK<A> =
             ListK.empty()
 
-    override fun <A, B> mapFilter(fa: ListKOf<A>, f: kotlin.Function1<A, Option<B>>): ListK<B> =
-            fa.fix().mapFilter(f)
+    override fun <A, B> Kind<ForListK, A>.mapFilter(f: (A) -> Option<B>): ListK<B> =
+            this@mapFilter.fix().mapFilter(f)
 
-    override fun <A, B> ap(fa: ListKOf<A>, ff: ListKOf<kotlin.Function1<A, B>>): ListK<B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
+            fix().ap(ff)
 
     override fun <A, B> flatMap(fa: ListKOf<A>, f: kotlin.Function1<A, ListKOf<B>>): ListK<B> =
             fa.fix().flatMap(f)
@@ -29,8 +30,8 @@ interface ListKMonadCombineInstance : MonadCombine<ForListK> {
     override fun <A, B> map(fa: ListKOf<A>, f: kotlin.Function1<A, B>): ListK<B> =
             fa.fix().map(f)
 
-    override fun <A, B, Z> map2(fa: ListKOf<A>, fb: ListKOf<B>, f: kotlin.Function1<Tuple2<A, B>, Z>): ListK<Z> =
-            fa.fix().map2(fb, f)
+    override fun <A, B, Z> Kind<ForListK, A>.map2(fb: Kind<ForListK, B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
+            fix().map2(fb, f)
 
     override fun <A> pure(a: A): ListK<A> =
             ListK.pure(a)
@@ -41,8 +42,8 @@ interface ListKMonadCombineInstance : MonadCombine<ForListK> {
 
 @instance(ListK::class)
 interface ListKFunctorFilterInstance : FunctorFilter<ForListK> {
-    override fun <A, B> mapFilter(fa: ListKOf<A>, f: kotlin.Function1<A, Option<B>>): ListK<B> =
-            fa.fix().mapFilter(f)
+    override fun <A, B> arrow.Kind<arrow.data.ForListK, A>.mapFilter(f: (A) -> arrow.core.Option<B>): ListK<B> =
+            this@mapFilter.fix().mapFilter(f)
 
     override fun <A, B> map(fa: ListKOf<A>, f: kotlin.Function1<A, B>): ListK<B> =
             fa.fix().map(f)
@@ -53,11 +54,11 @@ interface ListKMonadFilterInstance : MonadFilter<ForListK> {
     override fun <A> empty(): ListK<A> =
             ListK.empty()
 
-    override fun <A, B> mapFilter(fa: ListKOf<A>, f: kotlin.Function1<A, Option<B>>): ListK<B> =
-            fa.fix().mapFilter(f)
+    override fun <A, B> arrow.Kind<arrow.data.ForListK, A>.mapFilter(f: (A) -> arrow.core.Option<B>): ListK<B> =
+            this@mapFilter.fix().mapFilter(f)
 
-    override fun <A, B> ap(fa: ListKOf<A>, ff: ListKOf<kotlin.Function1<A, B>>): ListK<B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
+            fix().ap(ff)
 
     override fun <A, B> flatMap(fa: ListKOf<A>, f: kotlin.Function1<A, ListKOf<B>>): ListK<B> =
             fa.fix().flatMap(f)
@@ -68,8 +69,8 @@ interface ListKMonadFilterInstance : MonadFilter<ForListK> {
     override fun <A, B> map(fa: ListKOf<A>, f: kotlin.Function1<A, B>): ListK<B> =
             fa.fix().map(f)
 
-    override fun <A, B, Z> map2(fa: ListKOf<A>, fb: ListKOf<B>, f: kotlin.Function1<Tuple2<A, B>, Z>): ListK<Z> =
-            fa.fix().map2(fb, f)
+    override fun <A, B, Z> Kind<ForListK, A>.map2(fb: Kind<ForListK, B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
+            fix().map2(fb, f)
 
     override fun <A> pure(a: A): ListK<A> =
             ListK.pure(a)
