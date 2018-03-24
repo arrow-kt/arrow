@@ -1,9 +1,9 @@
 package arrow.optics
 
 import arrow.collections.firstOption
-import arrow.collections.toOption
 import arrow.core.Option
 import arrow.core.eq
+import arrow.core.toOption
 import arrow.core.toT
 import arrow.data.*
 import arrow.instances.IntMonoidInstance
