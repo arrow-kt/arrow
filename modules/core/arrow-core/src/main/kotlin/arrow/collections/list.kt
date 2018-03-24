@@ -2,6 +2,7 @@ package arrow.collections
 
 import arrow.core.Option
 import arrow.core.Some
+import arrow.core.toOption
 import arrow.legacy.Disjunction
 import arrow.legacy.map
 

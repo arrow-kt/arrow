@@ -194,3 +194,9 @@ infix fun <T> OptionOf<T>.or(value: Option<T>): Option<T> = if (fix().isEmpty())
 } else {
     fix()
 }
+
+fun <T> T?.toOption(): Option<T> = if (this != null) {
+    Some(this)
+} else {
+    None
+}

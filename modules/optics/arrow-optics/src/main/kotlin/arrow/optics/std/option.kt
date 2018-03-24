@@ -1,6 +1,5 @@
 package arrow.optics
 
-import arrow.collections.toOption
 import arrow.core.*
 
 /**

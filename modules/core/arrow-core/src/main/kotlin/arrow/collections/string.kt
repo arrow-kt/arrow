@@ -2,6 +2,7 @@ package arrow.collections
 
 import arrow.core.Option
 import arrow.core.Predicate
+import arrow.core.toOption
 
 fun String.firstOption(): Option<Char> = firstOrNull().toOption()
 
