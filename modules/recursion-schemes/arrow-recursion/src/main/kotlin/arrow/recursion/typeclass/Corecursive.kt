@@ -1,8 +1,6 @@
 package arrow.recursion.typeclass
 
 import arrow.*
-import arrow.instances.ComposedFunctor
-import arrow.instances.ComposedTraverse
 import arrow.typeclasses.*
 
 interface Corecursive<F, G> {
