@@ -29,8 +29,8 @@ interface EitherMonadInstance<L> : EitherApplicativeInstance<L>, Monad<EitherPar
     override fun <A, B> Kind<EitherPartialOf<L>, A>.ap(ff: Kind<EitherPartialOf<L>, (A) -> B>): Either<L, B> =
             fix().ap(null, ff)
 
-    override fun <A, B> flatMap(fa: EitherOf<L, A>, f: (A) -> EitherOf<L, B>): Either<L, B> =
-            fa.fix().flatMap(null) { f(it).fix() }
+    override fun <A, B> Kind<EitherPartialOf<L>, A>.flatMap(f: (A) -> Kind<EitherPartialOf<L>, B>): Either<L, B> =
+            fix().flatMap(null) { f(it).fix() }
 
     override fun <A, B> tailRecM(a: A, f: (A) -> Kind<EitherPartialOf<L>, Either<A, B>>): Either<L, B> =
             Either.tailRecM(a, f)

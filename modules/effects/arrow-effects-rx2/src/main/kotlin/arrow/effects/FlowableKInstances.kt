@@ -34,8 +34,8 @@ interface FlowableKMonadInstance : Monad<ForFlowableK> {
     override fun <A, B> FlowableKOf<A>.ap(ff: FlowableKOf<(A) -> B>): FlowableK<B> =
             fix().ap(ff)
 
-    override fun <A, B> flatMap(fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
-            fa.fix().flatMap(f)
+    override fun <A, B> Kind<ForFlowableK, A>.flatMap(f: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
+            fix().flatMap(f)
 
     override fun <A, B> map(fa: FlowableKOf<A>, f: (A) -> B): FlowableK<B> =
             fa.fix().map(f)

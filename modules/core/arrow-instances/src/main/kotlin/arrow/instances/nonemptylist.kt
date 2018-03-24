@@ -52,8 +52,8 @@ interface NonEmptyListMonadInstance : Monad<ForNonEmptyList> {
     override fun <A, B> Kind<ForNonEmptyList, A>.ap(ff: Kind<ForNonEmptyList, (A) -> B>): NonEmptyList<B> =
             fix().ap(ff)
 
-    override fun <A, B> flatMap(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, NonEmptyListOf<B>>): NonEmptyList<B> =
-            fa.fix().flatMap(f)
+    override fun <A, B> Kind<ForNonEmptyList, A>.flatMap(f: (A) -> Kind<ForNonEmptyList, B>): NonEmptyList<B> =
+            fix().flatMap(f)
 
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, NonEmptyListOf<Either<A, B>>>): NonEmptyList<B> =
             NonEmptyList.tailRecM(a, f)
@@ -82,8 +82,8 @@ interface NonEmptyListBimonadInstance : Bimonad<ForNonEmptyList> {
     override fun <A, B> Kind<ForNonEmptyList, A>.ap(ff: Kind<ForNonEmptyList, (A) -> B>): NonEmptyList<B> =
             fix().ap(ff)
 
-    override fun <A, B> flatMap(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, NonEmptyListOf<B>>): NonEmptyList<B> =
-            fa.fix().flatMap(f)
+    override fun <A, B> Kind<ForNonEmptyList, A>.flatMap(f: (A) -> Kind<ForNonEmptyList, B>): NonEmptyList<B> =
+            fix().flatMap(f)
 
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, NonEmptyListOf<Either<A, B>>>): NonEmptyList<B> =
             NonEmptyList.tailRecM(a, f)

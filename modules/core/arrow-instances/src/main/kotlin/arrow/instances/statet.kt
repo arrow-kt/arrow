@@ -38,8 +38,8 @@ interface StateTMonadInstance<F, S> : StateTApplicativeInstance<F, S>, Monad<Sta
 
     override fun <A, B> map(fa: StateTOf<F, S, A>, f: (A) -> B): StateT<F, S, B> = fa.fix().map(f, FF())
 
-    override fun <A, B> flatMap(fa: StateTOf<F, S, A>, f: (A) -> StateTOf<F, S, B>): StateT<F, S, B> =
-            fa.fix().flatMap(f, FF())
+    override fun <A, B> Kind<StateTPartialOf<F, S>, A>.flatMap(f: (A) -> Kind<StateTPartialOf<F, S>, B>): StateT<F, S, B> =
+            fix().flatMap(f, FF())
 
     override fun <A, B> tailRecM(a: A, f: (A) -> StateTOf<F, S, Either<A, B>>): StateT<F, S, B> =
             StateT.tailRecM(FF(), a, f)

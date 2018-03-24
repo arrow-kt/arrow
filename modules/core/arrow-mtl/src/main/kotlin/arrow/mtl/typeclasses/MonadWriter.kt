@@ -23,5 +23,5 @@ interface MonadWriter<F, W> : Monad<F> {
     fun <A, B> Kind<F, A>.listens(f: (W) -> B): Kind<F, Tuple2<B, A>> = map(listen()) { Tuple2(f(it.a), it.b) }
 
     /** Modify the accumulator */
-    fun <A> Kind<F, A>.censor(f: (W) -> W): Kind<F, A> = flatMap(listen()) { writer(Tuple2(f(it.a), it.b)) }
+    fun <A> Kind<F, A>.censor(f: (W) -> W): Kind<F, A> = listen().flatMap() { writer(Tuple2(f(it.a), it.b)) }
 }

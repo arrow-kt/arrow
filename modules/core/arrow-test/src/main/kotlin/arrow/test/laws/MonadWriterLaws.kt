@@ -34,7 +34,7 @@ object MonadWriterLaws {
     fun <F, W> MonadWriter<F, W>.monadWriterTellFusion(genW: Gen<W>,
                                                                              MOW: Monoid<W>): Unit {
         forAll(genW, genW, { x: W, y: W ->
-            flatMap(tell(x), { tell(y) }).equalUnderTheLaw(tell(MOW.run { x.combine(y) }), Eq.any())
+            tell(x).flatMap({ tell(y) }).equalUnderTheLaw(tell(MOW.run { x.combine(y) }), Eq.any())
         })
     }
 

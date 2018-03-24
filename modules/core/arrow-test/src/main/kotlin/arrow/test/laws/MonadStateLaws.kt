@@ -17,22 +17,22 @@ object MonadStateLaws {
             )
 
     fun <F> MonadState<F, Int>.monadStateGetIdempotent(EQ: Eq<Kind<F, Int>>) {
-        flatMap(get(), { get() }).equalUnderTheLaw(get(), EQ)
+        get().flatMap({ get() }).equalUnderTheLaw(get(), EQ)
     }
 
     fun <F> MonadState<F, Int>.monadStateSetTwice(EQ: Eq<Kind<F, Unit>>) {
         forAll(genIntSmall(), genIntSmall(), { s: Int, t: Int ->
-            flatMap(set(s), { set(t) }).equalUnderTheLaw(set(t), EQ)
+            set(s).flatMap({ set(t) }).equalUnderTheLaw(set(t), EQ)
         })
     }
 
     fun <F> MonadState<F, Int>.monadStateSetGet(EQ: Eq<Kind<F, Int>>) {
         forAll(genIntSmall(), { s: Int ->
-            flatMap(set(s), { get() }).equalUnderTheLaw(flatMap(set(s), { pure(s) }), EQ)
+            set(s).flatMap({ get() }).equalUnderTheLaw(set(s).flatMap({ pure(s) }), EQ)
         })
     }
 
     fun <F> MonadState<F, Int>.monadStateGetSet(EQ: Eq<Kind<F, Unit>>) {
-        flatMap(get(), { set(it) }).equalUnderTheLaw(pure(Unit), EQ)
+        get().flatMap({ set(it) }).equalUnderTheLaw(pure(Unit), EQ)
     }
 }

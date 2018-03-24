@@ -40,8 +40,8 @@ interface WriterTMonadInstance<F, W> : WriterTApplicativeInstance<F, W>, Monad<W
     override fun <A, B> map(fa: WriterTOf<F, W, A>, f: (A) -> B): WriterT<F, W, B> =
             fa.fix().map(FF(), { f(it) })
 
-    override fun <A, B> flatMap(fa: WriterTOf<F, W, A>, f: (A) -> Kind<WriterTPartialOf<F, W>, B>): WriterT<F, W, B> =
-            fa.fix().flatMap(FF(), MM(), { f(it).fix() })
+    override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.flatMap(f: (A) -> Kind<WriterTPartialOf<F, W>, B>): WriterT<F, W, B> =
+            fix().flatMap(FF(), MM(), { f(it).fix() })
 
     override fun <A, B> tailRecM(a: A, f: (A) -> Kind<WriterTPartialOf<F, W>, Either<A, B>>): WriterT<F, W, B> =
             WriterT.tailRecM(a, f, FF())

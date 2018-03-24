@@ -48,8 +48,9 @@ data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTOf<F, W, 
 
         fun <F, W, A> empty(MMF: MonoidK<F>): WriterTOf<F, W, A> = WriterT(MMF.empty())
 
-        fun <F, W, A> pass(fa: Kind<WriterTPartialOf<F, W>, Tuple2<(W) -> W, A>>, MF: Monad<F>): WriterT<F, W, A> =
-                WriterT(MF.flatMap(fa.fix().content(MF), { tuple2FA -> MF.map(fa.fix().write(MF), { l -> Tuple2(tuple2FA.a(l), tuple2FA.b) }) }))
+        fun <F, W, A> pass(fa: Kind<WriterTPartialOf<F, W>, Tuple2<(W) -> W, A>>, MF: Monad<F>): WriterT<F, W, A> =  MF.run {
+            WriterT(fa.fix().content(this).flatMap({ tuple2FA -> map(fa.fix().write(this), { l -> Tuple2(tuple2FA.a(l), tuple2FA.b) }) }))
+        }
 
         fun <F, W, A, B> tailRecM(a: A, f: (A) -> Kind<WriterTPartialOf<F, W>, Either<A, B>>, MF: Monad<F>): WriterT<F, W, B> =
                 WriterT(MF.tailRecM(a, {
@@ -65,8 +66,9 @@ data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTOf<F, W, 
 
     fun tell(w: W, SG: Semigroup<W>, MF: Monad<F>): WriterT<F, W, A> = mapAcc(MF, { SG.run { it.combine(w) } })
 
-    fun listen(MF: Monad<F>): Kind<WriterTPartialOf<F, W>, Tuple2<W, A>> =
-            WriterT(MF.flatMap(content(MF), { a -> MF.map(write(MF), { l -> Tuple2(l, Tuple2(l, a)) }) }))
+    fun listen(MF: Monad<F>): Kind<WriterTPartialOf<F, W>, Tuple2<W, A>> =  MF.run {
+        WriterT(content(this).flatMap({ a -> map(write(this), { l -> Tuple2(l, Tuple2(l, a)) }) }))
+    }
 
     fun content(FF: Functor<F>): Kind<F, A> = FF.map(value, { it.b })
 
@@ -86,11 +88,11 @@ data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTOf<F, W, 
             ff.fix().flatMap(MF, SG, { map(MF, it) })
 
     inline fun <B> flatMap(MF: Monad<F>, SG: Semigroup<W>, crossinline f: (A) -> WriterT<F, W, B>): WriterT<F, W, B> = MF.run {
-        WriterT(flatMap(value, { value -> map(f(value.b).value, { SG.run { it.a.combine(value.a) } toT it.b }) }))
+        WriterT(value.flatMap({ value -> map(f(value.b).value, { SG.run { it.a.combine(value.a) } toT it.b }) }))
     }
 
     inline fun <B, U> transform(crossinline f: (Tuple2<W, A>) -> Tuple2<U, B>, MF: Monad<F>): WriterT<F, U, B> = MF.run {
-        WriterT(flatMap(value, { pure(f(it)) }))
+        WriterT(value.flatMap({ pure(f(it)) }))
     }
 
     fun <B> liftF(fa: Kind<F, B>, AF: Applicative<F>): WriterT<F, W, B> =

@@ -64,8 +64,8 @@ interface SequenceKMonadInstance : Monad<ForSequenceK> {
     override fun <A, B> Kind<ForSequenceK, A>.ap(ff: Kind<ForSequenceK, (A) -> B>): SequenceK<B> =
             fix().ap(ff)
 
-    override fun <A, B> flatMap(fa: SequenceKOf<A>, f: kotlin.Function1<A, SequenceKOf<B>>): SequenceK<B> =
-            fa.fix().flatMap(f)
+    override fun <A, B> Kind<ForSequenceK, A>.flatMap(f: (A) -> Kind<ForSequenceK, B>): SequenceK<B> =
+            fix().flatMap(f)
 
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, SequenceKOf<Either<A, B>>>): SequenceK<B> =
             SequenceK.tailRecM(a, f)

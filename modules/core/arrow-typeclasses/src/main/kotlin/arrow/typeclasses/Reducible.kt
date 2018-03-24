@@ -139,6 +139,6 @@ interface NonEmptyReducible<F, G> : Reducible<F> {
 
     fun <A, B> Monad<G>.foldM_(fa: Kind<F, A>, z: B, f: (B, A) -> Kind<G, B>): Kind<G, B> {
         val (a, ga) = split(fa)
-        return flatMap(f(z, a), { FG().run { foldM(ga, it, f) } })
+        return f(z, a).flatMap({ FG().run { foldM(ga, it, f) } })
     }
 }

@@ -28,8 +28,8 @@ interface Function0MonadInstance : Monad<ForFunction0> {
     override fun <A, B> Kind<ForFunction0, A>.ap(ff: Kind<ForFunction0, (A) -> B>): Function0<B> =
             fix().ap(ff)
 
-    override fun <A, B> flatMap(fa: Function0Of<A>, f: kotlin.Function1<A, Function0Of<B>>): Function0<B> =
-            fa.fix().flatMap(f)
+    override fun <A, B> Kind<ForFunction0, A>.flatMap(f: (A) -> Kind<ForFunction0, B>): Function0<B> =
+            fix().flatMap(f)
 
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, Function0Of<Either<A, B>>>): Function0<B> =
             Function0.tailRecM(a, f)
@@ -58,8 +58,8 @@ interface Function0BimonadInstance : Bimonad<ForFunction0> {
     override fun <A, B> Kind<ForFunction0, A>.ap(ff: Kind<ForFunction0, (A) -> B>): Function0<B> =
             fix().ap(ff)
 
-    override fun <A, B> flatMap(fa: Function0Of<A>, f: kotlin.Function1<A, Function0Of<B>>): Function0<B> =
-            fa.fix().flatMap(f)
+    override fun <A, B> Kind<ForFunction0, A>.flatMap(f: (A) -> Kind<ForFunction0, B>): Function0<B> =
+            fix().flatMap(f)
 
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, Function0Of<Either<A, B>>>): Function0<B> =
             Function0.tailRecM(a, f)

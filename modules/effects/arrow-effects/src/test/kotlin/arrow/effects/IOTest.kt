@@ -217,7 +217,7 @@ class IOTest : UnitSpec() {
         }
 
         "should flatMap values correctly on success" {
-            val run = IO.monad().flatMap(IO.pure(1)) { num -> IO { num + 1 } }.unsafeRunSync()
+            val run = IO.monad().run { IO.pure(1).flatMap() { num -> IO { num + 1 } }.unsafeRunSync() }
 
             val expected = 2
 

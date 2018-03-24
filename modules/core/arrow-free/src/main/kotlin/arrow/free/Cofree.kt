@@ -1,7 +1,10 @@
 package arrow.free
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Eval
+import arrow.core.ForEval
+import arrow.core.applicative
+import arrow.core.fix
 import arrow.higherkind
 import arrow.typeclasses.FunctionK
 import arrow.typeclasses.Functor
@@ -42,13 +45,13 @@ data class Cofree<S, A>(val FS: Functor<S>, val head: A, val tail: Eval<CofreeEv
         return ev.flatMap { folder(extract(), it) }
     }
 
-    fun <F, M, A, B> Cofree<F, A>.cataM(folder: (A, Kind<F, B>) -> Kind<M, B>, inclusion: FunctionK<ForEval, M>, TF: Traverse<F>, MM: Monad<M>): Kind<M, B> {
+    fun <F, M, A, B> Cofree<F, A>.cataM(folder: (A, Kind<F, B>) -> Kind<M, B>, inclusion: FunctionK<ForEval, M>, TF: Traverse<F>, MM: Monad<M>): Kind<M, B> = MM.run {
         fun loop(ev: Cofree<F, A>): Eval<Kind<M, B>> {
-            val looped: Kind<M, Kind<F, B>> = TF.run { MM.traverse(ev.tailForced(), { MM.flatten(inclusion(Eval.defer { loop(it) })) }) }
-            val folded: Kind<M, B> = MM.flatMap(looped) { fb -> folder(ev.head, fb) }
+            val looped: Kind<M, Kind<F, B>> = TF.run { traverse(ev.tailForced(), { inclusion(Eval.defer { loop(it) }).flatten() }) }
+            val folded: Kind<M, B> = looped.flatMap() { fb -> folder(ev.head, fb) }
             return Eval.now(folded)
         }
-        return MM.flatten(inclusion(loop(this)))
+        inclusion(loop(this@cataM)).flatten()
     }
 
     companion object {

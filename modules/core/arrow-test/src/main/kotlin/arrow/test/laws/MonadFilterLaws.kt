@@ -22,17 +22,17 @@ object MonadFilterLaws {
 
     fun <F> MonadFilter<F>.monadFilterLeftEmpty(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genFunctionAToB(genApplicative(Gen.int(), this)), { f: (Int) -> Kind<F, Int> ->
-                flatMap(empty(), f).equalUnderTheLaw(empty(), EQ)
+                empty().flatMap(f).equalUnderTheLaw(empty(), EQ)
             })
 
     fun <F> MonadFilter<F>.monadFilterRightEmpty(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genApplicative(Gen.int(), this), { fa: Kind<F, Int> ->
-                flatMap(fa, { empty<Int>() }).equalUnderTheLaw(empty(), EQ)
+                fa.flatMap({ empty<Int>() }).equalUnderTheLaw(empty(), EQ)
             })
 
     fun <F> MonadFilter<F>.monadFilterConsistency(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genFunctionAToB(Gen.bool()), genConstructor(Gen.int(), cf), { f: (Int) -> Boolean, fa: Kind<F, Int> ->
-                fa.filter(f).equalUnderTheLaw(flatMap(fa, { a -> if (f(a)) pure(a) else empty() }), EQ)
+                fa.filter(f).equalUnderTheLaw(fa.flatMap({ a -> if (f(a)) pure(a) else empty() }), EQ)
             })
 
     fun <F> MonadFilter<F>.monadFilterEmptyComprehensions(EQ: Eq<Kind<F, Int>>): Unit =

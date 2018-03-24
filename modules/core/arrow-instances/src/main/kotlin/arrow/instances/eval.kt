@@ -28,8 +28,8 @@ interface EvalMonadInstance : Monad<ForEval> {
     override fun <A, B> Kind<ForEval, A>.ap(ff: Kind<ForEval, (A) -> B>): Eval<B> =
             fix().ap(ff)
 
-    override fun <A, B> flatMap(fa: EvalOf<A>, f: kotlin.Function1<A, EvalOf<B>>): Eval<B> =
-            fa.fix().flatMap(f)
+    override fun <A, B> Kind<ForEval, A>.flatMap(f: (A) -> Kind<ForEval, B>): Eval<B> =
+            fix().flatMap(f)
 
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, EvalOf<Either<A, B>>>): Eval<B> =
             Eval.tailRecM(a, f)
@@ -58,8 +58,8 @@ interface EvalBimonadInstance : Bimonad<ForEval> {
     override fun <A, B> Kind<ForEval, A>.ap(ff: Kind<ForEval, (A) -> B>): Eval<B> =
             fix().ap(ff)
 
-    override fun <A, B> flatMap(fa: EvalOf<A>, f: kotlin.Function1<A, EvalOf<B>>): Eval<B> =
-            fa.fix().flatMap(f)
+    override fun <A, B> Kind<ForEval, A>.flatMap(f: (A) -> Kind<ForEval, B>): Eval<B> =
+            fix().flatMap(f)
 
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, EvalOf<Either<A, B>>>): Eval<B> =
             Eval.tailRecM(a, f)

@@ -36,7 +36,7 @@ interface OptionTMonadInstance<F> : OptionTApplicativeInstance<F>, Monad<OptionT
 
     override fun <A, B> map(fa: OptionTOf<F, A>, f: (A) -> B): OptionT<F, B> = fa.fix().map(f, FF())
 
-    override fun <A, B> flatMap(fa: OptionTOf<F, A>, f: (A) -> OptionTOf<F, B>): OptionT<F, B> = fa.fix().flatMap({ f(it).fix() }, FF())
+    override fun <A, B> Kind<OptionTPartialOf<F>, A>.flatMap(f: (A) -> Kind<OptionTPartialOf<F>, B>): OptionT<F, B> = fix().flatMap({ f(it).fix() }, FF())
 
     override fun <A, B> Kind<OptionTPartialOf<F>, A>.ap(ff: Kind<OptionTPartialOf<F>, (A) -> B>): OptionT<F, B> =
             fix().ap(ff, FF())

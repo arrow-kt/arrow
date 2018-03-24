@@ -12,6 +12,7 @@ interface Recursive<F, G> {
     fun <A> cata(t: Kind<F, G>, f: Algebra<Nested<F, G>, A>, FF: Functor<F>, FG: Functor<G>): A =
             hylo(t, f, this::projectT, ComposedFunctor(FF, FG))
 
-    fun <M, A> cataM(t: Kind<F, G>, f: AlgebraM<M, Nested<F, G>, A>, FF: Functor<F>, FG: Monad<G>, TF: Traverse<F>, TG: Traverse<G>, MM: Monad<M>): Kind<M, A> =
-            cata(t, { MM.flatMap(ComposedTraverse(TF, TG, FG).run { MM.sequence(it) }, f) }, FF, FG)
+    fun <M, A> cataM(t: Kind<F, G>, f: AlgebraM<M, Nested<F, G>, A>, FF: Functor<F>, FG: Monad<G>, TF: Traverse<F>, TG: Traverse<G>, MM: Monad<M>): Kind<M, A> = MM.run {
+        cata(t, { ComposedTraverse(TF, TG, FG).run { sequence(it) }.flatMap(f) }, FF, FG)
+    }
 }

@@ -35,12 +35,12 @@ object MonadLaws {
 
     fun <F> Monad<F>.leftIdentity(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), this)), Gen.int(), { f: (Int) -> Kind<F, Int>, a: Int ->
-                flatMap(pure(a), f).equalUnderTheLaw(f(a), EQ)
+                pure(a).flatMap(f).equalUnderTheLaw(f(a), EQ)
             })
 
     fun <F> Monad<F>.rightIdentity(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genApplicative(Gen.int(), this), { fa: Kind<F, Int> ->
-                flatMap(fa, { pure(it) }).equalUnderTheLaw(fa, EQ)
+                fa.flatMap({ pure(it) }).equalUnderTheLaw(fa, EQ)
             })
 
     fun <F> Monad<F>.kleisliLeftIdentity(EQ: Eq<Kind<F, Int>>): Unit =
@@ -55,7 +55,7 @@ object MonadLaws {
 
     fun <F> Monad<F>.mapFlatMapCoherence(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genFunctionAToB<Int, Int>(Gen.int()), genApplicative(Gen.int(), this), { f: (Int) -> Int, fa: Kind<F, Int> ->
-                flatMap(fa, { pure(f(it)) }).equalUnderTheLaw(map(fa, f), EQ)
+                fa.flatMap({ pure(f(it)) }).equalUnderTheLaw(map(fa, f), EQ)
             })
 
     fun <F> Monad<F>.stackSafety(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit =

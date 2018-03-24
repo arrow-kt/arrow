@@ -53,8 +53,9 @@ data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, 
 
     inline fun <C> flatMap(crossinline f: (B) -> EitherT<F, A, C>, MF: Monad<F>): EitherT<F, A, C> = flatMapF({ it -> f(it).value }, MF)
 
-    inline fun <C> flatMapF(crossinline f: (B) -> Kind<F, Either<A, C>>, MF: Monad<F>): EitherT<F, A, C> =
-            EitherT(MF.flatMap(value, { either -> either.fold({ MF.pure(Left(it)) }, { f(it) }) }))
+    inline fun <C> flatMapF(crossinline f: (B) -> Kind<F, Either<A, C>>, MF: Monad<F>): EitherT<F, A, C> = MF.run {
+        EitherT(value.flatMap({ either -> either.fold({ MF.pure(Left(it)) }, { f(it) }) }))
+    }
 
     inline fun <C> cata(crossinline l: (A) -> C, crossinline r: (B) -> C, FF: Functor<F>): Kind<F, C> = fold(l, r, FF)
 
@@ -74,13 +75,14 @@ data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, 
 
     fun toOptionT(FF: Functor<F>): OptionT<F, B> = OptionT(FF.map(value, { it.toOption() }))
 
-    fun combineK(y: EitherTOf<F, A, B>, MF: Monad<F>): EitherT<F, A, B> =
-            EitherT(MF.flatMap(this.fix().value) {
-                when (it) {
-                    is Either.Left -> y.fix().value
-                    is Either.Right -> MF.pure(it)
-                }
-            })
+    fun combineK(y: EitherTOf<F, A, B>, MF: Monad<F>): EitherT<F, A, B> = MF.run {
+        EitherT(fix().value.flatMap() {
+            when (it) {
+                is Either.Left -> y.fix().value
+                is Either.Right -> MF.pure(it)
+            }
+        })
+    }
 
     fun <C> ap(ff: EitherTOf<F, A, (B) -> C>, MF: Monad<F>): EitherT<F, A, C> = ff.fix().flatMap({ f -> map(f, MF) }, MF)
 }

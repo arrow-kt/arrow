@@ -25,7 +25,7 @@ interface Traverse<F> : Functor<F>, Foldable<F> {
             IdMonad.traverse(fa, { Id(f(it)) }).value()
 
     fun <G, A, B> FlatTraverse<F, G>.flatTraverse(fa: Kind<F, A>, f: (A) -> Kind<G, Kind<F, B>>): Kind<G, Kind<F, B>> =
-            AG().run { map(traverse(fa, f)) { MF().run { flatten(it) } } }
+            AG().run { map(traverse(fa, f)) { MF().run { it.flatten() } } }
 }
 
 interface FlatTraverse<F, G> {

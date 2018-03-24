@@ -123,7 +123,7 @@ class IorTest : UnitSpec() {
 
         "Ior.monad.flatMap should combine left values" {
             val ior1 = Ior.Both(3, "Hello, world!")
-            val iorResult = intIorMonad.flatMap(ior1, { Ior.Left<Int, String>(7) })
+            val iorResult = intIorMonad.run { ior1.flatMap({ Ior.Left<Int, String>(7) }) }
             iorResult shouldBe Ior.Left<Int, String>(10)
         }
 

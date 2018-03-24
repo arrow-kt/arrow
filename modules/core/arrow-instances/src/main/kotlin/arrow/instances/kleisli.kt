@@ -39,8 +39,8 @@ interface KleisliMonadInstance<F, D> : KleisliApplicativeInstance<F, D>, Monad<K
     override fun <A, B> map(fa: KleisliOf<F, D, A>, f: (A) -> B): Kleisli<F, D, B> =
             fa.fix().map(f, FF())
 
-    override fun <A, B> flatMap(fa: KleisliOf<F, D, A>, f: (A) -> KleisliOf<F, D, B>): Kleisli<F, D, B> =
-            fa.fix().flatMap(f.andThen { it.fix() }, FF())
+    override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.flatMap(f: (A) -> Kind<KleisliPartialOf<F, D>, B>): Kleisli<F, D, B> =
+            fix().flatMap(f.andThen { it.fix() }, FF())
 
     override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.ap(ff: Kind<KleisliPartialOf<F, D>, (A) -> B>): Kleisli<F, D, B> =
             fix().ap(ff, FF())

@@ -161,7 +161,7 @@ class StateT<F, S, A>(
             MF.run {
                 invokeF(runF.map2(sb.runF) { (ssa, ssb) ->
                     ssa.andThen { fsa ->
-                        flatMap(fsa) { (s, a) ->
+                        fsa.flatMap() { (s, a) ->
                             map(ssb(s)) { (s, b) -> Tuple2(s, fn(a, b)) }
                         }
                     }
@@ -178,7 +178,7 @@ class StateT<F, S, A>(
     fun <B, Z> map2Eval(MF: Monad<F>, sb: Eval<StateT<F, S, B>>, fn: (A, B) -> Z): Eval<StateT<F, S, Z>> = MF.run {
         runF.map2Eval(sb.map { it.runF }) { (ssa, ssb) ->
             ssa.andThen { fsa ->
-                flatMap(fsa) { (s, a) ->
+                fsa.flatMap() { (s, a) ->
                     map(ssb((s))) { (s, b) -> Tuple2(s, fn(a, b)) }
                 }
             }
@@ -208,15 +208,16 @@ class StateT<F, S, A>(
      * @param fas the function to apply.
      * @param MF [Monad] for the context [F].
      */
-    fun <B> flatMap(fas: (A) -> StateTOf<F, S, B>, MF: Monad<F>): StateT<F, S, B> =
-            invokeF(
-                    MF.map(runF) { sfsa ->
-                        sfsa.andThen { fsa ->
-                            MF.flatMap(fsa) {
-                                fas(it.b).runM(MF, it.a)
-                            }
+    fun <B> flatMap(fas: (A) -> StateTOf<F, S, B>, MF: Monad<F>): StateT<F, S, B> = MF.run {
+        invokeF(
+                map(runF) { sfsa ->
+                    sfsa.andThen { fsa ->
+                        fsa.flatMap() {
+                            fas(it.b).runM(MF, it.a)
                         }
-                    })
+                    }
+                })
+    }
 
     /**
      * Map the value [A] to a arbitrary type [B] that is within the context of [F].
@@ -224,15 +225,16 @@ class StateT<F, S, A>(
      * @param faf the function to apply.
      * @param MF [Monad] for the context [F].
      */
-    fun <B> flatMapF(faf: (A) -> Kind<F, B>, MF: Monad<F>): StateT<F, S, B> =
-            invokeF(
-                    MF.map(runF) { sfsa ->
-                        sfsa.andThen { fsa ->
-                            MF.flatMap(fsa) { (s, a) ->
-                                MF.map(faf(a)) { b -> Tuple2(s, b) }
-                            }
+    fun <B> flatMapF(faf: (A) -> Kind<F, B>, MF: Monad<F>): StateT<F, S, B> =  MF.run {
+        invokeF(
+                map(runF) { sfsa ->
+                    sfsa.andThen { fsa ->
+                        fsa.flatMap() { (s, a) ->
+                            map(faf(a)) { b -> Tuple2(s, b) }
                         }
-                    })
+                    }
+                })
+    }
 
     /**
      * Transform the product of state [S] and value [A] to an another product of state [S] and an arbitrary type [B].
@@ -264,7 +266,9 @@ class StateT<F, S, A>(
      * @param s initial state to run stateful computation.
      * @param MF [Monad] for the context [F].
      */
-    fun run(initial: S, MF: Monad<F>): Kind<F, Tuple2<S, A>> = MF.flatMap(runF) { f -> f(initial) }
+    fun run(initial: S, MF: Monad<F>): Kind<F, Tuple2<S, A>> =  MF.run {
+        runF.flatMap() { f -> f(initial) }
+    }
 
     /**
      * Run the stateful computation within the context `F` and get the value [A].

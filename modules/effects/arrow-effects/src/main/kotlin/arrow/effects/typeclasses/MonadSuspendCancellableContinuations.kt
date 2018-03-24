@@ -37,7 +37,7 @@ open class MonadSuspendCancellableContinuation<F, A>(SC: MonadSuspend<F>, overri
 
     override suspend fun <B> bind(m: () -> Kind<F, B>): B = suspendCoroutineOrReturn { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels
-        returnedMonad = flatMap(m(), { x: B ->
+        returnedMonad = m().flatMap({ x: B ->
             c.stackLabels = labelHere
             if (cancelled.get()) {
                 throw BindingCancellationException()
@@ -56,7 +56,7 @@ open class MonadSuspendCancellableContinuation<F, A>(SC: MonadSuspend<F>, overri
             } catch (t: Throwable) {
                 ME.raiseError<B>(t)
             }
-            flatMap(datatype, { xx: B ->
+            datatype.flatMap({ xx: B ->
                 c.stackLabels = labelHere
                 if (cancelled.get()) {
                     throw BindingCancellationException()
@@ -66,7 +66,7 @@ open class MonadSuspendCancellableContinuation<F, A>(SC: MonadSuspend<F>, overri
             })
         }
         val completion = bindingInContextContinuation(context)
-        returnedMonad = flatMap(pure(Unit), {
+        returnedMonad = pure(Unit).flatMap({
             monadCreation.startCoroutine(completion)
             val error = completion.await()
             if (error != null) {

@@ -29,8 +29,8 @@ interface DeferredKApplicativeInstance : Applicative<ForDeferredK> {
 
 @instance(DeferredK::class)
 interface DeferredKMonadInstance : Monad<ForDeferredK> {
-    override fun <A, B> flatMap(fa: DeferredKOf<A>, f: kotlin.Function1<A, DeferredKOf<B>>): DeferredK<B> =
-            fa.fix().flatMap(f)
+    override fun <A, B> Kind<ForDeferredK, A>.flatMap(f: (A) -> Kind<ForDeferredK, B>): DeferredK<B> =
+            fix().flatMap(f)
 
     override fun <A, B> map(fa: DeferredKOf<A>, f: (A) -> B): DeferredK<B> =
             fa.fix().map(f)

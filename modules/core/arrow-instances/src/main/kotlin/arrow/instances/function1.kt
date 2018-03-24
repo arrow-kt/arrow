@@ -36,8 +36,8 @@ interface Function1MonadInstance<I> : Function1ApplicativeInstance<I>, Monad<Fun
     override fun <A, B> Kind<Function1PartialOf<I>, A>.ap(ff: Kind<Function1PartialOf<I>, (A) -> B>): Function1<I, B> =
             fix().ap(ff)
 
-    override fun <A, B> flatMap(fa: Function1Of<I, A>, f: (A) -> Function1Of<I, B>): Function1<I, B> =
-            fa.fix().flatMap(f)
+    override fun <A, B> Kind<Function1PartialOf<I>, A>.flatMap(f: (A) -> Kind<Function1PartialOf<I>, B>): Function1<I, B> =
+            fix().flatMap(f)
 
     override fun <A, B> tailRecM(a: A, f: (A) -> Function1Of<I, Either<A, B>>): Function1<I, B> =
             Function1.tailRecM(a, f)

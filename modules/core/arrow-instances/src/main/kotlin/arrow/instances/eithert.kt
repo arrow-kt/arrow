@@ -33,7 +33,7 @@ interface EitherTMonadInstance<F, L> : EitherTApplicativeInstance<F, L>, Monad<E
     override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.ap(ff: Kind<EitherTPartialOf<F, L>, (A) -> B>): EitherT<F, L, B> =
             fix().ap(ff, MF())
 
-    override fun <A, B> flatMap(fa: EitherTOf<F, L, A>, f: (A) -> EitherTOf<F, L, B>): EitherT<F, L, B> = fa.fix().flatMap({ f(it).fix() }, MF())
+    override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.flatMap(f: (A) -> Kind<EitherTPartialOf<F, L>, B>): EitherT<F, L, B> = fix().flatMap({ f(it).fix() }, MF())
 
     override fun <A, B> tailRecM(a: A, f: (A) -> EitherTOf<F, L, Either<A, B>>): EitherT<F, L, B> =
             EitherT.tailRecM(a, f, MF())
@@ -41,13 +41,14 @@ interface EitherTMonadInstance<F, L> : EitherTApplicativeInstance<F, L>, Monad<E
 
 interface EitherTApplicativeErrorInstance<F, L> : EitherTApplicativeInstance<F, L>, ApplicativeError<EitherTPartialOf<F, L>, L> {
 
-    override fun <A> Kind<EitherTPartialOf<F, L>, A>.handleErrorWith(f: (L) -> Kind<EitherTPartialOf<F, L>, A>): EitherT<F, L, A> =
-            EitherT(MF().flatMap(fix().value, {
-                when (it) {
-                    is Either.Left -> f(it.a).fix().value
-                    is Either.Right -> MF().pure(it)
-                }
-            }))
+    override fun <A> Kind<EitherTPartialOf<F, L>, A>.handleErrorWith(f: (L) -> Kind<EitherTPartialOf<F, L>, A>): EitherT<F, L, A> = MF().run {
+        EitherT(fix().value.flatMap({
+            when (it) {
+                is Either.Left -> f(it.a).fix().value
+                is Either.Right -> pure(it)
+            }
+        }))
+    }
 
     override fun <A> raiseError(e: L): EitherT<F, L, A> = EitherT(MF().pure(Left(e)))
 }

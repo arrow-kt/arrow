@@ -33,8 +33,8 @@ interface ObservableKMonadInstance : Monad<ForObservableK> {
     override fun <A, B> ObservableKOf<A>.ap(ff: ObservableKOf<(A) -> B>): ObservableK<B> =
             fix().ap(ff)
 
-    override fun <A, B> flatMap(fa: ObservableKOf<A>, f: (A) -> ObservableKOf<B>): ObservableK<B> =
-            fa.fix().flatMap(f)
+    override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
+            fix().flatMap(f)
 
     override fun <A, B> map(fa: ObservableKOf<A>, f: (A) -> B): ObservableK<B> =
             fa.fix().map(f)

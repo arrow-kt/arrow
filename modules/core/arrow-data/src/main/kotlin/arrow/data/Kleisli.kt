@@ -48,10 +48,11 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
      * @param f the function to flatmap.
      * @param MF [Monad] for the context [F].
      */
-    fun <B> flatMap(f: (A) -> Kleisli<F, D, B>, MF: Monad<F>): Kleisli<F, D, B> =
-            Kleisli { d ->
-                MF.flatMap(run(d)) { a -> f(a).run(d) }
-            }
+    fun <B> flatMap(f: (A) -> Kleisli<F, D, B>, MF: Monad<F>): Kleisli<F, D, B> = MF.run {
+        Kleisli { d ->
+            run(d).flatMap() { a -> f(a).run(d) }
+        }
+    }
 
     /**
      * Zip with another [Kleisli] arrow.
@@ -85,7 +86,9 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
      * @param f the function to apply.
      * @param MF [Monad] for the context [F].
      */
-    fun <B> andThen(f: (A) -> Kind<F, B>, MF: Monad<F>): Kleisli<F, D, B> = Kleisli { MF.flatMap(run(it), f) }
+    fun <B> andThen(f: (A) -> Kind<F, B>, MF: Monad<F>): Kleisli<F, D, B> = MF.run {
+        Kleisli { run(it).flatMap(f) }
+    }
 
     /**
      * Set the end of the arrow to `Kind<F, B>` after running the computation.

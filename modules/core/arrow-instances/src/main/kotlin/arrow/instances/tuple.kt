@@ -35,8 +35,8 @@ interface Tuple2MonadInstance<F> : Tuple2ApplicativeInstance<F>, Monad<Tuple2Par
     override fun <A, B> Kind<Tuple2PartialOf<F>, A>.ap(ff: Kind<Tuple2PartialOf<F>, (A) -> B>) =
             fix().ap(ff)
 
-    override fun <A, B> flatMap(fa: Tuple2Of<F, A>, f: (A) -> Tuple2Of<F, B>) =
-            fa.fix().flatMap { f(it).fix() }
+    override fun <A, B> Kind<Tuple2PartialOf<F>, A>.flatMap(f: (A) -> Kind<Tuple2PartialOf<F>, B>) =
+            fix().flatMap { f(it).fix() }
 
     override tailrec fun <A, B> tailRecM(a: A, f: (A) -> Tuple2Of<F, Either<A, B>>): Tuple2<F, B> {
         val b = f(a).fix().b

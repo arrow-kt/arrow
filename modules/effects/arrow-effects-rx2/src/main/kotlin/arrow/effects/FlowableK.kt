@@ -94,25 +94,25 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
         fun monadFlat(): FlowableKMonadInstance = monad()
 
         fun monadConcat(): FlowableKMonadInstance = object : FlowableKMonadInstance {
-            override fun <A, B> flatMap(fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
-                    fa.fix().concatMap { f(it).fix() }
+            override fun <A, B> Kind<ForFlowableK, A>.flatMap(f: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
+                    fix().concatMap { f(it).fix() }
         }
 
         fun monadSwitch(): FlowableKMonadInstance = object : FlowableKMonadInstance {
-            override fun <A, B> flatMap(fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
-                    fa.fix().switchMap { f(it).fix() }
+            override fun <A, B> Kind<ForFlowableK, A>.flatMap(f: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
+                    fix().switchMap { f(it).fix() }
         }
 
         fun monadErrorFlat(): FlowableKMonadErrorInstance = monadError()
 
         fun monadErrorConcat(): FlowableKMonadErrorInstance = object : FlowableKMonadErrorInstance {
-            override fun <A, B> flatMap(fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
-                    fa.fix().concatMap { f(it).fix() }
+            override fun <A, B> Kind<ForFlowableK, A>.flatMap(f: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
+                    fix().concatMap { f(it).fix() }
         }
 
         fun monadErrorSwitch(): FlowableKMonadErrorInstance = object : FlowableKMonadErrorInstance {
-            override fun <A, B> flatMap(fa: FlowableKOf<A>, f: (A) -> FlowableKOf<B>): FlowableK<B> =
-                    fa.fix().switchMap { f(it).fix() }
+            override fun <A, B> Kind<ForFlowableK, A>.flatMap(f: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
+                    fix().switchMap { f(it).fix() }
         }
 
         fun monadSuspendBuffer(): FlowableKMonadSuspendInstance = monadSuspend()

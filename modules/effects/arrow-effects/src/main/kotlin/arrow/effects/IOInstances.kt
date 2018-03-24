@@ -29,8 +29,8 @@ interface IOApplicativeInstance : Applicative<ForIO> {
 
 @instance(IO::class)
 interface IOMonadInstance : Monad<ForIO> {
-    override fun <A, B> flatMap(fa: IOOf<A>, f: kotlin.Function1<A, IOOf<B>>): IO<B> =
-            fa.fix().flatMap(f)
+    override fun <A, B> Kind<ForIO, A>.flatMap(f: (A) -> Kind<ForIO, B>): IO<B> =
+            fix().flatMap(f)
 
     override fun <A, B> map(fa: IOOf<A>, f: kotlin.Function1<A, B>): IO<B> =
             fa.fix().map(f)

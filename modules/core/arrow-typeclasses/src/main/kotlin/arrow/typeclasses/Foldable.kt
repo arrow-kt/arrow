@@ -158,7 +158,7 @@ interface Foldable<F> {
      * entirety of the structure), depending on the G result produced at a given step.
      */
     fun <G, A, B> Monad<G>.foldM(fa: Kind<F, A>, z: B, f: (B, A) -> Kind<G, B>): Kind<G, B> =
-            foldLeft(fa, pure(z), { gb, a -> flatMap(gb) { f(it, a) } })
+            foldLeft(fa, pure(z), { gb, a -> gb.flatMap() { f(it, a) } })
 
     /**
      * Get the element at the index of the Foldable.

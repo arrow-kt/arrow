@@ -30,8 +30,8 @@ interface IorMonadInstance<L> : IorApplicativeInstance<L>, Monad<IorPartialOf<L>
 
     override fun <A, B> map(fa: IorOf<L, A>, f: (A) -> B): Ior<L, B> = fa.fix().map(f)
 
-    override fun <A, B> flatMap(fa: IorOf<L, A>, f: (A) -> IorOf<L, B>): Ior<L, B> =
-            fa.fix().flatMap(SL(), { f(it).fix() })
+    override fun <A, B> Kind<IorPartialOf<L>, A>.flatMap(f: (A) -> Kind<IorPartialOf<L>, B>): Ior<L, B> =
+            fix().flatMap(SL(), { f(it).fix() })
 
     override fun <A, B> Kind<IorPartialOf<L>, A>.ap(ff: Kind<IorPartialOf<L>, (A) -> B>): Ior<L, B> =
             fix().ap(SL(), ff)

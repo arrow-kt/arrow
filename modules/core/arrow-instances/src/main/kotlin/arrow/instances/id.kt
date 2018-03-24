@@ -43,8 +43,8 @@ interface IdMonadInstance : Monad<ForId> {
     override fun <A, B> Kind<ForId, A>.ap(ff: Kind<ForId, (A) -> B>): Id<B> =
             fix().ap(ff)
 
-    override fun <A, B> flatMap(fa: IdOf<A>, f: kotlin.Function1<A, IdOf<B>>): Id<B> =
-            fa.fix().flatMap(f)
+    override fun <A, B> Kind<ForId, A>.flatMap(f: (A) -> Kind<ForId, B>): Id<B> =
+            fix().flatMap(f)
 
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, IdOf<Either<A, B>>>): Id<B> =
             Id.tailRecM(a, f)
@@ -73,8 +73,8 @@ interface IdBimonadInstance : Bimonad<ForId> {
     override fun <A, B> Kind<ForId, A>.ap(ff: Kind<ForId, (A) -> B>): Id<B> =
             fix().ap(ff)
 
-    override fun <A, B> flatMap(fa: IdOf<A>, f: kotlin.Function1<A, IdOf<B>>): Id<B> =
-            fa.fix().flatMap(f)
+    override fun <A, B> Kind<ForId, A>.flatMap(f: (A) -> Kind<ForId, B>): Id<B> =
+            fix().flatMap(f)
 
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, IdOf<Either<A, B>>>): Id<B> =
             Id.tailRecM(a, f)

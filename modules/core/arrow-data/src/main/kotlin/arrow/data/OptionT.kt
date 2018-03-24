@@ -48,8 +48,9 @@ data class OptionT<F, A>(val value: Kind<F, Option<A>>) : OptionTOf<F, A>, Optio
 
     inline fun <B> flatMap(crossinline f: (A) -> OptionT<F, B>, MF: Monad<F>): OptionT<F, B> = flatMapF({ it -> f(it).value }, MF)
 
-    inline fun <B> flatMapF(crossinline f: (A) -> Kind<F, Option<B>>, MF: Monad<F>): OptionT<F, B> =
-            OptionT(MF.flatMap(value, { option -> option.fold({ MF.pure(None) }, f) }))
+    inline fun <B> flatMapF(crossinline f: (A) -> Kind<F, Option<B>>, MF: Monad<F>): OptionT<F, B> = MF.run {
+        OptionT(value.flatMap({ option -> option.fold({ pure(None) }, f) }))
+    }
 
     fun <B> liftF(fa: Kind<F, B>, FF: Functor<F>): OptionT<F, B> = OptionT(FF.map(fa, { Some(it) }))
 
@@ -59,7 +60,9 @@ data class OptionT<F, A>(val value: Kind<F, Option<A>>) : OptionTOf<F, A>, Optio
 
     fun getOrElse(default: () -> A, FF: Functor<F>): Kind<F, A> = FF.map(value, { it.getOrElse(default) })
 
-    inline fun getOrElseF(crossinline default: () -> Kind<F, A>, MF: Monad<F>): Kind<F, A> = MF.flatMap(value, { it.fold(default, { MF.pure(it) }) })
+    inline fun getOrElseF(crossinline default: () -> Kind<F, A>, MF: Monad<F>): Kind<F, A> =  MF.run {
+        value.flatMap({ it.fold(default, { pure(it) }) })
+    }
 
     inline fun filter(crossinline p: (A) -> Boolean, FF: Functor<F>): OptionT<F, A> = OptionT(FF.map(value, { it.filter(p) }))
 
@@ -71,13 +74,14 @@ data class OptionT<F, A>(val value: Kind<F, Option<A>>) : OptionTOf<F, A>, Optio
 
     inline fun orElse(crossinline default: () -> OptionT<F, A>, MF: Monad<F>): OptionT<F, A> = orElseF({ default().value }, MF)
 
-    inline fun orElseF(crossinline default: () -> Kind<F, Option<A>>, MF: Monad<F>): OptionT<F, A> =
-            OptionT(MF.flatMap(value) {
-                when (it) {
-                    is Some<A> -> MF.pure(it)
-                    is None -> default()
-                }
-            })
+    inline fun orElseF(crossinline default: () -> Kind<F, Option<A>>, MF: Monad<F>): OptionT<F, A> = MF.run {
+        OptionT(value.flatMap() {
+            when (it) {
+                is Some<A> -> MF.pure(it)
+                is None -> default()
+            }
+        })
+    }
 
     inline fun <B> transform(crossinline f: (Option<A>) -> Option<B>, FF: Functor<F>): OptionT<F, B> = OptionT(FF.map(value, { f(it) }))
 

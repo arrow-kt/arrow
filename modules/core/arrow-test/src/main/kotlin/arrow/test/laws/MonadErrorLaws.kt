@@ -20,11 +20,11 @@ object MonadErrorLaws {
 
     fun <F> MonadError<F, Throwable>.monadErrorLeftZero(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), this)), genThrowable(), { f: (Int) -> Kind<F, Int>, e: Throwable ->
-                flatMap(raiseError<Int>(e), f).equalUnderTheLaw(raiseError<Int>(e), EQ)
+                raiseError<Int>(e).flatMap(f).equalUnderTheLaw(raiseError<Int>(e), EQ)
             })
 
     fun <F> MonadError<F, Throwable>.monadErrorEnsureConsistency(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genApplicative(Gen.int(), this), genThrowable(), genFunctionAToB<Int, Boolean>(Gen.bool()), { fa: Kind<F, Int>, e: Throwable, p: (Int) -> Boolean ->
-                fa.ensure({ e }, p).equalUnderTheLaw(flatMap(fa, { a -> if (p(a)) pure(a) else raiseError(e) }), EQ)
+                fa.ensure({ e }, p).equalUnderTheLaw(fa.flatMap({ a -> if (p(a)) pure(a) else raiseError(e) }), EQ)
             })
 }

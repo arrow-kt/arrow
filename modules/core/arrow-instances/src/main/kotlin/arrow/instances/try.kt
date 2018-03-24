@@ -74,8 +74,8 @@ interface TryMonadInstance : Monad<ForTry> {
     override fun <A, B> Kind<ForTry, A>.ap(ff: Kind<ForTry, (A) -> B>): Try<B> =
             fix().ap(ff)
 
-    override fun <A, B> flatMap(fa: TryOf<A>, f: kotlin.Function1<A, TryOf<B>>): Try<B> =
-            fa.fix().flatMap(f)
+    override fun <A, B> Kind<ForTry, A>.flatMap(f: (A) -> Kind<ForTry, B>): Try<B> =
+            fix().flatMap(f)
 
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, TryOf<Either<A, B>>>): Try<B> =
             Try.tailRecM(a, f)
