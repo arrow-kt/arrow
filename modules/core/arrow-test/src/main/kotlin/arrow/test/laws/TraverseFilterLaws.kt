@@ -28,6 +28,6 @@ object TraverseFilterLaws {
 
     fun <F> TraverseFilter<F>.filterAconsistentWithTraverseFilter(GA: Applicative<F>, EQ: Eq<Kind<F, Kind<F, Int>>> = Eq.any()) =
             forAll(genApplicative(genIntSmall(), GA), genFunctionAToB(genApplicative(Gen.bool(), GA)), { fa: Kind<F, Int>, f: (Int) -> Kind<F, Boolean> ->
-                fa.filterA(f, GA).equalUnderTheLaw(GA.traverseFilter(fa, { a -> map(f(a)) { b: Boolean -> if (b) Some(a) else None } }), EQ)
+                fa.filterA(f, GA).equalUnderTheLaw(GA.traverseFilter(fa, { a -> f(a).map() { b: Boolean -> if (b) Some(a) else None } }), EQ)
             })
 }

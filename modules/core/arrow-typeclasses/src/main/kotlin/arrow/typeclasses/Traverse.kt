@@ -21,11 +21,11 @@ interface Traverse<F> : Functor<F>, Foldable<F> {
      */
     fun <G, A> Applicative<G>.sequence(fga: Kind<F, Kind<G, A>>): Kind<G, Kind<F, A>> = traverse(fga) { it }
 
-    override fun <A, B> map(fa: Kind<F, A>, f: (A) -> B): Kind<F, B> =
-            IdMonad.traverse(fa, { Id(f(it)) }).value()
+    override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> =
+            IdMonad.traverse(this, { Id(f(it)) }).value()
 
     fun <G, A, B> FlatTraverse<F, G>.flatTraverse(fa: Kind<F, A>, f: (A) -> Kind<G, Kind<F, B>>): Kind<G, Kind<F, B>> =
-            AG().run { map(traverse(fa, f)) { MF().run { it.flatten() } } }
+            AG().run { traverse(fa, f).map() { MF().run { it.flatten() } } }
 }
 
 interface FlatTraverse<F, G> {

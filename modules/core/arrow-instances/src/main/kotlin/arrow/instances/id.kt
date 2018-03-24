@@ -22,8 +22,8 @@ interface IdShowInstance<A> : Show<Id<A>> {
 
 @instance(Id::class)
 interface IdFunctorInstance : Functor<ForId> {
-    override fun <A, B> map(fa: IdOf<A>, f: kotlin.Function1<A, B>): Id<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForId, A>.map(f: (A) -> B): Id<B> =
+            fix().map(f)
 }
 
 @instance(Id::class)
@@ -31,8 +31,8 @@ interface IdApplicativeInstance : Applicative<ForId> {
     override fun <A, B> Kind<ForId, A>.ap(ff: Kind<ForId, (A) -> B>): Id<B> =
             fix().ap(ff)
 
-    override fun <A, B> map(fa: IdOf<A>, f: kotlin.Function1<A, B>): Id<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForId, A>.map(f: (A) -> B): Id<B> =
+            fix().map(f)
 
     override fun <A> pure(a: A): Id<A> =
             Id.pure(a)
@@ -49,8 +49,8 @@ interface IdMonadInstance : Monad<ForId> {
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, IdOf<Either<A, B>>>): Id<B> =
             Id.tailRecM(a, f)
 
-    override fun <A, B> map(fa: IdOf<A>, f: kotlin.Function1<A, B>): Id<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForId, A>.map(f: (A) -> B): Id<B> =
+            fix().map(f)
 
     override fun <A> pure(a: A): Id<A> =
             Id.pure(a)
@@ -64,8 +64,8 @@ interface IdComonadInstance : Comonad<ForId> {
     override fun <A> Kind<ForId, A>.extract(): A =
             fix().extract()
 
-    override fun <A, B> map(fa: IdOf<A>, f: kotlin.Function1<A, B>): Id<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForId, A>.map(f: (A) -> B): Id<B> =
+            fix().map(f)
 }
 
 @instance(Id::class)
@@ -79,8 +79,8 @@ interface IdBimonadInstance : Bimonad<ForId> {
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, IdOf<Either<A, B>>>): Id<B> =
             Id.tailRecM(a, f)
 
-    override fun <A, B> map(fa: IdOf<A>, f: kotlin.Function1<A, B>): Id<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForId, A>.map(f: (A) -> B): Id<B> =
+            fix().map(f)
 
     override fun <A> pure(a: A): Id<A> =
             Id.pure(a)
@@ -102,13 +102,13 @@ interface IdFoldableInstance : Foldable<ForId> {
 }
 
 fun <A, G, B> Id<A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Id<B>> = GA.run {
-    map(f(fix().value), { Id(it) })
+    f(fix().value).map({ Id(it) })
 }
 
 @instance(Id::class)
 interface IdTraverseInstance : Traverse<ForId> {
-    override fun <A, B> map(fa: IdOf<A>, f: kotlin.Function1<A, B>): Id<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForId, A>.map(f: (A) -> B): Id<B> =
+            fix().map(f)
 
     override fun <G, A, B> Applicative<G>.traverse(fa: Kind<ForId, A>, f: (A) -> Kind<G, B>): Kind<G, Id<B>> =
             fa.fix().traverse(f, this)

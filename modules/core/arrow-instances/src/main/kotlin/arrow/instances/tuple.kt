@@ -9,16 +9,16 @@ import arrow.typeclasses.*
 
 @instance(Tuple2::class)
 interface Tuple2FunctorInstance<F> : Functor<Tuple2PartialOf<F>> {
-    override fun <A, B> map(fa: Tuple2Of<F, A>, f: (A) -> B) =
-            fa.fix().map(f)
+    override fun <A, B> Kind<Tuple2PartialOf<F>, A>.map(f: (A) -> B) =
+            fix().map(f)
 }
 
 @instance(Tuple2::class)
 interface Tuple2ApplicativeInstance<F> : Tuple2FunctorInstance<F>, Applicative<Tuple2PartialOf<F>> {
     fun MF(): Monoid<F>
 
-    override fun <A, B> map(fa: Tuple2Of<F, A>, f: (A) -> B) =
-            fa.fix().map(f)
+    override fun <A, B> Kind<Tuple2PartialOf<F>, A>.map(f: (A) -> B) =
+            fix().map(f)
 
     override fun <A, B> Kind<Tuple2PartialOf<F>, A>.ap(ff: Kind<Tuple2PartialOf<F>, (A) -> B>) =
             fix().ap(ff.fix())
@@ -29,8 +29,8 @@ interface Tuple2ApplicativeInstance<F> : Tuple2FunctorInstance<F>, Applicative<T
 
 @instance(Tuple2::class)
 interface Tuple2MonadInstance<F> : Tuple2ApplicativeInstance<F>, Monad<Tuple2PartialOf<F>> {
-    override fun <A, B> map(fa: Tuple2Of<F, A>, f: (A) -> B) =
-            fa.fix().map(f)
+    override fun <A, B> Kind<Tuple2PartialOf<F>, A>.map(f: (A) -> B) =
+            fix().map(f)
 
     override fun <A, B> Kind<Tuple2PartialOf<F>, A>.ap(ff: Kind<Tuple2PartialOf<F>, (A) -> B>) =
             fix().ap(ff)
@@ -68,7 +68,7 @@ interface Tuple2FoldableInstance<F> : Foldable<Tuple2PartialOf<F>> {
 @instance(Tuple2::class)
 interface Tuple2TraverseInstance<F> : Tuple2FoldableInstance<F>, Traverse<Tuple2PartialOf<F>> {
     override fun <G, A, B> Applicative<G>.traverse(fa: Kind<Tuple2PartialOf<F>, A>, f: (A) -> Kind<G, B>) =
-            fa.fix().run { map(f(b), a::toT) }
+            fa.fix().run { f(b).map(a::toT) }
 }
 
 @instance(Tuple2::class)

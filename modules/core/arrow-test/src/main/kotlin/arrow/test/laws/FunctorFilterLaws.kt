@@ -34,6 +34,6 @@ object FunctorFilterLaws {
                     genConstructor(Gen.int(), ff),
                     genFunctionAToB<Int, Int>(Gen.int()),
                     { fa: Kind<F, Int>, f ->
-                        fa.mapFilter({ Some(f(it)) }).equalUnderTheLaw(map(fa, f), EQ)
+                        fa.mapFilter({ Some(f(it)) }).equalUnderTheLaw(fa.map(f), EQ)
                     })
 }

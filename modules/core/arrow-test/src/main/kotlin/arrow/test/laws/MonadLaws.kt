@@ -55,7 +55,7 @@ object MonadLaws {
 
     fun <F> Monad<F>.mapFlatMapCoherence(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genFunctionAToB<Int, Int>(Gen.int()), genApplicative(Gen.int(), this), { f: (Int) -> Int, fa: Kind<F, Int> ->
-                fa.flatMap({ pure(f(it)) }).equalUnderTheLaw(map(fa, f), EQ)
+                fa.flatMap({ pure(f(it)) }).equalUnderTheLaw(fa.map(f), EQ)
             })
 
     fun <F> Monad<F>.stackSafety(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit =

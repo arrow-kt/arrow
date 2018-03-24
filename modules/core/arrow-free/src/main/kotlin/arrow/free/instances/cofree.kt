@@ -11,7 +11,7 @@ import arrow.typeclasses.Functor
 
 @instance(Cofree::class)
 interface CofreeFunctorInstance<S> : Functor<CofreePartialOf<S>> {
-    override fun <A, B> map(fa: CofreeOf<S, A>, f: (A) -> B): Cofree<S, B> = fa.fix().map(f)
+    override fun <A, B> Kind<CofreePartialOf<S>, A>.map(f: (A) -> B): Cofree<S, B> = fix().map(f)
 }
 
 @instance(Cofree::class)

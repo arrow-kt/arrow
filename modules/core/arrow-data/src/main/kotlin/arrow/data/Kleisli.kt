@@ -41,7 +41,7 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
      * @param FF [Functor] for the context [F].
      */
     fun <B> map(f: (A) -> B, FF: Functor<F>): Kleisli<F, D, B> = FF.run {
-        Kleisli { a -> map(run(a)) { f(it) } }
+        Kleisli { a -> run(a).map() { f(it) } }
     }
 
     /**

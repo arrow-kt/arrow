@@ -11,14 +11,14 @@ import arrow.typeclasses.*
 
 @instance(IO::class)
 interface IOFunctorInstance : Functor<ForIO> {
-    override fun <A, B> map(fa: IOOf<A>, f: (A) -> B): IO<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForIO, A>.map(f: (A) -> B): IO<B> =
+            fix().map(f)
 }
 
 @instance(IO::class)
 interface IOApplicativeInstance : Applicative<ForIO> {
-    override fun <A, B> map(fa: IOOf<A>, f: (A) -> B): IO<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForIO, A>.map(f: (A) -> B): IO<B> =
+            fix().map(f)
 
     override fun <A> pure(a: A): IO<A> =
             IO.pure(a)
@@ -32,8 +32,8 @@ interface IOMonadInstance : Monad<ForIO> {
     override fun <A, B> Kind<ForIO, A>.flatMap(f: (A) -> Kind<ForIO, B>): IO<B> =
             fix().flatMap(f)
 
-    override fun <A, B> map(fa: Kind<ForIO, A>, f: (A) -> B): IO<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForIO, A>.map(f: (A) -> B): IO<B> =
+            fix().map(f)
 
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, IOOf<arrow.core.Either<A, B>>>): IO<B> =
             IO.tailRecM(a, f)

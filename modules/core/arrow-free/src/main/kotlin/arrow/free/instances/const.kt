@@ -8,7 +8,7 @@ import arrow.typeclasses.*
 
 @instance(Const::class)
 interface ConstFunctorInstance<A> : Functor<ConstPartialOf<A>> {
-    override fun <T, U> map(fa: ConstOf<A, T>, f: (T) -> U): Const<A, U> = fa.fix().retag()
+    override fun <T, U> Kind<ConstPartialOf<A>, T>.map(f: (T) -> U): Const<A, U> = fix().retag()
 }
 
 @instance(Const::class)
@@ -16,7 +16,7 @@ interface ConstApplicativeInstance<A> : Applicative<ConstPartialOf<A>> {
 
     fun MA(): Monoid<A>
 
-    override fun <T, U> map(fa: ConstOf<A, T>, f: (T) -> U): Const<A, U> = fa.fix().retag()
+    override fun <T, U> Kind<ConstPartialOf<A>, T>.map(f: (T) -> U): Const<A, U> = fix().retag()
 
     override fun <T> pure(a: T): Const<A, T> = object : ConstMonoidInstance<A, T> {
         override fun SA(): Monoid<A> = MA()
@@ -37,7 +37,7 @@ interface ConstFoldableInstance<A> : Foldable<ConstPartialOf<A>> {
 @instance(Const::class)
 interface ConstTraverseInstance<X> : ConstFoldableInstance<X>, Traverse<ConstPartialOf<X>> {
 
-    override fun <T, U> map(fa: Kind<ConstPartialOf<X>, T>, f: (T) -> U): Const<X, U> = fa.fix().retag()
+    override fun <T, U> Kind<ConstPartialOf<X>, T>.map(f: (T) -> U): Const<X, U> = fix().retag()
 
     override fun <G, A, B> Applicative<G>.traverse(fa: ConstOf<X, A>, f: (A) -> Kind<G, B>): Kind<G, ConstOf<X, B>> =
             fa.fix().traverse(f, this)

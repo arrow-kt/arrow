@@ -14,7 +14,7 @@ interface OptionTFunctorInstance<F> : Functor<OptionTPartialOf<F>> {
 
     fun FF(): Functor<F>
 
-    override fun <A, B> map(fa: OptionTOf<F, A>, f: (A) -> B): OptionT<F, B> = fa.fix().map(f, FF())
+    override fun <A, B> Kind<OptionTPartialOf<F>, A>.map(f: (A) -> B): OptionT<F, B> = fix().map(f, FF())
 
 }
 
@@ -25,7 +25,7 @@ interface OptionTApplicativeInstance<F> : OptionTFunctorInstance<F>, Applicative
 
     override fun <A> pure(a: A): OptionT<F, A> = OptionT(FF().pure(Option(a)))
 
-    override fun <A, B> map(fa: OptionTOf<F, A>, f: (A) -> B): OptionT<F, B> = fa.fix().map(f, FF())
+    override fun <A, B> Kind<OptionTPartialOf<F>, A>.map(f: (A) -> B): OptionT<F, B> = fix().map(f, FF())
 
     override fun <A, B> Kind<OptionTPartialOf<F>, A>.ap(ff: Kind<OptionTPartialOf<F>, (A) -> B>): OptionT<F, B> =
             fix().ap(ff, FF())
@@ -34,7 +34,7 @@ interface OptionTApplicativeInstance<F> : OptionTFunctorInstance<F>, Applicative
 @instance(OptionT::class)
 interface OptionTMonadInstance<F> : OptionTApplicativeInstance<F>, Monad<OptionTPartialOf<F>> {
 
-    override fun <A, B> map(fa: Kind<OptionTPartialOf<F>, A>, f: (A) -> B): OptionT<F, B> = fa.fix().map(f, FF())
+    override fun <A, B> Kind<OptionTPartialOf<F>, A>.map(f: (A) -> B): OptionT<F, B> = fix().map(f, FF())
 
     override fun <A, B> Kind<OptionTPartialOf<F>, A>.flatMap(f: (A) -> Kind<OptionTPartialOf<F>, B>): OptionT<F, B> = fix().flatMap({ f(it).fix() }, FF())
 
@@ -52,7 +52,7 @@ fun <F, A, B> OptionT<F, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, F
 
 fun <F, G, A, B> OptionT<F, A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>, FF: Traverse<F>): Kind<G, OptionT<F, B>> {
     val fa = ComposedTraverse(FF, Option.traverse(), Option.applicative()).traverseC(value, f, GA)
-    return GA.run { map(fa, { OptionT(FF.run { map(it.unnest(), { it.fix() }) }) }) }
+    return GA.run { fa.map({ OptionT(FF.run { it.unnest().map({ it.fix() }) }) }) }
 }
 
 @instance(OptionT::class)

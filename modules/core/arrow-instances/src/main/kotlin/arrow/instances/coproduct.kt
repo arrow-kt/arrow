@@ -16,7 +16,7 @@ interface CoproductFunctorInstance<F, G> : Functor<CoproductPartialOf<F, G>> {
 
     fun FG(): Functor<G>
 
-    override fun <A, B> map(fa: CoproductOf<F, G, A>, f: (A) -> B): Coproduct<F, G, B> = fa.fix().map(FF(), FG(), f)
+    override fun <A, B> Kind<CoproductPartialOf<F, G>, A>.map(f: (A) -> B): Coproduct<F, G, B> = fix().map(FF(), FG(), f)
 }
 
 @instance(Coproduct::class)
@@ -30,7 +30,7 @@ interface CoproductComonadInstance<F, G> : Comonad<CoproductPartialOf<F, G>> {
 
     override fun <A> Kind<CoproductPartialOf<F, G>, A>.extract(): A = fix().extract(CF(), CG())
 
-    override fun <A, B> map(fa: CoproductOf<F, G, A>, f: (A) -> B): Coproduct<F, G, B> = fa.fix().map(CF(), CG(), f)
+    override fun <A, B> Kind<CoproductPartialOf<F, G>, A>.map(f: (A) -> B): Coproduct<F, G, B> = fix().map(CF(), CG(), f)
 
 }
 

@@ -88,7 +88,7 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
     fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FA.run {
         getOrModify(s).fold(
                 ::pure,
-                { map(f(it), ::reverseGet) }
+                { f(it).map(::reverseGet) }
         )
     }
 
@@ -99,7 +99,7 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
         { s ->
             getOrModify(s).fold(
                     ::pure,
-                    { map(f(it), ::reverseGet) }
+                    { f(it).map(::reverseGet) }
             )
         }
     }
@@ -227,7 +227,7 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
         override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FA.run {
             getOrModify(s).fold(
                     ::pure,
-                    { map(f(it), this@PPrism::reverseGet) }
+                    { f(it).map(this@PPrism::reverseGet) }
             )
         }
     }

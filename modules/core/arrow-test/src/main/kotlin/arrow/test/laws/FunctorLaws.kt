@@ -27,7 +27,7 @@ object FunctorLaws {
 
     fun <F> Functor<F>.covariantIdentity(f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), f), { fa: Kind<F, Int> ->
-                map(fa, ::identity).equalUnderTheLaw(fa, EQ)
+                fa.map(::identity).equalUnderTheLaw(fa, EQ)
             })
 
     fun <F> Functor<F>.covariantComposition(ff: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
@@ -36,7 +36,7 @@ object FunctorLaws {
                     genFunctionAToB<Int, Int>(Gen.int()),
                     genFunctionAToB<Int, Int>(Gen.int()),
                     { fa: Kind<F, Int>, f, g ->
-                        map(map(fa, f), g).equalUnderTheLaw(map(fa, f andThen g), EQ)
+                        fa.map(f).map(g).equalUnderTheLaw(fa.map(f andThen g), EQ)
                     }
             )
 }

@@ -8,7 +8,7 @@ import arrow.typeclasses.*
 
 @instance(MapK::class)
 interface MapKFunctorInstance<K> : Functor<MapKPartialOf<K>> {
-    override fun <A, B> map(fa: Kind<MapKPartialOf<K>, A>, f: (A) -> B): MapK<K, B> = fa.fix().map(f)
+    override fun <A, B> Kind<MapKPartialOf<K>, A>.map(f: (A) -> B): MapK<K, B> = fix().map(f)
 }
 
 @instance(MapK::class)

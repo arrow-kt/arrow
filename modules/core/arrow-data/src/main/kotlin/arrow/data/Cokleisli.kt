@@ -11,9 +11,9 @@ typealias CoreaderT<F, A, B> = Cokleisli<F, A, B>
 @higherkind
 data class Cokleisli<F, A, B>(val MM: Comonad<F>, val run: CokleisliFun<F, A, B>) : CokleisliOf<F, A, B>, CokleisliKindedJ<F, A, B>, Comonad<F> by MM {
 
-    inline fun <C, D> bimap(noinline g: (D) -> A, crossinline f: (B) -> C): Cokleisli<F, D, C> = Cokleisli(MM, { f(run(map(it, g))) })
+    inline fun <C, D> bimap(noinline g: (D) -> A, crossinline f: (B) -> C): Cokleisli<F, D, C> = Cokleisli(MM, { f(run(it.map(g))) })
 
-    fun <D> lmap(g: (D) -> A): Cokleisli<F, D, B> = Cokleisli(MM, { run(map(it, g)) })
+    fun <D> lmap(g: (D) -> A): Cokleisli<F, D, B> = Cokleisli(MM, { run(it.map(g)) })
 
     inline fun <C> map(crossinline f: (B) -> C): Cokleisli<F, A, C> = Cokleisli(MM, { f(run(it)) })
 

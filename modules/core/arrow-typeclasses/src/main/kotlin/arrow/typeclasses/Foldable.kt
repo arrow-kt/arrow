@@ -148,7 +148,7 @@ interface Foldable<F> {
      */
     fun <G, A, B, TC> TC.foldMapM(fa: Kind<F, A>, f: (A) -> Kind<G, B>): Kind<G, B>
             where TC : Monad<G>, TC : Monoid<B> =
-            foldM(fa, empty(), { b, a -> map(f(a)) { b.combine(it) } })
+            foldM(fa, empty(), { b, a -> f(a).map() { b.combine(it) } })
 
     /**
      * Left associative monadic folding on F.

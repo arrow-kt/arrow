@@ -33,6 +33,6 @@ interface StateTMonadCombineInstance<F, S> : MonadCombine<StateTPartialOf<F, S>>
     override fun <A> empty(): Kind<StateTPartialOf<F, S>, A> = liftT(MC().empty())
 
     fun <A> liftT(ma: Kind<F, A>): StateT<F, S, A> = FF().run {
-        StateT(pure({ s: S -> map(ma, { a: A -> s toT a }) }))
+        StateT(pure({ s: S -> ma.map({ a: A -> s toT a }) }))
     }
 }

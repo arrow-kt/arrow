@@ -37,7 +37,7 @@ interface MapEachInstance<K, V> : Each<Map<K, V>, V> {
         override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> = FA.run {
             MapK.traverse<K>().run { traverse(s.k(), f) }
                     .let {
-                        map(it) {
+                        it.map() {
                             it.fix().map
                         }
                     }
@@ -55,12 +55,12 @@ interface MapFilterIndexInstance<K, V> : FilterIndex<Map<K, V>, K, V> {
         override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> = FA.run {
             ListK.traverse().run {
                 traverse(s.toList().k(), { (k, v) ->
-                    map(if (p(k)) f(v) else pure(v)) {
+                    (if (p(k)) f(v) else pure(v)).map() {
                         k to it
                     }
                 })
             }.let {
-                map(it) {
+                it.map() {
                     it.toMap()
                 }
             }

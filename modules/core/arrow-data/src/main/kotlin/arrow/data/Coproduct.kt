@@ -34,9 +34,9 @@ data class Coproduct<F, G, A>(val run: Either<Kind<F, A>, Kind<G, A>>) : Coprodu
 
     fun <H, B> traverse(GA: Applicative<H>, FT: Traverse<F>, GT: Traverse<G>, f: (A) -> Kind<H, B>): Kind<H, Coproduct<F, G, B>> = GA.run {
         run.fold({
-            map(FT.run { GA.traverse(it, f) }, { Coproduct<F, G, B>(Left(it)) })
+            FT.run { GA.traverse(it, f) }.map({ Coproduct<F, G, B>(Left(it)) })
         }, {
-            map(GT.run { GA.traverse(it, f) }, { Coproduct<F, G, B>(Right(it)) })
+            GT.run { GA.traverse(it, f) }.map({ Coproduct<F, G, B>(Right(it)) })
         })
     }
 

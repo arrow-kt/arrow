@@ -68,7 +68,7 @@ interface PSetter<S, T, A, B> : PSetterOf<S, T, A, B> {
          */
         fun <F, A, B> fromFunctor(FF: Functor<F>): PSetter<Kind<F, A>, Kind<F, B>, A, B> = FF.run {
             PSetter { f ->
-                { fs: Kind<F, A> -> map(fs, f) }
+                { fs: Kind<F, A> -> fs.map(f) }
             }
         }
     }

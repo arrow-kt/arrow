@@ -8,8 +8,8 @@ import arrow.typeclasses.*
 
 @instance(SortedMapK::class)
 interface SortedMapKFunctorInstance<A : Comparable<A>> : Functor<SortedMapKPartialOf<A>> {
-    override fun <B, C> map(fa: Kind<SortedMapKPartialOf<A>, B>, f: (B) -> C): SortedMapK<A, C> =
-            fa.fix().map(f)
+    override fun <B, C> Kind<SortedMapKPartialOf<A>, B>.map(f: (B) -> C): SortedMapK<A, C> =
+            fix().map(f)
 }
 
 @instance(SortedMapK::class)

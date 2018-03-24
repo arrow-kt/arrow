@@ -11,7 +11,7 @@ interface EitherTFunctorInstance<F, L> : Functor<EitherTPartialOf<F, L>> {
 
     fun FF(): Functor<F>
 
-    override fun <A, B> map(fa: EitherTOf<F, L, A>, f: (A) -> B): EitherT<F, L, B> = fa.fix().map({ f(it) }, FF())
+    override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.map(f: (A) -> B): EitherT<F, L, B> = fix().map({ f(it) }, FF())
 }
 
 interface EitherTApplicativeInstance<F, L> : EitherTFunctorInstance<F, L>, Applicative<EitherTPartialOf<F, L>> {
@@ -20,7 +20,7 @@ interface EitherTApplicativeInstance<F, L> : EitherTFunctorInstance<F, L>, Appli
 
     override fun <A> pure(a: A): EitherT<F, L, A> = EitherT.pure(a, MF())
 
-    override fun <A, B> map(fa: EitherTOf<F, L, A>, f: (A) -> B): EitherT<F, L, B> = fa.fix().map({ f(it) }, this@EitherTApplicativeInstance.MF())
+    override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.map(f: (A) -> B): EitherT<F, L, B> = fix().map({ f(it) }, this@EitherTApplicativeInstance.MF())
 
     override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.ap(ff: Kind<EitherTPartialOf<F, L>, (A) -> B>): EitherT<F, L, B> =
             fix().ap(ff, MF())
@@ -28,7 +28,7 @@ interface EitherTApplicativeInstance<F, L> : EitherTFunctorInstance<F, L>, Appli
 
 interface EitherTMonadInstance<F, L> : EitherTApplicativeInstance<F, L>, Monad<EitherTPartialOf<F, L>> {
 
-    override fun <A, B> map(fa: EitherTOf<F, L, A>, f: (A) -> B): EitherT<F, L, B> = fa.fix().map({ f(it) }, MF())
+    override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.map(f: (A) -> B): EitherT<F, L, B> = fix().map({ f(it) }, MF())
 
     override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.ap(ff: Kind<EitherTPartialOf<F, L>, (A) -> B>): EitherT<F, L, B> =
             fix().ap(ff, MF())
@@ -68,7 +68,7 @@ interface EitherTTraverseInstance<F, L> : EitherTFunctorInstance<F, L>, EitherTF
 
     fun TF(): Traverse<F>
 
-    override fun <A, B> map(fa: EitherTOf<F, L, A>, f: (A) -> B): EitherT<F, L, B> = fa.fix().map({ f(it) }, TF())
+    override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.map(f: (A) -> B): EitherT<F, L, B> = fix().map({ f(it) }, TF())
 
     override fun <G, B, C> Applicative<G>.traverse(fa: EitherTOf<F, L, B>, f: (B) -> Kind<G, C>): Kind<G, EitherT<F, L, C>> =
             fa.fix().traverse(f, this, TF())

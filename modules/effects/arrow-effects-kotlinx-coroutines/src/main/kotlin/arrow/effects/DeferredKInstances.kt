@@ -11,14 +11,14 @@ import arrow.typeclasses.*
 
 @instance(DeferredK::class)
 interface DeferredKFunctorInstance : Functor<ForDeferredK> {
-    override fun <A, B> map(fa: DeferredKOf<A>, f: (A) -> B): DeferredK<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForDeferredK, A>.map(f: (A) -> B): DeferredK<B> =
+            fix().map(f)
 }
 
 @instance(DeferredK::class)
 interface DeferredKApplicativeInstance : Applicative<ForDeferredK> {
-    override fun <A, B> map(fa: DeferredKOf<A>, f: (A) -> B): DeferredK<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForDeferredK, A>.map(f: (A) -> B): DeferredK<B> =
+            fix().map(f)
 
     override fun <A> pure(a: A): DeferredK<A> =
             DeferredK.pure(a)
@@ -32,8 +32,8 @@ interface DeferredKMonadInstance : Monad<ForDeferredK> {
     override fun <A, B> Kind<ForDeferredK, A>.flatMap(f: (A) -> Kind<ForDeferredK, B>): DeferredK<B> =
             fix().flatMap(f)
 
-    override fun <A, B> map(fa: DeferredKOf<A>, f: (A) -> B): DeferredK<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForDeferredK, A>.map(f: (A) -> B): DeferredK<B> =
+            fix().map(f)
 
     override fun <A, B> tailRecM(a: A, f: (A) -> DeferredKOf<Either<A, B>>): DeferredK<B> =
             DeferredK.tailRecM(a, f)

@@ -7,7 +7,7 @@ import arrow.typeclasses.*
 
 @instance(Either::class)
 interface EitherFunctorInstance<L> : Functor<EitherPartialOf<L>> {
-    override fun <A, B> map(fa: EitherOf<L, A>, f: (A) -> B): Either<L, B> = fa.fix().map(f)
+    override fun <A, B> Kind<EitherPartialOf<L>, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 }
 
 @instance(Either::class)
@@ -15,7 +15,7 @@ interface EitherApplicativeInstance<L> : EitherFunctorInstance<L>, Applicative<E
 
     override fun <A> pure(a: A): Either<L, A> = Right(a)
 
-    override fun <A, B> map(fa: EitherOf<L, A>, f: (A) -> B): Either<L, B> = fa.fix().map(f)
+    override fun <A, B> Kind<EitherPartialOf<L>, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 
     override fun <A, B> Kind<EitherPartialOf<L>, A>.ap(ff: Kind<EitherPartialOf<L>, (A) -> B>): Either<L, B> =
             fix().ap(null, ff)
@@ -24,7 +24,7 @@ interface EitherApplicativeInstance<L> : EitherFunctorInstance<L>, Applicative<E
 @instance(Either::class)
 interface EitherMonadInstance<L> : EitherApplicativeInstance<L>, Monad<EitherPartialOf<L>> {
 
-    override fun <A, B> map(fa: EitherOf<L, A>, f: (A) -> B): Either<L, B> = fa.fix().map(f)
+    override fun <A, B> Kind<EitherPartialOf<L>, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 
     override fun <A, B> Kind<EitherPartialOf<L>, A>.ap(ff: Kind<EitherPartialOf<L>, (A) -> B>): Either<L, B> =
             fix().ap(null, ff)
@@ -64,7 +64,7 @@ interface EitherFoldableInstance<L> : Foldable<EitherPartialOf<L>> {
 }
 
 fun <G, A, B, C> Either<A, B>.traverse(f: (B) -> Kind<G, C>, GA: Applicative<G>): Kind<G, Either<A, C>> = GA.run {
-    fix().fold({ pure(Either.Left(it)) }, { map(f(it), { Either.Right(it) }) })
+    fix().fold({ pure(Either.Left(it)) }, { f(it).map({ Either.Right(it) }) })
 }
 
 @instance(Either::class)

@@ -38,7 +38,7 @@ object ApplicativeLaws {
 
     fun <F> Applicative<F>.mapDerived(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genApplicative(Gen.int(), this), genFunctionAToB<Int, Int>(Gen.int()), { fa: Kind<F, Int>, f: (Int) -> Int ->
-                map(fa, f).equalUnderTheLaw(fa.ap(pure(f)), EQ)
+                fa.map(f).equalUnderTheLaw(fa.ap(pure(f)), EQ)
             })
 
     fun <F> Applicative<F>.cartesianBuilderMap(EQ: Eq<Kind<F, Int>>): Unit =
@@ -48,6 +48,6 @@ object ApplicativeLaws {
 
     fun <F> Applicative<F>.cartesianBuilderTupled(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genIntSmall(), genIntSmall(), genIntSmall(), genIntSmall(), genIntSmall(), genIntSmall(), { a: Int, b: Int, c: Int, d: Int, e: Int, f: Int ->
-                map(tupled(pure(a), pure(b), pure(c), pure(d), pure(e), pure(f)), { (x, y, z, u, v, w) -> x + y + z - u - v - w }).equalUnderTheLaw(pure(a + b + c - d - e - f), EQ)
+                tupled(pure(a), pure(b), pure(c), pure(d), pure(e), pure(f)).map({ (x, y, z, u, v, w) -> x + y + z - u - v - w }).equalUnderTheLaw(pure(a + b + c - d - e - f), EQ)
             })
 }

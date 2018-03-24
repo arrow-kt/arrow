@@ -12,7 +12,7 @@ typealias Coalgebra <F, A> = (A) -> Kind<F, A>
 typealias CoalgebraM <M, F, A> = (A) -> Kind<M, Kind<F, A>>
 
 fun <F, A, B> hylo(a: A, alg: Algebra<F, B>, coalg: Coalgebra<F, A>, FF: Functor<F>): B = FF.run {
-    alg(map(coalg(a), { hylo(it, alg, coalg, FF) }))
+    alg(coalg(a).map({ hylo(it, alg, coalg, FF) }))
 }
 
 fun <M, F, A, B> hyloM(a: A, algM: AlgebraM<M, F, B>, coalgM: CoalgebraM<M, F, A>, TF: Traverse<F>, MM: Monad<M>): Kind<M, B> = MM.run {

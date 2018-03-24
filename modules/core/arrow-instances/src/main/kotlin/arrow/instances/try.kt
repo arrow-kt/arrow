@@ -53,8 +53,8 @@ interface TryShowInstance<A> : Show<Try<A>> {
 
 @instance(Try::class)
 interface TryFunctorInstance : Functor<ForTry> {
-    override fun <A, B> map(fa: TryOf<A>, f: kotlin.Function1<A, B>): Try<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForTry, A>.map(f: (A) -> B): Try<B> =
+            fix().map(f)
 }
 
 @instance(Try::class)
@@ -62,8 +62,8 @@ interface TryApplicativeInstance : Applicative<ForTry> {
     override fun <A, B> Kind<ForTry, A>.ap(ff: Kind<ForTry, (A) -> B>): Try<B> =
             fix().ap(ff)
 
-    override fun <A, B> map(fa: TryOf<A>, f: kotlin.Function1<A, B>): Try<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForTry, A>.map(f: (A) -> B): Try<B> =
+            fix().map(f)
 
     override fun <A> pure(a: A): Try<A> =
             Try.pure(a)
@@ -80,8 +80,8 @@ interface TryMonadInstance : Monad<ForTry> {
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, TryOf<Either<A, B>>>): Try<B> =
             Try.tailRecM(a, f)
 
-    override fun <A, B> map(fa: TryOf<A>, f: kotlin.Function1<A, B>): Try<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForTry, A>.map(f: (A) -> B): Try<B> =
+            fix().map(f)
 
     override fun <A> pure(a: A): Try<A> =
             Try.pure(a)
@@ -100,13 +100,13 @@ interface TryFoldableInstance : Foldable<ForTry> {
 }
 
 fun <A, B, G> Try<A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Try<B>> = GA.run {
-    fix().fold({ pure(Try.raise(it)) }, { map(f(it), { Try { it } }) })
+    fix().fold({ pure(Try.raise(it)) }, { f(it).map({ Try { it } }) })
 }
 
 @instance(Try::class)
 interface TryTraverseInstance : Traverse<ForTry> {
-    override fun <A, B> map(fa: TryOf<A>, f: kotlin.Function1<A, B>): Try<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForTry, A>.map(f: (A) -> B): Try<B> =
+            fix().map(f)
 
     override fun <G, A, B> Applicative<G>.traverse(fa: Kind<ForTry, A>, f: (A) -> Kind<G, B>): Kind<G, Try<B>> =
             fa.fix().traverse(f, this)

@@ -49,7 +49,7 @@ object TraverseLaws {
 
     inline fun <F> Traverse<F>.identityTraverse(FF: Functor<F>, crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>) = Id.applicative().run {
         forAll(genFunctionAToB<Int, Kind<ForId, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf), { f: (Int) -> Kind<ForId, Int>, fa: Kind<F, Int> ->
-            traverse(fa, f).value().equalUnderTheLaw(FF.run { map(map(fa, f)) { it.value() } }, EQ)
+            traverse(fa, f).value().equalUnderTheLaw(FF.run { fa.map(f).map() { it.value() } }, EQ)
         })
     }
 
@@ -57,8 +57,8 @@ object TraverseLaws {
         forAll(genFunctionAToB<Int, Kind<ForId, Int>>(genConstructor(genIntSmall(), ::Id)), genFunctionAToB<Int, Kind<ForId, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf), { f: (Int) -> Kind<ForId, Int>, g: (Int) -> Kind<ForId, Int>, fha: Kind<F, Int> ->
 
             val fa = traverse(fha, f).fix()
-            val composed = map(fa, { traverse(it, g) }).value.value()
-            val expected = ComposedApplicative(this, this).traverse(fha, { a: Int -> map(f(a), g).nest() }).unnest().value().value()
+            val composed = fa.map({ traverse(it, g) }).value.value()
+            val expected = ComposedApplicative(this, this).traverse(fha, { a: Int -> f(a).map(g).nest() }).unnest().value().value()
             composed.equalUnderTheLaw(expected, EQ)
         })
     }

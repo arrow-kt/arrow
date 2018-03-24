@@ -9,9 +9,9 @@ interface Monad<F> : Applicative<F> {
 
     fun <A, B> Kind<F, A>.flatMap(f: (A) -> Kind<F, B>): Kind<F, B>
 
-    override fun <A, B> map(fa: Kind<F, A>, f: (A) -> B): Kind<F, B> = fa.flatMap({ a -> pure(f(a)) })
+    override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> = flatMap({ a -> pure(f(a)) })
 
-    override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> = ff.flatMap({ f -> map(this, f) })
+    override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> = ff.flatMap({ f -> this.map(f) })
 
     fun <A, B> tailRecM(a: A, f: (A) -> Kind<F, Either<A, B>>): Kind<F, B>
 
@@ -21,9 +21,9 @@ interface Monad<F> : Applicative<F> {
 
     fun <A, B> Kind<F, A>.followedByEval(fb: Eval<Kind<F, B>>): Kind<F, B> = this.flatMap({ fb.value() })
 
-    fun <A, B> Kind<F, A>.forEffect(fb: Kind<F, B>): Kind<F, A> = this.flatMap({ a -> map(fb, { a }) })
+    fun <A, B> Kind<F, A>.forEffect(fb: Kind<F, B>): Kind<F, A> = this.flatMap({ a -> fb.map({ a }) })
 
-    fun <A, B> Kind<F, A>.forEffectEval(fb: Eval<Kind<F, B>>): Kind<F, A> = this.flatMap({ a -> map(fb.value(), { a }) })
+    fun <A, B> Kind<F, A>.forEffectEval(fb: Eval<Kind<F, B>>): Kind<F, A> = this.flatMap({ a -> fb.value().map({ a }) })
 }
 
 /**

@@ -12,8 +12,8 @@ import arrow.typeclasses.*
 
 @instance(ObservableK::class)
 interface ObservableKFunctorInstance : Functor<ForObservableK> {
-    override fun <A, B> map(fa: ObservableKOf<A>, f: (A) -> B): ObservableK<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
+            fix().map(f)
 }
 
 @instance(ObservableK::class)
@@ -21,8 +21,8 @@ interface ObservableKApplicativeInstance : Applicative<ForObservableK> {
     override fun <A, B> ObservableKOf<A>.ap(ff: ObservableKOf<(A) -> B>): ObservableK<B> =
             fix().ap(ff)
 
-    override fun <A, B> map(fa: Kind<ForObservableK, A>, f: (A) -> B): ObservableK<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
+            fix().map(f)
 
     override fun <A> pure(a: A): ObservableK<A> =
             ObservableK.pure(a)
@@ -36,8 +36,8 @@ interface ObservableKMonadInstance : Monad<ForObservableK> {
     override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
             fix().flatMap(f)
 
-    override fun <A, B> map(fa: Kind<ForObservableK, A>, f: (A) -> B): ObservableK<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
+            fix().map(f)
 
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ObservableKOf<arrow.core.Either<A, B>>>): ObservableK<B> =
             ObservableK.tailRecM(a, f)
@@ -57,8 +57,8 @@ interface ObservableKFoldableInstance : arrow.typeclasses.Foldable<ForObservable
 
 @instance(ObservableK::class)
 interface ObservableKTraverseInstance : arrow.typeclasses.Traverse<ForObservableK> {
-    override fun <A, B> map(fa: Kind<ForObservableK, A>, f: (A) -> B): ObservableK<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
+            fix().map(f)
 
     override fun <G, A, B> Applicative<G>.traverse(fa: ObservableKOf<A>, f: (A) -> Kind<G, B>): arrow.Kind<G, ObservableK<B>> =
             fa.fix().traverse(this, f)

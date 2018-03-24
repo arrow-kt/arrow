@@ -77,7 +77,7 @@ class StateT<F, S, A>(
          * @param fa the value to lift.
          */
         fun <F, S, A> lift(MF: Monad<F>, fa: Kind<F, A>): StateT<F, S, A> = MF.run {
-            StateT(pure({ s -> map(fa, { a -> Tuple2(s, a) }) }))
+            StateT(pure({ s -> fa.map({ a -> Tuple2(s, a) }) }))
         }
 
         /**
@@ -104,7 +104,7 @@ class StateT<F, S, A>(
          * @param f the modify function to apply.
          */
         fun <F, S> modify(AF: Applicative<F>, f: (S) -> S): StateT<F, S, Unit> = AF.run {
-            StateT(pure({ s -> map(pure(f(s))) { Tuple2(it, Unit) } }))
+            StateT(pure({ s -> pure(f(s)).map() { Tuple2(it, Unit) } }))
         }
 
         /**
@@ -114,7 +114,7 @@ class StateT<F, S, A>(
          * @param f the modify function to apply.
          */
         fun <F, S> modifyF(AF: Applicative<F>, f: (S) -> Kind<F, S>): StateT<F, S, Unit> = AF.run {
-            StateT(pure({ s -> map(f(s)) { Tuple2(it, Unit) } }))
+            StateT(pure({ s -> f(s).map() { Tuple2(it, Unit) } }))
         }
 
         /**
@@ -134,7 +134,7 @@ class StateT<F, S, A>(
          * @param s value to set.
          */
         fun <F, S> setF(AF: Applicative<F>, s: Kind<F, S>): StateT<F, S, Unit> = AF.run {
-            StateT(pure({ _ -> map(s) { Tuple2(it, Unit) } }))
+            StateT(pure({ _ -> s.map() { Tuple2(it, Unit) } }))
         }
 
         /**
@@ -147,7 +147,7 @@ class StateT<F, S, A>(
         fun <F, S, A, B> tailRecM(MF: Monad<F>, a: A, f: (A) -> Kind<StateTPartialOf<F, S>, Either<A, B>>): StateT<F, S, B> = MF.run {
             StateT(pure({ s: S ->
                 tailRecM(Tuple2(s, a), { (s, a0) ->
-                    map(f(a0).runM(this, s)) { (s, ab) ->
+                    f(a0).runM(this, s).map() { (s, ab) ->
                         ab.bimap({ a1 -> Tuple2(s, a1) }, { b -> Tuple2(s, b) })
                     }
                 })
@@ -175,7 +175,7 @@ class StateT<F, S, A>(
                 invokeF(runF.map2(sb.runF) { (ssa, ssb) ->
                     ssa.andThen { fsa ->
                         fsa.flatMap() { (s, a) ->
-                            map(ssb(s)) { (s, b) -> Tuple2(s, fn(a, b)) }
+                            ssb(s).map() { (s, b) -> Tuple2(s, fn(a, b)) }
                         }
                     }
                 })
@@ -192,7 +192,7 @@ class StateT<F, S, A>(
         runF.map2Eval(sb.map { it.runF }) { (ssa, ssb) ->
             ssa.andThen { fsa ->
                 fsa.flatMap() { (s, a) ->
-                    map(ssb((s))) { (s, b) -> Tuple2(s, fn(a, b)) }
+                    ssb((s)).map() { (s, b) -> Tuple2(s, fn(a, b)) }
                 }
             }
         }.map { invokeF(it) }
@@ -223,7 +223,7 @@ class StateT<F, S, A>(
      */
     fun <B> flatMap(fas: (A) -> StateTOf<F, S, B>, MF: Monad<F>): StateT<F, S, B> = MF.run {
         invokeF(
-                map(runF) { sfsa ->
+                runF.map() { sfsa ->
                     sfsa.andThen { fsa ->
                         fsa.flatMap() {
                             fas(it.b).runM(MF, it.a)
@@ -240,10 +240,10 @@ class StateT<F, S, A>(
      */
     fun <B> flatMapF(faf: (A) -> Kind<F, B>, MF: Monad<F>): StateT<F, S, B> = MF.run {
         invokeF(
-                map(runF) { sfsa ->
+                runF.map() { sfsa ->
                     sfsa.andThen { fsa ->
                         fsa.flatMap() { (s, a) ->
-                            map(faf(a)) { b -> Tuple2(s, b) }
+                            faf(a).map() { b -> Tuple2(s, b) }
                         }
                     }
                 })
@@ -257,9 +257,9 @@ class StateT<F, S, A>(
      */
     fun <B> transform(f: (Tuple2<S, A>) -> Tuple2<S, B>, FF: Functor<F>): StateT<F, S, B> = FF.run {
         invokeF(
-                map(runF) { sfsa ->
+                runF.map() { sfsa ->
                     sfsa.andThen { fsa ->
-                        map(fsa, f)
+                        fsa.map(f)
                     }
                 })
     }
@@ -291,7 +291,7 @@ class StateT<F, S, A>(
      * @param MF [Monad] for the context [F].
      */
     fun runA(s: S, MF: Monad<F>): Kind<F, A> = MF.run {
-        map(run(s, MF)) { it.b }
+        run(s, MF).map() { it.b }
     }
 
     /**
@@ -301,7 +301,7 @@ class StateT<F, S, A>(
      * @param MF [Monad] for the context [F].
      */
     fun runS(s: S, MF: Monad<F>): Kind<F, S> = MF.run {
-        map(run(s, MF)) { it.a }
+        run(s, MF).map() { it.a }
     }
 }
 

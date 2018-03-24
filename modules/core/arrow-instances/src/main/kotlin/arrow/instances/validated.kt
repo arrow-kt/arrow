@@ -8,7 +8,7 @@ import arrow.typeclasses.*
 
 @instance(Validated::class)
 interface ValidatedFunctorInstance<E> : Functor<ValidatedPartialOf<E>> {
-    override fun <A, B> map(fa: ValidatedOf<E, A>, f: (A) -> B): Validated<E, B> = fa.fix().map(f)
+    override fun <A, B> Kind<ValidatedPartialOf<E>, A>.map(f: (A) -> B): Validated<E, B> = fix().map(f)
 }
 
 @instance(Validated::class)
@@ -18,7 +18,7 @@ interface ValidatedApplicativeInstance<E> : ValidatedFunctorInstance<E>, Applica
 
     override fun <A> pure(a: A): Validated<E, A> = Valid(a)
 
-    override fun <A, B> map(fa: ValidatedOf<E, A>, f: (A) -> B): Validated<E, B> = fa.fix().map(f)
+    override fun <A, B> Kind<ValidatedPartialOf<E>, A>.map(f: (A) -> B): Validated<E, B> = fix().map(f)
 
     override fun <A, B> Kind<ValidatedPartialOf<E>, A>.ap(ff: Kind<ValidatedPartialOf<E>, (A) -> B>): Validated<E, B> = fix().ap(ff.fix(), SE())
 

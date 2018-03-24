@@ -31,8 +31,8 @@ interface NonEmptyListShowInstance<A> : Show<NonEmptyList<A>> {
 
 @instance(NonEmptyList::class)
 interface NonEmptyListFunctorInstance : Functor<ForNonEmptyList> {
-    override fun <A, B> map(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
+            fix().map(f)
 }
 
 @instance(NonEmptyList::class)
@@ -40,8 +40,8 @@ interface NonEmptyListApplicativeInstance : Applicative<ForNonEmptyList> {
     override fun <A, B> Kind<ForNonEmptyList, A>.ap(ff: Kind<ForNonEmptyList, (A) -> B>): NonEmptyList<B> =
             fix().ap(ff)
 
-    override fun <A, B> map(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
+            fix().map(f)
 
     override fun <A> pure(a: A): NonEmptyList<A> =
             NonEmptyList.pure(a)
@@ -58,8 +58,8 @@ interface NonEmptyListMonadInstance : Monad<ForNonEmptyList> {
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, NonEmptyListOf<Either<A, B>>>): NonEmptyList<B> =
             NonEmptyList.tailRecM(a, f)
 
-    override fun <A, B> map(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
+            fix().map(f)
 
     override fun <A> pure(a: A): NonEmptyList<A> =
             NonEmptyList.pure(a)
@@ -73,8 +73,8 @@ interface NonEmptyListComonadInstance : Comonad<ForNonEmptyList> {
     override fun <A> Kind<ForNonEmptyList, A>.extract(): A =
             fix().extract()
 
-    override fun <A, B> map(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
+            fix().map(f)
 }
 
 @instance(NonEmptyList::class)
@@ -88,8 +88,8 @@ interface NonEmptyListBimonadInstance : Bimonad<ForNonEmptyList> {
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, NonEmptyListOf<Either<A, B>>>): NonEmptyList<B> =
             NonEmptyList.tailRecM(a, f)
 
-    override fun <A, B> map(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
+            fix().map(f)
 
     override fun <A> pure(a: A): NonEmptyList<A> =
             NonEmptyList.pure(a)
@@ -115,7 +115,7 @@ interface NonEmptyListFoldableInstance : Foldable<ForNonEmptyList> {
 
 @instance(NonEmptyList::class)
 interface NonEmptyListTraverseInstance : Traverse<ForNonEmptyList> {
-    override fun <A, B> map(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
+    override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
             this@map.fix().map(f)
 
     override fun <G, A, B> Applicative<G>.traverse(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, Kind<G, B>>): Kind<G, NonEmptyList<B>> =

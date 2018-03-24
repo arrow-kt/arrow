@@ -74,7 +74,7 @@ interface ComposedTraverse<F, G> :
     override fun GF(): Foldable<G> = GT()
 
     override fun <H, A, B> Applicative<H>.traverse(fa: Kind<Nested<F, G>, A>, f: (A) -> Kind<H, B>): Kind<H, Kind<Nested<F, G>, B>> =
-            map(FT().run { traverse(fa.unnest(), { ga -> GT().run { traverse(ga, f) } }) }, { it.nest() })
+            FT().run { traverse(fa.unnest(), { ga -> GT().run { traverse(ga, f) } }) }.map({ it.nest() })
 
     fun <H, A, B> traverseC(fa: Kind<F, Kind<G, A>>, f: (A) -> Kind<H, B>, HA: Applicative<H>): Kind<H, Kind<Nested<F, G>, B>> = HA.traverse(fa.nest(), f)
 
@@ -148,11 +148,11 @@ interface ComposedFunctor<F, G> : Functor<Nested<F, G>> {
 
     fun G(): Functor<G>
 
-    override fun <A, B> map(fa: Kind<Nested<F, G>, A>, f: (A) -> B): Kind<Nested<F, G>, B> = this.F().run {
-        this@Functor.map(fa.unnest(), { this@ComposedFunctor.G().run { this@Functor.map(it, f) } }).nest()
+    override fun <A, B> Kind<Nested<F, G>, A>.map(f: (A) -> B): Kind<Nested<F, G>, B> = this@ComposedFunctor.F().run {
+        this@Functor.map(unnest(), { this@ComposedFunctor.G().run { this@Functor.map(it, f) } }).nest()
     }
 
-    fun <A, B> mapC(fa: Kind<F, Kind<G, A>>, f: (A) -> B): Kind<F, Kind<G, B>> = map(fa.nest(), f).unnest()
+    fun <A, B> mapC(fa: Kind<F, Kind<G, A>>, f: (A) -> B): Kind<F, Kind<G, B>> = fa.nest().map(f).unnest()
 
     companion object {
         operator fun <F, G> invoke(FF: Functor<F>, GF: Functor<G>): Functor<Nested<F, G>> =
@@ -171,13 +171,13 @@ interface ComposedApplicative<F, G> : Applicative<Nested<F, G>>, ComposedFunctor
 
     override fun G(): Applicative<G>
 
-    override fun <A, B> map(fa: Kind<Nested<F, G>, A>, f: (A) -> B): Kind<Nested<F, G>, B> =
-            fa.ap(pure(f))
+    override fun <A, B> Kind<Nested<F, G>, A>.map(f: (A) -> B): Kind<Nested<F, G>, B> =
+            ap(pure(f))
 
     override fun <A> pure(a: A): Kind<Nested<F, G>, A> = F().pure(G().pure(a)).nest()
 
     override fun <A, B> Kind<Nested<F, G>, A>.ap(ff: Kind<Nested<F, G>, (A) -> B>): Kind<Nested<F, G>, B> =
-            F().run { unnest().ap(map(ff.unnest(), { gfa: Kind<G, (A) -> B> -> { ga: Kind<G, A> -> G().run { ga.ap(gfa) } } })) }.nest()
+            F().run { unnest().ap(ff.unnest().map({ gfa: Kind<G, (A) -> B> -> { ga: Kind<G, A> -> G().run { ga.ap(gfa) } } })) }.nest()
 
     fun <A, B> apC(fa: Kind<F, Kind<G, A>>, ff: Kind<F, Kind<G, (A) -> B>>): Kind<F, Kind<G, B>> = fa.nest().ap(ff.nest()).unnest()
 

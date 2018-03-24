@@ -83,11 +83,11 @@ fun <M, S, A> Free<S, A>.foldMap(f: FunctionK<S, M>, MM: Monad<M>): Kind<M, A> =
         val x = it.step()
         when (x) {
             is Free.Pure<S, A> -> pure(Either.Right(x.a))
-            is Free.Suspend<S, A> -> map(f(x.a), { Either.Right(it) })
+            is Free.Suspend<S, A> -> f(x.a).map({ Either.Right(it) })
             is Free.FlatMapped<S, A, *> -> {
                 val g = (x.fm as (A) -> Free<S, A>)
                 val c = x.c as Free<S, A>
-                map(c.foldMap(f, MM), { cc -> Either.Left(g(cc)) })
+                c.foldMap(f, MM).map({ cc -> Either.Left(g(cc)) })
             }
         }
     }

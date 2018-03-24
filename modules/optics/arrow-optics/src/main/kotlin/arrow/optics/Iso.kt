@@ -71,8 +71,8 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
      */
     fun <F> mapping(FF: Functor<F>): PIso<Kind<F, S>, Kind<F, T>, Kind<F, A>, Kind<F, B>> = FF.run {
         PIso(
-                { fa -> map(fa, ::get) },
-                { fb -> map(fb, ::reverseGet) }
+                { fa -> fa.map(::get) },
+                { fb -> fb.map(::reverseGet) }
         )
     }
 
@@ -80,14 +80,14 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
      * Modify polymorphically the target of a [PIso] with a Functor function
      */
     fun <F> modifyF(FF: Functor<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FF.run {
-        map(f(get(s)), ::reverseGet)
+        f(get(s)).map(::reverseGet)
     }
 
     /**
      * Lift a function [f] with a functor: `(A) -> Kind<F, B> to the context of `S`: `(S) -> Kind<F, T>`
      */
     fun <F> liftF(FF: Functor<F>, f: (A) -> Kind<F, B>): (S) -> Kind<F, T> = FF.run {
-        { s -> map(f(get(s)), ::reverseGet) }
+        { s -> f(get(s)).map(::reverseGet) }
     }
 
     /**
@@ -250,7 +250,7 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
      */
     fun asTraversal(): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
         override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FA.run {
-            map(f(get(s)), this@PIso::reverseGet)
+            f(get(s)).map(this@PIso::reverseGet)
         }
     }
 
@@ -259,8 +259,8 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
      */
     fun <F> mapping(FF: Functor<F>, dummy: Unit = Unit): PIso<Kind<F, S>, Kind<F, T>, Kind<F, A>, Kind<F, B>> = FF.run {
         PIso(
-                { fa -> map(fa, ::get) },
-                { fb -> map(fb, ::reverseGet) }
+                { fa -> fa.map(::get) },
+                { fb -> fb.map(::reverseGet) }
         )
     }
 

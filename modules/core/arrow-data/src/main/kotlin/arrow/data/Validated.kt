@@ -177,7 +177,7 @@ fun <E, A, B> Validated<E, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>)
 
 fun <G, E, A, B> Validated<E, A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Validated<E, B>> = GA.run {
     when (this@traverse) {
-        is Valid -> map(f(a), { Valid(it) })
+        is Valid -> f(a).map({ Valid(it) })
         is Invalid -> pure(this@traverse)
 
     }

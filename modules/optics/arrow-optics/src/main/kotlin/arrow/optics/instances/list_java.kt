@@ -21,7 +21,7 @@ interface ListEachInstance<A> : Each<List<A>, A> {
                 ListK.traverse().run {
                     FA.run {
                         traverse(s.k(), f).let {
-                            map(it) {
+                            it.map() {
                                 it.list
                             }
                         }
@@ -43,7 +43,7 @@ interface ListFilterIndexInstance<A> : FilterIndex<List<A>, Int, A> {
                             if (p(j)) f(a) else pure(a)
                         })
                                 .let {
-                                    map(it) {
+                                    it.map() {
                                         it.list
                                     }
                                 }

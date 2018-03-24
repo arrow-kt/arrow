@@ -42,12 +42,12 @@ interface MapKFilterIndexInstance<K, V> : FilterIndex<MapKOf<K, V>, K, V> {
         override fun <F> modifyF(FA: Applicative<F>, s: Kind<Kind<ForMapK, K>, V>, f: (V) -> Kind<F, V>): Kind<F, Kind<Kind<ForMapK, K>, V>> = FA.run {
             ListK.traverse().run {
                 traverse(s.fix().map.toList().k(), { (k, v) ->
-                    map(if (p(k)) f(v) else pure(v)) {
+                    (if (p(k)) f(v) else pure(v)).map() {
                         k to it
                     }
                 })
             }.let {
-                map(it) {
+                it.map() {
                     it.toMap().k()
                 }
             }

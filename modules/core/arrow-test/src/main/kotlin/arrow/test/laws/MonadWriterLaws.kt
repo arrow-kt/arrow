@@ -48,7 +48,7 @@ object MonadWriterLaws {
     fun <F, W> MonadWriter<F, W>.monadWriterListenWriter(genTupleWA: Gen<Tuple2<W, Int>>,
                                                                                EqTupleWA: Eq<Kind<F, Tuple2<W, Int>>>): Unit {
         forAll(genTupleWA, { tupleWA: Tuple2<W, Int> ->
-            writer(tupleWA).listen().equalUnderTheLaw(map(tell(tupleWA.a), { tupleWA }), EqTupleWA)
+            writer(tupleWA).listen().equalUnderTheLaw(tell(tupleWA.a).map({ tupleWA }), EqTupleWA)
         })
     }
 }
