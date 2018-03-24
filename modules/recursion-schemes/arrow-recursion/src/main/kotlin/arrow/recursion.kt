@@ -1,6 +1,5 @@
 package arrow
 
-import arrow.instances.ComposedFunctor
 import arrow.recursion.typeclass.Birecursive
 import arrow.typeclasses.*
 
