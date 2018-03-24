@@ -4,12 +4,7 @@ import arrow.Algebra
 import arrow.AlgebraM
 import arrow.Kind
 import arrow.hylo
-import arrow.instances.ComposedFunctor
-import arrow.instances.ComposedTraverse
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.Nested
-import arrow.typeclasses.Traverse
+import arrow.typeclasses.*
 
 interface Recursive<F, G> {
     fun projectT(fg: Kind<F, G>): Kind<Nested<F, G>, Kind<F, G>>
