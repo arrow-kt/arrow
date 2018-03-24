@@ -24,14 +24,16 @@ data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTOf<F, W, 
 
         operator fun <F, W, A> invoke(value: Kind<F, Tuple2<W, A>>): WriterT<F, W, A> = WriterT(value)
 
-        fun <F, W, A> putT(FF: Functor<F>, vf: Kind<F, A>, w: W): WriterT<F, W, A> =
-                WriterT(FF.map(vf, { v -> Tuple2(w, v) }))
+        fun <F, W, A> putT(FF: Functor<F>, vf: Kind<F, A>, w: W): WriterT<F, W, A> = FF.run {
+            WriterT(map(vf, { v -> Tuple2(w, v) }))
+        }
 
         fun <F, W, A> put(AF: Applicative<F>, a: A, w: W): WriterT<F, W, A> =
                 putT(AF, AF.pure(a), w)
 
-        fun <F, W, A> putT2(FF: Functor<F>, vf: Kind<F, A>, w: W): WriterT<F, W, A> =
-                WriterT(FF.map(vf, { v -> Tuple2(w, v) }))
+        fun <F, W, A> putT2(FF: Functor<F>, vf: Kind<F, A>, w: W): WriterT<F, W, A> = FF.run {
+            WriterT(map(vf, { v -> Tuple2(w, v) }))
+        }
 
         fun <F, W, A> put2(AF: Applicative<F>, a: A, w: W): WriterT<F, W, A> =
                 putT2(AF, AF.pure(a), w)
@@ -48,35 +50,42 @@ data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTOf<F, W, 
 
         fun <F, W, A> empty(MMF: MonoidK<F>): WriterTOf<F, W, A> = WriterT(MMF.empty())
 
-        fun <F, W, A> pass(fa: Kind<WriterTPartialOf<F, W>, Tuple2<(W) -> W, A>>, MF: Monad<F>): WriterT<F, W, A> =  MF.run {
+        fun <F, W, A> pass(fa: Kind<WriterTPartialOf<F, W>, Tuple2<(W) -> W, A>>, MF: Monad<F>): WriterT<F, W, A> = MF.run {
             WriterT(fa.fix().content(this).flatMap({ tuple2FA -> map(fa.fix().write(this), { l -> Tuple2(tuple2FA.a(l), tuple2FA.b) }) }))
         }
 
-        fun <F, W, A, B> tailRecM(a: A, f: (A) -> Kind<WriterTPartialOf<F, W>, Either<A, B>>, MF: Monad<F>): WriterT<F, W, B> =
-                WriterT(MF.tailRecM(a, {
-                    MF.map(f(it).fix().value) {
-                        val value = it.b
-                        when (value) {
-                            is Either.Left<A, B> -> Either.Left(value.a)
-                            is Either.Right<A, B> -> Either.Right(it.a toT value.b)
-                        }
+        fun <F, W, A, B> tailRecM(a: A, f: (A) -> Kind<WriterTPartialOf<F, W>, Either<A, B>>, MF: Monad<F>): WriterT<F, W, B> = MF.run {
+            WriterT(tailRecM(a, {
+                map(f(it).fix().value) {
+                    val value = it.b
+                    when (value) {
+                        is Either.Left<A, B> -> Either.Left(value.a)
+                        is Either.Right<A, B> -> Either.Right(it.a toT value.b)
                     }
-                }))
+                }
+            }))
+        }
     }
 
     fun tell(w: W, SG: Semigroup<W>, MF: Monad<F>): WriterT<F, W, A> = mapAcc(MF, { SG.run { it.combine(w) } })
 
-    fun listen(MF: Monad<F>): Kind<WriterTPartialOf<F, W>, Tuple2<W, A>> =  MF.run {
+    fun listen(MF: Monad<F>): Kind<WriterTPartialOf<F, W>, Tuple2<W, A>> = MF.run {
         WriterT(content(this).flatMap({ a -> map(write(this), { l -> Tuple2(l, Tuple2(l, a)) }) }))
     }
 
-    fun content(FF: Functor<F>): Kind<F, A> = FF.map(value, { it.b })
+    fun content(FF: Functor<F>): Kind<F, A> = FF.run {
+        map(value, { it.b })
+    }
 
-    fun write(FF: Functor<F>): Kind<F, W> = FF.map(value, { it.a })
+    fun write(FF: Functor<F>): Kind<F, W> = FF.run {
+        map(value, { it.a })
+    }
 
     fun reset(MF: Monad<F>, MM: Monoid<W>): WriterT<F, W, A> = mapAcc(MF, { MM.empty() })
 
-    fun <B> map(FF: Functor<F>, f: (A) -> B): WriterT<F, W, B> = WriterT(FF.map(value, { it.a toT f(it.b) }))
+    fun <B> map(FF: Functor<F>, f: (A) -> B): WriterT<F, W, B> = FF.run {
+        WriterT(map(value, { it.a toT f(it.b) }))
+    }
 
     inline fun <U> mapAcc(MF: Monad<F>, crossinline f: (W) -> U): WriterT<F, U, A> = transform({ f(it.a) toT it.b }, MF)
 

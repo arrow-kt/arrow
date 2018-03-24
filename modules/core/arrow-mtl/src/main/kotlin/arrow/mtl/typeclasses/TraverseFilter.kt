@@ -12,8 +12,9 @@ interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F> {
     override fun <A, B> Kind<F, A>.mapFilter(f: (A) -> Option<B>): Kind<F, B> =
             Id.applicative().traverseFilter(this@mapFilter, { Id(f(it)) }).value()
 
-    fun <G, A> Kind<F, A>.filterA(f: (A) -> Kind<G, Boolean>, GA: Applicative<G>): Kind<G, Kind<F, A>> =
-            GA.traverseFilter(this, { a -> GA.map(f(a), { b -> if (b) Some(a) else None }) })
+    fun <G, A> Kind<F, A>.filterA(f: (A) -> Kind<G, Boolean>, GA: Applicative<G>): Kind<G, Kind<F, A>> = GA.run {
+        traverseFilter(this@filterA, { a -> map(f(a), { b -> if (b) Some(a) else None }) })
+    }
 
     override fun <A> Kind<F, A>.filter(f: (A) -> Boolean): Kind<F, A> =
             this.filterA({ Id(f(it)) }, Id.applicative()).value()

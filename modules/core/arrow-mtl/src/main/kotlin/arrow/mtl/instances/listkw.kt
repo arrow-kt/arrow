@@ -28,7 +28,7 @@ interface ListKMonadCombineInstance : MonadCombine<ForListK> {
             ListK.tailRecM(a, f)
 
     override fun <A, B> map(fa: ListKOf<A>, f: kotlin.Function1<A, B>): ListK<B> =
-            fa.fix().map(f)
+            this@map.fix().map(f)
 
     override fun <A, B, Z> Kind<ForListK, A>.map2(fb: Kind<ForListK, B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
             fix().map2(fb, f)
@@ -46,7 +46,7 @@ interface ListKFunctorFilterInstance : FunctorFilter<ForListK> {
             this@mapFilter.fix().mapFilter(f)
 
     override fun <A, B> map(fa: ListKOf<A>, f: kotlin.Function1<A, B>): ListK<B> =
-            fa.fix().map(f)
+            this@map.fix().map(f)
 }
 
 @instance(ListK::class)
@@ -67,7 +67,7 @@ interface ListKMonadFilterInstance : MonadFilter<ForListK> {
             ListK.tailRecM(a, f)
 
     override fun <A, B> map(fa: ListKOf<A>, f: kotlin.Function1<A, B>): ListK<B> =
-            fa.fix().map(f)
+            this@map.fix().map(f)
 
     override fun <A, B, Z> Kind<ForListK, A>.map2(fb: Kind<ForListK, B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
             fix().map2(fb, f)

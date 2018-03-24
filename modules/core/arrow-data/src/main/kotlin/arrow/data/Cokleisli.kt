@@ -9,20 +9,20 @@ typealias CokleisliFun<F, A, B> = (Kind<F, A>) -> B
 typealias CoreaderT<F, A, B> = Cokleisli<F, A, B>
 
 @higherkind
-data class Cokleisli<F, A, B>(val MM: Comonad<F>, val run: CokleisliFun<F, A, B>) : CokleisliOf<F, A, B>, CokleisliKindedJ<F, A, B> {
+data class Cokleisli<F, A, B>(val MM: Comonad<F>, val run: CokleisliFun<F, A, B>) : CokleisliOf<F, A, B>, CokleisliKindedJ<F, A, B>, Comonad<F> by MM {
 
-    inline fun <C, D> bimap(noinline g: (D) -> A, crossinline f: (B) -> C): Cokleisli<F, D, C> = Cokleisli(MM, { f(run(MM.map(it, g))) })
+    inline fun <C, D> bimap(noinline g: (D) -> A, crossinline f: (B) -> C): Cokleisli<F, D, C> = Cokleisli(MM, { f(run(map(it, g))) })
 
-    fun <D> lmap(g: (D) -> A): Cokleisli<F, D, B> = Cokleisli(MM, { run(MM.map(it, g)) })
+    fun <D> lmap(g: (D) -> A): Cokleisli<F, D, B> = Cokleisli(MM, { run(map(it, g)) })
 
     inline fun <C> map(crossinline f: (B) -> C): Cokleisli<F, A, C> = Cokleisli(MM, { f(run(it)) })
 
     inline fun <C> contramapValue(crossinline f: (Kind<F, C>) -> Kind<F, A>): Cokleisli<F, C, B> = Cokleisli(MM, { run(f(it)) })
 
-    fun <D> compose(a: Cokleisli<F, D, A>): Cokleisli<F, D, B> = Cokleisli(MM, { run(MM.coflatMap(it, a.run)) })
+    fun <D> compose(a: Cokleisli<F, D, A>): Cokleisli<F, D, B> = Cokleisli(MM, { run(coflatMap(it, a.run)) })
 
     @JvmName("andThenK")
-    fun <C> andThen(a: Kind<F, C>): Cokleisli<F, A, C> = Cokleisli(MM, { MM.run { a.extract() } })
+    fun <C> andThen(a: Kind<F, C>): Cokleisli<F, A, C> = Cokleisli(MM, { run { a.extract() } })
 
     fun <C> andThen(a: Cokleisli<F, B, C>): Cokleisli<F, A, C> = a.compose(this)
 

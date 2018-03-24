@@ -69,22 +69,26 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
     /**
      * Lift a [PIso] to a Functor level
      */
-    fun <F> mapping(FF: Functor<F>): PIso<Kind<F, S>, Kind<F, T>, Kind<F, A>, Kind<F, B>> = PIso(
-            { fa -> FF.map(fa, this::get) },
-            { fb -> FF.map(fb, this::reverseGet) }
-    )
+    fun <F> mapping(FF: Functor<F>): PIso<Kind<F, S>, Kind<F, T>, Kind<F, A>, Kind<F, B>> = FF.run {
+        PIso(
+                { fa -> map(fa, ::get) },
+                { fb -> map(fb, ::reverseGet) }
+        )
+    }
 
     /**
      * Modify polymorphically the target of a [PIso] with a Functor function
      */
-    fun <F> modifyF(FF: Functor<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> =
-            FF.map(f(get(s)), this::reverseGet)
+    fun <F> modifyF(FF: Functor<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FF.run {
+        map(f(get(s)), ::reverseGet)
+    }
 
     /**
      * Lift a function [f] with a functor: `(A) -> Kind<F, B> to the context of `S`: `(S) -> Kind<F, T>`
      */
-    fun <F> liftF(FF: Functor<F>, f: (A) -> Kind<F, B>): (S) -> Kind<F, T> =
-            { s -> FF.map(f(get(s)), this::reverseGet) }
+    fun <F> liftF(FF: Functor<F>, f: (A) -> Kind<F, B>): (S) -> Kind<F, T> = FF.run {
+        { s -> map(f(get(s)), ::reverseGet) }
+    }
 
     /**
      * Reverse a [PIso]: the source becomes the target and the target becomes the source
@@ -245,17 +249,20 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
      * View a [PIso] as a [PTraversal]
      */
     fun asTraversal(): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
-        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> =
-                FA.map(f(get(s)), this@PIso::reverseGet)
+        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FA.run {
+            map(f(get(s)), this@PIso::reverseGet)
+        }
     }
 
     /**
      * Lift a [PIso] to a Functor level
      */
-    fun <F> mapping(FF: Functor<F>, dummy: Unit = Unit): PIso<Kind<F, S>, Kind<F, T>, Kind<F, A>, Kind<F, B>> = PIso(
-            { fa -> FF.map(fa, this::get) },
-            { fb -> FF.map(fb, this::reverseGet) }
-    )
+    fun <F> mapping(FF: Functor<F>, dummy: Unit = Unit): PIso<Kind<F, S>, Kind<F, T>, Kind<F, A>, Kind<F, B>> = FF.run {
+        PIso(
+                { fa -> map(fa, ::get) },
+                { fb -> map(fb, ::reverseGet) }
+        )
+    }
 
     /**
      * Check if the focus satisfies the predicate

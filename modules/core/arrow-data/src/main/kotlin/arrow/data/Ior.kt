@@ -144,8 +144,9 @@ sealed class Ior<A, B> : IorOf<A, B> {
     fun <C> foldRight(lc: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
             fold({ lc }, { f(it, lc) }, { _, b -> f(b, lc) })
 
-    fun <G, C> traverse(f: (B) -> Kind<G, C>, GA: Applicative<G>): Kind<G, Ior<A, C>> =
-            fold({ GA.pure(Left(it)) }, { GA.map(f(it), { Right<A, C>(it) }) }, { _, b -> GA.map(f(b), { Right<A, C>(it) }) })
+    fun <G, C> traverse(f: (B) -> Kind<G, C>, GA: Applicative<G>): Kind<G, Ior<A, C>> = GA.run {
+        fold({ pure(Left(it)) }, { map(f(it), { Right<A, C>(it) }) }, { _, b -> map(f(b), { Right<A, C>(it) }) })
+    }
 
     /**
      * The given function is applied if this is a [Right] or [Both] to `B`.

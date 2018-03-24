@@ -70,7 +70,7 @@ interface OptionShowInstance<A> : Show<Option<A>> {
 @instance(Option::class)
 interface OptionFunctorInstance : Functor<ForOption> {
     override fun <A, B> map(fa: OptionOf<A>, f: kotlin.Function1<A, B>): Option<B> =
-            fa.fix().map(f)
+            this@map.fix().map(f)
 }
 
 @instance(Option::class)
@@ -79,7 +79,7 @@ interface OptionApplicativeInstance : Applicative<ForOption> {
             fix().ap(ff)
 
     override fun <A, B> map(fa: OptionOf<A>, f: kotlin.Function1<A, B>): Option<B> =
-            fa.fix().map(f)
+            this@map.fix().map(f)
 
     override fun <A> pure(a: A): Option<A> =
             Option.pure(a)
@@ -97,7 +97,7 @@ interface OptionMonadInstance : Monad<ForOption> {
             Option.tailRecM(a, f)
 
     override fun <A, B> map(fa: OptionOf<A>, f: kotlin.Function1<A, B>): Option<B> =
-            fa.fix().map(f)
+            this@map.fix().map(f)
 
     override fun <A> pure(a: A): Option<A> =
             Option.pure(a)
@@ -124,15 +124,16 @@ interface OptionFoldableInstance : Foldable<ForOption> {
             fa.fix().nonEmpty()
 }
 
-fun <A, G, B> Option<A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Option<B>> =
-        this.fix().let { option ->
+fun <A, G, B> OptionOf<A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Option<B>> = GA.run {
+        fix().let { option ->
             when (option) {
-                is Some -> GA.map(f(option.t), { Some(it) })
-                is None -> GA.pure(None)
+                is Some -> map(f(option.t), { Some(it) })
+                is None -> pure(None)
             }
         }
+}
 
-fun <A, G, B> Option<A>.traverseFilter(f: (A) -> Kind<G, Option<B>>, GA: Applicative<G>): Kind<G, Option<B>> =
+fun <A, G, B> OptionOf<A>.traverseFilter(f: (A) -> Kind<G, Option<B>>, GA: Applicative<G>): Kind<G, Option<B>> =
         this.fix().let { option ->
             when (option) {
                 is Some -> f(option.t)
@@ -143,7 +144,7 @@ fun <A, G, B> Option<A>.traverseFilter(f: (A) -> Kind<G, Option<B>>, GA: Applica
 @instance(Option::class)
 interface OptionTraverseInstance : Traverse<ForOption> {
     override fun <A, B> map(fa: OptionOf<A>, f: kotlin.Function1<A, B>): Option<B> =
-            fa.fix().map(f)
+            this@map.fix().map(f)
 
     override fun <G, A, B> Applicative<G>.traverse(fa: Kind<ForOption, A>, f: (A) -> Kind<G, B>): Kind<G, Option<B>> =
             fa.fix().traverse(f, this)

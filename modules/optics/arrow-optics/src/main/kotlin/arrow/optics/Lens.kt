@@ -66,8 +66,9 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
     /**
      * Modify the focus of a [PLens] using Functor function
      */
-    fun <F> modifyF(FF: Functor<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> =
-            FF.map(f(get(s)), { b -> set(s, b) })
+    fun <F> modifyF(FF: Functor<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> =  FF.run {
+        map(f(get(s)), { b -> set(s, b) })
+    }
 
     /**
      * Lift a function [f]: `(A) -> Kind<F, B> to the context of `S`: `(S) -> Kind<F, T>`
@@ -198,8 +199,9 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
      * View a [PLens] as a [PTraversal]
      */
     fun asTraversal(): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
-        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> =
-                FA.map(f(get(s)), { b -> this@PLens.set(s, b) })
+        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FA.run {
+            map(f(get(s)), { b -> this@PLens.set(s, b) })
+        }
     }
 
     /**

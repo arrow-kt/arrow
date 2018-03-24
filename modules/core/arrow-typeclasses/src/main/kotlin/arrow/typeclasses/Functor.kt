@@ -1,6 +1,6 @@
 package arrow.typeclasses
 
-import arrow.*
+import arrow.Kind
 import arrow.core.Tuple2
 
 interface Functor<F> {
@@ -22,6 +22,5 @@ interface Functor<F> {
 
     fun <A, B> tupleRight(fa: Kind<F, A>, b: B): Kind<F, Tuple2<A, B>> = map(fa, { a -> Tuple2(a, b) })
 
+    fun <B, A : B> Kind<F, A>.widen(): Kind<F, B> = this
 }
-
-fun <F, B, A : B> Functor<F>.widen(fa: Kind<F, A>): Kind<F, B> = fa

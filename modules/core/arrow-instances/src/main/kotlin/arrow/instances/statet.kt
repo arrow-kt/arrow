@@ -12,7 +12,7 @@ interface StateTFunctorInstance<F, S> : Functor<StateTPartialOf<F, S>> {
 
     fun FF(): Functor<F>
 
-    override fun <A, B> map(fa: StateTOf<F, S, A>, f: (A) -> B): StateT<F, S, B> = fa.fix().map(f, FF())
+    override fun <A, B> map(fa: StateTOf<F, S, A>, f: (A) -> B): StateT<F, S, B> = fa.fix().map(f, this@StateTFunctorInstance.FF())
 
 }
 
@@ -21,7 +21,7 @@ interface StateTApplicativeInstance<F, S> : StateTFunctorInstance<F, S>, Applica
 
     override fun FF(): Monad<F>
 
-    override fun <A, B> map(fa: StateTOf<F, S, A>, f: (A) -> B): StateT<F, S, B> = fa.fix().map(f, FF())
+    override fun <A, B> map(fa: StateTOf<F, S, A>, f: (A) -> B): StateT<F, S, B> = fa.fix().map(f, this@StateTApplicativeInstance.FF())
 
     override fun <A> pure(a: A): StateT<F, S, A> = StateT(FF().pure({ s: S -> FF().pure(Tuple2(s, a)) }))
 
@@ -36,7 +36,7 @@ interface StateTApplicativeInstance<F, S> : StateTFunctorInstance<F, S>, Applica
 @instance(StateT::class)
 interface StateTMonadInstance<F, S> : StateTApplicativeInstance<F, S>, Monad<StateTPartialOf<F, S>> {
 
-    override fun <A, B> map(fa: StateTOf<F, S, A>, f: (A) -> B): StateT<F, S, B> = fa.fix().map(f, FF())
+    override fun <A, B> map(fa: StateTOf<F, S, A>, f: (A) -> B): StateT<F, S, B> = fa.fix().map(f, this@StateTMonadInstance.FF())
 
     override fun <A, B> Kind<StateTPartialOf<F, S>, A>.flatMap(f: (A) -> Kind<StateTPartialOf<F, S>, B>): StateT<F, S, B> =
             fix().flatMap(f, FF())

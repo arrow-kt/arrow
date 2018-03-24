@@ -116,7 +116,7 @@ interface NonEmptyListFoldableInstance : Foldable<ForNonEmptyList> {
 @instance(NonEmptyList::class)
 interface NonEmptyListTraverseInstance : Traverse<ForNonEmptyList> {
     override fun <A, B> map(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, B>): NonEmptyList<B> =
-            fa.fix().map(f)
+            this@map.fix().map(f)
 
     override fun <G, A, B> Applicative<G>.traverse(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, Kind<G, B>>): Kind<G, NonEmptyList<B>> =
             fa.fix().traverse(this, f)

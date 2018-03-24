@@ -13,7 +13,7 @@ interface ComposedFunctorFilter<F, G> : FunctorFilter<Nested<F, G>>, ComposedFun
     override fun G(): FunctorFilter<G>
 
     override fun <A, B> Kind<Nested<F, G>, A>.mapFilter(f: (A) -> Option<B>): Kind<Nested<F, G>, B> =
-            this@ComposedFunctorFilter.F().map(unnest(), { this@ComposedFunctorFilter.G().run { it.mapFilter(f) } }).nest()
+            F().run { map(unnest(), { G().run { it.mapFilter(f) } }).nest() }
 
     fun <A, B> mapFilterC(fga: Kind<F, Kind<G, A>>, f: (A) -> Option<B>): Kind<F, Kind<G, B>> =
             fga.nest().mapFilter(f).unnest()

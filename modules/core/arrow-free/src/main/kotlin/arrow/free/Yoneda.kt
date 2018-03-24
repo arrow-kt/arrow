@@ -20,8 +20,8 @@ abstract class Yoneda<F, A> : YonedaOf<F, A>, YonedaKindedJ<F, A> {
 
     companion object {
         operator fun <U, A> invoke(fa: Kind<U, A>, FF: Functor<U>): Yoneda<U, A> =
-                object : Yoneda<U, A>() {
-                    override fun <B> invoke(f: (A) -> B): Kind<U, B> = FF.map(fa, f)
+                object : Yoneda<U, A>(), Functor<U> by FF {
+                    override fun <B> invoke(f: (A) -> B): Kind<U, B> = map(fa, f)
                 }
     }
 }

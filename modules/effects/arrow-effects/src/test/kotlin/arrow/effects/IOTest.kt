@@ -208,20 +208,23 @@ class IOTest : UnitSpec() {
             }
         }
 
-        "should map values correctly on success" {
-            val run = IO.functor().map(IO.pure(1)) { it + 1 }.unsafeRunSync()
+        with (IO.monad()) {
 
-            val expected = 2
+            "should map values correctly on success" {
+                val run = IO.pure(1).map() { it + 1 }.unsafeRunSync()
 
-            run shouldBe expected
-        }
+                val expected = 2
 
-        "should flatMap values correctly on success" {
-            val run = IO.monad().run { IO.pure(1).flatMap() { num -> IO { num + 1 } }.unsafeRunSync() }
+                run shouldBe expected
+            }
 
-            val expected = 2
+            "should flatMap values correctly on success" {
+                val run = pure(1).flatMap { num -> IO { num + 1 } }.unsafeRunSync()
 
-            run shouldBe expected
+                val expected = 2
+
+                run shouldBe expected
+            }
         }
 
         "invoke is called on every run call" {

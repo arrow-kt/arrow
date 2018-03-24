@@ -14,6 +14,7 @@ import arrow.typeclasses.Traverse
  * and restricts the [PTraversal] to monomorphic updates.
  */
 typealias Traversal<S, A> = PTraversal<S, S, A, A>
+
 typealias ForTraversal = ForPTraversal
 typealias TraversalOf<S, A> = PTraversalOf<S, S, A, A>
 typealias TraversalPartialOf<S> = Kind<ForTraversal, S>
@@ -39,8 +40,9 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
         fun <S> id() = Iso.id<S>().asTraversal()
 
         fun <S> codiagonal(): Traversal<Either<S, S>, S> = object : Traversal<Either<S, S>, S> {
-            override fun <F> modifyF(FA: Applicative<F>, s: Either<S, S>, f: (S) -> Kind<F, S>): Kind<F, Either<S, S>> =
-                    s.bimap(f, f).fold({ fa -> FA.map(fa, { a -> Either.Left(a) }) }, { fa -> FA.map(fa, { a -> Either.Right(a) }) })
+            override fun <F> modifyF(FA: Applicative<F>, s: Either<S, S>, f: (S) -> Kind<F, S>): Kind<F, Either<S, S>> = FA.run {
+                s.bimap(f, f).fold({ fa -> map(fa, { a -> Either.Left(a) }) }, { fa -> map(fa, { a -> Either.Right(a) }) })
+            }
         }
 
         /**
@@ -245,10 +247,12 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
     fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s, { b -> Const(Some(b)) }).value
 
     fun <U, V> choice(other: PTraversal<U, V, A, B>): PTraversal<Either<S, U>, Either<T, V>, A, B> = object : PTraversal<Either<S, U>, Either<T, V>, A, B> {
-        override fun <F> modifyF(FA: Applicative<F>, s: Either<S, U>, f: (A) -> Kind<F, B>): Kind<F, Either<T, V>> = s.fold(
-                { a -> FA.map(this@PTraversal.modifyF(FA, a, f)) { Either.Left(it) } },
-                { u -> FA.map(other.modifyF(FA, u, f)) { Either.Right(it) } }
-        )
+        override fun <F> modifyF(FA: Applicative<F>, s: Either<S, U>, f: (A) -> Kind<F, B>): Kind<F, Either<T, V>> = FA.run {
+            s.fold(
+                    { a -> map(this@PTraversal.modifyF(FA, a, f)) { Either.Left(it) } },
+                    { u -> map(other.modifyF(FA, u, f)) { Either.Right(it) } }
+            )
+        }
     }
 
     /**

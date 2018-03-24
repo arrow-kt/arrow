@@ -45,8 +45,9 @@ class TypeclasslessExamples : FreeSpec() {
         fun <A> A.pure(): Kind<F, A> =
                 AP().pure(this)
 
-        fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> =
-                AP().map(this, f)
+        fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> = AP().run {
+            map(this@map, f)
+        }
     }
 
     fun <F> Applicative<F>.s() =

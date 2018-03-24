@@ -127,7 +127,7 @@ fun <A> A.nel(): NonEmptyList<A> = NonEmptyList.of(this)
 fun <A> NonEmptyList<A>.combineK(y: NonEmptyListOf<A>): NonEmptyList<A> = this.plus(y.fix())
 
 private val ListKTraverse: Traverse<ForListK> = object : Traverse<ForListK> {
-    override fun <A, B> map(fa: ListKOf<A>, f: kotlin.Function1<A, B>): ListK<B> =
+    override fun <A, B> map(fa: Kind<ForListK, A>, f: (A) -> B): ListK<B> =
             fa.fix().map(f)
 
     override fun <G, A, B> Applicative<G>.traverse(fa: ListKOf<A>, f: kotlin.Function1<A, Kind<G, B>>): Kind<G, ListK<B>> =

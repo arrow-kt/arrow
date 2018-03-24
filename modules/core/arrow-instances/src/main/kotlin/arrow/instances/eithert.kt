@@ -20,7 +20,7 @@ interface EitherTApplicativeInstance<F, L> : EitherTFunctorInstance<F, L>, Appli
 
     override fun <A> pure(a: A): EitherT<F, L, A> = EitherT.pure(a, MF())
 
-    override fun <A, B> map(fa: EitherTOf<F, L, A>, f: (A) -> B): EitherT<F, L, B> = fa.fix().map({ f(it) }, MF())
+    override fun <A, B> map(fa: EitherTOf<F, L, A>, f: (A) -> B): EitherT<F, L, B> = fa.fix().map({ f(it) }, this@EitherTApplicativeInstance.MF())
 
     override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.ap(ff: Kind<EitherTPartialOf<F, L>, (A) -> B>): EitherT<F, L, B> =
             fix().ap(ff, MF())

@@ -40,7 +40,9 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
      * @param f the function to apply.
      * @param FF [Functor] for the context [F].
      */
-    fun <B> map(f: (A) -> B, FF: Functor<F>): Kleisli<F, D, B> = Kleisli { a -> FF.map(run(a)) { f(it) } }
+    fun <B> map(f: (A) -> B, FF: Functor<F>): Kleisli<F, D, B> = FF.run {
+        Kleisli { a -> map(run(a)) { f(it) } }
+    }
 
     /**
      * FlatMap the end of the arrow [A] to another [Kleisli] arrow for the same start [D] and context [F].
@@ -105,7 +107,7 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
      * @param ME [MonadError] for the context [F].
      */
     fun <E> handleErrorWith(f: (E) -> KleisliOf<F, D, A>, ME: MonadError<F, E>): Kleisli<F, D, A> = Kleisli {
-        ME.run{ run(it).handleErrorWith({ e: E -> f(e).fix().run(it) }) }
+        ME.run { run(it).handleErrorWith({ e: E -> f(e).fix().run(it) }) }
     }
 
     companion object {
@@ -149,7 +151,6 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
         fun <F, D, E, A> raiseError(e: E, ME: MonadError<F, E>): Kleisli<F, D, A> = Kleisli { ME.raiseError(e) }
 
     }
-
 }
 
 /**

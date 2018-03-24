@@ -1,7 +1,10 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.Left
+import arrow.core.Right
 import arrow.higherkind
 import arrow.typeclasses.*
 
@@ -29,12 +32,13 @@ data class Coproduct<F, G, A>(val run: Either<Kind<F, A>, Kind<G, A>>) : Coprodu
     fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>, FG: Foldable<G>): Eval<B> =
             run.fold({ FF.foldRight(it, lb, f) }, { FG.foldRight(it, lb, f) })
 
-    fun <H, B> traverse(GA: Applicative<H>, FT: Traverse<F>, GT: Traverse<G>, f: (A) -> Kind<H, B>): Kind<H, Coproduct<F, G, B>> =
-            run.fold({
-                GA.map(FT.run { GA.traverse(it, f) }, { Coproduct<F, G, B>(Left(it)) })
-            }, {
-                GA.map(GT.run { GA.traverse(it, f) }, { Coproduct<F, G, B>(Right(it)) })
-            })
+    fun <H, B> traverse(GA: Applicative<H>, FT: Traverse<F>, GT: Traverse<G>, f: (A) -> Kind<H, B>): Kind<H, Coproduct<F, G, B>> = GA.run {
+        run.fold({
+            map(FT.run { GA.traverse(it, f) }, { Coproduct<F, G, B>(Left(it)) })
+        }, {
+            map(GT.run { GA.traverse(it, f) }, { Coproduct<F, G, B>(Right(it)) })
+        })
+    }
 
     companion object {
         inline operator fun <reified F, reified G, A> invoke(run: Either<Kind<F, A>, Kind<G, A>>): Coproduct<F, G, A> =

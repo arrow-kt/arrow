@@ -174,14 +174,14 @@ interface Applicative<F> : Functor<F> {
             a: Kind<F, A>,
             b: Kind<F, B>,
             lbd: (Tuple2<A, B>) -> Z): Kind<F, Z> =
-            this.map(a.product(b), lbd)
+            map(a.product(b), lbd)
 
     fun <A, B, C, Z> map(
             a: Kind<F, A>,
             b: Kind<F, B>,
             c: Kind<F, C>,
             lbd: (Tuple3<A, B, C>) -> Z): Kind<F, Z> =
-            this.map(a.product(b).product(c), lbd)
+            map(a.product(b).product(c), lbd)
 
     fun <A, B, C, D, Z> map(
             a: Kind<F, A>,
@@ -189,7 +189,7 @@ interface Applicative<F> : Functor<F> {
             c: Kind<F, C>,
             d: Kind<F, D>,
             lbd: (Tuple4<A, B, C, D>) -> Z): Kind<F, Z> =
-            this.map(a.product(b).product(c).product(d), lbd)
+            map(a.product(b).product(c).product(d), lbd)
 
     fun <A, B, C, D, E, Z> map(
             a: Kind<F, A>,
@@ -198,7 +198,7 @@ interface Applicative<F> : Functor<F> {
             d: Kind<F, D>,
             e: Kind<F, E>,
             lbd: (Tuple5<A, B, C, D, E>) -> Z): Kind<F, Z> =
-            this.map(a.product(b).product(c).product(d).product(e), lbd)
+            map(a.product(b).product(c).product(d).product(e), lbd)
 
     fun <A, B, C, D, E, FF, Z> map(
             a: Kind<F, A>,
@@ -208,7 +208,7 @@ interface Applicative<F> : Functor<F> {
             e: Kind<F, E>,
             f: Kind<F, FF>,
             lbd: (Tuple6<A, B, C, D, E, FF>) -> Z): Kind<F, Z> =
-            this.map(a.product(b).product(c).product(d).product(e).product(f), lbd)
+            map(a.product(b).product(c).product(d).product(e).product(f), lbd)
 
     fun <A, B, C, D, E, FF, G, Z> map(
             a: Kind<F, A>,
@@ -219,7 +219,7 @@ interface Applicative<F> : Functor<F> {
             f: Kind<F, FF>,
             g: Kind<F, G>,
             lbd: (Tuple7<A, B, C, D, E, FF, G>) -> Z): Kind<F, Z> =
-            this.map(a.product(b).product(c).product(d).product(e).product(f).product(g), lbd)
+            map(a.product(b).product(c).product(d).product(e).product(f).product(g), lbd)
 
     fun <A, B, C, D, E, FF, G, H, Z> map(
             a: Kind<F, A>,
@@ -231,7 +231,7 @@ interface Applicative<F> : Functor<F> {
             g: Kind<F, G>,
             h: Kind<F, H>,
             lbd: (Tuple8<A, B, C, D, E, FF, G, H>) -> Z): Kind<F, Z> =
-            this.map(a.product(b).product(c).product(d).product(e).product(f)
+            map(a.product(b).product(c).product(d).product(e).product(f)
                     .product(g).product(h), lbd)
 
     fun <A, B, C, D, E, FF, G, H, I, Z> map(
@@ -245,7 +245,7 @@ interface Applicative<F> : Functor<F> {
             h: Kind<F, H>,
             i: Kind<F, I>,
             lbd: (Tuple9<A, B, C, D, E, FF, G, H, I>) -> Z): Kind<F, Z> =
-            this.map(a.product(b).product(c).product(d).product(e).product(f)
+            map(a.product(b).product(c).product(d).product(e).product(f)
                     .product(g).product(h).product(i), lbd)
 
     fun <A, B, C, D, E, FF, G, H, I, J, Z> map(
@@ -260,7 +260,7 @@ interface Applicative<F> : Functor<F> {
             i: Kind<F, I>,
             j: Kind<F, J>,
             lbd: (Tuple10<A, B, C, D, E, FF, G, H, I, J>) -> Z): Kind<F, Z> =
-            this.map(a.product(b).product(c).product(d).product(e).product(f)
+            map(a.product(b).product(c).product(d).product(e).product(f)
                     .product(g).product(h).product(i).product(j), lbd)
 
 }

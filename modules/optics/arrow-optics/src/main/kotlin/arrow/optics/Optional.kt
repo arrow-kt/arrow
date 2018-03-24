@@ -89,10 +89,12 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
     /**
      * Modify the focus of a [POptional] with an Applicative function [f]
      */
-    fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = getOrModify(s).fold(
-            FA::pure,
-            { FA.map(f(it), { set(s, it) }) }
-    )
+    fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FA.run {
+        getOrModify(s).fold(
+                ::pure,
+                { map(f(it), { set(s, it) }) }
+        )
+    }
 
     /**
      * Lift a function [f]: `(A) -> Kind<F, B> to the context of `S`: `(S) -> Kind<F, T>`

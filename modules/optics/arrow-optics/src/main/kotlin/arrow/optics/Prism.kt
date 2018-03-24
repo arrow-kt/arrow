@@ -12,6 +12,7 @@ import arrow.typeclasses.Monoid
  * and restricts the [PPrism] to monomorphic updates.
  */
 typealias Prism<S, A> = PPrism<S, S, A, A>
+
 typealias ForPrism = ForPPrism
 typealias PrismOf<S, A> = PPrismOf<S, S, A, A>
 typealias PrismPartialOf<S> = Kind<ForPrism, S>
@@ -84,19 +85,23 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
     /**
      * Modify the focus of a [PPrism] with an [Applicative] function
      */
-    fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = getOrModify(s).fold(
-            FA::pure,
-            { FA.map(f(it), this::reverseGet) }
-    )
+    fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FA.run {
+        getOrModify(s).fold(
+                ::pure,
+                { map(f(it), ::reverseGet) }
+        )
+    }
 
     /**
      * Modify the focus of a [PPrism] with an [Applicative] function
      */
-    fun <F> liftF(FA: Applicative<F>, f: (A) -> Kind<F, B>): (S) -> Kind<F, T> = { s ->
-        getOrModify(s).fold(
-                FA::pure,
-                { FA.map(f(it), this::reverseGet) }
-        )
+    fun <F> liftF(FA: Applicative<F>, f: (A) -> Kind<F, B>): (S) -> Kind<F, T> = FA.run {
+        { s ->
+            getOrModify(s).fold(
+                    ::pure,
+                    { map(f(it), ::reverseGet) }
+            )
+        }
     }
 
     /**
@@ -219,12 +224,13 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
      * View a [PPrism] as a [PTraversal]
      */
     fun asTraversal(): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
-        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = getOrModify(s).fold(
-                FA::pure,
-                { FA.map(f(it), this@PPrism::reverseGet) }
-        )
+        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FA.run {
+            getOrModify(s).fold(
+                    ::pure,
+                    { map(f(it), this@PPrism::reverseGet) }
+            )
+        }
     }
-
 }
 
 /**

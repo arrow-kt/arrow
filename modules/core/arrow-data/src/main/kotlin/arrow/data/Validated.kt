@@ -175,11 +175,13 @@ fun <E, A, B> Validated<E, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>)
             is Invalid -> lb
         }
 
-fun <G, E, A, B> Validated<E, A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Validated<E, B>> =
-        when (this) {
-            is Valid -> GA.map(f(this.a), { Valid(it) })
-            is Invalid -> GA.pure(this)
-        }
+fun <G, E, A, B> Validated<E, A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Validated<E, B>> = GA.run {
+    when (this@traverse) {
+        is Valid -> map(f(a), { Valid(it) })
+        is Invalid -> pure(this@traverse)
+
+    }
+}
 
 inline fun <E, A> Validated<E, A>.combine(SE: Semigroup<E>,
                                           SA: Semigroup<A>,

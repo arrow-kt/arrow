@@ -40,7 +40,7 @@ interface SequenceKShowInstance<A> : Show<SequenceK<A>> {
 
 @instance(SequenceK::class)
 interface SequenceKFunctorInstance : Functor<ForSequenceK> {
-    override fun <A, B> map(fa: SequenceKOf<A>, f: kotlin.Function1<A, B>): SequenceK<B> =
+    override fun <A, B> map(fa: Kind<ForSequenceK, A>, f: (A) -> B): SequenceK<B> =
             fa.fix().map(f)
 }
 
@@ -49,7 +49,7 @@ interface SequenceKApplicativeInstance : Applicative<ForSequenceK> {
     override fun <A, B> Kind<ForSequenceK, A>.ap(ff: Kind<ForSequenceK, (A) -> B>): SequenceK<B> =
             fix().ap(ff)
 
-    override fun <A, B> map(fa: SequenceKOf<A>, f: kotlin.Function1<A, B>): SequenceK<B> =
+    override fun <A, B> map(fa: Kind<ForSequenceK, A>, f: (A) -> B): SequenceK<B> =
             fa.fix().map(f)
 
     override fun <A, B, Z> Kind<ForSequenceK, A>.map2(fb: Kind<ForSequenceK, B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
@@ -70,7 +70,7 @@ interface SequenceKMonadInstance : Monad<ForSequenceK> {
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, SequenceKOf<Either<A, B>>>): SequenceK<B> =
             SequenceK.tailRecM(a, f)
 
-    override fun <A, B> map(fa: SequenceKOf<A>, f: kotlin.Function1<A, B>): SequenceK<B> =
+    override fun <A, B> map(fa: Kind<ForSequenceK, A>, f: (A) -> B): SequenceK<B> =
             fa.fix().map(f)
 
     override fun <A, B, Z> Kind<ForSequenceK, A>.map2(fb: Kind<ForSequenceK, B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
@@ -91,7 +91,7 @@ interface SequenceKFoldableInstance : Foldable<ForSequenceK> {
 
 @instance(SequenceK::class)
 interface SequenceKTraverseInstance : Traverse<ForSequenceK> {
-    override fun <A, B> map(fa: SequenceKOf<A>, f: kotlin.Function1<A, B>): SequenceK<B> =
+    override fun <A, B> map(fa: Kind<ForSequenceK, A>, f: (A) -> B): SequenceK<B> =
             fa.fix().map(f)
 
     override fun <G, A, B> Applicative<G>.traverse(fa: SequenceKOf<A>, f: kotlin.Function1<A, Kind<G, B>>): Kind<G, SequenceK<B>> =
