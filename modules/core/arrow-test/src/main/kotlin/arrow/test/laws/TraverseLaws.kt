@@ -6,7 +6,6 @@ import arrow.data.Const
 import arrow.data.applicative
 import arrow.data.const
 import arrow.data.value
-import arrow.instances.ComposedApplicative
 import arrow.instances.IntMonoidInstance
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB
