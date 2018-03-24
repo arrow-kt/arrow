@@ -88,6 +88,6 @@ interface IorEqInstance<L, R> : Eq<Ior<L, R>> {
 
 @instance(Ior::class)
 interface IorShowInstance<L, R> : Show<Ior<L, R>> {
-    override fun show(a: Ior<L, R>): String =
-            a.toString()
+    override fun Ior<L, R>.show(): String =
+            toString()
 }

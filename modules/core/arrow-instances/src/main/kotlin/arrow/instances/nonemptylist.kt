@@ -25,8 +25,8 @@ interface NonEmptyListEqInstance<A> : Eq<NonEmptyList<A>> {
 
 @instance(NonEmptyList::class)
 interface NonEmptyListShowInstance<A> : Show<NonEmptyList<A>> {
-    override fun show(a: NonEmptyList<A>): String =
-            a.toString()
+    override fun NonEmptyList<A>.show(): String =
+            toString()
 }
 
 @instance(NonEmptyList::class)

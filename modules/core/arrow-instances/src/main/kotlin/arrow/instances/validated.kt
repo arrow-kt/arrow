@@ -84,6 +84,6 @@ interface ValidatedEqInstance<L, R> : Eq<Validated<L, R>> {
 
 @instance(Validated::class)
 interface ValidatedShowInstance<L, R> : Show<Validated<L, R>> {
-    override fun show(a: Validated<L, R>): String =
-            a.toString()
+    override fun Validated<L, R>.show(): String =
+            toString()
 }

@@ -47,8 +47,8 @@ interface TryEqInstance<A> : Eq<Try<A>> {
 
 @instance(Try::class)
 interface TryShowInstance<A> : Show<Try<A>> {
-    override fun show(a: Try<A>): String =
-            a.toString()
+    override fun Try<A>.show(): String =
+            toString()
 }
 
 @instance(Try::class)

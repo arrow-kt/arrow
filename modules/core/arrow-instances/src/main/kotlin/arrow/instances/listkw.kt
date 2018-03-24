@@ -31,8 +31,8 @@ interface ListKEqInstance<A> : Eq<ListKOf<A>> {
 
 @instance(ListK::class)
 interface ListKShowInstance<A> : Show<ListKOf<A>> {
-    override fun show(a: ListKOf<A>): String =
-            a.toString()
+    override fun ListKOf<A>.show(): String =
+            toString()
 }
 
 @instance(ListK::class)

@@ -42,14 +42,14 @@ class ReducibleTests : UnitSpec() {
                     val tail = (2 to 10).toList()
                     val total = 1 + tail.sum()
                     val nel = NonEmptyList(1, tail)
-                    reduceLeft(nel, { a, b -> a + b }) shouldBe total
-                    reduceRight(nel, { x, ly -> ly.map({ x + it }) }).value() shouldBe (total)
+                    nel.reduceLeft({ a, b -> a + b }) shouldBe total
+                    nel.reduceRight({ x, ly -> ly.map({ x + it }) }).value() shouldBe (total)
                     reduce(nel) shouldBe total
 
                     // more basic checks
                     val names = NonEmptyList.of("Aaron", "Betty", "Calvin", "Deirdra")
                     val totalLength = names.all.map({ it.length }).sum()
-                    reduceLeftTo(names, { it.length }, { sum, s -> s.length + sum }) shouldBe totalLength
+                    names.reduceLeftTo({ it.length }, { sum, s -> s.length + sum }) shouldBe totalLength
                     reduceMap(names, { it.length }) shouldBe totalLength
                 }
             }

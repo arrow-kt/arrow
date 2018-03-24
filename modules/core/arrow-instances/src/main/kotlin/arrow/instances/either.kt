@@ -103,6 +103,6 @@ interface EitherEqInstance<in L, in R> : Eq<Either<L, R>> {
 
 @instance(Either::class)
 interface EitherShowInstance<L, R> : Show<Either<L, R>> {
-    override fun show(a: Either<L, R>): String =
-            a.toString()
+    override fun Either<L, R>.show(): String =
+            toString()
 }

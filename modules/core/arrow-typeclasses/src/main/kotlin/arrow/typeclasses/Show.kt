@@ -7,12 +7,12 @@ package arrow.typeclasses
 interface Show<in A> {
 
     /**
-     * Given an object [a] of type [A] it returns its textual representation.
+     * Given an object [this@show] of type [A] it returns its textual representation.
      *
-     * @param a object of type [A].
-     * @returns a [String] representing [a].
+     * @param this@show object of type [A].
+     * @returns a [String] representing [this@show].
      */
-    fun show(a: A): String
+    fun A.show(): String
 
     companion object {
 
@@ -23,8 +23,8 @@ interface Show<in A> {
          * @returns a [Show] instance that is defined by the [fshow] function.
          */
         operator inline fun <A> invoke(crossinline fshow: (A) -> String): Show<A> = object : Show<A> {
-            override fun show(a: A): String =
-                    fshow(a)
+            override fun A.show(): String =
+                    fshow(this)
         }
 
         /**
@@ -33,8 +33,8 @@ interface Show<in A> {
          * @returns a [Show] instance that is defined by the [A] `toString` method.
          */
         fun <A> fromToString(): Show<A> = object : Show<A> {
-            override fun show(a: A): String =
-                    a.toString()
+            override fun A.show(): String =
+                    toString()
         }
 
         /**
@@ -43,8 +43,8 @@ interface Show<in A> {
         fun any(): Show<Any?> = ShowAny
 
         private object ShowAny : Show<Any?> {
-            override fun show(a: Any?): String =
-                    a.toString()
+            override fun Any?.show(): String =
+                    toString()
         }
     }
 }

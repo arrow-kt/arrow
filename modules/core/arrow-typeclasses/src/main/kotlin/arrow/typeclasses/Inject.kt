@@ -11,6 +11,6 @@ interface Inject<F, G> {
 
     fun inj(): FunctionK<F, G>
 
-    fun <A> invoke(fa: Kind<F, A>): Kind<G, A> = inj()(fa)
+    fun <A> Kind<F, A>.invoke(): Kind<G, A> = inj()(this)
 
 }

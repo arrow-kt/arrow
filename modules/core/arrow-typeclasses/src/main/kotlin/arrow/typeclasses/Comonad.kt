@@ -15,7 +15,7 @@ interface Comonad<F> : Functor<F> {
 
     fun <A> Kind<F, A>.extract(): A
 
-    fun <A> duplicate(fa: Kind<F, A>): Kind<F, Kind<F, A>> = coflatMap(fa, { it })
+    fun <A> Kind<F, A>.duplicate(): Kind<F, Kind<F, A>> = coflatMap(this, { it })
 }
 
 @RestrictsSuspension

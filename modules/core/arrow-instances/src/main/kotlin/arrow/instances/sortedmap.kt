@@ -45,6 +45,6 @@ interface SortedMapKMonoidInstance<A : Comparable<A>, B> : SortedMapKSemigroupIn
 
 @instance(SortedMapK::class)
 interface SortedMapKShowInstance<A : Comparable<A>, B> : Show<SortedMapKOf<A, B>> {
-    override fun show(a: SortedMapKOf<A, B>): String =
-            a.toString()
+    override fun SortedMapKOf<A, B>.show(): String =
+            toString()
 }

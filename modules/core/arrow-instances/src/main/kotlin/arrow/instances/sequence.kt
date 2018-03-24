@@ -34,8 +34,8 @@ interface SequenceKEqInstance<A> : Eq<SequenceK<A>> {
 
 @instance(SequenceK::class)
 interface SequenceKShowInstance<A> : Show<SequenceK<A>> {
-    override fun show(a: SequenceK<A>): String =
-            a.toString()
+    override fun SequenceK<A>.show(): String =
+            toString()
 }
 
 @instance(SequenceK::class)

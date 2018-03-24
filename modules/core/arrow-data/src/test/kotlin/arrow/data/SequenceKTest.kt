@@ -21,8 +21,8 @@ class SequenceKTest : UnitSpec() {
         }
 
         val show: Show<Kind<ForSequenceK, Int>> = object : Show<Kind<ForSequenceK, Int>> {
-            override fun show(a: Kind<ForSequenceK, Int>): String =
-                    a.toList().toString()
+            override fun Kind<ForSequenceK, Int>.show(): String =
+                    toList().toString()
         }
 
         testLaws(

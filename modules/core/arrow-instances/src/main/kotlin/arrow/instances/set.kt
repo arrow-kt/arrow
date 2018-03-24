@@ -32,8 +32,8 @@ interface SetKEqInstance<A> : Eq<SetK<A>> {
 
 @instance(SetK::class)
 interface SetKShowInstance<A> : Show<SetK<A>> {
-    override fun show(a: SetK<A>): String =
-            a.toString()
+    override fun SetK<A>.show(): String =
+            toString()
 }
 
 @instance(SetK::class)

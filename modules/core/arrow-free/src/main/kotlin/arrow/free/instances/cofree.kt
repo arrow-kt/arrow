@@ -20,5 +20,5 @@ interface CofreeComonadInstance<S> : CofreeFunctorInstance<S>, Comonad<CofreePar
 
     override fun <A> CofreeOf<S, A>.extract(): A = fix().extract()
 
-    override fun <A> duplicate(fa: CofreeOf<S, A>): Kind<CofreePartialOf<S>, Cofree<S, A>> = fa.fix().duplicate()
+    override fun <A> Kind<CofreePartialOf<S>, A>.duplicate(): Kind<CofreePartialOf<S>, Cofree<S, A>> = fix().duplicate()
 }

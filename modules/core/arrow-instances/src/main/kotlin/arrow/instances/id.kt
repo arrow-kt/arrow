@@ -16,8 +16,8 @@ interface IdEqInstance<A> : Eq<Id<A>> {
 
 @instance(Id::class)
 interface IdShowInstance<A> : Show<Id<A>> {
-    override fun show(a: Id<A>): String =
-            Show.fromToString<Id<A>>().show(a)
+    override fun Id<A>.show(): String =
+            toString()
 }
 
 @instance(Id::class)

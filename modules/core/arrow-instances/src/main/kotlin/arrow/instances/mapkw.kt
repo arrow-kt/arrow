@@ -65,6 +65,6 @@ interface MapKEqInstance<K, A> : Eq<MapK<K, A>> {
 
 @instance(MapK::class)
 interface MapKShowInstance<K, A> : Show<MapK<K, A>> {
-    override fun show(a: MapK<K, A>): String =
-            a.toString()
+    override fun MapK<K, A>.show(): String =
+            toString()
 }

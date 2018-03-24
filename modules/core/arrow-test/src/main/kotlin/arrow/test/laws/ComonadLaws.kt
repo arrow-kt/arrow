@@ -26,12 +26,12 @@ object ComonadLaws {
 
     fun <F> Comonad<F>.duplicateThenExtractIsId(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), cf), { fa: Kind<F, Int> ->
-                duplicate(fa).extract().equalUnderTheLaw(fa, EQ)
+                fa.duplicate().extract().equalUnderTheLaw(fa, EQ)
             })
 
     fun <F> Comonad<F>.duplicateThenMapExtractIsId(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), cf), { fa: Kind<F, Int> ->
-                duplicate(fa).map() { it.extract() }.equalUnderTheLaw(fa, EQ)
+                fa.duplicate().map() { it.extract() }.equalUnderTheLaw(fa, EQ)
             })
 
     fun <F> Comonad<F>.mapAndCoflatmapCoherence(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =

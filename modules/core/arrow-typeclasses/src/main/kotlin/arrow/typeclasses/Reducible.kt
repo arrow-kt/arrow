@@ -21,29 +21,29 @@ interface Reducible<F> : Foldable<F> {
      *
      * Implementations should override this method when possible.
      */
-    fun <A> reduceLeft(fa: Kind<F, A>, f: (A, A) -> A): A = reduceLeftTo(fa, { a -> a }, f)
+    fun <A> Kind<F, A>.reduceLeft(f: (A, A) -> A): A = this.reduceLeftTo({ a -> a }, f)
 
     /**
      * Right-associative reduction on F using the function f.
      */
-    fun <A> reduceRight(fa: Kind<F, A>, f: (A, Eval<A>) -> Eval<A>): Eval<A> = reduceRightTo(fa, { a -> a }, f)
+    fun <A> Kind<F, A>.reduceRight(f: (A, Eval<A>) -> Eval<A>): Eval<A> = this.reduceRightTo({ a -> a }, f)
 
     /**
      * Apply f to the "initial element" of fa and combine it with every other value using
      * the given function g.
      */
-    fun <A, B> reduceLeftTo(fa: Kind<F, A>, f: (A) -> B, g: (B, A) -> B): B
+    fun <A, B> Kind<F, A>.reduceLeftTo(f: (A) -> B, g: (B, A) -> B): B
 
-    override fun <A, B> reduceLeftToOption(fa: Kind<F, A>, f: (A) -> B, g: (B, A) -> B): Option<B> = Some(reduceLeftTo(fa, f, g))
+    override fun <A, B> reduceLeftToOption(fa: Kind<F, A>, f: (A) -> B, g: (B, A) -> B): Option<B> = Some(fa.reduceLeftTo(f, g))
 
     /**
      * Apply f to the "initial element" of fa and lazily combine it with every other value using the
      * given function g.
      */
-    fun <A, B> reduceRightTo(fa: Kind<F, A>, f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<B>
+    fun <A, B> Kind<F, A>.reduceRightTo(f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<B>
 
     override fun <A, B> reduceRightToOption(fa: Kind<F, A>, f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<Option<B>> =
-            reduceRightTo(fa, f, g).map({ Some(it) })
+            fa.reduceRightTo(f, g).map({ Some(it) })
 
     override fun <A> isEmpty(fa: Kind<F, A>): Boolean = false
 
@@ -52,7 +52,7 @@ interface Reducible<F> : Foldable<F> {
     /**
      * Reduce a F<A> value using the given Semigroup<A>.
      */
-    fun <A> Semigroup<A>.reduce(fa: Kind<F, A>): A = reduceLeft(fa, { a, b -> a.combine(b) })
+    fun <A> Semigroup<A>.reduce(fa: Kind<F, A>): A = fa.reduceLeft({ a, b -> a.combine(b) })
 
     /**
      * Reduce a F<G<A>> value using SemigroupK<G>, a universal semigroup for G<_>.
@@ -65,7 +65,7 @@ interface Reducible<F> : Foldable<F> {
      * Apply f to each element of fa and combine them using the given Semigroup<B>.
      */
     fun <A, B> Semigroup<B>.reduceMap(fa: Kind<F, A>, f: (A) -> B): B =
-            reduceLeftTo(fa, f, { b, a -> b.combine(f(a)) })
+            fa.reduceLeftTo(f, { b, a -> b.combine(f(a)) })
 
 }
 
@@ -88,13 +88,13 @@ interface NonEmptyReducible<F, G> : Reducible<F> {
     override fun <A, B> foldRight(fa: Kind<F, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
             Eval.Always({ split(fa) }).flatMap { (a, ga) -> f(a, FG().foldRight(ga, lb, f)) }
 
-    override fun <A, B> reduceLeftTo(fa: Kind<F, A>, f: (A) -> B, g: (B, A) -> B): B {
-        val (a, ga) = split(fa)
+    override fun <A, B> Kind<F, A>.reduceLeftTo(f: (A) -> B, g: (B, A) -> B): B {
+        val (a, ga) = split(this)
         return FG().foldLeft(ga, f(a), { bb, aa -> g(bb, aa) })
     }
 
-    override fun <A, B> reduceRightTo(fa: Kind<F, A>, f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            Eval.Always({ split(fa) }).flatMap { (a, ga) ->
+    override fun <A, B> Kind<F, A>.reduceRightTo(f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<B> =
+            Eval.Always({ split(this) }).flatMap { (a, ga) ->
                 FG().reduceRightToOption(ga, f, g).flatMap { option ->
                     when (option) {
                         is Some<B> -> g(a, Eval.Now(option.t))

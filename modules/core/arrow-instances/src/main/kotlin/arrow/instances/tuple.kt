@@ -100,8 +100,8 @@ interface Tuple2EqInstance<A, B> : Eq<Tuple2<A, B>> {
 
 @instance(Tuple2::class)
 interface Tuple2ShowInstance<A, B> : Show<Tuple2<A, B>> {
-    override fun show(a: Tuple2<A, B>): String =
-            a.toString()
+    override fun Tuple2<A, B>.show(): String =
+            toString()
 }
 
 @instance(Tuple3::class)
@@ -121,8 +121,8 @@ interface Tuple3EqInstance<A, B, C> : Eq<Tuple3<A, B, C>> {
 
 @instance(Tuple3::class)
 interface Tuple3ShowInstance<A, B, C> : Show<Tuple3<A, B, C>> {
-    override fun show(a: Tuple3<A, B, C>): String =
-            a.toString()
+    override fun Tuple3<A, B, C>.show(): String =
+            toString()
 }
 
 @instance(Tuple4::class)
@@ -145,8 +145,8 @@ interface Tuple4EqInstance<A, B, C, D> : Eq<Tuple4<A, B, C, D>> {
 
 @instance(Tuple4::class)
 interface Tuple4ShowInstance<A, B, C, D> : Show<Tuple4<A, B, C, D>> {
-    override fun show(a: Tuple4<A, B, C, D>): String =
-            a.toString()
+    override fun Tuple4<A, B, C, D>.show(): String =
+            toString()
 }
 
 @instance(Tuple5::class)
@@ -173,8 +173,8 @@ interface Tuple5EqInstance<A, B, C, D, E> : Eq<Tuple5<A, B, C, D, E>> {
 
 @instance(Tuple5::class)
 interface Tuple5ShowInstance<A, B, C, D, E> : Show<Tuple5<A, B, C, D, E>> {
-    override fun show(a: Tuple5<A, B, C, D, E>): String =
-            a.toString()
+    override fun Tuple5<A, B, C, D, E>.show(): String =
+            toString()
 }
 
 @instance(Tuple6::class)
@@ -204,8 +204,8 @@ interface Tuple6EqInstance<A, B, C, D, E, F> : Eq<Tuple6<A, B, C, D, E, F>> {
 
 @instance(Tuple6::class)
 interface Tuple6ShowInstance<A, B, C, D, E, F> : Show<Tuple6<A, B, C, D, E, F>> {
-    override fun show(a: Tuple6<A, B, C, D, E, F>): String =
-            a.toString()
+    override fun Tuple6<A, B, C, D, E, F>.show(): String =
+            toString()
 }
 
 @instance(Tuple7::class)
@@ -238,8 +238,8 @@ interface Tuple7EqInstance<A, B, C, D, E, F, G> : Eq<Tuple7<A, B, C, D, E, F, G>
 
 @instance(Tuple7::class)
 interface Tuple7ShowInstance<A, B, C, D, E, F, G> : Show<Tuple7<A, B, C, D, E, F, G>> {
-    override fun show(a: Tuple7<A, B, C, D, E, F, G>): String =
-            a.toString()
+    override fun Tuple7<A, B, C, D, E, F, G>.show(): String =
+            toString()
 }
 
 @instance(Tuple8::class)
@@ -275,8 +275,8 @@ interface Tuple8EqInstance<A, B, C, D, E, F, G, H> : Eq<Tuple8<A, B, C, D, E, F,
 
 @instance(Tuple8::class)
 interface Tuple8ShowInstance<A, B, C, D, E, F, G, H> : Show<Tuple8<A, B, C, D, E, F, G, H>> {
-    override fun show(a: Tuple8<A, B, C, D, E, F, G, H>): String =
-            a.toString()
+    override fun Tuple8<A, B, C, D, E, F, G, H>.show(): String =
+            toString()
 }
 
 @instance(Tuple9::class)
@@ -315,8 +315,8 @@ interface Tuple9EqInstance<A, B, C, D, E, F, G, H, I> : Eq<Tuple9<A, B, C, D, E,
 
 @instance(Tuple9::class)
 interface Tuple9ShowInstance<A, B, C, D, E, F, G, H, I> : Show<Tuple9<A, B, C, D, E, F, G, H, I>> {
-    override fun show(a: Tuple9<A, B, C, D, E, F, G, H, I>): String =
-            a.toString()
+    override fun Tuple9<A, B, C, D, E, F, G, H, I>.show(): String =
+            toString()
 }
 
 @instance(Tuple10::class)
@@ -358,6 +358,6 @@ interface Tuple10EqInstance<A, B, C, D, E, F, G, H, I, J> : Eq<Tuple10<A, B, C, 
 
 @instance(Tuple10::class)
 interface Tuple10ShowInstance<A, B, C, D, E, F, G, H, I, J> : Show<Tuple10<A, B, C, D, E, F, G, H, I, J>> {
-    override fun show(a: Tuple10<A, B, C, D, E, F, G, H, I, J>): String =
-            a.toString()
+    override fun Tuple10<A, B, C, D, E, F, G, H, I, J>.show(): String =
+            toString()
 }

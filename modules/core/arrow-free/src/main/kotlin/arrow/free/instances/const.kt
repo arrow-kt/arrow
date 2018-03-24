@@ -72,6 +72,6 @@ interface ConstEqInstance<A, T> : Eq<Const<A, T>> {
 
 @instance(Const::class)
 interface ConstShowInstance<A, T> : Show<Const<A, T>> {
-    override fun show(a: Const<A, T>): String =
-            a.toString()
+    override fun Const<A, T>.show(): String =
+            toString()
 }

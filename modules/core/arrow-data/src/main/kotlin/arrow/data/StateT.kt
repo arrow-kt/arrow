@@ -271,8 +271,9 @@ class StateT<F, S, A>(
      * @param MF [Monad] for the context [F].
      * @param SF [SemigroupK] for [F].
      */
-    fun combineK(y: StateTOf<F, S, A>, MF: Monad<F>, SF: SemigroupK<F>): StateT<F, S, A> =
-            StateT(MF.pure({ s -> SF.combineK(run(s, MF), y.fix().run(s, MF)) }))
+    fun combineK(y: StateTOf<F, S, A>, MF: Monad<F>, SF: SemigroupK<F>): StateT<F, S, A> = SF.run {
+        StateT(MF.pure({ s -> combineK(run(s, MF), y.fix().run(s, MF)) }))
+    }
 
     /**
      * Run the stateful computation within the context `F`.
@@ -281,7 +282,7 @@ class StateT<F, S, A>(
      * @param MF [Monad] for the context [F].
      */
     fun run(initial: S, MF: Monad<F>): Kind<F, Tuple2<S, A>> = MF.run {
-        runF.flatMap() { f -> f(initial) }
+        runF.flatMap { f -> f(initial) }
     }
 
     /**

@@ -112,6 +112,7 @@ data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTOf<F, W, 
 
     inline fun <B> subflatMap(crossinline f: (A) -> Tuple2<W, B>, MF: Monad<F>): WriterT<F, W, B> = transform({ f(it.b) }, MF)
 
-    fun combineK(y: WriterTOf<F, W, A>, SF: SemigroupK<F>): WriterT<F, W, A> =
-            WriterT(SF.combineK(value, y.fix().value))
+    fun combineK(y: WriterTOf<F, W, A>, SF: SemigroupK<F>): WriterT<F, W, A> = SF.run {
+        WriterT(combineK(value, y.fix().value))
+    }
 }
