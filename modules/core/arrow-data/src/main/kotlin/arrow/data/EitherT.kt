@@ -16,7 +16,8 @@ import arrow.typeclasses.Monad
  *
  * It may also be said that [EitherT] is a monad transformer for [Either].
  */
-@higherkind data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, B>, EitherTKindedJ<F, A, B> {
+@higherkind
+data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, B>, EitherTKindedJ<F, A, B> {
 
     companion object {
 
@@ -81,7 +82,5 @@ import arrow.typeclasses.Monad
                 }
             })
 
-    fun <C> ap(ff: EitherTOf<F, A, (B) -> C>, MF: Monad<F>): EitherT<F, A, C> = ff.fix().flatMap ({ f -> map(f, MF) }, MF)
+    fun <C> ap(ff: EitherTOf<F, A, (B) -> C>, MF: Monad<F>): EitherT<F, A, C> = ff.fix().flatMap({ f -> map(f, MF) }, MF)
 }
-
-fun <F, A, B> EitherTOf<F, A, B>.value(): Kind<F, Either<A, B>> = this.fix().value
