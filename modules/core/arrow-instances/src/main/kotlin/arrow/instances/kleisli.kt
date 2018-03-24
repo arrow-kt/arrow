@@ -1,13 +1,8 @@
 package arrow.instances
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Tuple2
-import arrow.core.andThen
-import arrow.data.Kleisli
-import arrow.data.KleisliOf
-import arrow.data.KleisliPartialOf
-import arrow.data.fix
+import arrow.core.*
+import arrow.data.*
 import arrow.instance
 import arrow.typeclasses.*
 
@@ -70,3 +65,19 @@ interface KleisliApplicativeErrorInstance<F, D, E> : ApplicativeError<KleisliPar
 
 @instance(Kleisli::class)
 interface KleisliMonadErrorInstance<F, D, E> : KleisliApplicativeErrorInstance<F, D, E>, MonadError<KleisliPartialOf<F, D>, E>, KleisliMonadInstance<F, D>
+
+
+/**
+ * Alias for [Kleisli] for [Id]
+ */
+fun <D> ReaderApi.functor(): Functor<ReaderPartialOf<D>> = Kleisli.functor(Id.functor())
+
+/**
+ * Alias for [Kleisli] for [Id]
+ */
+fun <D> ReaderApi.applicative(): Applicative<ReaderPartialOf<D>> = Kleisli.applicative(Id.applicative())
+
+/**
+ * Alias for [Kleisli] for [Id]
+ */
+fun <D> ReaderApi.monad(): Monad<ReaderPartialOf<D>> = Kleisli.monad(Id.monad())

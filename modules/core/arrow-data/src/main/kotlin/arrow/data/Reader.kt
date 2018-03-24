@@ -118,21 +118,4 @@ object ReaderApi {
     fun <D, A> pure(x: A): Reader<D, A> = ReaderT.pure(x, IdMonad)
 
     fun <D> ask(): Reader<D, D> = ReaderT.ask(IdMonad)
-
-    /* TODO(paco)
-    /**
-     * Alias for [ReaderT.Companion.functor]
-     */
-    fun <D> functor(): Functor<ReaderPartialOf<D>> = arrow.typeclasses.functor()
-
-    /**
-     * Alias for[ReaderT.Companion.applicative]
-     */
-    fun <D> applicative(): Applicative<ReaderPartialOf<D>> = arrow.typeclasses.applicative()
-
-    /**
-     * Alias for [ReaderT.Companion.monad]
-     */
-    fun <D> monad(): Monad<ReaderPartialOf<D>> = arrow.typeclasses.monad()
-    */
 }
