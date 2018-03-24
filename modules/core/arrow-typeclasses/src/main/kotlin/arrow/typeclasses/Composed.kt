@@ -148,8 +148,8 @@ interface ComposedFunctor<F, G> : Functor<Nested<F, G>> {
 
     fun G(): Functor<G>
 
-    override fun <A, B> Kind<Nested<F, G>, A>.map(f: (A) -> B): Kind<Nested<F, G>, B> = this@ComposedFunctor.F().run {
-        this@Functor.map(unnest(), { this@ComposedFunctor.G().run { this@Functor.map(it, f) } }).nest()
+    override fun <A, B> Kind<Nested<F, G>, A>.map(f: (A) -> B): Kind<Nested<F, G>, B> = F().run {
+        unnest().map { G().run { it.map(f) } }.nest()
     }
 
     fun <A, B> mapC(fa: Kind<F, Kind<G, A>>, f: (A) -> B): Kind<F, Kind<G, B>> = fa.nest().map(f).unnest()
