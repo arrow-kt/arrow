@@ -35,7 +35,7 @@ interface DeferredKMonadInstance : Monad<ForDeferredK> {
     override fun <A, B> map(fa: DeferredKOf<A>, f: (A) -> B): DeferredK<B> =
             fa.fix().map(f)
 
-    override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, DeferredKOf<arrow.core.Either<A, B>>>): DeferredK<B> =
+    override fun <A, B> tailRecM(a: A, f: (A) -> DeferredKOf<Either<A, B>>): DeferredK<B> =
             DeferredK.tailRecM(a, f)
 
     override fun <A, B> DeferredKOf<A>.ap(ff: DeferredKOf<(A) -> B>): DeferredK<B> =
