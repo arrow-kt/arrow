@@ -23,14 +23,14 @@ class ValidatedTest : UnitSpec() {
         val VAL_SGK = Validated.semigroupK<String>(StringMonoidInstance)
 
         testLaws(
-            EqLaws.laws(EQ) { Valid(it) },
-            ShowLaws.laws(Validated.show(), EQ) { Valid(it) },
-            ApplicativeLaws.laws(Validated.applicative(StringMonoidInstance), Eq.any()),
-            TraverseLaws.laws(Validated.traverse(), Validated.applicative(StringMonoidInstance), ::Valid, Eq.any()),
-            SemigroupKLaws.laws(
-                Validated.semigroupK(IntMonoidInstance),
-                Validated.applicative(IntMonoidInstance),
-                Eq.any())
+                EqLaws.laws(EQ) { Valid(it) },
+                ShowLaws.laws(Validated.show(), EQ) { Valid(it) },
+                ApplicativeLaws.laws(Validated.applicative(StringMonoidInstance), Eq.any()),
+                TraverseLaws.laws(Validated.traverse(), Validated.applicative(StringMonoidInstance), ::Valid, Eq.any()),
+                SemigroupKLaws.laws(
+                        Validated.semigroupK(IntMonoidInstance),
+                        Validated.applicative(IntMonoidInstance),
+                        Eq.any())
         )
 
 
@@ -48,8 +48,8 @@ class ValidatedTest : UnitSpec() {
             val result: Validated<Throwable, String> = Valid(value)
             result.fold(
                     { fail("None should not be called") },
-                    { a -> a + " processed"}
-            ) shouldBe value + " processed"
+                    { a -> "$a processed" }
+            ) shouldBe "$value processed"
         }
 
         "leftMap should modify error" {
@@ -78,7 +78,7 @@ class ValidatedTest : UnitSpec() {
 
         "valueOr should return value if is Valid or the the result of f in otherwise" {
             Valid(13).valueOr { fail("None should not be called") } shouldBe 13
-            Invalid(13).valueOr { e ->  e.toString() + " is the defaultValue" } shouldBe "13 is the defaultValue"
+            Invalid(13).valueOr { e -> e.toString() + " is the defaultValue" } shouldBe "13 is the defaultValue"
         }
 
         "orElse should return Valid(value) if is Valid or the result of default in otherwise" {
@@ -169,10 +169,10 @@ class ValidatedTest : UnitSpec() {
             Invalid(10).withEither { it } shouldBe Invalid(10)
         }
 
-        with (VAL_AP) {
+        with(VAL_AP) {
 
             "Cartesian builder should build products over homogeneous Validated" {
-                VAL_AP.map(
+                map(
                         Valid("11th"),
                         Valid("Doctor"),
                         Valid("Who"),
@@ -180,7 +180,7 @@ class ValidatedTest : UnitSpec() {
             }
 
             "Cartesian builder should build products over heterogeneous Validated" {
-                VAL_AP.map(
+                map(
                         Valid(13),
                         Valid("Doctor"),
                         Valid(false),
@@ -188,7 +188,7 @@ class ValidatedTest : UnitSpec() {
             }
 
             "Cartesian builder should build products over Invalid Validated" {
-                VAL_AP.map(
+                map(
                         Invalid("fail1"),
                         Invalid("fail2"),
                         Valid("Who"),
@@ -196,44 +196,44 @@ class ValidatedTest : UnitSpec() {
             }
         }
 
-        with (VAL_SGK) {
+        with(VAL_SGK) {
             "CombineK should combine Valid Validated" {
                 val valid = Valid("Who")
 
-                VAL_SGK.combineK(valid, valid) shouldBe (Valid("Who"))
+                combineK(valid, valid) shouldBe (Valid("Who"))
             }
 
             "CombineK should combine Valid and Invalid Validated" {
                 val valid = Valid("Who")
                 val invalid = Invalid("Nope")
 
-                VAL_SGK.combineK(valid, invalid) shouldBe (Valid("Who"))
+                combineK(valid, invalid) shouldBe (Valid("Who"))
             }
 
             "CombineK should combine Invalid Validated" {
                 val invalid = Invalid("Nope")
 
-                VAL_SGK.combineK(invalid, invalid) shouldBe (Invalid("NopeNope"))
+                combineK(invalid, invalid) shouldBe (Invalid("NopeNope"))
             }
         }
 
         "Combine should combine Valid Validated" {
             val valid: Validated<String, String> = Valid("Who")
 
-            valid.combine(StringMonoidInstance, StringMonoidInstance, valid) shouldBe(Valid("WhoWho"))
+            valid.combine(StringMonoidInstance, StringMonoidInstance, valid) shouldBe (Valid("WhoWho"))
         }
 
         "Combine should combine Valid and Invalid Validated" {
             val valid = Valid("Who")
             val invalid = Invalid("Nope")
 
-            valid.combine(StringMonoidInstance, StringMonoidInstance, invalid) shouldBe(Invalid("Nope"))
+            valid.combine(StringMonoidInstance, StringMonoidInstance, invalid) shouldBe (Invalid("Nope"))
         }
 
         "Combine should combine Invalid Validated" {
             val invalid: Validated<String, String> = Invalid("Nope")
 
-            invalid.combine(StringMonoidInstance, StringMonoidInstance, invalid) shouldBe(Invalid("NopeNope"))
+            invalid.combine(StringMonoidInstance, StringMonoidInstance, invalid) shouldBe (Invalid("NopeNope"))
         }
     }
 }
