@@ -1,15 +1,18 @@
 package arrow.data
 
 import arrow.Kind2
-import arrow.core.*
-import arrow.instances.*
-import io.kotlintest.KTestJUnitRunner
-import org.junit.runner.RunWith
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.ForEither
+import arrow.core.Right
 import arrow.test.UnitSpec
 import arrow.test.laws.BifoldableLaws
 import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Eq
 import arrow.typeclasses.binest
+import arrow.typeclasses.compose
+import io.kotlintest.KTestJUnitRunner
+import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class BifoldableTests : UnitSpec() {
