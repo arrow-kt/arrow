@@ -83,23 +83,24 @@ interface NonEmptyReducible<F, G> : Reducible<F> {
 
     fun FG(): Foldable<G>
 
-    fun <A> split(fa: Kind<F, A>): Tuple2<A, Kind<G, A>>
+    fun <A> Kind<F, A>.split(): Tuple2<A, Kind<G, A>>
 
-    override fun <A, B> foldLeft(fa: Kind<F, A>, b: B, f: (B, A) -> B): B = FG().run {
-        val (a, ga) = split(fa)
-        foldLeft(ga, f(b, a), f)
+    override fun <A, B> Kind<F, A>.foldLeft(b: B, f: (B, A) -> B): B = FG().run {
+        val (a, ga) = split()
+        ga.foldLeft(f(b, a), f)
     }
 
-    override fun <A, B> foldRight(fa: Kind<F, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            Eval.Always({ split(fa) }).flatMap { (a, ga) -> f(a, FG().run { foldRight(ga, lb, f) }) }
+    override fun <A, B> foldRight(fa: Kind<F, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = FG().run {
+        Eval.Always({ fa.split() }).flatMap { (a, ga) -> f(a, foldRight(ga, lb, f)) }
+    }
 
     override fun <A, B> Kind<F, A>.reduceLeftTo(f: (A) -> B, g: (B, A) -> B): B = FG().run {
-        val (a, ga) = split(this@reduceLeftTo)
-        foldLeft(ga, f(a), { bb, aa -> g(bb, aa) })
+        val (a, ga) = split()
+        ga.foldLeft(f(a), { bb, aa -> g(bb, aa) })
     }
 
     override fun <A, B> Kind<F, A>.reduceRightTo(f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<B> = FG().run {
-        Eval.Always({ split(this@reduceRightTo) }).flatMap { (a, ga) ->
+        Eval.Always({ split() }).flatMap { (a, ga) ->
             ga.reduceRightToOption(f, g).flatMap { option ->
                 when (option) {
                     is Some<B> -> g(a, Eval.Now(option.t))
@@ -110,38 +111,38 @@ interface NonEmptyReducible<F, G> : Reducible<F> {
     }
 
     override fun <A> Kind<F, A>.fold(MN: Monoid<A>): A = MN.run {
-        val (a, ga) = split(this@fold)
+        val (a, ga) = split()
         return a.combine(FG().run { ga.fold(MN) })
     }
 
     override fun <A> Kind<F, A>.find(f: (A) -> Boolean): Option<A> = FG().run {
-        val (a, ga) = split(this@find)
+        val (a, ga) = split()
         return if (f(a)) Some(a) else ga.find(f)
     }
 
-    override fun <A> Kind<F, A>.exists(p: (A) -> Boolean): Boolean = this@NonEmptyReducible.FG().run {
-        val (a, ga) = this@NonEmptyReducible.split(this@exists)
+    override fun <A> Kind<F, A>.exists(p: (A) -> Boolean): Boolean = FG().run {
+        val (a, ga) = split()
         return p(a) || ga.exists(p)
     }
 
     override fun <A> Kind<F, A>.forAll(p: (A) -> Boolean): Boolean = FG().run {
-        val (a, ga) = split(this@forAll)
+        val (a, ga) = split()
         return p(a) && ga.forAll(p)
     }
 
     override fun <A> Kind<F, A>.size(MN: Monoid<Long>): Long = FG().run {
-        val (_, tail) = split(this@size)
+        val (_, tail) = split()
         return 1 + tail.size(MN)
     }
 
     override fun <A> Kind<F, A>.get(M: Monad<Kind<ForEither, A>>, idx: Long): Option<A> =
             if (idx == 0L)
-                Some(split(this).a)
+                Some(this.split().a)
             else
-                FG().run { split(this@get).b.get(M, idx - 1L) }
+                FG().run { split().b.get(M, idx - 1L) }
 
     fun <A, B> Kind<F, A>.foldM_(M: Monad<G>, z: B, f: (B, A) -> Kind<G, B>): Kind<G, B> = M.run {
-        val (a, ga) = split(this@foldM_)
+        val (a, ga) = split()
         return f(z, a).flatMap({ FG().run { ga.foldM(M, it, f) } })
     }
 }

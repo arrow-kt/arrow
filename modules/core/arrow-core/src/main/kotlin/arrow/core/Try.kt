@@ -1,7 +1,7 @@
 package arrow.core
 
-import arrow.*
-import arrow.legacy.*
+import arrow.higherkind
+import arrow.legacy.Disjunction
 
 typealias Failure<A> = Try.Failure<A>
 typealias Success<A> = Try.Success<A>
@@ -130,6 +130,10 @@ sealed class Try<out A> : TryOf<A> {
     @Deprecated("arrow.data.Either is already right biased. This function will be removed in future releases", ReplaceWith("toEither()"))
     fun toDisjunction(): Disjunction<Throwable, A> = toEither().toDisjunction()
 
+    fun <B> foldLeft(b: B, f: (B, A) -> B): B = this.fix().fold({ b }, { f(b, it) })
+
+    fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = this.fix().fold({ lb }, { f(it, lb) })
+
     /**
      * The `Failure` type represents a computation that result in an exception.
      */
@@ -160,53 +164,49 @@ sealed class TryException(override val message: String) : kotlin.Exception(messa
     data class UnsupportedOperationException(override val message: String) : TryException(message)
 }
 
-fun <A, B> Try<A>.foldLeft(b: B, f: (B, A) -> B): B = this.fix().fold({ b }, { f(b, it) })
-
-fun <A, B> Try<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = this.fix().fold({ lb }, { f(it, lb) })
+/**
+ * Returns the value from this `Success` or the given `default` argument if this is a `Failure`.
+ *
+ * ''Note:'': This will throw an exception if it is not a success and default throws an exception.
+ */
+fun <B> TryOf<B>.getOrDefault(default: () -> B): B = fix().fold({ default() }, { it })
 
 /**
  * Returns the value from this `Success` or the given `default` argument if this is a `Failure`.
  *
  * ''Note:'': This will throw an exception if it is not a success and default throws an exception.
  */
-fun <B> Try<B>.getOrDefault(default: () -> B): B = fold({ default() }, { it })
+fun <B> TryOf<B>.getOrElse(default: (Throwable) -> B): B = fix().fold(default, { it })
 
-/**
- * Returns the value from this `Success` or the given `default` argument if this is a `Failure`.
- *
- * ''Note:'': This will throw an exception if it is not a success and default throws an exception.
- */
-fun <B> Try<B>.getOrElse(default: (Throwable) -> B): B = fold(default, { it })
-
-fun <B, A: B> Try<A>.orElse(f: () -> Try<B>): Try<B> = when (this) {
-    is Try.Success -> this
-    is Try.Failure -> f()
+fun <B, A: B> TryOf<A>.orElse(f: () -> TryOf<B>): Try<B> = when (this.fix()) {
+    is Try.Success -> this.fix()
+    is Try.Failure -> f().fix()
 }
 
 /**
  * Applies the given function `f` if this is a `Failure`, otherwise returns this if this is a `Success`.
  * This is like `flatMap` for the exception.
  */
-fun <B> Try<B>.recoverWith(f: (Throwable) -> Try<B>): Try<B> = fold({ f(it) }, { Success(it) })
+fun <B> TryOf<B>.recoverWith(f: (Throwable) -> TryOf<B>): Try<B> = fix().fold({ f(it).fix() }, { Success(it) })
 
 @Deprecated(DeprecatedAmbiguity, ReplaceWith("recoverWith(f)"))
-fun <A> Try<A>.rescue(f: (Throwable) -> Try<A>): Try<A> = recoverWith(f)
+fun <A> TryOf<A>.rescue(f: (Throwable) -> TryOf<A>): Try<A> = fix().recoverWith(f)
 
 /**
  * Applies the given function `f` if this is a `Failure`, otherwise returns this if this is a `Success`.
  * This is like map for the exception.
  */
-fun <B> Try<B>.recover(f: (Throwable) -> B): Try<B> = fold({ Success(f(it)) }, { Success(it) })
+fun <B> TryOf<B>.recover(f: (Throwable) -> B): Try<B> = fix().fold({ Success(f(it)) }, { Success(it) })
 
 @Deprecated(DeprecatedAmbiguity, ReplaceWith("recover(f)"))
-fun <A> Try<A>.handle(f: (Throwable) -> A): Try<A> = recover(f)
+fun <A> TryOf<A>.handle(f: (Throwable) -> A): Try<A> = fix().recover(f)
 
 /**
  * Completes this `Try` by applying the function `f` to this if this is of type `Failure`,
  * or conversely, by applying `s` if this is a `Success`.
  */
-fun <A, B> Try<A>.transform(s: (A) -> Try<B>, f: (Throwable) -> Try<B>): Try<B> = fold({ f(it) }, { flatMap(s) })
+fun <A, B> TryOf<A>.transform(s: (A) -> TryOf<B>, f: (Throwable) -> TryOf<B>): Try<B> = fix().fold({ f(it).fix() }, { fix().flatMap(s) })
 
 fun <A> (() -> A).try_(): Try<A> = Try(this)
 
-fun <T> Try<Try<T>>.flatten(): Try<T> = flatMap(::identity)
+fun <T> TryOf<TryOf<T>>.flatten(): Try<T> = fix().flatMap(::identity)

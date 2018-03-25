@@ -81,8 +81,8 @@ interface ListKMonadInstance : Monad<ForListK> {
 
 @instance(ListK::class)
 interface ListKFoldableInstance : Foldable<ForListK> {
-    override fun <A, B> foldLeft(fa: ListKOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
-            fa.fix().foldLeft(b, f)
+    override fun <A, B> Kind<ForListK, A>.foldLeft(b: B, f: (B, A) -> B): B =
+            fix().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: ListKOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
             fa.fix().foldRight(lb, f)
@@ -99,8 +99,8 @@ interface ListKTraverseInstance : Traverse<ForListK> {
     override fun <G, A, B> Kind<ForListK, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ListK<B>> =
             fix().traverse(AP, f)
 
-    override fun <A, B> foldLeft(fa: ListKOf<A>, b: B, f: Function2<B, A, B>): B =
-            fa.fix().foldLeft(b, f)
+    override fun <A, B> Kind<ForListK, A>.foldLeft(b: B, f: (B, A) -> B): B =
+            fix().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: ListKOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
             fa.fix().foldRight(lb, f)

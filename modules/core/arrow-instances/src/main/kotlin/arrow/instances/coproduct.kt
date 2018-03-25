@@ -41,7 +41,7 @@ interface CoproductFoldableInstance<F, G> : Foldable<CoproductPartialOf<F, G>> {
 
     fun FG(): Foldable<G>
 
-    override fun <A, B> foldLeft(fa: CoproductOf<F, G, A>, b: B, f: (B, A) -> B): B = fa.fix().foldLeft(b, f, FF(), FG())
+    override fun <A, B> Kind<CoproductPartialOf<F, G>, A>.foldLeft(b: B, f: (B, A) -> B): B = fix().foldLeft(b, f, FF(), FG())
 
     override fun <A, B> foldRight(fa: CoproductOf<F, G, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = fa.fix().foldRight(lb, f, FF(), FG())
 
@@ -57,7 +57,7 @@ interface CoproductTraverseInstance<F, G> : Traverse<CoproductPartialOf<F, G>> {
     override fun <H, A, B> CoproductOf<F, G, A>.traverse(AP: Applicative<H>, f: (A) -> Kind<H, B>): Kind<H, Coproduct<F, G, B>> =
             fix().traverse(AP, TF(), TG(), f)
 
-    override fun <A, B> foldLeft(fa: CoproductOf<F, G, A>, b: B, f: (B, A) -> B): B = fa.fix().foldLeft(b, f, TF(), TG())
+    override fun <A, B> Kind<CoproductPartialOf<F, G>, A>.foldLeft(b: B, f: (B, A) -> B): B = fix().foldLeft(b, f, TF(), TG())
 
     override fun <A, B> foldRight(fa: CoproductOf<F, G, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = fa.fix().foldRight(lb, f, TF(), TG())
 

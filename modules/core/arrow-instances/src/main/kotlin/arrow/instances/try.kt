@@ -92,8 +92,8 @@ interface TryFoldableInstance : Foldable<ForTry> {
     override fun <A> TryOf<A>.exists(p: (A) -> Boolean): kotlin.Boolean =
             fix().exists(p)
 
-    override fun <A, B> foldLeft(fa: TryOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
-            fa.fix().foldLeft(b, f)
+    override fun <A, B> Kind<ForTry, A>.foldLeft(b: B, f: (B, A) -> B): B =
+            fix().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: TryOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
             fa.fix().foldRight(lb, f)
@@ -114,8 +114,8 @@ interface TryTraverseInstance : Traverse<ForTry> {
     override fun <A> TryOf<A>.exists(p: (A) -> Boolean): kotlin.Boolean =
             fix().exists(p)
 
-    override fun <A, B> foldLeft(fa: TryOf<A>, b: B, f: Function2<B, A, B>): B =
-            fa.fix().foldLeft(b, f)
+    override fun <A, B> Kind<ForTry, A>.foldLeft(b: B, f: (B, A) -> B): B =
+            fix().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: TryOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
             fa.fix().foldRight(lb, f)

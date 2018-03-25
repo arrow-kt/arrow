@@ -48,8 +48,8 @@ interface ObservableKMonadInstance : Monad<ForObservableK> {
 
 @instance(ObservableK::class)
 interface ObservableKFoldableInstance : Foldable<ForObservableK> {
-    override fun <A, B> foldLeft(fa: ObservableKOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
-            fa.fix().foldLeft(b, f)
+    override fun <A, B> Kind<ForObservableK, A>.foldLeft(b: B, f: (B, A) -> B): B =
+            fix().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: ObservableKOf<A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): arrow.core.Eval<B> =
             fa.fix().foldRight(lb, f)
@@ -63,8 +63,8 @@ interface ObservableKTraverseInstance : Traverse<ForObservableK> {
     override fun <G, A, B> ObservableKOf<A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ObservableK<B>> =
             fix().traverse(AP, f)
 
-    override fun <A, B> foldLeft(fa: ObservableKOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
-            fa.fix().foldLeft(b, f)
+    override fun <A, B> Kind<ForObservableK, A>.foldLeft(b: B, f: (B, A) -> B): B =
+            fix().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: ObservableKOf<A>, lb: arrow.core.Eval<B>, f: kotlin.Function2<A, arrow.core.Eval<B>, arrow.core.Eval<B>>): arrow.core.Eval<B> =
             fa.fix().foldRight(lb, f)

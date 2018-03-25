@@ -58,8 +58,8 @@ interface Tuple2ComonadInstance<F> : Tuple2FunctorInstance<F>, Comonad<Tuple2Par
 
 @instance(Tuple2::class)
 interface Tuple2FoldableInstance<F> : Foldable<Tuple2PartialOf<F>> {
-    override fun <A, B> foldLeft(fa: Tuple2Of<F, A>, b: B, f: (B, A) -> B) =
-            fa.fix().foldL(b, f)
+    override fun <A, B> Kind<Tuple2PartialOf<F>, A>.foldLeft(b: B, f: (B, A) -> B) =
+            fix().foldL(b, f)
 
     override fun <A, B> foldRight(fa: Tuple2Of<F, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>) =
             fa.fix().foldR(lb, f)

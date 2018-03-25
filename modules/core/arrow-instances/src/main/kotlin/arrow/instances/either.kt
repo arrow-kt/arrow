@@ -56,8 +56,8 @@ interface EitherMonadErrorInstance<L> : EitherApplicativeErrorInstance<L>, Eithe
 @instance(Either::class)
 interface EitherFoldableInstance<L> : Foldable<EitherPartialOf<L>> {
 
-    override fun <A, B> foldLeft(fa: Kind<EitherPartialOf<L>, A>, b: B, f: (B, A) -> B): B =
-            fa.fix().foldLeft(b, f)
+    override fun <A, B> Kind<EitherPartialOf<L>, A>.foldLeft(b: B, f: (B, A) -> B): B =
+            fix().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: Kind<EitherPartialOf<L>, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
             fa.fix().foldRight(lb, f)

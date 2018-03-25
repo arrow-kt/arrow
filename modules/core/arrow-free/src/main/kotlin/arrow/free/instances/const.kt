@@ -28,7 +28,7 @@ interface ConstApplicativeInstance<A> : Applicative<ConstPartialOf<A>> {
 @instance(Const::class)
 interface ConstFoldableInstance<A> : Foldable<ConstPartialOf<A>> {
 
-    override fun <T, U> foldLeft(fa: ConstOf<A, T>, b: U, f: (U, T) -> U): U = b
+    override fun <T, U> Kind<ConstPartialOf<A>, T>.foldLeft(b: U, f: (U, T) -> U): U = b
 
     override fun <T, U> foldRight(fa: ConstOf<A, T>, lb: Eval<U>, f: (T, Eval<U>) -> Eval<U>): Eval<U> = lb
 

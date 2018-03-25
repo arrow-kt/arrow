@@ -14,8 +14,8 @@ interface SortedMapKFunctorInstance<A : Comparable<A>> : Functor<SortedMapKParti
 
 @instance(SortedMapK::class)
 interface SortedMapKFoldableInstance<A : Comparable<A>> : Foldable<SortedMapKPartialOf<A>> {
-    override fun <B, C> foldLeft(fa: SortedMapKOf<A, B>, b: C, f: (C, B) -> C): C =
-            fa.fix().foldLeft(b, f)
+    override fun <B, C> Kind<SortedMapKPartialOf<A>, B>.foldLeft(b: C, f: (C, B) -> C): C =
+            fix().foldLeft(b, f)
 
     override fun <B, C> foldRight(fa: SortedMapKOf<A, B>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
             fa.fix().foldRight(lb, f)

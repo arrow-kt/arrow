@@ -19,7 +19,7 @@ interface Foldable<F> {
     /**
      * Left associative fold on F using the provided function.
      */
-    fun <A, B> foldLeft(fa: Kind<F, A>, b: B, f: (B, A) -> B): B
+    fun <A, B> Kind<F, A>.foldLeft(b: B, f: (B, A) -> B): B
 
     /**
      * Right associative lazy fold on F using the provided function.
@@ -36,11 +36,11 @@ interface Foldable<F> {
      * Fold implemented using the given Monoid<A> instance.
      */
     fun <A> Kind<F, A>.fold(MN: Monoid<A>): A = MN.run {
-        foldLeft(this@fold, empty(), { acc, a -> acc.combine(a) })
+        this@fold.foldLeft(empty(), { acc, a -> acc.combine(a) })
     }
 
     fun <A, B> Kind<F, A>.reduceLeftToOption(f: (A) -> B, g: (B, A) -> B): Option<B> =
-            foldLeft(this, Option.empty()) { option, a ->
+            this.foldLeft(Option.empty()) { option, a ->
                 when (option) {
                     is Some<B> -> Some(g(option.t, a))
                     is None -> Some(f(a))
@@ -87,8 +87,7 @@ interface Foldable<F> {
      * Fold implemented by mapping A values into B and then combining them using the given Monoid<B> instance.
      */
     fun <A, B> Kind<F, A>.foldMap(MN: Monoid<B>, f: (A) -> B): B = MN.run {
-        foldLeft(this@foldMap, MN.empty(),
-                { b, a -> b.combine(f(a)) })
+        this@foldMap.foldLeft(MN.empty(), { b, a -> b.combine(f(a)) })
     }
 
     /**
@@ -172,7 +171,7 @@ interface Foldable<F> {
      * entirety of the structure), depending on the G result produced at a given step.
      */
     fun <G, A, B> Kind<F, A>.foldM(M: Monad<G>, z: B, f: (B, A) -> Kind<G, B>): Kind<G, B> = M.run {
-        foldLeft(this@foldM, M.pure(z), { gb, a -> gb.flatMap { f(it, a) } })
+        this@foldM.foldLeft(M.pure(z), { gb, a -> gb.flatMap { f(it, a) } })
     }
 
     /**

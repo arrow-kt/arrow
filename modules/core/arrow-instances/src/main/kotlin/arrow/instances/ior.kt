@@ -44,7 +44,7 @@ interface IorMonadInstance<L> : IorApplicativeInstance<L>, Monad<IorPartialOf<L>
 @instance(Ior::class)
 interface IorFoldableInstance<L> : Foldable<IorPartialOf<L>> {
 
-    override fun <B, C> foldLeft(fa: Kind<Kind<ForIor, L>, B>, b: C, f: (C, B) -> C): C = fa.fix().foldLeft(b, f)
+    override fun <B, C> Kind<IorPartialOf<L>, B>.foldLeft(b: C, f: (C, B) -> C): C = fix().foldLeft(b, f)
 
     override fun <B, C> foldRight(fa: Kind<Kind<ForIor, L>, B>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
             fa.fix().foldRight(lb, f)

@@ -37,8 +37,8 @@ interface ValidatedApplicativeErrorInstance<E> : ValidatedApplicativeInstance<E>
 @instance(Validated::class)
 interface ValidatedFoldableInstance<E> : Foldable<ValidatedPartialOf<E>> {
 
-    override fun <A, B> foldLeft(fa: ValidatedOf<E, A>, b: B, f: (B, A) -> B): B =
-            fa.fix().foldLeft(b, f)
+    override fun <A, B> Kind<ValidatedPartialOf<E>, A>.foldLeft(b: B, f: (B, A) -> B): B =
+            fix().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: ValidatedOf<E, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
             fa.fix().foldRight(lb, f)
