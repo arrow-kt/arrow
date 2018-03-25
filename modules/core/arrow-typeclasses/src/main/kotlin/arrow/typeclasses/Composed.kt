@@ -220,12 +220,12 @@ interface ComposedBifoldable<F, G> : Bifoldable<Nested<F, G>> {
     fun G(): Bifoldable<G>
 
     override fun <A, B, C> Kind2<Nested<F, G>, A, B>.bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C = F().run {
-        this@bifoldLeft.biunnest().bifoldLeft(c, { cc: C, gab: Kind2<G, A, B> -> G().run { gab.bifoldLeft(cc, f, g) } },
-                { cc: C, gab: Kind2<G, A, B> -> this@ComposedBifoldable.G().run { gab.bifoldLeft(cc, f, g) } })
+        biunnest().bifoldLeft(c, { cc: C, gab: Kind2<G, A, B> -> G().run { gab.bifoldLeft(cc, f, g) } },
+                { cc: C, gab: Kind2<G, A, B> -> G().run { gab.bifoldLeft(cc, f, g) } })
     }
 
     override fun <A, B, C> Kind2<Nested<F, G>, A, B>.bifoldRight(c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> = F().run {
-        this@bifoldRight.biunnest().bifoldRight(c, { gab: Kind2<G, A, B>, cc: Eval<C> -> G().run { gab.bifoldRight(cc, f, g) } },
+        biunnest().bifoldRight(c, { gab: Kind2<G, A, B>, cc: Eval<C> -> G().run { gab.bifoldRight(cc, f, g) } },
                 { gab: Kind2<G, A, B>, cc: Eval<C> -> G().run { gab.bifoldRight(cc, f, g) } })
     }
 
