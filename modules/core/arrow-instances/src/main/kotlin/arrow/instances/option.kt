@@ -70,7 +70,7 @@ interface OptionShowInstance<A> : Show<Option<A>> {
 @instance(Option::class)
 interface OptionFunctorInstance : Functor<ForOption> {
     override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
-            this@map.fix().map(f)
+            fix().map(f)
 }
 
 @instance(Option::class)
@@ -79,7 +79,7 @@ interface OptionApplicativeInstance : Applicative<ForOption> {
             fix().ap(ff)
 
     override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
-            this@map.fix().map(f)
+            fix().map(f)
 
     override fun <A> pure(a: A): Option<A> =
             Option.pure(a)
@@ -97,7 +97,7 @@ interface OptionMonadInstance : Monad<ForOption> {
             Option.tailRecM(a, f)
 
     override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
-            this@map.fix().map(f)
+            fix().map(f)
 
     override fun <A> pure(a: A): Option<A> =
             Option.pure(a)
