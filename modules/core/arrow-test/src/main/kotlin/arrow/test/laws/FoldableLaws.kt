@@ -92,7 +92,7 @@ object FoldableLaws {
             forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: Kind<F, Int> ->
                 with(IntMonoidInstance) {
                     val foldL: Int = foldLeft(fa, empty(), { acc, a -> acc.combine(f(a)) })
-                    val foldM: Int = Id.monad().foldM(fa, empty(), { acc, a -> Id(acc.combine(f(a))) }).value()
+                    val foldM: Int = fa.foldM(Id.monad(), empty(), { acc, a -> Id(acc.combine(f(a))) }).value()
                     foldM.equalUnderTheLaw(foldL, EQ)
                 }
             })

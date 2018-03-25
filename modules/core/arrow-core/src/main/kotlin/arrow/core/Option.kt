@@ -200,3 +200,10 @@ fun <T> T?.toOption(): Option<T> = if (this != null) {
 } else {
     None
 }
+
+fun <A> Boolean.maybe(f: () -> A): Option<A> =
+        if (this) {
+            Some(f())
+        } else {
+            None
+        }

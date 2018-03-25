@@ -131,7 +131,8 @@ interface Foldable<F> {
      *
      * If there are no elements, the result is true.
      */
-    fun <A> forall(fa: Kind<F, A>, p: (A) -> Boolean): Boolean = foldRight(fa, Eval.True, { a, lb -> if (p(a)) lb else Eval.False }).value()
+    fun <A> forall(fa: Kind<F, A>, p: (A) -> Boolean): Boolean =
+            foldRight(fa, Eval.True, { a, lb -> if (p(a)) lb else Eval.False }).value()
 
     /**
      * Returns true if there are no elements. Otherwise false.
@@ -155,9 +156,10 @@ interface Foldable<F> {
      *
      * Similar to foldM, but using a Monoid<B>.
      */
-    fun <G, A, B, TC> TC.foldMapM(fa: Kind<F, A>, f: (A) -> Kind<G, B>): Kind<G, B>
-            where TC : Monad<G>, TC : Monoid<B> =
-            foldM(fa, empty(), { b, a -> f(a).map { b.combine(it) } })
+    fun <G, A, B, TC> Kind<F, A>.foldMapM(tc: TC, f: (A) -> Kind<G, B>): Kind<G, B>
+            where TC : Monad<G>, TC : Monoid<B> = tc.run {
+        this@foldMapM.foldM(tc, tc.empty(), { b, a -> f(a).map { b.combine(it) } })
+    }
 
     /**
      * Left associative monadic folding on F.
@@ -166,21 +168,20 @@ interface Foldable<F> {
      * Certain structures are able to implement this in such a way that folds can be short-circuited (not traverse the
      * entirety of the structure), depending on the G result produced at a given step.
      */
-    fun <G, A, B> Monad<G>.foldM(fa: Kind<F, A>, z: B, f: (B, A) -> Kind<G, B>): Kind<G, B> =
-            foldLeft(fa, pure(z), { gb, a -> gb.flatMap { f(it, a) } })
+    fun <G, A, B> Kind<F, A>.foldM(M: Monad<G>, z: B, f: (B, A) -> Kind<G, B>): Kind<G, B> = M.run {
+        foldLeft(this@foldM, M.pure(z), { gb, a -> gb.flatMap { f(it, a) } })
+    }
 
     /**
      * Get the element at the index of the Foldable.
      */
-    fun <F, A, TC> TC.get(fa: Kind<F, A>, idx: Long): Option<A>
-            where TC : Foldable<F>, TC : Monad<Kind<ForEither, A>> =
+    fun <A> Kind<F, A>.get(M: Monad<Kind<ForEither, A>>, idx: Long): Option<A> =
             if (idx < 0L)
                 None
-            else {
-                foldM(fa, 0L, { i, a ->
+            else
+                foldM(M, 0L, { i, a ->
                     if (i == idx) Left(a) else Right(i + 1L)
                 }).fix().swap().toOption()
-            }
 
     companion object {
         fun <A, B> iterateRight(it: Iterator<A>, lb: Eval<B>): (f: (A, Eval<B>) -> Eval<B>) -> Eval<B> = { f: (A, Eval<B>) -> Eval<B> ->

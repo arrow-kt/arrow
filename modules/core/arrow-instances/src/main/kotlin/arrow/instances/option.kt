@@ -105,7 +105,7 @@ interface OptionMonadInstance : Monad<ForOption> {
 
 @instance(Option::class)
 interface OptionFoldableInstance : Foldable<ForOption> {
-    override fun <A> exists(fa: OptionOf<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
+    override fun <A> exists(fa: Kind<ForOption, A>, p: (A) -> Boolean): kotlin.Boolean =
             fa.fix().exists(p)
 
     override fun <A, B> foldLeft(fa: OptionOf<A>, b: B, f: Function2<B, A, B>): B =
@@ -149,7 +149,7 @@ interface OptionTraverseInstance : Traverse<ForOption> {
     override fun <G, A, B> Kind<ForOption, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Option<B>> =
             fix().traverse(f, AP)
 
-    override fun <A> exists(fa: OptionOf<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
+    override fun <A> exists(fa: Kind<ForOption, A>, p: (A) -> Boolean): kotlin.Boolean =
             fa.fix().exists(p)
 
     override fun <A, B> foldLeft(fa: OptionOf<A>, b: B, f: Function2<B, A, B>): B =
