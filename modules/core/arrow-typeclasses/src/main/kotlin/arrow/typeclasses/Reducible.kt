@@ -45,9 +45,9 @@ interface Reducible<F> : Foldable<F> {
     override fun <A, B> Kind<F, A>.reduceRightToOption(f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<Option<B>> =
             reduceRightTo(f, g).map({ Some(it) })
 
-    override fun <A> isEmpty(fa: Kind<F, A>): Boolean = false
+    override fun <A> Kind<F, A>.isEmpty(): Boolean = false
 
-    override fun <A> nonEmpty(fa: Kind<F, A>): Boolean = true
+    override fun <A> Kind<F, A>.nonEmpty(): Boolean = true
 
     /**
      * Reduce a F<A> value using the given Semigroup<A>.

@@ -55,7 +55,7 @@ object FoldableLaws {
                     sideEffect.increment()
                     true
                 })
-                val expected = if (isEmpty(fa)) 0 else 1
+                val expected = if (fa.isEmpty()) 0 else 1
                 sideEffect.counter.equalUnderTheLaw(expected, EQ)
             })
 
@@ -66,7 +66,7 @@ object FoldableLaws {
                     sideEffect.increment()
                     true
                 })
-                val expected = if (isEmpty(fa)) 0 else 1
+                val expected = if (fa.isEmpty()) 0 else 1
                 sideEffect.counter.equalUnderTheLaw(expected, EQ)
             })
 
@@ -79,13 +79,13 @@ object FoldableLaws {
                     !negationExists &&
                             // if p is true for all elements, then either there must be no elements
                             // or there must exist an element for which it is true.
-                            (isEmpty(fa) || exists(fa, f))
+                            (fa.isEmpty() || exists(fa, f))
                 } else true
             })
 
     fun <F> Foldable<F>.forallReturnsTrueIfEmpty(cf: (Int) -> Kind<F, Int>) =
             forAll(genIntPredicate(), genConstructor(Gen.int(), cf), { f: (Int) -> Boolean, fa: Kind<F, Int> ->
-                !isEmpty(fa) || forall(fa, f)
+                !fa.isEmpty() || forall(fa, f)
             })
 
     fun <F> Foldable<F>.foldMIdIsFoldL(cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>) =

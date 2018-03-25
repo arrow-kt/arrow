@@ -136,9 +136,9 @@ interface Foldable<F> {
     /**
      * Returns true if there are no elements. Otherwise false.
      */
-    fun <A> isEmpty(fa: Kind<F, A>): Boolean = foldRight(fa, Eval.True, { _, _ -> Eval.False }).value()
+    fun <A> Kind<F, A>.isEmpty(): Boolean = foldRight(this, Eval.True, { _, _ -> Eval.False }).value()
 
-    fun <A> nonEmpty(fa: Kind<F, A>): Boolean = !isEmpty(fa)
+    fun <A> Kind<F, A>.nonEmpty(): Boolean = !isEmpty()
 
     /**
      * The size of this Foldable.
@@ -157,7 +157,7 @@ interface Foldable<F> {
      */
     fun <G, A, B, TC> TC.foldMapM(fa: Kind<F, A>, f: (A) -> Kind<G, B>): Kind<G, B>
             where TC : Monad<G>, TC : Monoid<B> =
-            foldM(fa, empty(), { b, a -> f(a).map() { b.combine(it) } })
+            foldM(fa, empty(), { b, a -> f(a).map { b.combine(it) } })
 
     /**
      * Left associative monadic folding on F.
@@ -167,7 +167,7 @@ interface Foldable<F> {
      * entirety of the structure), depending on the G result produced at a given step.
      */
     fun <G, A, B> Monad<G>.foldM(fa: Kind<F, A>, z: B, f: (B, A) -> Kind<G, B>): Kind<G, B> =
-            foldLeft(fa, pure(z), { gb, a -> gb.flatMap() { f(it, a) } })
+            foldLeft(fa, pure(z), { gb, a -> gb.flatMap { f(it, a) } })
 
     /**
      * Get the element at the index of the Foldable.

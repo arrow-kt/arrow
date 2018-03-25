@@ -1,5 +1,6 @@
 package arrow.instances
 
+import arrow.Kind
 import arrow.core.Eval
 import arrow.data.*
 import arrow.instance
@@ -44,8 +45,8 @@ interface SetKFoldableInstance : Foldable<ForSetK> {
     override fun <A, B> foldRight(fa: SetKOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
             fa.fix().foldRight(lb, f)
 
-    override fun <A> isEmpty(fa: SetKOf<A>): kotlin.Boolean =
-            fa.fix().isEmpty()
+    override fun <A> Kind<ForSetK, A>.isEmpty(): kotlin.Boolean =
+            fix().isEmpty()
 }
 
 @instance(SetK::class)

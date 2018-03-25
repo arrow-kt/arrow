@@ -109,8 +109,8 @@ interface NonEmptyListFoldableInstance : Foldable<ForNonEmptyList> {
     override fun <A, B> foldRight(fa: NonEmptyListOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
             fa.fix().foldRight(lb, f)
 
-    override fun <A> isEmpty(fa: NonEmptyListOf<A>): kotlin.Boolean =
-            fa.fix().isEmpty()
+    override fun <A> Kind<ForNonEmptyList, A>.isEmpty(): kotlin.Boolean =
+            fix().isEmpty()
 }
 
 @instance(NonEmptyList::class)
@@ -127,8 +127,8 @@ interface NonEmptyListTraverseInstance : Traverse<ForNonEmptyList> {
     override fun <A, B> foldRight(fa: NonEmptyListOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
             fa.fix().foldRight(lb, f)
 
-    override fun <A> isEmpty(fa: NonEmptyListOf<A>): kotlin.Boolean =
-            fa.fix().isEmpty()
+    override fun <A> Kind<ForNonEmptyList, A>.isEmpty(): kotlin.Boolean =
+            fix().isEmpty()
 }
 
 @instance(NonEmptyList::class)

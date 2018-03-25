@@ -117,11 +117,11 @@ interface OptionFoldableInstance : Foldable<ForOption> {
     override fun <A> forall(fa: OptionOf<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
             fa.fix().forall(p)
 
-    override fun <A> isEmpty(fa: OptionOf<A>): kotlin.Boolean =
-            fa.fix().isEmpty()
+    override fun <A> Kind<ForOption, A>.isEmpty(): kotlin.Boolean =
+            fix().isEmpty()
 
-    override fun <A> nonEmpty(fa: OptionOf<A>): kotlin.Boolean =
-            fa.fix().nonEmpty()
+    override fun <A> Kind<ForOption, A>.nonEmpty(): kotlin.Boolean =
+            fix().nonEmpty()
 }
 
 fun <A, G, B> OptionOf<A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Option<B>> = GA.run {
@@ -161,9 +161,9 @@ interface OptionTraverseInstance : Traverse<ForOption> {
     override fun <A> forall(fa: OptionOf<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
             fa.fix().forall(p)
 
-    override fun <A> isEmpty(fa: OptionOf<A>): kotlin.Boolean =
-            fa.fix().isEmpty()
+    override fun <A> Kind<ForOption, A>.isEmpty(): kotlin.Boolean =
+            fix().isEmpty()
 
-    override fun <A> nonEmpty(fa: OptionOf<A>): kotlin.Boolean =
-            fa.fix().nonEmpty()
+    override fun <A> Kind<ForOption, A>.nonEmpty(): kotlin.Boolean =
+            fix().nonEmpty()
 }

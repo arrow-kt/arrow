@@ -85,8 +85,8 @@ interface ListKFoldableInstance : Foldable<ForListK> {
     override fun <A, B> foldRight(fa: ListKOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
             fa.fix().foldRight(lb, f)
 
-    override fun <A> isEmpty(fa: ListKOf<A>): kotlin.Boolean =
-            fa.fix().isEmpty()
+    override fun <A> Kind<ForListK, A>.isEmpty(): kotlin.Boolean =
+            fix().isEmpty()
 }
 
 @instance(ListK::class)
@@ -103,8 +103,8 @@ interface ListKTraverseInstance : Traverse<ForListK> {
     override fun <A, B> foldRight(fa: ListKOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
             fa.fix().foldRight(lb, f)
 
-    override fun <A> isEmpty(fa: ListKOf<A>): kotlin.Boolean =
-            fa.fix().isEmpty()
+    override fun <A> Kind<ForListK, A>.isEmpty(): kotlin.Boolean =
+            fix().isEmpty()
 }
 
 @instance(ListK::class)

@@ -35,11 +35,11 @@ interface OptionTraverseFilterInstance : TraverseFilter<ForOption> {
     override fun <A> forall(fa: OptionOf<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
             fa.fix().forall(p)
 
-    override fun <A> isEmpty(fa: OptionOf<A>): kotlin.Boolean =
-            fa.fix().isEmpty()
+    override fun <A> Kind<ForOption, A>.isEmpty(): kotlin.Boolean =
+            fix().isEmpty()
 
-    override fun <A> nonEmpty(fa: OptionOf<A>): kotlin.Boolean =
-            fa.fix().nonEmpty()
+    override fun <A> Kind<ForOption, A>.nonEmpty(): kotlin.Boolean =
+            fix().nonEmpty()
 }
 
 @instance(Option::class)
