@@ -91,7 +91,7 @@ interface NonEmptyReducible<F, G> : Reducible<F> {
     }
 
     override fun <A, B> foldRight(fa: Kind<F, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            Eval.Always({ split(fa) }).flatMap { (a, ga) -> f(a, FG().foldRight(ga, lb, f)) }
+            Eval.Always({ split(fa) }).flatMap { (a, ga) -> f(a, FG().run { foldRight(ga, lb, f) }) }
 
     override fun <A, B> Kind<F, A>.reduceLeftTo(f: (A) -> B, g: (B, A) -> B): B = FG().run {
         val (a, ga) = split(this@reduceLeftTo)

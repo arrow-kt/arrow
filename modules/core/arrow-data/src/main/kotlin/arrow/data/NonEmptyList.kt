@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.*
 import arrow.higherkind
 import arrow.typeclasses.Applicative
-import arrow.typeclasses.Traverse
 
 typealias Nel<A> = NonEmptyList<A>
 
@@ -43,14 +42,14 @@ class NonEmptyList<out A> private constructor(
     fun <B> foldLeft(b: B, f: (B, A) -> B): B = this.fix().tail.fold(f(b, this.fix().head), f)
 
     fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            ListKTraverse.foldRight(this.fix().all.k(), lb, f)
+            all.k().foldRight(lb, f)
 
-    fun <G, B> traverse(AG: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, NonEmptyList<B>> = with (AG) {
-            f(fix().head).map2Eval(Eval.always {
-                ListKTraverse.run { fix().tail.k().traverse(AG, f) }
-            }, {
-                NonEmptyList(it.a, it.b.fix().list)
-            }).value()
+    fun <G, B> traverse(AG: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, NonEmptyList<B>> = with(AG) {
+        f(fix().head).map2Eval(Eval.always {
+            tail.k().traverse(AG, f)
+        }, {
+            NonEmptyList(it.a, it.b.fix().list)
+        }).value()
     }
 
     fun <B> coflatMap(f: (NonEmptyListOf<A>) -> B): NonEmptyList<B> {
@@ -125,20 +124,3 @@ class NonEmptyList<out A> private constructor(
 fun <A> A.nel(): NonEmptyList<A> = NonEmptyList.of(this)
 
 fun <A> NonEmptyList<A>.combineK(y: NonEmptyListOf<A>): NonEmptyList<A> = this.plus(y.fix())
-
-private val ListKTraverse: Traverse<ForListK> = object : Traverse<ForListK> {
-    override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
-            fix().map(f)
-
-    override fun <G, A, B> Kind<ForListK, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ListK<B>> =
-            fix().traverse(AP, f)
-
-    override fun <A, B> foldLeft(fa: ListKOf<A>, b: B, f: Function2<B, A, B>): B =
-            fa.fix().foldLeft(b, f)
-
-    override fun <A, B> foldRight(fa: ListKOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
-            fa.fix().foldRight(lb, f)
-
-    override fun <A> Kind<ForListK, A>.isEmpty(): kotlin.Boolean =
-            fix().isEmpty()
-}
