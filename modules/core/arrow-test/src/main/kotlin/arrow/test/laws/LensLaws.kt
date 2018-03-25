@@ -12,16 +12,17 @@ import io.kotlintest.properties.forAll
 
 object LensLaws {
 
-    inline fun <A, B> laws(lens: Lens<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQB: Eq<B>, MB: Monoid<B>) = listOf(
-            Law("Lens law: get set", { lens.lensGetSet(aGen, EQA) }),
-            Law("Lens law: set get", { lens.lensSetGet(aGen, bGen, EQB) }),
-            Law("Lens law: is set idempotent", { lens.lensSetIdempotent(aGen, bGen, EQA) }),
-            Law("Lens law: modify identity", { lens.lensModifyIdentity(aGen, EQA) }),
-            Law("Lens law: compose modify", { lens.lensComposeModify(aGen, funcGen, EQA) }),
-            Law("Lens law: consistent set modify", { lens.lensConsistentSetModify(aGen, bGen, EQA) }),
-            Law("Lens law: consistent modify modify id", { lens.lensConsistentModifyModifyId(aGen, funcGen, EQA) }),
-            Law("Lens law: consistent get modify id", { lens.lensConsistentGetModifyid(aGen, EQB, MB) })
-    )
+    inline fun <A, B> laws(lens: Lens<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQB: Eq<B>, MB: Monoid<B>) =
+            listOf(
+                    Law("Lens law: get set", { lens.lensGetSet(aGen, EQA) }),
+                    Law("Lens law: set get", { lens.lensSetGet(aGen, bGen, EQB) }),
+                    Law("Lens law: is set idempotent", { lens.lensSetIdempotent(aGen, bGen, EQA) }),
+                    Law("Lens law: modify identity", { lens.lensModifyIdentity(aGen, EQA) }),
+                    Law("Lens law: compose modify", { lens.lensComposeModify(aGen, funcGen, EQA) }),
+                    Law("Lens law: consistent set modify", { lens.lensConsistentSetModify(aGen, bGen, EQA) }),
+                    Law("Lens law: consistent modify modify id", { lens.lensConsistentModifyModifyId(aGen, funcGen, EQA) }),
+                    Law("Lens law: consistent get modify id", { lens.lensConsistentGetModifyid(aGen, EQB, MB) })
+            )
 
     fun <A, B> Lens<A, B>.lensGetSet(aGen: Gen<A>, EQA: Eq<A>) =
             forAll(aGen, { a ->

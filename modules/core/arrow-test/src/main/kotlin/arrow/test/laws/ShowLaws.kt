@@ -12,7 +12,7 @@ object ShowLaws {
                     Law("Show Laws: equality", { S.equalShow(EQ, cf) })
             )
 
-    inline fun <F> Show<F>.equalShow(EQ: Eq<F>, crossinline cf: (Int) -> F): Unit =
+    fun <F> Show<F>.equalShow(EQ: Eq<F>, cf: (Int) -> F): Unit =
             forAll(Gen.int(), { int: Int ->
                 val a = cf(int)
                 val b = cf(int)
