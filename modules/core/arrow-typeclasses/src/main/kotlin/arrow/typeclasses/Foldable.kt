@@ -35,18 +35,20 @@ interface Foldable<F> {
     /**
      * Fold implemented using the given Monoid<A> instance.
      */
-    fun <A> Monoid<A>.fold(fa: Kind<F, A>): A = foldLeft(fa, empty(), { acc, a -> acc.combine(a) })
+    fun <A> Kind<F, A>.fold(MN: Monoid<A>): A = MN.run {
+        foldLeft(this@fold, empty(), { acc, a -> acc.combine(a) })
+    }
 
-    fun <A, B> reduceLeftToOption(fa: Kind<F, A>, f: (A) -> B, g: (B, A) -> B): Option<B> =
-            foldLeft(fa, Option.empty()) { option, a ->
+    fun <A, B> Kind<F, A>.reduceLeftToOption(f: (A) -> B, g: (B, A) -> B): Option<B> =
+            foldLeft(this, Option.empty()) { option, a ->
                 when (option) {
                     is Some<B> -> Some(g(option.t, a))
                     is None -> Some(f(a))
                 }
             }
 
-    fun <A, B> reduceRightToOption(fa: Kind<F, A>, f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<Option<B>> =
-            foldRight(fa, Eval.Now(Option.empty())) { a, lb ->
+    fun <A, B> Kind<F, A>.reduceRightToOption(f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<Option<B>> =
+            foldRight(this, Eval.Now(Option.empty())) { a, lb ->
                 lb.flatMap { option ->
                     when (option) {
                         is Some<B> -> g(a, Eval.Now(option.t)).map({ Some(it) })
@@ -62,7 +64,8 @@ interface Foldable<F> {
      * @return None if the structure is empty, otherwise the result of combining the cumulative left-associative result
      * of the f operation over all of the elements.
      */
-    fun <A> reduceLeftOption(fa: Kind<F, A>, f: (A, A) -> A): Option<A> = reduceLeftToOption(fa, { a -> a }, f)
+    fun <A> Kind<F, A>.reduceLeftOption(f: (A, A) -> A): Option<A> =
+            reduceLeftToOption({ a -> a }, f)
 
     /**
      * Reduce the elements of this structure down to a single value by applying the provided aggregation function in
@@ -71,17 +74,22 @@ interface Foldable<F> {
      * @return None if the structure is empty, otherwise the result of combining the cumulative right-associative
      * result of the f operation over the A elements.
      */
-    fun <A> reduceRightOption(fa: Kind<F, A>, f: (A, Eval<A>) -> Eval<A>): Eval<Option<A>> = reduceRightToOption(fa, { a -> a }, f)
+    fun <A> Kind<F, A>.reduceRightOption(f: (A, Eval<A>) -> Eval<A>): Eval<Option<A>> =
+            reduceRightToOption({ a -> a }, f)
 
     /**
      * Alias for fold.
      */
-    fun <A> Monoid<A>.combineAll(fa: Kind<F, A>): A = fold(fa)
+    fun <A> Kind<F, A>.combineAll(MN: Monoid<A>): A =
+            fold(MN)
 
     /**
      * Fold implemented by mapping A values into B and then combining them using the given Monoid<B> instance.
      */
-    fun <A, B> Monoid<B>.foldMap(fa: Kind<F, A>, f: (A) -> B): B = foldLeft(fa, empty(), { b, a -> b.combine(f(a)) })
+    fun <A, B> Kind<F, A>.foldMap(MN: Monoid<B>, f: (A) -> B): B = MN.run {
+        foldLeft(this@foldMap, MN.empty(),
+                { b, a -> b.combine(f(a)) })
+    }
 
     /**
      * Traverse F<A> using Applicative<G>.
@@ -91,8 +99,8 @@ interface Foldable<F> {
      * This method is primarily useful when G<_> represents an action or effect, and the specific A aspect of G<A> is
      * not otherwise needed.
      */
-    fun <G, A, B> traverse_(GA: Applicative<G>, fa: Kind<F, A>, f: (A) -> Kind<G, B>): Kind<G, Unit> = GA.run {
-        foldRight(fa, always { pure(Unit) }, { a, acc -> f(a).map2Eval(acc) { Unit } }).value()
+    fun <G, A, B> Kind<F, A>.traverse_(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Unit> = GA.run {
+        foldRight(this@traverse_, always { pure(Unit) }, { a, acc -> f(a).map2Eval(acc) { Unit } }).value()
     }
 
     /**
@@ -100,7 +108,7 @@ interface Foldable<F> {
      *
      * Similar to traverse except it operates on F<G<A>> values, so no additional functions are needed.
      */
-    fun <G, A> sequence_(ag: Applicative<G>, fga: Kind<F, Kind<G, A>>): Kind<G, Unit> = traverse_(ag, fga, { it })
+    fun <G, A> Kind<F, Kind<G, A>>.sequence_(ag: Applicative<G>): Kind<G, Unit> = traverse_(ag, { it })
 
     /**
      * Find the first element matching the predicate, if one exists.
@@ -115,7 +123,8 @@ interface Foldable<F> {
      *
      * If there are no elements, the result is false.
      */
-    fun <A> exists(fa: Kind<F, A>, p: (A) -> Boolean): Boolean = foldRight(fa, Eval.False, { a, lb -> if (p(a)) Eval.True else lb }).value()
+    fun <A> exists(fa: Kind<F, A>, p: (A) -> Boolean): Boolean =
+            foldRight(fa, Eval.False, { a, lb -> if (p(a)) Eval.True else lb }).value()
 
     /**
      * Check whether all elements satisfy the predicate.
@@ -139,7 +148,7 @@ interface Foldable<F> {
      *
      * Note: will not terminate for infinite-sized collections.
      */
-    fun <A> Monoid<Long>.size(fa: Kind<F, A>): Long = foldMap(fa) { 1 }
+    fun <A> Monoid<Long>.size(fa: Kind<F, A>): Long = fa.foldMap(this) { 1 }
 
     /**
      * Monadic folding on F by mapping A values to G<B>, combining the B values using the given Monoid<B> instance.

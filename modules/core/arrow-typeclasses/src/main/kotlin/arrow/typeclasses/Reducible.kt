@@ -34,7 +34,7 @@ interface Reducible<F> : Foldable<F> {
      */
     fun <A, B> Kind<F, A>.reduceLeftTo(f: (A) -> B, g: (B, A) -> B): B
 
-    override fun <A, B> reduceLeftToOption(fa: Kind<F, A>, f: (A) -> B, g: (B, A) -> B): Option<B> = Some(fa.reduceLeftTo(f, g))
+    override fun <A, B> Kind<F, A>.reduceLeftToOption(f: (A) -> B, g: (B, A) -> B): Option<B> = Some(reduceLeftTo(f, g))
 
     /**
      * Apply f to the "initial element" of fa and lazily combine it with every other value using the
@@ -42,8 +42,8 @@ interface Reducible<F> : Foldable<F> {
      */
     fun <A, B> Kind<F, A>.reduceRightTo(f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<B>
 
-    override fun <A, B> reduceRightToOption(fa: Kind<F, A>, f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<Option<B>> =
-            fa.reduceRightTo(f, g).map({ Some(it) })
+    override fun <A, B> Kind<F, A>.reduceRightToOption(f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<Option<B>> =
+            reduceRightTo(f, g).map({ Some(it) })
 
     override fun <A> isEmpty(fa: Kind<F, A>): Boolean = false
 
@@ -100,7 +100,7 @@ interface NonEmptyReducible<F, G> : Reducible<F> {
 
     override fun <A, B> Kind<F, A>.reduceRightTo(f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<B> = FG().run {
         Eval.Always({ split(this@reduceRightTo) }).flatMap { (a, ga) ->
-            reduceRightToOption(ga, f, g).flatMap { option ->
+            ga.reduceRightToOption(f, g).flatMap { option ->
                 when (option) {
                     is Some<B> -> g(a, Eval.Now(option.t))
                     is None -> Eval.Later({ f(a) })
@@ -109,29 +109,29 @@ interface NonEmptyReducible<F, G> : Reducible<F> {
         }
     }
 
-    override fun <A> Monoid<A>.fold(fa: Kind<F, A>): A {
-        val (a, ga) = split(fa)
-        return a.combine(FG().run { fold(ga) })
+    override fun <A> Kind<F, A>.fold(MN: Monoid<A>): A = MN.run {
+        val (a, ga) = split(this@fold)
+        return a.combine(FG().run { ga.fold(MN) })
     }
 
-    override fun <A> find(fa: Kind<F, A>, f: (A) -> Boolean): Option<A> {
+    override fun <A> find(fa: Kind<F, A>, f: (A) -> Boolean): Option<A> = FG().run {
         val (a, ga) = split(fa)
-        return if (f(a)) Some(a) else FG().find(ga, f)
+        return if (f(a)) Some(a) else find(ga, f)
     }
 
-    override fun <A> exists(fa: Kind<F, A>, p: (A) -> Boolean): Boolean {
+    override fun <A> exists(fa: Kind<F, A>, p: (A) -> Boolean): Boolean = FG().run {
         val (a, ga) = split(fa)
-        return p(a) || FG().exists(ga, p)
+        return p(a) || exists(ga, p)
     }
 
-    override fun <A> forall(fa: Kind<F, A>, p: (A) -> Boolean): Boolean {
+    override fun <A> forall(fa: Kind<F, A>, p: (A) -> Boolean): Boolean = FG().run {
         val (a, ga) = split(fa)
-        return p(a) && FG().forall(ga, p)
+        return p(a) && forall(ga, p)
     }
 
-    override fun <A> Monoid<Long>.size(fa: Kind<F, A>): Long {
+    override fun <A> Monoid<Long>.size(fa: Kind<F, A>): Long = FG().run {
         val (_, tail) = split(fa)
-        return 1 + FG().run { size(tail) }
+        return 1 + size(tail)
     }
 
     fun <A> Kind<F, A>.get(M: Monad<Kind<ForEither, A>>, idx: Long): Option<A> =

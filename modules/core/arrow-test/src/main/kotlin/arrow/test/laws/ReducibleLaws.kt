@@ -41,7 +41,7 @@ object ReducibleLaws {
     fun <F> Reducible<F>.reduceRightToConsistentWithReduceRightToOption(cf: (Int) -> Kind<F, Int>, EQ: Eq<Option<Int>>) =
             forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: Kind<F, Int> ->
                 with(IntMonoidInstance) {
-                    reduceRightToOption(fa, f, { a, eb -> eb.map({ f(a).combine(it) }) }).value()
+                    fa.reduceRightToOption(f, { a, eb -> eb.map({ f(a).combine(it) }) }).value()
                             .equalUnderTheLaw(fa.reduceRightTo(f, { a, eb -> eb.map({ f(a).combine(it) }) }).map({ Option(it) }).value(), EQ)
                 }
             })
@@ -49,7 +49,7 @@ object ReducibleLaws {
     fun <F> Reducible<F>.reduceRightConsistentWithReduceRightOption(cf: (Int) -> Kind<F, Int>, EQ: Eq<Option<Int>>) =
             forAll(genFunctionAAToA(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int, Int) -> Int, fa: Kind<F, Int> ->
                 fa.reduceRight({ a1, e2 -> Eval.Now(f(a1, e2.value())) }).map({ Option(it) }).value()
-                        .equalUnderTheLaw(reduceRightOption(fa, { a1, e2 -> Eval.Now(f(a1, e2.value())) }).value(), EQ)
+                        .equalUnderTheLaw(fa.reduceRightOption({ a1, e2 -> Eval.Now(f(a1, e2.value())) }).value(), EQ)
             })
 
     fun <F> Reducible<F>.reduceReduceLeftConsistent(cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>) =

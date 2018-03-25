@@ -19,7 +19,7 @@ interface Traverse<F> : Functor<F>, Foldable<F> {
     /**
      * Thread all the G effects through the F structure to invert the structure from F<G<A>> to G<F<A>>.
      */
-    fun <G, A> Kind<F, Kind<G, A>>.sequence(AG: Applicative<G>): Kind<G, Kind<F, A>> = this.traverse(AG) { it }
+    fun <G, A> Kind<F, Kind<G, A>>.sequence(AG: Applicative<G>): Kind<G, Kind<F, A>> = traverse(AG) { it }
 
     override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> =
             traverse(IdMonad, { Id(f(it)) }).value()
