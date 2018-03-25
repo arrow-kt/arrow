@@ -1,16 +1,17 @@
 package arrow.derive
 
-import com.google.auto.service.AutoService
-import arrow.common.utils.*
+import arrow.common.utils.AbstractProcessor
+import arrow.common.utils.ClassOrPackageDataWrapper
+import arrow.common.utils.knownError
 import org.jetbrains.kotlin.serialization.deserialization.TypeTable
 import java.io.File
-import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
 
-@AutoService(Processor::class)
+// FIXME(paco) Enable Deriving once it's ready again
+//@AutoService(Processor::class)
 class DerivingProcessor : AbstractProcessor() {
 
     private val annotatedList: MutableList<AnnotatedDeriving> = mutableListOf()

@@ -15,7 +15,7 @@ interface ApplicativeError<F, E> : Applicative<F> {
     fun <A> Kind<F, A>.handleError(f: (E) -> A): Kind<F, A> = handleErrorWith { pure(f(it)) }
 
     fun <A> Kind<F, A>.attempt(): Kind<F, Either<E, A>> =
-            this.map() { Right(it) }.handleErrorWith {
+            this.map { Right(it) }.handleErrorWith {
                 pure(Left(it))
             }
 
