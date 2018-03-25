@@ -60,7 +60,7 @@ fun <S, A, B> Free<S, A>.map(dummy: Unit? = null, f: (A) -> B): Free<S, B> = fla
 
 fun <S, A, B> Free<S, A>.flatMap(dummy: Unit? = null, f: (A) -> Free<S, B>): Free<S, B> = Free.FlatMapped(this, f)
 
-fun <S, A, B> Free<S, A>.ap(dummy: Unit? = null, ff: FreeOf<S, (A) -> B>): Free<S, B> = ff.fix().flatMap { f -> map(f =  f) }.fix()
+fun <S, A, B> Free<S, A>.ap(dummy: Unit? = null, ff: FreeOf<S, (A) -> B>): Free<S, B> = ff.fix().flatMap { f -> map(f = f) }.fix()
 
 @Suppress("UNCHECKED_CAST")
 tailrec fun <S, A> Free<S, A>.step(): Free<S, A> =

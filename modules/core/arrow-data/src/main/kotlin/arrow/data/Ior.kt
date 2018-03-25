@@ -311,7 +311,7 @@ sealed class Ior<A, B> : IorOf<A, B> {
     data class Right<A, B>(val value: B) : Ior<A, B>() {
         override val isRight: Boolean get() = true
         override val isLeft: Boolean get() = false
-        override val isBoth: Boolean get()  = false
+        override val isBoth: Boolean get() = false
     }
 
     data class Both<A, B>(val leftValue: A, val rightValue: B) : Ior<A, B>() {

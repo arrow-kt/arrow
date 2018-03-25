@@ -66,7 +66,7 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
     /**
      * Modify the focus of a [PLens] using Functor function
      */
-    fun <F> modifyF(FF: Functor<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> =  FF.run {
+    fun <F> modifyF(FF: Functor<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FF.run {
         f(get(s)).map({ b -> set(s, b) })
     }
 

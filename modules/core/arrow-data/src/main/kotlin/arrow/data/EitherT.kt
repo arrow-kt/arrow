@@ -50,7 +50,7 @@ data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, 
                 EitherT(pure(value))
     }
 
-    inline fun <C> fold(crossinline l: (A) -> C, crossinline r: (B) -> C, FF: Functor<F>): Kind<F, C> =  FF.run {
+    inline fun <C> fold(crossinline l: (A) -> C, crossinline r: (B) -> C, FF: Functor<F>): Kind<F, C> = FF.run {
         value.map({ either -> either.fold(l, r) })
     }
 
@@ -62,7 +62,7 @@ data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, 
 
     inline fun <C> cata(crossinline l: (A) -> C, crossinline r: (B) -> C, FF: Functor<F>): Kind<F, C> = fold(l, r, FF)
 
-    fun <C> liftF(fa: Kind<F, C>, FF: Functor<F>): EitherT<F, A, C> =  FF.run {
+    fun <C> liftF(fa: Kind<F, C>, FF: Functor<F>): EitherT<F, A, C> = FF.run {
         EitherT(fa.map({ Right(it) }))
     }
 
