@@ -52,20 +52,25 @@ interface Reducible<F> : Foldable<F> {
     /**
      * Reduce a F<A> value using the given Semigroup<A>.
      */
-    fun <A> Semigroup<A>.reduce(fa: Kind<F, A>): A = fa.reduceLeft({ a, b -> a.combine(b) })
+    fun <A> Kind<F, A>.reduce(SG: Semigroup<A>): A = SG.run {
+        reduceLeft({ a, b -> a.combine(b) })
+    }
 
     /**
      * Reduce a F<G<A>> value using SemigroupK<G>, a universal semigroup for G<_>.
      *
      * This method is a generalization of reduce.
      */
-    fun <G, A> SemigroupK<G>.reduceK(fga: Kind<F, Kind<G, A>>): Kind<G, A> = this.algebra<A>().reduce(fga)
+    fun <G, A> Kind<F, Kind<G, A>>.reduceK(SG: SemigroupK<G>): Kind<G, A> = SG.run {
+        reduce(algebra())
+    }
 
     /**
      * Apply f to each element of fa and combine them using the given Semigroup<B>.
      */
-    fun <A, B> Semigroup<B>.reduceMap(fa: Kind<F, A>, f: (A) -> B): B =
-            fa.reduceLeftTo(f, { b, a -> b.combine(f(a)) })
+    fun <A, B> Kind<F, A>.reduceMap(SG: Semigroup<B>, f: (A) -> B): B = SG.run {
+        reduceLeftTo(f, { b, a -> b.combine(f(a)) })
+    }
 
 }
 
@@ -129,17 +134,17 @@ interface NonEmptyReducible<F, G> : Reducible<F> {
         return 1 + FG().run { size(tail) }
     }
 
-    fun <A> Monad<Kind<ForEither, A>>.get(fa: Kind<F, A>, idx: Long): Option<A> =
+    fun <A> Kind<F, A>.get(M: Monad<Kind<ForEither, A>>, idx: Long): Option<A> =
             if (idx == 0L)
-                Some(split(fa).a)
+                Some(split(this).a)
             else
-                getObject().get(split(fa).b, idx - 1L)
+                getObject(M).get(split(this).b, idx - 1L)
 
-    private inline fun <A> Monad<Kind<ForEither, A>>.getObject() =
-            object : Monad<Kind<ForEither, A>> by this, Foldable<G> by FG() {}
+    private inline fun <A> getObject(M: Monad<Kind<ForEither, A>>) =
+            object : Monad<Kind<ForEither, A>> by M, Foldable<G> by FG() {}
 
-    fun <A, B> Monad<G>.foldM_(fa: Kind<F, A>, z: B, f: (B, A) -> Kind<G, B>): Kind<G, B> {
-        val (a, ga) = split(fa)
+    fun <A, B> Kind<F, A>.foldM_(M: Monad<G>, z: B, f: (B, A) -> Kind<G, B>): Kind<G, B> = M.run {
+        val (a, ga) = split(this@foldM_)
         return f(z, a).flatMap({ FG().run { foldM(ga, it, f) } })
     }
 }
