@@ -14,14 +14,14 @@ interface OptionTraverseFilterInstance : TraverseFilter<ForOption> {
     override fun <A> Kind<ForOption, A>.filter(f: (A) -> Boolean): Option<A> =
             fix().filter(f)
 
-    override fun <G, A, B> Applicative<G>.traverseFilter(fa: Kind<ForOption, A>, f: (A) -> Kind<G, Option<B>>): arrow.Kind<G, Option<B>> =
-            fa.fix().traverseFilter(f, this)
+    override fun <G, A, B> Kind<ForOption, A>.traverseFilter(AP: Applicative<G>, f: (A) -> Kind<G, Option<B>>): arrow.Kind<G, Option<B>> =
+            fix().traverseFilter(f, AP)
 
     override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
             fix().map(f)
 
-    override fun <G, A, B> Applicative<G>.traverse(fa: Kind<ForOption, A>, f: (A) -> Kind<G, B>): arrow.Kind<G, Option<B>> =
-            fa.fix().traverse(f, this)
+    override fun <G, A, B> Kind<ForOption, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): arrow.Kind<G, Option<B>> =
+            fix().traverse(f, AP)
 
     override fun <A> exists(fa: OptionOf<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
             fa.fix().exists(p)

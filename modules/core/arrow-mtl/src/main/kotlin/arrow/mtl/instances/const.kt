@@ -16,6 +16,6 @@ interface ConstTraverseFilterInstance<X> : ConstTraverseInstance<X>, TraverseFil
 
     override fun <T, U> Kind<ConstPartialOf<X>, T>.map(f: (T) -> U): Const<X, U> = fix().retag()
 
-    override fun <G, A, B> Applicative<G>.traverseFilter(fa: Kind<ConstPartialOf<X>, A>, f: (A) -> Kind<G, Option<B>>): Kind<G, ConstOf<X, B>> =
-            fa.fix().traverseFilter(f, this)
+    override fun <G, A, B> Kind<ConstPartialOf<X>, A>.traverseFilter(applicative: Applicative<G>, f: (A) -> Kind<G, Option<B>>): Kind<G, ConstOf<X, B>> =
+            fix().traverseFilter(f, applicative)
 }

@@ -9,7 +9,7 @@ interface FunctorFilter<F> : Functor<F> {
     /**
      * A combined map and filter. Filtering is handled via Option instead of Boolean such that the output type B can be different than the input type A.
      */
-    fun <A, B> arrow.Kind<F, A>.mapFilter(f: (A) -> arrow.core.Option<B>): Kind<F, B>
+    fun <A, B> Kind<F, A>.mapFilter(f: (A) -> Option<B>): Kind<F, B>
 
     /**
      * Similar to mapFilter but uses a partial function instead of a function that returns an Option.

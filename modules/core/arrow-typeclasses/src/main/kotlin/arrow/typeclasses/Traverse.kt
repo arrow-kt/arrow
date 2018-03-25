@@ -22,7 +22,7 @@ interface Traverse<F> : Functor<F>, Foldable<F> {
     fun <G, A> Kind<F, Kind<G, A>>.sequence(AG: Applicative<G>): Kind<G, Kind<F, A>> = this.traverse(AG) { it }
 
     override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> =
-            this.traverse(IdMonad, { Id(f(it)) }).value()
+            traverse(IdMonad, { Id(f(it)) }).value()
 
     fun <G, A, B> Kind<F, A>.flatTraverse(flatTraverse: FlatTraverse<F, G>, f: (A) -> Kind<G, Kind<F, B>>): Kind<G, Kind<F, B>> =
             flatTraverse.AG().run { this@flatTraverse.traverse(this, f).map { flatTraverse.MF().run { it.flatten() } } }
