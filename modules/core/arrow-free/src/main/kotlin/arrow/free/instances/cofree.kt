@@ -16,7 +16,7 @@ interface CofreeFunctorInstance<S> : Functor<CofreePartialOf<S>> {
 
 @instance(Cofree::class)
 interface CofreeComonadInstance<S> : CofreeFunctorInstance<S>, Comonad<CofreePartialOf<S>> {
-    override fun <A, B> coflatMap(fa: CofreeOf<S, A>, f: (CofreeOf<S, A>) -> B): Cofree<S, B> = fa.fix().coflatMap(f)
+    override fun <A, B> Kind<CofreePartialOf<S>, A>.coflatMap(f: (Kind<CofreePartialOf<S>, A>) -> B): Cofree<S, B> = fix().coflatMap(f)
 
     override fun <A> CofreeOf<S, A>.extract(): A = fix().extract()
 

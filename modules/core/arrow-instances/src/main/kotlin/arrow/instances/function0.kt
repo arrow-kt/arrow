@@ -43,8 +43,8 @@ interface Function0MonadInstance : Monad<ForFunction0> {
 
 @instance(Function0::class)
 interface Function0ComonadInstance : Comonad<ForFunction0> {
-    override fun <A, B> coflatMap(fa: Function0Of<A>, f: kotlin.Function1<Function0Of<A>, B>): Function0<B> =
-            fa.fix().coflatMap(f)
+    override fun <A, B> Kind<ForFunction0, A>.coflatMap(f: (Kind<ForFunction0, A>) -> B): Function0<B> =
+            fix().coflatMap(f)
 
     override fun <A> Kind<ForFunction0, A>.extract(): A =
             fix().extract()
@@ -70,8 +70,8 @@ interface Function0BimonadInstance : Bimonad<ForFunction0> {
     override fun <A> pure(a: A): Function0<A> =
             Function0.pure(a)
 
-    override fun <A, B> coflatMap(fa: Function0Of<A>, f: kotlin.Function1<Function0Of<A>, B>): Function0<B> =
-            fa.fix().coflatMap(f)
+    override fun <A, B> Kind<ForFunction0, A>.coflatMap(f: (Kind<ForFunction0, A>) -> B): Function0<B> =
+            fix().coflatMap(f)
 
     override fun <A> Kind<ForFunction0, A>.extract(): A =
             fix().extract()

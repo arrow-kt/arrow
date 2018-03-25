@@ -26,7 +26,7 @@ interface CoproductComonadInstance<F, G> : Comonad<CoproductPartialOf<F, G>> {
 
     fun CG(): Comonad<G>
 
-    override fun <A, B> coflatMap(fa: CoproductOf<F, G, A>, f: (CoproductOf<F, G, A>) -> B): Coproduct<F, G, B> = fa.fix().coflatMap(CF(), CG(), f)
+    override fun <A, B> Kind<CoproductPartialOf<F, G>, A>.coflatMap(f: (Kind<CoproductPartialOf<F, G>, A>) -> B): Coproduct<F, G, B> = fix().coflatMap(CF(), CG(), f)
 
     override fun <A> Kind<CoproductPartialOf<F, G>, A>.extract(): A = fix().extract(CF(), CG())
 

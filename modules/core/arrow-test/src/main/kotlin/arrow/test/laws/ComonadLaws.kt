@@ -36,17 +36,17 @@ object ComonadLaws {
 
     fun <F> Comonad<F>.mapAndCoflatmapCoherence(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), cf), genFunctionAToB(Gen.int()), { fa: Kind<F, Int>, f: (Int) -> Int ->
-                fa.map(f).equalUnderTheLaw(coflatMap(fa, { f(it.extract()) }), EQ)
+                fa.map(f).equalUnderTheLaw(fa.coflatMap({ f(it.extract()) }), EQ)
             })
 
     fun <F> Comonad<F>.comonadLeftIdentity(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), cf), { fa: Kind<F, Int> ->
-                coflatMap(fa, { it.extract() }).equalUnderTheLaw(fa, EQ)
+                fa.coflatMap({ it.extract() }).equalUnderTheLaw(fa, EQ)
             })
 
     fun <F> Comonad<F>.comonadRightIdentity(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), cf), genFunctionAToB(genConstructor(Gen.int(), cf)), { fa: Kind<F, Int>, f: (Kind<F, Int>) -> Kind<F, Int> ->
-                coflatMap(fa, f).extract().equalUnderTheLaw(f(fa), EQ)
+                fa.coflatMap(f).extract().equalUnderTheLaw(f(fa), EQ)
             })
 
     fun <F> Comonad<F>.cokleisliLeftIdentity(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =

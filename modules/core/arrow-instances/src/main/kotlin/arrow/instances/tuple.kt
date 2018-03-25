@@ -49,8 +49,8 @@ interface Tuple2MonadInstance<F> : Tuple2ApplicativeInstance<F>, Monad<Tuple2Par
 
 @instance(Tuple2::class)
 interface Tuple2ComonadInstance<F> : Tuple2FunctorInstance<F>, Comonad<Tuple2PartialOf<F>> {
-    override fun <A, B> coflatMap(fa: Tuple2Of<F, A>, f: (Tuple2Of<F, A>) -> B) =
-            fa.fix().coflatMap(f)
+    override fun <A, B> Kind<Tuple2PartialOf<F>, A>.coflatMap(f: (Kind<Tuple2PartialOf<F>, A>) -> B) =
+            fix().coflatMap(f)
 
     override fun <A> Kind<Tuple2PartialOf<F>, A>.extract() =
             fix().extract()

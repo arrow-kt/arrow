@@ -67,8 +67,8 @@ interface NonEmptyListMonadInstance : Monad<ForNonEmptyList> {
 
 @instance(NonEmptyList::class)
 interface NonEmptyListComonadInstance : Comonad<ForNonEmptyList> {
-    override fun <A, B> coflatMap(fa: NonEmptyListOf<A>, f: kotlin.Function1<NonEmptyListOf<A>, B>): NonEmptyList<B> =
-            fa.fix().coflatMap(f)
+    override fun <A, B> Kind<ForNonEmptyList, A>.coflatMap(f: (Kind<ForNonEmptyList, A>) -> B): NonEmptyList<B> =
+            fix().coflatMap(f)
 
     override fun <A> Kind<ForNonEmptyList, A>.extract(): A =
             fix().extract()
@@ -94,8 +94,8 @@ interface NonEmptyListBimonadInstance : Bimonad<ForNonEmptyList> {
     override fun <A> pure(a: A): NonEmptyList<A> =
             NonEmptyList.pure(a)
 
-    override fun <A, B> coflatMap(fa: NonEmptyListOf<A>, f: kotlin.Function1<NonEmptyListOf<A>, B>): NonEmptyList<B> =
-            fa.fix().coflatMap(f)
+    override fun <A, B> Kind<ForNonEmptyList, A>.coflatMap(f: (Kind<ForNonEmptyList, A>) -> B): NonEmptyList<B> =
+            fix().coflatMap(f)
 
     override fun <A> Kind<ForNonEmptyList, A>.extract(): A =
             fix().extract()
@@ -103,7 +103,7 @@ interface NonEmptyListBimonadInstance : Bimonad<ForNonEmptyList> {
 
 @instance(NonEmptyList::class)
 interface NonEmptyListFoldableInstance : Foldable<ForNonEmptyList> {
-    override fun <A, B> foldLeft(fa: NonEmptyListOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
+    override fun <A, B> foldLeft(fa: NonEmptyListOf<A>, b: B, f: Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: NonEmptyListOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
@@ -121,7 +121,7 @@ interface NonEmptyListTraverseInstance : Traverse<ForNonEmptyList> {
     override fun <G, A, B> Applicative<G>.traverse(fa: NonEmptyListOf<A>, f: kotlin.Function1<A, Kind<G, B>>): Kind<G, NonEmptyList<B>> =
             fa.fix().traverse(this, f)
 
-    override fun <A, B> foldLeft(fa: NonEmptyListOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
+    override fun <A, B> foldLeft(fa: NonEmptyListOf<A>, b: B, f: Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: NonEmptyListOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =

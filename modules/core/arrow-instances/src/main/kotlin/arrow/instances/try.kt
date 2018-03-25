@@ -114,7 +114,7 @@ interface TryTraverseInstance : Traverse<ForTry> {
     override fun <A> exists(fa: TryOf<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
             fa.fix().exists(p)
 
-    override fun <A, B> foldLeft(fa: TryOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
+    override fun <A, B> foldLeft(fa: TryOf<A>, b: B, f: Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: TryOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =

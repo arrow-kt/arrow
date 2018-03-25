@@ -58,8 +58,8 @@ interface IdMonadInstance : Monad<ForId> {
 
 @instance(Id::class)
 interface IdComonadInstance : Comonad<ForId> {
-    override fun <A, B> coflatMap(fa: IdOf<A>, f: kotlin.Function1<IdOf<A>, B>): Id<B> =
-            fa.fix().coflatMap(f)
+    override fun <A, B> Kind<ForId, A>.coflatMap(f: (Kind<ForId, A>) -> B): Id<B> =
+            fix().coflatMap(f)
 
     override fun <A> Kind<ForId, A>.extract(): A =
             fix().extract()
@@ -85,8 +85,8 @@ interface IdBimonadInstance : Bimonad<ForId> {
     override fun <A> pure(a: A): Id<A> =
             Id.pure(a)
 
-    override fun <A, B> coflatMap(fa: IdOf<A>, f: kotlin.Function1<IdOf<A>, B>): Id<B> =
-            fa.fix().coflatMap(f)
+    override fun <A, B> Kind<ForId, A>.coflatMap(f: (Kind<ForId, A>) -> B): Id<B> =
+            fix().coflatMap(f)
 
     override fun <A> Kind<ForId, A>.extract(): A =
             fix().extract()
@@ -113,7 +113,7 @@ interface IdTraverseInstance : Traverse<ForId> {
     override fun <G, A, B> Applicative<G>.traverse(fa: Kind<ForId, A>, f: (A) -> Kind<G, B>): Kind<G, Id<B>> =
             fa.fix().traverse(f, this)
 
-    override fun <A, B> foldLeft(fa: IdOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
+    override fun <A, B> foldLeft(fa: IdOf<A>, b: B, f: Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: IdOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =

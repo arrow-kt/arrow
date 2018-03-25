@@ -97,7 +97,7 @@ interface SequenceKTraverseInstance : Traverse<ForSequenceK> {
     override fun <G, A, B> Applicative<G>.traverse(fa: SequenceKOf<A>, f: kotlin.Function1<A, Kind<G, B>>): Kind<G, SequenceK<B>> =
             fa.fix().traverse(this, f)
 
-    override fun <A, B> foldLeft(fa: SequenceKOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
+    override fun <A, B> foldLeft(fa: SequenceKOf<A>, b: B, f: Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: SequenceKOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =

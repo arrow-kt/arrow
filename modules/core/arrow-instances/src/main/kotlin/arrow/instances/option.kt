@@ -108,7 +108,7 @@ interface OptionFoldableInstance : Foldable<ForOption> {
     override fun <A> exists(fa: OptionOf<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
             fa.fix().exists(p)
 
-    override fun <A, B> foldLeft(fa: OptionOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
+    override fun <A, B> foldLeft(fa: OptionOf<A>, b: B, f: Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: OptionOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
@@ -152,7 +152,7 @@ interface OptionTraverseInstance : Traverse<ForOption> {
     override fun <A> exists(fa: OptionOf<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
             fa.fix().exists(p)
 
-    override fun <A, B> foldLeft(fa: OptionOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
+    override fun <A, B> foldLeft(fa: OptionOf<A>, b: B, f: Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)
 
     override fun <A, B> foldRight(fa: OptionOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =

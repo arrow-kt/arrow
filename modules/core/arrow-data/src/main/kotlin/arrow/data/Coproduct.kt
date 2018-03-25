@@ -16,8 +16,8 @@ data class Coproduct<F, G, A>(val run: Either<Kind<F, A>, Kind<G, A>>) : Coprodu
 
     fun <B> coflatMap(CF: Comonad<F>, CG: Comonad<G>, f: (Coproduct<F, G, A>) -> B): Coproduct<F, G, B> =
             Coproduct(run.bimap(
-                    { CF.run { coflatMap(it, { f(Coproduct(Left(it))) }) } },
-                    { CG.run { coflatMap(it, { f(Coproduct(Right(it))) }) } }
+                    { CF.run { it.coflatMap({ f(Coproduct(Left(it))) }) } },
+                    { CG.run { it.coflatMap({ f(Coproduct(Right(it))) }) } }
             ))
 
     fun extract(CF: Comonad<F>, CG: Comonad<G>): A =

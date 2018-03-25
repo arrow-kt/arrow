@@ -19,7 +19,7 @@ data class Cokleisli<F, A, B>(val MM: Comonad<F>, val run: CokleisliFun<F, A, B>
 
     inline fun <C> contramapValue(crossinline f: (Kind<F, C>) -> Kind<F, A>): Cokleisli<F, C, B> = Cokleisli(MM, { run(f(it)) })
 
-    fun <D> compose(a: Cokleisli<F, D, A>): Cokleisli<F, D, B> = Cokleisli(MM, { run(coflatMap(it, a.run)) })
+    fun <D> compose(a: Cokleisli<F, D, A>): Cokleisli<F, D, B> = Cokleisli(MM, { run(it.coflatMap(a.run)) })
 
     @JvmName("andThenK")
     fun <C> andThen(a: Kind<F, C>): Cokleisli<F, A, C> = Cokleisli(MM, { run { a.extract() } })
