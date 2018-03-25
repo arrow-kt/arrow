@@ -54,7 +54,7 @@ interface MapFilterIndexInstance<K, V> : FilterIndex<Map<K, V>, K, V> {
     override fun filter(p: Predicate<K>) = object : Traversal<Map<K, V>, V> {
         override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> = FA.run {
             ListK.traverse().run {
-                traverse(FA, s.toList().k(), { (k, v) ->
+                s.toList().k().traverse(FA, { (k, v) ->
                     (if (p(k)) f(v) else pure(v))
                             .map {
                                 k to it

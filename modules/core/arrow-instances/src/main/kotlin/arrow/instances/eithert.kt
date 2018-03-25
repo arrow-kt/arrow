@@ -70,8 +70,8 @@ interface EitherTTraverseInstance<F, L> : EitherTFunctorInstance<F, L>, EitherTF
 
     override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.map(f: (A) -> B): EitherT<F, L, B> = fix().map({ f(it) }, TF())
 
-    override fun <G, B, C> traverse(AP: Applicative<G>, fa: Kind<EitherTPartialOf<F, L>, B>, f: (B) -> Kind<G, C>): Kind<G, EitherT<F, L, C>> =
-            fa.fix().traverse(f, AP, TF())
+    override fun <G, B, C> Kind<EitherTPartialOf<F, L>, B>.traverse(AP: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, EitherT<F, L, C>> =
+            fix().traverse(f, AP, TF())
 }
 
 interface EitherTSemigroupKInstance<F, L> : SemigroupK<EitherTPartialOf<F, L>> {

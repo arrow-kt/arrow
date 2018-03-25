@@ -71,8 +71,8 @@ interface OptionTTraverseInstance<F> : OptionTFoldableInstance<F>, Traverse<Opti
 
     override fun FFF(): Traverse<F>
 
-    override fun <G, A, B> traverse(AP: Applicative<G>, fa: Kind<OptionTPartialOf<F>, A>, f: (A) -> Kind<G, B>): Kind<G, OptionT<F, B>> =
-            fa.fix().traverse(f, AP, FFF())
+    override fun <G, A, B> Kind<OptionTPartialOf<F>, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, OptionT<F, B>> =
+            fix().traverse(f, AP, FFF())
 
 }
 

@@ -47,7 +47,7 @@ class NonEmptyList<out A> private constructor(
 
     fun <G, B> traverse(AG: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, NonEmptyList<B>> = with (AG) {
             f(fix().head).map2Eval(Eval.always {
-                ListKTraverse.run { traverse(AG, fix().tail.k(), f) }
+                ListKTraverse.run { fix().tail.k().traverse(AG, f) }
             }, {
                 NonEmptyList(it.a, it.b.fix().list)
             }).value()
@@ -130,8 +130,8 @@ private val ListKTraverse: Traverse<ForListK> = object : Traverse<ForListK> {
     override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
             fix().map(f)
 
-    override fun <G, A, B> traverse(AP: Applicative<G>, fa: Kind<ForListK, A>, f: (A) -> Kind<G, B>): Kind<G, ListK<B>> =
-            fa.fix().traverse(AP, f)
+    override fun <G, A, B> Kind<ForListK, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ListK<B>> =
+            fix().traverse(AP, f)
 
     override fun <A, B> foldLeft(fa: ListKOf<A>, b: B, f: Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)

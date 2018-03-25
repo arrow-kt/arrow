@@ -118,8 +118,8 @@ interface NonEmptyListTraverseInstance : Traverse<ForNonEmptyList> {
     override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
             this@map.fix().map(f)
 
-    override fun <G, A, B> traverse(AP: Applicative<G>, fa: Kind<ForNonEmptyList, A>, f: (A) -> Kind<G, B>): Kind<G, NonEmptyList<B>> =
-            fa.fix().traverse(AP, f)
+    override fun <G, A, B> Kind<ForNonEmptyList, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, NonEmptyList<B>> =
+            fix().traverse(AP, f)
 
     override fun <A, B> foldLeft(fa: NonEmptyListOf<A>, b: B, f: Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)

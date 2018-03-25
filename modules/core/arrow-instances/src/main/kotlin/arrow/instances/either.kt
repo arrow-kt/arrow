@@ -70,8 +70,8 @@ fun <G, A, B, C> Either<A, B>.traverse(f: (B) -> Kind<G, C>, GA: Applicative<G>)
 @instance(Either::class)
 interface EitherTraverseInstance<L> : EitherFoldableInstance<L>, Traverse<EitherPartialOf<L>> {
 
-    override fun <G, A, B> traverse(AP: Applicative<G>, fa: Kind<EitherPartialOf<L>, A>, f: (A) -> Kind<G, B>): Kind<G, Kind<EitherPartialOf<L>, B>> =
-            fa.fix().traverse(f, AP)
+    override fun <G, A, B> Kind<EitherPartialOf<L>, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Kind<EitherPartialOf<L>, B>> =
+            fix().traverse(f, AP)
 }
 
 @instance(Either::class)
