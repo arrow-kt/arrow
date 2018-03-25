@@ -21,8 +21,7 @@ object BifoldableLaws {
             forAll(genFunctionAToB<Int, Int>(genIntSmall()), genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf),
                     { f: (Int) -> Int, g: (Int) -> Int, fab: Kind2<F, Int, Int> ->
                         with(IntMonoidInstance) {
-                            val expected = bifoldLeft(fab, IntMonoidInstance.empty(),
-                                    { c: Int, a: Int -> c.combine(f(a)) },
+                            val expected = fab.bifoldLeft(IntMonoidInstance.empty(), { c: Int, a: Int -> c.combine(f(a)) },
                                     { c: Int, b: Int -> c.combine(g(b)) })
                             expected.equalUnderTheLaw(fab.bifoldMap(this, f, g), EQ)
                         }
