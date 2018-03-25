@@ -123,4 +123,4 @@ class NonEmptyList<out A> private constructor(
 
 fun <A> A.nel(): NonEmptyList<A> = NonEmptyList.of(this)
 
-fun <A> NonEmptyList<A>.combineK(y: NonEmptyListOf<A>): NonEmptyList<A> = this.plus(y.fix())
+fun <A> NonEmptyListOf<A>.combineK(dummy: Unit? = null, y: NonEmptyListOf<A>): NonEmptyList<A> = fix().plus(y.fix())

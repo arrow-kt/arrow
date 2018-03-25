@@ -10,12 +10,14 @@ import arrow.typeclasses.*
 
 @instance(ListK::class)
 interface ListKSemigroupInstance<A> : Semigroup<ListK<A>> {
-    override fun ListK<A>.combine(b: ListK<A>): ListK<A> = (this + b).k()
+    override fun ListK<A>.combine(b: ListK<A>): ListK<A> =
+            (this + b).k()
 }
 
 @instance(ListK::class)
 interface ListKMonoidInstance<A> : ListKSemigroupInstance<A>, Monoid<ListK<A>> {
-    override fun empty(): ListK<A> = emptyList<A>().k()
+    override fun empty(): ListK<A> =
+            emptyList<A>().k()
 }
 
 @instance(ListK::class)
@@ -110,7 +112,7 @@ interface ListKTraverseInstance : Traverse<ForListK> {
 @instance(ListK::class)
 interface ListKSemigroupKInstance : SemigroupK<ForListK> {
     override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
-            fix().combineK(y)
+            fix().combineK(null, y)
 }
 
 @instance(ListK::class)
@@ -119,5 +121,5 @@ interface ListKMonoidKInstance : MonoidK<ForListK> {
             ListK.empty()
 
     override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
-            fix().combineK(y)
+            fix().combineK(null, y)
 }

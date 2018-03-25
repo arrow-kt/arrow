@@ -78,7 +78,7 @@ interface EitherTraverseInstance<L> : EitherFoldableInstance<L>, Traverse<Either
 interface EitherSemigroupKInstance<L> : SemigroupK<EitherPartialOf<L>> {
 
     override fun <A> Kind<EitherPartialOf<L>, A>.combineK(y: Kind<EitherPartialOf<L>, A>): Either<L, A> =
-            fix().combineK(y)
+            fix().combineK(null, y)
 }
 
 @instance(Either::class)

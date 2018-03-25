@@ -134,5 +134,5 @@ interface NonEmptyListTraverseInstance : Traverse<ForNonEmptyList> {
 @instance(NonEmptyList::class)
 interface NonEmptyListSemigroupKInstance : SemigroupK<ForNonEmptyList> {
     override fun <A> Kind<ForNonEmptyList, A>.combineK(y: Kind<ForNonEmptyList, A>): NonEmptyList<A> =
-            fix().combineK(y)
+            fix().combineK(null, y)
 }

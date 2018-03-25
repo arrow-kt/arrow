@@ -77,6 +77,6 @@ data class SequenceK<out A> constructor(val sequence: Sequence<A>) : SequenceKOf
     }
 }
 
-fun <A> SequenceK<A>.combineK(y: SequenceKOf<A>): SequenceK<A> = (this.sequence + y.fix().sequence).k()
+fun <A> SequenceKOf<A>.combineK(dummy: Unit? = null, y: SequenceKOf<A>): SequenceK<A> = (fix().sequence + y.fix().sequence).k()
 
 fun <A> Sequence<A>.k(): SequenceK<A> = SequenceK(this)

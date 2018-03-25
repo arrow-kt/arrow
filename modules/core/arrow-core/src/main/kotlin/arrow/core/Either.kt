@@ -283,7 +283,7 @@ fun <A, B> Either<A, B>.contains(elem: B): Boolean = fold({ false }, { it == ele
 
 fun <A, B, C> Either<A, B>.ap(dummy: Unit? = null, ff: EitherOf<A, (B) -> C>): Either<A, C> = ff.fix().flatMap { f -> map(f) }.fix()
 
-fun <A, B> Either<A, B>.combineK(y: EitherOf<A, B>): Either<A, B> =
+fun <A, B> Either<A, B>.combineK(dummy: Unit? = null, y: EitherOf<A, B>): Either<A, B> =
         when (this) {
             is Either.Left -> y.fix()
             else -> this.fix()
