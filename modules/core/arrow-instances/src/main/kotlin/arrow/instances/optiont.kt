@@ -48,7 +48,9 @@ interface OptionTMonadInstance<F> : OptionTApplicativeInstance<F>, Monad<OptionT
 
 fun <F, A, B> OptionT<F, A>.foldLeft(b: B, f: (B, A) -> B, FF: Foldable<F>): B = FF.compose(Option.foldable()).foldLC(value, b, f)
 
-fun <F, A, B> OptionT<F, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>): Eval<B> = FF.compose(Option.foldable()).foldRC(value, lb, f)
+fun <F, A, B> OptionT<F, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>): Eval<B> = FF.compose(Option.foldable()).run {
+    value.foldRC(lb, f)
+}
 
 fun <F, G, A, B> OptionT<F, A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>, FF: Traverse<F>): Kind<G, OptionT<F, B>> {
     val fa = ComposedTraverse(FF, Option.traverse(), Option.applicative()).traverseC(value, f, GA)
@@ -60,9 +62,11 @@ interface OptionTFoldableInstance<F> : Foldable<OptionTPartialOf<F>> {
 
     fun FFF(): Foldable<F>
 
-    override fun <A, B> Kind<OptionTPartialOf<F>, A>.foldLeft(b: B, f: (B, A) -> B): B = fix().foldLeft(b, f, FFF())
+    override fun <A, B> Kind<OptionTPartialOf<F>, A>.foldLeft(b: B, f: (B, A) -> B): B =
+            fix().foldLeft(b, f, FFF())
 
-    override fun <A, B> foldRight(fa: OptionTOf<F, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = fa.fix().foldRight(lb, f, FFF())
+    override fun <A, B> Kind<OptionTPartialOf<F>, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+            fix().foldRight(lb, f, FFF())
 
 }
 

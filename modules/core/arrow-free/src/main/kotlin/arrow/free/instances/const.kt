@@ -30,7 +30,7 @@ interface ConstFoldableInstance<A> : Foldable<ConstPartialOf<A>> {
 
     override fun <T, U> Kind<ConstPartialOf<A>, T>.foldLeft(b: U, f: (U, T) -> U): U = b
 
-    override fun <T, U> foldRight(fa: ConstOf<A, T>, lb: Eval<U>, f: (T, Eval<U>) -> Eval<U>): Eval<U> = lb
+    override fun <T, U> Kind<ConstPartialOf<A>, T>.foldRight(lb: Eval<U>, f: (T, Eval<U>) -> Eval<U>): Eval<U> = lb
 
 }
 

@@ -30,17 +30,17 @@ interface Foldable<F> {
      *
      * For more detailed information about how this method works see the documentation for Eval<A>.
      */
-    fun <A, B> foldRight(fa: Kind<F, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B>
+    fun <A, B> Kind<F, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B>
 
     /**
      * Fold implemented using the given Monoid<A> instance.
      */
     fun <A> Kind<F, A>.fold(MN: Monoid<A>): A = MN.run {
-        this@fold.foldLeft(empty(), { acc, a -> acc.combine(a) })
+        foldLeft(empty(), { acc, a -> acc.combine(a) })
     }
 
     fun <A, B> Kind<F, A>.reduceLeftToOption(f: (A) -> B, g: (B, A) -> B): Option<B> =
-            this.foldLeft(Option.empty()) { option, a ->
+            foldLeft(Option.empty()) { option, a ->
                 when (option) {
                     is Some<B> -> Some(g(option.t, a))
                     is None -> Some(f(a))
@@ -48,14 +48,14 @@ interface Foldable<F> {
             }
 
     fun <A, B> Kind<F, A>.reduceRightToOption(f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<Option<B>> =
-            foldRight(this, Eval.Now(Option.empty())) { a, lb ->
+            foldRight(Eval.Now(Option.empty()), { a, lb ->
                 lb.flatMap { option ->
                     when (option) {
                         is Some<B> -> g(a, Eval.Now(option.t)).map({ Some(it) })
                         is None -> Eval.Later({ Some(f(a)) })
                     }
                 }
-            }
+            })
 
     /**
      * Reduce the elements of this structure down to a single value by applying the provided aggregation function in
@@ -87,7 +87,7 @@ interface Foldable<F> {
      * Fold implemented by mapping A values into B and then combining them using the given Monoid<B> instance.
      */
     fun <A, B> Kind<F, A>.foldMap(MN: Monoid<B>, f: (A) -> B): B = MN.run {
-        this@foldMap.foldLeft(MN.empty(), { b, a -> b.combine(f(a)) })
+        foldLeft(MN.empty(), { b, a -> b.combine(f(a)) })
     }
 
     /**
@@ -99,7 +99,7 @@ interface Foldable<F> {
      * not otherwise needed.
      */
     fun <G, A, B> Kind<F, A>.traverse_(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Unit> = GA.run {
-        foldRight(this@traverse_, always { pure(Unit) }, { a, acc -> f(a).map2Eval(acc) { Unit } }).value()
+        foldRight(always { pure(Unit) }, { a, acc -> f(a).map2Eval(acc) { Unit } }).value()
     }
 
     /**
@@ -113,7 +113,7 @@ interface Foldable<F> {
      * Find the first element matching the predicate, if one exists.
      */
     fun <A> Kind<F, A>.find(f: (A) -> Boolean): Option<A> =
-            foldRight(this@find, Eval.now<Option<A>>(None), { a, lb ->
+            foldRight(Eval.now<Option<A>>(None), { a, lb ->
                 if (f(a)) Eval.now(Some(a)) else lb
             }).value()
 
@@ -123,7 +123,7 @@ interface Foldable<F> {
      * If there are no elements, the result is false.
      */
     fun <A> Kind<F, A>.exists(p: (A) -> Boolean): Boolean =
-            foldRight(this, Eval.False, { a, lb -> if (p(a)) Eval.True else lb }).value()
+            this.foldRight(Eval.False, { a, lb -> if (p(a)) Eval.True else lb }).value()
 
     /**
      * Check whether all elements satisfy the predicate.
@@ -131,13 +131,13 @@ interface Foldable<F> {
      * If there are no elements, the result is true.
      */
     fun <A> Kind<F, A>.forAll(p: (A) -> Boolean): Boolean =
-            foldRight(this, Eval.True, { a, lb -> if (p(a)) lb else Eval.False }).value()
+            this.foldRight(Eval.True, { a, lb -> if (p(a)) lb else Eval.False }).value()
 
     /**
      * Returns true if there are no elements. Otherwise false.
      */
     fun <A> Kind<F, A>.isEmpty(): Boolean =
-            foldRight(this, Eval.True, { _, _ -> Eval.False }).value()
+            this.foldRight(Eval.True, { _, _ -> Eval.False }).value()
 
     fun <A> Kind<F, A>.nonEmpty(): Boolean =
             !isEmpty()
@@ -160,7 +160,7 @@ interface Foldable<F> {
      */
     fun <G, A, B, TC> Kind<F, A>.foldMapM(tc: TC, f: (A) -> Kind<G, B>): Kind<G, B>
             where TC : Monad<G>, TC : Monoid<B> = tc.run {
-        this@foldMapM.foldM(tc, tc.empty(), { b, a -> f(a).map { b.combine(it) } })
+        foldM(tc, tc.empty(), { b, a -> f(a).map { b.combine(it) } })
     }
 
     /**
@@ -171,7 +171,7 @@ interface Foldable<F> {
      * entirety of the structure), depending on the G result produced at a given step.
      */
     fun <G, A, B> Kind<F, A>.foldM(M: Monad<G>, z: B, f: (B, A) -> Kind<G, B>): Kind<G, B> = M.run {
-        this@foldM.foldLeft(M.pure(z), { gb, a -> gb.flatMap { f(it, a) } })
+        foldLeft(M.pure(z), { gb, a -> gb.flatMap { f(it, a) } })
     }
 
     /**

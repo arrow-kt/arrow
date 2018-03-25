@@ -97,8 +97,8 @@ interface IdFoldableInstance : Foldable<ForId> {
     override fun <A, B> Kind<ForId, A>.foldLeft(b: B, f: (B, A) -> B): B =
             fix().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: IdOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
-            fa.fix().foldRight(lb, f)
+    override fun <A, B> Kind<ForId, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+            fix().foldRight(lb, f)
 }
 
 fun <A, G, B> Id<A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Id<B>> = GA.run {
@@ -116,6 +116,6 @@ interface IdTraverseInstance : Traverse<ForId> {
     override fun <A, B> Kind<ForId, A>.foldLeft(b: B, f: (B, A) -> B): B =
             fix().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: IdOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
-            fa.fix().foldRight(lb, f)
+    override fun <A, B> arrow.Kind<arrow.core.ForId, A>.foldRight(lb: arrow.core.Eval<B>, f: (A, arrow.core.Eval<B>) -> arrow.core.Eval<B>): Eval<B> =
+            this@foldRight.fix().foldRight(lb, f)
 }

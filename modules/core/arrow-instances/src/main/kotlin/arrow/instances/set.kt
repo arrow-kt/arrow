@@ -42,8 +42,8 @@ interface SetKFoldableInstance : Foldable<ForSetK> {
     override fun <A, B> Kind<ForSetK, A>.foldLeft(b: B, f: (B, A) -> B): B =
             fix().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: SetKOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
-            fa.fix().foldRight(lb, f)
+    override fun <A, B> Kind<ForSetK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+            fix().foldRight(lb, f)
 
     override fun <A> Kind<ForSetK, A>.isEmpty(): kotlin.Boolean =
             fix().isEmpty()

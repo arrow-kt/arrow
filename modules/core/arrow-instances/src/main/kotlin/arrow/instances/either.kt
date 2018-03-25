@@ -59,8 +59,8 @@ interface EitherFoldableInstance<L> : Foldable<EitherPartialOf<L>> {
     override fun <A, B> Kind<EitherPartialOf<L>, A>.foldLeft(b: B, f: (B, A) -> B): B =
             fix().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: Kind<EitherPartialOf<L>, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            fa.fix().foldRight(lb, f)
+    override fun <A, B> Kind<EitherPartialOf<L>, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+            fix().foldRight(lb, f)
 }
 
 fun <G, A, B, C> Either<A, B>.traverse(f: (B) -> Kind<G, C>, GA: Applicative<G>): Kind<G, Either<A, C>> = GA.run {

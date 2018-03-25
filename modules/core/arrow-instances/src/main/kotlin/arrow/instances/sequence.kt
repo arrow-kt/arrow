@@ -85,8 +85,8 @@ interface SequenceKFoldableInstance : Foldable<ForSequenceK> {
     override fun <A, B> Kind<ForSequenceK, A>.foldLeft(b: B, f: (B, A) -> B): B =
             fix().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: SequenceKOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
-            fa.fix().foldRight(lb, f)
+    override fun <A, B> Kind<ForSequenceK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+            fix().foldRight(lb, f)
 }
 
 @instance(SequenceK::class)
@@ -100,8 +100,8 @@ interface SequenceKTraverseInstance : Traverse<ForSequenceK> {
     override fun <A, B> Kind<ForSequenceK, A>.foldLeft(b: B, f: (B, A) -> B): B =
             fix().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: SequenceKOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
-            fa.fix().foldRight(lb, f)
+    override fun <A, B> Kind<ForSequenceK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+            fix().foldRight(lb, f)
 }
 
 @instance(SequenceK::class)

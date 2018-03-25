@@ -116,6 +116,12 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
      */
     fun <B> foldLeft(b: B, f: (B, A) -> B): B = fold({ b }, { f(b, it) })
 
+    fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+            when (this) {
+                is Valid -> f(this.a, lb)
+                is Invalid -> lb
+            }
+
     fun swap(): Validated<A, E> = fold({ Valid(it) }, { Invalid(it) })
 }
 
@@ -168,12 +174,6 @@ fun <E, A, B> Validated<E, A>.ap(f: Validated<E, (A) -> B>, SE: Semigroup<E>): V
 
 fun <E, A> Validated<E, A>.handleLeftWith(f: (E) -> ValidatedOf<E, A>): Validated<E, A> =
         fold({ f(it).fix() }, { Valid(it) })
-
-fun <E, A, B> Validated<E, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-        when (this) {
-            is Valid -> f(this.a, lb)
-            is Invalid -> lb
-        }
 
 fun <G, E, A, B> Validated<E, A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Validated<E, B>> = GA.run {
     when (this@traverse) {

@@ -3,7 +3,10 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.data.*
+import arrow.data.Ior
+import arrow.data.IorOf
+import arrow.data.IorPartialOf
+import arrow.data.fix
 import arrow.instance
 import arrow.typeclasses.*
 
@@ -46,8 +49,8 @@ interface IorFoldableInstance<L> : Foldable<IorPartialOf<L>> {
 
     override fun <B, C> Kind<IorPartialOf<L>, B>.foldLeft(b: C, f: (C, B) -> C): C = fix().foldLeft(b, f)
 
-    override fun <B, C> foldRight(fa: Kind<Kind<ForIor, L>, B>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
-            fa.fix().foldRight(lb, f)
+    override fun <B, C> Kind<IorPartialOf<L>, B>.foldRight(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
+            fix().foldRight(lb, f)
 
 }
 

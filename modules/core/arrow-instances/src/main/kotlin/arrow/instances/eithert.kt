@@ -61,7 +61,8 @@ interface EitherTFoldableInstance<F, L> : Foldable<EitherTPartialOf<F, L>> {
 
     override fun <B, C> Kind<EitherTPartialOf<F, L>, B>.foldLeft(b: C, f: (C, B) -> C): C = fix().foldLeft(b, f, FFF())
 
-    override fun <B, C> foldRight(fa: Kind<EitherTPartialOf<F, L>, B>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> = fa.fix().foldRight(lb, f, FFF())
+    override fun <B, C> Kind<EitherTPartialOf<F, L>, B>.foldRight(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
+            fix().foldRight(lb, f, FFF())
 }
 
 interface EitherTTraverseInstance<F, L> : EitherTFunctorInstance<F, L>, EitherTFoldableInstance<F, L>, Traverse<EitherTPartialOf<F, L>> {

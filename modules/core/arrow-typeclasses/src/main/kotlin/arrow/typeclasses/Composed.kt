@@ -38,11 +38,11 @@ interface ComposedFoldable<F, G> :
     fun <A, B> foldLC(fa: Kind<F, Kind<G, A>>, b: B, f: (B, A) -> B): B =
             fa.nest().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: Kind<Nested<F, G>, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            FF().run { foldRight(fa.unnest(), lb, { laa, lbb -> GF().run { foldRight(laa, lbb, f) } }) }
+    override fun <A, B> Kind<Nested<F, G>, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+            FF().run { unnest().foldRight(lb, { laa, lbb -> GF().run { laa.foldRight(lbb, f) } }) }
 
-    fun <A, B> foldRC(fa: Kind<F, Kind<G, A>>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            foldRight(fa.nest(), lb, f)
+    fun <A, B> Kind<F, Kind<G, A>>.foldRC(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+            nest().foldRight(lb, f)
 
     companion object {
         operator fun <F, G> invoke(FF: Foldable<F>, GF: Foldable<G>): ComposedFoldable<F, G> =

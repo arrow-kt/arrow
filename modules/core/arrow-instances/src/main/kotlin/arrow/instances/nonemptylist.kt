@@ -106,8 +106,8 @@ interface NonEmptyListFoldableInstance : Foldable<ForNonEmptyList> {
     override fun <A, B> Kind<ForNonEmptyList, A>.foldLeft(b: B, f: (B, A) -> B): B =
             fix().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: NonEmptyListOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
-            fa.fix().foldRight(lb, f)
+    override fun <A, B> arrow.Kind<arrow.data.ForNonEmptyList, A>.foldRight(lb: arrow.core.Eval<B>, f: (A, arrow.core.Eval<B>) -> arrow.core.Eval<B>): Eval<B> =
+            this@foldRight.fix().foldRight(lb, f)
 
     override fun <A> Kind<ForNonEmptyList, A>.isEmpty(): kotlin.Boolean =
             fix().isEmpty()
@@ -124,8 +124,8 @@ interface NonEmptyListTraverseInstance : Traverse<ForNonEmptyList> {
     override fun <A, B> Kind<ForNonEmptyList, A>.foldLeft(b: B, f: (B, A) -> B): B =
             fix().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: NonEmptyListOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
-            fa.fix().foldRight(lb, f)
+    override fun <A, B> arrow.Kind<arrow.data.ForNonEmptyList, A>.foldRight(lb: arrow.core.Eval<B>, f: (A, arrow.core.Eval<B>) -> arrow.core.Eval<B>): Eval<B> =
+            this@foldRight.fix().foldRight(lb, f)
 
     override fun <A> Kind<ForNonEmptyList, A>.isEmpty(): kotlin.Boolean =
             fix().isEmpty()

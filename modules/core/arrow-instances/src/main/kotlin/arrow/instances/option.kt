@@ -111,8 +111,8 @@ interface OptionFoldableInstance : Foldable<ForOption> {
     override fun <A, B> Kind<ForOption, A>.foldLeft(b: B, f: (B, A) -> B): B =
             fix().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: OptionOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
-            fa.fix().foldRight(lb, f)
+    override fun <A, B> arrow.Kind<arrow.core.ForOption, A>.foldRight(lb: arrow.core.Eval<B>, f: (A, arrow.core.Eval<B>) -> arrow.core.Eval<B>): Eval<B> =
+            this@foldRight.fix().foldRight(lb, f)
 
     override fun <A> OptionOf<A>.forAll(p: (A) -> Boolean): kotlin.Boolean =
             fix().forall(p)
@@ -155,8 +155,8 @@ interface OptionTraverseInstance : Traverse<ForOption> {
     override fun <A, B> Kind<ForOption, A>.foldLeft(b: B, f: (B, A) -> B): B =
             fix().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: OptionOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
-            fa.fix().foldRight(lb, f)
+    override fun <A, B> arrow.Kind<arrow.core.ForOption, A>.foldRight(lb: arrow.core.Eval<B>, f: (A, arrow.core.Eval<B>) -> arrow.core.Eval<B>): Eval<B> =
+            this@foldRight.fix().foldRight(lb, f)
 
     override fun <A> Kind<ForOption, A>.forAll(p: (A) -> Boolean): kotlin.Boolean =
             fix().forall(p)

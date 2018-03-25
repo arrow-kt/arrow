@@ -39,7 +39,7 @@ object FoldableLaws {
     fun <F> Foldable<F>.rightFoldConsistentWithFoldMap(cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>) =
             forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: Kind<F, Int> ->
                 with(IntMonoidInstance) {
-                    fa.foldMap(this, f).equalUnderTheLaw(foldRight(fa, Eval.later { empty() }, { a, lb: Eval<Int> -> lb.map { f(a).combine(it) } }).value(), EQ)
+                    fa.foldMap(this, f).equalUnderTheLaw(fa.foldRight(Eval.later { empty() }, { a, lb: Eval<Int> -> lb.map { f(a).combine(it) } }).value(), EQ)
                 }
             })
 

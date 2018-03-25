@@ -61,8 +61,8 @@ interface Tuple2FoldableInstance<F> : Foldable<Tuple2PartialOf<F>> {
     override fun <A, B> Kind<Tuple2PartialOf<F>, A>.foldLeft(b: B, f: (B, A) -> B) =
             fix().foldL(b, f)
 
-    override fun <A, B> foldRight(fa: Tuple2Of<F, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>) =
-            fa.fix().foldR(lb, f)
+    override fun <A, B> Kind<Tuple2PartialOf<F>, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>) =
+            fix().foldR(lb, f)
 }
 
 @instance(Tuple2::class)

@@ -30,7 +30,7 @@ data class Coproduct<F, G, A>(val run: Either<Kind<F, A>, Kind<G, A>>) : Coprodu
             run.fold({ FF.run { it.foldLeft(b, f) } }, { FG.run { it.foldLeft(b, f) } })
 
     fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>, FG: Foldable<G>): Eval<B> =
-            run.fold({ FF.run { foldRight(it, lb, f) } }, { FG.run { foldRight(it, lb, f) } })
+            run.fold({ FF.run { it.foldRight(lb, f) } }, { FG.run { it.foldRight(lb, f) } })
 
     fun <H, B> traverse(GA: Applicative<H>, FT: Traverse<F>, GT: Traverse<G>, f: (A) -> Kind<H, B>): Kind<H, Coproduct<F, G, B>> = GA.run {
         run.fold({

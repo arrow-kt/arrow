@@ -52,8 +52,8 @@ interface FlowableKFoldableInstance : Foldable<ForFlowableK> {
     override fun <A, B> Kind<ForFlowableK, A>.foldLeft(b: B, f: (B, A) -> B): B =
             fix().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: FlowableKOf<A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): arrow.core.Eval<B> =
-            fa.fix().foldRight(lb, f)
+    override fun <A, B> Kind<ForFlowableK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): arrow.core.Eval<B> =
+            fix().foldRight(lb, f)
 }
 
 @instance(FlowableK::class)
@@ -67,8 +67,8 @@ interface FlowableKTraverseInstance : Traverse<ForFlowableK> {
     override fun <A, B> Kind<ForFlowableK, A>.foldLeft(b: B, f: (B, A) -> B): B =
             fix().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: FlowableKOf<A>, lb: arrow.core.Eval<B>, f: kotlin.Function2<A, arrow.core.Eval<B>, arrow.core.Eval<B>>): arrow.core.Eval<B> =
-            fa.fix().foldRight(lb, f)
+    override fun <A, B> Kind<ForFlowableK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): arrow.core.Eval<B> =
+            fix().foldRight(lb, f)
 }
 
 @instance(FlowableK::class)

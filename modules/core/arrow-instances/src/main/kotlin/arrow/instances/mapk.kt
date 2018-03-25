@@ -16,8 +16,8 @@ interface MapKFoldableInstance<K> : Foldable<MapKPartialOf<K>> {
 
     override fun <A, B> Kind<MapKPartialOf<K>, A>.foldLeft(b: B, f: (B, A) -> B): B = fix().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: MapKOf<K, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            fa.fix().foldRight(lb, f)
+    override fun <A, B> Kind<MapKPartialOf<K>, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+            fix().foldRight(lb, f)
 }
 
 @instance(MapK::class)
