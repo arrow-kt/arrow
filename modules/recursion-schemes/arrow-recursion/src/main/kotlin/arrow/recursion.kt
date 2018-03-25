@@ -18,7 +18,7 @@ fun <F, A, B> hylo(a: A, alg: Algebra<F, B>, coalg: Coalgebra<F, A>, FF: Functor
 fun <M, F, A, B> hyloM(a: A, algM: AlgebraM<M, F, B>, coalgM: CoalgebraM<M, F, A>, TF: Traverse<F>, MM: Monad<M>): Kind<M, B> = MM.run {
     hylo(
             a,
-            { it.unnest().flatMap({ TF.run { sequence(it) }.flatMap(algM) }) },
+            { it.unnest().flatMap({ TF.run { sequence(MM, it) }.flatMap(algM) }) },
             { aa: A -> coalgM(aa).nest() },
             ComposedFunctor(this, TF)
     )
