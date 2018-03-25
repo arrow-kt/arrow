@@ -4,10 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Option
 import arrow.core.Tuple2
-import arrow.data.ForListK
-import arrow.data.ListK
-import arrow.data.ListKOf
-import arrow.data.fix
+import arrow.data.*
 import arrow.instance
 import arrow.mtl.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.MonadCombine
@@ -19,7 +16,7 @@ interface ListKMonadCombineInstance : MonadCombine<ForListK> {
             ListK.empty()
 
     override fun <A, B> Kind<ForListK, A>.mapFilter(f: (A) -> Option<B>): ListK<B> =
-            this@mapFilter.fix().mapFilter(f)
+            fix().mapFilter(f)
 
     override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
             fix().ap(ff)
@@ -40,16 +37,16 @@ interface ListKMonadCombineInstance : MonadCombine<ForListK> {
             ListK.pure(a)
 
     override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
-            fix().combineK(y)
+            fix().combineK(null, y)
 }
 
 @instance(ListK::class)
 interface ListKFunctorFilterInstance : FunctorFilter<ForListK> {
     override fun <A, B> arrow.Kind<arrow.data.ForListK, A>.mapFilter(f: (A) -> arrow.core.Option<B>): ListK<B> =
-            this@mapFilter.fix().mapFilter(f)
+            fix().mapFilter(f)
 
     override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
-            this@map.fix().map(f)
+            fix().map(f)
 }
 
 @instance(ListK::class)
@@ -58,7 +55,7 @@ interface ListKMonadFilterInstance : MonadFilter<ForListK> {
             ListK.empty()
 
     override fun <A, B> arrow.Kind<arrow.data.ForListK, A>.mapFilter(f: (A) -> arrow.core.Option<B>): ListK<B> =
-            this@mapFilter.fix().mapFilter(f)
+            fix().mapFilter(f)
 
     override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
             fix().ap(ff)
@@ -70,7 +67,7 @@ interface ListKMonadFilterInstance : MonadFilter<ForListK> {
             ListK.tailRecM(a, f)
 
     override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
-            this@map.fix().map(f)
+            fix().map(f)
 
     override fun <A, B, Z> Kind<ForListK, A>.map2(fb: Kind<ForListK, B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
             fix().map2(fb, f)
