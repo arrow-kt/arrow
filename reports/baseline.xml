@@ -25,6 +25,7 @@
     <ID>LabeledExpression:ContinuationUtils.kt$this@completion</ID>
     <ID>LabeledExpression:MonoidK.kt$MonoidK.&lt;no name provided&gt;$this@MonoidK</ID>
     <ID>LabeledExpression:MonoidK.kt$MonoidK.&lt;no name provided&gt;$this@MonoidK</ID>
+    <ID>ComplexMethod:FreeApplicative.kt$FreeApplicative$// Beware: smart code @Suppress("UNCHECKED_CAST") fun &lt;G&gt; foldMap(f: FunctionK&lt;F, G&gt;, GA: Applicative&lt;G&gt;): Kind&lt;G, A&gt;</ID>
     <ID>ComplexMethod:IORunLoop.kt$IORunLoop$fun &lt;A&gt; step(source: IO&lt;A&gt;): IO&lt;A&gt;</ID>
     <ID>ComplexMethod:IORunLoop.kt$IORunLoop$private fun loop( source: Current, cb: (Either&lt;Throwable, Any?&gt;) -&gt; Unit, rcbRef: RestartCallback?, bFirstRef: BindF?, bRestRef: CallStack?): Unit</ID>
     <ID>LabeledExpression:Iso.kt$PIso.&lt;no name provided&gt;$this@PIso</ID>
