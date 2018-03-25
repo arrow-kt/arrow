@@ -45,7 +45,7 @@ object FoldableLaws {
 
     fun <F> Foldable<F>.existsConsistentWithFind(cf: (Int) -> Kind<F, Int>) =
             forAll(genIntPredicate(), genConstructor(Gen.int(), cf), { f: (Int) -> Boolean, fa: Kind<F, Int> ->
-                exists(fa, f).equalUnderTheLaw(find(fa, f).fold({ false }, { true }), Eq.any())
+                exists(fa, f).equalUnderTheLaw(fa.find(f).fold({ false }, { true }), Eq.any())
             })
 
     fun <F> Foldable<F>.existsIsLazy(cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>) =

@@ -113,8 +113,8 @@ interface Foldable<F> {
     /**
      * Find the first element matching the predicate, if one exists.
      */
-    fun <A> find(fa: Kind<F, A>, f: (A) -> Boolean): Option<A> =
-            foldRight(fa, Eval.now<Option<A>>(None), { a, lb ->
+    fun <A> Kind<F, A>.find(f: (A) -> Boolean): Option<A> =
+            this@Foldable.foldRight(this@find, Eval.now<Option<A>>(None), { a, lb ->
                 if (f(a)) Eval.now(Some(a)) else lb
             }).value()
 

@@ -114,9 +114,9 @@ interface NonEmptyReducible<F, G> : Reducible<F> {
         return a.combine(FG().run { ga.fold(MN) })
     }
 
-    override fun <A> find(fa: Kind<F, A>, f: (A) -> Boolean): Option<A> = FG().run {
-        val (a, ga) = split(fa)
-        return if (f(a)) Some(a) else find(ga, f)
+    override fun <A> Kind<F, A>.find(f: (A) -> Boolean): Option<A> = FG().run {
+        val (a, ga) = split(this@find)
+        return if (f(a)) Some(a) else ga.find(f)
     }
 
     override fun <A> exists(fa: Kind<F, A>, p: (A) -> Boolean): Boolean = FG().run {
