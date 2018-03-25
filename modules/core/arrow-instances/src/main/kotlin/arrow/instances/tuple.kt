@@ -67,8 +67,10 @@ interface Tuple2FoldableInstance<F> : Foldable<Tuple2PartialOf<F>> {
 
 @instance(Tuple2::class)
 interface Tuple2TraverseInstance<F> : Tuple2FoldableInstance<F>, Traverse<Tuple2PartialOf<F>> {
-    override fun <G, A, B> Applicative<G>.traverse(fa: Kind<Tuple2PartialOf<F>, A>, f: (A) -> Kind<G, B>) =
-            fa.fix().run { f(b).map(a::toT) }
+
+    override fun <G, A, B> Tuple2Of<F, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Tuple2<F, B>> = AP.run {
+        fix().let { f(it.b).map(it.a::toT) }
+    }
 }
 
 @instance(Tuple2::class)

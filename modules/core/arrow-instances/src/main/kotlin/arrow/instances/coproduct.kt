@@ -54,8 +54,8 @@ interface CoproductTraverseInstance<F, G> : Traverse<CoproductPartialOf<F, G>> {
 
     fun TG(): Traverse<G>
 
-    override fun <H, A, B> Applicative<H>.traverse(fa: CoproductOf<F, G, A>, f: (A) -> Kind<H, B>): Kind<H, Coproduct<F, G, B>> =
-            fa.fix().traverse(this, TF(), TG(), f)
+    override fun <H, A, B> CoproductOf<F, G, A>.traverse(AP: Applicative<H>, f: (A) -> Kind<H, B>): Kind<H, Coproduct<F, G, B>> =
+            fix().traverse(AP, TF(), TG(), f)
 
     override fun <A, B> foldLeft(fa: CoproductOf<F, G, A>, b: B, f: (B, A) -> B): B = fa.fix().foldLeft(b, f, TF(), TG())
 

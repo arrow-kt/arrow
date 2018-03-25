@@ -35,9 +35,9 @@ interface MapAtInstance<K, V> : At<Map<K, V>, K, Option<V>> {
 interface MapEachInstance<K, V> : Each<Map<K, V>, V> {
     override fun each() = object : Traversal<Map<K, V>, V> {
         override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> = FA.run {
-            MapK.traverse<K>().run { traverse(s.k(), f) }
+            MapK.traverse<K>().run { s.k().traverse(FA, f) }
                     .let {
-                        it.map() {
+                        it.map {
                             it.fix().map
                         }
                     }

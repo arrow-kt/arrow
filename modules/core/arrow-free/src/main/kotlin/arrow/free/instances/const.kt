@@ -39,8 +39,8 @@ interface ConstTraverseInstance<X> : ConstFoldableInstance<X>, Traverse<ConstPar
 
     override fun <T, U> Kind<ConstPartialOf<X>, T>.map(f: (T) -> U): Const<X, U> = fix().retag()
 
-    override fun <G, A, B> Applicative<G>.traverse(fa: ConstOf<X, A>, f: (A) -> Kind<G, B>): Kind<G, ConstOf<X, B>> =
-            fa.fix().traverse(f, this)
+    override fun <G, A, B> ConstOf<X, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ConstOf<X, B>> =
+            fix().traverse(f, AP)
 }
 
 @instance(Const::class)

@@ -54,8 +54,8 @@ interface IorFoldableInstance<L> : Foldable<IorPartialOf<L>> {
 @instance(Ior::class)
 interface IorTraverseInstance<L> : IorFoldableInstance<L>, Traverse<IorPartialOf<L>> {
 
-    override fun <G, B, C> Applicative<G>.traverse(fa: IorOf<L, B>, f: (B) -> Kind<G, C>): Kind<G, Ior<L, C>> =
-            fa.fix().traverse(f, this)
+    override fun <G, B, C> IorOf<L, B>.traverse(AP: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Ior<L, C>> =
+            fix().traverse(f, AP)
 
 }
 
