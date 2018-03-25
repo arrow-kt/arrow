@@ -94,8 +94,8 @@ interface ListKTraverseInstance : Traverse<ForListK> {
     override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
             fix().map(f)
 
-    override fun <G, A, B> Applicative<G>.traverse(fa: ListKOf<A>, f: kotlin.Function1<A, Kind<G, B>>): Kind<G, ListK<B>> =
-            fa.fix().traverse(this, f)
+    override fun <G, A, B> traverse(AP: Applicative<G>, fa: Kind<ForListK, A>, f: (A) -> Kind<G, B>): Kind<G, ListK<B>> =
+            fa.fix().traverse(AP, f)
 
     override fun <A, B> foldLeft(fa: ListKOf<A>, b: B, f: Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)

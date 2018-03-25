@@ -40,7 +40,7 @@ interface FilterIndex<S, I, A> {
                 override fun <F> modifyF(FA: Applicative<F>, s: Kind<S, A>, f: (A) -> Kind<F, A>): Kind<F, Kind<S, A>> =
                         traverse.run {
                             FA.run {
-                                traverse(zipWithIndex(s), { (a, j) ->
+                                traverse(this, zipWithIndex(s), { (a, j) ->
                                     if (p(j)) f(a) else pure(a)
                                 })
                             }

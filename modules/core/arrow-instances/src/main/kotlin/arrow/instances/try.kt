@@ -108,8 +108,8 @@ interface TryTraverseInstance : Traverse<ForTry> {
     override fun <A, B> Kind<ForTry, A>.map(f: (A) -> B): Try<B> =
             fix().map(f)
 
-    override fun <G, A, B> Applicative<G>.traverse(fa: Kind<ForTry, A>, f: (A) -> Kind<G, B>): Kind<G, Try<B>> =
-            fa.fix().traverse(f, this)
+    override fun <G, A, B> traverse(AP: Applicative<G>, fa: Kind<ForTry, A>, f: (A) -> Kind<G, B>): Kind<G, Try<B>> =
+            fa.fix().traverse(f, AP)
 
     override fun <A> exists(fa: TryOf<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
             fa.fix().exists(p)

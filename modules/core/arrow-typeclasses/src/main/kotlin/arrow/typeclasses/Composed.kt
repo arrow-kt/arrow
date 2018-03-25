@@ -73,10 +73,12 @@ interface ComposedTraverse<F, G> :
 
     override fun GF(): Foldable<G> = GT()
 
-    override fun <H, A, B> Applicative<H>.traverse(fa: Kind<Nested<F, G>, A>, f: (A) -> Kind<H, B>): Kind<H, Kind<Nested<F, G>, B>> =
-            FT().run { traverse(fa.unnest(), { ga -> GT().run { traverse(ga, f) } }) }.map({ it.nest() })
+    override fun <H, A, B> traverse(AP: Applicative<H>, fa: Kind<Nested<F, G>, A>, f: (A) -> Kind<H, B>): Kind<H, Kind<Nested<F, G>, B>> = AP.run {
+        FT().run { traverse(AP, fa.unnest(), { ga -> GT().run { traverse(AP, ga, f) } }) }.map({ it.nest() })
+    }
 
-    fun <H, A, B> traverseC(fa: Kind<F, Kind<G, A>>, f: (A) -> Kind<H, B>, HA: Applicative<H>): Kind<H, Kind<Nested<F, G>, B>> = HA.traverse(fa.nest(), f)
+    fun <H, A, B> traverseC(fa: Kind<F, Kind<G, A>>, f: (A) -> Kind<H, B>, HA: Applicative<H>): Kind<H, Kind<Nested<F, G>, B>> =
+            traverse(HA, fa.nest(), f)
 
     companion object {
         operator fun <F, G> invoke(

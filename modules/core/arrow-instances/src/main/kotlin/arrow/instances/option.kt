@@ -146,8 +146,8 @@ interface OptionTraverseInstance : Traverse<ForOption> {
     override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
             this@map.fix().map(f)
 
-    override fun <G, A, B> Applicative<G>.traverse(fa: Kind<ForOption, A>, f: (A) -> Kind<G, B>): Kind<G, Option<B>> =
-            fa.fix().traverse(f, this)
+    override fun <G, A, B> traverse(AP: Applicative<G>, fa: Kind<ForOption, A>, f: (A) -> Kind<G, B>): Kind<G, Option<B>> =
+            fa.fix().traverse(f, AP)
 
     override fun <A> exists(fa: OptionOf<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
             fa.fix().exists(p)
