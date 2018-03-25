@@ -21,7 +21,7 @@ data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, 
 
     companion object {
 
-        inline operator fun <reified F, A, B> invoke(value: Kind<F, Either<A, B>>): EitherT<F, A, B> = EitherT(value)
+        inline operator fun <F, A, B> invoke(value: Kind<F, Either<A, B>>): EitherT<F, A, B> = EitherT(value)
 
         fun <F, A, B> pure(b: B, MF: Applicative<F>): EitherT<F, A, B> = right(b, MF)
 
@@ -46,8 +46,8 @@ data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, 
 
         fun <F, A, B> left(a: A, MF: Applicative<F>): EitherT<F, A, B> = EitherT(MF.pure(Left(a)))
 
-        inline fun <reified F, A, B> Applicative<F>.fromEither(value: Either<A, B>): EitherT<F, A, B> =
-                EitherT(pure(value))
+        inline fun <F, A, B> fromEither(AP: Applicative<F>, value: Either<A, B>): EitherT<F, A, B> =
+                EitherT(AP.pure(value))
     }
 
     inline fun <C> fold(crossinline l: (A) -> C, crossinline r: (B) -> C, FF: Functor<F>): Kind<F, C> = FF.run {

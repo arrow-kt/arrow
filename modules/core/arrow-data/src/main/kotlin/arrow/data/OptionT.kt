@@ -20,11 +20,11 @@ data class OptionT<F, A>(val value: Kind<F, Option<A>>) : OptionTOf<F, A>, Optio
 
         operator fun <F, A> invoke(value: Kind<F, Option<A>>): OptionT<F, A> = OptionT(value)
 
-        inline fun <reified F, A> pure(a: A, AF: Applicative<F>): OptionT<F, A> = OptionT(AF.pure(Some(a)))
+        inline fun <F, A> pure(a: A, AF: Applicative<F>): OptionT<F, A> = OptionT(AF.pure(Some(a)))
 
-        inline fun <reified F> none(AF: Applicative<F>): OptionT<F, Nothing> = OptionT(AF.pure(None))
+        inline fun <F> none(AF: Applicative<F>): OptionT<F, Nothing> = OptionT(AF.pure(None))
 
-        inline fun <reified F, A> fromOption(value: Option<A>, AF: Applicative<F>): OptionT<F, A> =
+        inline fun <F, A> fromOption(value: Option<A>, AF: Applicative<F>): OptionT<F, A> =
                 OptionT(AF.pure(value))
 
         fun <F, A, B> tailRecM(a: A, f: (A) -> OptionTOf<F, Either<A, B>>, MF: Monad<F>): OptionT<F, B> = MF.run {

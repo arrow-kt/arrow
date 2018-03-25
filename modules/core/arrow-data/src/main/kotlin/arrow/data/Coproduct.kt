@@ -41,10 +41,10 @@ data class Coproduct<F, G, A>(val run: Either<Kind<F, A>, Kind<G, A>>) : Coprodu
     }
 
     companion object {
-        inline operator fun <reified F, reified G, A> invoke(run: Either<Kind<F, A>, Kind<G, A>>): Coproduct<F, G, A> =
+        inline operator fun <F, G, A> invoke(run: Either<Kind<F, A>, Kind<G, A>>): Coproduct<F, G, A> =
                 Coproduct(run)
     }
 }
 
-inline fun <reified F, reified G, A> Either<Kind<F, A>, Kind<G, A>>.coproduct(): Coproduct<F, G, A> =
+inline fun <F, G, A> Either<Kind<F, A>, Kind<G, A>>.coproduct(): Coproduct<F, G, A> =
         Coproduct(this)

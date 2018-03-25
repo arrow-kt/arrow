@@ -158,7 +158,7 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
  *
  * @param MF [Monad] for the context [F].
  */
-inline fun <reified F, D, A> Kleisli<F, D, Kleisli<F, D, A>>.flatten(MF: Monad<F>): Kleisli<F, D, A> = flatMap({ it }, MF)
+inline fun <F, D, A> Kleisli<F, D, Kleisli<F, D, A>>.flatten(MF: Monad<F>): Kleisli<F, D, A> = flatMap({ it }, MF)
 
 /**
  * Syntax for constructing a [Kleisli]

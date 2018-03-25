@@ -7,10 +7,10 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.FunctionK
 import arrow.typeclasses.Monoid
 
-inline fun <F, reified G, A> FreeApplicativeOf<F, A>.foldMapK(f: FunctionK<F, G>, GA: Applicative<G>): Kind<G, A> =
+inline fun <F, G, A> FreeApplicativeOf<F, A>.foldMapK(f: FunctionK<F, G>, GA: Applicative<G>): Kind<G, A> =
         (this as FreeApplicative<F, A>).foldMap(f, GA)
 
-inline fun <reified F, A> FreeApplicativeOf<F, A>.foldK(FA: Applicative<F>): Kind<F, A> = (this as FreeApplicative<F, A>).fold(FA)
+inline fun <F, A> FreeApplicativeOf<F, A>.foldK(FA: Applicative<F>): Kind<F, A> = (this as FreeApplicative<F, A>).fold(FA)
 
 /**
  * See [https://github.com/edmundnoble/cats/blob/6454b4f8b7c5cefd15d8198fa7d52e46e2f45fea/docs/src/main/tut/datatypes/freeapplicative.md]
@@ -60,7 +60,7 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
     fun <G> flatCompile(f: FunctionK<F, FreeApplicativePartialOf<G>>, GFA: Applicative<FreeApplicativePartialOf<G>>): FreeApplicative<G, A> =
             foldMap(f, GFA).fix()
 
-    inline fun <reified M> analyze(f: FunctionK<F, ConstPartialOf<M>>, MM: Monoid<M>): M =
+    inline fun <M> analyze(f: FunctionK<F, ConstPartialOf<M>>, MM: Monoid<M>): M =
             foldMap(object : FunctionK<F, ConstPartialOf<M>> {
                 override fun <A> invoke(fa: Kind<F, A>): Const<M, A> = f(fa).fix()
             }, Const.applicative(MM)).value()

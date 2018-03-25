@@ -114,7 +114,7 @@ fun <B> genOption(genB: Gen<B>): Gen<Option<B>> =
                     if (random.generate() % 20 == 0) None else Option.pure(genB.generate())
         }
 
-inline fun <reified E, reified A> genEither(genE: Gen<E>, genA: Gen<A>): Gen<Either<E, A>> =
+inline fun <E, A> genEither(genE: Gen<E>, genA: Gen<A>): Gen<Either<E, A>> =
         object : Gen<Either<E, A>> {
             override fun generate(): Either<E, A> =
                     Gen.oneOf(genE, genA).generate().let {
@@ -126,10 +126,10 @@ inline fun <reified E, reified A> genEither(genE: Gen<E>, genA: Gen<A>): Gen<Eit
                     }
         }
 
-inline fun <reified E, reified A> genValidated(genE: Gen<E>, genA: Gen<A>): Gen<Validated<E, A>> =
+inline fun <E, A> genValidated(genE: Gen<E>, genA: Gen<A>): Gen<Validated<E, A>> =
         Gen.create { Validated.fromEither(genEither(genE, genA).generate()) }
 
-inline fun <reified A> genTry(genA: Gen<A>, genThrowable: Gen<Throwable> = genThrowable()): Gen<Try<A>> = Gen.create {
+inline fun <A> genTry(genA: Gen<A>, genThrowable: Gen<Throwable> = genThrowable()): Gen<Try<A>> = Gen.create {
     genEither(genThrowable, genA).generate().fold(
             { throwable -> Failure<A>(throwable) },
             { a -> Success(a) }

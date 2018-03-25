@@ -29,10 +29,10 @@ data class Cokleisli<F, A, B>(val MM: Comonad<F>, val run: CokleisliFun<F, A, B>
     inline fun <C> flatMap(crossinline f: (B) -> Cokleisli<F, A, C>): Cokleisli<F, A, C> = Cokleisli(MM, { f(run(it)).run(it) })
 
     companion object {
-        inline operator fun <reified F, A, B> invoke(MF: Comonad<F>, noinline run: (Kind<F, A>) -> B): Cokleisli<F, A, B> = Cokleisli(MF, run)
+        inline operator fun <F, A, B> invoke(MF: Comonad<F>, noinline run: (Kind<F, A>) -> B): Cokleisli<F, A, B> = Cokleisli(MF, run)
 
-        inline fun <reified F, A, B> pure(MF: Comonad<F>, b: B): Cokleisli<F, A, B> = Cokleisli(MF, { b })
+        inline fun <F, A, B> pure(MF: Comonad<F>, b: B): Cokleisli<F, A, B> = Cokleisli(MF, { b })
 
-        inline fun <reified F, B> ask(MF: Comonad<F>): Cokleisli<F, B, B> = Cokleisli(MF, { MF.run { it.extract() } })
+        inline fun <F, B> ask(MF: Comonad<F>): Cokleisli<F, B, B> = Cokleisli(MF, { MF.run { it.extract() } })
     }
 }
