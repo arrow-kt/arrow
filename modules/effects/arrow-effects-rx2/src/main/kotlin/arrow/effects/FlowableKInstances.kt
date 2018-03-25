@@ -34,10 +34,10 @@ interface FlowableKMonadInstance : Monad<ForFlowableK> {
     override fun <A, B> FlowableKOf<A>.ap(ff: FlowableKOf<(A) -> B>): FlowableK<B> =
             fix().ap(ff)
 
-    override fun <A, B> Kind<ForFlowableK, A>.flatMap(f: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
+    override fun <A, B> FlowableKOf<A>.flatMap(f: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
             fix().flatMap(f)
 
-    override fun <A, B> Kind<ForFlowableK, A>.map(f: (A) -> B): FlowableK<B> =
+    override fun <A, B> FlowableKOf<A>.map(f: (A) -> B): FlowableK<B> =
             fix().map(f)
 
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, FlowableKOf<arrow.core.Either<A, B>>>): FlowableK<B> =
@@ -48,7 +48,7 @@ interface FlowableKMonadInstance : Monad<ForFlowableK> {
 }
 
 @instance(FlowableK::class)
-interface FlowableKFoldableInstance : arrow.typeclasses.Foldable<ForFlowableK> {
+interface FlowableKFoldableInstance : Foldable<ForFlowableK> {
     override fun <A, B> foldLeft(fa: FlowableKOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)
 
@@ -57,12 +57,12 @@ interface FlowableKFoldableInstance : arrow.typeclasses.Foldable<ForFlowableK> {
 }
 
 @instance(FlowableK::class)
-interface FlowableKTraverseInstance : arrow.typeclasses.Traverse<ForFlowableK> {
+interface FlowableKTraverseInstance : Traverse<ForFlowableK> {
     override fun <A, B> Kind<ForFlowableK, A>.map(f: (A) -> B): FlowableK<B> =
             fix().map(f)
 
-    override fun <G, A, B> Applicative<G>.traverse(fa: FlowableKOf<A>, f: (A) -> Kind<G, B>): arrow.Kind<G, FlowableK<B>> =
-            fa.fix().traverse(this, f)
+    override fun <G, A, B> FlowableKOf<A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, FlowableK<B>> =
+            fix().traverse(AP, f)
 
     override fun <A, B> foldLeft(fa: FlowableKOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)

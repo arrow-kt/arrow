@@ -50,7 +50,7 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
          */
         fun <T, A, B> fromTraversable(TT: Traverse<T>) = object : PTraversal<Kind<T, A>, Kind<T, B>, A, B> {
             override fun <F> modifyF(FA: Applicative<F>, s: Kind<T, A>, f: (A) -> Kind<F, B>): Kind<F, Kind<T, B>> =
-                    TT.run { FA.traverse(s, f) }
+                    TT.run { s.traverse(FA, f) }
         }
 
         /**

@@ -62,7 +62,7 @@ object ReducibleLaws {
     fun <F> Reducible<F>.sizeConsistent(cf: (Int) -> Kind<F, Int>, EQ: Eq<Long>) =
             forAll(genConstructor(genIntSmall(), cf), { fa: Kind<F, Int> ->
                 with(LongMonoidInstance) {
-                    size(fa).equalUnderTheLaw(fa.reduceMap(this) { 1L }, EQ)
+                    fa.size(this).equalUnderTheLaw(fa.reduceMap(this) { 1L }, EQ)
                 }
             })
 }

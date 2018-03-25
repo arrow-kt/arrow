@@ -34,7 +34,7 @@ class ReducibleTests : UnitSpec() {
 
                 "Reducible<NonEmptyList> default size implementation" {
                     val nel = NonEmptyList.of(1, 2, 3)
-                    LongMonoidInstance.size(nel) shouldBe nel.size.toLong()
+                    nel.size(LongMonoidInstance) shouldBe nel.size.toLong()
                 }
 
                 "Reducible<NonEmptyList>" {

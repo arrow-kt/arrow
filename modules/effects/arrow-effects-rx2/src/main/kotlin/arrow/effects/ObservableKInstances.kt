@@ -47,7 +47,7 @@ interface ObservableKMonadInstance : Monad<ForObservableK> {
 }
 
 @instance(ObservableK::class)
-interface ObservableKFoldableInstance : arrow.typeclasses.Foldable<ForObservableK> {
+interface ObservableKFoldableInstance : Foldable<ForObservableK> {
     override fun <A, B> foldLeft(fa: ObservableKOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)
 
@@ -56,12 +56,12 @@ interface ObservableKFoldableInstance : arrow.typeclasses.Foldable<ForObservable
 }
 
 @instance(ObservableK::class)
-interface ObservableKTraverseInstance : arrow.typeclasses.Traverse<ForObservableK> {
+interface ObservableKTraverseInstance : Traverse<ForObservableK> {
     override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
             fix().map(f)
 
-    override fun <G, A, B> Applicative<G>.traverse(fa: ObservableKOf<A>, f: (A) -> Kind<G, B>): arrow.Kind<G, ObservableK<B>> =
-            fa.fix().traverse(this, f)
+    override fun <G, A, B> ObservableKOf<A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ObservableK<B>> =
+            fix().traverse(AP, f)
 
     override fun <A, B> foldLeft(fa: ObservableKOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)
