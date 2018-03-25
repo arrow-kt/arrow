@@ -22,11 +22,11 @@ object MonoidKLaws {
 
     fun <F> MonoidK<F>.monoidKLeftIdentity(f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), f), { fa: Kind<F, Int> ->
-                combineK(empty<Int>(), fa).equalUnderTheLaw(fa, EQ)
+                empty<Int>().combineK(fa).equalUnderTheLaw(fa, EQ)
             })
 
     fun <F> MonoidK<F>.monoidKRightIdentity(f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), f), { fa: Kind<F, Int> ->
-                combineK(fa, empty<Int>()).equalUnderTheLaw(fa, EQ)
+                fa.combineK(empty<Int>()).equalUnderTheLaw(fa, EQ)
             })
 }

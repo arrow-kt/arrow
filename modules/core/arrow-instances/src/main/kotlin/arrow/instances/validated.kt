@@ -48,8 +48,8 @@ interface ValidatedFoldableInstance<E> : Foldable<ValidatedPartialOf<E>> {
 @instance(Validated::class)
 interface ValidatedTraverseInstance<E> : ValidatedFoldableInstance<E>, Traverse<ValidatedPartialOf<E>> {
 
-    override fun <G, A, B> Applicative<G>.traverse(fa: Kind<ValidatedPartialOf<E>, A>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> =
-            fa.fix().traverse(f, this)
+    override fun <G, A, B> Kind<ValidatedPartialOf<E>, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> =
+            fix().traverse(f, AP)
 
 }
 
@@ -58,8 +58,8 @@ interface ValidatedSemigroupKInstance<E> : SemigroupK<ValidatedPartialOf<E>> {
 
     fun SE(): Semigroup<E>
 
-    override fun <B> combineK(x: ValidatedOf<E, B>, y: ValidatedOf<E, B>): Validated<E, B> =
-            x.fix().combineK(SE(), y)
+    override fun <B> Kind<ValidatedPartialOf<E>, B>.combineK(y: Kind<ValidatedPartialOf<E>, B>): Validated<E, B> =
+            fix().combineK(SE(), y)
 
 }
 

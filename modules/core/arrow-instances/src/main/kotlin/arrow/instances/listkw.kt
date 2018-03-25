@@ -109,8 +109,8 @@ interface ListKTraverseInstance : Traverse<ForListK> {
 
 @instance(ListK::class)
 interface ListKSemigroupKInstance : SemigroupK<ForListK> {
-    override fun <A> combineK(x: ListKOf<A>, y: ListKOf<A>): ListK<A> =
-            x.fix().combineK(y)
+    override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
+            fix().combineK(y)
 }
 
 @instance(ListK::class)
@@ -118,6 +118,6 @@ interface ListKMonoidKInstance : MonoidK<ForListK> {
     override fun <A> empty(): ListK<A> =
             ListK.empty()
 
-    override fun <A> combineK(x: ListKOf<A>, y: ListKOf<A>): ListK<A> =
-            x.fix().combineK(y)
+    override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
+            fix().combineK(y)
 }

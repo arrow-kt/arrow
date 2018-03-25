@@ -51,8 +51,8 @@ interface SetKFoldableInstance : Foldable<ForSetK> {
 
 @instance(SetK::class)
 interface SetKSemigroupKInstance : SemigroupK<ForSetK> {
-    override fun <A> combineK(x: SetKOf<A>, y: SetKOf<A>): SetK<A> =
-            x.fix().combineK(y)
+    override fun <A> Kind<ForSetK, A>.combineK(y: Kind<ForSetK, A>): SetK<A> =
+            fix().combineK(y)
 }
 
 @instance(SetK::class)
@@ -60,6 +60,6 @@ interface SetKMonoidKInstance : MonoidK<ForSetK> {
     override fun <A> empty(): SetK<A> =
             SetK.empty()
 
-    override fun <A> combineK(x: SetKOf<A>, y: SetKOf<A>): SetK<A> =
-            x.fix().combineK(y)
+    override fun <A> Kind<ForSetK, A>.combineK(y: Kind<ForSetK, A>): SetK<A> =
+            fix().combineK(y)
 }

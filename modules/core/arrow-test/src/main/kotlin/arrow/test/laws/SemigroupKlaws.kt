@@ -18,6 +18,6 @@ object SemigroupKLaws {
 
     fun <F> SemigroupK<F>.semigroupKAssociative(f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), f), genConstructor(Gen.int(), f), genConstructor(Gen.int(), f), { a, b, c ->
-                combineK(combineK(a, b), c).equalUnderTheLaw(combineK(a, combineK(b, c)), EQ)
+                a.combineK(b).combineK(c).equalUnderTheLaw(a.combineK(b.combineK(c)), EQ)
             })
 }

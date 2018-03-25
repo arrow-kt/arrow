@@ -36,8 +36,8 @@ interface ListKMonadCombineInstance : MonadCombine<ForListK> {
     override fun <A> pure(a: A): ListK<A> =
             ListK.pure(a)
 
-    override fun <A> combineK(x: ListKOf<A>, y: ListKOf<A>): ListK<A> =
-            x.fix().combineK(y)
+    override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
+            fix().combineK(y)
 }
 
 @instance(ListK::class)

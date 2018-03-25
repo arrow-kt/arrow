@@ -106,8 +106,8 @@ interface SequenceKTraverseInstance : Traverse<ForSequenceK> {
 
 @instance(SequenceK::class)
 interface SequenceKSemigroupKInstance : SemigroupK<ForSequenceK> {
-    override fun <A> combineK(x: SequenceKOf<A>, y: SequenceKOf<A>): SequenceK<A> =
-            x.fix().combineK(y)
+    override fun <A> Kind<ForSequenceK, A>.combineK(y: Kind<ForSequenceK, A>): SequenceK<A> =
+            fix().combineK(y)
 }
 
 @instance(SequenceK::class)
@@ -115,6 +115,6 @@ interface SequenceKMonoidKInstance : MonoidK<ForSequenceK> {
     override fun <A> empty(): SequenceK<A> =
             SequenceK.empty()
 
-    override fun <A> combineK(x: SequenceKOf<A>, y: SequenceKOf<A>): SequenceK<A> =
-            x.fix().combineK(y)
+    override fun <A> Kind<ForSequenceK, A>.combineK(y: Kind<ForSequenceK, A>): SequenceK<A> =
+            fix().combineK(y)
 }

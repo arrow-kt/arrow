@@ -77,6 +77,6 @@ interface EitherTTraverseInstance<F, L> : EitherTFunctorInstance<F, L>, EitherTF
 interface EitherTSemigroupKInstance<F, L> : SemigroupK<EitherTPartialOf<F, L>> {
     fun MF(): Monad<F>
 
-    override fun <A> combineK(x: EitherTOf<F, L, A>, y: EitherTOf<F, L, A>): EitherT<F, L, A> =
-            x.fix().combineK(y, MF())
+    override fun <A> Kind<EitherTPartialOf<F, L>, A>.combineK(y: Kind<EitherTPartialOf<F, L>, A>): EitherT<F, L, A> =
+            fix().combineK(y, MF())
 }

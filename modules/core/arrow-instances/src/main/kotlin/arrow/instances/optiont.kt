@@ -81,7 +81,7 @@ interface OptionTSemigroupKInstance<F> : SemigroupK<OptionTPartialOf<F>> {
 
     fun FF(): Monad<F>
 
-    override fun <A> combineK(x: OptionTOf<F, A>, y: OptionTOf<F, A>): OptionT<F, A> = x.fix().orElse({ y.fix() }, FF())
+    override fun <A> Kind<OptionTPartialOf<F>, A>.combineK(y: Kind<OptionTPartialOf<F>, A>): OptionT<F, A> = fix().orElse({ y.fix() }, FF())
 }
 
 @instance(OptionT::class)

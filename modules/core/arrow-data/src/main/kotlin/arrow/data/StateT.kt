@@ -272,7 +272,7 @@ class StateT<F, S, A>(
      * @param SF [SemigroupK] for [F].
      */
     fun combineK(y: StateTOf<F, S, A>, MF: Monad<F>, SF: SemigroupK<F>): StateT<F, S, A> = SF.run {
-        StateT(MF.pure({ s -> combineK(run(s, MF), y.fix().run(s, MF)) }))
+        StateT(MF.pure({ s -> run(s, MF).combineK(y.fix().run(s, MF)) }))
     }
 
     /**

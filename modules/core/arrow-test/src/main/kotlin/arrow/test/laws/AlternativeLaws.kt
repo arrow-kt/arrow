@@ -28,7 +28,7 @@ object AlternativeLaws {
     fun <F> Alternative<F>.alternativeLeftDistributivity(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), cf), genConstructor(Gen.int(), cf), genFunctionAToB<Int, Int>(Gen.int()),
                     { fa: Kind<F, Int>, fa2: Kind<F, Int>, f: (Int) -> Int ->
-                        combineK(fa, fa2).map(f).equalUnderTheLaw(combineK(fa.map(f), fa2.map(f)), EQ)
+                        fa.combineK(fa2).map(f).equalUnderTheLaw(fa.map(f).combineK(fa2.map(f)), EQ)
                     })
 
     fun <F> Alternative<F>.alternativeRightDistributivity(cf: (Int) -> Kind<F, Int>,
@@ -36,6 +36,6 @@ object AlternativeLaws {
                                                           EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), cf), genConstructor2(Gen.int(), cff), genConstructor2(Gen.int(), cff),
                     { fa: Kind<F, Int>, ff: Kind<F, (Int) -> Int>, fg: Kind<F, (Int) -> Int> ->
-                        fa.ap(combineK(ff, fg)).equalUnderTheLaw(combineK(fa.ap(ff), fa.ap(fg)), EQ)
+                        fa.ap(ff.combineK(fg)).equalUnderTheLaw(fa.ap(ff).combineK(fa.ap(fg)), EQ)
                     })
 }

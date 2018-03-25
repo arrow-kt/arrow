@@ -109,9 +109,11 @@ interface ComposedSemigroupK<F, G> : SemigroupK<Nested<F, G>> {
 
     fun F(): SemigroupK<F>
 
-    override fun <A> combineK(x: Kind<Nested<F, G>, A>, y: Kind<Nested<F, G>, A>): Kind<Nested<F, G>, A> = F().run { combineK(x.unnest(), y.unnest()).nest() }
+    override fun <A> Kind<Nested<F, G>, A>.combineK(y: Kind<Nested<F, G>, A>): Kind<Nested<F, G>, A> = F().run {
+        unnest().combineK(unnest()).nest()
+    }
 
-    fun <A> combineKC(x: Kind<F, Kind<G, A>>, y: Kind<F, Kind<G, A>>): Kind<Nested<F, G>, A> = combineK(x.nest(), y.nest())
+    fun <A> combineKC(x: Kind<F, Kind<G, A>>, y: Kind<F, Kind<G, A>>): Kind<Nested<F, G>, A> = x.nest().combineK(y.nest())
 
     companion object {
         operator fun <F, G> invoke(SF: SemigroupK<F>): SemigroupK<Nested<F, G>> =

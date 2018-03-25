@@ -55,8 +55,8 @@ interface WriterTSemigroupKInstance<F, W> : SemigroupK<WriterTPartialOf<F, W>> {
 
     fun SS(): SemigroupK<F>
 
-    override fun <A> combineK(x: WriterTOf<F, W, A>, y: WriterTOf<F, W, A>): WriterT<F, W, A> =
-            x.fix().combineK(y, SS())
+    override fun <A> Kind<WriterTPartialOf<F, W>, A>.combineK(y: Kind<WriterTPartialOf<F, W>, A>): WriterT<F, W, A> =
+            fix().combineK(y, SS())
 }
 
 @instance(WriterT::class)

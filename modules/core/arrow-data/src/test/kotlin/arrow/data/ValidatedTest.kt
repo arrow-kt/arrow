@@ -200,20 +200,20 @@ class ValidatedTest : UnitSpec() {
             "CombineK should combine Valid Validated" {
                 val valid = Valid("Who")
 
-                combineK(valid, valid) shouldBe (Valid("Who"))
+                valid.combineK(valid) shouldBe (Valid("Who"))
             }
 
             "CombineK should combine Valid and Invalid Validated" {
                 val valid = Valid("Who")
                 val invalid = Invalid("Nope")
 
-                combineK(valid, invalid) shouldBe (Valid("Who"))
+                valid.combineK(invalid) shouldBe (Valid("Who"))
             }
 
             "CombineK should combine Invalid Validated" {
                 val invalid = Invalid("Nope")
 
-                combineK(invalid, invalid) shouldBe (Invalid("NopeNope"))
+                invalid.combineK(invalid) shouldBe (Invalid("NopeNope"))
             }
         }
 

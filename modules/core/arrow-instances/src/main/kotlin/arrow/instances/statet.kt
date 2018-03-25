@@ -56,8 +56,8 @@ interface StateTSemigroupKInstance<F, S> : SemigroupK<StateTPartialOf<F, S>> {
 
     fun SS(): SemigroupK<F>
 
-    override fun <A> combineK(x: StateTOf<F, S, A>, y: StateTOf<F, S, A>): StateT<F, S, A> =
-            x.fix().combineK(y, FF(), SS())
+    override fun <A> Kind<StateTPartialOf<F, S>, A>.combineK(y: Kind<StateTPartialOf<F, S>, A>): StateT<F, S, A> =
+            fix().combineK(y, FF(), SS())
 
 }
 

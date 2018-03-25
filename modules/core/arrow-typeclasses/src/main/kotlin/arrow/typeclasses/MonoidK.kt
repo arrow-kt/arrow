@@ -19,6 +19,6 @@ interface MonoidK<F> : SemigroupK<F> {
 
         override fun empty(): Kind<F, A> = empty()
 
-        override fun Kind<F, A>.combine(b: Kind<F, A>): Kind<F, A> = combineK(this, b)
+        override fun Kind<F, A>.combine(b: Kind<F, A>): Kind<F, A> = this.combineK(b)
     }
 }
