@@ -7,14 +7,17 @@ video: 3y9KI7XWXSY
 
 ## Typeclasses
 
-A typeclass is a specification for one behavior associated with a single type.
-This behavior is checked by a test suite called the "laws" for that typeclass.
+Typeclasses are interfaces that define a set of functions associated to one type.
+These functions can be either extension functions on the type, or a smart constructor / factory function.
+The extension functions are scoped within the Typeclass, so they do not pollute the global namespace.
+
+To assure that a typeclass has been correctly implemented, a test suite called the "laws" is provided per typeclass.
 These test suites are available in the package arrow-tests.
 
-What differentiates typeclasses from regular OOP inheritance is that typeclasses are meant to be implemented outside of their types.
+What differentiates typeclasses from regular OOP inheritance is that typeclasses are meant to be implemented *outside* of their types.
 The association is done using generic parametrization rather than the usual subclassing by implementing the interface.
 This means that they can be implemented for any class, even those not in the current project,
-and allows us to make available at the global scope any one implementation of a typeclasses for the single unique type they're associated with.
+and allows us to make available at any scope any one implementation of a typeclasses for the single unique type they're associated with.
 
 #### Example
 
