@@ -119,19 +119,19 @@ interface NonEmptyReducible<F, G> : Reducible<F> {
         return if (f(a)) Some(a) else ga.find(f)
     }
 
-    override fun <A> exists(fa: Kind<F, A>, p: (A) -> Boolean): Boolean = FG().run {
-        val (a, ga) = split(fa)
-        return p(a) || exists(ga, p)
+    override fun <A> Kind<F, A>.exists(p: (A) -> Boolean): Boolean = this@NonEmptyReducible.FG().run {
+        val (a, ga) = this@NonEmptyReducible.split(this@exists)
+        return p(a) || ga.exists(p)
     }
 
-    override fun <A> forall(fa: Kind<F, A>, p: (A) -> Boolean): Boolean = FG().run {
-        val (a, ga) = split(fa)
-        return p(a) && forall(ga, p)
+    override fun <A> Kind<F, A>.forAll(p: (A) -> Boolean): Boolean = FG().run {
+        val (a, ga) = split(this@forAll)
+        return p(a) && ga.forAll(p)
     }
 
-    override fun <A> Monoid<Long>.size(fa: Kind<F, A>): Long = FG().run {
-        val (_, tail) = split(fa)
-        return 1 + size(tail)
+    override fun <A> Kind<F, A>.size(MN: Monoid<Long>): Long = FG().run {
+        val (_, tail) = split(this@size)
+        return 1 + tail.size(MN)
     }
 
     override fun <A> Kind<F, A>.get(M: Monad<Kind<ForEither, A>>, idx: Long): Option<A> =

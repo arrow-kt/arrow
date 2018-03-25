@@ -45,16 +45,16 @@ object FoldableLaws {
 
     fun <F> Foldable<F>.existsConsistentWithFind(cf: (Int) -> Kind<F, Int>) =
             forAll(genIntPredicate(), genConstructor(Gen.int(), cf), { f: (Int) -> Boolean, fa: Kind<F, Int> ->
-                exists(fa, f).equalUnderTheLaw(fa.find(f).fold({ false }, { true }), Eq.any())
+                fa.exists(f).equalUnderTheLaw(fa.find(f).fold({ false }, { true }), Eq.any())
             })
 
     fun <F> Foldable<F>.existsIsLazy(cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>) =
             forAll(genConstructor(Gen.int(), cf), { fa: Kind<F, Int> ->
                 val sideEffect = SideEffect()
-                exists(fa, { _ ->
+                fa.exists { _ ->
                     sideEffect.increment()
                     true
-                })
+                }
                 val expected = if (fa.isEmpty()) 0 else 1
                 sideEffect.counter.equalUnderTheLaw(expected, EQ)
             })
@@ -62,30 +62,30 @@ object FoldableLaws {
     fun <F> Foldable<F>.forAllIsLazy(cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>) =
             forAll(genConstructor(Gen.int(), cf), { fa: Kind<F, Int> ->
                 val sideEffect = SideEffect()
-                forall(fa, { _ ->
+                fa.forAll { _ ->
                     sideEffect.increment()
                     true
-                })
+                }
                 val expected = if (fa.isEmpty()) 0 else 1
                 sideEffect.counter.equalUnderTheLaw(expected, EQ)
             })
 
     fun <F> Foldable<F>.forallConsistentWithExists(cf: (Int) -> Kind<F, Int>) =
             forAll(genIntPredicate(), genConstructor(Gen.int(), cf), { f: (Int) -> Boolean, fa: Kind<F, Int> ->
-                if (forall(fa, f)) {
-                    val negationExists = exists(fa, { a -> !(f(a)) })
+                if (fa.forAll(f)) {
+                    val negationExists = fa.exists { a -> !(f(a)) }
                     // if p is true for all elements, then there cannot be an element for which
                     // it does not hold.
                     !negationExists &&
                             // if p is true for all elements, then either there must be no elements
                             // or there must exist an element for which it is true.
-                            (fa.isEmpty() || exists(fa, f))
+                            (fa.isEmpty() || fa.exists(f))
                 } else true
             })
 
     fun <F> Foldable<F>.forallReturnsTrueIfEmpty(cf: (Int) -> Kind<F, Int>) =
             forAll(genIntPredicate(), genConstructor(Gen.int(), cf), { f: (Int) -> Boolean, fa: Kind<F, Int> ->
-                !fa.isEmpty() || forall(fa, f)
+                !fa.isEmpty() || fa.forAll(f)
             })
 
     fun <F> Foldable<F>.foldMIdIsFoldL(cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>) =

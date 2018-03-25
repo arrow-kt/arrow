@@ -89,8 +89,8 @@ interface TryMonadInstance : Monad<ForTry> {
 
 @instance(Try::class)
 interface TryFoldableInstance : Foldable<ForTry> {
-    override fun <A> exists(fa: TryOf<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
-            fa.fix().exists(p)
+    override fun <A> TryOf<A>.exists(p: (A) -> Boolean): kotlin.Boolean =
+            fix().exists(p)
 
     override fun <A, B> foldLeft(fa: TryOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)
@@ -105,14 +105,14 @@ fun <A, B, G> Try<A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G,
 
 @instance(Try::class)
 interface TryTraverseInstance : Traverse<ForTry> {
-    override fun <A, B> Kind<ForTry, A>.map(f: (A) -> B): Try<B> =
+    override fun <A, B> TryOf<A>.map(f: (A) -> B): Try<B> =
             fix().map(f)
 
-    override fun <G, A, B> Kind<ForTry, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Try<B>> =
+    override fun <G, A, B> TryOf<A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Try<B>> =
             fix().traverse(f, AP)
 
-    override fun <A> exists(fa: TryOf<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
-            fa.fix().exists(p)
+    override fun <A> TryOf<A>.exists(p: (A) -> Boolean): kotlin.Boolean =
+            fix().exists(p)
 
     override fun <A, B> foldLeft(fa: TryOf<A>, b: B, f: Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)

@@ -23,8 +23,8 @@ interface OptionTraverseFilterInstance : TraverseFilter<ForOption> {
     override fun <G, A, B> Kind<ForOption, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): arrow.Kind<G, Option<B>> =
             fix().traverse(f, AP)
 
-    override fun <A> exists(fa: Kind<ForOption, A>, p: (A) -> Boolean): kotlin.Boolean =
-            fa.fix().exists(p)
+    override fun <A> Kind<ForOption, A>.exists(p: (A) -> Boolean): kotlin.Boolean =
+            fix().exists(p)
 
     override fun <A, B> foldLeft(fa: OptionOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
             fa.fix().foldLeft(b, f)
@@ -32,8 +32,8 @@ interface OptionTraverseFilterInstance : TraverseFilter<ForOption> {
     override fun <A, B> foldRight(fa: OptionOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
             fa.fix().foldRight(lb, f)
 
-    override fun <A> forall(fa: OptionOf<A>, p: kotlin.Function1<A, kotlin.Boolean>): kotlin.Boolean =
-            fa.fix().forall(p)
+    override fun <A> OptionOf<A>.forAll(p: (A) -> Boolean): kotlin.Boolean =
+            fix().forall(p)
 
     override fun <A> Kind<ForOption, A>.isEmpty(): kotlin.Boolean =
             fix().isEmpty()

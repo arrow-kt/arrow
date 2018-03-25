@@ -123,23 +123,25 @@ interface Foldable<F> {
      *
      * If there are no elements, the result is false.
      */
-    fun <A> exists(fa: Kind<F, A>, p: (A) -> Boolean): Boolean =
-            foldRight(fa, Eval.False, { a, lb -> if (p(a)) Eval.True else lb }).value()
+    fun <A> Kind<F, A>.exists(p: (A) -> Boolean): Boolean =
+            foldRight(this, Eval.False, { a, lb -> if (p(a)) Eval.True else lb }).value()
 
     /**
      * Check whether all elements satisfy the predicate.
      *
      * If there are no elements, the result is true.
      */
-    fun <A> forall(fa: Kind<F, A>, p: (A) -> Boolean): Boolean =
-            foldRight(fa, Eval.True, { a, lb -> if (p(a)) lb else Eval.False }).value()
+    fun <A> Kind<F, A>.forAll(p: (A) -> Boolean): Boolean =
+            foldRight(this, Eval.True, { a, lb -> if (p(a)) lb else Eval.False }).value()
 
     /**
      * Returns true if there are no elements. Otherwise false.
      */
-    fun <A> Kind<F, A>.isEmpty(): Boolean = foldRight(this, Eval.True, { _, _ -> Eval.False }).value()
+    fun <A> Kind<F, A>.isEmpty(): Boolean =
+            foldRight(this, Eval.True, { _, _ -> Eval.False }).value()
 
-    fun <A> Kind<F, A>.nonEmpty(): Boolean = !isEmpty()
+    fun <A> Kind<F, A>.nonEmpty(): Boolean =
+            !isEmpty()
 
     /**
      * The size of this Foldable.
@@ -149,7 +151,8 @@ interface Foldable<F> {
      *
      * Note: will not terminate for infinite-sized collections.
      */
-    fun <A> Monoid<Long>.size(fa: Kind<F, A>): Long = fa.foldMap(this) { 1 }
+    fun <A> Kind<F, A>.size(MN: Monoid<Long>): Long =
+            foldMap(MN) { 1 }
 
     /**
      * Monadic folding on F by mapping A values to G<B>, combining the B values using the given Monoid<B> instance.
