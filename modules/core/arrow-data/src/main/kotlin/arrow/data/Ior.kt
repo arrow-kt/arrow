@@ -28,7 +28,7 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
  * The isomorphic Either form can be accessed via the [unwrap] method.
  */
 @higherkind
-sealed class Ior<A, B> : IorOf<A, B> {
+sealed class Ior<out A, out B> : IorOf<A, B> {
 
     /**
      * Returns `true` if this is a [Right], `false` otherwise.
@@ -278,51 +278,63 @@ sealed class Ior<A, B> : IorOf<A, B> {
      */
     fun toValidated(): Validated<A, B> = fold({ Invalid(it) }, { Valid(it) }, { _, b -> Valid(b) })
 
-    /**
-     * Binds the given function across [Ior.Right].
-     *
-     * @param f The function to bind across [Ior.Right].
-     */
-    fun <D> flatMap(SG: Semigroup<A>, f: (B) -> Ior<A, D>): Ior<A, D> = fold(
-            ::Left,
-            f,
-            { l, r ->
-                with(SG) {
-                    f(r).fold({
-                        Ior.Left(l.combine(it))
-                    }, {
-                        Ior.Both(l, it)
-                    }, { ll, rr ->
-                        Ior.Both(l.combine(ll), rr)
-                    })
-                }
-            }
-    )
-
-    fun <D> ap(SG: Semigroup<A>, ff: IorOf<A, (B) -> D>): Ior<A, D> =
-            ff.fix().flatMap(SG) { f -> map(f) }
-
-    data class Left<A, B>(val value: A) : Ior<A, B>() {
+    data class Left<out A, out B> @PublishedApi internal constructor(val value: A) : Ior<A, B>() {
         override val isRight: Boolean get() = false
         override val isLeft: Boolean get() = true
         override val isBoth: Boolean get() = false
+
+        companion object {
+            inline operator fun <A> invoke(a: A): Ior<A, Nothing> = Left(a)
+        }
     }
 
-    data class Right<A, B>(val value: B) : Ior<A, B>() {
+    data class Right<out A, out B> @PublishedApi internal constructor(val value: B) : Ior<A, B>() {
         override val isRight: Boolean get() = true
         override val isLeft: Boolean get() = false
         override val isBoth: Boolean get() = false
+
+        companion object {
+            inline operator fun <B> invoke(b: B): Ior<Nothing, B> = Right(b)
+        }
     }
 
-    data class Both<A, B>(val leftValue: A, val rightValue: B) : Ior<A, B>() {
+    data class Both<out A, out B>(val leftValue: A, val rightValue: B) : Ior<A, B>() {
         override val isRight: Boolean get() = false
         override val isLeft: Boolean get() = false
         override val isBoth: Boolean get() = true
     }
 }
 
+/**
+ * Binds the given function across [Ior.Right].
+ *
+ * @param f The function to bind across [Ior.Right].
+ */
+fun <A, B, D> Ior<A, B>.flatMap(SG: Semigroup<A>, f: (B) -> Ior<A, D>): Ior<A, D> = fold(
+        { Ior.Left(it) },
+        f,
+        { l, r ->
+            with(SG) {
+                f(r).fold({
+                    Ior.Left(l.combine(it))
+                }, {
+                    Ior.Both(l, it)
+                }, { ll, rr ->
+                    Ior.Both(l.combine(ll), rr)
+                })
+            }
+        }
+)
+
+fun <A, B, D> Ior<A, B>.ap(SG: Semigroup<A>, ff: IorOf<A, (B) -> D>): Ior<A, D> =
+        ff.fix().flatMap(SG) { f -> map(f) }
+
 inline fun <A, B> Ior<A, B>.getOrElse(crossinline default: () -> B): B = fold({ default() }, { it }, { _, b -> b })
 
 fun <A, B> Pair<A, B>.bothIor(): Ior<A, B> = Ior.Both(this.first, this.second)
 
 fun <A, B> Tuple2<A, B>.bothIor(): Ior<A, B> = Ior.Both(this.a, this.b)
+
+fun <A> A.leftIor(): Ior<A, Nothing> = Ior.Left(this)
+
+fun <A> A.rightIor(): Ior<Nothing, A> = Ior.Right(this)

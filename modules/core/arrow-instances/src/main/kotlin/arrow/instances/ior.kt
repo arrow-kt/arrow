@@ -3,10 +3,7 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.data.Ior
-import arrow.data.IorOf
-import arrow.data.IorPartialOf
-import arrow.data.fix
+import arrow.data.*
 import arrow.instance
 import arrow.typeclasses.*
 
