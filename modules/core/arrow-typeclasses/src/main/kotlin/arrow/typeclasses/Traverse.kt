@@ -3,7 +3,7 @@ package arrow.typeclasses
 import arrow.Kind
 import arrow.core.Id
 import arrow.core.value
-import arrow.typeclasses.internal.IdMonad
+import arrow.typeclasses.internal.IdBimonad
 
 /**
  * Traverse, also known as Traversable. Traversal over a structure with an effect.
@@ -22,7 +22,7 @@ interface Traverse<F> : Functor<F>, Foldable<F> {
     fun <G, A> Kind<F, Kind<G, A>>.sequence(AG: Applicative<G>): Kind<G, Kind<F, A>> = traverse(AG) { it }
 
     override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> =
-            traverse(IdMonad, { Id(f(it)) }).value()
+            traverse(IdBimonad, { Id(f(it)) }).value()
 
     fun <G, A, B> Kind<F, A>.flatTraverse(flatTraverse: FlatTraverse<F, G>, f: (A) -> Kind<G, Kind<F, B>>): Kind<G, Kind<F, B>> =
             flatTraverse.AG().run { this@flatTraverse.traverse(this, f).map { flatTraverse.MF().run { it.flatten() } } }

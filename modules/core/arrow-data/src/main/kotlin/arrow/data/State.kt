@@ -2,7 +2,7 @@ package arrow.data
 
 import arrow.collections.prependTo
 import arrow.core.*
-import arrow.typeclasses.internal.IdMonad
+import arrow.typeclasses.internal.IdBimonad
 
 /**
  * Alias that represents stateful computation of the form `(S) -> Tuple2<S, A>`.
@@ -49,7 +49,7 @@ fun <S, A> State(run: (S) -> Tuple2<S, A>): State<S, A> = StateT(Id(run.andThen 
 /**
  * Syntax for constructing a `StateT<ForId, S, A>` from a function `(S) -> Tuple2<S, A>`
  */
-fun <S, A> StateFun<S, A>.toState(): State<S, A> = State(IdMonad, this)
+fun <S, A> StateFun<S, A>.toState(): State<S, A> = State(IdBimonad, this)
 
 /**
  * Syntax for constructing a `StateT<ForId, S, A>` from a function `(S) -> Tuple2<S, A>`
@@ -57,16 +57,16 @@ fun <S, A> StateFun<S, A>.toState(): State<S, A> = State(IdMonad, this)
 fun <S, A> StateFunOf<S, A>.toState(): State<S, A> = State(this)
 
 fun <S, T, P1, R> State<S, T>.map(sx: State<S, P1>, f: (T, P1) -> R): State<S, R> =
-        flatMap ({ t -> sx.map { x -> f(t, x) } }, IdMonad).fix()
+        flatMap ({ t -> sx.map { x -> f(t, x) } }, IdBimonad).fix()
 
-fun <S, T, R> State<S, T>.map(f: (T) -> R): State<S, R> = flatMap({ t -> StateApi.pure<S, R>(f(t)) }, IdMonad).fix()
+fun <S, T, R> State<S, T>.map(f: (T) -> R): State<S, R> = flatMap({ t -> StateApi.pure<S, R>(f(t)) }, IdBimonad).fix()
 
 /**
  * Alias for [StateT.run] `StateT<ForId, S, A>`
  *
  * @param initial state to start stateful computation.
  */
-fun <S, A> StateT<ForId, S, A>.run(initial: S): Tuple2<S, A> = run(initial, IdMonad).value()
+fun <S, A> StateT<ForId, S, A>.run(initial: S): Tuple2<S, A> = run(initial, IdBimonad).value()
 
 /**
  * Alias for [StateT.runA] `StateT<ForId, S, A>`
@@ -90,33 +90,33 @@ fun State() = StateApi
 
 object StateApi {
 
-    fun <S, T> pure(t: T): State<S, T> = StateT.pure(IdMonad, t)
+    fun <S, T> pure(t: T): State<S, T> = StateT.pure(IdBimonad, t)
 
     /**
      * Return input without modifying it.
      */
-    fun <S> get(): State<S, S> = StateT.get(IdMonad)
+    fun <S> get(): State<S, S> = StateT.get(IdBimonad)
 
     /**
      * Inspect a value of the state [S] with [f] `(S) -> T` without modifying the state.
      *
      * @param f the function applied to inspect [T] from [S].
      */
-    fun <S, T> inspect(f: (S) -> T): State<S, T> = StateT.inspect(IdMonad, f)
+    fun <S, T> inspect(f: (S) -> T): State<S, T> = StateT.inspect(IdBimonad, f)
 
     /**
      * Modify the state with [f] `(S) -> S` and return [Unit].
      *
      * @param f the modify function to apply.
      */
-    fun <S> modify(f: (S) -> S): State<S, Unit> = StateT.modify(IdMonad, f)
+    fun <S> modify(f: (S) -> S): State<S, Unit> = StateT.modify(IdBimonad, f)
 
     /**
      * Set the state to [s] and return [Unit].
      *
      * @param s value to set.
      */
-    fun <S> set(s: S): State<S, Unit> = StateT.set(IdMonad, s)
+    fun <S> set(s: S): State<S, Unit> = StateT.set(IdBimonad, s)
 }
 
 fun <R, S, T> List<T>.stateTraverse(f: (T) -> State<S, R>): State<S, List<R>> = foldRight(StateApi.pure(emptyList())) { i: T, accumulator: State<S, List<R>> ->

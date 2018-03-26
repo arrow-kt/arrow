@@ -5,9 +5,15 @@ import arrow.core.Either
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.fix
-import arrow.typeclasses.Monad
+import arrow.typeclasses.Bimonad
 
-val IdMonad: Monad<ForId> = object : Monad<ForId> {
+val IdBimonad: Bimonad<ForId> = object : Bimonad<ForId> {
+    override fun <A, B> Kind<ForId, A>.coflatMap(f: (Kind<ForId, A>) -> B): Kind<ForId, B> =
+            fix().coflatMap(f)
+
+    override fun <A> Kind<ForId, A>.extract(): A =
+            fix().extract()
+
     override fun <A> pure(a: A): Kind<ForId, A> =
             Id(a)
 
