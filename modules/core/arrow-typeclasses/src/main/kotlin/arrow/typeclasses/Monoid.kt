@@ -7,7 +7,7 @@ interface Monoid<A> : Semigroup<A> {
     fun empty(): A
 
     /**
-     * Combine a collection of [A] values.
+     * Combine an [Collection] of [A] values.
      */
     fun Collection<A>.combineAll(): A =
             if (isEmpty()) empty() else reduce { a, b -> a.combine(b) }
