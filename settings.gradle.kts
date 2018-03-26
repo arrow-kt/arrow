@@ -98,5 +98,4 @@ project(":arrow-dagger-effects-rx2").projectDir = file("modules/dagger/arrow-dag
 include(":arrow-dagger-effects-kotlinx-coroutines")
 project(":arrow-dagger-effects-kotlinx-coroutines").projectDir = file("modules/dagger/arrow-dagger-effects-kotlinx-coroutines")
 
-
 rootProject.name = "arrow-parent"
