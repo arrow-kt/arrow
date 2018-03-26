@@ -1,9 +1,9 @@
 package arrow.test.laws
 
-import arrow.collections.firstOption
 import arrow.core.Option
 import arrow.core.compose
 import arrow.core.identity
+import arrow.core.toOption
 import arrow.data.ListK
 import arrow.optics.Traversal
 import arrow.typeclasses.Eq
@@ -23,7 +23,7 @@ object TraversalLaws {
     fun <A, B : Any> Traversal<A, B>.headOption(aGen: Gen<A>, EQOptionB: Eq<Option<B>>): Unit =
             forAll(aGen, { a ->
                 headOption(a)
-                        .equalUnderTheLaw(getAll(a).firstOption(), EQOptionB)
+                        .equalUnderTheLaw(getAll(a).firstOrNull().toOption(), EQOptionB)
             })
 
     fun <A, B> Traversal<A, B>.modifyGetAll(aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQListB: Eq<ListK<B>>): Unit =
