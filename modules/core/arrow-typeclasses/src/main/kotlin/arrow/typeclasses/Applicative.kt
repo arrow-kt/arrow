@@ -12,7 +12,7 @@ interface Applicative<F> : Functor<F> {
     fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B>
 
     fun <A, B> Kind<F, A>.product(fb: Kind<F, B>): Kind<F, Tuple2<A, B>> =
-            fb.ap(this.map() { a: A -> { b: B -> Tuple2(a, b) } })
+            fb.ap(this.map { a: A -> { b: B -> Tuple2(a, b) } })
 
     override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> = ap(pure(f))
 

@@ -211,3 +211,11 @@ fun <E, A> Validated<E, A>.combineK(SE: Semigroup<E>, y: ValidatedOf<E, A>): Val
  * Converts the value to an Ior<E, A>
  */
 fun <E, A> Validated<E, A>.toIor(): Ior<E, A> = fold({ Ior.Left(it) }, { Ior.Right(it) })
+
+fun <E, A> A.valid(): Validated<E, A> = Valid(this)
+
+fun <E, A> E.invalid(): Validated<E, A> = Invalid(this)
+
+fun <E, A> A.validNel(): ValidatedNel<E, A> = Validated.validNel(this)
+
+fun <E, A> E.invalidNel(): ValidatedNel<E, A> = Validated.invalidNel(this)

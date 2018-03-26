@@ -14,6 +14,4 @@ interface FunctionK<F, G> {
             override fun <A> invoke(fa: Kind<F, A>): Kind<F, A> = fa
         }
     }
-
 }
-

@@ -19,14 +19,17 @@
 include(":arrow-core")
 project(":arrow-core").projectDir = file("modules/core/arrow-core")
 
+include(":arrow-syntax")
+project(":arrow-syntax").projectDir = file("modules/core/arrow-syntax")
+
 include(":arrow-typeclasses")
 project(":arrow-typeclasses").projectDir = file("modules/core/arrow-typeclasses")
 
-include(":arrow-instances")
-project(":arrow-instances").projectDir = file("modules/core/arrow-instances")
-
 include(":arrow-data")
 project(":arrow-data").projectDir = file("modules/core/arrow-data")
+
+include(":arrow-instances")
+project(":arrow-instances").projectDir = file("modules/core/arrow-instances")
 
 include(":arrow-free")
 project(":arrow-free").projectDir = file("modules/core/arrow-free")

@@ -1,4 +1,4 @@
-package arrow.collections
+package arrow.syntax.collections
 
 import arrow.core.Option
 import arrow.core.Predicate

@@ -3,27 +3,41 @@ package arrow.typeclasses
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.Tuple2
 import kotlin.coroutines.experimental.startCoroutine
 
 interface Monad<F> : Applicative<F> {
 
     fun <A, B> Kind<F, A>.flatMap(f: (A) -> Kind<F, B>): Kind<F, B>
 
-    override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> = flatMap({ a -> pure(f(a)) })
-
-    override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> = ff.flatMap({ f -> this.map(f) })
-
     fun <A, B> tailRecM(a: A, f: (A) -> Kind<F, Either<A, B>>): Kind<F, B>
 
-    fun <A> Kind<F, Kind<F, A>>.flatten(): Kind<F, A> = this.flatMap({ it })
+    override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> =
+            flatMap({ a -> pure(f(a)) })
 
-    fun <A, B> Kind<F, A>.followedBy(fb: Kind<F, B>): Kind<F, B> = this.flatMap({ fb })
+    override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> =
+            ff.flatMap({ f -> this.map(f) })
 
-    fun <A, B> Kind<F, A>.followedByEval(fb: Eval<Kind<F, B>>): Kind<F, B> = this.flatMap({ fb.value() })
+    fun <A> Kind<F, Kind<F, A>>.flatten(): Kind<F, A> =
+            flatMap { it }
 
-    fun <A, B> Kind<F, A>.forEffect(fb: Kind<F, B>): Kind<F, A> = this.flatMap({ a -> fb.map({ a }) })
+    fun <A, B> Kind<F, A>.followedBy(fb: Kind<F, B>): Kind<F, B> =
+            flatMap { fb }
 
-    fun <A, B> Kind<F, A>.forEffectEval(fb: Eval<Kind<F, B>>): Kind<F, A> = this.flatMap({ a -> fb.value().map({ a }) })
+    fun <A, B> Kind<F, A>.followedByEval(fb: Eval<Kind<F, B>>): Kind<F, B> =
+            flatMap { fb.value() }
+
+    fun <A, B> Kind<F, A>.forEffect(fb: Kind<F, B>): Kind<F, A> =
+            flatMap { a -> fb.map({ a }) }
+
+    fun <A, B> Kind<F, A>.forEffectEval(fb: Eval<Kind<F, B>>): Kind<F, A> =
+            flatMap { a -> fb.value().map({ a }) }
+
+    fun <A, B> Kind<F, A>.mproduct(f: (A) -> Kind<F, B>): Kind<F, Tuple2<A, B>> =
+            flatMap { a -> f(a).map({ Tuple2(a, it) }) }
+
+    fun <B> Kind<F, Boolean>.ifM(ifTrue: () -> Kind<F, B>, ifFalse: () -> Kind<F, B>): Kind<F, B> =
+            flatMap { if (it) ifTrue() else ifFalse() }
 }
 
 /**

@@ -148,6 +148,9 @@ sealed class Option<out A> : OptionOf<A> {
                 }
             }
 
+    fun <L> toEither(ifEmpty: () -> L): Either<L, A> =
+            fold({ ifEmpty().left() }, { it.right() })
+
     fun toList(): List<A> = fold(::emptyList, { listOf(it) })
 
     infix fun <X> and(value: Option<X>): Option<X> = if (isEmpty()) {
@@ -207,3 +210,7 @@ fun <A> Boolean.maybe(f: () -> A): Option<A> =
         } else {
             None
         }
+
+fun <A> A.some(): Option<A> = Some(this)
+
+fun <A> none(): Option<A> = None

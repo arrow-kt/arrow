@@ -14,7 +14,8 @@ import arrow.legacy.RightProjection
  * Represents a value of one of two possible types (a disjoint union.)
  * An instance of Either is either an instance of [Left] or [Right].
  */
-@higherkind sealed class Either<out A, out B> : EitherOf<A, B> {
+@higherkind
+sealed class Either<out A, out B> : EitherOf<A, B> {
 
     /**
      * Returns `true` if this is a [Right], `false` otherwise.
@@ -295,3 +296,7 @@ inline fun <T> eitherTry(body: () -> T): Either<Throwable, T> = try {
 } catch (t: Throwable) {
     Left(t)
 }
+
+fun <A> A.left(): Either<A, Nothing> = Either.Left(this)
+
+fun <A> A.right(): Either<Nothing, A> = Either.Right(this)

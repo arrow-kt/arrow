@@ -41,10 +41,17 @@ data class Coproduct<F, G, A>(val run: Either<Kind<F, A>, Kind<G, A>>) : Coprodu
     }
 
     companion object {
-        inline operator fun <F, G, A> invoke(run: Either<Kind<F, A>, Kind<G, A>>): Coproduct<F, G, A> =
+        operator fun <F, G, A> invoke(run: Either<Kind<F, A>, Kind<G, A>>): Coproduct<F, G, A> =
                 Coproduct(run)
     }
 }
 
-inline fun <F, G, A> Either<Kind<F, A>, Kind<G, A>>.coproduct(): Coproduct<F, G, A> =
+fun <F, G, A> Either<Kind<F, A>, Kind<G, A>>.coproduct(): Coproduct<F, G, A> =
         Coproduct(this)
+
+fun <F, G, H> FunctionK<F, G>.or(h: FunctionK<H, G>): FunctionK<CoproductPartialOf<F, H>, G> =
+        object : FunctionK<CoproductPartialOf<F, H>, G> {
+            override fun <A> invoke(fa: CoproductOf<F, H, A>): Kind<G, A> {
+                return fa.fix().fold(this@or, h)
+            }
+        }

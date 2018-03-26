@@ -1,6 +1,5 @@
 package arrow.data
 
-import arrow.collections.prependTo
 import arrow.core.*
 import arrow.typeclasses.internal.IdBimonad
 
@@ -121,7 +120,7 @@ object StateApi {
 
 fun <R, S, T> List<T>.stateTraverse(f: (T) -> State<S, R>): State<S, List<R>> = foldRight(StateApi.pure(emptyList())) { i: T, accumulator: State<S, List<R>> ->
     f(i).map(accumulator, ({ head: R, tail: List<R> ->
-        head prependTo tail
+        listOf(head) + tail
     }))
 }
 
