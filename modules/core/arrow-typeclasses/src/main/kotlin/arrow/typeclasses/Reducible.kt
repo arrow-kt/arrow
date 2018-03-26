@@ -71,7 +71,6 @@ interface Reducible<F> : Foldable<F> {
     fun <A, B> Kind<F, A>.reduceMap(SG: Semigroup<B>, f: (A) -> B): B = SG.run {
         reduceLeftTo(f, { b, a -> b.combine(f(a)) })
     }
-
 }
 
 /**

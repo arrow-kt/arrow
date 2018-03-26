@@ -107,7 +107,7 @@ interface NonEmptyListFoldableInstance : Foldable<ForNonEmptyList> {
             fix().foldLeft(b, f)
 
     override fun <A, B> arrow.Kind<arrow.data.ForNonEmptyList, A>.foldRight(lb: arrow.core.Eval<B>, f: (A, arrow.core.Eval<B>) -> arrow.core.Eval<B>): Eval<B> =
-            this@foldRight.fix().foldRight(lb, f)
+            fix().foldRight(lb, f)
 
     override fun <A> Kind<ForNonEmptyList, A>.isEmpty(): kotlin.Boolean =
             fix().isEmpty()
@@ -116,7 +116,7 @@ interface NonEmptyListFoldableInstance : Foldable<ForNonEmptyList> {
 @instance(NonEmptyList::class)
 interface NonEmptyListTraverseInstance : Traverse<ForNonEmptyList> {
     override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
-            this@map.fix().map(f)
+            fix().map(f)
 
     override fun <G, A, B> Kind<ForNonEmptyList, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, NonEmptyList<B>> =
             fix().traverse(AP, f)
@@ -125,7 +125,7 @@ interface NonEmptyListTraverseInstance : Traverse<ForNonEmptyList> {
             fix().foldLeft(b, f)
 
     override fun <A, B> arrow.Kind<arrow.data.ForNonEmptyList, A>.foldRight(lb: arrow.core.Eval<B>, f: (A, arrow.core.Eval<B>) -> arrow.core.Eval<B>): Eval<B> =
-            this@foldRight.fix().foldRight(lb, f)
+            fix().foldRight(lb, f)
 
     override fun <A> Kind<ForNonEmptyList, A>.isEmpty(): kotlin.Boolean =
             fix().isEmpty()
@@ -136,3 +136,8 @@ interface NonEmptyListSemigroupKInstance : SemigroupK<ForNonEmptyList> {
     override fun <A> Kind<ForNonEmptyList, A>.combineK(y: Kind<ForNonEmptyList, A>): NonEmptyList<A> =
             fix().combineK(null, y)
 }
+
+fun <F, A> Reducible<F>.toNonEmptyList(fa: Kind<F, A>): NonEmptyList<A> =
+        fa.reduceRightTo({ a -> NonEmptyList.of(a) }, { a, lnel ->
+            lnel.map { nonEmptyList -> NonEmptyList(a, listOf(nonEmptyList.head) + nonEmptyList.tail) }
+        }).value()
