@@ -50,7 +50,7 @@ class CoreaderTest : UnitSpec() {
                 }
 
                 "reader should lift a reader from any (A) -> B function" {
-                    val r = { x: Int -> Id(x * 2) }.coreader(this)
+                    val r = { x: Int -> Id(x * 2) }.coreader()
                     r::class.java shouldBe Cokleisli::class.java
                     r.runId(2).value() shouldBe 4
                 }

@@ -1,10 +1,10 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.collections.firstOption
-import arrow.collections.option
 import arrow.core.*
 import arrow.instances.IntEqInstance
+import arrow.syntax.collections.firstOption
+import arrow.syntax.collections.option
 import arrow.test.UnitSpec
 import arrow.test.generators.genOption
 import arrow.test.laws.EqLaws
