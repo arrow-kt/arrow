@@ -3,15 +3,16 @@ package arrow.derive
 import arrow.common.utils.AbstractProcessor
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.knownError
+import com.google.auto.service.AutoService
 import org.jetbrains.kotlin.serialization.deserialization.TypeTable
 import java.io.File
+import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
 
-// FIXME(paco) Enable Deriving once it's ready again
-//@AutoService(Processor::class)
+@AutoService(Processor::class)
 class DerivingProcessor : AbstractProcessor() {
 
     private val annotatedList: MutableList<AnnotatedDeriving> = mutableListOf()
@@ -29,7 +30,7 @@ class DerivingProcessor : AbstractProcessor() {
                 .map { element ->
                     when (element.kind) {
                         ElementKind.CLASS -> processClass(element as TypeElement)
-                        else -> knownError("${derivingAnnotationName} can only be used on classes")
+                        else -> knownError("$derivingAnnotationName can only be used on classes")
                     }
                 }
 
@@ -59,11 +60,11 @@ class DerivingProcessor : AbstractProcessor() {
             val superTypes = recurseTypeclassInterfaces(typeClassWrapper, typeTable, emptyList())
             typeClassWrapper to superTypes
         }.toMap()
-        val companionName = proto.nameResolver
-                .getString(proto.classProto.fqName)
-                .replace("/", ".") + "." +
+        val className = proto.nameResolver.getString(proto.classProto.fqName).replace("/", ".")
+        val companionName = className + "." +
                 proto.nameResolver.getString(proto.classProto.companionObjectName)
         val typeClassElement = elementUtils.getTypeElement(companionName)
+                ?: knownError("Deriving for $className: It is required that the class declares a companion object")
         val companionProto = getClassOrPackageDataWrapper(typeClassElement)
         return AnnotatedDeriving(element, proto, companionProto, typeClasses, typeclassSuperTypes)
     }
