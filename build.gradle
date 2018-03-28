@@ -40,7 +40,7 @@ buildscript {
         classpath "com.github.ben-manes:gradle-versions-plugin:$gradleVersionsPluginVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
-        classpath 'io.arrow-kt:ank-gradle-plugin:0.6.2-SNAPSHOT'
+        classpath 'io.arrow-kt:ank-gradle-plugin:0.6.2-20180328.183523-7'
         classpath 'org.ajoberstar:gradle-git-publish:0.3.2'
     }
 }
