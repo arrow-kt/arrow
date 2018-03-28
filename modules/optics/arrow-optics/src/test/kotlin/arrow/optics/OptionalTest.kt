@@ -1,6 +1,5 @@
 package arrow.optics
 
-import arrow.collections.firstOption
 import arrow.core.*
 import arrow.data.ListK
 import arrow.data.eq
@@ -92,51 +91,51 @@ class OptionalTest : UnitSpec() {
 
             "asFold should behave as valid Fold: size" {
                 forAll { ints: List<Int> ->
-                    size(ints) == ints.firstOption().map { 1 }.getOrElse { 0 }
+                    size(ints) == ints.firstOrNull().toOption().map { 1 }.getOrElse { 0 }
                 }
             }
 
             "asFold should behave as valid Fold: nonEmpty" {
                 forAll { ints: List<Int> ->
-                    nonEmpty(ints) == ints.firstOption().nonEmpty()
+                    nonEmpty(ints) == ints.firstOrNull().toOption().nonEmpty()
                 }
             }
 
             "asFold should behave as valid Fold: isEmpty" {
                 forAll { ints: List<Int> ->
-                    isEmpty(ints) == ints.firstOption().isEmpty()
+                    isEmpty(ints) == ints.firstOrNull().toOption().isEmpty()
                 }
             }
 
             "asFold should behave as valid Fold: getAll" {
                 forAll { ints: List<Int> ->
-                    getAll(ListK.monoid(), ints) == ints.firstOption().toList().k()
+                    getAll(ListK.monoid(), ints) == ints.firstOrNull().toOption().toList().k()
                 }
             }
 
             "asFold should behave as valid Fold: combineAll" {
                 forAll { ints: List<Int> ->
                     combineAll(IntMonoidInstance, ints) ==
-                            ints.firstOption().fold({ IntMonoidInstance.empty() }, { it })
+                            ints.firstOrNull().toOption().fold({ IntMonoidInstance.empty() }, { it })
                 }
             }
 
             "asFold should behave as valid Fold: fold" {
                 forAll { ints: List<Int> ->
                     fold(IntMonoidInstance, ints) ==
-                            ints.firstOption().fold({ IntMonoidInstance.empty() }, { it })
+                            ints.firstOrNull().toOption().fold({ IntMonoidInstance.empty() }, { it })
                 }
             }
 
             "asFold should behave as valid Fold: headOption" {
                 forAll { ints: List<Int> ->
-                    headOption(ints) == ints.firstOption()
+                    headOption(ints) == ints.firstOrNull().toOption()
                 }
             }
 
             "asFold should behave as valid Fold: lastOption" {
                 forAll { ints: List<Int> ->
-                    lastOption(ints) == ints.firstOption()
+                    lastOption(ints) == ints.firstOrNull().toOption()
                 }
             }
         }
