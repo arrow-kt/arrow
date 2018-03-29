@@ -56,11 +56,11 @@ sealed class Free<S, out A> : FreeOf<S, A> {
     override fun toString(): String = "Free(...) : toString is not stack-safe"
 }
 
-fun <S, A, B> Free<S, A>.map(dummy: Unit? = null, f: (A) -> B): Free<S, B> = flatMap { Free.Pure<S, B>(f(it)) }
+fun <S, A, B> FreeOf<S, A>.map(f: (A) -> B): Free<S, B> = flatMap { Free.Pure<S, B>(f(it)) }
 
-fun <S, A, B> Free<S, A>.flatMap(dummy: Unit? = null, f: (A) -> Free<S, B>): Free<S, B> = Free.FlatMapped(this, f)
+fun <S, A, B> FreeOf<S, A>.flatMap(f: (A) -> Free<S, B>): Free<S, B> = Free.FlatMapped(this.fix(), f)
 
-fun <S, A, B> Free<S, A>.ap(dummy: Unit? = null, ff: FreeOf<S, (A) -> B>): Free<S, B> = ff.fix().flatMap { f -> map(f = f) }.fix()
+fun <S, A, B> FreeOf<S, A>.ap(ff: FreeOf<S, (A) -> B>): Free<S, B> = ff.fix().flatMap { f -> map(f = f) }.fix()
 
 @Suppress("UNCHECKED_CAST")
 tailrec fun <S, A> Free<S, A>.step(): Free<S, A> =

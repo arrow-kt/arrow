@@ -6,6 +6,7 @@ import arrow.core.Eval
 import arrow.data.*
 import arrow.instance
 import arrow.typeclasses.*
+import arrow.data.combineK as nelCombineK
 
 @instance(NonEmptyList::class)
 interface NonEmptyListSemigroupInstance<A> : Semigroup<NonEmptyList<A>> {
@@ -134,7 +135,7 @@ interface NonEmptyListTraverseInstance : Traverse<ForNonEmptyList> {
 @instance(NonEmptyList::class)
 interface NonEmptyListSemigroupKInstance : SemigroupK<ForNonEmptyList> {
     override fun <A> Kind<ForNonEmptyList, A>.combineK(y: Kind<ForNonEmptyList, A>): NonEmptyList<A> =
-            fix().combineK(null, y)
+            fix().nelCombineK(y)
 }
 
 fun <F, A> Reducible<F>.toNonEmptyList(fa: Kind<F, A>): NonEmptyList<A> =

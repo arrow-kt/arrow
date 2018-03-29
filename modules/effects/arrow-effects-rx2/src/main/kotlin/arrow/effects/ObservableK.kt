@@ -51,6 +51,9 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
         }.value()
     }
 
+    fun handleErrorWith(function: (Throwable) -> ObservableK<A>): ObservableK<A> =
+            this.fix().observable.onErrorResumeNext { t: Throwable -> function(t).observable }.k()
+
     fun runAsync(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Unit> =
             observable.flatMap { cb(Right(it)).value() }.onErrorResumeNext(io.reactivex.functions.Function { cb(Left(it)).value() }).k()
 
@@ -112,6 +115,3 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
         }
     }
 }
-
-fun <A> ObservableKOf<A>.handleErrorWith(dummy: Unit? = null, function: (Throwable) -> ObservableK<A>): ObservableK<A> =
-        this.fix().observable.onErrorResumeNext { t: Throwable -> function(t).observable }.k()

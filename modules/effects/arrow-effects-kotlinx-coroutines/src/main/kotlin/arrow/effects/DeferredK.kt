@@ -83,7 +83,7 @@ data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferre
     }
 }
 
-fun <A> DeferredKOf<A>.handleErrorWith(dummy: Unit? = null, f: (Throwable) -> DeferredK<A>): DeferredK<A> =
+fun <A> DeferredKOf<A>.handleErrorWith(f: (Throwable) -> DeferredK<A>): DeferredK<A> =
         async(Unconfined, CoroutineStart.LAZY) {
             Try { await() }.fold({ f(it).await() }, ::identity)
         }.k()

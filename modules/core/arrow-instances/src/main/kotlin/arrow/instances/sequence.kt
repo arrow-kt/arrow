@@ -7,6 +7,7 @@ import arrow.core.Tuple2
 import arrow.data.*
 import arrow.instance
 import arrow.typeclasses.*
+import arrow.data.combineK as sequenceCombineK
 
 @instance(SequenceK::class)
 interface SequenceKSemigroupInstance<A> : Semigroup<SequenceK<A>> {
@@ -107,7 +108,7 @@ interface SequenceKTraverseInstance : Traverse<ForSequenceK> {
 @instance(SequenceK::class)
 interface SequenceKSemigroupKInstance : SemigroupK<ForSequenceK> {
     override fun <A> Kind<ForSequenceK, A>.combineK(y: Kind<ForSequenceK, A>): SequenceK<A> =
-            fix().combineK(null, y)
+            fix().sequenceCombineK(y)
 }
 
 @instance(SequenceK::class)
@@ -116,5 +117,5 @@ interface SequenceKMonoidKInstance : MonoidK<ForSequenceK> {
             SequenceK.empty()
 
     override fun <A> Kind<ForSequenceK, A>.combineK(y: Kind<ForSequenceK, A>): SequenceK<A> =
-            fix().combineK(null, y)
+            fix().sequenceCombineK(y)
 }

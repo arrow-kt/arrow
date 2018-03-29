@@ -127,10 +127,10 @@ sealed class IO<out A> : IOOf<A> {
     }
 }
 
-fun <A, B> IO<A>.ap(dummy: Unit? = null, ff: IOOf<(A) -> B>): IO<B> =
-        flatMap { a -> ff.fix().map({ it(a) }) }
+fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
+        fix().flatMap { a -> ff.fix().map({ it(a) }) }
 
-fun <A> IO<A>.handleErrorWith(dummy: Unit? = null, f: (Throwable) -> IOOf<A>): IO<A> =
-        IO.Bind(this, IOFrame.errorHandler(f))
+fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
+        IO.Bind(this.fix(), IOFrame.errorHandler(f))
 
 fun <A> A.liftIO(): IO<A> = IO.pure(this)

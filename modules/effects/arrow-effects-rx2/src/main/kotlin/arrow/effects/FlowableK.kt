@@ -51,11 +51,11 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
         }.value()
     }
 
-    fun runAsync(cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Unit> =
-            flowable.flatMap { cb(Right(it)).value() }.onErrorResumeNext(io.reactivex.functions.Function { cb(Left(it)).value() }).k()
-
     fun handleErrorWith(function: (Throwable) -> FlowableK<A>): FlowableK<A> =
             flowable.onErrorResumeNext { t: Throwable -> function(t).flowable }.k()
+
+    fun runAsync(cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Unit> =
+            flowable.flatMap { cb(Right(it)).value() }.onErrorResumeNext(io.reactivex.functions.Function { cb(Left(it)).value() }).k()
 
     companion object {
         fun <A> pure(a: A): FlowableK<A> =

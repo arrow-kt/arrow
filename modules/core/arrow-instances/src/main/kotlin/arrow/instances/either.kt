@@ -4,6 +4,9 @@ import arrow.Kind
 import arrow.core.*
 import arrow.instance
 import arrow.typeclasses.*
+import arrow.core.ap as eitherAp
+import arrow.core.combineK as eitherCombineK
+import arrow.core.flatMap as eitherFlatMap
 
 @instance(Either::class)
 interface EitherFunctorInstance<L> : Functor<EitherPartialOf<L>> {
@@ -18,7 +21,7 @@ interface EitherApplicativeInstance<L> : EitherFunctorInstance<L>, Applicative<E
     override fun <A, B> Kind<EitherPartialOf<L>, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 
     override fun <A, B> Kind<EitherPartialOf<L>, A>.ap(ff: Kind<EitherPartialOf<L>, (A) -> B>): Either<L, B> =
-            fix().ap(null, ff)
+            fix().eitherAp(ff)
 }
 
 @instance(Either::class)
@@ -27,10 +30,10 @@ interface EitherMonadInstance<L> : EitherApplicativeInstance<L>, Monad<EitherPar
     override fun <A, B> Kind<EitherPartialOf<L>, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 
     override fun <A, B> Kind<EitherPartialOf<L>, A>.ap(ff: Kind<EitherPartialOf<L>, (A) -> B>): Either<L, B> =
-            fix().ap(null, ff)
+            fix().eitherAp(ff)
 
     override fun <A, B> Kind<EitherPartialOf<L>, A>.flatMap(f: (A) -> Kind<EitherPartialOf<L>, B>): Either<L, B> =
-            fix().flatMap(null) { f(it).fix() }
+            fix().eitherFlatMap { f(it).fix() }
 
     override fun <A, B> tailRecM(a: A, f: (A) -> Kind<EitherPartialOf<L>, Either<A, B>>): Either<L, B> =
             Either.tailRecM(a, f)
@@ -78,7 +81,7 @@ interface EitherTraverseInstance<L> : EitherFoldableInstance<L>, Traverse<Either
 interface EitherSemigroupKInstance<L> : SemigroupK<EitherPartialOf<L>> {
 
     override fun <A> Kind<EitherPartialOf<L>, A>.combineK(y: Kind<EitherPartialOf<L>, A>): Either<L, A> =
-            fix().combineK(null, y)
+            fix().eitherCombineK(y)
 }
 
 @instance(Either::class)

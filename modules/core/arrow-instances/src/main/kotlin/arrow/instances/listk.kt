@@ -7,6 +7,7 @@ import arrow.core.Tuple2
 import arrow.data.*
 import arrow.instance
 import arrow.typeclasses.*
+import arrow.data.combineK as listCombineK
 
 @instance(ListK::class)
 interface ListKSemigroupInstance<A> : Semigroup<ListK<A>> {
@@ -112,7 +113,7 @@ interface ListKTraverseInstance : Traverse<ForListK> {
 @instance(ListK::class)
 interface ListKSemigroupKInstance : SemigroupK<ForListK> {
     override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
-            fix().combineK(null, y)
+            fix().listCombineK(y)
 }
 
 @instance(ListK::class)
@@ -121,5 +122,5 @@ interface ListKMonoidKInstance : MonoidK<ForListK> {
             ListK.empty()
 
     override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
-            fix().combineK(null, y)
+            fix().listCombineK(y)
 }

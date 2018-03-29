@@ -8,6 +8,7 @@ import arrow.effects.typeclasses.MonadSuspend
 import arrow.effects.typeclasses.Proc
 import arrow.instance
 import arrow.typeclasses.*
+import arrow.effects.handleErrorWith as deferredHandleErrorWith
 
 @instance(DeferredK::class)
 interface DeferredKFunctorInstance : Functor<ForDeferredK> {
@@ -51,7 +52,7 @@ interface DeferredKApplicativeErrorInstance : DeferredKApplicativeInstance, Appl
             DeferredK.raiseError(e)
 
     override fun <A> DeferredKOf<A>.handleErrorWith(f: (Throwable) -> DeferredKOf<A>): DeferredK<A> =
-            handleErrorWith(null) { f(it).fix() }
+            deferredHandleErrorWith { f(it).fix() }
 }
 
 @instance(DeferredK::class)
@@ -60,7 +61,7 @@ interface DeferredKMonadErrorInstance : DeferredKMonadInstance, MonadError<ForDe
             DeferredK.raiseError(e)
 
     override fun <A> DeferredKOf<A>.handleErrorWith(f: (Throwable) -> DeferredKOf<A>): DeferredK<A> =
-            handleErrorWith(null) { f(it).fix() }
+            deferredHandleErrorWith { f(it).fix() }
 }
 
 @instance(DeferredK::class)

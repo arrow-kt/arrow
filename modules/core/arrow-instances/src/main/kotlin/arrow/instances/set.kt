@@ -5,6 +5,7 @@ import arrow.core.Eval
 import arrow.data.*
 import arrow.instance
 import arrow.typeclasses.*
+import arrow.data.combineK as setCombineK
 
 @instance(SetK::class)
 interface SetKSemigroupInstance<A> : Semigroup<SetK<A>> {
@@ -52,7 +53,7 @@ interface SetKFoldableInstance : Foldable<ForSetK> {
 @instance(SetK::class)
 interface SetKSemigroupKInstance : SemigroupK<ForSetK> {
     override fun <A> Kind<ForSetK, A>.combineK(y: Kind<ForSetK, A>): SetK<A> =
-            fix().combineK(null, y)
+            fix().setCombineK(y)
 }
 
 @instance(SetK::class)
@@ -61,5 +62,5 @@ interface SetKMonoidKInstance : MonoidK<ForSetK> {
             SetK.empty()
 
     override fun <A> Kind<ForSetK, A>.combineK(y: Kind<ForSetK, A>): SetK<A> =
-            fix().combineK(null, y)
+            fix().setCombineK(y)
 }

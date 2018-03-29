@@ -8,6 +8,8 @@ import arrow.effects.typeclasses.MonadSuspend
 import arrow.effects.typeclasses.Proc
 import arrow.instance
 import arrow.typeclasses.*
+import arrow.effects.ap as ioAp
+import arrow.effects.handleErrorWith as ioHandleErrorWith
 
 @instance(IO::class)
 interface IOFunctorInstance : Functor<ForIO> {
@@ -24,7 +26,7 @@ interface IOApplicativeInstance : Applicative<ForIO> {
             IO.pure(a)
 
     override fun <A, B> Kind<ForIO, A>.ap(ff: IOOf<(A) -> B>): IO<B> =
-            fix().ap(null, ff)
+            fix().ioAp(ff)
 }
 
 @instance(IO::class)
@@ -48,7 +50,7 @@ interface IOApplicativeErrorInstance : IOApplicativeInstance, ApplicativeError<F
             fix().attempt()
 
     override fun <A> Kind<ForIO, A>.handleErrorWith(f: (Throwable) -> Kind<ForIO, A>): IO<A> =
-            fix().handleErrorWith(null, f)
+            fix().ioHandleErrorWith(f)
 
     override fun <A> raiseError(e: Throwable): IO<A> =
             IO.raiseError(e)
@@ -60,7 +62,7 @@ interface IOMonadErrorInstance : IOMonadInstance, MonadError<ForIO, Throwable> {
             fix().attempt()
 
     override fun <A> Kind<ForIO, A>.handleErrorWith(f: (Throwable) -> Kind<ForIO, A>): IO<A> =
-            fix().handleErrorWith(null, f)
+            fix().ioHandleErrorWith(f)
 
     override fun <A> raiseError(e: Throwable): IO<A> =
             IO.raiseError(e)

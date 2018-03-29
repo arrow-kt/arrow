@@ -75,7 +75,7 @@ data class ListK<out A> constructor(val list: List<A>) : ListKOf<A>, List<A> by 
 
 }
 
-fun <A> ListKOf<A>.combineK(dummy: Unit? = null, y: ListKOf<A>): ListK<A> =
+fun <A> ListKOf<A>.combineK(y: ListKOf<A>): ListK<A> =
         (fix().list + y.fix().list).k()
 
 fun <A> List<A>.k(): ListK<A> = ListK(this)
