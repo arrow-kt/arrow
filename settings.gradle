@@ -38,7 +38,6 @@ include {
             _ 'annotations-processor-test'
             _ 'core'
             _ 'data'
-            _ 'examples'
             _ 'free'
             _ 'instances'
             _ 'kindedj'
@@ -61,6 +60,7 @@ include {
 
         docs {
             _ 'docs'
+            _ 'examples'
         }
 
         optics {
