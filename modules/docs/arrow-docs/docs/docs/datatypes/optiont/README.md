@@ -2,6 +2,7 @@
 layout: docs
 title: OptionT
 permalink: /docs/datatypes/optiont/
+video: EWfxL9yBUJo
 ---
 
 ## OptionT
