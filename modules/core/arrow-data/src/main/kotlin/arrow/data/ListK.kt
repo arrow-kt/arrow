@@ -9,7 +9,7 @@ import arrow.higherkind
 import arrow.typeclasses.Applicative
 
 @higherkind
-data class ListK<out A> constructor(val list: List<A>) : ListKOf<A>, List<A> by list {
+data class ListK<out A> (val list: List<A>) : ListKOf<A>, List<A> by list {
 
     fun <B> flatMap(f: (A) -> ListKOf<B>): ListK<B> = this.fix().list.flatMap { f(it).fix().list }.k()
 

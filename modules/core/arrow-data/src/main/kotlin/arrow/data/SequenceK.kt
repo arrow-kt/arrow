@@ -10,7 +10,7 @@ import arrow.typeclasses.Applicative
 fun <A> SequenceKOf<A>.toList(): List<A> = this.fix().sequence.toList()
 
 @higherkind
-data class SequenceK<out A> constructor(val sequence: Sequence<A>) : SequenceKOf<A>, Sequence<A> by sequence {
+data class SequenceK<out A> (val sequence: Sequence<A>) : SequenceKOf<A>, Sequence<A> by sequence {
 
     fun <B> flatMap(f: (A) -> SequenceKOf<B>): SequenceK<B> = this.fix().sequence.flatMap { f(it).fix().sequence }.k()
 

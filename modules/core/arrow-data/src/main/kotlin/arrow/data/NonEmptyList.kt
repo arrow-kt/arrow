@@ -87,6 +87,7 @@ class NonEmptyList<out A> private constructor(
     override fun toString(): String = "NonEmptyList(all=$all)"
 
     companion object {
+        operator fun <A> invoke(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
         fun <A> of(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
         fun <A> fromList(l: List<A>): Option<NonEmptyList<A>> = if (l.isEmpty()) None else Some(NonEmptyList(l))
         fun <A> fromListUnsafe(l: List<A>): NonEmptyList<A> = NonEmptyList(l)
