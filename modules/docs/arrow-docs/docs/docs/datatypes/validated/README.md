@@ -220,8 +220,9 @@ houseNumber
 
 ## Available Instances
 
-```kotlin:ank
+```kotlin
 import arrow.debug.*
 
 showInstances<ValidatedPartialOf<String>, Unit>()
+// [Applicative, ApplicativeError, Eq, Foldable, Functor, SemigroupK, Traverse, TraverseFilter]
 ```

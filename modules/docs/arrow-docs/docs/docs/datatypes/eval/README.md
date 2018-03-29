@@ -69,10 +69,11 @@ odd(100000).value()
 
 ### Available Instances
 
-```kotlin:ank
+```kotlin
 import arrow.debug.*
 
 showInstances<ForEval, Unit>()
+// [Applicative, Bimonad, Comonad, Functor, Monad]
 ```
  
 # Credits

@@ -65,8 +65,9 @@ sequenceOf('a', 'b', 'c', 'd', 'e').k().foldLeft("") { x, y -> x + y }
 
 Available Instances:
 
-```kotlin:ank
+```kotlin
 import arrow.debug.*
 
 showInstances<ForSequenceK, Unit>()
+// [Applicative, Foldable, Functor, Monad, Monoid, MonoidK, Semigroup, SemigroupK, Traverse, TraverseFilter]
 ```

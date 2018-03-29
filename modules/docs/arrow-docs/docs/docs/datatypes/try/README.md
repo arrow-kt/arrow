@@ -193,8 +193,9 @@ Try.monadError().bindingCatch {
 
 Available Instances:
 
-```kotlin:ank
+```kotlin
 import arrow.debug.*
 
 showInstances<ForTry, Unit>()
+// [Applicative, ApplicativeError, Foldable, Functor, Monad, MonadError, Traverse, TraverseFilter]
 ```

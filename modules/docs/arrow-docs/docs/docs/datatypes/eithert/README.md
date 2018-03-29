@@ -231,10 +231,11 @@ EitherT(Option(3.left())).mapLeft({it + 1}, Option.functor())
 
 ## Instances
 
-```kotlin:ank
+```kotlin
 import arrow.debug.*
 
 showInstances<EitherTPartialOf<ForObservableK, BizError>, BizError>()
+// [Applicative, ApplicativeError, Foldable, Functor, Monad, MonadError, SemigroupK, Traverse, TraverseFilter]
 ```
 
 Take a look at the [`OptionT` docs]({{ '/docs/datatypes/optiont' | relative_url }}) for an alternative version of this content with the `OptionT` monad transformer

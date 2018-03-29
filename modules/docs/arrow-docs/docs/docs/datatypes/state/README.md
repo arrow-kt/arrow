@@ -118,10 +118,11 @@ stackOperations().runA(Nel.of("hello", "world", "!").some())
 
 Available Instances:
 
-```kotlin:ank
+```kotlin
 import arrow.debug.*
 
 showInstances<StatePartialOf<Stack>, Unit>()
+// [Applicative, Functor, Monad, MonadState]
 ```
 
 # Credits

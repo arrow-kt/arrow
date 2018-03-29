@@ -58,8 +58,9 @@ numbers.foldLeft(0) {sum, number -> sum + (number * number)}
 
 Available Instances:
 
-```kotlin:ank
+```kotlin
 import arrow.debug.*
 
 showInstances<ForSetK, Unit>()
+// [Foldable, Monoid, MonoidK, Semigroup, SemigroupK]
 ```

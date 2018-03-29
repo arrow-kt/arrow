@@ -28,8 +28,9 @@ id.map{it + 3}
 
 Available Instances:
 
-```kotlin:ank
+```kotlin
 import arrow.debug.*
 
 showInstances<ForId, Unit>()
+// [Applicative, Bimonad, Comonad, Foldable, Functor, Monad, Traverse, TraverseFilter]
 ```

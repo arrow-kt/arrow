@@ -206,10 +206,11 @@ Here we no longer have to deal with the `None` cases, and the binding to the val
 
 Available Instances:
 
-```kotlin:ank
+```kotlin
 import arrow.debug.*
 
 showInstances<OptionTPartialOf<ForObservableK>, Unit>()
+// [Applicative, Foldable, Functor, FunctorFilter, Monad, MonoidK, SemigroupK, Traverse, TraverseFilter]
 ```
 
 Take a look at the [`EitherT` docs]({{ '/docs/datatypes/eithert' | relative_url }}) for an alternative version of this content with the `EitherT` monad transformer
