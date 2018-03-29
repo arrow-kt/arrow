@@ -7,7 +7,6 @@ import arrow.core.Tuple2
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Foldable
-import java.util.*
 
 @higherkind
 data class SortedMapK<A: Comparable<A>, B>(val map: SortedMap<A, B>) : SortedMapKOf<A, B>, SortedMapKKindedJ<A, B>, SortedMap<A, B> by map {
