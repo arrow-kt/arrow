@@ -27,10 +27,9 @@ class ReaderTest : UnitSpec() {
         }
 
         "flatMap should be callable without explicit monad instance" {
-            Reader().lift { a: Int -> a * 2  }
-            /*{ a: Int -> a * 2 }.reader()
+            { a: Int -> a * 2 }.reader()
                     .flatMap { a -> Reader().pure<Int, Int>(a * 3) }
-                    .runId(2) shouldBe 12*/
+                    .runId(2) shouldBe 12
         }
 
         "zip should return a new Reader zipping two given ones" {
