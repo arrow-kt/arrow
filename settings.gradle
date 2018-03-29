@@ -70,6 +70,7 @@ include {
         dagger {
             _ 'dagger'
             _ 'dagger-effects'
+            _ 'dagger-effects-rx2'
             _ 'dagger-effects-kotlinx-coroutines'
         }
     }
