@@ -2,6 +2,9 @@ package arrow.typeclasses
 
 import arrow.Kind
 
+inline operator fun <F, G, A> FunctionK<F, G>.invoke(ff: FunctionK<F, G>.() -> A) =
+        run(ff)
+
 interface FunctionK<F, G> {
 
     /**
