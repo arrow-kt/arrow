@@ -52,7 +52,7 @@ fun <D, A> Reader(run: ReaderFun<D, A>): Reader<D, A> = ReaderT(run.andThen { Id
  *
  * @receiver [ReaderFun] a function that represents computation dependent on type [D].
  */
-fun <D, A> (ReaderFun<D, A>).reader(): Reader<D, A> = Reader(this)
+fun <D, A> (ReaderFun<D, A>).reader(): Reader<D, A> = Reader().lift(this)
 
 /**
  * Alias for [Kleisli.run]
@@ -118,4 +118,6 @@ object ReaderApi {
     fun <D, A> pure(x: A): Reader<D, A> = ReaderT.pure(x, IdBimonad)
 
     fun <D> ask(): Reader<D, D> = ReaderT.ask(IdBimonad)
+
+    fun <D, A> lift(run: ReaderFun<D, A>): Reader<D, A> = ReaderT(run.andThen { Id(it) })
 }
