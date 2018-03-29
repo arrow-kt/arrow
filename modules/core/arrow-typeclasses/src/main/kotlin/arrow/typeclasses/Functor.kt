@@ -3,6 +3,9 @@ package arrow.typeclasses
 import arrow.Kind
 import arrow.core.Tuple2
 
+inline operator fun <F, A> Functor<F>.invoke(ff: Functor<F>.() -> A) =
+        run(ff)
+
 interface Functor<F> {
 
     fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B>

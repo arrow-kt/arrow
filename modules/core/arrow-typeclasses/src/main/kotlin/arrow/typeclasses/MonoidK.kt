@@ -2,6 +2,9 @@ package arrow.typeclasses
 
 import arrow.Kind
 
+inline operator fun <F, A> MonoidK<F>.invoke(ff: MonoidK<F>.() -> A) =
+        run(ff)
+
 /**
  * MonoidK is a universal monoid which operates on kinds.
  *

@@ -8,6 +8,9 @@ import arrow.optics.Traversal
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Traverse
 
+inline operator fun <S, I, A, R> FilterIndex<S, I, A>.invoke(ff: FilterIndex<S, I, A>.() -> R) =
+        run(ff)
+
 /**
  * [FilterIndex] provides a [Traversal] for a structure [S] with all its foci [A] whose index [I] satisfies a predicate.
  *

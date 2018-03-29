@@ -4,6 +4,9 @@ import arrow.Kind
 import arrow.core.Tuple2
 import arrow.typeclasses.Monad
 
+inline operator fun <F, S, A> MonadState<F, S>.invoke(ff: MonadState<F, S>.() -> A) =
+        run(ff)
+
 interface MonadState<F, S> : Monad<F> {
 
     fun <A> state(f: (S) -> Tuple2<S, A>): Kind<F, A> = get().flatMap({ s -> f(s).let { (a, b) -> set(a).map({ b }) } })

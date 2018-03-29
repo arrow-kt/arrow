@@ -6,6 +6,9 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.identity
 
+inline operator fun <F, A, E> ApplicativeError<F, E>.invoke(ff: ApplicativeError<F, E>.() -> A) =
+        run(ff)
+
 interface ApplicativeError<F, E> : Applicative<F> {
 
     fun <A> raiseError(e: E): Kind<F, A>

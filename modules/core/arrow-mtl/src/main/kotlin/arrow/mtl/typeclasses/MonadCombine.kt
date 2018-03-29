@@ -7,6 +7,9 @@ import arrow.typeclasses.Alternative
 import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Foldable
 
+inline operator fun <F, A> MonadCombine<F>.invoke(ff: MonadCombine<F>.() -> A) =
+        run(ff)
+
 /**
  * The combination of a Monad with a MonoidK
  */

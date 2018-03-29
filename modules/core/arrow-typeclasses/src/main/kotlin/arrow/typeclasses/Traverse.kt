@@ -5,6 +5,9 @@ import arrow.core.Id
 import arrow.core.value
 import arrow.typeclasses.internal.IdBimonad
 
+inline operator fun <F, A> Traverse<F>.invoke(ff: Traverse<F>.() -> A) =
+        run(ff)
+
 /**
  * Traverse, also known as Traversable. Traversal over a structure with an effect.
  */

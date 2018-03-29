@@ -3,6 +3,9 @@ package arrow.mtl.typeclasses
 import arrow.Kind
 import arrow.typeclasses.Monad
 
+inline operator fun <F, D, A> MonadReader<F, D>.invoke(ff: MonadReader<F, D>.() -> A) =
+        run(ff)
+
 interface MonadReader<F, D> : Monad<F> {
     /** Get the environment */
     fun ask(): Kind<F, D>

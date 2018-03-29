@@ -6,6 +6,9 @@ import kotlin.coroutines.experimental.*
 import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
 
+inline operator fun <F, A> Comonad<F>.invoke(ff: Comonad<F>.() -> A) =
+        run(ff)
+
 /**
  * The dual of monads, used to extract values from F
  */

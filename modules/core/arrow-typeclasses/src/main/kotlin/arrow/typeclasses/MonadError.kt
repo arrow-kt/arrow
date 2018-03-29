@@ -3,6 +3,9 @@ package arrow.typeclasses
 import arrow.Kind
 import kotlin.coroutines.experimental.startCoroutine
 
+inline operator fun <F, E, A> MonadError<F, E>.invoke(ff: MonadError<F, E>.() -> A) =
+        run(ff)
+
 interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
 
     fun <A> Kind<F, A>.ensure(error: () -> E, predicate: (A) -> Boolean): Kind<F, A> =

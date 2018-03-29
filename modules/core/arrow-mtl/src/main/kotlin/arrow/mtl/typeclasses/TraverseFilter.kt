@@ -5,6 +5,9 @@ import arrow.core.*
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Traverse
 
+inline operator fun <F, A> TraverseFilter<F>.invoke(ff: TraverseFilter<F>.() -> A) =
+        run(ff)
+
 interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F> {
 
     fun <G, A, B> Kind<F, A>.traverseFilter(AP: Applicative<G>, f: (A) -> Kind<G, Option<B>>): Kind<G, Kind<F, B>>

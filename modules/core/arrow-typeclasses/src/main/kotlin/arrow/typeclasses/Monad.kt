@@ -6,6 +6,9 @@ import arrow.core.Eval
 import arrow.core.Tuple2
 import kotlin.coroutines.experimental.startCoroutine
 
+inline operator fun <F, A> Monad<F>.invoke(ff: Monad<F>.() -> A) =
+        run(ff)
+
 interface Monad<F> : Applicative<F> {
 
     fun <A, B> Kind<F, A>.flatMap(f: (A) -> Kind<F, B>): Kind<F, B>
