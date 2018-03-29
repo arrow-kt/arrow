@@ -222,7 +222,7 @@ fun <R> Right(right: R): Either<Nothing, R> = Either.right(right)
  *
  * @param f The function to bind across [Either.Right].
  */
-fun <A, B, C> EitherOf<A, B>.flatMap(dummy: Unit? = null, f: (B) -> Either<A, C>): Either<A, C> =
+fun <A, B, C> EitherOf<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> =
         fix().fold({ Left(it) }, { f(it) })
 
 /**

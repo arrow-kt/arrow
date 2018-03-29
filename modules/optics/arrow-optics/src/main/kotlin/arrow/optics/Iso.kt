@@ -255,16 +255,6 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
     }
 
     /**
-     * Lift a [PIso] to a Functor level
-     */
-    fun <F> mapping(FF: Functor<F>, dummy: Unit = Unit): PIso<Kind<F, S>, Kind<F, T>, Kind<F, A>, Kind<F, B>> = FF.run {
-        PIso(
-                { fa -> fa.map(::get) },
-                { fb -> fb.map(::reverseGet) }
-        )
-    }
-
-    /**
      * Check if the focus satisfies the predicate
      */
     fun exist(s: S, p: (A) -> Boolean): Boolean = p(get(s))

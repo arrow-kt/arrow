@@ -23,7 +23,7 @@ typealias KleisliFun<F, D, A> = (D) -> Kind<F, A>
  * @property run the arrow from [D] to `Kind<F, A>`.
  */
 @higherkind
-class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: Unit = Unit) : KleisliOf<F, D, A>, KleisliKindedJ<F, D, A> {
+class Kleisli<F, D, A> (val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, KleisliKindedJ<F, D, A> {
 
     /**
      * Apply a function `(A) -> B` that operates within the [Kleisli] context.
@@ -41,7 +41,7 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
      * @param FF [Functor] for the context [F].
      */
     fun <B> map(f: (A) -> B, FF: Functor<F>): Kleisli<F, D, B> = FF.run {
-        Kleisli { a -> run(a).map() { f(it) } }
+        Kleisli { a -> run(a).map { f(it) } }
     }
 
     /**
@@ -52,7 +52,7 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
      */
     fun <B> flatMap(f: (A) -> Kleisli<F, D, B>, MF: Monad<F>): Kleisli<F, D, B> = MF.run {
         Kleisli { d ->
-            run(d).flatMap() { a -> f(a).run(d) }
+            run(d).flatMap { a -> f(a).run(d) }
         }
     }
 
@@ -117,7 +117,7 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
          *
          * @param run the arrow from [D] to a monadic value `Kind<F, A>`
          */
-        operator fun <F, D, A> invoke(run: KleisliFun<F, D, A>): Kleisli<F, D, A> = Kleisli(run, Unit)
+        operator fun <F, D, A> invoke(run: KleisliFun<F, D, A>): Kleisli<F, D, A> = Kleisli(run)
 
         /**
          * Tail recursive function that keeps calling [f] until [arrow.Either.Right] is returned.
@@ -158,7 +158,7 @@ class Kleisli<F, D, A> private constructor(val run: KleisliFun<F, D, A>, dummy: 
  *
  * @param MF [Monad] for the context [F].
  */
-inline fun <F, D, A> Kleisli<F, D, Kleisli<F, D, A>>.flatten(MF: Monad<F>): Kleisli<F, D, A> = flatMap({ it }, MF)
+fun <F, D, A> KleisliOf<F, D, Kleisli<F, D, A>>.flatten(MF: Monad<F>): Kleisli<F, D, A> = fix().flatMap({ it }, MF)
 
 /**
  * Syntax for constructing a [Kleisli]

@@ -76,14 +76,14 @@ interface StateTMonadErrorInstance<F, S, E> : StateTApplicativeErrorInstance<F, 
 /**
  * Alias for[StateT.Companion.applicative]
  */
-fun <S> StateApi.applicative(): Applicative<StateTPartialOf<ForId, S>> = StateT.applicative<ForId, S>(Id.monad(), dummy = Unit)
+fun <S> StateApi.applicative(): Applicative<StateTPartialOf<ForId, S>> = StateT.applicative<ForId, S>(Id.monad())
 
 /**
  * Alias for [StateT.Companion.functor]
  */
-fun <S> StateApi.functor(): Functor<StateTPartialOf<ForId, S>> = StateT.functor<ForId, S>(Id.monad(), dummy = Unit)
+fun <S> StateApi.functor(): Functor<StateTPartialOf<ForId, S>> = StateT.functor<ForId, S>(Id.monad())
 
 /**
  * Alias for [StateT.Companion.monad]
  */
-fun <S> StateApi.monad(): Monad<StateTPartialOf<ForId, S>> = StateT.monad<ForId, S>(Id.monad(), dummy = Unit)
+fun <S> StateApi.monad(): Monad<StateTPartialOf<ForId, S>> = StateT.monad<ForId, S>(Id.monad())

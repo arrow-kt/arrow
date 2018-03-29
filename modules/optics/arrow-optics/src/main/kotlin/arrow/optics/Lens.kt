@@ -215,11 +215,6 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
     fun lift(f: (A) -> B): (S) -> T = { s -> modify(s, f) }
 
     /**
-     * Lift a function [f]: `(A) -> Kind<F, B> to the context of `S`: `(S) -> Kind<F, T>` using [Functor] function
-     */
-    fun <F> liftF(FF: Functor<F>, dummy: Unit = Unit, f: (A) -> Kind<F, B>): (S) -> Kind<F, T> = { s -> modifyF(FF, s) { a -> f(a) } }
-
-    /**
      * Find a focus that satisfies the predicate
      */
     fun find(s: S, p: (A) -> Boolean): Option<A> = get(s).let { a ->
