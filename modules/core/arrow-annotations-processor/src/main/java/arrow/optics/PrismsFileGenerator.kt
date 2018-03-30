@@ -31,7 +31,7 @@ class PrismsFileGenerator(
                    |                else -> $sourceName.left()
                    |            }
                    |        },
-                   |        reverseGet = { it }
+                   |        reverseGet = ::identity
                    |)
                 """.trimMargin()
             }

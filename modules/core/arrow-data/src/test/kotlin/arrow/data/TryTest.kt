@@ -9,11 +9,7 @@ import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.beTheSameInstanceAs
-import io.kotlintest.matchers.fail
-import io.kotlintest.matchers.should
-import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldEqual
+import io.kotlintest.matchers.*
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -27,8 +23,8 @@ class TryTest : UnitSpec() {
         val EQ = Try.eq(Eq { a, b -> a::class == b::class }, IntEqInstance)
 
         testLaws(
-                EqLaws.laws(EQ) { Try { it } },
-                ShowLaws.laws(Try.show(), EQ) { Try { it } },
+                EqLaws.laws(EQ) { Try.just(it) },
+                ShowLaws.laws(Try.show(), EQ) { Try.just(it) },
                 MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()),
                 TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any())
         )

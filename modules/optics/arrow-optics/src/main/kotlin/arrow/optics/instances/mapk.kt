@@ -39,21 +39,19 @@ interface MapKEachInstance<K, V> : Each<MapKOf<K, V>, V> {
 interface MapKFilterIndexInstance<K, V> : FilterIndex<MapKOf<K, V>, K, V> {
 
     override fun filter(p: (K) -> Boolean): Traversal<MapKOf<K, V>, V> = object : Traversal<MapKOf<K, V>, V> {
-        override fun <F> modifyF(FA: Applicative<F>, s: Kind<Kind<ForMapK, K>, V>, f: (V) -> Kind<F, V>): Kind<F, Kind<Kind<ForMapK, K>, V>> =
-                ListK.traverse().run {
-                    FA.run {
-                        traverse(s.fix().map.toList().k(), { (k, v) ->
-                            FA.map(if (p(k)) f(v) else FA.pure(v)) {
-                                k to it
-                            }
-                        })
+        override fun <F> modifyF(FA: Applicative<F>, s: Kind<Kind<ForMapK, K>, V>, f: (V) -> Kind<F, V>): Kind<F, Kind<Kind<ForMapK, K>, V>> = FA.run {
+            ListK.traverse().run {
+                s.fix().map.toList().k().traverse(FA, { (k, v) ->
+                    (if (p(k)) f(v) else just(v)).map {
+                        k to it
                     }
-                }.let {
-                    FA.map(it) {
-                        it.toMap().k()
-                    }
+                })
+            }.let {
+                it.map {
+                    it.toMap().k()
                 }
-
+            }
+        }
     }
 }
 

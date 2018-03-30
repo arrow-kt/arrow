@@ -20,8 +20,8 @@ interface ListEachInstance<A> : Each<List<A>, A> {
         override fun <F> modifyF(FA: Applicative<F>, s: List<A>, f: (A) -> Kind<F, A>): Kind<F, List<A>> =
                 ListK.traverse().run {
                     FA.run {
-                        traverse(s.k(), f).let {
-                            map(it) {
+                        s.k().traverse(this, f).let {
+                            it.map() {
                                 it.list
                             }
                         }
@@ -39,11 +39,11 @@ interface ListFilterIndexInstance<A> : FilterIndex<List<A>, Int, A> {
         override fun <F> modifyF(FA: Applicative<F>, s: List<A>, f: (A) -> Kind<F, A>): Kind<F, List<A>> =
                 ListK.traverse().run {
                     FA.run {
-                        traverse(s.mapIndexed { index, a -> a toT index }.k(), { (a, j) ->
-                            if (p(j)) f(a) else pure(a)
+                        s.mapIndexed { index, a -> a toT index }.k().traverse(this, { (a, j) ->
+                            if (p(j)) f(a) else just(a)
                         })
                                 .let {
-                                    map(it) {
+                                    it.map() {
                                         it.list
                                     }
                                 }

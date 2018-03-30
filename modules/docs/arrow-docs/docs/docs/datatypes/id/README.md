@@ -18,18 +18,19 @@ Id("hello")
 ```
 
 Using this type declaration, we can treat our Id type constructor as a `Monad` and as a `Comonad`. 
-The `pure` method, which has type `A -> Id<A>` just becomes the identity function. The `map` method 
+The `just` method, which has type `A -> Id<A>` just becomes the identity function. The `map` method
 from `Functor` just becomes function application
 
 ```kotlin:ank
-val id: Id<Int> = Id.pure(3)
+val id: Id<Int> = Id.just(3)
 id.map{it + 3}
 ```
 
 Available Instances:
 
-```kotlin:ank
+```kotlin
 import arrow.debug.*
 
 showInstances<ForId, Unit>()
+// [Applicative, Bimonad, Comonad, Foldable, Functor, Monad, Traverse, TraverseFilter]
 ```

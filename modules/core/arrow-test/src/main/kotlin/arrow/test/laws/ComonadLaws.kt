@@ -26,27 +26,27 @@ object ComonadLaws {
 
     fun <F> Comonad<F>.duplicateThenExtractIsId(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), cf), { fa: Kind<F, Int> ->
-                duplicate(fa).extract().equalUnderTheLaw(fa, EQ)
+                fa.duplicate().extract().equalUnderTheLaw(fa, EQ)
             })
 
     fun <F> Comonad<F>.duplicateThenMapExtractIsId(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), cf), { fa: Kind<F, Int> ->
-                map(duplicate(fa)) { it.extract() }.equalUnderTheLaw(fa, EQ)
+                fa.duplicate().map() { it.extract() }.equalUnderTheLaw(fa, EQ)
             })
 
     fun <F> Comonad<F>.mapAndCoflatmapCoherence(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), cf), genFunctionAToB(Gen.int()), { fa: Kind<F, Int>, f: (Int) -> Int ->
-                map(fa, f).equalUnderTheLaw(coflatMap(fa, { f(it.extract()) }), EQ)
+                fa.map(f).equalUnderTheLaw(fa.coflatMap({ f(it.extract()) }), EQ)
             })
 
     fun <F> Comonad<F>.comonadLeftIdentity(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), cf), { fa: Kind<F, Int> ->
-                coflatMap(fa, { it.extract() }).equalUnderTheLaw(fa, EQ)
+                fa.coflatMap({ it.extract() }).equalUnderTheLaw(fa, EQ)
             })
 
     fun <F> Comonad<F>.comonadRightIdentity(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), cf), genFunctionAToB(genConstructor(Gen.int(), cf)), { fa: Kind<F, Int>, f: (Kind<F, Int>) -> Kind<F, Int> ->
-                coflatMap(fa, f).extract().equalUnderTheLaw(f(fa), EQ)
+                fa.coflatMap(f).extract().equalUnderTheLaw(f(fa), EQ)
             })
 
     fun <F> Comonad<F>.cokleisliLeftIdentity(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
@@ -63,8 +63,8 @@ object ComonadLaws {
             forAll(genConstructor(Gen.int(), cf), { fa: Kind<F, Int> ->
                 cobinding {
                     val x = fa.extract()
-                    val y = extract { map(fa, { it + x }) }
-                    map(fa, { x + y })
-                }.equalUnderTheLaw(map(fa, { it * 3 }), EQ)
+                    val y = extract { fa.map({ it + x }) }
+                    fa.map({ x + y })
+                }.equalUnderTheLaw(fa.map({ it * 3 }), EQ)
             })
 }

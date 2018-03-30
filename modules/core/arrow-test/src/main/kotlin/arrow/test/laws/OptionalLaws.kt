@@ -12,7 +12,7 @@ import io.kotlintest.properties.forAll
 
 object OptionalLaws {
 
-    inline fun <reified A, reified B> laws(optional: Optional<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQOptionB: Eq<Option<B>>): List<Law> = listOf(
+    inline fun <A, B> laws(optional: Optional<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQOptionB: Eq<Option<B>>): List<Law> = listOf(
             Law("Optional Law: set what you get", { optional.getOptionSet(aGen, EQA) }),
             Law("Optional Law: set what you get", { optional.setGetOption(aGen, bGen, EQOptionB) }),
             Law("Optional Law: set is idempotent", { optional.setIdempotent(aGen, bGen, EQA) }),
@@ -62,7 +62,7 @@ object OptionalLaws {
     fun <A, B> Optional<A, B>.consistentModifyModifyId(aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>): Unit =
             forAll(aGen, funcGen, { a, f ->
                 modify(a, f)
-                        .equalUnderTheLaw(modifyF(Id.applicative(), a, { Id.pure(f(it)) }).value(), EQA)
+                        .equalUnderTheLaw(modifyF(Id.applicative(), a, { Id.just(f(it)) }).value(), EQA)
             })
 
     fun <A, B> Optional<A, B>.consistentGetOptionModifyId(aGen: Gen<A>, EQOptionB: Eq<Option<B>>): Unit {

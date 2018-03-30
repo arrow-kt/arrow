@@ -23,7 +23,7 @@ class CoreaderTest : UnitSpec() {
 
                 "flatMap should map over the inner value" {
                     forAll { num: Int ->
-                        invoke<Int, Int>({ it -> it * 2 }).flatMap { a -> Coreader.pure<Int, Int>(this, a * 3) }
+                        invoke<Int, Int>({ it -> it * 2 }).flatMap { a -> Coreader.just<Int, Int>(this, a * 3) }
                                 .runId(num) == num * 6
                     }
                 }
@@ -50,13 +50,13 @@ class CoreaderTest : UnitSpec() {
                 }
 
                 "reader should lift a reader from any (A) -> B function" {
-                    val r = { x: Int -> Id(x * 2) }.coreader(this)
+                    val r = { x: Int -> Id(x * 2) }.coreader()
                     r::class.java shouldBe Cokleisli::class.java
                     r.runId(2).value() shouldBe 4
                 }
 
                 "andThen should continue sequence" {
-                    val cokleisli: Cokleisli<ForId, Int, Int> = invoke({ it })
+                    val cokleisli: Cokleisli<ForId, Int, Int> = invoke(::identity)
 
                     cokleisli.andThen(Id(3)).run(Id(0)) shouldBe 3
 

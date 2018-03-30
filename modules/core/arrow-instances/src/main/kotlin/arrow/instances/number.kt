@@ -27,7 +27,7 @@ object ByteEqInstance : Eq<Byte> {
 }
 
 object ByteShowInstance : Show<Byte> {
-    override fun show(a: Byte): String = a.toString()
+    override fun Byte.show(): String = toString()
 }
 
 //////////
@@ -51,7 +51,7 @@ object DoubleEqInstance : Eq<Double> {
 }
 
 object DoubleShowInstance : Show<Double> {
-    override fun show(a: Double): String = a.toString()
+    override fun Double.show(): String = toString()
 }
 
 //////////
@@ -71,7 +71,7 @@ object IntEqInstance : Eq<Int> {
 }
 
 object IntShowInstance : Show<Int> {
-    override fun show(a: Int): String = a.toString()
+    override fun Int.show(): String = toString()
 }
 
 object IntOrderInstance : Order<Int> {
@@ -99,7 +99,7 @@ object LongEqInstance : Eq<Long> {
 }
 
 object LongShowInstance : Show<Long> {
-    override fun show(a: Long): String = a.toString()
+    override fun Long.show(): String = toString()
 }
 
 //////////
@@ -123,7 +123,7 @@ object ShortEqInstance : Eq<Short> {
 }
 
 object ShortShowInstance : Show<Short> {
-    override fun show(a: Short): String = a.toString()
+    override fun Short.show(): String = toString()
 }
 
 //////////
@@ -147,5 +147,5 @@ object FloatEqInstance : Eq<Float> {
 }
 
 object FloatShowInstance : Show<Float> {
-    override fun show(a: Float): String = a.toString()
+    override fun Float.show(): String = toString()
 }

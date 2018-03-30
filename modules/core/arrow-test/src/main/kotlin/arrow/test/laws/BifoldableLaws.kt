@@ -21,10 +21,9 @@ object BifoldableLaws {
             forAll(genFunctionAToB<Int, Int>(genIntSmall()), genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf),
                     { f: (Int) -> Int, g: (Int) -> Int, fab: Kind2<F, Int, Int> ->
                         with(IntMonoidInstance) {
-                            val expected = bifoldLeft(fab, IntMonoidInstance.empty(),
-                                    { c: Int, a: Int -> c.combine(f(a)) },
+                            val expected = fab.bifoldLeft(IntMonoidInstance.empty(), { c: Int, a: Int -> c.combine(f(a)) },
                                     { c: Int, b: Int -> c.combine(g(b)) })
-                            expected.equalUnderTheLaw(bifoldMap(fab, f, g), EQ)
+                            expected.equalUnderTheLaw(fab.bifoldMap(this, f, g), EQ)
                         }
                     })
 
@@ -32,10 +31,9 @@ object BifoldableLaws {
             forAll(genFunctionAToB<Int, Int>(genIntSmall()), genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf),
                     { f: (Int) -> Int, g: (Int) -> Int, fab: Kind2<F, Int, Int> ->
                         with(IntMonoidInstance) {
-                            val expected = bifoldRight(fab, Eval.Later({ IntMonoidInstance.empty() }),
-                                    { a: Int, ec: Eval<Int> -> ec.map({ c -> f(a).combine(c) }) },
+                            val expected = fab.bifoldRight(Eval.Later({ IntMonoidInstance.empty() }), { a: Int, ec: Eval<Int> -> ec.map({ c -> f(a).combine(c) }) },
                                     { b: Int, ec: Eval<Int> -> ec.map({ c -> g(b).combine(c) }) })
-                            expected.value().equalUnderTheLaw(bifoldMap(fab, f, g), EQ)
+                            expected.value().equalUnderTheLaw(fab.bifoldMap(this, f, g), EQ)
                         }
                     })
 }

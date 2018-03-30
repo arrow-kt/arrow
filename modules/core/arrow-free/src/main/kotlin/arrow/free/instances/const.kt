@@ -8,7 +8,7 @@ import arrow.typeclasses.*
 
 @instance(Const::class)
 interface ConstFunctorInstance<A> : Functor<ConstPartialOf<A>> {
-    override fun <T, U> map(fa: ConstOf<A, T>, f: (T) -> U): Const<A, U> = fa.fix().retag()
+    override fun <T, U> Kind<ConstPartialOf<A>, T>.map(f: (T) -> U): Const<A, U> = fix().retag()
 }
 
 @instance(Const::class)
@@ -16,31 +16,31 @@ interface ConstApplicativeInstance<A> : Applicative<ConstPartialOf<A>> {
 
     fun MA(): Monoid<A>
 
-    override fun <T, U> map(fa: ConstOf<A, T>, f: (T) -> U): Const<A, U> = fa.fix().retag()
+    override fun <T, U> Kind<ConstPartialOf<A>, T>.map(f: (T) -> U): Const<A, U> = fix().retag()
 
-    override fun <T> pure(a: T): Const<A, T> = object : ConstMonoidInstance<A, T> {
+    override fun <T> just(a: T): Const<A, T> = object : ConstMonoidInstance<A, T> {
         override fun SA(): Monoid<A> = MA()
     }.empty().fix()
 
-    override fun <T, U> ap(fa: ConstOf<A, T>, ff: ConstOf<A, (T) -> U>): Const<A, U> = fa.ap(ff, MA())
+    override fun <T, U> Kind<ConstPartialOf<A>, T>.ap(ff: Kind<ConstPartialOf<A>, (T) -> U>): Const<A, U> = ap(ff, MA())
 }
 
 @instance(Const::class)
 interface ConstFoldableInstance<A> : Foldable<ConstPartialOf<A>> {
 
-    override fun <T, U> foldLeft(fa: ConstOf<A, T>, b: U, f: (U, T) -> U): U = b
+    override fun <T, U> Kind<ConstPartialOf<A>, T>.foldLeft(b: U, f: (U, T) -> U): U = b
 
-    override fun <T, U> foldRight(fa: ConstOf<A, T>, lb: Eval<U>, f: (T, Eval<U>) -> Eval<U>): Eval<U> = lb
+    override fun <T, U> Kind<ConstPartialOf<A>, T>.foldRight(lb: Eval<U>, f: (T, Eval<U>) -> Eval<U>): Eval<U> = lb
 
 }
 
 @instance(Const::class)
 interface ConstTraverseInstance<X> : ConstFoldableInstance<X>, Traverse<ConstPartialOf<X>> {
 
-    override fun <T, U> map(fa: ConstOf<X, T>, f: (T) -> U): Const<X, U> = fa.fix().retag()
+    override fun <T, U> Kind<ConstPartialOf<X>, T>.map(f: (T) -> U): Const<X, U> = fix().retag()
 
-    override fun <G, A, B> Applicative<G>.traverse(fa: ConstOf<X, A>, f: (A) -> Kind<G, B>): Kind<G, ConstOf<X, B>> =
-            fa.fix().traverse(f, this)
+    override fun <G, A, B> ConstOf<X, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ConstOf<X, B>> =
+            fix().traverse(f, AP)
 }
 
 @instance(Const::class)
@@ -72,6 +72,6 @@ interface ConstEqInstance<A, T> : Eq<Const<A, T>> {
 
 @instance(Const::class)
 interface ConstShowInstance<A, T> : Show<Const<A, T>> {
-    override fun show(a: Const<A, T>): String =
-            a.toString()
+    override fun Const<A, T>.show(): String =
+            toString()
 }

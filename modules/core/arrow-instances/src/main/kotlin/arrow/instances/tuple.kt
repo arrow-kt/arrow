@@ -9,48 +9,48 @@ import arrow.typeclasses.*
 
 @instance(Tuple2::class)
 interface Tuple2FunctorInstance<F> : Functor<Tuple2PartialOf<F>> {
-    override fun <A, B> map(fa: Tuple2Of<F, A>, f: (A) -> B) =
-            fa.fix().map(f)
+    override fun <A, B> Kind<Tuple2PartialOf<F>, A>.map(f: (A) -> B) =
+            fix().map(f)
 }
 
 @instance(Tuple2::class)
 interface Tuple2ApplicativeInstance<F> : Tuple2FunctorInstance<F>, Applicative<Tuple2PartialOf<F>> {
     fun MF(): Monoid<F>
 
-    override fun <A, B> map(fa: Tuple2Of<F, A>, f: (A) -> B) =
-            fa.fix().map(f)
+    override fun <A, B> Kind<Tuple2PartialOf<F>, A>.map(f: (A) -> B) =
+            fix().map(f)
 
-    override fun <A, B> ap(fa: Tuple2Of<F, A>, ff: Tuple2Of<F, (A) -> B>) =
-            fa.fix().ap(ff.fix())
+    override fun <A, B> Kind<Tuple2PartialOf<F>, A>.ap(ff: Kind<Tuple2PartialOf<F>, (A) -> B>) =
+            fix().ap(ff.fix())
 
-    override fun <A> pure(a: A) =
+    override fun <A> just(a: A) =
             MF().empty() toT a
 }
 
 @instance(Tuple2::class)
 interface Tuple2MonadInstance<F> : Tuple2ApplicativeInstance<F>, Monad<Tuple2PartialOf<F>> {
-    override fun <A, B> map(fa: Tuple2Of<F, A>, f: (A) -> B) =
-            fa.fix().map(f)
+    override fun <A, B> Kind<Tuple2PartialOf<F>, A>.map(f: (A) -> B) =
+            fix().map(f)
 
-    override fun <A, B> ap(fa: Tuple2Of<F, A>, ff: Tuple2Of<F, (A) -> B>) =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<Tuple2PartialOf<F>, A>.ap(ff: Kind<Tuple2PartialOf<F>, (A) -> B>) =
+            fix().ap(ff)
 
-    override fun <A, B> flatMap(fa: Tuple2Of<F, A>, f: (A) -> Tuple2Of<F, B>) =
-            fa.fix().flatMap { f(it).fix() }
+    override fun <A, B> Kind<Tuple2PartialOf<F>, A>.flatMap(f: (A) -> Kind<Tuple2PartialOf<F>, B>) =
+            fix().flatMap { f(it).fix() }
 
     override tailrec fun <A, B> tailRecM(a: A, f: (A) -> Tuple2Of<F, Either<A, B>>): Tuple2<F, B> {
         val b = f(a).fix().b
         return when (b) {
             is Left -> tailRecM(b.a, f)
-            is Right -> pure(b.b)
+            is Right -> just(b.b)
         }
     }
 }
 
 @instance(Tuple2::class)
 interface Tuple2ComonadInstance<F> : Tuple2FunctorInstance<F>, Comonad<Tuple2PartialOf<F>> {
-    override fun <A, B> coflatMap(fa: Tuple2Of<F, A>, f: (Tuple2Of<F, A>) -> B) =
-            fa.fix().coflatMap(f)
+    override fun <A, B> Kind<Tuple2PartialOf<F>, A>.coflatMap(f: (Kind<Tuple2PartialOf<F>, A>) -> B) =
+            fix().coflatMap(f)
 
     override fun <A> Kind<Tuple2PartialOf<F>, A>.extract() =
             fix().extract()
@@ -58,17 +58,19 @@ interface Tuple2ComonadInstance<F> : Tuple2FunctorInstance<F>, Comonad<Tuple2Par
 
 @instance(Tuple2::class)
 interface Tuple2FoldableInstance<F> : Foldable<Tuple2PartialOf<F>> {
-    override fun <A, B> foldLeft(fa: Tuple2Of<F, A>, b: B, f: (B, A) -> B) =
-            fa.fix().foldL(b, f)
+    override fun <A, B> Kind<Tuple2PartialOf<F>, A>.foldLeft(b: B, f: (B, A) -> B) =
+            fix().foldL(b, f)
 
-    override fun <A, B> foldRight(fa: Tuple2Of<F, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>) =
-            fa.fix().foldR(lb, f)
+    override fun <A, B> Kind<Tuple2PartialOf<F>, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>) =
+            fix().foldR(lb, f)
 }
 
 @instance(Tuple2::class)
 interface Tuple2TraverseInstance<F> : Tuple2FoldableInstance<F>, Traverse<Tuple2PartialOf<F>> {
-    override fun <G, A, B> Applicative<G>.traverse(fa: Kind<Tuple2PartialOf<F>, A>, f: (A) -> Kind<G, B>) =
-            fa.fix().run { map(f(b), a::toT) }
+
+    override fun <G, A, B> Tuple2Of<F, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Tuple2<F, B>> = AP.run {
+        fix().let { f(it.b).map(it.a::toT) }
+    }
 }
 
 @instance(Tuple2::class)
@@ -100,8 +102,8 @@ interface Tuple2EqInstance<A, B> : Eq<Tuple2<A, B>> {
 
 @instance(Tuple2::class)
 interface Tuple2ShowInstance<A, B> : Show<Tuple2<A, B>> {
-    override fun show(a: Tuple2<A, B>): String =
-            a.toString()
+    override fun Tuple2<A, B>.show(): String =
+            toString()
 }
 
 @instance(Tuple3::class)
@@ -121,8 +123,8 @@ interface Tuple3EqInstance<A, B, C> : Eq<Tuple3<A, B, C>> {
 
 @instance(Tuple3::class)
 interface Tuple3ShowInstance<A, B, C> : Show<Tuple3<A, B, C>> {
-    override fun show(a: Tuple3<A, B, C>): String =
-            a.toString()
+    override fun Tuple3<A, B, C>.show(): String =
+            toString()
 }
 
 @instance(Tuple4::class)
@@ -145,8 +147,8 @@ interface Tuple4EqInstance<A, B, C, D> : Eq<Tuple4<A, B, C, D>> {
 
 @instance(Tuple4::class)
 interface Tuple4ShowInstance<A, B, C, D> : Show<Tuple4<A, B, C, D>> {
-    override fun show(a: Tuple4<A, B, C, D>): String =
-            a.toString()
+    override fun Tuple4<A, B, C, D>.show(): String =
+            toString()
 }
 
 @instance(Tuple5::class)
@@ -173,8 +175,8 @@ interface Tuple5EqInstance<A, B, C, D, E> : Eq<Tuple5<A, B, C, D, E>> {
 
 @instance(Tuple5::class)
 interface Tuple5ShowInstance<A, B, C, D, E> : Show<Tuple5<A, B, C, D, E>> {
-    override fun show(a: Tuple5<A, B, C, D, E>): String =
-            a.toString()
+    override fun Tuple5<A, B, C, D, E>.show(): String =
+            toString()
 }
 
 @instance(Tuple6::class)
@@ -204,8 +206,8 @@ interface Tuple6EqInstance<A, B, C, D, E, F> : Eq<Tuple6<A, B, C, D, E, F>> {
 
 @instance(Tuple6::class)
 interface Tuple6ShowInstance<A, B, C, D, E, F> : Show<Tuple6<A, B, C, D, E, F>> {
-    override fun show(a: Tuple6<A, B, C, D, E, F>): String =
-            a.toString()
+    override fun Tuple6<A, B, C, D, E, F>.show(): String =
+            toString()
 }
 
 @instance(Tuple7::class)
@@ -238,8 +240,8 @@ interface Tuple7EqInstance<A, B, C, D, E, F, G> : Eq<Tuple7<A, B, C, D, E, F, G>
 
 @instance(Tuple7::class)
 interface Tuple7ShowInstance<A, B, C, D, E, F, G> : Show<Tuple7<A, B, C, D, E, F, G>> {
-    override fun show(a: Tuple7<A, B, C, D, E, F, G>): String =
-            a.toString()
+    override fun Tuple7<A, B, C, D, E, F, G>.show(): String =
+            toString()
 }
 
 @instance(Tuple8::class)
@@ -275,8 +277,8 @@ interface Tuple8EqInstance<A, B, C, D, E, F, G, H> : Eq<Tuple8<A, B, C, D, E, F,
 
 @instance(Tuple8::class)
 interface Tuple8ShowInstance<A, B, C, D, E, F, G, H> : Show<Tuple8<A, B, C, D, E, F, G, H>> {
-    override fun show(a: Tuple8<A, B, C, D, E, F, G, H>): String =
-            a.toString()
+    override fun Tuple8<A, B, C, D, E, F, G, H>.show(): String =
+            toString()
 }
 
 @instance(Tuple9::class)
@@ -315,8 +317,8 @@ interface Tuple9EqInstance<A, B, C, D, E, F, G, H, I> : Eq<Tuple9<A, B, C, D, E,
 
 @instance(Tuple9::class)
 interface Tuple9ShowInstance<A, B, C, D, E, F, G, H, I> : Show<Tuple9<A, B, C, D, E, F, G, H, I>> {
-    override fun show(a: Tuple9<A, B, C, D, E, F, G, H, I>): String =
-            a.toString()
+    override fun Tuple9<A, B, C, D, E, F, G, H, I>.show(): String =
+            toString()
 }
 
 @instance(Tuple10::class)
@@ -358,6 +360,6 @@ interface Tuple10EqInstance<A, B, C, D, E, F, G, H, I, J> : Eq<Tuple10<A, B, C, 
 
 @instance(Tuple10::class)
 interface Tuple10ShowInstance<A, B, C, D, E, F, G, H, I, J> : Show<Tuple10<A, B, C, D, E, F, G, H, I, J>> {
-    override fun show(a: Tuple10<A, B, C, D, E, F, G, H, I, J>): String =
-            a.toString()
+    override fun Tuple10<A, B, C, D, E, F, G, H, I, J>.show(): String =
+            toString()
 }

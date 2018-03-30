@@ -8,7 +8,7 @@ permalink: /docs/typeclasses/applicative/
 
 The `Applicative` typeclass abstracts the ability to lift values and apply functions over the computational context of a type constructor.
 Examples of type constructors that can implement instances of the Applicative typeclass include `Option`, `NonEmptyList`,
-`List` and many other datatypes that include a `pure` and either `ap` function. `ap` may be derived for monadic types that include a `Monad` instance via `flatMap`.
+`List` and many other datatypes that include a `just` and either `ap` function. `ap` may be derived for monadic types that include a `Monad` instance via `flatMap`.
 
 `Applicative` includes all combinators present in [`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }}).
 
@@ -50,15 +50,15 @@ Option.applicative().map(profileService(), phoneService(), addressService(), { (
 
 ### Main Combinators
 
-#### pure
+#### just
 
 A constructor function.
 It lifts a value into the computational context of a type constructor.
 
-`fun <A> pure(a: A): Kind<F, A>`
+`fun <A> just(a: A): Kind<F, A>`
 
 ```kotlin:ank
-Option.pure(1) // Some(1)
+Option.just(1) // Some(1)
 ```
 
 #### ap
@@ -77,12 +77,12 @@ For a full list of other useful combinators available in `Applicative` see the [
 
 ### Syntax
 
-#### Kind<F, A>#pure
+#### Kind<F, A>#just
 
 Lift a value into the computational context of a type constructor
 
 ```kotlin:ank
-1.pure<ForOption, Int>()
+1.just<ForOption, Int>()
 ```
 
 #### Kind<F, A>#ap

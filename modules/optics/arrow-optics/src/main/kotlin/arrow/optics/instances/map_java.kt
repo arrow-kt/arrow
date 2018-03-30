@@ -34,13 +34,14 @@ interface MapAtInstance<K, V> : At<Map<K, V>, K, Option<V>> {
 
 interface MapEachInstance<K, V> : Each<Map<K, V>, V> {
     override fun each() = object : Traversal<Map<K, V>, V> {
-        override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> =
-                MapK.traverse<K>().run { FA.traverse(s.k(), f) }
-                        .let {
-                            FA.map(it) {
-                                it.fix().map
-                            }
+        override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> = FA.run {
+            MapK.traverse<K>().run { s.k().traverse(FA, f) }
+                    .let {
+                        it.map {
+                            it.fix().map
                         }
+                    }
+        }
 
     }
 
@@ -51,21 +52,16 @@ interface MapEachInstance<K, V> : Each<Map<K, V>, V> {
 
 interface MapFilterIndexInstance<K, V> : FilterIndex<Map<K, V>, K, V> {
     override fun filter(p: Predicate<K>) = object : Traversal<Map<K, V>, V> {
-        override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> =
-                ListK.traverse().run {
-                    FA.run {
-                        traverse(s.toList().k(), { (k, v) ->
-                            FA.map(if (p(k)) f(v) else FA.pure(v)) {
+        override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> = FA.run {
+            ListK.traverse().run {
+                s.toList().k().traverse(FA, { (k, v) ->
+                    (if (p(k)) f(v) else just(v))
+                            .map {
                                 k to it
                             }
-                        })
-                    }
-                }
-                        .let {
-                            FA.map(it) {
-                                it.toMap()
-                            }
-                        }
+                }).map { it.toMap() }
+            }
+        }
     }
 
     companion object {

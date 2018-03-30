@@ -36,7 +36,7 @@ class DeferredKTest : UnitSpec() {
 
         "should complete when running a pure value with unsafeRunAsync" {
             val expected = 0
-            DeferredK.pure(expected).unsafeRunAsync { either ->
+            DeferredK.just(expected).unsafeRunAsync { either ->
                 either.fold({ fail("") }, { it shouldBe expected })
             }
         }
@@ -79,7 +79,7 @@ class DeferredKTest : UnitSpec() {
 
         "should complete when running a pure value with runAsync" {
             val expected = 0
-            DeferredK.pure(expected).runAsync { either ->
+            DeferredK.just(expected).runAsync { either ->
                 either.fold({ fail("") }, { DeferredK { it shouldBe expected } })
             }
         }

@@ -2,6 +2,9 @@ package arrow.typeclasses
 
 import arrow.core.Tuple2
 
+inline operator fun <F, A> Order<F>.invoke(ff: Order<F>.() -> A) =
+        run(ff)
+
 /**
  * The [Order] type class is used to define a total ordering on some type [F] and is defined by being able to fully determine order between two instances.
  *

@@ -14,7 +14,7 @@ import arrow.typeclasses.*
 interface WriterTFunctorInstance<F, W> : Functor<WriterTPartialOf<F, W>> {
     fun FF(): Functor<F>
 
-    override fun <A, B> map(fa: WriterTOf<F, W, A>, f: (A) -> B): WriterT<F, W, B> = fa.fix().map({ f(it) }, FF())
+    override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.map(f: (A) -> B): WriterT<F, W, B> = fix().map(FF(), { f(it) })
 }
 
 @instance(WriterT::class)
@@ -24,30 +24,30 @@ interface WriterTApplicativeInstance<F, W> : Applicative<WriterTPartialOf<F, W>>
 
     fun MM(): Monoid<W>
 
-    override fun <A> pure(a: A): WriterTOf<F, W, A> =
-            WriterT(FF().pure(MM().empty() toT a))
+    override fun <A> just(a: A): WriterTOf<F, W, A> =
+            WriterT(FF().just(MM().empty() toT a))
 
-    override fun <A, B> ap(fa: WriterTOf<F, W, A>, ff: Kind<WriterTPartialOf<F, W>, (A) -> B>): WriterT<F, W, B> =
-            fa.fix().ap(ff, MM(), FF())
+    override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.ap(ff: Kind<WriterTPartialOf<F, W>, (A) -> B>): WriterT<F, W, B> =
+            fix().ap(FF(), MM(), ff)
 
-    override fun <A, B> map(fa: WriterTOf<F, W, A>, f: (A) -> B): WriterT<F, W, B> =
-            fa.fix().map({ f(it) }, FF())
+    override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.map(f: (A) -> B): WriterT<F, W, B> =
+            this@map.fix().map(FF(), { f(it) })
 }
 
 @instance(WriterT::class)
 interface WriterTMonadInstance<F, W> : WriterTApplicativeInstance<F, W>, Monad<WriterTPartialOf<F, W>> {
 
-    override fun <A, B> map(fa: WriterTOf<F, W, A>, f: (A) -> B): WriterT<F, W, B> =
-            fa.fix().map({ f(it) }, FF())
+    override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.map(f: (A) -> B): WriterT<F, W, B> =
+            this@map.fix().map(this@WriterTMonadInstance.FF(), { f(it) })
 
-    override fun <A, B> flatMap(fa: WriterTOf<F, W, A>, f: (A) -> Kind<WriterTPartialOf<F, W>, B>): WriterT<F, W, B> =
-            fa.fix().flatMap({ f(it).fix() }, MM(), FF())
+    override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.flatMap(f: (A) -> Kind<WriterTPartialOf<F, W>, B>): WriterT<F, W, B> =
+            fix().flatMap(FF(), MM(), { f(it).fix() })
 
     override fun <A, B> tailRecM(a: A, f: (A) -> Kind<WriterTPartialOf<F, W>, Either<A, B>>): WriterT<F, W, B> =
-            WriterT.tailRecM(a, f, FF())
+            WriterT.tailRecM(FF(), a, f)
 
-    override fun <A, B> ap(fa: WriterTOf<F, W, A>, ff: Kind<WriterTPartialOf<F, W>, (A) -> B>): WriterT<F, W, B> =
-            fa.fix().ap(ff, MM(), FF())
+    override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.ap(ff: Kind<WriterTPartialOf<F, W>, (A) -> B>): WriterT<F, W, B> =
+            fix().ap(FF(), MM(), ff)
 }
 
 @instance(WriterT::class)
@@ -55,8 +55,8 @@ interface WriterTSemigroupKInstance<F, W> : SemigroupK<WriterTPartialOf<F, W>> {
 
     fun SS(): SemigroupK<F>
 
-    override fun <A> combineK(x: WriterTOf<F, W, A>, y: WriterTOf<F, W, A>): WriterT<F, W, A> =
-            x.fix().combineK(y, SS())
+    override fun <A> Kind<WriterTPartialOf<F, W>, A>.combineK(y: Kind<WriterTPartialOf<F, W>, A>): WriterT<F, W, A> =
+            fix().combineK(SS(), y)
 }
 
 @instance(WriterT::class)

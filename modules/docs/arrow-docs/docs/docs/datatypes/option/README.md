@@ -170,10 +170,11 @@ Option.monad().binding {
 
 Available Instances:
 
-```kotlin:ank
+```kotlin
 import arrow.debug.*
 
 showInstances<ForOption, Unit>()
+// [Applicative, ApplicativeError, Foldable, Functor, Monad, MonadError, MonadFilter, Traverse, TraverseFilter]
 ```
 
 # Credits

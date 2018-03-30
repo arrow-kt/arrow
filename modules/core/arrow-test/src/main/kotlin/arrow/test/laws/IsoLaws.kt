@@ -50,7 +50,7 @@ object IsoLaws {
 
     fun <A, B> Iso<A, B>.consistentModifyModifyId(aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>): Unit =
             forAll(aGen, funcGen, { a, f ->
-                modify(a, f).equalUnderTheLaw(modifyF(Id.functor(), a, { Id.pure(f(it)) }).value(), EQA)
+                modify(a, f).equalUnderTheLaw(modifyF(Id.functor(), a, { Id.just(f(it)) }).value(), EQA)
             })
 
     fun <A, B> Iso<A, B>.consitentGetModifyId(aGen: Gen<A>, EQB: Eq<B>, bMonoid: Monoid<B>): Unit =

@@ -16,7 +16,7 @@ data class Coyoneda<F, P, A>(val pivot: Kind<F, P>, internal val ks: List<AnyFun
         curr as A
     }
 
-    fun lower(FF: Functor<F>): Kind<F, A> = FF.map(pivot, transform)
+    fun lower(FF: Functor<F>): Kind<F, A> = FF.run { pivot.map(transform) }
 
     @Suppress("UNCHECKED_CAST")
     fun <B> map(f: (A) -> B): Coyoneda<F, P, B> = Coyoneda(pivot, ks + f as AnyFunc)
@@ -29,9 +29,9 @@ data class Coyoneda<F, P, A>(val pivot: Kind<F, P>, internal val ks: List<AnyFun
 
     companion object {
         @Suppress("UNCHECKED_CAST")
-        inline operator fun <reified U, A, B> invoke(fa: Kind<U, A>, noinline f: (A) -> B): Coyoneda<U, A, B> = unsafeApply(fa, listOf(f as AnyFunc))
+        inline operator fun <U, A, B> invoke(fa: Kind<U, A>, noinline f: (A) -> B): Coyoneda<U, A, B> = unsafeApply(fa, listOf(f as AnyFunc))
 
-        inline fun <reified U, A, B> unsafeApply(fa: Kind<U, A>, f: List<AnyFunc>): Coyoneda<U, A, B> = Coyoneda(fa, f)
+        inline fun <U, A, B> unsafeApply(fa: Kind<U, A>, f: List<AnyFunc>): Coyoneda<U, A, B> = Coyoneda(fa, f)
 
     }
 

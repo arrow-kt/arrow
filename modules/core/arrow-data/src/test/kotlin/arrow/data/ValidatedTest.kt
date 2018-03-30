@@ -129,13 +129,13 @@ class ValidatedTest : UnitSpec() {
         }
 
         "ap should return Valid(f(a)) if both are Valid" {
-            Valid(10).ap<Int, Int, Int>(Valid({ a -> a + 5 }), plusIntSemigroup) shouldBe Valid(15)
+            Valid(10).ap<Int, Int, Int>(plusIntSemigroup, Valid({ a -> a + 5 })) shouldBe Valid(15)
         }
 
         "ap should return first Invalid found if is unique or combine both in otherwise" {
-            Invalid(10).ap<Int, Int, Int>(Valid({ a -> a + 5 }), plusIntSemigroup) shouldBe Invalid(10)
-            Valid(10).ap<Int, Int, Int>(Invalid(5), plusIntSemigroup) shouldBe Invalid(5)
-            Invalid(10).ap<Int, Int, Int>(Invalid(5), plusIntSemigroup) shouldBe Invalid(15)
+            Invalid(10).ap<Int, Int, Int>(plusIntSemigroup, Valid({ a -> a + 5 })) shouldBe Invalid(10)
+            Valid(10).ap<Int, Int, Int>(plusIntSemigroup, Invalid(5)) shouldBe Invalid(5)
+            Invalid(10).ap<Int, Int, Int>(plusIntSemigroup, Invalid(5)) shouldBe Invalid(15)
         }
 
         data class MyException(val msg: String) : Exception()
@@ -166,7 +166,7 @@ class ValidatedTest : UnitSpec() {
 
         "withEither should return Invalid(result) if f return Left" {
             Valid(10).withEither { Left(5) } shouldBe Invalid(5)
-            Invalid(10).withEither { it } shouldBe Invalid(10)
+            Invalid(10).withEither(::identity) shouldBe Invalid(10)
         }
 
         with(VAL_AP) {
@@ -200,20 +200,20 @@ class ValidatedTest : UnitSpec() {
             "CombineK should combine Valid Validated" {
                 val valid = Valid("Who")
 
-                combineK(valid, valid) shouldBe (Valid("Who"))
+                valid.combineK(valid) shouldBe (Valid("Who"))
             }
 
             "CombineK should combine Valid and Invalid Validated" {
                 val valid = Valid("Who")
                 val invalid = Invalid("Nope")
 
-                combineK(valid, invalid) shouldBe (Valid("Who"))
+                valid.combineK(invalid) shouldBe (Valid("Who"))
             }
 
             "CombineK should combine Invalid Validated" {
                 val invalid = Invalid("Nope")
 
-                combineK(invalid, invalid) shouldBe (Invalid("NopeNope"))
+                invalid.combineK(invalid) shouldBe (Invalid("NopeNope"))
             }
         }
 

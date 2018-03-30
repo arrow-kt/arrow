@@ -1,9 +1,6 @@
 package arrow.optics
 
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.eq
-import arrow.core.getOrElse
+import arrow.core.*
 import arrow.data.ListK
 import arrow.data.eq
 import arrow.data.k
@@ -139,14 +136,14 @@ class PrismTest : UnitSpec() {
             "asFold should behave as valid Fold: combineAll" {
                 forAll(SumGen) { sum: SumType ->
                     combineAll(StringMonoidInstance, sum) ==
-                            sumPrism.getOption(sum).fold({StringMonoidInstance.empty()}, { it })
+                            sumPrism.getOption(sum).fold({StringMonoidInstance.empty()}, ::identity)
                 }
             }
 
             "asFold should behave as valid Fold: fold" {
                 forAll(SumGen) { sum: SumType ->
                     fold(StringMonoidInstance, sum) ==
-                            sumPrism.getOption(sum).fold({StringMonoidInstance.empty()}, { it })
+                            sumPrism.getOption(sum).fold({StringMonoidInstance.empty()}, ::identity)
                 }
             }
 

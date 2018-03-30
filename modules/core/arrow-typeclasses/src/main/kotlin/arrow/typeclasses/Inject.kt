@@ -2,6 +2,9 @@ package arrow.typeclasses
 
 import arrow.Kind
 
+inline operator fun <F, G, A> Inject<F, G>.invoke(ff: Inject<F, G>.() -> A) =
+        run(ff)
+
 /**
  * Inject type class as described in "Data types a la carte" (Swierstra 2008).
  *
@@ -11,6 +14,5 @@ interface Inject<F, G> {
 
     fun inj(): FunctionK<F, G>
 
-    fun <A> invoke(fa: Kind<F, A>): Kind<G, A> = inj()(fa)
-
+    fun <A> Kind<F, A>.inject(): Kind<G, A> = inj()(this)
 }

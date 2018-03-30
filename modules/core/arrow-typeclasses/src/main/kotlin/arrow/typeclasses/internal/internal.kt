@@ -5,20 +5,26 @@ import arrow.core.Either
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.fix
-import arrow.typeclasses.Monad
+import arrow.typeclasses.Bimonad
 
-val IdMonad: Monad<ForId> = object : Monad<ForId> {
-    override fun <A> pure(a: A): Kind<ForId, A> =
+val IdBimonad: Bimonad<ForId> = object : Bimonad<ForId> {
+    override fun <A, B> Kind<ForId, A>.coflatMap(f: (Kind<ForId, A>) -> B): Kind<ForId, B> =
+            fix().coflatMap(f)
+
+    override fun <A> Kind<ForId, A>.extract(): A =
+            fix().extract()
+
+    override fun <A> just(a: A): Kind<ForId, A> =
             Id(a)
 
-    override fun <A, B> ap(fa: Kind<ForId, A>, ff: Kind<ForId, (A) -> B>): Kind<ForId, B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<ForId, A>.ap(ff: Kind<ForId, (A) -> B>): Kind<ForId, B> =
+            fix().ap(ff)
 
-    override fun <A, B> map(fa: Kind<ForId, A>, f: (A) -> B): Kind<ForId, B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForId, A>.map(f: (A) -> B): Kind<ForId, B> =
+            fix().map(f)
 
-    override fun <A, B> flatMap(fa: Kind<ForId, A>, f: (A) -> Kind<ForId, B>): Kind<ForId, B> =
-            fa.fix().flatMap(f)
+    override fun <A, B> Kind<ForId, A>.flatMap(f: (A) -> Kind<ForId, B>): Kind<ForId, B> =
+            fix().flatMap(f)
 
     override fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForId, Either<A, B>>): Kind<ForId, B> =
             Id.tailRecM(a, f)

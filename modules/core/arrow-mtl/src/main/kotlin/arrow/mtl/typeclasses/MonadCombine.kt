@@ -7,17 +7,21 @@ import arrow.typeclasses.Alternative
 import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Foldable
 
+inline operator fun <F, A> MonadCombine<F>.invoke(ff: MonadCombine<F>.() -> A) =
+        run(ff)
+
 /**
  * The combination of a Monad with a MonoidK
  */
 interface MonadCombine<F> : MonadFilter<F>, Alternative<F> {
 
-    fun <G, A> unite(fga: Kind<F, Kind<G, A>>, FG: Foldable<G>): Kind<F, A> =
-            flatMap(fga, { ga -> FG.foldLeft(ga, empty<A>(), { acc, a -> combineK(acc, pure(a)) }) })
+    fun <G, A> Kind<F, Kind<G, A>>.unite(FG: Foldable<G>): Kind<F, A> = FG.run {
+        flatMap({ ga -> ga.foldLeft(empty<A>(), { acc, a -> acc.combineK(just(a)) }) })
+    }
 
-    fun <G, A, B> separate(fgab: Kind<F, Kind2<G, A, B>>, BFG: Bifoldable<G>): Tuple2<Kind<F, A>, Kind<F, B>> {
-        val asep = flatMap(fgab, { gab -> BFG.run { algebra<A>().bifoldMap(gab, { pure(it) }, { _ -> empty() }) } })
-        val bsep = flatMap(fgab, { gab -> BFG.run { algebra<B>().bifoldMap(gab, { _ -> empty() }, { pure(it) }) } })
+    fun <G, A, B> Kind<F, Kind2<G, A, B>>.separate(BFG: Bifoldable<G>): Tuple2<Kind<F, A>, Kind<F, B>> = BFG.run {
+        val asep = this@separate.flatMap({ gab -> run { gab.bifoldMap(algebra<A>(), { just(it) }, { _ -> empty() }) } })
+        val bsep = this@separate.flatMap({ gab -> run { gab.bifoldMap(algebra<B>(), { _ -> empty() }, { just(it) }) } })
         return Tuple2(asep, bsep)
     }
 }

@@ -1,9 +1,11 @@
 package arrow.instances
 
+import arrow.Kind
 import arrow.core.Eval
 import arrow.data.*
 import arrow.instance
 import arrow.typeclasses.*
+import arrow.data.combineK as setCombineK
 
 @instance(SetK::class)
 interface SetKSemigroupInstance<A> : Semigroup<SetK<A>> {
@@ -32,26 +34,26 @@ interface SetKEqInstance<A> : Eq<SetK<A>> {
 
 @instance(SetK::class)
 interface SetKShowInstance<A> : Show<SetK<A>> {
-    override fun show(a: SetK<A>): String =
-            a.toString()
+    override fun SetK<A>.show(): String =
+            toString()
 }
 
 @instance(SetK::class)
 interface SetKFoldableInstance : Foldable<ForSetK> {
-    override fun <A, B> foldLeft(fa: SetKOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
-            fa.fix().foldLeft(b, f)
+    override fun <A, B> Kind<ForSetK, A>.foldLeft(b: B, f: (B, A) -> B): B =
+            fix().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: SetKOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
-            fa.fix().foldRight(lb, f)
+    override fun <A, B> Kind<ForSetK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+            fix().foldRight(lb, f)
 
-    override fun <A> isEmpty(fa: SetKOf<A>): kotlin.Boolean =
-            fa.fix().isEmpty()
+    override fun <A> Kind<ForSetK, A>.isEmpty(): kotlin.Boolean =
+            fix().isEmpty()
 }
 
 @instance(SetK::class)
 interface SetKSemigroupKInstance : SemigroupK<ForSetK> {
-    override fun <A> combineK(x: SetKOf<A>, y: SetKOf<A>): SetK<A> =
-            x.fix().combineK(y)
+    override fun <A> Kind<ForSetK, A>.combineK(y: Kind<ForSetK, A>): SetK<A> =
+            fix().setCombineK(y)
 }
 
 @instance(SetK::class)
@@ -59,6 +61,6 @@ interface SetKMonoidKInstance : MonoidK<ForSetK> {
     override fun <A> empty(): SetK<A> =
             SetK.empty()
 
-    override fun <A> combineK(x: SetKOf<A>, y: SetKOf<A>): SetK<A> =
-            x.fix().combineK(y)
+    override fun <A> Kind<ForSetK, A>.combineK(y: Kind<ForSetK, A>): SetK<A> =
+            fix().setCombineK(y)
 }

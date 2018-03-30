@@ -19,16 +19,16 @@ class BifoldableTests : UnitSpec() {
     init {
 
         val eitherBifoldable: Bifoldable<ForEither> = object : Bifoldable<ForEither> {
-            override fun <A, B, C> bifoldLeft(fab: Kind2<ForEither, A, B>, c: C, f: (C, A) -> C, g: (C, B) -> C): C =
-                    when (fab) {
-                        is Either.Left -> f(c, fab.a)
-                        else -> g(c, (fab as Either.Right).b)
+            override fun <A, B, C> arrow.Kind2<arrow.core.ForEither, A, B>.bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
+                    when (this@bifoldLeft) {
+                        is Either.Left -> f(c, this@bifoldLeft.a)
+                        else -> g(c, (this@bifoldLeft as Either.Right).b)
                     }
 
-            override fun <A, B, C> bifoldRight(fab: Kind2<ForEither, A, B>, c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
-                    when (fab) {
-                        is Either.Left -> f(fab.a, c)
-                        else -> g((fab as Either.Right).b, c)
+            override fun <A, B, C> Kind2<ForEither, A, B>.bifoldRight(c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
+                    when (this) {
+                        is Either.Left -> f(a, c)
+                        else -> g((this as Either.Right).b, c)
                     }
         }
 

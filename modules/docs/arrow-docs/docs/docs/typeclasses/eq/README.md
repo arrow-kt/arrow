@@ -69,7 +69,7 @@ import arrow.core.*
 import arrow.typeclasses.*
 
 // Option is a data class with a single value
-Eq.any().eqv(Some(1), Option.pure(1))
+Eq.any().eqv(Some(1), Option.just(1))
 ```
 
 ```kotlin:ank

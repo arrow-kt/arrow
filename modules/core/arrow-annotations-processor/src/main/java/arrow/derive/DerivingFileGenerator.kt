@@ -7,6 +7,7 @@ import arrow.higherkinds.HKMarkerPreFix
 import arrow.higherkinds.KindPostFix
 import me.eugeniomarletti.kotlin.metadata.modality
 import org.jetbrains.kotlin.serialization.ProtoBuf
+import org.jetbrains.kotlin.serialization.deserialization.hasReceiver
 import java.io.File
 
 fun argAsSeenFromReceiver(typeClassFirstTypeArg: String, abstractType: String, receiverType: String): String =
@@ -21,7 +22,7 @@ fun retTypeAsSeenFromReceiver(typeClassFirstTypeArg: String, abstractType: Strin
 
 sealed class HKArgs {
     object None : HKArgs()
-    object First : HKArgs()
+    data class First(val receiver: String) : HKArgs()
     object Unknown : HKArgs()
 }
 
@@ -39,24 +40,28 @@ data class FunctionSignature(
     fun generate(): String {
         val typeParamsS = tparams.joinToString(prefix = "<`", separator = "`, `", postfix = "`>")
         val argsS = args.joinToString(prefix = "(`", separator = "`, `", postfix = "`)") { "${it.first}: ${it.second}" }
-        return """|override fun $typeParamsS `$name`$argsS: $retType =
+        val receiver = if (hkArgs is HKArgs.First) "`${hkArgs.receiver}`" else ""
+        return """|override fun $typeParamsS $receiver.`$name`$argsS: $retType =
                   |    ${implBody()}""".removeBackticks().trimMargin()
     }
 
     fun implBody(): String =
             when (hkArgs) {
                 HKArgs.None -> "$receiverType.$name()"
-                HKArgs.First -> "${args[0].first}.fix().$name(${args.drop(1).joinToString(", ") { it.first }})"
+                is HKArgs.First -> "fix().$name(${args.joinToString(", ") { it.first }})"
                 HKArgs.Unknown -> "$receiverType.$name(${args.joinToString(", ") { it.first }})"
             }
 
     companion object {
 
         fun from(receiverType: String, typeClass: ClassOrPackageDataWrapper, f: ProtoBuf.Function): FunctionSignature {
-            val typeParams = f.typeParameterList.map { typeClass.nameResolver.getString(it.name) }
-            val typeClassAbstractKind = typeClass.nameResolver.getString(typeClass.typeParameters[0].name)
+            fun Int.get() =
+                    typeClass.nameResolver.getString(this)
+
+            val typeParams = f.typeParameterList.map { it.name.get() }
+            val typeClassAbstractKind = typeClass.typeParameters[0].name.get()
             val args = f.valueParameterList.map {
-                val argName = typeClass.nameResolver.getString(it.name)
+                val argName = it.name.get()
                 val argType = it.type.extractFullName(typeClass)
                 argName to argAsSeenFromReceiver(typeClassAbstractKind, argType, receiverType)
             }
@@ -68,15 +73,19 @@ data class FunctionSignature(
                     name = typeClass.nameResolver.getString(f.name),
                     args = args,
                     retType = concreteType,
-                    hkArgs = when {
-                        f.valueParameterList.isEmpty() -> HKArgs.None
-                        typeClass.nameResolver.getString(f.getValueParameter(0).type.className).startsWith("arrow/Kind") -> HKArgs.First
-                        else -> HKArgs.Unknown
-                    },
+                    hkArgs = findArgs(f, typeClassAbstractKind, typeClass, receiverType),
                     receiverType = receiverType,
                     isAbstract = isAbstract
             )
         }
+
+        private fun findArgs(f: ProtoBuf.Function, typeClassAbstractKind: String, typeClass: ClassOrPackageDataWrapper, receiverType: String): HKArgs =
+                when {
+                    f.valueParameterList.isEmpty() -> HKArgs.None
+                    f.hasReceiver() ->
+                        HKArgs.First(argAsSeenFromReceiver(typeClassAbstractKind, f.receiverType.extractFullName(typeClass), receiverType))
+                    else -> HKArgs.Unknown
+                }
     }
 }
 
@@ -121,10 +130,10 @@ class TypeclassInstanceGenerator(
             }
 
     fun targetRequestsDelegation(f: FunctionSignature): Boolean = when (f.hkArgs) {
-            HKArgs.None -> f.isAbstract || targetHasFunction(f, targetType.companionClassProto)
-            HKArgs.First -> f.isAbstract || targetHasFunction(f, target)
-            HKArgs.Unknown -> f.isAbstract || targetHasFunction(f, targetType.companionClassProto)
-        }
+        HKArgs.None -> f.isAbstract || targetHasFunction(f, targetType.companionClassProto)
+        is HKArgs.First -> f.isAbstract || targetHasFunction(f, target)
+        HKArgs.Unknown -> f.isAbstract || targetHasFunction(f, targetType.companionClassProto)
+    }
 
     val delegatedFunctions: List<String> = functionSignatures().filter(this::targetRequestsDelegation).map { it.generate() }
 

@@ -19,15 +19,15 @@ class StateTTests : UnitSpec() {
     val M: StateTMonadStateInstance<ForTry, Int> = StateT.monadState(Try.monad())
 
     val EQ: Eq<StateTOf<ForTry, Int, Int>> = Eq { a, b ->
-        a.runM(1, Try.monad()) == b.runM(1, Try.monad())
+        a.runM(Try.monad(), 1) == b.runM(Try.monad(), 1)
     }
 
     val EQ_UNIT: Eq<StateTOf<ForTry, Int, Unit>> = Eq { a, b ->
-        a.runM(1, Try.monad()) == b.runM(1, Try.monad())
+        a.runM(Try.monad(), 1) == b.runM(Try.monad(), 1)
     }
 
     val EQ_LIST: Eq<Kind<StateTPartialOf<ForListK, Int>, Int>> = Eq { a, b ->
-        a.runM(1, ListK.monad()) == b.runM(1, ListK.monad())
+        a.runM(ListK.monad(), 1) == b.runM(ListK.monad(), 1)
     }
 
     init {
@@ -39,8 +39,8 @@ class StateTTests : UnitSpec() {
                         StateT.applicative<ForListK, Int>(ListK.monad()),
                         EQ_LIST),
                 MonadCombineLaws.laws(StateT.monadCombine<ForListK, Int>(ListK.monadCombine(), ListK.semigroupK(), ListK.monadCombine()),
-                        { StateT.lift(ListK.pure(it), ListK.monad()) },
-                        { StateT.lift(ListK.pure({ s: Int -> s * 2 }), ListK.monad()) },
+                        { StateT.lift(ListK.monad(), ListK.just(it)) },
+                        { StateT.lift(ListK.monad(), ListK.just({ s: Int -> s * 2 })) },
                         EQ_LIST)
         )
 

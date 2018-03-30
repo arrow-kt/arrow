@@ -19,7 +19,7 @@ object AsyncLaws {
 
     fun <F> Async<F>.asyncSuccess(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(Gen.int(), { num: Int ->
-                async { ff: (Either<Throwable, Int>) -> Unit -> ff(Right(num)) }.equalUnderTheLaw(pure<Int>(num), EQ)
+                async { ff: (Either<Throwable, Int>) -> Unit -> ff(Right(num)) }.equalUnderTheLaw(just<Int>(num), EQ)
             })
 
     fun <F> Async<F>.asyncError(EQ: Eq<Kind<F, Int>>): Unit =

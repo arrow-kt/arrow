@@ -5,12 +5,15 @@ import arrow.core.Option
 import arrow.typeclasses.Monad
 import kotlin.coroutines.experimental.startCoroutine
 
+inline operator fun <F, A> MonadFilter<F>.invoke(ff: MonadFilter<F>.() -> A) =
+        run(ff)
+
 interface MonadFilter<F> : Monad<F>, FunctorFilter<F> {
 
     fun <A> empty(): Kind<F, A>
 
-    override fun <A, B> mapFilter(fa: Kind<F, A>, f: (A) -> Option<B>): Kind<F, B> =
-            flatMap(fa, { a -> f(a).fold({ empty<B>() }, { pure(it) }) })
+    override fun <A, B> Kind<F, A>.mapFilter(f: (A) -> Option<B>): Kind<F, B> =
+            this.flatMap({ a -> f(a).fold({ empty<B>() }, { just(it) }) })
 }
 
 /**
@@ -20,7 +23,7 @@ interface MonadFilter<F> : Monad<F>, FunctorFilter<F> {
  */
 fun <F, B> MonadFilter<F>.bindingFilter(c: suspend MonadFilterContinuation<F, *>.() -> B): Kind<F, B> {
     val continuation = MonadFilterContinuation<F, B>(this)
-    val wrapReturn: suspend MonadFilterContinuation<F, *>.() -> Kind<F, B> = { pure(c()) }
+    val wrapReturn: suspend MonadFilterContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
 }

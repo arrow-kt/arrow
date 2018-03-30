@@ -20,5 +20,5 @@ object StringEqInstance : Eq<String> {
 }
 
 object StringShowInstance : Show<String> {
-    override fun show(a: String): String = a
+    override fun String.show(): String = this
 }

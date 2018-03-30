@@ -8,6 +8,9 @@ import arrow.optics.Traversal
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Traverse
 
+inline operator fun <S, I, A, R> FilterIndex<S, I, A>.invoke(ff: FilterIndex<S, I, A>.() -> R) =
+        run(ff)
+
 /**
  * [FilterIndex] provides a [Traversal] for a structure [S] with all its foci [A] whose index [I] satisfies a predicate.
  *
@@ -40,8 +43,8 @@ interface FilterIndex<S, I, A> {
                 override fun <F> modifyF(FA: Applicative<F>, s: Kind<S, A>, f: (A) -> Kind<F, A>): Kind<F, Kind<S, A>> =
                         traverse.run {
                             FA.run {
-                                traverse(zipWithIndex(s), { (a, j) ->
-                                    if (p(j)) f(a) else pure(a)
+                                zipWithIndex(s).traverse(this, { (a, j) ->
+                                    if (p(j)) f(a) else just(a)
                                 })
                             }
                         }

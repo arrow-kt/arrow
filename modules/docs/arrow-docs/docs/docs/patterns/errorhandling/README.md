@@ -292,8 +292,8 @@ Let's now rewrite our program as a polymorphic function that will work over any 
 Polymorphic code in Arrow is based on emulated [`Higher Kinds`](/docs/patterns/polymorphicprograms) as described in [Lightweight higher-kinded polymorphism](https://www.cl.cam.ac.uk/~jdy22/papers/lightweight-higher-kinded-polymorphism.pdf) and applied to Kotlin, a lang which does not yet support Higher Kinded Types.
 
 ```kotlin
-inline fun <reified F> arm(ME: MonadError<F, NukeException> = monadError()): Kind<F, Nuke> = ME.pure(Nuke)
-inline fun <reified F> aim(ME: MonadError<F, NukeException> = monadError()): Kind<F, Target> = ME.pure(Target)
+inline fun <reified F> arm(ME: MonadError<F, NukeException> = monadError()): Kind<F, Nuke> = ME.just(Nuke)
+inline fun <reified F> aim(ME: MonadError<F, NukeException> = monadError()): Kind<F, Target> = ME.just(Target)
 inline fun <reified F> launch(target: Target, nuke: Nuke, ME: MonadError<F, NukeException> = monadError()):
   Kind<F, Impacted> = ME.raiseError(MissedByMeters(5))
 ```
@@ -327,7 +327,7 @@ result1.fix()
 Note that `MonadError` also has a function `bindingCatch` that automatically captures and wraps exceptions in its binding block.
 
 ```kotlin
-inline fun <reified F> launchImpure(target: Target, nuke: Nuke, ME: MonadError<F, NukeException> = monadError()): Impacted {
+inline fun <reified F> launchImjust(target: Target, nuke: Nuke, ME: MonadError<F, NukeException> = monadError()): Impacted {
   throw MissedByMeters(5)
 }
 

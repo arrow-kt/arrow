@@ -1,8 +1,8 @@
 package arrow.data
 
-import arrow.collections.collect
 import arrow.core.case
 import arrow.core.then
+import arrow.syntax.collections.collect
 import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe

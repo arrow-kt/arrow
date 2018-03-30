@@ -102,13 +102,13 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
     /**
      * Apply a function to a Valid value, returning a new Valid value
      */
-    fun <B> map(f: (A) -> B): Validated<E, B> = bimap({ it }, { f(it) })
+    fun <B> map(f: (A) -> B): Validated<E, B> = bimap(::identity, { f(it) })
 
     /**
      * Apply a function to an Invalid value, returning a new Invalid value.
      * Or, if the original valid was Valid, return it.
      */
-    fun <EE> leftMap(f: (E) -> EE): Validated<EE, A> = bimap({ f(it) }, { it })
+    fun <EE> leftMap(f: (E) -> EE): Validated<EE, A> = bimap({ f(it) }, ::identity)
 
     /**
      * apply the given function to the value with the given B when
@@ -116,18 +116,24 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
      */
     fun <B> foldLeft(b: B, f: (B, A) -> B): B = fold({ b }, { f(b, it) })
 
+    fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+            when (this) {
+                is Valid -> f(this.a, lb)
+                is Invalid -> lb
+            }
+
     fun swap(): Validated<A, E> = fold({ Valid(it) }, { Invalid(it) })
 }
 
 /**
  * Return the Valid value, or the default if Invalid
  */
-fun <E, B> Validated<E, B>.getOrElse(default: () -> B): B = fold({ default() }, { it })
+fun <E, B> Validated<E, B>.getOrElse(default: () -> B): B = fold({ default() }, ::identity)
 
 /**
  * Return the Valid value, or the result of f if Invalid
  */
-fun <E, B> Validated<E, B>.valueOr(f: (E) -> B): B = fold({ f(it) }, { it })
+fun <E, B> Validated<E, B>.valueOr(f: (E) -> B): B = fold({ f(it) }, ::identity)
 
 /**
  * If `this` is valid return `this`, otherwise if `that` is valid return `that`, otherwise combine the failures.
@@ -160,7 +166,7 @@ fun <E, A> Validated<E, A>.orElse(default: () -> Validated<E, A>): Validated<E, 
  * From Apply:
  * if both the function and this value are Valid, apply the function
  */
-fun <E, A, B> Validated<E, A>.ap(f: Validated<E, (A) -> B>, SE: Semigroup<E>): Validated<E, B> =
+fun <E, A, B> Validated<E, A>.ap(SE: Semigroup<E>, f: Validated<E, (A) -> B>): Validated<E, B> =
         when (this) {
             is Valid -> f.fold({ Invalid(it) }, { Valid(it(a)) })
             is Invalid -> f.fold({ Invalid(SE.run { it.combine(e) }) }, { Invalid(e) })
@@ -169,17 +175,13 @@ fun <E, A, B> Validated<E, A>.ap(f: Validated<E, (A) -> B>, SE: Semigroup<E>): V
 fun <E, A> Validated<E, A>.handleLeftWith(f: (E) -> ValidatedOf<E, A>): Validated<E, A> =
         fold({ f(it).fix() }, { Valid(it) })
 
-fun <E, A, B> Validated<E, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-        when (this) {
-            is Valid -> f(this.a, lb)
-            is Invalid -> lb
-        }
+fun <G, E, A, B> Validated<E, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> = GA.run {
+    when (this@traverse) {
+        is Valid -> f(a).map({ Valid(it) })
+        is Invalid -> just(this@traverse)
 
-fun <G, E, A, B> Validated<E, A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Validated<E, B>> =
-        when (this) {
-            is Valid -> GA.map(f(this.a), { Valid(it) })
-            is Invalid -> GA.pure(this)
-        }
+    }
+}
 
 inline fun <E, A> Validated<E, A>.combine(SE: Semigroup<E>,
                                           SA: Semigroup<A>,
@@ -209,3 +211,11 @@ fun <E, A> Validated<E, A>.combineK(SE: Semigroup<E>, y: ValidatedOf<E, A>): Val
  * Converts the value to an Ior<E, A>
  */
 fun <E, A> Validated<E, A>.toIor(): Ior<E, A> = fold({ Ior.Left(it) }, { Ior.Right(it) })
+
+fun <E, A> A.valid(): Validated<E, A> = Valid(this)
+
+fun <E, A> E.invalid(): Validated<E, A> = Invalid(this)
+
+fun <E, A> A.validNel(): ValidatedNel<E, A> = Validated.validNel(this)
+
+fun <E, A> E.invalidNel(): ValidatedNel<E, A> = Validated.invalidNel(this)

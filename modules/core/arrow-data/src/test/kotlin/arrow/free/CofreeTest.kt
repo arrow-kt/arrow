@@ -129,7 +129,7 @@ class CofreeTest : UnitSpec() {
             "cataM should traverse the structure in a stack-safe way on a monad" {
                 val folder: (Int, Kind<ForOption, NonEmptyList<Int>>) -> EvalOption<NonEmptyList<Int>> = { i, lb ->
                     if (i <= 2000)
-                        OptionT.pure(NonEmptyList(i, lb.fix().fold({ emptyList<Int>() }, { it.all })), Eval.applicative())
+                        OptionT.just(NonEmptyList(i, lb.fix().fold({ emptyList<Int>() }, { it.all })), Eval.applicative())
                     else
                         OptionT.none(Eval.applicative())
                 }
@@ -137,9 +137,9 @@ class CofreeTest : UnitSpec() {
                     override fun <A> invoke(fa: Kind<ForEval, A>): Kind<EvalOptionF, A> =
                             OptionT(fa.fix().map { Some(it) })
                 }
-                val cataHundred = cataM(folder, inclusion, Option.traverse(), OptionT.monad(Eval.monad())).fix().value.fix().value()
+                val cataHundred = cataM(inclusion, OptionT.monad(Eval.monad()), Option.traverse(), folder).fix().value.fix().value()
                 val newCof = Cofree(Option.functor(), 2001, Eval.now(Some(startTwoThousand)))
-                val cataHundredOne = newCof.cataM(folder, inclusion, Option.traverse(), OptionT.monad(Eval.monad())).fix().value.fix().value()
+                val cataHundredOne = newCof.cataM(inclusion, OptionT.monad(Eval.monad()), Option.traverse(), folder).fix().value.fix().value()
 
                 cataHundred shouldBe Some(NonEmptyList.fromListUnsafe((0..2000).toList()))
                 cataHundredOne shouldBe None

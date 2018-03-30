@@ -1,6 +1,5 @@
 package arrow.optics
 
-import arrow.collections.firstOption
 import arrow.core.Option
 import arrow.core.eq
 import arrow.core.toOption
@@ -96,7 +95,7 @@ class TraversalTest : UnitSpec() {
 
             "asFold should behave as valid Fold: headOption" {
                 forAll(genListK(Gen.int())) { ints ->
-                    headOption(ints) == ints.firstOption()
+                    headOption(ints) == ints.firstOrNull().toOption()
                 }
             }
 

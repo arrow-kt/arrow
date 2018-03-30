@@ -15,8 +15,8 @@ object FunctorLaws {
 
     inline fun <F> laws(AP: Applicative<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
             listOf(
-                    Law("Functor Laws: Covariant Identity", { AP.covariantIdentity(AP::pure, EQ) }),
-                    Law("Functor Laws: Covariant Composition", { AP.covariantComposition(AP::pure, EQ) })
+                    Law("Functor Laws: Covariant Identity", { AP.covariantIdentity(AP::just, EQ) }),
+                    Law("Functor Laws: Covariant Composition", { AP.covariantComposition(AP::just, EQ) })
             )
 
     fun <F> laws(FF: Functor<F>, f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
@@ -27,7 +27,7 @@ object FunctorLaws {
 
     fun <F> Functor<F>.covariantIdentity(f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), f), { fa: Kind<F, Int> ->
-                map(fa, ::identity).equalUnderTheLaw(fa, EQ)
+                fa.map(::identity).equalUnderTheLaw(fa, EQ)
             })
 
     fun <F> Functor<F>.covariantComposition(ff: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
@@ -36,7 +36,7 @@ object FunctorLaws {
                     genFunctionAToB<Int, Int>(Gen.int()),
                     genFunctionAToB<Int, Int>(Gen.int()),
                     { fa: Kind<F, Int>, f, g ->
-                        map(map(fa, f), g).equalUnderTheLaw(map(fa, f andThen g), EQ)
+                        fa.map(f).map(g).equalUnderTheLaw(fa.map(f andThen g), EQ)
                     }
             )
 }

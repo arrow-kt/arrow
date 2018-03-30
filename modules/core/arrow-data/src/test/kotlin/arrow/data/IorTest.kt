@@ -35,7 +35,7 @@ class IorTest : UnitSpec() {
 
         "bimap() should allow modify both value" {
             forAll { a: Int, b: String ->
-                Ior.Right<Int, String>(b).bimap({ "5" }, { a * 2 }) == Ior.Right<Int, Int>(a * 2) &&
+                Ior.Right.invoke(b).bimap({ "5" }, { a * 2 }) == Ior.Right.invoke(a * 2) &&
                         Ior.Left<Int, String>(a).bimap({ a * 3 }, { "5" }) == Ior.Left<Int, String>(a * 3) &&
                         Ior.Both(a, b).bimap({ 2 }, { "power of $it" }) == Ior.Both(2, "power of $b")
             }
@@ -104,9 +104,9 @@ class IorTest : UnitSpec() {
 
         "fromOptions() should build a correct Option<Ior>" {
             forAll { a: Int, b: String ->
-                Ior.fromOptions(Some(a), None) == Some(Ior.Left<Int, String>(a)) &&
+                Ior.fromOptions(Some(a), None) == Some(Ior.Left.invoke(a)) &&
                         Ior.fromOptions(Some(a), Some(b)) == Some(Ior.Both(a, b)) &&
-                        Ior.fromOptions(None, Some(b)) == Some(Ior.Right<Int, String>(b)) &&
+                        Ior.fromOptions(None, Some(b)) == Some(Ior.Right.invoke(b)) &&
                         Ior.fromOptions(None, None) == None
             }
         }
@@ -123,7 +123,7 @@ class IorTest : UnitSpec() {
 
         "Ior.monad.flatMap should combine left values" {
             val ior1 = Ior.Both(3, "Hello, world!")
-            val iorResult = intIorMonad.flatMap(ior1, { Ior.Left<Int, String>(7) })
+            val iorResult = intIorMonad.run { ior1.flatMap({ Ior.Left<Int, String>(7) }) }
             iorResult shouldBe Ior.Left<Int, String>(10)
         }
 

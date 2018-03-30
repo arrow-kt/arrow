@@ -32,7 +32,7 @@ interface Fold<S, A> : FoldOf<S, A> {
         /**
          * [Fold] that takes either [S] or [S] and strips the choice of [S].
          */
-        inline fun <reified S> codiagonal() = object : Fold<Either<S, S>, S> {
+        inline fun <S> codiagonal() = object : Fold<Either<S, S>, S> {
             override fun <R> foldMap(M: Monoid<R>, s: Either<S, S>, f: (S) -> R): R = s.fold(f, f)
         }
 
@@ -52,7 +52,7 @@ interface Fold<S, A> : FoldOf<S, A> {
          * Create a [Fold] from a [arrow.Foldable]
          */
         fun <F, S> fromFoldable(foldable: Foldable<F>) = object : Fold<Kind<F, S>, S> {
-            override fun <R> foldMap(M: Monoid<R>, s: Kind<F, S>, f: (S) -> R): R = foldable.run { M.foldMap(s, f) }
+            override fun <R> foldMap(M: Monoid<R>, s: Kind<F, S>, f: (S) -> R): R = foldable.run { s.foldMap(M, f) }
         }
 
     }
@@ -100,7 +100,7 @@ interface Fold<S, A> : FoldOf<S, A> {
     /**
      * Get all targets of the [Fold]
      */
-    fun getAll(M: Monoid<ListK<A>>, s: S): ListK<A> = foldMap(M, s, { ListK.pure(it) })
+    fun getAll(M: Monoid<ListK<A>>, s: S): ListK<A> = foldMap(M, s, { ListK.just(it) })
 
     /**
      * Join two [Fold] with the same target

@@ -19,7 +19,8 @@ class ReducibleTests : UnitSpec() {
         val nonEmptyReducible = object : NonEmptyReducible<ForNonEmptyList, ForListK> {
             override fun FG(): Foldable<ForListK> = ListK.foldable()
 
-            override fun <A> split(fa: Kind<ForNonEmptyList, A>): Tuple2<A, Kind<ForListK, A>> = Tuple2(fa.fix().head, ListK(fa.fix().tail))
+            override fun <A> Kind<ForNonEmptyList, A>.split(): Tuple2<A, Kind<ForListK, A>> =
+                    Tuple2(fix().head, ListK(fix().tail))
         }
 
         testLaws(ReducibleLaws.laws(
@@ -34,7 +35,7 @@ class ReducibleTests : UnitSpec() {
 
                 "Reducible<NonEmptyList> default size implementation" {
                     val nel = NonEmptyList.of(1, 2, 3)
-                    LongMonoidInstance.size(nel) shouldBe nel.size.toLong()
+                    nel.size(LongMonoidInstance) shouldBe nel.size.toLong()
                 }
 
                 "Reducible<NonEmptyList>" {
@@ -42,15 +43,15 @@ class ReducibleTests : UnitSpec() {
                     val tail = (2 to 10).toList()
                     val total = 1 + tail.sum()
                     val nel = NonEmptyList(1, tail)
-                    reduceLeft(nel, { a, b -> a + b }) shouldBe total
-                    reduceRight(nel, { x, ly -> ly.map({ x + it }) }).value() shouldBe (total)
-                    reduce(nel) shouldBe total
+                    nel.reduceLeft({ a, b -> a + b }) shouldBe total
+                    nel.reduceRight({ x, ly -> ly.map({ x + it }) }).value() shouldBe (total)
+                    nel.reduce(this) shouldBe total
 
                     // more basic checks
                     val names = NonEmptyList.of("Aaron", "Betty", "Calvin", "Deirdra")
                     val totalLength = names.all.map({ it.length }).sum()
-                    reduceLeftTo(names, { it.length }, { sum, s -> s.length + sum }) shouldBe totalLength
-                    reduceMap(names, { it.length }) shouldBe totalLength
+                    names.reduceLeftTo({ it.length }, { sum, s -> s.length + sum }) shouldBe totalLength
+                    names.reduceMap(this, { it.length }) shouldBe totalLength
                 }
             }
         }

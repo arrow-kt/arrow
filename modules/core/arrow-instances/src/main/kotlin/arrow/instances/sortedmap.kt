@@ -8,23 +8,23 @@ import arrow.typeclasses.*
 
 @instance(SortedMapK::class)
 interface SortedMapKFunctorInstance<A : Comparable<A>> : Functor<SortedMapKPartialOf<A>> {
-    override fun <B, C> map(fa: Kind<SortedMapKPartialOf<A>, B>, f: (B) -> C): SortedMapK<A, C> =
-            fa.fix().map(f)
+    override fun <B, C> SortedMapKOf<A, B>.map(f: (B) -> C): SortedMapK<A, C> =
+            fix().map(f)
 }
 
 @instance(SortedMapK::class)
 interface SortedMapKFoldableInstance<A : Comparable<A>> : Foldable<SortedMapKPartialOf<A>> {
-    override fun <B, C> foldLeft(fa: Kind<SortedMapKPartialOf<A>, B>, b: C, f: (C, B) -> C): C =
-            fa.fix().foldLeft(b, f)
+    override fun <B, C> Kind<SortedMapKPartialOf<A>, B>.foldLeft(b: C, f: (C, B) -> C): C =
+            fix().foldLeft(b, f)
 
-    override fun <B, C> foldRight(fa: Kind<SortedMapKPartialOf<A>, B>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
-            fa.fix().foldRight(lb, f)
+    override fun <B, C> Kind<SortedMapKPartialOf<A>, B>.foldRight(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
+            fix().foldRight(lb, f)
 }
 
 @instance(SortedMapK::class)
 interface SortedMapKTraverseInstance<A : Comparable<A>> : SortedMapKFoldableInstance<A>, Traverse<SortedMapKPartialOf<A>> {
-    override fun <G, B, C> Applicative<G>.traverse(fa: Kind<SortedMapKPartialOf<A>, B>, f: (B) -> Kind<G, C>): Kind<G, Kind<SortedMapKPartialOf<A>, C>> =
-            fa.fix().traverse(f, this)
+    override fun <G, B, C> SortedMapKOf<A, B>.traverse(AP: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Kind<SortedMapKPartialOf<A>, C>> =
+            fix().traverse(AP, f)
 }
 
 @instance(SortedMapK::class)
@@ -45,6 +45,6 @@ interface SortedMapKMonoidInstance<A : Comparable<A>, B> : SortedMapKSemigroupIn
 
 @instance(SortedMapK::class)
 interface SortedMapKShowInstance<A : Comparable<A>, B> : Show<SortedMapKOf<A, B>> {
-    override fun show(a: SortedMapKOf<A, B>): String =
-            a.toString()
+    override fun SortedMapKOf<A, B>.show(): String =
+            toString()
 }

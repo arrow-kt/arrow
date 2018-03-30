@@ -114,7 +114,7 @@ The equivalent code without using comprehensions would look like:
 ```kotlin:ank
 IO.invoke { 1 }
   .flatMap { result ->
-    IO.pure(result + 1)
+    IO.just(result + 1)
   }
 .fix().unsafeRunSync()
 ```
@@ -196,7 +196,7 @@ Arrow uses the same abstraction as coroutines to group threads and other context
 There are multiple default values and wrappers for common cases in both the standard library, and the extension library [kotlinx.coroutines](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/-coroutine-dispatcher/index.html).
 
 In any `binding()` block there is a helper function `bindIn()` that takes a `CoroutineContext` as a parameter and can return any value.
-This value will be lifted into a data type using `pure()`.
+This value will be lifted into a data type using `just()`.
 
 The functions will cause a new coroutine to start on the `CoroutineContext` passed as a parameter to then `bind()` to await for its completion.
 
@@ -207,7 +207,7 @@ val computationThreadContext = newSingleThreadContext("Computation")
 fun getLineLengthAverage(path: FilePath): IO<List<String>> = 
   IO.monadError().bindingCatch {
     
-    // Implicitly wrap the result of a synchronous operation into IO.pure() using bindIn
+    // Implicitly wrap the result of a synchronous operation into IO.just() using bindIn
     val file = bindIn(ioThreadContext) { getFile(path) }    
     val lines = bindIn(computationThreadContext) { file.readLines() }
     

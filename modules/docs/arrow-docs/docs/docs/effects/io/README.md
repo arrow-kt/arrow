@@ -112,12 +112,12 @@ IO { 1 }
 As we have seen above, the way of constructing an `IO` affects its behavior when run multiple times.
 Understanding the constructors is key to mastering `IO`.
 
-### pure
+### just
 
 Used to wrap single values. It creates an`IO`that returns an existing value.
 
 ```kotlin
-IO.pure(1)
+IO.just(1)
   .unsafeRunSync()
 ```
 
@@ -169,7 +169,7 @@ IO.merge ({ 1 }, { 2 }, { throw RuntimeException("Boom!") })
 Used to defer the evaluation of an existing `IO`.
 
 ```kotlin
-IO.suspend { IO.pure(1) }
+IO.suspend { IO.just(1) }
   .attempt()
   .unsafeRunSync()
 ```
@@ -225,7 +225,7 @@ IO.monad().binding {
 
 ### A#liftIO
 
-Puts the value `A` inside an `IO<A>` using `pure`.
+Puts the value `A` inside an `IO<A>` using `just`.
 
 ```kotlin
 1.liftIO()

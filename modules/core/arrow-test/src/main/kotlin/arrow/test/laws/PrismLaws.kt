@@ -13,7 +13,7 @@ import io.kotlintest.properties.forAll
 
 object PrismLaws {
 
-    inline fun <reified A, reified B> laws(prism: Prism<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQOptionB: Eq<Option<B>>): List<Law> = listOf(
+    inline fun <A, B> laws(prism: Prism<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQOptionB: Eq<Option<B>>): List<Law> = listOf(
             Law("Prism law: partial round trip one way", { prism.partialRoundTripOneWay(aGen, EQA) }),
             Law("Prism law: round trip other way", { prism.roundTripOtherWay(bGen, EQOptionB) }),
             Law("Prism law: modify identity", { prism.modifyIdentity(aGen, EQA) }),
@@ -52,7 +52,7 @@ object PrismLaws {
 
     fun <A, B> Prism<A, B>.consistentModifyModifyFId(aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>): Unit =
             forAll(aGen, funcGen, { a, f ->
-                modifyF(Id.applicative(), a, { Id.pure(f(it)) }).value().equalUnderTheLaw(modify(a, f), EQA)
+                modifyF(Id.applicative(), a, { Id.just(f(it)) }).value().equalUnderTheLaw(modify(a, f), EQA)
             })
 
     fun <A, B> Prism<A, B>.consistentGetOptionModifyId(aGen: Gen<A>, EQOptionB: Eq<Option<B>>): Unit =

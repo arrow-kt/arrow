@@ -7,6 +7,7 @@ import arrow.core.Tuple2
 import arrow.data.*
 import arrow.instance
 import arrow.typeclasses.*
+import arrow.data.combineK as sequenceCombineK
 
 @instance(SequenceK::class)
 interface SequenceKSemigroupInstance<A> : Semigroup<SequenceK<A>> {
@@ -34,80 +35,80 @@ interface SequenceKEqInstance<A> : Eq<SequenceK<A>> {
 
 @instance(SequenceK::class)
 interface SequenceKShowInstance<A> : Show<SequenceK<A>> {
-    override fun show(a: SequenceK<A>): String =
-            a.toString()
+    override fun SequenceK<A>.show(): String =
+            toString()
 }
 
 @instance(SequenceK::class)
 interface SequenceKFunctorInstance : Functor<ForSequenceK> {
-    override fun <A, B> map(fa: SequenceKOf<A>, f: kotlin.Function1<A, B>): SequenceK<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForSequenceK, A>.map(f: (A) -> B): SequenceK<B> =
+            fix().map(f)
 }
 
 @instance(SequenceK::class)
 interface SequenceKApplicativeInstance : Applicative<ForSequenceK> {
-    override fun <A, B> ap(fa: SequenceKOf<A>, ff: SequenceKOf<kotlin.Function1<A, B>>): SequenceK<B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<ForSequenceK, A>.ap(ff: Kind<ForSequenceK, (A) -> B>): SequenceK<B> =
+            fix().ap(ff)
 
-    override fun <A, B> map(fa: SequenceKOf<A>, f: kotlin.Function1<A, B>): SequenceK<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForSequenceK, A>.map(f: (A) -> B): SequenceK<B> =
+            fix().map(f)
 
-    override fun <A, B, Z> map2(fa: SequenceKOf<A>, fb: SequenceKOf<B>, f: kotlin.Function1<Tuple2<A, B>, Z>): SequenceK<Z> =
-            fa.fix().map2(fb, f)
+    override fun <A, B, Z> Kind<ForSequenceK, A>.map2(fb: Kind<ForSequenceK, B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
+            fix().map2(fb, f)
 
-    override fun <A> pure(a: A): SequenceK<A> =
-            SequenceK.pure(a)
+    override fun <A> just(a: A): SequenceK<A> =
+            SequenceK.just(a)
 }
 
 @instance(SequenceK::class)
 interface SequenceKMonadInstance : Monad<ForSequenceK> {
-    override fun <A, B> ap(fa: SequenceKOf<A>, ff: SequenceKOf<kotlin.Function1<A, B>>): SequenceK<B> =
-            fa.fix().ap(ff)
+    override fun <A, B> Kind<ForSequenceK, A>.ap(ff: Kind<ForSequenceK, (A) -> B>): SequenceK<B> =
+            fix().ap(ff)
 
-    override fun <A, B> flatMap(fa: SequenceKOf<A>, f: kotlin.Function1<A, SequenceKOf<B>>): SequenceK<B> =
-            fa.fix().flatMap(f)
+    override fun <A, B> Kind<ForSequenceK, A>.flatMap(f: (A) -> Kind<ForSequenceK, B>): SequenceK<B> =
+            fix().flatMap(f)
 
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, SequenceKOf<Either<A, B>>>): SequenceK<B> =
             SequenceK.tailRecM(a, f)
 
-    override fun <A, B> map(fa: SequenceKOf<A>, f: kotlin.Function1<A, B>): SequenceK<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForSequenceK, A>.map(f: (A) -> B): SequenceK<B> =
+            fix().map(f)
 
-    override fun <A, B, Z> map2(fa: SequenceKOf<A>, fb: SequenceKOf<B>, f: kotlin.Function1<Tuple2<A, B>, Z>): SequenceK<Z> =
-            fa.fix().map2(fb, f)
+    override fun <A, B, Z> Kind<ForSequenceK, A>.map2(fb: Kind<ForSequenceK, B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
+            fix().map2(fb, f)
 
-    override fun <A> pure(a: A): SequenceK<A> =
-            SequenceK.pure(a)
+    override fun <A> just(a: A): SequenceK<A> =
+            SequenceK.just(a)
 }
 
 @instance(SequenceK::class)
 interface SequenceKFoldableInstance : Foldable<ForSequenceK> {
-    override fun <A, B> foldLeft(fa: SequenceKOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
-            fa.fix().foldLeft(b, f)
+    override fun <A, B> Kind<ForSequenceK, A>.foldLeft(b: B, f: (B, A) -> B): B =
+            fix().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: SequenceKOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
-            fa.fix().foldRight(lb, f)
+    override fun <A, B> Kind<ForSequenceK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+            fix().foldRight(lb, f)
 }
 
 @instance(SequenceK::class)
 interface SequenceKTraverseInstance : Traverse<ForSequenceK> {
-    override fun <A, B> map(fa: SequenceKOf<A>, f: kotlin.Function1<A, B>): SequenceK<B> =
-            fa.fix().map(f)
+    override fun <A, B> Kind<ForSequenceK, A>.map(f: (A) -> B): SequenceK<B> =
+            fix().map(f)
 
-    override fun <G, A, B> Applicative<G>.traverse(fa: SequenceKOf<A>, f: kotlin.Function1<A, Kind<G, B>>): Kind<G, SequenceK<B>> =
-            fa.fix().traverse(f, this)
+    override fun <G, A, B> Kind<ForSequenceK, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, SequenceK<B>> =
+            fix().traverse(AP, f)
 
-    override fun <A, B> foldLeft(fa: SequenceKOf<A>, b: B, f: kotlin.Function2<B, A, B>): B =
-            fa.fix().foldLeft(b, f)
+    override fun <A, B> Kind<ForSequenceK, A>.foldLeft(b: B, f: (B, A) -> B): B =
+            fix().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: SequenceKOf<A>, lb: Eval<B>, f: kotlin.Function2<A, Eval<B>, Eval<B>>): Eval<B> =
-            fa.fix().foldRight(lb, f)
+    override fun <A, B> Kind<ForSequenceK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+            fix().foldRight(lb, f)
 }
 
 @instance(SequenceK::class)
 interface SequenceKSemigroupKInstance : SemigroupK<ForSequenceK> {
-    override fun <A> combineK(x: SequenceKOf<A>, y: SequenceKOf<A>): SequenceK<A> =
-            x.fix().combineK(y)
+    override fun <A> Kind<ForSequenceK, A>.combineK(y: Kind<ForSequenceK, A>): SequenceK<A> =
+            fix().sequenceCombineK(y)
 }
 
 @instance(SequenceK::class)
@@ -115,6 +116,6 @@ interface SequenceKMonoidKInstance : MonoidK<ForSequenceK> {
     override fun <A> empty(): SequenceK<A> =
             SequenceK.empty()
 
-    override fun <A> combineK(x: SequenceKOf<A>, y: SequenceKOf<A>): SequenceK<A> =
-            x.fix().combineK(y)
+    override fun <A> Kind<ForSequenceK, A>.combineK(y: Kind<ForSequenceK, A>): SequenceK<A> =
+            fix().sequenceCombineK(y)
 }

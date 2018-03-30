@@ -57,7 +57,7 @@ class OptionInstancesTest : UnitSpec() {
                 EQB = Eq.any(),
                 bMonoid = object : Monoid<Either<Unit, Int>> {
                     override fun Either<Unit, Int>.combine(b: Either<Unit, Int>): Either<Unit, Int> =
-                            Either.applicative<Unit>().map2(this, b) { (a, b) -> a + b }.fix()
+                            Either.applicative<Unit>().run { this@combine.map2(b) { (a, b) -> a + b }.fix() }
 
                     override fun empty(): Either<Unit, Int> = Right(0)
                 }

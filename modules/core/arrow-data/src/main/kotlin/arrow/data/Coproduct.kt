@@ -1,7 +1,10 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.Left
+import arrow.core.Right
 import arrow.higherkind
 import arrow.typeclasses.*
 
@@ -13,8 +16,8 @@ data class Coproduct<F, G, A>(val run: Either<Kind<F, A>, Kind<G, A>>) : Coprodu
 
     fun <B> coflatMap(CF: Comonad<F>, CG: Comonad<G>, f: (Coproduct<F, G, A>) -> B): Coproduct<F, G, B> =
             Coproduct(run.bimap(
-                    { CF.coflatMap(it, { f(Coproduct(Left(it))) }) },
-                    { CG.coflatMap(it, { f(Coproduct(Right(it))) }) }
+                    { CF.run { it.coflatMap({ f(Coproduct(Left(it))) }) } },
+                    { CG.run { it.coflatMap({ f(Coproduct(Right(it))) }) } }
             ))
 
     fun extract(CF: Comonad<F>, CG: Comonad<G>): A =
@@ -24,23 +27,31 @@ data class Coproduct<F, G, A>(val run: Either<Kind<F, A>, Kind<G, A>>) : Coprodu
             run.fold({ f(it) }, { g(it) })
 
     fun <B> foldLeft(b: B, f: (B, A) -> B, FF: Foldable<F>, FG: Foldable<G>): B =
-            run.fold({ FF.foldLeft(it, b, f) }, { FG.foldLeft(it, b, f) })
+            run.fold({ FF.run { it.foldLeft(b, f) } }, { FG.run { it.foldLeft(b, f) } })
 
     fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>, FF: Foldable<F>, FG: Foldable<G>): Eval<B> =
-            run.fold({ FF.foldRight(it, lb, f) }, { FG.foldRight(it, lb, f) })
+            run.fold({ FF.run { it.foldRight(lb, f) } }, { FG.run { it.foldRight(lb, f) } })
 
-    fun <H, B> traverse(GA: Applicative<H>, FT: Traverse<F>, GT: Traverse<G>, f: (A) -> Kind<H, B>): Kind<H, Coproduct<F, G, B>> =
-            run.fold({
-                GA.map(FT.run { GA.traverse(it, f) }, { Coproduct<F, G, B>(Left(it)) })
-            }, {
-                GA.map(GT.run { GA.traverse(it, f) }, { Coproduct<F, G, B>(Right(it)) })
-            })
+    fun <H, B> traverse(GA: Applicative<H>, FT: Traverse<F>, GT: Traverse<G>, f: (A) -> Kind<H, B>): Kind<H, Coproduct<F, G, B>> = GA.run {
+        run.fold({
+            FT.run { it.traverse(GA, f) }.map({ Coproduct<F, G, B>(Left(it)) })
+        }, {
+            GT.run { it.traverse(GA, f) }.map({ Coproduct<F, G, B>(Right(it)) })
+        })
+    }
 
     companion object {
-        inline operator fun <reified F, reified G, A> invoke(run: Either<Kind<F, A>, Kind<G, A>>): Coproduct<F, G, A> =
+        operator fun <F, G, A> invoke(run: Either<Kind<F, A>, Kind<G, A>>): Coproduct<F, G, A> =
                 Coproduct(run)
     }
 }
 
-inline fun <reified F, reified G, A> Either<Kind<F, A>, Kind<G, A>>.coproduct(): Coproduct<F, G, A> =
+fun <F, G, A> Either<Kind<F, A>, Kind<G, A>>.coproduct(): Coproduct<F, G, A> =
         Coproduct(this)
+
+fun <F, G, H> FunctionK<F, G>.or(h: FunctionK<H, G>): FunctionK<CoproductPartialOf<F, H>, G> =
+        object : FunctionK<CoproductPartialOf<F, H>, G> {
+            override fun <A> invoke(fa: CoproductOf<F, H, A>): Kind<G, A> {
+                return fa.fix().fold(this@or, h)
+            }
+        }
