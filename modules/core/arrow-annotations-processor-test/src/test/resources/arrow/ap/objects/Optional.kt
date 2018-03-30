@@ -1,7 +1,8 @@
 package `arrow`.`ap`.`objects`
 
-import arrow.syntax.either.*
-import arrow.syntax.option.toOption
+import arrow.core.left
+import arrow.core.right
+import arrow.core.toOption
 
 fun optionalNullableOptional(): arrow.optics.Optional<`arrow`.`ap`.`objects`.`Optional`, `kotlin`.`String`> = arrow.optics.Optional(
   getOrModify = { optional: `arrow`.`ap`.`objects`.`Optional` -> optional.`nullable`?.right() ?: optional.left() },
