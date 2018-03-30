@@ -24,7 +24,7 @@ interface SortedMapKFoldableInstance<A : Comparable<A>> : Foldable<SortedMapKPar
 @instance(SortedMapK::class)
 interface SortedMapKTraverseInstance<A : Comparable<A>> : SortedMapKFoldableInstance<A>, Traverse<SortedMapKPartialOf<A>> {
     override fun <G, B, C> SortedMapKOf<A, B>.traverse(AP: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Kind<SortedMapKPartialOf<A>, C>> =
-            fix().traverse(f, AP)
+            fix().traverse(AP, f)
 }
 
 @instance(SortedMapK::class)
