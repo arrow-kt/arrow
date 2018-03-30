@@ -179,31 +179,31 @@ return list.map(f)
 
 Higher kinds are also used to model functions that require for a datatype to implement a typeclass. This way you can create functions that abstract behavior (defined by a typeclass) and allow callers to define which datatype they'd like to apply it to.
 
-Let's use the typeclass [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}), that contains the constructor function `pure()`.
+Let's use the typeclass [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}), that contains the constructor function `just()`.
 
 ```kotlin
 interface Applicative<F>: Functor<F> {
 
   // Constructs the current datatype with a value of type A inside
-  fun <A> pure(a: A): Kind<F, A>
+  fun <A> just(a: A): Kind<F, A>
   
   /* ... */
 }
 ```
 
-Once we have this typeclass behavior define we can now write a function that's parametrized for any `F` that has one instance of `Applicative`. The function uses the constructor `pure` to create a value of type `Kind<F, User>`, effectively generifying the return on any container `F`.
+Once we have this typeclass behavior define we can now write a function that's parametrized for any `F` that has one instance of `Applicative`. The function uses the constructor `just` to create a value of type `Kind<F, User>`, effectively generifying the return on any container `F`.
 
 ```kotlin
 fun <F> Applicative<F>.randomUserStructure(f: (Int) -> User): Kind<F, User> =
-  AP.pure(f(Math.random()))
+  AP.just(f(Math.random()))
 ```
 
-Now lets create a simple example instance of `Applicative` where our `F` is `ListK`. This implementation of a `pure` constructor is trivial for lists, as it just requires wrapping the value.
+Now lets create a simple example instance of `Applicative` where our `F` is `ListK`. This implementation of a `just` constructor is trivial for lists, as it just requires wrapping the value.
 
 ```kotlin
 @instance
 interface ListKApplicativeInstance : Applicative<ForListK> {
-  override fun <A> pure(a: A): Kind<ForListK, A> = ListK(listOf(a))
+  override fun <A> just(a: A): Kind<ForListK, A> = ListK(listOf(a))
   
   /* ... */
 }

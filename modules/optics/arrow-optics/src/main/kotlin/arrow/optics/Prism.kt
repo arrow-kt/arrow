@@ -87,7 +87,7 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
      */
     fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FA.run {
         getOrModify(s).fold(
-                ::pure,
+                ::just,
                 { f(it).map(::reverseGet) }
         )
     }
@@ -98,7 +98,7 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
     fun <F> liftF(FA: Applicative<F>, f: (A) -> Kind<F, B>): (S) -> Kind<F, T> = FA.run {
         { s ->
             getOrModify(s).fold(
-                    ::pure,
+                    ::just,
                     { f(it).map(::reverseGet) }
             )
         }
@@ -226,7 +226,7 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
     fun asTraversal(): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
         override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FA.run {
             getOrModify(s).fold(
-                    ::pure,
+                    ::just,
                     { f(it).map(this@PPrism::reverseGet) }
             )
         }

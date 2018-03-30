@@ -55,8 +55,8 @@ interface ListKApplicativeInstance : Applicative<ForListK> {
     override fun <A, B, Z> Kind<ForListK, A>.map2(fb: Kind<ForListK, B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
             fix().map2(fb, f)
 
-    override fun <A> pure(a: A): ListK<A> =
-            ListK.pure(a)
+    override fun <A> just(a: A): ListK<A> =
+            ListK.just(a)
 }
 
 @instance(ListK::class)
@@ -76,8 +76,8 @@ interface ListKMonadInstance : Monad<ForListK> {
     override fun <A, B, Z> Kind<ForListK, A>.map2(fb: Kind<ForListK, B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
             fix().map2(fb, f)
 
-    override fun <A> pure(a: A): ListK<A> =
-            ListK.pure(a)
+    override fun <A> just(a: A): ListK<A> =
+            ListK.just(a)
 }
 
 @instance(ListK::class)

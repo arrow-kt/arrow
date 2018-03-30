@@ -43,7 +43,7 @@ data class MapK<K, out A>(val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> by map {
             this.map.foldLeft(b) { m, (k, v) -> f(m.k(), Tuple2(k, v)) }.k()
 
     fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, MapK<K, B>> = GA.run {
-        (Foldable.iterateRight(map.iterator(), Eval.always { pure(emptyMap<K, B>().k()) }))({ kv, lbuf ->
+        (Foldable.iterateRight(map.iterator(), Eval.always { just(emptyMap<K, B>().k()) }))({ kv, lbuf ->
             f(kv.value).map2Eval(lbuf) { (mapOf(kv.key to it.a).k() + it.b).k() }
         }).value()
     }

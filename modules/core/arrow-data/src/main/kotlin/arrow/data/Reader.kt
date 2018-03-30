@@ -115,7 +115,7 @@ fun Reader(): ReaderApi = ReaderApi
 
 object ReaderApi {
 
-    fun <D, A> pure(x: A): Reader<D, A> = ReaderT.pure(IdBimonad, x)
+    fun <D, A> just(x: A): Reader<D, A> = ReaderT.just(IdBimonad, x)
 
     fun <D> ask(): Reader<D, D> = ReaderT.ask(IdBimonad)
 

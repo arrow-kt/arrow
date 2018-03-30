@@ -18,7 +18,7 @@ interface ConstApplicativeInstance<A> : Applicative<ConstPartialOf<A>> {
 
     override fun <T, U> Kind<ConstPartialOf<A>, T>.map(f: (T) -> U): Const<A, U> = fix().retag()
 
-    override fun <T> pure(a: T): Const<A, T> = object : ConstMonoidInstance<A, T> {
+    override fun <T> just(a: T): Const<A, T> = object : ConstMonoidInstance<A, T> {
         override fun SA(): Monoid<A> = MA()
     }.empty().fix()
 

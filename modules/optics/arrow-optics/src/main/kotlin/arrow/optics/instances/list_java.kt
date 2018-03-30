@@ -40,7 +40,7 @@ interface ListFilterIndexInstance<A> : FilterIndex<List<A>, Int, A> {
                 ListK.traverse().run {
                     FA.run {
                         s.mapIndexed { index, a -> a toT index }.k().traverse(this, { (a, j) ->
-                            if (p(j)) f(a) else pure(a)
+                            if (p(j)) f(a) else just(a)
                         })
                                 .let {
                                     it.map() {

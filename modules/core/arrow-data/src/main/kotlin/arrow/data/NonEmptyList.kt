@@ -92,7 +92,7 @@ class NonEmptyList<out A> private constructor(
         fun <A> fromList(l: List<A>): Option<NonEmptyList<A>> = if (l.isEmpty()) None else Some(NonEmptyList(l))
         fun <A> fromListUnsafe(l: List<A>): NonEmptyList<A> = NonEmptyList(l)
 
-        fun <A> pure(a: A): NonEmptyList<A> = a.nel()
+        fun <A> just(a: A): NonEmptyList<A> = a.nel()
 
         @Suppress("UNCHECKED_CAST")
         private tailrec fun <A, B> go(

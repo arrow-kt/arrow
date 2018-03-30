@@ -56,8 +56,8 @@ interface SequenceKApplicativeInstance : Applicative<ForSequenceK> {
     override fun <A, B, Z> Kind<ForSequenceK, A>.map2(fb: Kind<ForSequenceK, B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
             fix().map2(fb, f)
 
-    override fun <A> pure(a: A): SequenceK<A> =
-            SequenceK.pure(a)
+    override fun <A> just(a: A): SequenceK<A> =
+            SequenceK.just(a)
 }
 
 @instance(SequenceK::class)
@@ -77,8 +77,8 @@ interface SequenceKMonadInstance : Monad<ForSequenceK> {
     override fun <A, B, Z> Kind<ForSequenceK, A>.map2(fb: Kind<ForSequenceK, B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
             fix().map2(fb, f)
 
-    override fun <A> pure(a: A): SequenceK<A> =
-            SequenceK.pure(a)
+    override fun <A> just(a: A): SequenceK<A> =
+            SequenceK.just(a)
 }
 
 @instance(SequenceK::class)

@@ -23,7 +23,7 @@ interface Tuple2ApplicativeInstance<F> : Tuple2FunctorInstance<F>, Applicative<T
     override fun <A, B> Kind<Tuple2PartialOf<F>, A>.ap(ff: Kind<Tuple2PartialOf<F>, (A) -> B>) =
             fix().ap(ff.fix())
 
-    override fun <A> pure(a: A) =
+    override fun <A> just(a: A) =
             MF().empty() toT a
 }
 
@@ -42,7 +42,7 @@ interface Tuple2MonadInstance<F> : Tuple2ApplicativeInstance<F>, Monad<Tuple2Par
         val b = f(a).fix().b
         return when (b) {
             is Left -> tailRecM(b.a, f)
-            is Right -> pure(b.b)
+            is Right -> just(b.b)
         }
     }
 }

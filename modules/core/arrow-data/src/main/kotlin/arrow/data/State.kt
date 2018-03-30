@@ -58,7 +58,7 @@ fun <S, A> StateFunOf<S, A>.toState(): State<S, A> = State(this)
 fun <S, T, P1, R> State<S, T>.map(sx: State<S, P1>, f: (T, P1) -> R): State<S, R> =
         flatMap (IdBimonad, { t -> sx.map { x -> f(t, x) } }).fix()
 
-fun <S, T, R> State<S, T>.map(f: (T) -> R): State<S, R> = flatMap(IdBimonad, { t -> StateApi.pure<S, R>(f(t)) }).fix()
+fun <S, T, R> State<S, T>.map(f: (T) -> R): State<S, R> = flatMap(IdBimonad, { t -> StateApi.just<S, R>(f(t)) }).fix()
 
 /**
  * Alias for [StateT.run] `StateT<ForId, S, A>`
@@ -89,7 +89,7 @@ fun State() = StateApi
 
 object StateApi {
 
-    fun <S, T> pure(t: T): State<S, T> = StateT.pure(IdBimonad, t)
+    fun <S, T> just(t: T): State<S, T> = StateT.just(IdBimonad, t)
 
     /**
      * Return input without modifying it.
@@ -118,7 +118,7 @@ object StateApi {
     fun <S> set(s: S): State<S, Unit> = StateT.set(IdBimonad, s)
 }
 
-fun <R, S, T> List<T>.stateTraverse(f: (T) -> State<S, R>): State<S, List<R>> = foldRight(StateApi.pure(emptyList())) { i: T, accumulator: State<S, List<R>> ->
+fun <R, S, T> List<T>.stateTraverse(f: (T) -> State<S, R>): State<S, List<R>> = foldRight(StateApi.just(emptyList())) { i: T, accumulator: State<S, List<R>> ->
     f(i).map(accumulator, ({ head: R, tail: List<R> ->
         listOf(head) + tail
     }))

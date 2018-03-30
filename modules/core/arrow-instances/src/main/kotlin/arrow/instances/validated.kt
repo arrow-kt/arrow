@@ -17,7 +17,7 @@ interface ValidatedApplicativeInstance<E> : ValidatedFunctorInstance<E>, Applica
 
     fun SE(): Semigroup<E>
 
-    override fun <A> pure(a: A): Validated<E, A> = Valid(a)
+    override fun <A> just(a: A): Validated<E, A> = Valid(a)
 
     override fun <A, B> Kind<ValidatedPartialOf<E>, A>.map(f: (A) -> B): Validated<E, B> = fix().map(f)
 

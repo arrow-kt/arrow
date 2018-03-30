@@ -14,7 +14,7 @@ val IdBimonad: Bimonad<ForId> = object : Bimonad<ForId> {
     override fun <A> Kind<ForId, A>.extract(): A =
             fix().extract()
 
-    override fun <A> pure(a: A): Kind<ForId, A> =
+    override fun <A> just(a: A): Kind<ForId, A> =
             Id(a)
 
     override fun <A, B> Kind<ForId, A>.ap(ff: Kind<ForId, (A) -> B>): Kind<ForId, B> =

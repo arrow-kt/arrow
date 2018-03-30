@@ -23,7 +23,7 @@ data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, 
 
         inline operator fun <F, A, B> invoke(value: Kind<F, Either<A, B>>): EitherT<F, A, B> = EitherT(value)
 
-        fun <F, A, B> pure(MF: Applicative<F>, b: B): EitherT<F, A, B> = right(MF, b)
+        fun <F, A, B> just(MF: Applicative<F>, b: B): EitherT<F, A, B> = right(MF, b)
 
         fun <F, L, A, B> tailRecM(MF: Monad<F>, a: A, f: (A) -> EitherTOf<F, L, Either<A, B>>): EitherT<F, L, B> = MF.run {
             EitherT(tailRecM(a, {
@@ -42,12 +42,12 @@ data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, 
             }))
         }
 
-        fun <F, A, B> right(MF: Applicative<F>, b: B): EitherT<F, A, B> = EitherT(MF.pure(Right(b)))
+        fun <F, A, B> right(MF: Applicative<F>, b: B): EitherT<F, A, B> = EitherT(MF.just(Right(b)))
 
-        fun <F, A, B> left(MF: Applicative<F>, a: A): EitherT<F, A, B> = EitherT(MF.pure(Left(a)))
+        fun <F, A, B> left(MF: Applicative<F>, a: A): EitherT<F, A, B> = EitherT(MF.just(Left(a)))
 
         inline fun <F, A, B> fromEither(AP: Applicative<F>, value: Either<A, B>): EitherT<F, A, B> =
-                EitherT(AP.pure(value))
+                EitherT(AP.just(value))
     }
 
     inline fun <C> fold(FF: Functor<F>, crossinline l: (A) -> C, crossinline r: (B) -> C): Kind<F, C> = FF.run {
@@ -58,7 +58,7 @@ data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, 
             flatMapF(MF, { it -> f(it).value })
 
     inline fun <C> flatMapF(MF: Monad<F>, crossinline f: (B) -> Kind<F, Either<A, C>>): EitherT<F, A, C> = MF.run {
-        EitherT(value.flatMap({ either -> either.fold({ MF.pure(Left(it)) }, { f(it) }) }))
+        EitherT(value.flatMap({ either -> either.fold({ MF.just(Left(it)) }, { f(it) }) }))
     }
 
     inline fun <C> cata(FF: Functor<F>, crossinline l: (A) -> C, crossinline r: (B) -> C): Kind<F, C> = fold(FF, l, r)
@@ -95,7 +95,7 @@ data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, 
         EitherT(fix().value.flatMap {
             when (it) {
                 is Either.Left -> y.fix().value
-                is Either.Right -> pure(it)
+                is Either.Right -> just(it)
             }
         })
     }

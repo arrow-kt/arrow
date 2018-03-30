@@ -11,7 +11,7 @@ import arrow.mtl.typeclasses.MonadReader
 @instance(Kleisli::class)
 interface KleisliMonadReaderInstance<F, D> : KleisliMonadInstance<F, D>, MonadReader<KleisliPartialOf<F, D>, D> {
 
-    override fun ask(): Kleisli<F, D, D> = Kleisli({ FF().pure(it) })
+    override fun ask(): Kleisli<F, D, D> = Kleisli({ FF().just(it) })
 
     override fun <A> Kind<KleisliPartialOf<F, D>, A>.local(f: (D) -> D): Kleisli<F, D, A> = fix().local(f)
 

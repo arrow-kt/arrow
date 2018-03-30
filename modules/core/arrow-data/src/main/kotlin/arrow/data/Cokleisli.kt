@@ -31,7 +31,7 @@ data class Cokleisli<F, A, B>(val MM: Comonad<F>, val run: CokleisliFun<F, A, B>
     companion object {
         inline operator fun <F, A, B> invoke(MF: Comonad<F>, noinline run: (Kind<F, A>) -> B): Cokleisli<F, A, B> = Cokleisli(MF, run)
 
-        inline fun <F, A, B> pure(MF: Comonad<F>, b: B): Cokleisli<F, A, B> = Cokleisli(MF, { b })
+        inline fun <F, A, B> just(MF: Comonad<F>, b: B): Cokleisli<F, A, B> = Cokleisli(MF, { b })
 
         inline fun <F, B> ask(MF: Comonad<F>): Cokleisli<F, B, B> = Cokleisli(MF, { MF.run { it.extract() } })
     }

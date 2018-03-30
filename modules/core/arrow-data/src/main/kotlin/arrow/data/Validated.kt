@@ -178,7 +178,7 @@ fun <E, A> Validated<E, A>.handleLeftWith(f: (E) -> ValidatedOf<E, A>): Validate
 fun <G, E, A, B> Validated<E, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> = GA.run {
     when (this@traverse) {
         is Valid -> f(a).map({ Valid(it) })
-        is Invalid -> pure(this@traverse)
+        is Invalid -> just(this@traverse)
 
     }
 }

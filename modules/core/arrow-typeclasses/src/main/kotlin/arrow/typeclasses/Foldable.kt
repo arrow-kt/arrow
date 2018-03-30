@@ -102,7 +102,7 @@ interface Foldable<F> {
      * not otherwise needed.
      */
     fun <G, A, B> Kind<F, A>.traverse_(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Unit> = GA.run {
-        foldRight(always { pure(Unit) }, { a, acc -> f(a).map2Eval(acc) { Unit } }).value()
+        foldRight(always { just(Unit) }, { a, acc -> f(a).map2Eval(acc) { Unit } }).value()
     }
 
     /**
@@ -174,7 +174,7 @@ interface Foldable<F> {
      * entirety of the structure), depending on the G result produced at a given step.
      */
     fun <G, A, B> Kind<F, A>.foldM(M: Monad<G>, z: B, f: (B, A) -> Kind<G, B>): Kind<G, B> = M.run {
-        foldLeft(M.pure(z), { gb, a -> gb.flatMap { f(it, a) } })
+        foldLeft(M.just(z), { gb, a -> gb.flatMap { f(it, a) } })
     }
 
     /**

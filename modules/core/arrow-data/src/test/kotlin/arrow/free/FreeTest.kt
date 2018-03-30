@@ -43,7 +43,7 @@ class FreeTest : UnitSpec() {
 
     private fun stackSafeTestProgram(n: Int, stopAt: Int): Free<Ops.F, Int> = Ops.binding {
         val v = Ops.add(n, 1).bind()
-        val r = bind { if (v < stopAt) stackSafeTestProgram(v, stopAt) else Free.pure(v) }
+        val r = bind { if (v < stopAt) stackSafeTestProgram(v, stopAt) else Free.just(v) }
         r
     }.fix()
 

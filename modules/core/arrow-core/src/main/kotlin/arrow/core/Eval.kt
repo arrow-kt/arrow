@@ -37,11 +37,11 @@ sealed class Eval<out A> : EvalOf<A> {
                 f(a).fix().flatMap { eval: Either<A, B> ->
                     when (eval) {
                         is Either.Left -> tailRecM(eval.a, f)
-                        is Either.Right -> pure(eval.b)
+                        is Either.Right -> just(eval.b)
                     }
                 }
 
-        fun <A> pure(a: A): Eval<A> = now(a)
+        fun <A> just(a: A): Eval<A> = now(a)
 
         fun <A> now(a: A) = Now(a)
 

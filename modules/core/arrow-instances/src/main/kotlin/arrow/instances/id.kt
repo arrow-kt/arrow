@@ -34,8 +34,8 @@ interface IdApplicativeInstance : Applicative<ForId> {
     override fun <A, B> Kind<ForId, A>.map(f: (A) -> B): Id<B> =
             fix().map(f)
 
-    override fun <A> pure(a: A): Id<A> =
-            Id.pure(a)
+    override fun <A> just(a: A): Id<A> =
+            Id.just(a)
 }
 
 @instance(Id::class)
@@ -52,8 +52,8 @@ interface IdMonadInstance : Monad<ForId> {
     override fun <A, B> Kind<ForId, A>.map(f: (A) -> B): Id<B> =
             fix().map(f)
 
-    override fun <A> pure(a: A): Id<A> =
-            Id.pure(a)
+    override fun <A> just(a: A): Id<A> =
+            Id.just(a)
 }
 
 @instance(Id::class)
@@ -82,8 +82,8 @@ interface IdBimonadInstance : Bimonad<ForId> {
     override fun <A, B> Kind<ForId, A>.map(f: (A) -> B): Id<B> =
             fix().map(f)
 
-    override fun <A> pure(a: A): Id<A> =
-            Id.pure(a)
+    override fun <A> just(a: A): Id<A> =
+            Id.just(a)
 
     override fun <A, B> Kind<ForId, A>.coflatMap(f: (Kind<ForId, A>) -> B): Id<B> =
             fix().coflatMap(f)

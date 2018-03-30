@@ -40,7 +40,7 @@ import arrow.core.*
 import arrow.typeclasses.*
 
 // Option is a data class with a single value
-Show.any().show(Option.pure(1))
+Show.any().show(Option.just(1))
 ```
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Show` instances for custom datatypes.

@@ -15,12 +15,12 @@ data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTOf<F, W, 
 
     companion object {
 
-        fun <F, W, A> pure(AF: Applicative<F>, MM: Monoid<W>, a: A) =
-                WriterT(AF.pure(Tuple2(MM.empty(), a)))
+        fun <F, W, A> just(AF: Applicative<F>, MM: Monoid<W>, a: A) =
+                WriterT(AF.just(Tuple2(MM.empty(), a)))
 
-        fun <F, W, A> both(MF: Monad<F>, w: W, a: A) = WriterT(MF.pure(Tuple2(w, a)))
+        fun <F, W, A> both(MF: Monad<F>, w: W, a: A) = WriterT(MF.just(Tuple2(w, a)))
 
-        fun <F, W, A> fromTuple(MF: Monad<F>, z: Tuple2<W, A>) = WriterT(MF.pure(z))
+        fun <F, W, A> fromTuple(MF: Monad<F>, z: Tuple2<W, A>) = WriterT(MF.just(z))
 
         operator fun <F, W, A> invoke(value: Kind<F, Tuple2<W, A>>): WriterT<F, W, A> = WriterT(value)
 
@@ -29,14 +29,14 @@ data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTOf<F, W, 
         }
 
         fun <F, W, A> put(AF: Applicative<F>, a: A, w: W): WriterT<F, W, A> =
-                putT(AF, AF.pure(a), w)
+                putT(AF, AF.just(a), w)
 
         fun <F, W, A> putT2(FF: Functor<F>, vf: Kind<F, A>, w: W): WriterT<F, W, A> = FF.run {
             WriterT(vf.map({ v -> Tuple2(w, v) }))
         }
 
         fun <F, W, A> put2(AF: Applicative<F>, a: A, w: W): WriterT<F, W, A> =
-                putT2(AF, AF.pure(a), w)
+                putT2(AF, AF.just(a), w)
 
         fun <F, W> tell(AF: Applicative<F>, l: W): WriterT<F, W, Unit> = put(AF, Unit, l)
 
@@ -101,7 +101,7 @@ data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTOf<F, W, 
     }
 
     inline fun <B, U> transform(MF: Monad<F>, crossinline f: (Tuple2<W, A>) -> Tuple2<U, B>): WriterT<F, U, B> = MF.run {
-        WriterT(value.flatMap({ pure(f(it)) }))
+        WriterT(value.flatMap({ just(f(it)) }))
     }
 
     fun <B> liftF(AF: Applicative<F>, fa: Kind<F, B>): WriterT<F, W, B> =

@@ -19,7 +19,7 @@ interface KleisliApplicativeInstance<F, D> : KleisliFunctorInstance<F, D>, Appli
 
     override fun FF(): Applicative<F>
 
-    override fun <A> pure(a: A): Kleisli<F, D, A> = Kleisli({ FF().pure(a) })
+    override fun <A> just(a: A): Kleisli<F, D, A> = Kleisli({ FF().just(a) })
 
     override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.map(f: (A) -> B): Kleisli<F, D, B> =
             fix().map(this@KleisliApplicativeInstance.FF(), f)

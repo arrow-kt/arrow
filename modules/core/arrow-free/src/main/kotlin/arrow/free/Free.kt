@@ -14,11 +14,11 @@ inline fun <M, S, A> FreeOf<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M>): Ki
 sealed class Free<S, out A> : FreeOf<S, A> {
 
     companion object {
-        fun <S, A> pure(a: A): Free<S, A> = Pure(a)
+        fun <S, A> just(a: A): Free<S, A> = Pure(a)
 
         fun <S, A> liftF(fa: Kind<S, A>): Free<S, A> = Suspend(fa)
 
-        fun <S, A> defer(value: () -> Free<S, A>): Free<S, A> = pure<S, Unit>(Unit).flatMap { _ -> value() }
+        fun <S, A> defer(value: () -> Free<S, A>): Free<S, A> = just<S, Unit>(Unit).flatMap { _ -> value() }
 
         internal fun <F> functionKF(): FunctionK<F, FreePartialOf<F>> =
                 object : FunctionK<F, FreePartialOf<F>> {
@@ -30,8 +30,8 @@ sealed class Free<S, out A> : FreeOf<S, A> {
         internal fun <F> applicativeF(applicative: Applicative<FreePartialOf<F>>): Applicative<FreePartialOf<F>> =
                 object : Applicative<FreePartialOf<F>> {
 
-                    override fun <A> pure(a: A): Free<F, A> =
-                            Companion.pure(a)
+                    override fun <A> just(a: A): Free<F, A> =
+                            Companion.just(a)
 
                     override fun <A, B> Kind<FreePartialOf<F>, A>.ap(ff: Kind<FreePartialOf<F>, (A) -> B>): Free<F, B> =
                             applicative.run { ap(ff).fix() }
@@ -41,7 +41,7 @@ sealed class Free<S, out A> : FreeOf<S, A> {
     abstract fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B>
 
     data class Pure<S, out A>(val a: A) : Free<S, A>() {
-        override fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B> = pure(f(a))
+        override fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B> = just(f(a))
     }
 
     data class Suspend<S, out A>(val a: Kind<S, A>) : Free<S, A>() {
@@ -82,7 +82,7 @@ fun <M, S, A> Free<S, A>.foldMap(f: FunctionK<S, M>, MM: Monad<M>): Kind<M, A> =
     tailRecM(this@foldMap) {
         val x = it.step()
         when (x) {
-            is Free.Pure<S, A> -> pure(Either.Right(x.a))
+            is Free.Pure<S, A> -> just(Either.Right(x.a))
             is Free.Suspend<S, A> -> f(x.a).map({ Either.Right(it) })
             is Free.FlatMapped<S, A, *> -> {
                 val g = (x.fm as (A) -> Free<S, A>)
@@ -93,7 +93,7 @@ fun <M, S, A> Free<S, A>.foldMap(f: FunctionK<S, M>, MM: Monad<M>): Kind<M, A> =
     }
 }
 
-fun <S, A> A.free(): Free<S, A> = Free.pure<S, A>(this)
+fun <S, A> A.free(): Free<S, A> = Free.just<S, A>(this)
 
 fun <F, A> Free<F, A>.run(M: Monad<F>): Kind<F, A> = this.foldMap(FunctionK.id(), M)
 

@@ -15,7 +15,7 @@ fun <A> DeferredKOf<A>.value(): Deferred<A> = this.fix().deferred
 data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferred<A> by deferred {
 
     fun <B> map(f: (A) -> B): DeferredK<B> =
-            flatMap { a: A -> pure(f(a)) }
+            flatMap { a: A -> just(f(a)) }
 
     fun <B> ap(fa: DeferredKOf<(A) -> B>): DeferredK<B> =
             flatMap { a -> fa.fix().map { ff -> ff(a) } }
@@ -29,7 +29,7 @@ data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferre
         fun unit(): DeferredK<Unit> =
                 CompletableDeferred(Unit).k()
 
-        fun <A> pure(a: A): DeferredK<A> =
+        fun <A> just(a: A): DeferredK<A> =
                 CompletableDeferred(a).k()
 
         fun <A> suspend(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.LAZY, f: suspend () -> A): DeferredK<A> =

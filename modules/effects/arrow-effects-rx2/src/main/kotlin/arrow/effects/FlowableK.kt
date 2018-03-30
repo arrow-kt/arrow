@@ -46,7 +46,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
     }
 
     fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, FlowableK<B>> = GA.run {
-        foldRight(Eval.always { pure(Flowable.empty<B>().k()) }) { a, eval ->
+        foldRight(Eval.always { just(Flowable.empty<B>().k()) }) { a, eval ->
             f(a).map2Eval(eval) { Flowable.concat(Flowable.just<B>(it.a), it.b.flowable).k() }
         }.value()
     }
@@ -58,14 +58,14 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
             flowable.flatMap { cb(Right(it)).value() }.onErrorResumeNext(io.reactivex.functions.Function { cb(Left(it)).value() }).k()
 
     companion object {
-        fun <A> pure(a: A): FlowableK<A> =
+        fun <A> just(a: A): FlowableK<A> =
                 Flowable.just(a).k()
 
         fun <A> raiseError(t: Throwable): FlowableK<A> =
                 Flowable.error<A>(t).k()
 
         operator fun <A> invoke(fa: () -> A): FlowableK<A> =
-                suspend { pure(fa()) }
+                suspend { just(fa()) }
 
         fun <A> suspend(fa: () -> FlowableKOf<A>): FlowableK<A> =
                 Flowable.defer { fa().value() }.k()

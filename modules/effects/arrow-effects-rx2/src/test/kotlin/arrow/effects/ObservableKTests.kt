@@ -48,8 +48,8 @@ class ObservableKTest : UnitSpec() {
         //testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
 
         testLaws(
-                FoldableLaws.laws(ObservableK.foldable(), { ObservableK.pure(it) }, Eq.any()),
-                TraverseLaws.laws(ObservableK.traverse(), ObservableK.functor(), { ObservableK.pure(it) }, EQ())
+                FoldableLaws.laws(ObservableK.foldable(), { ObservableK.just(it) }, Eq.any()),
+                TraverseLaws.laws(ObservableK.traverse(), ObservableK.functor(), { ObservableK.just(it) }, EQ())
         )
 
         "Multi-thread Observables finish correctly" {

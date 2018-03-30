@@ -16,7 +16,7 @@ interface EitherFunctorInstance<L> : Functor<EitherPartialOf<L>> {
 @instance(Either::class)
 interface EitherApplicativeInstance<L> : EitherFunctorInstance<L>, Applicative<EitherPartialOf<L>> {
 
-    override fun <A> pure(a: A): Either<L, A> = Right(a)
+    override fun <A> just(a: A): Either<L, A> = Right(a)
 
     override fun <A, B> Kind<EitherPartialOf<L>, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 
@@ -67,7 +67,7 @@ interface EitherFoldableInstance<L> : Foldable<EitherPartialOf<L>> {
 }
 
 fun <G, A, B, C> EitherOf<A, B>.traverse(f: (B) -> Kind<G, C>, GA: Applicative<G>): Kind<G, Either<A, C>> = GA.run {
-    fix().fold({ pure(Either.Left(it)) }, { f(it).map({ Either.Right(it) }) })
+    fix().fold({ just(Either.Left(it)) }, { f(it).map({ Either.Right(it) }) })
 }
 
 @instance(Either::class)

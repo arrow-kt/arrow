@@ -19,7 +19,7 @@ inline fun <F, A> FreeApplicativeOf<F, A>.foldK(FA: Applicative<F>): Kind<F, A> 
 sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
 
     companion object {
-        fun <F, A> pure(a: A): FreeApplicative<F, A> = Pure(a)
+        fun <F, A> just(a: A): FreeApplicative<F, A> = Pure(a)
 
         fun <F, P, A> ap(fp: FreeApplicative<F, P>, fn: FreeApplicative<F, (P) -> A>): FreeApplicative<F, A> = Ap(fn, fp)
 
@@ -33,8 +33,8 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
                 }
 
         internal fun <F> applicativeF(): Applicative<FreeApplicativePartialOf<F>> = object : Applicative<FreeApplicativePartialOf<F>> {
-            override fun <A> pure(a: A): FreeApplicative<F, A> =
-                    Companion.pure(a)
+            override fun <A> just(a: A): FreeApplicative<F, A> =
+                    Companion.just(a)
 
             override fun <A, B> Kind<FreeApplicativePartialOf<F>, A>.ap(ff: Kind<FreeApplicativePartialOf<F>, (A) -> B>): FreeApplicative<F, B> =
                     Companion.ap(fix(), ff.fix())
@@ -163,11 +163,11 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
 
 private fun <F, G, A> foldArg(node: FreeApplicative<F, A>, f: FunctionK<F, G>, GA: Applicative<G>): Kind<G, A> =
         when (node) {
-            is FreeApplicative.Pure<F, A> -> GA.pure(node.value)
+            is FreeApplicative.Pure<F, A> -> GA.just(node.value)
             else -> {
                 val lift = node as FreeApplicative.Lift<F, A>
                 f(lift.fa)
             }
         }
 
-fun <S, A> A.freeAp(): FreeApplicative<S, A> = FreeApplicative.pure(this)
+fun <S, A> A.freeAp(): FreeApplicative<S, A> = FreeApplicative.just(this)

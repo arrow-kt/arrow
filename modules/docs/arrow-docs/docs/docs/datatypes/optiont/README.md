@@ -96,10 +96,10 @@ Now we've got two new functions in the mix that are going to call a remote servi
 import arrow.effects.*
 
 fun findPerson(personId : Int) : ObservableK<Option<Person>> =
-  ObservableK.pure(Option.fromNullable(personDB.get(personId))) //mock impl for simplicity
+  ObservableK.just(Option.fromNullable(personDB.get(personId))) //mock impl for simplicity
 
 fun findCountry(addressId : Int) : ObservableK<Option<Country>> =
-  ObservableK.pure(
+  ObservableK.just(
     Option.fromNullable(adressDB.get(addressId)).flatMap { it.country }
   ) //mock impl for simplicity
 
@@ -138,16 +138,16 @@ fun getCountryCode(personId: Int): ObservableK<Option<String>> =
         val maybePerson = findPerson(personId).bind()
         val person = maybePerson.fold(
           { ObservableK.raiseError<Person>(NoSuchElementException("...")) },
-          { ObservableK.pure(it) }
+          { ObservableK.just(it) }
         ).bind()
         val address = person.address.fold(
           { ObservableK.raiseError<Address>(NoSuchElementException("...")) },
-          { ObservableK.pure(it) }
+          { ObservableK.just(it) }
         ).bind()
         val maybeCountry = findCountry(address.id).bind()
         val country = maybeCountry.fold(
           { ObservableK.raiseError<Country>(NoSuchElementException("...")) },
-          { ObservableK.pure(it) }
+          { ObservableK.just(it) }
         ).bind()
         country.code
       }.fix()
@@ -173,7 +173,7 @@ We can now lift any value to a `OptionT<F, A>` which looks like this:
 import arrow.syntax.applicative.*
 import arrow.data.*
 
-val optTVal = 1.pure<OptionTPartialOf<ForObservableK>, Int>()
+val optTVal = 1.just<OptionTPartialOf<ForObservableK>, Int>()
 optTVal
 ```
 
@@ -196,9 +196,9 @@ So how would our function look if we implemented it with the OptionT monad trans
 fun getCountryCode(personId: Int): ObservableK<Option<String>> =
   OptionT.monad<ForObservableK>().binding {
     val person = OptionT(findPerson(personId)).bind()
-    val address = OptionT(ObservableK.pure(person.address)).bind()
+    val address = OptionT(ObservableK.just(person.address)).bind()
     val country = OptionT(findCountry(address.id)).bind()
-    val code = OptionT(ObservableK.pure(country.code)).bind()
+    val code = OptionT(ObservableK.just(country.code)).bind()
     code
   }.value().fix()
 ```

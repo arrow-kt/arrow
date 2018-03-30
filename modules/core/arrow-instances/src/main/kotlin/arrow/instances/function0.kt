@@ -19,8 +19,8 @@ interface Function0ApplicativeInstance : Applicative<ForFunction0> {
     override fun <A, B> Kind<ForFunction0, A>.map(f: (A) -> B): Function0<B> =
             fix().map(f)
 
-    override fun <A> pure(a: A): Function0<A> =
-            Function0.pure(a)
+    override fun <A> just(a: A): Function0<A> =
+            Function0.just(a)
 }
 
 @instance(Function0::class)
@@ -37,8 +37,8 @@ interface Function0MonadInstance : Monad<ForFunction0> {
     override fun <A, B> Kind<ForFunction0, A>.map(f: (A) -> B): Function0<B> =
             fix().map(f)
 
-    override fun <A> pure(a: A): Function0<A> =
-            Function0.pure(a)
+    override fun <A> just(a: A): Function0<A> =
+            Function0.just(a)
 }
 
 @instance(Function0::class)
@@ -67,8 +67,8 @@ interface Function0BimonadInstance : Bimonad<ForFunction0> {
     override fun <A, B> Kind<ForFunction0, A>.map(f: (A) -> B): Function0<B> =
             fix().map(f)
 
-    override fun <A> pure(a: A): Function0<A> =
-            Function0.pure(a)
+    override fun <A> just(a: A): Function0<A> =
+            Function0.just(a)
 
     override fun <A, B> Kind<ForFunction0, A>.coflatMap(f: (Kind<ForFunction0, A>) -> B): Function0<B> =
             fix().coflatMap(f)

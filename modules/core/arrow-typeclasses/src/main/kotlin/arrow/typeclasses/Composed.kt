@@ -180,9 +180,9 @@ interface ComposedApplicative<F, G> : Applicative<Nested<F, G>>, ComposedFunctor
     override fun G(): Applicative<G>
 
     override fun <A, B> Kind<Nested<F, G>, A>.map(f: (A) -> B): Kind<Nested<F, G>, B> =
-            ap(pure(f))
+            ap(just(f))
 
-    override fun <A> pure(a: A): Kind<Nested<F, G>, A> = F().pure(G().pure(a)).nest()
+    override fun <A> just(a: A): Kind<Nested<F, G>, A> = F().just(G().just(a)).nest()
 
     override fun <A, B> Kind<Nested<F, G>, A>.ap(ff: Kind<Nested<F, G>, (A) -> B>): Kind<Nested<F, G>, B> =
             F().run { unnest().ap(ff.unnest().map({ gfa: Kind<G, (A) -> B> -> { ga: Kind<G, A> -> G().run { ga.ap(gfa) } } })) }.nest()

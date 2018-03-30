@@ -16,7 +16,7 @@ interface Monad<F> : Applicative<F> {
     fun <A, B> tailRecM(a: A, f: (A) -> Kind<F, Either<A, B>>): Kind<F, B>
 
     override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> =
-            flatMap({ a -> pure(f(a)) })
+            flatMap({ a -> just(f(a)) })
 
     override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> =
             ff.flatMap({ f -> this.map(f) })
@@ -50,7 +50,7 @@ interface Monad<F> : Applicative<F> {
  */
 fun <F, B> Monad<F>.binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> {
     val continuation = MonadContinuation<F, B>(this)
-    val wrapReturn: suspend MonadContinuation<F, *>.() -> Kind<F, B> = { pure(c()) }
+    val wrapReturn: suspend MonadContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
 }

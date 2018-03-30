@@ -17,7 +17,7 @@ sealed class Try<out A> : TryOf<A> {
 
     companion object {
 
-        fun <A> pure(a: A): Try<A> = Success(a)
+        fun <A> just(a: A): Try<A> = Success(a)
 
         tailrec fun <A, B> tailRecM(a: A, f: (A) -> TryOf<Either<A, B>>): Try<B> {
             val ev: Try<Either<A, B>> = f(a).fix()
@@ -114,7 +114,7 @@ sealed class Try<out A> : TryOf<A> {
         return this
     }
 
-    @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("fold ({ Try { body(it); it }}, { Try.pure(it) })"))
+    @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("fold ({ Try { body(it); it }}, { Try.just(it) })"))
     fun onFailure(body: (Throwable) -> Unit): Try<A> = when (this) {
         is Success -> this
         is Failure -> {

@@ -28,11 +28,11 @@ object MonadStateLaws {
 
     fun <F> MonadState<F, Int>.monadStateSetGet(EQ: Eq<Kind<F, Int>>) {
         forAll(genIntSmall(), { s: Int ->
-            set(s).flatMap({ get() }).equalUnderTheLaw(set(s).flatMap({ pure(s) }), EQ)
+            set(s).flatMap({ get() }).equalUnderTheLaw(set(s).flatMap({ just(s) }), EQ)
         })
     }
 
     fun <F> MonadState<F, Int>.monadStateGetSet(EQ: Eq<Kind<F, Unit>>) {
-        get().flatMap({ set(it) }).equalUnderTheLaw(pure(Unit), EQ)
+        get().flatMap({ set(it) }).equalUnderTheLaw(just(Unit), EQ)
     }
 }

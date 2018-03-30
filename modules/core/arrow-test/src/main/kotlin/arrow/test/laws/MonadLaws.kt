@@ -35,67 +35,67 @@ object MonadLaws {
 
     fun <F> Monad<F>.leftIdentity(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), this)), Gen.int(), { f: (Int) -> Kind<F, Int>, a: Int ->
-                pure(a).flatMap(f).equalUnderTheLaw(f(a), EQ)
+                just(a).flatMap(f).equalUnderTheLaw(f(a), EQ)
             })
 
     fun <F> Monad<F>.rightIdentity(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genApplicative(Gen.int(), this), { fa: Kind<F, Int> ->
-                fa.flatMap({ pure(it) }).equalUnderTheLaw(fa, EQ)
+                fa.flatMap({ just(it) }).equalUnderTheLaw(fa, EQ)
             })
 
     fun <F> Monad<F>.kleisliLeftIdentity(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), this)), Gen.int(), { f: (Int) -> Kind<F, Int>, a: Int ->
-                (Kleisli({ n: Int -> pure(n) }).andThen(this, Kleisli(f)).run(a).equalUnderTheLaw(f(a), EQ))
+                (Kleisli({ n: Int -> just(n) }).andThen(this, Kleisli(f)).run(a).equalUnderTheLaw(f(a), EQ))
             })
 
     fun <F> Monad<F>.kleisliRightIdentity(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), this)), Gen.int(), { f: (Int) -> Kind<F, Int>, a: Int ->
-                (Kleisli(f).andThen(this, Kleisli({ n: Int -> pure(n) })).run(a).equalUnderTheLaw(f(a), EQ))
+                (Kleisli(f).andThen(this, Kleisli({ n: Int -> just(n) })).run(a).equalUnderTheLaw(f(a), EQ))
             })
 
     fun <F> Monad<F>.mapFlatMapCoherence(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genFunctionAToB<Int, Int>(Gen.int()), genApplicative(Gen.int(), this), { f: (Int) -> Int, fa: Kind<F, Int> ->
-                fa.flatMap({ pure(f(it)) }).equalUnderTheLaw(fa.map(f), EQ)
+                fa.flatMap({ just(f(it)) }).equalUnderTheLaw(fa.map(f), EQ)
             })
 
     fun <F> Monad<F>.stackSafety(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit =
             forFew(1, Gen.oneOf(listOf(iterations))) { iter ->
-                val res = tailRecM(0, { i -> pure(if (i < iter) Left(i + 1) else Right(i)) })
-                res.equalUnderTheLaw(pure(iter), EQ)
+                val res = tailRecM(0, { i -> just(if (i < iter) Left(i + 1) else Right(i)) })
+                res.equalUnderTheLaw(just(iter), EQ)
             }
 
     fun <F> Monad<F>.stackSafetyComprehensions(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit =
             forFew(1, Gen.oneOf(listOf(iterations))) { iter ->
                 val res = stackSafeTestProgram(0, iter)
-                res.run(this).equalUnderTheLaw(pure(iter), EQ)
+                res.run(this).equalUnderTheLaw(just(iter), EQ)
             }
 
     fun <F> Monad<F>.equivalentComprehensions(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(Gen.int(), { num: Int ->
                 val aa = binding {
-                    val a = pure(num).bind()
-                    val b = pure(a + 1).bind()
-                    val c = pure(b + 1).bind()
+                    val a = just(num).bind()
+                    val b = just(a + 1).bind()
+                    val c = just(b + 1).bind()
                     c
                 }
                 val bb = bindingStackSafe {
-                    val a = pure(num).bind()
-                    val b = pure(a + 1).bind()
-                    val c = pure(b + 1).bind()
+                    val a = just(num).bind()
+                    val b = just(a + 1).bind()
+                    val c = just(b + 1).bind()
                     c
                 }.run(this)
                 aa.equalUnderTheLaw(bb, EQ) &&
-                        aa.equalUnderTheLaw(pure(num + 2), EQ)
+                        aa.equalUnderTheLaw(just(num + 2), EQ)
             })
 
     fun <F> Monad<F>.monadComprehensions(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(Gen.int(), { num: Int ->
                 binding {
-                    val a = pure(num).bind()
-                    val b = pure(a + 1).bind()
-                    val c = pure(b + 1).bind()
+                    val a = just(num).bind()
+                    val b = just(a + 1).bind()
+                    val c = just(b + 1).bind()
                     c
-                }.equalUnderTheLaw(pure(num + 2), EQ)
+                }.equalUnderTheLaw(just(num + 2), EQ)
             })
 
     fun <F> Monad<F>.monadComprehensionsBindInContext(EQ: Eq<Kind<F, Int>>): Unit =
@@ -104,12 +104,12 @@ object MonadLaws {
                     val a = bindIn(newSingleThreadContext("$num")) { num + 1 }
                     val b = bindIn(newSingleThreadContext("$a")) { a + 1 }
                     b
-                }.equalUnderTheLaw(pure(num + 2), EQ)
+                }.equalUnderTheLaw(just(num + 2), EQ)
             })
 
     fun <F> arrow.typeclasses.Monad<F>.stackSafeTestProgram(n: kotlin.Int, stopAt: kotlin.Int): Free<F, Int> = bindingStackSafe {
-        val v = this.pure(n + 1).bind()
-        val r = if (v < stopAt) stackSafeTestProgram(v, stopAt).bind() else this.pure(v).bind()
+        val v = this.just(n + 1).bind()
+        val r = if (v < stopAt) stackSafeTestProgram(v, stopAt).bind() else this.just(v).bind()
         r
     }
 }

@@ -32,7 +32,7 @@ object MonadFilterLaws {
 
     fun <F> MonadFilter<F>.monadFilterConsistency(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genFunctionAToB(Gen.bool()), genConstructor(Gen.int(), cf), { f: (Int) -> Boolean, fa: Kind<F, Int> ->
-                fa.filter(f).equalUnderTheLaw(fa.flatMap({ a -> if (f(a)) pure(a) else empty() }), EQ)
+                fa.filter(f).equalUnderTheLaw(fa.flatMap({ a -> if (f(a)) just(a) else empty() }), EQ)
             })
 
     fun <F> MonadFilter<F>.monadFilterEmptyComprehensions(EQ: Eq<Kind<F, Int>>): Unit =
@@ -40,15 +40,15 @@ object MonadFilterLaws {
                 bindingFilter {
                     continueIf(guard)
                     n
-                }.equalUnderTheLaw(if (!guard) empty() else pure(n), EQ)
+                }.equalUnderTheLaw(if (!guard) empty() else just(n), EQ)
             })
 
     fun <F> MonadFilter<F>.monadFilterBindWithFilterComprehensions(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(Gen.bool(), Gen.int(), { guard: Boolean, n: Int ->
                 bindingFilter {
-                    val x = this@monadFilterBindWithFilterComprehensions.pure(n).bindWithFilter { _ -> guard }
+                    val x = this@monadFilterBindWithFilterComprehensions.just(n).bindWithFilter { _ -> guard }
                     x
-                }.equalUnderTheLaw(if (!guard) empty() else pure(n), EQ)
+                }.equalUnderTheLaw(if (!guard) empty() else just(n), EQ)
             })
 
 }

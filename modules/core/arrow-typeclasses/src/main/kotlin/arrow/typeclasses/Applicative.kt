@@ -10,14 +10,14 @@ inline operator fun <F, A> Applicative<F>.invoke(ff: Applicative<F>.() -> A) =
 
 interface Applicative<F> : Functor<F> {
 
-    fun <A> pure(a: A): Kind<F, A>
+    fun <A> just(a: A): Kind<F, A>
 
     fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B>
 
     fun <A, B> Kind<F, A>.product(fb: Kind<F, B>): Kind<F, Tuple2<A, B>> =
             fb.ap(this.map { a: A -> { b: B -> Tuple2(a, b) } })
 
-    override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> = ap(pure(f))
+    override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> = ap(just(f))
 
     fun <A, B, Z> Kind<F, A>.map2(fb: Kind<F, B>, f: (Tuple2<A, B>) -> Z): Kind<F, Z> = product(fb).map(f)
 

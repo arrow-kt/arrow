@@ -22,8 +22,8 @@ interface IOApplicativeInstance : Applicative<ForIO> {
     override fun <A, B> Kind<ForIO, A>.map(f: (A) -> B): IO<B> =
             fix().map(f)
 
-    override fun <A> pure(a: A): IO<A> =
-            IO.pure(a)
+    override fun <A> just(a: A): IO<A> =
+            IO.just(a)
 
     override fun <A, B> Kind<ForIO, A>.ap(ff: IOOf<(A) -> B>): IO<B> =
             fix().ioAp(ff)
@@ -40,8 +40,8 @@ interface IOMonadInstance : Monad<ForIO> {
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, IOOf<arrow.core.Either<A, B>>>): IO<B> =
             IO.tailRecM(a, f)
 
-    override fun <A> pure(a: A): IO<A> =
-            IO.pure(a)
+    override fun <A> just(a: A): IO<A> =
+            IO.just(a)
 }
 
 @instance(IO::class)
@@ -99,7 +99,7 @@ interface IOMonoidInstance<A> : Monoid<Kind<ForIO, A>>, Semigroup<Kind<ForIO, A>
     override fun IOOf<A>.combine(b: IOOf<A>): IO<A> =
             fix().flatMap { a1: A -> b.fix().map { a2: A -> SM().run { a1.combine(a2) } } }
 
-    override fun empty(): IO<A> = IO.pure(SM().empty())
+    override fun empty(): IO<A> = IO.just(SM().empty())
 }
 
 @instance(IO::class)

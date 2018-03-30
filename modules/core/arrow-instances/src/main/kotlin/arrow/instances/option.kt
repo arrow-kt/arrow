@@ -81,8 +81,8 @@ interface OptionApplicativeInstance : Applicative<ForOption> {
     override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
             fix().map(f)
 
-    override fun <A> pure(a: A): Option<A> =
-            Option.pure(a)
+    override fun <A> just(a: A): Option<A> =
+            Option.just(a)
 }
 
 @instance(Option::class)
@@ -99,8 +99,8 @@ interface OptionMonadInstance : Monad<ForOption> {
     override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
             fix().map(f)
 
-    override fun <A> pure(a: A): Option<A> =
-            Option.pure(a)
+    override fun <A> just(a: A): Option<A> =
+            Option.just(a)
 }
 
 @instance(Option::class)
@@ -128,7 +128,7 @@ fun <A, G, B> OptionOf<A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Ki
     fix().let { option ->
         when (option) {
             is Some -> f(option.t).map({ Some(it) })
-            is None -> pure(None)
+            is None -> just(None)
         }
     }
 }
@@ -137,7 +137,7 @@ fun <A, G, B> OptionOf<A>.traverseFilter(f: (A) -> Kind<G, Option<B>>, GA: Appli
         this.fix().let { option ->
             when (option) {
                 is Some -> f(option.t)
-                None -> GA.pure(None)
+                None -> GA.just(None)
             }
         }
 

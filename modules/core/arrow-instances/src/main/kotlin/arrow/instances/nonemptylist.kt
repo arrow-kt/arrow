@@ -44,8 +44,8 @@ interface NonEmptyListApplicativeInstance : Applicative<ForNonEmptyList> {
     override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
             fix().map(f)
 
-    override fun <A> pure(a: A): NonEmptyList<A> =
-            NonEmptyList.pure(a)
+    override fun <A> just(a: A): NonEmptyList<A> =
+            NonEmptyList.just(a)
 }
 
 @instance(NonEmptyList::class)
@@ -62,8 +62,8 @@ interface NonEmptyListMonadInstance : Monad<ForNonEmptyList> {
     override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
             fix().map(f)
 
-    override fun <A> pure(a: A): NonEmptyList<A> =
-            NonEmptyList.pure(a)
+    override fun <A> just(a: A): NonEmptyList<A> =
+            NonEmptyList.just(a)
 }
 
 @instance(NonEmptyList::class)
@@ -92,8 +92,8 @@ interface NonEmptyListBimonadInstance : Bimonad<ForNonEmptyList> {
     override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
             fix().map(f)
 
-    override fun <A> pure(a: A): NonEmptyList<A> =
-            NonEmptyList.pure(a)
+    override fun <A> just(a: A): NonEmptyList<A> =
+            NonEmptyList.just(a)
 
     override fun <A, B> Kind<ForNonEmptyList, A>.coflatMap(f: (Kind<ForNonEmptyList, A>) -> B): NonEmptyList<B> =
             fix().coflatMap(f)

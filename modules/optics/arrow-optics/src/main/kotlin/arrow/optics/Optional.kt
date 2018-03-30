@@ -91,7 +91,7 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
      */
     fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FA.run {
         getOrModify(s).fold(
-                ::pure,
+                ::just,
                 { f(it).map({ set(s, it) }) }
         )
     }

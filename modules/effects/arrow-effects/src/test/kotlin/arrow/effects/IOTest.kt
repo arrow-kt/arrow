@@ -59,7 +59,7 @@ class IOTest : UnitSpec() {
         }
 
         "should yield immediate successful pure value" {
-            val run = IO.pure(1).unsafeRunSync()
+            val run = IO.just(1).unsafeRunSync()
 
             val expected = 1
 
@@ -67,7 +67,7 @@ class IOTest : UnitSpec() {
         }
 
         "should yield immediate successful pure value" {
-            val run = IO.pure(1).unsafeRunSync()
+            val run = IO.just(1).unsafeRunSync()
 
             val expected = 1
 
@@ -96,21 +96,21 @@ class IOTest : UnitSpec() {
         }
 
         "should return a null value from unsafeRunTimed" {
-            val never = IO.pure<Int?>(null)
+            val never = IO.just<Int?>(null)
             val received = never.unsafeRunTimed(100.milliseconds)
 
             received shouldBe Some(null)
         }
 
         "should return a null value from unsafeRunSync" {
-            val value = IO.pure<Int?>(null).unsafeRunSync()
+            val value = IO.just<Int?>(null).unsafeRunSync()
 
             value shouldBe null
         }
 
         "should complete when running a pure value with unsafeRunAsync" {
             val expected = 0
-            IO.pure(expected).unsafeRunAsync { either ->
+            IO.just(expected).unsafeRunAsync { either ->
                 either.fold({ fail("") }, { it shouldBe expected })
             }
         }
@@ -159,7 +159,7 @@ class IOTest : UnitSpec() {
 
         "should complete when running a pure value with runAsync" {
             val expected = 0
-            IO.pure(expected).runAsync { either ->
+            IO.just(expected).runAsync { either ->
                 either.fold({ fail("") }, { IO { it shouldBe expected } })
             }
         }
@@ -211,7 +211,7 @@ class IOTest : UnitSpec() {
         with (IO.monad()) {
 
             "should map values correctly on success" {
-                val run = IO.pure(1).map() { it + 1 }.unsafeRunSync()
+                val run = IO.just(1).map() { it + 1 }.unsafeRunSync()
 
                 val expected = 2
 
@@ -219,7 +219,7 @@ class IOTest : UnitSpec() {
             }
 
             "should flatMap values correctly on success" {
-                val run = pure(1).flatMap { num -> IO { num + 1 } }.unsafeRunSync()
+                val run = just(1).flatMap { num -> IO { num + 1 } }.unsafeRunSync()
 
                 val expected = 2
 
@@ -244,7 +244,7 @@ class IOTest : UnitSpec() {
 
         "IO.binding should for comprehend over IO" {
             val result = IO.monad().binding {
-                val x = IO.pure(1).bind()
+                val x = IO.just(1).bind()
                 val y = bind { IO { x + 1 } }
                 y
             }.fix()

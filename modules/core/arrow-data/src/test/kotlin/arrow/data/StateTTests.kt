@@ -39,8 +39,8 @@ class StateTTests : UnitSpec() {
                         StateT.applicative<ForListK, Int>(ListK.monad()),
                         EQ_LIST),
                 MonadCombineLaws.laws(StateT.monadCombine<ForListK, Int>(ListK.monadCombine(), ListK.semigroupK(), ListK.monadCombine()),
-                        { StateT.lift(ListK.monad(), ListK.pure(it)) },
-                        { StateT.lift(ListK.monad(), ListK.pure({ s: Int -> s * 2 })) },
+                        { StateT.lift(ListK.monad(), ListK.just(it)) },
+                        { StateT.lift(ListK.monad(), ListK.just({ s: Int -> s * 2 })) },
                         EQ_LIST)
         )
 

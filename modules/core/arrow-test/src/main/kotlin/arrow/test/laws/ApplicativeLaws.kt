@@ -23,31 +23,31 @@ object ApplicativeLaws {
 
     fun <F> Applicative<F>.apIdentity(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genApplicative(Gen.int(), this), { fa: Kind<F, Int> ->
-                fa.ap(pure({ n: Int -> n })).equalUnderTheLaw(fa, EQ)
+                fa.ap(just({ n: Int -> n })).equalUnderTheLaw(fa, EQ)
             })
 
     fun <F> Applicative<F>.homomorphism(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genFunctionAToB<Int, Int>(Gen.int()), Gen.int(), { ab: (Int) -> Int, a: Int ->
-                pure(a).ap(pure(ab)).equalUnderTheLaw(pure(ab(a)), EQ)
+                just(a).ap(just(ab)).equalUnderTheLaw(just(ab(a)), EQ)
             })
 
     fun <F> Applicative<F>.interchange(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genApplicative(genFunctionAToB<Int, Int>(Gen.int()), this), Gen.int(), { fa: Kind<F, (Int) -> Int>, a: Int ->
-                pure(a).ap(fa).equalUnderTheLaw(fa.ap(pure({ x: (Int) -> Int -> x(a) })), EQ)
+                just(a).ap(fa).equalUnderTheLaw(fa.ap(just({ x: (Int) -> Int -> x(a) })), EQ)
             })
 
     fun <F> Applicative<F>.mapDerived(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genApplicative(Gen.int(), this), genFunctionAToB<Int, Int>(Gen.int()), { fa: Kind<F, Int>, f: (Int) -> Int ->
-                fa.map(f).equalUnderTheLaw(fa.ap(pure(f)), EQ)
+                fa.map(f).equalUnderTheLaw(fa.ap(just(f)), EQ)
             })
 
     fun <F> Applicative<F>.cartesianBuilderMap(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genIntSmall(), genIntSmall(), genIntSmall(), genIntSmall(), genIntSmall(), genIntSmall(), { a: Int, b: Int, c: Int, d: Int, e: Int, f: Int ->
-                map(pure(a), pure(b), pure(c), pure(d), pure(e), pure(f), { (x, y, z, u, v, w) -> x + y + z - u - v - w }).equalUnderTheLaw(pure(a + b + c - d - e - f), EQ)
+                map(just(a), just(b), just(c), just(d), just(e), just(f), { (x, y, z, u, v, w) -> x + y + z - u - v - w }).equalUnderTheLaw(just(a + b + c - d - e - f), EQ)
             })
 
     fun <F> Applicative<F>.cartesianBuilderTupled(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genIntSmall(), genIntSmall(), genIntSmall(), genIntSmall(), genIntSmall(), genIntSmall(), { a: Int, b: Int, c: Int, d: Int, e: Int, f: Int ->
-                tupled(pure(a), pure(b), pure(c), pure(d), pure(e), pure(f)).map({ (x, y, z, u, v, w) -> x + y + z - u - v - w }).equalUnderTheLaw(pure(a + b + c - d - e - f), EQ)
+                tupled(just(a), just(b), just(c), just(d), just(e), just(f)).map({ (x, y, z, u, v, w) -> x + y + z - u - v - w }).equalUnderTheLaw(just(a + b + c - d - e - f), EQ)
             })
 }

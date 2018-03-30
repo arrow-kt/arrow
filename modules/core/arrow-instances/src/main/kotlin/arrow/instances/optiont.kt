@@ -23,7 +23,7 @@ interface OptionTApplicativeInstance<F> : OptionTFunctorInstance<F>, Applicative
 
     override fun FF(): Monad<F>
 
-    override fun <A> pure(a: A): OptionT<F, A> = OptionT(FF().pure(Option(a)))
+    override fun <A> just(a: A): OptionT<F, A> = OptionT(FF().just(Option(a)))
 
     override fun <A, B> Kind<OptionTPartialOf<F>, A>.map(f: (A) -> B): OptionT<F, B> = fix().map(FF(), f)
 
@@ -90,5 +90,5 @@ interface OptionTSemigroupKInstance<F> : SemigroupK<OptionTPartialOf<F>> {
 
 @instance(OptionT::class)
 interface OptionTMonoidKInstance<F> : MonoidK<OptionTPartialOf<F>>, OptionTSemigroupKInstance<F> {
-    override fun <A> empty(): OptionT<F, A> = OptionT(FF().pure(None))
+    override fun <A> empty(): OptionT<F, A> = OptionT(FF().just(None))
 }

@@ -16,7 +16,7 @@ object Trampoline : TrampolineFunctions
 
 interface TrampolineFunctions {
 
-    fun <A> done(a: A): TrampolineF<A> = Free.pure<ForFunction0, A>(a)
+    fun <A> done(a: A): TrampolineF<A> = Free.just<ForFunction0, A>(a)
 
     fun <A> defer(a: () -> TrampolineF<A>): TrampolineF<A> = Free.defer(a)
 

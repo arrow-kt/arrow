@@ -44,7 +44,7 @@ interface FilterIndex<S, I, A> {
                         traverse.run {
                             FA.run {
                                 zipWithIndex(s).traverse(this, { (a, j) ->
-                                    if (p(j)) f(a) else pure(a)
+                                    if (p(j)) f(a) else just(a)
                                 })
                             }
                         }

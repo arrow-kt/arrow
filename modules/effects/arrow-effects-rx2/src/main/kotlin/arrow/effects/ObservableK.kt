@@ -46,7 +46,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
     }
 
     fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ObservableK<B>> = GA.run {
-        foldRight(Eval.always { GA.pure(Observable.empty<B>().k()) }) { a, eval ->
+        foldRight(Eval.always { GA.just(Observable.empty<B>().k()) }) { a, eval ->
             f(a).map2Eval(eval) { Observable.concat(Observable.just<B>(it.a), it.b.observable).k() }
         }.value()
     }
@@ -58,14 +58,14 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
             observable.flatMap { cb(Right(it)).value() }.onErrorResumeNext(io.reactivex.functions.Function { cb(Left(it)).value() }).k()
 
     companion object {
-        fun <A> pure(a: A): ObservableK<A> =
+        fun <A> just(a: A): ObservableK<A> =
                 Observable.just(a).k()
 
         fun <A> raiseError(t: Throwable): ObservableK<A> =
                 Observable.error<A>(t).k()
 
         operator fun <A> invoke(fa: () -> A): ObservableK<A> =
-                suspend { pure(fa()) }
+                suspend { just(fa()) }
 
         fun <A> suspend(fa: () -> ObservableKOf<A>): ObservableK<A> =
                 Observable.defer { fa().value() }.k()

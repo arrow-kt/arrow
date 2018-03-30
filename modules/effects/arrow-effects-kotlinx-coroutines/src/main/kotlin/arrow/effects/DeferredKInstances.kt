@@ -21,8 +21,8 @@ interface DeferredKApplicativeInstance : Applicative<ForDeferredK> {
     override fun <A, B> Kind<ForDeferredK, A>.map(f: (A) -> B): DeferredK<B> =
             fix().map(f)
 
-    override fun <A> pure(a: A): DeferredK<A> =
-            DeferredK.pure(a)
+    override fun <A> just(a: A): DeferredK<A> =
+            DeferredK.just(a)
 
     override fun <A, B> DeferredKOf<A>.ap(ff: DeferredKOf<(A) -> B>): DeferredK<B> =
             fix().ap(ff)
@@ -42,8 +42,8 @@ interface DeferredKMonadInstance : Monad<ForDeferredK> {
     override fun <A, B> DeferredKOf<A>.ap(ff: DeferredKOf<(A) -> B>): DeferredK<B> =
             fix().ap(ff)
 
-    override fun <A> pure(a: A): DeferredK<A> =
-            DeferredK.pure(a)
+    override fun <A> just(a: A): DeferredK<A> =
+            DeferredK.just(a)
 }
 
 @instance(DeferredK::class)

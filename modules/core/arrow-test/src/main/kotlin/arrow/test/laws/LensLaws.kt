@@ -57,7 +57,7 @@ object LensLaws {
     fun <A, B> Lens<A, B>.lensConsistentModifyModifyId(aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>) =
             forAll(aGen, funcGen, { a, f ->
                 modify(a, f)
-                        .equalUnderTheLaw(modifyF(Id.functor(), a, { Id.pure(f(it)) }).value(), EQA)
+                        .equalUnderTheLaw(modifyF(Id.functor(), a, { Id.just(f(it)) }).value(), EQA)
             })
 
     fun <A, B> Lens<A, B>.lensConsistentGetModifyid(aGen: Gen<A>, EQB: Eq<B>, MA: Monoid<B>) =

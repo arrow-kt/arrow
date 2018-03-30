@@ -18,7 +18,7 @@ data class SetK<out A>(val set: Set<A>) : SetKOf<A>, Set<A> by set {
 
     companion object {
 
-        fun <A> pure(a: A): SetK<A> = setOf(a).k()
+        fun <A> just(a: A): SetK<A> = setOf(a).k()
 
         fun empty(): SetK<Nothing> = empty
 

@@ -42,8 +42,8 @@ class TypeclasslessExamples : FreeSpec() {
     interface ApplicativeSyntax<F> {
         fun AP(): Applicative<F>
 
-        fun <A> A.pure(): Kind<F, A> =
-                AP().pure(this)
+        fun <A> A.just(): Kind<F, A> =
+                AP().just(this)
 
         fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> = AP().run {
             this@map.map(f)
@@ -84,7 +84,7 @@ class TypeclasslessExamples : FreeSpec() {
 
     object ScopeOne {
         fun <F> ApplicativeSyntax<F>.inScopeOne(): Kind<F, Int> =
-                1.pure()
+                1.just()
     }
 
     object ScopeTwo {
@@ -92,7 +92,7 @@ class TypeclasslessExamples : FreeSpec() {
                 a.identify()
 
         fun <F> ApplicativeSyntax<F>.withApplicative(): Kind<F, Int> =
-                1.pure().map { inScopeOne() }.map { 1 }
+                1.just().map { inScopeOne() }.map { 1 }
 
         fun <F> ApplicativeAndIdentifySyntax<F>.withAll(): Kind<F, Int> =
                 withIdentify(withApplicative()).identify().map { it }

@@ -17,8 +17,8 @@ interface Function1FunctorInstance<I> : Functor<Function1PartialOf<I>> {
 @instance(Function1::class)
 interface Function1ApplicativeInstance<I> : Function1FunctorInstance<I>, Applicative<Function1PartialOf<I>> {
 
-    override fun <A> pure(a: A): Function1<I, A> =
-            Function1.pure(a)
+    override fun <A> just(a: A): Function1<I, A> =
+            Function1.just(a)
 
     override fun <A, B> Kind<Function1PartialOf<I>, A>.map(f: (A) -> B): Function1<I, B> =
             fix().map(f)

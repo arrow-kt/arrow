@@ -10,5 +10,5 @@ interface Corecursive<F, G> {
             hylo(a, { embedT(it) }, f, ComposedFunctor(FF, FG))
 
     fun <M, A> anaM(a: A, f: CoalgebraM<M, Nested<F, G>, A>, AG: Applicative<G>, TF: Traverse<F>, TG: Traverse<G>, MM: Monad<M>): Kind<M, Kind<F, G>> =
-            hyloM(a, { MM.pure(embedT(it)) }, f, ComposedTraverse(TF, TG, AG), MM)
+            hyloM(a, { MM.just(embedT(it)) }, f, ComposedTraverse(TF, TG, AG), MM)
 }

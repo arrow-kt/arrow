@@ -22,7 +22,7 @@ interface StateTApplicativeInstance<F, S> : StateTFunctorInstance<F, S>, Applica
 
     override fun <A, B> Kind<StateTPartialOf<F, S>, A>.map(f: (A) -> B): StateT<F, S, B> = fix().map(this@StateTApplicativeInstance.FF(), f)
 
-    override fun <A> pure(a: A): StateT<F, S, A> = StateT(FF().pure({ s: S -> FF().pure(Tuple2(s, a)) }))
+    override fun <A> just(a: A): StateT<F, S, A> = StateT(FF().just({ s: S -> FF().just(Tuple2(s, a)) }))
 
     override fun <A, B> Kind<StateTPartialOf<F, S>, A>.ap(ff: Kind<StateTPartialOf<F, S>, (A) -> B>): StateT<F, S, B> =
             fix().ap(FF(), ff)
@@ -67,7 +67,7 @@ interface StateTApplicativeErrorInstance<F, S, E> : StateTApplicativeInstance<F,
     override fun <A> raiseError(e: E): Kind<StateTPartialOf<F, S>, A> = StateT.lift(FF(), FF().raiseError(e))
 
     override fun <A> Kind<StateTPartialOf<F, S>, A>.handleErrorWith(f: (E) -> Kind<StateTPartialOf<F, S>, A>): StateT<F, S, A> =
-            StateT(FF().pure({ s -> FF().run { runM(FF(), s).handleErrorWith({ e -> f(e).runM(FF(), s) }) } }))
+            StateT(FF().just({ s -> FF().run { runM(FF(), s).handleErrorWith({ e -> f(e).runM(FF(), s) }) } }))
 }
 
 @instance(StateT::class)

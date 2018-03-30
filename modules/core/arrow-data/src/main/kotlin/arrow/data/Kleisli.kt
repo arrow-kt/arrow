@@ -135,14 +135,14 @@ class Kleisli<F, D, A> (val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Klei
          * @param x value of [A].
          * @param AF [Applicative] for context [F].
          */
-        inline fun <F, D, A> pure(AF: Applicative<F>, x: A): Kleisli<F, D, A> = Kleisli { _ -> AF.pure(x) }
+        inline fun <F, D, A> just(AF: Applicative<F>, x: A): Kleisli<F, D, A> = Kleisli { _ -> AF.just(x) }
 
         /**
          * Ask an arrow from [D] to [D].
          *
          * @param AF [Applicative] for context [F].
          */
-        inline fun <F, D> ask(AF: Applicative<F>): Kleisli<F, D, D> = Kleisli { AF.pure(it) }
+        inline fun <F, D> ask(AF: Applicative<F>): Kleisli<F, D, D> = Kleisli { AF.just(it) }
 
         /**
          * Raise an error [E].

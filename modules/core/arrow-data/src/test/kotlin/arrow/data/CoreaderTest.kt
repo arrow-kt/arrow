@@ -23,7 +23,7 @@ class CoreaderTest : UnitSpec() {
 
                 "flatMap should map over the inner value" {
                     forAll { num: Int ->
-                        invoke<Int, Int>({ it -> it * 2 }).flatMap { a -> Coreader.pure<Int, Int>(this, a * 3) }
+                        invoke<Int, Int>({ it -> it * 2 }).flatMap { a -> Coreader.just<Int, Int>(this, a * 3) }
                                 .runId(num) == num * 6
                     }
                 }

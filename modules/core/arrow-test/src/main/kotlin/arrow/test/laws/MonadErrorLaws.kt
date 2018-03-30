@@ -25,6 +25,6 @@ object MonadErrorLaws {
 
     fun <F> MonadError<F, Throwable>.monadErrorEnsureConsistency(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genApplicative(Gen.int(), this), genThrowable(), genFunctionAToB<Int, Boolean>(Gen.bool()), { fa: Kind<F, Int>, e: Throwable, p: (Int) -> Boolean ->
-                fa.ensure({ e }, p).equalUnderTheLaw(fa.flatMap({ a -> if (p(a)) pure(a) else raiseError(e) }), EQ)
+                fa.ensure({ e }, p).equalUnderTheLaw(fa.flatMap({ a -> if (p(a)) just(a) else raiseError(e) }), EQ)
             })
 }

@@ -65,8 +65,8 @@ interface TryApplicativeInstance : Applicative<ForTry> {
     override fun <A, B> Kind<ForTry, A>.map(f: (A) -> B): Try<B> =
             fix().map(f)
 
-    override fun <A> pure(a: A): Try<A> =
-            Try.pure(a)
+    override fun <A> just(a: A): Try<A> =
+            Try.just(a)
 }
 
 @instance(Try::class)
@@ -83,8 +83,8 @@ interface TryMonadInstance : Monad<ForTry> {
     override fun <A, B> Kind<ForTry, A>.map(f: (A) -> B): Try<B> =
             fix().map(f)
 
-    override fun <A> pure(a: A): Try<A> =
-            Try.pure(a)
+    override fun <A> just(a: A): Try<A> =
+            Try.just(a)
 }
 
 @instance(Try::class)
@@ -100,7 +100,7 @@ interface TryFoldableInstance : Foldable<ForTry> {
 }
 
 fun <A, B, G> Try<A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Try<B>> = GA.run {
-    fix().fold({ pure(Try.raise(it)) }, { f(it).map({ Try { it } }) })
+    fix().fold({ just(Try.raise(it)) }, { f(it).map({ Try { it } }) })
 }
 
 @instance(Try::class)

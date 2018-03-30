@@ -17,7 +17,7 @@ interface IorApplicativeInstance<L> : IorFunctorInstance<L>, Applicative<IorPart
 
     fun SL(): Semigroup<L>
 
-    override fun <A> pure(a: A): Ior<L, A> = Ior.Right(a)
+    override fun <A> just(a: A): Ior<L, A> = Ior.Right(a)
 
     override fun <A, B> Kind<IorPartialOf<L>, A>.map(f: (A) -> B): Ior<L, B> = fix().map(f)
 

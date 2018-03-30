@@ -11,7 +11,7 @@ sealed class Option<out A> : OptionOf<A> {
 
     companion object {
 
-        fun <A> pure(a: A): Option<A> = Some(a)
+        fun <A> just(a: A): Option<A> = Some(a)
 
         tailrec fun <A, B> tailRecM(a: A, f: (A) -> OptionOf<Either<A, B>>): Option<B> {
             val option = f(a).fix()

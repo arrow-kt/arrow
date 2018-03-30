@@ -15,11 +15,11 @@ class SetKTest : UnitSpec() {
         val EQ = SetK.eq(IntEqInstance)
 
         testLaws(
-                EqLaws.laws(EQ) { SetK.pure(it) },
-                ShowLaws.laws(SetK.show(), EQ) { SetK.pure(it) },
-                SemigroupKLaws.laws(SetK.semigroupK(), { SetK.pure(it) }, Eq.any()),
-                MonoidKLaws.laws(SetK.monoidK(), { SetK.pure(it) }, Eq.any()),
-                FoldableLaws.laws(SetK.foldable(), { SetK.pure(it) }, Eq.any())
+                EqLaws.laws(EQ) { SetK.just(it) },
+                ShowLaws.laws(SetK.show(), EQ) { SetK.just(it) },
+                SemigroupKLaws.laws(SetK.semigroupK(), { SetK.just(it) }, Eq.any()),
+                MonoidKLaws.laws(SetK.monoidK(), { SetK.just(it) }, Eq.any()),
+                FoldableLaws.laws(SetK.foldable(), { SetK.just(it) }, Eq.any())
         )
     }
 }

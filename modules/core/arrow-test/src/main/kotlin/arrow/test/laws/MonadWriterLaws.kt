@@ -19,15 +19,15 @@ object MonadWriterLaws {
                            EqInt: Eq<Kind<F, Int>>,
                            EqTupleWA: Eq<Kind<F, Tuple2<W, Int>>>): List<Law> =
             MonadLaws.laws(MF, EqInt) + listOf(
-                    Law("Monad Writer Laws: writer pure", { MW.monadWriterWriterPure(MOW, EqInt) }),
+                    Law("Monad Writer Laws: writer just", { MW.monadWriterWriterJust(MOW, EqInt) }),
                     Law("Monad Writer Laws: tell fusion", { MW.monadWriterTellFusion(genW, MOW) }),
-                    Law("Monad Writer Laws: listen pure", { MW.monadWriterListenPure(MOW, EqTupleWA) }),
+                    Law("Monad Writer Laws: listen just", { MW.monadWriterListenJust(MOW, EqTupleWA) }),
                     Law("Monad Writer Laws: listen writer", { MW.monadWriterListenWriter(genTupleWA, EqTupleWA) }))
 
-    fun <F, W> MonadWriter<F, W>.monadWriterWriterPure(MOW: Monoid<W>,
+    fun <F, W> MonadWriter<F, W>.monadWriterWriterJust(MOW: Monoid<W>,
                                                                              EQ: Eq<Kind<F, Int>>): Unit {
         forAll(Gen.int(), { a: Int ->
-            writer(Tuple2(MOW.empty(), a)).equalUnderTheLaw(pure(a), EQ)
+            writer(Tuple2(MOW.empty(), a)).equalUnderTheLaw(just(a), EQ)
         })
     }
 
@@ -38,10 +38,10 @@ object MonadWriterLaws {
         })
     }
 
-    fun <F, W> MonadWriter<F, W>.monadWriterListenPure(MOW: Monoid<W>,
+    fun <F, W> MonadWriter<F, W>.monadWriterListenJust(MOW: Monoid<W>,
                                                                              EqTupleWA: Eq<Kind<F, Tuple2<W, Int>>>): Unit {
         forAll(Gen.int(), { a: Int ->
-            pure(a).listen().equalUnderTheLaw(pure(Tuple2(MOW.empty(), a)), EqTupleWA)
+            just(a).listen().equalUnderTheLaw(just(Tuple2(MOW.empty(), a)), EqTupleWA)
         })
     }
 

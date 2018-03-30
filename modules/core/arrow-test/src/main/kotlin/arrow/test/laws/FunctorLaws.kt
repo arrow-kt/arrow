@@ -15,8 +15,8 @@ object FunctorLaws {
 
     inline fun <F> laws(AP: Applicative<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
             listOf(
-                    Law("Functor Laws: Covariant Identity", { AP.covariantIdentity(AP::pure, EQ) }),
-                    Law("Functor Laws: Covariant Composition", { AP.covariantComposition(AP::pure, EQ) })
+                    Law("Functor Laws: Covariant Identity", { AP.covariantIdentity(AP::just, EQ) }),
+                    Law("Functor Laws: Covariant Composition", { AP.covariantComposition(AP::just, EQ) })
             )
 
     fun <F> laws(FF: Functor<F>, f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =

@@ -41,8 +41,8 @@ class StateTests : UnitSpec() {
             add1.run(1) shouldBe (2 toT 1)
         }
 
-        "pure" {
-            val s1 = StateApi.pure<String, Int>(1)
+        "just" {
+            val s1 = StateApi.just<String, Int>(1)
             s1.run("foo") shouldBe ("foo" toT 1)
         }
 

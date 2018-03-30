@@ -115,12 +115,12 @@ Now we've got two new functions in the mix that are going to call a remote servi
 import arrow.effects.*
 
 fun findPerson(personId : Int) : ObservableK<Either<BizError, Person>> =
-  ObservableK.pure(
+  ObservableK.just(
     Option.fromNullable(personDB.get(personId)).toEither { PersonNotFound(personId) }
   ) //mock impl for simplicity
 
 fun findCountry(addressId : Int) : ObservableK<Either<BizError, Country>> =
-  ObservableK.pure(
+  ObservableK.just(
     Option.fromNullable(adressDB.get(addressId))
       .flatMap { it.country }
       .toEither { CountryNotFound(addressId) }
@@ -165,7 +165,7 @@ fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
           { it.address.toEither { AddressNotFound(personId) } }
         )
         val maybeCountry = address.fold(
-          { ObservableK.pure(it.left()) },
+          { ObservableK.just(it.left()) },
           { findCountry(it.id) }
         ).bind()
         val code = maybeCountry.fold(
@@ -195,7 +195,7 @@ We can now lift any value to a `EitherT<F, BizError, A>` which looks like this:
 ```kotlin:ank
 import arrow.syntax.applicative.*
 import arrow.data.*
-val eitherTVal = 1.pure<EitherTPartialOf<ForObservableK, BizError>, Int>()
+val eitherTVal = 1.just<EitherTPartialOf<ForObservableK, BizError>, Int>()
 eitherTVal
 ```
 
@@ -211,7 +211,7 @@ So how would our function look if we implemented it with the EitherT monad trans
 fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
   EitherT.monadError<ForObservableK, BizError>().binding {
     val person = EitherT(findPerson(personId)).bind()
-    val address = EitherT(ObservableK.pure(
+    val address = EitherT(ObservableK.just(
       person.address.toEither { AddressNotFound(personId) }
     )).bind()
     val country = EitherT(findCountry(address.id)).bind()

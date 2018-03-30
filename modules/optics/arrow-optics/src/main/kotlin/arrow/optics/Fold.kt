@@ -100,7 +100,7 @@ interface Fold<S, A> : FoldOf<S, A> {
     /**
      * Get all targets of the [Fold]
      */
-    fun getAll(M: Monoid<ListK<A>>, s: S): ListK<A> = foldMap(M, s, { ListK.pure(it) })
+    fun getAll(M: Monoid<ListK<A>>, s: S): ListK<A> = foldMap(M, s, { ListK.just(it) })
 
     /**
      * Join two [Fold] with the same target

@@ -42,8 +42,8 @@ class StateT<F, S, A>(
 
     companion object {
 
-        inline fun <F, S, T> pure(MF: Monad<F>, t: T): StateT<F, S, T> =
-                StateT(MF) { s -> MF.pure(s toT t) }
+        inline fun <F, S, T> just(MF: Monad<F>, t: T): StateT<F, S, T> =
+                StateT(MF) { s -> MF.just(s toT t) }
 
         /**
          * Constructor to create `StateT<F, S, A>` given a [StateTFun].
@@ -52,7 +52,7 @@ class StateT<F, S, A>(
          * @param run the stateful function to wrap with [StateT].
          */
         inline operator fun <F, S, A> invoke(MF: Monad<F>, noinline run: StateTFun<F, S, A>): StateT<F, S, A> = MF.run {
-            StateT(pure(run))
+            StateT(just(run))
         }
 
         /**
@@ -69,7 +69,7 @@ class StateT<F, S, A>(
          * @param fa the value to lift.
          */
         fun <F, S, A> lift(MF: Monad<F>, fa: Kind<F, A>): StateT<F, S, A> = MF.run {
-            StateT(pure({ s -> fa.map({ a -> Tuple2(s, a) }) }))
+            StateT(just({ s -> fa.map({ a -> Tuple2(s, a) }) }))
         }
 
         /**
@@ -77,7 +77,7 @@ class StateT<F, S, A>(
          *
          * @param AF [Applicative] for the context [F].
          */
-        fun <F, S> get(AF: Applicative<F>): StateT<F, S, S> = StateT(AF.pure({ s -> AF.pure(Tuple2(s, s)) }))
+        fun <F, S> get(AF: Applicative<F>): StateT<F, S, S> = StateT(AF.just({ s -> AF.just(Tuple2(s, s)) }))
 
         /**
          * Inspect a value of the state [S] with [f] `(S) -> T` without modifying the state.
@@ -87,7 +87,7 @@ class StateT<F, S, A>(
          * @param AF [Applicative] for the context [F].
          * @param f the function applied to inspect [T] from [S].
          */
-        fun <F, S, T> inspect(AF: Applicative<F>, f: (S) -> T): StateT<F, S, T> = StateT(AF.pure({ s -> AF.pure(Tuple2(s, f(s))) }))
+        fun <F, S, T> inspect(AF: Applicative<F>, f: (S) -> T): StateT<F, S, T> = StateT(AF.just({ s -> AF.just(Tuple2(s, f(s))) }))
 
         /**
          * Modify the state with [f] `(S) -> S` and return [Unit].
@@ -96,7 +96,7 @@ class StateT<F, S, A>(
          * @param f the modify function to apply.
          */
         fun <F, S> modify(AF: Applicative<F>, f: (S) -> S): StateT<F, S, Unit> = AF.run {
-            StateT(pure({ s -> pure(f(s)).map { Tuple2(it, Unit) } }))
+            StateT(just({ s -> just(f(s)).map { Tuple2(it, Unit) } }))
         }
 
         /**
@@ -106,7 +106,7 @@ class StateT<F, S, A>(
          * @param f the modify function to apply.
          */
         fun <F, S> modifyF(AF: Applicative<F>, f: (S) -> Kind<F, S>): StateT<F, S, Unit> = AF.run {
-            StateT(pure({ s -> f(s).map { Tuple2(it, Unit) } }))
+            StateT(just({ s -> f(s).map { Tuple2(it, Unit) } }))
         }
 
         /**
@@ -116,7 +116,7 @@ class StateT<F, S, A>(
          * @param s value to set.
          */
         fun <F, S> set(AF: Applicative<F>, s: S): StateT<F, S, Unit> = AF.run {
-            StateT(pure({ _ -> pure(Tuple2(s, Unit)) }))
+            StateT(just({ _ -> just(Tuple2(s, Unit)) }))
         }
 
         /**
@@ -126,7 +126,7 @@ class StateT<F, S, A>(
          * @param s value to set.
          */
         fun <F, S> setF(AF: Applicative<F>, s: Kind<F, S>): StateT<F, S, Unit> = AF.run {
-            StateT(pure({ _ -> s.map { Tuple2(it, Unit) } }))
+            StateT(just({ _ -> s.map { Tuple2(it, Unit) } }))
         }
 
         /**
@@ -137,7 +137,7 @@ class StateT<F, S, A>(
          * @param MF [Monad] for the context [F].
          */
         fun <F, S, A, B> tailRecM(MF: Monad<F>, a: A, f: (A) -> Kind<StateTPartialOf<F, S>, Either<A, B>>): StateT<F, S, B> = MF.run {
-            StateT(pure({ s: S ->
+            StateT(just({ s: S ->
                 tailRecM(Tuple2(s, a), { (s, a0) ->
                     f(a0).runM(this, s).map { (s, ab) ->
                         ab.bimap({ a1 -> Tuple2(s, a1) }, { b -> Tuple2(s, b) })
@@ -264,7 +264,7 @@ class StateT<F, S, A>(
      * @param SF [SemigroupK] for [F].
      */
     fun combineK(MF: Monad<F>, SF: SemigroupK<F>, y: StateTOf<F, S, A>): StateT<F, S, A> = SF.run {
-        StateT(MF.pure({ s -> run(MF, s).combineK(y.fix().run(MF, s)) }))
+        StateT(MF.just({ s -> run(MF, s).combineK(y.fix().run(MF, s)) }))
     }
 
     /**

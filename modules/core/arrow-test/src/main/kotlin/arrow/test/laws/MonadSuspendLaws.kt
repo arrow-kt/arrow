@@ -37,7 +37,7 @@ object MonadSuspendLaws {
                     val c = bindDefer { b + z }
                     c
                 }
-                bound.equalUnderTheLaw(pure<Int>(x + y + z), EQ)
+                bound.equalUnderTheLaw(just<Int>(x + y + z), EQ)
             })
 
     fun <F> MonadSuspend<F>.asyncBindError(EQ: Eq<Kind<F, Int>>): Unit =
@@ -56,7 +56,7 @@ object MonadSuspendLaws {
                     val c = bindDeferUnsafe { Right(b + z) }
                     c
                 }
-                bound.equalUnderTheLaw(pure<Int>(x + y + z), EQ)
+                bound.equalUnderTheLaw(just<Int>(x + y + z), EQ)
             })
 
     fun <F> MonadSuspend<F>.asyncBindUnsafeError(EQ: Eq<Kind<F, Int>>): Unit =
@@ -73,7 +73,7 @@ object MonadSuspendLaws {
                     val value = bind { tupled(this@asyncParallelBind { x }, this@asyncParallelBind { y }, this@asyncParallelBind { z }) }
                     value.a + value.b + value.c
                 }
-                bound.equalUnderTheLaw(pure<Int>(x + y + z), EQ)
+                bound.equalUnderTheLaw(just<Int>(x + y + z), EQ)
             })
 
     fun <F> MonadSuspend<F>.asyncCancellationBefore(EQ: Eq<Kind<F, Int>>): Unit =
@@ -83,7 +83,7 @@ object MonadSuspendLaws {
                     val a = bindDefer { Thread.sleep(500); num }
                     sideEffect.increment()
                     val b = bindDefer { a + 1 }
-                    val c = pure(b + 1).bind()
+                    val c = just(b + 1).bind()
                     c
                 }
                 Try { Thread.sleep(250); dispose() }.recover { throw it }
@@ -111,7 +111,7 @@ object MonadSuspendLaws {
                     val a = bindIn(CommonPool) { Thread.sleep(500); num }
                     sideEffect.increment()
                     val b = bindIn(CommonPool) { a + 1 }
-                    val c = pure(b + 1).bind()
+                    val c = just(b + 1).bind()
                     c
                 }
                 Try { Thread.sleep(250); dispose() }.recover { throw it }

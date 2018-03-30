@@ -59,8 +59,8 @@ interface OptionMonadFilterInstance : MonadFilter<ForOption> {
     override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
             fix().map(f)
 
-    override fun <A> pure(a: A): Option<A> =
-            Option.pure(a)
+    override fun <A> just(a: A): Option<A> =
+            Option.just(a)
 
     override fun <A> Kind<ForOption, A>.filter(f: (A) -> Boolean): Option<A> =
             fix().filter(f)

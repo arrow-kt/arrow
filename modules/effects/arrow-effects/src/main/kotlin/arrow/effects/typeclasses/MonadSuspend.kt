@@ -18,7 +18,7 @@ interface MonadSuspend<F> : MonadError<F, Throwable> {
     operator fun <A> invoke(fa: () -> A): Kind<F, A> =
             suspend {
                 try {
-                    pure(fa())
+                    just(fa())
                 } catch (t: Throwable) {
                     raiseError<A>(t)
                 }
@@ -27,7 +27,7 @@ interface MonadSuspend<F> : MonadError<F, Throwable> {
     fun lazy(): Kind<F, Unit> = invoke { }
 
     fun <A> deferUnsafe(f: () -> Either<Throwable, A>): Kind<F, A> =
-            suspend { f().fold({ raiseError<A>(it) }, { pure(it) }) }
+            suspend { f().fold({ raiseError<A>(it) }, { just(it) }) }
 }
 
 /**
@@ -43,7 +43,7 @@ interface MonadSuspend<F> : MonadError<F, Throwable> {
  */
 fun <F, B> MonadSuspend<F>.bindingCancellable(c: suspend MonadSuspendCancellableContinuation<F, *>.() -> B): Tuple2<Kind<F, B>, Disposable> {
     val continuation = MonadSuspendCancellableContinuation<F, B>(this)
-    val wrapReturn: suspend MonadSuspendCancellableContinuation<F, *>.() -> Kind<F, B> = { pure(c()) }
+    val wrapReturn: suspend MonadSuspendCancellableContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad() toT continuation.disposable()
 }

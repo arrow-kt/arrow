@@ -19,8 +19,8 @@ interface EvalApplicativeInstance : Applicative<ForEval> {
     override fun <A, B> Kind<ForEval, A>.map(f: (A) -> B): Eval<B> =
             fix().map(f)
 
-    override fun <A> pure(a: A): Eval<A> =
-            Eval.pure(a)
+    override fun <A> just(a: A): Eval<A> =
+            Eval.just(a)
 }
 
 @instance(Eval::class)
@@ -37,8 +37,8 @@ interface EvalMonadInstance : Monad<ForEval> {
     override fun <A, B> Kind<ForEval, A>.map(f: (A) -> B): Eval<B> =
             fix().map(f)
 
-    override fun <A> pure(a: A): Eval<A> =
-            Eval.pure(a)
+    override fun <A> just(a: A): Eval<A> =
+            Eval.just(a)
 }
 
 @instance(Eval::class)
@@ -67,8 +67,8 @@ interface EvalBimonadInstance : Bimonad<ForEval> {
     override fun <A, B> Kind<ForEval, A>.map(f: (A) -> B): Eval<B> =
             fix().map(f)
 
-    override fun <A> pure(a: A): Eval<A> =
-            Eval.pure(a)
+    override fun <A> just(a: A): Eval<A> =
+            Eval.just(a)
 
     override fun <A, B> Kind<ForEval, A>.coflatMap(f: (Kind<ForEval, A>) -> B): Eval<B> =
             fix().coflatMap(f)

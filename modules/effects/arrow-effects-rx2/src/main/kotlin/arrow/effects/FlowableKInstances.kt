@@ -25,8 +25,8 @@ interface FlowableKApplicativeInstance : Applicative<ForFlowableK> {
     override fun <A, B> Kind<ForFlowableK, A>.map(f: (A) -> B): FlowableK<B> =
             fix().map(f)
 
-    override fun <A> pure(a: A): FlowableK<A> =
-            FlowableK.pure(a)
+    override fun <A> just(a: A): FlowableK<A> =
+            FlowableK.just(a)
 }
 
 @instance(FlowableK::class)
@@ -43,8 +43,8 @@ interface FlowableKMonadInstance : Monad<ForFlowableK> {
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, FlowableKOf<arrow.core.Either<A, B>>>): FlowableK<B> =
             FlowableK.tailRecM(a, f)
 
-    override fun <A> pure(a: A): FlowableK<A> =
-            FlowableK.pure(a)
+    override fun <A> just(a: A): FlowableK<A> =
+            FlowableK.just(a)
 }
 
 @instance(FlowableK::class)

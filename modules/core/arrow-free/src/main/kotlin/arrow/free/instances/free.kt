@@ -19,7 +19,7 @@ interface FreeFunctorInstance<S> : Functor<FreePartialOf<S>> {
 @instance(Free::class)
 interface FreeApplicativeInstance<S> : FreeFunctorInstance<S>, Applicative<FreePartialOf<S>> {
 
-    override fun <A> pure(a: A): Free<S, A> = Free.pure(a)
+    override fun <A> just(a: A): Free<S, A> = Free.just(a)
 
     override fun <A, B> Kind<FreePartialOf<S>, A>.map(f: (A) -> B): Free<S, B> =
             fix().freeMap(f)
@@ -43,7 +43,7 @@ interface FreeMonadInstance<S> : FreeApplicativeInstance<S>, Monad<FreePartialOf
     override fun <A, B> tailRecM(a: A, f: (A) -> FreeOf<S, Either<A, B>>): Free<S, B> = f(a).fix().flatMap {
         when (it) {
             is Either.Left -> tailRecM(it.a, f)
-            is Either.Right -> pure(it.b)
+            is Either.Right -> just(it.b)
         }
     }
 }

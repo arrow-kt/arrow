@@ -24,8 +24,8 @@ interface WriterTApplicativeInstance<F, W> : Applicative<WriterTPartialOf<F, W>>
 
     fun MM(): Monoid<W>
 
-    override fun <A> pure(a: A): WriterTOf<F, W, A> =
-            WriterT(FF().pure(MM().empty() toT a))
+    override fun <A> just(a: A): WriterTOf<F, W, A> =
+            WriterT(FF().just(MM().empty() toT a))
 
     override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.ap(ff: Kind<WriterTPartialOf<F, W>, (A) -> B>): WriterT<F, W, B> =
             fix().ap(FF(), MM(), ff)

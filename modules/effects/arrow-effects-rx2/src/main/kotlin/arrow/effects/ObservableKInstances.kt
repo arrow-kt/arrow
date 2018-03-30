@@ -24,8 +24,8 @@ interface ObservableKApplicativeInstance : Applicative<ForObservableK> {
     override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
             fix().map(f)
 
-    override fun <A> pure(a: A): ObservableK<A> =
-            ObservableK.pure(a)
+    override fun <A> just(a: A): ObservableK<A> =
+            ObservableK.just(a)
 }
 
 @instance(ObservableK::class)
@@ -42,8 +42,8 @@ interface ObservableKMonadInstance : Monad<ForObservableK> {
     override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ObservableKOf<arrow.core.Either<A, B>>>): ObservableK<B> =
             ObservableK.tailRecM(a, f)
 
-    override fun <A> pure(a: A): ObservableK<A> =
-            ObservableK.pure(a)
+    override fun <A> just(a: A): ObservableK<A> =
+            ObservableK.just(a)
 }
 
 @instance(ObservableK::class)

@@ -52,7 +52,7 @@ object PrismLaws {
 
     fun <A, B> Prism<A, B>.consistentModifyModifyFId(aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>): Unit =
             forAll(aGen, funcGen, { a, f ->
-                modifyF(Id.applicative(), a, { Id.pure(f(it)) }).value().equalUnderTheLaw(modify(a, f), EQA)
+                modifyF(Id.applicative(), a, { Id.just(f(it)) }).value().equalUnderTheLaw(modify(a, f), EQA)
             })
 
     fun <A, B> Prism<A, B>.consistentGetOptionModifyId(aGen: Gen<A>, EQOptionB: Eq<Option<B>>): Unit =

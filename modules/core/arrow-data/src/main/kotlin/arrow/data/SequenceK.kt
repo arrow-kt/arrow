@@ -29,7 +29,7 @@ data class SequenceK<out A> (val sequence: Sequence<A>) : SequenceKOf<A>, Sequen
     }
 
     fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, SequenceK<B>> = GA.run {
-        foldRight(Eval.always { pure(emptySequence<B>().k()) }) { a, eval ->
+        foldRight(Eval.always { just(emptySequence<B>().k()) }) { a, eval ->
             f(a).map2Eval(eval) { (sequenceOf(it.a) + it.b).k() }
         }.value()
     }
@@ -43,7 +43,7 @@ data class SequenceK<out A> (val sequence: Sequence<A>) : SequenceKOf<A>, Sequen
 
     companion object {
 
-        fun <A> pure(a: A): SequenceK<A> = sequenceOf(a).k()
+        fun <A> just(a: A): SequenceK<A> = sequenceOf(a).k()
 
         fun <A> empty(): SequenceK<A> = emptySequence<A>().k()
 

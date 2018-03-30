@@ -130,7 +130,7 @@ Or, as we have with `recoverWith`, we can use a version of `fold` which allows u
 ```kotlin:ank
 lotteryTry.transform(
     { Try { it.map { it.toInt() } } },
-    { Try.pure(emptyList<Int>()) })
+    { Try.just(emptyList<Int>()) })
 ```
 
 Lastly, Arrow contains `Try` instances for many useful typeclasses that allows you to use and transform fallibale values:

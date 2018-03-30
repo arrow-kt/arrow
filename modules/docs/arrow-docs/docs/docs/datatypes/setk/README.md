@@ -25,7 +25,7 @@ SetK(setOf(1, 2, 5, 3, 2))
 ```
 or
 ```kotlin:ank
-SetK.pure(1)
+SetK.just(1)
 ```
 
 given the following:
