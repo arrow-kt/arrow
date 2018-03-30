@@ -11,7 +11,7 @@ interface StateTFunctorInstance<F, S> : Functor<StateTPartialOf<F, S>> {
 
     fun FF(): Functor<F>
 
-    override fun <A, B> Kind<StateTPartialOf<F, S>, A>.map(f: (A) -> B): StateT<F, S, B> = fix().map(f, this@StateTFunctorInstance.FF())
+    override fun <A, B> Kind<StateTPartialOf<F, S>, A>.map(f: (A) -> B): StateT<F, S, B> = fix().map(this@StateTFunctorInstance.FF(), f)
 
 }
 
@@ -20,25 +20,25 @@ interface StateTApplicativeInstance<F, S> : StateTFunctorInstance<F, S>, Applica
 
     override fun FF(): Monad<F>
 
-    override fun <A, B> Kind<StateTPartialOf<F, S>, A>.map(f: (A) -> B): StateT<F, S, B> = fix().map(f, this@StateTApplicativeInstance.FF())
+    override fun <A, B> Kind<StateTPartialOf<F, S>, A>.map(f: (A) -> B): StateT<F, S, B> = fix().map(this@StateTApplicativeInstance.FF(), f)
 
     override fun <A> pure(a: A): StateT<F, S, A> = StateT(FF().pure({ s: S -> FF().pure(Tuple2(s, a)) }))
 
     override fun <A, B> Kind<StateTPartialOf<F, S>, A>.ap(ff: Kind<StateTPartialOf<F, S>, (A) -> B>): StateT<F, S, B> =
-            fix().ap(ff, FF())
+            fix().ap(FF(), ff)
 
     override fun <A, B> arrow.Kind<arrow.data.StateTPartialOf<F, S>, A>.product(fb: arrow.Kind<arrow.data.StateTPartialOf<F, S>, B>): StateT<F, S, Tuple2<A, B>> =
-            this@product.fix().product(fb.fix(), this@StateTApplicativeInstance.FF())
+            this@product.fix().product(this@StateTApplicativeInstance.FF(), fb.fix())
 
 }
 
 @instance(StateT::class)
 interface StateTMonadInstance<F, S> : StateTApplicativeInstance<F, S>, Monad<StateTPartialOf<F, S>> {
 
-    override fun <A, B> Kind<StateTPartialOf<F, S>, A>.map(f: (A) -> B): StateT<F, S, B> = fix().map(f, this@StateTMonadInstance.FF())
+    override fun <A, B> Kind<StateTPartialOf<F, S>, A>.map(f: (A) -> B): StateT<F, S, B> = fix().map(this@StateTMonadInstance.FF(), f)
 
     override fun <A, B> Kind<StateTPartialOf<F, S>, A>.flatMap(f: (A) -> Kind<StateTPartialOf<F, S>, B>): StateT<F, S, B> =
-            fix().flatMap(f, FF())
+            fix().flatMap(FF(), f)
 
     override fun <A, B> tailRecM(a: A, f: (A) -> StateTOf<F, S, Either<A, B>>): StateT<F, S, B> =
             StateT.tailRecM(FF(), a, f)
@@ -56,7 +56,7 @@ interface StateTSemigroupKInstance<F, S> : SemigroupK<StateTPartialOf<F, S>> {
     fun SS(): SemigroupK<F>
 
     override fun <A> Kind<StateTPartialOf<F, S>, A>.combineK(y: Kind<StateTPartialOf<F, S>, A>): StateT<F, S, A> =
-            fix().combineK(y, FF(), SS())
+            fix().combineK(FF(), SS(), y)
 
 }
 

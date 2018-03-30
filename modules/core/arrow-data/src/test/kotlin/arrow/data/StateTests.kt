@@ -22,11 +22,11 @@ class StateTests : UnitSpec() {
         }
 
         "addOne.map(n -> n).run(1) should return same Pair(2, 1)" {
-            addOne.map({ n -> n }, Id.functor()).run(1) shouldBe Tuple2(2, 1)
+            addOne.map(Id.functor(), { n -> n }).run(1) shouldBe Tuple2(2, 1)
         }
 
         "addOne.map(n -> n.toString).run(1) should return same Pair(2, \"1\")" {
-            addOne.map(Int::toString, Id.functor()).run(1) shouldBe Tuple2(2, "1")
+            addOne.map(Id.functor(), Int::toString).run(1) shouldBe Tuple2(2, "1")
         }
 
         "addOne.runS(1) should return 2" {

@@ -56,16 +56,16 @@ fun <S, A> StateFun<S, A>.toState(): State<S, A> = State(IdBimonad, this)
 fun <S, A> StateFunOf<S, A>.toState(): State<S, A> = State(this)
 
 fun <S, T, P1, R> State<S, T>.map(sx: State<S, P1>, f: (T, P1) -> R): State<S, R> =
-        flatMap ({ t -> sx.map { x -> f(t, x) } }, IdBimonad).fix()
+        flatMap (IdBimonad, { t -> sx.map { x -> f(t, x) } }).fix()
 
-fun <S, T, R> State<S, T>.map(f: (T) -> R): State<S, R> = flatMap({ t -> StateApi.pure<S, R>(f(t)) }, IdBimonad).fix()
+fun <S, T, R> State<S, T>.map(f: (T) -> R): State<S, R> = flatMap(IdBimonad, { t -> StateApi.pure<S, R>(f(t)) }).fix()
 
 /**
  * Alias for [StateT.run] `StateT<ForId, S, A>`
  *
  * @param initial state to start stateful computation.
  */
-fun <S, A> StateT<ForId, S, A>.run(initial: S): Tuple2<S, A> = run(initial, IdBimonad).value()
+fun <S, A> StateT<ForId, S, A>.run(initial: S): Tuple2<S, A> = run(IdBimonad, initial).value()
 
 /**
  * Alias for [StateT.runA] `StateT<ForId, S, A>`
