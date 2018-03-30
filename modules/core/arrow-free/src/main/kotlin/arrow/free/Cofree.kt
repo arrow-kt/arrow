@@ -47,7 +47,7 @@ data class Cofree<S, A>(val FS: Functor<S>, val head: A, val tail: Eval<CofreeEv
         return ev.flatMap { folder(extract(), it) }
     }
 
-    fun <F, M, A, B> Cofree<F, A>.cataM(folder: (A, Kind<F, B>) -> Kind<M, B>, inclusion: FunctionK<ForEval, M>, TF: Traverse<F>, MM: Monad<M>): Kind<M, B> = MM.run {
+    fun <F, M, A, B> Cofree<F, A>.cataM(inclusion: FunctionK<ForEval, M>, MM: Monad<M>, TF: Traverse<F>, folder: (A, Kind<F, B>) -> Kind<M, B>): Kind<M, B> = MM.run {
         fun loop(ev: Cofree<F, A>): Eval<Kind<M, B>> {
             val looped: Kind<M, Kind<F, B>> = TF.run { ev.tailForced().traverse(MM, { inclusion(Eval.defer { loop(it) }).flatten() }) }
             val folded: Kind<M, B> = looped.flatMap { fb -> folder(ev.head, fb) }
@@ -57,10 +57,10 @@ data class Cofree<S, A>(val FS: Functor<S>, val head: A, val tail: Eval<CofreeEv
     }
 
     companion object {
-        fun <S, A> unfold(FS: Functor<S>, a: A, f: (A) -> Kind<S, A>): Cofree<S, A> = create(a, f, FS)
+        fun <S, A> unfold(FS: Functor<S>, a: A, f: (A) -> Kind<S, A>): Cofree<S, A> = create(FS, a, f)
 
-        fun <S, A> create(a: A, f: (A) -> Kind<S, A>, FS: Functor<S>): Cofree<S, A> = FS.run {
-            Cofree(this, a, Eval.later { f(a).map({ create(it, f, this) }) })
+        fun <S, A> create(FS: Functor<S>, a: A, f: (A) -> Kind<S, A>): Cofree<S, A> = FS.run {
+            Cofree(this, a, Eval.later { f(a).map({ create(this, it, f) }) })
         }
 
     }
