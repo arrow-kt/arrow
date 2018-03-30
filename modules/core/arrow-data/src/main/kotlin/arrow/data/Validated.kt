@@ -166,7 +166,7 @@ fun <E, A> Validated<E, A>.orElse(default: () -> Validated<E, A>): Validated<E, 
  * From Apply:
  * if both the function and this value are Valid, apply the function
  */
-fun <E, A, B> Validated<E, A>.ap(f: Validated<E, (A) -> B>, SE: Semigroup<E>): Validated<E, B> =
+fun <E, A, B> Validated<E, A>.ap(SE: Semigroup<E>, f: Validated<E, (A) -> B>): Validated<E, B> =
         when (this) {
             is Valid -> f.fold({ Invalid(it) }, { Valid(it(a)) })
             is Invalid -> f.fold({ Invalid(SE.run { it.combine(e) }) }, { Invalid(e) })
@@ -175,7 +175,7 @@ fun <E, A, B> Validated<E, A>.ap(f: Validated<E, (A) -> B>, SE: Semigroup<E>): V
 fun <E, A> Validated<E, A>.handleLeftWith(f: (E) -> ValidatedOf<E, A>): Validated<E, A> =
         fold({ f(it).fix() }, { Valid(it) })
 
-fun <G, E, A, B> Validated<E, A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Validated<E, B>> = GA.run {
+fun <G, E, A, B> Validated<E, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> = GA.run {
     when (this@traverse) {
         is Valid -> f(a).map({ Valid(it) })
         is Invalid -> pure(this@traverse)
