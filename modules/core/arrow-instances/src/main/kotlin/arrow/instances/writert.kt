@@ -44,7 +44,7 @@ interface WriterTMonadInstance<F, W> : WriterTApplicativeInstance<F, W>, Monad<W
             fix().flatMap(FF(), MM(), { f(it).fix() })
 
     override fun <A, B> tailRecM(a: A, f: (A) -> Kind<WriterTPartialOf<F, W>, Either<A, B>>): WriterT<F, W, B> =
-            WriterT.tailRecM(a, f, FF())
+            WriterT.tailRecM(FF(), a, f)
 
     override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.ap(ff: Kind<WriterTPartialOf<F, W>, (A) -> B>): WriterT<F, W, B> =
             fix().ap(FF(), MM(), ff)
@@ -56,7 +56,7 @@ interface WriterTSemigroupKInstance<F, W> : SemigroupK<WriterTPartialOf<F, W>> {
     fun SS(): SemigroupK<F>
 
     override fun <A> Kind<WriterTPartialOf<F, W>, A>.combineK(y: Kind<WriterTPartialOf<F, W>, A>): WriterT<F, W, A> =
-            fix().combineK(y, SS())
+            fix().combineK(SS(), y)
 }
 
 @instance(WriterT::class)
