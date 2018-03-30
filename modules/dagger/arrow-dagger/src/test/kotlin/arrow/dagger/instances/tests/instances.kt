@@ -193,7 +193,7 @@ object Arrow {
 object test {
     @JvmStatic
     fun main(args: Array<String>) {
-        println(Arrow.instances.optionApplicative().pure(1))
+        println(Arrow.instances.optionApplicative().just(1))
     }
 }
 

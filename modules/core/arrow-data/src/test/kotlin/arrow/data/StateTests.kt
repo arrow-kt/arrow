@@ -4,7 +4,6 @@ import arrow.core.Id
 import arrow.core.Tuple2
 import arrow.core.functor
 import arrow.core.toT
-import arrow.syntax.collections.stateTraverse
 import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
@@ -23,11 +22,11 @@ class StateTests : UnitSpec() {
         }
 
         "addOne.map(n -> n).run(1) should return same Pair(2, 1)" {
-            addOne.map({ n -> n }, Id.functor()).run(1) shouldBe Tuple2(2, 1)
+            addOne.map(Id.functor(), { n -> n }).run(1) shouldBe Tuple2(2, 1)
         }
 
         "addOne.map(n -> n.toString).run(1) should return same Pair(2, \"1\")" {
-            addOne.map(Int::toString, Id.functor()).run(1) shouldBe Tuple2(2, "1")
+            addOne.map(Id.functor(), Int::toString).run(1) shouldBe Tuple2(2, "1")
         }
 
         "addOne.runS(1) should return 2" {
@@ -42,14 +41,8 @@ class StateTests : UnitSpec() {
             add1.run(1) shouldBe (2 toT 1)
         }
 
-        "traverse" {
-            val ns = (0..10).toList()
-            val x = ns.stateTraverse { add1 }
-            x.run(0).a shouldBe 11
-        }
-
-        "pure" {
-            val s1 = StateApi.pure<String, Int>(1)
+        "just" {
+            val s1 = StateApi.just<String, Int>(1)
             s1.run("foo") shouldBe ("foo" toT 1)
         }
 

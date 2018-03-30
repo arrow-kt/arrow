@@ -1,10 +1,15 @@
 package arrow.optics.instances
 
 import arrow.core.Option
+import arrow.core.monoid
 import arrow.data.MapK
 import arrow.data.SetK
+import arrow.data.at
+import arrow.data.eq
+import arrow.instances.IntMonoidInstance
+import arrow.instances.IntSemigroupInstance
+import arrow.instances.StringEqInstance
 import arrow.optics.AndMonoid
-import arrow.optics.typeclasses.at
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genMapK
@@ -13,8 +18,9 @@ import arrow.test.generators.genSetK
 import arrow.test.laws.LensLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.Gen
+import java_util.MapAtInstance
+import java_util.SetAtInstance
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -22,44 +28,44 @@ class AtInstanceTest : UnitSpec() {
 
     init {
 
-        "instances can be resolved implicitly" {
-            at<MapK<String, Int>, String, Option<Int>>() shouldNotBe null
-            at<Map<String, Int>, String, Option<Int>>() shouldNotBe null
-            at<SetK<String>, String, Boolean>() shouldNotBe null
-            at<Set<String>, String, Boolean>() shouldNotBe null
-        }
-
         testLaws(LensLaws.laws(
-                lens = at<MapK<String, Int>, String, Option<Int>>().at(Gen.string().generate()),
+                lens = MapK.at<String, Int>().at(Gen.string().generate()),
                 aGen = genMapK(Gen.string(), Gen.int()),
                 bGen = genOption(Gen.int()),
-                funcGen = genFunctionAToB(genOption(Gen.int()))
+                funcGen = genFunctionAToB(genOption(Gen.int())),
+                EQA = Eq.any(),
+                EQB = Eq.any(),
+                MB = Option.monoid(IntMonoidInstance)
         ))
 
         testLaws(LensLaws.laws(
-                lens = at<Map<String, Int>, String, Option<Int>>().at(Gen.string().generate()),
+                lens = MapAtInstance<String, Int>().at(Gen.string().generate()),
                 aGen = Gen.map(Gen.string(), Gen.int()),
                 bGen = genOption(Gen.int()),
                 funcGen = genFunctionAToB(genOption(Gen.int())),
-                EQA = Eq.any()
+                EQA = Eq.any(),
+                EQB = Eq.any(),
+                MB = Option.monoid(IntSemigroupInstance)
         ))
 
         testLaws(LensLaws.laws(
-                lens = at<SetK<String>, String, Boolean>().at(Gen.string().generate()),
+                lens = SetK.at<String>().at(Gen.string().generate()),
                 aGen = genSetK(Gen.string()),
                 bGen = Gen.bool(),
                 funcGen = genFunctionAToB(Gen.bool()),
+                EQA = SetK.eq(StringEqInstance),
+                EQB = Eq.any(),
                 MB = AndMonoid
         ))
 
         testLaws(LensLaws.laws(
-                lens = at<Set<String>, String, Boolean>().at(Gen.string().generate()),
+                lens = SetAtInstance<String>().at(Gen.string().generate()),
                 aGen = Gen.set(Gen.string()),
                 bGen = Gen.bool(),
                 funcGen = genFunctionAToB(Gen.bool()),
                 EQA = Eq.any(),
+                EQB = Eq.any(),
                 MB = AndMonoid
         ))
-
     }
 }

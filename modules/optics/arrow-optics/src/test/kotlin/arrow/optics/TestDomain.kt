@@ -1,10 +1,10 @@
 package arrow.optics
 
-import io.kotlintest.properties.Gen
+import arrow.core.Left
+import arrow.core.Right
 import arrow.core.identity
-import arrow.syntax.either.left
-import arrow.syntax.either.right
 import arrow.typeclasses.Eq
+import io.kotlintest.properties.Gen
 
 sealed class SumType {
     data class A(val string: String) : SumType()
@@ -22,15 +22,15 @@ object SumGen : Gen<SumType> {
 val sumPrism: Prism<SumType, String> = Prism(
         {
             when (it) {
-                is SumType.A -> it.string.right()
-                else -> it.left()
+                is SumType.A -> Right(it.string)
+                else -> Left(it)
             }
         },
         SumType::A
 )
 
 val stringPrism: Prism<String, List<Char>> = Prism(
-        { it.toList().right() },
+        { Right(it.toList()) },
         { it.joinToString(separator = "") }
 )
 
@@ -60,7 +60,7 @@ internal val userSetter: Setter<User, Token> = Setter { s ->
 internal data class Token(val value: String) {
     companion object {
         fun eq() = object : Eq<Token> {
-            override fun eqv(a: Token, b: Token): Boolean = a == b
+            override fun Token.eqv(b: Token): Boolean = this == b
         }
     }
 }
@@ -81,11 +81,11 @@ internal val userLens: Lens<User, Token> = Lens(
 )
 
 internal val optionalHead: Optional<List<Int>, Int> = Optional(
-        { it.firstOrNull()?.right() ?: it.left() },
+        { it.firstOrNull()?.let(::Right) ?: it.let(::Left) },
         { int -> { list -> listOf(int) + if (list.size > 1) list.drop(1) else emptyList() } }
 )
 
 internal val defaultHead: Optional<Int, Int> = Optional(
-        { it.right() },
+        { it.let(::Right) },
         { ::identity }
 )

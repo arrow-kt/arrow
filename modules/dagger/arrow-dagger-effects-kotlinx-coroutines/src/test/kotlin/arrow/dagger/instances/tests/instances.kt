@@ -1,10 +1,10 @@
 package arrow.dagger.instances.tests
 
 import arrow.dagger.effects.instances.coroutines.ArrowEffectsCoroutinesInstances
-import arrow.effects.Async
+import arrow.effects.typeclasses.Async
 import arrow.effects.ForDeferredK
-import arrow.effects.Effect
-import arrow.effects.MonadSuspend
+import arrow.effects.typeclasses.Effect
+import arrow.effects.typeclasses.MonadSuspend
 import arrow.typeclasses.*
 import dagger.Component
 import javax.inject.Singleton

@@ -5,7 +5,6 @@ dependencies {
     compile 'io.arrow-kt:ank-core:0.6.2-20180328.183436-8'
     compile project(':arrow-data')
     compile project(':arrow-core')
-    compile project(':arrow-syntax')
     compile project(':arrow-instances')
     compile project(':arrow-effects')
     compile project(':arrow-effects-rx2')

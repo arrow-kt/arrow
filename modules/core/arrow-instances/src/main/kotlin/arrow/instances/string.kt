@@ -3,32 +3,22 @@ package arrow.instances
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Show
 
 object StringSemigroupInstance : Semigroup<String> {
-    override fun combine(a: String, b: String): String = "$a$b"
-}
-
-object StringSemigroupInstanceImplicits {
-
-    fun instance(): StringSemigroupInstance = StringSemigroupInstance
+    override fun String.combine(b: String): String = "${this}$b"
 }
 
 object StringMonoidInstance : Monoid<String> {
     override fun empty(): String = ""
 
-    override fun combine(a: String, b: String): String = StringSemigroupInstance.combine(a, b)
-}
-
-object StringMonoidInstanceImplicits {
-
-    fun instance(): StringMonoidInstance = StringMonoidInstance
+    override fun String.combine(b: String): String = StringSemigroupInstance.run { combine(b) }
 }
 
 object StringEqInstance : Eq<String> {
-    override fun eqv(a: String, b: String): Boolean = a == b
+    override fun String.eqv(b: String): Boolean = this == b
 }
 
-object StringEqInstanceImplicits {
-
-    fun instance(): StringEqInstance = StringEqInstance
+object StringShowInstance : Show<String> {
+    override fun String.show(): String = this
 }

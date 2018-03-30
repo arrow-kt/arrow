@@ -1,19 +1,15 @@
 package arrow.optics.instances
 
+import arrow.core.Left
+import arrow.core.Right
 import arrow.core.toT
-import arrow.data.ForNonEmptyList
-import arrow.data.NonEmptyList
-import arrow.data.NonEmptyListOf
-import arrow.data.fix
-import arrow.data.traverse
+import arrow.data.*
 import arrow.instance
 import arrow.optics.Optional
 import arrow.optics.POptional
 import arrow.optics.Traversal
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
-import arrow.syntax.either.left
-import arrow.syntax.either.right
 
 @instance(NonEmptyList::class)
 interface NonEmptyListFilterIndexInstance<A> : FilterIndex<NonEmptyListOf<A>, Int, A> {
@@ -29,7 +25,7 @@ interface NonEmptyListIndexInstance<A> : Index<NonEmptyListOf<A>, Int, A> {
 
     override fun index(i: Int): Optional<NonEmptyListOf<A>, A> = POptional(
             getOrModify = { l ->
-                l.fix().all.getOrNull(i)?.right() ?: l.fix().left()
+                l.fix().all.getOrNull(i)?.let(::Right) ?: l.fix().let(::Left)
             },
             set = { a ->
                 { l ->

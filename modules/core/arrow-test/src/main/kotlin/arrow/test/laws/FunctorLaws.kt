@@ -1,44 +1,42 @@
 package arrow.test.laws
 
-import arrow.*
+import arrow.Kind
 import arrow.core.andThen
 import arrow.core.identity
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Functor
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object FunctorLaws {
 
-    inline fun <reified F> laws(AP: Applicative<F> = applicative<F>(), EQ: Eq<Kind<F, Int>>): List<Law> =
+    inline fun <F> laws(AP: Applicative<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
             listOf(
-                    Law("Functor Laws: Covariant Identity", { covariantIdentity(AP, AP::pure, EQ) }),
-                    Law("Functor Laws: Covariant Composition", { covariantComposition(AP, AP::pure, EQ) })
+                    Law("Functor Laws: Covariant Identity", { AP.covariantIdentity(AP::just, EQ) }),
+                    Law("Functor Laws: Covariant Composition", { AP.covariantComposition(AP::just, EQ) })
             )
 
-    inline fun <reified F> laws(FF: Functor<F> = functor<F>(), crossinline f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
+    fun <F> laws(FF: Functor<F>, f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
             listOf(
-                    Law("Functor Laws: Covariant Identity", { covariantIdentity(FF, f, EQ) }),
-                    Law("Functor Laws: Covariant Composition", { covariantComposition(FF, f, EQ) })
+                    Law("Functor Laws: Covariant Identity", { FF.covariantIdentity(f, EQ) }),
+                    Law("Functor Laws: Covariant Composition", { FF.covariantComposition(f, EQ) })
             )
 
-    inline fun <reified F> covariantIdentity(FF: Functor<F> = functor<F>(), crossinline f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
+    fun <F> Functor<F>.covariantIdentity(f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genConstructor(Gen.int(), f), { fa: Kind<F, Int> ->
-                FF.map(fa, ::identity).equalUnderTheLaw(fa, EQ)
+                fa.map(::identity).equalUnderTheLaw(fa, EQ)
             })
 
-    inline fun <reified F> covariantComposition(FF: Functor<F> = functor<F>(), crossinline ff: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
+    fun <F> Functor<F>.covariantComposition(ff: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(
                     genConstructor(Gen.int(), ff),
                     genFunctionAToB<Int, Int>(Gen.int()),
                     genFunctionAToB<Int, Int>(Gen.int()),
                     { fa: Kind<F, Int>, f, g ->
-                        FF.map(FF.map(fa, f), g).equalUnderTheLaw(FF.map(fa, f andThen g), EQ)
+                        fa.map(f).map(g).equalUnderTheLaw(fa.map(f andThen g), EQ)
                     }
             )
-
 }
-
-
-

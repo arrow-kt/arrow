@@ -1,18 +1,18 @@
 package arrow.typeclasses
 
-import arrow.*
+import arrow.Kind2
 import arrow.core.Eval
 
-@typeclass
-interface Bifoldable<F> : TC {
+inline operator fun <F, A> Bifoldable<F>.invoke(ff: Bifoldable<F>.() -> A) =
+        run(ff)
 
-    fun <A, B, C> bifoldLeft(fab: Kind2<F, A, B>, c: C, f: (C, A) -> C, g: (C, B) -> C): C
+interface Bifoldable<F> {
 
-    fun <A, B, C> bifoldRight(fab: Kind2<F, A, B>, c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C>
+    fun <A, B, C> Kind2<F, A, B>.bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C
 
-    fun <A, B, C> bifoldMap(fab: Kind2<F, A, B>, f: (A) -> C, g: (B) -> C, MC: Monoid<C>) =
-            bifoldLeft(fab, MC.empty(), { c, a -> MC.combine(c, f(a)) }, { c, b -> MC.combine(c, g(b)) })
+    fun <A, B, C> Kind2<F, A, B>.bifoldRight(c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C>
+
+    fun <A, B, C> Kind2<F, A, B>.bifoldMap(MN: Monoid<C>, f: (A) -> C, g: (B) -> C) = MN.run {
+        bifoldLeft(MN.empty(), { c, a -> c.combine(f(a)) }, { c, b -> c.combine(g(b)) })
+    }
 }
-
-inline fun <F, A, B, reified C> Bifoldable<in F>.bifoldMap(MC: Monoid<C> = monoid(), fab: Kind2<F, A, B>, noinline f: (A) -> C, noinline g: (B) -> C) =
-        bifoldMap(fab, f, g, MC)

@@ -1,7 +1,9 @@
 package arrow.derive
 
+import arrow.common.utils.AbstractProcessor
+import arrow.common.utils.ClassOrPackageDataWrapper
+import arrow.common.utils.knownError
 import com.google.auto.service.AutoService
-import arrow.common.utils.*
 import org.jetbrains.kotlin.serialization.deserialization.TypeTable
 import java.io.File
 import javax.annotation.processing.Processor
@@ -28,7 +30,7 @@ class DerivingProcessor : AbstractProcessor() {
                 .map { element ->
                     when (element.kind) {
                         ElementKind.CLASS -> processClass(element as TypeElement)
-                        else -> knownError("${derivingAnnotationName} can only be used on classes")
+                        else -> knownError("$derivingAnnotationName can only be used on classes")
                     }
                 }
 
@@ -58,11 +60,11 @@ class DerivingProcessor : AbstractProcessor() {
             val superTypes = recurseTypeclassInterfaces(typeClassWrapper, typeTable, emptyList())
             typeClassWrapper to superTypes
         }.toMap()
-        val companionName = proto.nameResolver
-                .getString(proto.classProto.fqName)
-                .replace("/", ".") + "." +
+        val className = proto.nameResolver.getString(proto.classProto.fqName).replace("/", ".")
+        val companionName = className + "." +
                 proto.nameResolver.getString(proto.classProto.companionObjectName)
         val typeClassElement = elementUtils.getTypeElement(companionName)
+                ?: knownError("Deriving for $className: It is required that the class declares a companion object")
         val companionProto = getClassOrPackageDataWrapper(typeClassElement)
         return AnnotatedDeriving(element, proto, companionProto, typeClasses, typeclassSuperTypes)
     }

@@ -10,7 +10,7 @@ operator fun <A> Function0Of<A>.invoke(): A = this.fix().f()
 @higherkind
 data class Function0<out A>(internal val f: () -> A) : Function0Of<A> {
 
-    fun <B> map(f: (A) -> B): Function0<B> = pure(f(this()))
+    fun <B> map(f: (A) -> B): Function0<B> = just(f(this()))
 
     fun <B> flatMap(ff: (A) -> Function0Of<B>): Function0<B> = ff(f()).fix()
 
@@ -22,7 +22,7 @@ data class Function0<out A>(internal val f: () -> A) : Function0Of<A> {
 
     companion object {
 
-        fun <A> pure(a: A): Function0<A> = { a }.k()
+        fun <A> just(a: A): Function0<A> = { a }.k()
 
         tailrec fun <A, B> loop(a: A, f: (A) -> Kind<ForFunction0, Either<A, B>>): B {
             val fa = f(a).fix()()

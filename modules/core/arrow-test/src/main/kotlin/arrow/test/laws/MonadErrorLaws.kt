@@ -7,25 +7,24 @@ import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genThrowable
 import arrow.typeclasses.Eq
 import arrow.typeclasses.MonadError
-import arrow.typeclasses.monadError
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object MonadErrorLaws {
 
-    inline fun <reified F> laws(M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQERR: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>, EQ: Eq<Kind<F, Int>> = EQERR): List<Law> =
+    inline fun <F> laws(M: MonadError<F, Throwable>, EQERR: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>, EQ: Eq<Kind<F, Int>> = EQERR): List<Law> =
             MonadLaws.laws(M, EQ) + ApplicativeErrorLaws.laws(M, EQERR, EQ_EITHER, EQ) + listOf(
-                    Law("Monad Error Laws: left zero", { monadErrorLeftZero(M, EQERR) }),
-                    Law("Monad Error Laws: ensure consistency", { monadErrorEnsureConsistency(M, EQERR) })
+                    Law("Monad Error Laws: left zero", { M.monadErrorLeftZero(EQERR) }),
+                    Law("Monad Error Laws: ensure consistency", { M.monadErrorEnsureConsistency(EQERR) })
             )
 
-    inline fun <reified F> monadErrorLeftZero(M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<Kind<F, Int>>): Unit =
-            forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), M)), genThrowable(), { f: (Int) -> Kind<F, Int>, e: Throwable ->
-                M.flatMap(M.raiseError<Int>(e), f).equalUnderTheLaw(M.raiseError<Int>(e), EQ)
+    fun <F> MonadError<F, Throwable>.monadErrorLeftZero(EQ: Eq<Kind<F, Int>>): Unit =
+            forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), this)), genThrowable(), { f: (Int) -> Kind<F, Int>, e: Throwable ->
+                raiseError<Int>(e).flatMap(f).equalUnderTheLaw(raiseError<Int>(e), EQ)
             })
 
-    inline fun <reified F> monadErrorEnsureConsistency(M: MonadError<F, Throwable> = monadError<F, Throwable>(), EQ: Eq<Kind<F, Int>>): Unit =
-            forAll(genApplicative(Gen.int(), M), genThrowable(), genFunctionAToB<Int, Boolean>(Gen.bool()), { fa: Kind<F, Int>, e: Throwable, p: (Int) -> Boolean ->
-                M.ensure(fa, { e }, p).equalUnderTheLaw(M.flatMap(fa, { a -> if (p(a)) M.pure(a) else M.raiseError(e) }), EQ)
+    fun <F> MonadError<F, Throwable>.monadErrorEnsureConsistency(EQ: Eq<Kind<F, Int>>): Unit =
+            forAll(genApplicative(Gen.int(), this), genThrowable(), genFunctionAToB<Int, Boolean>(Gen.bool()), { fa: Kind<F, Int>, e: Throwable, p: (Int) -> Boolean ->
+                fa.ensure({ e }, p).equalUnderTheLaw(fa.flatMap({ a -> if (p(a)) just(a) else raiseError(e) }), EQ)
             })
 }

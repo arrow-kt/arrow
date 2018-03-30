@@ -1,29 +1,16 @@
 package arrow.optics.instances
 
 import arrow.Kind
+import arrow.core.Left
 import arrow.core.Option
-import arrow.data.ForMapK
-import arrow.data.ListK
-import arrow.data.MapK
-import arrow.data.MapKOf
-import arrow.data.MapKPartialOf
-import arrow.data.fix
-import arrow.data.getOption
-import arrow.data.k
-import arrow.data.traverse
+import arrow.core.Right
+import arrow.data.*
 import arrow.instance
-import arrow.optics.Lens
-import arrow.optics.Optional
-import arrow.optics.PLens
-import arrow.optics.POptional
-import arrow.optics.Traversal
-import arrow.optics.fromTraversable
+import arrow.optics.*
 import arrow.optics.typeclasses.At
 import arrow.optics.typeclasses.Each
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
-import arrow.syntax.either.left
-import arrow.syntax.either.right
 import arrow.typeclasses.Applicative
 
 @instance(MapK::class)
@@ -43,33 +30,35 @@ interface MapKAtInstance<K, V> : At<MapK<K, V>, K, Option<V>> {
 }
 
 @instance(MapK::class)
-interface MapKEachInstance<K> : Each<MapKPartialOf<K>, K> {
-    override fun each(): Traversal<MapKPartialOf<K>, K> =
-            Traversal.fromTraversable()
+interface MapKEachInstance<K, V> : Each<MapKOf<K, V>, V> {
+    override fun each(): Traversal<MapKOf<K, V>, V> =
+            Traversal.fromTraversable(MapK.traverse())
 }
 
 @instance(MapK::class)
 interface MapKFilterIndexInstance<K, V> : FilterIndex<MapKOf<K, V>, K, V> {
 
     override fun filter(p: (K) -> Boolean): Traversal<MapKOf<K, V>, V> = object : Traversal<MapKOf<K, V>, V> {
-        override fun <F> modifyF(FA: Applicative<F>, s: Kind<Kind<ForMapK, K>, V>, f: (V) -> Kind<F, V>): Kind<F, Kind<Kind<ForMapK, K>, V>> =
-                ListK.traverse().traverse(s.fix().map.toList().k(), { (k, v) ->
-                    FA.map(if (p(k)) f(v) else FA.pure(v)) {
+        override fun <F> modifyF(FA: Applicative<F>, s: Kind<Kind<ForMapK, K>, V>, f: (V) -> Kind<F, V>): Kind<F, Kind<Kind<ForMapK, K>, V>> = FA.run {
+            ListK.traverse().run {
+                s.fix().map.toList().k().traverse(FA, { (k, v) ->
+                    (if (p(k)) f(v) else just(v)).map {
                         k to it
                     }
-                }, FA).let {
-                    FA.map(it) {
-                        it.toMap().k()
-                    }
+                })
+            }.let {
+                it.map {
+                    it.toMap().k()
                 }
-
+            }
+        }
     }
 }
 
 @instance(MapK::class)
 interface MapKIndexInstance<K, V> : Index<MapKOf<K, V>, K, V> {
     override fun index(i: K): Optional<MapKOf<K, V>, V> = POptional(
-            getOrModify = { it.fix()[i]?.right() ?: it.left() },
+            getOrModify = { it.fix()[i]?.let(::Right) ?: it.let(::Left) },
             set = { v -> { m -> m.fix().mapValues { (k, vv) -> if (k == i) v else vv }.k() } }
     )
 }

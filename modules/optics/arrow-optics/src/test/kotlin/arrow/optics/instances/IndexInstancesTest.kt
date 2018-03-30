@@ -1,90 +1,82 @@
 package arrow.optics.instances
 
-import arrow.data.ListK
-import arrow.data.MapK
-import arrow.data.NonEmptyList
-import arrow.data.SequenceK
-import arrow.optics.typeclasses.index
+import arrow.data.*
+import arrow.instances.StringEqInstance
 import arrow.test.UnitSpec
-import arrow.test.generators.genChars
-import arrow.test.generators.genFunctionAToB
-import arrow.test.generators.genListK
-import arrow.test.generators.genMapK
-import arrow.test.generators.genNonEmptyList
-import arrow.test.generators.genSequenceK
+import arrow.test.generators.*
 import arrow.test.laws.OptionalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.Gen
+import java_util.ListIndexInstance
+import java_util.MapIndexInstance
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class IndexInstanceTest : UnitSpec() {
 
     init {
-
-        "instances can be resolved implicitly" {
-            index<ListK<String>, Int, String>() shouldNotBe null
-            index<List<String>, Int, String>() shouldNotBe null
-            index<NonEmptyList<String>, Int, String>() shouldNotBe null
-            index<SequenceK<Char>, Int, Char>() shouldNotBe null
-            index<MapK<Char, Int>, String, Int>() shouldNotBe null
-            index<Map<Char, Int>, String, Int>() shouldNotBe null
-            index<String, Int, Char>() shouldNotBe null
-        }
-
         testLaws(OptionalLaws.laws(
-                optional = index<ListK<String>, Int, String>().index(5),
+                optional = ListK.index<String>().index(5),
                 aGen = genListK(Gen.string()),
                 bGen = Gen.string(),
-                funcGen = genFunctionAToB(Gen.string())
+                funcGen = genFunctionAToB(Gen.string()),
+                EQOptionB = Eq.any(),
+                EQA = Eq.any()
         ))
 
         testLaws(OptionalLaws.laws(
-                optional = index<List<String>, Int, String>().index(5),
+                optional = ListIndexInstance<String>().index(5),
                 aGen = Gen.list(Gen.string()),
                 bGen = Gen.string(),
                 funcGen = genFunctionAToB(Gen.string()),
+                EQOptionB = Eq.any(),
                 EQA = Eq.any()
         ))
 
         testLaws(OptionalLaws.laws(
-                optional = index<NonEmptyList<String>, Int, String>().index(5),
+                optional = NonEmptyList.index<String>().index(5),
                 aGen = genNonEmptyList(Gen.string()),
                 bGen = Gen.string(),
-                funcGen = genFunctionAToB(Gen.string())
+                funcGen = genFunctionAToB(Gen.string()),
+                EQOptionB = Eq.any(),
+                EQA = Eq.any()
         ))
 
         testLaws(OptionalLaws.laws(
-                optional = index<SequenceK<String>, Int, String>().index(5),
+                optional = SequenceK.index<String>().index(5),
                 aGen = genSequenceK(Gen.string()),
                 bGen = Gen.string(),
-                funcGen = genFunctionAToB(Gen.string())
+                funcGen = genFunctionAToB(Gen.string()),
+                EQOptionB = Eq.any(),
+                EQA = SequenceK.eq(StringEqInstance)
         ))
 
         testLaws(OptionalLaws.laws(
-                optional = index<MapK<String, Int>, String, Int>().index(Gen.string().generate()),
+                optional = MapK.index<String, Int>().index(Gen.string().generate()),
                 aGen = genMapK(Gen.string(), Gen.int()),
                 bGen = Gen.int(),
-                funcGen = genFunctionAToB(Gen.int())
+                funcGen = genFunctionAToB(Gen.int()),
+                EQOptionB = Eq.any(),
+                EQA = Eq.any()
         ))
 
         testLaws(OptionalLaws.laws(
-                optional = index<Map<String, Int>, String, Int>().index(Gen.string().generate()),
+                optional = MapIndexInstance<String, Int>().index(Gen.string().generate()),
                 aGen = Gen.map(Gen.string(), Gen.int()),
                 bGen = Gen.int(),
                 funcGen = genFunctionAToB(Gen.int()),
+                EQOptionB = Eq.any(),
                 EQA = Eq.any()
         ))
 
         testLaws(OptionalLaws.laws(
-                optional = index<String, Int, Char>().index(5),
+                optional = StringIndexInstance().index(5),
                 aGen = Gen.string(),
                 bGen = genChars(),
-                funcGen = genFunctionAToB(genChars())
+                funcGen = genFunctionAToB(genChars()),
+                EQOptionB = Eq.any(),
+                EQA = Eq.any()
         ))
-
     }
-
 }

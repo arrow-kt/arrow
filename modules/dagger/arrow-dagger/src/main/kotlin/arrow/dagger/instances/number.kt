@@ -12,10 +12,10 @@ import dagger.Provides
 class NumberInstances {
 
     @Provides
-    fun byteSemigroup(): Semigroup<Byte> = ByteMonoid
+    fun byteSemigroup(): Semigroup<Byte> = ByteMonoidInstance
 
     @Provides
-    fun byteMonoid(): Monoid<Byte> = ByteMonoid
+    fun byteMonoid(): Monoid<Byte> = ByteMonoidInstance
 
     @Provides
     fun byteOrder(): Order<Byte> = ByteOrderInstance
@@ -36,10 +36,10 @@ class NumberInstances {
     fun doubleEq(): Eq<@JvmSuppressWildcards Double> = DoubleEqInstance
 
     @Provides
-    fun intSemigroup(): Semigroup<Int> = IntMonoid
+    fun intSemigroup(): Semigroup<Int> = IntMonoidInstance
 
     @Provides
-    fun intMonoid(): Monoid<Int> = IntMonoid
+    fun intMonoid(): Monoid<Int> = IntMonoidInstance
 
     @Provides
     fun intOrder(): Order<Int> = IntOrderInstance
@@ -48,10 +48,10 @@ class NumberInstances {
     fun intEq(): Eq<@JvmSuppressWildcards Int> = IntEqInstance
 
     @Provides
-    fun longSemigroup(): Semigroup<Long> = LongMonoid
+    fun longSemigroup(): Semigroup<Long> = LongMonoidInstance
 
     @Provides
-    fun longMonoid(): Monoid<Long> = LongMonoid
+    fun longMonoid(): Monoid<Long> = LongMonoidInstance
 
     @Provides
     fun longOrder(): Order<Long> = LongOrderInstance

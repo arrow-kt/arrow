@@ -1,16 +1,12 @@
 package arrow.optics
 
 import arrow.core.*
+import arrow.data.ListK
+import arrow.data.eq
 import arrow.data.k
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
-import arrow.instances.IntMonoid
+import arrow.data.monoid
+import arrow.instances.IntMonoidInstance
 import arrow.instances.StringMonoidInstance
-import arrow.syntax.either.left
-import arrow.syntax.either.right
-import arrow.syntax.option.some
-import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.laws.LensLaws
@@ -18,6 +14,10 @@ import arrow.test.laws.OptionalLaws
 import arrow.test.laws.SetterLaws
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.properties.Gen
+import io.kotlintest.properties.forAll
+import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class LensTest : UnitSpec() {
@@ -39,7 +39,9 @@ class LensTest : UnitSpec() {
                         aGen = TokenGen,
                         bGen = Gen.string(),
                         funcGen = genFunctionAToB(Gen.string()),
-                        EQA = Token.eq()
+                        EQA = Eq.any(),
+                        EQOptionB = Option.eq(Eq.any()),
+                        EQListB = ListK.eq(Eq.any())
                 ),
 
                 OptionalLaws.laws(
@@ -47,7 +49,8 @@ class LensTest : UnitSpec() {
                         aGen = TokenGen,
                         bGen = Gen.string(),
                         funcGen = genFunctionAToB(Gen.string()),
-                        EQA = Token.eq()
+                        EQA = Eq.any(),
+                        EQOptionB = Option.eq(Eq.any())
                 ),
 
                 SetterLaws.laws(
@@ -66,7 +69,7 @@ class LensTest : UnitSpec() {
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                MB = IntMonoid
+                MB = IntMonoidInstance
         ))
 
         "asFold should behave as valid Fold: size" {
@@ -89,37 +92,37 @@ class LensTest : UnitSpec() {
 
         "asFold should behave as valid Fold: getAll" {
             forAll(TokenGen) { token ->
-                tokenLens.asFold().getAll(token) == listOf(token.value).k()
+                tokenLens.asFold().getAll(ListK.monoid(), token) == listOf(token.value).k()
             }
         }
 
         "asFold should behave as valid Fold: combineAll" {
             forAll(TokenGen) { token ->
-                tokenLens.asFold().combineAll(token) == token.value
+                tokenLens.asFold().combineAll(StringMonoidInstance, token) == token.value
             }
         }
 
         "asFold should behave as valid Fold: fold" {
             forAll(TokenGen) { token ->
-                tokenLens.asFold().fold(token) == token.value
+                tokenLens.asFold().fold(StringMonoidInstance, token) == token.value
             }
         }
 
         "asFold should behave as valid Fold: headOption" {
             forAll(TokenGen) { token ->
-                tokenLens.asFold().headOption(token) == token.value.some()
+                tokenLens.asFold().headOption(token) == Some(token.value)
             }
         }
 
         "asFold should behave as valid Fold: lastOption" {
             forAll(TokenGen) { token ->
-                tokenLens.asFold().lastOption(token) == token.value.some()
+                tokenLens.asFold().lastOption(token) == Some(token.value)
             }
         }
 
         "asGetter should behave as valid Getter: get" {
             forAll(TokenGen) { token ->
-                tokenLens.asGetter().get(token) ==  tokenGetter.get(token)
+                tokenLens.asGetter().get(token) == tokenGetter.get(token)
             }
         }
 
@@ -143,7 +146,7 @@ class LensTest : UnitSpec() {
 
         "Lifting a function as a functor should yield the same result as not yielding" {
             forAll(TokenGen, Gen.string(), { token, value ->
-                tokenLens.modifyF(Option.functor(), token) { Some(value) } == tokenLens.liftF { Some(value) }(token)
+                tokenLens.modifyF(Option.functor(), token) { Some(value) } == tokenLens.liftF(Option.functor()) { Some(value) }(token)
             })
         }
 
@@ -166,7 +169,7 @@ class LensTest : UnitSpec() {
             forAll({ tokenValue: String ->
                 val token = Token(tokenValue)
                 val user = User(token)
-                joinedLens.get(token.left()) == joinedLens.get(user.right())
+                joinedLens.get(Left(token)) == joinedLens.get(Right(user))
             })
         }
 

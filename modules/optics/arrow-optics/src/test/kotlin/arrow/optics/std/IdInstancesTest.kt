@@ -1,13 +1,13 @@
 package arrow.optics
 
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.properties.Gen
-import arrow.typeclasses.Eq
 import arrow.core.Id
-import arrow.instances.IntMonoid
-import arrow.test.laws.IsoLaws
+import arrow.instances.IntMonoidInstance
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
+import arrow.test.laws.IsoLaws
+import arrow.typeclasses.Eq
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -21,7 +21,7 @@ class IdInstancesTest : UnitSpec() {
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                bMonoid = IntMonoid
+                bMonoid = IntMonoidInstance
         ))
     }
 

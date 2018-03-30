@@ -2,107 +2,105 @@ package arrow.test.laws
 
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Order
-import arrow.typeclasses.order
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
-
 object OrderLaws {
 
-    inline fun <reified F> laws(O: Order<F> = order(), fGen: Gen<F>, funcGen: Gen<(F) -> F>): List<Law> = listOf(
-            Law("Order law: reflexivity equality", { reflexitivityEq(O, fGen) }),
-            Law("Order law: symmetry equality", { symmetryEq(O, fGen) }),
-            Law("Order law: antisymmetry equality", { antisymmetryEq(O, fGen, funcGen) }),
-            Law("Order law: transitivity equality", { transitivityEq(O, fGen) }),
-            Law("Order law: reflexivity partial order", { reflexivityPartialOrder(O, fGen) }),
-            Law("Order law: antisymmetry partial order", { antisymmetryPartialOrder(O, fGen) }),
-            Law("Order law: transitivity partial order", { transitivityPartialOrder(O, fGen) }),
-            Law("Order law: greater than or equal partial order", { greaterThanOrEqualPartialOrder(O, fGen) }),
-            Law("Order law: lesser than partial order", { lesserThanPartialOrder(O, fGen) }),
-            Law("Order law: greater than partial order", { greaterThanPartialOrder(O, fGen) }),
-            Law("Order law: totality order", { totalityOrder(O, fGen) }),
-            Law("Order law: compare order", { compareOrder(O, fGen) }),
-            Law("Order law: min order", { minOrder(O, fGen) }),
-            Law("Order law: max order", { maxOrder(O, fGen) })
-    )
+    inline fun <F> laws(O: Order<F>, fGen: Gen<F>, funcGen: Gen<(F) -> F>): List<Law> =
+            EqLaws.laws(O, { fGen.generate() }) + listOf(
+                    Law("Order law: reflexivity equality", { O.reflexitivityEq(fGen) }),
+                    Law("Order law: symmetry equality", { O.symmetryEq(fGen) }),
+                    Law("Order law: antisymmetry equality", { O.antisymmetryEq(fGen, funcGen) }),
+                    Law("Order law: transitivity equality", { O.transitivityEq(fGen) }),
+                    Law("Order law: reflexivity partial order", { O.reflexivityPartialOrder(fGen) }),
+                    Law("Order law: antisymmetry partial order", { O.antisymmetryPartialOrder(fGen) }),
+                    Law("Order law: transitivity partial order", { O.transitivityPartialOrder(fGen) }),
+                    Law("Order law: greater than or equal partial order", { O.greaterThanOrEqualPartialOrder(fGen) }),
+                    Law("Order law: lesser than partial order", { O.lesserThanPartialOrder(fGen) }),
+                    Law("Order law: greater than partial order", { O.greaterThanPartialOrder(fGen) }),
+                    Law("Order law: totality order", { O.totalityOrder(fGen) }),
+                    Law("Order law: compare order", { O.compareOrder(fGen) }),
+                    Law("Order law: min order", { O.minOrder(fGen) }),
+                    Law("Order law: max order", { O.maxOrder(fGen) })
+            )
 
-    inline fun <reified F> reflexitivityEq(O: Order<F>, fGen: Gen<F>) =
+    fun <F> Order<F>.reflexitivityEq(fGen: Gen<F>) =
             forAll(fGen, { x ->
-                x.equalUnderTheLaw(x, O)
+                x.equalUnderTheLaw(x, this)
             })
 
-    inline fun <reified F> symmetryEq(O: Order<F>, fGen: Gen<F>) =
+    fun <F> Order<F>.symmetryEq(fGen: Gen<F>) =
             forAll(fGen, fGen, { x, y ->
-                O.eqv(x, y).equalUnderTheLaw(O.eqv(y, x), Eq.any())
+                x.eqv(y).equalUnderTheLaw(y.eqv(x), Eq.any())
             })
 
-    inline fun <reified F> antisymmetryEq(O: Order<F>, fGen: Gen<F>, funcGen: Gen<(F) -> F>) =
+    fun <F> Order<F>.antisymmetryEq(fGen: Gen<F>, funcGen: Gen<(F) -> F>) =
             forAll(fGen, fGen, funcGen, { x, y, f ->
-                !O.eqv(x, y) || O.eqv(f(x), f(y))
+                !x.eqv(y) || f(x).eqv(f(y))
             })
 
-    inline fun <reified F> transitivityEq(O: Order<F>, fGen: Gen<F>) =
+    fun <F> Order<F>.transitivityEq(fGen: Gen<F>) =
             forAll(fGen, fGen, fGen, { x, y, z ->
-                !(O.eqv(x, y) && O.eqv(y, z)) || O.eqv(x, z)
+                !(x.eqv(y) && y.eqv(z)) || x.eqv(z)
             })
 
-    inline fun <reified F> reflexivityPartialOrder(O: Order<F>, fGen: Gen<F>) =
+    fun <F> Order<F>.reflexivityPartialOrder(fGen: Gen<F>) =
             forAll(fGen, { x ->
-                O.lte(x, x)
+                x.lte(x)
             })
 
-    inline fun <reified F> antisymmetryPartialOrder(O: Order<F>, fGen: Gen<F>) =
+    fun <F> Order<F>.antisymmetryPartialOrder(fGen: Gen<F>) =
             forAll(fGen, fGen, { x, y ->
-                !(O.lte(x, y) && O.lte(y, x)) || O.eqv(x, y)
+                !(x.lte(y) && y.lte(x)) || x.eqv(y)
             })
 
-    inline fun <reified F> transitivityPartialOrder(O: Order<F>, fGen: Gen<F>) =
+    fun <F> Order<F>.transitivityPartialOrder(fGen: Gen<F>) =
             forAll(fGen, fGen, fGen, { x, y, z ->
-                !(O.lte(x, y) && O.lte(y, x)) || O.lte(x, z)
+                !(x.lte(y) && y.lte(x)) || x.lte(z)
             })
 
-    inline fun <reified F> greaterThanOrEqualPartialOrder(O: Order<F>, fGen: Gen<F>) =
+    fun <F> Order<F>.greaterThanOrEqualPartialOrder(fGen: Gen<F>) =
             forAll(fGen, fGen, { x, y ->
-                O.lte(x, y) == O.gte(y, x)
+                x.lte(y) == y.gte(x)
             })
 
-    inline fun <reified F> lesserThanPartialOrder(O: Order<F>, fGen: Gen<F>) =
+    fun <F> Order<F>.lesserThanPartialOrder(fGen: Gen<F>) =
             forAll(fGen, fGen, { x, y ->
-                O.lt(x, y) == (O.lte(x, y) && O.neqv(x, y))
+                x.lt(y) == (x.lte(y) && x.neqv(y))
             })
 
-    inline fun <reified F> greaterThanPartialOrder(O: Order<F>, fGen: Gen<F>) =
+    fun <F> Order<F>.greaterThanPartialOrder(fGen: Gen<F>) =
             forAll(fGen, fGen, { x, y ->
-                O.lt(x, y) == O.gt(y, x)
+                x.lt(y) == y.gt(x)
             })
 
-    inline fun <reified F> totalityOrder(O: Order<F>, fGen: Gen<F>) =
+    fun <F> Order<F>.totalityOrder(fGen: Gen<F>) =
             forAll(fGen, fGen, { x, y ->
-                O.lte(x, y) || O.lte(y, x)
+                x.lte(y) || y.lte(x)
             })
 
-    inline fun <reified F> compareOrder(O: Order<F>, fGen: Gen<F>) =
+    fun <F> Order<F>.compareOrder(fGen: Gen<F>) =
             forAll(fGen, fGen, { x, y ->
-                val c = O.compare(x, y)
-                ((c < 0) == O.lt(x, y)) && ((c == 0) == O.eqv(x, y)) && ((c > 0) == O.gt(x, y))
+                val c = x.compare(y)
+                ((c < 0) == x.lt(y)) && ((c == 0) == x.eqv(y)) && ((c > 0) == x.gt(y))
             })
 
-    inline fun <reified F> minOrder(O: Order<F>, fGen: Gen<F>) =
+    fun <F> Order<F>.minOrder(fGen: Gen<F>) =
             forAll(fGen, fGen, { x, y ->
-                val c = O.compare(x, y)
-                val m = O.min(x, y)
+                val c = x.compare(y)
+                val m = x.min(y)
                 if (c < 0) m == x
                 else if (c == 0) (m == x) && (m == y)
                 else m == y
             })
 
-    inline fun <reified F> maxOrder(O: Order<F>, fGen: Gen<F>) =
+    fun <F> Order<F>.maxOrder(fGen: Gen<F>) =
             forAll(fGen, fGen, { x, y ->
-                val c = O.compare(x, y)
-                val m = O.max(x, y)
+                val c = x.compare(y)
+                val m = x.max(y)
                 if (c < 0) m == y
                 else if (c == 0) (m == x) && (m == y)
                 else m == x
             })
-
 }

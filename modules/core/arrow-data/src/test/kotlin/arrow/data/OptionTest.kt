@@ -2,19 +2,16 @@ package arrow.data
 
 import arrow.Kind
 import arrow.core.*
-import arrow.mtl.traverseFilter
-import arrow.syntax.`try`.optionTry
+import arrow.instances.IntEqInstance
 import arrow.syntax.collections.firstOption
 import arrow.syntax.collections.option
-import arrow.syntax.collections.optionSequential
-import arrow.syntax.option.some
 import arrow.test.UnitSpec
 import arrow.test.generators.genOption
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseFilterLaws
-import arrow.typeclasses.*
+import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
@@ -31,21 +28,6 @@ class OptionTest : UnitSpec() {
 
     init {
 
-        "instances can be resolved implicitly" {
-            functor<ForOption>() shouldNotBe null
-            applicative<ForOption>() shouldNotBe null
-            monad<ForOption>() shouldNotBe null
-            foldable<ForOption>() shouldNotBe null
-            traverse<ForOption>() shouldNotBe null
-            traverseFilter<ForOption>() shouldNotBe null
-            semigroup<Option<Int>>() shouldNotBe null
-            monoid<Option<Int>>() shouldNotBe null
-            applicativeError<ForOption, Unit>() shouldNotBe null
-            monadError<ForOption, Unit>() shouldNotBe null
-            eq<Option<Int>>() shouldNotBe null
-            show<Option<Int>>() shouldNotBe null
-        }
-
         val EQ_EITHER: Eq<Kind<ForOption, Either<Unit, Int>>> = Eq { a, b ->
             a.fix().fold(
                     { b.fix().fold({ true }, { false }) },
@@ -61,8 +43,8 @@ class OptionTest : UnitSpec() {
         }
 
         testLaws(
-                EqLaws.laws(eq(), { genOption(Gen.int()).generate() }),
-                ShowLaws.laws(show(), eq(), { it.some() }),
+                EqLaws.laws(Option.eq(IntEqInstance), { genOption(Gen.int()).generate() }),
+                ShowLaws.laws(Option.show(),Option.eq(IntEqInstance), { Some(it) }),
                 //testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
                 TraverseFilterLaws.laws(Option.traverseFilter(), Option.monad(), ::Some, Eq.any()),
                 MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any())
@@ -184,20 +166,6 @@ class OptionTest : UnitSpec() {
             val l = listOf(1, 2, 3, 4, 5, 6)
             l.firstOption() shouldBe Some(1)
             l.firstOption { it > 2 } shouldBe Some(3)
-        }
-
-        "optionBody" {
-            optionTry { "1".toInt() } shouldBe Some(1)
-            optionTry { "foo".toInt() } shouldBe None
-        }
-
-        "sequential" {
-            fun parseInts(ints: List<String>): Option<List<Int>> {
-                return ints.map { optionTry { it.toInt() } }.optionSequential()
-            }
-
-            parseInts(listOf("1", "2", "3")) shouldBe Some(listOf(1, 2, 3))
-            parseInts(listOf("1", "foo", "3")) shouldBe None
         }
 
         "and" {

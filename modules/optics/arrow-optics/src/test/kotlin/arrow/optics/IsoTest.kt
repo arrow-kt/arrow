@@ -1,22 +1,19 @@
 package arrow.optics
 
 import arrow.core.*
+import arrow.data.ListK
+import arrow.data.eq
 import arrow.data.k
+import arrow.data.monoid
+import arrow.instances.StringMonoidInstance
+import arrow.test.UnitSpec
+import arrow.test.generators.genFunctionAToB
+import arrow.test.laws.*
+import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import arrow.instances.StringMonoidInstance
-import arrow.syntax.option.some
 import org.junit.runner.RunWith
-import arrow.test.UnitSpec
-import arrow.test.generators.genFunctionAToB
-import arrow.test.laws.IsoLaws
-import arrow.test.laws.LensLaws
-import arrow.test.laws.OptionalLaws
-import arrow.test.laws.PrismLaws
-import arrow.test.laws.SetterLaws
-import arrow.test.laws.TraversalLaws
-import arrow.typeclasses.Eq
 
 @RunWith(KTestJUnitRunner::class)
 class IsoTest : UnitSpec() {
@@ -51,7 +48,9 @@ class IsoTest : UnitSpec() {
                         aGen = TokenGen,
                         bGen = Gen.string(),
                         funcGen = genFunctionAToB(Gen.string()),
-                        EQA = Token.eq()
+                        EQA = Eq.any(),
+                        EQOptionB = Option.eq(Eq.any()),
+                        EQListB = ListK.eq(Eq.any())
                 ),
 
                 OptionalLaws.laws(
@@ -59,7 +58,8 @@ class IsoTest : UnitSpec() {
                         aGen = TokenGen,
                         bGen = Gen.string(),
                         funcGen = genFunctionAToB(Gen.string()),
-                        EQA = Token.eq()
+                        EQA = Eq.any(),
+                        EQOptionB = Option.eq(Eq.any())
                 ),
 
                 SetterLaws.laws(
@@ -80,69 +80,75 @@ class IsoTest : UnitSpec() {
                         bMonoid = StringMonoidInstance)
         )
 
-        "asFold should behave as valid Fold: size" {
-            forAll(TokenGen) { token ->
-                tokenIso.asFold().size(token) == 1
+        with (tokenIso.asFold()) {
+
+            "asFold should behave as valid Fold: size" {
+                forAll(TokenGen) { token ->
+                    size(token) == 1
+                }
+            }
+
+            "asFold should behave as valid Fold: nonEmpty" {
+                forAll(TokenGen) { token ->
+                    nonEmpty(token)
+                }
+            }
+
+            "asFold should behave as valid Fold: isEmpty" {
+                forAll(TokenGen) { token ->
+                    !isEmpty(token)
+                }
+            }
+
+            "asFold should behave as valid Fold: getAll" {
+                forAll(TokenGen) { token ->
+                    getAll(ListK.monoid(), token) == listOf(token.value).k()
+                }
+            }
+
+            "asFold should behave as valid Fold: combineAll" {
+                forAll(TokenGen) { token ->
+                    combineAll(StringMonoidInstance, token) == token.value
+                }
+            }
+
+            "asFold should behave as valid Fold: fold" {
+                forAll(TokenGen) { token ->
+                    fold(StringMonoidInstance, token) == token.value
+                }
+            }
+
+            "asFold should behave as valid Fold: headOption" {
+                forAll(TokenGen) { token ->
+                    headOption(token) == Some(token.value)
+                }
+            }
+
+            "asFold should behave as valid Fold: lastOption" {
+                forAll(TokenGen) { token ->
+                    lastOption(token) == Some(token.value)
+                }
             }
         }
 
-        "asFold should behave as valid Fold: nonEmpty" {
-            forAll(TokenGen) { token ->
-                tokenIso.asFold().nonEmpty(token)
-            }
-        }
+        with (tokenIso.asGetter()) {
 
-        "asFold should behave as valid Fold: isEmpty" {
-            forAll(TokenGen) { token ->
-                !tokenIso.asFold().isEmpty(token)
+            "asGetter should behave as valid Getter: get" {
+                forAll(TokenGen) { token ->
+                    get(token) == tokenGetter.get(token)
+                }
             }
-        }
 
-        "asFold should behave as valid Fold: getAll" {
-            forAll(TokenGen) { token ->
-                tokenIso.asFold().getAll(token) == listOf(token.value).k()
+            "asGetter should behave as valid Getter: find" {
+                forAll(TokenGen, genFunctionAToB<String, Boolean>(Gen.bool())) { token, p ->
+                    find(token, p) == tokenGetter.find(token, p)
+                }
             }
-        }
 
-        "asFold should behave as valid Fold: combineAll" {
-            forAll(TokenGen) { token ->
-                tokenIso.asFold().combineAll(token) == token.value
-            }
-        }
-
-        "asFold should behave as valid Fold: fold" {
-            forAll(TokenGen) { token ->
-                tokenIso.asFold().fold(token) == token.value
-            }
-        }
-
-        "asFold should behave as valid Fold: headOption" {
-            forAll(TokenGen) { token ->
-                tokenIso.asFold().headOption(token) == token.value.some()
-            }
-        }
-
-        "asFold should behave as valid Fold: lastOption" {
-            forAll(TokenGen) { token ->
-                tokenIso.asFold().lastOption(token) == token.value.some()
-            }
-        }
-
-        "asGetter should behave as valid Getter: get" {
-            forAll(TokenGen) { token ->
-                tokenIso.asGetter().get(token) ==  tokenGetter.get(token)
-            }
-        }
-
-        "asGetter should behave as valid Getter: find" {
-            forAll(TokenGen, genFunctionAToB<String, Boolean>(Gen.bool())) { token, p ->
-                tokenIso.asGetter().find(token, p) == tokenGetter.find(token, p)
-            }
-        }
-
-        "asGetter should behave as valid Getter: exist" {
-            forAll(TokenGen, genFunctionAToB<String, Boolean>(Gen.bool())) { token, p ->
-                tokenIso.asGetter().exist(token, p) == tokenGetter.exist(token, p)
+            "asGetter should behave as valid Getter: exist" {
+                forAll(TokenGen, genFunctionAToB<String, Boolean>(Gen.bool())) { token, p ->
+                    exist(token, p) == tokenGetter.exist(token, p)
+                }
             }
         }
 
@@ -154,7 +160,7 @@ class IsoTest : UnitSpec() {
 
         "Lifting a function as a functor should yield the same result as not yielding" {
             forAll(TokenGen, Gen.string(), { token, value ->
-                tokenIso.modifyF(Option.functor(), token) { Some(value) } == tokenIso.liftF { Some(value) }(token)
+                tokenIso.modifyF(Option.functor(), token) { Some(value) } == tokenIso.liftF(Option.functor()) { Some(value) }(token)
             })
         }
 

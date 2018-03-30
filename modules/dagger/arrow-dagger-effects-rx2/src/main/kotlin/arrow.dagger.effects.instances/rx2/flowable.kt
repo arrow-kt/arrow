@@ -1,6 +1,9 @@
 package arrow.dagger.effects.instances.rx2
 
 import arrow.effects.*
+import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.Effect
+import arrow.effects.typeclasses.MonadSuspend
 import arrow.typeclasses.*
 import dagger.Module
 import dagger.Provides

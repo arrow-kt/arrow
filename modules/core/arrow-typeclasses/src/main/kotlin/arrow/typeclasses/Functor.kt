@@ -1,28 +1,29 @@
 package arrow.typeclasses
 
-import arrow.*
+import arrow.Kind
 import arrow.core.Tuple2
 
-@typeclass
-interface Functor<F> : TC {
+inline operator fun <F, A> Functor<F>.invoke(ff: Functor<F>.() -> A) =
+        run(ff)
 
-    fun <A, B> map(fa: Kind<F, A>, f: (A) -> B): Kind<F, B>
+interface Functor<F> {
+
+    fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B>
 
     fun <A, B> lift(f: (A) -> B): (Kind<F, A>) -> Kind<F, B> =
             { fa: Kind<F, A> ->
-                map(fa, f)
+                fa.map(f)
             }
 
-    fun <A> void(fa: Kind<F, A>): Kind<F, Unit> = map(fa, { _ -> Unit })
+    fun <A> Kind<F, A>.void(): Kind<F, Unit> = map({ _ -> Unit })
 
-    fun <A, B> fproduct(fa: Kind<F, A>, f: (A) -> B): Kind<F, Tuple2<A, B>> = map(fa, { a -> Tuple2(a, f(a)) })
+    fun <A, B> Kind<F, A>.fproduct(f: (A) -> B): Kind<F, Tuple2<A, B>> = map({ a -> Tuple2(a, f(a)) })
 
-    fun <A, B> `as`(fa: Kind<F, A>, b: B): Kind<F, B> = map(fa, { _ -> b })
+    fun <A, B> Kind<F, A>.`as`(b: B): Kind<F, B> = map({ _ -> b })
 
-    fun <A, B> tupleLeft(fa: Kind<F, A>, b: B): Kind<F, Tuple2<B, A>> = map(fa, { a -> Tuple2(b, a) })
+    fun <A, B> Kind<F, A>.tupleLeft(b: B): Kind<F, Tuple2<B, A>> = map({ a -> Tuple2(b, a) })
 
-    fun <A, B> tupleRight(fa: Kind<F, A>, b: B): Kind<F, Tuple2<A, B>> = map(fa, { a -> Tuple2(a, b) })
+    fun <A, B> Kind<F, A>.tupleRight(b: B): Kind<F, Tuple2<A, B>> = map({ a -> Tuple2(a, b) })
 
+    fun <B, A : B> Kind<F, A>.widen(): Kind<F, B> = this
 }
-
-fun <F, B, A : B> Functor<F>.widen(fa: Kind<F, A>): Kind<F, B> = fa

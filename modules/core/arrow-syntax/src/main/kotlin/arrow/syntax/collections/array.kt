@@ -2,7 +2,7 @@ package arrow.syntax.collections
 
 import arrow.core.Option
 import arrow.core.Predicate
-import arrow.syntax.option.*
+import arrow.core.toOption
 
 fun <T> Array<out T>.firstOption(): Option<T> = firstOrNull().toOption()
 

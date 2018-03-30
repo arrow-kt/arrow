@@ -1,10 +1,9 @@
 package arrow.test.laws
 
-import arrow.*
+import arrow.Kind
 import arrow.core.Option
 import arrow.core.Some
-import arrow.mtl.FunctorFilter
-import arrow.mtl.functorFilter
+import arrow.mtl.typeclasses.FunctorFilter
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genIntSmall
@@ -15,26 +14,26 @@ import io.kotlintest.properties.forAll
 
 object FunctorFilterLaws {
 
-    inline fun <reified F> laws(FFF: FunctorFilter<F> = functorFilter(), crossinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
+    inline fun <F> laws(FFF: FunctorFilter<F>, noinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
             FunctorLaws.laws(FFF, cf, EQ) + listOf(
-                    Law("Functor Filter: mapFilter composition", { mapFilterComposition(FFF, cf, EQ) }),
-                    Law("Functor Filter: mapFilter map consistency", { mapFilterMapConsistency(FFF, cf, EQ) })
+                    Law("Functor Filter: mapFilter composition", { FFF.mapFilterComposition(cf, EQ) }),
+                    Law("Functor Filter: mapFilter map consistency", { FFF.mapFilterMapConsistency(cf, EQ) })
             )
 
-    inline fun <reified F> mapFilterComposition(FFF: FunctorFilter<F> = functorFilter(), crossinline ff: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
+    fun <F> FunctorFilter<F>.mapFilterComposition(ff: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(
                     genConstructor(Gen.int(), ff),
                     genFunctionAToB<Int, Option<Int>>(genOption(genIntSmall())),
                     genFunctionAToB<Int, Option<Int>>(genOption(genIntSmall())),
                     { fa: Kind<F, Int>, f, g ->
-                        FFF.mapFilter(FFF.mapFilter(fa, f), g).equalUnderTheLaw(FFF.mapFilter(fa, { a -> f(a).flatMap(g) }), EQ)
+                        fa.mapFilter(f).mapFilter(g).equalUnderTheLaw(fa.mapFilter({ a -> f(a).flatMap(g) }), EQ)
                     })
 
-    inline fun <reified F> mapFilterMapConsistency(FFF: FunctorFilter<F> = functorFilter(), crossinline ff: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
+    fun <F> FunctorFilter<F>.mapFilterMapConsistency(ff: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
             forAll(
                     genConstructor(Gen.int(), ff),
                     genFunctionAToB<Int, Int>(Gen.int()),
                     { fa: Kind<F, Int>, f ->
-                        FFF.mapFilter(fa, { Some(f(it)) }).equalUnderTheLaw(FFF.map(fa, f), EQ)
+                        fa.mapFilter({ Some(f(it)) }).equalUnderTheLaw(fa.map(f), EQ)
                     })
 }

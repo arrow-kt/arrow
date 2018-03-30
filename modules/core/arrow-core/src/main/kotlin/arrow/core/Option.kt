@@ -11,7 +11,7 @@ sealed class Option<out A> : OptionOf<A> {
 
     companion object {
 
-        fun <A> pure(a: A): Option<A> = Some(a)
+        fun <A> just(a: A): Option<A> = Some(a)
 
         tailrec fun <A, B> tailRecM(a: A, f: (A) -> OptionOf<Either<A, B>>): Option<B> {
             val option = f(a).fix()
@@ -54,7 +54,7 @@ sealed class Option<out A> : OptionOf<A> {
     @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("getOrElse { ifEmpty }"))
     abstract fun get(): A
 
-    fun orNull(): A? = fold({ null }, { it })
+    fun orNull(): A? = fold({ null }, ::identity)
 
     /**
      * Returns a [Some<$B>] containing the result of applying $f to this $option's
@@ -148,6 +148,9 @@ sealed class Option<out A> : OptionOf<A> {
                 }
             }
 
+    fun <L> toEither(ifEmpty: () -> L): Either<L, A> =
+            fold({ ifEmpty().left() }, { it.right() })
+
     fun toList(): List<A> = fold(::emptyList, { listOf(it) })
 
     infix fun <X> and(value: Option<X>): Option<X> = if (isEmpty()) {
@@ -179,7 +182,7 @@ data class Some<out T>(val t: T) : Option<T>() {
  *
  * @param default the default expression.
  */
-fun <T> Option<T>.getOrElse(default: () -> T): T = fold({ default() }, { it })
+fun <T> Option<T>.getOrElse(default: () -> T): T = fold({ default() }, ::identity)
 
 /**
  * Returns this option's if the option is nonempty, otherwise
@@ -194,3 +197,20 @@ infix fun <T> OptionOf<T>.or(value: Option<T>): Option<T> = if (fix().isEmpty())
 } else {
     fix()
 }
+
+fun <T> T?.toOption(): Option<T> = if (this != null) {
+    Some(this)
+} else {
+    None
+}
+
+fun <A> Boolean.maybe(f: () -> A): Option<A> =
+        if (this) {
+            Some(f())
+        } else {
+            None
+        }
+
+fun <A> A.some(): Option<A> = Some(this)
+
+fun <A> none(): Option<A> = None

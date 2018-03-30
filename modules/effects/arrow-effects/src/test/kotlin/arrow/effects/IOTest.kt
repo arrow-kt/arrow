@@ -2,38 +2,33 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.*
+import arrow.effects.typeclasses.milliseconds
+import arrow.effects.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.AsyncLaws
-import arrow.typeclasses.*
+import arrow.typeclasses.Eq
+import arrow.typeclasses.binding
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldEqual
-import io.kotlintest.matchers.shouldNotBe
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class IOTest : UnitSpec() {
-    fun <A> EQ(): Eq<Kind<ForIO, A>> = Eq { a, b ->
-        Option.eq(Eq.any()).eqv(a.fix().attempt().unsafeRunTimed(60.seconds), b.fix().attempt().unsafeRunTimed(60.seconds))
+    val EQ_OPTION = Option.eq(Eq.any())
+
+    fun <A> EQ(): Eq<Kind<ForIO, A>> {
+        return Eq { a, b ->
+            EQ_OPTION.run {
+                a.fix().attempt().unsafeRunTimed(60.seconds).eqv(b.fix().attempt().unsafeRunTimed(60.seconds))
+            }
+        }
     }
 
     init {
         testLaws(AsyncLaws.laws(IO.async(), EQ(), EQ()))
-
-        "instances can be resolved implicitly" {
-            functor<ForIO>() shouldNotBe null
-            applicative<ForIO>() shouldNotBe null
-            monad<ForIO>() shouldNotBe null
-            applicativeError<ForIO, Throwable>() shouldNotBe null
-            monadError<ForIO, Throwable>() shouldNotBe null
-            monadSuspend<ForIO>() shouldNotBe null
-            async<ForIO>() shouldNotBe null
-            effect<ForIO>() shouldNotBe null
-            semigroup<IOOf<Int>>() shouldNotBe null
-            monoid<IOOf<Int>>() shouldNotBe null
-        }
 
         "should defer evaluation until run" {
             var run = false
@@ -64,7 +59,7 @@ class IOTest : UnitSpec() {
         }
 
         "should yield immediate successful pure value" {
-            val run = IO.pure(1).unsafeRunSync()
+            val run = IO.just(1).unsafeRunSync()
 
             val expected = 1
 
@@ -72,7 +67,7 @@ class IOTest : UnitSpec() {
         }
 
         "should yield immediate successful pure value" {
-            val run = IO.pure(1).unsafeRunSync()
+            val run = IO.just(1).unsafeRunSync()
 
             val expected = 1
 
@@ -101,21 +96,21 @@ class IOTest : UnitSpec() {
         }
 
         "should return a null value from unsafeRunTimed" {
-            val never = IO.pure<Int?>(null)
+            val never = IO.just<Int?>(null)
             val received = never.unsafeRunTimed(100.milliseconds)
 
             received shouldBe Some(null)
         }
 
         "should return a null value from unsafeRunSync" {
-            val value = IO.pure<Int?>(null).unsafeRunSync()
+            val value = IO.just<Int?>(null).unsafeRunSync()
 
             value shouldBe null
         }
 
         "should complete when running a pure value with unsafeRunAsync" {
             val expected = 0
-            IO.pure(expected).unsafeRunAsync { either ->
+            IO.just(expected).unsafeRunAsync { either ->
                 either.fold({ fail("") }, { it shouldBe expected })
             }
         }
@@ -164,7 +159,7 @@ class IOTest : UnitSpec() {
 
         "should complete when running a pure value with runAsync" {
             val expected = 0
-            IO.pure(expected).runAsync { either ->
+            IO.just(expected).runAsync { either ->
                 either.fold({ fail("") }, { IO { it shouldBe expected } })
             }
         }
@@ -213,20 +208,23 @@ class IOTest : UnitSpec() {
             }
         }
 
-        "should map values correctly on success" {
-            val run = IO.functor().map(IO.pure(1)) { it + 1 }.unsafeRunSync()
+        with (IO.monad()) {
 
-            val expected = 2
+            "should map values correctly on success" {
+                val run = IO.just(1).map() { it + 1 }.unsafeRunSync()
 
-            run shouldBe expected
-        }
+                val expected = 2
 
-        "should flatMap values correctly on success" {
-            val run = IO.monad().flatMap(IO.pure(1)) { num -> IO { num + 1 } }.unsafeRunSync()
+                run shouldBe expected
+            }
 
-            val expected = 2
+            "should flatMap values correctly on success" {
+                val run = just(1).flatMap { num -> IO { num + 1 } }.unsafeRunSync()
 
-            run shouldBe expected
+                val expected = 2
+
+                run shouldBe expected
+            }
         }
 
         "invoke is called on every run call" {
@@ -246,7 +244,7 @@ class IOTest : UnitSpec() {
 
         "IO.binding should for comprehend over IO" {
             val result = IO.monad().binding {
-                val x = IO.pure(1).bind()
+                val x = IO.just(1).bind()
                 val y = bind { IO { x + 1 } }
                 y
             }.fix()

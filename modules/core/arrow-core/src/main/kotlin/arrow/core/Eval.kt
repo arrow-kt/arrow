@@ -37,11 +37,11 @@ sealed class Eval<out A> : EvalOf<A> {
                 f(a).fix().flatMap { eval: Either<A, B> ->
                     when (eval) {
                         is Either.Left -> tailRecM(eval.a, f)
-                        is Either.Right -> pure(eval.b)
+                        is Either.Right -> just(eval.b)
                     }
                 }
 
-        fun <A> pure(a: A): Eval<A> = now(a)
+        fun <A> just(a: A): Eval<A> = now(a)
 
         fun <A> now(a: A) = Now(a)
 
@@ -159,6 +159,7 @@ sealed class Eval<out A> : EvalOf<A> {
 
     fun <B> ap(ff: EvalOf<(A) -> B>): Eval<B> = ff.fix().flatMap { f -> map(f) }.fix()
 
+    @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
     fun <B> flatMap(f: (A) -> EvalOf<B>): Eval<B> =
             when (this) {
                 is FlatMap<A> -> object : FlatMap<B>() {

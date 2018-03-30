@@ -1,28 +1,29 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import arrow.TC
-import arrow.typeclass
+import arrow.core.identity
 import java.io.Serializable
 import kotlin.coroutines.experimental.*
 import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
 
+inline operator fun <F, A> Comonad<F>.invoke(ff: Comonad<F>.() -> A) =
+        run(ff)
+
 /**
  * The dual of monads, used to extract values from F
  */
-@typeclass
-interface Comonad<F> : Functor<F>, TC {
+interface Comonad<F> : Functor<F> {
 
-    fun <A, B> coflatMap(fa: Kind<F, A>, f: (Kind<F, A>) -> B): Kind<F, B>
+    fun <A, B> Kind<F, A>.coflatMap(f: (Kind<F, A>) -> B): Kind<F, B>
 
-    fun <A> extract(fa: Kind<F, A>): A
+    fun <A> Kind<F, A>.extract(): A
 
-    fun <A> duplicate(fa: Kind<F, A>): Kind<F, Kind<F, A>> = coflatMap(fa, { it })
+    fun <A> Kind<F, A>.duplicate(): Kind<F, Kind<F, A>> = coflatMap(::identity)
 }
 
 @RestrictsSuspension
-open class ComonadContinuation<F, A : Any>(val CM: Comonad<F>, override val context: CoroutineContext = EmptyCoroutineContext) : Serializable, Continuation<A> {
+open class ComonadContinuation<F, A : Any>(CM: Comonad<F>, override val context: CoroutineContext = EmptyCoroutineContext) : Serializable, Continuation<A>, Comonad<F> by CM {
 
     override fun resume(value: A) {
         returnedMonad = value
@@ -38,11 +39,11 @@ open class ComonadContinuation<F, A : Any>(val CM: Comonad<F>, override val cont
 
     suspend fun <B> extract(m: () -> Kind<F, B>): B = suspendCoroutineOrReturn { c ->
         val labelHere = c.stackLabels // save the whole coroutine stack labels
-        returnedMonad = CM.extract(CM.coflatMap(m(), { x: Kind<F, B> ->
+        returnedMonad = m().coflatMap({ x: Kind<F, B> ->
             c.stackLabels = labelHere
-            c.resume(CM.extract(x))
+            c.resume(x.extract())
             returnedMonad
-        }))
+        }).extract()
         COROUTINE_SUSPENDED
     }
 }

@@ -2,25 +2,19 @@ package arrow.effects
 
 import arrow.core.*
 import arrow.core.Either.Left
-import arrow.deriving
 import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
+import arrow.effects.typeclasses.Duration
+import arrow.effects.typeclasses.Proc
 import arrow.higherkind
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
 
 @higherkind
-@deriving(
-        Functor::class,
-        Applicative::class,
-        Monad::class)
 sealed class IO<out A> : IOOf<A> {
 
     companion object {
 
-        fun <A> pure(a: A): IO<A> = Pure(a)
+        fun <A> just(a: A): IO<A> = Pure(a)
 
         fun <A> raiseError(e: Throwable): IO<A> = RaiseError(e)
 
@@ -42,14 +36,14 @@ sealed class IO<out A> : IOOf<A> {
                 }
 
         val unit: IO<Unit> =
-                pure(Unit)
+                just(Unit)
 
         val lazy: IO<Unit> =
                 invoke { }
 
         fun <A> eval(eval: Eval<A>): IO<A> =
                 when (eval) {
-                    is Eval.Now -> pure(eval.value)
+                    is Eval.Now -> just(eval.value)
                     else -> invoke { eval.value() }
                 }
 
@@ -57,7 +51,7 @@ sealed class IO<out A> : IOOf<A> {
                 f(a).fix().flatMap {
                     when (it) {
                         is Either.Left -> tailRecM(it.a, f)
-                        is Either.Right -> IO.pure(it.b)
+                        is Either.Right -> IO.just(it.b)
                     }
                 }
     }
@@ -78,7 +72,7 @@ sealed class IO<out A> : IOOf<A> {
 
     fun unsafeRunSync(): A =
             unsafeRunTimed(Duration.INFINITE)
-                    .fold({ throw IllegalArgumentException("IO execution should yield a valid result") }, { it })
+                    .fold({ throw IllegalArgumentException("IO execution should yield a valid result") }, ::identity)
 
     fun unsafeRunTimed(limit: Duration): Option<A> = IORunLoop.step(this).unsafeRunTimedTotal(limit)
 
@@ -121,7 +115,7 @@ sealed class IO<out A> : IOOf<A> {
     }
 
     internal data class Map<E, out A>(val source: IOOf<E>, val g: (E) -> A, val index: Int) : IO<A>(), (E) -> IO<A> {
-        override fun invoke(value: E): IO<A> = pure(g(value))
+        override fun invoke(value: E): IO<A> = just(g(value))
 
         override fun <B> map(f: (A) -> B): IO<B> =
                 // Allowed to do maxStackDepthSize map operations in sequence before
@@ -133,10 +127,10 @@ sealed class IO<out A> : IOOf<A> {
     }
 }
 
-fun <A, B> IO<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
-        flatMap { a -> ff.fix().map({ it(a) }) }
+fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
+        fix().flatMap { a -> ff.fix().map({ it(a) }) }
 
-fun <A> IO<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
-        IO.Bind(this, IOFrame.errorHandler(f))
+fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
+        IO.Bind(this.fix(), IOFrame.errorHandler(f))
 
-fun <A> A.liftIO(): IO<A> = IO.pure(this)
+fun <A> A.liftIO(): IO<A> = IO.just(this)

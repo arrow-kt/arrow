@@ -136,10 +136,11 @@ Ior.Both("Warning", 41).toOption()
 
 Available Instances:
 
-```kotlin:ank
+```kotlin
 import arrow.debug.*
 
 showInstances<ForIor, Unit>()
+// [Foldable, Functor, Traverse, TraverseFilter]
 ```
 
 # Credits

@@ -1,8 +1,11 @@
 package arrow.typeclasses
 
-import arrow.*
+import arrow.Kind
 import arrow.core.*
 import arrow.core.Eval.Companion.always
+
+inline operator fun <F, A> Foldable<F>.invoke(ff: Foldable<F>.() -> A) =
+        run(ff)
 
 /**
  * Data structures that can be folded to a summary value.
@@ -14,13 +17,12 @@ import arrow.core.Eval.Companion.always
  *
  * Beyond these it provides many other useful methods related to folding over F<A> values.
  */
-@typeclass
-interface Foldable<F> : TC {
+interface Foldable<F> {
 
     /**
      * Left associative fold on F using the provided function.
      */
-    fun <A, B> foldLeft(fa: Kind<F, A>, b: B, f: (B, A) -> B): B
+    fun <A, B> Kind<F, A>.foldLeft(b: B, f: (B, A) -> B): B
 
     /**
      * Right associative lazy fold on F using the provided function.
@@ -31,30 +33,32 @@ interface Foldable<F> : TC {
      *
      * For more detailed information about how this method works see the documentation for Eval<A>.
      */
-    fun <A, B> foldRight(fa: Kind<F, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B>
+    fun <A, B> Kind<F, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B>
 
     /**
      * Fold implemented using the given Monoid<A> instance.
      */
-    fun <A> fold(ma: Monoid<A>, fa: Kind<F, A>): A = foldLeft(fa, ma.empty(), { acc, a -> ma.combine(acc, a) })
+    fun <A> Kind<F, A>.fold(MN: Monoid<A>): A = MN.run {
+        foldLeft(empty(), { acc, a -> acc.combine(a) })
+    }
 
-    fun <A, B> reduceLeftToOption(fa: Kind<F, A>, f: (A) -> B, g: (B, A) -> B): Option<B> =
-            foldLeft(fa, Option.empty()) { option, a ->
+    fun <A, B> Kind<F, A>.reduceLeftToOption(f: (A) -> B, g: (B, A) -> B): Option<B> =
+            foldLeft(Option.empty()) { option, a ->
                 when (option) {
                     is Some<B> -> Some(g(option.t, a))
                     is None -> Some(f(a))
                 }
             }
 
-    fun <A, B> reduceRightToOption(fa: Kind<F, A>, f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<Option<B>> =
-            foldRight(fa, Eval.Now(Option.empty())) { a, lb ->
+    fun <A, B> Kind<F, A>.reduceRightToOption(f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<Option<B>> =
+            foldRight(Eval.Now(Option.empty()), { a, lb ->
                 lb.flatMap { option ->
                     when (option) {
                         is Some<B> -> g(a, Eval.Now(option.t)).map({ Some(it) })
                         is None -> Eval.Later({ Some(f(a)) })
                     }
                 }
-            }
+            })
 
     /**
      * Reduce the elements of this structure down to a single value by applying the provided aggregation function in
@@ -63,7 +67,8 @@ interface Foldable<F> : TC {
      * @return None if the structure is empty, otherwise the result of combining the cumulative left-associative result
      * of the f operation over all of the elements.
      */
-    fun <A> reduceLeftOption(fa: Kind<F, A>, f: (A, A) -> A): Option<A> = reduceLeftToOption(fa, { a -> a }, f)
+    fun <A> Kind<F, A>.reduceLeftOption(f: (A, A) -> A): Option<A> =
+            reduceLeftToOption({ a -> a }, f)
 
     /**
      * Reduce the elements of this structure down to a single value by applying the provided aggregation function in
@@ -72,17 +77,21 @@ interface Foldable<F> : TC {
      * @return None if the structure is empty, otherwise the result of combining the cumulative right-associative
      * result of the f operation over the A elements.
      */
-    fun <A> reduceRightOption(fa: Kind<F, A>, f: (A, Eval<A>) -> Eval<A>): Eval<Option<A>> = reduceRightToOption(fa, { a -> a }, f)
+    fun <A> Kind<F, A>.reduceRightOption(f: (A, Eval<A>) -> Eval<A>): Eval<Option<A>> =
+            reduceRightToOption({ a -> a }, f)
 
     /**
      * Alias for fold.
      */
-    fun <A> combineAll(m: Monoid<A>, fa: Kind<F, A>): A = fold(m, fa)
+    fun <A> Kind<F, A>.combineAll(MN: Monoid<A>): A =
+            fold(MN)
 
     /**
      * Fold implemented by mapping A values into B and then combining them using the given Monoid<B> instance.
      */
-    fun <A, B> foldMap(mb: Monoid<B>, fa: Kind<F, A>, f: (A) -> B): B = foldLeft(fa, mb.empty(), { b, a -> mb.combine(b, f(a)) })
+    fun <A, B> Kind<F, A>.foldMap(MN: Monoid<B>, f: (A) -> B): B = MN.run {
+        foldLeft(MN.empty(), { b, a -> b.combine(f(a)) })
+    }
 
     /**
      * Traverse F<A> using Applicative<G>.
@@ -92,21 +101,22 @@ interface Foldable<F> : TC {
      * This method is primarily useful when G<_> represents an action or effect, and the specific A aspect of G<A> is
      * not otherwise needed.
      */
-    fun <G, A, B> traverse_(ag: Applicative<G>, fa: Kind<F, A>, f: (A) -> Kind<G, B>): Kind<G, Unit> =
-            foldRight(fa, always { ag.pure(Unit) }, { a, acc -> ag.map2Eval(f(a), acc) { Unit } }).value()
+    fun <G, A, B> Kind<F, A>.traverse_(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Unit> = GA.run {
+        foldRight(always { just(Unit) }, { a, acc -> f(a).map2Eval(acc) { Unit } }).value()
+    }
 
     /**
      * Sequence F<G<A>> using Applicative<G>.
      *
      * Similar to traverse except it operates on F<G<A>> values, so no additional functions are needed.
      */
-    fun <G, A> sequence_(ag: Applicative<G>, fga: Kind<F, Kind<G, A>>): Kind<G, Unit> = traverse_(ag, fga, { it })
+    fun <G, A> Kind<F, Kind<G, A>>.sequence_(ag: Applicative<G>): Kind<G, Unit> = traverse_(ag, ::identity)
 
     /**
      * Find the first element matching the predicate, if one exists.
      */
-    fun <A> find(fa: Kind<F, A>, f: (A) -> Boolean): Option<A> =
-            foldRight(fa, Eval.now<Option<A>>(None), { a, lb ->
+    fun <A> Kind<F, A>.find(f: (A) -> Boolean): Option<A> =
+            foldRight(Eval.now<Option<A>>(None), { a, lb ->
                 if (f(a)) Eval.now(Some(a)) else lb
             }).value()
 
@@ -115,21 +125,68 @@ interface Foldable<F> : TC {
      *
      * If there are no elements, the result is false.
      */
-    fun <A> exists(fa: Kind<F, A>, p: (A) -> Boolean): Boolean = foldRight(fa, Eval.False, { a, lb -> if (p(a)) Eval.True else lb }).value()
+    fun <A> Kind<F, A>.exists(p: (A) -> Boolean): Boolean =
+            this.foldRight(Eval.False, { a, lb -> if (p(a)) Eval.True else lb }).value()
 
     /**
      * Check whether all elements satisfy the predicate.
      *
      * If there are no elements, the result is true.
      */
-    fun <A> forall(fa: Kind<F, A>, p: (A) -> Boolean): Boolean = foldRight(fa, Eval.True, { a, lb -> if (p(a)) lb else Eval.False }).value()
+    fun <A> Kind<F, A>.forAll(p: (A) -> Boolean): Boolean =
+            this.foldRight(Eval.True, { a, lb -> if (p(a)) lb else Eval.False }).value()
 
     /**
      * Returns true if there are no elements. Otherwise false.
      */
-    fun <A> isEmpty(fa: Kind<F, A>): Boolean = foldRight(fa, Eval.True, { _, _ -> Eval.False }).value()
+    fun <A> Kind<F, A>.isEmpty(): Boolean =
+            this.foldRight(Eval.True, { _, _ -> Eval.False }).value()
 
-    fun <A> nonEmpty(fa: Kind<F, A>): Boolean = !isEmpty(fa)
+    fun <A> Kind<F, A>.nonEmpty(): Boolean =
+            !isEmpty()
+
+    /**
+     * The size of this Foldable.
+     *
+     * This is overriden in structures that have more efficient size implementations
+     * (e.g. Vector, Set, Map).
+     *
+     * Note: will not terminate for infinite-sized collections.
+     */
+    fun <A> Kind<F, A>.size(MN: Monoid<Long>): Long =
+            foldMap(MN) { 1 }
+
+    /**
+     * Monadic folding on F by mapping A values to G<B>, combining the B values using the given Monoid<B> instance.
+     *
+     * Similar to foldM, but using a Monoid<B>.
+     */
+    fun <G, A, B, TC> Kind<F, A>.foldMapM(tc: TC, f: (A) -> Kind<G, B>): Kind<G, B>
+            where TC : Monad<G>, TC : Monoid<B> = tc.run {
+        foldM(tc, tc.empty(), { b, a -> f(a).map { b.combine(it) } })
+    }
+
+    /**
+     * Left associative monadic folding on F.
+     *
+     * The default implementation of this is based on foldL, and thus will always fold across the entire structure.
+     * Certain structures are able to implement this in such a way that folds can be short-circuited (not traverse the
+     * entirety of the structure), depending on the G result produced at a given step.
+     */
+    fun <G, A, B> Kind<F, A>.foldM(M: Monad<G>, z: B, f: (B, A) -> Kind<G, B>): Kind<G, B> = M.run {
+        foldLeft(M.just(z), { gb, a -> gb.flatMap { f(it, a) } })
+    }
+
+    /**
+     * Get the element at the index of the Foldable.
+     */
+    fun <A> Kind<F, A>.get(M: Monad<Kind<ForEither, A>>, idx: Long): Option<A> =
+            if (idx < 0L)
+                None
+            else
+                foldM(M, 0L, { i, a ->
+                    if (i == idx) Left(a) else Right(i + 1L)
+                }).fix().swap().toOption()
 
     companion object {
         fun <A, B> iterateRight(it: Iterator<A>, lb: Eval<B>): (f: (A, Eval<B>) -> Eval<B>) -> Eval<B> = { f: (A, Eval<B>) -> Eval<B> ->
@@ -139,48 +196,3 @@ interface Foldable<F> : TC {
         }
     }
 }
-
-/**
- * Monadic folding on F by mapping A values to G<B>, combining the B values using the given Monoid<B> instance.
- *
- * Similar to foldM, but using a Monoid<B>.
- */
-inline fun <F, reified G, A, reified B> Foldable<F>.foldMapM(fa: Kind<F, A>, noinline f: (A) -> Kind<G, B>, MG: Monad<G> = monad(), bb: Monoid<B> = monoid()):
-        Kind<G, B> = foldM(fa, bb.empty(), { b, a -> MG.map(f(a)) { bb.combine(b, it) } }, MG)
-
-/**
- * Get the element at the index of the Foldable.
- */
-fun <F, A> Foldable<F>.get(fa: Kind<F, A>, idx: Long): Option<A> {
-    if (idx < 0L) return None
-    else {
-        foldM(fa, 0L, { i, a ->
-            if (i == idx) Left(a) else Right(i + 1L)
-        }).let {
-            return when (it) {
-                is Either.Left -> Some(it.a)
-                else -> None
-            }
-        }
-    }
-}
-
-/**
- * The size of this Foldable.
- *
- * This is overriden in structures that have more efficient size implementations
- * (e.g. Vector, Set, Map).
- *
- * Note: will not terminate for infinite-sized collections.
- */
-inline fun <reified F, A> Foldable<F>.size(MB: Monoid<Long> = monoid(), fa: Kind<F, A>): Long = foldMap(MB, fa, { 1 })
-
-/**
- * Left associative monadic folding on F.
- *
- * The default implementation of this is based on foldL, and thus will always fold across the entire structure.
- * Certain structures are able to implement this in such a way that folds can be short-circuited (not traverse the
- * entirety of the structure), depending on the G result produced at a given step.
- */
-inline fun <F, reified G, A, B> Foldable<F>.foldM(fa: Kind<F, A>, z: B, crossinline f: (B, A) -> Kind<G, B>, MG: Monad<G> = monad()): Kind<G, B> =
-        foldLeft(fa, MG.pure(z), { gb, a -> MG.flatMap(gb) { f(it, a) } })

@@ -1,6 +1,5 @@
 package arrow.instances
 
-import java.io.File
 import arrow.common.Package
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.extractFullName
@@ -9,7 +8,7 @@ import arrow.common.utils.typeConstraints
 import me.eugeniomarletti.kotlin.metadata.modality
 import org.jetbrains.kotlin.serialization.ProtoBuf
 import org.jetbrains.kotlin.serialization.deserialization.TypeTable
-import org.jetbrains.kotlin.serialization.deserialization.supertypes
+import java.io.File
 
 data class FunctionMapping(
         val name: String,
@@ -22,8 +21,6 @@ data class Instance(
         val target: AnnotatedInstance
 ) {
     val name = target.classElement.simpleName
-
-    val implicitObjectName: String = "${name}Implicits"
 
     val receiverTypeName = target.dataType.nameResolver.getString(target.dataType.classProto.fqName).replace("/", ".")
 
@@ -56,18 +53,18 @@ data class Instance(
 
     private fun normalizeOverridenFunctions(): (List<FunctionMapping>, FunctionMapping) -> List<FunctionMapping> =
             { acc, func ->
-                val retType = func.function.returnType.extractFullName(func.typeclass, failOnGeneric = false).removeBackticks()
+                val retType = func.function.returnType.extractFullName(func.typeclass).removeBackticks()
                 val existingParamInfo = getParamInfo(func.name to retType)
                 when {
                     acc.contains(func) -> acc //if the same param was already added ignore it
                     else -> { //remove accumulated functions whose return types  supertypes of the current evaluated one and add the current one
                         val remove = acc.find { av ->
-                            val avRetType = av.function.returnType.extractFullName(av.typeclass, failOnGeneric = false)
+                            val avRetType = av.function.returnType.extractFullName(av.typeclass)
                                     .removeBackticks().replace(".", "/").substringBefore("<")
                             existingParamInfo.superTypes.contains(avRetType)
                         }
                         val ignore = acc.any { av ->
-                            val avRetTypeUnparsed = av.function.returnType.extractFullName(av.typeclass, failOnGeneric = false)
+                            val avRetTypeUnparsed = av.function.returnType.extractFullName(av.typeclass)
                                     .removeBackticks()
                             val parsedRetType = retType.replace(".", "/").substringBefore("<")
                             val avParamInfo = getParamInfo(av.name to avRetTypeUnparsed)
@@ -78,7 +75,7 @@ data class Instance(
                             ignore -> acc
                             else -> acc + listOf(func)
                         }
-                    } //
+                    }
                 }
             }
 
@@ -86,23 +83,16 @@ data class Instance(
             (target.superTypes + listOf(target.classOrPackageProto)).flatMap { tc ->
                 tc.functionList
                         .filter { it.modality == ProtoBuf.Modality.ABSTRACT }
-                        .flatMap {
-                            val retTypeName = it.returnType.extractFullName(tc, failOnGeneric = false).removeBackticks().substringBefore("<")
-                            val retType = target.processor.elementUtils.getTypeElement(
-                                    it.returnType.extractFullName(tc, failOnGeneric = false).removeBackticks().substringBefore("<")
-                            )
+                        .map { it to it.returnType.extractFullName(tc).removeBackticks() }
+                        // FIXME(paco): number of parameters and naming convention, used to be based off the TC interface
+                        .filter { (it, name) -> it.valueParameterCount == 0 && name.contains("typeclass") }
+                        .distinctBy { (_, name) -> name }
+                        .flatMap { (it, name) ->
+                            val retTypeName = name.substringBefore("<")
+                            val retType = target.processor.elementUtils.getTypeElement(retTypeName)
                             when {
                                 retType != null -> {
-                                    val current = target.processor.getClassOrPackageDataWrapper(retType) as ClassOrPackageDataWrapper.Class
-                                    val typeTable = TypeTable(current.classProto.typeTable)
-                                    val isTypeClassReturnType = current.classProto.supertypes(typeTable).any {
-                                        val typeName = it.extractFullName(current, failOnGeneric = false)
-                                        typeName == "`arrow`.`TC`"
-                                    }
-                                    if (isTypeClassReturnType)
-                                        listOf(FunctionMapping(tc.nameResolver.getString(it.name), tc, it, retTypeName))
-                                    else
-                                        emptyList()
+                                    listOf(FunctionMapping(tc.nameResolver.getString(it.name), tc, it, retTypeName))
                                 }
                                 else -> emptyList()
                             }
@@ -130,17 +120,13 @@ data class Instance(
 
     val args: List<Pair<String, String>> = abstractFunctions.sortedBy { f ->
         val typeClassTypeArgs = f.typeclass.typeParameters.map { f.typeclass.nameResolver.getString(it.name) }
-        val functionRetTypeTypeArgs = f.function.returnType.extractFullName(f.typeclass, failOnGeneric = false)
+        val functionRetTypeTypeArgs = f.function.returnType.extractFullName(f.typeclass)
                 .removeBackticks().substringAfter("<").substringBefore(">")
         typeClassTypeArgs.indexOf(functionRetTypeTypeArgs)
     }.map { (name, tc, func) ->
-        val retType = func.returnType.extractFullName(tc, failOnGeneric = false)
+        val retType = func.returnType.extractFullName(tc)
         name to retType.removeBackticks()
     }
-
-    val expandedArgs: String = args.joinToString(separator = ", ", transform = {
-        "${it.first}: ${it.second}"
-    })
 
     val targetImplementations = args.joinToString(
             separator = "\n",
@@ -164,8 +150,7 @@ class InstanceFileGenerator(
     fun generate() {
         instances.forEach {
             val elementsToGenerate: List<String> =
-                    listOf(genImports(it), genImplicitObject(it), genCompanionExtensions(it)) +
-                            (if (it.args.isNotEmpty()) listOf(genCompanionReifiedExtensions(it)) else emptyList())
+                    listOf(genImports(it), genCompanionExtensions(it))
             val source: String = elementsToGenerate.joinToString(prefix = "package ${it.`package`}\n\n", separator = "\n", postfix = "\n")
             val file = File(generatedDir, instanceAnnotationClass.simpleName + ".${it.target.classElement.qualifiedName}.kt")
             file.writeText(source)
@@ -176,36 +161,15 @@ class InstanceFileGenerator(
             |import ${i.target.classOrPackageProto.`package`}.*
             |""".trimMargin()
 
-    private fun genImplicitObject(i: Instance): String = """
-            |object ${i.implicitObjectName} {
-            |  fun ${i.expandedTypeArgs()} instance(${i.expandedArgs}): ${i.name}${i.expandedTypeArgs()}${i.typeConstraints()} =
-            |    object : ${i.name}${i.expandedTypeArgs()} {
-            |${i.targetImplementations}
-            |    }
-            |}
-            |""".trimMargin()
-
     private fun genCompanionExtensions(i: Instance): String =
             """|
                 |fun ${i.expandedTypeArgs(reified = false)} ${i.receiverTypeName}.Companion.${i.companionFactoryName}(${(i.args.map {
                 "${it.first}: ${it.second}"
             } + (if (i.args.isNotEmpty()) listOf("@Suppress(\"UNUSED_PARAMETER\") dummy: kotlin.Unit = kotlin.Unit") else emptyList())).joinToString(", ")
             }): ${i.name}${i.expandedTypeArgs()}${i.typeConstraints()} =
-                |  ${i.implicitObjectName}.instance(${i.args.map { it.first }.joinToString(", ")})
+                |    object : ${i.name}${i.expandedTypeArgs()} {
+                |${i.targetImplementations}
+                |    }
                 |
                 |""".trimMargin()
-
-    private fun genCompanionReifiedExtensions(i: Instance): String =
-            """|
-                |inline fun ${i.expandedTypeArgs(reified = true)} ${i.receiverTypeName}.Companion.${i.companionFactoryName}(${i.args.map {
-                "${it.first}: ${it.second} = ${classToTypeclassMethodCall(it.second)}"
-            }.joinToString(", ")
-            }): ${i.name}${i.expandedTypeArgs()}${i.typeConstraints()} =
-                |  ${i.implicitObjectName}.instance(${i.args.map { it.first }.joinToString(", ")})
-                |
-                |""".trimMargin()
-
-    private fun classToTypeclassMethodCall(typeclassWGenerics: String): String =
-            "${typeclassWGenerics.substringBefore("<").split(".").map { it.decapitalize() }.joinToString(".")}<${typeclassWGenerics.substringAfter("<")}()"
-
 }

@@ -3,14 +3,16 @@ package arrow.data
 import arrow.Kind
 import arrow.core.*
 import arrow.core.Eval.Now
-import arrow.syntax.collections.prependTo
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
-import arrow.test.laws.*
+import arrow.test.laws.ComonadLaws
+import arrow.test.laws.MonadLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.*
-import io.kotlintest.properties.*
+import io.kotlintest.matchers.fail
+import io.kotlintest.matchers.shouldBe
+import io.kotlintest.properties.Gen
+import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -22,8 +24,8 @@ class EvalTest : UnitSpec() {
     init {
 
         testLaws(
-            MonadLaws.laws(Eval.monad(), EQ),
-            ComonadLaws.laws(Eval.comonad(), ::Now, EQ)
+                MonadLaws.laws(Eval.monad(), EQ),
+                ComonadLaws.laws(Eval.comonad(), ::Now, EQ)
         )
 
         "should map wrapped value" {
@@ -126,7 +128,7 @@ class EvalTest : UnitSpec() {
         "flatMap should complete without blowing up the stack" {
             val limit = 10000
             val sideEffect = SideEffect()
-            val flatMapped = Eval.pure(0).flatMap(recur(limit, sideEffect))
+            val flatMapped = Eval.just(0).flatMap(recur(limit, sideEffect))
             sideEffect.counter shouldBe 0
             flatMapped.value() shouldBe -1
             sideEffect.counter shouldBe limit + 1
@@ -172,9 +174,9 @@ class EvalTest : UnitSpec() {
                             val o = os[i]
                             when (o) {
                                 is O.Defer -> Eval.defer { step(i + 1, leaf, cbs) }
-                                is O.Memoize -> step(i + 1, leaf, cbs.also { it.add(0) { e: Eval<Int> -> e.memoize() }})
-                                is O.Map -> step(i + 1, leaf, cbs.also { it.add(0) { e: Eval<Int> -> e.map(o.f) }})
-                                is O.FlatMap -> step(i + 1, leaf, cbs.also { it.add(0) { e: Eval<Int> -> e.flatMap(o.f) }})
+                                is O.Memoize -> step(i + 1, leaf, cbs.also { it.add(0) { e: Eval<Int> -> e.memoize() } })
+                                is O.Map -> step(i + 1, leaf, cbs.also { it.add(0) { e: Eval<Int> -> e.map(o.f) } })
+                                is O.FlatMap -> step(i + 1, leaf, cbs.also { it.add(0) { e: Eval<Int> -> e.flatMap(o.f) } })
                             }
                         }
 
@@ -197,7 +199,7 @@ class EvalTest : UnitSpec() {
                     recur(limit, sideEffect).invoke(num + 1)
                 }
             } else {
-                Eval.pure(-1)
+                Eval.just(-1)
             }
         }
     }

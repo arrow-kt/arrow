@@ -1,20 +1,15 @@
 package arrow.data
 
 import arrow.core.*
-import arrow.syntax.applicative.map
+import arrow.instances.IntEqInstance
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadErrorLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
-import arrow.typeclasses.*
+import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.beTheSameInstanceAs
-import io.kotlintest.matchers.fail
-import io.kotlintest.matchers.should
-import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldEqual
-import io.kotlintest.matchers.shouldNotBe
+import io.kotlintest.matchers.*
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -25,21 +20,11 @@ class TryTest : UnitSpec() {
 
     init {
 
-        "instances can be resolved implicitly" {
-            functor<ForTry>() shouldNotBe null
-            applicative<ForTry>() shouldNotBe null
-            monad<ForTry>() shouldNotBe null
-            foldable<ForTry>() shouldNotBe null
-            traverse<ForTry>() shouldNotBe null
-            applicativeError<ForTry, Throwable>() shouldNotBe null
-            monadError<ForTry, Throwable>() shouldNotBe null
-            eq<Try<Int>>() shouldNotBe null
-            show<Try<Int>>() shouldNotBe null
-        }
+        val EQ = Try.eq(Eq { a, b -> a::class == b::class }, IntEqInstance)
 
         testLaws(
-                EqLaws.laws { Try { it } },
-                ShowLaws.laws { Try { it } },
+                EqLaws.laws(EQ) { Try.just(it) },
+                ShowLaws.laws(Try.show(), EQ) { Try.just(it) },
                 MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()),
                 TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any())
         )

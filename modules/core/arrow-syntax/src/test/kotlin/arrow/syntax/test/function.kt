@@ -1,10 +1,9 @@
 package arrow.syntax.test
 
 import arrow.syntax.function.*
-
+import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
-import arrow.test.UnitSpec
 import org.junit.runner.RunWith
 import java.util.*
 

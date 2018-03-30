@@ -1,7 +1,12 @@
 package arrow.core
 
-import arrow.*
-import arrow.legacy.*
+import arrow.Kind
+import arrow.core.Either.Left
+import arrow.core.Either.Right
+import arrow.higherkind
+import arrow.legacy.Disjunction
+import arrow.legacy.LeftProjection
+import arrow.legacy.RightProjection
 
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Either.scala
@@ -9,7 +14,8 @@ import arrow.legacy.*
  * Represents a value of one of two possible types (a disjoint union.)
  * An instance of Either is either an instance of [Left] or [Right].
  */
-@higherkind sealed class Either<out A, out B> : EitherOf<A, B> {
+@higherkind
+sealed class Either<out A, out B> : EitherOf<A, B> {
 
     /**
      * Returns `true` if this is a [Right], `false` otherwise.
@@ -96,7 +102,8 @@ import arrow.legacy.*
      * Left(12).map { "flower" }  // Result: Left(12)
      * ```
      */
-    inline fun <C> map(crossinline f: (B) -> C): Either<A, C> = fold({ Left(it) }, { Right(f(it)) })
+    inline fun <C> map(crossinline f: (B) -> C): Either<A, C> =
+            fold({ Left(it) }, { Right(f(it)) })
 
     /**
      * The given function is applied if this is a `Left`.
@@ -107,12 +114,14 @@ import arrow.legacy.*
      * Left(12).mapLeft { "flower" }  // Result: Left("flower)
      * ```
      */
-    inline fun <C> mapLeft(crossinline f: (A) -> C): Either<C, B> = fold({ Left(f(it)) }, { Right(it) })
+    inline fun <C> mapLeft(crossinline f: (A) -> C): Either<C, B> =
+            fold({ Left(f(it)) }, { Right(it) })
 
     /**
      * Map over Left and Right of this Either
      */
-    inline fun <C, D> bimap(crossinline fa: (A) -> C, crossinline fb: (B) -> D): Either<C, D> = fold({ Left(fa(it)) }, { Right(fb(it)) })
+    inline fun <C, D> bimap(crossinline fa: (A) -> C, crossinline fb: (B) -> D): Either<C, D> =
+            fold({ Left(fa(it)) }, { Right(fb(it)) })
 
     /**
      * Returns `false` if [Left] or returns the result of the application of
@@ -127,7 +136,8 @@ import arrow.legacy.*
      * left.exists { it > 10 }      // Result: false
      * ```
      */
-    inline fun exists(crossinline predicate: (B) -> Boolean): Boolean = fold({ false }, { predicate(it) })
+    inline fun exists(crossinline predicate: (B) -> Boolean): Boolean =
+            fold({ false }, { predicate(it) })
 
     /**
      * Returns a [Some] containing the [Right] value
@@ -139,7 +149,8 @@ import arrow.legacy.*
      * Left(12).toOption()  // Result: None
      * ```
      */
-    fun toOption(): Option<B> = fold({ None }, { Some(it) })
+    fun toOption(): Option<B> =
+            fold({ None }, { Some(it) })
 
     @Deprecated("arrow.data.Either is right biased. This method will be removed in future releases")
     fun left(): LeftProjection<A, B> = LeftProjection(this)
@@ -211,7 +222,8 @@ fun <R> Right(right: R): Either<Nothing, R> = Either.right(right)
  *
  * @param f The function to bind across [Either.Right].
  */
-fun <A, B, C> Either<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> = fold({ Left(it) }, { f(it) })
+fun <A, B, C> EitherOf<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> =
+        fix().fold({ Left(it) }, { f(it) })
 
 /**
  * Returns the value from this [Either.Right] or the given argument if this is a [Either.Left].
@@ -222,7 +234,8 @@ fun <A, B, C> Either<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> = fold(
  * Left(12).getOrElse(17)  // Result: 17
  * ```
  */
-inline fun <B> Either<*, B>.getOrElse(crossinline default: () -> B): B = fold({ default() }, { it })
+inline fun <B> EitherOf<*, B>.getOrElse(crossinline default: () -> B): B =
+        fix().fold({ default() }, ::identity)
 
 /**
  * Returns the value from this [Either.Right] or allows clients to transform [Either.Left] to [Either.Right] while providing access to
@@ -234,7 +247,8 @@ inline fun <B> Either<*, B>.getOrElse(crossinline default: () -> B): B = fold({ 
  * Left(12).getOrHandle { it + 5 } // Result: 17
  * ```
  */
-inline fun <A, B> Either<A, B>.getOrHandle(crossinline default: (A) -> B): B = fold({ default(it) }, { it })
+inline fun <A, B> EitherOf<A, B>.getOrHandle(crossinline default: (A) -> B): B =
+        fix().fold({ default(it) }, ::identity)
 
 /**
  * * Returns [Either.Right] with the existing value of [Either.Right] if this is a [Either.Right] and the given predicate
@@ -252,8 +266,8 @@ inline fun <A, B> Either<A, B>.getOrHandle(crossinline default: (A) -> B): B = f
  * left.filterOrElse({ it > 10 }, { -1 })      // Result: Left(12)
  * ```
  */
-inline fun <A, B> Either<A, B>.filterOrElse(crossinline predicate: (B) -> Boolean, crossinline default: () -> A): Either<A, B> =
-        fold({ Left(it) }, { if (predicate(it)) Right(it) else Left(default()) })
+inline fun <A, B> EitherOf<A, B>.filterOrElse(crossinline predicate: (B) -> Boolean, crossinline default: () -> A): Either<A, B> =
+        fix().fold({ Left(it) }, { if (predicate(it)) Right(it) else Left(default()) })
 
 /**
  * Returns `true` if this is a [Either.Right] and its value is equal to `elem` (as determined by `==`),
@@ -269,11 +283,13 @@ inline fun <A, B> Either<A, B>.filterOrElse(crossinline predicate: (B) -> Boolea
  * @param elem the element to test.
  * @return `true` if the option has an element that is equal (as determined by `==`) to `elem`, `false` otherwise.
  */
-fun <A, B> Either<A, B>.contains(elem: B): Boolean = fold({ false }, { it == elem })
+fun <A, B> EitherOf<A, B>.contains(elem: B): Boolean =
+        fix().fold({ false }, { it == elem })
 
-fun <A, B, C> Either<A, B>.ap(ff: EitherOf<A, (B) -> C>): Either<A, C> = ff.fix().flatMap { f -> map(f) }.fix()
+fun <A, B, C> EitherOf<A, B>.ap(ff: EitherOf<A, (B) -> C>): Either<A, C> =
+        ff.fix().flatMap { f -> fix().map(f) }.fix()
 
-fun <A, B> Either<A, B>.combineK(y: EitherOf<A, B>): Either<A, B> =
+fun <A, B> EitherOf<A, B>.combineK(y: EitherOf<A, B>): Either<A, B> =
         when (this) {
             is Either.Left -> y.fix()
             else -> this.fix()
@@ -285,3 +301,7 @@ inline fun <T> eitherTry(body: () -> T): Either<Throwable, T> = try {
 } catch (t: Throwable) {
     Left(t)
 }
+
+fun <A> A.left(): Either<A, Nothing> = Either.Left(this)
+
+fun <A> A.right(): Either<Nothing, A> = Either.Right(this)

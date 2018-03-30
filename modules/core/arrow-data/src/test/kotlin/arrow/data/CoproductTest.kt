@@ -2,14 +2,12 @@ package arrow.data
 
 import arrow.Kind3
 import arrow.core.*
-import arrow.syntax.comonad.extract
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldNotBe
-import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
 import arrow.test.laws.TraverseLaws
-import arrow.typeclasses.*
+import arrow.typeclasses.Eq
+import io.kotlintest.KTestJUnitRunner
+import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class CoproductTest : UnitSpec() {
@@ -18,17 +16,13 @@ class CoproductTest : UnitSpec() {
     }
 
     init {
-
-        "instances can be resolved implicitly" {
-            functor<CoproductPartialOf<ForId, ForNonEmptyList>>() shouldNotBe null
-            comonad<CoproductPartialOf<ForId, ForNonEmptyList>>()  shouldNotBe null
-            foldable<CoproductPartialOf<ForId, ForNonEmptyList>>() shouldNotBe null
-            traverse<CoproductPartialOf<ForId, ForNonEmptyList>>() shouldNotBe null
-        }
+        val TF = Coproduct.traverse(Id.traverse(), Id.traverse())
+        val FF = Coproduct.functor(Id.functor(), Id.functor())
+        val CM = Coproduct.comonad(Id.comonad(), Id.comonad())
 
         testLaws(
-            TraverseLaws.laws(traverse(), functor(), { Coproduct(Right(Id(it))) }, EQ),
-            ComonadLaws.laws(comonad(), { Coproduct(Right(Id(it))) }, EQ)
+                TraverseLaws.laws(TF, FF, { Coproduct(Right(Id(it))) }, EQ),
+                ComonadLaws.laws(CM, { Coproduct(Right(Id(it))) }, EQ)
         )
 
     }

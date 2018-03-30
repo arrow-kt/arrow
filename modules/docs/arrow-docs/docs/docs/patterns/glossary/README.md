@@ -38,12 +38,8 @@ or error recovery ([`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_u
 
 You can read more about all the [typeclasses]({{ '/docs/typeclasses/intro' | relative_url }}) that Arrow provides in its [section of the docs]({{ '/docs/typeclasses/intro' | relative_url }}).
 
-To define a fully featured typeclass in Λrrow you use an interface that extends from `TC`, and use the annotation `@typeclass` to generate all boilerplate related to global lookup, which is explained below.
-The annotation and interface to extend have different names to avoid collision.
-
 ```kotlin
-@typeclass
-interface Eq<F>: TC {
+interface Eq<F> {
   fun eqv(a: F, b: F): Boolean
 }
 ```
@@ -54,25 +50,17 @@ A single implementation of a typeclass for a specific datatype or class.
 Because typeclasses require generic parameters each implementation is meant to be unique for that parameter.
 
 ```kotlin
-@instance
-interface IntEqInstance: Eq<Int> {
-  override fun eqv(a: Int, b: Int): Boolean = a == b
+@instance(User::class)
+interface UserEqInstance: Eq<User> {
+  override fun User.eqv(b: User): Boolean = id == b.id
 }
 ```
 
-In Λrrow all typeclass instances can be looked up in a global scope using an inlined reified method with the same name as the typeclass.
-Its generic parameter will be used for the lookup, which reinforces the concept that most typeclasses should have a single implementation per type.
+In Λrrow all typeclass instances can be looked up in either the datatype they're defined for, or a global object for platform types like String or Int.
 
 All the instances in the library are already registered and available in the global scope.
-If you're defining your own instances and would like for them to be discoverable in the global scope 
-you can add them by annotating them as `@instance`, and Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will register them for you. The interface has to have all required methods defined by default implementations, and be named after the datatype + typeclass + the word `Instance`.
-
-```kotlin:ank
-import arrow.*
-import arrow.typeclasses.*
-
-eq<Int>()
-```
+If you're defining your own instances and would like for them to be discoverable in their corresponding datatypes 
+you can generate it by annotating them as `@instance`, and Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create the extension functions for you.
 
 ### Type constructors
 
@@ -148,8 +136,7 @@ Now that we have a way of representing generic constructors for any type, we can
 Let's take as an example a typeclass that specifies how to map the contents of any container `F`. This typeclass that comes from computer science is called a [`Functor`]({{ '/docs/typeclasses/functor' | relative_url }}).
 
 ```kotlin
-@typeclass
-interface Functor<F>: TC {
+interface Functor<F> {
   fun <A, B> map(fa: Kind<F, A>, f: (A) -> B): Kind<F, B>
 }
 ```
@@ -192,32 +179,31 @@ return list.map(f)
 
 Higher kinds are also used to model functions that require for a datatype to implement a typeclass. This way you can create functions that abstract behavior (defined by a typeclass) and allow callers to define which datatype they'd like to apply it to.
 
-Let's use the typeclass [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}), that contains the constructor function `pure()`.
+Let's use the typeclass [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}), that contains the constructor function `just()`.
 
 ```kotlin
-@typeclass
-interface Applicative<F>: Functor<F>, TC {
+interface Applicative<F>: Functor<F> {
 
   // Constructs the current datatype with a value of type A inside
-  fun <A> pure(a: A): Kind<F, A>
+  fun <A> just(a: A): Kind<F, A>
   
   /* ... */
 }
 ```
 
-Once we have this typeclass behavior define we can now write a function that's parametrized for any `F` that has one instance of `Applicative`. The function uses the constructor `pure` to create a value of type `Kind<F, User>`, effectively generifying the return on any container `F`.
+Once we have this typeclass behavior define we can now write a function that's parametrized for any `F` that has one instance of `Applicative`. The function uses the constructor `just` to create a value of type `Kind<F, User>`, effectively generifying the return on any container `F`.
 
 ```kotlin
-inline fun <reified F> randomUserStructure(f: (Int) -> User, AP: Applicative<F> = applicative<F>()): Kind<F, User> =
-  AP.pure(f(Math.random()))
+fun <F> Applicative<F>.randomUserStructure(f: (Int) -> User): Kind<F, User> =
+  AP.just(f(Math.random()))
 ```
 
-Now lets create a simple example instance of `Applicative` where our `F` is `ListK`. This implementation of a `pure` constructor is trivial for lists, as it just requires wrapping the value.
+Now lets create a simple example instance of `Applicative` where our `F` is `ListK`. This implementation of a `just` constructor is trivial for lists, as it just requires wrapping the value.
 
 ```kotlin
 @instance
 interface ListKApplicativeInstance : Applicative<ForListK> {
-  override fun <A> pure(a: A): Kind<ForListK, A> = ListK(listOf(a))
+  override fun <A> just(a: A): Kind<ForListK, A> = ListK(listOf(a))
   
   /* ... */
 }
@@ -226,44 +212,50 @@ interface ListKApplicativeInstance : Applicative<ForListK> {
 And now we can show how this function `randomUserStructure()` can be used for any datatype that implements [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}). As the function returns a value `Kind<F, User>` the caller is responsible of calling `fix()` to downcast it to the expected value.
 
 ```kotlin
-val list = randomUserStructure(::User, ListK.applicative()).fix()
+val list = ListK.applicative().randomUserStructure(::User).fix()
 //[User(342)]
 ```
 
 ```kotlin
-val option = randomUserStructure(::User, Option.applicative()).fix()
+val option = Option.applicative().randomUserStructure(::User).fix()
 //Some(User(765))
 ```
 
 ```kotlin
-val either = randomUserStructure(::User, Either.applicative<Unit>()).fix()
+val either = Either.applicative<Unit>().randomUserStructure(::User).fix()
 //Right(User(221))
 ```
 
-Passing the instance in every function call seems like a burden. But, remember that all instances already defined in Λrrow can be looked up globally!! That means that whenever asking for any instance you can ask for a default value that'll be looked up globally based on its type:
-
-```kotlin:ank
-import arrow.data.*
-
-applicative<ForListK>()
-```
-
-```kotlin:ank
-import arrow.core.*
-
-applicative<ForOption>()
-```
-
-So, because `randomUserStructure` provides a default value for [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}) that's looked up globally, we can call it without passing the second parameter as long as we tell the compiler what type we're expecting the function to return.
+Passing the instance in every function call seems like a burden. So, because `randomUserStructure` is an extension function for [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}) we can omit the implicit parameter as long as we are within the scope of an Applicative instance. You can use the standard functions `with` and `run` for this.
 
 ```kotlin
-val list: ListK<User> = randomUserStructure(::User).fix()
-//[User(342)]
+with (ListK.applicative()) {
+    // Lots of Kotlin here
+
+    // Multiple calls
+
+    randomUserStructure(::User).fix()
+}
+// [User(342)]
 ```
 
 ```kotlin
-val option: Option<User> = randomUserStructure(::User).fix()
-//Some(User(765))
+Option.applicative().run { 
+    tupled(randomUserStructure(::User), randomUserStructure(::User))
+}
+// Some(value = Tuple2(a = User(765), b = User(127)))
 ```
 
-This system of looking up global instances and allowing manual overrides has several pitfalls and can and will be simplified when the feature request [KEEP-87](https://github.com/Kotlin/KEEP/pull/87) is implemented into the language.
+To make the typeclass scope available to a whole class you can use simple delegation, like this:
+
+```kotlin
+class UserFetcher<F>(AP: Applicative<F>): Applicative<F> by AP {
+
+    fun genUser() = randomUserStructure(::User)
+}
+
+UserFetcher(Option.applicative()).genUser().fix()
+// Some(value = User(943))
+```
+
+This technique of [Dependency Injection]({{ '/docs/patterns/dependencyinjection' | relative_url }}) that expresses dependencies as the implicit parameter of an extension function is called `Typeclassless`. You can read more about it in this [blog series](http://www.pacoworks.com/2018/02/25/simple-dependency-injection-in-kotlin-part-1/).

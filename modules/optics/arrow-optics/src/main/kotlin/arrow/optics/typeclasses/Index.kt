@@ -1,9 +1,10 @@
 package arrow.optics.typeclasses
 
-import arrow.TC
 import arrow.optics.Iso
 import arrow.optics.Optional
-import arrow.typeclass
+
+inline operator fun <S, I, A, R> Index<S, I, A>.invoke(ff: Index<S, I, A>.() -> R) =
+        run(ff)
 
 /**
  * [Index] provides an [Optional] for a structure [S] to focus in an optional [A] at a given index [I].
@@ -12,8 +13,7 @@ import arrow.typeclass
  * @param I index
  * @param A focus of [Optional], [A] is supposed to be unique for a given pair [S] and [I].
  */
-@typeclass
-interface Index<S, I, A> : TC {
+interface Index<S, I, A> {
 
     /**
      * Get [Optional] focus [A] for a structure [S] at index [i].
@@ -37,13 +37,3 @@ interface Index<S, I, A> : TC {
     }
 
 }
-
-/**
- * Lift an instance of [Index] using an [Iso].
- */
-inline fun <reified S, reified A, reified I, reified B> Index.Companion.fromIso(iso: Iso<S, A>, ID: Index<A, I, B> = arrow.optics.typeclasses.index()): Index<S, I, B> = Index.fromIso(ID, iso)
-
-/**
- * Get an [Optional] for an index [i] given an [Index].
- */
-inline fun <reified S, reified I, reified A> Index.Companion.index(i: I, ID: Index<S, I, A> = arrow.optics.typeclasses.index()): Optional<S, A> = ID.index(i)

@@ -3,6 +3,7 @@ package arrow.optics
 import arrow.core.*
 import arrow.data.ListK
 import arrow.data.NonEmptyList
+import arrow.data.fix
 import arrow.data.k
 
 /**
@@ -28,7 +29,7 @@ fun <A> listTail(): Optional<List<A>, List<A>> = Optional(
  */
 fun <A, B> pListToOptionNel(): PIso<List<A>, List<B>, Option<NonEmptyList<A>>, Option<NonEmptyList<B>>> = PIso(
         get = { aas -> if (aas.isEmpty()) None else Some(NonEmptyList(aas.first(), aas.drop(1))) },
-        reverseGet = { optNel -> optNel.fold({ emptyList() }, { it.all }) }
+        reverseGet = { optNel -> optNel.fix().fold({ emptyList() }, { it.fix().all }) }
 )
 
 /**
@@ -41,7 +42,7 @@ fun <A> listToOptionNel(): Iso<List<A>, Option<NonEmptyList<A>>> = pListToOption
  */
 fun <A, B> pListToListK(): PIso<List<A>, List<B>, ListK<A>, ListK<B>> = PIso(
         get = { it.k() },
-        reverseGet = { it.list }
+        reverseGet = { it.fix().list }
 )
 
 /**

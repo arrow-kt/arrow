@@ -1,7 +1,8 @@
 package arrow.data
 
-import arrow.*
+import arrow.Kind
 import arrow.core.*
+import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Semigroup
 
@@ -26,7 +27,8 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
  * values, regardless of whether the `B` values appear in a [Ior.Right] or a [Ior.Both].
  * The isomorphic Either form can be accessed via the [unwrap] method.
  */
-@higherkind sealed class Ior<out A, out B> : IorOf<A, B> {
+@higherkind
+sealed class Ior<out A, out B> : IorOf<A, B> {
 
     /**
      * Returns `true` if this is a [Right], `false` otherwise.
@@ -86,26 +88,27 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
             }
         }
 
-        private tailrec fun <L, A, B> loop(v: Ior<L, Either<A, B>>, f: (A) -> IorOf<L, Either<A, B>>, SL: Semigroup<L>): Ior<L, B> = when (v) {
+        private tailrec fun <L, A, B> Semigroup<L>.loop(v: Ior<L, Either<A, B>>, f: (A) -> IorOf<L, Either<A, B>>): Ior<L, B> = when (v) {
             is Left -> Left(v.value)
             is Right -> when (v.value) {
                 is Either.Right -> Right(v.value.b)
-                is Either.Left -> loop(f(v.value.a).fix().fix(), f, SL)
+                is Either.Left -> loop(f(v.value.a).fix(), f)
             }
             is Both -> when (v.rightValue) {
                 is Either.Right -> Both(v.leftValue, v.rightValue.b)
                 is Either.Left -> {
                     val fnb = f(v.rightValue.a).fix()
                     when (fnb) {
-                        is Left -> Left(SL.combine(v.leftValue, fnb.value))
-                        is Right -> loop(Both(v.leftValue, fnb.value), f, SL)
-                        is Both -> loop(Both(SL.combine(v.leftValue, fnb.leftValue), fnb.rightValue), f, SL)
+                        is Left -> Left(v.leftValue.combine(fnb.value))
+                        is Right -> loop(Both(v.leftValue, fnb.value), f)
+                        is Both -> loop(Both(v.leftValue.combine(fnb.leftValue), fnb.rightValue), f)
                     }
                 }
             }
         }
 
-        fun <L, A, B> tailRecM(a: A, f: (A) -> IorOf<L, Either<A, B>>, SL: Semigroup<L>): Ior<L, B> = loop(f(a).fix(), f, SL)
+        fun <L, A, B> tailRecM(a: A, f: (A) -> IorOf<L, Either<A, B>>, SL: Semigroup<L>): Ior<L, B> =
+                SL.run { loop(f(a).fix(), f) }
 
         fun <A, B> leftNel(a: A): IorNel<A, B> = Left(NonEmptyList.of(a))
 
@@ -141,8 +144,9 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
     fun <C> foldRight(lc: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
             fold({ lc }, { f(it, lc) }, { _, b -> f(b, lc) })
 
-    fun <G, C> traverse(f: (B) -> Kind<G, C>, GA: Applicative<G>): Kind<G, Ior<A, C>> =
-            fold({ GA.pure(Left(it)) }, { GA.map(f(it), { Right(it) }) }, { _, b -> GA.map(f(b), { Right(it) }) })
+    fun <G, C> traverse(GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Ior<A, C>> = GA.run {
+        fold({ just(Left(it)) }, { f(it).map({ Right<A, C>(it) }) }, { _, b -> f(b).map({ Right<A, C>(it) }) })
+    }
 
     /**
      * The given function is applied if this is a [Right] or [Both] to `B`.
@@ -171,7 +175,7 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
      * Ior.Both(12, "power").bimap ({ a, b -> "flower $b" },{ a * 2})  // Result: Both("flower power", 24)
      * ```
      */
-    inline fun <C, D> bimap(fa: (A) -> C, fb: (B) -> D) = fold(
+    inline fun <C, D> bimap(fa: (A) -> C, fb: (B) -> D): Ior<C, D> = fold(
             { Left(fa(it)) },
             { Right(fb(it)) },
             { a, b -> Both(fa(a), fb(b)) }
@@ -274,22 +278,30 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
      */
     fun toValidated(): Validated<A, B> = fold({ Invalid(it) }, { Valid(it) }, { _, b -> Valid(b) })
 
-    data class Left<out A>(val value: A) : Ior<A, Nothing>() {
-        override val isRight: Boolean = false
-        override val isLeft: Boolean = true
-        override val isBoth: Boolean = false
+    data class Left<out A, out B> @PublishedApi internal constructor(val value: A) : Ior<A, B>() {
+        override val isRight: Boolean get() = false
+        override val isLeft: Boolean get() = true
+        override val isBoth: Boolean get() = false
+
+        companion object {
+            inline operator fun <A> invoke(a: A): Ior<A, Nothing> = Left(a)
+        }
     }
 
-    data class Right<out B>(val value: B) : Ior<Nothing, B>() {
-        override val isRight: Boolean = true
-        override val isLeft: Boolean = false
-        override val isBoth: Boolean = false
+    data class Right<out A, out B> @PublishedApi internal constructor(val value: B) : Ior<A, B>() {
+        override val isRight: Boolean get() = true
+        override val isLeft: Boolean get() = false
+        override val isBoth: Boolean get() = false
+
+        companion object {
+            inline operator fun <B> invoke(b: B): Ior<Nothing, B> = Right(b)
+        }
     }
 
     data class Both<out A, out B>(val leftValue: A, val rightValue: B) : Ior<A, B>() {
-        override val isRight: Boolean = false
-        override val isLeft: Boolean = false
-        override val isBoth: Boolean = true
+        override val isRight: Boolean get() = false
+        override val isLeft: Boolean get() = false
+        override val isBoth: Boolean get() = true
     }
 }
 
@@ -298,27 +310,31 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
  *
  * @param f The function to bind across [Ior.Right].
  */
-inline fun <A, B, D> Ior<A, B>.flatMap(crossinline f: (B) -> Ior<A, D>, SA: Semigroup<A>): Ior<A, D> = when (this) {
-    is Ior.Left -> Ior.Left(value)
-    is Ior.Right -> f(value)
-    is Ior.Both -> {
-        val fm = f(rightValue)
-        when (fm) {
-            is Ior.Left -> Ior.Left(SA.combine(leftValue, fm.value))
-            is Ior.Right -> Ior.Both(leftValue, fm.value)
-            is Ior.Both -> Ior.Both(SA.combine(leftValue, fm.leftValue), fm.rightValue)
+fun <A, B, D> Ior<A, B>.flatMap(SG: Semigroup<A>, f: (B) -> Ior<A, D>): Ior<A, D> = fold(
+        { Ior.Left(it) },
+        f,
+        { l, r ->
+            with(SG) {
+                f(r).fold({
+                    Ior.Left(l.combine(it))
+                }, {
+                    Ior.Both(l, it)
+                }, { ll, rr ->
+                    Ior.Both(l.combine(ll), rr)
+                })
+            }
         }
-    }
-}
+)
 
-fun <A, B, D> Ior<A, B>.ap(ff: IorOf<A, (B) -> D>, SA: Semigroup<A>): Ior<A, D> = ff.fix().flatMap({ f -> map(f) }, SA)
+fun <A, B, D> Ior<A, B>.ap(SG: Semigroup<A>, ff: IorOf<A, (B) -> D>): Ior<A, D> =
+        ff.fix().flatMap(SG) { f -> map(f) }
 
-inline fun <A, B> Ior<A, B>.getOrElse(crossinline default: () -> B): B = fold({ default() }, { it }, { _, b -> b })
-
-fun <B> B.rightIor(): Ior<Nothing, B> = Ior.Right(this)
-
-fun <A> A.leftIor(): Ior<A, Nothing> = Ior.Left(this)
+inline fun <A, B> Ior<A, B>.getOrElse(crossinline default: () -> B): B = fold({ default() }, ::identity, { _, b -> b })
 
 fun <A, B> Pair<A, B>.bothIor(): Ior<A, B> = Ior.Both(this.first, this.second)
 
 fun <A, B> Tuple2<A, B>.bothIor(): Ior<A, B> = Ior.Both(this.a, this.b)
+
+fun <A> A.leftIor(): Ior<A, Nothing> = Ior.Left(this)
+
+fun <A> A.rightIor(): Ior<Nothing, A> = Ior.Right(this)

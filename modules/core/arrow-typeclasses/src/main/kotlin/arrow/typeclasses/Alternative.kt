@@ -1,6 +1,6 @@
 package arrow.typeclasses
 
-import arrow.*
+inline operator fun <F, A> Alternative<F>.invoke(ff: Alternative<F>.() -> A) =
+        run(ff)
 
-@typeclass
-interface Alternative<F> : Applicative<F>, MonoidK<F>, TC
+interface Alternative<F> : Applicative<F>, MonoidK<F>

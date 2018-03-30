@@ -1,14 +1,18 @@
 package arrow.optics
 
-import arrow.*
+import arrow.Kind
 import arrow.core.*
-import arrow.typeclasses.*
+import arrow.higherkind
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
 
 /**
  * [Prism] is a type alias for [PPrism] which fixes the type arguments
  * and restricts the [PPrism] to monomorphic updates.
  */
 typealias Prism<S, A> = PPrism<S, S, A, A>
+
 typealias ForPrism = ForPPrism
 typealias PrismOf<S, A> = PPrismOf<S, S, A, A>
 typealias PrismPartialOf<S> = Kind<ForPrism, S>
@@ -71,8 +75,8 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
         /**
          * A [PPrism] that checks for equality with a given value [a]
          */
-        inline fun <reified A> only(a: A, EQA: Eq<A> = eq()): Prism<A, Unit> = Prism(
-                getOrModify = { a2 -> (if (EQA.eqv(a, a2)) Either.Left(a) else Either.Right(Unit)) },
+        fun <A> only(a: A, EQA: Eq<A>): Prism<A, Unit> = Prism(
+                getOrModify = { a2 -> (if (EQA.run { a.eqv(a2) }) Either.Left(a) else Either.Right(Unit)) },
                 reverseGet = { a }
         )
 
@@ -81,19 +85,23 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
     /**
      * Modify the focus of a [PPrism] with an [Applicative] function
      */
-    fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = getOrModify(s).fold(
-            FA::pure,
-            { FA.map(f(it), this::reverseGet) }
-    )
+    fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FA.run {
+        getOrModify(s).fold(
+                ::just,
+                { f(it).map(::reverseGet) }
+        )
+    }
 
     /**
      * Modify the focus of a [PPrism] with an [Applicative] function
      */
-    fun <F> liftF(FA: Applicative<F>, f: (A) -> Kind<F, B>): (S) -> Kind<F, T> = { s ->
-        getOrModify(s).fold(
-                FA::pure,
-                { FA.map(f(it), this::reverseGet) }
-        )
+    fun <F> liftF(FA: Applicative<F>, f: (A) -> Kind<F, B>): (S) -> Kind<F, T> = FA.run {
+        { s ->
+            getOrModify(s).fold(
+                    ::just,
+                    { f(it).map(::reverseGet) }
+            )
+        }
     }
 
     /**
@@ -216,25 +224,14 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
      * View a [PPrism] as a [PTraversal]
      */
     fun asTraversal(): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
-        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = getOrModify(s).fold(
-                FA::pure,
-                { FA.map(f(it), this@PPrism::reverseGet) }
-        )
+        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FA.run {
+            getOrModify(s).fold(
+                    ::just,
+                    { f(it).map(this@PPrism::reverseGet) }
+            )
+        }
     }
-
 }
-
-/**
- * Modify the focus of a [PPrism] with an [Applicative] function
- */
-inline fun <S, T, A, B, reified F> PPrism<S, T, A, B>.modifyF(s: S, crossinline f: (A) -> Kind<F, B>, FA: Applicative<F> = applicative()): Kind<F, T> =
-        modifyF(FA, s) { a -> f(a) }
-
-/**
- * Lift a function [f]: `(A) -> Kind<F, B> to the context of `S`: `(S) -> Kind<F, T>` with an [Applicative] function
- */
-inline fun <S, T, A, B, reified F> PPrism<S, T, A, B>.liftF(FA: Applicative<F> = applicative(), dummy: Unit = Unit, crossinline f: (A) -> Kind<F, B>): (S) -> Kind<F, T> =
-        liftF(FA) { a -> f(a) }
 
 /**
  * Modify the focus of a [PPrism] with a function

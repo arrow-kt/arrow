@@ -9,9 +9,8 @@ interface SetAtInstance<A> : At<Set<A>, A, Boolean> {
             get = { it.contains(i) },
             set = { b -> { (if (b) it + i else it - i) } }
     )
-}
 
-object SetAtInstanceImplicits {
-    @JvmStatic
-    fun <A> instance(): At<Set<A>, A, Boolean> = object : SetAtInstance<A> {}
+    companion object {
+        operator fun <A> invoke() = object : SetAtInstance<A> {}
+    }
 }

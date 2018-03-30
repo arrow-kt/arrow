@@ -1,14 +1,12 @@
 package arrow.optics
 
 import arrow.core.Either
+import arrow.core.Right
 import arrow.core.applicative
 import arrow.core.fix
 import arrow.data.Invalid
 import arrow.data.Valid
 import arrow.data.Validated
-import arrow.syntax.either.right
-import arrow.syntax.validated.invalid
-import arrow.syntax.validated.valid
 import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.IsoLaws
@@ -49,10 +47,10 @@ class TryInstancesTest : UnitSpec() {
                 EQA = Eq.any(),
                 EQB = Eq.any(),
                 bMonoid = object : Monoid<Either<Throwable, Int>> {
-                    override fun combine(a: Either<Throwable, Int>, b: Either<Throwable, Int>): Either<Throwable, Int> =
-                            Either.applicative<Throwable>().map2(a, b) { (a, b) -> a + b }.fix()
+                    override fun Either<Throwable, Int>.combine(b: Either<Throwable, Int>): Either<Throwable, Int> =
+                            Either.applicative<Throwable>().run { this@combine.map2(b) { (a, b) -> a + b }.fix() }
 
-                    override fun empty(): Either<Throwable, Int> = 0.right()
+                    override fun empty(): Either<Throwable, Int> = Right(0)
                 }
         ))
 
@@ -64,23 +62,23 @@ class TryInstancesTest : UnitSpec() {
                 EQA = Eq.any(),
                 EQB = Eq.any(),
                 bMonoid = object : Monoid<Validated<Throwable, Int>> {
-                    override fun combine(a: Validated<Throwable, Int>, b: Validated<Throwable, Int>): Validated<Throwable, Int> =
-                            when (a) {
+                    override fun Validated<Throwable, Int>.combine(b: Validated<Throwable, Int>): Validated<Throwable, Int> =
+                            when (this) {
                                 is Invalid -> {
                                     when (b) {
-                                        is Invalid -> (a.e).invalid()
+                                        is Invalid -> Invalid(e)
                                         is Valid -> b
                                     }
                                 }
                                 is Valid -> {
                                     when (b) {
                                         is Invalid -> b
-                                        is Valid -> (a.a + b.a).valid()
+                                        is Valid -> Valid(a + b.a)
                                     }
                                 }
                             }
 
-                    override fun empty() = 0.valid<Throwable, Int>()
+                    override fun empty() = Valid(0)
                 }
         ))
 

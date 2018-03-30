@@ -1,13 +1,15 @@
 package arrow.instances
 
-import arrow.*
+import arrow.Kind
 import arrow.core.Eval
 import arrow.data.*
+import arrow.instance
 import arrow.typeclasses.*
+import arrow.data.traverse as validatedTraverse
 
 @instance(Validated::class)
 interface ValidatedFunctorInstance<E> : Functor<ValidatedPartialOf<E>> {
-    override fun <A, B> map(fa: ValidatedOf<E, A>, f: (A) -> B): Validated<E, B> = fa.fix().map(f)
+    override fun <A, B> Kind<ValidatedPartialOf<E>, A>.map(f: (A) -> B): Validated<E, B> = fix().map(f)
 }
 
 @instance(Validated::class)
@@ -15,11 +17,11 @@ interface ValidatedApplicativeInstance<E> : ValidatedFunctorInstance<E>, Applica
 
     fun SE(): Semigroup<E>
 
-    override fun <A> pure(a: A): Validated<E, A> = Valid(a)
+    override fun <A> just(a: A): Validated<E, A> = Valid(a)
 
-    override fun <A, B> map(fa: ValidatedOf<E, A>, f: (A) -> B): Validated<E, B> = fa.fix().map(f)
+    override fun <A, B> Kind<ValidatedPartialOf<E>, A>.map(f: (A) -> B): Validated<E, B> = fix().map(f)
 
-    override fun <A, B> ap(fa: ValidatedOf<E, A>, ff: Kind<ValidatedPartialOf<E>, (A) -> B>): Validated<E, B> = fa.fix().ap(ff.fix(), SE())
+    override fun <A, B> Kind<ValidatedPartialOf<E>, A>.ap(ff: Kind<ValidatedPartialOf<E>, (A) -> B>): Validated<E, B> = fix().ap(SE(), ff.fix())
 
 }
 
@@ -28,28 +30,26 @@ interface ValidatedApplicativeErrorInstance<E> : ValidatedApplicativeInstance<E>
 
     override fun <A> raiseError(e: E): Validated<E, A> = Invalid(e)
 
-    override fun <A> handleErrorWith(fa: ValidatedOf<E, A>, f: (E) -> ValidatedOf<E, A>): Validated<E, A> =
-            fa.fix().handleLeftWith(f)
+    override fun <A> Kind<ValidatedPartialOf<E>, A>.handleErrorWith(f: (E) -> Kind<ValidatedPartialOf<E>, A>): Validated<E, A> =
+            fix().handleLeftWith(f)
 
 }
 
 @instance(Validated::class)
 interface ValidatedFoldableInstance<E> : Foldable<ValidatedPartialOf<E>> {
 
-    override fun <A, B> foldLeft(fa: ValidatedOf<E, A>, b: B, f: (B, A) -> B): B =
-            fa.fix().foldLeft(b, f)
+    override fun <A, B> Kind<ValidatedPartialOf<E>, A>.foldLeft(b: B, f: (B, A) -> B): B =
+            fix().foldLeft(b, f)
 
-    override fun <A, B> foldRight(fa: ValidatedOf<E, A>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-            fa.fix().foldRight(lb, f)
-
+    override fun <A, B> Kind<ValidatedPartialOf<E>, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+            fix().foldRight(lb, f)
 }
 
 @instance(Validated::class)
 interface ValidatedTraverseInstance<E> : ValidatedFoldableInstance<E>, Traverse<ValidatedPartialOf<E>> {
 
-    override fun <G, A, B> traverse(fa: Kind<ValidatedPartialOf<E>, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Validated<E, B>> =
-            fa.fix().traverse(f, GA)
-
+    override fun <G, A, B> Kind<ValidatedPartialOf<E>, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> =
+            fix().validatedTraverse(AP, f)
 }
 
 @instance(Validated::class)
@@ -57,9 +57,8 @@ interface ValidatedSemigroupKInstance<E> : SemigroupK<ValidatedPartialOf<E>> {
 
     fun SE(): Semigroup<E>
 
-    override fun <B> combineK(x: ValidatedOf<E, B>, y: ValidatedOf<E, B>): Validated<E, B> =
-            x.fix().combineK(y, SE())
-
+    override fun <B> Kind<ValidatedPartialOf<E>, B>.combineK(y: Kind<ValidatedPartialOf<E>, B>): Validated<E, B> =
+            fix().combineK(SE(), y)
 }
 
 @instance(Validated::class)
@@ -69,13 +68,13 @@ interface ValidatedEqInstance<L, R> : Eq<Validated<L, R>> {
 
     fun EQR(): Eq<R>
 
-    override fun eqv(a: Validated<L, R>, b: Validated<L, R>): Boolean = when (a) {
+    override fun Validated<L, R>.eqv(b: Validated<L, R>): Boolean = when (this) {
         is Valid -> when (b) {
             is Invalid -> false
-            is Valid -> EQR().eqv(a.a, b.a)
+            is Valid -> EQR().run { a.eqv(b.a) }
         }
         is Invalid -> when (b) {
-            is Invalid -> EQL().eqv(a.e, b.e)
+            is Invalid -> EQL().run { e.eqv(b.e) }
             is Valid -> false
         }
     }
@@ -83,6 +82,6 @@ interface ValidatedEqInstance<L, R> : Eq<Validated<L, R>> {
 
 @instance(Validated::class)
 interface ValidatedShowInstance<L, R> : Show<Validated<L, R>> {
-    override fun show(a: Validated<L, R>): String =
-            a.toString()
+    override fun Validated<L, R>.show(): String =
+            toString()
 }

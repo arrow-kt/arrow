@@ -35,7 +35,7 @@ val songDeferred: DeferredK<Url> = getSongUrlAsync().fix()
 Receives a function returning `Kind<F, A>`. The instance is responsible of creating and running the returned datatype lazily.
 
 ```kotlin
-IO.monadSuspend().suspend { IO.pure(1) }
+IO.monadSuspend().suspend { IO.just(1) }
 ```
 
 This can be used to wrap synchronous APIs that already return the expected datatype, forcing them to be run lazily.
@@ -50,7 +50,7 @@ val SC = IO.monadSuspend()
 
 val result = SC.binding {
   println("Print: now")
-  val result = pure(1).bind()
+  val result = just(1).bind()
   result + 1
 }
 
@@ -94,19 +94,19 @@ It starts a [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | rela
 
 #### bindindCancellable#bindDefer
 
-Binds the function parameter by wrapping the result in `pure()`.
+Binds the function parameter by wrapping the result in `just()`.
 
 Exceptions are wrapped in `raiseError()`.
 
 #### bindindCancellable#bindDeferIn
 
-Executes the function parameter in a separate `CoroutineContext` and wraps the result in `pure()`.
+Executes the function parameter in a separate `CoroutineContext` and wraps the result in `just()`.
 
 Exceptions are wrapped in `raiseError()`.
 
 #### bindindCancellable#bindDeferUnsafe
 
-Binds the function parameter by wrapping the result in `pure()`.
+Binds the function parameter by wrapping the result in `just()`.
 
 While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution.
 

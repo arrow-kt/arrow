@@ -1,14 +1,14 @@
 package arrow.data
 
-import arrow.*
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.flatMap
+import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
-import arrow.typeclasses.monad
 
 /**
  * [EitherT]`<F, A, B>` is a light wrapper on an `F<`[Either]`<A, B>>` with some
@@ -16,72 +16,89 @@ import arrow.typeclasses.monad
  *
  * It may also be said that [EitherT] is a monad transformer for [Either].
  */
-@higherkind data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, B>, EitherTKindedJ<F, A, B> {
+@higherkind
+data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, B>, EitherTKindedJ<F, A, B> {
 
     companion object {
 
-        inline operator fun <reified F, A, B> invoke(value: Kind<F, Either<A, B>>): EitherT<F, A, B> = EitherT(value)
+        inline operator fun <F, A, B> invoke(value: Kind<F, Either<A, B>>): EitherT<F, A, B> = EitherT(value)
 
-        fun <F, A, B> pure(b: B, MF: Applicative<F>): EitherT<F, A, B> = right(b, MF)
+        fun <F, A, B> just(MF: Applicative<F>, b: B): EitherT<F, A, B> = right(MF, b)
 
-        fun <F, L, A, B> tailRecM(a: A, f: (A) -> EitherTOf<F, L, Either<A, B>>, MF: Monad<F>): EitherT<F, L, B> =
-                EitherT(MF.tailRecM(a, {
-                    MF.map(f(it).fix().value) { recursionControl ->
-                        when (recursionControl) {
-                            is Either.Left<L, Either<A, B>> -> Right(Left(recursionControl.a))
-                            is Either.Right<L, Either<A, B>> -> {
-                                val b: Either<A, B> = recursionControl.b
-                                when (b) {
-                                    is Either.Left<A, B> -> Left(b.a)
-                                    is Either.Right<A, B> -> Right(Right(b.b))
-                                }
+        fun <F, L, A, B> tailRecM(MF: Monad<F>, a: A, f: (A) -> EitherTOf<F, L, Either<A, B>>): EitherT<F, L, B> = MF.run {
+            EitherT(tailRecM(a, {
+                f(it).fix().value.map { recursionControl ->
+                    when (recursionControl) {
+                        is Either.Left<L, Either<A, B>> -> Right(Left(recursionControl.a))
+                        is Either.Right<L, Either<A, B>> -> {
+                            val b: Either<A, B> = recursionControl.b
+                            when (b) {
+                                is Either.Left<A, B> -> Left(b.a)
+                                is Either.Right<A, B> -> Right(Right(b.b))
                             }
                         }
                     }
-                }))
+                }
+            }))
+        }
 
-        fun <F, A, B> right(b: B, MF: Applicative<F>): EitherT<F, A, B> = EitherT(MF.pure(Right(b)))
+        fun <F, A, B> right(MF: Applicative<F>, b: B): EitherT<F, A, B> = EitherT(MF.just(Right(b)))
 
-        fun <F, A, B> left(a: A, MF: Applicative<F>): EitherT<F, A, B> = EitherT(MF.pure(Left(a)))
+        fun <F, A, B> left(MF: Applicative<F>, a: A): EitherT<F, A, B> = EitherT(MF.just(Left(a)))
 
-        inline fun <reified F, A, B> fromEither(value: Either<A, B>, MF: Applicative<F> = monad<F>()): EitherT<F, A, B> =
-                EitherT(MF.pure(value))
+        inline fun <F, A, B> fromEither(AP: Applicative<F>, value: Either<A, B>): EitherT<F, A, B> =
+                EitherT(AP.just(value))
     }
 
-    inline fun <C> fold(crossinline l: (A) -> C, crossinline r: (B) -> C, FF: Functor<F>): Kind<F, C> = FF.map(value, { either -> either.fold(l, r) })
+    inline fun <C> fold(FF: Functor<F>, crossinline l: (A) -> C, crossinline r: (B) -> C): Kind<F, C> = FF.run {
+        value.map({ either -> either.fold(l, r) })
+    }
 
-    inline fun <C> flatMap(crossinline f: (B) -> EitherT<F, A, C>, MF: Monad<F>): EitherT<F, A, C> = flatMapF({ it -> f(it).value }, MF)
+    inline fun <C> flatMap(MF: Monad<F>, crossinline f: (B) -> EitherT<F, A, C>): EitherT<F, A, C> =
+            flatMapF(MF, { it -> f(it).value })
 
-    inline fun <C> flatMapF(crossinline f: (B) -> Kind<F, Either<A, C>>, MF: Monad<F>): EitherT<F, A, C> =
-            EitherT(MF.flatMap(value, { either -> either.fold({ MF.pure(Left(it)) }, { f(it) }) }))
+    inline fun <C> flatMapF(MF: Monad<F>, crossinline f: (B) -> Kind<F, Either<A, C>>): EitherT<F, A, C> = MF.run {
+        EitherT(value.flatMap({ either -> either.fold({ MF.just(Left(it)) }, { f(it) }) }))
+    }
 
-    inline fun <C> cata(crossinline l: (A) -> C, crossinline r: (B) -> C, FF: Functor<F>): Kind<F, C> = fold(l, r, FF)
+    inline fun <C> cata(FF: Functor<F>, crossinline l: (A) -> C, crossinline r: (B) -> C): Kind<F, C> = fold(FF, l, r)
 
-    fun <C> liftF(fa: Kind<F, C>, FF: Functor<F>): EitherT<F, A, C> = EitherT(FF.map(fa, { Right(it) }))
+    fun <C> liftF(FF: Functor<F>, fa: Kind<F, C>): EitherT<F, A, C> = FF.run {
+        EitherT(fa.map({ Right(it) }))
+    }
 
-    inline fun <C> semiflatMap(crossinline f: (B) -> Kind<F, C>, MF: Monad<F>): EitherT<F, A, C> = flatMap({ liftF(f(it), MF) }, MF)
+    inline fun <C> semiflatMap(MF: Monad<F>, crossinline f: (B) -> Kind<F, C>): EitherT<F, A, C> = flatMap(MF, { liftF(MF, f(it)) })
 
-    fun <C> map(f: (B) -> C, FF: Functor<F>): EitherT<F, A, C> = EitherT(FF.map(value, { it.map(f) }))
+    fun <C> map(FF: Functor<F>, f: (B) -> C): EitherT<F, A, C> = FF.run {
+        EitherT(value.map({ it.map(f) }))
+    }
 
-    inline fun <C> mapLeft(crossinline f: (A) -> C, FF: Functor<F>): EitherT<F, C, B> = EitherT(FF.map(value, { it.mapLeft(f) }))
+    inline fun <C> mapLeft(FF: Functor<F>, crossinline f: (A) -> C): EitherT<F, C, B> = FF.run {
+        EitherT(value.map({ it.mapLeft(f) }))
+    }
 
-    inline fun exists(crossinline p: (B) -> Boolean, FF: Functor<F>): Kind<F, Boolean> = FF.map(value, { it.exists(p) })
+    inline fun exists(FF: Functor<F>, crossinline p: (B) -> Boolean): Kind<F, Boolean> = FF.run {
+        value.map({ it.exists(p) })
+    }
 
-    inline fun <C, D> transform(crossinline f: (Either<A, B>) -> Either<C, D>, FF: Functor<F>): EitherT<F, C, D> = EitherT(FF.map(value, { f(it) }))
+    inline fun <C, D> transform(FF: Functor<F>, crossinline f: (Either<A, B>) -> Either<C, D>): EitherT<F, C, D> = FF.run {
+        EitherT(value.map({ f(it) }))
+    }
 
-    fun <C> subflatMap(f: (B) -> Either<A, C>, FF: Functor<F>): EitherT<F, A, C> = transform({ it.flatMap(f) }, FF)
+    fun <C> subflatMap(FF: Functor<F>, f: (B) -> Either<A, C>): EitherT<F, A, C> = transform(FF, { it.flatMap(f = f) })
 
-    fun toOptionT(FF: Functor<F>): OptionT<F, B> = OptionT(FF.map(value, { it.toOption() }))
+    fun toOptionT(FF: Functor<F>): OptionT<F, B> = FF.run {
+        OptionT(value.map({ it.toOption() }))
+    }
 
-    fun combineK(y: EitherTOf<F, A, B>, MF: Monad<F>): EitherT<F, A, B> =
-            EitherT(MF.flatMap(this.fix().value) {
-                when (it) {
-                    is Either.Left -> y.fix().value
-                    is Either.Right -> MF.pure(it)
-                }
-            })
+    fun combineK(MF: Monad<F>, y: EitherTOf<F, A, B>): EitherT<F, A, B> = MF.run {
+        EitherT(fix().value.flatMap {
+            when (it) {
+                is Either.Left -> y.fix().value
+                is Either.Right -> just(it)
+            }
+        })
+    }
 
-    fun <C> ap(ff: EitherTOf<F, A, (B) -> C>, MF: Monad<F>): EitherT<F, A, C> = ff.fix().flatMap ({ f -> map(f, MF) }, MF)
+    fun <C> ap(MF: Monad<F>, ff: EitherTOf<F, A, (B) -> C>): EitherT<F, A, C> = ff.fix().flatMap(MF, { f -> map(MF, f) })
 }
-
-fun <F, A, B> EitherTOf<F, A, B>.value(): Kind<F, Either<A, B>> = this.fix().value

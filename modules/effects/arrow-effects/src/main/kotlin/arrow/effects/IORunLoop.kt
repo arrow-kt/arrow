@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.effects.internal.Platform.ArrayStack
+import arrow.effects.typeclasses.Proc
 
 private typealias Current = IOOf<Any?>
 private typealias BindF = (Any?) -> IO<Any?>

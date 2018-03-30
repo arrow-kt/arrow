@@ -4,11 +4,10 @@ import arrow.Kind
 import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
 import arrow.test.laws.AsyncLaws
-import arrow.typeclasses.*
+import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.experimental.CoroutineStart
 import kotlinx.coroutines.experimental.Unconfined
@@ -24,17 +23,6 @@ class DeferredKTest : UnitSpec() {
     init {
         testLaws(AsyncLaws.laws(DeferredK.async(), EQ(), EQ()))
 
-        "instances can be resolved implicitly"{
-            functor<ForDeferredK>() shouldNotBe null
-            applicative<ForDeferredK>() shouldNotBe null
-            monad<ForDeferredK>() shouldNotBe null
-            applicativeError<ForDeferredK, Throwable>() shouldNotBe null
-            monadError<ForDeferredK, Throwable>() shouldNotBe null
-            monadSuspend<ForDeferredK>() shouldNotBe null
-            async<ForDeferredK>() shouldNotBe null
-            effect<ForDeferredK>() shouldNotBe null
-        }
-
         "DeferredK is awaitable" {
             forAll(genIntSmall(), genIntSmall(), genIntSmall(), { x: Int, y: Int, z: Int ->
                 runBlocking {
@@ -48,7 +36,7 @@ class DeferredKTest : UnitSpec() {
 
         "should complete when running a pure value with unsafeRunAsync" {
             val expected = 0
-            DeferredK.pure(expected).unsafeRunAsync { either ->
+            DeferredK.just(expected).unsafeRunAsync { either ->
                 either.fold({ fail("") }, { it shouldBe expected })
             }
         }
@@ -91,7 +79,7 @@ class DeferredKTest : UnitSpec() {
 
         "should complete when running a pure value with runAsync" {
             val expected = 0
-            DeferredK.pure(expected).runAsync { either ->
+            DeferredK.just(expected).runAsync { either ->
                 either.fold({ fail("") }, { DeferredK { it shouldBe expected } })
             }
         }

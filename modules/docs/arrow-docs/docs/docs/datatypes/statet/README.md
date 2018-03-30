@@ -143,10 +143,11 @@ stackOperationsS2().runM(listOf())
 
 Available Instances:
 
-```kotlin:ank
+```kotlin
 import arrow.debug.*
 
 showInstances<StateTPartialOf<EitherPartialOf<StackError>, Stack>, Unit>()
+// [Applicative, ApplicativeError, Functor, Monad, MonadError, MonadState]
 ```
 
 Take a look at the [`EitherT` docs]({{ '/docs/datatypes/eithert' | relative_url }}) or [`OptionT` docs]({{ '/docs/datatypes/optiont' | relative_url }}) for an alternative version monad transformer for achieving different goals.

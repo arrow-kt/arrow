@@ -55,7 +55,7 @@ open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: C
 fun <F, B> Monad<F>.bindingStackSafe(c: suspend StackSafeMonadContinuation<F, *>.() -> B):
         Free<F, B> {
     val continuation = StackSafeMonadContinuation<F, B>(this)
-    val wrapReturn: suspend StackSafeMonadContinuation<F, *>.() -> Free<F, B> = { Free.pure(c()) }
+    val wrapReturn: suspend StackSafeMonadContinuation<F, *>.() -> Free<F, B> = { Free.just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
 }

@@ -1,17 +1,16 @@
 package arrow.test.generators
 
-import arrow.typeclasses.Applicative
 import arrow.Kind
-import arrow.typeclasses.applicative
 import arrow.core.*
 import arrow.data.*
+import arrow.typeclasses.Applicative
 import io.kotlintest.properties.Gen
 import java.util.concurrent.TimeUnit
 
-inline fun <reified F, A> genApplicative(valueGen: Gen<A>, AP: Applicative<F> = applicative<F>()): Gen<Kind<F, A>> =
+fun <F, A> genApplicative(valueGen: Gen<A>, AP: Applicative<F>): Gen<Kind<F, A>> =
         object : Gen<Kind<F, A>> {
             override fun generate(): Kind<F, A> =
-                    AP.pure(valueGen.generate())
+                    AP.just(valueGen.generate())
         }
 
 fun <A, B> genFunctionAToB(genB: Gen<B>): Gen<(A) -> B> =
@@ -112,7 +111,7 @@ fun <B> genOption(genB: Gen<B>): Gen<Option<B>> =
         object : Gen<Option<B>> {
             val random = genIntSmall()
             override fun generate(): Option<B> =
-                    if (random.generate() % 20 == 0) None else Option.pure(genB.generate())
+                    if (random.generate() % 20 == 0) None else Option.just(genB.generate())
         }
 
 inline fun <reified E, reified A> genEither(genE: Gen<E>, genA: Gen<A>): Gen<Either<E, A>> =

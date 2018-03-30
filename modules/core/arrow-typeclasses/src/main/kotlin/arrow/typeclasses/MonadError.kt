@@ -1,16 +1,16 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import arrow.TC
-import arrow.typeclass
 import kotlin.coroutines.experimental.startCoroutine
 
-@typeclass
-interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F>, TC {
+inline operator fun <F, E, A> MonadError<F, E>.invoke(ff: MonadError<F, E>.() -> A) =
+        run(ff)
 
-    fun <A> ensure(fa: Kind<F, A>, error: () -> E, predicate: (A) -> Boolean): Kind<F, A> =
-            flatMap(fa, {
-                if (predicate(it)) pure(it)
+interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
+
+    fun <A> Kind<F, A>.ensure(error: () -> E, predicate: (A) -> Boolean): Kind<F, A> =
+            this.flatMap({
+                if (predicate(it)) just(it)
                 else raiseError(error())
             })
 
@@ -26,7 +26,7 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F>, TC {
  */
 fun <F, B> MonadError<F, Throwable>.bindingCatch(c: suspend MonadErrorContinuation<F, *>.() -> B): Kind<F, B> {
     val continuation = MonadErrorContinuation<F, B>(this)
-    val wrapReturn: suspend MonadErrorContinuation<F, *>.() -> Kind<F, B> = { pure(c()) }
+    val wrapReturn: suspend MonadErrorContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
 }

@@ -1,11 +1,11 @@
 package arrow.optics
 
 import arrow.core.*
+import arrow.data.ListK
+import arrow.data.eq
 import arrow.data.k
-import arrow.syntax.collections.firstOption
-import arrow.syntax.either.left
-import arrow.syntax.either.right
-import arrow.syntax.foldable.combineAll
+import arrow.data.monoid
+import arrow.instances.IntMonoidInstance
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genTry
@@ -74,7 +74,9 @@ class OptionalTest : UnitSpec() {
                 aGen = Gen.list(Gen.int()),
                 bGen = Gen.int(),
                 funcGen = genFunctionAToB(Gen.int()),
-                EQA = Eq.any()
+                EQA = Eq.any(),
+                EQOptionB = Option.eq(Eq.any()),
+                EQListB = ListK.eq(Eq.any())
         ))
 
         testLaws(SetterLaws.laws(
@@ -85,51 +87,56 @@ class OptionalTest : UnitSpec() {
                 EQA = Eq.any()
         ))
 
-        "asFold should behave as valid Fold: size" {
-            forAll { ints: List<Int> ->
-                optionalHead.asFold().size(ints) == ints.firstOption().map { 1 }.getOrElse { 0 }
-            }
-        }
+        with(optionalHead.asFold()) {
 
-        "asFold should behave as valid Fold: nonEmpty" {
-            forAll { ints: List<Int> ->
-                optionalHead.asFold().nonEmpty(ints) == ints.firstOption().nonEmpty()
+            "asFold should behave as valid Fold: size" {
+                forAll { ints: List<Int> ->
+                    size(ints) == ints.firstOrNull().toOption().map { 1 }.getOrElse { 0 }
+                }
             }
-        }
 
-        "asFold should behave as valid Fold: isEmpty" {
-            forAll { ints: List<Int> ->
-                optionalHead.asFold().isEmpty(ints) == ints.firstOption().isEmpty()
+            "asFold should behave as valid Fold: nonEmpty" {
+                forAll { ints: List<Int> ->
+                    nonEmpty(ints) == ints.firstOrNull().toOption().nonEmpty()
+                }
             }
-        }
 
-        "asFold should behave as valid Fold: getAll" {
-            forAll { ints: List<Int> ->
-                optionalHead.asFold().getAll(ints) == ints.firstOption().toList().k()
+            "asFold should behave as valid Fold: isEmpty" {
+                forAll { ints: List<Int> ->
+                    isEmpty(ints) == ints.firstOrNull().toOption().isEmpty()
+                }
             }
-        }
 
-        "asFold should behave as valid Fold: combineAll" {
-            forAll { ints: List<Int> ->
-                optionalHead.asFold().combineAll(ints) == ints.firstOption().combineAll()
+            "asFold should behave as valid Fold: getAll" {
+                forAll { ints: List<Int> ->
+                    getAll(ListK.monoid(), ints) == ints.firstOrNull().toOption().toList().k()
+                }
             }
-        }
 
-        "asFold should behave as valid Fold: fold" {
-            forAll { ints: List<Int> ->
-                optionalHead.asFold().fold(ints) == ints.firstOption().combineAll()
+            "asFold should behave as valid Fold: combineAll" {
+                forAll { ints: List<Int> ->
+                    combineAll(IntMonoidInstance, ints) ==
+                            ints.firstOrNull().toOption().fold({ IntMonoidInstance.empty() }, ::identity)
+                }
             }
-        }
 
-        "asFold should behave as valid Fold: headOption" {
-            forAll { ints: List<Int> ->
-                optionalHead.asFold().headOption(ints) == ints.firstOption()
+            "asFold should behave as valid Fold: fold" {
+                forAll { ints: List<Int> ->
+                    fold(IntMonoidInstance, ints) ==
+                            ints.firstOrNull().toOption().fold({ IntMonoidInstance.empty() }, ::identity)
+                }
             }
-        }
 
-        "asFold should behave as valid Fold: lastOption" {
-            forAll { ints: List<Int> ->
-                optionalHead.asFold().lastOption(ints) == ints.firstOption()
+            "asFold should behave as valid Fold: headOption" {
+                forAll { ints: List<Int> ->
+                    headOption(ints) == ints.firstOrNull().toOption()
+                }
+            }
+
+            "asFold should behave as valid Fold: lastOption" {
+                forAll { ints: List<Int> ->
+                    lastOption(ints) == ints.firstOrNull().toOption()
+                }
             }
         }
 
@@ -161,7 +168,7 @@ class OptionalTest : UnitSpec() {
         "LiftF should be consistent with modifyF" {
             forAll(Gen.list(Gen.int()), genTry(Gen.int()), { list, tryInt ->
                 val f = { _: Int -> tryInt }
-                optionalHead.liftF(f, Try.applicative())(list) == optionalHead.modifyF(list, f, Try.applicative())
+                optionalHead.liftF(Try.applicative(), f)(list) == optionalHead.modifyF(Try.applicative(), list, f)
             })
         }
 
@@ -193,7 +200,7 @@ class OptionalTest : UnitSpec() {
             val joinedOptional = optionalHead.choice(defaultHead)
 
             forAll(Gen.int(), { int ->
-                joinedOptional.getOption(listOf(int).left()) == joinedOptional.getOption(int.right())
+                joinedOptional.getOption(Left(listOf(int))) == joinedOptional.getOption(Right(int))
             })
         }
 

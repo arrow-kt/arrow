@@ -1,15 +1,16 @@
 package arrow.typeclasses
 
-import arrow.*
 import arrow.core.Option
 
-@typeclass
-interface Semigroup<A> : TC {
+inline operator fun <F, A> Semigroup<F>.invoke(ff: Semigroup<F>.() -> A) =
+        run(ff)
+
+interface Semigroup<A> {
     /**
      * Combine two [A] values.
      */
-    fun combine(a: A, b: A): A
+    fun A.combine(b: A): A
 
-    fun maybeCombine(a: A, b: A?): A = Option.fromNullable(b).fold({ a }, { this.combine(a, it) })
+    fun A.maybeCombine(b: A?): A = Option.fromNullable(b).fold({ this }, { combine(it) })
 
 }

@@ -2,10 +2,13 @@ package arrow.data
 
 import arrow.Kind
 import arrow.core.Tuple2
-import arrow.instances.LongMonoid
+import arrow.instances.IntSemigroupInstance
+import arrow.instances.LongMonoidInstance
 import arrow.test.UnitSpec
 import arrow.test.laws.ReducibleLaws
-import arrow.typeclasses.*
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.NonEmptyReducible
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
@@ -13,10 +16,11 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class ReducibleTests : UnitSpec() {
     init {
-        val nonEmptyReducible = object : NonEmptyReducible<ForNonEmptyList, ForListK>() {
+        val nonEmptyReducible = object : NonEmptyReducible<ForNonEmptyList, ForListK> {
             override fun FG(): Foldable<ForListK> = ListK.foldable()
 
-            override fun <A> split(fa: Kind<ForNonEmptyList, A>): Tuple2<A, Kind<ForListK, A>> = Tuple2(fa.fix().head, ListK(fa.fix().tail))
+            override fun <A> Kind<ForNonEmptyList, A>.split(): Tuple2<A, Kind<ForListK, A>> =
+                    Tuple2(fix().head, ListK(fix().tail))
         }
 
         testLaws(ReducibleLaws.laws(
@@ -26,25 +30,30 @@ class ReducibleTests : UnitSpec() {
                 Eq.any(),
                 Eq.any()))
 
-        "Reducible<NonEmptyList> default size implementation" {
-            val nel = NonEmptyList.of(1, 2, 3)
-            nonEmptyReducible.size(LongMonoid, nel) shouldBe nel.size.toLong()
-        }
+        with(nonEmptyReducible) {
+            with(IntSemigroupInstance) {
 
-        "Reducible<NonEmptyList>" {
-            // some basic sanity checks
-            val tail = (2 to 10).toList()
-            val total = 1 + tail.sum()
-            val nel = NonEmptyList(1, tail)
-            nonEmptyReducible.reduceLeft(nel, { a, b -> a + b }) shouldBe total
-            nonEmptyReducible.reduceRight(nel, { x, ly -> ly.map({ x + it }) }).value() shouldBe (total)
-            nonEmptyReducible.reduce(nel) shouldBe total
+                "Reducible<NonEmptyList> default size implementation" {
+                    val nel = NonEmptyList.of(1, 2, 3)
+                    nel.size(LongMonoidInstance) shouldBe nel.size.toLong()
+                }
 
-            // more basic checks
-            val names = NonEmptyList.of("Aaron", "Betty", "Calvin", "Deirdra")
-            val totalLength = names.all.map({ it.length }).sum()
-            nonEmptyReducible.reduceLeftTo(names, { it.length }, { sum, s -> s.length + sum }) shouldBe totalLength
-            nonEmptyReducible.reduceMap(names, { it.length }) shouldBe totalLength
+                "Reducible<NonEmptyList>" {
+                    // some basic sanity checks
+                    val tail = (2 to 10).toList()
+                    val total = 1 + tail.sum()
+                    val nel = NonEmptyList(1, tail)
+                    nel.reduceLeft({ a, b -> a + b }) shouldBe total
+                    nel.reduceRight({ x, ly -> ly.map({ x + it }) }).value() shouldBe (total)
+                    nel.reduce(this) shouldBe total
+
+                    // more basic checks
+                    val names = NonEmptyList.of("Aaron", "Betty", "Calvin", "Deirdra")
+                    val totalLength = names.all.map({ it.length }).sum()
+                    names.reduceLeftTo({ it.length }, { sum, s -> s.length + sum }) shouldBe totalLength
+                    names.reduceMap(this, { it.length }) shouldBe totalLength
+                }
+            }
         }
     }
 }

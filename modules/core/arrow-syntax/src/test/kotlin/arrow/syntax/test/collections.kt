@@ -16,11 +16,13 @@
 
 package arrow.syntax.test
 
+import arrow.syntax.collections.destructured
+import arrow.syntax.collections.prependTo
+import arrow.syntax.collections.tail
+import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
-import arrow.test.UnitSpec
 import org.junit.runner.RunWith
-import arrow.syntax.collections.*
 
 @RunWith(KTestJUnitRunner::class)
 class CollectionsSyntaxTests : UnitSpec() {

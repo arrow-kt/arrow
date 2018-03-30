@@ -3,10 +3,10 @@ package arrow.data
 import arrow.core.case
 import arrow.core.then
 import arrow.syntax.collections.collect
-import io.kotlintest.KTestJUnitRunner
-import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
+import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class IterableTests : UnitSpec() {

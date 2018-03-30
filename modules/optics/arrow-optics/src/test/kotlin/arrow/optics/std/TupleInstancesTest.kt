@@ -4,16 +4,16 @@ import arrow.core.Option
 import arrow.core.eq
 import arrow.data.ListK
 import arrow.data.eq
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.properties.Gen
-import arrow.typeclasses.Eq
-import arrow.test.laws.LensLaws
-import arrow.test.laws.TraversalLaws
-import arrow.instances.IntMonoid
+import arrow.instances.IntMonoidInstance
 import arrow.instances.StringMonoidInstance
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genTuple
+import arrow.test.laws.LensLaws
+import arrow.test.laws.TraversalLaws
+import arrow.typeclasses.Eq
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -28,7 +28,7 @@ class TupleInstancesTest : UnitSpec() {
                 funcGen = genFunctionAToB(Gen.int()),
                 EQA = Eq.any(),
                 EQB = Eq.any(),
-                MB = IntMonoid
+                MB = IntMonoidInstance
         ))
 
         testLaws(LensLaws.laws(
