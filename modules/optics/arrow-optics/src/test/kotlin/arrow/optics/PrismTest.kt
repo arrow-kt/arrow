@@ -1,9 +1,6 @@
 package arrow.optics
 
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.eq
-import arrow.core.getOrElse
+import arrow.core.*
 import arrow.data.ListK
 import arrow.data.eq
 import arrow.data.k
