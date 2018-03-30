@@ -3,6 +3,7 @@ package arrow
 import arrow.TypeclasslessExamples.ScopeOne.inScopeOne
 import arrow.TypeclasslessExamples.ScopeTwo.withAll
 import arrow.TypeclasslessExamples.ScopeTwo.withApplicative
+import arrow.core.identity
 import arrow.data.ForListK
 import arrow.data.ListK
 import arrow.data.applicative
@@ -95,7 +96,7 @@ class TypeclasslessExamples : FreeSpec() {
                 1.just().map { inScopeOne() }.map { 1 }
 
         fun <F> ApplicativeAndIdentifySyntax<F>.withAll(): Kind<F, Int> =
-                withIdentify(withApplicative()).identify().map ::identity
+                withIdentify(withApplicative()).identify().map(::identity)
     }
 
     // It only works inside classes if they extend the syntax, although it's inheritable!
