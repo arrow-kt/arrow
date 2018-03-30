@@ -11,20 +11,20 @@ import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
 
 interface StringFilterIndexInstance : FilterIndex<String, Int, Char> {
-    override fun filter(p: (Int) -> Boolean): Traversal<String, Char> =
-            stringToList compose listToListK() compose ListK.filterIndex<Char>().filter(p)
+  override fun filter(p: (Int) -> Boolean): Traversal<String, Char> =
+    stringToList compose listToListK() compose ListK.filterIndex<Char>().filter(p)
 
-    companion object {
-        operator fun invoke() = object : StringFilterIndexInstance {}
-    }
+  companion object {
+    operator fun invoke() = object : StringFilterIndexInstance {}
+  }
 }
 
 interface StringIndexInstance : Index<String, Int, Char> {
 
-    override fun index(i: Int): Optional<String, Char> =
-            stringToList compose listToListK() compose ListK.index<Char>().index(i)
+  override fun index(i: Int): Optional<String, Char> =
+    stringToList compose listToListK() compose ListK.index<Char>().index(i)
 
-    companion object {
-        operator fun invoke() = object : StringIndexInstance {}
-    }
+  companion object {
+    operator fun invoke() = object : StringIndexInstance {}
+  }
 }

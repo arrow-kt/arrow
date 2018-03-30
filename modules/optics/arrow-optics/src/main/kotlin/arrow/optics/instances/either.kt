@@ -9,6 +9,6 @@ import arrow.optics.typeclasses.Each
 
 @instance(Either::class)
 interface EitherEachInstance<L, R> : Each<EitherOf<L, R>, R> {
-    override fun each(): Traversal<EitherOf<L, R>, R> =
-            Traversal.fromTraversable(Either.traverse())
+  override fun each(): Traversal<EitherOf<L, R>, R> =
+    Traversal.fromTraversable(Either.traverse())
 }

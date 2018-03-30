@@ -4,15 +4,15 @@ import arrow.Kind
 import kotlin.coroutines.experimental.startCoroutine
 
 inline operator fun <F, E, A> MonadError<F, E>.invoke(ff: MonadError<F, E>.() -> A) =
-        run(ff)
+  run(ff)
 
 interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
 
-    fun <A> Kind<F, A>.ensure(error: () -> E, predicate: (A) -> Boolean): Kind<F, A> =
-            this.flatMap({
-                if (predicate(it)) just(it)
-                else raiseError(error())
-            })
+  fun <A> Kind<F, A>.ensure(error: () -> E, predicate: (A) -> Boolean): Kind<F, A> =
+    this.flatMap({
+      if (predicate(it)) just(it)
+      else raiseError(error())
+    })
 
 }
 
@@ -25,8 +25,8 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
  * errors as failed computations in their monadic context and not letting exceptions thrown as the regular monad binding does.
  */
 fun <F, B> MonadError<F, Throwable>.bindingCatch(c: suspend MonadErrorContinuation<F, *>.() -> B): Kind<F, B> {
-    val continuation = MonadErrorContinuation<F, B>(this)
-    val wrapReturn: suspend MonadErrorContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
-    wrapReturn.startCoroutine(continuation, continuation)
-    return continuation.returnedMonad()
+  val continuation = MonadErrorContinuation<F, B>(this)
+  val wrapReturn: suspend MonadErrorContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
+  wrapReturn.startCoroutine(continuation, continuation)
+  return continuation.returnedMonad()
 }

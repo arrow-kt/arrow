@@ -26,46 +26,46 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class AtInstanceTest : UnitSpec() {
 
-    init {
+  init {
 
-        testLaws(LensLaws.laws(
-                lens = MapK.at<String, Int>().at(Gen.string().generate()),
-                aGen = genMapK(Gen.string(), Gen.int()),
-                bGen = genOption(Gen.int()),
-                funcGen = genFunctionAToB(genOption(Gen.int())),
-                EQA = Eq.any(),
-                EQB = Eq.any(),
-                MB = Option.monoid(IntMonoidInstance)
-        ))
+    testLaws(LensLaws.laws(
+      lens = MapK.at<String, Int>().at(Gen.string().generate()),
+      aGen = genMapK(Gen.string(), Gen.int()),
+      bGen = genOption(Gen.int()),
+      funcGen = genFunctionAToB(genOption(Gen.int())),
+      EQA = Eq.any(),
+      EQB = Eq.any(),
+      MB = Option.monoid(IntMonoidInstance)
+    ))
 
-        testLaws(LensLaws.laws(
-                lens = MapAtInstance<String, Int>().at(Gen.string().generate()),
-                aGen = Gen.map(Gen.string(), Gen.int()),
-                bGen = genOption(Gen.int()),
-                funcGen = genFunctionAToB(genOption(Gen.int())),
-                EQA = Eq.any(),
-                EQB = Eq.any(),
-                MB = Option.monoid(IntSemigroupInstance)
-        ))
+    testLaws(LensLaws.laws(
+      lens = MapAtInstance<String, Int>().at(Gen.string().generate()),
+      aGen = Gen.map(Gen.string(), Gen.int()),
+      bGen = genOption(Gen.int()),
+      funcGen = genFunctionAToB(genOption(Gen.int())),
+      EQA = Eq.any(),
+      EQB = Eq.any(),
+      MB = Option.monoid(IntSemigroupInstance)
+    ))
 
-        testLaws(LensLaws.laws(
-                lens = SetK.at<String>().at(Gen.string().generate()),
-                aGen = genSetK(Gen.string()),
-                bGen = Gen.bool(),
-                funcGen = genFunctionAToB(Gen.bool()),
-                EQA = SetK.eq(StringEqInstance),
-                EQB = Eq.any(),
-                MB = AndMonoid
-        ))
+    testLaws(LensLaws.laws(
+      lens = SetK.at<String>().at(Gen.string().generate()),
+      aGen = genSetK(Gen.string()),
+      bGen = Gen.bool(),
+      funcGen = genFunctionAToB(Gen.bool()),
+      EQA = SetK.eq(StringEqInstance),
+      EQB = Eq.any(),
+      MB = AndMonoid
+    ))
 
-        testLaws(LensLaws.laws(
-                lens = SetAtInstance<String>().at(Gen.string().generate()),
-                aGen = Gen.set(Gen.string()),
-                bGen = Gen.bool(),
-                funcGen = genFunctionAToB(Gen.bool()),
-                EQA = Eq.any(),
-                EQB = Eq.any(),
-                MB = AndMonoid
-        ))
-    }
+    testLaws(LensLaws.laws(
+      lens = SetAtInstance<String>().at(Gen.string().generate()),
+      aGen = Gen.set(Gen.string()),
+      bGen = Gen.bool(),
+      funcGen = genFunctionAToB(Gen.bool()),
+      EQA = Eq.any(),
+      EQB = Eq.any(),
+      MB = AndMonoid
+    ))
+  }
 }

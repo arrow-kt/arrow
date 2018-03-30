@@ -4,121 +4,121 @@ import arrow.instances.*
 import arrow.typeclasses.Semigroup
 
 object IntegerMonoidInstanceImplicits {
-    fun instance(): IntMonoidInstance = IntMonoidInstance
+  fun instance(): IntMonoidInstance = IntMonoidInstance
 }
 
 object IntegerSemigroupInstanceImplicits {
-    fun instance(): Semigroup<Int> = IntMonoidInstance
+  fun instance(): Semigroup<Int> = IntMonoidInstance
 }
 
 object IntegerEqInstanceImplicits {
-    fun instance(): IntEqInstance = IntEqInstance
+  fun instance(): IntEqInstance = IntEqInstance
 }
 
 object IntegerShowInstanceImplicits {
-    fun instance(): IntShowInstance = IntShowInstance
+  fun instance(): IntShowInstance = IntShowInstance
 }
 
 object IntegerOrderInstanceImplicits {
-    fun instance(): IntOrderInstance = IntOrderInstance
+  fun instance(): IntOrderInstance = IntOrderInstance
 }
 
 object LongMonoidInstanceImplicits {
-    fun instance(): LongMonoidInstance = LongMonoidInstance
+  fun instance(): LongMonoidInstance = LongMonoidInstance
 }
 
 object LongSemigroupInstanceImplicits {
-    fun instance(): Semigroup<Long> = LongMonoidInstance
+  fun instance(): Semigroup<Long> = LongMonoidInstance
 }
 
 object LongOrderInstanceImplicits {
-    fun instance(): LongOrderInstance = LongOrderInstance
+  fun instance(): LongOrderInstance = LongOrderInstance
 }
 
 object LongEqInstanceImplicits {
-    fun instance(): LongEqInstance = LongEqInstance
+  fun instance(): LongEqInstance = LongEqInstance
 }
 
 object LongShowInstanceImplicits {
-    fun instance(): LongShowInstance = LongShowInstance
+  fun instance(): LongShowInstance = LongShowInstance
 }
 
 object ShortMonoidInstanceImplicits {
-    fun instance(): ShortMonoid = ShortMonoid
+  fun instance(): ShortMonoid = ShortMonoid
 }
 
 object ShortSemigroupInstanceImplicits {
-    fun instance(): Semigroup<Short> = ShortMonoid
+  fun instance(): Semigroup<Short> = ShortMonoid
 }
 
 object ShortOrderInstanceImplicits {
-    fun instance(): ShortOrderInstance = ShortOrderInstance
+  fun instance(): ShortOrderInstance = ShortOrderInstance
 }
 
 object ShortEqInstanceImplicits {
-    fun instance(): ShortEqInstance = ShortEqInstance
+  fun instance(): ShortEqInstance = ShortEqInstance
 }
 
 object ShortShowInstanceImplicits {
-    fun instance(): ShortShowInstance = ShortShowInstance
+  fun instance(): ShortShowInstance = ShortShowInstance
 }
 
 object ByteMonoidInstanceImplicits {
-    fun instance(): ByteMonoidInstance = ByteMonoidInstance
+  fun instance(): ByteMonoidInstance = ByteMonoidInstance
 }
 
 object ByteSemigroupInstanceImplicits {
-    fun instance(): Semigroup<Byte> = ByteMonoidInstance
+  fun instance(): Semigroup<Byte> = ByteMonoidInstance
 }
 
 object ByteOrderInstanceImplicits {
-    fun instance(): ByteOrderInstance = ByteOrderInstance
+  fun instance(): ByteOrderInstance = ByteOrderInstance
 }
 
 object ByteEqInstanceImplicits {
-    fun instance(): ByteEqInstance = ByteEqInstance
+  fun instance(): ByteEqInstance = ByteEqInstance
 }
 
 object ByteShowInstanceImplicits {
-    fun instance(): ByteShowInstance = ByteShowInstance
+  fun instance(): ByteShowInstance = ByteShowInstance
 }
 
 object DoubleMonoidInstanceImplicits {
-    fun instance(): DoubleMonoid = DoubleMonoid
+  fun instance(): DoubleMonoid = DoubleMonoid
 }
 
 object DoubleSemigroupInstanceImplicits {
-    fun instance(): Semigroup<Double> = DoubleMonoid
+  fun instance(): Semigroup<Double> = DoubleMonoid
 }
 
 object DoubleOrderInstanceImplicits {
-    fun instance(): DoubleOrderInstance = DoubleOrderInstance
+  fun instance(): DoubleOrderInstance = DoubleOrderInstance
 }
 
 object DoubleEqInstanceImplicits {
-    fun instance(): DoubleEqInstance = DoubleEqInstance
+  fun instance(): DoubleEqInstance = DoubleEqInstance
 }
 
 object DoubleShowInstanceImplicits {
-    fun instance(): DoubleShowInstance = DoubleShowInstance
+  fun instance(): DoubleShowInstance = DoubleShowInstance
 }
 
 object FloatMonoidInstanceImplicits {
-    fun instance(): FloatMonoid = FloatMonoid
+  fun instance(): FloatMonoid = FloatMonoid
 }
 
 object FloatSemigroupInstanceImplicits {
-    fun instance(): Semigroup<Float> = FloatMonoid
+  fun instance(): Semigroup<Float> = FloatMonoid
 }
 
 object FloatOrderInstanceImplicits {
-    fun instance(): FloatOrderInstance = FloatOrderInstance
+  fun instance(): FloatOrderInstance = FloatOrderInstance
 }
 
 object FloatEqInstanceImplicits {
-    fun instance(): FloatEqInstance = FloatEqInstance
+  fun instance(): FloatEqInstance = FloatEqInstance
 }
 
 object FloatShowInstanceImplicits {
-    fun instance(): FloatShowInstance = FloatShowInstance
+  fun instance(): FloatShowInstance = FloatShowInstance
 }

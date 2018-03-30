@@ -14,27 +14,27 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class SortedMapKTest : UnitSpec() {
 
-    val EQ: Eq<Kind2<ForSortedMapK, String, Int>> = object : Eq<Kind2<ForSortedMapK, String, Int>> {
-        override fun Kind2<ForSortedMapK, String, Int>.eqv(b: Kind2<ForSortedMapK, String, Int>): Boolean =
-                fix()["key"] == b.fix()["key"]
-    }
+  val EQ: Eq<Kind2<ForSortedMapK, String, Int>> = object : Eq<Kind2<ForSortedMapK, String, Int>> {
+    override fun Kind2<ForSortedMapK, String, Int>.eqv(b: Kind2<ForSortedMapK, String, Int>): Boolean =
+      fix()["key"] == b.fix()["key"]
+  }
 
-    init {
+  init {
 
-        testLaws(
-                ShowLaws.laws(SortedMapK.show(), EQ) { sortedMapOf("key" to 1).k() },
-                MonoidLaws.laws(SortedMapK.monoid<String, Int>(IntMonoidInstance), sortedMapOf("key" to 1).k(), EQ),
-                SemigroupLaws.laws(SortedMapK.monoid<String, Int>(IntMonoidInstance),
-                        sortedMapOf("key" to 1).k(),
-                        sortedMapOf("key" to 2).k(),
-                        sortedMapOf("key" to 3).k(),
-                        EQ),
-                TraverseLaws.laws(
-                        SortedMapK.traverse<String>(),
-                        SortedMapK.traverse<String>(),
-                        { a: Int -> sortedMapOf("key" to a).k() },
-                        EQ))
+    testLaws(
+      ShowLaws.laws(SortedMapK.show(), EQ) { sortedMapOf("key" to 1).k() },
+      MonoidLaws.laws(SortedMapK.monoid<String, Int>(IntMonoidInstance), sortedMapOf("key" to 1).k(), EQ),
+      SemigroupLaws.laws(SortedMapK.monoid<String, Int>(IntMonoidInstance),
+        sortedMapOf("key" to 1).k(),
+        sortedMapOf("key" to 2).k(),
+        sortedMapOf("key" to 3).k(),
+        EQ),
+      TraverseLaws.laws(
+        SortedMapK.traverse<String>(),
+        SortedMapK.traverse<String>(),
+        { a: Int -> sortedMapOf("key" to a).k() },
+        EQ))
 
-    }
+  }
 
 }

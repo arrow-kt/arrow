@@ -9,14 +9,14 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class IdTest : UnitSpec() {
-    init {
+  init {
 
-        testLaws(
-                EqLaws.laws(Id.eq(Eq.any())) { Id(it) },
-                ShowLaws.laws(Id.show(), Eq.any()) { Id(it) },
-                MonadLaws.laws(Id.monad(), Eq.any()),
-                TraverseLaws.laws(Id.traverse(), Id.functor(), ::Id, Eq.any()),
-                ComonadLaws.laws(Id.comonad(), ::Id, Eq.any())
-        )
-    }
+    testLaws(
+      EqLaws.laws(Id.eq(Eq.any())) { Id(it) },
+      ShowLaws.laws(Id.show(), Eq.any()) { Id(it) },
+      MonadLaws.laws(Id.monad(), Eq.any()),
+      TraverseLaws.laws(Id.traverse(), Id.functor(), ::Id, Eq.any()),
+      ComonadLaws.laws(Id.comonad(), ::Id, Eq.any())
+    )
+  }
 }

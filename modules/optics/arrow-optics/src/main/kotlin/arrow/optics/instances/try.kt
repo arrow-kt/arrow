@@ -9,6 +9,6 @@ import arrow.optics.typeclasses.Each
 
 @instance(Try::class)
 interface TryEachInstance<A> : Each<TryOf<A>, A> {
-    override fun each(): Traversal<TryOf<A>, A> =
-            Traversal.fromTraversable(Try.traverse())
+  override fun each(): Traversal<TryOf<A>, A> =
+    Traversal.fromTraversable(Try.traverse())
 }

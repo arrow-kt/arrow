@@ -9,25 +9,25 @@ import arrow.typeclasses.MonadError
 import kotlin.coroutines.experimental.startCoroutine
 
 inline operator fun <F, A> MonadSuspend<F>.invoke(ff: MonadSuspend<F>.() -> A) =
-        run(ff)
+  run(ff)
 
 /** The context required to defer evaluating a safe computation. **/
 interface MonadSuspend<F> : MonadError<F, Throwable> {
-    fun <A> suspend(fa: () -> Kind<F, A>): Kind<F, A>
+  fun <A> suspend(fa: () -> Kind<F, A>): Kind<F, A>
 
-    operator fun <A> invoke(fa: () -> A): Kind<F, A> =
-            suspend {
-                try {
-                    just(fa())
-                } catch (t: Throwable) {
-                    raiseError<A>(t)
-                }
-            }
+  operator fun <A> invoke(fa: () -> A): Kind<F, A> =
+    suspend {
+      try {
+        just(fa())
+      } catch (t: Throwable) {
+        raiseError<A>(t)
+      }
+    }
 
-    fun lazy(): Kind<F, Unit> = invoke { }
+  fun lazy(): Kind<F, Unit> = invoke { }
 
-    fun <A> deferUnsafe(f: () -> Either<Throwable, A>): Kind<F, A> =
-            suspend { f().fold({ raiseError<A>(it) }, { just(it) }) }
+  fun <A> deferUnsafe(f: () -> Either<Throwable, A>): Kind<F, A> =
+    suspend { f().fold({ raiseError<A>(it) }, { just(it) }) }
 }
 
 /**
@@ -42,8 +42,8 @@ interface MonadSuspend<F> : MonadError<F, Throwable> {
  * If [Disposable.invoke] is called the binding result will become a lifted [BindingCancellationException].
  */
 fun <F, B> MonadSuspend<F>.bindingCancellable(c: suspend MonadSuspendCancellableContinuation<F, *>.() -> B): Tuple2<Kind<F, B>, Disposable> {
-    val continuation = MonadSuspendCancellableContinuation<F, B>(this)
-    val wrapReturn: suspend MonadSuspendCancellableContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
-    wrapReturn.startCoroutine(continuation, continuation)
-    return continuation.returnedMonad() toT continuation.disposable()
+  val continuation = MonadSuspendCancellableContinuation<F, B>(this)
+  val wrapReturn: suspend MonadSuspendCancellableContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
+  wrapReturn.startCoroutine(continuation, continuation)
+  return continuation.returnedMonad() toT continuation.disposable()
 }

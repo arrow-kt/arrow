@@ -18,62 +18,62 @@ typealias Disposable = () -> Unit
 
 @RestrictsSuspension
 open class MonadSuspendCancellableContinuation<F, A>(SC: MonadSuspend<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
-        MonadErrorContinuation<F, A>(SC), MonadSuspend<F> by SC {
+  MonadErrorContinuation<F, A>(SC), MonadSuspend<F> by SC {
 
-    protected val cancelled: AtomicBoolean = AtomicBoolean(false)
+  protected val cancelled: AtomicBoolean = AtomicBoolean(false)
 
-    fun disposable(): Disposable = { cancelled.set(true) }
+  fun disposable(): Disposable = { cancelled.set(true) }
 
-    override fun returnedMonad(): Kind<F, A> = returnedMonad
+  override fun returnedMonad(): Kind<F, A> = returnedMonad
 
-    suspend fun <B> bindDefer(f: () -> B): B =
-            invoke(f).bind()
+  suspend fun <B> bindDefer(f: () -> B): B =
+    invoke(f).bind()
 
-    suspend fun <B> bindDeferIn(context: CoroutineContext, f: () -> B): B =
-            suspend { bindingCatch { bindIn(context, f) } }.bind()
+  suspend fun <B> bindDeferIn(context: CoroutineContext, f: () -> B): B =
+    suspend { bindingCatch { bindIn(context, f) } }.bind()
 
-    suspend fun <B> bindDeferUnsafe(f: () -> Either<Throwable, B>): B =
-            deferUnsafe(f).bind()
+  suspend fun <B> bindDeferUnsafe(f: () -> Either<Throwable, B>): B =
+    deferUnsafe(f).bind()
 
-    override suspend fun <B> bind(m: () -> Kind<F, B>): B = suspendCoroutineOrReturn { c ->
-        val labelHere = c.stackLabels // save the whole coroutine stack labels
-        returnedMonad = m().flatMap({ x: B ->
-            c.stackLabels = labelHere
-            if (cancelled.get()) {
-                throw BindingCancellationException()
-            }
-            c.resume(x)
-            returnedMonad
-        })
-        COROUTINE_SUSPENDED
-    }
+  override suspend fun <B> bind(m: () -> Kind<F, B>): B = suspendCoroutineOrReturn { c ->
+    val labelHere = c.stackLabels // save the whole coroutine stack labels
+    returnedMonad = m().flatMap({ x: B ->
+      c.stackLabels = labelHere
+      if (cancelled.get()) {
+        throw BindingCancellationException()
+      }
+      c.resume(x)
+      returnedMonad
+    })
+    COROUTINE_SUSPENDED
+  }
 
-    override suspend fun <B> bindIn(context: CoroutineContext, m: () -> B): B = suspendCoroutineOrReturn { c ->
-        val labelHere = c.stackLabels // save the whole coroutine stack labels
-        val monadCreation: suspend () -> Kind<F, A> = {
-            val datatype = try {
-                just(m())
-            } catch (t: Throwable) {
-                ME.raiseError<B>(t)
-            }
-            datatype.flatMap({ xx: B ->
-                c.stackLabels = labelHere
-                if (cancelled.get()) {
-                    throw BindingCancellationException()
-                }
-                c.resume(xx)
-                returnedMonad
-            })
+  override suspend fun <B> bindIn(context: CoroutineContext, m: () -> B): B = suspendCoroutineOrReturn { c ->
+    val labelHere = c.stackLabels // save the whole coroutine stack labels
+    val monadCreation: suspend () -> Kind<F, A> = {
+      val datatype = try {
+        just(m())
+      } catch (t: Throwable) {
+        ME.raiseError<B>(t)
+      }
+      datatype.flatMap({ xx: B ->
+        c.stackLabels = labelHere
+        if (cancelled.get()) {
+          throw BindingCancellationException()
         }
-        val completion = bindingInContextContinuation(context)
-        returnedMonad = just(Unit).flatMap({
-            monadCreation.startCoroutine(completion)
-            val error = completion.await()
-            if (error != null) {
-                throw error
-            }
-            returnedMonad
-        })
-        COROUTINE_SUSPENDED
+        c.resume(xx)
+        returnedMonad
+      })
     }
+    val completion = bindingInContextContinuation(context)
+    returnedMonad = just(Unit).flatMap({
+      monadCreation.startCoroutine(completion)
+      val error = completion.await()
+      if (error != null) {
+        throw error
+      }
+      returnedMonad
+    })
+    COROUTINE_SUSPENDED
+  }
 }

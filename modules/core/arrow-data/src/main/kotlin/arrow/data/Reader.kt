@@ -115,9 +115,9 @@ fun Reader(): ReaderApi = ReaderApi
 
 object ReaderApi {
 
-    fun <D, A> just(x: A): Reader<D, A> = ReaderT.just(IdBimonad, x)
+  fun <D, A> just(x: A): Reader<D, A> = ReaderT.just(IdBimonad, x)
 
-    fun <D> ask(): Reader<D, D> = ReaderT.ask(IdBimonad)
+  fun <D> ask(): Reader<D, D> = ReaderT.ask(IdBimonad)
 
-    fun <D, A> lift(run: ReaderFun<D, A>): Reader<D, A> = ReaderT(run.andThen { Id(it) })
+  fun <D, A> lift(run: ReaderFun<D, A>): Reader<D, A> = ReaderT(run.andThen { Id(it) })
 }

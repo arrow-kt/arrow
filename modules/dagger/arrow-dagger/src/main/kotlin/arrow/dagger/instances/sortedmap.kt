@@ -13,14 +13,14 @@ import javax.inject.Inject
 @Module
 abstract class SortedMapKInstances<K : Comparable<K>> {
 
-    @Provides
-    fun sortedMapKFunctor(ev: DaggerSortedMapKFunctorInstance<K>): Functor<SortedMapKPartialOf<K>> = ev
+  @Provides
+  fun sortedMapKFunctor(ev: DaggerSortedMapKFunctorInstance<K>): Functor<SortedMapKPartialOf<K>> = ev
 
-    @Provides
-    fun sortedMapKFoldable(ev: DaggerSortedMapKFoldableInstance<K>): Foldable<SortedMapKPartialOf<K>> = ev
+  @Provides
+  fun sortedMapKFoldable(ev: DaggerSortedMapKFoldableInstance<K>): Foldable<SortedMapKPartialOf<K>> = ev
 
-    @Provides
-    fun sortedMapKTraverse(ev: DaggerSortedMapKTraverseInstance<K>): Traverse<SortedMapKPartialOf<K>> = ev
+  @Provides
+  fun sortedMapKTraverse(ev: DaggerSortedMapKTraverseInstance<K>): Traverse<SortedMapKPartialOf<K>> = ev
 
 }
 
@@ -31,9 +31,9 @@ class DaggerSortedMapKFoldableInstance<K : Comparable<K>> @Inject constructor() 
 class DaggerSortedMapKTraverseInstance<K : Comparable<K>> @Inject constructor() : SortedMapKTraverseInstance<K>
 
 class DaggerSortedMapKSemigroupInstance<K : Comparable<K>, A> @Inject constructor(val SG: Semigroup<A>) : SortedMapKSemigroupInstance<K, A> {
-    override fun SG(): Semigroup<A> = SG
+  override fun SG(): Semigroup<A> = SG
 }
 
 class DaggerSortedMapKMonoidInstance<K : Comparable<K>, A> @Inject constructor(val SG: Semigroup<A>) : SortedMapKMonoidInstance<K, A> {
-    override fun SG(): Semigroup<A> = SG
+  override fun SG(): Semigroup<A> = SG
 }

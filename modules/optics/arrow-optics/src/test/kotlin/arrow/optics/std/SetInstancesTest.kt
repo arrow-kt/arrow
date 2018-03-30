@@ -14,18 +14,18 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class SetInstancesTest : UnitSpec() {
 
-    init {
+  init {
 
-        testLaws(IsoLaws.laws(
-                iso = setToSetK(),
-                aGen = Gen.set(Gen.int()),
-                bGen = Gen.create { Gen.set(Gen.int()).generate().k() },
-                funcGen = genFunctionAToB(Gen.create { Gen.set(Gen.int()).generate().k() }),
-                EQA = Eq.any(),
-                EQB = Eq.any(),
-                bMonoid = SetK.monoid()
-        ))
+    testLaws(IsoLaws.laws(
+      iso = setToSetK(),
+      aGen = Gen.set(Gen.int()),
+      bGen = Gen.create { Gen.set(Gen.int()).generate().k() },
+      funcGen = genFunctionAToB(Gen.create { Gen.set(Gen.int()).generate().k() }),
+      EQA = Eq.any(),
+      EQB = Eq.any(),
+      bMonoid = SetK.monoid()
+    ))
 
-    }
+  }
 
 }

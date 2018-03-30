@@ -3,10 +3,10 @@ package arrow.instances
 import arrow.typeclasses.Eq
 
 object CharEqInstance : Eq<Char> {
-    override fun Char.eqv(b: Char): Boolean = this == b
+  override fun Char.eqv(b: Char): Boolean = this == b
 }
 
 object CharEqInstanceImplicits {
-    @JvmStatic
-    fun instance(): CharEqInstance = CharEqInstance
+  @JvmStatic
+  fun instance(): CharEqInstance = CharEqInstance
 }

@@ -34,98 +34,98 @@ typealias SetterKindedJ<S, A> = PSetterKindedJ<S, S, A, A>
 @higherkind
 interface PSetter<S, T, A, B> : PSetterOf<S, T, A, B> {
 
-    /**
-     * Modify polymorphically the target of a [PSetter] with a function
-     */
-    fun modify(s: S, f: (A) -> B): T
+  /**
+   * Modify polymorphically the target of a [PSetter] with a function
+   */
+  fun modify(s: S, f: (A) -> B): T
+
+  /**
+   * Set polymorphically the target of a [PSetter] with a value
+   */
+  fun set(s: S, b: B): T
+
+  companion object {
+
+    fun <S> id() = Iso.id<S>().asSetter()
 
     /**
-     * Set polymorphically the target of a [PSetter] with a value
+     * [PSetter] that takes either S or S and strips the choice of S.
      */
-    fun set(s: S, b: B): T
+    fun <S> codiagonal(): Setter<Either<S, S>, S> = Setter { f -> { aa -> aa.bimap(f, f) } }
 
-    companion object {
+    /**
+     * Invoke operator overload to create a [PSetter] of type `S` with target `A`.
+     * Can also be used to construct [Setter]
+     */
+    operator fun <S, T, A, B> invoke(modify: ((A) -> B) -> (S) -> T): PSetter<S, T, A, B> = object : PSetter<S, T, A, B> {
+      override fun modify(s: S, f: (A) -> B): T = modify(f)(s)
 
-        fun <S> id() = Iso.id<S>().asSetter()
-
-        /**
-         * [PSetter] that takes either S or S and strips the choice of S.
-         */
-        fun <S> codiagonal(): Setter<Either<S, S>, S> = Setter { f -> { aa -> aa.bimap(f, f) } }
-
-        /**
-         * Invoke operator overload to create a [PSetter] of type `S` with target `A`.
-         * Can also be used to construct [Setter]
-         */
-        operator fun <S, T, A, B> invoke(modify: ((A) -> B) -> (S) -> T): PSetter<S, T, A, B> = object : PSetter<S, T, A, B> {
-            override fun modify(s: S, f: (A) -> B): T = modify(f)(s)
-
-            override fun set(s: S, b: B): T = modify(s) { b }
-        }
-
-        /**
-         * Create a [PSetter] from a [arrow.Functor]
-         */
-        fun <F, A, B> fromFunctor(FF: Functor<F>): PSetter<Kind<F, A>, Kind<F, B>, A, B> = FF.run {
-            PSetter { f ->
-                { fs: Kind<F, A> -> fs.map(f) }
-            }
-        }
+      override fun set(s: S, b: B): T = modify(s) { b }
     }
 
     /**
-     * Join two [PSetter] with the same target
+     * Create a [PSetter] from a [arrow.Functor]
      */
-    infix fun <U, V> choice(other: PSetter<U, V, A, B>): PSetter<Either<S, U>, Either<T, V>, A, B> = PSetter { f ->
-        { su -> su.bimap({ s -> modify(s, f) }, { u -> other.modify(u, f) }) }
+    fun <F, A, B> fromFunctor(FF: Functor<F>): PSetter<Kind<F, A>, Kind<F, B>, A, B> = FF.run {
+      PSetter { f ->
+        { fs: Kind<F, A> -> fs.map(f) }
+      }
     }
+  }
 
-    /**
-     * Compose a [PSetter] with a [PSetter]
-     */
-    infix fun <C, D> compose(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = PSetter { fb ->
-        { s -> modify(s) { a -> other.modify(a, fb) } }
-    }
+  /**
+   * Join two [PSetter] with the same target
+   */
+  infix fun <U, V> choice(other: PSetter<U, V, A, B>): PSetter<Either<S, U>, Either<T, V>, A, B> = PSetter { f ->
+    { su -> su.bimap({ s -> modify(s, f) }, { u -> other.modify(u, f) }) }
+  }
 
-    /**
-     * Compose a [PSetter] with a [POptional]
-     */
-    infix fun <C, D> compose(other: POptional<A, B, C, D>): PSetter<S, T, C, D> = compose(other.asSetter())
+  /**
+   * Compose a [PSetter] with a [PSetter]
+   */
+  infix fun <C, D> compose(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = PSetter { fb ->
+    { s -> modify(s) { a -> other.modify(a, fb) } }
+  }
 
-    /**
-     * Compose a [PSetter] with a [PPrism]
-     */
-    infix fun <C, D> compose(other: PPrism<A, B, C, D>): PSetter<S, T, C, D> = compose(other.asSetter())
+  /**
+   * Compose a [PSetter] with a [POptional]
+   */
+  infix fun <C, D> compose(other: POptional<A, B, C, D>): PSetter<S, T, C, D> = compose(other.asSetter())
 
-    /**
-     * Compose a [PSetter] with a [PLens]
-     */
-    infix fun <C, D> compose(other: PLens<A, B, C, D>): PSetter<S, T, C, D> = compose(other.asSetter())
+  /**
+   * Compose a [PSetter] with a [PPrism]
+   */
+  infix fun <C, D> compose(other: PPrism<A, B, C, D>): PSetter<S, T, C, D> = compose(other.asSetter())
 
-    /**
-     * Compose a [PSetter] with a [PIso]
-     */
-    infix fun <C, D> compose(other: PIso<A, B, C, D>): PSetter<S, T, C, D> = compose(other.asSetter())
+  /**
+   * Compose a [PSetter] with a [PLens]
+   */
+  infix fun <C, D> compose(other: PLens<A, B, C, D>): PSetter<S, T, C, D> = compose(other.asSetter())
 
-    /**
-     * Compose a [PSetter] with a [PTraversal]
-     */
-    infix fun <C, D> compose(other: PTraversal<A, B, C, D>): PSetter<S, T, C, D> = compose(other.asSetter())
+  /**
+   * Compose a [PSetter] with a [PIso]
+   */
+  infix fun <C, D> compose(other: PIso<A, B, C, D>): PSetter<S, T, C, D> = compose(other.asSetter())
 
-    /**
-     * Plus operator overload to compose optionals
-     */
-    operator fun <C, D> plus(o: PSetter<A, B, C, D>): PSetter<S, T, C, D> = compose(o)
+  /**
+   * Compose a [PSetter] with a [PTraversal]
+   */
+  infix fun <C, D> compose(other: PTraversal<A, B, C, D>): PSetter<S, T, C, D> = compose(other.asSetter())
 
-    operator fun <C, D> plus(o: POptional<A, B, C, D>): PSetter<S, T, C, D> = compose(o)
+  /**
+   * Plus operator overload to compose optionals
+   */
+  operator fun <C, D> plus(o: PSetter<A, B, C, D>): PSetter<S, T, C, D> = compose(o)
 
-    operator fun <C, D> plus(o: PPrism<A, B, C, D>): PSetter<S, T, C, D> = compose(o)
+  operator fun <C, D> plus(o: POptional<A, B, C, D>): PSetter<S, T, C, D> = compose(o)
 
-    operator fun <C, D> plus(o: PLens<A, B, C, D>): PSetter<S, T, C, D> = compose(o)
+  operator fun <C, D> plus(o: PPrism<A, B, C, D>): PSetter<S, T, C, D> = compose(o)
 
-    operator fun <C, D> plus(o: PIso<A, B, C, D>): PSetter<S, T, C, D> = compose(o)
+  operator fun <C, D> plus(o: PLens<A, B, C, D>): PSetter<S, T, C, D> = compose(o)
 
-    operator fun <C, D> plus(o: PTraversal<A, B, C, D>): PSetter<S, T, C, D> = compose(o)
+  operator fun <C, D> plus(o: PIso<A, B, C, D>): PSetter<S, T, C, D> = compose(o)
+
+  operator fun <C, D> plus(o: PTraversal<A, B, C, D>): PSetter<S, T, C, D> = compose(o)
 
 }
 
@@ -133,5 +133,5 @@ interface PSetter<S, T, A, B> : PSetterOf<S, T, A, B> {
  * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
  */
 inline fun <S, T, A, B> PSetter<S, T, A, B>.lift(crossinline f: (A) -> B): (S) -> T = { s ->
-    modify(s) { f(it) }
+  modify(s) { f(it) }
 }

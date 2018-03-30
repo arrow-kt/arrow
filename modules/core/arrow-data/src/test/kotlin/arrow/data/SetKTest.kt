@@ -10,16 +10,16 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class SetKTest : UnitSpec() {
 
-    init {
+  init {
 
-        val EQ = SetK.eq(IntEqInstance)
+    val EQ = SetK.eq(IntEqInstance)
 
-        testLaws(
-                EqLaws.laws(EQ) { SetK.just(it) },
-                ShowLaws.laws(SetK.show(), EQ) { SetK.just(it) },
-                SemigroupKLaws.laws(SetK.semigroupK(), { SetK.just(it) }, Eq.any()),
-                MonoidKLaws.laws(SetK.monoidK(), { SetK.just(it) }, Eq.any()),
-                FoldableLaws.laws(SetK.foldable(), { SetK.just(it) }, Eq.any())
-        )
-    }
+    testLaws(
+      EqLaws.laws(EQ) { SetK.just(it) },
+      ShowLaws.laws(SetK.show(), EQ) { SetK.just(it) },
+      SemigroupKLaws.laws(SetK.semigroupK(), { SetK.just(it) }, Eq.any()),
+      MonoidKLaws.laws(SetK.monoidK(), { SetK.just(it) }, Eq.any()),
+      FoldableLaws.laws(SetK.foldable(), { SetK.just(it) }, Eq.any())
+    )
+  }
 }

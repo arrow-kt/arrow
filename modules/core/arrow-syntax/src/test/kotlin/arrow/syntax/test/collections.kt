@@ -27,21 +27,21 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class CollectionsSyntaxTests : UnitSpec() {
 
-    init {
+  init {
 
-        "tail" {
-            listOf(1, 2, 3).tail() shouldBe listOf(2, 3)
-        }
-
-        "prependTo" {
-            1 prependTo listOf(2, 3) shouldBe listOf(1, 2, 3)
-        }
-
-        "destructured" {
-            val (head, tail) = listOf(1, 2, 3).destructured()
-            head shouldBe 1
-            tail shouldBe listOf(2, 3)
-        }
-
+    "tail" {
+      listOf(1, 2, 3).tail() shouldBe listOf(2, 3)
     }
+
+    "prependTo" {
+      1 prependTo listOf(2, 3) shouldBe listOf(1, 2, 3)
+    }
+
+    "destructured" {
+      val (head, tail) = listOf(1, 2, 3).destructured()
+      head shouldBe 1
+      tail shouldBe listOf(2, 3)
+    }
+
+  }
 }

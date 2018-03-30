@@ -12,13 +12,13 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class ConstTest : UnitSpec() {
-    init {
+  init {
 
-        testLaws(
-                TraverseFilterLaws.laws(Const.traverseFilter(), Const.applicative(IntMonoidInstance), { Const(it) }, Eq.any()),
-                ApplicativeLaws.laws(Const.applicative(IntMonoidInstance), Eq.any()),
-                EqLaws.laws(Const.eq<Int, Int>(Eq.any()), { Const(it) }),
-                ShowLaws.laws(Const.show(), Const.eq<Int, Int>(Eq.any()), { Const(it) })
-        )
-    }
+    testLaws(
+      TraverseFilterLaws.laws(Const.traverseFilter(), Const.applicative(IntMonoidInstance), { Const(it) }, Eq.any()),
+      ApplicativeLaws.laws(Const.applicative(IntMonoidInstance), Eq.any()),
+      EqLaws.laws(Const.eq<Int, Int>(Eq.any()), { Const(it) }),
+      ShowLaws.laws(Const.show(), Const.eq<Int, Int>(Eq.any()), { Const(it) })
+    )
+  }
 }

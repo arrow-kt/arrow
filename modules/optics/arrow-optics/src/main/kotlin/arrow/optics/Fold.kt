@@ -20,177 +20,177 @@ import arrow.typeclasses.Monoid
 @higherkind
 interface Fold<S, A> : FoldOf<S, A> {
 
+  /**
+   * Map each target to a type R and use a Monoid to fold the results
+   */
+  fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R
+
+  companion object {
+
+    fun <A> id() = Iso.id<A>().asFold()
+
     /**
-     * Map each target to a type R and use a Monoid to fold the results
+     * [Fold] that takes either [S] or [S] and strips the choice of [S].
      */
-    fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R
-
-    companion object {
-
-        fun <A> id() = Iso.id<A>().asFold()
-
-        /**
-         * [Fold] that takes either [S] or [S] and strips the choice of [S].
-         */
-        inline fun <S> codiagonal() = object : Fold<Either<S, S>, S> {
-            override fun <R> foldMap(M: Monoid<R>, s: Either<S, S>, f: (S) -> R): R = s.fold(f, f)
-        }
-
-        /**
-         * Creates a [Fold] based on a predicate of the source [S]
-         */
-        fun <S> select(p: (S) -> Boolean): Fold<S, S> = object : Fold<S, S> {
-            override fun <R> foldMap(M: Monoid<R>, s: S, f: (S) -> R): R = if (p(s)) f(s) else M.empty()
-        }
-
-        /**
-         * [Fold] that points to nothing
-         */
-        fun <A, B> void() = Optional.void<A, B>().asFold()
-
-        /**
-         * Create a [Fold] from a [arrow.Foldable]
-         */
-        fun <F, S> fromFoldable(foldable: Foldable<F>) = object : Fold<Kind<F, S>, S> {
-            override fun <R> foldMap(M: Monoid<R>, s: Kind<F, S>, f: (S) -> R): R = foldable.run { s.foldMap(M, f) }
-        }
-
+    inline fun <S> codiagonal() = object : Fold<Either<S, S>, S> {
+      override fun <R> foldMap(M: Monoid<R>, s: Either<S, S>, f: (S) -> R): R = s.fold(f, f)
     }
 
     /**
-     * Calculate the number of targets
+     * Creates a [Fold] based on a predicate of the source [S]
      */
-    fun size(s: S) = foldMap(IntMonoidInstance, s = s, f = { _ -> 1 })
-
-    /**
-     * Check if all targets satisfy the predicate
-     */
-    fun forall(s: S, p: (A) -> Boolean): Boolean = foldMap(AndMonoid, s, p)
-
-    /**
-     * Check if there is no target
-     */
-    fun isEmpty(s: S): Boolean = foldMap(AndMonoid, s, { _ -> false })
-
-    /**
-     * Check if there is at least one target
-     */
-    fun nonEmpty(s: S): Boolean = !isEmpty(s)
-
-    /**
-     * Get the first target
-     */
-    fun headOption(s: S): Option<A> = foldMap(firstOptionMonoid<A>(), s, { b -> Const(Some(b)) }).value
-
-    /**
-     * Get the last target
-     */
-    fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s, { b -> Const(Some(b)) }).value
-
-    /**
-     * Fold using the given [Monoid] instance.
-     */
-    fun fold(M: Monoid<A>, s: S): A = foldMap(M, s, ::identity)
-
-    /**
-     * Alias for fold.
-     */
-    fun combineAll(M: Monoid<A>, s: S): A = foldMap(M, s, ::identity)
-
-    /**
-     * Get all targets of the [Fold]
-     */
-    fun getAll(M: Monoid<ListK<A>>, s: S): ListK<A> = foldMap(M, s, { ListK.just(it) })
-
-    /**
-     * Join two [Fold] with the same target
-     */
-    infix fun <C> choice(other: Fold<C, A>): Fold<Either<S, C>, A> = object : Fold<Either<S, C>, A> {
-        override fun <R> foldMap(M: Monoid<R>, s: Either<S, C>, f: (A) -> R): R =
-                s.fold({ ac -> this@Fold.foldMap(M, ac, f) }, { c -> other.foldMap(M, c, f) })
+    fun <S> select(p: (S) -> Boolean): Fold<S, S> = object : Fold<S, S> {
+      override fun <R> foldMap(M: Monoid<R>, s: S, f: (S) -> R): R = if (p(s)) f(s) else M.empty()
     }
 
     /**
-     * Create a sum of the [Fold] and a type [C]
+     * [Fold] that points to nothing
      */
-    fun <C> left(): Fold<Either<S, C>, Either<A, C>> = object : Fold<Either<S, C>, Either<A, C>> {
-        override fun <R> foldMap(M: Monoid<R>, s: Either<S, C>, f: (Either<A, C>) -> R): R =
-                s.fold({ a1: S -> this@Fold.foldMap(M, a1, { b -> f(Either.Left(b)) }) }, { c -> f(Either.Right(c)) })
+    fun <A, B> void() = Optional.void<A, B>().asFold()
+
+    /**
+     * Create a [Fold] from a [arrow.Foldable]
+     */
+    fun <F, S> fromFoldable(foldable: Foldable<F>) = object : Fold<Kind<F, S>, S> {
+      override fun <R> foldMap(M: Monoid<R>, s: Kind<F, S>, f: (S) -> R): R = foldable.run { s.foldMap(M, f) }
     }
 
-    /**
-     * Create a sum of a type [C] and the [Fold]
-     */
-    fun <C> right(): Fold<Either<C, S>, Either<C, A>> = object : Fold<Either<C, S>, Either<C, A>> {
-        override fun <R> foldMap(M: Monoid<R>, s: Either<C, S>, f: (Either<C, A>) -> R): R =
-                s.fold({ c -> f(Either.Left(c)) }, { a1 -> this@Fold.foldMap(M, a1, { b -> f(Either.Right(b)) }) })
-    }
+  }
 
-    /**
-     * Compose a [Fold] with a [Fold]
-     */
-    infix fun <C> compose(other: Fold<A, C>): Fold<S, C> = object : Fold<S, C> {
-        override fun <R> foldMap(M: Monoid<R>, s: S, f: (C) -> R): R =
-                this@Fold.foldMap(M, s, { c -> other.foldMap(M, c, f) })
-    }
+  /**
+   * Calculate the number of targets
+   */
+  fun size(s: S) = foldMap(IntMonoidInstance, s = s, f = { _ -> 1 })
 
-    /**
-     * Compose a [Fold] with a [Getter]
-     */
-    infix fun <C> compose(other: Getter<A, C>): Fold<S, C> = compose(other.asFold())
+  /**
+   * Check if all targets satisfy the predicate
+   */
+  fun forall(s: S, p: (A) -> Boolean): Boolean = foldMap(AndMonoid, s, p)
 
-    /**
-     * Compose a [Fold] with a [Optional]
-     */
-    infix fun <C> compose(other: Optional<A, C>): Fold<S, C> = compose(other.asFold())
+  /**
+   * Check if there is no target
+   */
+  fun isEmpty(s: S): Boolean = foldMap(AndMonoid, s, { _ -> false })
 
-    /**
-     * Compose a [[Fold]] with a [Prism]
-     */
-    infix fun <C> compose(other: Prism<A, C>): Fold<S, C> = compose(other.asFold())
+  /**
+   * Check if there is at least one target
+   */
+  fun nonEmpty(s: S): Boolean = !isEmpty(s)
 
-    /**
-     * Compose a [Fold] with a [Lens]
-     */
-    infix fun <C> compose(other: Lens<A, C>): Fold<S, C> = compose(other.asFold())
+  /**
+   * Get the first target
+   */
+  fun headOption(s: S): Option<A> = foldMap(firstOptionMonoid<A>(), s, { b -> Const(Some(b)) }).value
 
-    /**
-     * Compose a [Fold] with a [Iso]
-     */
-    infix fun <C> compose(other: Iso<A, C>): Fold<S, C> = compose(other.asFold())
+  /**
+   * Get the last target
+   */
+  fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s, { b -> Const(Some(b)) }).value
 
-    /**
-     * Compose a [Fold] with a [Traversal]
-     */
-    infix fun <C> compose(other: Traversal<A, C>): Fold<S, C> = compose(other.asFold())
+  /**
+   * Fold using the given [Monoid] instance.
+   */
+  fun fold(M: Monoid<A>, s: S): A = foldMap(M, s, ::identity)
 
-    /**
-     * Plus operator  overload to compose lenses
-     */
-    operator fun <C> plus(other: Fold<A, C>): Fold<S, C> = compose(other)
+  /**
+   * Alias for fold.
+   */
+  fun combineAll(M: Monoid<A>, s: S): A = foldMap(M, s, ::identity)
 
-    operator fun <C> plus(other: Optional<A, C>): Fold<S, C> = compose(other)
+  /**
+   * Get all targets of the [Fold]
+   */
+  fun getAll(M: Monoid<ListK<A>>, s: S): ListK<A> = foldMap(M, s, { ListK.just(it) })
 
-    operator fun <C> plus(other: Getter<A, C>): Fold<S, C> = compose(other)
+  /**
+   * Join two [Fold] with the same target
+   */
+  infix fun <C> choice(other: Fold<C, A>): Fold<Either<S, C>, A> = object : Fold<Either<S, C>, A> {
+    override fun <R> foldMap(M: Monoid<R>, s: Either<S, C>, f: (A) -> R): R =
+      s.fold({ ac -> this@Fold.foldMap(M, ac, f) }, { c -> other.foldMap(M, c, f) })
+  }
 
-    operator fun <C> plus(other: Prism<A, C>): Fold<S, C> = compose(other)
+  /**
+   * Create a sum of the [Fold] and a type [C]
+   */
+  fun <C> left(): Fold<Either<S, C>, Either<A, C>> = object : Fold<Either<S, C>, Either<A, C>> {
+    override fun <R> foldMap(M: Monoid<R>, s: Either<S, C>, f: (Either<A, C>) -> R): R =
+      s.fold({ a1: S -> this@Fold.foldMap(M, a1, { b -> f(Either.Left(b)) }) }, { c -> f(Either.Right(c)) })
+  }
 
-    operator fun <C> plus(other: Lens<A, C>): Fold<S, C> = compose(other)
+  /**
+   * Create a sum of a type [C] and the [Fold]
+   */
+  fun <C> right(): Fold<Either<C, S>, Either<C, A>> = object : Fold<Either<C, S>, Either<C, A>> {
+    override fun <R> foldMap(M: Monoid<R>, s: Either<C, S>, f: (Either<C, A>) -> R): R =
+      s.fold({ c -> f(Either.Left(c)) }, { a1 -> this@Fold.foldMap(M, a1, { b -> f(Either.Right(b)) }) })
+  }
 
-    operator fun <C> plus(other: Iso<A, C>): Fold<S, C> = compose(other)
+  /**
+   * Compose a [Fold] with a [Fold]
+   */
+  infix fun <C> compose(other: Fold<A, C>): Fold<S, C> = object : Fold<S, C> {
+    override fun <R> foldMap(M: Monoid<R>, s: S, f: (C) -> R): R =
+      this@Fold.foldMap(M, s, { c -> other.foldMap(M, c, f) })
+  }
 
-    operator fun <C> plus(other: Traversal<A, C>): Fold<S, C> = compose(other)
+  /**
+   * Compose a [Fold] with a [Getter]
+   */
+  infix fun <C> compose(other: Getter<A, C>): Fold<S, C> = compose(other.asFold())
 
-    /**
-     * Find the first element matching the predicate, if one exists.
-     */
-    fun find(s: S, p: (A) -> Boolean): Option<A> =
-            foldMap(firstOptionMonoid<A>(), s, { b -> (if (p(b)) Const(Some(b)) else Const(None)) }).value
+  /**
+   * Compose a [Fold] with a [Optional]
+   */
+  infix fun <C> compose(other: Optional<A, C>): Fold<S, C> = compose(other.asFold())
 
-    /**
-     * Check whether at least one element satisfies the predicate.
-     *
-     * If there are no elements, the result is false.
-     */
-    fun exists(s: S, p: (A) -> Boolean): Boolean = find(s, p).fold({ false }, { true })
+  /**
+   * Compose a [[Fold]] with a [Prism]
+   */
+  infix fun <C> compose(other: Prism<A, C>): Fold<S, C> = compose(other.asFold())
+
+  /**
+   * Compose a [Fold] with a [Lens]
+   */
+  infix fun <C> compose(other: Lens<A, C>): Fold<S, C> = compose(other.asFold())
+
+  /**
+   * Compose a [Fold] with a [Iso]
+   */
+  infix fun <C> compose(other: Iso<A, C>): Fold<S, C> = compose(other.asFold())
+
+  /**
+   * Compose a [Fold] with a [Traversal]
+   */
+  infix fun <C> compose(other: Traversal<A, C>): Fold<S, C> = compose(other.asFold())
+
+  /**
+   * Plus operator  overload to compose lenses
+   */
+  operator fun <C> plus(other: Fold<A, C>): Fold<S, C> = compose(other)
+
+  operator fun <C> plus(other: Optional<A, C>): Fold<S, C> = compose(other)
+
+  operator fun <C> plus(other: Getter<A, C>): Fold<S, C> = compose(other)
+
+  operator fun <C> plus(other: Prism<A, C>): Fold<S, C> = compose(other)
+
+  operator fun <C> plus(other: Lens<A, C>): Fold<S, C> = compose(other)
+
+  operator fun <C> plus(other: Iso<A, C>): Fold<S, C> = compose(other)
+
+  operator fun <C> plus(other: Traversal<A, C>): Fold<S, C> = compose(other)
+
+  /**
+   * Find the first element matching the predicate, if one exists.
+   */
+  fun find(s: S, p: (A) -> Boolean): Option<A> =
+    foldMap(firstOptionMonoid<A>(), s, { b -> (if (p(b)) Const(Some(b)) else Const(None)) }).value
+
+  /**
+   * Check whether at least one element satisfies the predicate.
+   *
+   * If there are no elements, the result is false.
+   */
+  fun exists(s: S, p: (A) -> Boolean): Boolean = find(s, p).fold({ false }, { true })
 }
