@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Tuple2
+import arrow.core.identity
 import kotlin.coroutines.experimental.startCoroutine
 
 inline operator fun <F, A> Monad<F>.invoke(ff: Monad<F>.() -> A) =
@@ -22,7 +23,7 @@ interface Monad<F> : Applicative<F> {
             ff.flatMap({ f -> this.map(f) })
 
     fun <A> Kind<F, Kind<F, A>>.flatten(): Kind<F, A> =
-            flatMap { it }
+            flatMap(::identity)
 
     fun <A, B> Kind<F, A>.followedBy(fb: Kind<F, B>): Kind<F, B> =
             flatMap { fb }

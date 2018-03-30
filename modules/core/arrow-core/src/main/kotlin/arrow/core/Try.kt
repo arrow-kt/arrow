@@ -169,14 +169,14 @@ sealed class TryException(override val message: String) : kotlin.Exception(messa
  *
  * ''Note:'': This will throw an exception if it is not a success and default throws an exception.
  */
-fun <B> TryOf<B>.getOrDefault(default: () -> B): B = fix().fold({ default() }, { it })
+fun <B> TryOf<B>.getOrDefault(default: () -> B): B = fix().fold({ default() }, ::identity)
 
 /**
  * Returns the value from this `Success` or the given `default` argument if this is a `Failure`.
  *
  * ''Note:'': This will throw an exception if it is not a success and default throws an exception.
  */
-fun <B> TryOf<B>.getOrElse(default: (Throwable) -> B): B = fix().fold(default, { it })
+fun <B> TryOf<B>.getOrElse(default: (Throwable) -> B): B = fix().fold(default, ::identity)
 
 fun <B, A: B> TryOf<A>.orElse(f: () -> TryOf<B>): Try<B> = when (this.fix()) {
     is Try.Success -> this.fix()

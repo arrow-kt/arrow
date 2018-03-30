@@ -3,6 +3,7 @@ package arrow.data
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
+import arrow.core.identity
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
@@ -158,7 +159,7 @@ class Kleisli<F, D, A> (val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Klei
  *
  * @param MF [Monad] for the context [F].
  */
-fun <F, D, A> KleisliOf<F, D, Kleisli<F, D, A>>.flatten(MF: Monad<F>): Kleisli<F, D, A> = fix().flatMap(MF, { it })
+fun <F, D, A> KleisliOf<F, D, Kleisli<F, D, A>>.flatten(MF: Monad<F>): Kleisli<F, D, A> = fix().flatMap(MF, ::identity)
 
 /**
  * Syntax for constructing a [Kleisli]

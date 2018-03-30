@@ -54,7 +54,7 @@ sealed class Option<out A> : OptionOf<A> {
     @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("getOrElse { ifEmpty }"))
     abstract fun get(): A
 
-    fun orNull(): A? = fold({ null }, { it })
+    fun orNull(): A? = fold({ null }, ::identity)
 
     /**
      * Returns a [Some<$B>] containing the result of applying $f to this $option's
@@ -182,7 +182,7 @@ data class Some<out T>(val t: T) : Option<T>() {
  *
  * @param default the default expression.
  */
-fun <T> Option<T>.getOrElse(default: () -> T): T = fold({ default() }, { it })
+fun <T> Option<T>.getOrElse(default: () -> T): T = fold({ default() }, ::identity)
 
 /**
  * Returns this option's if the option is nonempty, otherwise

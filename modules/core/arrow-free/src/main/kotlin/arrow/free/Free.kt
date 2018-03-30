@@ -2,6 +2,7 @@ package arrow.free
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.identity
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.FunctionK
@@ -50,7 +51,7 @@ sealed class Free<S, out A> : FreeOf<S, A> {
 
     data class FlatMapped<S, out A, C>(val c: Free<S, C>, val fm: (C) -> Free<S, A>) : Free<S, A>() {
         override fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B> =
-                FlatMapped(c.transform({ it }, fs), { c.flatMap { fm(it) }.transform(f, fs) })
+                FlatMapped(c.transform(::identity, fs), { c.flatMap { fm(it) }.transform(f, fs) })
     }
 
     override fun toString(): String = "Free(...) : toString is not stack-safe"

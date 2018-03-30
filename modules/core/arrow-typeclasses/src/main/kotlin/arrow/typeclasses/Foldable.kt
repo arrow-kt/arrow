@@ -110,7 +110,7 @@ interface Foldable<F> {
      *
      * Similar to traverse except it operates on F<G<A>> values, so no additional functions are needed.
      */
-    fun <G, A> Kind<F, Kind<G, A>>.sequence_(ag: Applicative<G>): Kind<G, Unit> = traverse_(ag, { it })
+    fun <G, A> Kind<F, Kind<G, A>>.sequence_(ag: Applicative<G>): Kind<G, Unit> = traverse_(ag, ::identity)
 
     /**
      * Find the first element matching the predicate, if one exists.

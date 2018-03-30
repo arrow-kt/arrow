@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
+import arrow.core.identity
 import arrow.test.generators.genApplicative
 import arrow.test.generators.genEither
 import arrow.test.generators.genFunctionAToB
@@ -58,6 +59,6 @@ object ApplicativeErrorLaws {
 
     fun <F> ApplicativeError<F, Throwable>.applicativeErrorCatch(EQ: Eq<Kind<F, Int>>): Unit =
             forAll(genEither(genThrowable(), Gen.int()), { either: Either<Throwable, Int> ->
-                catch({ either.fold({ throw it }, { it }) }).equalUnderTheLaw(either.fold({ raiseError<Int>(it) }, { just(it) }), EQ)
+                catch({ either.fold({ throw it }, ::identity) }).equalUnderTheLaw(either.fold({ raiseError<Int>(it) }, { just(it) }), EQ)
             })
 }

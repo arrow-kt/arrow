@@ -56,7 +56,7 @@ class CoreaderTest : UnitSpec() {
                 }
 
                 "andThen should continue sequence" {
-                    val cokleisli: Cokleisli<ForId, Int, Int> = invoke({ it })
+                    val cokleisli: Cokleisli<ForId, Int, Int> = invoke(::identity)
 
                     cokleisli.andThen(Id(3)).run(Id(0)) shouldBe 3
 

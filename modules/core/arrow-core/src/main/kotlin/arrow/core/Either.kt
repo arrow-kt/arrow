@@ -235,7 +235,7 @@ fun <A, B, C> EitherOf<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> =
  * ```
  */
 inline fun <B> EitherOf<*, B>.getOrElse(crossinline default: () -> B): B =
-        fix().fold({ default() }, { it })
+        fix().fold({ default() }, ::identity)
 
 /**
  * Returns the value from this [Either.Right] or allows clients to transform [Either.Left] to [Either.Right] while providing access to
@@ -248,7 +248,7 @@ inline fun <B> EitherOf<*, B>.getOrElse(crossinline default: () -> B): B =
  * ```
  */
 inline fun <A, B> EitherOf<A, B>.getOrHandle(crossinline default: (A) -> B): B =
-        fix().fold({ default(it) }, { it })
+        fix().fold({ default(it) }, ::identity)
 
 /**
  * * Returns [Either.Right] with the existing value of [Either.Right] if this is a [Either.Right] and the given predicate

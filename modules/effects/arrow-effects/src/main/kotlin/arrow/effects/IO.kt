@@ -72,7 +72,7 @@ sealed class IO<out A> : IOOf<A> {
 
     fun unsafeRunSync(): A =
             unsafeRunTimed(Duration.INFINITE)
-                    .fold({ throw IllegalArgumentException("IO execution should yield a valid result") }, { it })
+                    .fold({ throw IllegalArgumentException("IO execution should yield a valid result") }, ::identity)
 
     fun unsafeRunTimed(limit: Duration): Option<A> = IORunLoop.step(this).unsafeRunTimedTotal(limit)
 

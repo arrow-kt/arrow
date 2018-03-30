@@ -2,6 +2,7 @@ package arrow.syntax.collections
 
 import arrow.core.Option
 import arrow.core.Some
+import arrow.core.identity
 import arrow.core.toOption
 import arrow.legacy.Disjunction
 import arrow.legacy.map
@@ -21,7 +22,7 @@ fun <T, R> List<T>.optionTraverse(f: (T) -> Option<R>): Option<List<R>> = foldRi
     }
 }
 
-fun <T> List<Option<T>>.optionSequential(): Option<List<T>> = optionTraverse { it }
+fun <T> List<Option<T>>.optionSequential(): Option<List<T>> = optionTraverse(::identity)
 
 fun <T> List<T>.firstOption(): Option<T> = firstOrNull().toOption()
 
@@ -38,4 +39,4 @@ fun <T, L, R> List<T>.disjuntionTraverse(f: (T) -> Disjunction<L, R>): Disjuncti
     }
 }
 
-fun <L, R> List<Disjunction<L, R>>.disjunctionSequential(): Disjunction<L, List<R>> = disjuntionTraverse { it }
+fun <L, R> List<Disjunction<L, R>>.disjunctionSequential(): Disjunction<L, List<R>> = disjuntionTraverse(::identity)

@@ -1,6 +1,7 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.core.identity
 import java.io.Serializable
 import kotlin.coroutines.experimental.*
 import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
@@ -18,7 +19,7 @@ interface Comonad<F> : Functor<F> {
 
     fun <A> Kind<F, A>.extract(): A
 
-    fun <A> Kind<F, A>.duplicate(): Kind<F, Kind<F, A>> = this.coflatMap({ it })
+    fun <A> Kind<F, A>.duplicate(): Kind<F, Kind<F, A>> = coflatMap(::identity)
 }
 
 @RestrictsSuspension

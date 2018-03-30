@@ -100,7 +100,7 @@ interface TryFoldableInstance : Foldable<ForTry> {
 }
 
 fun <A, B, G> Try<A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Try<B>> = GA.run {
-    fix().fold({ just(Try.raise(it)) }, { f(it).map({ Try { it } }) })
+    fix().fold({ just(Try.raise(it)) }, { f(it).map({ Try.just(it) }) })
 }
 
 @instance(Try::class)

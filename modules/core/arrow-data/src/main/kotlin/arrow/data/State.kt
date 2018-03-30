@@ -124,4 +124,4 @@ fun <R, S, T> List<T>.stateTraverse(f: (T) -> State<S, R>): State<S, List<R>> = 
     }))
 }
 
-fun <S, T> List<State<S, T>>.stateSequential(): State<S, List<T>> = stateTraverse { it }
+fun <S, T> List<State<S, T>>.stateSequential(): State<S, List<T>> = stateTraverse(::identity)

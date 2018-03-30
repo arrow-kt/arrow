@@ -95,7 +95,7 @@ class TypeclasslessExamples : FreeSpec() {
                 1.just().map { inScopeOne() }.map { 1 }
 
         fun <F> ApplicativeAndIdentifySyntax<F>.withAll(): Kind<F, Int> =
-                withIdentify(withApplicative()).identify().map { it }
+                withIdentify(withApplicative()).identify().map ::identity
     }
 
     // It only works inside classes if they extend the syntax, although it's inheritable!

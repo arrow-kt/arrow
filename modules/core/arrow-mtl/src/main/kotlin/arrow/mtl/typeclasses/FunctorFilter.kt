@@ -23,7 +23,7 @@ interface FunctorFilter<F> : Functor<F> {
     /**
      * "Flatten" out a structure by collapsing Options.
      */
-    fun <A> Kind<F, Option<A>>.flattenOption(): Kind<F, A> = mapFilter({ it })
+    fun <A> Kind<F, Option<A>>.flattenOption(): Kind<F, A> = mapFilter(::identity)
 
     /**
      * Apply a filter to a structure such that the output structure contains all A elements in the input structure that satisfy the predicate f but none

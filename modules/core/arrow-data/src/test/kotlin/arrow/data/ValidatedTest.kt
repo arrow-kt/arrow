@@ -166,7 +166,7 @@ class ValidatedTest : UnitSpec() {
 
         "withEither should return Invalid(result) if f return Left" {
             Valid(10).withEither { Left(5) } shouldBe Invalid(5)
-            Invalid(10).withEither { it } shouldBe Invalid(10)
+            Invalid(10).withEither(::identity) shouldBe Invalid(10)
         }
 
         with(VAL_AP) {

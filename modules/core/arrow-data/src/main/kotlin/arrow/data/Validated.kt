@@ -102,13 +102,13 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
     /**
      * Apply a function to a Valid value, returning a new Valid value
      */
-    fun <B> map(f: (A) -> B): Validated<E, B> = bimap({ it }, { f(it) })
+    fun <B> map(f: (A) -> B): Validated<E, B> = bimap(::identity, { f(it) })
 
     /**
      * Apply a function to an Invalid value, returning a new Invalid value.
      * Or, if the original valid was Valid, return it.
      */
-    fun <EE> leftMap(f: (E) -> EE): Validated<EE, A> = bimap({ f(it) }, { it })
+    fun <EE> leftMap(f: (E) -> EE): Validated<EE, A> = bimap({ f(it) }, ::identity)
 
     /**
      * apply the given function to the value with the given B when
@@ -128,12 +128,12 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
 /**
  * Return the Valid value, or the default if Invalid
  */
-fun <E, B> Validated<E, B>.getOrElse(default: () -> B): B = fold({ default() }, { it })
+fun <E, B> Validated<E, B>.getOrElse(default: () -> B): B = fold({ default() }, ::identity)
 
 /**
  * Return the Valid value, or the result of f if Invalid
  */
-fun <E, B> Validated<E, B>.valueOr(f: (E) -> B): B = fold({ f(it) }, { it })
+fun <E, B> Validated<E, B>.valueOr(f: (E) -> B): B = fold({ f(it) }, ::identity)
 
 /**
  * If `this` is valid return `this`, otherwise if `that` is valid return `that`, otherwise combine the failures.
