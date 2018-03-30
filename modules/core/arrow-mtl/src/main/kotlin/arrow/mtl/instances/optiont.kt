@@ -22,7 +22,7 @@ import arrow.typeclasses.unnest
 interface OptionTFunctorFilterInstance<F> : OptionTFunctorInstance<F>, FunctorFilter<OptionTPartialOf<F>> {
 
     override fun <A, B> Kind<OptionTPartialOf<F>, A>.mapFilter(f: (A) -> Option<B>): OptionT<F, B> =
-            this@mapFilter.fix().mapFilter(f, this@OptionTFunctorFilterInstance.FF())
+            this@mapFilter.fix().mapFilter(this@OptionTFunctorFilterInstance.FF(), f)
 }
 
 @instance(OptionT::class)

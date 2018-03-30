@@ -14,7 +14,7 @@ interface OptionTFunctorInstance<F> : Functor<OptionTPartialOf<F>> {
 
     fun FF(): Functor<F>
 
-    override fun <A, B> Kind<OptionTPartialOf<F>, A>.map(f: (A) -> B): OptionT<F, B> = fix().map(f, FF())
+    override fun <A, B> Kind<OptionTPartialOf<F>, A>.map(f: (A) -> B): OptionT<F, B> = fix().map(FF(), f)
 
 }
 
@@ -25,24 +25,24 @@ interface OptionTApplicativeInstance<F> : OptionTFunctorInstance<F>, Applicative
 
     override fun <A> pure(a: A): OptionT<F, A> = OptionT(FF().pure(Option(a)))
 
-    override fun <A, B> Kind<OptionTPartialOf<F>, A>.map(f: (A) -> B): OptionT<F, B> = fix().map(f, FF())
+    override fun <A, B> Kind<OptionTPartialOf<F>, A>.map(f: (A) -> B): OptionT<F, B> = fix().map(FF(), f)
 
     override fun <A, B> Kind<OptionTPartialOf<F>, A>.ap(ff: Kind<OptionTPartialOf<F>, (A) -> B>): OptionT<F, B> =
-            fix().ap(ff, FF())
+            fix().ap(FF(), ff)
 }
 
 @instance(OptionT::class)
 interface OptionTMonadInstance<F> : OptionTApplicativeInstance<F>, Monad<OptionTPartialOf<F>> {
 
-    override fun <A, B> Kind<OptionTPartialOf<F>, A>.map(f: (A) -> B): OptionT<F, B> = fix().map(f, FF())
+    override fun <A, B> Kind<OptionTPartialOf<F>, A>.map(f: (A) -> B): OptionT<F, B> = fix().map(FF(), f)
 
-    override fun <A, B> Kind<OptionTPartialOf<F>, A>.flatMap(f: (A) -> Kind<OptionTPartialOf<F>, B>): OptionT<F, B> = fix().flatMap({ f(it).fix() }, FF())
+    override fun <A, B> Kind<OptionTPartialOf<F>, A>.flatMap(f: (A) -> Kind<OptionTPartialOf<F>, B>): OptionT<F, B> = fix().flatMap(FF(), { f(it).fix() })
 
     override fun <A, B> Kind<OptionTPartialOf<F>, A>.ap(ff: Kind<OptionTPartialOf<F>, (A) -> B>): OptionT<F, B> =
-            fix().ap(ff, FF())
+            fix().ap(FF(), ff)
 
     override fun <A, B> tailRecM(a: A, f: (A) -> OptionTOf<F, Either<A, B>>): OptionT<F, B> =
-            OptionT.tailRecM(a, f, FF())
+            OptionT.tailRecM(FF(), a, f)
 
 }
 
@@ -85,7 +85,7 @@ interface OptionTSemigroupKInstance<F> : SemigroupK<OptionTPartialOf<F>> {
 
     fun FF(): Monad<F>
 
-    override fun <A> Kind<OptionTPartialOf<F>, A>.combineK(y: Kind<OptionTPartialOf<F>, A>): OptionT<F, A> = fix().orElse({ y.fix() }, FF())
+    override fun <A> Kind<OptionTPartialOf<F>, A>.combineK(y: Kind<OptionTPartialOf<F>, A>): OptionT<F, A> = fix().orElse(FF(), { y.fix() })
 }
 
 @instance(OptionT::class)
