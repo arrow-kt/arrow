@@ -32,12 +32,12 @@ class OptionalFileGenerator(
         val nonNullTargetClassName = targetClassName.dropLast(1)
         """
                     |fun $sourceName${targetName.toUpperCamelCase()}Optional(): $optional<$sourceClassName, $nonNullTargetClassName> = $optional(
-                    |        getOrModify = { $sourceName: $sourceClassName -> $sourceName.${targetName.plusIfNotBlank(prefix = "`", postfix = "`")}?.right() ?: $sourceName.left() },
-                    |        set = { value: $nonNullTargetClassName ->
-                    |            { $sourceName: $sourceClassName ->
-                    |                $sourceName.copy(${targetName.plusIfNotBlank(prefix = "`", postfix = "`")} = value)
-                    |            }
-                    |        }
+                    |  getOrModify = { $sourceName: $sourceClassName -> $sourceName.${targetName.plusIfNotBlank(prefix = "`", postfix = "`")}?.right() ?: $sourceName.left() },
+                    |  set = { value: $nonNullTargetClassName ->
+                    |    { $sourceName: $sourceClassName ->
+                    |      $sourceName.copy(${targetName.plusIfNotBlank(prefix = "`", postfix = "`")} = value)
+                    |    }
+                    |  }
                     |)
                     """.trimMargin()
       } else if (targetClassName.startsWith("`arrow`.`core`.`Option`")) {
@@ -46,12 +46,12 @@ class OptionalFileGenerator(
 
         """
                     |fun $sourceName${targetName.toUpperCamelCase()}Optional(): $optional<$sourceClassName, $clz> = $optional(
-                    |        getOrModify = { $sourceName: $sourceClassName -> $sourceName.${targetName.plusIfNotBlank(prefix = "`", postfix = "`")}.orNull()?.right() ?: $sourceName.left() },
-                    |        set = { value: $clz ->
-                    |            { $sourceName: $sourceClassName ->
-                    |                $sourceName.copy(${targetName.plusIfNotBlank(prefix = "`", postfix = "`")} = value.toOption())
-                    |            }
-                    |        }
+                    |  getOrModify = { $sourceName: $sourceClassName -> $sourceName.${targetName.plusIfNotBlank(prefix = "`", postfix = "`")}.orNull()?.right() ?: $sourceName.left() },
+                    |  set = { value: $clz ->
+                    |    { $sourceName: $sourceClassName ->
+                    |      $sourceName.copy(${targetName.plusIfNotBlank(prefix = "`", postfix = "`")} = value.toOption())
+                    |    }
+                    |  }
                     |)
                     """.trimMargin()
 
@@ -62,8 +62,10 @@ class OptionalFileGenerator(
 
   fun fileHeader(packageName: String): String =
     """package $packageName
-               |import arrow.syntax.either.*
-               |import arrow.syntax.option.toOption
+               |
+               |import arrow.core.left
+               |import arrow.core.right
+               |import arrow.core.toOption
                |""".trimMargin()
 
 }

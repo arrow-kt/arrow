@@ -1,16 +1,12 @@
 package arrow.ap.tests
 
-import io.kotlintest.specs.StringSpec
-
-import arrow.optics.OptikalProcessor
 import com.google.common.collect.ImmutableList
 import com.google.common.io.Files
-import com.google.testing.compile.Compilation
-import com.google.testing.compile.Compilation.Status.*
 import com.google.testing.compile.CompilationSubject.assertThat
 import com.google.testing.compile.Compiler.javac
 import com.google.testing.compile.JavaFileObjects
 import io.kotlintest.matchers.shouldBe
+import io.kotlintest.specs.StringSpec
 import java.io.File
 import java.nio.file.Paths
 
@@ -62,7 +58,7 @@ open class APTest : StringSpec() {
         val expected = File(expectedDir, dest).readText()
         val actual = temp.listFiles()[0].readText()
 
-        expected shouldBe actual
+        actual shouldBe expected
 
       }
 

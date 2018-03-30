@@ -25,21 +25,22 @@ class PrismsFileGenerator(
       val targetName = target.paramName
 
       """fun $sourceName$targetName(): $prism<$sourceClassName, $targetClassName> = $prism(
-                   |        getOrModify = { $sourceName: $sourceClassName ->
-                   |            when ($sourceName) {
-                   |                is $targetClassName -> $sourceName.right()
-                   |                else -> $sourceName.left()
-                   |            }
-                   |        },
-                   |        reverseGet = ::identity
-                   |)
+                 |  getOrModify = { $sourceName: $sourceClassName ->
+                 |    when ($sourceName) {
+                 |      is $targetClassName -> $sourceName.right()
+                 |      else -> $sourceName.left()
+                 |    }
+                 |  },
+                 |  reverseGet = { it }
+                 |)
                 """.trimMargin()
     }
 
   fun fileHeader(packageName: String): String =
     """package $packageName
                |
-               |import arrow.syntax.either.*
+               |import arrow.core.left
+               |import arrow.core.right
                |
                |""".trimMargin()
 

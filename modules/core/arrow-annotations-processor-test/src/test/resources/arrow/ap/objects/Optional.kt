@@ -12,7 +12,6 @@ fun optionalNullableOptional(): arrow.optics.Optional<`arrow`.`ap`.`objects`.`Op
     }
   }
 )
-
 fun optionalOptionOptional(): arrow.optics.Optional<`arrow`.`ap`.`objects`.`Optional`, `kotlin`.`String`> = arrow.optics.Optional(
   getOrModify = { optional: `arrow`.`ap`.`objects`.`Optional` -> optional.`option`.orNull()?.right() ?: optional.left() },
   set = { value: `kotlin`.`String` ->
