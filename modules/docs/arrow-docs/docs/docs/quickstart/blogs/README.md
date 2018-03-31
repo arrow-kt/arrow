@@ -47,6 +47,14 @@ KotlinConf, San Francisco, Nov '17 - version 0.3.11
 <iframe width="560" height="315" src="https://www.youtube.com/embed/qGef3sFAIxU" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
  
  Mobilization 7, Łódź, Oct '17 - version 0.3.11
+ 
+### It's all about morphisms
+ 
+[@uberto](https://github.com/uberto) gives a gentle introduction to Category Theory for programmers used to OOP but interested in Functional Programming. No Haskell knowledge required. We will explain main concepts behind functional programming with many diagrams and simple metaphors and examples. Some code will clarify how to translate these ideas in programs.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Eq8dv4H3RTE" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+
+Voxxed Days, Vienna, Mar '18 - version 0.6.1
 
 ### Functional Programming in Kotlin
 
