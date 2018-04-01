@@ -6,7 +6,7 @@ import arrow.optics.Traversal
 import arrow.typeclasses.Traverse
 
 inline operator fun <S, A, R> Each<S, A>.invoke(ff: Each<S, A>.() -> R) =
-        run(ff)
+  run(ff)
 
 /**
  * [Each] provides a [Traversal] that can focus into a structure [S] to see all its foci [A].
@@ -16,26 +16,26 @@ inline operator fun <S, A, R> Each<S, A>.invoke(ff: Each<S, A>.() -> R) =
  */
 interface Each<S, A> {
 
+  /**
+   * Get a [Traversal] for a structure [S] with focus in [A].
+   */
+  fun each(): Traversal<S, A>
+
+  companion object {
+
     /**
-     * Get a [Traversal] for a structure [S] with focus in [A].
+     * Lift an instance of [Each] using an [Iso].
      */
-    fun each(): Traversal<S, A>
-
-    companion object {
-
-        /**
-         * Lift an instance of [Each] using an [Iso].
-         */
-        fun <S, A, B> fromIso(iso: Iso<S, A>, EA: Each<A, B>): Each<S, B> = object : Each<S, B> {
-            override fun each(): Traversal<S, B> = iso compose EA.each()
-        }
-
-        /**
-         * Create an instance of [Each] from a [Traverse].
-         */
-        fun <S, A> fromTraverse(T: Traverse<S>): Each<Kind<S, A>, A> = object : Each<Kind<S, A>, A> {
-            override fun each(): Traversal<Kind<S, A>, A> = Traversal.fromTraversable(T)
-        }
+    fun <S, A, B> fromIso(iso: Iso<S, A>, EA: Each<A, B>): Each<S, B> = object : Each<S, B> {
+      override fun each(): Traversal<S, B> = iso compose EA.each()
     }
+
+    /**
+     * Create an instance of [Each] from a [Traverse].
+     */
+    fun <S, A> fromTraverse(T: Traverse<S>): Each<Kind<S, A>, A> = object : Each<Kind<S, A>, A> {
+      override fun each(): Traversal<Kind<S, A>, A> = Traversal.fromTraversable(T)
+    }
+  }
 
 }

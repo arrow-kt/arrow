@@ -21,26 +21,26 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class MapInstancesTest : UnitSpec() {
 
-    init {
-        testLaws(IsoLaws.laws(
-                iso = mapToMapK(),
-                aGen = genMap(Gen.string(), Gen.int()),
-                bGen = genMapK(Gen.string(), Gen.int()),
-                funcGen = genFunctionAToB(genMapK(Gen.string(), Gen.int())),
-                EQA = Eq.any(),
-                EQB = MapK.eq(StringEqInstance, IntEqInstance),
-                bMonoid = MapK.monoid<String, Int>(IntMonoidInstance)
-        ))
+  init {
+    testLaws(IsoLaws.laws(
+      iso = mapToMapK(),
+      aGen = genMap(Gen.string(), Gen.int()),
+      bGen = genMapK(Gen.string(), Gen.int()),
+      funcGen = genFunctionAToB(genMapK(Gen.string(), Gen.int())),
+      EQA = Eq.any(),
+      EQB = MapK.eq(StringEqInstance, IntEqInstance),
+      bMonoid = MapK.monoid<String, Int>(IntMonoidInstance)
+    ))
 
-        testLaws(IsoLaws.laws(
-                iso = mapKToSetK(),
-                aGen = genMapK(Gen.string(), Gen.create { Unit }),
-                bGen = genSetK(Gen.string()),
-                funcGen = genFunctionAToB(genSetK(Gen.string())),
-                EQA = Eq.any(),
-                EQB = Eq.any(),
-                bMonoid = SetK.monoid()
-        ))
-    }
+    testLaws(IsoLaws.laws(
+      iso = mapKToSetK(),
+      aGen = genMapK(Gen.string(), Gen.create { Unit }),
+      bGen = genSetK(Gen.string()),
+      funcGen = genFunctionAToB(genSetK(Gen.string())),
+      EQA = Eq.any(),
+      EQB = Eq.any(),
+      bMonoid = SetK.monoid()
+    ))
+  }
 
 }

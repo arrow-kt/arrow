@@ -8,16 +8,16 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class NumberEqTest : UnitSpec() {
-    init {
+  init {
 
-        testLaws(
-                EqLaws.laws(LongEqInstance) { it.toLong() },
-                EqLaws.laws(IntEqInstance) { it },
-                EqLaws.laws(DoubleEqInstance) { it.toDouble() },
-                EqLaws.laws(FloatEqInstance) { it.toFloat() },
-                EqLaws.laws(ByteEqInstance) { it.toByte() },
-                EqLaws.laws(ShortEqInstance) { it.toShort() }
-        )
+    testLaws(
+      EqLaws.laws(LongEqInstance) { it.toLong() },
+      EqLaws.laws(IntEqInstance) { it },
+      EqLaws.laws(DoubleEqInstance) { it.toDouble() },
+      EqLaws.laws(FloatEqInstance) { it.toFloat() },
+      EqLaws.laws(ByteEqInstance) { it.toByte() },
+      EqLaws.laws(ShortEqInstance) { it.toShort() }
+    )
 
-    }
+  }
 }

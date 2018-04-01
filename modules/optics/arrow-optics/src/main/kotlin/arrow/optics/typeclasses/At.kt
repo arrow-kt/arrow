@@ -6,7 +6,7 @@ import arrow.optics.Iso
 import arrow.optics.Lens
 
 inline operator fun <S, I, A, R> At<S, I, A>.invoke(ff: At<S, I, A>.() -> R) =
-        run(ff)
+  run(ff)
 
 /**
  * [At] provides a [Lens] for a structure [S] to focus in [A] at a given index [I].
@@ -17,25 +17,25 @@ inline operator fun <S, I, A, R> At<S, I, A>.invoke(ff: At<S, I, A>.() -> R) =
  */
 interface At<S, I, A> {
 
+  /**
+   * Get a [Lens] for a structure [S] with focus in [A] at index [i].
+   */
+  fun at(i: I): Lens<S, A>
+
+  companion object {
+
     /**
-     * Get a [Lens] for a structure [S] with focus in [A] at index [i].
+     * Get an [At] for an index [i] given an [Index].
      */
-    fun at(i: I): Lens<S, A>
+    fun <S, I, A> at(AT: At<S, I, A>, i: I): Lens<S, A> = AT.at(i)
 
-    companion object {
-
-        /**
-         * Get an [At] for an index [i] given an [Index].
-         */
-        fun <S, I, A> at(AT: At<S, I, A>, i: I): Lens<S, A> = AT.at(i)
-
-        /**
-         * Lift an instance of [At] using an [Iso].
-         */
-        fun <S, U, I, A> fromIso(AT: At<U, I, A>, iso: Iso<S, U>): At<S, I, A> = object : At<S, I, A> {
-            override fun at(i: I): Lens<S, A> = iso compose AT.at(i)
-        }
+    /**
+     * Lift an instance of [At] using an [Iso].
+     */
+    fun <S, U, I, A> fromIso(AT: At<U, I, A>, iso: Iso<S, U>): At<S, I, A> = object : At<S, I, A> {
+      override fun at(i: I): Lens<S, A> = iso compose AT.at(i)
     }
+  }
 
 }
 

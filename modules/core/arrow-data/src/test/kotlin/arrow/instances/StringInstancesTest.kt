@@ -8,10 +8,10 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class StringInstancesTest : UnitSpec() {
-    init {
-        testLaws(
-                EqLaws.laws(StringEqInstance) { it.toString() },
-                ShowLaws.laws(StringShowInstance, StringEqInstance) { it.toString() }
-        )
-    }
+  init {
+    testLaws(
+      EqLaws.laws(StringEqInstance) { it.toString() },
+      ShowLaws.laws(StringShowInstance, StringEqInstance) { it.toString() }
+    )
+  }
 }

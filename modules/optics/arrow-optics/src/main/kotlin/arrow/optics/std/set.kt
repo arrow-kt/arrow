@@ -8,8 +8,8 @@ import arrow.data.k
  * [PIso] that defines the equality between a [Set] and a [arrow.SetK]
  */
 fun <A, B> pSetToSetK(): PIso<Set<A>, Set<B>, SetK<A>, SetK<B>> = PIso(
-        get = { it.k() },
-        reverseGet = { it.fix().set }
+  get = { it.k() },
+  reverseGet = { it.fix().set }
 )
 
 /**

@@ -16,31 +16,31 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class NonEmptyListInstancesTest : UnitSpec() {
 
-    init {
+  init {
 
-        testLaws(
-                LensLaws.laws(
-                        lens = nelHead(),
-                        aGen = genNonEmptyList(Gen.string()),
-                        bGen = Gen.string(),
-                        funcGen = genFunctionAToB(Gen.string()),
-                        EQA = Eq.any(),
-                        EQB = Eq.any(),
-                        MB = StringMonoidInstance),
+    testLaws(
+      LensLaws.laws(
+        lens = nelHead(),
+        aGen = genNonEmptyList(Gen.string()),
+        bGen = Gen.string(),
+        funcGen = genFunctionAToB(Gen.string()),
+        EQA = Eq.any(),
+        EQB = Eq.any(),
+        MB = StringMonoidInstance),
 
-                IsoLaws.laws(
-                        iso = optionNelToList(),
-                        aGen = genOption(genNonEmptyList(Gen.int())),
-                        bGen = Gen.list(Gen.int()),
-                        funcGen = genFunctionAToB(Gen.list(Gen.int())),
-                        EQA = Eq.any(),
-                        EQB = Eq.any(),
-                        bMonoid = object : Monoid<List<Int>> {
-                            override fun List<Int>.combine(b: List<Int>): List<Int> = this + b
-                            override fun empty(): List<Int> = emptyList()
-                        })
-        )
+      IsoLaws.laws(
+        iso = optionNelToList(),
+        aGen = genOption(genNonEmptyList(Gen.int())),
+        bGen = Gen.list(Gen.int()),
+        funcGen = genFunctionAToB(Gen.list(Gen.int())),
+        EQA = Eq.any(),
+        EQB = Eq.any(),
+        bMonoid = object : Monoid<List<Int>> {
+          override fun List<Int>.combine(b: List<Int>): List<Int> = this + b
+          override fun empty(): List<Int> = emptyList()
+        })
+    )
 
-    }
+  }
 
 }

@@ -16,11 +16,11 @@ object Trampoline : TrampolineFunctions
 
 interface TrampolineFunctions {
 
-    fun <A> done(a: A): TrampolineF<A> = Free.just<ForFunction0, A>(a)
+  fun <A> done(a: A): TrampolineF<A> = Free.just<ForFunction0, A>(a)
 
-    fun <A> defer(a: () -> TrampolineF<A>): TrampolineF<A> = Free.defer(a)
+  fun <A> defer(a: () -> TrampolineF<A>): TrampolineF<A> = Free.defer(a)
 
-    fun <A> delay(a: () -> A): TrampolineF<A> = defer { done(a()) }
+  fun <A> delay(a: () -> A): TrampolineF<A> = defer { done(a()) }
 }
 
 fun <A> TrampolineF<A>.runT(): A = this.foldMap(FunctionK.id(), Function0.monad()).fix().invoke()

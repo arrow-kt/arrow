@@ -16,53 +16,53 @@ import arrow.optics.typeclasses.Index
 import arrow.typeclasses.Applicative
 
 interface ListEachInstance<A> : Each<List<A>, A> {
-    override fun each() = object : Traversal<List<A>, A> {
-        override fun <F> modifyF(FA: Applicative<F>, s: List<A>, f: (A) -> Kind<F, A>): Kind<F, List<A>> =
-                ListK.traverse().run {
-                    FA.run {
-                        s.k().traverse(this, f).let {
-                            it.map() {
-                                it.list
-                            }
-                        }
-                    }
-                }
-    }
+  override fun each() = object : Traversal<List<A>, A> {
+    override fun <F> modifyF(FA: Applicative<F>, s: List<A>, f: (A) -> Kind<F, A>): Kind<F, List<A>> =
+      ListK.traverse().run {
+        FA.run {
+          s.k().traverse(this, f).let {
+            it.map() {
+              it.list
+            }
+          }
+        }
+      }
+  }
 
-    companion object {
-        operator fun <A> invoke() = object : ListEachInstance<A> {}
-    }
+  companion object {
+    operator fun <A> invoke() = object : ListEachInstance<A> {}
+  }
 }
 
 interface ListFilterIndexInstance<A> : FilterIndex<List<A>, Int, A> {
-    override fun filter(p: (Int) -> Boolean): Traversal<List<A>, A> = object : Traversal<List<A>, A> {
-        override fun <F> modifyF(FA: Applicative<F>, s: List<A>, f: (A) -> Kind<F, A>): Kind<F, List<A>> =
-                ListK.traverse().run {
-                    FA.run {
-                        s.mapIndexed { index, a -> a toT index }.k().traverse(this, { (a, j) ->
-                            if (p(j)) f(a) else just(a)
-                        })
-                                .let {
-                                    it.map() {
-                                        it.list
-                                    }
-                                }
-                    }
-                }
-    }
+  override fun filter(p: (Int) -> Boolean): Traversal<List<A>, A> = object : Traversal<List<A>, A> {
+    override fun <F> modifyF(FA: Applicative<F>, s: List<A>, f: (A) -> Kind<F, A>): Kind<F, List<A>> =
+      ListK.traverse().run {
+        FA.run {
+          s.mapIndexed { index, a -> a toT index }.k().traverse(this, { (a, j) ->
+            if (p(j)) f(a) else just(a)
+          })
+            .let {
+              it.map() {
+                it.list
+              }
+            }
+        }
+      }
+  }
 
-    companion object {
-        operator fun <A> invoke() = object : ListFilterIndexInstance<A> {}
-    }
+  companion object {
+    operator fun <A> invoke() = object : ListFilterIndexInstance<A> {}
+  }
 }
 
 interface ListIndexInstance<A> : Index<List<A>, Int, A> {
-    override fun index(i: Int): Optional<List<A>, A> = POptional(
-            getOrModify = { it.getOrNull(i)?.let(::Right) ?: it.let(::Left) },
-            set = { a -> { l -> l.mapIndexed { index: Int, aa: A -> if (index == i) a else aa } } }
-    )
+  override fun index(i: Int): Optional<List<A>, A> = POptional(
+    getOrModify = { it.getOrNull(i)?.let(::Right) ?: it.let(::Left) },
+    set = { a -> { l -> l.mapIndexed { index: Int, aa: A -> if (index == i) a else aa } } }
+  )
 
-    companion object {
-        operator fun <A> invoke() = object : ListIndexInstance<A> {}
-    }
+  companion object {
+    operator fun <A> invoke() = object : ListIndexInstance<A> {}
+  }
 }

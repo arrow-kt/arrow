@@ -7,17 +7,17 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class NonEmptyListSemigroupTest : UnitSpec() {
-    init {
-        "should semigroup with the instance passed" {
-            forAll { value: Int ->
-                with(NonEmptyList.semigroup<Int>()) {
+  init {
+    "should semigroup with the instance passed" {
+      forAll { value: Int ->
+        with(NonEmptyList.semigroup<Int>()) {
 
-                    val seen = NonEmptyList.of(value).combine(NonEmptyList.of(value))
-                    val expected = NonEmptyList.of(value, value)
+          val seen = NonEmptyList.of(value).combine(NonEmptyList.of(value))
+          val expected = NonEmptyList.of(value, value)
 
-                    expected == seen
-                }
-            }
+          expected == seen
         }
+      }
     }
+  }
 }

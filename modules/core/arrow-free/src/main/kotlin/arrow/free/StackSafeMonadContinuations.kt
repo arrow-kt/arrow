@@ -9,39 +9,39 @@ import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
 
 @RestrictsSuspension
 open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
-        Continuation<Free<F, A>>, Monad<F> by M {
+  Continuation<Free<F, A>>, Monad<F> by M {
 
-    override fun resume(value: Free<F, A>) {
-        returnedMonad = value
+  override fun resume(value: Free<F, A>) {
+    returnedMonad = value
+  }
+
+  override fun resumeWithException(exception: Throwable) {
+    throw exception
+  }
+
+  protected lateinit var returnedMonad: Free<F, A>
+
+  internal fun returnedMonad(): Free<F, A> = returnedMonad
+
+  suspend fun <B> Kind<F, B>.bind(): B = bind { Free.liftF(this) }
+
+  suspend fun <B> Free<F, B>.bind(): B = bind { this }
+
+  suspend fun <B> bind(m: () -> Free<F, B>): B = suspendCoroutineOrReturn { c ->
+    val labelHere = c.stackLabels // save the whole coroutine stack labels
+    returnedMonad = m().flatMap { z ->
+      c.stackLabels = labelHere
+      c.resume(z)
+      returnedMonad
     }
+    COROUTINE_SUSPENDED
+  }
 
-    override fun resumeWithException(exception: Throwable) {
-        throw exception
-    }
+  @Deprecated("Yielding in comprehensions isn't required anymore", ReplaceWith("b"))
+  infix fun <B> yields(b: B): B = b
 
-    protected lateinit var returnedMonad: Free<F, A>
-
-    internal fun returnedMonad(): Free<F, A> = returnedMonad
-
-    suspend fun <B> Kind<F, B>.bind(): B = bind { Free.liftF(this) }
-
-    suspend fun <B> Free<F, B>.bind(): B = bind { this }
-
-    suspend fun <B> bind(m: () -> Free<F, B>): B = suspendCoroutineOrReturn { c ->
-        val labelHere = c.stackLabels // save the whole coroutine stack labels
-        returnedMonad = m().flatMap { z ->
-            c.stackLabels = labelHere
-            c.resume(z)
-            returnedMonad
-        }
-        COROUTINE_SUSPENDED
-    }
-
-    @Deprecated("Yielding in comprehensions isn't required anymore", ReplaceWith("b"))
-    infix fun <B> yields(b: B): B = b
-
-    @Deprecated("Yielding in comprehensions isn't required anymore", ReplaceWith("b()"))
-    infix fun <B> yields(b: () -> B): B = b()
+  @Deprecated("Yielding in comprehensions isn't required anymore", ReplaceWith("b()"))
+  infix fun <B> yields(b: () -> B): B = b()
 }
 
 /**
@@ -53,9 +53,9 @@ open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: C
  * over any stack-unsafe monads.
  */
 fun <F, B> Monad<F>.bindingStackSafe(c: suspend StackSafeMonadContinuation<F, *>.() -> B):
-        Free<F, B> {
-    val continuation = StackSafeMonadContinuation<F, B>(this)
-    val wrapReturn: suspend StackSafeMonadContinuation<F, *>.() -> Free<F, B> = { Free.just(c()) }
-    wrapReturn.startCoroutine(continuation, continuation)
-    return continuation.returnedMonad()
+  Free<F, B> {
+  val continuation = StackSafeMonadContinuation<F, B>(this)
+  val wrapReturn: suspend StackSafeMonadContinuation<F, *>.() -> Free<F, B> = { Free.just(c()) }
+  wrapReturn.startCoroutine(continuation, continuation)
+  return continuation.returnedMonad()
 }

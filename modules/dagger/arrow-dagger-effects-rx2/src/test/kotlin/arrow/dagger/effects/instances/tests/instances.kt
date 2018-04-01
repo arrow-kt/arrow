@@ -17,29 +17,29 @@ import javax.inject.Singleton
  */
 @Singleton
 @Component(modules = [
-    ArrowEffectsRx2Instances::class
+  ArrowEffectsRx2Instances::class
 ])
 interface Runtime {
-    fun observableKWFunctor(): Functor<ForObservableK>
-    fun observableKWApplicative(): Applicative<ForObservableK>
-    fun observableKWApplicativeError(): ApplicativeError<ForObservableK, Throwable>
-    fun observableKWMonad(): Monad<ForObservableK>
-    fun observableKWMonadError(): MonadError<ForObservableK, Throwable>
-    fun observableKWMonadSuspend(): MonadSuspend<ForObservableK>
-    fun observableKWAsync(): Async<ForObservableK>
-    fun observableKWEffect(): Effect<ForObservableK>
-    fun flowableKWFunctor(): Functor<ForFlowableK>
-    fun flowableKWApplicative(): Applicative<ForFlowableK>
-    fun flowableKWApplicativeError(): ApplicativeError<ForFlowableK, Throwable>
-    fun flowableKWMonad(): Monad<ForFlowableK>
-    fun flowableKWMonadError(): MonadError<ForFlowableK, Throwable>
-    fun flowableKWMonadSuspend(): MonadSuspend<ForFlowableK>
-    fun flowableKWAsync(): Async<ForFlowableK>
-    fun flowableKWEffect(): Effect<ForFlowableK>
+  fun observableKWFunctor(): Functor<ForObservableK>
+  fun observableKWApplicative(): Applicative<ForObservableK>
+  fun observableKWApplicativeError(): ApplicativeError<ForObservableK, Throwable>
+  fun observableKWMonad(): Monad<ForObservableK>
+  fun observableKWMonadError(): MonadError<ForObservableK, Throwable>
+  fun observableKWMonadSuspend(): MonadSuspend<ForObservableK>
+  fun observableKWAsync(): Async<ForObservableK>
+  fun observableKWEffect(): Effect<ForObservableK>
+  fun flowableKWFunctor(): Functor<ForFlowableK>
+  fun flowableKWApplicative(): Applicative<ForFlowableK>
+  fun flowableKWApplicativeError(): ApplicativeError<ForFlowableK, Throwable>
+  fun flowableKWMonad(): Monad<ForFlowableK>
+  fun flowableKWMonadError(): MonadError<ForFlowableK, Throwable>
+  fun flowableKWMonadSuspend(): MonadSuspend<ForFlowableK>
+  fun flowableKWAsync(): Async<ForFlowableK>
+  fun flowableKWEffect(): Effect<ForFlowableK>
 }
 
 object Arrow {
-    val instances = DaggerRuntime.builder().build()
+  val instances = DaggerRuntime.builder().build()
 }
 
 
