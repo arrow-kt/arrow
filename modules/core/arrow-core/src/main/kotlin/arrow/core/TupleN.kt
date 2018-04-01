@@ -68,7 +68,7 @@ data class Tuple9<out A, out B, out C, out D, out E, out F, out G, out H, out I>
 }
 
 @higherkind
-data class Tuple10<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I, val j: J): Tuple10Of<A, B, C, D, E, F, G, H, I, J> {
+data class Tuple10<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I, val j: J) : Tuple10Of<A, B, C, D, E, F, G, H, I, J> {
     companion object
 }
 

@@ -61,6 +61,7 @@ class ProductFileGenerator(
             |
             |import arrow.syntax.applicative.*
             |import arrow.core.toT
+            |import arrow.instances.*
             |
             |fun ${product.sourceClassName}.combine(other: ${product.sourceClassName}): ${product.sourceClassName} =
             |  this + other
@@ -101,15 +102,11 @@ class ProductFileGenerator(
             |    this.map(tupled(${product.targets.joinToString(", ") { it.paramName }}), { it.to${product.sourceSimpleName}() })
             |
             |object ${product.sourceSimpleName}SemigroupInstance : arrow.typeclasses.Semigroup<${product.sourceClassName}> {
-            |  override fun combine(a: ${product.sourceClassName}, b: ${product.sourceClassName}): ${product.sourceClassName} {
-            |    val (${product.types().joinToString(", ") { "x$it" }}) = a
+            |  override fun ${product.sourceClassName}.combine(b: ${product.sourceClassName}): ${product.sourceClassName} {
+            |    val (${product.types().joinToString(", ") { "x$it" }}) = this
             |    val (${product.types().joinToString(", ") { "y$it" }}) = b
-            |    return ${product.sourceClassName}(${product.types().zip(product.targetNames).joinToString(", ") { "${Semigroup.factory()}<${it.second}>().combine(x${it.first}, y${it.first})" }})
+            |    return ${product.sourceClassName}(${product.types().zip(product.targetNames).joinToString(", ") { "with(${it.second}.semigroup()){ x${it.first}.combine(y${it.first}) }" }})
             |  }
-            |}
-            |
-            |object ${product.sourceSimpleName}SemigroupInstanceImplicits {
-            |  fun instance(): ${product.sourceSimpleName}SemigroupInstance = ${product.sourceSimpleName}SemigroupInstance
             |}
             |
             |object ${product.sourceSimpleName}MonoidInstance : arrow.typeclasses.Monoid<${product.sourceClassName}> {
@@ -124,18 +121,9 @@ class ProductFileGenerator(
             |    ${product.sourceClassName}(${product.types().zip(product.targetNames).joinToString(", ") { "${Monoid.factory()}<${it.second}>().empty()" }})
             |}
             |
-            |object ${product.sourceSimpleName}MonoidInstanceImplicits {
-            |  fun instance(): ${product.sourceSimpleName}MonoidInstance = ${product.sourceSimpleName}MonoidInstance
-            |}
-            |
             |interface ${product.sourceSimpleName}EqInstance : arrow.typeclasses.Eq<${product.sourceClassName}> {
             |  override fun eqv(a: ${product.sourceClassName}, b: ${product.sourceClassName}): Boolean =
             |    a == b
-            |}
-            |
-            |object ${product.sourceSimpleName}EqInstanceImplicits {
-            |  fun instance(): ${product.sourceSimpleName}EqInstance =
-            |    object : ${product.sourceSimpleName}EqInstance {}
             |}
             |
             |interface ${product.sourceSimpleName}ShowInstance : arrow.typeclasses.Show<${product.sourceClassName}> {
@@ -143,10 +131,6 @@ class ProductFileGenerator(
             |    a.toString()
             |}
             |
-            |object ${product.sourceSimpleName}ShowInstanceImplicits {
-            |  fun instance(): ${product.sourceSimpleName}ShowInstance =
-            |    object : ${product.sourceSimpleName}ShowInstance {}
-            |}
             |""".trimMargin()
 
     private fun tupleConstructor(product: AnnotatedGeneric): String =

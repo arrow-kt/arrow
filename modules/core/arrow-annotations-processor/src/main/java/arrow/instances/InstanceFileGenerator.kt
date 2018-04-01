@@ -1,7 +1,6 @@
 package arrow.instances
 
 import arrow.common.Package
-import arrow.common.messager.logW
 import arrow.common.utils.*
 import me.eugeniomarletti.kotlin.metadata.modality
 import org.jetbrains.kotlin.serialization.ProtoBuf

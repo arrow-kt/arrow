@@ -1,9 +1,7 @@
 package arrow.generic
 
-import arrow.common.messager.logW
 import com.google.auto.service.AutoService
 import arrow.common.utils.AbstractProcessor
-import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.asClassOrPackageDataWrapper
 import arrow.common.utils.knownError
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
@@ -22,11 +20,11 @@ import javax.lang.model.element.Element
 
 @AutoService(Processor::class)
 class ProductProcessor : AbstractProcessor() {
-    
+
     private val annotatedProduct = mutableListOf<AnnotatedGeneric>()
 
     override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
-    
+
     override fun getSupportedAnnotationTypes() = setOf(productAnnotationClass.canonicalName)
 
     override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {

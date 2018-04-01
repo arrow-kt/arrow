@@ -39,6 +39,7 @@ include {
             _ 'core'
             _ 'data'
             _ 'free'
+            _ 'generic'
             _ 'instances'
             _ 'kindedj'
             _ 'mtl'
