@@ -67,7 +67,7 @@ multiplyBy2<ForOption>(Option(1))
 ```
 
 ```kotlin
-multiplyBy2<ForTry>(Try.pure(1))
+multiplyBy2<ForTry>(Try.just(1))
 ```
 
 In the example above we've defined a function that can operate over any data type for which a `Functor` instance is available.

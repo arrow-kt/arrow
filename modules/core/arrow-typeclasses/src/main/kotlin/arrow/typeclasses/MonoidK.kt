@@ -1,6 +1,9 @@
 package arrow.typeclasses
 
-import arrow.*
+import arrow.Kind
+
+inline operator fun <F, A> MonoidK<F>.invoke(ff: MonoidK<F>.() -> A) =
+  run(ff)
 
 /**
  * MonoidK is a universal monoid which operates on kinds.
@@ -8,18 +11,17 @@ import arrow.*
  * MonoidK<F> allows two F<A> values to be combined, for any A. It also means that for any A, there
  * is an "empty" F<A> value.
  */
-@typeclass
-interface MonoidK<F> : SemigroupK<F>, TC {
+interface MonoidK<F> : SemigroupK<F> {
 
-    /**
-     * Given a type A, create an "empty" F<A> value.
-     */
-    fun <A> empty(): Kind<F, A>
+  /**
+   * Given a type A, create an "empty" F<A> value.
+   */
+  fun <A> empty(): Kind<F, A>
 
-    override fun <A> algebra(): Monoid<Kind<F, A>> = object : Monoid<Kind<F, A>> {
+  override fun <A> algebra(): Monoid<Kind<F, A>> = object : Monoid<Kind<F, A>> {
 
-        override fun empty(): Kind<F, A> = this@MonoidK.empty()
+    override fun empty(): Kind<F, A> = empty()
 
-        override fun combine(a: Kind<F, A>, b: Kind<F, A>): Kind<F, A> = this@MonoidK.combineK(a, b)
-    }
+    override fun Kind<F, A>.combine(b: Kind<F, A>): Kind<F, A> = this.combineK(b)
+  }
 }

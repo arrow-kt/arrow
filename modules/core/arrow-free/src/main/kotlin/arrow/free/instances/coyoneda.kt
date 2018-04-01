@@ -6,5 +6,5 @@ import arrow.typeclasses.Functor
 
 @instance(Coyoneda::class)
 interface CoyonedaFunctorInstance<F, G> : Functor<CoyonedaPartialOf<F, G>> {
-    override fun <A, B> map(fa: CoyonedaOf<F, G, A>, f: (A) -> B): Coyoneda<F, G, B> = fa.fix().map(f)
+  override fun <A, B> Kind<CoyonedaPartialOf<F, G>, A>.map(f: (A) -> B): Coyoneda<F, G, B> = fix().map(f)
 }

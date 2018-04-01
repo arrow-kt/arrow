@@ -14,14 +14,14 @@ import javax.inject.Inject
 @Module
 abstract class Function1Instances<F> {
 
-    @Provides
-    fun function1Functor(ev: DaggerFunction1FunctorInstance<F>): Functor<Function1PartialOf<F>> = ev
+  @Provides
+  fun function1Functor(ev: DaggerFunction1FunctorInstance<F>): Functor<Function1PartialOf<F>> = ev
 
-    @Provides
-    fun function1Applicative(ev: DaggerFunction1ApplicativeInstance<F>): Applicative<Function1PartialOf<F>> = ev
+  @Provides
+  fun function1Applicative(ev: DaggerFunction1ApplicativeInstance<F>): Applicative<Function1PartialOf<F>> = ev
 
-    @Provides
-    fun function1Monad(ev: DaggerFunction1MonadInstance<F>): Monad<Function1PartialOf<F>> = ev
+  @Provides
+  fun function1Monad(ev: DaggerFunction1MonadInstance<F>): Monad<Function1PartialOf<F>> = ev
 
 }
 

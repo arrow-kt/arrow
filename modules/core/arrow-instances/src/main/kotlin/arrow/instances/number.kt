@@ -3,233 +3,149 @@ package arrow.instances
 import arrow.typeclasses.*
 
 class NumberSemigroup<A : Number>(val f: (A, A) -> A) : Semigroup<A> {
-    override fun combine(a: A, b: A): A = f(a, b)
+  override fun A.combine(b: A): A = f(this, b)
 }
 
-object ByteMonoid : Monoid<Byte>, Semigroup<Byte> by SGByte {
-    override fun empty(): Byte = 0
-}
-
-object ByteMonoidInstanceImplicits {
-    fun instance(): ByteMonoid = ByteMonoid
-}
+//////////
+// Byte
+//////////
 
 private val SGByte: Semigroup<Byte> = NumberSemigroup({ one, two -> (one + two).toByte() })
 
-object ByteSemigroupInstanceImplicits {
-    fun instance(): Semigroup<Byte> = SGByte
+object ByteMonoidInstance : Monoid<Byte>, Semigroup<Byte> by SGByte {
+  override fun empty(): Byte = 0
 }
+
+object ByteSemigroupInstance : Semigroup<Byte> by SGByte
 
 object ByteOrderInstance : Order<Byte> {
-    override fun compare(a: Byte, b: Byte): Int = a.compareTo(b)
-}
-
-object ByteOrderInstanceImplicits {
-    fun instance(): Order<Byte> = ByteOrderInstance
+  override fun Byte.compare(b: Byte): Int = compareTo(b)
 }
 
 object ByteEqInstance : Eq<Byte> {
-    override fun eqv(a: Byte, b: Byte): Boolean = a == b
-}
-
-object ByteEqInstanceImplicits {
-    fun instance(): ByteEqInstance = ByteEqInstance
+  override fun Byte.eqv(b: Byte): Boolean = this == b
 }
 
 object ByteShowInstance : Show<Byte> {
-    override fun show(a: Byte): String = a.toString()
+  override fun Byte.show(): String = toString()
 }
 
-object ByteShowInstanceImplicits {
-    fun instance(): ByteShowInstance = ByteShowInstance
-}
-
-object DoubleMonoid : Monoid<Double>, Semigroup<Double> by SGDouble {
-    override fun empty(): Double = .0
-}
-
-object DoubleMonoidInstanceImplicits {
-    fun instance(): DoubleMonoid = DoubleMonoid
-}
+//////////
+// Double
+//////////
 
 private val SGDouble: Semigroup<Double> = NumberSemigroup(Double::plus)
 
-object DoubleSemigroupInstanceImplicits {
-    fun instance(): Semigroup<Double> = SGDouble
+object DoubleMonoid : Monoid<Double>, Semigroup<Double> by SGDouble {
+  override fun empty(): Double = .0
 }
+
+object DoubleSemigroupInstance : Semigroup<Double> by SGDouble
 
 object DoubleOrderInstance : Order<Double> {
-    override fun compare(a: Double, b: Double): Int = a.compareTo(b)
-}
-
-object DoubleOrderInstanceImplicits {
-    fun instance(): Order<Double> = DoubleOrderInstance
+  override fun Double.compare(b: Double): Int = compareTo(b)
 }
 
 object DoubleEqInstance : Eq<Double> {
-    override fun eqv(a: Double, b: Double): Boolean = a == b
-}
-
-object DoubleEqInstanceImplicits {
-    fun instance(): DoubleEqInstance = DoubleEqInstance
+  override fun Double.eqv(b: Double): Boolean = this == b
 }
 
 object DoubleShowInstance : Show<Double> {
-    override fun show(a: Double): String = a.toString()
+  override fun Double.show(): String = toString()
 }
 
-object DoubleShowInstanceImplicits {
-    fun instance(): DoubleShowInstance = DoubleShowInstance
-}
-
-object IntMonoid : Monoid<Int>, Semigroup<Int> by SGInt {
-    override fun empty(): Int = 0
-}
-
-object IntMonoidInstanceImplicits {
-    fun instance(): IntMonoid = IntMonoid
-}
+//////////
+// Int
+//////////
 
 private val SGInt: Semigroup<Int> = NumberSemigroup(Int::plus)
 
-object IntSemigroupInstanceImplicits {
-    fun instance(): Semigroup<Int> = SGInt
+object IntSemigroupInstance : Semigroup<Int> by SGInt
+
+object IntMonoidInstance : Monoid<Int>, Semigroup<Int> by SGInt {
+  override fun empty(): Int = 0
 }
 
 object IntEqInstance : Eq<Int> {
-    override fun eqv(a: Int, b: Int): Boolean = a == b
-}
-
-object IntEqInstanceImplicits {
-    fun instance(): IntEqInstance = IntEqInstance
+  override fun Int.eqv(b: Int): Boolean = this == b
 }
 
 object IntShowInstance : Show<Int> {
-    override fun show(a: Int): String = a.toString()
-}
-
-object IntShowInstanceImplicits {
-    fun instance(): IntShowInstance = IntShowInstance
+  override fun Int.show(): String = toString()
 }
 
 object IntOrderInstance : Order<Int> {
-    override fun compare(a: Int, b: Int): Int = a.compareTo(b)
+  override fun Int.compare(b: Int): Int = compareTo(b)
 }
 
-object IntOrderInstanceImplicits {
-    fun instance(): Order<Int> = IntOrderInstance
-}
-
-object LongMonoid : Monoid<Long>, Semigroup<Long> by SGLong {
-    override fun empty(): Long = 0L
-}
-
-object LongMonoidInstanceImplicits {
-    fun instance(): LongMonoid = LongMonoid
-}
+//////////
+// Long
+//////////
 
 private val SGLong: Semigroup<Long> = NumberSemigroup(Long::plus)
 
-object LongSemigroupInstanceImplicits {
-    fun instance(): Semigroup<Long> = SGLong
+object LongMonoidInstance : Monoid<Long>, Semigroup<Long> by SGLong {
+  override fun empty(): Long = 0L
 }
+
+object LongSemigroupInstance : Semigroup<Long> by SGLong
 
 object LongOrderInstance : Order<Long> {
-    override fun compare(a: Long, b: Long): Int = a.compareTo(b)
-}
-
-object LongOrderInstanceImplicits {
-    fun instance(): Order<Long> = LongOrderInstance
+  override fun Long.compare(b: Long): Int = compareTo(b)
 }
 
 object LongEqInstance : Eq<Long> {
-    override fun eqv(a: Long, b: Long): Boolean = a == b
-}
-
-object LongEqInstanceImplicits {
-    fun instance(): LongEqInstance = LongEqInstance
+  override fun Long.eqv(b: Long): Boolean = this == b
 }
 
 object LongShowInstance : Show<Long> {
-    override fun show(a: Long): String = a.toString()
+  override fun Long.show(): String = toString()
 }
 
-object LongShowInstanceImplicits {
-    fun instance(): LongShowInstance = LongShowInstance
-}
-
-object ShortMonoid : Monoid<Short>, Semigroup<Short> by SGShort {
-    override fun empty(): Short = 0
-}
-
-object ShortMonoidInstanceImplicits {
-    fun instance(): ShortMonoid = ShortMonoid
-}
+//////////
+// Short
+//////////
 
 private val SGShort: Semigroup<Short> = NumberSemigroup({ one, two -> (one + two).toShort() })
 
-object ShortSemigroupInstanceImplicits {
-    fun instance(): Semigroup<Short> = SGShort
+object ShortMonoid : Monoid<Short>, Semigroup<Short> by SGShort {
+  override fun empty(): Short = 0
 }
+
+object ShortSemigroupInstance : Semigroup<Short> by SGShort
 
 object ShortOrderInstance : Order<Short> {
-    override fun compare(a: Short, b: Short): Int = a.compareTo(b)
-}
-
-object ShortOrderInstanceImplicits {
-    fun instance(): Order<Short> = ShortOrderInstance
+  override fun Short.compare(b: Short): Int = compareTo(b)
 }
 
 object ShortEqInstance : Eq<Short> {
-    override fun eqv(a: Short, b: Short): Boolean = a == b
-}
-
-object ShortEqInstanceImplicits {
-    fun instance(): ShortEqInstance = ShortEqInstance
+  override fun Short.eqv(b: Short): Boolean = this == b
 }
 
 object ShortShowInstance : Show<Short> {
-    override fun show(a: Short): String = a.toString()
+  override fun Short.show(): String = toString()
 }
 
-object ShortShowInstanceImplicits {
-    fun instance(): ShortShowInstance = ShortShowInstance
-}
-
-object FloatMonoid : Monoid<Float>, Semigroup<Float> by SGFloat {
-    override fun empty(): Float = .0f
-}
-
-object FloatMonoidInstanceImplicits {
-    fun instance(): FloatMonoid = FloatMonoid
-}
+//////////
+// Float
+//////////
 
 private val SGFloat: Semigroup<Float> = NumberSemigroup(Float::plus)
 
-object FloatSemigroupInstanceImplicits {
-    fun instance(): Semigroup<Float> = SGFloat
+object FloatMonoid : Monoid<Float>, Semigroup<Float> by SGFloat {
+  override fun empty(): Float = .0f
 }
+
+object FloatSemigroupInstance : Semigroup<Float> by SGFloat
 
 object FloatOrderInstance : Order<Float> {
-    override fun compare(a: Float, b: Float): Int = a.compareTo(b)
-}
-
-object FloatOrderInstanceImplicits {
-    fun instance(): Order<Float> = FloatOrderInstance
+  override fun Float.compare(b: Float): Int = compareTo(b)
 }
 
 object FloatEqInstance : Eq<Float> {
-    override fun eqv(a: Float, b: Float): Boolean = a == b
-}
-
-object FloatEqInstanceImplicits {
-    fun instance(): FloatEqInstance = FloatEqInstance
+  override fun Float.eqv(b: Float): Boolean = this == b
 }
 
 object FloatShowInstance : Show<Float> {
-    override fun show(a: Float): String = a.toString()
-}
-
-object FloatShowInstanceImplicits {
-    fun instance(): FloatShowInstance = FloatShowInstance
+  override fun Float.show(): String = toString()
 }

@@ -4,30 +4,30 @@ import arrow.*
 
 @higherkind
 data class Tuple2<out A, out B>(val a: A, val b: B) : Tuple2Of<A, B> {
-    fun <C> map(f: (B) -> C) =
-            a toT f(b)
+  fun <C> map(f: (B) -> C) =
+    a toT f(b)
 
-    fun <C> ap(f: Tuple2Of<*, (B) -> C>) =
-            map(f.fix().b)
+  fun <C> ap(f: Tuple2Of<*, (B) -> C>) =
+    map(f.fix().b)
 
-    fun <C> flatMap(f: (B) -> Tuple2Of<@UnsafeVariance A, C>) =
-            f(b).fix()
+  fun <C> flatMap(f: (B) -> Tuple2Of<@UnsafeVariance A, C>) =
+    f(b).fix()
 
-    fun <C> coflatMap(f: (Tuple2Of<A, B>) -> C) =
-            a toT f(this)
+  fun <C> coflatMap(f: (Tuple2Of<A, B>) -> C) =
+    a toT f(this)
 
-    fun extract() =
-            b
+  fun extract() =
+    b
 
-    fun <C> foldL(b: C, f: (C, B) -> C) =
-            f(b, this.b)
+  fun <C> foldL(b: C, f: (C, B) -> C) =
+    f(b, this.b)
 
-    fun <C> foldR(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>) =
-            f(b, lb)
+  fun <C> foldR(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>) =
+    f(b, lb)
 
-    fun reverse(): Tuple2<B, A> = Tuple2(b, a)
+  fun reverse(): Tuple2<B, A> = Tuple2(b, a)
 
-    companion object
+  companion object
 }
 
 @higherkind

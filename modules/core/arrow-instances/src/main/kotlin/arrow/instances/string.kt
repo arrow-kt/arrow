@@ -3,45 +3,23 @@ package arrow.instances
 import arrow.typeclasses.*
 
 object StringSemigroupInstance : Semigroup<String> {
-    override fun combine(a: String, b: String): String = "$a$b"
-}
-
-object StringSemigroupInstanceImplicits {
-
-    fun instance(): StringSemigroupInstance = StringSemigroupInstance
+  override fun String.combine(b: String): String = "${this}$b"
 }
 
 object StringMonoidInstance : Monoid<String> {
-    override fun empty(): String = ""
+  override fun empty(): String = ""
 
-    override fun combine(a: String, b: String): String = StringSemigroupInstance.combine(a, b)
-}
-
-object StringMonoidInstanceImplicits {
-
-    fun instance(): StringMonoidInstance = StringMonoidInstance
+  override fun String.combine(b: String): String = StringSemigroupInstance.run { combine(b) }
 }
 
 object StringEqInstance : Eq<String> {
-    override fun eqv(a: String, b: String): Boolean = a == b
-}
-
-object StringOrderInstance : Order<String> {
-    override fun compare(a: String, b: String): Int = a.compareTo(b)
+  override fun String.eqv(b: String): Boolean = this == b
 }
 
 object StringShowInstance : Show<String> {
-    override fun show(a: String): String = a
+  override fun String.show(): String = this
 }
 
-object StringEqInstanceImplicits {
-    fun instance(): StringEqInstance = StringEqInstance
-}
-
-object StringOrderInstanceImplicits {
-    fun instance(): StringOrderInstance = StringOrderInstance
-}
-
-object StringShowInstanceImplicits {
-    fun instance(): StringShowInstance = StringShowInstance
+object StringOrderInstance : Order<String> {
+    override fun String.compare(b: String): Int = this.compareTo(b)
 }

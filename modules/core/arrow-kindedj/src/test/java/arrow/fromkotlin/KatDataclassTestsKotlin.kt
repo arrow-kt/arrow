@@ -11,11 +11,11 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class KatDataclassTestsKotlin : StringSpec() {
-    private val kinded = KatDataclass1(0)
+  private val kinded = KatDataclass1(0)
 
-    init {
-        "Values should be convertible" {
-            KatDataclassArrowShow.show(kinded) shouldBe KatDataclassKindedJShow.INSTANCE.show(kinded.toKindedJ())
-        }
+  init {
+    "Values should be convertible" {
+      KatDataclassArrowShow.show(kinded) shouldBe KatDataclassKindedJShow.INSTANCE.show(kinded.toKindedJ())
     }
+  }
 }

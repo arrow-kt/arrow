@@ -25,7 +25,7 @@ SetK(setOf(1, 2, 5, 3, 2))
 ```
 or
 ```kotlin:ank
-SetK.pure(1)
+SetK.just(1)
 ```
 
 given the following:
@@ -58,8 +58,9 @@ numbers.foldLeft(0) {sum, number -> sum + (number * number)}
 
 Available Instances:
 
-```kotlin:ank
+```kotlin
 import arrow.debug.*
 
 showInstances<ForSetK, Unit>()
+// [Foldable, Monoid, MonoidK, Semigroup, SemigroupK]
 ```

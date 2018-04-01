@@ -10,23 +10,23 @@ import javax.inject.Inject
 @Module
 abstract class EitherInstances<L> {
 
-    @Provides
-    fun eitherFunctor(ev: DaggerEitherFunctorInstance<L>): Functor<EitherPartialOf<L>> = ev
+  @Provides
+  fun eitherFunctor(ev: DaggerEitherFunctorInstance<L>): Functor<EitherPartialOf<L>> = ev
 
-    @Provides
-    fun eitherApplicative(ev: DaggerEitherApplicativeInstance<L>): Applicative<EitherPartialOf<L>> = ev
+  @Provides
+  fun eitherApplicative(ev: DaggerEitherApplicativeInstance<L>): Applicative<EitherPartialOf<L>> = ev
 
-    @Provides
-    fun eitherMonad(ev: DaggerEitherMonadInstance<L>): Monad<EitherPartialOf<L>> = ev
+  @Provides
+  fun eitherMonad(ev: DaggerEitherMonadInstance<L>): Monad<EitherPartialOf<L>> = ev
 
-    @Provides
-    fun eitherFoldable(ev: DaggerEitherFoldableInstance<L>): Foldable<EitherPartialOf<L>> = ev
+  @Provides
+  fun eitherFoldable(ev: DaggerEitherFoldableInstance<L>): Foldable<EitherPartialOf<L>> = ev
 
-    @Provides
-    fun eitherTraverse(ev: DaggerEitherTraverseInstance<L>): Traverse<EitherPartialOf<L>> = ev
+  @Provides
+  fun eitherTraverse(ev: DaggerEitherTraverseInstance<L>): Traverse<EitherPartialOf<L>> = ev
 
-    @Provides
-    fun eitherSemigroupK(ev: DaggerEitherSemigroupKInstance<L>): SemigroupK<EitherPartialOf<L>> = ev
+  @Provides
+  fun eitherSemigroupK(ev: DaggerEitherSemigroupKInstance<L>): SemigroupK<EitherPartialOf<L>> = ev
 
 }
 

@@ -12,12 +12,12 @@ import dagger.Provides
 @Module
 class StringInstances {
 
-    @Provides
-    fun stringSemigroup(): Semigroup<String> = StringSemigroupInstance
+  @Provides
+  fun stringSemigroup(): Semigroup<String> = StringSemigroupInstance
 
-    @Provides
-    fun stringMonoid(): Monoid<String> = StringMonoidInstance
+  @Provides
+  fun stringMonoid(): Monoid<String> = StringMonoidInstance
 
-    @Provides
-    fun stringEq(): Eq<String> = StringEqInstance
+  @Provides
+  fun stringEq(): Eq<String> = StringEqInstance
 }
