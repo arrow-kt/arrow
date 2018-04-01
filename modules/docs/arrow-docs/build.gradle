@@ -2,7 +2,7 @@ apply plugin: 'ank-gradle-plugin'
 apply plugin: 'org.ajoberstar.git-publish'
 
 dependencies {
-    compile 'io.arrow-kt:ank-core:0.6.2-20180328.183436-8'
+    compile 'io.arrow-kt:ank-core:0.7.0-20180401.180605-1'
     compile project(':arrow-data')
     compile project(':arrow-core')
     compile project(':arrow-instances')
