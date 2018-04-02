@@ -2,9 +2,6 @@ package arrow.optics
 
 import arrow.core.*
 import arrow.data.ListK
-import arrow.data.eq
-import arrow.data.k
-import arrow.data.monoid
 import arrow.instances.IntMonoidInstance
 import arrow.instances.StringMonoidInstance
 import arrow.test.UnitSpec

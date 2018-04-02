@@ -5,8 +5,6 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import arrow.typeclasses.Eq
 import arrow.test.laws.IsoLaws
-import arrow.data.k
-import arrow.data.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import org.junit.runner.RunWith

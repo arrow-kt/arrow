@@ -8,9 +8,6 @@ import arrow.test.laws.IsoLaws
 import arrow.core.monoid
 import arrow.data.ListK
 import arrow.data.NonEmptyList
-import arrow.data.k
-import arrow.data.monoid
-import arrow.data.semigroup
 import arrow.test.laws.OptionalLaws
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB

@@ -1,6 +1,6 @@
 package arrow.dagger.instances
 
-import arrow.data.Function1PartialOf
+import arrow.core.Function1PartialOf
 import arrow.instances.Function1ApplicativeInstance
 import arrow.instances.Function1FunctorInstance
 import arrow.instances.Function1MonadInstance

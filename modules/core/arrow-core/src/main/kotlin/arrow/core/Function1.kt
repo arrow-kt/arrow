@@ -1,8 +1,5 @@
-package arrow.data
+package arrow.core
 
-import arrow.core.Either
-import arrow.core.andThen
-import arrow.core.compose
 import arrow.higherkind
 
 fun <I, O> ((I) -> O).k(): Function1<I, O> = Function1(this)

@@ -249,8 +249,8 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
   fun <U, V> choice(other: PTraversal<U, V, A, B>): PTraversal<Either<S, U>, Either<T, V>, A, B> = object : PTraversal<Either<S, U>, Either<T, V>, A, B> {
     override fun <F> modifyF(FA: Applicative<F>, s: Either<S, U>, f: (A) -> Kind<F, B>): Kind<F, Either<T, V>> = FA.run {
       s.fold(
-        { a -> this@PTraversal.modifyF(FA, a, f).map() { Either.Left(it) } },
-        { u -> other.modifyF(FA, u, f).map() { Either.Right(it) } }
+        { a -> this@PTraversal.modifyF(FA, a, f).map { Either.Left(it) } },
+        { u -> other.modifyF(FA, u, f).map { Either.Right(it) } }
       )
     }
   }

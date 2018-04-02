@@ -1,6 +1,8 @@
 package arrow.data
 
 import arrow.Kind
+import arrow.core.Function0
+import arrow.core.k
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
 import arrow.test.laws.MonadLaws

@@ -1,8 +1,8 @@
 package arrow.instances
 
-import arrow.*
+import arrow.Kind
 import arrow.core.*
-import arrow.data.*
+import arrow.instance
 import arrow.typeclasses.*
 
 @instance(Function0::class)
