@@ -52,16 +52,14 @@ val optionIntDoubleKleisli = Kleisli { str: String ->
   if (str.toCharArray().all { it.isDigit() }) Some(intToDouble) else None
 }
   
-optionIntKleisli.ap(optionIntDoubleKleisli,Option.applicative()).fix().run("1")
+optionIntKleisli.ap(Option.applicative(), optionIntDoubleKleisli).fix().run("1")
 ```
 
 #### Map
 The `map` function transform the `Kleisli` output value.
 
 ```kotlin:ank
-import arrow.syntax.functor.map
-
-optionIntKleisli.map { output -> output + 1 }.fix().run("1")
+optionIntKleisli.map(Option.applicative()) { output -> output + 1 }.fix().run("1")
 ```
 
 #### FlatMap
@@ -74,7 +72,7 @@ val optionDoubleKleisli = Kleisli { str: String ->
   if (str.toCharArray().all { it.isDigit() }) Some(str.toDouble()) else None
 }
   
-optionIntKleisli.flatMap({optionDoubleKleisli},Option.monad()).fix().run("1")
+optionIntKleisli.flatMap(Option.monad(), { optionDoubleKleisli }).fix().run("1")
 ```
 
 
@@ -88,19 +86,19 @@ val optionFromOptionKleisli = Kleisli { number: Int ->
    Some(number+1)
 }
   
-optionIntKleisli.andThen(optionFromOptionKleisli,Option.monad()).fix().run("1")
+optionIntKleisli.andThen(Option.monad(), optionFromOptionKleisli).fix().run("1")
 ```
 
 with another function
 
 ```kotlin:ank
-optionIntKleisli.andThen({number: Int -> Some(number+1)}, Option.monad()).fix().run("1")
+optionIntKleisli.andThen(Option.monad(), { number: Int -> Some(number+1) }).fix().run("1")
 ```
 
 or to replace the `Kleisli` result
 
 ```kotlin:ank
-optionIntKleisli.andThen(Some(0), Option.monad()).fix().run("1")
+optionIntKleisli.andThen(Option.monad(), Some(0)).fix().run("1")
 ```
 
 

@@ -24,6 +24,7 @@ So let's test this out with an example:
 ```kotlin:ank
 import arrow.*
 import arrow.core.*
+import arrow.data.*
 
 data class Country(val code: String)
 data class Address(val id: Int, val country: Option<Country>)
@@ -47,10 +48,6 @@ typealias CountryNotFound = BizError.CountryNotFound
 We can now implement a naive lookup function to obtain the country code given a person result.
 
 ```kotlin:ank
-import arrow.syntax.function.*
-import arrow.syntax.either.*
-import arrow.syntax.option.*
-
 fun getCountryCode(maybePerson : Either<BizError, Person>): Either<BizError, String> =
   maybePerson.flatMap { person ->
     person.address.toEither({ AddressNotFound(person.id) }).flatMap { address ->
@@ -193,16 +190,14 @@ So our specialization `EitherT<ForObservableK, BizError, A>` is the EitherT tran
 We can now lift any value to a `EitherT<F, BizError, A>` which looks like this:
 
 ```kotlin:ank
-import arrow.syntax.applicative.*
-import arrow.data.*
-val eitherTVal = 1.just<EitherTPartialOf<ForObservableK, BizError>, Int>()
+val eitherTVal = EitherT.just<ForObservableK, BizError, Int>(ObservableK.applicative(), 1)
 eitherTVal
 ```
 
 And back to the `ObservableK<Either<BizError, A>>` running the transformer
 
 ```kotlin:ank
-eitherTVal.value()
+eitherTVal.fix().value
 ```
 
 So how would our function look if we implemented it with the EitherT monad transformer?
@@ -226,7 +221,7 @@ Here we no longer have to deal with the `Left` cases, and the binding to the val
 As `EitherT<F, A ,B>` allows to manipulate the nested `Either` structure, it provides a `mapLeft` method to map over the left element of nested Eithers.
 
 ```kotlin:ank
-EitherT(Option(3.left())).mapLeft({it + 1}, Option.functor())
+EitherT(Option(3.left())).mapLeft(Option.functor(), {it + 1})
 ```
 
 ## Instances

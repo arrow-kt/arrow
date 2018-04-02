@@ -129,7 +129,7 @@ class CofreeTest : UnitSpec() {
       "cataM should traverse the structure in a stack-safe way on a monad" {
         val folder: (Int, Kind<ForOption, NonEmptyList<Int>>) -> EvalOption<NonEmptyList<Int>> = { i, lb ->
           if (i <= 2000)
-            OptionT.just(NonEmptyList(i, lb.fix().fold({ emptyList<Int>() }, { it.all })), Eval.applicative())
+            OptionT.just(Eval.applicative(), NonEmptyList(i, lb.fix().fold({ emptyList<Int>() }, { it.all })))
           else
             OptionT.none(Eval.applicative())
         }
