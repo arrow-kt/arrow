@@ -2,6 +2,8 @@ package arrow.optics
 
 import arrow.core.*
 import arrow.data.ListK
+import arrow.data.eq
+import arrow.data.k
 import arrow.instances.StringMonoidInstance
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
@@ -99,7 +101,7 @@ class IsoTest : UnitSpec() {
 
       "asFold should behave as valid Fold: getAll" {
         forAll(TokenGen) { token ->
-          getAll(ListK.monoid(), token) == listOf(token.value).k()
+          getAll(token) == listOf(token.value).k()
         }
       }
 
