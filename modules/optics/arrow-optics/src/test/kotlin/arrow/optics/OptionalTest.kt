@@ -4,7 +4,6 @@ import arrow.core.*
 import arrow.data.ListK
 import arrow.data.eq
 import arrow.data.k
-import arrow.data.monoid
 import arrow.instances.IntMonoidInstance
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
@@ -109,7 +108,7 @@ class OptionalTest : UnitSpec() {
 
       "asFold should behave as valid Fold: getAll" {
         forAll { ints: List<Int> ->
-          getAll(ListK.monoid(), ints) == ints.firstOrNull().toOption().toList().k()
+          getAll(ints) == ints.firstOrNull().toOption().toList().k()
         }
       }
 

@@ -21,7 +21,7 @@ class FoldTest : UnitSpec() {
       val select = Fold.select<List<Int>> { it.contains(1) }
 
       forAll(Gen.list(Gen.int()), { ints ->
-        select.run { getAll(ListK.monoid(), ints) }.list.firstOrNull() ==
+        select.run { getAll(ints) }.list.firstOrNull() ==
           ints.let { if (it.contains(1)) it else null }
       })
     }
@@ -48,7 +48,7 @@ class FoldTest : UnitSpec() {
 
       "Get all targets" {
         forAll(Gen.list(Gen.int()), { ints ->
-          getAll(ListK.monoid(), ints.k()) == ints.k()
+          getAll(ints.k()) == ints.k()
         })
       }
 

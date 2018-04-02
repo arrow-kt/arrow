@@ -1,5 +1,9 @@
 package arrow.data
 
+import arrow.core.Function1
+import arrow.core.Function1Of
+import arrow.core.invoke
+import arrow.core.monad
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadLaws
 import arrow.typeclasses.Eq

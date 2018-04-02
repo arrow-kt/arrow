@@ -4,7 +4,6 @@ import arrow.core.*
 import arrow.data.ListK
 import arrow.data.eq
 import arrow.data.k
-import arrow.data.monoid
 import arrow.instances.IntMonoidInstance
 import arrow.instances.StringMonoidInstance
 import arrow.test.UnitSpec
@@ -92,7 +91,7 @@ class LensTest : UnitSpec() {
 
     "asFold should behave as valid Fold: getAll" {
       forAll(TokenGen) { token ->
-        tokenLens.asFold().getAll(ListK.monoid(), token) == listOf(token.value).k()
+        tokenLens.asFold().getAll(token) == listOf(token.value).k()
       }
     }
 

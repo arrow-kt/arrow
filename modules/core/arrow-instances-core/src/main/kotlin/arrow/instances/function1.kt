@@ -1,12 +1,11 @@
 package arrow.instances
 
 import arrow.Kind
+import arrow.core.*
+import arrow.instance
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
-import arrow.core.*
-import arrow.data.*
-import arrow.instance
 
 @instance(Function1::class)
 interface Function1FunctorInstance<I> : Functor<Function1PartialOf<I>> {

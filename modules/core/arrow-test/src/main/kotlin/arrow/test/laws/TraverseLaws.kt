@@ -2,10 +2,7 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.*
-import arrow.data.Const
-import arrow.data.applicative
-import arrow.data.const
-import arrow.data.value
+import arrow.free.*
 import arrow.instances.IntMonoidInstance
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB
