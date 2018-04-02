@@ -28,7 +28,6 @@ Both `Try` and `Option` are example datatypes that can be computed over transfor
 import arrow.*
 import arrow.core.*
 import arrow.data.*
-import arrow.syntax.function.*
 
 Try { "1".toInt() }.map { it * 2 }
 Option(1).map { it * 2 }
@@ -47,7 +46,6 @@ val tryFunctor = Try.functor()
 Mapping over the empty/failed cases is always safe since the `map` operation in both Try and Option operate under the bias of those containing success values
 
 ```kotlin:ank
-import arrow.syntax.option.*
 
 Try { "x".toInt() }.map { it * 2 }
 none<Int>().map { it * 2 }
@@ -123,7 +121,6 @@ Try { 1 }.map({ it + 1 })
 Lift a function into the functor context
 
 ```kotlin:ank
-import arrow.syntax.functor.*
 
 val f = { n: Int -> n + 1 }.lift<ForOption, Int, Int>()
 f(Option(1))

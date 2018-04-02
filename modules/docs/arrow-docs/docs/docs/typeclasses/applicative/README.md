@@ -32,7 +32,6 @@ This more or less illustrate the common use case of performing several independe
 The module arrow-syntax features several methods related to [Applicative Builders]({{ '/docs/patterns/applicative_builder' | relative_url }}) that allow you to easily combine all the independent operations into one result.
 
 ```kotlin:ank
-import arrow.syntax.applicative.*
 
 data class Profile(val name: String, val phone: Int, val address: List<String>)
 

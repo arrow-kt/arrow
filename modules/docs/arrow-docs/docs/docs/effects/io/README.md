@@ -239,10 +239,11 @@ IO implements all the operators common to all instances of [`MonadError`]({{ '/d
 
 You can see all the type classes `IO` implements below:
 
-```kotlin:ank
+```kotlin
 import arrow.*
 import arrow.effects.*
 import arrow.debug.*
 
 showInstances<ForIO, Throwable>()
+// [Applicative, ApplicativeError, Functor, Monad, MonadError, MonadSuspend, Async, Effect]
 ```

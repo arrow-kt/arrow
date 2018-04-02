@@ -183,10 +183,11 @@ unsafeCancel()
 
 You can see all the type classes `DeferredK` implements below:
 
-```kotlin:ank
+```kotlin
 import arrow.*
 import arrow.effects.*
 import arrow.debug.*
 
 showInstances<ForDeferredK, Throwable>()
+// [Applicative, ApplicativeError, Functor, Monad, MonadError, MonadSuspend, Async, Effect]
 ```

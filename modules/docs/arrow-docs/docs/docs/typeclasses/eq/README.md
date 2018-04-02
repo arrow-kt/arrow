@@ -41,7 +41,6 @@ It is the opposite comparison of `eqv`.
 Compares two values for equality
 
 ```kotlin:ank
-import arrow.syntax.eq.*
 
 1.eqv(IntEqInstance, 2)
 ```

@@ -15,7 +15,6 @@ Given a simple structure `Foo` we can create a `Lens<Foo, Int>` to get, set or m
 
 ```kotlin:ank
 import arrow.optics.*
-import arrow.syntax.function.*
 
 data class Foo(val value: Int)
 
@@ -48,7 +47,6 @@ We can also `modify` and `lift` the focus of a `Lens` using a `Functor`
 ```kotlin:ank
 import arrow.*
 import arrow.core.*
-import arrow.syntax.option.*
 
 fooLens.modifyF(Option.functor(), foo) { it.some() }.fix()
 ```

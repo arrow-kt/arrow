@@ -20,8 +20,6 @@ For a sum type `NetworkResult` we can create a `Prism` that has a focus into `Su
 ```kotlin:ank
 import arrow.*
 import arrow.optics.*
-import arrow.syntax.option.*
-import arrow.syntax.either.*
 
 sealed class NetworkResult {
     data class Success(val content: String): NetworkResult()
@@ -105,8 +103,6 @@ Let's imagine from our previous example we want to retrieve an `Int` from the ne
 
 ```kotlin:ank
 import arrow.data.*
-import arrow.syntax.option.*
-import arrow.syntax.foldable.*
 
 val successToInt: Prism<NetworkResult.Success, Int> = Prism(
         partialFunction = case({ success: NetworkResult.Success -> Try { success.content.toInt() }.nonEmpty() }

@@ -20,7 +20,6 @@ For a structure `List<Int>` we can create an `Optional` to focus an optional hea
 import arrow.*
 import arrow.core.*
 import arrow.optics.*
-import arrow.syntax.either.*
 
 val optionalHead: Optional<List<Int>, Int> = Optional(
     getOrModify = { list -> list.firstOrNull()?.right() ?: list.left() },

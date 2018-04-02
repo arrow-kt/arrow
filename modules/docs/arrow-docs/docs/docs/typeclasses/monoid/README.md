@@ -29,7 +29,6 @@ StringMonoid.empty()
 ```
 
 ```kotlin:ank
-import arrow.syntax.monoid.*
 
 listOf("Λ", "R", "R", "O", "W").combineAll()
 ```
