@@ -2,7 +2,7 @@ package arrow.optics
 
 import arrow.Kind
 import arrow.core.*
-import arrow.data.Const
+import arrow.free.Const
 import arrow.data.ListK
 import arrow.higherkind
 import arrow.instances.IntMonoidInstance

@@ -2,7 +2,7 @@ package arrow.optics
 
 import arrow.core.None
 import arrow.core.Option
-import arrow.data.Const
+import arrow.free.Const
 import arrow.typeclasses.Monoid
 
 @PublishedApi

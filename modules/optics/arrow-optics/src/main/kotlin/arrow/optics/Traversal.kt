@@ -3,6 +3,7 @@ package arrow.optics
 import arrow.Kind
 import arrow.core.*
 import arrow.data.*
+import arrow.free.*
 import arrow.higherkind
 import arrow.instances.IntMonoidInstance
 import arrow.typeclasses.Applicative

@@ -1,9 +1,7 @@
 package arrow.test.laws
 
 import arrow.core.*
-import arrow.data.Const
-import arrow.data.applicative
-import arrow.data.value
+import arrow.free.*
 import arrow.optics.Prism
 import arrow.optics.modify
 import arrow.typeclasses.Eq

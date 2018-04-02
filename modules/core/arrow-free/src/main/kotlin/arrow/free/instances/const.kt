@@ -2,9 +2,14 @@ package arrow.free.instances
 
 import arrow.Kind
 import arrow.core.Eval
-import arrow.data.*
+import arrow.free.Const
+import arrow.free.ConstOf
+import arrow.free.ConstPartialOf
+import arrow.free.fix
 import arrow.instance
 import arrow.typeclasses.*
+import arrow.free.ap as constAp
+import arrow.free.combine as combineAp
 
 @instance(Const::class)
 interface ConstFunctorInstance<A> : Functor<ConstPartialOf<A>> {
@@ -22,7 +27,8 @@ interface ConstApplicativeInstance<A> : Applicative<ConstPartialOf<A>> {
     override fun SA(): Monoid<A> = MA()
   }.empty().fix()
 
-  override fun <T, U> Kind<ConstPartialOf<A>, T>.ap(ff: Kind<ConstPartialOf<A>, (T) -> U>): Const<A, U> = ap(ff, MA())
+  override fun <T, U> Kind<ConstPartialOf<A>, T>.ap(ff: Kind<ConstPartialOf<A>, (T) -> U>): Const<A, U> =
+    constAp(ff, MA())
 }
 
 @instance(Const::class)
@@ -48,8 +54,8 @@ interface ConstSemigroupInstance<A, T> : Semigroup<ConstOf<A, T>> {
 
   fun SA(): Semigroup<A>
 
-  override fun ConstOf<A, T>.combine(b: ConstOf<A, T>): Const<A, T> = combine(b, SA())
-
+  override fun ConstOf<A, T>.combine(b: ConstOf<A, T>): Const<A, T> =
+    combineAp(b, SA())
 }
 
 @instance(Const::class)
