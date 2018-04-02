@@ -5,7 +5,7 @@ dependencies {
     compile 'io.arrow-kt:ank-core:0.7.0-20180401.180605-1'
     compile project(':arrow-data')
     compile project(':arrow-core')
-    compile project(':arrow-instances')
+    compile project(':arrow-instances-data')
     compile project(':arrow-effects')
     compile project(':arrow-effects-rx2')
     compile project(':arrow-effects-kotlinx-coroutines')

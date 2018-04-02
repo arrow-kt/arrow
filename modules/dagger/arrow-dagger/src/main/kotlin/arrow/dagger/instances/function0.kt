@@ -1,6 +1,6 @@
 package arrow.dagger.instances
 
-import arrow.data.*
+import arrow.core.*
 import arrow.typeclasses.*
 import dagger.Module
 import dagger.Provides
@@ -22,6 +22,4 @@ class Function0Instances {
 
   @Provides
   fun function0Bimonad(): Bimonad<ForFunction0> = Function0.bimonad()
-
 }
-

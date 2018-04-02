@@ -1,10 +1,11 @@
 package arrow.instances
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Eval
-import arrow.core.Left
-import arrow.data.*
+import arrow.core.*
+import arrow.data.EitherT
+import arrow.data.EitherTOf
+import arrow.data.EitherTPartialOf
+import arrow.data.fix
 import arrow.typeclasses.*
 
 interface EitherTFunctorInstance<F, L> : Functor<EitherTPartialOf<F, L>> {
@@ -20,7 +21,7 @@ interface EitherTApplicativeInstance<F, L> : EitherTFunctorInstance<F, L>, Appli
 
   override fun <A> just(a: A): EitherT<F, L, A> = EitherT.just(MF(), a)
 
-  override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.map(f: (A) -> B): EitherT<F, L, B> = fix().map(this@EitherTApplicativeInstance.MF(), { f(it) })
+  override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.map(f: (A) -> B): EitherT<F, L, B> = fix().map(MF(), { f(it) })
 
   override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.ap(ff: Kind<EitherTPartialOf<F, L>, (A) -> B>): EitherT<F, L, B> =
     fix().ap(MF(), ff)
@@ -59,10 +60,10 @@ interface EitherTFoldableInstance<F, L> : Foldable<EitherTPartialOf<F, L>> {
 
   fun FFF(): Foldable<F>
 
-  override fun <B, C> Kind<EitherTPartialOf<F, L>, B>.foldLeft(b: C, f: (C, B) -> C): C = fix().foldLeft(b, f, FFF())
+  override fun <B, C> Kind<EitherTPartialOf<F, L>, B>.foldLeft(b: C, f: (C, B) -> C): C = fix().foldLeft(FFF(), b, f)
 
   override fun <B, C> Kind<EitherTPartialOf<F, L>, B>.foldRight(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
-    fix().foldRight(lb, f, FFF())
+    fix().foldRight(FFF(), lb, f)
 }
 
 interface EitherTTraverseInstance<F, L> : EitherTFunctorInstance<F, L>, EitherTFoldableInstance<F, L>, Traverse<EitherTPartialOf<F, L>> {
@@ -72,7 +73,7 @@ interface EitherTTraverseInstance<F, L> : EitherTFunctorInstance<F, L>, EitherTF
   override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.map(f: (A) -> B): EitherT<F, L, B> = fix().map(TF(), { f(it) })
 
   override fun <G, B, C> Kind<EitherTPartialOf<F, L>, B>.traverse(AP: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, EitherT<F, L, C>> =
-    fix().traverse(f, AP, TF())
+    fix().traverse(TF(), AP, f)
 }
 
 interface EitherTSemigroupKInstance<F, L> : SemigroupK<EitherTPartialOf<F, L>> {
@@ -81,3 +82,67 @@ interface EitherTSemigroupKInstance<F, L> : SemigroupK<EitherTPartialOf<F, L>> {
   override fun <A> Kind<EitherTPartialOf<F, L>, A>.combineK(y: Kind<EitherTPartialOf<F, L>, A>): EitherT<F, L, A> =
     fix().combineK(MF(), y)
 }
+
+fun <F, A, B, C> EitherT<F, A, B>.foldLeft(FF: Foldable<F>, b: C, f: (C, B) -> C): C = FF.compose(Either.foldable<A>()).foldLC(value, b, f)
+
+fun <F, A, B, C> EitherT<F, A, B>.foldRight(FF: Foldable<F>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> = FF.compose(Either.foldable<A>()).run {
+  value.foldRC(lb, f)
+}
+
+fun <F, A, B, G, C> EitherT<F, A, B>.traverse(FF: Traverse<F>, GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, EitherT<F, A, C>> {
+  val fa: Kind<G, Kind<Nested<F, EitherPartialOf<A>>, C>> = ComposedTraverse(FF, Either.traverse(), Either.monad<A>()).traverseC(value, f, GA)
+  return GA.run { fa.map({ EitherT(FF.run { it.unnest().map({ it.fix() }) }) }) }
+}
+
+fun <F, L> EitherT.Companion.functor(FF: Functor<F>): Functor<EitherTPartialOf<F, L>> =
+  object : EitherTFunctorInstance<F, L> {
+    override fun FF(): Functor<F> = FF
+
+  }
+
+fun <F, L> EitherT.Companion.applicative(MF: Monad<F>): Applicative<EitherTPartialOf<F, L>> =
+  object : EitherTApplicativeInstance<F, L> {
+    override fun FF(): Functor<F> = MF
+
+    override fun MF(): Monad<F> = MF
+  }
+
+fun <F, L> EitherT.Companion.monad(MF: Monad<F>): Monad<EitherTPartialOf<F, L>> =
+  object : EitherTMonadInstance<F, L> {
+    override fun FF(): Functor<F> = MF
+
+    override fun MF(): Monad<F> = MF
+  }
+
+fun <F, L> EitherT.Companion.applicativeError(MF: Monad<F>): ApplicativeError<EitherTPartialOf<F, L>, L> =
+  object : EitherTApplicativeErrorInstance<F, L> {
+    override fun FF(): Functor<F> = MF
+
+    override fun MF(): Monad<F> = MF
+  }
+
+fun <F, L> EitherT.Companion.monadError(MF: Monad<F>): MonadError<EitherTPartialOf<F, L>, L> =
+  object : EitherTMonadErrorInstance<F, L> {
+    override fun FF(): Functor<F> = MF
+
+    override fun MF(): Monad<F> = MF
+  }
+
+fun <F, A> EitherT.Companion.traverse(FF: Traverse<F>): Traverse<EitherTPartialOf<F, A>> =
+  object : EitherTTraverseInstance<F, A> {
+    override fun FF(): Functor<F> = FF
+
+    override fun FFF(): Foldable<F> = FF
+
+    override fun TF(): Traverse<F> = FF
+  }
+
+fun <F, A> EitherT.Companion.foldable(FF: Traverse<F>): Foldable<EitherTPartialOf<F, A>> =
+  object : EitherTFoldableInstance<F, A> {
+    override fun FFF(): Foldable<F> = FF
+  }
+
+fun <F, L> EitherT.Companion.semigroupK(MF: Monad<F>): SemigroupK<EitherTPartialOf<F, L>> =
+  object : EitherTSemigroupKInstance<F, L> {
+    override fun MF(): Monad<F> = MF
+  }

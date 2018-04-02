@@ -1,9 +1,9 @@
 package arrow.mtl.instances
 
 import arrow.Kind
-import arrow.data.Function1
-import arrow.data.Function1PartialOf
-import arrow.data.fix
+import arrow.core.Function1
+import arrow.core.Function1PartialOf
+import arrow.core.fix
 import arrow.instance
 import arrow.instances.Function1MonadInstance
 import arrow.mtl.typeclasses.MonadReader

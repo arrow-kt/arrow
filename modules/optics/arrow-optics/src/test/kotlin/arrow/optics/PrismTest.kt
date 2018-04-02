@@ -4,7 +4,6 @@ import arrow.core.*
 import arrow.data.ListK
 import arrow.data.eq
 import arrow.data.k
-import arrow.data.monoid
 import arrow.instances.StringMonoidInstance
 import arrow.test.UnitSpec
 import arrow.test.generators.genEither
@@ -129,7 +128,7 @@ class PrismTest : UnitSpec() {
 
       "asFold should behave as valid Fold: getAll" {
         forAll(SumGen) { sum: SumType ->
-          getAll(ListK.monoid(), sum) == sumPrism.getOption(sum).toList().k()
+          getAll(sum) == sumPrism.getOption(sum).toList().k()
         }
       }
 
