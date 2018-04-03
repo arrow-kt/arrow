@@ -13,9 +13,9 @@ It can be considered the typeclass equivalent of Java's `Comparable`.
 
 ### Main Combinators
 
-#### compare
+#### F#compare
 
-`fun compare(a: F, b: F): Int`
+`fun F.compare(b: F): Int`
 
 Compare [a] with [b]. Returns an Int whose sign is:
   * negative if `x < y`
@@ -25,37 +25,46 @@ Compare [a] with [b]. Returns an Int whose sign is:
 ```kotlin:ank
 import arrow.*
 import arrow.typeclasses.*
+import arrow.instances.*
 
-order<Int>().compare(1, 2)
+IntOrderInstance.run { 1.compare(2) }
 ```
 
-#### lte / lt
+#### F#lte / F#lt
 
 Lesser than or equal to defines total order in a set, it compares two elements and returns true if they're equal or the first is lesser than the second.
 It is the opposite of `gte`.
 
 ```kotlin:ank
-order<Int>().lte(1, 2)
+IntOrderInstance.run { 1.lte(2) }
 ```
 
-#### gte / gt
+#### F#gte / F#gt
 
 Greater than or equal compares two elements and returns true if they're equal or the first is lesser than the second.
 It is the opposite of `lte`.
 
 ```kotlin:ank
-order<Int>().gte(1, 2)
+IntOrderInstance.run { 1.gte(2) }
 ```
 
-#### max / min
+#### F#max / F#min
 
 Compares two elements and respectively returns the maximum or minimum in respect to their order.
 
 ```kotlin:ank
-order<Int>().min(1, 2)
+IntOrderInstance.run { 1.min(2) }
 ```
 ```kotlin:ank
-order<Int>().max(1, 2)
+IntOrderInstance.run { 1.max(2) }
+```
+
+#### F#sort
+
+Sorts the elements in a `Tuple2`
+
+```kotlin:ank
+IntOrderInstance.run { 1.sort(2) }
 ```
 
 ### Laws
@@ -68,14 +77,9 @@ Order has a constructor to create an `Order` instance from a compare function `(
 
 ```kotlin:ank
 
-val reverseOrder = Order { a: Int, b: Int -> b - a }
-1.lt(reverseOrder, 2)
-```
-
-Since `Order` can be constructed from the same function as defined by `Comparable` you can retrieve an `Order` instance form any type that implements `Comparable`.
-
-```kotlin:ank
-toOrder<Char>().max('A', 'B')
+Order { a: Int, b: Int -> b - a }.run {
+  1.lt(2)
+}
 ```
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Order` instances for custom datatypes.

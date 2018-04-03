@@ -29,10 +29,9 @@ fun addressService(): Option<List<String>> = Some(listOf("1 Main Street", "11130
 
 This more or less illustrate the common use case of performing several independent operations where we need to get all the results together
 
-The module arrow-syntax features several methods related to [Applicative Builders]({{ '/docs/patterns/applicative_builder' | relative_url }}) that allow you to easily combine all the independent operations into one result.
+The typeclass features several methods related to [Applicative Builders]({{ '/docs/patterns/applicative_builder' | relative_url }}) that allow you to easily combine all the independent operations into one result.
 
 ```kotlin:ank
-
 data class Profile(val name: String, val phone: Int, val address: List<String>)
 
 val r: Option<Tuple3<String, Int, List<String>>> = Option.applicative().tupled(profileService(), phoneService(), addressService()).fix()
@@ -60,44 +59,27 @@ It lifts a value into the computational context of a type constructor.
 Option.just(1) // Some(1)
 ```
 
-#### ap
+#### Kind<F, A>#ap
 
 Apply a function inside the type constructor's context
 
-`fun <A, B> ap(fa: Kind<F, A>, ff: Kind<F, (A) -> B>): Kind<F, B>`
+`fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B>`
 
 ```kotlin:ank
-Option.applicative().ap(Some(1), Some({ n: Int -> n + 1 })) // Some(2)
+Option.applicative().run { Some(1).ap(Some({ n: Int -> n + 1 })) }
 ```
 
 #### Other combinators
 
 For a full list of other useful combinators available in `Applicative` see the [Source][applicative_source]{:target="_blank"}
 
-### Syntax
-
-#### Kind<F, A>#just
-
-Lift a value into the computational context of a type constructor
-
-```kotlin:ank
-1.just<ForOption, Int>()
-```
-
-#### Kind<F, A>#ap
-
-Apply a function inside the type constructor's context
-
-```kotlin:ank
-Some(1).ap(Some({ n: Int -> n + 1 }))
-```
 
 #### Kind<F, A>#map2
 
 Map 2 values inside the type constructor context and apply a function to their cartesian product
 
 ```kotlin:ank
-Option.applicative().map2(Some(1), Some("x"), { z: Tuple2<Int, String> ->  "${z.a}${z.b}" })
+Option.applicative().run { Some(1).map2(Some("x")) { z: Tuple2<Int, String> ->  "${z.a}${z.b}" } }
 ```
 
 #### Kind<F, A>#map2Eval
@@ -106,9 +88,8 @@ Lazily map 2 values inside the type constructor context and apply a function to 
 Computation happens when `.value()` is invoked.
 
 ```kotlin:ank
-Option.applicative().map2Eval(Some(1), Eval.later { Some("x") }, { z: Tuple2<Int, String> ->  "${z.a}${z.b}" }).value()
+Option.applicative().run { Some(1).map2Eval(Eval.later { Some("x") }, { z: Tuple2<Int, String> ->  "${z.a}${z.b}" }).value() }
 ```
-
 
 ### Laws
 

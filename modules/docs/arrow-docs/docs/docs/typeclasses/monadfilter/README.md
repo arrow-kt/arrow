@@ -21,7 +21,7 @@ When `continueIf` is satisfied the computation continues
 ```kotlin:ank
 import arrow.*
 import arrow.core.*
-import arrow.mtl.*
+import arrow.mtl.typeclasses.*
 
 Option.monadFilter().bindingFilter {
  val a = Option(1).bind()

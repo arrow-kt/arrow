@@ -15,17 +15,22 @@ It can be considered the typeclass equivalent of Java's `Object#equals`.
 import arrow.*
 import arrow.instances.*
 
-IntEqInstance.eqv(1, 2)
+StringEqInstance.run { "1".eqv("2") }
 ```
 
 ### Main Combinators
 
-#### eqv
+#### F.eqv
 
 Compares two instances of `F` and returns true if they're considered equal for this instance.
 It is the opposite comparison of `neqv`.
 
-`fun eqv(a: F, b: F): Boolean`
+`fun F.eqv(b: F): Boolean`
+
+
+```kotlin:ank
+IntEqInstance.run { 1.eqv(2) }
+```
 
 #### neqv
 
@@ -34,23 +39,8 @@ It is the opposite comparison of `eqv`.
 
 `fun neqv(a: F, b: F): Boolean`
 
-### Syntax
-
-#### Kind<F, A>#eqv
-
-Compares two values for equality
-
 ```kotlin:ank
-
-1.eqv(IntEqInstance, 2)
-```
-
-#### Kind<F, A>#neqv
-
-Compares two values for inequality
-
-```kotlin:ank
-1.neqv(IntEqInstance, 2)
+IntEqInstance.run { 1.neqv(2) }
 ```
 
 ### Laws
@@ -68,12 +58,12 @@ import arrow.core.*
 import arrow.typeclasses.*
 
 // Option is a data class with a single value
-Eq.any().eqv(Some(1), Option.just(1))
+Eq.any().run { Some(1).eqv(Option.just(1)) }
 ```
 
 ```kotlin:ank
 // Fails because the wrapped function is not evaluated for comparison
-Eq.any().eqv(Eval.later{ 1 }, Eval.later{ 1 })
+Eq.any().run { Eval.later { 1 }.eqv(Eval.later { 1 }) }
 ```
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Eq` instances for custom datatypes.
