@@ -1,10 +1,9 @@
 package arrow.optics
 
 import arrow.syntax
-import arrow.optics.syntax.nullable
-import arrow.optics.syntax.setter
+import arrow.optics.syntax.*
+import arrow.test.UnitSpec
 import io.kotlintest.matchers.shouldBe
-import io.kotlintest.specs.StringSpec
 
 @syntax
 data class Street(val number: Int, val name: String)
@@ -16,16 +15,16 @@ data class Company(val name: String, val address: Address)
 data class Employee(val name: String, val company: Company?)
 
 //TODO: Rewrite to annotation processor test when multiple file support is implemented
-class BoundedTest: StringSpec() {
+class BoundedTest: UnitSpec() {
 
     init {
 
         "@syntax classes are generated properly" {
 
             val employee = Employee("John Doe", Company("Kategory", Address("Functional city", Street(42, "lambda street"))))
-            val newEmployee = employee.setter().company.nullable.address.street.name.modify { it.capitalize() }
+            val newEmployee = employee.setter().company.address.street.name.modify(String::toUpperCase)
 
-            val expected = Employee("John Doe", Company("Kategory", Address("Functional city", Street(42, "Lambda street"))))
+            val expected = Employee("John Doe", Company("Kategory", Address("Functional city", Street(42, "LAMBDA STREET"))))
 
             newEmployee shouldBe expected
         }
