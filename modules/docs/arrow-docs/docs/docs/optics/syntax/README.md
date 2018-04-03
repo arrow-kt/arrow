@@ -41,7 +41,7 @@ In above example we want to apply a function `f` to the `Street::name` of the `C
 We can compose an `Optic` that achieves the same goal.
 
 ```kotlin:ank
-import arrow.optics.*
+import arrow.optics.Optional
 
 val employeesStreetName: Optional<Employee, String> = employeeCompany() compose companyAddress() compose addressStreet() compose streetName()
 ```
