@@ -4,7 +4,9 @@ title: Quick Start
 permalink: /docs/
 ---
 
-NOTE: The docs are currently at around 50% completion. They're the present priority project, and you can track the progress on the github issue [#311](https://github.com/arrow-kt/arrow/issues/311).
+NOTE (Apr 3rd): We're in the process of updating the docs to version 0.7.0. Until the release, expect inconsistencies and frequent fixes.
+
+NOTE: The docs are currently at around 60% completion. They're the present priority project, and you can track the progress on the github issue [#311](https://github.com/arrow-kt/arrow/issues/311).
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
 [![Build Status](https://travis-ci.org/arrow-kt/arrow.svg?branch=master)](https://travis-ci.org/arrow-kt/arrow/)
