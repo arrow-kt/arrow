@@ -95,7 +95,7 @@ class ProductFileGenerator(
             |fun ${focusType(product)}.to${product.sourceSimpleName}(): ${product.sourceClassName} =
             |  ${classConstructorFromTuple(product.sourceClassName, product.focusSize)}
             |
-            |inline fun <reified F> arrow.typeclasses.Applicative<F>.mapTo${product.sourceSimpleName}${kindedProperties("F", product)}: arrow.Kind<F, ${product.sourceClassName}> =
+            |inline fun <F> arrow.typeclasses.Applicative<F>.mapTo${product.sourceSimpleName}${kindedProperties("F", product)}: arrow.Kind<F, ${product.sourceClassName}> =
             |    this.map(${product.targets.joinToString(", ") { it.paramName }}, { it.to${product.sourceSimpleName}() })
             |
             |interface ${product.sourceSimpleName}SemigroupInstance : arrow.typeclasses.Semigroup<${product.sourceClassName}> {
