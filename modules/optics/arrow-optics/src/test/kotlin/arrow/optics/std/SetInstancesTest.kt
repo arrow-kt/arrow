@@ -17,7 +17,7 @@ class SetInstancesTest : UnitSpec() {
   init {
 
     testLaws(IsoLaws.laws(
-      iso = setToSetK(),
+      iso = SetK.toSet<Int>().reverse(),
       aGen = Gen.set(Gen.int()),
       bGen = Gen.create { Gen.set(Gen.int()).generate().k() },
       funcGen = genFunctionAToB(Gen.create { Gen.set(Gen.int()).generate().k() }),

@@ -15,7 +15,12 @@ fun <A1, A2, B1, B2> pEitherToValidation(): PIso<Either<A1, B1>, Either<A2, B2>,
   reverseGet = { it.fix().toEither() }
 )
 
+fun <A1, A2, B1, B2> Either.Companion.toPValidated(): PIso<Either<A1, B1>, Either<A2, B2>, Validated<A1, B1>, Validated<A2, B2>> = PIso(
+  get = { it.fix().fold({ Invalid(it) }, { Valid(it) }) },
+  reverseGet = { it.fix().toEither() }
+)
+
 /**
  * [Iso] that defines the equality between [Either] and [Validated]
  */
-fun <A, B> eitherToValidated(): Iso<Either<A, B>, Validated<A, B>> = pEitherToValidation()
+fun <A, B> Either.Companion.toValidated(): Iso<Either<A, B>, Validated<A, B>> = toPValidated()

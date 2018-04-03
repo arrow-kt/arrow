@@ -21,7 +21,7 @@ class ListInstancesTest : UnitSpec() {
   init {
 
     testLaws(OptionalLaws.laws(
-      optional = listHead(),
+      optional = ListK.head(),
       aGen = Gen.list(Gen.int()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
@@ -30,7 +30,7 @@ class ListInstancesTest : UnitSpec() {
     ))
 
     testLaws(OptionalLaws.laws(
-      optional = listTail(),
+      optional = ListK.tail(),
       aGen = Gen.list(Gen.int()),
       bGen = Gen.list(Gen.int()),
       funcGen = genFunctionAToB(Gen.list(Gen.int())),

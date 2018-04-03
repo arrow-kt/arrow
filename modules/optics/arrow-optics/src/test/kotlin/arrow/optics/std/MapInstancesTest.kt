@@ -31,7 +31,7 @@ class MapInstancesTest : UnitSpec() {
     ))
 
     testLaws(IsoLaws.laws(
-      iso = mapKToSetK(),
+      iso = MapK.toSetK(),
       aGen = genMapK(Gen.string(), Gen.create { Unit }),
       bGen = genSetK(Gen.string()),
       funcGen = genFunctionAToB(genSetK(Gen.string())),

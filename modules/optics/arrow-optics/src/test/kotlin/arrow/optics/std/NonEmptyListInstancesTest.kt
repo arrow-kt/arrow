@@ -1,5 +1,6 @@
 package arrow.optics
 
+import arrow.data.NonEmptyList
 import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
@@ -20,7 +21,7 @@ class NonEmptyListInstancesTest : UnitSpec() {
 
     testLaws(
       LensLaws.laws(
-        lens = nelHead(),
+        lens = NonEmptyList.head(),
         aGen = genNonEmptyList(Gen.string()),
         bGen = Gen.string(),
         funcGen = genFunctionAToB(Gen.string()),

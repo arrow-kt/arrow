@@ -1,5 +1,6 @@
 package arrow.optics
 
+import arrow.core.identity
 import arrow.data.MapK
 import arrow.data.SetK
 import arrow.data.fix
@@ -21,7 +22,7 @@ fun <K, A> mapToMapK(): Iso<Map<K, A>, MapK<K, A>> = pMapToMapK()
 /**
  * [Iso] that defines the equality between a Unit value [Map] and a [Set] with its keys
  */
-fun <K> mapKToSetK(): Iso<MapK<K, Unit>, SetK<K>> = Iso(
+fun <K> MapK.Companion.toSetK(): Iso<MapK<K, Unit>, SetK<K>> = Iso(
   get = { it.fix().keys.k() },
   reverseGet = { keys -> keys.fix().map { it to Unit }.toMap().k() }
 )

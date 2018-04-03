@@ -7,7 +7,7 @@ import arrow.data.fix
 /**
  * [Lens] to operate on the head of a [NonEmptyList]
  */
-fun <A> nelHead(): Lens<NonEmptyList<A>, A> = Lens(
+fun <A> NonEmptyList.Companion.head(): Lens<NonEmptyList<A>, A> = Lens(
   get = { it.fix().head },
   set = { newHead -> { nel -> NonEmptyList(newHead, nel.fix().tail) } }
 )
