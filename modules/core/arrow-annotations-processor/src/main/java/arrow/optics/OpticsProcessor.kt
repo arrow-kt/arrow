@@ -25,7 +25,10 @@ class OptikalProcessor : AbstractProcessor() {
 
   private val annotatedOptional = mutableListOf<AnnotatedOptic>()
 
+  private val annotatedBounded = mutableListOf<AnnotatedOptic>()
+
   override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
+
   override fun getSupportedAnnotationTypes() = setOf(opticsAnnotationClass.canonicalName)
 
   override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
@@ -49,12 +52,21 @@ class OptikalProcessor : AbstractProcessor() {
       .filter { it.getAnnotation(opticsAnnotationClass).targets.contains(OpticsTarget.OPTIONAL) }
       .mapNotNull(this::evalAnnotatedElement)
 
+    annotatedBounded += roundEnv
+      .getElementsAnnotatedWith(opticsAnnotationClass)
+      .filter { it.getAnnotation(opticsAnnotationClass).targets.contains(OpticsTarget.DSL) }
+      .mapNotNull(this::evalAnnotatedElement)
+
     if (roundEnv.processingOver()) {
       val generatedDir = File(this.generatedDir!!, "").also { it.mkdirs() }
       LensesFileGenerator(annotatedLenses, generatedDir).generate()
       PrismsFileGenerator(annotatedPrisms, generatedDir).generate()
       IsosFileGenerator(annotatedIsos, generatedDir).generate()
       OptionalFileGenerator(annotatedOptional, generatedDir).generate()
+
+      LensesFileGenerator(annotatedBounded, generatedDir).generate()
+      OptionalFileGenerator(annotatedBounded, generatedDir).generate()
+      BoundSetterGenerator(annotatedBounded, generatedDir).generate()
     }
   }
 
@@ -63,7 +75,7 @@ class OptikalProcessor : AbstractProcessor() {
       AnnotatedOptic(
         element as TypeElement,
         element.getClassData(),
-        element.getConstructorTypesNames().zip(element.getConstructorParamNames(), ::Target)
+        element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Target.Companion::invoke)
       )
 
     else -> null
@@ -88,7 +100,7 @@ class OptikalProcessor : AbstractProcessor() {
 
   private fun evalAnnotatedIsoElement(element: Element): AnnotatedOptic? = when {
     (element.kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isDataClass == true -> {
-      val properties = element.getConstructorTypesNames().zip(element.getConstructorParamNames(), ::Target)
+      val properties = element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Target.Companion::invoke)
 
       if (properties.size > 10) {
         logW("""
@@ -96,8 +108,7 @@ class OptikalProcessor : AbstractProcessor() {
           |Iso generation is supported up to 10 constructor parameters is supported
           """)
         null
-      } else
-        AnnotatedOptic(element as TypeElement, element.getClassData(), properties)
+      } else AnnotatedOptic(element as TypeElement, element.getClassData(), properties)
     }
 
     else -> null
