@@ -144,10 +144,6 @@ class TypeclassInstanceGenerator(
             |  ${delegatedFunctions.joinToString("\n\n  ")}
             |}
             |
-            |object ${instanceName}Implicits {
-            |  fun instance(): $instanceName = $receiverType.Companion.$companionFactoryName()
-            |}
-            |
             |fun $receiverType.Companion.$companionFactoryName(): $instanceName =
             |  object : $instanceName, $typeClassFQName<$tArgs> {}
             |

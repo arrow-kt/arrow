@@ -1,5 +1,6 @@
 package arrow.data
 
+import arrow.free.*
 import arrow.instances.IntMonoidInstance
 import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws

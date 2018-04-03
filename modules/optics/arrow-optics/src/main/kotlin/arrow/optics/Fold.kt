@@ -2,8 +2,9 @@ package arrow.optics
 
 import arrow.Kind
 import arrow.core.*
-import arrow.data.Const
 import arrow.data.ListK
+import arrow.data.monoid
+import arrow.free.Const
 import arrow.higherkind
 import arrow.instances.IntMonoidInstance
 import arrow.instances.monoid
@@ -101,7 +102,7 @@ interface Fold<S, A> : FoldOf<S, A> {
   /**
    * Get all targets of the [Fold]
    */
-  fun getAll(M: Monoid<ListK<A>>, s: S): ListK<A> = foldMap(M, s, { ListK.just(it) })
+  fun getAll(s: S): ListK<A> = foldMap(ListK.monoid(), s, { ListK.just(it) })
 
   /**
    * Join two [Fold] with the same target

@@ -1,7 +1,8 @@
-package arrow.data
+package arrow.free
 
-import arrow.*
+import arrow.Kind
 import arrow.core.Option
+import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Semigroup
 
@@ -22,7 +23,7 @@ data class Const<A, out T>(val value: A) : ConstOf<A, T> {
   }
 }
 
-fun <A, T> ConstOf<A, T>.combine(that: ConstOf<A, T>, SG: Semigroup<A>): Const<A, T> = Const(SG.run { value().combine(that.value()) })
+fun <A, T> ConstOf<A, T>.combine(that: ConstOf<A, T>, SG: Semigroup<A>): Const<A, T> = arrow.free.Const(SG.run { value().combine(that.value()) })
 
 fun <A, T, U> ConstOf<A, T>.ap(ff: ConstOf<A, (T) -> U>, SG: Semigroup<A>): Const<A, U> = ff.fix().retag<U>().combine(this.fix().retag(), SG)
 

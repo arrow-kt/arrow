@@ -77,7 +77,7 @@ class TraversalTest : UnitSpec() {
 
       "asFold should behave as valid Fold: getAll" {
         forAll(genListK(Gen.int())) { ints ->
-          getAll(ListK.monoid(), ints) == ints.k()
+          getAll(ints) == ints.k()
         }
       }
 

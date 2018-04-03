@@ -1,7 +1,6 @@
-package arrow.data
+package arrow.core
 
 import arrow.*
-import arrow.core.Either
 
 fun <A> (() -> A).k(): Function0<A> = Function0(this)
 

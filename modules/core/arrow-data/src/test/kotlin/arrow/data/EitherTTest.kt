@@ -1,6 +1,10 @@
 package arrow.data
 
 import arrow.core.*
+import arrow.instances.applicative
+import arrow.instances.monadError
+import arrow.instances.semigroupK
+import arrow.instances.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadErrorLaws
 import arrow.test.laws.SemigroupKLaws
