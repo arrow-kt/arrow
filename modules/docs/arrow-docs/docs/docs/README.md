@@ -4,7 +4,7 @@ title: Quick Start
 permalink: /docs/
 ---
 
-NOTE (Apr 3rd): We're in the process of updating the docs to version 0.7.0. Until the release expect inconsistencies and frequent fixes.
+NOTE (Apr 3rd): We're in the process of updating the docs to version 0.7.0. Until the release is finalised in the next few days expect inconsistencies and frequent fixes.
 
 NOTE: The docs are currently at around 60% completion. They're the present priority project, and you can track the progress on the github issue [#311](https://github.com/arrow-kt/arrow/issues/311).
 
