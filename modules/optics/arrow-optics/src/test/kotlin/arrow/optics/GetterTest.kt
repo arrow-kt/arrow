@@ -3,6 +3,7 @@ package arrow.optics
 import arrow.core.*
 import arrow.data.k
 import arrow.instances.StringMonoidInstance
+import arrow.instances.monoid
 import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
@@ -46,13 +47,13 @@ class GetterTest : UnitSpec() {
 
       "asFold should behave as valid Fold: combineAll" {
         forAll(TokenGen) { token ->
-          combineAll(StringMonoidInstance, token) == token.value
+          combineAll(String.monoid(), token) == token.value
         }
       }
 
       "asFold should behave as valid Fold: fold" {
         forAll(TokenGen) { token ->
-          fold(StringMonoidInstance, token) == token.value
+          fold(String.monoid(), token) == token.value
         }
       }
 

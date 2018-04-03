@@ -2,6 +2,7 @@ package arrow.optics.instances
 
 import arrow.data.*
 import arrow.instances.StringEqInstance
+import arrow.instances.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.OptionalLaws
@@ -49,7 +50,7 @@ class IndexInstanceTest : UnitSpec() {
       bGen = Gen.string(),
       funcGen = genFunctionAToB(Gen.string()),
       EQOptionB = Eq.any(),
-      EQA = SequenceK.eq(StringEqInstance)
+      EQA = SequenceK.eq(String.eq())
     ))
 
     testLaws(OptionalLaws.laws(

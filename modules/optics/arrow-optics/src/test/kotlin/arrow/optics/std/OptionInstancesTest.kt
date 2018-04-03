@@ -2,6 +2,7 @@ package arrow.optics
 
 import arrow.core.*
 import arrow.instances.IntMonoidInstance
+import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genEither
 import arrow.test.generators.genFunctionAToB
@@ -45,7 +46,7 @@ class OptionInstancesTest : UnitSpec() {
       EQA = Eq.any(),
       EQB = Eq.any(),
       funcGen = genFunctionAToB(genOption(Gen.int())),
-      bMonoid = Option.monoid(IntMonoidInstance)
+      bMonoid = Option.monoid(Int.monoid())
     ))
 
     testLaws(IsoLaws.laws(

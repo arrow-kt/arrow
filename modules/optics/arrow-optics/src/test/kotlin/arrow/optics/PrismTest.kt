@@ -5,6 +5,7 @@ import arrow.data.ListK
 import arrow.data.eq
 import arrow.data.k
 import arrow.instances.StringMonoidInstance
+import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genEither
 import arrow.test.generators.genFunctionAToB
@@ -134,15 +135,15 @@ class PrismTest : UnitSpec() {
 
       "asFold should behave as valid Fold: combineAll" {
         forAll(SumGen) { sum: SumType ->
-          combineAll(StringMonoidInstance, sum) ==
-            sumPrism.getOption(sum).fold({ StringMonoidInstance.empty() }, ::identity)
+          combineAll(String.monoid(), sum) ==
+            sumPrism.getOption(sum).fold({ String.monoid().empty() }, ::identity)
         }
       }
 
       "asFold should behave as valid Fold: fold" {
         forAll(SumGen) { sum: SumType ->
-          fold(StringMonoidInstance, sum) ==
-            sumPrism.getOption(sum).fold({ StringMonoidInstance.empty() }, ::identity)
+          fold(String.monoid(), sum) ==
+            sumPrism.getOption(sum).fold({ String.monoid().empty() }, ::identity)
         }
       }
 

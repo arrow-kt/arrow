@@ -1,6 +1,6 @@
 package arrow.optics
 
-import arrow.instances.StringMonoidInstance
+import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genNonEmptyList
@@ -26,7 +26,7 @@ class NonEmptyListInstancesTest : UnitSpec() {
         funcGen = genFunctionAToB(Gen.string()),
         EQA = Eq.any(),
         EQB = Eq.any(),
-        MB = StringMonoidInstance),
+        MB = String.monoid()),
 
       IsoLaws.laws(
         iso = optionNelToList(),
