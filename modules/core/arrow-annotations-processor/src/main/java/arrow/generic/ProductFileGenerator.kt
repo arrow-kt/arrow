@@ -1,6 +1,5 @@
 package arrow.generic
 
-import arrow.common.utils.removeBackticks
 import me.eugeniomarletti.kotlin.metadata.escapedClassName
 import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 import java.io.File

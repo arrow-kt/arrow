@@ -4,6 +4,8 @@ import arrow.Kind
 import arrow.core.Tuple2
 import arrow.instances.IntSemigroupInstance
 import arrow.instances.LongMonoidInstance
+import arrow.instances.monoid
+import arrow.instances.semigroup
 import arrow.test.UnitSpec
 import arrow.test.laws.ReducibleLaws
 import arrow.typeclasses.Eq
@@ -31,11 +33,11 @@ class ReducibleTests : UnitSpec() {
       Eq.any()))
 
     with(nonEmptyReducible) {
-      with(IntSemigroupInstance) {
+      with(Int.semigroup()) {
 
         "Reducible<NonEmptyList> default size implementation" {
           val nel = NonEmptyList.of(1, 2, 3)
-          nel.size(LongMonoidInstance) shouldBe nel.size.toLong()
+          nel.size(Long.monoid()) shouldBe nel.size.toLong()
         }
 
         "Reducible<NonEmptyList>" {

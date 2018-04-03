@@ -3,6 +3,7 @@ package arrow.data
 import arrow.Kind
 import arrow.core.*
 import arrow.instances.IntEqInstance
+import arrow.instances.eq
 import arrow.syntax.collections.firstOption
 import arrow.syntax.collections.option
 import arrow.test.UnitSpec
@@ -43,8 +44,8 @@ class OptionTest : UnitSpec() {
     }
 
     testLaws(
-      EqLaws.laws(Option.eq(IntEqInstance), { genOption(Gen.int()).generate() }),
-      ShowLaws.laws(Option.show(), Option.eq(IntEqInstance), { Some(it) }),
+      EqLaws.laws(Option.eq(Int.eq()), { genOption(Gen.int()).generate() }),
+      ShowLaws.laws(Option.show(), Option.eq(Int.eq()), { Some(it) }),
       //testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
       TraverseFilterLaws.laws(Option.traverseFilter(), Option.monad(), ::Some, Eq.any()),
       MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any())

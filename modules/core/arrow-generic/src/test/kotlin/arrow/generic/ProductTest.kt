@@ -133,7 +133,6 @@ class ProductTest : UnitSpec() {
             })
         }
 
-        //TODO look at typeclassless encoding to see if it's better than runtime lookups in these cases
         with(Gen) {
             testLaws(
                     EqLaws.laws(Person.eq(), { personGen().generate().copy(age = it) }),

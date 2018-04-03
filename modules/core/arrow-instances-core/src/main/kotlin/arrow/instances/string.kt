@@ -1,6 +1,5 @@
 package arrow.instances
 
-import arrow.instance
 import arrow.typeclasses.*
 
 interface StringSemigroupInstance : Semigroup<String> {

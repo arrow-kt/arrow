@@ -11,12 +11,12 @@ class NumberEqTest : UnitSpec() {
   init {
 
     testLaws(
-      EqLaws.laws(LongEqInstance) { it.toLong() },
-      EqLaws.laws(IntEqInstance) { it },
-      EqLaws.laws(DoubleEqInstance) { it.toDouble() },
-      EqLaws.laws(FloatEqInstance) { it.toFloat() },
-      EqLaws.laws(ByteEqInstance) { it.toByte() },
-      EqLaws.laws(ShortEqInstance) { it.toShort() }
+      EqLaws.laws(Long.eq()) { it.toLong() },
+      EqLaws.laws(Int.eq()) { it },
+      EqLaws.laws(Double.eq()) { it.toDouble() },
+      EqLaws.laws(Float.eq()) { it.toFloat() },
+      EqLaws.laws(Byte.eq()) { it.toByte() },
+      EqLaws.laws(Short.eq()) { it.toShort() }
     )
 
   }

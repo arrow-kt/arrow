@@ -1,6 +1,5 @@
 package arrow.instances
 
-import arrow.common.messager.logW
 import arrow.common.utils.AbstractProcessor
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.knownError

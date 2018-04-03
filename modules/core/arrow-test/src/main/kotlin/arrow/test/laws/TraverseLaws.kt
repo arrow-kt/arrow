@@ -4,12 +4,15 @@ import arrow.Kind
 import arrow.core.*
 import arrow.data.value
 import arrow.free.Const
+import arrow.free.applicative
 import arrow.free.const
+import arrow.free.value
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genIntSmall
 import arrow.typeclasses.*
 import io.kotlintest.properties.forAll
+import arrow.instances.*
 
 typealias TI<A> = Tuple2<IdOf<A>, IdOf<A>>
 

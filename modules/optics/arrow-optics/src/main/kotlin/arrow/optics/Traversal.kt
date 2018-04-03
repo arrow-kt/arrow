@@ -5,7 +5,6 @@ import arrow.core.*
 import arrow.data.*
 import arrow.free.*
 import arrow.higherkind
-import arrow.instances.IntMonoidInstance
 import arrow.instances.monoid
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monoid

@@ -6,7 +6,6 @@ import arrow.data.ListK
 import arrow.data.monoid
 import arrow.free.Const
 import arrow.higherkind
-import arrow.instances.IntMonoidInstance
 import arrow.instances.monoid
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Monoid

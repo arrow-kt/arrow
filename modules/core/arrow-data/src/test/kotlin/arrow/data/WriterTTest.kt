@@ -3,6 +3,7 @@ package arrow.data
 import arrow.Kind
 import arrow.core.*
 import arrow.instances.IntMonoidInstance
+import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
 import arrow.test.generators.genTuple
@@ -19,17 +20,17 @@ class WriterTTest : UnitSpec() {
   init {
 
     testLaws(
-      MonadLaws.laws(WriterT.monad(NonEmptyList.monad(), IntMonoidInstance), Eq.any()),
+      MonadLaws.laws(WriterT.monad(NonEmptyList.monad(), Int.monoid()), Eq.any()),
       MonoidKLaws.laws(
         WriterT.monoidK<ForListK, Int>(ListK.monoidK()),
-        WriterT.applicative(ListK.monad(), IntMonoidInstance),
+        WriterT.applicative(ListK.monad(), Int.monoid()),
         Eq { a, b ->
           a.fix().value == b.fix().value
         }),
 
-      MonadWriterLaws.laws(WriterT.monad(Option.monad(), IntMonoidInstance),
-        WriterT.monadWriter(Option.monad(), IntMonoidInstance),
-        IntMonoidInstance,
+      MonadWriterLaws.laws(WriterT.monad(Option.monad(), Int.monoid()),
+        WriterT.monadWriter(Option.monad(), Int.monoid()),
+        Int.monoid(),
         genIntSmall(),
         genTuple(genIntSmall(), genIntSmall()),
         Eq { a, b ->
@@ -46,7 +47,7 @@ class WriterTTest : UnitSpec() {
         }
       ),
 
-      MonadFilterLaws.laws(WriterT.monadFilter(Option.monadFilter(), IntMonoidInstance),
+      MonadFilterLaws.laws(WriterT.monadFilter(Option.monadFilter(), Int.monoid()),
         { WriterT(Option(Tuple2(it, it))) },
         object : Eq<Kind<WriterTPartialOf<ForOption, Int>, Int>> {
           override fun Kind<WriterTPartialOf<ForOption, Int>, Int>.eqv(b: Kind<WriterTPartialOf<ForOption, Int>, Int>): Boolean =

@@ -1,6 +1,7 @@
 package arrow.data
 
 import arrow.instances.IntEqInstance
+import arrow.instances.eq
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -12,7 +13,7 @@ class SetKTest : UnitSpec() {
 
   init {
 
-    val EQ = SetK.eq(IntEqInstance)
+    val EQ = SetK.eq(Int.eq())
 
     testLaws(
       EqLaws.laws(EQ) { SetK.just(it) },

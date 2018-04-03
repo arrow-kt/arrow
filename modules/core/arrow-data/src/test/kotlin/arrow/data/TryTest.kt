@@ -2,6 +2,7 @@ package arrow.data
 
 import arrow.core.*
 import arrow.instances.IntEqInstance
+import arrow.instances.eq
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadErrorLaws
@@ -20,7 +21,7 @@ class TryTest : UnitSpec() {
 
   init {
 
-    val EQ = Try.eq(Eq { a, b -> a::class == b::class }, IntEqInstance)
+    val EQ = Try.eq(Eq { a, b -> a::class == b::class }, Int.eq())
 
     testLaws(
       EqLaws.laws(EQ) { Try.just(it) },
