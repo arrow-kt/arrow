@@ -5,6 +5,7 @@ import arrow.core.*
 import arrow.data.*
 import arrow.higherkind
 import arrow.instances.IntMonoidInstance
+import arrow.instances.monoid
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Traverse
@@ -224,7 +225,7 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
   /**
    * Calculate the number of targets in the [PTraversal]
    */
-  fun size(s: S): Int = foldMap(IntMonoidInstance, s, { 1 })
+  fun size(s: S): Int = foldMap(Int.monoid(), s, { 1 })
 
   /**
    * Check if there is no target

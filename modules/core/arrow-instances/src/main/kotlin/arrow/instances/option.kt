@@ -5,6 +5,7 @@ import arrow.core.*
 import arrow.instance
 import arrow.typeclasses.*
 
+@instance(Option::class)
 interface OptionSemigroupInstance<A> : Semigroup<Option<A>> {
 
   fun SG(): Semigroup<A>

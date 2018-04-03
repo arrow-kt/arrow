@@ -5,7 +5,7 @@ import arrow.core.Eval
 import arrow.core.Id
 import arrow.core.monad
 import arrow.core.value
-import arrow.instances.IntMonoidInstance
+import arrow.instances.monoid
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB
@@ -31,14 +31,14 @@ object FoldableLaws {
 
   fun <F> Foldable<F>.leftFoldConsistentWithFoldMap(cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>) =
     forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: Kind<F, Int> ->
-      with(IntMonoidInstance) {
+      with(Int.monoid()) {
         fa.foldMap(this, f).equalUnderTheLaw(fa.foldLeft(empty(), { acc, a -> acc.combine(f(a)) }), EQ)
       }
     })
 
   fun <F> Foldable<F>.rightFoldConsistentWithFoldMap(cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>) =
     forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: Kind<F, Int> ->
-      with(IntMonoidInstance) {
+      with(Int.monoid()) {
         fa.foldMap(this, f).equalUnderTheLaw(fa.foldRight(Eval.later { empty() }, { a, lb: Eval<Int> -> lb.map { f(a).combine(it) } }).value(), EQ)
       }
     })
@@ -90,7 +90,7 @@ object FoldableLaws {
 
   fun <F> Foldable<F>.foldMIdIsFoldL(cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>) =
     forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: Kind<F, Int> ->
-      with(IntMonoidInstance) {
+      with(Int.monoid()) {
         val foldL: Int = fa.foldLeft(empty(), { acc, a -> acc.combine(f(a)) })
         val foldM: Int = fa.foldM(Id.monad(), empty(), { acc, a -> Id(acc.combine(f(a))) }).value()
         foldM.equalUnderTheLaw(foldL, EQ)

@@ -1,13 +1,11 @@
 package arrow.generic
 
+import arrow.common.utils.removeBackticks
 import me.eugeniomarletti.kotlin.metadata.escapedClassName
 import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 import java.io.File
 
-sealed class DerivedTypeClass(val type: String) {
-    fun factory(): String = "${type.substringBeforeLast(".")}.${type.substringAfterLast(".").decapitalize()}"
-}
-
+sealed class DerivedTypeClass(val type: String)
 object Semigroup : DerivedTypeClass("arrow.typeclasses.Semigroup")
 object Monoid : DerivedTypeClass("arrow.typeclasses.Monoid")
 object Eq : DerivedTypeClass("arrow.typeclasses.Eq")
@@ -59,8 +57,8 @@ class ProductFileGenerator(
     private fun processElement(product: AnnotatedGeneric): Pair<AnnotatedGeneric, String> = product to """
             |package ${product.classData.`package`.escapedClassName}
             |
-            |import arrow.syntax.applicative.*
-            |import arrow.core.toT
+            |import arrow.typeclasses.*
+            |import arrow.core.*
             |import arrow.instances.*
             |
             |fun ${product.sourceClassName}.combine(other: ${product.sourceClassName}): ${product.sourceClassName} =
@@ -70,10 +68,10 @@ class ProductFileGenerator(
             |  this.reduce { a, b -> a + b }
             |
             |operator fun ${product.sourceClassName}.plus(other: ${product.sourceClassName}): ${product.sourceClassName} =
-            |  arrow.typeclasses.semigroup<${product.sourceClassName}>().combine(this, other)
+            |  with(${product.sourceClassName}.semigroup()) { this@plus.combine(other) }
             |
             |fun empty${product.sourceSimpleName}(): ${product.sourceClassName} =
-            |  arrow.typeclasses.monoid<${product.sourceClassName}>().empty()
+            |  ${product.sourceClassName}.monoid().empty()
             |
             |fun ${product.sourceClassName}.tupled(): ${focusType(product)} =
             |  ${tupleConstructor(product)}
@@ -99,39 +97,60 @@ class ProductFileGenerator(
             |  ${classConstructorFromTuple(product.sourceClassName, product.focusSize)}
             |
             |inline fun <reified F> arrow.typeclasses.Applicative<F>.mapTo${product.sourceSimpleName}${kindedProperties("F", product)}: arrow.Kind<F, ${product.sourceClassName}> =
-            |    this.map(tupled(${product.targets.joinToString(", ") { it.paramName }}), { it.to${product.sourceSimpleName}() })
+            |    this.map(${product.targets.joinToString(", ") { it.paramName }}, { it.to${product.sourceSimpleName}() })
             |
-            |object ${product.sourceSimpleName}SemigroupInstance : arrow.typeclasses.Semigroup<${product.sourceClassName}> {
+            |interface ${product.sourceSimpleName}SemigroupInstance : arrow.typeclasses.Semigroup<${product.sourceClassName}> {
             |  override fun ${product.sourceClassName}.combine(b: ${product.sourceClassName}): ${product.sourceClassName} {
             |    val (${product.types().joinToString(", ") { "x$it" }}) = this
             |    val (${product.types().joinToString(", ") { "y$it" }}) = b
-            |    return ${product.sourceClassName}(${product.types().zip(product.targetNames).joinToString(", ") { "with(${it.second}.semigroup()){ x${it.first}.combine(y${it.first}) }" }})
+            |    return ${product.sourceClassName}(${product.types().zip(product.targetNames).joinToString(", ") { "with(${it.second.companionFromType()}.semigroup${it.second.typeArg()}(${it.second.instance(product, "${product.sourceSimpleName}SemigroupInstance", "semigroup()")})){ x${it.first}.combine(y${it.first}) }" }})
             |  }
             |}
             |
-            |object ${product.sourceSimpleName}MonoidInstance : arrow.typeclasses.Monoid<${product.sourceClassName}> {
+            |fun ${product.sourceClassName}.Companion.semigroup(): ${Semigroup.type}<${product.sourceClassName}> =
+            |  lazyOf(object : ${product.sourceSimpleName}SemigroupInstance {}).value
             |
-            |  override fun combine(a: ${product.sourceClassName}, b: ${product.sourceClassName}): ${product.sourceClassName} {
-            |    val (${product.types().joinToString(", ") { "x$it" }}) = a
-            |    val (${product.types().joinToString(", ") { "y$it" }}) = b
-            |    return ${product.sourceClassName}(${product.types().zip(product.targetNames).joinToString(", ") { "${Monoid.factory()}<${it.second}>().combine(x${it.first}, y${it.first})" }})
-            |  }
-            |
+            |interface ${product.sourceSimpleName}MonoidInstance : arrow.typeclasses.Monoid<${product.sourceClassName}>, ${product.sourceSimpleName}SemigroupInstance {
             |  override fun empty(): ${product.sourceClassName} =
-            |    ${product.sourceClassName}(${product.types().zip(product.targetNames).joinToString(", ") { "${Monoid.factory()}<${it.second}>().empty()" }})
+            |    ${product.sourceClassName}(${product.types().zip(product.targetNames).joinToString(", ") { "with(${it.second.companionFromType()}.monoid${it.second.typeArg()}(${it.second.instance(product, "${product.sourceSimpleName}MonoidInstance", "monoid()")})){ empty() }" }})
             |}
+            |
+            |fun ${product.sourceClassName}.Companion.monoid(): ${Monoid.type}<${product.sourceClassName}> =
+            |  lazyOf(object : ${product.sourceSimpleName}MonoidInstance {}).value
             |
             |interface ${product.sourceSimpleName}EqInstance : arrow.typeclasses.Eq<${product.sourceClassName}> {
-            |  override fun eqv(a: ${product.sourceClassName}, b: ${product.sourceClassName}): Boolean =
-            |    a == b
+            |  override fun ${product.sourceClassName}.eqv(b: ${product.sourceClassName}): Boolean =
+            |    this == b
             |}
+            |
+            |fun ${product.sourceClassName}.Companion.eq(): ${Eq.type}<${product.sourceClassName}> =
+            |  lazyOf(object : ${product.sourceSimpleName}EqInstance {}).value
             |
             |interface ${product.sourceSimpleName}ShowInstance : arrow.typeclasses.Show<${product.sourceClassName}> {
-            |  override fun show(a: ${product.sourceClassName}): String =
-            |    a.toString()
+            |  override fun ${product.sourceClassName}.show(): String =
+            |    this.toString()
             |}
             |
+            |fun ${product.sourceClassName}.Companion.show(): ${Show.type}<${product.sourceClassName}> =
+            |  lazyOf(object : ${product.sourceSimpleName}ShowInstance {}).value
+            |
             |""".trimMargin()
+
+    private fun String.companionFromType(): String =
+            substringBefore("<")
+
+    private fun String.typeArg(): String =
+            if (contains("<"))
+                "<${substringAfter("<").substringBeforeLast(">")}>"
+            else ""
+
+    private fun String.instance(product: AnnotatedGeneric, instance: String, factory: String): String =
+            if (contains("<")) {
+                val type = typeArg().removeSurrounding("<", ">")
+                if (product.sourceClassName == type) "this@$instance"
+                else "$type.$factory"
+            }
+            else ""
 
     private fun tupleConstructor(product: AnnotatedGeneric): String =
             product.targets.joinToString(prefix = "$tuple${product.focusSize}(", postfix = ")", transform = { "this.${it.paramName.plusIfNotBlank(prefix = "`", postfix = "`")}" })

@@ -16,7 +16,7 @@ class ValidatedTest : UnitSpec() {
 
   init {
 
-    val EQ = Validated.eq(StringEqInstance, IntEqInstance)
+    val EQ = Validated.eq(StringEqInstance, Int.eq())
 
     val VAL_AP = Validated.applicative<String>(StringMonoidInstance)
 
@@ -25,11 +25,11 @@ class ValidatedTest : UnitSpec() {
     testLaws(
       EqLaws.laws(EQ) { Valid(it) },
       ShowLaws.laws(Validated.show(), EQ) { Valid(it) },
-      ApplicativeLaws.laws(Validated.applicative(StringMonoidInstance), Eq.any()),
-      TraverseLaws.laws(Validated.traverse(), Validated.applicative(StringMonoidInstance), ::Valid, Eq.any()),
+      ApplicativeLaws.laws(Validated.applicative(String.monoid()), Eq.any()),
+      TraverseLaws.laws(Validated.traverse(), Validated.applicative(String.monoid()), ::Valid, Eq.any()),
       SemigroupKLaws.laws(
-        Validated.semigroupK(IntMonoidInstance),
-        Validated.applicative(IntMonoidInstance),
+        Validated.semigroupK(Int.monoid()),
+        Validated.applicative(Int.monoid()),
         Eq.any())
     )
 
@@ -120,7 +120,7 @@ class ValidatedTest : UnitSpec() {
       Invalid(13).toValidatedNel() shouldBe Invalid(NonEmptyList(13, listOf()))
     }
 
-    val plusIntSemigroup: Semigroup<Int> = IntSemigroupInstance
+    val plusIntSemigroup: Semigroup<Int> = Int.semigroup()
 
     "findValid should return the first Valid value or combine or Invalid values in otherwise" {
       Valid(10).findValid(plusIntSemigroup, { fail("None should not be called") }) shouldBe Valid(10)

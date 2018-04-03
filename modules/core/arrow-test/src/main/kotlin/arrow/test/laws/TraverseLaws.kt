@@ -6,7 +6,7 @@ import arrow.data.Const
 import arrow.data.applicative
 import arrow.data.const
 import arrow.data.value
-import arrow.instances.IntMonoidInstance
+import arrow.instances.monoid
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genIntSmall
@@ -91,8 +91,8 @@ object TraverseLaws {
 
   fun <F> Traverse<F>.foldMapDerived(cf: (Int) -> Kind<F, Int>) =
     forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: Kind<F, Int> ->
-      val traversed = fa.traverse(Const.applicative(IntMonoidInstance), { a -> f(a).const() }).value()
-      val mapped = fa.foldMap(IntMonoidInstance, f)
+      val traversed = fa.traverse(Const.applicative(Int.monoid()), { a -> f(a).const() }).value()
+      val mapped = fa.foldMap(Int.monoid(), f)
       mapped.equalUnderTheLaw(traversed, Eq.any())
     })
 }

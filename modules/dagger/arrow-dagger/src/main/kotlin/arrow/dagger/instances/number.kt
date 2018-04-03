@@ -12,75 +12,75 @@ import dagger.Provides
 class NumberInstances {
 
   @Provides
-  fun byteSemigroup(): Semigroup<Byte> = ByteMonoidInstance
+  fun byteSemigroup(): Semigroup<Byte> = Byte.semigroup()
 
   @Provides
-  fun byteMonoid(): Monoid<Byte> = ByteMonoidInstance
+  fun byteMonoid(): Monoid<Byte> = Byte.monoid()
 
   @Provides
-  fun byteOrder(): Order<Byte> = ByteOrderInstance
+  fun byteOrder(): Order<Byte> = Byte.order()
 
   @Provides
-  fun byteEq(): Eq<Byte> = ByteEqInstance
+  fun byteEq(): Eq<Byte> = Byte.eq()
 
   @Provides
-  fun doubleSemigroup(): Semigroup<Double> = DoubleMonoid
+  fun doubleSemigroup(): Semigroup<Double> = Double.semigroup()
 
   @Provides
-  fun doubleMonoid(): Monoid<Double> = DoubleMonoid
+  fun doubleMonoid(): Monoid<Double> = Double.monoid()
 
   @Provides
-  fun doubleOrder(): Order<Double> = DoubleOrderInstance
+  fun doubleOrder(): Order<Double> = Double.order()
 
   @Provides
-  fun doubleEq(): Eq<@JvmSuppressWildcards Double> = DoubleEqInstance
+  fun doubleEq(): Eq<@JvmSuppressWildcards Double> = Double.eq()
 
   @Provides
-  fun intSemigroup(): Semigroup<Int> = IntMonoidInstance
+  fun intSemigroup(): Semigroup<Int> = Int.semigroup()
 
   @Provides
-  fun intMonoid(): Monoid<Int> = IntMonoidInstance
+  fun intMonoid(): Monoid<Int> = Int.monoid()
 
   @Provides
-  fun intOrder(): Order<Int> = IntOrderInstance
+  fun intOrder(): Order<Int> = Int.order()
 
   @Provides
-  fun intEq(): Eq<@JvmSuppressWildcards Int> = IntEqInstance
+  fun intEq(): Eq<@JvmSuppressWildcards Int> = Int.eq()
 
   @Provides
-  fun longSemigroup(): Semigroup<Long> = LongMonoidInstance
+  fun longSemigroup(): Semigroup<Long> = Long.semigroup()
 
   @Provides
-  fun longMonoid(): Monoid<Long> = LongMonoidInstance
+  fun longMonoid(): Monoid<Long> = Long.monoid()
 
   @Provides
-  fun longOrder(): Order<Long> = LongOrderInstance
+  fun longOrder(): Order<Long> = Long.order()
 
   @Provides
-  fun longEq(): Eq<@JvmSuppressWildcards Long> = LongEqInstance
+  fun longEq(): Eq<@JvmSuppressWildcards Long> = Long.eq()
 
   @Provides
-  fun shortSemigroup(): Semigroup<Short> = ShortMonoid
+  fun shortSemigroup(): Semigroup<Short> = Short.semigroup()
 
   @Provides
-  fun shortMonoid(): Monoid<Short> = ShortMonoid
+  fun shortMonoid(): Monoid<Short> = Short.monoid()
 
   @Provides
-  fun shortOrder(): Order<Short> = ShortOrderInstance
+  fun shortOrder(): Order<Short> = Short.order()
 
   @Provides
-  fun shortEq(): Eq<@JvmSuppressWildcards Short> = ShortEqInstance
+  fun shortEq(): Eq<@JvmSuppressWildcards Short> = Short.eq()
 
   @Provides
-  fun floatSemigroup(): Semigroup<Float> = FloatMonoid
+  fun floatSemigroup(): Semigroup<Float> = Float.semigroup()
 
   @Provides
-  fun floatMonoid(): Monoid<Float> = FloatMonoid
+  fun floatMonoid(): Monoid<Float> = Float.monoid()
 
   @Provides
-  fun floatOrder(): Order<Float> = FloatOrderInstance
+  fun floatOrder(): Order<Float> = Float.order()
 
   @Provides
-  fun floatEq(): Eq<@JvmSuppressWildcards Float> = FloatEqInstance
+  fun floatEq(): Eq<@JvmSuppressWildcards Float> = Float.eq()
 
 }
