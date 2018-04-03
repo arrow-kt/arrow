@@ -65,9 +65,17 @@ sequenceOf('a', 'b', 'c', 'd', 'e').k().foldLeft("") { x, y -> x + y }
 
 Available Instances:
 
-```kotlin
-import arrow.debug.*
-
-showInstances<ForSequenceK, Unit>()
-// [Applicative, Foldable, Functor, Monad, Monoid, MonoidK, Semigroup, SemigroupK, Traverse, TraverseFilter]
-```
+[Show](/docs/typeclasses/show)
+[Eq](/docs/typeclasses/eq)
+[Applicative](/docs/typeclasses/applicative)
+[Foldable](/docs/typeclasses/foldable)
+[Functor](/docs/typeclasses/functor)
+[Monad](/docs/typeclasses/monad)
+[Monoid](/docs/typeclasses/monoid)
+[MonoidK](/docs/typeclasses/monoidk)
+[Semigroup](/docs/typeclasses/semigroup)
+[SemigroupK](/docs/typeclasses/semigroupk)
+[Traverse](/docs/typeclasses/traverse)
+[TraverseFilter](/docs/typeclasses/traversefilter)
+[Index](/docs/optics/index)
+[FilterIndex](/docs/optics/filterindex)

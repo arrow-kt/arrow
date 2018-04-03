@@ -117,12 +117,10 @@ stackOperations().runA(Nel.of("hello", "world", "!").some())
 
 Available Instances:
 
-```kotlin
-import arrow.debug.*
-
-showInstances<StatePartialOf<Stack>, Unit>()
-// [Applicative, Functor, Monad, MonadState]
-```
+[Applicative](/docs/typeclasses/applicative)
+[Functor](/docs/typeclasses/functor)
+[Monad](/docs/typeclasses/monad)
+[MonadState](/docs/typeclasses/monadstate)
 
 # Credits
 

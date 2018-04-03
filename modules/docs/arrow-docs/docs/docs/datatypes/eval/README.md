@@ -69,13 +69,12 @@ odd(100000).value()
 
 ### Available Instances
 
-```kotlin
-import arrow.debug.*
+[Applicative](/docs/typeclasses/applicative)
+[Bimonad](/docs/typeclasses/bimonad)
+[Comonad](/docs/typeclasses/comonad)
+[Functor](/docs/typeclasses/functor)
+[Monad](/docs/typeclasses/monad)
 
-showInstances<ForEval, Unit>()
-// [Applicative, Bimonad, Comonad, Functor, Monad]
-```
- 
 # Credits
  
 Contents partially adapted from [Cats Eval](https://typelevel.org/cats/datatypes/eval.html)

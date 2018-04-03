@@ -130,3 +130,19 @@ NonEmptyList.applicative().map(nelId, nelName, nelYear, { (id, name, year) ->
 - `foldLeft`, `map`, `flatMap` and others are used to compute over the internal contents of a `NonEmptyList` value.
 - `NonEmptyList.monad().binding { ... } Comprehensions` can be __used to imperatively compute__ over multiple `NonEmptyList` values in sequence.
 - `NonEmptyList.applicative().map { ... }` can be used to compute over multiple `NonEmptyList` values preserving type information and __abstracting over arity__ with `map`
+
+## Available Instances
+
+[Show](/docs/typeclasses/show)
+[Eq](/docs/typeclasses/eq)
+[Applicative](/docs/typeclasses/applicative)
+[Bimonad](/docs/typeclasses/bimonad)
+[Comonad](/docs/typeclasses/comonad)
+[Foldable](/docs/typeclasses/foldable)
+[Functor](/docs/typeclasses/functor)
+[Monad](/docs/typeclasses/monad)
+[Semigroup](/docs/typeclasses/semigroup)
+[SemigroupK](/docs/typeclasses/semigroupk)
+[Traverse](/docs/typeclasses/traverse)
+[Index](/docs/optics/index)
+[FilterIndex](/docs/optics/filterindex)

@@ -216,9 +216,11 @@ houseNumber
 
 ## Available Instances
 
-```kotlin
-import arrow.debug.*
-
-showInstances<ValidatedPartialOf<String>, Unit>()
-// [Applicative, ApplicativeError, Eq, Foldable, Functor, SemigroupK, Traverse, TraverseFilter]
-```
+[Show](/docs/typeclasses/show)
+[Eq](/docs/typeclasses/eq)
+[Applicative](/docs/typeclasses/applicative)
+[ApplicativeError](/docs/typeclasses/applicativeerror)
+[Foldable](/docs/typeclasses/foldable)
+[Functor](/docs/typeclasses/functor)
+[SemigroupK](/docs/typeclasses/semigroupk)
+[Traverse](/docs/typeclasses/traverse)

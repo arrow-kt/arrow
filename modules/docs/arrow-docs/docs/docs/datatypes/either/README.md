@@ -309,9 +309,15 @@ val httpStatusCode = r.getOrHandle {
 
 ## Instances
 
-```kotlin
-import arrow.debug.*
-
-showInstances<ForEither, Throwable>()
-// [Applicative, ApplicativeError, Foldable, Functor, Monad, MonadError, SemigroupK, Traverse, TraverseFilter]
-```
+[Show](/docs/typeclasses/show)
+[Eq](/docs/typeclasses/eq)
+[Applicative](/docs/typeclasses/applicative)
+[ApplicativeError](/docs/typeclasses/applicativeerror)
+[Foldable](/docs/typeclasses/foldable)
+[Functor](/docs/typeclasses/functor)
+[Monad](/docs/typeclasses/monad)
+[MonadError](/docs/typeclasses/monaderror)
+[SemigroupK](/docs/typeclasses/semigroupk)
+[Traverse](/docs/typeclasses/traverse)
+[TraverseFilter](/docs/typeclasses/traversefilter)
+[Each](/docs/optics/each)

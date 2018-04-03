@@ -140,11 +140,11 @@ stackOperationsS2().runM(Either.monad<StackError>(), listOf())
 
 Available Instances:
 
-```kotlin
-import arrow.debug.*
-
-showInstances<StateTPartialOf<EitherPartialOf<StackError>, Stack>, Unit>()
-// [Applicative, ApplicativeError, Functor, Monad, MonadError, MonadState]
-```
+[Applicative](/docs/typeclasses/applicative)
+[ApplicativeError](/docs/typeclasses/applicativeerror)
+[Functor](/docs/typeclasses/functor)
+[Monad](/docs/typeclasses/monad)
+[MonadError](/docs/typeclasses/monaderror)
+[MonadState](/docs/typeclasses/monadstate)
 
 Take a look at the [`EitherT` docs]({{ '/docs/datatypes/eithert' | relative_url }}) or [`OptionT` docs]({{ '/docs/datatypes/optiont' | relative_url }}) for an alternative version monad transformer for achieving different goals.
