@@ -277,31 +277,31 @@ Arrow provides the following `MonadError` instances for `Option`, `Try` and `Eit
 ```kotlin:ank
 import arrow.typeclasses.*
 
-monadError<ForOption, Unit>()
+Option.monadError()
 ```
 
 ```kotlin:ank
-monadError<ForTry, Throwable>()
+Try.monadError()
 ```
 
 ```kotlin:ank
-monadError<EitherPartialOf<NukeException>, NukeException>()
+Either.monadError<NukeException>()
 ```
 
 Let's now rewrite our program as a polymorphic function that will work over any datatype for which a `MonadError` instance exists.
 Polymorphic code in Arrow is based on emulated [`Higher Kinds`](/docs/patterns/polymorphicprograms) as described in [Lightweight higher-kinded polymorphism](https://www.cl.cam.ac.uk/~jdy22/papers/lightweight-higher-kinded-polymorphism.pdf) and applied to Kotlin, a lang which does not yet support Higher Kinded Types.
 
 ```kotlin
-inline fun <reified F> arm(ME: MonadError<F, NukeException> = monadError()): Kind<F, Nuke> = ME.just(Nuke)
-inline fun <reified F> aim(ME: MonadError<F, NukeException> = monadError()): Kind<F, Target> = ME.just(Target)
-inline fun <reified F> launch(target: Target, nuke: Nuke, ME: MonadError<F, NukeException> = monadError()):
+fun <f> arm(ME: MonadError<F, NukeException>): Kind<F, Nuke> = ME.just(Nuke)
+fun <f> aim(ME: MonadError<F, NukeException>): Kind<F, Target> = ME.just(Target)
+fun <f> launch(target: Target, nuke: Nuke, ME: MonadError<F, NukeException>):
   Kind<F, Impacted> = ME.raiseError(MissedByMeters(5))
 ```
 
 We can now express the same program as before in a fully polymorphic context
 
 ```kotlin
-inline fun <reified F> attack(ME:MonadError<F, NukeException> = monadError()):Kind<F, Impacted> =
+fun <f> attack(ME:MonadError<F, NukeException>):Kind<F, Impacted> =
   ME.binding {
     val nuke = arm<F>().bind()
     val target = aim<F>().bind()
@@ -313,7 +313,7 @@ inline fun <reified F> attack(ME:MonadError<F, NukeException> = monadError()):Ki
 Or since `arm()` and `bind()` are operations that do not depend on each other we don't need the [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) here and we can express our logic as:
 
 ```kotlin
-inline fun <reified F> attack1(ME: MonadError<F, NukeException> = monadError()): Kind<F, Impacted> =
+fun <f> attack1(ME: MonadError<F, NukeException>): Kind<F, Impacted> =
   ME.tupled(aim(), arm()).flatMap(ME, { (nuke, target) -> launch<F>(nuke, target) })
 
 val result = attack<EitherPartialOf<NukeException>>()
@@ -327,11 +327,11 @@ result1.fix()
 Note that `MonadError` also has a function `bindingCatch` that automatically captures and wraps exceptions in its binding block.
 
 ```kotlin
-inline fun <reified F> launchImjust(target: Target, nuke: Nuke, ME: MonadError<F, NukeException> = monadError()): Impacted {
+fun <f> launchImjust(target: Target, nuke: Nuke, ME: MonadError<F, NukeException>): Impacted {
   throw MissedByMeters(5)
 }
 
-inline fun <reified F> attack(ME:MonadError<F, NukeException> = monadError()):Kind<F, Impacted> =
+fun <f> attack(ME:MonadError<F, NukeException>):Kind<F, Impacted> =
   ME.binding {
     val nuke = arm<F>().bind()
     val target = aim<F>().bind()

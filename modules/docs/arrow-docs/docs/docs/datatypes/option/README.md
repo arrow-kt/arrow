@@ -113,8 +113,6 @@ noNumber.fold({ 1 }, { it * 3 })
 Arrow also adds syntax to all datatypes so you can easily lift them into the context of `Option` where needed.
 
 ```kotlin:ank
-import arrow.syntax.option.*
-
 1.some()
 ```
 
@@ -131,7 +129,7 @@ Transforming the inner contents
 ```kotlin:ank
 import arrow.typeclasses.*
 
-Option.functor().map(Some(1), { it + 1 })
+Option.functor().run { Some(1).map { it + 1 } }
 ```
 
 [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }})
@@ -139,8 +137,6 @@ Option.functor().map(Some(1), { it + 1 })
 Computing over independent values
 
 ```kotlin:ank
-import arrow.syntax.applicative.*
-
 Option.applicative().tupled(Some(1), Some("Hello"), Some(20.0))
 ```
 

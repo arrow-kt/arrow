@@ -17,7 +17,7 @@ We can use that `Optional` to safely operate on that focus `S` i.e. operating on
 import arrow.data.*
 import arrow.optics.typeclasses.*
 
-val thirdListItemOptional = Index.index<ListKOf<String>, Int, String>(3)
+val thirdListItemOptional = Index.index(ListK.index<String>(), 3)
 
 thirdListItemOptional.set(listOf("0", "1", "2", "3").k(), "newValue")
 ```

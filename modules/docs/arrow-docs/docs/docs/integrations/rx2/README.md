@@ -150,3 +150,12 @@ observable.value()
 disposable()
 // Boom! caused by BindingCancellationException
 ```
+
+```kotlin
+import arrow.*
+import arrow.effects.*
+import arrow.debug.*
+
+showInstances<ForObservableK, Throwable>()
+// [Applicative, ApplicativeError, Functor, Monad, MonadError, MonadSuspend, Async, Effect, Foldable, Traverse]
+```

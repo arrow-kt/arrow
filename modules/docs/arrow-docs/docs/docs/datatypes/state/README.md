@@ -16,7 +16,6 @@ Let's build a simple Stack using Arrow's NonEmptyList and Option:
 import arrow.*
 import arrow.core.*
 import arrow.data.*
-import arrow.syntax.option.*
 
 typealias Stack = Option<Nel<String>>
 ```

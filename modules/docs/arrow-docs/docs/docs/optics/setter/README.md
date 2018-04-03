@@ -21,7 +21,7 @@ import arrow.*
 import arrow.optics.*
 import arrow.data.*
 
-val setter: Setter<ListKOf<Int>, Int> = Setter.fromFunctor()
+val setter: Setter<ListKOf<Int>, Int> = Setter.fromFunctor(ListK.functor())
 setter.set(listOf(1, 2, 3, 4).k(), 5)
 ```
 ```kotlin:ank
@@ -81,7 +81,7 @@ Previously when we used a `Setter<ListKOf<Int>, Int>` it was able to morph the `
 With a `PSetter<ListKOf<Int>, ListKOf<String>, Int, String>` we can morph an `Int` value to a `String` value and thus also morph the type from `ListK<Int>` to `ListK<String>`.
 
 ```kotlin:ank
-val pSetter: PSetter<ListKOf<Int>, ListKOf<String>, Int, String> = PSetter.fromFunctor()
+val pSetter: PSetter<ListKOf<Int>, ListKOf<String>, Int, String> = PSetter.fromFunctor(ListK.functor())
 pSetter.set(listOf(1, 2, 3, 4).k(), "Constant")
 ```
 ```kotlin:ank

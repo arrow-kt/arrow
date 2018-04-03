@@ -4,8 +4,8 @@
 echo "Branch '$TRAVIS_BRANCH'"
 
 if [ "$TRAVIS_BRANCH" == "master" ]; then
-#    ./gradlew :arrow-docs:gitPublishPush
-    echo "Docs temporarily disabled!"
+    ./gradlew :arrow-docs:gitPublishPush
+    echo "Docs deployed!"
 else
     echo "Skipped docs deployment in branch '$TRAVIS_BRANCH'"
 fi
