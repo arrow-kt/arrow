@@ -18,7 +18,7 @@ Given a `Prism<S, A>` we can write functions that work on the focus `A` without 
 For a sum type `NetworkResult` we can create a `Prism` that has a focus into `Success`
 
 ```kotlin:ank
-import arrow.*
+import arrow.core.*
 import arrow.optics.*
 
 sealed class NetworkResult {
@@ -42,8 +42,6 @@ As is clear from above `Prism` definition it gathers two concepts: pattern match
 Since sealed classes enforce a certain relationship we can omit the `reverseGet` parameter to create a `Prism` for them. 
 
 ```kotlin:ank:silent
-import arrow.core.*
-
 val networkSuccessPrism2: Prism<NetworkResult, NetworkResult.Success> = Prism { networkResult ->
     when (networkResult) {
         is NetworkResult.Success -> networkResult.right()
@@ -105,7 +103,7 @@ Let's imagine from our previous example we want to retrieve an `Int` from the ne
 import arrow.data.*
 
 val successToInt: Prism<NetworkResult.Success, Int> = Prism(
-        partialFunction = case({ success: NetworkResult.Success -> Try { success.content.toInt() }.nonEmpty() }
+        partialFunction = case({ success: NetworkResult.Success -> Try { success.content.toInt() }.isSuccess() }
                 toT { success -> success.content.toInt() }
         ),
         reverseGet = NetworkResult::Success compose Int::toString
