@@ -28,19 +28,19 @@ typealias SetterKindedJ<S, A> = PSetterKindedJ<S, S, A, A>
  *
  * @param S the source of a [PSetter]
  * @param T the modified source of a [PSetter]
- * @param A the target of a [PSetter]
- * @param B the modified target of a [PSetter]
+ * @param A the focus of a [PSetter]
+ * @param B the modified focus of a [PSetter]
  */
 @higherkind
 interface PSetter<S, T, A, B> : PSetterOf<S, T, A, B> {
 
   /**
-   * Modify polymorphically the target of a [PSetter] with a function
+   * Modify polymorphically the focus of a [PSetter] with a function [f].
    */
   fun modify(s: S, f: (A) -> B): T
 
   /**
-   * Set polymorphically the target of a [PSetter] with a value
+   * Set polymorphically the focus of a [PSetter] with a value [b].
    */
   fun set(s: S, b: B): T
 
