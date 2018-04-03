@@ -7,6 +7,7 @@ import arrow.data.applicative
 import arrow.data.fix
 import arrow.free.instances.FreeApplicativeApplicativeInstance
 import arrow.free.instances.FreeApplicativeEq
+import arrow.free.instances.eq
 import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.EqLaws

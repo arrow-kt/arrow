@@ -3,7 +3,7 @@ package arrow.free
 import arrow.Kind
 import arrow.higherkind
 import arrow.typeclasses.Applicative
-import arrow.typeclasses.FunctionK
+import arrow.core.FunctionK
 import arrow.typeclasses.Monoid
 
 inline fun <F, G, A> FreeApplicativeOf<F, A>.foldMapK(f: FunctionK<F, G>, GA: Applicative<G>): Kind<G, A> =

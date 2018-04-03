@@ -2,9 +2,13 @@ package arrow.free.instances
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.FunctionK
 import arrow.free.*
 import arrow.instance
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
 import arrow.free.ap as freeAp
 import arrow.free.flatMap as freeFlatMap
 import arrow.free.map as freeMap
@@ -48,7 +52,6 @@ interface FreeMonadInstance<S> : FreeApplicativeInstance<S>, Monad<FreePartialOf
   }
 }
 
-@instance(Free::class)
 interface FreeEq<F, G, A> : Eq<Kind<FreePartialOf<F>, A>> {
 
   fun MG(): Monad<G>
@@ -58,3 +61,11 @@ interface FreeEq<F, G, A> : Eq<Kind<FreePartialOf<F>, A>> {
   override fun Kind<FreePartialOf<F>, A>.eqv(b: Kind<FreePartialOf<F>, A>): Boolean =
     fix().foldMap(FK(), MG()) == b.fix().foldMap(FK(), MG())
 }
+
+@Suppress("UNUSED_PARAMETER")
+fun <F, G, A> Free.Companion.eq(FK: FunctionK<F, G>, MG: Monad<G>, dummy: Unit = Unit): FreeEq<F, G, A> =
+  object : FreeEq<F, G, A> {
+    override fun FK(): FunctionK<F, G> = FK
+
+    override fun MG(): arrow.typeclasses.Monad<G> = MG
+  }
