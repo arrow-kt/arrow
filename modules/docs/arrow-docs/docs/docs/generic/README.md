@@ -34,7 +34,8 @@ Because of such properties we can automatically derive interesting behaviors fro
 ##### + operator
 
 ```kotlin:ank
-import docs.*
+import arrow.core.*
+import arrow.generic.*
 
 Account(1000, 900) + Account(1000, 900)
 ```
@@ -52,7 +53,7 @@ Account(1000, 900).tupled()
 ```
 
 ```kotlin:ank
-Account(1000, 900).tupledLabeled()
+Account(1000, 900).tupledLabelled()
 ```
 
 ```kotlin:ank
@@ -66,7 +67,7 @@ Account(1000, 900).toHList()
 ```
 
 ```kotlin:ank
-Account(1000, 900).toHListLabeled()
+Account(1000, 900).toHListLabelled()
 ```
 
 ```kotlin:ank
@@ -81,27 +82,28 @@ Map independent values in the context of any `Applicative` capable data type str
 val maybeBalance: Option<Int> = Option(1000)
 val maybeAvailable: Option<Int> = Option(900)
 
-Option.applicative() { 
-  mapToPerson(maybeBalance, maybeAvailable)
-}
+Option.applicative().mapToAccount(maybeBalance, maybeAvailable)
 ```
 
 ```kotlin:ank
 val maybeBalance: Option<Int> = Option(1000)
 val maybeAvailable: Option<Int> = None
 
-Option.applicative() { 
-  mapToPerson(maybeBalance, maybeAvailable)
-}
+Option.applicative().mapToAccount(maybeBalance, maybeAvailable)
+```
+
+```kotlin:ank
+val tryBalance: Try<Int> = Try { 1000 }
+val tryAvailable: Try<Int> = Try { 900 }
+
+Try.applicative().mapToAccount(tryBalance, tryAvailable)
 ```
 
 ```kotlin:ank
 val tryBalance: Try<Int> = Try { 1000 }
 val tryAvailable: Try<Int> = Try { throw RuntimeException("BOOM") }
 
-Try.applicative() { 
-  mapToPerson(tryBalance, tryAvailable)
-}
+Try.applicative().mapToAccount(tryBalance, tryAvailable)
 ```
 
 #### Typeclass instances
@@ -109,7 +111,7 @@ Try.applicative() {
 ##### Semigroup 
 
 ```kotlin:ank
-Account.semigroup() {
+with(Account.semigroup()) {
   Account(1000, 900).combine(Account(1000, 900))
 }
 ```
@@ -127,13 +129,13 @@ Account.monoid().empty()
 ##### Eq 
 
 ```kotlin:ank
-Account.eq() {
+with(Account.eq()) {
   Account(1000, 900).eqv(Account(1000, 900))
 }
 ```
 
 ```kotlin:ank
-Account.eq() {
+with(Account.eq()) {
   Account(1000, 900).neqv(Account(1000, 900))
 }
 ```
@@ -141,7 +143,7 @@ Account.eq() {
 ##### Show 
 
 ```kotlin:ank
-Account.show() {
+with(Account.show()) {
   Account(1000, 900).show()
 }
 ```

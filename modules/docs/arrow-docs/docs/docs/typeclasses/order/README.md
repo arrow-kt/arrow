@@ -27,7 +27,7 @@ import arrow.*
 import arrow.typeclasses.*
 import arrow.instances.*
 
-IntOrderInstance.run { 1.compare(2) }
+Int.order().run { 1.compare(2) }
 ```
 
 #### F#lte / F#lt
@@ -36,7 +36,7 @@ Lesser than or equal to defines total order in a set, it compares two elements a
 It is the opposite of `gte`.
 
 ```kotlin:ank
-IntOrderInstance.run { 1.lte(2) }
+Int.order().run { 1.lte(2) }
 ```
 
 #### F#gte / F#gt
@@ -45,7 +45,7 @@ Greater than or equal compares two elements and returns true if they're equal or
 It is the opposite of `lte`.
 
 ```kotlin:ank
-IntOrderInstance.run { 1.gte(2) }
+Int.order().run { 1.gte(2) }
 ```
 
 #### F#max / F#min
@@ -53,10 +53,10 @@ IntOrderInstance.run { 1.gte(2) }
 Compares two elements and respectively returns the maximum or minimum in respect to their order.
 
 ```kotlin:ank
-IntOrderInstance.run { 1.min(2) }
+Int.order().run { 1.min(2) }
 ```
 ```kotlin:ank
-IntOrderInstance.run { 1.max(2) }
+Int.order().run { 1.max(2) }
 ```
 
 #### F#sort
@@ -64,7 +64,7 @@ IntOrderInstance.run { 1.max(2) }
 Sorts the elements in a `Tuple2`
 
 ```kotlin:ank
-IntOrderInstance.run { 1.sort(2) }
+Int.order().run { 1.sort(2) }
 ```
 
 ### Laws

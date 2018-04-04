@@ -32,7 +32,7 @@ import arrow.*
 import arrow.typeclasses.*
 import arrow.instances.*
 
-IntSemigroupInstance.run { 1.combine(2) }
+Int.semigroup().run { 1.combine(2) }
 ```
 
 ```kotlin:ank   
@@ -44,11 +44,11 @@ ListK.semigroup<Int>().run { listOf(1, 2, 3).k().combine(listOf(4, 5, 6).k()) }
 ```kotlin:ank
 import arrow.core.*
 
-Option.monoid<Int>(IntSemigroupInstance).run { Option(1).combine(Option(2)) }
+Option.monoid<Int>(Int.semigroup()).run { Option(1).combine(Option(2)) }
 ```
 
 ```kotlin:ank
-Option.monoid<Int>(IntSemigroupInstance).run { Option(1).combine(None) }
+Option.monoid<Int>(Int.semigroup()).run { Option(1).combine(None) }
 ```
 
 Many of these types have methods defined directly on them, which allow for such combining, e.g. `+` on `List`, but the value of having a `Semigroup` typeclass available is that these compose.

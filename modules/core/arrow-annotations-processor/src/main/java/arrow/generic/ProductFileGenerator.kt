@@ -53,6 +53,114 @@ class ProductFileGenerator(
             |
             |""".trimMargin()
 
+    private fun semigroupExtensions(product: AnnotatedGeneric): String =
+            """|
+                |fun ${product.sourceClassName}.combine(other: ${product.sourceClassName}): ${product.sourceClassName} =
+                |  this + other
+                |
+                |fun List<${product.sourceClassName}>.combineAll(): ${product.sourceClassName} =
+                |  this.reduce { a, b -> a + b }
+                |
+                |operator fun ${product.sourceClassName}.plus(other: ${product.sourceClassName}): ${product.sourceClassName} =
+                |  with(${product.sourceClassName}.semigroup()) { this@plus.combine(other) }
+                |""".trimMargin()
+
+    private fun monoidExtensions(product: AnnotatedGeneric): String =
+            """|fun empty${product.sourceSimpleName}(): ${product.sourceClassName} =
+                |  ${product.sourceClassName}.monoid().empty()
+                |""".trimMargin()
+
+    private fun tupledExtensions(product: AnnotatedGeneric): String =
+            if (product.hasTupleFocus)
+                """|
+                |fun ${product.sourceClassName}.tupled(): ${focusType(product)} =
+                | ${tupleConstructor(product)}
+                |
+                |fun ${product.sourceClassName}.tupledLabelled(): ${labelledFocusType(product)} =
+                |  ${product.targets.joinToString(prefix = "arrow.core.Tuple${product.focusSize}(", postfix = ")") { """("${it.paramName}" toT ${it.paramName})""" }}
+                |
+                |fun <B> ${product.sourceClassName}.foldLabelled(f: ${product.targetNames.joinToString(prefix = "(", separator = ", ", postfix = ")") { "arrow.core.Tuple2<kotlin.String, $it>" }} -> B): B {
+                |  val t = tupledLabelled()
+                |  return f(${(0 until product.focusSize).joinToString(", ") { "t.${letters[it]}" }})
+                |}
+                |
+                |fun ${focusType(product)}.to${product.sourceSimpleName}(): ${product.sourceClassName} =
+                |  ${classConstructorFromTuple(product.sourceClassName, product.focusSize)}
+                |""".trimMargin()
+            else ""
+
+    private fun hListExtensions(product: AnnotatedGeneric): String =
+            """|
+                |fun ${product.sourceClassName}.toHList(): ${focusHListType(product)} =
+                |  ${hListConstructor(product)}
+                |
+                |fun ${focusHListType(product)}.to${product.sourceSimpleName}(): ${product.sourceClassName} =
+                |  ${classConstructorFromHList(product.sourceClassName, product.focusSize)}
+                |
+                |fun ${product.sourceClassName}.toHListLabelled(): ${labelledHListFocusType(product)} =
+                |  ${product.targets.joinToString(prefix = "arrow.generic.hListOf(", postfix = ")") { """("${it.paramName}" toT ${it.paramName})""" }}
+                |""".trimMargin()
+
+    private fun applicativeExtensions(product: AnnotatedGeneric): String =
+            if (product.hasTupleFocus)
+                """|
+                |fun <F> arrow.typeclasses.Applicative<F>.mapTo${product.sourceSimpleName}${kindedProperties("F", product)}: arrow.Kind<F, ${product.sourceClassName}> =
+                |    this.map(${product.targets.joinToString(", ") { it.paramName }}, { it.to${product.sourceSimpleName}() })
+                |
+                |""".trimMargin()
+            else ""
+
+    private fun semigroupInstance(product: AnnotatedGeneric): String =
+            """|
+                |interface ${product.sourceSimpleName}SemigroupInstance : arrow.typeclasses.Semigroup<${product.sourceClassName}> {
+                |  override fun ${product.sourceClassName}.combine(b: ${product.sourceClassName}): ${product.sourceClassName} {
+                |    val (${product.types().joinToString(", ") { "x$it" }}) = this
+                |    val (${product.types().joinToString(", ") { "y$it" }}) = b
+                |    return ${product.sourceClassName}(${product.types().zip(product.targetNames).joinToString(", ") { "with(${it.second.companionFromType()}.semigroup${it.second.typeArg()}(${it.second.instance(product, "${product.sourceSimpleName}SemigroupInstance", "semigroup()")})){ x${it.first}.combine(y${it.first}) }" }})
+                |  }
+                |
+                |  companion object {
+                |    val defaultInstance : arrow.typeclasses.Semigroup<${product.sourceClassName}> =
+                |      object : ${product.sourceSimpleName}SemigroupInstance {}
+                |  }
+                |}
+                |
+                |fun ${product.sourceClassName}.Companion.semigroup(): ${Semigroup.type}<${product.sourceClassName}> =
+                |  ${product.sourceSimpleName}SemigroupInstance.defaultInstance
+                |""".trimMargin()
+
+    private fun monoidInstance(product: AnnotatedGeneric): String =
+            """|
+                |interface ${product.sourceSimpleName}MonoidInstance : arrow.typeclasses.Monoid<${product.sourceClassName}>, ${product.sourceSimpleName}SemigroupInstance {
+                |  override fun empty(): ${product.sourceClassName} =
+                |    ${product.sourceClassName}(${product.types().zip(product.targetNames).joinToString(", ") { "with(${it.second.companionFromType()}.monoid${it.second.typeArg()}(${it.second.instance(product, "${product.sourceSimpleName}MonoidInstance", "monoid()")})){ empty() }" }})
+                |
+                |    companion object {
+                |       val defaultInstance : arrow.typeclasses.Monoid<${product.sourceClassName}> =
+                |           object : ${product.sourceSimpleName}MonoidInstance {}
+                |    }
+                |}
+                |
+                |fun ${product.sourceClassName}.Companion.monoid(): ${Monoid.type}<${product.sourceClassName}> =
+                |  ${product.sourceSimpleName}MonoidInstance.defaultInstance
+                |""".trimMargin()
+
+    private fun eqInstance(product: AnnotatedGeneric): String =
+            """|
+                |interface ${product.sourceSimpleName}EqInstance : arrow.typeclasses.Eq<${product.sourceClassName}> {
+                |  override fun ${product.sourceClassName}.eqv(b: ${product.sourceClassName}): Boolean =
+                |    this == b
+                |
+                |  companion object {
+                |    val defaultInstance : arrow.typeclasses.Eq<${product.sourceClassName}> =
+                |           object : ${product.sourceSimpleName}EqInstance {}
+                |  }
+                |}
+                |
+                |fun ${product.sourceClassName}.Companion.eq(): ${Eq.type}<${product.sourceClassName}> =
+                |  ${product.sourceSimpleName}EqInstance.defaultInstance
+                |""".trimMargin()
+
     private fun processElement(product: AnnotatedGeneric): Pair<AnnotatedGeneric, String> = product to """
             |package ${product.classData.`package`.escapedClassName}
             |
@@ -60,70 +168,21 @@ class ProductFileGenerator(
             |import arrow.core.*
             |import arrow.instances.*
             |
-            |fun ${product.sourceClassName}.combine(other: ${product.sourceClassName}): ${product.sourceClassName} =
-            |  this + other
+            |${semigroupExtensions(product)}
             |
-            |fun List<${product.sourceClassName}>.combineAll(): ${product.sourceClassName} =
-            |  this.reduce { a, b -> a + b }
+            |${monoidExtensions(product)}
             |
-            |operator fun ${product.sourceClassName}.plus(other: ${product.sourceClassName}): ${product.sourceClassName} =
-            |  with(${product.sourceClassName}.semigroup()) { this@plus.combine(other) }
+            |${tupledExtensions(product)}
             |
-            |fun empty${product.sourceSimpleName}(): ${product.sourceClassName} =
-            |  ${product.sourceClassName}.monoid().empty()
+            |${hListExtensions(product)}
             |
-            |fun ${product.sourceClassName}.tupled(): ${focusType(product)} =
-            |  ${tupleConstructor(product)}
+            |${applicativeExtensions(product)}
             |
-            |fun ${product.sourceClassName}.toHList(): ${focusHListType(product)} =
-            |  ${hListConstructor(product)}
+            |${semigroupInstance(product)}
             |
-            |fun ${focusHListType(product)}.to${product.sourceSimpleName}(): ${product.sourceClassName} =
-            |  ${classConstructorFromHList(product.sourceClassName, product.focusSize)}
+            |${monoidInstance(product)}
             |
-            |fun ${product.sourceClassName}.toHListLabelled(): ${labelledHListFocusType(product)} =
-            |  ${product.targets.joinToString(prefix = "arrow.generic.hListOf(", postfix = ")") { """("${it.paramName}" toT ${it.paramName})""" }}
-            |
-            |fun ${product.sourceClassName}.tupledLabelled(): ${labelledFocusType(product)} =
-            |  ${product.targets.joinToString(prefix = "arrow.core.Tuple${product.focusSize}(", postfix = ")") { """("${it.paramName}" toT ${it.paramName})""" }}
-            |
-            |fun <B> ${product.sourceClassName}.foldLabelled(f: ${product.targetNames.joinToString(prefix = "(", separator = ", ", postfix = ")") { "arrow.core.Tuple2<kotlin.String, $it>" }} -> B): B {
-            |  val t = tupledLabelled()
-            |  return f(${(0 until product.focusSize).joinToString(", ") { "t.${letters[it]}" }})
-            |}
-            |
-            |fun ${focusType(product)}.to${product.sourceSimpleName}(): ${product.sourceClassName} =
-            |  ${classConstructorFromTuple(product.sourceClassName, product.focusSize)}
-            |
-            |inline fun <F> arrow.typeclasses.Applicative<F>.mapTo${product.sourceSimpleName}${kindedProperties("F", product)}: arrow.Kind<F, ${product.sourceClassName}> =
-            |    this.map(${product.targets.joinToString(", ") { it.paramName }}, { it.to${product.sourceSimpleName}() })
-            |
-            |interface ${product.sourceSimpleName}SemigroupInstance : arrow.typeclasses.Semigroup<${product.sourceClassName}> {
-            |  override fun ${product.sourceClassName}.combine(b: ${product.sourceClassName}): ${product.sourceClassName} {
-            |    val (${product.types().joinToString(", ") { "x$it" }}) = this
-            |    val (${product.types().joinToString(", ") { "y$it" }}) = b
-            |    return ${product.sourceClassName}(${product.types().zip(product.targetNames).joinToString(", ") { "with(${it.second.companionFromType()}.semigroup${it.second.typeArg()}(${it.second.instance(product, "${product.sourceSimpleName}SemigroupInstance", "semigroup()")})){ x${it.first}.combine(y${it.first}) }" }})
-            |  }
-            |}
-            |
-            |fun ${product.sourceClassName}.Companion.semigroup(): ${Semigroup.type}<${product.sourceClassName}> =
-            |  lazyOf(object : ${product.sourceSimpleName}SemigroupInstance {}).value
-            |
-            |interface ${product.sourceSimpleName}MonoidInstance : arrow.typeclasses.Monoid<${product.sourceClassName}>, ${product.sourceSimpleName}SemigroupInstance {
-            |  override fun empty(): ${product.sourceClassName} =
-            |    ${product.sourceClassName}(${product.types().zip(product.targetNames).joinToString(", ") { "with(${it.second.companionFromType()}.monoid${it.second.typeArg()}(${it.second.instance(product, "${product.sourceSimpleName}MonoidInstance", "monoid()")})){ empty() }" }})
-            |}
-            |
-            |fun ${product.sourceClassName}.Companion.monoid(): ${Monoid.type}<${product.sourceClassName}> =
-            |  lazyOf(object : ${product.sourceSimpleName}MonoidInstance {}).value
-            |
-            |interface ${product.sourceSimpleName}EqInstance : arrow.typeclasses.Eq<${product.sourceClassName}> {
-            |  override fun ${product.sourceClassName}.eqv(b: ${product.sourceClassName}): Boolean =
-            |    this == b
-            |}
-            |
-            |fun ${product.sourceClassName}.Companion.eq(): ${Eq.type}<${product.sourceClassName}> =
-            |  lazyOf(object : ${product.sourceSimpleName}EqInstance {}).value
+            |${eqInstance(product)}
             |
             |interface ${product.sourceSimpleName}ShowInstance : arrow.typeclasses.Show<${product.sourceClassName}> {
             |  override fun ${product.sourceClassName}.show(): String =
@@ -131,7 +190,7 @@ class ProductFileGenerator(
             |}
             |
             |fun ${product.sourceClassName}.Companion.show(): ${Show.type}<${product.sourceClassName}> =
-            |  lazyOf(object : ${product.sourceSimpleName}ShowInstance {}).value
+            |  object : ${product.sourceSimpleName}ShowInstance {}
             |
             |""".trimMargin()
 
@@ -148,8 +207,7 @@ class ProductFileGenerator(
                 val type = typeArg().removeSurrounding("<", ">")
                 if (product.sourceClassName == type) "this@$instance"
                 else "$type.$factory"
-            }
-            else ""
+            } else ""
 
     private fun tupleConstructor(product: AnnotatedGeneric): String =
             product.targets.joinToString(prefix = "$tuple${product.focusSize}(", postfix = ")", transform = { "this.${it.paramName.plusIfNotBlank(prefix = "`", postfix = "`")}" })

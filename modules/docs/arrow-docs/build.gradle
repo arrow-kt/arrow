@@ -14,6 +14,9 @@ dependencies {
     compile project(':arrow-mtl')
     compile project(':arrow-free')
     compile project(':arrow-typeclasses')
+    compile project(':arrow-generic')
+    kapt project(':arrow-annotations-processor')
+    kaptTest project(':arrow-annotations-processor')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
     compile "io.kotlintest:kotlintest:$kotlinTestVersion"
@@ -51,3 +54,6 @@ targetCompatibility = javaVersion
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
 
 compileKotlin.kotlinOptions.freeCompilerArgs += ["-Xskip-runtime-version-check"]
+
+apply from: rootProject.file('gradle/generated-kotlin-sources.gradle')
+apply plugin: 'kotlin-kapt'

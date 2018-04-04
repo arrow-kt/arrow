@@ -23,17 +23,17 @@ import arrow.*
 import arrow.instances.*
 import arrow.typeclasses.*
 
-StringMonoidInstance.empty()
+String.monoid().empty()
 ```
 
 ```kotlin:ank
-StringMonoidInstance.run { listOf<String>("Λ", "R", "R", "O", "W").combineAll() }
+String.monoid().run { listOf<String>("Λ", "R", "R", "O", "W").combineAll() }
 ```
 
 ```kotlin:ank
 import arrow.core.*
 
-Option.monoid(IntMonoidInstance).run { listOf<Option<Int>>(Some(1), Some(1)).combineAll() }
+Option.monoid(Int.monoid()).run { listOf<Option<Int>>(Some(1), Some(1)).combineAll() }
 ```
 
 The advantage of using these type class provided methods, rather than the specific ones for each type, is that we can compose monoids to allow us to operate on more complex types, e.g.
@@ -43,11 +43,11 @@ This is also true if we define our own instances. As an example, let's use `Fold
 ```kotlin:ank
 import arrow.data.*
 
-ListK.foldable().run { listOf(1, 2, 3, 4, 5).k().foldMap(IntMonoidInstance, ::identity) }
+ListK.foldable().run { listOf(1, 2, 3, 4, 5).k().foldMap(Int.monoid(), ::identity) }
 ```
 
 ```kotlin:ank
-ListK.foldable().run { listOf(1, 2, 3, 4, 5).k().foldMap(StringMonoidInstance, { it.toString() }) }
+ListK.foldable().run { listOf(1, 2, 3, 4, 5).k().foldMap(String.monoid(), { it.toString() }) }
 ```
 
 To use this with a function that produces a tuple, we can define a Monoid for a tuple that will be valid for any tuple where the types it contains also have a Monoid available. 
@@ -70,7 +70,7 @@ This way we are able to combine both values in one pass, hurrah!
 
 ```kotlin:ank
 ListK.foldable().run { 
-  val M = monoidTuple(IntMonoidInstance, StringMonoidInstance)
+  val M = monoidTuple(Int.monoid(), String.monoid())
   val list = listOf(1, 1).k()
 
   list.foldMap(M) { n: Int -> 
