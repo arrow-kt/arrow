@@ -14,16 +14,16 @@ It can be considered the typeclass equivalent of Java's `Object#toString`.
 import arrow.*
 import arrow.instances.*
 
-IntShowInstance.show(1)
+IntShowInstance.run { 1.show() }
 ```
 
 ### Main Combinators
 
-#### show
+#### F#show
 
 Given an instance of `F` it returns the `String` representation of this instance.
 
-`fun show(a: F): String`
+`fun F.show(): String`
 
 ### Laws
 
@@ -40,7 +40,7 @@ import arrow.core.*
 import arrow.typeclasses.*
 
 // Option is a data class with a single value
-Show.any().show(Option.just(1))
+Show.any().run { Option.just(1).show() }
 ```
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Show` instances for custom datatypes.

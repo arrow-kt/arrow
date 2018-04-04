@@ -1,6 +1,7 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.core.FunctionK
 
 inline operator fun <F, G, A> Inject<F, G>.invoke(ff: Inject<F, G>.() -> A) =
   run(ff)

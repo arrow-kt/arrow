@@ -43,7 +43,7 @@ import arrow.effects.*
 IO.applicativeError().raiseError<Int>(RuntimeException("Paco"))
 ```
 
-#### handleErrorWith
+#### Kind<F, A>#handleErrorWith
 
 This method requires a function that creates a new datatype from an error, `(E) -> Kind<F, A>`. This function is used as a catch + recover clause for the current instance, allowing it to return a new computation after a failure.
 
@@ -54,49 +54,41 @@ val AE_EITHER = Either.applicativeError<Throwable>()
 
 val success: Either<Throwable, Int> = Either.Right(1)
 
-AE_EITHER.handleErrorWith(success, { t -> Either.Right(0) })
+AE_EITHER.run { success.handleErrorWith { t -> Either.Right(0) } }
 ```
 
 ```kotlin:ank
 val failure: Either<Throwable, Int> = Either.Left(RuntimeException("Boom!"))
 
-AE_EITHER.handleErrorWith(failure, { t -> Either.Right(0) })
+AE_EITHER.run { failure.handleErrorWith { t -> Either.Right(0) } }
 ```
 
-#### handleError
+#### Kind<F, A>#handleError
 
 Similar to `handleErrorWith`, except the function can return any regular value. This value will be wrapped and used as a return.
 
 ```kotlin:ank
-AE_EITHER.handleError(success, { t -> 0 })
+AE_EITHER.run { success.handleError { t -> 0 } }
 ```
 
 ```kotlin:ank
-AE_EITHER.handleError(failure, { t -> 0 })
+AE_EITHER.run { failure.handleError { t -> 0 } }
 ```
 
-#### attempt
+#### Kind<F, A>#attempt
 
 Maps the current content of the datatype to an [`Either<E, A>`]({{ '/docs/datatypes/either' | relative_url }}), recovering from any previous error state.
 
 ```kotlin:ank
 val AE_TRY = Try.applicativeError()
-
-val pass = Try { "3".toInt() }
-pass
 ```
 
 ```kotlin:ank
-AE_TRY.attempt(pass)
+AE_TRY.run { Try { "3".toInt() }.attempt() }
 ```
 
 ```kotlin:ank
-val fail = Try { "nope".toInt() }
-fail
-```
-
-```kotlin:ank
-AE_TRY.attempt(fail)
+AE_TRY.run { Try { "nope".toInt() }.attempt() }
 ```
 
 #### fromEither

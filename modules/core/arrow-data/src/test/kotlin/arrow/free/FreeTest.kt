@@ -7,6 +7,7 @@ import arrow.data.fix
 import arrow.data.monad
 import arrow.free.instances.FreeEq
 import arrow.free.instances.FreeMonadInstance
+import arrow.free.instances.eq
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadLaws

@@ -28,7 +28,6 @@ Both `Try` and `Option` are example datatypes that can be computed over transfor
 import arrow.*
 import arrow.core.*
 import arrow.data.*
-import arrow.syntax.function.*
 
 Try { "1".toInt() }.map { it * 2 }
 Option(1).map { it * 2 }
@@ -47,7 +46,6 @@ val tryFunctor = Try.functor()
 Mapping over the empty/failed cases is always safe since the `map` operation in both Try and Option operate under the bias of those containing success values
 
 ```kotlin:ank
-import arrow.syntax.option.*
 
 Try { "x".toInt() }.map { it * 2 }
 none<Int>().map { it * 2 }
@@ -83,14 +81,14 @@ users provide their own provided there is typeclass instances for their datatype
 
 ### Main Combinators
 
-#### map
+#### Kind<F, A>#map
 
 Transforms the inner contents
 
-`fun <A, B> map(fa: Kind<F, A>, f: (A) -> B): Kind<F, B>`
+`fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B>`
 
 ```kotlin:ank
-optionFunctor.map(Option(1), { it + 1 })
+optionFunctor.run { Option(1).map { it + 1 } }
 ```
 
 #### lift
@@ -107,28 +105,6 @@ lifted(Option(1))
 #### Other combinators
 
 For a full list of other useful combinators available in `Functor` see the [Source][functor_source]{:target="_blank"}
-
-### Syntax
-
-#### Kind<F, A>#map
-
-Maps over any higher kinded type constructor for which a functor instance is found
-
-```kotlin:ank
-Try { 1 }.map({ it + 1 })
-```
-
-#### ((A) -> B)#lift
-
-Lift a function into the functor context
-
-```kotlin:ank
-import arrow.syntax.functor.*
-
-val f = { n: Int -> n + 1 }.lift<ForOption, Int, Int>()
-f(Option(1))
-```
-
 
 ### Laws
 

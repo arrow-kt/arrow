@@ -40,7 +40,7 @@ import arrow.effects.*
 IO.monadError().raiseError<Int>(RuntimeException("Paco"))
 ```
 
-#### ensure
+#### Kind<F, A>.ensure
 
 Tests a predicate against the object, and if it fails it executes a function to create an error.
 
@@ -49,11 +49,11 @@ val ME = Either.monadError<Throwable>()
 
 val either: Either<Throwable, Int> = Either.Right(1)
 
-ME.ensure(either, { RuntimeException("Failed predicate") }, { it > 0 })
+ME.run { either.ensure({ RuntimeException("Failed predicate") }, { it > 0 }) }
 ```
 
 ```kotlin:ank
-ME.ensure(either, { RuntimeException("Failed predicate") }, { it < 0 })
+ME.run { either.ensure({ RuntimeException("Failed predicate") }, { it < 0 }) }
 ```
 
 ### Comprehensions

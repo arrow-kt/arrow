@@ -8,7 +8,7 @@ import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
-import arrow.typeclasses.FunctionK
+import arrow.core.FunctionK
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
@@ -129,7 +129,7 @@ class CofreeTest : UnitSpec() {
       "cataM should traverse the structure in a stack-safe way on a monad" {
         val folder: (Int, Kind<ForOption, NonEmptyList<Int>>) -> EvalOption<NonEmptyList<Int>> = { i, lb ->
           if (i <= 2000)
-            OptionT.just(NonEmptyList(i, lb.fix().fold({ emptyList<Int>() }, { it.all })), Eval.applicative())
+            OptionT.just(Eval.applicative(), NonEmptyList(i, lb.fix().fold({ emptyList<Int>() }, { it.all })))
           else
             OptionT.none(Eval.applicative())
         }

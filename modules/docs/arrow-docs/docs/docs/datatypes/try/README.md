@@ -142,7 +142,7 @@ Transforming the value, if the computation is a success:
 ```kotlin:ank
 import arrow.typeclasses.*
 
-Try.functor().map(Try { "3".toInt() }, { it + 1})
+Try.functor().run { Try { "3".toInt() }.map { it + 1} }
 ```
 
 [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }})
@@ -150,8 +150,6 @@ Try.functor().map(Try { "3".toInt() }, { it + 1})
 Computing over independent values:
 
 ```kotlin:ank
-import arrow.syntax.applicative.*
-
 Try.applicative().tupled(Try { "3".toInt() }, Try { "5".toInt() }, Try { "nope".toInt() })
 ```
 

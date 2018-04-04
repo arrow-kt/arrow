@@ -170,17 +170,16 @@ So our specialization `OptionT<ForObservableK, A>` is the OptionT transformer ar
 We can now lift any value to a `OptionT<F, A>` which looks like this:
 
 ```kotlin:ank
-import arrow.syntax.applicative.*
 import arrow.data.*
 
-val optTVal = 1.just<OptionTPartialOf<ForObservableK>, Int>()
+val optTVal = OptionT.just<ForObservableK, Int>(ObservableK.applicative(), 1)
 optTVal
 ```
 
 or
 
 ```kotlin:ank
-val optTVal = OptionT.fromOption<ForObservableK, Int>(Some(1))
+val optTVal = OptionT.fromOption<ForObservableK, Int>(ObservableK.applicative(), Some(1))
 optTVal
 ```
 

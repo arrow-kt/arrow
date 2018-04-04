@@ -109,7 +109,6 @@ NonEmptyList.monad().binding {
 
 ```kotlin:ank
 import arrow.data.*
-import arrow.syntax.applicative.*
 import java.util.*
 
 data class Person(val id: UUID, val name: String, val year: Int)

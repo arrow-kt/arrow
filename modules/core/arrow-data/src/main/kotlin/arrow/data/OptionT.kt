@@ -20,7 +20,7 @@ data class OptionT<F, A>(val value: Kind<F, Option<A>>) : OptionTOf<F, A>, Optio
 
     operator fun <F, A> invoke(value: Kind<F, Option<A>>): OptionT<F, A> = OptionT(value)
 
-    inline fun <F, A> just(a: A, AF: Applicative<F>): OptionT<F, A> = OptionT(AF.just(Some(a)))
+    inline fun <F, A> just(AF: Applicative<F>, a: A): OptionT<F, A> = OptionT(AF.just(Some(a)))
 
     inline fun <F> none(AF: Applicative<F>): OptionT<F, Nothing> = OptionT(AF.just(None))
 

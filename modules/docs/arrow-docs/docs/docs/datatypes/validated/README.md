@@ -101,7 +101,6 @@ Now we are ready to write our parser.
 
 ```kotlin:ank
 import arrow.data.*
-import arrow.syntax.validated.*
 
 data class Config(val map: Map<String, String>) {
 
@@ -200,9 +199,6 @@ then Validated provides `withEither` method to allow you to temporarily turn a V
 instance into an Either instance and apply it to a function.
 
 ```kotlin:ank
-import arrow.syntax.either.*
-
-
 fun positive(field: String, i: Int): Either<ConfigError, Int> {
     return if (i >= 0) i.right()
     else ConfigError.ParseConfig(field).left()
