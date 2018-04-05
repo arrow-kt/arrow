@@ -122,9 +122,10 @@ Try.applicative().mapToAccount(tryBalance, tryAvailable)
 
 ```kotlin:ank
 import arrow.effects.*
+import kotlinx.coroutines.experimental.async
 
 val asyncBalance: DeferredK<Int> = async { 1000 }.k()
-val asyncAvailable: DeferredK<Int> = async { throw RuntimeException("BOOM") }.k()
+val asyncAvailable: DeferredK<Int> = async { 900 }.k()
 
 DeferredK.applicative().mapToAccount(asyncBalance, asyncAvailable)
 ```
