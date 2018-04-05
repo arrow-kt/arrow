@@ -13,6 +13,6 @@ data class Speed(val kmh: Int) {
 }
 
 @product
-data class Car(val mod: Int, val speed: Speed) {
+data class Car(val speed: Speed) {
     companion object
 }
