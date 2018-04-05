@@ -17,7 +17,7 @@ A copy of Apache License 2.0 has been included at the end of this file.
 
 ------------------------------------------------------------------------
 
-Code in Arrow is derived in part from typelevel/Cats and Scalaz.
+Code in Arrow is derived in part from typelevel/Cats, Shapeless and Scalaz.
 
 Cats license follows:
 
