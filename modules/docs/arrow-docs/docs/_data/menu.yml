@@ -257,6 +257,9 @@ options:
       - title: Each
         url: /docs/optics/each/
 
+  - title: Generic
+    url: /docs/generic/
+
   - title: Integrations
 
     nested_options:

@@ -25,7 +25,7 @@ interface CharOrderInstance : Order<Char> {
 }
 
 fun Char.Companion.eq(): Eq<Char> =
-        lazyOf(object : CharEqInstance {}).value
+        object : CharEqInstance {}
 
 fun Char.Companion.order(): Order<Char> =
-        lazyOf(object : CharOrderInstance {}).value
+        object : CharOrderInstance {}

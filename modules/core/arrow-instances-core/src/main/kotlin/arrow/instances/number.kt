@@ -26,19 +26,19 @@ interface ByteShowInstance : Show<Byte> {
 }
 
 fun Byte.Companion.show(): Show<Byte> =
-        lazyOf(object : ByteShowInstance {}).value
+        object : ByteShowInstance {}
 
 fun Byte.Companion.eq(): Eq<Byte> =
-        lazyOf(object : ByteEqInstance {}).value
+        object : ByteEqInstance {}
 
 fun Byte.Companion.order(): Order<Byte> =
-        lazyOf(object : ByteOrderInstance {}).value
+        object : ByteOrderInstance {}
 
 fun Byte.Companion.semigroup(): Semigroup<Byte> =
-        lazyOf(object : ByteSemigroupInstance {}).value
+        object : ByteSemigroupInstance {}
 
 fun Byte.Companion.monoid(): Monoid<Byte> =
-        lazyOf(object : ByteMonoidInstance {}).value
+        object : ByteMonoidInstance {}
 
 //////////
 // Double
@@ -65,19 +65,19 @@ interface DoubleShowInstance : Show<Double> {
 }
 
 fun Double.Companion.show(): Show<Double> =
-        lazyOf(object : DoubleShowInstance {}).value
+        object : DoubleShowInstance {}
 
 fun Double.Companion.eq(): Eq<Double> =
-        lazyOf(object : DoubleEqInstance {}).value
+        object : DoubleEqInstance {}
 
 fun Double.Companion.order(): Order<Double> =
-        lazyOf(object : DoubleOrderInstance {}).value
+        object : DoubleOrderInstance {}
 
 fun Double.Companion.semigroup(): Semigroup<Double> =
-        lazyOf(object : DoubleSemigroupInstance {}).value
+        object : DoubleSemigroupInstance {}
 
 fun Double.Companion.monoid(): Monoid<Double> =
-        lazyOf(object : DoubleMonoidInstance {}).value
+        object : DoubleMonoidInstance {}
 
 //////////
 // Int
@@ -103,19 +103,19 @@ interface IntOrderInstance : Order<Int> {
 }
 
 fun Int.Companion.show(): Show<Int> =
-        lazyOf(object : IntShowInstance {}).value
+        object : IntShowInstance {}
 
 fun Int.Companion.eq(): Eq<Int> =
-        lazyOf(object : IntEqInstance {}).value
+        object : IntEqInstance {}
 
 fun Int.Companion.order(): Order<Int> =
-        lazyOf(object : IntOrderInstance {}).value
+        object : IntOrderInstance {}
 
 fun Int.Companion.semigroup(): Semigroup<Int> =
-        lazyOf(object : IntSemigroupInstance {}).value
+        object : IntSemigroupInstance {}
 
 fun Int.Companion.monoid(): Monoid<Int> =
-        lazyOf(object : IntMonoidInstance {}).value
+        object : IntMonoidInstance {}
 
 //////////
 // Long
@@ -142,19 +142,19 @@ interface LongShowInstance : Show<Long> {
 }
 
 fun Long.Companion.show(): Show<Long> =
-        lazyOf(object : LongShowInstance {}).value
+        object : LongShowInstance {}
 
 fun Long.Companion.eq(): Eq<Long> =
-        lazyOf(object : LongEqInstance {}).value
+        object : LongEqInstance {}
 
 fun Long.Companion.order(): Order<Long> =
-        lazyOf(object : LongOrderInstance {}).value
+        object : LongOrderInstance {}
 
 fun Long.Companion.semigroup(): Semigroup<Long> =
-        lazyOf(object : LongSemigroupInstance {}).value
+        object : LongSemigroupInstance {}
 
 fun Long.Companion.monoid(): Monoid<Long> =
-        lazyOf(object : LongMonoidInstance {}).value
+        object : LongMonoidInstance {}
 
 //////////
 // Short
@@ -181,19 +181,19 @@ interface ShortShowInstance : Show<Short> {
 }
 
 fun Short.Companion.show(): Show<Short> =
-        lazyOf(object : ShortShowInstance {}).value
+        object : ShortShowInstance {}
 
 fun Short.Companion.eq(): Eq<Short> =
-        lazyOf(object : ShortEqInstance {}).value
+        object : ShortEqInstance {}
 
 fun Short.Companion.order(): Order<Short> =
-        lazyOf(object : ShortOrderInstance {}).value
+        object : ShortOrderInstance {}
 
 fun Short.Companion.semigroup(): Semigroup<Short> =
-        lazyOf(object : ShortSemigroupInstance {}).value
+        object : ShortSemigroupInstance {}
 
 fun Short.Companion.monoid(): Monoid<Short> =
-        lazyOf(object : ShortMonoidInstance {}).value
+        object : ShortMonoidInstance {}
 
 //////////
 // Float
@@ -220,16 +220,16 @@ interface FloatShowInstance : Show<Float> {
 }
 
 fun Float.Companion.show(): Show<Float> =
-        lazyOf(object : FloatShowInstance {}).value
+        object : FloatShowInstance {}
 
 fun Float.Companion.eq(): Eq<Float> =
-        lazyOf(object : FloatEqInstance {}).value
+        object : FloatEqInstance {}
 
 fun Float.Companion.order(): Order<Float> =
-        lazyOf(object : FloatOrderInstance {}).value
+        object : FloatOrderInstance {}
 
 fun Float.Companion.semigroup(): Semigroup<Float> =
-        lazyOf(object : FloatSemigroupInstance {}).value
+        object : FloatSemigroupInstance {}
 
 fun Float.Companion.monoid(): Monoid<Float> =
-        lazyOf(object : FloatMonoidInstance {}).value
+        object : FloatMonoidInstance {}

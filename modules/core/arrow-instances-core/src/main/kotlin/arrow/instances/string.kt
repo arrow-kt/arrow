@@ -7,32 +7,32 @@ interface StringSemigroupInstance : Semigroup<String> {
 }
 
 fun String.Companion.semigroup(): Semigroup<String> =
-        lazyOf(object : StringSemigroupInstance {}).value
+        object : StringSemigroupInstance {}
 
 interface StringMonoidInstance : Monoid<String>, StringSemigroupInstance {
     override fun empty(): String = ""
 }
 
 fun String.Companion.monoid(): Monoid<String> =
-        lazyOf(object : StringMonoidInstance {}).value
+        object : StringMonoidInstance {}
 
 interface StringEqInstance : Eq<String> {
     override fun String.eqv(b: String): Boolean = this == b
 }
 
 fun String.Companion.eq(): Eq<String> =
-        lazyOf(object : StringEqInstance {}).value
+        object : StringEqInstance {}
 
 interface StringShowInstance : Show<String> {
     override fun String.show(): String = this
 }
 
 fun String.Companion.show(): Show<String> =
-        lazyOf(object : StringShowInstance {}).value
+        object : StringShowInstance {}
 
 interface StringOrderInstance : Order<String> {
     override fun String.compare(b: String): Int = this.compareTo(b)
 }
 
 fun String.Companion.order(): Order<String> =
-        lazyOf(object : StringOrderInstance {}).value
+        object : StringOrderInstance {}
