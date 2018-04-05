@@ -48,7 +48,7 @@ Account(1000, 900) + Account(1000, 900)
 
 ##### combineAll
 
-`@product` enables also syntax over `List<Account>` automatically to reduce `(List<Account>) -> Account` automatically based also on the `Semigroup` instance, `@product` expects already defined instances for all contained data types which for most basic primitives Arrow already provides and for custom data types can be manually generated or automatically derived by Arrow with `@product`
+`@product` enables also syntax over `List<Account>` to reduce `(List<Account>) -> Account` automatically based also on the `Semigroup` instance, `@product` expects already defined instances for all contained data types which for most basic primitives Arrow already provides and for custom data types can be manually generated or automatically derived by Arrow with `@product`
 
 ```kotlin:ank
 listOf(Account(1000, 900), Account(1000, 900)).combineAll()
