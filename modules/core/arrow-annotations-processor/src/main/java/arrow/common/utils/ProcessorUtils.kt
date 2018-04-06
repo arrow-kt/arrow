@@ -13,7 +13,7 @@ import javax.lang.model.element.VariableElement
 
 interface ProcessorUtils : KotlinMetadataUtils {
 
-  fun getConstructorParamNames(element: Element): List<String> = element.kotlinMetadata
+  fun Element.getConstructorParamNames(): List<String> = kotlinMetadata
     .let { it as KotlinClassMetadata }.data
     .let { (nameResolver, classProto) ->
       classProto.constructorOrBuilderList
@@ -23,12 +23,12 @@ interface ProcessorUtils : KotlinMetadataUtils {
         .map(nameResolver::getString)
     }
 
-  fun getClassData(element: Element) = element.kotlinMetadata
+  fun Element.getClassData(): ClassOrPackageDataWrapper.Class = kotlinMetadata
     .let { it as KotlinClassMetadata }
     .data
-    .asClassOrPackageDataWrapper(elementUtils.getPackageOf(element).toString())
+    .asClassOrPackageDataWrapper(elementUtils.getPackageOf(this).toString())
 
-  fun getConstructorTypesNames(element: Element): List<String> = element.kotlinMetadata
+  fun Element.getConstructorTypesNames(): List<String> = kotlinMetadata
     .let { it as KotlinClassMetadata }.data
     .let { data ->
       data.proto.constructorOrBuilderList

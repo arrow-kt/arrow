@@ -39,9 +39,9 @@ class ProductProcessor : AbstractProcessor() {
 
   private fun evalAnnotatedProductElement(element: Element): AnnotatedGeneric = when {
     (element.kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isDataClass == true -> {
-      val elementClassData = getClassData(element)
-      val paramNames = getConstructorParamNames(element)
-      val typeNames = getConstructorTypesNames(element)
+      val elementClassData = element.getClassData()
+      val paramNames = element.getConstructorParamNames()
+      val typeNames = element.getConstructorTypesNames()
       val properties = paramNames.zip(typeNames).map { Target(it.second, it.first) }
       if (properties.size > 22)
         knownError("${element.enclosingElement}.${element.simpleName} up to 22 constructor parameters is supported")

@@ -63,8 +63,8 @@ class OptikalProcessor : AbstractProcessor() {
     element.let { it.kotlinMetadata as? KotlinClassMetadata }?.data?.classProto?.isDataClass == true ->
       AnnotatedOptic(
         element as TypeElement,
-        getClassData(element),
-        getConstructorTypesNames(element).zip(getConstructorParamNames(element), ::Target)
+        element.getClassData(),
+        element.getConstructorTypesNames().zip(element.getConstructorParamNames(), ::Target)
       )
 
     else -> knownError(opticsAnnotationError(element, lensesAnnotationName, lensesAnnotationTarget))
@@ -76,7 +76,7 @@ class OptikalProcessor : AbstractProcessor() {
 
       AnnotatedOptic(
         element as TypeElement,
-        getClassData(element),
+        element.getClassData(),
         classProto.sealedSubclassFqNameList
           .map(nameResolver::getString)
           .map { it.replace('/', '.') }
@@ -93,12 +93,12 @@ class OptikalProcessor : AbstractProcessor() {
 
   private fun evalAnnotatedIsoElement(element: Element): AnnotatedOptic = when {
     (element.kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isDataClass == true -> {
-      val properties = getConstructorTypesNames(element).zip(getConstructorParamNames(element), ::Target)
+      val properties = element.getConstructorTypesNames().zip(element.getConstructorParamNames(), ::Target)
 
       if (properties.size > 10)
         knownError("${element.enclosingElement}.${element.simpleName} up to 10 constructor parameters is supported")
       else
-        AnnotatedOptic(element as TypeElement, getClassData(element), properties)
+        AnnotatedOptic(element as TypeElement, element.getClassData(), properties)
     }
 
     else -> knownError(opticsAnnotationError(element, isosAnnotationName, isosAnnotationTarget))
