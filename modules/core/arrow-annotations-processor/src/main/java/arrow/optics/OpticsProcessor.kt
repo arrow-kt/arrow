@@ -1,23 +1,18 @@
 package arrow.optics
 
-import com.google.auto.service.AutoService
 import arrow.common.utils.AbstractProcessor
-import arrow.common.utils.asClassOrPackageDataWrapper
 import arrow.common.utils.isSealed
 import arrow.common.utils.knownError
+import com.google.auto.service.AutoService
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
-import me.eugeniomarletti.kotlin.metadata.extractFullName
 import me.eugeniomarletti.kotlin.metadata.isDataClass
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
-import me.eugeniomarletti.kotlin.metadata.proto
-import org.jetbrains.kotlin.serialization.ProtoBuf
 import java.io.File
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
-import javax.lang.model.element.TypeElement
-
 import javax.lang.model.element.Element
+import javax.lang.model.element.TypeElement
 
 @AutoService(Processor::class)
 class OptikalProcessor : AbstractProcessor() {
@@ -108,29 +103,5 @@ class OptikalProcessor : AbstractProcessor() {
 
     else -> knownError(opticsAnnotationError(element, isosAnnotationName, isosAnnotationTarget))
   }
-
-  private fun getConstructorTypesNames(element: Element): List<String> = element.kotlinMetadata
-    .let { it as KotlinClassMetadata }.data
-    .let { data ->
-      data.proto.constructorOrBuilderList
-        .first()
-        .valueParameterList
-        .map { it.type.extractFullName(data) }
-    }
-
-  private fun getConstructorParamNames(element: Element): List<String> = element.kotlinMetadata
-    .let { it as KotlinClassMetadata }.data
-    .let { (nameResolver, classProto) ->
-      classProto.constructorOrBuilderList
-        .first()
-        .valueParameterList
-        .map(ProtoBuf.ValueParameter::getName)
-        .map(nameResolver::getString)
-    }
-
-  private fun getClassData(element: Element) = element.kotlinMetadata
-    .let { it as KotlinClassMetadata }
-    .data
-    .asClassOrPackageDataWrapper(elementUtils.getPackageOf(element).toString())
 
 }
