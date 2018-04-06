@@ -59,9 +59,9 @@ class ProductTest : UnitSpec() {
       })
     }
 
-    ".tupledLabelled()" {
+    ".tupledLabeled()" {
       forAll(personGen(), {
-        it.tupledLabelled() == Tuple3(
+        it.tupledLabeled() == Tuple3(
           "name" toT it.name,
           "age" toT it.age,
           "related" toT it.related

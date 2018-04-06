@@ -63,7 +63,7 @@ Account(1000, 900).tupled()
 ```
 
 ```kotlin:ank
-Account(1000, 900).tupledLabelled()
+Account(1000, 900).tupledLabeled()
 ```
 
 ```kotlin:ank
@@ -79,7 +79,7 @@ Account(1000, 900).toHList()
 ```
 
 ```kotlin:ank
-Account(1000, 900).toHListLabelled()
+Account(1000, 900).toHListLabeled()
 ```
 
 ```kotlin:ank

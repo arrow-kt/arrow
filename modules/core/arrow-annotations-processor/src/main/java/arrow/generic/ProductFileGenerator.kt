@@ -76,11 +76,11 @@ class ProductFileGenerator(
                 |fun ${product.sourceClassName}.tupled(): ${focusType(product)} =
                 | ${tupleConstructor(product)}
                 |
-                |fun ${product.sourceClassName}.tupledLabelled(): ${labelledFocusType(product)} =
+                |fun ${product.sourceClassName}.tupledLabeled(): ${labeledFocusType(product)} =
                 |  ${product.targets.joinToString(prefix = "arrow.core.Tuple${product.focusSize}(", postfix = ")") { """("${it.paramName}" toT ${it.paramName})""" }}
                 |
-                |fun <B> ${product.sourceClassName}.foldLabelled(f: ${product.targetNames.joinToString(prefix = "(", separator = ", ", postfix = ")") { "arrow.core.Tuple2<kotlin.String, $it>" }} -> B): B {
-                |  val t = tupledLabelled()
+                |fun <B> ${product.sourceClassName}.foldLabeled(f: ${product.targetNames.joinToString(prefix = "(", separator = ", ", postfix = ")") { "arrow.core.Tuple2<kotlin.String, $it>" }} -> B): B {
+                |  val t = tupledLabeled()
                 |  return f(${(0 until product.focusSize).joinToString(", ") { "t.${letters[it]}" }})
                 |}
                 |
@@ -97,7 +97,7 @@ class ProductFileGenerator(
                 |fun ${focusHListType(product)}.to${product.sourceSimpleName}(): ${product.sourceClassName} =
                 |  ${classConstructorFromHList(product.sourceClassName, product.focusSize)}
                 |
-                |fun ${product.sourceClassName}.toHListLabelled(): ${labelledHListFocusType(product)} =
+                |fun ${product.sourceClassName}.toHListLabeled(): ${labeledHListFocusType(product)} =
                 |  ${product.targets.joinToString(prefix = "arrow.generic.hListOf(", postfix = ")") { """("${it.paramName}" toT ${it.paramName})""" }}
                 |""".trimMargin()
 
@@ -215,7 +215,7 @@ class ProductFileGenerator(
   private fun hListConstructor(product: AnnotatedGeneric): String =
     product.targets.joinToString(prefix = "arrow.generic.hListOf(", postfix = ")", transform = { "this.${it.paramName.plusIfNotBlank(prefix = "`", postfix = "`")}" })
 
-  private fun labelledFocusType(product: AnnotatedGeneric): String =
+  private fun labeledFocusType(product: AnnotatedGeneric): String =
     if (product.hasTupleFocus) product.targetNames.map { "${tuple}2<String, $it>" }.joinToString(prefix = "$tuple${product.targets.size}<", postfix = ">")
     else product.targetNames.first()
 
@@ -226,7 +226,7 @@ class ProductFileGenerator(
   private fun focusHListType(product: AnnotatedGeneric): String =
     product.targetNames.joinToString(prefix = "$hlist${product.targets.size}<", postfix = ">")
 
-  private fun labelledHListFocusType(product: AnnotatedGeneric): String =
+  private fun labeledHListFocusType(product: AnnotatedGeneric): String =
     product.targetNames.map { "${tuple}2<String, $it>" }.joinToString(prefix = "$hlist${product.targets.size}<", postfix = ">")
 
   private fun classConstructorFromTuple(sourceClassName: String, propertiesSize: Int): String =

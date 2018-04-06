@@ -41,7 +41,7 @@ interface ProductTypeClassCompanion<C> {
  * Refines ProductTypeClass with the addition of runtime `String` labels
  * corresponding to the names of the product elements.
  */
-interface LabelledProductTypeClass<C> {
+interface LabeledProductTypeClass<C> {
   /**
    * Given a type class instance for `H`, and a type class instance for a
    * product, produce a type class instance for the product prepended with `H`.
