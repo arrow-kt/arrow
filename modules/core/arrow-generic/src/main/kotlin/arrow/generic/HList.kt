@@ -4,21 +4,22 @@ package arrow.generic
  * An Heterogeneous list of values that preserves type information
  */
 sealed class HList {
-    abstract fun size(): Int
+  abstract fun size(): Int
 }
 
 data class HCons<out H, out T : HList>(val head: H, val tail: T) : HList() {
-    override fun size(): Int = 1 + tail.size()
+  override fun size(): Int = 1 + tail.size()
 }
 
 object HNil : HList() {
-    override fun size(): Int = 0
+  override fun size(): Int = 0
 }
 
 /**
  * HList supported arity is up to product of 22 elements
  */
 typealias HList1<A> = HCons<A, HNil>
+
 typealias HList2<A, B> = HCons<A, HCons<B, HNil>>
 typealias HList3<A, B, C> = HCons<A, HCons<B, HCons<C, HNil>>>
 typealias HList4<A, B, C, D> = HCons<A, HCons<B, HCons<C, HCons<D, HNil>>>>
@@ -45,6 +46,7 @@ typealias HList22<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U,
  * HList factories create proper heterogeneous lists that preserve type information up to arity 22
  */
 fun <A> hListOf(a: A): HList1<A> = HList1(a, HNil)
+
 fun <A, B> hListOf(a: A, b: B): HList2<A, B> = HList2(a, HCons(b, HNil))
 fun <A, B, C> hListOf(a: A, b: B, c: C): HList3<A, B, C> = HList3(a, HCons(b, HCons(c, HNil)))
 fun <A, B, C, D> hListOf(a: A, b: B, c: C, d: D): HList4<A, B, C, D> = HList4(a, HCons(b, HCons(c, HCons(d, HNil))))

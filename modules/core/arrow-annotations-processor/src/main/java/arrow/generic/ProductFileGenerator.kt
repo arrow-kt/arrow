@@ -13,36 +13,36 @@ object Show : DerivedTypeClass("arrow.typeclasses.Show")
 object Hash : DerivedTypeClass("arrow.typeclasses.Hash")
 
 class ProductFileGenerator(
-        private val annotatedList: Collection<AnnotatedGeneric>,
-        private val generatedDir: File
+  private val annotatedList: Collection<AnnotatedGeneric>,
+  private val generatedDir: File
 ) {
 
-    private val tuple = "arrow.core.Tuple"
-    private val hlist = "arrow.generic.HList"
-    private val letters = ('a'..'j').toList()
+  private val tuple = "arrow.core.Tuple"
+  private val hlist = "arrow.generic.HList"
+  private val letters = ('a'..'j').toList()
 
-    fun generate() {
-        buildProduct(annotatedList)
-        //buildInstances(annotatedList)
-    }
+  fun generate() {
+    buildProduct(annotatedList)
+    //buildInstances(annotatedList)
+  }
 
-    private fun buildProduct(products: Collection<AnnotatedGeneric>) =
-            products.map(this::processElement)
-                    .forEach { (element, funString) ->
-                        File(generatedDir, "${productAnnotationClass.simpleName}.${element.classData.`package`}.${element.sourceName}.kt").printWriter().use { w ->
-                            w.println(funString)
-                        }
-                    }
+  private fun buildProduct(products: Collection<AnnotatedGeneric>) =
+    products.map(this::processElement)
+      .forEach { (element, funString) ->
+        File(generatedDir, "${productAnnotationClass.simpleName}.${element.classData.`package`}.${element.sourceName}.kt").printWriter().use { w ->
+          w.println(funString)
+        }
+      }
 
-    private fun buildInstances(products: Collection<AnnotatedGeneric>) =
-            products.map { p -> processInstancesForElement(p) }
-                    .forEach { (element, funString) ->
-                        File(generatedDir, "${productAnnotationClass.simpleName}.${element.classData.`package`}.${element.sourceName}.instances.kt").printWriter().use { w ->
-                            w.println(funString)
-                        }
-                    }
+  private fun buildInstances(products: Collection<AnnotatedGeneric>) =
+    products.map { p -> processInstancesForElement(p) }
+      .forEach { (element, funString) ->
+        File(generatedDir, "${productAnnotationClass.simpleName}.${element.classData.`package`}.${element.sourceName}.instances.kt").printWriter().use { w ->
+          w.println(funString)
+        }
+      }
 
-    private fun processInstancesForElement(product: AnnotatedGeneric): Pair<AnnotatedGeneric, String> = product to """
+  private fun processInstancesForElement(product: AnnotatedGeneric): Pair<AnnotatedGeneric, String> = product to """
             |package arrow.core
             |
             |${semigroupTupleNInstance(product)}
@@ -53,8 +53,8 @@ class ProductFileGenerator(
             |
             |""".trimMargin()
 
-    private fun semigroupExtensions(product: AnnotatedGeneric): String =
-            """|
+  private fun semigroupExtensions(product: AnnotatedGeneric): String =
+    """|
                 |fun ${product.sourceClassName}.combine(other: ${product.sourceClassName}): ${product.sourceClassName} =
                 |  this + other
                 |
@@ -65,14 +65,14 @@ class ProductFileGenerator(
                 |  with(${product.sourceClassName}.semigroup()) { this@plus.combine(other) }
                 |""".trimMargin()
 
-    private fun monoidExtensions(product: AnnotatedGeneric): String =
-            """|fun empty${product.sourceSimpleName}(): ${product.sourceClassName} =
+  private fun monoidExtensions(product: AnnotatedGeneric): String =
+    """|fun empty${product.sourceSimpleName}(): ${product.sourceClassName} =
                 |  ${product.sourceClassName}.monoid().empty()
                 |""".trimMargin()
 
-    private fun tupledExtensions(product: AnnotatedGeneric): String =
-            if (product.hasTupleFocus)
-                """|
+  private fun tupledExtensions(product: AnnotatedGeneric): String =
+    if (product.hasTupleFocus)
+      """|
                 |fun ${product.sourceClassName}.tupled(): ${focusType(product)} =
                 | ${tupleConstructor(product)}
                 |
@@ -87,10 +87,10 @@ class ProductFileGenerator(
                 |fun ${focusType(product)}.to${product.sourceSimpleName}(): ${product.sourceClassName} =
                 |  ${classConstructorFromTuple(product.sourceClassName, product.focusSize)}
                 |""".trimMargin()
-            else ""
+    else ""
 
-    private fun hListExtensions(product: AnnotatedGeneric): String =
-            """|
+  private fun hListExtensions(product: AnnotatedGeneric): String =
+    """|
                 |fun ${product.sourceClassName}.toHList(): ${focusHListType(product)} =
                 |  ${hListConstructor(product)}
                 |
@@ -101,17 +101,17 @@ class ProductFileGenerator(
                 |  ${product.targets.joinToString(prefix = "arrow.generic.hListOf(", postfix = ")") { """("${it.paramName}" toT ${it.paramName})""" }}
                 |""".trimMargin()
 
-    private fun applicativeExtensions(product: AnnotatedGeneric): String =
-            if (product.hasTupleFocus)
-                """|
+  private fun applicativeExtensions(product: AnnotatedGeneric): String =
+    if (product.hasTupleFocus)
+      """|
                 |fun <F> arrow.typeclasses.Applicative<F>.mapTo${product.sourceSimpleName}${kindedProperties("F", product)}: arrow.Kind<F, ${product.sourceClassName}> =
                 |    this.map(${product.targets.joinToString(", ") { it.paramName }}, { it.to${product.sourceSimpleName}() })
                 |
                 |""".trimMargin()
-            else ""
+    else ""
 
-    private fun semigroupInstance(product: AnnotatedGeneric): String =
-            """|
+  private fun semigroupInstance(product: AnnotatedGeneric): String =
+    """|
                 |interface ${product.sourceSimpleName}SemigroupInstance : arrow.typeclasses.Semigroup<${product.sourceClassName}> {
                 |  override fun ${product.sourceClassName}.combine(b: ${product.sourceClassName}): ${product.sourceClassName} {
                 |    val (${product.types().joinToString(", ") { "x$it" }}) = this
@@ -129,8 +129,8 @@ class ProductFileGenerator(
                 |  ${product.sourceSimpleName}SemigroupInstance.defaultInstance
                 |""".trimMargin()
 
-    private fun monoidInstance(product: AnnotatedGeneric): String =
-            """|
+  private fun monoidInstance(product: AnnotatedGeneric): String =
+    """|
                 |interface ${product.sourceSimpleName}MonoidInstance : arrow.typeclasses.Monoid<${product.sourceClassName}>, ${product.sourceSimpleName}SemigroupInstance {
                 |  override fun empty(): ${product.sourceClassName} =
                 |    ${product.sourceClassName}(${product.types().zip(product.targetNames).joinToString(", ") { "with(${it.second.companionFromType()}.monoid${it.second.typeArg()}(${it.second.instance(product, "${product.sourceSimpleName}MonoidInstance", "monoid()")})){ empty() }" }})
@@ -145,8 +145,8 @@ class ProductFileGenerator(
                 |  ${product.sourceSimpleName}MonoidInstance.defaultInstance
                 |""".trimMargin()
 
-    private fun eqInstance(product: AnnotatedGeneric): String =
-            """|
+  private fun eqInstance(product: AnnotatedGeneric): String =
+    """|
                 |interface ${product.sourceSimpleName}EqInstance : arrow.typeclasses.Eq<${product.sourceClassName}> {
                 |  override fun ${product.sourceClassName}.eqv(b: ${product.sourceClassName}): Boolean =
                 |    this == b
@@ -161,7 +161,7 @@ class ProductFileGenerator(
                 |  ${product.sourceSimpleName}EqInstance.defaultInstance
                 |""".trimMargin()
 
-    private fun processElement(product: AnnotatedGeneric): Pair<AnnotatedGeneric, String> = product to """
+  private fun processElement(product: AnnotatedGeneric): Pair<AnnotatedGeneric, String> = product to """
             |package ${product.classData.`package`.escapedClassName}
             |
             |import arrow.typeclasses.*
@@ -194,96 +194,96 @@ class ProductFileGenerator(
             |
             |""".trimMargin()
 
-    private fun String.companionFromType(): String =
-            substringBefore("<")
+  private fun String.companionFromType(): String =
+    substringBefore("<")
 
-    private fun String.typeArg(): String =
-            if (contains("<"))
-                "<${substringAfter("<").substringBeforeLast(">")}>"
-            else ""
+  private fun String.typeArg(): String =
+    if (contains("<"))
+      "<${substringAfter("<").substringBeforeLast(">")}>"
+    else ""
 
-    private fun String.instance(product: AnnotatedGeneric, instance: String, factory: String): String =
-            if (contains("<")) {
-                val type = typeArg().removeSurrounding("<", ">")
-                if (product.sourceClassName == type) "this@$instance"
-                else "$type.$factory"
-            } else ""
+  private fun String.instance(product: AnnotatedGeneric, instance: String, factory: String): String =
+    if (contains("<")) {
+      val type = typeArg().removeSurrounding("<", ">")
+      if (product.sourceClassName == type) "this@$instance"
+      else "$type.$factory"
+    } else ""
 
-    private fun tupleConstructor(product: AnnotatedGeneric): String =
-            product.targets.joinToString(prefix = "$tuple${product.focusSize}(", postfix = ")", transform = { "this.${it.paramName.plusIfNotBlank(prefix = "`", postfix = "`")}" })
+  private fun tupleConstructor(product: AnnotatedGeneric): String =
+    product.targets.joinToString(prefix = "$tuple${product.focusSize}(", postfix = ")", transform = { "this.${it.paramName.plusIfNotBlank(prefix = "`", postfix = "`")}" })
 
-    private fun hListConstructor(product: AnnotatedGeneric): String =
-            product.targets.joinToString(prefix = "arrow.generic.hListOf(", postfix = ")", transform = { "this.${it.paramName.plusIfNotBlank(prefix = "`", postfix = "`")}" })
+  private fun hListConstructor(product: AnnotatedGeneric): String =
+    product.targets.joinToString(prefix = "arrow.generic.hListOf(", postfix = ")", transform = { "this.${it.paramName.plusIfNotBlank(prefix = "`", postfix = "`")}" })
 
-    private fun labelledFocusType(product: AnnotatedGeneric): String =
-            if (product.hasTupleFocus) product.targetNames.map { "${tuple}2<String, $it>" }.joinToString(prefix = "$tuple${product.targets.size}<", postfix = ">")
-            else product.targetNames.first()
+  private fun labelledFocusType(product: AnnotatedGeneric): String =
+    if (product.hasTupleFocus) product.targetNames.map { "${tuple}2<String, $it>" }.joinToString(prefix = "$tuple${product.targets.size}<", postfix = ">")
+    else product.targetNames.first()
 
-    private fun focusType(product: AnnotatedGeneric): String =
-            if (product.hasTupleFocus) product.targetNames.joinToString(prefix = "$tuple${product.targets.size}<", postfix = ">")
-            else product.targetNames.first()
+  private fun focusType(product: AnnotatedGeneric): String =
+    if (product.hasTupleFocus) product.targetNames.joinToString(prefix = "$tuple${product.targets.size}<", postfix = ">")
+    else product.targetNames.first()
 
-    private fun focusHListType(product: AnnotatedGeneric): String =
-            product.targetNames.joinToString(prefix = "$hlist${product.targets.size}<", postfix = ">")
+  private fun focusHListType(product: AnnotatedGeneric): String =
+    product.targetNames.joinToString(prefix = "$hlist${product.targets.size}<", postfix = ">")
 
-    private fun labelledHListFocusType(product: AnnotatedGeneric): String =
-            product.targetNames.map { "${tuple}2<String, $it>" }.joinToString(prefix = "$hlist${product.targets.size}<", postfix = ">")
+  private fun labelledHListFocusType(product: AnnotatedGeneric): String =
+    product.targetNames.map { "${tuple}2<String, $it>" }.joinToString(prefix = "$hlist${product.targets.size}<", postfix = ">")
 
-    private fun classConstructorFromTuple(sourceClassName: String, propertiesSize: Int): String =
-            (0 until propertiesSize).joinToString(prefix = "$sourceClassName(", postfix = ")", transform = { "this.${letters[it]}" })
+  private fun classConstructorFromTuple(sourceClassName: String, propertiesSize: Int): String =
+    (0 until propertiesSize).joinToString(prefix = "$sourceClassName(", postfix = ")", transform = { "this.${letters[it]}" })
 
-    private fun classConstructorFromHList(sourceClassName: String, propertiesSize: Int): String =
-            (0 until propertiesSize).joinToString(prefix = "$sourceClassName(", postfix = ")", transform = {
-                "this." + (0 until it).fold("") { acc, n ->
-                    acc + "tail."
-                } + "head"
-            })
+  private fun classConstructorFromHList(sourceClassName: String, propertiesSize: Int): String =
+    (0 until propertiesSize).joinToString(prefix = "$sourceClassName(", postfix = ")", transform = {
+      "this." + (0 until it).fold("") { acc, n ->
+        acc + "tail."
+      } + "head"
+    })
 
-    private fun kindedProperties(prefix: String, product: AnnotatedGeneric): String =
-            product.targets.map { it.paramName }.zip(product.targetNames).joinToString(
-                    prefix = "(",
-                    separator = ", ",
-                    transform = { "${it.first}: arrow.Kind<$prefix, ${it.second}>" },
-                    postfix = ")"
-            )
+  private fun kindedProperties(prefix: String, product: AnnotatedGeneric): String =
+    product.targets.map { it.paramName }.zip(product.targetNames).joinToString(
+      prefix = "(",
+      separator = ", ",
+      transform = { "${it.first}: arrow.Kind<$prefix, ${it.second}>" },
+      postfix = ")"
+    )
 
-    private fun AnnotatedGeneric.types(): List<String> =
-            (0 until focusSize).toList().map { letters[it].toString().capitalize() }
+  private fun AnnotatedGeneric.types(): List<String> =
+    (0 until focusSize).toList().map { letters[it].toString().capitalize() }
 
-    private fun AnnotatedGeneric.arityConcreteInstanceProviders(tc: DerivedTypeClass): String =
-            targetNames.mapIndexed { i, t -> i to t }.joinToString("\n  ") { "fun ${tc.type.substringAfterLast(".")[0]}${letters[it.first].toString().capitalize()}(): ${tc.type}<${it.second}>" }
+  private fun AnnotatedGeneric.arityConcreteInstanceProviders(tc: DerivedTypeClass): String =
+    targetNames.mapIndexed { i, t -> i to t }.joinToString("\n  ") { "fun ${tc.type.substringAfterLast(".")[0]}${letters[it.first].toString().capitalize()}(): ${tc.type}<${it.second}>" }
 
-    private fun AnnotatedGeneric.arityConcreteInstanceInjections(tc: DerivedTypeClass): String =
-            targetNames.mapIndexed { i, t -> i to t }.joinToString(", ") {
-                "val ${tc.type.substringAfterLast(".")[0]}${letters[it.first].toString().capitalize()}: ${tc.type}<${it.second}>"
-            }
+  private fun AnnotatedGeneric.arityConcreteInstanceInjections(tc: DerivedTypeClass): String =
+    targetNames.mapIndexed { i, t -> i to t }.joinToString(", ") {
+      "val ${tc.type.substringAfterLast(".")[0]}${letters[it.first].toString().capitalize()}: ${tc.type}<${it.second}>"
+    }
 
-    private fun AnnotatedGeneric.arityConcreteInstanceImplementations(tc: DerivedTypeClass): String =
-            targetNames.mapIndexed { i, t -> i to t }.joinToString("\n      ") {
-                "override fun ${tc.type.substringAfterLast(".")[0]}${letters[it.first].toString().capitalize()}(): ${tc.type}<${it.second}> = ${"${tc.type.substringBeforeLast(".")}.${tc.type.substringAfterLast(".").decapitalize()}"}()"
-            }
+  private fun AnnotatedGeneric.arityConcreteInstanceImplementations(tc: DerivedTypeClass): String =
+    targetNames.mapIndexed { i, t -> i to t }.joinToString("\n      ") {
+      "override fun ${tc.type.substringAfterLast(".")[0]}${letters[it.first].toString().capitalize()}(): ${tc.type}<${it.second}> = ${"${tc.type.substringBeforeLast(".")}.${tc.type.substringAfterLast(".").decapitalize()}"}()"
+    }
 
-    private fun AnnotatedGeneric.arityInstanceProviders(tc: DerivedTypeClass): String =
-            types().joinToString("\n  ") { "fun ${tc.type.substringAfterLast(".")[0]}$it(): ${tc.type}<$it>" }
+  private fun AnnotatedGeneric.arityInstanceProviders(tc: DerivedTypeClass): String =
+    types().joinToString("\n  ") { "fun ${tc.type.substringAfterLast(".")[0]}$it(): ${tc.type}<$it>" }
 
-    private fun AnnotatedGeneric.arityInstanceInjections(tc: DerivedTypeClass): String =
-            types().joinToString(", ") { "${tc.type.substringAfterLast(".")[0]}$it: ${tc.type}<$it>" }
+  private fun AnnotatedGeneric.arityInstanceInjections(tc: DerivedTypeClass): String =
+    types().joinToString(", ") { "${tc.type.substringAfterLast(".")[0]}$it: ${tc.type}<$it>" }
 
-    private fun AnnotatedGeneric.arityInstanceImplementations(tc: DerivedTypeClass): String =
-            types().joinToString("\n      ") { "override fun ${tc.type.substringAfterLast(".")[0]}$it(): ${tc.type}<$it> = ${tc.type.substringAfterLast(".")[0]}$it" }
+  private fun AnnotatedGeneric.arityInstanceImplementations(tc: DerivedTypeClass): String =
+    types().joinToString("\n      ") { "override fun ${tc.type.substringAfterLast(".")[0]}$it(): ${tc.type}<$it> = ${tc.type.substringAfterLast(".")[0]}$it" }
 
-    private fun AnnotatedGeneric.expandedTypeArgs(): String =
-            types().joinToString(", ")
+  private fun AnnotatedGeneric.expandedTypeArgs(): String =
+    types().joinToString(", ")
 
-    private fun AnnotatedGeneric.isRecursive(name: String): Boolean =
-            sourceClassName in name
+  private fun AnnotatedGeneric.isRecursive(name: String): Boolean =
+    sourceClassName in name
 
-    private fun AnnotatedGeneric.foldRecursive(name: String, ifNotRecursive: () -> String, ifRecursive: () -> String): String =
-            if (isRecursive(name)) ifRecursive() else ifNotRecursive()
+  private fun AnnotatedGeneric.foldRecursive(name: String, ifNotRecursive: () -> String, ifRecursive: () -> String): String =
+    if (isRecursive(name)) ifRecursive() else ifNotRecursive()
 
-    private fun semigroupTupleNInstance(product: AnnotatedGeneric): String =
-            if (product.hasTupleFocus)
-                """|
+  private fun semigroupTupleNInstance(product: AnnotatedGeneric): String =
+    if (product.hasTupleFocus)
+      """|
                 |interface Tuple${product.focusSize}SemigroupInstance<${product.expandedTypeArgs()}>
                 | : ${Semigroup.type}<arrow.core.Tuple${product.focusSize}<${product.expandedTypeArgs()}>> {
                 |
@@ -306,11 +306,11 @@ class ProductFileGenerator(
                 |    }
                 |}
                 |""".trimMargin()
-            else ""
+    else ""
 
-    private fun monoidTupleNInstance(product: AnnotatedGeneric): String =
-            if (product.hasTupleFocus)
-                """|
+  private fun monoidTupleNInstance(product: AnnotatedGeneric): String =
+    if (product.hasTupleFocus)
+      """|
                 |interface Tuple${product.focusSize}MonoidInstance<${product.expandedTypeArgs()}>
                 | : ${Monoid.type}<arrow.core.Tuple${product.focusSize}<${product.expandedTypeArgs()}>> {
                 |
@@ -337,11 +337,11 @@ class ProductFileGenerator(
                 |    }
                 |}
                 |""".trimMargin()
-            else ""
+    else ""
 
-    private fun eqTupleNInstance(product: AnnotatedGeneric): String =
-            if (product.hasTupleFocus)
-                """|
+  private fun eqTupleNInstance(product: AnnotatedGeneric): String =
+    if (product.hasTupleFocus)
+      """|
                 |interface Tuple${product.focusSize}EqInstance<${product.expandedTypeArgs()}>
                 | : ${Eq.type}<arrow.core.Tuple${product.focusSize}<${product.expandedTypeArgs()}>> {
                 |
@@ -364,11 +364,11 @@ class ProductFileGenerator(
                 |    }
                 |}
                 |""".trimMargin()
-            else ""
+    else ""
 
-    private fun orderTupleNInstance(product: AnnotatedGeneric): String =
-            if (product.hasTupleFocus)
-                """|
+  private fun orderTupleNInstance(product: AnnotatedGeneric): String =
+    if (product.hasTupleFocus)
+      """|
                 |interface Tuple${product.focusSize}OrderInstance<${product.expandedTypeArgs()}>
                 | : ${Order.type}<arrow.core.Tuple${product.focusSize}<${product.expandedTypeArgs()}>> {
                 |
@@ -392,11 +392,11 @@ class ProductFileGenerator(
                 |    }
                 |}
                 |""".trimMargin()
-            else ""
+    else ""
 
-    private fun showTupleNInstance(product: AnnotatedGeneric): String =
-            if (product.hasTupleFocus)
-                """|
+  private fun showTupleNInstance(product: AnnotatedGeneric): String =
+    if (product.hasTupleFocus)
+      """|
                 |interface Tuple${product.focusSize}ShowInstance<${product.expandedTypeArgs()}>
                 | : ${Show.type}<arrow.core.Tuple${product.focusSize}<${product.expandedTypeArgs()}>> {
                 |
@@ -418,6 +418,6 @@ class ProductFileGenerator(
                 |    }
                 |}
                 |""".trimMargin()
-            else ""
+    else ""
 }
 

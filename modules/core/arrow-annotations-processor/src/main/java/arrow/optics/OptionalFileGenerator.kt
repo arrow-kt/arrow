@@ -42,7 +42,8 @@ class OptionalFileGenerator(
                     """.trimMargin()
       } else if (targetClassName.startsWith("`arrow`.`core`.`Option`")) {
 
-        val clz = Regex("`arrow`.`core`.`Option`<(.*)>$").matchEntire(targetClassName)?.groupValues?.get(1) ?: return@map ""
+        val clz = Regex("`arrow`.`core`.`Option`<(.*)>$").matchEntire(targetClassName)?.groupValues?.get(1)
+          ?: return@map ""
 
         """
                     |fun $sourceName${targetName.toUpperCamelCase()}Optional(): $optional<$sourceClassName, $clz> = $optional(
