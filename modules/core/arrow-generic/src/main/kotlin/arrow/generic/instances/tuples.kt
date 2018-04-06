@@ -1,2 +1,0 @@
-package arrow.generic.instances
-
