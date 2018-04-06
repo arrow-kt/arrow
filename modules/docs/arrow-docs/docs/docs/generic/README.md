@@ -72,7 +72,7 @@ Tuple2(1000, 900).toAccount()
 
 ##### toHList
 
-`@product` enables `Account#tpHList` and `HList2#toAccount` extensions automatically to go back and forth between the data class value to a heterogeneous list representation such as `HList2` with the same arity and property types as those declared in the data class regardless of the number of properties.
+`@product` enables `Account#toHList` and `HList2#toAccount` extensions automatically to go back and forth between the data class value to a heterogeneous list representation such as `HList2` with the same arity and property types as those declared in the data class regardless of the number of properties.
 
 ```kotlin:ank
 Account(1000, 900).toHList()
