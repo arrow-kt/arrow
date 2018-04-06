@@ -2,6 +2,7 @@ package arrow.optics
 
 import arrow.core.Id
 import arrow.instances.IntMonoidInstance
+import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.laws.IsoLaws
@@ -21,7 +22,7 @@ class IdInstancesTest : UnitSpec() {
       funcGen = genFunctionAToB(Gen.int()),
       EQA = Eq.any(),
       EQB = Eq.any(),
-      bMonoid = IntMonoidInstance
+      bMonoid = Int.monoid()
     ))
   }
 

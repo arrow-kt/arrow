@@ -2,13 +2,17 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.*
-import arrow.free.*
-import arrow.instances.IntMonoidInstance
+import arrow.data.value
+import arrow.free.Const
+import arrow.free.applicative
+import arrow.free.const
+import arrow.free.value
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genIntSmall
 import arrow.typeclasses.*
 import io.kotlintest.properties.forAll
+import arrow.instances.*
 
 typealias TI<A> = Tuple2<IdOf<A>, IdOf<A>>
 
@@ -88,8 +92,8 @@ object TraverseLaws {
 
   fun <F> Traverse<F>.foldMapDerived(cf: (Int) -> Kind<F, Int>) =
     forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: Kind<F, Int> ->
-      val traversed = fa.traverse(Const.applicative(IntMonoidInstance), { a -> f(a).const() }).value()
-      val mapped = fa.foldMap(IntMonoidInstance, f)
+      val traversed = fa.traverse(Const.applicative(Int.monoid()), { a -> f(a).const() }).value()
+      val mapped = fa.foldMap(Int.monoid(), f)
       mapped.equalUnderTheLaw(traversed, Eq.any())
     })
 }

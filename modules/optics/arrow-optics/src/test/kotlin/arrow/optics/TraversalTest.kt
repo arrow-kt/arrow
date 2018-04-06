@@ -6,6 +6,7 @@ import arrow.core.toOption
 import arrow.core.toT
 import arrow.data.*
 import arrow.instances.IntMonoidInstance
+import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genListK
@@ -83,13 +84,13 @@ class TraversalTest : UnitSpec() {
 
       "asFold should behave as valid Fold: combineAll" {
         forAll(genListK(Gen.int())) { ints ->
-          combineAll(IntMonoidInstance, ints) == ints.sum()
+          combineAll(Int.monoid(), ints) == ints.sum()
         }
       }
 
       "asFold should behave as valid Fold: fold" {
         forAll(genListK(Gen.int())) { ints ->
-          fold(IntMonoidInstance, ints) == ints.sum()
+          fold(Int.monoid(), ints) == ints.sum()
         }
       }
 
@@ -116,13 +117,13 @@ class TraversalTest : UnitSpec() {
 
       "Folding all the values of a traversal" {
         forAll(Gen.list(Gen.int()), { ints ->
-          fold(IntMonoidInstance, ints.k()) == ints.sum()
+          fold(Int.monoid(), ints.k()) == ints.sum()
         })
       }
 
       "Combining all the values of a traversal" {
         forAll(Gen.list(Gen.int()), { ints ->
-          combineAll(IntMonoidInstance, ints.k()) == ints.sum()
+          combineAll(Int.monoid(), ints.k()) == ints.sum()
         })
       }
 

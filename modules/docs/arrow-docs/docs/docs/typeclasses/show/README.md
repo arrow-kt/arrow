@@ -14,7 +14,7 @@ It can be considered the typeclass equivalent of Java's `Object#toString`.
 import arrow.*
 import arrow.instances.*
 
-IntShowInstance.run { 1.show() }
+Int.show().run { 1.show() }
 ```
 
 ### Main Combinators

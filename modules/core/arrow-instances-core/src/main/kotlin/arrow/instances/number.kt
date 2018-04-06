@@ -2,150 +2,234 @@ package arrow.instances
 
 import arrow.typeclasses.*
 
-class NumberSemigroup<A : Number>(val f: (A, A) -> A) : Semigroup<A> {
-  override fun A.combine(b: A): A = f(this, b)
-}
-
 //////////
 // Byte
 //////////
+interface ByteSemigroupInstance : Semigroup<Byte> {
+  override fun Byte.combine(b: Byte): Byte = (this + b).toByte()
+}
 
-private val SGByte: Semigroup<Byte> = NumberSemigroup({ one, two -> (one + two).toByte() })
-
-object ByteMonoidInstance : Monoid<Byte>, Semigroup<Byte> by SGByte {
+interface ByteMonoidInstance : Monoid<Byte>, ByteSemigroupInstance {
   override fun empty(): Byte = 0
 }
 
-object ByteSemigroupInstance : Semigroup<Byte> by SGByte
-
-object ByteOrderInstance : Order<Byte> {
+interface ByteOrderInstance : Order<Byte> {
   override fun Byte.compare(b: Byte): Int = compareTo(b)
 }
 
-object ByteEqInstance : Eq<Byte> {
+interface ByteEqInstance : Eq<Byte> {
   override fun Byte.eqv(b: Byte): Boolean = this == b
 }
 
-object ByteShowInstance : Show<Byte> {
+interface ByteShowInstance : Show<Byte> {
   override fun Byte.show(): String = toString()
 }
+
+fun Byte.Companion.show(): Show<Byte> =
+  object : ByteShowInstance {}
+
+fun Byte.Companion.eq(): Eq<Byte> =
+  object : ByteEqInstance {}
+
+fun Byte.Companion.order(): Order<Byte> =
+  object : ByteOrderInstance {}
+
+fun Byte.Companion.semigroup(): Semigroup<Byte> =
+  object : ByteSemigroupInstance {}
+
+fun Byte.Companion.monoid(): Monoid<Byte> =
+  object : ByteMonoidInstance {}
 
 //////////
 // Double
 //////////
 
-private val SGDouble: Semigroup<Double> = NumberSemigroup(Double::plus)
+interface DoubleSemigroupInstance : Semigroup<Double> {
+  override fun Double.combine(b: Double): Double = this + b
+}
 
-object DoubleMonoid : Monoid<Double>, Semigroup<Double> by SGDouble {
+interface DoubleMonoidInstance : Monoid<Double>, DoubleSemigroupInstance {
   override fun empty(): Double = .0
 }
 
-object DoubleSemigroupInstance : Semigroup<Double> by SGDouble
-
-object DoubleOrderInstance : Order<Double> {
+interface DoubleOrderInstance : Order<Double> {
   override fun Double.compare(b: Double): Int = compareTo(b)
 }
 
-object DoubleEqInstance : Eq<Double> {
+interface DoubleEqInstance : Eq<Double> {
   override fun Double.eqv(b: Double): Boolean = this == b
 }
 
-object DoubleShowInstance : Show<Double> {
+interface DoubleShowInstance : Show<Double> {
   override fun Double.show(): String = toString()
 }
+
+fun Double.Companion.show(): Show<Double> =
+  object : DoubleShowInstance {}
+
+fun Double.Companion.eq(): Eq<Double> =
+  object : DoubleEqInstance {}
+
+fun Double.Companion.order(): Order<Double> =
+  object : DoubleOrderInstance {}
+
+fun Double.Companion.semigroup(): Semigroup<Double> =
+  object : DoubleSemigroupInstance {}
+
+fun Double.Companion.monoid(): Monoid<Double> =
+  object : DoubleMonoidInstance {}
 
 //////////
 // Int
 //////////
+interface IntSemigroupInstance : Semigroup<Int> {
+  override fun Int.combine(b: Int): Int = this + b
+}
 
-private val SGInt: Semigroup<Int> = NumberSemigroup(Int::plus)
-
-object IntSemigroupInstance : Semigroup<Int> by SGInt
-
-object IntMonoidInstance : Monoid<Int>, Semigroup<Int> by SGInt {
+interface IntMonoidInstance : Monoid<Int>, IntSemigroupInstance {
   override fun empty(): Int = 0
 }
 
-object IntEqInstance : Eq<Int> {
+interface IntEqInstance : Eq<Int> {
   override fun Int.eqv(b: Int): Boolean = this == b
 }
 
-object IntShowInstance : Show<Int> {
+interface IntShowInstance : Show<Int> {
   override fun Int.show(): String = toString()
 }
 
-object IntOrderInstance : Order<Int> {
+interface IntOrderInstance : Order<Int> {
   override fun Int.compare(b: Int): Int = compareTo(b)
 }
+
+fun Int.Companion.show(): Show<Int> =
+  object : IntShowInstance {}
+
+fun Int.Companion.eq(): Eq<Int> =
+  object : IntEqInstance {}
+
+fun Int.Companion.order(): Order<Int> =
+  object : IntOrderInstance {}
+
+fun Int.Companion.semigroup(): Semigroup<Int> =
+  object : IntSemigroupInstance {}
+
+fun Int.Companion.monoid(): Monoid<Int> =
+  object : IntMonoidInstance {}
 
 //////////
 // Long
 //////////
 
-private val SGLong: Semigroup<Long> = NumberSemigroup(Long::plus)
+interface LongSemigroupInstance : Semigroup<Long> {
+  override fun Long.combine(b: Long): Long = this + b
+}
 
-object LongMonoidInstance : Monoid<Long>, Semigroup<Long> by SGLong {
+interface LongMonoidInstance : Monoid<Long>, LongSemigroupInstance {
   override fun empty(): Long = 0L
 }
 
-object LongSemigroupInstance : Semigroup<Long> by SGLong
-
-object LongOrderInstance : Order<Long> {
+interface LongOrderInstance : Order<Long> {
   override fun Long.compare(b: Long): Int = compareTo(b)
 }
 
-object LongEqInstance : Eq<Long> {
+interface LongEqInstance : Eq<Long> {
   override fun Long.eqv(b: Long): Boolean = this == b
 }
 
-object LongShowInstance : Show<Long> {
+interface LongShowInstance : Show<Long> {
   override fun Long.show(): String = toString()
 }
+
+fun Long.Companion.show(): Show<Long> =
+  object : LongShowInstance {}
+
+fun Long.Companion.eq(): Eq<Long> =
+  object : LongEqInstance {}
+
+fun Long.Companion.order(): Order<Long> =
+  object : LongOrderInstance {}
+
+fun Long.Companion.semigroup(): Semigroup<Long> =
+  object : LongSemigroupInstance {}
+
+fun Long.Companion.monoid(): Monoid<Long> =
+  object : LongMonoidInstance {}
 
 //////////
 // Short
 //////////
 
-private val SGShort: Semigroup<Short> = NumberSemigroup({ one, two -> (one + two).toShort() })
+interface ShortSemigroupInstance : Semigroup<Short> {
+  override fun Short.combine(b: Short): Short = (this + b).toShort()
+}
 
-object ShortMonoid : Monoid<Short>, Semigroup<Short> by SGShort {
+interface ShortMonoidInstance : Monoid<Short>, ShortSemigroupInstance {
   override fun empty(): Short = 0
 }
 
-object ShortSemigroupInstance : Semigroup<Short> by SGShort
-
-object ShortOrderInstance : Order<Short> {
+interface ShortOrderInstance : Order<Short> {
   override fun Short.compare(b: Short): Int = compareTo(b)
 }
 
-object ShortEqInstance : Eq<Short> {
+interface ShortEqInstance : Eq<Short> {
   override fun Short.eqv(b: Short): Boolean = this == b
 }
 
-object ShortShowInstance : Show<Short> {
+interface ShortShowInstance : Show<Short> {
   override fun Short.show(): String = toString()
 }
+
+fun Short.Companion.show(): Show<Short> =
+  object : ShortShowInstance {}
+
+fun Short.Companion.eq(): Eq<Short> =
+  object : ShortEqInstance {}
+
+fun Short.Companion.order(): Order<Short> =
+  object : ShortOrderInstance {}
+
+fun Short.Companion.semigroup(): Semigroup<Short> =
+  object : ShortSemigroupInstance {}
+
+fun Short.Companion.monoid(): Monoid<Short> =
+  object : ShortMonoidInstance {}
 
 //////////
 // Float
 //////////
 
-private val SGFloat: Semigroup<Float> = NumberSemigroup(Float::plus)
-
-object FloatMonoid : Monoid<Float>, Semigroup<Float> by SGFloat {
-  override fun empty(): Float = .0f
+interface FloatSemigroupInstance : Semigroup<Float> {
+  override fun Float.combine(b: Float): Float = this + b
 }
 
-object FloatSemigroupInstance : Semigroup<Float> by SGFloat
+interface FloatMonoidInstance : Monoid<Float>, FloatSemigroupInstance {
+  override fun empty(): Float = 0f
+}
 
-object FloatOrderInstance : Order<Float> {
+interface FloatOrderInstance : Order<Float> {
   override fun Float.compare(b: Float): Int = compareTo(b)
 }
 
-object FloatEqInstance : Eq<Float> {
+interface FloatEqInstance : Eq<Float> {
   override fun Float.eqv(b: Float): Boolean = this == b
 }
 
-object FloatShowInstance : Show<Float> {
+interface FloatShowInstance : Show<Float> {
   override fun Float.show(): String = toString()
 }
+
+fun Float.Companion.show(): Show<Float> =
+  object : FloatShowInstance {}
+
+fun Float.Companion.eq(): Eq<Float> =
+  object : FloatEqInstance {}
+
+fun Float.Companion.order(): Order<Float> =
+  object : FloatOrderInstance {}
+
+fun Float.Companion.semigroup(): Semigroup<Float> =
+  object : FloatSemigroupInstance {}
+
+fun Float.Companion.monoid(): Monoid<Float> =
+  object : FloatMonoidInstance {}

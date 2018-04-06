@@ -35,7 +35,7 @@ val nonEmptyIntFold: Fold<NonEmptyListOf<Int>, Int> = Fold.fromFoldable(NonEmpty
 nullableFold<Int>().isEmpty(null)
 ```
 ```kotlin:ank
-nonEmptyIntFold.combineAll(IntMonoidInstance, NonEmptyList.of(1, 2, 3))
+nonEmptyIntFold.combineAll(Int.monoid(), NonEmptyList.of(1, 2, 3))
 ```
 ```kotlin:ank
 nullableFold<Int>().headOption(null)

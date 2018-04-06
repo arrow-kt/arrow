@@ -2,6 +2,7 @@ package arrow.data
 
 import arrow.Kind2
 import arrow.instances.IntMonoidInstance
+import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.SemigroupLaws
@@ -23,8 +24,8 @@ class SortedMapKTest : UnitSpec() {
 
     testLaws(
       ShowLaws.laws(SortedMapK.show(), EQ) { sortedMapOf("key" to 1).k() },
-      MonoidLaws.laws(SortedMapK.monoid<String, Int>(IntMonoidInstance), sortedMapOf("key" to 1).k(), EQ),
-      SemigroupLaws.laws(SortedMapK.monoid<String, Int>(IntMonoidInstance),
+      MonoidLaws.laws(SortedMapK.monoid<String, Int>(Int.monoid()), sortedMapOf("key" to 1).k(), EQ),
+      SemigroupLaws.laws(SortedMapK.monoid<String, Int>(Int.monoid()),
         sortedMapOf("key" to 1).k(),
         sortedMapOf("key" to 2).k(),
         sortedMapOf("key" to 3).k(),

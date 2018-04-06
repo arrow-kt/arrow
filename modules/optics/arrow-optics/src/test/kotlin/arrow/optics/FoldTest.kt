@@ -1,8 +1,11 @@
 package arrow.optics
 
 import arrow.core.Option
-import arrow.data.*
-import arrow.instances.IntMonoidInstance
+import arrow.data.ForListK
+import arrow.data.ListK
+import arrow.data.foldable
+import arrow.data.k
+import arrow.instances.monoid
 import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
@@ -30,19 +33,19 @@ class FoldTest : UnitSpec() {
 
       "Folding a list of ints" {
         forAll(Gen.list(Gen.int()), { ints ->
-          fold(IntMonoidInstance, ints.k()) == ints.sum()
+          fold(Int.monoid(), ints.k()) == ints.sum()
         })
       }
 
       "Folding a list should yield same result as combineAll" {
         forAll(Gen.list(Gen.int()), { ints ->
-          combineAll(IntMonoidInstance, ints.k()) == ints.sum()
+          combineAll(Int.monoid(), ints.k()) == ints.sum()
         })
       }
 
       "Folding and mapping a list of strings" {
         forAll(Gen.list(Gen.int()), { ints ->
-          stringFold.run { foldMap(IntMonoidInstance, ints.map(Int::toString).k(), String::toInt) } == ints.sum()
+          stringFold.run { foldMap(Int.monoid(), ints.map(Int::toString).k(), String::toInt) } == ints.sum()
         })
       }
 

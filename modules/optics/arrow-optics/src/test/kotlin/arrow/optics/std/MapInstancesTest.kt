@@ -4,9 +4,7 @@ import arrow.data.MapK
 import arrow.data.SetK
 import arrow.data.eq
 import arrow.data.monoid
-import arrow.instances.IntEqInstance
-import arrow.instances.IntMonoidInstance
-import arrow.instances.StringEqInstance
+import arrow.instances.*
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genMap
@@ -28,8 +26,8 @@ class MapInstancesTest : UnitSpec() {
       bGen = genMapK(Gen.string(), Gen.int()),
       funcGen = genFunctionAToB(genMapK(Gen.string(), Gen.int())),
       EQA = Eq.any(),
-      EQB = MapK.eq(StringEqInstance, IntEqInstance),
-      bMonoid = MapK.monoid<String, Int>(IntMonoidInstance)
+      EQB = MapK.eq(String.eq(), Int.eq()),
+      bMonoid = MapK.monoid<String, Int>(Int.monoid())
     ))
 
     testLaws(IsoLaws.laws(

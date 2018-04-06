@@ -4,7 +4,7 @@ import arrow.core.*
 import arrow.data.ListK
 import arrow.data.eq
 import arrow.data.k
-import arrow.instances.IntMonoidInstance
+import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genTry
@@ -114,15 +114,15 @@ class OptionalTest : UnitSpec() {
 
       "asFold should behave as valid Fold: combineAll" {
         forAll { ints: List<Int> ->
-          combineAll(IntMonoidInstance, ints) ==
-            ints.firstOrNull().toOption().fold({ IntMonoidInstance.empty() }, ::identity)
+          combineAll(Int.monoid(), ints) ==
+            ints.firstOrNull().toOption().fold({ Int.monoid().empty() }, ::identity)
         }
       }
 
       "asFold should behave as valid Fold: fold" {
         forAll { ints: List<Int> ->
-          fold(IntMonoidInstance, ints) ==
-            ints.firstOrNull().toOption().fold({ IntMonoidInstance.empty() }, ::identity)
+          fold(Int.monoid(), ints) ==
+            ints.firstOrNull().toOption().fold({ Int.monoid().empty() }, ::identity)
         }
       }
 

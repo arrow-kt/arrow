@@ -4,8 +4,7 @@ import arrow.core.*
 import arrow.data.ListK
 import arrow.data.eq
 import arrow.data.k
-import arrow.instances.IntMonoidInstance
-import arrow.instances.StringMonoidInstance
+import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.laws.LensLaws
@@ -30,7 +29,7 @@ class LensTest : UnitSpec() {
         funcGen = genFunctionAToB(Gen.string()),
         EQA = Eq.any(),
         EQB = Eq.any(),
-        MB = StringMonoidInstance
+        MB = String.monoid()
       ),
 
       TraversalLaws.laws(
@@ -68,7 +67,7 @@ class LensTest : UnitSpec() {
       funcGen = genFunctionAToB(Gen.int()),
       EQA = Eq.any(),
       EQB = Eq.any(),
-      MB = IntMonoidInstance
+      MB = Int.monoid()
     ))
 
     "asFold should behave as valid Fold: size" {
@@ -97,13 +96,13 @@ class LensTest : UnitSpec() {
 
     "asFold should behave as valid Fold: combineAll" {
       forAll(TokenGen) { token ->
-        tokenLens.asFold().combineAll(StringMonoidInstance, token) == token.value
+        tokenLens.asFold().combineAll(String.monoid(), token) == token.value
       }
     }
 
     "asFold should behave as valid Fold: fold" {
       forAll(TokenGen) { token ->
-        tokenLens.asFold().fold(StringMonoidInstance, token) == token.value
+        tokenLens.asFold().fold(String.monoid(), token) == token.value
       }
     }
 

@@ -6,9 +6,7 @@ import arrow.data.MapK
 import arrow.data.SetK
 import arrow.data.at
 import arrow.data.eq
-import arrow.instances.IntMonoidInstance
-import arrow.instances.IntSemigroupInstance
-import arrow.instances.StringEqInstance
+import arrow.instances.*
 import arrow.optics.AndMonoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
@@ -35,7 +33,7 @@ class AtInstanceTest : UnitSpec() {
       funcGen = genFunctionAToB(genOption(Gen.int())),
       EQA = Eq.any(),
       EQB = Eq.any(),
-      MB = Option.monoid(IntMonoidInstance)
+      MB = Option.monoid(Int.monoid())
     ))
 
     testLaws(LensLaws.laws(
@@ -45,7 +43,7 @@ class AtInstanceTest : UnitSpec() {
       funcGen = genFunctionAToB(genOption(Gen.int())),
       EQA = Eq.any(),
       EQB = Eq.any(),
-      MB = Option.monoid(IntSemigroupInstance)
+      MB = Option.monoid(Int.semigroup())
     ))
 
     testLaws(LensLaws.laws(
@@ -53,7 +51,7 @@ class AtInstanceTest : UnitSpec() {
       aGen = genSetK(Gen.string()),
       bGen = Gen.bool(),
       funcGen = genFunctionAToB(Gen.bool()),
-      EQA = SetK.eq(StringEqInstance),
+      EQA = SetK.eq(String.eq()),
       EQB = Eq.any(),
       MB = AndMonoid
     ))

@@ -134,11 +134,11 @@ tasks.create('repl') {
     doFirst {
         javaexec {
             classpath(
-                classpathConfig.resolvedConfiguration.resolvedArtifacts.findAll {
-                    it.moduleVersion.id.group == 'org.jetbrains.kotlin'
-                }.collect {
-                    it.file
-                }
+                    classpathConfig.resolvedConfiguration.resolvedArtifacts.findAll {
+                        it.moduleVersion.id.group == 'org.jetbrains.kotlin'
+                    }.collect {
+                        it.file
+                    }
             )
             main = "org.jetbrains.kotlin.cli.jvm.K2JVMCompiler"
             standardInput = System.in

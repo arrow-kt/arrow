@@ -4,6 +4,7 @@ import arrow.core.Option
 import arrow.core.eq
 import arrow.data.*
 import arrow.instances.CharEqInstance
+import arrow.instances.eq
 import arrow.optics.typeclasses.FilterIndex
 import arrow.test.UnitSpec
 import arrow.test.generators.*
@@ -54,7 +55,7 @@ class FilterIndexInstanceTest : UnitSpec() {
       aGen = genSequenceK(genChars()),
       bGen = genChars(),
       funcGen = genFunctionAToB(genChars()),
-      EQA = SequenceK.eq(CharEqInstance),
+      EQA = SequenceK.eq(Char.eq()),
       EQOptionB = Option.eq(Eq.any()),
       EQListB = ListK.eq(Eq.any())
     ))

@@ -16,20 +16,20 @@ class ValidatedTest : UnitSpec() {
 
   init {
 
-    val EQ = Validated.eq(StringEqInstance, IntEqInstance)
+    val EQ = Validated.eq(String.eq(), Int.eq())
 
-    val VAL_AP = Validated.applicative<String>(StringMonoidInstance)
+    val VAL_AP = Validated.applicative<String>(String.monoid())
 
-    val VAL_SGK = Validated.semigroupK<String>(StringMonoidInstance)
+    val VAL_SGK = Validated.semigroupK<String>(String.semigroup())
 
     testLaws(
       EqLaws.laws(EQ) { Valid(it) },
       ShowLaws.laws(Validated.show(), EQ) { Valid(it) },
-      ApplicativeLaws.laws(Validated.applicative(StringMonoidInstance), Eq.any()),
-      TraverseLaws.laws(Validated.traverse(), Validated.applicative(StringMonoidInstance), ::Valid, Eq.any()),
+      ApplicativeLaws.laws(Validated.applicative(String.monoid()), Eq.any()),
+      TraverseLaws.laws(Validated.traverse(), Validated.applicative(String.monoid()), ::Valid, Eq.any()),
       SemigroupKLaws.laws(
-        Validated.semigroupK(IntMonoidInstance),
-        Validated.applicative(IntMonoidInstance),
+        Validated.semigroupK(Int.monoid()),
+        Validated.applicative(Int.monoid()),
         Eq.any())
     )
 
@@ -120,7 +120,7 @@ class ValidatedTest : UnitSpec() {
       Invalid(13).toValidatedNel() shouldBe Invalid(NonEmptyList(13, listOf()))
     }
 
-    val plusIntSemigroup: Semigroup<Int> = IntSemigroupInstance
+    val plusIntSemigroup: Semigroup<Int> = Int.semigroup()
 
     "findValid should return the first Valid value or combine or Invalid values in otherwise" {
       Valid(10).findValid(plusIntSemigroup, { fail("None should not be called") }) shouldBe Valid(10)
@@ -220,20 +220,20 @@ class ValidatedTest : UnitSpec() {
     "Combine should combine Valid Validated" {
       val valid: Validated<String, String> = Valid("Who")
 
-      valid.combine(StringMonoidInstance, StringMonoidInstance, valid) shouldBe (Valid("WhoWho"))
+      valid.combine(String.monoid(), String.monoid(), valid) shouldBe (Valid("WhoWho"))
     }
 
     "Combine should combine Valid and Invalid Validated" {
       val valid = Valid("Who")
       val invalid = Invalid("Nope")
 
-      valid.combine(StringMonoidInstance, StringMonoidInstance, invalid) shouldBe (Invalid("Nope"))
+      valid.combine(String.monoid(), String.monoid(), invalid) shouldBe (Invalid("Nope"))
     }
 
     "Combine should combine Invalid Validated" {
       val invalid: Validated<String, String> = Invalid("Nope")
 
-      invalid.combine(StringMonoidInstance, StringMonoidInstance, invalid) shouldBe (Invalid("NopeNope"))
+      invalid.combine(String.monoid(), String.monoid(), invalid) shouldBe (Invalid("NopeNope"))
     }
   }
 }

@@ -13,6 +13,30 @@ import javax.lang.model.element.VariableElement
 
 interface ProcessorUtils : KotlinMetadataUtils {
 
+  fun Element.getConstructorParamNames(): List<String> = kotlinMetadata
+    .let { it as KotlinClassMetadata }.data
+    .let { (nameResolver, classProto) ->
+      classProto.constructorOrBuilderList
+        .first()
+        .valueParameterList
+        .map(ProtoBuf.ValueParameter::getName)
+        .map(nameResolver::getString)
+    }
+
+  fun Element.getClassData(): ClassOrPackageDataWrapper.Class = kotlinMetadata
+    .let { it as KotlinClassMetadata }
+    .data
+    .asClassOrPackageDataWrapper(elementUtils.getPackageOf(this).toString())
+
+  fun Element.getConstructorTypesNames(): List<String> = kotlinMetadata
+    .let { it as KotlinClassMetadata }.data
+    .let { data ->
+      data.proto.constructorOrBuilderList
+        .first()
+        .valueParameterList
+        .map { it.type.extractFullName(data) }
+    }
+
   fun KotlinMetadata.asClassOrPackageDataWrapper(classElement: TypeElement): ClassOrPackageDataWrapper? {
     val `package` = elementUtils.getPackageOf(classElement).toString()
     return when (this) {
@@ -34,6 +58,8 @@ interface ProcessorUtils : KotlinMetadataUtils {
   fun ClassOrPackageDataWrapper.getFunction(methodElement: ExecutableElement) =
     getFunctionOrNull(methodElement, nameResolver, functionList)
       ?: knownError("Can't find annotated method ${methodElement.jvmMethodSignature}")
+
+  private fun kindedRex() = "(?i)Kind<(.)>".toRegex()
 
   fun ProtoBuf.Function.overrides(o: ProtoBuf.Function): Boolean = false
 
@@ -65,11 +91,15 @@ interface ProcessorUtils : KotlinMetadataUtils {
       interfaces.isEmpty() -> acc
       else -> {
         interfaces.flatMap { i ->
-          val className = i.removeBackticks().substringBefore("<")
-          val typeClassElement = elementUtils.getTypeElement(className) ?: knownError("Could not find typeclass $className")
-          val parentInterface = getClassOrPackageDataWrapper(typeClassElement)
-          val newAcc = acc + parentInterface
-          recurseTypeclassInterfaces(parentInterface as ClassOrPackageDataWrapper.Class, typeTable, newAcc)
+          try {
+            val className = i.removeBackticks().substringBefore("<")
+            val typeClassElement = elementUtils.getTypeElement(className)
+            val parentInterface = getClassOrPackageDataWrapper(typeClassElement)
+            val newAcc = acc + parentInterface
+            recurseTypeclassInterfaces(parentInterface as ClassOrPackageDataWrapper.Class, typeTable, newAcc)
+          } catch (_: Throwable) {
+            emptyList<ClassOrPackageDataWrapper>()
+          }
         }
       }
     }

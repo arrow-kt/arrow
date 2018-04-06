@@ -50,7 +50,7 @@ Arrow optics also provides a number of predefined `Traversal` optics.
 ```kotlin:ank
 import arrow.instances.*
 
-traversalTuple2<String>().combineAll(StringMonoidInstance, "Hello, " toT "World!")
+traversalTuple2<String>().combineAll(String.monoid(), "Hello, " toT "World!")
 ```
 ```kotlin:ank
 traversalTuple10<Int>().getAll(Tuple10(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
@@ -64,7 +64,7 @@ Composing `Traversal` can be used for accessing and modifying foci in nested str
 val listOfPairTraversal: Traversal<ListKOf<Tuple2<String, String>>, Tuple2<String, String>> = Traversal.fromTraversable(ListK.traverse())
 val nestedInts = listOfPairTraversal compose traversalTuple2()
 
-nestedInts.fold(StringMonoidInstance, listOf("Hello, " toT "World ", "from " toT "nested structures!").k())
+nestedInts.fold(String.monoid(), listOf("Hello, " toT "World ", "from " toT "nested structures!").k())
 ```
 
 `Traversal` can be composed with all optics and results in the following optics.

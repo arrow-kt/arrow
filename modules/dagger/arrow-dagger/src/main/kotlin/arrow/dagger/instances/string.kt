@@ -1,8 +1,6 @@
 package arrow.dagger.instances
 
-import arrow.instances.StringEqInstance
-import arrow.instances.StringMonoidInstance
-import arrow.instances.StringSemigroupInstance
+import arrow.instances.*
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
@@ -13,11 +11,12 @@ import dagger.Provides
 class StringInstances {
 
   @Provides
-  fun stringSemigroup(): Semigroup<String> = StringSemigroupInstance
+  fun stringSemigroup(): Semigroup<String> = String.semigroup()
 
   @Provides
-  fun stringMonoid(): Monoid<String> = StringMonoidInstance
+  fun stringMonoid(): Monoid<String> = String.monoid()
 
   @Provides
-  fun stringEq(): Eq<String> = StringEqInstance
+  fun stringEq(): Eq<String> = String.eq()
+
 }

@@ -1,6 +1,6 @@
 package arrow.instances
 
-import arrow.data.ValidatedPartialOf
+import arrow.data.*
 import arrow.typeclasses.*
 import dagger.Module
 import dagger.Provides

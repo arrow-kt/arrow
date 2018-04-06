@@ -1,23 +1,18 @@
 package arrow.optics
 
-import com.google.auto.service.AutoService
 import arrow.common.utils.AbstractProcessor
-import arrow.common.utils.asClassOrPackageDataWrapper
 import arrow.common.utils.isSealed
 import arrow.common.utils.knownError
+import com.google.auto.service.AutoService
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
-import me.eugeniomarletti.kotlin.metadata.extractFullName
 import me.eugeniomarletti.kotlin.metadata.isDataClass
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
-import me.eugeniomarletti.kotlin.metadata.proto
-import org.jetbrains.kotlin.serialization.ProtoBuf
 import java.io.File
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
-import javax.lang.model.element.TypeElement
-
 import javax.lang.model.element.Element
+import javax.lang.model.element.TypeElement
 
 @AutoService(Processor::class)
 class OptikalProcessor : AbstractProcessor() {
@@ -68,8 +63,8 @@ class OptikalProcessor : AbstractProcessor() {
     element.let { it.kotlinMetadata as? KotlinClassMetadata }?.data?.classProto?.isDataClass == true ->
       AnnotatedOptic(
         element as TypeElement,
-        getClassData(element),
-        getConstructorTypesNames(element).zip(getConstructorParamNames(element), ::Target)
+        element.getClassData(),
+        element.getConstructorTypesNames().zip(element.getConstructorParamNames(), ::Target)
       )
 
     else -> knownError(opticsAnnotationError(element, lensesAnnotationName, lensesAnnotationTarget))
@@ -81,7 +76,7 @@ class OptikalProcessor : AbstractProcessor() {
 
       AnnotatedOptic(
         element as TypeElement,
-        getClassData(element),
+        element.getClassData(),
         classProto.sealedSubclassFqNameList
           .map(nameResolver::getString)
           .map { it.replace('/', '.') }
@@ -98,39 +93,15 @@ class OptikalProcessor : AbstractProcessor() {
 
   private fun evalAnnotatedIsoElement(element: Element): AnnotatedOptic = when {
     (element.kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isDataClass == true -> {
-      val properties = getConstructorTypesNames(element).zip(getConstructorParamNames(element), ::Target)
+      val properties = element.getConstructorTypesNames().zip(element.getConstructorParamNames(), ::Target)
 
       if (properties.size > 10)
         knownError("${element.enclosingElement}.${element.simpleName} up to 10 constructor parameters is supported")
       else
-        AnnotatedOptic(element as TypeElement, getClassData(element), properties)
+        AnnotatedOptic(element as TypeElement, element.getClassData(), properties)
     }
 
     else -> knownError(opticsAnnotationError(element, isosAnnotationName, isosAnnotationTarget))
   }
-
-  private fun getConstructorTypesNames(element: Element): List<String> = element.kotlinMetadata
-    .let { it as KotlinClassMetadata }.data
-    .let { data ->
-      data.proto.constructorOrBuilderList
-        .first()
-        .valueParameterList
-        .map { it.type.extractFullName(data) }
-    }
-
-  private fun getConstructorParamNames(element: Element): List<String> = element.kotlinMetadata
-    .let { it as KotlinClassMetadata }.data
-    .let { (nameResolver, classProto) ->
-      classProto.constructorOrBuilderList
-        .first()
-        .valueParameterList
-        .map(ProtoBuf.ValueParameter::getName)
-        .map(nameResolver::getString)
-    }
-
-  private fun getClassData(element: Element) = element.kotlinMetadata
-    .let { it as KotlinClassMetadata }
-    .data
-    .asClassOrPackageDataWrapper(elementUtils.getPackageOf(element).toString())
 
 }

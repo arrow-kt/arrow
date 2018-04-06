@@ -6,6 +6,7 @@ import arrow.data.ListK
 import arrow.data.eq
 import arrow.instances.IntMonoidInstance
 import arrow.instances.StringMonoidInstance
+import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genTuple
@@ -28,7 +29,7 @@ class TupleInstancesTest : UnitSpec() {
       funcGen = genFunctionAToB(Gen.int()),
       EQA = Eq.any(),
       EQB = Eq.any(),
-      MB = IntMonoidInstance
+      MB = Int.monoid()
     ))
 
     testLaws(LensLaws.laws(
@@ -38,7 +39,7 @@ class TupleInstancesTest : UnitSpec() {
       funcGen = genFunctionAToB(Gen.string()),
       EQA = Eq.any(),
       EQB = Eq.any(),
-      MB = StringMonoidInstance
+      MB = String.monoid()
     ))
 
     testLaws(TraversalLaws.laws(

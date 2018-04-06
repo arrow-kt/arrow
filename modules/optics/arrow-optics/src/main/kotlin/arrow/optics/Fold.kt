@@ -6,7 +6,7 @@ import arrow.data.ListK
 import arrow.data.monoid
 import arrow.free.Const
 import arrow.higherkind
-import arrow.instances.IntMonoidInstance
+import arrow.instances.monoid
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Monoid
 
@@ -61,7 +61,7 @@ interface Fold<S, A> : FoldOf<S, A> {
   /**
    * Calculate the number of targets
    */
-  fun size(s: S) = foldMap(IntMonoidInstance, s = s, f = { _ -> 1 })
+  fun size(s: S) = foldMap(Int.monoid(), s = s, f = { _ -> 1 })
 
   /**
    * Check if all targets satisfy the predicate

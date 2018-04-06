@@ -1,24 +1,38 @@
 package arrow.instances
 
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
+import arrow.typeclasses.*
 
-object StringSemigroupInstance : Semigroup<String> {
+interface StringSemigroupInstance : Semigroup<String> {
   override fun String.combine(b: String): String = "${this}$b"
 }
 
-object StringMonoidInstance : Monoid<String> {
-  override fun empty(): String = ""
+fun String.Companion.semigroup(): Semigroup<String> =
+  object : StringSemigroupInstance {}
 
-  override fun String.combine(b: String): String = StringSemigroupInstance.run { combine(b) }
+interface StringMonoidInstance : Monoid<String>, StringSemigroupInstance {
+  override fun empty(): String = ""
 }
 
-object StringEqInstance : Eq<String> {
+fun String.Companion.monoid(): Monoid<String> =
+  object : StringMonoidInstance {}
+
+interface StringEqInstance : Eq<String> {
   override fun String.eqv(b: String): Boolean = this == b
 }
 
-object StringShowInstance : Show<String> {
+fun String.Companion.eq(): Eq<String> =
+  object : StringEqInstance {}
+
+interface StringShowInstance : Show<String> {
   override fun String.show(): String = this
 }
+
+fun String.Companion.show(): Show<String> =
+  object : StringShowInstance {}
+
+interface StringOrderInstance : Order<String> {
+  override fun String.compare(b: String): Int = this.compareTo(b)
+}
+
+fun String.Companion.order(): Order<String> =
+  object : StringOrderInstance {}

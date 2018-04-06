@@ -7,6 +7,9 @@ import arrow.core.Either.Right
 import arrow.instance
 import arrow.typeclasses.*
 
+//TODO this should be user driven allowing consumers to generate the tuple arities on demand to avoid cluttering arrow dependents with unused code
+//TODO @arities(fromTupleN = 2, toTupleN = 22 | fromHListN = 1, toHListN = 22)
+
 @instance(Tuple2::class)
 interface Tuple2FunctorInstance<F> : Functor<Tuple2PartialOf<F>> {
   override fun <A, B> Kind<Tuple2PartialOf<F>, A>.map(f: (A) -> B) =

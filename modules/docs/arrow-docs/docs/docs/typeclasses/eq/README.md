@@ -15,7 +15,7 @@ It can be considered the typeclass equivalent of Java's `Object#equals`.
 import arrow.*
 import arrow.instances.*
 
-StringEqInstance.run { "1".eqv("2") }
+String.eq().run { "1".eqv("2") }
 ```
 
 ### Main Combinators
@@ -29,7 +29,7 @@ It is the opposite comparison of `neqv`.
 
 
 ```kotlin:ank
-IntEqInstance.run { 1.eqv(2) }
+Int.eq().run { 1.eqv(2) }
 ```
 
 #### neqv
@@ -40,7 +40,7 @@ It is the opposite comparison of `eqv`.
 `fun neqv(a: F, b: F): Boolean`
 
 ```kotlin:ank
-IntEqInstance.run { 1.neqv(2) }
+Int.eq().run { 1.neqv(2) }
 ```
 
 ### Laws
