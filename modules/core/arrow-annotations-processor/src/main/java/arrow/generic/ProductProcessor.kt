@@ -52,5 +52,4 @@ class ProductProcessor : AbstractProcessor() {
         else -> knownError(productAnnotationError(element, productAnnotationName, productAnnotationTarget))
     }
 
-
 }
