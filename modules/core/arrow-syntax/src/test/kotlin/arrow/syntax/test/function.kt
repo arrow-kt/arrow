@@ -14,6 +14,7 @@ class FunctionSyntaxTest : UnitSpec() {
     values.map { "$prefix$it$numericPostfix" }
   }
 
+  private val sum = { i1: Int, i2: Int -> i1 + i2 }
   private val add5 = { i: Int -> i + 5 }
   private val multiplyBy2 = { i: Int -> i * 2 }
 
@@ -47,9 +48,19 @@ class FunctionSyntaxTest : UnitSpec() {
       add5andMultiplyBy2(2) shouldBe 14
     }
 
+    "testAndThen2" {
+      val sumAndMultiplyBy2 = sum andThen multiplyBy2
+      sumAndMultiplyBy2(5, 2) shouldBe 14
+    }
+
     "testForwardCompose" {
       val add5andMultiplyBy2 = add5 forwardCompose multiplyBy2
       add5andMultiplyBy2(2) shouldBe 14
+    }
+
+    "testForwardCompose2" {
+      val sumAndMultiplyBy2 = sum forwardCompose multiplyBy2
+      sumAndMultiplyBy2(5, 2) shouldBe 14
     }
 
     "testCompose" {
