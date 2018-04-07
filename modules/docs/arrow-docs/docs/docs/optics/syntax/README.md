@@ -7,18 +7,18 @@ permalink: /docs/optics/syntax/
 ## Syntax DSL
 
 In some cases the full power of Optics is not required and a familiar property-like syntax to work with values of immutable structures is desired.
-To avoid boilerplate Arrow can generate this property-like dsl using `@syntax` annotation.
+To avoid boilerplate Arrow can generate this property-like dsl using `@optics` annotation.
 
 ```kotlin
 package com.example.domain
 
-@syntax
+@optics
 data class Street(val number: Int, val name: String)
-@syntax
+@optics
 data class Address(val city: String, val street: Street)
-@syntax
+@optics
 data class Company(val name: String, val address: Address)
-@syntax
+@optics
 data class Employee(val name: String, val company: Company?)
 ```
 

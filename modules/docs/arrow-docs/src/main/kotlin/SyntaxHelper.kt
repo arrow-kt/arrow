@@ -1,19 +1,15 @@
 package com.example.domain
 
-import arrow.lenses
-import arrow.optionals
-import arrow.syntax
+import arrow.optics.optics
 
-@syntax
+@optics
 data class Street(val number: Int, val name: String)
 
-@syntax
+@optics
 data class Address(val city: String, val street: Street)
 
-@syntax
+@optics
 data class Company(val name: String, val address: Address)
 
-@syntax
-@optionals
-@lenses
+@optics
 data class Employee(val name: String, val company: Company?)

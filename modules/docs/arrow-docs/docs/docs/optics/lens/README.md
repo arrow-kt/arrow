@@ -131,10 +131,10 @@ Don't worry about the boilerplate of the lenses written above because it can be 
 
 ### Generating lenses
 
-Lenses can be generated for a `data class` by the `@lenses` annotation. For every constructor parameter of the `data class` a `Lens` will be generated. The lenses will be generated in the same package as the `data class` and will be named `classnameProperty()`.
+Lenses can be generated for a `data class` by the `@optics` annotation. For every constructor parameter of the `data class` a `Lens` will be generated. The lenses will be generated in the same package as the `data class` and will be named `classnameProperty()`.
 
 ```kotlin
-@lenses data class Employee(val name: String, val company: Company)
+@optics data class Employee(val name: String, val company: Company)
 ```
 
 For `Employee` 2 lenses will be generated `fun employeeName(): Lens<Employee, String>` and `fun employeeCompany(): Lens<Employee, Company>`. Using generated lenses we can reduce our previous code example.

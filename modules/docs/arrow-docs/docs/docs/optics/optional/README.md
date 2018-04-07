@@ -92,10 +92,11 @@ triedEmail.getOption(Try.Failure(IllegalStateException("Something wrong with net
 To avoid boilerplate, optionals can be generated for `A?` and `Option<A>` fields for a `data class`. The `Optionals` will be generated in the same package as `data class`.
 
 ```kotlin
-@optionals data class Point2D(val x: Int, val y: Int, val color: Int?)
+@optics data class Person(val age: Int?, val address: Option<Address>)
 ```
 ```kotlin:ank:silent
-val optional: Optional<Point2D, Int> = point2DColor()
+val optionalAge: Optional<Person, Int> = personAge()
+val optionalAddress: Optional<Person, Address> = personAddress()
 ```
 
 ### Polymorphic optional
