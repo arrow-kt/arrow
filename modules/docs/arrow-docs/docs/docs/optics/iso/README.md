@@ -112,12 +112,13 @@ val nullableOptionIso: Iso<String?, Option<String>> = nullableToOption()
 
 ### Generating isos
 
-To avoid boilerplate, isos can be generated for a `data class` to `TupleN` with 2 to 10 parameters by the `@isos` annotation. The `Iso` will be generated in the same package as the `data class` and will be named `classnameIso()`.
+To avoid boilerplate, isos can be generated for a `data class` to `TupleN` with 2 to 10 parameters by the `@optics` annotation. The `Iso` will be generated in the same package as the `data class` and will be named `classnameIso()`.
 
 ```kotlin
-@isos data class Point2D(val x: Int, val y: Int)
-
-val iso: Iso<Point2D, Tuple2<Int, Int>> = point2dIso()
+@optics data class Pos(val x: Int, val y: Int)
+```
+```kotlin:ank:silent
+val iso: Iso<Pos, Tuple2<Int, Int>> = posIso()
 ```
 
 ### Polymorphic isos

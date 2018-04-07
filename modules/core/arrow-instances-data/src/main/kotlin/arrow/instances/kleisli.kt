@@ -59,7 +59,7 @@ interface KleisliApplicativeErrorInstance<F, D, E> : ApplicativeError<KleisliPar
     fix().handleErrorWith(FF(), f)
 
   override fun <A> raiseError(e: E): Kleisli<F, D, A> =
-    Kleisli.raiseError(e, FF())
+    Kleisli.raiseError(FF(), e)
 
 }
 

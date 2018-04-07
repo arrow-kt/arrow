@@ -149,7 +149,7 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
      * Raise an error [E].
      * @param ME [MonadError] for context [F].
      */
-    fun <F, D, E, A> raiseError(e: E, ME: MonadError<F, E>): Kleisli<F, D, A> = Kleisli { ME.raiseError(e) }
+    fun <F, D, E, A> raiseError(ME: MonadError<F, E>, e: E): Kleisli<F, D, A> = Kleisli { ME.raiseError(e) }
 
   }
 }

@@ -64,12 +64,13 @@ At first sight a `Lens` does not seem very useful as it is just a getter/setter 
 
 Let's examine following example. We have an `Employee` and he works for a certain `Company` located at a certain `Address` in a `Street`. And as a business requirement we have to capitalize `Street::name` in order to print nicer business cards.
 
-```kotlin:ank
+```kotlin
 data class Street(val number: Int, val name: String)
 data class Address(val city: String, val street: Street)
 data class Company(val name: String, val address: Address)
 data class Employee(val name: String, val company: Company)
-
+```
+```kotlin:ank
 val employee = Employee("John Doe", Company("Arrow", Address("Functional city", Street(23, "lambda street"))))
 employee
 ```
@@ -128,18 +129,16 @@ Don't worry about the boilerplate of the lenses written above because it can be 
 
 ### Generating lenses
 
-Lenses can be generated for a `data class` by the `@lenses` annotation. For every constructor parameter of the `data class` a `Lens` will be generated. The lenses will be generated in the same package as the `data class` and will be named `classnameProperty()`.
+Lenses can be generated for a `data class` by the `@optics` annotation. For every constructor parameter of the `data class` a `Lens` will be generated. The lenses will be generated in the same package as the `data class` and will be named `classnameProperty()`.
 
 ```kotlin
-@lenses data class Employee(val name: String, val company: Company)
+@optics data class Account(val balance: Int, val available: Int)
 ```
 
-For `Employee` 2 lenses will be generated `fun employeeName(): Lens<Employee, String>` and `fun employeeCompany(): Lens<Employee, Company>`. Using generated lenses we can reduce our previous code example.
+For `Account` 2 lenses will be generated `fun accountBalance(): Lens<Account, Int>` and `fun accountAvailable(): Lens<Account, Int>`.
 
-```kotlin
-val employeeStreetName: Lens<Employee, String> = employeeCompany() compose companyAddress() compose addressStrees() compose streetName()
-
-employeeStreetName.modify(employee, String::capitalize)
+```kotlin:ank:silent
+val balanceLens: Lens<Account, Int> = accountBalance()
 ```
 
 ### Polymorphic lenses <a id="Plens"></a>

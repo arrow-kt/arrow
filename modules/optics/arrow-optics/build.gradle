@@ -1,5 +1,4 @@
 dependencies {
-    compile project(':arrow-free')
     compile project(':arrow-data')
     compile project(':arrow-instances-data')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
@@ -8,6 +7,7 @@ dependencies {
 
     compile project(':arrow-annotations')
     kapt project(':arrow-annotations-processor')
+    kaptTest project(':arrow-annotations-processor')
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
