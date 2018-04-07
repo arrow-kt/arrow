@@ -8,11 +8,12 @@ import arrow.data.*
 import arrow.instance
 import arrow.typeclasses.*
 import arrow.data.combineK as listCombineK
+import kotlin.collections.plus as listPlus
 
 @instance(ListK::class)
 interface ListKSemigroupInstance<A> : Semigroup<ListK<A>> {
   override fun ListK<A>.combine(b: ListK<A>): ListK<A> =
-    (this + b).k()
+    (this.listPlus(b)).k()
 }
 
 @instance(ListK::class)
