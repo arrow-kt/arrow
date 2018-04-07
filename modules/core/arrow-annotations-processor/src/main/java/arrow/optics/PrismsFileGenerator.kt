@@ -9,11 +9,12 @@ class PrismsFileGenerator(
   private val generatedDir: File
 ) {
 
+  private val filePrefix = "prisms"
   private val prism = "arrow.optics.Prism"
 
   fun generate() = annotatedList.map(this::processElement)
     .map { (element, funs) ->
-      "${prismsAnnotationClass.simpleName}.${element.classData.`package`}.${element.type.simpleName.toString().toLowerCase()}.kt" to
+      "$filePrefix.${element.classData.`package`}.${element.type.simpleName.toString().toLowerCase()}.kt" to
         funs.joinToString(prefix = fileHeader(element.classData.`package`.escapedClassName), separator = "\n\n")
     }.forEach { (name, fileString) -> File(generatedDir, name).writeText(fileString) }
 

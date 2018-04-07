@@ -10,11 +10,12 @@ class LensesFileGenerator(
   private val generatedDir: File
 ) {
 
+  private val filePrefix = "lenses"
   private val lens = "arrow.optics.Lens"
 
   fun generate() = annotatedList.map(this::processElement)
     .map { (element, funs) ->
-      "${lensesAnnotationClass.simpleName}.${element.classData.`package`}.${element.type.simpleName.toString().toLowerCase()}.kt" to
+      "$filePrefix.${element.classData.`package`}.${element.type.simpleName.toString().toLowerCase()}.kt" to
         funs.joinToString(prefix = "package ${element.classData.`package`.escapedClassName}\n\n", separator = "\n")
     }.forEach { (name, fileString) -> File(generatedDir, name).writeText(fileString) }
 

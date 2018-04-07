@@ -1,7 +1,8 @@
 package arrow.ap.objects
 
 import arrow.core.Option
-import arrow.optionals
+import arrow.optics.OpticsTarget
+import arrow.optics.optics
 
-@optionals
+@optics([(OpticsTarget.OPTIONAL)])
 data class Optional(val field: String, val nullable: String?, val option: Option<String>)
