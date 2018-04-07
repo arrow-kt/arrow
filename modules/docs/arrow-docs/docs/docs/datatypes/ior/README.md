@@ -136,12 +136,12 @@ Ior.Both("Warning", 41).toOption()
 
 Available Instances:
 
-[Show](/docs/typeclasses/show)
-[Eq](/docs/typeclasses/eq)
-[Foldable](/docs/typeclasses/foldable)
-[Functor](/docs/typeclasses/functor)
-[Traverse](/docs/typeclasses/traverse)
-[TraverseFilter](/docs/typeclasses/traversefilter)
+[Show]({{ '/docs/typeclasses/show' | relative_url }})
+[Eq]({{ '/docs/typeclasses/eq' | relative_url }})
+[Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
+[Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+[Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
+[TraverseFilter]({{ '/docs/typeclasses/traversefilter' | relative_url }})
 
 # Credits
 
