@@ -27,9 +27,14 @@ class LensesFileGenerator(
       val sourceName = annotatedOptic.type.simpleName.toString().decapitalize()
       val targetClassName = variable.fullName
       val targetName = variable.paramName
+      val lensType = when (variable) {
+        is Target.NullableTarget -> "Nullable${targetName.toUpperCamelCase()}"
+        is Target.OptionTarget -> "Option${targetName.toUpperCamelCase()}"
+        is Target.NonNullTarget -> targetName.toUpperCamelCase()
+      }
 
       """
-                    |fun $sourceName${targetName.toUpperCamelCase()}(): $lens<$sourceClassName, $targetClassName> = $lens(
+                    |fun $sourceName$lensType(): $lens<$sourceClassName, $targetClassName> = $lens(
                     |        get = { $sourceName: $sourceClassName -> $sourceName.${targetName.plusIfNotBlank(prefix = "`", postfix = "`")} },
                     |        set = { value: $targetClassName ->
                     |            { $sourceName: $sourceClassName ->
