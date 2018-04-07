@@ -6,10 +6,12 @@ import arrow.data.*
 import arrow.instance
 import arrow.typeclasses.*
 import arrow.data.combineK as setCombineK
+import kotlin.collections.plus as setPlus
 
 @instance(SetK::class)
 interface SetKSemigroupInstance<A> : Semigroup<SetK<A>> {
-  override fun SetK<A>.combine(b: SetK<A>): SetK<A> = (this + b).k()
+  override fun SetK<A>.combine(b: SetK<A>): SetK<A> =
+    (this.setPlus(b)).k()
 }
 
 @instance(SetK::class)

@@ -53,4 +53,12 @@ Option.monoid<Int>(Int.semigroup()).run { Option(1).combine(None) }
 
 Many of these types have methods defined directly on them, which allow for such combining, e.g. `+` on `List`, but the value of having a `Semigroup` typeclass available is that these compose.
 
+Additionaly `Semigroup` adds `+` syntax to all types for which a Semigroup instance exists:
+
+```kotlin:ank
+Option.monoid<Int>(Int.semigroup()).run { 
+  Option(1) + Option(2)
+}
+```
+
 Contents partially adapted from [Scala Exercises Cat's Semigroup Tutorial](https://www.scala-exercises.org/cats/semigroup)
