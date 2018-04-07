@@ -96,7 +96,7 @@ interface ObservableKMonadErrorInstance :
 interface ObservableKMonadSuspendInstance :
   ObservableKMonadErrorInstance,
   MonadSuspend<ForObservableK> {
-  override fun <A> suspend(fa: () -> ObservableKOf<A>): ObservableK<A> =
+  override fun <A> defer(fa: () -> ObservableKOf<A>): ObservableK<A> =
     ObservableK.suspend(fa)
 }
 

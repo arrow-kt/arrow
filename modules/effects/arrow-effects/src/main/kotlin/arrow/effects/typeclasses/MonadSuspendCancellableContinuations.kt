@@ -30,7 +30,7 @@ open class MonadSuspendCancellableContinuation<F, A>(SC: MonadSuspend<F>, overri
     invoke(f).bind()
 
   suspend fun <B> bindDeferIn(context: CoroutineContext, f: () -> B): B =
-    suspend { bindingCatch { bindIn(context, f) } }.bind()
+    defer { bindingCatch { bindIn(context, f) } }.bind()
 
   suspend fun <B> bindDeferUnsafe(f: () -> Either<Throwable, B>): B =
     deferUnsafe(f).bind()

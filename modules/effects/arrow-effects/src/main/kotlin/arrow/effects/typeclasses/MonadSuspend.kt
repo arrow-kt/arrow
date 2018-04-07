@@ -10,10 +10,10 @@ import kotlin.coroutines.experimental.startCoroutine
 
 /** The context required to defer evaluating a safe computation. **/
 interface MonadSuspend<F> : MonadError<F, Throwable> {
-  fun <A> suspend(fa: () -> Kind<F, A>): Kind<F, A>
+  fun <A> defer(fa: () -> Kind<F, A>): Kind<F, A>
 
   operator fun <A> invoke(fa: () -> A): Kind<F, A> =
-    suspend {
+    defer {
       try {
         just(fa())
       } catch (t: Throwable) {
@@ -24,7 +24,7 @@ interface MonadSuspend<F> : MonadError<F, Throwable> {
   fun lazy(): Kind<F, Unit> = invoke { }
 
   fun <A> deferUnsafe(f: () -> Either<Throwable, A>): Kind<F, A> =
-    suspend { f().fold({ raiseError<A>(it) }, { just(it) }) }
+    defer { f().fold({ raiseError<A>(it) }, { just(it) }) }
 }
 
 /**

@@ -30,7 +30,7 @@ val songIO: IOOf<Url> = getSongUrlAsync()
 val songDeferred: DeferredKOf<Url> = getSongUrlAsync()
 ```
 
-#### suspend
+#### defer
 
 Receives a function returning `Kind<F, A>`. The instance is responsible of creating and running the returned datatype lazily.
 
