@@ -2,9 +2,6 @@ package arrow.typeclasses
 
 import arrow.Kind
 
-inline operator fun <F, A> SemigroupK<F>.invoke(ff: SemigroupK<F>.() -> A) =
-  run(ff)
-
 interface SemigroupK<F> {
 
   /**

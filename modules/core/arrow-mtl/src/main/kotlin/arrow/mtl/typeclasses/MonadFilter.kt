@@ -5,9 +5,6 @@ import arrow.core.Option
 import arrow.typeclasses.Monad
 import kotlin.coroutines.experimental.startCoroutine
 
-inline operator fun <F, A> MonadFilter<F>.invoke(ff: MonadFilter<F>.() -> A) =
-  run(ff)
-
 interface MonadFilter<F> : Monad<F>, FunctorFilter<F> {
 
   fun <A> empty(): Kind<F, A>

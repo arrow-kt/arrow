@@ -5,9 +5,6 @@ package arrow.typeclasses
 import arrow.Kind
 import arrow.core.*
 
-inline operator fun <F, A> Applicative<F>.invoke(ff: Applicative<F>.() -> A) =
-  run(ff)
-
 interface Applicative<F> : Functor<F> {
 
   fun <A> just(a: A): Kind<F, A>

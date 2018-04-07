@@ -4,9 +4,6 @@ import arrow.Kind
 import arrow.core.*
 import arrow.core.Eval.Companion.always
 
-inline operator fun <F, A> Foldable<F>.invoke(ff: Foldable<F>.() -> A) =
-  run(ff)
-
 /**
  * Data structures that can be folded to a summary value.
  *

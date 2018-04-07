@@ -4,9 +4,6 @@ import arrow.Kind
 import arrow.core.Tuple2
 import arrow.typeclasses.Monad
 
-inline operator fun <F, S, A> MonadWriter<F, S>.invoke(ff: MonadWriter<F, S>.() -> A) =
-  run(ff)
-
 /** A monad that support monoidal accumulation (e.g. logging List<String>) */
 interface MonadWriter<F, W> : Monad<F> {
 

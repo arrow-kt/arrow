@@ -8,9 +8,6 @@ import arrow.effects.data.internal.BindingCancellationException
 import arrow.typeclasses.MonadError
 import kotlin.coroutines.experimental.startCoroutine
 
-inline operator fun <F, A> MonadSuspend<F>.invoke(ff: MonadSuspend<F>.() -> A) =
-  run(ff)
-
 /** The context required to defer evaluating a safe computation. **/
 interface MonadSuspend<F> : MonadError<F, Throwable> {
   fun <A> suspend(fa: () -> Kind<F, A>): Kind<F, A>
