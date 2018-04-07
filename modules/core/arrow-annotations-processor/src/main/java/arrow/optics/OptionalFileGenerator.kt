@@ -10,12 +10,13 @@ class OptionalFileGenerator(
   private val generatedDir: File
 ) {
 
+  private val filePrefix = "optionals"
   private val optional = "arrow.optics.Optional"
 
   fun generate() = annotatedList.map(this::processElement)
     .filter { it.second.joinToString(separator = "").isNotEmpty() }
     .map { (element, funs) ->
-      "${optionalsAnnotationClass.simpleName}.${element.classData.`package`}.${element.type.simpleName.toString().toLowerCase()}.kt" to
+      "$filePrefix.${element.classData.`package`}.${element.type.simpleName.toString().toLowerCase()}.kt" to
         funs.joinToString(prefix = fileHeader(element.classData.`package`.escapedClassName), separator = "\n")
     }.forEach { (name, fileString) -> File(generatedDir, name).writeText(fileString) }
 

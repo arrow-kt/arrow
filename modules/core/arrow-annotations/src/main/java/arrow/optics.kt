@@ -5,16 +5,8 @@ import kotlin.annotation.AnnotationTarget.CLASS
 
 @Retention(SOURCE)
 @Target(CLASS)
-annotation class lenses
+annotation class optic(val targets: Array<OpticsTarget> = [OpticsTarget.ISO, OpticsTarget.LENS, OpticsTarget.PRISM, OpticsTarget.OPTIONAL, OpticsTarget.DSL])
 
-@Retention(SOURCE)
-@Target(CLASS)
-annotation class prisms
-
-@Retention(SOURCE)
-@Target(CLASS)
-annotation class isos
-
-@Retention(SOURCE)
-@Target(CLASS)
-annotation class optionals
+enum class OpticsTarget {
+  ISO, LENS, PRISM, OPTIONAL, DSL
+}
