@@ -31,14 +31,14 @@ interface WriterTApplicativeInstance<F, W> : Applicative<WriterTPartialOf<F, W>>
     fix().ap(FF(), MM(), ff)
 
   override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.map(f: (A) -> B): WriterT<F, W, B> =
-    this@map.fix().map(FF(), { f(it) })
+    fix().map(FF(), { f(it) })
 }
 
 @instance(WriterT::class)
 interface WriterTMonadInstance<F, W> : WriterTApplicativeInstance<F, W>, Monad<WriterTPartialOf<F, W>> {
 
   override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.map(f: (A) -> B): WriterT<F, W, B> =
-    this@map.fix().map(this@WriterTMonadInstance.FF(), { f(it) })
+    fix().map(FF(), { f(it) })
 
   override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.flatMap(f: (A) -> Kind<WriterTPartialOf<F, W>, B>): WriterT<F, W, B> =
     fix().flatMap(FF(), MM(), { f(it).fix() })

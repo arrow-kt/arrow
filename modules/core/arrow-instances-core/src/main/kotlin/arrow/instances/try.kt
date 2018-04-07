@@ -89,7 +89,7 @@ interface TryMonadInstance : Monad<ForTry> {
 
 @instance(Try::class)
 interface TryFoldableInstance : Foldable<ForTry> {
-  override fun <A> TryOf<A>.exists(p: (A) -> Boolean): kotlin.Boolean =
+  override fun <A> TryOf<A>.exists(p: (A) -> Boolean): Boolean =
     fix().exists(p)
 
   override fun <A, B> Kind<ForTry, A>.foldLeft(b: B, f: (B, A) -> B): B =
@@ -117,6 +117,6 @@ interface TryTraverseInstance : Traverse<ForTry> {
   override fun <A, B> Kind<ForTry, A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> arrow.Kind<arrow.core.ForTry, A>.foldRight(lb: arrow.core.Eval<B>, f: (A, arrow.core.Eval<B>) -> arrow.core.Eval<B>): Eval<B> =
-    this@foldRight.fix().foldRight(lb, f)
+  override fun <A, B> Kind<ForTry, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+    foldRight(lb, f)
 }

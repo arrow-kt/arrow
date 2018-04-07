@@ -11,7 +11,8 @@ interface StateTFunctorInstance<F, S> : Functor<StateTPartialOf<F, S>> {
 
   fun FF(): Functor<F>
 
-  override fun <A, B> Kind<StateTPartialOf<F, S>, A>.map(f: (A) -> B): StateT<F, S, B> = fix().map(this@StateTFunctorInstance.FF(), f)
+  override fun <A, B> Kind<StateTPartialOf<F, S>, A>.map(f: (A) -> B): StateT<F, S, B> =
+    fix().map(FF(), f)
 
 }
 
@@ -20,22 +21,25 @@ interface StateTApplicativeInstance<F, S> : StateTFunctorInstance<F, S>, Applica
 
   override fun FF(): Monad<F>
 
-  override fun <A, B> Kind<StateTPartialOf<F, S>, A>.map(f: (A) -> B): StateT<F, S, B> = fix().map(this@StateTApplicativeInstance.FF(), f)
+  override fun <A, B> Kind<StateTPartialOf<F, S>, A>.map(f: (A) -> B): StateT<F, S, B> =
+    fix().map(FF(), f)
 
-  override fun <A> just(a: A): StateT<F, S, A> = StateT(FF().just({ s: S -> FF().just(Tuple2(s, a)) }))
+  override fun <A> just(a: A): StateT<F, S, A> =
+    StateT(FF().just({ s: S -> FF().just(Tuple2(s, a)) }))
 
   override fun <A, B> Kind<StateTPartialOf<F, S>, A>.ap(ff: Kind<StateTPartialOf<F, S>, (A) -> B>): StateT<F, S, B> =
     fix().ap(FF(), ff)
 
-  override fun <A, B> arrow.Kind<arrow.data.StateTPartialOf<F, S>, A>.product(fb: arrow.Kind<arrow.data.StateTPartialOf<F, S>, B>): StateT<F, S, Tuple2<A, B>> =
-    this@product.fix().product(this@StateTApplicativeInstance.FF(), fb.fix())
+  override fun <A, B> Kind<StateTPartialOf<F, S>, A>.product(fb: Kind<StateTPartialOf<F, S>, B>): StateT<F, S, Tuple2<A, B>> =
+    fix().product(FF(), fb.fix())
 
 }
 
 @instance(StateT::class)
 interface StateTMonadInstance<F, S> : StateTApplicativeInstance<F, S>, Monad<StateTPartialOf<F, S>> {
 
-  override fun <A, B> Kind<StateTPartialOf<F, S>, A>.map(f: (A) -> B): StateT<F, S, B> = fix().map(this@StateTMonadInstance.FF(), f)
+  override fun <A, B> Kind<StateTPartialOf<F, S>, A>.map(f: (A) -> B): StateT<F, S, B> =
+    fix().map(FF(), f)
 
   override fun <A, B> Kind<StateTPartialOf<F, S>, A>.flatMap(f: (A) -> Kind<StateTPartialOf<F, S>, B>): StateT<F, S, B> =
     fix().flatMap(FF(), f)

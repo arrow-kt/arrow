@@ -104,10 +104,10 @@ interface ListKTraverseInstance : Traverse<ForListK> {
   override fun <A, B> Kind<ForListK, A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> arrow.Kind<arrow.data.ForListK, A>.foldRight(lb: arrow.core.Eval<B>, f: (A, arrow.core.Eval<B>) -> arrow.core.Eval<B>): Eval<B> =
-    this@foldRight.fix().foldRight(lb, f)
+  override fun <A, B> Kind<ForListK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+    fix().foldRight(lb, f)
 
-  override fun <A> Kind<ForListK, A>.isEmpty(): kotlin.Boolean =
+  override fun <A> Kind<ForListK, A>.isEmpty(): Boolean =
     fix().isEmpty()
 }
 

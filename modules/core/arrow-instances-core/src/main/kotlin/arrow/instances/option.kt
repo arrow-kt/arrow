@@ -105,22 +105,22 @@ interface OptionMonadInstance : Monad<ForOption> {
 
 @instance(Option::class)
 interface OptionFoldableInstance : Foldable<ForOption> {
-  override fun <A> Kind<ForOption, A>.exists(p: (A) -> Boolean): kotlin.Boolean =
+  override fun <A> Kind<ForOption, A>.exists(p: (A) -> Boolean): Boolean =
     fix().exists(p)
 
   override fun <A, B> Kind<ForOption, A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> arrow.Kind<arrow.core.ForOption, A>.foldRight(lb: arrow.core.Eval<B>, f: (A, arrow.core.Eval<B>) -> arrow.core.Eval<B>): Eval<B> =
-    this@foldRight.fix().foldRight(lb, f)
+  override fun <A, B> Kind<ForOption, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+    fix().foldRight(lb, f)
 
-  override fun <A> OptionOf<A>.forAll(p: (A) -> Boolean): kotlin.Boolean =
+  override fun <A> OptionOf<A>.forAll(p: (A) -> Boolean): Boolean =
     fix().forall(p)
 
-  override fun <A> Kind<ForOption, A>.isEmpty(): kotlin.Boolean =
+  override fun <A> Kind<ForOption, A>.isEmpty(): Boolean =
     fix().isEmpty()
 
-  override fun <A> Kind<ForOption, A>.nonEmpty(): kotlin.Boolean =
+  override fun <A> Kind<ForOption, A>.nonEmpty(): Boolean =
     fix().nonEmpty()
 }
 
@@ -149,21 +149,21 @@ interface OptionTraverseInstance : Traverse<ForOption> {
   override fun <G, A, B> Kind<ForOption, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Option<B>> =
     fix().traverse(f, AP)
 
-  override fun <A> arrow.Kind<arrow.core.ForOption, A>.exists(p: (A) -> kotlin.Boolean): kotlin.Boolean =
+  override fun <A> Kind<ForOption, A>.exists(p: (A) -> Boolean): Boolean =
     fix().exists(p)
 
   override fun <A, B> Kind<ForOption, A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> arrow.Kind<arrow.core.ForOption, A>.foldRight(lb: arrow.core.Eval<B>, f: (A, arrow.core.Eval<B>) -> arrow.core.Eval<B>): Eval<B> =
-    this@foldRight.fix().foldRight(lb, f)
+  override fun <A, B> Kind<ForOption, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+    fix().foldRight(lb, f)
 
-  override fun <A> Kind<ForOption, A>.forAll(p: (A) -> Boolean): kotlin.Boolean =
+  override fun <A> Kind<ForOption, A>.forAll(p: (A) -> Boolean): Boolean =
     fix().forall(p)
 
-  override fun <A> Kind<ForOption, A>.isEmpty(): kotlin.Boolean =
+  override fun <A> Kind<ForOption, A>.isEmpty(): Boolean =
     fix().isEmpty()
 
-  override fun <A> Kind<ForOption, A>.nonEmpty(): kotlin.Boolean =
+  override fun <A> Kind<ForOption, A>.nonEmpty(): Boolean =
     fix().nonEmpty()
 }
