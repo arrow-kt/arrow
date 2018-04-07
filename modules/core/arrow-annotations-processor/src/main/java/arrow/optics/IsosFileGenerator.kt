@@ -9,6 +9,7 @@ class IsosFileGenerator(
   private val generatedDir: File
 ) {
 
+  private val filePrefix = "isos"
   private val tuple = "arrow.core.Tuple"
   private val letters = ('a'..'j').toList()
 
@@ -17,7 +18,7 @@ class IsosFileGenerator(
   private fun buildIsos(optics: Collection<AnnotatedOptic>) =
     optics.map(this::processElement)
       .forEach { (element, funString) ->
-        File(generatedDir, "${isosAnnotationClass.simpleName}.${element.classData.`package`}.${element.sourceName}.kt").printWriter().use { w ->
+        File(generatedDir, "$filePrefix.${element.classData.`package`}.${element.sourceName}.kt").printWriter().use { w ->
           w.println(funString)
         }
       }
