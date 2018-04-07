@@ -90,7 +90,7 @@ hListOf(1000, 900).toAccount()
 
 `@product` allows us map independent values in the context of any `Applicative` capable data type straight to the data class inside the data type context
 
-In the examples below we can observe how 2 different `Int` properties are returned inside a type constructor such as `Option`, `Try`, `Deferred` etc... and the automatically mapped to the shape of our `Account` data class removing all boilerplate from extracting the values from their context and returning and `Account value in the same context.
+In the examples below we can observe how 2 different `Int` properties are returned inside a type constructor such as `Option`, `Try`, `Deferred` etc... and the automatically mapped to the shape of our `Account` data class removing all boilerplate from extracting the values from their context and returning an `Account` value in the same context.
 
 ```kotlin:ank
 val maybeBalance: Option<Int> = Option(1000)
