@@ -1,8 +1,6 @@
 package arrow.optics
 
 import arrow.OpticsTarget
-import arrow.common.messager.logE
-import arrow.common.messager.logMW
 import arrow.common.messager.logW
 import arrow.common.utils.AbstractProcessor
 import arrow.common.utils.isSealed
