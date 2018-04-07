@@ -28,9 +28,13 @@ id.map{it + 3}
 
 Available Instances:
 
-```kotlin
-import arrow.debug.*
-
-showInstances<ForId, Unit>()
-// [Applicative, Bimonad, Comonad, Foldable, Functor, Monad, Traverse, TraverseFilter]
-```
+[Show](/docs/typeclasses/show)
+[Eq](/docs/typeclasses/eq)
+[Applicative](/docs/typeclasses/applicative)
+[Bimonad](/docs/typeclasses/bimonad)
+[Comonad](/docs/typeclasses/comonad)
+[Foldable](/docs/typeclasses/foldable)
+[Functor](/docs/typeclasses/functor)
+[Monad](/docs/typeclasses/monad)
+[Traverse](/docs/typeclasses/traverse)
+[TraverseFilter](/docs/typeclasses/traversefilter)
