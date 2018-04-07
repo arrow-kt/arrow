@@ -13,7 +13,7 @@ refers to `Option`, `List` or any other type constructor whose contents can be t
 
 ### Example
 
-Often times we find ourselves in situations where we need to transform the contents of some datatype. `Functor#map` allows
+Oftentimes we find ourselves in situations where we need to transform the contents of some datatype. `Functor#map` allows
 us to safely compute over values under the assumption that they'll be there returning the transformation encapsulated in the same context.
 
 Consider both `Option` and `Try`:
@@ -51,34 +51,6 @@ Try { "x".toInt() }.map { it * 2 }
 none<Int>().map { it * 2 }
 ```
 
-Arrow allows abstract polymorphic code that operates over the evidence of having an instance of a typeclass available.
-This enables programs that are not coupled to specific datatype implementations.
-The technique demonstrated below to write polymorphic code is available for all other `Typeclasses` beside `Functor`.
-
-```kotlin
-import arrow.typeclasses.*
-
-inline fun <reified F> multiplyBy2(fa: Kind<F, Int>, FT: Functor<F> = functor()): Kind<F, Int> =
-    FT.map(fa, { it * 2 })
-
-multiplyBy2<ForOption>(Option(1))
-```
-
-```kotlin
-multiplyBy2<ForTry>(Try.just(1))
-```
-
-In the example above we've defined a function that can operate over any data type for which a `Functor` instance is available.
-And then we applied `multiplyBy2` to two different datatypes for which Functor instances exist.
-This technique applied to other Typeclasses allows users to describe entire programs in terms of behaviors typeclasses removing
-dependencies to concrete data types and how they operate.
-
-This technique does not enforce inheritance or any kind of subtyping relationship and is frequently known as [`ad-hoc polymorphism`](https://en.wikipedia.org/wiki/Ad_hoc_polymorphism)
-and frequently used in programming languages that support [Typeclasses](https://en.wikipedia.org/wiki/Type_class) and [Higher Kinded Types](https://en.wikipedia.org/wiki/Kind_(type_theory)).
-
-Entire libraries and applications can be written without enforcing consumers to use the lib author provided datatypes but letting
-users provide their own provided there is typeclass instances for their datatypes.
-
 ### Main Combinators
 
 #### Kind<F, A>#map
@@ -113,7 +85,7 @@ Arrow provides [`FunctorLaws`][functor_laws_source]{:target="_blank"} in the for
 #### Creating your own `Functor` instances
 
 Arrow already provides Functor instances for most common datatypes both in Arrow and the Kotlin stdlib.
-Often times you may find the need to provide your own for unsupported datatypes.
+Oftentimes you may find the need to provide your own for unsupported datatypes.
 
 You may create or automatically derive instances of functor for your own datatypes which you will be able to use in the context of abstract polymorfic code
 as demonstrated in the [example](#example) above.
