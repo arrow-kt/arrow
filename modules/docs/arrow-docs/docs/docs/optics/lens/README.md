@@ -64,11 +64,14 @@ At first sight a `Lens` does not seem very useful as it is just a getter/setter 
 
 Let's examine following example. We have an `Employee` and he works for a certain `Company` located at a certain `Address` in a `Street`. And as a business requirement we have to capitalize `Street::name` in order to print nicer business cards.
 
-```kotlin:ank
+```kotlin
 data class Street(val number: Int, val name: String)
 data class Address(val city: String, val street: Street)
 data class Company(val name: String, val address: Address)
 data class Employee(val name: String, val company: Company)
+```
+```kotlin:ank
+import lens.docs.domain.*
 
 val employee = Employee("John Doe", Company("Arrow", Address("Functional city", Street(23, "lambda street"))))
 employee
@@ -136,8 +139,8 @@ Lenses can be generated for a `data class` by the `@lenses` annotation. For ever
 
 For `Employee` 2 lenses will be generated `fun employeeName(): Lens<Employee, String>` and `fun employeeCompany(): Lens<Employee, Company>`. Using generated lenses we can reduce our previous code example.
 
-```kotlin
-val employeeStreetName: Lens<Employee, String> = employeeCompany() compose companyAddress() compose addressStrees() compose streetName()
+```kotlin:ank
+val employeeStreetName: Lens<Employee, String> = employeeCompany() compose companyAddress() compose addressStreet() compose streetName()
 
 employeeStreetName.modify(employee, String::capitalize)
 ```
