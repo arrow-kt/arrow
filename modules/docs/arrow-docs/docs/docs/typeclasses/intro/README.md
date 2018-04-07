@@ -9,16 +9,20 @@ video: 3y9KI7XWXSY
 
 Typeclasses define a set of functions associated to one type.
 These functions can be either extension functions on the type, or a smart constructor / factory function.
-The extension functions are scoped within the typeclass, so they do not pollute the global namespace.
+These extension functions are scoped within the typeclass so they do not pollute the global namespace.
 
-To assure that a typeclass has been correctly implemented, a test suite called the "laws" is provided per typeclass.
-These test suites are available in the package arrow-tests.
+You can use typeclasses to add new free functionality to an existing type,
+or treat them as an abstraction placeholder for any one type that can implement the typeclass.
 
 What differentiates typeclasses from regular OOP inheritance is that typeclasses are meant to be implemented *outside* of their types.
-The association is done using generic parametrization rather than subclassing by implementing the interface.
+The association is done using generic parametrization rather than subclassing by implementing the interface. This has multiple benefits:
 
-This means that they can be implemented for any class, even those not in the current project.
-It also allows you to make available any one implementation of a typeclasses at any scope for the generic type they're associated with.
+* You can treat typeclass implementations as stateless parameters because they're just a collection of functions.
+* Typeclasses can be implemented for any class, even those not in the current project.
+* You can make available any one implementation of a typeclasses at any scope for the generic type they're associated with using functions like `run` and `with`.
+
+To assure that a typeclass has been correctly implemented for a type, Arrow provides a test suite called the "laws" per typeclass.
+These test suites are available in the package `arrow-tests`.
 
 #### Example
 
