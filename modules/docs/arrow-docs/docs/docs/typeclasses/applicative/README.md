@@ -50,7 +50,7 @@ Option.applicative().map(profileService(), phoneService(), addressService(), { (
 
 #### just
 
-A constructor function.
+A constructor function, also known as `pure` in other languages.
 It lifts a value into the computational context of a type constructor.
 
 `fun <A> just(a: A): Kind<F, A>`
