@@ -67,19 +67,23 @@ import arrow.instances.*
 ```
 
 ```kotlin:ank
-Int.eq()
+String.eq()
 ```
 
 ```kotlin:ank
-Option.monad()
+Option.functor()
 ```
 
 ```kotlin:ank
-ListK.monoid(String.monoid())
+MapK.semigroup<String, Int>(Int.semigroup())
 ```
 
 ```kotlin:ank
 Either.monadError<Throwable>()
+```
+
+```kotlin:ank
+ListK.traverse()
 ```
 
 If you're defining your own instances and would like for them to be discoverable in their corresponding datatypes
