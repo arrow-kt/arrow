@@ -7,25 +7,48 @@ video: 3y9KI7XWXSY
 
 ## Typeclasses
 
-Typeclasses are interfaces that define a set of functions associated to one type.
-These functions can be either extension functions on the type, or a smart constructor / factory function.
-The extension functions are scoped within the Typeclass, so they do not pollute the global namespace.
+Typeclasses define a set of functions associated to one generic type.
+These functions can be either *extension functions* for the type, or *constructor functions*
 
-To assure that a typeclass has been correctly implemented, a test suite called the "laws" is provided per typeclass.
-These test suites are available in the package arrow-tests.
+You can use typeclasses to access new free functionality for an existing type,
+or treat them as an abstraction placeholder for any one type that can implement the typeclass.
+The extension functions are scoped within the typeclass so they do not pollute the global namespace.
 
 What differentiates typeclasses from regular OOP inheritance is that typeclasses are meant to be implemented *outside* of their types.
-The association is done using generic parametrization rather than the usual subclassing by implementing the interface.
-This means that they can be implemented for any class, even those not in the current project,
-and allows us to make available at any scope any one implementation of a typeclasses for the single unique type they're associated with.
+The association is done using generic parametrization rather than subclassing by implementing the interface. This has multiple benefits:
+
+* You can treat typeclass implementations as stateless parameters because they're just a collection of functions
+* Typeclasses can be implemented for any class, even those not in the current project
+* You can make available any one implementation of a typeclasses at any scope for the generic type they're associated with by using functions like `run` and `with`
+
+To assure that a typeclass has been correctly implemented for a type, Arrow provides a test suite called the "laws" per typeclass.
+These test suites are available in the package `arrow-tests`.
 
 #### Example
 
-You can read all about how Arrow does typeclasses in the [glossary]({{ '/docs/patterns/glossary/' | relative_url }}).
+You can read all about how Arrow implements typeclasses in the [glossary]({{ '/docs/patterns/glossary/' | relative_url }}).
 
-### Typeclasses in Arrow
+For this short example we will make available the scope of the typeclass `Eq` implemented for the type `String`, by using `run`.
+This will make all the `Eq` extension functions, such as `eqv` and `neqv`, available inside the `run` block.
 
-We will list all the typeclasses available in arrow by the module they belong to, and a short description of the behavior they abstract.
+```kotlin:ank
+import arrow.instances.*
+
+val stringEq = String.eq()
+
+stringEq
+```
+
+```kotlin:ank
+stringEq.run {
+  "1".eqv("2")
+    && "2".neqv("1")
+}
+```
+
+### Typeclasses provided by Arrow
+
+We will list all the typeclasses provided in Arrow grouped by the module they belong to, and a short description of the behavior they abstract.
 
 #### Typeclasses
 
@@ -48,6 +71,16 @@ We will list them by their hierarchy.
 
 - [`Order`]({{ '/docs/typeclasses/order/' | relative_url }}) -  determine whether one object precedes another
 
+##### Semigroup
+
+- [`Semigroup`]({{ '/docs/typeclasses/semigroup/' | relative_url }}) - can combine two objects together
+
+- [`SemigroupK`]({{ '/docs/typeclasses/semigroupk/' | relative_url }}) - can combine two datatypes together
+
+- [`Monoid`]({{ '/docs/typeclasses/monoid/' | relative_url }}) - combinable objects have an empty value
+
+- [`MonoidK`]({{ '/docs/typeclasses/monoidk/' | relative_url }}) - combinable datatypes have an empty value
+
 ##### Functor
 
 - [`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }}) - its contents can be mapped
@@ -63,16 +96,6 @@ We will list them by their hierarchy.
 - [`Comonad`]({{ '/docs/typeclasses/comonad/' | relative_url }}) - can extract values from it
 
 - [`Bimonad`]({{ '/docs/typeclasses/bimonad/' | relative_url }}) - both monad and comonad
-
-##### Semigroup
-
-- [`Semigroup`]({{ '/docs/typeclasses/semigroup/' | relative_url }}) - can combine two objects together
-
-- [`SemigroupK`]({{ '/docs/typeclasses/semigroupk/' | relative_url }}) - can combine two datatypes together
-
-- [`Monoid`]({{ '/docs/typeclasses/monoid/' | relative_url }}) - combinable objects have an empty value
-
-- [`MonoidK`]({{ '/docs/typeclasses/monoidk/' | relative_url }}) - combinable datatypes have an empty value
 
 ##### Foldable
 
@@ -114,18 +137,18 @@ The Monad Template Library module gives more specialized version of existing typ
 
 #### Optics
 
-- [`At`]({{ '/docs/typeclasses/at/' | relative_url }}) - provides a [`Lens`]({{ '/docs/optics/lens/' | relative_url }}) for a structure with an indexable focus.
+- [`At`]({{ '/docs/optics/at/' | relative_url }}) - provides a [`Lens`]({{ '/docs/optics/lens/' | relative_url }}) for a structure with an indexable focus.
 
-- [`FilterIndex`]({{ '/docs/typeclasses/filterindex/' | relative_url }}) - provides a [`Traversal`]({{ '/docs/optics/traversal/' | relative_url }}) for a structure with indexable foci that satisfy a predicate.
+- [`FilterIndex`]({{ '/docs/optics/filterindex/' | relative_url }}) - provides a [`Traversal`]({{ '/docs/optics/traversal/' | relative_url }}) for a structure with indexable foci that satisfy a predicate.
 
-- [`Index`]({{ '/docs/typeclasses/index/' | relative_url }}) - provides an [`Optional`]({{ '/docs/optics/optional/' | relative_url }}) for a structure with an indexable optional focus.
+- [`Index`]({{ '/docs/optics/index/' | relative_url }}) - provides an [`Optional`]({{ '/docs/optics/optional/' | relative_url }}) for a structure with an indexable optional focus.
 
-- [`Each`]({{ '/docs/typeclasses/each/' | relative_url }}) - provides a [`Traversal`]({{ '/docs/optics/traversal/' | relative_url }}).
+- [`Each`]({{ '/docs/optics/each/' | relative_url }}) - provides a [`Traversal`]({{ '/docs/optics/traversal/' | relative_url }}).
 
 #### Recursion
 
-- [`Corecursive`]({{ '/docs/typeclasses/corecursive/' | relative_url }}) - traverses a structure forwards from the starting case
+- [`Corecursive`]({{ '/docs/recursion/corecursive/' | relative_url }}) - traverses a structure forwards from the starting case
 
-- [`Recursive`]({{ '/docs/typeclasses/recursive/' | relative_url }}) - traverses a structure backwards from the base case
+- [`Recursive`]({{ '/docs/recursion/recursive/' | relative_url }}) - traverses a structure backwards from the base case
 
-- [`Birecursive`]({{ '/docs/typeclasses/birecursive/' | relative_url }}) - it is both recursive and corecursive
+- [`Birecursive`]({{ '/docs/recursion/birecursive/' | relative_url }}) - it is both recursive and corecursive

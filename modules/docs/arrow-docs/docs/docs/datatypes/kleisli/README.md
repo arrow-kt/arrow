@@ -101,4 +101,10 @@ or to replace the `Kleisli` result
 optionIntKleisli.andThen(Option.monad(), Some(0)).fix().run("1")
 ```
 
+## Available Instances
 
+[Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+[ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
+[Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+[Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+[MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})

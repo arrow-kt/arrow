@@ -59,9 +59,11 @@ numbers.foldLeft(0) {sum, number -> sum + (number * number)}
 
 Available Instances:
 
-```kotlin
-import arrow.debug.*
-
-showInstances<ForSetK, Unit>()
-// [Foldable, Monoid, MonoidK, Semigroup, SemigroupK]
-```
+[Show]({{ '/docs/typeclasses/show' | relative_url }})
+[Eq]({{ '/docs/typeclasses/eq' | relative_url }})
+[Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
+[Monoid]({{ '/docs/typeclasses/monoid' | relative_url }})
+[MonoidK]({{ '/docs/typeclasses/monoidk' | relative_url }})
+[Semigroup]({{ '/docs/typeclasses/semigroup' | relative_url }})
+[SemigroupK]({{ '/docs/typeclasses/semigroupk' | relative_url }})
+[At]({{ '/docs/optics/at' | relative_url }})

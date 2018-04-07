@@ -3,9 +3,6 @@ package arrow.optics.typeclasses
 import arrow.optics.Iso
 import arrow.optics.Optional
 
-inline operator fun <S, I, A, R> Index<S, I, A>.invoke(ff: Index<S, I, A>.() -> R) =
-  run(ff)
-
 /**
  * [Index] provides an [Optional] for a structure [S] to focus in an optional [A] at a given index [I].
  *

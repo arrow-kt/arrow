@@ -70,7 +70,7 @@ object MonadSuspendLaws {
   fun <F> MonadSuspend<F>.asyncParallelBind(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genIntSmall(), genIntSmall(), genIntSmall(), { x: Int, y: Int, z: Int ->
       val (bound, dispose) = bindingCancellable {
-        val value = bind { tupled(this@asyncParallelBind { x }, this@asyncParallelBind { y }, this@asyncParallelBind { z }) }
+        val value = bind { tupled(invoke { x }, invoke { y }, invoke { z }) }
         value.a + value.b + value.c
       }
       bound.equalUnderTheLaw(just<Int>(x + y + z), EQ)

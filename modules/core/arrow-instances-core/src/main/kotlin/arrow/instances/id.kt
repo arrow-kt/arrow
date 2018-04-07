@@ -117,5 +117,5 @@ interface IdTraverseInstance : Traverse<ForId> {
     fix().foldLeft(b, f)
 
   override fun <A, B> arrow.Kind<arrow.core.ForId, A>.foldRight(lb: arrow.core.Eval<B>, f: (A, arrow.core.Eval<B>) -> arrow.core.Eval<B>): Eval<B> =
-    this@foldRight.fix().foldRight(lb, f)
+    fix().foldRight(lb, f)
 }

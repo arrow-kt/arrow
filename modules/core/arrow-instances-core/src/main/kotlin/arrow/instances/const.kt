@@ -1,15 +1,11 @@
-package arrow.free.instances
+package arrow.instances
 
 import arrow.Kind
 import arrow.core.Eval
-import arrow.free.Const
-import arrow.free.ConstOf
-import arrow.free.ConstPartialOf
-import arrow.free.fix
 import arrow.instance
 import arrow.typeclasses.*
-import arrow.free.ap as constAp
-import arrow.free.combine as combineAp
+import arrow.typeclasses.ap as constAp
+import arrow.typeclasses.combine as combineAp
 
 @instance(Const::class)
 interface ConstFunctorInstance<A> : Functor<ConstPartialOf<A>> {
@@ -46,7 +42,7 @@ interface ConstTraverseInstance<X> : ConstFoldableInstance<X>, Traverse<ConstPar
   override fun <T, U> Kind<ConstPartialOf<X>, T>.map(f: (T) -> U): Const<X, U> = fix().retag()
 
   override fun <G, A, B> ConstOf<X, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ConstOf<X, B>> =
-    fix().traverse(f, AP)
+    fix().traverse(AP, f)
 }
 
 @instance(Const::class)

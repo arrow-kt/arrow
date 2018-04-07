@@ -3,12 +3,9 @@ package arrow.optics
 import arrow.Kind
 import arrow.core.*
 import arrow.data.*
-import arrow.free.*
 import arrow.higherkind
 import arrow.instances.monoid
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Traverse
+import arrow.typeclasses.*
 
 /**
  * [Traversal] is a type alias for [PTraversal] which fixes the type arguments

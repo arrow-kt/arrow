@@ -4,9 +4,9 @@ import arrow.Kind
 import arrow.core.*
 import arrow.data.ListK
 import arrow.data.monoid
-import arrow.free.Const
 import arrow.higherkind
 import arrow.instances.monoid
+import arrow.typeclasses.Const
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Monoid
 

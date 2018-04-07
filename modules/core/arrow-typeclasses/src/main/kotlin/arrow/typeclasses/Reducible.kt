@@ -3,9 +3,6 @@ package arrow.typeclasses
 import arrow.Kind
 import arrow.core.*
 
-inline operator fun <F, A> Reducible<F>.invoke(ff: Reducible<F>.() -> A) =
-  run(ff)
-
 /**
  * Data structures that can be reduced to a summary value.
  *

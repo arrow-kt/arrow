@@ -66,7 +66,7 @@ interface DeferredKMonadErrorInstance : DeferredKMonadInstance, MonadError<ForDe
 
 @instance(DeferredK::class)
 interface DeferredKMonadSuspendInstance : DeferredKMonadErrorInstance, MonadSuspend<ForDeferredK> {
-  override fun <A> suspend(fa: () -> DeferredKOf<A>): DeferredK<A> =
+  override fun <A> defer(fa: () -> DeferredKOf<A>): DeferredK<A> =
     DeferredK.suspend(fa = fa)
 }
 

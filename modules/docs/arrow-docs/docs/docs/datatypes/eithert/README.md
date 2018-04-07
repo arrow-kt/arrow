@@ -226,12 +226,15 @@ EitherT(Option(3.left())).mapLeft(Option.functor(), {it + 1})
 
 ## Instances
 
-```kotlin
-import arrow.debug.*
-
-showInstances<EitherTPartialOf<ForObservableK, BizError>, BizError>()
-// [Applicative, ApplicativeError, Foldable, Functor, Monad, MonadError, SemigroupK, Traverse, TraverseFilter]
-```
+[Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+[ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
+[Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
+[Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+[Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+[MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
+[SemigroupK]({{ '/docs/typeclasses/semigroupk' | relative_url }})
+[Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
+[TraverseFilter]({{ '/docs/typeclasses/traversefilter' | relative_url }})
 
 Take a look at the [`OptionT` docs]({{ '/docs/datatypes/optiont' | relative_url }}) for an alternative version of this content with the `OptionT` monad transformer
 

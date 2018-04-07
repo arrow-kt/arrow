@@ -5,9 +5,6 @@ import arrow.optics.Iso
 import arrow.optics.Traversal
 import arrow.typeclasses.Traverse
 
-inline operator fun <S, A, R> Each<S, A>.invoke(ff: Each<S, A>.() -> R) =
-  run(ff)
-
 /**
  * [Each] provides a [Traversal] that can focus into a structure [S] to see all its foci [A].
  *

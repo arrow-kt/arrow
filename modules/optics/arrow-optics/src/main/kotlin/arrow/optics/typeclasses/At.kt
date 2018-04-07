@@ -5,9 +5,6 @@ import arrow.core.Option
 import arrow.optics.Iso
 import arrow.optics.Lens
 
-inline operator fun <S, I, A, R> At<S, I, A>.invoke(ff: At<S, I, A>.() -> R) =
-  run(ff)
-
 /**
  * [At] provides a [Lens] for a structure [S] to focus in [A] at a given index [I].
  *

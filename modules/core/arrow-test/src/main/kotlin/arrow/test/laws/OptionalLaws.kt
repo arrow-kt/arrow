@@ -1,7 +1,7 @@
 package arrow.test.laws
 
 import arrow.core.*
-import arrow.free.*
+import arrow.typeclasses.*
 import arrow.optics.Optional
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid

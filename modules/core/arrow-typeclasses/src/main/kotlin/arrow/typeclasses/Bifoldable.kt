@@ -3,9 +3,6 @@ package arrow.typeclasses
 import arrow.Kind2
 import arrow.core.Eval
 
-inline operator fun <F, A> Bifoldable<F>.invoke(ff: Bifoldable<F>.() -> A) =
-  run(ff)
-
 interface Bifoldable<F> {
 
   fun <A, B, C> Kind2<F, A, B>.bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C

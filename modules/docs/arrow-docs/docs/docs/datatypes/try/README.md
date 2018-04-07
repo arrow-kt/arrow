@@ -191,9 +191,13 @@ Try.monadError().bindingCatch {
 
 Available Instances:
 
-```kotlin
-import arrow.debug.*
-
-showInstances<ForTry, Unit>()
-// [Applicative, ApplicativeError, Foldable, Functor, Monad, MonadError, Traverse, TraverseFilter]
-```
+[Show]({{ '/docs/typeclasses/show' | relative_url }})
+[Eq]({{ '/docs/typeclasses/eq' | relative_url }})
+[Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+[ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
+[Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
+[Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+[Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+[MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
+[Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
+[Each]({{ '/docs/optics/each' | relative_url }})

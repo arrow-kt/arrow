@@ -4,9 +4,6 @@ import arrow.Kind
 import arrow.core.*
 import arrow.typeclasses.Functor
 
-inline operator fun <F, A> FunctorFilter<F>.invoke(ff: FunctorFilter<F>.() -> A) =
-  run(ff)
-
 interface FunctorFilter<F> : Functor<F> {
 
   /**

@@ -1,8 +1,5 @@
 package arrow.typeclasses
 
-inline operator fun <F, A> Monoid<F>.invoke(ff: Monoid<F>.() -> A) =
-  run(ff)
-
 interface Monoid<A> : Semigroup<A> {
   /**
    * A zero value for this A

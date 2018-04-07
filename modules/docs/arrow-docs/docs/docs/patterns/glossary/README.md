@@ -8,6 +8,9 @@ permalink: /docs/patterns/glossary/
 
 Note: This section keeps on growing! Keep an eye on it from time to time.
 
+This document is meant to be an introduction to Functional Programming for people from all backgrounds.
+We'll go through some of the key concepts, and then dive on their implementation and use in real world cases.
+
 ### Datatypes
 
 A datatype is a class that encapsulates one reusable coding pattern.
@@ -22,14 +25,11 @@ You can read more about all the [datatypes]({{ '/docs/datatypes/intro' | relativ
 
 ### Typeclasses
 
-A typeclass is a specification for one behavior associated with a single type.
+Typeclasses define a set of functions associated to one type.
 This behavior is checked by a test suite called the "laws" for that typeclass.
-These test suites are available in the package arrow-tests.
 
-What differentiates typeclasses from regular OOP inheritance is that typeclasses are meant to be implemented outside of their types.
-The association is done using generic parametrization rather than the usual subclassing by implementing the interface.
-This means that they can be implemented for any class, even those not in the current project,
-and allows us to make available at the global scope any one implementation of a typeclasses for the single unique type they're associated with.
+You can use typeclasses to add new free functionality to an existing type,
+or treat them as an abstraction placeholder for any one type that can implement the typeclass.
 
 Examples of these behaviors are comparability ([`Eq`]({{ '/docs/typeclasses/eq' | relative_url }})),
 composability ([`Monoid`]({{ '/docs/typeclasses/monoid' | relative_url }})),
@@ -37,6 +37,8 @@ its contents can be mapped from one type to another ([`Functor`]({{ '/docs/typec
 or error recovery ([`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }})).
 
 You can read more about all the [typeclasses]({{ '/docs/typeclasses/intro' | relative_url }}) that Arrow provides in its [section of the docs]({{ '/docs/typeclasses/intro' | relative_url }}).
+
+One example, the typeclass `Eq` parametrized to `F` defines equality between two objects of type `F`:
 
 ```kotlin
 interface Eq<F> {
@@ -56,11 +58,36 @@ interface UserEqInstance: Eq<User> {
 }
 ```
 
-In Λrrow all typeclass instances can be looked up in either the datatype they're defined for, or a global object for platform types like String or Int.
+All typeclass instances provided Arrow can be found in the companion object of the type they're defined for, including platform types like String or Int.
 
-All the instances in the library are already registered and available in the global scope.
-If you're defining your own instances and would like for them to be discoverable in their corresponding datatypes 
-you can generate it by annotating them as `@instance`, and Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create the extension functions for you.
+```kotlin:ank:silent
+import arrow.core.*
+import arrow.data.*
+import arrow.instances.*
+```
+
+```kotlin:ank
+String.eq()
+```
+
+```kotlin:ank
+Option.functor()
+```
+
+```kotlin:ank
+MapK.semigroup<String, Int>(Int.semigroup())
+```
+
+```kotlin:ank
+Either.monadError<Throwable>()
+```
+
+```kotlin:ank
+ListK.traverse()
+```
+
+If you're defining your own instances and would like for them to be discoverable in their corresponding datatypes
+you can generate it by annotating them as `@instance`, and Arrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create the extension functions for you.
 
 ### Type constructors
 
@@ -258,4 +285,4 @@ UserFetcher(Option.applicative()).genUser().fix()
 // Some(value = User(943))
 ```
 
-This technique of [Dependency Injection]({{ '/docs/patterns/dependencyinjection' | relative_url }}) that expresses dependencies as the implicit parameter of an extension function is called `Typeclassless`. You can read more about it in this [blog series](http://www.pacoworks.com/2018/02/25/simple-dependency-injection-in-kotlin-part-1/).
+This technique of [Dependency Injection]({{ '/docs/patterns/dependency_injection' | relative_url }}) that expresses dependencies as the implicit parameter of an extension function is called `Typeclassless`. You can read more about it in this [blog series](http://www.pacoworks.com/2018/02/25/simple-dependency-injection-in-kotlin-part-1/).

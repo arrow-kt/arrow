@@ -1,8 +1,5 @@
 package arrow.typeclasses
 
-inline operator fun <F, A> Show<F>.invoke(ff: Show<F>.() -> A) =
-  run(ff)
-
 /**
  * A type class used to get a textual representation for an instance of type [A] in a type safe way.
  *

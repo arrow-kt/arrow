@@ -1,5 +1,4 @@
 dependencies {
-    compile project(':arrow-free')
     compile project(':arrow-data')
     compile project(':arrow-instances-data')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"

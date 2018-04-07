@@ -1,7 +1,6 @@
 package arrow.data
 
 import arrow.core.*
-import arrow.instances.IntEqInstance
 import arrow.instances.eq
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws

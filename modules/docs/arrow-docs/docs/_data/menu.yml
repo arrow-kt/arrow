@@ -153,6 +153,9 @@ options:
       - title: Traverse
         url: /docs/typeclasses/traverse/
 
+      - title: Reducible
+        url: /docs/typeclasses/reducible/
+
       - title: TraverseFilter
         url: /docs/typeclasses/traversefilter/
 
@@ -200,6 +203,12 @@ options:
 
       - title: MonoidK
         url: /docs/typeclasses/monoidk/
+
+      - title: Inject
+        url: /docs/typeclasses/inject/
+
+      - title: Alternative
+        url: /docs/typeclasses/alternative/
 
   - title: Effects
 
@@ -297,6 +306,19 @@ options:
 
       - title: Coyoneda
         url: /docs/free/coyoneda/
+
+  - title: Recursion Schemes
+
+    nested_options:
+
+      - title: Corecursive
+        url: /docs/recursion/corecursive/
+
+      - title: Recursive
+        url: /docs/recursion/recursive/
+
+      - title: Birecursive
+        url: /docs/recursion/birecursive/
 
   - title: Legal
 

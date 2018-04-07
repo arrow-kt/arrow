@@ -1,10 +1,8 @@
 package arrow.test.laws
 
 import arrow.core.*
-import arrow.free.*
+import arrow.typeclasses.*
 import arrow.optics.Lens
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

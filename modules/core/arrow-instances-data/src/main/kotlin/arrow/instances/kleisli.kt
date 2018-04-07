@@ -22,7 +22,7 @@ interface KleisliApplicativeInstance<F, D> : KleisliFunctorInstance<F, D>, Appli
   override fun <A> just(a: A): Kleisli<F, D, A> = Kleisli({ FF().just(a) })
 
   override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.map(f: (A) -> B): Kleisli<F, D, B> =
-    fix().map(this@KleisliApplicativeInstance.FF(), f)
+    fix().map(FF(), f)
 
   override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.ap(ff: Kind<KleisliPartialOf<F, D>, (A) -> B>): Kleisli<F, D, B> =
     fix().ap(FF(), ff)
@@ -37,7 +37,7 @@ interface KleisliMonadInstance<F, D> : KleisliApplicativeInstance<F, D>, Monad<K
   override fun FF(): Monad<F>
 
   override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.map(f: (A) -> B): Kleisli<F, D, B> =
-    this@map.fix().map(this@KleisliMonadInstance.FF(), f)
+    fix().map(FF(), f)
 
   override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.flatMap(f: (A) -> Kind<KleisliPartialOf<F, D>, B>): Kleisli<F, D, B> =
     fix().flatMap(FF(), f.andThen { it.fix() })
@@ -59,7 +59,7 @@ interface KleisliApplicativeErrorInstance<F, D, E> : ApplicativeError<KleisliPar
     fix().handleErrorWith(FF(), f)
 
   override fun <A> raiseError(e: E): Kleisli<F, D, A> =
-    Kleisli.raiseError(e, FF())
+    Kleisli.raiseError(FF(), e)
 
 }
 

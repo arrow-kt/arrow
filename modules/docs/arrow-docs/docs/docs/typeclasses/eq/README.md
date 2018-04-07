@@ -7,15 +7,17 @@ permalink: /docs/typeclasses/eq/
 ## Eq
 
 The `Eq` typeclass abstracts the ability to compare two instances of any object.
-Depending on your needs this comparison can be structural -the content of the object-, referential -the memory address of the object-, based on an identity -like an Id fields-, or any combination of the above.
-
 It can be considered the typeclass equivalent of Java's `Object#equals`.
 
+Depending on your needs this comparison can be structural -the content of the object-, referential -the memory address of the object-, based on an identity -like an Id fields-, or any combination of the above.
+
 ```kotlin:ank
-import arrow.*
 import arrow.instances.*
 
-String.eq().run { "1".eqv("2") }
+// Enable the extension functions inside Eq using run
+String.eq().run {
+  "1".eqv("2")
+}
 ```
 
 ### Main Combinators

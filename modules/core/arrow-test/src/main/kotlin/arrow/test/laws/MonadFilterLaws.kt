@@ -46,7 +46,7 @@ object MonadFilterLaws {
   fun <F> MonadFilter<F>.monadFilterBindWithFilterComprehensions(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.bool(), Gen.int(), { guard: Boolean, n: Int ->
       bindingFilter {
-        val x = this@monadFilterBindWithFilterComprehensions.just(n).bindWithFilter { _ -> guard }
+        val x = just(n).bindWithFilter { _ -> guard }
         x
       }.equalUnderTheLaw(if (!guard) empty() else just(n), EQ)
     })
