@@ -7,19 +7,19 @@ video: 3y9KI7XWXSY
 
 ## Typeclasses
 
-Typeclasses define a set of functions associated to one type.
-These functions can be either extension functions on the type, or a smart constructor / factory function.
-These extension functions are scoped within the typeclass so they do not pollute the global namespace.
+Typeclasses define a set of functions associated to one generic type.
+These functions can be either *extension functions* for the type, or *constructor functions*
 
-You can use typeclasses to add new free functionality to an existing type,
+You can use typeclasses to access new free functionality for an existing type,
 or treat them as an abstraction placeholder for any one type that can implement the typeclass.
+The extension functions are scoped within the typeclass so they do not pollute the global namespace.
 
 What differentiates typeclasses from regular OOP inheritance is that typeclasses are meant to be implemented *outside* of their types.
 The association is done using generic parametrization rather than subclassing by implementing the interface. This has multiple benefits:
 
-* You can treat typeclass implementations as stateless parameters because they're just a collection of functions.
-* Typeclasses can be implemented for any class, even those not in the current project.
-* You can make available any one implementation of a typeclasses at any scope for the generic type they're associated with using functions like `run` and `with`.
+* You can treat typeclass implementations as stateless parameters because they're just a collection of functions
+* Typeclasses can be implemented for any class, even those not in the current project
+* You can make available any one implementation of a typeclasses at any scope for the generic type they're associated with by using functions like `run` and `with`
 
 To assure that a typeclass has been correctly implemented for a type, Arrow provides a test suite called the "laws" per typeclass.
 These test suites are available in the package `arrow-tests`.
@@ -27,6 +27,24 @@ These test suites are available in the package `arrow-tests`.
 #### Example
 
 You can read all about how Arrow implements typeclasses in the [glossary]({{ '/docs/patterns/glossary/' | relative_url }}).
+
+For this short example we will make available the scope of the typeclass `Eq` implemented for the type `String`, by using `run`.
+This will make all the `Eq` extension functions, such as `eqv` and `neqv`, available inside the `run` block.
+
+```kotlin:ank
+import arrow.instances.*
+
+val stringEq = String.eq()
+
+stringEq
+```
+
+```kotlin:ank
+stringEq.run {
+  "1".eqv("2")
+    && "2".neqv("1")
+}
+```
 
 ### Typeclasses provided by Arrow
 
