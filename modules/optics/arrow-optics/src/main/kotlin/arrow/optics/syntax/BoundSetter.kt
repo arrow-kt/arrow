@@ -52,5 +52,3 @@ class BoundSetter<S, A>(val value: S, val setter: Setter<S, A>) {
     fun <T> compose(other: Traversal<A, T>) = BoundSetter(value, setter + other)
 
 }
-
-fun <T> T.setter() = BoundSetter(this, PSetter.id())

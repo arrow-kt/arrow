@@ -1,6 +1,5 @@
 package arrow.optics
 
-import arrow.syntax
 import arrow.optics.syntax.*
 import arrow.test.UnitSpec
 import io.kotlintest.matchers.shouldBe
