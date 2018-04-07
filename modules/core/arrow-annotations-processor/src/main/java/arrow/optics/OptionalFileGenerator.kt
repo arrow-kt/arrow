@@ -29,45 +29,41 @@ class OptionalFileGenerator(
       val targetClassName = variable.fullName
       val targetName = variable.paramName
 
-      if (targetClassName.endsWith("?")) {
-        val nonNullTargetClassName = targetClassName.dropLast(1)
-        """
-                    |fun $sourceName${targetName.toUpperCamelCase()}Optional(): $optional<$sourceClassName, $nonNullTargetClassName> = $optional(
-                    |  getOrModify = { $sourceName: $sourceClassName -> $sourceName.${targetName.plusIfNotBlank(prefix = "`", postfix = "`")}?.right() ?: $sourceName.left() },
-                    |  set = { value: $nonNullTargetClassName ->
-                    |    { $sourceName: $sourceClassName ->
-                    |      $sourceName.copy(${targetName.plusIfNotBlank(prefix = "`", postfix = "`")} = value)
-                    |    }
-                    |  }
-                    |)
-                    """.trimMargin()
-      } else if (targetClassName.startsWith("`arrow`.`core`.`Option`")) {
-
-        val clz = Regex("`arrow`.`core`.`Option`<(.*)>$").matchEntire(targetClassName)?.groupValues?.get(1)
-          ?: return@map ""
-
-        """
-                    |fun $sourceName${targetName.toUpperCamelCase()}Optional(): $optional<$sourceClassName, $clz> = $optional(
-                    |  getOrModify = { $sourceName: $sourceClassName -> $sourceName.${targetName.plusIfNotBlank(prefix = "`", postfix = "`")}.orNull()?.right() ?: $sourceName.left() },
-                    |  set = { value: $clz ->
-                    |    { $sourceName: $sourceClassName ->
-                    |      $sourceName.copy(${targetName.plusIfNotBlank(prefix = "`", postfix = "`")} = value.toOption())
-                    |    }
-                    |  }
-                    |)
-                    """.trimMargin()
-
-      } else {
-        ""
+      when (variable) {
+        is Target.NullableTarget -> processNullableOptional(targetClassName.dropLast(1), sourceName, targetName, sourceClassName)
+        is Target.OptionTarget -> processOptionOptional(sourceName, targetName, sourceClassName, variable.nestedFullName)
+        is Target.NonNullTarget -> "" //Don't generate optional for non-null targets.
       }
     }
 
-  fun fileHeader(packageName: String): String =
+  private fun fileHeader(packageName: String): String =
     """package $packageName
                |
                |import arrow.core.left
                |import arrow.core.right
                |import arrow.core.toOption
                |""".trimMargin()
+
+  private fun processNullableOptional(nonNullTargetClassName: String, sourceName: String, targetName: String, sourceClassName: String) = """
+      |fun $sourceName${targetName.toUpperCamelCase()}(): $optional<$sourceClassName, $nonNullTargetClassName> = $optional(
+      |  getOrModify = { $sourceName: $sourceClassName -> $sourceName.${targetName.plusIfNotBlank(prefix = "`", postfix = "`")}?.right() ?: $sourceName.left() },
+      |  set = { value: $nonNullTargetClassName ->
+      |    { $sourceName: $sourceClassName ->
+      |      $sourceName.copy(${targetName.plusIfNotBlank(prefix = "`", postfix = "`")} = value)
+      |    }
+      |  }
+      |)
+      """.trimMargin()
+
+  private fun processOptionOptional(sourceName: String, targetName: String, sourceClassName: String, clz: String) = """
+      |fun $sourceName${targetName.toUpperCamelCase()}(): $optional<$sourceClassName, $clz> = $optional(
+      |  getOrModify = { $sourceName: $sourceClassName -> $sourceName.${targetName.plusIfNotBlank(prefix = "`", postfix = "`")}.orNull()?.right() ?: $sourceName.left() },
+      |  set = { value: $clz ->
+      |    { $sourceName: $sourceClassName ->
+      |      $sourceName.copy(${targetName.plusIfNotBlank(prefix = "`", postfix = "`")} = value.toOption())
+      |    }
+      |  }
+      |)
+      """.trimMargin()
 
 }

@@ -2,9 +2,8 @@ package arrow.free
 
 import arrow.Kind
 import arrow.higherkind
-import arrow.typeclasses.Applicative
+import arrow.typeclasses.*
 import arrow.core.FunctionK
-import arrow.typeclasses.Monoid
 
 inline fun <F, G, A> FreeApplicativeOf<F, A>.foldMapK(f: FunctionK<F, G>, GA: Applicative<G>): Kind<G, A> =
   (this as FreeApplicative<F, A>).foldMap(f, GA)
@@ -59,7 +58,7 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
   fun <G> flatCompile(f: FunctionK<F, FreeApplicativePartialOf<G>>, GFA: Applicative<FreeApplicativePartialOf<G>>): FreeApplicative<G, A> =
     foldMap(f, GFA).fix()
 
-  inline fun <M> analyze(f: FunctionK<F, ConstPartialOf<M>>, MM: Monoid<M>): M =
+  inline fun <M> analyze(MM: Monoid<M>, f: FunctionK<F, ConstPartialOf<M>>): M =
     foldMap(object : FunctionK<F, ConstPartialOf<M>> {
       override fun <A> invoke(fa: Kind<F, A>): Const<M, A> = f(fa).fix()
     }, Const.applicative(MM)).value()
