@@ -103,8 +103,8 @@ optionIntKleisli.andThen(Option.monad(), Some(0)).fix().run("1")
 
 ## Available Instances
 
-[Applicative](/docs/typeclasses/applicative)
-[ApplicativeError](/docs/typeclasses/applicativeerror)
-[Functor](/docs/typeclasses/functor)
-[Monad](/docs/typeclasses/monad)
-[MonadError](/docs/typeclasses/monaderror)
+[Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+[ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
+[Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+[Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+[MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})

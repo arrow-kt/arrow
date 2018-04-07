@@ -191,13 +191,13 @@ Try.monadError().bindingCatch {
 
 Available Instances:
 
-[Show](/docs/typeclasses/show)
-[Eq](/docs/typeclasses/eq)
-[Applicative](/docs/typeclasses/applicative)
-[ApplicativeError](/docs/typeclasses/applicativeerror)
-[Foldable](/docs/typeclasses/foldable)
-[Functor](/docs/typeclasses/functor)
-[Monad](/docs/typeclasses/monad)
-[MonadError](/docs/typeclasses/monaderror)
-[Traverse](/docs/typeclasses/traverse)
-[Each](/docs/optics/each)
+[Show]({{ '/docs/typeclasses/show' | relative_url }})
+[Eq]({{ '/docs/typeclasses/eq' | relative_url }})
+[Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+[ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
+[Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
+[Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+[Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+[MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
+[Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
+[Each]({{ '/docs/optics/each' | relative_url }})

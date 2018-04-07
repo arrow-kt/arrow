@@ -117,10 +117,10 @@ stackOperations().runA(Nel.of("hello", "world", "!").some())
 
 Available Instances:
 
-[Applicative](/docs/typeclasses/applicative)
-[Functor](/docs/typeclasses/functor)
-[Monad](/docs/typeclasses/monad)
-[MonadState](/docs/typeclasses/monadstate)
+[Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+[Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+[Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+[MonadState]({{ '/docs/typeclasses/monadstate' | relative_url }})
 
 # Credits
 

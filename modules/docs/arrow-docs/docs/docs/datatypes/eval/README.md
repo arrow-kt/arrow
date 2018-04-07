@@ -69,11 +69,11 @@ odd(100000).value()
 
 ### Available Instances
 
-[Applicative](/docs/typeclasses/applicative)
-[Bimonad](/docs/typeclasses/bimonad)
-[Comonad](/docs/typeclasses/comonad)
-[Functor](/docs/typeclasses/functor)
-[Monad](/docs/typeclasses/monad)
+[Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+[Bimonad]({{ '/docs/typeclasses/bimonad' | relative_url }})
+[Comonad]({{ '/docs/typeclasses/comonad' | relative_url }})
+[Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+[Monad]({{ '/docs/typeclasses/monad' | relative_url }})
 
 # Credits
  

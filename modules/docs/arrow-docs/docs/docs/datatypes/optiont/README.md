@@ -206,13 +206,13 @@ Here we no longer have to deal with the `None` cases, and the binding to the val
 
 Available Instances:
 
-[Applicative](/docs/typeclasses/applicative)
-[Foldable](/docs/typeclasses/foldable)
-[Functor](/docs/typeclasses/functor)
-[Monad](/docs/typeclasses/monad)
-[MonoidK](/docs/typeclasses/monoidk)
-[SemigroupK](/docs/typeclasses/semigroupk)
-[Traverse](/docs/typeclasses/traverse)
+[Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+[Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
+[Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+[Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+[MonoidK]({{ '/docs/typeclasses/monoidk' | relative_url }})
+[SemigroupK]({{ '/docs/typeclasses/semigroupk' | relative_url }})
+[Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
 
 Take a look at the [`EitherT` docs]({{ '/docs/datatypes/eithert' | relative_url }}) for an alternative version of this content with the `EitherT` monad transformer
 
