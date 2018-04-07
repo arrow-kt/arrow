@@ -131,14 +131,14 @@ networkInt.getOption(NetworkResult.Success("5"))
 Prisms can be generated for `sealed classes` by the `@optics` annotation. For every defined subtype a `Prism` will be generated. The prisms will be generated in the same package as the `sealed class` and will be named `parentnameSubtypename()`.
 
 ```kotlin
-@optics sealed class NetworkResult {
-    data class Success(val content: String) : NetworkResult()
-    object Failure : NetworkResult()
+@optics sealed class Shape {
+  data class Circle(val radius: Double) : Shape()
+  data class Rectangle(val width: Double, val height: Double) : Shape()
 }
 ```
-```kotlin:ank
-val networkSuccessPrism: Prism<NetworkResult, NetworkResult.Success> = networkResultSuccess()
-val networkFailurePrism: Prism<NetworkResult, NetworkResult.Failure> = networkResultFailure()
+```kotlin:ank:silent
+val circleShape: Prism<Shape, Shape.Circle> = shapeCircle()
+val rectangleShape: Prism<Shape, Shape.Rectangle> = shapeRectangle()
 ```
 
 ### Polymorphic prisms <a id="PPrism"></a>

@@ -1,9 +1,16 @@
 package arrow.optics
 
 import arrow.core.Option
+import arrow.optics.optics
 
 @optics
-data class Point2D(val x: Int, val y: Int)
+data class Pos(val x: Int, val y: Int)
+
+@optics
+data class Account(val balance: Int, val available: Int)
+
+@optics
+data class Person(val age: Int?, val address: Option<Address>)
 
 @optics
 data class Street(val number: Int, val name: String)
@@ -18,9 +25,7 @@ data class Company(val name: String, val address: Address)
 data class Employee(val name: String, val company: Company)
 
 @optics
-data class Person(val age: Int?, val address: Option<Address>)
-
-@optics sealed class NetworkResult {
-  data class Success(val content: String) : NetworkResult()
-  object Failure : NetworkResult()
+sealed class Shape {
+  data class Circle(val radius: Double) : Shape()
+  data class Rectangle(val width: Double, val height: Double) : Shape()
 }

@@ -71,8 +71,6 @@ data class Company(val name: String, val address: Address)
 data class Employee(val name: String, val company: Company)
 ```
 ```kotlin:ank
-import lens.docs.domain.*
-
 val employee = Employee("John Doe", Company("Arrow", Address("Functional city", Street(23, "lambda street"))))
 employee
 ```
@@ -134,15 +132,13 @@ Don't worry about the boilerplate of the lenses written above because it can be 
 Lenses can be generated for a `data class` by the `@optics` annotation. For every constructor parameter of the `data class` a `Lens` will be generated. The lenses will be generated in the same package as the `data class` and will be named `classnameProperty()`.
 
 ```kotlin
-@optics data class Employee(val name: String, val company: Company)
+@optics data class Account(val balance: Int, val available: Int)
 ```
 
-For `Employee` 2 lenses will be generated `fun employeeName(): Lens<Employee, String>` and `fun employeeCompany(): Lens<Employee, Company>`. Using generated lenses we can reduce our previous code example.
+For `Account` 2 lenses will be generated `fun accountBalance(): Lens<Account, Int>` and `fun accountAvailable(): Lens<Account, Int>`.
 
-```kotlin:ank
-val employeeStreetName: Lens<Employee, String> = employeeCompany() compose companyAddress() compose addressStreet() compose streetName()
-
-employeeStreetName.modify(employee, String::capitalize)
+```kotlin:ank:silent
+val balanceLens: Lens<Account, Int> = accountBalance()
 ```
 
 ### Polymorphic lenses <a id="Plens"></a>
