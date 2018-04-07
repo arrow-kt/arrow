@@ -3,7 +3,7 @@ package arrow.dagger.effects.instances.coroutines
 import arrow.effects.*
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
-import arrow.effects.typeclasses.MonadSuspend
+import arrow.effects.typeclasses.MonadDefer
 import arrow.typeclasses.*
 import dagger.Module
 import dagger.Provides
@@ -27,7 +27,7 @@ class DeferredKInstances {
   fun deferredKMonadError(): MonadError<ForDeferredK, Throwable> = DeferredK.monadError()
 
   @Provides
-  fun deferredKMonadSuspend(): MonadSuspend<ForDeferredK> = DeferredK.monadSuspend()
+  fun deferredKMonadSuspend(): MonadDefer<ForDeferredK> = DeferredK.monadSuspend()
 
   @Provides
   fun deferredKAsync(): Async<ForDeferredK> = DeferredK.async()

@@ -115,21 +115,21 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
         fix().switchMap { f(it).fix() }
     }
 
-    fun monadSuspendBuffer(): FlowableKMonadSuspendInstance = monadSuspend()
+    fun monadSuspendBuffer(): FlowableKMonadDeferInstance = monadSuspend()
 
-    fun monadSuspendDrop(): FlowableKMonadSuspendInstance = object : FlowableKMonadSuspendInstance {
+    fun monadSuspendDrop(): FlowableKMonadDeferInstance = object : FlowableKMonadDeferInstance {
       override fun BS(): BackpressureStrategy = BackpressureStrategy.DROP
     }
 
-    fun monadSuspendError(): FlowableKMonadSuspendInstance = object : FlowableKMonadSuspendInstance {
+    fun monadSuspendError(): FlowableKMonadDeferInstance = object : FlowableKMonadDeferInstance {
       override fun BS(): BackpressureStrategy = BackpressureStrategy.ERROR
     }
 
-    fun monadSuspendLatest(): FlowableKMonadSuspendInstance = object : FlowableKMonadSuspendInstance {
+    fun monadSuspendLatest(): FlowableKMonadDeferInstance = object : FlowableKMonadDeferInstance {
       override fun BS(): BackpressureStrategy = BackpressureStrategy.LATEST
     }
 
-    fun monadSuspendMissing(): FlowableKMonadSuspendInstance = object : FlowableKMonadSuspendInstance {
+    fun monadSuspendMissing(): FlowableKMonadDeferInstance = object : FlowableKMonadDeferInstance {
       override fun BS(): BackpressureStrategy = BackpressureStrategy.MISSING
     }
 

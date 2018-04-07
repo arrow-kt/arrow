@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
-import arrow.effects.typeclasses.MonadSuspend
+import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.instance
 import arrow.typeclasses.*
@@ -69,7 +69,7 @@ interface IOMonadErrorInstance : IOMonadInstance, MonadError<ForIO, Throwable> {
 }
 
 @instance(IO::class)
-interface IOMonadSuspendInstance : IOMonadErrorInstance, MonadSuspend<ForIO> {
+interface IOMonadDeferInstance : IOMonadErrorInstance, MonadDefer<ForIO> {
   override fun <A> defer(fa: () -> IOOf<A>): IO<A> =
     IO.suspend(fa)
 
@@ -77,7 +77,7 @@ interface IOMonadSuspendInstance : IOMonadErrorInstance, MonadSuspend<ForIO> {
 }
 
 @instance(IO::class)
-interface IOAsyncInstance : IOMonadSuspendInstance, Async<ForIO> {
+interface IOAsyncInstance : IOMonadDeferInstance, Async<ForIO> {
   override fun <A> async(fa: Proc<A>): IO<A> =
     IO.async(fa)
 

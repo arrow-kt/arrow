@@ -5,7 +5,7 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
-import arrow.effects.typeclasses.MonadSuspend
+import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.instance
 import arrow.typeclasses.*
@@ -93,16 +93,16 @@ interface ObservableKMonadErrorInstance :
 }
 
 @instance(ObservableK::class)
-interface ObservableKMonadSuspendInstance :
+interface ObservableKMonadDeferInstance :
   ObservableKMonadErrorInstance,
-  MonadSuspend<ForObservableK> {
+  MonadDefer<ForObservableK> {
   override fun <A> defer(fa: () -> ObservableKOf<A>): ObservableK<A> =
     ObservableK.suspend(fa)
 }
 
 @instance(ObservableK::class)
 interface ObservableKAsyncInstance :
-  ObservableKMonadSuspendInstance,
+  ObservableKMonadDeferInstance,
   Async<ForObservableK> {
   override fun <A> async(fa: Proc<A>): ObservableK<A> =
     ObservableK.runAsync(fa)

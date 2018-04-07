@@ -3,7 +3,7 @@ package arrow.dagger.effects.instances
 import arrow.effects.*
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
-import arrow.effects.typeclasses.MonadSuspend
+import arrow.effects.typeclasses.MonadDefer
 import arrow.typeclasses.*
 import dagger.Module
 import dagger.Provides
@@ -28,7 +28,7 @@ class IOInstances {
   fun ioMonadError(): MonadError<ForIO, Throwable> = IO.monadError()
 
   @Provides
-  fun ioMonadSuspend(): MonadSuspend<ForIO> = IO.monadSuspend()
+  fun ioMonadSuspend(): MonadDefer<ForIO> = IO.monadSuspend()
 
   @Provides
   fun ioAsync(): Async<ForIO> = IO.async()

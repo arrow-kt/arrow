@@ -5,7 +5,7 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
-import arrow.effects.typeclasses.MonadSuspend
+import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.instance
 import arrow.typeclasses.*
@@ -94,9 +94,9 @@ interface FlowableKMonadErrorInstance :
 }
 
 @instance(FlowableK::class)
-interface FlowableKMonadSuspendInstance :
+interface FlowableKMonadDeferInstance :
   FlowableKMonadErrorInstance,
-  MonadSuspend<ForFlowableK> {
+  MonadDefer<ForFlowableK> {
   override fun <A> defer(fa: () -> FlowableKOf<A>): FlowableK<A> =
     FlowableK.suspend(fa)
 
@@ -105,7 +105,7 @@ interface FlowableKMonadSuspendInstance :
 
 @instance(FlowableK::class)
 interface FlowableKAsyncInstance :
-  FlowableKMonadSuspendInstance,
+  FlowableKMonadDeferInstance,
   Async<ForFlowableK> {
   override fun <A> async(fa: Proc<A>): FlowableK<A> =
     FlowableK.async(fa, BS())
