@@ -27,7 +27,7 @@ class DeferredKInstances {
   fun deferredKMonadError(): MonadError<ForDeferredK, Throwable> = DeferredK.monadError()
 
   @Provides
-  fun deferredKMonadSuspend(): MonadDefer<ForDeferredK> = DeferredK.monadSuspend()
+  fun deferredKMonadSuspend(): MonadDefer<ForDeferredK> = DeferredK.monadDefer()
 
   @Provides
   fun deferredKAsync(): Async<ForDeferredK> = DeferredK.async()

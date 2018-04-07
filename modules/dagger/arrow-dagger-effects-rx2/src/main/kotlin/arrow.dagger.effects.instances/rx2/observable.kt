@@ -27,7 +27,7 @@ class ObservableKInstances {
   fun observableKMonadError(): MonadError<ForObservableK, Throwable> = ObservableK.monadError()
 
   @Provides
-  fun observableKMonadSuspend(): MonadDefer<ForObservableK> = ObservableK.monadSuspend()
+  fun observableKMonadSuspend(): MonadDefer<ForObservableK> = ObservableK.monadDefer()
 
   @Provides
   fun observableKAsync(): Async<ForObservableK> = ObservableK.async()

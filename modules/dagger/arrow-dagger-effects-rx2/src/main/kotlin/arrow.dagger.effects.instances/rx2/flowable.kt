@@ -27,7 +27,7 @@ class FlowableKInstances {
   fun flowableKMonadError(): MonadError<ForFlowableK, Throwable> = FlowableK.monadError()
 
   @Provides
-  fun flowableKMonadSuspend(): MonadDefer<ForFlowableK> = FlowableK.monadSuspend()
+  fun flowableKMonadSuspend(): MonadDefer<ForFlowableK> = FlowableK.monadDefer()
 
   @Provides
   fun flowableKAsync(): Async<ForFlowableK> = FlowableK.async()

@@ -28,7 +28,7 @@ class IOInstances {
   fun ioMonadError(): MonadError<ForIO, Throwable> = IO.monadError()
 
   @Provides
-  fun ioMonadSuspend(): MonadDefer<ForIO> = IO.monadSuspend()
+  fun ioMonadSuspend(): MonadDefer<ForIO> = IO.monadDefer()
 
   @Provides
   fun ioAsync(): Async<ForIO> = IO.async()
