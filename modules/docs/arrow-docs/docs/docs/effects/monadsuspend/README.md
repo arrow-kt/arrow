@@ -26,8 +26,8 @@ As it captures exceptions, `invoke()` is the simplest way of wrapping existing s
 fun <F> getSongUrlAsync(SC: MonadSuspend<F> = monadSuspend()) =
   SC { getSongUrl() }
 
-val songIO: IO<Url> = getSongUrlAsync().fix()
-val songDeferred: DeferredK<Url> = getSongUrlAsync().fix()
+val songIO: IOOf<Url> = getSongUrlAsync()
+val songDeferred: DeferredKOf<Url> = getSongUrlAsync()
 ```
 
 #### suspend
@@ -109,46 +109,6 @@ Exceptions are wrapped in `raiseError()`.
 Binds the function parameter by wrapping the result in `just()`.
 
 While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution.
-
-### Syntax
-
-#### (() -> A)#defer
-
-Wraps the current function in the Sync passed as a parameter. All exceptions are wrapped.
-
-```kotlin
-{ fibonacci(100) }.defer(ObservableK.monadSuspend())
-```
-
-```kotlin
-{ fibonacci(100) }.defer(IO.monadSuspend())
-```
-
-```kotlin
-{ throw RuntimeException("Boom") }
-  .defer(IO.monadSuspend())
-  .fix().attempt().unsafeRunAsync { }
-```
-
-#### (() -> Either<Throwable, A>)#deferUnsafe
-
-Runs the current function in the `MonadSuspend` passed as a parameter.
-
-While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution.
-
-```kotlin
-{ fibonacci(100).left() }.deferUnsafe(ObservableK.monadSuspend())
-```
-
-```kotlin
-{ fibonacci(100).left() }.deferUnsafe(IO.monadSuspend())
-```
-
-```kotlin
-{ RuntimeException("Boom").right() }
-  .deferUnsafe(IO.monadSuspend())
-  .fix().attempt().unsafeRunSync()
-```
 
 ### Laws
 
