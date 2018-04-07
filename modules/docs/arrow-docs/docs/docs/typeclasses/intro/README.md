@@ -7,25 +7,26 @@ video: 3y9KI7XWXSY
 
 ## Typeclasses
 
-Typeclasses are interfaces that define a set of functions associated to one type.
+Typeclasses define a set of functions associated to one type.
 These functions can be either extension functions on the type, or a smart constructor / factory function.
-The extension functions are scoped within the Typeclass, so they do not pollute the global namespace.
+The extension functions are scoped within the typeclass, so they do not pollute the global namespace.
 
 To assure that a typeclass has been correctly implemented, a test suite called the "laws" is provided per typeclass.
 These test suites are available in the package arrow-tests.
 
 What differentiates typeclasses from regular OOP inheritance is that typeclasses are meant to be implemented *outside* of their types.
-The association is done using generic parametrization rather than the usual subclassing by implementing the interface.
-This means that they can be implemented for any class, even those not in the current project,
-and allows us to make available at any scope any one implementation of a typeclasses for the single unique type they're associated with.
+The association is done using generic parametrization rather than subclassing by implementing the interface.
+
+This means that they can be implemented for any class, even those not in the current project.
+It also allows you to make available any one implementation of a typeclasses at any scope for the generic type they're associated with.
 
 #### Example
 
-You can read all about how Arrow does typeclasses in the [glossary]({{ '/docs/patterns/glossary/' | relative_url }}).
+You can read all about how Arrow implements typeclasses in the [glossary]({{ '/docs/patterns/glossary/' | relative_url }}).
 
-### Typeclasses in Arrow
+### Typeclasses provided by Arrow
 
-We will list all the typeclasses available in arrow by the module they belong to, and a short description of the behavior they abstract.
+We will list all the typeclasses provided in Arrow grouped by the module they belong to, and a short description of the behavior they abstract.
 
 #### Typeclasses
 
