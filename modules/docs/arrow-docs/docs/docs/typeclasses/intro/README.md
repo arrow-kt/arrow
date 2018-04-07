@@ -22,7 +22,7 @@ The association is done using generic parametrization rather than subclassing by
 * You can make available any one implementation of a typeclasses at any scope for the generic type they're associated with by using functions like `run` and `with`
 
 To assure that a typeclass has been correctly implemented for a type, Arrow provides a test suite called the "laws" per typeclass.
-These test suites are available in the package `arrow-tests`.
+These test suites are available in the module `arrow-tests`.
 
 #### Example
 
