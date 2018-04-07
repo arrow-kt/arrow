@@ -89,12 +89,14 @@ triedEmail.getOption(Try.Failure(IllegalStateException("Something wrong with net
 
 ### Generating optional
 
-To avoid boilerplate, optionals can be generated for `A?` and `Option<A>` fields for a `data class`. The `Optionals` will be generated in the same package as `data class` and will have `Optional` suffix.
+To avoid boilerplate, optionals can be generated for `A?` and `Option<A>` fields for a `data class`. The `Optionals` will be generated in the same package as `data class`.
 
 ```kotlin
-@optionals data class Point2D(val x: Int, val y: Int, val color: Int?)
-
-val optional: Optional<Point2D, Int> = point2dColorOptional()
+@optics data class Person(val age: Int?, val address: Option<Address>)
+```
+```kotlin:ank:silent
+val optionalAge: Optional<Person, Int> = personAge()
+val optionalAddress: Optional<Person, Address> = personAddress()
 ```
 
 ### Polymorphic optional
@@ -104,8 +106,6 @@ A `POptional` is very similar to [PLens](docs/optics/Lens#Plens) and [PPrism](do
 Given a `PPrism` with a focus into `Success` of `Try<Tuple2<Int, String>>` that can polymorphically change its content to `Tuple2<String, String>` and a `PLens` with a focus into the `Tuple2<Int, String>` that can morph the first parameter from `Int` to `String`. We can compose them together build an `Optional` that can look into `Try` and morph the first type of the `Tuple2` within.
 
 ```kotlin:ank
-import arrow.core.*
-
 val pprism = pTrySuccess<Tuple2<Int, String>, Tuple2<String, String>>()
 val plens = pFirstTuple2<Int, String, String>()
 
