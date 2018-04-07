@@ -118,5 +118,5 @@ interface TryTraverseInstance : Traverse<ForTry> {
     fix().foldLeft(b, f)
 
   override fun <A, B> Kind<ForTry, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-    foldRight(lb, f)
+    fix().foldRight(lb, f)
 }
