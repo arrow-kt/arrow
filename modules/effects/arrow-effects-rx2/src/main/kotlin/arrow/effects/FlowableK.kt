@@ -115,7 +115,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
         fix().switchMap { f(it).fix() }
     }
 
-    fun monadSuspendBuffer(): FlowableKMonadDeferInstance = monadSuspend()
+    fun monadSuspendBuffer(): FlowableKMonadDeferInstance = monadDefer()
 
     fun monadSuspendDrop(): FlowableKMonadDeferInstance = object : FlowableKMonadDeferInstance {
       override fun BS(): BackpressureStrategy = BackpressureStrategy.DROP
