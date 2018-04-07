@@ -114,18 +114,18 @@ The Monad Template Library module gives more specialized version of existing typ
 
 #### Optics
 
-- [`At`]({{ '/docs/typeclasses/at/' | relative_url }}) - provides a [`Lens`]({{ '/docs/optics/lens/' | relative_url }}) for a structure with an indexable focus.
+- [`At`]({{ '/docs/optics/at/' | relative_url }}) - provides a [`Lens`]({{ '/docs/optics/lens/' | relative_url }}) for a structure with an indexable focus.
 
-- [`FilterIndex`]({{ '/docs/typeclasses/filterindex/' | relative_url }}) - provides a [`Traversal`]({{ '/docs/optics/traversal/' | relative_url }}) for a structure with indexable foci that satisfy a predicate.
+- [`FilterIndex`]({{ '/docs/optics/filterindex/' | relative_url }}) - provides a [`Traversal`]({{ '/docs/optics/traversal/' | relative_url }}) for a structure with indexable foci that satisfy a predicate.
 
-- [`Index`]({{ '/docs/typeclasses/index/' | relative_url }}) - provides an [`Optional`]({{ '/docs/optics/optional/' | relative_url }}) for a structure with an indexable optional focus.
+- [`Index`]({{ '/docs/optics/index/' | relative_url }}) - provides an [`Optional`]({{ '/docs/optics/optional/' | relative_url }}) for a structure with an indexable optional focus.
 
-- [`Each`]({{ '/docs/typeclasses/each/' | relative_url }}) - provides a [`Traversal`]({{ '/docs/optics/traversal/' | relative_url }}).
+- [`Each`]({{ '/docs/optics/each/' | relative_url }}) - provides a [`Traversal`]({{ '/docs/optics/traversal/' | relative_url }}).
 
 #### Recursion
 
-- [`Corecursive`]({{ '/docs/typeclasses/corecursive/' | relative_url }}) - traverses a structure forwards from the starting case
+- [`Corecursive`]({{ '/docs/recursion/corecursive/' | relative_url }}) - traverses a structure forwards from the starting case
 
-- [`Recursive`]({{ '/docs/typeclasses/recursive/' | relative_url }}) - traverses a structure backwards from the base case
+- [`Recursive`]({{ '/docs/recursion/recursive/' | relative_url }}) - traverses a structure backwards from the base case
 
-- [`Birecursive`]({{ '/docs/typeclasses/birecursive/' | relative_url }}) - it is both recursive and corecursive
+- [`Birecursive`]({{ '/docs/recursion/birecursive/' | relative_url }}) - it is both recursive and corecursive
