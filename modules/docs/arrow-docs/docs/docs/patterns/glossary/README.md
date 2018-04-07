@@ -258,4 +258,4 @@ UserFetcher(Option.applicative()).genUser().fix()
 // Some(value = User(943))
 ```
 
-This technique of [Dependency Injection]({{ '/docs/patterns/dependencyinjection' | relative_url }}) that expresses dependencies as the implicit parameter of an extension function is called `Typeclassless`. You can read more about it in this [blog series](http://www.pacoworks.com/2018/02/25/simple-dependency-injection-in-kotlin-part-1/).
+This technique of [Dependency Injection]({{ '/docs/patterns/dependency_injection' | relative_url }}) that expresses dependencies as the implicit parameter of an extension function is called `Typeclassless`. You can read more about it in this [blog series](http://www.pacoworks.com/2018/02/25/simple-dependency-injection-in-kotlin-part-1/).
