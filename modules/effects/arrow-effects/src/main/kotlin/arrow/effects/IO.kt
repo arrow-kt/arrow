@@ -20,9 +20,9 @@ sealed class IO<out A> : IOOf<A> {
 
     internal fun <A, B> mapDefault(t: IOOf<A>, f: (A) -> B): IO<B> = Map(t, f, 0)
 
-    operator fun <A> invoke(f: () -> A): IO<A> = suspend { Pure(f()) }
+    operator fun <A> invoke(f: () -> A): IO<A> = defer { Pure(f()) }
 
-    fun <A> suspend(f: () -> IOOf<A>): IO<A> = Suspend(f)
+    fun <A> defer(f: () -> IOOf<A>): IO<A> = Suspend(f)
 
     fun <A> async(k: Proc<A>): IO<A> =
       Async { ff: (Either<Throwable, A>) -> Unit ->

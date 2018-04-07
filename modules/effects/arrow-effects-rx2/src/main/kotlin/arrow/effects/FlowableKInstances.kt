@@ -98,7 +98,7 @@ interface FlowableKMonadDeferInstance :
   FlowableKMonadErrorInstance,
   MonadDefer<ForFlowableK> {
   override fun <A> defer(fa: () -> FlowableKOf<A>): FlowableK<A> =
-    FlowableK.suspend(fa)
+    FlowableK.defer(fa)
 
   fun BS(): BackpressureStrategy = BackpressureStrategy.BUFFER
 }

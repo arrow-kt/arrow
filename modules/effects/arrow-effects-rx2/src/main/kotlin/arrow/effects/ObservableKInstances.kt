@@ -97,7 +97,7 @@ interface ObservableKMonadDeferInstance :
   ObservableKMonadErrorInstance,
   MonadDefer<ForObservableK> {
   override fun <A> defer(fa: () -> ObservableKOf<A>): ObservableK<A> =
-    ObservableK.suspend(fa)
+    ObservableK.defer(fa)
 }
 
 @instance(ObservableK::class)

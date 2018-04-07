@@ -111,7 +111,7 @@ We will list them by their hierarchy.
 
 Effects provides a hierarchy of typeclasses for lazy and asynchronous execution.
 
-- [`MonadSuspend`]({{ '/docs/effects/monadsuspend/' | relative_url }}) - can evaluate functions lazily
+- [`MonadDefer`]({{ '/docs/effects/monaddefer/' | relative_url }}) - can evaluate functions lazily
 
 - [`Async`]({{ '/docs/effects/async/' | relative_url }}) - can be created using an asynchronous callback function
 

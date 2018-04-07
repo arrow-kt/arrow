@@ -71,7 +71,7 @@ interface IOMonadErrorInstance : IOMonadInstance, MonadError<ForIO, Throwable> {
 @instance(IO::class)
 interface IOMonadDeferInstance : IOMonadErrorInstance, MonadDefer<ForIO> {
   override fun <A> defer(fa: () -> IOOf<A>): IO<A> =
-    IO.suspend(fa)
+    IO.defer(fa)
 
   override fun lazy(): IO<Unit> = IO.lazy
 }

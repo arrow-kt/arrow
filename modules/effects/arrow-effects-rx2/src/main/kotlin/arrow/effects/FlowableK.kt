@@ -65,9 +65,9 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
       Flowable.error<A>(t).k()
 
     operator fun <A> invoke(fa: () -> A): FlowableK<A> =
-      suspend { just(fa()) }
+      defer { just(fa()) }
 
-    fun <A> suspend(fa: () -> FlowableKOf<A>): FlowableK<A> =
+    fun <A> defer(fa: () -> FlowableKOf<A>): FlowableK<A> =
       Flowable.defer { fa().value() }.k()
 
     fun <A> async(fa: Proc<A>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
