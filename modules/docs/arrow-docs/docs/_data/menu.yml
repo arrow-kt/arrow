@@ -217,8 +217,8 @@ options:
       - title: IO
         url: /docs/effects/io/
 
-      - title: MonadSuspend
-        url: /docs/effects/monadsuspend/
+      - title: MonadDefer
+        url: /docs/effects/monaddefer/
 
       - title: Async
         url: /docs/effects/async/

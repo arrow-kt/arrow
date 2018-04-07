@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
-import arrow.effects.typeclasses.MonadSuspend
+import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.instance
 import arrow.typeclasses.*
@@ -65,13 +65,13 @@ interface DeferredKMonadErrorInstance : DeferredKMonadInstance, MonadError<ForDe
 }
 
 @instance(DeferredK::class)
-interface DeferredKMonadSuspendInstance : DeferredKMonadErrorInstance, MonadSuspend<ForDeferredK> {
+interface DeferredKMonadDeferInstance : DeferredKMonadErrorInstance, MonadDefer<ForDeferredK> {
   override fun <A> defer(fa: () -> DeferredKOf<A>): DeferredK<A> =
-    DeferredK.suspend(fa = fa)
+    DeferredK.defer(fa = fa)
 }
 
 @instance(DeferredK::class)
-interface DeferredKAsyncInstance : DeferredKMonadSuspendInstance, Async<ForDeferredK> {
+interface DeferredKAsyncInstance : DeferredKMonadDeferInstance, Async<ForDeferredK> {
   override fun <A> async(fa: Proc<A>): DeferredK<A> =
     DeferredK.async(fa = fa)
 

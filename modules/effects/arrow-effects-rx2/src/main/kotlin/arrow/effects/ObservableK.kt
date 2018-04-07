@@ -65,9 +65,9 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
       Observable.error<A>(t).k()
 
     operator fun <A> invoke(fa: () -> A): ObservableK<A> =
-      suspend { just(fa()) }
+      defer { just(fa()) }
 
-    fun <A> suspend(fa: () -> ObservableKOf<A>): ObservableK<A> =
+    fun <A> defer(fa: () -> ObservableKOf<A>): ObservableK<A> =
       Observable.defer { fa().value() }.k()
 
     fun <A> runAsync(fa: Proc<A>): ObservableK<A> =

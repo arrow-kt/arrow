@@ -4,7 +4,7 @@ import arrow.dagger.effects.instances.coroutines.ArrowEffectsCoroutinesInstances
 import arrow.effects.typeclasses.Async
 import arrow.effects.ForDeferredK
 import arrow.effects.typeclasses.Effect
-import arrow.effects.typeclasses.MonadSuspend
+import arrow.effects.typeclasses.MonadDefer
 import arrow.typeclasses.*
 import dagger.Component
 import javax.inject.Singleton
@@ -24,7 +24,7 @@ interface Runtime {
   fun deferredKWApplicativeError(): ApplicativeError<ForDeferredK, Throwable>
   fun deferredKWMonad(): Monad<ForDeferredK>
   fun deferredKWMonadError(): MonadError<ForDeferredK, Throwable>
-  fun deferredKWMonadSuspend(): MonadSuspend<ForDeferredK>
+  fun deferredKWMonadSuspend(): MonadDefer<ForDeferredK>
   fun deferredKWAsync(): Async<ForDeferredK>
   fun deferredKWEffect(): Effect<ForDeferredK>
 }

@@ -32,10 +32,10 @@ data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferre
     fun <A> just(a: A): DeferredK<A> =
       CompletableDeferred(a).k()
 
-    fun <A> suspend(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.LAZY, f: suspend () -> A): DeferredK<A> =
+    fun <A> defer(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.LAZY, f: suspend () -> A): DeferredK<A> =
       kotlinx.coroutines.experimental.async(ctx, start) { f() }.k()
 
-    fun <A> suspend(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.LAZY, fa: () -> DeferredKOf<A>): DeferredK<A> =
+    fun <A> defer(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.LAZY, fa: () -> DeferredKOf<A>): DeferredK<A> =
       kotlinx.coroutines.experimental.async(ctx, start) { fa().await() }.k()
 
     operator fun <A> invoke(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.DEFAULT, f: () -> A): DeferredK<A> =

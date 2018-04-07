@@ -17,8 +17,8 @@ import kotlin.coroutines.experimental.startCoroutine
 typealias Disposable = () -> Unit
 
 @RestrictsSuspension
-open class MonadSuspendCancellableContinuation<F, A>(SC: MonadSuspend<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
-  MonadErrorContinuation<F, A>(SC), MonadSuspend<F> by SC {
+open class MonadDeferCancellableContinuation<F, A>(SC: MonadDefer<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
+  MonadErrorContinuation<F, A>(SC), MonadDefer<F> by SC {
 
   protected val cancelled: AtomicBoolean = AtomicBoolean(false)
 

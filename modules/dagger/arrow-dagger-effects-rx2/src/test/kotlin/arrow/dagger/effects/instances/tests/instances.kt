@@ -5,7 +5,7 @@ import arrow.effects.ForFlowableK
 import arrow.effects.ForObservableK
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
-import arrow.effects.typeclasses.MonadSuspend
+import arrow.effects.typeclasses.MonadDefer
 import arrow.typeclasses.*
 import dagger.Component
 import javax.inject.Singleton
@@ -25,7 +25,7 @@ interface Runtime {
   fun observableKWApplicativeError(): ApplicativeError<ForObservableK, Throwable>
   fun observableKWMonad(): Monad<ForObservableK>
   fun observableKWMonadError(): MonadError<ForObservableK, Throwable>
-  fun observableKWMonadSuspend(): MonadSuspend<ForObservableK>
+  fun observableKWMonadSuspend(): MonadDefer<ForObservableK>
   fun observableKWAsync(): Async<ForObservableK>
   fun observableKWEffect(): Effect<ForObservableK>
   fun flowableKWFunctor(): Functor<ForFlowableK>
@@ -33,7 +33,7 @@ interface Runtime {
   fun flowableKWApplicativeError(): ApplicativeError<ForFlowableK, Throwable>
   fun flowableKWMonad(): Monad<ForFlowableK>
   fun flowableKWMonadError(): MonadError<ForFlowableK, Throwable>
-  fun flowableKWMonadSuspend(): MonadSuspend<ForFlowableK>
+  fun flowableKWMonadSuspend(): MonadDefer<ForFlowableK>
   fun flowableKWAsync(): Async<ForFlowableK>
   fun flowableKWEffect(): Effect<ForFlowableK>
 }

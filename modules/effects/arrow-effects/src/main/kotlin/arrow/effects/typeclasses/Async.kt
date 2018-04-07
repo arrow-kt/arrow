@@ -7,7 +7,7 @@ import arrow.core.Either
 typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
 
 /** The context required to run an asynchronous computation that may fail. **/
-interface Async<F> : MonadSuspend<F> {
+interface Async<F> : MonadDefer<F> {
   fun <A> async(fa: Proc<A>): Kind<F, A>
 
   fun <A> never(): Kind<F, A> =

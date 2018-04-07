@@ -245,5 +245,5 @@ import arrow.effects.*
 import arrow.debug.*
 
 showInstances<ForIO, Throwable>()
-// [Applicative, ApplicativeError, Functor, Monad, MonadError, MonadSuspend, Async, Effect]
+// [Applicative, ApplicativeError, Functor, Monad, MonadError, MonadDefer, Async, Effect]
 ```

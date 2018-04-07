@@ -64,16 +64,16 @@ subject.value()
 
 ### Observable comprehensions
 
-The library provides instances of [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) and [`MonadSuspend`]({{ '/docs/effects/monadsuspend' | relative_url }}).
+The library provides instances of [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) and [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}).
 
-[`MonadSuspend`]({{ '/docs/effects/async' | relative_url }}) allows you to generify over datatypes that can run asynchronous code. You can use it with `ObservableK` and `FlowableK`.
+[`MonadDefer`]({{ '/docs/effects/async' | relative_url }}) allows you to generify over datatypes that can run asynchronous code. You can use it with `ObservableK` and `FlowableK`.
 
 ```kotlin
-fun <F> getSongUrlAsync(MS: MonadSuspend<F> = monadSuspend()) =
+fun <F> getSongUrlAsync(MS: MonadDefer<F>) =
   MS { getSongUrl() }
 
-val songObservable: ObservableK<Url> = getSongUrlAsync().fix()
-val songFlowable: FlowableK<Url> = getSongUrlAsync().fix()
+val songObservable: ObservableKOf<Url> = getSongUrlAsync(ObservableK.monadDefer())
+val songFlowable: FlowableKOf<Url> = getSongUrlAsync(FlowableK.monadDefer())
 ```
 
 [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) using the method `bindingCatch`, with all its benefits.
@@ -131,12 +131,12 @@ val disposable =
 disposable.dispose()
 ```
 
-Note that [`MonadSuspend`]({{ '/docs/effects/monadsuspend' | relative_url }}) provides an alternative to `bindingCatch` called `bindingCancellable` returning a `arrow.Disposable`.
+Note that [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) provides an alternative to `bindingCatch` called `bindingCancellable` returning a `arrow.Disposable`.
 Invoking this `Disposable` causes an `BindingCancellationException` in the chain which needs to be handled by the subscriber, similarly to what `Deferred` does.
 
 ```kotlin
 val (observable, disposable) = 
-  ObservableK.monadSuspend().bindingCancellable {
+  ObservableK.monadDefer().bindingCancellable {
     val userProfile = Observable.create { getUserProfile("123") }
     val friendProfiles = userProfile.friends().map { friend ->
         bindAsync(observableAsync) { getProfile(friend.id) }
@@ -157,5 +157,5 @@ import arrow.effects.*
 import arrow.debug.*
 
 showInstances<ForObservableK, Throwable>()
-// [Applicative, ApplicativeError, Functor, Monad, MonadError, MonadSuspend, Async, Effect, Foldable, Traverse]
+// [Applicative, ApplicativeError, Functor, Monad, MonadError, MonadDefer, Async, Effect, Foldable, Traverse]
 ```

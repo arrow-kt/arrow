@@ -9,7 +9,7 @@ import arrow.typeclasses.MonadError
 import kotlin.coroutines.experimental.startCoroutine
 
 /** The context required to defer evaluating a safe computation. **/
-interface MonadSuspend<F> : MonadError<F, Throwable> {
+interface MonadDefer<F> : MonadError<F, Throwable> {
   fun <A> defer(fa: () -> Kind<F, A>): Kind<F, A>
 
   operator fun <A> invoke(fa: () -> A): Kind<F, A> =
@@ -29,7 +29,7 @@ interface MonadSuspend<F> : MonadError<F, Throwable> {
 
 /**
  * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.
- * A coroutines is initiated and inside [MonadSuspendCancellableContinuation] suspended yielding to [Monad.flatMap]. Once all the flatMap binds are completed
+ * A coroutines is initiated and inside [MonadDeferCancellableContinuation] suspended yielding to [Monad.flatMap]. Once all the flatMap binds are completed
  * the underlying monad is returned from the act of executing the coroutine
  *
  * This one operates over [MonadError] instances that can support [Throwable] in their error type automatically lifting
@@ -38,9 +38,9 @@ interface MonadSuspend<F> : MonadError<F, Throwable> {
  * This operation is cancellable by calling invoke on the [Disposable] return.
  * If [Disposable.invoke] is called the binding result will become a lifted [BindingCancellationException].
  */
-fun <F, B> MonadSuspend<F>.bindingCancellable(c: suspend MonadSuspendCancellableContinuation<F, *>.() -> B): Tuple2<Kind<F, B>, Disposable> {
-  val continuation = MonadSuspendCancellableContinuation<F, B>(this)
-  val wrapReturn: suspend MonadSuspendCancellableContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
+fun <F, B> MonadDefer<F>.bindingCancellable(c: suspend MonadDeferCancellableContinuation<F, *>.() -> B): Tuple2<Kind<F, B>, Disposable> {
+  val continuation = MonadDeferCancellableContinuation<F, B>(this)
+  val wrapReturn: suspend MonadDeferCancellableContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
   wrapReturn.startCoroutine(continuation, continuation)
   return continuation.returnedMonad() toT continuation.disposable()
 }

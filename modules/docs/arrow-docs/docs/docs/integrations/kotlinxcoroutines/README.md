@@ -158,12 +158,12 @@ recoveryArrowWrapper.unsafeAttemptSync()
 
 `DeferredK` created with `bindingCatch` behave the same way regular `Deferred` do, including cancellation by disposing the subscription.
 
-Note that [`MonadSuspend`]({{ '/docs/effects/monadsuspend' | relative_url }}) provides an alternative to `bindingCatch` called `bindingCancellable` returning a `arrow.Disposable`.
+Note that [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) provides an alternative to `bindingCatch` called `bindingCancellable` returning a `arrow.Disposable`.
 Invoking this `Disposable` causes an `BindingCancellationException` in the chain which needs to be handled by the subscriber, similarly to what `Deferred` does.
 
 ```kotlin
 val (deferred, unsafeCancel) = 
-  DeferredK.monadSuspend().bindingCancellable {
+  DeferredK.monadDefer().bindingCancellable {
     val userProfile = DeferredK { getUserProfile("123") }.bind()
     val friendProfiles = userProfile.friends().map { friend ->
         DeferredK { getProfile(friend.id) }.bind()
@@ -189,5 +189,5 @@ import arrow.effects.*
 import arrow.debug.*
 
 showInstances<ForDeferredK, Throwable>()
-// [Applicative, ApplicativeError, Functor, Monad, MonadError, MonadSuspend, Async, Effect]
+// [Applicative, ApplicativeError, Functor, Monad, MonadError, MonadDefer, Async, Effect]
 ```

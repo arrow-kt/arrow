@@ -3,7 +3,7 @@ package arrow.dagger.effects.instances.rx2
 import arrow.effects.*
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
-import arrow.effects.typeclasses.MonadSuspend
+import arrow.effects.typeclasses.MonadDefer
 import arrow.typeclasses.*
 import dagger.Module
 import dagger.Provides
@@ -27,7 +27,7 @@ class ObservableKInstances {
   fun observableKMonadError(): MonadError<ForObservableK, Throwable> = ObservableK.monadError()
 
   @Provides
-  fun observableKMonadSuspend(): MonadSuspend<ForObservableK> = ObservableK.monadSuspend()
+  fun observableKMonadSuspend(): MonadDefer<ForObservableK> = ObservableK.monadDefer()
 
   @Provides
   fun observableKAsync(): Async<ForObservableK> = ObservableK.async()
