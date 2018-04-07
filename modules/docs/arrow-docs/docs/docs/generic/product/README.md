@@ -202,7 +202,7 @@ data class Car(val mod: Int, val speed: Speed) {
 Once we attempt to compile this we would get an error similar to the one below:
 
 ```$xslt
-:arrow-docs:compileKotline: /home/raulraja/workspace/arrow/arrow/modules/docs/arrow-docs/build/generated/source/kaptKotlin/main/product.arrow.generic.car.kt: (60, 119): Unresolved reference.
+:arrow-docs:compileKotlin: /home/raulraja/workspace/arrow/arrow/modules/docs/arrow-docs/build/generated/source/kaptKotlin/main/product.arrow.generic.car.kt: (60, 119): Unresolved reference.
 ```
 
 This is because `Speed` is a data class not flagged as `@product`. Let's fix that:
