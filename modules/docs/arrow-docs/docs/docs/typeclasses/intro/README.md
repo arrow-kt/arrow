@@ -71,6 +71,16 @@ We will list them by their hierarchy.
 
 - [`Order`]({{ '/docs/typeclasses/order/' | relative_url }}) -  determine whether one object precedes another
 
+##### Semigroup
+
+- [`Semigroup`]({{ '/docs/typeclasses/semigroup/' | relative_url }}) - can combine two objects together
+
+- [`SemigroupK`]({{ '/docs/typeclasses/semigroupk/' | relative_url }}) - can combine two datatypes together
+
+- [`Monoid`]({{ '/docs/typeclasses/monoid/' | relative_url }}) - combinable objects have an empty value
+
+- [`MonoidK`]({{ '/docs/typeclasses/monoidk/' | relative_url }}) - combinable datatypes have an empty value
+
 ##### Functor
 
 - [`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }}) - its contents can be mapped
@@ -86,16 +96,6 @@ We will list them by their hierarchy.
 - [`Comonad`]({{ '/docs/typeclasses/comonad/' | relative_url }}) - can extract values from it
 
 - [`Bimonad`]({{ '/docs/typeclasses/bimonad/' | relative_url }}) - both monad and comonad
-
-##### Semigroup
-
-- [`Semigroup`]({{ '/docs/typeclasses/semigroup/' | relative_url }}) - can combine two objects together
-
-- [`SemigroupK`]({{ '/docs/typeclasses/semigroupk/' | relative_url }}) - can combine two datatypes together
-
-- [`Monoid`]({{ '/docs/typeclasses/monoid/' | relative_url }}) - combinable objects have an empty value
-
-- [`MonoidK`]({{ '/docs/typeclasses/monoidk/' | relative_url }}) - combinable datatypes have an empty value
 
 ##### Foldable
 
