@@ -10,23 +10,25 @@ import io.kotlintest.specs.StringSpec
 import java.io.File
 import java.nio.file.Paths
 
-open class APTest : StringSpec() {
+abstract class APTest(
+        val pckg: String
+) : StringSpec() {
 
   fun testProcessor(
-    vararg processor: AnnotationProcessor
+          vararg processor: AnnotationProcessor
   ) {
 
     processor.forEach { (name, source, dest, proc, error) ->
 
-      val stubs = Paths.get("", "build", "tmp", "kapt3", "stubs", "main", "arrow", "ap", "objects").toFile()
-      val expectedDir = Paths.get("", "src", "test", "resources", "arrow", "ap", "objects").toFile()
+      val stubs = Paths.get("", "build", "tmp", "kapt3", "stubs", "main", *pckg.split(".").toTypedArray()).toFile()
+      val expectedDir = Paths.get("", "src", "test", "resources", *pckg.split(".").toTypedArray()).toFile()
 
       if (dest == null && error == null) {
         throw Exception("Destination file and error cannot be both null")
       }
 
       if (dest != null && error != null) {
-        throw Exception("Destination file and error cannot be both nonnull")
+        throw Exception("Destination file or error must be set")
       }
 
       name {
@@ -36,30 +38,30 @@ open class APTest : StringSpec() {
         val stub = File(stubs, source).toURI().toURL()
 
         val compilation = javac()
-          .withProcessors(proc)
-          .withOptions(ImmutableList.of("-Akapt.kotlin.generated=$temp"))
-          .compile(JavaFileObjects.forResource(stub))
+                .withProcessors(proc)
+                .withOptions(ImmutableList.of("-Akapt.kotlin.generated=$temp"))
+                .compile(JavaFileObjects.forResource(stub))
 
         if (error != null) {
 
           assertThat(compilation)
-            .failed()
+                  .failed()
           assertThat(compilation)
-            .hadErrorContaining(error)
+                  .hadErrorContaining(error)
 
-          return@name
+        } else {
+
+          assertThat(compilation)
+                  .succeeded()
+
+          temp.listFiles().size shouldBe 1
+
+          val expected = File(expectedDir, dest).readText()
+          val actual = temp.listFiles()[0].readText()
+
+          actual shouldBe expected
+
         }
-
-        assertThat(compilation)
-          .succeeded()
-
-        temp.listFiles().size shouldBe 1
-
-        val expected = File(expectedDir, dest).readText()
-        val actual = temp.listFiles()[0].readText()
-
-        actual shouldBe expected
-
       }
 
     }

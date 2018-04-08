@@ -1,22 +1,24 @@
 package arrow.ap.tests
 
-class OptionalTest: APTest() {
+import arrow.optics.OpticsProcessor
+
+class OptionalTest: APTest("arrow.ap.objects.optional") {
 
     init {
-//FIXME: testProccesor loses annotation arguments.
-//        testProcessor(AnnotationProcessor(
-//                name = "@optionals test",
-//                sourceFile = "Optional.java",
-//                destFile = "Optional.kt",
-//                processor = OptikalProcessor()
-//        ))
 
-//FIXME: Add support asserting no file generation without errors.
-//        testProcessor(AnnotationProcessor(
-//                name = "@optionals sealed test",
-//                sourceFile = "OptionalSealed.java",
-//                processor = OptikalProcessor(),
-//        ))
+        testProcessor(AnnotationProcessor(
+                name = "Optionals cannot be generated for sealed class",
+                sourceFile = "OptionalSealed.java",
+                errorMessage = "Optionals can only be generated for data classes",
+                processor = OpticsProcessor()
+        ))
+
+        testProcessor(AnnotationProcessor(
+                name = "Optionals will be generated for data class",
+                sourceFile = "Optional.java",
+                destFile = "Optional.kt",
+                processor = OpticsProcessor()
+        ))
 
     }
 

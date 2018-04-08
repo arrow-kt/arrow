@@ -1,4 +1,4 @@
-package arrow.ap.objects
+package arrow.ap.objects.optional
 
 import arrow.core.Option
 import arrow.optics.OpticsTarget
