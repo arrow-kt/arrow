@@ -192,7 +192,7 @@ when(x) {
 }
 ```
 
-## Additional Syntax
+## Syntax
 
 Either can also map over the `left` value with `mapLeft` which is similar to map but applies on left instances.
 

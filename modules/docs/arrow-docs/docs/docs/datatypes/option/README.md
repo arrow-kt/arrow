@@ -14,8 +14,6 @@ Arrow models the absence of values through the `Option` datatype similar to how 
 
 `Option<A>` is a container for an optional value of type `A`. If the value of type `A` is present, the `Option<A>` is an instance of `Some<A>`, containing the present value of type `A`. If the value is absent, the `Option<A>` is the object `None`.
 
-
-
 ```kotlin:ank
 import arrow.*
 import arrow.core.*
