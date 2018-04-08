@@ -10,7 +10,7 @@ interface Eq<in F> {
   /**
    * Compares two instances of [F] and returns true if they're considered equal for this instance.
    *
-   * @param this@eqv object to compare with [b]
+   * @receiver object to compare with [b]
    * @param b object to compare with [this@eqv]
    * @returns true if [this@eqv] and [b] are equivalent, false otherwise.
    */
@@ -19,7 +19,7 @@ interface Eq<in F> {
   /**
    * Compares two instances of [F] and returns true if they're considered not equal for this instance.
    *
-   * @param this@neqv object to compare with [b]
+   * @receiver object to compare with [b]
    * @param b object to compare with [this@neqv]
    * @returns false if [this@neqv] and [b] are equivalent, true otherwise.
    */
