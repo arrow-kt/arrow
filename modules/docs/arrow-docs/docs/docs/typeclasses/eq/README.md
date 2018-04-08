@@ -70,27 +70,27 @@ Eq.any().run { Eval.later { 1 }.eqv(Eval.later { 1 }) }
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Eq` instances for custom datatypes.
 
-### Data types
+### Data Types
 
 Most of the datatypes in Arrow that are not related to functions provide instances of the `Eq` typeclass.
 
-- [`Id`]({{ '/docs/datatypes/id/' | relative_url }})
-- [`Option`]({{ '/docs/datatypes/option/' | relative_url }})
-- [`Either`]({{ '/docs/datatypes/either/' | relative_url }})
-- [`Eval`]({{ '/docs/datatypes/eval/' | relative_url }})
+- [Id]({{ '/docs/datatypes/id/' | relative_url }})
+- [Option]({{ '/docs/datatypes/option/' | relative_url }})
+- [Either]({{ '/docs/datatypes/either/' | relative_url }})
+- [Eval]({{ '/docs/datatypes/eval/' | relative_url }})
 - `TupleN`
-- [`NonEmptyList`]({{ '/docs/datatypes/nonemptylist/' | relative_url }})
-- [`Ior`]({{ '/docs/datatypes/ior/' | relative_url }})
-- [`Const`]({{ '/docs/datatypes/const/' | relative_url }})
-- [`Coproduct`]({{ '/docs/datatypes/coproduct/' | relative_url }})
-- [`Try`]({{ '/docs/datatypes/try/' | relative_url }})
-- [`Validated`]({{ '/docs/datatypes/validated/' | relative_url }})
-- [`Free`]({{ '/docs/datatypes/free' | relative_url }})
-- [`FreeApplicative`]({{ '/docs/datatypes/FreeApplicative' | relative_url }})
-- [`ListK`]({{ '/docs/datatypes/listK/' | relative_url }})
-- [`SequenceK`]({{ '/docs/datatypes/sequenceK/' | relative_url }})
-- [`SetK`]({{ '/docs/datatypes/setK/' | relative_url }})
-- [`MapK`]({{ '/docs/datatypes/mapK/' | relative_url }}) 
-- [`SortedMapK`]({{ '/docs/datatypes/sortedmapK/' | relative_url }})
+- [NonEmptyList]({{ '/docs/datatypes/nonemptylist/' | relative_url }})
+- [Ior]({{ '/docs/datatypes/ior/' | relative_url }})
+- [Const]({{ '/docs/datatypes/const/' | relative_url }})
+- [Coproduct]({{ '/docs/datatypes/coproduct/' | relative_url }})
+- [Try]({{ '/docs/datatypes/try/' | relative_url }})
+- [Validated]({{ '/docs/datatypes/validated/' | relative_url }})
+- [Free]({{ '/docs/datatypes/free' | relative_url }})
+- [FreeApplicative]({{ '/docs/datatypes/FreeApplicative' | relative_url }})
+- [ListK]({{ '/docs/datatypes/listK/' | relative_url }})
+- [SequenceK]({{ '/docs/datatypes/sequenceK/' | relative_url }})
+- [SetK]({{ '/docs/datatypes/setK/' | relative_url }})
+- [MapK]({{ '/docs/datatypes/mapK/' | relative_url }})
+- [SortedMapK]({{ '/docs/datatypes/sortedmapK/' | relative_url }})
 
 Additionally all instances of [`Order`]({{ '/docs/typeclasses/order' | relative_url }}) and their MTL variants implement the `Eq` typeclass directly since they are all subtypes of `Eq`

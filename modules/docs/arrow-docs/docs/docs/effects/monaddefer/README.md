@@ -114,9 +114,9 @@ While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/d
 
 Arrow provides [`MonadDeferLaws`]({{ '/docs/typeclasses/laws#monaddeferlaws' | relative_url }}) in the form of test cases for internal verification of lawful instances and third party apps creating their own `MonadDefer` instances.
 
-### Data types
+### Data Types
 
-The following datatypes in Arrow provide instances that adhere to the `MonadDefer` typeclass.
+The following data types in Arrow provide instances that adhere to the `MonadDefer` type class.
 
 - [IO]({{ '/docs/effects/io' | relative_url }})
 - [ObservableK]({{ '/docs/integrations/rx2' | relative_url }})

@@ -123,7 +123,7 @@ DeferredK.monadError().bindingCatch {
   val songUrl = getSongUrlAsync().bind()
   val musicPlayer = MediaPlayer.load(songUrl)
   val totalTime = musicPlayer.getTotaltime() // Oh oh, total time is 0
-  
+
   val timelineClick = audioTimeline.click().bind()
 
   val percent = (timelineClick / totalTime * 100).toInt()
@@ -162,7 +162,7 @@ Note that [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) provid
 Invoking this `Disposable` causes an `BindingCancellationException` in the chain which needs to be handled by the subscriber, similarly to what `Deferred` does.
 
 ```kotlin
-val (deferred, unsafeCancel) = 
+val (deferred, unsafeCancel) =
   DeferredK.monadDefer().bindingCancellable {
     val userProfile = DeferredK { getUserProfile("123") }.bind()
     val friendProfiles = userProfile.friends().map { friend ->
@@ -174,20 +174,19 @@ val (deferred, unsafeCancel) =
 deferred.unsafeRunAsync { result ->
   result.fold({ println("Boom! caused by $it") }, { println(it.toString()) })
 }
-  
+
 unsafeCancel()
 // Boom! caused by BindingCancellationException
 ```
 
-### Instances
 
-You can see all the type classes `DeferredK` implements below:
+## Available Instances
 
-```kotlin
-import arrow.*
-import arrow.effects.*
-import arrow.debug.*
-
-showInstances<ForDeferredK, Throwable>()
-// [Applicative, ApplicativeError, Functor, Monad, MonadError, MonadDefer, Async, Effect]
-```
+* [Applicative]({{ '/docs/typeclasses/Applicative' | relative_url }})
+* [ApplicativeError]({{ '/docs/typeclasses/ApplicativeError' | relative_url }})
+* [Functor]({{ '/docs/typeclasses/Functor' | relative_url }})
+* [Monad]({{ '/docs/typeclasses/Monad' | relative_url }})
+* [MonadError]({{ '/docs/typeclasses/MonadError' | relative_url }})
+* [MonadDefer]({{ '/docs/typeclasses/MonadDefer' | relative_url }})
+* [Async]({{ '/docs/effects/async' | relative_url }})
+* [Effect]({{ '/docs/effects/effect' | relative_url }})

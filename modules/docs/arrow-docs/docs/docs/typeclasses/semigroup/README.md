@@ -20,7 +20,7 @@ a.combine(b.combine(c))
 
 for all possible values of a, b ,c.
 
-There are instances of `Semigroup` defined for many types found in Arrow and the Kotlin std lib. 
+There are instances of `Semigroup` defined for many types found in Arrow and the Kotlin std lib.
 For example, `Int` values are combined using addition by default but multiplication is also associative and forms another `Semigroup`.
 
 ### Examples
@@ -56,9 +56,18 @@ Many of these types have methods defined directly on them, which allow for such 
 Additionaly `Semigroup` adds `+` syntax to all types for which a Semigroup instance exists:
 
 ```kotlin:ank
-Option.monoid<Int>(Int.semigroup()).run { 
+Option.monoid<Int>(Int.semigroup()).run {
   Option(1) + Option(2)
 }
 ```
 
 Contents partially adapted from [Scala Exercises Cat's Semigroup Tutorial](https://www.scala-exercises.org/cats/semigroup)
+
+
+### Data Types
+
+The following data types in Arrow provide instances that adhere to the `Semigroup` type class.
+
+- [NonEmptyList]({{ '/docs/datatypes/nonemptylist' | relative_url }})
+- [SequenceK]({{ '/docs/datatypes/sequencek' | relative_url }})
+- [SetK]({{ '/docs/datatypes/setk' | relative_url }})

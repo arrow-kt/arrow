@@ -44,3 +44,18 @@ Show.any().run { Option.just(1).show() }
 ```
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Show` instances for custom datatypes.
+
+
+### Data Types
+
+The following data types in Arrow provide instances that adhere to the `Show` type class.
+
+- [Either]({{ '/docs/datatypes/either' | relative_url }})
+- [Id]({{ '/docs/datatypes/id' | relative_url }})
+- [Ior]({{ '/docs/datatypes/ior' | relative_url }})
+- [NonEmptyList]({{ '/docs/datatypes/nonemptylist' | relative_url }})
+- [Option]({{ '/docs/datatypes/option' | relative_url }})
+- [SequenceK]({{ '/docs/datatypes/sequencek' | relative_url }})
+- [SetK]({{ '/docs/datatypes/setk' | relative_url }})
+- [Try]({{ '/docs/datatypes/try' | relative_url }})
+- [Validated]({{ '/docs/datatypes/validated' | relative_url }})

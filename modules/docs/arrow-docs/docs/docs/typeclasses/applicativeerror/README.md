@@ -47,7 +47,7 @@ IO.applicativeError().raiseError<Int>(RuntimeException("Paco"))
 
 This method requires a function that creates a new datatype from an error, `(E) -> Kind<F, A>`. This function is used as a catch + recover clause for the current instance, allowing it to return a new computation after a failure.
 
-If [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) has `flatMap` to allow mapping the value inside a *successful* datatype into a new datatype, you can think of `handleErrorWith` as a way that allows you to map the value of a *failed datatype into a new datatype. 
+If [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) has `flatMap` to allow mapping the value inside a *successful* datatype into a new datatype, you can think of `handleErrorWith` as a way that allows you to map the value of a *failed datatype into a new datatype.
 
 ```kotlin:ank
 val AE_EITHER = Either.applicativeError<Throwable>()
@@ -120,7 +120,7 @@ AE_EITHER.catch({ throw RuntimeException("Boom") } ,::identity)
 
 Arrow provides [`ApplicativeErrorLaws`]({{ '/docs/typeclasses/laws#applicativeerrorlaws' | relative_url }}) in the form of test cases for internal verification of lawful instances and third party apps creating their own `ApplicativeError` instances.
 
-### Data types
+### Data Types
 
 The following datatypes in Arrow provide instances that adhere to the `ApplicativeError` typeclass.
 

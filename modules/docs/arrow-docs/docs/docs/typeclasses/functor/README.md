@@ -92,7 +92,7 @@ as demonstrated in the [example](#example) above.
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }})
 
-### Data types
+### Data Types
 
 The following datatypes in Arrow provide instances that adhere to the `Functor` typeclass.
 

@@ -18,15 +18,15 @@ import arrow.core.*
 import arrow.effects.*
 
 IO.async()
-  .async { callback: (Either<Throwable, Int>) -> Unit -> 
-    callback(1.right()) 
+  .async { callback: (Either<Throwable, Int>) -> Unit ->
+    callback(1.right())
   }.fix().attempt().unsafeRunSync()
 ```
 
 ```kotlin:ank
 IO.async()
-  .async { callback: (Either<Throwable, Int>) -> Unit -> 
-    callback(RuntimeException().left()) 
+  .async { callback: (Either<Throwable, Int>) -> Unit ->
+    callback(RuntimeException().left())
   }.fix().attempt().unsafeRunSync()
 ```
 
@@ -42,7 +42,7 @@ The callback accepts `Either<Throwable, A>` as the return, where the left side o
 
 ```kotlin
 IO.async()
-  .async { callback: (Either<Throwable, Int>) -> Unit -> 
+  .async { callback: (Either<Throwable, Int>) -> Unit ->
     userFetcherWithCallback("1").startAsync({ user: User ->
       callback(user.left())
     }, { error: Exception ->
@@ -53,7 +53,7 @@ IO.async()
 
 ```kotlin
 IO.async()
-  .async { callback: (Either<Throwable, Int>) -> Unit -> 
+  .async { callback: (Either<Throwable, Int>) -> Unit ->
     userFromDatabaseObservable().subscribe({ user: User ->
       callback(user.left())
     }, { error: Exception ->
@@ -124,9 +124,9 @@ IO.monad().binding {
 
 Arrow provides [`AsyncLaws`]({{ '/docs/typeclasses/laws#asynclaws' | relative_url }}) in the form of test cases for internal verification of lawful instances and third party apps creating their own `Async` instances.
 
-### Data types
+### Data Types
 
-The following datatypes in Arrow provide instances that adhere to the `Async` typeclass.
+The following data types in Arrow provide instances that adhere to the `Async` type class.
 
 - [IO]({{ '/docs/effects/io' | relative_url }})
 - [ObservableK]({{ '/docs/integrations/rx2' | relative_url }})

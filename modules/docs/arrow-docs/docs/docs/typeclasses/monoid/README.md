@@ -50,7 +50,7 @@ ListK.foldable().run { listOf(1, 2, 3, 4, 5).k().foldMap(Int.monoid(), ::identit
 ListK.foldable().run { listOf(1, 2, 3, 4, 5).k().foldMap(String.monoid(), { it.toString() }) }
 ```
 
-To use this with a function that produces a tuple, we can define a Monoid for a tuple that will be valid for any tuple where the types it contains also have a Monoid available. 
+To use this with a function that produces a tuple, we can define a Monoid for a tuple that will be valid for any tuple where the types it contains also have a Monoid available.
 
 ```kotlin:ank:silent
 fun <A, B> monoidTuple(MA: Monoid<A>, MB: Monoid<B>): Monoid<Tuple2<A, B>> =
@@ -69,12 +69,20 @@ fun <A, B> monoidTuple(MA: Monoid<A>, MB: Monoid<B>): Monoid<Tuple2<A, B>> =
 This way we are able to combine both values in one pass, hurrah!
 
 ```kotlin:ank
-ListK.foldable().run { 
+ListK.foldable().run {
   val M = monoidTuple(Int.monoid(), String.monoid())
   val list = listOf(1, 1).k()
 
-  list.foldMap(M) { n: Int -> 
-   Tuple2(n, n.toString()) 
+  list.foldMap(M) { n: Int ->
+   Tuple2(n, n.toString())
   }
 }
 ```
+
+
+### Data Types
+
+The following data types in Arrow provide instances that adhere to the `Monoid` type class.
+
+- [SequenceK]({{ '/docs/datatypes/sequencek' | relative_url }})
+- [SetK]({{ '/docs/datatypes/setk' | relative_url }})

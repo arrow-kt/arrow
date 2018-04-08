@@ -101,7 +101,7 @@ Arrow already provides Applicative instances for most common datatypes both in A
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own Applicative instances for custom datatypes.
 
-### Data types
+### Data Types
 
 The following datatypes in Arrow provide instances that adhere to the `Applicative` typeclass.
 
@@ -128,4 +128,3 @@ since they are all subtypes of `Applicative`.
 
 [applicative_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-data/src/main/kotlin/arrow/typeclasses/Applicative.kt
 [applicative_law_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/ApplicativeLaws.kt
-
