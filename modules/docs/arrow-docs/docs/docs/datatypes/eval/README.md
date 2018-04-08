@@ -7,7 +7,7 @@ video: FcaaTJhCEcw
 
 ## Eval
 
-Eval is a monad that allows us to control evaluation and chain lazy operations that are not executed until `value()` is invoked. 
+Eval is a monad that allows us to control evaluation and chain lazy operations that are not executed until `value()` is invoked.
 
 Eval includes internally trampolining facilities which allows us to chain computations without fear of blowing up the stack.
 There are two different factors that play into evaluation: memoization and laziness.
@@ -64,17 +64,17 @@ fun odd(n: Int): Eval<Boolean> =
   }
 
 // if not wrapped in eval this type of computation would blow the stack and result in a StackOverflowError
-odd(100000).value() 
+odd(100000).value()
 ```
 
-### Available Instances
+## Available Instances
 
-[Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
-[Bimonad]({{ '/docs/typeclasses/bimonad' | relative_url }})
-[Comonad]({{ '/docs/typeclasses/comonad' | relative_url }})
-[Functor]({{ '/docs/typeclasses/functor' | relative_url }})
-[Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+* [Bimonad]({{ '/docs/typeclasses/bimonad' | relative_url }})
+* [Comonad]({{ '/docs/typeclasses/comonad' | relative_url }})
+* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
 
-# Credits
- 
+## Credits
+
 Contents partially adapted from [Cats Eval](https://typelevel.org/cats/datatypes/eval.html)
