@@ -12,7 +12,7 @@ This means `IO` is the data type of choice when interacting with the external en
 `IO` is used to represent operations that can be executed lazily and are capable of failing, generally with exceptions.
 This means that code wrapped inside `IO` will not throw exceptions until it is run, and those exceptions can be captured inside `IO` for the user to check.
 
-The first challenge for someone new to effects with`IO`is evaluating its result. Given that `IO` is used to wrap operations with the environment, 
+The first challenge for someone new to effects with`IO`is evaluating its result. Given that `IO` is used to wrap operations with the environment,
 the return value after completion is commonly used in another part of the program.
 Coming from an OOP background the simplest way to use the return value of `IO` is to consider it as an asynchronous operation you can register a callback for.
 
@@ -207,7 +207,7 @@ IO.async<Int> { callback ->
 IO.monad().binding {
     val file = getFile("/tmp/file.txt").bind()
     val lines = file.readLines().bind()
-    val average = 
+    val average =
       if (lines.isEmpty()) {
         0
       } else {
@@ -237,13 +237,14 @@ Puts the value `A` inside an `IO<A>` using `just`.
 
 IO implements all the operators common to all instances of [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}). Those include `map`, `flatMap`, and `handleErrorWith`.
 
-You can see all the type classes `IO` implements below:
 
-```kotlin
-import arrow.*
-import arrow.effects.*
-import arrow.debug.*
+## Available Instances
 
-showInstances<ForIO, Throwable>()
-// [Applicative, ApplicativeError, Functor, Monad, MonadError, MonadDefer, Async, Effect]
-```
+* [Applicative]({{ '/docs/typeclasses/Applicative' | relative_url }})
+* [ApplicativeError]({{ '/docs/typeclasses/ApplicativeError' | relative_url }})
+* [Functor]({{ '/docs/typeclasses/Functor' | relative_url }})
+* [Monad]({{ '/docs/typeclasses/Monad' | relative_url }})
+* [MonadError]({{ '/docs/typeclasses/MonadError' | relative_url }})
+* [MonadDefer]({{ '/docs/typeclasses/MonadDefer' | relative_url }})
+* [Async]({{ '/docs/effects/async' | relative_url }})
+* [Effect]({{ '/docs/effects/effect' | relative_url }})

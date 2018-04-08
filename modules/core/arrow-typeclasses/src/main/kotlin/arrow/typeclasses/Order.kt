@@ -18,7 +18,7 @@ interface Order<F> : Eq<F> {
    * - zero     if `x = y`
    * - positive if `x > y`
    *
-   * @param this@compare object to compare with [b]
+   * @receiver object to compare with [b]
    * @param b object to compare with [this@compare]
    * @returns zero objects are equal, a negative number if [this@compare] is less than [b], or a positive number if [this@compare] greater than [b].
    */
@@ -30,7 +30,7 @@ interface Order<F> : Eq<F> {
   /**
    * Check if [this@lt] is `lower than` [b]
    *
-   * @param this@lt object to compare with [b]
+   * @receiver object to compare with [b]
    * @param b object to compare with [this@lt]
    * @returns true if [this@lt] is `lower than` [b] and false otherwise
    */
@@ -39,7 +39,7 @@ interface Order<F> : Eq<F> {
   /**
    * Check if [this@lte] is `lower than or equal to` [b]
    *
-   * @param this@lte object to compare with [b]
+   * @receiver object to compare with [b]
    * @param b object to compare with [this@lte]
    * @returns true if [this@lte] is `lower than or equal to` [b] and false otherwise
    */
@@ -48,7 +48,7 @@ interface Order<F> : Eq<F> {
   /**
    * Check if [this@gt] is `greater than` [b]
    *
-   * @param this@gt object to compare with [b]
+   * @receiver object to compare with [b]
    * @param b object to compare with [this@gt]
    * @returns true if [this@gt] is `greater than` [b] and false otherwise
    */
@@ -57,7 +57,7 @@ interface Order<F> : Eq<F> {
   /**
    * Check if [this@gte] is `greater than or equal to` [b]
    *
-   * @param this@gte object to compare with [b]
+   * @receiver object to compare with [b]
    * @param b object to compare with [this@gte]
    * @returns true if [this@gte] is `greater than or equal to` [b] and false otherwise
    */
@@ -66,7 +66,7 @@ interface Order<F> : Eq<F> {
   /**
    * Determines the maximum of [this@max] and [b] in terms of order.
    *
-   * @param this@max object to compare with [b]
+   * @receiver object to compare with [b]
    * @param b object to compare with [this@max]
    * @returns the maximum [this@max] if it is greater than [b] or [b] otherwise
    */
@@ -75,7 +75,7 @@ interface Order<F> : Eq<F> {
   /**
    * Determines the minimum of [this@min] and [b] in terms of order.
    *
-   * @param this@min object to compare with [b]
+   * @receiver object to compare with [b]
    * @param b object to compare with [this@min]
    * @returns the minimum [this@min] if it is less than [b] or [b] otherwise
    */
@@ -84,7 +84,7 @@ interface Order<F> : Eq<F> {
   /**
    * Sorts [this@sort] and [b] in terms of order.
    *
-   * @param this@sort object to compare with [b]
+   * @receiver object to compare with [b]
    * @param b object to compare with [this@sort]
    * @returns a sorted [Tuple2] of [this@sort] and [b].
    */

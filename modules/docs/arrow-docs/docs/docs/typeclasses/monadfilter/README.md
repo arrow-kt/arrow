@@ -6,15 +6,15 @@ permalink: /docs/typeclasses/monadfilter/
 
 ## MonadFilter
 
-`MonadFilter` is a type class that abstracts away the option of interrupting computation if a given predicate is not satisfied. 
+`MonadFilter` is a type class that abstracts away the option of interrupting computation if a given predicate is not satisfied.
 
 All instances of `MonadFilter` provide syntax over their respective data types to comprehend monadically over their computation:
 
 ## continueWith
 
-Binding over `MonadFilter` instances with `bindingFilter` brings into scope the `continueIf` guard that requires a `Boolean` predicate as value. If the predicate is `true` the computation will continue and if the predicate returns `false` the computation is short-circuited returning monad filter instance `empty()` value. 
+Binding over `MonadFilter` instances with `bindingFilter` brings into scope the `continueIf` guard that requires a `Boolean` predicate as value. If the predicate is `true` the computation will continue and if the predicate returns `false` the computation is short-circuited returning monad filter instance `empty()` value.
 
-In the example below we demonstrate monadic comprehension over the `MonadFilter` instances for both `Option` and `ListK` since both data types can provide a safe `empty` value. 
+In the example below we demonstrate monadic comprehension over the `MonadFilter` instances for both `Option` and `ListK` since both data types can provide a safe `empty` value.
 
 When `continueIf` is satisfied the computation continues
 
@@ -44,7 +44,7 @@ ListK.monadFilter().bindingFilter {
 }
 ```    
 
-When `continueIf` returns `false` the computation is interrupted and the `empty()` value is returned 
+When `continueIf` returns `false` the computation is interrupted and the `empty()` value is returned
 
 ```kotlin:ank
 Option.monadFilter().bindingFilter {
@@ -68,7 +68,7 @@ ListK.monadFilter().bindingFilter {
 
 ##bindWithFilter
 
-Binding over `MonadFilter` instances with `bindingFilter` brings into scope the `bindWithFilter` guard that requires a `Boolean` predicate as value getting matched on the monad capturing inner value. If the predicate is `true` the computation will continue and if the predicate returns `false` the computation is short-circuited returning the monad filter instance `empty()` value. 
+Binding over `MonadFilter` instances with `bindingFilter` brings into scope the `bindWithFilter` guard that requires a `Boolean` predicate as value getting matched on the monad capturing inner value. If the predicate is `true` the computation will continue and if the predicate returns `false` the computation is short-circuited returning the monad filter instance `empty()` value.
 
 When `bindWithFilter` is satisfied the computation continues
 
@@ -105,3 +105,9 @@ ListK.monadFilter().bindingFilter {
  a + b
 }
 ```
+
+### Data Types
+
+The following data types in Arrow provide instances that adhere to the `MonadFilter` type class.
+
+- [Option]({{ '/docs/datatypes/option' | relative_url }})

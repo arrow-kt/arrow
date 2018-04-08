@@ -9,7 +9,7 @@ interface Show<in A> {
   /**
    * Given an object [this@show] of type [A] it returns its textual representation.
    *
-   * @param this@show object of type [A].
+   * @receiver object of type [A].
    * @returns a [String] representing [this@show].
    */
   fun A.show(): String
@@ -22,7 +22,7 @@ interface Show<in A> {
      * @param fshow function that defines a textual representation for type [A].
      * @returns a [Show] instance that is defined by the [fshow] function.
      */
-    operator inline fun <A> invoke(crossinline fshow: (A) -> String): Show<A> = object : Show<A> {
+    inline operator fun <A> invoke(crossinline fshow: (A) -> String): Show<A> = object : Show<A> {
       override fun A.show(): String =
         fshow(this)
     }

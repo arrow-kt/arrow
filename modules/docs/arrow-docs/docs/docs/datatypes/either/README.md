@@ -192,7 +192,7 @@ when(x) {
 }
 ```
 
-## Additional Syntax
+## Syntax
 
 Either can also map over the `left` value with `mapLeft` which is similar to map but applies on left instances.
 
@@ -307,17 +307,17 @@ val httpStatusCode = r.getOrHandle {
  // Right(b=6, dummy=kotlin.Unit)
  ```
 
-## Instances
+## Available Instances
 
-[Show]({{ '/docs/typeclasses/show' | relative_url }})
-[Eq]({{ '/docs/typeclasses/eq' | relative_url }})
-[Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
-[ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
-[Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
-[Functor]({{ '/docs/typeclasses/functor' | relative_url }})
-[Monad]({{ '/docs/typeclasses/monad' | relative_url }})
-[MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
-[SemigroupK]({{ '/docs/typeclasses/semigroupk' | relative_url }})
-[Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
-[TraverseFilter]({{ '/docs/typeclasses/traversefilter' | relative_url }})
-[Each]({{ '/docs/optics/each' | relative_url }})
+* [Show]({{ '/docs/typeclasses/show' | relative_url }})
+* [Eq]({{ '/docs/typeclasses/eq' | relative_url }})
+* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+* [ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
+* [Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
+* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+* [MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
+* [SemigroupK]({{ '/docs/typeclasses/semigroupk' | relative_url }})
+* [Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
+* [TraverseFilter]({{ '/docs/typeclasses/traversefilter' | relative_url }})
+* [Each]({{ '/docs/optics/each' | relative_url }})

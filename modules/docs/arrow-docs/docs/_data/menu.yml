@@ -22,32 +22,14 @@ options:
       - title: Error Handling
         url: /docs/patterns/error_handling/
 
-      - title: Monad Comprehensions
-        url: /docs/patterns/monad_comprehensions/
-
-      - title: Comonad Comprehensions
-        url: /docs/patterns/comonad_comprehensions/
-
-      - title: Applicative Builder
-        url: /docs/patterns/applicative_builder/
-
-      - title: Polymorphic programs
-        url: /docs/patterns/polymorphic_programs/
-
-      - title: Free Algebras
-        url: /docs/patterns/free_algebras/
-
       - title: Dependency Injection
         url: /docs/patterns/dependency_injection/
 
-      - title: Monad Transformers
-        url: /docs/patterns/monad_transformers/
+      - title: Monad Comprehensions
+        url: /docs/patterns/monad_comprehensions/
 
-      - title: Concurrency
-        url: /docs/patterns/concurrency/
-
-      - title: Optics
-        url: /docs/patterns/optics/
+      - title: Free Algebras
+        url: /docs/patterns/free_algebras/
 
   - title: Data Types
 
@@ -55,6 +37,9 @@ options:
 
       - title: Intro
         url: /docs/datatypes/intro/
+
+      - title: Basic Types
+        url: /docs/datatypes/basic/
 
       - title: Option
         url: /docs/datatypes/option/

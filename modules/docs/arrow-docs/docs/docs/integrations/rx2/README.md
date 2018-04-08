@@ -86,7 +86,7 @@ getSongUrlAsync()
   .flatMap {
     val totalTime = musicPlayer.getTotaltime()
     Observable.interval(100, Milliseconds)
-      .flatMap { 
+      .flatMap {
         Observable.create { musicPlayer.getCurrentTime() }
           .subscribeOn(AndroidSchedulers.mainThread())
           .map { tick -> (tick / totalTime * 100).toInt() }
@@ -117,14 +117,14 @@ ObservableK.monadError().bindingCatch {
 }.fix()
 ```
 
-Note that any unexpected exception, like `AritmeticException` when `totalTime` is 0, is automatically caught and wrapped inside the observable. 
+Note that any unexpected exception, like `AritmeticException` when `totalTime` is 0, is automatically caught and wrapped inside the observable.
 
 ### Subscription and cancellation
 
 Observables created with comprehensions like `bindingCatch` behave the same way regular observables do, including cancellation by disposing the subscription.
 
 ```kotlin
-val disposable = 
+val disposable =
   songObservable.value()
     .subscribe({ Log.d("Song $it") } , { prinln("Error $it") })
 
@@ -135,7 +135,7 @@ Note that [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) provid
 Invoking this `Disposable` causes an `BindingCancellationException` in the chain which needs to be handled by the subscriber, similarly to what `Deferred` does.
 
 ```kotlin
-val (observable, disposable) = 
+val (observable, disposable) =
   ObservableK.monadDefer().bindingCancellable {
     val userProfile = Observable.create { getUserProfile("123") }
     val friendProfiles = userProfile.friends().map { friend ->
@@ -151,11 +151,15 @@ disposable()
 // Boom! caused by BindingCancellationException
 ```
 
-```kotlin
-import arrow.*
-import arrow.effects.*
-import arrow.debug.*
+## Available Instances
 
-showInstances<ForObservableK, Throwable>()
-// [Applicative, ApplicativeError, Functor, Monad, MonadError, MonadDefer, Async, Effect, Foldable, Traverse]
-```
+* [Applicative]({{ '/docs/typeclasses/Applicative' | relative_url }})
+* [ApplicativeError]({{ '/docs/typeclasses/ApplicativeError' | relative_url }})
+* [Functor]({{ '/docs/typeclasses/Functor' | relative_url }})
+* [Monad]({{ '/docs/typeclasses/Monad' | relative_url }})
+* [MonadError]({{ '/docs/typeclasses/MonadError' | relative_url }})
+* [MonadDefer]({{ '/docs/typeclasses/MonadDefer' | relative_url }})
+* [Async]({{ '/docs/effects/async' | relative_url }})
+* [Effect]({{ '/docs/effects/effect' | relative_url }})
+* [Foldable]({{ '/docs/effects/foldable' | relative_url }})
+* [Traverse]({{ '/docs/effects/traverse' | relative_url }})

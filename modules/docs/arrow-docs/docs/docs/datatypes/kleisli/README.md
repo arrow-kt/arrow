@@ -4,7 +4,7 @@ title: Kleisli
 permalink: /docs/datatypes/kleisli/
 ---
 
-## Kleisli 
+## Kleisli
 Kleisli enables composition of functions that return a monadic value, for instance, an `Option<Int>` or an `Either<String, Int>`, without having functions take an `Option` or `Either` as a parameter.
 
 For example, we have the function `String.toInt()` which can throw a `NumberFormatException` and we want to do a safe conversion like this:
@@ -51,7 +51,7 @@ val intToDouble = {number:Int -> number.toDouble()}
 val optionIntDoubleKleisli = Kleisli { str: String ->
   if (str.toCharArray().all { it.isDigit() }) Some(intToDouble) else None
 }
-  
+
 optionIntKleisli.ap(Option.applicative(), optionIntDoubleKleisli).fix().run("1")
 ```
 
@@ -71,7 +71,7 @@ import arrow.data.fix
 val optionDoubleKleisli = Kleisli { str: String ->
   if (str.toCharArray().all { it.isDigit() }) Some(str.toDouble()) else None
 }
-  
+
 optionIntKleisli.flatMap(Option.monad(), { optionDoubleKleisli }).fix().run("1")
 ```
 
@@ -85,7 +85,7 @@ import arrow.data.fix
 val optionFromOptionKleisli = Kleisli { number: Int ->
    Some(number+1)
 }
-  
+
 optionIntKleisli.andThen(Option.monad(), optionFromOptionKleisli).fix().run("1")
 ```
 
@@ -103,8 +103,8 @@ optionIntKleisli.andThen(Option.monad(), Some(0)).fix().run("1")
 
 ## Available Instances
 
-[Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
-[ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
-[Functor]({{ '/docs/typeclasses/functor' | relative_url }})
-[Monad]({{ '/docs/typeclasses/monad' | relative_url }})
-[MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
+* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+* [ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
+* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+* [MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
