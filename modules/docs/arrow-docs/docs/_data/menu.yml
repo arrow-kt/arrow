@@ -56,6 +56,9 @@ options:
       - title: Intro
         url: /docs/datatypes/intro/
 
+      - title: Basic Types
+        url: /docs/datatypes/basic/
+
       - title: Option
         url: /docs/datatypes/option/
 

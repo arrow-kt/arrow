@@ -2,6 +2,12 @@ package arrow.instances
 
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Order
+import arrow.typeclasses.Show
+
+interface CharShowInstance: Show<Char> {
+  override fun Char.show(): String =
+    this.toString()
+}
 
 interface CharEqInstance : Eq<Char> {
   override fun Char.eqv(b: Char): Boolean = this == b
@@ -23,6 +29,9 @@ interface CharOrderInstance : Order<Char> {
 
   override fun Char.neqv(b: Char): Boolean = this != b
 }
+
+fun Char.Companion.show(): Show<Char> =
+  object : CharShowInstance {}
 
 fun Char.Companion.eq(): Eq<Char> =
   object : CharEqInstance {}
