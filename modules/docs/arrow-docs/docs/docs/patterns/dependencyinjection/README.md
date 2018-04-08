@@ -51,7 +51,7 @@ fun <F> multiplyBy2(FT: Functor<F>, fa: Kind<F, Int>): Kind<F, Int> =
   FT.run { fa.map { it * 2 } }
 ```
 
-If we have a block that does not return a value, it is recommended to use either `with(typeclass) { }` or `typeclass.apply { }`.
+If we have a block that does not return a value or `Unit`, I recommended to use either `with(typeclass) { }` to emphasize the difference.
 
 ```kotlin
 fun <F> printAllValues(S: Show<Kind<F, Int>>, fa: List<Kind<F, Int>>): Unit {
