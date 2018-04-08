@@ -393,7 +393,7 @@ object Api {
     bindingCatch {
       val id = fid.bind()
       val user = getUser(id).bind()
-      user.friendIds.map { api().getUser(it.id) }.bind()
+      user.friendIds.map { getUser(it.id) }.bind()
     }.handleError { listOf() }
 
   fun MonadError<F, Throwable>.createId(id: String): Kind<F, UserId> = ...
