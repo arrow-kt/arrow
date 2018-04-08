@@ -28,7 +28,7 @@ You can read more about all the [datatypes]({{ '/docs/datatypes/intro' | relativ
 Typeclasses define a set of functions associated to one type.
 This behavior is checked by a test suite called the "laws" for that typeclass.
 
-You can use typeclasses to add new free functionality to an existing type,
+You can use typeclasses as a DSL to add new free functionality to an existing type,
 or treat them as an abstraction placeholder for any one type that can implement the typeclass.
 
 Examples of these behaviors are comparability ([`Eq`]({{ '/docs/typeclasses/eq' | relative_url }})),
