@@ -4,7 +4,7 @@ title: Ior
 permalink: /docs/datatypes/ior/
 ---
 
-## Ior 
+## Ior
 
 `Ior` represents an inclusive-or relationship between two data types.
 This makes it very similar to the [`Either`](/docs/datatypes/either) data type, which represents an "exclusive-or" relationship.
@@ -134,15 +134,15 @@ Ior.Both("Warning", 41).toValidated()
 Ior.Both("Warning", 41).toOption()
 ```
 
-Available Instances:
+## Available Instances
 
-[Show]({{ '/docs/typeclasses/show' | relative_url }})
-[Eq]({{ '/docs/typeclasses/eq' | relative_url }})
-[Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
-[Functor]({{ '/docs/typeclasses/functor' | relative_url }})
-[Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
-[TraverseFilter]({{ '/docs/typeclasses/traversefilter' | relative_url }})
+* [Show]({{ '/docs/typeclasses/show' | relative_url }})
+* [Eq]({{ '/docs/typeclasses/eq' | relative_url }})
+* [Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
+* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+* [Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
+* [TraverseFilter]({{ '/docs/typeclasses/traversefilter' | relative_url }})
 
-# Credits
+## Credits
 
 Contents partially adapted from [Cats Ior](https://typelevel.org/cats/datatypes/ior.html)

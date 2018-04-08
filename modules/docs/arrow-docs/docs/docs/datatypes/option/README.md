@@ -164,22 +164,22 @@ Option.monad().binding {
 //None
 ```
 
-Available Instances:
+## Available Instances:
 
-[Show]({{ '/docs/typeclasses/show' | relative_url }})
-[Eq]({{ '/docs/typeclasses/eq' | relative_url }})
-[Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
-[ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
-[Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
-[Functor]({{ '/docs/typeclasses/functor' | relative_url }})
-[Monad]({{ '/docs/typeclasses/monad' | relative_url }})
-[MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
-[MonadFilter]({{ '/docs/typeclasses/monadfilter' | relative_url }})
-[Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
-[TraverseFilter]({{ '/docs/typeclasses/traversefilter' | relative_url }})
-[Each]({{ '/docs/optics/each' | relative_url }})
+* [Show]({{ '/docs/typeclasses/show' | relative_url }})
+* [Eq]({{ '/docs/typeclasses/eq' | relative_url }})
+* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+* [ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
+* [Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
+* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+* [MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
+* [MonadFilter]({{ '/docs/typeclasses/monadfilter' | relative_url }})
+* [Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
+* [TraverseFilter]({{ '/docs/typeclasses/traversefilter' | relative_url }})
+* [Each]({{ '/docs/optics/each' | relative_url }})
 
-# Credits
+## Credits
 
 Contents partially adapted from [Scala Exercises Option Tutorial](https://www.scala-exercises.org/std_lib/options)
 Originally based on the Scala Koans.

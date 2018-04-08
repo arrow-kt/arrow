@@ -4,7 +4,7 @@ title: State
 permalink: /docs/datatypes/state/
 ---
 
-## State 
+## State
 
 `State` is a structure that provides a functional approach to handling application state. `State<S, A>` is basically a function `S -> Tuple2(S, A)`, where `S` is the type that represents your state and `A` is the result the function produces. In addition to returning the result of type `A`, the function returns a new `S` value, which is the updated state.
 
@@ -115,13 +115,13 @@ If we only care about the resulting String and not the final state, then we can 
 stackOperations().runA(Nel.of("hello", "world", "!").some())
 ```
 
-Available Instances:
+## Available Instances
 
-[Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
-[Functor]({{ '/docs/typeclasses/functor' | relative_url }})
-[Monad]({{ '/docs/typeclasses/monad' | relative_url }})
-[MonadState]({{ '/docs/typeclasses/monadstate' | relative_url }})
+* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+* [MonadState]({{ '/docs/typeclasses/monadstate' | relative_url }})
 
-# Credits
+## Credits
 
 Contents partially adapted from [Cats State](https://typelevel.org/cats/datatypes/state.html)
