@@ -86,8 +86,7 @@ Either.monadError<Throwable>()
 ListK.traverse()
 ```
 
-If you're defining your own instances and would like for them to be discoverable in their corresponding datatypes
-you can generate it by annotating them as `@instance`, and Arrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create the extension functions for you.
+If you're defining your own instances and would like for them to be discoverable in their corresponding datatypes' companion object, you can generate it by annotating them as `@instance`, and Arrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create the extension functions for you.
 
 ### Type constructors
 
@@ -182,11 +181,16 @@ interface ListKFunctorInstance : Functor<ForListK> {
 }
 ```
 
-This interface extends `Functor` for the value `F` of `ListK`. We use an annotation processor `@instance` to generate an object out of an interface with all the default methods already defined, and to add that method to the global typeclass instance lookup. See that we respect the naming convention of datatype + typeclass + the word `Instance`.
+This interface extends `Functor` for the value `F` of `ListK`. We use an annotation processor `@instance` to generate an object out of an interface with all the default methods already defined, and to add an extension function to get it into the companion object of the datatype.
 
 ```kotlin
 @instance
 interface ListKFunctorInstance : Functor<ForListK>
+```
+
+```kotlin:ank
+// Somewhere else in the codebase
+ListK.functor()
 ```
 
 The signature of `map` once the types have been replaced takes a parameter `Kind<ForListK, A>`, which is the receiver, and a mapping function from `A` to `B`. This means that map will work for all instances of `ListK<A>` for whatever the value of `A` can be.
