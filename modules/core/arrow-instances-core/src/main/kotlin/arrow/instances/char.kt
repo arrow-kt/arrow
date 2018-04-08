@@ -4,7 +4,7 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.Order
 import arrow.typeclasses.Show
 
-interface CharShowInstance: Show<Char> {
+interface CharShowInstance : Show<Char> {
   override fun Char.show(): String =
     this.toString()
 }
