@@ -10,7 +10,7 @@ video: 3y9KI7XWXSY
 Typeclasses define a set of functions associated to one generic type.
 These functions can be either *extension functions* for the type, or *constructor functions*.
 
-You can use typeclasses to access new free functionality for an existing type,
+You can use typeclasses as a DSL to access new free functionality for an existing type,
 or treat them as an abstraction placeholder for any one type that can implement the typeclass.
 The extension functions are scoped within the typeclass so they do not pollute the global namespace.
 
