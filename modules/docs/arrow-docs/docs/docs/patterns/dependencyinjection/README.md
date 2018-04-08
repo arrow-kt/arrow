@@ -13,15 +13,13 @@ This enables programs that are not coupled to specific datatype implementations.
 The technique demonstrated below to write polymorphic code is available for all other typeclasses besides [`Functor`]({{ '/docs/typeclasses/functor' | relative_url }}).
 
 ```kotlin
-import arrow.typeclasses.*
-
 fun <F> multiplyBy2(FT: Functor<F>, fa: Kind<F, Int>): Kind<F, Int> =
   /* ... */
 
-multiplyBy2(Option.functor(), Option(1))
+Option.functor().multiplyBy2(Option(1))
 // Some(2)
 
-multiplyBy2(Try.functor(), Try.just(1))
+Try.functor().multiplyBy2(Try.just(1))
 // Success(2)
 ```
 
@@ -65,20 +63,18 @@ fun <F> printAllValues(S: Show<Kind<F, Int>>, fa: List<Kind<F, Int>>): Unit {
 
 An extension function is applied to a type, that becomes bound to `this` and enables calling all its functions without using `this.method()`. If we declare a function to depend on the typeclass, we get automatic access to the extension functions declared inside.
 
-```kotlin:ank
-import arrow.typeclasses.*
-
+```kotlin
 fun <F> Functor<F>.multiplyBy2(fa: Kind<F, Int>): Kind<F, Int> =
   fa.map { it * 2 }
 ```
 
 And we can call it on the typeclass instances:
 
-```kotlin:ank
+```kotlin
 multiplyBy2(Option.functor(), Try.just(1))
 ```
 
-```kotlin:ank
+```kotlin
 multiplyBy2(Try.functor(), Try.just(1))
 ```
 
@@ -128,9 +124,9 @@ Option.functor().test({ it.some() })
 ```
 
 ```kotlin
-fun <F> MonadError<F, Throwable>.ankMonadErrorInterpreter(): FunctionK<AnkOpsHK, F> =
-  object : FunctionK<AnkOpsHK, F> {
-    override fun <A> invoke(fa: HK<AnkOpsHK, A>): HK<F, A> {
+fun <F> MonadError<F, Throwable>.ankMonadErrorInterpreter(): FunctionK<ForAnkOps, F> =
+  object : FunctionK<ForAnkOps, F> {
+    override fun <A> invoke(fa: Kind<ForAnkOps, A>): Kind<F, A> {
       val op = fa.ev()
       return when (op) {
           is AnkOps.CreateTarget -> catch { createTargetImpl(op.source, op.target) }
@@ -141,7 +137,7 @@ fun <F> MonadError<F, Throwable>.ankMonadErrorInterpreter(): FunctionK<AnkOpsHK,
           is AnkOps.CompileCode -> catch { compileCodeImpl(op.snippets, op.compilerArgs) }
           is AnkOps.ReplaceAnkToLang -> catch { replaceAnkToLangImpl(op.compilationResults) }
           is AnkOps.GenerateFiles -> catch { generateFilesImpl(op.candidates, op.newContents) }
-      } as HK<F, A>
+      }
     }
   }
 ```
@@ -353,7 +349,7 @@ Cool, once we have all the pieces in place, explained and understood, let's ment
 
 ## Using DI to inject any object
 
-Nnow that you know how to define new types to declare multiple dependencies, and add fields to prevent collision between typeclasses in the same hierarchy,
+Now that you know how to define new types to declare multiple dependencies, and add fields to prevent collision between typeclasses in the same hierarchy,
 what prevents you from adding arbitrary data to any fields of the type? Well, the answer is nothing :D
 
 Let's grab one of our previous examples and refactor it
@@ -375,11 +371,15 @@ class UserFetcher<F>(ME: MonadError<F, Throwable>, val api: ApiService): MonadEr
 On the first step, we'll create a new type enclosing all the dependencies:
 
 ```kotlin
-interface FetcherDependencies: MonadError<F, Throwable>, ApiService {
+interface FetcherDependencies: MonadError<F, Throwable> {
+
+  fun api(): ApiService
 
   companion object {
     operator fun invoke(ME: MonadError<F, Throwable>, api: ApiService): FetcherDependencies =
-      object: FetcherDependencies, MonadError<F, Throwable> by ME, ApiService by Api
+      object: FetcherDependencies, MonadError<F, Throwable> by ME {
+       override fun api() = api
+      }
   }
 }
 ```
@@ -392,8 +392,8 @@ object Api {
   fun FetcherDependencies.getUserFriends(fid: Kind<F, UserId>): Kind<F, List<User>> =
     bindingCatch {
       val id = fid.bind()
-      val user = getUser(id).bind()
-      user.friendIds.map { getUser(it.id) }.bind()
+      val user = api().getUser(id).bind()
+      user.friendIds.map { api().getUser(it.id) }.bind()
     }.handleError { listOf() }
 
   fun MonadError<F, Throwable>.createId(id: String): Kind<F, UserId> = ...
@@ -467,7 +467,7 @@ The expected lifecycle of the Dependencies object is the same as the Activity, a
 import Api.*
 
 class SettingsActivity: Activity {
-  val deps = FetcherDependencies(Either.monadError(), ApiService())
+  val deps = FetcherDependencies(Either.monadError(), ActivityApiService(this))
 
   override fun onResume() {
     val id = deps.createId("1234")
