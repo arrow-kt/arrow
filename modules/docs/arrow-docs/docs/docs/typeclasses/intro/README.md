@@ -8,11 +8,15 @@ video: 3y9KI7XWXSY
 ## Typeclasses
 
 Typeclasses define a set of functions associated to one generic type.
-These functions can be either *extension functions* for the type, or *constructor functions*.
+All methods inside a typeclass will have one of two shapes:
+
+* Constructor: create a new `Kind<F, A>` from a value, a function, an error... Some examples are `just`, `raise`, `async`, `defer`, or `binding`.
+
+* Extensions: add new functionality to a value `A` or a container `Kind<F, A>`, provided by an extension function. For example, `map`, `eqv`, `show`, `traverse`, `sequence`, or `combineAll`.
 
 You can use typeclasses as a DSL to access new free functionality for an existing type,
 or treat them as an abstraction placeholder for any one type that can implement the typeclass.
-The extension functions are scoped within the typeclass so they do not pollute the global namespace.
+The extension functions are scoped within the typeclass so they do not pollute the global namespace!
 
 What differentiates typeclasses from regular OOP inheritance is that typeclasses are meant to be implemented *outside* of their types.
 The association is done using generic parametrization rather than subclassing by implementing the interface. This has multiple benefits:
