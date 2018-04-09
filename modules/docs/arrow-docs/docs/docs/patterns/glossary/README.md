@@ -42,7 +42,7 @@ One example, the typeclass `Eq` parametrized to `F` defines equality between two
 
 ```kotlin
 interface Eq<F> {
-  fun eqv(a: F, b: F): Boolean
+  fun F.eqv(b: F): Boolean
 }
 ```
 
