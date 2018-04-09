@@ -96,4 +96,4 @@ Kotlin Brooklyn Meetup, Jan ’18 - version 0.6.1
 * [Either](http://danielecampogiani.com/blog/2018/02/android-functional-validation-3-either/)
 * [Validated](http://danielecampogiani.com/blog/2018/02/android-functional-validation-4-validated/)
 
-Dec ’17 - kategory version 0.3.11
+April ’18 - version 0.7
