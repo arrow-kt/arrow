@@ -4,7 +4,7 @@ title: Dependency Injection
 permalink: /docs/patterns/dependency_injection/
 ---
 
-If you would like to know about using the `Reader` datatype instead, visit [this article](https://medium.com/@JorgeCastilloPr/kotlin-dependency-injection-with-the-reader-monad-7d52f94a482e) by [Jorge Castillo](https://github.com/JorgeCastilloPrz).
+If you would like to know about using the [`Reader`]({{ '/docs/datatypes/reader' | relative_url }}) datatype instead, visit [this article](https://medium.com/@JorgeCastilloPr/kotlin-dependency-injection-with-the-reader-monad-7d52f94a482e) by [Jorge Castillo](https://github.com/JorgeCastilloPrz).
 
 ## Dependency Injection using the `Typeclassless` technique
 
@@ -120,7 +120,7 @@ object FunctorLaws {
 
 import arrow.test.FunctorLaws.test
 
-Option.functor().test({ it.some() })
+Option.functor().test { it.some() }
 ```
 
 ```kotlin
@@ -378,7 +378,7 @@ interface FetcherDependencies: MonadError<F, Throwable> {
   companion object {
     operator fun invoke(ME: MonadError<F, Throwable>, api: ApiService): FetcherDependencies =
       object: FetcherDependencies, MonadError<F, Throwable> by ME {
-       override fun api() = api
+        override fun api() = api
       }
   }
 }
@@ -423,7 +423,7 @@ All the promises of OOP, fulfilled with simple functions and interfaces.
 import Api.*
 
 with (Option.monadError()) {
-  createId("123") shouldBe 123
+  createId("123") shouldBe Some(123)
 
   createId("-123") shouldBe None
 
