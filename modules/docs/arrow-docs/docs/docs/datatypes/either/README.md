@@ -10,7 +10,7 @@ video: q6HpChSq-xc
 In day-to-day programming, it is fairly common to find ourselves writing functions that can fail.
 For instance, querying a service may result in a connection issue, or some unexpected JSON response.
 
-To communicate these errors it has become common practice to throw exceptions. However,
+To communicate these errors it has become common practice to throw exceptions; however,
 exceptions are not tracked in any way, shape, or form by the compiler. To see what
 kind of exceptions (if any) a function may throw, we have to dig through the source code.
 Then to handle these exceptions, we have to make sure we catch them at the call site. This
@@ -20,27 +20,28 @@ all becomes even more unwieldy when we try to compose exception-throwing procedu
 import arrow.*
 import arrow.core.*
 
-val throwsSomeStuff: (Int) -> Double = {x -> x.toDouble()}
+val throwsSomeStuff: (Int) -> Double = { T}
 val throwsOtherThings: (Double) -> String = {x -> x.toString()}
 val moreThrowing: (String) -> List<String> = {x -> listOf(x) }
 val magic = throwsSomeStuff.andThen(throwsOtherThings).andThen(moreThrowing)
 magic
 ```
 
-Assume we happily throw exceptions in our code. Looking at the types, any of those functions can
-throw any number of exceptions, we don't know. When we compose, exceptions from any of the constituent
-functions can be thrown. Moreover, they may throw the same kind of exception
-(e.g. `IllegalArgumentException`) and thus it gets tricky tracking exactly where that exception came from.
+Assume we happily throw exceptions in our code.
 
-How then do we communicate an error? By making it explicit in the data type we return.
+Looking at the types of the above functions, any of them could throw any number of exceptions -- 
+we simply do not know. When we compose, exceptions from any of the constituent
+functions can be thrown. Moreover, they may throw the same kind of exception
+(e.g. `IllegalArgumentException`) and thus it gets tricky tracking exactly where an exception came from.
+
+So how then do we communicate an error? By making it explicit in the data type we return.
 
 ## Either vs Validated
 
 In general, `Validated` is used to accumulate errors, while `Either` is used to short-circuit a computation
 upon the first error. For more information, see the `Validated` vs `Either` section of the `Validated` documentation.
 
-More often than not we want to just bias towards one side and call it a day - by convention,
-the right side is most often chosen.
+By convention the right hand side of an `Either` is used to hold successful values.
 
 ```kotlin:ank
 val right: Either<String, Int> = Either.Right(5)
@@ -56,22 +57,27 @@ Because `Either` is right-biased, it is possible to define a Monad instance for 
 Since we only ever want the computation to continue in the case of `Right` (as captured by the right-bias nature),
 we fix the left type parameter and leave the right one free.
 
-So the flatMap method is right-biased:
+So the map and flatMap methods are right-biased:
 
 ```kotlin:ank
 val right: Either<String, Int> = Either.Right(5)
-right.flatMap{Either.Right(it + 1)}
+right.flatMap{Either.Right(it + 1)} // Also increments to Right(b=6)
+```
 
+```kotlin:ank
 val left: Either<String, Int> = Either.Left("Something went wrong")
-left.flatMap{Either.Right(it + 1)}
+left.flatMap{Either.Right(it + 1)} 
 ```
 
 ## Using Either instead of exceptions
 
-As a running example, we will have a series of functions that will parse a string into an integer,
-take the reciprocal, and then turn the reciprocal into a string.
+As a running example, we will have a series of functions that will: 
 
-In exception-throwing code, we would have something like this:
+* Parse a string into an integer
+* Calculate the reciprocal
+* Convert the reciprocal into a string
+
+Using exception-throwing code, we could write something like this:
 
 ```kotlin:ank:silent
 // Exception Style
@@ -178,8 +184,8 @@ fun magic(s: String): Either<Error, String> =
 
 For our little module, we enumerate any and all errors that can occur. Then, instead of using
 exception classes as error values, we use one of the enumerated cases. Now when we pattern match,
-we get much nicer matching. Moreover, since Error is sealed, no outside code can add additional
-subtypes which we might fail to handle.
+the compiler will check that we have handled all possibilities, without requiring an `else` branch; 
+moreover since Error is sealed, no outside code can add additional subtypes which we might fail to handle.
 
 ```kotlin
 val x = magic("2")
