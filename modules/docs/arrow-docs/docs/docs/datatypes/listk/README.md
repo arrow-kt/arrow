@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: ListK
-permalink: /docs/datatypes/listK/
+permalink: /docs/datatypes/listk/
 ---
 
 ## ListK

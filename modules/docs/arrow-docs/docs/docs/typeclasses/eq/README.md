@@ -87,10 +87,10 @@ Most of the datatypes in Arrow that are not related to functions provide instanc
 - [Validated]({{ '/docs/datatypes/validated/' | relative_url }})
 - [Free]({{ '/docs/datatypes/free' | relative_url }})
 - [FreeApplicative]({{ '/docs/datatypes/FreeApplicative' | relative_url }})
-- [ListK]({{ '/docs/datatypes/listK/' | relative_url }})
-- [SequenceK]({{ '/docs/datatypes/sequenceK/' | relative_url }})
-- [SetK]({{ '/docs/datatypes/setK/' | relative_url }})
-- [MapK]({{ '/docs/datatypes/mapK/' | relative_url }})
-- [SortedMapK]({{ '/docs/datatypes/sortedmapK/' | relative_url }})
+- [ListK]({{ '/docs/datatypes/listk/' | relative_url }})
+- [SequenceK]({{ '/docs/datatypes/sequencek/' | relative_url }})
+- [SetK]({{ '/docs/datatypes/setk/' | relative_url }})
+- [MapK]({{ '/docs/datatypes/mapk/' | relative_url }})
+- [SortedMapK]({{ '/docs/datatypes/sortedmapk/' | relative_url }})
 
 Additionally all instances of [`Order`]({{ '/docs/typeclasses/order' | relative_url }}) and their MTL variants implement the `Eq` typeclass directly since they are all subtypes of `Eq`

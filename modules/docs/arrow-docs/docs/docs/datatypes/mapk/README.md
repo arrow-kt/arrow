@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: MapK
-permalink: /docs/datatypes/mapK/
+permalink: /docs/datatypes/mapk/
 ---
 
 ## MapK

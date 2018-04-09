@@ -49,5 +49,5 @@ See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | rela
 
 The following datatypes in Arrow provide instances that adhere to the `At` typeclass.
 
-- [SetK]({{ '/docs/datatypes/setK' | relative_url }})
-- [MapK]({{ '/docs/datatypes/mapK' | relative_url }})
+- [SetK]({{ '/docs/datatypes/setk' | relative_url }})
+- [MapK]({{ '/docs/datatypes/mapk' | relative_url }})

@@ -43,6 +43,6 @@ The following datatypes in Arrow provide instances that adhere to the `Index` ty
 
 - [String]
 - [NonEmptyList]({{ '/docs/datatypes/nonemptylist' | relative_url }})
-- [ListK]({{ '/docs/datatypes/listK' | relative_url }})
-- [SequenceK]({{ '/docs/datatypes/sequenceK' | relative_url }})
-- [MapK]({{ '/docs/datatypes/mapK' | relative_url }})
+- [ListK]({{ '/docs/datatypes/listk' | relative_url }})
+- [SequenceK]({{ '/docs/datatypes/sequencek' | relative_url }})
+- [MapK]({{ '/docs/datatypes/mapk' | relative_url }})

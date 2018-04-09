@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: SequenceK
-permalink: /docs/datatypes/sequenceK/
+permalink: /docs/datatypes/sequencek/
 ---
 
 ## SequenceK
