@@ -9,7 +9,7 @@ permalink: /docs/patterns/glossary/
 Note: This section keeps on growing! Keep an eye on it from time to time.
 
 This document is meant to be an introduction to Functional Programming for people from all backgrounds.
-We'll go through some of the key concept and then dive into their implementation and use in real world cases.
+We'll go through some of the key concepts and then dive into their implementation and use in real world cases.
 
 ### Datatypes
 
