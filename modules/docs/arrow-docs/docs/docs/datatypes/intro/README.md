@@ -86,15 +86,15 @@ Data contains the bulk of the datatypes provided by Arrow. We can separate them 
 
 These types wrap over some of Kotlin's collections and functions to give them capabilities related to [typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}) provided by Arrow.
 
-- [`ListK`]({{ '/docs/datatypes/listK/' | relative_url }})
+- [`ListK`]({{ '/docs/datatypes/listk/' | relative_url }})
 
-- [`SequenceK`]({{ '/docs/datatypes/sequenceK/' | relative_url }})
+- [`SequenceK`]({{ '/docs/datatypes/sequencek/' | relative_url }})
 
-- [`SetK`]({{ '/docs/datatypes/setK/' | relative_url }})
+- [`SetK`]({{ '/docs/datatypes/setk/' | relative_url }})
 
-- [`MapK`]({{ '/docs/datatypes/mapK/' | relative_url }}) 
+- [`MapK`]({{ '/docs/datatypes/mapk/' | relative_url }})
 
-- [`SortedMapK`]({{ '/docs/datatypes/sortedmapK/' | relative_url }})
+- [`SortedMapK`]({{ '/docs/datatypes/sortedmapk/' | relative_url }})
 
 - [`Function0`]({{ '/docs/datatypes/function0/' | relative_url }})
 
@@ -125,7 +125,7 @@ TODO
 
 #### Effects
 
-All effects are different implementations of the same abstraction: lazy execution of code that can move to other threads and cause exceptions. 
+All effects are different implementations of the same abstraction: lazy execution of code that can move to other threads and cause exceptions.
 They are more general than the other datatypes as they combine the abstractions of several of them.
 
 - [`IO`]({{ '/docs/effects/io/' | relative_url }})

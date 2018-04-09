@@ -57,19 +57,19 @@ options:
         url: /docs/datatypes/nonemptylist/
 
       - title: ListK
-        url: /docs/datatypes/listK/
+        url: /docs/datatypes/listk/
 
       - title: SequenceK
-        url: /docs/datatypes/sequenceK/
+        url: /docs/datatypes/sequencek/
 
       - title: SetK
-        url: /docs/datatypes/setK/
+        url: /docs/datatypes/setk/
 
       - title: MapK
-        url: /docs/datatypes/mapK/
+        url: /docs/datatypes/mapk/
 
       - title: SortedMapK
-        url: /docs/datatypes/sortedmapK/
+        url: /docs/datatypes/sortedmapk/
 
       - title: Ior
         url: /docs/datatypes/ior/
@@ -266,7 +266,7 @@ options:
 
       - title: Rx2
         url: /docs/integrations/rx2/
-        
+
       - title: kotlinx.coroutines
         url: /docs/integrations/kotlinxcoroutines/
 
