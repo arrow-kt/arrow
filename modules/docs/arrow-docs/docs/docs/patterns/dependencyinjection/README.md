@@ -16,10 +16,10 @@ The technique demonstrated below to write polymorphic code is available for all 
 fun <F> multiplyBy2(FT: Functor<F>, fa: Kind<F, Int>): Kind<F, Int> =
   /* ... */
 
-Option.functor().multiplyBy2(Option(1))
+multiplyBy2(Option.functor(), Option(1))
 // Some(2)
 
-Try.functor().multiplyBy2(Try.just(1))
+multiplyBy2(Try.functor(), Try.just(1))
 // Success(2)
 ```
 
@@ -71,11 +71,11 @@ fun <F> Functor<F>.multiplyBy2(fa: Kind<F, Int>): Kind<F, Int> =
 And we can call it on the typeclass instances:
 
 ```kotlin
-multiplyBy2(Option.functor(), Try.just(1))
+Option.functor().multiplyBy2(Try.just(1))
 ```
 
 ```kotlin
-multiplyBy2(Try.functor(), Try.just(1))
+Try.functor().multiplyBy2(Try.just(1))
 ```
 
 The same applies to functions without a return value, so you don't have to remember to use the right function.
