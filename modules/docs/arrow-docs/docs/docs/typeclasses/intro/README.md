@@ -31,7 +31,7 @@ These test suites are available in the module `arrow-tests`.
 #### Example
 
 You can read all about how Arrow implements typeclasses in the [glossary]({{ '/docs/patterns/glossary/' | relative_url }}).
-If you'd like to use typeclasses effectively in your client code you can head to the docs entry about [`Dependency Injection`]({{ '/docs/patterns/dependency_injection' | relative_url }}).
+If you'd like to use typeclasses effectively in your client code you can head to the docs entry about [dependency injection]({{ '/docs/patterns/dependency_injection' | relative_url }}).
 
 For this short example we will make available the scope of the typeclass `Eq` implemented for the type `String`, by using `run`.
 This will make all the `Eq` extension functions, such as `eqv` and `neqv`, available inside the `run` block.
