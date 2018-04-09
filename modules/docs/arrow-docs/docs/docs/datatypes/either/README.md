@@ -20,21 +20,18 @@ all becomes even more unwieldy when we try to compose exception-throwing procedu
 import arrow.*
 import arrow.core.*
 
-val throwsSomeStuff: (Int) -> Double = { T}
+val throwsSomeStuff: (Int) -> Double = {x -> x.toDouble()}
 val throwsOtherThings: (Double) -> String = {x -> x.toString()}
-val moreThrowing: (String) -> List<String> = {x -> listOf(x) }
+val moreThrowing: (String) -> List<String> = {x -> listOf(x)}
 val magic = throwsSomeStuff.andThen(throwsOtherThings).andThen(moreThrowing)
 magic
 ```
 
-Assume we happily throw exceptions in our code.
-
-Looking at the types of the above functions, any of them could throw any number of exceptions -- 
-we simply do not know. When we compose, exceptions from any of the constituent
+Assume we happily throw exceptions in our code. Looking at the types of the above functions, any of them could throw any number of exceptions -- we do not know. When we compose, exceptions from any of the constituent
 functions can be thrown. Moreover, they may throw the same kind of exception
 (e.g. `IllegalArgumentException`) and thus it gets tricky tracking exactly where an exception came from.
 
-So how then do we communicate an error? By making it explicit in the data type we return.
+How then do we communicate an error? By making it explicit in the data type we return.
 
 ## Either vs Validated
 
@@ -61,12 +58,12 @@ So the map and flatMap methods are right-biased:
 
 ```kotlin:ank
 val right: Either<String, Int> = Either.Right(5)
-right.flatMap{Either.Right(it + 1)} // Also increments to Right(b=6)
+right.flatMap{Either.Right(it + 1)}
 ```
 
 ```kotlin:ank
 val left: Either<String, Int> = Either.Left("Something went wrong")
-left.flatMap{Either.Right(it + 1)} 
+left.flatMap{Either.Right(it + 1)}
 ```
 
 ## Using Either instead of exceptions
@@ -184,8 +181,8 @@ fun magic(s: String): Either<Error, String> =
 
 For our little module, we enumerate any and all errors that can occur. Then, instead of using
 exception classes as error values, we use one of the enumerated cases. Now when we pattern match,
-the compiler will check that we have handled all possibilities, without requiring an `else` branch; 
-moreover since Error is sealed, no outside code can add additional subtypes which we might fail to handle.
+we are able to comphrensively handle failure without resulting to an `else` branch; moreover
+since Error is sealed, no outside code can add additional subtypes which we might fail to handle.
 
 ```kotlin
 val x = magic("2")
