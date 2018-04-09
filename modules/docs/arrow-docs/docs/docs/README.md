@@ -30,7 +30,7 @@ Use the list below to learn more about Λrrow's main features.
 
 Make sure to have the latest version of JDK 1.8 installed.
 
-In your projects root `build.gradle` append the jcenter repository to your list of repositories.
+In your project's root `build.gradle` append the jcenter repository to your list of repositories.
 
 ```groovy
 allprojects {
