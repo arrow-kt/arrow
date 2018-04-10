@@ -9,7 +9,7 @@ permalink: /docs/patterns/glossary/
 Note: This section keeps on growing! Keep an eye on it from time to time.
 
 This document is meant to be an introduction to Functional Programming for people from all backgrounds.
-We'll go through some of the key concepts, and then dive on their implementation and use in real world cases.
+We'll go through some of the key concepts and then dive into their implementation and use in real world cases.
 
 ### Datatypes
 
@@ -22,16 +22,16 @@ catching exceptions with [`Try`]({{ '/docs/datatypes/try' | relative_url }}),
 or interacting with the platform the program runs in using [`IO`]({{ '/docs/effects/io' | relative_url }}).
 
 You can read more about all the [datatypes]({{ '/docs/datatypes/intro' | relative_url }}) that Arrow provides in its [section of the docs]({{ '/docs/datatypes/intro' | relative_url }}).
-
+ 
 ### Typeclasses
 
 Typeclasses define a set of functions associated to one type.
 This behavior is checked by a test suite called the "laws" for that typeclass.
 
-You can use typeclasses as a DSL to add new free functionality to an existing type,
+You can use typeclasses as a DSL to add new free functionality to an existing type
 or treat them as an abstraction placeholder for any one type that can implement the typeclass.
 
-Examples of these behaviors are comparability ([`Eq`]({{ '/docs/typeclasses/eq' | relative_url }})),
+Examples of these behaviors are: comparability ([`Eq`]({{ '/docs/typeclasses/eq' | relative_url }})),
 composability ([`Monoid`]({{ '/docs/typeclasses/monoid' | relative_url }})),
 its contents can be mapped from one type to another ([`Functor`]({{ '/docs/typeclasses/functor' | relative_url }})),
 or error recovery ([`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }})).
@@ -98,10 +98,10 @@ They're called constructors because they're similar to a factory function where 
 So, we could say that after applying the parameter `Int` to the type constructor `ListK<A>` it returns a `ListK<Int>`.
 As `ListK<Int>` isn't parametrized in any generic value it is not considered a type constructor anymore, just a regular type.
 
-Like functions, a type constructor with several parameters like [`Either<L, R>`]({{ '/docs/datatypes/either' | relative_url }}) can be partially applied for one of them to return another type constructor with one fewer parameter,
-for example applying `Throwable` to the left side yields `Either<Throwable, A>`, or applying `String` to the right side results in `Either<E, String>`.
+Like functions, a type constructor with several parameters like [`Either<L, R>`]({{ '/docs/datatypes/either' | relative_url }}) can be partially applied for one of them to return another type constructor with one fewer parameter.
+For example, applying `Throwable` to the left side yields `Either<Throwable, A>`, or applying `String` to the right side results in `Either<E, String>`.
 
-Type constructors are useful when matched with typeclasses because they help us represent instances of parametrized classes -the containers- that work for all generic parameters -the content-.
+Type constructors are useful when matched with typeclasses because they help us represent instances of parametrized classes — the containers — that work for all generic parameters — the content.
 As type constructors is not a first class feature in Kotlin, Λrrow uses an interface `Kind<F, A>` to represent them.
 Kind stands for Higher Kind, which is the name of the language feature that allows working directly with type constructors.
 
@@ -277,7 +277,7 @@ Option.applicative().run {
 // Some(value = Tuple2(a = User(765), b = User(127)))
 ```
 
-To make the typeclass scope available to a whole class you can use simple delegation, like this:
+It is also possible to use a form of [`Dependency Injection`]({{ '/docs/patterns/dependency_injection' | relative_url }}) to make the typeclass scope available to a whole class. For example, using simple delegation:
 
 ```kotlin
 class UserFetcher<F>(AP: Applicative<F>): Applicative<F> by AP {
@@ -289,4 +289,4 @@ UserFetcher(Option.applicative()).genUser().fix()
 // Some(value = User(943))
 ```
 
-To learn all about this `Typeclassless` technique of you can head to the docs entry about [`Dependency Injection`]({{ '/docs/patterns/dependency_injection' | relative_url }}).
+To learn more about this `Typeclassless` technique you should head to the [`Dependency Injection`]({{ '/docs/patterns/dependency_injection' | relative_url }}) documentation.
