@@ -40,8 +40,8 @@ data class FunctionSignature(
   fun generate(): String {
     val typeParamsS = tparams.joinToString(prefix = "<`", separator = "`, `", postfix = "`>")
     val argsS = args.joinToString(prefix = "(`", separator = "`, `", postfix = "`)") { "${it.first}: ${it.second}" }
-    val receiver = if (hkArgs is HKArgs.First) "`${hkArgs.receiver}`" else ""
-    return """|override fun $typeParamsS $receiver.`$name`$argsS: $retType =
+    val receiver = if (hkArgs is HKArgs.First) "`${hkArgs.receiver}.`" else ""
+    return """|override fun $typeParamsS $receiver`$name`$argsS: $retType =
                   |    ${implBody()}""".removeBackticks().trimMargin()
   }
 

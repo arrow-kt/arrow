@@ -10,6 +10,9 @@ dependencies {
     compile "io.kotlintest:kotlintest-core:$kotlinTestVersion"
     compile "io.kotlintest:kotlintest-assertions:$kotlinTestVersion"
     compile "io.kotlintest:kotlintest-runner-junit5:$kotlinTestVersion"
+    kapt project(':arrow-annotations-processor')
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+apply from: rootProject.file('gradle/generated-kotlin-sources.gradle')
+apply plugin: 'kotlin-kapt'
