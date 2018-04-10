@@ -126,7 +126,7 @@ Observables created with comprehensions like `bindingCatch` behave the same way 
 ```kotlin
 val disposable =
   songObservable.value()
-    .subscribe({ Log.d("Song $it") } , { prinln("Error $it") })
+    .subscribe({ Log.d("Song $it") } , { println("Error $it") })
 
 disposable.dispose()
 ```
@@ -145,7 +145,7 @@ val (observable, disposable) =
   }
 
 observable.value()
-  .subscribe({ Log.d("User $it") } , { prinln("Boom! caused by $it") })
+  .subscribe({ Log.d("User $it") } , { println("Boom! caused by $it") })
 
 disposable()
 // Boom! caused by BindingCancellationException
