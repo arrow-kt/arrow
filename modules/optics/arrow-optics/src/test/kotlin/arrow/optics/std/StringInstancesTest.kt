@@ -2,14 +2,12 @@ package arrow.optics
 
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.generate
 import arrow.test.laws.IsoLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
-import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
-import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
 class StringInstancesTest : UnitSpec() {
 
   init {

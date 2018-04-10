@@ -12,11 +12,9 @@ import arrow.test.generators.genMapK
 import arrow.test.generators.genSetK
 import arrow.test.laws.IsoLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
 class MapInstancesTest : UnitSpec() {
 
   init {

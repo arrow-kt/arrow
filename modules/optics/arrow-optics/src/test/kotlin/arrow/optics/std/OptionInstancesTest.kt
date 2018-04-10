@@ -12,11 +12,9 @@ import arrow.test.laws.IsoLaws
 import arrow.test.laws.PrismLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
-import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
 class OptionInstancesTest : UnitSpec() {
 
   init {

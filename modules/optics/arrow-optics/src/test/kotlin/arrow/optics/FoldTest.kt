@@ -7,12 +7,10 @@ import arrow.data.foldable
 import arrow.data.k
 import arrow.instances.monoid
 import arrow.test.UnitSpec
-import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
 class FoldTest : UnitSpec() {
 
   init {

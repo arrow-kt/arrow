@@ -3,8 +3,11 @@ package arrow.optics
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.identity
+import arrow.test.generators.generate
+import arrow.test.generators.oneOf
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
+import io.kotlintest.properties.map
 
 sealed class SumType {
   data class A(val string: String) : SumType()
@@ -12,11 +15,16 @@ sealed class SumType {
 }
 
 object AGen : Gen<SumType.A> {
-  override fun generate(): SumType.A = SumType.A(Gen.string().generate())
+  override fun always(): Iterable<SumType.A> = emptyList()
+
+  override fun random(): Sequence<SumType.A> = Gen.string().random().map { SumType.A(it) }
+
 }
 
 object SumGen : Gen<SumType> {
-  override fun generate(): SumType = Gen.oneOf(AGen, Gen.create { SumType.B(Gen.int().generate()) }).generate()
+  override fun always(): Iterable<SumType> = listOf()
+
+  override fun random(): Sequence<SumType> = oneOf(AGen, Gen.create { SumType.B(Gen.int().generate()) }).random()
 }
 
 val sumPrism: Prism<SumType, String> = Prism(
@@ -66,12 +74,16 @@ internal data class Token(val value: String) {
 }
 
 internal object TokenGen : Gen<Token> {
-  override fun generate() = Token(Gen.string().generate())
+  override fun always(): Iterable<Token> = emptyList()
+
+  override fun random(): Sequence<Token> = Gen.string().random().map { Token(it) }
 }
 
 internal data class User(val token: Token)
 internal object UserGen : Gen<User> {
-  override fun generate() = User(TokenGen.generate())
+  override fun always(): Iterable<User> = emptyList()
+
+  override fun random(): Sequence<User> = TokenGen.random().map { User(it) }
 }
 
 internal val tokenGetter: Getter<Token, String> = Getter(Token::value)

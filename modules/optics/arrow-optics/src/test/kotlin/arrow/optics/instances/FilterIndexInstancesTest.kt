@@ -3,20 +3,16 @@ package arrow.optics.instances
 import arrow.core.Option
 import arrow.core.eq
 import arrow.data.*
-import arrow.instances.CharEqInstance
 import arrow.instances.eq
 import arrow.optics.typeclasses.FilterIndex
 import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import java_util.ListFilterIndexInstance
 import java_util.MapFilterIndexInstance
-import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
 class FilterIndexInstanceTest : UnitSpec() {
 
   init {

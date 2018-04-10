@@ -13,12 +13,9 @@ import arrow.test.laws.OptionalLaws
 import arrow.test.laws.SetterLaws
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
 class OptionalTest : UnitSpec() {
 
   init {

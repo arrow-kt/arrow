@@ -7,13 +7,11 @@ import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.OptionalLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import java_util.ListIndexInstance
 import java_util.MapIndexInstance
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
 class IndexInstanceTest : UnitSpec() {
 
   init {
