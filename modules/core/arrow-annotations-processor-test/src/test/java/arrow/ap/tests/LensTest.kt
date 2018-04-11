@@ -2,12 +2,12 @@ package arrow.ap.tests
 
 import arrow.optics.OpticsProcessor
 
-class LensTest: APTest("arrow.ap.objects.lens")  {
+class LensTest: APTest("arrow.ap.objects.lens") {
 
     init {
 
         testProcessor(AnnotationProcessor(
-                name = "Lenses cannot be created for sealed classes",
+                name = "Lenses cannot be generated for sealed classes",
                 sourceFile = "LensSealed.java",
                 errorMessage = "Lenses can only be generated for data classes",
                 processor = OpticsProcessor()

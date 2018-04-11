@@ -164,15 +164,14 @@ class OpticsProcessor : AbstractProcessor() {
 
       if (properties.size > 10) {
         logE("""
-          |Cannot generate arrow.optics.Iso for ${element.enclosingElement}.${element.simpleName}.
-          |Iso generation is supported up to 10 constructor parameters is supported
+          Iso generation is not supported for data classes with more than 10 constructor parameters
           """, element)
         null
       } else AnnotatedOptic(element as TypeElement, element.getClassData(), properties)
     }
 
     else -> {
-      knownError(element, OpticsTarget.ISO)
+      logE("Isos can only be generated for data classes", element)
       null
     }
   }
