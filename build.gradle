@@ -70,7 +70,7 @@ subprojects { project ->
     archivesBaseName = POM_ARTIFACT_ID
 
     jacoco {
-        toolVersion '0.7.8'
+        toolVersion '0.8.1'
     }
 
     task codeCoverageReport(type: JacocoReport) {
@@ -82,7 +82,7 @@ subprojects { project ->
         }
 
         classDirectories = fileTree(
-                dir: 'build/classes/main/arrow',
+                dir: 'build/classes/kotlin/main',
         )
 
         sourceDirectories = files('src/main/kotlin')
@@ -111,6 +111,10 @@ subprojects { project ->
         testLogging {
             events "passed", "skipped", "failed", "standardOut", "standardError"
         }
+    }
+
+    tasks.withType(Test) {
+        maxParallelForks = Runtime.runtime.availableProcessors()
     }
 
     build.dependsOn ':detekt'

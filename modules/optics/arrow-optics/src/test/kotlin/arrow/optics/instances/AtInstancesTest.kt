@@ -6,7 +6,9 @@ import arrow.data.MapK
 import arrow.data.SetK
 import arrow.data.at
 import arrow.data.eq
-import arrow.instances.*
+import arrow.instances.eq
+import arrow.instances.monoid
+import arrow.instances.semigroup
 import arrow.optics.AndMonoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
@@ -17,8 +19,6 @@ import arrow.test.laws.LensLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
-import java_util.MapAtInstance
-import java_util.SetAtInstance
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
