@@ -110,12 +110,12 @@ class OpticsProcessor : AbstractProcessor() {
 
   }
 
-  private fun evalAnnotatedLensElement(element: Element): AnnotatedOptic? = when {
-    element.let { it.kotlinMetadata as? KotlinClassMetadata }?.data?.classProto?.isDataClass == true ->
+  private fun evalAnnotatedLensElement(element: Element): AnnotatedOptic? = when(element.getClassType()) {
+    ClassType.DATA_CLASS ->
       AnnotatedOptic(
-        element as TypeElement,
-        element.getClassData(),
-        element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Target.Companion::invoke)
+              element as TypeElement,
+              element.getClassData(),
+              element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Target.Companion::invoke)
       )
 
     else -> {
@@ -124,8 +124,8 @@ class OpticsProcessor : AbstractProcessor() {
     }
   }
 
-  private fun evalAnnotatedDslElement(element: Element): AnnotatedOptic? = when {
-    element.let { it.kotlinMetadata as? KotlinClassMetadata }?.data?.classProto?.isDataClass == true ->
+  private fun evalAnnotatedDslElement(element: Element): AnnotatedOptic? = when(element.getClassType()) {
+    ClassType.DATA_CLASS ->
       AnnotatedOptic(
               element as TypeElement,
               element.getClassData(),
@@ -138,28 +138,28 @@ class OpticsProcessor : AbstractProcessor() {
     }
   }
 
-  private fun evalAnnotatedPrismElement(element: Element): AnnotatedOptic? = when {
-    element.let { it.kotlinMetadata as? KotlinClassMetadata }?.data?.classProto?.isSealed == true -> {
+  private fun evalAnnotatedPrismElement(element: Element): AnnotatedOptic? = when(element.getClassType()) {
+    ClassType.SEALED_CLASS -> {
       val (nameResolver, classProto) = element.kotlinMetadata.let { it as KotlinClassMetadata }.data
 
       AnnotatedOptic(
-        element as TypeElement,
-        element.getClassData(),
-        classProto.sealedSubclassFqNameList
-          .map(nameResolver::getString)
-          .map { it.replace('/', '.') }
-          .map { Target(it, it.substringAfterLast(".")) }
+              element as TypeElement,
+              element.getClassData(),
+              classProto.sealedSubclassFqNameList
+                      .map(nameResolver::getString)
+                      .map { it.replace('/', '.') }
+                      .map { Target(it, it.substringAfterLast(".")) }
       )
     }
 
     else -> {
-      knownError(element, OpticsTarget.PRISM)
+      logE("Prisms can only be generated for sealed classes", element)
       null
     }
   }
 
-  private fun evalAnnotatedIsoElement(element: Element): AnnotatedOptic? = when {
-    (element.kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isDataClass == true -> {
+  private fun evalAnnotatedIsoElement(element: Element): AnnotatedOptic? = when(element.getClassType()) {
+    ClassType.DATA_CLASS -> {
       val properties = element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Target.Companion::invoke)
 
       if (properties.size > 10) {
@@ -174,10 +174,6 @@ class OpticsProcessor : AbstractProcessor() {
       logE("Isos can only be generated for data classes", element)
       null
     }
-  }
-
-  private fun knownError(element: Element, target: OpticsTarget) {
-    messager.printMessage(Diagnostic.Kind.ERROR, "Annotation $target is invalid for element", element)
   }
 
   private enum class ClassType {
