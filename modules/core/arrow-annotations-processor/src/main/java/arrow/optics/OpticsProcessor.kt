@@ -13,7 +13,6 @@ import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
-import javax.tools.Diagnostic
 
 @AutoService(Processor::class)
 class OpticsProcessor : AbstractProcessor() {
@@ -110,7 +109,7 @@ class OpticsProcessor : AbstractProcessor() {
 
   }
 
-  private fun evalAnnotatedLensElement(element: Element): AnnotatedOptic? = when(element.getClassType()) {
+  private fun evalAnnotatedLensElement(element: Element): AnnotatedOptic? = when (element.getClassType()) {
     ClassType.DATA_CLASS ->
       AnnotatedOptic(
               element as TypeElement,
@@ -124,7 +123,7 @@ class OpticsProcessor : AbstractProcessor() {
     }
   }
 
-  private fun evalAnnotatedDslElement(element: Element): AnnotatedOptic? = when(element.getClassType()) {
+  private fun evalAnnotatedDslElement(element: Element): AnnotatedOptic? = when (element.getClassType()) {
     ClassType.DATA_CLASS ->
       AnnotatedOptic(
               element as TypeElement,
@@ -138,7 +137,7 @@ class OpticsProcessor : AbstractProcessor() {
     }
   }
 
-  private fun evalAnnotatedPrismElement(element: Element): AnnotatedOptic? = when(element.getClassType()) {
+  private fun evalAnnotatedPrismElement(element: Element): AnnotatedOptic? = when (element.getClassType()) {
     ClassType.SEALED_CLASS -> {
       val (nameResolver, classProto) = element.kotlinMetadata.let { it as KotlinClassMetadata }.data
 
@@ -158,7 +157,7 @@ class OpticsProcessor : AbstractProcessor() {
     }
   }
 
-  private fun evalAnnotatedIsoElement(element: Element): AnnotatedOptic? = when(element.getClassType()) {
+  private fun evalAnnotatedIsoElement(element: Element): AnnotatedOptic? = when (element.getClassType()) {
     ClassType.DATA_CLASS -> {
       val properties = element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Target.Companion::invoke)
 
