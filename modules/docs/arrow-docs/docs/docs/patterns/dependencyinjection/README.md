@@ -223,7 +223,7 @@ Parser().parseInts(Option.monad(), listOf("1".some(), "2".some()))
 ```
 
 We are almost back to where we started with parameter passing, at least on this first layer.
-Except, there are some benefits once you're inside these public functions, as you can declare private extension methods inside the class and you will be able to seamlessly call them as well as with scoped functions.
+Except, there are some benefits once you're inside these public functions, as you can declare private extension methods inside the class and you will be able to seamlessly call them as well as other scoped functions.
 
 ## Composing dependencies
 
@@ -413,11 +413,11 @@ What have we gained from this change? We have replaced one concretion, a final c
 
 * The code is more functional: we have one structural type and many functions that act on it
 * A single instance of the object that's used but not retained by the functions, so there's single ownership
-* We can define as many extensions to the functionality as we want
-* We can use the partial type to make any function call that requires just some of the types, encapsulating the rest
+* We can still define as many extensions to the functionality as we want
+* We can call any function that requires just one or some of the types, encapsulating the rest
 
 And as a consequence to all of this, testability and refactoring possibilities are through the roof!
-All the promises of OOP, fulfilled with simple functions and interfaces.
+Many of the promises of OOP, fulfilled with simple functions and interfaces.
 
 ```kotlin
 import Api.*
@@ -444,9 +444,9 @@ with (FetcherDependencies(Option.monadError(), MockApiService())) {
 ### Scoping
 
 Typeclasses are completely stateless collections of functions.
-Once you're adding objects that are stateful you need to take care of the lifecycle of your Dependencies object.
+Once you start adding other objects that are stateful you need to take care of the lifecycle of your Dependencies object.
 
-Luckily for us, as there is only one reference to the Syntax object that's passed around across layers instead of being retained, it's easy to track its lifecycle and manage it.
+Luckily for us, as there is only one reference to the Syntax object that's passed around across layers through function parameters instead of being retained by classes, it's easy to track its lifecycle and manage it.
 
 Assuming this Dependencies object is completely stateless and it lives at the global scope, a simple root value suffices:
 
@@ -472,9 +472,11 @@ class SettingsActivity: Activity {
   override fun onResume() {
     val id = deps.createId("1234")
 
-    user.text = id.fix().getOrElse { "" }
+    user.text = 
+      id.fix().map { it.toString() }.getOrElse { "" }
 
-    friends.text = deps.getUserFriends(id).fix().getOrElse { "[]" }
+    friends.text = 
+      deps.getUserFriends(id).fix().getOrElse { emptyList() }.joinToString()
   }
 }
 ```
