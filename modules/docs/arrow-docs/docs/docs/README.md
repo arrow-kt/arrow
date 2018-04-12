@@ -64,7 +64,7 @@ dependencies {
 
 # Additional Setup
 
-For projects that wish to use their own `@higherkind`, `@deriving` and other meta programming facilities provided by Λrrow
+For projects that wish to use their own `@higherkind`, `@optics` and other meta programming facilities provided by Λrrow
 the setup below is also required:
 
 Add the dependencies into the project's `build.gradle`
