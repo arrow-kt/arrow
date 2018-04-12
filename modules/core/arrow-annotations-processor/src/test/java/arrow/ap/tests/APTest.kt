@@ -20,7 +20,7 @@ abstract class APTest(
 
     processor.forEach { (name, source, dest, proc, error) ->
 
-      val stubs = Paths.get("", "build", "tmp", "kapt3", "stubs", "main", *pckg.split(".").toTypedArray()).toFile()
+      val stubs = Paths.get("", "build", "tmp", "kapt3", "stubs", "test", *pckg.split(".").toTypedArray()).toFile()
       val expectedDir = Paths.get("", "src", "test", "resources", *pckg.split(".").toTypedArray()).toFile()
 
       if (dest == null && error == null) {

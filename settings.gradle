@@ -35,7 +35,6 @@ include {
         core {
             _ 'annotations'
             _ 'annotations-processor'
-            _ 'annotations-processor-test'
             _ 'core'
             _ 'data'
             _ 'free'
