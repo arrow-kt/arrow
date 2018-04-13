@@ -12,6 +12,7 @@ import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import java_util.ListFilterIndexInstance
 import java_util.MapFilterIndexInstance
+import org.junit.runner.RunWith
 
 class FilterIndexInstanceTest : UnitSpec() {
 

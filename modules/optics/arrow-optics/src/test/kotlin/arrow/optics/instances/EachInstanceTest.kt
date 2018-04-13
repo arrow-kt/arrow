@@ -12,6 +12,7 @@ import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import java_util.ListEachInstance
 import java_util.MapEachInstance
+import org.junit.runner.RunWith
 
 class EachInstanceTest : UnitSpec() {
 

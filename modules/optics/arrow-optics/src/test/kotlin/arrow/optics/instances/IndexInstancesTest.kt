@@ -1,15 +1,12 @@
 package arrow.optics.instances
 
 import arrow.data.*
-import arrow.instances.StringEqInstance
 import arrow.instances.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.OptionalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
-import java_util.ListIndexInstance
-import java_util.MapIndexInstance
 import org.junit.runner.RunWith
 
 class IndexInstanceTest : UnitSpec() {

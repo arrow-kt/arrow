@@ -1,4 +1,4 @@
-package java_util
+package arrow.optics.instances
 
 import arrow.optics.Lens
 import arrow.optics.PLens
