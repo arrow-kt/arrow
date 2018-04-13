@@ -16,6 +16,7 @@ dependencies {
     testCompile "com.google.testing.compile:compile-testing:0.15"
     testCompile fileTree(dir: './src/test/libs', includes: ['*.jar'])
     testCompile project(":arrow-data")
+    testCompile project(":arrow-annotations-processor-test-models")
     testCompile project(":arrow-optics")
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
     def toolsJar = Jvm.current().getToolsJar()
@@ -24,7 +25,6 @@ dependencies {
         throw new GradleException("tools.jar not found at your JAVA_HOME dir ${Jvm.current().getJavaHome().getAbsolutePath()}.\n" +
                 "Building with a JRE or JDK9 is currently not supported.")
     testCompile files(toolsJar)
-    //Tests are in "arrow-annotations-processor-test"
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
