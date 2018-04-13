@@ -4,6 +4,7 @@
 [![Build Status](https://travis-ci.org/arrow-kt/arrow.svg?branch=master)](https://travis-ci.org/arrow-kt/arrow/)
 [![Kotlin version badge](https://img.shields.io/badge/kotlin-1.2.31-blue.svg)](http://kotlinlang.org/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+[![codecov](https://codecov.io/gh/arrow-kt/arrow/branch/master/graph/badge.svg)](https://codecov.io/gh/arrow-kt/arrow)
 
 Λrrow is a library for Typed Functional Programming in Kotlin.
 It includes the most popular data types, type classes and abstractions such as `Option`, `Try`, `Either`, `IO`, `Functor`, `Applicative`, `Monad` and many more empowering users to define pure FP apps and libraries built atop higher order abstractions. Use the below list to learn more about Λrrow's main features.
