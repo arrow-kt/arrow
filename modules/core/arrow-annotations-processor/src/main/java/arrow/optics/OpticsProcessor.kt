@@ -102,10 +102,10 @@ class OptikalProcessor : AbstractProcessor() {
     (element.kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isDataClass == true -> {
       val properties = element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Target.Companion::invoke)
 
-      if (properties.size > 10) {
+      if (properties.size > 22) {
         logW("""
           |Cannot generate arrow.optics.Iso for ${element.enclosingElement}.${element.simpleName}.
-          |Iso generation is supported up to 10 constructor parameters is supported
+          |Iso generation is supported up to 22 constructor parameters.
           """)
         null
       } else AnnotatedOptic(element as TypeElement, element.getClassData(), properties)
