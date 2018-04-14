@@ -7,6 +7,7 @@ import com.google.auto.service.AutoService
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
 import me.eugeniomarletti.kotlin.metadata.isDataClass
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
+import org.jetbrains.kotlin.utils.addIfNotNull
 import java.io.File
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
@@ -39,42 +40,38 @@ class OpticsProcessor : AbstractProcessor() {
 
               val type = element.getClassType()
 
-              val targets = element.getAnnotation(opticsAnnotationClass).targets
+              val targets = element.getAnnotation(opticsAnnotationClass).targets.toList()
 
               if (type == ClassType.OTHER) {
                 logE("Only data and sealed classes can be annotated with optics annotation", element)
                 return@forEach
               }
 
-              val normalizedTargets = if (targets.isEmpty()) {
+              val normalizedTargets = when {
+                targets.isEmpty() ->
+                  when (type) {
+                    ClassType.SEALED_CLASS -> listOf(OpticsTarget.PRISM)
+                    else -> listOf(OpticsTarget.ISO, OpticsTarget.LENS, OpticsTarget.OPTIONAL, OpticsTarget.DSL)
+                  }
+                targets.contains(OpticsTarget.DSL) ->
+                  when (type) {
+                    ClassType.DATA_CLASS -> targets + listOf(OpticsTarget.LENS, OpticsTarget.OPTIONAL)
+                    else -> {
+                      logE("Only data classes can have DSL target", element); emptyList()
+                    }
 
-                if (type == ClassType.SEALED_CLASS) {
-                  listOf(OpticsTarget.PRISM)
-                } else {
-                  listOf(OpticsTarget.ISO, OpticsTarget.LENS, OpticsTarget.OPTIONAL, OpticsTarget.DSL)
-                }
-
-              } else if (targets.contains(OpticsTarget.DSL)) {
-
-                if (type != ClassType.DATA_CLASS) {
-                  logE("Only data classes can have DSL target", element)
-                  emptyList()
-                } else {
-                  targets.toSet().plus(listOf(OpticsTarget.LENS, OpticsTarget.OPTIONAL)).toList()
-                }
-
-              } else {
-                targets.toList()
+                  }
+                else -> targets
               }
 
               normalizedTargets.forEach { target ->
 
                 when (target) {
-                  OpticsTarget.LENS -> annotatedLenses.addAll(evalAnnotatedLensElement(element).singleToList())
-                  OpticsTarget.PRISM -> annotatedPrisms.addAll(evalAnnotatedPrismElement(element).singleToList())
-                  OpticsTarget.ISO -> annotatedIsos.addAll(evalAnnotatedIsoElement(element).singleToList())
-                  OpticsTarget.OPTIONAL -> annotatedOptional.addAll(evalAnnotatedOptionalElement(element).singleToList())
-                  OpticsTarget.DSL -> annotatedBounded.addAll(evalAnnotatedDslElement(element).singleToList())
+                  OpticsTarget.LENS -> annotatedLenses.addIfNotNull(evalAnnotatedLensElement(element))
+                  OpticsTarget.PRISM -> annotatedPrisms.addIfNotNull(evalAnnotatedPrismElement(element))
+                  OpticsTarget.ISO -> annotatedIsos.addIfNotNull(evalAnnotatedIsoElement(element))
+                  OpticsTarget.OPTIONAL -> annotatedOptional.addIfNotNull(evalAnnotatedOptionalElement(element))
+                  OpticsTarget.DSL -> annotatedBounded.addIfNotNull(evalAnnotatedDslElement(element))
                 }
 
               }
@@ -87,9 +84,6 @@ class OpticsProcessor : AbstractProcessor() {
       PrismsFileGenerator(annotatedPrisms, generatedDir).generate()
       IsosFileGenerator(annotatedIsos, generatedDir).generate()
       OptionalFileGenerator(annotatedOptional, generatedDir).generate()
-
-      LensesFileGenerator(annotatedBounded, generatedDir).generate()
-      OptionalFileGenerator(annotatedBounded, generatedDir).generate()
       BoundSetterGenerator(annotatedBounded, generatedDir).generate()
     }
   }
@@ -182,15 +176,8 @@ class OpticsProcessor : AbstractProcessor() {
   }
 
   private fun Element.getClassType(): ClassType = when {
-      (kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isDataClass == true -> ClassType.DATA_CLASS
-      (kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isSealed == true -> ClassType.SEALED_CLASS
-      else -> ClassType.OTHER
-    }
-
-  private fun <T> T?.singleToList(): List<T> = if (this == null) {
-      emptyList()
-    } else {
-      listOf(this)
-    }
-
+    (kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isDataClass == true -> ClassType.DATA_CLASS
+    (kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isSealed == true -> ClassType.SEALED_CLASS
+    else -> ClassType.OTHER
+  }
 }
