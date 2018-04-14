@@ -103,3 +103,5 @@ April ’18 - version 0.7
 [Emmanuel Nhan](https://www.enhan.eu/author/enhan/) showcases different approaches to validation including examples for `ValidatedNel` from Arrow in this great and in depth post using Kafka Streams Config parameters as example.
 
 [1/n - How do I ... in FP : Validation](https://www.enhan.eu/how-to-in-fp/)
+
+April ’18 - version 0.7
