@@ -22,7 +22,7 @@ abstract class APTest(
 
       val parent = File(".").absoluteFile.parent
 
-      val stubs = Paths.get(parent,  "models", "build", "tmp", "kapt3", "stubs", "main", *pckg.split(".").toTypedArray()).toFile()
+      val stubs = Paths.get(parent, "models", "build", "tmp", "kapt3", "stubs", "main", *pckg.split(".").toTypedArray()).toFile()
       val expectedDir = Paths.get("", "src", "test", "resources", *pckg.split(".").toTypedArray()).toFile()
 
       if (dest == null && error == null) {
