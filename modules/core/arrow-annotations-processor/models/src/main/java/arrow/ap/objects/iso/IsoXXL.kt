@@ -15,5 +15,15 @@ data class IsoXXL(
         val field8: String,
         val field9: String,
         val field10: String,
-        val field11: String
+        val field12: String,
+        val field13: String,
+        val field14: String,
+        val field15: String,
+        val field16: String,
+        val field17: String,
+        val field18: String,
+        val field19: String,
+        val field20: String,
+        val field21: String,
+        val field22: String
 )
