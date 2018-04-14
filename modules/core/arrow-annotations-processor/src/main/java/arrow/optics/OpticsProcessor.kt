@@ -155,9 +155,9 @@ class OpticsProcessor : AbstractProcessor() {
     ClassType.DATA_CLASS -> {
       val properties = element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Target.Companion::invoke)
 
-      if (properties.size > 10) {
+      if (properties.size > 22) {
         logE("""
-          Iso generation is not supported for data classes with more than 10 constructor parameters
+          Iso generation is not supported for data classes with more than 22 constructor parameters
           """, element)
         null
       } else AnnotatedOptic(element as TypeElement, element.getClassData(), properties)
