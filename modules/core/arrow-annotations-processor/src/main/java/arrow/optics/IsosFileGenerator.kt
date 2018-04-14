@@ -11,7 +11,7 @@ class IsosFileGenerator(
 
   private val filePrefix = "isos"
   private val tuple = "arrow.core.Tuple"
-  private val letters = ('a'..'j').toList()
+  private val letters = ('a'..'v').toList()
 
   fun generate() = buildIsos(annotatedList)
 
