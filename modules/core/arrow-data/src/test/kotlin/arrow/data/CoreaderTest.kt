@@ -2,12 +2,12 @@ package arrow.data
 
 import arrow.core.*
 import arrow.test.UnitSpec
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
+
+import io.kotlintest.shouldBe
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+
 class CoreaderTest : UnitSpec() {
   init {
     with(Coreader) {
@@ -23,7 +23,7 @@ class CoreaderTest : UnitSpec() {
 
         "flatMap should map over the inner value" {
           forAll { num: Int ->
-            invoke<Int, Int>({ it -> it * 2 }).flatMap { a -> Coreader.just<Int, Int>(this, a * 3) }
+            invoke<Int, Int>({ it -> it * 2 }).flatMap { a -> Coreader.just<Int, Int>(this@with, a * 3) }
               .runId(num) == num * 6
           }
         }

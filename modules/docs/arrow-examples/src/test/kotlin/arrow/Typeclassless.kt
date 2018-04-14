@@ -9,7 +9,7 @@ import arrow.data.ListK
 import arrow.data.applicative
 import arrow.data.k
 import arrow.typeclasses.Applicative
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.shouldBe
 import io.kotlintest.specs.FreeSpec
 
 class TypeclasslessExamples : FreeSpec() {

@@ -8,11 +8,11 @@ import arrow.instances.eq
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
+
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+
 class EitherTest : UnitSpec() {
   val EQ: Eq<Kind<EitherPartialOf<ForId>, Int>> = Eq { a, b ->
     a.fix() == b.fix()

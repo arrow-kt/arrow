@@ -8,11 +8,11 @@ import arrow.test.laws.MonadErrorLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.*
-import org.junit.runner.RunWith
+import io.kotlintest.fail
+import io.kotlintest.matchers.beTheSameInstanceAs
+import io.kotlintest.should
+import io.kotlintest.shouldBe
 
-@RunWith(KTestJUnitRunner::class)
 class TryTest : UnitSpec() {
 
   val success = Try { "10".toInt() }
@@ -82,7 +82,7 @@ class TryTest : UnitSpec() {
       val e: Throwable = Exception()
 
       Success(1).getOrElse { _: Throwable -> 2 } shouldBe 1
-      Failure<Int>(e).getOrElse { (it shouldEqual e); 2 } shouldBe 2
+      Failure<Int>(e).getOrElse { (it shouldBe e); 2 } shouldBe 2
     }
 
     "recoverWith should modify Failure entity" {

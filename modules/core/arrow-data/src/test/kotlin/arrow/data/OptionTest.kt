@@ -2,26 +2,23 @@ package arrow.data
 
 import arrow.Kind
 import arrow.core.*
-import arrow.instances.IntEqInstance
 import arrow.instances.eq
 import arrow.syntax.collections.firstOption
 import arrow.syntax.collections.option
 import arrow.test.UnitSpec
 import arrow.test.generators.genOption
+import arrow.test.generators.generate
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseFilterLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.fail
-import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldNotBe
+import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import org.junit.runner.RunWith
+import io.kotlintest.shouldBe
+import io.kotlintest.shouldNotBe
 
-@RunWith(KTestJUnitRunner::class)
 class OptionTest : UnitSpec() {
 
   val some: Option<String> = Some("kotlin")

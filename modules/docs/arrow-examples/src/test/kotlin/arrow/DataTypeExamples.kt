@@ -5,7 +5,7 @@ import arrow.core.*
 import arrow.typeclasses.binding
 import io.kotlintest.matchers.Matcher
 import io.kotlintest.matchers.Result
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.shouldBe
 import io.kotlintest.specs.FreeSpec
 import kotlin.reflect.KClass
 

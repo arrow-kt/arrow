@@ -11,8 +11,8 @@ import arrow.free.instances.eq
 import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.EqLaws
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
+
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
 sealed class OpsAp<out A> : Kind<OpsAp.F, A> {
@@ -32,7 +32,7 @@ sealed class OpsAp<out A> : Kind<OpsAp.F, A> {
 
 fun <A> Kind<OpsAp.F, A>.fix(): OpsAp<A> = this as OpsAp<A>
 
-@RunWith(KTestJUnitRunner::class)
+
 class FreeApplicativeTest : UnitSpec() {
 
   private val program = OpsAp.tupled(OpsAp.value(1), OpsAp.add(3, 4), OpsAp.subtract(3, 4)).fix()

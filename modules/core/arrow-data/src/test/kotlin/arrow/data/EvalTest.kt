@@ -8,14 +8,12 @@ import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws
 import arrow.test.laws.MonadLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.fail
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.fail
+
+import io.kotlintest.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
 class EvalTest : UnitSpec() {
   val EQ: Eq<Kind<ForEval, Int>> = Eq { a, b ->
     a.fix().value() == b.fix().value()

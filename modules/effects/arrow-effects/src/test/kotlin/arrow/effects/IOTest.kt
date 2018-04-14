@@ -9,9 +9,9 @@ import arrow.test.concurrency.SideEffect
 import arrow.test.laws.AsyncLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.binding
-import io.kotlintest.KTestJUnitRunner
+
 import io.kotlintest.matchers.fail
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.shouldBe
 import io.kotlintest.matchers.shouldEqual
 import org.junit.runner.RunWith
 
