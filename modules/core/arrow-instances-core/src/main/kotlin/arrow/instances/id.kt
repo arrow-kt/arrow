@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.instance
 import arrow.typeclasses.*
+import arrow.instances.traverse as idTraverse
 
 @instance(Id::class)
 interface IdEqInstance<A> : Eq<Id<A>> {
@@ -101,8 +102,8 @@ interface IdFoldableInstance : Foldable<ForId> {
     fix().foldRight(lb, f)
 }
 
-fun <A, G, B> Id<A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Id<B>> = GA.run {
-  f(fix().value).map({ Id(it) })
+fun <A, G, B> Id<A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Id<B>> = GA.run {
+  f(value()).map { Id(it) }
 }
 
 @instance(Id::class)
@@ -111,7 +112,7 @@ interface IdTraverseInstance : Traverse<ForId> {
     fix().map(f)
 
   override fun <G, A, B> Kind<ForId, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Id<B>> =
-    fix().traverse(f, AP)
+    fix().idTraverse(AP, f)
 
   override fun <A, B> Kind<ForId, A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)

@@ -124,7 +124,7 @@ interface OptionFoldableInstance : Foldable<ForOption> {
     fix().nonEmpty()
 }
 
-fun <A, G, B> OptionOf<A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Option<B>> = GA.run {
+fun <A, G, B> OptionOf<A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Option<B>> = GA.run {
   fix().let { option ->
     when (option) {
       is Some -> f(option.t).map({ Some(it) })
@@ -133,13 +133,14 @@ fun <A, G, B> OptionOf<A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Ki
   }
 }
 
-fun <A, G, B> OptionOf<A>.traverseFilter(f: (A) -> Kind<G, Option<B>>, GA: Applicative<G>): Kind<G, Option<B>> =
-  this.fix().let { option ->
+fun <A, G, B> OptionOf<A>.traverseFilter(GA: Applicative<G>, f: (A) -> Kind<G, Option<B>>): Kind<G, Option<B>> = GA.run {
+  fix().let { option ->
     when (option) {
       is Some -> f(option.t)
-      None -> GA.just(None)
+      None -> just(None)
     }
   }
+}
 
 @instance(Option::class)
 interface OptionTraverseInstance : Traverse<ForOption> {
@@ -147,7 +148,7 @@ interface OptionTraverseInstance : Traverse<ForOption> {
     fix().map(f)
 
   override fun <G, A, B> Kind<ForOption, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Option<B>> =
-    fix().traverse(f, AP)
+    fix().traverse(AP, f)
 
   override fun <A> Kind<ForOption, A>.exists(p: (A) -> Boolean): Boolean =
     fix().exists(p)
