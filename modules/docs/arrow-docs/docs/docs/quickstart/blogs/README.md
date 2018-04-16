@@ -56,6 +56,14 @@ KotlinConf, San Francisco, Nov '17 - version 0.3.11
 
 Voxxed Days, Vienna, Mar '18 - version 0.6.1
 
+### Introduction to Kotlin Arrow by Jacob Bass
+
+[@bassjacob](https://github.com/bassjacob) goes through how Funktionale and Kategory merged into Arrow, consolidating two of the most popular FP libraries in the Kotlin space into one powerhouse. The talk is an introduction to some FP concepts, how the libraries work, what features they bring to the table and where you might use them in your code.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/tM2wEI-e80E" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+
+Kotlin Meetup, Sydney, Mar '18 - version 0.6.1
+
 ### Functional Programming in Kotlin
 
 An ongoing blog series introducing Functional Programming architectures from scratch
@@ -66,17 +74,23 @@ An ongoing blog series introducing Functional Programming architectures from scr
 
 [Kotlin Functional Programming II: Monad Transformers](https://medium.com/@JorgeCastilloPr/kotlin-functional-programming-ii-monad-transformers-b1f020f14dd8)
 
+Nov '17 - version 0.3.11
+
 ### Happy Path: Kotlin + Actors + Arrow
 
 [@javipacheco](https://github.com/javipacheco) creates a Proof of Concept architecture for Android using the Actor pattern and modelling the domain with [`Either`]({{ '/docs/datatypes/either' | relative_url }}).
 
 [Happy Path: Kotlin + Actors + Arrow](https://medium.com/@javipacheco/happy-path-kotlin-actors-arrow-proof-of-concept-322e9099d2ea)
 
+Nov '17 - version 0.3.11
+
 ### Handling exceptions in Arrow
 
 [@uris77](https://github.com/uris77) explains how to use [`Try`]({{ '/docs/datatypes/try' | relative_url }}) in real world examples.
 
 [Handling Kotlin Exceptions with Arrow – A Functional Approach](https://www.spantree.net/blog/2017/09/15/kotlin-exception-handling-with-kategory.html)
+
+Sept '17 - version 0.3.11
 
 ### Optics and Type Classes in Arrow
 
