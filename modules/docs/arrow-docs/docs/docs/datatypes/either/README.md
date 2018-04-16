@@ -296,7 +296,7 @@ val httpStatusCode = r.getOrHandle {
  Either.applicative<Int>().tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
  ```
 
- [`Monad`]({{ '/docs/_docs/typeclasses/monad/' | relative_url }})
+ [`Monad`]({{ '/docs/typeclasses/monad/' | relative_url }})
 
  Computing over dependent values ignoring absence
 

@@ -23,7 +23,7 @@ Observable.from(7, 4, 11, 3)
 
 ### Integration with your existing Observable chains
 
-The largest quality of life improvement when using Observables in Arrow is the introduction of the [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}). This library construct allows expressing asynchronous Observable sequences as synchronous code using binding/bind.
+The largest quality of life improvement when using Observables in Arrow is the introduction of the [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}). This library construct allows expressing asynchronous Observable sequences as synchronous code using binding/bind.
 
 #### Arrow Wrapper
 
@@ -76,7 +76,7 @@ val songObservable: ObservableKOf<Url> = getSongUrlAsync(ObservableK.monadDefer(
 val songFlowable: FlowableKOf<Url> = getSongUrlAsync(FlowableK.monadDefer())
 ```
 
-[`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) using the method `bindingCatch`, with all its benefits.
+[`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) using the method `bindingCatch`, with all its benefits.
 
 Let's take an example and convert it to a comprehension. We'll create an observable that loads a song from a remote location, and then reports the current play % every 100 milliseconds until the percentage reaches 100%:
 
@@ -153,13 +153,13 @@ disposable()
 
 ## Available Instances
 
-* [Applicative]({{ '/docs/typeclasses/Applicative' | relative_url }})
-* [ApplicativeError]({{ '/docs/typeclasses/ApplicativeError' | relative_url }})
-* [Functor]({{ '/docs/typeclasses/Functor' | relative_url }})
-* [Monad]({{ '/docs/typeclasses/Monad' | relative_url }})
-* [MonadError]({{ '/docs/typeclasses/MonadError' | relative_url }})
-* [MonadDefer]({{ '/docs/typeclasses/MonadDefer' | relative_url }})
+* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+* [ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
+* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+* [MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
+* [MonadDefer]({{ '/docs/effects/monaddefer' | relative_url }})
 * [Async]({{ '/docs/effects/async' | relative_url }})
 * [Effect]({{ '/docs/effects/effect' | relative_url }})
-* [Foldable]({{ '/docs/effects/foldable' | relative_url }})
-* [Traverse]({{ '/docs/effects/traverse' | relative_url }})
+* [Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
+* [Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})

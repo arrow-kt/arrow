@@ -107,6 +107,15 @@ options:
       - title: EitherT
         url: /docs/datatypes/eithert/
 
+      - title: Function0
+        url: /docs/datatypes/function0/
+
+      - title: Function1
+        url: /docs/datatypes/function1/
+
+      - title: Const
+        url: /docs/datatypes/const/
+
   - title: Type Classes
 
     nested_options:
