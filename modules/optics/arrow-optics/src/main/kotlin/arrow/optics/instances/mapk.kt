@@ -29,17 +29,19 @@ interface MapKAtInstance<K, V> : At<MapK<K, V>, K, Option<V>> {
   )
 }
 
+fun <K, V> MapK.Companion.traversal(): Traversal<MapK<K, V>, V> = object : Traversal<MapK<K, V>, V> {
+  override fun <F> modifyF(FA: Applicative<F>, s: MapK<K, V>, f: (V) -> Kind<F, V>): Kind<F, MapK<K, V>> =
+    MapK.traverse<K>().run { s.traverse(FA, f) }
+}
+
 @instance(MapK::class)
 interface MapKEachInstance<K, V> : Each<MapK<K, V>, V> {
-  override fun each(): Traversal<MapK<K, V>, V> = object : Traversal<MapK<K, V>, V> {
-    override fun <F> modifyF(FA: Applicative<F>, s: MapK<K, V>, f: (V) -> Kind<F, V>): Kind<F, MapK<K, V>> =
-      MapK.traverse<K>().run { s.traverse(FA, f) }
-  }
+  override fun each(): Traversal<MapK<K, V>, V> =
+    MapK.traversal()
 }
 
 @instance(MapK::class)
 interface MapKFilterIndexInstance<K, V> : FilterIndex<MapK<K, V>, K, V> {
-
   override fun filter(p: (K) -> Boolean): Traversal<MapK<K, V>, V> = object : Traversal<MapK<K, V>, V> {
     override fun <F> modifyF(FA: Applicative<F>, s: MapK<K, V>, f: (V) -> Kind<F, V>): Kind<F, MapK<K, V>> = FA.run {
       ListK.traverse().run {
