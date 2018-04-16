@@ -153,7 +153,7 @@ Computing over independent values:
 Try.applicative().tupled(Try { "3".toInt() }, Try { "5".toInt() }, Try { "nope".toInt() })
 ```
 
-[`Monad`]({{ '/docs/_docs/typeclasses/monad/' | relative_url }})
+[`Monad`]({{ '/docs/typeclasses/monad/' | relative_url }})
 
 Computing over dependent values ignoring failure:
 

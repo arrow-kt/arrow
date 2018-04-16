@@ -200,8 +200,8 @@ IO.async<Int> { callback ->
 
 ## Effect Comprehensions
 
-`IO` is usually best paired with [comprehensions]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) to get a cleaner syntax.
-[Comprehensions]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) also enable cancellation and parallelization of IO effects.
+`IO` is usually best paired with [comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) to get a cleaner syntax.
+[Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) also enable cancellation and parallelization of IO effects.
 
 ```kotlin
 IO.monad().binding {
