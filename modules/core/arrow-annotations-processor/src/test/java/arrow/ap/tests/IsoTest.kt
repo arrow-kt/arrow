@@ -16,7 +16,7 @@ class IsoTest : APTest("arrow.ap.objects.iso") {
     testProcessor(AnnotationProcessor(
             name = "Isos cannot be generated for huge classes",
             sourceFile = "IsoXXL.java",
-            errorMessage = "Iso generation is not supported for data classes with more than 10 constructor parameters",
+            errorMessage = "Iso generation is not supported for data classes with more than 22 constructor parameters",
             processor = OpticsProcessor()
     ))
 
