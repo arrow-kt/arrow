@@ -224,7 +224,7 @@ It's available for `bindingCancellable` comprehensions over instances of [`Monad
 
 ### What if I'd like to run multiple operations independently from each other, in a non-sequential way?
 
-You can check the section on the [Applicative Builder]({{ '/docs/patterns/applicative_builder' | relative_url }}) pattern for them!
+You can check the section on the Applicative Builder pattern for them!
 
 ### Cancellation and cleanup of resources
 

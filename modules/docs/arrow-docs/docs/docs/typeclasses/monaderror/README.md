@@ -60,11 +60,11 @@ ME.run { either.ensure({ RuntimeException("Failed predicate") }, { it < 0 }) }
 
 #### bindingCatch
 
-It starts a [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) that wraps any exception thrown in the block inside `raiseError()`.
+It starts a [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) that wraps any exception thrown in the block inside `raiseError()`.
 
 ### Laws
 
-Arrow provides [`MonadErrorLaws`]({{ '/docs/typeclasses/laws#monaderrorlaws' | relative_url }}) in the form of test cases for internal verification of lawful instances and third party apps creating their own `MonadError` instances.
+Arrow provides `MonadErrorLaws` in the form of test cases for internal verification of lawful instances and third party apps creating their own `MonadError` instances.
 
 ### Data types
 

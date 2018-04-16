@@ -60,7 +60,7 @@ recoveryArrowWrapper.unsafeAttemptSync()
 The second advantage is that we're providing all the instances required to create an architecture that's agnostic to the framework, so you can mix and match multiple frameworks
 in a way that feels idiomatic, while not having to worry about the semantics of each implementation.
 
-You can read more about FP architectures in the section on [Monad Transformers]({{ '/docs/patterns/monad_transformers' | relative_url }}).
+You can read more about FP architectures in the section on Monad Transformers.
 
 ### Bringing Deferred to Arrow
 
@@ -115,7 +115,7 @@ It is also posible to `await()` on the wrapper like you would on `Deferred`, but
 
 ### Error handling & recovery
 
-[`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) using the method `bindingCatch`, with all its benefits.
+[`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) using the method `bindingCatch`, with all its benefits.
 These benefits include capturing all exceptions that happen inside the block.
 
 ```kotlin
@@ -182,11 +182,11 @@ unsafeCancel()
 
 ## Available Instances
 
-* [Applicative]({{ '/docs/typeclasses/Applicative' | relative_url }})
-* [ApplicativeError]({{ '/docs/typeclasses/ApplicativeError' | relative_url }})
-* [Functor]({{ '/docs/typeclasses/Functor' | relative_url }})
-* [Monad]({{ '/docs/typeclasses/Monad' | relative_url }})
-* [MonadError]({{ '/docs/typeclasses/MonadError' | relative_url }})
-* [MonadDefer]({{ '/docs/typeclasses/MonadDefer' | relative_url }})
+* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+* [ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
+* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+* [MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
+* [MonadDefer]({{ '/docs/effects/monaddefer' | relative_url }})
 * [Async]({{ '/docs/effects/async' | relative_url }})
 * [Effect]({{ '/docs/effects/effect' | relative_url }})
