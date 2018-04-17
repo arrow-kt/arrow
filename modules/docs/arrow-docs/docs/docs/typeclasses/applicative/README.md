@@ -29,7 +29,7 @@ fun addressService(): Option<List<String>> = Some(listOf("1 Main Street", "11130
 
 This more or less illustrate the common use case of performing several independent operations where we need to get all the results together
 
-The typeclass features several methods related to [Applicative Builders]({{ '/docs/patterns/applicative_builder' | relative_url }}) that allow you to easily combine all the independent operations into one result.
+The typeclass features several methods related to Applicative Builders that allow you to easily combine all the independent operations into one result.
 
 ```kotlin:ank
 data class Profile(val name: String, val phone: Int, val address: List<String>)
@@ -107,7 +107,7 @@ The following datatypes in Arrow provide instances that adhere to the `Applicati
 
 - [Either]({{ '/docs/datatypes/either' | relative_url }})
 - [EitherT]({{ '/docs/datatypes/eithert' | relative_url }})
-- [FreeApplicative]({{ '/docs/datatypes/freeapplicative' | relative_url }})
+- [FreeApplicative]({{ '/docs/free/freeapplicative' | relative_url }})
 - [Function1]({{ '/docs/datatypes/function1' | relative_url }})
 - [Ior]({{ '/docs/datatypes/ior' | relative_url }})
 - [Kleisli]({{ '/docs/datatypes/kleisli' | relative_url }})

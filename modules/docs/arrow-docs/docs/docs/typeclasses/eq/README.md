@@ -47,7 +47,7 @@ Int.eq().run { 1.neqv(2) }
 
 ### Laws
 
-Arrow provides [`EqLaws`]({{ '/docs/typeclasses/laws#eqlaws' | relative_url }}) in the form of test cases for internal verification of lawful instances and third party apps creating their own `Eq` instances.
+Arrow provides `EqLaws` in the form of test cases for internal verification of lawful instances and third party apps creating their own `Eq` instances.
 
 #### Creating your own `Eq` instances
 
@@ -85,8 +85,8 @@ Most of the datatypes in Arrow that are not related to functions provide instanc
 - [Coproduct]({{ '/docs/datatypes/coproduct/' | relative_url }})
 - [Try]({{ '/docs/datatypes/try/' | relative_url }})
 - [Validated]({{ '/docs/datatypes/validated/' | relative_url }})
-- [Free]({{ '/docs/datatypes/free' | relative_url }})
-- [FreeApplicative]({{ '/docs/datatypes/FreeApplicative' | relative_url }})
+- [Free]({{ '/docs/free/free' | relative_url }})
+- [FreeApplicative]({{ '/docs/free/freeapplicative' | relative_url }})
 - [ListK]({{ '/docs/datatypes/listk/' | relative_url }})
 - [SequenceK]({{ '/docs/datatypes/sequencek/' | relative_url }})
 - [SetK]({{ '/docs/datatypes/setk/' | relative_url }})

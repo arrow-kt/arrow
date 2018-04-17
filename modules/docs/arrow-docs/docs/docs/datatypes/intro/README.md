@@ -119,9 +119,9 @@ A transformer is a special kind of datatype that allows combining two datatypes 
 
 TODO
 
-- [`Cokleisli`]({{ '/docs/datatypes/cokleisli/' | relative_url }})
+- [`Cokleisli`]
 
-- [`Coreader`]({{ '/docs/datatypes/coreader/' | relative_url }})
+- [`Coreader`]
 
 #### Effects
 
@@ -140,7 +140,7 @@ They are more general than the other datatypes as they combine the abstractions 
 
 - [`Free`]({{ '/docs/free/free/' | relative_url }})
 
-- [`FreeApplicative`]({{ '/docs/effects/freeapplicative/' | relative_url }})
+- [`FreeApplicative`]({{ '/docs/free/freeapplicative/' | relative_url }})
 
 - [`Cofree`]({{ '/docs/free/cofree/' | relative_url }})
 
