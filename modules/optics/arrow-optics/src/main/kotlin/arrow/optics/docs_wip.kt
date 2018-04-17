@@ -74,16 +74,3 @@ fun main(args: Array<String>) {
   complex.setter().someEmployee.employee.name.modify(String::toUpperCase).let(::println)
 
 }
-
-//Should go in Optics STD
-inline val <T, A> BoundSetter<T, Option<A>>.some: BoundSetter<T, A>
-  get() = this.compose(arrow.optics.somePrism())
-
-//Everything below will be generated
-fun ComplexDomain.setter() = arrow.optics.syntax.BoundSetter(this, arrow.optics.PSetter.id())
-
-inline val <T> BoundSetter<T, ComplexDomain>.someEmployee: BoundSetter<T, ComplexDomain.SomeEmployee>
-  get() = compose(complexDomainSomeEmployee())
-
-inline val <T> BoundSetter<T, ComplexDomain.SomeEmployee>.employee: BoundSetter<T, Employee>
-  get() = compose(someEmployeeEmployee())
