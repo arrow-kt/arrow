@@ -6,10 +6,10 @@ import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
+
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+
 class CoproductTest : UnitSpec() {
   val EQ: Eq<Kind3<ForCoproduct, ForId, ForId, Int>> = Eq { a, b ->
     a.fix().fix() == b.fix().fix()

@@ -4,7 +4,7 @@ import arrow.effects.typeclasses.Duration
 import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
 import arrow.test.generators.genTimeUnit
-import io.kotlintest.KTestJUnitRunner
+
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 

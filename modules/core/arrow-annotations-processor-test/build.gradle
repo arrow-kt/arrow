@@ -15,7 +15,9 @@ dependencies {
     testCompile fileTree(dir: './src/test/libs', includes: ['*.jar'])
     testCompile project(":arrow-data")
     testCompile project(":arrow-optics")
-    testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
+    testCompile "io.kotlintest:kotlintest-core:$kotlinTestVersion"
+    testCompile "io.kotlintest:kotlintest-assertions:$kotlinTestVersion"
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$kotlinTestVersion"
     def toolsJar = Jvm.current().getToolsJar()
 
     if (!toolsJar)

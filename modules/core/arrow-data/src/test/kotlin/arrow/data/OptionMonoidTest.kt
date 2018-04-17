@@ -5,11 +5,11 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.monoid
 import arrow.test.UnitSpec
-import io.kotlintest.KTestJUnitRunner
+
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+
 class OptionMonoidTest : UnitSpec() {
   init {
     "should semigroup with the instance passed" {

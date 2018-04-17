@@ -6,12 +6,11 @@ import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Semigroup
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.fail
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.fail
+
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
 class ValidatedTest : UnitSpec() {
 
   init {

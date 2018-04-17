@@ -2,7 +2,7 @@ dependencies {
     compile project(':arrow-data')
     compile project(':arrow-instances-data')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
-    testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$kotlinTestVersion"
     testCompile project(':arrow-test')
 
     compile project(':arrow-annotations')

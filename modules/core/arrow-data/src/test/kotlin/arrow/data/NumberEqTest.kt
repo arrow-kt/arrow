@@ -3,10 +3,10 @@ package arrow.data
 import arrow.instances.*
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
-import io.kotlintest.KTestJUnitRunner
+
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+
 class NumberEqTest : UnitSpec() {
   init {
 

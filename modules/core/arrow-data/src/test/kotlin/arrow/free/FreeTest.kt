@@ -12,8 +12,8 @@ import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadLaws
 import arrow.typeclasses.binding
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
+
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
 sealed class Ops<out A> : Kind<Ops.F, A> {
@@ -33,7 +33,7 @@ sealed class Ops<out A> : Kind<Ops.F, A> {
 
 fun <A> Kind<Ops.F, A>.fix(): Ops<A> = this as Ops<A>
 
-@RunWith(KTestJUnitRunner::class)
+
 class FreeTest : UnitSpec() {
 
   private val program = Ops.binding {

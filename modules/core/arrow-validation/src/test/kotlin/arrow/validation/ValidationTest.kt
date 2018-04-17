@@ -1,14 +1,14 @@
 package arrow.validation
 
 import arrow.core.Either
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
+
+import io.kotlintest.shouldBe
 import arrow.test.UnitSpec
 import org.junit.runner.RunWith
 
 data class ExampleForValidation(val number: Int, val text: String)
 
-@RunWith(KTestJUnitRunner::class)
+
 class ValidationTest : UnitSpec() {
 
   init {

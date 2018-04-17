@@ -7,10 +7,10 @@ import arrow.test.laws.EqLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseFilterLaws
 import arrow.typeclasses.*
-import io.kotlintest.KTestJUnitRunner
+
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+
 class ConstTest : UnitSpec() {
   init {
 

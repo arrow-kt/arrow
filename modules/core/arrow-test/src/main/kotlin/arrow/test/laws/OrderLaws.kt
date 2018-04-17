@@ -1,5 +1,6 @@
 package arrow.test.laws
 
+import arrow.test.generators.generate
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Order
 import io.kotlintest.properties.Gen

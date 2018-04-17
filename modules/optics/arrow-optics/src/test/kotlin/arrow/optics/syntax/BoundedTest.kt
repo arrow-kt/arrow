@@ -2,7 +2,7 @@ package arrow.optics
 
 import arrow.optics.syntax.*
 import arrow.test.UnitSpec
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.shouldBe
 
 @optics
 data class Street(val number: Int, val name: String)

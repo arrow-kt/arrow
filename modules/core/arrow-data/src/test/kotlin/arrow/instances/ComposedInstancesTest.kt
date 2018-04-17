@@ -7,12 +7,12 @@ import arrow.mtl.instances.ComposedFunctorFilter
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.*
-import io.kotlintest.KTestJUnitRunner
+
 import org.junit.runner.RunWith
 
 typealias OptionTNel = Kind<OptionTPartialOf<ForNonEmptyList>, Int>
 
-@RunWith(KTestJUnitRunner::class)
+
 class ComposedInstancesTest : UnitSpec() {
   init {
     val EQ_OPTION_NEL: Eq<NestedType<ForOption, ForNonEmptyList, Int>> = Eq { a, b ->

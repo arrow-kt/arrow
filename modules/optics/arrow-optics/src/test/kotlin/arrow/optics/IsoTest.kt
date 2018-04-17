@@ -4,18 +4,14 @@ import arrow.core.*
 import arrow.data.ListK
 import arrow.data.eq
 import arrow.data.k
-import arrow.instances.StringMonoidInstance
 import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
 class IsoTest : UnitSpec() {
 
   init {

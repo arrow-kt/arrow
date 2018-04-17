@@ -5,12 +5,10 @@ import arrow.data.k
 import arrow.instances.StringMonoidInstance
 import arrow.instances.monoid
 import arrow.test.UnitSpec
-import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
 class GetterTest : UnitSpec() {
 
   init {

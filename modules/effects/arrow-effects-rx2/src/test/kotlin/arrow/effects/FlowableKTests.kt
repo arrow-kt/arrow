@@ -6,7 +6,7 @@ import arrow.test.laws.FoldableLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.bindingCatch
-import io.kotlintest.KTestJUnitRunner
+
 import io.kotlintest.matchers.shouldNotBe
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers

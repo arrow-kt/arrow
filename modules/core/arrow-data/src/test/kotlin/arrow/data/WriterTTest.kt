@@ -12,10 +12,10 @@ import arrow.test.laws.MonadLaws
 import arrow.test.laws.MonadWriterLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
+
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+
 class WriterTTest : UnitSpec() {
   init {
 

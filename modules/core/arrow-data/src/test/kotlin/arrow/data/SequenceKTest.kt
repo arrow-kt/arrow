@@ -7,10 +7,10 @@ import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Show
-import io.kotlintest.KTestJUnitRunner
+
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+
 class SequenceKTest : UnitSpec() {
   val applicative = SequenceK.applicative()
 

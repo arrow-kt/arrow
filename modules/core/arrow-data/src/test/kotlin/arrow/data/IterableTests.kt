@@ -4,11 +4,11 @@ import arrow.core.case
 import arrow.core.then
 import arrow.syntax.collections.collect
 import arrow.test.UnitSpec
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
+
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+
 class IterableTests : UnitSpec() {
 
   init {

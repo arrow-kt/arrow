@@ -1,11 +1,11 @@
 package arrow.data
 
 import arrow.test.UnitSpec
-import io.kotlintest.KTestJUnitRunner
+
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+
 class NonEmptyListSemigroupTest : UnitSpec() {
   init {
     "should semigroup with the instance passed" {

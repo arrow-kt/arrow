@@ -4,7 +4,7 @@ dependencies {
     compile project(':arrow-effects-kotlinx-coroutines')
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
     kaptTest "com.google.dagger:dagger-compiler:$daggerVersion"
-    testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$kotlinTestVersion"
     testCompile project(':arrow-test')
 }
 
