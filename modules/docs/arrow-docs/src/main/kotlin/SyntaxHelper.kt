@@ -58,6 +58,18 @@ fun jsArrayEach(): Each<JsArray, Json> = object : Each<JsArray, Json> {
   override fun each(): Traversal<JsArray, Json> = jsArrayIso() compose ListTraversal()
 }
 
+@optics
+sealed class NetworkResult
+
+@optics
+data class Success(val content: String) : NetworkResult()
+
+@optics
+sealed class NetworkError : NetworkResult()
+
+@optics
+data class HttpError(val message: String) : NetworkError()
+object TimeoutError : NetworkError()
 fun main(args: Array<String>) {
   val json: Json = JsArray(listOf(
     JsInt(1),
