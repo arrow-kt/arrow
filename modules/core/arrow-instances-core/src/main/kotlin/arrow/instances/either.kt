@@ -66,7 +66,7 @@ interface EitherFoldableInstance<L> : Foldable<EitherPartialOf<L>> {
     fix().foldRight(lb, f)
 }
 
-fun <G, A, B, C> EitherOf<A, B>.traverse(GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Either<A, C>> = GA.run {
+fun <G, A, B, C> EitherOf<A, B>.traverse(f: (B) -> Kind<G, C>, GA: Applicative<G>): Kind<G, Either<A, C>> = GA.run {
   fix().fold({ just(Either.Left(it)) }, { f(it).map({ Either.Right(it) }) })
 }
 
@@ -74,7 +74,7 @@ fun <G, A, B, C> EitherOf<A, B>.traverse(GA: Applicative<G>, f: (B) -> Kind<G, C
 interface EitherTraverseInstance<L> : EitherFoldableInstance<L>, Traverse<EitherPartialOf<L>> {
 
   override fun <G, A, B> Kind<EitherPartialOf<L>, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Kind<EitherPartialOf<L>, B>> =
-    fix().traverse(AP, f)
+    traverse(f, AP)
 }
 
 @instance(Either::class)

@@ -33,8 +33,9 @@ interface MapAtInstance<K, V> : At<Map<K, V>, K, Option<V>> {
 }
 
 interface MapTraversal<K, V> : Traversal<Map<K, V>, V> {
-  override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> =
-    MapK.traverse<K>().run { s.k().traverse(FA, f) }
+  override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> = with(MapK.traverse<K>()) {
+    FA.run { s.k().traverse(this, f).map { it.map } }
+  }
 
   companion object {
     operator fun <K, V> invoke(): MapTraversal<K, V> = object : MapTraversal<K, V> {}
