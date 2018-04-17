@@ -35,48 +35,48 @@ class OpticsProcessor : AbstractProcessor() {
   override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
 
     roundEnv
-            .getElementsAnnotatedWith(opticsAnnotationClass)
-            .forEach { element ->
+      .getElementsAnnotatedWith(opticsAnnotationClass)
+      .forEach { element ->
 
-              val type = element.getClassType()
+        val type = element.getClassType()
 
-              val targets = element.getAnnotation(opticsAnnotationClass).targets.toList()
+        val targets = element.getAnnotation(opticsAnnotationClass).targets.toList()
 
-              if (type == ClassType.OTHER) {
-                logE("Only data and sealed classes can be annotated with optics annotation", element)
-                return@forEach
-              }
+        if (type == ClassType.OTHER) {
+          logE("Only data and sealed classes can be annotated with optics annotation", element)
+          return@forEach
+        }
 
-              val normalizedTargets = when {
-                targets.isEmpty() ->
-                  when (type) {
-                    ClassType.SEALED_CLASS -> listOf(OpticsTarget.PRISM)
-                    else -> listOf(OpticsTarget.ISO, OpticsTarget.LENS, OpticsTarget.OPTIONAL, OpticsTarget.DSL)
-                  }
-                targets.contains(OpticsTarget.DSL) ->
-                  when (type) {
-                    ClassType.DATA_CLASS -> targets + listOf(OpticsTarget.LENS, OpticsTarget.OPTIONAL)
-                    else -> {
-                      logE("Only data classes can have DSL target", element); emptyList()
-                    }
-
-                  }
-                else -> targets
-              }
-
-              normalizedTargets.forEach { target ->
-
-                when (target) {
-                  OpticsTarget.LENS -> annotatedLenses.addIfNotNull(evalAnnotatedLensElement(element))
-                  OpticsTarget.PRISM -> annotatedPrisms.addIfNotNull(evalAnnotatedPrismElement(element))
-                  OpticsTarget.ISO -> annotatedIsos.addIfNotNull(evalAnnotatedIsoElement(element))
-                  OpticsTarget.OPTIONAL -> annotatedOptional.addIfNotNull(evalAnnotatedOptionalElement(element))
-                  OpticsTarget.DSL -> annotatedBounded.addIfNotNull(evalAnnotatedDslElement(element))
-                }
-
+        val normalizedTargets = when {
+          targets.isEmpty() ->
+            when (type) {
+              ClassType.SEALED_CLASS -> listOf(OpticsTarget.PRISM)
+              else -> listOf(OpticsTarget.ISO, OpticsTarget.LENS, OpticsTarget.OPTIONAL, OpticsTarget.DSL)
+            }
+          targets.contains(OpticsTarget.DSL) ->
+            when (type) {
+              ClassType.DATA_CLASS -> targets + listOf(OpticsTarget.LENS, OpticsTarget.OPTIONAL)
+              else -> {
+                logE("Only data classes can have DSL target", element); emptyList()
               }
 
             }
+          else -> targets
+        }
+
+        normalizedTargets.forEach { target ->
+
+          when (target) {
+            OpticsTarget.LENS -> annotatedLenses.addIfNotNull(evalAnnotatedLensElement(element))
+            OpticsTarget.PRISM -> annotatedPrisms.addIfNotNull(evalAnnotatedPrismElement(element))
+            OpticsTarget.ISO -> annotatedIsos.addIfNotNull(evalAnnotatedIsoElement(element))
+            OpticsTarget.OPTIONAL -> annotatedOptional.addIfNotNull(evalAnnotatedOptionalElement(element))
+            OpticsTarget.DSL -> annotatedBounded.addIfNotNull(evalAnnotatedDslElement(element))
+          }
+
+        }
+
+      }
 
     if (roundEnv.processingOver()) {
       val generatedDir = File(this.generatedDir!!, "").also { it.mkdirs() }
@@ -91,9 +91,9 @@ class OpticsProcessor : AbstractProcessor() {
   private fun evalAnnotatedOptionalElement(element: Element): AnnotatedOptic? = when (element.getClassType()) {
     ClassType.DATA_CLASS ->
       AnnotatedOptic(
-              element as TypeElement,
-              element.getClassData(),
-              element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Target.Companion::invoke)
+        element as TypeElement,
+        element.getClassData(),
+        element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Target.Companion::invoke)
       )
 
     else -> {
@@ -106,9 +106,9 @@ class OpticsProcessor : AbstractProcessor() {
   private fun evalAnnotatedLensElement(element: Element): AnnotatedOptic? = when (element.getClassType()) {
     ClassType.DATA_CLASS ->
       AnnotatedOptic(
-              element as TypeElement,
-              element.getClassData(),
-              element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Target.Companion::invoke)
+        element as TypeElement,
+        element.getClassData(),
+        element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Target.Companion::invoke)
       )
 
     else -> {
@@ -120,9 +120,9 @@ class OpticsProcessor : AbstractProcessor() {
   private fun evalAnnotatedDslElement(element: Element): AnnotatedOptic? = when (element.getClassType()) {
     ClassType.DATA_CLASS ->
       AnnotatedOptic(
-              element as TypeElement,
-              element.getClassData(),
-              element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Target.Companion::invoke)
+        element as TypeElement,
+        element.getClassData(),
+        element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Target.Companion::invoke)
       )
 
     else -> {
@@ -136,12 +136,12 @@ class OpticsProcessor : AbstractProcessor() {
       val (nameResolver, classProto) = element.kotlinMetadata.let { it as KotlinClassMetadata }.data
 
       AnnotatedOptic(
-              element as TypeElement,
-              element.getClassData(),
-              classProto.sealedSubclassFqNameList
-                      .map(nameResolver::getString)
-                      .map { it.replace('/', '.') }
-                      .map { Target(it, it.substringAfterLast(".")) }
+        element as TypeElement,
+        element.getClassData(),
+        classProto.sealedSubclassFqNameList
+          .map(nameResolver::getString)
+          .map { it.replace('/', '.') }
+          .map { Target(it, it.substringAfterLast(".")) }
       )
     }
 

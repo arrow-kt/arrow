@@ -11,11 +11,11 @@ import java.io.File
 import java.nio.file.Paths
 
 abstract class APTest(
-        val pckg: String
+  val pckg: String
 ) : StringSpec() {
 
   fun testProcessor(
-          vararg processor: AnnotationProcessor
+    vararg processor: AnnotationProcessor
   ) {
 
     processor.forEach { (name, source, dest, proc, error) ->
@@ -40,21 +40,21 @@ abstract class APTest(
         val stub = File(stubs, source).toURI().toURL()
 
         val compilation = javac()
-                .withProcessors(proc)
-                .withOptions(ImmutableList.of("-Akapt.kotlin.generated=$temp"))
-                .compile(JavaFileObjects.forResource(stub))
+          .withProcessors(proc)
+          .withOptions(ImmutableList.of("-Akapt.kotlin.generated=$temp"))
+          .compile(JavaFileObjects.forResource(stub))
 
         if (error != null) {
 
           assertThat(compilation)
-                  .failed()
+            .failed()
           assertThat(compilation)
-                  .hadErrorContaining(error)
+            .hadErrorContaining(error)
 
         } else {
 
           assertThat(compilation)
-                  .succeeded()
+            .succeeded()
 
           temp.listFiles().size shouldBe 1
 
