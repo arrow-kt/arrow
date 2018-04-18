@@ -28,13 +28,13 @@ class LensesFileGenerator(
       val targetClassName = variable.fullName
       val targetName = variable.paramName
       val lensType = when (variable) {
-        is Target.NullableTarget -> "Nullable${targetName.toUpperCamelCase()}"
-        is Target.OptionTarget -> "Option${targetName.toUpperCamelCase()}"
-        is Target.NonNullTarget -> targetName.toUpperCamelCase()
+        is Target.NullableTarget -> "nullable${targetName.toUpperCamelCase()}"
+        is Target.OptionTarget -> "option${targetName.toUpperCamelCase()}"
+        is Target.NonNullTarget -> targetName
       }
 
       """
-                    |fun $sourceName$lensType(): $lens<$sourceClassName, $targetClassName> = $lens(
+                    |inline val $sourceClassName.Companion.$lensType: $lens<$sourceClassName, $targetClassName> get()= $lens(
                     |        get = { $sourceName: $sourceClassName -> $sourceName.${targetName.plusIfNotBlank(prefix = "`", postfix = "`")} },
                     |        set = { value: $targetClassName ->
                     |            { $sourceName: $sourceClassName ->

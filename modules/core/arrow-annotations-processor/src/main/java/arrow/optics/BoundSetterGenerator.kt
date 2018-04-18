@@ -51,7 +51,7 @@ class BoundSetterGenerator(
 
   fun processBoundSetter(sourceClassName: String, targetName: String, targetClassName: String, sourceName: String) = """
       |inline val <T> $boundSetter<T, $sourceClassName>.$targetName: $boundSetter<T, $targetClassName>
-      |    get() = this.compose($sourceName${targetName.toUpperCamelCase()}())
+      |    get() = this.compose($sourceClassName.$targetName)
       |""".trimMargin()
 
 }

@@ -45,7 +45,7 @@ class OptionalFileGenerator(
                |""".trimMargin()
 
   private fun processNullableOptional(nonNullTargetClassName: String, sourceName: String, targetName: String, sourceClassName: String) = """
-      |fun $sourceName${targetName.toUpperCamelCase()}(): $optional<$sourceClassName, $nonNullTargetClassName> = $optional(
+      |inline val $sourceClassName.Companion.$targetName: $optional<$sourceClassName, $nonNullTargetClassName> get()= $optional(
       |  getOrModify = { $sourceName: $sourceClassName -> $sourceName.${targetName.plusIfNotBlank(prefix = "`", postfix = "`")}?.right() ?: $sourceName.left() },
       |  set = { value: $nonNullTargetClassName ->
       |    { $sourceName: $sourceClassName ->
@@ -56,7 +56,7 @@ class OptionalFileGenerator(
       """.trimMargin()
 
   private fun processOptionOptional(sourceName: String, targetName: String, sourceClassName: String, clz: String) = """
-      |fun $sourceName${targetName.toUpperCamelCase()}(): $optional<$sourceClassName, $clz> = $optional(
+      |inline val $sourceClassName.Companion.$targetName: $optional<$sourceClassName, $clz> get()= $optional(
       |  getOrModify = { $sourceName: $sourceClassName -> $sourceName.${targetName.plusIfNotBlank(prefix = "`", postfix = "`")}.orNull()?.right() ?: $sourceName.left() },
       |  set = { value: $clz ->
       |    { $sourceName: $sourceClassName ->
