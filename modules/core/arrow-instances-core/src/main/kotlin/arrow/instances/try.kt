@@ -99,7 +99,7 @@ interface TryFoldableInstance : Foldable<ForTry> {
     fix().foldRight(lb, f)
 }
 
-fun <A, B, G> TryOf<A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Try<B>> = GA.run {
+fun <A, B, G> Try<A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Try<B>> = GA.run {
   fix().fold({ just(Try.raise(it)) }, { f(it).map({ Try.just(it) }) })
 }
 
@@ -109,7 +109,7 @@ interface TryTraverseInstance : Traverse<ForTry> {
     fix().map(f)
 
   override fun <G, A, B> TryOf<A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Try<B>> =
-    traverse(f, AP)
+    fix().traverse(f, AP)
 
   override fun <A> TryOf<A>.exists(p: (A) -> Boolean): kotlin.Boolean =
     fix().exists(p)

@@ -74,7 +74,7 @@ fun <G, A, B, C> EitherOf<A, B>.traverse(f: (B) -> Kind<G, C>, GA: Applicative<G
 interface EitherTraverseInstance<L> : EitherFoldableInstance<L>, Traverse<EitherPartialOf<L>> {
 
   override fun <G, A, B> Kind<EitherPartialOf<L>, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Kind<EitherPartialOf<L>, B>> =
-    traverse(f, AP)
+    fix().traverse(f, AP)
 }
 
 @instance(Either::class)
