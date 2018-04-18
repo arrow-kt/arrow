@@ -76,6 +76,14 @@ val employees = Employees(listOf(john, jane).k())
 employees.setter().employees.every(ListK.each()).company.address.street.name.modify(String::capitalize)
 ```
 
+If you are in the scope of `Each` you don't need to specify the instance.
+
+```kotlin:ank
+ListK.each<Employee>().run {
+  employees.setter().employees.every().company.address.street.name.modify(String::capitalize)
+}
+```
+
 `At` can be used to focus in `A` at a given index `I` for a given structure `S`.
 
 ```kotlin
