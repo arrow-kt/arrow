@@ -47,7 +47,8 @@ interface ProcessorUtils : KotlinMetadataUtils {
   }
 
   fun getClassOrPackageDataWrapper(classElement: TypeElement): ClassOrPackageDataWrapper {
-    val metadata = classElement.kotlinMetadata ?: knownError("Arrow's annotations can only be used on Kotlin classes. Not valid for $classElement")
+    val metadata = classElement.kotlinMetadata
+      ?: knownError("Arrow's annotations can only be used on Kotlin classes. Not valid for $classElement")
 
     return metadata.asClassOrPackageDataWrapper(classElement)
       ?: knownError("Arrow's annotation can't be used on $classElement")

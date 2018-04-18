@@ -69,15 +69,5 @@ sealed class NetworkError : NetworkResult()
 
 @optics
 data class HttpError(val message: String) : NetworkError()
-object TimeoutError : NetworkError()
-fun main(args: Array<String>) {
-  val json: Json = JsArray(listOf(
-    JsInt(1),
-    JsInt(2),
-    JsInt(3),
-    JsDouble(4.0)
-  ))
 
-  json.setter().jsArray.every(jsArrayEach()).jsInt.int.modify { it + 1 }
-    .let(::println)
-}
+object TimeoutError : NetworkError()

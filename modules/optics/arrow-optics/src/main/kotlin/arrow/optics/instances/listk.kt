@@ -28,15 +28,15 @@ interface ListKEachInstance<A> : Each<ListK<A>, A> {
 @instance(ListK::class)
 interface ListKFilterIndexInstance<A> : FilterIndex<ListK<A>, Int, A> {
   override fun filter(p: (Int) -> Boolean): Traversal<ListK<A>, A> = object : Traversal<ListK<A>, A> {
-      override fun <F> modifyF(FA: Applicative<F>, s: ListK<A>, f: (A) -> Kind<F, A>): Kind<F, ListK<A>> =
-        ListK.traverse().run {
-          FA.run {
-            s.mapIndexed { index, a -> a toT index }.k().traverse(FA, { (a, j) ->
-              if (p(j)) f(a) else just(a)
-            })
-          }
+    override fun <F> modifyF(FA: Applicative<F>, s: ListK<A>, f: (A) -> Kind<F, A>): Kind<F, ListK<A>> =
+      ListK.traverse().run {
+        FA.run {
+          s.mapIndexed { index, a -> a toT index }.k().traverse(FA, { (a, j) ->
+            if (p(j)) f(a) else just(a)
+          })
         }
-    }
+      }
+  }
 }
 
 @instance(ListK::class)
