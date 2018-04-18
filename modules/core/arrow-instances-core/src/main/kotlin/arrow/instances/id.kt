@@ -102,9 +102,12 @@ interface IdFoldableInstance : Foldable<ForId> {
     fix().foldRight(lb, f)
 }
 
-fun <A, G, B> Id<A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Id<B>> = GA.run {
+fun <A, G, B> IdOf<A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Id<B>> = GA.run {
   f(value()).map { Id(it) }
 }
+
+fun <A, G> IdOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Id<A>> =
+  idTraverse(GA, ::identity)
 
 @instance(Id::class)
 interface IdTraverseInstance : Traverse<ForId> {
@@ -112,7 +115,7 @@ interface IdTraverseInstance : Traverse<ForId> {
     fix().map(f)
 
   override fun <G, A, B> Kind<ForId, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Id<B>> =
-    fix().idTraverse(AP, f)
+    idTraverse(AP, f)
 
   override fun <A, B> Kind<ForId, A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
