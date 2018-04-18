@@ -104,6 +104,14 @@ val db = Db(mapOf(
 db.setter().content.at(MapK.at(), 2).some.modify(String::reversed)
 ```
 
+If you are in the scope of `At` you don't need to specify the instance.
+
+```kotlin:ank
+MapK.at<Int, String>().run {
+  db.setter().content.at(2).some.modify(String::reversed)
+}
+```
+
 ## Syntax DSL vs Optics
 
 In contrast to regular optics the DSL is bound to a value. Lets also generate `Lens` and `Optional` for our above domain so we can compare the difference.
