@@ -28,6 +28,10 @@ buildscript {
 
 apply plugin: 'ch.tutteli.settings'
 
+
+include(':arrow-annotations-processor-test-models')
+project(':arrow-annotations-processor-test-models').projectDir = new File('modules/core/arrow-annotations-processor/models')
+
 //noinspection GroovyAssignabilityCheck
 include {
     modules {
@@ -35,7 +39,6 @@ include {
         core {
             _ 'annotations'
             _ 'annotations-processor'
-            _ 'annotations-processor-test'
             _ 'core'
             _ 'data'
             _ 'free'
