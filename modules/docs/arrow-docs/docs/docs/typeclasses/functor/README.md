@@ -96,12 +96,12 @@ See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | rela
 
 The following datatypes in Arrow provide instances that adhere to the `Functor` typeclass.
 
-- [Cofree]({{ '/docs/datatypes/cofree' | relative_url }})
+- [Cofree]({{ '/docs/free/cofree' | relative_url }})
 - [Coproduct]({{ '/docs/datatypes/coproduct' | relative_url }})  
-- [Coyoneda]({{ '/docs/datatypes/coyoneda' | relative_url }})
+- [Coyoneda]({{ '/docs/free/coyoneda' | relative_url }})
 - [Either]({{ '/docs/datatypes/either' | relative_url }})
 - [EitherT]({{ '/docs/datatypes/eithert' | relative_url }})
-- [FreeApplicative]({{ '/docs/datatypes/freeapplicative' | relative_url }})
+- [FreeApplicative]({{ '/docs/free/freeapplicative' | relative_url }})
 - [Function1]({{ '/docs/datatypes/function1' | relative_url }})
 - [Ior]({{ '/docs/datatypes/ior' | relative_url }})
 - [Kleisli]({{ '/docs/datatypes/kleisli' | relative_url }})
@@ -109,7 +109,7 @@ The following datatypes in Arrow provide instances that adhere to the `Functor` 
 - [StateT]({{ '/docs/datatypes/statet' | relative_url }})
 - [Validated]({{ '/docs/datatypes/validated' | relative_url }})
 - [WriterT]({{ '/docs/datatypes/writert' | relative_url }})
-- [Yoneda]({{ '/docs/datatypes/yoneda' | relative_url }})
+- [Yoneda]({{ '/docs/free/yoneda' | relative_url }})
 - [Const]({{ '/docs/datatypes/const' | relative_url }})
 - [Try]({{ '/docs/datatypes/try' | relative_url }})
 - [Eval]({{ '/docs/datatypes/eval' | relative_url }})

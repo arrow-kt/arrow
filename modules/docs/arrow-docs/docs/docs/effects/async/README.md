@@ -82,7 +82,7 @@ For example, IO has unsafeRunTimed that runs never() safely.
 
 ### Syntax available inside Monad Comprehensions
 
-All the syntax functions are geared towards using `Async` inside [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }})
+All the syntax functions are geared towards using `Async` inside [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }})
 to create blocks of code to be run asynchronously.
 
 #### binding#bindAsync
@@ -122,7 +122,7 @@ IO.monad().binding {
 
 ### Laws
 
-Arrow provides [`AsyncLaws`]({{ '/docs/typeclasses/laws#asynclaws' | relative_url }}) in the form of test cases for internal verification of lawful instances and third party apps creating their own `Async` instances.
+Arrow provides `AsyncLaws` in the form of test cases for internal verification of lawful instances and third party apps creating their own `Async` instances.
 
 ### Data Types
 

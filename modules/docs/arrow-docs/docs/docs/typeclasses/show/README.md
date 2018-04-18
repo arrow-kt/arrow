@@ -27,7 +27,7 @@ Given an instance of `F` it returns the `String` representation of this instance
 
 ### Laws
 
-Arrow provides [`ShowLaws`]({{ '/docs/typeclasses/laws#showlaws' | relative_url }}) in the form of test cases for internal verification of lawful instances and third party apps creating their own `Show` instances.
+Arrow provides `ShowLaws` in the form of test cases for internal verification of lawful instances and third party apps creating their own `Show` instances.
 
 #### Creating your own `Show` instances
 

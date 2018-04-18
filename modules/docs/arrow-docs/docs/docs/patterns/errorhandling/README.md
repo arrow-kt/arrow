@@ -289,7 +289,7 @@ Either.monadError<NukeException>()
 ```
 
 Let's now rewrite our program as a polymorphic function that will work over any datatype for which a `MonadError` instance exists.
-Polymorphic code in Arrow is based on emulated [`Higher Kinds`](/docs/patterns/polymorphicprograms) as described in [Lightweight higher-kinded polymorphism](https://www.cl.cam.ac.uk/~jdy22/papers/lightweight-higher-kinded-polymorphism.pdf) and applied to Kotlin, a lang which does not yet support Higher Kinded Types.
+Polymorphic code in Arrow is based on emulated `Higher Kinds` as described in [Lightweight higher-kinded polymorphism](https://www.cl.cam.ac.uk/~jdy22/papers/lightweight-higher-kinded-polymorphism.pdf) and applied to Kotlin, a lang which does not yet support Higher Kinded Types.
 
 ```kotlin
 fun <f> arm(ME: MonadError<F, NukeException>): Kind<F, Nuke> = ME.just(Nuke)

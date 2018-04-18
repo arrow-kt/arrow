@@ -69,7 +69,7 @@ Int.order().run { 1.sort(2) }
 
 ### Laws
 
-Arrow provides [`OrderLaws`]({{ '/docs/typeclasses/laws#orderlaws' | relative_url }}) in the form of test cases for internal verification of lawful instances and third party apps creating their own `Order` instances.
+Arrow provides `OrderLaws` in the form of test cases for internal verification of lawful instances and third party apps creating their own `Order` instances.
 
 #### Creating your own `Order` instances
 

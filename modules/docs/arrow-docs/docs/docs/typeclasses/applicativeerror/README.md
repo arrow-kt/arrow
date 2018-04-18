@@ -118,7 +118,7 @@ AE_EITHER.catch({ throw RuntimeException("Boom") } ,::identity)
 
 ### Laws
 
-Arrow provides [`ApplicativeErrorLaws`]({{ '/docs/typeclasses/laws#applicativeerrorlaws' | relative_url }}) in the form of test cases for internal verification of lawful instances and third party apps creating their own `ApplicativeError` instances.
+Arrow provides `ApplicativeErrorLaws` in the form of test cases for internal verification of lawful instances and third party apps creating their own `ApplicativeError` instances.
 
 ### Data Types
 

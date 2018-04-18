@@ -43,7 +43,7 @@ This can be used to wrap synchronous APIs that already return the expected datat
 #### lazy
 
 Suspends a function returning `Unit`.
-Useful in cases like [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) where you'd want to defer the start of the comprehension until the datatype is run without needing to use suspend.
+Useful in cases like [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) where you'd want to defer the start of the comprehension until the datatype is run without needing to use suspend.
 
 ```kotlin
 val SC = IO.monadDefer()
@@ -90,7 +90,7 @@ IO.async()
 
 #### bindindCancellable
 
-It starts a [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) that allows for cancellation and suspension in separate threads.
+It starts a [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) that allows for cancellation and suspension in separate threads.
 
 #### bindindCancellable#bindDefer
 
@@ -112,7 +112,7 @@ While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/d
 
 ### Laws
 
-Arrow provides [`MonadDeferLaws`]({{ '/docs/typeclasses/laws#monaddeferlaws' | relative_url }}) in the form of test cases for internal verification of lawful instances and third party apps creating their own `MonadDefer` instances.
+Arrow provides `MonadDeferLaws` in the form of test cases for internal verification of lawful instances and third party apps creating their own `MonadDefer` instances.
 
 ### Data Types
 
