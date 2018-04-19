@@ -41,7 +41,7 @@ class AutoFoldFileGenerator(
 
   private fun params(variants: List<Variant>, returnType: String, annotatedFold: AnnotatedFold): String = variants.joinToString(transform = { variant ->
     if (variant.typeParams.size > annotatedFold.typeParams.size) autoFoldGenericError(annotatedFold, variant)
-    else "        crossinline ${variant.simpleName.decapitalize()}: (${variant.fullName.escapedClassName}${typeParams(variant.typeParams)}) -> $returnType"
+    else "  crossinline ${variant.simpleName.decapitalize()}: (${variant.fullName.escapedClassName}${typeParams(variant.typeParams)}) -> $returnType"
   }, separator = ",\n")
 
   private fun fileHeader(packageName: String) = """
@@ -50,7 +50,7 @@ class AutoFoldFileGenerator(
     |""".trimMargin()
 
   private fun patternMatching(variants: List<Variant>): String = variants.joinToString(transform = { variant ->
-    "    is ${variant.fullName.escapedClassName} -> ${variant.simpleName.decapitalize().escapedClassName}(this)"
+    "  is ${variant.fullName.escapedClassName} -> ${variant.simpleName.decapitalize().escapedClassName}(this)"
   }, separator = "\n")
 
   private fun functionTypeParams(params: List<String>, returnType: String): String =
