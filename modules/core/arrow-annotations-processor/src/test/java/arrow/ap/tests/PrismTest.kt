@@ -9,7 +9,12 @@ class PrismTest : APTest("arrow.ap.objects.prism") {
     testProcessor(AnnotationProcessor(
       name = "Prisms cannot be generated for data class",
       sourceFile = "PrismDataClass.java",
-      errorMessage = "Prisms can only be generated for sealed classes",
+      errorMessage = """
+      |Cannot generate arrow.optics.Prism for arrow.ap.objects.prism.PrismDataClass
+      |                                          ^
+      |  arrow.optics.OpticsTarget.PRISM is an invalid @optics argument for arrow.ap.objects.prism.PrismDataClass.
+      |  It is only valid for sealed classes.
+      """.trimMargin(),
       processor = OpticsProcessor()
     ))
 

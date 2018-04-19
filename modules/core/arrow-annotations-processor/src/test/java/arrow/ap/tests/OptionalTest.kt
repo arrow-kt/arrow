@@ -9,7 +9,12 @@ class OptionalTest : APTest("arrow.ap.objects.optional") {
     testProcessor(AnnotationProcessor(
       name = "Optionals cannot be generated for sealed class",
       sourceFile = "OptionalSealed.java",
-      errorMessage = "Optionals can only be generated for data classes",
+      errorMessage = """
+    |Cannot generate arrow.optics.Optional for arrow.ap.objects.optional.OptionalSealed
+    |                                             ^
+    |  arrow.optics.OpticsTarget.OPTIONAL is an invalid @optics argument for arrow.ap.objects.optional.OptionalSealed.
+    |  It is only valid for data classes.
+    """.trimMargin(),
       processor = OpticsProcessor()
     ))
 

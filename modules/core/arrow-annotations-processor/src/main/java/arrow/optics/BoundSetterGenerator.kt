@@ -29,9 +29,9 @@ class BoundSetterGenerator(
       val targetName = variable.paramName
 
       when (variable) {
-        is Target.NullableTarget -> processBoundSetter(sourceClassName, targetName, variable.nonNullFullName, sourceName)
-        is Target.OptionTarget -> processBoundSetter(sourceClassName, targetName, variable.nestedFullName, sourceName)
-        is Target.NonNullTarget -> processBoundSetter(sourceClassName, targetName, targetClassName, sourceName)
+        is Target.NullableTarget -> processBoundSetter(sourceName, sourceClassName, targetName, variable.nonNullFullName)
+        is Target.OptionTarget -> processBoundSetter(sourceName, sourceClassName, targetName, variable.nestedFullName)
+        is Target.NonNullTarget -> processBoundSetter(sourceName, sourceClassName, targetName, targetClassName)
       }
     }
 
@@ -41,7 +41,7 @@ class BoundSetterGenerator(
                |import $packageName.*
                |""".trimMargin()
 
-  fun createDslFunction(annotatedOptic: AnnotatedOptic): String = """
+  private fun createDslFunction(annotatedOptic: AnnotatedOptic): String = """
         |/**
         | * @receiver [${annotatedOptic.sourceClassName.removeBackticks()}] the instance you want to bind the dsl on.
         | * @return [$boundSetter] an intermediate optics that is bound to the instance.
@@ -49,8 +49,8 @@ class BoundSetterGenerator(
         |fun ${annotatedOptic.sourceClassName}.setter() = $boundSetter(this, arrow.optics.PSetter.id())
         |""".trimMargin()
 
-  fun processBoundSetter(sourceClassName: String, targetName: String, targetClassName: String, sourceName: String) = """
-      |inline val <T> $boundSetter<T, $sourceClassName>.$targetName: $boundSetter<T, $targetClassName>
+  private fun processBoundSetter(sourceName: String, sourceClassName: String, targetName: String, targetClassName: String) = """
+      |inline val <T> $boundSetter<T, $sourceClassName>.${targetName.decapitalize()}: $boundSetter<T, $targetClassName>
       |    get() = this.compose($sourceName${targetName.toUpperCamelCase()}())
       |""".trimMargin()
 

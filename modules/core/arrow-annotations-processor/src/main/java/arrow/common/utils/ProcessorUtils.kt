@@ -47,13 +47,15 @@ interface ProcessorUtils : KotlinMetadataUtils {
   }
 
   fun getClassOrPackageDataWrapper(classElement: TypeElement): ClassOrPackageDataWrapper {
-    val metadata = classElement.kotlinMetadata ?: knownError("These annotations can only be used in Kotlin")
+    val metadata = classElement.kotlinMetadata
+      ?: knownError("Arrow's annotations can only be used on Kotlin classes. Not valid for $classElement")
+
     return metadata.asClassOrPackageDataWrapper(classElement)
-      ?: knownError("This annotation can't be used on this element")
+      ?: knownError("Arrow's annotation can't be used on $classElement")
   }
 
   fun TypeElement.methods(): List<MethodElement> =
-    enclosedElements.mapNotNull { if (it is MethodElement) it as MethodElement else null }
+    enclosedElements.mapNotNull { it as? MethodElement }
 
   fun ClassOrPackageDataWrapper.getFunction(methodElement: ExecutableElement) =
     getFunctionOrNull(methodElement, nameResolver, functionList)
