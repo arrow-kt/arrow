@@ -3,6 +3,7 @@ package arrow.optics.typeclasses
 import arrow.Kind
 import arrow.optics.Iso
 import arrow.optics.Traversal
+import arrow.optics.syntax.BoundSetter
 import arrow.typeclasses.Traverse
 
 /**
@@ -17,6 +18,12 @@ interface Each<S, A> {
    * Get a [Traversal] for a structure [S] with focus in [A].
    */
   fun each(): Traversal<S, A>
+
+  /**
+   * Syntax to focus in on every element [A] of [S] for a [BoundSetter].
+   */
+  fun <T> BoundSetter<T, S>.every(): BoundSetter<T, A> =
+    this.compose(each())
 
   companion object {
 

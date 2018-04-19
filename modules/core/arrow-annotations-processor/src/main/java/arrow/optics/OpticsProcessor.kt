@@ -3,6 +3,8 @@ package arrow.optics
 import arrow.common.messager.logE
 import arrow.common.utils.AbstractProcessor
 import arrow.common.utils.isSealed
+import arrow.optics.OpticsTarget.*
+import arrow.optics.OpticsProcessor.ClassType.*
 import com.google.auto.service.AutoService
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
 import me.eugeniomarletti.kotlin.metadata.isDataClass
@@ -37,43 +39,19 @@ class OpticsProcessor : AbstractProcessor() {
     roundEnv
       .getElementsAnnotatedWith(opticsAnnotationClass)
       .forEach { element ->
-
-        val type = element.getClassType()
-
-        val targets = element.getAnnotation(opticsAnnotationClass).targets.toList()
-
-        if (type == ClassType.OTHER) {
-          logE("Only data and sealed classes can be annotated with optics annotation", element)
+        if (element.classType == OTHER) {
+          logE(element.otherClassTypeErrorMessage, element)
           return@forEach
         }
 
-        val normalizedTargets = when {
-          targets.isEmpty() ->
-            when (type) {
-              ClassType.SEALED_CLASS -> listOf(OpticsTarget.PRISM)
-              else -> listOf(OpticsTarget.ISO, OpticsTarget.LENS, OpticsTarget.OPTIONAL, OpticsTarget.DSL)
-            }
-          targets.contains(OpticsTarget.DSL) ->
-            when (type) {
-              ClassType.DATA_CLASS -> targets + listOf(OpticsTarget.LENS, OpticsTarget.OPTIONAL)
-              else -> {
-                logE("Only data classes can have DSL target", element); emptyList()
-              }
-
-            }
-          else -> targets
-        }
-
-        normalizedTargets.forEach { target ->
-
+        element.normalizedTargets().forEach { target ->
           when (target) {
-            OpticsTarget.LENS -> annotatedLenses.addIfNotNull(evalAnnotatedLensElement(element))
-            OpticsTarget.PRISM -> annotatedPrisms.addIfNotNull(evalAnnotatedPrismElement(element))
-            OpticsTarget.ISO -> annotatedIsos.addIfNotNull(evalAnnotatedIsoElement(element))
-            OpticsTarget.OPTIONAL -> annotatedOptional.addIfNotNull(evalAnnotatedOptionalElement(element))
-            OpticsTarget.DSL -> annotatedBounded.addIfNotNull(evalAnnotatedDslElement(element))
+            LENS -> annotatedLenses.addIfNotNull(evalAnnotatedDataClass(element, element.lensErrorMessage))
+            PRISM -> annotatedPrisms.addIfNotNull(evalAnnotatedPrismElement(element))
+            ISO -> annotatedIsos.addIfNotNull(evalAnnotatedIsoElement(element))
+            OPTIONAL -> annotatedOptional.addIfNotNull(evalAnnotatedDataClass(element, element.optionalErrorMessage))
+            DSL -> annotatedBounded.addIfNotNull(evalAnnotatedDslElement(element))
           }
-
         }
 
       }
@@ -88,51 +66,37 @@ class OpticsProcessor : AbstractProcessor() {
     }
   }
 
-  private fun evalAnnotatedOptionalElement(element: Element): AnnotatedOptic? = when (element.getClassType()) {
-    ClassType.DATA_CLASS ->
-      AnnotatedOptic(
-        element as TypeElement,
-        element.getClassData(),
-        element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Target.Companion::invoke)
-      )
-
-    else -> {
-      logE("Optionals can only be generated for data classes", element)
-      null
+  private fun Element.normalizedTargets(): List<OpticsTarget> = with(getAnnotation(opticsAnnotationClass).targets) {
+    when {
+      isEmpty() -> if (classType == SEALED_CLASS) listOf(PRISM, DSL) else listOf(ISO, LENS, OPTIONAL, DSL)
+      contains(DSL) -> toList() + if (classType == SEALED_CLASS) listOf(PRISM) else listOf(LENS, OPTIONAL, PRISM)
+      else -> toList()
     }
 
   }
 
-  private fun evalAnnotatedLensElement(element: Element): AnnotatedOptic? = when (element.getClassType()) {
-    ClassType.DATA_CLASS ->
-      AnnotatedOptic(
-        element as TypeElement,
-        element.getClassData(),
-        element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Target.Companion::invoke)
-      )
+  private fun evalAnnotatedDataClass(element: Element, errorMessage: String): AnnotatedOptic? = when (element.classType) {
+    DATA_CLASS -> AnnotatedOptic(
+      element as TypeElement,
+      element.getClassData(),
+      element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Target.Companion::invoke)
+    )
 
-    else -> {
-      logE("Lenses can only be generated for data classes", element)
-      null
-    }
+    else -> null.also { logE(errorMessage, element) }
   }
 
-  private fun evalAnnotatedDslElement(element: Element): AnnotatedOptic? = when (element.getClassType()) {
-    ClassType.DATA_CLASS ->
-      AnnotatedOptic(
-        element as TypeElement,
-        element.getClassData(),
-        element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Target.Companion::invoke)
-      )
-
-    else -> {
-      logE("DSL can only be generated for data classes", element)
-      null
-    }
+  private fun evalAnnotatedDslElement(element: Element): AnnotatedOptic? = when (element.classType) {
+    DATA_CLASS -> AnnotatedOptic(
+      element as TypeElement,
+      element.getClassData(),
+      element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Target.Companion::invoke)
+    )
+    SEALED_CLASS -> evalAnnotatedPrismElement(element)
+    OTHER -> null.also { logE(element.dslErrorMessage, element) }
   }
 
-  private fun evalAnnotatedPrismElement(element: Element): AnnotatedOptic? = when (element.getClassType()) {
-    ClassType.SEALED_CLASS -> {
+  private fun evalAnnotatedPrismElement(element: Element): AnnotatedOptic? = when (element.classType) {
+    SEALED_CLASS -> {
       val (nameResolver, classProto) = element.kotlinMetadata.let { it as KotlinClassMetadata }.data
 
       AnnotatedOptic(
@@ -145,28 +109,18 @@ class OpticsProcessor : AbstractProcessor() {
       )
     }
 
-    else -> {
-      logE("Prisms can only be generated for sealed classes", element)
-      null
-    }
+    else -> null.also { logE(element.prismErrorMessage, element) }
   }
 
-  private fun evalAnnotatedIsoElement(element: Element): AnnotatedOptic? = when (element.getClassType()) {
-    ClassType.DATA_CLASS -> {
+  private fun evalAnnotatedIsoElement(element: Element): AnnotatedOptic? = when (element.classType) {
+    DATA_CLASS -> {
       val properties = element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Target.Companion::invoke)
 
-      if (properties.size > 22) {
-        logE("""
-          Iso generation is not supported for data classes with more than 22 constructor parameters
-          """, element)
-        null
-      } else AnnotatedOptic(element as TypeElement, element.getClassData(), properties)
+      if (properties.size > 22) null.also { logE(element.isoTooBigErrorMessage, element) }
+      else AnnotatedOptic(element as TypeElement, element.getClassData(), properties)
     }
 
-    else -> {
-      logE("Isos can only be generated for data classes", element)
-      null
-    }
+    else -> null.also { logE(element.isoErrorMessage, element) }
   }
 
   private enum class ClassType {
@@ -175,9 +129,10 @@ class OpticsProcessor : AbstractProcessor() {
     OTHER;
   }
 
-  private fun Element.getClassType(): ClassType = when {
-    (kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isDataClass == true -> ClassType.DATA_CLASS
-    (kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isSealed == true -> ClassType.SEALED_CLASS
-    else -> ClassType.OTHER
-  }
+  private val Element.classType: ClassType
+    get() = when {
+      (kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isDataClass == true -> DATA_CLASS
+      (kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isSealed == true -> SEALED_CLASS
+      else -> OTHER
+    }
 }

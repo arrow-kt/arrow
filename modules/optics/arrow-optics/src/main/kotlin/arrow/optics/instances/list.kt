@@ -15,19 +15,20 @@ import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
 import arrow.typeclasses.Applicative
 
-interface ListEachInstance<A> : Each<List<A>, A> {
-  override fun each() = object : Traversal<List<A>, A> {
-    override fun <F> modifyF(FA: Applicative<F>, s: List<A>, f: (A) -> Kind<F, A>): Kind<F, List<A>> =
-      ListK.traverse().run {
-        FA.run {
-          s.k().traverse(this, f).let {
-            it.map {
-              it.list
-            }
-          }
-        }
-      }
+interface ListTraversal<A> : Traversal<List<A>, A> {
+
+  override fun <F> modifyF(FA: Applicative<F>, s: List<A>, f: (A) -> Kind<F, A>): Kind<F, List<A>> = with(ListK.traverse()) {
+    FA.run { s.k().traverse(FA, f).map { it.list } }
   }
+
+  companion object {
+    operator fun <A> invoke() = object : ListTraversal<A> {}
+  }
+
+}
+
+interface ListEachInstance<A> : Each<List<A>, A> {
+  override fun each() = ListTraversal<A>()
 
   companion object {
     operator fun <A> invoke() = object : ListEachInstance<A> {}
@@ -41,12 +42,7 @@ interface ListFilterIndexInstance<A> : FilterIndex<List<A>, Int, A> {
         FA.run {
           s.mapIndexed { index, a -> a toT index }.k().traverse(this, { (a, j) ->
             if (p(j)) f(a) else just(a)
-          })
-            .let {
-              it.map {
-                it.list
-              }
-            }
+          }).map { it.list }
         }
       }
   }

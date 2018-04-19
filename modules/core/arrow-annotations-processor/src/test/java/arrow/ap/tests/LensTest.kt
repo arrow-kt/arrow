@@ -9,7 +9,12 @@ class LensTest : APTest("arrow.ap.objects.lens") {
     testProcessor(AnnotationProcessor(
       name = "Lenses cannot be generated for sealed classes",
       sourceFile = "LensSealed.java",
-      errorMessage = "Lenses can only be generated for data classes",
+      errorMessage = """
+    |Cannot generate arrow.optics.Lens for arrow.ap.objects.lens.LensSealed
+    |                                         ^
+    |  arrow.optics.OpticsTarget.LENS is an invalid @optics argument for arrow.ap.objects.lens.LensSealed.
+    |  It is only valid for data classes.
+    """.trimMargin(),
       processor = OpticsProcessor()
     ))
 

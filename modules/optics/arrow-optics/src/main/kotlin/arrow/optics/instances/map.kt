@@ -32,18 +32,19 @@ interface MapAtInstance<K, V> : At<Map<K, V>, K, Option<V>> {
   }
 }
 
-interface MapEachInstance<K, V> : Each<Map<K, V>, V> {
-  override fun each() = object : Traversal<Map<K, V>, V> {
-    override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> = FA.run {
-      MapK.traverse<K>().run { s.k().traverse(FA, f) }
-        .let {
-          it.map {
-            it.fix().map
-          }
-        }
-    }
-
+interface MapTraversal<K, V> : Traversal<Map<K, V>, V> {
+  override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> = with(MapK.traverse<K>()) {
+    FA.run { s.k().traverse(this, f).map { it.map } }
   }
+
+  companion object {
+    operator fun <K, V> invoke(): MapTraversal<K, V> = object : MapTraversal<K, V> {}
+  }
+}
+
+interface MapEachInstance<K, V> : Each<Map<K, V>, V> {
+  override fun each() =
+    MapTraversal<K, V>()
 
   companion object {
     operator fun <K, V> invoke() = object : MapEachInstance<K, V> {}

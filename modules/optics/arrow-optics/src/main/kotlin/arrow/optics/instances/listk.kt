@@ -1,5 +1,6 @@
 package arrow.optics.instances
 
+import arrow.Kind
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.toT
@@ -11,21 +12,31 @@ import arrow.optics.Traversal
 import arrow.optics.typeclasses.Each
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
+import arrow.typeclasses.Applicative
+
+fun <A> ListK.Companion.traversal(): Traversal<ListK<A>, A> = object : Traversal<ListK<A>, A> {
+  override fun <F> modifyF(FA: Applicative<F>, s: ListK<A>, f: (A) -> Kind<F, A>): Kind<F, ListK<A>> =
+    ListK.traverse().run { s.traverse(FA, f) }
+}
 
 @instance(ListK::class)
 interface ListKEachInstance<A> : Each<ListK<A>, A> {
   override fun each(): Traversal<ListK<A>, A> =
-  // FIXME(paco) we're not scala, so we need to safely downcast
-    Traversal.fromTraversable<ForListK, A, A>(ListK.traverse()) as Traversal<ListK<A>, A>
+    ListK.traversal()
 }
 
 @instance(ListK::class)
 interface ListKFilterIndexInstance<A> : FilterIndex<ListK<A>, Int, A> {
-  override fun filter(p: (Int) -> Boolean): Traversal<ListK<A>, A> =
-  // FIXME(paco) we're not scala, so we need to safely downcast
-    FilterIndex.fromTraverse<ForListK, A>({ aas ->
-      aas.fix().mapIndexed { index, a -> a toT index }.k()
-    }, ListK.traverse()).filter(p) as Traversal<ListK<A>, A>
+  override fun filter(p: (Int) -> Boolean): Traversal<ListK<A>, A> = object : Traversal<ListK<A>, A> {
+    override fun <F> modifyF(FA: Applicative<F>, s: ListK<A>, f: (A) -> Kind<F, A>): Kind<F, ListK<A>> =
+      ListK.traverse().run {
+        FA.run {
+          s.mapIndexed { index, a -> a toT index }.k().traverse(FA, { (a, j) ->
+            if (p(j)) f(a) else just(a)
+          })
+        }
+      }
+  }
 }
 
 @instance(ListK::class)
