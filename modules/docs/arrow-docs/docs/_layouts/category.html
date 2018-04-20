@@ -4,11 +4,14 @@ layout: blog
 <main id="content">
    <section class="blog">
     {% for post in site.categories[page.category] %}
-      {% if post.title != "" %}
+      {% if post.title  != "" %}
          <h3>{{ post.title }}</h3>
       {% endif %}
-      {% if post.title != "" %}
+      {% if post.description != "" %}
          <p>{{ post.description }}</p>
+      {% endif %}
+      {% if post.video != "" %}
+         <iframe width="560" height="315" src="{{ post.video }}" frameborder="0" allowfullscreen></iframe>
       {% endif %}
     {% endfor %}
     </section>

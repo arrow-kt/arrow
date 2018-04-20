@@ -1,6 +1,7 @@
 ---
-title: Podcast
 layout: category
+principal: POdcast
+description: esto es un POdcast
 category: [all, podcast]
 ---
 
