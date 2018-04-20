@@ -2,6 +2,7 @@
 layout: docs
 title: Kleisli
 permalink: /docs/datatypes/kleisli/
+video: vAdhMJWnBUI
 ---
 
 ## Kleisli
