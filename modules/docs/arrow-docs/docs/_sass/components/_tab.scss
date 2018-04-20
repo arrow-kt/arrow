@@ -1,0 +1,20 @@
+// TAB
+// -----------------------------------------------
+// -----------------------------------------------
+.tab {
+    padding: ($base-point-grid * 2) 0;
+    border-bottom: 1px solid rgba($brand-primary, 0.1);
+    background: $white;
+    text-align: center;
+    
+    .tab-item {
+        display: inline-block;
+        
+        a {
+            
+            &:hover {
+                text-decoration: none;
+            }
+        }
+    }
+}

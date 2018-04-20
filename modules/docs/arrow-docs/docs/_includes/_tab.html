@@ -1,0 +1,7 @@
+<ul class="tab">
+    {% for item in site.data.menu.tab %}
+    <li class="tab-item {% if item.url == page.url %}active {% endif %}">
+        <a href="{{ item.url }}" alt="{{ item.title }}">{{ item.title }}</a>
+    </li>
+    {% endfor %}
+</ul>

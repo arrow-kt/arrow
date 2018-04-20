@@ -1,0 +1,15 @@
+---
+layout: blog
+---
+<main id="content">
+   <section class="blog">
+    {% for post in site.categories[page.category] %}
+      {% if post.title != "" %}
+         <h3>{{ post.title }}</h3>
+      {% endif %}
+      {% if post.title != "" %}
+         <p>{{ post.description }}</p>
+      {% endif %}
+    {% endfor %}
+    </section>
+</main>
