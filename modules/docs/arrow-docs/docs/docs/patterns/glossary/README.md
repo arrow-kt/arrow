@@ -163,7 +163,7 @@ Let's take as an example a typeclass that specifies how to map the contents of a
 
 ```kotlin
 interface Functor<F> {
-  fun <A, B> map(fa: Kind<F, A>, f: (A) -> B): Kind<F, B>
+  fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B>
 }
 ```
 
@@ -174,8 +174,8 @@ Let's define an instance of `Functor` for the datatype `ListK`, our own wrapper 
 ```kotlin
 @instance
 interface ListKFunctorInstance : Functor<ForListK> {
-  override fun <A, B> map(fa: Kind<ForListK, A>, f: (A) -> B): ListK<B> {
-    val list: ListK<A> = fa.fix()
+  override fun <A, B> Kind<F, A>.map(f: (A) -> B): ListK<B> {
+    val list: ListK<A> = this.fix()
     return list.map(f)
   }
 }
@@ -196,13 +196,13 @@ ListK.functor()
 The signature of `map` once the types have been replaced takes a parameter `Kind<ForListK, A>`, which is the receiver, and a mapping function from `A` to `B`. This means that map will work for all instances of `ListK<A>` for whatever the value of `A` can be.
 
 ```kotlin
-override fun <A, B> map(fa: Kind<ForListK, A>, f: (A) -> B): ListK<B>
+override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B>
 ```
 
 The implementation is short. On the first line we downcast `Kind<ForListK, A>` to `ListK<A>` using `fix()`. Once the value has been downcasted, the implementation of map inside the `ListK<A>` we have obtained already implements the expected behavior of map.
 
 ```kotlin
-val list: ListK<A> = fa.fix()
+val list: ListK<A> = this.fix()
 return list.map(f)
 ```
 
