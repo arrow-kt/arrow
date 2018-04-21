@@ -2,8 +2,6 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.*
-import arrow.data.ListK
-import arrow.data.fix
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Applicative
