@@ -6,6 +6,7 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.instance
 import arrow.typeclasses.*
+import arrow.instances.traverse as tuple2Traverse
 
 //TODO this should be user driven allowing consumers to generate the tuple arities on demand to avoid cluttering arrow dependents with unused code
 //TODO @arities(fromTupleN = 2, toTupleN = 22 | fromHListN = 1, toHListN = 22)
@@ -68,12 +69,18 @@ interface Tuple2FoldableInstance<F> : Foldable<Tuple2PartialOf<F>> {
     fix().foldR(lb, f)
 }
 
+fun <F, G, A, B> Tuple2Of<F, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Tuple2<F, B>> = GA.run {
+  fix().let { f(it.b).map(it.a::toT) }
+}
+
+fun <F, G, A> Tuple2Of<F, Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Tuple2<F, A>> =
+  fix().tuple2Traverse(GA, ::identity)
+
 @instance(Tuple2::class)
 interface Tuple2TraverseInstance<F> : Tuple2FoldableInstance<F>, Traverse<Tuple2PartialOf<F>> {
 
-  override fun <G, A, B> Tuple2Of<F, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Tuple2<F, B>> = AP.run {
-    fix().let { f(it.b).map(it.a::toT) }
-  }
+  override fun <G, A, B> Tuple2Of<F, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Tuple2<F, B>> =
+    tuple2Traverse(AP, f)
 }
 
 @instance(Tuple2::class)
