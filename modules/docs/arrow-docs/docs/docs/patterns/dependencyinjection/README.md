@@ -113,7 +113,7 @@ object FunctorLaws {
 
   fun <F> Functor<F>.covariantIdentityTest(f: (Int) -> Kind<F, Int>): Unit = ...
 
-  fun <F> Functor<F>.covariantComposition(f: (Int) -> Kind<F, Int>: Unit = ...
+  fun <F> Functor<F>.covariantComposition(f: (Int) -> Kind<F, Int>): Unit = ...
 }
 
 ...
@@ -201,7 +201,7 @@ This makes that extension functions declared inside a class require using the st
 class Parser {
   fun Monad<ForOption>.parseInt(s: String): Option<Int> = ...
 
-  fun ???.parseInts(l: List<Option<String>>): Option<List<Int>> =
+  fun ???.parseInts(l: List<Option<String>>): Option<List<Int>> = ...
 }
 
 // TEDIOUS AND NOT IDIOMATIC
@@ -213,9 +213,11 @@ Once inside the method we can use the standard library functions to access the s
 
 ```kotlin
 class Parser {
-  fun parseInt(M: Monad<ForOption>, s: String): Option<Int> = M.run { ... }
+  fun parseInt(M: Monad<ForOption>, s: String): Option<Int> =
+    M.run { ... }
 
-  fun parseInts(M: Monad<ForOption>, l: List<Option<String>>): Option<List<Int>> = M.run { ListK.traverse().run { ... } }
+  fun parseInts(M: Monad<ForOption>, l: List<Option<String>>): Option<List<Int>> =
+    M.run { ListK.traverse().run { ... } }
 }
 
 // JUST MEH
