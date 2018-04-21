@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.instance
 import arrow.typeclasses.*
+import arrow.instances.traverse as optionTraverse
 
 @instance(Option::class)
 interface OptionSemigroupInstance<A> : Semigroup<Option<A>> {
@@ -93,7 +94,7 @@ interface OptionMonadInstance : Monad<ForOption> {
   override fun <A, B> Kind<ForOption, A>.flatMap(f: (A) -> Kind<ForOption, B>): Option<B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, OptionOf<Either<A, B>>>): Option<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> OptionOf<Either<A, B>>): Option<B> =
     Option.tailRecM(a, f)
 
   override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
@@ -124,22 +125,16 @@ interface OptionFoldableInstance : Foldable<ForOption> {
     fix().nonEmpty()
 }
 
-fun <A, G, B> OptionOf<A>.traverse(f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Option<B>> = GA.run {
-  fix().let { option ->
-    when (option) {
-      is Some -> f(option.t).map({ Some(it) })
-      is None -> just(None)
-    }
-  }
+fun <A, G, B> OptionOf<A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Option<B>> = GA.run {
+  fix().fold({ just(None) }, { f(it).map { Some(it) } })
 }
 
-fun <A, G, B> OptionOf<A>.traverseFilter(f: (A) -> Kind<G, Option<B>>, GA: Applicative<G>): Kind<G, Option<B>> =
-  this.fix().let { option ->
-    when (option) {
-      is Some -> f(option.t)
-      None -> GA.just(None)
-    }
-  }
+fun <A, G> OptionOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Option<A>> =
+  optionTraverse(GA, ::identity)
+
+fun <A, G, B> OptionOf<A>.traverseFilter(GA: Applicative<G>, f: (A) -> Kind<G, Option<B>>): Kind<G, Option<B>> = GA.run {
+  fix().fold({ just(None) }, f)
+}
 
 @instance(Option::class)
 interface OptionTraverseInstance : Traverse<ForOption> {
@@ -147,7 +142,7 @@ interface OptionTraverseInstance : Traverse<ForOption> {
     fix().map(f)
 
   override fun <G, A, B> Kind<ForOption, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Option<B>> =
-    fix().traverse(f, AP)
+    optionTraverse(AP, f)
 
   override fun <A> Kind<ForOption, A>.exists(p: (A) -> Boolean): Boolean =
     fix().exists(p)

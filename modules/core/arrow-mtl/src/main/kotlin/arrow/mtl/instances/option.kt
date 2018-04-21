@@ -3,11 +3,11 @@ package arrow.mtl.instances
 import arrow.Kind
 import arrow.core.*
 import arrow.instance
-import arrow.instances.traverse
-import arrow.instances.traverseFilter
 import arrow.mtl.typeclasses.MonadFilter
 import arrow.mtl.typeclasses.TraverseFilter
 import arrow.typeclasses.Applicative
+import arrow.instances.traverse as optionTraverse
+import arrow.instances.traverseFilter as optionTraverseFilter
 
 @instance(Option::class)
 interface OptionTraverseFilterInstance : TraverseFilter<ForOption> {
@@ -15,13 +15,13 @@ interface OptionTraverseFilterInstance : TraverseFilter<ForOption> {
     fix().filter(f)
 
   override fun <G, A, B> Kind<ForOption, A>.traverseFilter(AP: Applicative<G>, f: (A) -> Kind<G, Option<B>>): arrow.Kind<G, Option<B>> =
-    fix().traverseFilter(f, AP)
+    optionTraverseFilter(AP, f)
 
   override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
 
   override fun <G, A, B> Kind<ForOption, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): arrow.Kind<G, Option<B>> =
-    fix().traverse(f, AP)
+    optionTraverse(AP, f)
 
   override fun <A> Kind<ForOption, A>.exists(p: (A) -> Boolean): kotlin.Boolean =
     fix().exists(p)
