@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Tuple2
+import arrow.core.identity
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 
@@ -78,5 +79,8 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
 }
 
 fun <A> SequenceKOf<A>.combineK(y: SequenceKOf<A>): SequenceK<A> = (fix().sequence + y.fix().sequence).k()
+
+inline fun <A, G> SequenceKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, SequenceK<A>> =
+  fix().traverse(GA, ::identity)
 
 fun <A> Sequence<A>.k(): SequenceK<A> = SequenceK(this)
