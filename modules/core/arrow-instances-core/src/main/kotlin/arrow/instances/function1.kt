@@ -42,3 +42,10 @@ interface Function1MonadInstance<I> : Function1ApplicativeInstance<I>, Monad<Fun
     Function1.tailRecM(a, f)
 }
 
+class Function1Context<A> : Function1MonadInstance<A>
+
+fun <A> Function1.Companion.run(f: Function1Context<A>.() -> A): A =
+  f(Function1Context())
+
+fun <A> with(c: Function1.Companion, f: Function1Context<A>.() -> A): A =
+  f(Function1Context())
