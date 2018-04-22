@@ -80,3 +80,33 @@ fun <D> ReaderApi.applicative(): Applicative<ReaderPartialOf<D>> = Kleisli.appli
  * Alias for [Kleisli] for [Id]
  */
 fun <D> ReaderApi.monad(): Monad<ReaderPartialOf<D>> = Kleisli.monad(Id.monad())
+
+class ReaderContext<D> : KleisliMonadInstance<ForId, D> {
+  override fun FF(): Monad<ForId> = Id.monad()
+}
+
+class ReaderContextPartiallyApplied<L> {
+  fun <A> run(f: ReaderContext<L>.() -> A): A =
+    f(ReaderContext())
+}
+
+fun <D> Reader(): ReaderContextPartiallyApplied<D> =
+  ReaderContextPartiallyApplied()
+
+fun <L, A> with(c: ReaderContextPartiallyApplied<L>, f: ReaderContext<L>.() -> A): A =
+  c.run(f)
+
+class KleisliContext<F, D, E>(val MF: MonadError<F, E>) : KleisliMonadErrorInstance<F, D, E> {
+  override fun FF(): MonadError<F, E> = MF
+}
+
+class KleisliContextPartiallyApplied<F, D, E>(val MF: MonadError<F, E>) {
+  fun <A> run(f: KleisliContext<F, D, E>.() -> A): A =
+    f(KleisliContext(MF))
+}
+
+fun <F, D, E> Kleisli(MF: MonadError<F, E>): KleisliContextPartiallyApplied<F, D, E> =
+  KleisliContextPartiallyApplied(MF)
+
+fun <F, D, E, A> with(c: KleisliContextPartiallyApplied<F, D, E>, f: KleisliContext<F, D, E>.() -> A): A =
+  c.run(f)
