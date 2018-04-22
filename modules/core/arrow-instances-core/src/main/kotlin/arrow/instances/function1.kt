@@ -44,8 +44,13 @@ interface Function1MonadInstance<I> : Function1ApplicativeInstance<I>, Monad<Fun
 
 class Function1Context<A> : Function1MonadInstance<A>
 
-fun <A> Function1.Companion.run(f: Function1Context<A>.() -> A): A =
-  f(Function1Context())
+class Function1ContextPartiallyApplied<L> {
+  fun <A> run(f: Function1Context<L>.() -> A): A =
+    f(Function1Context())
+}
 
-fun <A> with(c: Function1.Companion, f: Function1Context<A>.() -> A): A =
-  f(Function1Context())
+fun <L> Function1(): Function1ContextPartiallyApplied<L> =
+  Function1ContextPartiallyApplied()
+
+fun <L, A> with(c: Function1ContextPartiallyApplied<L>, f: Function1Context<L>.() -> A): A =
+  c.run(f)
