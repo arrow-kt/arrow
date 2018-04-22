@@ -99,7 +99,7 @@ interface Tuple2SemigroupInstance<A, B> : Semigroup<Tuple2<A, B>> {
 
 @instance(Tuple2::class)
 interface Tuple2MonoidInstance<A, B> : Tuple2SemigroupInstance<A, B>, Monoid<Tuple2<A, B>> {
-  
+
   override fun SA(): Semigroup<A> = MA()
 
   override fun SB(): Semigroup<B> = MB()
