@@ -76,3 +76,11 @@ interface EvalBimonadInstance : Bimonad<ForEval> {
   override fun <A> Kind<ForEval, A>.extract(): A =
     fix().extract()
 }
+
+object EvalContext : EvalBimonadInstance
+
+fun <L> Eval.Companion.run(f: EvalContext.() -> L): L =
+  f(EvalContext)
+
+fun <A> with(c: Eval.Companion, f: EvalContext.() -> A): A =
+  f(EvalContext)
