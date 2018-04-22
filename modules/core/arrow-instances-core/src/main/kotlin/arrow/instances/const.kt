@@ -86,8 +86,13 @@ class ConstContext<A>(val MA: Monoid<A>) : ConstApplicativeInstance<A>, ConstTra
     fix().map(f)
 }
 
-fun <A> Const.Companion.run(MA: Monoid<A>, f: ConstContext<A>.() -> A): A =
-  f(ConstContext(MA))
+class ConstContextPartiallyApplied<L>(val MA: Monoid<L>) {
+  fun <A> run(f: ConstContext<L>.() -> A): A =
+    f(ConstContext(MA))
+}
 
-fun <A> with(c: Const.Companion, MA: Monoid<A>, f: ConstContext<A>.() -> A): A =
-  f(ConstContext(MA))
+fun <L> Const(MA: Monoid<L>): ConstContextPartiallyApplied<L> =
+  ConstContextPartiallyApplied(MA)
+
+fun <L, A> with(c: ConstContextPartiallyApplied<L>, f: ConstContext<L>.() -> A): A =
+  c.run(f)
