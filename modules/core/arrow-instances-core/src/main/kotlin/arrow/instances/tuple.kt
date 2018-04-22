@@ -86,9 +86,9 @@ interface Tuple2TraverseInstance<F> : Tuple2FoldableInstance<F>, Traverse<Tuple2
 @instance(Tuple2::class)
 interface Tuple2SemigroupInstance<A, B> : Semigroup<Tuple2<A, B>> {
 
-  fun MA(): Monoid<A>
+  fun SA(): Semigroup<A>
 
-  fun MB(): Monoid<B>
+  fun SB(): Semigroup<B>
 
   override fun Tuple2<A, B>.combine(b: Tuple2<A, B>): Tuple2<A, B> {
     val (xa, xb) = this
@@ -99,6 +99,10 @@ interface Tuple2SemigroupInstance<A, B> : Semigroup<Tuple2<A, B>> {
 
 @instance(Tuple2::class)
 interface Tuple2MonoidInstance<A, B> : Tuple2SemigroupInstance<A, B>, Monoid<Tuple2<A, B>> {
+  
+  override fun SA(): Semigroup<A> = MA()
+
+  override fun SB(): Semigroup<B> = MB()
 
   fun MA(): Monoid<A>
 
