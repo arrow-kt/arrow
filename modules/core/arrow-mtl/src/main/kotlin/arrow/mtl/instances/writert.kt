@@ -10,6 +10,8 @@ import arrow.instance
 import arrow.instances.WriterTMonadInstance
 import arrow.mtl.typeclasses.MonadFilter
 import arrow.mtl.typeclasses.MonadWriter
+import arrow.typeclasses.Monad
+import arrow.typeclasses.Monoid
 
 @instance(WriterT::class)
 interface WriterTMonadFilterInstance<F, W> : WriterTMonadInstance<F, W>, MonadFilter<WriterTPartialOf<F, W>> {
@@ -34,3 +36,20 @@ interface WriterTMonadWriterInstance<F, W> : MonadWriter<WriterTPartialOf<F, W>,
   override fun tell(w: W): Kind<WriterTPartialOf<F, W>, Unit> = WriterT.tell2(FF(), w)
 
 }
+
+class WriterTMtlContext<F, W>(val MF: Monad<F>, val MW: Monoid<W>) : WriterTMonadWriterInstance<F, W> {
+  override fun FF(): Monad<F> = MF
+
+  override fun MM(): Monoid<W> = MW
+}
+
+class WriterTMtlContextPartiallyApplied<F, W>(val MF: Monad<F>, val MW: Monoid<W>) {
+  fun <A> run(f: WriterTMtlContext<F, W>.() -> A): A =
+    f(WriterTMtlContext(MF, MW))
+}
+
+fun <F, W> WriterT(MF: Monad<F>, MW: Monoid<W>): WriterTMtlContextPartiallyApplied<F, W> =
+  WriterTMtlContextPartiallyApplied(MF, MW)
+
+fun <F, W, A> with(c: WriterTMtlContextPartiallyApplied<F, W>, f: WriterTMtlContext<F, W>.() -> A): A =
+  c.run(f)
