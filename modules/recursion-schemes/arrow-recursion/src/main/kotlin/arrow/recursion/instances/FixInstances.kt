@@ -16,3 +16,18 @@ interface FixInstances<F> : Birecursive<ForFix, F> {
   override fun embedT(compFG: Kind<Nested<ForFix, F>, FixOf<F>>): FixOf<F> =
     Fix.embedT(compFG, FF())
 }
+
+class FixContext<F>(val FF: Functor<F>) : FixInstances<F> {
+  override fun FF(): Functor<F> = FF
+}
+
+class FixContextPartiallyApplied<F>(val FF: Functor<F>) {
+  fun <A> run(f: FixContext<F>.() -> A): A =
+    f(FixContext(FF))
+}
+
+fun <F> Fix(FF: Functor<F>): FixContextPartiallyApplied<F> =
+  FixContextPartiallyApplied(FF)
+
+fun <F, A> with(c: FixContextPartiallyApplied<F>, f: FixContext<F>.() -> A): A =
+  c.run(f)
