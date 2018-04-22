@@ -116,8 +116,13 @@ class EitherContext<L> : EitherMonadErrorInstance<L>, EitherTraverseInstance<L> 
     fix().map(f)
 }
 
-fun <L> Either.Companion.run(f: EitherContext<L>.() -> L): L =
-  f(EitherContext())
+class EitherContextPartiallyApplied<L> {
+  fun <A> run(f: EitherContext<L>.() -> A): A =
+    f(EitherContext())
+}
 
-fun <A> with(c: Either.Companion, f: EitherContext<A>.() -> A): A =
-  f(EitherContext())
+fun <L> Either(): EitherContextPartiallyApplied<L> =
+  EitherContextPartiallyApplied()
+
+fun <L, A> with(c: EitherContextPartiallyApplied<L>, f: EitherContext<L>.() -> A): A =
+  c.run(f)
