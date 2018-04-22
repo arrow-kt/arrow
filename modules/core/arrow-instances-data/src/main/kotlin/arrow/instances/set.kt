@@ -66,3 +66,11 @@ interface SetKMonoidKInstance : MonoidK<ForSetK> {
   override fun <A> Kind<ForSetK, A>.combineK(y: Kind<ForSetK, A>): SetK<A> =
     fix().setCombineK(y)
 }
+
+object SetKContext : SetKFoldableInstance, SetKMonoidKInstance
+
+fun <A> SetK.Companion.run(f: SetKContext.() -> A): A =
+  f(SetKContext)
+
+fun <A> with(c: SetK.Companion, f: SetKContext.() -> A): A =
+  f(SetKContext)
