@@ -2,6 +2,9 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.ForOption
+import arrow.core.Option
+import arrow.core.fix
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.MonadDefer
@@ -84,3 +87,11 @@ interface DeferredKEffectInstance : DeferredKAsyncInstance, Effect<ForDeferredK>
   override fun <A> Kind<ForDeferredK, A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Unit> =
     fix().runAsync(cb)
 }
+
+object DeferredKContext : DeferredKEffectInstance
+
+fun <A> DeferredK.Companion.run(f: DeferredKContext.() -> A): A =
+  f(DeferredKContext)
+
+fun <A> with(c: DeferredK.Companion, f: DeferredKContext.() -> A): A =
+  f(DeferredKContext)
