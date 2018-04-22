@@ -91,3 +91,18 @@ fun <S> StateApi.functor(): Functor<StateTPartialOf<ForId, S>> = StateT.functor<
  * Alias for [StateT.Companion.monad]
  */
 fun <S> StateApi.monad(): Monad<StateTPartialOf<ForId, S>> = StateT.monad<ForId, S>(Id.monad())
+
+class StateTContext<F, S, E>(val ME: MonadError<F, E>) : StateTMonadErrorInstance<F, S, E> {
+  override fun FF(): MonadError<F, E> = ME
+}
+
+class StateTContextPartiallyApplied<F, S, E>(val ME: MonadError<F, E>) {
+  fun <A> run(f: StateTContext<F, S, E>.() -> A): A =
+    f(StateTContext(ME))
+}
+
+fun <F, S, E> StateT(ME: MonadError<F, E>): StateTContextPartiallyApplied<F, S, E> =
+  StateTContextPartiallyApplied(ME)
+
+fun <F, S, E, A> with(c: StateTContextPartiallyApplied<F, S, E>, f: StateTContext<F, S, E>.() -> A): A =
+  c.run(f)
