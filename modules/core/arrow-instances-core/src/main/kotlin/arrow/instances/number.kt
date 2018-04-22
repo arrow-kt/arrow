@@ -40,6 +40,14 @@ fun Byte.Companion.semigroup(): Semigroup<Byte> =
 fun Byte.Companion.monoid(): Monoid<Byte> =
   object : ByteMonoidInstance {}
 
+object ByteContext : ByteShowInstance, ByteOrderInstance, ByteMonoidInstance
+
+fun <L> Byte.Companion.run(f: ByteContext.() -> L): L =
+  f(ByteContext)
+
+fun <A> with(c: Byte.Companion, f: ByteContext.() -> A): A =
+  f(ByteContext)
+
 //////////
 // Double
 //////////
