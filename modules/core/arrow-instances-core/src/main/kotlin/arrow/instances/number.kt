@@ -273,3 +273,11 @@ fun Float.Companion.semigroup(): Semigroup<Float> =
 
 fun Float.Companion.monoid(): Monoid<Float> =
   object : FloatMonoidInstance {}
+
+object FloatContext : FloatShowInstance, FloatOrderInstance, FloatMonoidInstance
+
+fun <L> Float.Companion.run(f: FloatContext.() -> L): L =
+  f(FloatContext)
+
+fun <A> with(c: Float.Companion, f: FloatContext.() -> A): A =
+  f(FloatContext)
