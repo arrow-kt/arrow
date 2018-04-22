@@ -98,19 +98,13 @@ interface Tuple2SemigroupInstance<A, B> : Semigroup<Tuple2<A, B>> {
 }
 
 @instance(Tuple2::class)
-interface Tuple2MonoidInstance<A, B> : Monoid<Tuple2<A, B>> {
+interface Tuple2MonoidInstance<A, B> : Tuple2SemigroupInstance<A, B>, Monoid<Tuple2<A, B>> {
 
   fun MA(): Monoid<A>
 
   fun MB(): Monoid<B>
 
   override fun empty(): Tuple2<A, B> = Tuple2(MA().empty(), MB().empty())
-
-  override fun Tuple2<A, B>.combine(b: Tuple2<A, B>): Tuple2<A, B> {
-    val (xa, xb) = this
-    val (ya, yb) = b
-    return Tuple2(MA().run { xa.combine(ya) }, MB().run { xb.combine(yb) })
-  }
 }
 
 @instance(Tuple2::class)
