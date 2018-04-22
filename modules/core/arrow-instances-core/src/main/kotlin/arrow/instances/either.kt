@@ -110,3 +110,14 @@ interface EitherShowInstance<L, R> : Show<Either<L, R>> {
   override fun Either<L, R>.show(): String =
     toString()
 }
+
+class EitherContext<L> : EitherMonadErrorInstance<L>, EitherTraverseInstance<L> {
+  override fun <A, B> Kind<EitherPartialOf<L>, A>.map(f: (A) -> B): Either<L, B> =
+    fix().map(f)
+}
+
+fun <L> Either.Companion.run(f: EitherContext<L>.() -> L): L =
+  f(EitherContext())
+
+fun <A> with(c: Either.Companion, f: EitherContext<A>.() -> A): A =
+  f(EitherContext())
