@@ -227,6 +227,14 @@ fun Short.Companion.semigroup(): Semigroup<Short> =
 fun Short.Companion.monoid(): Monoid<Short> =
   object : ShortMonoidInstance {}
 
+object ShortContext : ShortShowInstance, ShortOrderInstance, ShortMonoidInstance
+
+fun <L> Short.Companion.run(f: ShortContext.() -> L): L =
+  f(ShortContext)
+
+fun <A> with(c: Short.Companion, f: ShortContext.() -> A): A =
+  f(ShortContext)
+
 //////////
 // Float
 //////////
