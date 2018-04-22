@@ -87,6 +87,14 @@ fun Double.Companion.semigroup(): Semigroup<Double> =
 fun Double.Companion.monoid(): Monoid<Double> =
   object : DoubleMonoidInstance {}
 
+object DoubleContext : DoubleShowInstance, DoubleOrderInstance, DoubleMonoidInstance
+
+fun <L> Double.Companion.run(f: DoubleContext.() -> L): L =
+  f(DoubleContext)
+
+fun <A> with(c: Double.Companion, f: DoubleContext.() -> A): A =
+  f(DoubleContext)
+
 //////////
 // Int
 //////////
