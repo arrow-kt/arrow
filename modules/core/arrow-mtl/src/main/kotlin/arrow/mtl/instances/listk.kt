@@ -6,6 +6,8 @@ import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.data.*
 import arrow.instance
+import arrow.instances.ListKMonoidKInstance
+import arrow.instances.ListKTraverseInstance
 import arrow.mtl.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.MonadCombine
 import arrow.mtl.typeclasses.MonadFilter
@@ -76,3 +78,20 @@ interface ListKMonadFilterInstance : MonadFilter<ForListK> {
   override fun <A> just(a: A): ListK<A> =
     ListK.just(a)
 }
+
+object ListKMtlContext : ListKMonadCombineInstance, ListKTraverseInstance, ListKMonoidKInstance {
+  override fun <A> empty(): ListK<A> =
+    ListK.empty()
+
+  override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
+    fix().listCombineK(y)
+
+  override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
+    fix().map(f)
+}
+
+fun <A> ListK.Companion.run(f: ListKMtlContext.() -> A): A =
+  f(ListKMtlContext)
+
+fun <A> with(c: ListK.Companion, f: ListKMtlContext.() -> A): A =
+  f(ListKMtlContext)
