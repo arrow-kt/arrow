@@ -133,6 +133,14 @@ fun Int.Companion.semigroup(): Semigroup<Int> =
 fun Int.Companion.monoid(): Monoid<Int> =
   object : IntMonoidInstance {}
 
+object IntContext : IntShowInstance, IntOrderInstance, IntMonoidInstance
+
+fun <L> Int.Companion.run(f: IntContext.() -> L): L =
+  f(IntContext)
+
+fun <A> with(c: Int.Companion, f: IntContext.() -> A): A =
+  f(IntContext)
+
 //////////
 // Long
 //////////
