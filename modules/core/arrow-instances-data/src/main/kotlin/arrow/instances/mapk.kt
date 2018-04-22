@@ -68,3 +68,16 @@ interface MapKShowInstance<K, A> : Show<MapK<K, A>> {
   override fun MapK<K, A>.show(): String =
     toString()
 }
+
+class MapKContext<L> : MapKTraverseInstance<L>
+
+class MapKContextPartiallyApplied<L> {
+  fun <A> run(f: MapKContext<L>.() -> A): A =
+    f(MapKContext())
+}
+
+fun <L> MapK(): MapKContextPartiallyApplied<L> =
+  MapKContextPartiallyApplied()
+
+fun <L, A> with(c: MapKContextPartiallyApplied<L>, f: MapKContext<L>.() -> A): A =
+  c.run(f)
