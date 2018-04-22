@@ -2,6 +2,7 @@ package arrow.instances
 
 import arrow.Kind
 import arrow.core.Eval
+import arrow.core.functor
 import arrow.instance
 import arrow.typeclasses.*
 import arrow.typeclasses.ap as constAp
@@ -77,3 +78,16 @@ interface ConstShowInstance<A, T> : Show<Const<A, T>> {
   override fun Const<A, T>.show(): String =
     toString()
 }
+
+class ConstContext<A>(val MA: Monoid<A>) : ConstApplicativeInstance<A>, ConstTraverseInstance<A> {
+  override fun MA(): Monoid<A> = MA
+
+  override fun <T, U> Kind<ConstPartialOf<A>, T>.map(f: (T) -> U): Const<A, U> =
+    fix().map(f)
+}
+
+fun <A> Const.Companion.run(MA: Monoid<A>, f: ConstContext<A>.() -> A): A =
+  f(ConstContext(MA))
+
+fun <A> with(c: Const.Companion, MA: Monoid<A>, f: ConstContext<A>.() -> A): A =
+  f(ConstContext(MA))
