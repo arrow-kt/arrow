@@ -110,3 +110,11 @@ interface IOSemigroupInstance<A> : Semigroup<Kind<ForIO, A>> {
   override fun IOOf<A>.combine(b: IOOf<A>): IO<A> =
     fix().flatMap { a1: A -> b.fix().map { a2: A -> SG().run { a1.combine(a2) } } }
 }
+
+object IOContext : IOEffectInstance
+
+fun <A> IO.Companion.run(f: IOContext.() -> A): A =
+  f(IOContext)
+
+fun <A> with(c: IO.Companion, f: IOContext.() -> A): A =
+  f(IOContext)
