@@ -180,6 +180,14 @@ fun Long.Companion.semigroup(): Semigroup<Long> =
 fun Long.Companion.monoid(): Monoid<Long> =
   object : LongMonoidInstance {}
 
+object LongContext : LongShowInstance, LongOrderInstance, LongMonoidInstance
+
+fun <L> Long.Companion.run(f: LongContext.() -> L): L =
+  f(LongContext)
+
+fun <A> with(c: Long.Companion, f: LongContext.() -> A): A =
+  f(LongContext)
+
 //////////
 // Short
 //////////
