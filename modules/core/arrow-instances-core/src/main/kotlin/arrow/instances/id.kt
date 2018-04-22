@@ -123,3 +123,14 @@ interface IdTraverseInstance : Traverse<ForId> {
   override fun <A, B> arrow.Kind<arrow.core.ForId, A>.foldRight(lb: arrow.core.Eval<B>, f: (A, arrow.core.Eval<B>) -> arrow.core.Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
 }
+
+object IdContext : IdBimonadInstance, IdTraverseInstance {
+  override fun <A, B> Kind<ForId, A>.map(f: (A) -> B): Id<B> =
+    fix().map(f)
+}
+
+fun <L> Id.Companion.run(f: IdContext.() -> L): L =
+  f(IdContext)
+
+fun <A> with(c: Id.Companion, f: IdContext.() -> A): A =
+  f(IdContext)
