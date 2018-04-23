@@ -10,6 +10,8 @@
     .tab-item {
         display: inline-block;
         
+        margin-right: ($base-point-grid * 3);
+        
         a {
             
             &:hover {

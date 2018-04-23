@@ -2,17 +2,21 @@
 layout: blog
 ---
 <main id="content">
-   <section class="blog">
-    {% for post in site.categories[page.category] %}
-      {% if post.title  != "" %}
-         <h3>{{ post.title }}</h3>
-      {% endif %}
-      {% if post.description != "" %}
-         <p>{{ post.description }}</p>
-      {% endif %}
-      {% if post.video != "" %}
-         <iframe width="560" height="315" src="{{ post.video }}" frameborder="0" allowfullscreen></iframe>
-      {% endif %}
-    {% endfor %}
+    <section class="blog">
+        <div class="container">
+            {% for post in site.categories[page.category] %}
+            <div class="blog-item">
+                <div class="blog-item-header"></div>
+                <div class="blog-item-content">
+                    {% if post.title != "" %}
+                    <h2>{{ post.title }}</h2>
+                    {% endif %}
+                    {% if post.excerpt != "" %}
+                    <p>{{ post.excerpt }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </section>
 </main>

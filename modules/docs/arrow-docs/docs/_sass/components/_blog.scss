@@ -5,4 +5,18 @@
 .blog {
     padding: ($base-point-grid * 8);
     background: rgba($brand-tertiary, 0.10);
+    
+    .blog-item {
+        @include grid-column(4, $base-grid);
+        background: $white;
+        .blog-item-header {}
+        .blog-item-content {
+            padding: ($base-point-grid * 3);
+            
+            h2 {
+                font-size: 1.5rem;
+                color: $header-font-color;
+            }
+        }
+    }
 }
