@@ -1,7 +1,13 @@
 <ul class="tab">
     {% for item in site.data.menu.tab %}
-    <li class="tab-item {% if item.url == page.url %}active {% endif %}">
-        <a href="{{ item.url }}" alt="{{ item.title }}">{{ item.title }}</a>
-    </li>
+        {% assign cat = item.title | All %}
+        {% if page.url contains cat %}
+            {% assign class = "tab-item active" %}
+        {% else %}
+            {% assign class = "tab-item" %}
+        {% endif %}
+        <li class={{ class }}>
+            <a href="{{ item.url }}" alt="{{ item.title }}">{{ item.title }}</a>
+        </li>
     {% endfor %}
 </ul>
