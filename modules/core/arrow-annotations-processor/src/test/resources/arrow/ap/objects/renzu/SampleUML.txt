@@ -1,0 +1,16 @@
+#font: Menlo
+#fontSize: 15
+#arrowSize: 1
+#bendSize: 0.3
+#lineWidth: 2
+#padding: 8
+#zoom: 1
+#fill: #64B5F6
+#.typeclass: fill=#64B5F6 visual=database bold
+#.instances: fill=#B9F6CA visual=class italic bold dashed
+
+[<typeclass>Functor]<-[<typeclass>Applicative]
+[<typeclass>Applicative]<-[<typeclass>Monad]
+[<typeclass>Monad]<-[<instances>Instances|NonEmptyList|Option|OptionT|SequenceK|State|StateT|Try|Either|EitherT|Eval|Id]
+[<typeclass>Applicative]<-[Something2]
+[<typeclass>Applicative]<-[Something3]

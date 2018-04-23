@@ -40,7 +40,7 @@ class RenzuGenerator(private val generatedDir: File, annotatedList: List<Annotat
     }
 
   fun generate() {
-    val file = File(generatedDir, "arrow-infographic.kt")
+    val file = File(generatedDir, "arrow-infographic.txt")
 
     instances.forEach {
       val elementsToGenerate: List<String> = genDiagramRelations(typeclassTree)

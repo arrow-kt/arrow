@@ -18,7 +18,7 @@ abstract class APTest(
     vararg processor: AnnotationProcessor
   ) {
 
-    processor.forEach { (name, source, dest, proc, error) ->
+    processor.forEach { (name, sources, dest, proc, error) ->
 
       val parent = File(".").absoluteFile.parent
 
@@ -37,12 +37,13 @@ abstract class APTest(
 
         val temp = Files.createTempDir()
 
-        val stub = File(stubs, source).toURI().toURL()
-
         val compilation = javac()
           .withProcessors(proc)
           .withOptions(ImmutableList.of("-Akapt.kotlin.generated=$temp"))
-          .compile(JavaFileObjects.forResource(stub))
+          .compile(sources.map {
+            val stub = File(stubs, it).toURI().toURL()
+            JavaFileObjects.forResource(stub)
+          })
 
         if (error != null) {
 
