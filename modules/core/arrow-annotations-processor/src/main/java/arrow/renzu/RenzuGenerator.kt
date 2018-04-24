@@ -18,24 +18,31 @@ data class Instance(val target: AnnotatedInstance) {
     target.superTypes.filter { it.fullName.removeBackticks().contains("typeclass") }
 }
 
-typealias TypeClass = ClassOrPackageDataWrapper.Class
-typealias ParentTypeClass = ClassOrPackageDataWrapper.Class
+data class TypeClass(val simpleName: String, private val classWrapper: ClassOrPackageDataWrapper.Class) {
+  override fun equals(other: Any?): Boolean =
+    if (other !is TypeClass) false else simpleName == other.simpleName
+
+  override fun hashCode(): Int = simpleName.hashCode()
+}
+
+typealias ParentTypeClass = TypeClass
 typealias Instances = List<String>
 
 class RenzuGenerator(private val generatedDir: File, annotatedList: List<AnnotatedInstance>) {
 
-  private val instances: List<Instance> = annotatedList.map { Instance(it) }
   private val typeclassTree: MutableMap<TypeClass, Tuple2<Instances, ParentTypeClass>> =
-    normalizeTypeclassTree(instances)
+    normalizeTypeclassTree(annotatedList.map { Instance(it) })
 
   private fun normalizeTypeclassTree(instances: List<Instance>)
     : MutableMap<TypeClass, Tuple2<Instances, ParentTypeClass>> =
     instances.fold(mutableMapOf()) { acc, instance ->
       instance.implementedTypeclasses().forEach { tc ->
-        acc.computeIfPresent(tc, { key, value ->
-          Tuple2(value._1 + listOf(instance.receiverTypeSimpleName), key)
-        })
-        acc.putIfAbsent(tc, Tuple2(listOf(instance.receiverTypeSimpleName), tc))
+        acc.computeIfPresent(TypeClass(tc.simpleName, tc),
+          { _, value ->
+            Tuple2(value._1 + listOf(instance.receiverTypeSimpleName), TypeClass(tc.simpleName, tc))
+          })
+        acc.putIfAbsent(TypeClass(tc.simpleName, tc),
+          Tuple2(listOf(instance.receiverTypeSimpleName), TypeClass(tc.simpleName, tc)))
       }
       acc
     }
@@ -88,7 +95,7 @@ class RenzuGenerator(private val generatedDir: File, annotatedList: List<Annotat
       val instances = it.value._1
       val parentTypeClass = it.value._2
 
-      if (typeClass.fullName != parentTypeClass.fullName) {
+      if (typeClass.simpleName != parentTypeClass.simpleName) {
         relations += "[<typeclass>${parentTypeClass.simpleName}]<-[<typeclass>${typeClass.simpleName}]"
       }
 
