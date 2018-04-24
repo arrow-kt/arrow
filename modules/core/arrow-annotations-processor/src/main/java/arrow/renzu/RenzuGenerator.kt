@@ -99,7 +99,7 @@ class RenzuGenerator(private val generatedDir: File, annotatedList: List<Annotat
         relations += "[<typeclass>${parentTypeClass.simpleName}]<-[<typeclass>${typeClass.simpleName}]"
       }
 
-      relations += "[<typeclass>${typeClass.simpleName}]<-[<instances>Instances|${instances.joinToString(separator = "|")}]"
+      relations += "[<typeclass>${typeClass.simpleName}]<-[<instances>${typeClass.simpleName} Instances|${instances.joinToString(separator = "|")}]"
     }
 
     return relations.toList()
