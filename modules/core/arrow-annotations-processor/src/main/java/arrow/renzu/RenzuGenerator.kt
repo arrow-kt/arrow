@@ -26,7 +26,7 @@ data class TypeClass(val simpleName: String, private val classWrapper: ClassOrPa
 }
 
 typealias ParentTypeClass = TypeClass
-typealias Instances = List<String>
+typealias Instances = Set<String>
 
 class RenzuGenerator(private val generatedDir: File, annotatedList: List<AnnotatedInstance>) {
 
@@ -39,10 +39,10 @@ class RenzuGenerator(private val generatedDir: File, annotatedList: List<Annotat
       instance.implementedTypeclasses().forEach { tc ->
         acc.computeIfPresent(TypeClass(tc.simpleName, tc),
           { _, value ->
-            Tuple2(value._1 + listOf(instance.name.toString()), TypeClass(tc.simpleName, tc))
+            Tuple2(value._1 + setOf(instance.name.toString()), TypeClass(tc.simpleName, tc))
           })
         acc.putIfAbsent(TypeClass(tc.simpleName, tc),
-          Tuple2(listOf(instance.name.toString()), TypeClass(tc.simpleName, tc)))
+          Tuple2(setOf(instance.name.toString()), TypeClass(tc.simpleName, tc)))
       }
       acc
     }
