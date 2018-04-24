@@ -234,9 +234,9 @@ As cleanup is important in these restricted environments, any instance of [`Mona
 ```kotlin
 val (binding: IO<List<User>>, unsafeCancel: Disposable) =
   ioSync.bindingCancellable {
-    val userProfile = bindAsync(ioAsync) { getUserProfile("123") }
+    val userProfile = bindDefer { getUserProfile("123") }
     val friendProfiles = userProfile.friends().map { friend ->
-        bindAsync(ioAsync) { getProfile(friend.id) }
+        bindDefer { getProfile(friend.id) }
     }
     listOf(userProfile) + friendProfiles
   }
