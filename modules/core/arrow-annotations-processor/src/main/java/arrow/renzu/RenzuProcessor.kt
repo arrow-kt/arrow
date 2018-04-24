@@ -38,7 +38,7 @@ class RenzuProcessor : AbstractProcessor() {
       }
 
     if (roundEnv.processingOver()) {
-      val generatedDir = File(this.generatedDir!!, instanceAnnotationClass.simpleName).also { it.mkdirs() }
+      val generatedDir = File(this.generatedDir!!, "").also { it.mkdirs() }
       RenzuGenerator(generatedDir, annotatedList).generate()
     }
   }
