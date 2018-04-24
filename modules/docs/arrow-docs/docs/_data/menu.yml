@@ -3,7 +3,7 @@ nav:
       url: /docs
   
     - title: Blog
-      url: /category
+      url: /category/all
 
     - title: Github
       url: https://github.com/arrow-kt/arrow
@@ -13,7 +13,7 @@ nav:
       
 tab:
     - title: All
-      url: /category
+      url: /category/all
       
     - title: Videos
       url: /category/videos

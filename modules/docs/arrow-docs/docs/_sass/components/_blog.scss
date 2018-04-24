@@ -1,21 +1,61 @@
 // Blog
 // -----------------------------------------------
 // -----------------------------------------------
-
 .blog {
-    padding: ($base-point-grid * 8);
+    padding: ($base-point-grid * 8) 0;
     background: rgba($brand-tertiary, 0.10);
-    
-    .blog-item {
-        @include grid-column(4, $base-grid);
-        background: $white;
-        .blog-item-header {}
-        .blog-item-content {
-            padding: ($base-point-grid * 3);
-            
-            h2 {
-                font-size: 1.5rem;
-                color: $header-font-color;
+    .blog-list {
+        @include flexbox;
+        @include flex-wrap(wrap);
+        @include justify-content(flex-start);
+        @include align-items(stretch);
+        .blog-item {
+            margin-bottom: ($base-point-grid * 3);
+            @include grid-column(4, $base-grid);
+
+            @include bp(large) {
+                @include grid-column(6, $base-grid);
+            }
+
+            @include bp(medium) {
+                @include grid-column(12, $base-grid);
+            }
+            .blog-item-header {
+                position: relative;
+                .icon {
+                    position: absolute;
+                    z-index: 20;
+                    right: ($base-point-grid * 2);
+                    top: ($base-point-grid * 2);
+                }
+                .version {
+                    position: absolute;
+                    z-index: 10;
+                    left: ($base-point-grid * 3);
+                    bottom: ($base-point-grid * 2);
+                    color: $white;
+                    font-size: 0.875rem;
+                    
+                }
+            }
+            .blog-item-content {
+                padding: ($base-point-grid * 3);
+                background: $white;
+
+                h2 {
+                    margin-bottom: ($base-point-grid * 2);
+                    color: $header-font-color;
+                    font-size: 1.5rem;
+                    line-height: 1.3;
+                }
+
+                ul {
+                    margin-top: ($base-point-grid * 2);
+                    li {
+                        color: rgba($brand-secondary, 0.8);
+                        font-size: 0.875rem;
+                    }
+                }
             }
         }
     }

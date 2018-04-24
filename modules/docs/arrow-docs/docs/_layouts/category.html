@@ -2,21 +2,44 @@
 layout: blog
 ---
 <main id="content">
-    <section class="blog">
-        <div class="container">
+   <div class="blog">
+    <div class="container">
+        <div class="blog-list">
             {% for post in site.categories[page.category] %}
             <div class="blog-item">
-                <div class="blog-item-header"></div>
+                <div class="blog-item-header">
+                   {% if post.icon != "" %}
+                   <div class="icon">
+                       <img src="{{ post.icon }}" alt="">
+                   </div>
+                   {% endif %}
+                   {% if post.version != "" %}
+                   <div class="version">{{ post.version }}</div>
+                   {% endif %}
+                   {% if post.header-image != "" %}
+                    <a href="#">
+                        <img src="{{ post.header-image }}" alt="">
+                    </a>
+                    {% endif %}
+                </div>
                 <div class="blog-item-content">
                     {% if post.title != "" %}
                     <h2>{{ post.title }}</h2>
-                    {% endif %}
-                    {% if post.excerpt != "" %}
+                    {% endif %} {% if post.excerpt != "" %}
                     <p>{{ post.excerpt }}</p>
                     {% endif %}
+                    <ul>
+                        {% if post.event != "" %}
+                        <li>{{ post.event }}</li>
+                        {% endif %}
+                        {% if post.date != "" %}
+                        <li>{{ post.date | date: '%B %d, %Y' }}</li>
+                        {% endif %}
+                    </ul>
                 </div>
             </div>
             {% endfor %}
         </div>
-    </section>
+    </div>
+    </div>
 </main>
