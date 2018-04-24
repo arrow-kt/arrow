@@ -29,7 +29,7 @@ class RenzuGenerator(private val generatedDir: File, annotatedList: List<Annotat
 
   private fun normalizeTypeclassTree(instances: List<Instance>)
     : MutableMap<TypeClass, Tuple2<Instances, ParentTypeClass>> =
-    instances.fold(typeclassTree) { acc, instance ->
+    instances.fold(mutableMapOf()) { acc, instance ->
       instance.implementedTypeclasses().forEach { tc ->
         acc.computeIfPresent(tc, { key, value ->
           Tuple2(value._1 + listOf(instance.receiverTypeSimpleName), key)
