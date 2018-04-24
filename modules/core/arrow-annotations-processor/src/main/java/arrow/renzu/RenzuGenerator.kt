@@ -1,48 +1,89 @@
 package arrow.renzu
 
-import arrow.common.utils.ClassOrPackageDataWrapper
-import arrow.common.utils.fullName
-import arrow.common.utils.removeBackticks
-import arrow.common.utils.simpleName
+import arrow.common.utils.*
 import arrow.instances.AnnotatedInstance
 import javaslang.Tuple2
+import org.jetbrains.kotlin.serialization.deserialization.TypeTable
+import org.jetbrains.kotlin.serialization.deserialization.supertypes
 import java.io.File
+import javax.lang.model.element.Name
 
 data class Instance(val target: AnnotatedInstance) {
-  val name = target.classElement.simpleName
-  val receiverTypeName = target.dataType.nameResolver.getString(target.dataType.classProto.fqName)
-    .replace("/", ".")
-  val receiverTypeSimpleName = receiverTypeName.substringAfterLast(".")
+  val name: Name = target.classElement.simpleName
 
+  /**
+   * Returns any implemented typeclasses at any level crawling the instance hierarchy.
+   */
   fun implementedTypeclasses(): List<ClassOrPackageDataWrapper.Class> =
     target.superTypes.filter { it.fullName.removeBackticks().contains("typeclass") }
 }
 
-data class TypeClass(val simpleName: String, private val classWrapper: ClassOrPackageDataWrapper.Class) {
+data class TypeClass(val processor: RenzuProcessor, val simpleName: String, private val classWrapper: ClassOrPackageDataWrapper.Class) {
   override fun equals(other: Any?): Boolean =
     if (other !is TypeClass) false else simpleName == other.simpleName
 
   override fun hashCode(): Int = simpleName.hashCode()
+
+  /**
+   * Returns the typeclasses that are a direct parent of this one, for composing the typeclass
+   * relationship on the tree.
+   */
+  fun parentTypeClasses(current: ClassOrPackageDataWrapper.Class): List<TypeClass> {
+    val typeTable = TypeTable(current.classProto.typeTable)
+    val interfaces = current.classProto.supertypes(typeTable).map {
+      it.extractFullName(current)
+    }.filter {
+      it != "`kotlin`.`Any`"
+    }
+    val parentInterfaces: List<ClassOrPackageDataWrapper.Class> = listOf()
+    return when {
+      interfaces.isEmpty() -> parentInterfaces.map {
+        TypeClass(processor, it.simpleName, it)
+      }
+      else -> {
+        interfaces.flatMap { i ->
+          try {
+            val className = i.removeBackticks().substringBefore("<")
+            val typeClassElement = processor.elementUtils.getTypeElement(className)
+            val parentInterface = processor.getClassOrPackageDataWrapper(typeClassElement) as ClassOrPackageDataWrapper.Class
+            if (i.removeBackticks().contains("typeclass")) {
+              parentInterfaces + parentInterface
+            } else
+              parentInterfaces
+          } catch (_: Throwable) {
+            emptyList<ClassOrPackageDataWrapper.Class>()
+          }
+        }.map {
+          TypeClass(processor, it.simpleName, it)
+        }
+      }
+    }
+  }
 }
 
 typealias ParentTypeClass = TypeClass
 typealias Instances = Set<String>
 
-class RenzuGenerator(private val generatedDir: File, annotatedList: List<AnnotatedInstance>) {
+class RenzuGenerator(private val processor: RenzuProcessor, private val generatedDir: File, annotatedList: List<AnnotatedInstance>) {
 
-  private val typeclassTree: MutableMap<TypeClass, Tuple2<Instances, ParentTypeClass>> =
+  private val typeclassTree: MutableMap<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>> =
     normalizeTypeclassTree(annotatedList.map { Instance(it) })
 
   private fun normalizeTypeclassTree(instances: List<Instance>)
-    : MutableMap<TypeClass, Tuple2<Instances, ParentTypeClass>> =
+    : MutableMap<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>> =
     instances.fold(mutableMapOf()) { acc, instance ->
       instance.implementedTypeclasses().forEach { tc ->
-        acc.computeIfPresent(TypeClass(tc.simpleName, tc),
+        val typeclass = TypeClass(processor, tc.simpleName, tc)
+        val parentTypeClasses = typeclass.parentTypeClasses(tc)
+
+        acc.computeIfPresent(typeclass,
           { _, value ->
-            Tuple2(value._1 + setOf(instance.name.toString()), TypeClass(tc.simpleName, tc))
+            Tuple2(
+              value._1 + setOf(instance.name.toString()),
+              value._2 + parentTypeClasses)
           })
-        acc.putIfAbsent(TypeClass(tc.simpleName, tc),
-          Tuple2(setOf(instance.name.toString()), TypeClass(tc.simpleName, tc)))
+        acc.putIfAbsent(typeclass,
+          Tuple2(setOf(instance.name.toString()), parentTypeClasses.toSet()))
       }
       acc
     }
@@ -72,11 +113,11 @@ class RenzuGenerator(private val generatedDir: File, annotatedList: List<Annotat
 
    * [<typeclass>Functor]<-[<typeclass>Applicative]
    * [<typeclass>Applicative]<-[<typeclass>Monad]
-   * [<typeclass>Monad]<-[<instances>Instances|NonEmptyList|Option|OptionT|SequenceK|State|StateT|Try|Either|EitherT|Eval|Id]
+   * [<typeclass>Monad]<-[<instances>Monad Instances|NonEmptyList|Option|OptionT|SequenceK|State|StateT|Try|Either|EitherT|Eval|Id]
    * [<typeclass>Applicative]<-[Something 2]
    * [<typeclass>Applicative]<-[Something 3]
    */
-  private fun genDiagramRelations(typeclassTree: MutableMap<TypeClass, Tuple2<Instances, ParentTypeClass>>)
+  private fun genDiagramRelations(typeclassTree: MutableMap<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>>)
     : List<String> {
     val relations = mutableListOf<String>()
     relations += listOf("#font: Menlo") +
@@ -93,10 +134,10 @@ class RenzuGenerator(private val generatedDir: File, annotatedList: List<Annotat
     typeclassTree.forEach {
       val typeClass = it.key
       val instances = it.value._1
-      val parentTypeClass = it.value._2
+      val parentTypeClasses = it.value._2
 
-      if (typeClass.simpleName != parentTypeClass.simpleName) {
-        relations += "[<typeclass>${parentTypeClass.simpleName}]<-[<typeclass>${typeClass.simpleName}]"
+      parentTypeClasses.filter { typeClass.simpleName != it.simpleName }.forEach {
+        relations += "[<typeclass>${it.simpleName}]<-[<typeclass>${typeClass.simpleName}]"
       }
 
       relations += "[<typeclass>${typeClass.simpleName}]<-[<instances>${typeClass.simpleName} Instances|${instances.joinToString(separator = "|")}]"
