@@ -1,7 +1,6 @@
 package arrow.renzu
 
 import arrow.common.messager.log
-import arrow.common.messager.logW
 import arrow.common.utils.*
 import arrow.instances.AnnotatedInstance
 import javaslang.Tuple2
@@ -69,9 +68,10 @@ data class TypeClass(val processor: RenzuProcessor, val simpleName: String, priv
 typealias ParentTypeClass = TypeClass
 typealias Instances = Set<Instance>
 
-class RenzuGenerator(private val processor: RenzuProcessor,
-                     private val generatedDir: File,
-                     annotatedList: List<AnnotatedInstance>) {
+class RenzuGenerator(
+  private val processor: RenzuProcessor,
+  private val generatedDir: File,
+  annotatedList: List<AnnotatedInstance>) {
 
   private val typeclassTree: MutableMap<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>> =
     normalizeTypeclassTree(annotatedList.map { Instance(it) })
