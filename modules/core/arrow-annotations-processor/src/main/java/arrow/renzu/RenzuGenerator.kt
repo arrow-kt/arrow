@@ -10,6 +10,7 @@ import javax.lang.model.element.Name
 
 data class Instance(val target: AnnotatedInstance) {
   val name: Name = target.classElement.simpleName
+  val arrowModule: String = target.classOrPackageProto.`package`.substringAfterLast(".")
 
   /**
    * Returns any implemented typeclasses at any level crawling the instance hierarchy.
@@ -19,6 +20,8 @@ data class Instance(val target: AnnotatedInstance) {
 }
 
 data class TypeClass(val processor: RenzuProcessor, val simpleName: String, private val classWrapper: ClassOrPackageDataWrapper.Class) {
+  val arrowModule: String = classWrapper.`package`.substringAfterLast(".")
+
   override fun equals(other: Any?): Boolean =
     if (other !is TypeClass) false else simpleName == other.simpleName
 
@@ -62,9 +65,11 @@ data class TypeClass(val processor: RenzuProcessor, val simpleName: String, priv
 }
 
 typealias ParentTypeClass = TypeClass
-typealias Instances = Set<String>
+typealias Instances = Set<Instance>
 
-class RenzuGenerator(private val processor: RenzuProcessor, private val generatedDir: File, annotatedList: List<AnnotatedInstance>) {
+class RenzuGenerator(private val processor: RenzuProcessor,
+                     private val generatedDir: File,
+                     annotatedList: List<AnnotatedInstance>) {
 
   private val typeclassTree: MutableMap<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>> =
     normalizeTypeclassTree(annotatedList.map { Instance(it) })
@@ -79,11 +84,11 @@ class RenzuGenerator(private val processor: RenzuProcessor, private val generate
         acc.computeIfPresent(typeclass,
           { _, value ->
             Tuple2(
-              value._1 + setOf(instance.name.toString()),
+              value._1 + setOf(instance),
               value._2 + parentTypeClasses)
           })
         acc.putIfAbsent(typeclass,
-          Tuple2(setOf(instance.name.toString()), parentTypeClasses.toSet()))
+          Tuple2(setOf(instance), parentTypeClasses.toSet()))
       }
       acc
     }
@@ -127,9 +132,12 @@ class RenzuGenerator(private val processor: RenzuProcessor, private val generate
       listOf("#lineWidth: 2") +
       listOf("#padding: 8") +
       listOf("#zoom: 1") +
-      listOf("#fill: #64B5F6") +
-      listOf("#.typeclass: fill=#64B5F6 visual=database bold") +
-      listOf("#.instances: fill=#B9F6CA visual=class italic bold dashed")
+      listOf("#fill: #64B5F6")
+
+    val modules = typeclassTree.flatMap { setOf(it.key.arrowModule) + it.value._1.map { it.arrowModule } }.toSet()
+    modules.forEach {
+      relations += listOf("#.${normalizeModule(it)}: ${getModuleStyle(it)}")
+    }
 
     typeclassTree.forEach {
       val typeClass = it.key
@@ -137,10 +145,11 @@ class RenzuGenerator(private val processor: RenzuProcessor, private val generate
       val parentTypeClasses = it.value._2
 
       parentTypeClasses.filter { typeClass.simpleName != it.simpleName }.forEach {
-        relations += "[<typeclass>${it.simpleName}]<-[<typeclass>${typeClass.simpleName}]"
+        relations += "[<typeclasses>${it.simpleName}]<-[<typeclasses>${typeClass.simpleName}]"
       }
 
-      relations += "[<typeclass>${typeClass.simpleName}]<-[<instances>${typeClass.simpleName} Instances|${instances.joinToString(separator = "|")}]"
+      relations += "[<typeclasses>${typeClass.simpleName}]<-[<instances>${typeClass.simpleName} Instances|${instances
+        .map { it.name.toString() }.joinToString(separator = "|")}]"
     }
 
     return relations.toList()
