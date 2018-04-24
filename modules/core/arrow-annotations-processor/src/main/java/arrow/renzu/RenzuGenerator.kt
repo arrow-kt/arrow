@@ -39,10 +39,10 @@ class RenzuGenerator(private val generatedDir: File, annotatedList: List<Annotat
       instance.implementedTypeclasses().forEach { tc ->
         acc.computeIfPresent(TypeClass(tc.simpleName, tc),
           { _, value ->
-            Tuple2(value._1 + listOf(instance.receiverTypeSimpleName), TypeClass(tc.simpleName, tc))
+            Tuple2(value._1 + listOf(instance.name.toString()), TypeClass(tc.simpleName, tc))
           })
         acc.putIfAbsent(TypeClass(tc.simpleName, tc),
-          Tuple2(listOf(instance.receiverTypeSimpleName), TypeClass(tc.simpleName, tc)))
+          Tuple2(listOf(instance.name.toString()), TypeClass(tc.simpleName, tc)))
       }
       acc
     }
