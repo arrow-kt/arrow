@@ -1,0 +1,63 @@
+apply plugin: 'ank-gradle-plugin'
+apply plugin: 'org.ajoberstar.git-publish'
+
+dependencies {
+    compile('io.arrow-kt:ank-core:0.7.0-20180405.163901-2') {
+        exclude group: 'io.arrow-kt', module: 'arrow-core'
+        exclude group: 'io.arrow-kt', module: 'arrow-instances-core'
+        exclude group: 'io.arrow-kt', module: 'arrow-free'
+    }
+    compile project(':arrow-data')
+    compile project(':arrow-core')
+    compile project(':arrow-instances-data')
+    compile project(':arrow-effects')
+    compile project(':arrow-effects-rx2')
+    compile project(':arrow-effects-kotlinx-coroutines')
+    compile project(':arrow-optics')
+    compile project(':arrow-recursion')
+    compile project(':arrow-mtl')
+    compile project(':arrow-free')
+    compile project(':arrow-typeclasses')
+    compile project(':arrow-generic')
+    kapt project(':arrow-annotations-processor')
+    kaptTest project(':arrow-annotations-processor')
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+    compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
+    compile "io.kotlintest:kotlintest:$kotlinTestVersion"
+
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
+    compile "io.reactivex.rxjava2:rxjava:2.1.4"
+}
+
+task printcp {
+    doLast {
+        println sourceSets.main.runtimeClasspath.each { println it }
+    }
+}
+
+ank {
+    source = file("${projectDir}/docs")
+    target = file("${projectDir}/build/site")
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+gitPublish {
+    repoUri = 'git@github.com:arrow-kt/arrow.git'
+    branch = 'gh-pages'
+
+    contents {
+        from 'build/site'
+    }
+
+    commitMessage = 'update site'
+}
+
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+
+compileKotlin.kotlinOptions.freeCompilerArgs += ["-Xskip-runtime-version-check"]
+
+apply from: rootProject.file('gradle/generated-kotlin-sources.gradle')
+apply plugin: 'kotlin-kapt'

@@ -12,12 +12,17 @@ potential-bugs:
     active: false
   UnsafeCallOnNullableType:
     active: false
+  LateinitUsage:
+      active: false
 
 exceptions:
   active: true
 
 empty:
   active: true
+
+empty-blocks:
+  active: false
 
 complexity:
   active: true
@@ -34,7 +39,7 @@ complexity:
   TooManyFunctions:
     active: false
   LabeledExpression:
-    active: true
+    active: false
 
 code-smell:
   active: true
@@ -49,6 +54,7 @@ formatting:
   Indentation:
     active: true
     autoCorrect: true
+    indentSize: 2
   ConsecutiveBlankLines:
     active: true
     autoCorrect: true

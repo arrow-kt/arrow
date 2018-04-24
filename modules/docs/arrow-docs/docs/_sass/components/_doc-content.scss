@@ -1,0 +1,80 @@
+// DOC-CONTENT
+// -----------------------------------------------
+// -----------------------------------------------
+.doc-content {
+    position: relative;
+    padding: ($base-point-grid * 4);
+    font-size: 1.125rem;
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin-bottom: ($base-point-grid * 2);
+        margin-top: ($base-point-grid * 4);
+        color: $header-font-color;
+
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+
+    h1 {
+        font-size: 2.25rem;
+    }
+
+    h2 {
+        font-size: 1.9rem;
+    }
+    h3 {
+        font-size: 1.675rem;
+    }
+    h4 {
+        font-size: 1.425rem;
+    }
+
+
+    h5 {}
+    h6 {}
+
+    p {
+        margin-bottom: ($base-point-grid * 2);
+    }
+
+    .browser {
+        margin-top: ($base-point-grid * 3);
+    }
+    
+    ul {
+        padding-left: 24px;
+        li {
+            list-style: circle;
+            margin-bottom: 14px;
+        }
+    }
+    
+    hr {
+        border: none;
+        height: 1px;
+        width: 100%;
+        background: rgba($brand-secondary, 0.25);
+    }
+
+    .header-link {
+      float: left;
+      font-size: 1.4rem;
+      line-height: 1;
+      margin-left: -24px;
+      margin-top: 10px;
+      opacity: 0;
+      transition: opacity $base-duration $base-timing;
+    }
+
+    h1:hover, h2:hover, h3:hover, h4:hover, h5:hover, h6:hover {
+        .header-link {
+            opacity: 1;
+        }
+    }
+
+}

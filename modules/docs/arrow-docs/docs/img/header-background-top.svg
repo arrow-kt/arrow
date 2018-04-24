@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="960px" height="121px" viewBox="0 0 960 121" version="1.1" xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
+    <title>header-background-top</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="arrow-ui" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="header-background-top" transform="translate(0.000000, -175.000000)" fill-rule="nonzero">
+            <polygon id="path" fill-opacity="0.261492301" fill="#4B74E5"
+                     points="133.05859 266.351562 0 80 278.39844 115.222656"></polygon>
+            <polygon id="path" fill-opacity="0.2" fill="#4B74E5"
+                     points="89.51047 204.955233 17 103.402677 143.0423 98 217.21833 107.384667"></polygon>
+            <polygon id="path" fill-opacity="0.25" fill="#4B74E5"
+                     points="593.81641 84 410.85547 281.429687 59 109.972656"></polygon>
+            <polygon id="path" fill-opacity="0.65" fill="#4B74E5" opacity="0.731997283"
+                     points="1128.44531 54 410.87094 281.425631 316 54"></polygon>
+            <polygon id="path" fill-opacity="0.228317482" fill="#3877EC"
+                     points="411.08489 281.416913 594.03398 84 334 96.6282089"></polygon>
+            <polygon id="path" fill-opacity="0.3" fill="#4B74E5"
+                     points="569 62.5507812 904.914062 221.726562 954.36328 0"></polygon>
+        </g>
+    </g>
+</svg>

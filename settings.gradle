@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 The Kategory Authors
+ * Copyright (C) 2017 The Arrow Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,69 @@
  * limitations under the License.
  */
 
-include ':kategory-annotations'
-include ':kategory-annotations-processor'
-include ':kategory-core'
-include ':kategory-test'
-include ':kategory-effects'
-include ':kategory-effects-rx2'
-include ':kategory-effects-kotlinx-coroutines'
-include ':kategory-effects-test'
-include ':kategory-recursion'
-include ':kategory-docs'
-include ':kategory-optics'
-include ':ank-core'
-rootProject.name = 'kategory-parent'
+rootProject.name = "arrow"
+
+buildscript {
+    gradle.ext.tutteli_plugins_version = '0.4.0'
+    repositories {
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath "ch.tutteli:tutteli-gradle-settings:$gradle.ext.tutteli_plugins_version"
+    }
+}
+
+apply plugin: 'ch.tutteli.settings'
+
+
+include(':arrow-annotations-processor-test-models')
+project(':arrow-annotations-processor-test-models').projectDir = new File('modules/core/arrow-annotations-processor/models')
+
+//noinspection GroovyAssignabilityCheck
+include {
+    modules {
+
+        core {
+            _ 'annotations'
+            _ 'annotations-processor'
+            _ 'core'
+            _ 'data'
+            _ 'free'
+            _ 'instances-core'
+            _ 'instances-data'
+            _ 'generic'
+            _ 'kindedj'
+            _ 'mtl'
+            _ 'syntax'
+            _ 'test'
+            _ 'typeclasses'
+            _ 'validation'
+        }
+
+        effects {
+            _ 'effects'
+            _ 'effects-rx2'
+            _ 'effects-kotlinx-coroutines'
+        }
+
+        folder('recursion-schemes') {
+            _ 'recursion'
+        }
+
+        docs {
+            _ 'docs'
+            _ 'examples'
+        }
+
+        optics {
+            _ 'optics'
+        }
+
+        dagger {
+            _ 'dagger'
+            _ 'dagger-effects'
+            _ 'dagger-effects-rx2'
+            _ 'dagger-effects-kotlinx-coroutines'
+        }
+    }
+}

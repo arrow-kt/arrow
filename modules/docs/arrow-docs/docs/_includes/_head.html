@@ -1,0 +1,37 @@
+<head>
+    <meta charset="UTF-8">
+    <title>{{site.data.commons.name}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{site.data.commons.description}}">
+    <meta name="keywords" content="{{site.data.commons.keywords}}">
+
+    <meta property="og:image" content="http://arrow-kt.io/img/poster.png"/>
+    <meta property="og:title" content="{{site.data.commons.name}}"/>
+    <meta property="og:site_name" content="{{site.data.commons.name}}"/>
+    <meta property="og:url" content="http://arrow-kt.io/"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:description" content="{{site.data.commons.description}}"/>
+    <meta property="og:keywords" content="{{site.data.commons.keywords}}"/>
+
+    <meta name="twitter:text:description" content="{{site.data.commons.description}}"/>
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@arrow_kt">
+    <meta name="twitter:creator" content="@arrow_kt">
+    <meta name="twitter:image" content="http://arrow-kt.io/img/twitter-card.png"/>
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet"
+          type="text/css">
+    <!-- Animated -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+    <!-- Arrow main css -->
+    <link rel="shortcut icon" href="{{ '/img/favicon.png' | relative_url }}">
+    <!-- highlight  css -->
+    <link rel="stylesheet" type="text/css" href="{{ '/css/highlight/atom-one-light.css' | relative_url }}">
+    <!-- Arrow main css -->
+    <link rel="stylesheet" type="text/css" href="{{ '/css/arrow.css' | relative_url }}">
+
+    {% if jekyll.environment == 'production' and site.data.commons.google_analytics %}
+    {% include _google-analytics.html %}
+    {% endif %}
+</head>

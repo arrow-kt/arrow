@@ -1,0 +1,38 @@
+<div id="sidebar-wrapper">
+
+    <div class="sidebar-brand">
+        <a class="brand" href="/">
+            <img src="/img/arrow-brand-sidebar.svg" alt="">
+            <span>Λrrow</span>
+        </a>
+        <a href="javascript:void(0)" id="main-toggle" class="sidebar-toggle">
+            <i class="fa fa-bars"></i>
+        </a>
+    </div>
+
+    <ul class="sidebar-nav">
+        {% for item in site.data.menu.options %}
+        <li class="sidebar-nav-item">
+            <a href="{% if item.url %}{{item.url}}{% else %}#{% endif %}">
+                <span>{{ item.title }}</span>
+                {% if item.nested_options %}
+                <i class="fa fa-angle-right"></i>
+                {% endif%}
+            </a>
+            {% if item.nested_options %}
+            <ul>
+                {% for nested_item in item.nested_options %}
+                <li>
+                    <a href="{{ nested_item.url }}">
+                        <i class="fa fa-circle"></i>
+                        <span>{{ nested_item.title }}</span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif%}
+        </li>
+        {% endfor %}
+    </ul>
+
+</div>
