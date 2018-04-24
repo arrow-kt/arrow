@@ -125,6 +125,9 @@ val ProtoBuf.Class.isSealed
 val ClassOrPackageDataWrapper.Class.fullName: String
   get() = nameResolver.getName(classProto.fqName).asString()
 
+val ClassOrPackageDataWrapper.Class.simpleName: String
+  get() = fullName.substringAfterLast("/")
+
 fun ClassOrPackageDataWrapper.getParameter(function: ProtoBuf.Function, parameterElement: VariableElement) =
   getValueParameterOrNull(nameResolver, function, parameterElement)
     ?: knownError("Can't find annotated parameter ${parameterElement.simpleName} in ${function.getJvmMethodSignature(nameResolver)}")

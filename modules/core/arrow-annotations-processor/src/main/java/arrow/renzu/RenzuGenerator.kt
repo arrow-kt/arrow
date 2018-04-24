@@ -3,6 +3,7 @@ package arrow.renzu
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.fullName
 import arrow.common.utils.removeBackticks
+import arrow.common.utils.simpleName
 import arrow.instances.AnnotatedInstance
 import javaslang.Tuple2
 import java.io.File
@@ -88,10 +89,10 @@ class RenzuGenerator(private val generatedDir: File, annotatedList: List<Annotat
       val parentTypeClass = it.value._2
 
       if (typeClass.fullName != parentTypeClass.fullName) {
-        relations += "[<typeclass>${parentTypeClass.fullName}]<-[<typeclass>${typeClass.fullName}]"
+        relations += "[<typeclass>${parentTypeClass.simpleName}]<-[<typeclass>${typeClass.simpleName}]"
       }
 
-      relations += "[<typeclass>${typeClass.fullName}]<-[<instances>Instances|${instances.joinToString(separator = "|")}]"
+      relations += "[<typeclass>${typeClass.simpleName}]<-[<instances>Instances|${instances.joinToString(separator = "|")}]"
     }
 
     return relations.toList()
