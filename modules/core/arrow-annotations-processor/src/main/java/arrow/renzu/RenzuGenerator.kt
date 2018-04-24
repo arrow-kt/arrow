@@ -110,7 +110,7 @@ class RenzuGenerator(
    * Sample format for the output:
    *
    * #font: Menlo
-   * #fontSize: 15
+   * #fontSize: 10
    * #arrowSize: 1
    * #bendSize: 0.3
    * #lineWidth: 2
@@ -130,7 +130,7 @@ class RenzuGenerator(
     : List<String> {
     val relations = mutableListOf<String>()
     relations += listOf("#font: Menlo") +
-      listOf("#fontSize: 15") +
+      listOf("#fontSize: 10") +
       listOf("#arrowSize: 1") +
       listOf("#bendSize: 0.3") +
       listOf("#lineWidth: 2") +
