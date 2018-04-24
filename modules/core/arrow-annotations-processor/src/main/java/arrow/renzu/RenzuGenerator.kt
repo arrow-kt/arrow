@@ -1,5 +1,7 @@
 package arrow.renzu
 
+import arrow.common.messager.log
+import arrow.common.messager.logW
 import arrow.common.utils.*
 import arrow.instances.AnnotatedInstance
 import javaslang.Tuple2
@@ -98,6 +100,8 @@ class RenzuGenerator(private val processor: RenzuProcessor,
     val elementsToGenerate: List<String> = genDiagramRelations(typeclassTree)
     val source: String = elementsToGenerate.joinToString(separator = "\n")
     file.writeText(source)
+
+    processor.log("arrow-infographic generated: " + file.path)
   }
 
   /**
