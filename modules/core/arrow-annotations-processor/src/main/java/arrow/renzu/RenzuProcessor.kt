@@ -18,6 +18,8 @@ import javax.lang.model.element.TypeElement
 @AutoService(Processor::class)
 class RenzuProcessor : AbstractProcessor() {
 
+  val annotatedList = mutableListOf<AnnotatedInstance>()
+
   override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
   override fun getSupportedAnnotationTypes(): Set<String> = setOf(instanceAnnotationClass.canonicalName)
@@ -26,7 +28,6 @@ class RenzuProcessor : AbstractProcessor() {
    * Processor entry point
    */
   override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
-    val annotatedList = mutableListOf<AnnotatedInstance>()
     annotatedList += roundEnv
       .getElementsAnnotatedWith(instanceAnnotationClass)
       .map { element ->

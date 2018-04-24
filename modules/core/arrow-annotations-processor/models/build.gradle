@@ -8,4 +8,6 @@ dependencies {
     compile project(":arrow-data")
     compile project(':arrow-annotations')
     compile project(":arrow-optics")
+    compile project(":arrow-instances-core")
+    compile project(":arrow-instances-data")
 }
