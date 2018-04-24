@@ -151,6 +151,11 @@ class OptionTest : UnitSpec() {
       none.orElse { Some("java") }.get() shouldBe "java"
     }
 
+    "toNullable" {
+      none.toNullable() shouldBe null
+      some.toNullable() shouldBe "kotlin"
+    }
+
     "toList" {
       some.toList() shouldBe listOf("kotlin")
       none.toList() shouldBe listOf<String>()

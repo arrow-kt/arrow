@@ -204,6 +204,8 @@ fun <T> T?.toOption(): Option<T> = if (this != null) {
   None
 }
 
+fun <A> Option<A>.toNullable(): A? = this.getOrElse { null }
+
 fun <A> Boolean.maybe(f: () -> A): Option<A> =
   if (this) {
     Some(f())
