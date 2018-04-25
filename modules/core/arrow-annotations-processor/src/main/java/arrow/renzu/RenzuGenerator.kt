@@ -97,9 +97,21 @@ class RenzuGenerator(
 
   fun generate() {
     val file = File(generatedDir, "arrow-infographic.txt")
+    val globalStyles =
+      listOf("#font: Menlo") +
+      listOf("#fontSize: 10") +
+      listOf("#arrowSize: 1") +
+      listOf("#bendSize: 0.3") +
+      listOf("#lineWidth: 2") +
+      listOf("#padding: 8") +
+      listOf("#zoom: 1") +
+      listOf("#fill: #64B5F6")
+
+    file.appendText(globalStyles.joinToString(prefix = "\n", separator = "\n", postfix = "\n"))
+
     val elementsToGenerate: List<String> = genDiagramRelations(typeclassTree)
-    val source: String = elementsToGenerate.joinToString(separator = "\n")
-    file.writeText(source)
+    val source: String = elementsToGenerate.joinToString(prefix = "\n", separator = "\n", postfix = "\n")
+    file.appendText(source)
 
     processor.log("arrow-infographic generated: " + file.path)
   }
@@ -129,14 +141,6 @@ class RenzuGenerator(
   private fun genDiagramRelations(typeclassTree: MutableMap<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>>)
     : List<String> {
     val relations = mutableListOf<String>()
-    relations += listOf("#font: Menlo") +
-      listOf("#fontSize: 10") +
-      listOf("#arrowSize: 1") +
-      listOf("#bendSize: 0.3") +
-      listOf("#lineWidth: 2") +
-      listOf("#padding: 8") +
-      listOf("#zoom: 1") +
-      listOf("#fill: #64B5F6")
 
     val modules = typeclassTree.flatMap { setOf(it.key.arrowModule) + it.value._1.map { it.arrowModule } }.toSet()
     modules.forEach {
