@@ -48,6 +48,12 @@ buildscript {
 apply from: 'detekt.gradle.kts'
 
 allprojects {
+    apply plugin: 'base'
+
+    clean.doFirst {
+        delete "${rootDir}/infographic/arrow-infographic.txt"
+    }
+
     repositories {
         jcenter()
         maven { url 'https://oss.jfrog.org/oss-snapshot-local/' }
