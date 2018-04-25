@@ -108,20 +108,14 @@ sealed class Try<out A> : TryOf<A> {
   @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("getOrElse { ifEmpty }"))
   abstract fun get(): A
 
-  @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("map { body(it); it }"))
-  fun onSuccess(body: (A) -> Unit): Try<A> {
-    foreach(body)
-    return this
-  }
+  fun onSuccess(body: (A) -> Unit): Try<A> =
+          flatMap { Try { body(it); it } }
 
-  @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("fold ({ Try { body(it); it }}, { Try.just(it) })"))
-  fun onFailure(body: (Throwable) -> Unit): Try<A> = when (this) {
-    is Success -> this
-    is Failure -> {
-      body(exception)
-      this
-    }
-  }
+  fun onFailure(body: (Throwable) -> Unit): Try<A> =
+          fold({
+            body(it)
+            Try.raise(it)
+          }, { Try.just(it) })
 
   fun toOption(): Option<A> = fold({ None }, { Some(it) })
 
