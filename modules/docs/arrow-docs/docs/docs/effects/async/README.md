@@ -80,46 +80,6 @@ IO.async()
 > never() exists to test datatypes that can handle non-termination.
 For example, IO has unsafeRunTimed that runs never() safely.
 
-### Syntax available inside Monad Comprehensions
-
-All the syntax functions are geared towards using `Async` inside [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }})
-to create blocks of code to be run asynchronously.
-
-#### binding#bindAsync
-
-Runs a function parameter in the Async passed as a parameter,
-and then awaits for the result before continuing the execution.
-
-Note that there is no automatic error handling or wrapping of exceptions.
-
-```kotlin
-IO.monad().binding {
-  val a = bindAsync(IO.async()) { fibonacci(100) }
-  a + 1
-}.fix().unsafeRunSync()
-```
-
-#### binding#bindAsyncUnsafe
-
-Runs a function parameter in the Async passed as a parameter,
-and then awaits for the result before continuing the execution.
-
-While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution.
-
-```kotlin
-IO.monad().binding {
-  val a = bindAsync(IO.async()) { fibonacci(100).left() }
-  a + 1
-}.fix().unsafeRunSync()
-```
-
-```kotlin
-IO.monad().binding {
-  val a = bindAsync(IO.async()) { RuntimeException("Boom").right() }
-  a + 1
-}.fix().unsafeRunSync()
-```
-
 ### Laws
 
 Arrow provides `AsyncLaws` in the form of test cases for internal verification of lawful instances and third party apps creating their own `Async` instances.
