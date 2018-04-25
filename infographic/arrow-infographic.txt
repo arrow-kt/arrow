@@ -9,98 +9,6 @@
 #fill: #64B5F6
 
 #.typeclasses: fill=#64B5F6 visual=database bold
-#.instances: fill=#B9F6CA visual=class italic bold dashed
-[<typeclasses>Applicative]<-[<typeclasses>Monad]
-[<typeclasses>Monad]<-[<instances>Monad Instances|TryMonadInstance|EitherMonadErrorInstance|EvalBimonadInstance|IdMonadInstance|OptionMonadInstance|EvalMonadInstance|Function0BimonadInstance|EitherMonadInstance|Tuple2MonadInstance|IdBimonadInstance|Function0MonadInstance|TryMonadErrorInstance|OptionMonadErrorInstance|Function1MonadInstance]
-[<typeclasses>Functor]<-[<typeclasses>Applicative]
-[<typeclasses>Applicative]<-[<instances>Applicative Instances|TryMonadInstance|EitherMonadErrorInstance|Tuple2ApplicativeInstance|EvalBimonadInstance|Function1ApplicativeInstance|IdMonadInstance|OptionMonadInstance|EvalApplicativeInstance|EvalMonadInstance|EitherApplicativeErrorInstance|Function0BimonadInstance|EitherApplicativeInstance|TryApplicativeErrorInstance|EitherMonadInstance|OptionApplicativeInstance|Tuple2MonadInstance|IdApplicativeInstance|TryApplicativeInstance|IdBimonadInstance|Function0MonadInstance|OptionApplicativeErrorInstance|TryMonadErrorInstance|ConstApplicativeInstance|Function0ApplicativeInstance|OptionMonadErrorInstance|Function1MonadInstance]
-[<typeclasses>Functor]<-[<instances>Functor Instances|TryMonadInstance|Function1FunctorInstance|EitherMonadErrorInstance|Tuple2FunctorInstance|ConstFunctorInstance|Function0FunctorInstance|Tuple2ComonadInstance|Function0ComonadInstance|Tuple2ApplicativeInstance|OptionTraverseInstance|IdComonadInstance|EitherFunctorInstance|EvalBimonadInstance|IdFunctorInstance|Function1ApplicativeInstance|IdMonadInstance|ConstTraverseInstance|OptionMonadInstance|EvalApplicativeInstance|OptionFunctorInstance|EvalMonadInstance|EitherApplicativeErrorInstance|TryTraverseInstance|Function0BimonadInstance|EitherApplicativeInstance|TryApplicativeErrorInstance|EitherMonadInstance|OptionApplicativeInstance|Tuple2MonadInstance|IdTraverseInstance|EvalFunctorInstance|IdApplicativeInstance|TryApplicativeInstance|IdBimonadInstance|EvalComonadInstance|Tuple2TraverseInstance|EitherTraverseInstance|Function0MonadInstance|OptionApplicativeErrorInstance|TryMonadErrorInstance|TryFunctorInstance|ConstApplicativeInstance|Function0ApplicativeInstance|OptionMonadErrorInstance|Function1MonadInstance]
-[<typeclasses>Applicative]<-[<typeclasses>ApplicativeError]
-[<typeclasses>ApplicativeError]<-[<instances>ApplicativeError Instances|EitherMonadErrorInstance|EitherApplicativeErrorInstance|TryApplicativeErrorInstance|OptionApplicativeErrorInstance|TryMonadErrorInstance|OptionMonadErrorInstance]
-[<typeclasses>ApplicativeError]<-[<typeclasses>MonadError]
-[<typeclasses>Monad]<-[<typeclasses>MonadError]
-[<typeclasses>MonadError]<-[<instances>MonadError Instances|EitherMonadErrorInstance|TryMonadErrorInstance|OptionMonadErrorInstance]
-[<typeclasses>Eq]<-[<instances>Eq Instances|Tuple6EqInstance|OptionEqInstance|Tuple9EqInstance|Tuple8EqInstance|EitherEqInstance|Tuple7EqInstance|Tuple5EqInstance|ConstEqInstance|Tuple2EqInstance|Tuple3EqInstance|Tuple4EqInstance|IdEqInstance|Tuple10EqInstance|TryEqInstance]
-[<typeclasses>Show]<-[<instances>Show Instances|OptionShowInstance|EitherShowInstance|Tuple4ShowInstance|TryShowInstance|IdShowInstance|Tuple5ShowInstance|Tuple9ShowInstance|Tuple10ShowInstance|Tuple2ShowInstance|Tuple6ShowInstance|Tuple8ShowInstance|ConstShowInstance|Tuple3ShowInstance|Tuple7ShowInstance]
-[<typeclasses>Semigroup]<-[<instances>Semigroup Instances|OptionMonoidInstance|ConstSemigroupInstance|ConstMonoidInstance|Tuple2MonoidInstance|OptionSemigroupInstance]
-[<typeclasses>Semigroup]<-[<typeclasses>Monoid]
-[<typeclasses>Monoid]<-[<instances>Monoid Instances|OptionMonoidInstance|ConstMonoidInstance|Tuple2MonoidInstance]
-[<typeclasses>Functor]<-[<typeclasses>Comonad]
-[<typeclasses>Comonad]<-[<instances>Comonad Instances|Tuple2ComonadInstance|Function0ComonadInstance|IdComonadInstance|EvalBimonadInstance|Function0BimonadInstance|IdBimonadInstance|EvalComonadInstance]
-[<typeclasses>Foldable]<-[<instances>Foldable Instances|IdFoldableInstance|OptionTraverseInstance|ConstTraverseInstance|EitherFoldableInstance|TryTraverseInstance|Tuple2FoldableInstance|IdTraverseInstance|OptionFoldableInstance|Tuple2TraverseInstance|TryFoldableInstance|EitherTraverseInstance|ConstFoldableInstance]
-[<typeclasses>Functor]<-[<typeclasses>Traverse]
-[<typeclasses>Foldable]<-[<typeclasses>Traverse]
-[<typeclasses>Traverse]<-[<instances>Traverse Instances|OptionTraverseInstance|ConstTraverseInstance|TryTraverseInstance|IdTraverseInstance|Tuple2TraverseInstance|EitherTraverseInstance]
-[<typeclasses>Monad]<-[<typeclasses>Bimonad]
-[<typeclasses>Comonad]<-[<typeclasses>Bimonad]
-[<typeclasses>Bimonad]<-[<instances>Bimonad Instances|EvalBimonadInstance|Function0BimonadInstance|IdBimonadInstance]
-[<typeclasses>SemigroupK]<-[<instances>SemigroupK Instances|EitherSemigroupKInstance]
-
-#font: Menlo
-#fontSize: 10
-#arrowSize: 1
-#bendSize: 0.3
-#lineWidth: 2
-#padding: 8
-#zoom: 1
-#fill: #64B5F6
-
-#.typeclasses: fill=#64B5F6 visual=database bold
-#.instances: fill=#B9F6CA visual=class italic bold dashed
-[<typeclasses>SemigroupK]<-[<instances>SemigroupK Instances|WriterTSemigroupKInstance|SetKSemigroupKInstance|WriterTMonoidKInstance|ListKMonoidKInstance|OptionTMonoidKInstance|SequenceKSemigroupKInstance|NonEmptyListSemigroupKInstance|ValidatedSemigroupKInstance|OptionTSemigroupKInstance|SetKMonoidKInstance|ListKSemigroupKInstance|StateTSemigroupKInstance|SequenceKMonoidKInstance]
-[<typeclasses>Semigroup]<-[<instances>Semigroup Instances|SetKSemigroupInstance|ListKMonoidInstance|SequenceKMonoidInstance|MapKMonoidInstance|NonEmptyListSemigroupInstance|SequenceKSemigroupInstance|SetKMonoidInstance|ListKSemigroupInstance|MapKSemigroupInstance|SortedMapKSemigroupInstance|SortedMapKMonoidInstance]
-[<typeclasses>Semigroup]<-[<typeclasses>Monoid]
-[<typeclasses>Monoid]<-[<instances>Monoid Instances|ListKMonoidInstance|SequenceKMonoidInstance|MapKMonoidInstance|SetKMonoidInstance|SortedMapKMonoidInstance]
-[<typeclasses>Show]<-[<instances>Show Instances|SetKShowInstance|ListKShowInstance|SortedMapKShowInstance|IorShowInstance|ValidatedShowInstance|NonEmptyListShowInstance|SequenceKShowInstance|MapKShowInstance]
-[<typeclasses>Foldable]<-[<instances>Foldable Instances|SortedMapKFoldableInstance|ListKTraverseInstance|ValidatedTraverseInstance|OptionTTraverseInstance|SequenceKFoldableInstance|NonEmptyListFoldableInstance|CoproductFoldableInstance|IorFoldableInstance|MapKTraverseInstance|NonEmptyListTraverseInstance|SetKFoldableInstance|CoproductTraverseInstance|OptionTFoldableInstance|SequenceKTraverseInstance|ListKFoldableInstance|ValidatedFoldableInstance|SortedMapKTraverseInstance|MapKFoldableInstance|IorTraverseInstance]
-[<typeclasses>Applicative]<-[<typeclasses>ApplicativeError]
-[<typeclasses>ApplicativeError]<-[<instances>ApplicativeError Instances|KleisliMonadErrorInstance|ValidatedApplicativeErrorInstance|StateTApplicativeErrorInstance|StateTMonadErrorInstance|KleisliApplicativeErrorInstance]
-[<typeclasses>Functor]<-[<typeclasses>Applicative]
-[<typeclasses>Applicative]<-[<instances>Applicative Instances|KleisliMonadErrorInstance|IorApplicativeInstance|StateTApplicativeInstance|KleisliMonadInstance|OptionTMonadInstance|WriterTMonadInstance|ListKMonadInstance|OptionTApplicativeInstance|StateTMonadInstance|ValidatedApplicativeErrorInstance|IorMonadInstance|ListKApplicativeInstance|WriterTApplicativeInstance|SequenceKApplicativeInstance|StateTApplicativeErrorInstance|StateTMonadErrorInstance|NonEmptyListMonadInstance|NonEmptyListBimonadInstance|NonEmptyListApplicativeInstance|SequenceKMonadInstance|KleisliApplicativeErrorInstance|ValidatedApplicativeInstance|KleisliApplicativeInstance]
-[<typeclasses>Functor]<-[<instances>Functor Instances|KleisliMonadErrorInstance|IorApplicativeInstance|ListKTraverseInstance|StateTApplicativeInstance|ValidatedTraverseInstance|NonEmptyListFunctorInstance|IorFunctorInstance|KleisliMonadInstance|OptionTTraverseInstance|CoproductFunctorInstance|NonEmptyListComonadInstance|OptionTMonadInstance|WriterTMonadInstance|CoproductComonadInstance|ListKMonadInstance|OptionTApplicativeInstance|KleisliFunctorInstance|StateTMonadInstance|ValidatedApplicativeErrorInstance|IorMonadInstance|ListKApplicativeInstance|MapKTraverseInstance|WriterTApplicativeInstance|SequenceKApplicativeInstance|StateTApplicativeErrorInstance|SequenceKFunctorInstance|NonEmptyListTraverseInstance|StateTMonadErrorInstance|CoproductTraverseInstance|MapKFunctorInstance|NonEmptyListMonadInstance|StateTFunctorInstance|SequenceKTraverseInstance|SortedMapKFunctorInstance|NonEmptyListBimonadInstance|NonEmptyListApplicativeInstance|SortedMapKTraverseInstance|SequenceKMonadInstance|WriterTFunctorInstance|KleisliApplicativeErrorInstance|ListKFunctorInstance|ValidatedApplicativeInstance|OptionTFunctorInstance|KleisliApplicativeInstance|ValidatedFunctorInstance|IorTraverseInstance]
-[<typeclasses>ApplicativeError]<-[<typeclasses>MonadError]
-[<typeclasses>Monad]<-[<typeclasses>MonadError]
-[<typeclasses>MonadError]<-[<instances>MonadError Instances|KleisliMonadErrorInstance|StateTMonadErrorInstance]
-[<typeclasses>Applicative]<-[<typeclasses>Monad]
-[<typeclasses>Monad]<-[<instances>Monad Instances|KleisliMonadErrorInstance|KleisliMonadInstance|OptionTMonadInstance|WriterTMonadInstance|ListKMonadInstance|StateTMonadInstance|IorMonadInstance|StateTMonadErrorInstance|NonEmptyListMonadInstance|NonEmptyListBimonadInstance|SequenceKMonadInstance]
-[<typeclasses>Functor]<-[<typeclasses>Traverse]
-[<typeclasses>Foldable]<-[<typeclasses>Traverse]
-[<typeclasses>Traverse]<-[<instances>Traverse Instances|ListKTraverseInstance|ValidatedTraverseInstance|OptionTTraverseInstance|MapKTraverseInstance|NonEmptyListTraverseInstance|CoproductTraverseInstance|SequenceKTraverseInstance|SortedMapKTraverseInstance|IorTraverseInstance]
-[<typeclasses>Eq]<-[<instances>Eq Instances|IorEqInstance|SetKEqInstance|NonEmptyListEqInstance|ValidatedEqInstance|SequenceKEqInstance|MapKEqInstance|ListKEqInstance]
-[<typeclasses>Functor]<-[<typeclasses>Comonad]
-[<typeclasses>Comonad]<-[<instances>Comonad Instances|NonEmptyListComonadInstance|CoproductComonadInstance|NonEmptyListBimonadInstance]
-[<typeclasses>SemigroupK]<-[<typeclasses>MonoidK]
-[<typeclasses>MonoidK]<-[<instances>MonoidK Instances|WriterTMonoidKInstance|ListKMonoidKInstance|OptionTMonoidKInstance|SetKMonoidKInstance|SequenceKMonoidKInstance]
-[<typeclasses>Monad]<-[<typeclasses>Bimonad]
-[<typeclasses>Comonad]<-[<typeclasses>Bimonad]
-[<typeclasses>Bimonad]<-[<instances>Bimonad Instances|NonEmptyListBimonadInstance]
-
-#font: Menlo
-#fontSize: 10
-#arrowSize: 1
-#bendSize: 0.3
-#lineWidth: 2
-#padding: 8
-#zoom: 1
-#fill: #64B5F6
-
-#.typeclasses: fill=#64B5F6 visual=database bold
-#.instances: fill=#B9F6CA visual=class italic bold dashed
-[<typeclasses>Each]<-[<instances>Each Instances|ListKEachInstance|OptionEachInstance|EitherEachInstance|TryEachInstance|SequenceKEachInstance|NonEmptyListEachInstance|MapKEachInstance]
-[<typeclasses>Index]<-[<instances>Index Instances|MapKIndexInstance|SequenceKIndexInstance|NonEmptyListIndexInstance|ListKIndexInstance]
-[<typeclasses>FilterIndex]<-[<instances>FilterIndex Instances|SequenceKFilterIndexInstance|MapKFilterIndexInstance|ListKFilterIndexInstance|NonEmptyListFilterIndexInstance]
-[<typeclasses>At]<-[<instances>At Instances|MapKAtInstance|SetKAtInstance]
-
-#font: Menlo
-#fontSize: 10
-#arrowSize: 1
-#bendSize: 0.3
-#lineWidth: 2
-#padding: 8
-#zoom: 1
-#fill: #64B5F6
-
-#.typeclasses: fill=#64B5F6 visual=database bold
 #.effects: fill=#B9F6CA visual=class italic bold dashed
 [<typeclasses>Semigroup]<-[<typeclasses>Monoid]
 [<typeclasses>Monoid]<-[<instances>Monoid Instances|IOMonoidInstance]
@@ -121,69 +29,6 @@
 [<typeclasses>Async]<-[<instances>Async Instances|IOAsyncInstance|IOEffectInstance]
 [<typeclasses>Async]<-[<typeclasses>Effect]
 [<typeclasses>Effect]<-[<instances>Effect Instances|IOEffectInstance]
-
-#font: Menlo
-#fontSize: 10
-#arrowSize: 1
-#bendSize: 0.3
-#lineWidth: 2
-#padding: 8
-#zoom: 1
-#fill: #64B5F6
-
-#.typeclasses: fill=#64B5F6 visual=database bold
-#.instances: fill=#B9F6CA visual=class italic bold dashed
-[<typeclasses>Functor]<-[<instances>Functor Instances|CofreeComonadInstance|CofreeFunctorInstance|FreeApplicativeFunctorInstance|CoyonedaFunctorInstance|FreeApplicativeInstance|FreeApplicativeApplicativeInstance|FreeFunctorInstance|FreeMonadInstance|YonedaFunctorInstance]
-[<typeclasses>Functor]<-[<typeclasses>Comonad]
-[<typeclasses>Comonad]<-[<instances>Comonad Instances|CofreeComonadInstance]
-[<typeclasses>Functor]<-[<typeclasses>Applicative]
-[<typeclasses>Applicative]<-[<instances>Applicative Instances|FreeApplicativeInstance|FreeApplicativeApplicativeInstance|FreeMonadInstance]
-[<typeclasses>Applicative]<-[<typeclasses>Monad]
-[<typeclasses>Monad]<-[<instances>Monad Instances|FreeMonadInstance]
-
-#font: Menlo
-#fontSize: 10
-#arrowSize: 1
-#bendSize: 0.3
-#lineWidth: 2
-#padding: 8
-#zoom: 1
-#fill: #64B5F6
-
-#.typeclasses: fill=#64B5F6 visual=database bold
-#.instances: fill=#B9F6CA visual=class italic bold dashed
-[<typeclasses>MonadFilter]<-[<typeclasses>MonadCombine]
-[<typeclasses>Alternative]<-[<typeclasses>MonadCombine]
-[<typeclasses>MonadCombine]<-[<instances>MonadCombine Instances|StateTMonadCombineInstance|ListKMonadCombineInstance]
-[<typeclasses>Monad]<-[<typeclasses>MonadFilter]
-[<typeclasses>FunctorFilter]<-[<typeclasses>MonadFilter]
-[<typeclasses>MonadFilter]<-[<instances>MonadFilter Instances|StateTMonadCombineInstance|OptionMonadFilterInstance|ListKMonadFilterInstance|ListKMonadCombineInstance|WriterTMonadFilterInstance]
-[<typeclasses>Applicative]<-[<typeclasses>Monad]
-[<typeclasses>Monad]<-[<instances>Monad Instances|StateTMonadCombineInstance|KleisliMonadReaderInstance|StateTMonadStateInstance|OptionMonadFilterInstance|ListKMonadFilterInstance|Function1MonadReaderInstance|ListKMonadCombineInstance|WriterTMonadFilterInstance|WriterTMonadWriterInstance]
-[<typeclasses>Functor]<-[<typeclasses>Applicative]
-[<typeclasses>Applicative]<-[<instances>Applicative Instances|StateTMonadCombineInstance|KleisliMonadReaderInstance|StateTMonadStateInstance|OptionMonadFilterInstance|ListKMonadFilterInstance|Function1MonadReaderInstance|ListKMonadCombineInstance|WriterTMonadFilterInstance|WriterTMonadWriterInstance]
-[<typeclasses>Functor]<-[<instances>Functor Instances|StateTMonadCombineInstance|KleisliMonadReaderInstance|StateTMonadStateInstance|OptionTraverseFilterInstance|OptionMonadFilterInstance|ListKFunctorFilterInstance|ConstTraverseFilterInstance|ListKMonadFilterInstance|Function1MonadReaderInstance|ListKMonadCombineInstance|WriterTMonadFilterInstance|OptionTFunctorFilterInstance|OptionTTraverseFilterInstance|WriterTMonadWriterInstance]
-[<typeclasses>Functor]<-[<typeclasses>FunctorFilter]
-[<typeclasses>FunctorFilter]<-[<instances>FunctorFilter Instances|StateTMonadCombineInstance|OptionTraverseFilterInstance|OptionMonadFilterInstance|ListKFunctorFilterInstance|ConstTraverseFilterInstance|ListKMonadFilterInstance|ListKMonadCombineInstance|WriterTMonadFilterInstance|OptionTFunctorFilterInstance|OptionTTraverseFilterInstance]
-[<typeclasses>Applicative]<-[<typeclasses>Alternative]
-[<typeclasses>MonoidK]<-[<typeclasses>Alternative]
-[<typeclasses>Alternative]<-[<instances>Alternative Instances|StateTMonadCombineInstance|ListKMonadCombineInstance]
-[<typeclasses>SemigroupK]<-[<typeclasses>MonoidK]
-[<typeclasses>MonoidK]<-[<instances>MonoidK Instances|StateTMonadCombineInstance|ListKMonadCombineInstance]
-[<typeclasses>SemigroupK]<-[<instances>SemigroupK Instances|StateTMonadCombineInstance|ListKMonadCombineInstance]
-[<typeclasses>Monad]<-[<typeclasses>MonadReader]
-[<typeclasses>MonadReader]<-[<instances>MonadReader Instances|KleisliMonadReaderInstance|Function1MonadReaderInstance]
-[<typeclasses>Monad]<-[<typeclasses>MonadState]
-[<typeclasses>MonadState]<-[<instances>MonadState Instances|StateTMonadStateInstance]
-[<typeclasses>Traverse]<-[<typeclasses>TraverseFilter]
-[<typeclasses>FunctorFilter]<-[<typeclasses>TraverseFilter]
-[<typeclasses>TraverseFilter]<-[<instances>TraverseFilter Instances|OptionTraverseFilterInstance|ConstTraverseFilterInstance|OptionTTraverseFilterInstance]
-[<typeclasses>Functor]<-[<typeclasses>Traverse]
-[<typeclasses>Foldable]<-[<typeclasses>Traverse]
-[<typeclasses>Traverse]<-[<instances>Traverse Instances|OptionTraverseFilterInstance|ConstTraverseFilterInstance|OptionTTraverseFilterInstance]
-[<typeclasses>Foldable]<-[<instances>Foldable Instances|OptionTraverseFilterInstance|ConstTraverseFilterInstance|OptionTTraverseFilterInstance]
-[<typeclasses>Monad]<-[<typeclasses>MonadWriter]
-[<typeclasses>MonadWriter]<-[<instances>MonadWriter Instances|WriterTMonadWriterInstance]
 
 #font: Menlo
 #fontSize: 10
@@ -244,6 +89,161 @@
 [<typeclasses>Foldable]<-[<instances>Foldable Instances|FlowableKTraverseInstance|ObservableKFoldableInstance|ObservableKTraverseInstance|FlowableKFoldableInstance]
 [<typeclasses>Async]<-[<typeclasses>Effect]
 [<typeclasses>Effect]<-[<instances>Effect Instances|ObservableKEffectInstance|FlowableKEffectInstance]
+
+#font: Menlo
+#fontSize: 10
+#arrowSize: 1
+#bendSize: 0.3
+#lineWidth: 2
+#padding: 8
+#zoom: 1
+#fill: #64B5F6
+
+#.typeclasses: fill=#64B5F6 visual=database bold
+#.instances: fill=#B9F6CA visual=class italic bold dashed
+[<typeclasses>Applicative]<-[<typeclasses>Monad]
+[<typeclasses>Monad]<-[<instances>Monad Instances|TryMonadInstance|EitherMonadErrorInstance|EvalBimonadInstance|IdMonadInstance|OptionMonadInstance|EvalMonadInstance|Function0BimonadInstance|EitherMonadInstance|Tuple2MonadInstance|IdBimonadInstance|Function0MonadInstance|TryMonadErrorInstance|OptionMonadErrorInstance|Function1MonadInstance]
+[<typeclasses>Functor]<-[<typeclasses>Applicative]
+[<typeclasses>Applicative]<-[<instances>Applicative Instances|TryMonadInstance|EitherMonadErrorInstance|Tuple2ApplicativeInstance|EvalBimonadInstance|Function1ApplicativeInstance|IdMonadInstance|OptionMonadInstance|EvalApplicativeInstance|EvalMonadInstance|EitherApplicativeErrorInstance|Function0BimonadInstance|EitherApplicativeInstance|TryApplicativeErrorInstance|EitherMonadInstance|OptionApplicativeInstance|Tuple2MonadInstance|IdApplicativeInstance|TryApplicativeInstance|IdBimonadInstance|Function0MonadInstance|OptionApplicativeErrorInstance|TryMonadErrorInstance|ConstApplicativeInstance|Function0ApplicativeInstance|OptionMonadErrorInstance|Function1MonadInstance]
+[<typeclasses>Functor]<-[<instances>Functor Instances|TryMonadInstance|Function1FunctorInstance|EitherMonadErrorInstance|Tuple2FunctorInstance|ConstFunctorInstance|Function0FunctorInstance|Tuple2ComonadInstance|Function0ComonadInstance|Tuple2ApplicativeInstance|OptionTraverseInstance|IdComonadInstance|EitherFunctorInstance|EvalBimonadInstance|IdFunctorInstance|Function1ApplicativeInstance|IdMonadInstance|ConstTraverseInstance|OptionMonadInstance|EvalApplicativeInstance|OptionFunctorInstance|EvalMonadInstance|EitherApplicativeErrorInstance|TryTraverseInstance|Function0BimonadInstance|EitherApplicativeInstance|TryApplicativeErrorInstance|EitherMonadInstance|OptionApplicativeInstance|Tuple2MonadInstance|IdTraverseInstance|EvalFunctorInstance|IdApplicativeInstance|TryApplicativeInstance|IdBimonadInstance|EvalComonadInstance|Tuple2TraverseInstance|EitherTraverseInstance|Function0MonadInstance|OptionApplicativeErrorInstance|TryMonadErrorInstance|TryFunctorInstance|ConstApplicativeInstance|Function0ApplicativeInstance|OptionMonadErrorInstance|Function1MonadInstance]
+[<typeclasses>Applicative]<-[<typeclasses>ApplicativeError]
+[<typeclasses>ApplicativeError]<-[<instances>ApplicativeError Instances|EitherMonadErrorInstance|EitherApplicativeErrorInstance|TryApplicativeErrorInstance|OptionApplicativeErrorInstance|TryMonadErrorInstance|OptionMonadErrorInstance]
+[<typeclasses>ApplicativeError]<-[<typeclasses>MonadError]
+[<typeclasses>Monad]<-[<typeclasses>MonadError]
+[<typeclasses>MonadError]<-[<instances>MonadError Instances|EitherMonadErrorInstance|TryMonadErrorInstance|OptionMonadErrorInstance]
+[<typeclasses>Eq]<-[<instances>Eq Instances|Tuple6EqInstance|OptionEqInstance|Tuple9EqInstance|Tuple8EqInstance|EitherEqInstance|Tuple7EqInstance|Tuple5EqInstance|ConstEqInstance|Tuple2EqInstance|Tuple3EqInstance|Tuple4EqInstance|IdEqInstance|Tuple10EqInstance|TryEqInstance]
+[<typeclasses>Show]<-[<instances>Show Instances|OptionShowInstance|EitherShowInstance|Tuple4ShowInstance|TryShowInstance|IdShowInstance|Tuple5ShowInstance|Tuple9ShowInstance|Tuple10ShowInstance|Tuple2ShowInstance|Tuple6ShowInstance|Tuple8ShowInstance|ConstShowInstance|Tuple3ShowInstance|Tuple7ShowInstance]
+[<typeclasses>Semigroup]<-[<instances>Semigroup Instances|OptionMonoidInstance|ConstSemigroupInstance|ConstMonoidInstance|Tuple2MonoidInstance|OptionSemigroupInstance]
+[<typeclasses>Semigroup]<-[<typeclasses>Monoid]
+[<typeclasses>Monoid]<-[<instances>Monoid Instances|OptionMonoidInstance|ConstMonoidInstance|Tuple2MonoidInstance]
+[<typeclasses>Functor]<-[<typeclasses>Comonad]
+[<typeclasses>Comonad]<-[<instances>Comonad Instances|Tuple2ComonadInstance|Function0ComonadInstance|IdComonadInstance|EvalBimonadInstance|Function0BimonadInstance|IdBimonadInstance|EvalComonadInstance]
+[<typeclasses>Foldable]<-[<instances>Foldable Instances|IdFoldableInstance|OptionTraverseInstance|ConstTraverseInstance|EitherFoldableInstance|TryTraverseInstance|Tuple2FoldableInstance|IdTraverseInstance|OptionFoldableInstance|Tuple2TraverseInstance|TryFoldableInstance|EitherTraverseInstance|ConstFoldableInstance]
+[<typeclasses>Functor]<-[<typeclasses>Traverse]
+[<typeclasses>Foldable]<-[<typeclasses>Traverse]
+[<typeclasses>Traverse]<-[<instances>Traverse Instances|OptionTraverseInstance|ConstTraverseInstance|TryTraverseInstance|IdTraverseInstance|Tuple2TraverseInstance|EitherTraverseInstance]
+[<typeclasses>Monad]<-[<typeclasses>Bimonad]
+[<typeclasses>Comonad]<-[<typeclasses>Bimonad]
+[<typeclasses>Bimonad]<-[<instances>Bimonad Instances|EvalBimonadInstance|Function0BimonadInstance|IdBimonadInstance]
+[<typeclasses>SemigroupK]<-[<instances>SemigroupK Instances|EitherSemigroupKInstance]
+
+#font: Menlo
+#fontSize: 10
+#arrowSize: 1
+#bendSize: 0.3
+#lineWidth: 2
+#padding: 8
+#zoom: 1
+#fill: #64B5F6
+
+#.typeclasses: fill=#64B5F6 visual=database bold
+#.instances: fill=#B9F6CA visual=class italic bold dashed
+[<typeclasses>Functor]<-[<instances>Functor Instances|CofreeComonadInstance|CofreeFunctorInstance|FreeApplicativeFunctorInstance|CoyonedaFunctorInstance|FreeApplicativeInstance|FreeApplicativeApplicativeInstance|FreeFunctorInstance|FreeMonadInstance|YonedaFunctorInstance]
+[<typeclasses>Functor]<-[<typeclasses>Comonad]
+[<typeclasses>Comonad]<-[<instances>Comonad Instances|CofreeComonadInstance]
+[<typeclasses>Functor]<-[<typeclasses>Applicative]
+[<typeclasses>Applicative]<-[<instances>Applicative Instances|FreeApplicativeInstance|FreeApplicativeApplicativeInstance|FreeMonadInstance]
+[<typeclasses>Applicative]<-[<typeclasses>Monad]
+[<typeclasses>Monad]<-[<instances>Monad Instances|FreeMonadInstance]
+
+#font: Menlo
+#fontSize: 10
+#arrowSize: 1
+#bendSize: 0.3
+#lineWidth: 2
+#padding: 8
+#zoom: 1
+#fill: #64B5F6
+
+#.typeclasses: fill=#64B5F6 visual=database bold
+#.instances: fill=#B9F6CA visual=class italic bold dashed
+[<typeclasses>SemigroupK]<-[<instances>SemigroupK Instances|WriterTSemigroupKInstance|SetKSemigroupKInstance|WriterTMonoidKInstance|ListKMonoidKInstance|OptionTMonoidKInstance|SequenceKSemigroupKInstance|NonEmptyListSemigroupKInstance|ValidatedSemigroupKInstance|OptionTSemigroupKInstance|SetKMonoidKInstance|ListKSemigroupKInstance|StateTSemigroupKInstance|SequenceKMonoidKInstance]
+[<typeclasses>Semigroup]<-[<instances>Semigroup Instances|SetKSemigroupInstance|ListKMonoidInstance|SequenceKMonoidInstance|MapKMonoidInstance|NonEmptyListSemigroupInstance|SequenceKSemigroupInstance|SetKMonoidInstance|ListKSemigroupInstance|MapKSemigroupInstance|SortedMapKSemigroupInstance|SortedMapKMonoidInstance]
+[<typeclasses>Semigroup]<-[<typeclasses>Monoid]
+[<typeclasses>Monoid]<-[<instances>Monoid Instances|ListKMonoidInstance|SequenceKMonoidInstance|MapKMonoidInstance|SetKMonoidInstance|SortedMapKMonoidInstance]
+[<typeclasses>Show]<-[<instances>Show Instances|SetKShowInstance|ListKShowInstance|SortedMapKShowInstance|IorShowInstance|ValidatedShowInstance|NonEmptyListShowInstance|SequenceKShowInstance|MapKShowInstance]
+[<typeclasses>Foldable]<-[<instances>Foldable Instances|SortedMapKFoldableInstance|ListKTraverseInstance|ValidatedTraverseInstance|OptionTTraverseInstance|SequenceKFoldableInstance|NonEmptyListFoldableInstance|CoproductFoldableInstance|IorFoldableInstance|MapKTraverseInstance|NonEmptyListTraverseInstance|SetKFoldableInstance|CoproductTraverseInstance|OptionTFoldableInstance|SequenceKTraverseInstance|ListKFoldableInstance|ValidatedFoldableInstance|SortedMapKTraverseInstance|MapKFoldableInstance|IorTraverseInstance]
+[<typeclasses>Applicative]<-[<typeclasses>ApplicativeError]
+[<typeclasses>ApplicativeError]<-[<instances>ApplicativeError Instances|KleisliMonadErrorInstance|ValidatedApplicativeErrorInstance|StateTApplicativeErrorInstance|StateTMonadErrorInstance|KleisliApplicativeErrorInstance]
+[<typeclasses>Functor]<-[<typeclasses>Applicative]
+[<typeclasses>Applicative]<-[<instances>Applicative Instances|KleisliMonadErrorInstance|IorApplicativeInstance|StateTApplicativeInstance|KleisliMonadInstance|OptionTMonadInstance|WriterTMonadInstance|ListKMonadInstance|OptionTApplicativeInstance|StateTMonadInstance|ValidatedApplicativeErrorInstance|IorMonadInstance|ListKApplicativeInstance|WriterTApplicativeInstance|SequenceKApplicativeInstance|StateTApplicativeErrorInstance|StateTMonadErrorInstance|NonEmptyListMonadInstance|NonEmptyListBimonadInstance|NonEmptyListApplicativeInstance|SequenceKMonadInstance|KleisliApplicativeErrorInstance|ValidatedApplicativeInstance|KleisliApplicativeInstance]
+[<typeclasses>Functor]<-[<instances>Functor Instances|KleisliMonadErrorInstance|IorApplicativeInstance|ListKTraverseInstance|StateTApplicativeInstance|ValidatedTraverseInstance|NonEmptyListFunctorInstance|IorFunctorInstance|KleisliMonadInstance|OptionTTraverseInstance|CoproductFunctorInstance|NonEmptyListComonadInstance|OptionTMonadInstance|WriterTMonadInstance|CoproductComonadInstance|ListKMonadInstance|OptionTApplicativeInstance|KleisliFunctorInstance|StateTMonadInstance|ValidatedApplicativeErrorInstance|IorMonadInstance|ListKApplicativeInstance|MapKTraverseInstance|WriterTApplicativeInstance|SequenceKApplicativeInstance|StateTApplicativeErrorInstance|SequenceKFunctorInstance|NonEmptyListTraverseInstance|StateTMonadErrorInstance|CoproductTraverseInstance|MapKFunctorInstance|NonEmptyListMonadInstance|StateTFunctorInstance|SequenceKTraverseInstance|SortedMapKFunctorInstance|NonEmptyListBimonadInstance|NonEmptyListApplicativeInstance|SortedMapKTraverseInstance|SequenceKMonadInstance|WriterTFunctorInstance|KleisliApplicativeErrorInstance|ListKFunctorInstance|ValidatedApplicativeInstance|OptionTFunctorInstance|KleisliApplicativeInstance|ValidatedFunctorInstance|IorTraverseInstance]
+[<typeclasses>ApplicativeError]<-[<typeclasses>MonadError]
+[<typeclasses>Monad]<-[<typeclasses>MonadError]
+[<typeclasses>MonadError]<-[<instances>MonadError Instances|KleisliMonadErrorInstance|StateTMonadErrorInstance]
+[<typeclasses>Applicative]<-[<typeclasses>Monad]
+[<typeclasses>Monad]<-[<instances>Monad Instances|KleisliMonadErrorInstance|KleisliMonadInstance|OptionTMonadInstance|WriterTMonadInstance|ListKMonadInstance|StateTMonadInstance|IorMonadInstance|StateTMonadErrorInstance|NonEmptyListMonadInstance|NonEmptyListBimonadInstance|SequenceKMonadInstance]
+[<typeclasses>Functor]<-[<typeclasses>Traverse]
+[<typeclasses>Foldable]<-[<typeclasses>Traverse]
+[<typeclasses>Traverse]<-[<instances>Traverse Instances|ListKTraverseInstance|ValidatedTraverseInstance|OptionTTraverseInstance|MapKTraverseInstance|NonEmptyListTraverseInstance|CoproductTraverseInstance|SequenceKTraverseInstance|SortedMapKTraverseInstance|IorTraverseInstance]
+[<typeclasses>Eq]<-[<instances>Eq Instances|IorEqInstance|SetKEqInstance|NonEmptyListEqInstance|ValidatedEqInstance|SequenceKEqInstance|MapKEqInstance|ListKEqInstance]
+[<typeclasses>Functor]<-[<typeclasses>Comonad]
+[<typeclasses>Comonad]<-[<instances>Comonad Instances|NonEmptyListComonadInstance|CoproductComonadInstance|NonEmptyListBimonadInstance]
+[<typeclasses>SemigroupK]<-[<typeclasses>MonoidK]
+[<typeclasses>MonoidK]<-[<instances>MonoidK Instances|WriterTMonoidKInstance|ListKMonoidKInstance|OptionTMonoidKInstance|SetKMonoidKInstance|SequenceKMonoidKInstance]
+[<typeclasses>Monad]<-[<typeclasses>Bimonad]
+[<typeclasses>Comonad]<-[<typeclasses>Bimonad]
+[<typeclasses>Bimonad]<-[<instances>Bimonad Instances|NonEmptyListBimonadInstance]
+
+#font: Menlo
+#fontSize: 10
+#arrowSize: 1
+#bendSize: 0.3
+#lineWidth: 2
+#padding: 8
+#zoom: 1
+#fill: #64B5F6
+
+#.typeclasses: fill=#64B5F6 visual=database bold
+#.instances: fill=#B9F6CA visual=class italic bold dashed
+[<typeclasses>MonadFilter]<-[<typeclasses>MonadCombine]
+[<typeclasses>Alternative]<-[<typeclasses>MonadCombine]
+[<typeclasses>MonadCombine]<-[<instances>MonadCombine Instances|StateTMonadCombineInstance|ListKMonadCombineInstance]
+[<typeclasses>Monad]<-[<typeclasses>MonadFilter]
+[<typeclasses>FunctorFilter]<-[<typeclasses>MonadFilter]
+[<typeclasses>MonadFilter]<-[<instances>MonadFilter Instances|StateTMonadCombineInstance|OptionMonadFilterInstance|ListKMonadFilterInstance|ListKMonadCombineInstance|WriterTMonadFilterInstance]
+[<typeclasses>Applicative]<-[<typeclasses>Monad]
+[<typeclasses>Monad]<-[<instances>Monad Instances|StateTMonadCombineInstance|KleisliMonadReaderInstance|StateTMonadStateInstance|OptionMonadFilterInstance|ListKMonadFilterInstance|Function1MonadReaderInstance|ListKMonadCombineInstance|WriterTMonadFilterInstance|WriterTMonadWriterInstance]
+[<typeclasses>Functor]<-[<typeclasses>Applicative]
+[<typeclasses>Applicative]<-[<instances>Applicative Instances|StateTMonadCombineInstance|KleisliMonadReaderInstance|StateTMonadStateInstance|OptionMonadFilterInstance|ListKMonadFilterInstance|Function1MonadReaderInstance|ListKMonadCombineInstance|WriterTMonadFilterInstance|WriterTMonadWriterInstance]
+[<typeclasses>Functor]<-[<instances>Functor Instances|StateTMonadCombineInstance|KleisliMonadReaderInstance|StateTMonadStateInstance|OptionTraverseFilterInstance|OptionMonadFilterInstance|ListKFunctorFilterInstance|ConstTraverseFilterInstance|ListKMonadFilterInstance|Function1MonadReaderInstance|ListKMonadCombineInstance|WriterTMonadFilterInstance|OptionTFunctorFilterInstance|OptionTTraverseFilterInstance|WriterTMonadWriterInstance]
+[<typeclasses>Functor]<-[<typeclasses>FunctorFilter]
+[<typeclasses>FunctorFilter]<-[<instances>FunctorFilter Instances|StateTMonadCombineInstance|OptionTraverseFilterInstance|OptionMonadFilterInstance|ListKFunctorFilterInstance|ConstTraverseFilterInstance|ListKMonadFilterInstance|ListKMonadCombineInstance|WriterTMonadFilterInstance|OptionTFunctorFilterInstance|OptionTTraverseFilterInstance]
+[<typeclasses>Applicative]<-[<typeclasses>Alternative]
+[<typeclasses>MonoidK]<-[<typeclasses>Alternative]
+[<typeclasses>Alternative]<-[<instances>Alternative Instances|StateTMonadCombineInstance|ListKMonadCombineInstance]
+[<typeclasses>SemigroupK]<-[<typeclasses>MonoidK]
+[<typeclasses>MonoidK]<-[<instances>MonoidK Instances|StateTMonadCombineInstance|ListKMonadCombineInstance]
+[<typeclasses>SemigroupK]<-[<instances>SemigroupK Instances|StateTMonadCombineInstance|ListKMonadCombineInstance]
+[<typeclasses>Monad]<-[<typeclasses>MonadReader]
+[<typeclasses>MonadReader]<-[<instances>MonadReader Instances|KleisliMonadReaderInstance|Function1MonadReaderInstance]
+[<typeclasses>Monad]<-[<typeclasses>MonadState]
+[<typeclasses>MonadState]<-[<instances>MonadState Instances|StateTMonadStateInstance]
+[<typeclasses>Traverse]<-[<typeclasses>TraverseFilter]
+[<typeclasses>FunctorFilter]<-[<typeclasses>TraverseFilter]
+[<typeclasses>TraverseFilter]<-[<instances>TraverseFilter Instances|OptionTraverseFilterInstance|ConstTraverseFilterInstance|OptionTTraverseFilterInstance]
+[<typeclasses>Functor]<-[<typeclasses>Traverse]
+[<typeclasses>Foldable]<-[<typeclasses>Traverse]
+[<typeclasses>Traverse]<-[<instances>Traverse Instances|OptionTraverseFilterInstance|ConstTraverseFilterInstance|OptionTTraverseFilterInstance]
+[<typeclasses>Foldable]<-[<instances>Foldable Instances|OptionTraverseFilterInstance|ConstTraverseFilterInstance|OptionTTraverseFilterInstance]
+[<typeclasses>Monad]<-[<typeclasses>MonadWriter]
+[<typeclasses>MonadWriter]<-[<instances>MonadWriter Instances|WriterTMonadWriterInstance]
+
+#font: Menlo
+#fontSize: 10
+#arrowSize: 1
+#bendSize: 0.3
+#lineWidth: 2
+#padding: 8
+#zoom: 1
+#fill: #64B5F6
+
+#.typeclasses: fill=#64B5F6 visual=database bold
+#.instances: fill=#B9F6CA visual=class italic bold dashed
+[<typeclasses>Each]<-[<instances>Each Instances|ListKEachInstance|OptionEachInstance|EitherEachInstance|TryEachInstance|SequenceKEachInstance|NonEmptyListEachInstance|MapKEachInstance]
+[<typeclasses>Index]<-[<instances>Index Instances|MapKIndexInstance|SequenceKIndexInstance|NonEmptyListIndexInstance|ListKIndexInstance]
+[<typeclasses>FilterIndex]<-[<instances>FilterIndex Instances|SequenceKFilterIndexInstance|MapKFilterIndexInstance|ListKFilterIndexInstance|NonEmptyListFilterIndexInstance]
+[<typeclasses>At]<-[<instances>At Instances|MapKAtInstance|SetKAtInstance]
 
 #font: Menlo
 #fontSize: 10
