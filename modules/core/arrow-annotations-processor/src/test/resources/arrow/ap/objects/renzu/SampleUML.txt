@@ -1,5 +1,5 @@
 #font: Menlo
-#fontSize: 15
+#fontSize: 10
 #arrowSize: 1
 #bendSize: 0.3
 #lineWidth: 2
