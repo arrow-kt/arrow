@@ -15,7 +15,8 @@ abstract class APTest(
 ) : StringSpec() {
 
   fun testProcessor(
-    vararg processor: AnnotationProcessor
+    vararg processor: AnnotationProcessor,
+    generationDir: File = Files.createTempDir()
   ) {
 
     processor.forEach { (name, sources, dest, proc, error) ->
@@ -35,11 +36,9 @@ abstract class APTest(
 
       name {
 
-        val temp = Files.createTempDir()
-
         val compilation = javac()
           .withProcessors(proc)
-          .withOptions(ImmutableList.of("-Akapt.kotlin.generated=$temp", "-proc:only"))
+          .withOptions(ImmutableList.of("-Akapt.kotlin.generated=$generationDir", "-proc:only"))
           .compile(sources.map {
             val stub = File(stubs, it).toURI().toURL()
             JavaFileObjects.forResource(stub)
@@ -57,10 +56,10 @@ abstract class APTest(
           assertThat(compilation)
             .succeeded()
 
-          temp.listFiles().size shouldBe 1
+          generationDir.listFiles().size shouldBe 1
 
           val expected = File(expectedDir, dest).readText()
-          val actual = temp.listFiles()[0].readText()
+          val actual = generationDir.listFiles()[0].readText()
 
           actual shouldBe expected
 

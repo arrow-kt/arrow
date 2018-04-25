@@ -38,7 +38,7 @@ class RenzuProcessor : AbstractProcessor() {
       }
 
     if (roundEnv.processingOver()) {
-      val generatedDir = File(this.generatedDir!!, "").also { it.mkdirs() }
+      val generatedDir = File("./infographic/", "").also { it.mkdirs() }
       RenzuGenerator(this, generatedDir, annotatedList).generate()
     }
   }
