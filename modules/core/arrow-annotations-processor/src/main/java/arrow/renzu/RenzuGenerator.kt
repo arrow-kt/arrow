@@ -68,7 +68,10 @@ data class TypeClass(val processor: RenzuProcessor, val simpleName: String, priv
 typealias ParentTypeClass = TypeClass
 typealias Instances = Set<Instance>
 
-class RenzuGenerator(private val processor: RenzuProcessor, annotatedList: List<AnnotatedInstance>) {
+class RenzuGenerator(
+  private val processor: RenzuProcessor,
+  annotatedList: List<AnnotatedInstance>,
+  val isolateForTests: Boolean = false) {
 
   private val typeclassTree: MutableMap<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>> =
     normalizeTypeclassTree(annotatedList.map { Instance(it) })
@@ -93,7 +96,12 @@ class RenzuGenerator(private val processor: RenzuProcessor, annotatedList: List<
     }
 
   fun generate() {
-    val generatedDir = File("../../../infographic", "").also { it.mkdirs() }
+    val generatedDir = if (isolateForTests)
+      File("./infographic")
+    else
+      File("${recurseFilesUpwards("arrow").absolutePath}/infographic", "")
+        .also { it.mkdirs() }
+
     val file = File(generatedDir, "arrow-infographic.txt")
     if (!file.exists()) {
       val globalStyles =
@@ -106,12 +114,20 @@ class RenzuGenerator(private val processor: RenzuProcessor, annotatedList: List<
           listOf("#zoom: 1") +
           listOf("#fill: #64B5F6")
 
-      file.appendText(globalStyles.joinToString(prefix = "\n", separator = "\n", postfix = "\n"))
+      file.appendText(globalStyles.joinToString(separator = "\n"))
     }
 
     val elementsToGenerate: List<String> = genDiagramRelations(typeclassTree)
-    val source: String = elementsToGenerate.joinToString(prefix = "\n", separator = "\n", postfix = "\n")
-    file.appendText(source)
+    val currentFileLines = file.readLines()
+
+    val source: String = elementsToGenerate
+      .toSet()
+      .filterNot { currentFileLines.contains(it) }
+      .joinToString(prefix = "\n", separator = "\n")
+
+    if (source != "\n") {
+      file.appendText(source)
+    }
 
     processor.log("arrow-infographic generated: " + file.path)
   }

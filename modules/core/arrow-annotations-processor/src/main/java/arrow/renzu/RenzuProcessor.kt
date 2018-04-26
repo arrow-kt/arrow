@@ -8,7 +8,6 @@ import arrow.instances.instanceAnnotationClass
 import arrow.instances.instanceAnnotationName
 import com.google.auto.service.AutoService
 import org.jetbrains.kotlin.serialization.deserialization.TypeTable
-import java.io.File
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
@@ -16,7 +15,7 @@ import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
 
 @AutoService(Processor::class)
-class RenzuProcessor : AbstractProcessor() {
+class RenzuProcessor(val isolateForTests: Boolean = false) : AbstractProcessor() {
 
   val annotatedList = mutableListOf<AnnotatedInstance>()
 
@@ -38,7 +37,7 @@ class RenzuProcessor : AbstractProcessor() {
       }
 
     if (roundEnv.processingOver()) {
-      RenzuGenerator(this, annotatedList).generate()
+      RenzuGenerator(this, annotatedList, isolateForTests).generate()
     }
   }
 

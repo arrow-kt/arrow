@@ -6,6 +6,7 @@ import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.java.MethodElement
 import org.jetbrains.kotlin.serialization.ProtoBuf
 import org.jetbrains.kotlin.serialization.deserialization.TypeTable
 import org.jetbrains.kotlin.serialization.deserialization.supertypes
+import java.io.File
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
@@ -166,3 +167,12 @@ fun ClassOrPackageDataWrapper.typeConstraints(): String =
     }
   }
 
+fun recurseFilesUpwards(rootDirName: String): File =
+  recurseFilesUpwards(rootDirName, File("."))
+
+fun recurseFilesUpwards(rootDirName: String, currentFile: File): File =
+  if (currentFile.name == rootDirName) {
+    currentFile
+  } else {
+    recurseFilesUpwards(rootDirName, currentFile.absoluteFile.parentFile)
+  }

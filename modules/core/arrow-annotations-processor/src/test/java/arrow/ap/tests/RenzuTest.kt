@@ -10,9 +10,7 @@ class RenzuTest : APTest("arrow.ap.objects.renzu") {
       name = "Generates UML for nomnoml",
       sourceFiles = listOf("OptionMonoidInstance.java", "OptionSemigroupInstance.java"),
       destFile = "SampleUML.txt",
-      processor = RenzuProcessor()
-    ), generationDir = File("../../../infographic", "").also { it.mkdirs() })
-
-    File("../../../infographic", "").listFiles()?.forEach { it.delete() }
+      processor = RenzuProcessor(isolateForTests = true)
+    ), generationDir = File("./infographic", "").also { it.mkdirs() })
   }
 }
