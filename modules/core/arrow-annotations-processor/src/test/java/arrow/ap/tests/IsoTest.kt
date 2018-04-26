@@ -8,7 +8,7 @@ class IsoTest : APTest("arrow.ap.objects.iso") {
 
     testProcessor(AnnotationProcessor(
       name = "Isos cannot be generated for sealed classes",
-      sourceFile = "IsoSealed.java",
+      sourceFiles = listOf("IsoSealed.java"),
       errorMessage = """
       |Cannot generate arrow.optics.Iso for arrow.ap.objects.iso.IsoSealed
       |                                        ^
@@ -20,7 +20,7 @@ class IsoTest : APTest("arrow.ap.objects.iso") {
 
     testProcessor(AnnotationProcessor(
       name = "Isos cannot be generated for huge classes",
-      sourceFile = "IsoXXL.java",
+      sourceFiles = listOf("IsoXXL.java"),
       errorMessage = """
       |Cannot generate arrow.optics.Iso for arrow.ap.objects.iso.IsoXXL
       |                                        ^
@@ -31,7 +31,7 @@ class IsoTest : APTest("arrow.ap.objects.iso") {
 
     testProcessor(AnnotationProcessor(
       name = "Isos will be generated for data class",
-      sourceFile = "Iso.java",
+      sourceFiles = listOf("Iso.java"),
       destFile = "Iso.kt",
       processor = OpticsProcessor()
     ))

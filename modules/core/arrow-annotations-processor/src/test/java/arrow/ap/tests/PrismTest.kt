@@ -8,7 +8,7 @@ class PrismTest : APTest("arrow.ap.objects.prism") {
 
     testProcessor(AnnotationProcessor(
       name = "Prisms cannot be generated for data class",
-      sourceFile = "PrismDataClass.java",
+      sourceFiles = listOf("PrismDataClass.java"),
       errorMessage = """
       |Cannot generate arrow.optics.Prism for arrow.ap.objects.prism.PrismDataClass
       |                                          ^
@@ -20,7 +20,7 @@ class PrismTest : APTest("arrow.ap.objects.prism") {
 
     testProcessor(AnnotationProcessor(
       name = "Prisms are generated for sealed class",
-      sourceFile = "Prism.java",
+      sourceFiles = listOf("Prism.java"),
       destFile = "Prism.kt",
       processor = OpticsProcessor()
     ))
