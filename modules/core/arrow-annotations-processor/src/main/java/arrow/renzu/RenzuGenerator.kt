@@ -106,16 +106,18 @@ class RenzuGenerator(
     val file = File(generatedDir, "arrow-infographic.txt")
     if (!file.exists()) {
       val globalStyles =
-        listOf("#font: Menlo") +
-          listOf("#fontSize: 10") +
-          listOf("#arrowSize: 1") +
-          listOf("#bendSize: 0.3") +
-          listOf("#lineWidth: 2") +
-          listOf("#padding: 8") +
-          listOf("#zoom: 1") +
-          listOf("#fill: #64B5F6")
+        """
+        |#font: Menlo
+        |#fontSize: 10
+        |#arrowSize: 1
+        |#bendSize: 0.3
+        |#lineWidth: 2
+        |#padding: 8
+        |#zoom: 1
+        |#fill: #64B5F6
+        """.trimMargin()
 
-      file.appendText(globalStyles.joinToString(separator = "\n"))
+      file.appendText(globalStyles)
     }
 
     val elementsToGenerate: List<String> = genDiagramRelations(typeclassTree)
