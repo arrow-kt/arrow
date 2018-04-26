@@ -73,26 +73,27 @@ class RenzuGenerator(
   annotatedList: List<AnnotatedInstance>,
   val isolateForTests: Boolean = false) {
 
-  private val typeclassTree: MutableMap<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>> =
+  private val typeclassTree: Map<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>> =
     normalizeTypeclassTree(annotatedList.map { Instance(it) })
 
   private fun normalizeTypeclassTree(instances: List<Instance>)
-    : MutableMap<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>> =
-    instances.fold(mutableMapOf()) { acc, instance ->
-      instance.implementedTypeclasses().forEach { tc ->
+    : Map<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>> =
+    instances.fold(mapOf()) { acc, instance ->
+      instance.implementedTypeclasses().fold(acc, { acc2, tc ->
         val typeclass = TypeClass(processor, tc.simpleName, tc)
         val parentTypeClasses = typeclass.parentTypeClasses(tc)
 
-        acc.computeIfPresent(typeclass,
-          { _, value ->
-            Tuple2(
-              value._1 + setOf(instance),
-              value._2 + parentTypeClasses)
-          })
-        acc.putIfAbsent(typeclass,
-          Tuple2(setOf(instance), parentTypeClasses.toSet()))
-      }
-      acc
+        val value = acc2[typeclass]
+        if (value != null) {
+          acc2.filterKeys { it != typeclass } + mapOf(typeclass to Tuple2(
+            value._1 + setOf(instance),
+            value._2 + parentTypeClasses))
+        } else {
+          acc2 + mapOf(typeclass to Tuple2(
+            setOf(instance),
+            parentTypeClasses.toSet()))
+        }
+      })
     }
 
   fun generate() {
@@ -154,7 +155,7 @@ class RenzuGenerator(
    * [<typeclass>Applicative]<-[Something 2]
    * [<typeclass>Applicative]<-[Something 3]
    */
-  private fun genDiagramRelations(typeclassTree: MutableMap<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>>)
+  private fun genDiagramRelations(typeclassTree: Map<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>>)
     : List<String> {
     val relations = mutableListOf<String>()
 
