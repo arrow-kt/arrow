@@ -139,7 +139,7 @@ val (observable, disposable) =
   ObservableK.monadDefer().bindingCancellable {
     val userProfile = Observable.create { getUserProfile("123") }
     val friendProfiles = userProfile.friends().map { friend ->
-        bindAsync(observableAsync) { getProfile(friend.id) }
+        bindDefer { getProfile(friend.id) }
     }
     listOf(userProfile) + friendProfiles
   }
