@@ -158,27 +158,20 @@ class RenzuGenerator(
    * [<typeclass>Applicative]<-[Something 3]
    */
   private fun genDiagramRelations(typeclassTree: Map<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>>)
-    : List<String> {
-    val relations = mutableListOf<String>()
-
-    val modules = typeclassTree.flatMap { setOf(it.key.arrowModule) + it.value._1.map { it.arrowModule } }.toSet()
-    modules.forEach {
-      relations += listOf("#.${normalizeModule(it)}: ${getModuleStyle(it)}")
-    }
-
-    typeclassTree.forEach {
+    : List<String> =
+    typeclassTree.flatMap {
+      setOf(it.key.arrowModule) + it.value._1.map { it.arrowModule }
+    }.toSet().flatMap {
+      listOf("#.${normalizeModule(it)}: ${getModuleStyle(it)}")
+    } + typeclassTree.flatMap {
       val typeClass = it.key
       val instances = it.value._1
       val parentTypeClasses = it.value._2
 
-      parentTypeClasses.filter { typeClass.simpleName != it.simpleName }.forEach {
-        relations += "[<typeclasses>${it.simpleName}]<-[<typeclasses>${typeClass.simpleName}]"
-      }
-
-      relations += "[<typeclasses>${typeClass.simpleName}]<-[<instances>${typeClass.simpleName} Instances|${instances
-        .map { it.name.toString() }.joinToString(separator = "|")}]"
+      parentTypeClasses.filter { typeClass.simpleName != it.simpleName }.map {
+        "[<typeclasses>${it.simpleName}]<-[<typeclasses>${typeClass.simpleName}]"
+      } +
+        "[<typeclasses>${typeClass.simpleName}]<-[<instances>${typeClass.simpleName} Instances|${instances
+          .joinToString(separator = "|") { it.name.toString() }}]"
     }
-
-    return relations.toList()
-  }
 }
