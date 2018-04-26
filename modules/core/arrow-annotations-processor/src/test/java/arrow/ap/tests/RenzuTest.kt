@@ -11,8 +11,8 @@ class RenzuTest : APTest("arrow.ap.objects.renzu") {
       sourceFiles = listOf("OptionMonoidInstance.java", "OptionSemigroupInstance.java"),
       destFile = "SampleUML.txt",
       processor = RenzuProcessor()
-    ), generationDir = File("./infographic/", "").also { it.mkdirs() })
+    ), generationDir = File("../../../infographic", "").also { it.mkdirs() })
 
-    File("./infographic/", "").listFiles()?.forEach { it.delete() }
+    File("../../../infographic", "").listFiles()?.forEach { it.delete() }
   }
 }
