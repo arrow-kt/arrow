@@ -115,6 +115,8 @@ class RenzuGenerator(
         |#padding: 8
         |#zoom: 1
         |#fill: #64B5F6
+        |#.typeclasses: fill=#64B5F6 visual=database bold
+        |#.instances: fill=#B9F6CA visual=class italic bold dashed
         """.trimMargin()
 
       file.appendText(globalStyles)
@@ -140,17 +142,6 @@ class RenzuGenerator(
    *
    * Sample format for the output:
    *
-   * #font: Menlo
-   * #fontSize: 10
-   * #arrowSize: 1
-   * #bendSize: 0.3
-   * #lineWidth: 2
-   * #padding: 8
-   * #zoom: 1
-   * #fill: #64B5F6
-   * #.typeclass: fill=#64B5F6 visual=database bold
-   * #.instances: fill=#B9F6CA visual=class italic bold dashed
-
    * [<typeclass>Functor]<-[<typeclass>Applicative]
    * [<typeclass>Applicative]<-[<typeclass>Monad]
    * [<typeclass>Monad]<-[<instances>Monad Instances|NonEmptyList|Option|OptionT|SequenceK|State|StateT|Try|Either|EitherT|Eval|Id]
@@ -160,10 +151,6 @@ class RenzuGenerator(
   private fun genDiagramRelations(typeclassTree: Map<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>>)
     : List<String> =
     typeclassTree.flatMap {
-      setOf(it.key.arrowModule) + it.value._1.map { it.arrowModule }
-    }.toSet().flatMap {
-      listOf("#.${normalizeModule(it)}: ${getModuleStyle(it)}")
-    } + typeclassTree.flatMap {
       val typeClass = it.key
       val instances = it.value._1
       val parentTypeClasses = it.value._2
