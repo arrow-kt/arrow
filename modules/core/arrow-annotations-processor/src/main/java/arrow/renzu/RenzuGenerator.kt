@@ -2,6 +2,7 @@ package arrow.renzu
 
 import arrow.common.messager.log
 import arrow.common.utils.*
+import arrow.core.Tuple2
 import arrow.instances.AnnotatedInstance
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.supertypes
@@ -72,11 +73,11 @@ class RenzuGenerator(
   annotatedList: List<AnnotatedInstance>,
   val isolateForTests: Boolean = false) {
 
-  private val typeclassTree: Map<TypeClass, Pair<Instances, Set<ParentTypeClass>>> =
+  private val typeclassTree: Map<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>> =
     normalizeTypeclassTree(annotatedList.map { Instance(it) })
 
   private fun normalizeTypeclassTree(instances: List<Instance>)
-    : Map<TypeClass, Pair<Instances, Set<ParentTypeClass>>> =
+    : Map<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>> =
     instances.fold(mapOf()) { acc, instance ->
       instance.implementedTypeclasses().fold(acc, { acc2, tc ->
         val typeclass = TypeClass(processor, tc.simpleName, tc)
@@ -84,11 +85,11 @@ class RenzuGenerator(
 
         val value = acc2[typeclass]
         if (value != null) {
-          acc2.filterKeys { it != typeclass } + mapOf(typeclass to Pair(
-            value.first + setOf(instance),
-            value.second + parentTypeClasses))
+          acc2.filterKeys { it != typeclass } + mapOf(typeclass to Tuple2(
+            value.a + setOf(instance),
+            value.b + parentTypeClasses))
         } else {
-          acc2 + mapOf(typeclass to Pair(
+          acc2 + mapOf(typeclass to Tuple2(
             setOf(instance),
             parentTypeClasses.toSet()))
         }
@@ -156,16 +157,16 @@ class RenzuGenerator(
    * [<typeclass>Applicative]<-[Something 2]
    * [<typeclass>Applicative]<-[Something 3]
    */
-  private fun genDiagramRelations(typeclassTree: Map<TypeClass, Pair<Instances, Set<ParentTypeClass>>>)
+  private fun genDiagramRelations(typeclassTree: Map<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>>)
     : List<String> =
     typeclassTree.flatMap {
-      setOf(it.key.arrowModule) + it.value.first.map { it.arrowModule }
+      setOf(it.key.arrowModule) + it.value.a.map { it.arrowModule }
     }.toSet().flatMap {
       listOf("#.${normalizeModule(it)}: ${getModuleStyle(it)}")
     } + typeclassTree.flatMap {
       val typeClass = it.key
-      val instances = it.value.first
-      val parentTypeClasses = it.value.second
+      val instances = it.value.a
+      val parentTypeClasses = it.value.b
 
       parentTypeClasses.filter { typeClass.simpleName != it.simpleName }.map {
         "[<typeclasses>${it.simpleName}]<-[<typeclasses>${typeClass.simpleName}]"
