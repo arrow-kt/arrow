@@ -1,6 +1,6 @@
 package `arrow`.`ap`.`objects`.`lens`
 
-fun lensField(): arrow.optics.Lens<`arrow`.`ap`.`objects`.`lens`.`Lens`, `kotlin`.`String`> = arrow.optics.Lens(
+inline val `arrow`.`ap`.`objects`.`lens`.`Lens`.Companion.field: arrow.optics.Lens<`arrow`.`ap`.`objects`.`lens`.`Lens`, `kotlin`.`String`> get()= arrow.optics.Lens(
         get = { lens: `arrow`.`ap`.`objects`.`lens`.`Lens` -> lens.`field` },
         set = { value: `kotlin`.`String` ->
             { lens: `arrow`.`ap`.`objects`.`lens`.`Lens` ->
@@ -8,7 +8,7 @@ fun lensField(): arrow.optics.Lens<`arrow`.`ap`.`objects`.`lens`.`Lens`, `kotlin
             }
         }
 )
-fun lensNullableNullable(): arrow.optics.Lens<`arrow`.`ap`.`objects`.`lens`.`Lens`, `kotlin`.`String`?> = arrow.optics.Lens(
+inline val `arrow`.`ap`.`objects`.`lens`.`Lens`.Companion.nullableNullable: arrow.optics.Lens<`arrow`.`ap`.`objects`.`lens`.`Lens`, `kotlin`.`String`?> get()= arrow.optics.Lens(
         get = { lens: `arrow`.`ap`.`objects`.`lens`.`Lens` -> lens.`nullable` },
         set = { value: `kotlin`.`String`? ->
             { lens: `arrow`.`ap`.`objects`.`lens`.`Lens` ->
@@ -16,7 +16,7 @@ fun lensNullableNullable(): arrow.optics.Lens<`arrow`.`ap`.`objects`.`lens`.`Len
             }
         }
 )
-fun lensOptionOption(): arrow.optics.Lens<`arrow`.`ap`.`objects`.`lens`.`Lens`, `arrow`.`core`.`Option`<`kotlin`.`String`>> = arrow.optics.Lens(
+inline val `arrow`.`ap`.`objects`.`lens`.`Lens`.Companion.optionOption: arrow.optics.Lens<`arrow`.`ap`.`objects`.`lens`.`Lens`, `arrow`.`core`.`Option`<`kotlin`.`String`>> get()= arrow.optics.Lens(
         get = { lens: `arrow`.`ap`.`objects`.`lens`.`Lens` -> lens.`option` },
         set = { value: `arrow`.`core`.`Option`<`kotlin`.`String`> ->
             { lens: `arrow`.`ap`.`objects`.`lens`.`Lens` ->

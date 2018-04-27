@@ -27,7 +27,6 @@ class IsoTest : APTest("arrow.ap.objects.iso") {
       processor = OpticsProcessor()
     ))
 
-
   }
 
 }
