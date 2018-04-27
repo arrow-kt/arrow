@@ -55,9 +55,6 @@ interface ProcessorUtils : KotlinMetadataUtils {
       ?: knownError("Arrow's annotation can't be used on $classElement")
   }
 
-//  fun TypeElement.methods(): List<MethodElement> =
-//    enclosedElements.mapNotNull { it as? MethodElement }
-
   fun ClassOrPackageDataWrapper.getFunction(methodElement: ExecutableElement) =
     getFunctionOrNull(methodElement, nameResolver, functionList)
       ?: knownError("Can't find annotated method ${methodElement.jvmMethodSignature}")
