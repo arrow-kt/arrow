@@ -2,7 +2,6 @@ package arrow.common.utils
 
 import me.eugeniomarletti.kotlin.metadata.*
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmMethodSignature
-import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.java.MethodElement
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.supertypes
@@ -55,9 +54,6 @@ interface ProcessorUtils : KotlinMetadataUtils {
     return metadata.asClassOrPackageDataWrapper(classElement)
       ?: knownError("Arrow's annotation can't be used on $classElement")
   }
-
-  fun TypeElement.methods(): List<MethodElement> =
-    enclosedElements.mapNotNull { it as? MethodElement }
 
   fun ClassOrPackageDataWrapper.getFunction(methodElement: ExecutableElement) =
     getFunctionOrNull(methodElement, nameResolver, functionList)
