@@ -79,9 +79,9 @@ interface ProcessorUtils : KotlinMetadataUtils {
   }
 
   fun recurseTypeclassInterfaces(
-          current: ClassOrPackageDataWrapper.Class,
-          typeTable: TypeTable,
-          acc: List<ClassOrPackageDataWrapper>): List<ClassOrPackageDataWrapper> {
+    current: ClassOrPackageDataWrapper.Class,
+    typeTable: TypeTable,
+    acc: List<ClassOrPackageDataWrapper>): List<ClassOrPackageDataWrapper> {
     val interfaces = current.classProto.supertypes(typeTable).map {
       it.extractFullName(current)
     }.filter {
