@@ -83,16 +83,20 @@ interface EitherTSemigroupKInstance<F, L> : SemigroupK<EitherTPartialOf<F, L>> {
     fix().combineK(MF(), y)
 }
 
-fun <F, A, B, C> EitherT<F, A, B>.foldLeft(FF: Foldable<F>, b: C, f: (C, B) -> C): C = FF.compose(Either.foldable<A>()).foldLC(value, b, f)
+fun <F, A, B, C> EitherTOf<F, A, B>.foldLeft(FF: Foldable<F>, b: C, f: (C, B) -> C): C =
+  FF.compose(Either.foldable<A>()).foldLC(fix().value, b, f)
 
-fun <F, A, B, C> EitherT<F, A, B>.foldRight(FF: Foldable<F>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> = FF.compose(Either.foldable<A>()).run {
-  value.foldRC(lb, f)
+fun <F, A, B, C> EitherTOf<F, A, B>.foldRight(FF: Foldable<F>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> = FF.compose(Either.foldable<A>()).run {
+  fix().value.foldRC(lb, f)
 }
 
-fun <F, A, B, G, C> EitherT<F, A, B>.traverse(FF: Traverse<F>, GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, EitherT<F, A, C>> {
-  val fa: Kind<G, Kind<Nested<F, EitherPartialOf<A>>, C>> = ComposedTraverse(FF, Either.traverse(), Either.monad<A>()).traverseC(value, f, GA)
+fun <F, A, B, G, C> EitherTOf<F, A, B>.traverse(FF: Traverse<F>, GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, EitherT<F, A, C>> {
+  val fa: Kind<G, Kind<Nested<F, EitherPartialOf<A>>, C>> = ComposedTraverse(FF, Either.traverse(), Either.monad<A>()).traverseC(fix().value, f, GA)
   return GA.run { fa.map({ EitherT(FF.run { it.unnest().map({ it.fix() }) }) }) }
 }
+
+fun <F, G, A, B> EitherTOf<F, A, Kind<G, B>>.sequence(FF: Traverse<F>, GA: Applicative<G>): Kind<G, EitherT<F, A, B>> =
+  traverse(FF, GA, ::identity)
 
 fun <F, L> EitherT.Companion.functor(FF: Functor<F>): Functor<EitherTPartialOf<F, L>> =
   object : EitherTFunctorInstance<F, L> {

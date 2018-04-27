@@ -24,7 +24,7 @@ interface ConstApplicativeInstance<A> : Applicative<ConstPartialOf<A>> {
   }.empty().fix()
 
   override fun <T, U> Kind<ConstPartialOf<A>, T>.ap(ff: Kind<ConstPartialOf<A>, (T) -> U>): Const<A, U> =
-    constAp(ff, MA())
+    constAp(MA(), ff)
 }
 
 @instance(Const::class)
@@ -51,7 +51,7 @@ interface ConstSemigroupInstance<A, T> : Semigroup<ConstOf<A, T>> {
   fun SA(): Semigroup<A>
 
   override fun ConstOf<A, T>.combine(b: ConstOf<A, T>): Const<A, T> =
-    combineAp(b, SA())
+    combineAp(SA(), b)
 }
 
 @instance(Const::class)

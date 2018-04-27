@@ -128,19 +128,21 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
 /**
  * Return the Valid value, or the default if Invalid
  */
-fun <E, B> Validated<E, B>.getOrElse(default: () -> B): B = fold({ default() }, ::identity)
+fun <E, B> ValidatedOf<E, B>.getOrElse(default: () -> B): B =
+  fix().fold({ default() }, ::identity)
 
 /**
  * Return the Valid value, or the result of f if Invalid
  */
-fun <E, B> Validated<E, B>.valueOr(f: (E) -> B): B = fold({ f(it) }, ::identity)
+fun <E, B> ValidatedOf<E, B>.valueOr(f: (E) -> B): B =
+  fix().fold({ f(it) }, ::identity)
 
 /**
  * If `this` is valid return `this`, otherwise if `that` is valid return `that`, otherwise combine the failures.
  * This is similar to [[orElse]] except that here failures are accumulated.
  */
-fun <E, A> Validated<E, A>.findValid(SE: Semigroup<E>, that: () -> Validated<E, A>): Validated<E, A> =
-  fold(
+fun <E, A> ValidatedOf<E, A>.findValid(SE: Semigroup<E>, that: () -> Validated<E, A>): Validated<E, A> =
+  fix().fold(
 
     { e ->
       that().fold(
@@ -156,8 +158,8 @@ fun <E, A> Validated<E, A>.findValid(SE: Semigroup<E>, that: () -> Validated<E, 
  * The functionality is similar to that of [[findValid]] except for failure accumulation,
  * where here only the error on the right is preserved and the error on the left is ignored.
  */
-fun <E, A> Validated<E, A>.orElse(default: () -> Validated<E, A>): Validated<E, A> =
-  fold(
+fun <E, A> ValidatedOf<E, A>.orElse(default: () -> Validated<E, A>): Validated<E, A> =
+  fix().fold(
     { default() },
     { Valid(it) }
   )
@@ -166,26 +168,25 @@ fun <E, A> Validated<E, A>.orElse(default: () -> Validated<E, A>): Validated<E, 
  * From Apply:
  * if both the function and this value are Valid, apply the function
  */
-fun <E, A, B> Validated<E, A>.ap(SE: Semigroup<E>, f: Validated<E, (A) -> B>): Validated<E, B> =
-  when (this) {
-    is Valid -> f.fold({ Invalid(it) }, { Valid(it(a)) })
-    is Invalid -> f.fold({ Invalid(SE.run { it.combine(e) }) }, { Invalid(e) })
-  }
+fun <E, A, B> ValidatedOf<E, A>.ap(SE: Semigroup<E>, f: Validated<E, (A) -> B>): Validated<E, B> =
+  fix().fold(
+    { e -> f.fold({ Invalid(SE.run { it.combine(e) }) }, { Invalid(e) }) },
+    { a -> f.fold(::Invalid, { Valid(it(a)) }) }
+  )
 
-fun <E, A> Validated<E, A>.handleLeftWith(f: (E) -> ValidatedOf<E, A>): Validated<E, A> =
-  fold({ f(it).fix() }, { Valid(it) })
+fun <E, A> ValidatedOf<E, A>.handleLeftWith(f: (E) -> ValidatedOf<E, A>): Validated<E, A> =
+  fix().fold({ f(it).fix() }, ::Valid)
 
-fun <G, E, A, B> Validated<E, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> = GA.run {
-  when (this@traverse) {
-    is Valid -> f(a).map({ Valid(it) })
-    is Invalid -> just(this@traverse)
-
-  }
+fun <G, E, A, B> ValidatedOf<E, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> = GA.run {
+  fix().fold({ e -> just(Invalid(e)) }, { a -> f(a).map(::Valid) })
 }
 
-inline fun <E, A> Validated<E, A>.combine(SE: Semigroup<E>,
-                                          SA: Semigroup<A>,
-                                          y: ValidatedOf<E, A>): Validated<E, A> =
+fun <G, E, A> ValidatedOf<E, Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Validated<E, A>> =
+  fix().traverse(GA, ::identity)
+
+inline fun <E, A> ValidatedOf<E, A>.combine(SE: Semigroup<E>,
+                                            SA: Semigroup<A>,
+                                            y: ValidatedOf<E, A>): Validated<E, A> =
   y.fix().let { that ->
     when {
       this is Valid && that is Valid -> Valid(SA.run { a.combine(that.a) })
@@ -195,8 +196,8 @@ inline fun <E, A> Validated<E, A>.combine(SE: Semigroup<E>,
     }
   }
 
-fun <E, A> Validated<E, A>.combineK(SE: Semigroup<E>, y: ValidatedOf<E, A>): Validated<E, A> {
-  val xev = this
+fun <E, A> ValidatedOf<E, A>.combineK(SE: Semigroup<E>, y: ValidatedOf<E, A>): Validated<E, A> {
+  val xev = fix()
   val yev = y.fix()
   return when (xev) {
     is Valid -> xev
@@ -210,12 +211,17 @@ fun <E, A> Validated<E, A>.combineK(SE: Semigroup<E>, y: ValidatedOf<E, A>): Val
 /**
  * Converts the value to an Ior<E, A>
  */
-fun <E, A> Validated<E, A>.toIor(): Ior<E, A> = fold({ Ior.Left(it) }, { Ior.Right(it) })
+fun <E, A> ValidatedOf<E, A>.toIor(): Ior<E, A> =
+  fix().fold({ Ior.Left(it) }, { Ior.Right(it) })
 
-fun <E, A> A.valid(): Validated<E, A> = Valid(this)
+fun <E, A> A.valid(): Validated<E, A> =
+  Valid(this)
 
-fun <E, A> E.invalid(): Validated<E, A> = Invalid(this)
+fun <E, A> E.invalid(): Validated<E, A> =
+  Invalid(this)
 
-fun <E, A> A.validNel(): ValidatedNel<E, A> = Validated.validNel(this)
+fun <E, A> A.validNel(): ValidatedNel<E, A> =
+  Validated.validNel(this)
 
-fun <E, A> E.invalidNel(): ValidatedNel<E, A> = Validated.invalidNel(this)
+fun <E, A> E.invalidNel(): ValidatedNel<E, A> =
+  Validated.invalidNel(this)

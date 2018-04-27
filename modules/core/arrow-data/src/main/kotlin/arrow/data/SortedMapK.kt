@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Option
 import arrow.core.Tuple2
+import arrow.core.identity
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Foldable
@@ -61,6 +62,9 @@ fun <A : Comparable<A>, B> Option<Tuple2<A, B>>.k(): SortedMapK<A, B> = this.fol
   { sortedMapOf<A, B>().k() },
   { mapEntry -> sortedMapOf<A, B>(mapEntry.a to mapEntry.b).k() }
 )
+
+inline fun <K: Comparable<K>, V, G> SortedMapKOf<K, Kind<G, V>>.sequence(GA: Applicative<G>): Kind<G, SortedMapK<K, V>> =
+  fix().traverse(GA, ::identity)
 
 fun <A : Comparable<A>, B> List<Map.Entry<A, B>>.k(): SortedMapK<A, B> =
   this.map { it.key to it.value }.toMap().toSortedMap().k()
