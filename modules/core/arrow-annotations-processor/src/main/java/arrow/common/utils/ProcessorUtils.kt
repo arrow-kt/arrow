@@ -3,9 +3,10 @@ package arrow.common.utils
 import me.eugeniomarletti.kotlin.metadata.*
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmMethodSignature
 import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.java.MethodElement
-import org.jetbrains.kotlin.serialization.ProtoBuf
-import org.jetbrains.kotlin.serialization.deserialization.TypeTable
-import org.jetbrains.kotlin.serialization.deserialization.supertypes
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.supertypes
+import me.eugeniomarletti.kotlin.metadata.shadow.serialization.deserialization.getName
 import java.io.File
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement

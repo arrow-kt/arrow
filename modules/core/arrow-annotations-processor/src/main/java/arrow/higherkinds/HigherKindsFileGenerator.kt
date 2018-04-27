@@ -3,7 +3,7 @@ package arrow.higherkinds
 import arrow.common.Package
 import arrow.common.utils.knownError
 import arrow.common.utils.typeConstraints
-import org.jetbrains.kotlin.serialization.ProtoBuf
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import java.io.File
 import javax.lang.model.element.Name
 

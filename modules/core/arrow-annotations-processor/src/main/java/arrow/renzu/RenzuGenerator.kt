@@ -4,8 +4,8 @@ import arrow.common.messager.log
 import arrow.common.utils.*
 import arrow.instances.AnnotatedInstance
 import javaslang.Tuple2
-import org.jetbrains.kotlin.serialization.deserialization.TypeTable
-import org.jetbrains.kotlin.serialization.deserialization.supertypes
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.supertypes
 import java.io.File
 import javax.lang.model.element.Name
 

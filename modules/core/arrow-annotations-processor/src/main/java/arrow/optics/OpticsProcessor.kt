@@ -9,7 +9,7 @@ import com.google.auto.service.AutoService
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
 import me.eugeniomarletti.kotlin.metadata.isDataClass
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
-import org.jetbrains.kotlin.utils.addIfNotNull
+import me.eugeniomarletti.kotlin.metadata.shadow.utils.addIfNotNull
 import java.io.File
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
