@@ -122,20 +122,66 @@ class RenzuGenerator(
       file.appendText(globalStyles)
     }
 
-    val elementsToGenerate: List<String> = genDiagramRelations(typeclassTree)
-    val currentFileLines = file.readLines()
+    val fileRelations = file.readLines()
+    val generatedRelations = genGeneratedRelations(typeclassTree)
 
-    val source: String = elementsToGenerate
+    val notCollidingFileRelations: List<String> = fileRelations
+      .filterNot { rel ->
+        rel.isInstanceRelation() && generatedRelations.find { it.contains(rel.instancesBlockName()) } != null
+      }
+
+    val notCollidingGeneratedRelations: List<String> = generatedRelations
       .toSet()
-      .filterNot { currentFileLines.contains(it) }
-      .joinToString(prefix = "\n", separator = "\n")
+      .filterNot { fileRelations.contains(it) }
+      .filterNot { rel ->
+        rel.isInstanceRelation() && fileRelations.find { it.contains(rel.instancesBlockName()) } != null
+      }
+
+    val source = (notCollidingFileRelations +
+      notCollidingGeneratedRelations +
+      composedCollidingRelations(fileRelations, generatedRelations)).joinToString(separator = "\n")
 
     if (source != "\n") {
-      file.appendText(source)
+      file.writeText(source, Charsets.UTF_8)
     }
 
     processor.log("arrow-infographic generated: " + file.path)
   }
+
+  private fun composedCollidingRelations(fileRelations: List<String>, generatedRelations: List<String>): List<String> {
+    val collidingRelations = fileRelations.filter { rel ->
+      rel.isInstanceRelation() && generatedRelations.find { it.contains(rel.instancesBlockName()) } != null
+    }
+
+    return collidingRelations.map { collidingRelation ->
+      val collidingRelationInstances = collidingRelation.instanceNames()
+      val generatedCollidingRelationInstances = generatedRelations.find {
+        it.contains(collidingRelation.instancesBlockName())
+      }!!.instanceNames()
+
+      val composedInstances = (collidingRelationInstances + generatedCollidingRelationInstances)
+        .toSet()
+        .joinToString("|")
+
+      "[<typeclasses>${collidingRelation.typeClassName()}]<-[<instances>${collidingRelation.typeClassName()
+      } Instances|$composedInstances]"
+    }
+  }
+
+  private fun String.isInstanceRelation(): Boolean = this.contains("Instances")
+
+  private fun String.instancesBlockName(): String = this
+    .substringAfter("[<instances>")
+    .substringBefore("|")
+
+  private fun String.instanceNames(): List<String> = this
+    .substringAfter("Instances|")
+    .substringBeforeLast("]")
+    .split("|")
+
+  private fun String.typeClassName(): String = this
+    .substringAfter("[<typeclasses>")
+    .substringBefore("]")
 
   /**
    * Returns the UML text for the diagram to be rendered using nomnoml.
@@ -148,7 +194,7 @@ class RenzuGenerator(
    * [<typeclass>Applicative]<-[Something 2]
    * [<typeclass>Applicative]<-[Something 3]
    */
-  private fun genDiagramRelations(typeclassTree: Map<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>>)
+  private fun genGeneratedRelations(typeclassTree: Map<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>>)
     : List<String> =
     typeclassTree.flatMap {
       val typeClass = it.key
