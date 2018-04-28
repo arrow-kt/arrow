@@ -3,7 +3,6 @@ package arrow.renzu
 import arrow.common.messager.log
 import arrow.common.utils.*
 import arrow.instances.AnnotatedInstance
-import arrow.common.utils.extractFullName
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.supertypes
 import java.io.File
