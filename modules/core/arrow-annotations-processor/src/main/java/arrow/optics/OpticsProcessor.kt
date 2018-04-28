@@ -3,6 +3,7 @@ package arrow.optics
 import arrow.common.messager.logE
 import arrow.common.utils.AbstractProcessor
 import arrow.common.utils.isSealed
+import arrow.common.utils.knownError
 import com.google.auto.service.AutoService
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
 import me.eugeniomarletti.kotlin.metadata.isDataClass
@@ -46,6 +47,8 @@ class OpticsProcessor : AbstractProcessor() {
           logE("Only data and sealed classes can be annotated with optics annotation", element)
           return@forEach
         }
+
+        if (element.hasNoCompanion) knownError("@optics annotated class $element needs to declare companion object.")
 
         val normalizedTargets = when {
           targets.isEmpty() ->
