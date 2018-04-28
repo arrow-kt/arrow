@@ -26,6 +26,13 @@ class OptionalTest : APTest("arrow.ap.objects.optional") {
     ))
 
     testProcessor(AnnotationProcessor(
+      name = "Optional generation requires companion object declaration",
+      sourceFile = "OptionalCompanion.java",
+      errorMessage = "@optics annotated class arrow.ap.objects.optional.OptionalCompanion needs to declare companion object.",
+      processor = OpticsProcessor()
+    ))
+
+    testProcessor(AnnotationProcessor(
       name = "Optionals will be generated for data class",
       sourceFiles = listOf("Optional.java"),
       destFile = "Optional.kt",
