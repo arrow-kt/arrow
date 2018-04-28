@@ -55,9 +55,6 @@ interface ProcessorUtils : KotlinMetadataUtils {
       ?: knownError("Arrow's annotation can't be used on $classElement")
   }
 
-//  fun TypeElement.methods(): List<MethodElement> =
-//    enclosedElements.mapNotNull { it as? MethodElement }
-
   fun ClassOrPackageDataWrapper.getFunction(methodElement: ExecutableElement) =
     getFunctionOrNull(methodElement, nameResolver, functionList)
       ?: knownError("Can't find annotated method ${methodElement.jvmMethodSignature}")
@@ -82,9 +79,9 @@ interface ProcessorUtils : KotlinMetadataUtils {
   }
 
   fun recurseTypeclassInterfaces(
-          current: ClassOrPackageDataWrapper.Class,
-          typeTable: TypeTable,
-          acc: List<ClassOrPackageDataWrapper>): List<ClassOrPackageDataWrapper> {
+    current: ClassOrPackageDataWrapper.Class,
+    typeTable: TypeTable,
+    acc: List<ClassOrPackageDataWrapper>): List<ClassOrPackageDataWrapper> {
     val interfaces = current.classProto.supertypes(typeTable).map {
       it.extractFullName(current)
     }.filter {
