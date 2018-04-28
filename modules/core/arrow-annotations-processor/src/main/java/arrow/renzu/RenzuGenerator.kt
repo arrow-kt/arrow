@@ -3,9 +3,8 @@ package arrow.renzu
 import arrow.common.messager.log
 import arrow.common.utils.*
 import arrow.instances.AnnotatedInstance
-import javaslang.Tuple2
-import org.jetbrains.kotlin.serialization.deserialization.TypeTable
-import org.jetbrains.kotlin.serialization.deserialization.supertypes
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.supertypes
 import java.io.File
 import javax.lang.model.element.Name
 
@@ -68,22 +67,22 @@ class RenzuGenerator(
   annotatedList: List<AnnotatedInstance>,
   val isolateForTests: Boolean = false) {
 
-  private val typeclassTree: Map<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>> =
+  private val typeclassTree: Map<TypeClass, Pair<Instances, Set<ParentTypeClass>>> =
     normalizeTypeclassTree(annotatedList.map { Instance(it) })
 
   private fun normalizeTypeclassTree(instances: List<Instance>)
-    : Map<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>> =
+    : Map<TypeClass, Pair<Instances, Set<ParentTypeClass>>> =
     instances.fold(mapOf()) { acc, instance ->
       parentTypeClasses(processor, instance.target.classOrPackageProto).fold(acc, { acc2, typeclass ->
         val parentTypeClasses = parentTypeClasses(processor, typeclass.classWrapper)
 
         val value = acc2[typeclass]
         if (value != null) {
-          acc2.filterKeys { it != typeclass } + mapOf(typeclass to Tuple2(
-            value._1 + setOf(instance),
-            value._2 + parentTypeClasses))
+          acc2.filterKeys { it != typeclass } + mapOf(typeclass to Pair(
+            value.first + setOf(instance),
+            value.second + parentTypeClasses))
         } else {
-          acc2 + mapOf(typeclass to Tuple2(
+          acc2 + mapOf(typeclass to Pair(
             setOf(instance),
             parentTypeClasses.toSet()))
         }
@@ -188,12 +187,12 @@ class RenzuGenerator(
    * [<typeclass>Applicative]<-[Something 2]
    * [<typeclass>Applicative]<-[Something 3]
    */
-  private fun genGeneratedRelations(typeclassTree: Map<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>>)
+  private fun genGeneratedRelations(typeclassTree: Map<TypeClass, Pair<Instances, Set<ParentTypeClass>>>)
     : List<String> =
     typeclassTree.flatMap {
       val typeClass = it.key
-      val instances = it.value._1
-      val parentTypeClasses = it.value._2
+      val instances = it.value.first
+      val parentTypeClasses = it.value.second
 
       parentTypeClasses.filter { typeClass.simpleName != it.simpleName }.map {
         "[<typeclasses>${it.simpleName}]<-[<typeclasses>${typeClass.simpleName}]"
