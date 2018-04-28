@@ -1,5 +1,6 @@
 package arrow.optics.instances
 
+import arrow.Kind
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.toT
@@ -8,29 +9,40 @@ import arrow.instance
 import arrow.optics.Optional
 import arrow.optics.POptional
 import arrow.optics.Traversal
+import arrow.optics.typeclasses.Each
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
+import arrow.typeclasses.Applicative
 
-@instance(NonEmptyList::class)
-interface NonEmptyListFilterIndexInstance<A> : FilterIndex<NonEmptyListOf<A>, Int, A> {
-  override fun filter(p: (Int) -> Boolean): Traversal<NonEmptyListOf<A>, A> = FilterIndex.fromTraverse<ForNonEmptyList, A>({ aas ->
-    aas.fix().all.mapIndexed { index, a -> a toT index }.let {
-      NonEmptyList.fromListUnsafe(it)
-    }
-  }, NonEmptyList.traverse()).filter(p)
+fun <A> NonEmptyList.Companion.traversal(): Traversal<NonEmptyList<A>, A> = object : Traversal<NonEmptyList<A>, A> {
+  override fun <F> modifyF(FA: Applicative<F>, s: NonEmptyList<A>, f: (A) -> Kind<F, A>): Kind<F, NonEmptyList<A>> = with(NonEmptyList.traverse()) {
+    s.traverse(FA, f)
+  }
 }
 
 @instance(NonEmptyList::class)
-interface NonEmptyListIndexInstance<A> : Index<NonEmptyListOf<A>, Int, A> {
+interface NonEmptyListEachInstance<A> : Each<NonEmptyList<A>, A> {
+  override fun each(): Traversal<NonEmptyList<A>, A> =
+    NonEmptyList.traversal()
+}
 
-  override fun index(i: Int): Optional<NonEmptyListOf<A>, A> = POptional(
-    getOrModify = { l ->
-      l.fix().all.getOrNull(i)?.let(::Right) ?: l.fix().let(::Left)
-    },
+@instance(NonEmptyList::class)
+interface NonEmptyListFilterIndexInstance<A> : FilterIndex<NonEmptyList<A>, Int, A> {
+  override fun filter(p: (Int) -> Boolean): Traversal<NonEmptyList<A>, A> = FilterIndex.fromTraverse<ForNonEmptyList, A>({ aas ->
+    aas.fix().all.mapIndexed { index, a -> a toT index }.let {
+      NonEmptyList.fromListUnsafe(it)
+    }
+  }, NonEmptyList.traverse()).filter(p) as Traversal<NonEmptyList<A>, A>
+}
+
+@instance(NonEmptyList::class)
+interface NonEmptyListIndexInstance<A> : Index<NonEmptyList<A>, Int, A> {
+  override fun index(i: Int): Optional<NonEmptyList<A>, A> = POptional(
+    getOrModify = { l -> l.all.getOrNull(i)?.let(::Right) ?: l.fix().let(::Left) },
     set = { a ->
       { l ->
         NonEmptyList.fromListUnsafe(
-          l.fix().all.mapIndexed { index: Int, aa: A -> if (index == i) a else aa }
+          l.all.mapIndexed { index: Int, aa: A -> if (index == i) a else aa }
         )
       }
     }

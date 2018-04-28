@@ -64,5 +64,4 @@ interface CoproductTraverseInstance<F, G> : Traverse<CoproductPartialOf<F, G>> {
 
   override fun <A, B> Kind<CoproductPartialOf<F, G>, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f, TF(), TG())
-
 }

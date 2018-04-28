@@ -1,10 +1,7 @@
 package arrow.effects
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Eval
-import arrow.core.Left
-import arrow.core.Right
+import arrow.core.*
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Applicative
@@ -17,7 +14,6 @@ fun <A> ObservableKOf<A>.value(): Observable<A> =
   this.fix().observable
 
 @higherkind
-
 data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, ObservableKKindedJ<A> {
   fun <B> map(f: (A) -> B): ObservableK<B> =
     observable.map(f).k()
@@ -115,3 +111,6 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
     }
   }
 }
+
+inline fun <A, G> ObservableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, ObservableK<A>> =
+  fix().traverse(GA, ::identity)

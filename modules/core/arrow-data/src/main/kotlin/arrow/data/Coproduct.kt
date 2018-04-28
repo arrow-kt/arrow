@@ -43,8 +43,11 @@ data class Coproduct<F, G, A>(val run: Either<Kind<F, A>, Kind<G, A>>) : Coprodu
   }
 }
 
-fun <F, G, A> Either<Kind<F, A>, Kind<G, A>>.coproduct(): Coproduct<F, G, A> =
-  Coproduct(this)
+fun <F, G, A, H> CoproductOf<F, G, Kind<H, A>>.sequence(HA: Applicative<H>, FT: Traverse<F>, GT: Traverse<G>): Kind<H, Coproduct<F, G, A>> =
+  fix().traverse(HA, FT, GT, ::identity)
+
+fun <F, G, A> EitherOf<Kind<F, A>, Kind<G, A>>.coproduct(): Coproduct<F, G, A> =
+  Coproduct(fix())
 
 fun <F, G, H> FunctionK<F, G>.or(h: FunctionK<H, G>): FunctionK<CoproductPartialOf<F, H>, G> =
   object : FunctionK<CoproductPartialOf<F, H>, G> {

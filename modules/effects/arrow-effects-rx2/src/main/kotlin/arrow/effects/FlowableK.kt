@@ -1,10 +1,7 @@
 package arrow.effects
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Eval
-import arrow.core.Left
-import arrow.core.Right
+import arrow.core.*
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Applicative
@@ -170,3 +167,6 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
     }
   }
 }
+
+inline fun <A, G> FlowableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, FlowableK<A>> =
+  fix().traverse(GA, ::identity)

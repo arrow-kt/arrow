@@ -4,6 +4,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.optics.Iso
 import arrow.optics.Lens
+import arrow.optics.syntax.BoundSetter
 
 /**
  * [At] provides a [Lens] for a structure [S] to focus in [A] at a given index [I].
@@ -18,6 +19,12 @@ interface At<S, I, A> {
    * Get a [Lens] for a structure [S] with focus in [A] at index [i].
    */
   fun at(i: I): Lens<S, A>
+
+  /**
+   * Syntax to focus in [A] at given index [I] for a [BoundSetter].
+   */
+  fun <T> BoundSetter<T, S>.at(i: I): BoundSetter<T, A> =
+    this.compose(this@At.at(i))
 
   companion object {
 

@@ -1,10 +1,7 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Eval
-import arrow.core.Option
-import arrow.core.Tuple2
+import arrow.core.*
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 
@@ -77,5 +74,8 @@ data class ListK<out A>(val list: List<A>) : ListKOf<A>, List<A> by list {
 
 fun <A> ListKOf<A>.combineK(y: ListKOf<A>): ListK<A> =
   (fix().list + y.fix().list).k()
+
+inline fun <A, G> ListKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, ListK<A>> =
+  fix().traverse(GA, ::identity)
 
 fun <A> List<A>.k(): ListK<A> = ListK(this)
