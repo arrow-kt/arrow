@@ -1,4 +1,3 @@
-
 #font: Menlo
 #fontSize: 10
 #arrowSize: 1
@@ -11,4 +10,4 @@
 #.instances: fill=#B9F6CA visual=class italic bold dashed
 [<typeclasses>Semigroup]<-[<typeclasses>Monoid]
 [<typeclasses>Monoid]<-[<instances>Monoid Instances|OptionMonoidInstance]
-[<typeclasses>Semigroup]<-[<instances>Semigroup Instances|OptionMonoidInstance|OptionSemigroupInstance]
+[<typeclasses>Semigroup]<-[<instances>Semigroup Instances|OptionSemigroupInstance]

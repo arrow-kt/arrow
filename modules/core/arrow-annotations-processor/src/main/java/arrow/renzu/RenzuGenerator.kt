@@ -12,15 +12,9 @@ import javax.lang.model.element.Name
 data class Instance(val target: AnnotatedInstance) {
   val name: Name = target.classElement.simpleName
   val arrowModule: String = target.classOrPackageProto.`package`.substringAfterLast(".")
-
-  /**
-   * Returns any implemented typeclasses at any level crawling the instance hierarchy.
-   */
-  fun implementedTypeclasses(): List<ClassOrPackageDataWrapper.Class> =
-    target.superTypes.filter { it.fullName.removeBackticks().contains("typeclass") }
 }
 
-data class TypeClass(val processor: RenzuProcessor, val simpleName: String, private val classWrapper: ClassOrPackageDataWrapper.Class) {
+data class TypeClass(val processor: RenzuProcessor, val simpleName: String, val classWrapper: ClassOrPackageDataWrapper.Class) {
   val arrowModule: String = classWrapper.`package`.substringAfterLast(".")
 
   override fun equals(other: Any?): Boolean =
@@ -32,34 +26,35 @@ data class TypeClass(val processor: RenzuProcessor, val simpleName: String, priv
    * Returns the typeclasses that are a direct parent of this one, for composing the typeclass
    * relationship on the tree.
    */
-  fun parentTypeClasses(current: ClassOrPackageDataWrapper.Class): List<TypeClass> {
-    val typeTable = TypeTable(current.classProto.typeTable)
-    val interfaces = current.classProto.supertypes(typeTable).map {
-      it.extractFullName(current)
-    }.filter {
-      it != "`kotlin`.`Any`"
+}
+
+fun parentTypeClasses(processor: RenzuProcessor, current: ClassOrPackageDataWrapper.Class): List<TypeClass> {
+  val typeTable = TypeTable(current.classProto.typeTable)
+  val interfaces = current.classProto.supertypes(typeTable).map {
+    it.extractFullName(current)
+  }.filter {
+    it != "`kotlin`.`Any`"
+  }
+  val parentInterfaces: List<ClassOrPackageDataWrapper.Class> = listOf()
+  return when {
+    interfaces.isEmpty() -> parentInterfaces.map {
+      TypeClass(processor, it.simpleName, it)
     }
-    val parentInterfaces: List<ClassOrPackageDataWrapper.Class> = listOf()
-    return when {
-      interfaces.isEmpty() -> parentInterfaces.map {
-        TypeClass(processor, it.simpleName, it)
-      }
-      else -> {
-        interfaces.flatMap { i ->
-          try {
-            val className = i.removeBackticks().substringBefore("<")
-            val typeClassElement = processor.elementUtils.getTypeElement(className)
-            val parentInterface = processor.getClassOrPackageDataWrapper(typeClassElement) as ClassOrPackageDataWrapper.Class
-            if (i.removeBackticks().contains("typeclass")) {
-              parentInterfaces + parentInterface
-            } else
-              parentInterfaces
-          } catch (_: Throwable) {
-            emptyList<ClassOrPackageDataWrapper.Class>()
-          }
-        }.map {
-          TypeClass(processor, it.simpleName, it)
+    else -> {
+      interfaces.flatMap { i ->
+        try {
+          val className = i.removeBackticks().substringBefore("<")
+          val typeClassElement = processor.elementUtils.getTypeElement(className)
+          val parentInterface = processor.getClassOrPackageDataWrapper(typeClassElement) as ClassOrPackageDataWrapper.Class
+          if (i.removeBackticks().contains("typeclass")) {
+            parentInterfaces + parentInterface
+          } else
+            parentInterfaces
+        } catch (_: Throwable) {
+          emptyList<ClassOrPackageDataWrapper.Class>()
         }
+      }.map {
+        TypeClass(processor, it.simpleName, it)
       }
     }
   }
@@ -79,9 +74,8 @@ class RenzuGenerator(
   private fun normalizeTypeclassTree(instances: List<Instance>)
     : Map<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>> =
     instances.fold(mapOf()) { acc, instance ->
-      instance.implementedTypeclasses().fold(acc, { acc2, tc ->
-        val typeclass = TypeClass(processor, tc.simpleName, tc)
-        val parentTypeClasses = typeclass.parentTypeClasses(tc)
+      parentTypeClasses(processor, instance.target.classOrPackageProto).fold(acc, { acc2, typeclass ->
+        val parentTypeClasses = parentTypeClasses(processor, typeclass.classWrapper)
 
         val value = acc2[typeclass]
         if (value != null) {
