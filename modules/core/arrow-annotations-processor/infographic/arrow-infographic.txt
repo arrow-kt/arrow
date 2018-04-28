@@ -8,6 +8,6 @@
 #fill: #64B5F6
 #.typeclasses: fill=#64B5F6 visual=database bold
 #.instances: fill=#B9F6CA visual=class italic bold dashed
-[<typeclasses>Semigroup]<-[<instances>Semigroup Instances|OptionMonoidInstance|OptionSemigroupInstance]
 [<typeclasses>Semigroup]<-[<typeclasses>Monoid]
 [<typeclasses>Monoid]<-[<instances>Monoid Instances|OptionMonoidInstance]
+[<typeclasses>Semigroup]<-[<instances>Semigroup Instances|OptionSemigroupInstance]

@@ -12,15 +12,9 @@ import javax.lang.model.element.Name
 data class Instance(val target: AnnotatedInstance) {
   val name: Name = target.classElement.simpleName
   val arrowModule: String = target.classOrPackageProto.`package`.substringAfterLast(".")
-
-  /**
-   * Returns any implemented typeclasses at any level crawling the instance hierarchy.
-   */
-  fun implementedTypeclasses(): List<ClassOrPackageDataWrapper.Class> =
-    target.superTypes.filter { it.fullName.removeBackticks().contains("typeclass") }
 }
 
-data class TypeClass(val processor: RenzuProcessor, val simpleName: String, private val classWrapper: ClassOrPackageDataWrapper.Class) {
+data class TypeClass(val processor: RenzuProcessor, val simpleName: String, val classWrapper: ClassOrPackageDataWrapper.Class) {
   val arrowModule: String = classWrapper.`package`.substringAfterLast(".")
 
   override fun equals(other: Any?): Boolean =
@@ -32,34 +26,35 @@ data class TypeClass(val processor: RenzuProcessor, val simpleName: String, priv
    * Returns the typeclasses that are a direct parent of this one, for composing the typeclass
    * relationship on the tree.
    */
-  fun parentTypeClasses(current: ClassOrPackageDataWrapper.Class): List<TypeClass> {
-    val typeTable = TypeTable(current.classProto.typeTable)
-    val interfaces = current.classProto.supertypes(typeTable).map {
-      it.extractFullName(current)
-    }.filter {
-      it != "`kotlin`.`Any`"
+}
+
+fun parentTypeClasses(processor: RenzuProcessor, current: ClassOrPackageDataWrapper.Class): List<TypeClass> {
+  val typeTable = TypeTable(current.classProto.typeTable)
+  val interfaces = current.classProto.supertypes(typeTable).map {
+    it.extractFullName(current)
+  }.filter {
+    it != "`kotlin`.`Any`"
+  }
+  val parentInterfaces: List<ClassOrPackageDataWrapper.Class> = listOf()
+  return when {
+    interfaces.isEmpty() -> parentInterfaces.map {
+      TypeClass(processor, it.simpleName, it)
     }
-    val parentInterfaces: List<ClassOrPackageDataWrapper.Class> = listOf()
-    return when {
-      interfaces.isEmpty() -> parentInterfaces.map {
-        TypeClass(processor, it.simpleName, it)
-      }
-      else -> {
-        interfaces.flatMap { i ->
-          try {
-            val className = i.removeBackticks().substringBefore("<")
-            val typeClassElement = processor.elementUtils.getTypeElement(className)
-            val parentInterface = processor.getClassOrPackageDataWrapper(typeClassElement) as ClassOrPackageDataWrapper.Class
-            if (i.removeBackticks().contains("typeclass")) {
-              parentInterfaces + parentInterface
-            } else
-              parentInterfaces
-          } catch (_: Throwable) {
-            emptyList<ClassOrPackageDataWrapper.Class>()
-          }
-        }.map {
-          TypeClass(processor, it.simpleName, it)
+    else -> {
+      interfaces.flatMap { i ->
+        try {
+          val className = i.removeBackticks().substringBefore("<")
+          val typeClassElement = processor.elementUtils.getTypeElement(className)
+          val parentInterface = processor.getClassOrPackageDataWrapper(typeClassElement) as ClassOrPackageDataWrapper.Class
+          if (i.removeBackticks().contains("typeclass")) {
+            parentInterfaces + parentInterface
+          } else
+            parentInterfaces
+        } catch (_: Throwable) {
+          emptyList<ClassOrPackageDataWrapper.Class>()
         }
+      }.map {
+        TypeClass(processor, it.simpleName, it)
       }
     }
   }
@@ -79,9 +74,8 @@ class RenzuGenerator(
   private fun normalizeTypeclassTree(instances: List<Instance>)
     : Map<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>> =
     instances.fold(mapOf()) { acc, instance ->
-      instance.implementedTypeclasses().fold(acc, { acc2, tc ->
-        val typeclass = TypeClass(processor, tc.simpleName, tc)
-        val parentTypeClasses = typeclass.parentTypeClasses(tc)
+      parentTypeClasses(processor, instance.target.classOrPackageProto).fold(acc, { acc2, typeclass ->
+        val parentTypeClasses = parentTypeClasses(processor, typeclass.classWrapper)
 
         val value = acc2[typeclass]
         if (value != null) {
@@ -115,55 +109,88 @@ class RenzuGenerator(
         |#padding: 8
         |#zoom: 1
         |#fill: #64B5F6
+        |#.typeclasses: fill=#64B5F6 visual=database bold
+        |#.instances: fill=#B9F6CA visual=class italic bold dashed
         """.trimMargin()
 
       file.appendText(globalStyles)
     }
 
-    val elementsToGenerate: List<String> = genDiagramRelations(typeclassTree)
-    val currentFileLines = file.readLines()
+    val fileRelations = file.readLines()
+    val generatedRelations = genGeneratedRelations(typeclassTree)
 
-    val source: String = elementsToGenerate
+    val notCollidingFileRelations: List<String> = fileRelations
+      .filterNot { rel ->
+        rel.isInstanceRelation() && generatedRelations.find { it.contains(rel.instancesBlockName()) } != null
+      }
+
+    val notCollidingGeneratedRelations: List<String> = generatedRelations
       .toSet()
-      .filterNot { currentFileLines.contains(it) }
-      .joinToString(prefix = "\n", separator = "\n")
+      .filterNot { fileRelations.contains(it) }
+      .filterNot { rel ->
+        rel.isInstanceRelation() && fileRelations.find { it.contains(rel.instancesBlockName()) } != null
+      }
+
+    val source = (notCollidingFileRelations +
+      notCollidingGeneratedRelations +
+      composedCollidingRelations(fileRelations, generatedRelations)).joinToString(separator = "\n")
 
     if (source != "\n") {
-      file.appendText(source)
+      file.writeText(source, Charsets.UTF_8)
     }
 
     processor.log("arrow-infographic generated: " + file.path)
   }
+
+  private fun composedCollidingRelations(fileRelations: List<String>, generatedRelations: List<String>): List<String> {
+    val collidingRelations = fileRelations.filter { rel ->
+      rel.isInstanceRelation() && generatedRelations.find { it.contains(rel.instancesBlockName()) } != null
+    }
+
+    return collidingRelations.map { collidingRelation ->
+      val collidingRelationInstances = collidingRelation.instanceNames()
+      val generatedCollidingRelationInstances = generatedRelations.find {
+        it.contains(collidingRelation.instancesBlockName())
+      }!!.instanceNames()
+
+      val composedInstances = (collidingRelationInstances + generatedCollidingRelationInstances)
+        .toSet()
+        .joinToString("|")
+
+      "[<typeclasses>${collidingRelation.typeClassName()}]<-[<instances>${collidingRelation.typeClassName()
+      } Instances|$composedInstances]"
+    }
+  }
+
+  private fun String.isInstanceRelation(): Boolean = this.contains("Instances")
+
+  private fun String.instancesBlockName(): String = this
+    .substringAfter("[<instances>")
+    .substringBefore("|")
+
+  private fun String.instanceNames(): List<String> = this
+    .substringAfter("Instances|")
+    .substringBeforeLast("]")
+    .split("|")
+
+  private fun String.typeClassName(): String = this
+    .substringAfter("[<typeclasses>")
+    .substringBefore("]")
 
   /**
    * Returns the UML text for the diagram to be rendered using nomnoml.
    *
    * Sample format for the output:
    *
-   * #font: Menlo
-   * #fontSize: 10
-   * #arrowSize: 1
-   * #bendSize: 0.3
-   * #lineWidth: 2
-   * #padding: 8
-   * #zoom: 1
-   * #fill: #64B5F6
-   * #.typeclass: fill=#64B5F6 visual=database bold
-   * #.instances: fill=#B9F6CA visual=class italic bold dashed
-
    * [<typeclass>Functor]<-[<typeclass>Applicative]
    * [<typeclass>Applicative]<-[<typeclass>Monad]
    * [<typeclass>Monad]<-[<instances>Monad Instances|NonEmptyList|Option|OptionT|SequenceK|State|StateT|Try|Either|EitherT|Eval|Id]
    * [<typeclass>Applicative]<-[Something 2]
    * [<typeclass>Applicative]<-[Something 3]
    */
-  private fun genDiagramRelations(typeclassTree: Map<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>>)
+  private fun genGeneratedRelations(typeclassTree: Map<TypeClass, Tuple2<Instances, Set<ParentTypeClass>>>)
     : List<String> =
     typeclassTree.flatMap {
-      setOf(it.key.arrowModule) + it.value._1.map { it.arrowModule }
-    }.toSet().flatMap {
-      listOf("#.${normalizeModule(it)}: ${getModuleStyle(it)}")
-    } + typeclassTree.flatMap {
       val typeClass = it.key
       val instances = it.value._1
       val parentTypeClasses = it.value._2
