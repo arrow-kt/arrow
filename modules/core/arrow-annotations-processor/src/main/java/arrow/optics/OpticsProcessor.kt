@@ -10,7 +10,6 @@ import com.google.auto.service.AutoService
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
 import me.eugeniomarletti.kotlin.metadata.isDataClass
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
-import me.eugeniomarletti.kotlin.metadata.shadow.utils.addIfNotNull
 import java.io.File
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
@@ -138,4 +137,8 @@ class OpticsProcessor : AbstractProcessor() {
       (kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isSealed == true -> SEALED_CLASS
       else -> OTHER
     }
+
+  private fun <T> MutableCollection<T>.addIfNotNull(t: T?) {
+    if (t != null) add(t)
+  }
 }
