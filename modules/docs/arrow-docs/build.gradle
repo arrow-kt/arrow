@@ -26,7 +26,7 @@ dependencies {
     compile "io.kotlintest:kotlintest:$kotlinTestVersion"
 
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
-    compile "io.reactivex.rxjava2:rxjava:2.1.4"
+    compile "io.reactivex.rxjava2:rxjava:2.1.13"
 }
 
 task printcp {

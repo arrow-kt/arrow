@@ -164,12 +164,12 @@ fun ClassOrPackageDataWrapper.typeConstraints(): String =
     }
   }
 
-fun recurseFilesUpwards(rootDirName: String): File =
-  recurseFilesUpwards(rootDirName, File("."))
+fun recurseFilesUpwards(fileName: String): File =
+  recurseFilesUpwards(fileName, File(".").absoluteFile)
 
-fun recurseFilesUpwards(rootDirName: String, currentFile: File): File =
-  if (currentFile.name == rootDirName) {
-    currentFile
+fun recurseFilesUpwards(fileName: String, currentDirectory: File): File =
+  if (currentDirectory.list().contains(fileName)) {
+    currentDirectory
   } else {
-    recurseFilesUpwards(rootDirName, currentFile.absoluteFile.parentFile)
+    recurseFilesUpwards(fileName, currentDirectory.parentFile)
   }
