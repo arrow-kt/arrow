@@ -93,7 +93,7 @@ class RenzuGenerator(
     val generatedDir = if (isolateForTests)
       File("./infographic")
     else
-      File("${recurseFilesUpwards("arrow").absolutePath}/infographic", "")
+      File("${recurseFilesUpwards("settings.gradle").absolutePath}/infographic")
         .also { it.mkdirs() }
 
     val file = File(generatedDir, "arrow-infographic.txt")
