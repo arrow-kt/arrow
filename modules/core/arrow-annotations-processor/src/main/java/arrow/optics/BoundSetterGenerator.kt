@@ -22,9 +22,8 @@ class BoundSetterGenerator(
   private fun processElement(annotatedOptic: AnnotatedOptic): Pair<AnnotatedOptic, List<String>> =
     annotatedOptic to listOf(createDslFunction(annotatedOptic)) + annotatedOptic.targets.map { variable ->
       val sourceClassName = annotatedOptic.classData.fullName.escapedClassName
-      val sourceName = annotatedOptic.type.simpleName.toString().decapitalize()
       val targetClassName = variable.fullName
-      val targetName = variable.paramName
+      val targetName = variable.paramName.decapitalize()
 
       when (variable) {
         is Target.NullableTarget -> processBoundSetter(sourceClassName, targetName, variable.nonNullFullName)
@@ -49,7 +48,7 @@ class BoundSetterGenerator(
 
   private fun processBoundSetter(sourceClassName: String, targetName: String, targetClassName: String) = """
       |inline val <T> $boundSetter<T, $sourceClassName>.$targetName: $boundSetter<T, $targetClassName>
-      |    get() = this.compose($sourceClassName.${targetName.decapitalize()})
+      |    get() = this.compose($sourceClassName.$targetName)
       |""".trimMargin()
 
 }

@@ -122,7 +122,10 @@ We can compose an `Optic` that achieves the same goal.
 ```kotlin:ank
 import arrow.optics.Optional
 
-val employeesStreetName: Optional<Employee, String> = employeeCompany() compose companyAddress() compose addressStreet() compose streetName()
+val employeesStreetName: Optional<Employee, String> = (Employee.company compose
+  Company.address compose
+  Address.street compose
+  Street.name)
 ```
 
 The result is an `Optional` since `Employee::company` is nullable. The `Optional` can be used to apply a function `f` to any `Employee`.
