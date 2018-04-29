@@ -7,7 +7,7 @@ import arrow.instances.AnnotatedInstance
 import arrow.instances.instanceAnnotationClass
 import arrow.instances.instanceAnnotationName
 import com.google.auto.service.AutoService
-import org.jetbrains.kotlin.serialization.deserialization.TypeTable
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
