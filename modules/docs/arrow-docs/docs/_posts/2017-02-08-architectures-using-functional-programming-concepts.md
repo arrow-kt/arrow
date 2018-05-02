@@ -9,4 +9,4 @@ header-image: /img/blog-image-header.png
 category: [all, videos]
 ---
 
-Introductory talk to Functional architectures to be built on top of Arrow.
+Introductory talk to Functional architectures to be built on top of Arrow. 
