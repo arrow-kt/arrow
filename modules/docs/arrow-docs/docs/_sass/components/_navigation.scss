@@ -1,7 +1,6 @@
 // NAVIGATION
 // -----------------------------------------------
 // -----------------------------------------------
-
 #navigation {
     position: fixed;
     z-index: 30;
@@ -26,19 +25,17 @@
             display: inline-block;
             text-transform: uppercase;
             font-size: 0.875rem;
-            
+
             margin-right: ($base-point-grid * 4);
-
-
 
             @include bp(medium) {
                 &:last-child {
                     margin-right: ($base-point-grid * 2);
                 }
-                
+
                 text-transform: none;
             }
-            
+
             &.active {
                 border-bottom: 2px solid $brand-quaternary;
             }
