@@ -36,7 +36,10 @@
                     bottom: ($base-point-grid * 2);
                     color: $white;
                     font-size: 0.875rem;
-
+                }
+                
+                img {
+                    width: 100%;
                 }
             }
             .blog-item-content {

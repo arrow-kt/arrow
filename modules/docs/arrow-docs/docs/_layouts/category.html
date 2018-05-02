@@ -16,8 +16,9 @@ layout: blog
                    {% if post.version != "" %}
                    <div class="version">{{ post.version }}</div>
                    {% endif %}
-                   {% if post.header-image != "" %}
-                    <a href="#">
+
+                    {% if post.video != "" %} 
+                    <a href="{{ post.video }}">
                         <img src="{{ post.header-image }}" alt="">
                     </a>
                     {% endif %}
