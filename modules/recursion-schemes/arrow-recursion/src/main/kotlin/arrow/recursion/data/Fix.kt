@@ -1,13 +1,16 @@
-package io.github.aedans.katalyst.data
+package arrow.recursion.data
 
 import arrow.Kind
 import arrow.core.Eval
 import arrow.higherkind
 import arrow.instance
 import arrow.typeclasses.Functor
-import io.github.aedans.katalyst.typeclasses.Birecursive
-import io.github.aedans.katalyst.typeclasses.Corecursive
-import io.github.aedans.katalyst.typeclasses.Recursive
+import arrow.recursion.typeclasses.Birecursive
+import arrow.recursion.typeclasses.Corecursive
+import arrow.recursion.typeclasses.Recursive
+import io.github.aedans.katalyst.data.FixOf
+import io.github.aedans.katalyst.data.ForFix
+import io.github.aedans.katalyst.data.fix
 
 /**
  * Type level combinator for obtaining the fixed point of a type.

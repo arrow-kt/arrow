@@ -1,4 +1,4 @@
-package io.github.aedans.katalyst
+package arrow.recursion
 
 import arrow.Kind
 import arrow.core.Eval

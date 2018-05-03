@@ -1,11 +1,11 @@
-package io.github.aedans.katalyst.typeclasses
+package arrow.recursion.typeclasses
 
 import arrow.Kind
 import arrow.core.Eval
 import arrow.typeclasses.Functor
-import io.github.aedans.katalyst.Algebra
-import io.github.aedans.katalyst.Coalgebra
-import io.github.aedans.katalyst.hylo
+import arrow.recursion.Algebra
+import arrow.recursion.Coalgebra
+import arrow.recursion.hylo
 
 /**
  * Typeclass for types that can be generically folded with algebras.
