@@ -1,6 +1,7 @@
-package arrow.recursion.laws
+package arrow.test.laws
 
 import arrow.recursion.typeclasses.Corecursive
+import arrow.test.generators.toGNat
 import arrow.test.laws.Law
 
 object CorecursiveLaws {

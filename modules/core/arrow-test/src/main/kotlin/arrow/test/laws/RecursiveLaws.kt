@@ -1,7 +1,9 @@
-package arrow.recursion.laws
+package arrow.test.laws
 
 import arrow.recursion.typeclasses.Corecursive
 import arrow.recursion.typeclasses.Recursive
+import arrow.test.generators.toGNat
+import arrow.test.generators.toInt
 import arrow.test.laws.Law
 import io.kotlintest.matchers.shouldEqual
 

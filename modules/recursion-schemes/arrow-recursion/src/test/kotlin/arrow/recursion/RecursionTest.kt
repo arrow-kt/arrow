@@ -2,10 +2,10 @@ package arrow.recursion
 
 import arrow.core.Option
 import arrow.core.functor
-import arrow.recursion.laws.fromGNatAlgebra
-import arrow.recursion.laws.intGen
-import arrow.recursion.laws.toGNatCoalgebra
 import arrow.test.UnitSpec
+import arrow.test.generators.fromGNatAlgebra
+import arrow.test.generators.toGNatCoalgebra
+import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 class RecursionTest : UnitSpec() {
@@ -15,7 +15,7 @@ class RecursionTest : UnitSpec() {
     }
 
     "Hylo == id if alg . coalg == id" {
-      forAll(intGen) {
+      forAll(Gen.choose(0, 1000)) {
         hylo(Option.functor(), fromGNatAlgebra(), toGNatCoalgebra(), it) == it
       }
     }
