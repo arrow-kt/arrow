@@ -87,7 +87,7 @@ Arrow provides [`FunctorLaws`][functor_laws_source]{:target="_blank"} in the for
 Arrow already provides Functor instances for most common datatypes both in Arrow and the Kotlin stdlib.
 Oftentimes you may find the need to provide your own for unsupported datatypes.
 
-You may create or automatically derive instances of functor for your own datatypes which you will be able to use in the context of abstract polymorfic code
+You may create or automatically derive instances of functor for your own datatypes which you will be able to use in the context of abstract polymorphic code
 as demonstrated in the [example](#example) above.
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }})
