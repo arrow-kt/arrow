@@ -10,9 +10,6 @@ import arrow.recursion.Coalgebra
 import arrow.recursion.typeclasses.Birecursive
 import arrow.recursion.typeclasses.Corecursive
 import arrow.recursion.typeclasses.Recursive
-import io.github.aedans.katalyst.data.ForNu
-import io.github.aedans.katalyst.data.NuOf
-import io.github.aedans.katalyst.data.fix
 
 /**
  * Type level combinator for obtaining the greatest fixed point of a type.

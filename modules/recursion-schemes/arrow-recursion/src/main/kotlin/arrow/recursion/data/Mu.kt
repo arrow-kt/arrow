@@ -10,9 +10,6 @@ import arrow.recursion.Algebra
 import arrow.recursion.typeclasses.Birecursive
 import arrow.recursion.typeclasses.Corecursive
 import arrow.recursion.typeclasses.Recursive
-import io.github.aedans.katalyst.data.ForMu
-import io.github.aedans.katalyst.data.MuOf
-import io.github.aedans.katalyst.data.fix
 
 /**
  * Type level combinator for obtaining the least fixed point of a type.
