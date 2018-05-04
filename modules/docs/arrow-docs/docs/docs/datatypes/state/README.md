@@ -2,6 +2,7 @@
 layout: docs
 title: State
 permalink: /docs/datatypes/state/
+video: GcXC0xARSXg
 ---
 
 ## State
