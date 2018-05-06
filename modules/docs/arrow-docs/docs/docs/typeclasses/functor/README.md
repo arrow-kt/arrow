@@ -8,7 +8,7 @@ permalink: /docs/typeclasses/functor/
 
 The `Functor` typeclass abstracts the ability to `map` over the computational context of a type constructor.
 Examples of type constructors that can implement instances of the Functor typeclass include `Option`, `NonEmptyList`,
-`List` and many other datatypes that include a `map` function with the shape `fun F<B>.map(f: (A) -> B): F<B>` where `F`
+`List` and many other datatypes that include a `map` function with the shape `fun F<A>.map(f: (A) -> B): F<B>` where `F`
 refers to `Option`, `List` or any other type constructor whose contents can be transformed.
 
 ### Example
@@ -87,7 +87,7 @@ Arrow provides [`FunctorLaws`][functor_laws_source]{:target="_blank"} in the for
 Arrow already provides Functor instances for most common datatypes both in Arrow and the Kotlin stdlib.
 Oftentimes you may find the need to provide your own for unsupported datatypes.
 
-You may create or automatically derive instances of functor for your own datatypes which you will be able to use in the context of abstract polymorfic code
+You may create or automatically derive instances of functor for your own datatypes which you will be able to use in the context of abstract polymorphic code
 as demonstrated in the [example](#example) above.
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }})
@@ -121,5 +121,5 @@ The following datatypes in Arrow provide instances that adhere to the `Functor` 
 Additionally all instances of [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}), [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) and their MTL variants implement the `Functor` typeclass directly
 since they are all subtypes of `Functor`
 
-[functor_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-data/src/main/kotlin/arrow/typeclasses/Functor.kt
-[functor_laws_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/FunctorLaws.kt
+[functor_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-typeclasses/src/main/kotlin/arrow/typeclasses/Functor.kt
+[functor_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/FunctorLaws.kt
