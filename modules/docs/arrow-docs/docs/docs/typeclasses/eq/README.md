@@ -18,6 +18,9 @@ import arrow.instances.*
 String.eq().run {
   "1".eqv("2")
 }
+
+// using invoke constructor
+val intEq = Eq<Int> { x, y -> x == y}
 ```
 
 ### Main Combinators
