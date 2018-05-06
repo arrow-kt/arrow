@@ -42,6 +42,7 @@ buildscript {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
         classpath 'io.arrow-kt:ank-gradle-plugin:0.7.0-20180405.164002-2'
         classpath 'org.ajoberstar:gradle-git-publish:0.3.2'
+        classpath 'com.github.pedrovgs:kuronometer:0.1.1'
     }
 }
 
@@ -49,6 +50,7 @@ apply from: 'detekt.gradle.kts'
 
 allprojects {
     apply plugin: 'base'
+    apply plugin: 'com.github.pedrovgs.kuronometer'
 
     clean.doFirst {
         delete "${rootDir}/infographic/arrow-infographic.txt"
