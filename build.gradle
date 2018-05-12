@@ -29,7 +29,6 @@ buildscript {
 
     repositories {
         jcenter()
-        maven { url 'https://oss.jfrog.org/oss-snapshot-local/' }
         maven { url 'https://jitpack.io' }
         maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
         maven { url "https://dl.bintray.com/jetbrains/markdown/" }
@@ -40,7 +39,7 @@ buildscript {
         classpath "com.github.ben-manes:gradle-versions-plugin:$gradleVersionsPluginVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
-        classpath 'io.arrow-kt:ank-gradle-plugin:0.7.0-20180405.164002-2'
+        classpath 'io.arrow-kt:ank-gradle-plugin:0.7.1'
         classpath 'org.ajoberstar:gradle-git-publish:0.3.2'
     }
 }
@@ -56,7 +55,6 @@ allprojects {
 
     repositories {
         jcenter()
-        maven { url 'https://oss.jfrog.org/oss-snapshot-local/' }
         maven { url 'https://kotlin.bintray.com/kotlinx' }
         maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
         maven { url "http://dl.bintray.com/arrow-kt/arrow-kt" }
