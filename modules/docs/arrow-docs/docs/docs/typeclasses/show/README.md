@@ -43,6 +43,12 @@ import arrow.typeclasses.*
 Show.any().run { Option.just(1).show() }
 ```
 
+```kotlin:ank
+// using invoke constructor
+class Person(val firstName: String, val lastName: String)
+val personShow = Show<Person> { "Hello $firstName $lastName" }
+```
+
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Show` instances for custom datatypes.
 
 
