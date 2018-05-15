@@ -108,7 +108,7 @@ IO.monad().binding {
 }.fix().unsafeRunSync()
 ```
 
-What `bind()` does is use the rest of the sequential operations as the function you'd normally past to `flatMap`.
+What `bind()` does is use the rest of the sequential operations as the function you'd normally pass to `flatMap`.
 The equivalent code without using comprehensions would look like:
 
 ```kotlin:ank
@@ -234,9 +234,9 @@ As cleanup is important in these restricted environments, any instance of [`Mona
 ```kotlin
 val (binding: IO<List<User>>, unsafeCancel: Disposable) =
   ioSync.bindingCancellable {
-    val userProfile = bindAsync(ioAsync) { getUserProfile("123") }
+    val userProfile = bindDefer { getUserProfile("123") }
     val friendProfiles = userProfile.friends().map { friend ->
-        bindAsync(ioAsync) { getProfile(friend.id) }
+        bindDefer { getProfile(friend.id) }
     }
     listOf(userProfile) + friendProfiles
   }

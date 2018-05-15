@@ -10,6 +10,8 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 
+fun <F, A, B> EitherTOf<F, A, B>.value() = fix().value
+
 /**
  * [EitherT]`<F, A, B>` is a light wrapper on an `F<`[Either]`<A, B>>` with some
  * convenient methods for working with this nested structure.

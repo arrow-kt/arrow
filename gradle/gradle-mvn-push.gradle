@@ -120,7 +120,7 @@ install {
 
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
-    from sourceSets.main.allSource
+    from sourceSets.main.allSource, 'build/generated/source/kapt/main', 'build/generated/source/kaptKotlin/main'
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
