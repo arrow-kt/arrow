@@ -23,11 +23,15 @@ import arrow.*
 import arrow.instances.*
 import arrow.typeclasses.*
 
-String.monoid().empty()
+String syntax { 
+  empty()
+}
 ```
 
 ```kotlin:ank
-String.monoid().run { listOf<String>("Λ", "R", "R", "O", "W").combineAll() }
+String syntax { 
+  listOf<String>("Λ", "R", "R", "O", "W").combineAll() 
+}
 ```
 
 ```kotlin:ank
@@ -43,11 +47,15 @@ This is also true if we define our own instances. As an example, let's use `Fold
 ```kotlin:ank
 import arrow.data.*
 
-ListK.foldable().run { listOf(1, 2, 3, 4, 5).k().foldMap(Int.monoid(), ::identity) }
+ListK syntax { 
+  listOf(1, 2, 3, 4, 5).k().foldMap(Int.monoid(), ::identity) 
+}
 ```
 
 ```kotlin:ank
-ListK.foldable().run { listOf(1, 2, 3, 4, 5).k().foldMap(String.monoid(), { it.toString() }) }
+ListK syntax { 
+  listOf(1, 2, 3, 4, 5).k().foldMap(String.monoid(), { it.toString() }) 
+}
 ```
 
 To use this with a function that produces a tuple, we can define a Monoid for a tuple that will be valid for any tuple where the types it contains also have a Monoid available.
@@ -69,7 +77,7 @@ fun <A, B> monoidTuple(MA: Monoid<A>, MB: Monoid<B>): Monoid<Tuple2<A, B>> =
 This way we are able to combine both values in one pass, hurrah!
 
 ```kotlin:ank
-ListK.foldable().run {
+ListK syntax {
   val M = monoidTuple(Int.monoid(), String.monoid())
   val list = listOf(1, 1).k()
 
