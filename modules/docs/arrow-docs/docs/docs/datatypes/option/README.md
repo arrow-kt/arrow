@@ -139,7 +139,7 @@ Computing over independent values
 
 ```kotlin:ank
 Option syntax {
-  tupled(Some(1), Some("Hello"), Some(20.0)
+  tupled(Some(1), Some("Hello"), Some(20.0))
 }
 ```
 
@@ -147,7 +147,7 @@ Option syntax {
 
 Computing over dependent values ignoring absence
 
-```kotlin:ank
+```kotlin
 Option syntax {
   binding {
    val a = Some(1).bind()
