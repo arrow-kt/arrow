@@ -126,8 +126,11 @@ Transforming the inner contents
 
 ```kotlin:ank
 import arrow.typeclasses.*
+import arrow.instances.*
 
-Option.functor().run { Some(1).map { it + 1 } }
+Option syntax {
+  Some(1).map { it + 1 }
+}
 ```
 
 [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }})
@@ -135,29 +138,35 @@ Option.functor().run { Some(1).map { it + 1 } }
 Computing over independent values
 
 ```kotlin:ank
-Option.applicative().tupled(Some(1), Some("Hello"), Some(20.0))
+Option syntax {
+  tupled(Some(1), Some("Hello"), Some(20.0)
+}
 ```
 
 [`Monad`]({{ '/docs/typeclasses/monad/' | relative_url }})
 
 Computing over dependent values ignoring absence
 
-```kotlin
-Option.monad().binding {
+```kotlin:ank
+Option syntax {
+  binding {
    val a = Some(1).bind()
    val b = Some(1 + a).bind()
    val c = Some(1 + b).bind()
    a + b + c
+  }
 }
 //Some(value=6)
 ```
 
 ```kotlin
-Option.monad().binding {
+Option syntax {
+  binding {
    val x = none<Int>().bind()
    val y = Some(1 + x).bind()
    val z = Some(1 + y).bind()
    x + y + z
+  }
 }
 //None
 ```
