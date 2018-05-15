@@ -68,6 +68,11 @@ Eq.any().run { Some(1).eqv(Option.just(1)) }
 Eq.any().run { Eval.later { 1 }.eqv(Eval.later { 1 }) }
 ```
 
+```kotlin:ank
+// using invoke constructor
+val intEq = Eq<Int> { a, b -> a == b }
+```
+
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Eq` instances for custom datatypes.
 
 ### Data Types

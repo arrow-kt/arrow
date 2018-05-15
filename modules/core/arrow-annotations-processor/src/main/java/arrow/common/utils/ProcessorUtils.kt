@@ -2,10 +2,10 @@ package arrow.common.utils
 
 import me.eugeniomarletti.kotlin.metadata.*
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmMethodSignature
-import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.java.MethodElement
-import org.jetbrains.kotlin.serialization.ProtoBuf
-import org.jetbrains.kotlin.serialization.deserialization.TypeTable
-import org.jetbrains.kotlin.serialization.deserialization.supertypes
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.supertypes
+import me.eugeniomarletti.kotlin.metadata.shadow.serialization.deserialization.getName
 import java.io.File
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
@@ -59,9 +59,6 @@ interface ProcessorUtils : KotlinMetadataUtils {
     return metadata.asClassOrPackageDataWrapper(classElement)
       ?: knownError("Arrow's annotation can't be used on $classElement")
   }
-
-  fun TypeElement.methods(): List<MethodElement> =
-    enclosedElements.mapNotNull { it as? MethodElement }
 
   fun ClassOrPackageDataWrapper.getFunction(methodElement: ExecutableElement) =
     getFunctionOrNull(methodElement, nameResolver, functionList)
@@ -172,12 +169,12 @@ fun ClassOrPackageDataWrapper.typeConstraints(): String =
     }
   }
 
-fun recurseFilesUpwards(rootDirName: String): File =
-  recurseFilesUpwards(rootDirName, File("."))
+fun recurseFilesUpwards(fileName: String): File =
+  recurseFilesUpwards(fileName, File(".").absoluteFile)
 
-fun recurseFilesUpwards(rootDirName: String, currentFile: File): File =
-  if (currentFile.name == rootDirName) {
-    currentFile
+fun recurseFilesUpwards(fileName: String, currentDirectory: File): File =
+  if (currentDirectory.list().contains(fileName)) {
+    currentDirectory
   } else {
-    recurseFilesUpwards(rootDirName, currentFile.absoluteFile.parentFile)
+    recurseFilesUpwards(fileName, currentDirectory.parentFile)
   }
