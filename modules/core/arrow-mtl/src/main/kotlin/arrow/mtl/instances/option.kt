@@ -67,7 +67,12 @@ interface OptionMonadFilterInstance : MonadFilter<ForOption> {
     fix().filter(f)
 }
 
-object OptionMtlContext : OptionMonadErrorInstance, OptionTraverseFilterInstance {
+object OptionMtlContext : OptionMonadFilterInstance, OptionTraverseFilterInstance {
+  override fun <A> Kind<ForOption, A>.filter(f: (A) -> Boolean): Option<A> =
+    fix().filter(f)
+
+  override fun <A, B> Kind<ForOption, A>.mapFilter(f: (A) -> Option<B>): Option<B> =
+    this.flatMap({ a -> f(a).fold({ empty<B>() }, { just(it) }) })
 
   override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
