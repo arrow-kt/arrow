@@ -26,7 +26,7 @@ class IsosFileGenerator(
   private fun processElement(iso: AnnotatedOptic): Pair<AnnotatedOptic, String> = iso to """
             |package ${iso.classData.`package`.escapedClassName}
             |
-            |inline val ${iso.sourceClassName}.Companion.iso: arrow.optics.Iso<${iso.sourceClassName}, ${focusType(iso)}> get()= arrow.optics.Iso(
+            |inline val ${iso.sourceClassName}.Companion.iso: $Iso<${iso.sourceClassName}, ${focusType(iso)}> get()= $Iso(
             |        get = { ${iso.sourceName}: ${iso.sourceClassName} -> ${getFunction(iso)} },
             |        reverseGet = { ${reverseGetFunction(iso)} }
             |)""".trimMargin()
