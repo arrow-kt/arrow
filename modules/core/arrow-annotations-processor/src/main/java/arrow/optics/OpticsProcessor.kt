@@ -29,8 +29,6 @@ class OpticsProcessor : AbstractProcessor() {
 
   private val annotatedOptional = mutableListOf<AnnotatedOptic>()
 
-  private val annotatedBounded = mutableListOf<AnnotatedOptic>()
-
   override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
   override fun getSupportedAnnotationTypes() = setOf(opticsAnnotationClass.canonicalName)
@@ -53,7 +51,6 @@ class OpticsProcessor : AbstractProcessor() {
             PRISM -> annotatedPrisms.addIfNotNull(evalAnnotatedPrismElement(element))
             ISO -> annotatedIsos.addIfNotNull(evalAnnotatedIsoElement(element))
             OPTIONAL -> annotatedOptional.addIfNotNull(evalAnnotatedDataClass(element, element.optionalErrorMessage))
-            DSL -> annotatedBounded.addIfNotNull(evalAnnotatedDslElement(element))
           }
         }
 
@@ -65,14 +62,12 @@ class OpticsProcessor : AbstractProcessor() {
       PrismsFileGenerator(annotatedPrisms, generatedDir).generate()
       IsosFileGenerator(annotatedIsos, generatedDir).generate()
       OptionalFileGenerator(annotatedOptional, generatedDir).generate()
-      BoundSetterGenerator(annotatedBounded, generatedDir).generate()
     }
   }
 
   private fun Element.normalizedTargets(): List<OpticsTarget> = with(getAnnotation(opticsAnnotationClass).targets) {
     when {
-      isEmpty() -> if (classType == SEALED_CLASS) listOf(PRISM, DSL) else listOf(ISO, LENS, OPTIONAL, DSL)
-      contains(DSL) -> toList() + if (classType == SEALED_CLASS) listOf(PRISM) else listOf(LENS, OPTIONAL, PRISM)
+      isEmpty() -> if (classType == SEALED_CLASS) listOf(PRISM) else listOf(ISO, LENS, OPTIONAL)
       else -> toList()
     }
 
@@ -86,16 +81,6 @@ class OpticsProcessor : AbstractProcessor() {
     )
 
     else -> null.also { logE(errorMessage, element) }
-  }
-
-  private fun evalAnnotatedDslElement(element: Element): AnnotatedOptic? = when (element.classType) {
-    DATA_CLASS -> AnnotatedOptic(
-      element as TypeElement,
-      element.getClassData(),
-      element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Target.Companion::invoke)
-    )
-    SEALED_CLASS -> evalAnnotatedPrismElement(element)
-    OTHER -> null.also { logE(element.dslErrorMessage, element) }
   }
 
   private fun evalAnnotatedPrismElement(element: Element): AnnotatedOptic? = when (element.classType) {
