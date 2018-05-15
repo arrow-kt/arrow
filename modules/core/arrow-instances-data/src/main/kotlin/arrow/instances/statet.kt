@@ -103,3 +103,15 @@ class StateTContextPartiallyApplied<F, S, E>(val ME: MonadError<F, E>) {
 
 fun <F, S, E> StateT(ME: MonadError<F, E>): StateTContextPartiallyApplied<F, S, E> =
   StateTContextPartiallyApplied(ME)
+
+class StateTMonadContext<S> : StateTMonadInstance<ForId, S> {
+  override fun FF(): Monad<ForId> = Id.monad()
+}
+
+class StateContextPartiallyApplied<S>() {
+  infix fun <A> syntax(f: StateTMonadContext<S>.() -> A): A =
+    f(StateTMonadContext())
+}
+
+fun <S> State(): StateContextPartiallyApplied<S> =
+  StateContextPartiallyApplied()
