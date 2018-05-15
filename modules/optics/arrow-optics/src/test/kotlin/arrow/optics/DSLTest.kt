@@ -57,7 +57,7 @@ class BoundedTest : UnitSpec() {
     ).k())
 
     "@optics generate DSL properly" {
-      employee.setter().company.address.street.name.modify(String::toUpperCase) shouldBe
+      Employee.company.address.street.name.modify(employee, String::toUpperCase) shouldBe
         (Employee.company compose
           Company.address compose
           Address.street compose
@@ -65,14 +65,14 @@ class BoundedTest : UnitSpec() {
     }
 
     "Working with At in BoundSetter should be same as in DSL" {
-      db.setter().content.at(MapK.at(), One).some.modify(String::toUpperCase) shouldBe
+      Db.content.at(MapK.at(), One).some.modify(db, String::toUpperCase) shouldBe
         (Db.content compose
           MapK.at<Keys, String>().at(One) compose
           somePrism()).modify(db, String::toUpperCase)
     }
 
     "Working with Each in BoundSetter should be same as in DSL" {
-      db.setter().content.every(MapK.each()).modify(String::toUpperCase) shouldBe
+      Db.content.every(MapK.each()).modify(db, String::toUpperCase) shouldBe
         (Db.content compose
           MapK.traversal()).modify(db, String::toUpperCase)
     }
