@@ -52,12 +52,9 @@ interface SortedMapKShowInstance<A : Comparable<A>, B> : Show<SortedMapKOf<A, B>
 class SortedMapKContext<K : Comparable<K>> : SortedMapKTraverseInstance<K>
 
 class SortedMapKContextPartiallyApplied<K : Comparable<K>> {
-  fun <A> run(f: SortedMapKContext<K>.() -> A): A =
+  infix fun <A> syntax(f: SortedMapKContext<K>.() -> A): A =
     f(SortedMapKContext())
 }
 
 fun <K : Comparable<K>> SortedMapK(): SortedMapKContextPartiallyApplied<K> =
   SortedMapKContextPartiallyApplied()
-
-fun <K : Comparable<K>, A> with(c: SortedMapKContextPartiallyApplied<K>, f: SortedMapKContext<K>.() -> A): A =
-  c.run(f)

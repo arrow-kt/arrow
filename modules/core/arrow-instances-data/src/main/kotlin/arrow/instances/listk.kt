@@ -129,8 +129,5 @@ object ListKContext : ListKMonadInstance, ListKTraverseInstance, ListKMonoidKIns
     fix().map(f)
 }
 
-fun <A> ListK.Companion.run(f: ListKContext.() -> A): A =
-  f(ListKContext)
-
-fun <A> with(c: ListK.Companion, f: ListKContext.() -> A): A =
+infix fun <A> ListK.Companion.syntax(f: ListKContext.() -> A): A =
   f(ListKContext)

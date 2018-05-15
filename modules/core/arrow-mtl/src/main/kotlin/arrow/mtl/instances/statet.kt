@@ -44,12 +44,9 @@ class StateTMtlContext<F, S, E>(val ME: MonadError<F, E>) : StateTMonadStateInst
 }
 
 class StateTMtlContextPartiallyApplied<F, S, E>(val ME: MonadError<F, E>) {
-  fun <A> run(f: StateTMtlContext<F, S, E>.() -> A): A =
+  infix fun <A> syntax(f: StateTMtlContext<F, S, E>.() -> A): A =
     f(StateTMtlContext(ME))
 }
 
 fun <F, S, E> StateT(ME: MonadError<F, E>): StateTMtlContextPartiallyApplied<F, S, E> =
   StateTMtlContextPartiallyApplied(ME)
-
-fun <F, S, E, A> with(c: StateTMtlContextPartiallyApplied<F, S, E>, f: StateTMtlContext<F, S, E>.() -> A): A =
-  c.run(f)

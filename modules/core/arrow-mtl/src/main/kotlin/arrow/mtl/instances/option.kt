@@ -73,8 +73,5 @@ object OptionMtlContext : OptionMonadErrorInstance, OptionTraverseFilterInstance
     fix().map(f)
 }
 
-fun <A> Option.Companion.run(f: OptionMtlContext.() -> A): A =
-  f(OptionMtlContext)
-
-fun <A> with(c: Option.Companion, f: OptionMtlContext.() -> A): A =
+infix fun <A> Option.Companion.syntax(f: OptionMtlContext.() -> A): A =
   f(OptionMtlContext)

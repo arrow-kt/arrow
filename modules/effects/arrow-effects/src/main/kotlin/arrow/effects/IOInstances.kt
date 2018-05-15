@@ -113,8 +113,5 @@ interface IOSemigroupInstance<A> : Semigroup<Kind<ForIO, A>> {
 
 object IOContext : IOEffectInstance
 
-fun <A> IO.Companion.run(f: IOContext.() -> A): A =
-  f(IOContext)
-
-fun <A> with(c: IO.Companion, f: IOContext.() -> A): A =
+infix fun <A> IO.Companion.syntax(f: IOContext.() -> A): A =
   f(IOContext)

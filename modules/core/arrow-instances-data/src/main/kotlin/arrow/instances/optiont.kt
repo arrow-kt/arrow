@@ -105,12 +105,9 @@ class OptionTContext<F>(val MF: Monad<F>) : OptionTMonadInstance<F>, OptionTMono
 }
 
 class OptionTContextPartiallyApplied<F>(val MF: Monad<F>) {
-  fun <A> run(f: OptionTContext<F>.() -> A): A =
+  infix fun <A> syntax(f: OptionTContext<F>.() -> A): A =
     f(OptionTContext(MF))
 }
 
 fun <F> OptionT(MF: Monad<F>): OptionTContextPartiallyApplied<F> =
   OptionTContextPartiallyApplied(MF)
-
-fun <F, A> with(c: OptionTContextPartiallyApplied<F>, f: OptionTContext<F>.() -> A): A =
-  c.run(f)

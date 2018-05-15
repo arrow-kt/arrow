@@ -130,8 +130,5 @@ object TryContext : TryMonadErrorInstance, TryTraverseInstance {
     fix().map(f)
 }
 
-fun <A> Try.Companion.run(f: TryContext.() -> A): A =
-  f(TryContext)
-
-fun <A> with(c: Try.Companion, f: TryContext.() -> A): A =
+infix fun <A> Try.Companion.syntax(f: TryContext.() -> A): A =
   f(TryContext)

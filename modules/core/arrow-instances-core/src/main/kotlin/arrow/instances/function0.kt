@@ -79,8 +79,5 @@ interface Function0BimonadInstance : Bimonad<ForFunction0> {
 
 object Function0Context : Function0BimonadInstance
 
-fun <L> Function0.Companion.run(f: Function0Context.() -> L): L =
-  f(Function0Context)
-
-fun <A> with(c: Function0.Companion, f: Function0Context.() -> A): A =
+infix fun <L> Function0.Companion.syntax(f: Function0Context.() -> L): L =
   f(Function0Context)

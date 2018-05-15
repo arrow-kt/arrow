@@ -1,7 +1,6 @@
 package arrow.instances
 
 import arrow.Kind
-import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.fix
 import arrow.data.Coproduct
@@ -74,12 +73,9 @@ class CoproductContext<F, G>(val TF: Traverse<F>, val TG: Traverse<G>) : Coprodu
 }
 
 class CoproductContextPartiallyApplied<F, G>(val TF: Traverse<F>, val TG: Traverse<G>) {
-  fun <A> run(f: CoproductContext<F, G>.() -> A): A =
+  infix fun <A> syntax(f: CoproductContext<F, G>.() -> A): A =
     f(CoproductContext(TF, TG))
 }
 
 fun <F, G> Coproduct(TF: Traverse<F>, TG: Traverse<G>): CoproductContextPartiallyApplied<F, G> =
   CoproductContextPartiallyApplied(TF, TG)
-
-fun <F, G, A> with(c: CoproductContextPartiallyApplied<F, G>, f: CoproductContext<F, G>.() -> A): A =
-  c.run(f)

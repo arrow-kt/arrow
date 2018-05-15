@@ -148,8 +148,5 @@ object NonEmptyListContext : NonEmptyListMonadInstance, NonEmptyListTraverseInst
     fix().map(f)
 }
 
-fun <A> NonEmptyList.Companion.run(f: NonEmptyListContext.() -> A): A =
-  f(NonEmptyListContext)
-
-fun <A> with(c: NonEmptyList.Companion, f: NonEmptyListContext.() -> A): A =
+infix fun <A> NonEmptyList.Companion.syntax(f: NonEmptyListContext.() -> A): A =
   f(NonEmptyListContext)

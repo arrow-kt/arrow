@@ -24,12 +24,9 @@ class KleisliMtlContext<F, D, E>(val MF: MonadError<F, E>) : KleisliMonadReaderI
 }
 
 class KleisliMtlContextPartiallyApplied<F, D, E>(val MF: MonadError<F, E>) {
-  fun <A> run(f: KleisliMtlContext<F, D, E>.() -> A): A =
+  infix fun <A> syntax(f: KleisliMtlContext<F, D, E>.() -> A): A =
     f(KleisliMtlContext(MF))
 }
 
 fun <F, D, E> Kleisli(MF: MonadError<F, E>): KleisliMtlContextPartiallyApplied<F, D, E> =
   KleisliMtlContextPartiallyApplied(MF)
-
-fun <F, D, E, A> with(c: KleisliMtlContextPartiallyApplied<F, D, E>, f: KleisliMtlContext<F, D, E>.() -> A): A =
-  c.run(f)

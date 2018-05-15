@@ -45,12 +45,10 @@ interface Function1MonadInstance<I> : Function1ApplicativeInstance<I>, Monad<Fun
 class Function1Context<A> : Function1MonadInstance<A>
 
 class Function1ContextPartiallyApplied<L> {
-  fun <A> run(f: Function1Context<L>.() -> A): A =
+  infix fun <A> syntax(f: Function1Context<L>.() -> A): A =
     f(Function1Context())
 }
 
 fun <L> Function1(): Function1ContextPartiallyApplied<L> =
   Function1ContextPartiallyApplied()
 
-fun <L, A> with(c: Function1ContextPartiallyApplied<L>, f: Function1Context<L>.() -> A): A =
-  c.run(f)

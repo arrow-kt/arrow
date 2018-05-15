@@ -2,7 +2,6 @@ package arrow.instances
 
 import arrow.Kind
 import arrow.core.Eval
-import arrow.core.functor
 import arrow.instance
 import arrow.typeclasses.*
 import arrow.typeclasses.ap as constAp
@@ -87,12 +86,9 @@ class ConstContext<A>(val MA: Monoid<A>) : ConstApplicativeInstance<A>, ConstTra
 }
 
 class ConstContextPartiallyApplied<L>(val MA: Monoid<L>) {
-  fun <A> run(f: ConstContext<L>.() -> A): A =
+  infix fun <A> syntax(f: ConstContext<L>.() -> A): A =
     f(ConstContext(MA))
 }
 
 fun <L> Const(MA: Monoid<L>): ConstContextPartiallyApplied<L> =
   ConstContextPartiallyApplied(MA)
-
-fun <L, A> with(c: ConstContextPartiallyApplied<L>, f: ConstContext<L>.() -> A): A =
-  c.run(f)

@@ -157,12 +157,9 @@ class EitherTContext<F, E>(val MF: Monad<F>) : EitherTMonadErrorInstance<F, E> {
 }
 
 class EitherTContextPartiallyApplied<F, E>(val MF: Monad<F>) {
-  fun <A> run(f: EitherTContext<F, E>.() -> A): A =
+  infix fun <A> syntax(f: EitherTContext<F, E>.() -> A): A =
     f(EitherTContext(MF))
 }
 
 fun <F, E> EitherT(MF: Monad<F>): EitherTContextPartiallyApplied<F, E> =
   EitherTContextPartiallyApplied(MF)
-
-fun <F, E, A> with(c: EitherTContextPartiallyApplied<F, E>, f: EitherTContext<F, E>.() -> A): A =
-  c.run(f)

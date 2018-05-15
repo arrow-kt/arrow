@@ -2,8 +2,6 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.ForOption
-import arrow.core.Option
 import arrow.core.fix
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
@@ -90,8 +88,5 @@ interface DeferredKEffectInstance : DeferredKAsyncInstance, Effect<ForDeferredK>
 
 object DeferredKContext : DeferredKEffectInstance
 
-fun <A> DeferredK.Companion.run(f: DeferredKContext.() -> A): A =
-  f(DeferredKContext)
-
-fun <A> with(c: DeferredK.Companion, f: DeferredKContext.() -> A): A =
+infix fun <A> DeferredK.Companion.syntax(f: DeferredKContext.() -> A): A =
   f(DeferredKContext)

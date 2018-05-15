@@ -44,12 +44,9 @@ class WriterTMtlContext<F, W>(val MF: Monad<F>, val MW: Monoid<W>) : WriterTMona
 }
 
 class WriterTMtlContextPartiallyApplied<F, W>(val MF: Monad<F>, val MW: Monoid<W>) {
-  fun <A> run(f: WriterTMtlContext<F, W>.() -> A): A =
+  infix fun <A> syntax(f: WriterTMtlContext<F, W>.() -> A): A =
     f(WriterTMtlContext(MF, MW))
 }
 
 fun <F, W> WriterT(MF: Monad<F>, MW: Monoid<W>): WriterTMtlContextPartiallyApplied<F, W> =
   WriterTMtlContextPartiallyApplied(MF, MW)
-
-fun <F, W, A> with(c: WriterTMtlContextPartiallyApplied<F, W>, f: WriterTMtlContext<F, W>.() -> A): A =
-  c.run(f)

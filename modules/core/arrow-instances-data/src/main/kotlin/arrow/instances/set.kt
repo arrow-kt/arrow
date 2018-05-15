@@ -69,8 +69,5 @@ interface SetKMonoidKInstance : MonoidK<ForSetK> {
 
 object SetKContext : SetKFoldableInstance, SetKMonoidKInstance
 
-fun <A> SetK.Companion.run(f: SetKContext.() -> A): A =
-  f(SetKContext)
-
-fun <A> with(c: SetK.Companion, f: SetKContext.() -> A): A =
+infix fun <A> SetK.Companion.syntax(f: SetKContext.() -> A): A =
   f(SetKContext)

@@ -117,12 +117,9 @@ class EitherContext<L> : EitherMonadErrorInstance<L>, EitherTraverseInstance<L> 
 }
 
 class EitherContextPartiallyApplied<L> {
-  fun <A> run(f: EitherContext<L>.() -> A): A =
+  infix fun <A> syntax(f: EitherContext<L>.() -> A): A =
     f(EitherContext())
 }
 
 fun <L> Either(): EitherContextPartiallyApplied<L> =
   EitherContextPartiallyApplied()
-
-fun <L, A> with(c: EitherContextPartiallyApplied<L>, f: EitherContext<L>.() -> A): A =
-  c.run(f)

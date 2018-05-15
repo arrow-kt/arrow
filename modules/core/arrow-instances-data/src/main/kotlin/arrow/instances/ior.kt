@@ -101,12 +101,9 @@ class IorContext<L>(val SL: Semigroup<L>) : IorMonadInstance<L>, IorTraverseInst
 }
 
 class IorContextPartiallyApplied<L>(val SL: Semigroup<L>) {
-  fun <A> run(f: IorContext<L>.() -> A): A =
+  infix fun <A> syntax(f: IorContext<L>.() -> A): A =
     f(IorContext(SL))
 }
 
 fun <L> Ior(SL: Semigroup<L>): IorContextPartiallyApplied<L> =
   IorContextPartiallyApplied(SL)
-
-fun <L, A> with(c: IorContextPartiallyApplied<L>, f: IorContext<L>.() -> A): A =
-  c.run(f)

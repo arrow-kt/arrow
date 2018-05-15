@@ -25,12 +25,9 @@ class ConstMtlContext<A>(val MA: Monoid<A>) : ConstApplicativeInstance<A>, Const
 }
 
 class ConstMtlContextPartiallyApplied<L>(val MA: Monoid<L>) {
-  fun <A> run(f: ConstMtlContext<L>.() -> A): A =
+  infix fun <A> syntax(f: ConstMtlContext<L>.() -> A): A =
     f(ConstMtlContext(MA))
 }
 
 fun <L> Const(MA: Monoid<L>): ConstMtlContextPartiallyApplied<L> =
   ConstMtlContextPartiallyApplied(MA)
-
-fun <L, A> with(c: ConstMtlContextPartiallyApplied<L>, f: ConstMtlContext<L>.() -> A): A =
-  c.run(f)

@@ -19,12 +19,9 @@ interface Function1MonadReaderInstance<I> : Function1MonadInstance<I>, MonadRead
 class Function1MtlContext<A> : Function1MonadReaderInstance<A>
 
 class Function1MtlContextPartiallyApplied<L> {
-  fun <A> run(f: Function1MtlContext<L>.() -> A): A =
+  infix fun <A> syntax(f: Function1MtlContext<L>.() -> A): A =
     f(Function1MtlContext())
 }
 
 fun <L> Function1(): Function1MtlContextPartiallyApplied<L> =
   Function1MtlContextPartiallyApplied()
-
-fun <L, A> with(c: Function1MtlContextPartiallyApplied<L>, f: Function1MtlContext<L>.() -> A): A =
-  c.run(f)

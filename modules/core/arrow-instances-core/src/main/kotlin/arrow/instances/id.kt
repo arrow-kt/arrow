@@ -129,8 +129,5 @@ object IdContext : IdBimonadInstance, IdTraverseInstance {
     fix().map(f)
 }
 
-fun <L> Id.Companion.run(f: IdContext.() -> L): L =
-  f(IdContext)
-
-fun <A> with(c: Id.Companion, f: IdContext.() -> A): A =
+infix fun <L> Id.Companion.syntax(f: IdContext.() -> L): L =
   f(IdContext)

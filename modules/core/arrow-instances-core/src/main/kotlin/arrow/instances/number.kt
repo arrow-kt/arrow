@@ -42,10 +42,7 @@ fun Byte.Companion.monoid(): Monoid<Byte> =
 
 object ByteContext : ByteShowInstance, ByteOrderInstance, ByteMonoidInstance
 
-fun <L> Byte.Companion.run(f: ByteContext.() -> L): L =
-  f(ByteContext)
-
-fun <A> with(c: Byte.Companion, f: ByteContext.() -> A): A =
+infix fun <L> Byte.Companion.syntax(f: ByteContext.() -> L): L =
   f(ByteContext)
 
 //////////
@@ -89,10 +86,7 @@ fun Double.Companion.monoid(): Monoid<Double> =
 
 object DoubleContext : DoubleShowInstance, DoubleOrderInstance, DoubleMonoidInstance
 
-fun <L> Double.Companion.run(f: DoubleContext.() -> L): L =
-  f(DoubleContext)
-
-fun <A> with(c: Double.Companion, f: DoubleContext.() -> A): A =
+infix fun <L> Double.Companion.syntax(f: DoubleContext.() -> L): L =
   f(DoubleContext)
 
 //////////
@@ -135,10 +129,7 @@ fun Int.Companion.monoid(): Monoid<Int> =
 
 object IntContext : IntShowInstance, IntOrderInstance, IntMonoidInstance
 
-fun <L> Int.Companion.run(f: IntContext.() -> L): L =
-  f(IntContext)
-
-fun <A> with(c: Int.Companion, f: IntContext.() -> A): A =
+infix fun <L> Int.Companion.syntax(f: IntContext.() -> L): L =
   f(IntContext)
 
 //////////
@@ -182,10 +173,7 @@ fun Long.Companion.monoid(): Monoid<Long> =
 
 object LongContext : LongShowInstance, LongOrderInstance, LongMonoidInstance
 
-fun <L> Long.Companion.run(f: LongContext.() -> L): L =
-  f(LongContext)
-
-fun <A> with(c: Long.Companion, f: LongContext.() -> A): A =
+infix fun <L> Long.Companion.syntax(f: LongContext.() -> L): L =
   f(LongContext)
 
 //////////
@@ -229,10 +217,7 @@ fun Short.Companion.monoid(): Monoid<Short> =
 
 object ShortContext : ShortShowInstance, ShortOrderInstance, ShortMonoidInstance
 
-fun <L> Short.Companion.run(f: ShortContext.() -> L): L =
-  f(ShortContext)
-
-fun <A> with(c: Short.Companion, f: ShortContext.() -> A): A =
+infix fun <L> Short.Companion.syntax(f: ShortContext.() -> L): L =
   f(ShortContext)
 
 //////////
@@ -276,8 +261,5 @@ fun Float.Companion.monoid(): Monoid<Float> =
 
 object FloatContext : FloatShowInstance, FloatOrderInstance, FloatMonoidInstance
 
-fun <L> Float.Companion.run(f: FloatContext.() -> L): L =
-  f(FloatContext)
-
-fun <A> with(c: Float.Companion, f: FloatContext.() -> A): A =
+infix fun <L> Float.Companion.syntax(f: FloatContext.() -> L): L =
   f(FloatContext)

@@ -79,8 +79,5 @@ interface EvalBimonadInstance : Bimonad<ForEval> {
 
 object EvalContext : EvalBimonadInstance
 
-fun <L> Eval.Companion.run(f: EvalContext.() -> L): L =
-  f(EvalContext)
-
-fun <A> with(c: Eval.Companion, f: EvalContext.() -> A): A =
+infix fun <L> Eval.Companion.syntax(f: EvalContext.() -> L): L =
   f(EvalContext)

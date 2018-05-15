@@ -118,8 +118,5 @@ interface ObservableKEffectInstance :
 
 object ObservableKContext : ObservableKEffectInstance
 
-fun <A> ObservableK.Companion.run(f: ObservableKContext.() -> A): A =
-  f(ObservableKContext)
-
-fun <A> with(c: ObservableK.Companion, f: ObservableKContext.() -> A): A =
+infix fun <A> ObservableK.Companion.syntax(f: ObservableKContext.() -> A): A =
   f(ObservableKContext)

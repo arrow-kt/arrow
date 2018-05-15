@@ -39,8 +39,5 @@ fun String.Companion.order(): Order<String> =
 
 object StringContext : StringShowInstance, StringOrderInstance, StringMonoidInstance
 
-fun <L> String.Companion.run(f: StringContext.() -> L): L =
-  f(StringContext)
-
-fun <A> with(c: String.Companion, f: StringContext.() -> A): A =
+infix fun <L> String.Companion.syntax(f: StringContext.() -> L): L =
   f(StringContext)

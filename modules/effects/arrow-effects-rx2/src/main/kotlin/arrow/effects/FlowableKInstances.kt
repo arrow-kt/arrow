@@ -121,8 +121,5 @@ interface FlowableKEffectInstance :
 
 object FlowableKContext : FlowableKEffectInstance
 
-fun <A> FlowableK.Companion.run(f: FlowableKContext.() -> A): A =
-  f(FlowableKContext)
-
-fun <A> with(c: FlowableK.Companion, f: FlowableKContext.() -> A): A =
+infix fun <A> FlowableK.Companion.syntax(f: FlowableKContext.() -> A): A =
   f(FlowableKContext)
