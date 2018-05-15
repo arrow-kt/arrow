@@ -24,20 +24,27 @@ It lifts an exception into the computational context of a type constructor.
 ```kotlin:ank
 import arrow.*
 import arrow.core.*
+import arrow.instances.*
 
-Either.monadError<Throwable>().raiseError<Int>(RuntimeException("Paco"))
+Either<Throwable>() syntax { 
+  raiseError<Int>(RuntimeException("Paco"))
+}
 ```
 
 ```kotlin:ank
 import arrow.data.*
 
-Try.monadError().raiseError<Int>(RuntimeException("Paco"))
+Try syntax { 
+  raiseError<Int>(RuntimeException("Paco"))
+}
 ```
 
 ```kotlin:ank
 import arrow.effects.*
 
-IO.monadError().raiseError<Int>(RuntimeException("Paco"))
+IO syntax { 
+  raiseError<Int>(RuntimeException("Paco"))
+}
 ```
 
 #### Kind<F, A>.ensure
@@ -45,15 +52,15 @@ IO.monadError().raiseError<Int>(RuntimeException("Paco"))
 Tests a predicate against the object, and if it fails it executes a function to create an error.
 
 ```kotlin:ank
-val ME = Either.monadError<Throwable>()
-
-val either: Either<Throwable, Int> = Either.Right(1)
-
-ME.run { either.ensure({ RuntimeException("Failed predicate") }, { it > 0 }) }
+Either<Throwable>() syntax {
+  Either.Right(1).ensure({ RuntimeException("Failed predicate") }, { it > 0 }) 
+}
 ```
 
 ```kotlin:ank
-ME.run { either.ensure({ RuntimeException("Failed predicate") }, { it < 0 }) }
+Either<Throwable>() syntax {
+  Either.Right(1).ensure({ RuntimeException("Failed predicate") }, { it < 0 }) 
+}
 ```
 
 ### Comprehensions
