@@ -86,15 +86,12 @@ class ReaderContext<D> : KleisliMonadInstance<ForId, D> {
 }
 
 class ReaderContextPartiallyApplied<L> {
-  fun <A> run(f: ReaderContext<L>.() -> A): A =
+  inline fun <A> syntax(f: ReaderContext<L>.() -> A): A =
     f(ReaderContext())
 }
 
 fun <D> Reader(): ReaderContextPartiallyApplied<D> =
   ReaderContextPartiallyApplied()
-
-fun <L, A> with(c: ReaderContextPartiallyApplied<L>, f: ReaderContext<L>.() -> A): A =
-  c.run(f)
 
 class KleisliContext<F, D, E>(val MF: MonadError<F, E>) : KleisliMonadErrorInstance<F, D, E> {
   override fun FF(): MonadError<F, E> = MF

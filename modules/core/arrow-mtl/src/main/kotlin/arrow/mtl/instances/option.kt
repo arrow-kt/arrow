@@ -3,7 +3,6 @@ package arrow.mtl.instances
 import arrow.Kind
 import arrow.core.*
 import arrow.instance
-import arrow.instances.OptionMonadErrorInstance
 import arrow.mtl.typeclasses.MonadFilter
 import arrow.mtl.typeclasses.TraverseFilter
 import arrow.typeclasses.Applicative

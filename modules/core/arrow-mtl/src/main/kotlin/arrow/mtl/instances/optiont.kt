@@ -44,18 +44,20 @@ fun <F, G, A, B> OptionT<F, A>.traverseFilter(f: (A) -> Kind<G, Option<B>>, GA: 
   fa.map({ OptionT(FF.run { it.unnest().map({ it.fix() }) }) })
 }
 
-class OptionTMtlContext<F>(val MF: Monad<F>) : OptionTMonadInstance<F>, OptionTMonoidKInstance<F>, OptionTFunctorFilterInstance<F> {
+class OptionTMtlContext<F>(val MF: Monad<F>, val TF: TraverseFilter<F>) : OptionTMonadInstance<F>, OptionTMonoidKInstance<F>, OptionTTraverseFilterInstance<F> {
 
   override fun FF(): Monad<F> = MF
 
+  override fun FFF(): TraverseFilter<F> = TF
+
   override fun <A, B> Kind<OptionTPartialOf<F>, A>.map(f: (A) -> B): OptionT<F, B> =
-    fix().map(f)
+    fix().map(FF(), f)
 }
 
-class OptionTMtlContextPartiallyApplied<F>(val MF: Monad<F>) {
+class OptionTMtlContextPartiallyApplied<F>(val MF: Monad<F>, val TF: TraverseFilter<F>) {
   infix fun <A> syntax(f: OptionTMtlContext<F>.() -> A): A =
-    f(OptionTMtlContext(MF))
+    f(OptionTMtlContext(MF, TF))
 }
 
-fun <F> OptionT(MF: Monad<F>): OptionTMtlContextPartiallyApplied<F> =
-  OptionTMtlContextPartiallyApplied(MF)
+fun <F> OptionT(MF: Monad<F>, TF: TraverseFilter<F>): OptionTMtlContextPartiallyApplied<F> =
+  OptionTMtlContextPartiallyApplied(MF, TF)

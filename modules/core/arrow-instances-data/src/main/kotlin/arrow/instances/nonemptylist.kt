@@ -143,7 +143,7 @@ fun <F, A> Reducible<F>.toNonEmptyList(fa: Kind<F, A>): NonEmptyList<A> =
     lnel.map { nonEmptyList -> NonEmptyList(a, listOf(nonEmptyList.head) + nonEmptyList.tail) }
   }).value()
 
-object NonEmptyListContext : NonEmptyListMonadInstance, NonEmptyListTraverseInstance, NonEmptyListSemigroupKInstance {
+object NonEmptyListContext : NonEmptyListBimonadInstance, NonEmptyListTraverseInstance, NonEmptyListSemigroupKInstance {
   override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
     fix().map(f)
 }

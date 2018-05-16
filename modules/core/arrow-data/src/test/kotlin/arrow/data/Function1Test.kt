@@ -4,6 +4,7 @@ import arrow.core.Function1
 import arrow.core.Function1Of
 import arrow.core.invoke
 import arrow.core.monad
+import arrow.instances.Function1
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadLaws
 import arrow.typeclasses.Eq
@@ -17,7 +18,8 @@ class Function1Test : UnitSpec() {
   }
 
   init {
-
-    testLaws(MonadLaws.laws(Function1.monad<Int>(), EQ))
+    Function1<Int>() syntax {
+      testLaws(MonadLaws.laws(this, EQ))
+    }
   }
 }

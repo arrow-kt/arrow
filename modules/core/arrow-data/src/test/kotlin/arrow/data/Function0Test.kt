@@ -2,6 +2,7 @@ package arrow.data
 
 import arrow.Kind
 import arrow.core.*
+import arrow.instances.syntax
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
 import arrow.test.laws.MonadLaws
@@ -16,9 +17,11 @@ class Function0Test : UnitSpec() {
   }
 
   init {
-    testLaws(
-      MonadLaws.laws(Function0.monad(), EQ),
-      ComonadLaws.laws(Function0.comonad(), { { it }.k() }, EQ)
-    )
+    Function0 syntax {
+      testLaws(
+        MonadLaws.laws(this, EQ),
+        ComonadLaws.laws(this, { { it }.k() }, EQ)
+      )
+    }
   }
 }

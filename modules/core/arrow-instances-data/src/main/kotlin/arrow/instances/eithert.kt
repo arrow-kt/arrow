@@ -151,7 +151,7 @@ fun <F, L> EitherT.Companion.semigroupK(MF: Monad<F>): SemigroupK<EitherTPartial
     override fun MF(): Monad<F> = MF
   }
 
-class EitherTContext<F, E>(val MF: Monad<F>) : EitherTMonadErrorInstance<F, E> {
+class EitherTContext<F, E>(val MF: Monad<F>) : EitherTMonadErrorInstance<F, E>, EitherTSemigroupKInstance<F, E> {
   override fun FF(): Functor<F> = MF
   override fun MF(): Monad<F> = MF
 }

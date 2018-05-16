@@ -21,7 +21,7 @@ class ConstMtlContext<A>(val MA: Monoid<A>) : ConstApplicativeInstance<A>, Const
   override fun MA(): Monoid<A> = MA
 
   override fun <T, U> Kind<ConstPartialOf<A>, T>.map(f: (T) -> U): Const<A, U> =
-    fix().map(f)
+    fix().retag()
 }
 
 class ConstMtlContextPartiallyApplied<L>(val MA: Monoid<L>) {

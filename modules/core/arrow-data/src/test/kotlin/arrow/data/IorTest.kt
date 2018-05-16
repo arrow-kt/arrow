@@ -5,6 +5,7 @@ import arrow.core.None
 import arrow.core.Some
 import arrow.data.Ior.Right
 import arrow.instances.IntSemigroupInstance
+import arrow.instances.Ior
 import arrow.instances.semigroup
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
@@ -27,12 +28,14 @@ class IorTest : UnitSpec() {
 
     val EQ = Ior.eq(Eq.any(), Eq.any())
 
-    testLaws(
-      EqLaws.laws(EQ, { Right(it) }),
-      ShowLaws.laws(Ior.show(), EQ) { Right(it) },
-      MonadLaws.laws(intIorMonad, Eq.any()),
-      TraverseLaws.laws(Ior.traverse(), Ior.applicative<Int>(Int.semigroup()), ::Right, Eq.any())
-    )
+    Ior(Int.semigroup()) syntax {
+      testLaws(
+        EqLaws.laws(EQ, { Right(it) }),
+        ShowLaws.laws(Ior.show(), EQ) { Right(it) },
+        MonadLaws.laws(this, Eq.any()),
+        TraverseLaws.laws(Ior.traverse(), this, ::Right, Eq.any())
+      )
+    }
 
     "bimap() should allow modify both value" {
       forAll { a: Int, b: String ->

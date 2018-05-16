@@ -1,6 +1,7 @@
 package arrow.data
 
 import arrow.core.*
+import arrow.instances.Kleisli
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadErrorLaws
 import arrow.typeclasses.Eq
@@ -16,7 +17,9 @@ class KleisliTest : UnitSpec() {
 
   init {
 
-    testLaws(MonadErrorLaws.laws(Kleisli.monadError<ForTry, Int, Throwable>(Try.monadError()), EQ(), EQ()))
+    Kleisli<ForTry, Int, Throwable>(Try.monadError()) syntax {
+      testLaws(MonadErrorLaws.laws(this, EQ(), EQ()))
+    }
 
     "andThen should continue sequence" {
       val kleisli: Kleisli<ForId, Int, Int> = Kleisli({ a: Int -> Id(a) })
