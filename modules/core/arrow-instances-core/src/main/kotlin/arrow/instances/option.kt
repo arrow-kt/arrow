@@ -75,6 +75,18 @@ interface OptionFunctorInstance : Functor<ForOption> {
 }
 
 @instance(Option::class)
+interface OptionInvariantInstance : Invariant<ForOption> {
+  override fun <A, B> Kind<ForOption, A>.imap(f: (A) -> B, fi: (B) -> A): Kind<ForOption, B> =
+    fix().imap(f, fi)
+}
+
+@instance(Option::class)
+interface OptionContravariantInstance : Contravariant<ForOption> {
+  override fun <A, B> Kind<ForOption, A>.contramap(f: (B) -> A): Kind<ForOption, B> =
+    fix().contramap(f)
+}
+
+@instance(Option::class)
 interface OptionApplicativeInstance : Applicative<ForOption> {
   override fun <A, B> Kind<ForOption, A>.ap(ff: Kind<ForOption, (A) -> B>): Option<B> =
     fix().ap(ff)

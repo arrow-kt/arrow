@@ -15,6 +15,18 @@ interface EitherFunctorInstance<L> : Functor<EitherPartialOf<L>> {
 }
 
 @instance(Either::class)
+interface EitherInvariantInstance<L> : Invariant<EitherPartialOf<L>> {
+  override fun <A, B> Kind<EitherPartialOf<L>, A>.imap(f: (A) -> B, fi: (B) -> A): Either<L, B> =
+    fix().imap(f, fi)
+}
+
+@instance(Either::class)
+interface EitherContravariantInstance<L> : Contravariant<EitherPartialOf<L>> {
+  override fun <A, B> Kind<EitherPartialOf<L>, A>.contramap(f: (B) -> A): Either<L, B> =
+    fix().contramap(f)
+}
+
+@instance(Either::class)
 interface EitherApplicativeInstance<L> : EitherFunctorInstance<L>, Applicative<EitherPartialOf<L>> {
 
   override fun <A> just(a: A): Either<L, A> = Right(a)

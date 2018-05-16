@@ -46,6 +46,18 @@ interface ListKFunctorInstance : Functor<ForListK> {
 }
 
 @instance(ListK::class)
+interface ListKInvariantInstance : Invariant<ForListK> {
+  override fun <A, B> Kind<ForListK, A>.imap(f: (A) -> B, fi: (B) -> A): Kind<ForListK, B> =
+    fix().imap(f, fi)
+}
+
+@instance(ListK::class)
+interface ListKContravariantInstance : Contravariant<ForListK> {
+  override fun <A, B> Kind<ForListK, A>.contramap(f: (B) -> A): Kind<ForListK, B> =
+    fix().contramap(f)
+}
+
+@instance(ListK::class)
 interface ListKApplicativeInstance : Applicative<ForListK> {
   override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
     fix().ap(ff)

@@ -3,14 +3,24 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.*
 import arrow.instance
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
+import arrow.typeclasses.*
 
 @instance(Function1::class)
 interface Function1FunctorInstance<I> : Functor<Function1PartialOf<I>> {
   override fun <A, B> Kind<Function1PartialOf<I>, A>.map(f: (A) -> B): Function1<I, B> =
     fix().map(f)
+}
+
+@instance(Function1::class)
+interface Function1InvariantInstance<I> : Invariant<Function1PartialOf<I>> {
+  override fun <A, B> Kind<Function1PartialOf<I>, A>.imap(f: (A) -> B, fi: (B) -> A): Function1<I, B> =
+    fix().imap(f, fi)
+}
+
+@instance(Function1::class)
+interface Function1ContravariantInstance<I> : Contravariant<Function1PartialOf<I>> {
+  override fun <A, B> Kind<Function1PartialOf<I>, A>.contramap(f: (B) -> A): Function1<I, B> =
+    fix().contramap(f)
 }
 
 @instance(Function1::class)

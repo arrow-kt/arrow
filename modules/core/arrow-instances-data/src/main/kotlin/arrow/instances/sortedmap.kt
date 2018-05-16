@@ -13,6 +13,18 @@ interface SortedMapKFunctorInstance<A : Comparable<A>> : Functor<SortedMapKParti
 }
 
 @instance(SortedMapK::class)
+interface SortedMapKInvariantInstance<A : Comparable<A>> : Invariant<SortedMapKPartialOf<A>> {
+  override fun <B, C> SortedMapKOf<A, B>.imap(f: (B) -> C, fi: (C) -> B): SortedMapK<A, C> =
+    fix().imap(f, fi)
+}
+
+@instance(SortedMapK::class)
+interface SortedMapKContravariantInstance<A : Comparable<A>> : Contravariant<SortedMapKPartialOf<A>> {
+  override fun <B, C> SortedMapKOf<A, B>.contramap(f: (C) -> B): SortedMapK<A, C> =
+    fix().contramap(f)
+}
+
+@instance(SortedMapK::class)
 interface SortedMapKFoldableInstance<A : Comparable<A>> : Foldable<SortedMapKPartialOf<A>> {
   override fun <B, C> Kind<SortedMapKPartialOf<A>, B>.foldLeft(b: C, f: (C, B) -> C): C =
     fix().foldLeft(b, f)

@@ -12,6 +12,18 @@ interface MapKFunctorInstance<K> : Functor<MapKPartialOf<K>> {
 }
 
 @instance(MapK::class)
+interface MapKInvariantInstance<K> : Invariant<MapKPartialOf<K>> {
+  override fun <A, B> Kind<MapKPartialOf<K>, A>.imap(f: (A) -> B, fi: (B) -> A): Kind<MapKPartialOf<K>, B> =
+    fix().imap(f, fi)
+}
+
+@instance(MapK::class)
+interface MapKContravariantInstance<K> : Contravariant<MapKPartialOf<K>> {
+  override fun <A, B> Kind<MapKPartialOf<K>, A>.contramap(f: (B) -> A): Kind<MapKPartialOf<K>, B> =
+    fix().contramap(f)
+}
+
+@instance(MapK::class)
 interface MapKFoldableInstance<K> : Foldable<MapKPartialOf<K>> {
 
   override fun <A, B> Kind<MapKPartialOf<K>, A>.foldLeft(b: B, f: (B, A) -> B): B = fix().foldLeft(b, f)

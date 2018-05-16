@@ -12,6 +12,18 @@ interface Function0FunctorInstance : Functor<ForFunction0> {
 }
 
 @instance(Function0::class)
+interface Function0InvariantInstance : Invariant<ForFunction0> {
+  override fun <A, B> Kind<ForFunction0, A>.imap(f: (A) -> B, fi: (B) -> A): Kind<ForFunction0, B> =
+    fix().imap(f, fi)
+}
+
+@instance(Function0::class)
+interface Function0ContravariantInstance : Contravariant<ForFunction0> {
+  override fun <A, B> Kind<ForFunction0, A>.contramap(f: (B) -> A): Kind<ForFunction0, B> =
+    fix().contramap(f)
+}
+
+@instance(Function0::class)
 interface Function0ApplicativeInstance : Applicative<ForFunction0> {
   override fun <A, B> Kind<ForFunction0, A>.ap(ff: Kind<ForFunction0, (A) -> B>): Function0<B> =
     fix().ap(ff)

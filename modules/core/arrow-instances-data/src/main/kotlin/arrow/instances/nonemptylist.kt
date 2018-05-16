@@ -37,6 +37,18 @@ interface NonEmptyListFunctorInstance : Functor<ForNonEmptyList> {
 }
 
 @instance(NonEmptyList::class)
+interface NonEmptyListInvariantInstance : Invariant<ForNonEmptyList> {
+  override fun <A, B> Kind<ForNonEmptyList, A>.imap(f: (A) -> B, fi: (B) -> A): Kind<ForNonEmptyList, B> =
+    fix().imap(f, fi)
+}
+
+@instance(NonEmptyList::class)
+interface NonEmptyListContravariantInstance : Contravariant<ForNonEmptyList> {
+  override fun <A, B> Kind<ForNonEmptyList, A>.contramap(f: (B) -> A): Kind<ForNonEmptyList, B> =
+    fix().contramap(f)
+}
+
+@instance(NonEmptyList::class)
 interface NonEmptyListApplicativeInstance : Applicative<ForNonEmptyList> {
   override fun <A, B> Kind<ForNonEmptyList, A>.ap(ff: Kind<ForNonEmptyList, (A) -> B>): NonEmptyList<B> =
     fix().ap(ff)

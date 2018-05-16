@@ -12,6 +12,18 @@ interface EvalFunctorInstance : Functor<ForEval> {
 }
 
 @instance(Eval::class)
+interface EvalInvariantInstance : Invariant<ForEval> {
+  override fun <A, B> Kind<ForEval, A>.imap(f: (A) -> B, fi: (B) -> A): Kind<ForEval, B> =
+    fix().imap(f, fi)
+}
+
+@instance(Eval::class)
+interface EvalContravariantInstance : Contravariant<ForEval> {
+  override fun <A, B> Kind<ForEval, A>.contramap(f: (B) -> A): Kind<ForEval, B> =
+    fix().contramap(f)
+}
+
+@instance(Eval::class)
 interface EvalApplicativeInstance : Applicative<ForEval> {
   override fun <A, B> Kind<ForEval, A>.ap(ff: Kind<ForEval, (A) -> B>): Eval<B> =
     fix().ap(ff)

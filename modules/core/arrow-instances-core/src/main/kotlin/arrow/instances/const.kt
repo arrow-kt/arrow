@@ -13,6 +13,18 @@ interface ConstFunctorInstance<A> : Functor<ConstPartialOf<A>> {
 }
 
 @instance(Const::class)
+interface ConstInvariantInstance<A> : Invariant<ConstPartialOf<A>> {
+  override fun <T, U> Kind<ConstPartialOf<A>, T>.imap(f: (T) -> U, fi: (U) -> T): Const<A, U> =
+    fix().imap(f, fi)
+}
+
+@instance(Const::class)
+interface ConstContravariantInstance<A> : Contravariant<ConstPartialOf<A>> {
+  override fun <T, U> Kind<ConstPartialOf<A>, T>.contramap(f: (U) -> T): Const<A, U> =
+    fix().contramap(f)
+}
+
+@instance(Const::class)
 interface ConstApplicativeInstance<A> : Applicative<ConstPartialOf<A>> {
 
   fun MA(): Monoid<A>

@@ -59,6 +59,18 @@ interface TryFunctorInstance : Functor<ForTry> {
 }
 
 @instance(Try::class)
+interface TryInvariantInstance : Invariant<ForTry> {
+  override fun <A, B> Kind<ForTry, A>.imap(f: (A) -> B, fi: (B) -> A): Kind<ForTry, B> =
+    fix().imap(f, fi)
+}
+
+@instance(Try::class)
+interface TryContravariantInstance : Contravariant<ForTry> {
+  override fun <A, B> Kind<ForTry, A>.contramap(f: (B) -> A): Kind<ForTry, B> =
+    fix().contramap(f)
+}
+
+@instance(Try::class)
 interface TryApplicativeInstance : Applicative<ForTry> {
   override fun <A, B> Kind<ForTry, A>.ap(ff: Kind<ForTry, (A) -> B>): Try<B> =
     fix().ap(ff)

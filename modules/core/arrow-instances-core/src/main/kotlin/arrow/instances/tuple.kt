@@ -18,6 +18,18 @@ interface Tuple2FunctorInstance<F> : Functor<Tuple2PartialOf<F>> {
 }
 
 @instance(Tuple2::class)
+interface Tuple2InvariantInstance<F> : Invariant<Tuple2PartialOf<F>> {
+  override fun <A, B> Kind<Tuple2PartialOf<F>, A>.imap(f: (A) -> B, fi: (B) -> A): Kind<Tuple2PartialOf<F>, B> =
+    fix().imap(f, fi)
+}
+
+@instance(Tuple2::class)
+interface Tuple2ContravariantInstance<F> : Contravariant<Tuple2PartialOf<F>> {
+  override fun <A, B> Kind<Tuple2PartialOf<F>, A>.contramap(f: (B) -> A): Kind<Tuple2PartialOf<F>, B> =
+    fix().contramap(f)
+}
+
+@instance(Tuple2::class)
 interface Tuple2ApplicativeInstance<F> : Tuple2FunctorInstance<F>, Applicative<Tuple2PartialOf<F>> {
   fun MF(): Monoid<F>
 

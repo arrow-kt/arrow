@@ -13,6 +13,18 @@ interface IorFunctorInstance<L> : Functor<IorPartialOf<L>> {
 }
 
 @instance(Ior::class)
+interface IorInvariantInstance<L> : Invariant<IorPartialOf<L>> {
+  override fun <A, B> Kind<IorPartialOf<L>, A>.imap(f: (A) -> B, fi: (B) -> A): Kind<IorPartialOf<L>, B> =
+    fix().imap(f, fi)
+}
+
+@instance(Ior::class)
+interface IorContravariantInstance<L> : Contravariant<IorPartialOf<L>> {
+  override fun <A, B> Kind<IorPartialOf<L>, A>.contramap(f: (B) -> A): Kind<IorPartialOf<L>, B> =
+    fix().contramap(f)
+}
+
+@instance(Ior::class)
 interface IorApplicativeInstance<L> : IorFunctorInstance<L>, Applicative<IorPartialOf<L>> {
 
   fun SL(): Semigroup<L>

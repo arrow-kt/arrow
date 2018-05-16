@@ -13,6 +13,18 @@ interface ValidatedFunctorInstance<E> : Functor<ValidatedPartialOf<E>> {
 }
 
 @instance(Validated::class)
+interface ValidatedInvariantInstance<E> : Invariant<ValidatedPartialOf<E>> {
+  override fun <A, B> Kind<ValidatedPartialOf<E>, A>.imap(f: (A) -> B, fi: (B) -> A): Kind<ValidatedPartialOf<E>, B> =
+    fix().imap(f, fi)
+}
+
+@instance(Validated::class)
+interface ValidatedContravariantInstance<E> : Contravariant<ValidatedPartialOf<E>> {
+  override fun <A, B> Kind<ValidatedPartialOf<E>, A>.contramap(f: (B) -> A): Kind<ValidatedPartialOf<E>, B> =
+    fix().contramap(f)
+}
+
+@instance(Validated::class)
 interface ValidatedApplicativeInstance<E> : ValidatedFunctorInstance<E>, Applicative<ValidatedPartialOf<E>> {
 
   fun SE(): Semigroup<E>

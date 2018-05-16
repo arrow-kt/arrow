@@ -28,6 +28,18 @@ interface IdFunctorInstance : Functor<ForId> {
 }
 
 @instance(Id::class)
+interface IdInvariantInstance : Invariant<ForId> {
+  override fun <A, B> Kind<ForId, A>.imap(f: (A) -> B, fi: (B) -> A): Kind<ForId, B> =
+    fix().imap(f, fi)
+}
+
+@instance(Id::class)
+interface IdContravariantInstance : Contravariant<ForId> {
+  override fun <A, B> Kind<ForId, A>.contramap(f: (B) -> A): Kind<ForId, B> =
+    fix().contramap(f)
+}
+
+@instance(Id::class)
 interface IdApplicativeInstance : Applicative<ForId> {
   override fun <A, B> Kind<ForId, A>.ap(ff: Kind<ForId, (A) -> B>): Id<B> =
     fix().ap(ff)

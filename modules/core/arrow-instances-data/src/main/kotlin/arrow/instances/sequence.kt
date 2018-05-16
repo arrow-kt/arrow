@@ -46,6 +46,18 @@ interface SequenceKFunctorInstance : Functor<ForSequenceK> {
 }
 
 @instance(SequenceK::class)
+interface SequenceKInvariantInstance : Invariant<ForSequenceK> {
+  override fun <A, B> Kind<ForSequenceK, A>.imap(f: (A) -> B, fi: (B) -> A): Kind<ForSequenceK, B> =
+    fix().imap(f, fi)
+}
+
+@instance(SequenceK::class)
+interface SequenceKContravariantInstance : Contravariant<ForSequenceK> {
+  override fun <A, B> Kind<ForSequenceK, A>.contramap(f: (B) -> A): Kind<ForSequenceK, B> =
+    fix().contramap(f)
+}
+
+@instance(SequenceK::class)
 interface SequenceKApplicativeInstance : Applicative<ForSequenceK> {
   override fun <A, B> Kind<ForSequenceK, A>.ap(ff: Kind<ForSequenceK, (A) -> B>): SequenceK<B> =
     fix().ap(ff)
