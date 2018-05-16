@@ -88,7 +88,10 @@ Either.monadError<Throwable>()
 ListK.traverse()
 ```
 
-# Syntax
+If you're defining your own instances and would like for them to be discoverable in their corresponding datatypes' companion object, you can generate it by annotating them as `@instance`, and Arrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create the extension functions for you.
+
+
+### Syntax
 
 Arrow provides a `syntax` DSL making available in the direct scope all type classes declared functions and extensions in a given data type through the `infix` `syntax` function.
 
@@ -174,8 +177,6 @@ class EitherContextPartiallyApplied<L> {
 fun <L> Either(): EitherContextPartiallyApplied<L> =
   EitherContextPartiallyApplied()
 ```
-
-If you're defining your own instances and would like for them to be discoverable in their corresponding datatypes' companion object, you can generate it by annotating them as `@instance`, and Arrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create the extension functions for you.
 
 ### Type constructors
 
