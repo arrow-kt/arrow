@@ -7,6 +7,8 @@ interface Invariant<F> {
   fun <A, B> Kind<F, A>.imap(f: (A) -> B, fi: (B) -> A): Kind<F, B>
 
   // TODO("What are those!")
+  // 6 codegen creates the extension functions for the companion for you, so just add the instances and annotate them with @instance
+
 /*  object Invariant {
     implicit val catsInvariantMonoid: Invariant[Monoid] = new Invariant[Monoid] {
 
