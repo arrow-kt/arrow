@@ -2,6 +2,7 @@
 layout: docs
 title: EitherT
 permalink: /docs/datatypes/eithert/
+video: 1h4X8CrMjVs
 ---
 
 
