@@ -15,6 +15,12 @@ class FlowableKInstances {
   fun flowableKFunctor(): Functor<ForFlowableK> = FlowableK.functor()
 
   @Provides
+  fun flowableKInvariant(): Invariant<ForFlowableK> = FlowableK.invariant()
+
+  @Provides
+  fun flowableKContravariant(): Contravariant<ForFlowableK> = FlowableK.contravariant()
+
+  @Provides
   fun flowableKApplicative(): Applicative<ForFlowableK> = FlowableK.applicative()
 
   @Provides

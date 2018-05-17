@@ -15,6 +15,12 @@ class DeferredKInstances {
   fun deferredKFunctor(): Functor<ForDeferredK> = DeferredK.functor()
 
   @Provides
+  fun deferredKInvariant(): Invariant<ForDeferredK> = DeferredK.invariant()
+
+  @Provides
+  fun deferredKContravariant(): Contravariant<ForDeferredK> = DeferredK.contravariant()
+
+  @Provides
   fun deferredKApplicative(): Applicative<ForDeferredK> = DeferredK.applicative()
 
   @Provides

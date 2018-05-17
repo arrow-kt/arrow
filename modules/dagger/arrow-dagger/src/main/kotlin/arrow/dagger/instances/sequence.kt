@@ -12,6 +12,12 @@ class SequenceKInstances {
   fun sequenceKFunctor(): Functor<ForSequenceK> = SequenceK.functor()
 
   @Provides
+  fun sequenceKInvariant(): Invariant<ForSequenceK> = SequenceK.invariant()
+
+  @Provides
+  fun sequenceKContravariant(): Contravariant<ForSequenceK> = SequenceK.contravariant()
+
+  @Provides
   fun sequenceKApplicative(): Applicative<ForSequenceK> = SequenceK.applicative()
 
   @Provides

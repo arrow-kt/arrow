@@ -66,6 +66,8 @@ interface Runtime {
   fun coproductFoldable(): Foldable<CoproductPartialOf<F, G>>
   fun coproductTraverse(): Traverse<CoproductPartialOf<F, G>>
   fun eitherFunctor(): Functor<EitherPartialOf<L>>
+  fun eitherInvariant(): Invariant<EitherPartialOf<L>>
+  fun eitherContravariant(): Contravariant<EitherPartialOf<L>>
   fun eitherApplicative(): Applicative<EitherPartialOf<L>>
   fun eitherMonad(): Monad<EitherPartialOf<L>>
   fun eitherFoldable(): Foldable<EitherPartialOf<L>>
@@ -80,19 +82,27 @@ interface Runtime {
   fun eitherTTraverse(): Traverse<EitherTPartialOf<F, L>>
   fun eitherTSemigroupK(): SemigroupK<EitherTPartialOf<F, L>>
   fun evalFunctor(): Functor<ForEval>
+  fun evalInvariant(): Invariant<ForEval>
+  fun evalContravariant(): Contravariant<ForEval>
   fun evalApplicative(): Applicative<ForEval>
   fun evalMonad(): Monad<ForEval>
   fun evalComonad(): Comonad<ForEval>
   fun evalBimonad(): Bimonad<ForEval>
   fun function0Functor(): Functor<ForFunction0>
+  fun function0Invariant(): Invariant<ForFunction0>
+  fun function0Contravariant(): Contravariant<ForFunction0>
   fun function0Applicative(): Applicative<ForFunction0>
   fun function0Monad(): Monad<ForFunction0>
   fun function0Comonad(): Comonad<ForFunction0>
   fun function0Bimonad(): Bimonad<ForFunction0>
   fun function1Functor(): Functor<Function1PartialOf<F>>
+  fun function1Invariant(): Invariant<Function1PartialOf<F>>
+  fun function1Contravariant(): Contravariant<Function1PartialOf<F>>
   fun function1Applicative(): Applicative<Function1PartialOf<F>>
   fun function1Monad(): Monad<Function1PartialOf<F>>
   fun idFunctor(): Functor<ForId>
+  fun idInvariant(): Invariant<ForId>
+  fun idContravariant(): Contravariant<ForId>
   fun idApplicative(): Applicative<ForId>
   fun idMonad(): Monad<ForId>
   fun idComonad(): Comonad<ForId>
@@ -103,6 +113,8 @@ interface Runtime {
   fun kleisliApplicativeError(): ApplicativeError<KleisliPartialOf<F, D>, D>
   fun kleisliMonadError(): MonadError<KleisliPartialOf<F, D>, D>
   fun listKFunctor(): Functor<ForListK>
+  fun listKInvariant(): Invariant<ForListK>
+  fun listKContravariant(): Contravariant<ForListK>
   fun listKApplicative(): Applicative<ForListK>
   fun listKMonad(): Monad<ForListK>
   fun listKFoldable(): Foldable<ForListK>
@@ -113,6 +125,8 @@ interface Runtime {
   fun mapKFoldable(): Foldable<MapKPartialOf<K>>
   fun mapKTraverse(): Traverse<MapKPartialOf<K>>
   fun nonEmptyListFunctor(): Functor<ForNonEmptyList>
+  fun nonEmptyListInvariant(): Invariant<ForNonEmptyList>
+  fun nonEmptyListContravariant(): Contravariant<ForNonEmptyList>
   fun nonEmptyListApplicative(): Applicative<ForNonEmptyList>
   fun nonEmptyListMonad(): Monad<ForNonEmptyList>
   fun nonEmptyListFoldable(): Foldable<ForNonEmptyList>
@@ -145,6 +159,8 @@ interface Runtime {
   fun floatOrder(): Order<Float>
   fun floatEq(): Eq<@JvmSuppressWildcards Float>
   fun optionFunctor(): Functor<ForOption>
+  fun optionInvariant(): Invariant<ForOption>
+  fun optionContravariant(): Contravariant<ForOption>
   fun optionApplicative(): Applicative<ForOption>
   fun optionMonad(): Monad<ForOption>
   fun optionMonadError(): MonadError<ForOption, Unit>
@@ -158,6 +174,8 @@ interface Runtime {
   fun optionTSemigroupK(): SemigroupK<OptionTPartialOf<F>>
   fun optionTMonoidK(): MonoidK<OptionTPartialOf<F>>
   fun sequenceKFunctor(): Functor<ForSequenceK>
+  fun sequenceKInvariant(): Invariant<ForSequenceK>
+  fun sequenceKContravariant(): Contravariant<ForSequenceK>
   fun sequenceKApplicative(): Applicative<ForSequenceK>
   fun sequenceKMonad(): Monad<ForSequenceK>
   fun sequenceKFoldable(): Foldable<ForSequenceK>
@@ -179,6 +197,8 @@ interface Runtime {
   fun stringMonoid(): Monoid<String>
   fun stringEq(): Eq<@JvmSuppressWildcards String>
   fun tryFunctor(): Functor<ForTry>
+  fun tryInvariant(): Invariant<ForTry>
+  fun tryContravariant(): Contravariant<ForTry>
   fun tryApplicative(): Applicative<ForTry>
   fun tryMonad(): Monad<ForTry>
   fun tryMonadError(): MonadError<ForTry, Throwable>

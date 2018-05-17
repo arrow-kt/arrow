@@ -17,6 +17,18 @@ interface DeferredKFunctorInstance : Functor<ForDeferredK> {
 }
 
 @instance(DeferredK::class)
+interface DeferredKInvariantInstance : Invariant<ForDeferredK> {
+  override fun <A, B> Kind<ForDeferredK, A>.imap(f: (A) -> B, fi: (B) -> A): DeferredK<B> =
+    fix().imap(f, fi)
+}
+
+@instance(DeferredK::class)
+interface DeferredKContravariantInstance : Contravariant<ForDeferredK> {
+  override fun <A, B> Kind<ForDeferredK, A>.contramap(f: (B) -> A): DeferredK<B> =
+    fix().contramap(f)
+}
+
+@instance(DeferredK::class)
 interface DeferredKApplicativeInstance : Applicative<ForDeferredK> {
   override fun <A, B> Kind<ForDeferredK, A>.map(f: (A) -> B): DeferredK<B> =
     fix().map(f)

@@ -12,13 +12,6 @@ import io.kotlintest.properties.forAll
 
 object ContravariantLaws {
 
-/*  TODO("Remove?")
-inline fun <F> laws(AP: Applicative<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
-    listOf(
-      Law("Contravariant Laws: Contravariant Identity", { AP.contravariantIdentity(AP::just, EQ) }),
-      Law("Contravariant Laws: Contravariant Composition", { AP.contravariantComposition(AP::just, EQ) })
-    )*/
-
   fun <F> laws(FC: Contravariant<F>, f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
     listOf(
       Law("Contravariant Laws: Contravariant Identity", { FC.contravariantIdentity(f, EQ) }),

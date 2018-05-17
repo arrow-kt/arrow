@@ -12,6 +12,12 @@ class ListKInstances {
   fun listKFunctor(): Functor<ForListK> = ListK.functor()
 
   @Provides
+  fun listKInvariant(): Invariant<ForListK> = ListK.invariant()
+
+  @Provides
+  fun listKContravariant(): Contravariant<ForListK> = ListK.contravariant()
+
+  @Provides
   fun listKApplicative(): Applicative<ForListK> = ListK.applicative()
 
   @Provides

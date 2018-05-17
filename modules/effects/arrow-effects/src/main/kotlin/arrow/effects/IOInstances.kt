@@ -18,6 +18,18 @@ interface IOFunctorInstance : Functor<ForIO> {
 }
 
 @instance(IO::class)
+interface IOInvariantInstance : Invariant<ForIO> {
+  override fun <A, B> Kind<ForIO, A>.imap(f: (A) -> B, fi: (B) -> A): IO<B> =
+    fix().imap(f, fi)
+}
+
+@instance(IO::class)
+interface IOContravariantInstance : Contravariant<ForIO> {
+  override fun <A, B> Kind<ForIO, A>.contramap(f: (B) -> A): IO<B> =
+    fix().contramap(f)
+}
+
+@instance(IO::class)
 interface IOApplicativeInstance : Applicative<ForIO> {
   override fun <A, B> Kind<ForIO, A>.map(f: (A) -> B): IO<B> =
     fix().map(f)

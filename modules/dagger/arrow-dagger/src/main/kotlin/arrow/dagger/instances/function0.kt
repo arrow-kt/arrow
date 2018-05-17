@@ -12,6 +12,12 @@ class Function0Instances {
   fun function0Functor(): Functor<ForFunction0> = Function0.functor()
 
   @Provides
+  fun function0Invariant(): Invariant<ForFunction0> = Function0.invariant()
+
+  @Provides
+  fun function0Contravariant(): Contravariant<ForFunction0> = Function0.contravariant()
+
+  @Provides
   fun function0Applicative(): Applicative<ForFunction0> = Function0.applicative()
 
   @Provides

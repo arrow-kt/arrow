@@ -12,6 +12,12 @@ class TryInstances {
   fun tryFunctor(): Functor<ForTry> = Try.functor()
 
   @Provides
+  fun tryInvariant(): Invariant<ForTry> = Try.invariant()
+
+  @Provides
+  fun tryContravariant(): Contravariant<ForTry> = Try.contravariant()
+
+  @Provides
   fun tryApplicative(): Applicative<ForTry> = Try.applicative()
 
   @Provides

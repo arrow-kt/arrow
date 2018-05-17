@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Invariant
-permalink: /docs/typeclasses/Invariant/
+permalink: /docs/typeclasses/invariant/
 ---
 
 ## Invariant

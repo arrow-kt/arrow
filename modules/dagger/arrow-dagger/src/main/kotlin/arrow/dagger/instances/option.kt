@@ -12,6 +12,12 @@ class OptionInstances {
   fun optionFunctor(): Functor<ForOption> = Option.functor()
 
   @Provides
+  fun optionInvariant(): Invariant<ForOption> = Option.invariant()
+
+  @Provides
+  fun optionContravariant(): Contravariant<ForOption> = Option.contravariant()
+
+  @Provides
   fun optionApplicative(): Applicative<ForOption> = Option.applicative()
 
   @Provides

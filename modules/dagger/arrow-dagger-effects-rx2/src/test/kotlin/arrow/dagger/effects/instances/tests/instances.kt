@@ -21,6 +21,8 @@ import javax.inject.Singleton
 ])
 interface Runtime {
   fun observableKWFunctor(): Functor<ForObservableK>
+  fun observableKWInvariant(): Invariant<ForObservableK>
+  fun observableKWContravariant(): Contravariant<ForObservableK>
   fun observableKWApplicative(): Applicative<ForObservableK>
   fun observableKWApplicativeError(): ApplicativeError<ForObservableK, Throwable>
   fun observableKWMonad(): Monad<ForObservableK>
@@ -29,6 +31,8 @@ interface Runtime {
   fun observableKWAsync(): Async<ForObservableK>
   fun observableKWEffect(): Effect<ForObservableK>
   fun flowableKWFunctor(): Functor<ForFlowableK>
+  fun flowableKWInvariant(): Invariant<ForFlowableK>
+  fun flowableKWContravariant(): Contravariant<ForFlowableK>
   fun flowableKWApplicative(): Applicative<ForFlowableK>
   fun flowableKWApplicativeError(): ApplicativeError<ForFlowableK, Throwable>
   fun flowableKWMonad(): Monad<ForFlowableK>

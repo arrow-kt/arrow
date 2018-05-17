@@ -16,6 +16,12 @@ class IOInstances {
   fun ioFunctor(): Functor<ForIO> = IO.functor()
 
   @Provides
+  fun ioInvariant(): Invariant<ForIO> = IO.invariant()
+
+  @Provides
+  fun ioContravariant(): Contravariant<ForIO> = IO.contravariant()
+
+  @Provides
   fun ioApplicative(): Applicative<ForIO> = IO.applicative()
 
   @Provides

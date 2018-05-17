@@ -1,8 +1,8 @@
 package arrow.dagger.instances.tests
 
 import arrow.dagger.effects.instances.coroutines.ArrowEffectsCoroutinesInstances
-import arrow.effects.typeclasses.Async
 import arrow.effects.ForDeferredK
+import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.MonadDefer
 import arrow.typeclasses.*
@@ -20,6 +20,8 @@ import javax.inject.Singleton
 ])
 interface Runtime {
   fun deferredKWFunctor(): Functor<ForDeferredK>
+  fun deferredKWInvariant(): Invariant<ForDeferredK>
+  fun deferredKWContravariant(): Contravariant<ForDeferredK>
   fun deferredKWApplicative(): Applicative<ForDeferredK>
   fun deferredKWApplicativeError(): ApplicativeError<ForDeferredK, Throwable>
   fun deferredKWMonad(): Monad<ForDeferredK>

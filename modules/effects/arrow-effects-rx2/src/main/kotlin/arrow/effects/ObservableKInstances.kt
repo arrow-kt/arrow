@@ -17,6 +17,18 @@ interface ObservableKFunctorInstance : Functor<ForObservableK> {
 }
 
 @instance(ObservableK::class)
+interface ObservableKInvariantInstance : Invariant<ForObservableK> {
+  override fun <A, B> Kind<ForObservableK, A>.imap(f: (A) -> B, fi: (B) -> A): ObservableK<B> =
+    fix().imap(f, fi)
+}
+
+@instance(ObservableK::class)
+interface ObservableKContravariantInstance : Contravariant<ForObservableK> {
+  override fun <A, B> Kind<ForObservableK, A>.contramap(f: (B) -> A): ObservableK<B> =
+    fix().contramap(f)
+}
+
+@instance(ObservableK::class)
 interface ObservableKApplicativeInstance : Applicative<ForObservableK> {
   override fun <A, B> ObservableKOf<A>.ap(ff: ObservableKOf<(A) -> B>): ObservableK<B> =
     fix().ap(ff)

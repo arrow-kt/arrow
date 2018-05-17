@@ -15,6 +15,12 @@ class ObservableKInstances {
   fun observableKFunctor(): Functor<ForObservableK> = ObservableK.functor()
 
   @Provides
+  fun observableKInvariant(): Invariant<ForObservableK> = ObservableK.invariant()
+
+  @Provides
+  fun observableKContravariant(): Contravariant<ForObservableK> = ObservableK.contravariant()
+
+  @Provides
   fun observableKApplicative(): Applicative<ForObservableK> = ObservableK.applicative()
 
   @Provides

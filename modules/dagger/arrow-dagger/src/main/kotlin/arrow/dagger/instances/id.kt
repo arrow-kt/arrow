@@ -12,6 +12,12 @@ class IdInstances {
   fun idFunctor(): Functor<ForId> = Id.functor()
 
   @Provides
+  fun idInvariant(): Invariant<ForId> = Id.invariant()
+
+  @Provides
+  fun idContravariant(): Contravariant<ForId> = Id.contravariant()
+
+  @Provides
   fun idApplicative(): Applicative<ForId> = Id.applicative()
 
   @Provides

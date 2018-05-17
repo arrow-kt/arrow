@@ -12,6 +12,12 @@ class NonEmptyListInstances {
   fun nonEmptyListFunctor(): Functor<ForNonEmptyList> = NonEmptyList.functor()
 
   @Provides
+  fun nonEmptyListInvariant(): Invariant<ForNonEmptyList> = NonEmptyList.invariant()
+
+  @Provides
+  fun nonEmptyListContravariant(): Contravariant<ForNonEmptyList> = NonEmptyList.contravariant()
+
+  @Provides
   fun nonEmptyListApplicative(): Applicative<ForNonEmptyList> = NonEmptyList.applicative()
 
   @Provides

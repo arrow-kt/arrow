@@ -18,6 +18,18 @@ interface FlowableKFunctorInstance : Functor<ForFlowableK> {
 }
 
 @instance(FlowableK::class)
+interface FlowableKInvariantInstance : Invariant<ForFlowableK> {
+  override fun <A, B> Kind<ForFlowableK, A>.imap(f: (A) -> B, fi: (B) -> A): FlowableK<B> =
+    fix().imap(f, fi)
+}
+
+@instance(FlowableK::class)
+interface FlowableKContravariantInstance : Contravariant<ForFlowableK> {
+  override fun <A, B> Kind<ForFlowableK, A>.contramap(f: (B) -> A): FlowableK<B> =
+    fix().contramap(f)
+}
+
+@instance(FlowableK::class)
 interface FlowableKApplicativeInstance : Applicative<ForFlowableK> {
   override fun <A, B> FlowableKOf<A>.ap(ff: FlowableKOf<(A) -> B>): FlowableK<B> =
     fix().ap(ff)

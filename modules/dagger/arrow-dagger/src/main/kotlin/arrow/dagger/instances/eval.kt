@@ -12,6 +12,12 @@ class EvalInstances {
   fun evalFunctor(): Functor<ForEval> = Eval.functor()
 
   @Provides
+  fun evalInvariant(): Invariant<ForEval> = Eval.invariant()
+
+  @Provides
+  fun evalContravariant(): Contravariant<ForEval> = Eval.contravariant()
+
+  @Provides
   fun evalApplicative(): Applicative<ForEval> = Eval.applicative()
 
   @Provides

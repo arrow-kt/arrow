@@ -14,6 +14,12 @@ abstract class EitherInstances<L> {
   fun eitherFunctor(ev: DaggerEitherFunctorInstance<L>): Functor<EitherPartialOf<L>> = ev
 
   @Provides
+  fun eitherInvariant(ev: DaggerEitherInvariantInstance<L>): Invariant<EitherPartialOf<L>> = ev
+
+  @Provides
+  fun eitherContravariant(ev: DaggerEitherContravariantInstance<L>): Contravariant<EitherPartialOf<L>> = ev
+
+  @Provides
   fun eitherApplicative(ev: DaggerEitherApplicativeInstance<L>): Applicative<EitherPartialOf<L>> = ev
 
   @Provides
@@ -31,6 +37,8 @@ abstract class EitherInstances<L> {
 }
 
 class DaggerEitherFunctorInstance<F> @Inject constructor() : EitherFunctorInstance<F>
+class DaggerEitherInvariantInstance<F> @Inject constructor() : EitherInvariantInstance<F>
+class DaggerEitherContravariantInstance<F> @Inject constructor() : EitherContravariantInstance<F>
 class DaggerEitherApplicativeInstance<F> @Inject constructor() : EitherApplicativeInstance<F>
 class DaggerEitherMonadInstance<F> @Inject constructor() : EitherMonadInstance<F>
 class DaggerEitherFoldableInstance<F> @Inject constructor() : EitherFoldableInstance<F>
