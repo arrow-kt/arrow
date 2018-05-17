@@ -232,7 +232,7 @@ data class NotAnEmail(val reasons: Nel<ValidationError>) : ValidationError("Not 
 data class FormField(val label: String, val value: String)
 data class Email(val value: String)
 
-abstract class Rules<F>(A: ApplicativeError<F, Nel<ValidationError>>) : ApplicativeError<F, Nel<ValidationError>> by A {
+sealed class Rules<F>(A: ApplicativeError<F, Nel<ValidationError>>) : ApplicativeError<F, Nel<ValidationError>> by A {
 
   private fun FormField.contains(needle: String): Kind<F, FormField> =
     if (value.contains(needle, false)) just(this)
@@ -247,6 +247,17 @@ abstract class Rules<F>(A: ApplicativeError<F, Nel<ValidationError>>) : Applicat
       Email(value)
     }).handleErrorWith { raiseError(NotAnEmail(it).nel()) }
 
+  object ErrorAccumulationStrategy :
+    Rules<ValidatedPartialOf<Nel<ValidationError>>>(Validated.applicativeError(NonEmptyList.semigroup()))
+  
+  object FailFastStrategy :
+    Rules<EitherPartialOf<Nel<ValidationError>>>(Either.applicativeError())
+  
+  companion object {
+    infix fun <A> failFast(f: FailFastStrategy.() -> A): A = f(FailFastStrategy)
+    infix fun <A> accumulateErrors(f: ErrorAccumulationStrategy.() -> A): A = f(ErrorAccumulationStrategy)
+  }
+
 }
 ```
 
@@ -254,20 +265,10 @@ abstract class Rules<F>(A: ApplicativeError<F, Nel<ValidationError>>) : Applicat
 
 Once we have such abstract algebra defined we can simply materialize it to data types that support different error strategies:
 
-```kotlin:ank:silent
-object ErrorAccumulationStrategy :
-  Rules<ValidatedPartialOf<Nel<ValidationError>>>(
-    Validated.applicativeError(NonEmptyList.semigroup()))
-
-object FailFastStrategy :
-  Rules<EitherPartialOf<Nel<ValidationError>>>(
-    Either.applicativeError())
-```
-
 *Error accumulation*
 
 ```kotlin:ank
-with(ErrorAccumulationStrategy) {
+Rules accumulateErrors {
   listOf(
     FormField("Invalid Email Domain Label", "nowhere.com"),
     FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this accumulates N errors
@@ -278,7 +279,7 @@ with(ErrorAccumulationStrategy) {
 *Fail Fast*
 
 ```kotlin:ank
-with(FailFastStrategy) {
+Rules failFast {
   listOf(
     FormField("Invalid Email Domain Label", "nowhere.com"),
     FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this fails fast 
