@@ -21,8 +21,9 @@ package com.example.domain
 The DSL will be generated in the same package as your `data class` and can be used on the `Companion` of your class.
 
 ```kotlin:ank
-import com.example.domain.*
 import arrow.optics.dsl.*
+import com.example.domain.*
+import arrow.optics.Optional
 
 val john = Employee("John Doe", Company("Kategory", Address("Functional city", Street(42, "lambda street"))))
 
