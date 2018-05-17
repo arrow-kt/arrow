@@ -214,7 +214,7 @@ val houseNumber = config.parse(Read.intRead, "house_number").withEither { either
 houseNumber
 ```
 
-## Abstracting aways validation strategies with `ApplicativeError`
+## Alternative validation strategies to Validated: using `ApplicativeError`
 
 We may use `ApplicativeError` instead of `Validated` to abstract away validation strategies and raising errors in the context we are computing in.
 
