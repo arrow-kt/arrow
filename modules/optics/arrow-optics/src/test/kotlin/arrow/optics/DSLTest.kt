@@ -1,8 +1,8 @@
 package arrow.optics
 
 import arrow.data.*
-import arrow.optics.syntax.*
 import arrow.optics.instances.*
+import arrow.optics.dsl.*
 import arrow.test.UnitSpec
 import io.kotlintest.matchers.shouldBe
 
@@ -64,14 +64,14 @@ class BoundedTest : UnitSpec() {
           Street.name).modify(employee, String::toUpperCase)
     }
 
-    "Working with At in BoundSetter should be same as in DSL" {
-      Db.content.at(MapK.at(), One).some.modify(db, String::toUpperCase) shouldBe
+    "Working with At in Optics should be same as in DSL" {
+      Db.content.at(MapK.at(), One).compose(somePrism()).modify(db, String::toUpperCase) shouldBe
         (Db.content compose
           MapK.at<Keys, String>().at(One) compose
           somePrism()).modify(db, String::toUpperCase)
     }
 
-    "Working with Each in BoundSetter should be same as in DSL" {
+    "Working with Each in Optics should be same as in DSL" {
       Db.content.every(MapK.each()).modify(db, String::toUpperCase) shouldBe
         (Db.content compose
           MapK.traversal()).modify(db, String::toUpperCase)
