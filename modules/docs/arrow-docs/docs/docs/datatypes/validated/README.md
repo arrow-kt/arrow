@@ -232,7 +232,7 @@ data class NotAnEmail(val reasons: Nel<ValidationError>) : ValidationError("Not 
 data class FormField(val label: String, val value: String)
 data class Email(val value: String)
 
-abstract class Rules<F>(val A: ApplicativeError<F, Nel<ValidationError>>) : ApplicativeError<F, Nel<ValidationError>> by A {
+abstract class Rules<F>(A: ApplicativeError<F, Nel<ValidationError>>) : ApplicativeError<F, Nel<ValidationError>> by A {
 
   private fun FormField.contains(needle: String): Kind<F, FormField> =
     if (value.contains(needle, false)) just(this)
