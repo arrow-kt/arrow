@@ -214,6 +214,79 @@ val houseNumber = config.parse(Read.intRead, "house_number").withEither { either
 houseNumber
 ```
 
+## Abstracting aways validation strategies with `ApplicativeError`
+
+We may use `ApplicativeError` instead of `Validated` to abstract away validation strategies and raising errors in the context we are computing in.
+
+```kotlin:ank:silent
+import arrow.*
+import arrow.core.*
+import arrow.typeclasses.*
+import arrow.data.*
+
+sealed class ValidationError(val msg: String)
+data class DoesNotContain(val value: String) : ValidationError("Did not contain $value")
+data class MaxLength(val value: Int) : ValidationError("Exceeded length of $value")
+data class NotAnEmail(val reasons: Nel<ValidationError>) : ValidationError("Not a valid email")
+
+data class FormField(val label: String, val value: String)
+data class Email(val value: String)
+
+abstract class Rules<F>(val A: ApplicativeError<F, Nel<ValidationError>>) : ApplicativeError<F, Nel<ValidationError>> by A {
+
+  private fun FormField.contains(needle: String): Kind<F, FormField> =
+    if (value.contains(needle, false)) just(this)
+    else raiseError(DoesNotContain(needle).nel())
+
+  private fun FormField.maxLength(maxLength: Int): Kind<F, FormField> =
+    if (value.length <= maxLength) just(this)
+    else raiseError(MaxLength(maxLength).nel())
+
+  fun FormField.validateEmail(): Kind<F, Email> =
+    map(contains("@"), maxLength(250), {
+      Email(value)
+    }).handleErrorWith { raiseError(NotAnEmail(it).nel()) }
+
+}
+```
+
+`Rules` defines abstract behaviors that can be composed and have access to the scoipe of `ApplicativeError` where we can invoke `just` to lift values in to the positive result and `raiseError` into the error context.
+
+Once we have such abstract algebra defined we can simply materialize it to data types that support different error strategies:
+
+```kotlin:ank:silent
+object ErrorAccumulationStrategy :
+  Rules<ValidatedPartialOf<Nel<ValidationError>>>(
+    Validated.applicativeError(NonEmptyList.semigroup()))
+
+object FailFastStrategy :
+  Rules<EitherPartialOf<Nel<ValidationError>>>(
+    Either.applicativeError())
+```
+
+*Error accumulation*
+
+```kotlin:ank
+with(ErrorAccumulationStrategy) {
+  listOf(
+    FormField("Invalid Email Domain Label", "nowhere.com"),
+    FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this accumulates N errors
+    FormField("Valid Email Label", "getlost@nowhere.com")
+  .map { it.validateEmail() }
+}
+```
+*Fail Fast*
+
+```kotlin:ank
+with(FailFastStrategy) {
+  listOf(
+    FormField("Invalid Email Domain Label", "nowhere.com"),
+    FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this fails fast 
+    FormField("Valid Email Label", "getlost@nowhere.com")
+  .map { it.validateEmail() }
+}
+```
+
 ## Available Instances
 
 * [Show]({{ '/docs/typeclasses/show' | relative_url }})
