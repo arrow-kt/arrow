@@ -150,16 +150,11 @@ fun <F, G> MonoidK<F>.compose(): MonoidK<Nested<F, G>> = object : ComposedMonoid
   override fun F(): MonoidK<F> = this@compose
 }
 
-// -----------------------------------------------------------------------
-
-//TODO("Remove scala comment - Completed")
 interface ComposedFunctor<F, G> : Functor<Nested<F, G>> {
   fun F(): Functor<F>
 
   fun G(): Functor<G>
 
-  //  override def map[A, B](fga: F[G[A]])(f: A => B): F[G[B]] =
-//  F.map(fga)(ga => G.map(ga)(f))
   override fun <A, B> Kind<Nested<F, G>, A>.map(f: (A) -> B): Kind<Nested<F, G>, B> = F().run {
     unnest().map { G().run { it.map(f) } }.nest()
   }
@@ -177,23 +172,13 @@ interface ComposedFunctor<F, G> : Functor<Nested<F, G>> {
   }
 }
 
-/*def compose[G[_]: Functor]: Functor[λ[α => F[G[α]]]] =
-new ComposedFunctor[F, G] {
-  val F = self
-  val G = Functor[G]
-}*/
 fun <F, G> Functor<F>.compose(GF: Functor<G>): Functor<Nested<F, G>> = ComposedFunctor(this, GF)
 
-// -----------------------------------------------------------------------
-
-//TODO("Remove scala comment - Completed")
 interface ComposedCovariantContravariant<F, G> : Contravariant<Nested<F, G>> {
   fun F(): Functor<F>
 
   fun G(): Contravariant<G>
 
-  //  override def contramap[A, B](fga: F[G[A]])(f: B => A): F[G[B]] =
-//  F.map(fga)(ga => G.contramap(ga)(f))
   override fun <A, B> Kind<Nested<F, G>, A>.contramap(f: (B) -> A): Kind<Nested<F, G>, B> = F().run {
     unnest().map { G().run { it.contramap(f) } }.nest()
   }
@@ -212,24 +197,14 @@ interface ComposedCovariantContravariant<F, G> : Contravariant<Nested<F, G>> {
   }
 }
 
-/*  override def composeContravariant[G[_]: Contravariant]: Contravariant[λ[α => F[G[α]]]] =
-    new ComposedCovariantContravariant[F, G] {
-      val F = self
-      val G = Contravariant[G]
-    }*/
 fun <F, G> Functor<F>.composeContravariant(GF: Contravariant<G>): Contravariant<Nested<F, G>> =
   ComposedCovariantContravariant(this, GF)
 
-// -----------------------------------------------------------------------
-
-//TODO("Remove scala comment - Completed")
 interface ComposedContravariant<F, G> : Contravariant<Nested<F, G>> {
   fun F(): Contravariant<F>
 
   fun G(): Contravariant<G>
 
-  //  override def map[A, B](fga: F[G[A]])(f: A => B): F[G[B]] =
-//  F.contramap(fga)(gb => G.contramap(gb)(f))
   override fun <A, B> Kind<Nested<F, G>, A>.contramap(f: (B) -> A): Kind<Nested<F, G>, B> = F().run {
     unnest().contramap { gb: Kind<G, B> -> G().run { gb.contramap(f) } }.nest()
   }
@@ -247,24 +222,14 @@ interface ComposedContravariant<F, G> : Contravariant<Nested<F, G>> {
   }
 }
 
-/* def compose[G[_]: Contravariant]: Functor[λ[α => F[G[α]]]] =
-    new ComposedContravariant[F, G] {
-      val F = self
-      val G = Contravariant[G]
-    }*/
 fun <F, G> Contravariant<F>.compose(GC: Contravariant<G>): Contravariant<Nested<F, G>> =
   ComposedContravariant(this, GC)
 
-// ---------------------------------------------------------------------
-
-//TODO("Remove scala comment - Completed")
 interface ComposedContravariantCovariant<F, G> : Contravariant<Nested<F, G>> {
   fun F(): Contravariant<F>
 
   fun G(): Functor<G>
 
-  //  override def contramap[A, B](fga: F[G[A]])(f: B => A): F[G[B]] =
-//  F.contramap(fga)(gb => G.map(gb)(f))
   override fun <A, B> Kind<Nested<F, G>, A>.contramap(f: (B) -> A): Kind<Nested<F, G>, B> = F().run {
     unnest().contramap { gb: Kind<G, B> -> G().run { gb.map(f) } }.nest()
   }
@@ -282,24 +247,14 @@ interface ComposedContravariantCovariant<F, G> : Contravariant<Nested<F, G>> {
   }
 }
 
-/*  override def composeFunctor[G[_]: Functor]: Contravariant[λ[α => F[G[α]]]] =
-    new ComposedContravariantCovariant[F, G] {
-      val F = self
-      val G = Functor[G]
-    }*/
 fun <F, G> Contravariant<F>.composeFunctor(GF: Functor<G>): Contravariant<Nested<F, G>> =
   ComposedContravariantCovariant(this, GF)
 
-// ---------------------------------------------------------------------
-
-//TODO("Remove scala comment - Completed")
 interface ComposedInvariant<F, G> : Invariant<Nested<F, G>> {
   fun F(): Invariant<F>
 
   fun G(): Invariant<G>
 
-  //  override def imap[A, B](fga: F[G[A]])(f: A => B)(g: B => A): F[G[B]] =
-//  F.imap(fga)(ga => G.imap(ga)(f)(g))  (gb => G.imap(gb)(g)(f))
   override fun <A, B> Kind<Nested<F, G>, A>.imap(f: (A) -> B, fi: (B) -> A): Kind<Nested<F, G>, B> = F().run {
     unnest().imap(
       { G().run { it.imap(f, fi) } },
@@ -319,23 +274,13 @@ interface ComposedInvariant<F, G> : Invariant<Nested<F, G>> {
   }
 }
 
-/*def compose[G[_]: Invariant]: Invariant[λ[α => F[G[α]]]] =
-new ComposedInvariant[F, G] {
-  val F = self
-  val G = Invariant[G]
-}*/
 fun <F, G> Invariant<F>.compose(GI: Invariant<G>): Invariant<Nested<F, G>> = ComposedInvariant(this, GI)
 
-// ---------------------------------------------------------------------
-
-//TODO("Remove scala comment - Completed")
 interface ComposedInvariantCovariant<F, G> : Invariant<Nested<F, G>> {
   fun F(): Invariant<F>
 
   fun G(): Functor<G>
 
-  //  override def imap[A, B](fga: F[G[A]])(f: A => B)(g: B => A): F[G[B]] =
-//  F.imap(fga)(ga => G.map(ga)(f))(gb => G.map(gb)(g))
   override fun <A, B> Kind<Nested<F, G>, A>.imap(f: (A) -> B, fi: (B) -> A): Kind<Nested<F, G>, B> = F().run {
     unnest().imap(
       { G().run { it.map(f) } },
@@ -355,23 +300,13 @@ interface ComposedInvariantCovariant<F, G> : Invariant<Nested<F, G>> {
   }
 }
 
-/*def composeFunctor[G[_]: Functor]: Invariant[λ[α => F[G[α]]]] =
-new ComposedInvariantCovariant[F, G] {
-  val F = self
-  val G = Functor[G]
-}*/
 fun <F, G> Invariant<F>.compose(GF: Functor<G>): Invariant<Nested<F, G>> = ComposedInvariantCovariant(this, GF)
 
-// ---------------------------------------------------------------------
-
-//TODO("Remove scala comment - Completed")
 interface ComposedInvariantContravariant<F, G> : Invariant<Nested<F, G>> {
   fun F(): Invariant<F>
 
   fun G(): Contravariant<G>
 
-  //  override def imap[A, B](fga: F[G[A]])(f: A => B)(g: B => A): F[G[B]] =
-//  F.imap(fga)(ga => G.contramap(ga)(g))(gb => G.contramap(gb)(f))
   override fun <A, B> Kind<Nested<F, G>, A>.imap(f: (A) -> B, fi: (B) -> A): Kind<Nested<F, G>, B> = F().run {
     unnest().imap(
       { G().run { it.contramap(fi) } },
@@ -391,15 +326,7 @@ interface ComposedInvariantContravariant<F, G> : Invariant<Nested<F, G>> {
   }
 }
 
-/*  def composeContravariant[G[_]: Contravariant]: Invariant[λ[α => F[G[α]]]] =
-  new ComposedInvariantContravariant[F, G] {
-    val F = self
-    val G = Contravariant[G]
-  }
-}*/
 fun <F, G> Invariant<F>.compose(GC: Contravariant<G>): Invariant<Nested<F, G>> = ComposedInvariantContravariant(this, GC)
-
-// ---------------------------------------------------------------------
 
 interface ComposedApplicative<F, G> : Applicative<Nested<F, G>>, ComposedFunctor<F, G> {
   override fun F(): Applicative<F>

@@ -86,9 +86,13 @@ We will list them by their hierarchy.
 
 - [`MonoidK`]({{ '/docs/typeclasses/monoidk/' | relative_url }}) - combinable datatypes have an empty value
 
-##### Functor
+##### Invariant, Contravariant, Functor
 
-- [`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }}) - its contents can be mapped
+- [`Invariant`]({{ '/docs/typeclasses/Invariant/' | relative_url }}) - its contents can be bidirectionally mapped
+
+- [`Contravariant`]({{ '/docs/typeclasses/contravariant/' | relative_url }}) - its contents can be mapped reverse sequentially
+
+- [`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }}) - its contents can be mapped sequentially
 
 - [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }}) - independent execution
 
