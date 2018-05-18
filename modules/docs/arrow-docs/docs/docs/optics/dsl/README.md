@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Syntax DSL
-permalink: /docs/optics/syntax/
+permalink: /docs/optics/dsl/
 ---
 
 ## Optics DSL
