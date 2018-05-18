@@ -1,52 +1,33 @@
 package arrow.optics
 
-import me.eugeniomarletti.kotlin.metadata.escapedClassName
 import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
-import java.io.File
 
-class IsosFileGenerator(
-  private val annotatedList: Collection<AnnotatedOptic>,
-  private val generatedDir: File
-) {
+fun generateIsos(annotatedOptic: AnnotatedOptic, isoOptic: IsoOptic) = Snippet(
+  content = processElement(annotatedOptic, isoOptic)
+)
 
-  private val filePrefix = "isos"
-  private val tuple = "arrow.core.Tuple"
-  private val letters = ('a'..'v').toList()
+private fun processElement(iso: AnnotatedOptic, isoOptic: IsoOptic): String {
+  val foci = isoOptic.foci
+  val hasTupleFocus = foci.size > 1
+  val letters = ('a'..'v').toList()
 
-  fun generate() = buildIsos(annotatedList)
+  fun tupleConstructor() =
+    foci.joinToString(prefix = "$Tuple${foci.size}(", postfix = ")", transform = { "${iso.sourceName}.${it.paramName.plusIfNotBlank(prefix = "`", postfix = "`")}" })
 
-  private fun buildIsos(optics: Collection<AnnotatedOptic>) =
-    optics.map(this::processElement)
-      .forEach { (element, funString) ->
-        File(generatedDir, "$filePrefix.${element.classData.`package`}.${element.sourceName}.kt").printWriter().use { w ->
-          w.println(funString)
-        }
-      }
+  fun focusType() =
+    if (hasTupleFocus) isoOptic.targetNames.joinToString(prefix = "$Tuple${foci.size}<", postfix = ">")
+    else isoOptic.targetNames.first()
 
-  private fun processElement(iso: AnnotatedOptic): Pair<AnnotatedOptic, String> = iso to """
-            |package ${iso.classData.`package`.escapedClassName}
-            |
-            |inline val ${iso.sourceClassName}.Companion.iso: $Iso<${iso.sourceClassName}, ${focusType(iso)}> get()= $Iso(
-            |        get = { ${iso.sourceName}: ${iso.sourceClassName} -> ${getFunction(iso)} },
-            |        reverseGet = { ${reverseGetFunction(iso)} }
-            |)""".trimMargin()
-
-  private fun getFunction(iso: AnnotatedOptic) =
-    if (iso.hasTupleFocus) tupleConstructor(iso)
-    else "${iso.sourceName}.${iso.targets.first().paramName}"
-
-  private fun reverseGetFunction(iso: AnnotatedOptic) =
-    if (iso.hasTupleFocus) "tuple: ${focusType(iso)} -> ${classConstructorFromTuple(iso.sourceClassName, iso.focusSize)}"
-    else "${iso.sourceClassName}(it)"
-
-  private fun tupleConstructor(iso: AnnotatedOptic) =
-    iso.targets.joinToString(prefix = "$tuple${iso.focusSize}(", postfix = ")", transform = { "${iso.sourceName}.${it.paramName.plusIfNotBlank(prefix = "`", postfix = "`")}" })
-
-  private fun focusType(iso: AnnotatedOptic) =
-    if (iso.hasTupleFocus) iso.targetNames.joinToString(prefix = "$tuple${iso.targets.size}<", postfix = ">")
-    else iso.targetNames.first()
-
-  private fun classConstructorFromTuple(sourceClassName: String, propertiesSize: Int) =
+  fun classConstructorFromTuple(sourceClassName: String, propertiesSize: Int) =
     (0 until propertiesSize).joinToString(prefix = "$sourceClassName(", postfix = ")", transform = { "tuple.${letters[it]}" })
 
+  val get = if (hasTupleFocus) tupleConstructor() else "${iso.sourceName}.${isoOptic.foci.first().paramName}"
+  val reverseGet = if (hasTupleFocus) "tuple: ${focusType()} -> ${classConstructorFromTuple(iso.sourceClassName, foci.size)}" else "${iso.sourceClassName}(it)"
+
+  return """
+        |inline val ${iso.sourceClassName}.Companion.iso: $Iso<${iso.sourceClassName}, ${focusType()}> get()= $Iso(
+        |        get = { ${iso.sourceName}: ${iso.sourceClassName} -> $get },
+        |        reverseGet = { $reverseGet }
+        |)
+        |""".trimMargin()
 }
