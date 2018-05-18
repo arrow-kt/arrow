@@ -2,29 +2,20 @@ package arrow.optics
 
 import arrow.common.utils.fullName
 import me.eugeniomarletti.kotlin.metadata.escapedClassName
-import java.io.File
 
-class PrismsFileGenerator(
-  private val annotatedList: Collection<AnnotatedOptic>,
-  private val generatedDir: File
-) {
+fun generatePrisms(annotatedOptic: AnnotatedOptic, isoOptic: PrismOptic) = Snippet(
+  imports = setOf("import arrow.core.left", "import arrow.core.right"),
+  content = processElement(annotatedOptic, isoOptic)
+)
 
-  private val filePrefix = "prisms"
+private fun processElement(annotatedPrism: AnnotatedOptic, isoOptic: PrismOptic): String =
+  isoOptic.foci.map { target ->
+    val sourceClassName = annotatedPrism.classData.fullName.escapedClassName
+    val sourceName = annotatedPrism.type.simpleName.toString().decapitalize()
+    val targetClassName = target.fullName.escapedClassName
+    val targetName = target.paramName.decapitalize()
 
-  fun generate() = annotatedList.map(this::processElement)
-    .map { (element, funs) ->
-      "$filePrefix.${element.classData.`package`}.${element.type.simpleName.toString().toLowerCase()}.kt" to
-        funs.joinToString(prefix = fileHeader(element.classData.`package`.escapedClassName), separator = "\n\n")
-    }.forEach { (name, fileString) -> File(generatedDir, name).writeText(fileString) }
-
-  private fun processElement(annotatedPrism: AnnotatedOptic): Pair<AnnotatedOptic, List<String>> =
-    annotatedPrism to annotatedPrism.targets.map { target ->
-      val sourceClassName = annotatedPrism.classData.fullName.escapedClassName
-      val sourceName = annotatedPrism.type.simpleName.toString().decapitalize()
-      val targetClassName = target.fullName.escapedClassName
-      val targetName = target.paramName.decapitalize()
-
-      """
+    """
         |inline val $sourceClassName.Companion.$targetName: $Prism<$sourceClassName, $targetClassName> get()= $Prism(
         |  getOrModify = { $sourceName: $sourceClassName ->
         |    when ($sourceName) {
@@ -43,14 +34,4 @@ class PrismsFileGenerator(
         |inline val <S> $Traversal<S, $sourceClassName>.$targetName: $Traversal<S, $targetClassName> inline get() = this + $sourceClassName.$targetName
         |inline val <S> $Fold<S, $sourceClassName>.$targetName: $Fold<S, $targetClassName> inline get() = this + $sourceClassName.$targetName
         |""".trimMargin()
-    }
-
-  fun fileHeader(packageName: String): String =
-    """package $packageName
-               |
-               |import arrow.core.left
-               |import arrow.core.right
-               |
-               |""".trimMargin()
-
-}
+  }.joinToString(separator = "\n\n")

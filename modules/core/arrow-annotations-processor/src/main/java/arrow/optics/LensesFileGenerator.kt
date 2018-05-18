@@ -5,34 +5,24 @@ import me.eugeniomarletti.kotlin.metadata.escapedClassName
 import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 import java.io.File
 
-class LensesFileGenerator(
-  private val annotatedList: Collection<AnnotatedOptic>,
-  private val generatedDir: File
-) {
+fun generateLenses(annotatedOptic: AnnotatedOptic, lensOptic: LensOptic) = Snippet(
+  content = processElement(annotatedOptic, lensOptic.foci)
+)
 
-  private val filePrefix = "lenses"
+private fun String.toUpperCamelCase(): String = split(" ").joinToString("", transform = String::capitalize)
 
-  fun generate() = annotatedList.map(this::processElement)
-    .map { (element, funs) ->
-      "$filePrefix.${element.classData.`package`}.${element.type.simpleName.toString().toLowerCase()}.kt" to
-        funs.joinToString(prefix = "package ${element.classData.`package`.escapedClassName}\n\n", separator = "\n")
-    }.forEach { (name, fileString) -> File(generatedDir, name).writeText(fileString) }
+private fun processElement(annotatedOptic: AnnotatedOptic, foci: List<Focus>): String = foci.map { variable ->
+  val sourceClassName = annotatedOptic.classData.fullName.escapedClassName
+  val sourceName = annotatedOptic.type.simpleName.toString().decapitalize()
+  val targetClassName = variable.fullName
+  val targetName = variable.paramName
+  val lensType = when (variable) {
+    is NullableFocus -> "nullable${targetName.toUpperCamelCase()}"
+    is OptionFocus -> "option${targetName.toUpperCamelCase()}"
+    is NonNullFocus -> targetName
+  }
 
-  private fun String.toUpperCamelCase(): String = split(" ").joinToString("", transform = String::capitalize)
-
-  private fun processElement(annotatedOptic: AnnotatedOptic): Pair<AnnotatedOptic, List<String>> =
-    annotatedOptic to annotatedOptic.targets.map { variable ->
-      val sourceClassName = annotatedOptic.classData.fullName.escapedClassName
-      val sourceName = annotatedOptic.type.simpleName.toString().decapitalize()
-      val targetClassName = variable.fullName
-      val targetName = variable.paramName
-      val lensType = when (variable) {
-        is Target.NullableTarget -> "nullable${targetName.toUpperCamelCase()}"
-        is Target.OptionTarget -> "option${targetName.toUpperCamelCase()}"
-        is Target.NonNullTarget -> targetName
-      }
-
-      """
+  """
                     |inline val $sourceClassName.Companion.$lensType: $Lens<$sourceClassName, $targetClassName> get()= $Lens(
                     |        get = { $sourceName: $sourceClassName -> $sourceName.${targetName.plusIfNotBlank(prefix = "`", postfix = "`")} },
                     |        set = { value: $targetClassName ->
@@ -51,6 +41,5 @@ class LensesFileGenerator(
                     |inline val <S> $Traversal<S, $sourceClassName>.$lensType: $Traversal<S, $targetClassName> inline get() = this + $sourceClassName.$lensType
                     |inline val <S> $Fold<S, $sourceClassName>.$lensType: $Fold<S, $targetClassName> inline get() = this + $sourceClassName.$lensType
                     |""".trimMargin()
-    }
 
-}
+}.joinToString(separator = "\n")
