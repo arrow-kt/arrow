@@ -2,12 +2,12 @@ package arrow.optics
 
 import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 
-fun generateOptionals(annotatedOptic: AnnotatedOptic, optic: OptionalOptic) = Snippet(
+fun generateOptionals(ele: AnnotatedElement, target: OptionalTarget) = Snippet(
   imports = setOf("import arrow.core.left", "import arrow.core.right", "import arrow.core.toOption"),
-  content = processElement(annotatedOptic, optic)
+  content = processElement(ele, target.foci)
 )
 
-private fun processElement(ele: AnnotatedOptic, optic: OptionalOptic): String = optic.foci.joinToString(separator = "\n") { focus ->
+private fun processElement(ele: AnnotatedElement, foci: List<Focus>): String = foci.joinToString(separator = "\n") { focus ->
   fun getOrModifyF(toNullable: String = "") = "{ ${ele.sourceName}: ${ele.sourceClassName} -> ${ele.sourceName}.${focus.paramName.plusIfNotBlank(prefix = "`", postfix = "`")}$toNullable?.right() ?: ${ele.sourceName}.left() }"
   fun setF(fromNullable: String = "") = "${ele.sourceName}.copy(${focus.paramName.plusIfNotBlank(prefix = "`", postfix = "`")} = value$fromNullable)"
 

@@ -1,18 +1,18 @@
 package arrow.optics
 
-fun generateLensDsl(annotatedOptic: AnnotatedOptic, optic: DataClassDsl) = Snippet(
-  content = processLensSyntax(annotatedOptic, optic.foci)
+fun generateLensDsl(ele: AnnotatedElement, optic: DataClassDsl) = Snippet(
+  content = processLensSyntax(ele, optic.foci)
 )
 
-fun generateOptionalDsl(annotatedOptic: AnnotatedOptic, optic: DataClassDsl) = Snippet(
-  content = processOptionalSyntax(annotatedOptic, optic)
+fun generateOptionalDsl(ele: AnnotatedElement, optic: DataClassDsl) = Snippet(
+  content = processOptionalSyntax(ele, optic)
 )
 
-fun generatePrismDsl(annotatedOptic: AnnotatedOptic, isoOptic: SealedClassDsl) = Snippet(
-  content = processPrismSyntax(annotatedOptic, isoOptic)
+fun generatePrismDsl(ele: AnnotatedElement, isoOptic: SealedClassDsl) = Snippet(
+  content = processPrismSyntax(ele, isoOptic)
 )
 
-private fun processLensSyntax(ele: AnnotatedOptic, foci: List<Focus>): String = foci.joinToString(separator = "\n") { focus ->
+private fun processLensSyntax(ele: AnnotatedElement, foci: List<Focus>): String = foci.joinToString(separator = "\n") { focus ->
   """
   |inline val <S> $Iso<S, ${ele.sourceClassName}>.${focus.lensParamName()}: $Lens<S, ${focus.className}> inline get() = this + ${ele.sourceClassName}.${focus.lensParamName()}
   |inline val <S> $Lens<S, ${ele.sourceClassName}>.${focus.lensParamName()}: $Lens<S, ${focus.className}> inline get() = this + ${ele.sourceClassName}.${focus.lensParamName()}
@@ -25,7 +25,7 @@ private fun processLensSyntax(ele: AnnotatedOptic, foci: List<Focus>): String = 
   |""".trimMargin()
 }
 
-private fun processOptionalSyntax(ele: AnnotatedOptic, optic: DataClassDsl) = optic.foci.joinToString(separator = "\n") { focus ->
+private fun processOptionalSyntax(ele: AnnotatedElement, optic: DataClassDsl) = optic.foci.joinToString(separator = "\n") { focus ->
   val targetClassName = when (focus) {
     is NullableFocus -> focus.nonNullClassName
     is OptionFocus -> focus.nestedClassName
@@ -43,7 +43,7 @@ private fun processOptionalSyntax(ele: AnnotatedOptic, optic: DataClassDsl) = op
   |""".trimMargin()
 }
 
-private fun processPrismSyntax(ele: AnnotatedOptic, dsl: SealedClassDsl): String = dsl.foci.joinToString(separator = "\n\n") { focus ->
+private fun processPrismSyntax(ele: AnnotatedElement, dsl: SealedClassDsl): String = dsl.foci.joinToString(separator = "\n\n") { focus ->
   """
   |inline val <S> $Iso<S, ${ele.sourceClassName}>.${focus.paramName}: $Prism<S, ${focus.className}> inline get() = this + ${ele.sourceClassName}.${focus.paramName}
   |inline val <S> $Lens<S, ${ele.sourceClassName}>.${focus.paramName}: $Optional<S, ${focus.className}> inline get() = this + ${ele.sourceClassName}.${focus.paramName}

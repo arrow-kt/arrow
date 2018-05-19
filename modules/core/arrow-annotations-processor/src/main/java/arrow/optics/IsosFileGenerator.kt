@@ -2,12 +2,14 @@ package arrow.optics
 
 import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 
-fun generateIsos(annotatedOptic: AnnotatedOptic, isoOptic: IsoOptic) = Snippet(
-  content = processElement(annotatedOptic, isoOptic)
+fun generateIsos(ele: AnnotatedElement, target: IsoTarget) = Snippet(
+  content = processElement(ele, target)
 )
 
-private fun processElement(iso: AnnotatedOptic, isoOptic: IsoOptic): String {
-  val foci = isoOptic.foci
+inline val Target.targetNames inline get() = foci.map(Focus::className)
+
+private fun processElement(iso: AnnotatedElement, target: Target): String {
+  val foci = target.foci
   val hasTupleFocus = foci.size > 1
   val letters = ('a'..'v').toList()
 
@@ -15,13 +17,13 @@ private fun processElement(iso: AnnotatedOptic, isoOptic: IsoOptic): String {
     foci.joinToString(prefix = "$Tuple${foci.size}(", postfix = ")", transform = { "${iso.sourceName}.${it.paramName.plusIfNotBlank(prefix = "`", postfix = "`")}" })
 
   fun focusType() =
-    if (hasTupleFocus) isoOptic.targetNames.joinToString(prefix = "$Tuple${foci.size}<", postfix = ">")
-    else isoOptic.targetNames.first()
+    if (hasTupleFocus) target.targetNames.joinToString(prefix = "$Tuple${foci.size}<", postfix = ">")
+    else target.targetNames.first()
 
   fun classConstructorFromTuple(sourceClassName: String, propertiesSize: Int) =
     (0 until propertiesSize).joinToString(prefix = "$sourceClassName(", postfix = ")", transform = { "tuple.${letters[it]}" })
 
-  val get = if (hasTupleFocus) tupleConstructor() else "${iso.sourceName}.${isoOptic.foci.first().paramName}"
+  val get = if (hasTupleFocus) tupleConstructor() else "${iso.sourceName}.${foci.first().paramName}"
   val reverseGet = if (hasTupleFocus) "tuple: ${focusType()} -> ${classConstructorFromTuple(iso.sourceClassName, foci.size)}" else "${iso.sourceClassName}(it)"
 
   return """
