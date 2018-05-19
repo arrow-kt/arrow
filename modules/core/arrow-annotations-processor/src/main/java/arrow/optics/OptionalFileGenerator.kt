@@ -1,7 +1,5 @@
 package arrow.optics
 
-import arrow.common.utils.fullName
-import me.eugeniomarletti.kotlin.metadata.escapedClassName
 import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 
 fun generateOptionals(annotatedOptic: AnnotatedOptic, optic: OptionalOptic) = Snippet(
@@ -9,52 +7,24 @@ fun generateOptionals(annotatedOptic: AnnotatedOptic, optic: OptionalOptic) = Sn
   content = processElement(annotatedOptic, optic)
 )
 
-private fun processElement(annotatedOptic: AnnotatedOptic, optic: OptionalOptic): String =
-  optic.foci.map { variable ->
-    val sourceClassName = annotatedOptic.classData.fullName.escapedClassName
-    val sourceName = annotatedOptic.type.simpleName.toString().decapitalize()
-    val targetClassName = variable.fullName
-    val targetName = variable.paramName
+private fun processElement(ele: AnnotatedOptic, optic: OptionalOptic): String = optic.foci.joinToString(separator = "\n") { focus ->
+  fun getOrModifyF(toNullable: String = "") = "{ ${ele.sourceName}: ${ele.sourceClassName} -> ${ele.sourceName}.${focus.paramName.plusIfNotBlank(prefix = "`", postfix = "`")}$toNullable?.right() ?: ${ele.sourceName}.left() }"
+  fun setF(fromNullable: String = "") = "${ele.sourceName}.copy(${focus.paramName.plusIfNotBlank(prefix = "`", postfix = "`")} = value$fromNullable)"
 
-    when (variable) {
-      is NullableFocus -> processNullableOptional(sourceName, sourceClassName, targetName, targetClassName.dropLast(1))
-      is OptionFocus -> processOptionOptional(sourceName, sourceClassName, targetName, variable.nestedFullName)
-      is NonNullFocus -> "" //Don't generate optional for non-null foci.
-    }
-  }.joinToString(separator = "\n")
+  val (targetClassName, getOrModify, set) = when (focus) {
+    is NullableFocus -> Triple(focus.nonNullClassName, getOrModifyF(), setF())
+    is OptionFocus -> Triple(focus.nestedClassName, getOrModifyF(".orNull()"), setF(".toOption()"))
+    is NonNullFocus -> return@joinToString ""
+  }
 
-private fun processNullableOptional(sourceName: String, sourceClassName: String, targetName: String, targetClassName: String) = """
-      |inline val $sourceClassName.Companion.$targetName: $Optional<$sourceClassName, $targetClassName> get()= $Optional(
-      |  getOrModify = { $sourceName: $sourceClassName -> $sourceName.${targetName.plusIfNotBlank(prefix = "`", postfix = "`")}?.right() ?: $sourceName.left() },
+  """
+      |inline val ${ele.sourceClassName}.Companion.${focus.paramName}: $Optional<${ele.sourceClassName}, $targetClassName> inline get()= $Optional(
+      |  getOrModify = $getOrModify,
       |  set = { value: $targetClassName ->
-      |    { $sourceName: $sourceClassName ->
-      |      $sourceName.copy(${targetName.plusIfNotBlank(prefix = "`", postfix = "`")} = value)
+      |    { ${ele.sourceName}: ${ele.sourceClassName} ->
+      |      $set
       |    }
       |  }
       |)
-      |
-      |${processSyntax(sourceClassName, targetName, targetClassName)}
       |""".trimMargin()
-
-private fun processOptionOptional(sourceName: String, sourceClassName: String, targetName: String, targetClassName: String) = """
-      |inline val $sourceClassName.Companion.$targetName: $Optional<$sourceClassName, $targetClassName> get()= $Optional(
-      |  getOrModify = { $sourceName: $sourceClassName -> $sourceName.${targetName.plusIfNotBlank(prefix = "`", postfix = "`")}.orNull()?.right() ?: $sourceName.left() },
-      |  set = { value: $targetClassName ->
-      |    { $sourceName: $sourceClassName ->
-      |      $sourceName.copy(${targetName.plusIfNotBlank(prefix = "`", postfix = "`")} = value.toOption())
-      |    }
-      |  }
-      |)
-      |
-      |${processSyntax(sourceClassName, targetName, targetClassName)}
-      |""".trimMargin()
-
-private fun processSyntax(sourceClassName: String, targetName: String, targetClassName: String) = """
-    |inline val <S> $Iso<S, $sourceClassName>.$targetName: $Optional<S, $targetClassName> inline get() = this + $sourceClassName.$targetName
-    |inline val <S> $Lens<S, $sourceClassName>.$targetName: $Optional<S, $targetClassName> inline get() = this + $sourceClassName.$targetName
-    |inline val <S> $Optional<S, $sourceClassName>.$targetName: $Optional<S, $targetClassName> inline get() = this + $sourceClassName.$targetName
-    |inline val <S> $Prism<S, $sourceClassName>.$targetName: $Optional<S, $targetClassName> inline get() = this + $sourceClassName.$targetName
-    |inline val <S> $Setter<S, $sourceClassName>.$targetName: $Setter<S, $targetClassName> inline get() = this + $sourceClassName.$targetName
-    |inline val <S> $Traversal<S, $sourceClassName>.$targetName: $Traversal<S, $targetClassName> inline get() = this + $sourceClassName.$targetName
-    |inline val <S> $Fold<S, $sourceClassName>.$targetName: $Fold<S, $targetClassName> inline get() = this + $sourceClassName.$targetName
-    """.trimMargin()
+}
