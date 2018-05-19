@@ -28,8 +28,8 @@ private fun processElement(iso: AnnotatedElement, target: Target): String {
 
   return """
         |inline val ${iso.sourceClassName}.Companion.iso: $Iso<${iso.sourceClassName}, ${focusType()}> inline get()= $Iso(
-        |        get = { ${iso.sourceName}: ${iso.sourceClassName} -> $get },
-        |        reverseGet = { $reverseGet }
+        |  get = { ${iso.sourceName}: ${iso.sourceClassName} -> $get },
+        |  reverseGet = { $reverseGet }
         |)
         |""".trimMargin()
 }
