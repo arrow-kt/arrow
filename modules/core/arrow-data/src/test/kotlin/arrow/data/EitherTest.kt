@@ -2,8 +2,6 @@ package arrow.data
 
 import arrow.Kind
 import arrow.core.*
-import arrow.instances.IntEqInstance
-import arrow.instances.StringEqInstance
 import arrow.instances.eq
 import arrow.test.UnitSpec
 import arrow.test.laws.*
@@ -23,6 +21,7 @@ class EitherTest : UnitSpec() {
     testLaws(
       EqLaws.laws(Either.eq(String.eq(), Int.eq()), { Right(it) }),
       ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq()), { Right(it) }),
+      ContravariantLaws.laws(Either.contravariant(), { Right(it) }, Eq.any()),
       MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()),
       TraverseLaws.laws(Either.traverse<Throwable>(), Either.applicative(), { Right(it) }, Eq.any()),
       SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ)

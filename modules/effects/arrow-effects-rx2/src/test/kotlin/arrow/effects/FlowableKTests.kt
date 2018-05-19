@@ -2,6 +2,7 @@ package arrow.effects
 
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
+import arrow.test.laws.ContravariantLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
@@ -67,6 +68,7 @@ class FlowableKTests : UnitSpec() {
     //testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
 
     testLaws(
+      ContravariantLaws.laws(FlowableK.contravariant(), { FlowableK.just(it) }, EQ()),
       FoldableLaws.laws(FlowableK.foldable(), { FlowableK.just(it) }, Eq.any()),
       TraverseLaws.laws(FlowableK.traverse(), FlowableK.functor(), { FlowableK.just(it) }, EQ())
     )

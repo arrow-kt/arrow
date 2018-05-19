@@ -1,7 +1,6 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.instances.IntEqInstance
 import arrow.instances.eq
 import arrow.test.UnitSpec
 import arrow.test.laws.*
@@ -27,6 +26,7 @@ class SequenceKTest : UnitSpec() {
     }
 
     testLaws(
+      ContravariantLaws.laws(SequenceK.contravariant(), { sequenceOf(it).k() }, eq),
       EqLaws.laws(SequenceK.eq(Int.eq())) { sequenceOf(it).k() },
       ShowLaws.laws(show, eq) { sequenceOf(it).k() },
       MonadLaws.laws(SequenceK.monad(), eq),

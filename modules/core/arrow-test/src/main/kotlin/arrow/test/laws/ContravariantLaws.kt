@@ -13,7 +13,7 @@ import io.kotlintest.properties.forAll
 object ContravariantLaws {
 
   fun <F> laws(FC: Contravariant<F>, f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
-    listOf(
+    InvariantLaws.laws(FC, f, EQ) + listOf(
       Law("Contravariant Laws: Contravariant Identity", { FC.contravariantIdentity(f, EQ) }),
       Law("Contravariant Laws: Contravariant Composition", { FC.contravariantComposition(f, EQ) })
     )

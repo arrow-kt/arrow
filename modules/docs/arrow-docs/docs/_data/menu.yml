@@ -153,6 +153,12 @@ options:
       - title: TraverseFilter
         url: /docs/typeclasses/traversefilter/
 
+      - title: Invariant
+        url: /docs/typeclasses/invariant/
+
+      - title: Contravariant
+        url: /docs/typeclasses/contravariant/
+
       - title: Functor
         url: /docs/typeclasses/functor/
 

@@ -2,16 +2,12 @@ package arrow.data
 
 import arrow.Kind
 import arrow.core.*
-import arrow.instances.IntEqInstance
 import arrow.instances.eq
 import arrow.syntax.collections.firstOption
 import arrow.syntax.collections.option
 import arrow.test.UnitSpec
 import arrow.test.generators.genOption
-import arrow.test.laws.EqLaws
-import arrow.test.laws.MonadFilterLaws
-import arrow.test.laws.ShowLaws
-import arrow.test.laws.TraverseFilterLaws
+import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
@@ -44,6 +40,7 @@ class OptionTest : UnitSpec() {
     }
 
     testLaws(
+      ContravariantLaws.laws(Option.contravariant(), { Some(it) }, Eq.any()),
       EqLaws.laws(Option.eq(Int.eq()), { genOption(Gen.int()).generate() }),
       ShowLaws.laws(Option.show(), Option.eq(Int.eq()), { Some(it) }),
       //testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`

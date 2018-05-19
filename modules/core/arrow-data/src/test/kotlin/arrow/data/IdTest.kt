@@ -12,6 +12,7 @@ class IdTest : UnitSpec() {
   init {
 
     testLaws(
+      ContravariantLaws.laws(Id.contravariant(), ::Id, Eq.any()),
       EqLaws.laws(Id.eq(Eq.any())) { Id(it) },
       ShowLaws.laws(Id.show(), Eq.any()) { Id(it) },
       MonadLaws.laws(Id.monad(), Eq.any()),

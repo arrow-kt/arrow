@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
+import arrow.test.laws.ContravariantLaws
 import arrow.test.laws.MonadLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
@@ -17,6 +18,7 @@ class Function0Test : UnitSpec() {
 
   init {
     testLaws(
+      ContravariantLaws.laws(Function0.contravariant(), { { it }.k() }, EQ),
       MonadLaws.laws(Function0.monad(), EQ),
       ComonadLaws.laws(Function0.comonad(), { { it }.k() }, EQ)
     )

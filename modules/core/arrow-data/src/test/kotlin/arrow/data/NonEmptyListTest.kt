@@ -1,6 +1,5 @@
 package arrow.data
 
-import arrow.instances.IntEqInstance
 import arrow.instances.eq
 import arrow.test.UnitSpec
 import arrow.test.laws.*
@@ -16,6 +15,7 @@ class NonEmptyListTest : UnitSpec() {
 
     val EQ = NonEmptyList.eq(Int.eq())
     testLaws(
+      ContravariantLaws.laws(NonEmptyList.contravariant(), { NonEmptyList.of(it) }, Eq.any()),
       EqLaws.laws(EQ) { it.nel() },
       ShowLaws.laws(NonEmptyList.show(), EQ) { it.nel() },
       MonadLaws.laws(NonEmptyList.monad(), Eq.any()),

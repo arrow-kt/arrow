@@ -1,7 +1,9 @@
 package arrow.data
 
 import arrow.core.*
-import arrow.instances.*
+import arrow.instances.eq
+import arrow.instances.monoid
+import arrow.instances.semigroup
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -23,6 +25,7 @@ class ValidatedTest : UnitSpec() {
     val VAL_SGK = Validated.semigroupK<String>(String.semigroup())
 
     testLaws(
+      ContravariantLaws.laws(Validated.contravariant(), { Valid(it) }, Eq.any()),
       EqLaws.laws(EQ) { Valid(it) },
       ShowLaws.laws(Validated.show(), EQ) { Valid(it) },
       ApplicativeLaws.laws(Validated.applicative(String.monoid()), Eq.any()),

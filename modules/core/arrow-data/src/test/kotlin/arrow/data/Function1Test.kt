@@ -1,10 +1,8 @@
 package arrow.data
 
-import arrow.core.Function1
-import arrow.core.Function1Of
-import arrow.core.invoke
-import arrow.core.monad
+import arrow.core.*
 import arrow.test.UnitSpec
+import arrow.test.laws.ContravariantLaws
 import arrow.test.laws.MonadLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
@@ -18,6 +16,8 @@ class Function1Test : UnitSpec() {
 
   init {
 
-    testLaws(MonadLaws.laws(Function1.monad<Int>(), EQ))
+    testLaws(
+      ContravariantLaws.laws(Function1.contravariant(), { Function1.just(it) }, EQ),
+      MonadLaws.laws(Function1.monad<Int>(), EQ))
   }
 }

@@ -7,6 +7,7 @@ import arrow.effects.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.AsyncLaws
+import arrow.test.laws.ContravariantLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.binding
 import io.kotlintest.KTestJUnitRunner
@@ -28,7 +29,9 @@ class IOTest : UnitSpec() {
   }
 
   init {
-    testLaws(AsyncLaws.laws(IO.async(), EQ(), EQ()))
+    testLaws(
+      ContravariantLaws.laws(IO.contravariant(), { IO.just(it) }, EQ()),
+      AsyncLaws.laws(IO.async(), EQ(), EQ()))
 
     "should defer evaluation until run" {
       var run = false

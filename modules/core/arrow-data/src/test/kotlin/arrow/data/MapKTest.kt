@@ -1,7 +1,8 @@
 package arrow.data
 
 import arrow.Kind2
-import arrow.instances.*
+import arrow.instances.eq
+import arrow.instances.semigroup
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -20,6 +21,7 @@ class MapKTest : UnitSpec() {
     val EQ_TC = MapK.eq(String.eq(), Int.eq())
 
     testLaws(
+      ContravariantLaws.laws(MapK.contravariant(), { mapOf("key" to 1).k() }, EQ),
       EqLaws.laws(EQ_TC) { mapOf(it.toString() to it).k() },
       ShowLaws.laws(MapK.show(), EQ_TC) { mapOf(it.toString() to it).k() },
       TraverseLaws.laws(MapK.traverse(), MapK.traverse(), { a: Int -> mapOf("key" to a).k() }, EQ),

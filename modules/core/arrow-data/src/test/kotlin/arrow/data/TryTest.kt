@@ -3,10 +3,7 @@ package arrow.data
 import arrow.core.*
 import arrow.instances.eq
 import arrow.test.UnitSpec
-import arrow.test.laws.EqLaws
-import arrow.test.laws.MonadErrorLaws
-import arrow.test.laws.ShowLaws
-import arrow.test.laws.TraverseLaws
+import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.*
@@ -23,6 +20,7 @@ class TryTest : UnitSpec() {
     val EQ = Try.eq(Eq { a, b -> a::class == b::class }, Int.eq())
 
     testLaws(
+      ContravariantLaws.laws(Try.contravariant(), { Try.just(it) }, Eq.any()),
       EqLaws.laws(EQ) { Try.just(it) },
       ShowLaws.laws(Try.show(), EQ) { Try.just(it) },
       MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()),

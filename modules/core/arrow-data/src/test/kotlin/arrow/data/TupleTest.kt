@@ -9,6 +9,7 @@ class TupleTest : UnitSpec() {
   init {
     /* FIXME(paco) this code sends gradle into an infinite loop, and turns IntelliJ into a memory churner
             testLaws(
+                    ContravariantLaws.laws(Tuple2.contravariant(), { 0 toT (it) }, Eq.any()),
                     MonadLaws.laws(Tuple2.monad(IntMonoidInstance), Eq.any()),
                     ComonadLaws.laws(Tuple2.comonad(), { 0 toT it }, Eq.any()),
                     TraverseLaws.laws(Tuple2.traverse(), Tuple2.functor(), { 0 toT it }, Eq.any()),

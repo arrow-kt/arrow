@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
 import arrow.test.laws.AsyncLaws
+import arrow.test.laws.ContravariantLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
@@ -21,7 +22,10 @@ class DeferredKTest : UnitSpec() {
   }
 
   init {
-    testLaws(AsyncLaws.laws(DeferredK.async(), EQ(), EQ()))
+    testLaws(
+      AsyncLaws.laws(DeferredK.async(), EQ(), EQ()),
+      ContravariantLaws.laws(DeferredK.contravariant(), { DeferredK.just(it) }, EQ())
+    )
 
     "DeferredK is awaitable" {
       forAll(genIntSmall(), genIntSmall(), genIntSmall(), { x: Int, y: Int, z: Int ->

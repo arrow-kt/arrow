@@ -6,6 +6,7 @@ import arrow.core.Eval.Now
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws
+import arrow.test.laws.ContravariantLaws
 import arrow.test.laws.MonadLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
@@ -24,6 +25,7 @@ class EvalTest : UnitSpec() {
   init {
 
     testLaws(
+      ContravariantLaws.laws(Eval.contravariant(), ::Now, EQ),
       MonadLaws.laws(Eval.monad(), EQ),
       ComonadLaws.laws(Eval.comonad(), ::Now, EQ)
     )

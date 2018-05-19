@@ -1,13 +1,9 @@
 package arrow.data
 
 import arrow.Kind2
-import arrow.instances.IntMonoidInstance
 import arrow.instances.monoid
 import arrow.test.UnitSpec
-import arrow.test.laws.MonoidLaws
-import arrow.test.laws.SemigroupLaws
-import arrow.test.laws.ShowLaws
-import arrow.test.laws.TraverseLaws
+import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import org.junit.runner.RunWith
@@ -23,6 +19,7 @@ class SortedMapKTest : UnitSpec() {
   init {
 
     testLaws(
+      ContravariantLaws.laws(SortedMapK.contravariant<String>(), { a: Int -> sortedMapOf("key" to a).k() }, EQ),
       ShowLaws.laws(SortedMapK.show(), EQ) { sortedMapOf("key" to 1).k() },
       MonoidLaws.laws(SortedMapK.monoid<String, Int>(Int.monoid()), sortedMapOf("key" to 1).k(), EQ),
       SemigroupLaws.laws(SortedMapK.monoid<String, Int>(Int.monoid()),
