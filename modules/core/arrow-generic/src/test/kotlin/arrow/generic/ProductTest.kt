@@ -62,7 +62,7 @@ class ProductTest : UnitSpec() {
     ".tupledLabeled()" {
       forAll(personGen(), {
         it.tupledLabeled() == Tuple3(
-          "className" toT it.name,
+          "name" toT it.name,
           "age" toT it.age,
           "related" toT it.related
         )
