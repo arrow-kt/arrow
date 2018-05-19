@@ -25,11 +25,11 @@ private fun processLensSyntax(ele: AnnotatedElement, foci: List<Focus>): String 
   |""".trimMargin()
 }
 
-private fun processOptionalSyntax(ele: AnnotatedElement, optic: DataClassDsl) = optic.foci.joinToString(separator = "\n") { focus ->
+private fun processOptionalSyntax(ele: AnnotatedElement, optic: DataClassDsl) = optic.foci.filterNot { it is NonNullFocus }.joinToString(separator = "\n") { focus ->
   val targetClassName = when (focus) {
     is NullableFocus -> focus.nonNullClassName
     is OptionFocus -> focus.nestedClassName
-    is NonNullFocus -> return@joinToString ""
+    is NonNullFocus -> ""
   }
 
   """
