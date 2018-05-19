@@ -25,7 +25,7 @@ private fun processElement(iso: AnnotatedOptic, isoOptic: IsoOptic): String {
   val reverseGet = if (hasTupleFocus) "tuple: ${focusType()} -> ${classConstructorFromTuple(iso.sourceClassName, foci.size)}" else "${iso.sourceClassName}(it)"
 
   return """
-        |inline val ${iso.sourceClassName}.Companion.iso: $Iso<${iso.sourceClassName}, ${focusType()}> get()= $Iso(
+        |inline val ${iso.sourceClassName}.Companion.iso: $Iso<${iso.sourceClassName}, ${focusType()}> inline get()= $Iso(
         |        get = { ${iso.sourceName}: ${iso.sourceClassName} -> $get },
         |        reverseGet = { $reverseGet }
         |)
