@@ -26,13 +26,6 @@ class LensTest : APTest("arrow.ap.objects.lens") {
     ))
 
     testProcessor(AnnotationProcessor(
-      name = "Lens generation requires companion object declaration",
-      sourceFile = "LensCompanion.java",
-      errorMessage = "@optics annotated class arrow.ap.objects.lens.LensCompanion needs to declare companion object.",
-      processor = OpticsProcessor()
-    ))
-
-    testProcessor(AnnotationProcessor(
       name = "Lenses will be generated for data class",
       sourceFiles = listOf("Lens.java"),
       destFile = "Lens.kt",
