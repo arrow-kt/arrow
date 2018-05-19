@@ -19,7 +19,7 @@ import javax.lang.model.element.TypeElement
 @AutoService(Processor::class)
 class OpticsProcessor : AbstractProcessor() {
 
-  private val annotatedElements = mutableListOf<AnnotatedOptic>()
+  private val annotatedEles = mutableListOf<AnnotatedElement>()
 
   override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
@@ -34,21 +34,21 @@ class OpticsProcessor : AbstractProcessor() {
 
         val targets: List<Target> = element.normalizedTargets().map { target ->
           when (target) {
-            LENS -> evalAnnotatedDataClass(element, element.lensErrorMessage).let(::LensOptic)
-            OPTIONAL -> evalAnnotatedDataClass(element, element.optionalErrorMessage).let(::OptionalOptic)
-            ISO -> evalAnnotatedIsoElement(element).let(::IsoOptic)
-            PRISM -> evalAnnotatedPrismElement(element).let(::PrismOptic)
+            LENS -> evalAnnotatedDataClass(element, element.lensErrorMessage).let(::LensTarget)
+            OPTIONAL -> evalAnnotatedDataClass(element, element.optionalErrorMessage).let(::OptionalTarget)
+            ISO -> evalAnnotatedIsoElement(element).let(::IsoTarget)
+            PRISM -> evalAnnotatedPrismElement(element).let(::PrismTarget)
             DSL -> evalAnnotatedDslElement(element)
           }
         }
 
-        annotatedElements.add(AnnotatedOptic(element as TypeElement, element.getClassData(), targets))
+        annotatedEles.add(AnnotatedElement(element as TypeElement, element.getClassData(), targets))
       }
 
     if (roundEnv.processingOver()) {
       val generatedDir = File(this.generatedDir!!, "").also { it.mkdirs() }
 
-      annotatedElements
+      annotatedEles
         .forEach { ele ->
           val content = ele.snippets().reduce(Snippet::plus).asFileText(ele.packageName)
           File(generatedDir, "optics.arrow.${ele.sourceName}.kt").writeText(content)
@@ -56,12 +56,12 @@ class OpticsProcessor : AbstractProcessor() {
     }
   }
 
-  private fun AnnotatedOptic.snippets(): List<Snippet> = this.targets.map {
+  private fun AnnotatedElement.snippets(): List<Snippet> = this.targets.map {
     when (it) {
-      is IsoOptic -> generateIsos(this, it)
-      is PrismOptic -> generatePrisms(this, it)
-      is LensOptic -> generateLenses(this, it)
-      is OptionalOptic -> generateOptionals(this, it)
+      is IsoTarget -> generateIsos(this, it)
+      is PrismTarget -> generatePrisms(this, it)
+      is LensTarget -> generateLenses(this, it)
+      is OptionalTarget -> generateOptionals(this, it)
       is SealedClassDsl -> generatePrismDsl(this, it)
       is DataClassDsl -> generateOptionalDsl(this, it) + generateLensDsl(this, it)
     }

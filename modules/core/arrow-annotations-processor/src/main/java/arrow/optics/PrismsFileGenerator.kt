@@ -1,11 +1,11 @@
 package arrow.optics
 
-fun generatePrisms(annotatedOptic: AnnotatedOptic, isoOptic: PrismOptic) = Snippet(
-  imports = setOf("import arrow.core.left", "import arrow.core.right"),
-  content = processElement(annotatedOptic, isoOptic)
+fun generatePrisms(ele: AnnotatedElement, target: PrismTarget) = Snippet(
+  imports = setOf("import arrow.core.left", "import arrow.core.right", "import arrow.core.identity"),
+  content = processElement(ele, target.foci)
 )
 
-private fun processElement(ele: AnnotatedOptic, isoOptic: PrismOptic): String = isoOptic.foci.joinToString(separator = "\n\n") { focus ->
+private fun processElement(ele: AnnotatedElement, foci: List<Focus>): String = foci.joinToString(separator = "\n\n") { focus ->
   """
   |inline val ${ele.sourceClassName}.Companion.${focus.paramName}: $Prism<${ele.sourceClassName}, ${focus.className}> inline get()= $Prism(
   |  getOrModify = { ${ele.sourceName}: ${ele.sourceClassName} ->
@@ -14,7 +14,7 @@ private fun processElement(ele: AnnotatedOptic, isoOptic: PrismOptic): String = 
   |      else -> ${ele.sourceName}.left()
   |    }
   |  },
-  |  reverseGet = { it }
+  |  reverseGet = ::identity
   |)
   |""".trimMargin()
 }

@@ -6,24 +6,29 @@ import arrow.common.utils.fullName
 import me.eugeniomarletti.kotlin.metadata.escapedClassName
 import javax.lang.model.element.TypeElement
 
-data class AnnotatedOptic(val type: TypeElement, val classData: ClassOrPackageDataWrapper.Class, val targets: List<Target>) {
+data class AnnotatedElement(val type: TypeElement, val classData: ClassOrPackageDataWrapper.Class, val targets: List<Target>) {
   val sourceClassName = classData.fullName.escapedClassName
   val sourceName = type.simpleName.toString().decapitalize()
   val packageName = classData.`package`.escapedClassName
 }
 
-inline val Target.targetNames inline get() = foci.map(Focus::className)
+typealias IsoTarget = Target.Iso
+typealias PrismTarget = Target.Prism
+typealias LensTarget = Target.Lens
+typealias OptionalTarget = Target.Optional
+typealias SealedClassDsl = Target.SealedClassDsl
+typealias DataClassDsl = Target.DataClassDsl
 
 sealed class Target {
   abstract val foci: List<Focus>
-}
 
-data class IsoOptic(override val foci: List<Focus>) : Target()
-data class PrismOptic(override val foci: List<Focus>) : Target()
-data class LensOptic(override val foci: List<Focus>) : Target()
-data class OptionalOptic(override val foci: List<Focus>) : Target()
-data class SealedClassDsl(override val foci: List<Focus>) : Target()
-data class DataClassDsl(override val foci: List<Focus>) : Target()
+  data class Iso(override val foci: List<Focus>) : Target()
+  data class Prism(override val foci: List<Focus>) : Target()
+  data class Lens(override val foci: List<Focus>) : Target()
+  data class Optional(override val foci: List<Focus>) : Target()
+  data class SealedClassDsl(override val foci: List<Focus>) : Target()
+  data class DataClassDsl(override val foci: List<Focus>) : Target()
+}
 
 typealias NonNullFocus = Focus.NonNull
 typealias OptionFocus = Focus.Option
@@ -54,15 +59,15 @@ sealed class Focus {
 
 }
 
-val Lens = "arrow.optics.Lens"
-val Iso = "arrow.optics.Iso"
-val Optional = "arrow.optics.Optional"
-val Prism = "arrow.optics.Prism"
-val Getter = "arrow.optics.Getter"
-val Setter = "arrow.optics.Setter"
-val Traversal = "arrow.optics.Traversal"
-val Fold = "arrow.optics.Fold"
-val Tuple = "arrow.core.Tuple"
+const val Lens = "arrow.optics.Lens"
+const val Iso = "arrow.optics.Iso"
+const val Optional = "arrow.optics.Optional"
+const val Prism = "arrow.optics.Prism"
+const val Getter = "arrow.optics.Getter"
+const val Setter = "arrow.optics.Setter"
+const val Traversal = "arrow.optics.Traversal"
+const val Fold = "arrow.optics.Fold"
+const val Tuple = "arrow.core.Tuple"
 
 data class Snippet(val imports: Set<String> = emptySet(), val content: String)
 
