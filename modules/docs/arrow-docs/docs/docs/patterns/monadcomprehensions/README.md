@@ -108,7 +108,7 @@ IO.monad().binding {
 }.fix().unsafeRunSync()
 ```
 
-What `bind()` does is use the rest of the sequential operations as the function you'd normally past to `flatMap`.
+What `bind()` does is use the rest of the sequential operations as the function you'd normally pass to `flatMap`.
 The equivalent code without using comprehensions would look like:
 
 ```kotlin:ank
