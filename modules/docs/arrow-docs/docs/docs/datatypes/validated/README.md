@@ -274,7 +274,7 @@ Rules accumulateErrors {
     FormField("Invalid Email Domain Label", "nowhere.com"),
     FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this accumulates N errors
     FormField("Valid Email Label", "getlost@nowhere.com")
-  .map { it.validateEmail() }
+  ).map { it.validateEmail() }
 }
 ```
 *Fail Fast*
@@ -285,7 +285,7 @@ Rules failFast {
     FormField("Invalid Email Domain Label", "nowhere.com"),
     FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this fails fast 
     FormField("Valid Email Label", "getlost@nowhere.com")
-  .map { it.validateEmail() }
+  ).map { it.validateEmail() }
 }
 ```
 
