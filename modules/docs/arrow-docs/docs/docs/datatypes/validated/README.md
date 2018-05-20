@@ -224,10 +224,11 @@ import arrow.core.*
 import arrow.typeclasses.*
 import arrow.data.*
 
-sealed class ValidationError(val msg: String)
-data class DoesNotContain(val value: String) : ValidationError("Did not contain $value")
-data class MaxLength(val value: Int) : ValidationError("Exceeded length of $value")
-data class NotAnEmail(val reasons: Nel<ValidationError>) : ValidationError("Not a valid email")
+sealed class ValidationError(val msg: String) {
+  data class DoesNotContain(val value: String) : ValidationError("Did not contain $value")
+  data class MaxLength(val value: Int) : ValidationError("Exceeded length of $value")
+  data class NotAnEmail(val reasons: Nel<ValidationError>) : ValidationError("Not a valid email")
+}
 
 data class FormField(val label: String, val value: String)
 data class Email(val value: String)
@@ -236,16 +237,16 @@ sealed class Rules<F>(A: ApplicativeError<F, Nel<ValidationError>>) : Applicativ
 
   private fun FormField.contains(needle: String): Kind<F, FormField> =
     if (value.contains(needle, false)) just(this)
-    else raiseError(DoesNotContain(needle).nel())
+    else raiseError(ValidationError.DoesNotContain(needle).nel())
 
   private fun FormField.maxLength(maxLength: Int): Kind<F, FormField> =
     if (value.length <= maxLength) just(this)
-    else raiseError(MaxLength(maxLength).nel())
+    else raiseError(ValidationError.MaxLength(maxLength).nel())
 
   fun FormField.validateEmail(): Kind<F, Email> =
     map(contains("@"), maxLength(250), {
       Email(value)
-    }).handleErrorWith { raiseError(NotAnEmail(it).nel()) }
+    }).handleErrorWith { raiseError(ValidationError.NotAnEmail(it).nel()) }
 
   object ErrorAccumulationStrategy :
     Rules<ValidatedPartialOf<Nel<ValidationError>>>(Validated.applicativeError(NonEmptyList.semigroup()))
