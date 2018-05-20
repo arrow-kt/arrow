@@ -261,7 +261,7 @@ sealed class Rules<F>(A: ApplicativeError<F, Nel<ValidationError>>) : Applicativ
 }
 ```
 
-`Rules` defines abstract behaviors that can be composed and have access to the scoipe of `ApplicativeError` where we can invoke `just` to lift values in to the positive result and `raiseError` into the error context.
+`Rules` defines abstract behaviors that can be composed and have access to the scope of `ApplicativeError` where we can invoke `just` to lift values in to the positive result and `raiseError` into the error context.
 
 Once we have such abstract algebra defined we can simply materialize it to data types that support different error strategies:
 
