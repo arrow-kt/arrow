@@ -13,7 +13,7 @@ class CoreaderTest : UnitSpec() {
   init {
     with(Coreader) {
 
-      Id extensions {
+      ForId extensions {
 
         "map should return mapped value" {
           forAll { num: Int ->

@@ -15,7 +15,7 @@ class ListKTest : UnitSpec() {
 
     val EQ: Eq<ListKOf<Int>> = ListK.eq(Eq.any())
 
-    ListK extensions {
+    ForListK extensions {
       testLaws(
         EqLaws.laws(EQ) { listOf(it).k() },
         ShowLaws.laws(ListK.show(), EQ) { listOf(it).k() },

@@ -17,7 +17,7 @@ class Function0Test : UnitSpec() {
   }
 
   init {
-    Function0 extensions {
+    ForFunction0 extensions {
       testLaws(
         MonadLaws.laws(this, EQ),
         ComonadLaws.laws(this, { { it }.k() }, EQ)

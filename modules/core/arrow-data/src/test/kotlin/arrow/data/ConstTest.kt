@@ -14,7 +14,7 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class ConstTest : UnitSpec() {
   init {
-    Const(Int.monoid()) extensions {
+    ForConst(Int.monoid()) extensions {
       testLaws(
         TraverseFilterLaws.laws(this, this, { Const(it) }, Eq.any()),
         ApplicativeLaws.laws(this, Eq.any()),

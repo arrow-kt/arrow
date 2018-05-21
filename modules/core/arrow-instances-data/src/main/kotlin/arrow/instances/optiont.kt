@@ -109,5 +109,5 @@ class OptionTContextPartiallyApplied<F>(val MF: Monad<F>) {
     f(OptionTContext(MF))
 }
 
-fun <F> OptionT(MF: Monad<F>): OptionTContextPartiallyApplied<F> =
+fun <F> ForOptionT(MF: Monad<F>): OptionTContextPartiallyApplied<F> =
   OptionTContextPartiallyApplied(MF)

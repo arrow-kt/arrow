@@ -96,7 +96,7 @@ If you're defining your own instances and would like for them to be discoverable
 Arrow provides a `extensions` DSL making available in the direct scope all type classes declared functions and extensions in a given data type through the `infix` `extensions` function.
 
 ```kotlin
-Option extensions {
+ForOption extensions {
   binding {
     val a = Option(1).bind()
     val b = Option(a + 1).bind()
@@ -107,7 +107,7 @@ Option extensions {
 ```
 
 ```kotlin
-Option extensions {
+ForOption extensions {
   map(Option(1), Option(2), Option(3), { (one, two, three) ->
     one + two + three
   })
@@ -116,14 +116,14 @@ Option extensions {
 ```
 
 ```kotlin
-Option extensions {
+ForOption extensions {
   listOf(Option(1), Option(2), Option(3)).k().traverse(this, ::identity)
 }
 //Option(ListK(1, 2, 3))
 ```
 
 ```kotlin
-Try extensions {
+ForTry extensions {
   binding {
     val a = Try { 1 }.bind()
     val b = Try { a + 1 }.bind()
@@ -134,7 +134,7 @@ Try extensions {
 ```
 
 ```kotlin
-Try extensions {
+ForTry extensions {
   map(Try { 1 }, Try { 2 }, Try { 3 }, { (one, two, three) ->
     one + two + three
   })
@@ -143,7 +143,7 @@ Try extensions {
 ```
 
 ```kotlin
-Try extensions {
+ForTry extensions {
   listOf(Try { 1 }, Try { 2 }, Try { 3 }).k().traverse(this, ::identity)
 }
 //Success(ListK(1,2,3))
@@ -157,7 +157,7 @@ object OptionContext : OptionMonadErrorInstance, OptionTraverseInstance {
     fix().map(f)
 }
 
-infix fun <A> Option.Companion.extensions(f: OptionContext.() -> A): A =
+infix fun <A> ForOption.Companion.extensions(f: OptionContext.() -> A): A =
   f(OptionContext)
 ```
 
@@ -174,7 +174,7 @@ class EitherContextPartiallyApplied<L> {
     f(EitherContext())
 }
 
-fun <L> Either(): EitherContextPartiallyApplied<L> =
+fun <L> ForEither(): EitherContextPartiallyApplied<L> =
   EitherContextPartiallyApplied()
 ```
 

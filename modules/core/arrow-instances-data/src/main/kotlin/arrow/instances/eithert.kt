@@ -161,5 +161,5 @@ class EitherTContextPartiallyApplied<F, E>(val MF: Monad<F>) {
     f(EitherTContext(MF))
 }
 
-fun <F, E> EitherT(MF: Monad<F>): EitherTContextPartiallyApplied<F, E> =
+fun <F, E> ForEitherT(MF: Monad<F>): EitherTContextPartiallyApplied<F, E> =
   EitherTContextPartiallyApplied(MF)

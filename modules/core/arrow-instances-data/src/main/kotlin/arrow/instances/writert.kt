@@ -78,5 +78,5 @@ class WriterTContextPartiallyApplied<F, W>(val MF: Monad<F>, val MW: Monoid<W>) 
     f(WriterTContext(MF, MW))
 }
 
-fun <F, W> WriterT(MF: Monad<F>, MW: Monoid<W>): WriterTContextPartiallyApplied<F, W> =
+fun <F, W> ForWriterT(MF: Monad<F>, MW: Monoid<W>): WriterTContextPartiallyApplied<F, W> =
   WriterTContextPartiallyApplied(MF, MW)

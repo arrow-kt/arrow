@@ -23,7 +23,7 @@ class TryTest : UnitSpec() {
 
     val EQ = Try.eq(Eq { a, b -> a::class == b::class }, Int.eq())
 
-    Try extensions {
+    ForTry extensions {
       testLaws(
         EqLaws.laws(EQ) { Try.just(it) },
         ShowLaws.laws(Try.show(), EQ) { Try.just(it) },
@@ -108,7 +108,7 @@ class TryTest : UnitSpec() {
     }
 
     "Cartesian builder should build products over homogeneous Try" {
-      Try extensions {
+      ForTry extensions {
         map(
           Success("11th"),
           Success("Doctor"),
@@ -118,7 +118,7 @@ class TryTest : UnitSpec() {
     }
 
     "Cartesian builder should build products over heterogeneous Try" {
-      Try extensions {
+      ForTry extensions {
         map(
           Success(13),
           Success("Doctor"),
@@ -130,7 +130,7 @@ class TryTest : UnitSpec() {
     data class DoctorNotFoundException(val msg: String) : Exception()
 
     "Cartesian builder should build products over Failure Try" {
-      Try extensions {
+      ForTry extensions {
         map(
           Success(13),
           Failure<Boolean>(DoctorNotFoundException("13th Doctor is coming!")),

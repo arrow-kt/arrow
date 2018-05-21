@@ -44,7 +44,7 @@ class OptionTest : UnitSpec() {
         })
     }
 
-    Option extensions {
+    ForOption extensions {
       testLaws(
         EqLaws.laws(Option.eq(Int.eq()), { genOption(Gen.int()).generate() }),
         ShowLaws.laws(Option.show(), Option.eq(Int.eq()), { Some(it) }),

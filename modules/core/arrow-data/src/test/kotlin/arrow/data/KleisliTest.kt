@@ -1,7 +1,7 @@
 package arrow.data
 
 import arrow.core.*
-import arrow.instances.Kleisli
+import arrow.instances.ForKleisli
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadErrorLaws
 import arrow.typeclasses.Eq
@@ -17,7 +17,7 @@ class KleisliTest : UnitSpec() {
 
   init {
 
-    Kleisli<ForTry, Int, Throwable>(Try.monadError()) extensions {
+    ForKleisli<ForTry, Int, Throwable>(Try.monadError()) extensions {
       testLaws(MonadErrorLaws.laws(this, EQ(), EQ()))
     }
 

@@ -98,5 +98,5 @@ class ValidatedContextPartiallyApplied<L>(val SL: Semigroup<L>) {
     f(ValidatedContext(SL))
 }
 
-fun <L> Validated(SL: Semigroup<L>): ValidatedContextPartiallyApplied<L> =
+fun <L> ForValidated(SL: Semigroup<L>): ValidatedContextPartiallyApplied<L> =
   ValidatedContextPartiallyApplied(SL)

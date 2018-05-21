@@ -28,5 +28,5 @@ class KleisliMtlContextPartiallyApplied<F, D, E>(val MF: MonadError<F, E>) {
     f(KleisliMtlContext(MF))
 }
 
-fun <F, D, E> Kleisli(MF: MonadError<F, E>): KleisliMtlContextPartiallyApplied<F, D, E> =
+fun <F, D, E> ForKleisli(MF: MonadError<F, E>): KleisliMtlContextPartiallyApplied<F, D, E> =
   KleisliMtlContextPartiallyApplied(MF)

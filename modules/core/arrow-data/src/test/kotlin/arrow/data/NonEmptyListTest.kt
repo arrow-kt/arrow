@@ -14,7 +14,7 @@ class NonEmptyListTest : UnitSpec() {
   init {
 
     val EQ = NonEmptyList.eq(Int.eq())
-    NonEmptyList extensions {
+    ForNonEmptyList extensions {
       testLaws(
         EqLaws.laws(EQ) { it.nel() },
         ShowLaws.laws(NonEmptyList.show(), EQ) { it.nel() },

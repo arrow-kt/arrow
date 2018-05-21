@@ -122,7 +122,7 @@ These benefits include capturing all exceptions that happen inside the block.
 import arrow.effects.*
 import arrow.typeclasses.*
 
-DeferredK extensions { 
+ForDeferredK extensions { 
   bindingCatch {
       val songUrl = getSongUrlAsync().bind()
       val musicPlayer = MediaPlayer.load(songUrl)

@@ -130,5 +130,5 @@ object TryContext : TryMonadErrorInstance, TryTraverseInstance {
     fix().map(f)
 }
 
-infix fun <A> Try.Companion.extensions(f: TryContext.() -> A): A =
+infix fun <A> ForTry.Companion.extensions(f: TryContext.() -> A): A =
   f(TryContext)

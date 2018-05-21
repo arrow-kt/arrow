@@ -49,7 +49,7 @@ import arrow.typeclasses.*
 import arrow.instances.*
 
 fun getCountryCode(maybePerson : Option<Person>): Option<String> =
-  Option extensions {
+  ForOption extensions {
    binding {
      val person = maybePerson.bind()
      val address = person.address.bind()
@@ -137,7 +137,7 @@ Let's look at how a similar implementation would look like using monad comprehen
 
 ```kotlin:ank
 fun getCountryCode(personId: Int): ObservableK<Option<String>> =
-      ObservableK extensions {
+      ForObservableK extensions {
        binding {
         val maybePerson = findPerson(personId).bind()
         val person = maybePerson.fold(
@@ -198,7 +198,7 @@ So how would our function look if we implemented it with the OptionT monad trans
 
 ```kotlin
 fun getCountryCode(personId: Int): ObservableK<Option<String>> =
-  OptionT(ObservableK.monad()) extensions { 
+  ForOptionT(ObservableK.monad()) extensions { 
    binding {
     val person = OptionT(findPerson(personId)).bind()
     val address = OptionT(ObservableK.just(person.address)).bind()

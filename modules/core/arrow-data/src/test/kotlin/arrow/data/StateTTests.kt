@@ -5,7 +5,7 @@ import arrow.core.ForTry
 import arrow.core.Try
 import arrow.core.monad
 import arrow.core.monadError
-import arrow.mtl.instances.StateT
+import arrow.mtl.instances.ForStateT
 import arrow.mtl.instances.StateTMonadStateInstance
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadCombineLaws
@@ -34,7 +34,7 @@ class StateTTests : UnitSpec() {
 
   init {
 
-    StateT<ForTry, Int, Throwable>(Try.monadError()) extensions {
+    ForStateT<ForTry, Int, Throwable>(Try.monadError()) extensions {
       testLaws(
         MonadStateLaws.laws(M, EQ, EQ_UNIT),
         SemigroupKLaws.laws(

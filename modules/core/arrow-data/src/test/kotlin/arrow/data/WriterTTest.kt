@@ -2,9 +2,8 @@ package arrow.data
 
 import arrow.Kind
 import arrow.core.*
-import arrow.instances.IntMonoidInstance
+import arrow.instances.ForWriterT
 import arrow.instances.monoid
-import arrow.mtl.instances.WriterT
 import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
 import arrow.test.generators.genTuple
@@ -20,7 +19,7 @@ import org.junit.runner.RunWith
 class WriterTTest : UnitSpec() {
   init {
 
-    WriterT(NonEmptyList.monad(), Int.monoid()) extensions {
+    ForWriterT(NonEmptyList.monad(), Int.monoid()) extensions {
       testLaws(
         MonadLaws.laws(this, Eq.any()),
         MonoidKLaws.laws(

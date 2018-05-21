@@ -30,5 +30,5 @@ class CofreeContextPartiallyApplied<S> {
     f(CofreeContext())
 }
 
-fun <S> Cofree(): CofreeContextPartiallyApplied<S> =
+fun <S> ForCofree(): CofreeContextPartiallyApplied<S> =
   CofreeContextPartiallyApplied()

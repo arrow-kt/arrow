@@ -101,7 +101,7 @@ class StateTContextPartiallyApplied<F, S, E>(val ME: MonadError<F, E>) {
     f(StateTContext(ME))
 }
 
-fun <F, S, E> StateT(ME: MonadError<F, E>): StateTContextPartiallyApplied<F, S, E> =
+fun <F, S, E> ForStateT(ME: MonadError<F, E>): StateTContextPartiallyApplied<F, S, E> =
   StateTContextPartiallyApplied(ME)
 
 class StateTMonadContext<S> : StateTMonadInstance<ForId, S> {
@@ -113,5 +113,5 @@ class StateContextPartiallyApplied<S>() {
     f(StateTMonadContext())
 }
 
-fun <S> State(): StateContextPartiallyApplied<S> =
+fun <S> ForState(): StateContextPartiallyApplied<S> =
   StateContextPartiallyApplied()

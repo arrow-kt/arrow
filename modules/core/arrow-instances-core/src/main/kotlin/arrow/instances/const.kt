@@ -90,5 +90,5 @@ class ConstContextPartiallyApplied<L>(val MA: Monoid<L>) {
     f(ConstContext(MA))
 }
 
-fun <L> Const(MA: Monoid<L>): ConstContextPartiallyApplied<L> =
+fun <L> ForConst(MA: Monoid<L>): ConstContextPartiallyApplied<L> =
   ConstContextPartiallyApplied(MA)

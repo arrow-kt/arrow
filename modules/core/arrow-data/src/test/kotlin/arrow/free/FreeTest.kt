@@ -52,7 +52,7 @@ class FreeTest : UnitSpec() {
 
     val EQ: FreeEq<Ops.F, ForId, Int> = Free.eq(idInterpreter, IdMonad)
 
-    Free<Ops.F>() extensions {
+    ForFree<Ops.F>() extensions {
       testLaws(
         EqLaws.laws(EQ, { Ops.value(it) }),
         MonadLaws.laws(Ops, EQ),

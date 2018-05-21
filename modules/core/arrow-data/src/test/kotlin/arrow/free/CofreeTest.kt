@@ -9,7 +9,7 @@ import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
 import arrow.core.FunctionK
-import arrow.free.instances.Cofree
+import arrow.free.instances.ForCofree
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
@@ -19,7 +19,7 @@ class CofreeTest : UnitSpec() {
 
   init {
 
-    Cofree<ForOption>() extensions {
+    ForCofree<ForOption>() extensions {
       testLaws(ComonadLaws.laws(this, {
         val sideEffect = SideEffect()
         unfold(Option.functor(), sideEffect.counter, {

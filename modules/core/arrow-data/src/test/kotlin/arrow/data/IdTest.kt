@@ -12,7 +12,7 @@ import org.junit.runner.RunWith
 class IdTest : UnitSpec() {
   init {
 
-    Id extensions {
+    ForId extensions {
       testLaws(
         EqLaws.laws(Id.eq(Eq.any())) { Id(it) },
         ShowLaws.laws(Id.show(), Eq.any()) { Id(it) },

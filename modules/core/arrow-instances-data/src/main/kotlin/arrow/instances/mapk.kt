@@ -76,5 +76,5 @@ class MapKContextPartiallyApplied<L> {
     f(MapKContext())
 }
 
-fun <L> MapK(): MapKContextPartiallyApplied<L> =
+fun <L> ForMapK(): MapKContextPartiallyApplied<L> =
   MapKContextPartiallyApplied()

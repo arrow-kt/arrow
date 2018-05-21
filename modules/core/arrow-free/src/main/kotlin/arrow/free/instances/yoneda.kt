@@ -16,5 +16,5 @@ class YonedaContextPartiallyApplied<U> {
     f(YonedaContext())
 }
 
-fun <U> Yoneda(): YonedaContextPartiallyApplied<U> =
+fun <U> ForYoneda(): YonedaContextPartiallyApplied<U> =
   YonedaContextPartiallyApplied()

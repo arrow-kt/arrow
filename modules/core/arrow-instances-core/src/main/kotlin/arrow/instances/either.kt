@@ -121,5 +121,5 @@ class EitherContextPartiallyApplied<L> {
     f(EitherContext())
 }
 
-fun <L> Either(): EitherContextPartiallyApplied<L> =
+fun <L> ForEither(): EitherContextPartiallyApplied<L> =
   EitherContextPartiallyApplied()

@@ -129,5 +129,5 @@ object IdContext : IdBimonadInstance, IdTraverseInstance {
     fix().map(f)
 }
 
-infix fun <L> Id.Companion.extensions(f: IdContext.() -> L): L =
+infix fun <L> ForId.Companion.extensions(f: IdContext.() -> L): L =
   f(IdContext)

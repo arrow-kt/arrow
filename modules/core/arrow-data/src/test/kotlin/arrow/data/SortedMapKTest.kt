@@ -2,7 +2,7 @@ package arrow.data
 
 import arrow.Kind2
 import arrow.instances.IntMonoidInstance
-import arrow.instances.SortedMapK
+import arrow.instances.ForSortedMapK
 import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.laws.MonoidLaws
@@ -23,7 +23,7 @@ class SortedMapKTest : UnitSpec() {
 
   init {
 
-    SortedMapK<String>() extensions {
+    ForSortedMapK<String>() extensions {
       testLaws(
         ShowLaws.laws(SortedMapK.show(), EQ) { sortedMapOf("key" to 1).k() },
         MonoidLaws.laws(SortedMapK.monoid<String, Int>(Int.monoid()), sortedMapOf("key" to 1).k(), EQ),

@@ -16,5 +16,5 @@ class CoyonedaContextPartiallyApplied<F, G> {
     f(CoyonedaContext())
 }
 
-fun <F, G> Coyoneda(): CoyonedaContextPartiallyApplied<F, G> =
+fun <F, G> ForCoyoneda(): CoyonedaContextPartiallyApplied<F, G> =
   CoyonedaContextPartiallyApplied()

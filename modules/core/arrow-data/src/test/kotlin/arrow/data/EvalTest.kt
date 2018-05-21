@@ -24,7 +24,7 @@ class EvalTest : UnitSpec() {
 
   init {
 
-    Eval extensions {
+    ForEval extensions {
       testLaws(
         MonadLaws.laws(this, EQ),
         ComonadLaws.laws(this, ::Now, EQ)

@@ -40,7 +40,7 @@ fibonacci.map { it * 2 }.takeWhile { it < 10 }.toList()
 Applying a sequence of functions to a sequence:
 ```kotlin:ank
 import arrow.instances.*
-SequenceK extensions {
+ForSequenceK extensions {
   sequenceOf(1, 2, 3).k()
     .ap(sequenceOf({ x: Int -> x + 1}, { x: Int -> x * 2}).k())
     .toList() 
@@ -55,7 +55,7 @@ import arrow.typeclasses.*
 val positive = generateSequence(1) { it + 1 }.k() // sequence of positive numbers
 val positiveEven = positive.filter { it % 2 == 0 }.k()
 
-SequenceK extensions { 
+ForSequenceK extensions { 
   binding {
    val p = positive.bind()
    val pe = positiveEven.bind()

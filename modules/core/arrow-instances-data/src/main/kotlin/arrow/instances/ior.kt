@@ -105,5 +105,5 @@ class IorContextPartiallyApplied<L>(val SL: Semigroup<L>) {
     f(IorContext(SL))
 }
 
-fun <L> Ior(SL: Semigroup<L>): IorContextPartiallyApplied<L> =
+fun <L> ForIor(SL: Semigroup<L>): IorContextPartiallyApplied<L> =
   IorContextPartiallyApplied(SL)

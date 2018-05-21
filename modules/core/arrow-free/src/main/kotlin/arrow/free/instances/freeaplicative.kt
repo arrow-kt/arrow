@@ -50,5 +50,5 @@ class FreeApplicativeContextPartiallyApplied<S> {
     f(FreeApplicativeContext())
 }
 
-fun <S> FreeApplicative(): FreeApplicativeContextPartiallyApplied<S> =
+fun <S> ForFreeApplicative(): FreeApplicativeContextPartiallyApplied<S> =
   FreeApplicativeContextPartiallyApplied()

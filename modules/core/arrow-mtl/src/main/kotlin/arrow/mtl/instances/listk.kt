@@ -90,5 +90,5 @@ object ListKMtlContext : ListKMonadCombineInstance, ListKTraverseInstance, ListK
     fix().map(f)
 }
 
-infix fun <A> ListK.Companion.extensions(f: ListKMtlContext.() -> A): A =
+infix fun <A> ForListK.Companion.extensions(f: ListKMtlContext.() -> A): A =
   f(ListKMtlContext)

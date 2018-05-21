@@ -23,13 +23,13 @@ import arrow.*
 import arrow.instances.*
 import arrow.typeclasses.*
 
-String extensions { 
+ForString extensions { 
   empty()
 }
 ```
 
 ```kotlin:ank
-String extensions { 
+ForString extensions { 
   listOf<String>("Λ", "R", "R", "O", "W").combineAll() 
 }
 ```
@@ -47,13 +47,13 @@ This is also true if we define our own instances. As an example, let's use `Fold
 ```kotlin:ank
 import arrow.data.*
 
-ListK extensions { 
+ForListK extensions { 
   listOf(1, 2, 3, 4, 5).k().foldMap(Int.monoid(), ::identity) 
 }
 ```
 
 ```kotlin:ank
-ListK extensions { 
+ForListK extensions { 
   listOf(1, 2, 3, 4, 5).k().foldMap(String.monoid(), { it.toString() }) 
 }
 ```
@@ -77,7 +77,7 @@ fun <A, B> monoidTuple(MA: Monoid<A>, MB: Monoid<B>): Monoid<Tuple2<A, B>> =
 This way we are able to combine both values in one pass, hurrah!
 
 ```kotlin:ank
-ListK extensions {
+ForListK extensions {
   val M = monoidTuple(Int.monoid(), String.monoid())
   val list = listOf(1, 1).k()
 

@@ -2,7 +2,7 @@ package arrow.data
 
 import arrow.Kind
 import arrow.core.*
-import arrow.mtl.instances.OptionT
+import arrow.mtl.instances.ForOptionT
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -26,7 +26,7 @@ class OptionTTest : UnitSpec() {
 
   init {
 
-    OptionT(Option.monad(), Option.traverseFilter()) extensions {
+    ForOptionT(Option.monad(), Option.traverseFilter()) extensions {
 
       testLaws(
         MonadLaws.laws(this, Eq.any()),

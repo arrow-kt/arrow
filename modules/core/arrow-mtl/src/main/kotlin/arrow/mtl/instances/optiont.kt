@@ -59,5 +59,5 @@ class OptionTMtlContextPartiallyApplied<F>(val MF: Monad<F>, val TF: TraverseFil
     f(OptionTMtlContext(MF, TF))
 }
 
-fun <F> OptionT(MF: Monad<F>, TF: TraverseFilter<F>): OptionTMtlContextPartiallyApplied<F> =
+fun <F> ForOptionT(MF: Monad<F>, TF: TraverseFilter<F>): OptionTMtlContextPartiallyApplied<F> =
   OptionTMtlContextPartiallyApplied(MF, TF)

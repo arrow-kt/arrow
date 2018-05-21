@@ -42,8 +42,10 @@ fun Byte.Companion.monoid(): Monoid<Byte> =
 
 object ByteContext : ByteShowInstance, ByteOrderInstance, ByteMonoidInstance
 
-infix fun <L> Byte.Companion.extensions(f: ByteContext.() -> L): L =
-  f(ByteContext)
+object ForByte {
+  infix fun <L> extensions(f: ByteContext.() -> L): L =
+    f(ByteContext)
+}
 
 //////////
 // Double
@@ -86,8 +88,10 @@ fun Double.Companion.monoid(): Monoid<Double> =
 
 object DoubleContext : DoubleShowInstance, DoubleOrderInstance, DoubleMonoidInstance
 
-infix fun <L> Double.Companion.extensions(f: DoubleContext.() -> L): L =
-  f(DoubleContext)
+object ForDouble {
+  infix fun <L> extensions(f: DoubleContext.() -> L): L =
+    f(DoubleContext)
+}
 
 //////////
 // Int
@@ -129,8 +133,10 @@ fun Int.Companion.monoid(): Monoid<Int> =
 
 object IntContext : IntShowInstance, IntOrderInstance, IntMonoidInstance
 
-infix fun <L> Int.Companion.extensions(f: IntContext.() -> L): L =
-  f(IntContext)
+object ForInt {
+  infix fun <L> extensions(f: IntContext.() -> L): L =
+    f(IntContext)
+}
 
 //////////
 // Long
@@ -173,8 +179,10 @@ fun Long.Companion.monoid(): Monoid<Long> =
 
 object LongContext : LongShowInstance, LongOrderInstance, LongMonoidInstance
 
-infix fun <L> Long.Companion.extensions(f: LongContext.() -> L): L =
-  f(LongContext)
+object ForLong {
+  infix fun <L> extensions(f: LongContext.() -> L): L =
+    f(LongContext)
+}
 
 //////////
 // Short
@@ -217,8 +225,10 @@ fun Short.Companion.monoid(): Monoid<Short> =
 
 object ShortContext : ShortShowInstance, ShortOrderInstance, ShortMonoidInstance
 
-infix fun <L> Short.Companion.extensions(f: ShortContext.() -> L): L =
-  f(ShortContext)
+object ForShort {
+  infix fun <L> extensions(f: ShortContext.() -> L): L =
+    f(ShortContext)
+}
 
 //////////
 // Float
@@ -261,5 +271,7 @@ fun Float.Companion.monoid(): Monoid<Float> =
 
 object FloatContext : FloatShowInstance, FloatOrderInstance, FloatMonoidInstance
 
-infix fun <L> Float.Companion.extensions(f: FloatContext.() -> L): L =
-  f(FloatContext)
+object ForFloat {
+  infix fun <L> extensions(f: FloatContext.() -> L): L =
+    f(FloatContext)
+}

@@ -23,5 +23,5 @@ class Function1MtlContextPartiallyApplied<L> {
     f(Function1MtlContext())
 }
 
-fun <L> Function1(): Function1MtlContextPartiallyApplied<L> =
+fun <L> ForForFunction1(): Function1MtlContextPartiallyApplied<L> =
   Function1MtlContextPartiallyApplied()

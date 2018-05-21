@@ -48,5 +48,5 @@ class StateTMtlContextPartiallyApplied<F, S, E>(val ME: MonadError<F, E>) {
     f(StateTMtlContext(ME))
 }
 
-fun <F, S, E> StateT(ME: MonadError<F, E>): StateTMtlContextPartiallyApplied<F, S, E> =
+fun <F, S, E> ForStateT(ME: MonadError<F, E>): StateTMtlContextPartiallyApplied<F, S, E> =
   StateTMtlContextPartiallyApplied(ME)

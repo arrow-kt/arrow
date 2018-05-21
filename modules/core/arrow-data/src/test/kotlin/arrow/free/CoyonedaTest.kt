@@ -1,7 +1,7 @@
 package arrow.free
 
 import arrow.core.*
-import arrow.free.instances.Coyoneda
+import arrow.free.instances.ForCoyoneda
 import arrow.test.UnitSpec
 import arrow.test.laws.FunctorLaws
 import arrow.typeclasses.Eq
@@ -18,7 +18,7 @@ class CoyonedaTest : UnitSpec() {
 
   init {
 
-    Coyoneda<ForId, Int>() extensions {
+    ForCoyoneda<ForId, Int>() extensions {
       testLaws(FunctorLaws.laws(this, { Coyoneda(Id(0), { it }) }, EQ))
     }
 

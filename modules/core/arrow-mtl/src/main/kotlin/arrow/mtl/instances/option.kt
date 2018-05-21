@@ -77,5 +77,5 @@ object OptionMtlContext : OptionMonadFilterInstance, OptionTraverseFilterInstanc
     fix().map(f)
 }
 
-infix fun <A> Option.Companion.extensions(f: OptionMtlContext.() -> A): A =
+infix fun <A> ForOption.Companion.extensions(f: OptionMtlContext.() -> A): A =
   f(OptionMtlContext)

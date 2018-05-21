@@ -56,5 +56,5 @@ class SortedMapKContextPartiallyApplied<K : Comparable<K>> {
     f(SortedMapKContext())
 }
 
-fun <K : Comparable<K>> SortedMapK(): SortedMapKContextPartiallyApplied<K> =
+fun <K : Comparable<K>> ForSortedMapK(): SortedMapKContextPartiallyApplied<K> =
   SortedMapKContextPartiallyApplied()

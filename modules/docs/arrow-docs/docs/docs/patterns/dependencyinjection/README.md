@@ -77,13 +77,13 @@ And we can call it on the typeclass instances:
 ```kotlin:ank
 import arrow.instances.*
 
-Option extensions { 
+ForOption extensions { 
   multiplyBy2(Option(1)) 
 }
 ```
 
 ```kotlin:ank
-Try extensions { 
+ForTry extensions { 
   multiplyBy2(Try.just(1))
 }
 ```
@@ -130,7 +130,7 @@ object FunctorLaws {
 
 import arrow.test.FunctorLaws.test
 
-Option extensions { 
+ForOption extensions { 
   test { it.some() }
 }
 ```
@@ -217,7 +217,7 @@ class Parser {
 }
 
 // TEDIOUS AND NOT IDIOMATIC
-Option extensions { 
+ForOption extensions { 
   Parser().run { parseInt("123") }
 }
 ```

@@ -121,5 +121,5 @@ interface FlowableKEffectInstance :
 
 object FlowableKContext : FlowableKEffectInstance
 
-infix fun <A> FlowableK.Companion.extensions(f: FlowableKContext.() -> A): A =
+infix fun <A> ForFlowableK.Companion.extensions(f: FlowableKContext.() -> A): A =
   f(FlowableKContext)

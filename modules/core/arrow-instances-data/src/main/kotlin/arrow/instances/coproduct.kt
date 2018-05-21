@@ -77,5 +77,5 @@ class CoproductContextPartiallyApplied<F, G>(val TF: Traverse<F>, val TG: Traver
     f(CoproductContext(TF, TG))
 }
 
-fun <F, G> Coproduct(TF: Traverse<F>, TG: Traverse<G>): CoproductContextPartiallyApplied<F, G> =
+fun <F, G> ForCoproduct(TF: Traverse<F>, TG: Traverse<G>): CoproductContextPartiallyApplied<F, G> =
   CoproductContextPartiallyApplied(TF, TG)

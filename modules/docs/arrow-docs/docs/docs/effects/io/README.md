@@ -207,7 +207,7 @@ IO.async<Int> { callback ->
 import arrow.typeclasses.*
 import arrow.effects.*
 
-IO extensions {
+ForIO extensions {
   binding {
     val file = getFile("/tmp/file.txt").bind()
     val lines = file.readLines().bind()

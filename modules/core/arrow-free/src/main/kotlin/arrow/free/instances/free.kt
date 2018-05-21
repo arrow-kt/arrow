@@ -77,5 +77,5 @@ class FreeContextPartiallyApplied<S> {
     f(FreeContext())
 }
 
-fun <S> Free(): FreeContextPartiallyApplied<S> =
+fun <S> ForFree(): FreeContextPartiallyApplied<S> =
   FreeContextPartiallyApplied()

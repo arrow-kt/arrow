@@ -79,5 +79,5 @@ interface Function0BimonadInstance : Bimonad<ForFunction0> {
 
 object Function0Context : Function0BimonadInstance
 
-infix fun <L> Function0.Companion.extensions(f: Function0Context.() -> L): L =
+infix fun <L> ForFunction0.Companion.extensions(f: Function0Context.() -> L): L =
   f(Function0Context)

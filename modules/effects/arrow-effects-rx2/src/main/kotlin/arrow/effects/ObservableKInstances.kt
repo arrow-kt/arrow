@@ -118,5 +118,5 @@ interface ObservableKEffectInstance :
 
 object ObservableKContext : ObservableKEffectInstance
 
-infix fun <A> ObservableK.Companion.extensions(f: ObservableKContext.() -> A): A =
+infix fun <A> ForObservableK.Companion.extensions(f: ObservableKContext.() -> A): A =
   f(ObservableKContext)

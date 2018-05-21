@@ -16,7 +16,7 @@ class SetKTest : UnitSpec() {
 
     val EQ = SetK.eq(Int.eq())
 
-    SetK extensions {
+    ForSetK extensions {
       testLaws(
         EqLaws.laws(EQ) { SetK.just(it) },
         ShowLaws.laws(SetK.show(), EQ) { SetK.just(it) },

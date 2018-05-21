@@ -86,7 +86,7 @@ val nelOne: NonEmptyList<Int> = NonEmptyList.of(1)
 val nelTwo: NonEmptyList<Int> = NonEmptyList.of(2)
 val nelThree: NonEmptyList<Int> = NonEmptyList.of(3)
 
-NonEmptyList extensions {
+ForNonEmptyList extensions {
   binding {
     val one = nelOne.bind()
     val two = nelTwo.bind()
@@ -99,7 +99,7 @@ NonEmptyList extensions {
 Monad binding in `NonEmptyList` and other collection related data type can be used as generators
 
 ```kotlin:ank
-NonEmptyList extensions {
+ForNonEmptyList extensions {
   binding {
     val x = NonEmptyList.of(1, 2, 3).bind()
     val y = NonEmptyList.of(1, 2, 3).bind()
@@ -123,7 +123,7 @@ val nelId: NonEmptyList<UUID> = NonEmptyList.of(UUID.randomUUID(), UUID.randomUU
 val nelName: NonEmptyList<String> = NonEmptyList.of("William Alvin Howard", "Haskell Curry")
 val nelYear: NonEmptyList<Int> = NonEmptyList.of(1926, 1900)
 
-NonEmptyList extensions {
+ForNonEmptyList extensions {
  map(nelId, nelName, nelYear, { (id, name, year) ->
   Person(id, name, year)
  })

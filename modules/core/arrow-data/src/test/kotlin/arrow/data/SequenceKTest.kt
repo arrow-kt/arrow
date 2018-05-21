@@ -26,7 +26,7 @@ class SequenceKTest : UnitSpec() {
         toList().toString()
     }
 
-    SequenceK extensions {
+    ForSequenceK extensions {
       testLaws(
         EqLaws.laws(SequenceK.eq(Int.eq())) { sequenceOf(it).k() },
         ShowLaws.laws(show, eq) { sequenceOf(it).k() },

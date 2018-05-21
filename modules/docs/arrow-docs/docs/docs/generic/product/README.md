@@ -98,7 +98,7 @@ import arrow.instances.*
 val maybeBalance: Option<Int> = Option(1000)
 val maybeAvailable: Option<Int> = Option(900)
 
-Option extensions { 
+ForOption extensions { 
   mapToAccount(maybeBalance, maybeAvailable)
 }
 ```
@@ -107,7 +107,7 @@ Option extensions {
 val maybeBalance: Option<Int> = Option(1000)
 val maybeAvailable: Option<Int> = None
 
-Option extensions { 
+ForOption extensions { 
   mapToAccount(maybeBalance, maybeAvailable) 
 }
 ```
@@ -116,7 +116,7 @@ Option extensions {
 val tryBalance: Try<Int> = Try { 1000 }
 val tryAvailable: Try<Int> = Try { 900 }
 
-Try extensions { 
+ForTry extensions { 
   mapToAccount(tryBalance, tryAvailable)
 }
 ```
@@ -125,7 +125,7 @@ Try extensions {
 val tryBalance: Try<Int> = Try { 1000 }
 val tryAvailable: Try<Int> = Try { throw RuntimeException("BOOM") }
 
-Try extensions { 
+ForTry extensions { 
   mapToAccount(tryBalance, tryAvailable)
 }
 ```
@@ -137,7 +137,7 @@ import kotlinx.coroutines.experimental.async
 val asyncBalance: DeferredK<Int> = async { 1000 }.k()
 val asyncAvailable: DeferredK<Int> = async { 900 }.k()
 
-DeferredK extensions { 
+ForDeferredK extensions { 
   mapToAccount(asyncBalance, asyncAvailable)
 }
 ```

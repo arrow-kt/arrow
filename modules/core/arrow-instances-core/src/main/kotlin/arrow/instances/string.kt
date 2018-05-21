@@ -39,5 +39,7 @@ fun String.Companion.order(): Order<String> =
 
 object StringContext : StringShowInstance, StringOrderInstance, StringMonoidInstance
 
-infix fun <L> String.Companion.extensions(f: StringContext.() -> L): L =
-  f(StringContext)
+object ForString {
+  infix fun <L> extensions(f: StringContext.() -> L): L =
+    f(StringContext)
+}
