@@ -123,9 +123,7 @@ sealed class Try<out A> : TryOf<A> {
     }
   }
 
-  fun toOption(): Option<A> = fold({ None }, {
-    arrayListOf<String>().fold
-    Some(it) })
+  fun toOption(): Option<A> = fold({ None }, { Some(it) })
 
   fun toEither(): Either<Throwable, A> = fold({ Left(it) }, { Right(it) })
 
@@ -133,7 +131,6 @@ sealed class Try<out A> : TryOf<A> {
   fun toDisjunction(): Disjunction<Throwable, A> = toEither().toDisjunction()
 
   fun <B> foldLeft(initial: B, operation: (B, A) -> B): B = this.fix().fold({ initial }, { operation(initial, it) })
-
 
   fun <B> foldRight(initial: Eval<B>, operation: (A, Eval<B>) -> Eval<B>): Eval<B> = this.fix().fold({ initial }, { operation(it, initial) })
 
