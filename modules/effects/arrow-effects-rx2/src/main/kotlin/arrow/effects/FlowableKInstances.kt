@@ -118,3 +118,8 @@ interface FlowableKEffectInstance :
   override fun <A> FlowableKOf<A>.runAsync(cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Unit> =
     fix().runAsync(cb)
 }
+
+object FlowableKContext : FlowableKEffectInstance
+
+infix fun <A> ForFlowableK.Companion.extensions(f: FlowableKContext.() -> A): A =
+  f(FlowableKContext)

@@ -99,7 +99,11 @@ getSongUrlAsync()
 When rewritten using `bindingCatch` it becomes:
 
 ```kotlin
-ObservableK.monadError().bindingCatch {
+import arrow.effects.*
+import arrow.typeclasses.*
+
+ForObservableK extensions { 
+ bindingCatch {
   val songUrl = getSongUrlAsync().bind()
   val musicPlayer = MediaPlayer.load(songUrl)
   val totalTime = musicPlayer.getTotaltime()
@@ -114,7 +118,8 @@ ObservableK.monadError().bindingCatch {
   }
 
   percent
-}.fix()
+ }.fix()
+}
 ```
 
 Note that any unexpected exception, like `AritmeticException` when `totalTime` is 0, is automatically caught and wrapped inside the observable.

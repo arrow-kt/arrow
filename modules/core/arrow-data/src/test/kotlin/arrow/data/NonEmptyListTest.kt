@@ -2,6 +2,7 @@ package arrow.data
 
 import arrow.instances.IntEqInstance
 import arrow.instances.eq
+import arrow.instances.extensions
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -12,20 +13,20 @@ import org.junit.runner.RunWith
 class NonEmptyListTest : UnitSpec() {
   init {
 
-    val applicative = NonEmptyList.applicative()
-
     val EQ = NonEmptyList.eq(Int.eq())
-    testLaws(
-      EqLaws.laws(EQ) { it.nel() },
-      ShowLaws.laws(NonEmptyList.show(), EQ) { it.nel() },
-      MonadLaws.laws(NonEmptyList.monad(), Eq.any()),
-      SemigroupKLaws.laws(
-        NonEmptyList.semigroupK(),
-        applicative,
-        Eq.any()),
-      ComonadLaws.laws(NonEmptyList.comonad(), { NonEmptyList.of(it) }, Eq.any()),
-      TraverseLaws.laws(NonEmptyList.traverse(), applicative, { n: Int -> NonEmptyList.of(n) }, Eq.any())
-    )
+    ForNonEmptyList extensions {
+      testLaws(
+        EqLaws.laws(EQ) { it.nel() },
+        ShowLaws.laws(NonEmptyList.show(), EQ) { it.nel() },
+        MonadLaws.laws(this, Eq.any()),
+        SemigroupKLaws.laws(
+          this,
+          this,
+          Eq.any()),
+        ComonadLaws.laws(this, { NonEmptyList.of(it) }, Eq.any()),
+        TraverseLaws.laws(this, this, { n: Int -> NonEmptyList.of(n) }, Eq.any())
+      )
+    }
 
   }
 }

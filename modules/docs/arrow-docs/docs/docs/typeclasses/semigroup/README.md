@@ -32,7 +32,7 @@ import arrow.*
 import arrow.typeclasses.*
 import arrow.instances.*
 
-Int.semigroup().run { 1.combine(2) }
+ForInt extensions { 1.combine(2) }
 ```
 
 ```kotlin:ank   

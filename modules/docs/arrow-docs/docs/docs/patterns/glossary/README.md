@@ -61,9 +61,11 @@ interface UserEqInstance: Eq<User> {
 All typeclass instances provided Arrow can be found in the companion object of the type they're defined for, including platform types like String or Int.
 
 ```kotlin:ank:silent
+import arrow.*
 import arrow.core.*
 import arrow.data.*
 import arrow.instances.*
+import arrow.typeclasses.*
 ```
 
 ```kotlin:ank
@@ -87,6 +89,94 @@ ListK.traverse()
 ```
 
 If you're defining your own instances and would like for them to be discoverable in their corresponding datatypes' companion object, you can generate it by annotating them as `@instance`, and Arrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create the extension functions for you.
+
+
+### Syntax
+
+Arrow provides a `extensions` DSL making available in the direct scope all type classes declared functions and extensions in a given data type through the `infix` `extensions` function.
+
+```kotlin
+ForOption extensions {
+  binding {
+    val a = Option(1).bind()
+    val b = Option(a + 1).bind()
+    a + b
+  }.fix()
+}
+//Option(3)
+```
+
+```kotlin
+ForOption extensions {
+  map(Option(1), Option(2), Option(3), { (one, two, three) ->
+    one + two + three
+  })
+}
+//Option(6)
+```
+
+```kotlin
+ForOption extensions {
+  listOf(Option(1), Option(2), Option(3)).k().traverse(this, ::identity)
+}
+//Option(ListK(1, 2, 3))
+```
+
+```kotlin
+ForTry extensions {
+  binding {
+    val a = Try { 1 }.bind()
+    val b = Try { a + 1 }.bind()
+    a + b
+  }.fix()
+}
+//Success(3)
+```
+
+```kotlin
+ForTry extensions {
+  map(Try { 1 }, Try { 2 }, Try { 3 }, { (one, two, three) ->
+    one + two + three
+  })
+}
+//Success(6)
+```
+
+```kotlin
+ForTry extensions {
+  listOf(Try { 1 }, Try { 2 }, Try { 3 }).k().traverse(this, ::identity)
+}
+//Success(ListK(1,2,3))
+```
+
+If you defined your own instances over your own data types and wish to use a similar `extensions` DSL you can do so for both types with a single type argument such as `Option`:
+
+```kotlin:ank:silent
+object OptionContext : OptionMonadErrorInstance, OptionTraverseInstance {
+  override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
+    fix().map(f)
+}
+
+infix fun <A> ForOption.Companion.extensions(f: OptionContext.() -> A): A =
+  f(OptionContext)
+```
+
+Or for types that require partial application of some of their type arguments such as `Either<L, R>` where `L` needs to be partially applied
+
+```kotlin:ank:silent
+class EitherContext<L> : EitherMonadErrorInstance<L>, EitherTraverseInstance<L> {
+  override fun <A, B> Kind<EitherPartialOf<L>, A>.map(f: (A) -> B): Either<L, B> =
+    fix().map(f)
+}
+
+class EitherContextPartiallyApplied<L> {
+  infix fun <A> extensions(f: EitherContext<L>.() -> A): A =
+    f(EitherContext())
+}
+
+fun <L> ForEither(): EitherContextPartiallyApplied<L> =
+  EitherContextPartiallyApplied()
+```
 
 ### Type constructors
 

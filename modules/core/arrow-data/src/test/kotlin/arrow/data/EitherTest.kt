@@ -2,8 +2,7 @@ package arrow.data
 
 import arrow.Kind
 import arrow.core.*
-import arrow.instances.IntEqInstance
-import arrow.instances.StringEqInstance
+import arrow.instances.*
 import arrow.instances.eq
 import arrow.test.UnitSpec
 import arrow.test.laws.*
@@ -20,13 +19,17 @@ class EitherTest : UnitSpec() {
 
   init {
 
-    testLaws(
-      EqLaws.laws(Either.eq(String.eq(), Int.eq()), { Right(it) }),
-      ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq()), { Right(it) }),
-      MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()),
-      TraverseLaws.laws(Either.traverse<Throwable>(), Either.applicative(), { Right(it) }, Eq.any()),
-      SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ)
-    )
+    ForEither<Throwable>() extensions {
+
+      testLaws(
+        EqLaws.laws(Either.eq(String.eq(), Int.eq()), { Right(it) }),
+        ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq()), { Right(it) }),
+        MonadErrorLaws.laws(this, Eq.any(), Eq.any()),
+        TraverseLaws.laws(this, this, { Right(it) }, Eq.any()),
+        SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ)
+      )
+
+    }
 
     "getOrElse should return value" {
       forAll { a: Int, b: Int ->

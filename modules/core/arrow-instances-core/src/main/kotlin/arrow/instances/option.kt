@@ -162,3 +162,11 @@ interface OptionTraverseInstance : Traverse<ForOption> {
   override fun <A> Kind<ForOption, A>.nonEmpty(): Boolean =
     fix().nonEmpty()
 }
+
+object OptionContext : OptionMonadErrorInstance, OptionTraverseInstance {
+  override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
+    fix().map(f)
+}
+
+infix fun <A> ForOption.Companion.extensions(f: OptionContext.() -> A): A =
+  f(OptionContext)
