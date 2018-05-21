@@ -43,7 +43,6 @@ interface StringFilterIndexInstance : FilterIndex<String, Int, Char> {
   }
 }
 
-
 fun String.Companion.index(): Index<String, Int, Char> = StringIndexInstance()
 
 interface StringIndexInstance : Index<String, Int, Char> {
