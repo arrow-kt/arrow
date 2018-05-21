@@ -18,7 +18,7 @@ class FilterIndexInstanceTest : UnitSpec() {
 
   init {
     testLaws(TraversalLaws.laws(
-      traversal = FilterIndex.filterIndex(ListK.filterIndex<String>()) { true },
+      traversal = FilterIndex.filterIndex(ListK.filterIndex()) { true },
       aGen = genListK(Gen.string()),
       bGen = Gen.string(),
       funcGen = genFunctionAToB(Gen.string()),
@@ -38,7 +38,7 @@ class FilterIndexInstanceTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = FilterIndex.filterIndex(NonEmptyList.filterIndex<String>()) { true },
+      traversal = FilterIndex.filterIndex(NonEmptyList.filterIndex()) { true },
       aGen = genNonEmptyList(Gen.string()),
       bGen = Gen.string(),
       funcGen = genFunctionAToB(Gen.string()),
@@ -58,7 +58,7 @@ class FilterIndexInstanceTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = FilterIndex.filterIndex(MapK.filterIndex<Char, Int>()) { true },
+      traversal = FilterIndex.filterIndex(MapK.filterIndex()) { true },
       aGen = genMapK(genChars(), genIntSmall()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
@@ -78,7 +78,7 @@ class FilterIndexInstanceTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = FilterIndex.filterIndex(StringFilterIndexInstance()) { true },
+      traversal = FilterIndex.filterIndex(String.filterIndex()) { true },
       aGen = Gen.string(),
       bGen = genChars(),
       funcGen = genFunctionAToB(genChars()),
