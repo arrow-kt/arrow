@@ -28,11 +28,16 @@ interface SequenceKEachInstance<A> : Each<SequenceK<A>, A> {
 
 @instance(SequenceK::class)
 interface SequenceKFilterIndexInstance<A> : FilterIndex<SequenceK<A>, Int, A> {
-  override fun filter(p: (Int) -> Boolean): Traversal<SequenceK<A>, A> =
-  // FIXME(paco) we're not scala, so we need to safely downcast
-    FilterIndex.fromTraverse<ForSequenceK, A>({ aas ->
-      aas.fix().mapIndexed { index, a -> a toT index }.k()
-    }, SequenceK.traverse()).filter(p) as Traversal<SequenceK<A>, A>
+  override fun filter(p: (Int) -> Boolean): Traversal<SequenceK<A>, A> = object : Traversal<SequenceK<A>, A> {
+    override fun <F> modifyF(FA: Applicative<F>, s: SequenceK<A>, f: (A) -> Kind<F, A>): Kind<F, SequenceK<A>> =
+      SequenceK.traverse().run {
+        FA.run {
+          s.mapIndexed { index, a -> a toT index }.k().traverse(FA, { (a, j) ->
+            if (p(j)) f(a) else just(a)
+          })
+        }
+      }
+  }
 }
 
 @instance(SequenceK::class)
