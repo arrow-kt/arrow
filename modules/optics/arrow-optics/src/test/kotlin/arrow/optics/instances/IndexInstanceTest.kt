@@ -69,7 +69,7 @@ class IndexInstanceTest : UnitSpec() {
     ))
 
     testLaws(OptionalLaws.laws(
-      optional = StringIndexInstance().index(5),
+      optional = String.index().index(5),
       aGen = Gen.string(),
       bGen = genChars(),
       funcGen = genFunctionAToB(genChars()),

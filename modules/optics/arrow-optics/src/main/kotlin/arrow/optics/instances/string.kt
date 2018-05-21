@@ -17,7 +17,7 @@ import arrow.typeclasses.Applicative
 
 fun String.Companion.traversal(): Traversal<String, Char> = object : Traversal<String, Char> {
   override fun <F> modifyF(FA: Applicative<F>, s: String, f: (Char) -> Kind<F, Char>): Kind<F, String> = with(ListK.traverse()) {
-    FA.run { s.toList().k().traverse(FA, f).map { it.toString() } }
+    FA.run { s.toList().k().traverse(FA, f).map { it.joinToString(separator = "") } }
   }
 }
 
@@ -32,6 +32,8 @@ interface StringEachInstance : Each<String, Char> {
   }
 }
 
+fun String.Companion.filterIndex(): FilterIndex<String, Int, Char> = StringFilterIndexInstance()
+
 interface StringFilterIndexInstance : FilterIndex<String, Int, Char> {
   override fun filter(p: (Int) -> Boolean): Traversal<String, Char> =
     stringToList compose listToListK() compose ListK.filterIndex<Char>().filter(p)
@@ -41,6 +43,8 @@ interface StringFilterIndexInstance : FilterIndex<String, Int, Char> {
   }
 }
 
+fun String.Companion.index(): Index<String, Int, Char> = StringIndexInstance()
+
 interface StringIndexInstance : Index<String, Int, Char> {
 
   override fun index(i: Int): Optional<String, Char> =
@@ -49,4 +53,5 @@ interface StringIndexInstance : Index<String, Int, Char> {
   companion object {
     operator fun invoke(): Index<String, Int, Char> = object : StringIndexInstance {}
   }
+
 }
