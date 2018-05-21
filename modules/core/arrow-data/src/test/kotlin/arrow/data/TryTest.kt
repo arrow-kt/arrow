@@ -2,7 +2,7 @@ package arrow.data
 
 import arrow.core.*
 import arrow.instances.eq
-import arrow.instances.syntax
+import arrow.instances.extensions
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadErrorLaws
@@ -23,7 +23,7 @@ class TryTest : UnitSpec() {
 
     val EQ = Try.eq(Eq { a, b -> a::class == b::class }, Int.eq())
 
-    Try syntax {
+    Try extensions {
       testLaws(
         EqLaws.laws(EQ) { Try.just(it) },
         ShowLaws.laws(Try.show(), EQ) { Try.just(it) },
@@ -108,7 +108,7 @@ class TryTest : UnitSpec() {
     }
 
     "Cartesian builder should build products over homogeneous Try" {
-      Try syntax {
+      Try extensions {
         map(
           Success("11th"),
           Success("Doctor"),
@@ -118,7 +118,7 @@ class TryTest : UnitSpec() {
     }
 
     "Cartesian builder should build products over heterogeneous Try" {
-      Try syntax {
+      Try extensions {
         map(
           Success(13),
           Success("Doctor"),
@@ -130,7 +130,7 @@ class TryTest : UnitSpec() {
     data class DoctorNotFoundException(val msg: String) : Exception()
 
     "Cartesian builder should build products over Failure Try" {
-      Try syntax {
+      Try extensions {
         map(
           Success(13),
           Failure<Boolean>(DoctorNotFoundException("13th Doctor is coming!")),

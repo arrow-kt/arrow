@@ -32,7 +32,7 @@ import arrow.*
 import arrow.typeclasses.*
 import arrow.instances.*
 
-Int syntax { 1.combine(2) }
+Int extensions { 1.combine(2) }
 ```
 
 ```kotlin:ank   

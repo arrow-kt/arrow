@@ -139,7 +139,7 @@ import arrow.typeclasses.*
 import arrow.instances.*
 
 fun attackOption(): Option<Impacted> =
-  Option syntax {
+  Option extensions {
     binding {
         val nuke = arm().bind()
         val target = aim().bind()
@@ -200,7 +200,7 @@ import arrow.typeclasses.*
 import arrow.instances.*
 
 fun attackTry(): Try<Impacted> =
-  Try syntax {
+  Try extensions {
     binding {
       val nuke = arm().bind()
       val target = aim().bind()
@@ -259,7 +259,7 @@ All values on the left side assume to be `Right` biased and whenever a `Left` va
 
 ```kotlin
 fun attackEither(): Either<NukeException, Impacted> =
-  Either<NukeException>() syntax {
+  Either<NukeException>() extensions {
    binding {
     val nuke = arm().bind()
     val target = aim().bind()

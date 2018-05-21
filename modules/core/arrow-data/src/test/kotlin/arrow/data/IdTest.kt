@@ -1,7 +1,7 @@
 package arrow.data
 
 import arrow.core.*
-import arrow.instances.syntax
+import arrow.instances.extensions
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -12,7 +12,7 @@ import org.junit.runner.RunWith
 class IdTest : UnitSpec() {
   init {
 
-    Id syntax {
+    Id extensions {
       testLaws(
         EqLaws.laws(Id.eq(Eq.any())) { Id(it) },
         ShowLaws.laws(Id.show(), Eq.any()) { Id(it) },

@@ -20,7 +20,7 @@ import org.junit.runner.RunWith
 class WriterTTest : UnitSpec() {
   init {
 
-    WriterT(NonEmptyList.monad(), Int.monoid()) syntax {
+    WriterT(NonEmptyList.monad(), Int.monoid()) extensions {
       testLaws(
         MonadLaws.laws(this, Eq.any()),
         MonoidKLaws.laws(

@@ -125,5 +125,5 @@ object SequenceKContext : SequenceKMonadInstance, SequenceKTraverseInstance, Seq
     fix().map(f)
 }
 
-infix fun <A> SequenceK.Companion.syntax(f: SequenceKContext.() -> A): A =
+infix fun <A> SequenceK.Companion.extensions(f: SequenceKContext.() -> A): A =
   f(SequenceKContext)

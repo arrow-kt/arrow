@@ -34,7 +34,7 @@ class StateTTests : UnitSpec() {
 
   init {
 
-    StateT<ForTry, Int, Throwable>(Try.monadError()) syntax {
+    StateT<ForTry, Int, Throwable>(Try.monadError()) extensions {
       testLaws(
         MonadStateLaws.laws(M, EQ, EQ_UNIT),
         SemigroupKLaws.laws(

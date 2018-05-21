@@ -45,7 +45,7 @@ interface Function1MonadInstance<I> : Function1ApplicativeInstance<I>, Monad<Fun
 class Function1Context<A> : Function1MonadInstance<A>
 
 class Function1ContextPartiallyApplied<L> {
-  infix fun <A> syntax(f: Function1Context<L>.() -> A): A =
+  infix fun <A> extensions(f: Function1Context<L>.() -> A): A =
     f(Function1Context())
 }
 

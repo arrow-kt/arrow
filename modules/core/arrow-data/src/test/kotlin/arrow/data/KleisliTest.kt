@@ -17,7 +17,7 @@ class KleisliTest : UnitSpec() {
 
   init {
 
-    Kleisli<ForTry, Int, Throwable>(Try.monadError()) syntax {
+    Kleisli<ForTry, Int, Throwable>(Try.monadError()) extensions {
       testLaws(MonadErrorLaws.laws(this, EQ(), EQ()))
     }
 

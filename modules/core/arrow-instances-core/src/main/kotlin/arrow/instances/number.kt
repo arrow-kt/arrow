@@ -42,7 +42,7 @@ fun Byte.Companion.monoid(): Monoid<Byte> =
 
 object ByteContext : ByteShowInstance, ByteOrderInstance, ByteMonoidInstance
 
-infix fun <L> Byte.Companion.syntax(f: ByteContext.() -> L): L =
+infix fun <L> Byte.Companion.extensions(f: ByteContext.() -> L): L =
   f(ByteContext)
 
 //////////
@@ -86,7 +86,7 @@ fun Double.Companion.monoid(): Monoid<Double> =
 
 object DoubleContext : DoubleShowInstance, DoubleOrderInstance, DoubleMonoidInstance
 
-infix fun <L> Double.Companion.syntax(f: DoubleContext.() -> L): L =
+infix fun <L> Double.Companion.extensions(f: DoubleContext.() -> L): L =
   f(DoubleContext)
 
 //////////
@@ -129,7 +129,7 @@ fun Int.Companion.monoid(): Monoid<Int> =
 
 object IntContext : IntShowInstance, IntOrderInstance, IntMonoidInstance
 
-infix fun <L> Int.Companion.syntax(f: IntContext.() -> L): L =
+infix fun <L> Int.Companion.extensions(f: IntContext.() -> L): L =
   f(IntContext)
 
 //////////
@@ -173,7 +173,7 @@ fun Long.Companion.monoid(): Monoid<Long> =
 
 object LongContext : LongShowInstance, LongOrderInstance, LongMonoidInstance
 
-infix fun <L> Long.Companion.syntax(f: LongContext.() -> L): L =
+infix fun <L> Long.Companion.extensions(f: LongContext.() -> L): L =
   f(LongContext)
 
 //////////
@@ -217,7 +217,7 @@ fun Short.Companion.monoid(): Monoid<Short> =
 
 object ShortContext : ShortShowInstance, ShortOrderInstance, ShortMonoidInstance
 
-infix fun <L> Short.Companion.syntax(f: ShortContext.() -> L): L =
+infix fun <L> Short.Companion.extensions(f: ShortContext.() -> L): L =
   f(ShortContext)
 
 //////////
@@ -261,5 +261,5 @@ fun Float.Companion.monoid(): Monoid<Float> =
 
 object FloatContext : FloatShowInstance, FloatOrderInstance, FloatMonoidInstance
 
-infix fun <L> Float.Companion.syntax(f: FloatContext.() -> L): L =
+infix fun <L> Float.Companion.extensions(f: FloatContext.() -> L): L =
   f(FloatContext)

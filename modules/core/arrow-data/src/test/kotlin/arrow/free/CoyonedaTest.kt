@@ -18,7 +18,7 @@ class CoyonedaTest : UnitSpec() {
 
   init {
 
-    Coyoneda<ForId, Int>() syntax {
+    Coyoneda<ForId, Int>() extensions {
       testLaws(FunctorLaws.laws(this, { Coyoneda(Id(0), { it }) }, EQ))
     }
 

@@ -23,7 +23,7 @@ class SortedMapKTest : UnitSpec() {
 
   init {
 
-    SortedMapK<String>() syntax {
+    SortedMapK<String>() extensions {
       testLaws(
         ShowLaws.laws(SortedMapK.show(), EQ) { sortedMapOf("key" to 1).k() },
         MonoidLaws.laws(SortedMapK.monoid<String, Int>(Int.monoid()), sortedMapOf("key" to 1).k(), EQ),

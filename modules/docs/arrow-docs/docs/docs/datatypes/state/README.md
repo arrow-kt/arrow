@@ -91,7 +91,7 @@ The `flatMap` method on `State<S, A>` lets you use the result of one `State` in 
 import arrow.typeclasses.*
 import arrow.instances.*
 
-fun stackOperations() = State<Stack>() syntax {
+fun stackOperations() = State<Stack>() extensions {
   binding {
     val a = push("a").bind()
     val b = pop().bind()

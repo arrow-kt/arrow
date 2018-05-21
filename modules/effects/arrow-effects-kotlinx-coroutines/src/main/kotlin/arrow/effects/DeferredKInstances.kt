@@ -88,5 +88,5 @@ interface DeferredKEffectInstance : DeferredKAsyncInstance, Effect<ForDeferredK>
 
 object DeferredKContext : DeferredKEffectInstance
 
-infix fun <A> DeferredK.Companion.syntax(f: DeferredKContext.() -> A): A =
+infix fun <A> DeferredK.Companion.extensions(f: DeferredKContext.() -> A): A =
   f(DeferredKContext)

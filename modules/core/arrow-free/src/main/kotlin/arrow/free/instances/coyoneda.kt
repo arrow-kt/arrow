@@ -12,7 +12,7 @@ interface CoyonedaFunctorInstance<F, G> : Functor<CoyonedaPartialOf<F, G>> {
 class CoyonedaContext<F, G> : CoyonedaFunctorInstance<F, G>
 
 class CoyonedaContextPartiallyApplied<F, G> {
-  infix fun <A> syntax(f: CoyonedaContext<F, G>.() -> A): A =
+  infix fun <A> extensions(f: CoyonedaContext<F, G>.() -> A): A =
     f(CoyonedaContext())
 }
 

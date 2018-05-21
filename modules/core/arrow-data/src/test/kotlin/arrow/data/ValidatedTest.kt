@@ -22,7 +22,7 @@ class ValidatedTest : UnitSpec() {
 
     val VAL_SGK = Validated.semigroupK(String.semigroup())
 
-    Validated(String.semigroup()) syntax {
+    Validated(String.semigroup()) extensions {
       testLaws(
         EqLaws.laws(EQ) { Valid(it) },
         ShowLaws.laws(Validated.show(), EQ) { Valid(it) },

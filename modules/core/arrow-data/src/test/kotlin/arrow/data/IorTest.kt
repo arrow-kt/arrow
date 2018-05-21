@@ -28,7 +28,7 @@ class IorTest : UnitSpec() {
 
     val EQ = Ior.eq(Eq.any(), Eq.any())
 
-    Ior(Int.semigroup()) syntax {
+    Ior(Int.semigroup()) extensions {
       testLaws(
         EqLaws.laws(EQ, { Right(it) }),
         ShowLaws.laws(Ior.show(), EQ) { Right(it) },

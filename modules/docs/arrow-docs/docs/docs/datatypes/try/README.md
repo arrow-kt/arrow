@@ -143,7 +143,7 @@ Transforming the value, if the computation is a success:
 import arrow.typeclasses.*
 import arrow.instances.*
 
-Try syntax {
+Try extensions {
   Try { "3".toInt() }.map { it + 1} 
 }
 ```
@@ -153,7 +153,7 @@ Try syntax {
 Computing over independent values:
 
 ```kotlin:ank
-Try syntax {
+Try extensions {
   tupled(Try { "3".toInt() }, Try { "5".toInt() }, Try { "nope".toInt() })
 }
 ```
@@ -163,7 +163,7 @@ Try syntax {
 Computing over dependent values ignoring failure:
 
 ```kotlin
-Try syntax {
+Try extensions {
   binding {
     val a = Try { "3".toInt() }.bind()
     val b = Try { "4".toInt() }.bind()
@@ -174,7 +174,7 @@ Try syntax {
 ```
 
 ```kotlin
-Try syntax {
+Try extensions {
   binding {
     val a = Try { "none".toInt() }.bind()
     val b = Try { "4".toInt() }.bind()
@@ -189,7 +189,7 @@ Try syntax {
 Computing over dependent values that are automatically lifted to the context of `Try`:
 
 ```kotlin
-Try syntax { 
+Try extensions { 
   bindingCatch {
     val a = "none".toInt()
     val b = "4".toInt()

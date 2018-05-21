@@ -1,6 +1,6 @@
 package arrow.data
 
-import arrow.mtl.instances.syntax
+import arrow.mtl.instances.extensions
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -15,7 +15,7 @@ class ListKTest : UnitSpec() {
 
     val EQ: Eq<ListKOf<Int>> = ListK.eq(Eq.any())
 
-    ListK syntax {
+    ListK extensions {
       testLaws(
         EqLaws.laws(EQ) { listOf(it).k() },
         ShowLaws.laws(ListK.show(), EQ) { listOf(it).k() },

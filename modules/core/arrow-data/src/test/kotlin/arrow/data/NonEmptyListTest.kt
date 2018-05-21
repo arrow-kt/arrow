@@ -2,7 +2,7 @@ package arrow.data
 
 import arrow.instances.IntEqInstance
 import arrow.instances.eq
-import arrow.instances.syntax
+import arrow.instances.extensions
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -14,7 +14,7 @@ class NonEmptyListTest : UnitSpec() {
   init {
 
     val EQ = NonEmptyList.eq(Int.eq())
-    NonEmptyList syntax {
+    NonEmptyList extensions {
       testLaws(
         EqLaws.laws(EQ) { it.nel() },
         ShowLaws.laws(NonEmptyList.show(), EQ) { it.nel() },

@@ -46,7 +46,7 @@ fun <F, G, A> FreeApplicative.Companion.eq(FK: FunctionK<F, G>, MG: Monad<G>, du
 class FreeApplicativeContext<S> : FreeApplicativeApplicativeInstance<S>
 
 class FreeApplicativeContextPartiallyApplied<S> {
-  infix fun <A> syntax(f: FreeApplicativeContext<S>.() -> A): A =
+  infix fun <A> extensions(f: FreeApplicativeContext<S>.() -> A): A =
     f(FreeApplicativeContext())
 }
 

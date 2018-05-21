@@ -73,7 +73,7 @@ class CoproductContext<F, G>(val TF: Traverse<F>, val TG: Traverse<G>) : Coprodu
 }
 
 class CoproductContextPartiallyApplied<F, G>(val TF: Traverse<F>, val TG: Traverse<G>) {
-  infix fun <A> syntax(f: CoproductContext<F, G>.() -> A): A =
+  infix fun <A> extensions(f: CoproductContext<F, G>.() -> A): A =
     f(CoproductContext(TF, TG))
 }
 

@@ -3,7 +3,7 @@ package arrow.data
 import arrow.Kind
 import arrow.core.*
 import arrow.core.Eval.Now
-import arrow.instances.syntax
+import arrow.instances.extensions
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws
@@ -24,7 +24,7 @@ class EvalTest : UnitSpec() {
 
   init {
 
-    Eval syntax {
+    Eval extensions {
       testLaws(
         MonadLaws.laws(this, EQ),
         ComonadLaws.laws(this, ::Now, EQ)

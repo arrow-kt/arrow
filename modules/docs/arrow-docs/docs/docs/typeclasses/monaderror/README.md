@@ -26,7 +26,7 @@ import arrow.*
 import arrow.core.*
 import arrow.instances.*
 
-Either<Throwable>() syntax { 
+Either<Throwable>() extensions { 
   raiseError<Int>(RuntimeException("Paco"))
 }
 ```
@@ -34,7 +34,7 @@ Either<Throwable>() syntax {
 ```kotlin:ank
 import arrow.data.*
 
-Try syntax { 
+Try extensions { 
   raiseError<Int>(RuntimeException("Paco"))
 }
 ```
@@ -42,7 +42,7 @@ Try syntax {
 ```kotlin:ank
 import arrow.effects.*
 
-IO syntax { 
+IO extensions { 
   raiseError<Int>(RuntimeException("Paco"))
 }
 ```
@@ -52,13 +52,13 @@ IO syntax {
 Tests a predicate against the object, and if it fails it executes a function to create an error.
 
 ```kotlin:ank
-Either<Throwable>() syntax {
+Either<Throwable>() extensions {
   Either.Right(1).ensure({ RuntimeException("Failed predicate") }, { it > 0 }) 
 }
 ```
 
 ```kotlin:ank
-Either<Throwable>() syntax {
+Either<Throwable>() extensions {
   Either.Right(1).ensure({ RuntimeException("Failed predicate") }, { it < 0 }) 
 }
 ```

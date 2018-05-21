@@ -42,7 +42,7 @@ class FreeApplicativeTest : UnitSpec() {
 
     val EQ: FreeApplicativeEq<OpsAp.F, ForId, Int> = FreeApplicative.eq(idApInterpreter, Id.monad())
 
-    FreeApplicative<OpsAp.F>() syntax {
+    FreeApplicative<OpsAp.F>() extensions {
       testLaws(
         EqLaws.laws(EQ, { OpsAp.value(it) }),
         ApplicativeLaws.laws(OpsAp, EQ),

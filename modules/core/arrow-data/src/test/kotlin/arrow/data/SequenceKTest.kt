@@ -3,7 +3,7 @@ package arrow.data
 import arrow.Kind
 import arrow.instances.IntEqInstance
 import arrow.instances.eq
-import arrow.instances.syntax
+import arrow.instances.extensions
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -26,7 +26,7 @@ class SequenceKTest : UnitSpec() {
         toList().toString()
     }
 
-    SequenceK syntax {
+    SequenceK extensions {
       testLaws(
         EqLaws.laws(SequenceK.eq(Int.eq())) { sequenceOf(it).k() },
         ShowLaws.laws(show, eq) { sequenceOf(it).k() },

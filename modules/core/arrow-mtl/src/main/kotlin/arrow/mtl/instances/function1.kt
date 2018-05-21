@@ -19,7 +19,7 @@ interface Function1MonadReaderInstance<I> : Function1MonadInstance<I>, MonadRead
 class Function1MtlContext<A> : Function1MonadReaderInstance<A>
 
 class Function1MtlContextPartiallyApplied<L> {
-  infix fun <A> syntax(f: Function1MtlContext<L>.() -> A): A =
+  infix fun <A> extensions(f: Function1MtlContext<L>.() -> A): A =
     f(Function1MtlContext())
 }
 

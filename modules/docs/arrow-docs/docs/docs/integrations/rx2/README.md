@@ -102,7 +102,7 @@ When rewritten using `bindingCatch` it becomes:
 import arrow.effects.*
 import arrow.typeclasses.*
 
-ObservableK syntax { 
+ObservableK extensions { 
  bindingCatch {
   val songUrl = getSongUrlAsync().bind()
   val musicPlayer = MediaPlayer.load(songUrl)

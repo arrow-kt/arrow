@@ -128,7 +128,7 @@ import arrow.typeclasses.*
 import arrow.instances.*
 
 fun stackOperationsS2() = 
- StateT<EitherPartialOf<StackError>, Stack, StackError>(Either.monadError<StackError>()) syntax {
+ StateT<EitherPartialOf<StackError>, Stack, StackError>(Either.monadError<StackError>()) extensions {
   binding {
     pushS("a").bind()
     popS().bind()

@@ -1,7 +1,7 @@
 package arrow.data
 
 import arrow.core.*
-import arrow.instances.syntax
+import arrow.instances.extensions
 import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
@@ -13,7 +13,7 @@ class CoreaderTest : UnitSpec() {
   init {
     with(Coreader) {
 
-      Id syntax {
+      Id extensions {
 
         "map should return mapped value" {
           forAll { num: Int ->

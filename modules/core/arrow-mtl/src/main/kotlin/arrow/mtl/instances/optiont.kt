@@ -55,7 +55,7 @@ class OptionTMtlContext<F>(val MF: Monad<F>, val TF: TraverseFilter<F>) : Option
 }
 
 class OptionTMtlContextPartiallyApplied<F>(val MF: Monad<F>, val TF: TraverseFilter<F>) {
-  infix fun <A> syntax(f: OptionTMtlContext<F>.() -> A): A =
+  infix fun <A> extensions(f: OptionTMtlContext<F>.() -> A): A =
     f(OptionTMtlContext(MF, TF))
 }
 

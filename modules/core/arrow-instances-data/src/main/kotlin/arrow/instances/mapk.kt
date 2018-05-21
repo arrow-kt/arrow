@@ -72,7 +72,7 @@ interface MapKShowInstance<K, A> : Show<MapK<K, A>> {
 class MapKContext<L> : MapKTraverseInstance<L>
 
 class MapKContextPartiallyApplied<L> {
-  infix fun <A> syntax(f: MapKContext<L>.() -> A): A =
+  infix fun <A> extensions(f: MapKContext<L>.() -> A): A =
     f(MapKContext())
 }
 

@@ -86,7 +86,7 @@ class ReaderContext<D> : KleisliMonadInstance<ForId, D> {
 }
 
 class ReaderContextPartiallyApplied<L> {
-  inline fun <A> syntax(f: ReaderContext<L>.() -> A): A =
+  inline fun <A> extensions(f: ReaderContext<L>.() -> A): A =
     f(ReaderContext())
 }
 
@@ -98,7 +98,7 @@ class KleisliContext<F, D, E>(val MF: MonadError<F, E>) : KleisliMonadErrorInsta
 }
 
 class KleisliContextPartiallyApplied<F, D, E>(val MF: MonadError<F, E>) {
-  infix fun <A> syntax(f: KleisliContext<F, D, E>.() -> A): A =
+  infix fun <A> extensions(f: KleisliContext<F, D, E>.() -> A): A =
     f(KleisliContext(MF))
 }
 

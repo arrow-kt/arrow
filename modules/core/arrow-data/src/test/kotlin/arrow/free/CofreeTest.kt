@@ -19,7 +19,7 @@ class CofreeTest : UnitSpec() {
 
   init {
 
-    Cofree<ForOption>() syntax {
+    Cofree<ForOption>() extensions {
       testLaws(ComonadLaws.laws(this, {
         val sideEffect = SideEffect()
         unfold(Option.functor(), sideEffect.counter, {

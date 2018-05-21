@@ -2,7 +2,7 @@ package arrow.data
 
 import arrow.instances.IntEqInstance
 import arrow.instances.eq
-import arrow.instances.syntax
+import arrow.instances.extensions
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -16,7 +16,7 @@ class SetKTest : UnitSpec() {
 
     val EQ = SetK.eq(Int.eq())
 
-    SetK syntax {
+    SetK extensions {
       testLaws(
         EqLaws.laws(EQ) { SetK.just(it) },
         ShowLaws.laws(SetK.show(), EQ) { SetK.just(it) },

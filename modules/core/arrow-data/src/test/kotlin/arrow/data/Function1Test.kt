@@ -18,7 +18,7 @@ class Function1Test : UnitSpec() {
   }
 
   init {
-    Function1<Int>() syntax {
+    Function1<Int>() extensions {
       testLaws(MonadLaws.laws(this, EQ))
     }
   }

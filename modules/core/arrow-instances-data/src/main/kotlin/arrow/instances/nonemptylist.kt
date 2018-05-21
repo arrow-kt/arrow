@@ -148,5 +148,5 @@ object NonEmptyListContext : NonEmptyListBimonadInstance, NonEmptyListTraverseIn
     fix().map(f)
 }
 
-infix fun <A> NonEmptyList.Companion.syntax(f: NonEmptyListContext.() -> A): A =
+infix fun <A> NonEmptyList.Companion.extensions(f: NonEmptyListContext.() -> A): A =
   f(NonEmptyListContext)

@@ -168,5 +168,5 @@ object OptionContext : OptionMonadErrorInstance, OptionTraverseInstance {
     fix().map(f)
 }
 
-infix fun <A> Option.Companion.syntax(f: OptionContext.() -> A): A =
+infix fun <A> Option.Companion.extensions(f: OptionContext.() -> A): A =
   f(OptionContext)

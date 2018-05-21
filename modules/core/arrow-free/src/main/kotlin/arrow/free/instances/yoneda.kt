@@ -12,7 +12,7 @@ interface YonedaFunctorInstance<U> : Functor<YonedaPartialOf<U>> {
 class YonedaContext<U> : YonedaFunctorInstance<U>
 
 class YonedaContextPartiallyApplied<U> {
-  infix fun <A> syntax(f: YonedaContext<U>.() -> A): A =
+  infix fun <A> extensions(f: YonedaContext<U>.() -> A): A =
     f(YonedaContext())
 }
 

@@ -44,7 +44,7 @@ class WriterTMtlContext<F, W>(val MF: Monad<F>, val MW: Monoid<W>) : WriterTMona
 }
 
 class WriterTMtlContextPartiallyApplied<F, W>(val MF: Monad<F>, val MW: Monoid<W>) {
-  infix fun <A> syntax(f: WriterTMtlContext<F, W>.() -> A): A =
+  infix fun <A> extensions(f: WriterTMtlContext<F, W>.() -> A): A =
     f(WriterTMtlContext(MF, MW))
 }
 

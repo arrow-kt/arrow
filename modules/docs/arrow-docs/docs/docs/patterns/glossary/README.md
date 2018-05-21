@@ -93,10 +93,10 @@ If you're defining your own instances and would like for them to be discoverable
 
 ### Syntax
 
-Arrow provides a `syntax` DSL making available in the direct scope all type classes declared functions and extensions in a given data type through the `infix` `syntax` function.
+Arrow provides a `extensions` DSL making available in the direct scope all type classes declared functions and extensions in a given data type through the `infix` `extensions` function.
 
 ```kotlin
-Option syntax {
+Option extensions {
   binding {
     val a = Option(1).bind()
     val b = Option(a + 1).bind()
@@ -107,7 +107,7 @@ Option syntax {
 ```
 
 ```kotlin
-Option syntax {
+Option extensions {
   map(Option(1), Option(2), Option(3), { (one, two, three) ->
     one + two + three
   })
@@ -116,14 +116,14 @@ Option syntax {
 ```
 
 ```kotlin
-Option syntax {
+Option extensions {
   listOf(Option(1), Option(2), Option(3)).k().traverse(this, ::identity)
 }
 //Option(ListK(1, 2, 3))
 ```
 
 ```kotlin
-Try syntax {
+Try extensions {
   binding {
     val a = Try { 1 }.bind()
     val b = Try { a + 1 }.bind()
@@ -134,7 +134,7 @@ Try syntax {
 ```
 
 ```kotlin
-Try syntax {
+Try extensions {
   map(Try { 1 }, Try { 2 }, Try { 3 }, { (one, two, three) ->
     one + two + three
   })
@@ -143,13 +143,13 @@ Try syntax {
 ```
 
 ```kotlin
-Try syntax {
+Try extensions {
   listOf(Try { 1 }, Try { 2 }, Try { 3 }).k().traverse(this, ::identity)
 }
 //Success(ListK(1,2,3))
 ```
 
-If you defined your own instances over your own data types and wish to use a similar `syntax` DSL you can do so for both types with a single type argument such as `Option`:
+If you defined your own instances over your own data types and wish to use a similar `extensions` DSL you can do so for both types with a single type argument such as `Option`:
 
 ```kotlin:ank:silent
 object OptionContext : OptionMonadErrorInstance, OptionTraverseInstance {
@@ -157,7 +157,7 @@ object OptionContext : OptionMonadErrorInstance, OptionTraverseInstance {
     fix().map(f)
 }
 
-infix fun <A> Option.Companion.syntax(f: OptionContext.() -> A): A =
+infix fun <A> Option.Companion.extensions(f: OptionContext.() -> A): A =
   f(OptionContext)
 ```
 
@@ -170,7 +170,7 @@ class EitherContext<L> : EitherMonadErrorInstance<L>, EitherTraverseInstance<L> 
 }
 
 class EitherContextPartiallyApplied<L> {
-  infix fun <A> syntax(f: EitherContext<L>.() -> A): A =
+  infix fun <A> extensions(f: EitherContext<L>.() -> A): A =
     f(EitherContext())
 }
 

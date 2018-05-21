@@ -24,7 +24,7 @@ import arrow.core.*
 import arrow.mtl.typeclasses.*
 import arrow.mtl.instances.*
 
-Option syntax { 
+Option extensions { 
   bindingFilter {
      val a = Option(1).bind()
      val b = Option(1).bind()
@@ -38,7 +38,7 @@ Option syntax {
 ```kotlin:ank
 import arrow.data.*
 
-ListK syntax { 
+ListK extensions { 
  bindingFilter {
      val a = listOf(1).k().bind()
      val b = listOf(1).k().bind()
@@ -52,7 +52,7 @@ ListK syntax {
 When `continueIf` returns `false` the computation is interrupted and the `empty()` value is returned
 
 ```kotlin:ank
-Option syntax {
+Option extensions {
   bindingFilter {
      val a = Option(1).bind()
      val b = Option(1).bind()
@@ -64,7 +64,7 @@ Option syntax {
 ```
 
 ```kotlin:ank
-ListK syntax {
+ListK extensions {
  bindingFilter {
      val a = listOf(1).k().bind()
      val b = listOf(1).k().bind()
@@ -82,7 +82,7 @@ Binding over `MonadFilter` instances with `bindingFilter` brings into scope the 
 When `bindWithFilter` is satisfied the computation continues
 
 ```kotlin:ank
-Option syntax { 
+Option extensions { 
  bindingFilter {
      val a = Option(1).bind()
      val b = Option(1).bindWithFilter { it == a } //continues

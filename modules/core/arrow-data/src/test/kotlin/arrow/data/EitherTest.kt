@@ -19,7 +19,7 @@ class EitherTest : UnitSpec() {
 
   init {
 
-    Either<Throwable>() syntax {
+    Either<Throwable>() extensions {
 
       testLaws(
         EqLaws.laws(Either.eq(String.eq(), Int.eq()), { Right(it) }),

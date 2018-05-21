@@ -94,7 +94,7 @@ class ValidatedContext<L>(val SL: Semigroup<L>) : ValidatedApplicativeErrorInsta
 }
 
 class ValidatedContextPartiallyApplied<L>(val SL: Semigroup<L>) {
-  infix fun <A> syntax(f: ValidatedContext<L>.() -> A): A =
+  infix fun <A> extensions(f: ValidatedContext<L>.() -> A): A =
     f(ValidatedContext(SL))
 }
 

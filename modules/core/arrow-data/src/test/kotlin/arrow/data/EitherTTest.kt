@@ -15,7 +15,7 @@ import org.junit.runner.RunWith
 class EitherTTest : UnitSpec() {
   init {
 
-    EitherT<ForId, Throwable>(Id.monad()) syntax {
+    EitherT<ForId, Throwable>(Id.monad()) extensions {
 
       testLaws(
         MonadErrorLaws.laws(this, Eq.any(), Eq.any()),

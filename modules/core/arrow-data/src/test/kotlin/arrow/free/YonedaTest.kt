@@ -21,7 +21,7 @@ class YonedaTest : UnitSpec() {
 
   init {
 
-    Yoneda<ForId>() syntax {
+    Yoneda<ForId>() extensions {
       testLaws(FunctorLaws.laws(this, { Yoneda(Id(it), Id.functor()) }, EQ))
     }
 

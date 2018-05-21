@@ -26,7 +26,7 @@ interface CofreeComonadInstance<S> : CofreeFunctorInstance<S>, Comonad<CofreePar
 class CofreeContext<S> : CofreeComonadInstance<S>
 
 class CofreeContextPartiallyApplied<S> {
-  infix fun <A> syntax(f: CofreeContext<S>.() -> A): A =
+  infix fun <A> extensions(f: CofreeContext<S>.() -> A): A =
     f(CofreeContext())
 }
 

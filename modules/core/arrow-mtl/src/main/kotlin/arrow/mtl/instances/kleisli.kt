@@ -24,7 +24,7 @@ class KleisliMtlContext<F, D, E>(val MF: MonadError<F, E>) : KleisliMonadReaderI
 }
 
 class KleisliMtlContextPartiallyApplied<F, D, E>(val MF: MonadError<F, E>) {
-  infix fun <A> syntax(f: KleisliMtlContext<F, D, E>.() -> A): A =
+  infix fun <A> extensions(f: KleisliMtlContext<F, D, E>.() -> A): A =
     f(KleisliMtlContext(MF))
 }
 

@@ -73,7 +73,7 @@ fun <F, G, A> Free.Companion.eq(FK: FunctionK<F, G>, MG: Monad<G>, dummy: Unit =
 class FreeContext<S> : FreeMonadInstance<S>
 
 class FreeContextPartiallyApplied<S> {
-  infix fun <A> syntax(f: FreeContext<S>.() -> A): A =
+  infix fun <A> extensions(f: FreeContext<S>.() -> A): A =
     f(FreeContext())
 }
 

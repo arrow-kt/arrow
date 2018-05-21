@@ -19,7 +19,7 @@ class MapKTest : UnitSpec() {
   init {
     val EQ_TC = MapK.eq(String.eq(), Int.eq())
 
-    MapK<String>() syntax {
+    MapK<String>() extensions {
       testLaws(
         EqLaws.laws(EQ_TC) { mapOf(it.toString() to it).k() },
         ShowLaws.laws(MapK.show(), EQ_TC) { mapOf(it.toString() to it).k() },

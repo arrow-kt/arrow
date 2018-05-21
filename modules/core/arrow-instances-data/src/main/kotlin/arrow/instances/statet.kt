@@ -97,7 +97,7 @@ class StateTContext<F, S, E>(val ME: MonadError<F, E>) : StateTMonadErrorInstanc
 }
 
 class StateTContextPartiallyApplied<F, S, E>(val ME: MonadError<F, E>) {
-  infix fun <A> syntax(f: StateTContext<F, S, E>.() -> A): A =
+  infix fun <A> extensions(f: StateTContext<F, S, E>.() -> A): A =
     f(StateTContext(ME))
 }
 
@@ -109,7 +109,7 @@ class StateTMonadContext<S> : StateTMonadInstance<ForId, S> {
 }
 
 class StateContextPartiallyApplied<S>() {
-  infix fun <A> syntax(f: StateTMonadContext<S>.() -> A): A =
+  infix fun <A> extensions(f: StateTMonadContext<S>.() -> A): A =
     f(StateTMonadContext())
 }
 

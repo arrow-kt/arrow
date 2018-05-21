@@ -105,7 +105,7 @@ class OptionTContext<F>(val MF: Monad<F>) : OptionTMonadInstance<F>, OptionTMono
 }
 
 class OptionTContextPartiallyApplied<F>(val MF: Monad<F>) {
-  infix fun <A> syntax(f: OptionTContext<F>.() -> A): A =
+  infix fun <A> extensions(f: OptionTContext<F>.() -> A): A =
     f(OptionTContext(MF))
 }
 

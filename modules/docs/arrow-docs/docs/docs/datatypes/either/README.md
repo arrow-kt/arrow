@@ -287,7 +287,7 @@ val httpStatusCode = r.getOrHandle {
 ```kotlin:ank
 import arrow.instances.*
  
-Either<Int>() syntax { 
+Either<Int>() extensions { 
    Right(1).map {it + 1}
 }
 ```
@@ -297,7 +297,7 @@ Either<Int>() syntax {
  Computing over independent values
 
 ```kotlin:ank
-Either<Int>() syntax { 
+Either<Int>() extensions { 
   tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
 }
 ```
@@ -307,7 +307,7 @@ Either<Int>() syntax {
  Computing over dependent values ignoring absence
 
 ```kotlin
-Either<Int>() syntax {
+Either<Int>() extensions {
  binding {
     val a = Either.Right(1).bind()
     val b = Either.Right(1 + a).bind()

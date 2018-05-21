@@ -67,7 +67,7 @@ import arrow.typeclasses.*
 import arrow.instances.*
 
 fun getCountryCode(maybePerson : Either<BizError, Person>): Either<BizError, String> =
-  Either<BizError>() syntax { 
+  Either<BizError>() extensions { 
    binding {
     val person = maybePerson.bind()
     val address = person.address.toEither({ AddressNotFound(person.id) }).bind()
@@ -160,7 +160,7 @@ Let's look at how a similar implementation would look like using monad comprehen
 
 ```kotlin:ank
 fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
-      ObservableK syntax {
+      ObservableK extensions {
        binding {
         val person = findPerson(personId).bind()
         val address = person.fold (
@@ -211,7 +211,7 @@ So how would our function look if we implemented it with the EitherT monad trans
 
 ```kotlin
 fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
-  EitherT<ForObservableK, BizError>(ObservableK.monad()) syntax { 
+  EitherT<ForObservableK, BizError>(ObservableK.monad()) extensions { 
    binding {
     val person = EitherT(findPerson(personId)).bind()
     val address = EitherT(ObservableK.just(

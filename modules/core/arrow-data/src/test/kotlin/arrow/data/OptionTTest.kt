@@ -26,7 +26,7 @@ class OptionTTest : UnitSpec() {
 
   init {
 
-    OptionT(Option.monad(), Option.traverseFilter()) syntax {
+    OptionT(Option.monad(), Option.traverseFilter()) extensions {
 
       testLaws(
         MonadLaws.laws(this, Eq.any()),

@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.instances.IntEqInstance
 import arrow.instances.eq
-import arrow.mtl.instances.syntax
+import arrow.mtl.instances.extensions
 import arrow.syntax.collections.firstOption
 import arrow.syntax.collections.option
 import arrow.test.UnitSpec
@@ -44,7 +44,7 @@ class OptionTest : UnitSpec() {
         })
     }
 
-    Option syntax {
+    Option extensions {
       testLaws(
         EqLaws.laws(Option.eq(Int.eq()), { genOption(Gen.int()).generate() }),
         ShowLaws.laws(Option.show(), Option.eq(Int.eq()), { Some(it) }),

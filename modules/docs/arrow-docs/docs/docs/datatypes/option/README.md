@@ -128,7 +128,7 @@ Transforming the inner contents
 import arrow.typeclasses.*
 import arrow.instances.*
 
-Option syntax {
+Option extensions {
   Some(1).map { it + 1 }
 }
 ```
@@ -138,7 +138,7 @@ Option syntax {
 Computing over independent values
 
 ```kotlin:ank
-Option syntax {
+Option extensions {
   tupled(Some(1), Some("Hello"), Some(20.0))
 }
 ```
@@ -148,7 +148,7 @@ Option syntax {
 Computing over dependent values ignoring absence
 
 ```kotlin
-Option syntax {
+Option extensions {
   binding {
    val a = Some(1).bind()
    val b = Some(1 + a).bind()
@@ -160,7 +160,7 @@ Option syntax {
 ```
 
 ```kotlin
-Option syntax {
+Option extensions {
   binding {
    val x = none<Int>().bind()
    val y = Some(1 + x).bind()
