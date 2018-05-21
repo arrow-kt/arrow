@@ -22,47 +22,56 @@ When `continueIf` is satisfied the computation continues
 import arrow.*
 import arrow.core.*
 import arrow.mtl.typeclasses.*
+import arrow.mtl.instances.*
 
-Option.monadFilter().bindingFilter {
- val a = Option(1).bind()
- val b = Option(1).bind()
- val c = a + b
- continueIf(c > 0)
- c
+ForOption extensions { 
+  bindingFilter {
+     val a = Option(1).bind()
+     val b = Option(1).bind()
+     val c = a + b
+     continueIf(c > 0)
+     c
+  }
 }
 ```
 
 ```kotlin:ank
 import arrow.data.*
 
-ListK.monadFilter().bindingFilter {
- val a = listOf(1).k().bind()
- val b = listOf(1).k().bind()
- val c = a + b
- continueIf(c > 0)
- c
+ForListK extensions { 
+ bindingFilter {
+     val a = listOf(1).k().bind()
+     val b = listOf(1).k().bind()
+     val c = a + b
+     continueIf(c > 0)
+     c
+ }
 }
 ```    
 
 When `continueIf` returns `false` the computation is interrupted and the `empty()` value is returned
 
 ```kotlin:ank
-Option.monadFilter().bindingFilter {
- val a = Option(1).bind()
- val b = Option(1).bind()
- val c = a + b
- continueIf(c < 0)
- c
+ForOption extensions {
+  bindingFilter {
+     val a = Option(1).bind()
+     val b = Option(1).bind()
+     val c = a + b
+     continueIf(c < 0)
+     c
+  }
 }
 ```
 
 ```kotlin:ank
-ListK.monadFilter().bindingFilter {
- val a = listOf(1).k().bind()
- val b = listOf(1).k().bind()
- val c = a + b
- continueIf(c < 0)
- c
+ForListK extensions {
+ bindingFilter {
+     val a = listOf(1).k().bind()
+     val b = listOf(1).k().bind()
+     val c = a + b
+     continueIf(c < 0)
+     c
+ }
 }
 ```    
 
@@ -73,10 +82,12 @@ Binding over `MonadFilter` instances with `bindingFilter` brings into scope the 
 When `bindWithFilter` is satisfied the computation continues
 
 ```kotlin:ank
-Option.monadFilter().bindingFilter {
- val a = Option(1).bind()
- val b = Option(1).bindWithFilter { it == a } //continues
- a + b
+ForOption extensions { 
+ bindingFilter {
+     val a = Option(1).bind()
+     val b = Option(1).bindWithFilter { it == a } //continues
+     a + b
+ }
 }
 ```
 

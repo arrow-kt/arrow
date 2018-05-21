@@ -5,9 +5,7 @@ import arrow.core.*
 import arrow.data.NonEmptyList
 import arrow.data.fix
 import arrow.data.monad
-import arrow.free.instances.FreeEq
-import arrow.free.instances.FreeMonadInstance
-import arrow.free.instances.eq
+import arrow.free.instances.*
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadLaws
@@ -53,10 +51,14 @@ class FreeTest : UnitSpec() {
     val IdMonad = Id.monad()
 
     val EQ: FreeEq<Ops.F, ForId, Int> = Free.eq(idInterpreter, IdMonad)
-    testLaws(
-      EqLaws.laws<Free<Ops.F, Int>>(EQ, { Ops.value(it) }),
-      MonadLaws.laws(Ops, EQ)
-    )
+
+    ForFree<Ops.F>() extensions {
+      testLaws(
+        EqLaws.laws(EQ, { Ops.value(it) }),
+        MonadLaws.laws(Ops, EQ),
+        MonadLaws.laws(this, EQ)
+      )
+    }
 
     "Can interpret an ADT as Free operations" {
       program.foldMap(optionInterpreter, Option.monad()).fix() shouldBe Some(-30)

@@ -35,7 +35,7 @@ Because of such properties we can automatically derive interesting behaviors fro
 
 #### Extensions
 
-`@product` autmatically derives instances for `Semigroup` and `Monoid` supporting recursion in declared data types. In the example below we are able to `+` two `Account` objects because the instance `Int.semigroup()` is provided by Arrow.
+`@product` automatically derives instances for `Semigroup` and `Monoid` supporting recursion in declared data types. In the example below we are able to `+` two `Account` objects because the instance `Int.semigroup()` is provided by Arrow.
 
 ##### + operator
 
@@ -93,31 +93,41 @@ hListOf(1000, 900).toAccount()
 In the examples below we can observe how 2 different `Int` properties are returned inside a type constructor such as `Option`, `Try`, `Deferred` etc... and the automatically mapped to the shape of our `Account` data class removing all boilerplate from extracting the values from their context and returning an `Account` value in the same context.
 
 ```kotlin:ank
+import arrow.instances.*
+
 val maybeBalance: Option<Int> = Option(1000)
 val maybeAvailable: Option<Int> = Option(900)
 
-Option.applicative().mapToAccount(maybeBalance, maybeAvailable)
+ForOption extensions { 
+  mapToAccount(maybeBalance, maybeAvailable)
+}
 ```
 
 ```kotlin:ank
 val maybeBalance: Option<Int> = Option(1000)
 val maybeAvailable: Option<Int> = None
 
-Option.applicative().mapToAccount(maybeBalance, maybeAvailable)
+ForOption extensions { 
+  mapToAccount(maybeBalance, maybeAvailable) 
+}
 ```
 
 ```kotlin:ank
 val tryBalance: Try<Int> = Try { 1000 }
 val tryAvailable: Try<Int> = Try { 900 }
 
-Try.applicative().mapToAccount(tryBalance, tryAvailable)
+ForTry extensions { 
+  mapToAccount(tryBalance, tryAvailable)
+}
 ```
 
 ```kotlin:ank
 val tryBalance: Try<Int> = Try { 1000 }
 val tryAvailable: Try<Int> = Try { throw RuntimeException("BOOM") }
 
-Try.applicative().mapToAccount(tryBalance, tryAvailable)
+ForTry extensions { 
+  mapToAccount(tryBalance, tryAvailable)
+}
 ```
 
 ```kotlin:ank
@@ -127,7 +137,9 @@ import kotlinx.coroutines.experimental.async
 val asyncBalance: DeferredK<Int> = async { 1000 }.k()
 val asyncAvailable: DeferredK<Int> = async { 900 }.k()
 
-DeferredK.applicative().mapToAccount(asyncBalance, asyncAvailable)
+ForDeferredK extensions { 
+  mapToAccount(asyncBalance, asyncAvailable)
+}
 ```
 
 #### Typeclass instances

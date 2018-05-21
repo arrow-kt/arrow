@@ -48,3 +48,13 @@ interface SortedMapKShowInstance<A : Comparable<A>, B> : Show<SortedMapKOf<A, B>
   override fun SortedMapKOf<A, B>.show(): String =
     toString()
 }
+
+class SortedMapKContext<K : Comparable<K>> : SortedMapKTraverseInstance<K>
+
+class SortedMapKContextPartiallyApplied<K : Comparable<K>> {
+  infix fun <A> extensions(f: SortedMapKContext<K>.() -> A): A =
+    f(SortedMapKContext())
+}
+
+fun <K : Comparable<K>> ForSortedMapK(): SortedMapKContextPartiallyApplied<K> =
+  SortedMapKContextPartiallyApplied()

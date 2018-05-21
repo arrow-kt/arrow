@@ -201,9 +201,9 @@ Either can also map over the `left` value with `mapLeft` which is similar to map
 
 ```kotlin:ank
 val r : Either<Int, Int> = Either.Right(7)
-r.mapLeft{it +1}
+r.mapLeft {it + 1}
 val l: Either<Int, Int> = Either.Left(7)
-l.mapLeft{it + 1}
+l.mapLeft {it + 1}
 ```
 
 `Either<A, B>` can be transformed to `Either<B,A>` using the `swap()` method.
@@ -251,15 +251,15 @@ Either.cond(false, { 42 }, { "Error" })
 
 Another operation is `fold`. This operation will extract the value from the Either, or provide a default if the value is `Left`
 
- ```kotlin:ank
- val x = 7.right()
- x.fold({ 1 }, { it * 3 }) // 21
- ```
+```kotlin:ank
+val x : Either<Int, Int> = 7.right()
+x.fold({ 1 }, { it + 3 }) 
+```
 
- ```kotlin:ank
- val x = 7.left()
- x.fold({ 1 }, { it * 3 }) // 1
- ```
+```kotlin:ank
+val y : Either<Int, Int> = 7.left()
+y.fold({ 1 }, { it + 3 }) 
+```
 
 The `getOrHandle()` operation allows the transformation of an `Either.Left` value to a `Either.Right` using
 the value of `Left`. This can be useful when a mapping to a single result type is required like `fold()` but without
@@ -284,31 +284,39 @@ val httpStatusCode = r.getOrHandle {
 
  Transforming the inner contents
 
- ```kotlin:ank
- Either.functor<Int>().map(Either.Right(1), {it + 1})
- ```
+```kotlin:ank
+import arrow.instances.*
+ 
+ForEither<Int>() extensions { 
+   Right(1).map {it + 1}
+}
+```
 
  [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }})
 
  Computing over independent values
 
- ```kotlin:ank
- Either.applicative<Int>().tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
- ```
+```kotlin:ank
+ForEither<Int>() extensions { 
+  tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
+}
+```
 
  [`Monad`]({{ '/docs/typeclasses/monad/' | relative_url }})
 
  Computing over dependent values ignoring absence
 
- ```kotlin
- Either.monad<Int>().binding {
+```kotlin
+ForEither<Int>() extensions {
+ binding {
     val a = Either.Right(1).bind()
     val b = Either.Right(1 + a).bind()
     val c = Either.Right(1 + b).bind()
     a + b + c
  }
- // Right(b=6, dummy=kotlin.Unit)
- ```
+}
+// Right(6)
+```
 
 ## Available Instances
 
