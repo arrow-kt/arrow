@@ -28,4 +28,6 @@ data class IsoXXL(
   val field21: String,
   val field22: String,
   val field23: String
-)
+) {
+  companion object
+}

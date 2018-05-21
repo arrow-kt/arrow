@@ -224,8 +224,8 @@ options:
 
     nested_options:
 
-      - title: Syntax DSL
-        url: /docs/optics/syntax/
+      - title: Optics DSL
+        url: /docs/optics/dsl/
 
       - title: Iso
         url: /docs/optics/iso/

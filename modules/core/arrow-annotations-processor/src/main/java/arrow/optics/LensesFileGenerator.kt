@@ -11,7 +11,6 @@ class LensesFileGenerator(
 ) {
 
   private val filePrefix = "lenses"
-  private val lens = "arrow.optics.Lens"
 
   fun generate() = annotatedList.map(this::processElement)
     .map { (element, funs) ->
@@ -28,13 +27,13 @@ class LensesFileGenerator(
       val targetClassName = variable.fullName
       val targetName = variable.paramName
       val lensType = when (variable) {
-        is Target.NullableTarget -> "Nullable${targetName.toUpperCamelCase()}"
-        is Target.OptionTarget -> "Option${targetName.toUpperCamelCase()}"
-        is Target.NonNullTarget -> targetName.toUpperCamelCase()
+        is Target.NullableTarget -> "nullable${targetName.toUpperCamelCase()}"
+        is Target.OptionTarget -> "option${targetName.toUpperCamelCase()}"
+        is Target.NonNullTarget -> targetName
       }
 
       """
-                    |fun $sourceName$lensType(): $lens<$sourceClassName, $targetClassName> = $lens(
+                    |inline val $sourceClassName.Companion.$lensType: $Lens<$sourceClassName, $targetClassName> get()= $Lens(
                     |        get = { $sourceName: $sourceClassName -> $sourceName.${targetName.plusIfNotBlank(prefix = "`", postfix = "`")} },
                     |        set = { value: $targetClassName ->
                     |            { $sourceName: $sourceClassName ->
@@ -42,7 +41,16 @@ class LensesFileGenerator(
                     |            }
                     |        }
                     |)
-                    """.trimMargin()
+                    |
+                    |inline val <S> $Iso<S, $sourceClassName>.$lensType: $Lens<S, $targetClassName> inline get() = this + $sourceClassName.$lensType
+                    |inline val <S> $Lens<S, $sourceClassName>.$lensType: $Lens<S, $targetClassName> inline get() = this + $sourceClassName.$lensType
+                    |inline val <S> $Optional<S, $sourceClassName>.$lensType: $Optional<S, $targetClassName> inline get() = this + $sourceClassName.$lensType
+                    |inline val <S> $Prism<S, $sourceClassName>.$lensType: $Optional<S, $targetClassName> inline get() = this + $sourceClassName.$lensType
+                    |inline val <S> $Getter<S, $sourceClassName>.$lensType: $Getter<S, $targetClassName> inline get() = this + $sourceClassName.$lensType
+                    |inline val <S> $Setter<S, $sourceClassName>.$lensType: $Setter<S, $targetClassName> inline get() = this + $sourceClassName.$lensType
+                    |inline val <S> $Traversal<S, $sourceClassName>.$lensType: $Traversal<S, $targetClassName> inline get() = this + $sourceClassName.$lensType
+                    |inline val <S> $Fold<S, $sourceClassName>.$lensType: $Fold<S, $targetClassName> inline get() = this + $sourceClassName.$lensType
+                    |""".trimMargin()
     }
 
 }

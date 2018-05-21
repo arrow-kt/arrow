@@ -37,7 +37,11 @@ class ProductProcessor : AbstractProcessor() {
             |Cannot use $annotationName on ${element.enclosingElement}.${element.simpleName}.
             |It can only be used on $targetName.""".trimMargin()
 
+  private fun productCompanionError(element: Element, annotationName: String): String =
+    "$annotationName annotated class $element needs to declare companion object."
+
   private fun evalAnnotatedProductElement(element: Element): AnnotatedGeneric = when {
+    element.hasNoCompanion -> knownError(productCompanionError(element, productAnnotationName))
     (element.kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isDataClass == true -> {
       val elementClassData = element.getClassData()
       val paramNames = element.getConstructorParamNames()

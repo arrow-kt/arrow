@@ -5,6 +5,4 @@ import arrow.optics.OpticsTarget
 import arrow.optics.optics
 
 @optics([OpticsTarget.OPTIONAL])
-data class Optional(val field: String, val nullable: String?, val option: Option<String>) {
-  companion object
-}
+data class OptionalWithoutCompanion(val field: String, val nullable: String?, val option: Option<String>)
