@@ -1,35 +1,43 @@
 package arrow.optics
 
+import arrow.common.utils.knownError
+import arrow.common.utils.removeBackticks
 import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 
-fun generateIsos(ele: AnnotatedElement, target: IsoTarget) = Snippet(
-  content = processElement(ele, target)
-)
+val AnnotatedType.isoSnippet
+  get() = when (this) {
+    is AnnotatedProductType -> Snippet(content = processElement())
+    is AnnotatedSumType -> knownError(element.isoErrorMessage, element)
+    is AnnotatedFunctionType -> knownError(element.isoErrorMessage, element)
+  }
 
-inline val Target.targetNames inline get() = foci.map(Focus::className)
+private fun AnnotatedProductType.processElement(): String {
+  if (foci.size > 22) knownError(element.isoTooBigErrorMessage, element)
 
-private fun processElement(iso: AnnotatedElement, target: Target): String {
-  val foci = target.foci
   val hasTupleFocus = foci.size > 1
   val letters = ('a'..'v').toList()
+  val fociClassNames = foci.map(Focus::className)
 
   fun tupleConstructor() =
-    foci.joinToString(prefix = "$Tuple${foci.size}(", postfix = ")", transform = { "${iso.sourceName}.${it.paramName.plusIfNotBlank(prefix = "`", postfix = "`")}" })
+    foci.joinToString(prefix = "$Tuple${foci.size}(", postfix = ")", transform = { "$sourceName.${it.paramName.plusIfNotBlank(prefix = "`", postfix = "`")}" })
 
   fun focusType() =
-    if (hasTupleFocus) target.targetNames.joinToString(prefix = "$Tuple${foci.size}<", postfix = ">")
-    else target.targetNames.first()
+    if (hasTupleFocus) fociClassNames.joinToString(prefix = "$Tuple${foci.size}<", postfix = ">")
+    else fociClassNames.first()
 
   fun classConstructorFromTuple(sourceClassName: String, propertiesSize: Int) =
     (0 until propertiesSize).joinToString(prefix = "$sourceClassName(", postfix = ")", transform = { "tuple.${letters[it]}" })
 
-  val get = if (hasTupleFocus) tupleConstructor() else "${iso.sourceName}.${foci.first().paramName}"
-  val reverseGet = if (hasTupleFocus) "tuple: ${focusType()} -> ${classConstructorFromTuple(iso.sourceClassName, foci.size)}" else "${iso.sourceClassName}(it)"
+  val get = if (hasTupleFocus) tupleConstructor() else "$sourceName.${foci.first().paramName}"
+  val reverseGet = if (hasTupleFocus) "tuple: ${focusType()} -> ${classConstructorFromTuple(sourceClassName, foci.size)}" else "$sourceClassName(it)"
 
   return """
-        |inline val ${iso.sourceClassName}.Companion.iso: $Iso<${iso.sourceClassName}, ${focusType()}> inline get()= $Iso(
-        |  get = { ${iso.sourceName}: ${iso.sourceClassName} -> $get },
-        |  reverseGet = { $reverseGet }
-        |)
-        |""".trimMargin()
+    |/**
+    | * [$Iso] that defines the equality between ${sourceClassName.removeBackticks()} and its generic representation [${focusType().removeBackticks()}]
+    | */
+    |inline val $sourceClassName.Companion.iso: $Iso<$sourceClassName, ${focusType()}> inline get()= $Iso(
+    |  get = { $sourceName: $sourceClassName -> $get },
+    |  reverseGet = { $reverseGet }
+    |)
+    |""".trimMargin()
 }

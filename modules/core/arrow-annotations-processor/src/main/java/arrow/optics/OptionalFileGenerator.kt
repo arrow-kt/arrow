@@ -1,15 +1,22 @@
 package arrow.optics
 
+import arrow.common.utils.knownError
+import arrow.common.utils.removeBackticks
 import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 
-fun generateOptionals(ele: AnnotatedElement, target: OptionalTarget) = Snippet(
-  imports = setOf("import arrow.core.left", "import arrow.core.right", "import arrow.core.toOption"),
-  content = processElement(ele, target.foci)
-)
+val AnnotatedType.optionalSnippet
+  get() = when (this) {
+    is AnnotatedProductType -> Snippet(
+      imports = setOf("import arrow.core.left", "import arrow.core.right", "import arrow.core.toOption"),
+      content = processElement()
+    )
+    is AnnotatedSumType -> knownError(element.optionalErrorMessage, element)
+    is AnnotatedFunctionType -> knownError(element.optionalErrorMessage, element)
+  }
 
-private fun processElement(ele: AnnotatedElement, foci: List<Focus>): String = foci.joinToString(separator = "\n") { focus ->
-  fun getOrModifyF(toNullable: String = "") = "{ ${ele.sourceName}: ${ele.sourceClassName} -> ${ele.sourceName}.${focus.paramName.plusIfNotBlank(prefix = "`", postfix = "`")}$toNullable?.right() ?: ${ele.sourceName}.left() }"
-  fun setF(fromNullable: String = "") = "${ele.sourceName}.copy(${focus.paramName.plusIfNotBlank(prefix = "`", postfix = "`")} = value$fromNullable)"
+private fun AnnotatedProductType.processElement(): String = foci.joinToString(separator = "\n") { focus ->
+  fun getOrModifyF(toNullable: String = "") = "{ $sourceName: $sourceClassName -> $sourceName.${focus.paramName.plusIfNotBlank(prefix = "`", postfix = "`")}$toNullable?.right() ?: $sourceName.left() }"
+  fun setF(fromNullable: String = "") = "$sourceName.copy(${focus.paramName.plusIfNotBlank(prefix = "`", postfix = "`")} = value$fromNullable)"
 
   val (targetClassName, getOrModify, set) = when (focus) {
     is NullableFocus -> Triple(focus.nonNullClassName, getOrModifyF(), setF())
@@ -18,13 +25,16 @@ private fun processElement(ele: AnnotatedElement, foci: List<Focus>): String = f
   }
 
   """
-      |inline val ${ele.sourceClassName}.Companion.${focus.paramName}: $Optional<${ele.sourceClassName}, $targetClassName> inline get()= $Optional(
-      |  getOrModify = $getOrModify,
-      |  set = { value: $targetClassName ->
-      |    { ${ele.sourceName}: ${ele.sourceClassName} ->
-      |      $set
-      |    }
-      |  }
-      |)
-      |""".trimMargin()
+    |/**
+    | * [$Optional] that can see into ${sourceClassName.removeBackticks()} and focus in its property ${focus.paramName} [${targetClassName.removeBackticks()}]
+    | */
+    |inline val $sourceClassName.Companion.${focus.paramName}: $Optional<$sourceClassName, $targetClassName> inline get()= $Optional(
+    |  getOrModify = $getOrModify,
+    |  set = { value: $targetClassName ->
+    |    { $sourceName: $sourceClassName ->
+    |      $set
+    |    }
+    |  }
+    |)
+    |""".trimMargin()
 }

@@ -1,25 +1,35 @@
 package arrow.optics
 
 import arrow.common.utils.AbstractProcessor
+import arrow.common.utils.ClassOrPackageDataWrapper
+import arrow.common.utils.extractFullName
 import arrow.common.utils.isSealed
 import arrow.optics.OpticsTarget.*
-import arrow.optics.OpticsProcessor.ClassType.*
+import arrow.optics.OpticsProcessor.Type.*
 import arrow.common.utils.knownError
+import arrow.common.utils.nextGenericParam
+import arrow.common.utils.removeBackticks
 import com.google.auto.service.AutoService
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
 import me.eugeniomarletti.kotlin.metadata.isDataClass
+import me.eugeniomarletti.kotlin.metadata.jvm.getJvmMethodSignature
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.hasReceiver
+import me.eugeniomarletti.kotlin.metadata.shadow.serialization.deserialization.getName
 import java.io.File
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
+import javax.lang.model.element.ElementKind
+import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
 
 @AutoService(Processor::class)
 class OpticsProcessor : AbstractProcessor() {
 
-  private val annotatedEles = mutableListOf<AnnotatedElement>()
+  private val annotatedTypes = mutableListOf<AnnotatedType>()
 
   override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
@@ -29,90 +39,69 @@ class OpticsProcessor : AbstractProcessor() {
     roundEnv
       .getElementsAnnotatedWith(opticsAnnotationClass)
       .forEach { element ->
-        if (element.classType == OTHER) knownError(element.otherClassTypeErrorMessage, element)
-        if (element.hasNoCompanion) knownError("@optics annotated class $element needs to declare companion object.")
-
-        val targets: List<Target> = element.normalizedTargets().map { target ->
-          when (target) {
-            LENS -> evalAnnotatedDataClass(element, element.lensErrorMessage).let(::LensTarget)
-            OPTIONAL -> evalAnnotatedDataClass(element, element.optionalErrorMessage).let(::OptionalTarget)
-            ISO -> evalAnnotatedIsoElement(element).let(::IsoTarget)
-            PRISM -> evalAnnotatedPrismElement(element).let(::PrismTarget)
-            DSL -> evalAnnotatedDslElement(element)
-          }
-        }
-
-        annotatedEles.add(AnnotatedElement(element as TypeElement, element.getClassData(), targets))
+        when (element.type) {
+          SealedClass -> (element as TypeElement).toAnnotatedSumType()
+          DataClass -> (element as TypeElement).toAnnotatedProductType()
+          Other -> knownError(element.otherClassTypeErrorMessage, element)
+        }.let(annotatedTypes::add)
       }
 
     if (roundEnv.processingOver()) {
-      val generatedDir = File(this.generatedDir!!, "").also { it.mkdirs() }
+      val generatedDir = File(this.generatedDir!!, "optics").also { it.mkdirs() }
 
-      annotatedEles
-        .forEach { ele ->
-          val content = ele.snippets().reduce(Snippet::plus).asFileText(ele.packageName)
-          File(generatedDir, "optics.arrow.${ele.sourceName}.kt").writeText(content)
+      (annotatedTypes.filterIsInstance<AnnotatedSumType>() + annotatedTypes.filterIsInstance<AnnotatedProductType>()).forEach { ele ->
+        val content = ele.snippet().asFileText(ele.packageName)
+        File(generatedDir, "optics.arrow.${ele.sourceName}.kt").writeText(content)
+      }
         }
     }
   }
 
-  private fun AnnotatedElement.snippets(): List<Snippet> = this.targets.map {
-    when (it) {
-      is IsoTarget -> generateIsos(this, it)
-      is PrismTarget -> generatePrisms(this, it)
-      is LensTarget -> generateLenses(this, it)
-      is OptionalTarget -> generateOptionals(this, it)
-      is SealedClassDsl -> generatePrismDsl(this, it)
-      is DataClassDsl -> generateOptionalDsl(this, it) + generateLensDsl(this, it)
-    }
-  }
-
-  private fun Element.normalizedTargets(): List<OpticsTarget> = with(getAnnotation(opticsAnnotationClass).targets) {
-    when {
-      isEmpty() -> if (classType == SEALED_CLASS) listOf(PRISM, DSL) else listOf(ISO, LENS, OPTIONAL, DSL)
-      else -> toList()
-    }
-  }
-
-  private fun evalAnnotatedDataClass(element: Element, errorMessage: String): List<Focus> = when (element.classType) {
-    DATA_CLASS -> element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Focus.Companion::invoke)
-    else -> knownError(errorMessage, element)
-  }
-
-  private fun evalAnnotatedPrismElement(element: Element): List<Focus> = when (element.classType) {
-    SEALED_CLASS -> element.kotlinMetadata.let { it as KotlinClassMetadata }.data.let { (nameResolver, classProto) ->
-      classProto.sealedSubclassFqNameList
-        .map(nameResolver::getString)
-        .map { it.replace('/', '.') }
-        .map { Focus(it, it.substringAfterLast(".").decapitalize()) }
+  private fun AnnotatedType.snippet(): Snippet {
+    fun AnnotatedType.normalizedTargets(): List<OpticsTarget> = with(element.getAnnotation(opticsAnnotationClass).targets) {
+      when {
+        isEmpty() -> when (element.type) {
+          SealedClass -> listOf(PRISM, DSL)
+          DataClass -> listOf(ISO, LENS, OPTIONAL, DSL)
+          Other -> knownError(element.otherClassTypeErrorMessage, element)
+        }
+        else -> toList()
+      }
     }
 
-    else -> knownError(element.prismErrorMessage, element)
+    return normalizedTargets().map { target ->
+      when (target) {
+        ISO -> isoSnippet
+        LENS -> lensSnippet
+        OPTIONAL -> optionalSnippet
+        PRISM -> prismSnippet
+        DSL -> dslSnippet
+      }
+    }.fold(Snippet.EMPTY, Snippet::plus)
   }
 
-  private fun evalAnnotatedDslElement(element: Element): Target = when (element.classType) {
-    DATA_CLASS -> DataClassDsl(element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Focus.Companion::invoke))
-    SEALED_CLASS -> SealedClassDsl(evalAnnotatedPrismElement(element))
-    OTHER -> knownError(element.dslErrorMessage, element)
+  private fun TypeElement.toAnnotatedSumType() = AnnotatedSumType(this, getClassData(), kotlinMetadata.let { it as KotlinClassMetadata }.data.let { (nameResolver, classProto) ->
+    classProto.sealedSubclassFqNameList
+      .map(nameResolver::getString)
+      .map { it.replace('/', '.') }
+      .map { Focus(it, it.substringAfterLast(".").decapitalize()) }
+  }).also { if (hasNoCompanion) knownError("${opticsAnnotationClass.canonicalName} annotated class $this needs to declare companion object.", this) }
+
+
+
   }
 
-  private fun evalAnnotatedIsoElement(element: Element): List<Focus> = when (element.classType) {
-    DATA_CLASS -> element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Focus.Companion::invoke)
-      .takeIf { it.size <= 22 } ?: knownError(element.isoTooBigErrorMessage, element)
-    else -> knownError(element.isoErrorMessage, element)
+  private enum class Type {
+    DataClass,
+    SealedClass,
+    Other;
   }
 
-  private enum class ClassType {
-    DATA_CLASS,
-    SEALED_CLASS,
-    OTHER;
-  }
-
-  private val Element.classType: ClassType
+  private val Element.type: Type
     get() = when {
-      (kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isDataClass == true -> DATA_CLASS
-      (kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isSealed == true -> SEALED_CLASS
-      else -> OTHER
+      (kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isDataClass == true -> DataClass
+      (kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isSealed == true -> SealedClass
+      else -> Other
     }
 
 }

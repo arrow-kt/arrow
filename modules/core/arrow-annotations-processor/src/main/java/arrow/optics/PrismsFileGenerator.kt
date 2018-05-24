@@ -1,20 +1,31 @@
 package arrow.optics
 
-fun generatePrisms(ele: AnnotatedElement, target: PrismTarget) = Snippet(
-  imports = setOf("import arrow.core.left", "import arrow.core.right", "import arrow.core.identity"),
-  content = processElement(ele, target.foci)
-)
+import arrow.common.utils.knownError
+import arrow.common.utils.removeBackticks
 
-private fun processElement(ele: AnnotatedElement, foci: List<Focus>): String = foci.joinToString(separator = "\n\n") { focus ->
+val AnnotatedType.prismSnippet
+  get() = when (this) {
+    is AnnotatedSumType -> Snippet(
+      imports = setOf("import arrow.core.left", "import arrow.core.right", "import arrow.core.identity"),
+      content = processElement()
+    )
+    is AnnotatedProductType -> knownError(element.prismErrorMessage, element)
+    is AnnotatedFunctionType -> knownError(element.prismErrorMessage, element)
+  }
+
+private fun AnnotatedSumType.processElement(): String = foci.joinToString(separator = "\n\n") { focus ->
   """
-  |inline val ${ele.sourceClassName}.Companion.${focus.paramName}: $Prism<${ele.sourceClassName}, ${focus.className}> inline get()= $Prism(
-  |  getOrModify = { ${ele.sourceName}: ${ele.sourceClassName} ->
-  |    when (${ele.sourceName}) {
-  |      is ${focus.className} -> ${ele.sourceName}.right()
-  |      else -> ${ele.sourceName}.left()
-  |    }
-  |  },
-  |  reverseGet = ::identity
-  |)
-  |""".trimMargin()
+    |/**
+    | * [$Prism] that can see into ${sourceClassName.removeBackticks()} and focus in its property ${focus.paramName} ${focus.className.removeBackticks()}
+    | */
+    |inline val $sourceClassName.Companion.${focus.paramName}: $Prism<$sourceClassName, ${focus.className}> inline get()= $Prism(
+    |  getOrModify = { $sourceName: $sourceClassName ->
+    |    when ($sourceName) {
+    |      is ${focus.className} -> $sourceName.right()
+    |      else -> $sourceName.left()
+    |    }
+    |  },
+    |  reverseGet = ::identity
+    |)
+    |""".trimMargin()
 }

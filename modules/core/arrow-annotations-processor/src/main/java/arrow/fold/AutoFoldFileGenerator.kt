@@ -1,6 +1,7 @@
 package arrow.fold
 
 import arrow.common.utils.fullName
+import arrow.common.utils.nextGenericParam
 import me.eugeniomarletti.kotlin.metadata.escapedClassName
 import java.io.File
 
@@ -19,7 +20,7 @@ class AutoFoldFileGenerator(
     annotatedFold to annotatedFold.targets.let { targets ->
       val sourceClassName = annotatedFold.classData.fullName.escapedClassName
       val sumTypeParams = typeParams(annotatedFold.typeParams)
-      val returnType = getFoldType(annotatedFold.typeParams)
+      val returnType = annotatedFold.typeParams.nextGenericParam()
       val functionTypeParams = functionTypeParams(annotatedFold.typeParams, returnType)
 
       """inline fun $functionTypeParams $sourceClassName$sumTypeParams.fold(
@@ -45,15 +46,6 @@ class AutoFoldFileGenerator(
   fun functionTypeParams(params: List<String>, returnType: String): String =
     if (params.isEmpty()) ""
     else params.joinToString(prefix = "<", postfix = ", $returnType>")
-
-  fun getFoldType(params: List<String>): String {
-    fun check(param: String, next: List<String>): String = (param[0] + 1).let {
-      if (next.contains(it.toString())) check(next.firstOrNull() ?: "", next.drop(1))
-      else it.toString()
-    }
-
-    return check(params.firstOrNull() ?: "", params.drop(1))
-  }
 
   fun fileHeader(packageName: String): String =
     """package $packageName

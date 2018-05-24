@@ -178,3 +178,12 @@ fun recurseFilesUpwards(fileName: String, currentDirectory: File): File =
   } else {
     recurseFilesUpwards(fileName, currentDirectory.parentFile)
   }
+
+fun List<String>.nextGenericParam(): String {
+  fun check(param: String, next: List<String>): String = (param[0] + 1).let {
+    if (next.contains(it.toString())) check(next.firstOrNull() ?: "", next.drop(1))
+    else it.toString()
+  }
+
+  return if (isNotEmpty()) check(first(), drop(1)) else "A"
+}
