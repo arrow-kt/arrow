@@ -124,7 +124,7 @@ networkInt.getOption(NetworkResult.Success("5"))
 
 |   | Iso | Lens | Prism |Optional | Getter | Setter | Fold | Traversal |
 | --- | --- | --- | --- |--- | --- | --- | --- | --- |
-| Prism | Prism | Optional | Prism | Optional | X | Setter | Fold | Traversal |
+| Prism | Prism | Optional | Prism | Optional | Fold | Setter | Fold | Traversal |
 
 ## Generated prisms <a id="generated-prisms"></a>
 

@@ -169,6 +169,11 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
   infix fun <C, D> compose(other: PLens<A, B, C, D>): POptional<S, T, C, D> = asOptional() compose other
 
   /**
+   * Compose a [PPrism] with a [Getter]
+   */
+  infix fun <C> compose(other: Getter<A, C>): Fold<S, C> = asFold() compose other
+
+  /**
    * Compose a [PPrism] with a [PSetter]
    */
   infix fun <C, D> compose(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = asSetter() compose other
@@ -195,6 +200,8 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
   operator fun <C, D> plus(other: PIso<A, B, C, D>): PPrism<S, T, C, D> = compose(other)
 
   operator fun <C, D> plus(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = compose(other)
+
+  operator fun <C> plus(other: Getter<A, C>): Fold<S, C> = compose(other)
 
   operator fun <C> plus(other: Fold<A, C>): Fold<S, C> = compose(other)
 
