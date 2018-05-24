@@ -64,13 +64,17 @@ that enables monad comprehensions for all datatypes for which a monad instance i
 
 ```kotlin:ank
 import arrow.typeclasses.*
+import arrow.instances.*
+
 fun getCountryCode(maybePerson : Either<BizError, Person>): Either<BizError, String> =
-  Either.monadError<BizError>().binding {
+  ForEither<BizError>() extensions { 
+   binding {
     val person = maybePerson.bind()
     val address = person.address.toEither({ AddressNotFound(person.id) }).bind()
-    val country = address.country.toEither({ CountryNotFound(address.id) }).bind()
+    val country = address.country.toEither({ CountryNotFound(address.id)}).bind()
     country.code
-  }.fix()
+   }.fix()
+ }
 ```
 
 Alright, a piece of cake right? That's because we were dealing with a simple type `Either`. But here's where things can get more complicated. Let's introduce another monad in the middle of the computation. For example what happens when we need to load a person by id, then their address and country to obtain the country code from a remote service?
@@ -156,7 +160,8 @@ Let's look at how a similar implementation would look like using monad comprehen
 
 ```kotlin:ank
 fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
-      ObservableK.monad().binding {
+      ForObservableK extensions {
+       binding {
         val person = findPerson(personId).bind()
         val address = person.fold (
           { it.left() },
@@ -172,6 +177,7 @@ fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
         )
         code
       }.fix()
+     }
 ```
 
 While we've got the logic working now, we're in a situation where we're forced to deal with the `Left cases`. We also have a ton of boilerplate type conversion with `fold`. The type conversion is necessary because in a monad comprehension you can only use a type of Monad. If we start with `ObservableK`, we have to stay in it’s monadic context by lifting anything we compute sequentially to a `ObservableK` whether or not it's async.
@@ -205,14 +211,16 @@ So how would our function look if we implemented it with the EitherT monad trans
 
 ```kotlin
 fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
-  EitherT.monadError<ForObservableK, BizError>().binding {
+  ForEitherT<ForObservableK, BizError>(ObservableK.monad()) extensions { 
+   binding {
     val person = EitherT(findPerson(personId)).bind()
     val address = EitherT(ObservableK.just(
       person.address.toEither { AddressNotFound(personId) }
     )).bind()
     val country = EitherT(findCountry(address.id)).bind()
     country.code
-  }.value()
+   }.value()
+  }
 ```
 
 Here we no longer have to deal with the `Left` cases, and the binding to the values on the left side are already the underlying values we want to focus on instead of the potential biz error values. We have automatically `flatMapped` through the `ObservableK` and `Either` in a single expression reducing the boilerplate and encoding the effects concerns in the type signatures.

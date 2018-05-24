@@ -69,3 +69,13 @@ fun <F, G, A> Free.Companion.eq(FK: FunctionK<F, G>, MG: Monad<G>, dummy: Unit =
 
     override fun MG(): arrow.typeclasses.Monad<G> = MG
   }
+
+class FreeContext<S> : FreeMonadInstance<S>
+
+class FreeContextPartiallyApplied<S> {
+  infix fun <A> extensions(f: FreeContext<S>.() -> A): A =
+    f(FreeContext())
+}
+
+fun <S> ForFree(): FreeContextPartiallyApplied<S> =
+  FreeContextPartiallyApplied()

@@ -119,3 +119,11 @@ interface SequenceKMonoidKInstance : MonoidK<ForSequenceK> {
   override fun <A> Kind<ForSequenceK, A>.combineK(y: Kind<ForSequenceK, A>): SequenceK<A> =
     fix().sequenceCombineK(y)
 }
+
+object SequenceKContext : SequenceKMonadInstance, SequenceKTraverseInstance, SequenceKMonoidKInstance {
+  override fun <A, B> Kind<ForSequenceK, A>.map(f: (A) -> B): SequenceK<B> =
+    fix().map(f)
+}
+
+infix fun <A> ForSequenceK.Companion.extensions(f: SequenceKContext.() -> A): A =
+  f(SequenceKContext)

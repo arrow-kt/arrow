@@ -110,3 +110,16 @@ interface EitherShowInstance<L, R> : Show<Either<L, R>> {
   override fun Either<L, R>.show(): String =
     toString()
 }
+
+class EitherContext<L> : EitherMonadErrorInstance<L>, EitherTraverseInstance<L>, EitherSemigroupKInstance<L> {
+  override fun <A, B> Kind<EitherPartialOf<L>, A>.map(f: (A) -> B): Either<L, B> =
+    fix().map(f)
+}
+
+class EitherContextPartiallyApplied<L> {
+  infix fun <A> extensions(f: EitherContext<L>.() -> A): A =
+    f(EitherContext())
+}
+
+fun <L> ForEither(): EitherContextPartiallyApplied<L> =
+  EitherContextPartiallyApplied()

@@ -9,6 +9,7 @@ import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
 import arrow.core.FunctionK
+import arrow.free.instances.ForCofree
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
@@ -18,15 +19,17 @@ class CofreeTest : UnitSpec() {
 
   init {
 
-    testLaws(ComonadLaws.laws(Cofree.comonad<ForOption>(), {
-      val sideEffect = SideEffect()
-      unfold(Option.functor(), sideEffect.counter, {
-        sideEffect.increment()
-        if (it % 2 == 0) None else Some(it + 1)
-      })
-    }, Eq { a, b ->
-      a.fix().run().fix() == b.fix().run().fix()
-    }))
+    ForCofree<ForOption>() extensions {
+      testLaws(ComonadLaws.laws(this, {
+        val sideEffect = SideEffect()
+        unfold(Option.functor(), sideEffect.counter, {
+          sideEffect.increment()
+          if (it % 2 == 0) None else Some(it + 1)
+        })
+      }, Eq { a, b ->
+        a.fix().run().fix() == b.fix().run().fix()
+      }))
+    }
 
     "tailForced should evaluate and return" {
       val sideEffect = SideEffect()

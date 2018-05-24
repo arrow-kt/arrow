@@ -40,6 +40,13 @@ fun Byte.Companion.semigroup(): Semigroup<Byte> =
 fun Byte.Companion.monoid(): Monoid<Byte> =
   object : ByteMonoidInstance {}
 
+object ByteContext : ByteShowInstance, ByteOrderInstance, ByteMonoidInstance
+
+object ForByte {
+  infix fun <L> extensions(f: ByteContext.() -> L): L =
+    f(ByteContext)
+}
+
 //////////
 // Double
 //////////
@@ -79,6 +86,13 @@ fun Double.Companion.semigroup(): Semigroup<Double> =
 fun Double.Companion.monoid(): Monoid<Double> =
   object : DoubleMonoidInstance {}
 
+object DoubleContext : DoubleShowInstance, DoubleOrderInstance, DoubleMonoidInstance
+
+object ForDouble {
+  infix fun <L> extensions(f: DoubleContext.() -> L): L =
+    f(DoubleContext)
+}
+
 //////////
 // Int
 //////////
@@ -116,6 +130,13 @@ fun Int.Companion.semigroup(): Semigroup<Int> =
 
 fun Int.Companion.monoid(): Monoid<Int> =
   object : IntMonoidInstance {}
+
+object IntContext : IntShowInstance, IntOrderInstance, IntMonoidInstance
+
+object ForInt {
+  infix fun <L> extensions(f: IntContext.() -> L): L =
+    f(IntContext)
+}
 
 //////////
 // Long
@@ -156,6 +177,13 @@ fun Long.Companion.semigroup(): Semigroup<Long> =
 fun Long.Companion.monoid(): Monoid<Long> =
   object : LongMonoidInstance {}
 
+object LongContext : LongShowInstance, LongOrderInstance, LongMonoidInstance
+
+object ForLong {
+  infix fun <L> extensions(f: LongContext.() -> L): L =
+    f(LongContext)
+}
+
 //////////
 // Short
 //////////
@@ -195,6 +223,13 @@ fun Short.Companion.semigroup(): Semigroup<Short> =
 fun Short.Companion.monoid(): Monoid<Short> =
   object : ShortMonoidInstance {}
 
+object ShortContext : ShortShowInstance, ShortOrderInstance, ShortMonoidInstance
+
+object ForShort {
+  infix fun <L> extensions(f: ShortContext.() -> L): L =
+    f(ShortContext)
+}
+
 //////////
 // Float
 //////////
@@ -233,3 +268,10 @@ fun Float.Companion.semigroup(): Semigroup<Float> =
 
 fun Float.Companion.monoid(): Monoid<Float> =
   object : FloatMonoidInstance {}
+
+object FloatContext : FloatShowInstance, FloatOrderInstance, FloatMonoidInstance
+
+object ForFloat {
+  infix fun <L> extensions(f: FloatContext.() -> L): L =
+    f(FloatContext)
+}

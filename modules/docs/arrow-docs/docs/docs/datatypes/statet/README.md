@@ -124,12 +124,18 @@ stackOperationsS().runM(Either.monad<StackError>(), listOf())
 While our code looks very similar to what we had before there are some key advantages. State management is now contained within `State` and we are dealing only with 1 monad instead of 2 nested monads so we can use monad bindings!
 
 ```kotlin:ank
-fun stackOperationsS2() = StateT.monad<EitherPartialOf<StackError>, Stack>(Either.monad<StackError>()).binding {
+import arrow.typeclasses.*
+import arrow.instances.*
+
+fun stackOperationsS2() = 
+ ForStateT<EitherPartialOf<StackError>, Stack, StackError>(Either.monadError<StackError>()) extensions {
+  binding {
     pushS("a").bind()
     popS().bind()
     val string = popS().bind()
     string
-}.fix()
+  }.fix()
+ }
 
 stackOperationsS2().runM(Either.monad<StackError>(), listOf("hello", "world", "!"))
 ```

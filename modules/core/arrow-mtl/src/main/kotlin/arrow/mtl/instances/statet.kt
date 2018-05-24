@@ -5,11 +5,13 @@ import arrow.core.toT
 import arrow.data.StateT
 import arrow.data.StateTPartialOf
 import arrow.instance
+import arrow.instances.StateTMonadErrorInstance
 import arrow.instances.StateTMonadInstance
 import arrow.instances.StateTSemigroupKInstance
 import arrow.mtl.typeclasses.MonadCombine
 import arrow.mtl.typeclasses.MonadState
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
 import arrow.typeclasses.SemigroupK
 
 @instance(StateT::class)
@@ -36,3 +38,15 @@ interface StateTMonadCombineInstance<F, S> : MonadCombine<StateTPartialOf<F, S>>
     StateT(just({ s: S -> ma.map({ a: A -> s toT a }) }))
   }
 }
+
+class StateTMtlContext<F, S, E>(val ME: MonadError<F, E>) : StateTMonadStateInstance<F, S>, StateTMonadErrorInstance<F, S, E> {
+  override fun FF(): MonadError<F, E> = ME
+}
+
+class StateTMtlContextPartiallyApplied<F, S, E>(val ME: MonadError<F, E>) {
+  infix fun <A> extensions(f: StateTMtlContext<F, S, E>.() -> A): A =
+    f(StateTMtlContext(ME))
+}
+
+fun <F, S, E> ForStateT(ME: MonadError<F, E>): StateTMtlContextPartiallyApplied<F, S, E> =
+  StateTMtlContextPartiallyApplied(ME)

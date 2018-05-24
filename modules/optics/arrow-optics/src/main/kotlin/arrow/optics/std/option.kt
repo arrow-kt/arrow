@@ -16,7 +16,7 @@ fun <A, B> pNullableToOption(): PIso<A?, B?, Option<A>, Option<B>> = PIso(
 fun <A> nullableToOption(): Iso<A?, Option<A>> = pNullableToOption()
 
 /**
- * [PPrism] to focus into an [arrow.Option.Some]
+ * [PPrism] to focus into an [arrow.core.Some]
  */
 fun <A, B> pSomePrism(): PPrism<Option<A>, Option<B>, A, B> = PPrism(
   getOrModify = { option -> option.fix().fold({ Either.Left(None) }, { a -> Either.Right(a) }) },
@@ -24,7 +24,7 @@ fun <A, B> pSomePrism(): PPrism<Option<A>, Option<B>, A, B> = PPrism(
 )
 
 /**
- * [Prism] to focus into an [arrow.Option.Some]
+ * [Prism] to focus into an [arrow.core.Some]
  */
 fun <A> somePrism(): Prism<Option<A>, A> = pSomePrism()
 

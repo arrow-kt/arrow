@@ -1,10 +1,7 @@
 package arrow.data
 
 import arrow.core.*
-import arrow.instances.applicative
-import arrow.instances.monadError
-import arrow.instances.semigroupK
-import arrow.instances.traverse
+import arrow.instances.*
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadErrorLaws
 import arrow.test.laws.SemigroupKLaws
@@ -18,14 +15,17 @@ import org.junit.runner.RunWith
 class EitherTTest : UnitSpec() {
   init {
 
-    testLaws(
-      MonadErrorLaws.laws(EitherT.monadError<ForId, Throwable>(Id.monad()), Eq.any(), Eq.any()),
-      TraverseLaws.laws(EitherT.traverse<ForId, Int>(Id.traverse()), EitherT.applicative<ForId, Int>(Id.monad()), { EitherT(Id(Right(it))) }, Eq.any()),
-      SemigroupKLaws.laws<EitherTPartialOf<ForId, Int>>(
-        EitherT.semigroupK(Id.monad()),
-        EitherT.applicative(Id.monad()),
-        Eq.any())
-    )
+    ForEitherT<ForId, Throwable>(Id.monad()) extensions {
+
+      testLaws(
+        MonadErrorLaws.laws(this, Eq.any(), Eq.any()),
+        TraverseLaws.laws(EitherT.traverse<ForId, Int>(Id.traverse()), EitherT.applicative<ForId, Int>(Id.monad()), { EitherT(Id(Right(it))) }, Eq.any()),
+        SemigroupKLaws.laws<EitherTPartialOf<ForId, Int>>(
+          EitherT.semigroupK(Id.monad()),
+          EitherT.applicative(Id.monad()),
+          Eq.any())
+      )
+    }
 
     "mapLeft should alter left instance only" {
       forAll { i: Int, j: Int ->
