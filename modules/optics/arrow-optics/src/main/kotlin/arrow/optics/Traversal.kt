@@ -292,6 +292,11 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
   infix fun <C> compose(other: Fold<A, C>): Fold<S, C> = asFold() compose other
 
   /**
+   * Compose a [PTraversal] with a [Getter]
+   */
+  infix fun <C> compose(other: Getter<A, C>): Fold<S, C> = compose(other.asFold())
+
+  /**
    * Plus operator overload to compose [PTraversal] with other optics
    */
   operator fun <C, D> plus(other: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> = compose(other)
