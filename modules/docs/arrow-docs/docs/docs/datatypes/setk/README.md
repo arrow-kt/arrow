@@ -49,7 +49,7 @@ evenNumbers.combineK(integers).combineK(oddNumbers)
 
 [`Monoid`](/docs/typeclasses/monoid/) and [`MonoidK`](/docs/typeclasses/monoidk/):
 ```kotlin:ank
-SetK.monoidK().run { numbers.combineK(SetK.empty()) }
+numbers.combineK(SetK.empty()) 
 ```
 
 [`Foldable`](/docs/typeclasses/foldable/):

@@ -18,20 +18,22 @@ class ValidatedTest : UnitSpec() {
 
     val EQ = Validated.eq(String.eq(), Int.eq())
 
-    val VAL_AP = Validated.applicative<String>(String.monoid())
+    val VAL_AP = Validated.applicative(String.monoid())
 
-    val VAL_SGK = Validated.semigroupK<String>(String.semigroup())
+    val VAL_SGK = Validated.semigroupK(String.semigroup())
 
-    testLaws(
-      EqLaws.laws(EQ) { Valid(it) },
-      ShowLaws.laws(Validated.show(), EQ) { Valid(it) },
-      ApplicativeLaws.laws(Validated.applicative(String.monoid()), Eq.any()),
-      TraverseLaws.laws(Validated.traverse(), Validated.applicative(String.monoid()), ::Valid, Eq.any()),
-      SemigroupKLaws.laws(
-        Validated.semigroupK(Int.monoid()),
-        Validated.applicative(Int.monoid()),
-        Eq.any())
-    )
+    ForValidated(String.semigroup()) extensions {
+      testLaws(
+        EqLaws.laws(EQ) { Valid(it) },
+        ShowLaws.laws(Validated.show(), EQ) { Valid(it) },
+        ApplicativeLaws.laws(this, Eq.any()),
+        TraverseLaws.laws(this, this, ::Valid, Eq.any()),
+        SemigroupKLaws.laws(
+          this,
+          this,
+          Eq.any())
+      )
+    }
 
 
     "fold should call function on Invalid" {
