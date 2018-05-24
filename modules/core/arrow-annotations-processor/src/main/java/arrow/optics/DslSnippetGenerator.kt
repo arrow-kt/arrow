@@ -6,6 +6,16 @@ val AnnotatedType.dslSnippet
   get() = when (this) {
     is AnnotatedSumType -> generatePrismDsl()
     is AnnotatedProductType -> generateLensDsl() + generateOptionalDsl()
+    is AnnotatedType.Function -> when(dslElement.opticType) {
+      Iso -> dslElement.isoSyntax
+      Lens -> dslElement.lensSyntax
+      Optional -> dslElement.optionalSyntax
+      Prism -> dslElement.prismSyntax
+      Getter -> dslElement.getterSyntax
+      Setter -> dslElement.setterSyntax
+      Traversal -> dslElement.traversalSyntax
+      Fold -> dslElement.foldSyntax
+    }
   }
 
 

@@ -42,6 +42,7 @@ class OpticsProcessor : AbstractProcessor() {
         when (element.type) {
           SealedClass -> (element as TypeElement).toAnnotatedSumType()
           DataClass -> (element as TypeElement).toAnnotatedProductType()
+          Function -> (element as ExecutableElement).toAnnotatedFunctionType()
           Other -> knownError(element.otherClassTypeErrorMessage, element)
         }.let(annotatedTypes::add)
       }
@@ -53,6 +54,14 @@ class OpticsProcessor : AbstractProcessor() {
         val content = ele.snippet().asFileText(ele.packageName)
         File(generatedDir, "optics.arrow.${ele.sourceName}.kt").writeText(content)
       }
+
+      annotatedTypes.filterIsInstance<AnnotatedType.Function>()
+        .groupBy(AnnotatedType.Function::`package`)
+        .mapValues { (`package`, functions) ->
+          functions.map { it.snippet() }.fold(Snippet.EMPTY, Snippet::plus).asFileText(`package`)
+        }
+        .forEach { (`package`, content) ->
+          File(generatedDir, "optics.arrow.$`package`.kt").writeText(content)
         }
     }
   }
@@ -63,6 +72,7 @@ class OpticsProcessor : AbstractProcessor() {
         isEmpty() -> when (element.type) {
           SealedClass -> listOf(PRISM, DSL)
           DataClass -> listOf(ISO, LENS, OPTIONAL, DSL)
+          Function -> listOf(DSL)
           Other -> knownError(element.otherClassTypeErrorMessage, element)
         }
         else -> toList()
@@ -87,13 +97,59 @@ class OpticsProcessor : AbstractProcessor() {
       .map { Focus(it, it.substringAfterLast(".").decapitalize()) }
   }).also { if (hasNoCompanion) knownError("${opticsAnnotationClass.canonicalName} annotated class $this needs to declare companion object.", this) }
 
+  private fun TypeElement.toAnnotatedProductType() =
+    AnnotatedProductType(this, getClassData(), getConstructorTypesNames().zip(getConstructorParamNames(), Focus.Companion::invoke))
+      .also { if (hasNoCompanion) knownError("${opticsAnnotationClass.canonicalName} annotated class $this needs to declare companion object.", this) }
 
+  private fun ExecutableElement.toAnnotatedFunctionType(): AnnotatedFunctionType {
+    val classElement = enclosingElement as TypeElement
+    val proto = getClassOrPackageDataWrapper(classElement) as? ClassOrPackageDataWrapper.Package
+      ?: knownError(dslErrorMessage, this)
 
+    //TODO any better way to figure this out??
+    val function = proto.functionList.firstOrNull {
+      it.getJvmMethodSignature(proto.nameResolver)?.replace("\$Companion", "/Companion") == jvmMethodSignature
+    } ?: knownError(dslErrorMessage, this)
+
+    if (function.valueParameterList.isNotEmpty()) knownError(dslFunctionParametersMessage, this)
+
+    fun ProtoBuf.Type.isNotOptic(proto: ClassOrPackageDataWrapper.Package): Boolean =
+      (Optic.values.map(Optic::toString) + POptic.values.map(POptic::toString)).none { proto.nameResolver.getQualifiedClassName(className).replace("/", ".").removeBackticks().startsWith(it) }
+
+    fun ProtoBuf.Type.isNotMonoOptic(): Boolean = when (argumentCount) {
+      4 -> getArgument(0).type.extractFullName(proto) != getArgument(1).type.extractFullName(proto) && getArgument(2).type.extractFullName(proto) != getArgument(3).type.extractFullName(proto)
+      2 -> true
+      else -> false
+    }
+
+    fun ProtoBuf.Type.opticSourceAndFocus(proto: ClassOrPackageDataWrapper.Package): Pair<ProtoBuf.Type.Argument, ProtoBuf.Type.Argument> = when {
+      isNotOptic(proto) -> knownError(dslWrongOptic, this@toAnnotatedFunctionType)
+      isNotMonoOptic() -> knownError(dslWrongOptic, this@toAnnotatedFunctionType)
+      argumentCount == 2 -> getArgument(0) to getArgument(1)
+      argumentCount == 4 -> getArgument(1) to getArgument(3)
+      else -> knownError(dslWrongOptic, this@toAnnotatedFunctionType)
+    }
+
+    val (source, focus) = function.returnType.opticSourceAndFocus(proto)
+
+    return AnnotatedFunctionType(this, DslElement(
+      `package` = proto.`package`,
+      params = function.typeParameterList.map { proto.nameResolver.getString(it.name) }.let { it + it.nextGenericParam() },
+      sourceType = function.typeParameterList.map { proto.nameResolver.getString(it.name) }.nextGenericParam(),
+      dslName = function.name.let(proto.nameResolver::getName).asString(),
+      originalFocus = source.type.extractFullName(proto),
+      resultFocus = focus.type.extractFullName(proto),
+      optic = if (function.hasReceiver()) "${function.receiverType.extractFullName(proto)}.${function.name.let(proto.nameResolver::getName)}()" else "${function.name.let(proto.nameResolver::getName)}()",
+      opticType = Optic.values.firstOrNull { proto.nameResolver.getQualifiedClassName(function.returnType.className).replace("/", ".").removeBackticks().startsWith(it.toString()) }
+        ?: POptic.values.firstOrNull { proto.nameResolver.getQualifiedClassName(function.returnType.className).replace("/", ".").removeBackticks().startsWith(it.toString()) }?.monomorphic()
+        ?: knownError(dslWrongOptic, this@toAnnotatedFunctionType)
+    ))
   }
 
   private enum class Type {
     DataClass,
     SealedClass,
+    Function,
     Other;
   }
 
@@ -101,6 +157,7 @@ class OpticsProcessor : AbstractProcessor() {
     get() = when {
       (kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isDataClass == true -> DataClass
       (kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isSealed == true -> SealedClass
+      kind == ElementKind.METHOD -> Function
       else -> Other
     }
 

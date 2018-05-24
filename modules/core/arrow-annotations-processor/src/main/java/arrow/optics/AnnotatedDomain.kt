@@ -11,6 +11,7 @@ import javax.lang.model.element.TypeElement
 
 typealias AnnotatedSumType = AnnotatedType.AnnotatedClass.Sum
 typealias AnnotatedProductType = AnnotatedType.AnnotatedClass.Product
+typealias AnnotatedFunctionType = AnnotatedType.Function
 
 sealed class AnnotatedType {
 
@@ -32,6 +33,9 @@ sealed class AnnotatedType {
     data class Product(override val element: TypeElement, override val classData: ClassOrPackageDataWrapper.Class, override val foci: List<Focus>) : AnnotatedClass()
   }
 
+  data class Function(override val element: ExecutableElement, val dslElement: DslElement) : AnnotatedType() {
+    override val `package`: String get() = dslElement.`package`
+  }
 
 }
 

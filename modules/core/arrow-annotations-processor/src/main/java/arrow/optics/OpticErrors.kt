@@ -51,8 +51,24 @@ val Element.isoTooBigErrorMessage
 
 val Element.dslErrorMessage
   get() = """
-      |Cannot generate DSL (arrow.optics.BoundSetter) for $this
-      |                                           ^
-      |arrow.optics.OpticsTarget.DSL is an invalid @optics argument for $this.
-      |It is only valid for data classes and sealed classes.
+      |Cannot generate Optics DSL for $this
+      |                                ^
+      |arrow.optics.OpticsTarget.DSL is an invalid ${opticsAnnotationClass.canonicalName} argument for $this.
+      |It is only valid for data classes and sealed classes or top level functions without parameters.
       """.trimMargin()
+
+val ExecutableElement.dslFunctionParametersMessage
+  get() = """
+      |Cannot generate Optics DSL for $this
+      |                                ^
+      |Top level Function annotated with ${opticsAnnotationClass.canonicalName} cannot have any parameters.
+      """.trimMargin()
+
+private val validOptics = (Optic.values.map(Optic::toString) + POptic.values.map(POptic::toString)).map { it.replace("arrow.optics.", "") }.joinToString()
+
+val ExecutableElement.dslWrongOptic
+  get() = """
+  |Cannot generate Optics DSL for $this
+  |                                ^
+  |Top level Function annotated with ${opticsAnnotationClass.canonicalName} must return monomorphic optic. Candidates are $validOptics.
+  """.trimMargin()
