@@ -103,6 +103,21 @@ interface Getter<S, A> : GetterOf<S, A> {
   infix fun <C> compose(other: Iso<A, C>): Getter<S, C> = Getter(other::get compose this::get)
 
   /**
+   * Compose a [Getter] with a [Prism]
+   */
+  infix fun <C> compose(other: Prism<A, C>): Fold<S, C> = compose(other.asFold())
+
+  /**
+   * Compose a [Getter] with a [Optional]
+   */
+  infix fun <C> compose(other: Optional<A, C>): Fold<S, C> = compose(other.asFold())
+
+  /**
+   * Compose a [Getter] with a [Traversal]
+   */
+  infix fun <C> compose(other: Traversal<A, C>): Fold<S, C> = asFold() compose other
+
+  /**
    * Compose a [Getter] with a [Fold]
    */
   infix fun <C> compose(other: Fold<A, C>): Fold<S, C> = asFold() compose other

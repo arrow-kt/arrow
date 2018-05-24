@@ -54,4 +54,4 @@ firstBar.get(Foo(5).nel())
 
 |   | Iso | Lens | Prism |Optional | Getter | Setter | Fold | Traversal |
 | --- | --- | --- | --- |--- | --- | --- | --- | --- |
-| Getter | Getter | Getter | X | X | Getter | X | Fold | X |
+| Getter | Getter | Getter | Fold | Fold | Getter | X | Fold | Fold |
