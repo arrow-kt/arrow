@@ -76,9 +76,9 @@ class ObservableKTest : UnitSpec() {
       val lastThread: Thread = test.awaitDone(5, TimeUnit.SECONDS).lastThread()
       val nextThread = (threadRef?.name ?: "")
 
-      nextThread shouldNotBeElseLogged originalThread.name
-      lastThread.name shouldNotBeElseLogged originalThread.name
-      lastThread.name shouldNotBeElseLogged nextThread
+      nextThread shouldNotBe originalThread.name
+      lastThread.name shouldNotBe originalThread.name
+      lastThread.name shouldNotBe nextThread
     }
 
     "Observable cancellation forces binding to cancel without completing too" {
@@ -90,16 +90,6 @@ class ObservableKTest : UnitSpec() {
       test.awaitTerminalEvent(5, TimeUnit.SECONDS)
 
       test.assertNotTerminated().assertNotComplete().assertNoErrors().assertNoValues()
-    }
-  }
-
-  // FIXME(paco): remove if this hasn't triggered in a while - 26 Jan 18
-  private infix fun String.shouldNotBeElseLogged(b: String) {
-    try {
-      this shouldNotBe b
-    } catch (t: Throwable) {
-      println("$this  <---->  $b")
-      throw t
     }
   }
 }
