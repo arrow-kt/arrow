@@ -146,7 +146,7 @@ ForTry extensions {
 
 ```kotlin
 ForEither<Throwable>() extensions {
-  listOf(Right.just(1), Right.just(2), Right.just(3)).k().traverse(this, ::identity)
+  listOf(just(1), just(2), just(3)).k().traverse(this, ::identity)
 }
 //Right<Throwable, ListK<Int>>(ListK(1,2,3))
 ```
