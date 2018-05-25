@@ -95,7 +95,7 @@ NOTE: If you'd like to use `@instance` for transitive typeclasses, like a `Show<
 
 ### Syntax
 
-Arrow provides a `extensions` DSL making available in the direct scope all type classes declared functions and extensions in a given data type through the `infix` `extensions` function.
+Arrow provides a `extensions` DSL making available in the direct scope all type classes declared functions and extensions in a given data type through the infix `extensions` function on an object prefixed with For- and the name of the datatype.
 
 ```kotlin
 ForOption extensions {
@@ -205,16 +205,17 @@ A malformed Higher Kind would use the whole type constructor to define the conta
 This incorrect representation has large a number of issues when working with partially applied types and nested types.
 
 What Λrrow does instead is define a surrogate type that's not parametrized to represent `F`.
-These types are named same as the container and prefixed by For, as in `ForOption` or `ForListK`.
+These types are named same as the container and prefixed by For-, as in `ForOption` or `ForListK`.
+You have seen these types used in the Syntax section above! 
 
 ```kotlin
-class ForOption private constructor()
+class ForOption private constructor() { companion object {} }
 
 sealed class Option<A>: Kind<ForOption, A>
 ```
 
 ```kotlin
-class ForListK private constructor()
+class ForListK private constructor() { companion object {} }
 
 data class ListK<A>(val list: List<A>): Kind<ForListK, A>
 ```
@@ -240,7 +241,7 @@ data class ListK<A>(val list: List<A>): ListKOf<A>
 
 // Generates the following code:
 //
-// class ForListK private constructor()
+// class ForListK private constructor() { companion object {} }
 // typealias ListKOf<A> = Kind<ForListK, A>
 // fun ListKOf<A>.fix() = this as ListK<A>
 ```
