@@ -95,7 +95,7 @@ NOTE: If you'd like to use `@instance` for transitive typeclasses, like a `Show<
 
 ### Syntax
 
-Arrow provides a `extensions` DSL making available in the scope the functions and extensions defined in all instances for that datatype. Use the infix function `extensions` on an object with the name of the datatype prefixed by For-.
+Arrow provides a `extensions` DSL making available in the scoped block all the functions and extensions defined in all instances for that datatype. Use the infix function `extensions` on an object, or function, with the name of the datatype prefixed by For-.
 
 ```kotlin
 ForOption extensions {
@@ -145,10 +145,10 @@ ForTry extensions {
 ```
 
 ```kotlin
-ForTry extensions {
-  listOf(Try { 1 }, Try { 2 }, Try { 3 }).k().traverse(this, ::identity)
+ForEither<Throwable>() extensions {
+  listOf(Right.just(1), Right.just(2), Right.just(3)).k().traverse(this, ::identity)
 }
-//Success(ListK(1,2,3))
+//Right<Throwable, ListK<Int>>(ListK(1,2,3))
 ```
 
 If you defined your own instances over your own data types and wish to use a similar `extensions` DSL you can do so for both types with a single type argument such as `Option`:
