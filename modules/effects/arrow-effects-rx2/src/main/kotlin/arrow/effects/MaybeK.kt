@@ -1,8 +1,6 @@
 package arrow.effects
 
-import arrow.core.Either
-import arrow.core.Left
-import arrow.core.Right
+import arrow.core.*
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import io.reactivex.Maybe
@@ -23,6 +21,34 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
 
   fun <B> flatMap(f: (A) -> MaybeKOf<B>): MaybeK<B> =
     maybe.flatMap { f(it).fix().maybe }.k()
+
+  fun <C> fold(ifEmpty: () -> C, ifSome: (A) -> C): C {
+    return if (this.maybe.isEmpty.blockingGet()) {
+      ifEmpty()
+    } else {
+      ifSome(this.maybe.blockingGet())
+    }
+  }
+
+  fun <B> foldLeft(b: B, f: (B, A) -> B): B =
+    when (maybe) {
+      maybe.isEmpty -> b
+      else -> f(b, maybe.blockingGet())
+    }
+
+  fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+    when (maybe) {
+      maybe.isEmpty -> lb
+      else -> f(maybe.blockingGet(), lb)
+    }
+
+  fun isEmpty(): Boolean = maybe.isEmpty.blockingGet()
+
+  fun nonEmpty(): Boolean = !isEmpty()
+
+  fun exists(predicate: Predicate<A>): Boolean = fold({ false }, { a -> predicate(a) })
+
+  fun forall(p: Predicate<A>): Boolean = fold({ true }, p)
 
   fun handleErrorWith(function: (Throwable) -> MaybeK<A>): MaybeK<A> =
     maybe.onErrorResumeNext { t: Throwable -> function(t).maybe }.k()

@@ -42,6 +42,7 @@ class MaybeKTests : UnitSpec() {
       FunctorLaws.laws(MaybeK.functor(), { MaybeK.just(it) }, EQ()),
       ApplicativeLaws.laws(MaybeK.applicative(), EQ()),
       MonadLaws.laws(MaybeK.monad(), EQ()),
+      FoldableLaws.laws(MaybeK.foldable(), { MaybeK.just(it) }, Eq.any()),
       MonadErrorLaws.laws(MaybeK.monadError(), EQ(), EQ(), EQ()),
       ApplicativeErrorLaws.laws(MaybeK.applicativeError(), EQ(), EQ(), EQ()),
       MonadSuspendLaws.laws(MaybeK.monadDefer(), EQ(), EQ(), EQ()),

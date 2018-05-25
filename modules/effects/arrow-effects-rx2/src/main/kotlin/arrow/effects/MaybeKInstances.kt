@@ -2,6 +2,7 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.Eval
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.MonadDefer
@@ -43,6 +44,28 @@ interface MaybeKMonadInstance : Monad<ForMaybeK> {
 
   override fun <A> just(a: A): MaybeK<A> =
     MaybeK.just(a)
+}
+
+@instance(MaybeK::class)
+interface MaybeKFoldableInstance : Foldable<ForMaybeK> {
+
+  override fun <A, B> Kind<ForMaybeK, A>.foldLeft(b: B, f: (B, A) -> B): B =
+    fix().foldLeft(b, f)
+
+  override fun <A, B> Kind<ForMaybeK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+    fix().foldRight(lb, f)
+
+  override fun <A> Kind<ForMaybeK, A>.isEmpty(): Boolean =
+    fix().isEmpty()
+
+  override fun <A> Kind<ForMaybeK, A>.exists(p: (A) -> Boolean): Boolean =
+    fix().exists(p)
+
+  override fun <A> MaybeKOf<A>.forAll(p: (A) -> Boolean): Boolean =
+    fix().forall(p)
+
+  override fun <A> Kind<ForMaybeK, A>.nonEmpty(): Boolean =
+    fix().nonEmpty()
 }
 
 @instance(MaybeK::class)
