@@ -90,6 +90,8 @@ ListK.traverse()
 
 If you're defining your own instances and would like for them to be discoverable in their corresponding datatypes' companion object, you can generate it by annotating them as `@instance`, and Arrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create the extension functions for you.
 
+NOTE: If you'd like to use `@instance` for transitive typeclasses, like a `Show<List<A>>` that requires a function returning a `Show<A>`, you'll need for the function providing the transitive typeclass to have 0 parameters, and for any new typeclass defined outside Arrow to be on a package named `typeclass`. This will make the transitive typeclass a parameter of the extension function. This is a *temporary* limitation of the processor to be fixed because we don't have an annotation or type marker for what's a typeclass and what's not.
+
 
 ### Syntax
 
