@@ -44,6 +44,11 @@ flow
 ```
 
 ```kotlin:ank
+val single = Single.fromCallable { 1 }.k()
+single
+```
+
+```kotlin:ank
 val subject = PublishSubject.create<Int>().k()
 subject
 ```
@@ -56,6 +61,10 @@ obs.value()
 
 ```kotlin:ank
 flow.value()
+```
+
+```kotlin:ank
+single.value()
 ```
 
 ```kotlin:ank
