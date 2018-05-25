@@ -60,7 +60,7 @@ class SingleKTests : UnitSpec() {
       test.assertTerminated().assertComplete().assertNoErrors().assertValue(0)
     }
 
-    "Multi-thread Observables should run on their required threads" {
+    "Multi-thread Singles should run on their required threads" {
       val originalThread: Thread = Thread.currentThread()
       var threadRef: Thread? = null
 
