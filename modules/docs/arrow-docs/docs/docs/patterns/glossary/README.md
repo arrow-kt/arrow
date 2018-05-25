@@ -95,7 +95,7 @@ NOTE: If you'd like to use `@instance` for transitive typeclasses, like a `Show<
 
 ### Syntax
 
-Arrow provides a `extensions` DSL making available in the direct scope all type classes declared functions and extensions in a given data type through the `infix` `extensions` function.
+Arrow provides a `extensions` DSL making available in the scoped block all the functions and extensions defined in all instances for that datatype. Use the infix function `extensions` on an object, or function, with the name of the datatype prefixed by For-.
 
 ```kotlin
 ForOption extensions {
@@ -145,10 +145,10 @@ ForTry extensions {
 ```
 
 ```kotlin
-ForTry extensions {
-  listOf(Try { 1 }, Try { 2 }, Try { 3 }).k().traverse(this, ::identity)
+ForEither<Throwable>() extensions {
+  listOf(just(1), just(2), just(3)).k().traverse(this, ::identity)
 }
-//Success(ListK(1,2,3))
+//Right<Throwable, ListK<Int>>(ListK(1,2,3))
 ```
 
 If you defined your own instances over your own data types and wish to use a similar `extensions` DSL you can do so for both types with a single type argument such as `Option`:
@@ -205,16 +205,17 @@ A malformed Higher Kind would use the whole type constructor to define the conta
 This incorrect representation has large a number of issues when working with partially applied types and nested types.
 
 What Λrrow does instead is define a surrogate type that's not parametrized to represent `F`.
-These types are named same as the container and prefixed by For, as in `ForOption` or `ForListK`.
+These types are named same as the container and prefixed by For-, as in `ForOption` or `ForListK`.
+You have seen these types used in the Syntax section above! 
 
 ```kotlin
-class ForOption private constructor()
+class ForOption private constructor() { companion object {} }
 
 sealed class Option<A>: Kind<ForOption, A>
 ```
 
 ```kotlin
-class ForListK private constructor()
+class ForListK private constructor() { companion object {} }
 
 data class ListK<A>(val list: List<A>): Kind<ForListK, A>
 ```
@@ -240,7 +241,7 @@ data class ListK<A>(val list: List<A>): ListKOf<A>
 
 // Generates the following code:
 //
-// class ForListK private constructor()
+// class ForListK private constructor() { companion object {} }
 // typealias ListKOf<A> = Kind<ForListK, A>
 // fun ListKOf<A>.fix() = this as ListK<A>
 ```
