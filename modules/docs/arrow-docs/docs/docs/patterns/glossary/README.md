@@ -95,7 +95,7 @@ NOTE: If you'd like to use `@instance` for transitive typeclasses, like a `Show<
 
 ### Syntax
 
-Arrow provides a `extensions` DSL making available in the direct scope all type classes declared functions and extensions in a given data type through the infix `extensions` function on an object prefixed with For- and the name of the datatype.
+Arrow provides a `extensions` DSL making available in the scope the functions and extensions defined in all instances for that datatype. Use the infix function `extensions` on an object with the name of the datatype prefixed by For-.
 
 ```kotlin
 ForOption extensions {
