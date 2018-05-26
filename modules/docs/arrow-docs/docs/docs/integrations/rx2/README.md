@@ -44,6 +44,11 @@ flow
 ```
 
 ```kotlin:ank
+val single = Single.fromCallable { 1 }.k()
+single
+```
+
+```kotlin:ank
 val subject = PublishSubject.create<Int>().k()
 subject
 ```
@@ -59,6 +64,10 @@ flow.value()
 ```
 
 ```kotlin:ank
+single.value()
+```
+
+```kotlin:ank
 subject.value()
 ```
 
@@ -66,7 +75,7 @@ subject.value()
 
 The library provides instances of [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) and [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}).
 
-[`MonadDefer`]({{ '/docs/effects/async' | relative_url }}) allows you to generify over datatypes that can run asynchronous code. You can use it with `ObservableK` and `FlowableK`.
+[`MonadDefer`]({{ '/docs/effects/async' | relative_url }}) allows you to generify over datatypes that can run asynchronous code. You can use it with `ObservableK`, `FlowableK` or `SingleK`.
 
 ```kotlin
 fun <F> getSongUrlAsync(MS: MonadDefer<F>) =
@@ -74,6 +83,7 @@ fun <F> getSongUrlAsync(MS: MonadDefer<F>) =
 
 val songObservable: ObservableKOf<Url> = getSongUrlAsync(ObservableK.monadDefer())
 val songFlowable: FlowableKOf<Url> = getSongUrlAsync(FlowableK.monadDefer())
+val songSingle: SingleKOf<Url> = getSongUrlAsync(SingleK.monadDefer())
 ```
 
 [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) using the method `bindingCatch`, with all its benefits.
