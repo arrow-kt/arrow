@@ -5,6 +5,7 @@ import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import arrow.typeclasses.bindingCatch
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.reactivex.Maybe
 import io.reactivex.observers.TestObserver
@@ -95,6 +96,18 @@ class MaybeKTests : UnitSpec() {
 
       test.awaitTerminalEvent(5, TimeUnit.SECONDS)
       test.assertNotTerminated().assertNotComplete().assertNoErrors().assertNoValues()
+    }
+
+    "Folding over empty Maybe runs ifEmpty lambda" {
+      val emptyMaybe = Maybe.empty<String>().k()
+      val foldedToEmpty = emptyMaybe.fold({ true }, { false })
+      foldedToEmpty shouldBe true
+    }
+
+    "Folding over non-empty Maybe runs ifSome lambda" {
+      val maybe = Maybe.just(1).k()
+      val foldedToSome = maybe.fold({ false }, { true })
+      foldedToSome shouldBe true
     }
   }
 }
