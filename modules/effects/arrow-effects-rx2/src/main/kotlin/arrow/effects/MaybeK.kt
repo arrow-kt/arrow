@@ -22,7 +22,7 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
   fun <B> flatMap(f: (A) -> MaybeKOf<B>): MaybeK<B> =
     maybe.flatMap { f(it).fix().maybe }.k()
 
-  fun <C> fold(ifEmpty: () -> C, ifSome: (A) -> C): C {
+  fun <B> fold(ifEmpty: () -> B, ifSome: (A) -> B): B {
     return if (this.maybe.isEmpty.blockingGet()) {
       ifEmpty()
     } else {
@@ -31,16 +31,10 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
   }
 
   fun <B> foldLeft(b: B, f: (B, A) -> B): B =
-    when (maybe) {
-      maybe.isEmpty -> b
-      else -> f(b, maybe.blockingGet())
-    }
+    fold({ b }, { a -> f(b, a) })
 
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-    when (maybe) {
-      maybe.isEmpty -> lb
-      else -> f(maybe.blockingGet(), lb)
-    }
+    Eval.defer { fold({ lb }, { a -> f(a, lb) }) }
 
   fun isEmpty(): Boolean = maybe.isEmpty.blockingGet()
 
