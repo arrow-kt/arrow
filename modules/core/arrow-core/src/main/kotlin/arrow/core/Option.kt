@@ -74,9 +74,9 @@ sealed class Option<out A> : OptionOf<A> {
     p1.map { pp1 -> f(get(), pp1) }
   }
 
-  inline fun <R> fold(ifEmpty: () -> R, some: (A) -> R): R = when (this) {
+  inline fun <R> fold(ifEmpty: () -> R, ifSome: (A) -> R): R = when (this) {
     is None -> ifEmpty()
-    is Some<A> -> some(t)
+    is Some<A> -> ifSome(t)
   }
 
   /**
@@ -132,19 +132,19 @@ sealed class Option<out A> : OptionOf<A> {
     if (nonEmpty()) f(get())
   }
 
-  fun <B> foldLeft(b: B, f: (B, A) -> B): B =
+  fun <B> foldLeft(initial: B, operation: (B, A) -> B): B =
     this.fix().let { option ->
       when (option) {
-        is Some -> f(b, option.t)
-        is None -> b
+        is Some -> operation(initial, option.t)
+        is None -> initial
       }
     }
 
-  fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+  fun <B> foldRight(initial: Eval<B>, operation: (A, Eval<B>) -> Eval<B>): Eval<B> =
     this.fix().let { option ->
       when (option) {
-        is Some -> f(option.t, lb)
-        is None -> lb
+        is Some -> operation(option.t, initial)
+        is None -> initial
       }
     }
 
