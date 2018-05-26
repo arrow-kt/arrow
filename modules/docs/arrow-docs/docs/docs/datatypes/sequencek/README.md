@@ -39,7 +39,12 @@ fibonacci.map { it * 2 }.takeWhile { it < 10 }.toList()
 
 Applying a sequence of functions to a sequence:
 ```kotlin:ank
-SequenceK.applicative().run { sequenceOf(1, 2, 3).k().ap(sequenceOf({ x: Int -> x + 1}, { x: Int -> x * 2}).k()).toList() }
+import arrow.instances.*
+ForSequenceK extensions {
+  sequenceOf(1, 2, 3).k()
+    .ap(sequenceOf({ x: Int -> x + 1}, { x: Int -> x * 2}).k())
+    .toList() 
+}
 ```
 
 SequenceK is a [`Monad`](/docs/typeclasses/monad/) too. For example, it can be used to model non-deterministic computations. (In a sense that the computations return an arbitrary number of results.)
@@ -50,11 +55,13 @@ import arrow.typeclasses.*
 val positive = generateSequence(1) { it + 1 }.k() // sequence of positive numbers
 val positiveEven = positive.filter { it % 2 == 0 }.k()
 
-SequenceK.monad().binding {
+ForSequenceK extensions { 
+  binding {
    val p = positive.bind()
    val pe = positiveEven.bind()
    p + pe
-}.fix().take(5).toList()
+  }.fix().take(5).toList()
+}
 ```
 
 Folding a sequence,

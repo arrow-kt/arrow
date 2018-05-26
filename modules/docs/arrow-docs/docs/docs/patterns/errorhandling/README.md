@@ -136,14 +136,17 @@ Arrow provides [monadic comprehensions]({{ '/docs/patterns/monad_comprehensions'
 
 ```kotlin
 import arrow.typeclasses.*
+import arrow.instances.*
 
 fun attackOption(): Option<Impacted> =
-  Option.monad().binding {
-    val nuke = arm().bind()
-    val target = aim().bind()
-    val impact = launch(target, nuke).bind()
-    impact
-  }.fix()
+  ForOption extensions {
+    binding {
+        val nuke = arm().bind()
+        val target = aim().bind()
+        val impact = launch(target, nuke).bind()
+        impact
+    }.fix()
+  }
 
 attackOption()
 //None
@@ -193,13 +196,18 @@ result.fold({ ex -> "BOOM!: $ex"}, { "Got: $it" })
 Just like it does for `Option`, Arrow also provides `Monad` instances for `Try` and we can use it exactly in the same way
 
 ```kotlin
+import arrow.typeclasses.*
+import arrow.instances.*
+
 fun attackTry(): Try<Impacted> =
-  Try.monad().binding {
-    val nuke = arm().bind()
-    val target = aim().bind()
-    val impact = launch(target, nuke).bind()
-    impact
-  }.fix()
+  ForTry extensions {
+    binding {
+      val nuke = arm().bind()
+      val target = aim().bind()
+      val impact = launch(target, nuke).bind()
+      impact
+   }.fix()
+  }
 
 attackTry()
 //Failure(RuntimeException("SystemOffline"))
@@ -251,13 +259,15 @@ All values on the left side assume to be `Right` biased and whenever a `Left` va
 
 ```kotlin
 fun attackEither(): Either<NukeException, Impacted> =
-  Either.monad<NukeException>().binding {
+  ForEither<NukeException>() extensions {
+   binding {
     val nuke = arm().bind()
     val target = aim().bind()
     val impact = launch(target, nuke).bind()
     impact
-  }.fix()
-
+   }.fix()
+  }
+  
 attackEither()
 //Left(MissedByMeters(5))
 ```
@@ -301,8 +311,8 @@ fun <f> launch(target: Target, nuke: Nuke, ME: MonadError<F, NukeException>):
 We can now express the same program as before in a fully polymorphic context
 
 ```kotlin
-fun <f> attack(ME:MonadError<F, NukeException>):Kind<F, Impacted> =
-  ME.binding {
+fun <F> MonadError<F, NukeException>.attack():Kind<F, Impacted> =
+  binding {
     val nuke = arm<F>().bind()
     val target = aim<F>().bind()
     val impact = launch<F>(target, nuke).bind()
@@ -313,26 +323,26 @@ fun <f> attack(ME:MonadError<F, NukeException>):Kind<F, Impacted> =
 Or since `arm()` and `bind()` are operations that do not depend on each other we don't need the [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) here and we can express our logic as:
 
 ```kotlin
-fun <f> attack1(ME: MonadError<F, NukeException>): Kind<F, Impacted> =
+fun <F> MonadError<F, NukeException>.attack1(ME): Kind<F, Impacted> =
   ME.tupled(aim(), arm()).flatMap(ME, { (nuke, target) -> launch<F>(nuke, target) })
 
-val result = attack<EitherPartialOf<NukeException>>()
+val result = Either.monadError<NukeException>.attack()
 result.fix()
 //Left(MissedByMeters(5))
 // or
-val result1 = attack(Either.monadError())
+val result1 = Either.monadError<NukeException>.attack1()
 result1.fix()
 ```
 
 Note that `MonadError` also has a function `bindingCatch` that automatically captures and wraps exceptions in its binding block.
 
 ```kotlin
-fun <f> launchImjust(target: Target, nuke: Nuke, ME: MonadError<F, NukeException>): Impacted {
+fun <f> MonadError<F, NukeException>.launchImjust(target: Target, nuke: Nuke): Impacted {
   throw MissedByMeters(5)
 }
 
-fun <f> attack(ME:MonadError<F, NukeException>):Kind<F, Impacted> =
-  ME.binding {
+fun <f> MonadError<F, NukeException>.attack(): Kind<F, Impacted> =
+  bindingCatch {
     val nuke = arm<F>().bind()
     val target = aim<F>().bind()
     val impact = launchImpure<F>(target, nuke)

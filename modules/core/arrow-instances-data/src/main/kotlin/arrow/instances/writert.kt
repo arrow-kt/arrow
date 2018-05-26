@@ -66,3 +66,17 @@ interface WriterTMonoidKInstance<F, W> : MonoidK<WriterTPartialOf<F, W>>, Writer
 
   override fun <A> empty(): WriterT<F, W, A> = WriterT(SS().empty())
 }
+
+class WriterTContext<F, W>(val MF: Monad<F>, val MW: Monoid<W>) : WriterTMonadInstance<F, W> {
+  override fun FF(): Monad<F> = MF
+
+  override fun MM(): Monoid<W> = MW
+}
+
+class WriterTContextPartiallyApplied<F, W>(val MF: Monad<F>, val MW: Monoid<W>) {
+  infix fun <A> extensions(f: WriterTContext<F, W>.() -> A): A =
+    f(WriterTContext(MF, MW))
+}
+
+fun <F, W> ForWriterT(MF: Monad<F>, MW: Monoid<W>): WriterTContextPartiallyApplied<F, W> =
+  WriterTContextPartiallyApplied(MF, MW)
