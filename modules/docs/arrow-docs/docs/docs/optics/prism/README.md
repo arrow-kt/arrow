@@ -128,17 +128,19 @@ networkInt.getOption(NetworkResult.Success("5"))
 
 ## Generated prisms <a id="generated-prisms"></a>
 
-Prisms can be generated for `sealed classes` by the `@optics` annotation. For every defined subtype a `Prism` will be generated. The prisms will be generated in the same package as the `sealed class` and will be named `parentnameSubtypename()`.
+Prisms can be generated for `sealed classes` by the `@optics` annotation. For every defined subtype a `Prism` will be generated.
+The prisms will be generated as extension properties on the companion object `val T.Companion.subTypeName`.
 
 ```kotlin
 @optics sealed class Shape {
+  companion object { }
   data class Circle(val radius: Double) : Shape()
   data class Rectangle(val width: Double, val height: Double) : Shape()
 }
 ```
 ```kotlin:ank:silent
-val circleShape: Prism<Shape, Shape.Circle> = shapeCircle()
-val rectangleShape: Prism<Shape, Shape.Rectangle> = shapeRectangle()
+val circleShape: Prism<Shape, Shape.Circle> = Shape.circle
+val rectangleShape: Prism<Shape, Shape.Rectangle> = Shape.rectangle
 ```
 
 ### Polymorphic prisms <a id="PPrism"></a>

@@ -89,14 +89,17 @@ triedEmail.getOption(Try.Failure(IllegalStateException("Something wrong with net
 
 ### Generating optional
 
-To avoid boilerplate, optionals can be generated for `A?` and `Option<A>` fields for a `data class`. The `Optionals` will be generated in the same package as `data class`.
+To avoid boilerplate, optionals can be generated for `A?` and `Option<A>` fields for a `data class`.
+The `Optionals` will be generated as extension properties on the companion object `val T.Companion.paramName`.
 
 ```kotlin
-@optics data class Person(val age: Int?, val address: Option<Address>)
+@optics data class Person(val age: Int?, val address: Option<Address>) {
+  companion object
+}
 ```
 ```kotlin:ank:silent
-val optionalAge: Optional<Person, Int> = personAge()
-val optionalAddress: Optional<Person, Address> = personAddress()
+val optionalAge: Optional<Person, Int> = Person.age
+val optionalAddress: Optional<Person, Address> = Person.address
 ```
 
 ### Polymorphic optional

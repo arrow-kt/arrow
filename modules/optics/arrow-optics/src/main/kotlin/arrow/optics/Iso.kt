@@ -197,6 +197,8 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
 
   operator fun <C, D> plus(other: PLens<A, B, C, D>): PLens<S, T, C, D> = compose(other)
 
+  operator fun <C, D> plus(other: PPrism<A, B, C, D>): PPrism<S, T, C, D> = compose(other)
+
   operator fun <C> plus(other: Getter<A, C>): Getter<S, C> = compose(other)
 
   operator fun <C, D> plus(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = compose(other)

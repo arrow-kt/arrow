@@ -204,7 +204,11 @@ IO.async<Int> { callback ->
 [Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) also enable cancellation and parallelization of IO effects.
 
 ```kotlin
-IO.monad().binding {
+import arrow.typeclasses.*
+import arrow.effects.*
+
+ForIO extensions {
+  binding {
     val file = getFile("/tmp/file.txt").bind()
     val lines = file.readLines().bind()
     val average =
@@ -219,6 +223,7 @@ IO.monad().binding {
   .fix()
   .attempt()
   .unsafeRunSync()
+}
 ```
 
 ## Syntax
@@ -227,7 +232,9 @@ IO.monad().binding {
 
 Puts the value `A` inside an `IO<A>` using `just`.
 
-```kotlin
+```kotlin:ank
+import arrow.effects.*
+
 1.liftIO()
   .attempt()
   .unsafeRunSync()

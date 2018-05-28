@@ -141,8 +141,11 @@ Transforming the value, if the computation is a success:
 
 ```kotlin:ank
 import arrow.typeclasses.*
+import arrow.instances.*
 
-Try.functor().run { Try { "3".toInt() }.map { it + 1} }
+ForTry extensions {
+  Try { "3".toInt() }.map { it + 1} 
+}
 ```
 
 [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }})
@@ -150,7 +153,9 @@ Try.functor().run { Try { "3".toInt() }.map { it + 1} }
 Computing over independent values:
 
 ```kotlin:ank
-Try.applicative().tupled(Try { "3".toInt() }, Try { "5".toInt() }, Try { "nope".toInt() })
+ForTry extensions {
+  tupled(Try { "3".toInt() }, Try { "5".toInt() }, Try { "nope".toInt() })
+}
 ```
 
 [`Monad`]({{ '/docs/typeclasses/monad/' | relative_url }})
@@ -158,35 +163,41 @@ Try.applicative().tupled(Try { "3".toInt() }, Try { "5".toInt() }, Try { "nope".
 Computing over dependent values ignoring failure:
 
 ```kotlin
-Try.monad().binding {
+ForTry extensions {
+  binding {
     val a = Try { "3".toInt() }.bind()
     val b = Try { "4".toInt() }.bind()
     val c = Try { "5".toInt() }.bind()
-
     a + b + c
+  }
 } // Success(value=12)
 ```
 
 ```kotlin
-Try.monad().binding {
+ForTry extensions {
+  binding {
     val a = Try { "none".toInt() }.bind()
     val b = Try { "4".toInt() }.bind()
     val c = Try { "5".toInt() }.bind()
 
     a + b + c
-} // Failure(exception=java.lang.NumberFormatException: For input string: "none")
+  } 
+}
+// Failure(exception=java.lang.NumberFormatException: For input string: "none")
 ```
 
 Computing over dependent values that are automatically lifted to the context of `Try`:
 
 ```kotlin
-Try.monadError().bindingCatch {
+ForTry extensions { 
+  bindingCatch {
     val a = "none".toInt()
     val b = "4".toInt()
     val c = "5".toInt()
-
     a + b + c
-} // Failure(exception=java.lang.NumberFormatException: For input string: "none")
+  } 
+}
+// Failure(exception=java.lang.NumberFormatException: For input string: "none")
 ```
 
 ## Available Instances

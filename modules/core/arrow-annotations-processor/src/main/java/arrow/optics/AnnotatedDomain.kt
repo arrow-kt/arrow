@@ -37,3 +37,12 @@ sealed class Target {
   data class NonNullTarget(override val fullName: String, override val paramName: String) : Target()
 
 }
+
+val Lens = "arrow.optics.Lens"
+val Iso = "arrow.optics.Iso"
+val Optional = "arrow.optics.Optional"
+val Prism = "arrow.optics.Prism"
+val Getter = "arrow.optics.Getter"
+val Setter = "arrow.optics.Setter"
+val Traversal = "arrow.optics.Traversal"
+val Fold = "arrow.optics.Fold"

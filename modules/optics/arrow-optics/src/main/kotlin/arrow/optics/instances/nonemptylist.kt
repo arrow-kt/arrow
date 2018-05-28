@@ -28,11 +28,16 @@ interface NonEmptyListEachInstance<A> : Each<NonEmptyList<A>, A> {
 
 @instance(NonEmptyList::class)
 interface NonEmptyListFilterIndexInstance<A> : FilterIndex<NonEmptyList<A>, Int, A> {
-  override fun filter(p: (Int) -> Boolean): Traversal<NonEmptyList<A>, A> = FilterIndex.fromTraverse<ForNonEmptyList, A>({ aas ->
-    aas.fix().all.mapIndexed { index, a -> a toT index }.let {
-      NonEmptyList.fromListUnsafe(it)
+  override fun filter(p: (Int) -> Boolean): Traversal<NonEmptyList<A>, A> = object : Traversal<NonEmptyList<A>, A> {
+    override fun <F> modifyF(FA: Applicative<F>, s: NonEmptyList<A>, f: (A) -> Kind<F, A>): Kind<F, NonEmptyList<A>> = NonEmptyList.traverse().run {
+      FA.run {
+        s.fix().all.mapIndexed { index, a -> a toT index }.let {
+          NonEmptyList.fromListUnsafe(it)
+        }.traverse(FA) { (a, j) -> if (p(j)) f(a) else just(a) }
+      }
     }
-  }, NonEmptyList.traverse()).filter(p) as Traversal<NonEmptyList<A>, A>
+
+  }
 }
 
 @instance(NonEmptyList::class)

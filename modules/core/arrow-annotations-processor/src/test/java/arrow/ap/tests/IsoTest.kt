@@ -30,6 +30,13 @@ class IsoTest : APTest("arrow.ap.objects.iso") {
     ))
 
     testProcessor(AnnotationProcessor(
+      name = "Iso generation requires companion object declaration",
+      sourceFiles = listOf("IsoWithoutCompanion.java"),
+      errorMessage = "@optics annotated class arrow.ap.objects.iso.IsoWithoutCompanion needs to declare companion object.",
+      processor = OpticsProcessor()
+    ))
+
+    testProcessor(AnnotationProcessor(
       name = "Isos will be generated for data class",
       sourceFiles = listOf("Iso.java"),
       destFile = "Iso.kt",

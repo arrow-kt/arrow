@@ -115,3 +115,8 @@ interface ObservableKEffectInstance :
   override fun <A> ObservableKOf<A>.runAsync(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Unit> =
     fix().runAsync(cb)
 }
+
+object ObservableKContext : ObservableKEffectInstance
+
+infix fun <A> ForObservableK.Companion.extensions(f: ObservableKContext.() -> A): A =
+  f(ObservableKContext)
