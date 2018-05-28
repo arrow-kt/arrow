@@ -89,7 +89,7 @@ sealed class Option<out A> : OptionOf<A> {
    * @param f the function to apply
    * @see map
    */
-  inline fun <B> flatMap(crossinline f: (A) -> OptionOf<B>): Option<B> = fold({ None }, { a -> f(a) }).fix()
+  fun <B> flatMap(f: (A) -> OptionOf<B>): Option<B> = fold({ None }, { a -> f(a) }).fix()
 
   fun <B> ap(ff: OptionOf<(A) -> B>): Option<B> = ff.fix().flatMap { this.fix().map(it) }
 
