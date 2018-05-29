@@ -54,6 +54,7 @@ dependencies {
     compile 'io.arrow-kt:arrow-effects-kotlinx-coroutines:0.7.2' //optional
     compile 'io.arrow-kt:arrow-optics:0.7.2' //optional
     compile 'io.arrow-kt:arrow-generic:0.7.2' //optional
+    compile 'io.arrow-kt:arrow-recursion:0.7.2' //optional
 }
 ```
 
