@@ -93,7 +93,7 @@ fun <F> getSongUrlAsync(MS: MonadDefer<F>) =
 val songObservable: ObservableKOf<Url> = getSongUrlAsync(ObservableK.monadDefer())
 val songFlowable: FlowableKOf<Url> = getSongUrlAsync(FlowableK.monadDefer())
 val songSingle: SingleKOf<Url> = getSongUrlAsync(SingleK.monadDefer())
-val songMaybe: SingleKOf<Url> = getSongUrlAsync(MaybeK.monadDefer())
+val songMaybe: MaybeKOf<Url> = getSongUrlAsync(MaybeK.monadDefer())
 ```
 
 [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) using the method `bindingCatch`, with all its benefits.
