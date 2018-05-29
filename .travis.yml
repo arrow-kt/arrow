@@ -8,7 +8,7 @@ jdk:
 script:
   - ./gradlew codeCoverageReport
   - bash <(curl -s https://codecov.io/bash)
-  - ./gradlew clean build :arrow-docs:runAnk
+  - ./gradlew clean build :arrow-docs:runAnk 
 
 after_success:
   - ./deploy-scripts/deploy.sh
