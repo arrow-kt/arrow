@@ -15,9 +15,9 @@ interface OptionSemigroupInstance<A> : Semigroup<Option<A>> {
     when (this) {
       is Some<A> -> when (b) {
         is Some<A> -> Some(SG().run { t.combine(b.t) })
-        None -> b
+        None -> this
       }
-      None -> this
+      None -> b
     }
 }
 
