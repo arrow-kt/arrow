@@ -39,7 +39,7 @@ package com.example.domain
 @optics sealed class NetworkResult
 @optics data class Success(val content: String): NetworkResult()
 @optics sealed class NetworkError : NetworkResult()
-@optics data class HttpError(val message: String): NetworkResult()
+@optics data class HttpError(val message: String): NetworkError()
 object TimeoutError: NetworkError()
 ```
 
