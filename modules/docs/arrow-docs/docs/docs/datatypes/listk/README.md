@@ -46,7 +46,7 @@ val numbers =  listOf(Math.random(), Math.random(), Math.random()).k()
 requests.traverse(Option.applicative()) { if (it > 0.5) Some(it) else None }
 ```
 
-and the convenient function `sequence()` that converts a list of `List<Kind<F, A>>` into a `Kind<F, List<A>>`:
+and complements the convenient function `sequence()` that converts a list of `List<Kind<F, A>>` into a `Kind<F, List<A>>`:
 
 ```kotlin:ank
 fun request() = Some(Math.random())
