@@ -34,7 +34,7 @@ val hello = listOf('h', 'e', 'l', 'l', 'o').k()
 val commaSpace = listOf(',', ' ').k()
 val world = listOf('w', 'o', 'r', 'l', 'd').k()
 
-hello.combineK(commaSpace.combineK(world)) == hello.combineK(commaSpace).combineK(world)
+hello.combineK(commaSpace).combineK(world)
 ```
 
 The functions `traverse` and `sequence` come from [`Traverse`](/docs/typeclasses/traverse/).
@@ -52,9 +52,9 @@ numbers.traverse(Option.applicative()) { if (it > 0.5) Some(it) else None }
 and complements the convenient function `sequence()` that converts a list of `ListK<Kind<F, A>>` into a `Kind<F, ListK<A>>`:
 
 ```kotlin:ank
-fun request() = Some(Math.random())
+fun andAnother() = Some(Math.random())
 
-val requests =  listOf(request(), request(), request()).k()
+val requests = listOf(Some(Math.random()), andAnother(), andAnother()).k()
 requests.sequence(Option.applicative()).fix()
 ```
 
@@ -63,7 +63,7 @@ If you want to aggregate the elements of a list into any other value you can use
 Folding a list into a new value, `String` in this case, starting with an initial value and a combine function:
 
 ```kotlin:ank
-listOf('a', 'b', 'c', 'd', 'e').k().foldLeft("") { x, y -> x + y }
+listOf('a', 'b', 'c', 'd', 'e').k().foldLeft("-> ") { x, y -> x + y }
 ```
 
 Or you can apply a list of transformations using `ap` from [`Applicative`](/docs/typeclasses/applicative/).
@@ -72,7 +72,7 @@ Or you can apply a list of transformations using `ap` from [`Applicative`](/docs
 import arrow.instances.*
 ForListK extensions {
   listOf(1, 2, 3).k()
-    .ap(listOf({ x: Int -> x + 1}, { x: Int -> x * 2}).k())
+    .ap(listOf({ x: Int -> x + 10}, { x: Int -> x * 2}).k())
 }
 ```
 
