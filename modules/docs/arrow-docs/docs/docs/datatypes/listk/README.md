@@ -6,7 +6,7 @@ permalink: /docs/datatypes/listk/
 
 ## ListK
 
-ListK wraps over the platform `List` type to make it a (type constructor)[/docs/patterns/glossary/#type-constructors].
+ListK wraps over the platform `List` type to make it a [type constructor](/docs/patterns/glossary/#type-constructors).
 
 It can be created from Kotlin List type with a convenient `k()` function.
 
@@ -39,7 +39,7 @@ hello.combineK(commaSpace).combineK(world)
 
 The functions `traverse` and `sequence` come from [`Traverse`](/docs/typeclasses/traverse/).
 
-Traversing a list creates a new container (`Kind<F, A>`)[/docs/patterns/glossary/#type-constructors] by combining the result of a function applied to each element:
+Traversing a list creates a new container [`Kind<F, A>`](/docs/patterns/glossary/#type-constructors) by combining the result of a function applied to each element:
 
 ```kotlin:ank
 import arrow.core.*
