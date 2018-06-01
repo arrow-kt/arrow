@@ -8,7 +8,7 @@ permalink: /docs/datatypes/listk/
 
 ListK wraps over the platform `List` type to make it a (type constructor)[/docs/patterns/glossary/#type-constructors].
 
-It can be created from Kotlin Sequence type with a convenient `k()` function.
+It can be created from Kotlin List type with a convenient `k()` function.
 
 ```kotlin:ank
 import arrow.*
@@ -42,11 +42,14 @@ The functions `traverse` and `sequence` come from [`Traverse`](/docs/typeclasses
 Traversing a list creates a new container (`Kind<F, A>`)[/docs/patterns/glossary/#type-constructors] by combining the result of a function applied to each element:
 
 ```kotlin:ank
-val numbers =  listOf(Math.random(), Math.random(), Math.random()).k()
-requests.traverse(Option.applicative()) { if (it > 0.5) Some(it) else None }
+import arrow.core.*
+import arrow.instances.*
+
+val numbers = listOf(Math.random(), Math.random(), Math.random()).k()
+numbers.traverse(Option.applicative()) { if (it > 0.5) Some(it) else None }
 ```
 
-and complements the convenient function `sequence()` that converts a list of `List<Kind<F, A>>` into a `Kind<F, List<A>>`:
+and complements the convenient function `sequence()` that converts a list of `ListK<Kind<F, A>>` into a `Kind<F, ListK<A>>`:
 
 ```kotlin:ank
 fun request() = Some(Math.random())
@@ -55,9 +58,9 @@ val requests =  listOf(request(), request(), request()).k()
 requests.sequence(Option.applicative()).fix()
 ```
 
-A more general approach is aggregating values using `foldLeft` and `foldRight` from [`Foldable`](/docs/typeclasses/foldable).
+If you want to aggregate the elements of a list into any other value you can use `foldLeft` and `foldRight` from [`Foldable`](/docs/typeclasses/foldable).
 
-Folding a list into a new value starting with an initial value and a combine function:
+Folding a list into a new value, `String` in this case, starting with an initial value and a combine function:
 
 ```kotlin:ank
 listOf('a', 'b', 'c', 'd', 'e').k().foldLeft("") { x, y -> x + y }
