@@ -17,10 +17,10 @@ import arrow.data.*
 listOf(1, 2, 3).k()
 ```
 
-and unwrapped with the field `value`.
+and unwrapped with the field `list`.
 
 ```kotlin:ank
-listOf(1, 2, 3).k().value
+listOf(1, 2, 3).k().list
 ```
 
 ListK implements operators from many useful typeclasses.
