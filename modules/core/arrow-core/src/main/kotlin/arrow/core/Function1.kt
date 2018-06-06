@@ -26,8 +26,8 @@ class Function1<I, out O>(val f: (I) -> O) : Function1Of<I, O> {
     tailrec private fun <I, A, B> step(a: A, t: I, fn: (A) -> Function1Of<I, Either<A, B>>): B {
       val af = fn(a)(t)
       return when (af) {
-        is Either.Right<A, B> -> af.b
-        is Either.Left<A, B> -> step(af.a, t, fn)
+        is Either.Right -> af.b
+        is Either.Left -> step(af.a, t, fn)
       }
     }
 

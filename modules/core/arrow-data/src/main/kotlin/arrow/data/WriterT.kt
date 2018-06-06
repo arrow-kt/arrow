@@ -59,8 +59,8 @@ data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTOf<F, W, 
         f(it).fix().value.map() {
           val value = it.b
           when (value) {
-            is Either.Left<A, B> -> Either.Left(value.a)
-            is Either.Right<A, B> -> Either.Right(it.a toT value.b)
+            is Either.Left -> Either.Left(value.a)
+            is Either.Right -> Either.Right(it.a toT value.b)
           }
         }
       }))

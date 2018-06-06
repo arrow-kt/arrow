@@ -12,7 +12,7 @@ class LeftProjection<out L, out R>(val e: Either<L, R>) {
 
   fun forEach(f: (L) -> Unit) {
     when (e) {
-      is Either.Left<L, R> -> f(e.a)
+      is Either.Left -> f(e.a)
     }
   }
 
