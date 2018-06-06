@@ -106,7 +106,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
   inline fun <C> map(crossinline f: (B) -> C): Either<A, C> =
       when (this) {
         is Right -> Right(f(b))
-        is Left -> this as Left<Nothing, C>
+        is Left -> this as Left<A, Nothing>
       }
 
   /**
