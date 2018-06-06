@@ -202,7 +202,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
           val b: Either<A, B> = ev.b
           when (b) {
             is Left -> tailRecM(b.a, f)
-            is Right-> Right(b.b)
+            is Right -> Right(b.b)
           }
         }
       }

@@ -60,7 +60,7 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
               buf += head.b
               go(buf, f, v.drop(1).k())
             }
-            is Either.Left-> {
+            is Either.Left -> {
               if (v.count() == 1)
                 go(buf, f, (f(head.a).fix()).k())
               else
