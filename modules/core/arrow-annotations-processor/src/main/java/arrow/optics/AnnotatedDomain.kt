@@ -82,7 +82,6 @@ data class Snippet(
   val fqName = "$`package`.$name"
 }
 
-
 fun Snippet.asFileText(): String = """
             |package $`package`
             |${imports.joinToString(prefix = "\n", separator = "\n", postfix = "\n")}

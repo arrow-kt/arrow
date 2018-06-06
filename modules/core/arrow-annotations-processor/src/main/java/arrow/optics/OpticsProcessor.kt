@@ -49,7 +49,7 @@ class OpticsProcessor : AbstractProcessor() {
     if (roundEnv.processingOver()) {
       annotatedEles
         .forEach { ele ->
-         ele.snippets()
+          ele.snippets()
             .groupBy(Snippet::fqName)
             .values
             .map {
