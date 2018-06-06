@@ -34,7 +34,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
   fun isRight(): Boolean = isRight
 
   /**
-   * Applies `fa` if this is a [Left] or `fb` if this is a [Right].
+   * Applies `ifLeft` if this is a [Left] or `ifRight` if this is a [Right].
    *
    * Example:
    * ```
@@ -45,13 +45,13 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    * )
    * ```
    *
-   * @param fa the function to apply if this is a [Left]
-   * @param fb the function to apply if this is a [Right]
+   * @param ifLeft the function to apply if this is a [Left]
+   * @param ifRight the function to apply if this is a [Right]
    * @return the results of applying the function
    */
-  inline fun <C> fold(crossinline fa: (A) -> C, crossinline fb: (B) -> C): C = when (this) {
-    is Right<A, B> -> fb(b)
-    is Left<A, B> -> fa(a)
+  inline fun <C> fold(crossinline ifLeft: (A) -> C, crossinline ifRight: (B) -> C): C = when (this) {
+    is Right<A, B> -> ifRight(b)
+    is Left<A, B> -> ifLeft(a)
   }
 
   @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("getOrElse { ifLeft }"))
@@ -60,19 +60,19 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
     is Left -> throw NoSuchElementException("Disjunction.Left")
   }
 
-  fun <C> foldLeft(b: C, f: (C, B) -> C): C =
+  fun <C> foldLeft(initial: C, rightOperation: (C, B) -> C): C =
     this.fix().let { either ->
       when (either) {
-        is Right -> f(b, either.b)
-        is Left -> b
+        is Right -> rightOperation(initial, either.b)
+        is Left -> initial
       }
     }
 
-  fun <C> foldRight(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
+  fun <C> foldRight(initial: Eval<C>, rightOperation: (B, Eval<C>) -> Eval<C>): Eval<C> =
     this.fix().let { either ->
       when (either) {
-        is Right -> f(either.b, lb)
-        is Left -> lb
+        is Right -> rightOperation(either.b, initial)
+        is Left -> initial
       }
     }
 
@@ -120,8 +120,8 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
   /**
    * Map over Left and Right of this Either
    */
-  inline fun <C, D> bimap(crossinline fa: (A) -> C, crossinline fb: (B) -> D): Either<C, D> =
-    fold({ Left(fa(it)) }, { Right(fb(it)) })
+  inline fun <C, D> bimap(crossinline leftOperation: (A) -> C, crossinline rightOperation: (B) -> D): Either<C, D> =
+    fold({ Left(leftOperation(it)) }, { Right(rightOperation(it)) })
 
   /**
    * Returns `false` if [Left] or returns the result of the application of
@@ -208,7 +208,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
       }
     }
 
-    fun <L, R> cond(test: Boolean, r: () -> R, l: () -> L): Either<L, R> = if (test) right(r()) else left(l())
+    fun <L, R> cond(test: Boolean, ifTrue: () -> R, ifFalse: () -> L): Either<L, R> = if (test) right(ifTrue()) else left(ifFalse())
 
   }
 }
