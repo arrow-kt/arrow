@@ -1,8 +1,11 @@
 package arrow.optics
 
+import arrow.common.utils.simpleName
 import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 
 fun generateOptionals(ele: AnnotatedElement, target: OptionalTarget) = Snippet(
+  `package` = ele.packageName,
+  name = ele.classData.simpleName,
   imports = setOf("import arrow.core.left", "import arrow.core.right", "import arrow.core.toOption"),
   content = processElement(ele, target.foci)
 )

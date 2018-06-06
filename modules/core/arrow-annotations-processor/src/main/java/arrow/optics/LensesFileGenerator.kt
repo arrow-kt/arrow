@@ -1,8 +1,11 @@
 package arrow.optics
 
+import arrow.common.utils.simpleName
 import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 
 fun generateLenses(ele: AnnotatedElement, target: LensTarget) = Snippet(
+  `package` = ele.packageName,
+  name = ele.classData.simpleName,
   content = processElement(ele, target.foci)
 )
 

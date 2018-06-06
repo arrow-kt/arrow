@@ -1,6 +1,5 @@
 package arrow.optics
 
-import arrow.common.Package
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.fullName
 import me.eugeniomarletti.kotlin.metadata.escapedClassName
@@ -10,6 +9,11 @@ data class AnnotatedElement(val type: TypeElement, val classData: ClassOrPackage
   val sourceClassName = classData.fullName.escapedClassName
   val sourceName = type.simpleName.toString().decapitalize()
   val packageName = classData.`package`.escapedClassName
+
+  operator fun Snippet.plus(snippet: Snippet): Snippet = copy(
+    imports = imports + snippet.imports,
+    content = "$content\n${snippet.content}"
+  )
 }
 
 typealias IsoTarget = Target.Iso
@@ -69,15 +73,18 @@ const val Traversal = "arrow.optics.Traversal"
 const val Fold = "arrow.optics.Fold"
 const val Tuple = "arrow.core.Tuple"
 
-data class Snippet(val imports: Set<String> = emptySet(), val content: String)
+data class Snippet(
+  val `package`: String,
+  val name: String,
+  val imports: Set<String> = emptySet(),
+  val content: String
+) {
+  val fqName = "$`package`.$name"
+}
 
-operator fun Snippet.plus(snippet: Snippet): Snippet = Snippet(
-  this.imports + snippet.imports,
-  "${this.content}\n${snippet.content}"
-)
 
-fun Snippet.asFileText(packageName: Package): String = """
-            |package $packageName
+fun Snippet.asFileText(): String = """
+            |package $`package`
             |${imports.joinToString(prefix = "\n", separator = "\n", postfix = "\n")}
             |$content
             """.trimMargin()

@@ -1,6 +1,10 @@
 package arrow.optics
 
+import arrow.common.utils.simpleName
+
 fun generatePrisms(ele: AnnotatedElement, target: PrismTarget) = Snippet(
+  `package` = ele.packageName,
+  name = ele.classData.simpleName,
   imports = setOf("import arrow.core.left", "import arrow.core.right", "import arrow.core.identity"),
   content = processElement(ele, target.foci)
 )

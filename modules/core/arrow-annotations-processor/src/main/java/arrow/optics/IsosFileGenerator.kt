@@ -1,8 +1,11 @@
 package arrow.optics
 
+import arrow.common.utils.simpleName
 import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 
 fun generateIsos(ele: AnnotatedElement, target: IsoTarget) = Snippet(
+  `package` = ele.packageName,
+  name = ele.classData.simpleName,
   content = processElement(ele, target)
 )
 
