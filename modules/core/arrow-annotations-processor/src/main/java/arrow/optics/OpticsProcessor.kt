@@ -5,6 +5,7 @@ import arrow.common.utils.isSealed
 import arrow.optics.OpticsTarget.*
 import arrow.optics.OpticsProcessor.ClassType.*
 import arrow.common.utils.knownError
+import arrow.common.utils.removeBackticks
 import com.google.auto.service.AutoService
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
 import me.eugeniomarletti.kotlin.metadata.isDataClass
@@ -46,12 +47,22 @@ class OpticsProcessor : AbstractProcessor() {
       }
 
     if (roundEnv.processingOver()) {
-      val generatedDir = File(this.generatedDir!!, "").also { it.mkdirs() }
-
       annotatedEles
         .forEach { ele ->
-          val content = ele.snippets().reduce(Snippet::plus).asFileText(ele.packageName)
-          File(generatedDir, "optics.arrow.${ele.sourceName}.kt").writeText(content)
+         ele.snippets()
+            .groupBy(Snippet::fqName)
+            .values
+            .map {
+              it.reduce { acc, snippet ->
+                acc.copy(
+                  imports = acc.imports + snippet.imports,
+                  content = "${acc.content}\n${snippet.content}"
+                )
+              }
+            }.forEach {
+              val generatedDir = File("$generatedDir/${it.`package`.removeBackticks().replace(".", "/")}").also { it.mkdirs() }
+              File(generatedDir, "${it.name.removeBackticks()}\$\$optics.kt").writeText(it.asFileText())
+            }
         }
     }
   }
