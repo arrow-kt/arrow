@@ -35,8 +35,7 @@ class InstanceProcessor : AbstractProcessor() {
       }
 
     if (roundEnv.processingOver()) {
-      val generatedDir = File(this.generatedDir!!, instanceAnnotationClass.simpleName).also { it.mkdirs() }
-      InstanceFileGenerator(generatedDir, annotatedList).generate()
+      InstanceFileGenerator(generatedDir!!, annotatedList).generate()
     }
   }
 
