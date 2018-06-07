@@ -2,6 +2,7 @@
 layout: docs
 title: Functor
 permalink: /docs/typeclasses/functor/
+video: EUqg3fSahhk
 ---
 
 ## Functor
