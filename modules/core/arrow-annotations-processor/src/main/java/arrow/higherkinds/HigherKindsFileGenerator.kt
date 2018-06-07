@@ -42,7 +42,8 @@ class HigherKindsFileGenerator(
     higherKinds.forEachIndexed { _, hk ->
       val elementsToGenerate = listOf(genKindMarker(hk), genKindTypeAliases(hk), genKindedJTypeAliases(hk), genEv(hk))
       val source: String = elementsToGenerate.joinToString(prefix = "package ${hk.`package`}\n\n", separator = "\n", postfix = "\n")
-      val file = File(generatedDir, higherKindsAnnotationClass.simpleName + ".${hk.target.classElement.qualifiedName}.kt")
+      val dir = File("${generatedDir.absolutePath}/${hk.`package`.replace(".", "/")}").also { it.mkdirs() }
+      val file = File(dir, "${hk.target.classElement.simpleName}$$${higherKindsAnnotationClass.simpleName}.kt")
       file.writeText(source)
     }
   }

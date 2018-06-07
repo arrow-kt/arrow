@@ -34,8 +34,7 @@ class HigherKindsProcessor : AbstractProcessor() {
       }
 
     if (roundEnv.processingOver()) {
-      val generatedDir = File(this.generatedDir!!, higherKindsAnnotationClass.simpleName).also { it.mkdirs() }
-      HigherKindsFileGenerator(generatedDir, annotatedList).generate()
+      HigherKindsFileGenerator(generatedDir!!, annotatedList).generate()
     }
   }
 
