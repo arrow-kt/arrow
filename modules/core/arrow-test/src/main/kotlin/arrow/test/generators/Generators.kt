@@ -185,10 +185,8 @@ fun fromGNatAlgebra() = Algebra<NatPattern, Eval<Int>> {
   it.fix().fold({ Eval.Zero }, { it.map { it + 1 } })
 }
 
-inline fun <reified T> Int.toGNat(CT: Corecursive<T>): GNat<T> = CT.run {
-  ana(Option.functor(), toGNatCoalgebra())
-}
+inline fun <reified T> Corecursive<T>.toGNat(i: Int): GNat<T> =
+  Option.functor().ana(i, toGNatCoalgebra())
 
-inline fun <reified T> GNat<T>.toInt(RT: Recursive<T>): Int = RT.run {
-  cata(Option.functor(), fromGNatAlgebra())
-}
+inline fun <reified T> Recursive<T>.toInt(i: GNat<T>): Int =
+  Option.functor().cata(i, fromGNatAlgebra())
