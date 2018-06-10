@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: Intro to recursion schemes
+title: Intro to Recursion Schemes
 permalink: /docs/recursion/intro/
 ---
 
