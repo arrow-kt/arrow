@@ -46,6 +46,8 @@ buildscript {
 
 apply from: 'detekt.gradle.kts'
 
+apply plugin: 'kotlin'
+
 allprojects {
     apply plugin: 'base'
 
@@ -163,4 +165,62 @@ apply plugin: 'com.github.ben-manes.versions'
 
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+dependencies {
+    compile project(":arrow-annotations")
+    compile project(":arrow-annotations-processor")
+    compile project(":arrow-annotations-processor-test-models")
+    compile project(":arrow-core")
+    compile project(":arrow-dagger")
+    compile project(":arrow-dagger-effects")
+    compile project(":arrow-dagger-effects-kotlinx-coroutines")
+    compile project(":arrow-dagger-effects-rx2")
+    compile project(":arrow-data")
+    compile project(":arrow-docs")
+    compile project(":arrow-effects")
+    compile project(":arrow-effects-kotlinx-coroutines")
+    compile project(":arrow-effects-rx2")
+    compile project(":arrow-free")
+    compile project(":arrow-generic")
+    compile project(":arrow-instances-core")
+    compile project(":arrow-instances-data")
+    compile project(":arrow-kindedj")
+    // compile project(":arrow-mlt")
+    compile project(":arrow-optics")
+    compile project(":arrow-recursion")
+    compile project(":arrow-syntax")
+    compile project(":arrow-typeclasses")
+    compile project(":arrow-validation")
+}
+
+
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+jar {
+    from {
+        configurations.compile.filter {
+            // Exclude kotlin and jetbrains annotations from fat jar
+            // This is ugly but works)
+            !it.path.contains("kotlin") &&
+                    !it.path.contains("intellij") &&
+                    !it.path.contains("jetbrains")
+        }.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
 }
