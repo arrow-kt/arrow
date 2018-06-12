@@ -1,23 +1,9 @@
 package arrow.optics
 
-import arrow.core.identity
 import arrow.data.MapK
 import arrow.data.SetK
 import arrow.data.fix
 import arrow.data.k
-
-/**
- * [PIso] that defines the equality between a [Map] and a [arrow.MapK]
- */
-fun <K, A, B> pMapToMapK(): PIso<Map<K, A>, Map<K, B>, MapK<K, A>, MapK<K, B>> = PIso(
-  get = { it.k() },
-  reverseGet = { it.fix().map }
-)
-
-/**
- * [Iso] that defines the equality between a [Map] and a [arrow.MapK]
- */
-fun <K, A> mapToMapK(): Iso<Map<K, A>, MapK<K, A>> = pMapToMapK()
 
 /**
  * [Iso] that defines the equality between a Unit value [Map] and a [Set] with its keys

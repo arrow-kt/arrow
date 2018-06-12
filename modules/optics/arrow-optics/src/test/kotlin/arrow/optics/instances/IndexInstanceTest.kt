@@ -33,23 +33,5 @@ class IndexInstanceTest : UnitSpec() {
       EQA = SequenceK.eq(String.eq())
     ))
 
-    testLaws(OptionalLaws.laws(
-      optional = MapK.index<String, Int>().index(Gen.string().generate()),
-      aGen = genMapK(Gen.string(), Gen.int()),
-      bGen = Gen.int(),
-      funcGen = genFunctionAToB(Gen.int()),
-      EQOptionB = Eq.any(),
-      EQA = Eq.any()
-    ))
-
-    testLaws(OptionalLaws.laws(
-      optional = MapIndexInstance<String, Int>().index(Gen.string().generate()),
-      aGen = Gen.map(Gen.string(), Gen.int()),
-      bGen = Gen.int(),
-      funcGen = genFunctionAToB(Gen.int()),
-      EQOptionB = Eq.any(),
-      EQA = Eq.any()
-    ))
-
   }
 }

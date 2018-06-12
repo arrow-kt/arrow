@@ -13,6 +13,9 @@ import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
 import arrow.typeclasses.Applicative
 
+/**
+ * [At] instance definition for [Map].
+ */
 interface MapAtInstance<K, V> : At<Map<K, V>, K, Option<V>> {
   override fun at(i: K): Lens<Map<K, V>, Option<V>> = PLens(
     get = { it.getOption(i) },
@@ -28,48 +31,76 @@ interface MapAtInstance<K, V> : At<Map<K, V>, K, Option<V>> {
   )
 
   companion object {
+    /**
+     * Operator overload to instantiate typeclass instance.
+     *
+     * @return [Index] instance for [String]
+     */
     operator fun <K, V> invoke() = object : MapAtInstance<K, V> {}
   }
 }
 
+/**
+ * [Traversal] for [Map] that focuses in each [V] of the source [Map].
+ */
 interface MapTraversal<K, V> : Traversal<Map<K, V>, V> {
-  override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> = with(MapK.traverse<K>()) {
-    FA.run { s.k().traverse(this, f).map { it.map } }
+  override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> = FA.run {
+    s.k().traverse(FA, f).map { it.map }
   }
 
   companion object {
+    /**
+     * Operator overload to instantiate typeclass instance.
+     *
+     * @return [Index] instance for [String]
+     */
     operator fun <K, V> invoke(): MapTraversal<K, V> = object : MapTraversal<K, V> {}
   }
 }
 
+/**
+ * [Each] instance definition for [Map].
+ */
 interface MapEachInstance<K, V> : Each<Map<K, V>, V> {
-  override fun each() =
-    MapTraversal<K, V>()
+  override fun each() = MapTraversal<K, V>()
 
   companion object {
+    /**
+     * Operator overload to instantiate typeclass instance.
+     *
+     * @return [Index] instance for [String]
+     */
     operator fun <K, V> invoke() = object : MapEachInstance<K, V> {}
   }
 }
 
+/**
+ * [FilterIndex] instance definition for [Map].
+ */
 interface MapFilterIndexInstance<K, V> : FilterIndex<Map<K, V>, K, V> {
   override fun filter(p: Predicate<K>) = object : Traversal<Map<K, V>, V> {
     override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> = FA.run {
-      ListK.traverse().run {
-        s.toList().k().traverse(FA, { (k, v) ->
-          (if (p(k)) f(v) else just(v))
-            .map {
-              k to it
-            }
-        }).map { it.toMap() }
-      }
+      s.toList().k().traverse(FA, { (k, v) ->
+        (if (p(k)) f(v) else just(v)).map {
+          k to it
+        }
+      }).map { it.toMap() }
     }
   }
 
   companion object {
+    /**
+     * Operator overload to instantiate typeclass instance.
+     *
+     * @return [Index] instance for [String]
+     */
     operator fun <K, V> invoke() = object : MapFilterIndexInstance<K, V> {}
   }
 }
 
+/**
+ * [Index] instance definition for [Map].
+ */
 interface MapIndexInstance<K, V> : Index<Map<K, V>, K, V> {
   override fun index(i: K): Optional<Map<K, V>, V> = POptional(
     getOrModify = { it[i]?.let(::Right) ?: it.let(::Left) },
@@ -77,6 +108,11 @@ interface MapIndexInstance<K, V> : Index<Map<K, V>, K, V> {
   )
 
   companion object {
+    /**
+     * Operator overload to instantiate typeclass instance.
+     *
+     * @return [Index] instance for [String]
+     */
     operator fun <K, V> invoke() = object : MapIndexInstance<K, V> {}
   }
 }

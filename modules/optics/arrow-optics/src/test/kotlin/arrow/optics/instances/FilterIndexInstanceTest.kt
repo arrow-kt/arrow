@@ -38,26 +38,6 @@ class FilterIndexInstanceTest : UnitSpec() {
       EQListB = ListK.eq(Eq.any())
     ))
 
-    testLaws(TraversalLaws.laws(
-      traversal = FilterIndex.filterIndex(MapK.filterIndex()) { true },
-      aGen = genMapK(genChars(), genIntSmall()),
-      bGen = Gen.int(),
-      funcGen = genFunctionAToB(Gen.int()),
-      EQA = Eq.any(),
-      EQOptionB = Option.eq(Eq.any()),
-      EQListB = ListK.eq(Eq.any())
-    ))
-
-    testLaws(TraversalLaws.laws(
-      traversal = FilterIndex.filterIndex(MapFilterIndexInstance<Char, Int>()) { true },
-      aGen = genMapK(genChars(), genIntSmall()),
-      bGen = Gen.int(),
-      funcGen = genFunctionAToB(Gen.int()),
-      EQA = Eq.any(),
-      EQOptionB = Option.eq(Eq.any()),
-      EQListB = ListK.eq(Eq.any())
-    ))
-
   }
 
 }

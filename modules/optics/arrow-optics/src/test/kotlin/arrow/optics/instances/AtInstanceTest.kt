@@ -27,26 +27,6 @@ class AtInstanceTest : UnitSpec() {
   init {
 
     testLaws(LensLaws.laws(
-      lens = MapK.at<String, Int>().at(Gen.string().generate()),
-      aGen = genMapK(Gen.string(), Gen.int()),
-      bGen = genOption(Gen.int()),
-      funcGen = genFunctionAToB(genOption(Gen.int())),
-      EQA = Eq.any(),
-      EQB = Eq.any(),
-      MB = Option.monoid(Int.monoid())
-    ))
-
-    testLaws(LensLaws.laws(
-      lens = MapAtInstance<String, Int>().at(Gen.string().generate()),
-      aGen = Gen.map(Gen.string(), Gen.int()),
-      bGen = genOption(Gen.int()),
-      funcGen = genFunctionAToB(genOption(Gen.int())),
-      EQA = Eq.any(),
-      EQB = Eq.any(),
-      MB = Option.monoid(Int.semigroup())
-    ))
-
-    testLaws(LensLaws.laws(
       lens = SetK.at<String>().at(Gen.string().generate()),
       aGen = genSetK(Gen.string()),
       bGen = Gen.bool(),
