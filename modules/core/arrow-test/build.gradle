@@ -8,7 +8,9 @@ dependencies {
     compile project(":arrow-recursion")
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
-    compile "io.kotlintest:kotlintest:$kotlinTestVersion"
+    compile "io.kotlintest:kotlintest-core:$kotlinTestVersion"
+    compile "io.kotlintest:kotlintest-assertions:$kotlinTestVersion"
+    compile "io.kotlintest:kotlintest-assertions-arrow:$kotlinTestVersion"
     kapt project(':arrow-annotations-processor')
 }
 

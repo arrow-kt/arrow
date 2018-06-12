@@ -3,12 +3,12 @@ package arrow.test
 import arrow.test.laws.Law
 import arrow.typeclasses.Eq
 import io.kotlintest.TestCase
-import io.kotlintest.specs.StringSpec
+import io.kotlintest.specs.AbstractStringSpec
 
 /**
  * Base class for unit tests
  */
-abstract class UnitSpec : StringSpec() {
+abstract class UnitSpec : AbstractStringSpec() {
 
   fun testLaws(vararg laws: List<Law>): List<TestCase> {
     val flattened = laws.flatMap { list: List<Law> -> list.asIterable() }

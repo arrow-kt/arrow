@@ -2,12 +2,12 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.*
-import arrow.typeclasses.*
+import arrow.instances.monoid
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genIntSmall
+import arrow.typeclasses.*
 import io.kotlintest.properties.forAll
-import arrow.instances.*
 
 typealias TI<A> = Tuple2<IdOf<A>, IdOf<A>>
 
@@ -44,17 +44,19 @@ object TraverseLaws {
     )
 
   fun <F> Traverse<F>.identityTraverse(FF: Functor<F>, cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>) = Id.applicative().run {
+    val idApp = this
     forAll(genFunctionAToB<Int, Kind<ForId, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf), { f: (Int) -> Kind<ForId, Int>, fa: Kind<F, Int> ->
-      fa.traverse(this, f).value().equalUnderTheLaw(FF.run { fa.map(f).map { it.value() } }, EQ)
+      fa.traverse(idApp, f).value().equalUnderTheLaw(FF.run { fa.map(f).map { it.value() } }, EQ)
     })
   }
 
   fun <F> Traverse<F>.sequentialComposition(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>) = Id.applicative().run {
+    val idApp = this
     forAll(genFunctionAToB<Int, Kind<ForId, Int>>(genConstructor(genIntSmall(), ::Id)), genFunctionAToB<Int, Kind<ForId, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf), { f: (Int) -> Kind<ForId, Int>, g: (Int) -> Kind<ForId, Int>, fha: Kind<F, Int> ->
 
-      val fa = fha.traverse(this, f).fix()
-      val composed = fa.map({ it.traverse(this, g) }).value.value()
-      val expected = fha.traverse(ComposedApplicative(this, this), { a: Int -> f(a).map(g).nest() }).unnest().value().value()
+      val fa = fha.traverse(idApp, f).fix()
+      val composed = fa.map({ it.traverse(idApp, g) }).value.value()
+      val expected = fha.traverse(ComposedApplicative(idApp, idApp), { a: Int -> f(a).map(g).nest() }).unnest().value().value()
       composed.equalUnderTheLaw(expected, EQ)
     })
   }

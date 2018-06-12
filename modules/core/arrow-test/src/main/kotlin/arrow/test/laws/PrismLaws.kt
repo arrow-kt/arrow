@@ -1,9 +1,9 @@
 package arrow.test.laws
 
 import arrow.core.*
-import arrow.typeclasses.*
 import arrow.optics.Prism
 import arrow.optics.modify
+import arrow.typeclasses.*
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -19,11 +19,13 @@ object PrismLaws {
     Law("Prism law: consistent get option modify id", { prism.consistentGetOptionModifyId(aGen, EQOptionB) })
   )
 
-  fun <A, B> Prism<A, B>.partialRoundTripOneWay(aGen: Gen<A>, EQA: Eq<A>): Unit =
+  fun <A, B> Prism<A, B>.partialRoundTripOneWay(aGen: Gen<A>, EQA: Eq<A>): Unit = run{
+    val prims = this
     forAll(aGen, { a ->
-      getOrModify(a).fold(::identity, this::reverseGet)
-        .equalUnderTheLaw(a, EQA)
+      getOrModify(a).fold(::identity, prims::reverseGet)
+          .equalUnderTheLaw(a, EQA)
     })
+  }
 
   fun <A, B> Prism<A, B>.roundTripOtherWay(bGen: Gen<B>, EQOptionB: Eq<Option<B>>): Unit =
     forAll(bGen, { b ->

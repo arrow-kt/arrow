@@ -18,7 +18,9 @@ dependencies {
     testCompile project(":arrow-data")
     testCompile project(":arrow-annotations-processor-test-models")
     testCompile project(":arrow-optics")
-    testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
+    testCompile "io.kotlintest:kotlintest-core:$kotlinTestVersion"
+    testCompile "io.kotlintest:kotlintest-assertions:$kotlinTestVersion"
+    testCompile "io.kotlintest:kotlintest-assertions-arrow:$kotlinTestVersion"
     def toolsJar = Jvm.current().getToolsJar()
 
     if (!toolsJar)

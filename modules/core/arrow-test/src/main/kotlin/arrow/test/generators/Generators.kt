@@ -13,90 +13,60 @@ import java.util.concurrent.TimeUnit
 
 fun <F, A> genApplicative(valueGen: Gen<A>, AP: Applicative<F>): Gen<Kind<F, A>> =
   object : Gen<Kind<F, A>> {
-    override fun generate(): Kind<F, A> =
-      AP.just(valueGen.generate())
+    override fun constants(): Iterable<Kind<F, A>> = valueGen.constants().map { AP.just(it) }
+
+    override fun random(): Sequence<Kind<F, A>> = valueGen.random().map { AP.just(it) }
   }
 
 fun <A, B> genFunctionAToB(genB: Gen<B>): Gen<(A) -> B> =
   object : Gen<(A) -> B> {
-    override fun generate(): (A) -> B {
-      val v = genB.generate()
-      return { _ -> v }
-    }
+    override fun constants(): Iterable<(A) -> B> = genB.map { b:B -> {_: A -> b} }.constants()
+
+    override fun random(): Sequence<(A) -> B> = genB.map { b:B -> {_: A -> b} }.random()
   }
 
 fun <A> genFunctionAAToA(genA: Gen<A>): Gen<(A, A) -> A> =
   object : Gen<(A, A) -> A> {
-    override fun generate(): (A, A) -> A {
-      val v = genA.generate()
-      return { _, _ -> v }
-    }
+    override fun constants(): Iterable<(A, A) -> A> = genA.map { a:A -> {_: A, _: A -> a} }.constants()
+
+    override fun random(): Sequence<(A, A) -> A> = genA.map { a:A -> {_: A, _: A -> a} }.random()
   }
 
-fun genThrowable(): Gen<Throwable> = object : Gen<Throwable> {
-  override fun generate(): Throwable =
-    Gen.oneOf(listOf(RuntimeException(), NoSuchElementException(), IllegalArgumentException())).generate()
-}
+fun genThrowable(): Gen<Throwable> = Gen.from(listOf(RuntimeException(), NoSuchElementException(), IllegalArgumentException()))
 
-inline fun <F, A> genConstructor(valueGen: Gen<A>, crossinline cf: (A) -> Kind<F, A>): Gen<Kind<F, A>> =
-  object : Gen<Kind<F, A>> {
-    override fun generate(): Kind<F, A> =
-      cf(valueGen.generate())
-  }
+fun <F, A> genConstructor(valueGen: Gen<A>, cf: (A) -> Kind<F, A>): Gen<Kind<F, A>> = valueGen.map(cf)
 
-inline fun <F, A, B> genConstructor2(valueGen: Gen<A>, crossinline ff: (A) -> Kind<F, (A) -> B>): Gen<Kind<F, (A) -> B>> =
-  object : Gen<Kind<F, (A) -> B>> {
-    override fun generate(): Kind<F, (A) -> B> =
-      ff(valueGen.generate())
-  }
+fun <F, A, B> genConstructor2(valueGen: Gen<A>, ff: (A) -> Kind<F, (A) -> B>): Gen<Kind<F, (A) -> B>> = valueGen.map(ff)
 
 fun genIntSmall(): Gen<Int> =
   Gen.oneOf(Gen.negativeIntegers(), Gen.choose(0, Int.MAX_VALUE / 10000))
 
-fun <A, B> genTuple(genA: Gen<A>, genB: Gen<B>): Gen<Tuple2<A, B>> =
-  object : Gen<Tuple2<A, B>> {
-    override fun generate(): Tuple2<A, B> = Tuple2(genA.generate(), genB.generate())
-  }
+fun <A, B> genTuple(genA: Gen<A>, genB: Gen<B>): Gen<Tuple2<A, B>> = Gen.bind(genA,genB){a:A, b:B -> Tuple2(a, b)}
 
 fun <A, B, C> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>): Gen<Tuple3<A, B, C>> =
-  object : Gen<Tuple3<A, B, C>> {
-    override fun generate(): Tuple3<A, B, C> = Tuple3(genA.generate(), genB.generate(), genC.generate())
-  }
+  Gen.bind(genA,genB, genC){a:A, b:B, c:C -> Tuple3(a, b, c)
 
 fun <A, B, C, D> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>): Gen<Tuple4<A, B, C, D>> =
-  object : Gen<Tuple4<A, B, C, D>> {
-    override fun generate(): Tuple4<A, B, C, D> = Tuple4(genA.generate(), genB.generate(), genC.generate(), genD.generate())
-  }
+  Gen.bind(genA,genB, genC, genD){a:A, b:B, c:C, d:D -> Tuple4(a, b, c, d)
 
 fun <A, B, C, D, E> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>): Gen<Tuple5<A, B, C, D, E>> =
-  object : Gen<Tuple5<A, B, C, D, E>> {
-    override fun generate(): Tuple5<A, B, C, D, E> = Tuple5(genA.generate(), genB.generate(), genC.generate(), genD.generate(), genE.generate())
-  }
+  Gen.bind(genA,genB, genC, genD, genE){a:A, b:B, c:C, d:D, e:E -> Tuple5(a, b, c, d, e)
 
 fun <A, B, C, D, E, F> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>, genF: Gen<F>): Gen<Tuple6<A, B, C, D, E, F>> =
-  object : Gen<Tuple6<A, B, C, D, E, F>> {
-    override fun generate(): Tuple6<A, B, C, D, E, F> = Tuple6(genA.generate(), genB.generate(), genC.generate(), genD.generate(), genE.generate(), genF.generate())
-  }
+  Gen.bind(genA,genB, genC, genD, genE, genF){a:A, b:B, c:C, d:D, e:E, f:F -> Tuple6(a, b, c, d, e, f)
 
 fun <A, B, C, D, E, F, G> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>, genF: Gen<F>, genG: Gen<G>): Gen<Tuple7<A, B, C, D, E, F, G>> =
-  object : Gen<Tuple7<A, B, C, D, E, F, G>> {
-    override fun generate(): Tuple7<A, B, C, D, E, F, G> = Tuple7(genA.generate(), genB.generate(), genC.generate(), genD.generate(), genE.generate(), genF.generate(), genG.generate())
-  }
+  Gen.bind(genA,genB, genC, genD, genE, genF, genG){a:A, b:B, c:C, d:D, e:E, f:F, g:G -> Tuple7(a, b, c, d, e, f, g)
 
 fun <A, B, C, D, E, F, G, H> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>, genF: Gen<F>, genG: Gen<G>, genH: Gen<H>): Gen<Tuple8<A, B, C, D, E, F, G, H>> =
-  object : Gen<Tuple8<A, B, C, D, E, F, G, H>> {
-    override fun generate(): Tuple8<A, B, C, D, E, F, G, H> = Tuple8(genA.generate(), genB.generate(), genC.generate(), genD.generate(), genE.generate(), genF.generate(), genG.generate(), genH.generate())
-  }
+  Gen.bind(genTuple(genA,genB, genC, genD, genE, genF, genG), genH){ tuple: Tuple7<A, B, C, D, E, F, G>, h:H -> Tuple8(tuple.a, tuple.b, tuple.c, tuple.d, tuple.e, tuple.f, tuple.g, h)}
 
 fun <A, B, C, D, E, F, G, H, I> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>, genF: Gen<F>, genG: Gen<G>, genH: Gen<H>, genI: Gen<I>): Gen<Tuple9<A, B, C, D, E, F, G, H, I>> =
-  object : Gen<Tuple9<A, B, C, D, E, F, G, H, I>> {
-    override fun generate(): Tuple9<A, B, C, D, E, F, G, H, I> = Tuple9(genA.generate(), genB.generate(), genC.generate(), genD.generate(), genE.generate(), genF.generate(), genG.generate(), genH.generate(), genI.generate())
-  }
+  Gen.bind(genTuple(genA,genB, genC, genD, genE, genF, genG, genH), genI){ tuple: Tuple8<A, B, C, D, E, F, G, H>, i:I -> Tuple9(tuple.a, tuple.b, tuple.c, tuple.d, tuple.e, tuple.f, tuple.g, tuple.h, i)
 
 fun <A, B, C, D, E, F, G, H, I, J> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>, genF: Gen<F>, genG: Gen<G>, genH: Gen<H>, genI: Gen<I>, genJ: Gen<J>): Gen<Tuple10<A, B, C, D, E, F, G, H, I, J>> =
-  object : Gen<Tuple10<A, B, C, D, E, F, G, H, I, J>> {
-    override fun generate(): Tuple10<A, B, C, D, E, F, G, H, I, J> = Tuple10(genA.generate(), genB.generate(), genC.generate(), genD.generate(), genE.generate(), genF.generate(), genG.generate(), genH.generate(), genI.generate(), genJ.generate())
-  }
+  Gen.bind(genTuple(genA,genB, genC, genD, genE, genF, genG, genH, genI), genJ){tuple: Tuple9<A, B, C, D, E, F, G, H, I>, j:J -> Tuple10(tuple.a, tuple.b, tuple.c, tuple.d, tuple.e, tuple.f, tuple.g, tuple.h, tuple.i, j)
+
 
 fun genIntPredicate(): Gen<(Int) -> Boolean> =
   Gen.int().let { gen ->
@@ -113,6 +83,14 @@ fun genIntPredicate(): Gen<(Int) -> Boolean> =
 
 fun <B> genOption(genB: Gen<B>): Gen<Option<B>> =
   object : Gen<Option<B>> {
+    override fun constants(): Iterable<Option<B>> {
+      TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun random(): Sequence<Option<B>> {
+      TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     val random = genIntSmall()
     override fun generate(): Option<B> =
       if (random.generate() % 20 == 0) None else Option.just(genB.generate())
@@ -120,6 +98,14 @@ fun <B> genOption(genB: Gen<B>): Gen<Option<B>> =
 
 inline fun <reified E, reified A> genEither(genE: Gen<E>, genA: Gen<A>): Gen<Either<E, A>> =
   object : Gen<Either<E, A>> {
+    override fun constants(): Iterable<Either<E, A>> {
+      TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun random(): Sequence<Either<E, A>> {
+      TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun generate(): Either<E, A> =
       Gen.oneOf(genE, genA).generate().let {
         when (it) {
@@ -153,6 +139,14 @@ fun <K, V> genMapK(genK: Gen<K>, genV: Gen<V>): Gen<MapK<K, V>> =
   Gen.create { Gen.list(genK).generate().map { it to genV.generate() }.toMap().k() }
 
 fun genTimeUnit(): Gen<TimeUnit> = object : Gen<TimeUnit> {
+  override fun constants(): Iterable<TimeUnit> {
+    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+  }
+
+  override fun random(): Sequence<TimeUnit> {
+    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+  }
+
   val units = TimeUnit.values()
   val random = Gen.choose(0, units.size - 1)
   override fun generate(): TimeUnit = units[random.generate()]

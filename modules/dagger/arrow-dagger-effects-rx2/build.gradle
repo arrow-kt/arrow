@@ -4,7 +4,9 @@ dependencies {
     compile project(':arrow-effects-rx2')
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
     kaptTest "com.google.dagger:dagger-compiler:$daggerVersion"
-    testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
+    testCompile "io.kotlintest:kotlintest-core:$kotlinTestVersion"
+    testCompile "io.kotlintest:kotlintest-assertions:$kotlinTestVersion"
+    testCompile "io.kotlintest:kotlintest-assertions-arrow:$kotlinTestVersion"
     testCompile project(':arrow-test')
 }
 

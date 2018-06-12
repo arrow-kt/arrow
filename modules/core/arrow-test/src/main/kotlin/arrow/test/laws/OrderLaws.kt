@@ -25,10 +25,12 @@ object OrderLaws {
       Law("Order law: max order", { O.maxOrder(fGen) })
     )
 
-  fun <F> Order<F>.reflexitivityEq(fGen: Gen<F>) =
+  fun <F> Order<F>.reflexitivityEq(fGen: Gen<F>) = run{
+    val eq = this
     forAll(fGen, { x ->
-      x.equalUnderTheLaw(x, this)
+      x.equalUnderTheLaw(x, eq)
     })
+  }
 
   fun <F> Order<F>.symmetryEq(fGen: Gen<F>) =
     forAll(fGen, fGen, { x, y ->
