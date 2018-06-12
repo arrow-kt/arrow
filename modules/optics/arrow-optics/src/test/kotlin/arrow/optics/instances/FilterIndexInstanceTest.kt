@@ -19,16 +19,6 @@ class FilterIndexInstanceTest : UnitSpec() {
   init {
 
     testLaws(TraversalLaws.laws(
-      traversal = FilterIndex.filterIndex(NonEmptyList.filterIndex()) { true },
-      aGen = genNonEmptyList(Gen.string()),
-      bGen = Gen.string(),
-      funcGen = genFunctionAToB(Gen.string()),
-      EQA = Eq.any(),
-      EQOptionB = Option.eq(Eq.any()),
-      EQListB = ListK.eq(Eq.any())
-    ))
-
-    testLaws(TraversalLaws.laws(
       traversal = FilterIndex.filterIndex(SequenceK.filterIndex()) { true },
       aGen = genSequenceK(genChars()),
       bGen = genChars(),

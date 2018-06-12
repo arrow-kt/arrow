@@ -16,15 +16,6 @@ class IndexInstanceTest : UnitSpec() {
   init {
 
     testLaws(OptionalLaws.laws(
-      optional = NonEmptyList.index<String>().index(5),
-      aGen = genNonEmptyList(Gen.string()),
-      bGen = Gen.string(),
-      funcGen = genFunctionAToB(Gen.string()),
-      EQOptionB = Eq.any(),
-      EQA = Eq.any()
-    ))
-
-    testLaws(OptionalLaws.laws(
       optional = SequenceK.index<String>().index(5),
       aGen = genSequenceK(Gen.string()),
       bGen = Gen.string(),
