@@ -14,23 +14,6 @@ import org.junit.runner.RunWith
 class IndexInstanceTest : UnitSpec() {
 
   init {
-    testLaws(OptionalLaws.laws(
-      optional = ListK.index<String>().index(5),
-      aGen = genListK(Gen.string()),
-      bGen = Gen.string(),
-      funcGen = genFunctionAToB(Gen.string()),
-      EQOptionB = Eq.any(),
-      EQA = Eq.any()
-    ))
-
-    testLaws(OptionalLaws.laws(
-      optional = ListIndexInstance<String>().index(5),
-      aGen = Gen.list(Gen.string()),
-      bGen = Gen.string(),
-      funcGen = genFunctionAToB(Gen.string()),
-      EQOptionB = Eq.any(),
-      EQA = Eq.any()
-    ))
 
     testLaws(OptionalLaws.laws(
       optional = NonEmptyList.index<String>().index(5),
@@ -68,13 +51,5 @@ class IndexInstanceTest : UnitSpec() {
       EQA = Eq.any()
     ))
 
-    testLaws(OptionalLaws.laws(
-      optional = String.index().index(5),
-      aGen = Gen.string(),
-      bGen = genChars(),
-      funcGen = genFunctionAToB(genChars()),
-      EQOptionB = Eq.any(),
-      EQA = Eq.any()
-    ))
   }
 }

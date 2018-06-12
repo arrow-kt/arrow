@@ -17,25 +17,6 @@ import org.junit.runner.RunWith
 class FilterIndexInstanceTest : UnitSpec() {
 
   init {
-    testLaws(TraversalLaws.laws(
-      traversal = FilterIndex.filterIndex(ListK.filterIndex()) { true },
-      aGen = genListK(Gen.string()),
-      bGen = Gen.string(),
-      funcGen = genFunctionAToB(Gen.string()),
-      EQA = Eq.any(),
-      EQListB = Eq.any(),
-      EQOptionB = Eq.any()
-    ))
-
-    testLaws(TraversalLaws.laws(
-      traversal = FilterIndex.filterIndex(ListFilterIndexInstance()) { true },
-      aGen = Gen.list(Gen.string()),
-      bGen = Gen.string(),
-      funcGen = genFunctionAToB(Gen.string()),
-      EQA = Eq.any(),
-      EQListB = Eq.any(),
-      EQOptionB = Eq.any()
-    ))
 
     testLaws(TraversalLaws.laws(
       traversal = FilterIndex.filterIndex(NonEmptyList.filterIndex()) { true },
@@ -72,16 +53,6 @@ class FilterIndexInstanceTest : UnitSpec() {
       aGen = genMapK(genChars(), genIntSmall()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
-      EQA = Eq.any(),
-      EQOptionB = Option.eq(Eq.any()),
-      EQListB = ListK.eq(Eq.any())
-    ))
-
-    testLaws(TraversalLaws.laws(
-      traversal = FilterIndex.filterIndex(String.filterIndex()) { true },
-      aGen = Gen.string(),
-      bGen = genChars(),
-      funcGen = genFunctionAToB(genChars()),
       EQA = Eq.any(),
       EQOptionB = Option.eq(Eq.any()),
       EQListB = ListK.eq(Eq.any())

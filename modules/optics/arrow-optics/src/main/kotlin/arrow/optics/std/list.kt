@@ -3,7 +3,6 @@ package arrow.optics
 import arrow.core.*
 import arrow.data.ListK
 import arrow.data.NonEmptyList
-import arrow.data.fix
 import arrow.data.k
 
 /**
@@ -29,24 +28,27 @@ fun <A> ListK.Companion.tail(): Optional<List<A>, List<A>> = Optional(
  */
 fun <A, B> ListK.Companion.toPOptionNel(): PIso<List<A>, List<B>, Option<NonEmptyList<A>>, Option<NonEmptyList<B>>> = PIso(
   get = { aas -> if (aas.isEmpty()) None else Some(NonEmptyList(aas.first(), aas.drop(1))) },
-  reverseGet = { optNel -> optNel.fix().fold({ emptyList() }, { it.fix().all }) }
+  reverseGet = { optNel -> optNel.fold({ emptyList() }, NonEmptyList<B>::all) }
 )
 
 /**
  * [Iso] that defines equality between a [List] and [Option] [NonEmptyList]
  */
-fun <A>  ListK.Companion.toOptionNel(): Iso<List<A>, Option<NonEmptyList<A>>> = toPOptionNel()
+fun <A> ListK.Companion.toOptionNel(): Iso<List<A>, Option<NonEmptyList<A>>> = toPOptionNel()
 
-/**
- * [PIso] that defines the equality between a [List] and a [ListK]
- */
-fun <A, B> pListToListK(): PIso<List<A>, List<B>, ListK<A>, ListK<B>> = PIso(
-  get = { it.k() },
-  reverseGet = { it.fix().list }
-)
+object ListOptics {
 
-/**
- * [Iso] that defines the equality between a [List] and a [ListK]
- */
-fun <A> listToListK(): Iso<List<A>, ListK<A>> = pListToListK()
+  /**
+   * [PIso] that defines the equality between a [List] and a [ListK]
+   */
+  fun <A, B> toPListK(): PIso<List<A>, List<B>, ListK<A>, ListK<B>> = PIso(
+    get = { it.k() },
+    reverseGet = ListK<B>::list
+  )
 
+  /**
+   * [Iso] that defines the equality between a [List] and a [ListK]
+   */
+  fun <A> toListK(): Iso<List<A>, ListK<A>> = toPListK()
+
+}

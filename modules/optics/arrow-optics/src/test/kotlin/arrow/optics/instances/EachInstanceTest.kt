@@ -18,27 +18,6 @@ class EachInstanceTest : UnitSpec() {
 
   init {
 
-
-    testLaws(TraversalLaws.laws(
-      traversal = ListK.each<String>().each(),
-      aGen = genListK(Gen.string()),
-      bGen = Gen.string(),
-      funcGen = genFunctionAToB(Gen.string()),
-      EQA = Eq.any(),
-      EQOptionB = Option.eq(Eq.any()),
-      EQListB = ListK.eq(Eq.any())
-    ))
-
-    testLaws(TraversalLaws.laws(
-      traversal = ListEachInstance<String>().each(),
-      aGen = Gen.list(Gen.string()),
-      bGen = Gen.string(),
-      funcGen = genFunctionAToB(Gen.string()),
-      EQA = Eq.any(),
-      EQOptionB = Option.eq(Eq.any()),
-      EQListB = ListK.eq(Eq.any())
-    ))
-
     testLaws(TraversalLaws.laws(
       traversal = MapK.each<Int, String>().each(),
       aGen = genMapK(Gen.int(), Gen.string()),
