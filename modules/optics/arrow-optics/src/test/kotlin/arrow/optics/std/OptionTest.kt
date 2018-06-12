@@ -17,12 +17,12 @@ import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class OptionInstancesTest : UnitSpec() {
+class OptionTest : UnitSpec() {
 
   init {
 
     testLaws(PrismLaws.laws(
-      prism = Option.asSome(),
+      prism = Option.some(),
       aGen = genOption(Gen.int()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
@@ -31,7 +31,7 @@ class OptionInstancesTest : UnitSpec() {
     ))
 
     testLaws(PrismLaws.laws(
-      prism = Option.asNone(),
+      prism = Option.none(),
       aGen = genOption(Gen.int()),
       bGen = Gen.create { Unit },
       funcGen = genFunctionAToB(Gen.create { Unit }),

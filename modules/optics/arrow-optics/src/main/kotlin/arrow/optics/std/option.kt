@@ -2,31 +2,37 @@ package arrow.optics
 
 import arrow.core.*
 
+/**
+ * [PIso] that defines the equality between [Option] and the nullable platform type.
+ */
 fun <A, B> Option.Companion.toPNullable(): PIso<Option<A>, Option<B>, A?, B?> = PIso(
   get = { it.fold({ null }, ::identity) },
   reverseGet = Option.Companion::fromNullable
 )
 
+/**
+ * [PIso] that defines the isomorphic relationship between [Option] and the nullable platform type.
+ */
 fun <A> Option.Companion.toNullable(): Iso<Option<A>, A?> = toPNullable()
 
 /**
  * [PPrism] to focus into an [arrow.Some]
  */
-fun <A, B> Option.Companion.asPSome(): PPrism<Option<A>, Option<B>, A, B> = PPrism(
-  getOrModify = { option -> option.fix().fold({ Either.Left(None) }, { a -> Either.Right(a) }) },
+fun <A, B> Option.Companion.PSome(): PPrism<Option<A>, Option<B>, A, B> = PPrism(
+  getOrModify = { option -> option.fold({ Either.Left(None) }, ::Right) },
   reverseGet = { b -> Some(b) }
 )
 
 /**
  * [Prism] to focus into an [arrow.Some]
  */
-fun <A> Option.Companion.asSome(): Prism<Option<A>, A> = asPSome()
+fun <A> Option.Companion.some(): Prism<Option<A>, A> = PSome()
 
 /**
  * [Prism] to focus into an [arrow.None]
  */
-fun <A> Option.Companion.asNone(): Prism<Option<A>, Unit> = Prism(
-  getOrModify = { option -> option.fix().fold({ Either.Right(Unit) }, { Either.Left(Some(it)) }) },
+fun <A> Option.Companion.none(): Prism<Option<A>, Unit> = Prism(
+  getOrModify = { option -> option.fold({ Either.Right(Unit) }, { Either.Left(option) }) },
   reverseGet = { _ -> None }
 )
 
@@ -34,8 +40,8 @@ fun <A> Option.Companion.asNone(): Prism<Option<A>, Unit> = Prism(
  * [Iso] that defines the equality between and [arrow.Option] and [arrow.Either]
  */
 fun <A, B> Option.Companion.toPEither(): PIso<Option<A>, Option<B>, Either<Unit, A>, Either<Unit, B>> = PIso(
-  get = { opt -> opt.fix().fold({ Either.Left(Unit) }, { a -> Either.Right(a) }) },
-  reverseGet = { either -> either.fix().fold({ None }, { b -> Some(b) }) }
+  get = { opt -> opt.fold({ Either.Left(Unit) }, ::Right) },
+  reverseGet = { either -> either.fold({ None }, ::Some) }
 )
 
 /**
