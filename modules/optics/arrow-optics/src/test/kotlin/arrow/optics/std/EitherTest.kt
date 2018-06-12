@@ -16,7 +16,7 @@ import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class EitherInstancesTest : UnitSpec() {
+class EitherTest : UnitSpec() {
 
   init {
     val VAL_MONOID: Monoid<Validated<String, Int>> = object : Monoid<Validated<String, Int>> {

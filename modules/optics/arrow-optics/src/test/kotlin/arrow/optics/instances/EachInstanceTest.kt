@@ -17,15 +17,7 @@ import org.junit.runner.RunWith
 class EachInstanceTest : UnitSpec() {
 
   init {
-    testLaws(TraversalLaws.laws(
-      traversal = Either.each<String, Int>().each(),
-      aGen = genEither(Gen.string(), Gen.int()),
-      bGen = Gen.int(),
-      funcGen = genFunctionAToB(Gen.int()),
-      EQA = Eq.any(),
-      EQOptionB = Option.eq(Eq.any()),
-      EQListB = ListK.eq(Eq.any())
-    ))
+
 
     testLaws(TraversalLaws.laws(
       traversal = ListK.each<String>().each(),
