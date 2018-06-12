@@ -1,19 +1,12 @@
 package arrow.optics.instances
 
-import arrow.core.Option
-import arrow.core.monoid
-import arrow.data.MapK
 import arrow.data.SetK
 import arrow.data.at
 import arrow.data.eq
 import arrow.instances.eq
-import arrow.instances.monoid
-import arrow.instances.semigroup
 import arrow.optics.AndMonoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
-import arrow.test.generators.genMapK
-import arrow.test.generators.genOption
 import arrow.test.generators.genSetK
 import arrow.test.laws.LensLaws
 import arrow.typeclasses.Eq
@@ -22,7 +15,7 @@ import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class AtInstanceTest : UnitSpec() {
+class SetInstanceTest : UnitSpec() {
 
   init {
 

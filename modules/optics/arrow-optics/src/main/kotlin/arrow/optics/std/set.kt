@@ -1,16 +1,21 @@
 package arrow.optics
 
-import arrow.core.identity
 import arrow.data.SetK
-import arrow.data.fix
 import arrow.data.k
 
-/**
- * [PIso] that defines the equality between a [arrow.SetK] and a [Set]
- */
-fun <A, B> SetK.Companion.toPSet(): PIso<SetK<A>, SetK<B>, Set<A>, Set<B>> = PIso(
-  get = ::identity,
-  reverseGet = { it.k() }
-)
+object SetOptics {
 
-fun <A> SetK.Companion.toSet(): Iso<SetK<A>, Set<A>> = toPSet()
+  /**
+   * [PIso] that defines the equality between a [Set] and a [SetK]
+   */
+  fun <A, B> toPSetK(): PIso<Set<A>, Set<B>, SetK<A>, SetK<B>> = PIso(
+    get = { it.k() },
+    reverseGet = SetK<B>::set
+  )
+
+  /**
+   * [Iso] that defines the equality between a [Set] and a [SetK]
+   */
+  fun <A> toSetK(): Iso<Set<A>, SetK<A>> = toPSetK()
+
+}
