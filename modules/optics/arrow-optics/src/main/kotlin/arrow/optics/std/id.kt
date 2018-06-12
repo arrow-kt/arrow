@@ -7,7 +7,7 @@ import arrow.core.value
  * [PIso] that defines the equality between a [Id] wrapped type [A] and the type [A] itself.
  */
 fun <A, B> Id.Companion.toPValue(): PIso<Id<A>, Id<B>, A, B> = PIso(
-  get = { it.value() },
+  get = Id<A>::value,
   reverseGet = ::Id
 )
 
