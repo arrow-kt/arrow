@@ -19,11 +19,11 @@ import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class TryInstancesTest : UnitSpec() {
+class TryTest : UnitSpec() {
   init {
 
     testLaws(PrismLaws.laws(
-      prism = Try.asSuccess(),
+      prism = Try.success(),
       aGen = genTry(Gen.int()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
@@ -32,7 +32,7 @@ class TryInstancesTest : UnitSpec() {
     ))
 
     testLaws(PrismLaws.laws(
-      prism = Try.asFailure(),
+      prism = Try.failure(),
       aGen = genTry(Gen.int()),
       bGen = genThrowable(),
       funcGen = genFunctionAToB(genThrowable()),
@@ -41,7 +41,7 @@ class TryInstancesTest : UnitSpec() {
     ))
 
     testLaws(IsoLaws.laws(
-      iso = Try.asEither(),
+      iso = Try.toEither(),
       aGen = genTry(Gen.int()),
       bGen = genEither(genThrowable(), Gen.int()),
       funcGen = genFunctionAToB(genEither(genThrowable(), Gen.int())),
@@ -56,7 +56,7 @@ class TryInstancesTest : UnitSpec() {
     ))
 
     testLaws(IsoLaws.laws(
-      iso = Try.asValidated(),
+      iso = Try.toValidated(),
       aGen = genTry(Gen.int()),
       bGen = genValidated(genThrowable(), Gen.int()),
       funcGen = genFunctionAToB(genValidated(genThrowable(), Gen.int())),

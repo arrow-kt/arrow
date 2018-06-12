@@ -2,11 +2,11 @@ package arrow.optics.instances
 
 import arrow.core.*
 import arrow.data.ListK
-import arrow.data.MapK
-import arrow.data.each
 import arrow.data.eq
+import arrow.optics.typeclasses.FilterIndex
 import arrow.test.UnitSpec
 import arrow.test.generators.*
+import arrow.test.laws.OptionalLaws
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
@@ -14,7 +14,7 @@ import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class EachInstanceTest : UnitSpec() {
+class TryInstanceTest : UnitSpec() {
 
   init {
 
@@ -27,5 +27,6 @@ class EachInstanceTest : UnitSpec() {
       EQOptionB = Option.eq(Eq.any()),
       EQListB = ListK.eq(Eq.any())
     ))
+
   }
 }
