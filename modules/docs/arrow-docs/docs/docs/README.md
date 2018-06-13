@@ -6,9 +6,6 @@ permalink: /docs/
 
 NOTE: The docs are currently at around 60% completion. They're the present priority project, and you can track the progress on the github issue [#311](https://github.com/arrow-kt/arrow/issues/311).
 
-{:.beginner}
-test
-
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
 [![Build Status](https://travis-ci.org/arrow-kt/arrow.svg?branch=master)](https://travis-ci.org/arrow-kt/arrow/)
 [![Kotlin version badge](https://img.shields.io/badge/kotlin-1.2.0-blue.svg)](http://kotlinlang.org/)
@@ -24,16 +21,12 @@ Use the list below to learn more about Λrrow's main features.
 - [Effects](http://arrow-kt.io/docs/effects/io/): interfacing with external systems
 - [Optics](http://arrow-kt.io/docs/optics/iso/): inspecting and modifying data structures
 
-{:.intermediate}
-test
 
 #### Curated external links
 
 - [Projects and Examples](http://arrow-kt.io/docs/quickstart/projects/)
 - [Blogs and Presentations](http://arrow-kt.io/docs/quickstart/blogs/)
 
-{:.advanced}
-test
 
 # Basic Setup
 
