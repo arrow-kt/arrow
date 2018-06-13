@@ -15,18 +15,16 @@ NOTE: The docs are currently at around 60% completion. They're the present prior
 It includes the most popular data types, type classes and abstractions such as `Option`, `Try`, `Either`, `IO`, `Functor`, `Applicative`, `Monad` to empower users to define pure FP apps and libraries built atop higher order abstractions.
 Use the list below to learn more about Λrrow's main features.
 
-- [Patterns](http://arrow-kt.io/docs/patterns/glossary/): tutorials and approaches to day-to-day challenges using FP
+- [Patterns](http://arrow-kt.io/docs/patterns/glossary/): tutorials and approaches to day-to-day challenges using FP 
 - [Type classes](http://arrow-kt.io/docs/typeclasses/intro/): defining behaviors for data
 - [Data types](http://arrow-kt.io/docs/datatypes/intro/): common abstractions
 - [Effects](http://arrow-kt.io/docs/effects/io/): interfacing with external systems
 - [Optics](http://arrow-kt.io/docs/optics/iso/): inspecting and modifying data structures
 
-
 #### Curated external links
 
 - [Projects and Examples](http://arrow-kt.io/docs/quickstart/projects/)
 - [Blogs and Presentations](http://arrow-kt.io/docs/quickstart/blogs/)
-
 
 # Basic Setup
 
