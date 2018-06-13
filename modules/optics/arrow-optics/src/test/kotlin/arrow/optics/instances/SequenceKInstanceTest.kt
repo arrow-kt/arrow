@@ -2,6 +2,7 @@ package arrow.optics.instances
 
 import arrow.core.*
 import arrow.data.*
+import arrow.instances.eq
 import arrow.optics.typeclasses.FilterIndex
 import arrow.test.UnitSpec
 import arrow.test.generators.*
@@ -22,9 +23,9 @@ class SequenceKInstanceTest : UnitSpec() {
       aGen = genSequenceK(Gen.string()),
       bGen = Gen.string(),
       funcGen = genFunctionAToB(Gen.string()),
-      EQA = Eq.any(),
-      EQOptionB = Option.eq(Eq.any()),
-      EQListB = ListK.eq(Eq.any())
+      EQA = SequenceK.eq(String.eq()),
+      EQOptionB = Option.eq(String.eq()),
+      EQListB = ListK.eq(String.eq())
     ))
 
     testLaws(TraversalLaws.laws(
@@ -32,9 +33,9 @@ class SequenceKInstanceTest : UnitSpec() {
       aGen = genSequenceK(Gen.string()),
       bGen = Gen.string(),
       funcGen = genFunctionAToB(Gen.string()),
-      EQA = Eq.any(),
-      EQListB = Eq.any(),
-      EQOptionB = Eq.any()
+      EQA = SequenceK.eq(String.eq()),
+      EQListB = ListK.eq(String.eq()),
+      EQOptionB = Option.eq(String.eq())
     ))
 
     testLaws(OptionalLaws.laws(
@@ -42,8 +43,8 @@ class SequenceKInstanceTest : UnitSpec() {
       aGen = genSequenceK(Gen.string()),
       bGen = Gen.string(),
       funcGen = genFunctionAToB(Gen.string()),
-      EQOptionB = Eq.any(),
-      EQA = Eq.any()
+      EQOptionB = Option.eq(String.eq()),
+      EQA = SequenceK.eq(String.eq())
     ))
 
   }
