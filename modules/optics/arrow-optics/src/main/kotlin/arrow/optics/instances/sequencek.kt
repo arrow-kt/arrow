@@ -2,7 +2,6 @@ package arrow.optics.instances
 
 import arrow.Kind
 import arrow.core.Left
-import arrow.core.Option
 import arrow.core.Right
 import arrow.core.toT
 import arrow.data.*

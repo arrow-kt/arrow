@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.toT
-import arrow.data.ListK
 import arrow.data.k
 import arrow.data.traverse
 import arrow.optics.Optional
@@ -83,7 +82,6 @@ interface ListIndexInstance<A> : Index<List<A>, Int, A> {
   )
 
   companion object {
-
 
     operator fun <A> invoke() = object : ListIndexInstance<A> {}
   }

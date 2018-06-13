@@ -1,7 +1,6 @@
 package arrow.optics.instances
 
 import arrow.Kind
-import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.toT

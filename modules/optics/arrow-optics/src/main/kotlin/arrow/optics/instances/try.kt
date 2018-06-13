@@ -2,8 +2,6 @@ package arrow.optics.instances
 
 import arrow.Kind
 import arrow.core.Try
-import arrow.data.ListK
-import arrow.data.SequenceK
 import arrow.instance
 import arrow.instances.traverse
 import arrow.optics.Traversal

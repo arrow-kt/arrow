@@ -1,11 +1,9 @@
 package arrow.optics
 
 import arrow.core.Either
-import arrow.core.fix
 import arrow.data.Invalid
 import arrow.data.Valid
 import arrow.data.Validated
-import arrow.data.fix
 
 /**
  * [PIso] that defines the equality between [Either] and [Validated]

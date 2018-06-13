@@ -3,7 +3,6 @@ package arrow.optics.instances
 import arrow.Kind
 import arrow.core.Option
 import arrow.core.traverse
-import arrow.data.NonEmptyList
 import arrow.instance
 import arrow.optics.Traversal
 import arrow.optics.typeclasses.Each

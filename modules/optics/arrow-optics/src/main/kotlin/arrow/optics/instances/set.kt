@@ -3,7 +3,6 @@ package arrow.optics.instances
 import arrow.optics.Lens
 import arrow.optics.PLens
 import arrow.optics.typeclasses.At
-import arrow.optics.typeclasses.Index
 
 /**
  * [At] instance definition for [Set].
