@@ -79,4 +79,4 @@ fun <K, A, B> Map<K, A>.foldRight(b: Map<K, B>, f: (Map.Entry<K, A>, Map<K, B>) 
 
 fun <A, B> Iterator<A>.iterateRight(lb: Eval<B>): (f: (A, Eval<B>) -> Eval<B>) -> Eval<B> = Foldable.iterateRight(this, lb)
 
-fun <K, V> mapOf(vararg tuple: Tuple2<K, V>): MapK<K, V> = if (tuple.isNotEmpty()) tuple.map { it.a to it.b }.toMap().k() else emptyMap().k()
+fun <K, V> mapOf(vararg tuple: Tuple2<K, V>): MapK<K, V> = if (tuple.isNotEmpty()) tuple.map { it.a to it.b }.toMap().k() else emptyMap<K, V>().k()
