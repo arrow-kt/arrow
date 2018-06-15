@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: SequenceK
-permalink: /docs/datatypes/sequenceK/
+permalink: /docs/datatypes/sequencek/
 ---
 
 ## SequenceK
@@ -39,10 +39,15 @@ fibonacci.map { it * 2 }.takeWhile { it < 10 }.toList()
 
 Applying a sequence of functions to a sequence:
 ```kotlin:ank
-SequenceK.applicative().ap(sequenceOf(1, 2, 3).k(), sequenceOf({ x: Int -> x + 1}, { x: Int -> x * 2}).k()).toList()
+import arrow.instances.*
+ForSequenceK extensions {
+  sequenceOf(1, 2, 3).k()
+    .ap(sequenceOf({ x: Int -> x + 1}, { x: Int -> x * 2}).k())
+    .toList() 
+}
 ```
 
-SequenceK is a [`Monad`](/docs/_docs/typeclasses/monad/) too. For example, it can be used to model non-deterministic computations. (In a sense that the computations return an arbitrary number of results.)
+SequenceK is a [`Monad`](/docs/typeclasses/monad/) too. For example, it can be used to model non-deterministic computations. (In a sense that the computations return an arbitrary number of results.)
 
 ```kotlin:ank
 import arrow.typeclasses.*
@@ -50,11 +55,13 @@ import arrow.typeclasses.*
 val positive = generateSequence(1) { it + 1 }.k() // sequence of positive numbers
 val positiveEven = positive.filter { it % 2 == 0 }.k()
 
-SequenceK.monad().binding {
+ForSequenceK extensions { 
+  binding {
    val p = positive.bind()
    val pe = positiveEven.bind()
    p + pe
-}.fix().take(5).toList()
+  }.fix().take(5).toList()
+}
 ```
 
 Folding a sequence,
@@ -63,10 +70,19 @@ Folding a sequence,
 sequenceOf('a', 'b', 'c', 'd', 'e').k().foldLeft("") { x, y -> x + y }
 ```
 
-Available Instances:
+## Available Instances
 
-```kotlin:ank
-import arrow.debug.*
-
-showInstances<ForSequenceK, Unit>()
-```
+* [Show]({{ '/docs/typeclasses/show' | relative_url }})
+* [Eq]({{ '/docs/typeclasses/eq' | relative_url }})
+* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+* [Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
+* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+* [Monoid]({{ '/docs/typeclasses/monoid' | relative_url }})
+* [MonoidK]({{ '/docs/typeclasses/monoidk' | relative_url }})
+* [Semigroup]({{ '/docs/typeclasses/semigroup' | relative_url }})
+* [SemigroupK]({{ '/docs/typeclasses/semigroupk' | relative_url }})
+* [Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
+* [TraverseFilter]({{ '/docs/typeclasses/traversefilter' | relative_url }})
+* [Index]({{ '/docs/optics/index' | relative_url }})
+* [FilterIndex]({{ '/docs/optics/filterindex' | relative_url }})

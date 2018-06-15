@@ -14,6 +14,8 @@ Note: This section keeps on growing! Keep an eye on it from time to time.
 
 [Guardiola31337/uiagesturegen](https://github.com/Guardiola31337/uiagesturegen): UI Automator Gesture Generation DSL
 
+[aedans/Katalyst](https://github.com/aedans/Katalyst): Kotlin recursion schemes with Arrow
+
 #### Android
 
 [JorgeCastilloPrz/KotlinAndroidFunctional](https://github.com/JorgeCastilloPrz/KotlinAndroidFunctional): Functional Programing based architectures

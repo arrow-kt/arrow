@@ -60,7 +60,7 @@ recoveryArrowWrapper.unsafeAttemptSync()
 The second advantage is that we're providing all the instances required to create an architecture that's agnostic to the framework, so you can mix and match multiple frameworks
 in a way that feels idiomatic, while not having to worry about the semantics of each implementation.
 
-You can read more about FP architectures in the section on [Monad Transformers]({{ '/docs/patterns/monad_transformers' | relative_url }}).
+You can read more about FP architectures in the section on Monad Transformers.
 
 ### Bringing Deferred to Arrow
 
@@ -76,7 +76,7 @@ To wrap any existing `Deferred` in its Arrow Wrapper counterpart you can use the
 val deferredWrapped = async { throw RuntimeException("BOOM!") }.k()
 ```
 
-All the other usual constructors like `pure()`, `suspend()`, and `async()` are available too, in versions that accept different values for `CoroutineStart` and `CoroutineContext`.
+All the other usual constructors like `just()`, `suspend()`, and `async()` are available too, in versions that accept different values for `CoroutineStart` and `CoroutineContext`.
 
 To unwrap the value of a `DeferredK` we provide a synchronous method called `unsafeAttemptSync()` that returns a `Try<A>`.
 
@@ -115,21 +115,26 @@ It is also posible to `await()` on the wrapper like you would on `Deferred`, but
 
 ### Error handling & recovery
 
-[`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) using the method `bindingCatch`, with all its benefits.
+[`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) using the method `bindingCatch`, with all its benefits.
 These benefits include capturing all exceptions that happen inside the block.
 
 ```kotlin
-DeferredK.monadError().bindingCatch {
-  val songUrl = getSongUrlAsync().bind()
-  val musicPlayer = MediaPlayer.load(songUrl)
-  val totalTime = musicPlayer.getTotaltime() // Oh oh, total time is 0
-  
-  val timelineClick = audioTimeline.click().bind()
+import arrow.effects.*
+import arrow.typeclasses.*
 
-  val percent = (timelineClick / totalTime * 100).toInt()
-
-  percent
-}.unsafeAttemptSync()
+ForDeferredK extensions { 
+  bindingCatch {
+      val songUrl = getSongUrlAsync().bind()
+      val musicPlayer = MediaPlayer.load(songUrl)
+      val totalTime = musicPlayer.getTotaltime() // Oh oh, total time is 0
+    
+      val timelineClick = audioTimeline.click().bind()
+    
+      val percent = (timelineClick / totalTime * 100).toInt()
+    
+      percent
+  }.unsafeAttemptSync()
+}
  // Failure(ArithmeticException("/ by zero"))
 ```
 
@@ -158,12 +163,12 @@ recoveryArrowWrapper.unsafeAttemptSync()
 
 `DeferredK` created with `bindingCatch` behave the same way regular `Deferred` do, including cancellation by disposing the subscription.
 
-Note that [`MonadSuspend`]({{ '/docs/effects/monadsuspend' | relative_url }}) provides an alternative to `bindingCatch` called `bindingCancellable` returning a `arrow.Disposable`.
+Note that [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) provides an alternative to `bindingCatch` called `bindingCancellable` returning a `arrow.Disposable`.
 Invoking this `Disposable` causes an `BindingCancellationException` in the chain which needs to be handled by the subscriber, similarly to what `Deferred` does.
 
 ```kotlin
-val (deferred, unsafeCancel) = 
-  DeferredK.monadSuspend().bindingCancellable {
+val (deferred, unsafeCancel) =
+  DeferredK.monadDefer().bindingCancellable {
     val userProfile = DeferredK { getUserProfile("123") }.bind()
     val friendProfiles = userProfile.friends().map { friend ->
         DeferredK { getProfile(friend.id) }.bind()
@@ -174,19 +179,19 @@ val (deferred, unsafeCancel) =
 deferred.unsafeRunAsync { result ->
   result.fold({ println("Boom! caused by $it") }, { println(it.toString()) })
 }
-  
+
 unsafeCancel()
 // Boom! caused by BindingCancellationException
 ```
 
-### Instances
 
-You can see all the type classes `DeferredK` implements below:
+## Available Instances
 
-```kotlin:ank
-import arrow.*
-import arrow.effects.*
-import arrow.debug.*
-
-showInstances<ForDeferredK, Throwable>()
-```
+* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+* [ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
+* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+* [MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
+* [MonadDefer]({{ '/docs/effects/monaddefer' | relative_url }})
+* [Async]({{ '/docs/effects/async' | relative_url }})
+* [Effect]({{ '/docs/effects/effect' | relative_url }})

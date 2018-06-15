@@ -1,7 +1,7 @@
 package arrow.data
 
 import arrow.core.*
-import arrow.typeclasses.*
+import arrow.typeclasses.internal.IdBimonad
 
 /**
  * Alias that represents a computation that has a dependency on [D].
@@ -52,7 +52,7 @@ fun <D, A> Reader(run: ReaderFun<D, A>): Reader<D, A> = ReaderT(run.andThen { Id
  *
  * @receiver [ReaderFun] a function that represents computation dependent on type [D].
  */
-fun <D, A> (ReaderFun<D, A>).reader(): Reader<D, A> = Reader(this)
+fun <D, A> (ReaderFun<D, A>).reader(): Reader<D, A> = Reader().lift(this)
 
 /**
  * Alias for [Kleisli.run]
@@ -66,35 +66,35 @@ fun <D, A> Reader<D, A>.runId(d: D): A = this.run(d).value()
  *
  * @param f the function to apply.
  */
-fun <D, A, B> Reader<D, A>.map(f: (A) -> B): Reader<D, B> = map(f, functor())
+fun <D, A, B> Reader<D, A>.map(f: (A) -> B): Reader<D, B> = map(IdBimonad, f)
 
 /**
  * FlatMap the result of the computation [A] to another [Reader] for the same dependency [D] and flatten the structure.
  *
  * @param f the function to apply.
  */
-fun <D, A, B> Reader<D, A>.flatMap(f: (A) -> Reader<D, B>): Reader<D, B> = flatMap(f, monad())
+fun <D, A, B> Reader<D, A>.flatMap(f: (A) -> Reader<D, B>): Reader<D, B> = flatMap(IdBimonad, f)
 
 /**
  * Apply a function `(A) -> B` that operates within the context of [Reader].
  *
  * @param ff function that maps [A] to [B] within the [Reader] context.
  */
-fun <D, A, B> Reader<D, A>.ap(ff: ReaderOf<D, (A) -> B>): Reader<D, B> = ap(ff, applicative())
+fun <D, A, B> Reader<D, A>.ap(ff: ReaderOf<D, (A) -> B>): Reader<D, B> = ap(IdBimonad, ff)
 
 /**
  * Zip with another [Reader].
  *
  * @param o other [Reader] to zip with.
  */
-fun <D, A, B> Reader<D, A>.zip(o: Reader<D, B>): Reader<D, Tuple2<A, B>> = zip(o, monad())
+fun <D, A, B> Reader<D, A>.zip(o: Reader<D, B>): Reader<D, Tuple2<A, B>> = zip(IdBimonad, o)
 
 /**
  * Compose with another [Reader] that has a dependency on the output of the computation.
  *
  * @param o other [Reader] to compose with.
  */
-fun <D, A, C> Reader<D, A>.andThen(o: Reader<A, C>): Reader<D, C> = andThen(o, monad())
+fun <D, A, C> Reader<D, A>.andThen(o: Reader<A, C>): Reader<D, C> = andThen(IdBimonad, o)
 
 /**
  * Map the result of the computation [A] to [B] given a function [f].
@@ -115,23 +115,9 @@ fun Reader(): ReaderApi = ReaderApi
 
 object ReaderApi {
 
-    /**
-     * Alias for[ReaderT.Companion.applicative]
-     */
-    fun <D> applicative(): Applicative<ReaderPartialOf<D>> = arrow.typeclasses.applicative()
+  fun <D, A> just(x: A): Reader<D, A> = ReaderT.just(IdBimonad, x)
 
-    /**
-     * Alias for [ReaderT.Companion.functor]
-     */
-    fun <D> functor(): Functor<ReaderPartialOf<D>> = arrow.typeclasses.functor()
+  fun <D> ask(): Reader<D, D> = ReaderT.ask(IdBimonad)
 
-    /**
-     * Alias for [ReaderT.Companion.monad]
-     */
-    fun <D> monad(): Monad<ReaderPartialOf<D>> = arrow.typeclasses.monad()
-
-    fun <D, A> pure(x: A): Reader<D, A> = ReaderT.pure(x, arrow.typeclasses.monad())
-
-    fun <D> ask(): Reader<D, D> = ReaderT.ask(arrow.typeclasses.monad())
-
+  fun <D, A> lift(run: ReaderFun<D, A>): Reader<D, A> = ReaderT(run.andThen { Id(it) })
 }

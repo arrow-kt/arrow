@@ -108,13 +108,13 @@ IO.monad().binding {
 }.fix().unsafeRunSync()
 ```
 
-What `bind()` does is use the rest of the sequential operations as the function you'd normally past to `flatMap`.
+What `bind()` does is use the rest of the sequential operations as the function you'd normally pass to `flatMap`.
 The equivalent code without using comprehensions would look like:
 
 ```kotlin:ank
 IO.invoke { 1 }
   .flatMap { result ->
-    IO.pure(result + 1)
+    IO.just(result + 1)
   }
 .fix().unsafeRunSync()
 ```
@@ -139,7 +139,7 @@ fun getNLines(path: FilePath, count: Int): IO<List<String>> =
     val file = getFile(path).bind()
     val lines = file.readLines().bind()
     if (lines.length < count) {
-      IO.raiseError(RuntimeException("File has fewer lines than expected"))
+      IO.raiseError(RuntimeException("File has fewer lines than expected")).bind()
     } else {
       lines.take(count)
     }
@@ -196,7 +196,7 @@ Arrow uses the same abstraction as coroutines to group threads and other context
 There are multiple default values and wrappers for common cases in both the standard library, and the extension library [kotlinx.coroutines](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/-coroutine-dispatcher/index.html).
 
 In any `binding()` block there is a helper function `bindIn()` that takes a `CoroutineContext` as a parameter and can return any value.
-This value will be lifted into a data type using `pure()`.
+This value will be lifted into a data type using `just()`.
 
 The functions will cause a new coroutine to start on the `CoroutineContext` passed as a parameter to then `bind()` to await for its completion.
 
@@ -207,7 +207,7 @@ val computationThreadContext = newSingleThreadContext("Computation")
 fun getLineLengthAverage(path: FilePath): IO<List<String>> = 
   IO.monadError().bindingCatch {
     
-    // Implicitly wrap the result of a synchronous operation into IO.pure() using bindIn
+    // Implicitly wrap the result of a synchronous operation into IO.just() using bindIn
     val file = bindIn(ioThreadContext) { getFile(path) }    
     val lines = bindIn(computationThreadContext) { file.readLines() }
     
@@ -220,23 +220,23 @@ fun getLineLengthAverage(path: FilePath): IO<List<String>> =
 Note that `bindIn()`assures that the execution will return to the same thread where the binding started after the `bindIn` block executes.
 
 There is also a version of `bindIn` called `bindDeferredIn` that allows deferred construction.
-It's available for `bindingCancellable` comprehensions over instances of [`MonadSuspend`]({{ '/docs/effects/monadsuspend' | relative_url }}).
+It's available for `bindingCancellable` comprehensions over instances of [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}).
 
 ### What if I'd like to run multiple operations independently from each other, in a non-sequential way?
 
-You can check the section on the [Applicative Builder]({{ '/docs/patterns/applicative_builder' | relative_url }}) pattern for them!
+You can check the section on the Applicative Builder pattern for them!
 
 ### Cancellation and cleanup of resources
 
 In some environments that have resources with their own lifecycle (i.e. Activity in Android development) retaining these values in operations that can run indefinitely may cause large memory leaks and lead to undefined behavior.
-As cleanup is important in these restricted environments, any instance of [`MonadSuspend`]({{ '/docs/effects/monadsuspend' | relative_url }}) provides the function `bindingCancellable`, which allows for comprehensions to be finished early by throwing an `BindingCancellationException` at the beginning of the next `bind()` step.
+As cleanup is important in these restricted environments, any instance of [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) provides the function `bindingCancellable`, which allows for comprehensions to be finished early by throwing an `BindingCancellationException` at the beginning of the next `bind()` step.
 
 ```kotlin
 val (binding: IO<List<User>>, unsafeCancel: Disposable) =
   ioSync.bindingCancellable {
-    val userProfile = bindAsync(ioAsync) { getUserProfile("123") }
+    val userProfile = bindDefer { getUserProfile("123") }
     val friendProfiles = userProfile.friends().map { friend ->
-        bindAsync(ioAsync) { getProfile(friend.id) }
+        bindDefer { getProfile(friend.id) }
     }
     listOf(userProfile) + friendProfiles
   }

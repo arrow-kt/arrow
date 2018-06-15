@@ -14,8 +14,6 @@ Arrow models the absence of values through the `Option` datatype similar to how 
 
 `Option<A>` is a container for an optional value of type `A`. If the value of type `A` is present, the `Option<A>` is an instance of `Some<A>`, containing the present value of type `A`. If the value is absent, the `Option<A>` is the object `None`.
 
-
-
 ```kotlin:ank
 import arrow.*
 import arrow.core.*
@@ -113,8 +111,6 @@ noNumber.fold({ 1 }, { it * 3 })
 Arrow also adds syntax to all datatypes so you can easily lift them into the context of `Option` where needed.
 
 ```kotlin:ank
-import arrow.syntax.option.*
-
 1.some()
 ```
 
@@ -130,8 +126,11 @@ Transforming the inner contents
 
 ```kotlin:ank
 import arrow.typeclasses.*
+import arrow.instances.*
 
-Option.functor().map(Some(1), { it + 1 })
+ForOption extensions {
+  Some(1).map { it + 1 }
+}
 ```
 
 [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }})
@@ -139,9 +138,9 @@ Option.functor().map(Some(1), { it + 1 })
 Computing over independent values
 
 ```kotlin:ank
-import arrow.syntax.applicative.*
-
-Option.applicative().tupled(Some(1), Some("Hello"), Some(20.0))
+ForOption extensions {
+  tupled(Some(1), Some("Hello"), Some(20.0))
+}
 ```
 
 [`Monad`]({{ '/docs/typeclasses/monad/' | relative_url }})
@@ -149,34 +148,45 @@ Option.applicative().tupled(Some(1), Some("Hello"), Some(20.0))
 Computing over dependent values ignoring absence
 
 ```kotlin
-Option.monad().binding {
+ForOption extensions {
+  binding {
    val a = Some(1).bind()
    val b = Some(1 + a).bind()
    val c = Some(1 + b).bind()
    a + b + c
+  }
 }
 //Some(value=6)
 ```
 
 ```kotlin
-Option.monad().binding {
+ForOption extensions {
+  binding {
    val x = none<Int>().bind()
    val y = Some(1 + x).bind()
    val z = Some(1 + y).bind()
    x + y + z
+  }
 }
 //None
 ```
 
-Available Instances:
+## Available Instances:
 
-```kotlin:ank
-import arrow.debug.*
+* [Show]({{ '/docs/typeclasses/show' | relative_url }})
+* [Eq]({{ '/docs/typeclasses/eq' | relative_url }})
+* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+* [ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
+* [Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
+* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+* [MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
+* [MonadFilter]({{ '/docs/typeclasses/monadfilter' | relative_url }})
+* [Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
+* [TraverseFilter]({{ '/docs/typeclasses/traversefilter' | relative_url }})
+* [Each]({{ '/docs/optics/each' | relative_url }})
 
-showInstances<ForOption, Unit>()
-```
-
-# Credits
+## Credits
 
 Contents partially adapted from [Scala Exercises Option Tutorial](https://www.scala-exercises.org/std_lib/options)
 Originally based on the Scala Koans.

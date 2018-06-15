@@ -2,26 +2,58 @@
 layout: docs
 title: Intro to datatypes
 permalink: /docs/typeclasses/intro/
+video: 3y9KI7XWXSY
 ---
 
 ## Typeclasses
 
-A typeclass is a specification for one behavior associated with a single type.
-This behavior is checked by a test suite called the "laws" for that typeclass.
-These test suites are available in the package arrow-tests.
+Typeclasses define a set of functions associated to one generic type.
+All methods inside a typeclass will have one of two shapes:
 
-What differentiates typeclasses from regular OOP inheritance is that typeclasses are meant to be implemented outside of their types.
-The association is done using generic parametrization rather than the usual subclassing by implementing the interface.
-This means that they can be implemented for any class, even those not in the current project,
-and allows us to make available at the global scope any one implementation of a typeclasses for the single unique type they're associated with.
+* Constructor: create a new `Kind<F, A>` from a value, a function, an error... Some examples are `just`, `raise`, `async`, `defer`, or `binding`.
+
+* Extensions: add new functionality to a value `A` or a container `Kind<F, A>`, provided by an extension function. For example, `map`, `eqv`, `show`, `traverse`, `sequence`, or `combineAll`.
+
+You can use typeclasses as a DSL to access new free functionality for an existing type,
+or treat them as an abstraction placeholder for any one type that can implement the typeclass.
+The extension functions are scoped within the typeclass so they do not pollute the global namespace!
+
+What differentiates typeclasses from regular OOP inheritance is that typeclasses are meant to be implemented *outside* of their types.
+The association is done using generic parametrization rather than subclassing by implementing the interface. This has multiple benefits:
+
+* You can treat typeclass implementations as stateless parameters because they're just a collection of functions
+* Typeclasses can be implemented for any class, even those not in the current project
+* You can make available any one implementation of a typeclasses at any scope for the generic type they're associated with by using functions like `run` and `with`
+
+To assure that a typeclass has been correctly implemented for a type, Arrow provides a test suite called the "laws" per typeclass.
+These test suites are available in the module `arrow-tests`.
 
 #### Example
 
-You can read all about how Arrow does typeclasses in the [glossary]({{ '/docs/patterns/glossary/' | relative_url }}).
+You can read all about how Arrow implements typeclasses in the [glossary]({{ '/docs/patterns/glossary/' | relative_url }}).
+If you'd like to use typeclasses effectively in your client code you can head to the docs entry about [dependency injection]({{ '/docs/patterns/dependency_injection' | relative_url }}).
 
-### Typeclasses in Arrow
+For this short example we will make available the scope of the typeclass `Eq` implemented for the type `String`, by using `run`.
+This will make all the `Eq` extension functions, such as `eqv` and `neqv`, available inside the `run` block.
 
-We will list all the typeclasses available in arrow by the module they belong to, and a short description of the behavior they abstract.
+```kotlin:ank
+import arrow.instances.*
+
+val stringEq = String.eq()
+
+stringEq
+```
+
+```kotlin:ank
+stringEq.run {
+  "1".eqv("2")
+    && "2".neqv("1")
+}
+```
+
+### Typeclasses provided by Arrow
+
+We will list all the typeclasses provided in Arrow grouped by the module they belong to, and a short description of the behavior they abstract.
 
 #### Typeclasses
 
@@ -44,6 +76,16 @@ We will list them by their hierarchy.
 
 - [`Order`]({{ '/docs/typeclasses/order/' | relative_url }}) -  determine whether one object precedes another
 
+##### Semigroup
+
+- [`Semigroup`]({{ '/docs/typeclasses/semigroup/' | relative_url }}) - can combine two objects together
+
+- [`SemigroupK`]({{ '/docs/typeclasses/semigroupk/' | relative_url }}) - can combine two datatypes together
+
+- [`Monoid`]({{ '/docs/typeclasses/monoid/' | relative_url }}) - combinable objects have an empty value
+
+- [`MonoidK`]({{ '/docs/typeclasses/monoidk/' | relative_url }}) - combinable datatypes have an empty value
+
 ##### Functor
 
 - [`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }}) - its contents can be mapped
@@ -60,16 +102,6 @@ We will list them by their hierarchy.
 
 - [`Bimonad`]({{ '/docs/typeclasses/bimonad/' | relative_url }}) - both monad and comonad
 
-##### Semigroup
-
-- [`Semigroup`]({{ '/docs/typeclasses/semigroup/' | relative_url }}) - can combine two objects together
-
-- [`SemigroupK`]({{ '/docs/typeclasses/semigroupk/' | relative_url }}) - can combine two datatypes together
-
-- [`Monoid`]({{ '/docs/typeclasses/monoid/' | relative_url }}) - combinable objects have an empty value
-
-- [`MonoidK`]({{ '/docs/typeclasses/monoidk/' | relative_url }}) - datatypes have an empty value
-
 ##### Foldable
 
 - [`Foldable`]({{ '/docs/typeclasses/foldable/' | relative_url }}) - has a structure from which a value can be computed from visiting each element
@@ -84,7 +116,7 @@ We will list them by their hierarchy.
 
 Effects provides a hierarchy of typeclasses for lazy and asynchronous execution.
 
-- [`MonadSuspend`]({{ '/docs/effects/monadsuspend/' | relative_url }}) - can evaluate functions lazily
+- [`MonadDefer`]({{ '/docs/effects/monaddefer/' | relative_url }}) - can evaluate functions lazily
 
 - [`Async`]({{ '/docs/effects/async/' | relative_url }}) - can be created using an asynchronous callback function
 
@@ -110,18 +142,18 @@ The Monad Template Library module gives more specialized version of existing typ
 
 #### Optics
 
-- [`At`]({{ '/docs/typeclasses/at/' | relative_url }}) - provides a [`Lens`]({{ '/docs/optics/lens/' | relative_url }}) for a structure with an indexable focus.
+- [`At`]({{ '/docs/optics/at/' | relative_url }}) - provides a [`Lens`]({{ '/docs/optics/lens/' | relative_url }}) for a structure with an indexable focus
 
-- [`FilterIndex`]({{ '/docs/typeclasses/filterindex/' | relative_url }}) - provides a [`Traversal`]({{ '/docs/optics/traversal/' | relative_url }}) for a structure with indexable foci that satisfy a predicate.
+- [`FilterIndex`]({{ '/docs/optics/filterindex/' | relative_url }}) - provides a [`Traversal`]({{ '/docs/optics/traversal/' | relative_url }}) for a structure with indexable foci that satisfy a predicate
 
-- [`Index`]({{ '/docs/typeclasses/index/' | relative_url }}) - provides an [`Optional`]({{ '/docs/optics/optional/' | relative_url }}) for a structure with an indexable optional focus.
+- [`Index`]({{ '/docs/optics/index/' | relative_url }}) - provides an [`Optional`]({{ '/docs/optics/optional/' | relative_url }}) for a structure with an indexable optional focus
 
-- [`Each`]({{ '/docs/typeclasses/each/' | relative_url }}) - provides a [`Traversal`]({{ '/docs/optics/traversal/' | relative_url }}).
+- [`Each`]({{ '/docs/optics/each/' | relative_url }}) - provides a [`Traversal`]({{ '/docs/optics/traversal/' | relative_url }})
 
 #### Recursion
 
-- [`Corecursive`]({{ '/docs/typeclasses/corecursive/' | relative_url }}) - traverses a structure forwards from the starting case
+- [`Corecursive`]({{ '/docs/recursion/corecursive/' | relative_url }}) - traverses a structure forwards from the starting case
 
-- [`Recursive`]({{ '/docs/typeclasses/recursive/' | relative_url }}) - traverses a structure backwards from the base case
+- [`Recursive`]({{ '/docs/recursion/recursive/' | relative_url }}) - traverses a structure backwards from the base case
 
-- [`Birecursive`]({{ '/docs/typeclasses/birecursive/' | relative_url }}) - it is both recursive and corecursive
+- [`Birecursive`]({{ '/docs/recursion/birecursive/' | relative_url }}) - it is both recursive and corecursive

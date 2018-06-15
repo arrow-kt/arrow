@@ -24,47 +24,54 @@ It lifts an exception into the computational context of a type constructor.
 ```kotlin:ank
 import arrow.*
 import arrow.core.*
+import arrow.instances.*
 
-Either.monadError<Throwable>().raiseError<Int>(RuntimeException("Paco"))
+ForEither<Throwable>() extensions { 
+  raiseError<Int>(RuntimeException("Paco"))
+}
 ```
 
 ```kotlin:ank
 import arrow.data.*
 
-Try.monadError().raiseError<Int>(RuntimeException("Paco"))
+ForTry extensions { 
+  raiseError<Int>(RuntimeException("Paco"))
+}
 ```
 
 ```kotlin:ank
 import arrow.effects.*
 
-IO.monadError().raiseError<Int>(RuntimeException("Paco"))
+ForIO extensions { 
+  raiseError<Int>(RuntimeException("Paco"))
+}
 ```
 
-#### ensure
+#### Kind<F, A>.ensure
 
 Tests a predicate against the object, and if it fails it executes a function to create an error.
 
 ```kotlin:ank
-val ME = Either.monadError<Throwable>()
-
-val either: Either<Throwable, Int> = Either.Right(1)
-
-ME.ensure(either, { RuntimeException("Failed predicate") }, { it > 0 })
+ForEither<Throwable>() extensions {
+  Either.Right(1).ensure({ RuntimeException("Failed predicate") }, { it > 0 }) 
+}
 ```
 
 ```kotlin:ank
-ME.ensure(either, { RuntimeException("Failed predicate") }, { it < 0 })
+ForEither<Throwable>() extensions {
+  Either.Right(1).ensure({ RuntimeException("Failed predicate") }, { it < 0 }) 
+}
 ```
 
 ### Comprehensions
 
 #### bindingCatch
 
-It starts a [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) that wraps any exception thrown in the block inside `raiseError()`.
+It starts a [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) that wraps any exception thrown in the block inside `raiseError()`.
 
 ### Laws
 
-Arrow provides [`MonadErrorLaws`]({{ '/docs/typeclasses/laws#monaderrorlaws' | relative_url }}) in the form of test cases for internal verification of lawful instances and third party apps creating their own `MonadError` instances.
+Arrow provides `MonadErrorLaws` in the form of test cases for internal verification of lawful instances and third party apps creating their own `MonadError` instances.
 
 ### Data types
 

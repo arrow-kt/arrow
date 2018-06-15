@@ -22,32 +22,14 @@ options:
       - title: Error Handling
         url: /docs/patterns/error_handling/
 
-      - title: Monad Comprehensions
-        url: /docs/patterns/monad_comprehensions/
-
-      - title: Comonad Comprehensions
-        url: /docs/patterns/comonad_comprehensions/
-
-      - title: Applicative Builder
-        url: /docs/patterns/applicative_builder/
-
-      - title: Polymorphic programs
-        url: /docs/patterns/polymorphic_programs/
-
-      - title: Free Algebras
-        url: /docs/patterns/free_algebras/
-
       - title: Dependency Injection
         url: /docs/patterns/dependency_injection/
 
-      - title: Monad Transformers
-        url: /docs/patterns/monad_transformers/
+      - title: Monad Comprehensions
+        url: /docs/patterns/monad_comprehensions/
 
-      - title: Concurrency
-        url: /docs/patterns/concurrency/
-
-      - title: Optics
-        url: /docs/patterns/optics/
+      - title: Free Algebras
+        url: /docs/patterns/free_algebras/
 
   - title: Data Types
 
@@ -55,6 +37,9 @@ options:
 
       - title: Intro
         url: /docs/datatypes/intro/
+
+      - title: Basic Types
+        url: /docs/datatypes/basic/
 
       - title: Option
         url: /docs/datatypes/option/
@@ -72,19 +57,19 @@ options:
         url: /docs/datatypes/nonemptylist/
 
       - title: ListK
-        url: /docs/datatypes/listK/
+        url: /docs/datatypes/listk/
 
       - title: SequenceK
-        url: /docs/datatypes/sequenceK/
+        url: /docs/datatypes/sequencek/
 
       - title: SetK
-        url: /docs/datatypes/setK/
+        url: /docs/datatypes/setk/
 
       - title: MapK
-        url: /docs/datatypes/mapK/
+        url: /docs/datatypes/mapk/
 
       - title: SortedMapK
-        url: /docs/datatypes/sortedmapK/
+        url: /docs/datatypes/sortedmapk/
 
       - title: Ior
         url: /docs/datatypes/ior/
@@ -122,6 +107,15 @@ options:
       - title: EitherT
         url: /docs/datatypes/eithert/
 
+      - title: Function0
+        url: /docs/datatypes/function0/
+
+      - title: Function1
+        url: /docs/datatypes/function1/
+
+      - title: Const
+        url: /docs/datatypes/const/
+
   - title: Type Classes
 
     nested_options:
@@ -152,6 +146,9 @@ options:
 
       - title: Traverse
         url: /docs/typeclasses/traverse/
+
+      - title: Reducible
+        url: /docs/typeclasses/reducible/
 
       - title: TraverseFilter
         url: /docs/typeclasses/traversefilter/
@@ -201,6 +198,12 @@ options:
       - title: MonoidK
         url: /docs/typeclasses/monoidk/
 
+      - title: Inject
+        url: /docs/typeclasses/inject/
+
+      - title: Alternative
+        url: /docs/typeclasses/alternative/
+
   - title: Effects
 
     nested_options:
@@ -208,8 +211,8 @@ options:
       - title: IO
         url: /docs/effects/io/
 
-      - title: MonadSuspend
-        url: /docs/effects/monadsuspend/
+      - title: MonadDefer
+        url: /docs/effects/monaddefer/
 
       - title: Async
         url: /docs/effects/async/
@@ -220,6 +223,9 @@ options:
   - title: Optics
 
     nested_options:
+
+      - title: Optics DSL
+        url: /docs/optics/dsl/
 
       - title: Iso
         url: /docs/optics/iso/
@@ -257,13 +263,19 @@ options:
       - title: Each
         url: /docs/optics/each/
 
+  - title: Generic
+    nested_options:
+
+          - title: Product
+            url: /docs/generic/product/
+
   - title: Integrations
 
     nested_options:
 
       - title: Rx2
         url: /docs/integrations/rx2/
-        
+
       - title: kotlinx.coroutines
         url: /docs/integrations/kotlinxcoroutines/
 
@@ -288,6 +300,19 @@ options:
 
       - title: Coyoneda
         url: /docs/free/coyoneda/
+
+  - title: Recursion Schemes
+
+    nested_options:
+
+      - title: Corecursive
+        url: /docs/recursion/corecursive/
+
+      - title: Recursive
+        url: /docs/recursion/recursive/
+
+      - title: Birecursive
+        url: /docs/recursion/birecursive/
 
   - title: Legal
 

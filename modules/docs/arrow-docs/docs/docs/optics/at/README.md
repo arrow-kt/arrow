@@ -19,9 +19,8 @@ A `MapK<Int, String>` can be indexed by its keys `Int` but not for every index a
 import arrow.core.*
 import arrow.data.*
 import arrow.optics.typeclasses.*
-import arrow.syntax.option.*
 
-val mapAt = At.at<MapKOf<Int, String>, Int, Option<String>>(2)
+val mapAt = At.at(MapK.at<Int, String>(), 2)
 
 val map = mapOf(
             1 to "one",
@@ -50,5 +49,5 @@ See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | rela
 
 The following datatypes in Arrow provide instances that adhere to the `At` typeclass.
 
-- [SetK]({{ '/docs/datatypes/setK' | relative_url }})
-- [MapK]({{ '/docs/datatypes/mapK' | relative_url }})
+- [SetK]({{ '/docs/datatypes/setk' | relative_url }})
+- [MapK]({{ '/docs/datatypes/mapk' | relative_url }})

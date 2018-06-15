@@ -4,7 +4,7 @@ import arrow.common.utils.AbstractProcessor
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.knownError
 import com.google.auto.service.AutoService
-import org.jetbrains.kotlin.serialization.deserialization.TypeTable
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import java.io.File
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
@@ -15,46 +15,46 @@ import javax.lang.model.element.TypeElement
 @AutoService(Processor::class)
 class InstanceProcessor : AbstractProcessor() {
 
-    private val annotatedList = mutableListOf<AnnotatedInstance>()
+  private val annotatedList = mutableListOf<AnnotatedInstance>()
 
-    override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
+  override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
-    override fun getSupportedAnnotationTypes(): Set<String> = setOf(instanceAnnotationClass.canonicalName)
+  override fun getSupportedAnnotationTypes(): Set<String> = setOf(instanceAnnotationClass.canonicalName)
 
-    /**
-     * Processor entry point
-     */
-    override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
-        annotatedList += roundEnv
-                .getElementsAnnotatedWith(instanceAnnotationClass)
-                .map { element ->
-                    when (element.kind) {
-                        ElementKind.INTERFACE -> processClass(element as TypeElement)
-                        else -> knownError("$instanceAnnotationName can only be used on interfaces")
-                    }
-                }
-
-        if (roundEnv.processingOver()) {
-            val generatedDir = File(this.generatedDir!!, instanceAnnotationClass.simpleName).also { it.mkdirs() }
-            InstanceFileGenerator(generatedDir, annotatedList).generate()
+  /**
+   * Processor entry point
+   */
+  override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
+    annotatedList += roundEnv
+      .getElementsAnnotatedWith(instanceAnnotationClass)
+      .map { element ->
+        when (element.kind) {
+          ElementKind.INTERFACE -> processClass(element as TypeElement)
+          else -> knownError("$instanceAnnotationName can only be used on interfaces")
         }
-    }
+      }
 
-    private fun processClass(element: TypeElement): AnnotatedInstance {
-        val proto: ClassOrPackageDataWrapper.Class = getClassOrPackageDataWrapper(element) as ClassOrPackageDataWrapper.Class
-        val dataType = element.annotationMirrors.flatMap { am ->
-            am.elementValues.entries.filter {
-                "target" == it.key.simpleName.toString()
-            }.map {
-                val targetName = it.value.toString().replace(".class", "")
-                val targetElement = elementUtils.getTypeElement(targetName)
-                getClassOrPackageDataWrapper(targetElement) as ClassOrPackageDataWrapper.Class
-            }
-        }
-        val typeTable = TypeTable(proto.classProto.typeTable)
-        val superTypes: List<ClassOrPackageDataWrapper.Class> =
-                recurseTypeclassInterfaces(proto, typeTable, emptyList()).map { it as ClassOrPackageDataWrapper.Class }
-        return AnnotatedInstance(element, proto, superTypes, this, dataType[0])
+    if (roundEnv.processingOver()) {
+      val generatedDir = File(this.generatedDir!!, instanceAnnotationClass.simpleName).also { it.mkdirs() }
+      InstanceFileGenerator(generatedDir, annotatedList).generate()
     }
+  }
+
+  private fun processClass(element: TypeElement): AnnotatedInstance {
+    val proto: ClassOrPackageDataWrapper.Class = getClassOrPackageDataWrapper(element) as ClassOrPackageDataWrapper.Class
+    val dataType = element.annotationMirrors.flatMap { am ->
+      am.elementValues.entries.filter {
+        "target" == it.key.simpleName.toString()
+      }.map {
+        val targetName = it.value.toString().replace(".class", "")
+        val targetElement = elementUtils.getTypeElement(targetName)
+        getClassOrPackageDataWrapper(targetElement) as ClassOrPackageDataWrapper.Class
+      }
+    }
+    val typeTable = TypeTable(proto.classProto.typeTable)
+    val superTypes: List<ClassOrPackageDataWrapper.Class> =
+      recurseTypeclassInterfaces(proto, typeTable, emptyList()).map { it as ClassOrPackageDataWrapper.Class }
+    return AnnotatedInstance(element, proto, superTypes, this, dataType[0])
+  }
 
 }

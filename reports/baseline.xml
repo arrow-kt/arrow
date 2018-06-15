@@ -1,41 +1,10 @@
 <?xml version="1.0" ?>
 <SmellBaseline>
   <Blacklist timestamp="1503308049178"></Blacklist>
-  <Whitelist timestamp="1505778251263">
-    <ID>LabeledExpression:FunctionK.kt$&lt;no name provided&gt;$this@or</ID>
-    <ID>LabeledExpression:PartialFunction.kt$&lt;no name provided&gt;$this@orElse</ID>
-    <ID>LabeledExpression:PartialFunction.kt$&lt;no name provided&gt;$this@orElse</ID>
-    <ID>LabeledExpression:PartialFunction.kt$&lt;no name provided&gt;$this@orElse</ID>
-    <ID>LabeledExpression:PartialFunction.kt$&lt;no name provided&gt;$this@andThen</ID>
-    <ID>LabeledExpression:PartialFunction.kt$&lt;no name provided&gt;$this@andThen</ID>
-    <ID>LabeledExpression:Eval.kt$Eval.&lt;no name provided&gt;$this@Eval</ID>
-    <ID>LabeledExpression:Eval.kt$Eval.&lt;no name provided&gt;.&lt;no name provided&gt;$this@Eval</ID>
-    <ID>LabeledExpression:Eval.kt$Eval.&lt;no name provided&gt;$this@Eval</ID>
-    <ID>LabeledExpression:Eval.kt$Eval.&lt;no name provided&gt;$this@Eval</ID>
-    <ID>LabeledExpression:Eval.kt$Eval.Compute$break@loop</ID>
-    <ID>LabeledExpression:Eval.kt$Eval.Compute$loop@ while (true) { when (curr) { is Compute -&gt; { val currComp: Compute&lt;A&gt; = curr currComp.start&lt;A&gt;().let { cc -&gt; when (cc) { is Compute -&gt; { val inStartFun: (Any?) -&gt; Eval&lt;A&gt; = { cc.run(it) } val outStartFun: (Any?) -&gt; Eval&lt;A&gt; = { currComp.run(it) } curr = cc.start&lt;A&gt;() fs = listOf(inStartFun, outStartFun) + fs } else -&gt; { curr = currComp.run(cc.value()) } } } } else -&gt; if (fs.isNotEmpty()) { curr = fs[0](curr.value()) fs = fs.drop(1) } else { break@loop } } }</ID>
-    <ID>LabeledExpression:Coyoneda.kt$Coyoneda.&lt;no name provided&gt;$this@Coyoneda</ID>
-    <ID>LabeledExpression:Yoneda.kt$Yoneda.&lt;no name provided&gt;$this@Yoneda</ID>
-    <ID>LabeledExpression:Composed.kt$&lt;no name provided&gt;$this@compose</ID>
-    <ID>LabeledExpression:Composed.kt$&lt;no name provided&gt;$this@compose</ID>
-    <ID>LabeledExpression:Composed.kt$&lt;no name provided&gt;$this@compose</ID>
-    <ID>LabeledExpression:Composed.kt$&lt;no name provided&gt;$this@compose</ID>
-    <ID>LabeledExpression:Composed.kt$&lt;no name provided&gt;$this@compose</ID>
-    <ID>LabeledExpression:ContinuationUtils.kt$this@label</ID>
-    <ID>LabeledExpression:ContinuationUtils.kt$this@completion</ID>
-    <ID>LabeledExpression:MonoidK.kt$MonoidK.&lt;no name provided&gt;$this@MonoidK</ID>
-    <ID>LabeledExpression:MonoidK.kt$MonoidK.&lt;no name provided&gt;$this@MonoidK</ID>
+  <Whitelist timestamp="1523048034037">
+    <ID>ComplexMethod:FreeApplicative.kt$FreeApplicative$// Beware: smart code @Suppress("UNCHECKED_CAST") fun &lt;G&gt; foldMap(f: FunctionK&lt;F, G&gt;, GA: Applicative&lt;G&gt;): Kind&lt;G, A&gt;</ID>
+    <ID>ComplexMethod:tuple.kt$Tuple10EqInstance$override fun Tuple10&lt;A, B, C, D, E, F, G, H, I, J&gt;.eqv(b: Tuple10&lt;A, B, C, D, E, F, G, H, I, J&gt;): Boolean</ID>
     <ID>ComplexMethod:IORunLoop.kt$IORunLoop$fun &lt;A&gt; step(source: IO&lt;A&gt;): IO&lt;A&gt;</ID>
     <ID>ComplexMethod:IORunLoop.kt$IORunLoop$private fun loop( source: Current, cb: (Either&lt;Throwable, Any?&gt;) -&gt; Unit, rcbRef: RestartCallback?, bFirstRef: BindF?, bRestRef: CallStack?): Unit</ID>
-    <ID>LabeledExpression:Iso.kt$PIso.&lt;no name provided&gt;$this@PIso</ID>
-    <ID>LabeledExpression:Prism.kt$PPrism.&lt;no name provided&gt;$this@PPrism</ID>
-    <ID>LabeledExpression:Traversal.kt$PTraversal.&lt;no name provided&gt;$this@PTraversal</ID>
-    <ID>LabeledExpression:Lens.kt$PLens.&lt;no name provided&gt;$this@PLens</ID>
-    <ID>LabeledExpression:Fold.kt$Fold.&lt;no name provided&gt;$this@Fold</ID>
-    <ID>ComplexMethod:AndThen.kt$AndThen$ @Suppress("UNCHECKED_CAST") internal fun runLoop(_success: A?, _failure: Throwable?, _isSuccess: Boolean): B</ID>
-    <ID>EmptyClassBlock:Typeclass.kt$&lt;no name provided&gt; : TypeLiteral</ID>
-    <ID>LateinitUsage:Comonad.kt$ComonadContinuation$internal lateinit var returnedMonad: A</ID>
-    <ID>LateinitUsage:MonadContinuations.kt$MonadContinuation$protected lateinit var returnedMonad: HK&lt;F, A&gt;</ID>
-    <ID>LateinitUsage:MonadContinuations.kt$StackSafeMonadContinuation$protected lateinit var returnedMonad: Free&lt;F, A&gt;</ID>
   </Whitelist>
 </SmellBaseline>

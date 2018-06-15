@@ -16,30 +16,32 @@
 
 package arrow.syntax.test
 
+import arrow.syntax.collections.destructured
+import arrow.syntax.collections.prependTo
+import arrow.syntax.collections.tail
+import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
-import arrow.test.UnitSpec
 import org.junit.runner.RunWith
-import arrow.syntax.collections.*
 
 @RunWith(KTestJUnitRunner::class)
 class CollectionsSyntaxTests : UnitSpec() {
 
-    init {
+  init {
 
-        "tail" {
-            listOf(1, 2, 3).tail() shouldBe listOf(2, 3)
-        }
-
-        "prependTo" {
-            1 prependTo listOf(2, 3) shouldBe listOf(1, 2, 3)
-        }
-
-        "destructured" {
-            val (head, tail) = listOf(1, 2, 3).destructured()
-            head shouldBe 1
-            tail shouldBe listOf(2, 3)
-        }
-
+    "tail" {
+      listOf(1, 2, 3).tail() shouldBe listOf(2, 3)
     }
+
+    "prependTo" {
+      1 prependTo listOf(2, 3) shouldBe listOf(1, 2, 3)
+    }
+
+    "destructured" {
+      val (head, tail) = listOf(1, 2, 3).destructured()
+      head shouldBe 1
+      tail shouldBe listOf(2, 3)
+    }
+
+  }
 }

@@ -2,9 +2,10 @@
 layout: docs
 title: State
 permalink: /docs/datatypes/state/
+video: GcXC0xARSXg
 ---
 
-## State 
+## State
 
 `State` is a structure that provides a functional approach to handling application state. `State<S, A>` is basically a function `S -> Tuple2(S, A)`, where `S` is the type that represents your state and `A` is the result the function produces. In addition to returning the result of type `A`, the function returns a new `S` value, which is the updated state.
 
@@ -16,7 +17,6 @@ Let's build a simple Stack using Arrow's NonEmptyList and Option:
 import arrow.*
 import arrow.core.*
 import arrow.data.*
-import arrow.syntax.option.*
 
 typealias Stack = Option<Nel<String>>
 ```
@@ -91,13 +91,14 @@ The `flatMap` method on `State<S, A>` lets you use the result of one `State` in 
 import arrow.typeclasses.*
 import arrow.instances.*
 
-fun stackOperations() = State().monad<Stack>().binding {
+fun stackOperations() = ForState<Stack>() extensions {
+  binding {
     val a = push("a").bind()
     val b = pop().bind()
     val c = pop().bind()
-
     c
-}.fix()
+  }.fix()
+}
 ```
 
 At this point, we have not yet interacted with any Stack; we have written instructions to operate one. We need to pass in an initial stack value, and then we actually apply our operations to it:
@@ -116,14 +117,13 @@ If we only care about the resulting String and not the final state, then we can 
 stackOperations().runA(Nel.of("hello", "world", "!").some())
 ```
 
-Available Instances:
+## Available Instances
 
-```kotlin:ank
-import arrow.debug.*
+* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+* [MonadState]({{ '/docs/typeclasses/monadstate' | relative_url }})
 
-showInstances<StatePartialOf<Stack>, Unit>()
-```
-
-# Credits
+## Credits
 
 Contents partially adapted from [Cats State](https://typelevel.org/cats/datatypes/state.html)

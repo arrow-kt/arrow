@@ -16,22 +16,21 @@ Examples of that can run code asynchronously are typically datatypes that can su
 import arrow.*
 import arrow.core.*
 import arrow.effects.*
-import arrow.syntax.either.*
 
 IO.async()
-  .async { callback: (Either<Throwable, Int>) -> Unit -> 
-    callback(1.right()) 
+  .async { callback: (Either<Throwable, Int>) -> Unit ->
+    callback(1.right())
   }.fix().attempt().unsafeRunSync()
 ```
 
 ```kotlin:ank
 IO.async()
-  .async { callback: (Either<Throwable, Int>) -> Unit -> 
-    callback(RuntimeException().left()) 
+  .async { callback: (Either<Throwable, Int>) -> Unit ->
+    callback(RuntimeException().left())
   }.fix().attempt().unsafeRunSync()
 ```
 
-`Async` includes all combinators present in [`MonadSuspend`]({{ '/docs/effects/monadsuspend/' | relative_url }}).
+`Async` includes all combinators present in [`MonadDefer`]({{ '/docs/effects/monaddefer/' | relative_url }}).
 
 ### Main Combinators
 
@@ -43,7 +42,7 @@ The callback accepts `Either<Throwable, A>` as the return, where the left side o
 
 ```kotlin
 IO.async()
-  .async { callback: (Either<Throwable, Int>) -> Unit -> 
+  .async { callback: (Either<Throwable, Int>) -> Unit ->
     userFetcherWithCallback("1").startAsync({ user: User ->
       callback(user.left())
     }, { error: Exception ->
@@ -54,7 +53,7 @@ IO.async()
 
 ```kotlin
 IO.async()
-  .async { callback: (Either<Throwable, Int>) -> Unit -> 
+  .async { callback: (Either<Throwable, Int>) -> Unit ->
     userFromDatabaseObservable().subscribe({ user: User ->
       callback(user.left())
     }, { error: Exception ->
@@ -81,53 +80,13 @@ IO.async()
 > never() exists to test datatypes that can handle non-termination.
 For example, IO has unsafeRunTimed that runs never() safely.
 
-### Syntax available inside Monad Comprehensions
-
-All the syntax functions are geared towards using `Async` inside [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }})
-to create blocks of code to be run asynchronously.
-
-#### binding#bindAsync
-
-Runs a function parameter in the Async passed as a parameter,
-and then awaits for the result before continuing the execution.
-
-Note that there is no automatic error handling or wrapping of exceptions.
-
-```kotlin
-IO.monad().binding {
-  val a = bindAsync(IO.async()) { fibonacci(100) }
-  a + 1
-}.fix().unsafeRunSync()
-```
-
-#### binding#bindAsyncUnsafe
-
-Runs a function parameter in the Async passed as a parameter,
-and then awaits for the result before continuing the execution.
-
-While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution.
-
-```kotlin
-IO.monad().binding {
-  val a = bindAsync(IO.async()) { fibonacci(100).left() }
-  a + 1
-}.fix().unsafeRunSync()
-```
-
-```kotlin
-IO.monad().binding {
-  val a = bindAsync(IO.async()) { RuntimeException("Boom").right() }
-  a + 1
-}.fix().unsafeRunSync()
-```
-
 ### Laws
 
-Arrow provides [`AsyncLaws`]({{ '/docs/typeclasses/laws#asynclaws' | relative_url }}) in the form of test cases for internal verification of lawful instances and third party apps creating their own `Async` instances.
+Arrow provides `AsyncLaws` in the form of test cases for internal verification of lawful instances and third party apps creating their own `Async` instances.
 
-### Data types
+### Data Types
 
-The following datatypes in Arrow provide instances that adhere to the `Async` typeclass.
+The following data types in Arrow provide instances that adhere to the `Async` type class.
 
 - [IO]({{ '/docs/effects/io' | relative_url }})
 - [ObservableK]({{ '/docs/integrations/rx2' | relative_url }})

@@ -36,7 +36,7 @@ filter.getAll(listOf("H", "He", "Hel", "Hell", "Hello").k())
 Arrow provides `FilterIndex` instances for some common datatypes both in Arrow and the Kotlin stdlib that can be filtered by index, like `ListK` and `MapK`. You can look them up by calling `FilterIndex.filterIndex()`.
 
 ```kotlin:ank
-FilterIndex.filterIndex<ListKOf<Int>, Int, Int> { index -> index % 2 == 0 }
+FilterIndex.filterIndex(ListK.filterIndex<Int>()) { index -> index % 2 == 0 }
             .getAll(listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).k())
 ```
 
@@ -46,6 +46,6 @@ The following datatypes in Arrow provide instances that adhere to the `FilterInd
 
 - [String]
 - [NonEmptyList]({{ '/docs/datatypes/nonemptylist' | relative_url }})
-- [ListK]({{ '/docs/datatypes/listK' | relative_url }})
-- [SequenceK]({{ '/docs/datatypes/sequenceK' | relative_url }})
-- [MapK]({{ '/docs/datatypes/mapK' | relative_url }})
+- [ListK]({{ '/docs/datatypes/listk' | relative_url }})
+- [SequenceK]({{ '/docs/datatypes/sequencek' | relative_url }})
+- [MapK]({{ '/docs/datatypes/mapk' | relative_url }})

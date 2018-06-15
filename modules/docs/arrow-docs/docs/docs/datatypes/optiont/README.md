@@ -2,6 +2,7 @@
 layout: docs
 title: OptionT
 permalink: /docs/datatypes/optiont/
+video: EWfxL9yBUJo
 ---
 
 ## OptionT
@@ -45,15 +46,18 @@ that enables monad comprehensions for all datatypes for which a monad instance i
 
 ```kotlin:ank
 import arrow.typeclasses.*
+import arrow.instances.*
 
 fun getCountryCode(maybePerson : Option<Person>): Option<String> =
-  Option.monad().binding {
-    val person = maybePerson.bind()
-    val address = person.address.bind()
-    val country = address.country.bind()
-    val code = country.code.bind()
-    code
-  }.fix()
+  ForOption extensions {
+   binding {
+     val person = maybePerson.bind()
+     val address = person.address.bind()
+     val country = address.country.bind()
+     val code = country.code.bind()
+     code
+   }.fix()
+  }
 ```
 
 Alright, a piece of cake right? That's because we were dealing with a simple type `Option`. But here's where things can get more complicated. Let's introduce another monad in the middle of the computation. For example what happens when we need to load a person by id, then their address and country to obtain the country code from a remote service?
@@ -95,10 +99,10 @@ Now we've got two new functions in the mix that are going to call a remote servi
 import arrow.effects.*
 
 fun findPerson(personId : Int) : ObservableK<Option<Person>> =
-  ObservableK.pure(Option.fromNullable(personDB.get(personId))) //mock impl for simplicity
+  ObservableK.just(Option.fromNullable(personDB.get(personId))) //mock impl for simplicity
 
 fun findCountry(addressId : Int) : ObservableK<Option<Country>> =
-  ObservableK.pure(
+  ObservableK.just(
     Option.fromNullable(adressDB.get(addressId)).flatMap { it.country }
   ) //mock impl for simplicity
 
@@ -133,23 +137,25 @@ Let's look at how a similar implementation would look like using monad comprehen
 
 ```kotlin:ank
 fun getCountryCode(personId: Int): ObservableK<Option<String>> =
-      ObservableK.monad().binding {
+      ForObservableK extensions {
+       binding {
         val maybePerson = findPerson(personId).bind()
         val person = maybePerson.fold(
           { ObservableK.raiseError<Person>(NoSuchElementException("...")) },
-          { ObservableK.pure(it) }
+          { ObservableK.just(it) }
         ).bind()
         val address = person.address.fold(
           { ObservableK.raiseError<Address>(NoSuchElementException("...")) },
-          { ObservableK.pure(it) }
+          { ObservableK.just(it) }
         ).bind()
         val maybeCountry = findCountry(address.id).bind()
         val country = maybeCountry.fold(
           { ObservableK.raiseError<Country>(NoSuchElementException("...")) },
-          { ObservableK.pure(it) }
+          { ObservableK.just(it) }
         ).bind()
         country.code
       }.fix()
+     }
 ```
 
 While we've got the logic working now, we're in a situation where we're forced to deal with the `None cases`. We also have a ton of boilerplate type conversion with `fold`. The type conversion is necessary because in a monad comprehension you can only use a type of Monad. If we start with `ObservableK`, we have to stay in it’s monadic context by lifting anything we compute sequentially to a `ObservableK` whether or not it's async.
@@ -169,17 +175,16 @@ So our specialization `OptionT<ForObservableK, A>` is the OptionT transformer ar
 We can now lift any value to a `OptionT<F, A>` which looks like this:
 
 ```kotlin:ank
-import arrow.syntax.applicative.*
 import arrow.data.*
 
-val optTVal = 1.pure<OptionTPartialOf<ForObservableK>, Int>()
+val optTVal = OptionT.just<ForObservableK, Int>(ObservableK.applicative(), 1)
 optTVal
 ```
 
 or
 
 ```kotlin:ank
-val optTVal = OptionT.fromOption<ForObservableK, Int>(Some(1))
+val optTVal = OptionT.fromOption<ForObservableK, Int>(ObservableK.applicative(), Some(1))
 optTVal
 ```
 
@@ -193,24 +198,28 @@ So how would our function look if we implemented it with the OptionT monad trans
 
 ```kotlin
 fun getCountryCode(personId: Int): ObservableK<Option<String>> =
-  OptionT.monad<ForObservableK>().binding {
+  ForOptionT(ObservableK.monad()) extensions { 
+   binding {
     val person = OptionT(findPerson(personId)).bind()
-    val address = OptionT(ObservableK.pure(person.address)).bind()
+    val address = OptionT(ObservableK.just(person.address)).bind()
     val country = OptionT(findCountry(address.id)).bind()
-    val code = OptionT(ObservableK.pure(country.code)).bind()
+    val code = OptionT(ObservableK.just(country.code)).bind()
     code
   }.value().fix()
+ }
 ```
 
 Here we no longer have to deal with the `None` cases, and the binding to the values on the left side are already the underlying values we want to focus on instead of the optional values. We have automatically `flatMapped` through the `ObservableK` and `Option` in a single expression reducing the boilerplate and encoding the effects concerns in the type signatures.
 
-Available Instances:
+## Available Instances
 
-```kotlin:ank
-import arrow.debug.*
-
-showInstances<OptionTPartialOf<ForObservableK>, Unit>()
-```
+* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+* [Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
+* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+* [MonoidK]({{ '/docs/typeclasses/monoidk' | relative_url }})
+* [SemigroupK]({{ '/docs/typeclasses/semigroupk' | relative_url }})
+* [Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
 
 Take a look at the [`EitherT` docs]({{ '/docs/datatypes/eithert' | relative_url }}) for an alternative version of this content with the `EitherT` monad transformer
 

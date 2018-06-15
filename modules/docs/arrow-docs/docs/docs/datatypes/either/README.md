@@ -10,7 +10,7 @@ video: q6HpChSq-xc
 In day-to-day programming, it is fairly common to find ourselves writing functions that can fail.
 For instance, querying a service may result in a connection issue, or some unexpected JSON response.
 
-To communicate these errors it has become common practice to throw exceptions. However,
+To communicate these errors it has become common practice to throw exceptions; however,
 exceptions are not tracked in any way, shape, or form by the compiler. To see what
 kind of exceptions (if any) a function may throw, we have to dig through the source code.
 Then to handle these exceptions, we have to make sure we catch them at the call site. This
@@ -22,15 +22,14 @@ import arrow.core.*
 
 val throwsSomeStuff: (Int) -> Double = {x -> x.toDouble()}
 val throwsOtherThings: (Double) -> String = {x -> x.toString()}
-val moreThrowing: (String) -> List<String> = {x -> listOf(x) }
+val moreThrowing: (String) -> List<String> = {x -> listOf(x)}
 val magic = throwsSomeStuff.andThen(throwsOtherThings).andThen(moreThrowing)
 magic
 ```
 
-Assume we happily throw exceptions in our code. Looking at the types, any of those functions can
-throw any number of exceptions, we don't know. When we compose, exceptions from any of the constituent
+Assume we happily throw exceptions in our code. Looking at the types of the above functions, any of them could throw any number of exceptions -- we do not know. When we compose, exceptions from any of the constituent
 functions can be thrown. Moreover, they may throw the same kind of exception
-(e.g. `IllegalArgumentException`) and thus it gets tricky tracking exactly where that exception came from.
+(e.g. `IllegalArgumentException`) and thus it gets tricky tracking exactly where an exception came from.
 
 How then do we communicate an error? By making it explicit in the data type we return.
 
@@ -39,8 +38,7 @@ How then do we communicate an error? By making it explicit in the data type we r
 In general, `Validated` is used to accumulate errors, while `Either` is used to short-circuit a computation
 upon the first error. For more information, see the `Validated` vs `Either` section of the `Validated` documentation.
 
-More often than not we want to just bias towards one side and call it a day - by convention,
-the right side is most often chosen.
+By convention the right hand side of an `Either` is used to hold successful values.
 
 ```kotlin:ank
 val right: Either<String, Int> = Either.Right(5)
@@ -56,22 +54,27 @@ Because `Either` is right-biased, it is possible to define a Monad instance for 
 Since we only ever want the computation to continue in the case of `Right` (as captured by the right-bias nature),
 we fix the left type parameter and leave the right one free.
 
-So the flatMap method is right-biased:
+So the map and flatMap methods are right-biased:
 
 ```kotlin:ank
 val right: Either<String, Int> = Either.Right(5)
 right.flatMap{Either.Right(it + 1)}
+```
 
+```kotlin:ank
 val left: Either<String, Int> = Either.Left("Something went wrong")
 left.flatMap{Either.Right(it + 1)}
 ```
 
 ## Using Either instead of exceptions
 
-As a running example, we will have a series of functions that will parse a string into an integer,
-take the reciprocal, and then turn the reciprocal into a string.
+As a running example, we will have a series of functions that will: 
 
-In exception-throwing code, we would have something like this:
+* Parse a string into an integer
+* Calculate the reciprocal
+* Convert the reciprocal into a string
+
+Using exception-throwing code, we could write something like this:
 
 ```kotlin:ank:silent
 // Exception Style
@@ -178,8 +181,8 @@ fun magic(s: String): Either<Error, String> =
 
 For our little module, we enumerate any and all errors that can occur. Then, instead of using
 exception classes as error values, we use one of the enumerated cases. Now when we pattern match,
-we get much nicer matching. Moreover, since Error is sealed, no outside code can add additional
-subtypes which we might fail to handle.
+we are able to comphrensively handle failure without resulting to an `else` branch; moreover
+since Error is sealed, no outside code can add additional subtypes which we might fail to handle.
 
 ```kotlin
 val x = magic("2")
@@ -192,15 +195,15 @@ when(x) {
 }
 ```
 
-## Additional Syntax
+## Syntax
 
 Either can also map over the `left` value with `mapLeft` which is similar to map but applies on left instances.
 
 ```kotlin:ank
 val r : Either<Int, Int> = Either.Right(7)
-r.mapLeft{it +1}
+r.mapLeft {it + 1}
 val l: Either<Int, Int> = Either.Left(7)
-l.mapLeft{it + 1}
+l.mapLeft {it + 1}
 ```
 
 `Either<A, B>` can be transformed to `Either<B,A>` using the `swap()` method.
@@ -214,8 +217,6 @@ For using Either's syntax on arbitrary data types.
 This will make possible to use the `left()`, `right()`, `contains()`, `getOrElse()` and `getOrHandle()` methods:
 
 ```kotlin:ank
-import arrow.syntax.either.*
-
 7.right()
 ```
 
@@ -250,21 +251,21 @@ Either.cond(false, { 42 }, { "Error" })
 
 Another operation is `fold`. This operation will extract the value from the Either, or provide a default if the value is `Left`
 
- ```kotlin:ank
- val x = 7.right()
- x.fold({ 1 }, { it * 3 }) // 21
- ```
+```kotlin:ank
+val x : Either<Int, Int> = 7.right()
+x.fold({ 1 }, { it + 3 }) 
+```
 
- ```kotlin:ank
- val x = 7.left()
- x.fold({ 1 }, { it * 3 }) // 1
- ```
+```kotlin:ank
+val y : Either<Int, Int> = 7.left()
+y.fold({ 1 }, { it + 3 }) 
+```
 
 The `getOrHandle()` operation allows the transformation of an `Either.Left` value to a `Either.Right` using
 the value of `Left`. This can be useful when a mapping to a single result type is required like `fold()` but without
 the need to handle `Either.Right` case.
 
-As an example we want to map an `Either<Int, Throwable>` to a proper HTTP status code:
+As an example we want to map an `Either<Throwable, Int>` to a proper HTTP status code:
 
 ```kotlin:ank
 val r: Either<Throwable, Int> = Either.Left(NumberFormatException())
@@ -283,36 +284,51 @@ val httpStatusCode = r.getOrHandle {
 
  Transforming the inner contents
 
- ```kotlin:ank
- Either.functor<Int>().map(Either.Right(1), {it + 1})
- ```
+```kotlin:ank
+import arrow.instances.*
+ 
+ForEither<Int>() extensions { 
+   Right(1).map {it + 1}
+}
+```
 
  [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }})
 
  Computing over independent values
 
- ```kotlin:ank
- Either.applicative<Int>().tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
- ```
+```kotlin:ank
+ForEither<Int>() extensions { 
+  tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
+}
+```
 
- [`Monad`]({{ '/docs/_docs/typeclasses/monad/' | relative_url }})
+ [`Monad`]({{ '/docs/typeclasses/monad/' | relative_url }})
 
  Computing over dependent values ignoring absence
 
- ```kotlin
- Either.monad<Int>().binding {
+```kotlin
+ForEither<Int>() extensions {
+ binding {
     val a = Either.Right(1).bind()
     val b = Either.Right(1 + a).bind()
     val c = Either.Right(1 + b).bind()
     a + b + c
  }
- // Right(b=6, dummy=kotlin.Unit)
- ```
-
-## Instances
-
-```kotlin:ank
-import arrow.debug.*
-
-showInstances<ForEither, Throwable>()
+}
+// Right(6)
 ```
+
+## Available Instances
+
+* [Show]({{ '/docs/typeclasses/show' | relative_url }})
+* [Eq]({{ '/docs/typeclasses/eq' | relative_url }})
+* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+* [ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
+* [Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
+* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+* [MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
+* [SemigroupK]({{ '/docs/typeclasses/semigroupk' | relative_url }})
+* [Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
+* [TraverseFilter]({{ '/docs/typeclasses/traversefilter' | relative_url }})
+* [Each]({{ '/docs/optics/each' | relative_url }})

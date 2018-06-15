@@ -17,7 +17,7 @@ We can use that `Optional` to safely operate on that focus `S` i.e. operating on
 import arrow.data.*
 import arrow.optics.typeclasses.*
 
-val thirdListItemOptional = Index.index<ListKOf<String>, Int, String>(3)
+val thirdListItemOptional = Index.index(ListK.index<String>(), 3)
 
 thirdListItemOptional.set(listOf("0", "1", "2", "3").k(), "newValue")
 ```
@@ -43,6 +43,6 @@ The following datatypes in Arrow provide instances that adhere to the `Index` ty
 
 - [String]
 - [NonEmptyList]({{ '/docs/datatypes/nonemptylist' | relative_url }})
-- [ListK]({{ '/docs/datatypes/listK' | relative_url }})
-- [SequenceK]({{ '/docs/datatypes/sequenceK' | relative_url }})
-- [MapK]({{ '/docs/datatypes/mapK' | relative_url }})
+- [ListK]({{ '/docs/datatypes/listk' | relative_url }})
+- [SequenceK]({{ '/docs/datatypes/sequencek' | relative_url }})
+- [MapK]({{ '/docs/datatypes/mapk' | relative_url }})

@@ -1,34 +1,23 @@
 package arrow.data
 
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldNotBe
+import arrow.instances.*
 import arrow.test.UnitSpec
-import arrow.typeclasses.eq
 import arrow.test.laws.EqLaws
+import io.kotlintest.KTestJUnitRunner
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class NumberEqTest : UnitSpec() {
-    init {
+  init {
 
-        "instances can be resolved implicitly" {
-            eq<Long>() shouldNotBe null
-            eq<Int>() shouldNotBe null
-            eq<Double>() shouldNotBe null
-            eq<Float>() shouldNotBe null
-            eq<Byte>() shouldNotBe null
-            eq<Short>() shouldNotBe null
-            eq<Integer>() shouldNotBe null
-        }
+    testLaws(
+      EqLaws.laws(Long.eq()) { it.toLong() },
+      EqLaws.laws(Int.eq()) { it },
+      EqLaws.laws(Double.eq()) { it.toDouble() },
+      EqLaws.laws(Float.eq()) { it.toFloat() },
+      EqLaws.laws(Byte.eq()) { it.toByte() },
+      EqLaws.laws(Short.eq()) { it.toShort() }
+    )
 
-        testLaws(
-            EqLaws.laws { it.toLong() },
-            EqLaws.laws { it },
-            EqLaws.laws { it.toDouble() },
-            EqLaws.laws { it.toFloat() },
-            EqLaws.laws { it.toByte() },
-            EqLaws.laws { it.toShort() }
-        )
-
-    }
+  }
 }

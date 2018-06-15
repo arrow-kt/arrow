@@ -4,7 +4,7 @@ title: Quick Start
 permalink: /docs/
 ---
 
-NOTE: The docs are currently at around 50% completion. They're the present priority project, and you can track the progress on the github issue [#311](https://github.com/arrow-kt/arrow/issues/311).
+NOTE: The docs are currently at around 60% completion. They're the present priority project, and you can track the progress on the github issue [#311](https://github.com/arrow-kt/arrow/issues/311).
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
 [![Build Status](https://travis-ci.org/arrow-kt/arrow.svg?branch=master)](https://travis-ci.org/arrow-kt/arrow/)
@@ -12,7 +12,7 @@ NOTE: The docs are currently at around 50% completion. They're the present prior
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 Λrrow is a library for Typed Functional Programming in Kotlin.
-It includes the most popular data types, type classes and abstractions such as `Option`, `Try`, `Either`, `IO`, `Functor`, `Applicative`, `Monad` and many more empowering users to define pure FP apps and libraries built atop higher order abstractions.
+It includes the most popular data types, type classes and abstractions such as `Option`, `Try`, `Either`, `IO`, `Functor`, `Applicative`, `Monad` to empower users to define pure FP apps and libraries built atop higher order abstractions.
 Use the list below to learn more about Λrrow's main features.
 
 - [Patterns](http://arrow-kt.io/docs/patterns/glossary/): tutorials and approaches to day-to-day challenges using FP 
@@ -30,7 +30,7 @@ Use the list below to learn more about Λrrow's main features.
 
 Make sure to have the latest version of JDK 1.8 installed.
 
-Add it in your root `build.gradle` at the end of repositories.
+In your project's root `build.gradle` append the jcenter repository to your list of repositories.
 
 ```groovy
 allprojects {
@@ -44,25 +44,28 @@ Add the dependencies into the project's `build.gradle`
 
 ```groovy
 dependencies {
-    compile 'io.arrow-kt:arrow-core:0.6.1'
-    compile 'io.arrow-kt:arrow-typeclasses:0.6.1' 
-    compile 'io.arrow-kt:arrow-instances:0.6.1' 
-    compile 'io.arrow-kt:arrow-data:0.6.1' 
-    compile 'io.arrow-kt:arrow-syntax:0.6.1'
-    kapt    'io.arrow-kt:arrow-annotations-processor:0.6.1' 
-    
-    compile 'io.arrow-kt:arrow-free:0.6.1' //optional
-    compile 'io.arrow-kt:arrow-mtl:0.6.1' //optional
-    compile 'io.arrow-kt:arrow-effects:0.6.1' //optional
-    compile 'io.arrow-kt:arrow-effects-rx2:0.6.1' //optional
-    compile 'io.arrow-kt:arrow-effects-kotlinx-coroutines:0.6.1' //optional
-    compile 'io.arrow-kt:arrow-optics:0.6.1' //optional
+    compile 'io.arrow-kt:arrow-core:0.7.2'
+    compile 'io.arrow-kt:arrow-syntax:0.7.2'
+    compile 'io.arrow-kt:arrow-typeclasses:0.7.2'
+    compile 'io.arrow-kt:arrow-data:0.7.2'
+    compile 'io.arrow-kt:arrow-instances-core:0.7.2'
+    compile 'io.arrow-kt:arrow-instances-data:0.7.2'
+    kapt    'io.arrow-kt:arrow-annotations-processor:0.7.2'
+
+    compile 'io.arrow-kt:arrow-free:0.7.2' //optional
+    compile 'io.arrow-kt:arrow-mtl:0.7.2' //optional
+    compile 'io.arrow-kt:arrow-effects:0.7.2' //optional
+    compile 'io.arrow-kt:arrow-effects-rx2:0.7.2' //optional
+    compile 'io.arrow-kt:arrow-effects-kotlinx-coroutines:0.7.2' //optional
+    compile 'io.arrow-kt:arrow-optics:0.7.2' //optional
+    compile 'io.arrow-kt:arrow-generic:0.7.2' //optional
+    compile 'io.arrow-kt:arrow-recursion:0.7.2' //optional
 }
 ```
 
 # Additional Setup
 
-For projects that wish to use their own `@higherkind`, `@deriving` and other meta programming facilities provided by Λrrow
+For projects that wish to use their own `@higherkind`, `@optics` and other meta programming facilities provided by Λrrow
 the setup below is also required:
 
 Add the dependencies into the project's `build.gradle`
@@ -73,7 +76,7 @@ apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //optiona
 
 dependencies {
     ...
-    kapt    'io.arrow-kt:arrow-annotations-processor:0.6.1' //optional
+    kapt    'io.arrow-kt:arrow-annotations-processor:0.7.2' //optional
     ...
 }
 ```

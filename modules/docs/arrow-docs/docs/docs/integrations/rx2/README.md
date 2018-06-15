@@ -23,7 +23,7 @@ Observable.from(7, 4, 11, 3)
 
 ### Integration with your existing Observable chains
 
-The largest quality of life improvement when using Observables in Arrow is the introduction of the [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}). This library construct allows expressing asynchronous Observable sequences as synchronous code using binding/bind.
+The largest quality of life improvement when using Observables in Arrow is the introduction of the [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}). This library construct allows expressing asynchronous Observable sequences as synchronous code using binding/bind.
 
 #### Arrow Wrapper
 
@@ -44,6 +44,16 @@ flow
 ```
 
 ```kotlin:ank
+val single = Single.fromCallable { 1 }.k()
+single
+```
+
+```kotlin:ank
+val maybe = Maybe.fromCallable { 1 }.k()
+maybe
+```
+
+```kotlin:ank
 val subject = PublishSubject.create<Int>().k()
 subject
 ```
@@ -59,24 +69,34 @@ flow.value()
 ```
 
 ```kotlin:ank
+single.value()
+```
+
+```kotlin:ank
+maybe.value()
+```
+
+```kotlin:ank
 subject.value()
 ```
 
 ### Observable comprehensions
 
-The library provides instances of [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) and [`MonadSuspend`]({{ '/docs/effects/monadsuspend' | relative_url }}).
+The library provides instances of [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) and [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}).
 
-[`MonadSuspend`]({{ '/docs/effects/async' | relative_url }}) allows you to generify over datatypes that can run asynchronous code. You can use it with `ObservableK` and `FlowableK`.
+[`MonadDefer`]({{ '/docs/effects/async' | relative_url }}) allows you to generify over datatypes that can run asynchronous code. You can use it with `ObservableK`, `FlowableK` or `SingleK`.
 
 ```kotlin
-fun <F> getSongUrlAsync(MS: MonadSuspend<F> = monadSuspend()) =
+fun <F> getSongUrlAsync(MS: MonadDefer<F>) =
   MS { getSongUrl() }
 
-val songObservable: ObservableK<Url> = getSongUrlAsync().fix()
-val songFlowable: FlowableK<Url> = getSongUrlAsync().fix()
+val songObservable: ObservableKOf<Url> = getSongUrlAsync(ObservableK.monadDefer())
+val songFlowable: FlowableKOf<Url> = getSongUrlAsync(FlowableK.monadDefer())
+val songSingle: SingleKOf<Url> = getSongUrlAsync(SingleK.monadDefer())
+val songMaybe: MaybeKOf<Url> = getSongUrlAsync(MaybeK.monadDefer())
 ```
 
-[`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) using the method `bindingCatch`, with all its benefits.
+[`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) using the method `bindingCatch`, with all its benefits.
 
 Let's take an example and convert it to a comprehension. We'll create an observable that loads a song from a remote location, and then reports the current play % every 100 milliseconds until the percentage reaches 100%:
 
@@ -86,7 +106,7 @@ getSongUrlAsync()
   .flatMap {
     val totalTime = musicPlayer.getTotaltime()
     Observable.interval(100, Milliseconds)
-      .flatMap { 
+      .flatMap {
         Observable.create { musicPlayer.getCurrentTime() }
           .subscribeOn(AndroidSchedulers.mainThread())
           .map { tick -> (tick / totalTime * 100).toInt() }
@@ -99,7 +119,11 @@ getSongUrlAsync()
 When rewritten using `bindingCatch` it becomes:
 
 ```kotlin
-ObservableK.monadError().bindingCatch {
+import arrow.effects.*
+import arrow.typeclasses.*
+
+ForObservableK extensions { 
+ bindingCatch {
   val songUrl = getSongUrlAsync().bind()
   val musicPlayer = MediaPlayer.load(songUrl)
   val totalTime = musicPlayer.getTotaltime()
@@ -114,39 +138,53 @@ ObservableK.monadError().bindingCatch {
   }
 
   percent
-}.fix()
+ }.fix()
+}
 ```
 
-Note that any unexpected exception, like `AritmeticException` when `totalTime` is 0, is automatically caught and wrapped inside the observable. 
+Note that any unexpected exception, like `AritmeticException` when `totalTime` is 0, is automatically caught and wrapped inside the observable.
 
 ### Subscription and cancellation
 
 Observables created with comprehensions like `bindingCatch` behave the same way regular observables do, including cancellation by disposing the subscription.
 
 ```kotlin
-val disposable = 
+val disposable =
   songObservable.value()
-    .subscribe({ Log.d("Song $it") } , { prinln("Error $it") })
+    .subscribe({ Log.d("Song $it") } , { println("Error $it") })
 
 disposable.dispose()
 ```
 
-Note that [`MonadSuspend`]({{ '/docs/effects/monadsuspend' | relative_url }}) provides an alternative to `bindingCatch` called `bindingCancellable` returning a `arrow.Disposable`.
+Note that [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) provides an alternative to `bindingCatch` called `bindingCancellable` returning a `arrow.Disposable`.
 Invoking this `Disposable` causes an `BindingCancellationException` in the chain which needs to be handled by the subscriber, similarly to what `Deferred` does.
 
 ```kotlin
-val (observable, disposable) = 
-  ObservableK.monadSuspend().bindingCancellable {
+val (observable, disposable) =
+  ObservableK.monadDefer().bindingCancellable {
     val userProfile = Observable.create { getUserProfile("123") }
     val friendProfiles = userProfile.friends().map { friend ->
-        bindAsync(observableAsync) { getProfile(friend.id) }
+        bindDefer { getProfile(friend.id) }
     }
     listOf(userProfile) + friendProfiles
   }
 
 observable.value()
-  .subscribe({ Log.d("User $it") } , { prinln("Boom! caused by $it") })
+  .subscribe({ Log.d("User $it") } , { println("Boom! caused by $it") })
 
 disposable()
 // Boom! caused by BindingCancellationException
 ```
+
+## Available Instances
+
+* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+* [ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
+* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+* [MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
+* [MonadDefer]({{ '/docs/effects/monaddefer' | relative_url }})
+* [Async]({{ '/docs/effects/async' | relative_url }})
+* [Effect]({{ '/docs/effects/effect' | relative_url }})
+* [Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
+* [Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})

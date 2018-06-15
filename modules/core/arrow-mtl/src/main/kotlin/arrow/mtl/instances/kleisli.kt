@@ -1,15 +1,32 @@
 package arrow.mtl.instances
 
-import arrow.*
-import arrow.data.*
+import arrow.Kind
+import arrow.data.Kleisli
+import arrow.data.KleisliPartialOf
+import arrow.data.fix
+import arrow.instance
+import arrow.instances.KleisliMonadErrorInstance
 import arrow.instances.KleisliMonadInstance
-import arrow.mtl.MonadReader
+import arrow.mtl.typeclasses.MonadReader
+import arrow.typeclasses.MonadError
 
 @instance(Kleisli::class)
 interface KleisliMonadReaderInstance<F, D> : KleisliMonadInstance<F, D>, MonadReader<KleisliPartialOf<F, D>, D> {
 
-    override fun ask(): Kleisli<F, D, D> = Kleisli({ FF().pure(it) })
+  override fun ask(): Kleisli<F, D, D> = Kleisli({ FF().just(it) })
 
-    override fun <A> local(f: (D) -> D, fa: KleisliOf<F, D, A>): Kleisli<F, D, A> = fa.fix().local(f)
+  override fun <A> Kind<KleisliPartialOf<F, D>, A>.local(f: (D) -> D): Kleisli<F, D, A> = fix().local(f)
 
 }
+
+class KleisliMtlContext<F, D, E>(val MF: MonadError<F, E>) : KleisliMonadReaderInstance<F, D>, KleisliMonadErrorInstance<F, D, E> {
+  override fun FF(): MonadError<F, E> = MF
+}
+
+class KleisliMtlContextPartiallyApplied<F, D, E>(val MF: MonadError<F, E>) {
+  infix fun <A> extensions(f: KleisliMtlContext<F, D, E>.() -> A): A =
+    f(KleisliMtlContext(MF))
+}
+
+fun <F, D, E> ForKleisli(MF: MonadError<F, E>): KleisliMtlContextPartiallyApplied<F, D, E> =
+  KleisliMtlContextPartiallyApplied(MF)

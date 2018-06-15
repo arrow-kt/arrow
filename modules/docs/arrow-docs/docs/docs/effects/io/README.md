@@ -12,7 +12,7 @@ This means `IO` is the data type of choice when interacting with the external en
 `IO` is used to represent operations that can be executed lazily and are capable of failing, generally with exceptions.
 This means that code wrapped inside `IO` will not throw exceptions until it is run, and those exceptions can be captured inside `IO` for the user to check.
 
-The first challenge for someone new to effects with`IO`is evaluating its result. Given that `IO` is used to wrap operations with the environment, 
+The first challenge for someone new to effects with`IO`is evaluating its result. Given that `IO` is used to wrap operations with the environment,
 the return value after completion is commonly used in another part of the program.
 Coming from an OOP background the simplest way to use the return value of `IO` is to consider it as an asynchronous operation you can register a callback for.
 
@@ -22,6 +22,8 @@ Coming from an OOP background the simplest way to use the return value of `IO` i
 Running in this context means evaluating the content of an `IO` object, and propagating its result in a synchronous, asynchronous, or deferred way.
 
 Note that `IO` objects can be run multiple times, and depending on how they are constructed they will evaluate its content again every time they're run.
+
+The general good practice is to have a single unsafe run call per program, at the entry point. In backend applications or command line tools this can be at the main. For Android apps, specially those before Android 9.0, this could happen per Activity.
 
 ### attempt
 
@@ -39,6 +41,8 @@ Takes as a parameter a callback from a result of `Either<Throwable, A>` to a new
 All exceptions that would happen on the function parameter are automatically captured and propagated to the `IO<Unit>` return.
 
 It runs the current `IO` asynchronously, calling the callback parameter on completion and returning its result.
+
+The operation will not yield a result immediately; ultimately to start running the suspended computation you have to evaluate that new instance using an unsafe operator like `unsafeRunAsync` or `unsafeRunSync` for `IO`.
 
 ```kotlin
 IO<Int> { throw RuntimeException("Boom!") }
@@ -79,7 +83,7 @@ IO<Int> { throw RuntimeException("Boom!") }
 ```
 
 ```kotlin
-IO.runAsync<Int> { }
+IO.async<Int> { }
   .attempt()
   .unsafeRunTimed(100.milliseconds)
 ```
@@ -112,12 +116,12 @@ IO { 1 }
 As we have seen above, the way of constructing an `IO` affects its behavior when run multiple times.
 Understanding the constructors is key to mastering `IO`.
 
-### pure
+### just
 
 Used to wrap single values. It creates an`IO`that returns an existing value.
 
 ```kotlin
-IO.pure(1)
+IO.just(1)
   .unsafeRunSync()
 ```
 
@@ -169,7 +173,7 @@ IO.merge ({ 1 }, { 2 }, { throw RuntimeException("Boom!") })
 Used to defer the evaluation of an existing `IO`.
 
 ```kotlin
-IO.suspend { IO.pure(1) }
+IO.suspend { IO.just(1) }
   .attempt()
   .unsafeRunSync()
 ```
@@ -200,14 +204,18 @@ IO.async<Int> { callback ->
 
 ## Effect Comprehensions
 
-`IO` is usually best paired with [comprehensions]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) to get a cleaner syntax.
-[Comprehensions]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) also enable cancellation and parallelization of IO effects.
+`IO` is usually best paired with [comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) to get a cleaner syntax.
+[Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) also enable cancellation and parallelization of IO effects.
 
 ```kotlin
-IO.monad().binding {
+import arrow.typeclasses.*
+import arrow.effects.*
+
+ForIO extensions {
+  binding {
     val file = getFile("/tmp/file.txt").bind()
     val lines = file.readLines().bind()
-    val average = 
+    val average =
       if (lines.isEmpty()) {
         0
       } else {
@@ -219,15 +227,18 @@ IO.monad().binding {
   .fix()
   .attempt()
   .unsafeRunSync()
+}
 ```
 
 ## Syntax
 
 ### A#liftIO
 
-Puts the value `A` inside an `IO<A>` using `pure`.
+Puts the value `A` inside an `IO<A>` using `just`.
 
-```kotlin
+```kotlin:ank
+import arrow.effects.*
+
 1.liftIO()
   .attempt()
   .unsafeRunSync()
@@ -237,12 +248,14 @@ Puts the value `A` inside an `IO<A>` using `pure`.
 
 IO implements all the operators common to all instances of [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}). Those include `map`, `flatMap`, and `handleErrorWith`.
 
-You can see all the type classes `IO` implements below:
 
-```kotlin:ank
-import arrow.*
-import arrow.effects.*
-import arrow.debug.*
+## Available Instances
 
-showInstances<ForIO, Throwable>()
-```
+* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+* [ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
+* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+* [MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
+* [MonadDefer]({{ '/docs/effects/monaddefer/' | relative_url }})
+* [Async]({{ '/docs/effects/async' | relative_url }})
+* [Effect]({{ '/docs/effects/effect' | relative_url }})

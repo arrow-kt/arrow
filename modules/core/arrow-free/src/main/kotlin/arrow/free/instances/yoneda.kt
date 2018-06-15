@@ -6,5 +6,15 @@ import arrow.typeclasses.Functor
 
 @instance(Yoneda::class)
 interface YonedaFunctorInstance<U> : Functor<YonedaPartialOf<U>> {
-    override fun <A, B> map(fa: YonedaOf<U, A>, f: (A) -> B): Yoneda<U, B> = fa.fix().map(f)
+  override fun <A, B> Kind<YonedaPartialOf<U>, A>.map(f: (A) -> B): Yoneda<U, B> = fix().map(f)
 }
+
+class YonedaContext<U> : YonedaFunctorInstance<U>
+
+class YonedaContextPartiallyApplied<U> {
+  infix fun <A> extensions(f: YonedaContext<U>.() -> A): A =
+    f(YonedaContext())
+}
+
+fun <U> ForYoneda(): YonedaContextPartiallyApplied<U> =
+  YonedaContextPartiallyApplied()

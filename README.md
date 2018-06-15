@@ -2,8 +2,9 @@
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
 [![Build Status](https://travis-ci.org/arrow-kt/arrow.svg?branch=master)](https://travis-ci.org/arrow-kt/arrow/)
-[![Kotlin version badge](https://img.shields.io/badge/kotlin-1.2.0-blue.svg)](http://kotlinlang.org/)
+[![Kotlin version badge](https://img.shields.io/badge/kotlin-1.2.41-blue.svg)](http://kotlinlang.org/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+[![codecov](https://codecov.io/gh/arrow-kt/arrow/branch/master/graph/badge.svg)](https://codecov.io/gh/arrow-kt/arrow)
 
 Λrrow is a library for Typed Functional Programming in Kotlin.
 It includes the most popular data types, type classes and abstractions such as `Option`, `Try`, `Either`, `IO`, `Functor`, `Applicative`, `Monad` and many more empowering users to define pure FP apps and libraries built atop higher order abstractions. Use the below list to learn more about Λrrow's main features.
@@ -38,25 +39,28 @@ Add the dependencies into the project's `build.gradle`
 
 ```groovy
 dependencies {
-    compile 'io.arrow-kt:arrow-core:0.6.1'
-    compile 'io.arrow-kt:arrow-typeclasses:0.6.1' 
-    compile 'io.arrow-kt:arrow-data:0.6.1' 
-    compile 'io.arrow-kt:arrow-instances:0.6.1'
-    compile 'io.arrow-kt:arrow-syntax:0.6.1'
-    kapt    'io.arrow-kt:arrow-annotations-processor:0.6.1' 
+    compile 'io.arrow-kt:arrow-core:0.7.2'
+    compile 'io.arrow-kt:arrow-syntax:0.7.2'
+    compile 'io.arrow-kt:arrow-typeclasses:0.7.2' 
+    compile 'io.arrow-kt:arrow-data:0.7.2' 
+    compile 'io.arrow-kt:arrow-instances-core:0.7.2'
+    compile 'io.arrow-kt:arrow-instances-data:0.7.2'
+    kapt    'io.arrow-kt:arrow-annotations-processor:0.7.2' 
     
-    compile 'io.arrow-kt:arrow-free:0.6.1' //optional
-    compile 'io.arrow-kt:arrow-mtl:0.6.1' //optional
-    compile 'io.arrow-kt:arrow-effects:0.6.1' //optional
-    compile 'io.arrow-kt:arrow-effects-rx2:0.6.1' //optional
-    compile 'io.arrow-kt:arrow-effects-kotlinx-coroutines:0.6.1' //optional
-    compile 'io.arrow-kt:arrow-optics:0.6.1' //optional
+    compile 'io.arrow-kt:arrow-free:0.7.2' //optional
+    compile 'io.arrow-kt:arrow-mtl:0.7.2' //optional
+    compile 'io.arrow-kt:arrow-effects:0.7.2' //optional
+    compile 'io.arrow-kt:arrow-effects-rx2:0.7.2' //optional
+    compile 'io.arrow-kt:arrow-effects-kotlinx-coroutines:0.7.2' //optional
+    compile 'io.arrow-kt:arrow-optics:0.7.2' //optional
+    compile 'io.arrow-kt:arrow-generic:0.7.2' //optional
+    compile 'io.arrow-kt:arrow-recursion:0.7.2' //optional
 }
 ```
 
 # Additional Setup
 
-For projects that wish to use their own `@higherkind`, `@deriving` and other meta programming facilities provided by Λrrow
+For projects that wish to use their own `@higherkind`, `@optics` and other meta programming facilities provided by Λrrow
 the setup below is also required:
 
 Add the dependencies into the project's `build.gradle`
@@ -67,7 +71,7 @@ apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //optiona
 
 dependencies {
     ...
-    kapt    'io.arrow-kt:arrow-annotations-processor:0.6.1' //optional
+    kapt    'io.arrow-kt:arrow-annotations-processor:0.7.2' //optional
     ...
 }
 ```
@@ -122,7 +126,7 @@ idea {
 
 # License
 
-    Copyright (C) 2017 The Arrow Authors
+    Copyright (C) 2017 The Λrrow Authors
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

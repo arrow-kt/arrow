@@ -54,8 +54,6 @@ Luckily Arrow offers some nice solutions [`Functional Error Handling` docs]({{ '
 Now we can model our error domain with ease.
 
 ```kotlin:ank:silent
-import arrow.syntax.either.*
-
 sealed class StackError {
     object StackEmpty : StackError()
 }
@@ -99,54 +97,60 @@ The only thing we can do is handle this with `StateT`. We want to wrap `State` w
 `EitherKindPartial` is an alias that helps us to fix `StackError` as the left type parameter for `Either<L, R>`.
 
 ```kotlin:ank
-fun popS() = StateT<EitherPartialOf<StackError>, Stack, String> { stack ->
+fun popS() = StateT<EitherPartialOf<StackError>, Stack, String>(Either.monad()) { stack: Stack ->
     if (stack.isEmpty()) StackEmpty.left()
     else stack.first().let {
         stack.drop(1) toT it
     }.right()
 }
 
-fun pushS(s: String) = StateT<EitherPartialOf<StackError>, Stack, Unit> { stack ->
+fun pushS(s: String) = StateT<EitherPartialOf<StackError>, Stack, Unit>(Either.monad()) { stack: Stack ->
     (listOf(s, *stack.toTypedArray()) toT Unit).right()
 }
 
-fun stackOperationsS(): StateT<EitherPartialOf<StackError>, Stack, String> {
-    return pushS("a").flatMap({ _ ->
-        popS().flatMap({ _ ->
+fun stackOperationsS(): StateT<EitherPartialOf<StackError>, Stack, String> =
+    pushS("a").flatMap(Either.monad()) { _ ->
+        popS().flatMap(Either.monad()) { _ ->
             popS()
-        }, Either.monad())
-    }, Either.monad()).fix()
-}
+        }
+    }.fix()
 
-stackOperationsS().runM(listOf("hello", "world", "!"))
+stackOperationsS().runM(Either.monad<StackError>(), listOf("hello", "world", "!"))
 ```
 ```kotlin:ank
-stackOperationsS().runM(listOf())
+stackOperationsS().runM(Either.monad<StackError>(), listOf())
 ```
 
 While our code looks very similar to what we had before there are some key advantages. State management is now contained within `State` and we are dealing only with 1 monad instead of 2 nested monads so we can use monad bindings!
 
 ```kotlin:ank
-fun stackOperationsS2() = StateT .monad<EitherPartialOf<StackError>, Stack>().binding {
+import arrow.typeclasses.*
+import arrow.instances.*
+
+fun stackOperationsS2() = 
+ ForStateT<EitherPartialOf<StackError>, Stack, StackError>(Either.monadError<StackError>()) extensions {
+  binding {
     pushS("a").bind()
     popS().bind()
     val string = popS().bind()
     string
-}.fix()
+  }.fix()
+ }
 
-stackOperationsS2().runM(listOf("hello", "world", "!"))
+stackOperationsS2().runM(Either.monad<StackError>(), listOf("hello", "world", "!"))
 ```
 
 ```kotlin:ank
-stackOperationsS2().runM(listOf())
+stackOperationsS2().runM(Either.monad<StackError>(), listOf())
 ```
 
-Available Instances:
+## Available Instances
 
-```kotlin:ank
-import arrow.debug.*
-
-showInstances<StateTPartialOf<EitherPartialOf<StackError>, Stack>, Unit>()
-```
+* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+* [ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
+* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+* [MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
+* [MonadState]({{ '/docs/typeclasses/monadstate' | relative_url }})
 
 Take a look at the [`EitherT` docs]({{ '/docs/datatypes/eithert' | relative_url }}) or [`OptionT` docs]({{ '/docs/datatypes/optiont' | relative_url }}) for an alternative version monad transformer for achieving different goals.

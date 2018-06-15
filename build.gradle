@@ -21,15 +21,14 @@ buildscript {
         gradleVersionsPluginVersion = '0.17.0'
         javaVersion = JavaVersion.VERSION_1_7
         kotlinTestVersion = '2.0.7'
-        kotlinVersion = '1.2.20'
-        daggerVersion = '2.5'
-        kotlinxCoroutinesVersion = '0.21.2'
+        kotlinVersion = '1.2.41'
+        daggerVersion = '2.15'
+        kotlinxCoroutinesVersion = '0.22.5'
         kotlinxCollectionsImmutableVersion = '0.1'
     }
 
     repositories {
         jcenter()
-        maven { url 'https://oss.jfrog.org/oss-snapshot-local/' }
         maven { url 'https://jitpack.io' }
         maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
         maven { url "https://dl.bintray.com/jetbrains/markdown/" }
@@ -40,7 +39,7 @@ buildscript {
         classpath "com.github.ben-manes:gradle-versions-plugin:$gradleVersionsPluginVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
-        classpath 'io.arrow-kt:ank-gradle-plugin:0.6.2-SNAPSHOT'
+        classpath 'io.arrow-kt:ank-gradle-plugin:0.7.1'
         classpath 'org.ajoberstar:gradle-git-publish:0.3.2'
     }
 }
@@ -48,9 +47,14 @@ buildscript {
 apply from: 'detekt.gradle.kts'
 
 allprojects {
+    apply plugin: 'base'
+
+    clean.doFirst {
+        delete "${rootDir}/infographic/arrow-infographic.txt"
+    }
+
     repositories {
         jcenter()
-        maven { url 'https://oss.jfrog.org/oss-snapshot-local/' }
         maven { url 'https://kotlin.bintray.com/kotlinx' }
         maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
         maven { url "http://dl.bintray.com/arrow-kt/arrow-kt" }
@@ -70,7 +74,7 @@ subprojects { project ->
     archivesBaseName = POM_ARTIFACT_ID
 
     jacoco {
-        toolVersion '0.7.8'
+        toolVersion '0.8.1'
     }
 
     task codeCoverageReport(type: JacocoReport) {
@@ -82,7 +86,7 @@ subprojects { project ->
         }
 
         classDirectories = fileTree(
-                dir: 'build/classes/main/arrow',
+                dir: 'build/classes/kotlin/main',
         )
 
         sourceDirectories = files('src/main/kotlin')
@@ -113,6 +117,10 @@ subprojects { project ->
         }
     }
 
+    tasks.withType(Test) {
+        maxParallelForks = Runtime.runtime.availableProcessors()
+    }
+
     build.dependsOn ':detekt'
 
     sourceCompatibility = javaVersion
@@ -134,11 +142,11 @@ tasks.create('repl') {
     doFirst {
         javaexec {
             classpath(
-                classpathConfig.resolvedConfiguration.resolvedArtifacts.findAll {
-                    it.moduleVersion.id.group == 'org.jetbrains.kotlin'
-                }.collect {
-                    it.file
-                }
+                    classpathConfig.resolvedConfiguration.resolvedArtifacts.findAll {
+                        it.moduleVersion.id.group == 'org.jetbrains.kotlin'
+                    }.collect {
+                        it.file
+                    }
             )
             main = "org.jetbrains.kotlin.cli.jvm.K2JVMCompiler"
             standardInput = System.in
@@ -152,3 +160,7 @@ task wrapper(type: Wrapper) {
 }
 
 apply plugin: 'com.github.ben-manes.versions'
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}

@@ -1,20 +1,15 @@
-package arrow
+package arrow.optics
 
 import kotlin.annotation.AnnotationRetention.SOURCE
 import kotlin.annotation.AnnotationTarget.CLASS
 
 @Retention(SOURCE)
 @Target(CLASS)
-annotation class lenses
+/**
+ * Empty arrays means "Everything that matches annotated class"
+ */
+annotation class optics(val targets: Array<OpticsTarget> = [])
 
-@Retention(SOURCE)
-@Target(CLASS)
-annotation class prisms
-
-@Retention(SOURCE)
-@Target(CLASS)
-annotation class isos
-
-@Retention(SOURCE)
-@Target(CLASS)
-annotation class optionals
+enum class OpticsTarget {
+  ISO, LENS, PRISM, OPTIONAL, DSL
+}

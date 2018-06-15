@@ -18,8 +18,8 @@ For a structure `List<Int>` we can create an `Optional` to focus an optional hea
 
 ```kotlin:ank
 import arrow.*
+import arrow.core.*
 import arrow.optics.*
-import arrow.syntax.either.*
 
 val optionalHead: Optional<List<Int>, Int> = Optional(
     getOrModify = { list -> list.firstOrNull()?.right() ?: list.left() },
@@ -35,8 +35,6 @@ import arrow.optics.instances.*
 listHead<Int>().set(listOf(1, 3, 6), 5)
 ```
 ```kotlin:ank
-import arrow.data.*
-
 listHead<Int>().modify(listOf(1, 3, 6)) { head -> head * 5 }
 ```
 
@@ -91,23 +89,26 @@ triedEmail.getOption(Try.Failure(IllegalStateException("Something wrong with net
 
 ### Generating optional
 
-To avoid boilerplate, optionals can be generated for `A?` and `Option<A>` fields for a `data class`. The `Optionals` will be generated in the same package as `data class` and will have `Optional` suffix.
+To avoid boilerplate, optionals can be generated for `A?` and `Option<A>` fields for a `data class`.
+The `Optionals` will be generated as extension properties on the companion object `val T.Companion.paramName`.
 
 ```kotlin
-@optionals data class Point2D(val x: Int, val y: Int, val color: Int?)
-
-val optional: Optional<Point2D, Int> = point2dColorOptional()
+@optics data class Person(val age: Int?, val address: Option<Address>) {
+  companion object
+}
+```
+```kotlin:ank:silent
+val optionalAge: Optional<Person, Int> = Person.age
+val optionalAddress: Optional<Person, Address> = Person.address
 ```
 
 ### Polymorphic optional
 
-A `POptional` is very similar to [PLens](docs/optics/Lens#Plens) and [PPrism](docs/optics/Prism/Prism#PPrism) so lets see if we can combine both examples shown in their documentation.
+A `POptional` is very similar to [PLens](/docs/optics/lens#Plens) and [PPrism](/docs/optics/prism#PPrism) so lets see if we can combine both examples shown in their documentation.
 
 Given a `PPrism` with a focus into `Success` of `Try<Tuple2<Int, String>>` that can polymorphically change its content to `Tuple2<String, String>` and a `PLens` with a focus into the `Tuple2<Int, String>` that can morph the first parameter from `Int` to `String`. We can compose them together build an `Optional` that can look into `Try` and morph the first type of the `Tuple2` within.
 
 ```kotlin:ank
-import arrow.core.*
-
 val pprism = pTrySuccess<Tuple2<Int, String>, Tuple2<String, String>>()
 val plens = pFirstTuple2<Int, String, String>()
 

@@ -20,39 +20,54 @@ a.combine(b.combine(c))
 
 for all possible values of a, b ,c.
 
-There are instances of `Semigroup` defined for many types found in Arrow and the Kotlin std lib. 
+There are instances of `Semigroup` defined for many types found in Arrow and the Kotlin std lib.
 For example, `Int` values are combined using addition by default but multiplication is also associative and forms another `Semigroup`.
 
 ### Examples
 
 Now that you've learned about the Semigroup instance for Int try to guess how it works in the following examples:
 
-```kotlin:ank:silent
-import arrow.*
-```
-
 ```kotlin:ank
+import arrow.*
 import arrow.typeclasses.*
+import arrow.instances.*
 
-semigroup<Int>().combine(1, 2)
+ForInt extensions { 1.combine(2) }
 ```
 
 ```kotlin:ank   
 import arrow.data.*
 
-ListK.semigroup<Int>().combine(listOf(1, 2, 3).k(), listOf(4, 5, 6).k())
+ListK.semigroup<Int>().run { listOf(1, 2, 3).k().combine(listOf(4, 5, 6).k()) }
 ```
 
 ```kotlin:ank
 import arrow.core.*
 
-Option.monoid<Int>().combine(Option(1), Option(2))
+Option.monoid<Int>(Int.semigroup()).run { Option(1).combine(Option(2)) }
 ```
 
 ```kotlin:ank
-Option.monoid<Int>().combine(Option(1), None)
+Option.monoid<Int>(Int.semigroup()).run { Option(1).combine(None) }
 ```
 
 Many of these types have methods defined directly on them, which allow for such combining, e.g. `+` on `List`, but the value of having a `Semigroup` typeclass available is that these compose.
 
+Additionaly `Semigroup` adds `+` syntax to all types for which a Semigroup instance exists:
+
+```kotlin:ank
+Option.monoid<Int>(Int.semigroup()).run {
+  Option(1) + Option(2)
+}
+```
+
 Contents partially adapted from [Scala Exercises Cat's Semigroup Tutorial](https://www.scala-exercises.org/cats/semigroup)
+
+
+### Data Types
+
+The following data types in Arrow provide instances that adhere to the `Semigroup` type class.
+
+- [NonEmptyList]({{ '/docs/datatypes/nonemptylist' | relative_url }})
+- [SequenceK]({{ '/docs/datatypes/sequencek' | relative_url }})
+- [SetK]({{ '/docs/datatypes/setk' | relative_url }})

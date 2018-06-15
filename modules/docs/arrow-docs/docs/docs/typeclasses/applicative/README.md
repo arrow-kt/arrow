@@ -8,7 +8,7 @@ permalink: /docs/typeclasses/applicative/
 
 The `Applicative` typeclass abstracts the ability to lift values and apply functions over the computational context of a type constructor.
 Examples of type constructors that can implement instances of the Applicative typeclass include `Option`, `NonEmptyList`,
-`List` and many other datatypes that include a `pure` and either `ap` function. `ap` may be derived for monadic types that include a `Monad` instance via `flatMap`.
+`List` and many other datatypes that include a `just` and either `ap` function. `ap` may be derived for monadic types that include a `Monad` instance via `flatMap`.
 
 `Applicative` includes all combinators present in [`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }}).
 
@@ -29,11 +29,9 @@ fun addressService(): Option<List<String>> = Some(listOf("1 Main Street", "11130
 
 This more or less illustrate the common use case of performing several independent operations where we need to get all the results together
 
-The module arrow-syntax features several methods related to [Applicative Builders]({{ '/docs/patterns/applicative_builder' | relative_url }}) that allow you to easily combine all the independent operations into one result.
+The typeclass features several methods related to Applicative Builders that allow you to easily combine all the independent operations into one result.
 
 ```kotlin:ank
-import arrow.syntax.applicative.*
-
 data class Profile(val name: String, val phone: Int, val address: List<String>)
 
 val r: Option<Tuple3<String, Int, List<String>>> = Option.applicative().tupled(profileService(), phoneService(), addressService()).fix()
@@ -50,55 +48,38 @@ Option.applicative().map(profileService(), phoneService(), addressService(), { (
 
 ### Main Combinators
 
-#### pure
+#### just
 
-A constructor function.
+A constructor function, also known as `pure` in other languages.
 It lifts a value into the computational context of a type constructor.
 
-`fun <A> pure(a: A): Kind<F, A>`
+`fun <A> just(a: A): Kind<F, A>`
 
 ```kotlin:ank
-Option.pure(1) // Some(1)
-```
-
-#### ap
-
-Apply a function inside the type constructor's context
-
-`fun <A, B> ap(fa: Kind<F, A>, ff: Kind<F, (A) -> B>): Kind<F, B>`
-
-```kotlin:ank
-Option.applicative().ap(Some(1), Some({ n: Int -> n + 1 })) // Some(2)
-```
-
-#### Other combinators
-
-For a full list of other useful combinators available in `Applicative` see the [Source][applicative_source]{:target="_blank"}
-
-### Syntax
-
-#### Kind<F, A>#pure
-
-Lift a value into the computational context of a type constructor
-
-```kotlin:ank
-1.pure<ForOption, Int>()
+Option.just(1) // Some(1)
 ```
 
 #### Kind<F, A>#ap
 
 Apply a function inside the type constructor's context
 
+`fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B>`
+
 ```kotlin:ank
-Some(1).ap(Some({ n: Int -> n + 1 }))
+Option.applicative().run { Some(1).ap(Some({ n: Int -> n + 1 })) }
 ```
+
+#### Other combinators
+
+For a full list of other useful combinators available in `Applicative` see the [Source][applicative_source]{:target="_blank"}
+
 
 #### Kind<F, A>#map2
 
 Map 2 values inside the type constructor context and apply a function to their cartesian product
 
 ```kotlin:ank
-Option.applicative().map2(Some(1), Some("x"), { z: Tuple2<Int, String> ->  "${z.a}${z.b}" })
+Option.applicative().run { Some(1).map2(Some("x")) { z: Tuple2<Int, String> ->  "${z.a}${z.b}" } }
 ```
 
 #### Kind<F, A>#map2Eval
@@ -107,9 +88,8 @@ Lazily map 2 values inside the type constructor context and apply a function to 
 Computation happens when `.value()` is invoked.
 
 ```kotlin:ank
-Option.applicative().map2Eval(Some(1), Eval.later { Some("x") }, { z: Tuple2<Int, String> ->  "${z.a}${z.b}" }).value()
+Option.applicative().run { Some(1).map2Eval(Eval.later { Some("x") }, { z: Tuple2<Int, String> ->  "${z.a}${z.b}" }).value() }
 ```
-
 
 ### Laws
 
@@ -121,13 +101,13 @@ Arrow already provides Applicative instances for most common datatypes both in A
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own Applicative instances for custom datatypes.
 
-### Data types
+### Data Types
 
 The following datatypes in Arrow provide instances that adhere to the `Applicative` typeclass.
 
 - [Either]({{ '/docs/datatypes/either' | relative_url }})
 - [EitherT]({{ '/docs/datatypes/eithert' | relative_url }})
-- [FreeApplicative]({{ '/docs/datatypes/freeapplicative' | relative_url }})
+- [FreeApplicative]({{ '/docs/free/freeapplicative' | relative_url }})
 - [Function1]({{ '/docs/datatypes/function1' | relative_url }})
 - [Ior]({{ '/docs/datatypes/ior' | relative_url }})
 - [Kleisli]({{ '/docs/datatypes/kleisli' | relative_url }})
@@ -148,4 +128,3 @@ since they are all subtypes of `Applicative`.
 
 [applicative_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-data/src/main/kotlin/arrow/typeclasses/Applicative.kt
 [applicative_law_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/ApplicativeLaws.kt
-
