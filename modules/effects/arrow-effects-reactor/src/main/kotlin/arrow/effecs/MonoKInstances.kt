@@ -2,60 +2,95 @@ package arrow.effecs
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.effects.Async
-import arrow.effects.Effect
-import arrow.effects.MonadSuspend
-import arrow.effects.Proc
+import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.Effect
+import arrow.effects.typeclasses.MonadDefer
+import arrow.effects.typeclasses.Proc
 import arrow.instance
+import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 
 @instance(MonoK::class)
-interface MonoKApplicativeErrorInstance :
-        MonoKApplicativeInstance,
-        ApplicativeError<ForMonoK, Throwable> {
-    override fun <A> raiseError(e: Throwable): MonoK<A> =
-            MonoK.raiseError(e)
+interface MonoKFunctorInstance : Functor<ForMonoK> {
+  override fun <A, B> Kind<ForMonoK, A>.map(f: (A) -> B): MonoK<B> =
+      fix().map(f)
+}
 
-    override fun <A> handleErrorWith(fa: MonoKOf<A>, f: (Throwable) -> MonoKOf<A>): MonoK<A> =
-            fa.handleErrorWith { f(it).fix() }
+@instance(MonoK::class)
+interface MonoKApplicativeInstance : Applicative<ForMonoK> {
+  override fun <A, B> MonoKOf<A>.ap(ff: MonoKOf<(A) -> B>): MonoK<B> =
+      fix().ap(ff)
+
+  override fun <A, B> Kind<ForMonoK, A>.map(f: (A) -> B): MonoK<B> =
+      fix().map(f)
+
+  override fun <A> just(a: A): MonoK<A> =
+      MonoK.just(a)
+}
+
+@instance(MonoK::class)
+interface MonoKMonadInstance : Monad<ForMonoK> {
+  override fun <A, B> MonoKOf<A>.ap(ff: MonoKOf<(A) -> B>): MonoK<B> =
+      fix().ap(ff)
+
+  override fun <A, B> MonoKOf<A>.flatMap(f: (A) -> Kind<ForMonoK, B>): MonoK<B> =
+      fix().flatMap(f)
+
+  override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
+      fix().map(f)
+
+  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, MonoKOf<arrow.core.Either<A, B>>>): MonoK<B> =
+      MonoK.tailRecM(a, f)
+
+  override fun <A> just(a: A): MonoK<A> =
+      MonoK.just(a)
+}
+
+@instance(MonoK::class)
+interface MonoKApplicativeErrorInstance :
+    MonoKApplicativeInstance,
+    ApplicativeError<ForMonoK, Throwable> {
+  override fun <A> raiseError(e: Throwable): MonoK<A> =
+      MonoK.raiseError(e)
+
+  override fun <A> MonoKOf<A>.handleErrorWith(f: (Throwable) -> MonoKOf<A>): MonoK<A> =
+      fix().handleErrorWith { f(it).fix() }
 }
 
 @instance(MonoK::class)
 interface MonoKMonadErrorInstance :
-        MonoKApplicativeErrorInstance,
-        MonoKMonadInstance,
-        MonadError<ForMonoK, Throwable> {
-    override fun <A, B> ap(fa: MonoKOf<A>, ff: MonoKOf<(A) -> B>): MonoK<B> =
-            super<MonoKMonadInstance>.ap(fa, ff)
+    MonoKMonadInstance,
+    MonadError<ForMonoK, Throwable> {
+  override fun <A> raiseError(e: Throwable): MonoK<A> =
+      MonoK.raiseError(e)
 
-    override fun <A, B> map(fa: MonoKOf<A>, f: (A) -> B): MonoK<B> =
-            super<MonoKMonadInstance>.map(fa, f)
-
-    override fun <A> pure(a: A): MonoK<A> =
-            super<MonoKMonadInstance>.pure(a)
+  override fun <A> MonoKOf<A>.handleErrorWith(f: (Throwable) -> MonoKOf<A>): MonoK<A> =
+      fix().handleErrorWith { f(it).fix() }
 }
 
 @instance(MonoK::class)
-interface MonoKMonadSuspendInstance :
-        MonoKMonadErrorInstance,
-        MonadSuspend<ForMonoK> {
-    override fun <A> suspend(fa: () -> Kind<ForMonoK, A>): Kind<ForMonoK, A> =
-            MonoK.suspend(fa)
+interface MonoKMonadDeferInstance :
+    MonoKMonadErrorInstance,
+    MonadDefer<ForMonoK> {
+  override fun <A> defer(fa: () -> MonoKOf<A>): MonoK<A> =
+      MonoK.defer(fa)
 }
 
 @instance(MonoK::class)
 interface MonoKAsyncInstance :
-        MonoKMonadSuspendInstance,
-        Async<ForMonoK> {
-    override fun <A> async(fa: Proc<A>): Kind<ForMonoK, A> =
-            MonoK.runAsync(fa)
+    MonoKMonadDeferInstance,
+    Async<ForMonoK> {
+  override fun <A> async(fa: Proc<A>): MonoK<A> =
+      MonoK.async(fa)
 }
 
 @instance(MonoK::class)
 interface MonoKEffectInstance :
-        MonoKAsyncInstance,
-        Effect<ForMonoK> {
-    override fun <A> runAsync(fa: MonoKOf<A>, cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Unit> =
-            fa.fix().runAsync(cb)
+    MonoKAsyncInstance,
+    Effect<ForMonoK> {
+  override fun <A> MonoKOf<A>.runAsync(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Unit> =
+      fix().runAsync(cb)
 }
