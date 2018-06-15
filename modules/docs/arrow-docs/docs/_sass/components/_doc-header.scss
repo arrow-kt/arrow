@@ -3,21 +3,37 @@
 // -----------------------------------------------
 .doc-header {
     @include flexbox;
-    @include justify-content(flex-end);
+    @include justify-content(space-between);
     @include align-items(center);
     height: ($base-point-grid * 11);
     padding: 0 ($base-point-grid * 4);
     background: $white;
 
-    .search {
+    .search-wrapper {
+      position: relative;
+      &:after {
+        color: #4b74e5;
+        content: "\f002";
         display: block;
-        width: 100%;
-        padding: $base-point-grid 0;
-        font-family: $base-font-family;
-        font-size: $base-font-size;
-        color: $brand-secondary;
-        border: none;
-        cursor: auto;
+        font-family: FontAwesome;
+        font-size: 1rem;
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translate(0, -50%);
+      }
+      .search {
+          display: block;
+          width: 100%;
+          padding: $base-point-grid 0;
+          font-family: $base-font-family;
+          font-size: $base-font-size;
+          color: $brand-secondary;
+          margin-left: 1.5rem;
+          border: none;
+          cursor: auto;
+          position: relative;
+      }
     }
 
     a {
