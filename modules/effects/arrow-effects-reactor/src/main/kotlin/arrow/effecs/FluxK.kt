@@ -38,7 +38,7 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
 
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
     fun loop(fa_p: FluxK<A>): Eval<B> = when {
-      fa_p.flux.hasElements().block() -> lb
+      fa_p.flux.hasElements().map { !it }.block() -> lb
       else -> f(fa_p.flux.blockFirst(), Eval.defer { loop(fa_p.flux.skip(1).k()) })
     }
 

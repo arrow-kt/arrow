@@ -13,10 +13,12 @@ import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.binding
 import arrow.typeclasses.bindingCatch
 import io.kotlintest.KTestJUnitRunner
 import org.junit.runner.RunWith
 import reactor.core.publisher.Flux
+import reactor.test.StepVerifier
 import reactor.test.test
 import java.time.Duration
 
@@ -66,15 +68,23 @@ class FluxKTest : UnitSpec() {
     }
 
     "Flux cancellation forces binding to cancel without completing too" {
-      val value = FluxK.monadErrorFlat().bindingCatch {
-        val a = Flux.just(0).delayElements(Duration.ofSeconds(3)).k().bind()
+      val value: Flux<Long> = FluxK.monadErrorFlat().binding {
+        val a = Flux.just(0L).delayElements(Duration.ofSeconds(3)).k().bind()
         a
       }.value()
 
-      val test = value.doOnSubscribe { subscription -> Flux.just(0).delayElements(Duration.ofSeconds(1)).subscribe { subscription.cancel() } }.test()
+      val test = value.doOnSubscribe { subscription ->
+        Flux.just(0L).delayElements(Duration.ofSeconds(1))
+            .subscribe { subscription.cancel() }
+      }.test()
+
       test
+          .thenAwait(Duration.ofSeconds(5))
           .expectNextCount(0)
-          .verifyComplete()
+          .thenCancel()
+          .verifyThenAssertThat()
+          .hasNotDroppedElements()
+          .hasNotDroppedErrors()
     }
 
   }

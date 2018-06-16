@@ -110,9 +110,8 @@ interface FluxKMonadDeferInstance :
 interface FluxKAsyncInstance :
     FluxKMonadDeferInstance,
     Async<ForFluxK> {
-  override fun <A> async(fa: Proc<A>): FluxK<A> {
-    return FluxK.runAsync(fa)
-  }
+  override fun <A> async(fa: Proc<A>): FluxK<A> =
+      FluxK.runAsync(fa)
 }
 
 @instance(FluxK::class)
