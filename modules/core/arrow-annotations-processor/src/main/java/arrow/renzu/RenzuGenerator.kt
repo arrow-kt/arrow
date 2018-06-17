@@ -6,6 +6,7 @@ import arrow.instances.AnnotatedInstance
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.supertypes
 import java.io.File
+import java.util.Comparator
 import javax.lang.model.element.Name
 
 data class Instance(val target: AnnotatedInstance) {
@@ -86,7 +87,7 @@ class RenzuGenerator(
             setOf(instance),
             parentTypeClasses.toSet()))
         }
-      })
+      }).toSortedMap(Comparator<TypeClass> { o1, o2 -> o1.simpleName.compareTo(o2.simpleName) })
     }
 
   fun generate() {
@@ -121,14 +122,14 @@ class RenzuGenerator(
     val notCollidingFileRelations: List<String> = fileRelations
       .filterNot { rel ->
         rel.isInstanceRelation() && generatedRelations.find { it.contains(rel.instancesBlockName()) } != null
-      }
+      }.sorted()
 
     val notCollidingGeneratedRelations: List<String> = generatedRelations
       .toSet()
       .filterNot { fileRelations.contains(it) }
       .filterNot { rel ->
         rel.isInstanceRelation() && fileRelations.find { it.contains(rel.instancesBlockName()) } != null
-      }
+      }.sorted()
 
     val source = (notCollidingFileRelations +
       notCollidingGeneratedRelations +
@@ -153,7 +154,7 @@ class RenzuGenerator(
       }!!.instanceNames()
 
       val composedInstances = (collidingRelationInstances + generatedCollidingRelationInstances)
-        .toSet()
+        .toSortedSet()
         .joinToString("|")
 
       "[<typeclasses>${collidingRelation.typeClassName()}]<-[<instances>${collidingRelation.typeClassName()
@@ -197,7 +198,7 @@ class RenzuGenerator(
       parentTypeClasses.filter { typeClass.simpleName != it.simpleName }.map {
         "[<typeclasses>${it.simpleName}]<-[<typeclasses>${typeClass.simpleName}]"
       } +
-        "[<typeclasses>${typeClass.simpleName}]<-[<instances>${typeClass.simpleName} Instances|${instances
+        "[<typeclasses>${typeClass.simpleName}]<-[<instances>${typeClass.simpleName} Instances|${instances.sortedBy { it.name.toString() }
           .joinToString(separator = "|") { it.name.toString() }}]"
     }
 }
