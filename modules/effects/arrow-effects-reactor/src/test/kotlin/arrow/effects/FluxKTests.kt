@@ -16,14 +16,21 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.binding
 import arrow.typeclasses.bindingCatch
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldNotBe
+import org.hamcrest.CoreMatchers.not
+import org.hamcrest.CoreMatchers.startsWith
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.runner.RunWith
 import reactor.core.publisher.Flux
-import reactor.test.StepVerifier
+import reactor.core.scheduler.Schedulers
 import reactor.test.test
 import java.time.Duration
 
 @RunWith(KTestJUnitRunner::class)
 class FluxKTest : UnitSpec() {
+
+  fun <T> assertThreadNot(flux: Flux<T>, name: String): Flux<T> =
+      flux.doOnNext { assertThat(Thread.currentThread().name, not(startsWith(name))) }
 
   fun <T> EQ(): Eq<FluxKOf<T>> = object : Eq<FluxKOf<T>> {
     override fun FluxKOf<T>.eqv(b: FluxKOf<T>): Boolean =
@@ -65,6 +72,32 @@ class FluxKTest : UnitSpec() {
       value.test()
           .expectNext(0)
           .verifyComplete()
+    }
+
+    "Multi-thread Fluxes should run on their required threads" {
+      val originalThread: Thread = Thread.currentThread()
+      var threadRef: Thread? = null
+      val value: Flux<Long> = FluxK.monadErrorFlat().bindingCatch {
+        val a = Flux.just(0L)
+            .delayElements(Duration.ofSeconds(2), Schedulers.newSingle("newThread"))
+            .k()
+            .bind()
+        threadRef = Thread.currentThread()
+        val b = Flux.just(a)
+            .subscribeOn(Schedulers.newSingle("anotherThread"))
+            .k()
+            .bind()
+        b
+      }.value()
+
+      val nextThread = (threadRef?.name ?: "")
+
+      value.test()
+          .expectNextCount(1)
+          .verifyComplete()
+      nextThread shouldNotBe originalThread.name
+      assertThreadNot(value, originalThread.name)
+      assertThreadNot(value, nextThread)
     }
 
     "Flux cancellation forces binding to cancel without completing too" {
