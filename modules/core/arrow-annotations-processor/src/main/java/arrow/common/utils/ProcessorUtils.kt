@@ -169,12 +169,17 @@ fun ClassOrPackageDataWrapper.typeConstraints(): String =
     }
   }
 
-fun recurseFilesUpwards(fileName: String): File =
-  recurseFilesUpwards(fileName, File(".").absoluteFile)
+fun recurseFilesUpwards(fileNames: Set<String>): File =
+  recurseFilesUpwards(fileNames, File(".").absoluteFile)
 
-fun recurseFilesUpwards(fileName: String, currentDirectory: File): File =
-  if (currentDirectory.list().contains(fileName)) {
+fun recurseFilesUpwards(fileNames: Set<String>, currentDirectory: File): File {
+
+  val filesInDir = currentDirectory.list()
+
+  //Am I being to smart? Basically we want to check if there is an element that is in both fileNames and filesInDir
+  return if ((fileNames - filesInDir).isNotEmpty()) {
     currentDirectory
   } else {
-    recurseFilesUpwards(fileName, currentDirectory.parentFile)
+    recurseFilesUpwards(fileNames, currentDirectory.parentFile)
   }
+}
