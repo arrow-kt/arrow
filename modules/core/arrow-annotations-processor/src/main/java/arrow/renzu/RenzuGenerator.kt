@@ -145,16 +145,15 @@ class RenzuGenerator(
   private fun composedCollidingRelations(fileRelations: List<String>, generatedRelations: List<String>): List<String> {
     val collidingRelations = fileRelations.filter { rel ->
       rel.isInstanceRelation() && generatedRelations.find { it.contains(rel.instancesBlockName()) } != null
-    }
+    }.sorted()
 
     return collidingRelations.map { collidingRelation ->
-      val collidingRelationInstances = collidingRelation.instanceNames()
+      val collidingRelationInstances = collidingRelation.instanceNames().sorted()
       val generatedCollidingRelationInstances = generatedRelations.find {
         it.contains(collidingRelation.instancesBlockName())
-      }!!.instanceNames()
+      }!!.instanceNames().sorted()
 
       val composedInstances = (collidingRelationInstances + generatedCollidingRelationInstances)
-        .toSortedSet()
         .joinToString("|")
 
       "[<typeclasses>${collidingRelation.typeClassName()}]<-[<instances>${collidingRelation.typeClassName()
