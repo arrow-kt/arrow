@@ -176,7 +176,7 @@ fun recurseFilesUpwards(fileNames: Set<String>, currentDirectory: File): File {
 
   val filesInDir = currentDirectory.list()
 
-  return if ((fileNames.intersect(filesInDir)).isNotEmpty()) {
+  return if ((filesInDir.intersect(fileNames)).isNotEmpty()) {
     currentDirectory
   } else {
     recurseFilesUpwards(fileNames, currentDirectory.parentFile)
