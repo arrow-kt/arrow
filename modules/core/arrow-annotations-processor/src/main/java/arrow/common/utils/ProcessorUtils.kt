@@ -176,8 +176,7 @@ fun recurseFilesUpwards(fileNames: Set<String>, currentDirectory: File): File {
 
   val filesInDir = currentDirectory.list()
 
-  //Am I being to smart? Basically we want to check if there is an element that is in both fileNames and filesInDir
-  return if ((fileNames - filesInDir).isNotEmpty()) {
+  return if ((fileNames.intersect(filesInDir)).isNotEmpty()) {
     currentDirectory
   } else {
     recurseFilesUpwards(fileNames, currentDirectory.parentFile)
