@@ -6,7 +6,7 @@ permalink: /docs/recursion/mu/
 
 ## Mu
 
-The Mu data type is the simplest way to model recursion via a direct encoding of the 
+The Mu datatype is the simplest way to model recursion via a direct encoding of the
 cata function.
 
 ```kotlin
@@ -16,11 +16,11 @@ abstract class Mu<out F> : MuOf<F> {
 }
 ```
 
-`unMu` is isomorphic to cata. 
+`unMu` is isomorphic to cata.
 
 ### Comparison to Fix and Nu
 
-Mu guarantees that a data type will be finite, and should be used for any algorithms
+Mu guarantees that a datatype will be finite, and should be used for any algorithms
 that will only work on finite data (for example `sum`). Due to it being a direct encoding
 of cata, Mu also has a very fast Recursive instance.
 

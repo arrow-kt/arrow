@@ -28,18 +28,18 @@ The implementation for embed; takes a `Kind<F, Kind<T, F>>` and returns a `Kind<
 
 #### Functor<F>#ana
 
-Unfold generalized over any Coecursive `T` for any Functor `F`.
+Unfold generalized over any Corecursive `T` for any Functor `F`.
 
 `fun <F, A> Functor<F>.ana(a: A, coalg: Coalgebra<F, A>): Kind<T, F>`
 
 ### Laws
 
-Arrow provides `CorcursiveLaws` in the form of test cases for internal verification of 
-lawful instances and third party apps creating their own `Coecursive` instances.
+Arrow provides `CorecursiveLaws` in the form of test cases for internal verification of
+lawful instances and third party apps creating their own `Corecursive` instances.
 
 ### Data Types
 
-Arrow provides three datatypes that are instances of `Coecursive`, each modeling a
+Arrow provides three datatypes that are instances of `Corecursive`, each modeling a
 different way of defining corecursion.
 
 - [Fix]({{ 'docs/recursion/fix' | relative_url }})

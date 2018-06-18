@@ -6,7 +6,8 @@ permalink: /docs/recursion/birecursive/
 
 ## Birecursive
 
-A datatype that's both `Recursive` and `Corecursive`.
+A datatype that's both `Recursive` and `Corecursive`, which enables applying both `fold` and `unfold`
+operations to it.
 
 ### Data Types
 
