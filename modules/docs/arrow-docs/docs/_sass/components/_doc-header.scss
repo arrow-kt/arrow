@@ -10,6 +10,7 @@
     background: $white;
 
     .search-wrapper {
+      flex: 1 1 auto;
       position: relative;
       &:after {
         color: #4b74e5;
@@ -24,7 +25,7 @@
       }
       .search {
           display: block;
-          width: 100%;
+          width: calc(100% - 1.5rem);
           padding: $base-point-grid 0;
           font-family: $base-font-family;
           font-size: $base-font-size;
