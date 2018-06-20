@@ -666,7 +666,9 @@ table {
   background: #fff; }
   .doc-header .search-wrapper {
     flex: 1 1 auto;
-    position: relative; }
+    position: relative;
+    /* clears the 'X' from Internet Explorer */
+    /* clears the 'X' from Chrome */ }
     .doc-header .search-wrapper:after {
       color: #4b74e5;
       content: "\f002";
@@ -688,6 +690,19 @@ table {
       border: none;
       cursor: auto;
       position: relative; }
+    .doc-header .search-wrapper input[type=search]::-ms-clear {
+      display: none;
+      width: 0;
+      height: 0; }
+    .doc-header .search-wrapper input[type=search]::-ms-reveal {
+      display: none;
+      width: 0;
+      height: 0; }
+    .doc-header .search-wrapper input[type="search"]::-webkit-search-decoration,
+    .doc-header .search-wrapper input[type="search"]::-webkit-search-cancel-button,
+    .doc-header .search-wrapper input[type="search"]::-webkit-search-results-button,
+    .doc-header .search-wrapper input[type="search"]::-webkit-search-results-decoration {
+      display: none; }
   .doc-header a:hover {
     text-decoration: none; }
   .doc-header .fa {
