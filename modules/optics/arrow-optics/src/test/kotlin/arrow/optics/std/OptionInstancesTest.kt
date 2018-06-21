@@ -6,7 +6,6 @@ import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genEither
 import arrow.test.generators.genFunctionAToB
-import arrow.test.generators.genNullable
 import arrow.test.generators.genOption
 import arrow.test.laws.IsoLaws
 import arrow.test.laws.PrismLaws
@@ -41,7 +40,7 @@ class OptionInstancesTest : UnitSpec() {
 
     testLaws(IsoLaws.laws(
       iso = nullableToOption<Int>(),
-      aGen = genNullable(Gen.int()),
+      aGen = Gen.int().orNull(),
       bGen = genOption(Gen.int()),
       EQA = Eq.any(),
       EQB = Eq.any(),

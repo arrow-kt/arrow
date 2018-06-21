@@ -5,20 +5,19 @@ import io.kotlintest.properties.Gen
 
 data class Law(val name: String, val test: () -> Unit)
 
-inline fun <A> A.equalUnderTheLaw(b: A, eq: Eq<A>): Boolean =
+fun <A> A.equalUnderTheLaw(b: A, eq: Eq<A>): Boolean =
   eq.run { eqv(b) }
 
-fun <A> forFew(amount: Int, gena: Gen<A>, fn: (a: A) -> Boolean): Unit {
-  for (k in 0..amount) {
-    val a = gena.generate()
-    val passed = fn(a)
+fun <A> forFew(amount: Int, genA: Gen<A>, fn: (a: A) -> Boolean) {
+  val listA = genA.map(fn).random().toList()
+  listA.take(amount).forEachIndexed { index :Int ,passed:Boolean ->
     if (!passed) {
-      throw AssertionError("Property failed for\n$a)")
+      throw AssertionError("Property failed for\n${listA[index]})")
     }
   }
 }
 
-fun <A, B> forFew(amount: Int, gena: Gen<A>, genb: Gen<B>, fn: (a: A, b: B) -> Boolean): Unit {
+fun <A, B> forFew(amount: Int, gena: Gen<A>, genb: Gen<B>, fn: (a: A, b: B) -> Boolean) {
   for (k in 0..amount) {
     val a = gena.generate()
     val b = genb.generate()

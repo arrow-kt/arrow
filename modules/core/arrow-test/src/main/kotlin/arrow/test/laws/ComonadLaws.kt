@@ -14,14 +14,14 @@ object ComonadLaws {
 
   inline fun <F> laws(CM: Comonad<F>, noinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
     FunctorLaws.laws(CM, cf, EQ) + listOf(
-      Law("Comonad Laws: duplicate then extract is identity", { CM.duplicateThenExtractIsId(cf, EQ) }),
-      Law("Comonad Laws: duplicate then map into extract is identity", { CM.duplicateThenMapExtractIsId(cf, EQ) }),
-      Law("Comonad Laws: map and coflatmap are coherent", { CM.mapAndCoflatmapCoherence(cf, EQ) }),
-      Law("Comonad Laws: left identity", { CM.comonadLeftIdentity(cf, EQ) }),
-      Law("Comonad Laws: right identity", { CM.comonadRightIdentity(cf, EQ) }),
-      Law("Comonad Laws: cokleisli left identity", { CM.cokleisliLeftIdentity(cf, EQ) }),
-      Law("Comonad Laws: cokleisli right identity", { CM.cokleisliRightIdentity(cf, EQ) }),
-      Law("Comonad Laws: cobinding", { CM.cobinding(cf, EQ) })
+      Law("Comonad Laws: duplicate then extract is identity") { CM.duplicateThenExtractIsId(cf, EQ) },
+      Law("Comonad Laws: duplicate then map into extract is identity") { CM.duplicateThenMapExtractIsId(cf, EQ) },
+      Law("Comonad Laws: map and coflatmap are coherent") { CM.mapAndCoflatmapCoherence(cf, EQ) },
+      Law("Comonad Laws: left identity") { CM.comonadLeftIdentity(cf, EQ) },
+      Law("Comonad Laws: right identity") { CM.comonadRightIdentity(cf, EQ) },
+      Law("Comonad Laws: cokleisli left identity") { CM.cokleisliLeftIdentity(cf, EQ) },
+      Law("Comonad Laws: cokleisli right identity") { CM.cokleisliRightIdentity(cf, EQ) },
+      Law("Comonad Laws: cobinding") { CM.cobinding(cf, EQ) }
     )
 
   fun <F> Comonad<F>.duplicateThenExtractIsId(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =

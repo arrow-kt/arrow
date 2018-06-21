@@ -6,7 +6,6 @@ import arrow.data.*
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genNonEmptyList
-import arrow.test.generators.genNullable
 import arrow.test.generators.genOption
 import arrow.test.laws.IsoLaws
 import arrow.test.laws.OptionalLaws
@@ -60,7 +59,7 @@ class ListInstancesTest : UnitSpec() {
 
     testLaws(OptionalLaws.laws(
       optional = nullableOptional(),
-      aGen = genNullable(Gen.int()),
+      aGen = Gen.int().orNull(),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
       EQA = Eq.any(),

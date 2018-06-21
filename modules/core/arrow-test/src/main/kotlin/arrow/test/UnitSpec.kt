@@ -2,6 +2,7 @@ package arrow.test
 
 import arrow.test.laws.Law
 import arrow.typeclasses.Eq
+import io.kotlintest.Description
 import io.kotlintest.TestCase
 import io.kotlintest.specs.AbstractStringSpec
 
@@ -14,7 +15,7 @@ abstract class UnitSpec : AbstractStringSpec() {
     val flattened = laws.flatMap { list: List<Law> -> list.asIterable() }
     val distinct = flattened.distinctBy { law: Law -> law.name }
     return distinct.map { law: Law ->
-      val tc = TestCase(suite = rootTestSuite, name = law.name, test = law.test, config = defaultTestCaseConfig)
+      val tc = TestCase(description = Description.root(law.name), test = law.test , config = defaultTestCaseConfig)
       rootTestSuite.addTestCase(tc)
       tc
     }
