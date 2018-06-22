@@ -29,3 +29,6 @@
 @import "components/features";
 @import "components/font";
 @import "components/footer";
+@import "components/dropdown";
+
+@include dropdown($dropdown-config...);
