@@ -1,25 +1,30 @@
 package arrow.effects
 
+import arrow.effecs.FluxK
 import arrow.effecs.MonoK
 import arrow.effecs.MonoKOf
 import arrow.effecs.applicative
 import arrow.effecs.applicativeError
 import arrow.effecs.async
 import arrow.effecs.effect
+import arrow.effecs.foldable
 import arrow.effecs.functor
 import arrow.effecs.k
 import arrow.effecs.monad
 import arrow.effecs.monadDefer
 import arrow.effecs.monadError
+import arrow.effecs.traverse
 import arrow.effecs.value
 import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeErrorLaws
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.AsyncLaws
+import arrow.test.laws.FoldableLaws
 import arrow.test.laws.FunctorLaws
 import arrow.test.laws.MonadErrorLaws
 import arrow.test.laws.MonadLaws
 import arrow.test.laws.MonadSuspendLaws
+import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.bindingCatch
 import io.kotlintest.KTestJUnitRunner
@@ -64,14 +69,7 @@ class MonoKTest : UnitSpec() {
 
   init {
     testLaws(
-        FunctorLaws.laws(MonoK.functor(), { MonoK.just(it) }, EQ()),
-        ApplicativeLaws.laws(MonoK.applicative(), EQ()),
-        MonadLaws.laws(MonoK.monad(), EQ()),
-        MonadErrorLaws.laws(MonoK.monadError(), EQ(), EQ(), EQ()),
-        ApplicativeErrorLaws.laws(MonoK.applicativeError(), EQ(), EQ(), EQ()),
-        MonadSuspendLaws.laws(MonoK.monadDefer(), EQ(), EQ(), EQ()),
-        AsyncLaws.laws(MonoK.async(), EQ(), EQ(), EQ()),
-        AsyncLaws.laws(MonoK.effect(), EQ(), EQ())
+        AsyncLaws.laws(MonoK.async(), EQ(), EQ())
     )
 
     "Multi-thread Singles finish correctly" {
