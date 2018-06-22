@@ -1,4 +1,4 @@
-package arrow.effecs
+package arrow.effects
 
 import arrow.Kind
 import arrow.core.Either

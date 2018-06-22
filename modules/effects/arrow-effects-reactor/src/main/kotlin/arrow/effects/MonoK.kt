@@ -1,4 +1,4 @@
-package arrow.effecs
+package arrow.effects
 
 import arrow.core.Either
 import arrow.core.Either.Left

@@ -1,13 +1,5 @@
 package arrow.effects
 
-import arrow.effecs.FluxK
-import arrow.effecs.FluxKOf
-import arrow.effecs.async
-import arrow.effecs.foldable
-import arrow.effecs.functor
-import arrow.effecs.k
-import arrow.effecs.traverse
-import arrow.effecs.value
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FoldableLaws
