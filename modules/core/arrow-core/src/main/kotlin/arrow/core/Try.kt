@@ -80,12 +80,12 @@ sealed class Try<out A> : TryOf<A> {
     )
 
   /**
-   * Applies `fa` if this is a `Failure` or `fb` if this is a `Success`.
+   * Applies `ifFailure` if this is a `Failure` or `ifSuccess` if this is a `Success`.
    */
-  inline fun <B> fold(fa: (Throwable) -> B, fb: (A) -> B): B =
+  inline fun <B> fold(ifFailure: (Throwable) -> B, ifSuccess: (A) -> B): B =
     when (this) {
-      is Failure -> fa(exception)
-      is Success -> fb(value)
+      is Failure -> ifFailure(exception)
+      is Success -> ifSuccess(value)
     }
 
   abstract fun isFailure(): Boolean
@@ -130,9 +130,9 @@ sealed class Try<out A> : TryOf<A> {
   @Deprecated("arrow.data.Either is already right biased. This function will be removed in future releases", ReplaceWith("toEither()"))
   fun toDisjunction(): Disjunction<Throwable, A> = toEither().toDisjunction()
 
-  fun <B> foldLeft(b: B, f: (B, A) -> B): B = this.fix().fold({ b }, { f(b, it) })
+  fun <B> foldLeft(initial: B, operation: (B, A) -> B): B = this.fix().fold({ initial }, { operation(initial, it) })
 
-  fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = this.fix().fold({ lb }, { f(it, lb) })
+  fun <B> foldRight(initial: Eval<B>, operation: (A, Eval<B>) -> Eval<B>): Eval<B> = this.fix().fold({ initial }, { operation(it, initial) })
 
   /**
    * The `Failure` type represents a computation that result in an exception.
@@ -202,10 +202,10 @@ fun <B> TryOf<B>.recover(f: (Throwable) -> B): Try<B> = fix().fold({ Success(f(i
 fun <A> TryOf<A>.handle(f: (Throwable) -> A): Try<A> = fix().recover(f)
 
 /**
- * Completes this `Try` by applying the function `f` to this if this is of type `Failure`,
- * or conversely, by applying `s` if this is a `Success`.
+ * Completes this `Try` by applying the function `ifFailure` to this if this is of type `Failure`,
+ * or conversely, by applying `ifSuccess` if this is a `Success`.
  */
-fun <A, B> TryOf<A>.transform(s: (A) -> TryOf<B>, f: (Throwable) -> TryOf<B>): Try<B> = fix().fold({ f(it).fix() }, { fix().flatMap(s) })
+fun <A, B> TryOf<A>.transform(ifSuccess: (A) -> TryOf<B>, ifFailure: (Throwable) -> TryOf<B>): Try<B> = fix().fold({ ifFailure(it).fix() }, { fix().flatMap(ifSuccess) })
 
 fun <A> (() -> A).try_(): Try<A> = Try(this)
 

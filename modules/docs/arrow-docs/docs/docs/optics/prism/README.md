@@ -128,17 +128,19 @@ networkInt.getOption(NetworkResult.Success("5"))
 
 ## Generated prisms <a id="generated-prisms"></a>
 
-Prisms can be generated for `sealed classes` by the `@optics` annotation. For every defined subtype a `Prism` will be generated. The prisms will be generated in the same package as the `sealed class` and will be named `parentnameSubtypename()`.
+Prisms can be generated for `sealed classes` by the `@optics` annotation. For every defined subtype a `Prism` will be generated.
+The prisms will be generated as extension properties on the companion object `val T.Companion.subTypeName`.
 
 ```kotlin
 @optics sealed class Shape {
+  companion object { }
   data class Circle(val radius: Double) : Shape()
   data class Rectangle(val width: Double, val height: Double) : Shape()
 }
 ```
 ```kotlin:ank:silent
-val circleShape: Prism<Shape, Shape.Circle> = shapeCircle()
-val rectangleShape: Prism<Shape, Shape.Rectangle> = shapeRectangle()
+val circleShape: Prism<Shape, Shape.Circle> = Shape.circle
+val rectangleShape: Prism<Shape, Shape.Rectangle> = Shape.rectangle
 ```
 
 ### Polymorphic prisms <a id="PPrism"></a>
@@ -161,5 +163,5 @@ liftSuccess(Try.Failure<Int>(ArithmeticException("/ by zero")))
 
 Arrow provides [`PrismLaws`][prism_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own prisms.
 
-[prism_laws_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/PrismLaws.kt
+[prism_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/PrismLaws.kt
 

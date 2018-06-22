@@ -38,6 +38,11 @@ interface ProcessorUtils : KotlinMetadataUtils {
         .map { it.type.extractFullName(data) }
     }
 
+  val Element.hasNoCompanion: Boolean
+    get() = (kotlinMetadata as? KotlinClassMetadata)?.data?.run {
+      nameResolver.getName(proto.companionObjectName).asString() != "Companion"
+    } ?: true
+
   fun KotlinMetadata.asClassOrPackageDataWrapper(classElement: TypeElement): ClassOrPackageDataWrapper? {
     val `package` = elementUtils.getPackageOf(classElement).toString()
     return when (this) {

@@ -4,6 +4,7 @@ import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.fix
 import arrow.core.functor
+import arrow.free.instances.ForYoneda
 import arrow.test.UnitSpec
 import arrow.test.laws.FunctorLaws
 import arrow.typeclasses.Eq
@@ -14,15 +15,15 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class YonedaTest : UnitSpec() {
 
-  val F = Yoneda.functor<ForId>()
-
   val EQ = Eq<YonedaOf<ForId, Int>> { a, b ->
     a.fix().lower() == b.fix().lower()
   }
 
   init {
 
-    testLaws(FunctorLaws.laws(F, { Yoneda(Id(it), Id.functor()) }, EQ))
+    ForYoneda<ForId>() extensions {
+      testLaws(FunctorLaws.laws(this, { Yoneda(Id(it), Id.functor()) }, EQ))
+    }
 
     "toCoyoneda should convert to an equivalent Coyoneda" {
       forAll { x: Int ->

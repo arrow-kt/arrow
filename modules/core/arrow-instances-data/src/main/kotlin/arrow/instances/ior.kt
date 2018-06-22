@@ -91,3 +91,19 @@ interface IorShowInstance<L, R> : Show<Ior<L, R>> {
   override fun Ior<L, R>.show(): String =
     toString()
 }
+
+class IorContext<L>(val SL: Semigroup<L>) : IorMonadInstance<L>, IorTraverseInstance<L> {
+
+  override fun SL(): Semigroup<L> = SL
+
+  override fun <A, B> Kind<IorPartialOf<L>, A>.map(f: (A) -> B): Ior<L, B> =
+    fix().map(f)
+}
+
+class IorContextPartiallyApplied<L>(val SL: Semigroup<L>) {
+  infix fun <A> extensions(f: IorContext<L>.() -> A): A =
+    f(IorContext(SL))
+}
+
+fun <L> ForIor(SL: Semigroup<L>): IorContextPartiallyApplied<L> =
+  IorContextPartiallyApplied(SL)

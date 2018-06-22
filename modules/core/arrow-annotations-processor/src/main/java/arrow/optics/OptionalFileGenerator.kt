@@ -1,69 +1,33 @@
 package arrow.optics
 
-import arrow.common.utils.fullName
-import me.eugeniomarletti.kotlin.metadata.escapedClassName
+import arrow.common.utils.simpleName
 import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
-import java.io.File
 
-class OptionalFileGenerator(
-  private val annotatedList: Collection<AnnotatedOptic>,
-  private val generatedDir: File
-) {
+fun generateOptionals(ele: AnnotatedElement, target: OptionalTarget) = Snippet(
+  `package` = ele.packageName,
+  name = ele.classData.simpleName,
+  imports = setOf("import arrow.core.left", "import arrow.core.right", "import arrow.core.toOption"),
+  content = processElement(ele, target.foci)
+)
 
-  private val filePrefix = "optionals"
-  private val optional = "arrow.optics.Optional"
+private fun processElement(ele: AnnotatedElement, foci: List<Focus>): String = foci.joinToString(separator = "\n") { focus ->
+  fun getOrModifyF(toNullable: String = "") = "{ ${ele.sourceName}: ${ele.sourceClassName} -> ${ele.sourceName}.${focus.paramName.plusIfNotBlank(prefix = "`", postfix = "`")}$toNullable?.right() ?: ${ele.sourceName}.left() }"
+  fun setF(fromNullable: String = "") = "${ele.sourceName}.copy(${focus.paramName.plusIfNotBlank(prefix = "`", postfix = "`")} = value$fromNullable)"
 
-  fun generate() = annotatedList.map(this::processElement)
-    .filter { it.second.joinToString(separator = "").isNotEmpty() }
-    .map { (element, funs) ->
-      "$filePrefix.${element.classData.`package`}.${element.type.simpleName.toString().toLowerCase()}.kt" to
-        funs.joinToString(prefix = fileHeader(element.classData.`package`.escapedClassName), separator = "\n")
-    }.forEach { (name, fileString) -> File(generatedDir, name).writeText(fileString) }
+  val (targetClassName, getOrModify, set) = when (focus) {
+    is NullableFocus -> Triple(focus.nonNullClassName, getOrModifyF(), setF())
+    is OptionFocus -> Triple(focus.nestedClassName, getOrModifyF(".orNull()"), setF(".toOption()"))
+    is NonNullFocus -> return@joinToString ""
+  }
 
-  private fun String.toUpperCamelCase(): String = split(" ").joinToString("", transform = String::capitalize)
-
-  private fun processElement(annotatedOptic: AnnotatedOptic): Pair<AnnotatedOptic, List<String>> =
-    annotatedOptic to annotatedOptic.targets.map { variable ->
-      val sourceClassName = annotatedOptic.classData.fullName.escapedClassName
-      val sourceName = annotatedOptic.type.simpleName.toString().decapitalize()
-      val targetClassName = variable.fullName
-      val targetName = variable.paramName
-
-      when (variable) {
-        is Target.NullableTarget -> processNullableOptional(targetClassName.dropLast(1), sourceName, targetName, sourceClassName)
-        is Target.OptionTarget -> processOptionOptional(sourceName, targetName, sourceClassName, variable.nestedFullName)
-        is Target.NonNullTarget -> "" //Don't generate optional for non-null targets.
-      }
-    }
-
-  private fun fileHeader(packageName: String): String =
-    """package $packageName
-               |
-               |import arrow.core.left
-               |import arrow.core.right
-               |import arrow.core.toOption
-               |""".trimMargin()
-
-  private fun processNullableOptional(nonNullTargetClassName: String, sourceName: String, targetName: String, sourceClassName: String) = """
-      |fun $sourceName${targetName.toUpperCamelCase()}(): $optional<$sourceClassName, $nonNullTargetClassName> = $optional(
-      |  getOrModify = { $sourceName: $sourceClassName -> $sourceName.${targetName.plusIfNotBlank(prefix = "`", postfix = "`")}?.right() ?: $sourceName.left() },
-      |  set = { value: $nonNullTargetClassName ->
-      |    { $sourceName: $sourceClassName ->
-      |      $sourceName.copy(${targetName.plusIfNotBlank(prefix = "`", postfix = "`")} = value)
+  """
+      |inline val ${ele.sourceClassName}.Companion.${focus.paramName}: $Optional<${ele.sourceClassName}, $targetClassName> inline get()= $Optional(
+      |  getOrModify = $getOrModify,
+      |  set = { value: $targetClassName ->
+      |    { ${ele.sourceName}: ${ele.sourceClassName} ->
+      |      $set
       |    }
       |  }
       |)
-      """.trimMargin()
-
-  private fun processOptionOptional(sourceName: String, targetName: String, sourceClassName: String, clz: String) = """
-      |fun $sourceName${targetName.toUpperCamelCase()}(): $optional<$sourceClassName, $clz> = $optional(
-      |  getOrModify = { $sourceName: $sourceClassName -> $sourceName.${targetName.plusIfNotBlank(prefix = "`", postfix = "`")}.orNull()?.right() ?: $sourceName.left() },
-      |  set = { value: $clz ->
-      |    { $sourceName: $sourceClassName ->
-      |      $sourceName.copy(${targetName.plusIfNotBlank(prefix = "`", postfix = "`")} = value.toOption())
-      |    }
-      |  }
-      |)
-      """.trimMargin()
-
+      |""".trimMargin()
 }

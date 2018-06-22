@@ -17,7 +17,7 @@ compile 'io.arrow-kt:arrow-data:$arrowVersion'
 
 ```kotlin:ank
 // namespace
-import arrow.data.NonEmptyList
+import arrow.data.*
 ```
 
 ## of
@@ -78,29 +78,34 @@ nelOne.flatMap { one ->
 
 Λrrow allows imperative style comprehensions to make computing over `NonEmptyList` values easy.
 
-```kotlin
+```kotlin:ank
+import arrow.typeclasses.*
+import arrow.instances.*
+
 val nelOne: NonEmptyList<Int> = NonEmptyList.of(1)
 val nelTwo: NonEmptyList<Int> = NonEmptyList.of(2)
 val nelThree: NonEmptyList<Int> = NonEmptyList.of(3)
 
-NonEmptyList.monad().binding {
+ForNonEmptyList extensions {
+  binding {
     val one = nelOne.bind()
     val two = nelTwo.bind()
     val three = nelThree.bind()
-    yields(one + two + three)
-}.ev()
-// NonEmptyList(6)
+    one + two + three
+  }.fix()
+}
 ```
 
 Monad binding in `NonEmptyList` and other collection related data type can be used as generators
 
-```kotlin
-NonEmptyList.monad().binding {
+```kotlin:ank
+ForNonEmptyList extensions {
+  binding {
     val x = NonEmptyList.of(1, 2, 3).bind()
     val y = NonEmptyList.of(1, 2, 3).bind()
-    yields(x + y)
-}.ev()
-// NonEmptyList(all=[2, 3, 4, 3, 4, 5, 4, 5, 6])
+    x + y
+  }.fix()
+}
 ```
 
 ## Applicative Builder
@@ -118,9 +123,11 @@ val nelId: NonEmptyList<UUID> = NonEmptyList.of(UUID.randomUUID(), UUID.randomUU
 val nelName: NonEmptyList<String> = NonEmptyList.of("William Alvin Howard", "Haskell Curry")
 val nelYear: NonEmptyList<Int> = NonEmptyList.of(1926, 1900)
 
-NonEmptyList.applicative().map(nelId, nelName, nelYear, { (id, name, year) ->
+ForNonEmptyList extensions {
+ map(nelId, nelName, nelYear, { (id, name, year) ->
   Person(id, name, year)
-})
+ })
+}
 ```
 
 ### Summary

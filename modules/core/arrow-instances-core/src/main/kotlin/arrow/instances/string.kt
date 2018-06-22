@@ -36,3 +36,10 @@ interface StringOrderInstance : Order<String> {
 
 fun String.Companion.order(): Order<String> =
   object : StringOrderInstance {}
+
+object StringContext : StringShowInstance, StringOrderInstance, StringMonoidInstance
+
+object ForString {
+  infix fun <L> extensions(f: StringContext.() -> L): L =
+    f(StringContext)
+}

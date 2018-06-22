@@ -89,14 +89,17 @@ triedEmail.getOption(Try.Failure(IllegalStateException("Something wrong with net
 
 ### Generating optional
 
-To avoid boilerplate, optionals can be generated for `A?` and `Option<A>` fields for a `data class`. The `Optionals` will be generated in the same package as `data class`.
+To avoid boilerplate, optionals can be generated for `A?` and `Option<A>` fields for a `data class`.
+The `Optionals` will be generated as extension properties on the companion object `val T.Companion.paramName`.
 
 ```kotlin
-@optics data class Person(val age: Int?, val address: Option<Address>)
+@optics data class Person(val age: Int?, val address: Option<Address>) {
+  companion object
+}
 ```
 ```kotlin:ank:silent
-val optionalAge: Optional<Person, Int> = personAge()
-val optionalAddress: Optional<Person, Address> = personAddress()
+val optionalAge: Optional<Person, Int> = Person.age
+val optionalAddress: Optional<Person, Address> = Person.address
 ```
 
 ### Polymorphic optional
@@ -123,4 +126,4 @@ lifted(Try.Failure<Tuple2<Int, String>>(IllegalStateException("something went wr
 
 Arrow provides [`OptionalLaws`][optional_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own optionals.
 
-[optional_laws_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/OptionalLaws.kt
+[optional_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/OptionalLaws.kt

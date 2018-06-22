@@ -15,9 +15,9 @@ interface OptionSemigroupInstance<A> : Semigroup<Option<A>> {
     when (this) {
       is Some<A> -> when (b) {
         is Some<A> -> Some(SG().run { t.combine(b.t) })
-        None -> b
+        None -> this
       }
-      None -> this
+      None -> b
     }
 }
 
@@ -162,3 +162,11 @@ interface OptionTraverseInstance : Traverse<ForOption> {
   override fun <A> Kind<ForOption, A>.nonEmpty(): Boolean =
     fix().nonEmpty()
 }
+
+object OptionContext : OptionMonadErrorInstance, OptionTraverseInstance {
+  override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
+    fix().map(f)
+}
+
+infix fun <A> ForOption.Companion.extensions(f: OptionContext.() -> A): A =
+  f(OptionContext)
