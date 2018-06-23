@@ -7,6 +7,9 @@ video: xtnyCqeLI_4
 
 ## SetK
 
+{:.beginner}
+beginner
+
 SetK(Kinded Wrapper) is a higher kinded wrapper around the the Set collection interface.
 
 It can be created from the Kotlin Set type with a convient `k()` function.
