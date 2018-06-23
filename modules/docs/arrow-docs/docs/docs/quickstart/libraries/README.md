@@ -147,3 +147,14 @@ The [Free datatype]({{ '/docs/free/free/' | relative_url }}) is a way of interpr
 This allows optimization of operations like operator fusion or parallelism, while remaining on your business domain.
 
 Datatypes: [`Free`]({{ '/docs/free/free/' | relative_url }}), [`FreeApplicative`]({{ '/docs/free/freeapplicative/' | relative_url }}), [`Cofree`]({{ '/docs/free/cofree/' | relative_url }}), [`Yoneda`]({{ '/docs/free/yoneda/' | relative_url }}), [`Coyoneda`]({{ '/docs/free/coyoneda/' | relative_url }})
+
+## Annotation processors
+
+These libraries focus on meta-programming to generate code that enables other libraries and constructs.
+
+### arrow-generic
+
+{:.advanced}
+advanced
+
+It allows anonating data classes with [`@product`]({{ '/docs/generic/product/' | relative_url }}) to enable them to be structurally deconstructed in tuples and heterogeneous lists.
