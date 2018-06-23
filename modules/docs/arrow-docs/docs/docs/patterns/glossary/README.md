@@ -386,3 +386,17 @@ UserFetcher(Option.applicative()).genUser().fix()
 ```
 
 To learn more about this `Typeclassless` technique you should head to the [`Dependency Injection`]({{ '/docs/patterns/dependency_injection' | relative_url }}) documentation.
+
+### Side-effects and Effects
+
+A side-effect is statement that changes something in the running environment. Generally this means setting a variable, displaying a value on screen, writing to a file or a database, logging, start a new thread...
+
+When talking about side-effects, we generally see functions that have the signature `(...) -> Unit`, meaning that unless the function doesn't do anything, there's at least one side-effect. Side-effects can also happen in the middle of another function, which is an undesirable behavior in Functional Programming.
+
+Side-effects are too general to be unitested for because they depend on the environment. They also have poor composability. Overall, they're considered to be outside the Functional Programming paradigm, and are often referred as "impure" functions.
+
+Because side-effects are unavoidable in any program FP provides several datatypes for dealing with them! One way is by abstracting their behavior. The simplest examples of this are the `Writer`datatype, which allows you to write to an information sink like a log or a file buffer; or `State` datatype, which simulates scoped mutable state for the duration of an operation.
+
+For more complicated side-effects that can throw or jump threads we need more advanced datatypes, called Effects, that wrap over impure operations. Some of these datatypes may be already familiar to you, like [`rx.Observable`]({{ '/docs/integrations/rx2/' | relative_url }}), [`kotlinx.coroutines.Deferred`]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }}), or Arrow's [`IO`]({{ '/docs/effects/io/' | relative_url }}). These Effects compose, catch exceptions, control asynchrony, and most importantly can be run lazily. This gets rid of the issues with side-effects.
+
+Although one can also write the whole program in an imperative way inside a single Effect wrapper that wouldn't be very efficient as you don't get any of its benefits :D
