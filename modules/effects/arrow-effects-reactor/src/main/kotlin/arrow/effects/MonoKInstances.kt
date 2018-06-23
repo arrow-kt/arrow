@@ -94,3 +94,8 @@ interface MonoKEffectInstance :
   override fun <A> MonoKOf<A>.runAsync(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Unit> =
       fix().runAsync(cb)
 }
+
+object MonoKContext : MonoKEffectInstance
+
+infix fun <A> ForMonoK.Companion.extensions(f: MonoKContext.() -> A): A =
+  f(MonoKContext)

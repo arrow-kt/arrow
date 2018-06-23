@@ -120,7 +120,10 @@ interface FluxKEffectInstance :
       fix().runAsync(cb)
 }
 
-object FluxKContext : FluxKEffectInstance
+object FluxKContext : FluxKEffectInstance, FluxKTraverseInstance {
+  override fun <A, B> FluxKOf<A>.map(f: (A) -> B): FluxK<B> =
+    fix().map(f)
+}
 
 infix fun <A> ForFluxK.Companion.extensions(f: FluxKContext.() -> A): A =
     f(FluxKContext)
