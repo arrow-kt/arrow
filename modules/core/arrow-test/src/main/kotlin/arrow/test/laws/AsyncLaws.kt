@@ -31,7 +31,9 @@ object AsyncLaws {
 
   fun <F> Async<F>.continueOn(EQ: Eq<Kind<F, Int>>): Unit =
     forFew(5, Gen.int(), { threadId: Int ->
-      Unit.just().continueOn(newSingleThreadContext(threadId.toString())).map { Thread.currentThread().name.toInt() }
+      Unit.just().continueOn(newSingleThreadContext(threadId.toString()))
+        // Turns out that kotlinx.coroutines decides to rewrite thread names
+        .map { Thread.currentThread().name.substringBefore(' ').toInt() }
         .equalUnderTheLaw(just(threadId), EQ)
     })
 }
