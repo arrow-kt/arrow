@@ -2,7 +2,7 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.*
-import arrow.effects.ContextScheduler.asScheduler
+import arrow.effects.CoroutineContextScheduler.asScheduler
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Applicative

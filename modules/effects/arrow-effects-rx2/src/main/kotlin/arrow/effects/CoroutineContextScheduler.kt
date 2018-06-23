@@ -8,7 +8,7 @@ import kotlin.coroutines.experimental.Continuation
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.startCoroutine
 
-object ContextScheduler {
+object CoroutineContextScheduler {
   private interface NonCancellableContinuation : Continuation<Unit>, Disposable
 
   fun CoroutineContext.asScheduler(): Scheduler =
