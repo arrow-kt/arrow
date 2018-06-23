@@ -6,6 +6,9 @@ permalink: /docs/patterns/glossary/
 
 ## Functional Programming Glossary
 
+{:.beginner}
+beginner
+
 Note: This section keeps on growing! Keep an eye on it from time to time.
 
 This document is meant to be an introduction to Functional Programming for people from all backgrounds.

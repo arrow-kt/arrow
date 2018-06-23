@@ -7,6 +7,9 @@ video: 3y9KI7XWXSY
 
 ## Typeclasses
 
+{:.beginner}
+beginner
+
 Typeclasses define a set of functions associated to one generic type.
 All methods inside a typeclass will have one of two shapes:
 

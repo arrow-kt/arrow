@@ -8,6 +8,9 @@ video: 1h4X8CrMjVs
 
 ## EitherT
 
+{:.advanced}
+advanced
+
 `EitherT` also known as the `Either` monad transformer allows to compute inside the context when `Either` is nested in a different monad.
 
 One issue we face with monads is that they don't compose. This can cause your code to get really hairy when trying to combine structures like `ObservableK` and `Either`. But there's a simple solution, and we're going to explain how you can use Monad Transformers to alleviate this problem.

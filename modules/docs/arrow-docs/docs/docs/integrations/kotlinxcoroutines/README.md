@@ -6,6 +6,9 @@ permalink: /docs/integrations/kotlinxcoroutines/
 
 ## kotlinx.coroutines
 
+{:.intermediate}
+intermediate
+
 Arrow wants to provide an abstraction over multiple concurrency frameworks, in a way where their semantics match and they become interchangeable.
 
 Working towards this purpose, it's only natural that we'd add support for the framework Jetbrains provides over coroutines.

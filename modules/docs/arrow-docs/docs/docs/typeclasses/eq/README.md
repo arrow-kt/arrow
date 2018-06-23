@@ -6,6 +6,9 @@ permalink: /docs/typeclasses/eq/
 
 ## Eq
 
+{:.beginner}
+beginner
+
 The `Eq` typeclass abstracts the ability to compare two instances of any object.
 It can be considered the typeclass equivalent of Java's `Object#equals`.
 
