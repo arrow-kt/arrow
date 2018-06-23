@@ -29,6 +29,11 @@ data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferre
       f(await()).await()
     }.k()
 
+  fun continueOn(ctx: CoroutineContext): DeferredK<A> =
+    kotlinx.coroutines.experimental.async(Unconfined, CoroutineStart.LAZY) {
+      deferred.await()
+    }.k()
+
   companion object {
     fun unit(): DeferredK<Unit> =
       CompletableDeferred(Unit).k()
