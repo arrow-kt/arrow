@@ -6,6 +6,9 @@ permalink: /docs/integrations/rx2/
 
 ## RxJava 2
 
+{:.intermediate}
+intermediate
+
 Arrow aims to enhance the user experience when using RxJava. While providing other datatypes that are capable of handling effects, like IO, the style of programming encouraged by the library allows users to generify behavior for any existing abstractions.
 
 One of such abstractions is RxJava, a library focused on providing composable streams that enable reactive programming. Observable streams are created by chaining operators into what are called observable chains.

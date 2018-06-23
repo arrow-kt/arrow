@@ -6,6 +6,9 @@ permalink: /docs/integrations/reactor/
 
 ## Project Reactor
 
+{:.intermediate}
+intermediate
+
 Arrow aims to enhance the user experience when using Project Reactor. While providing other datatypes that are capable of handling effects, like IO, the style of programming encouraged by the library allows users to generify behavior for any existing abstractions.
 
 One of such abstractions is Project Reactor, a library that, like RxJava, offers reactive streams.
