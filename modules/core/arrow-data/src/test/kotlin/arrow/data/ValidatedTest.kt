@@ -1,17 +1,20 @@
 package arrow.data
 
 import arrow.core.*
-import arrow.instances.*
+import arrow.instances.ForValidated
+import arrow.instances.eq
+import arrow.instances.monoid
+import arrow.instances.semigroup
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Semigroup
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.fail
+import io.kotlintest.fail
 import io.kotlintest.matchers.shouldBe
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class ValidatedTest : UnitSpec() {
 
   init {

@@ -8,10 +8,10 @@ import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Eq
 import arrow.typeclasses.binest
 import arrow.typeclasses.compose
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class BifoldableTests : UnitSpec() {
   init {
 

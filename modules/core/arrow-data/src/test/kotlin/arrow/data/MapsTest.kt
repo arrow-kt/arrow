@@ -1,12 +1,12 @@
 package arrow.data
 
 import arrow.core.Tuple2
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.Assert
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class MapsTest : UnitSpec() {
 
   init {

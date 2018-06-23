@@ -43,15 +43,19 @@ object MonadLaws {
       fa.flatMap { just(it) }.equalUnderTheLaw(fa, EQ)
     }
 
-  fun <F> Monad<F>.kleisliLeftIdentity(EQ: Eq<Kind<F, Int>>): Unit =
+  fun <F> Monad<F>.kleisliLeftIdentity(EQ: Eq<Kind<F, Int>>) {
+    val M = this
     forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
-      (Kleisli { n: Int -> just(n) }.andThen(this, Kleisli(f)).run(a).equalUnderTheLaw(f(a), EQ))
+      (Kleisli { n: Int -> just(n) }.andThen(M, Kleisli(f)).run(a).equalUnderTheLaw(f(a), EQ))
     }
+  }
 
-  fun <F> Monad<F>.kleisliRightIdentity(EQ: Eq<Kind<F, Int>>): Unit =
+  fun <F> Monad<F>.kleisliRightIdentity(EQ: Eq<Kind<F, Int>>) {
+    val M = this
     forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
-      (Kleisli(f).andThen(this, Kleisli { n: Int -> just(n) }).run(a).equalUnderTheLaw(f(a), EQ))
+      (Kleisli(f).andThen(M, Kleisli { n: Int -> just(n) }).run(a).equalUnderTheLaw(f(a), EQ))
     }
+  }
 
   fun <F> Monad<F>.mapFlatMapCoherence(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genFunctionAToB<Int, Int>(Gen.int()), genApplicative(Gen.int(), this)) { f: (Int) -> Int, fa: Kind<F, Int> ->
@@ -59,18 +63,19 @@ object MonadLaws {
     }
 
   fun <F> Monad<F>.stackSafety(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit =
-    forFew(1, Gen.oneOf(listOf(iterations))) { iter ->
+    forFew(1, Gen.from(listOf(iterations))) { iter ->
       val res = tailRecM(0) { i -> just(if (i < iter) Left(i + 1) else Right(i)) }
       res.equalUnderTheLaw(just(iter), EQ)
     }
 
   fun <F> Monad<F>.stackSafetyComprehensions(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit =
-    forFew(1, Gen.oneOf(listOf(iterations))) { iter ->
+    forFew(1, Gen.from(listOf(iterations))) { iter ->
       val res = stackSafeTestProgram(0, iter)
       res.run(this).equalUnderTheLaw(just(iter), EQ)
     }
 
-  fun <F> Monad<F>.equivalentComprehensions(EQ: Eq<Kind<F, Int>>): Unit =
+  fun <F> Monad<F>.equivalentComprehensions(EQ: Eq<Kind<F, Int>>) {
+    val M = this
     forAll(Gen.int()) { num: Int ->
       val aa = binding {
         val a = just(num).bind()
@@ -83,10 +88,11 @@ object MonadLaws {
         val b = just(a + 1).bind()
         val c = just(b + 1).bind()
         c
-      }.run(this)
+      }.run(M)
       aa.equalUnderTheLaw(bb, EQ) &&
           aa.equalUnderTheLaw(just(num + 2), EQ)
     }
+  }
 
   fun <F> Monad<F>.monadComprehensions(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int()) { num: Int ->

@@ -25,46 +25,50 @@ object ComonadLaws {
     )
 
   fun <F> Comonad<F>.duplicateThenExtractIsId(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genConstructor(Gen.int(), cf), { fa: Kind<F, Int> ->
+    forAll(genConstructor(Gen.int(), cf)) { fa: Kind<F, Int> ->
       fa.duplicate().extract().equalUnderTheLaw(fa, EQ)
-    })
+    }
 
   fun <F> Comonad<F>.duplicateThenMapExtractIsId(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genConstructor(Gen.int(), cf), { fa: Kind<F, Int> ->
+    forAll(genConstructor(Gen.int(), cf)) { fa: Kind<F, Int> ->
       fa.duplicate().map() { it.extract() }.equalUnderTheLaw(fa, EQ)
-    })
+    }
 
   fun <F> Comonad<F>.mapAndCoflatmapCoherence(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genConstructor(Gen.int(), cf), genFunctionAToB(Gen.int()), { fa: Kind<F, Int>, f: (Int) -> Int ->
-      fa.map(f).equalUnderTheLaw(fa.coflatMap({ f(it.extract()) }), EQ)
-    })
+    forAll(genConstructor(Gen.int(), cf), genFunctionAToB<Int,Int>(Gen.int())) { fa: Kind<F, Int>, f: (Int) -> Int ->
+      fa.map(f).equalUnderTheLaw(fa.coflatMap { f(it.extract()) }, EQ)
+    }
 
   fun <F> Comonad<F>.comonadLeftIdentity(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genConstructor(Gen.int(), cf), { fa: Kind<F, Int> ->
-      fa.coflatMap({ it.extract() }).equalUnderTheLaw(fa, EQ)
-    })
+    forAll(genConstructor(Gen.int(), cf)) { fa: Kind<F, Int> ->
+      fa.coflatMap { it.extract() }.equalUnderTheLaw(fa, EQ)
+    }
 
   fun <F> Comonad<F>.comonadRightIdentity(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genConstructor(Gen.int(), cf), genFunctionAToB(genConstructor(Gen.int(), cf)), { fa: Kind<F, Int>, f: (Kind<F, Int>) -> Kind<F, Int> ->
+    forAll(genConstructor(Gen.int(), cf), genFunctionAToB<Kind<F, Int>,Kind<F, Int>>(genConstructor(Gen.int(), cf))) { fa: Kind<F, Int>, f: (Kind<F, Int>) -> Kind<F, Int> ->
       fa.coflatMap(f).extract().equalUnderTheLaw(f(fa), EQ)
-    })
+    }
 
-  fun <F> Comonad<F>.cokleisliLeftIdentity(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genConstructor(Gen.int(), cf), genFunctionAToB(genConstructor(Gen.int(), cf)), { fa: Kind<F, Int>, f: (Kind<F, Int>) -> Kind<F, Int> ->
-      Cokleisli(this, { hk: Kind<F, Int> -> hk.extract() }).andThen(Cokleisli(this, f)).run(fa).equalUnderTheLaw(f(fa), EQ)
-    })
+  fun <F> Comonad<F>.cokleisliLeftIdentity(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>) {
+    val MM = this
+    forAll(genConstructor(Gen.int(), cf), genFunctionAToB<Kind<F, Int>,Kind<F, Int>>(genConstructor(Gen.int(), cf))) { fa: Kind<F, Int>, f: (Kind<F, Int>) -> Kind<F, Int> ->
+      Cokleisli(MM) { hk: Kind<F, Int> -> hk.extract() }.andThen(Cokleisli(MM, f)).run(fa).equalUnderTheLaw(f(fa), EQ)
+    }
+  }
 
-  fun <F> Comonad<F>.cokleisliRightIdentity(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genConstructor(Gen.int(), cf), genFunctionAToB(genConstructor(Gen.int(), cf)), { fa: Kind<F, Int>, f: (Kind<F, Int>) -> Kind<F, Int> ->
-      Cokleisli(this, f).andThen(Cokleisli(this, { hk: Kind<F, Kind<F, Int>> -> hk.extract() })).run(fa).equalUnderTheLaw(f(fa), EQ)
-    })
+  fun <F> Comonad<F>.cokleisliRightIdentity(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>) {
+    val MM = this
+    forAll(genConstructor(Gen.int(), cf), genFunctionAToB<Kind<F, Int>,Kind<F, Int>>(genConstructor(Gen.int(), cf))) { fa: Kind<F, Int>, f: (Kind<F, Int>) -> Kind<F, Int> ->
+      Cokleisli(MM, f).andThen(Cokleisli(MM) { hk: Kind<F, Kind<F, Int>> -> hk.extract() }).run(fa).equalUnderTheLaw(f(fa), EQ)
+    }
+  }
 
   fun <F> Comonad<F>.cobinding(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genConstructor(Gen.int(), cf), { fa: Kind<F, Int> ->
+    forAll(genConstructor(Gen.int(), cf)) { fa: Kind<F, Int> ->
       cobinding {
         val x = fa.extract()
-        val y = extract { fa.map({ it + x }) }
-        fa.map({ x + y })
-      }.equalUnderTheLaw(fa.map({ it * 3 }), EQ)
-    })
+        val y = extract { fa.map { it + x } }
+        fa.map { x + y }
+      }.equalUnderTheLaw(fa.map { it * 3 }, EQ)
+    }
 }

@@ -10,11 +10,11 @@ import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
 import arrow.core.FunctionK
 import arrow.free.instances.ForCofree
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class CofreeTest : UnitSpec() {
 
   init {

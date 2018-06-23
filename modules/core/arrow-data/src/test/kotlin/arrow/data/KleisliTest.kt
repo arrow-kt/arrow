@@ -5,11 +5,11 @@ import arrow.instances.ForKleisli
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadErrorLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class KleisliTest : UnitSpec() {
   private fun <A> EQ(): Eq<KleisliOf<ForTry, Int, A>> = Eq { a, b ->
     a.fix().run(1) == b.fix().run(1)

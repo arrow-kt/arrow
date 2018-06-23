@@ -2,11 +2,11 @@ package arrow.data
 
 import arrow.core.*
 import arrow.test.UnitSpec
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class UtilTest : UnitSpec() {
 
   private val add5 = { i: Int -> i + 5 }

@@ -10,11 +10,11 @@ import arrow.test.generators.genOption
 import arrow.test.laws.IsoLaws
 import arrow.test.laws.OptionalLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class ListInstancesTest : UnitSpec() {
 
   init {

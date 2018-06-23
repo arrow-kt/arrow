@@ -2,14 +2,14 @@ package arrow.data
 
 import arrow.core.*
 import arrow.test.UnitSpec
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.matchers.should
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldThrow
 import io.kotlintest.matchers.startWith
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class PartialFunctionTests : UnitSpec() {
 
   private val definetAt: (Int) -> Boolean = { it.rem(2) == 0 }

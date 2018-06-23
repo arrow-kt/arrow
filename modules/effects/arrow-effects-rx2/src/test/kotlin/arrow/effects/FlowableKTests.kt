@@ -6,7 +6,7 @@ import arrow.test.laws.FoldableLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.bindingCatch
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.matchers.shouldNotBe
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
@@ -14,7 +14,7 @@ import io.reactivex.subscribers.TestSubscriber
 import org.junit.runner.RunWith
 import java.util.concurrent.TimeUnit
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class FlowableKTests : UnitSpec() {
 
   fun <T> EQ(): Eq<FlowableKOf<T>> = object : Eq<FlowableKOf<T>> {

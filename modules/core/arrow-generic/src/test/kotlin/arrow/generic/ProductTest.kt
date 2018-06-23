@@ -8,7 +8,7 @@ import arrow.test.laws.EqLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.SemigroupLaws
 import arrow.typeclasses.Applicative
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
@@ -43,7 +43,7 @@ inline fun <reified F> Applicative<F>.testPersonApplicative() {
   })
 }
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class ProductTest : UnitSpec() {
   init {
 

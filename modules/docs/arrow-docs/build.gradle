@@ -26,6 +26,7 @@ dependencies {
     compile "io.kotlintest:kotlintest-core:$kotlinTestVersion"
     compile "io.kotlintest:kotlintest-assertions:$kotlinTestVersion"
     compile "io.kotlintest:kotlintest-assertions-arrow:$kotlinTestVersion"
+    compile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
 
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
     compile "io.reactivex.rxjava2:rxjava:2.1.13"

@@ -5,6 +5,7 @@ dependencies {
     testCompile "io.kotlintest:kotlintest-core:$kotlinTestVersion"
     testCompile "io.kotlintest:kotlintest-assertions:$kotlinTestVersion"
     testCompile "io.kotlintest:kotlintest-assertions-arrow:$kotlinTestVersion"
+    testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
     testCompile project(':arrow-test')
 }
 

@@ -1,10 +1,10 @@
 package arrow.data
 
 import arrow.test.UnitSpec
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class TupleTest : UnitSpec() {
   init {
     /* FIXME(paco) this code sends gradle into an infinite loop, and turns IntelliJ into a memory churner

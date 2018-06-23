@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
 fun <F, A> genApplicative(valueGen: Gen<A>, AP: Applicative<F>): Gen<Kind<F, A>> =
    valueGen.map { AP.just(it) }
 
-fun <A, B> genFunctionAToB(genB: Gen<B>): Gen<(A) -> B> = genB.map { b:B -> { _: A -> b } }
+inline fun <reified A, reified B> genFunctionAToB(genB: Gen<B>): Gen<(A) -> B> = genB.map { b:B -> { _: A -> b } }
 
 fun <A> genFunctionAAToA(genA: Gen<A>): Gen<(A, A) -> A> = genA.map { a:A -> { _: A, _: A -> a } }
 

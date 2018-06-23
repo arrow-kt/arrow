@@ -11,6 +11,7 @@ dependencies {
     compile "io.kotlintest:kotlintest-core:$kotlinTestVersion"
     compile "io.kotlintest:kotlintest-assertions:$kotlinTestVersion"
     compile "io.kotlintest:kotlintest-assertions-arrow:$kotlinTestVersion"
+    compile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
     kapt project(':arrow-annotations-processor')
 }
 

@@ -9,11 +9,15 @@ import arrow.test.laws.MonadErrorLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.*
+import io.kotlintest.fail
+import io.kotlintest.matchers.beTheSameInstanceAs
+import io.kotlintest.matchers.should
+import io.kotlintest.matchers.shouldBe
+import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldEqual
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class TryTest : UnitSpec() {
 
   val success = Try { "10".toInt() }

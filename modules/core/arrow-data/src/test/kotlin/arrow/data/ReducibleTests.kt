@@ -2,8 +2,6 @@ package arrow.data
 
 import arrow.Kind
 import arrow.core.Tuple2
-import arrow.instances.IntSemigroupInstance
-import arrow.instances.LongMonoidInstance
 import arrow.instances.monoid
 import arrow.instances.semigroup
 import arrow.test.UnitSpec
@@ -11,11 +9,11 @@ import arrow.test.laws.ReducibleLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.NonEmptyReducible
-import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class ReducibleTests : UnitSpec() {
   init {
     val nonEmptyReducible = object : NonEmptyReducible<ForNonEmptyList, ForListK> {
@@ -34,6 +32,7 @@ class ReducibleTests : UnitSpec() {
 
     with(nonEmptyReducible) {
       with(Int.semigroup()) {
+        val SG = this
 
         "Reducible<NonEmptyList> default size implementation" {
           val nel = NonEmptyList.of(1, 2, 3)
@@ -45,15 +44,15 @@ class ReducibleTests : UnitSpec() {
           val tail = (2 to 10).toList()
           val total = 1 + tail.sum()
           val nel = NonEmptyList(1, tail)
-          nel.reduceLeft({ a, b -> a + b }) shouldBe total
-          nel.reduceRight({ x, ly -> ly.map({ x + it }) }).value() shouldBe (total)
-          nel.reduce(this) shouldBe total
+          nel.reduceLeft { a, b -> a + b } shouldBe total
+          nel.reduceRight { x, ly -> ly.map { x + it } }.value() shouldBe (total)
+          nel.reduce(SG) shouldBe total
 
           // more basic checks
           val names = NonEmptyList.of("Aaron", "Betty", "Calvin", "Deirdra")
-          val totalLength = names.all.map({ it.length }).sum()
+          val totalLength = names.all.map { it.length }.sum()
           names.reduceLeftTo({ it.length }, { sum, s -> s.length + sum }) shouldBe totalLength
-          names.reduceMap(this, { it.length }) shouldBe totalLength
+          names.reduceMap(SG) { it.length } shouldBe totalLength
         }
       }
     }

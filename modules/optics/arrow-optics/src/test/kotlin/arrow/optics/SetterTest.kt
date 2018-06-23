@@ -6,12 +6,12 @@ import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genOption
 import arrow.test.laws.SetterLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class SetterTest : UnitSpec() {
 
   init {

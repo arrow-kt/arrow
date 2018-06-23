@@ -1,6 +1,6 @@
 package arrow.fromkotlin
 
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.specs.StringSpec
 import arrow.kindedj.KatDataclass1
@@ -9,7 +9,7 @@ import arrow.kindedj.fromarrow.KatDataclassKindedJShow
 import arrow.kindedj.toKindedJ
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class KatDataclassTestsKotlin : StringSpec() {
   private val kinded = KatDataclass1(0)
 
