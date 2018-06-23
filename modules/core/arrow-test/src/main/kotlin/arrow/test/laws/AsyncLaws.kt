@@ -9,12 +9,14 @@ import arrow.test.generators.genThrowable
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import kotlinx.coroutines.experimental.newSingleThreadContext
 
 object AsyncLaws {
   inline fun <F> laws(AC: Async<F>, EQ: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>, EQERR: Eq<Kind<F, Int>> = EQ): List<Law> =
     MonadSuspendLaws.laws(AC, EQERR, EQ_EITHER, EQ) + listOf(
       Law("Async Laws: success equivalence", { AC.asyncSuccess(EQ) }),
-      Law("Async Laws: error equivalence", { AC.asyncError(EQERR) })
+      Law("Async Laws: error equivalence", { AC.asyncError(EQERR) }),
+      Law("Async Laws: continueOn", { AC.continueOn(EQ) })
     )
 
   fun <F> Async<F>.asyncSuccess(EQ: Eq<Kind<F, Int>>): Unit =
@@ -25,5 +27,11 @@ object AsyncLaws {
   fun <F> Async<F>.asyncError(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genThrowable(), { e: Throwable ->
       async { ff: (Either<Throwable, Int>) -> Unit -> ff(Left(e)) }.equalUnderTheLaw(raiseError<Int>(e), EQ)
+    })
+
+  fun <F> Async<F>.continueOn(EQ: Eq<Kind<F, Int>>): Unit =
+    forFew(5, Gen.int(), { threadId: Int ->
+      Unit.just().continueOn(newSingleThreadContext(threadId.toString())).map { Thread.currentThread().name.toInt() }
+        .equalUnderTheLaw(just(threadId), EQ)
     })
 }
