@@ -6,12 +6,12 @@ permalink: /docs/quickstart/libraries/
 
 ## Core Libraries
 
-Arrow is a modular set of libraries that build on top of each other to provide higher level features.
+Arrow is a modular set of libraries that build on top of each other to provide increasingly higher level features.
 
-One of our design principles is to keep each library is kept as lean as possible to avoid pulling unnecessary dependencies,
-specially to support Android developers where app size affects performance.
+One of our design principles is to keep each library as lean as possible to avoid pulling unnecessary dependencies,
+specially to support Android development where app size affects performance.
 
-In this section we'll describe all the modules, alongside an ooverview and a list of all the constructs inside.
+In this section we'll describe all the modules that form the core, alongside a list of the most important the constructs they include.
 
 ### arrow-core
 
