@@ -6,6 +6,9 @@ options:
       - title: Index
         url: /docs/
 
+      - title: Libraries
+        url: /docs/quickstart/libraries/
+
       - title: Blogs & Presentations
         url: /docs/quickstart/blogs/
 

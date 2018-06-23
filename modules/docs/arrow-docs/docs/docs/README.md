@@ -16,6 +16,7 @@ It includes the most popular data types, type classes and abstractions such as `
 Use the list below to learn more about Λrrow's main features.
 
 - [Patterns](http://arrow-kt.io/docs/patterns/glossary/): tutorials and approaches to day-to-day challenges using FP 
+- [Libraries](http://arrow-kt.io/docs/quickstart/libraries/): all the libraries provided by Λrrow
 - [Type classes](http://arrow-kt.io/docs/typeclasses/intro/): defining behaviors for data
 - [Data types](http://arrow-kt.io/docs/datatypes/intro/): common abstractions
 - [Effects](http://arrow-kt.io/docs/effects/io/): interfacing with external systems
