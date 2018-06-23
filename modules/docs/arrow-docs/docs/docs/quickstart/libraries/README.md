@@ -114,7 +114,7 @@ Datatypes: [`IO`]({{ '/docs/effects/io/' | relative_url }})
 Typeclasses: [`MonadSuspend`]({{ '/docs/effects/monadsuspend/' | relative_url }}), [`Async`]({{ '/docs/effects/async/' | relative_url }}), [`Effect`]({{ '/docs/effects/effect/' | relative_url }})
 
 
-### arrow-effects-(rx2, reactor, kotlinxcoroutines)
+### arrow-effects-(rx2, reactor, kotlinx-coroutines)
 
 {:.intermediate}
 intermediate
