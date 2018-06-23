@@ -65,7 +65,7 @@ class BoundedTest : UnitSpec() {
     }
 
     "Working with At in Optics should be same as in DSL" {
-      Db.content.at(MapK.at(), One).compose(somePrism()).modify(db, String::toUpperCase) shouldBe
+      Db.content.at(MapK.at(), One).some.modify(db, String::toUpperCase) shouldBe
         (Db.content compose
           MapK.at<Keys, String>().at(One) compose
           somePrism()).modify(db, String::toUpperCase)
