@@ -8,13 +8,8 @@ import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.instance
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadError
-import arrow.typeclasses.Traverse
+import arrow.typeclasses.*
+import kotlin.coroutines.experimental.CoroutineContext
 
 @instance(FluxK::class)
 interface FluxKFunctorInstance : Functor<ForFluxK> {
@@ -112,6 +107,9 @@ interface FluxKAsyncInstance :
     Async<ForFluxK> {
   override fun <A> async(fa: Proc<A>): FluxK<A> =
       FluxK.runAsync(fa)
+
+  override fun <A> FluxKOf<A>.continueOn(ctx: CoroutineContext): FluxK<A> =
+    fix().continueOn(ctx)
 }
 
 @instance(FluxK::class)
@@ -122,7 +120,10 @@ interface FluxKEffectInstance :
       fix().runAsync(cb)
 }
 
-object FluxKContext : FluxKEffectInstance
+object FluxKContext : FluxKEffectInstance, FluxKTraverseInstance {
+  override fun <A, B> FluxKOf<A>.map(f: (A) -> B): FluxK<B> =
+    fix().map(f)
+}
 
 infix fun <A> ForFluxK.Companion.extensions(f: FluxKContext.() -> A): A =
     f(FluxKContext)
