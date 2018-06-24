@@ -234,7 +234,7 @@ It's available for `bindingCancellable` comprehensions over instances of [`Monad
 Any datatype that allows asynchronous execution has to be abstracted by the typeclass [`Async`]({{ '/docs/effects/aync' | relative_url }}).
 Thus, it's only logical that these datatypes allow for non-blocking thread jumping.
 
-The typeclass [`Async`] defines an extension function for comprehensions that enables continuing the execution on a new thread.
+The typeclass [`Async`]({{ '/docs/effects/aync' | relative_url }}) defines an extension function for comprehensions that enables continuing the execution on a new thread.
 This function is called `continueOn()`, takes a `CoroutineContext` and applies the effect of jumping to it, without any value returned.
 The rest of the continuation will be executed on that `CoroutineContext`. Simple as that.
 

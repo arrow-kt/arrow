@@ -2,7 +2,7 @@ package arrow.free
 
 import arrow.Kind
 import arrow.typeclasses.Monad
-import arrow.typeclasses.stackLabels
+import arrow.typeclasses.stateStack
 import kotlin.coroutines.experimental.*
 import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
@@ -28,9 +28,9 @@ open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: C
   suspend fun <B> Free<F, B>.bind(): B = bind { this }
 
   suspend fun <B> bind(m: () -> Free<F, B>): B = suspendCoroutineOrReturn { c ->
-    val labelHere = c.stackLabels // save the whole coroutine stack labels
+    val labelHere = c.stateStack // save the whole coroutine stack labels
     returnedMonad = m().flatMap { z ->
-      c.stackLabels = labelHere
+      c.stateStack = labelHere
       c.resume(z)
       returnedMonad
     }
