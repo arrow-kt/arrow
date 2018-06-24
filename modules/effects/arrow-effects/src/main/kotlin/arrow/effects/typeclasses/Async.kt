@@ -2,6 +2,7 @@ package arrow.effects.typeclasses
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.typeclasses.MonadContinuation
 import kotlin.coroutines.experimental.CoroutineContext
 
 /** An asynchronous computation that might fail. **/
@@ -12,6 +13,9 @@ interface Async<F> : MonadDefer<F> {
   fun <A> async(fa: Proc<A>): Kind<F, A>
 
   fun <A> Kind<F, A>.continueOn(ctx: CoroutineContext): Kind<F, A>
+
+  suspend fun <A> MonadContinuation<F, A>.continueOn(ctx: CoroutineContext): Unit =
+    just(Unit).continueOn(ctx).bind()
 
   fun <A> never(): Kind<F, A> =
     async { }
