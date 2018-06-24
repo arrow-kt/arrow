@@ -147,9 +147,9 @@ class InstanceFileGenerator(
   fun generate() {
     instances.forEach {
       val elementsToGenerate: List<String> = listOf(genImports(it), genCompanionExtensions(it))
-      val source: String = elementsToGenerate.joinToString(prefix = "package ${it.`package`}\n\n", separator = "\n", postfix = "\n")
-      val dir = File("${generatedDir.absolutePath}/${it.`package`.replace(".", "/")}").also { it.mkdirs() }
-      val file = File(dir, "${it.target.classElement.simpleName}$$${instanceAnnotationClass.simpleName}.kt")
+      val source: String = elementsToGenerate.joinToString(prefix = "package ${it.target.`package`}\n\n", separator = "\n", postfix = "\n")
+      val dir = File("${generatedDir.absolutePath}/${it.target.`package`.replace(".", "/")}").also { it.mkdirs() }
+      val file = File(dir, "${it.name}$$${instanceAnnotationClass.simpleName}.kt")
       file.writeText(source)
     }
   }
