@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.effects.typeclasses.Async
+import arrow.test.generators.genIntSmall
 import arrow.test.generators.genThrowable
 import arrow.typeclasses.Eq
 import arrow.typeclasses.binding
@@ -32,19 +33,26 @@ object AsyncLaws {
     })
 
   fun <F> Async<F>.continueOn(EQ: Eq<Kind<F, Int>>): Unit =
-    forFew(5, Gen.int(), { threadId: Int ->
-      Unit.just().continueOn(newSingleThreadContext(threadId.toString()))
-        // Turns out that kotlinx.coroutines decides to rewrite thread names
-        .map { Thread.currentThread().name.substringBefore(' ').toInt() }
-        .equalUnderTheLaw(just(threadId), EQ)
+    forFew(5, genIntSmall(), genIntSmall(), { threadId1: Int, threadId2: Int ->
+      Unit.just()
+        .continueOn(newSingleThreadContext(threadId1.toString()))
+        .map { getCurrentThread() }
+        .continueOn(newSingleThreadContext(threadId2.toString()))
+        .map { it + getCurrentThread() }
+        .equalUnderTheLaw(just(threadId1 + threadId2), EQ)
     })
 
   fun <F> Async<F>.continueOnComprehension(EQ: Eq<Kind<F, Int>>): Unit =
-    forFew(5, Gen.int(), { threadId: Int ->
+    forFew(5, genIntSmall(), genIntSmall(), { threadId1: Int, threadId2: Int ->
       binding {
-        continueOn(newSingleThreadContext(threadId.toString()))
-        // Turns out that kotlinx.coroutines decides to rewrite thread names
-        Thread.currentThread().name.substringBefore(' ').toInt()
-      }.equalUnderTheLaw(just(threadId), EQ)
+        continueOn(newSingleThreadContext(threadId1.toString()))
+        val t1: Int = getCurrentThread()
+        continueOn(newSingleThreadContext(threadId2.toString()))
+        t1 + getCurrentThread()
+      }.equalUnderTheLaw(just(threadId1 + threadId2), EQ)
     })
+
+  // Turns out that kotlinx.coroutines decides to rewrite thread names
+  private fun getCurrentThread() =
+    Thread.currentThread().name.substringBefore(' ').toInt()
 }
