@@ -10,8 +10,7 @@ import arrow.instances.ListInstances
  * [Optional] to safely operate on the head of a list
  */
 fun <A> ListK.Companion.head(): Optional<List<A>, A> = Optional(
-  partialFunction = case({ list: List<A> -> list.isNotEmpty() }
-    toT { list: List<A> -> list.first() }),
+  partialFunction = case(List<A>::isNotEmpty toT List<A>::first),
   set = { newHead -> { list -> list.mapIndexed { index, value -> if (index == 0) newHead else value } } }
 )
 
@@ -19,8 +18,7 @@ fun <A> ListK.Companion.head(): Optional<List<A>, A> = Optional(
  * [Optional] to safely operate on the tail of a list
  */
 fun <A> ListK.Companion.tail(): Optional<List<A>, List<A>> = Optional(
-  partialFunction = case({ list: List<A> -> list.isNotEmpty() }
-    toT { list: List<A> -> list.drop(1) }),
+  partialFunction = case(List<A>::isNotEmpty toT { list: List<A> -> list.drop(1) }),
   set = { newTail -> { list -> (list.firstOrNull()?.let(::listOf) ?: emptyList()) + newTail } }
 )
 
