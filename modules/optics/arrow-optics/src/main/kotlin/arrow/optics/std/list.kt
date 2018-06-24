@@ -35,7 +35,6 @@ fun <A, B> ListK.Companion.toPOptionNel(): PIso<List<A>, List<B>, Option<NonEmpt
  */
 fun <A> ListK.Companion.toOptionNel(): Iso<List<A>, Option<NonEmptyList<A>>> = toPOptionNel()
 
-
 /**
  * [PIso] that defines the equality between a [List] and a [ListK]
  */

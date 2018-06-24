@@ -2,7 +2,6 @@ package arrow.optics
 
 import arrow.data.MapK
 import arrow.data.SetK
-import arrow.data.fix
 import arrow.data.k
 
 /**

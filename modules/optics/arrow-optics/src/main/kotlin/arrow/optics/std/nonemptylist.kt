@@ -1,7 +1,6 @@
 package arrow.optics
 
 import arrow.data.NonEmptyList
-import arrow.data.fix
 
 /**
  * [Lens] to operate on the head of a [NonEmptyList]

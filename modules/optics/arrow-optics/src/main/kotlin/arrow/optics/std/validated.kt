@@ -3,7 +3,6 @@ package arrow.optics
 import arrow.core.*
 import arrow.data.Validated
 import arrow.data.Validated.Companion.fromEither
-import arrow.data.fix
 
 /**
  * [PIso] that defines equality between [Validated] and [Either]
