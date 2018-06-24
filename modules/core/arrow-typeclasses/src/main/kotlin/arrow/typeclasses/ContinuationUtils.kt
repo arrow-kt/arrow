@@ -5,6 +5,7 @@ import kotlin.coroutines.experimental.Continuation
 private val coroutineImplClass by lazy { Class.forName("kotlin.coroutines.experimental.jvm.internal.CoroutineImpl") }
 
 private val labelField by lazy { coroutineImplClass.getDeclaredField("label").apply { isAccessible = true } }
+
 private val completionField by lazy { coroutineImplClass.getDeclaredField("completion").apply { isAccessible = true } }
 
 private var <T> Continuation<T>.label

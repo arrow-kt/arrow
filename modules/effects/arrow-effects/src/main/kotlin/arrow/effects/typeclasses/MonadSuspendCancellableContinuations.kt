@@ -3,9 +3,9 @@ package arrow.effects.typeclasses
 import arrow.Kind
 import arrow.core.Either
 import arrow.effects.data.internal.BindingCancellationException
-import arrow.effects.internal.stackLabels
 import arrow.typeclasses.MonadErrorContinuation
 import arrow.typeclasses.bindingCatch
+import arrow.typeclasses.stackLabels
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.EmptyCoroutineContext
