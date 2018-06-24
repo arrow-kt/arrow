@@ -5,6 +5,10 @@ permalink: /docs/optics/traversal/
 ---
 
 ## Traversal
+
+{:.beginner}
+beginner
+
 A `Traversal` is an optic that can see into a structure and get, set or modify 0 to N foci.
 
 It is a generalization of [`Traverse#traverse`](/docs/typeclasses/traverse). Given a `Traverse<F>` we can apply a function `(A) -> Kind<G, B>` to `Kind<F, A>` and get `Kind<G, Kind<F, B>>`.

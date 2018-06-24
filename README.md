@@ -11,6 +11,7 @@ It includes the most popular data types, type classes and abstractions such as `
 
 - [Documentation](http://arrow-kt.io)
 - [Patterns](http://arrow-kt.io/docs/patterns/glossary/): tutorials and approaches to day-to-day challenges using FP 
+- [Libraries](http://arrow-kt.io/docs/quickstart/libraries/): all the libraries provided by Λrrow
 - [Type classes](http://arrow-kt.io/docs/typeclasses/intro/): defining behaviors for data
 - [Data types](http://arrow-kt.io/docs/datatypes/intro/): common abstractions
 - [Effects](http://arrow-kt.io/docs/effects/io/): interfacing with external systems
@@ -51,6 +52,7 @@ dependencies {
     compile 'io.arrow-kt:arrow-mtl:0.7.2' //optional
     compile 'io.arrow-kt:arrow-effects:0.7.2' //optional
     compile 'io.arrow-kt:arrow-effects-rx2:0.7.2' //optional
+    compile 'io.arrow-kt:arrow-effects-reactor:0.7.2' //optional
     compile 'io.arrow-kt:arrow-effects-kotlinx-coroutines:0.7.2' //optional
     compile 'io.arrow-kt:arrow-optics:0.7.2' //optional
     compile 'io.arrow-kt:arrow-generic:0.7.2' //optional

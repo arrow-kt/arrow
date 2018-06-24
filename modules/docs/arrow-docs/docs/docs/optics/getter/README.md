@@ -6,6 +6,9 @@ permalink: /docs/optics/getter/
 
 ## Getter
 
+{:.beginner}
+beginner
+
 A `Getter` is an optic that can focus into a structure and `get` its focus.
 It can be seen as a wrapper of a get function `(S) -> A` that can be composed with other optics.
 

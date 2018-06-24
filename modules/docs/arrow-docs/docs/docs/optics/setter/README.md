@@ -6,6 +6,9 @@ permalink: /docs/optics/setter/
 
 ## Setter
 
+{:.beginner}
+beginner
+
 A `Setter` is an optic that can see into a structure and set or modify its focus.
 
 It is a generalisation of [`Functor#map`](/docs/typeclasses/functor). Given a `Functor<F>` we can apply a function `(A) -> B` to `Kind<F, A>` and get `Kind<F, B>`. We can think of `Kind<F, A>` as a structure `S` that has a focus `A`.
