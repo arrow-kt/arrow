@@ -12,12 +12,13 @@ import arrow.test.generators.genOption
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.fail
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
+import java.util.*
 
 @RunWith(KotlinTestRunner::class)
 class OptionTest : UnitSpec() {
@@ -43,7 +44,10 @@ class OptionTest : UnitSpec() {
 
     ForOption extensions {
       testLaws(
-        EqLaws.laws(Option.eq(Int.eq())) { genOption(Gen.int()) },
+        EqLaws.laws(Option.eq(Int.eq())) {
+          val optionList = genOption(Gen.int()).random()
+          optionList.elementAt(Random().nextInt(optionList.count()))
+        },
         ShowLaws.laws(Option.show(), Option.eq(Int.eq())) { Some(it) },
         MonoidLaws.laws(Option.monoid(Int.monoid()), Some(1), Option.eq(Int.eq())),
         //testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`

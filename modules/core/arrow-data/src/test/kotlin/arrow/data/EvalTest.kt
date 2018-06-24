@@ -1,8 +1,10 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Eval
 import arrow.core.Eval.Now
+import arrow.core.ForEval
+import arrow.core.fix
 import arrow.instances.extensions
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
@@ -10,10 +12,10 @@ import arrow.test.laws.ComonadLaws
 import arrow.test.laws.MonadLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.fail
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -188,7 +190,7 @@ class EvalTest : UnitSpec() {
 
       val gen = Gen.create {
         val leaf = { Eval.Now(0) }
-        val eval = build(leaf, (0 until maxDepth).map { O.gen })
+        val eval = build(leaf, O.gen.random().take(maxDepth).toList())
         DeepEval(eval)
       }
     }
