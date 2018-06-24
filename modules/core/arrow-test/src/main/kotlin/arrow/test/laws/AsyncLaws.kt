@@ -7,6 +7,7 @@ import arrow.core.Right
 import arrow.effects.typeclasses.Async
 import arrow.test.generators.genThrowable
 import arrow.typeclasses.Eq
+import arrow.typeclasses.binding
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.experimental.newSingleThreadContext
@@ -16,7 +17,8 @@ object AsyncLaws {
     MonadSuspendLaws.laws(AC, EQERR, EQ_EITHER, EQ) + listOf(
       Law("Async Laws: success equivalence", { AC.asyncSuccess(EQ) }),
       Law("Async Laws: error equivalence", { AC.asyncError(EQERR) }),
-      Law("Async Laws: continueOn", { AC.continueOn(EQ) })
+      Law("Async Laws: continueOn jumps threads", { AC.continueOn(EQ) }),
+      Law("Async Laws: continueOn on comprehensions", { AC.continueOnComprehension(EQ) })
     )
 
   fun <F> Async<F>.asyncSuccess(EQ: Eq<Kind<F, Int>>): Unit =
@@ -35,5 +37,14 @@ object AsyncLaws {
         // Turns out that kotlinx.coroutines decides to rewrite thread names
         .map { Thread.currentThread().name.substringBefore(' ').toInt() }
         .equalUnderTheLaw(just(threadId), EQ)
+    })
+
+  fun <F> Async<F>.continueOnComprehension(EQ: Eq<Kind<F, Int>>): Unit =
+    forFew(5, Gen.int(), { threadId: Int ->
+      binding {
+        continueOn(newSingleThreadContext(threadId.toString()))
+        // Turns out that kotlinx.coroutines decides to rewrite thread names
+        Thread.currentThread().name.substringBefore(' ').toInt()
+      }.equalUnderTheLaw(just(threadId), EQ)
     })
 }
