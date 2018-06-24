@@ -7,11 +7,8 @@ import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.instance
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadError
+import arrow.typeclasses.*
+import kotlin.coroutines.experimental.CoroutineContext
 
 @instance(MonoK::class)
 interface MonoKFunctorInstance : Functor<ForMonoK> {
@@ -85,6 +82,9 @@ interface MonoKAsyncInstance :
     Async<ForMonoK> {
   override fun <A> async(fa: Proc<A>): MonoK<A> =
       MonoK.async(fa)
+
+  override fun <A> MonoKOf<A>.continueOn(ctx: CoroutineContext): MonoK<A> =
+    fix().continueOn(ctx)
 }
 
 @instance(MonoK::class)
@@ -94,3 +94,8 @@ interface MonoKEffectInstance :
   override fun <A> MonoKOf<A>.runAsync(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Unit> =
       fix().runAsync(cb)
 }
+
+object MonoKContext : MonoKEffectInstance
+
+infix fun <A> ForMonoK.Companion.extensions(f: MonoKContext.() -> A): A =
+  f(MonoKContext)

@@ -5,6 +5,9 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.effects.internal.Platform.ArrayStack
 import arrow.effects.typeclasses.Proc
+import kotlin.coroutines.experimental.Continuation
+import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.experimental.startCoroutine
 
 private typealias Current = IOOf<Any?>
 private typealias BindF = (Any?) -> IO<Any?>
@@ -66,6 +69,23 @@ internal object IORunLoop {
           bFirst = currentIO.g as BindF
           currentIO = currentIO.cont
         }
+        is IO.ContinueOn<*> -> {
+          if (bFirst != null) {
+            if (bRest == null) bRest = ArrayStack()
+            bRest.push(bFirst)
+          }
+          val localCurrent = currentIO
+
+          val currentCC = localCurrent.cc
+
+          val localCont = currentIO.cont
+
+          bFirst = { c: Any? -> IO.just(c) }
+
+          currentIO = IO.async { cc ->
+            loop(localCont, cc.asyncCallback(currentCC), null, null, null)
+          }
+        }
         is IO.Map<*, *> -> {
           if (bFirst != null) {
             if (bRest == null) {
@@ -99,7 +119,7 @@ internal object IORunLoop {
     } while (true)
   }
 
-  inline private fun <A> sanitizedCurrentIO(currentIO: Current?, unboxed: Any?): IO<A> =
+  private inline fun <A> sanitizedCurrentIO(currentIO: Current?, unboxed: Any?): IO<A> =
     (currentIO ?: IO.Pure(unboxed)) as IO<A>
 
   private fun <A> suspendInAsync(
@@ -186,6 +206,24 @@ internal object IORunLoop {
           bFirst = currentIO.g as BindF
           currentIO = currentIO.cont
         }
+        is IO.ContinueOn<*> -> {
+          if (bFirst != null) {
+            if (bRest == null) bRest = ArrayStack()
+            bRest.push(bFirst)
+          }
+          val localCurrent = currentIO
+
+          val currentCC = localCurrent.cc
+
+          val localCont = currentIO.cont
+
+          bFirst = { c: Any? -> IO.just(c) }
+
+          currentIO = IO.async { cc ->
+            loop(localCont, cc.asyncCallback(currentCC), null, null, null)
+          }
+
+        }
         is IO.Map<*, *> -> {
           if (bFirst != null) {
             if (bRest == null) {
@@ -220,7 +258,7 @@ internal object IORunLoop {
     } while (true)
   }
 
-  inline private fun executeSafe(crossinline f: () -> IOOf<Any?>): IO<Any?> =
+  private inline fun executeSafe(crossinline f: () -> IOOf<Any?>): IO<Any?> =
     try {
       f().fix()
     } catch (e: Throwable) {
@@ -301,4 +339,21 @@ internal object IORunLoop {
         }
     }
   }
+
+  private fun <T> ((Either<Throwable, T>) -> Unit).asyncCallback(currentCC: CoroutineContext): (Either<Throwable, T>) -> Unit =
+    { result ->
+      val func: suspend () -> Unit = { this(result) }
+
+      val normalResume: Continuation<Unit> = object : Continuation<Unit> {
+        override val context: CoroutineContext = currentCC
+
+        override fun resume(value: Unit) {}
+
+        override fun resumeWithException(exception: Throwable) {
+          this@asyncCallback(Either.left(exception))
+        }
+      }
+
+      func.startCoroutine(normalResume)
+    }
 }

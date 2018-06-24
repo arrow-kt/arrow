@@ -3,10 +3,12 @@ package arrow.effects
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.effects.CoroutineContextScheduler.asScheduler
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import reactor.core.publisher.Mono
 import reactor.core.publisher.MonoSink
+import kotlin.coroutines.experimental.CoroutineContext
 
 fun <A> Mono<A>.k(): MonoK<A> = MonoK(this)
 
@@ -26,6 +28,9 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
 
   fun handleErrorWith(function: (Throwable) -> MonoK<A>): MonoK<A> =
       mono.onErrorResume { t: Throwable -> function(t).mono }.k()
+
+  fun continueOn(ctx: CoroutineContext): MonoK<A> =
+    mono.publishOn(ctx.asScheduler()).k()
 
   fun runAsync(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Unit> =
       mono.flatMap { cb(Right(it)).value() }.onErrorResume { cb(Left(it)).value() }.k()
