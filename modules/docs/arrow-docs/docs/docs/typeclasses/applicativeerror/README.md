@@ -6,6 +6,9 @@ permalink: /docs/typeclasses/applicativeerror/
 
 ## ApplicativeError
 
+{:.intermediate}
+intermediate
+
 ApplicativeError is the typeclase used to explicitly represent errors during independent computations.
 It is parametrized to an error type `E`, which means the datatype has at least a "success" and a "failure" version.
 

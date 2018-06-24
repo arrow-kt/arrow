@@ -70,3 +70,27 @@ $base-grid: (
 
 // Box Shadow
 $box-shadow-item: rgba($brand-primary, 0.10) 0 0 20px;
+
+// Docsearch dropdown
+$dropdown-config: (
+  main-color: $brand-quaternary,
+  layout-type: normal,
+  layout-width: full,
+  background-color: #fff,
+  border-radius: 2,
+  border-width: 2,
+  border-color: rgba(0, 0, 0, .1),
+  box-shadow: none,
+  branding-position: bottom,
+  spacing: normal,
+  include-desc: yes,
+  background-category-header:  #ffffff,
+  font-size: normal,
+  header-color: $brand-primary,
+  title-color: $brand-primary,
+  subtitle-color: $brand-tertiary,
+  text-color: $brand-secondary,
+  highlight-color: #ef8836,
+  highlight-opacity: .1,
+  highlight-type: underline
+) !default;

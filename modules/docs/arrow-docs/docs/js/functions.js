@@ -1,9 +1,22 @@
 (function($) {
     "use strict";
 
-    // All these functions are related to the sidebar nav
+    var docsearchInputId = '#docsearch';
+
+    docsearch({
+     apiKey: 'b723ae1d349539b4a2b51bac514fc9ab',
+     indexName: 'arrow',
+     inputSelector: docsearchInputId,
+     debug: false // Set debug to true if you want to inspect the dropdown
+    });
+
     $(document).ready(function() {
 
+        // To focus the searchbar on load. Autofocus won't work since, in the end,
+        // the input is injected externally by the Algolia autocomplete.js library
+        document.querySelector(docsearchInputId).focus();
+
+        // Following functions are related to the sidebar nav
         // Show and hide the sidebar
         $(".sidebar-toggle").click(function(e) {
             e.preventDefault();

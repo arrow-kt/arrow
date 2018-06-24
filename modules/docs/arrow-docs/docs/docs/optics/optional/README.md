@@ -6,6 +6,9 @@ permalink: /docs/optics/optional/
 
 ## Optional
 
+{:.beginner}
+beginner
+
 An `Optional` is an optic that allows to see into a structure and getting, setting or modifying an optional focus.
 It combines the properties of a `Lens` (getting, setting and modifying) with the properties of a `Prism` (an optional focus).
 
@@ -126,4 +129,4 @@ lifted(Try.Failure<Tuple2<Int, String>>(IllegalStateException("something went wr
 
 Arrow provides [`OptionalLaws`][optional_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own optionals.
 
-[optional_laws_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/OptionalLaws.kt
+[optional_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/OptionalLaws.kt

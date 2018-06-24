@@ -8,6 +8,9 @@ If you would like to know about using the [`Reader`]({{ '/docs/datatypes/reader'
 
 ## Dependency Injection using the `Typeclassless` technique
 
+{:.intermediate}
+intermediate
+
 Arrow allows abstracting polymorphic code that operates over the evidence of having an instance of a [typeclass]({{ '/docs/typeclasses/intro' | relative_url }}) available.
 This enables programs that are not coupled to specific datatype implementations.
 The technique demonstrated below to write polymorphic code is available for all other typeclasses besides [`Functor`]({{ '/docs/typeclasses/functor' | relative_url }}).

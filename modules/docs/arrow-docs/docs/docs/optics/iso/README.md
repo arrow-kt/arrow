@@ -6,7 +6,10 @@ permalink: /docs/optics/iso/
 
 ## Iso
 
-An `Iso` is a loss less invertible optic that defines an isomorphism between a type `S` and `A` i.e. a data class and its properties represented by `TupleN`.
+{:.beginner}
+beginner
+
+An `Iso` is a lossless invertible optic that defines an isomorphism between a type `S` and `A` i.e. a data class and its properties represented by `TupleN`.
 
 Isos can be seen as a pair of functions that represent an isomorphism, `get` and `reverseGet`. So an `Iso<S, A>` represents two getters: `get: (S) -> A` and `reverseGet: (A) -> S` where `S` is called the source of the `Iso` and `A` is called the focus or target of the `Iso`.
 
@@ -150,4 +153,4 @@ reverse
 
 Arrow provides [`IsoLaws`][iso_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own isos.
 
-[iso_laws_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/IsoLaws.kt
+[iso_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/IsoLaws.kt

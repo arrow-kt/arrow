@@ -7,6 +7,9 @@ video: q6HpChSq-xc
 
 ## Either
 
+{:.beginner}
+beginner
+
 In day-to-day programming, it is fairly common to find ourselves writing functions that can fail.
 For instance, querying a service may result in a connection issue, or some unexpected JSON response.
 

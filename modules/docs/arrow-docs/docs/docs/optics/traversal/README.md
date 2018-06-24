@@ -5,6 +5,10 @@ permalink: /docs/optics/traversal/
 ---
 
 ## Traversal
+
+{:.beginner}
+beginner
+
 A `Traversal` is an optic that can see into a structure and get, set or modify 0 to N foci.
 
 It is a generalization of [`Traverse#traverse`](/docs/typeclasses/traverse). Given a `Traverse<F>` we can apply a function `(A) -> Kind<G, B>` to `Kind<F, A>` and get `Kind<G, Kind<F, B>>`.
@@ -94,4 +98,4 @@ pTraversal.modify(listOf(1, 2, 3, 4).k()) {
 
 Arrow provides [`TraversalLaws`][traversal_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own traversal.
 
-[traversal_laws_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/TraversalLaws.kt
+[traversal_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/TraversalLaws.kt
