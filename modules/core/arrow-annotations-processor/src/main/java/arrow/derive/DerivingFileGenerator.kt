@@ -3,7 +3,6 @@ package arrow.derive
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.extractFullName
 import arrow.common.utils.removeBackticks
-import arrow.generic.productAnnotationClass
 import arrow.higherkinds.HKMarkerPreFix
 import arrow.higherkinds.KindPostFix
 import me.eugeniomarletti.kotlin.metadata.modality

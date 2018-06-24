@@ -3,7 +3,6 @@ package arrow.higherkinds
 import com.google.auto.service.AutoService
 import arrow.common.utils.AbstractProcessor
 import arrow.common.utils.knownError
-import java.io.File
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
