@@ -12,6 +12,7 @@ data class AnnotatedGeneric(val type: TypeElement, val classData: ClassOrPackage
   val targetNames = targets.map(Target::fullName)
   val hasTupleFocus: Boolean = targets.size > 1
   val focusSize: Int = targets.size
+  val `package` = classData.`package`
 }
 
 data class Target(val fullName: String, val paramName: String)

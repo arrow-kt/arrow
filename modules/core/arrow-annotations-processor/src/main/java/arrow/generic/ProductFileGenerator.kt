@@ -1,5 +1,6 @@
 package arrow.generic
 
+import arrow.common.utils.removeBackticks
 import me.eugeniomarletti.kotlin.metadata.escapedClassName
 import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 import java.io.File
@@ -29,7 +30,8 @@ class ProductFileGenerator(
   private fun buildProduct(products: Collection<AnnotatedGeneric>) =
     products.map(this::processElement)
       .forEach { (element, funString) ->
-        File(generatedDir, "${productAnnotationClass.simpleName}.${element.classData.`package`}.${element.sourceName}.kt").printWriter().use { w ->
+        val generatedDir = File("$generatedDir/${element.`package`.removeBackticks().replace(".", "/")}").also { it.mkdirs() }
+        File(generatedDir, "${element.sourceName}\$\$${productAnnotationClass.simpleName}.kt").printWriter().use { w ->
           w.println(funString)
         }
       }
@@ -37,7 +39,8 @@ class ProductFileGenerator(
   private fun buildInstances(products: Collection<AnnotatedGeneric>) =
     products.map { p -> processInstancesForElement(p) }
       .forEach { (element, funString) ->
-        File(generatedDir, "${productAnnotationClass.simpleName}.${element.classData.`package`}.${element.sourceName}.instances.kt").printWriter().use { w ->
+        val generatedDir = File("$generatedDir/${element.`package`.removeBackticks().replace(".", "/")}").also { it.mkdirs() }
+        File(generatedDir, "${element.sourceName}\$\$${productAnnotationClass.simpleName}\$\$instances.kt").printWriter().use { w ->
           w.println(funString)
         }
       }
