@@ -3,6 +3,7 @@ package arrow.derive
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.extractFullName
 import arrow.common.utils.removeBackticks
+import arrow.generic.productAnnotationClass
 import arrow.higherkinds.HKMarkerPreFix
 import arrow.higherkinds.KindPostFix
 import me.eugeniomarletti.kotlin.metadata.modality
@@ -163,7 +164,8 @@ class DerivingFileGenerator(
     annotatedList.forEachIndexed { _, c ->
       val elementsToGenerate = listOf(genImpl(c))
       val source: String = elementsToGenerate.joinToString(prefix = "package ${c.classOrPackageProto.`package`}\n\n", separator = "\n")
-      val file = File(generatedDir, derivingAnnotationClass.simpleName + ".${c.classElement.qualifiedName}.kt")
+      val generatedDir = File("$generatedDir/${ c.classOrPackageProto.`package`.removeBackticks().replace(".", "/")}").also { it.mkdirs() }
+      val file = File(generatedDir, "${c.classElement.simpleName}\$\$${derivingAnnotationClass.simpleName}.kt")
       file.writeText(source)
     }
   }

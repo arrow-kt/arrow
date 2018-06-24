@@ -35,8 +35,7 @@ class DerivingProcessor : AbstractProcessor() {
       }
 
     if (roundEnv.processingOver()) {
-      val generatedDir = File(this.generatedDir!!, derivingAnnotationClass.simpleName).also { it.mkdirs() }
-      DerivingFileGenerator(generatedDir, annotatedList).generate()
+      DerivingFileGenerator(this.generatedDir!!, annotatedList).generate()
     }
   }
 
