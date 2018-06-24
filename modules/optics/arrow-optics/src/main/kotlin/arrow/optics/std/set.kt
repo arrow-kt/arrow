@@ -2,20 +2,17 @@ package arrow.optics
 
 import arrow.data.SetK
 import arrow.data.k
+import arrow.instances.SetInstances
 
-object SetOptics {
+/**
+ * [PIso] that defines the equality between a [Set] and a [SetK]
+ */
+fun <A, B> SetInstances.toPSetK(): PIso<Set<A>, Set<B>, SetK<A>, SetK<B>> = PIso(
+  get = Set<A>::k,
+  reverseGet = SetK<B>::set
+)
 
-  /**
-   * [PIso] that defines the equality between a [Set] and a [SetK]
-   */
-  fun <A, B> toPSetK(): PIso<Set<A>, Set<B>, SetK<A>, SetK<B>> = PIso(
-    get = { it.k() },
-    reverseGet = SetK<B>::set
-  )
-
-  /**
-   * [Iso] that defines the equality between a [Set] and a [SetK]
-   */
-  fun <A> toSetK(): Iso<Set<A>, SetK<A>> = toPSetK()
-
-}
+/**
+ * [Iso] that defines the equality between a [Set] and a [SetK]
+ */
+fun <A> SetInstances.toSetK(): Iso<Set<A>, SetK<A>> = toPSetK()

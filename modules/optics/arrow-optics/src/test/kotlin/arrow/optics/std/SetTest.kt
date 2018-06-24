@@ -3,6 +3,7 @@ package arrow.optics
 import arrow.data.SetK
 import arrow.data.k
 import arrow.data.monoid
+import arrow.instances.SetInstances
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genSetK
@@ -19,7 +20,7 @@ class SetTest : UnitSpec() {
   init {
 
     testLaws(IsoLaws.laws(
-      iso = SetOptics.toSetK(),
+      iso = SetInstances.toSetK(),
       aGen = Gen.set(Gen.int()),
       bGen = genSetK(Gen.int()),
       funcGen = genFunctionAToB(genSetK(Gen.int())),
