@@ -65,6 +65,25 @@ IO.async()
   }
 ```
 
+#### continueOn
+
+It makes the rest of the operator chain to be executed on a separate `CoroutineContext`, effectively jumping threads if necessary.
+
+```
+IO.async().run {
+  // In current thread
+  just(createUserFromId(123))
+    .continueOn(CommonPool)
+    // In CommonPool
+    .flatMap { request(it) }
+    .continueOn(Ui)
+    // In Ui
+    .flatMap { showResult(it) }
+}
+```
+
+Behind the scenes `continueOn()` starts a new coroutine and passes the rest of the chain as the block to execute.
+
 #### never
 
 Creates an object using `async()` whose callback is never called.

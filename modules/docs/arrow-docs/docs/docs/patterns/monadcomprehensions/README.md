@@ -198,6 +198,10 @@ Note that while most data types include an instance of [`Monad`]({{ '/docs/typec
 Arrow uses the same abstraction as coroutines to group threads and other contexts of execution: `CoroutineContext`.
 There are multiple default values and wrappers for common cases in both the standard library, and the extension library [kotlinx.coroutines](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/-coroutine-dispatcher/index.html).
 
+#### Blocking thread jumps
+
+NOTE: This blocking approach to thread jumping will change before the 1.0 release, as it's causing non-blocking datatypes to behave as if they were blocking.
+
 In any `binding()` block there is a helper function `bindIn()` that takes a `CoroutineContext` as a parameter and can return any value.
 This value will be lifted into a data type using `just()`.
 
@@ -224,6 +228,37 @@ Note that `bindIn()`assures that the execution will return to the same thread wh
 
 There is also a version of `bindIn` called `bindDeferredIn` that allows deferred construction.
 It's available for `bindingCancellable` comprehensions over instances of [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}).
+
+#### Non-blocking thread jumps
+
+Any datatype that allows asynchronous execution has to be abstracted by the typeclass [`Async`]({{ '/docs/effects/aync' | relative_url }}).
+Thus, it's only logical that these datatypes allow for non-blocking thread jumping.
+
+The typeclass [`Async`] defines an extension function for comprehensions that enables continuing the execution on a new thread.
+This function is called `continueOn()`, takes a `CoroutineContext` and applies the effect of jumping to it, without any value returned.
+The rest of the continuation will be executed on that `CoroutineContext`. Simple as that.
+
+Let's see an example:
+
+```
+IO.async().run {
+  binding {
+    // In current thread
+    val id = createIdFromNumber(762587).bind()
+    continueOn(CommonPool)
+
+    // In CommonPool now!
+    val result = request(id).bind()
+    continueOn(Ui)
+
+    // In Ui now!
+    showResult(result)
+  }
+}
+```
+
+Behind the scenes `continueOn()` starts a new coroutine and passes the rest of the execution as the block to execute.
+It's worth reminding that this means that you have to precompute thread local values like a thread name before doing the jump.
 
 ### What if I'd like to run multiple operations independently from each other, in a non-sequential way?
 
