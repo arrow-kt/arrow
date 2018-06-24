@@ -6,11 +6,13 @@ import arrow.core.Eval
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.identity
+import arrow.effects.CoroutineContextScheduler.asScheduler
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import reactor.core.publisher.Flux
 import reactor.core.publisher.FluxSink
+import kotlin.coroutines.experimental.CoroutineContext
 
 fun <A> Flux<A>.k(): FluxK<A> = FluxK(this)
 
@@ -53,6 +55,9 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
 
   fun handleErrorWith(function: (Throwable) -> FluxK<A>): FluxK<A> =
       this.fix().flux.onErrorResume { t: Throwable -> function(t).flux }.k()
+
+  fun continueOn(ctx: CoroutineContext): FluxK<A> =
+    flux.publishOn(ctx.asScheduler()).k()
 
   fun runAsync(cb: (Either<Throwable, A>) -> FluxKOf<Unit>): FluxK<Unit> =
       flux.flatMap { cb(Right(it)).value() }.onErrorResume { cb(Left(it)).value() }.k()
