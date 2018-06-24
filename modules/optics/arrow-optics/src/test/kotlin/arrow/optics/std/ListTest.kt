@@ -3,6 +3,7 @@ package arrow.optics
 import arrow.core.Option
 import arrow.core.monoid
 import arrow.data.*
+import arrow.instances.ListInstances
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genNonEmptyList
@@ -48,7 +49,7 @@ class ListTest : UnitSpec() {
     ))
 
     testLaws(IsoLaws.laws(
-      iso = ListOptics.toListK(),
+      iso = ListInstances.toListK(),
       aGen = Gen.list(Gen.int()),
       bGen = Gen.create { Gen.list(Gen.int()).generate().k() },
       funcGen = genFunctionAToB(Gen.create { Gen.list(Gen.int()).generate().k() }),

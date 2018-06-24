@@ -4,6 +4,7 @@ import arrow.core.*
 import arrow.data.ListK
 import arrow.data.NonEmptyList
 import arrow.data.k
+import arrow.instances.ListInstances
 
 /**
  * [Optional] to safely operate on the head of a list
@@ -36,19 +37,16 @@ fun <A, B> ListK.Companion.toPOptionNel(): PIso<List<A>, List<B>, Option<NonEmpt
  */
 fun <A> ListK.Companion.toOptionNel(): Iso<List<A>, Option<NonEmptyList<A>>> = toPOptionNel()
 
-object ListOptics {
 
-  /**
-   * [PIso] that defines the equality between a [List] and a [ListK]
-   */
-  fun <A, B> toPListK(): PIso<List<A>, List<B>, ListK<A>, ListK<B>> = PIso(
-    get = { it.k() },
-    reverseGet = ListK<B>::list
-  )
+/**
+ * [PIso] that defines the equality between a [List] and a [ListK]
+ */
+fun <A, B> ListInstances.toPListK(): PIso<List<A>, List<B>, ListK<A>, ListK<B>> = PIso(
+  get = List<A>::k,
+  reverseGet = ListK<B>::list
+)
 
-  /**
-   * [Iso] that defines the equality between a [List] and a [ListK]
-   */
-  fun <A> toListK(): Iso<List<A>, ListK<A>> = toPListK()
-
-}
+/**
+ * [Iso] that defines the equality between a [List] and a [ListK]
+ */
+fun <A> ListInstances.toListK(): Iso<List<A>, ListK<A>> = toPListK()
