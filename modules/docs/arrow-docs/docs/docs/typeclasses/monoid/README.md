@@ -6,6 +6,9 @@ permalink: /docs/typeclasses/monoid/
 
 ## Monoid
 
+{:.beginner}
+beginner
+
 `Monoid` extends the `Semigroup` type class, adding an `empty` method to semigroup's `combine`. The empty method must return a value that when combined with any other instance of that type returns the other instance, i.e.
 
 ```kotlin

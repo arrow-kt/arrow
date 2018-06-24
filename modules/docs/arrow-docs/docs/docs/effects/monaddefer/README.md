@@ -6,6 +6,9 @@ permalink: /docs/effects/monaddefer/
 
 ## MonadDefer
 
+{:.intermediate}
+intermediate
+
 `MonadDefer` is a typeclass representing suspension of execution via functions, allowing for asynchronous and lazy computations.
 
 `MonadDefer` includes all combinators present in [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}).

@@ -6,6 +6,9 @@ permalink: /docs/patterns/monad_comprehensions/
 
 ## Monad Comprehensions
 
+{:.intermediate}
+intermediate
+
 Monad comprehension is the name for a programming idiom available in multiple languages.
 The purpose of monad comprehensions is to compose sequential chains of actions in a style that feels natural for programmers of all backgrounds.
 
