@@ -31,7 +31,7 @@ class MapInstanceTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = MapEachInstance<Int, String>().each(),
+      traversal = MapInstances.each<Int, String>().each(),
       aGen = Gen.map(Gen.int(), Gen.string()),
       bGen = Gen.string(),
       funcGen = genFunctionAToB(Gen.string()),
@@ -51,7 +51,7 @@ class MapInstanceTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = FilterIndex.filterIndex(MapFilterIndexInstance<Char, Int>()) { true },
+      traversal = MapInstances.filterIndex<Char, Int>().filter { true },
       aGen = genMapK(genChars(), genIntSmall()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
@@ -70,7 +70,7 @@ class MapInstanceTest : UnitSpec() {
     ))
 
     testLaws(OptionalLaws.laws(
-      optional = MapIndexInstance<String, Int>().index(Gen.string().generate()),
+      optional = MapInstances.index<String, Int>().index(Gen.string().generate()),
       aGen = Gen.map(Gen.string(), Gen.int()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
@@ -89,7 +89,7 @@ class MapInstanceTest : UnitSpec() {
     ))
 
     testLaws(LensLaws.laws(
-      lens = MapAtInstance<String, Int>().at(Gen.string().generate()),
+      lens = MapInstances.at<String, Int>().at(Gen.string().generate()),
       aGen = Gen.map(Gen.string(), Gen.int()),
       bGen = genOption(Gen.int()),
       funcGen = genFunctionAToB(genOption(Gen.int())),

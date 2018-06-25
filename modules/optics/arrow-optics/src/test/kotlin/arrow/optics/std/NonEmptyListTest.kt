@@ -2,8 +2,6 @@ package arrow.optics
 
 import arrow.data.ListK
 import arrow.data.NonEmptyList
-import arrow.data.monoid
-import arrow.instances.ListInstances
 import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB

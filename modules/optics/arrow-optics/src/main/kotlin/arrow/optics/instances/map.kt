@@ -1,10 +1,7 @@
 package arrow.optics.instances
 
 import arrow.Kind
-import arrow.core.Left
-import arrow.core.Option
-import arrow.core.Predicate
-import arrow.core.Right
+import arrow.core.*
 import arrow.data.*
 import arrow.optics.*
 import arrow.optics.typeclasses.At
@@ -12,6 +9,8 @@ import arrow.optics.typeclasses.Each
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
 import arrow.typeclasses.Applicative
+
+fun <K, V> MapInstances.at(): At<Map<K, V>, K, Option<V>> = MapAtInstance()
 
 /**
  * [At] instance definition for [Map].
@@ -40,6 +39,8 @@ interface MapAtInstance<K, V> : At<Map<K, V>, K, Option<V>> {
   }
 }
 
+fun <K, V> MapInstances.traversal(): Traversal<Map<K, V>, V> = MapTraversal()
+
 /**
  * [Traversal] for [Map] that focuses in each [V] of the source [Map].
  */
@@ -58,6 +59,8 @@ interface MapTraversal<K, V> : Traversal<Map<K, V>, V> {
   }
 }
 
+fun <K, V> MapInstances.each(): Each<Map<K, V>, V> = MapEachInstance()
+
 /**
  * [Each] instance definition for [Map].
  */
@@ -73,6 +76,8 @@ interface MapEachInstance<K, V> : Each<Map<K, V>, V> {
     operator fun <K, V> invoke() = object : MapEachInstance<K, V> {}
   }
 }
+
+fun <K, V> MapInstances.filterIndex(): FilterIndex<Map<K, V>, K, V> = MapFilterIndexInstance()
 
 /**
  * [FilterIndex] instance definition for [Map].
@@ -97,6 +102,8 @@ interface MapFilterIndexInstance<K, V> : FilterIndex<Map<K, V>, K, V> {
     operator fun <K, V> invoke() = object : MapFilterIndexInstance<K, V> {}
   }
 }
+
+fun <K, V> MapInstances.index(): Index<Map<K, V>, K, V> = MapIndexInstance()
 
 /**
  * [Index] instance definition for [Map].
