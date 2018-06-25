@@ -3,6 +3,7 @@ package arrow.test.generators
 import arrow.Kind
 import arrow.core.*
 import arrow.data.*
+import arrow.instances.functor
 import arrow.recursion.Algebra
 import arrow.recursion.Coalgebra
 import arrow.recursion.typeclasses.Corecursive

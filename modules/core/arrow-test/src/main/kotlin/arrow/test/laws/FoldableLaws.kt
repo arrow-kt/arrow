@@ -3,8 +3,8 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Id
-import arrow.core.monad
 import arrow.core.value
+import arrow.instances.monad
 import arrow.instances.monoid
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.genConstructor

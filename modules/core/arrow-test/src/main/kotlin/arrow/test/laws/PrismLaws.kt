@@ -1,6 +1,7 @@
 package arrow.test.laws
 
 import arrow.core.*
+import arrow.instances.applicative
 import arrow.typeclasses.*
 import arrow.optics.Prism
 import arrow.optics.modify

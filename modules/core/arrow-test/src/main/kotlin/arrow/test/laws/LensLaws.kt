@@ -1,6 +1,7 @@
 package arrow.test.laws
 
 import arrow.core.*
+import arrow.instances.*
 import arrow.typeclasses.*
 import arrow.optics.Lens
 import io.kotlintest.properties.Gen
