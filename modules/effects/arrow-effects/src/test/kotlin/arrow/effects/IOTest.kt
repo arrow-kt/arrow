@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
+import arrow.instances.eq
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.AsyncLaws
