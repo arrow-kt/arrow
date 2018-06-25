@@ -28,7 +28,7 @@ class ListInstanceTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = ListEachInstance<String>().each(),
+      traversal = ListInstances.each<String>().each(),
       aGen = Gen.list(Gen.string()),
       bGen = Gen.string(),
       funcGen = genFunctionAToB(Gen.string()),
@@ -38,7 +38,7 @@ class ListInstanceTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = FilterIndex.filterIndex(ListK.filterIndex()) { true },
+      traversal = ListK.filterIndex<String>().filter { true },
       aGen = genListK(Gen.string()),
       bGen = Gen.string(),
       funcGen = genFunctionAToB(Gen.string()),
@@ -48,7 +48,7 @@ class ListInstanceTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = FilterIndex.filterIndex(ListFilterIndexInstance()) { true },
+      traversal = ListInstances.filterIndex<String>().filter { true },
       aGen = Gen.list(Gen.string()),
       bGen = Gen.string(),
       funcGen = genFunctionAToB(Gen.string()),
@@ -67,7 +67,7 @@ class ListInstanceTest : UnitSpec() {
     ))
 
     testLaws(OptionalLaws.laws(
-      optional = ListIndexInstance<String>().index(5),
+      optional = ListInstances.index<String>().index(5),
       aGen = Gen.list(Gen.string()),
       bGen = Gen.string(),
       funcGen = genFunctionAToB(Gen.string()),

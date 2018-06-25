@@ -2,6 +2,7 @@ package arrow.optics.instances
 
 import arrow.Kind
 import arrow.core.Left
+import arrow.core.ListInstances
 import arrow.core.Right
 import arrow.core.toT
 import arrow.data.k
@@ -13,6 +14,8 @@ import arrow.optics.typeclasses.Each
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
 import arrow.typeclasses.Applicative
+
+fun <A> ListInstances.traversal(): Traversal<List<A>, A> = ListTraversal()
 
 /**
  * [Traversal] for [List] that focuses in each [A] of the source [List].
@@ -34,6 +37,8 @@ interface ListTraversal<A> : Traversal<List<A>, A> {
 
 }
 
+fun <A> ListInstances.each(): Each<List<A>, A> = ListEachInstance()
+
 /**
  * [Each] instance definition for [List] that summons a [Traversal] to focus in each [A] of the source [List].
  */
@@ -49,6 +54,8 @@ interface ListEachInstance<A> : Each<List<A>, A> {
     operator fun <A> invoke() = object : ListEachInstance<A> {}
   }
 }
+
+fun <A> ListInstances.filterIndex(): FilterIndex<List<A>, Int, A> = ListFilterIndexInstance()
 
 /**
  * [FilterIndex] instance definition for [List].
@@ -71,6 +78,8 @@ interface ListFilterIndexInstance<A> : FilterIndex<List<A>, Int, A> {
     operator fun <A> invoke() = object : ListFilterIndexInstance<A> {}
   }
 }
+
+fun <A> ListInstances.index(): Index<List<A>, Int, A> = ListIndexInstance()
 
 /**
  * [Index] instance definition for [List].
