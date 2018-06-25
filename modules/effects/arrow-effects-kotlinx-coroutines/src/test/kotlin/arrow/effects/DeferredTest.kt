@@ -3,6 +3,8 @@ package arrow.effects
 import arrow.Kind
 import arrow.core.*
 import arrow.data.*
+import arrow.instances.functor
+import arrow.instances.traverse
 import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
 import arrow.test.laws.AsyncLaws
