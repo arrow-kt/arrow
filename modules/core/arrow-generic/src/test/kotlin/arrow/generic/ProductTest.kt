@@ -2,6 +2,8 @@ package arrow.generic
 
 import arrow.Kind
 import arrow.core.*
+import arrow.instances.applicative
+import arrow.instances.monoid
 import arrow.product
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
