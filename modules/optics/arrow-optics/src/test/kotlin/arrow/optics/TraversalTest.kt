@@ -1,12 +1,12 @@
 package arrow.optics
 
 import arrow.core.Option
-import arrow.core.eq
 import arrow.core.toOption
 import arrow.core.toT
 import arrow.data.*
-import arrow.instances.IntMonoidInstance
+import arrow.instances.eq
 import arrow.instances.monoid
+import arrow.instances.traverse
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genListK

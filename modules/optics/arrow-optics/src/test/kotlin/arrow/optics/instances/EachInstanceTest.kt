@@ -3,8 +3,7 @@ package arrow.optics.instances
 import arrow.core.*
 import arrow.data.ListK
 import arrow.data.MapK
-import arrow.data.each
-import arrow.data.eq
+import arrow.instances.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.TraversalLaws

@@ -3,8 +3,8 @@ package arrow.optics
 import arrow.core.Option
 import arrow.data.ForListK
 import arrow.data.ListK
-import arrow.data.foldable
 import arrow.data.k
+import arrow.instances.foldable
 import arrow.instances.monoid
 import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner

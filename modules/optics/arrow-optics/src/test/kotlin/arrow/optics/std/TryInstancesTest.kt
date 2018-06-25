@@ -2,11 +2,11 @@ package arrow.optics
 
 import arrow.core.Either
 import arrow.core.Right
-import arrow.core.applicative
 import arrow.core.fix
 import arrow.data.Invalid
 import arrow.data.Valid
 import arrow.data.Validated
+import arrow.instances.applicative
 import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.IsoLaws

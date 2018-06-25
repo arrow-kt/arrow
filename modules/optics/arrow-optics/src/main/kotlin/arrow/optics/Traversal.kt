@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.data.*
 import arrow.higherkind
+import arrow.instances.applicative
 import arrow.instances.monoid
 import arrow.typeclasses.*
 

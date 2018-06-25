@@ -6,7 +6,7 @@ import arrow.core.Right
 import arrow.core.toT
 import arrow.data.ListK
 import arrow.data.k
-import arrow.data.traverse
+import arrow.instances.traverse
 import arrow.optics.Optional
 import arrow.optics.POptional
 import arrow.optics.Traversal

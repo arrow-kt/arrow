@@ -1,11 +1,8 @@
 package arrow.optics
 
 import arrow.core.Option
-import arrow.core.eq
 import arrow.data.ListK
-import arrow.data.eq
-import arrow.instances.IntMonoidInstance
-import arrow.instances.StringMonoidInstance
+import arrow.instances.eq
 import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB

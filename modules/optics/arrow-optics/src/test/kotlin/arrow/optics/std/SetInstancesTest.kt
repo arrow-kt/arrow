@@ -2,7 +2,7 @@ package arrow.optics
 
 import arrow.data.SetK
 import arrow.data.k
-import arrow.data.monoid
+import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.laws.IsoLaws

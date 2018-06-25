@@ -1,11 +1,8 @@
 package arrow.optics.instances
 
 import arrow.core.Option
-import arrow.core.monoid
 import arrow.data.MapK
 import arrow.data.SetK
-import arrow.data.at
-import arrow.data.eq
 import arrow.instances.eq
 import arrow.instances.monoid
 import arrow.instances.semigroup

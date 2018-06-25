@@ -2,10 +2,8 @@ package arrow.optics.instances
 
 import arrow.Kind
 import arrow.data.ListK
-import arrow.data.filterIndex
-import arrow.data.index
 import arrow.data.k
-import arrow.data.traverse
+import arrow.instances.traverse
 import arrow.optics.Optional
 import arrow.optics.Traversal
 import arrow.optics.listToListK

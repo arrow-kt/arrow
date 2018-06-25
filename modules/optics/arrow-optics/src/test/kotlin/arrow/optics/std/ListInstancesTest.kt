@@ -1,8 +1,9 @@
 package arrow.optics
 
 import arrow.core.Option
-import arrow.core.monoid
 import arrow.data.*
+import arrow.instances.monoid
+import arrow.instances.semigroup
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genNonEmptyList

@@ -2,6 +2,7 @@ package arrow.optics
 
 import arrow.core.*
 import arrow.instances.IntMonoidInstance
+import arrow.instances.applicative
 import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genEither

@@ -6,6 +6,7 @@ import arrow.core.Option
 import arrow.core.Right
 import arrow.data.*
 import arrow.instance
+import arrow.instances.traverse
 import arrow.optics.*
 import arrow.optics.typeclasses.At
 import arrow.optics.typeclasses.Each
