@@ -2,18 +2,13 @@ package arrow.mtl.instances
 
 import arrow.Kind
 import arrow.core.Option
-import arrow.core.applicative
 import arrow.core.fix
-import arrow.core.traverseFilter
 import arrow.data.OptionT
 import arrow.data.OptionTPartialOf
 import arrow.data.fix
 import arrow.data.mapFilter
 import arrow.instance
-import arrow.instances.OptionTFunctorInstance
-import arrow.instances.OptionTMonadInstance
-import arrow.instances.OptionTMonoidKInstance
-import arrow.instances.OptionTTraverseInstance
+import arrow.instances.*
 import arrow.mtl.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.TraverseFilter
 import arrow.typeclasses.Applicative
