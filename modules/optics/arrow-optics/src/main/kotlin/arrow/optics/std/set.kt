@@ -2,7 +2,7 @@ package arrow.optics
 
 import arrow.data.SetK
 import arrow.data.k
-import arrow.instances.SetInstances
+import arrow.core.SetInstances
 
 /**
  * [PIso] that defines the equality between a [Set] and a [SetK]

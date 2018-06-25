@@ -4,7 +4,7 @@ import arrow.core.*
 import arrow.data.ListK
 import arrow.data.NonEmptyList
 import arrow.data.k
-import arrow.instances.ListInstances
+import arrow.core.ListInstances
 
 /**
  * [Optional] to safely operate on the head of a list

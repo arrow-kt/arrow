@@ -1,7 +1,7 @@
 package arrow.optics
 
 import arrow.data.ListK
-import arrow.instances.ListInstances
+import arrow.core.ListInstances
 
 private val stringToList: Iso<String, List<Char>> = Iso(
   get = CharSequence::toList,
