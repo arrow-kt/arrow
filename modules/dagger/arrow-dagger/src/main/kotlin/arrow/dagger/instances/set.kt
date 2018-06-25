@@ -1,6 +1,7 @@
 package arrow.dagger.instances
 
 import arrow.data.*
+import arrow.instances.*
 import arrow.instances.SetKEqInstance
 import arrow.instances.SetKMonoidInstance
 import arrow.instances.SetKSemigroupInstance
