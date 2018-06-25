@@ -3,12 +3,13 @@ package arrow.free
 import arrow.Kind
 import arrow.core.*
 import arrow.data.NonEmptyList
-import arrow.data.applicative
 import arrow.data.fix
 import arrow.free.instances.ForFreeApplicative
 import arrow.free.instances.FreeApplicativeApplicativeInstance
 import arrow.free.instances.FreeApplicativeEq
 import arrow.free.instances.eq
+import arrow.instances.applicative
+import arrow.instances.monad
 import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.EqLaws

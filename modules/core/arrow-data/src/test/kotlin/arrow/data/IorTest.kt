@@ -4,8 +4,7 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Some
 import arrow.data.Ior.Right
-import arrow.instances.ForIor
-import arrow.instances.semigroup
+import arrow.instances.*
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadLaws

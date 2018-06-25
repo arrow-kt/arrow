@@ -2,7 +2,9 @@ package arrow.data
 
 import arrow.Kind
 import arrow.core.*
+import arrow.instances.monad
 import arrow.mtl.instances.ForOptionT
+import arrow.mtl.instances.traverseFilter
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq

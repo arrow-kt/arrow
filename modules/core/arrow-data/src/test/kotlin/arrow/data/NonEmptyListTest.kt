@@ -1,8 +1,8 @@
 package arrow.data
 
-import arrow.instances.IntEqInstance
 import arrow.instances.eq
 import arrow.instances.extensions
+import arrow.instances.show
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq

@@ -3,6 +3,7 @@ package arrow.data
 import arrow.core.*
 import arrow.instances.eq
 import arrow.instances.extensions
+import arrow.instances.show
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadErrorLaws

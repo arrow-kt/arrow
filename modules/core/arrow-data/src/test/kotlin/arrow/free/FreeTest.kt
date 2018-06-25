@@ -4,8 +4,8 @@ import arrow.Kind
 import arrow.core.*
 import arrow.data.NonEmptyList
 import arrow.data.fix
-import arrow.data.monad
 import arrow.free.instances.*
+import arrow.instances.monad
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadLaws

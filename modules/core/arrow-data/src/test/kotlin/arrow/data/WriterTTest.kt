@@ -2,8 +2,9 @@ package arrow.data
 
 import arrow.Kind
 import arrow.core.*
-import arrow.instances.ForWriterT
-import arrow.instances.monoid
+import arrow.instances.*
+import arrow.mtl.instances.monadFilter
+import arrow.mtl.instances.monadWriter
 import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
 import arrow.test.generators.genTuple

@@ -2,6 +2,8 @@ package arrow.data
 
 import arrow.core.*
 import arrow.instances.ForKleisli
+import arrow.instances.monad
+import arrow.instances.monadError
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadErrorLaws
 import arrow.typeclasses.Eq

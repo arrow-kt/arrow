@@ -2,10 +2,7 @@ package arrow.data
 
 import arrow.Kind
 import arrow.core.Tuple2
-import arrow.instances.IntSemigroupInstance
-import arrow.instances.LongMonoidInstance
-import arrow.instances.monoid
-import arrow.instances.semigroup
+import arrow.instances.*
 import arrow.test.UnitSpec
 import arrow.test.laws.ReducibleLaws
 import arrow.typeclasses.Eq

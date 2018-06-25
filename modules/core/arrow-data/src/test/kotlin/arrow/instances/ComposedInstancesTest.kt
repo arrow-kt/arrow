@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.data.*
 import arrow.mtl.instances.ComposedFunctorFilter
+import arrow.mtl.instances.functorFilter
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.*

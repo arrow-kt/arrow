@@ -1,5 +1,6 @@
 package arrow.data
 
+import arrow.instances.semigroup
 import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.forAll

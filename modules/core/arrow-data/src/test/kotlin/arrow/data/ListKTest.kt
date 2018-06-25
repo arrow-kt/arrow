@@ -1,5 +1,8 @@
 package arrow.data
 
+import arrow.instances.applicative
+import arrow.instances.eq
+import arrow.instances.show
 import arrow.mtl.instances.extensions
 import arrow.test.UnitSpec
 import arrow.test.laws.*

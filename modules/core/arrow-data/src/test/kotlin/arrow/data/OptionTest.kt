@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.instances.eq
 import arrow.instances.monoid
+import arrow.instances.show
 import arrow.mtl.instances.extensions
 import arrow.syntax.collections.firstOption
 import arrow.syntax.collections.option

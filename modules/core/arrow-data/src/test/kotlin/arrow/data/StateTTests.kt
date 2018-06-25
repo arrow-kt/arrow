@@ -3,10 +3,14 @@ package arrow.data
 import arrow.Kind
 import arrow.core.ForTry
 import arrow.core.Try
-import arrow.core.monad
-import arrow.core.monadError
+import arrow.instances.applicative
+import arrow.instances.monad
+import arrow.instances.monadError
+import arrow.instances.semigroupK
 import arrow.mtl.instances.ForStateT
 import arrow.mtl.instances.StateTMonadStateInstance
+import arrow.mtl.instances.monadCombine
+import arrow.mtl.instances.monadState
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonadStateLaws

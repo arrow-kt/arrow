@@ -1,6 +1,8 @@
 package arrow.data
 
+import arrow.instances.eq
 import arrow.instances.monoid
+import arrow.instances.show
 import arrow.mtl.instances.*
 import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws
