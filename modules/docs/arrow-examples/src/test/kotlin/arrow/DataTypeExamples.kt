@@ -2,6 +2,9 @@ package arrow
 
 import arrow.Problem.*
 import arrow.core.*
+import arrow.instances.applicative
+import arrow.instances.functor
+import arrow.instances.monad
 import arrow.typeclasses.binding
 import io.kotlintest.matchers.Matcher
 import io.kotlintest.matchers.Result
