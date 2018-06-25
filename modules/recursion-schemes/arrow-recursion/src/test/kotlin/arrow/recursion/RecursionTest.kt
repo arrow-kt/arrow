@@ -1,7 +1,7 @@
 package arrow.recursion
 
 import arrow.core.Option
-import arrow.core.functor
+import arrow.instances.functor
 import arrow.test.UnitSpec
 import arrow.test.generators.fromGNatAlgebra
 import arrow.test.generators.toGNatCoalgebra
