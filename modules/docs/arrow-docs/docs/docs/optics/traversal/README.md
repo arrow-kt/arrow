@@ -40,8 +40,6 @@ listTraversal.modifyF(Try.applicative(), listOf(0, 2, 3).k()) {
 Or by using any of the constructors of `Traversal`.
 
 ```kotlin:ank
-import arrow.core.*
-
 fun <A> traversalTuple2Example(): Traversal<Tuple2<A, A>, A> = Traversal(
         get1 = { it.a },
         get2 = { it.b },
@@ -54,10 +52,10 @@ Arrow optics also provides a number of predefined `Traversal` optics.
 ```kotlin:ank
 import arrow.instances.*
 
-traversalTuple2<String>().combineAll(String.monoid(), "Hello, " toT "World!")
+Tuple2.traversal<String>().combineAll(String.monoid(), "Hello, " toT "World!")
 ```
 ```kotlin:ank
-traversalTuple10<Int>().getAll(Tuple10(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+Tuple10.traversal<Int>().getAll(Tuple10(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
 ```
 
 ## Composition
@@ -66,9 +64,9 @@ Composing `Traversal` can be used for accessing and modifying foci in nested str
 
 ```kotlin:ank
 val listOfPairTraversal: Traversal<ListKOf<Tuple2<String, String>>, Tuple2<String, String>> = Traversal.fromTraversable(ListK.traverse())
-val nestedInts = listOfPairTraversal compose traversalTuple2()
+val nestedStrings = listOfPairTraversal compose Tuple2.traversal<String>()
 
-nestedInts.fold(String.monoid(), listOf("Hello, " toT "World ", "from " toT "nested structures!").k())
+nestedStrings.fold(String.monoid(), listOf("Hello, " toT "World ", "from " toT "nested structures!").k())
 ```
 
 `Traversal` can be composed with all optics and results in the following optics.
