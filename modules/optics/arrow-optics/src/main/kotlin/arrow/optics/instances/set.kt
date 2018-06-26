@@ -4,6 +4,9 @@ import arrow.optics.Lens
 import arrow.optics.PLens
 import arrow.optics.typeclasses.At
 
+/**
+ * [At] instance definition for [Set].
+ */
 interface SetAtInstance<A> : At<Set<A>, A, Boolean> {
   override fun at(i: A): Lens<Set<A>, Boolean> = PLens(
     get = { it.contains(i) },
@@ -11,6 +14,11 @@ interface SetAtInstance<A> : At<Set<A>, A, Boolean> {
   )
 
   companion object {
+    /**
+     * Operator overload to instantiate typeclass instance.
+     *
+     * @return [Index] instance for [String]
+     */
     operator fun <A> invoke() = object : SetAtInstance<A> {}
   }
 }

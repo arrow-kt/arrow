@@ -1,6 +1,6 @@
 package arrow.optics
 
-import arrow.core.Option
+import arrow.core.*
 import arrow.data.ListK
 import arrow.instances.eq
 import arrow.instances.monoid
@@ -15,12 +15,12 @@ import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class TupleInstancesTest : UnitSpec() {
+class TupleTest : UnitSpec() {
 
   init {
 
     testLaws(LensLaws.laws(
-      lens = firstTuple2(),
+      lens = Tuple2.first(),
       aGen = genTuple(Gen.int(), Gen.string()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
@@ -30,7 +30,7 @@ class TupleInstancesTest : UnitSpec() {
     ))
 
     testLaws(LensLaws.laws(
-      lens = secondTuple2(),
+      lens = Tuple2.second(),
       aGen = genTuple(Gen.int(), Gen.string()),
       bGen = Gen.string(),
       funcGen = genFunctionAToB(Gen.string()),
@@ -39,8 +39,38 @@ class TupleInstancesTest : UnitSpec() {
       MB = String.monoid()
     ))
 
+    testLaws(LensLaws.laws(
+      lens = Tuple3.first(),
+      aGen = genTuple(Gen.int(), Gen.string(), Gen.string()),
+      bGen = Gen.int(),
+      funcGen = genFunctionAToB(Gen.int()),
+      EQA = Eq.any(),
+      EQB = Eq.any(),
+      MB = Int.monoid()
+    ))
+
+    testLaws(LensLaws.laws(
+      lens = Tuple3.second(),
+      aGen = genTuple(Gen.int(), Gen.string(), Gen.int()),
+      bGen = Gen.string(),
+      funcGen = genFunctionAToB(Gen.string()),
+      EQA = Eq.any(),
+      EQB = Eq.any(),
+      MB = String.monoid()
+    ))
+
+    testLaws(LensLaws.laws(
+      lens = Tuple3.third(),
+      aGen = genTuple(Gen.int(), Gen.int(), Gen.string()),
+      bGen = Gen.string(),
+      funcGen = genFunctionAToB(Gen.string()),
+      EQA = Eq.any(),
+      EQB = Eq.any(),
+      MB = String.monoid()
+    ))
+
     testLaws(TraversalLaws.laws(
-      traversal = traversalTuple2(),
+      traversal = Tuple2.traversal(),
       aGen = genTuple(Gen.int(), Gen.int()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
@@ -50,7 +80,7 @@ class TupleInstancesTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = traversalTuple3(),
+      traversal = Tuple3.traversal(),
       aGen = genTuple(Gen.int(), Gen.int(), Gen.int()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
@@ -60,7 +90,7 @@ class TupleInstancesTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = traversalTuple4(),
+      traversal = Tuple4.traversal(),
       aGen = genTuple(Gen.int(), Gen.int(), Gen.int(), Gen.int()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
@@ -70,7 +100,7 @@ class TupleInstancesTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = traversalTuple5(),
+      traversal = Tuple5.traversal(),
       aGen = genTuple(Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
@@ -80,7 +110,7 @@ class TupleInstancesTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = traversalTuple6(),
+      traversal = Tuple6.traversal(),
       aGen = genTuple(Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
@@ -90,7 +120,7 @@ class TupleInstancesTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = traversalTuple7(),
+      traversal = Tuple7.traversal(),
       aGen = genTuple(Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
@@ -100,7 +130,7 @@ class TupleInstancesTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = traversalTuple8(),
+      traversal = Tuple8.traversal(),
       aGen = genTuple(Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
@@ -110,7 +140,7 @@ class TupleInstancesTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = traversalTuple9(),
+      traversal = Tuple9.traversal(),
       aGen = genTuple(Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
@@ -120,7 +150,7 @@ class TupleInstancesTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = traversalTuple10(),
+      traversal = Tuple10.traversal(),
       aGen = genTuple(Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),

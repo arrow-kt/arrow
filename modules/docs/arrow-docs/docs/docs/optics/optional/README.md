@@ -20,46 +20,46 @@ It combines the properties of a `Lens` (getting, setting and modifying) with the
 For a structure `List<Int>` we can create an `Optional` to focus an optional head `Int`.
 
 ```kotlin:ank
-import arrow.*
 import arrow.core.*
+import arrow.data.*
 import arrow.optics.*
 
-val optionalHead: Optional<List<Int>, Int> = Optional(
+val optionalHead: Optional<ListK<Int>, Int> = Optional(
     getOrModify = { list -> list.firstOrNull()?.right() ?: list.left() },
-    set = { int -> { list -> list.mapIndexed { index, value -> if (index == 0) int else value } } }
+    set = { int -> { list -> list.mapIndexed { index, value -> if (index == 0) int else value }.k() } }
 )
 ```
 
-Our `optionalHead` allows us to operate on the head of `List<Int>` without having to worry if it is available. The `optionalHead` optic is by default available as `listHead<Int>()`
+Our `optionalHead` allows us to operate on the head of `List<Int>` without having to worry if it is available. You can find `optionalHead` in the optics library: `ListK.head<Int>()`
 
 ```kotlin:ank
 import arrow.optics.instances.*
 
-listHead<Int>().set(listOf(1, 3, 6), 5)
+ListK.head<Int>().set(listOf(1, 3, 6).k(), 5)
 ```
 ```kotlin:ank
-listHead<Int>().modify(listOf(1, 3, 6)) { head -> head * 5 }
+ListK.head<Int>().modify(listOf(1, 3, 6).k()) { head -> head * 5 }
 ```
 
 We can also lift such functions.
 
 ```kotlin:ank
-val lifted = listHead<Int>().lift { head -> head * 5 }
-lifted(emptyList())
+val lifted = ListK.head<Int>().lift { head -> head * 5 }
+lifted(emptyList<Int>().k())
 ```
 
 Or modify or lift functions using `Applicative`
 
 ```kotlin:ank
-listHead<Int>().modifyF(Try.applicative(), listOf(1, 3, 6)) { head ->
+ListK.head<Int>().modifyF(Try.applicative(), listOf(1, 3, 6).k()) { head ->
     Try { head / 2 }
 }
 ```
 ```kotlin:ank
-val liftedF = listHead<Int>().liftF(Try.applicative()) { head ->
+val liftedF = ListK.head<Int>().liftF(Try.applicative()) { head ->
     Try { head / 0 }
 }
-liftedF(listOf(1, 3, 6))
+liftedF(listOf(1, 3, 6).k())
 ```
 
 An `Optional` instance can be manually constructed from any default or custom `Iso`, `Lens` or `Prism` instance by calling their `asOptional()` or by creating a custom `Optional` instance as shown above.
@@ -76,7 +76,7 @@ val participantEmail: Optional<Participant, String> = Optional(
         set = { email -> { participant -> participant.copy(email = email) } }
 )
 
-val triedEmail: Optional<Try<Participant>, String> = trySuccess<Participant>() compose participantEmail
+val triedEmail: Optional<Try<Participant>, String> = Try.success<Participant>() compose participantEmail
 
 triedEmail.getOption(Try.Success(Participant("test", "email")))
 ```
@@ -112,8 +112,8 @@ A `POptional` is very similar to [PLens](/docs/optics/lens#Plens) and [PPrism](/
 Given a `PPrism` with a focus into `Success` of `Try<Tuple2<Int, String>>` that can polymorphically change its content to `Tuple2<String, String>` and a `PLens` with a focus into the `Tuple2<Int, String>` that can morph the first parameter from `Int` to `String`. We can compose them together build an `Optional` that can look into `Try` and morph the first type of the `Tuple2` within.
 
 ```kotlin:ank
-val pprism = pTrySuccess<Tuple2<Int, String>, Tuple2<String, String>>()
-val plens = pFirstTuple2<Int, String, String>()
+val pprism = Try.pSuccess<Tuple2<Int, String>, Tuple2<String, String>>()
+val plens = Tuple2.pFirst<Int, String, String>()
 
 val successTuple2: POptional<Try<Tuple2<Int, String>>, Try<Tuple2<String, String>>, Int, String> =
         pprism compose plens
