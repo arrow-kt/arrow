@@ -1,10 +1,11 @@
 package arrow.optics
 
 import arrow.data.SetK
-import arrow.data.k
 import arrow.data.monoid
+import arrow.core.SetInstances
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genSetK
 import arrow.test.laws.IsoLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
@@ -12,15 +13,15 @@ import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
-class SetInstancesTest : UnitSpec() {
+class SetTest : UnitSpec() {
 
   init {
 
     testLaws(IsoLaws.laws(
-      iso = setToSetK(),
+      iso = SetInstances.toSetK(),
       aGen = Gen.set(Gen.int()),
-      bGen = Gen.create { Gen.set(Gen.int()).generate().k() },
-      funcGen = genFunctionAToB(Gen.create { Gen.set(Gen.int()).generate().k() }),
+      bGen = genSetK(Gen.int()),
+      funcGen = genFunctionAToB(genSetK(Gen.int())),
       EQA = Eq.any(),
       EQB = Eq.any(),
       bMonoid = SetK.monoid()

@@ -10,12 +10,12 @@ import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
-class StringInstancesTest : UnitSpec() {
+class StringTest : UnitSpec() {
 
   init {
 
     testLaws(IsoLaws.laws(
-      iso = stringToList,
+      iso = String.toList(),
       aGen = Gen.string(),
       bGen = Gen.create { Gen.string().generate().toList() },
       funcGen = genFunctionAToB(Gen.create { Gen.string().generate().toList() }),

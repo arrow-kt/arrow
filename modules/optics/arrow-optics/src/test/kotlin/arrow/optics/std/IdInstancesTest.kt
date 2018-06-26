@@ -16,7 +16,7 @@ class IdInstancesTest : UnitSpec() {
 
   init {
     testLaws(IsoLaws.laws(
-      iso = idToType(),
+      iso = Id.toValue(),
       aGen = Gen.create { Id(Gen.int().generate()) },
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),

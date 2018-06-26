@@ -7,6 +7,9 @@ video: EWfxL9yBUJo
 
 ## OptionT
 
+{:.advanced}
+advanced
+
 `OptionT` also known as the `Option` monad transformer allows to compute inside the context when `Option` is nested in a different monad.
 
 One issue we face with monads is that they don't compose. This can cause your code to get really hairy when trying to combine structures like `ObservableK` and `Option`. But there's a simple solution, and we're going to explain how you can use Monad Transformers to alleviate this problem.

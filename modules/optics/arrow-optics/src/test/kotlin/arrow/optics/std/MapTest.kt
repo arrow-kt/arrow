@@ -16,21 +16,12 @@ import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
-class MapInstancesTest : UnitSpec() {
+class MapTest : UnitSpec() {
 
   init {
-    testLaws(IsoLaws.laws(
-      iso = mapToMapK(),
-      aGen = Gen.map(Gen.string(), Gen.int()),
-      bGen = genMapK(Gen.string(), Gen.int()),
-      funcGen = genFunctionAToB(genMapK(Gen.string(), Gen.int())),
-      EQA = Eq.any(),
-      EQB = MapK.eq(String.eq(), Int.eq()),
-      bMonoid = MapK.monoid<String, Int>(Int.monoid())
-    ))
 
     testLaws(IsoLaws.laws(
-      iso = mapKToSetK(),
+      iso = MapK.toSetK(),
       aGen = genMapK(Gen.string(), Gen.create { Unit }),
       bGen = genSetK(Gen.string()),
       funcGen = genFunctionAToB(genSetK(Gen.string())),

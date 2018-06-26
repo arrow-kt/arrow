@@ -6,6 +6,9 @@ permalink: /docs/datatypes/ior/
 
 ## Ior
 
+{:.beginner}
+beginner
+
 `Ior` represents an inclusive-or relationship between two data types.
 This makes it very similar to the [`Either`](/docs/datatypes/either) data type, which represents an "exclusive-or" relationship.
 An `Ior<A, B>` (also written as `A Ior B`) can contain either an `A`, a `B`, or both.

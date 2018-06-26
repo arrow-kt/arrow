@@ -6,6 +6,9 @@ permalink: /docs/typeclasses/applicative/
 
 ## Applicative
 
+{:.intermediate}
+intermediate
+
 The `Applicative` typeclass abstracts the ability to lift values and apply functions over the computational context of a type constructor.
 Examples of type constructors that can implement instances of the Applicative typeclass include `Option`, `NonEmptyList`,
 `List` and many other datatypes that include a `just` and either `ap` function. `ap` may be derived for monadic types that include a `Monad` instance via `flatMap`.
