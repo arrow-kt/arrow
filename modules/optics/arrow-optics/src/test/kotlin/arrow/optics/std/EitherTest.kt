@@ -1,5 +1,6 @@
 package arrow.optics
 
+import arrow.core.Either
 import arrow.data.Invalid
 import arrow.data.Valid
 import arrow.data.Validated
@@ -15,7 +16,7 @@ import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class EitherInstancesTest : UnitSpec() {
+class EitherTest : UnitSpec() {
 
   init {
     val VAL_MONOID: Monoid<Validated<String, Int>> = object : Monoid<Validated<String, Int>> {
@@ -39,7 +40,7 @@ class EitherInstancesTest : UnitSpec() {
 
     }
     testLaws(IsoLaws.laws(
-      iso = eitherToValidated(),
+      iso = Either.toValidated(),
       aGen = genEither(Gen.string(), Gen.int()),
       bGen = genValidated(Gen.string(), Gen.int()),
       funcGen = genFunctionAToB(genValidated(Gen.string(), Gen.int())),
