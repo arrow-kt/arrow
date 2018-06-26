@@ -289,6 +289,7 @@ Arrow provides the following `MonadError` instances for `Option`, `Try` and `Eit
 
 ```kotlin:ank
 import arrow.typeclasses.*
+import arrow.instances.*
 
 Option.monadError()
 ```

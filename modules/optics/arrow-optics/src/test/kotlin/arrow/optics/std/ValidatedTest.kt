@@ -1,6 +1,7 @@
 package arrow.optics
 
 import arrow.core.*
+import arrow.data.Validated
 import arrow.instances.applicative
 import arrow.test.UnitSpec
 import arrow.test.generators.*

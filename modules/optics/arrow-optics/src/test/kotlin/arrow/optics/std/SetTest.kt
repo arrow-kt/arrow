@@ -1,5 +1,6 @@
 package arrow.optics
 
+import arrow.core.SetInstances
 import arrow.data.SetK
 import arrow.data.k
 import arrow.instances.monoid

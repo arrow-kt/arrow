@@ -2,6 +2,7 @@ package arrow.optics.instances
 
 import arrow.core.*
 import arrow.data.*
+import arrow.instances.eq
 import arrow.instances.monoid
 import arrow.instances.semigroup
 import arrow.optics.typeclasses.FilterIndex

@@ -2,7 +2,7 @@ package arrow.optics.instances
 
 import arrow.core.*
 import arrow.data.ListK
-import arrow.data.eq
+import arrow.instances.eq
 import arrow.optics.typeclasses.FilterIndex
 import arrow.test.UnitSpec
 import arrow.test.generators.*

@@ -1,8 +1,8 @@
 package arrow.optics.instances
 
 import arrow.core.Option
-import arrow.core.eq
 import arrow.data.*
+import arrow.instances.eq
 import arrow.optics.typeclasses.FilterIndex
 import arrow.test.UnitSpec
 import arrow.test.generators.*

@@ -2,11 +2,9 @@ package arrow.optics.instances
 
 import arrow.core.*
 import arrow.data.ListK
-import arrow.data.eq
-import arrow.optics.typeclasses.FilterIndex
+import arrow.instances.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.*
-import arrow.test.laws.OptionalLaws
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
