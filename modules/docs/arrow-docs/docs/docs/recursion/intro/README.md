@@ -157,8 +157,8 @@ import arrow.recursion.data.*
 typealias IntFixList = Fix<ForIntListPattern>
 ```
 
-So why do this? We can now define a `Functor` instance for `IntListPattern`, allowing us to traverse into
-the structure.
+So why do this? We can now define a [Functor]({{ '/docs/typeclasses/functor' | relative_url }}) instance for 
+`IntListPattern`, allowing us to traverse into the structure.
 
 ```kotlin
 @instance(IntListPattern::class)
@@ -178,8 +178,9 @@ for any recursive data structure) by using `map` to recursively descend into the
 
 #### Recursive and Corecursive
 
-The `Recursive` typeclass provides `cata`, and the `Corecursive` typeclass provides `ana`, which are
-very similar to fold and unfold.
+The [Recursive]({{ '/docs/recursion/recursive' | relative_url }}) typeclass provides `cata`, and the 
+[Corecursive]({{ '/docs/recursion/recursive' | relative_url }}) typeclass provides `ana`, which are very
+similar to fold and unfold.
 
 ```kotlin
 typealias Algebra<F, A> = (Kind<F, A>) -> A     // fold
