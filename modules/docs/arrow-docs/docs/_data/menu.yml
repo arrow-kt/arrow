@@ -311,6 +311,18 @@ options:
 
     nested_options:
 
+      - title: Intro
+        url: /docs/recursion/intro/
+
+      - title: Fix
+        url: /docs/recursion/fix/
+
+      - title: Mu
+        url: /docs/recursion/mu/
+
+      - title: Nu
+        url: /docs/recursion/nu/
+
       - title: Corecursive
         url: /docs/recursion/corecursive/
 
