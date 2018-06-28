@@ -6,6 +6,9 @@ permalink: /docs/recursion/intro/
 
 ## Recursion Schemes
 
+{:.advanced}
+advanced
+
 Recursion schemes are an abstraction for structured recursion that ensure runtime safety and provide
 powerful abstractions for recursive datatypes.
 
