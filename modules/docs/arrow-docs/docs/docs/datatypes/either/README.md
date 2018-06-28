@@ -7,6 +7,9 @@ video: q6HpChSq-xc
 
 ## Either
 
+{:.beginner}
+beginner
+
 In day-to-day programming, it is fairly common to find ourselves writing functions that can fail.
 For instance, querying a service may result in a connection issue, or some unexpected JSON response.
 
@@ -265,7 +268,7 @@ The `getOrHandle()` operation allows the transformation of an `Either.Left` valu
 the value of `Left`. This can be useful when a mapping to a single result type is required like `fold()` but without
 the need to handle `Either.Right` case.
 
-As an example we want to map an `Either<Int, Throwable>` to a proper HTTP status code:
+As an example we want to map an `Either<Throwable, Int>` to a proper HTTP status code:
 
 ```kotlin:ank
 val r: Either<Throwable, Int> = Either.Left(NumberFormatException())

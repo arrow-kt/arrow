@@ -1,9 +1,31 @@
 (function($) {
     "use strict";
 
-    // All these functions are related to the sidebar nav
+    var docsearchInputId = '#docsearch';
+
+    docsearch({
+     apiKey: 'b723ae1d349539b4a2b51bac514fc9ab',
+     indexName: 'arrow',
+     inputSelector: docsearchInputId,
+     debug: false // Set debug to true if you want to inspect the dropdown
+    });
+
     $(document).ready(function() {
 
+        // To focus the searchbar on load. Autofocus won't work since, in the end,
+        // the input is injected externally by the Algolia autocomplete.js library.
+        // There is native way to focus an element without scrolling the view into it,
+        // but it's not possible to detect current engine's support in a clean way (yet).
+        // https://github.com/heycam/webidl/issues/107#issuecomment-399910305
+        var actualPosition = window.scrollY;
+        document.querySelector(docsearchInputId).focus();
+        // Hijacking the event loop order, since the focus() will trigger
+        // internally an scroll that goes to the event loop
+        setTimeout(function() {
+          window.scroll(window.scrollX, actualPosition);
+        }, 0);
+
+        // Following functions are related to the sidebar nav
         // Show and hide the sidebar
         $(".sidebar-toggle").click(function(e) {
             e.preventDefault();

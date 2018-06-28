@@ -7,6 +7,9 @@ import arrow.optics.Lens
 import arrow.optics.PLens
 import arrow.optics.typeclasses.At
 
+/**
+ * [At] instance definition for [SetK].
+ */
 @instance(SetK::class)
 interface SetKAtInstance<A> : At<SetK<A>, A, Boolean> {
   override fun at(i: A): Lens<SetK<A>, Boolean> = PLens(

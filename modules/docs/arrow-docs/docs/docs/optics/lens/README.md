@@ -6,6 +6,9 @@ permalink: /docs/optics/lens/
 
 ## Lens
 
+{:.beginner}
+beginner
+
 Optics are essentially abstractions to update immutable data structures in an elegant way.
 A `Lens` (aka functional reference) is an optic that can focus into a structure and `get`, `modify` or `set` its focus (target). They're mostly used for `product types` such as a `data class` or a `TupleN`.
 
@@ -161,4 +164,4 @@ pFirstTuple2<Int, String, String>().set(5 toT "World", "Hello, ")
 
 Arrow provides [`LensLaws`][lenses_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own lenses.
 
-[lenses_laws_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/LensLaws.kt
+[lenses_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/LensLaws.kt
