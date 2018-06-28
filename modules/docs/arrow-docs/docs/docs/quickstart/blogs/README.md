@@ -64,6 +64,13 @@ Voxxed Days, Vienna, Mar '18 - version 0.6.1
 
 Kotlin Meetup, Sydney, Mar '18 - version 0.6.1
 
+### Functional Programming in Kotlin with Arrow by Emmanuel Nhan
+[@nhanmanu](https://twitter.com/nhanmanu) introduces Kotlin and how it is a good fit for functional programming. The talk goes through some interesting features of Kotlin, then show how to use them to enter the world of Higher Kinds and Typeclasses. In the last part, we explore some Arrow capabilities & built-in syntax, using validation as an example. 
+
+<iframe src="//www.slideshare.net/slideshow/embed_code/key/eOPu1UXHZrloFf" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/EmmanuelNhan/functional-programming-in-kotlin-with-arrow-sunnytech-2018" title="Functional programming in kotlin with Arrow [Sunnytech 2018]" target="_blank">Functional programming in kotlin with Arrow [Sunnytech 2018]</a> </strong> de <strong><a href="//www.slideshare.net/EmmanuelNhan" target="_blank">Emmanuel Nhan</a></strong> </div>
+
+Sunny Tech, Montpellier, France, June '28 - version 0.7.2
+
 ### Functional Programming in Kotlin
 
 An ongoing blog series introducing Functional Programming architectures from scratch
@@ -119,3 +126,12 @@ April ’18 - version 0.7
 [1/n - How do I ... in FP : Validation](https://www.enhan.eu/how-to-in-fp/)
 
 April ’18 - version 0.7
+
+### Arrow 101 — Building an Android app using Functional Programming
+
+[Leandro Ferreira](https://twitter.com/mLeandroBF) presents how to build a simple app using Arrow, step by step. 
+
+[Arrow 101 — Building an Android app using Functional Programming](https://medium.com/@lehen01/arrow-101-building-an-android-app-using-functional-programming-fe959675d96d)
+
+June ’18 - version 0.7
+
