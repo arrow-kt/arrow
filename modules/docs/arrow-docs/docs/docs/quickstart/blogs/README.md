@@ -8,6 +8,12 @@ permalink: /docs/quickstart/blogs/
 
 A selection of external links to some of the content created by maintainers and users.
 
+### Arrow 101 — Building an Android app using Functional Programming
+
+Article that presents how to build a simple app using Arrow, step by step. 
+
+[Arrow 101 — Building an Android app using Functional Programming](https://medium.com/@lehen01/arrow-101-building-an-android-app-using-functional-programming-fe959675d96d)
+
 ### Functional Programming in Kotlin with Arrow
 
 A rundown of all the features included in the library.
