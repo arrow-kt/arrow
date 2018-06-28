@@ -119,3 +119,12 @@ April ’18 - version 0.7
 [1/n - How do I ... in FP : Validation](https://www.enhan.eu/how-to-in-fp/)
 
 April ’18 - version 0.7
+
+### Arrow 101 — Building an Android app using Functional Programming
+
+[Leandro Ferreira](https://twitter.com/mLeandroBF) presents how to build a simple app using Arrow, step by step. 
+
+[Arrow 101 — Building an Android app using Functional Programming](https://medium.com/@lehen01/arrow-101-building-an-android-app-using-functional-programming-fe959675d96d)
+
+June ’18 - version 0.7
+
