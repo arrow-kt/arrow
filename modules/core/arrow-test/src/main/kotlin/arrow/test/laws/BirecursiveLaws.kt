@@ -14,11 +14,11 @@ object BirecursiveLaws {
     CorecursiveLaws.laws(BT) + RecursiveLaws.laws(BT, BT) + listOf(
       Law("Birecursive Laws: ana . cata == hylo") {
         forAll(Gen.choose(0, 1000)) {
-          val composed = it
-            .ana(Option.functor(), toGNatCoalgebra())
-            .cata(Option.functor(), fromGNatAlgebra())
-          val hylo = hylo(Option.functor(), fromGNatAlgebra(), toGNatCoalgebra(), it)
-          hylo == composed
+          Option.functor().run {
+            val composed = cata(ana(it, toGNatCoalgebra()), fromGNatAlgebra())
+            val hylo = hylo(fromGNatAlgebra(), toGNatCoalgebra(), it)
+            hylo == composed
+          }
         }
       }
     )

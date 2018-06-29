@@ -11,12 +11,12 @@ import io.kotlintest.properties.forAll
 class RecursionTest : UnitSpec() {
   init {
     "Hylo should be stack safe" {
-      hylo(Option.functor(), fromGNatAlgebra(), toGNatCoalgebra(), 100000)
+      Option.functor().hylo(fromGNatAlgebra(), toGNatCoalgebra(), 100000)
     }
 
     "Hylo == id if alg . coalg == id" {
       forAll(Gen.choose(0, 1000)) {
-        hylo(Option.functor(), fromGNatAlgebra(), toGNatCoalgebra(), it) == it
+        Option.functor().hylo(fromGNatAlgebra(), toGNatCoalgebra(), it) == it
       }
     }
   }
