@@ -311,8 +311,8 @@ options:
 
     nested_options:
 
-      - tite: Intro
-        url: /docs/recursion/intro
+      - title: Intro
+        url: /docs/recursion/intro/
 
       - title: Recursive
         url: /docs/recursion/recursive/
