@@ -311,14 +311,26 @@ options:
 
     nested_options:
 
-      - title: Corecursive
-        url: /docs/recursion/corecursive/
+      - tite: Intro
+        url: /docs/recursion/intro
 
       - title: Recursive
         url: /docs/recursion/recursive/
 
+      - title: Corecursive
+        url: /docs/recursion/corecursive/
+
       - title: Birecursive
         url: /docs/recursion/birecursive/
+
+      - title: Mu
+        url: /docs/recursion/mu/
+
+      - title: Nu
+        url: /docs/recursion/nu/
+
+      - title: Fix
+        url: /docs/recursion/fix/
 
   - title: Legal
 
