@@ -2,6 +2,7 @@ package arrow.optics
 
 import arrow.core.Either
 import arrow.core.Right
+import arrow.core.Try
 import arrow.core.applicative
 import arrow.core.fix
 import arrow.data.Invalid
@@ -18,11 +19,11 @@ import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class TryInstancesTest : UnitSpec() {
+class TryTest : UnitSpec() {
   init {
 
     testLaws(PrismLaws.laws(
-      prism = trySuccess(),
+      prism = Try.success(),
       aGen = genTry(Gen.int()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
@@ -31,7 +32,7 @@ class TryInstancesTest : UnitSpec() {
     ))
 
     testLaws(PrismLaws.laws(
-      prism = tryFailure(),
+      prism = Try.failure(),
       aGen = genTry(Gen.int()),
       bGen = genThrowable(),
       funcGen = genFunctionAToB(genThrowable()),
@@ -40,7 +41,7 @@ class TryInstancesTest : UnitSpec() {
     ))
 
     testLaws(IsoLaws.laws(
-      iso = tryToEither(),
+      iso = Try.toEither(),
       aGen = genTry(Gen.int()),
       bGen = genEither(genThrowable(), Gen.int()),
       funcGen = genFunctionAToB(genEither(genThrowable(), Gen.int())),
@@ -55,7 +56,7 @@ class TryInstancesTest : UnitSpec() {
     ))
 
     testLaws(IsoLaws.laws(
-      iso = tryToValidated(),
+      iso = Try.toValidated(),
       aGen = genTry(Gen.int()),
       bGen = genValidated(genThrowable(), Gen.int()),
       funcGen = genFunctionAToB(genValidated(genThrowable(), Gen.int())),

@@ -1,5 +1,6 @@
 package arrow.optics
 
+import arrow.core.Option
 import arrow.data.*
 import arrow.optics.instances.*
 import arrow.optics.dsl.*
@@ -68,7 +69,7 @@ class BoundedTest : UnitSpec() {
       Db.content.at(MapK.at(), One).some.modify(db, String::toUpperCase) shouldBe
         (Db.content compose
           MapK.at<Keys, String>().at(One) compose
-          somePrism()).modify(db, String::toUpperCase)
+          Option.some()).modify(db, String::toUpperCase)
     }
 
     "Working with Each in Optics should be same as in DSL" {
