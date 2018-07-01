@@ -91,7 +91,7 @@ class RenzuGenerator(
 
   fun generate() {
 
-    val topLevelFiles = setOf("settings.gradle", "pom.xml", "build.xml", "Build.kt")
+    val topLevelFiles = setOf("settings.gradle", "pom.xml", "build.xml", "Build.kt", "settings.gradle.kt")
 
     val generatedDir = if (isolateForTests)
       File("./infographic")
