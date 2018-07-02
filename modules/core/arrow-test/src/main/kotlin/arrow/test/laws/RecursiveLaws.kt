@@ -9,7 +9,7 @@ import io.kotlintest.shouldBe
 object RecursiveLaws {
   inline fun <reified T> laws(CT: Corecursive<T>, RT: Recursive<T>): List<Law> = listOf(
     Law("Recursive Laws: Cata should be stack safe") {
-      10000.toGNat(CT).toInt(RT) shouldBe 10000
+      RT.toInt(CT.toGNat(10000)) shouldBe 10000
     }
   )
 }
