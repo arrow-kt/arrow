@@ -150,3 +150,15 @@ They are more general than the other datatypes as they combine the abstractions 
 - [`Yoneda`]({{ '/docs/free/yoneda/' | relative_url }})
 
 - [`Coyoneda`]({{ '/docs/free/coyoneda/' | relative_url }})
+
+
+#### Recursion schemes
+
+Recursion schemes are an abstraction for structured recursion that ensure runtime safety and provide powerful abstractions for recursive datatypes.
+
+- [`Fix`]({{ 'docs/recursion/fix' | relative_url }})
+
+- [`Mu`]({{ 'docs/recursion/mu' | relative_url }})
+
+- [`Nu`]({{ 'docs/recursion/nu' | relative_url }})
+
