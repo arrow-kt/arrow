@@ -20,46 +20,45 @@ object PrismLaws {
   )
 
   fun <A, B> Prism<A, B>.partialRoundTripOneWay(aGen: Gen<A>, EQA: Eq<A>): Unit = run{
-    val prims = this
-    forAll(aGen, { a ->
-      getOrModify(a).fold(::identity, prims::reverseGet)
-          .equalUnderTheLaw(a, EQA)
-    })
+    forAll(aGen) { a ->
+      getOrModify(a).fold(::identity, ::reverseGet)
+        .equalUnderTheLaw(a, EQA)
+    }
   }
 
   fun <A, B> Prism<A, B>.roundTripOtherWay(bGen: Gen<B>, EQOptionB: Eq<Option<B>>): Unit =
-    forAll(bGen, { b ->
+    forAll(bGen) { b ->
       getOption(reverseGet(b))
         .equalUnderTheLaw(Some(b), EQOptionB)
-    })
+    }
 
   fun <A, B> Prism<A, B>.modifyIdentity(aGen: Gen<A>, EQA: Eq<A>): Unit =
-    forAll(aGen, { a ->
+    forAll(aGen) { a ->
       modify(a, ::identity).equalUnderTheLaw(a, EQA)
-    })
+    }
 
   fun <A, B> Prism<A, B>.composeModify(aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>): Unit =
-    forAll(aGen, funcGen, funcGen, { a, f, g ->
+    forAll(aGen, funcGen, funcGen) { a, f, g ->
       modify(modify(a, f), g).equalUnderTheLaw(modify(a, g compose f), EQA)
-    })
+    }
 
   fun <A, B> Prism<A, B>.consistentSetModify(aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>): Unit =
-    forAll(aGen, bGen, { a, b ->
+    forAll(aGen, bGen) { a, b ->
       set(a, b).equalUnderTheLaw(modify(a) { b }, EQA)
-    })
+    }
 
   fun <A, B> Prism<A, B>.consistentModifyModifyFId(aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>): Unit =
-    forAll(aGen, funcGen, { a, f ->
+    forAll(aGen, funcGen) { a, f ->
       modifyF(Id.applicative(), a, { Id.just(f(it)) }).value().equalUnderTheLaw(modify(a, f), EQA)
-    })
+    }
 
   fun <A, B> Prism<A, B>.consistentGetOptionModifyId(aGen: Gen<A>, EQOptionB: Eq<Option<B>>): Unit =
-    forAll(aGen, { a ->
+    forAll(aGen) { a ->
       modifyF(Const.applicative(object : Monoid<Option<B>> {
         override fun Option<B>.combine(b: Option<B>): Option<B> = orElse { b }
 
         override fun empty(): Option<B> = None
       }), a, { Const(Some(it)) }).value().equalUnderTheLaw(getOption(a), EQOptionB)
-    })
+    }
 
 }

@@ -25,6 +25,7 @@ class OptionTest : UnitSpec() {
 
   val some: Option<String> = Some("kotlin")
   val none: Option<String> = Option.empty()
+  val random = Random()
 
   init {
 
@@ -46,7 +47,7 @@ class OptionTest : UnitSpec() {
       testLaws(
         EqLaws.laws(Option.eq(Int.eq())) {
           val optionList = genOption(Gen.int()).random()
-          optionList.elementAt(Random().nextInt(optionList.count()))
+          optionList.elementAt(random.nextInt(optionList.count()))
         },
         ShowLaws.laws(Option.show(), Option.eq(Int.eq())) { Some(it) },
         MonoidLaws.laws(Option.monoid(Int.monoid()), Some(1), Option.eq(Int.eq())),
