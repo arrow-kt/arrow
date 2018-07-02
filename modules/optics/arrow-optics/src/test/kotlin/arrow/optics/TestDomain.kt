@@ -3,6 +3,7 @@ package arrow.optics
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.identity
+import arrow.core.toOption
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 
@@ -82,11 +83,11 @@ internal val userLens: Lens<User, Token> = Lens(
 )
 
 internal val optionalHead: Optional<List<Int>, Int> = Optional(
-  { it.firstOrNull()?.let(::Right) ?: it.let(::Left) },
-  { int -> { list -> listOf(int) + if (list.size > 1) list.drop(1) else emptyList() } }
+  { it.firstOrNull().toOption() },
+  { int, list -> listOf(int) + if (list.size > 1) list.drop(1) else emptyList() }
 )
 
 internal val defaultHead: Optional<Int, Int> = Optional(
-  { it.let(::Right) },
-  { ::identity }
+  { it.toOption() },
+  { a: Int, _ : Int -> a }
 )

@@ -67,6 +67,12 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
       override fun set(s: S, b: B): T = set(b)(s)
     }
 
+    operator fun <S, A> invoke(get: (S) -> Option<A>, set: (A, S) -> S): Optional<S, A> = object: Optional<S, A> {
+      override fun getOrModify(s: S): Either<S, A> = get(s).toEither { s }
+
+      override fun set(s: S, b: A): S = set(b, s)
+    }
+
     /**
      * Invoke operator overload to create a [POptional] of type `S` with focus `A`.
      * Can also be used to construct [Optional]
