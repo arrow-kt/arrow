@@ -11,12 +11,12 @@ import arrow.data.combineK as sequenceCombineK
 
 @instance(SequenceK::class)
 interface SequenceKSemigroupInstance<A> : Semigroup<SequenceK<A>> {
-  override fun SequenceK<A>.combine(b: SequenceK<A>): SequenceK<A> = (this + b).k()
+  override fun SequenceK<A>.combine(b: SequenceK<A>): SequenceK<A> = (this.sequence + b.sequence).k()
 }
 
 @instance(SequenceK::class)
 interface SequenceKMonoidInstance<A> : Monoid<SequenceK<A>> {
-  override fun SequenceK<A>.combine(b: SequenceK<A>): SequenceK<A> = (this + b).k()
+  override fun SequenceK<A>.combine(b: SequenceK<A>): SequenceK<A> = (this.sequence + b.sequence).k()
 
   override fun empty(): SequenceK<A> = emptySequence<A>().k()
 }

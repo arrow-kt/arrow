@@ -169,12 +169,16 @@ fun ClassOrPackageDataWrapper.typeConstraints(): String =
     }
   }
 
-fun recurseFilesUpwards(fileName: String): File =
-  recurseFilesUpwards(fileName, File(".").absoluteFile)
+fun recurseFilesUpwards(fileNames: Set<String>): File =
+  recurseFilesUpwards(fileNames, File(".").absoluteFile)
 
-fun recurseFilesUpwards(fileName: String, currentDirectory: File): File =
-  if (currentDirectory.list().contains(fileName)) {
+fun recurseFilesUpwards(fileNames: Set<String>, currentDirectory: File): File {
+
+  val filesInDir = currentDirectory.list()
+
+  return if ((filesInDir.intersect(fileNames)).isNotEmpty()) {
     currentDirectory
   } else {
-    recurseFilesUpwards(fileName, currentDirectory.parentFile)
+    recurseFilesUpwards(fileNames, currentDirectory.parentFile)
   }
+}
