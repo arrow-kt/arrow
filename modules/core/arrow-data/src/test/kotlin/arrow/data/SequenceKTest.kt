@@ -36,6 +36,7 @@ class SequenceKTest : UnitSpec() {
         MonoidKLaws.laws(this, this, eq),
         MonoidLaws.laws(SequenceK.monoid(), Gen.list(Gen.int()).map{it.asSequence()}.generate().k(), eq),
         TraverseLaws.laws(this, this, { n: Int -> SequenceK(sequenceOf(n)) }, eq)
+      )
     }
   }
 }
