@@ -6,6 +6,9 @@ permalink: /docs/optics/getter/
 
 ## Getter
 
+{:.beginner}
+beginner
+
 A `Getter` is an optic that can focus into a structure and `get` its focus.
 It can be seen as a wrapper of a get function `(S) -> A` that can be composed with other optics.
 
@@ -37,8 +40,8 @@ Or from any of the optics defined in `arrow-optics` that allow to safely getting
 import arrow.core.*
 import arrow.optics.instances.*
 
-val headGetter: Getter<NonEmptyList<String>, String> = nelHead<String>().asGetter()
-val tupleGetter: Getter<Tuple2<String, Int>, String> = firstTuple2<String, Int>().asGetter()
+val headGetter: Getter<NonEmptyList<String>, String> = NonEmptyList.head<String>().asGetter()
+val tupleGetter: Getter<Tuple2<String, Int>, String> = Tuple2.first<String, Int>().asGetter()
 ``` 
 
 ## Composition
@@ -46,7 +49,7 @@ val tupleGetter: Getter<Tuple2<String, Int>, String> = firstTuple2<String, Int>(
 Unlike a regular `get` function a `Getter` composes. Similar to a `Lens` we can compose `Getter`s to create telescopes and zoom into nested structures.
 
 ```kotlin:ank
-val firstBar: Getter<NonEmptyList<Foo>, Int> = (nelHead<Foo>() compose barGetter)
+val firstBar: Getter<NonEmptyList<Foo>, Int> = NonEmptyList.head<Foo>() compose barGetter
 firstBar.get(Foo(5).nel())
 ```
 

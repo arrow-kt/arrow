@@ -1,6 +1,7 @@
 package arrow.optics
 
 import arrow.core.*
+import arrow.data.Validated
 import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.IsoLaws
@@ -11,13 +12,13 @@ import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class ValidatedInstancesTest : UnitSpec() {
+class ValidatedTest : UnitSpec() {
 
   init {
 
     testLaws(
       IsoLaws.laws(
-        iso = validatedToEither(),
+        iso = Validated.toEither(),
         aGen = genValidated(Gen.string(), Gen.int()),
         bGen = genEither(Gen.string(), Gen.int()),
         funcGen = genFunctionAToB(genEither(Gen.string(), Gen.int())),
@@ -31,7 +32,7 @@ class ValidatedInstancesTest : UnitSpec() {
         }),
 
       IsoLaws.laws(
-        iso = validatedToTry(),
+        iso = Validated.toTry(),
         aGen = genValidated(genThrowable(), Gen.int()),
         bGen = genTry(Gen.int()),
         funcGen = genFunctionAToB(genTry(Gen.int())),

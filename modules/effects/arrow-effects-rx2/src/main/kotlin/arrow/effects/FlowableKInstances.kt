@@ -10,6 +10,7 @@ import arrow.effects.typeclasses.Proc
 import arrow.instance
 import arrow.typeclasses.*
 import io.reactivex.BackpressureStrategy
+import kotlin.coroutines.experimental.CoroutineContext
 
 @instance(FlowableK::class)
 interface FlowableKFunctorInstance : Functor<ForFlowableK> {
@@ -109,6 +110,9 @@ interface FlowableKAsyncInstance :
   Async<ForFlowableK> {
   override fun <A> async(fa: Proc<A>): FlowableK<A> =
     FlowableK.async(fa, BS())
+
+  override fun <A> FlowableKOf<A>.continueOn(ctx: CoroutineContext): FlowableK<A> =
+    fix().continueOn(ctx)
 }
 
 @instance(FlowableK::class)
@@ -119,7 +123,10 @@ interface FlowableKEffectInstance :
     fix().runAsync(cb)
 }
 
-object FlowableKContext : FlowableKEffectInstance
+object FlowableKContext : FlowableKEffectInstance, FlowableKTraverseInstance {
+  override fun <A, B> FlowableKOf<A>.map(f: (A) -> B): FlowableK<B> =
+    fix().map(f)
+}
 
 infix fun <A> ForFlowableK.Companion.extensions(f: FlowableKContext.() -> A): A =
   f(FlowableKContext)

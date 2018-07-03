@@ -6,6 +6,9 @@ permalink: /docs/datatypes/listk/
 
 ## ListK
 
+{:.beginner}
+beginner
+
 ListK wraps over the platform `List` type to make it a [type constructor](/docs/patterns/glossary/#type-constructors).
 
 It can be created from Kotlin List type with a convenient `k()` function.

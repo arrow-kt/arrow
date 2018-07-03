@@ -2,9 +2,13 @@
 layout: docs
 title: Functor
 permalink: /docs/typeclasses/functor/
+video: EUqg3fSahhk
 ---
 
 ## Functor
+
+{:.beginner}
+beginner
 
 The `Functor` typeclass abstracts the ability to `map` over the computational context of a type constructor.
 Examples of type constructors that can implement instances of the Functor typeclass include `Option`, `NonEmptyList`,

@@ -1,8 +1,10 @@
 package arrow.effects
 
+import arrow.Kind
 import arrow.core.*
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
+import arrow.typeclasses.Traverse
 import kotlinx.coroutines.experimental.*
 import kotlin.coroutines.experimental.CoroutineContext
 
@@ -23,6 +25,11 @@ data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferre
   fun <B> flatMap(f: (A) -> DeferredKOf<B>): DeferredK<B> =
     kotlinx.coroutines.experimental.async(Unconfined, CoroutineStart.LAZY) {
       f(await()).await()
+    }.k()
+
+  fun continueOn(ctx: CoroutineContext): DeferredK<A> =
+    kotlinx.coroutines.experimental.async(ctx, CoroutineStart.LAZY) {
+      deferred.await()
     }.k()
 
   companion object {
@@ -110,3 +117,7 @@ fun <A> DeferredKOf<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit 
   }
 
 suspend fun <A> DeferredKOf<A>.await(): A = this.fix().await()
+
+suspend fun <F, A> Kind<F, DeferredKOf<A>>.awaitAll(T: Traverse<F>): Kind<F, A> = T.run {
+    this@awaitAll.sequence(DeferredK.applicative()).await()
+}

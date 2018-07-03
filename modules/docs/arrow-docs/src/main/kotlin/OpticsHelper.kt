@@ -41,11 +41,13 @@ data class Employee(val name: String, val company: Company) {
 sealed class Shape {
   companion object {}
 
-  @optics data class Circle(val radius: Double) : Shape() {
+  @optics
+  data class Circle(val radius: Double) : Shape() {
     companion object
   }
 
-  @optics data class Rectangle(val width: Double, val height: Double) : Shape() {
+  @optics
+  data class Rectangle(val width: Double, val height: Double) : Shape() {
     companion object
   }
 

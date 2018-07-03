@@ -102,8 +102,12 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    * Left(12).map { "flower" }  // Result: Left(12)
    * ```
    */
+  @Suppress("UNCHECKED_CAST")
   inline fun <C> map(crossinline f: (B) -> C): Either<A, C> =
-    fold({ Left(it) }, { Right(f(it)) })
+      when (this) {
+        is Right -> Right(f(b))
+        is Left -> this as Left<A, Nothing>
+      }
 
   /**
    * The given function is applied if this is a `Left`.
@@ -222,8 +226,14 @@ fun <R> Right(right: R): Either<Nothing, R> = Either.right(right)
  *
  * @param f The function to bind across [Either.Right].
  */
+@Suppress("UNCHECKED_CAST")
 fun <A, B, C> EitherOf<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> =
-  fix().fold({ Left(it) }, { f(it) })
+  fix().let {
+    when (it) {
+      is Right -> f(it.b)
+      is Left -> it as Left<A, Nothing>
+    }
+  }
 
 /**
  * Returns the value from this [Either.Right] or the given argument if this is a [Either.Left].
