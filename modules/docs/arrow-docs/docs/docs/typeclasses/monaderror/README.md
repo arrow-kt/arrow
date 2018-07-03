@@ -6,6 +6,9 @@ permalink: /docs/typeclasses/monaderror/
 
 ## MonadError
 
+{:.intermediate}
+intermediate
+
 MonadError is the typeclass used to explicitly represent errors during sequential execution.
 It is parametrized to an error type `E`, which means the datatype has at least a "success" and a "failure" version.
 These errors can come in the form of `Throwable`, `Exception`, or any other type hierarchy of the user's choice.
@@ -24,20 +27,27 @@ It lifts an exception into the computational context of a type constructor.
 ```kotlin:ank
 import arrow.*
 import arrow.core.*
+import arrow.instances.*
 
-Either.monadError<Throwable>().raiseError<Int>(RuntimeException("Paco"))
+ForEither<Throwable>() extensions { 
+  raiseError<Int>(RuntimeException("Paco"))
+}
 ```
 
 ```kotlin:ank
 import arrow.data.*
 
-Try.monadError().raiseError<Int>(RuntimeException("Paco"))
+ForTry extensions { 
+  raiseError<Int>(RuntimeException("Paco"))
+}
 ```
 
 ```kotlin:ank
 import arrow.effects.*
 
-IO.monadError().raiseError<Int>(RuntimeException("Paco"))
+ForIO extensions { 
+  raiseError<Int>(RuntimeException("Paco"))
+}
 ```
 
 #### Kind<F, A>.ensure
@@ -45,15 +55,15 @@ IO.monadError().raiseError<Int>(RuntimeException("Paco"))
 Tests a predicate against the object, and if it fails it executes a function to create an error.
 
 ```kotlin:ank
-val ME = Either.monadError<Throwable>()
-
-val either: Either<Throwable, Int> = Either.Right(1)
-
-ME.run { either.ensure({ RuntimeException("Failed predicate") }, { it > 0 }) }
+ForEither<Throwable>() extensions {
+  Either.Right(1).ensure({ RuntimeException("Failed predicate") }, { it > 0 }) 
+}
 ```
 
 ```kotlin:ank
-ME.run { either.ensure({ RuntimeException("Failed predicate") }, { it < 0 }) }
+ForEither<Throwable>() extensions {
+  Either.Right(1).ensure({ RuntimeException("Failed predicate") }, { it < 0 }) 
+}
 ```
 
 ### Comprehensions

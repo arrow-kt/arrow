@@ -8,7 +8,7 @@ class OptionalTest : APTest("arrow.ap.objects.optional") {
 
     testProcessor(AnnotationProcessor(
       name = "Optionals cannot be generated for sealed class",
-      sourceFile = "OptionalSealed.java",
+      sourceFiles = listOf("OptionalSealed.java"),
       errorMessage = """
     |Cannot generate arrow.optics.Optional for arrow.ap.objects.optional.OptionalSealed
     |                                             ^
@@ -19,8 +19,15 @@ class OptionalTest : APTest("arrow.ap.objects.optional") {
     ))
 
     testProcessor(AnnotationProcessor(
+      name = "Optional generation requires companion object declaration",
+      sourceFiles = listOf("OptionalWithoutCompanion.java"),
+      errorMessage = "@optics annotated class arrow.ap.objects.optional.OptionalWithoutCompanion needs to declare companion object.",
+      processor = OpticsProcessor()
+    ))
+
+    testProcessor(AnnotationProcessor(
       name = "Optionals will be generated for data class",
-      sourceFile = "Optional.java",
+      sourceFiles = listOf("Optional.java"),
       destFile = "Optional.kt",
       processor = OpticsProcessor()
     ))

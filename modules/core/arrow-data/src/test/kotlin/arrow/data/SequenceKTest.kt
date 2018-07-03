@@ -3,6 +3,7 @@ package arrow.data
 import arrow.Kind
 import arrow.instances.IntEqInstance
 import arrow.instances.eq
+import arrow.instances.extensions
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -12,7 +13,6 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class SequenceKTest : UnitSpec() {
-  val applicative = SequenceK.applicative()
 
   init {
 
@@ -26,12 +26,14 @@ class SequenceKTest : UnitSpec() {
         toList().toString()
     }
 
-    testLaws(
-      EqLaws.laws(SequenceK.eq(Int.eq())) { sequenceOf(it).k() },
-      ShowLaws.laws(show, eq) { sequenceOf(it).k() },
-      MonadLaws.laws(SequenceK.monad(), eq),
-      MonoidKLaws.laws(SequenceK.monoidK(), applicative, eq),
-      TraverseLaws.laws(SequenceK.traverse(), applicative, { n: Int -> SequenceK(sequenceOf(n)) }, eq)
-    )
+    ForSequenceK extensions {
+      testLaws(
+        EqLaws.laws(SequenceK.eq(Int.eq())) { sequenceOf(it).k() },
+        ShowLaws.laws(show, eq) { sequenceOf(it).k() },
+        MonadLaws.laws(this, eq),
+        MonoidKLaws.laws(this, this, eq),
+        TraverseLaws.laws(this, this, { n: Int -> SequenceK(sequenceOf(n)) }, eq)
+      )
+    }
   }
 }

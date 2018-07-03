@@ -76,3 +76,8 @@ interface Function0BimonadInstance : Bimonad<ForFunction0> {
   override fun <A> Kind<ForFunction0, A>.extract(): A =
     fix().extract()
 }
+
+object Function0Context : Function0BimonadInstance
+
+infix fun <L> ForFunction0.Companion.extensions(f: Function0Context.() -> L): L =
+  f(Function0Context)

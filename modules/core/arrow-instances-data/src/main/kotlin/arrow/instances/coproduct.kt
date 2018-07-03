@@ -2,6 +2,7 @@ package arrow.instances
 
 import arrow.Kind
 import arrow.core.Eval
+import arrow.core.fix
 import arrow.data.Coproduct
 import arrow.data.CoproductOf
 import arrow.data.CoproductPartialOf
@@ -65,3 +66,16 @@ interface CoproductTraverseInstance<F, G> : Traverse<CoproductPartialOf<F, G>> {
   override fun <A, B> Kind<CoproductPartialOf<F, G>, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f, TF(), TG())
 }
+
+class CoproductContext<F, G>(val TF: Traverse<F>, val TG: Traverse<G>) : CoproductTraverseInstance<F, G> {
+  override fun TF(): Traverse<F> = TF
+  override fun TG(): Traverse<G> = TG
+}
+
+class CoproductContextPartiallyApplied<F, G>(val TF: Traverse<F>, val TG: Traverse<G>) {
+  infix fun <A> extensions(f: CoproductContext<F, G>.() -> A): A =
+    f(CoproductContext(TF, TG))
+}
+
+fun <F, G> ForCoproduct(TF: Traverse<F>, TG: Traverse<G>): CoproductContextPartiallyApplied<F, G> =
+  CoproductContextPartiallyApplied(TF, TG)

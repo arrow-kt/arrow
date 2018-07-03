@@ -6,6 +6,9 @@ permalink: /docs/typeclasses/eq/
 
 ## Eq
 
+{:.beginner}
+beginner
+
 The `Eq` typeclass abstracts the ability to compare two instances of any object.
 It can be considered the typeclass equivalent of Java's `Object#equals`.
 
@@ -66,6 +69,11 @@ Eq.any().run { Some(1).eqv(Option.just(1)) }
 ```kotlin:ank
 // Fails because the wrapped function is not evaluated for comparison
 Eq.any().run { Eval.later { 1 }.eqv(Eval.later { 1 }) }
+```
+
+```kotlin:ank
+// using invoke constructor
+val intEq = Eq<Int> { a, b -> a == b }
 ```
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Eq` instances for custom datatypes.

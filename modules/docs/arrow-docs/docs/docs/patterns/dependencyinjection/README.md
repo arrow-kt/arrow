@@ -8,6 +8,9 @@ If you would like to know about using the [`Reader`]({{ '/docs/datatypes/reader'
 
 ## Dependency Injection using the `Typeclassless` technique
 
+{:.intermediate}
+intermediate
+
 Arrow allows abstracting polymorphic code that operates over the evidence of having an instance of a [typeclass]({{ '/docs/typeclasses/intro' | relative_url }}) available.
 This enables programs that are not coupled to specific datatype implementations.
 The technique demonstrated below to write polymorphic code is available for all other typeclasses besides [`Functor`]({{ '/docs/typeclasses/functor' | relative_url }}).
@@ -63,19 +66,29 @@ fun <F> printAllValues(S: Show<Kind<F, Int>>, fa: List<Kind<F, Int>>): Unit {
 
 An extension function is applied to a type, that becomes bound to `this` and enables calling all its functions without using `this.method()`. If we declare a function to depend on the typeclass, we get automatic access to the extension functions declared inside.
 
-```kotlin
+```kotlin:ank:silent
+import arrow.*
+import arrow.core.*
+import arrow.typeclasses.*
+
 fun <F> Functor<F>.multiplyBy2(fa: Kind<F, Int>): Kind<F, Int> =
   fa.map { it * 2 }
 ```
 
 And we can call it on the typeclass instances:
 
-```kotlin
-Option.functor().multiplyBy2(Try.just(1))
+```kotlin:ank
+import arrow.instances.*
+
+ForOption extensions { 
+  multiplyBy2(Option(1)) 
+}
 ```
 
-```kotlin
-Try.functor().multiplyBy2(Try.just(1))
+```kotlin:ank
+ForTry extensions { 
+  multiplyBy2(Try.just(1))
+}
 ```
 
 The same applies to functions without a return value, so you don't have to remember to use the right function.
@@ -98,7 +111,7 @@ Extension functions declared for the same types can call into each other without
 This is the simplest, most direct case, and that's no coincidence. Most FP languages only allow functions scoped to global, a module, or an object that acts as a namespace.
 Programs are composed by functions and tested on their typeclass and data parameters that define the functionality.
 
-```kotlin
+```kotlin:ank:silent
 fun <A> Eq<A>.remove(l: List<A>, a: A): List<A> =
   l.filterNot { a.eqv(it) }
 ```
@@ -120,7 +133,9 @@ object FunctorLaws {
 
 import arrow.test.FunctorLaws.test
 
-Option.functor().test { it.some() }
+ForOption extensions { 
+  test { it.some() }
+}
 ```
 
 ```kotlin
@@ -205,7 +220,9 @@ class Parser {
 }
 
 // TEDIOUS AND NOT IDIOMATIC
-Parser().run { Option.monad().parseInt("123") }
+ForOption extensions { 
+  Parser().run { parseInt("123") }
+}
 ```
 
 For these cases the most ergonomic option is not to use extension functions, and instead fall back to regular parameter passing.

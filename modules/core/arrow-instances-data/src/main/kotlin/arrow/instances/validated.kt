@@ -85,3 +85,18 @@ interface ValidatedShowInstance<L, R> : Show<Validated<L, R>> {
   override fun Validated<L, R>.show(): String =
     toString()
 }
+
+class ValidatedContext<L>(val SL: Semigroup<L>) : ValidatedApplicativeErrorInstance<L>, ValidatedTraverseInstance<L>, ValidatedSemigroupKInstance<L> {
+  override fun SE(): Semigroup<L> = SL
+
+  override fun <A, B> Kind<ValidatedPartialOf<L>, A>.map(f: (A) -> B): Validated<L, B> =
+    fix().map(f)
+}
+
+class ValidatedContextPartiallyApplied<L>(val SL: Semigroup<L>) {
+  infix fun <A> extensions(f: ValidatedContext<L>.() -> A): A =
+    f(ValidatedContext(SL))
+}
+
+fun <L> ForValidated(SL: Semigroup<L>): ValidatedContextPartiallyApplied<L> =
+  ValidatedContextPartiallyApplied(SL)

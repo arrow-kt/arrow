@@ -77,3 +77,18 @@ interface ConstShowInstance<A, T> : Show<Const<A, T>> {
   override fun Const<A, T>.show(): String =
     toString()
 }
+
+class ConstContext<A>(val MA: Monoid<A>) : ConstApplicativeInstance<A>, ConstTraverseInstance<A> {
+  override fun MA(): Monoid<A> = MA
+
+  override fun <T, U> Kind<ConstPartialOf<A>, T>.map(f: (T) -> U): Const<A, U> =
+    fix().map(f)
+}
+
+class ConstContextPartiallyApplied<L>(val MA: Monoid<L>) {
+  infix fun <A> extensions(f: ConstContext<L>.() -> A): A =
+    f(ConstContext(MA))
+}
+
+fun <L> ForConst(MA: Monoid<L>): ConstContextPartiallyApplied<L> =
+  ConstContextPartiallyApplied(MA)

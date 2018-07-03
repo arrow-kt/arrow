@@ -8,6 +8,7 @@ import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.instance
 import arrow.typeclasses.*
+import kotlin.coroutines.experimental.CoroutineContext
 import arrow.effects.handleErrorWith as deferredHandleErrorWith
 
 @instance(DeferredK::class)
@@ -75,6 +76,9 @@ interface DeferredKAsyncInstance : DeferredKMonadDeferInstance, Async<ForDeferre
   override fun <A> async(fa: Proc<A>): DeferredK<A> =
     DeferredK.async(fa = fa)
 
+  override fun <A> DeferredKOf<A>.continueOn(ctx: CoroutineContext): DeferredK<A> =
+    fix().continueOn(ctx)
+
   override fun <A> invoke(fa: () -> A): DeferredK<A> =
     DeferredK.invoke(f = fa)
 }
@@ -84,3 +88,8 @@ interface DeferredKEffectInstance : DeferredKAsyncInstance, Effect<ForDeferredK>
   override fun <A> Kind<ForDeferredK, A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Unit> =
     fix().runAsync(cb)
 }
+
+object DeferredKContext : DeferredKEffectInstance
+
+infix fun <A> ForDeferredK.Companion.extensions(f: DeferredKContext.() -> A): A =
+  f(DeferredKContext)

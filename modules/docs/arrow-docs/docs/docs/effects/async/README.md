@@ -6,6 +6,9 @@ permalink: /docs/effects/async/
 
 ## Async
 
+{:.intermediate}
+intermediate
+
 Being able to run code in a different context of execution (i.e. thread) than the current one implies that, even if it's part of a sequence, the code will have to be asynchronous.
 Running asynchronous code always requires a callback after completion on error capable of returning to the current thread.
 
@@ -62,6 +65,25 @@ IO.async()
   }
 ```
 
+#### continueOn
+
+It makes the rest of the operator chain to be executed on a separate `CoroutineContext`, effectively jumping threads if necessary.
+
+```
+IO.async().run {
+  // In current thread
+  just(createUserFromId(123))
+    .continueOn(CommonPool)
+    // In CommonPool
+    .flatMap { request(it) }
+    .continueOn(Ui)
+    // In Ui
+    .flatMap { showResult(it) }
+}
+```
+
+Behind the scenes `continueOn()` starts a new coroutine and passes the rest of the chain as the block to execute.
+
 #### never
 
 Creates an object using `async()` whose callback is never called.
@@ -79,46 +101,6 @@ IO.async()
 
 > never() exists to test datatypes that can handle non-termination.
 For example, IO has unsafeRunTimed that runs never() safely.
-
-### Syntax available inside Monad Comprehensions
-
-All the syntax functions are geared towards using `Async` inside [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }})
-to create blocks of code to be run asynchronously.
-
-#### binding#bindAsync
-
-Runs a function parameter in the Async passed as a parameter,
-and then awaits for the result before continuing the execution.
-
-Note that there is no automatic error handling or wrapping of exceptions.
-
-```kotlin
-IO.monad().binding {
-  val a = bindAsync(IO.async()) { fibonacci(100) }
-  a + 1
-}.fix().unsafeRunSync()
-```
-
-#### binding#bindAsyncUnsafe
-
-Runs a function parameter in the Async passed as a parameter,
-and then awaits for the result before continuing the execution.
-
-While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution.
-
-```kotlin
-IO.monad().binding {
-  val a = bindAsync(IO.async()) { fibonacci(100).left() }
-  a + 1
-}.fix().unsafeRunSync()
-```
-
-```kotlin
-IO.monad().binding {
-  val a = bindAsync(IO.async()) { RuntimeException("Boom").right() }
-  a + 1
-}.fix().unsafeRunSync()
-```
 
 ### Laws
 

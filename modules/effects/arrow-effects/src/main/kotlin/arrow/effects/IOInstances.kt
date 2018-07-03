@@ -8,6 +8,7 @@ import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.instance
 import arrow.typeclasses.*
+import kotlin.coroutines.experimental.CoroutineContext
 import arrow.effects.ap as ioAp
 import arrow.effects.handleErrorWith as ioHandleErrorWith
 
@@ -81,6 +82,9 @@ interface IOAsyncInstance : IOMonadDeferInstance, Async<ForIO> {
   override fun <A> async(fa: Proc<A>): IO<A> =
     IO.async(fa)
 
+  override fun <A> IOOf<A>.continueOn(ctx: CoroutineContext): Kind<ForIO, A> =
+    fix().continueOn(ctx)
+
   override fun <A> invoke(fa: () -> A): IO<A> =
     IO.invoke(fa)
 }
@@ -110,3 +114,8 @@ interface IOSemigroupInstance<A> : Semigroup<Kind<ForIO, A>> {
   override fun IOOf<A>.combine(b: IOOf<A>): IO<A> =
     fix().flatMap { a1: A -> b.fix().map { a2: A -> SG().run { a1.combine(a2) } } }
 }
+
+object IOContext : IOEffectInstance
+
+infix fun <A> ForIO.Companion.extensions(f: IOContext.() -> A): A =
+  f(IOContext)

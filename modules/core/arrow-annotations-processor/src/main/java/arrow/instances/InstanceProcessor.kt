@@ -4,7 +4,7 @@ import arrow.common.utils.AbstractProcessor
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.knownError
 import com.google.auto.service.AutoService
-import org.jetbrains.kotlin.serialization.deserialization.TypeTable
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import java.io.File
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment

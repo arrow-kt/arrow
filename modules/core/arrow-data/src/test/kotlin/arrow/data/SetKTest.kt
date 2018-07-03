@@ -2,6 +2,7 @@ package arrow.data
 
 import arrow.instances.IntEqInstance
 import arrow.instances.eq
+import arrow.instances.extensions
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -15,12 +16,14 @@ class SetKTest : UnitSpec() {
 
     val EQ = SetK.eq(Int.eq())
 
-    testLaws(
-      EqLaws.laws(EQ) { SetK.just(it) },
-      ShowLaws.laws(SetK.show(), EQ) { SetK.just(it) },
-      SemigroupKLaws.laws(SetK.semigroupK(), { SetK.just(it) }, Eq.any()),
-      MonoidKLaws.laws(SetK.monoidK(), { SetK.just(it) }, Eq.any()),
-      FoldableLaws.laws(SetK.foldable(), { SetK.just(it) }, Eq.any())
-    )
+    ForSetK extensions {
+      testLaws(
+        EqLaws.laws(EQ) { SetK.just(it) },
+        ShowLaws.laws(SetK.show(), EQ) { SetK.just(it) },
+        SemigroupKLaws.laws(this, { SetK.just(it) }, Eq.any()),
+        MonoidKLaws.laws(this, { SetK.just(it) }, Eq.any()),
+        FoldableLaws.laws(this, { SetK.just(it) }, Eq.any())
+      )
+    }
   }
 }

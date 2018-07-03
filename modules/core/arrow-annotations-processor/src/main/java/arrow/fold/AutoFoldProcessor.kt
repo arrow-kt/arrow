@@ -23,9 +23,6 @@ class AutoFoldProcessor : AbstractProcessor() {
 
   override fun getSupportedAnnotationTypes(): Set<String> = setOf(foldAnnotationClass.canonicalName)
 
-  /**
-   * Processor entry point
-   */
   override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
     annotatedList += roundEnv
       .getElementsAnnotatedWith(foldAnnotationClass)
@@ -52,7 +49,10 @@ class AutoFoldProcessor : AbstractProcessor() {
             )
           }
 
-          else -> knownError("Generation of fold is only supported for sealed classes.")
+          else -> knownError("""
+            |$this is an invalid target for @autofold.
+            |Generation of fold is only supported for sealed classes.
+            """.trimMargin())
         }
       }
 

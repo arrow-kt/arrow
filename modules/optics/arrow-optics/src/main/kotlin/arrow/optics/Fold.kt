@@ -33,7 +33,7 @@ interface Fold<S, A> : FoldOf<S, A> {
     /**
      * [Fold] that takes either [S] or [S] and strips the choice of [S].
      */
-    inline fun <S> codiagonal() = object : Fold<Either<S, S>, S> {
+    fun <S> codiagonal() = object : Fold<Either<S, S>, S> {
       override fun <R> foldMap(M: Monoid<R>, s: Either<S, S>, f: (S) -> R): R = s.fold(f, f)
     }
 

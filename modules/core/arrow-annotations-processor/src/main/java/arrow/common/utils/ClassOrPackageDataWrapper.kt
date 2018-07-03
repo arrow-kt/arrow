@@ -1,12 +1,12 @@
 package arrow.common.utils
 
-import org.jetbrains.kotlin.serialization.ClassData
-import org.jetbrains.kotlin.serialization.PackageData
-import org.jetbrains.kotlin.serialization.ProtoBuf.Constructor
-import org.jetbrains.kotlin.serialization.ProtoBuf.Function
-import org.jetbrains.kotlin.serialization.ProtoBuf.Property
-import org.jetbrains.kotlin.serialization.ProtoBuf.TypeParameter
-import org.jetbrains.kotlin.serialization.deserialization.NameResolver
+import me.eugeniomarletti.kotlin.metadata.ClassData
+import me.eugeniomarletti.kotlin.metadata.PackageData
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf.Constructor
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf.Function
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf.Property
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf.TypeParameter
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.NameResolver
 
 sealed class ClassOrPackageDataWrapper {
   abstract val `package`: String
@@ -19,7 +19,7 @@ sealed class ClassOrPackageDataWrapper {
 
   class Package(
     override val nameResolver: NameResolver,
-    val packageProto: org.jetbrains.kotlin.serialization.ProtoBuf.Package,
+    val packageProto: me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf.Package,
     override val `package`: String
   ) : ClassOrPackageDataWrapper() {
     override val constructorList: List<Constructor> get() = emptyList()
@@ -31,7 +31,7 @@ sealed class ClassOrPackageDataWrapper {
 
   class Class(
     override val nameResolver: NameResolver,
-    val classProto: org.jetbrains.kotlin.serialization.ProtoBuf.Class,
+    val classProto: me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf.Class,
     override val `package`: String
   ) : ClassOrPackageDataWrapper() {
     override val constructorList: List<Constructor> get() = classProto.constructorList

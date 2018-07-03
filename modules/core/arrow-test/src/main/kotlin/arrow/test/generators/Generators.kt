@@ -3,6 +3,10 @@ package arrow.test.generators
 import arrow.Kind
 import arrow.core.*
 import arrow.data.*
+import arrow.recursion.Algebra
+import arrow.recursion.Coalgebra
+import arrow.recursion.typeclasses.Corecursive
+import arrow.recursion.typeclasses.Recursive
 import arrow.typeclasses.Applicative
 import io.kotlintest.properties.Gen
 import java.util.concurrent.TimeUnit
@@ -167,3 +171,22 @@ fun <A> genSetK(genA: Gen<A>): Gen<SetK<A>> {
   val genSetA = Gen.set(genA)
   return Gen.create { genSetA.generate().k() }
 }
+
+// For generating recursive data structures with recursion schemes
+
+typealias NatPattern = ForOption
+typealias GNat<T> = Kind<T, NatPattern>
+
+fun toGNatCoalgebra() = Coalgebra<NatPattern, Int> {
+  if (it == 0) None else Some(it - 1)
+}
+
+fun fromGNatAlgebra() = Algebra<NatPattern, Eval<Int>> {
+  it.fix().fold({ Eval.Zero }, { it.map { it + 1 } })
+}
+
+inline fun <reified T> Corecursive<T>.toGNat(i: Int): GNat<T> =
+  Option.functor().ana(i, toGNatCoalgebra())
+
+inline fun <reified T> Recursive<T>.toInt(i: GNat<T>): Int =
+  Option.functor().cata(i, fromGNatAlgebra())

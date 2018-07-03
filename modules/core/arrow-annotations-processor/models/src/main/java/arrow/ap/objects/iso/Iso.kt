@@ -5,4 +5,6 @@ import arrow.optics.OpticsTarget
 import arrow.optics.optics
 
 @optics([OpticsTarget.ISO])
-data class Iso(val field: String, val nullable: String?, val option: Option<String>)
+data class Iso(val field: String, val nullable: String?, val option: Option<String>) {
+  companion object
+}

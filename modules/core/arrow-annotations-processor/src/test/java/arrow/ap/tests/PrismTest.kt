@@ -8,7 +8,7 @@ class PrismTest : APTest("arrow.ap.objects.prism") {
 
     testProcessor(AnnotationProcessor(
       name = "Prisms cannot be generated for data class",
-      sourceFile = "PrismDataClass.java",
+      sourceFiles = listOf("PrismDataClass.java"),
       errorMessage = """
       |Cannot generate arrow.optics.Prism for arrow.ap.objects.prism.PrismDataClass
       |                                          ^
@@ -19,12 +19,18 @@ class PrismTest : APTest("arrow.ap.objects.prism") {
     ))
 
     testProcessor(AnnotationProcessor(
-      name = "Prisms are generated for sealed class",
-      sourceFile = "Prism.java",
-      destFile = "Prism.kt",
+      name = "Prism generation requires companion object declaration",
+      sourceFiles = listOf("PrismWithoutCompanion.java"),
+      errorMessage = "@optics annotated class arrow.ap.objects.prism.PrismWithoutCompanion needs to declare companion object.",
       processor = OpticsProcessor()
     ))
 
+    testProcessor(AnnotationProcessor(
+      name = "Prisms are generated for sealed class",
+      sourceFiles = listOf("Prism.java"),
+      destFile = "Prism.kt",
+      processor = OpticsProcessor()
+    ))
 
   }
 

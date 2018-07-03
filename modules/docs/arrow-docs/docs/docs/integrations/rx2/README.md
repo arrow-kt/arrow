@@ -6,6 +6,9 @@ permalink: /docs/integrations/rx2/
 
 ## RxJava 2
 
+{:.intermediate}
+intermediate
+
 Arrow aims to enhance the user experience when using RxJava. While providing other datatypes that are capable of handling effects, like IO, the style of programming encouraged by the library allows users to generify behavior for any existing abstractions.
 
 One of such abstractions is RxJava, a library focused on providing composable streams that enable reactive programming. Observable streams are created by chaining operators into what are called observable chains.
@@ -44,6 +47,16 @@ flow
 ```
 
 ```kotlin:ank
+val single = Single.fromCallable { 1 }.k()
+single
+```
+
+```kotlin:ank
+val maybe = Maybe.fromCallable { 1 }.k()
+maybe
+```
+
+```kotlin:ank
 val subject = PublishSubject.create<Int>().k()
 subject
 ```
@@ -59,6 +72,14 @@ flow.value()
 ```
 
 ```kotlin:ank
+single.value()
+```
+
+```kotlin:ank
+maybe.value()
+```
+
+```kotlin:ank
 subject.value()
 ```
 
@@ -66,7 +87,7 @@ subject.value()
 
 The library provides instances of [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) and [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}).
 
-[`MonadDefer`]({{ '/docs/effects/async' | relative_url }}) allows you to generify over datatypes that can run asynchronous code. You can use it with `ObservableK` and `FlowableK`.
+[`MonadDefer`]({{ '/docs/effects/async' | relative_url }}) allows you to generify over datatypes that can run asynchronous code. You can use it with `ObservableK`, `FlowableK` or `SingleK`.
 
 ```kotlin
 fun <F> getSongUrlAsync(MS: MonadDefer<F>) =
@@ -74,6 +95,8 @@ fun <F> getSongUrlAsync(MS: MonadDefer<F>) =
 
 val songObservable: ObservableKOf<Url> = getSongUrlAsync(ObservableK.monadDefer())
 val songFlowable: FlowableKOf<Url> = getSongUrlAsync(FlowableK.monadDefer())
+val songSingle: SingleKOf<Url> = getSongUrlAsync(SingleK.monadDefer())
+val songMaybe: MaybeKOf<Url> = getSongUrlAsync(MaybeK.monadDefer())
 ```
 
 [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) using the method `bindingCatch`, with all its benefits.
@@ -99,7 +122,11 @@ getSongUrlAsync()
 When rewritten using `bindingCatch` it becomes:
 
 ```kotlin
-ObservableK.monadError().bindingCatch {
+import arrow.effects.*
+import arrow.typeclasses.*
+
+ForObservableK extensions { 
+ bindingCatch {
   val songUrl = getSongUrlAsync().bind()
   val musicPlayer = MediaPlayer.load(songUrl)
   val totalTime = musicPlayer.getTotaltime()
@@ -114,7 +141,8 @@ ObservableK.monadError().bindingCatch {
   }
 
   percent
-}.fix()
+ }.fix()
+}
 ```
 
 Note that any unexpected exception, like `AritmeticException` when `totalTime` is 0, is automatically caught and wrapped inside the observable.
@@ -139,7 +167,7 @@ val (observable, disposable) =
   ObservableK.monadDefer().bindingCancellable {
     val userProfile = Observable.create { getUserProfile("123") }
     val friendProfiles = userProfile.friends().map { friend ->
-        bindAsync(observableAsync) { getProfile(friend.id) }
+        bindDefer { getProfile(friend.id) }
     }
     listOf(userProfile) + friendProfiles
   }

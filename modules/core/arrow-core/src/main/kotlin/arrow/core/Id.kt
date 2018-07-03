@@ -11,9 +11,9 @@ data class Id<out A>(val value: A) : IdOf<A> {
 
   inline fun <B> flatMap(f: (A) -> IdOf<B>): Id<B> = f(value).fix()
 
-  fun <B> foldLeft(b: B, f: (B, A) -> B): B = f(b, this.fix().value)
+  fun <B> foldLeft(initial: B, operation: (B, A) -> B): B = operation(initial, this.fix().value)
 
-  fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = f(this.fix().value, lb)
+  fun <B> foldRight(initial: Eval<B>, operation: (A, Eval<B>) -> Eval<B>): Eval<B> = operation(this.fix().value, initial)
 
   fun <B> coflatMap(f: (IdOf<A>) -> B): Id<B> = this.fix().map({ f(this) })
 

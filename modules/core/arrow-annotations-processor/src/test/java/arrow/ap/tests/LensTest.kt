@@ -8,7 +8,7 @@ class LensTest : APTest("arrow.ap.objects.lens") {
 
     testProcessor(AnnotationProcessor(
       name = "Lenses cannot be generated for sealed classes",
-      sourceFile = "LensSealed.java",
+      sourceFiles = listOf("LensSealed.java"),
       errorMessage = """
     |Cannot generate arrow.optics.Lens for arrow.ap.objects.lens.LensSealed
     |                                         ^
@@ -19,8 +19,15 @@ class LensTest : APTest("arrow.ap.objects.lens") {
     ))
 
     testProcessor(AnnotationProcessor(
+      name = "Lens generation requires companion object declaration",
+      sourceFiles = listOf("LensWithoutCompanion.java"),
+      errorMessage = "@optics annotated class arrow.ap.objects.lens.LensWithoutCompanion needs to declare companion object.",
+      processor = OpticsProcessor()
+    ))
+
+    testProcessor(AnnotationProcessor(
       name = "Lenses will be generated for data class",
-      sourceFile = "Lens.java",
+      sourceFiles = listOf("Lens.java"),
       destFile = "Lens.kt",
       processor = OpticsProcessor()
     ))

@@ -3,8 +3,8 @@ package arrow.instances
 import arrow.common.Package
 import arrow.common.utils.*
 import me.eugeniomarletti.kotlin.metadata.modality
-import org.jetbrains.kotlin.serialization.ProtoBuf
-import org.jetbrains.kotlin.serialization.deserialization.TypeTable
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import java.io.File
 
 data class FunctionMapping(

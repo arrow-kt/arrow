@@ -7,7 +7,7 @@ import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.SemigroupLaws
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -104,7 +104,7 @@ class ProductTest : UnitSpec() {
           a.combine(b) == Person(
             a.name + b.name,
             a.age + b.age,
-            a.related.flatMap { ap -> b.related.map { bp -> ap + bp } }
+            Option.monoid(this).combineAll(a.related, b.related)
           )
         }
       })
@@ -115,7 +115,7 @@ class ProductTest : UnitSpec() {
         a + b == Person(
           a.name + b.name,
           a.age + b.age,
-          a.related.flatMap { ap -> b.related.map { bp -> ap + bp } }
+          Option.monoid(Person.monoid()).combineAll(a.related, b.related)
         )
       })
     }

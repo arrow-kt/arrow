@@ -6,6 +6,9 @@ permalink: /docs/effects/io/
 
 ## IO
 
+{:.intermediate}
+intermediate
+
 `IO` is the most common data type used to represent side-effects in functional languages.
 This means `IO` is the data type of choice when interacting with the external environment: databases, network, operative systems, files...
 
@@ -23,6 +26,8 @@ Running in this context means evaluating the content of an `IO` object, and prop
 
 Note that `IO` objects can be run multiple times, and depending on how they are constructed they will evaluate its content again every time they're run.
 
+The general good practice is to have a single unsafe run call per program, at the entry point. In backend applications or command line tools this can be at the main. For Android apps, specially those before Android 9.0, this could happen per Activity.
+
 ### attempt
 
 Executes and defers the result into a new `IO` that has captured any exceptions inside `Either<Throwable, A>`.
@@ -39,6 +44,8 @@ Takes as a parameter a callback from a result of `Either<Throwable, A>` to a new
 All exceptions that would happen on the function parameter are automatically captured and propagated to the `IO<Unit>` return.
 
 It runs the current `IO` asynchronously, calling the callback parameter on completion and returning its result.
+
+The operation will not yield a result immediately; ultimately to start running the suspended computation you have to evaluate that new instance using an unsafe operator like `unsafeRunAsync` or `unsafeRunSync` for `IO`.
 
 ```kotlin
 IO<Int> { throw RuntimeException("Boom!") }
@@ -204,7 +211,11 @@ IO.async<Int> { callback ->
 [Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) also enable cancellation and parallelization of IO effects.
 
 ```kotlin
-IO.monad().binding {
+import arrow.typeclasses.*
+import arrow.effects.*
+
+ForIO extensions {
+  binding {
     val file = getFile("/tmp/file.txt").bind()
     val lines = file.readLines().bind()
     val average =
@@ -219,6 +230,7 @@ IO.monad().binding {
   .fix()
   .attempt()
   .unsafeRunSync()
+}
 ```
 
 ## Syntax
@@ -227,7 +239,9 @@ IO.monad().binding {
 
 Puts the value `A` inside an `IO<A>` using `just`.
 
-```kotlin
+```kotlin:ank
+import arrow.effects.*
+
 1.liftIO()
   .attempt()
   .unsafeRunSync()

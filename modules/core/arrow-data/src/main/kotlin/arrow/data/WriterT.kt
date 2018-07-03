@@ -87,30 +87,30 @@ data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTOf<F, W, 
     WriterT(value.map({ it.a toT f(it.b) }))
   }
 
-  inline fun <U> mapAcc(MF: Monad<F>, crossinline f: (W) -> U): WriterT<F, U, A> = transform(MF, { f(it.a) toT it.b })
+  fun <U> mapAcc(MF: Monad<F>, f: (W) -> U): WriterT<F, U, A> = transform(MF, { f(it.a) toT it.b })
 
-  inline fun <C, U> bimap(MF: Monad<F>, crossinline g: (W) -> U, crossinline f: (A) -> C): WriterT<F, U, C> = transform(MF, { g(it.a) toT f(it.b) })
+  fun <C, U> bimap(MF: Monad<F>, g: (W) -> U, f: (A) -> C): WriterT<F, U, C> = transform(MF, { g(it.a) toT f(it.b) })
 
   fun swap(MF: Monad<F>): WriterT<F, A, W> = transform(MF, { it.b toT it.a })
 
   fun <B> ap(MF: Monad<F>, SG: Semigroup<W>, ff: WriterTOf<F, W, (A) -> B>): WriterT<F, W, B> =
     ff.fix().flatMap(MF, SG, { map(MF, it) })
 
-  inline fun <B> flatMap(MF: Monad<F>, SG: Semigroup<W>, crossinline f: (A) -> WriterT<F, W, B>): WriterT<F, W, B> = MF.run {
+  fun <B> flatMap(MF: Monad<F>, SG: Semigroup<W>, f: (A) -> WriterT<F, W, B>): WriterT<F, W, B> = MF.run {
     WriterT(value.flatMap({ value -> f(value.b).value.map({ SG.run { it.a.combine(value.a) } toT it.b }) }))
   }
 
-  inline fun <B, U> transform(MF: Monad<F>, crossinline f: (Tuple2<W, A>) -> Tuple2<U, B>): WriterT<F, U, B> = MF.run {
+  fun <B, U> transform(MF: Monad<F>, f: (Tuple2<W, A>) -> Tuple2<U, B>): WriterT<F, U, B> = MF.run {
     WriterT(value.flatMap({ just(f(it)) }))
   }
 
   fun <B> liftF(AF: Applicative<F>, fa: Kind<F, B>): WriterT<F, W, B> =
     WriterT(AF.run { fa.map2(value, { it.b.a toT it.a }) })
 
-  inline fun <C> semiflatMap(MF: Monad<F>, SG: Semigroup<W>, crossinline f: (A) -> Kind<F, C>): WriterT<F, W, C> =
+  fun <C> semiflatMap(MF: Monad<F>, SG: Semigroup<W>, f: (A) -> Kind<F, C>): WriterT<F, W, C> =
     flatMap(MF, SG, { liftF(MF, f(it)) })
 
-  inline fun <B> subflatMap(MF: Monad<F>, crossinline f: (A) -> Tuple2<W, B>): WriterT<F, W, B> = transform(MF, { f(it.b) })
+  fun <B> subflatMap(MF: Monad<F>, f: (A) -> Tuple2<W, B>): WriterT<F, W, B> = transform(MF, { f(it.b) })
 
   fun combineK(SF: SemigroupK<F>, y: WriterTOf<F, W, A>): WriterT<F, W, A> = SF.run {
     WriterT(value.combineK(y.fix().value))

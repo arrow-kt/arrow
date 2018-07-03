@@ -2,9 +2,13 @@
 layout: docs
 title: State
 permalink: /docs/datatypes/state/
+video: GcXC0xARSXg
 ---
 
 ## State
+
+{:.intermediate}
+intermediate
 
 `State` is a structure that provides a functional approach to handling application state. `State<S, A>` is basically a function `S -> Tuple2(S, A)`, where `S` is the type that represents your state and `A` is the result the function produces. In addition to returning the result of type `A`, the function returns a new `S` value, which is the updated state.
 
@@ -90,13 +94,14 @@ The `flatMap` method on `State<S, A>` lets you use the result of one `State` in 
 import arrow.typeclasses.*
 import arrow.instances.*
 
-fun stackOperations() = State().monad<Stack>().binding {
+fun stackOperations() = ForState<Stack>() extensions {
+  binding {
     val a = push("a").bind()
     val b = pop().bind()
     val c = pop().bind()
-
     c
-}.fix()
+  }.fix()
+}
 ```
 
 At this point, we have not yet interacted with any Stack; we have written instructions to operate one. We need to pass in an initial stack value, and then we actually apply our operations to it:

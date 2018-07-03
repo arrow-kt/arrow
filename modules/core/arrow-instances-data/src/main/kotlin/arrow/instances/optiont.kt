@@ -95,3 +95,19 @@ interface OptionTSemigroupKInstance<F> : SemigroupK<OptionTPartialOf<F>> {
 interface OptionTMonoidKInstance<F> : MonoidK<OptionTPartialOf<F>>, OptionTSemigroupKInstance<F> {
   override fun <A> empty(): OptionT<F, A> = OptionT(FF().just(None))
 }
+
+class OptionTContext<F>(val MF: Monad<F>) : OptionTMonadInstance<F>, OptionTMonoidKInstance<F> {
+
+  override fun FF(): Monad<F> = MF
+
+  override fun <A, B> Kind<OptionTPartialOf<F>, A>.map(f: (A) -> B): OptionT<F, B> =
+    fix().map(f)
+}
+
+class OptionTContextPartiallyApplied<F>(val MF: Monad<F>) {
+  infix fun <A> extensions(f: OptionTContext<F>.() -> A): A =
+    f(OptionTContext(MF))
+}
+
+fun <F> ForOptionT(MF: Monad<F>): OptionTContextPartiallyApplied<F> =
+  OptionTContextPartiallyApplied(MF)

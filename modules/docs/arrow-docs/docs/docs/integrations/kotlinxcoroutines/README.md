@@ -6,6 +6,9 @@ permalink: /docs/integrations/kotlinxcoroutines/
 
 ## kotlinx.coroutines
 
+{:.intermediate}
+intermediate
+
 Arrow wants to provide an abstraction over multiple concurrency frameworks, in a way where their semantics match and they become interchangeable.
 
 Working towards this purpose, it's only natural that we'd add support for the framework Jetbrains provides over coroutines.
@@ -119,17 +122,22 @@ It is also posible to `await()` on the wrapper like you would on `Deferred`, but
 These benefits include capturing all exceptions that happen inside the block.
 
 ```kotlin
-DeferredK.monadError().bindingCatch {
-  val songUrl = getSongUrlAsync().bind()
-  val musicPlayer = MediaPlayer.load(songUrl)
-  val totalTime = musicPlayer.getTotaltime() // Oh oh, total time is 0
+import arrow.effects.*
+import arrow.typeclasses.*
 
-  val timelineClick = audioTimeline.click().bind()
-
-  val percent = (timelineClick / totalTime * 100).toInt()
-
-  percent
-}.unsafeAttemptSync()
+ForDeferredK extensions { 
+  bindingCatch {
+      val songUrl = getSongUrlAsync().bind()
+      val musicPlayer = MediaPlayer.load(songUrl)
+      val totalTime = musicPlayer.getTotaltime() // Oh oh, total time is 0
+    
+      val timelineClick = audioTimeline.click().bind()
+    
+      val percent = (timelineClick / totalTime * 100).toInt()
+    
+      percent
+  }.unsafeAttemptSync()
+}
  // Failure(ArithmeticException("/ by zero"))
 ```
 

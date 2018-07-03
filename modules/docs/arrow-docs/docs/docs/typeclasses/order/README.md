@@ -6,6 +6,9 @@ permalink: /docs/typeclasses/order/
 
 ## Order
 
+{:.beginner}
+beginner
+
 The `Order` typeclass abstracts the ability to compare two instances of any object and determine their total order.
 Depending on your needs this comparison can be structural -the content of the object-, referential -the memory address of the object-, based on an identity -like an Id field-, or any combination of the above.
 
@@ -36,7 +39,9 @@ Lesser than or equal to defines total order in a set, it compares two elements a
 It is the opposite of `gte`.
 
 ```kotlin:ank
-Int.order().run { 1.lte(2) }
+ForInt extensions { 
+  1.lte(2) 
+}
 ```
 
 #### F#gte / F#gt
@@ -45,7 +50,9 @@ Greater than or equal compares two elements and returns true if they're equal or
 It is the opposite of `lte`.
 
 ```kotlin:ank
-Int.order().run { 1.gte(2) }
+ForInt extensions { 
+  1.gte(2) 
+}
 ```
 
 #### F#max / F#min
@@ -53,10 +60,14 @@ Int.order().run { 1.gte(2) }
 Compares two elements and respectively returns the maximum or minimum in respect to their order.
 
 ```kotlin:ank
-Int.order().run { 1.min(2) }
+ForInt extensions { 
+  1.min(2) 
+}
 ```
 ```kotlin:ank
-Int.order().run { 1.max(2) }
+ForInt extensions { 
+  1.max(2) 
+}
 ```
 
 #### F#sort
@@ -64,7 +75,9 @@ Int.order().run { 1.max(2) }
 Sorts the elements in a `Tuple2`
 
 ```kotlin:ank
-Int.order().run { 1.sort(2) }
+ForInt extensions { 
+  1.sort(2) 
+}
 ```
 
 ### Laws

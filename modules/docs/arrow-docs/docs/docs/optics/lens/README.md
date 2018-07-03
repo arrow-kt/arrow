@@ -6,6 +6,9 @@ permalink: /docs/optics/lens/
 
 ## Lens
 
+{:.beginner}
+beginner
+
 Optics are essentially abstractions to update immutable data structures in an elegant way.
 A `Lens` (aka functional reference) is an optic that can focus into a structure and `get`, `modify` or `set` its focus (target). They're mostly used for `product types` such as a `data class` or a `TupleN`.
 
@@ -129,16 +132,19 @@ Don't worry about the boilerplate of the lenses written above because it can be 
 
 ### Generating lenses
 
-Lenses can be generated for a `data class` by the `@optics` annotation. For every constructor parameter of the `data class` a `Lens` will be generated. The lenses will be generated in the same package as the `data class` and will be named `classnameProperty()`.
+Lenses can be generated for a `data class` by the `@optics` annotation. For every constructor parameter of the `data class` a `Lens` will be generated.
+The lenses will be generated as extension properties on the companion object `val T.Companion.paramName`.
 
 ```kotlin
-@optics data class Account(val balance: Int, val available: Int)
+@optics data class Account(val balance: Int, val available: Int) {
+  companion object
+}
 ```
 
-For `Account` 2 lenses will be generated `fun accountBalance(): Lens<Account, Int>` and `fun accountAvailable(): Lens<Account, Int>`.
+For `Account` 2 lenses will be generated `val Account.Companion.balance: Lens<Account, Int>` and `val Account.Companion.available: Lens<Account, Int>`.
 
 ```kotlin:ank:silent
-val balanceLens: Lens<Account, Int> = accountBalance()
+val balanceLens: Lens<Account, Int> = Account.balance
 ```
 
 ### Polymorphic lenses <a id="Plens"></a>
@@ -158,4 +164,4 @@ pFirstTuple2<Int, String, String>().set(5 toT "World", "Hello, ")
 
 Arrow provides [`LensLaws`][lenses_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own lenses.
 
-[lenses_laws_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/LensLaws.kt
+[lenses_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/LensLaws.kt

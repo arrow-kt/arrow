@@ -6,6 +6,9 @@ permalink: /docs/typeclasses/show/
 
 ## Show
 
+{:.beginner}
+beginner
+
 The `Show` typeclass abstracts the ability to obtain a `String` representation of any object.
 
 It can be considered the typeclass equivalent of Java's `Object#toString`.
@@ -14,7 +17,7 @@ It can be considered the typeclass equivalent of Java's `Object#toString`.
 import arrow.*
 import arrow.instances.*
 
-Int.show().run { 1.show() }
+ForInt extensions { 1.show() }
 ```
 
 ### Main Combinators
@@ -41,6 +44,12 @@ import arrow.typeclasses.*
 
 // Option is a data class with a single value
 Show.any().run { Option.just(1).show() }
+```
+
+```kotlin:ank
+// using invoke constructor
+class Person(val firstName: String, val lastName: String)
+val personShow = Show<Person> { "Hello $firstName $lastName" }
 ```
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Show` instances for custom datatypes.
