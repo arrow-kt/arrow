@@ -178,6 +178,11 @@ fun <B> TryOf<B>.getOrDefault(default: () -> B): B = fix().fold({ default() }, :
  */
 fun <B> TryOf<B>.getOrElse(default: (Throwable) -> B): B = fix().fold(default, ::identity)
 
+/**
+ * Returns the value from this `Success` or null if this is a `Failure`.
+ */
+fun <B> TryOf<B>.orNull(): B? = getOrElse { null }
+
 fun <B, A : B> TryOf<A>.orElse(f: () -> TryOf<B>): Try<B> = when (this.fix()) {
   is Try.Success -> this.fix()
   is Try.Failure -> f().fix()

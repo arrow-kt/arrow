@@ -248,6 +248,18 @@ inline fun <B> EitherOf<*, B>.getOrElse(crossinline default: () -> B): B =
   fix().fold({ default() }, ::identity)
 
 /**
+ * Returns the value from this [Either.Right] or null if this is a [Either.Left].
+ *
+ * Example:
+ * ```
+ * Right(12).orNull() // Result: 12
+ * Left(12).orNull()  // Result: null
+ * ```
+ */
+inline fun <B> EitherOf<*, B>.orNull(): B? =
+    getOrElse { null }
+
+/**
  * Returns the value from this [Either.Right] or allows clients to transform [Either.Left] to [Either.Right] while providing access to
  * the value of [Either.Left].
  *

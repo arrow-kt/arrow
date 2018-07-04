@@ -39,6 +39,14 @@ class EitherTest : UnitSpec() {
 
     }
 
+    "orNull should return value" {
+      forAll { a: Int ->
+          Either.Right(a).orNull() == a
+          && Either.Left(a).orNull() == null
+      }
+
+    }
+
     "getOrHandle should return value" {
       forAll { a: Int, b: Int ->
         Right(a).getOrHandle { b } == a

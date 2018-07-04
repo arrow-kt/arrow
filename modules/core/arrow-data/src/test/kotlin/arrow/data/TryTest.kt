@@ -88,6 +88,13 @@ class TryTest : UnitSpec() {
       Failure<Int>(e).getOrElse { (it shouldEqual e); 2 } shouldBe 2
     }
 
+    "orNull returns null if Failure" {
+      val e: Throwable = Exception()
+
+      Success(1).orNull() shouldBe 1
+      Failure<Int>(e).orNull() shouldBe null
+    }
+
     "recoverWith should modify Failure entity" {
       Success(1).recoverWith { Failure<Int>(Exception()) } shouldBe Success(1)
       Success(1).recoverWith { Success(2) } shouldBe Success(1)
