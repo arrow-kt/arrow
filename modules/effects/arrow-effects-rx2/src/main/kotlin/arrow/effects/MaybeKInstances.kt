@@ -9,6 +9,7 @@ import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.instance
 import arrow.typeclasses.*
+import kotlin.coroutines.experimental.CoroutineContext
 
 @instance(MaybeK::class)
 interface MaybeKFunctorInstance : Functor<ForMaybeK> {
@@ -104,6 +105,9 @@ interface MaybeKAsyncInstance :
   Async<ForMaybeK> {
   override fun <A> async(fa: Proc<A>): MaybeK<A> =
     MaybeK.async(fa)
+
+  override fun <A> MaybeKOf<A>.continueOn(ctx: CoroutineContext): MaybeK<A> =
+    fix().continueOn(ctx)
 }
 
 @instance(MaybeK::class)
@@ -113,3 +117,8 @@ interface MaybeKEffectInstance :
   override fun <A> MaybeKOf<A>.runAsync(cb: (Either<Throwable, A>) -> MaybeKOf<Unit>): MaybeK<Unit> =
     fix().runAsync(cb)
 }
+
+object MaybeKContext : MaybeKEffectInstance
+
+infix fun <A> ForMaybeK.Companion.extensions(f: MaybeKContext.() -> A): A =
+  f(MaybeKContext)

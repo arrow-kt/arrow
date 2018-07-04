@@ -7,6 +7,7 @@ dependencies {
     kaptTest project(':arrow-annotations-processor')
     compileOnly project(':arrow-annotations-processor')
     testCompileOnly project(':arrow-annotations-processor')
+    testCompile project(':arrow-instances-data')
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
     testCompile project(':arrow-test')
 

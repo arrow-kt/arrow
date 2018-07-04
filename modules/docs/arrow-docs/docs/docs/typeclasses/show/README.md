@@ -6,6 +6,9 @@ permalink: /docs/typeclasses/show/
 
 ## Show
 
+{:.beginner}
+beginner
+
 The `Show` typeclass abstracts the ability to obtain a `String` representation of any object.
 
 It can be considered the typeclass equivalent of Java's `Object#toString`.

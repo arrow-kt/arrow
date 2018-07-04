@@ -90,10 +90,13 @@ class RenzuGenerator(
     }
 
   fun generate() {
+
+    val topLevelFiles = setOf("settings.gradle", "pom.xml", "build.xml", "Build.kt", "settings.gradle.kt")
+
     val generatedDir = if (isolateForTests)
       File("./infographic")
     else
-      File("${recurseFilesUpwards("settings.gradle").absolutePath}/infographic")
+      File("${recurseFilesUpwards(topLevelFiles).absolutePath}/infographic")
         .also { it.mkdirs() }
 
     val file = File(generatedDir, "arrow-infographic.txt")

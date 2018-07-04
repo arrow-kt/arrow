@@ -8,6 +8,7 @@ import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.instance
 import arrow.typeclasses.*
+import kotlin.coroutines.experimental.CoroutineContext
 
 @instance(SingleK::class)
 interface SingleKFunctorInstance : Functor<ForSingleK> {
@@ -81,6 +82,9 @@ interface SingleKAsyncInstance :
   Async<ForSingleK> {
   override fun <A> async(fa: Proc<A>): SingleK<A> =
     SingleK.async(fa)
+
+  override fun <A> SingleKOf<A>.continueOn(ctx: CoroutineContext): SingleK<A> =
+    fix().continueOn(ctx)
 }
 
 @instance(SingleK::class)
@@ -90,3 +94,9 @@ interface SingleKEffectInstance :
   override fun <A> SingleKOf<A>.runAsync(cb: (Either<Throwable, A>) -> SingleKOf<Unit>): SingleK<Unit> =
     fix().runAsync(cb)
 }
+
+object SingleKContext : SingleKEffectInstance
+
+infix fun <A> ForSingleK.Companion.extensions(f: SingleKContext.() -> A): A =
+  f(SingleKContext)
+

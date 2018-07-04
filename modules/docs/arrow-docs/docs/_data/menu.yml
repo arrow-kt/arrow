@@ -6,6 +6,9 @@ options:
       - title: Index
         url: /docs/
 
+      - title: Libraries
+        url: /docs/quickstart/libraries/
+
       - title: Blogs & Presentations
         url: /docs/quickstart/blogs/
 
@@ -276,6 +279,9 @@ options:
       - title: Rx2
         url: /docs/integrations/rx2/
 
+      - title: Reactor
+        url: /docs/integrations/reactor/
+
       - title: kotlinx.coroutines
         url: /docs/integrations/kotlinxcoroutines/
 
@@ -305,14 +311,26 @@ options:
 
     nested_options:
 
-      - title: Corecursive
-        url: /docs/recursion/corecursive/
+      - title: Intro
+        url: /docs/recursion/intro/
 
       - title: Recursive
         url: /docs/recursion/recursive/
 
+      - title: Corecursive
+        url: /docs/recursion/corecursive/
+
       - title: Birecursive
         url: /docs/recursion/birecursive/
+
+      - title: Mu
+        url: /docs/recursion/mu/
+
+      - title: Nu
+        url: /docs/recursion/nu/
+
+      - title: Fix
+        url: /docs/recursion/fix/
 
   - title: Legal
 

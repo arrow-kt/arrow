@@ -7,6 +7,9 @@ video: DBvVd1pfLMo
 
 ## Id
 
+{:.beginner}
+beginner
+
 The identity monad can be seen as the ambient monad that encodes the effect of having no effect.
 It is ambient in the sense that plain pure values are values of `Id`.
 

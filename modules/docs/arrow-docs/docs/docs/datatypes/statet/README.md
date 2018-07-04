@@ -6,6 +6,9 @@ permalink: /docs/datatypes/statet/
 
 ## StateT
 
+{:.advanced}
+advanced
+
 `StateT` also known as the `State` monad transformer allows to compute inside the context when `State` is nested in a different monad.
 
 One issue we face with monads is that they don't compose. This can cause your code to get really hairy when trying to combine structures like `Either` and `State`. But there's a simple solution, and we're going to explain how you can use Monad Transformers to alleviate this problem.

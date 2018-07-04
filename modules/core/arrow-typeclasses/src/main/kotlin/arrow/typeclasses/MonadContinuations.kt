@@ -53,9 +53,9 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
     bindIn(context, this)
 
   open suspend fun <B> bind(m: () -> Kind<F, B>): B = suspendCoroutineOrReturn { c ->
-    val labelHere = c.stackLabels // save the whole coroutine stack labels
+    val labelHere = c.stateStack // save the whole coroutine stack labels
     returnedMonad = m().flatMap({ x: B ->
-      c.stackLabels = labelHere
+      c.stateStack = labelHere
       c.resume(x)
       returnedMonad
     })
@@ -63,10 +63,10 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
   }
 
   open suspend fun <B> bindIn(context: CoroutineContext, m: () -> B): B = suspendCoroutineOrReturn { c ->
-    val labelHere = c.stackLabels // save the whole coroutine stack labels
+    val labelHere = c.stateStack // save the whole coroutine stack labels
     val monadCreation: suspend () -> Kind<F, A> = {
       just(m()).flatMap({ xx: B ->
-        c.stackLabels = labelHere
+        c.stateStack = labelHere
         c.resume(xx)
         returnedMonad
       })

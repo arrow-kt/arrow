@@ -2,13 +2,13 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.fix
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.instance
 import arrow.typeclasses.*
+import kotlin.coroutines.experimental.CoroutineContext
 import arrow.effects.handleErrorWith as deferredHandleErrorWith
 
 @instance(DeferredK::class)
@@ -75,6 +75,9 @@ interface DeferredKMonadDeferInstance : DeferredKMonadErrorInstance, MonadDefer<
 interface DeferredKAsyncInstance : DeferredKMonadDeferInstance, Async<ForDeferredK> {
   override fun <A> async(fa: Proc<A>): DeferredK<A> =
     DeferredK.async(fa = fa)
+
+  override fun <A> DeferredKOf<A>.continueOn(ctx: CoroutineContext): DeferredK<A> =
+    fix().continueOn(ctx)
 
   override fun <A> invoke(fa: () -> A): DeferredK<A> =
     DeferredK.invoke(f = fa)
