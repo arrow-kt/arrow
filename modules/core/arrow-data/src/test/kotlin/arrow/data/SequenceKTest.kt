@@ -1,7 +1,6 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.instances.IntEqInstance
 import arrow.instances.eq
 import arrow.instances.extensions
 import arrow.test.UnitSpec
@@ -33,7 +32,7 @@ class SequenceKTest : UnitSpec() {
         ShowLaws.laws(show, eq) { sequenceOf(it).k() },
         MonadLaws.laws(this, eq),
         MonoidKLaws.laws(this, this, eq),
-        MonoidLaws.laws(SequenceK.monoid(), Gen.list(Gen.int()).map{it.asSequence()}.generate().k(), eq),
+        MonoidLaws.laws(SequenceK.monoid(), Gen.int().random().k(), eq),
         TraverseLaws.laws(this, this, { n: Int -> SequenceK(sequenceOf(n)) }, eq)
       )
     }
