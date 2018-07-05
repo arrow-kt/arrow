@@ -140,7 +140,7 @@ ListK.index<Employee>().run {
 
 Since [Index]({{ '/docs/optics/index' | relative_url }}) returns an [Optional]({{ '/docs/optics/optional' | relative_url }}) `index` and `[]` are safe operations.
 
-```kotlink:ank
+```kotlin:ank
 ListK.index<Employee>().run {
   Employees.employees[2].company.address.street.name.getOption(employees)
 }
