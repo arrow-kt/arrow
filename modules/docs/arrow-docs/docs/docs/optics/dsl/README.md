@@ -21,7 +21,7 @@ package com.example.domain
 @optics data class Employee(val name: String, val company: Company?)
 ```
 
-The DSL will be generated in the same package as your `data class` and can be used on the `Companion` of your class.
+The DSL will be generated in the same package as your `data class` and can be used on the `Companion` of your class. `Companion` definition is omitted here to improve readability.
 
 ```kotlin:ank
 import arrow.optics.dsl.*
@@ -62,6 +62,38 @@ We can rewrite this code with our generated dsl.
 
 ```kotlin:ank
 NetworkResult.networkError.httpError.message.modify(networkResult, f)
+```
+
+Arrow also supports generation of DSL for domain class that are not defined by your project.
+This can be done by providing `Optics` for the desired domain classes. For example `Pair` from Kotlin's stdlib.
+
+```kotlin
+@optics data class GameBoard(val player: Player)
+@optics data class Player(val name: String, val pos: Pair<Long, Long>)
+
+@optics
+fun <A, B> first(): Lens<Pair<A, B>, A> = Iso(
+  get = { a: Pair<A, B> -> a.first toT a.second },
+  reverseGet = { a: Tuple2<A, B> -> a.a to a.b }
+) compose Tuple2.first()
+```
+```kotlin:ank
+val board = GameBoard(Player("Simon", 1L to 20L))
+
+fun moveForward(pos: Long) = pos.inc()
+
+val updated = GameBoard.player.pos.first.modify(GameBoard(Player("Simon", 1L to 20L)), ::moveForward)
+updated
+```
+
+Or you can also use it to create aliases to bend the DSL to your own desire.
+
+```kotlin
+@optics
+fun xPos(): Lens<Player, Long> = Player.pos.first
+```
+```kotlin:ank
+GameBoard.player.xPos.get(updated)
 ```
 
 The DSL also has special support for [Each]({{ '/docs/optics/each' | relative_url }}) and [At]({{ '/docs/optics/at' | relative_url }}).
