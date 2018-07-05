@@ -1,10 +1,8 @@
 package arrow.optics
 
-import arrow.common.Package
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.fullName
 import me.eugeniomarletti.kotlin.metadata.escapedClassName
-import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement

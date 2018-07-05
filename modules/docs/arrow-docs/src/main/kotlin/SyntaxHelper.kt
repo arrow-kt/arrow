@@ -4,7 +4,7 @@ import arrow.core.Tuple2
 import arrow.core.toT
 import arrow.data.*
 import arrow.optics.*
-import arrow.optics.instances.ListIndexInstance
+import arrow.optics.dsl.every
 
 @optics
 data class Street(val number: Int, val name: String) {
@@ -76,3 +76,6 @@ fun <A, B> first(): Lens<Pair<A, B>, A> = Iso(
 
 @optics
 fun xPos(): Lens<Player, Long> = Player.pos.first
+
+@optics
+fun everyEmployee(): Traversal<Employees, Employee> = Employees.employees.every(ListK.each())

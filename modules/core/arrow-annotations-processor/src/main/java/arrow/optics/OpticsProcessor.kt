@@ -11,7 +11,6 @@ import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.hasReceiver
 import me.eugeniomarletti.kotlin.metadata.shadow.serialization.deserialization.getName
-import me.eugeniomarletti.kotlin.metadata.shadow.utils.addToStdlib.ifNotEmpty
 import java.io.File
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
@@ -91,11 +90,11 @@ private fun TypeElement.toAnnotatedSumType() = AnnotatedSumType(this, getClassDa
     .map(nameResolver::getString)
     .map { it.replace('/', '.') }
     .map { Focus(it, it.substringAfterLast(".").decapitalize()) }
-}).also { if (hasNoCompanion) knownError("${opticsAnnotationClass.canonicalName} annotated class $this needs to declare companion object.", this) }
+}).also { if (hasNoCompanion) knownError("@${opticsAnnotationClass.simpleName} annotated class $this needs to declare companion object.", this) }
 
 private fun TypeElement.toAnnotatedProductType() =
   AnnotatedProductType(this, getClassData(), getConstructorTypesNames().zip(getConstructorParamNames(), Focus.Companion::invoke))
-    .also { if (hasNoCompanion) knownError("${opticsAnnotationClass.canonicalName} annotated class $this needs to declare companion object.", this) }
+    .also { if (hasNoCompanion) knownError("@${opticsAnnotationClass.simpleName} annotated class $this needs to declare companion object.", this) }
 
 private fun ExecutableElement.toAnnotatedFunctionType(): AnnotatedFunctionType {
   val classElement = enclosingElement as TypeElement

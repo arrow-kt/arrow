@@ -107,7 +107,6 @@ data class DslElement(
     |inline val <${params.joinToString()}> $Iso<$sourceType, $originalFocus>.$dslName: $resultType<$sourceType, $resultFocus> inline get() = this compose $optic
     |""".trimMargin()
 
-
   private fun lensSnippet(resultType: Optic) = """
     |/**
     | * DSL to compose a [Lens] with focus of ${originalFocus.removeBackticks()} with a [$opticType] with focus ${resultFocus.removeBackticks()}
@@ -137,7 +136,6 @@ data class DslElement(
     | */
     |inline val <${params.joinToString()}> $Prism<$sourceType, $originalFocus>.$dslName: $resultType<$sourceType, $resultFocus> inline get() = this compose $optic
     |""".trimMargin()
-
 
   private fun getterSnippet(resultType: Optic) = """
     |/**
