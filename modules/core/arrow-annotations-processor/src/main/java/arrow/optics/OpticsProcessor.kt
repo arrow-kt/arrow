@@ -135,7 +135,7 @@ private fun ExecutableElement.toAnnotatedFunctionType(): AnnotatedFunctionType {
     dslName = function.name.let(proto.nameResolver::getName).asString(),
     originalFocus = source.type.extractFullName(proto),
     resultFocus = focus.type.extractFullName(proto),
-    optic = if (function.hasReceiver()) "${function.receiverType.extractFullName(proto)}.${function.name.let(proto.nameResolver::getName)}()" else "${function.name.let(proto.nameResolver::getName)}()",
+    optic = if (function.hasReceiver()) "${function.receiverType.extractFullName(proto)}.${function.name.let(proto.nameResolver::getName)}()" else "${proto.`package`}.${function.name.let(proto.nameResolver::getName)}()",
     opticType = Optic.values.firstOrNull { proto.nameResolver.getQualifiedClassName(function.returnType.className).replace("/", ".").removeBackticks().startsWith(it.toString()) }
       ?: POptic.values.firstOrNull { proto.nameResolver.getQualifiedClassName(function.returnType.className).replace("/", ".").removeBackticks().startsWith(it.toString()) }?.monomorphic()
       ?: knownError(dslWrongOptic, this@toAnnotatedFunctionType)
