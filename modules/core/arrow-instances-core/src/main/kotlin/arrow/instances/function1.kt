@@ -42,3 +42,13 @@ interface Function1MonadInstance<I> : Function1ApplicativeInstance<I>, Monad<Fun
     Function1.tailRecM(a, f)
 }
 
+class Function1Context<A> : Function1MonadInstance<A>
+
+class Function1ContextPartiallyApplied<L> {
+  infix fun <A> extensions(f: Function1Context<L>.() -> A): A =
+    f(Function1Context())
+}
+
+fun <L> ForFunction1(): Function1ContextPartiallyApplied<L> =
+  Function1ContextPartiallyApplied()
+

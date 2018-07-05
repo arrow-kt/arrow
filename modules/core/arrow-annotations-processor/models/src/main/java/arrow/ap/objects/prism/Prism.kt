@@ -9,4 +9,5 @@ sealed class Prism(val field: String, val nullable: String?, val option: Option<
   companion object { }
   data class PrismSealed1(private val a: String?) : Prism("", a, Option.empty())
   data class PrismSealed2(private val b: String?) : Prism("", b, Option.empty())
+  companion object
 }

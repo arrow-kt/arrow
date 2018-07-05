@@ -82,6 +82,6 @@ class HigherKindsFileGenerator(
         """.trimMargin()
 
   private fun genKindMarker(hk: HigherKind): String =
-    "class ${hk.markerName} private constructor()"
+    "class ${hk.markerName} private constructor() { companion object }"
 
 }

@@ -2,14 +2,18 @@ package arrow.optics
 
 import arrow.common.utils.knownError
 import arrow.common.utils.removeBackticks
+import arrow.common.utils.simpleName
 import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 
 val AnnotatedType.lensSnippet
   get() = when (this) {
-    is AnnotatedProductType -> Snippet(content = processElement())
+    is AnnotatedProductType -> Snippet(
+      `package` = packageName,
+      name = classData.simpleName,
+      content = processElement()
+    )
     is AnnotatedSumType -> knownError(element.lensErrorMessage, element)
-    is AnnotatedFunctionType -> knownError(element.lensErrorMessage
-      , element)
+    is AnnotatedFunctionType -> knownError(element.lensErrorMessage, element)
   }
 
 private fun String.toUpperCamelCase(): String = split(" ").joinToString("", transform = String::capitalize)

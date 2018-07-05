@@ -1,9 +1,7 @@
 package arrow.instances
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Eval
-import arrow.core.Tuple2
+import arrow.core.*
 import arrow.data.*
 import arrow.instance
 import arrow.typeclasses.*
@@ -125,3 +123,11 @@ interface ListKMonoidKInstance : MonoidK<ForListK> {
   override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
     fix().listCombineK(y)
 }
+
+object ListKContext : ListKMonadInstance, ListKTraverseInstance, ListKMonoidKInstance {
+  override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
+    fix().map(f)
+}
+
+infix fun <A> ForListK.Companion.extensions(f: ListKContext.() -> A): A =
+  f(ListKContext)

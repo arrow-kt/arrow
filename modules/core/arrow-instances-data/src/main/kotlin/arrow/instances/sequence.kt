@@ -11,12 +11,12 @@ import arrow.data.combineK as sequenceCombineK
 
 @instance(SequenceK::class)
 interface SequenceKSemigroupInstance<A> : Semigroup<SequenceK<A>> {
-  override fun SequenceK<A>.combine(b: SequenceK<A>): SequenceK<A> = (this + b).k()
+  override fun SequenceK<A>.combine(b: SequenceK<A>): SequenceK<A> = (this.sequence + b.sequence).k()
 }
 
 @instance(SequenceK::class)
 interface SequenceKMonoidInstance<A> : Monoid<SequenceK<A>> {
-  override fun SequenceK<A>.combine(b: SequenceK<A>): SequenceK<A> = (this + b).k()
+  override fun SequenceK<A>.combine(b: SequenceK<A>): SequenceK<A> = (this.sequence + b.sequence).k()
 
   override fun empty(): SequenceK<A> = emptySequence<A>().k()
 }
@@ -119,3 +119,11 @@ interface SequenceKMonoidKInstance : MonoidK<ForSequenceK> {
   override fun <A> Kind<ForSequenceK, A>.combineK(y: Kind<ForSequenceK, A>): SequenceK<A> =
     fix().sequenceCombineK(y)
 }
+
+object SequenceKContext : SequenceKMonadInstance, SequenceKTraverseInstance, SequenceKMonoidKInstance {
+  override fun <A, B> Kind<ForSequenceK, A>.map(f: (A) -> B): SequenceK<B> =
+    fix().map(f)
+}
+
+infix fun <A> ForSequenceK.Companion.extensions(f: SequenceKContext.() -> A): A =
+  f(SequenceKContext)

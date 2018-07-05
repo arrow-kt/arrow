@@ -11,6 +11,7 @@ It includes the most popular data types, type classes and abstractions such as `
 
 - [Documentation](http://arrow-kt.io)
 - [Patterns](http://arrow-kt.io/docs/patterns/glossary/): tutorials and approaches to day-to-day challenges using FP 
+- [Libraries](http://arrow-kt.io/docs/quickstart/libraries/): all the libraries provided by Λrrow
 - [Type classes](http://arrow-kt.io/docs/typeclasses/intro/): defining behaviors for data
 - [Data types](http://arrow-kt.io/docs/datatypes/intro/): common abstractions
 - [Effects](http://arrow-kt.io/docs/effects/io/): interfacing with external systems
@@ -38,22 +39,25 @@ allprojects {
 Add the dependencies into the project's `build.gradle`
 
 ```groovy
+def arrow_version = "0.7.2"
 dependencies {
-    compile 'io.arrow-kt:arrow-core:0.7.1'
-    compile 'io.arrow-kt:arrow-syntax:0.7.1'
-    compile 'io.arrow-kt:arrow-typeclasses:0.7.1' 
-    compile 'io.arrow-kt:arrow-data:0.7.1' 
-    compile 'io.arrow-kt:arrow-instances-core:0.7.1'
-    compile 'io.arrow-kt:arrow-instances-data:0.7.1'
-    kapt    'io.arrow-kt:arrow-annotations-processor:0.7.1' 
+    compile "io.arrow-kt:arrow-core:$arrow_version"
+    compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    compile "io.arrow-kt:arrow-typeclasses:$arrow_version" 
+    compile "io.arrow-kt:arrow-data:$arrow_version" 
+    compile "io.arrow-kt:arrow-instances-core:$arrow_version"
+    compile "io.arrow-kt:arrow-instances-data:$arrow_version"
+    kapt    "io.arrow-kt:arrow-annotations-processor:$arrow_version" 
     
-    compile 'io.arrow-kt:arrow-free:0.7.1' //optional
-    compile 'io.arrow-kt:arrow-mtl:0.7.1' //optional
-    compile 'io.arrow-kt:arrow-effects:0.7.1' //optional
-    compile 'io.arrow-kt:arrow-effects-rx2:0.7.1' //optional
-    compile 'io.arrow-kt:arrow-effects-kotlinx-coroutines:0.7.1' //optional
-    compile 'io.arrow-kt:arrow-optics:0.7.1' //optional
-    compile 'io.arrow-kt:arrow-generic:0.7.1' //optional
+    compile "io.arrow-kt:arrow-free:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-mtl:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-effects:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-effects-rx2:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-effects-reactor:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-effects-kotlinx-coroutines:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-optics:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-generic:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-recursion:$arrow_version" //optional
 }
 ```
 
@@ -68,9 +72,10 @@ Add the dependencies into the project's `build.gradle`
 apply plugin: 'kotlin-kapt' //optional
 apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //optional
 
+def arrow_version = "0.7.2"
 dependencies {
     ...
-    kapt    'io.arrow-kt:arrow-annotations-processor:0.7.1' //optional
+    kapt    'io.arrow-kt:arrow-annotations-processor:$arrow_version' //optional
     ...
 }
 ```
@@ -125,7 +130,7 @@ idea {
 
 # License
 
-    Copyright (C) 2017 The Arrow Authors
+    Copyright (C) 2017 The Λrrow Authors
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

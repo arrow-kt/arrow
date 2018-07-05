@@ -6,6 +6,9 @@ permalink: /docs/patterns/glossary/
 
 ## Functional Programming Glossary
 
+{:.beginner}
+beginner
+
 Note: This section keeps on growing! Keep an eye on it from time to time.
 
 This document is meant to be an introduction to Functional Programming for people from all backgrounds.
@@ -61,9 +64,11 @@ interface UserEqInstance: Eq<User> {
 All typeclass instances provided Arrow can be found in the companion object of the type they're defined for, including platform types like String or Int.
 
 ```kotlin:ank:silent
+import arrow.*
 import arrow.core.*
 import arrow.data.*
 import arrow.instances.*
+import arrow.typeclasses.*
 ```
 
 ```kotlin:ank
@@ -87,6 +92,96 @@ ListK.traverse()
 ```
 
 If you're defining your own instances and would like for them to be discoverable in their corresponding datatypes' companion object, you can generate it by annotating them as `@instance`, and Arrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create the extension functions for you.
+
+NOTE: If you'd like to use `@instance` for transitive typeclasses, like a `Show<List<A>>` that requires a function returning a `Show<A>`, you'll need for the function providing the transitive typeclass to have 0 parameters, and for any new typeclass defined outside Arrow to be on a package named `typeclass`. This will make the transitive typeclass a parameter of the extension function. This is a *temporary* limitation of the processor to be fixed because we don't have an annotation or type marker for what's a typeclass and what's not.
+
+
+### Syntax
+
+Arrow provides a `extensions` DSL making available in the scoped block all the functions and extensions defined in all instances for that datatype. Use the infix function `extensions` on an object, or function, with the name of the datatype prefixed by For-.
+
+```kotlin
+ForOption extensions {
+  binding {
+    val a = Option(1).bind()
+    val b = Option(a + 1).bind()
+    a + b
+  }.fix()
+}
+//Option(3)
+```
+
+```kotlin
+ForOption extensions {
+  map(Option(1), Option(2), Option(3), { (one, two, three) ->
+    one + two + three
+  })
+}
+//Option(6)
+```
+
+```kotlin
+ForOption extensions {
+  listOf(Option(1), Option(2), Option(3)).k().traverse(this, ::identity)
+}
+//Option(ListK(1, 2, 3))
+```
+
+```kotlin
+ForTry extensions {
+  binding {
+    val a = Try { 1 }.bind()
+    val b = Try { a + 1 }.bind()
+    a + b
+  }.fix()
+}
+//Success(3)
+```
+
+```kotlin
+ForTry extensions {
+  map(Try { 1 }, Try { 2 }, Try { 3 }, { (one, two, three) ->
+    one + two + three
+  })
+}
+//Success(6)
+```
+
+```kotlin
+ForEither<Throwable>() extensions {
+  listOf(just(1), just(2), just(3)).k().traverse(this, ::identity)
+}
+//Right<Throwable, ListK<Int>>(ListK(1,2,3))
+```
+
+If you defined your own instances over your own data types and wish to use a similar `extensions` DSL you can do so for both types with a single type argument such as `Option`:
+
+```kotlin:ank:silent
+object OptionContext : OptionMonadErrorInstance, OptionTraverseInstance {
+  override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
+    fix().map(f)
+}
+
+infix fun <A> ForOption.Companion.extensions(f: OptionContext.() -> A): A =
+  f(OptionContext)
+```
+
+Or for types that require partial application of some of their type arguments such as `Either<L, R>` where `L` needs to be partially applied
+
+```kotlin:ank:silent
+class EitherContext<L> : EitherMonadErrorInstance<L>, EitherTraverseInstance<L> {
+  override fun <A, B> Kind<EitherPartialOf<L>, A>.map(f: (A) -> B): Either<L, B> =
+    fix().map(f)
+}
+
+class EitherContextPartiallyApplied<L> {
+  infix fun <A> extensions(f: EitherContext<L>.() -> A): A =
+    f(EitherContext())
+}
+
+fun <L> ForEither(): EitherContextPartiallyApplied<L> =
+  EitherContextPartiallyApplied()
+```
 
 ### Type constructors
 
@@ -113,16 +208,17 @@ A malformed Higher Kind would use the whole type constructor to define the conta
 This incorrect representation has large a number of issues when working with partially applied types and nested types.
 
 What Λrrow does instead is define a surrogate type that's not parametrized to represent `F`.
-These types are named same as the container and prefixed by For, as in `ForOption` or `ForListK`.
+These types are named same as the container and prefixed by For-, as in `ForOption` or `ForListK`.
+You have seen these types used in the Syntax section above! 
 
 ```kotlin
-class ForOption private constructor()
+class ForOption private constructor() { companion object {} }
 
 sealed class Option<A>: Kind<ForOption, A>
 ```
 
 ```kotlin
-class ForListK private constructor()
+class ForListK private constructor() { companion object {} }
 
 data class ListK<A>(val list: List<A>): Kind<ForListK, A>
 ```
@@ -148,7 +244,7 @@ data class ListK<A>(val list: List<A>): ListKOf<A>
 
 // Generates the following code:
 //
-// class ForListK private constructor()
+// class ForListK private constructor() { companion object {} }
 // typealias ListKOf<A> = Kind<ForListK, A>
 // fun ListKOf<A>.fix() = this as ListK<A>
 ```
@@ -290,3 +386,17 @@ UserFetcher(Option.applicative()).genUser().fix()
 ```
 
 To learn more about this `Typeclassless` technique you should head to the [`Dependency Injection`]({{ '/docs/patterns/dependency_injection' | relative_url }}) documentation.
+
+### Side-effects and Effects
+
+A side-effect is statement that changes something in the running environment. Generally this means setting a variable, displaying a value on screen, writing to a file or a database, logging, start a new thread...
+
+When talking about side-effects, we generally see functions that have the signature `(...) -> Unit`, meaning that unless the function doesn't do anything, there's at least one side-effect. Side-effects can also happen in the middle of another function, which is an undesirable behavior in Functional Programming.
+
+Side-effects are too general to be unitested for because they depend on the environment. They also have poor composability. Overall, they're considered to be outside the Functional Programming paradigm, and are often referred as "impure" functions.
+
+Because side-effects are unavoidable in any program FP provides several datatypes for dealing with them! One way is by abstracting their behavior. The simplest examples of this are the `Writer`datatype, which allows you to write to an information sink like a log or a file buffer; or `State` datatype, which simulates scoped mutable state for the duration of an operation.
+
+For more complicated side-effects that can throw or jump threads we need more advanced datatypes, called Effects, that wrap over impure operations. Some of these datatypes may be already familiar to you, like [`rx.Observable`]({{ '/docs/integrations/rx2/' | relative_url }}), [`kotlinx.coroutines.Deferred`]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }}), or Arrow's [`IO`]({{ '/docs/effects/io/' | relative_url }}). These Effects compose, catch exceptions, control asynchrony, and most importantly can be run lazily. This gets rid of the issues with side-effects.
+
+Although one can also write the whole program in an imperative way inside a single Effect wrapper that wouldn't be very efficient as you don't get any of its benefits :D

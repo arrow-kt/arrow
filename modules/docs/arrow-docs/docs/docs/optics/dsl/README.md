@@ -6,6 +6,9 @@ permalink: /docs/optics/dsl/
 
 ## Optics DSL
 
+{:.beginner}
+beginner
+
 Arrow offers a Optics DSL to compose different Optics while improving ease of use and readability.
 To avoid boilerplate Arrow will generate this property-like dsl using `@optics` annotation.
 
@@ -39,7 +42,7 @@ package com.example.domain
 @optics sealed class NetworkResult
 @optics data class Success(val content: String): NetworkResult()
 @optics sealed class NetworkError : NetworkResult()
-@optics data class HttpError(val message: String): NetworkResult()
+@optics data class HttpError(val message: String): NetworkError()
 object TimeoutError: NetworkError()
 ```
 

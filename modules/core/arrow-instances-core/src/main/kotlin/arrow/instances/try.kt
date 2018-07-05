@@ -124,3 +124,11 @@ interface TryTraverseInstance : Traverse<ForTry> {
   override fun <A, B> Kind<ForTry, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
 }
+
+object TryContext : TryMonadErrorInstance, TryTraverseInstance {
+  override fun <A, B> Kind<ForTry, A>.map(f: (A) -> B): Try<B> =
+    fix().map(f)
+}
+
+infix fun <A> ForTry.Companion.extensions(f: TryContext.() -> A): A =
+  f(TryContext)

@@ -39,6 +39,35 @@ sealed class AnnotatedType {
 
 }
 
+data class AnnotatedElement(val type: TypeElement, val classData: ClassOrPackageDataWrapper.Class, val targets: List<Target>) {
+  val sourceClassName = classData.fullName.escapedClassName
+  val sourceName = type.simpleName.toString().decapitalize()
+  val packageName = classData.`package`.escapedClassName
+
+  operator fun Snippet.plus(snippet: Snippet): Snippet = copy(
+    imports = imports + snippet.imports,
+    content = "$content\n${snippet.content}"
+  )
+}
+
+typealias IsoTarget = Target.Iso
+typealias PrismTarget = Target.Prism
+typealias LensTarget = Target.Lens
+typealias OptionalTarget = Target.Optional
+typealias SealedClassDsl = Target.SealedClassDsl
+typealias DataClassDsl = Target.DataClassDsl
+
+sealed class Target {
+  abstract val foci: List<Focus>
+
+  data class Iso(override val foci: List<Focus>) : Target()
+  data class Prism(override val foci: List<Focus>) : Target()
+  data class Lens(override val foci: List<Focus>) : Target()
+  data class Optional(override val foci: List<Focus>) : Target()
+  data class SealedClassDsl(override val foci: List<Focus>) : Target()
+  data class DataClassDsl(override val foci: List<Focus>) : Target()
+}
+
 typealias NonNullFocus = Focus.NonNull
 typealias OptionFocus = Focus.Option
 typealias NullableFocus = Focus.Nullable
@@ -147,20 +176,17 @@ object PTraversal : POptic() {
 
 const val Tuple = "arrow.core.Tuple"
 
-data class Snippet(val imports: Set<String> = emptySet(), val content: String) {
-  companion object {
-    val EMPTY = Snippet(content = "")
-  }
+data class Snippet(
+  val `package`: String,
+  val name: String,
+  val imports: Set<String> = emptySet(),
+  val content: String
+) {
+  val fqName = "$`package`.$name"
+}
 
-  fun asFileText(packageName: Package): String = """
-            |package $packageName
+fun Snippet.asFileText(): String = """
+            |package $`package`
             |${imports.joinToString(prefix = "\n", separator = "\n", postfix = "\n")}
             |$content
             """.trimMargin()
-
-  operator fun plus(snippet: Snippet): Snippet = Snippet(
-    this.imports + snippet.imports,
-    content.plusIfNotBlank(postfix = "\n") + snippet.content
-  )
-
-}

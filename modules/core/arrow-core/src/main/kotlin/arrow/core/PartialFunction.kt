@@ -18,11 +18,11 @@ infix fun <A, B> PartialFunction<A, B>.orElse(f: PartialFunction<A, B>): Partial
 
   }
 
-fun <A, B> PartialFunction(definedAt: (A) -> Boolean, f: (A) -> B): PartialFunction<A, B> =
+fun <A, B> PartialFunction(definedAt: (A) -> Boolean, ifDefined: (A) -> B): PartialFunction<A, B> =
   object : PartialFunction<A, B>() {
     override fun invoke(p1: A): B {
       if (definedAt(p1)) {
-        return f(p1)
+        return ifDefined(p1)
       } else {
         throw IllegalArgumentException("Value: ($p1) isn't supported by this function")
       }

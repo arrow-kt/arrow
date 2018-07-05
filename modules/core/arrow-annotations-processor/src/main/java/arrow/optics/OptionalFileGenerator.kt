@@ -2,11 +2,14 @@ package arrow.optics
 
 import arrow.common.utils.knownError
 import arrow.common.utils.removeBackticks
+import arrow.common.utils.simpleName
 import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 
 val AnnotatedType.optionalSnippet
   get() = when (this) {
     is AnnotatedProductType -> Snippet(
+      `package` = packageName,
+      name = classData.simpleName,
       imports = setOf("import arrow.core.left", "import arrow.core.right", "import arrow.core.toOption"),
       content = processElement()
     )

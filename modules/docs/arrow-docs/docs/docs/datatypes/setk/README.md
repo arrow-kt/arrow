@@ -7,6 +7,9 @@ video: xtnyCqeLI_4
 
 ## SetK
 
+{:.beginner}
+beginner
+
 SetK(Kinded Wrapper) is a higher kinded wrapper around the the Set collection interface.
 
 It can be created from the Kotlin Set type with a convient `k()` function.
@@ -49,7 +52,7 @@ evenNumbers.combineK(integers).combineK(oddNumbers)
 
 [`Monoid`](/docs/typeclasses/monoid/) and [`MonoidK`](/docs/typeclasses/monoidk/):
 ```kotlin:ank
-SetK.monoidK().run { numbers.combineK(SetK.empty()) }
+numbers.combineK(SetK.empty()) 
 ```
 
 [`Foldable`](/docs/typeclasses/foldable/):

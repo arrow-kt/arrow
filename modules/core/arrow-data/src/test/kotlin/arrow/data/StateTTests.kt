@@ -4,6 +4,8 @@ import arrow.Kind
 import arrow.core.ForTry
 import arrow.core.Try
 import arrow.core.monad
+import arrow.core.monadError
+import arrow.mtl.instances.ForStateT
 import arrow.mtl.instances.StateTMonadStateInstance
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadCombineLaws
@@ -32,17 +34,19 @@ class StateTTests : UnitSpec() {
 
   init {
 
-    testLaws(
-      MonadStateLaws.laws(M, EQ, EQ_UNIT),
-      SemigroupKLaws.laws(
-        StateT.semigroupK<ForListK, Int>(ListK.monad(), ListK.semigroupK()),
-        StateT.applicative<ForListK, Int>(ListK.monad()),
-        EQ_LIST),
-      MonadCombineLaws.laws(StateT.monadCombine<ForListK, Int>(ListK.monadCombine(), ListK.semigroupK(), ListK.monadCombine()),
-        { StateT.lift(ListK.monad(), ListK.just(it)) },
-        { StateT.lift(ListK.monad(), ListK.just({ s: Int -> s * 2 })) },
-        EQ_LIST)
-    )
+    ForStateT<ForTry, Int, Throwable>(Try.monadError()) extensions {
+      testLaws(
+        MonadStateLaws.laws(M, EQ, EQ_UNIT),
+        SemigroupKLaws.laws(
+          StateT.semigroupK<ForListK, Int>(ListK.monad(), ListK.semigroupK()),
+          StateT.applicative<ForListK, Int>(ListK.monad()),
+          EQ_LIST),
+        MonadCombineLaws.laws(StateT.monadCombine<ForListK, Int>(ListK.monadCombine(), ListK.semigroupK(), ListK.monadCombine()),
+          { StateT.lift(ListK.monad(), ListK.just(it)) },
+          { StateT.lift(ListK.monad(), ListK.just({ s: Int -> s * 2 })) },
+          EQ_LIST)
+      )
+    }
 
   }
 }

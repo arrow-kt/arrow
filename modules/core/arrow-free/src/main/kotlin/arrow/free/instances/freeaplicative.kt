@@ -42,3 +42,13 @@ fun <F, G, A> FreeApplicative.Companion.eq(FK: FunctionK<F, G>, MG: Monad<G>, du
 
     override fun MG(): arrow.typeclasses.Monad<G> = MG
   }
+
+class FreeApplicativeContext<S> : FreeApplicativeApplicativeInstance<S>
+
+class FreeApplicativeContextPartiallyApplied<S> {
+  infix fun <A> extensions(f: FreeApplicativeContext<S>.() -> A): A =
+    f(FreeApplicativeContext())
+}
+
+fun <S> ForFreeApplicative(): FreeApplicativeContextPartiallyApplied<S> =
+  FreeApplicativeContextPartiallyApplied()

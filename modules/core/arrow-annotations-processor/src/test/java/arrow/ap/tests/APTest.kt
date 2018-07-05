@@ -11,7 +11,8 @@ import java.io.File
 import java.nio.file.Paths
 
 abstract class APTest(
-  val pckg: String
+  private val pckg: String,
+  private val enforcePackage: Boolean = true
 ) : StringSpec() {
 
   fun testProcessor(
@@ -56,10 +57,11 @@ abstract class APTest(
           assertThat(compilation)
             .succeeded()
 
-          generationDir.listFiles().size shouldBe 1
+          val targetDir = if (enforcePackage) File("${generationDir.absolutePath}/${pckg.replace(".", "/")}") else generationDir
+          targetDir.listFiles().size shouldBe 1
 
           val expected = File(expectedDir, dest).readText()
-          val actual = generationDir.listFiles()[0].readText()
+          val actual = targetDir.listFiles()[0].readText()
 
           actual shouldBe expected
 

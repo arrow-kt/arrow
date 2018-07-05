@@ -2,11 +2,16 @@ package arrow.optics
 
 import arrow.common.utils.knownError
 import arrow.common.utils.removeBackticks
+import arrow.common.utils.simpleName
 import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 
 val AnnotatedType.isoSnippet
   get() = when (this) {
-    is AnnotatedProductType -> Snippet(content = processElement())
+    is AnnotatedProductType -> Snippet(
+      `package` = packageName,
+      name = classData.simpleName,
+      content = processElement()
+    )
     is AnnotatedSumType -> knownError(element.isoErrorMessage, element)
     is AnnotatedFunctionType -> knownError(element.isoErrorMessage, element)
   }

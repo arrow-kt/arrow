@@ -6,6 +6,9 @@ permalink: /docs/patterns/error_handling/
 
 ## Functional Error Handling
 
+{:.beginner}
+beginner
+
 When dealing with errors in a purely functional way we try as much as we can to avoid exceptions.
 Exceptions break referential transparency and lead to bugs when callers are unaware that they may happen until it's too late at runtime.
 
@@ -136,14 +139,17 @@ Arrow provides [monadic comprehensions]({{ '/docs/patterns/monad_comprehensions'
 
 ```kotlin
 import arrow.typeclasses.*
+import arrow.instances.*
 
 fun attackOption(): Option<Impacted> =
-  Option.monad().binding {
-    val nuke = arm().bind()
-    val target = aim().bind()
-    val impact = launch(target, nuke).bind()
-    impact
-  }.fix()
+  ForOption extensions {
+    binding {
+        val nuke = arm().bind()
+        val target = aim().bind()
+        val impact = launch(target, nuke).bind()
+        impact
+    }.fix()
+  }
 
 attackOption()
 //None
@@ -193,13 +199,18 @@ result.fold({ ex -> "BOOM!: $ex"}, { "Got: $it" })
 Just like it does for `Option`, Arrow also provides `Monad` instances for `Try` and we can use it exactly in the same way
 
 ```kotlin
+import arrow.typeclasses.*
+import arrow.instances.*
+
 fun attackTry(): Try<Impacted> =
-  Try.monad().binding {
-    val nuke = arm().bind()
-    val target = aim().bind()
-    val impact = launch(target, nuke).bind()
-    impact
-  }.fix()
+  ForTry extensions {
+    binding {
+      val nuke = arm().bind()
+      val target = aim().bind()
+      val impact = launch(target, nuke).bind()
+      impact
+   }.fix()
+  }
 
 attackTry()
 //Failure(RuntimeException("SystemOffline"))
@@ -251,13 +262,15 @@ All values on the left side assume to be `Right` biased and whenever a `Left` va
 
 ```kotlin
 fun attackEither(): Either<NukeException, Impacted> =
-  Either.monad<NukeException>().binding {
+  ForEither<NukeException>() extensions {
+   binding {
     val nuke = arm().bind()
     val target = aim().bind()
     val impact = launch(target, nuke).bind()
     impact
-  }.fix()
-
+   }.fix()
+  }
+  
 attackEither()
 //Left(MissedByMeters(5))
 ```
@@ -301,8 +314,8 @@ fun <f> launch(target: Target, nuke: Nuke, ME: MonadError<F, NukeException>):
 We can now express the same program as before in a fully polymorphic context
 
 ```kotlin
-fun <f> attack(ME:MonadError<F, NukeException>):Kind<F, Impacted> =
-  ME.binding {
+fun <F> MonadError<F, NukeException>.attack():Kind<F, Impacted> =
+  binding {
     val nuke = arm<F>().bind()
     val target = aim<F>().bind()
     val impact = launch<F>(target, nuke).bind()
@@ -313,31 +326,112 @@ fun <f> attack(ME:MonadError<F, NukeException>):Kind<F, Impacted> =
 Or since `arm()` and `bind()` are operations that do not depend on each other we don't need the [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) here and we can express our logic as:
 
 ```kotlin
-fun <f> attack1(ME: MonadError<F, NukeException>): Kind<F, Impacted> =
+fun <F> MonadError<F, NukeException>.attack1(ME): Kind<F, Impacted> =
   ME.tupled(aim(), arm()).flatMap(ME, { (nuke, target) -> launch<F>(nuke, target) })
 
-val result = attack<EitherPartialOf<NukeException>>()
+val result = Either.monadError<NukeException>.attack()
 result.fix()
 //Left(MissedByMeters(5))
 // or
-val result1 = attack(Either.monadError())
+val result1 = Either.monadError<NukeException>.attack1()
 result1.fix()
 ```
 
 Note that `MonadError` also has a function `bindingCatch` that automatically captures and wraps exceptions in its binding block.
 
 ```kotlin
-fun <f> launchImjust(target: Target, nuke: Nuke, ME: MonadError<F, NukeException>): Impacted {
+fun <f> MonadError<F, NukeException>.launchImjust(target: Target, nuke: Nuke): Impacted {
   throw MissedByMeters(5)
 }
 
-fun <f> attack(ME:MonadError<F, NukeException>):Kind<F, Impacted> =
-  ME.binding {
+fun <f> MonadError<F, NukeException>.attack(): Kind<F, Impacted> =
+  bindingCatch {
     val nuke = arm<F>().bind()
     val target = aim<F>().bind()
     val impact = launchImpure<F>(target, nuke)
     impact
   }
+```
+
+### Example : Alternative validation strategies using `ApplicativeError`
+
+In this validation example we demonstrate how we can use `ApplicativeError` instead of `Validated` to abstract away validation strategies and raising errors in the context we are computing in.
+
+*Model*
+
+```kotlin
+import arrow.*
+import arrow.core.*
+import arrow.typeclasses.*
+import arrow.data.*
+
+sealed class ValidationError(val msg: String) {
+  data class DoesNotContain(val value: String) : ValidationError("Did not contain $value")
+  data class MaxLength(val value: Int) : ValidationError("Exceeded length of $value")
+  data class NotAnEmail(val reasons: Nel<ValidationError>) : ValidationError("Not a valid email")
+}
+
+data class FormField(val label: String, val value: String)
+data class Email(val value: String)
+```
+
+*Rules*
+
+```kotlin
+sealed class Rules<F>(A: ApplicativeError<F, Nel<ValidationError>>) : ApplicativeError<F, Nel<ValidationError>> by A {
+
+  private fun FormField.contains(needle: String): Kind<F, FormField> =
+    if (value.contains(needle, false)) just(this)
+    else raiseError(ValidationError.DoesNotContain(needle).nel())
+
+  private fun FormField.maxLength(maxLength: Int): Kind<F, FormField> =
+    if (value.length <= maxLength) just(this)
+    else raiseError(ValidationError.MaxLength(maxLength).nel())
+
+  fun FormField.validateEmail(): Kind<F, Email> =
+    map(contains("@"), maxLength(250), {
+      Email(value)
+    }).handleErrorWith { raiseError(ValidationError.NotAnEmail(it).nel()) }
+
+  object ErrorAccumulationStrategy :
+    Rules<ValidatedPartialOf<Nel<ValidationError>>>(Validated.applicativeError(NonEmptyList.semigroup()))
+  
+  object FailFastStrategy :
+    Rules<EitherPartialOf<Nel<ValidationError>>>(Either.applicativeError())
+  
+  companion object {
+    infix fun <A> failFast(f: FailFastStrategy.() -> A): A = f(FailFastStrategy)
+    infix fun <A> accumulateErrors(f: ErrorAccumulationStrategy.() -> A): A = f(ErrorAccumulationStrategy)
+  }
+
+}
+```
+
+`Rules` defines abstract behaviors that can be composed and have access to the scope of `ApplicativeError` where we can invoke `just` to lift values in to the positive result and `raiseError` into the error context.
+
+Once we have such abstract algebra defined we can simply materialize it to data types that support different error strategies:
+
+*Error accumulation*
+
+```kotlin
+Rules accumulateErrors {
+  listOf(
+    FormField("Invalid Email Domain Label", "nowhere.com"),
+    FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this accumulates N errors
+    FormField("Valid Email Label", "getlost@nowhere.com")
+  ).map { it.validateEmail() }
+}
+```
+*Fail Fast*
+
+```kotlin
+Rules failFast {
+  listOf(
+    FormField("Invalid Email Domain Label", "nowhere.com"),
+    FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this fails fast 
+    FormField("Valid Email Label", "getlost@nowhere.com")
+  ).map { it.validateEmail() }
+}
 ```
 
 ### Credits

@@ -9,6 +9,7 @@ import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.instance
 import arrow.typeclasses.*
+import kotlin.coroutines.experimental.CoroutineContext
 
 @instance(ObservableK::class)
 interface ObservableKFunctorInstance : Functor<ForObservableK> {
@@ -106,6 +107,9 @@ interface ObservableKAsyncInstance :
   Async<ForObservableK> {
   override fun <A> async(fa: Proc<A>): ObservableK<A> =
     ObservableK.runAsync(fa)
+
+  override fun <A> ObservableKOf<A>.continueOn(ctx: CoroutineContext): ObservableK<A> =
+    fix().continueOn(ctx)
 }
 
 @instance(ObservableK::class)
@@ -115,3 +119,11 @@ interface ObservableKEffectInstance :
   override fun <A> ObservableKOf<A>.runAsync(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Unit> =
     fix().runAsync(cb)
 }
+
+object ObservableKContext : ObservableKEffectInstance, ObservableKTraverseInstance {
+  override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
+    fix().map(f)
+}
+
+infix fun <A> ForObservableK.Companion.extensions(f: ObservableKContext.() -> A): A =
+  f(ObservableKContext)

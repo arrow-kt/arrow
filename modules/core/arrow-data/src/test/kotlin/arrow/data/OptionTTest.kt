@@ -2,6 +2,7 @@ package arrow.data
 
 import arrow.Kind
 import arrow.core.*
+import arrow.mtl.instances.ForOptionT
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -25,30 +26,34 @@ class OptionTTest : UnitSpec() {
 
   init {
 
-    testLaws(
-      MonadLaws.laws(OptionT.monad(NonEmptyList.monad()), Eq.any()),
-      SemigroupKLaws.laws(
-        OptionT.semigroupK(Id.monad()),
-        OptionT.applicative(Id.monad()),
-        EQ()),
+    ForOptionT(Option.monad(), Option.traverseFilter()) extensions {
 
-      MonoidKLaws.laws(
-        OptionT.monoidK(Id.monad()),
-        OptionT.applicative(Id.monad()),
-        EQ()),
+      testLaws(
+        MonadLaws.laws(this, Eq.any()),
+        SemigroupKLaws.laws(
+          this,
+          this,
+          EQ()),
 
-      FunctorFilterLaws.laws(
-        OptionT.functorFilter(Id.functor()),
-        { OptionT(Id(Some(it))) },
-        EQ()),
+        MonoidKLaws.laws(
+          this,
+          this,
+          EQ()),
 
-      TraverseFilterLaws.laws(
-        OptionT.traverseFilter(Option.traverseFilter()),
-        OptionT.applicative(Option.monad()),
-        { OptionT(Option(Some(it))) },
-        EQ(),
-        EQ_NESTED())
-    )
+        FunctorFilterLaws.laws(
+          this,
+          { OptionT(Some(Some(it))) },
+          EQ()),
+
+        TraverseFilterLaws.laws(
+          this,
+          this,
+          { OptionT(Some(Some(it))) },
+          EQ(),
+          EQ_NESTED())
+      )
+
+    }
 
     "toLeft for Some should build a correct EitherT" {
       forAll { a: Int, b: String ->

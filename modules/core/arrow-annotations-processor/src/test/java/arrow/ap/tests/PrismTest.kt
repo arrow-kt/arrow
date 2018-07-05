@@ -20,8 +20,8 @@ class PrismTest : APTest("arrow.ap.objects.prism") {
 
     testProcessor(AnnotationProcessor(
       name = "Prism generation requires companion object declaration",
-      sourceFiles = listOf("PrismCompanion.java"),
-      errorMessage = "@optics annotated class arrow.ap.objects.prism.PrismCompanion needs to declare companion object.",
+      sourceFiles = listOf("PrismWithoutCompanion.java"),
+      errorMessage = "@optics annotated class arrow.ap.objects.prism.PrismWithoutCompanion needs to declare companion object.",
       processor = OpticsProcessor()
     ))
 

@@ -19,16 +19,18 @@ class MapKTest : UnitSpec() {
   init {
     val EQ_TC = MapK.eq(String.eq(), Int.eq())
 
-    testLaws(
-      EqLaws.laws(EQ_TC) { mapOf(it.toString() to it).k() },
-      ShowLaws.laws(MapK.show(), EQ_TC) { mapOf(it.toString() to it).k() },
-      TraverseLaws.laws(MapK.traverse(), MapK.traverse(), { a: Int -> mapOf("key" to a).k() }, EQ),
-      MonoidLaws.laws(MapK.monoid<String, Int>(Int.semigroup()), mapOf("key" to 1).k(), EQ),
-      SemigroupLaws.laws(MapK.monoid<String, Int>(Int.semigroup()),
-        mapOf("key" to 1).k(),
-        mapOf("key" to 2).k(),
-        mapOf("key" to 3).k(),
-        EQ)
-    )
+    ForMapK<String>() extensions {
+      testLaws(
+        EqLaws.laws(EQ_TC) { mapOf(it.toString() to it).k() },
+        ShowLaws.laws(MapK.show(), EQ_TC) { mapOf(it.toString() to it).k() },
+        TraverseLaws.laws(this, this, { a: Int -> mapOf("key" to a).k() }, EQ),
+        MonoidLaws.laws(MapK.monoid<String, Int>(Int.semigroup()), mapOf("key" to 1).k(), EQ),
+        SemigroupLaws.laws(MapK.monoid<String, Int>(Int.semigroup()),
+          mapOf("key" to 1).k(),
+          mapOf("key" to 2).k(),
+          mapOf("key" to 3).k(),
+          EQ)
+      )
+    }
   }
 }

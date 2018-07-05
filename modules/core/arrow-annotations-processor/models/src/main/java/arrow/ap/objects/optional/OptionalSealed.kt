@@ -8,4 +8,5 @@ import arrow.optics.optics
 sealed class OptionalSealed(val field: String, val nullable: String?, val option: Option<String>) {
   companion object {}
   data class Optional2(val a: String?) : OptionalSealed("", null, Option.empty())
+  companion object
 }

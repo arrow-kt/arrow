@@ -22,3 +22,13 @@ interface CofreeComonadInstance<S> : CofreeFunctorInstance<S>, Comonad<CofreePar
 
   override fun <A> Kind<CofreePartialOf<S>, A>.duplicate(): Kind<CofreePartialOf<S>, Cofree<S, A>> = fix().duplicate()
 }
+
+class CofreeContext<S> : CofreeComonadInstance<S>
+
+class CofreeContextPartiallyApplied<S> {
+  infix fun <A> extensions(f: CofreeContext<S>.() -> A): A =
+    f(CofreeContext())
+}
+
+fun <S> ForCofree(): CofreeContextPartiallyApplied<S> =
+  CofreeContextPartiallyApplied()
