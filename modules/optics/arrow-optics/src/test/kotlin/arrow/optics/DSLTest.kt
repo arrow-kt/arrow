@@ -1,12 +1,11 @@
 package arrow.optics
 
-import arrow.core.None
+import arrow.core.*
 import arrow.data.*
-import arrow.optics.dsl.at
-import arrow.optics.dsl.every
-import arrow.optics.dsl.some
+import arrow.optics.dsl.*
 import arrow.optics.instances.*
-import arrow.test.UnitSpec
+import arrow.test.*
+
 import io.kotlintest.matchers.shouldBe
 
 @optics
@@ -71,30 +70,33 @@ class BoundedTest : UnitSpec() {
 
     "Index enables special Index syntax" {
       ListK.index<Employee>().run {
-        CompanyEmployees.employees[1].company.address.street.name.modify(employees, String::toUpperCase) shouldBe
+        CompanyEmployees.employees[1].company.address.street.name.modify(employees, String::toUpperCase)
+      } shouldBe
 
-          (CompanyEmployees.employees compose
-            ListK.index<Employee>().index(1) compose
-            Employee.company compose
-            Company.address compose
-            Address.street compose
-            Street.name).modify(employees, String::toUpperCase)
-      }
+        (CompanyEmployees.employees compose
+          ListK.index<Employee>().index(1) compose
+          Employee.company compose
+          Company.address compose
+          Address.street compose
+          Street.name).modify(employees, String::toUpperCase)
     }
 
     "Working with At in Optics should be same as in DSL" {
       MapK.at<Keys, String>().run {
-        Db.content.at(MapK.at(), One).set(db, None) shouldBe
-          (Db.content compose
-            MapK.at<Keys, String>().at(One))
-            .set(db, None)
-      }
+        Db.content.at(MapK.at(), One).set(db, None)
+      } shouldBe
+
+        (Db.content compose
+          MapK.at<Keys, String>().at(One))
+          .set(db, None)
     }
 
     "Working with Each in Optics should be same as in DSL" {
-      Db.content.every(MapK.each()).modify(db, String::toUpperCase) shouldBe
-        (Db.content compose
-          MapK.traversal()).modify(db, String::toUpperCase)
+      MapK.each<Keys, String>().run {
+        Db.content.every.modify(db, String::toUpperCase)
+      } shouldBe
+
+        (Db.content compose MapK.traversal()).modify(db, String::toUpperCase)
     }
 
   }
