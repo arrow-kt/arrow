@@ -1,8 +1,12 @@
 package arrow.free
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Eval
+import arrow.core.ForEval
+import arrow.core.applicative
+import arrow.core.fix
 import arrow.higherkind
+import arrow.core.FunctionK
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Traverse
