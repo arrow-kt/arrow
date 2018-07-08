@@ -24,11 +24,10 @@ data class ListK<out A>(val list: List<A>) : ListKOf<A>, List<A> by list {
 
   fun <B> ap(ff: ListKOf<(A) -> B>): ListK<B> = ff.fix().flatMap { f -> map(f) }.fix()
 
-  fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ListK<B>> = GA.run {
-    foldRight(Eval.always { just(emptyList<B>().k()) }) { a, eval ->
-      f(a).map2Eval(eval) { (listOf(it.a) + it.b).k() }
+  fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ListK<B>> =
+    foldRight(Eval.always { GA.just(emptyList<B>().k()) }) { a, eval ->
+      GA.run { f(a).map2Eval(eval) { (listOf(it.a) + it.b).k() } }
     }.value()
-  }
 
   fun <B, Z> map2(fb: ListKOf<B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
     this.fix().flatMap { a ->
