@@ -56,11 +56,11 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
         if (!(v.toList().isEmpty())) {
           val head: Either<A, B> = v.first()
           when (head) {
-            is Either.Right<A, B> -> {
+            is Either.Right -> {
               buf += head.b
               go(buf, f, v.drop(1).k())
             }
-            is Either.Left<A, B> -> {
+            is Either.Left -> {
               if (v.count() == 1)
                 go(buf, f, (f(head.a).fix()).k())
               else
