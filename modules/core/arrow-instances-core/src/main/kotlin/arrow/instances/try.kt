@@ -1,10 +1,51 @@
 package arrow.instances
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.Failure
+import arrow.core.ForTry
+import arrow.core.Success
+import arrow.core.Try
+import arrow.core.TryOf
+import arrow.core.fix
+import arrow.core.identity
+import arrow.core.recoverWith
 import arrow.instance
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
 import arrow.instances.traverse as tryTraverse
+
+@instance(Try::class)
+interface TrySemigroupInstance<A> : Semigroup<Try<A>> {
+
+  fun SG(): Semigroup<A>
+
+  override fun Try<A>.combine(b: Try<A>): Try<A> =
+    when (this) {
+      is Success<A> -> when (b) {
+        is Success<A> -> Success(SG().run { value.combine(b.value) })
+        is Failure -> this
+      }
+      is Failure -> b
+    }
+}
+
+@instance(Try::class)
+interface TryMonoidInstance<A> : TrySemigroupInstance<A>, Monoid<Try<A>> {
+  fun MO(): Monoid<A>
+
+  override fun empty(): Try<A> = Success(MO().empty())
+}
 
 @instance(Try::class)
 interface TryApplicativeErrorInstance : TryApplicativeInstance, ApplicativeError<ForTry, Throwable> {

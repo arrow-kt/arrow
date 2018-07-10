@@ -3,11 +3,44 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.*
 import arrow.instance
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
 import arrow.core.ap as eitherAp
 import arrow.core.combineK as eitherCombineK
 import arrow.core.flatMap as eitherFlatMap
 import arrow.instances.traverse as eitherTraverse
+
+@instance(Either::class)
+interface EitherSemigroupInstance<L, R> : Semigroup<Either<L, R>> {
+
+  fun SG(): Semigroup<R>
+
+  override fun Either<L, R>.combine(b: Either<L, R>): Either<L, R> =
+    when (this) {
+      is Either.Left -> this
+      is Either.Right -> { val x = this.b; when (b) {
+        is Either.Left -> b
+        is Either.Right -> Either.Right(SG().run { x.combine(b.b) })
+      }
+    }}
+}
+
+@instance(Either::class)
+interface EitherMonoidInstance<L, R> : EitherSemigroupInstance<L, R>, Monoid<Either<L, R>> {
+  fun MO(): Monoid<R>
+
+  override fun empty(): Either<L, R> = Right(MO().empty())
+}
 
 @instance(Either::class)
 interface EitherFunctorInstance<L> : Functor<EitherPartialOf<L>> {
