@@ -11,5 +11,5 @@ import kotlin.annotation.AnnotationTarget.CLASS
 annotation class optics(val targets: Array<OpticsTarget> = [])
 
 enum class OpticsTarget {
-  ISO, LENS, PRISM, OPTIONAL
+  ISO, LENS, PRISM, OPTIONAL, DSL
 }
