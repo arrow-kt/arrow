@@ -1,6 +1,7 @@
 package arrow.core
 
-import arrow.*
+import arrow.Kind
+import arrow.higherkind
 
 fun <A> (() -> A).k(): Function0<A> = Function0(this)
 
@@ -26,8 +27,8 @@ data class Function0<out A>(internal val f: () -> A) : Function0Of<A> {
     tailrec fun <A, B> loop(a: A, f: (A) -> Kind<ForFunction0, Either<A, B>>): B {
       val fa = f(a).fix()()
       return when (fa) {
-        is Either.Right<A, B> -> fa.b
-        is Either.Left<A, B> -> loop(fa.a, f)
+        is Either.Right -> fa.b
+        is Either.Left -> loop(fa.a, f)
       }
     }
 
