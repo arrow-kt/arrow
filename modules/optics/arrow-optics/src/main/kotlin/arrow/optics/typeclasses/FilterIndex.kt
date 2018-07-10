@@ -48,11 +48,6 @@ interface FilterIndex<S, I, A> {
       }
     }
 
-    /**
-     * Filter the foci [A] of a [Traversal] with the predicate [p] given an instance [FilterIndex] [FI].
-     */
-    fun <S, I, A> filterIndex(FI: FilterIndex<S, I, A>, p: Predicate<I>): Traversal<S, A> = FI.filter(p)
-
   }
 
 }
