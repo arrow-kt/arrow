@@ -6,6 +6,9 @@ permalink: /docs/optics/fold/
 
 ## Fold
 
+{:.beginner}
+beginner
+
 A `Fold` is an optic that can see into a structure and get 0 to N foci.
 It is a generalisation of an instance of [`Foldable`](/docs/typeclasses/foldable).
 

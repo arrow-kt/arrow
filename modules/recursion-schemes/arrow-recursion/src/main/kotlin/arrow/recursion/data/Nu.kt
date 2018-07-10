@@ -26,18 +26,17 @@ class Nu<out F>(val a: Any?, val unNu: Coalgebra<F, Any?>) : NuOf<F> {
 
 @instance(Nu::class)
 interface NuBirecursiveInstance : Birecursive<ForNu> {
-  override fun <F> projectT(FF: Functor<F>, t: NuOf<F>): Kind<F, Nu<F>> = FF.run {
-    val fix = t.fix()
+  override fun <F> Functor<F>.projectT(tf: Kind<ForNu, F>): Kind<F, Nu<F>> {
+    val fix = tf.fix()
     val unNu = fix.unNu
-    unNu(fix.a).map { Nu(it, unNu) }
+    return unNu(fix.a).map { Nu(it, unNu) }
   }
 
-  override fun <F> embedT(FF: Functor<F>, t: Kind<F, Eval<NuOf<F>>>) = FF.run {
-    Eval.now(Nu.invoke(t) { f -> f.map { nu -> projectT(FF, nu.value()).map(::Now) } })
-  }
+  override fun <F> Functor<F>.embedT(tf: Kind<F, Eval<Kind<ForNu, F>>>) =
+    Eval.now(Nu.invoke(tf) { f -> f.map { nu -> projectT(nu.value()).map(::Now) } })
 
-  override fun <F, A> A.ana(FF: Functor<F>, coalg: Coalgebra<F, A>) =
-    Nu(this, coalg)
+  override fun <F, A> Functor<F>.ana(a: A, coalg: Coalgebra<F, A>) =
+    Nu(a, coalg)
 }
 
 @instance(Nu::class)

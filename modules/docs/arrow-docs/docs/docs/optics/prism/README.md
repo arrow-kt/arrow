@@ -6,7 +6,10 @@ permalink: /docs/optics/prism/
 
 ## Prism
 
-A `Prism` is a loss less invertible optic that can see into a structure and optionally find its focus. They're mostly used for structures that have a relationship only under a certain condition. I.e. a certain `sum` of a `sum type` (`sealed class`), the head of a list or all whole double values and integers (safe casting).
+{:.beginner}
+beginner
+
+A `Prism` is a lossless invertible optic that can see into a structure and optionally find its focus. They're mostly used for structures that have a relationship only under a certain condition. I.e. a certain `sum` of a `sum type` (`sealed class`), the head of a list or all whole double values and integers (safe casting).
 
 Since `Prism` has an optional focus it can be seen as a pair of functions `getOrModify` and `reverseGet`.
 
@@ -163,5 +166,5 @@ liftSuccess(Try.Failure<Int>(ArithmeticException("/ by zero")))
 
 Arrow provides [`PrismLaws`][prism_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own prisms.
 
-[prism_laws_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/PrismLaws.kt
+[prism_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/PrismLaws.kt
 

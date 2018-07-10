@@ -7,6 +7,8 @@ import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
+import kotlin.coroutines.experimental.CoroutineContext
+import arrow.effects.CoroutineContextScheduler.asScheduler
 
 fun <A> Observable<A>.k(): ObservableK<A> = ObservableK(this)
 
@@ -49,6 +51,9 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
 
   fun handleErrorWith(function: (Throwable) -> ObservableK<A>): ObservableK<A> =
     this.fix().observable.onErrorResumeNext { t: Throwable -> function(t).observable }.k()
+
+  fun continueOn(ctx: CoroutineContext): ObservableK<A> =
+    observable.observeOn(ctx.asScheduler()).k()
 
   fun runAsync(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Unit> =
     observable.flatMap { cb(Right(it)).value() }.onErrorResumeNext(io.reactivex.functions.Function { cb(Left(it)).value() }).k()

@@ -6,6 +6,9 @@ permalink: /docs/generic/product/
 
 ## Arrow Generic
 
+{:.intermediate}
+intermediate
+
 `arrow-generic` provides meta programming facilities over Product types like data classes, tuples, and heterogeneous lists; and Coproduct types like sealed classes.
 
 ### Install 

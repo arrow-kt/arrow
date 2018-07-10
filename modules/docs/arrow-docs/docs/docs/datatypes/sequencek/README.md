@@ -6,6 +6,9 @@ permalink: /docs/datatypes/sequencek/
 
 ## SequenceK
 
+{:.beginner}
+beginner
+
 SequenceK implements lazy lists representing lazily-evaluated ordered sequence of homogenous values.
 
 It can be created from Kotlin Sequence type with a convenient `k()` function.

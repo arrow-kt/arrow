@@ -6,6 +6,10 @@ video: vAdhMJWnBUI
 ---
 
 ## Kleisli
+
+{:.intermediate}
+intermediate
+
 Kleisli enables composition of functions that return a monadic value, for instance, an `Option<Int>` or an `Either<String, Int>`, without having functions take an `Option` or `Either` as a parameter.
 
 For example, we have the function `String.toInt()` which can throw a `NumberFormatException` and we want to do a safe conversion like this:

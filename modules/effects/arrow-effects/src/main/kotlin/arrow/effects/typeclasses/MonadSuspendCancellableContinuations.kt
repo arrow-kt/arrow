@@ -3,9 +3,9 @@ package arrow.effects.typeclasses
 import arrow.Kind
 import arrow.core.Either
 import arrow.effects.data.internal.BindingCancellationException
-import arrow.effects.internal.stackLabels
 import arrow.typeclasses.MonadErrorContinuation
 import arrow.typeclasses.bindingCatch
+import arrow.typeclasses.stateStack
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.EmptyCoroutineContext
@@ -36,9 +36,9 @@ open class MonadDeferCancellableContinuation<F, A>(SC: MonadDefer<F>, override v
     deferUnsafe(f).bind()
 
   override suspend fun <B> bind(m: () -> Kind<F, B>): B = suspendCoroutineOrReturn { c ->
-    val labelHere = c.stackLabels // save the whole coroutine stack labels
+    val labelHere = c.stateStack // save the whole coroutine stack labels
     returnedMonad = m().flatMap({ x: B ->
-      c.stackLabels = labelHere
+      c.stateStack = labelHere
       if (cancelled.get()) {
         throw BindingCancellationException()
       }
@@ -49,7 +49,7 @@ open class MonadDeferCancellableContinuation<F, A>(SC: MonadDefer<F>, override v
   }
 
   override suspend fun <B> bindIn(context: CoroutineContext, m: () -> B): B = suspendCoroutineOrReturn { c ->
-    val labelHere = c.stackLabels // save the whole coroutine stack labels
+    val labelHere = c.stateStack // save the whole coroutine stack labels
     val monadCreation: suspend () -> Kind<F, A> = {
       val datatype = try {
         just(m())
@@ -57,7 +57,7 @@ open class MonadDeferCancellableContinuation<F, A>(SC: MonadDefer<F>, override v
         ME.raiseError<B>(t)
       }
       datatype.flatMap({ xx: B ->
-        c.stackLabels = labelHere
+        c.stateStack = labelHere
         if (cancelled.get()) {
           throw BindingCancellationException()
         }
