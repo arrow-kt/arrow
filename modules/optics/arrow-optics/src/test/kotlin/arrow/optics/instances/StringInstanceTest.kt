@@ -29,7 +29,7 @@ class StringInstanceTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = FilterIndex.filterIndex(String.filterIndex()) { true },
+      traversal = String.filterIndex().filter { true },
       aGen = Gen.string(),
       bGen = genChars(),
       funcGen = genFunctionAToB(genChars()),

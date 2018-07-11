@@ -15,7 +15,7 @@ beginner
 
 ```groovy
 // gradle
-compile 'io.arrow-kt:arrow-data:$arrowVersion'
+compile "io.arrow-kt:arrow-data:$arrow_version"
 ```
 
 ```kotlin:ank
