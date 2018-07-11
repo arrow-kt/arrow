@@ -69,7 +69,15 @@ Kotlin Meetup, Sydney, Mar '18 - version 0.6.1
 
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/eOPu1UXHZrloFf" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/EmmanuelNhan/functional-programming-in-kotlin-with-arrow-sunnytech-2018" title="Functional programming in kotlin with Arrow [Sunnytech 2018]" target="_blank">Functional programming in kotlin with Arrow [Sunnytech 2018]</a> </strong> de <strong><a href="//www.slideshare.net/EmmanuelNhan" target="_blank">Emmanuel Nhan</a></strong> </div>
 
-Sunny Tech, Montpellier, France, June '28 - version 0.7.2
+Sunny Tech, Montpellier, June '18 - version 0.7.2
+
+### Higher Kinded Types in a Lower Kinded Language by Jacob Bass
+
+It's hard coming back down to the earth of a JVM based language after spending time with Haskell and OCaml. This talk will discuss functional programming in Kotlin with the Arrow library, how the abstractions it provides can improve your code, and how this magic that provides higher-kinded types works under the hood.
+
+<iframe width="560" height="315" src="https://www.youtube.com/watch?v=ERM0mBPNLHc" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+
+Yow! Lambda Jam, Sydney, Australia, June '18 - version 0.7
 
 ### Functional Programming in Kotlin
 
@@ -106,7 +114,7 @@ Sept '17 - version 0.3.11
 
 [Functional Programming with Arrow](https://speakerdeck.com/heyitsmohit/functional-programming-with-arrow)
 
-Kotlin Brooklyn Meetup, Jan ’18 - version 0.6.1
+Kotlin Brooklyn Meetup, Jan '18 - version 0.6.1
 
 ### Android Functional Validation
 
@@ -117,7 +125,7 @@ Kotlin Brooklyn Meetup, Jan ’18 - version 0.6.1
 * [Either](http://danielecampogiani.com/blog/2018/02/android-functional-validation-3-either/)
 * [Validated](http://danielecampogiani.com/blog/2018/02/android-functional-validation-4-validated/)
 
-April ’18 - version 0.7
+April '18 - version 0.7
 
 ### 1/n - How do I ... in FP : Validation
 
@@ -125,7 +133,7 @@ April ’18 - version 0.7
 
 [1/n - How do I ... in FP : Validation](https://www.enhan.eu/how-to-in-fp/)
 
-April ’18 - version 0.7
+April '18 - version 0.7
 
 ### Arrow 101 — Building an Android app using Functional Programming
 
@@ -133,5 +141,4 @@ April ’18 - version 0.7
 
 [Arrow 101 — Building an Android app using Functional Programming](https://medium.com/@lehen01/arrow-101-building-an-android-app-using-functional-programming-fe959675d96d)
 
-June ’18 - version 0.7
-
+June '18 - version 0.7
