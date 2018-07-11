@@ -135,3 +135,10 @@ April ’18 - version 0.7
 
 June ’18 - version 0.7
 
+### Higher Kinded Types in a Lower Kinded Language by Jacob Bass
+
+It's hard coming back down to the earth of a JVM based language after spending time with Haskell and OCaml. This talk will discuss functional programming in Kotlin with the Arrow library, how the abstractions it provides can improve your code, and how this magic that provides higher-kinded types works under the hood.
+
+<iframe width="560" height="315" src="https://www.youtube.com/watch?v=ERM0mBPNLHc" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+
+June ’18 - version 0.7
