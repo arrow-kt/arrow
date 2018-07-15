@@ -21,7 +21,7 @@ buildscript {
         gradleVersionsPluginVersion = '0.17.0'
         javaVersion = JavaVersion.VERSION_1_7
         kotlinTestVersion = '2.0.7'
-        kotlinVersion = '1.2.41'
+        kotlinVersion = '1.2.51'
         daggerVersion = '2.15'
         kotlinxCoroutinesVersion = '0.23.3'
         kotlinxCollectionsImmutableVersion = '0.1'
