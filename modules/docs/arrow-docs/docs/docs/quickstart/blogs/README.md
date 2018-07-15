@@ -75,7 +75,7 @@ Sunny Tech, Montpellier, June '18 - version 0.7.2
 
 It's hard coming back down to the earth of a JVM based language after spending time with Haskell and OCaml. This talk will discuss functional programming in Kotlin with the Arrow library, how the abstractions it provides can improve your code, and how this magic that provides higher-kinded types works under the hood.
 
-<iframe width="560" height="315" src="https://www.youtube.com/watch?v=ERM0mBPNLHc" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/ERM0mBPNLHc" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
 
 Yow! Lambda Jam, Sydney, Australia, June '18 - version 0.7
 
