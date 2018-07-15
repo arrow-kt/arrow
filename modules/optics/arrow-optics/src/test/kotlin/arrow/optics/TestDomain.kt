@@ -1,8 +1,6 @@
 package arrow.optics
 
-import arrow.core.Left
-import arrow.core.Right
-import arrow.core.identity
+import arrow.core.*
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 
