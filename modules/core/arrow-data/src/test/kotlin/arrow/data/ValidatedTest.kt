@@ -78,6 +78,12 @@ class ValidatedTest : UnitSpec() {
       Invalid(13).getOrElse { "defaultValue" } shouldBe "defaultValue"
     }
 
+    "orNull should return value if is Valid or null otherwise" {
+      Valid(13).orNull() shouldBe 13
+      val invalid: Validated<Int, Int> = Invalid(13)
+      invalid.orNull() shouldBe null
+    }
+
     "valueOr should return value if is Valid or the the result of f in otherwise" {
       Valid(13).valueOr { fail("None should not be called") } shouldBe 13
       Invalid(13).valueOr { e -> e.toString() + " is the defaultValue" } shouldBe "13 is the defaultValue"
