@@ -61,5 +61,4 @@ apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
 
 compileKotlin.kotlinOptions.freeCompilerArgs += ["-Xskip-runtime-version-check"]
 
-apply from: rootProject.file('gradle/generated-kotlin-sources.gradle')
 apply plugin: 'kotlin-kapt'
