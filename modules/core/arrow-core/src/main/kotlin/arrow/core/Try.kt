@@ -26,8 +26,8 @@ sealed class Try<out A> : TryOf<A> {
         is Success -> {
           val b: Either<A, B> = ev.value
           when (b) {
-            is Either.Left<A, B> -> tailRecM(b.a, f)
-            is Either.Right<A, B> -> Success(b.b)
+            is Either.Left -> tailRecM(b.a, f)
+            is Either.Right -> Success(b.b)
           }
         }
       }

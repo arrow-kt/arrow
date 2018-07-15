@@ -50,8 +50,8 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    * @return the results of applying the function
    */
   inline fun <C> fold(crossinline ifLeft: (A) -> C, crossinline ifRight: (B) -> C): C = when (this) {
-    is Right<A, B> -> ifRight(b)
-    is Left<A, B> -> ifLeft(a)
+    is Right -> ifRight(b)
+    is Left -> ifLeft(a)
   }
 
   @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("getOrElse { ifLeft }"))
@@ -106,7 +106,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
   inline fun <C> map(crossinline f: (B) -> C): Either<A, C> =
       when (this) {
         is Right -> Right(f(b))
-        is Left -> this as Left<A, Nothing>
+        is Left -> this
       }
 
   /**
@@ -166,7 +166,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    * The left side of the disjoint union, as opposed to the [Right] side.
    */
   @Suppress("DataClassPrivateConstructor")
-  data class Left<out A, out B> @PublishedApi internal constructor(val a: A) : Either<A, B>() {
+  data class Left<out A> @PublishedApi internal constructor(val a: A) : Either<A, Nothing>() {
     override val isLeft
       get() = true
     override val isRight
@@ -181,7 +181,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    * The right side of the disjoint union, as opposed to the [Left] side.
    */
   @Suppress("DataClassPrivateConstructor")
-  data class Right<out A, out B> @PublishedApi internal constructor(val b: B) : Either<A, B>() {
+  data class Right<out B> @PublishedApi internal constructor(val b: B) : Either<Nothing, B>() {
     override val isLeft
       get() = false
     override val isRight
@@ -201,12 +201,12 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
     tailrec fun <L, A, B> tailRecM(a: A, f: (A) -> Kind<EitherPartialOf<L>, Either<A, B>>): Either<L, B> {
       val ev: Either<L, Either<A, B>> = f(a).fix()
       return when (ev) {
-        is Left<L, Either<A, B>> -> Left(ev.a)
-        is Right<L, Either<A, B>> -> {
+        is Left -> Left(ev.a)
+        is Right -> {
           val b: Either<A, B> = ev.b
           when (b) {
-            is Left<A, B> -> tailRecM(b.a, f)
-            is Right<A, B> -> Right(b.b)
+            is Left -> tailRecM(b.a, f)
+            is Right -> Right(b.b)
           }
         }
       }
@@ -231,7 +231,7 @@ fun <A, B, C> EitherOf<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> =
   fix().let {
     when (it) {
       is Right -> f(it.b)
-      is Left -> it as Left<A, Nothing>
+      is Left -> it
     }
   }
 
