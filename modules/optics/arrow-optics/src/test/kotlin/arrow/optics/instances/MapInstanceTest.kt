@@ -42,7 +42,7 @@ class MapInstanceTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = FilterIndex.filterIndex(MapK.filterIndex()) { true },
+      traversal = MapK.filterIndex<Char, Int>().filter { true },
       aGen = genMapK(genChars(), genIntSmall()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),

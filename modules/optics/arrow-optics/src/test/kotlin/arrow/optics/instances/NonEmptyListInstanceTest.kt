@@ -29,7 +29,7 @@ class NonEmptyListInstanceTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = FilterIndex.filterIndex(NonEmptyList.filterIndex()) { true },
+      traversal = NonEmptyList.filterIndex<String>().filter { true },
       aGen = genNonEmptyList(Gen.string()),
       bGen = Gen.string(),
       funcGen = genFunctionAToB(Gen.string()),
