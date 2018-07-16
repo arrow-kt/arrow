@@ -1,9 +1,7 @@
 package arrow.optics.instances
 
 import arrow.Kind
-import arrow.core.Left
-import arrow.core.Option
-import arrow.core.Right
+import arrow.core.*
 import arrow.data.*
 import arrow.instance
 import arrow.instances.traverse
@@ -75,7 +73,7 @@ interface MapKFilterIndexInstance<K, V> : FilterIndex<MapK<K, V>, K, V> {
 @instance(MapK::class)
 interface MapKIndexInstance<K, V> : Index<MapK<K, V>, K, V> {
   override fun index(i: K): Optional<MapK<K, V>, V> = POptional(
-    getOrModify = { it[i]?.let(::Right) ?: it.let(::Left) },
+    getOrModify = { it[i]?.right() ?: it.left() },
     set = { v -> { m -> m.mapValues { (k, vv) -> if (k == i) v else vv }.k() } }
   )
 }

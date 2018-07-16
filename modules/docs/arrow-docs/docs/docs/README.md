@@ -75,7 +75,7 @@ Add the dependencies into the project's `build.gradle`
 
 ```groovy
 apply plugin: 'kotlin-kapt' //optional
-apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //optional
+apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //only for Android projects
 
 def arrow_version = "0.7.2"
 dependencies {
@@ -84,28 +84,6 @@ dependencies {
     ...
 }
 ```
-
-JVM projects:
-
-`gradle/generated-kotlin-sources.gradle`
-```groovy
-apply plugin: 'idea'
-
-idea {
-    module {
-        sourceDirs += files(
-            'build/generated/source/kapt/main',
-            'build/generated/source/kaptKotlin/main',
-            'build/tmp/kapt/main/kotlinGenerated')
-        generatedSourceDirs += files(
-            'build/generated/source/kapt/main',
-            'build/generated/source/kaptKotlin/main',
-            'build/tmp/kapt/main/kotlinGenerated')
-    }
-}
-```
-
-Android projects:
 
 `gradle/generated-kotlin-sources.gradle`
 ```groovy

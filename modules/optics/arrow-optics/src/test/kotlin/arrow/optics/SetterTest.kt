@@ -49,8 +49,8 @@ class SetterTest : UnitSpec() {
       val user = User(token)
 
       forAll({ value: String ->
-        joinedSetter.set(token.let(::Left), value).swap().getOrElse { Token("Wrong value") }.value ==
-          joinedSetter.set(user.let(::Right), value).getOrElse { User(Token("Wrong value")) }.token.value
+        joinedSetter.set(token.left(), value).swap().getOrElse { Token("Wrong value") }.value ==
+          joinedSetter.set(user.right(), value).getOrElse { User(Token("Wrong value")) }.token.value
       })
     }
 
