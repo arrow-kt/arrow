@@ -282,8 +282,8 @@ fun <S, T, A, B, C> PPrism<S, T, A, B>.left(): PPrism<Either<S, C>, Either<T, C>
   { it.fold({ a -> getOrModify(a).bimap({ Either.Left(it) }, { Either.Left(it) }) }, { c -> Either.Right(Either.Right(c)) }) },
   {
     when (it) {
-      is Either.Left<B, C> -> Either.Left(reverseGet(it.a))
-      is Either.Right<B, C> -> Either.Right(it.b)
+      is Either.Left -> Either.Left(reverseGet(it.a))
+      is Either.Right -> Either.Right(it.b)
     }
   }
 )
