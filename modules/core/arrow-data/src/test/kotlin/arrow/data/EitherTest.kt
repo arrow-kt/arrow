@@ -22,6 +22,7 @@ class EitherTest : UnitSpec() {
     ForEither<Throwable>() extensions {
 
       testLaws(
+        MonoidLaws.laws(Either.monoid<String, Int>(MO = Int.monoid()), Either.right(1), Either.eq(String.eq(), Int.eq())),
         EqLaws.laws(Either.eq(String.eq(), Int.eq()), { Right(it) }),
         ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq()), { Right(it) }),
         MonadErrorLaws.laws(this, Eq.any(), Eq.any()),

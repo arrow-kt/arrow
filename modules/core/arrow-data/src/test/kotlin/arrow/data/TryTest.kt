@@ -1,13 +1,11 @@
 package arrow.data
 
 import arrow.core.*
+import arrow.instances.*
 import arrow.instances.eq
 import arrow.instances.extensions
 import arrow.test.UnitSpec
-import arrow.test.laws.EqLaws
-import arrow.test.laws.MonadErrorLaws
-import arrow.test.laws.ShowLaws
-import arrow.test.laws.TraverseLaws
+import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.*
@@ -25,6 +23,7 @@ class TryTest : UnitSpec() {
 
     ForTry extensions {
       testLaws(
+        MonoidLaws.laws(Try.monoid(MO = Int.monoid()), Try.just(1), EQ),
         EqLaws.laws(EQ) { Try.just(it) },
         ShowLaws.laws(Try.show(), EQ) { Try.just(it) },
         MonadErrorLaws.laws(this, Eq.any(), Eq.any()),
