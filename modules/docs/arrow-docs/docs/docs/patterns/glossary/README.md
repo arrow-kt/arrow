@@ -268,7 +268,7 @@ See how the class is parametrized on the container `F`, and the function is para
 Let's define an instance of `Functor` for the datatype `ListK`, our own wrapper for lists.
 
 ```kotlin
-@instance
+@instance(ListK::class)
 interface ListKFunctorInstance : Functor<ForListK> {
   override fun <A, B> Kind<F, A>.map(f: (A) -> B): ListK<B> {
     val list: ListK<A> = this.fix()
@@ -280,7 +280,7 @@ interface ListKFunctorInstance : Functor<ForListK> {
 This interface extends `Functor` for the value `F` of `ListK`. We use an annotation processor `@instance` to generate an object out of an interface with all the default methods already defined, and to add an extension function to get it into the companion object of the datatype.
 
 ```kotlin
-@instance
+@instance(ListK::class)
 interface ListKFunctorInstance : Functor<ForListK>
 ```
 

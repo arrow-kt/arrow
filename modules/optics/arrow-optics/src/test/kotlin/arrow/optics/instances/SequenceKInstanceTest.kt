@@ -29,7 +29,7 @@ class SequenceKInstanceTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = FilterIndex.filterIndex(SequenceK.filterIndex()) { true },
+      traversal = SequenceK.filterIndex<String>().filter { true },
       aGen = genSequenceK(Gen.string()),
       bGen = Gen.string(),
       funcGen = genFunctionAToB(Gen.string()),
