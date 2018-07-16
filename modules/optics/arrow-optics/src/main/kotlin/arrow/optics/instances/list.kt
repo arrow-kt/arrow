@@ -1,10 +1,7 @@
 package arrow.optics.instances
 
 import arrow.Kind
-import arrow.core.Left
-import arrow.core.ListInstances
-import arrow.core.Right
-import arrow.core.toT
+import arrow.core.*
 import arrow.data.k
 import arrow.data.traverse
 import arrow.optics.Optional
@@ -86,7 +83,7 @@ fun <A> ListInstances.index(): Index<List<A>, Int, A> = ListIndexInstance()
  */
 interface ListIndexInstance<A> : Index<List<A>, Int, A> {
   override fun index(i: Int): Optional<List<A>, A> = POptional(
-    getOrModify = { it.getOrNull(i)?.let(::Right) ?: it.let(::Left) },
+    getOrModify = { it.getOrNull(i)?.right() ?: it.left() },
     set = { a -> { l -> l.mapIndexed { index: Int, aa: A -> if (index == i) a else aa } } }
   )
 
