@@ -1,9 +1,7 @@
 package arrow.optics.instances
 
 import arrow.Kind
-import arrow.core.Left
-import arrow.core.Right
-import arrow.core.toT
+import arrow.core.*
 import arrow.data.*
 import arrow.data.NonEmptyList.Companion.fromListUnsafe
 import arrow.instance
@@ -54,7 +52,7 @@ interface NonEmptyListFilterIndexInstance<A> : FilterIndex<NonEmptyList<A>, Int,
 @instance(NonEmptyList::class)
 interface NonEmptyListIndexInstance<A> : Index<NonEmptyList<A>, Int, A> {
   override fun index(i: Int): Optional<NonEmptyList<A>, A> = POptional(
-    getOrModify = { l -> l.all.getOrNull(i)?.let(::Right) ?: l.let(::Left) },
+    getOrModify = { l -> l.all.getOrNull(i)?.right() ?: l.left() },
     set = { a ->
       { l ->
         NonEmptyList.fromListUnsafe(

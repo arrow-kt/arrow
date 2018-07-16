@@ -110,7 +110,7 @@ fun <K, V> MapInstances.index(): Index<Map<K, V>, K, V> = MapIndexInstance()
  */
 interface MapIndexInstance<K, V> : Index<Map<K, V>, K, V> {
   override fun index(i: K): Optional<Map<K, V>, V> = POptional(
-    getOrModify = { it[i]?.let(::Right) ?: it.let(::Left) },
+    getOrModify = { it[i]?.right() ?: it.left() },
     set = { v -> { m -> m.mapValues { (k, vv) -> if (k == i) v else vv } } }
   )
 
