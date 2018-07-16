@@ -129,7 +129,13 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
  * Return the Valid value, or the default if Invalid
  */
 fun <E, B> ValidatedOf<E, B>.getOrElse(default: () -> B): B =
-  fix().fold({ default() }, ::identity)
+    fix().fold({ default() }, ::identity)
+
+/**
+ * Return the Valid value, or null if Invalid
+ */
+fun <E, B> ValidatedOf<E, B>.orNull(): B? =
+  getOrElse { null }
 
 /**
  * Return the Valid value, or the result of f if Invalid
