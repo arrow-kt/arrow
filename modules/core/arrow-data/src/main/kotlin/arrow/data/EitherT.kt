@@ -31,12 +31,12 @@ data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, 
       EitherT(tailRecM(a, {
         f(it).fix().value.map { recursionControl ->
           when (recursionControl) {
-            is Either.Left<L, Either<A, B>> -> Right(Left(recursionControl.a))
-            is Either.Right<L, Either<A, B>> -> {
+            is Either.Left -> Right(Left(recursionControl.a))
+            is Either.Right -> {
               val b: Either<A, B> = recursionControl.b
               when (b) {
-                is Either.Left<A, B> -> Left(b.a)
-                is Either.Right<A, B> -> Right(Right(b.b))
+                is Either.Left -> Left(b.a)
+                is Either.Right -> Right(Right(b.b))
               }
             }
           }

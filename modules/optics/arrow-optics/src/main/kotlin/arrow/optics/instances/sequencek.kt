@@ -1,9 +1,7 @@
 package arrow.optics.instances
 
 import arrow.Kind
-import arrow.core.Left
-import arrow.core.Right
-import arrow.core.toT
+import arrow.core.*
 import arrow.data.*
 import arrow.instance
 import arrow.optics.Optional
@@ -54,7 +52,7 @@ interface SequenceKFilterIndexInstance<A> : FilterIndex<SequenceK<A>, Int, A> {
 @instance(SequenceK::class)
 interface SequenceKIndexInstance<A> : Index<SequenceK<A>, Int, A> {
   override fun index(i: Int): Optional<SequenceK<A>, A> = POptional(
-    getOrModify = { it.elementAtOrNull(i)?.let(::Right) ?: it.let(::Left) },
+    getOrModify = { it.elementAtOrNull(i)?.right() ?: it.left() },
     set = { a -> { it.mapIndexed { index, aa -> if (index == i) a else aa }.k() } }
   )
 }

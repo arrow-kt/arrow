@@ -53,11 +53,11 @@ data class ListK<out A>(val list: List<A>) : ListKOf<A>, List<A> by list {
       if (!v.isEmpty()) {
         val head: Either<A, B> = v.first()
         when (head) {
-          is Either.Right<A, B> -> {
+          is Either.Right -> {
             buf += head.b
             go(buf, f, v.drop(1).k())
           }
-          is Either.Left<A, B> -> go(buf, f, (f(head.a).fix() + v.drop(1)).k())
+          is Either.Left -> go(buf, f, (f(head.a).fix() + v.drop(1)).k())
         }
       }
     }

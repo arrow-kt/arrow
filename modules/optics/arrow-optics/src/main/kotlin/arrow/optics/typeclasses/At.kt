@@ -103,15 +103,6 @@ interface At<S, I, A> {
   companion object {
 
     /**
-     * Get an [At] for an index [i] given an [Index].
-     *
-     * @param AT [At] instance to provide [Lens] for a structure [S] to focus in [A] at a given index [I].
-     * @param i index [I] to zoom into [S] and find focus [A]
-     * @return [Lens] with a focus in [A] that was found at index [I].
-     */
-    fun <S, I, A> at(AT: At<S, I, A>, i: I): Lens<S, A> = AT.at(i)
-
-    /**
      * Lift an instance of [At] using an [Iso].
      *
      * @param AT [At] that can provide [Lens] for a structure [U] with a focus in [A] with given index [I].

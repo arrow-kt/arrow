@@ -2,7 +2,7 @@
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
 [![Build Status](https://travis-ci.org/arrow-kt/arrow.svg?branch=master)](https://travis-ci.org/arrow-kt/arrow/)
-[![Kotlin version badge](https://img.shields.io/badge/kotlin-1.2.41-blue.svg)](http://kotlinlang.org/)
+[![Kotlin version badge](https://img.shields.io/badge/kotlin-1.2.51-blue.svg)](http://kotlinlang.org/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![codecov](https://codecov.io/gh/arrow-kt/arrow/branch/master/graph/badge.svg)](https://codecov.io/gh/arrow-kt/arrow)
 
@@ -70,7 +70,7 @@ Add the dependencies into the project's `build.gradle`
 
 ```groovy
 apply plugin: 'kotlin-kapt' //optional
-apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //optional
+apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //only for Android projects
 
 def arrow_version = "0.7.2"
 dependencies {
@@ -79,28 +79,6 @@ dependencies {
     ...
 }
 ```
-
-JVM projects:
-
-`gradle/generated-kotlin-sources.gradle`
-```groovy
-apply plugin: 'idea'
-
-idea {
-    module {
-        sourceDirs += files(
-            'build/generated/source/kapt/main',
-            'build/generated/source/kaptKotlin/main',
-            'build/tmp/kapt/main/kotlinGenerated')
-        generatedSourceDirs += files(
-            'build/generated/source/kapt/main',
-            'build/generated/source/kaptKotlin/main',
-            'build/tmp/kapt/main/kotlinGenerated')
-    }
-}
-```
-
-Android projects:
 
 `gradle/generated-kotlin-sources.gradle`
 ```groovy
