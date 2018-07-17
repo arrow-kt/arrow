@@ -2,6 +2,7 @@ package arrow.optics
 
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.fullName
+import arrow.optics.Optic.*
 import me.eugeniomarletti.kotlin.metadata.escapedClassName
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
@@ -96,41 +97,42 @@ sealed class Focus {
 }
 
 sealed class Optic {
+
+  object Lens : Optic() {
+    override fun toString() = "arrow.optics.Lens"
+  }
+
+  object Iso : Optic() {
+    override fun toString() = "arrow.optics.Iso"
+  }
+
+  object Optional : Optic() {
+    override fun toString() = "arrow.optics.Optional"
+  }
+
+  object Prism : Optic() {
+    override fun toString() = "arrow.optics.Prism"
+  }
+
+  object Getter : Optic() {
+    override fun toString() = "arrow.optics.Getter"
+  }
+
+  object Setter : Optic() {
+    override fun toString() = "arrow.optics.Setter"
+  }
+
+  object Traversal : Optic() {
+    override fun toString() = "arrow.optics.Traversal"
+  }
+
+  object Fold : Optic() {
+    override fun toString() = "arrow.optics.Fold"
+  }
+
   companion object {
     val values = listOf(Lens, Iso, Optional, Prism, Getter, Setter, Traversal, Fold)
   }
-}
-
-object Lens : Optic() {
-  override fun toString() = "arrow.optics.Lens"
-}
-
-object Iso : Optic() {
-  override fun toString() = "arrow.optics.Iso"
-}
-
-object Optional : Optic() {
-  override fun toString() = "arrow.optics.Optional"
-}
-
-object Prism : Optic() {
-  override fun toString() = "arrow.optics.Prism"
-}
-
-object Getter : Optic() {
-  override fun toString() = "arrow.optics.Getter"
-}
-
-object Setter : Optic() {
-  override fun toString() = "arrow.optics.Setter"
-}
-
-object Traversal : Optic() {
-  override fun toString() = "arrow.optics.Traversal"
-}
-
-object Fold : Optic() {
-  override fun toString() = "arrow.optics.Fold"
 }
 
 sealed class POptic {
@@ -143,33 +145,33 @@ sealed class POptic {
     PTraversal -> Traversal
   }
 
+  object PLens : POptic() {
+    override fun toString() = "arrow.optics.PLens"
+  }
+
+  object PIso : POptic() {
+    override fun toString() = "arrow.optics.PIso"
+  }
+
+  object POptional : POptic() {
+    override fun toString() = "arrow.optics.POptional"
+  }
+
+  object PPrism : POptic() {
+    override fun toString() = "arrow.optics.PPrism"
+  }
+
+  object PSetter : POptic() {
+    override fun toString() = "arrow.optics.PSetter"
+  }
+
+  object PTraversal : POptic() {
+    override fun toString() = "arrow.optics.PTraversal"
+  }
+
   companion object {
     val values = listOf(PLens, PIso, POptional, PPrism, PSetter, PTraversal)
   }
-}
-
-object PLens : POptic() {
-  override fun toString() = "arrow.optics.PLens"
-}
-
-object PIso : POptic() {
-  override fun toString() = "arrow.optics.PIso"
-}
-
-object POptional : POptic() {
-  override fun toString() = "arrow.optics.POptional"
-}
-
-object PPrism : POptic() {
-  override fun toString() = "arrow.optics.PPrism"
-}
-
-object PSetter : POptic() {
-  override fun toString() = "arrow.optics.PSetter"
-}
-
-object PTraversal : POptic() {
-  override fun toString() = "arrow.optics.PTraversal"
 }
 
 const val Tuple = "arrow.core.Tuple"

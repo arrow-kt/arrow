@@ -4,6 +4,7 @@ import arrow.common.utils.knownError
 import arrow.common.utils.removeBackticks
 import arrow.common.utils.simpleName
 import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
+import arrow.optics.Optic.*
 
 val AnnotatedType.isoSnippet
   get() = when (this) {

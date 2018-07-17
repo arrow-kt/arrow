@@ -3,6 +3,7 @@ package arrow.optics
 import arrow.common.utils.simpleName
 import arrow.common.utils.knownError
 import arrow.common.utils.removeBackticks
+import arrow.optics.Optic.*
 
 val AnnotatedType.prismSnippet
   get() = when (this) {

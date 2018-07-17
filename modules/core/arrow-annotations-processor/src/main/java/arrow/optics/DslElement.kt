@@ -1,6 +1,7 @@
 package arrow.optics
 
 import arrow.common.utils.removeBackticks
+import arrow.optics.Optic.*
 
 data class DslElement(
   val `package`: String,

@@ -2,6 +2,7 @@ package arrow.optics
 
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
+import arrow.optics.Optic.*
 
 val Element.otherClassTypeErrorMessage
   get() = """
@@ -52,7 +53,7 @@ val Element.isoTooBigErrorMessage
 val Element.dslErrorMessage
   get() = """
       |Cannot generate Optics DSL for $this
-      |                                ^
+      |                               ^
       |arrow.optics.OpticsTarget.DSL is an invalid @${opticsAnnotationClass.simpleName} argument for $this.
       |It is only valid for data classes and sealed classes or top level functions without parameters.
       """.trimMargin()
@@ -64,7 +65,7 @@ val ExecutableElement.dslFunctionParametersMessage
       |Top level Function annotated with @${opticsAnnotationClass.simpleName} cannot have any parameters.
       """.trimMargin()
 
-private val validOptics = (Optic.values.map(Optic::toString) + POptic.values.map(POptic::toString)).map { it.replace("arrow.optics.", "") }.joinToString()
+internal val validOptics = (Optic.values.map(Optic::toString) + POptic.values.map(POptic::toString)).map { it.replace("arrow.optics.", "") }.joinToString()
 
 val ExecutableElement.dslWrongOptic
   get() = """

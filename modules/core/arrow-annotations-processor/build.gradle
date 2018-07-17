@@ -27,4 +27,6 @@ dependencies {
     testCompile files(toolsJar)
 }
 
+test.dependsOn(':arrow-annotations-processor-test-models:kaptGenerateStubsKotlin')
+
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
