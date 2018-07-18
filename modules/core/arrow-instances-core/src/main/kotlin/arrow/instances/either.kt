@@ -39,9 +39,7 @@ interface EitherSemigroupInstance<L, R> : Semigroup<Either<L, R>> {
 interface EitherMonoidInstance<L, R> : EitherSemigroupInstance<L, R>, Monoid<Either<L, R>> {
   fun MO(): Monoid<R>
 
-  override fun SG(): Semigroup<R> {
-    return MO()
-  }
+  override fun SG(): Semigroup<R> = MO()
 
   override fun empty(): Either<L, R> = Right(MO().empty())
 }

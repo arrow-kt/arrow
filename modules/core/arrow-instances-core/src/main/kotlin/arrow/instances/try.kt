@@ -44,9 +44,7 @@ interface TrySemigroupInstance<A> : Semigroup<Try<A>> {
 interface TryMonoidInstance<A> : TrySemigroupInstance<A>, Monoid<Try<A>> {
   fun MO(): Monoid<A>
 
-  override fun SG(): Semigroup<A> {
-    return MO()
-  }
+  override fun SG(): Semigroup<A> = MO()
 
   override fun empty(): Try<A> = Success(MO().empty())
 }
