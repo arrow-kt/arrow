@@ -23,25 +23,34 @@ import arrow.instances.traverse as eitherTraverse
 @instance(Either::class)
 interface EitherSemigroupInstance<L, R> : Semigroup<Either<L, R>> {
 
-  fun SG(): Semigroup<R>
+  fun SGL(): Semigroup<L>
+  fun SGR(): Semigroup<R>
 
-  override fun Either<L, R>.combine(b: Either<L, R>): Either<L, R> =
-    when (this) {
-      is Either.Left -> this
-      is Either.Right -> { val x = this.b; when (b) {
-        is Either.Left -> b
-        is Either.Right -> Either.Right(SG().run { x.combine(b.b) })
+  override fun Either<L, R>.combine(b: Either<L, R>): Either<L, R> {
+    val a = this
+
+    return when (a) {
+      is Either.Left -> when (b) {
+        is Either.Left -> Either.Left(SGL().run { a.a.combine(b.a) })
+        is Either.Right -> a
       }
-    }}
+      is Either.Right -> when (b) {
+        is Either.Left -> b
+        is Either.Right -> Either.right(SGR().run { a.b.combine(b.b) })
+      }
+    }
+  }
 }
 
 @instance(Either::class)
 interface EitherMonoidInstance<L, R> : EitherSemigroupInstance<L, R>, Monoid<Either<L, R>> {
-  fun MO(): Monoid<R>
+  fun MOL(): Monoid<L>
+  fun MOR(): Monoid<R>
 
-  override fun SG(): Semigroup<R> = MO()
+  override fun SGL(): Semigroup<L> = MOL()
+  override fun SGR(): Semigroup<R> = MOR()
 
-  override fun empty(): Either<L, R> = Right(MO().empty())
+  override fun empty(): Either<L, R> = Right(MOR().empty())
 }
 
 @instance(Either::class)
