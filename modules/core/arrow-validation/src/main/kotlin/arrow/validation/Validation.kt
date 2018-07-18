@@ -2,7 +2,7 @@ package arrow.validation
 
 import arrow.core.Either
 
-class Validation<out E : Any>(vararg disjunctionSequence: Either<E, *>) {
+class Validation<out E>(vararg disjunctionSequence: Either<E, *>) {
 
   val failures: List<E> = disjunctionSequence.filter { it.isLeft() }.map { it.swap().get() }
 
@@ -10,7 +10,7 @@ class Validation<out E : Any>(vararg disjunctionSequence: Either<E, *>) {
 
 }
 
-fun <L : Any, R : Any, R1 : Any, R2 : Any> validate(
+fun <L, R, R1, R2> validate(
   p1: Either<L, R1>,
   p2: Either<L, R2>,
   ifValid: (R1, R2) -> R
@@ -23,7 +23,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any> validate(
   }
 }
 
-fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any> validate(
+fun <L, R, R1, R2, R3> validate(
   p1: Either<L, R1>,
   p2: Either<L, R2>,
   p3: Either<L, R3>,
@@ -37,7 +37,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any> validate(
   }
 }
 
-fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any> validate(
+fun <L, R, R1, R2, R3, R4> validate(
   p1: Either<L, R1>,
   p2: Either<L, R2>,
   p3: Either<L, R3>,
@@ -52,7 +52,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any> validate(
   }
 }
 
-fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any> validate(
+fun <L, R, R1, R2, R3, R4, R5> validate(
   p1: Either<L, R1>,
   p2: Either<L, R2>,
   p3: Either<L, R3>,
@@ -68,7 +68,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any> validat
   }
 }
 
-fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : Any> validate(
+fun <L, R, R1, R2, R3, R4, R5, R6> validate(
   p1: Either<L, R1>,
   p2: Either<L, R2>,
   p3: Either<L, R3>,
@@ -85,7 +85,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
   }
 }
 
-fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : Any, R7 : Any> validate(
+fun <L, R, R1, R2, R3, R4, R5, R6, R7> validate(
   p1: Either<L, R1>,
   p2: Either<L, R2>,
   p3: Either<L, R3>,
@@ -103,7 +103,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
   }
 }
 
-fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : Any, R7 : Any, R8 : Any> validate(
+fun <L, R, R1, R2, R3, R4, R5, R6, R7, R8> validate(
   p1: Either<L, R1>,
   p2: Either<L, R2>,
   p3: Either<L, R3>,
@@ -122,7 +122,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
   }
 }
 
-fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : Any, R7 : Any, R8 : Any, R9 : Any> validate(
+fun <L, R, R1, R2, R3, R4, R5, R6, R7, R8, R9> validate(
   p1: Either<L, R1>,
   p2: Either<L, R2>,
   p3: Either<L, R3>,
@@ -142,7 +142,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
   }
 }
 
-fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : Any, R7 : Any, R8 : Any, R9 : Any, R10 : Any> validate(
+fun <L, R, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10> validate(
   p1: Either<L, R1>,
   p2: Either<L, R2>,
   p3: Either<L, R3>,
@@ -163,7 +163,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
   }
 }
 
-fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : Any, R7 : Any, R8 : Any, R9 : Any, R10 : Any, R11 : Any> validate(
+fun <L, R, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11> validate(
   p1: Either<L, R1>,
   p2: Either<L, R2>,
   p3: Either<L, R3>,
@@ -185,7 +185,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
   }
 }
 
-fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : Any, R7 : Any, R8 : Any, R9 : Any, R10 : Any, R11 : Any, R12 : Any> validate(
+fun <L, R, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12> validate(
   p1: Either<L, R1>,
   p2: Either<L, R2>,
   p3: Either<L, R3>,
@@ -208,7 +208,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
   }
 }
 
-fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : Any, R7 : Any, R8 : Any, R9 : Any, R10 : Any, R11 : Any, R12 : Any, R13 : Any> validate(
+fun <L, R, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13> validate(
   p1: Either<L, R1>,
   p2: Either<L, R2>,
   p3: Either<L, R3>,
@@ -232,7 +232,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
   }
 }
 
-fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : Any, R7 : Any, R8 : Any, R9 : Any, R10 : Any, R11 : Any, R12 : Any, R13 : Any, R14 : Any> validate(
+fun <L, R, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14> validate(
   p1: Either<L, R1>,
   p2: Either<L, R2>,
   p3: Either<L, R3>,
@@ -257,7 +257,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
   }
 }
 
-fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : Any, R7 : Any, R8 : Any, R9 : Any, R10 : Any, R11 : Any, R12 : Any, R13 : Any, R14 : Any, R15 : Any> validate(
+fun <L, R, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15> validate(
   p1: Either<L, R1>,
   p2: Either<L, R2>,
   p3: Either<L, R3>,
@@ -283,7 +283,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
   }
 }
 
-fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : Any, R7 : Any, R8 : Any, R9 : Any, R10 : Any, R11 : Any, R12 : Any, R13 : Any, R14 : Any, R15 : Any, R16 : Any> validate(
+fun <L, R, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16> validate(
   p1: Either<L, R1>,
   p2: Either<L, R2>,
   p3: Either<L, R3>,
@@ -310,7 +310,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
   }
 }
 
-fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : Any, R7 : Any, R8 : Any, R9 : Any, R10 : Any, R11 : Any, R12 : Any, R13 : Any, R14 : Any, R15 : Any, R16 : Any, R17 : Any> validate(
+fun <L, R, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17> validate(
   p1: Either<L, R1>,
   p2: Either<L, R2>,
   p3: Either<L, R3>,
@@ -338,7 +338,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
   }
 }
 
-fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : Any, R7 : Any, R8 : Any, R9 : Any, R10 : Any, R11 : Any, R12 : Any, R13 : Any, R14 : Any, R15 : Any, R16 : Any, R17 : Any, R18 : Any> validate(
+fun <L, R, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17, R18> validate(
   p1: Either<L, R1>,
   p2: Either<L, R2>,
   p3: Either<L, R3>,
@@ -367,7 +367,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
   }
 }
 
-fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : Any, R7 : Any, R8 : Any, R9 : Any, R10 : Any, R11 : Any, R12 : Any, R13 : Any, R14 : Any, R15 : Any, R16 : Any, R17 : Any, R18 : Any, R19 : Any> validate(
+fun <L, R, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17, R18, R19> validate(
   p1: Either<L, R1>,
   p2: Either<L, R2>,
   p3: Either<L, R3>,
@@ -397,7 +397,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
   }
 }
 
-fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : Any, R7 : Any, R8 : Any, R9 : Any, R10 : Any, R11 : Any, R12 : Any, R13 : Any, R14 : Any, R15 : Any, R16 : Any, R17 : Any, R18 : Any, R19 : Any, R20 : Any> validate(
+fun <L, R, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17, R18, R19, R20> validate(
   p1: Either<L, R1>,
   p2: Either<L, R2>,
   p3: Either<L, R3>,
@@ -428,7 +428,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
   }
 }
 
-fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : Any, R7 : Any, R8 : Any, R9 : Any, R10 : Any, R11 : Any, R12 : Any, R13 : Any, R14 : Any, R15 : Any, R16 : Any, R17 : Any, R18 : Any, R19 : Any, R20 : Any, R21 : Any> validate(
+fun <L, R, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17, R18, R19, R20, R21> validate(
   p1: Either<L, R1>,
   p2: Either<L, R2>,
   p3: Either<L, R3>,
@@ -460,7 +460,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
   }
 }
 
-fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : Any, R7 : Any, R8 : Any, R9 : Any, R10 : Any, R11 : Any, R12 : Any, R13 : Any, R14 : Any, R15 : Any, R16 : Any, R17 : Any, R18 : Any, R19 : Any, R20 : Any, R21 : Any, R22 : Any> validate(
+fun <L, R, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17, R18, R19, R20, R21, R22> validate(
   p1: Either<L, R1>,
   p2: Either<L, R2>,
   p3: Either<L, R3>,
