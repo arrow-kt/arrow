@@ -25,19 +25,21 @@ import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.instances.traverse as tryTraverse
 
+fun <A> Try<A>.combine(SG: Semigroup<A>, b: Try<A>): Try<A> =
+  when (this) {
+    is Success<A> -> when (b) {
+      is Success<A> -> Success(SG.run { value.combine(b.value) })
+      is Failure -> this
+    }
+    is Failure -> b
+  }
+
 @instance(Try::class)
 interface TrySemigroupInstance<A> : Semigroup<Try<A>> {
 
   fun SG(): Semigroup<A>
 
-  override fun Try<A>.combine(b: Try<A>): Try<A> =
-    when (this) {
-      is Success<A> -> when (b) {
-        is Success<A> -> Success(SG().run { value.combine(b.value) })
-        is Failure -> this
-      }
-      is Failure -> b
-    }
+  override fun Try<A>.combine(b: Try<A>): Try<A> = fix().combine(SG(), b)
 }
 
 @instance(Try::class)

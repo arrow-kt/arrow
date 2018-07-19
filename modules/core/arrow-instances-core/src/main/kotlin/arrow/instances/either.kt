@@ -20,26 +20,28 @@ import arrow.core.combineK as eitherCombineK
 import arrow.core.flatMap as eitherFlatMap
 import arrow.instances.traverse as eitherTraverse
 
+fun <L, R> Either<L, R>.combine(SGL: Semigroup<L>, SGR: Semigroup<R>, b: Either<L, R>): Either<L, R> {
+  val a = this
+
+  return when (a) {
+    is Either.Left -> when (b) {
+      is Either.Left -> Either.Left(SGL.run { a.a.combine(b.a) })
+      is Either.Right -> a
+    }
+    is Either.Right -> when (b) {
+      is Either.Left -> b
+      is Either.Right -> Either.right(SGR.run { a.b.combine(b.b) })
+    }
+  }
+}
+
 @instance(Either::class)
 interface EitherSemigroupInstance<L, R> : Semigroup<Either<L, R>> {
 
   fun SGL(): Semigroup<L>
   fun SGR(): Semigroup<R>
 
-  override fun Either<L, R>.combine(b: Either<L, R>): Either<L, R> {
-    val a = this
-
-    return when (a) {
-      is Either.Left -> when (b) {
-        is Either.Left -> Either.Left(SGL().run { a.a.combine(b.a) })
-        is Either.Right -> a
-      }
-      is Either.Right -> when (b) {
-        is Either.Left -> b
-        is Either.Right -> Either.right(SGR().run { a.b.combine(b.b) })
-      }
-    }
-  }
+  override fun Either<L, R>.combine(b: Either<L, R>): Either<L, R> = fix().combine(SGL(), SGR(), b)
 }
 
 @instance(Either::class)
