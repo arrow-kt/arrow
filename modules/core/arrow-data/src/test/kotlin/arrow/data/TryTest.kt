@@ -313,11 +313,6 @@ class TryTest : UnitSpec() {
       (failure.toOption().isEmpty()) shouldBe true
     }
 
-    "toDisjunction" {
-      (success.toDisjunction().isRight()) shouldBe true
-      (failure.toDisjunction().isLeft()) shouldBe true
-    }
-
     "failed" {
       success.failed().onSuccess { (it is UnsupportedOperationException) shouldBe true }
       failure.failed().onSuccess { (it is NumberFormatException) shouldBe true }
