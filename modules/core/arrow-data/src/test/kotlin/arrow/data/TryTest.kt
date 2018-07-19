@@ -1,16 +1,15 @@
 package arrow.data
 
 import arrow.core.*
+import arrow.instances.*
 import arrow.instances.eq
 import arrow.instances.extensions
 import arrow.test.UnitSpec
-import arrow.test.laws.EqLaws
-import arrow.test.laws.MonadErrorLaws
-import arrow.test.laws.ShowLaws
-import arrow.test.laws.TraverseLaws
+import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.*
+import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -25,11 +24,40 @@ class TryTest : UnitSpec() {
 
     ForTry extensions {
       testLaws(
+        SemigroupLaws.laws(Try.semigroup(Int.semigroup()), Try.just(1), Try.just(2), Try.just(3), EQ),
+        MonoidLaws.laws(Try.monoid(MO = Int.monoid()), Try.just(1), EQ),
         EqLaws.laws(EQ) { Try.just(it) },
         ShowLaws.laws(Try.show(), EQ) { Try.just(it) },
         MonadErrorLaws.laws(this, Eq.any(), Eq.any()),
         TraverseLaws.laws(this, this, ::Success, Eq.any())
       )
+    }
+
+    "empty should return a Success of the empty of the inner type" {
+      forAll { a: String ->
+        Success(String.monoid().run { empty() }) == Try.monoid(String.monoid()).run { empty() }
+      }
+    }
+
+    "combine two Successes should return a Success of the combine of the inners" {
+      forAll { a: String, b: String ->
+        String.monoid().run { Try.just(a.combine(b)) } == Try.just(a).combine(String.monoid(), Try.just(b))
+      }
+    }
+
+    "combine two Failures should return the second failure" {
+      val throwable1 = Exception("foo")
+      val throwable2 = Exception("foo")
+
+      Try.raise<String>(throwable2) == Try.raise<String>(throwable1).combine(String.monoid(), Try.raise(throwable2))
+    }
+
+    "combine a Success and a Failure should return Failure" {
+      val throwable = Exception("foo")
+      val string = "String"
+
+      Try.raise<String>(throwable) == Try.raise<String>(throwable).combine(String.monoid(), Try.just(string))
+      Try.raise<String>(throwable) == Try.just(string).combine(String.monoid(), Try.raise(throwable))
     }
 
     "invoke of any should be success" {
