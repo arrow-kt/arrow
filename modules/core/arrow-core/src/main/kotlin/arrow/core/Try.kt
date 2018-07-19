@@ -1,7 +1,6 @@
 package arrow.core
 
 import arrow.higherkind
-import arrow.legacy.Disjunction
 
 typealias Failure<A> = Try.Failure<A>
 typealias Success<A> = Try.Success<A>
@@ -126,9 +125,6 @@ sealed class Try<out A> : TryOf<A> {
   fun toOption(): Option<A> = fold({ None }, { Some(it) })
 
   fun toEither(): Either<Throwable, A> = fold({ Left(it) }, { Right(it) })
-
-  @Deprecated("arrow.data.Either is already right biased. This function will be removed in future releases", ReplaceWith("toEither()"))
-  fun toDisjunction(): Disjunction<Throwable, A> = toEither().toDisjunction()
 
   fun <B> foldLeft(initial: B, operation: (B, A) -> B): B = this.fix().fold({ initial }, { operation(initial, it) })
 
