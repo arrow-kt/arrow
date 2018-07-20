@@ -1,8 +1,6 @@
 package arrow.instances
 
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Order
-import arrow.typeclasses.Show
+import arrow.typeclasses.*
 
 interface CharShowInstance : Show<Char> {
   override fun Char.show(): String =
@@ -11,6 +9,10 @@ interface CharShowInstance : Show<Char> {
 
 interface CharEqInstance : Eq<Char> {
   override fun Char.eqv(b: Char): Boolean = this == b
+}
+
+interface CharSemigroupInstance : Semigroup<Char> {
+  override fun Char.combine(b: Char): Char = this + b
 }
 
 interface CharOrderInstance : Order<Char> {

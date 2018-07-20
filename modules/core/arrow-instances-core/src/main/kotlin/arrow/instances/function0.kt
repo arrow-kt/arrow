@@ -12,6 +12,17 @@ interface Function0FunctorInstance : Functor<ForFunction0> {
 }
 
 @instance(Function0::class)
+interface Function0SemigroupInstance<O> : Semigroup<Function0<O>> {
+  fun SG(): Semigroup<O>
+
+  override fun Function0<O>.combine(b: Function0<O>): Function0<O> {
+    val f1 = this
+
+    return Function0 { SG().run { f1().combine(b()) } }
+  }
+}
+
+@instance(Function0::class)
 interface Function0ApplicativeInstance : Applicative<ForFunction0> {
   override fun <A, B> Kind<ForFunction0, A>.ap(ff: Kind<ForFunction0, (A) -> B>): Function0<B> =
     fix().ap(ff)

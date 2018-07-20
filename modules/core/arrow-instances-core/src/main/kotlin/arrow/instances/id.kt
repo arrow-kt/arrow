@@ -21,6 +21,24 @@ interface IdShowInstance<A> : Show<Id<A>> {
     toString()
 }
 
+fun <A> Id<A>.combine(SG: Semigroup<A>, b: Id<A>): Id<A> = SG.run { value.combine(b.value) }.let { Id.just(it) }
+
+@instance(Id::class)
+interface IdSemigroupInstance<A> : Semigroup<Id<A>> {
+  fun SG(): Semigroup<A>
+
+  override fun Id<A>.combine(b: Id<A>): Id<A> = fix().combine(SG(), b)
+}
+
+@instance(Id::class)
+interface IdMonoidInstance<A> : IdSemigroupInstance<A>, Monoid<Id<A>> {
+  fun MO(): Monoid<A>
+
+  override fun SG(): Semigroup<A> = MO()
+
+  override fun empty(): Id<A> = MO().run { Id.just(empty()) }
+}
+
 @instance(Id::class)
 interface IdFunctorInstance : Functor<ForId> {
   override fun <A, B> Kind<ForId, A>.map(f: (A) -> B): Id<B> =

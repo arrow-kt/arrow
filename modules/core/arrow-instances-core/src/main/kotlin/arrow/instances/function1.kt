@@ -6,6 +6,14 @@ import arrow.instance
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.Semigroup
+
+@instance(Function1::class)
+interface Function1SemigroupInstance<I, O> : Semigroup<Function1<I, O>> {
+  fun SG(): Semigroup<O>
+
+  override fun Function1<I, O>.combine(b: Function1<I, O>): Function1<I, O> = Function1 { i: I -> SG().run { f(i).combine(b.f(i)) } }
+}
 
 @instance(Function1::class)
 interface Function1FunctorInstance<I> : Functor<Function1PartialOf<I>> {
