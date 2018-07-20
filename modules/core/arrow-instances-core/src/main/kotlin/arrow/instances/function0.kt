@@ -23,6 +23,14 @@ interface Function0SemigroupInstance<O> : Semigroup<Function0<O>> {
 }
 
 @instance(Function0::class)
+interface Function0MonoidInstance<O> : Function0SemigroupInstance<O>, Monoid<Function0<O>> {
+  fun MO(): Monoid<O>
+
+  override fun SG(): Semigroup<O> = MO()
+  override fun empty(): Function0<O> = Function0 { MO().empty() }
+}
+
+@instance(Function0::class)
 interface Function0ApplicativeInstance : Applicative<ForFunction0> {
   override fun <A, B> Kind<ForFunction0, A>.ap(ff: Kind<ForFunction0, (A) -> B>): Function0<B> =
     fix().ap(ff)

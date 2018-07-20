@@ -3,16 +3,22 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.*
 import arrow.instance
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.Semigroup
+import arrow.typeclasses.*
 
 @instance(Function1::class)
 interface Function1SemigroupInstance<I, O> : Semigroup<Function1<I, O>> {
   fun SG(): Semigroup<O>
 
   override fun Function1<I, O>.combine(b: Function1<I, O>): Function1<I, O> = Function1 { i: I -> SG().run { f(i).combine(b.f(i)) } }
+}
+
+@instance(Function1::class)
+interface Function1MonoidInstance<I, O> : Function1SemigroupInstance<I, O>, Monoid<Function1<I, O>> {
+  fun MO(): Monoid<O>
+
+  override fun SG(): Semigroup<O> = MO()
+
+  override fun empty(): Function1<I, O> = Function1 { MO().empty() }
 }
 
 @instance(Function1::class)
