@@ -260,6 +260,7 @@ class IOTest : UnitSpec() {
         IO.parMapN(newSingleThreadContext("all"), makePar(6), makePar(3), makePar(2), makePar(4), makePar(1), makePar(5))
         { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
           .unsafeRunSync()
+
       result shouldBe listOf(6L, 3, 2, 4, 1, 5)
       order.toList() shouldBe listOf(1L, 2, 3, 4, 5, 6)
     }
@@ -284,6 +285,7 @@ class IOTest : UnitSpec() {
         IO.parMapN(newSingleThreadContext("all"), makePar(6), IO.just(1L).order(), makePar(4), IO.defer { IO.just(2L) }.order(), makePar(5), IO { 3L }.order())
         { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
           .unsafeRunSync()
+
       result shouldBe listOf(6L, 1, 4, 2, 5, 3)
       order.toList() shouldBe listOf(1L, 2, 3, 4, 5, 6)
     }
@@ -301,6 +303,7 @@ class IOTest : UnitSpec() {
         { _, _, _, _, _, _ ->
           Thread.currentThread().name
         }.unsafeRunSync()
+
       result shouldBe "all"
     }
 
