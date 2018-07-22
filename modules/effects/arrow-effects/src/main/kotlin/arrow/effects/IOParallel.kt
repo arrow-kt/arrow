@@ -20,9 +20,9 @@ fun <A, B, C, D, E> IO.Companion.parMapN(ctx: CoroutineContext, ioA: IO<A>, ioB:
 
 fun <A, B, C, D, E, F> IO.Companion.parMapN(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, ioD: IO<D>, ioE: IO<E>, f: (A, B, C, D, E) -> F): IO<F> =
   parMapN(ctx,
-    parMapN(ctx, ioA, ioB, ::Tuple2),
-    parMapN(ctx, ioC, ioD, ioE, ::Tuple3),
-    { ab, cde -> f(ab.a, ab.b, cde.a, cde.b, cde.c) })
+    parMapN(ctx, ioA, ioB, ioC, ::Tuple3),
+    parMapN(ctx, ioD, ioE, ::Tuple2),
+    { abc, de -> f(abc.a, abc.b, abc.c, de.a, de.b) })
 
 fun <A, B, C, D, E, F, G> IO.Companion.parMapN(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, ioD: IO<D>, ioE: IO<E>, ioF: IO<F>, f: (A, B, C, D, E, F) -> G): IO<G> =
   parMapN(ctx,
