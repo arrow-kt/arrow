@@ -5,10 +5,15 @@ import arrow.core.Either.Left
 import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
+import arrow.effects.internal.asyncIOContinuation
+import arrow.effects.internal.parContinuation
 import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
+import kotlin.coroutines.experimental.Continuation
 import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.experimental.startCoroutine
+import kotlin.coroutines.experimental.suspendCoroutine
 
 @higherkind
 sealed class IO<out A> : IOOf<A> {
@@ -55,6 +60,52 @@ sealed class IO<out A> : IOOf<A> {
           is Either.Right -> IO.just(it.b)
         }
       }
+
+    fun <A, B, C> parMap(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, f: (A, B) -> C): IO<C> =
+      IO.async { cc ->
+        val a: suspend () -> Either<A, B> = {
+          suspendCoroutine { ca: Continuation<Either<A, B>> ->
+            ioA.map(::Left).unsafeRunAsync {
+              it.fold(ca::resumeWithException, ca::resume)
+            }
+          }
+        }
+        val b: suspend () -> Either<A, B> = {
+          suspendCoroutine { ca: Continuation<Either<A, B>> ->
+            ioB.map(::Right).unsafeRunAsync {
+              it.fold(ca::resumeWithException, ca::resume)
+            }
+          }
+        }
+        val parCont = parContinuation(ctx, f, asyncIOContinuation(ctx, cc))
+        a.startCoroutine(parCont)
+        b.startCoroutine(parCont)
+      }
+
+    fun <A, B, C, D> parMap3(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, f: (A, B, C) -> D): IO<D> =
+      parMap(ctx, ioA,
+        parMap(ctx, ioB, ioC, { b, c -> b toT c }),
+        { a, bc -> f(a, bc.a, bc.b) })
+
+    fun <A, B, C, D, E> parMap4(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, ioD: IO<D>, f: (A, B, C, D) -> E): IO<E> =
+      parMap(ctx,
+        parMap(ctx, ioA, ioB, { a, b -> a toT b }),
+        parMap(ctx, ioC, ioD, { c, d -> c toT d }),
+        { ab, cd -> f(ab.a, ab.b, cd.a, cd.b) })
+
+    fun <A, B, C, D, E, F> parMap5(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, ioD: IO<D>, ioE: IO<E>, f: (A, B, C, D, E) -> F): IO<F> =
+      parMap(ctx,
+        parMap4(ctx, ioA, ioB, ioC, ioD,
+          { a, b, c, d -> Tuple4(a, b, c, d) }),
+        ioE,
+        { abcd, e -> f(abcd.a, abcd.b, abcd.c, abcd.d, e) })
+
+    fun <A, B, C, D, E, F, G> parMap6(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, ioD: IO<D>, ioE: IO<E>, ioF: IO<F>, f: (A, B, C, D, E, F) -> G): IO<G> =
+      parMap3(ctx,
+        parMap(ctx, ioA, ioB, { a, b -> a toT b }),
+        parMap(ctx, ioC, ioD, { c, d -> c toT d }),
+        parMap(ctx, ioE, ioF, { e, ff -> e toT ff }),
+        { ab, cd, ef -> f(ab.a, ab.b, cd.a, cd.b, ef.a, ef.b) })
   }
 
   abstract fun <B> map(f: (A) -> B): IO<B>
