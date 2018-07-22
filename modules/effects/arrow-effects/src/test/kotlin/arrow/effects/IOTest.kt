@@ -247,18 +247,13 @@ class IOTest : UnitSpec() {
       val order = mutableListOf<Long>()
 
       fun makePar(num: Long) =
-        IO.async<Long> { cc ->
-          IO.unit.continueOn(newSingleThreadContext("$num"))
-            // Sleep according to my number
-            .map {
-              Thread.sleep(num * 20)
-              it
-            }
-            // Add myself to order list
-            .map {
-              order.add(num)
-              num
-            }.unsafeRunAsync(cc)
+        IO.async(newSingleThreadContext("$num")) {
+          // Sleep according to my number
+          Thread.sleep(num * 20)
+        }.map {
+          // Add myself to order list
+          order.add(num)
+          num
         }
 
       val result =
@@ -267,6 +262,46 @@ class IOTest : UnitSpec() {
           .unsafeRunSync()
       result shouldBe listOf(6L, 3, 2, 4, 1, 5)
       order.toList() shouldBe listOf(1L, 2, 3, 4, 5, 6)
+    }
+
+    "parallel execution preserves order for synchronous IOs" {
+      val order = mutableListOf<Long>()
+
+      fun IO<Long>.order() =
+        map {
+          order.add(it)
+          it
+        }
+
+      fun makePar(num: Long) =
+        IO.async(newSingleThreadContext("$num")) {
+          // Sleep according to my number
+          Thread.sleep(num * 20)
+          num
+        }.order()
+
+      val result =
+        IO.parMapN(newSingleThreadContext("all"), makePar(6), IO.just(1L).order(), makePar(4), IO.defer { IO.just(2L) }.order(), makePar(5), IO { 3L }.order())
+        { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
+          .unsafeRunSync()
+      result shouldBe listOf(6L, 1, 4, 2, 5, 3)
+      order.toList() shouldBe listOf(1L, 2, 3, 4, 5, 6)
+    }
+
+    "parallel mapping is done in the expected CoroutineContext" {
+      fun makePar(num: Long) =
+        IO.async(newSingleThreadContext("$num")) {
+          // Sleep according to my number
+          Thread.sleep(num * 20)
+          num
+        }
+
+      val result =
+        IO.parMapN(newSingleThreadContext("all"), makePar(6), IO.just(1L), makePar(4), IO.defer { IO.just(2L) }, makePar(5), IO { 3L })
+        { _, _, _, _, _, _ ->
+          Thread.currentThread().name
+        }.unsafeRunSync()
+      result shouldBe "all"
     }
 
     "IO.binding should for comprehend over IO" {
