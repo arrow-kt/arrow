@@ -2,6 +2,7 @@
 layout: docs
 title: StateT
 permalink: /docs/datatypes/statet/
+video: 1MJBXKaq0Hc
 ---
 
 ## StateT
