@@ -4,8 +4,8 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.effects.IO
 import arrow.effects.typeclasses.Duration
+import arrow.effects.IO
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
