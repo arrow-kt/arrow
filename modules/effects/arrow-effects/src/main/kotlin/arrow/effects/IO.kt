@@ -5,8 +5,10 @@ import arrow.core.Either.Left
 import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
+import arrow.effects.internal.Treither
 import arrow.effects.internal.asyncIOContinuation
 import arrow.effects.internal.parContinuation
+import arrow.effects.internal.triContinuation
 import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
@@ -83,9 +85,33 @@ sealed class IO<out A> : IOOf<A> {
       }
 
     fun <A, B, C, D> parMap3(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, f: (A, B, C) -> D): IO<D> =
-      parMap(ctx, ioA,
-        parMap(ctx, ioB, ioC, { b, c -> b toT c }),
-        { a, bc -> f(a, bc.a, bc.b) })
+      IO.async { cc ->
+        val a: suspend () -> Treither<A, B, C> = {
+          suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
+            ioA.map { Treither.Left<A, B, C>(it) }.unsafeRunAsync {
+              it.fold(ca::resumeWithException, ca::resume)
+            }
+          }
+        }
+        val b: suspend () -> Treither<A, B, C> = {
+          suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
+            ioB.map { Treither.Middle<A, B, C>(it) }.unsafeRunAsync {
+              it.fold(ca::resumeWithException, ca::resume)
+            }
+          }
+        }
+        val c: suspend () -> Treither<A, B, C> = {
+          suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
+            ioC.map { Treither.Right<A, B, C>(it) }.unsafeRunAsync {
+              it.fold(ca::resumeWithException, ca::resume)
+            }
+          }
+        }
+        val triCont = triContinuation(ctx, f, asyncIOContinuation(ctx, cc))
+        a.startCoroutine(triCont)
+        b.startCoroutine(triCont)
+        c.startCoroutine(triCont)
+      }
 
     fun <A, B, C, D, E> parMap4(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, ioD: IO<D>, f: (A, B, C, D) -> E): IO<E> =
       parMap(ctx,
@@ -95,10 +121,9 @@ sealed class IO<out A> : IOOf<A> {
 
     fun <A, B, C, D, E, F> parMap5(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, ioD: IO<D>, ioE: IO<E>, f: (A, B, C, D, E) -> F): IO<F> =
       parMap(ctx,
-        parMap4(ctx, ioA, ioB, ioC, ioD,
-          { a, b, c, d -> Tuple4(a, b, c, d) }),
-        ioE,
-        { abcd, e -> f(abcd.a, abcd.b, abcd.c, abcd.d, e) })
+        parMap(ctx, ioA, ioB, { a, b -> a toT b }),
+        parMap3(ctx, ioC, ioD, ioE, { c, d, e -> Tuple3(c, d, e) }),
+        { ab, cde -> f(ab.a, ab.b, cde.a, cde.b, cde.c) })
 
     fun <A, B, C, D, E, F, G> parMap6(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, ioD: IO<D>, ioE: IO<E>, ioF: IO<F>, f: (A, B, C, D, E, F) -> G): IO<G> =
       parMap3(ctx,
