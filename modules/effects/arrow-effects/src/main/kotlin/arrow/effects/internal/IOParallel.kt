@@ -10,6 +10,7 @@ import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.startCoroutine
 import kotlin.coroutines.experimental.suspendCoroutine
 
+/* See par3 */
 internal fun <A, B, C> par2(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, f: (A, B) -> C, cc: (Either<Throwable, C>) -> Unit) {
   val a: suspend () -> Either<A, B> = {
     suspendCoroutine { ca: Continuation<Either<A, B>> ->
