@@ -1,9 +1,6 @@
 package arrow.effects.internal
 
-import arrow.core.Either
-import arrow.core.Tuple3
-import arrow.core.left
-import arrow.core.right
+import arrow.core.*
 import arrow.effects.IO
 import arrow.effects.typeclasses.Proc
 import kotlin.coroutines.experimental.Continuation
@@ -68,30 +65,23 @@ private fun <A, B, C> parContinuation(ctx: CoroutineContext, f: (A, B) -> C, cc:
   object : Continuation<Either<A, B>> {
     override val context: CoroutineContext = ctx
 
-    var intermediate: Either<A, B>? = null
+    var intermediate: Tuple2<A?, B?> = null toT null
 
     override fun resume(value: Either<A, B>) =
       synchronized(this) {
-        val result = intermediate
-        if (null == result) {
-          intermediate = value
-        } else {
-          value.fold({ a ->
-            result.fold({
-              // Resumed twice on the same side, updating
-              intermediate = value
-            }, { b ->
-              cc.resume(f(a, b))
-            })
-          }, { b ->
-            result.fold({ a ->
-              cc.resume(f(a, b))
-            }, {
-              // Resumed twice on the same side, updating
-              intermediate = value
-            })
-          })
-        }
+        val resA = intermediate.a
+        val resB = intermediate.b
+        value.fold({ a ->
+          intermediate = a toT resB
+          if (resB != null) {
+            cc.resume(f(a, resB))
+          }
+        }, { b ->
+          intermediate = resA toT b
+          if (resA != null) {
+            cc.resume(f(resA, b))
+          }
+        })
       }
 
     override fun resumeWithException(exception: Throwable) {
@@ -111,22 +101,19 @@ private fun <A, B, C, D> triContinuation(ctx: CoroutineContext, f: (A, B, C) -> 
         val resB = intermediate.b
         val resC = intermediate.c
         value.fold({ a ->
+          intermediate = Tuple3(a, resB, resC)
           if (resB != null && resC != null) {
             cc.resume(f(a, resB, resC))
-          } else {
-            intermediate = Tuple3(a, resB, resC)
           }
         }, { b ->
+          intermediate = Tuple3(resA, b, resC)
           if (resA != null && resC != null) {
             cc.resume(f(resA, b, resC))
-          } else {
-            intermediate = Tuple3(resA, b, resC)
           }
         }, { c ->
+          intermediate = Tuple3(resA, resB, c)
           if (resA != null && resB != null) {
             cc.resume(f(resA, resB, c))
-          } else {
-            intermediate = Tuple3(resA, resB, c)
           }
         })
       }
