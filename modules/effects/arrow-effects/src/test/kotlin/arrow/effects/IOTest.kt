@@ -257,7 +257,7 @@ class IOTest : UnitSpec() {
         }
 
       val result =
-        IO.parMapN(newSingleThreadContext("all"), makePar(6), makePar(3), makePar(2), makePar(4), makePar(1), makePar(5))
+        IO.parallelMapN(newSingleThreadContext("all"), makePar(6), makePar(3), makePar(2), makePar(4), makePar(1), makePar(5))
         { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
           .unsafeRunSync()
 
@@ -282,7 +282,7 @@ class IOTest : UnitSpec() {
         }.order()
 
       val result =
-        IO.parMapN(newSingleThreadContext("all"), makePar(6), IO.just(1L).order(), makePar(4), IO.defer { IO.just(2L) }.order(), makePar(5), IO { 3L }.order())
+        IO.parallelMapN(newSingleThreadContext("all"), makePar(6), IO.just(1L).order(), makePar(4), IO.defer { IO.just(2L) }.order(), makePar(5), IO { 3L }.order())
         { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
           .unsafeRunSync()
 
@@ -299,7 +299,7 @@ class IOTest : UnitSpec() {
         }
 
       val result =
-        IO.parMapN(newSingleThreadContext("all"), makePar(6), IO.just(1L), makePar(4), IO.defer { IO.just(2L) }, makePar(5), IO { 3L })
+        IO.parallelMapN(newSingleThreadContext("all"), makePar(6), IO.just(1L), makePar(4), IO.defer { IO.just(2L) }, makePar(5), IO { 3L })
         { _, _, _, _, _, _ ->
           Thread.currentThread().name
         }.unsafeRunSync()
@@ -309,7 +309,7 @@ class IOTest : UnitSpec() {
 
     "parallel IO#defer, IO#suspend and IO#async are run in the expected CoroutineContext" {
       val result =
-        IO.parMapN(newSingleThreadContext("here"),
+        IO.parallelMapN(newSingleThreadContext("here"),
           IO { Thread.currentThread().name }, IO.defer { IO.just(Thread.currentThread().name) }, IO.async<String> { it(Thread.currentThread().name.right()) },
           ::Tuple3)
           .unsafeRunSync()
