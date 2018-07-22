@@ -25,6 +25,7 @@ class IOTest : UnitSpec() {
   private fun makePar(num: Int) =
     IO.async<Int> { cc ->
       IO.unit.continueOn(newSingleThreadContext("$num"))
+        .map(::hey)
         .map {
           val delay = (Math.random() * 100).toLong()
           Thread.sleep(delay)
@@ -36,11 +37,16 @@ class IOTest : UnitSpec() {
         }.unsafeRunAsync(cc)
     }
 
-  private fun <A> hey(a: A): A { println("I am $a in ${Thread.currentThread().name}"); return a }
+  private fun <A> hey(a: A): A {
+    println("I am $a in ${Thread.currentThread().name}"); return a
+  }
 
   init {
     "test parallel" {
-      IO.parMap5(newSingleThreadContext("all"), IO.just(0).map(::hey) , IO { 1 }.map(::hey), makePar(2), makePar(3), makePar(4))
+      IO.parMap5(newSingleThreadContext("all"), IO.just(50).map(::hey), IO {
+        Thread.sleep(101)
+        1
+      }.map(::hey), makePar(3), makePar(4), IO.just(0).map(::hey))
       { _, _, _, _, _ ->
         hey(-1)
         100

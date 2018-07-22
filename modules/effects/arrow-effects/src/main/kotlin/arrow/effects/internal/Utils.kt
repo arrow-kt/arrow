@@ -1,13 +1,14 @@
 package arrow.effects.internal
 
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
 import arrow.effects.IO
 import arrow.effects.typeclasses.Duration
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
-import kotlin.coroutines.experimental.Continuation
-import kotlin.coroutines.experimental.CoroutineContext
 
 object Platform {
 
@@ -74,110 +75,5 @@ private class OneShotLatch : AbstractQueuedSynchronizer() {
   override fun tryReleaseShared(ignore: Int): Boolean {
     state = 1
     return true
-  }
-}
-
-internal fun <A, B, C> parContinuation(ctx: CoroutineContext, f: (A, B) -> C, cc: Continuation<C>): Continuation<Either<A, B>> =
-  object : Continuation<Either<A, B>> {
-    override val context: CoroutineContext = ctx
-
-    var intermediate: Either<A, B>? = null
-
-    override fun resume(value: Either<A, B>) =
-      synchronized(this) {
-        val result = intermediate
-        if (null == result) {
-          intermediate = value
-        } else {
-          value.fold({ a ->
-            result.fold({
-              // Resumed twice on the same side, updating
-              intermediate = value
-            }, { b ->
-              cc.resume(f(a, b))
-            })
-          }, { b ->
-            result.fold({ a ->
-              cc.resume(f(a, b))
-            }, {
-              // Resumed twice on the same side, updating
-              intermediate = value
-            })
-          })
-        }
-      }
-
-    override fun resumeWithException(exception: Throwable) {
-      cc.resumeWithException(exception)
-    }
-  }
-
-internal fun <A, B, C, D> triContinuation(ctx: CoroutineContext, f: (A, B, C) -> D, cc: Continuation<D>): Continuation<Treither<A, B, C>> =
-  object : Continuation<Treither<A, B, C>> {
-    override val context: CoroutineContext = ctx
-
-    var intermediate: Tuple3<A?, B?, C?> = Tuple3(null, null, null)
-
-    override fun resume(value: Treither<A, B, C>) =
-      synchronized(this) {
-        val resA = intermediate.a
-        val resB = intermediate.b
-        val resC = intermediate.c
-        value.fold({ a ->
-          if (resB != null && resC != null) {
-            cc.resume(f(a, resB, resC))
-          } else {
-            intermediate = Tuple3(a, resB, resC)
-          }
-        }, { b ->
-          if (resA != null && resC != null) {
-            cc.resume(f(resA, b, resC))
-          } else {
-            intermediate = Tuple3(resA, b, resC)
-          }
-        }, { c ->
-          if (resA != null && resB != null) {
-            cc.resume(f(resA, resB, c))
-          } else {
-            intermediate = Tuple3(resA, resB, c)
-          }
-        })
-      }
-
-    override fun resumeWithException(exception: Throwable) {
-      cc.resumeWithException(exception)
-    }
-  }
-
-internal sealed class Treither<out A, out B, out C> {
-  data class Left<out A, out B, out C>(val a: A) : Treither<A, B, C>() {
-    override fun <D> fold(fa: (A) -> D, fb: (B) -> D, fc: (C) -> D) =
-      fa(a)
-  }
-
-  data class Middle<out A, out B, out C>(val b: B) : Treither<A, B, C>() {
-    override fun <D> fold(fa: (A) -> D, fb: (B) -> D, fc: (C) -> D) =
-      fb(b)
-  }
-
-  data class Right<out A, out B, out C>(val c: C) : Treither<A, B, C>() {
-    override fun <D> fold(fa: (A) -> D, fb: (B) -> D, fc: (C) -> D) =
-      fc(c)
-  }
-
-  abstract fun <D> fold(fa: (A) -> D, fb: (B) -> D, fc: (C) -> D): D
-}
-
-internal fun <A> asyncIOContinuation(ctx: CoroutineContext, cc: (Either<Throwable, A>) -> Unit): Continuation<A> {
-  return object : Continuation<A> {
-    override val context: CoroutineContext = ctx
-
-    override fun resume(value: A) {
-      cc(value.right())
-    }
-
-    override fun resumeWithException(exception: Throwable) {
-      cc(exception.left())
-    }
   }
 }

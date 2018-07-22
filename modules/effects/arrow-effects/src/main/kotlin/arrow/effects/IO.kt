@@ -5,17 +5,12 @@ import arrow.core.Either.Left
 import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
-import arrow.effects.internal.Treither
-import arrow.effects.internal.asyncIOContinuation
-import arrow.effects.internal.parContinuation
-import arrow.effects.internal.triContinuation
+import arrow.effects.internal.par2
+import arrow.effects.internal.par3
 import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
-import kotlin.coroutines.experimental.Continuation
 import kotlin.coroutines.experimental.CoroutineContext
-import kotlin.coroutines.experimental.startCoroutine
-import kotlin.coroutines.experimental.suspendCoroutine
 
 @higherkind
 sealed class IO<out A> : IOOf<A> {
@@ -65,52 +60,12 @@ sealed class IO<out A> : IOOf<A> {
 
     fun <A, B, C> parMap(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, f: (A, B) -> C): IO<C> =
       IO.async { cc ->
-        val a: suspend () -> Either<A, B> = {
-          suspendCoroutine { ca: Continuation<Either<A, B>> ->
-            ioA.map(::Left).unsafeRunAsync {
-              it.fold(ca::resumeWithException, ca::resume)
-            }
-          }
-        }
-        val b: suspend () -> Either<A, B> = {
-          suspendCoroutine { ca: Continuation<Either<A, B>> ->
-            ioB.map(::Right).unsafeRunAsync {
-              it.fold(ca::resumeWithException, ca::resume)
-            }
-          }
-        }
-        val parCont = parContinuation(ctx, f, asyncIOContinuation(ctx, cc))
-        a.startCoroutine(parCont)
-        b.startCoroutine(parCont)
+        par2(ctx, ioA, ioB, f, cc)
       }
 
     fun <A, B, C, D> parMap3(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, f: (A, B, C) -> D): IO<D> =
       IO.async { cc ->
-        val a: suspend () -> Treither<A, B, C> = {
-          suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
-            ioA.map { Treither.Left<A, B, C>(it) }.unsafeRunAsync {
-              it.fold(ca::resumeWithException, ca::resume)
-            }
-          }
-        }
-        val b: suspend () -> Treither<A, B, C> = {
-          suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
-            ioB.map { Treither.Middle<A, B, C>(it) }.unsafeRunAsync {
-              it.fold(ca::resumeWithException, ca::resume)
-            }
-          }
-        }
-        val c: suspend () -> Treither<A, B, C> = {
-          suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
-            ioC.map { Treither.Right<A, B, C>(it) }.unsafeRunAsync {
-              it.fold(ca::resumeWithException, ca::resume)
-            }
-          }
-        }
-        val triCont = triContinuation(ctx, f, asyncIOContinuation(ctx, cc))
-        a.startCoroutine(triCont)
-        b.startCoroutine(triCont)
-        c.startCoroutine(triCont)
+        par3(ctx, ioA, ioB, ioC, f, cc)
       }
 
     fun <A, B, C, D, E> parMap4(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, ioD: IO<D>, f: (A, B, C, D) -> E): IO<E> =
