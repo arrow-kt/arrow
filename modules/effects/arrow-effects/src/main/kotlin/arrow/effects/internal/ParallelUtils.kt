@@ -142,14 +142,15 @@ private sealed class Treither<out A, out B, out C> {
   abstract fun <D> fold(fa: (A) -> D, fb: (B) -> D, fc: (C) -> D): D
 }
 
-private fun <A> asyncIOContinuation(ctx: CoroutineContext, cc: (Either<Throwable, A>) -> Unit): Continuation<A> = object : Continuation<A> {
-  override val context: CoroutineContext = ctx
+private fun <A> asyncIOContinuation(ctx: CoroutineContext, cc: (Either<Throwable, A>) -> Unit): Continuation<A> =
+  object : Continuation<A> {
+    override val context: CoroutineContext = ctx
 
-  override fun resume(value: A) {
-    cc(value.right())
-  }
+    override fun resume(value: A) {
+      cc(value.right())
+    }
 
-  override fun resumeWithException(exception: Throwable) {
-    cc(exception.left())
+    override fun resumeWithException(exception: Throwable) {
+      cc(exception.left())
+    }
   }
-}
