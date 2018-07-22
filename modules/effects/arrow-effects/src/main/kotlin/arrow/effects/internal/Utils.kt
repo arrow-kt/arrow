@@ -79,9 +79,9 @@ private class OneShotLatch : AbstractQueuedSynchronizer() {
 
 internal fun <A, B, C> parContinuation(ctx: CoroutineContext, f: (A, B) -> C, c: Continuation<C>): Continuation<Either<A, B>> =
   object : Continuation<Either<A, B>> {
-    var intermediate: Either<A, B>? = null
-
     override val context: CoroutineContext = ctx
+
+    var intermediate: Either<A, B>? = null
 
     override fun resume(value: Either<A, B>) =
       synchronized(this) {
