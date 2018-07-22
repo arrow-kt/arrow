@@ -13,6 +13,7 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldEqual
+import kotlinx.coroutines.experimental.newSingleThreadContext
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -240,6 +241,32 @@ class IOTest : UnitSpec() {
       val never = IO.async<Int> { }
       val result = never.unsafeRunTimed(100.milliseconds)
       result shouldBe None
+    }
+
+    "parallel execution makes all IOs start at the same time" {
+      val order = mutableListOf<Long>()
+
+      fun makePar(num: Long) =
+        IO.async<Long> { cc ->
+          IO.unit.continueOn(newSingleThreadContext("$num"))
+            // Sleep according to my number
+            .map {
+              Thread.sleep(num * 20)
+              it
+            }
+            // Add myself to order list
+            .map {
+              order.add(num)
+              num
+            }.unsafeRunAsync(cc)
+        }
+
+      val result =
+        IO.parMapN(newSingleThreadContext("all"), makePar(6), makePar(3), makePar(2), makePar(4), makePar(1), makePar(5))
+        { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
+          .unsafeRunSync()
+      result shouldBe listOf(6L, 3, 2, 4, 1, 5)
+      order.toList() shouldBe listOf(1L, 2, 3, 4, 5, 6)
     }
 
     "IO.binding should for comprehend over IO" {
