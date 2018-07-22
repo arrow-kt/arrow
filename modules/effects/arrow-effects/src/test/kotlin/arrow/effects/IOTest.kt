@@ -307,12 +307,14 @@ class IOTest : UnitSpec() {
       result shouldBe "all"
     }
 
-    "parallel IO#defer and IO#suspend is done in the expected CoroutineContext" {
+    "parallel IO#defer, IO#suspend and IO#async are run in the expected CoroutineContext" {
       val result =
-        IO.parMapN(newSingleThreadContext("here"), IO {  Thread.currentThread().name }, IO.defer { IO.just(Thread.currentThread().name) }, ::Tuple2)
-        .unsafeRunSync()
+        IO.parMapN(newSingleThreadContext("here"),
+          IO { Thread.currentThread().name }, IO.defer { IO.just(Thread.currentThread().name) }, IO.async<String> { it(Thread.currentThread().name.right()) },
+          ::Tuple3)
+          .unsafeRunSync()
 
-      result shouldBe ("here" toT "here")
+      result shouldBe Tuple3("here", "here", "here")
     }
 
     "IO.binding should for comprehend over IO" {
