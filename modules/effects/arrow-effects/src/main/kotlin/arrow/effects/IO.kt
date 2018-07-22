@@ -59,33 +59,49 @@ sealed class IO<out A> : IOOf<A> {
       }
 
     fun <A, B, C> parMap(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, f: (A, B) -> C): IO<C> =
-      IO.async { cc ->
-        par2(ctx, ioA, ioB, f, cc)
-      }
+      IO.async(par2(ctx, ioA, ioB, f))
 
     fun <A, B, C, D> parMap3(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, f: (A, B, C) -> D): IO<D> =
-      IO.async { cc ->
-        par3(ctx, ioA, ioB, ioC, f, cc)
-      }
+      IO.async(par3(ctx, ioA, ioB, ioC, f))
 
     fun <A, B, C, D, E> parMap4(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, ioD: IO<D>, f: (A, B, C, D) -> E): IO<E> =
       parMap(ctx,
-        parMap(ctx, ioA, ioB, { a, b -> a toT b }),
-        parMap(ctx, ioC, ioD, { c, d -> c toT d }),
+        parMap(ctx, ioA, ioB, ::Tuple2),
+        parMap(ctx, ioC, ioD, ::Tuple2),
         { ab, cd -> f(ab.a, ab.b, cd.a, cd.b) })
 
     fun <A, B, C, D, E, F> parMap5(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, ioD: IO<D>, ioE: IO<E>, f: (A, B, C, D, E) -> F): IO<F> =
       parMap(ctx,
-        parMap(ctx, ioA, ioB, { a, b -> a toT b }),
+        parMap(ctx, ioA, ioB, ::Tuple2),
         parMap3(ctx, ioC, ioD, ioE, { c, d, e -> Tuple3(c, d, e) }),
         { ab, cde -> f(ab.a, ab.b, cde.a, cde.b, cde.c) })
 
     fun <A, B, C, D, E, F, G> parMap6(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, ioD: IO<D>, ioE: IO<E>, ioF: IO<F>, f: (A, B, C, D, E, F) -> G): IO<G> =
+      parMap(ctx,
+        parMap3(ctx, ioA, ioB, ioC, { a, b, c -> Tuple3(a, b, c) }),
+        parMap3(ctx, ioD, ioE, ioF, { d, e, ff -> Tuple3(d, e, ff) }),
+        { abc, def -> f(abc.a, abc.b, abc.c, def.a, def.b, def.c) })
+
+    fun <A, B, C, D, E, F, G, H> parMap7(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, ioD: IO<D>, ioE: IO<E>, ioF: IO<F>, ioG: IO<G>, f: (A, B, C, D, E, F, G) -> H): IO<H> =
       parMap3(ctx,
-        parMap(ctx, ioA, ioB, { a, b -> a toT b }),
-        parMap(ctx, ioC, ioD, { c, d -> c toT d }),
-        parMap(ctx, ioE, ioF, { e, ff -> e toT ff }),
-        { ab, cd, ef -> f(ab.a, ab.b, cd.a, cd.b, ef.a, ef.b) })
+        parMap3(ctx, ioA, ioB, ioC, { a, b, c -> Tuple3(a, b, c) }),
+        parMap(ctx, ioD, ioE, ::Tuple2),
+        parMap(ctx, ioF, ioG, ::Tuple2),
+        { abc, de, fg -> f(abc.a, abc.b, abc.c, de.a, de.b, fg.a, fg.b) })
+
+    fun <A, B, C, D, E, F, G, H, I> parMap8(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, ioD: IO<D>, ioE: IO<E>, ioF: IO<F>, ioG: IO<G>, ioH: IO<H>, f: (A, B, C, D, E, F, G, H) -> I): IO<I> =
+      parMap3(ctx,
+        parMap3(ctx, ioA, ioB, ioC, ::Tuple3),
+        parMap3(ctx, ioD, ioE, ioF, ::Tuple3),
+        parMap(ctx, ioG, ioH, ::Tuple2),
+        { abc, def, gh -> f(abc.a, abc.b, abc.c, def.a, def.b, def.c, gh.a, gh.b) })
+
+    fun <A, B, C, D, E, F, G, H, I, J> parMap9(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, ioD: IO<D>, ioE: IO<E>, ioF: IO<F>, ioG: IO<G>, ioH: IO<H>, ioI: IO<I>, f: (A, B, C, D, E, F, G, H, I) -> J): IO<J> =
+      parMap3(ctx,
+        parMap3(ctx, ioA, ioB, ioC, ::Tuple3),
+        parMap3(ctx, ioD, ioE, ioF, ::Tuple3),
+        parMap3(ctx, ioG, ioH, ioI, ::Tuple3),
+        { abc, def, ghi -> f(abc.a, abc.b, abc.c, def.a, def.b, def.c, ghi.a, ghi.b, ghi.c) })
   }
 
   abstract fun <B> map(f: (A) -> B): IO<B>

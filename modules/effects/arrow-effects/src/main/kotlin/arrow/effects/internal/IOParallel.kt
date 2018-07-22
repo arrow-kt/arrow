@@ -5,13 +5,14 @@ import arrow.core.Tuple3
 import arrow.core.left
 import arrow.core.right
 import arrow.effects.IO
+import arrow.effects.typeclasses.Proc
 import kotlin.coroutines.experimental.Continuation
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.startCoroutine
 import kotlin.coroutines.experimental.suspendCoroutine
 
 /* See par3 */
-internal fun <A, B, C> par2(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, f: (A, B) -> C, cc: (Either<Throwable, C>) -> Unit) {
+internal fun <A, B, C> par2(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, f: (A, B) -> C): Proc<C> = { cc ->
   val a: suspend () -> Either<A, B> = {
     suspendCoroutine { ca: Continuation<Either<A, B>> ->
       ioA.map { it.left() }.unsafeRunAsync {
@@ -35,7 +36,7 @@ internal fun <A, B, C> par2(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, f: (A
  * Every time you start 4+ elements, each pair or triple has to be combined with another one at the same depth.
  * Elements at higher depths that are synchronous can prevent elements at a higher depth to start.
  * Thus, we need to provide solutions for even and uneven amounts of IOs for all to be started at the same depth. */
-internal fun <A, B, C, D> par3(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, f: (A, B, C) -> D, cc: (Either<Throwable, D>) -> Unit) {
+internal fun <A, B, C, D> par3(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, f: (A, B, C) -> D): Proc<D> = { cc ->
   val a: suspend () -> Treither<A, B, C> = {
     suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
       ioA.map { Treither.Left<A, B, C>(it) }.unsafeRunAsync {
