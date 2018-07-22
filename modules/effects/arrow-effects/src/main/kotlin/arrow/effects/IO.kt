@@ -36,6 +36,9 @@ sealed class IO<out A> : IOOf<A> {
         }
       }
 
+    fun <A> async(ctx: CoroutineContext, f: () -> A): IO<A> =
+      IO.unit.continueOn(ctx).flatMap { Pure(f()) }
+
     val unit: IO<Unit> =
       just(Unit)
 
