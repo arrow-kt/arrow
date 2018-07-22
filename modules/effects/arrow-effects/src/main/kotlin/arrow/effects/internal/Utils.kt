@@ -91,7 +91,8 @@ internal fun <A, B, C> parContinuation(ctx: CoroutineContext, f: (A, B) -> C, c:
         } else {
           value.fold({ a ->
             result.fold({
-              // Resumed twice on the same side
+              // Resumed twice on the same side, updating
+              intermediate = value
             }, { b ->
               c.resume(f(a, b))
             })
@@ -99,7 +100,8 @@ internal fun <A, B, C> parContinuation(ctx: CoroutineContext, f: (A, B) -> C, c:
             result.fold({ a ->
               c.resume(f(a, b))
             }, {
-              // Resumed twice on the same side
+              // Resumed twice on the same side, updating
+              intermediate = value
             })
           })
         }
