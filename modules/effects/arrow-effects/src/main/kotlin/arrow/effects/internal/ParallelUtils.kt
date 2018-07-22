@@ -31,7 +31,7 @@ internal fun <A, B, C> parMap2(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, f:
 
 /* Parallelization is only provided in pairs and triples.
  * Every time you start 4+ elements, each pair or triple has to be combined with another one at the same depth.
- * Elements at higher depths that are synchronous can prevent elements at a higher depth to start.
+ * Elements at higher depths that are synchronous can prevent elements at a lower depth from starting.
  * Thus, we need to provide solutions for even and uneven amounts of IOs for all to be started at the same depth. */
 internal fun <A, B, C, D> parMap3(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, f: (A, B, C) -> D): Proc<D> = { cc ->
   val a: suspend () -> Treither<A, B, C> = {
