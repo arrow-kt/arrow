@@ -8,7 +8,6 @@
 #fill: #64B5F6
 #.typeclasses: fill=#64B5F6 visual=database bold
 #.instances: fill=#B9F6CA visual=class italic bold dashed
-[<typeclasses>Semigroup]<-[<typeclasses>Monoid]
 [<typeclasses>Monad]<-[<typeclasses>Bimonad]
 [<typeclasses>Comonad]<-[<typeclasses>Bimonad]
 [<typeclasses>Functor]<-[<typeclasses>Comonad]
@@ -18,6 +17,7 @@
 [<typeclasses>Functor]<-[<typeclasses>Applicative]
 [<typeclasses>ApplicativeError]<-[<typeclasses>MonadError]
 [<typeclasses>Monad]<-[<typeclasses>MonadError]
+[<typeclasses>Semigroup]<-[<typeclasses>Monoid]
 [<typeclasses>Applicative]<-[<typeclasses>Monad]
 [<typeclasses>SemigroupK]<-[<typeclasses>MonoidK]
 [<typeclasses>MonoidK]<-[<instances>MonoidK Instances|WriterTMonoidKInstance|ListKMonoidKInstance|OptionTMonoidKInstance|SetKMonoidKInstance|SequenceKMonoidKInstance]
@@ -32,8 +32,8 @@
 [<typeclasses>MonadError]<-[<typeclasses>MonadDefer]
 [<typeclasses>MonadDefer]<-[<typeclasses>Async]
 [<typeclasses>Async]<-[<typeclasses>Effect]
-[<typeclasses>Monoid]<-[<instances>Monoid Instances|OptionMonoidInstance|ConstMonoidInstance|Tuple2MonoidInstance|ListKMonoidInstance|SequenceKMonoidInstance|MapKMonoidInstance|SetKMonoidInstance|SortedMapKMonoidInstance|IOMonoidInstance]
-[<typeclasses>Semigroup]<-[<instances>Semigroup Instances|ConstSemigroupInstance|OptionSemigroupInstance|SetKSemigroupInstance|NonEmptyListSemigroupInstance|SequenceKSemigroupInstance|ListKSemigroupInstance|MapKSemigroupInstance|SortedMapKSemigroupInstance|IOMonoidInstance|IOSemigroupInstance]
+[<typeclasses>Semigroup]<-[<instances>Semigroup Instances|ConstSemigroupInstance|TrySemigroupInstance|EitherSemigroupInstance|OptionSemigroupInstance|SetKSemigroupInstance|NonEmptyListSemigroupInstance|SequenceKSemigroupInstance|ListKSemigroupInstance|MapKSemigroupInstance|SortedMapKSemigroupInstance|IOMonoidInstance|IOSemigroupInstance]
+[<typeclasses>Monoid]<-[<instances>Monoid Instances|OptionMonoidInstance|EitherMonoidInstance|ConstMonoidInstance|Tuple2MonoidInstance|TryMonoidInstance|ListKMonoidInstance|SequenceKMonoidInstance|MapKMonoidInstance|SetKMonoidInstance|SortedMapKMonoidInstance|IOMonoidInstance]
 [<typeclasses>Comonad]<-[<instances>Comonad Instances|Tuple2ComonadInstance|Function0ComonadInstance|IdComonadInstance|EvalComonadInstance|NonEmptyListComonadInstance|CoproductComonadInstance|CofreeComonadInstance]
 [<typeclasses>Monad]<-[<typeclasses>MonadState]
 [<typeclasses>MonadState]<-[<instances>MonadState Instances|StateTMonadStateInstance]
