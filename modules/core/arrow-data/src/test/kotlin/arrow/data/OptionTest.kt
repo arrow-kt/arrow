@@ -12,11 +12,11 @@ import arrow.test.generators.genOption
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.fail
-import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
+import io.kotlintest.shouldNotBe
 import org.junit.runner.RunWith
 import java.util.*
 
@@ -75,7 +75,7 @@ class OptionTest : UnitSpec() {
       val option = some
       when (option) {
         is Some<String> -> {
-          option.get() shouldBe "kotlin"
+          option shouldBe some
         }
         is None -> fail("")
       }
@@ -100,10 +100,10 @@ class OptionTest : UnitSpec() {
     }
 
     "map" {
-      some.map(String::toUpperCase).get() shouldBe "KOTLIN"
+      some.map(String::toUpperCase) shouldBe Some("KOTLIN")
       none.map(String::toUpperCase) shouldBe None
 
-      some.map(Some(12)) { name, version -> "${name.toUpperCase()} M$version" }.get() shouldBe "KOTLIN M12"
+      some.map(Some(12)) { name, version -> "${name.toUpperCase()} M$version" } shouldBe Some("KOTLIN M12")
       none.map(Some(12)) { name, version -> "${name.toUpperCase()} M$version" } shouldBe None
     }
 
@@ -113,18 +113,18 @@ class OptionTest : UnitSpec() {
     }
 
     "flatMap" {
-      some.flatMap { Some(it.toUpperCase()) }.get() shouldBe "KOTLIN"
+      some.flatMap { Some(it.toUpperCase()) } shouldBe Some("KOTLIN")
       none.flatMap { Some(it.toUpperCase()) } shouldBe None
     }
 
     "filter" {
       some.filter { it == "java" } shouldBe None
       none.filter { it == "java" } shouldBe None
-      some.filter { it.startsWith('k') }.get() shouldBe "kotlin"
+      some.filter { it.startsWith('k') } shouldBe some
     }
 
     "filterNot" {
-      some.filterNot { it == "java" }.get() shouldBe "kotlin"
+      some.filterNot { it == "java" } shouldBe some
       none.filterNot { it == "java" } shouldBe None
       some.filterNot { it.startsWith('k') } shouldBe None
     }
@@ -153,13 +153,13 @@ class OptionTest : UnitSpec() {
     }
 
     "orElse" {
-      some.orElse { Some("java") }.get() shouldBe "kotlin"
-      none.orElse { Some("java") }.get() shouldBe "java"
+      some.orElse { Some("java") } shouldBe some
+      none.orElse { Some("java") } shouldBe Some("java")
     }
 
     "toList" {
       some.toList() shouldBe listOf("kotlin")
-      none.toList() shouldBe listOf<String>()
+      none.toList() shouldBe listOf()
     }
 
     "getAsOption" {

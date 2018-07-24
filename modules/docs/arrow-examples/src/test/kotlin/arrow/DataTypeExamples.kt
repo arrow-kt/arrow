@@ -5,7 +5,7 @@ import arrow.core.*
 import arrow.typeclasses.binding
 import io.kotlintest.matchers.Matcher
 import io.kotlintest.matchers.Result
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.shouldBe
 import io.kotlintest.specs.FreeSpec
 import kotlin.reflect.KClass
 
@@ -20,7 +20,7 @@ class DataTypeExamples : FreeSpec() { init {
     val noneValue: Option<Int> = None
 
     "getOrElse" {
-      someValue.getOrElse { -1 }.shouldBe(42)
+      someValue.getOrElse { -1 }.shouldBe<Int, Int>(42)
       noneValue.getOrElse { -1 }.shouldBe(-1)
     }
 
@@ -35,7 +35,7 @@ class DataTypeExamples : FreeSpec() { init {
         is Some -> "ok"
         None -> "ko"
       }
-      msg shouldBe "ok"
+      msg shouldBe any
     }
 
     "Functor/Foldable style operations" {

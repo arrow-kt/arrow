@@ -6,8 +6,6 @@ import arrow.optics.dsl.*
 import arrow.optics.instances.*
 import arrow.test.*
 
-import io.kotlintest.matchers.shouldBe
-
 @optics
 data class Street(val number: Int, val name: String) {
   companion object

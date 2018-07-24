@@ -5,8 +5,8 @@ import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import arrow.typeclasses.bindingCatch
 import io.kotlintest.runner.junit4.KotlinTestRunner
-import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldNotBe
+import io.kotlintest.shouldBe
+import io.kotlintest.shouldNotBe
 import io.reactivex.Maybe
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers

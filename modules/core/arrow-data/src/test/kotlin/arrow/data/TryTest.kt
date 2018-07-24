@@ -2,18 +2,15 @@ package arrow.data
 
 import arrow.core.*
 import arrow.instances.*
-import arrow.instances.eq
-import arrow.instances.extensions
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.fail
 import io.kotlintest.matchers.beTheSameInstanceAs
-import io.kotlintest.matchers.should
-import io.kotlintest.matchers.shouldBe
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import io.kotlintest.shouldEqual
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.should
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -77,7 +74,7 @@ class TryTest : UnitSpec() {
       val failure: Try<Int> = Failure(Exception())
 
       Success(1).filter { true } shouldBe Success(1)
-      Success(1).filter { false } shouldBe Failure<Int>(TryException.PredicateException("Predicate does not hold for 1"))
+      Success(1).filter { false } shouldBe Failure(TryException.PredicateException("Predicate does not hold for 1"))
       failure.filter { true } shouldBe failure
       failure.filter { false } shouldBe failure
     }
@@ -117,7 +114,7 @@ class TryTest : UnitSpec() {
       val e: Throwable = Exception()
 
       Success(1).getOrElse { _: Throwable -> 2 } shouldBe 1
-      Failure<Int>(e).getOrElse { (it shouldEqual e); 2 } shouldBe 2
+      Failure<Int>(e).getOrElse { (it shouldBe e); 2 } shouldBe 2
     }
 
     "orNull returns null if Failure" {
@@ -128,7 +125,7 @@ class TryTest : UnitSpec() {
     }
 
     "recoverWith should modify Failure entity" {
-      Success(1).recoverWith { Failure<Int>(Exception()) } shouldBe Success(1)
+      Success(1).recoverWith { Failure(Exception()) } shouldBe Success(1)
       Success(1).recoverWith { Success(2) } shouldBe Success(1)
       Failure<Int>(Exception()).recoverWith { Success(2) } shouldBe Success(2)
     }
@@ -151,8 +148,8 @@ class TryTest : UnitSpec() {
         map(
           Success("11th"),
           Success("Doctor"),
-          Success("Who"),
-          { (a, b, c) -> "$a $b $c" }) shouldBe Success("11th Doctor Who")
+          Success("Who")
+        ) { (a, b, c) -> "$a $b $c" } shouldBe Success("11th Doctor Who")
       }
     }
 
@@ -161,8 +158,8 @@ class TryTest : UnitSpec() {
         map(
           Success(13),
           Success("Doctor"),
-          Success(false),
-          { (a, b, c) -> "${a}th $b is $c" }) shouldBe Success("13th Doctor is false")
+          Success(false)
+        ) { (a, b, c) -> "${a}th $b is $c" } shouldBe Success("13th Doctor is false")
       }
     }
 
@@ -173,8 +170,8 @@ class TryTest : UnitSpec() {
         map(
           Success(13),
           Failure<Boolean>(DoctorNotFoundException("13th Doctor is coming!")),
-          Success("Who"),
-          { (a, b, c) -> "${a}th $b is $c" }) shouldBe Failure<String>(DoctorNotFoundException("13th Doctor is coming!"))
+          Success("Who")
+        ) { (a, b, c) -> "${a}th $b is $c" } shouldBe Failure(DoctorNotFoundException("13th Doctor is coming!"))
       }
     }
 
@@ -189,9 +186,9 @@ class TryTest : UnitSpec() {
     }
 
     "get" {
-      10 shouldBe success()
+      10 shouldBe success
       try {
-        failure()
+        failure
         fail("")
       } catch (e: Exception) {
         (e is NumberFormatException) shouldBe true
@@ -204,32 +201,32 @@ class TryTest : UnitSpec() {
     }
 
     "orElse" {
-      success.orElse { Success(5) }.get() shouldBe 10
-      failure.orElse { Success(5) }.get() shouldBe 5
+      success.orElse { Success(5) } shouldBe success
+      failure.orElse { Success(5) } shouldBe 5
     }
 
     "`foreach with side effect (applied on Success)`" {
       var wasInside = false
-      success.foreach { wasInside = true }
+      success.fold({ Unit }) { _: Int -> wasInside = true }
       wasInside shouldBe true
     }
 
     "`foreach with side effect (applied on Failure)`" {
       var wasInside = false
-      failure.foreach { wasInside = true }
+      failure.fold({ Unit }) { wasInside = true }
       wasInside shouldBe false
     }
 
     "`foreach with exception thrown inside (applied on Success)`" {
       try {
-        success.foreach { throw RuntimeException("thrown inside") }
+        success.fold({ Unit }) { _: Int -> throw RuntimeException("thrown inside") }
       } catch (e: Throwable) {
         e.message shouldBe "thrown inside"
       }
     }
 
     "`foreach with exception thrown inside (applied on Failure)`" {
-      failure.foreach { throw RuntimeException("thrown inside") }
+      failure.fold({ Unit }) { _: Int -> throw RuntimeException("thrown inside") }
       // and no exception should be thrown
     }
 
@@ -262,8 +259,8 @@ class TryTest : UnitSpec() {
     }
 
     "`onEach with change of carried value (applied on Success)`" {
-      val result = success.onEach { it * 2 }.get()
-      result shouldBe 10
+      val result = success.onEach { it * 2 }
+      result shouldBe success
     }
 
     "`onEach with change of carried value (applied on Failure)`" {
@@ -323,8 +320,8 @@ class TryTest : UnitSpec() {
     }
 
     "transform" {
-      success.transform({ Try { it.toString() } }) { Try { "NaN" } }.get() shouldBe "10"
-      failure.transform({ Try { it.toString() } }) { Try { "NaN" } }.get() shouldBe "NaN"
+      success.transform({ Try { it.toString() } }) { Try { "NaN" } } shouldBe Success("10")
+      failure.transform({ Try { it.toString() } }) { Try { "NaN" } } shouldBe Try{ "NaN" }
     }
 
     "flatten" {

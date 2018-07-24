@@ -10,8 +10,8 @@ import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Semigroup
 import io.kotlintest.fail
-import io.kotlintest.matchers.shouldBe
 import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -89,7 +89,7 @@ class ValidatedTest : UnitSpec() {
 
     "valueOr should return value if is Valid or the the result of f in otherwise" {
       Valid(13).valueOr { fail("None should not be called") } shouldBe 13
-      Invalid(13).valueOr { e -> e.toString() + " is the defaultValue" } shouldBe "13 is the defaultValue"
+      Invalid(13).valueOr { e -> "$e is the defaultValue" } shouldBe "13 is the defaultValue"
     }
 
     "orElse should return Valid(value) if is Valid or the result of default in otherwise" {
@@ -103,7 +103,7 @@ class ValidatedTest : UnitSpec() {
     }
 
     "foldLeft should return f processed when is Valid" {
-      Valid(10).foldLeft("Tennant") { b, a -> a.toString() + " is " + b } shouldBe "10 is Tennant"
+      Valid(10).foldLeft("Tennant") { b, a -> "$a is $b" } shouldBe "10 is Tennant"
     }
 
     "toEither should return Either.Right(value) if is Valid or Either.Left(error) in otherwise" {
@@ -134,9 +134,9 @@ class ValidatedTest : UnitSpec() {
     val plusIntSemigroup: Semigroup<Int> = Int.semigroup()
 
     "findValid should return the first Valid value or combine or Invalid values in otherwise" {
-      Valid(10).findValid(plusIntSemigroup, { fail("None should not be called") }) shouldBe Valid(10)
-      Invalid(10).findValid(plusIntSemigroup, { Valid(5) }) shouldBe Valid(5)
-      Invalid(10).findValid(plusIntSemigroup, { Invalid(5) }) shouldBe Invalid(15)
+      Valid(10).findValid(plusIntSemigroup) { fail("None should not be called") } shouldBe Valid(10)
+      Invalid(10).findValid(plusIntSemigroup) { Valid(5) } shouldBe Valid(5)
+      Invalid(10).findValid(plusIntSemigroup) { Invalid(5) } shouldBe Invalid(15)
     }
 
     "ap should return Valid(f(a)) if both are Valid" {
@@ -186,24 +186,24 @@ class ValidatedTest : UnitSpec() {
         map(
           Valid("11th"),
           Valid("Doctor"),
-          Valid("Who"),
-          { (a, b, c) -> "$a $b $c" }) shouldBe Valid("11th Doctor Who")
+          Valid("Who")
+        ) { (a, b, c) -> "$a $b $c" } shouldBe Valid("11th Doctor Who")
       }
 
       "Cartesian builder should build products over heterogeneous Validated" {
         map(
           Valid(13),
           Valid("Doctor"),
-          Valid(false),
-          { (a, b, c) -> "${a}th $b is $c" }) shouldBe Valid("13th Doctor is false")
+          Valid(false)
+        ) { (a, b, c) -> "${a}th $b is $c" } shouldBe Valid("13th Doctor is false")
       }
 
       "Cartesian builder should build products over Invalid Validated" {
         map(
           Invalid("fail1"),
           Invalid("fail2"),
-          Valid("Who"),
-          { "success!" }) shouldBe Invalid("fail1fail2")
+          Valid("Who")
+        ) { "success!" } shouldBe Invalid("fail1fail2")
       }
     }
 

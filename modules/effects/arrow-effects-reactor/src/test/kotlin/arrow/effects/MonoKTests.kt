@@ -5,7 +5,7 @@ import arrow.test.laws.AsyncLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.bindingCatch
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldNotBe
+import io.kotlintest.shouldNotBe
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.MatcherAssert.assertThat

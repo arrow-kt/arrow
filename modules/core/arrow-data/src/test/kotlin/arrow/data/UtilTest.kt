@@ -3,7 +3,7 @@ package arrow.data
 import arrow.core.*
 import arrow.test.UnitSpec
 import io.kotlintest.runner.junit4.KotlinTestRunner
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -56,8 +56,8 @@ class UtilTest : UnitSpec() {
 
       //Test Setter
       greeter.receive["Hola"] = "Mario"
-      "Hola from Mario" shouldBe greeter.getReceivedHello()
-      "Hello Mario" shouldBe greeter.sayHello["Mario"]
+      greeter.getReceivedHello() shouldBe "Hola from Mario"
+      greeter.sayHelloTo("Mario") shouldBe "Hello Mario"
 
     }
   }

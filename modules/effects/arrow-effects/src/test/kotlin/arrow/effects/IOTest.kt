@@ -11,8 +11,8 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.binding
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.matchers.fail
-import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldEqual
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)

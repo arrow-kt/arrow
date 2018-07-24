@@ -3,11 +3,12 @@ package arrow.data
 import arrow.core.*
 import arrow.test.UnitSpec
 import io.kotlintest.runner.junit4.KotlinTestRunner
-import io.kotlintest.matchers.should
-import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldThrow
 import io.kotlintest.matchers.startWith
+import io.kotlintest.should
+import io.kotlintest.shouldBe
+import io.kotlintest.shouldThrow
 import org.junit.runner.RunWith
+import java.lang.IllegalArgumentException
 
 @RunWith(KotlinTestRunner::class)
 class PartialFunctionTests : UnitSpec() {
@@ -34,13 +35,13 @@ class PartialFunctionTests : UnitSpec() {
       val isEven = PartialFunction(definetAt, body)
 
       (isEven.isDefinedAt(2)) shouldBe true
-      isEven(2) shouldBe "is even"
+      isEven(2) shouldBe true
     }
 
     "toPartialFunction"{
       val isEven = body.toPartialFunction(definetAt)
       (isEven.isDefinedAt(2)) shouldBe true
-      isEven(2) shouldBe "is even"
+      isEven(2) shouldBe true
     }
 
     "orElse" {
@@ -55,7 +56,7 @@ class PartialFunctionTests : UnitSpec() {
     }
 
     "Throw IAE" {
-      val upper = { s: String? -> s!!.toUpperCase() }.toPartialFunction { s -> s != null }
+      val upper = { s: String? -> s?.toUpperCase() }.toPartialFunction { s -> s != null }
       upper("one") shouldBe "ONE"
       val iae = shouldThrow<IllegalArgumentException> {
         upper(null)

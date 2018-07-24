@@ -13,7 +13,7 @@ import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.EqLaws
 import io.kotlintest.runner.junit4.KotlinTestRunner
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
 sealed class OpsAp<out A> : Kind<OpsAp.F, A> {

@@ -4,9 +4,9 @@ import arrow.free.Trampoline
 import arrow.free.TrampolineF
 import arrow.free.runT
 import io.kotlintest.runner.junit4.KotlinTestRunner
-import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import io.kotlintest.shouldBe
 
 @RunWith(KotlinTestRunner::class)
 class TrampolineTest : UnitSpec() {

@@ -109,7 +109,7 @@ sealed class Try<out A> : TryOf<A> {
 
   @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("map { body(it); it }"))
   fun onSuccess(body: (A) -> Unit): Try<A> {
-    foreach(body)
+    fold({ Unit }, body)
     return this
   }
 

@@ -7,7 +7,7 @@ import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.bindingCatch
 import io.kotlintest.runner.junit4.KotlinTestRunner
-import io.kotlintest.matchers.shouldNotBe
+import io.kotlintest.shouldNotBe
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
