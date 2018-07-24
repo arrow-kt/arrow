@@ -22,6 +22,8 @@ class EitherTest : UnitSpec() {
     ForEither<Throwable>() extensions {
 
       testLaws(
+        SemigroupLaws.laws(Either.semigroup(String.semigroup(), String.semigroup()), Either.right("1"), Either.right("2"), Either.right("3"), Either.eq(String.eq(), String.eq())),
+        MonoidLaws.laws(Either.monoid(MOL=String.monoid(), MOR = Int.monoid()), Either.right(1), Either.eq(String.eq(), Int.eq())),
         EqLaws.laws(Either.eq(String.eq(), Int.eq()), { Right(it) }),
         ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq()), { Right(it) }),
         MonadErrorLaws.laws(this, Eq.any(), Eq.any()),
@@ -29,6 +31,31 @@ class EitherTest : UnitSpec() {
         SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ)
       )
 
+    }
+
+    "empty should return a Right of the empty of the inner type" {
+      forAll { a: String ->
+        Right(String.monoid().run { empty() }) == Either.monoid(String.monoid(), String.monoid()).run { empty() }
+      }
+    }
+
+    "combine two rights should return a right of the combine of the inners" {
+      forAll { a: String, b: String ->
+        String.monoid().run { Either.right(a.combine(b)) } == Either.right(a).combine(String.monoid(), String.monoid(), Either.right(b))
+      }
+    }
+
+    "combine two lefts should return a left of the combine of the inners" {
+      forAll { a: String, b: String ->
+        String.monoid().run { Either.left(a.combine(b)) } == Either.left(a).combine(String.monoid(), String.monoid(), Either.left(b))
+      }
+    }
+
+    "combine a right and a left should return left" {
+      forAll { a: String, b: String ->
+        Either.left(a) == Either.left(a).combine(String.monoid(), String.monoid(), Either.right(b))
+        Either.left(a) == Either.right(b).combine(String.monoid(), String.monoid(), Either.left(a))
+      }
     }
 
     "getOrElse should return value" {

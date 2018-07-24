@@ -3,11 +3,57 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.*
 import arrow.instance
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
 import arrow.core.ap as eitherAp
 import arrow.core.combineK as eitherCombineK
 import arrow.core.flatMap as eitherFlatMap
 import arrow.instances.traverse as eitherTraverse
+
+fun <L, R> Either<L, R>.combine(SGL: Semigroup<L>, SGR: Semigroup<R>, b: Either<L, R>): Either<L, R> {
+  val a = this
+
+  return when (a) {
+    is Either.Left -> when (b) {
+      is Either.Left -> Either.Left(SGL.run { a.a.combine(b.a) })
+      is Either.Right -> a
+    }
+    is Either.Right -> when (b) {
+      is Either.Left -> b
+      is Either.Right -> Either.right(SGR.run { a.b.combine(b.b) })
+    }
+  }
+}
+
+@instance(Either::class)
+interface EitherSemigroupInstance<L, R> : Semigroup<Either<L, R>> {
+
+  fun SGL(): Semigroup<L>
+  fun SGR(): Semigroup<R>
+
+  override fun Either<L, R>.combine(b: Either<L, R>): Either<L, R> = fix().combine(SGL(), SGR(), b)
+}
+
+@instance(Either::class)
+interface EitherMonoidInstance<L, R> : EitherSemigroupInstance<L, R>, Monoid<Either<L, R>> {
+  fun MOL(): Monoid<L>
+  fun MOR(): Monoid<R>
+
+  override fun SGL(): Semigroup<L> = MOL()
+  override fun SGR(): Semigroup<R> = MOR()
+
+  override fun empty(): Either<L, R> = Right(MOR().empty())
+}
 
 @instance(Either::class)
 interface EitherFunctorInstance<L> : Functor<EitherPartialOf<L>> {
