@@ -1,7 +1,8 @@
 package arrow.effects.internal
 
+import arrow.Kind
 import arrow.core.*
-import arrow.effects.IO
+import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.Proc
 import kotlin.coroutines.experimental.Continuation
 import kotlin.coroutines.experimental.CoroutineContext
@@ -9,19 +10,21 @@ import kotlin.coroutines.experimental.startCoroutine
 import kotlin.coroutines.experimental.suspendCoroutine
 
 /* See par3 */
-internal fun <A, B, C> parMap2(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, f: (A, B) -> C): Proc<C> = { cc ->
+internal fun <F, A, B, C> Effect<F>.parMap2(ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, f: (A, B) -> C,
+  /* start is used because this should return Tuple3<Proc, Future, Future>, but there's no good implementation of Future before Java8 */
+                                            start: (Kind<F, Unit>) -> Unit): Proc<C> = { cc ->
   val a: suspend () -> Either<A, B> = {
     suspendCoroutine { ca: Continuation<Either<A, B>> ->
-      ioA.map { it.left() }.unsafeRunAsync {
-        it.fold(ca::resumeWithException, ca::resume)
-      }
+      start(ioA.map { it.left() }.runAsync {
+        it.fold({ invoke { ca.resumeWithException(it) } }, { invoke { ca.resume(it) } })
+      })
     }
   }
   val b: suspend () -> Either<A, B> = {
     suspendCoroutine { ca: Continuation<Either<A, B>> ->
-      ioB.map { it.right() }.unsafeRunAsync {
-        it.fold(ca::resumeWithException, ca::resume)
-      }
+      start(ioB.map { it.right() }.runAsync {
+        it.fold({ invoke { ca.resumeWithException(it) } }, { invoke { ca.resume(it) } })
+      })
     }
   }
   val parCont = parContinuation(ctx, f, asyncIOContinuation(ctx, cc))
@@ -33,26 +36,28 @@ internal fun <A, B, C> parMap2(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, f:
  * Every time you start 4+ elements, each pair or triple has to be combined with another one at the same depth.
  * Elements at higher depths that are synchronous can prevent elements at a higher depth to start.
  * Thus, we need to provide solutions for even and uneven amounts of IOs for all to be started at the same depth. */
-internal fun <A, B, C, D> parMap3(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, f: (A, B, C) -> D): Proc<D> = { cc ->
+internal fun <F, A, B, C, D> Effect<F>.parMap3(ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, ioC: Kind<F, C>, f: (A, B, C) -> D,
+  /* start is used because this should return Tuple4<Proc, Future, Future, Future>, but there's no good implementation of Future before Java8 */
+                                               start: (Kind<F, Unit>) -> Unit): Proc<D> = { cc ->
   val a: suspend () -> Treither<A, B, C> = {
     suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
-      ioA.map { Treither.Left<A, B, C>(it) }.unsafeRunAsync {
-        it.fold(ca::resumeWithException, ca::resume)
-      }
+      start(ioA.map { Treither.Left<A, B, C>(it) }.runAsync {
+        it.fold({ invoke { ca.resumeWithException(it) } }, { invoke { ca.resume(it) } })
+      })
     }
   }
   val b: suspend () -> Treither<A, B, C> = {
     suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
-      ioB.map { Treither.Middle<A, B, C>(it) }.unsafeRunAsync {
-        it.fold(ca::resumeWithException, ca::resume)
-      }
+      start(ioB.map { Treither.Middle<A, B, C>(it) }.runAsync {
+        it.fold({ invoke { ca.resumeWithException(it) } }, { invoke { ca.resume(it) } })
+      })
     }
   }
   val c: suspend () -> Treither<A, B, C> = {
     suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
-      ioC.map { Treither.Right<A, B, C>(it) }.unsafeRunAsync {
-        it.fold(ca::resumeWithException, ca::resume)
-      }
+      start(ioC.map { Treither.Right<A, B, C>(it) }.runAsync {
+        it.fold({ invoke { ca.resumeWithException(it) } }, { invoke { ca.resume(it) } })
+      })
     }
   }
   val triCont = triContinuation(ctx, f, asyncIOContinuation(ctx, cc))

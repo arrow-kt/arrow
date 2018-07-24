@@ -7,10 +7,10 @@ import arrow.effects.internal.parMap3
 import kotlin.coroutines.experimental.CoroutineContext
 
 fun <A, B, C> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, f: (A, B) -> C): IO<C> =
-  IO.async(parMap2(ctx, ioA, ioB, f))
+  IO.async(IO.effect().parMap2(ctx, ioA, ioB, f, /* see parMap2 notes on this parameter */ { it.fix().unsafeRunSync() }))
 
 fun <A, B, C, D> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, f: (A, B, C) -> D): IO<D> =
-  IO.async(parMap3(ctx, ioA, ioB, ioC, f))
+  IO.async(IO.effect().parMap3(ctx, ioA, ioB, ioC, f, /* see parMap2 notes on this parameter */ { it.fix().unsafeRunSync() }))
 
 fun <A, B, C, D, E> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, ioD: IO<D>, f: (A, B, C, D) -> E): IO<E> =
   parallelMapN(ctx,
