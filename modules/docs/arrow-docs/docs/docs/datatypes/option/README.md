@@ -124,8 +124,11 @@ none<String>()
 ```kotlin:ank
 val nullableValue: String? = null
 nullableValue.toOption()
-// None if null
-// Some<Value> if it has value
+```
+
+```kotlin:ank
+val nullableValue: String? = "Hello"
+nullableValue.toOption()
 ```
 
 Arrow contains `Option` instances for many useful typeclasses that allows you to use and transform optional values
