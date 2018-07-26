@@ -121,6 +121,11 @@ Arrow also adds syntax to all datatypes so you can easily lift them into the con
 none<String>()
 ```
 
+```kotlin:ank
+val something: String? = null
+something.optionFromNullable()
+```
+
 Arrow contains `Option` instances for many useful typeclasses that allows you to use and transform optional values
 
 [`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }})

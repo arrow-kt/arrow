@@ -214,3 +214,5 @@ fun <A> Boolean.maybe(f: () -> A): Option<A> =
 fun <A> A.some(): Option<A> = Some(this)
 
 fun <A> none(): Option<A> = None
+
+fun <A> A?.optionFromNullable() : Option<A> = this?.let { Some(it) } ?: None
