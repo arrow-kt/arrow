@@ -35,8 +35,6 @@ class CoproductTest : UnitSpec() {
             coproduct2.select<String>() shouldBe Some("String")
         }
 
-        //Generated class tests
-
         "coproductOf(A) should equal cop<A, B>()" {
             "String".cop<String, Long>() shouldBe coproductOf<String, Long>("String")
         }
