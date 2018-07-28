@@ -459,23 +459,23 @@ The other names for similar concepts in other languages are Promise and Future.
 While the typical usage of Deferred in Kotlin is different from the Monad pattern we discussed, I can still come up with a Future class with the familiar structure:
 
 ```
-public class Future<T> {
+class Future<T> {
     val instance: Deferred<T>
 
-    public Future(T instance)
+    fun Future(T instance)
     {
         this.instance = async(LAZY) { instance }
     }
 
-    private Future(Deferred<T> instance)
+    fun Future(Deferred<T> instance)
     {
         this.instance = instance
     }
 
-    public Future<U> flatMap<U>(func: (T) -> Future<U>) =
+    fun <U> flatMap(func: (T) -> Future<U>): Future<U> =
       Future(async(LAZY) { instance.await() })
 
-    public void runSync(action: (Try<T>) -> Unit) =
+    fun runSync(action: (Try<T>) -> Unit): Unit =
       runBlocking { action(Try { instance.await() }) }
 }
 ```
