@@ -64,9 +64,9 @@ The base element of each functional program is Function. In typed languages each
 C# is object-oriented language, so we use methods to declare functions. There are two ways to define a method comparable to func function above. I can use static method:
 
 ```
-static class Mapper
+object Mapper
 {
-    static ClassB func(ClassA a) { ... }
+    fun func(a: ClassA): ClassB { ... }
 }
 ```
 
@@ -76,7 +76,7 @@ static class Mapper
 class ClassA
 {
     // Instance method
-    ClassB func() { ... }
+    fun func(): ClassB { ... }
 }
 ```
 
@@ -89,42 +89,42 @@ My sample code is going to be about conferences and speakers. The method impleme
 ```
 class Speaker
 {
-    Talk NextTalk() { ... }
+    fun nextTalk(): Talk { ... }
 }
 
 class Talk
 {
-    Conference GetConference() { ... }
+    fun getConference(): Conference { ... }
 }
 
 class Conference
 {
-    City GetCity() { ... }
+    fun getCity(): City { ... }
 }
 
 class City { ... }
+```
+
 These methods are currently very easy to compose into a workflow:
 
-static City NextTalkCity(Speaker speaker)
+```
+static City NextTalkCity(speaker: Speaker)
 {
-    Talk talk = speaker.NextTalk();
-    Conference conf = talk.GetConference();
-    City city = conf.GetCity();
-    return city;
+    val talk = speaker.nextTalk()
+    val conf = talk.getConference()
+    val city = conf.getCity()
+    return city
 }
 ```
 
 Because the return type of the previous step always matches the input type of the next step, we can write it even shorter:
 
 ```
-static City NextTalkCity(Speaker speaker)
-{
-    return
-        speaker
-        .NextTalk()
-        .GetConference()
-        .GetCity();
-}
+fun NextTalkCity(speaker: Speaker): City =
+  speaker
+    .nextTalk()
+    .getConference()
+    .getCity()
 ```
 
 This code looks quite readable. It's concise and it flows from top to bottom, from left to right, similar to how we are used to read any text. There is not much noise too.
@@ -140,37 +140,37 @@ Typed functional programming always tries to be explicit about types, so I'll re
 ```
 class Speaker
 {
-    Nullable<Talk> NextTalk() { ... }
+    fun nextTalk(): Talk? { ... }
 }
 
 class Talk
 {
-    Nullable<Conference> GetConference() { ... }
+    fun getConference(): Conference? { ... }
 }
 
 class Conference
 {
-    Nullable<City> GetCity() { ... }
+    fun getCity(): City? { ... }
 }
 
 class City { ... }
 ```
 
-This is actually invalid syntax in current C# version, because Nullable<T> and its short form T? are not applicable to reference types. This might change in C# 8 though, so bear with me.
-
 Now, when composing our workflow, we need to take care of null results:
 
 ```
-static Nullable<City> NextTalkCity(Speaker speaker)
+fun nextTalkCity(speaker: Speaker?): City?
 {
-    Nullable<Talk> talk = speaker.NextTalk();
-    if (talk == null) return null;
+    if (speaker == null) return null
 
-    Nullable<Conference> conf = talk.GetConference();
-    if (conf == null) return null;
+    val talk = speaker.nextTalk()
+    if (talk == null) return null
 
-    Nullable<City> city = conf.GetCity();
-    return city;
+    val conf = talk.getConference()
+    if (conf == null) return null
+
+    val city = conf.getCity()
+    return city
 }
 ```
 
@@ -179,13 +179,13 @@ It's still the same method, but it got more noise now. Even though I used short-
 To fight that problem, smart language designers came up with the Null Propagation Operator:
 
 ```
-static Nullable<City> NextTalkCity(Speaker speaker)
+fun nextTalkCity(speaker: Speaker?): City?
 {
     return
         speaker
         ?.NextTalk()
         ?.GetConference()
-        ?.GetCity();
+        ?.GetCity()
 }
 ```
 
@@ -202,35 +202,35 @@ Our sample API could look like this:
 ```
 class Speaker
 {
-    List<Talk> GetTalks() { ... }
+    fun getTalks(): List<Talk> { ... }
 }
 
 class Talk
 {
-    List<Conference> GetConferences() { ... }
+    fun getConferences(): List<Conference> { ... }
 }
 
 class Conference
 {
-    List<City> GetCities() { ... }
+    fun getCities() List<City> { ... }
 }
 ```
 
-I used List<T> but it could be any class or plain IEnumerable<T> interface.
+I used List<T> but it could be any class or plain Sequence<T> interface.
 
 How would we combine the methods into one workflow? Traditional version would look like this:
 
 ```
-static List<City> AllCitiesToVisit(Speaker speaker)
+fun allCitiesToVisit(speaker: Speaker): List<City>
 {
-    var result = new List<City>();
+    val result = mutableListOf<City>();
 
-    foreach (Talk talk in speaker.GetTalks())
-        foreach (Conference conf in talk.GetConferences())
-            foreach (City city in conf.GetCities())
-                result.Add(city);
+    for (talk in speaker.GetTalks())
+        for (conf in talk.GetConferences())
+            for (city in conf.GetCities())
+                result.add(city)
 
-    return result;
+    return result
 }
 ```
 
@@ -239,27 +239,26 @@ It reads ok-ish still. But the combination of nested loops and mutation with som
 As an alternative, C# language designers invented LINQ extension methods. We can write code like this:
 
 ```
-static List<City> AllCitiesToVisit(Speaker speaker)
+fun allCitiesToVisit(speaker: Speaker): List<City>
 {
     return
         speaker
-        .GetTalks()
-        .SelectMany(talk => talk.GetConferences())
-        .SelectMany(conf => conf.GetCities())
-        .ToList();
+        .getTalks()
+        .flatMap(talk -> talk.getConferences())
+        .flatMap(conf -> conf.getCities())
 }
 ```
 
 Let me do one further trick and format the same code in an unusual way:
 
 ```
-static List<City> AllCitiesToVisit(Speaker speaker)
+fun allCitiesToVisit(Speaker speaker): List<City>
 {
     return
         speaker
-        .GetTalks()           .SelectMany(x => x
-        .GetConferences()    ).SelectMany(x => x
-        .GetCities()         ).ToList();
+        .getTalks()           .flatMap(x -> x
+        .getConferences()    ).flatMap(x -> x
+        .getCities()         )
 }
 ```
 
@@ -274,17 +273,17 @@ What if our methods need to access some remote database or service to produce th
 ```
 class Speaker
 {
-    Task<Talk> NextTalk() { ... }
+    fun nextTalk(): Task<Talk> { ... }
 }
 
 class Talk
 {
-    Task<Conference> GetConference() { ... }
+    fun getConference(): Task<Conference> { ... }
 }
 
 class Conference
 {
-    Task<City> GetCity() { ... }
+    fun getCity(): Task<City> { ... }
 }
 ```
 
@@ -293,28 +292,25 @@ This change breaks our nice workflow composition again.
 We'll get back to async-await later, but the original way to combine Task-based methods was to use ContinueWith and Unwrap API:
 
 ```
-static Task<City> NextTalkCity(Speaker speaker)
+fun nextTalkCity(speaker: Speaker): Task<City>
 {
     return
         speaker
-        .NextTalk()
-        .ContinueWith(talk => talk.Result.GetConference())
-        .Unwrap()
-        .ContinueWith(conf => conf.Result.GetCity())
-        .Unwrap();
+        .flatMap(talk -> talk.getConference())
+        .flatMap(conf -> conf.getCity())
 }
 ```
 
 Hard to read, but let me apply my formatting trick again:
 
 ```
-static Task<City> NextTalkCity(Speaker speaker)
+fun nextTalkCity(speaker: Speaker): Task<City>
 {
     return
         speaker
-        .NextTalk()         .ContinueWith(x => x.Result
-        .GetConference()   ).Unwrap().ContinueWith(x => x.Result
-        .GetCity()         ).Unwrap();
+        .nextTalk()         .flatMap(x -> x
+        .getConference()   ).flatMap(x -> x
+        .getCity()         )
 }
 ```
 
@@ -327,31 +323,31 @@ Can you see a pattern yet?
 I'll repeat the Nullable-, List- and Task-based workflows again:
 
 ```
-static Nullable<City> NextTalkCity(Speaker speaker)
+fun nextTalkCity(speaker: Speaker?): City?
 {
     return
         speaker               ?
-        .NextTalk()           ?
-        .GetConference()      ?
-        .GetCity();
+        .nextTalk()           ?
+        .getConference()      ?
+        .getCity()
 }
 
-static List<City> AllCitiesToVisit(Speaker speaker)
+fun allCitiesToVisit(speaker: Speaker): List<City>
 {
     return
         speaker
-        .GetTalks()            .SelectMany(x => x
-        .GetConferences()     ).SelectMany(x => x
-        .GetCities()          ).ToList();
+        .getTalks()            .flatMap(x => x
+        .getConferences()     ).flatMap(x => x
+        .getCities()          )
 }
 
-static Task<City> NextTalkCity(Speaker speaker)
+fun nextTalkCity(speaker: Speaker): Task<City>
 {
     return
         speaker
-        .NextTalk()            .ContinueWith(x => x.Result
-        .GetConference()      ).Unwrap().ContinueWith(x => x.Result
-        .GetCity()            ).Unwrap();
+        .nextTalk()            .flatMap(x => x
+        .getConference()      ).flatMap(x => x
+        .getCity()            )
 }
 ```
 
@@ -362,7 +358,7 @@ Let's try to generalize this approach. Given some generic container type Workflo
 ```
 class WorkflowThatReturns<T>
 {
-    WorkflowThatReturns<U> AddStep(Func<T, WorkflowThatReturns<U>> step);
+    fun addStep(step: (T) -> WorkflowThatReturns<U>): WorkflowThatReturns<U>;
 }
 ```
 
@@ -383,13 +379,13 @@ Now we are ready to add another step!
 In the following code, NextTalk returns the first instance inside the container:
 
 ```
-WorkflowThatReturns<City> Workflow(Speaker speaker)
+fun workflow(speaker: Speaker): WorkflowThatReturns<City>
 {
     return
         speaker
-        .NextTalk()
-        .AddStep(x => x.GetConference())
-        .AddStep(x => x.GetCity());
+        .nextTalk()
+        .addStep(x -> x.getConference())
+        .addStep(x -> x.getCity())
 }
 ```
 
@@ -401,182 +397,139 @@ Subsequently, AddStep is called two times to transfer to Conference and then Cit
 
 The name of this pattern is `Monad`.
 
-In C# terms, a Monad is a generic class with two operations: constructor and bind.
+In Arrow terms, a Monad is an interface with two operations: constructor and flatMap.
 
 ```
-class Monad<T> {
-    Monad(T instance);
-    Monad<U> Bind(Func<T, Monad<U>> f);
+interface Monad<F> {
+    fun just (instance: A): Kind<F, A>
+
+    fun Kind<F, A>.flatMap(f: (A) ->  Kind<F, B>)
 }
 ```
 
-Constructor is used to put an object into container, Bind is used to replace one contained object with another contained object.
+Constructor is used to put an object into container `Kind<F, A>` as described in the [glossary]({{ '/docs/patterns/glossary/#type-constructors' | relative_url }}), flatMap is used to replace one contained object with another contained object.
 
-It's important that Bind's argument returns Monad<U> and not just U. We can think of Bind as a combination of Map and Unwrap as defined per following signature:
+It's important that flatMaps's argument returns Kind<F, B> and not just B. We can think of flatMap as a combination of map and flatten as defined per following signature:
 
 ```
-class Monad<T> {
-    Monad(T instance);
-    Monad<U> Map(Function<T, U> f);
-    static Monad<U> Unwrap(Monad<Monad<U>> nested);
-}
+fun <F, A> Kind<F, A>.map(f: (A) ->  B) // Defined in Functor, of which Monad inherits
+
+fun <F, A> Kind<F, Kind<F, A>>.flatten(): Kind<F, A>
 ```
 
 Even though I spent quite some time with examples, I expect you to be slightly confused at this point. That's ok.
 
 Keep going and let's have a look at several sample implementations of Monad pattern.
 
-### Maybe (Option)
+### Option
 
-My first motivational example was with Nullable<T> and ?.. The full pattern containing either 0 or 1 instance of some type is called Maybe (it maybe has a value, or maybe not).
+My first motivational example was with nullable `?`. The full pattern containing either 0 or 1 instance of some type is called Option (it maybe has a value, or maybe not).
 
-Maybe is another approach to dealing with 'no value' value, alternative to the concept of null.
+Option is another approach to dealing with 'no value' value, alternative to the concept of null. You can read more about [`Option`]({{ '/docs/datatypes/option' | relative_url }}) to see how Arrow implemented it.
 
-Functional-first language F# typically doesn't allow null for its types. Instead, F# has a maybe implementation built into the language: it's called option type.
-
-Here is a sample implementation in C#:
-
-```
-public class Maybe<T> where T : class
-{
-    private readonly T value;
-
-    public Maybe(T someValue)
-    {
-        if (someValue == null)
-            throw new ArgumentNullException(nameof(someValue));
-        this.value = someValue;
-    }
-
-    private Maybe()
-    {
-    }
-
-    public Maybe<U> Bind<U>(Func<T, Maybe<U>> func) where U : class
-    {
-        return value != null ? func(value) : Maybe<U>.None();
-    }
-
-    public static Maybe<T> None() => new Maybe<T>();
-}
-```
-
-When null is not allowed, any API contract gets more explicit: either you return type T and it's always going to be filled, or you return Maybe<T>. The client will see that Maybe type is used, so it will be forced to handle the case of absent value.
+When null is not allowed, any API contract gets more explicit: either you return type T and it's always going to be filled, or you return Option<T>.
+The client will see that Maybe type is used, so it will be forced to handle the case of absent value.
 
 Given an imaginary repository contract (which does something with customers and orders):
 
 ```
-public interface IMaybeAwareRepository
+interface OptionAwareRepository
 {
-    Maybe<Customer> GetCustomer(int id);
-    Maybe<Address> GetAddress(int id);
-    Maybe<Order> GetOrder(int id);
+    fun getCustomer(id: Int): Option<Customer>
+
+    fun getAddress(id: Int): Option<Address>
+
+    fun getOrder(id: Int): Option<Order>
 }
 ```
 
-The client can be written with Bind method composition, without branching, in fluent style:
+The client can be written with flatMap method composition, without branching, in fluent style:
 
 ```
-Maybe<Shipper> shipperOfLastOrderOnCurrentAddress =
-    repo.GetCustomer(customerId)
-        .Bind(c => c.Address)
-        .Bind(a => repo.GetAddress(a.Id))
-        .Bind(a => a.LastOrder)
-        .Bind(lo => repo.GetOrder(lo.Id))
-        .Bind(o => o.Shipper);
+fun shipperOfLastOrderOnCurrentAddress(customerId: Int): Option<Shipper> =
+    repo.getCustomer(customerId)
+        .flatMap(c -> c.address)
+        .flatMap(a -> repo.getAddress(a.id))
+        .flatMap(a -> a.lastOrder)
+        .flatMap(lo -> repo.getOrder(lo.id))
+        .flatMap(o -> o.shipper)
 ```
 
-As we saw above, this syntax looks very much like a LINQ query with a bunch of SelectMany statements. One of the common implementations of Maybe implements IEnumerable interface to enable a more C#-idiomatic binding composition. Actually:
+### Sequence can implement Monad
 
-### Enumerable + SelectMany is a Monad
+Sequence is an interface for enumerable containers.
 
-IEnumerable is an interface for enumerable containers.
+Sequence containers can be created - thus the constructor monadic operation.
 
-Enumerable containers can be created - thus the constructor monadic operation.
-
-The Bind operation is defined by the standard LINQ extension method, here is its signature:
+The flatMap operation is defined by the standard library, here is its signature:
 
 ```
-public static IEnumerable<U> SelectMany<T, U>(
-    this IEnumerable<T> first,
-    Func<T, IEnumerable<U>> selector)
-Direct implementation is quite straightforward:
-
-static class Enumerable
-{
-    public static IEnumerable<U> SelectMany(
-        this IEnumerable<T> values,
-        Func<T, IEnumerable<U>> func)
-    {
-        foreach (var item in values)
-            foreach (var subItem in func(item))
-                yield return subItem;
-    }
-}
+fun <T, R> Sequence<T>.flatMap(
+    transform: (T) -> Sequence<R>
+): Sequence<R>
 ```
 
 And here is an example of composition:
 
 ```
-IEnumerable<Shipper> shippers =
+val shippers: IEnumerable<Shipper> =
     customers
-        .SelectMany(c => c.Addresses)
-        .SelectMany(a => a.Orders)
-        .SelectMany(o => o.Shippers);
+        .flatMap(c => c.addresses)
+        .flatMap(a => a.prders)
+        .flatMap(o => o.shippers)
 ```
 
-The query has no idea about how the collections are stored (encapsulated in containers). We use functions T -> IEnumerable<U> to produce new enumerables (Bind operation).
+The query has no idea about how the collections are stored (encapsulated in containers). We use functions `A -> Sequence<B>` to produce new sequences (flatMap operation).
 
-### Task (Future)
+### Deferred (Future)
 
-In C# Task<T> type is used to denote asynchronous computation which will eventually return an instance of T. The other names for similar concepts in other languages are Promise and Future.
+In C# Deferred<T> type is used to denote asynchronous computation which will eventually return an instance of T.
+The other names for similar concepts in other languages are Promise and Future.
 
-While the typical usage of Task in C# is different from the Monad pattern we discussed, I can still come up with a Future class with the familiar structure:
+While the typical usage of Deferred in C# is different from the Monad pattern we discussed, I can still come up with a Future class with the familiar structure:
 
 ```
 public class Future<T>
 {
-    private readonly Task<T> instance;
+    val instance: Deferred<T>
 
     public Future(T instance)
     {
-        this.instance = Task.FromResult(instance);
+        this.instance = async(LAZY) { instance }
     }
 
-    private Future(Task<T> instance)
+    private Future(Deferred<T> instance)
     {
         this.instance = instance;
     }
 
-    public Future<U> Bind<U>(Func<T, Future<U>> func)
-    {
-        var a = this.instance.ContinueWith(t => func(t.Result).instance).Unwrap();
-        return new Future<U>(a);
-    }
+    public Future<U> flatMap<U>(func: (T) -> Future<U>) =
+      Future(async(LAZY) { instance.await() })
 
-    public void OnComplete(Action<T> action)
-    {
-        this.instance.ContinueWith(t => action(t.Result));
-    }
+    public void runSync(action: (Try<T>) -> Unit) =
+      runBlocking { action(Try { instance.await() }) }
 }
 ```
 
-Effectively, it's just a wrapper around the Task which doesn't add too much value, but it's a useful illustration because now we can do:
+Effectively, it's just a wrapper around the Deferred which doesn't add too much value, but it's a useful illustration because now we can do:
 
 ```
 repository
     .LoadSpeaker()
-    .Bind(speaker => speaker.NextTalk())
-    .Bind(talk => talk.GetConference())
-    .Bind(conference => conference.GetCity())
-    .OnComplete(city => reservations.BookFlight(city));
+    .flatMap(speaker -> speaker.nextTalk())
+    .flatMap(talk -> talk.getConference())
+    .flatMap(conference -> conference.getCity())
+    .runSync { city -> city.fold(
+        { Logger.logError(it); reservations.cancel() },
+        { reservations.bookFlight(city) })
+    }
 ```
 
 We are back to the familiar structure. Time for some more complications.
 
 ### Non-Sequential Workflows
 
-Up until now, all the composed workflows had very liniar, sequential structure: the output of a previous step was always the input for the next step. That piece of data could be discarded after the first use because it was never needed for later steps:
+Up until now, all the composed workflows had very linear, sequential structure: the output of a previous step was always the input for the next step. That piece of data could be discarded after the first use because it was never needed for later steps:
 
 ![](https://mikhail.io/2018/07/monads-explained-in-csharp-again//linear-workflow.png)
 
@@ -590,101 +543,47 @@ In this case, we would have to use closure to save speaker object until we get a
 
 ```
 repository
-    .LoadSpeaker()
-    .OnComplete(speaker =>
+    .loadSpeaker()
+    .runSync { speaker =>
         speaker
-            .NextTalk()
-            .Bind(talk => talk.GetConference())
-            .Bind(conference => conference.GetCity())
-            .OnComplete(city => reservations.BookFlight(speaker, city))
-        );
+            .nextTalk()
+            .flatMap(talk => talk.GetConference())
+            .flatMap(conference => conference.GetCity())
+            .runSync { city -> city.fold(
+                { Logger.logError(it); reservations.cancel() },
+                { reservations.bookFlight(city) })
+            }
+        )
+    }
 ```
 
 Obviously, this gets ugly very soon.
 
-To solve this structural problem, C# language got its async-await feature, which is now being reused in more languages including Javascript.
+To solve this structural problem, C# language got its async-await feature, which is brought from other languages including C # and JavaScript.
 
-If we move back to using Task instead of our custom Future, we are able to write
-
-```
-var speaker = await repository.LoadSpeaker();
-var talk = await speaker.NextTalk();
-var conference = await talk.GetConference();
-var city = await conference.GetCity();
-await reservations.BookFlight(speaker, city);
-```
-
-Even though we lost the fluent syntax, at least the block has just one level, which makes it easier to navigate.
-
-### Monads in Functional Languages
-
-So far we learned that
-
-Monad is a workflow composition pattern
-This pattern is used in functional programming
-Special syntax helps simplify the usage
-It should come at no surprise that functional languages support monads on syntactic level.
-
-F# is a functional-first language running on .NET framework. F# had its own way of doing workflows comparable to async-await before C# got it. In F#, the above code would look like this:
+If we move back to using Deferred instead of our custom Future, we are able to write
 
 ```
-let sendReservation () = async {
-    let! speaker = repository.LoadSpeaker()
-    let! talk = speaker.nextTalk()
-    let! conf = talk.getConference()
-    let! city = conf.getCity()
-    do! bookFlight(speaker, city)
-}
+var speaker = repository.loadSpeaker().await();
+var talk = await speaker.nextTalk().await();
+var conference = await talk.getConference().await();
+var city = await conference.getCity().await();
+await reservations.bookFlight(speaker, city).await();
 ```
 
-Apart from syntax (! instead of await), the major difference to C# is that async is just one possible monad type to be used this way. There are many other monads in F# standard library (they are called Computation Expressions).
+Even though we lost the fluent syntax, at least the block has just one level, which makes it easier to read and navigate.
 
-The best part is that any developer can create their own monads, and then use all the power of language features.
+### Comprehensions and parallelism
 
-Say, we want a hand-made Maybe computation expressoin in F#:
+By using coroutines, Arrow provides a generalisation that emulates async/await for any Monad.
+They are called [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}), and you can find a complete section of the docs explaining it.
 
-```
-let nextTalkCity (speaker: Speaker) = maybe {
-    let! talk = speaker.nextTalk()
-    let! conf = talk.getConference()
-    let! city = conf.getCity(talk)
-    return city
-}
-```
-
-To make this code runnable, we need to define Maybe computation expression builder:
-
-```
-type MaybeBuilder() =
-
-    member this.Bind(x, f) =
-        match x with
-        | None -> None
-        | Some a -> f a
-
-    member this.Return(x) =
-        Some x
-
-let maybe = new MaybeBuilder()
-```
-
-I won't explain the details of what happens here, but you can see that the code is quite trivial. Note the presence of Bind operation (and Return operation being the monad constructor).
-
-The feature is widely used by third-party F# libraries. Here is an actor definition in Akka.NET F# API:
-
-```
-let loop () = actor {
-    let! message = mailbox.Receive()
-    match message with
-    | Greet(name) -> printfn "Hello %s" name
-    | Hi -> printfn "Hello from F#!"
-    return! loop ()
-}
-```
+For some Monads, Arrow also provides error handling via [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) and parallelisation using `parMapN`.
 
 ### Monad Laws
 
-There are a couple laws that constructor and Bind need to adhere to, so that they produce a proper monad.
+There are a couple laws that constructor and flatMap need to adhere to, so that they produce a proper monad.
+These laws are encoded in Arrow as tests you can find in the `arrow-test` module, and are already tested for all instances in the library.
 
 A typical monad tutorial will make a lot of emphasis on the laws, but I find them less important to explain to a beginner. Nonetheless, here they are for the sake of completeness.
 
@@ -692,33 +591,33 @@ Left Identity law says that that Monad constructor is a neutral operation: you c
 
 ```
 // Given
-T value;
-Func<T, Monad<U>> f;
+val value: A
+val f: (A) -> Kind<F, B>
 
 // Then (== means both parts are equivalent)
-new Monad<T>(value).Bind(f) == f(value)
+just(value).flatMap(f) == f(value)
 ```
 
 Right Identity law says that given a monadic value, wrapping its contained data into another monad of same type and then Binding it, doesn't change the original value:
 
 ```
 // Given
-Monad<T> monadicValue;
+val monadicValue: Kind<F, A>;
 
 // Then (== means both parts are equivalent)
-monadicValue.Bind(x => new Monad<T>(x)) == monadicValue
+monadicValue.flatMap { x -> just(x) } == monadicValue
 ```
 
 Associativity law means that the order in which Bind operations are composed does not matter:
 
 ```
 // Given
-Monad<T> m;
-Func<T, Monad<U>> f;
-Func<U, Monad<V>> g;
+val m: Kind<F, T>
+val f: (T) -> Kind<F, U>
+val g: (T) -> Kind<F, V>
 
 // Then (== means both parts are equivalent)
-m.Bind(f).Bind(g) == m.Bind(a => f(a).Bind(g))
+m.flatMap(f).flatMap(g) == m.flatMap { a -> f(a).flatMap(g) }
 ```
 
 The laws may look complicated, but in fact they are very natural expectations that any developer has when working with monads, so don't spend too much mental effort on memorizing them.
@@ -727,4 +626,5 @@ The laws may look complicated, but in fact they are very natural expectations th
 
 You should not be afraid of the "M-word" just because you are a C# programmer.
 
-C# does not have a notion of monads as predefined language constructs, but that doesn't mean we can't borrow some ideas from the functional world. Having said that, it's also true that C# is lacking some powerful ways to combine and generalize monads that are available in functional programming languages.
+C# does not have a notion of monads as predefined language constructs, but that doesn't mean we can't borrow some ideas from the functional world.
+Having said that, it's also true that C# is lacking some powerful ways to combine and generalize monads that are available in functional programming languages.
