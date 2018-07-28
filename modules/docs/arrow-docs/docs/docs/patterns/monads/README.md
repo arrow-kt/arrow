@@ -613,7 +613,7 @@ Even though we lost the fluent syntax, at least the block has just one level, wh
 By using coroutines, Arrow provides a generalisation that emulates async/await for any Monad.
 
 ```kotlin
-fun <F> bookSpeakersFlights(M: Monad<F>): Kind<F, A>
+fun <F> bookSpeakersFlights(M: Monad<F>): Kind<F, A> =
     M.binding {
         val speaker = repository.loadSpeaker().bind()
         val talk = speaker.nextTalk().bind()
@@ -647,7 +647,7 @@ Right Identity law says that given a monadic value, wrapping its contained data 
 
 ```
 // Given
-val monadicValue: Kind<F, A>;
+val monadicValue: Kind<F, A>
 
 // Then (== means both parts are equivalent)
 monadicValue.flatMap { x -> just(x) } == monadicValue
