@@ -473,7 +473,10 @@ class Future<T> {
     }
 
     fun <U> flatMap(func: (T) -> Future<U>): Future<U> =
-      Future(async(LAZY) { instance.await() })
+      Future(async(LAZY) {
+        val t = instance.await()
+        func(t).await()
+      })
 
     fun runSync(action: (Try<T>) -> Unit): Unit =
       runBlocking { action(Try { instance.await() }) }
