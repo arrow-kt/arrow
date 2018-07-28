@@ -541,7 +541,7 @@ object: ObservableConcatMonadInstance: Monad<ForOption> {
 
 What are the benefits of separating the instances from the direct implementation, causing a duplication in methods and an extra layer of indirection?
 
-The main use case is allowing you to write code that is generic for any object that implements Monad.
+The main use case is allowing you to write code that is generic for any object that can provide a Monad instance object.
 
 ```kotlin
 fun <F> Monad<F>.shipperOfLastOrderOnCurrentAddress(customerId: Int): Kind<F, Shipper> =
@@ -553,7 +553,7 @@ fun <F> Monad<F>.shipperOfLastOrderOnCurrentAddress(customerId: Int): Kind<F, Sh
         .flatMap(o -> o.shipper)
 ```
 In this case, like with any other interface, Monad defines the API and behavior but not the implementation details.
-This code is specially useful to write for libraries that must remain agnostic to implementations.
+This pattern is specially useful for libraries that must remain agnostic to implementations.
 
 Using the Monad and other similar abstractions, Arrow can provide a rich collection of extension functions and new language extensions.
 
