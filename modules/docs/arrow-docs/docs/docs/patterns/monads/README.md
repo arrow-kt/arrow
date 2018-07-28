@@ -499,7 +499,11 @@ We are back to the familiar structure. Time for some more complications.
 
 ### Abstraction for all Monads
 
-We're going to dismiss one common misconception. As you have seen, neither Future nor Option implement Monad directly.
+We're going to dispell one common misconception.
+Sometimes the word Monad is used to refer to types like Option, Future, Either... and so on, and that's not correct.
+Those are called [datatypes]({{ '/docs/datatypes/intro' | relative_url }}) or just types. Let's see the difference!
+
+As you have seen, neither Future nor Option implement Monad directly.
 This is intentional, as you can potentially have several Monad implementations for a single type.
 For example, RxJava's Observable can be chained using flatMap, switchMap, and concatMap, and using each is still a Monad.
 
@@ -553,9 +557,9 @@ fun <F> Monad<F>.shipperOfLastOrderOnCurrentAddress(customerId: Int): Kind<F, Sh
         .flatMap(o -> o.shipper)
 ```
 In this case, like with any other interface, Monad defines the API and behavior but not the implementation details.
-This pattern is specially useful for libraries that must remain agnostic to implementations.
+This pattern is specially useful for libraries that must remain agnostic to implementations, and gives them a *lingua franca* when building on top of each other.
 
-Using the Monad and other similar abstractions, Arrow can provide a rich collection of extension functions and new language extensions.
+Using the Monad and other similar abstractions, Arrow can provide a rich collection of extension functions and new language extensions that can be reused by other codebases.
 
 You can read more about generalizing code in the [glossary]({{ '/docs/patterns/glossary' | relative_url }}) and [typeclasses intro]({{ '/docs/typeclasses/intro' | relative_url }}).
 
