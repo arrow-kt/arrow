@@ -198,11 +198,7 @@ infix fun <T> OptionOf<T>.or(value: Option<T>): Option<T> = if (fix().isEmpty())
   fix()
 }
 
-fun <T> T?.toOption(): Option<T> = if (this != null) {
-  Some(this)
-} else {
-  None
-}
+fun <T> T?.toOption(): Option<T> = this?.let { Some(it) } ?: None
 
 fun <A> Boolean.maybe(f: () -> A): Option<A> =
   if (this) {
