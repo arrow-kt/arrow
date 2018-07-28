@@ -26,7 +26,7 @@ interface Traverse<F> : Functor<F>, Foldable<F> {
     traverse(IdBimonad) { Id(f(it)) }.value()
 
   fun <G, A, B> Kind<F, A>.flatTraverse(flatTraverse: FlatTraverse<F, G>, f: (A) -> Kind<G, Kind<F, B>>): Kind<G, Kind<F, B>> =
-    flatTraverse.AG().run { this@flatTraverse.traverse(this, f).map { flatTraverse.MF().run { it.flatten() } } }
+    flatTraverse.AG().run { traverse(this, f).map { flatTraverse.MF().run { it.flatten() } } }
 }
 
 interface FlatTraverse<F, G> {
