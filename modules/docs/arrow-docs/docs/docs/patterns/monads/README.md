@@ -499,7 +499,7 @@ We are back to the familiar structure. Time for some more complications.
 
 ### Abstraction for all Monads
 
-We're going to dispell one common misconception.
+We're going to dispel one common misconception.
 Sometimes the word Monad is used to refer to types like Option, Future, Either... and so on, and that's not correct.
 Those are called [datatypes]({{ '/docs/datatypes/intro' | relative_url }}) or just types. Let's see the difference!
 
