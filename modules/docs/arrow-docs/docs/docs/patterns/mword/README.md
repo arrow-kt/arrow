@@ -4,7 +4,7 @@ title: The Monad Tutorial
 permalink: /docs/patterns/mword/
 ---
 
-## Monads explained in C# (again)
+## Monads explained in Kotlin (again)
 
 {:.intermediate}
 intermediate
@@ -19,7 +19,7 @@ If you're just interested in the API, head down to the [`Monad`]({{ '/docs/typec
 
 I love functional programming for the simplicity that it brings.
 
-But at the same time, I realize that learning functional programming is a challenging process. FP comes with a baggage of unfamiliar vocabulary that can be daunting for somebody coming from an object-oriented language like C#.
+But at the same time, I realize that learning functional programming is a challenging process. FP comes with a baggage of unfamiliar vocabulary that can be daunting for somebody coming from an object-oriented language like Kotlin.
 
 ![](https://mikhail.io/2018/07/monads-explained-in-csharp-again//functional-programming-word-cloud.png)
 
@@ -53,15 +53,13 @@ There is an actual academic paper from Tomas Petricek that studies monad tutoria
 
 I've read that paper and a dozen of monad tutorials online. And of course, now I came up with my own.
 
-I'm probably doomed to fail too, at least for some readers. Yet, I know that many people found the previous version of this article useful.
-
-I based my explanation on examples from C# - the object-oriented language familiar to .NET developers.
+I'm probably doomed to fail too, at least for some readers.
 
 ### Story of Composition
 
 The base element of each functional program is Function. In typed languages each function is just a mapping between the type of its input parameter and output parameter. Such type can be annotated as func: TypeA -> TypeB.
 
-C# is object-oriented language, so we use methods to declare functions. There are two ways to define a method comparable to func function above. I can use static method:
+Kotlin is object-oriented language, so we use methods to declare functions. There are two ways to define a method comparable to func function above. I can use static method:
 
 ```
 object Mapper
@@ -108,7 +106,7 @@ class City { ... }
 These methods are currently very easy to compose into a workflow:
 
 ```
-static City NextTalkCity(speaker: Speaker)
+fun nextTalkCity(speaker: Speaker): City
 {
     val talk = speaker.nextTalk()
     val conf = talk.getConference()
@@ -120,7 +118,7 @@ static City NextTalkCity(speaker: Speaker)
 Because the return type of the previous step always matches the input type of the next step, we can write it even shorter:
 
 ```
-fun NextTalkCity(speaker: Speaker): City =
+fun nextTalkCity(speaker: Speaker): City =
   speaker
     .nextTalk()
     .getConference()
@@ -133,7 +131,7 @@ That's not what real codebases look like though, because there are multiple comp
 
 ### NULLs
 
-Any class instance in C# can be null. In the example above I might get runtime errors if one of the methods ever returns null back.
+Any class instance in Kotlin can be null. In the example above I might get runtime errors if one of the methods ever returns null back.
 
 Typed functional programming always tries to be explicit about types, so I'll re-write the signatures of my methods to annotate the return types as nullables:
 
@@ -223,7 +221,7 @@ How would we combine the methods into one workflow? Traditional version would lo
 ```
 fun allCitiesToVisit(speaker: Speaker): List<City>
 {
-    val result = mutableListOf<City>();
+    val result = mutableListOf<City>()
 
     for (talk in speaker.GetTalks())
         for (conf in talk.GetConferences())
@@ -236,7 +234,7 @@ fun allCitiesToVisit(speaker: Speaker): List<City>
 
 It reads ok-ish still. But the combination of nested loops and mutation with some conditionals sprinkled on them can get unreadable pretty soon. The exact workflow might be lost in the mechanics.
 
-As an alternative, C# language designers invented LINQ extension methods. We can write code like this:
+As an alternative, Kotlin language designers included extension methods. We can write code like this:
 
 ```
 fun allCitiesToVisit(speaker: Speaker): List<City>
@@ -268,7 +266,7 @@ Let's discuss another possible complication.
 
 ### Asynchronous Calls
 
-What if our methods need to access some remote database or service to produce the results? This should be shown in type signature, and C# has Task<T> for that:
+What if our methods need to access some remote database or service to produce the results? This should be shown in type signature, and Kotlin has Task<T> for that:
 
 ```
 class Speaker
@@ -358,7 +356,7 @@ Let's try to generalize this approach. Given some generic container type Workflo
 ```
 class WorkflowThatReturns<T>
 {
-    fun addStep(step: (T) -> WorkflowThatReturns<U>): WorkflowThatReturns<U>;
+    fun addStep(step: (T) -> WorkflowThatReturns<U>): WorkflowThatReturns<U>
 }
 ```
 
@@ -483,10 +481,10 @@ The query has no idea about how the collections are stored (encapsulated in cont
 
 ### Deferred (Future)
 
-In C# Deferred<T> type is used to denote asynchronous computation which will eventually return an instance of T.
+In the Kotlin coroutines library Deferred<T> type is used to denote asynchronous computation which will eventually return an instance of T.
 The other names for similar concepts in other languages are Promise and Future.
 
-While the typical usage of Deferred in C# is different from the Monad pattern we discussed, I can still come up with a Future class with the familiar structure:
+While the typical usage of Deferred in Kotlin is different from the Monad pattern we discussed, I can still come up with a Future class with the familiar structure:
 
 ```
 public class Future<T>
@@ -500,7 +498,7 @@ public class Future<T>
 
     private Future(Deferred<T> instance)
     {
-        this.instance = instance;
+        this.instance = instance
     }
 
     public Future<U> flatMap<U>(func: (T) -> Future<U>) =
@@ -529,7 +527,8 @@ We are back to the familiar structure. Time for some more complications.
 
 ### Non-Sequential Workflows
 
-Up until now, all the composed workflows had very linear, sequential structure: the output of a previous step was always the input for the next step. That piece of data could be discarded after the first use because it was never needed for later steps:
+Up until now, all the composed workflows had very linear, sequential structure: the output of a previous step was always the input for the next step.
+That piece of data could be discarded after the first use because it was never needed for later steps:
 
 ![](https://mikhail.io/2018/07/monads-explained-in-csharp-again//linear-workflow.png)
 
@@ -559,26 +558,34 @@ repository
 
 Obviously, this gets ugly very soon.
 
-To solve this structural problem, C# language got its async-await feature, which is brought from other languages including C # and JavaScript.
+To solve this structural problem, Kotlin language got its coroutines feature, which is brought from other languages including C# and JavaScript.
 
 If we move back to using Deferred instead of our custom Future, we are able to write
 
 ```
-var speaker = repository.loadSpeaker().await();
-var talk = await speaker.nextTalk().await();
-var conference = await talk.getConference().await();
-var city = await conference.getCity().await();
-await reservations.bookFlight(speaker, city).await();
+val speaker = repository.loadSpeaker().await()
+val talk = speaker.nextTalk().await()
+val conference = talk.getConference().await()
+val city = conference.getCity().await()
+reservations.bookFlight(speaker, city).await()
 ```
 
 Even though we lost the fluent syntax, at least the block has just one level, which makes it easier to read and navigate.
 
-### Comprehensions and parallelism
-
 By using coroutines, Arrow provides a generalisation that emulates async/await for any Monad.
-They are called [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}), and you can find a complete section of the docs explaining it.
 
-For some Monads, Arrow also provides error handling via [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) and parallelisation using `parMapN`.
+```
+fun <F> bookSpeakersFlights(M: Monad<F>): Kind<F, A>
+    M.binding {
+        val speaker = repository.loadSpeaker().bind()
+        val talk = speaker.nextTalk().bind()
+        val conference = talk.getConference().bind()
+        val city = conference.getCity().bind()
+        reservations.bookFlight(speaker, city).bind()
+    }
+```
+
+These are called [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}), and you can find a complete section of the docs explaining it.
 
 ### Monad Laws
 
@@ -624,7 +631,7 @@ The laws may look complicated, but in fact they are very natural expectations th
 
 ### Conclusion
 
-You should not be afraid of the "M-word" just because you are a C# programmer.
+You should not be afraid of the "M-word" just because you are a Kotlin programmer.
 
-C# does not have a notion of monads as predefined language constructs, but that doesn't mean we can't borrow some ideas from the functional world.
-Having said that, it's also true that C# is lacking some powerful ways to combine and generalize monads that are available in functional programming languages.
+Kotlin does not have a notion of monads as predefined language constructs, but that doesn't mean we can't borrow some ideas from the functional world.
+Having said that, it's also true that Kotlin is lacking some powerful ways to combine and generalize monads that are available in functional programming languages.
