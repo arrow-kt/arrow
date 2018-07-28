@@ -170,9 +170,9 @@ To fight that problem, smart language designers came up with the Null Propagatio
 fun nextTalkCity(speaker: Speaker?): City? {
     return
         speaker
-        ?.NextTalk()
-        ?.GetConference()
-        ?.GetCity()
+        ?.nextTalk()
+        ?.getConference()
+        ?.getCity()
 }
 ```
 
