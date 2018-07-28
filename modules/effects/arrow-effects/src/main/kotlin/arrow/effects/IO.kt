@@ -36,6 +36,9 @@ sealed class IO<out A> : IOOf<A> {
         }
       }
 
+    fun <A> async(ctx: CoroutineContext, f: () -> A): IO<A> =
+      IO.unit.continueOn(ctx).flatMap { Pure(f()) }
+
     val unit: IO<Unit> =
       just(Unit)
 
@@ -55,6 +58,8 @@ sealed class IO<out A> : IOOf<A> {
           is Either.Right -> IO.just(it.b)
         }
       }
+
+    /* For parMap, look into IOParallel */
   }
 
   abstract fun <B> map(f: (A) -> B): IO<B>

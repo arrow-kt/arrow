@@ -4,9 +4,6 @@ import arrow.Kind
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.higherkind
-import arrow.legacy.Disjunction
-import arrow.legacy.LeftProjection
-import arrow.legacy.RightProjection
 
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Either.scala
@@ -75,12 +72,6 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
         is Left -> initial
       }
     }
-
-  @Deprecated("arrow.data.Either is right biased. This method will be removed in future releases")
-  fun toDisjunction(): Disjunction<A, B> = when (this) {
-    is Right -> Disjunction.Right(b)
-    is Left -> Disjunction.Left(a)
-  }
 
   /**
    * If this is a `Left`, then return the left value in `Right` or vice versa.
@@ -155,12 +146,6 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    */
   fun toOption(): Option<B> =
     fold({ None }, { Some(it) })
-
-  @Deprecated("arrow.data.Either is right biased. This method will be removed in future releases")
-  fun left(): LeftProjection<A, B> = LeftProjection(this)
-
-  @Deprecated("arrow.data.Either is right biased. This method will be removed in future releases")
-  fun right(): RightProjection<A, B> = RightProjection(this)
 
   /**
    * The left side of the disjoint union, as opposed to the [Right] side.
