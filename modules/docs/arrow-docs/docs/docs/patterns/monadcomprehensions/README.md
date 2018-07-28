@@ -9,7 +9,7 @@ permalink: /docs/patterns/monad_comprehensions/
 {:.intermediate}
 intermediate
 
-Monad comprehension is the name for a programming idiom available in multiple languages.
+Monad comprehension is the name for a programming idiom available in multiple languages like JavaScript, F#, Scala, or Haskell.
 The purpose of monad comprehensions is to compose sequential chains of actions in a style that feels natural for programmers of all backgrounds.
 
 ### Synchronous sequences of actions
@@ -37,12 +37,14 @@ They allow us to write sequenced code that can be run asynchronously over multip
 
 ### Asynchronous sequences of actions
 
-The general representation of sequenced execution in code is called a [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}). This typeclass is a short API for sequencing code, summarised in a single function `flatMap`.
-It takes as a parameter one function to be called after the current operation completes, and that function has to return another [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) to continue the operation with.
-A common renaming of `flatMap` is `andThen`. Go to the documentation page to see a deep dive on the Monad API.
-
+The abstraction of sequencing execution of code is summarised in a single function that in Arrow is called `flatMap`,
+although you may find it in other languages referred as `andThen`, `then`, `bind`, or `SelectMany`.
+It takes as a parameter one function to be called after the current operation completes, and that function has to return another value to continue the operation with.
 With knowledge of `flatMap` we can write sequential expressions that are ran asynchronously, even over multiple threads.
-Implementations of `Monad` are available for internal types like `Try` and also integrations like [RxJava 2]({{ '/docs/integrations/rx2' | relative_url }}) and [kotlinx.coroutines]({{ '/docs/integrations/kotlinxcoroutines' | relative_url }}). 
+
+The [typeclass]({{ '/docs/typeclasses/intro' | relative_url }}) interface that abstracts sequenced execution of code via `flatMap` is called a [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}).
+
+Implementations of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) are available for internal types like `Try` and also integrations like [RxJava 2]({{ '/docs/integrations/rx2' | relative_url }}) and [kotlinx.coroutines]({{ '/docs/integrations/kotlinxcoroutines' | relative_url }}).
 Let's see one example using a [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) called [`IO`]({{ '/docs/effects/io' | relative_url }}), where we fetch from a database the information about the dean of university some student attends:
 
 ```kotlin
