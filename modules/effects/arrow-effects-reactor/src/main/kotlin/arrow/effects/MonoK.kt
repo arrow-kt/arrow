@@ -3,7 +3,7 @@ package arrow.effects
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.effects.CoroutineContextScheduler.asScheduler
+import arrow.effects.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import reactor.core.publisher.Mono
