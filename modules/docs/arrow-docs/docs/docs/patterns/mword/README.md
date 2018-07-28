@@ -62,8 +62,7 @@ The base element of each functional program is Function. In typed languages each
 Kotlin is object-oriented language, so we use methods to declare functions. There are two ways to define a method comparable to func function above. I can use static method:
 
 ```
-object Mapper
-{
+object Mapper {
     fun func(a: ClassA): ClassB { ... }
 }
 ```
@@ -71,8 +70,7 @@ object Mapper
 ... or instance method:
 
 ```
-class ClassA
-{
+class ClassA {
     // Instance method
     fun func(): ClassB { ... }
 }
@@ -85,18 +83,15 @@ How do we compose more complex workflows, programs and applications out of such 
 My sample code is going to be about conferences and speakers. The method implementations aren't really important, just watch the types carefully. There are 4 classes (types) and 3 methods (functions):
 
 ```
-class Speaker
-{
+class Speaker {
     fun nextTalk(): Talk { ... }
 }
 
-class Talk
-{
+class Talk {
     fun getConference(): Conference { ... }
 }
 
-class Conference
-{
+class Conference {
     fun getCity(): City { ... }
 }
 
@@ -106,8 +101,7 @@ class City { ... }
 These methods are currently very easy to compose into a workflow:
 
 ```
-fun nextTalkCity(speaker: Speaker): City
-{
+fun nextTalkCity(speaker: Speaker): City {
     val talk = speaker.nextTalk()
     val conf = talk.getConference()
     val city = conf.getCity()
@@ -136,18 +130,15 @@ Any class instance in Kotlin can be null. In the example above I might get runti
 Typed functional programming always tries to be explicit about types, so I'll re-write the signatures of my methods to annotate the return types as nullables:
 
 ```
-class Speaker
-{
+class Speaker {
     fun nextTalk(): Talk? { ... }
 }
 
-class Talk
-{
+class Talk {
     fun getConference(): Conference? { ... }
 }
 
-class Conference
-{
+class Conference {
     fun getCity(): City? { ... }
 }
 
@@ -157,8 +148,7 @@ class City { ... }
 Now, when composing our workflow, we need to take care of null results:
 
 ```
-fun nextTalkCity(speaker: Speaker?): City?
-{
+fun nextTalkCity(speaker: Speaker?): City? {
     if (speaker == null) return null
 
     val talk = speaker.nextTalk()
@@ -177,8 +167,7 @@ It's still the same method, but it got more noise now. Even though I used short-
 To fight that problem, smart language designers came up with the Null Propagation Operator:
 
 ```
-fun nextTalkCity(speaker: Speaker?): City?
-{
+fun nextTalkCity(speaker: Speaker?): City? {
     return
         speaker
         ?.NextTalk()
@@ -198,18 +187,15 @@ Quite often a function returns a collection of items, not just a single item. To
 Our sample API could look like this:
 
 ```
-class Speaker
-{
+class Speaker {
     fun getTalks(): List<Talk> { ... }
 }
 
-class Talk
-{
+class Talk {
     fun getConferences(): List<Conference> { ... }
 }
 
-class Conference
-{
+class Conference {
     fun getCities() List<City> { ... }
 }
 ```
@@ -219,8 +205,7 @@ I used List<T> but it could be any class or plain Sequence<T> interface.
 How would we combine the methods into one workflow? Traditional version would look like this:
 
 ```
-fun allCitiesToVisit(speaker: Speaker): List<City>
-{
+fun allCitiesToVisit(speaker: Speaker): List<City> {
     val result = mutableListOf<City>()
 
     for (talk in speaker.GetTalks())
@@ -237,8 +222,7 @@ It reads ok-ish still. But the combination of nested loops and mutation with som
 As an alternative, Kotlin language designers included extension methods. We can write code like this:
 
 ```
-fun allCitiesToVisit(speaker: Speaker): List<City>
-{
+fun allCitiesToVisit(speaker: Speaker): List<City> {
     return
         speaker
         .getTalks()
@@ -250,8 +234,7 @@ fun allCitiesToVisit(speaker: Speaker): List<City>
 Let me do one further trick and format the same code in an unusual way:
 
 ```
-fun allCitiesToVisit(Speaker speaker): List<City>
-{
+fun allCitiesToVisit(Speaker speaker): List<City> {
     return
         speaker
         .getTalks()           .flatMap(x -> x
@@ -269,18 +252,15 @@ Let's discuss another possible complication.
 What if our methods need to access some remote database or service to produce the results? This should be shown in type signature, and Kotlin has Task<T> for that:
 
 ```
-class Speaker
-{
+class Speaker {
     fun nextTalk(): Task<Talk> { ... }
 }
 
-class Talk
-{
+class Talk {
     fun getConference(): Task<Conference> { ... }
 }
 
-class Conference
-{
+class Conference {
     fun getCity(): Task<City> { ... }
 }
 ```
@@ -290,8 +270,7 @@ This change breaks our nice workflow composition again.
 We'll get back to async-await later, but the original way to combine Task-based methods was to use ContinueWith and Unwrap API:
 
 ```
-fun nextTalkCity(speaker: Speaker): Task<City>
-{
+fun nextTalkCity(speaker: Speaker): Task<City> {
     return
         speaker
         .flatMap(talk -> talk.getConference())
@@ -302,8 +281,7 @@ fun nextTalkCity(speaker: Speaker): Task<City>
 Hard to read, but let me apply my formatting trick again:
 
 ```
-fun nextTalkCity(speaker: Speaker): Task<City>
-{
+fun nextTalkCity(speaker: Speaker): Task<City> {
     return
         speaker
         .nextTalk()         .flatMap(x -> x
@@ -321,8 +299,7 @@ Can you see a pattern yet?
 I'll repeat the Nullable-, List- and Task-based workflows again:
 
 ```
-fun nextTalkCity(speaker: Speaker?): City?
-{
+fun nextTalkCity(speaker: Speaker?): City? {
     return
         speaker               ?
         .nextTalk()           ?
@@ -330,8 +307,7 @@ fun nextTalkCity(speaker: Speaker?): City?
         .getCity()
 }
 
-fun allCitiesToVisit(speaker: Speaker): List<City>
-{
+fun allCitiesToVisit(speaker: Speaker): List<City> {
     return
         speaker
         .getTalks()            .flatMap(x => x
@@ -339,8 +315,7 @@ fun allCitiesToVisit(speaker: Speaker): List<City>
         .getCities()          )
 }
 
-fun nextTalkCity(speaker: Speaker): Task<City>
-{
+fun nextTalkCity(speaker: Speaker): Task<City> {
     return
         speaker
         .nextTalk()            .flatMap(x => x
@@ -354,8 +329,7 @@ In all 3 cases there was a complication which prevented us from sequencing metho
 Let's try to generalize this approach. Given some generic container type WorkflowThatReturns<T>, we have a method to combine an instance of such workflow with a function which accepts the result of that workflow and returns another workflow back:
 
 ```
-class WorkflowThatReturns<T>
-{
+class WorkflowThatReturns<T> {
     fun addStep(step: (T) -> WorkflowThatReturns<U>): WorkflowThatReturns<U>
 }
 ```
@@ -377,8 +351,7 @@ Now we are ready to add another step!
 In the following code, NextTalk returns the first instance inside the container:
 
 ```
-fun workflow(speaker: Speaker): WorkflowThatReturns<City>
-{
+fun workflow(speaker: Speaker): WorkflowThatReturns<City> {
     return
         speaker
         .nextTalk()
@@ -431,8 +404,7 @@ The client will see that Maybe type is used, so it will be forced to handle the 
 Given an imaginary repository contract (which does something with customers and orders):
 
 ```
-interface OptionAwareRepository
-{
+interface OptionAwareRepository {
     fun getCustomer(id: Int): Option<Customer>
 
     fun getAddress(id: Int): Option<Address>
@@ -487,8 +459,7 @@ The other names for similar concepts in other languages are Promise and Future.
 While the typical usage of Deferred in Kotlin is different from the Monad pattern we discussed, I can still come up with a Future class with the familiar structure:
 
 ```
-public class Future<T>
-{
+public class Future<T> {
     val instance: Deferred<T>
 
     public Future(T instance)
