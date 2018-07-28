@@ -12,7 +12,10 @@ beginner
 
 Typeclasses are interfaces that define a set of extension functions associated to one type. You may see them referred as "extension interfaces".
 
-What differentiates FP from OOP is that interfaces are meant to be implemented *outside* of their types, instead of *by* the types.
+The other purpose of these interfaces, like with any other unit of abstraction,
+is to have a single shared definition of a common API and behavior shared across many types in different libraries and codebases.
+
+What differentiates FP from OOP is that these interfaces are meant to be implemented *outside* of their types, instead of *by* the types.
 Now, the association is done using generic parametrization rather than subclassing by implementing the interface. This has multiple benefits:
 
 * Typeclasses can be implemented for any class, even those not in the current project
