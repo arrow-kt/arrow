@@ -6,7 +6,7 @@ import arrow.core.Eval
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.identity
-import arrow.effects.CoroutineContextScheduler.asScheduler
+import arrow.effects.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Applicative
