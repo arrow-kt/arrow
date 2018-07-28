@@ -29,7 +29,7 @@ options:
         url: /docs/patterns/dependency_injection/
 
       - title: The Monad Tutorial
-        url: /docs/patterns/mword/
+        url: /docs/patterns/monads/
 
       - title: Monad Comprehensions
         url: /docs/patterns/monad_comprehensions/
