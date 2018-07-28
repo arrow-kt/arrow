@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: The Monad Tutorial
-permalink: /docs/patterns/mword/
+permalink: /docs/patterns/monads/
 ---
 
 ## Monads explained in Kotlin (again)
@@ -61,7 +61,7 @@ The base element of each functional program is Function. In typed languages each
 
 Kotlin is object-oriented language, so we use methods to declare functions. There are two ways to define a method comparable to func function above. I can use static method:
 
-```
+```kotlin
 object Mapper {
     fun func(a: ClassA): ClassB { ... }
 }
@@ -69,7 +69,7 @@ object Mapper {
 
 ... or instance method:
 
-```
+```kotlin
 class ClassA {
     // Instance method
     fun func(): ClassB { ... }
@@ -82,7 +82,7 @@ How do we compose more complex workflows, programs and applications out of such 
 
 My sample code is going to be about conferences and speakers. The method implementations aren't really important, just watch the types carefully. There are 4 classes (types) and 3 methods (functions):
 
-```
+```kotlin
 class Speaker {
     fun nextTalk(): Talk { ... }
 }
@@ -100,7 +100,7 @@ class City { ... }
 
 These methods are currently very easy to compose into a workflow:
 
-```
+```kotlin
 fun nextTalkCity(speaker: Speaker): City {
     val talk = speaker.nextTalk()
     val conf = talk.getConference()
@@ -111,7 +111,7 @@ fun nextTalkCity(speaker: Speaker): City {
 
 Because the return type of the previous step always matches the input type of the next step, we can write it even shorter:
 
-```
+```kotlin
 fun nextTalkCity(speaker: Speaker): City =
   speaker
     .nextTalk()
@@ -129,7 +129,7 @@ Any class instance in Kotlin can be null. In the example above I might get runti
 
 Typed functional programming always tries to be explicit about types, so I'll re-write the signatures of my methods to annotate the return types as nullables:
 
-```
+```kotlin
 class Speaker {
     fun nextTalk(): Talk? { ... }
 }
@@ -147,7 +147,7 @@ class City { ... }
 
 Now, when composing our workflow, we need to take care of null results:
 
-```
+```kotlin
 fun nextTalkCity(speaker: Speaker?): City? {
     if (speaker == null) return null
 
@@ -166,7 +166,7 @@ It's still the same method, but it got more noise now. Even though I used short-
 
 To fight that problem, smart language designers came up with the Null Propagation Operator:
 
-```
+```kotlin
 fun nextTalkCity(speaker: Speaker?): City? {
     return
         speaker
@@ -186,7 +186,7 @@ Quite often a function returns a collection of items, not just a single item. To
 
 Our sample API could look like this:
 
-```
+```kotlin
 class Speaker {
     fun getTalks(): List<Talk> { ... }
 }
@@ -204,13 +204,13 @@ I used List<T> but it could be any class or plain Sequence<T> interface.
 
 How would we combine the methods into one workflow? Traditional version would look like this:
 
-```
+```kotlin
 fun allCitiesToVisit(speaker: Speaker): List<City> {
     val result = mutableListOf<City>()
 
-    for (talk in speaker.GetTalks())
-        for (conf in talk.GetConferences())
-            for (city in conf.GetCities())
+    for (talk in speaker.getTalks())
+        for (conf in talk.getConferences())
+            for (city in conf.getCities())
                 result.add(city)
 
     return result
@@ -221,7 +221,7 @@ It reads ok-ish still. But the combination of nested loops and mutation with som
 
 As an alternative, Kotlin language designers included extension methods. We can write code like this:
 
-```
+```kotlin
 fun allCitiesToVisit(speaker: Speaker): List<City> {
     return
         speaker
@@ -233,7 +233,7 @@ fun allCitiesToVisit(speaker: Speaker): List<City> {
 
 Let me do one further trick and format the same code in an unusual way:
 
-```
+```kotlin
 fun allCitiesToVisit(Speaker speaker): List<City> {
     return
         speaker
@@ -251,7 +251,7 @@ Let's discuss another possible complication.
 
 What if our methods need to access some remote database or service to produce the results? This should be shown in type signature, and Kotlin has Task<T> for that:
 
-```
+```kotlin
 class Speaker {
     fun nextTalk(): Task<Talk> { ... }
 }
@@ -269,7 +269,7 @@ This change breaks our nice workflow composition again.
 
 We'll get back to async-await later, but the original way to combine Task-based methods was to use ContinueWith and Unwrap API:
 
-```
+```kotlin
 fun nextTalkCity(speaker: Speaker): Task<City> {
     return
         speaker
@@ -280,7 +280,7 @@ fun nextTalkCity(speaker: Speaker): Task<City> {
 
 Hard to read, but let me apply my formatting trick again:
 
-```
+```kotlin
 fun nextTalkCity(speaker: Speaker): Task<City> {
     return
         speaker
@@ -298,7 +298,7 @@ Can you see a pattern yet?
 
 I'll repeat the Nullable-, List- and Task-based workflows again:
 
-```
+```kotlin
 fun nextTalkCity(speaker: Speaker?): City? {
     return
         speaker               ?
@@ -328,7 +328,7 @@ In all 3 cases there was a complication which prevented us from sequencing metho
 
 Let's try to generalize this approach. Given some generic container type WorkflowThatReturns<T>, we have a method to combine an instance of such workflow with a function which accepts the result of that workflow and returns another workflow back:
 
-```
+```kotlin
 class WorkflowThatReturns<T> {
     fun addStep(step: (T) -> WorkflowThatReturns<U>): WorkflowThatReturns<U>
 }
@@ -350,7 +350,7 @@ Now we are ready to add another step!
 
 In the following code, NextTalk returns the first instance inside the container:
 
-```
+```kotlin
 fun workflow(speaker: Speaker): WorkflowThatReturns<City> {
     return
         speaker
@@ -370,8 +370,8 @@ The name of this pattern is `Monad`.
 
 In Arrow terms, a Monad is an interface with two operations: constructor and flatMap.
 
-```
-interface Monad<F> {
+```kotlin
+interface Monad<F>: Applicative<F>, Functor<F> {
     fun just (instance: A): Kind<F, A>
 
     fun Kind<F, A>.flatMap(f: (A) ->  Kind<F, B>)
@@ -382,7 +382,7 @@ Constructor is used to put an object into container `Kind<F, A>` as described in
 
 It's important that flatMaps's argument returns Kind<F, B> and not just B. We can think of flatMap as a combination of map and flatten as defined per following signature:
 
-```
+```kotlin
 fun <F, A> Kind<F, A>.map(f: (A) ->  B) // Defined in Functor, of which Monad inherits
 
 fun <F, A> Kind<F, Kind<F, A>>.flatten(): Kind<F, A>
@@ -403,7 +403,7 @@ The client will see that Maybe type is used, so it will be forced to handle the 
 
 Given an imaginary repository contract (which does something with customers and orders):
 
-```
+```kotlin
 interface OptionAwareRepository {
     fun getCustomer(id: Int): Option<Customer>
 
@@ -415,7 +415,7 @@ interface OptionAwareRepository {
 
 The client can be written with flatMap method composition, without branching, in fluent style:
 
-```
+```kotlin
 fun shipperOfLastOrderOnCurrentAddress(customerId: Int): Option<Shipper> =
     repo.getCustomer(customerId)
         .flatMap(c -> c.address)
@@ -433,7 +433,7 @@ Sequence containers can be created - thus the constructor monadic operation.
 
 The flatMap operation is defined by the standard library, here is its signature:
 
-```
+```kotlin
 fun <T, R> Sequence<T>.flatMap(
     transform: (T) -> Sequence<R>
 ): Sequence<R>
@@ -441,7 +441,7 @@ fun <T, R> Sequence<T>.flatMap(
 
 And here is an example of composition:
 
-```
+```kotlin
 val shippers: IEnumerable<Shipper> =
     customers
         .flatMap(c => c.addresses)
@@ -458,17 +458,15 @@ The other names for similar concepts in other languages are Promise and Future.
 
 While the typical usage of Deferred in Kotlin is different from the Monad pattern we discussed, I can still come up with a Future class with the familiar structure:
 
-```
+```kotlin
 class Future<T> {
     val instance: Deferred<T>
 
-    fun Future(T instance)
-    {
+    fun Future(T instance) {
         this.instance = async(LAZY) { instance }
     }
 
-    fun Future(Deferred<T> instance)
-    {
+    fun Future(Deferred<T> instance) {
         this.instance = instance
     }
 
@@ -485,9 +483,9 @@ class Future<T> {
 
 Effectively, it's just a wrapper around the Deferred which doesn't add too much value, but it's a useful illustration because now we can do:
 
-```
+```kotlin
 repository
-    .LoadSpeaker()
+    .loadSpeaker()
     .flatMap(speaker -> speaker.nextTalk())
     .flatMap(talk -> talk.getConference())
     .flatMap(conference -> conference.getCity())
@@ -498,6 +496,68 @@ repository
 ```
 
 We are back to the familiar structure. Time for some more complications.
+
+### Abstraction for all Monads
+
+We're going to dismiss one common misconception. As you have seen, neither Future nor Option implement Monad directly.
+This is intentional, as you can potentially have several Monad implementations for a single type.
+For example, RxJava's Observable can be chained using flatMap, switchMap, and concatMap, and using each is still a Monad.
+
+Instead, Arrow specifies that Monad must be implemented by a separate object, referred as the "instance of Monad for type F".
+
+```kotlin
+object: FutureMonadInstance: Monad<ForFuture> {
+    fun just (instance: A): Future<A> =
+      Future(a)
+
+    fun FutureOf<A>.flatMap(f: (A) ->  FutureOf<F, B>): Future<B> =
+      flatMap(f) // as per precedence rules the class method is called
+}
+
+object: OptionMonadInstance: Monad<ForOption> {
+    fun just (instance: A): Future<A> =
+      Some(a)
+
+    fun FutureOf<A>.flatMap(f: (A) ->  FutureOf<B>): Option<B> =
+      flatMap(f) // as per precedence rules the class method is called
+}
+
+object: ObservableSwitchMonadInstance: Monad<ForOption> {
+    fun just (instance: A): Observable<A> =
+      Observable.just(a)
+
+    fun ObservableOf<A>.flatMap(f: (A) ->  ObservableOf<B>): Option<B> =
+      switchMap(f)
+}
+
+object: ObservableConcatMonadInstance: Monad<ForOption> {
+    fun just (instance: A): Observable<A> =
+      Observable.just(a)
+
+    fun ObservableOf<A>.flatMap(f: (A) ->  ObservableOf<B>): Option<B> =
+      concatMap(f)
+}
+```
+
+What are the benefits of separating the instances from the direct implementation, causing a duplication in methods and an extra layer of indirection?
+
+The main use case is allowing you to write code that is generic for any object that implements Monad.
+
+```kotlin
+fun <F> Monad<F>.shipperOfLastOrderOnCurrentAddress(customerId: Int): Kind<F, Shipper> =
+    repo.getCustomer(customerId)
+        .flatMap(c -> c.address)
+        .flatMap(a -> repo.getAddress(a.id))
+        .flatMap(a -> a.lastOrder)
+        .flatMap(lo -> repo.getOrder(lo.id))
+        .flatMap(o -> o.shipper)
+```
+In this case, like with any other interface, Monad defines the API and behavior but not the implementation details.
+This code is specially useful to write for libraries that must remain agnostic to implementations.
+
+Using the Monad and other similar abstractions, Arrow can provide a rich collection of extension functions and new language extensions.
+
+You can read more about generalizing code in the [glossary]({{ '/docs/patterns/glossary' | relative_url }}) and [typeclasses intro]({{ '/docs/typeclasses/intro' | relative_url }}).
 
 ### Non-Sequential Workflows
 
@@ -514,14 +574,14 @@ In the example above, BookFlight method might actually need both Speaker and Cit
 
 In this case, we would have to use closure to save speaker object until we get a talk too:
 
-```
+```kotlin
 repository
     .loadSpeaker()
     .runSync { speaker =>
         speaker
             .nextTalk()
-            .flatMap(talk => talk.GetConference())
-            .flatMap(conference => conference.GetCity())
+            .flatMap(talk => talk.getConference())
+            .flatMap(conference => conference.getCity())
             .runSync { city -> city.fold(
                 { Logger.logError(it); reservations.cancel() },
                 { reservations.bookFlight(city) })
@@ -536,7 +596,7 @@ To solve this structural problem, Kotlin language got its coroutines feature, wh
 
 If we move back to using Deferred instead of our custom Future, we are able to write
 
-```
+```kotlin
 val speaker = repository.loadSpeaker().await()
 val talk = speaker.nextTalk().await()
 val conference = talk.getConference().await()
@@ -548,7 +608,7 @@ Even though we lost the fluent syntax, at least the block has just one level, wh
 
 By using coroutines, Arrow provides a generalisation that emulates async/await for any Monad.
 
-```
+```kotlin
 fun <F> bookSpeakersFlights(M: Monad<F>): Kind<F, A>
     M.binding {
         val speaker = repository.loadSpeaker().bind()

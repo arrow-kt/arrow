@@ -12,7 +12,7 @@ intermediate
 `Monad` is a typeclass that abstracts over sequential execution of code.
 This doc focuses on the methods provided by the typeclass.
 If you'd like a long explanation of its origins with simple examples with nullable, `Option` and `List`,
-head to [The Monad Tutorial]({{ '/docs/patterns/mword' | relative_url }}).
+head to [The Monad Tutorial]({{ '/docs/patterns/monads' | relative_url }}).
 
 ### Main Combinators
 
