@@ -42,7 +42,8 @@ although you may find it in other languages referred as `andThen`, `then`, `bind
 It takes as a parameter one function to be called after the current operation completes, and that function has to return another value to continue the operation with.
 With knowledge of `flatMap` we can write sequential expressions that are ran asynchronously, even over multiple threads.
 
-The [typeclass]({{ '/docs/typeclasses/intro' | relative_url }}) interface that abstracts sequenced execution of code via `flatMap` is called a [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}).
+The [typeclass]({{ '/docs/typeclasses/intro' | relative_url }}) interface that abstracts sequenced execution of code via `flatMap` is called a [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}),
+for which we also have a [tutorial]({{ '/docs/patterns/mword' | relative_url }}).
 
 Implementations of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) are available for internal types like `Try` and also integrations like [RxJava 2]({{ '/docs/integrations/rx2' | relative_url }}) and [kotlinx.coroutines]({{ '/docs/integrations/kotlinxcoroutines' | relative_url }}).
 Let's see one example using a [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) called [`IO`]({{ '/docs/effects/io' | relative_url }}), where we fetch from a database the information about the dean of university some student attends:
