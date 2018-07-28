@@ -12,7 +12,8 @@ interface ApplicativeError<F, E> : Applicative<F> {
 
   fun <A> Kind<F, A>.handleErrorWith(f: (E) -> Kind<F, A>): Kind<F, A>
 
-  fun <A> E.raiseError(): Kind<F, A> = raiseError(this)
+  fun <A> E.raiseError(dummy: Unit = Unit): Kind<F, A> =
+    raiseError(this)
 
   fun <A> Kind<F, A>.handleError(f: (E) -> A): Kind<F, A> = handleErrorWith { just(f(it)) }
 
