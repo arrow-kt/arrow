@@ -27,17 +27,19 @@ data class OptionT<F, A>(val value: Kind<F, Option<A>>) : OptionTOf<F, A>, Optio
     fun <F, A> fromOption(AF: Applicative<F>, value: Option<A>): OptionT<F, A> =
       OptionT(AF.just(value))
 
-    fun <F, A, B> tailRecM(MF: Monad<F>, a: A, f: (A) -> OptionTOf<F, Either<A, B>>): OptionT<F, B> = MF.run {
-      OptionT(tailRecM(a, {
-        f(it).fix().value.map({
-          it.fold({
-            Right<Option<B>>(None)
-          }, {
-            it.map { Some(it) }
-          })
-        })
-      }))
-    }
+    fun <F, A, B> tailRecM(MF: Monad<F>, a: A, f: (A) -> OptionTOf<F, Either<A, B>>): OptionT<F, B> =
+      OptionT(MF.tailRecM(a) {
+        val value = f(it).fix().value
+        MF.run {
+          value.map {
+            it.fold({
+              Right<Option<B>>(None)
+            }, {
+              it.map { Some(it) }
+            })
+          }
+        }
+      })
 
   }
 

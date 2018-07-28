@@ -43,12 +43,12 @@ interface EitherTMonadInstance<F, L> : EitherTApplicativeInstance<F, L>, Monad<E
 interface EitherTApplicativeErrorInstance<F, L> : EitherTApplicativeInstance<F, L>, ApplicativeError<EitherTPartialOf<F, L>, L> {
 
   override fun <A> Kind<EitherTPartialOf<F, L>, A>.handleErrorWith(f: (L) -> Kind<EitherTPartialOf<F, L>, A>): EitherT<F, L, A> = MF().run {
-    EitherT(fix().value.flatMap({
+    EitherT(fix().value.flatMap {
       when (it) {
         is Either.Left -> f(it.a).fix().value
         is Either.Right -> just(it)
       }
-    }))
+    })
   }
 
   override fun <A> raiseError(e: L): EitherT<F, L, A> = EitherT(MF().just(Left(e)))
@@ -92,7 +92,8 @@ fun <F, A, B, C> EitherTOf<F, A, B>.foldRight(FF: Foldable<F>, lb: Eval<C>, f: (
 
 fun <F, A, B, G, C> EitherTOf<F, A, B>.traverse(FF: Traverse<F>, GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, EitherT<F, A, C>> {
   val fa: Kind<G, Kind<Nested<F, EitherPartialOf<A>>, C>> = ComposedTraverse(FF, Either.traverse(), Either.monad<A>()).traverseC(fix().value, f, GA)
-  return GA.run { fa.map({ EitherT(FF.run { it.unnest().map({ it.fix() }) }) }) }
+  val mapper: (Kind<Nested<F, EitherPartialOf<A>>, C>) -> EitherT<F, A, C> = { EitherT(FF.run { it.unnest().map { it.fix() } }) }
+  return GA.run { fa.map(mapper) }
 }
 
 fun <F, G, A, B> EitherTOf<F, A, Kind<G, B>>.sequence(FF: Traverse<F>, GA: Applicative<G>): Kind<G, EitherT<F, A, B>> =

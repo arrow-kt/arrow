@@ -27,22 +27,24 @@ data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, 
 
     fun <F, A, B> just(MF: Applicative<F>, b: B): EitherT<F, A, B> = right(MF, b)
 
-    fun <F, L, A, B> tailRecM(MF: Monad<F>, a: A, f: (A) -> EitherTOf<F, L, Either<A, B>>): EitherT<F, L, B> = MF.run {
-      EitherT(tailRecM(a, {
-        f(it).fix().value.map { recursionControl ->
-          when (recursionControl) {
-            is Either.Left -> Right(Left(recursionControl.a))
-            is Either.Right -> {
-              val b: Either<A, B> = recursionControl.b
-              when (b) {
-                is Either.Left -> Left(b.a)
-                is Either.Right -> Right(Right(b.b))
+    fun <F, L, A, B> tailRecM(MF: Monad<F>, a: A, f: (A) -> EitherTOf<F, L, Either<A, B>>): EitherT<F, L, B> =
+      EitherT(MF.tailRecM(a) {
+        val value = f(it).fix().value
+        MF.run {
+          value.map { recursionControl ->
+            when (recursionControl) {
+              is Either.Left -> Right(Left(recursionControl.a))
+              is Either.Right -> {
+                val b: Either<A, B> = recursionControl.b
+                when (b) {
+                  is Either.Left -> Left(b.a)
+                  is Either.Right -> Right(Right(b.b))
+                }
               }
             }
           }
         }
-      }))
-    }
+      })
 
     fun <F, A, B> right(MF: Applicative<F>, b: B): EitherT<F, A, B> = EitherT(MF.just(Right(b)))
 
