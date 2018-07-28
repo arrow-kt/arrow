@@ -28,7 +28,7 @@ You can read more about all the [datatypes]({{ '/docs/datatypes/intro' | relativ
  
 ### Typeclasses
 
-Typeclasses define a set of functions associated to one type.
+Typeclasses define a set of extension functions associated to one type.
 This behavior is checked by a test suite called the "laws" for that typeclass.
 
 You can use typeclasses as a DSL to add new free functionality to an existing type
@@ -46,6 +46,9 @@ One example, the typeclass `Eq` parametrized to `F` defines equality between two
 ```kotlin
 interface Eq<F> {
   fun F.eqv(b: F): Boolean
+
+  fun F.neqv(b: F): Boolean =
+    !eqv(b)
 }
 ```
 
