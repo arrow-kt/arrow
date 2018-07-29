@@ -525,10 +525,10 @@ object: FutureMonadInstance: Monad<ForFuture> {
 }
 
 object: OptionMonadInstance: Monad<ForOption> {
-    fun just (instance: A): Future<A> =
+    fun just (instance: A): Option<A> =
       Some(a)
 
-    fun FutureOf<A>.flatMap(f: (A) ->  FutureOf<B>): Option<B> =
+    fun OptionOf<A>.flatMap(f: (A) ->  OptionOf<B>): Option<B> =
       flatMap(f) // as per precedence rules the class method is called
 }
 
