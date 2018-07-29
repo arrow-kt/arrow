@@ -39,9 +39,9 @@ interface OptionTTraverseFilterInstance<F> :
     fix().traverseFilter(f, AP, FFF())
 }
 
-fun <F, G, A, B> OptionT<F, A>.traverseFilter(f: (A) -> Kind<G, Option<B>>, GA: Applicative<G>, FF: Traverse<F>): Kind<G, OptionT<F, B>> = GA.run {
+fun <F, G, A, B> OptionT<F, A>.traverseFilter(f: (A) -> Kind<G, Option<B>>, GA: Applicative<G>, FF: Traverse<F>): Kind<G, OptionT<F, B>> {
   val fa = ComposedTraverseFilter(FF, Option.traverseFilter(), Option.applicative()).traverseFilterC(value, f, GA)
-  fa.map({ OptionT(FF.run { it.unnest().map({ it.fix() }) }) })
+  return GA.run { fa.map { OptionT(FF.run { it.unnest().map { it.fix() } }) } }
 }
 
 class OptionTMtlContext<F>(val MF: Monad<F>, val TF: TraverseFilter<F>) : OptionTMonadInstance<F>, OptionTMonoidKInstance<F>, OptionTTraverseFilterInstance<F> {
