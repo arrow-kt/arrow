@@ -226,8 +226,8 @@ fun allCitiesToVisit(speaker: Speaker): List<City> {
     return
         speaker
         .getTalks()
-        .flatMap(talk -> talk.getConferences())
-        .flatMap(conf -> conf.getCities())
+        .flatMap { talk -> talk.getConferences() }
+        .flatMap { conf -> conf.getCities() }
 }
 ```
 
@@ -237,9 +237,9 @@ Let me do one further trick and format the same code in an unusual way:
 fun allCitiesToVisit(Speaker speaker): List<City> {
     return
         speaker
-        .getTalks()           .flatMap(x -> x
-        .getConferences()    ).flatMap(x -> x
-        .getCities()         )
+        .getTalks()           .flatMap { x -> x
+        .getConferences()    }.flatMap { x -> x
+        .getCities()         }
 }
 ```
 
@@ -283,9 +283,9 @@ Hard to read, but let me apply my formatting trick again:
 fun nextTalkCity(speaker: Speaker): Task<City> {
     return
         speaker
-        .nextTalk()         .execute().then(x -> x
-        .getConference()   ).execute().then(x -> x
-        .getCity()         )
+        .nextTalk()         .execute().then { x -> x
+        .getConference()   }.execute().then { x -> x
+        .getCity()         }
 }
 ```
 
@@ -309,17 +309,17 @@ fun nextTalkCity(speaker: Speaker?): City? {
 fun allCitiesToVisit(speaker: Speaker): List<City> {
     return
         speaker
-        .getTalks()            .flatMap(x => x
-        .getConferences()     ).flatMap(x => x
-        .getCities()          )
+        .getTalks()            .flatMap { x -> x
+        .getConferences()     }.flatMap { x -> x
+        .getCities()          }
 }
 
 fun nextTalkCity(speaker: Speaker): Task<City> {
     return
         speaker
-        .nextTalk()            .execute().then(x => x
-        .getConference()      ).execute().then(x => x
-        .getCity()            )
+        .nextTalk()            .execute().then { x -> x
+        .getConference()      }.execute().then { x -> x
+        .getCity()            }
 }
 ```
 
@@ -354,8 +354,8 @@ fun workflow(speaker: Speaker): WorkflowThatReturns<City> {
     return
         speaker
         .nextTalk()
-        .addStep(x -> x.getConference())
-        .addStep(x -> x.getCity())
+        .addStep { x -> x.getConference() }
+        .addStep { x -> x.getCity() }
 }
 ```
 
@@ -423,11 +423,11 @@ The client can be written with flatMap method composition, without branching, in
 ```kotlin
 fun shipperOfLastOrderOnCurrentAddress(customerId: Int): Option<Shipper> =
     repo.getCustomer(customerId)
-        .flatMap(c -> c.address)
-        .flatMap(a -> repo.getAddress(a.id))
-        .flatMap(a -> a.lastOrder)
-        .flatMap(lo -> repo.getOrder(lo.id))
-        .flatMap(o -> o.shipper)
+        .flatMap { c -> c.address }
+        .flatMap { a -> repo.getAddress(a.id) }
+        .flatMap { a -> a.lastOrder }
+        .flatMap { lo -> repo.getOrder(lo.id) }
+        .flatMap { o -> o.shipper }
 ```
 
 ### Sequence can implement Monad
@@ -449,9 +449,9 @@ And here is an example of composition:
 ```kotlin
 val shippers: IEnumerable<Shipper> =
     customers
-        .flatMap(c => c.addresses)
-        .flatMap(a => a.prders)
-        .flatMap(o => o.shippers)
+        .flatMap { c -> c.addresses }
+        .flatMap { a -> a.orders }
+        .flatMap { o -> o.shippers }
 ```
 
 The query has no idea about how the collections are stored (encapsulated in containers). We use functions `A -> Sequence<B>` to produce new sequences (flatMap operation).
@@ -491,12 +491,13 @@ Effectively, it's just a wrapper around the Deferred which doesn't add too much 
 ```kotlin
 repository
     .loadSpeaker()
-    .flatMap(speaker -> speaker.nextTalk())
-    .flatMap(talk -> talk.getConference())
-    .flatMap(conference -> conference.getCity())
-    .runSync { city -> city.fold(
+    .flatMap { speaker -> speaker.nextTalk()
+        .flatMap { talk -> talk.getConference() }
+        .flatMap { conference -> conference.getCity().map { it to speaker } }
+    }
+    .runSync { (city, speaker) -> city.fold(
         { Logger.logError(it); reservations.cancel() },
-        { reservations.bookFlight(city) })
+        { reservations.bookFlight(speaker, city) })
     }
 ```
 
@@ -555,11 +556,11 @@ The main use case is allowing you to write code that is generic for any object t
 ```kotlin
 fun <F> Monad<F>.shipperOfLastOrderOnCurrentAddress(customerId: Int): Kind<F, Shipper> =
     repo.getCustomer(customerId)
-        .flatMap(c -> c.address)
-        .flatMap(a -> repo.getAddress(a.id))
-        .flatMap(a -> a.lastOrder)
-        .flatMap(lo -> repo.getOrder(lo.id))
-        .flatMap(o -> o.shipper)
+        .flatMap { c -> c.address }
+        .flatMap { a -> repo.getAddress(a.id) }
+        .flatMap { a -> a.lastOrder }
+        .flatMap { lo -> repo.getOrder(lo.id) }
+        .flatMap { o -> o.shipper }
 ```
 In this case, like with any other interface, Monad defines the API and behavior but not the implementation details.
 This pattern is specially useful for libraries that must remain agnostic to implementations, and gives them a *lingua franca* when building on top of each other.
@@ -586,14 +587,14 @@ In this case, we would have to use closure to save speaker object until we get a
 ```kotlin
 repository
     .loadSpeaker()
-    .runSync { speaker =>
+    .runSync { speaker ->
         speaker
             .nextTalk()
-            .flatMap(talk => talk.getConference())
-            .flatMap(conference => conference.getCity())
+            .flatMap { talk -> talk.getConference() }
+            .flatMap { conference -> conference.getCity() }
             .runSync { city -> city.fold(
                 { Logger.logError(it); reservations.cancel() },
-                { reservations.bookFlight(city) })
+                { reservations.bookFlight(speaker, city) })
             }
         )
     }
@@ -615,10 +616,11 @@ reservations.bookFlight(speaker, city).await()
 
 Even though we lost the fluent syntax, at least the block has just one level, which makes it easier to read and navigate.
 
-By using coroutines, Arrow provides a generalisation that emulates async/await for any Monad.
+By using coroutines Arrow provides a specialization that enables readable async/await style code for any Monad.
+This specialization can be accessed using the function binding on any Monad, and the method bind for chaining using the Monad's flatMap.
 
 ```kotlin
-fun <F> bookSpeakersFlights(M: Monad<F>): Kind<F, A> =
+fun <F> bookSpeakersFlights(M: Monad<F>): Kind<F, Reservation> =
     M.binding {
         val speaker = repository.loadSpeaker().bind()
         val talk = speaker.nextTalk().bind()
@@ -626,6 +628,12 @@ fun <F> bookSpeakersFlights(M: Monad<F>): Kind<F, A> =
         val city = conference.getCity().bind()
         reservations.bookFlight(speaker, city).bind()
     }
+
+bookSpeakersFlights(ObservableSwitchMonadInstance).fix() // Observable<Reservation>
+
+bookSpeakersFlights(OptionMonadInstance).fix() // Option<Reservation>
+
+bookSpeakersFlights(ListMonadInstance).fix() // List<Reservation>
 ```
 
 These are called [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}), and you can find a complete section of the docs explaining it.
