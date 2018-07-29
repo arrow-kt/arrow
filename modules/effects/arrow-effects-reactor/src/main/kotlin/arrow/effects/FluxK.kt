@@ -1,12 +1,8 @@
 package arrow.effects
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Eval
-import arrow.core.Left
-import arrow.core.Right
-import arrow.core.identity
-import arrow.effects.CoroutineContextScheduler.asScheduler
+import arrow.core.*
+import arrow.effects.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Applicative
@@ -47,11 +43,10 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
     return Eval.defer { loop(this) }
   }
 
-  fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, FluxK<B>> = GA.run {
+  fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, FluxK<B>> =
     foldRight(Eval.always { GA.just(Flux.empty<B>().k()) }) { a, eval ->
-      f(a).map2Eval(eval) { Flux.concat(Flux.just<B>(it.a), it.b.flux).k() }
+      GA.run { f(a).map2Eval(eval) { Flux.concat(Flux.just<B>(it.a), it.b.flux).k() } }
     }.value()
-  }
 
   fun handleErrorWith(function: (Throwable) -> FluxK<A>): FluxK<A> =
       this.fix().flux.onErrorResume { t: Throwable -> function(t).flux }.k()
