@@ -49,7 +49,7 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
         Mono.defer { fa().value() }.k()
 
     fun <A> async(fa: Proc<A>): MonoK<A> =
-        Mono.create({ emitter: MonoSink<A> ->
+        Mono.create { emitter: MonoSink<A> ->
           fa { either: Either<Throwable, A> ->
             either.fold({
               emitter.error(it)
@@ -57,7 +57,7 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
               emitter.success(it)
             })
           }
-        }).k()
+        }.k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> MonoKOf<Either<A, B>>): MonoK<B> {
       val either = f(a).fix().value().block()
