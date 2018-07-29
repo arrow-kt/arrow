@@ -1,3 +1,4 @@
+
 dependencies {
     compile project(':arrow-data')
     compile project(':arrow-effects')
@@ -8,9 +9,8 @@ dependencies {
     compileOnly project(':arrow-annotations-processor')
     testCompileOnly project(':arrow-annotations-processor')
     testCompile project(':arrow-instances-data')
-    testCompile "io.kotlintest:kotlintest-core:$kotlinTestVersion"
-    testCompile "io.kotlintest:kotlintest-assertions:$kotlinTestVersion"
-    testCompile "io.kotlintest:kotlintest-assertions-arrow:$kotlinTestVersion"
+    testCompile("junit:junit:$jUnitVersion")
+    testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
     testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
     testCompile project(':arrow-test')
 

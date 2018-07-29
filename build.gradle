@@ -17,10 +17,12 @@
 buildscript {
     ext {
         // Constants
-        gradleVersion = '4.4.1'
+        gradleVersion = '4.9'
         gradleVersionsPluginVersion = '0.17.0'
         javaVersion = JavaVersion.VERSION_1_7
-        kotlinTestVersion = '3.1.6'
+        jUnitVersion = '4.12'
+        jUnitVintageVersion = '5.2.0'
+        kotlinTestVersion = '3.1.5'
         kotlinVersion = '1.2.51'
         daggerVersion = '2.15'
         kotlinxCoroutinesVersion = '0.23.3'
@@ -113,6 +115,7 @@ subprojects { project ->
     compileKotlin.kotlinOptions.freeCompilerArgs += ["-Xskip-runtime-version-check"]
 
     test {
+        useJUnitPlatform()
         testLogging {
             events "passed", "skipped", "failed", "standardOut", "standardError"
         }

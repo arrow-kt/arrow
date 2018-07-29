@@ -24,11 +24,9 @@ dependencies {
     kaptTest project(':arrow-annotations-processor')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
-    compile "io.kotlintest:kotlintest-core:$kotlinTestVersion"
-    compile "io.kotlintest:kotlintest-assertions:$kotlinTestVersion"
-    compile "io.kotlintest:kotlintest-assertions-arrow:$kotlinTestVersion"
+    testCompile("junit:junit:$jUnitVersion")
+    testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
     compile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
-
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
     compile "io.reactivex.rxjava2:rxjava:2.1.13"
     compile "io.projectreactor:reactor-core:3.1.3.RELEASE"

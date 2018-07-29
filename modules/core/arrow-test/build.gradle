@@ -1,3 +1,4 @@
+
 dependencies {
     compile project(':arrow-data')
     compile project(':arrow-optics')
@@ -8,9 +9,8 @@ dependencies {
     compile project(":arrow-recursion")
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
-    compile "io.kotlintest:kotlintest-core:$kotlinTestVersion"
-    compile "io.kotlintest:kotlintest-assertions:$kotlinTestVersion"
-    compile "io.kotlintest:kotlintest-assertions-arrow:$kotlinTestVersion"
+    testCompile("junit:junit:$jUnitVersion")
+    testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
     compile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
     kapt project(':arrow-annotations-processor')
 }
