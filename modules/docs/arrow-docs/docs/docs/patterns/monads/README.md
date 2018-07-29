@@ -379,12 +379,18 @@ interface Monad<F>: Applicative<F>, Functor<F> {
 
 Constructor is used to put an object into container `Kind<F, A>` as described in the [glossary]({{ '/docs/patterns/glossary/#type-constructors' | relative_url }}), flatMap is used to replace one contained object with another contained object.
 
-It's important that flatMaps's argument returns Kind<F, B> and not just B. We can think of flatMap as a combination of map and flatten as defined per following signature:
+It's important that flatMaps's argument returns Kind<F, B> and not just B, as this new contained object can have different behavior, like a left branch of Either or an async execution of IO.
+
+We can think of flatMap as a combination of map and flatten as defined per following signature:
 
 ```kotlin
-fun <F, A> Kind<F, A>.map(f: (A) ->  B) // Defined in Functor, of which Monad inherits
+fun <F, A> Kind<F, A>.map(f: (A) ->  B) // Inherited from Functor
 
 fun <F, A> Kind<F, Kind<F, A>>.flatten(): Kind<F, A>
+
+container
+  .map { x -> just(x + 1) } // Kind<F, Kind<F, Int>>
+  .flatten() // Kind<F, Int>
 ```
 
 Even though I spent quite some time with examples, I expect you to be slightly confused at this point. That's ok.
