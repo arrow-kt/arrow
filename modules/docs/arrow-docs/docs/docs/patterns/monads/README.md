@@ -249,7 +249,8 @@ Let's discuss another possible complication.
 
 ### Asynchronous Calls
 
-What if our methods need to access some remote database or service to produce the results? This should be shown in type signature, and Kotlin has Task<T> for that:
+What if our methods need to access some remote database or service to produce the results? This should be shown in type signature,
+and we can imagine a library has Task<T> for that:
 
 ```kotlin
 class Speaker {
@@ -267,14 +268,12 @@ class Conference {
 
 This change breaks our nice workflow composition again.
 
-We'll get back to async-await later, but the original way to combine Task-based methods was to use ContinueWith and Unwrap API:
-
 ```kotlin
 fun nextTalkCity(speaker: Speaker): Task<City> {
     return
         speaker
-        .flatMap(talk -> talk.getConference())
-        .flatMap(conf -> conf.getCity())
+        .then(talk -> talk.getConference()).execute()
+        .then(conf -> conf.getCity()).execute()
 }
 ```
 
@@ -284,8 +283,8 @@ Hard to read, but let me apply my formatting trick again:
 fun nextTalkCity(speaker: Speaker): Task<City> {
     return
         speaker
-        .nextTalk()         .flatMap(x -> x
-        .getConference()   ).flatMap(x -> x
+        .nextTalk()         .execute().then(x -> x
+        .getConference()   ).execute().then(x -> x
         .getCity()         )
 }
 ```
@@ -318,8 +317,8 @@ fun allCitiesToVisit(speaker: Speaker): List<City> {
 fun nextTalkCity(speaker: Speaker): Task<City> {
     return
         speaker
-        .nextTalk()            .flatMap(x => x
-        .getConference()      ).flatMap(x => x
+        .nextTalk()            .execute().then(x => x
+        .getConference()      ).execute().then(x => x
         .getCity()            )
 }
 ```
