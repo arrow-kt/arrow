@@ -1,10 +1,7 @@
 package arrow.mtl.instances
 
 import arrow.Kind
-import arrow.core.Option
-import arrow.core.applicative
-import arrow.core.fix
-import arrow.core.traverseFilter
+import arrow.core.*
 import arrow.data.OptionT
 import arrow.data.OptionTPartialOf
 import arrow.data.fix
@@ -16,10 +13,7 @@ import arrow.instances.OptionTMonoidKInstance
 import arrow.instances.OptionTTraverseInstance
 import arrow.mtl.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.TraverseFilter
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Monad
-import arrow.typeclasses.Traverse
-import arrow.typeclasses.unnest
+import arrow.typeclasses.*
 
 @instance(OptionT::class)
 interface OptionTFunctorFilterInstance<F> : OptionTFunctorInstance<F>, FunctorFilter<OptionTPartialOf<F>> {
@@ -41,7 +35,8 @@ interface OptionTTraverseFilterInstance<F> :
 
 fun <F, G, A, B> OptionT<F, A>.traverseFilter(f: (A) -> Kind<G, Option<B>>, GA: Applicative<G>, FF: Traverse<F>): Kind<G, OptionT<F, B>> {
   val fa = ComposedTraverseFilter(FF, Option.traverseFilter(), Option.applicative()).traverseFilterC(value, f, GA)
-  return GA.run { fa.map { OptionT(FF.run { it.unnest().map { it.fix() } }) } }
+  val mapper: (Kind<Nested<F, ForOption>, B>) -> OptionT<F, B> = { OptionT(FF.run { it.unnest().map { it.fix() } }) }
+  return GA.run { fa.map(mapper) }
 }
 
 class OptionTMtlContext<F>(val MF: Monad<F>, val TF: TraverseFilter<F>) : OptionTMonadInstance<F>, OptionTMonoidKInstance<F>, OptionTTraverseFilterInstance<F> {
