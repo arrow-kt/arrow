@@ -241,7 +241,7 @@ fun allCitiesToVisit(Speaker speaker): List<City> {
 }
 ```
 
-Now you can see the same original code on the left, combined with just a bit of technical repeatable clutter on the right. Hold on, I'll show you where I'm going.
+Now you can see the original original code on the left, combined with just a bit of technical repetitive clutter on the right. Hold on, I'll show you where I'm going.
 
 Let's discuss another possible complication.
 
@@ -369,9 +369,9 @@ In Arrow terms, a Monad is an interface with two operations: a constructor `just
 
 ```kotlin
 interface Monad<F>: Applicative<F>, Functor<F> {
-    fun just (instance: A): Kind<F, A>
+    fun <A> just (instance: A): Kind<F, A>
 
-    fun Kind<F, A>.flatMap(f: (A) ->  Kind<F, B>)
+    fun <A, B> Kind<F, A>.flatMap(f: (A) ->  Kind<F, B>)
 }
 ```
 
@@ -462,25 +462,25 @@ The other names for similar concepts in other languages are Promise and Future.
 While the typical usage of Deferred in Kotlin is different from the Monad pattern we discussed, I can still come up with a Future class with the familiar structure:
 
 ```kotlin
-class Future<T> {
+class Future<T>(
     val instance: Deferred<T>
-
-    fun Future(T instance) {
+) {
+    constructor(instance: T) {
         this.instance = async(LAZY) { instance }
     }
 
-    fun Future(Deferred<T> instance) {
+    constructor(instance: Deferred<T>) {
         this.instance = instance
     }
 
     fun <U> flatMap(func: (T) -> Future<U>): Future<U> =
-      Future(async(LAZY) {
-        val t = instance.await()
-        func(t).await()
-      })
+        Future(async(LAZY) {
+            val t = instance.await()
+            func(t).await()
+        })
 
-    fun runSync(action: (Try<T>) -> Unit): Unit =
-      runBlocking { action(Try { instance.await() }) }
+    fun runSync(action: (Try<T>) -> Unit) =
+        runBlocking { action(Try { instance.await() }) }
 }
 ```
 
@@ -511,39 +511,39 @@ As you have seen, neither Future nor Option implement Monad directly.
 This is intentional, as you can potentially have several Monad implementations for a single type.
 For example, RxJava's Observable can be chained using `flatMap`, `switchMap`, and `concatMap`, and using each is still a Monad.
 
-Instead, Arrow specifies that Monad must be implemented by a separate object, referred as the "instance of Monad for type F".
+Instead, Arrow specifies that Monad must be implemented by a separate object or class, referred as the "instance of Monad for type F".
 
 ```kotlin
-object: FutureMonadInstance: Monad<ForFuture> {
-    fun just (instance: A): Future<A> =
-      Future(a)
+object FutureMonadInstance: Monad<ForFuture> {
+    override fun <A> just (instance: A): Future<A> =
+        Future(a)
 
-    fun FutureOf<A>.flatMap(f: (A) ->  FutureOf<F, B>): Future<B> =
-      flatMap(f) // as per precedence rules the class method is called
+    override fun <A, B> FutureOf<A>.flatMap(f: (A) ->  FutureOf<F, B>): Future<B> =
+        flatMap(f) // as per precedence rules the class method is called
 }
 
-object: OptionMonadInstance: Monad<ForOption> {
-    fun just (instance: A): Option<A> =
-      Some(a)
+object OptionMonadInstance: Monad<ForOption> {
+    override fun <A> just (instance: A): Option<A> =
+        Some(a)
 
-    fun OptionOf<A>.flatMap(f: (A) ->  OptionOf<B>): Option<B> =
-      flatMap(f) // as per precedence rules the class method is called
+    override fun <A, B> OptionOf<A>.flatMap(f: (A) ->  OptionOf<B>): Option<B> =
+        flatMap(f) // as per precedence rules the class method is called
 }
 
-object: ObservableSwitchMonadInstance: Monad<ForOption> {
-    fun just (instance: A): Observable<A> =
-      Observable.just(a)
+object ObservableSwitchMonadInstance: Monad<ForObservable> {
+    override fun <A> just (instance: A): Observable<A> =
+        Observable.just(a)
 
-    fun ObservableOf<A>.flatMap(f: (A) ->  ObservableOf<B>): Option<B> =
-      switchMap(f)
+    override fun <A, B> ObservableOf<A>.flatMap(f: (A) ->  ObservableOf<B>): Observable<B> =
+        switchMap(f)
 }
 
-object: ObservableConcatMonadInstance: Monad<ForOption> {
-    fun just (instance: A): Observable<A> =
-      Observable.just(a)
+object ObservableConcatMonadInstance: Monad<ForObservable> {
+    override fun <A> just (instance: A): Observable<A> =
+        Observable.just(a)
 
-    fun ObservableOf<A>.flatMap(f: (A) ->  ObservableOf<B>): Option<B> =
-      concatMap(f)
+    override fun <A, B> ObservableOf<A>.flatMap(f: (A) ->  ObservableOf<B>): Observable<B> =
+        concatMap(f)
 }
 ```
 
@@ -576,11 +576,11 @@ That piece of data could be discarded after the first use because it was never n
 
 Quite often though, this might not be the case. A workflow step might need data from two or more previous steps combined.
 
-In the example above, BookFlight method might actually need both Speaker and City objects:
+In the example above, `bookFlight` method might actually needs both `Speaker` and `City` objects:
 
 ![](https://mikhail.io/2018/07/monads-explained-in-csharp-again//non-linear-workflow.png)
 
-In this case, we would have to use closure to save speaker object until we get a talk too:
+In this case, we would have to use a lambda to save the speaker variable until we get a talk too:
 
 ```kotlin
 repository
@@ -600,7 +600,7 @@ repository
 
 Obviously, this gets ugly very soon.
 
-To solve this structural problem, Kotlin language got its coroutines feature, which is brought from other languages including C# and JavaScript.
+To solve this structural problem the Kotlin language introduced coroutines, the design of which was inspired by other languages such as C# and JavaScript.
 
 If we move back to using Deferred instead of our custom Future, we are able to write
 
@@ -615,7 +615,7 @@ reservations.bookFlight(speaker, city).await()
 Even though we lost the fluent syntax, at least the block has just one level, which makes it easier to read and navigate.
 
 By using coroutines Arrow provides a specialization that enables readable async/await style code for any Monad.
-This specialization can be accessed using the function binding on any Monad, and the method bind for chaining using the Monad's `flatMap`.
+This specialization can be accessed using the function `binding` on any Monad, and the method `bind`. Internally, `Monad#flatMap` is used for chaining.
 
 ```kotlin
 fun <F> bookSpeakersFlights(M: Monad<F>): Kind<F, Reservation> =
@@ -638,12 +638,12 @@ These are called [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions'
 
 ### Monad Laws
 
-There are a couple laws that constructor and flatMap need to adhere to, so that they produce a proper monad.
+There are a couple laws that `just` constructor and `flatMap` need to adhere to, so that they produce a Monad with a stable implementation.
 These laws are encoded in Arrow as tests you can find in the `arrow-test` module, and are already tested for all instances in the library.
 
 A typical monad tutorial will make a lot of emphasis on the laws, but I find them less important to explain to a beginner. Nonetheless, here they are for the sake of completeness.
 
-Left Identity law says that that Monad constructor is a neutral operation: you can safely run it before Bind, and it won't change the result of the function call:
+`Left Identity law` says that that Monad constructor is a neutral operation: you can safely run it before Bind, and it won't change the result of the function call:
 
 ```
 // Given
@@ -654,7 +654,7 @@ val f: (A) -> Kind<F, B>
 just(value).flatMap(f) == f(value)
 ```
 
-Right Identity law says that given a monadic value, wrapping its contained data into another monad of same type and then Binding it, doesn't change the original value:
+`Right Identity law` says that given a monadic value, wrapping its contained data into another monad of same type and then Binding it, doesn't change the original value:
 
 ```
 // Given
@@ -664,7 +664,7 @@ val monadicValue: Kind<F, A>
 monadicValue.flatMap { x -> just(x) } == monadicValue
 ```
 
-Associativity law means that the order in which Bind operations are composed does not matter:
+`Associativity law` means that the order in which Bind operations are composed does not matter:
 
 ```
 // Given
