@@ -9,12 +9,15 @@ permalink: /docs/patterns/typeclass_polymorphism/
 {:.advanced}
 advanced
 
-What if we could write apps without caring about the runtime data types used but just about how the data is operated on? 
+What if we could write apps without caring about the runtime data types used but just about *how the data is operated 
+on*? 
+
 Let's say we have an  application working with RxJava's `Observable`. We'll end up having a bunch of chained call stacks 
-based on that given data type. But at the end of the day, and for the sake of simplicity, wouldn't  Observable be just 
+based on that given data type. But at the end of the day, and for the sake of simplicity, wouldn't  `Observable` be just 
 like a "container" with some extra powers?
 
-And same story for other "containers" like `Flowable` , `Deferred` (coroutines), `Future`, `IO`, and many more. 
+And same story for other "containers" like `Flowable` , `Deferred` (coroutines), `Future`, `IO`, and many more.
+
 Conceptually, all those types represent an operation (already done or pending to be done), which could support things 
 like mapping over the inner value, flatMapping to chain other operations of the same type, zipping it with other 
 instances of the same type, and so on.
@@ -31,9 +34,9 @@ a simple example first and then we talk about those. Deal?
 I'm grabbing the following code samples from my mate [Raúl Raja](https://twitter.com/raulraja) who helped to polish this 
 post.
 
-Let's say we have a **TODO** app, and we want  to fetch some user Tasks  from a local cache. In case we don't find them, 
-we'll try to fetch them from a network service. We could have a simple contract for for both of the DataSources able to 
-retrieve a List of Tasks for a given User, regardless of the source:
+Let's say we have a *TODO* app, and we want  to fetch some user `Tasks` from a local cache. In case we don't find them, 
+we'll try to fetch them from a network service. We could have a simple contract for for both of the `DataSources` able 
+to retrieve a `List` of `Tasks` for a given `User`, regardless of the source:
 
 ```kotlin
 interface DataSource {
@@ -44,8 +47,7 @@ interface DataSource {
 We'll return `Observable` here just for simplicity. It could be `Single`, `Maybe`, `Flowable`, `Deferred`, or anything 
 else depending on our needs.
 
-Now, let's add a couple of mocked implementations for it, mimicking what could be a **local** and a **remote** 
-`DataSource`.
+Now, let's add a couple of mocked implementations for it, mimicking what could be a *local* and a *remote* `DataSource`.
 
 ```Kotlin
 class LocalDataSource : DataSource {
@@ -204,7 +206,7 @@ object test {
 ```
 
 This program composes the execution chain for three different users, and then subscribes to the resulting `Observable`.
- 
+
 The first two `Users` are available, lucky of us. `User1` is available on the local DataSource, and `User2` is available 
 on the remote one.
 
@@ -219,8 +221,8 @@ This is what we get printed for the three cases:
 > UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user)))
 ```
 
-This is all what is worth for our canonical example. Let's try to encode it now using a **Functional Programming 
-polymorphic style**.
+This is all what is worth for our canonical example. Let's try to encode it now using a *Functional Programming 
+polymorphic style*.
 
 ### Abstracting out the data types
 
@@ -232,11 +234,13 @@ interface DataSource<F> {
 }
 ```
 
-It's fairly similar, but it has two important differences. First one, it depends on an `F` generic type. Second one, the 
-return type: `Kind<F, List<Task>>`.
+It's fairly similar, but it has two important differences:
+ 
+ * It depends on an `F` generic type. 
+ * The return type: `Kind<F, List<Task>>`.
 
-`Kind` is basically the way Arrow encodes something called **Higher Kinded Types**. Let's learn the concept pretty 
-rapidly with a very basic example.
+`Kind` is basically the way Arrow encodes something called *Higher Kinded Types*. Let's learn the concept pretty rapidly 
+with a very basic example.
 
 On `Observable<A>`, we have 2 parts:
 
@@ -266,8 +270,8 @@ The `DataSource` function **returns a higher kind**: `Kind<F, List<Task>>` . It
 stays generic.
 
 We're just fixing the `List<Task>` type here, which is already concrete. In other words, we don't care about what's the 
-container type (`F`), as long as it keeps  a `List<Task>` inside. a.k.a: We leave the slot open **for passing in 
-different containers**. Clear enough? Let's keep moving.
+container type (`F`), as long as it keeps  a `List<Task>` inside. a.k.a: We leave the slot open *for passing in 
+different containers*. Clear enough? Let's keep moving.
 
 Let's take a look at the `DataSource` implementations, but this time separately for a more gradual learning. The local 
 one first:
@@ -286,11 +290,11 @@ class LocalDataSource<F>(A: ApplicativeError<F, Throwable>) : DataSource<F>, App
 }
 ```
 
-Bunch of new things? Don't be scared, let's go **step by step**.
+Bunch of new things? Don't be scared, let's go *step by step*.
 
 This `DataSource` keeps the generic `F` since it implements `DataSource<F>` . We wanna be able to pass that type from 
 the outside, all the way down.
- 
+
 Now, forget about that probably unfamiliar `ApplicativeError` thing on the constructor, and focus on the 
 `allTasksByUser()` function, just for now. We'll get back to that.
 
@@ -306,14 +310,14 @@ As you see, it returns (one more time) `Kind<F, List<Task>>`. So we still don't 
 long as it contains a `List<Task>`.
 
 But we have a problem. Depending on whether we can find the `Tasks` for the given user on the local cache or not, we 
-might want to **notify an error** (when they're not found), or **return the Tasks already wrapped into `F`** in case 
-they're found. And for both things we must return: `Kind<F, List<Task>>`.
+might want to *notify an error* (when they're not found), or *return the Tasks already wrapped into `F`* in case they're 
+found. And for both things we must return: `Kind<F, List<Task>>`.
 
-In other words: there's a type **we still don't know anything about: `F** and we need a way to return an error wrapped `
+In other words: there's a type *we still don't know anything about: `F`* and we need a way to return an error wrapped 
 into it, and also a way to construct an instance of it wrapping a successful value. Sounds impossible?. 
 
 Let's go back to the class declaration and find that `ApplicativeError` being passed on construction and then used as a 
-delegate for the class (`by A).
+delegate for the class (`by A`).
 
 ```kotlin
 class LocalDataSource<F>(A: ApplicativeError<F, Throwable>) : DataSource<F>, ApplicativeError<F, Throwable> by A {
@@ -323,7 +327,7 @@ class LocalDataSource<F>(A: ApplicativeError<F, Throwable>) : DataSource<F>, App
 
 `ApplicativeError` extends from `Applicative`, and both are **Typeclasses**.
 
-**Typeclasses define behaviors (contracts)**. They're basically encoded as interfaces that work over a generic argument, 
+*Typeclasses define behaviors (contracts)*. They're basically encoded as interfaces that work over a generic argument, 
 as in `Monad<F>` , `Functor<F>` and many more. That `F` is the data type. So we will be able to pass types like `Either`
 , `Option`, `IO`, `Observable`, `Flowable` and many more for it.
 
@@ -334,17 +338,17 @@ from Functional Programming and you probably don't need to know more about them 
 
 So, back to our two problems:
 
-**Wrapping a successful value into an instance of `Kind<F, List<Task>>**
+*Wrapping a successful value into an instance of `Kind<F, List<Task>>*
 
 We can rely on a typeclass for this: `Applicative`. Since `ApplicativeError` extends from it, we can delegate to it. 
 We're delegating our class on it, so we can use its features out of the box.
 
-`Applicative` provides the `just(a)` function. `just(a)` is **wraps a value into the context of any Higher Kind**. So If 
+`Applicative` provides the `just(a)` function. `just(a)` is *wraps a value into the context of any Higher Kind*. So If 
 we have an `Applicative<F>`, it could call `just(a)` to wrap the value into the container `F`, regardless of which one 
 is it. Let's say it's `Observable`, we'll have an `Applicative<Observable>`, which will know how to wrap a into an 
 `Observable` like `Observable.just(a)`.
 
-**Wrapping an error into an instance of `Kind<F, List<Task>>`**
+*Wrapping an error into an instance of `Kind<F, List<Task>>`*
 
 We can use `ApplicativeError for that. It `brings the function `raiseError(e)` into scope. `raiseError(e)` basically 
 wraps an error into the `F` container. For the `Observable` example, raising the error would end up doing something like 
@@ -375,9 +379,8 @@ found), we are going to model that using an [`Option`](https://arrow-kt.io/docs/
 aware of how [`Option`](https://arrow-kt.io/docs/datatypes/option/) works, it models presence vs absence of a value. A 
 value that is wrapped inside of it.
 
-After getting our optional value, we `fold` over it. Folding [is just equivalent to a when statement over the optional 
-value](https://github.com/arrow-kt/arrow/blob/55bb4ff540e152e0a719af1732c2ee0347b2662e/modules/core/arrow-core/src/main/kotlin/arrow/core/Option.kt#L77)
-: When it's **absent**, it wraps an error into the `F` data type (first lambda passed in). And when it's **present** it 
+* After getting our optional value, we `fold` over it. Folding is just equivalent to a when statement over the optional 
+value. When it's *absent*, it wraps an error into the `F` data type (first lambda passed in). And when it's *present* it 
 constructs an instance of the `F` data type wrapping it (second lambda). For both cases, it uses the `ApplicativeError` 
 features mentioned before: `raiseError()` and `just()`.
 
@@ -403,12 +406,12 @@ class RemoteDataSource<F>(A: Async<F>) : DataSource<F>, Async<F> by A {
 
 This time there's a subtle difference: Instead of delegating into an instance of `ApplicativeError` as before, we'll use 
 a different typeclass: `Async`.
- 
+
 That's because of the asynchronous nature of a network call. We want to code it in an asynchronous way, so we'll 
 delegate its asynchrony requirements into a typeclass that is thought for it.
 
 `Async` models asynchronous operations. So it's able to model any operations that are based on callbacks. Note that we 
-still don't know about the concrete data types to use, but about the problem, which **is asynchronous by nature**. 
+still don't know about the concrete data types to use, but about the problem, which *is asynchronous by nature*. 
 Therefore we use a Typeclass that encodes that problematic to solve it.
 
 So, zooming in a bit into the function:
@@ -499,7 +502,7 @@ of it to solve the concerns we have at all the nested levels, and pass it all th
 
 ### Testing polymorphism
 
-We have finally got to the point where **our complete app is abstracted away from any concrete data type containers** 
+We have finally got to the point where *our complete app is abstracted away from any concrete data type containers* 
 (`F`) and we can focus on testing its polymorphism using the runtime. We'll test the same code passing in different data 
 types for the type `F`. The scenario is the same we had when we were plainly using `Observable`.
 
@@ -528,7 +531,7 @@ object test {
 ```
 
 Arrow provides wrappers over some well known library data types for compatibility, so there's a handy `SingleK` wrapper 
-available for it. These wrappers **enable the data types as Higher Kinds** to be able to use them with typeclasses.
+available for it. These wrappers *enable the data types as Higher Kinds* to be able to use them with typeclasses.
 
 This test will print:
 
@@ -877,7 +880,7 @@ get familiarized with the concepts. (Repeatability as in just using operations l
 way, regardless of the problem you're solving. Of course that's constrained to using some libraries that enable pure FP 
 over Kotlin and provide those operations and constructs, like Arrow.
 
-* These patterns **remove the need for specific DI frameworks**, since they're based on the same concepts of Dependency 
+* These patterns *remove the need for specific DI frameworks*, since they're based on the same concepts of Dependency 
 Injection out of the box. You're always able to provide implementation details later on and switch them transparently, 
 and before that moment your program is not tied to any "side-effecty" details. This approach could be considered DI by 
 itself actually, since it's based on targeting abstractions leaving details to be passed form a single point in the 
@@ -889,15 +892,15 @@ bunch of key benefits.
 
 ### Related links
 
-If you want to move further on typeclasses, you can [read the docs section about them](https://arrow-kt.io/docs/typeclasses/intro/). 
-Still I'll be happy if you got to understand that **they're used as contracts to compose our polymorphic programs based 
-on abstraction** thanks to this post.
+If you want to move further on *typeclasses*, you can [read the docs section about them](https://arrow-kt.io/docs/typeclasses/intro/). 
+Still I'll be happy if you got to understand that *they're used as contracts to compose our polymorphic programs based 
+on abstraction* thanks to this post.
 
 You can jump to the docs later when you have a clearest idea on how we want to using them.
 
-**Related Blogposts**
+*Related Blogposts*
 
 Some of the mentioned concepts like purity are described in the following blogposts:
 
-[Kotlin Functional Programming: Does it make sense?](https://medium.com/@JorgeCastilloPr/kotlin-functional-programming-does-it-make-sense-36ad07e6bacf) by [Jorge Castillo](https://www.twitter.com/JorgeCastilloPR))
-[Kotlin purity and Function Memoization](https://medium.com/@JorgeCastilloPr/kotlin-purity-and-function-memoization-b12ab35d70a5) by [Jorge Castillo](https://www.twitter.com/JorgeCastilloPR))
+* [Kotlin Functional Programming: Does it make sense?](https://medium.com/@JorgeCastilloPr/kotlin-functional-programming-does-it-make-sense-36ad07e6bacf) by [Jorge Castillo](https://www.twitter.com/JorgeCastilloPR))
+* [Kotlin purity and Function Memoization](https://medium.com/@JorgeCastilloPr/kotlin-purity-and-function-memoization-b12ab35d70a5) by [Jorge Castillo](https://www.twitter.com/JorgeCastilloPR))
