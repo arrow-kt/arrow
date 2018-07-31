@@ -9,8 +9,8 @@ permalink: /docs/patterns/typeclass_polymorphism/
 {:.advanced}
 advanced
 
-What if we could write apps without caring about the runtime data types used but just about *how the data is operated 
-on*? 
+What if we could write apps without caring about the runtime data types used but just about __how the data is operated 
+on__? 
 
 Let's say we have an  application working with RxJava's `Observable`. We'll end up having a bunch of chained call stacks 
 based on that given data type. But at the end of the day, and for the sake of simplicity, wouldn't  `Observable` be just 
