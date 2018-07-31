@@ -712,7 +712,7 @@ If you want to move further on **typeclasses**, you can [read the docs section a
 Still I'll be happy if you got to understand that **they're used as contracts to compose our polymorphic programs based 
 on abstraction** thanks to this post.
 
-You can jump to the docs later when you have a clearest idea on how we want to using them.
+If you still have any doubts, please don't hesitate to contact me. The fastest way to do it is my Twitter handle: [@JorgeCastilloPR](https://www.twitter.com/JorgeCastilloPR).
 
 Some of the mentioned concepts like purity are described in the following blogposts:
 
