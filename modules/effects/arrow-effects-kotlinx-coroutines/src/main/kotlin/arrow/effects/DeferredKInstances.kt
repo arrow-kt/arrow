@@ -79,8 +79,11 @@ interface DeferredKAsyncInstance : DeferredKMonadDeferInstance, Async<ForDeferre
   override fun <A> DeferredKOf<A>.continueOn(ctx: CoroutineContext): DeferredK<A> =
     fix().continueOn(ctx)
 
-  override fun <A> invoke(fa: () -> A): DeferredK<A> =
-    DeferredK.invoke(f = fa)
+  override fun <A> invoke(f: () -> A): DeferredK<A> =
+    DeferredK.invoke(f = f)
+
+  override fun <A> invoke(ctx: CoroutineContext, f: () -> A): Kind<ForDeferredK, A> =
+    DeferredK.invoke(ctx = ctx, f = f)
 }
 
 @instance(DeferredK::class)

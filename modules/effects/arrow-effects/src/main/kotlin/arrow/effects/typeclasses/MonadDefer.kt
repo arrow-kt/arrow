@@ -12,10 +12,10 @@ import kotlin.coroutines.experimental.startCoroutine
 interface MonadDefer<F> : MonadError<F, Throwable> {
   fun <A> defer(fa: () -> Kind<F, A>): Kind<F, A>
 
-  operator fun <A> invoke(fa: () -> A): Kind<F, A> =
+  operator fun <A> invoke(f: () -> A): Kind<F, A> =
     defer {
       try {
-        just(fa())
+        just(f())
       } catch (t: Throwable) {
         raiseError<A>(t)
       }
