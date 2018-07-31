@@ -34,7 +34,7 @@ options:
       - title: Monad Comprehensions
         url: /docs/patterns/monad_comprehensions/
 
-      - title: Typeclass Polymorphism
+      - title: Polymorphic Programs
         url: /docs/patterns/typeclass_polymorphism/
 
       - title: Free Algebras

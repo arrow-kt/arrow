@@ -1,10 +1,10 @@
 ---
 layout: docs
-title: Monad Comprehensions
+title: Polymorphic Programs
 permalink: /docs/patterns/typeclass_polymorphism/
 ---
 
-## TypeClass Polymorphism
+## How to write polymorphic programs
 
 {:.advanced}
 advanced
