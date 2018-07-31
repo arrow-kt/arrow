@@ -1,6 +1,7 @@
 package arrow.instances
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.*
 import arrow.core.Either.Left
 import arrow.core.Either.Right
@@ -49,6 +50,14 @@ interface Tuple2MonadInstance<F> : Tuple2ApplicativeInstance<F>, Monad<Tuple2Par
       is Right -> just(b.b)
     }
   }
+}
+
+@instance(Tuple2::class)
+interface Tuple2BifunctorInstance : Bifunctor<ForTuple2> {
+  override fun <A, B, C, D> Kind2<ForTuple2, A, B>.bimap(
+    fl: (A) -> C,
+    fr: (B) -> D
+  ) = fix().bimap(fl, fr)
 }
 
 @instance(Tuple2::class)
