@@ -81,11 +81,9 @@ class RemoteDataSource : DataSource {
 }
 ```
 
-It's clearly rusty and both implementations are the same. It's a simply a mocked version of both data sources that would 
-ideally retrieve the data from a local cache or a network API.
-
-Here, we're just using an in memory `Map<User, List<Task>>` for each one to hold the data. It's a simple shortcut for 
-the example.
+It's clearly rusty and both implementations are actually the same. It's simply a mocked version of both data sources 
+that would ideally retrieve the data from a local cache or a network API. We're using an in memory 
+`Map<User, List<Task>>` for each one to hold the data.
 
 Since we got two `DataSources`, we'll need a way to coordinate both. Let's add the following `Repository`:
 
@@ -101,7 +99,7 @@ class TaskRepository(private val localDS: DataSource,
 }
 ```
 
-It basically tries to load the `List<Task>` from the `LocalDataSource`, and if it's not found, it'll try to fetch it 
+It basically tries to load the `List<Task>` from the `LocalDataSource`, and if it's not found, it will try to fetch it 
 from Network using the `RemoteDataSource`, as required by our specs.
 
 Let's add a simple dependency provisioning Module. We'll use it to get all our instances up and running in a nested way. 
@@ -115,7 +113,7 @@ class Module {
 }
 ```
 
-And finally, we'll need a simple test to run the whole chain:
+And finally, we'll need a simple test to run the whole stack of operations:
 
 ```kotlin
 object test {
@@ -160,7 +158,7 @@ polymorphic style**.
 
 ### Abstracting out the data types
 
-Our `DataSource` will look like this from now on:
+Our `DataSource` contract interface will look like this from now on:
 
 ```kotlin
 interface DataSource<F> {
@@ -283,7 +281,7 @@ extends from it, we can delegate to it. We're delegating our class on it, so we 
 [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}) provides the `just(a)` function. `just(a)` **wraps 
 a value into the context of any Higher Kind**. So If we have an `Applicative<F>`, it could call `just(a)` to wrap the 
 value into the container `F`, regardless of which one is it. Let's say it's `Observable`, we'll have an 
-`Applicative<Observable>`, which will know how to wrap a into an `Observable` like `Observable.just(a)`.
+`Applicative<Observable>`, which will know how to wrap `a` into an `Observable` like `Observable.just(a)`.
 
 * **Wrapping an error into an instance of `Kind<F, List<Task>>`**
 
