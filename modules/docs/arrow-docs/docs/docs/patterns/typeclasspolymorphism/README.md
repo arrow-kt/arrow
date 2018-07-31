@@ -708,9 +708,9 @@ bunch of key benefits.
 
 ### Related links
 
-If you want to move further on *typeclasses*, you can [read the docs section about them]({{ '/docs/typeclasses/intro' | relative_url }}). 
-Still I'll be happy if you got to understand that *they're used as contracts to compose our polymorphic programs based 
-on abstraction* thanks to this post.
+If you want to move further on **typeclasses**, you can [read the docs section about them]({{ '/docs/typeclasses/intro' | relative_url }}). 
+Still I'll be happy if you got to understand that **they're used as contracts to compose our polymorphic programs based 
+on abstraction** thanks to this post.
 
 You can jump to the docs later when you have a clearest idea on how we want to using them.
 
