@@ -338,7 +338,7 @@ from Functional Programming and you probably don't need to know more about them 
 
 So, back to our two problems:
 
-*Wrapping a successful value into an instance of `Kind<F, List<Task>>*
+### Wrapping a successful value into an instance of `Kind<F, List<Task>>
 
 We can rely on a typeclass for this: `Applicative`. Since `ApplicativeError` extends from it, we can delegate to it. 
 We're delegating our class on it, so we can use its features out of the box.
@@ -348,7 +348,7 @@ we have an `Applicative<F>`, it could call `just(a)` to wrap the value into the 
 is it. Let's say it's `Observable`, we'll have an `Applicative<Observable>`, which will know how to wrap a into an 
 `Observable` like `Observable.just(a)`.
 
-*Wrapping an error into an instance of `Kind<F, List<Task>>`*
+### Wrapping an error into an instance of `Kind<F, List<Task>>`
 
 We can use `ApplicativeError for that. It `brings the function `raiseError(e)` into scope. `raiseError(e)` basically 
 wraps an error into the `F` container. For the `Observable` example, raising the error would end up doing something like 
