@@ -1,13 +1,13 @@
-#font: Menlo
-#fontSize: 10
+#.instances: fill=#B9F6CA visual=class italic bold dashed
+#.typeclasses: fill=#64B5F6 visual=database bold
 #arrowSize: 1
 #bendSize: 0.3
+#fill: #64B5F6
+#font: Menlo
+#fontSize: 10
 #lineWidth: 2
 #padding: 8
 #zoom: 1
-#fill: #64B5F6
-#.typeclasses: fill=#64B5F6 visual=database bold
-#.instances: fill=#B9F6CA visual=class italic bold dashed
 [<typeclasses>Semigroup]<-[<typeclasses>Monoid]
 [<typeclasses>Monoid]<-[<instances>Monoid Instances|OptionMonoidInstance]
 [<typeclasses>Semigroup]<-[<instances>Semigroup Instances|OptionSemigroupInstance]
