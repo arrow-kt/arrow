@@ -67,7 +67,7 @@ sealed class IO<out A> : IOOf<A> {
   fun <B> flatMap(f: (A) -> IOOf<B>): IO<B> =
     when (this) {
       is Pure -> Suspend { f(this.a).fix() }
-      else -> Bind(this, { f(it).fix() })
+      else -> Bind(this) { f(it).fix() }
     }
 
   fun continueOn(ctx: CoroutineContext): IO<A> =
