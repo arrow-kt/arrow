@@ -9,8 +9,12 @@ permalink: /docs/patterns/monad_comprehensions/
 {:.intermediate}
 intermediate
 
-Monad comprehension is the name for a programming idiom available in multiple languages like JavaScript, F#, Scala, or Haskell.
+Monad comprehensions is the name for a programming idiom available in multiple languages like JavaScript, F#, Scala, or Haskell.
 The purpose of monad comprehensions is to compose sequential chains of actions in a style that feels natural for programmers of all backgrounds.
+They're similar to coroutines or async/await, but extensible to existing and new types!
+
+Let's walk through the evolution of how code was written, up to where comprehensions are today.
+It'll take a couple of sections to get there, so if you're familiar with `flatMap` feel free to skip to [Comprehensions over coroutines]({{ '/docs/patterns/monad_comprehensions/#comprehensions-over-coroutines' | relative_url }}).
 
 ### Synchronous sequences of actions
 
