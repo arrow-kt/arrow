@@ -13,6 +13,7 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldEqual
+import kotlinx.coroutines.experimental.newSingleThreadContext
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -240,6 +241,80 @@ class IOTest : UnitSpec() {
       val never = IO.async<Int> { }
       val result = never.unsafeRunTimed(100.milliseconds)
       result shouldBe None
+    }
+
+    "parallel execution makes all IOs start at the same time" {
+      val order = mutableListOf<Long>()
+
+      fun makePar(num: Long) =
+        IO(newSingleThreadContext("$num")) {
+          // Sleep according to my number
+          Thread.sleep(num * 20)
+        }.map {
+          // Add myself to order list
+          order.add(num)
+          num
+        }
+
+      val result =
+        IO.parallelMapN(newSingleThreadContext("all"), makePar(6), makePar(3), makePar(2), makePar(4), makePar(1), makePar(5))
+        { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
+          .unsafeRunSync()
+
+      result shouldBe listOf(6L, 3, 2, 4, 1, 5)
+      order.toList() shouldBe listOf(1L, 2, 3, 4, 5, 6)
+    }
+
+    "parallel execution preserves order for synchronous IOs" {
+      val order = mutableListOf<Long>()
+
+      fun IO<Long>.order() =
+        map {
+          order.add(it)
+          it
+        }
+
+      fun makePar(num: Long) =
+        IO(newSingleThreadContext("$num")) {
+          // Sleep according to my number
+          Thread.sleep(num * 20)
+          num
+        }.order()
+
+      val result =
+        IO.parallelMapN(newSingleThreadContext("all"), makePar(6), IO.just(1L).order(), makePar(4), IO.defer { IO.just(2L) }.order(), makePar(5), IO { 3L }.order())
+        { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
+          .unsafeRunSync()
+
+      result shouldBe listOf(6L, 1, 4, 2, 5, 3)
+      order.toList() shouldBe listOf(1L, 2, 3, 4, 5, 6)
+    }
+
+    "parallel mapping is done in the expected CoroutineContext" {
+      fun makePar(num: Long) =
+        IO(newSingleThreadContext("$num")) {
+          // Sleep according to my number
+          Thread.sleep(num * 20)
+          num
+        }
+
+      val result =
+        IO.parallelMapN(newSingleThreadContext("all"), makePar(6), IO.just(1L), makePar(4), IO.defer { IO.just(2L) }, makePar(5), IO { 3L })
+        { _, _, _, _, _, _ ->
+          Thread.currentThread().name
+        }.unsafeRunSync()
+
+      result shouldBe "all"
+    }
+
+    "parallel IO#defer, IO#suspend and IO#async are run in the expected CoroutineContext" {
+      val result =
+        IO.parallelMapN(newSingleThreadContext("here"),
+          IO { Thread.currentThread().name }, IO.defer { IO.just(Thread.currentThread().name) }, IO.async<String> { it(Thread.currentThread().name.right()) },
+          ::Tuple3)
+          .unsafeRunSync()
+
+      result shouldBe Tuple3("here", "here", "here")
     }
 
     "IO.binding should for comprehend over IO" {

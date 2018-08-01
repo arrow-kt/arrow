@@ -8,6 +8,7 @@ import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.instance
 import arrow.typeclasses.*
+import kotlin.coroutines.experimental.CoroutineContext
 import arrow.effects.ap as ioAp
 import arrow.effects.handleErrorWith as ioHandleErrorWith
 
@@ -81,8 +82,11 @@ interface IOAsyncInstance : IOMonadDeferInstance, Async<ForIO> {
   override fun <A> async(fa: Proc<A>): IO<A> =
     IO.async(fa)
 
-  override fun <A> invoke(fa: () -> A): IO<A> =
-    IO.invoke(fa)
+  override fun <A> IOOf<A>.continueOn(ctx: CoroutineContext): Kind<ForIO, A> =
+    fix().continueOn(ctx)
+
+  override fun <A> invoke(f: () -> A): IO<A> =
+    IO.invoke(f)
 }
 
 @instance(IO::class)

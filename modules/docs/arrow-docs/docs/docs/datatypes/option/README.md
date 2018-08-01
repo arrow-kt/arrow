@@ -7,6 +7,9 @@ video: 5SFTbphderE
 
 ## Option
 
+{:.beginner}
+beginner
+
 If you have worked with Java at all in the past, it is very likely that you have come across a `NullPointerException` at some time (other languages will throw similarly named errors in such a case). Usually this happens because some method returns `null` when you were not expecting it and thus not dealing with that possibility in your client code. A value of `null` is often abused to represent an absent optional value.
 Kotlin tries to solve the problem by getting rid of `null` values altogether and providing its own special syntax [Null-safety machinery based on `?`](https://kotlinlang.org/docs/reference/null-safety.html).
 
@@ -116,6 +119,16 @@ Arrow also adds syntax to all datatypes so you can easily lift them into the con
 
 ```kotlin:ank
 none<String>()
+```
+
+```kotlin:ank
+val nullableValue: String? = null
+nullableValue.toOption()
+```
+
+```kotlin:ank
+val nullableValue: String? = "Hello"
+nullableValue.toOption()
 ```
 
 Arrow contains `Option` instances for many useful typeclasses that allows you to use and transform optional values

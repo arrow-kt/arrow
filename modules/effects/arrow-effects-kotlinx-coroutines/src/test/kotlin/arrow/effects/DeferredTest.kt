@@ -1,13 +1,18 @@
 package arrow.effects
 
 import arrow.Kind
+import arrow.core.*
+import arrow.data.*
 import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
 import arrow.test.laws.AsyncLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Traverse
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
+import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.experimental.CoroutineStart
 import kotlinx.coroutines.experimental.Unconfined
@@ -20,18 +25,22 @@ class DeferredKTest : UnitSpec() {
     a.unsafeAttemptSync() == b.unsafeAttemptSync()
   }
 
+  suspend fun <F, A> checkAwaitAll(FF: Functor<F>, T: Traverse<F>, v: Kind<F, A>) = FF.run {
+    v.map { DeferredK { it } }.awaitAll(T) == v
+  }
+
   init {
     testLaws(AsyncLaws.laws(DeferredK.async(), EQ(), EQ()))
 
     "DeferredK is awaitable" {
-      forAll(genIntSmall(), genIntSmall(), genIntSmall(), { x: Int, y: Int, z: Int ->
+      forAll(genIntSmall(), genIntSmall(), genIntSmall()) { x: Int, y: Int, z: Int ->
         runBlocking {
           val a = DeferredK { x }.await()
           val b = DeferredK { y + a }.await()
           val c = DeferredK { z + b }.await()
           c
         } == x + y + z
-      })
+      }
     }
 
     "should complete when running a pure value with unsafeRunAsync" {
@@ -125,6 +134,17 @@ class DeferredKTest : UnitSpec() {
         fail("${throwable.message}")
       } catch (throwable: Throwable) {
         // Success
+      }
+    }
+
+    "awaitAll called on a Traverse instance of Kind<F, DeferredK<T>> should return a Traverse instance of Kind<F, T>" {
+      forAll(Gen.string(), Gen.list(Gen.string())) { x, xs ->
+        runBlocking {
+          checkAwaitAll(ListK.functor(), ListK.traverse(), xs.k()) &&
+          checkAwaitAll(NonEmptyList.functor(), NonEmptyList.traverse(), NonEmptyList(x, xs)) &&
+          checkAwaitAll(Option.functor(), Option.traverse(), Option.just(x)) &&
+          checkAwaitAll(Try.functor(), Try.traverse(), Try.just(x))
+        }
       }
     }
   }

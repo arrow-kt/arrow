@@ -8,6 +8,7 @@ import arrow.effects.internal.Platform.unsafeResync
 import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
+import kotlin.coroutines.experimental.CoroutineContext
 
 @higherkind
 sealed class IO<out A> : IOOf<A> {
@@ -35,6 +36,9 @@ sealed class IO<out A> : IOOf<A> {
         }
       }
 
+    operator fun <A> invoke(ctx: CoroutineContext, f: () -> A): IO<A> =
+      IO.unit.continueOn(ctx).flatMap { invoke(f) }
+
     val unit: IO<Unit> =
       just(Unit)
 
@@ -54,12 +58,20 @@ sealed class IO<out A> : IOOf<A> {
           is Either.Right -> IO.just(it.b)
         }
       }
+
+    /* For parMap, look into IOParallel */
   }
 
   abstract fun <B> map(f: (A) -> B): IO<B>
 
   fun <B> flatMap(f: (A) -> IOOf<B>): IO<B> =
-    Bind(this, { f(it).fix() })
+    when (this) {
+      is Pure -> Suspend { f(this.a).fix() }
+      else -> Bind(this) { f(it).fix() }
+    }
+
+  fun continueOn(ctx: CoroutineContext): IO<A> =
+    ContinueOn(this, ctx)
 
   fun attempt(): IO<Either<Throwable, A>> =
     Bind(this, IOFrame.any())
@@ -109,6 +121,12 @@ sealed class IO<out A> : IOOf<A> {
   }
 
   internal data class Bind<E, out A>(val cont: IO<E>, val g: (E) -> IO<A>) : IO<A>() {
+    override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
+
+    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
+  }
+
+  internal data class ContinueOn<A>(val cont: IO<A>, val cc: CoroutineContext) : IO<A>() {
     override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")

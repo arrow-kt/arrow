@@ -54,7 +54,8 @@ fun <F, A, B> OptionTOf<F, A>.foldRight(FF: Foldable<F>, lb: Eval<B>, f: (A, Eva
 
 fun <F, G, A, B> OptionTOf<F, A>.traverse(FF: Traverse<F>, GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, OptionT<F, B>> {
   val fa = ComposedTraverse(FF, Option.traverse(), Option.applicative()).traverseC(fix().value, f, GA)
-  return GA.run { fa.map({ OptionT(FF.run { it.unnest().map({ it.fix() }) }) }) }
+  val mapper: (Kind<Nested<F, ForOption>, B>) -> OptionT<F, B> = { OptionT(FF.run { it.unnest().map { it.fix() } }) }
+  return GA.run { fa.map(mapper) }
 }
 
 fun <F, G, A> OptionTOf<F, Kind<G, A>>.sequence(FF: Traverse<F>, GA: Applicative<G>): Kind<G, OptionT<F, A>> =

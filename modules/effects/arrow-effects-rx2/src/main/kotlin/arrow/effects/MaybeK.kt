@@ -1,10 +1,12 @@
 package arrow.effects
 
 import arrow.core.*
+import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import io.reactivex.Maybe
 import io.reactivex.MaybeEmitter
+import kotlin.coroutines.experimental.CoroutineContext
 
 fun <A> Maybe<A>.k(): MaybeK<A> = MaybeK(this)
 
@@ -42,6 +44,9 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
 
   fun handleErrorWith(function: (Throwable) -> MaybeK<A>): MaybeK<A> =
     maybe.onErrorResumeNext { t: Throwable -> function(t).maybe }.k()
+
+  fun continueOn(ctx: CoroutineContext): MaybeK<A> =
+    maybe.observeOn(ctx.asScheduler()).k()
 
   fun runAsync(cb: (Either<Throwable, A>) -> MaybeKOf<Unit>): MaybeK<Unit> =
     maybe.flatMap { cb(Right(it)).value() }.onErrorResumeNext(io.reactivex.functions.Function { cb(Left(it)).value() }).k()

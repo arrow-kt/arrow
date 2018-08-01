@@ -3,7 +3,7 @@ package arrow.ap.tests
 import arrow.renzu.RenzuProcessor
 import java.io.File
 
-class RenzuTest : APTest("arrow.ap.objects.renzu") {
+class RenzuTest : APTest("arrow.ap.objects.renzu", false) {
 
   init {
     testProcessor(AnnotationProcessor(

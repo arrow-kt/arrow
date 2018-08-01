@@ -7,12 +7,15 @@ video: TC6IzE61OyE
 
 ## NonEmptyList
 
+{:.beginner}
+beginner
+
 `NonEmptyList` is a data type used in __Λrrow__ to model ordered lists that guarantee to have at least one value.
 `NonEmptyList` is available in the `arrow-data` module under the `import arrow.data.NonEmptyList`
 
 ```groovy
 // gradle
-compile 'io.arrow-kt:arrow-data:$arrowVersion'
+compile "io.arrow-kt:arrow-data:$arrow_version"
 ```
 
 ```kotlin:ank

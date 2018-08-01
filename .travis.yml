@@ -6,10 +6,11 @@ jdk:
   - oraclejdk8
 
 script:
-  - ./gradlew clean build :arrow-docs:runAnk
-  - ./gradlew codeCoverageReport
-
+  - ./gradlew clean build
+  - ./gradlew :arrow-docs:runAnk
+ 
 after_success:
+  - ./gradlew codeCoverageReport
   - bash <(curl -s https://codecov.io/bash)
   - ./deploy-scripts/deploy.sh
 

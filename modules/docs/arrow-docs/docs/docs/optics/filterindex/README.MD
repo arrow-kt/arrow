@@ -6,6 +6,9 @@ permalink: /docs/optics/filterindex/
 
 ## FilterIndex
 
+{:.beginner}
+beginner
+
 `FilterIndex` provides a [Traversal]({{ '/docs/optics/traversal' | relative_url }}) that can focus into a structure `S` and get, set or modify 0 to N foci whose index `I` satisfies a predicate.
 
 If for a structure `S` the foci `A` can be indexed by `I` then a `Traversal` can be created by `FilterIndex` that is filtered by a predicate on `I`.
@@ -36,7 +39,7 @@ filter.getAll(listOf("H", "He", "Hel", "Hell", "Hello").k())
 Arrow provides `FilterIndex` instances for some common datatypes both in Arrow and the Kotlin stdlib that can be filtered by index, like `ListK` and `MapK`. You can look them up by calling `FilterIndex.filterIndex()`.
 
 ```kotlin:ank
-FilterIndex.filterIndex(ListK.filterIndex<Int>()) { index -> index % 2 == 0 }
+ListK.filterIndex<Int>().filter { index -> index % 2 == 0 }
             .getAll(listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).k())
 ```
 

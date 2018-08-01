@@ -1,7 +1,6 @@
 package arrow.core
 
 import arrow.higherkind
-import arrow.legacy.Disjunction
 
 typealias Failure<A> = Try.Failure<A>
 typealias Success<A> = Try.Success<A>
@@ -26,8 +25,8 @@ sealed class Try<out A> : TryOf<A> {
         is Success -> {
           val b: Either<A, B> = ev.value
           when (b) {
-            is Either.Left<A, B> -> tailRecM(b.a, f)
-            is Either.Right<A, B> -> Success(b.b)
+            is Either.Left -> tailRecM(b.a, f)
+            is Either.Right -> Success(b.b)
           }
         }
       }
@@ -127,9 +126,6 @@ sealed class Try<out A> : TryOf<A> {
 
   fun toEither(): Either<Throwable, A> = fold({ Left(it) }, { Right(it) })
 
-  @Deprecated("arrow.data.Either is already right biased. This function will be removed in future releases", ReplaceWith("toEither()"))
-  fun toDisjunction(): Disjunction<Throwable, A> = toEither().toDisjunction()
-
   fun <B> foldLeft(initial: B, operation: (B, A) -> B): B = this.fix().fold({ initial }, { operation(initial, it) })
 
   fun <B> foldRight(initial: Eval<B>, operation: (A, Eval<B>) -> Eval<B>): Eval<B> = this.fix().fold({ initial }, { operation(it, initial) })
@@ -177,6 +173,11 @@ fun <B> TryOf<B>.getOrDefault(default: () -> B): B = fix().fold({ default() }, :
  * ''Note:'': This will throw an exception if it is not a success and default throws an exception.
  */
 fun <B> TryOf<B>.getOrElse(default: (Throwable) -> B): B = fix().fold(default, ::identity)
+
+/**
+ * Returns the value from this `Success` or null if this is a `Failure`.
+ */
+fun <B> TryOf<B>.orNull(): B? = getOrElse { null }
 
 fun <B, A : B> TryOf<A>.orElse(f: () -> TryOf<B>): Try<B> = when (this.fix()) {
   is Try.Success -> this.fix()

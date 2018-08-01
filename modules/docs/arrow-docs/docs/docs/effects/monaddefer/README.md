@@ -6,6 +6,9 @@ permalink: /docs/effects/monaddefer/
 
 ## MonadDefer
 
+{:.intermediate}
+intermediate
+
 `MonadDefer` is a typeclass representing suspension of execution via functions, allowing for asynchronous and lazy computations.
 
 `MonadDefer` includes all combinators present in [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}).
@@ -122,3 +125,6 @@ The following data types in Arrow provide instances that adhere to the `MonadDef
 - [ObservableK]({{ '/docs/integrations/rx2' | relative_url }})
 - [FlowableK]({{ '/docs/integrations/rx2' | relative_url }})
 - [DeferredK]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }})
+- [FluxK]({{ '/docs/integrations/reactor' | relative_url }})
+- [MonoK]({{ '/docs/integrations/reactor' | relative_url }})
+

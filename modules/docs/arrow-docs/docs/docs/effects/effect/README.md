@@ -6,6 +6,9 @@ permalink: /docs/effects/effect/
 
 ## Effect
 
+{:.intermediate}
+intermediate
+
 <blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">But can I use callback? I love callbacks. Christmas tree style. with the lights and all....</p>&mdash; Hadi Hariri (@hhariri) <a href="https://twitter.com/hhariri/status/986652337543491586?ref_src=twsrc%5Etfw">April 18, 2018</a></blockquote>
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
@@ -21,3 +24,5 @@ The following data types in Arrow provide instances that adhere to the `Async` t
 - [ObservableK]({{ '/docs/integrations/rx2' | relative_url }})
 - [FlowableK]({{ '/docs/integrations/rx2' | relative_url }})
 - [DeferredK]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }})
+- [FluxK]({{ '/docs/integrations/reactor' | relative_url }})
+- [MonoK]({{ '/docs/integrations/reactor' | relative_url }})

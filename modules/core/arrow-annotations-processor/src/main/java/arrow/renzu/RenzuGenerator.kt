@@ -73,7 +73,7 @@ class RenzuGenerator(
   private fun normalizeTypeclassTree(instances: List<Instance>)
     : Map<TypeClass, Pair<Instances, Set<ParentTypeClass>>> =
     instances.fold(mapOf()) { acc, instance ->
-      parentTypeClasses(processor, instance.target.classOrPackageProto).fold(acc, { acc2, typeclass ->
+      parentTypeClasses(processor, instance.target.classOrPackageProto).fold(acc) { acc2, typeclass ->
         val parentTypeClasses = parentTypeClasses(processor, typeclass.classWrapper)
 
         val value = acc2[typeclass]
@@ -86,14 +86,17 @@ class RenzuGenerator(
             setOf(instance),
             parentTypeClasses.toSet()))
         }
-      })
+      }.toSortedMap(Comparator { o1, o2 -> o1.simpleName.compareTo(o2.simpleName) })
     }
 
   fun generate() {
+
+    val topLevelFiles = setOf("settings.gradle", "pom.xml", "build.xml", "Build.kt", "settings.gradle.kt")
+
     val generatedDir = if (isolateForTests)
       File("./infographic")
     else
-      File("${recurseFilesUpwards("settings.gradle").absolutePath}/infographic")
+      File("${recurseFilesUpwards(topLevelFiles).absolutePath}/infographic")
         .also { it.mkdirs() }
 
     val file = File(generatedDir, "arrow-infographic.txt")
@@ -121,14 +124,14 @@ class RenzuGenerator(
     val notCollidingFileRelations: List<String> = fileRelations
       .filterNot { rel ->
         rel.isInstanceRelation() && generatedRelations.find { it.contains(rel.instancesBlockName()) } != null
-      }
+      }.sorted()
 
     val notCollidingGeneratedRelations: List<String> = generatedRelations
       .toSet()
       .filterNot { fileRelations.contains(it) }
       .filterNot { rel ->
         rel.isInstanceRelation() && fileRelations.find { it.contains(rel.instancesBlockName()) } != null
-      }
+      }.sorted()
 
     val source = (notCollidingFileRelations +
       notCollidingGeneratedRelations +
@@ -144,13 +147,13 @@ class RenzuGenerator(
   private fun composedCollidingRelations(fileRelations: List<String>, generatedRelations: List<String>): List<String> {
     val collidingRelations = fileRelations.filter { rel ->
       rel.isInstanceRelation() && generatedRelations.find { it.contains(rel.instancesBlockName()) } != null
-    }
+    }.sorted()
 
     return collidingRelations.map { collidingRelation ->
       val collidingRelationInstances = collidingRelation.instanceNames()
       val generatedCollidingRelationInstances = generatedRelations.find {
         it.contains(collidingRelation.instancesBlockName())
-      }!!.instanceNames()
+      }!!.instanceNames().sorted()
 
       val composedInstances = (collidingRelationInstances + generatedCollidingRelationInstances)
         .toSet()
@@ -198,6 +201,7 @@ class RenzuGenerator(
         "[<typeclasses>${it.simpleName}]<-[<typeclasses>${typeClass.simpleName}]"
       } +
         "[<typeclasses>${typeClass.simpleName}]<-[<instances>${typeClass.simpleName} Instances|${instances
+          .sortedBy { it.name.toString() }
           .joinToString(separator = "|") { it.name.toString() }}]"
     }
 }

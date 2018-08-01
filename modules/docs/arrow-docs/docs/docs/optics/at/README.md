@@ -6,6 +6,9 @@ permalink: /docs/optics/at/
 
 ## At
 
+{:.beginner}
+beginner
+
 `At` provides a [Lens]({{ '/docs/optics/lens' | relative_url }}) for a structure `S` to focus in `A` at a given index `I`.
 
 ### Example
@@ -20,7 +23,7 @@ import arrow.core.*
 import arrow.data.*
 import arrow.optics.typeclasses.*
 
-val mapAt = At.at(MapK.at<Int, String>(), 2)
+val mapAt = MapK.at<Int, String>().at(2)
 
 val map = mapOf(
             1 to "one",

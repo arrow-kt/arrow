@@ -2,11 +2,13 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.*
+import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
+import kotlin.coroutines.experimental.CoroutineContext
 
 fun <A> Observable<A>.k(): ObservableK<A> = ObservableK(this)
 
@@ -41,14 +43,16 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
     return Eval.defer { loop(this) }
   }
 
-  fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ObservableK<B>> = GA.run {
+  fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ObservableK<B>> =
     foldRight(Eval.always { GA.just(Observable.empty<B>().k()) }) { a, eval ->
-      f(a).map2Eval(eval) { Observable.concat(Observable.just<B>(it.a), it.b.observable).k() }
+      GA.run { f(a).map2Eval(eval) { Observable.concat(Observable.just<B>(it.a), it.b.observable).k() } }
     }.value()
-  }
 
   fun handleErrorWith(function: (Throwable) -> ObservableK<A>): ObservableK<A> =
     this.fix().observable.onErrorResumeNext { t: Throwable -> function(t).observable }.k()
+
+  fun continueOn(ctx: CoroutineContext): ObservableK<A> =
+    observable.observeOn(ctx.asScheduler()).k()
 
   fun runAsync(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Unit> =
     observable.flatMap { cb(Right(it)).value() }.onErrorResumeNext(io.reactivex.functions.Function { cb(Left(it)).value() }).k()

@@ -2,12 +2,14 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.*
+import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.FlowableEmitter
+import kotlin.coroutines.experimental.CoroutineContext
 
 fun <A> Flowable<A>.k(): FlowableK<A> = FlowableK(this)
 
@@ -42,14 +44,16 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
     return Eval.defer { loop(this) }
   }
 
-  fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, FlowableK<B>> = GA.run {
-    foldRight(Eval.always { just(Flowable.empty<B>().k()) }) { a, eval ->
-      f(a).map2Eval(eval) { Flowable.concat(Flowable.just<B>(it.a), it.b.flowable).k() }
+  fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, FlowableK<B>> =
+    foldRight(Eval.always { GA.just(Flowable.empty<B>().k()) }) { a, eval ->
+      GA.run { f(a).map2Eval(eval) { Flowable.concat(Flowable.just<B>(it.a), it.b.flowable).k() } }
     }.value()
-  }
 
   fun handleErrorWith(function: (Throwable) -> FlowableK<A>): FlowableK<A> =
     flowable.onErrorResumeNext { t: Throwable -> function(t).flowable }.k()
+
+  fun continueOn(ctx: CoroutineContext): FlowableK<A> =
+    flowable.observeOn(ctx.asScheduler()).k()
 
   fun runAsync(cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Unit> =
     flowable.flatMap { cb(Right(it)).value() }.onErrorResumeNext(io.reactivex.functions.Function { cb(Left(it)).value() }).k()

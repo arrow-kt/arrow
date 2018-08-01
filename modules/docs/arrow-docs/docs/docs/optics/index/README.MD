@@ -6,6 +6,9 @@ permalink: /docs/optics/index/
 
 ## Index
 
+{:.beginner}
+beginner
+
 `Index` provides an [Optional]({{ '/docs/optics/optional' | relative_url }}) for a structure `S` to focus in optional `A` at a given index `I`.
 
 ### Example
@@ -17,7 +20,7 @@ We can use that `Optional` to safely operate on that focus `S` i.e. operating on
 import arrow.data.*
 import arrow.optics.typeclasses.*
 
-val thirdListItemOptional = Index.index(ListK.index<String>(), 3)
+val thirdListItemOptional = ListK.index<String>().index(3)
 
 thirdListItemOptional.set(listOf("0", "1", "2", "3").k(), "newValue")
 ```

@@ -9,6 +9,8 @@ import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Show
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.properties.Gen
+import io.kotlintest.properties.map
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -32,6 +34,7 @@ class SequenceKTest : UnitSpec() {
         ShowLaws.laws(show, eq) { sequenceOf(it).k() },
         MonadLaws.laws(this, eq),
         MonoidKLaws.laws(this, this, eq),
+        MonoidLaws.laws(SequenceK.monoid(), Gen.list(Gen.int()).map{it.asSequence()}.generate().k(), eq),
         TraverseLaws.laws(this, this, { n: Int -> SequenceK(sequenceOf(n)) }, eq)
       )
     }

@@ -6,6 +6,9 @@ permalink: /docs/integrations/rx2/
 
 ## RxJava 2
 
+{:.intermediate}
+intermediate
+
 Arrow aims to enhance the user experience when using RxJava. While providing other datatypes that are capable of handling effects, like IO, the style of programming encouraged by the library allows users to generify behavior for any existing abstractions.
 
 One of such abstractions is RxJava, a library focused on providing composable streams that enable reactive programming. Observable streams are created by chaining operators into what are called observable chains.
@@ -93,7 +96,7 @@ fun <F> getSongUrlAsync(MS: MonadDefer<F>) =
 val songObservable: ObservableKOf<Url> = getSongUrlAsync(ObservableK.monadDefer())
 val songFlowable: FlowableKOf<Url> = getSongUrlAsync(FlowableK.monadDefer())
 val songSingle: SingleKOf<Url> = getSongUrlAsync(SingleK.monadDefer())
-val songMaybe: SingleKOf<Url> = getSongUrlAsync(MaybeK.monadDefer())
+val songMaybe: MaybeKOf<Url> = getSongUrlAsync(MaybeK.monadDefer())
 ```
 
 [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) using the method `bindingCatch`, with all its benefits.

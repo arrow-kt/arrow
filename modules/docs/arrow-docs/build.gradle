@@ -12,6 +12,7 @@ dependencies {
     compile project(':arrow-instances-data')
     compile project(':arrow-effects')
     compile project(':arrow-effects-rx2')
+    compile project(':arrow-effects-reactor')
     compile project(':arrow-effects-kotlinx-coroutines')
     compile project(':arrow-optics')
     compile project(':arrow-recursion')
@@ -27,6 +28,7 @@ dependencies {
 
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
     compile "io.reactivex.rxjava2:rxjava:2.1.13"
+    compile "io.projectreactor:reactor-core:3.1.3.RELEASE"
 }
 
 task printcp {
@@ -59,5 +61,4 @@ apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
 
 compileKotlin.kotlinOptions.freeCompilerArgs += ["-Xskip-runtime-version-check"]
 
-apply from: rootProject.file('gradle/generated-kotlin-sources.gradle')
 apply plugin: 'kotlin-kapt'
