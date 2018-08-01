@@ -195,6 +195,9 @@ options:
       - title: Bimonad
         url: /docs/typeclasses/bimonad/
 
+      - title: Bifunctor
+        url: /docs/typeclasses/bifunctor
+
       - title: SemigroupK
         url: /docs/typeclasses/semigroupk/
 
