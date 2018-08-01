@@ -13,6 +13,8 @@ interface Bifunctor<F> {
   fun <X> rightFunctor(): Functor<Kind<F, X>> = object : RightFunctor<F, X> {
     override val F: Bifunctor<F> = this@Bifunctor
   }
+
+  fun <AA, B, A : AA> Kind2<F, A, B>.leftWiden(): Kind2<F, AA, B> = this
 }
 
 private interface RightFunctor<F, X> : Functor<Kind<F, X>> {
