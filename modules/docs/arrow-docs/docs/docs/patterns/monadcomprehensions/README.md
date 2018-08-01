@@ -9,8 +9,12 @@ permalink: /docs/patterns/monad_comprehensions/
 {:.intermediate}
 intermediate
 
-Monad comprehension is the name for a programming idiom available in multiple languages.
+Monad comprehensions is the name for a programming idiom available in multiple languages like JavaScript, F#, Scala, or Haskell.
 The purpose of monad comprehensions is to compose sequential chains of actions in a style that feels natural for programmers of all backgrounds.
+They're similar to coroutines or async/await, but extensible to existing and new types!
+
+Let's walk through the evolution of how code was written, up to where comprehensions are today.
+It'll take a couple of sections to get there, so if you're familiar with `flatMap` feel free to skip to [Comprehensions over coroutines]({{ '/docs/patterns/monad_comprehensions/#comprehensions-over-coroutines' | relative_url }}).
 
 ### Synchronous sequences of actions
 
@@ -37,12 +41,15 @@ They allow us to write sequenced code that can be run asynchronously over multip
 
 ### Asynchronous sequences of actions
 
-The general representation of sequenced execution in code is called a [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}). This typeclass is a short API for sequencing code, summarised in a single function `flatMap`.
-It takes as a parameter one function to be called after the current operation completes, and that function has to return another [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) to continue the operation with.
-A common renaming of `flatMap` is `andThen`. Go to the documentation page to see a deep dive on the Monad API.
-
+The abstraction of sequencing execution of code is summarised in a single function that in Arrow is called `flatMap`,
+although you may find it in other languages referred as `andThen`, `then`, `bind`, or `SelectMany`.
+It takes as a parameter one function to be called after the current operation completes, and that function has to return another value to continue the operation with.
 With knowledge of `flatMap` we can write sequential expressions that are ran asynchronously, even over multiple threads.
-Implementations of `Monad` are available for internal types like `Try` and also integrations like [RxJava 2]({{ '/docs/integrations/rx2' | relative_url }}) and [kotlinx.coroutines]({{ '/docs/integrations/kotlinxcoroutines' | relative_url }}). 
+
+The [typeclass]({{ '/docs/typeclasses/intro' | relative_url }}) interface that abstracts sequenced execution of code via `flatMap` is called a [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}),
+for which we also have a [tutorial]({{ '/docs/patterns/monads' | relative_url }}).
+
+Implementations of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) are available for internal types like `Try` and also integrations like [RxJava 2]({{ '/docs/integrations/rx2' | relative_url }}) and [kotlinx.coroutines]({{ '/docs/integrations/kotlinxcoroutines' | relative_url }}).
 Let's see one example using a [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) called [`IO`]({{ '/docs/effects/io' | relative_url }}), where we fetch from a database the information about the dean of university some student attends:
 
 ```kotlin
@@ -66,6 +73,9 @@ Computer science can bring us a construct to get the best of both styles.
 This feature is known with multiple names: async/await, coroutines, do notation, for comprehensions...each version contains certain unique points but all derive from the same principles.
 In Kotlin, coroutines (introduced in version 1.1 of the language) make the compiler capable of rewriting seemingly synchronous code intro asynchronous sequences.
 Arrow uses this capability of the compiler to bring you coroutines-like notation to all instances of the [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) typeclass.
+
+This means that comprehensions are available for `Option`, `Try`, `List`, `Reader`, `Observable`, `Flux` or `IO` all the same.
+In the following examples we'll use `IO` as it's a simple concurrency primitive with straightforward behavior.
 
 Every instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) contains a method `binding` that receives a suspended function as a parameter.
 This functions must return the last element of the sequence of operations.
