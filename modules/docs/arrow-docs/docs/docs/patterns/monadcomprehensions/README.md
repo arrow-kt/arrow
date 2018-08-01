@@ -74,6 +74,9 @@ This feature is known with multiple names: async/await, coroutines, do notation,
 In Kotlin, coroutines (introduced in version 1.1 of the language) make the compiler capable of rewriting seemingly synchronous code intro asynchronous sequences.
 Arrow uses this capability of the compiler to bring you coroutines-like notation to all instances of the [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) typeclass.
 
+This means that comprehensions are available for `Option`, `Try`, `List`, `Reader`, `Observable`, `Flux` or `IO` all the same.
+In the following examples we'll use `IO` as it's a simple concurrency primitive with straightforward behavior.
+
 Every instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) contains a method `binding` that receives a suspended function as a parameter.
 This functions must return the last element of the sequence of operations.
 Let's see a minimal example.
