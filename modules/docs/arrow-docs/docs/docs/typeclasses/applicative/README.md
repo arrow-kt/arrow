@@ -125,6 +125,12 @@ The following datatypes in Arrow provide instances that adhere to the `Applicati
 - [NonEmptyList]({{ '/docs/datatypes/nonemptylist' | relative_url }})
 - [Id]({{ '/docs/datatypes/id' | relative_url }})
 - [Function0]({{ '/docs/datatypes/function0' | relative_url }})
+- [Observable]({{ '/docs/integrations/rx2' | relative_url }})
+- [Flowable]({{ '/docs/integrations/rx2' | relative_url }})
+- [Deferred]({{ '/docs/integrations/kotlinxcoroutines' | relative_url }})
+- [Flux]({{ '/docs/integrations/reactor' | relative_url }})
+- [Mono]({{ '/docs/integrations/reactor' | relative_url }})
+- [IO]({{ '/docs/effects/io' | relative_url }})
 
 Additionally all instances of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) and their MTL variants implement the `Applicative` typeclass directly
 since they are all subtypes of `Applicative`.
