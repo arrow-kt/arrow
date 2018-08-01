@@ -52,17 +52,17 @@ sealed class Try<out A> : TryOf<A> {
   /**
    * Returns the given function applied to the value from this `Success` or returns this if this is a `Failure`.
    */
-  inline fun <B> flatMap(crossinline f: (A) -> TryOf<B>): Try<B> = fold({ raise(it) }, { f(it).fix() })
+   fun <B> flatMap( f: (A) -> TryOf<B>): Try<B> = fold({ raise(it) }, { f(it).fix() })
 
   /**
    * Maps the given function to the value from this `Success` or returns this if this is a `Failure`.
    */
-  inline fun <B> map(crossinline f: (A) -> B): Try<B> = fold({ Failure(it) }, { Success(f(it)) })
+   fun <B> map( f: (A) -> B): Try<B> = fold({ Failure(it) }, { Success(f(it)) })
 
   /**
    * Converts this to a `Failure` if the predicate is not satisfied.
    */
-  inline fun filter(crossinline p: Predicate<A>): Try<A> =
+   fun filter( p: Predicate<A>): Try<A> =
     fold(
       { Failure(it) },
       { if (p(it)) Success(it) else Failure(TryException.PredicateException("Predicate does not hold for $it")) }
