@@ -105,6 +105,10 @@ We will list them by their hierarchy.
 
 - [`Bimonad`]({{ '/docs/typeclasses/bimonad/' | relative_url }}) - both monad and comonad
 
+- [`Bifunctor`]({{ '/docs/typeclasses/bifunctor' | relative_url }}) - lifts two functions into a new context
+
+- [`Profunctor`]({{ '/docs/typeclasses/profunctor' | relative_url }}) - function composition inside a context
+
 ##### Foldable
 
 - [`Foldable`]({{ '/docs/typeclasses/foldable/' | relative_url }}) - has a structure from which a value can be computed from visiting each element
