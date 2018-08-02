@@ -2,7 +2,7 @@ package arrow.core
 
 import arrow.higherkind
 
-typealias Failure<A> = Try.Failure
+typealias Failure = Try.Failure
 typealias Success<A> = Try.Success<A>
 
 /**
