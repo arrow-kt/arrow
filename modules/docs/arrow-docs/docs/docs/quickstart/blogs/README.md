@@ -8,21 +8,23 @@ permalink: /docs/quickstart/blogs/
 
 A selection of external links to some of the content created by maintainers and users.
 
+### State of the functional ecosystem in Kotlin: Mid 2018 checkup
+
+This talk focuses on the day-to-day problems Arrow solves, from small ideas to big concepts.
+
+It includes an overview of all the modules available, and some of the 3rd party libraries made by the community.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/q_1xPYQLyaU?rel=0" frameborder="0" allowfullscreen></iframe>
+
+Conference for Kotliners, Budapest, Jun '18 - version 0.7.2
+
 ### Functional Programming in Kotlin with Arrow
 
-A rundown of all the features included in the library.
+A rundown of all the features included in the library, focusing on implementation details.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/IL5XzaCMKpQ?rel=0" frameborder="0" allowfullscreen></iframe>
 
 Lambda World, Cadiz, Nov '17 - version 0.3.11
-
-### Kotlin for the Pragmatic Functionalist
-
-An introduction to Arrow and the enhancements it brings to Kotlin's standard library.
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/s9oMED6ZikQ?rel=0" frameborder="0" allowfullscreen></iframe>
-
-KotlinConf, San Francisco, Nov '17 - version 0.3.11
 
 ### Architectures Using Functional Programming Concepts
 
@@ -47,6 +49,14 @@ KotlinConf, San Francisco, Nov '17 - version 0.3.11
 <iframe width="560" height="315" src="https://www.youtube.com/embed/qGef3sFAIxU" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
  
  Mobilization 7, Łódź, Oct '17 - version 0.3.11
+ 
+### Kotlin for the Pragmatic Functionalist
+
+An introduction to Arrow and the enhancements it brings to Kotlin's standard library.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/s9oMED6ZikQ?rel=0" frameborder="0" allowfullscreen></iframe>
+
+KotlinConf, San Francisco, Nov '17 - version 0.3.11
  
 ### It's all about morphisms
  
