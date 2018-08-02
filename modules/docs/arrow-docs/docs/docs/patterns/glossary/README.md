@@ -28,24 +28,34 @@ You can read more about all the [datatypes]({{ '/docs/datatypes/intro' | relativ
  
 ### Typeclasses
 
-Typeclasses define a set of functions associated to one type.
-This behavior is checked by a test suite called the "laws" for that typeclass.
+Typeclasses are interface abstractions that define a set of extension functions associated to one type.
+These extension functions are canonical and consistent across languages and libraries;
+and they have inherent mathematical properties that are testable, such as commutativity or associativity.
 
-You can use typeclasses as a DSL to add new free functionality to an existing type
-or treat them as an abstraction placeholder for any one type that can implement the typeclass.
-
-Examples of these behaviors are: comparability ([`Eq`]({{ '/docs/typeclasses/eq' | relative_url }})),
+Examples of behaviours abstracted by typeclasses are: comparability ([`Eq`]({{ '/docs/typeclasses/eq' | relative_url }})),
 composability ([`Monoid`]({{ '/docs/typeclasses/monoid' | relative_url }})),
 its contents can be mapped from one type to another ([`Functor`]({{ '/docs/typeclasses/functor' | relative_url }})),
 or error recovery ([`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }})).
 
+Typeclasses have two main uses:
+
+* Add new functionality to types. For example, if I know how to compare two objects I can add a new extension function to check for inequality.
+Or if I know how to aggregate objects together, I can add an extension function for `List` that aggregates all of its elements.
+The number of extra extra extension functions that you get per typeclass can be from one in `Eq` to 17 (!) in `Foldable`.
+
+* Abstracting over behavior. Like any other interface, you can use them in your functions and classes as a way of talking about the capabilities of the implementation,
+without exposing the details. This way you can create APIs that work the same for `Option`, `Try`, or `Observable`.
+
 You can read more about all the [typeclasses]({{ '/docs/typeclasses/intro' | relative_url }}) that Arrow provides in its [section of the docs]({{ '/docs/typeclasses/intro' | relative_url }}).
 
-One example, the typeclass `Eq` parametrized to `F` defines equality between two objects of type `F`:
+Let's dive in one example. The typeclass `Eq` parametrized to `F` defines equality between two objects of type `F`:
 
 ```kotlin
 interface Eq<F> {
   fun F.eqv(b: F): Boolean
+
+  fun F.neqv(b: F): Boolean =
+    !eqv(b)
 }
 ```
 

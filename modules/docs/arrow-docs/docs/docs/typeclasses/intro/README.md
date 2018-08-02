@@ -10,31 +10,33 @@ video: 3y9KI7XWXSY
 {:.beginner}
 beginner
 
-Typeclasses define a set of functions associated to one generic type.
-All methods inside a typeclass will have one of two shapes:
+Typeclasses are interfaces that define a set of extension functions associated to one type. You may see them referred as "extension interfaces".
 
-* Constructor: create a new `Kind<F, A>` from a value, a function, an error... Some examples are `just`, `raise`, `async`, `defer`, or `binding`.
+The other purpose of these interfaces, like with any other unit of abstraction,
+is to have a single shared definition of a common API and behavior shared across many types in different libraries and codebases.
 
-* Extensions: add new functionality to a value `A` or a container `Kind<F, A>`, provided by an extension function. For example, `map`, `eqv`, `show`, `traverse`, `sequence`, or `combineAll`.
+What differentiates FP from OOP is that these interfaces are meant to be implemented *outside* of their types, instead of *by* the types.
+Now, the association is done using generic parametrization rather than subclassing by implementing the interface. This has multiple benefits:
 
-You can use typeclasses as a DSL to access new free functionality for an existing type,
-or treat them as an abstraction placeholder for any one type that can implement the typeclass.
-The extension functions are scoped within the typeclass so they do not pollute the global namespace!
-
-What differentiates typeclasses from regular OOP inheritance is that typeclasses are meant to be implemented *outside* of their types.
-The association is done using generic parametrization rather than subclassing by implementing the interface. This has multiple benefits:
-
-* You can treat typeclass implementations as stateless parameters because they're just a collection of functions
 * Typeclasses can be implemented for any class, even those not in the current project
-* You can make available any one implementation of a typeclasses at any scope for the generic type they're associated with by using functions like `run` and `with`
-
-To assure that a typeclass has been correctly implemented for a type, Arrow provides a test suite called the "laws" per typeclass.
-These test suites are available in the module `arrow-tests`.
-
-#### Example
+* You can treat typeclass implementations as stateless parameters because they're just a collection of functions
+* You can make the extensions provided by a typeclass for the type they're associated with by using functions like `run` and `with`.
 
 You can read all about how Arrow implements typeclasses in the [glossary]({{ '/docs/patterns/glossary/' | relative_url }}).
 If you'd like to use typeclasses effectively in your client code you can head to the docs entry about [dependency injection]({{ '/docs/patterns/dependency_injection' | relative_url }}).
+
+#### Example
+
+Let's define a typeclass for the behavior of equality between two objects, and we'll call it `Eq`:
+
+```kotlin
+interface Eq<T> {
+   fun T.eqv(b: T)
+
+   fun T.neqv(b: T) =
+    !eqv(b)
+}
+```
 
 For this short example we will make available the scope of the typeclass `Eq` implemented for the type `String`, by using `run`.
 This will make all the `Eq` extension functions, such as `eqv` and `neqv`, available inside the `run` block.
@@ -53,6 +55,39 @@ stringEq.run {
     && "2".neqv("1")
 }
 ```
+
+and even use it as parametrization in a function call
+
+```kotlin
+
+fun <F> List<F>.filter(other: F, EQ: Eq<F>) =
+  this.filter { EQ.run { it.eqv(other) } }
+
+listOf("1", "2", "3").filter("2", String.eq())
+// [2]
+
+listOf(1, 2, 3).filter(3, Eq { one, other -> one < other })
+// [1, 2]
+```
+
+#### Structure
+
+This section uses concepts explained in the [glossary]({{ '/docs/patterns/glossary/#type-constructors' | relative_url }}) like `Kind`,
+make sure to check them beforehand or else jump to the next section.
+
+A few typeclasses can be defined for values, like `Eq` above, and the rest are defined for type constructors defined by `Kind<F, A>` using a `For-` marker.
+All methods inside a typeclass will have one of two shapes:
+
+* Constructor: create a new `Kind<F, A>` from a value, a function, an error... Some examples are `just`, `raise`, `async`, `defer`, or `binding`.
+
+* Extensions: add new functionality to a value `A` or a container `Kind<F, A>`, provided by an extension function. For example, `map`, `eqv`, `show`, `traverse`, `sequence`, or `combineAll`.
+
+You can use typeclasses as a DSL to access new extension functions for an existing type,
+or treat them as an abstraction placeholder for any one type that can implement the typeclass.
+The extension functions are scoped within the typeclass so they do not pollute the global namespace!
+
+To assure that a typeclass has been correctly implemented for a type, Arrow provides a test suite called the "laws" per typeclass.
+These test suites are available in the module `arrow-tests`.
 
 ### Typeclasses provided by Arrow
 
