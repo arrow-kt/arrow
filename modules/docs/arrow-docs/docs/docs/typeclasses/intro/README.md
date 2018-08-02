@@ -105,7 +105,7 @@ We will list them by their hierarchy.
 
 - [`Bimonad`]({{ '/docs/typeclasses/bimonad/' | relative_url }}) - both monad and comonad
 
-- [`Bifunctor`]({{ '/docs/typeclasses/bifunctor' | relative_url }}) - lifts two functions into a new context
+- [`Bifunctor`]({{ '/docs/typeclasses/bifunctor' | relative_url }}) - same as functor but for two values in the container
 
 - [`Profunctor`]({{ '/docs/typeclasses/profunctor' | relative_url }}) - function composition inside a context
 
