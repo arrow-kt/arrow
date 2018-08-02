@@ -26,7 +26,7 @@ And how this works? Well, if we think in terms of function composition, function
 
 ```kotlin:ank
 val sum2: (Int) -> Int = { x -> x + 2 }
-val str: (Int) -> Int = { x -> x.toString() }
+val str: (Int) -> String = { x -> x.toString() }
 
 val f = str compose sum2
 val g = sum2 andThen str
