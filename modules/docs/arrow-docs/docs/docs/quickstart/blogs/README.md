@@ -50,7 +50,7 @@ KotlinConf, San Francisco, Nov '17 - version 0.3.11
  
  Mobilization 7, Łódź, Oct '17 - version 0.3.11
  
- ### Kotlin for the Pragmatic Functionalist
+### Kotlin for the Pragmatic Functionalist
 
 An introduction to Arrow and the enhancements it brings to Kotlin's standard library.
 
