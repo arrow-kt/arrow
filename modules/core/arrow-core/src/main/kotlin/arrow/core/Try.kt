@@ -2,7 +2,7 @@ package arrow.core
 
 import arrow.higherkind
 
-typealias Failure<A> = Try.Failure<A>
+typealias Failure<A> = Try.Failure
 typealias Success<A> = Try.Success<A>
 
 /**
@@ -21,7 +21,7 @@ sealed class Try<out A> : TryOf<A> {
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> TryOf<Either<A, B>>): Try<B> {
       val ev: Try<Either<A, B>> = f(a).fix()
       return when (ev) {
-        is Failure -> Failure<B>(ev.exception).fix()
+        is Failure -> Failure(ev.exception).fix()
         is Success -> {
           val b: Either<A, B> = ev.value
           when (b) {
@@ -52,21 +52,23 @@ sealed class Try<out A> : TryOf<A> {
   /**
    * Returns the given function applied to the value from this `Success` or returns this if this is a `Failure`.
    */
-  inline fun <B> flatMap(f: (A) -> TryOf<B>): Try<B> = fold({ raise(it) }, { f(it).fix() })
+  inline fun <B> flatMap(f: (A) -> TryOf<B>): Try<B> =
+    when (this) {
+      is Failure -> this
+      is Success -> f(value).fix()
+    }
 
   /**
    * Maps the given function to the value from this `Success` or returns this if this is a `Failure`.
    */
-  inline fun <B> map(f: (A) -> B): Try<B> = fold({ Failure(it) }, { Success(f(it)) })
+  inline fun <B> map(f: (A) -> B): Try<B> =
+    flatMap { Success(f(it)) }
 
   /**
    * Converts this to a `Failure` if the predicate is not satisfied.
    */
   fun filter(p: Predicate<A>): Try<A> =
-    fold(
-      { Failure(it) },
-      { if (p(it)) Success(it) else Failure(TryException.PredicateException("Predicate does not hold for $it")) }
-    )
+    flatMap { if (p(it)) Success(it) else Failure(TryException.PredicateException("Predicate does not hold for $it")) }
 
   /**
    * Inverts this `Try`. If this is a `Failure`, returns its exception wrapped in a `Success`.
@@ -126,19 +128,19 @@ sealed class Try<out A> : TryOf<A> {
 
   fun toEither(): Either<Throwable, A> = fold({ Left(it) }, { Right(it) })
 
-  fun <B> foldLeft(initial: B, operation: (B, A) -> B): B = this.fix().fold({ initial }, { operation(initial, it) })
+  fun <B> foldLeft(initial: B, operation: (B, A) -> B): B = fix().fold({ initial }, { operation(initial, it) })
 
-  fun <B> foldRight(initial: Eval<B>, operation: (A, Eval<B>) -> Eval<B>): Eval<B> = this.fix().fold({ initial }, { operation(it, initial) })
+  fun <B> foldRight(initial: Eval<B>, operation: (A, Eval<B>) -> Eval<B>): Eval<B> = fix().fold({ initial }, { operation(it, initial) })
 
   /**
    * The `Failure` type represents a computation that result in an exception.
    */
-  data class Failure<out A>(val exception: Throwable) : Try<A>() {
+  data class Failure(val exception: Throwable) : Try<Nothing>() {
     override fun isFailure(): Boolean = true
 
     override fun isSuccess(): Boolean = false
 
-    override fun get(): A {
+    override fun get(): Nothing {
       throw exception
     }
   }
@@ -155,7 +157,7 @@ sealed class Try<out A> : TryOf<A> {
   }
 }
 
-sealed class TryException(override val message: String) : kotlin.Exception(message) {
+sealed class TryException(override val message: String) : Exception(message) {
   data class PredicateException(override val message: String) : TryException(message)
   data class UnsupportedOperationException(override val message: String) : TryException(message)
 }
@@ -179,8 +181,8 @@ inline fun <B> TryOf<B>.getOrElse(default: (Throwable) -> B): B = fix().fold(def
  */
 inline fun <B> TryOf<B>.orNull(): B? = getOrElse { null }
 
-inline fun <B, A : B> TryOf<A>.orElse(f: () -> TryOf<B>): Try<B> = when (this.fix()) {
-  is Try.Success -> this.fix()
+inline fun <B, A : B> TryOf<A>.orElse(f: () -> TryOf<B>): Try<B> = when (fix()) {
+  is Try.Success -> fix()
   is Try.Failure -> f().fix()
 }
 

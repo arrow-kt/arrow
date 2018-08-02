@@ -58,7 +58,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
   }
 
   fun <C> foldLeft(initial: C, rightOperation: (C, B) -> C): C =
-    this.fix().let { either ->
+    fix().let { either ->
       when (either) {
         is Right -> rightOperation(initial, either.b)
         is Left -> initial
@@ -66,7 +66,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
     }
 
   fun <C> foldRight(initial: Eval<C>, rightOperation: (B, Eval<C>) -> Eval<C>): Eval<C> =
-    this.fix().let { either ->
+    fix().let { either ->
       when (either) {
         is Right -> rightOperation(either.b, initial)
         is Left -> initial
@@ -95,10 +95,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    */
   @Suppress("UNCHECKED_CAST")
   inline fun <C> map(f: (B) -> C): Either<A, C> =
-    when (this) {
-      is Right -> Right(f(b))
-      is Left -> this
-    }
+    flatMap { Right(f(it)) }
 
   /**
    * The given function is applied if this is a `Left`.
@@ -273,7 +270,7 @@ inline fun <A, B> EitherOf<A, B>.getOrHandle(default: (A) -> B): B =
  * ```
  */
 inline fun <A, B> EitherOf<A, B>.filterOrElse(predicate: (B) -> Boolean, default: () -> A): Either<A, B> =
-  fix().fold({ Left(it) }, { if (predicate(it)) Right(it) else Left(default()) })
+  flatMap { if (predicate(it)) Right(it) else Left(default()) }
 
 /**
  * Returns `true` if this is a [Either.Right] and its value is equal to `elem` (as determined by `==`),
@@ -298,7 +295,7 @@ fun <A, B, C> EitherOf<A, B>.ap(ff: EitherOf<A, (B) -> C>): Either<A, C> =
 fun <A, B> EitherOf<A, B>.combineK(y: EitherOf<A, B>): Either<A, B> =
   when (this) {
     is Either.Left -> y.fix()
-    else -> this.fix()
+    else -> fix()
   }
 
 @Deprecated(DeprecatedAmbiguity, ReplaceWith("Try { body }.toEither()"))

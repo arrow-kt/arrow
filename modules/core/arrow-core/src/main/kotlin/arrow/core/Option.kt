@@ -66,7 +66,8 @@ sealed class Option<out A> : OptionOf<A> {
    * @param f the function to apply
    * @see flatMap
    */
-  inline fun <B> map(f: (A) -> B): Option<B> = fold({ None }, { a -> Some(f(a)) })
+  inline fun <B> map(f: (A) -> B): Option<B> =
+    flatMap { a -> Some(f(a)) }
 
   inline fun <R> fold(ifEmpty: () -> R, ifSome: (A) -> R): R = when (this) {
     is None -> ifEmpty()
@@ -83,9 +84,14 @@ sealed class Option<out A> : OptionOf<A> {
    * @param f the function to apply
    * @see map
    */
-  inline fun <B> flatMap(f: (A) -> OptionOf<B>): Option<B> = fold({ None }, { a -> f(a) }).fix()
+  inline fun <B> flatMap(f: (A) -> OptionOf<B>): Option<B> =
+    when (this) {
+      is None -> this
+      is Some -> f(t).fix()
+    }
 
-  fun <B> ap(ff: OptionOf<(A) -> B>): Option<B> = ff.fix().flatMap { this.fix().map(it) }
+  fun <B> ap(ff: OptionOf<(A) -> B>): Option<B> =
+    ff.fix().flatMap { this.fix().map(it) }
 
   /**
    * Returns this $option if it is nonempty '''and''' applying the predicate $p to
@@ -94,7 +100,7 @@ sealed class Option<out A> : OptionOf<A> {
    *  @param predicate the predicate used for testing.
    */
   fun filter(predicate: Predicate<A>): Option<A> =
-    fold({ None }, { a -> if (predicate(a)) Some(a) else None })
+    flatMap { a -> if (predicate(a)) Some(a) else None }
 
   /**
    * Returns this $option if it is nonempty '''and''' applying the predicate $p to
@@ -102,7 +108,8 @@ sealed class Option<out A> : OptionOf<A> {
    *
    * @param predicate the predicate used for testing.
    */
-  fun filterNot(predicate: Predicate<A>): Option<A> = fold({ None }, { a -> if (!predicate(a)) Some(a) else None })
+  fun filterNot(predicate: Predicate<A>): Option<A> =
+    flatMap { a -> if (!predicate(a)) Some(a) else None }
 
   /**
    * Returns true if this option is nonempty '''and''' the predicate
@@ -127,7 +134,7 @@ sealed class Option<out A> : OptionOf<A> {
   }
 
   fun <B> foldLeft(initial: B, operation: (B, A) -> B): B =
-    this.fix().let { option ->
+    fix().let { option ->
       when (option) {
         is Some -> operation(initial, option.t)
         is None -> initial
@@ -135,7 +142,7 @@ sealed class Option<out A> : OptionOf<A> {
     }
 
   fun <B> foldRight(initial: Eval<B>, operation: (A, Eval<B>) -> Eval<B>): Eval<B> =
-    this.fix().let { option ->
+    fix().let { option ->
       when (option) {
         is Some -> operation(option.t, initial)
         is None -> initial
