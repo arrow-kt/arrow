@@ -8,6 +8,16 @@ permalink: /docs/quickstart/blogs/
 
 A selection of external links to some of the content created by maintainers and users.
 
+### State of the functional ecosystem in Kotlin: Mid 2018 checkup
+
+This talk focuses on the day-to-day problems Arrow solves, from small ideas to big concepts.
+
+It includes an overview of all the modules available, and some of the 3rd party libraries made by the community.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/q_1xPYQLyaU?rel=0" frameborder="0" allowfullscreen></iframe>
+
+Conference for Kotliners, Budapest, Jun '18 - version 0.7.2
+
 ### Functional Programming in Kotlin with Arrow
 
 A rundown of all the features included in the library.
