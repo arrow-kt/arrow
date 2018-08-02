@@ -19,12 +19,6 @@ sealed class IO<out A> : IOOf<A> {
 
     fun <A> raiseError(e: Throwable): IO<A> = RaiseError(e)
 
-    internal inline fun <A, B> mapDefault(t: IOOf<A>, noinline f: (A) -> B): IO<B> =
-      Map(t, f, 0)
-
-    internal inline fun <A, B> flatMapDefault(t: IOOf<A>, noinline f: (A) -> IOOf<B>): IO<B> =
-      Bind(t.fix()) { f(it).fix() }
-
     operator fun <A> invoke(f: () -> A): IO<A> = defer { Pure(f()) }
 
     fun <A> defer(f: () -> IOOf<A>): IO<A> = Suspend(f)
@@ -66,11 +60,13 @@ sealed class IO<out A> : IOOf<A> {
     /* For parMap, look into IOParallel */
   }
 
-  abstract fun <B> map(f: (A) -> B): IO<B>
+  open fun <B> map(f: (A) -> B): IO<B> =
+    Map(this, f, 0)
 
-  abstract fun <B> flatMap(f: (A) -> IOOf<B>): IO<B>
+  open fun <B> flatMap(f: (A) -> IOOf<B>): IO<B> =
+    Bind(this) { f(it).fix() }
 
-  fun continueOn(ctx: CoroutineContext): IO<A> =
+  open fun continueOn(ctx: CoroutineContext): IO<A> =
     ContinueOn(this, ctx)
 
   fun attempt(): IO<Either<Throwable, A>> =
@@ -91,57 +87,44 @@ sealed class IO<out A> : IOOf<A> {
   internal abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
 
   internal data class Pure<out A>(val a: A) : IO<A>() {
+    // Pure can be replaced by its value
     override fun <B> map(f: (A) -> B): IO<B> = Suspend { Pure(f(a)) }
 
+    // Pure can be replaced by its value
     override fun <B> flatMap(f: (A) -> IOOf<B>): IO<B> = Suspend { f(a).fix() }
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = Some(a)
   }
 
   internal data class RaiseError(val exception: Throwable) : IO<Nothing>() {
+    // Errors short-circuit
     override fun <B> map(f: (Nothing) -> B): IO<B> = this
 
+    // Errors short-circuit
     override fun <B> flatMap(f: (Nothing) -> IOOf<B>): IO<B> = this
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<Nothing> = throw exception
   }
 
   internal data class Delay<out A>(val thunk: () -> A) : IO<A>() {
-    override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
-
-    override fun <B> flatMap(f: (A) -> IOOf<B>): IO<B> = flatMapDefault(this, f)
-
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
   internal data class Suspend<out A>(val thunk: () -> IOOf<A>) : IO<A>() {
-    override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
-
-    override fun <B> flatMap(f: (A) -> IOOf<B>): IO<B> = flatMapDefault(this, f)
-
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
   internal data class Async<out A>(val cont: Proc<A>) : IO<A>() {
-    override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
-
-    override fun <B> flatMap(f: (A) -> IOOf<B>): IO<B> = flatMapDefault(this, f)
-
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
   }
 
   internal data class Bind<E, out A>(val cont: IO<E>, val g: (E) -> IO<A>) : IO<A>() {
-    override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
-
-    override fun <B> flatMap(f: (A) -> IOOf<B>): IO<B> = flatMapDefault(this, f)
-
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
   internal data class ContinueOn<A>(val cont: IO<A>, val cc: CoroutineContext) : IO<A>() {
-    override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
-
-    override fun <B> flatMap(f: (A) -> IOOf<B>): IO<B> = flatMapDefault(this, f)
+    // If a ContinueOn follows another ContinueOn, execute only the latest
+    override fun continueOn(ctx: CoroutineContext): IO<A> = ContinueOn(cont, ctx)
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
@@ -155,8 +138,6 @@ sealed class IO<out A> : IOOf<A> {
       if (index != maxStackDepthSize) Map(source, g.andThen(f), index + 1)
       else Map(this, f, 0)
 
-    override fun <B> flatMap(f: (A) -> IOOf<B>): IO<B> = flatMapDefault(this, f)
-
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 }
@@ -165,6 +146,6 @@ fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
   fix().flatMap { a -> ff.fix().map { it(a) } }
 
 fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
-  IO.Bind(this.fix(), IOFrame.errorHandler(f))
+  IO.Bind(fix(), IOFrame.errorHandler(f))
 
 inline fun <A> A.liftIO(): IO<A> = IO.just(this)
