@@ -47,7 +47,7 @@ val fab: Function1<Double, String> = { x -> "Result: $x" }.k()
 val f: (Int) -> Double = { x -> x.toDouble() / 2 }  
 val g: (Double) -> Double = { x -> x * 3 } 
 
-val h: Function1<Int, String> = Function1.profunctor().run { fab.bimap(f, g) } 
+val h: Function1<Int, String> = Function1.profunctor().run { fab.dimap(f, g) } 
 h(4)
 ```
 
@@ -58,6 +58,14 @@ h(4)
 Contramap on the first type parameter and map on the second type parameter
 
 `fun Kind2<F, A, B>.dimap(fl: (C) -> A, fr: (B) -> D): Kind2<F, C, D>`
+
+```kotlin:ank
+val f: Function1<Int, List<Int>> = { x -> List(x) { x } }.k()
+val fl: (String) -> Int = { x -> x.toInt() }
+val fr: (Int) -> Int = { x -> x + 10 }
+
+Function1.profunctor().run { f.dimap(fl, fr) } 
+```
 
 #### Other combinators
 
