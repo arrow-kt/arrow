@@ -59,7 +59,7 @@ For a full list of other useful combinators available in `Bifunctor` see the [So
 
 ### Laws
 
-Arrow provides [`BifunctorLaws`][bifunctor_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own Functor instances.
+Arrow provides [`BifunctorLaws`][bifunctor_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own Bifunctor instances.
 
 ### Data Types
 
