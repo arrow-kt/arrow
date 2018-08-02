@@ -16,7 +16,7 @@ head to [The Monad Tutorial]({{ '/docs/patterns/monads' | relative_url }}).
 
 ### Main Combinators
 
-`Applicative` includes all combinators present in [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }}).
+`Monad` includes all combinators present in [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }}).
 
 #### Kind<F, A>#flatMap
 
