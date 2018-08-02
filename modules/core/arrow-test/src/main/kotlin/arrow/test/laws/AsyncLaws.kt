@@ -19,6 +19,7 @@ object AsyncLaws {
       Law("Async Laws: success equivalence", { AC.asyncSuccess(EQ) }),
       Law("Async Laws: error equivalence", { AC.asyncError(EQERR) }),
       Law("Async Laws: continueOn jumps threads", { AC.continueOn(EQ) }),
+      Law("Async Laws: async constructor", { AC.asyncConstructor(EQ) }),
       Law("Async Laws: continueOn on comprehensions", { AC.continueOnComprehension(EQ) })
     )
 
@@ -39,6 +40,15 @@ object AsyncLaws {
         .map { getCurrentThread() }
         .continueOn(newSingleThreadContext(threadId2.toString()))
         .map { it + getCurrentThread() }
+        .equalUnderTheLaw(just(threadId1 + threadId2), EQ)
+    })
+
+  fun <F> Async<F>.asyncConstructor(EQ: Eq<Kind<F, Int>>): Unit =
+    forFew(5, genIntSmall(), genIntSmall(), { threadId1: Int, threadId2: Int ->
+      invoke(newSingleThreadContext(threadId1.toString())) { getCurrentThread() }
+        .flatMap {
+          invoke(newSingleThreadContext(threadId2.toString())) { it + getCurrentThread() }
+        }
         .equalUnderTheLaw(just(threadId1 + threadId2), EQ)
     })
 

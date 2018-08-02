@@ -1,7 +1,7 @@
 package arrow.effects
 
 import arrow.core.*
-import arrow.effects.CoroutineContextScheduler.asScheduler
+import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import io.reactivex.Maybe

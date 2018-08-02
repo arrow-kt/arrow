@@ -3,18 +3,7 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.*
 import arrow.instance
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadError
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.SemigroupK
-import arrow.typeclasses.Show
-import arrow.typeclasses.Traverse
+import arrow.typeclasses.*
 import arrow.core.ap as eitherAp
 import arrow.core.combineK as eitherCombineK
 import arrow.core.flatMap as eitherFlatMap
@@ -113,9 +102,8 @@ interface EitherFoldableInstance<L> : Foldable<EitherPartialOf<L>> {
     fix().foldRight(lb, f)
 }
 
-fun <G, A, B, C> EitherOf<A, B>.traverse(GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Either<A, C>> = GA.run {
-  fix().fold({ just(Either.Left(it)) }, { f(it).map({ Either.Right(it) }) })
-}
+fun <G, A, B, C> EitherOf<A, B>.traverse(GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Either<A, C>> =
+  fix().fold({ GA.just(Either.Left(it)) }, { GA.run { f(it).map { Either.Right(it) } } })
 
 @instance(Either::class)
 interface EitherTraverseInstance<L> : EitherFoldableInstance<L>, Traverse<EitherPartialOf<L>> {

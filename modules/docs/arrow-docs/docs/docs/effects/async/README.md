@@ -69,7 +69,7 @@ IO.async()
 
 It makes the rest of the operator chain to be executed on a separate `CoroutineContext`, effectively jumping threads if necessary.
 
-```
+```kotlin
 IO.async().run {
   // In current thread
   just(createUserFromId(123))
@@ -84,11 +84,27 @@ IO.async().run {
 
 Behind the scenes `continueOn()` starts a new coroutine and passes the rest of the chain as the block to execute.
 
+The function `continueOn()` is also available inside [`Monad Comprehensions`]({{ '/docs/patterns/monad_comprehensions' | relative_url }}).
+
+#### invoke with CoroutineContext
+
+Similar to `MonadDefer`'s `invoke`, this constructor it takes a single generator function and the `CoroutineContext` it has to be run on.
+
+```kotlin
+IO.async().run {
+  // In current thread
+  invoke(CommonPool) {
+    // In CommonPool
+    request(createUserFromId(123))
+  }
+}
+```
+
 #### never
 
 Creates an object using `async()` whose callback is never called.
 
-Depending on how the datatype is implemented this may cause unexpected errors like awaiting infinitely for a result.
+Depending on how the datatype is implemented this may cause unexpected errors like awaiting forever for a result.
 
 Use with *SEVERE CAUTION*.
 
@@ -114,3 +130,5 @@ The following data types in Arrow provide instances that adhere to the `Async` t
 - [ObservableK]({{ '/docs/integrations/rx2' | relative_url }})
 - [FlowableK]({{ '/docs/integrations/rx2' | relative_url }})
 - [DeferredK]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }})
+- [FluxK]({{ '/docs/integrations/reactor' | relative_url }})
+- [MonoK]({{ '/docs/integrations/reactor' | relative_url }})
