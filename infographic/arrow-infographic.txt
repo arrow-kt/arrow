@@ -36,7 +36,7 @@
 [<typeclasses>Functor]<-[<typeclasses>Comonad]
 [<typeclasses>Functor]<-[<typeclasses>FunctorFilter]
 [<typeclasses>Functor]<-[<typeclasses>Traverse]
-[<typeclasses>Index]<-[<instances>Index Instances|ListKIndexInstance|MapKIndexInstance|NonEmptyListIndexInstance|SequenceKIndexInstance]
+[<typeclasses>Index]<-[<instances>Index Instances|ListKIndexInstance|MapKIndexInstance|NonEmptyListIndexInstance|SequenceKIndexInstance|ListKFilterIndexInstance|MapKFilterIndexInstance|NonEmptyListFilterIndexInstance|SequenceKFilterIndexInstance]
 [<typeclasses>MonadCombine]<-[<instances>MonadCombine Instances|ListKMonadCombineInstance|StateTMonadCombineInstance]
 [<typeclasses>MonadDefer]<-[<instances>MonadDefer Instances|IOMonadDeferInstance|DeferredKMonadDeferInstance|FlowableKMonadDeferInstance|MaybeKMonadDeferInstance|ObservableKMonadDeferInstance|SingleKMonadDeferInstance|FluxKMonadDeferInstance|MonoKMonadDeferInstance]
 [<typeclasses>MonadDefer]<-[<typeclasses>Async]

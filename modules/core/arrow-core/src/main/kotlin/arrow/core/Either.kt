@@ -277,6 +277,23 @@ inline fun <A, B> EitherOf<A, B>.filterOrElse(crossinline predicate: (B) -> Bool
   fix().fold({ Left(it) }, { if (predicate(it)) Right(it) else Left(default()) })
 
 /**
+ * * Returns [Either.Right] with the existing value of [Either.Right] if this is an [Either.Right] with a non-null value.
+ * The returned Either.Right type is not nullable.
+ * * Returns `Left(default())` if this is an [Either.Right] and the existing value is null
+ * * Returns [Either.Left] with the existing value of [Either.Left] if this is an [Either.Left].
+ *
+ * Example:
+ * ```
+ * Right(12).leftIfNull({ -1 }) // Result: Right(12)
+ * Right(null).leftIfNull({ -1 })  // Result: Left(-1)
+ *
+ * Left(12).leftIfNull({ -1 })      // Result: Left(12)
+ * ```
+ */
+inline fun <A, B> EitherOf<A, B?>.leftIfNull(crossinline default: () -> A): Either<A, B> =
+  fix().flatMap { if (it == null) Left(default()) else Right(it) }
+
+/**
  * Returns `true` if this is a [Either.Right] and its value is equal to `elem` (as determined by `==`),
  * returns `false` otherwise.
  *
