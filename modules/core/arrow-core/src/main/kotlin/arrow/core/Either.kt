@@ -46,7 +46,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    * @param ifRight the function to apply if this is a [Right]
    * @return the results of applying the function
    */
-  inline fun <C> fold(crossinline ifLeft: (A) -> C, crossinline ifRight: (B) -> C): C = when (this) {
+  inline fun <C> fold(ifLeft: (A) -> C, ifRight: (B) -> C): C = when (this) {
     is Right -> ifRight(b)
     is Left -> ifLeft(a)
   }
@@ -58,7 +58,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
   }
 
   fun <C> foldLeft(initial: C, rightOperation: (C, B) -> C): C =
-    this.fix().let { either ->
+    fix().let { either ->
       when (either) {
         is Right -> rightOperation(initial, either.b)
         is Left -> initial
@@ -66,7 +66,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
     }
 
   fun <C> foldRight(initial: Eval<C>, rightOperation: (B, Eval<C>) -> Eval<C>): Eval<C> =
-    this.fix().let { either ->
+    fix().let { either ->
       when (either) {
         is Right -> rightOperation(either.b, initial)
         is Left -> initial
@@ -94,11 +94,8 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    * ```
    */
   @Suppress("UNCHECKED_CAST")
-  inline fun <C> map(crossinline f: (B) -> C): Either<A, C> =
-      when (this) {
-        is Right -> Right(f(b))
-        is Left -> this
-      }
+  inline fun <C> map(f: (B) -> C): Either<A, C> =
+    flatMap { Right(f(it)) }
 
   /**
    * The given function is applied if this is a `Left`.
@@ -109,13 +106,13 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    * Left(12).mapLeft { "flower" }  // Result: Left("flower)
    * ```
    */
-  inline fun <C> mapLeft(crossinline f: (A) -> C): Either<C, B> =
+  inline fun <C> mapLeft(f: (A) -> C): Either<C, B> =
     fold({ Left(f(it)) }, { Right(it) })
 
   /**
    * Map over Left and Right of this Either
    */
-  inline fun <C, D> bimap(crossinline leftOperation: (A) -> C, crossinline rightOperation: (B) -> D): Either<C, D> =
+  inline fun <C, D> bimap(leftOperation: (A) -> C, rightOperation: (B) -> D): Either<C, D> =
     fold({ Left(leftOperation(it)) }, { Right(rightOperation(it)) })
 
   /**
@@ -131,7 +128,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    * left.exists { it > 10 }      // Result: false
    * ```
    */
-  inline fun exists(crossinline predicate: (B) -> Boolean): Boolean =
+  fun exists(predicate: (B) -> Boolean): Boolean =
     fold({ false }, { predicate(it) })
 
   /**
@@ -211,8 +208,7 @@ fun <R> Right(right: R): Either<Nothing, R> = Either.right(right)
  *
  * @param f The function to bind across [Either.Right].
  */
-@Suppress("UNCHECKED_CAST")
-fun <A, B, C> EitherOf<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> =
+inline fun <A, B, C> EitherOf<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> =
   fix().let {
     when (it) {
       is Right -> f(it.b)
@@ -229,7 +225,7 @@ fun <A, B, C> EitherOf<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> =
  * Left(12).getOrElse(17)  // Result: 17
  * ```
  */
-inline fun <B> EitherOf<*, B>.getOrElse(crossinline default: () -> B): B =
+inline fun <B> EitherOf<*, B>.getOrElse(default: () -> B): B =
   fix().fold({ default() }, ::identity)
 
 /**
@@ -242,7 +238,7 @@ inline fun <B> EitherOf<*, B>.getOrElse(crossinline default: () -> B): B =
  * ```
  */
 inline fun <B> EitherOf<*, B>.orNull(): B? =
-    getOrElse { null }
+  getOrElse { null }
 
 /**
  * Returns the value from this [Either.Right] or allows clients to transform [Either.Left] to [Either.Right] while providing access to
@@ -254,7 +250,7 @@ inline fun <B> EitherOf<*, B>.orNull(): B? =
  * Left(12).getOrHandle { it + 5 } // Result: 17
  * ```
  */
-inline fun <A, B> EitherOf<A, B>.getOrHandle(crossinline default: (A) -> B): B =
+inline fun <A, B> EitherOf<A, B>.getOrHandle(default: (A) -> B): B =
   fix().fold({ default(it) }, ::identity)
 
 /**
@@ -273,8 +269,8 @@ inline fun <A, B> EitherOf<A, B>.getOrHandle(crossinline default: (A) -> B): B =
  * left.filterOrElse({ it > 10 }, { -1 })      // Result: Left(12)
  * ```
  */
-inline fun <A, B> EitherOf<A, B>.filterOrElse(crossinline predicate: (B) -> Boolean, crossinline default: () -> A): Either<A, B> =
-  fix().fold({ Left(it) }, { if (predicate(it)) Right(it) else Left(default()) })
+inline fun <A, B> EitherOf<A, B>.filterOrElse(predicate: (B) -> Boolean, default: () -> A): Either<A, B> =
+  flatMap { if (predicate(it)) Right(it) else Left(default()) }
 
 /**
  * * Returns [Either.Right] with the existing value of [Either.Right] if this is an [Either.Right] with a non-null value.
@@ -316,7 +312,7 @@ fun <A, B, C> EitherOf<A, B>.ap(ff: EitherOf<A, (B) -> C>): Either<A, C> =
 fun <A, B> EitherOf<A, B>.combineK(y: EitherOf<A, B>): Either<A, B> =
   when (this) {
     is Either.Left -> y.fix()
-    else -> this.fix()
+    else -> fix()
   }
 
 @Deprecated(DeprecatedAmbiguity, ReplaceWith("Try { body }.toEither()"))
