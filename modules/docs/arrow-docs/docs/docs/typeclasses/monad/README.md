@@ -16,7 +16,7 @@ head to [The Monad Tutorial]({{ '/docs/patterns/monads' | relative_url }}).
 
 ### Main Combinators
 
-`Applicative` includes all combinators present in [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }}).
+`Monad` includes all combinators present in [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }}).
 
 #### Kind<F, A>#flatMap
 
@@ -105,7 +105,7 @@ ForOption extensions {
 
 ### Laws
 
-Arrow provides [`MonadLaws`][applicative_law_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own Applicative instances.
+Arrow provides [`MonadLaws`][monad_law_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own Applicative instances.
 
 #### Creating your own `Monad` instances
 
@@ -135,3 +135,5 @@ The following data types in Arrow provide instances that adhere to the `Monad` t
 - [Flux]({{ '/docs/integrations/reactor' | relative_url }})
 - [Mono]({{ '/docs/integrations/reactor' | relative_url }})
 - [IO]({{ '/docs/effects/io' | relative_url }})
+
+[monad_law_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/MonadLaws.kt
