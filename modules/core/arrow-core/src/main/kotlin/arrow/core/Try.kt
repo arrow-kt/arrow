@@ -179,7 +179,7 @@ inline fun <B> TryOf<B>.getOrElse(default: (Throwable) -> B): B = fix().fold(def
 /**
  * Returns the value from this `Success` or null if this is a `Failure`.
  */
-inline fun <B> TryOf<B>.orNull(): B? = getOrElse { null }
+fun <B> TryOf<B>.orNull(): B? = getOrElse { null }
 
 inline fun <B, A : B> TryOf<A>.orElse(f: () -> TryOf<B>): Try<B> = when (fix()) {
   is Try.Success -> fix()
