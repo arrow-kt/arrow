@@ -25,6 +25,8 @@ The main difference between `bimap` and `dimap` is the function they accept as t
 And how this works? Well, if we think in terms of function composition, functions can be composed in both directions:
 
 ```kotlin:ank
+import arrow.core.*
+
 val sum2: (Int) -> Int = { x -> x + 2 }
 val str: (Int) -> String = { x -> x.toString() }
 
@@ -60,6 +62,9 @@ Contramap on the first type parameter and map on the second type parameter
 `fun Kind2<F, A, B>.dimap(fl: (C) -> A, fr: (B) -> D): Kind2<F, C, D>`
 
 ```kotlin:ank
+import arrow.core.*
+import arrow.instances.*
+
 val f: Function1<Int, List<Int>> = { x -> List(x) { x } }.k()
 val fl: (String) -> Int = { x -> x.toInt() }
 val fr: (Int) -> Int = { x -> x + 10 }
