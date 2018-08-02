@@ -52,17 +52,17 @@ sealed class Try<out A> : TryOf<A> {
   /**
    * Returns the given function applied to the value from this `Success` or returns this if this is a `Failure`.
    */
-  inline fun <B> flatMap(crossinline f: (A) -> TryOf<B>): Try<B> = fold({ raise(it) }, { f(it).fix() })
+  inline fun <B> flatMap(f: (A) -> TryOf<B>): Try<B> = fold({ raise(it) }, { f(it).fix() })
 
   /**
    * Maps the given function to the value from this `Success` or returns this if this is a `Failure`.
    */
-  inline fun <B> map(crossinline f: (A) -> B): Try<B> = fold({ Failure(it) }, { Success(f(it)) })
+  inline fun <B> map(f: (A) -> B): Try<B> = fold({ Failure(it) }, { Success(f(it)) })
 
   /**
    * Converts this to a `Failure` if the predicate is not satisfied.
    */
-  inline fun filter(crossinline p: Predicate<A>): Try<A> =
+  fun filter(p: Predicate<A>): Try<A> =
     fold(
       { Failure(it) },
       { if (p(it)) Success(it) else Failure(TryException.PredicateException("Predicate does not hold for $it")) }
@@ -165,21 +165,21 @@ sealed class TryException(override val message: String) : kotlin.Exception(messa
  *
  * ''Note:'': This will throw an exception if it is not a success and default throws an exception.
  */
-fun <B> TryOf<B>.getOrDefault(default: () -> B): B = fix().fold({ default() }, ::identity)
+inline fun <B> TryOf<B>.getOrDefault(default: () -> B): B = fix().fold({ default() }, ::identity)
 
 /**
  * Returns the value from this `Success` or the given `default` argument if this is a `Failure`.
  *
  * ''Note:'': This will throw an exception if it is not a success and default throws an exception.
  */
-fun <B> TryOf<B>.getOrElse(default: (Throwable) -> B): B = fix().fold(default, ::identity)
+inline fun <B> TryOf<B>.getOrElse(default: (Throwable) -> B): B = fix().fold(default, ::identity)
 
 /**
  * Returns the value from this `Success` or null if this is a `Failure`.
  */
-fun <B> TryOf<B>.orNull(): B? = getOrElse { null }
+inline fun <B> TryOf<B>.orNull(): B? = getOrElse { null }
 
-fun <B, A : B> TryOf<A>.orElse(f: () -> TryOf<B>): Try<B> = when (this.fix()) {
+inline fun <B, A : B> TryOf<A>.orElse(f: () -> TryOf<B>): Try<B> = when (this.fix()) {
   is Try.Success -> this.fix()
   is Try.Failure -> f().fix()
 }
@@ -206,7 +206,8 @@ fun <A> TryOf<A>.handle(f: (Throwable) -> A): Try<A> = fix().recover(f)
  * Completes this `Try` by applying the function `ifFailure` to this if this is of type `Failure`,
  * or conversely, by applying `ifSuccess` if this is a `Success`.
  */
-fun <A, B> TryOf<A>.transform(ifSuccess: (A) -> TryOf<B>, ifFailure: (Throwable) -> TryOf<B>): Try<B> = fix().fold({ ifFailure(it).fix() }, { fix().flatMap(ifSuccess) })
+@Deprecated(DeprecatedAmbiguity, ReplaceWith("fold(ifFailure, ifSuccess)"))
+inline fun <A, B> TryOf<A>.transform(ifSuccess: (A) -> TryOf<B>, ifFailure: (Throwable) -> TryOf<B>): Try<B> = fix().fold({ ifFailure(it).fix() }, { fix().flatMap(ifSuccess) })
 
 fun <A> (() -> A).try_(): Try<A> = Try(this)
 

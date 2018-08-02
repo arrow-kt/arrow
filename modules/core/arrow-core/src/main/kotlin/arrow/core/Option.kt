@@ -66,13 +66,7 @@ sealed class Option<out A> : OptionOf<A> {
    * @param f the function to apply
    * @see flatMap
    */
-  inline fun <B> map(crossinline f: (A) -> B): Option<B> = fold({ None }, { a -> Some(f(a)) })
-
-  inline fun <P1, R> map(p1: Option<P1>, crossinline f: (A, P1) -> R): Option<R> = if (isEmpty()) {
-    None
-  } else {
-    p1.map { pp1 -> f(get(), pp1) }
-  }
+  inline fun <B> map(f: (A) -> B): Option<B> = fold({ None }, { a -> Some(f(a)) })
 
   inline fun <R> fold(ifEmpty: () -> R, ifSome: (A) -> R): R = when (this) {
     is None -> ifEmpty()
@@ -89,7 +83,7 @@ sealed class Option<out A> : OptionOf<A> {
    * @param f the function to apply
    * @see map
    */
-  fun <B> flatMap(f: (A) -> OptionOf<B>): Option<B> = fold({ None }, { a -> f(a) }).fix()
+  inline fun <B> flatMap(f: (A) -> OptionOf<B>): Option<B> = fold({ None }, { a -> f(a) }).fix()
 
   fun <B> ap(ff: OptionOf<(A) -> B>): Option<B> = ff.fix().flatMap { this.fix().map(it) }
 
@@ -99,7 +93,7 @@ sealed class Option<out A> : OptionOf<A> {
    *
    *  @param predicate the predicate used for testing.
    */
-  inline fun filter(crossinline predicate: Predicate<A>): Option<A> =
+  fun filter(predicate: Predicate<A>): Option<A> =
     fold({ None }, { a -> if (predicate(a)) Some(a) else None })
 
   /**
@@ -108,7 +102,7 @@ sealed class Option<out A> : OptionOf<A> {
    *
    * @param predicate the predicate used for testing.
    */
-  inline fun filterNot(crossinline predicate: Predicate<A>): Option<A> = fold({ None }, { a -> if (!predicate(a)) Some(a) else None })
+  fun filterNot(predicate: Predicate<A>): Option<A> = fold({ None }, { a -> if (!predicate(a)) Some(a) else None })
 
   /**
    * Returns true if this option is nonempty '''and''' the predicate
@@ -117,7 +111,7 @@ sealed class Option<out A> : OptionOf<A> {
    *
    * @param predicate the predicate to test
    */
-  inline fun exists(crossinline predicate: Predicate<A>): Boolean = fold({ false }, { a -> predicate(a) })
+  fun exists(predicate: Predicate<A>): Boolean = fold({ false }, { a -> predicate(a) })
 
   /**
    * Returns true if this option is empty '''or''' the predicate
@@ -125,7 +119,7 @@ sealed class Option<out A> : OptionOf<A> {
    *
    * @param p the predicate to test
    */
-  inline fun forall(crossinline p: Predicate<A>): Boolean = fold({ true }, p)
+  fun forall(p: Predicate<A>): Boolean = fold({ true }, p)
 
   @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("fold({ Unit }, f)"))
   inline fun forEach(f: (A) -> Unit) {
@@ -151,7 +145,7 @@ sealed class Option<out A> : OptionOf<A> {
   fun <L> toEither(ifEmpty: () -> L): Either<L, A> =
     fold({ ifEmpty().left() }, { it.right() })
 
-  fun toList(): List<A> = fold(::emptyList, { listOf(it) })
+  fun toList(): List<A> = fold(::emptyList) { listOf(it) }
 
   infix fun <X> and(value: Option<X>): Option<X> = if (isEmpty()) {
     None
@@ -190,7 +184,7 @@ fun <T> Option<T>.getOrElse(default: () -> T): T = fold({ default() }, ::identit
  *
  * @param alternative the default option if this is empty.
  */
-fun <A, B : A> OptionOf<B>.orElse(alternative: () -> Option<B>): Option<B> = if (fix().isEmpty()) alternative() else fix()
+inline fun <A, B : A> OptionOf<B>.orElse(alternative: () -> Option<B>): Option<B> = if (fix().isEmpty()) alternative() else fix()
 
 infix fun <T> OptionOf<T>.or(value: Option<T>): Option<T> = if (fix().isEmpty()) {
   value
