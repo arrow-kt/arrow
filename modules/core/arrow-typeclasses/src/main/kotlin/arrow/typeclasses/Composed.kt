@@ -58,12 +58,7 @@ interface ComposedFoldable<F, G> :
   }
 }
 
-fun <F, G> Foldable<F>.compose(GT: Foldable<G>): ComposedFoldable<F, G> = object :
-  ComposedFoldable<F, G> {
-  override fun FF(): Foldable<F> = this@compose
-
-  override fun GF(): Foldable<G> = GT
-}
+fun <F, G> Foldable<F>.compose(GT: Foldable<G>): ComposedFoldable<F, G> = ComposedFoldable(this, GT)
 
 interface ComposedTraverse<F, G> :
   Traverse<Nested<F, G>>,
@@ -101,15 +96,7 @@ interface ComposedTraverse<F, G> :
   }
 }
 
-fun <F, G> Traverse<F>.compose(GT: Traverse<G>, GA: Applicative<G>): Traverse<Nested<F, G>> =
-  object :
-    ComposedTraverse<F, G> {
-    override fun FT(): Traverse<F> = this@compose
-
-    override fun GT(): Traverse<G> = GT
-
-    override fun GA(): Applicative<G> = GA
-  }
+fun <F, G> Traverse<F>.compose(GT: Traverse<G>, GA: Applicative<G>): Traverse<Nested<F, G>> = ComposedTraverse(this, GT, GA)
 
 interface ComposedSemigroupK<F, G> : SemigroupK<Nested<F, G>> {
 
@@ -130,9 +117,7 @@ interface ComposedSemigroupK<F, G> : SemigroupK<Nested<F, G>> {
   }
 }
 
-fun <F, G> SemigroupK<F>.compose(): SemigroupK<Nested<F, G>> = object : ComposedSemigroupK<F, G> {
-  override fun F(): SemigroupK<F> = this@compose
-}
+fun <F, G> SemigroupK<F>.compose(): SemigroupK<Nested<F, G>> = ComposedSemigroupK(this)
 
 interface ComposedMonoidK<F, G> : MonoidK<Nested<F, G>>, ComposedSemigroupK<F, G> {
 
@@ -150,9 +135,7 @@ interface ComposedMonoidK<F, G> : MonoidK<Nested<F, G>>, ComposedSemigroupK<F, G
   }
 }
 
-fun <F, G> MonoidK<F>.compose(): MonoidK<Nested<F, G>> = object : ComposedMonoidK<F, G> {
-  override fun F(): MonoidK<F> = this@compose
-}
+fun <F, G> MonoidK<F>.compose(): MonoidK<Nested<F, G>> = ComposedMonoidK(this)
 
 interface ComposedFunctor<F, G> : Functor<Nested<F, G>> {
   fun F(): Functor<F>
@@ -267,10 +250,14 @@ interface ComposedBifunctor<F, G> : Bifunctor<Nested<F, G>> {
 
   fun <A, B, C, D> BinestedType<F, G, A, B>.bimapC(fl: (A) -> C, fr: (B) -> D): Kind2<Nested<F, G>, C, D> =
     binest().bimap(fl, fr)
+
+  companion object {
+    operator fun <F, G> invoke(BF: Bifunctor<F>, BG: Bifunctor<G>): ComposedBifunctor<F, G> =
+      object : ComposedBifunctor<F, G> {
+        override val F: Bifunctor<F> = BF
+        override val G: Bifunctor<G> = BG
+      }
+  }
 }
 
-fun <F, G> Bifunctor<F>.compose(G0: Bifunctor<G>): Bifunctor<Nested<F, G>> =
-  object : ComposedBifunctor<F, G> {
-    override val F: Bifunctor<F> = this@compose
-    override val G: Bifunctor<G> = G0
-  }
+fun <F, G> Bifunctor<F>.compose(BG: Bifunctor<G>): Bifunctor<Nested<F, G>> = ComposedBifunctor(this, BG)
