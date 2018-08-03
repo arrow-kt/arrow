@@ -1,28 +1,10 @@
 package arrow.instances
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Eval
-import arrow.core.Failure
-import arrow.core.ForTry
-import arrow.core.Success
-import arrow.core.Try
-import arrow.core.TryOf
-import arrow.core.fix
-import arrow.core.identity
-import arrow.core.recoverWith
+import arrow.core.*
+import arrow.core.Try.Failure
 import arrow.instance
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadError
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
-import arrow.typeclasses.Traverse
+import arrow.typeclasses.*
 import arrow.instances.traverse as tryTraverse
 
 fun <A> Try<A>.combine(SG: Semigroup<A>, b: Try<A>): Try<A> =

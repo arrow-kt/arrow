@@ -141,7 +141,7 @@ Transforming the inner contents
 import arrow.typeclasses.*
 import arrow.instances.*
 
-ForOption extensions {
+Option.functor().run {
   Some(1).map { it + 1 }
 }
 ```
