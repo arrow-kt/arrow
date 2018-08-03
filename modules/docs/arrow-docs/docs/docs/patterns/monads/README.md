@@ -375,7 +375,7 @@ interface Monad<F>: Applicative<F>, Functor<F> {
 }
 ```
 
-See that instead of `WorkflowThatReturns<A>`, our containers are called, `Kind<F, A>`, where `F` is the generic parameter of the container and `A` the generic parameter of the content. We talk more about them in the [glossary]({{ '/docs/patterns/glossary/#type-constructors' | relative_url }}).
+See that instead of `WorkflowThatReturns<A>` our containers are called `Kind<F, A>`, where `F` is the generic parameter of the container and `A` the generic parameter of the content. We talk more about them in the [glossary]({{ '/docs/patterns/glossary/#type-constructors' | relative_url }}).
 
 The constructor `just` is used to put an object into a container `Kind<F, A>`, and `flatMap` is used to replace one contained object with another contained object.
 
