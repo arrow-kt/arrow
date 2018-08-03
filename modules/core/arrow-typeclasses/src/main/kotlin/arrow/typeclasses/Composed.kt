@@ -137,6 +137,68 @@ interface ComposedMonoidK<F, G> : MonoidK<Nested<F, G>>, ComposedSemigroupK<F, G
 
 fun <F, G> MonoidK<F>.compose(): MonoidK<Nested<F, G>> = ComposedMonoidK(this)
 
+interface ComposedInvariant<F, G> : Invariant<Nested<F, G>> {
+  fun F(): Invariant<F>
+
+  fun G(): Invariant<G>
+
+  override fun <A, B> Kind<Nested<F, G>, A>.imap(f: (A) -> B, g: (B) -> A): Kind<Nested<F, G>, B> =
+    F().run { unnest().imap({ ga -> G().run { ga.imap(f, g) } }, { gb -> G().run { gb.imap(g, f) } }) }.nest()
+
+  companion object {
+    operator fun <F, G> invoke(FF: Invariant<F>, GF: Invariant<G>): Invariant<Nested<F, G>> =
+        object : ComposedInvariant<F, G> {
+            override fun F(): Invariant<F> = FF
+
+            override fun G(): Invariant<G> = GF
+        }
+  }
+}
+
+interface ComposedInvariantCovariant<F, G> : Invariant<Nested<F, G>> {
+    fun F(): Invariant<F>
+
+    fun G(): Functor<G>
+
+    override fun <A, B> Kind<Nested<F, G>, A>.imap(f: (A) -> B, g: (B) -> A): Kind<Nested<F, G>, B> =
+        F().run { unnest().imap({ ga -> G().run { ga.map(f) } }, { gb -> G().run { gb.map(g) } }) }.nest()
+
+    companion object {
+        operator fun <F, G> invoke(FF: Invariant<F>, GF: Functor<G>): Invariant<Nested<F, G>> =
+            object : ComposedInvariantCovariant<F, G> {
+                override fun F(): Invariant<F> = FF
+
+                override fun G(): Functor<G> = GF
+            }
+    }
+}
+
+interface ComposedInvariantContravariant<F, G> : Invariant<Nested<F, G>> {
+    fun F(): Invariant<F>
+
+    fun G(): Contravariant<G>
+
+    override fun <A, B> Kind<Nested<F, G>, A>.imap(f: (A) -> B, g: (B) -> A): Kind<Nested<F, G>, B> =
+        F().run { unnest().imap({ ga -> G().run { ga.contramap(g) } }, { gb -> G().run { gb.contramap(f) } }) }.nest()
+
+    companion object {
+        operator fun <F, G> invoke(FF: Invariant<F>, GF: Contravariant<G>): Invariant<Nested<F, G>> =
+            object : ComposedInvariantContravariant<F, G> {
+                override fun F(): Invariant<F> = FF
+
+                override fun G(): Contravariant<G> = GF
+            }
+    }
+}
+
+fun <F, G> Invariant<F>.compose(GF: Invariant<G>): Invariant<Nested<F, G>> = ComposedInvariant(this, GF)
+
+fun <F, G> Invariant<F>.composeFunctor(GF: Functor<G>): Invariant<Nested<F, G>> =
+    ComposedInvariantCovariant(this, GF)
+
+fun <F, G> Invariant<F>.composeContravariant(GF: Contravariant<G>): Invariant<Nested<F, G>> =
+    ComposedInvariantContravariant(this, GF)
+
 interface ComposedFunctor<F, G> : Functor<Nested<F, G>> {
   fun F(): Functor<F>
 
@@ -159,7 +221,70 @@ interface ComposedFunctor<F, G> : Functor<Nested<F, G>> {
   }
 }
 
+interface ComposedCovariantContravariant<F, G> : Contravariant<Nested<F, G>> {
+    fun F(): Functor<F>
+
+    fun G(): Contravariant<G>
+
+    override fun <A, B> Kind<Nested<F, G>, A>.contramap(f: (B) -> A): Kind<Nested<F, G>, B> =
+        F().run { unnest().map { G().run { it.contramap(f) } }.nest() }
+
+    companion object {
+        operator fun <F, G> invoke(FF: Functor<F>, GF: Contravariant<G>): Contravariant<Nested<F, G>> =
+            object : ComposedCovariantContravariant<F, G> {
+                override fun F(): Functor<F> = FF
+
+                override fun G(): Contravariant<G> = GF
+            }
+    }
+}
+
 fun <F, G> Functor<F>.compose(GF: Functor<G>): Functor<Nested<F, G>> = ComposedFunctor(this, GF)
+
+fun <F, G> Functor<F>.composeContravariant(GF: Contravariant<G>): Contravariant<Nested<F, G>> =
+    ComposedCovariantContravariant(this, GF)
+
+interface ComposedContravariant<F, G> : Functor<Nested<F, G>> {
+    fun F(): Contravariant<F>
+
+    fun G(): Contravariant<G>
+
+    override fun <A, B> Kind<Nested<F, G>, A>.map(f: (A) -> B): Kind<Nested<F, G>, B> =
+        F().run { unnest().contramap { gb: Kind<G, B> -> G().run { gb.contramap(f) } }.nest() }
+
+    companion object {
+      operator fun <F, G> invoke(FF: Contravariant<F>, GF: Contravariant<G>): Functor<Nested<F, G>> =
+        object : ComposedContravariant<F, G> {
+          override fun F(): Contravariant<F> = FF
+
+          override fun G(): Contravariant<G> = GF
+        }
+    }
+}
+
+interface ComposedContravariantCovariant<F, G> : Contravariant<Nested<F, G>> {
+    fun F(): Contravariant<F>
+
+    fun G(): Functor<G>
+
+    override fun <A, B> Kind<Nested<F, G>, A>.contramap(f: (B) -> A): Kind<Nested<F, G>, B> =
+        F().run { unnest().contramap { gb: Kind<G, B> -> G().run { gb.map(f) } }.nest() }
+
+    companion object {
+        operator fun <F, G> invoke(FF: Contravariant<F>, GF: Functor<G>): Contravariant<Nested<F, G>> =
+            object : ComposedContravariantCovariant<F, G> {
+                override fun F(): Contravariant<F> = FF
+
+                override fun G(): Functor<G> = GF
+            }
+    }
+}
+
+fun <F, G> Contravariant<F>.compose(GF: Contravariant<G>): Functor<Nested<F, G>> =
+    ComposedContravariant(this, GF)
+
+fun <F, G> Contravariant<F>.composeFunctor(GF: Functor<G>): Contravariant<Nested<F, G>> =
+    ComposedContravariantCovariant(this, GF)
 
 interface ComposedApplicative<F, G> : Applicative<Nested<F, G>>, ComposedFunctor<F, G> {
   override fun F(): Applicative<F>
