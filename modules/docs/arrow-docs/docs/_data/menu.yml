@@ -198,6 +198,12 @@ options:
       - title: Bimonad
         url: /docs/typeclasses/bimonad/
 
+      - title: Bifunctor
+        url: /docs/typeclasses/bifunctor
+
+      - title: Profunctor
+        url: /docs/typeclasses/profunctor
+
       - title: SemigroupK
         url: /docs/typeclasses/semigroupk/
 

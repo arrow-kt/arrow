@@ -1,6 +1,7 @@
 package arrow.data
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.*
 import arrow.instances.*
 import arrow.instances.eq
@@ -17,11 +18,16 @@ class EitherTest : UnitSpec() {
     a.fix() == b.fix()
   }
 
+  val EQ2: Eq<Kind2<ForEither, Int, Int>> = Eq { a, b ->
+    a.fix() == b.fix()
+  }
+
   init {
 
     ForEither<Throwable>() extensions {
 
       testLaws(
+        BifunctorLaws.laws(Either.bifunctor(), { Right(it) }, EQ2),
         SemigroupLaws.laws(Either.semigroup(String.semigroup(), String.semigroup()), Either.right("1"), Either.right("2"), Either.right("3"), Either.eq(String.eq(), String.eq())),
         MonoidLaws.laws(Either.monoid(MOL=String.monoid(), MOR = Int.monoid()), Either.right(1), Either.eq(String.eq(), Int.eq())),
         EqLaws.laws(Either.eq(String.eq(), Int.eq()), { Right(it) }),

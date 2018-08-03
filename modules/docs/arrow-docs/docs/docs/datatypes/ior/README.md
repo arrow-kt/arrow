@@ -143,6 +143,7 @@ Ior.Both("Warning", 41).toOption()
 * [Eq]({{ '/docs/typeclasses/eq' | relative_url }})
 * [Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
 * [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+* [Bifunctor]({{ '/docs/typeclasses/bifunctor' | relative_url }})
 * [Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
 * [TraverseFilter]({{ '/docs/typeclasses/traversefilter' | relative_url }})
 

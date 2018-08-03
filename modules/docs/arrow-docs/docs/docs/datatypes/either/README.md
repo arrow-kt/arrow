@@ -363,6 +363,7 @@ ForEither<Int>() extensions {
 * [ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
 * [Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
 * [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+* [Bifunctor]({{ '/docs/typeclasses/bifunctor' | relative_url }})
 * [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
 * [MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
 * [SemigroupK]({{ '/docs/typeclasses/semigroupk' | relative_url }})
