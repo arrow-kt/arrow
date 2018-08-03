@@ -280,14 +280,14 @@ inline fun <A, B> EitherOf<A, B>.filterOrElse(predicate: (B) -> Boolean, default
  *
  * Example:
  * ```
- * Right(12).leftIfNull({ -1 }) // Result: Right(12)
- * Right(null).leftIfNull({ -1 })  // Result: Left(-1)
+ * Right(12).leftIfNull({ -1 })   // Result: Right(12)
+ * Right(null).leftIfNull({ -1 }) // Result: Left(-1)
  *
- * Left(12).leftIfNull({ -1 })      // Result: Left(12)
+ * Left(12).leftIfNull({ -1 })    // Result: Left(12)
  * ```
  */
 inline fun <A, B> EitherOf<A, B?>.leftIfNull(crossinline default: () -> A): Either<A, B> =
-  fix().flatMap { if (it == null) Left(default()) else Right(it) }
+  fix().flatMap { it.rightIfNotNull { default() } }
 
 /**
  * Returns `true` if this is a [Either.Right] and its value is equal to `elem` (as determined by `==`),
@@ -325,3 +325,18 @@ inline fun <T> eitherTry(body: () -> T): Either<Throwable, T> = try {
 fun <A> A.left(): Either<A, Nothing> = Either.Left(this)
 
 fun <A> A.right(): Either<Nothing, A> = Either.Right(this)
+
+/**
+ * Returns [Either.Right] if the value of type B is not null, otherwise the specified A value wrapped into an
+ * [Either.Left].
+ *
+ * Example:
+ * ```
+ * "value".rightIfNotNull { "left" } // Right(b="value")
+ * null.rightIfNotNull { "left" }    // Left(a="left")
+ * ```
+ */
+fun <A, B> B?.rightIfNotNull(default: () -> A): Either<A, B> = when (this) {
+  null -> Either.Left(default())
+  else -> Either.Right(this)
+}

@@ -299,6 +299,21 @@ Right(null).leftIfNull({ -1 })
  Left(12).leftIfNull({ -1 })
 ```
 
+Another useful operation when working with null is `rightIfNotNull`.
+If the value is null it will be transformed to the specified `Either.Left` and if its not null the type will
+be wrapped to `Either.Right`.
+
+Example:
+
+```kotlin:ank
+"value".rightIfNotNull { "left" }
+```
+
+```kotlin:ank
+null.rightIfNotNull { "left" }
+```
+
+
  Arrow contains `Either` instances for many useful typeclasses that allows you to use and transform right values.
  Both Option and Try don't require a type parameter with the following functions, but it is specifically used for Either.Left
 
