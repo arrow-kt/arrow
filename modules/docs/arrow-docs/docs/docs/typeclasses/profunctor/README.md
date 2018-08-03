@@ -45,11 +45,11 @@ Example:
 import arrow.core.*
 import arrow.instances.*
 
-val fab: Function1<Double, String> = { x -> "Result: $x" }.k()
+val fab: Function1<Double, Double> = { x: Double -> x * 3 }.k()
 val f: (Int) -> Double = { x -> x.toDouble() / 2 }  
-val g: (Double) -> Double = { x -> x * 3 } 
+val g: (Double) -> String = { x -> "Result: $x" } 
 
-val h: Function1<Int, String> = Function1.profunctor().run { fab.dimap(f, g) } 
+val h = Function1.profunctor().run { fab.dimap(f, g) } 
 h(4)
 ```
 
@@ -65,9 +65,9 @@ Contramap on the first type parameter and map on the second type parameter
 import arrow.core.*
 import arrow.instances.*
 
-val f: Function1<Int, List<Int>> = { x -> List(x) { x } }.k()
+val f: Function1<Int, Int> = { x: Int -> x + 10 }.k()
 val fl: (String) -> Int = { x -> x.toInt() }
-val fr: (Int) -> Int = { x -> x + 10 }
+val fr: (Int) -> List<Int> = { x -> List(x) { x } }
 
 Function1.profunctor().run { f.dimap(fl, fr) } 
 ```

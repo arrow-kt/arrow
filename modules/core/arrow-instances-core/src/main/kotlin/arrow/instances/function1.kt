@@ -1,7 +1,6 @@
 package arrow.instances
 
 import arrow.Kind
-import arrow.Kind2
 import arrow.core.*
 import arrow.instance
 import arrow.typeclasses.Applicative
@@ -17,7 +16,7 @@ interface Function1FunctorInstance<I> : Functor<Function1PartialOf<I>> {
 
 @instance(Function1::class)
 interface Function1ProfunctorInstance : Profunctor<ForFunction1> {
-  override fun <A, B, C, D> Kind2<ForFunction1, A, B>.dimap(fl: (C) -> A, fr: (B) -> D): Kind2<ForFunction1, C, D> =
+  override fun <A, B, C, D> Kind<Function1PartialOf<A>, B>.dimap(fl: (C) -> A, fr: (B) -> D): Function1<C, D> =
     (fr compose fix().f compose fl).k()
 }
 

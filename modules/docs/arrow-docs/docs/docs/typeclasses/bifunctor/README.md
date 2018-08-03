@@ -22,7 +22,7 @@ fun Kind2<F, A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Kind2<F, C, D>
 ```kotlin:ank
 import arrow.*
 import arrow.core.*
-import arrow.data.*
+import arrow.typeclasses.*
 
 fun <F> greet(BF: Bifunctor<F>, p: Kind2<F, String, String>): Kind2<F, String, String> =
     BF.run { p.bimap({ "Hello $it" }, { "General $it" }) }
