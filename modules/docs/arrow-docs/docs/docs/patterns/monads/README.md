@@ -648,7 +648,7 @@ These laws are encoded in Arrow as tests you can find in the `arrow-test` module
 
 A typical monad tutorial will make a lot of emphasis on the laws, but I find them less important to explain to a beginner. Nonetheless, here they are for the sake of completeness.
 
-`Left Identity law` says that that Monad constructor is a neutral operation: you can safely run it before Bind, and it won't change the result of the function call:
+`Left Identity law` says that Monad constructor is a neutral operation: you can safely run it before `flatMap`, and it won't change the result of the function call:
 
 ```
 // Given
@@ -659,7 +659,7 @@ val f: (A) -> Kind<F, B>
 just(value).flatMap(f) == f(value)
 ```
 
-`Right Identity law` says that given a monadic value, wrapping its contained data into another monad of same type and then Binding it, doesn't change the original value:
+`Right Identity law` says that given a monadic value, wrapping its contained data into another monad of same type and then `flatMap` it, doesn't change the original value:
 
 ```
 // Given
@@ -669,7 +669,7 @@ val monadicValue: Kind<F, A>
 monadicValue.flatMap { x -> just(x) } == monadicValue
 ```
 
-`Associativity law` means that the order in which Bind operations are composed does not matter:
+`Associativity law` means that the order in which `flatMap` operations are composed does not matter:
 
 ```
 // Given
