@@ -377,12 +377,12 @@ interface ComposedBifoldable<F, G> : Bifoldable<Nested<F, G>> {
 fun <F, G> Bifoldable<F>.compose(BG: Bifoldable<G>): Bifoldable<Nested<F, G>> = ComposedBifoldable(this, BG)
 
 interface ComposedBifunctor<F, G> : Bifunctor<Nested<F, G>> {
-  val F: Bifunctor<F>
-  val G: Bifunctor<G>
+  fun F(): Bifunctor<F>
+  fun G(): Bifunctor<G>
 
-  override fun <A, B, C, D> BinestedType<F, G, A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Kind2<Nested<F, G>, C, D> {
-    val innerBimap = { gab: Kind2<G, A, B> -> G.run { gab.bimap(fl, fr) } }
-    return F.run { biunnest().bimap(innerBimap, innerBimap) }.binest()
+  override fun <A, B, C, D> BinestedType<F, G, A, B>.bimap(fl: (A) -> C, fr: (B) -> D): BinestedType<F, G, C, D> {
+    val innerBimap = { gab: Kind2<G, A, B> -> G().run { gab.bimap(fl, fr) } }
+    return F().run { biunnest().bimap(innerBimap, innerBimap) }.binest()
   }
 
   fun <A, B, C, D> BiunnestedType<F, G, A, B>.bimapC(fl: (A) -> C, fr: (B) -> D): BiunnestedType<F, G, C, D> =
@@ -391,8 +391,8 @@ interface ComposedBifunctor<F, G> : Bifunctor<Nested<F, G>> {
   companion object {
     operator fun <F, G> invoke(BF: Bifunctor<F>, BG: Bifunctor<G>): ComposedBifunctor<F, G> =
       object : ComposedBifunctor<F, G> {
-        override val F: Bifunctor<F> = BF
-        override val G: Bifunctor<G> = BG
+        override fun F(): Bifunctor<F> = BF
+        override fun G(): Bifunctor<G> = BG
       }
   }
 }
