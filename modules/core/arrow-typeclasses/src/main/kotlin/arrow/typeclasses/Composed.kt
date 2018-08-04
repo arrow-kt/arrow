@@ -5,7 +5,9 @@ import arrow.Kind2
 import arrow.core.Eval
 
 /**
- * https://www.youtube.com/watch?v=wvSP5qYiz4Y
+ * A type to represent λ[α => Kind[F, C, α]]
+ *
+ * Use unnest to expand it, nest to re-compose it
  */
 interface Nested<out F, out G>
 
