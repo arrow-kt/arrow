@@ -11,7 +11,7 @@ import org.junit.runner.RunWith
 class MonoidTest : UnitSpec() {
 
     val EQ: Eq<MonoidOf<Int>> = Eq.invoke { a, b ->
-        a.fix() == b.fix()
+        a.fix().run { 3.combine(1) } == b.fix().run { 3.combine(1) }
     }
 
     init {

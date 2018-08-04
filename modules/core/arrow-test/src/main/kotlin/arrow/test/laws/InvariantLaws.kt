@@ -2,6 +2,7 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.compose
+import arrow.core.identity
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB
 import arrow.typeclasses.Eq
@@ -18,7 +19,8 @@ object InvariantLaws {
 
     fun <F> Invariant<F>.identity(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
         forAll(genConstructor(Gen.int(), cf)) { fa: Kind<F, Int> ->
-            fa.imap({ it }, { it }).equalUnderTheLaw(fa, EQ)
+            val imap: Kind<F, Int> = fa.imap<Int, Int>(::identity, ::identity)
+            imap.equalUnderTheLaw(fa, EQ)
         }
 
     fun <F> Invariant<F>.composition(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
