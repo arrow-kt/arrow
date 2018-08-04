@@ -142,8 +142,11 @@ interface ComposedInvariant<F, G> : Invariant<Nested<F, G>> {
 
   fun G(): Invariant<G>
 
-  override fun <A, B> Kind<Nested<F, G>, A>.imap(f: (A) -> B, g: (B) -> A): Kind<Nested<F, G>, B> =
-    F().run { unnest().imap({ ga -> G().run { ga.imap(f, g) } }, { gb -> G().run { gb.imap(g, f) } }) }.nest()
+  override fun <A, B> Kind<Nested<F, G>, A>.imap(f: (A) -> B, g: (B) -> A): Kind<Nested<F, G>, B> {
+      val fl: (Kind<G, A>) -> Kind<G, B> = { ga -> G().run { ga.imap(f, g) } }
+      val fr: (Kind<G, B>) -> Kind<G, A> = { gb -> G().run { gb.imap(g, f) } }
+      return F().run { unnest().imap(fl, fr) }.nest()
+  }
 
   companion object {
     operator fun <F, G> invoke(FF: Invariant<F>, GF: Invariant<G>): Invariant<Nested<F, G>> =
@@ -160,8 +163,11 @@ interface ComposedInvariantCovariant<F, G> : Invariant<Nested<F, G>> {
 
     fun G(): Functor<G>
 
-    override fun <A, B> Kind<Nested<F, G>, A>.imap(f: (A) -> B, g: (B) -> A): Kind<Nested<F, G>, B> =
-        F().run { unnest().imap({ ga -> G().run { ga.map(f) } }, { gb -> G().run { gb.map(g) } }) }.nest()
+    override fun <A, B> Kind<Nested<F, G>, A>.imap(f: (A) -> B, g: (B) -> A): Kind<Nested<F, G>, B> {
+        val fl: (Kind<G, A>) -> Kind<G, B> = { ga -> G().run { ga.map(f) } }
+        val fr: (Kind<G, B>) -> Kind<G, A> = { gb -> G().run { gb.map(g) } }
+        return F().run { unnest().imap(fl, fr) }.nest()
+    }
 
     companion object {
         operator fun <F, G> invoke(FF: Invariant<F>, GF: Functor<G>): Invariant<Nested<F, G>> =
@@ -178,8 +184,11 @@ interface ComposedInvariantContravariant<F, G> : Invariant<Nested<F, G>> {
 
     fun G(): Contravariant<G>
 
-    override fun <A, B> Kind<Nested<F, G>, A>.imap(f: (A) -> B, g: (B) -> A): Kind<Nested<F, G>, B> =
-        F().run { unnest().imap({ ga -> G().run { ga.contramap(g) } }, { gb -> G().run { gb.contramap(f) } }) }.nest()
+    override fun <A, B> Kind<Nested<F, G>, A>.imap(f: (A) -> B, g: (B) -> A): Kind<Nested<F, G>, B> {
+        val fl: (Kind<G, A>) -> Kind<G, B> = { ga -> G().run { ga.contramap(g) } }
+        val fr: (Kind<G, B>) -> Kind<G, A> = { gb -> G().run { gb.contramap(f) } }
+        return F().run { unnest().imap(fl, fr) }.nest()
+    }
 
     companion object {
         operator fun <F, G> invoke(FF: Invariant<F>, GF: Contravariant<G>): Invariant<Nested<F, G>> =
