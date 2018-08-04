@@ -37,7 +37,7 @@ f(4) == g(4)
 
 Functions are a binary type constructor of an input type and an output type. It is implemented in [`Function1`]({{ '/docs/datatypes/function1' | relative_url }}).
 
-So, if we have a function `(A) -> B` and a `Profunctor` instance for it, we can make the following transformation with `bimap`: `((C) -> A) -> ((A) -> B) -> ((B) -> D)`.
+So, if we have a function `(A) -> B` and a `Profunctor` instance for it, we can make the following transformation with `dimap`: `((C) -> A) -> ((A) -> B) -> ((B) -> D)`.
 
 Example:
 
@@ -69,7 +69,8 @@ val f: Function1<Int, Int> = { x: Int -> x + 10 }.k()
 val fl: (String) -> Int = { x -> x.toInt() }
 val fr: (Int) -> List<Int> = { x -> List(x) { x } }
 
-Function1.profunctor().run { f.dimap(fl, fr) } 
+val g: Function1<String, List<Int>> = Function1.profunctor().run { f.dimap(fl, fr) }
+g("6") 
 ```
 
 #### Other combinators
@@ -82,7 +83,7 @@ Arrow provides [`ProfunctorLaws`][profunctor_laws_source]{:target="_blank"} in t
 
 ### Data Types
 
-The following datatypes in Arrow provide instances that adhere to the `Bifunctor` typeclass.
+The following datatypes in Arrow provide instances that adhere to the `Profunctor` typeclass.
 
 - [Function1]({{ '/docs/datatypes/function1' | relative_url }})
 - [Cokleisli]({{ '/docs/datatypes/cokleisli' | relative_url }})
