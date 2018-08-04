@@ -25,7 +25,7 @@ interface Function1ContravariantInstance<O> : Contravariant<Conested<ForFunction
   override fun <A, B> Kind<Conested<ForFunction1, O>, A>.contramap(f: (B) -> A): Kind<Conested<ForFunction1, O>, B> =
     counnest().fix().contramap(f).conest()
 
-  fun <A, B> Function1Of<A, O>.contramapL(f: (B) -> A): Function1Of<B, O> =
+  fun <A, B> Function1Of<A, O>.contramapC(f: (B) -> A): Function1Of<B, O> =
     conest().contramap(f).counnest()
 }
 
