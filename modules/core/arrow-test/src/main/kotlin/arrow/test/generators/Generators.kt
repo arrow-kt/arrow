@@ -23,11 +23,8 @@ fun genThrowable(): Gen<Throwable> = Gen.from(listOf(RuntimeException(), NoSuchE
 
 fun <F, A> genConstructor(valueGen: Gen<A>, cf: (A) -> Kind<F, A>): Gen<Kind<F, A>> = valueGen.map(cf)
 
-inline fun <F, A> genDoubleConstructor(valueGen: Gen<A>, crossinline cf: (A) -> Kind2<F, A, A>): Gen<Kind2<F, A, A>> =
-  object : Gen<Kind2<F, A, A>> {
-    override fun generate(): Kind2<F, A, A> =
-      cf(valueGen.generate())
-  }
+fun <F, A> genDoubleConstructor(valueGen: Gen<A>, cf: (A) -> Kind2<F, A, A>): Gen<Kind2<F, A, A>> =
+  valueGen.map(cf)
 
 fun <F, A, B> genConstructor2(valueGen: Gen<A>, ff: (A) -> Kind<F, (A) -> B>): Gen<Kind<F, (A) -> B>> = valueGen.map(ff)
 
@@ -83,7 +80,7 @@ fun <E, A> genValidated(genE: Gen<E>, genA: Gen<A>): Gen<Validated<E, A>> =
   genEither(genE, genA).map { Validated.fromEither(it) }
 
 fun <A> genTry(genA: Gen<A>, genThrowable: Gen<Throwable> = genThrowable()): Gen<Try<A>> =
-  genEither(genThrowable, genA).map{ it.fold({ Failure<A>(it) }, { Success(it) }) }
+  genEither(genThrowable, genA).map{ it.fold({ Failure(it) }, { Success(it) }) }
 
 fun <A> genNonEmptyList(genA: Gen<A>): Gen<NonEmptyList<A>> =
   genA.flatMap { head -> Gen.list(genA).map { NonEmptyList(head, it) } }
