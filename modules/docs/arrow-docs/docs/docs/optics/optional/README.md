@@ -122,7 +122,7 @@ val lifted: (Try<Tuple2<Int, String>>) -> Try<Tuple2<String, String>> = successT
 lifted(Try.Success(5 toT "World!"))
 ```
 ```kotlin:ank
-lifted(Try.Failure<Tuple2<Int, String>>(IllegalStateException("something went wrong")))
+lifted(Try.Failure(IllegalStateException("something went wrong")))
 ```
 
 ### Laws

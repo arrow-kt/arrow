@@ -1,6 +1,7 @@
 package arrow.data
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.*
 import arrow.instances.*
 import arrow.instances.eq
@@ -17,11 +18,16 @@ class EitherTest : UnitSpec() {
     a.fix() == b.fix()
   }
 
+  val EQ2: Eq<Kind2<ForEither, Int, Int>> = Eq { a, b ->
+    a.fix() == b.fix()
+  }
+
   init {
 
     ForEither<Throwable>() extensions {
 
       testLaws(
+        BifunctorLaws.laws(Either.bifunctor(), { Right(it) }, EQ2),
         SemigroupLaws.laws(Either.semigroup(String.semigroup(), String.semigroup()), Either.right("1"), Either.right("2"), Either.right("3"), Either.eq(String.eq(), String.eq())),
         MonoidLaws.laws(Either.monoid(MOL=String.monoid(), MOR = Int.monoid()), Either.right(1), Either.eq(String.eq(), Int.eq())),
         EqLaws.laws(Either.eq(String.eq(), Int.eq()), { Right(it) }),
@@ -82,7 +88,7 @@ class EitherTest : UnitSpec() {
 
     }
 
-    "filterOrElse should filters value" {
+    "filterOrElse should filter values" {
       forAll { a: Int, b: Int ->
         val left: Either<Int, Int> = Left(a)
 
@@ -90,6 +96,21 @@ class EitherTest : UnitSpec() {
           && Right(a).filterOrElse({ it > a + 1 }, { b }) == Left(b)
           && left.filterOrElse({ it > a - 1 }, { b }) == Left(a)
           && left.filterOrElse({ it > a + 1 }, { b }) == Left(a)
+      }
+    }
+
+    "leftIfNull should return Left if Right value is null of if Either is Left" {
+      forAll { a: Int, b: Int ->
+        Right(a).leftIfNull { b }  == Right(a)
+          && Right( null ).leftIfNull { b }  == Left(b)
+        && Left(a).leftIfNull { b } == Left(a)
+      }
+    }
+
+    "rightIfNotNull should return Left if value is null or Right of value when not null" {
+      forAll { a: Int, b: Int ->
+        null.rightIfNotNull { b } == Left(b)
+          && a.rightIfNotNull { b } == Right(a)
       }
     }
 

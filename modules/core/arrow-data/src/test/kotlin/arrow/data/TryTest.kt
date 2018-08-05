@@ -67,7 +67,7 @@ class TryTest : UnitSpec() {
 
     "invoke of exception should be failure" {
       val ex = Exception()
-      Try.invoke { throw ex } shouldBe Failure<Any>(ex)
+      Try.invoke { throw ex } shouldBe Failure(ex)
     }
 
     "filter evaluates predicate" {
@@ -83,12 +83,12 @@ class TryTest : UnitSpec() {
       val ex = Exception()
       val failure: Try<Int> = Failure(ex)
 
-      Success(1).failed() shouldBe Failure<Int>(TryException.UnsupportedOperationException("Success"))
+      Success(1).failed() shouldBe Failure(TryException.UnsupportedOperationException("Success"))
       failure.failed() shouldBe Success(ex)
     }
 
     "fold should call left function on Failure" {
-      Failure<Int>(Exception()).fold({ 2 }, { 3 }) shouldBe 2
+      Failure(Exception()).fold({ 2 }, { 3 }) shouldBe 2
     }
 
     "fold should call right function on Success" {
@@ -107,32 +107,33 @@ class TryTest : UnitSpec() {
 
     "getOrDefault returns default if Failure" {
       Success(1).getOrDefault { 2 } shouldBe 1
-      Failure<Int>(Exception()).getOrDefault { 2 } shouldBe 2
+      Failure(Exception()).getOrDefault { 2 } shouldBe 2
     }
 
     "getOrElse returns default if Failure" {
       val e: Throwable = Exception()
 
       Success(1).getOrElse { _: Throwable -> 2 } shouldBe 1
-      Failure<Int>(e).getOrElse { (it shouldBe e); 2 } shouldBe 2
+      Failure(e).getOrElse { (it shouldEqual e); 2 } shouldBe 2
     }
 
     "orNull returns null if Failure" {
-      val e: Throwable = Exception()
-
       Success(1).orNull() shouldBe 1
-      Failure<Int>(e).orNull() shouldBe null
+
+      val e: Throwable = Exception()
+      val failure1: Try<Int> = Failure(e)
+      failure1.orNull() shouldBe null
     }
 
     "recoverWith should modify Failure entity" {
       Success(1).recoverWith { Failure(Exception()) } shouldBe Success(1)
       Success(1).recoverWith { Success(2) } shouldBe Success(1)
-      Failure<Int>(Exception()).recoverWith { Success(2) } shouldBe Success(2)
+      Failure(Exception()).recoverWith { Success(2) } shouldBe Success(2)
     }
 
     "recover should modify Failure value" {
       Success(1).recover { 2 } shouldBe Success(1)
-      Failure<Int>(Exception()).recover { 2 } shouldBe Success(2)
+      Failure(Exception()).recover { 2 } shouldBe Success(2)
     }
 
     "transform applies left function for Success" {
@@ -140,7 +141,7 @@ class TryTest : UnitSpec() {
     }
 
     "transform applies right function for Failure" {
-      Failure<Int>(Exception()).transform({ Success(2) }, { Success(3) }) shouldBe Success(3)
+      Failure(Exception()).transform({ Success(2) }, { Success(3) }) shouldBe Success(3)
     }
 
     "Cartesian builder should build products over homogeneous Try" {
@@ -169,7 +170,7 @@ class TryTest : UnitSpec() {
       ForTry extensions {
         map(
           Success(13),
-          Failure<Boolean>(DoctorNotFoundException("13th Doctor is coming!")),
+          Failure(DoctorNotFoundException("13th Doctor is coming!")),
           Success("Who")
         ) { (a, b, c) -> "${a}th $b is $c" } shouldBe Failure(DoctorNotFoundException("13th Doctor is coming!"))
       }

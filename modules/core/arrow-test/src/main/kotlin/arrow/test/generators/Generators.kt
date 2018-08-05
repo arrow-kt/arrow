@@ -1,6 +1,7 @@
 package arrow.test.generators
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.*
 import arrow.data.*
 import arrow.recursion.Algebra
@@ -21,6 +22,12 @@ fun <A> genFunctionAAToA(genA: Gen<A>): Gen<(A, A) -> A> = genA.map { a:A -> { _
 fun genThrowable(): Gen<Throwable> = Gen.from(listOf(RuntimeException(), NoSuchElementException(), IllegalArgumentException()))
 
 fun <F, A> genConstructor(valueGen: Gen<A>, cf: (A) -> Kind<F, A>): Gen<Kind<F, A>> = valueGen.map(cf)
+
+inline fun <F, A> genDoubleConstructor(valueGen: Gen<A>, crossinline cf: (A) -> Kind2<F, A, A>): Gen<Kind2<F, A, A>> =
+  object : Gen<Kind2<F, A, A>> {
+    override fun generate(): Kind2<F, A, A> =
+      cf(valueGen.generate())
+  }
 
 fun <F, A, B> genConstructor2(valueGen: Gen<A>, ff: (A) -> Kind<F, (A) -> B>): Gen<Kind<F, (A) -> B>> = valueGen.map(ff)
 

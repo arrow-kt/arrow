@@ -33,14 +33,14 @@ class DeferredKTest : UnitSpec() {
     testLaws(AsyncLaws.laws(DeferredK.async(), EQ(), EQ()))
 
     "DeferredK is awaitable" {
-      forAll(genIntSmall(), genIntSmall(), genIntSmall(), { x: Int, y: Int, z: Int ->
+      forAll(genIntSmall(), genIntSmall(), genIntSmall()) { x: Int, y: Int, z: Int ->
         runBlocking {
           val a = DeferredK { x }.await()
           val b = DeferredK { y + a }.await()
           val c = DeferredK { z + b }.await()
           c
         } == x + y + z
-      })
+      }
     }
 
     "should complete when running a pure value with unsafeRunAsync" {

@@ -247,7 +247,7 @@ class IOTest : UnitSpec() {
       val order = mutableListOf<Long>()
 
       fun makePar(num: Long) =
-        IO.async(newSingleThreadContext("$num")) {
+        IO(newSingleThreadContext("$num")) {
           // Sleep according to my number
           Thread.sleep(num * 20)
         }.map {
@@ -275,7 +275,7 @@ class IOTest : UnitSpec() {
         }
 
       fun makePar(num: Long) =
-        IO.async(newSingleThreadContext("$num")) {
+        IO(newSingleThreadContext("$num")) {
           // Sleep according to my number
           Thread.sleep(num * 20)
           num
@@ -292,7 +292,7 @@ class IOTest : UnitSpec() {
 
     "parallel mapping is done in the expected CoroutineContext" {
       fun makePar(num: Long) =
-        IO.async(newSingleThreadContext("$num")) {
+        IO(newSingleThreadContext("$num")) {
           // Sleep according to my number
           Thread.sleep(num * 20)
           num

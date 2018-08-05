@@ -102,9 +102,6 @@ class OptionTest : UnitSpec() {
     "map" {
       some.map(String::toUpperCase) shouldBe Some("KOTLIN")
       none.map(String::toUpperCase) shouldBe None
-
-      some.map(Some(12)) { name, version -> "${name.toUpperCase()} M$version" } shouldBe Some("KOTLIN M12")
-      none.map(Some(12)) { name, version -> "${name.toUpperCase()} M$version" } shouldBe None
     }
 
     "fold" {

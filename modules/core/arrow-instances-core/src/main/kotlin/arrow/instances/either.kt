@@ -1,6 +1,7 @@
 package arrow.instances
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.*
 import arrow.instance
 import arrow.typeclasses.*
@@ -47,6 +48,12 @@ interface EitherMonoidInstance<L, R> : EitherSemigroupInstance<L, R>, Monoid<Eit
 @instance(Either::class)
 interface EitherFunctorInstance<L> : Functor<EitherPartialOf<L>> {
   override fun <A, B> Kind<EitherPartialOf<L>, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
+}
+
+@instance(Either::class)
+interface EitherBifunctorInstance : Bifunctor<ForEither> {
+  override fun <A, B, C, D> Kind2<ForEither, A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Kind2<ForEither, C, D> =
+    fix().bimap(fl, fr)
 }
 
 @instance(Either::class)
