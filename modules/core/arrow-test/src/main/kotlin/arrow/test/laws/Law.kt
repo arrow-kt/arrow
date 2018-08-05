@@ -11,8 +11,8 @@ fun <A> A.equalUnderTheLaw(b: A, eq: Eq<A>): Boolean =
   eq.run { eqv(b) }
 
 fun <A> forFew(amount: Int, genA: Gen<A>, fn: (a: A) -> Boolean) {
-  val listA = genA.map(fn).random().toList()
-  listA.take(amount).forEachIndexed { index :Int ,passed:Boolean ->
+  val listA = genA.random().take(amount).map(fn).toList()
+  listA.forEachIndexed { index :Int ,passed:Boolean ->
     if (!passed) {
       throw AssertionError("Property failed for\n${listA[index]})")
     }
