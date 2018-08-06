@@ -11,6 +11,7 @@ import com.squareup.kotlinpoet.TypeAliasSpec
 import com.squareup.kotlinpoet.TypeVariableName
 
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.TypeSpec
 
 import java.io.File
 
@@ -18,6 +19,8 @@ private const val alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 private const val packageName = "arrow.generic"
 
 fun generateCoproducts(destination: File) {
+    generateGenericHolders(destination)
+
     for (size in 2 until alphabet.length + 1) {
         FileSpec.builder("$packageName.coproduct$size", "Coproduct$size")
                 .addImport(packageName, "Coproduct") //Import coproduct
@@ -37,6 +40,33 @@ fun generateCoproducts(destination: File) {
                 .build()
                 .writeTo(destination)
     }
+}
+
+private fun generateGenericHolders(destination: File) {
+    val parentClassName = ClassName("arrow.generic", "GenericHolder")
+
+    FileSpec.builder("arrow.generic", "GenericHolder")
+            .addType(
+                    TypeSpec.classBuilder(parentClassName)
+                            .addModifiers(KModifier.SEALED)
+                            .build()
+            )
+            .apply {
+                for (size in 2 until alphabet.length + 1) {
+                    val generics = alphabet.subSequence(0, size).toList()
+
+                    addType(
+                            TypeSpec.classBuilder("Generic$size")
+                                    .apply {
+                                        addTypeVariables(generics.map { TypeVariableName(it.toString()) })
+                                    }
+                                    .superclass(parentClassName)
+                                    .build()
+                    )
+                }
+            }
+            .build()
+            .writeTo(destination)
 }
 
 private fun FileSpec.Builder.addCoproductTypeAlias(generics: List<Char>) {
@@ -178,15 +208,15 @@ private fun FileSpec.Builder.addCoproductMapFunction(
                     .apply {
                         val types = generics.toList()
                         addCode(CodeBlock.builder()
-                                .add("return fold<${types.joinToString()}, Coproduct$size<${types.dropLast(1).joinToString()}, RESULT>>(\n")
-                                .apply {
-                                    for (type in types.dropLast(1)) {
-                                        add("\t{ it.cop<${types.dropLast(1).joinToString()}, RESULT>() },\n")
-                                    }
-                                }
-                                .add("\t{ apply(it).cop<${types.dropLast(1).joinToString()}, RESULT>() }\n")
-                                .add(")\n")
-                                .build())
+                                        .add("return fold<${types.joinToString()}, Coproduct$size<${types.dropLast(1).joinToString()}, RESULT>>(\n")
+                                        .apply {
+                                            for (type in types.dropLast(1)) {
+                                                add("\t{ it.cop<${types.dropLast(1).joinToString()}, RESULT>() },\n")
+                                            }
+                                        }
+                                        .add("\t{ apply(it).cop<${types.dropLast(1).joinToString()}, RESULT>() }\n")
+                                        .add(")\n")
+                                        .build())
                     }
                     .build()
     )

@@ -14,9 +14,7 @@ class CoproductProcessor : AbstractProcessor() {
 
     override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
-    override fun getSupportedAnnotationTypes(): Set<String> {
-        return setOf(coproduct::class.java.canonicalName)
-    }
+    override fun getSupportedAnnotationTypes(): Set<String> = setOf(coproduct::class.java.canonicalName)
 
     override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
         val generatedDir = File(this.generatedDir!!, "").also { it.mkdirs() }
