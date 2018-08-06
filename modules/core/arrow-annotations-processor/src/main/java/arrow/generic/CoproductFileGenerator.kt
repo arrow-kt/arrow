@@ -11,6 +11,7 @@ import com.squareup.kotlinpoet.TypeAliasSpec
 import com.squareup.kotlinpoet.TypeVariableName
 
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 
 import java.io.File
@@ -19,11 +20,8 @@ private const val alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 private const val packageName = "arrow.generic"
 
 fun generateCoproducts(destination: File) {
-    generateGenericHolders(destination)
-
     for (size in 2 until alphabet.length + 1) {
         FileSpec.builder("$packageName.coproduct$size", "Coproduct$size")
-                .addImport(packageName, "Coproduct") //Import coproduct
                 .apply {
                     val generics = alphabet.subSequence(0, size).toList()
                     val coproductType = ClassName("", "Coproduct$size")
@@ -31,7 +29,7 @@ fun generateCoproducts(destination: File) {
                             *generics.map { TypeVariableName(it.toString()) }.toTypedArray()
                     )
 
-                    addCoproductTypeAlias(generics)
+                    addCoproductClass(generics)
                     addCoproductConstructorFunctions(generics, parameterizedCoproductType)
                     addCoproductExtensionFunctions(generics, parameterizedCoproductType)
                     addCoproductFoldFunction(generics, parameterizedCoproductType)
@@ -42,43 +40,23 @@ fun generateCoproducts(destination: File) {
     }
 }
 
-private fun generateGenericHolders(destination: File) {
-    val parentClassName = ClassName("arrow.generic", "GenericHolder")
-
-    FileSpec.builder("arrow.generic", "GenericHolder")
-            .addType(
-                    TypeSpec.classBuilder(parentClassName)
-                            .addModifiers(KModifier.SEALED)
-                            .build()
-            )
-            .apply {
-                for (size in 2 until alphabet.length + 1) {
-                    val generics = alphabet.subSequence(0, size).toList()
-
-                    addType(
-                            TypeSpec.classBuilder("Generic$size")
-                                    .apply {
-                                        addTypeVariables(generics.map { TypeVariableName(it.toString()) })
-                                    }
-                                    .superclass(parentClassName)
+private fun FileSpec.Builder.addCoproductClass(generics: List<Char>) {
+    val size = generics.size
+    addType(
+            TypeSpec.classBuilder("Coproduct$size")
+                    .addTypeVariables(generics.map { TypeVariableName(it.toString()) })
+                    .addModifiers(KModifier.DATA)
+                    .addProperty(
+                            PropertySpec.builder("value", TypeVariableName("Any?"))
+                                    .mutable(false)
+                                    .initializer("value")
                                     .build()
                     )
-                }
-            }
-            .build()
-            .writeTo(destination)
-}
-
-private fun FileSpec.Builder.addCoproductTypeAlias(generics: List<Char>) {
-    val size = generics.size
-    val genericsString = generics.joinToString(separator = ", ")
-    val parameterizedClass =  ClassName("arrow.generic", "Coproduct").parameterizedBy(
-            ClassName("arrow.generic","Generic$size").parameterizedBy(
-                    TypeVariableName(genericsString)
-            )
-    )
-    addTypeAlias(
-            TypeAliasSpec.builder("Coproduct$size<$genericsString>",parameterizedClass)
+                    .primaryConstructor(
+                            FunSpec.constructorBuilder()
+                                    .addParameter("value", TypeVariableName("Any?"))
+                                    .build()
+                    )
                     .build()
     )
 }
@@ -87,7 +65,8 @@ private fun FileSpec.Builder.addCoproductConstructorFunctions(
         generics: List<Char>,
         parameterizedCoproductType: ParameterizedTypeName
 ) {
-    val genericHolderString = "Generic${generics.size}<${generics.joinToString(separator = ", ")}>()"
+    val size = generics.size
+    val genericHolderString = generics.joinToString(separator = ", ")
     for (index in 0 until generics.size) {
         val generic = generics[index]
         val paramName = "${generic.toLowerCase()}"
@@ -114,7 +93,7 @@ private fun FileSpec.Builder.addCoproductConstructorFunctions(
                             }
                         }
                         .returns(parameterizedCoproductType)
-                        .addStatement("return Coproduct($paramName, $genericHolderString)")
+                        .addStatement("return Coproduct$size<$genericHolderString>($paramName)")
                         .build()
         )
     }
@@ -224,6 +203,25 @@ private fun FileSpec.Builder.addCoproductMapFunction(
                     .build()
     )
 }
+
+//private fun FileSpec.Builder.addSelectFunctions(
+//        generics: List<Char>,
+//        parameterizedCoproductType: ParameterizedTypeName
+//) {
+//    addImport("arrow.core.","toOption")
+//
+//    for (generic in generics) {
+//        val typeVariableName = TypeVariableName(generic.toString())
+//        addFunction(
+//                FunSpec.builder("select")
+//                        .receiver(parameterizedCoproductType)
+//                        .addTypeVariable(typeVariableName)
+//                        .returns(ClassName("arrow.core", "Option").parameterizedBy(typeVariableName))
+//                        .addCode("(value as? $generic).toOption()")
+//                        .build()
+//        )
+//    }
+//}
 
 private fun FunSpec.Builder.addDummyParameter(index: Int) {
     addParameter(
