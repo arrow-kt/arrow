@@ -19,6 +19,6 @@ class CoproductProcessor : AbstractProcessor() {
     override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
         val generatedDir = File(this.generatedDir!!, "").also { it.mkdirs() }
 
-        generateCoproducts2(generatedDir)
+        generateCoproducts(generatedDir)
     }
 }

@@ -1,240 +1,150 @@
 package arrow.generic
 
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.ParameterSpec
-import com.squareup.kotlinpoet.ParameterizedTypeName
-import com.squareup.kotlinpoet.TypeAliasSpec
-import com.squareup.kotlinpoet.TypeVariableName
-
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import com.squareup.kotlinpoet.PropertySpec
-import com.squareup.kotlinpoet.TypeSpec
-
 import java.io.File
 
 private const val alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-private const val packageName = "arrow.generic"
 
 fun generateCoproducts(destination: File) {
     for (size in 2 until alphabet.length + 1) {
-        FileSpec.builder("$packageName.coproduct$size", "Coproduct$size")
-                .apply {
-                    val generics = alphabet.subSequence(0, size).toList()
-                    val coproductType = ClassName("", "Coproduct$size")
-                    val parameterizedCoproductType = coproductType.parameterizedBy(
-                            *generics.map { TypeVariableName(it.toString()) }.toTypedArray()
-                    )
+        val generics = alphabet.subSequence(0, size).toList()
 
-                    addCoproductClass(generics)
-                    addCoproductConstructorFunctions(generics, parameterizedCoproductType)
-                    addCoproductExtensionFunctions(generics, parameterizedCoproductType)
-                    addCoproductFoldFunction(generics, parameterizedCoproductType)
-                    addCoproductMapFunction(generics, coproductType, parameterizedCoproductType)
-                    addSelectFunctions(generics)
-                }
-                .build()
-                .writeTo(destination)
+        val fileString = listOf(
+                packageName(size),
+                imports(),
+                coproductClassDeclaration(generics),
+                coproductOfConstructors(generics),
+                copExtensionConstructors(generics),
+                selectFunctions(generics),
+                foldFunction(generics),
+                mapFunction(generics)
+        ).joinToString(separator = "\n")
+
+        val parentDir = File(destination, "arrow/generic/coproduct$size")
+                .also { it.mkdirs() }
+
+        File(parentDir, "Coproduct$size.kt")
+                .also { it.createNewFile() }
+                .printWriter()
+                .use { it.println(fileString) }
     }
 }
 
-private fun FileSpec.Builder.addCoproductClass(generics: List<Char>) {
+private fun packageName(size: Int) = "package arrow.generic.coproduct$size"
+
+private fun imports() = """|
+    |import arrow.core.Option
+    |import arrow.core.toOption
+    |import java.lang.IllegalStateException
+    |import kotlin.Unit
+|""".trimMargin()
+
+private fun coproductClassDeclaration(generics: List<Char>) = "data class Coproduct${generics.size}<${generics.joinToString()}>(val value: Any?)"
+
+private fun coproductOfConstructors(generics: List<Char>): String {
     val size = generics.size
-    addType(
-            TypeSpec.classBuilder("Coproduct$size")
-                    .addTypeVariables(generics.map { TypeVariableName(it.toString()) })
-                    .addModifiers(KModifier.DATA)
-                    .addProperty(
-                            PropertySpec.builder("value", TypeVariableName("Any?"))
-                                    .mutable(false)
-                                    .initializer("value")
-                                    .build()
-                    )
-                    .primaryConstructor(
-                            FunSpec.constructorBuilder()
-                                    .addParameter("value", TypeVariableName("Any?"))
-                                    .build()
-                    )
-                    .build()
-    )
-}
+    val genericsDeclaration = generics.joinToString(separator = ", ")
 
-private fun FileSpec.Builder.addCoproductConstructorFunctions(
-        generics: List<Char>,
-        parameterizedCoproductType: ParameterizedTypeName
-) {
-    val size = generics.size
-    val genericHolderString = generics.joinToString(separator = ", ")
-    for (index in 0 until generics.size) {
-        val generic = generics[index]
-        val paramName = "${generic.toLowerCase()}"
-
-        addFunction(
-                FunSpec.builder("coproductOf")
-                        .apply {
-                            generics.forEach {
-                                addTypeVariable(TypeVariableName("$it"))
-                            }
-                        }
-                        .apply {
-                            addParameter(
-                                    name = paramName,
-                                    type = TypeVariableName("$generic")
-                            )
-
-                            for (dummyArgsIndex in 0 until index) {
-                                addParameter(
-                                        ParameterSpec.builder("dummy$dummyArgsIndex", kotlin.Unit::class.java)
-                                                .defaultValue("%T", kotlin.Unit::class.java)
-                                                .build()
-                                )
-                            }
-                        }
-                        .returns(parameterizedCoproductType)
-                        .addStatement("return Coproduct$size<$genericHolderString>($paramName)")
-                        .build()
-        )
-    }
-}
-
-private fun FileSpec.Builder.addCoproductExtensionFunctions(
-        generics: List<Char>,
-        parameterizedCoproductType: ParameterizedTypeName
-) {
-    for (index in 0 until generics.size) {
-        val generic = generics[index]
-
-        addFunction(
-                FunSpec.builder("cop")
-                        .receiver(TypeVariableName(generic.toString()))
-                        .apply {
-                            generics.forEach {
-                                addTypeVariable(TypeVariableName("$it"))
-                            }
-                        }
-                        .apply {
-                            for (dummyArgsIndex in 0 until index) {
-                                addDummyParameter(dummyArgsIndex)
-                            }
-                        }
-                        .returns(parameterizedCoproductType)
-                        .addStatement("return coproductOf<${generics.joinToString(separator = ", ")}>(this)")
-                        .build()
-        )
-    }
-}
-
-private fun FileSpec.Builder.addCoproductFoldFunction(
-        generics: List<Char>,
-        parameterizedCoproductType: ParameterizedTypeName
-) {
-    val size = generics.size
-
-    addFunction(
-            FunSpec.builder("fold")
-                    .receiver(parameterizedCoproductType)
-                    .addModifiers(KModifier.INLINE)
-                    .apply {
-                        generics.forEach {
-                            addTypeVariable(TypeVariableName(it.toString()).reified(true))
-                            addParameter(
-                                    "${it.toLowerCase()}",
-                                    TypeVariableName("($it) -> RESULT"),
-                                    KModifier.CROSSINLINE
-                            )
-                        }
-                    }
-                    .addTypeVariable(TypeVariableName("RESULT"))
-                    .returns(TypeVariableName("RESULT"))
-                    .apply {
-                        beginControlFlow("return when (value)")
-                        for (generic in generics) {
-                            addStatement("is $generic -> ${generic.toLowerCase()}(value as $generic)")
-                        }
-                        val message = "Invalid Coproduct$size \$this"
-                        addStatement("""else -> throw %T("$message")""", IllegalStateException::class.java)
-                        endControlFlow()
-                    }
-                    .build()
-    )
-}
-
-private fun FileSpec.Builder.addCoproductMapFunction(
-        generics: List<Char>,
-        coproductType: ClassName,
-        parameterizedCoproductType: ParameterizedTypeName
-) {
-    val size = generics.size
-
-    val returnType = coproductType.parameterizedBy(
-            *generics.map { TypeVariableName(it.toString()) }
-                    .dropLast(1)
-                    .plus(TypeVariableName("RESULT"))
-                    .toTypedArray()
-    )
-
-    addFunction(
-            FunSpec.builder("map")
-                    .receiver(parameterizedCoproductType)
-                    .addModifiers(KModifier.INLINE)
-                    .apply {
-                        generics.forEach {
-                            addTypeVariable(TypeVariableName(it.toString()).reified(true))
-                        }
-                    }
-                    .addTypeVariable(TypeVariableName("RESULT"))
-                    .addParameter("apply", TypeVariableName("(${generics.last()}) -> RESULT"), KModifier.CROSSINLINE)
-                    .returns(returnType)
-                    .apply {
-                        val types = generics.toList()
-                        addCode(CodeBlock.builder()
-                                        .add("return fold<${types.joinToString()}, Coproduct$size<${types.dropLast(1).joinToString()}, RESULT>>(\n")
-                                        .apply {
-                                            for (type in types.dropLast(1)) {
-                                                add("\t{ it.cop<${types.dropLast(1).joinToString()}, RESULT>() },\n")
-                                            }
-                                        }
-                                        .add("\t{ apply(it).cop<${types.dropLast(1).joinToString()}, RESULT>() }\n")
-                                        .add(")\n")
-                                        .build())
-                    }
-                    .build()
-    )
-}
-
-private fun FileSpec.Builder.addSelectFunctions(
-        generics: List<Char>
-) {
-    addImport("arrow.core","toOption")
+    val result = StringBuilder()
 
     for (generic in generics) {
-        val typeVariableName = TypeVariableName(generic.toString())
-        val receiverGenerics = generics.map { if (it == generic) generic.toString() else "*" }
-                .joinToString(separator = ", ")
-        addFunction(
-                FunSpec.builder("select")
-                        .addModifiers(KModifier.INLINE)
-                        .receiver(TypeVariableName("Coproduct${generics.size}<$receiverGenerics>"))
-                        .addTypeVariable(typeVariableName.reified(true))
-                        .returns(ClassName("arrow.core", "Option").parameterizedBy(typeVariableName))
-                        .addCode("return (value as? $generic).toOption()")
-                        .apply {
-                            for (dummyArgsIndex in 0 until generics.indexOf(generic)) {
-                                addDummyParameter(dummyArgsIndex)
-                            }
-                        }
-                        .build()
+        val params = listOf("${generic.toLowerCase()} : $generic") + additionalParameters(generics.indexOf(generic))
+
+        result.append(
+                "fun <$genericsDeclaration> coproductOf(${params.joinToString()}) = Coproduct$size<$genericsDeclaration>(${generic.toLowerCase()})\n"
         )
     }
+
+    return result.toString()
 }
 
-private fun FunSpec.Builder.addDummyParameter(index: Int) {
-    addParameter(
-            ParameterSpec.builder("dummy$index", kotlin.Unit::class.java)
-                    .defaultValue("%T", kotlin.Unit::class.java)
-                    .build()
-    )
+private fun copExtensionConstructors(generics: List<Char>): String {
+    val genericsDeclaration = generics.joinToString(separator = ", ")
+
+    val result = StringBuilder()
+
+    for (generic in generics) {
+        val params = additionalParameters(generics.indexOf(generic)).joinToString()
+
+        result.append(
+                "fun <$genericsDeclaration> $generic.cop($params) = coproductOf<$genericsDeclaration>(this)\n"
+        )
+    }
+
+    return result.toString()
+}
+
+private fun selectFunctions(generics: List<Char>): String {
+    val size = generics.size
+    val result = StringBuilder()
+
+    for (generic in generics) {
+        val params = additionalParameters(generics.indexOf(generic)).joinToString()
+        val receiverGenerics = generics.map { if (it == generic) generic.toString() else "*" }
+                .joinToString(separator = ", ")
+
+        result.append(
+                "inline fun <reified $generic> Coproduct$size<$receiverGenerics>.select($params): Option<$generic> = (value as? $generic).toOption()\n"
+        )
+    }
+
+    return result.toString()
+}
+
+private fun foldFunction(generics: List<Char>): String {
+    val size = generics.size
+    val genericsDeclaration = generics.joinToString(separator = ", ")
+
+    val exceptionMessage = "Invalid Coproduct$size \$this"
+
+    val functionGenerics = (generics.map { "reified $it" } + "RESULT").joinToString()
+
+    val params = generics.map {
+        "   ${it.toLowerCase()}: ($it) -> RESULT"
+    }.joinToString(separator = ",\n")
+
+    val cases = generics.map {
+        "      is $it -> ${it.toLowerCase()}(value)"
+    }.joinToString(separator = "\n")
+
+    return """|
+        |inline fun <$functionGenerics> Coproduct$size<$genericsDeclaration>.fold(
+        |$params
+        |): RESULT {
+        |   return when (value) {
+        |$cases
+        |       else -> throw IllegalStateException("$exceptionMessage")
+        |   }
+        |}
+    """.trimMargin()
+}
+
+private fun mapFunction(generics: List<Char>): String {
+    val size = generics.size
+    val genericsDeclaration = generics.joinToString(separator = ", ")
+
+    val returnGenerics = generics.map { "$it" + 1 }
+    val returnGenericsString = returnGenerics.joinToString()
+    val functionGenerics = (generics.map { "reified $it" } + returnGenerics).joinToString()
+
+    val params = generics.map {
+        "   ${it.toLowerCase()}: ($it) -> $it" + 1
+    }.joinToString(separator = ",\n")
+
+    val lambdas = generics.map {
+        "       { ${it.toLowerCase()}(it).cop<$returnGenericsString>() }"
+    }.joinToString(separator = ",\n")
+
+    return """|
+        |inline fun <$functionGenerics> Coproduct$size<$genericsDeclaration>.map(
+        |$params
+        |): Coproduct$size<$returnGenericsString> {
+        |   return fold(
+        |$lambdas
+        |   )
+        |}
+    """.trimMargin()
+}
+
+private fun additionalParameters(count: Int): List<String> {
+    return List(count) { "dummy$it: Unit = Unit" }
 }
