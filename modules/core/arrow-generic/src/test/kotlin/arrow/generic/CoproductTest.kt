@@ -3,7 +3,7 @@ package arrow.generic
 import arrow.core.None
 import arrow.core.Some
 import arrow.generic.coproduct2.*
-import arrow.generic.coproduct26.Coproduct26
+import arrow.generic.coproduct22.Coproduct22
 import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
@@ -13,9 +13,9 @@ import java.math.BigDecimal
 @RunWith(KTestJUnitRunner::class)
 class CoproductTest : UnitSpec() {
     init {
-        "Coproducts should be generated up to 26" {
+        "Coproducts should be generated up to 22" {
             var two: Coproduct2<Unit, Unit>? = null
-            var twentysix: Coproduct26<Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit>? = null
+            var twentytwo: Coproduct22<Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit>? = null
         }
 
         "select should return None if value isn't correct type" {
@@ -40,7 +40,7 @@ class CoproductTest : UnitSpec() {
             coproduct2.map(
                     { 6L },
                     { BigDecimal.ONE }
-            ) shouldBe 6L.cop<Long, BigDecimal>()
+            ) shouldBe BigDecimal.ONE.cop<Long, BigDecimal>()
         }
 
         "Coproduct2 fold" {

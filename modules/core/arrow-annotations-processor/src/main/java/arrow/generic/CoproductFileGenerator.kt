@@ -2,17 +2,11 @@ package arrow.generic
 
 import java.io.File
 
-private const val alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-//TODO
-//Generate only 22 Coproducts
-//Clean up file generator, ie newlines
-//Try to remove Coproduct / @coproduct and still generate
-//Internal value / hide constructors if we can
+private const val allGenerics = "ABCDEFGHIJKLMNOPQRSTUV"
 
 fun generateCoproducts(destination: File) {
-    for (size in 2 until alphabet.length + 1) {
-        val generics = alphabet.subSequence(0, size).toList()
+    for (size in 2 until allGenerics.length + 1) {
+        val generics = allGenerics.subSequence(0, size).toList()
 
         val fileString = listOf(
                 packageName(size),
@@ -44,7 +38,7 @@ private fun imports() = """|
     |import kotlin.Unit
 |""".trimMargin()
 
-private fun coproductClassDeclaration(generics: List<Char>) = "data class Coproduct${generics.size}<${generics.joinToString()}>(val value: Any?)"
+private fun coproductClassDeclaration(generics: List<Char>) = "data class Coproduct${generics.size}<${generics.joinToString()}> internal constructor(val value: Any?)\n"
 
 private fun coproductOfConstructors(generics: List<Char>): String {
     val size = generics.size
@@ -109,10 +103,10 @@ private fun foldFunction(generics: List<Char>): String {
     }.joinToString(separator = ",\n")
 
     val cases = generics.map {
-        "      is $it -> ${it.toLowerCase()}(value)"
+        "       is $it -> ${it.toLowerCase()}(value)"
     }.joinToString(separator = "\n")
 
-    return """|
+    return """
         |inline fun <$functionGenerics> Coproduct$size<$genericsDeclaration>.fold(
         |$params
         |): RESULT {
@@ -121,7 +115,7 @@ private fun foldFunction(generics: List<Char>): String {
         |       else -> throw IllegalStateException("$exceptionMessage")
         |   }
         |}
-    """.trimMargin()
+    |""".trimMargin()
 }
 
 private fun mapFunction(generics: List<Char>): String {
@@ -140,7 +134,7 @@ private fun mapFunction(generics: List<Char>): String {
         "       { ${it.toLowerCase()}(it).cop<$returnGenericsString>() }"
     }.joinToString(separator = ",\n")
 
-    return """|
+    return """
         |inline fun <$functionGenerics> Coproduct$size<$genericsDeclaration>.map(
         |$params
         |): Coproduct$size<$returnGenericsString> {
@@ -148,7 +142,7 @@ private fun mapFunction(generics: List<Char>): String {
         |$lambdas
         |   )
         |}
-    """.trimMargin()
+    |""".trimMargin()
 }
 
 private fun additionalParameters(count: Int): List<String> {
