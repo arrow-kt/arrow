@@ -70,13 +70,15 @@ private fun generateGenericHolders(destination: File) {
 }
 
 private fun FileSpec.Builder.addCoproductTypeAlias(generics: List<Char>) {
+    val size = generics.size
+    val genericsString = generics.joinToString(separator = ", ")
+    val parameterizedClass =  ClassName("arrow.generic", "Coproduct").parameterizedBy(
+            ClassName("arrow.generic","Generic$size").parameterizedBy(
+                    TypeVariableName(genericsString)
+            )
+    )
     addTypeAlias(
-            TypeAliasSpec.builder("Coproduct${generics.size}", ClassName("arrow.generic", "Coproduct"))
-                    .apply {
-                        generics.forEach {
-                            addTypeVariable(TypeVariableName("$it"))
-                        }
-                    }
+            TypeAliasSpec.builder("Coproduct$size<$genericsString>",parameterizedClass)
                     .build()
     )
 }
@@ -85,6 +87,7 @@ private fun FileSpec.Builder.addCoproductConstructorFunctions(
         generics: List<Char>,
         parameterizedCoproductType: ParameterizedTypeName
 ) {
+    val genericHolderString = "Generic${generics.size}<${generics.joinToString(separator = ", ")}>()"
     for (index in 0 until generics.size) {
         val generic = generics[index]
         val paramName = "${generic.toLowerCase()}"
@@ -111,7 +114,7 @@ private fun FileSpec.Builder.addCoproductConstructorFunctions(
                             }
                         }
                         .returns(parameterizedCoproductType)
-                        .addStatement("return Coproduct($paramName)")
+                        .addStatement("return Coproduct($paramName, $genericHolderString)")
                         .build()
         )
     }
@@ -121,6 +124,7 @@ private fun FileSpec.Builder.addCoproductExtensionFunctions(
         generics: List<Char>,
         parameterizedCoproductType: ParameterizedTypeName
 ) {
+    val genericHolderString = "Generic${generics.size}<${generics.joinToString(separator = ", ")}>()"
     for (index in 0 until generics.size) {
         val generic = generics[index]
 
@@ -138,7 +142,7 @@ private fun FileSpec.Builder.addCoproductExtensionFunctions(
                             }
                         }
                         .returns(parameterizedCoproductType)
-                        .addStatement("return Coproduct(this)")
+                        .addStatement("return Coproduct(this, $genericHolderString)")
                         .build()
         )
     }

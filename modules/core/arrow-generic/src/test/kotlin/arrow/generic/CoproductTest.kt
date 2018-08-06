@@ -42,13 +42,13 @@ class CoproductTest : UnitSpec() {
         "Coproduct2 should map over right type" {
             val coproduct2 = "String".cop<Long, String>()
 
-            coproduct2.map<Long, String, Int> { it.length } shouldBe 6.cop<Long, Int>()
+            coproduct2.map { it.length } shouldBe 6.cop<Long, Int>()
         }
 
         "Coproduct2 should not map over left type" {
             val coproduct2 = 6L.cop<Long, String>()
 
-            coproduct2.map<Long, String, Int> { it.length } shouldBe 6L.cop<Long, Int>()
+            coproduct2.map { it.length } shouldBe 6L.cop<Long, Int>()
         }
 
         "Coproduct2 fold" {
