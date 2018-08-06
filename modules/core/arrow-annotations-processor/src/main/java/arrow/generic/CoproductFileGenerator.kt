@@ -4,6 +4,12 @@ import java.io.File
 
 private const val alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
+//TODO
+//Generate only 22 Coproducts
+//Clean up file generator, ie newlines
+//Try to remove Coproduct / @coproduct and still generate
+//Internal value / hide constructors if we can
+
 fun generateCoproducts(destination: File) {
     for (size in 2 until alphabet.length + 1) {
         val generics = alphabet.subSequence(0, size).toList()
