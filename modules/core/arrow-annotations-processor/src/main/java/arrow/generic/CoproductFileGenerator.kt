@@ -34,6 +34,7 @@ fun generateCoproducts(destination: File) {
                     addCoproductExtensionFunctions(generics, parameterizedCoproductType)
                     addCoproductFoldFunction(generics, parameterizedCoproductType)
                     addCoproductMapFunction(generics, coproductType, parameterizedCoproductType)
+                    addSelectFunctions(generics)
                 }
                 .build()
                 .writeTo(destination)
@@ -204,24 +205,31 @@ private fun FileSpec.Builder.addCoproductMapFunction(
     )
 }
 
-//private fun FileSpec.Builder.addSelectFunctions(
-//        generics: List<Char>,
-//        parameterizedCoproductType: ParameterizedTypeName
-//) {
-//    addImport("arrow.core.","toOption")
-//
-//    for (generic in generics) {
-//        val typeVariableName = TypeVariableName(generic.toString())
-//        addFunction(
-//                FunSpec.builder("select")
-//                        .receiver(parameterizedCoproductType)
-//                        .addTypeVariable(typeVariableName)
-//                        .returns(ClassName("arrow.core", "Option").parameterizedBy(typeVariableName))
-//                        .addCode("(value as? $generic).toOption()")
-//                        .build()
-//        )
-//    }
-//}
+private fun FileSpec.Builder.addSelectFunctions(
+        generics: List<Char>
+) {
+    addImport("arrow.core","toOption")
+
+    for (generic in generics) {
+        val typeVariableName = TypeVariableName(generic.toString())
+        val receiverGenerics = generics.map { if (it == generic) generic.toString() else "*" }
+                .joinToString(separator = ", ")
+        addFunction(
+                FunSpec.builder("select")
+                        .addModifiers(KModifier.INLINE)
+                        .receiver(TypeVariableName("Coproduct${generics.size}<$receiverGenerics>"))
+                        .addTypeVariable(typeVariableName.reified(true))
+                        .returns(ClassName("arrow.core", "Option").parameterizedBy(typeVariableName))
+                        .addCode("return (value as? $generic).toOption()")
+                        .apply {
+                            for (dummyArgsIndex in 0 until generics.indexOf(generic)) {
+                                addDummyParameter(dummyArgsIndex)
+                            }
+                        }
+                        .build()
+        )
+    }
+}
 
 private fun FunSpec.Builder.addDummyParameter(index: Int) {
     addParameter(
