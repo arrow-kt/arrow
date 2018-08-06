@@ -8,6 +8,7 @@ import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
+import java.math.BigDecimal
 
 @RunWith(KTestJUnitRunner::class)
 class CoproductTest : UnitSpec() {
@@ -33,16 +34,13 @@ class CoproductTest : UnitSpec() {
             "String".cop<String, Long>() shouldBe coproductOf<String, Long>("String")
         }
 
-        "Coproduct2 should map over right type" {
+        "Coproduct2 should map over all types but only operate on the present instance" {
             val coproduct2 = "String".cop<Long, String>()
 
-            coproduct2.map { it.length } shouldBe 6.cop<Long, Int>()
-        }
-
-        "Coproduct2 should not map over left type" {
-            val coproduct2 = 6L.cop<Long, String>()
-
-            coproduct2.map { it.length } shouldBe 6L.cop<Long, Int>()
+            coproduct2.map(
+                    { 6L },
+                    { BigDecimal.ONE }
+            ) shouldBe 6L.cop<Long, BigDecimal>()
         }
 
         "Coproduct2 fold" {
