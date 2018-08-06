@@ -23,12 +23,6 @@ class CoproductTest : UnitSpec() {
             coproduct2.select<Long>() shouldBe None
         }
 
-        "select should return None if type isn't part of Coproduct" {
-            val coproduct2 = "String".cop<String, Long>()
-
-            coproduct2.select<Unit>() shouldBe None
-        }
-
         "select returns Some if value is correct type" {
             val coproduct2 = "String".cop<String, Long>()
 
@@ -54,7 +48,7 @@ class CoproductTest : UnitSpec() {
         "Coproduct2 fold" {
             val coproduct2 = 100L.cop<Long, Int>()
 
-            coproduct2.fold<Long, Int, String>(
+            coproduct2.fold(
                     { "Long$it" },
                     { "Int$it"}
             ) shouldBe "Long100"
