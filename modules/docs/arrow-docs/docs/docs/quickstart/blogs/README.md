@@ -89,6 +89,14 @@ It's hard coming back down to the earth of a JVM based language after spending t
 
 Yow! Lambda Jam, Sydney, Australia, June '18 - version 0.7
 
+### Arrow and Functional Programming for Kotlin Developers
+
+A beginner level introduction to Functional Programming for Kotlin and/or Android Developers or developers with OOP background.
+ 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/qYgilPqMOp0" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+ 
+DroidJam India, Bangalore, India, July '18 - version 0.7.2
+
 ### Functional Programming in Kotlin
 
 An ongoing blog series introducing Functional Programming architectures from scratch
