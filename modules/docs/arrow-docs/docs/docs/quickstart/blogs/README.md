@@ -18,6 +18,14 @@ It includes an overview of all the modules available, and some of the 3rd party 
 
 Conference for Kotliners, Budapest, Jun '18 - version 0.7.2
 
+### Arrow and Functional Programming for Kotlin Developers
+
+ A beginner level introduction to Functional Programming for Kotlin and/or Android Developers or developers with OOP background.
+ 
+ <iframe width="560" height="315" src="https://www.youtube.com/embed/qYgilPqMOp0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+ 
+ DroidJam India, Bangalore, India, July '18 - version 0.7.2
+
 ### Functional Programming in Kotlin with Arrow
 
 A rundown of all the features included in the library, focusing on implementation details.
