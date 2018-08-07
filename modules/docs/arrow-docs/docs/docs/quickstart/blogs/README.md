@@ -130,6 +130,9 @@ Kotlin Brooklyn Meetup, Jan '18 - version 0.6.1
 
 [@dcampogiani](https://github.com/dcampogiani) explores some data types in Arrow and uses them to validate a form on Android.
 
+Video in Italian
+<iframe src="https://player.vimeo.com/video/279931528" width="560" height="315" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+
 * [Introduction](http://danielecampogiani.com/blog/2018/02/android-functional-validation-1-intro/)
 * [Option](http://danielecampogiani.com/blog/2018/02/android-functional-validation-2-option/)
 * [Either](http://danielecampogiani.com/blog/2018/02/android-functional-validation-3-either/)

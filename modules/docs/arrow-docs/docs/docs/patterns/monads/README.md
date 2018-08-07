@@ -371,7 +371,7 @@ In Arrow terms, a Monad is an interface with two operations: a constructor `just
 interface Monad<F>: Applicative<F>, Functor<F> {
     fun <A> just (instance: A): Kind<F, A>
 
-    fun <A, B> Kind<F, A>.flatMap(f: (A) ->  Kind<F, B>)
+    fun <A, B> Kind<F, A>.flatMap(f: (A) ->  Kind<F, B>) : Kind<F, B>
 }
 ```
 

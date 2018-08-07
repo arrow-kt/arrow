@@ -41,7 +41,7 @@ Typeclasses have two main uses:
 
 * Add new functionality to types. For example, if I know how to compare two objects I can add a new extension function to check for inequality.
 Or if I know how to aggregate objects together, I can add an extension function for `List` that aggregates all of its elements.
-The number of extra extra extension functions that you get per typeclass can be from one in `Eq` to 17 (!) in `Foldable`.
+The number of extra extension functions that you get per typeclass can be from one in `Eq` to 17 (!) in `Foldable`.
 
 * Abstracting over behavior. Like any other interface, you can use them in your functions and classes as a way of talking about the capabilities of the implementation,
 without exposing the details. This way you can create APIs that work the same for `Option`, `Try`, or `Observable`.
