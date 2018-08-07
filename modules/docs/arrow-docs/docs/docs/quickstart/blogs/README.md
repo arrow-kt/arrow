@@ -155,3 +155,11 @@ April '18 - version 0.7
 [Arrow 101 — Building an Android app using Functional Programming](https://medium.com/@lehen01/arrow-101-building-an-android-app-using-functional-programming-fe959675d96d)
 
 June '18 - version 0.7
+
+### Arrow and Functional Programming for Kotlin Developers
+
+A beginner level introduction to Functional Programming for Kotlin and/or Android Developers or developers with OOP background.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/qYgilPqMOp0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+
+DroidJam India, Bangalore, India, July '18 - version 0.7.2
