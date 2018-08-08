@@ -80,7 +80,7 @@ private fun coproductOfConstructors(generics: List<String>): String {
     return generics.mapIndexed { index, generic ->
         val params = listOf("${generic.toLowerCase()} : $generic") + additionalParameters(generics.indexOf(generic))
 
-        "fun <$genericsDeclaration> coproductOf(${params.joinToString()}): Coproduct$size<$genericsDeclaration> = ${genericsToClassNames[generic]}<$genericsDeclaration>(${generic.toLowerCase()})\n"
+        "fun <$genericsDeclaration> coproductOf(${params.joinToString()}): Coproduct$size<$genericsDeclaration> = ${genericsToClassNames[generic]}(${generic.toLowerCase()})\n"
     }.joinToString(separator = "")
 }
 
@@ -100,10 +100,10 @@ private fun selectFunctions(generics: List<String>): String {
 
     return generics.mapIndexed { index, generic ->
         val params = additionalParameters(generics.indexOf(generic)).joinToString()
-        val receiverGenerics = generics.map { if (it == generic) generic.toString() else "*" }
+        val receiverGenerics = generics.map { if (it == generic) generic else "*" }
                 .joinToString(separator = ", ")
 
-        "inline fun <reified $generic> Coproduct$size<$receiverGenerics>.select($params): Option<$generic> = (this as? ${genericsToClassNames[generic]})?.${generic.toLowerCase()}.toOption()\n"
+        "fun <$generic> Coproduct$size<$receiverGenerics>.select($params): Option<$generic> = (this as? ${genericsToClassNames[generic]})?.${generic.toLowerCase()}.toOption()\n"
     }.joinToString(separator = "")
 }
 
@@ -111,7 +111,7 @@ private fun foldFunction(generics: List<String>): String {
     val size = generics.size
     val genericsDeclaration = generics.joinToString(separator = ", ")
 
-    val functionGenerics = (generics.map { "reified $it" } + "RESULT").joinToString()
+    val functionGenerics = (generics + "RESULT").joinToString()
 
     val params = generics.map {
         "   ${it.toLowerCase()}: ($it) -> RESULT"
@@ -122,7 +122,7 @@ private fun foldFunction(generics: List<String>): String {
     }.joinToString(separator = "\n")
 
     return """
-        |inline fun <$functionGenerics> Coproduct$size<$genericsDeclaration>.fold(
+        |fun <$functionGenerics> Coproduct$size<$genericsDeclaration>.fold(
         |$params
         |): RESULT {
         |   return when (this) {
@@ -138,7 +138,7 @@ private fun mapFunction(generics: List<String>): String {
 
     val returnGenerics = generics.map { "$it" + 1 }
     val returnGenericsString = returnGenerics.joinToString()
-    val functionGenerics = (generics.map { "reified $it" } + returnGenerics).joinToString()
+    val functionGenerics = (generics + returnGenerics).joinToString()
 
     val params = generics.map {
         "   ${it.toLowerCase()}: ($it) -> $it" + 1
@@ -149,7 +149,7 @@ private fun mapFunction(generics: List<String>): String {
     }.joinToString(separator = ",\n")
 
     return """
-        |inline fun <$functionGenerics> Coproduct$size<$genericsDeclaration>.map(
+        |fun <$functionGenerics> Coproduct$size<$genericsDeclaration>.map(
         |$params
         |): Coproduct$size<$returnGenericsString> {
         |   return fold(
