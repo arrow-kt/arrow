@@ -603,10 +603,10 @@ object test {
 
     val deferredModuleAlt = Module(DeferredK.async())
     deferredModuleAlt.run {
-          println(repository.allTasksByUser(user1).fix().unsafeAttemptSync())
-          println(repository.allTasksByUser(user2).fix().unsafeAttemptSync())
-          println(repository.allTasksByUser(user3).fix().unsafeAttemptSync())
-        }
+      println(repository.allTasksByUser(user1).fix().unsafeAttemptSync())
+      println(repository.allTasksByUser(user2).fix().unsafeAttemptSync())
+      println(repository.allTasksByUser(user3).fix().unsafeAttemptSync())
+    }
   }
 }
 ```
