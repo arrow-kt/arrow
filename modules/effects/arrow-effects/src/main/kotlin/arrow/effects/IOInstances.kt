@@ -6,19 +6,19 @@ import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.*
 import kotlin.coroutines.experimental.CoroutineContext
 import arrow.effects.ap as ioAp
 import arrow.effects.handleErrorWith as ioHandleErrorWith
 
-@instance(IO::class)
+@extension
 interface IOFunctorInstance : Functor<ForIO> {
   override fun <A, B> Kind<ForIO, A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
 }
 
-@instance(IO::class)
+@extension
 interface IOApplicativeInstance : Applicative<ForIO> {
   override fun <A, B> Kind<ForIO, A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
@@ -30,7 +30,7 @@ interface IOApplicativeInstance : Applicative<ForIO> {
     fix().ioAp(ff)
 }
 
-@instance(IO::class)
+@extension
 interface IOMonadInstance : Monad<ForIO> {
   override fun <A, B> Kind<ForIO, A>.flatMap(f: (A) -> Kind<ForIO, B>): IO<B> =
     fix().flatMap(f)
@@ -45,7 +45,7 @@ interface IOMonadInstance : Monad<ForIO> {
     IO.just(a)
 }
 
-@instance(IO::class)
+@extension
 interface IOApplicativeErrorInstance : IOApplicativeInstance, ApplicativeError<ForIO, Throwable> {
   override fun <A> Kind<ForIO, A>.attempt(): IO<Either<Throwable, A>> =
     fix().attempt()
@@ -57,7 +57,7 @@ interface IOApplicativeErrorInstance : IOApplicativeInstance, ApplicativeError<F
     IO.raiseError(e)
 }
 
-@instance(IO::class)
+@extension
 interface IOMonadErrorInstance : IOMonadInstance, MonadError<ForIO, Throwable> {
   override fun <A> Kind<ForIO, A>.attempt(): IO<Either<Throwable, A>> =
     fix().attempt()
@@ -69,7 +69,7 @@ interface IOMonadErrorInstance : IOMonadInstance, MonadError<ForIO, Throwable> {
     IO.raiseError(e)
 }
 
-@instance(IO::class)
+@extension
 interface IOMonadDeferInstance : IOMonadErrorInstance, MonadDefer<ForIO> {
   override fun <A> defer(fa: () -> IOOf<A>): IO<A> =
     IO.defer(fa)
@@ -77,7 +77,7 @@ interface IOMonadDeferInstance : IOMonadErrorInstance, MonadDefer<ForIO> {
   override fun lazy(): IO<Unit> = IO.lazy
 }
 
-@instance(IO::class)
+@extension
 interface IOAsyncInstance : IOMonadDeferInstance, Async<ForIO> {
   override fun <A> async(fa: Proc<A>): IO<A> =
     IO.async(fa)
@@ -89,13 +89,13 @@ interface IOAsyncInstance : IOMonadDeferInstance, Async<ForIO> {
     IO.invoke(f)
 }
 
-@instance(IO::class)
+@extension
 interface IOEffectInstance : IOAsyncInstance, Effect<ForIO> {
   override fun <A> Kind<ForIO, A>.runAsync(cb: (Either<Throwable, A>) -> Kind<ForIO, Unit>): IO<Unit> =
     fix().runAsync(cb)
 }
 
-@instance(IO::class)
+@extension
 interface IOMonoidInstance<A> : Monoid<Kind<ForIO, A>>, Semigroup<Kind<ForIO, A>> {
 
   fun SM(): Monoid<A>
@@ -106,7 +106,7 @@ interface IOMonoidInstance<A> : Monoid<Kind<ForIO, A>>, Semigroup<Kind<ForIO, A>
   override fun empty(): IO<A> = IO.just(SM().empty())
 }
 
-@instance(IO::class)
+@extension
 interface IOSemigroupInstance<A> : Semigroup<Kind<ForIO, A>> {
 
   fun SG(): Semigroup<A>

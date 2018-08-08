@@ -3,16 +3,16 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.Eval
 import arrow.data.*
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.*
 
-@instance(SortedMapK::class)
+@extension
 interface SortedMapKFunctorInstance<A : Comparable<A>> : Functor<SortedMapKPartialOf<A>> {
   override fun <B, C> SortedMapKOf<A, B>.map(f: (B) -> C): SortedMapK<A, C> =
     fix().map(f)
 }
 
-@instance(SortedMapK::class)
+@extension
 interface SortedMapKFoldableInstance<A : Comparable<A>> : Foldable<SortedMapKPartialOf<A>> {
   override fun <B, C> Kind<SortedMapKPartialOf<A>, B>.foldLeft(b: C, f: (C, B) -> C): C =
     fix().foldLeft(b, f)
@@ -21,13 +21,13 @@ interface SortedMapKFoldableInstance<A : Comparable<A>> : Foldable<SortedMapKPar
     fix().foldRight(lb, f)
 }
 
-@instance(SortedMapK::class)
+@extension
 interface SortedMapKTraverseInstance<A : Comparable<A>> : SortedMapKFoldableInstance<A>, Traverse<SortedMapKPartialOf<A>> {
   override fun <G, B, C> SortedMapKOf<A, B>.traverse(AP: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Kind<SortedMapKPartialOf<A>, C>> =
     fix().traverse(AP, f)
 }
 
-@instance(SortedMapK::class)
+@extension
 interface SortedMapKSemigroupInstance<A : Comparable<A>, B> : Semigroup<SortedMapKOf<A, B>> {
   fun SG(): Semigroup<B>
 
@@ -38,12 +38,12 @@ interface SortedMapKSemigroupInstance<A : Comparable<A>, B> : Semigroup<SortedMa
     else b.fix().foldLeft<B>(this.fix(), { my: SortedMapK<A, B>, (k, a) -> my.updated(k, SG().run { a.maybeCombine(my[k]) }) })
 }
 
-@instance(SortedMapK::class)
+@extension
 interface SortedMapKMonoidInstance<A : Comparable<A>, B> : SortedMapKSemigroupInstance<A, B>, Monoid<SortedMapKOf<A, B>> {
   override fun empty(): SortedMapK<A, B> = sortedMapOf<A, B>().k()
 }
 
-@instance(SortedMapK::class)
+@extension
 interface SortedMapKShowInstance<A : Comparable<A>, B> : Show<SortedMapKOf<A, B>> {
   override fun SortedMapKOf<A, B>.show(): String =
     toString()

@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Eval.Now
 import arrow.higherkind
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.Functor
 import arrow.recursion.Coalgebra
 import arrow.recursion.typeclasses.Birecursive
@@ -24,7 +24,7 @@ class Nu<out F>(val a: Any?, val unNu: Coalgebra<F, Any?>) : NuOf<F> {
   }
 }
 
-@instance(Nu::class)
+@extension
 interface NuBirecursiveInstance : Birecursive<ForNu> {
   override fun <F> Functor<F>.projectT(tf: Kind<ForNu, F>): Kind<F, Nu<F>> {
     val fix = tf.fix()
@@ -39,8 +39,8 @@ interface NuBirecursiveInstance : Birecursive<ForNu> {
     Nu(a, coalg)
 }
 
-@instance(Nu::class)
+@extension
 interface NuRecursiveInstance : Recursive<ForNu>, NuBirecursiveInstance
 
-@instance(Nu::class)
+@extension
 interface NuCorecursiveInstance : Corecursive<ForNu>, NuBirecursiveInstance

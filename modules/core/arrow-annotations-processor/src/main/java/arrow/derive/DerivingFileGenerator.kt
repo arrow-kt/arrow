@@ -2,23 +2,69 @@ package arrow.derive
 
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.extractFullName
+import arrow.common.utils.fullName
 import arrow.common.utils.removeBackticks
 import arrow.higherkinds.HKMarkerPreFix
+import arrow.higherkinds.KindPartialPostFix
 import arrow.higherkinds.KindPostFix
 import me.eugeniomarletti.kotlin.metadata.modality
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.hasReceiver
 import java.io.File
 
-fun argAsSeenFromReceiver(typeClassFirstTypeArg: String, abstractType: String, receiverType: String): String =
-  abstractType.replace("`arrow`.`Kind`<`$typeClassFirstTypeArg`,\\s".toRegex(), "`$receiverType$KindPostFix`<")
-
-fun retTypeAsSeenFromReceiver(typeClassFirstTypeArg: String, abstractType: String, receiverType: String): String =
-  if (abstractType.startsWith("`arrow`.`Kind`")) {
-    abstractType.replace("`arrow`.`Kind`<`$typeClassFirstTypeArg`,\\s".toRegex(), "`$receiverType`<")
-  } else {
-    abstractType.replace("`arrow`.`Kind`<`$typeClassFirstTypeArg`,\\s".toRegex(), "`$receiverType$KindPostFix`<")
+private fun List<String>.prependTypeArgs(): String =
+  when {
+    isEmpty() -> ""
+    size == 1 -> joinToString(postfix = ", ")
+    else -> joinToString(", ")
   }
+
+private fun kindedRegex(typeClassFirstTypeArg: String): Regex = "arrow.Kind<$typeClassFirstTypeArg,\\s".toRegex()
+
+fun String.normalizeType(): String = removeBackticks().replace("/", ".")
+
+fun String.appendTypePrefix(prefix: String): String {
+  val pkg = substringBeforeLast(".")
+  val type = substringAfterLast(".")
+  return "$pkg.$prefix$type"
+}
+
+fun String.applyUnappliedTypeArgs(unappliedTypeArgs: List<Pair<String, String>>): String {
+  tailrec fun loop(remainingTypeArgs: List<Pair<String, String>>, acc: String): String =
+    if (remainingTypeArgs.isEmpty()) acc
+    else {
+      val head = remainingTypeArgs[0]
+      val replacement = head.second.normalizeType()
+      val newAcc = acc
+        .replace("<${head.first}>", "<$replacement>")
+        .replace("<${head.first}", "<$replacement")
+        .replace(",\\s${head.first},".toRegex(), ", $replacement,")
+        .replace(", ${head.first}>", ", $replacement>")
+      loop(remainingTypeArgs.drop(1), newAcc)
+    }
+  return loop(unappliedTypeArgs, this)
+}
+
+fun argAsSeenFromReceiver(typeClassFirstTypeArg: String, abstractType: String, recType: ClassOrPackageDataWrapper.Class, invariantTypeArgs: List<String>, unappliedTypeArgs: List<Pair<String, String>>): String {
+  val extraTypeArgs = invariantTypeArgs.prependTypeArgs()
+  val receiverType = recType.fullName.normalizeType()
+  val receiverPostFix = if (recType.typeParameters.size > 1) "$KindPartialPostFix<${invariantTypeArgs.joinToString(", ")}>" else ""
+  val receiverPrefix = if (recType.typeParameters.size == 1) HKMarkerPreFix else ""
+  return abstractType
+    .replace(kindedRegex(typeClassFirstTypeArg), "$receiverType$KindPostFix<$extraTypeArgs")
+    .replace("<$typeClassFirstTypeArg>".toRegex(), "<${receiverType.appendTypePrefix(receiverPrefix)}$receiverPostFix>")
+    .applyUnappliedTypeArgs(unappliedTypeArgs)
+}
+
+fun retTypeAsSeenFromReceiver(typeClassFirstTypeArg: String, abstractType: String, recType: ClassOrPackageDataWrapper.Class, invariantTypeArgs: List<String>, unappliedTypeArgs: List<Pair<String, String>>): String {
+  val extraTypeArgs = invariantTypeArgs.prependTypeArgs()
+  val receiverType = recType.fullName.normalizeType()
+  return when {
+  //abstractType.matches("arrow.Kind<(.*?), arrow.Kind<$typeClassFirstTypeArg, (.*?)>>".toRegex()) -> abstractType.replace(kindedRegex(typeClassFirstTypeArg), "$receiverType$KindPostFix<$extraTypeArgs")
+    abstractType.startsWith("arrow.Kind<") -> abstractType.replace(kindedRegex(typeClassFirstTypeArg), "$receiverType<$extraTypeArgs")
+    else -> abstractType.replace(kindedRegex(typeClassFirstTypeArg), "$receiverType$KindPostFix<$extraTypeArgs")
+  }.applyUnappliedTypeArgs(unappliedTypeArgs)
+}
 
 sealed class HKArgs {
   object None : HKArgs()
@@ -33,7 +79,8 @@ data class FunctionSignature(
   val retType: String,
   val hkArgs: HKArgs,
   val receiverType: String,
-  val isAbstract: Boolean
+  val isAbstract: Boolean,
+  val retTypeIsKinded: Boolean
 
 ) {
 
@@ -54,36 +101,46 @@ data class FunctionSignature(
 
   companion object {
 
-    fun from(receiverType: String, typeClass: ClassOrPackageDataWrapper, f: ProtoBuf.Function): FunctionSignature {
+    fun from(recType: ClassOrPackageDataWrapper.Class,
+             typeClass: ClassOrPackageDataWrapper,
+             f: ProtoBuf.Function,
+             invariantTypeArgs: List<String> = emptyList(),
+             unappliedTypeArgs: List<Pair<String, String>> = emptyList()): FunctionSignature {
       fun Int.get() =
         typeClass.nameResolver.getString(this)
 
+      val receiverType = recType.fullName.normalizeType()
       val typeParams = f.typeParameterList.map { it.name.get() }
-      val typeClassAbstractKind = typeClass.typeParameters[0].name.get()
+      val typeClassAbstractKind = typeClass.typeParameters[0].name.get().normalizeType()
       val args = f.valueParameterList.map {
         val argName = it.name.get()
-        val argType = it.type.extractFullName(typeClass)
-        argName to argAsSeenFromReceiver(typeClassAbstractKind, argType, receiverType)
+        val argType = it.type.extractFullName(typeClass).normalizeType()
+        argName to argAsSeenFromReceiver(typeClassAbstractKind, argType, recType, invariantTypeArgs, unappliedTypeArgs)
       }
-      val abstractReturnType = f.returnType.extractFullName(typeClass)
-      val concreteType = retTypeAsSeenFromReceiver(typeClassAbstractKind, abstractReturnType, receiverType)
+
+      val abstractReturnType = f.returnType.extractFullName(typeClass, outputTypeAlias = true).normalizeType()
+      val concreteType = retTypeAsSeenFromReceiver(
+        typeClassAbstractKind,
+        abstractReturnType,
+        recType, invariantTypeArgs, unappliedTypeArgs)
       val isAbstract = f.modality == ProtoBuf.Modality.ABSTRACT
       return FunctionSignature(
         tparams = typeParams,
         name = typeClass.nameResolver.getString(f.name),
         args = args,
         retType = concreteType,
-        hkArgs = findArgs(f, typeClassAbstractKind, typeClass, receiverType),
+        hkArgs = findArgs(f, typeClassAbstractKind.normalizeType(), typeClass, recType, invariantTypeArgs, unappliedTypeArgs),
         receiverType = receiverType,
-        isAbstract = isAbstract
+        isAbstract = isAbstract,
+        retTypeIsKinded = abstractReturnType.contains(kindedRegex(typeClassAbstractKind))
       )
     }
 
-    private fun findArgs(f: ProtoBuf.Function, typeClassAbstractKind: String, typeClass: ClassOrPackageDataWrapper, receiverType: String): HKArgs =
+    private fun findArgs(f: ProtoBuf.Function, typeClassAbstractKind: String, typeClass: ClassOrPackageDataWrapper, receiverType: ClassOrPackageDataWrapper.Class, invariantTypeArgs: List<String>, unappliedTypeArgs: List<Pair<String, String>>): HKArgs =
       when {
-        f.valueParameterList.isEmpty() -> HKArgs.None
         f.hasReceiver() ->
-          HKArgs.First(argAsSeenFromReceiver(typeClassAbstractKind, f.receiverType.extractFullName(typeClass), receiverType))
+          HKArgs.First(argAsSeenFromReceiver(typeClassAbstractKind, f.receiverType.extractFullName(typeClass).normalizeType(), receiverType, invariantTypeArgs, unappliedTypeArgs))
+        f.valueParameterList.isEmpty() -> HKArgs.None
         else -> HKArgs.Unknown
       }
   }
@@ -114,7 +171,7 @@ class TypeclassInstanceGenerator(
     val tcs = listOf(typeClass) + targetType.typeclassSuperTypes[typeClass]!!
     return tcs.flatMap { tc ->
       tc.functionList.map {
-        FunctionSignature.from(receiverType, tc, it)
+        FunctionSignature.from(target, tc, it)
       }
     }.distinctBy { it.name }
   }

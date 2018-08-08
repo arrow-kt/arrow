@@ -3,7 +3,7 @@ package arrow.recursion.data
 import arrow.Kind
 import arrow.core.Eval
 import arrow.higherkind
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.Functor
 import arrow.recursion.typeclasses.Birecursive
 import arrow.recursion.typeclasses.Corecursive
@@ -18,7 +18,7 @@ data class Fix<out A>(val unfix: Kind<A, Eval<FixOf<A>>>) : FixOf<A> {
   companion object
 }
 
-@instance(Fix::class)
+@extension
 interface FixBirecursiveInstance : Birecursive<ForFix> {
   override fun <F> Functor<F>.projectT(tf: Kind<ForFix, F>) =
     tf.fix().unfix.map { it.value() }
@@ -27,8 +27,8 @@ interface FixBirecursiveInstance : Birecursive<ForFix> {
     Eval.later { Fix(tf) }
 }
 
-@instance(Fix::class)
+@extension
 interface FixRecursiveInstance : Recursive<ForFix>, FixBirecursiveInstance
 
-@instance(Fix::class)
+@extension
 interface FixCorecursiveInstance : Corecursive<ForFix>, FixBirecursiveInstance

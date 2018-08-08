@@ -1,7 +1,7 @@
 package arrow.instances
 
-import arrow.instance
+import arrow.extension
 
-val instanceAnnotationKClass = instance::class
+val instanceAnnotationKClass = extension::class
 val instanceAnnotationClass = instanceAnnotationKClass.java
 val instanceAnnotationName = "@" + instanceAnnotationClass.simpleName

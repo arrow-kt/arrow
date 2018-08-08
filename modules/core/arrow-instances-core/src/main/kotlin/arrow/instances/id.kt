@@ -2,11 +2,11 @@ package arrow.instances
 
 import arrow.Kind
 import arrow.core.*
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.*
 import arrow.instances.traverse as idTraverse
 
-@instance(Id::class)
+@extension
 interface IdEqInstance<A> : Eq<Id<A>> {
 
   fun EQ(): Eq<A>
@@ -15,19 +15,19 @@ interface IdEqInstance<A> : Eq<Id<A>> {
     EQ().run { value.eqv(b.value) }
 }
 
-@instance(Id::class)
+@extension
 interface IdShowInstance<A> : Show<Id<A>> {
   override fun Id<A>.show(): String =
     toString()
 }
 
-@instance(Id::class)
+@extension
 interface IdFunctorInstance : Functor<ForId> {
   override fun <A, B> Kind<ForId, A>.map(f: (A) -> B): Id<B> =
     fix().map(f)
 }
 
-@instance(Id::class)
+@extension
 interface IdApplicativeInstance : Applicative<ForId> {
   override fun <A, B> Kind<ForId, A>.ap(ff: Kind<ForId, (A) -> B>): Id<B> =
     fix().ap(ff)
@@ -39,7 +39,7 @@ interface IdApplicativeInstance : Applicative<ForId> {
     Id.just(a)
 }
 
-@instance(Id::class)
+@extension
 interface IdMonadInstance : Monad<ForId> {
   override fun <A, B> Kind<ForId, A>.ap(ff: Kind<ForId, (A) -> B>): Id<B> =
     fix().ap(ff)
@@ -57,7 +57,7 @@ interface IdMonadInstance : Monad<ForId> {
     Id.just(a)
 }
 
-@instance(Id::class)
+@extension
 interface IdComonadInstance : Comonad<ForId> {
   override fun <A, B> Kind<ForId, A>.coflatMap(f: (Kind<ForId, A>) -> B): Id<B> =
     fix().coflatMap(f)
@@ -69,7 +69,7 @@ interface IdComonadInstance : Comonad<ForId> {
     fix().map(f)
 }
 
-@instance(Id::class)
+@extension
 interface IdBimonadInstance : Bimonad<ForId> {
   override fun <A, B> Kind<ForId, A>.ap(ff: Kind<ForId, (A) -> B>): Id<B> =
     fix().ap(ff)
@@ -93,7 +93,7 @@ interface IdBimonadInstance : Bimonad<ForId> {
     fix().extract()
 }
 
-@instance(Id::class)
+@extension
 interface IdFoldableInstance : Foldable<ForId> {
   override fun <A, B> Kind<ForId, A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
@@ -109,7 +109,7 @@ fun <A, G, B> IdOf<A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G
 fun <A, G> IdOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Id<A>> =
   idTraverse(GA, ::identity)
 
-@instance(Id::class)
+@extension
 interface IdTraverseInstance : Traverse<ForId> {
   override fun <A, B> Kind<ForId, A>.map(f: (A) -> B): Id<B> =
     fix().map(f)

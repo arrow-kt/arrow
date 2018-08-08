@@ -5,7 +5,7 @@ import arrow.core.Either
 import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.data.*
-import arrow.instance
+import arrow.extension
 import arrow.instances.ListKMonoidKInstance
 import arrow.instances.ListKTraverseInstance
 import arrow.mtl.typeclasses.FunctorFilter
@@ -13,7 +13,7 @@ import arrow.mtl.typeclasses.MonadCombine
 import arrow.mtl.typeclasses.MonadFilter
 import arrow.data.combineK as listCombineK
 
-@instance(ListK::class)
+@extension
 interface ListKMonadCombineInstance : MonadCombine<ForListK> {
   override fun <A> empty(): ListK<A> =
     ListK.empty()
@@ -43,7 +43,7 @@ interface ListKMonadCombineInstance : MonadCombine<ForListK> {
     fix().listCombineK(y)
 }
 
-@instance(ListK::class)
+@extension
 interface ListKFunctorFilterInstance : FunctorFilter<ForListK> {
   override fun <A, B> Kind<ForListK, A>.mapFilter(f: (A) -> Option<B>): ListK<B> =
     fix().mapFilter(f)
@@ -52,7 +52,7 @@ interface ListKFunctorFilterInstance : FunctorFilter<ForListK> {
     fix().map(f)
 }
 
-@instance(ListK::class)
+@extension
 interface ListKMonadFilterInstance : MonadFilter<ForListK> {
   override fun <A> empty(): ListK<A> =
     ListK.empty()

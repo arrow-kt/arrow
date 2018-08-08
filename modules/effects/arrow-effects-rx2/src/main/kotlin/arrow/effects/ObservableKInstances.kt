@@ -7,17 +7,17 @@ import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.*
 import kotlin.coroutines.experimental.CoroutineContext
 
-@instance(ObservableK::class)
+@extension
 interface ObservableKFunctorInstance : Functor<ForObservableK> {
   override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
     fix().map(f)
 }
 
-@instance(ObservableK::class)
+@extension
 interface ObservableKApplicativeInstance : Applicative<ForObservableK> {
   override fun <A, B> ObservableKOf<A>.ap(ff: ObservableKOf<(A) -> B>): ObservableK<B> =
     fix().ap(ff)
@@ -29,7 +29,7 @@ interface ObservableKApplicativeInstance : Applicative<ForObservableK> {
     ObservableK.just(a)
 }
 
-@instance(ObservableK::class)
+@extension
 interface ObservableKMonadInstance : Monad<ForObservableK> {
   override fun <A, B> ObservableKOf<A>.ap(ff: ObservableKOf<(A) -> B>): ObservableK<B> =
     fix().ap(ff)
@@ -47,7 +47,7 @@ interface ObservableKMonadInstance : Monad<ForObservableK> {
     ObservableK.just(a)
 }
 
-@instance(ObservableK::class)
+@extension
 interface ObservableKFoldableInstance : Foldable<ForObservableK> {
   override fun <A, B> Kind<ForObservableK, A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
@@ -56,7 +56,7 @@ interface ObservableKFoldableInstance : Foldable<ForObservableK> {
     fix().foldRight(lb, f)
 }
 
-@instance(ObservableK::class)
+@extension
 interface ObservableKTraverseInstance : Traverse<ForObservableK> {
   override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
     fix().map(f)
@@ -71,7 +71,7 @@ interface ObservableKTraverseInstance : Traverse<ForObservableK> {
     fix().foldRight(lb, f)
 }
 
-@instance(ObservableK::class)
+@extension
 interface ObservableKApplicativeErrorInstance :
   ObservableKApplicativeInstance,
   ApplicativeError<ForObservableK, Throwable> {
@@ -82,7 +82,7 @@ interface ObservableKApplicativeErrorInstance :
     fix().handleErrorWith { f(it).fix() }
 }
 
-@instance(ObservableK::class)
+@extension
 interface ObservableKMonadErrorInstance :
   ObservableKMonadInstance,
   MonadError<ForObservableK, Throwable> {
@@ -93,7 +93,7 @@ interface ObservableKMonadErrorInstance :
     fix().handleErrorWith { f(it).fix() }
 }
 
-@instance(ObservableK::class)
+@extension
 interface ObservableKMonadDeferInstance :
   ObservableKMonadErrorInstance,
   MonadDefer<ForObservableK> {
@@ -101,7 +101,7 @@ interface ObservableKMonadDeferInstance :
     ObservableK.defer(fa)
 }
 
-@instance(ObservableK::class)
+@extension
 interface ObservableKAsyncInstance :
   ObservableKMonadDeferInstance,
   Async<ForObservableK> {
@@ -112,7 +112,7 @@ interface ObservableKAsyncInstance :
     fix().continueOn(ctx)
 }
 
-@instance(ObservableK::class)
+@extension
 interface ObservableKEffectInstance :
   ObservableKAsyncInstance,
   Effect<ForObservableK> {

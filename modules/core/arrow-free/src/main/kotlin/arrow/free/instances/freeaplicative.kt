@@ -5,18 +5,18 @@ import arrow.core.FunctionK
 import arrow.free.FreeApplicative
 import arrow.free.FreeApplicativePartialOf
 import arrow.free.fix
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 
-@instance(FreeApplicative::class)
+@extension
 interface FreeApplicativeFunctorInstance<S> : Functor<FreeApplicativePartialOf<S>> {
   override fun <A, B> Kind<FreeApplicativePartialOf<S>, A>.map(f: (A) -> B): FreeApplicative<S, B> = fix().map(f)
 }
 
-@instance(FreeApplicative::class)
+@extension
 interface FreeApplicativeApplicativeInstance<S> : FreeApplicativeFunctorInstance<S>, Applicative<FreeApplicativePartialOf<S>> {
   override fun <A> just(a: A): FreeApplicative<S, A> = FreeApplicative.just(a)
 

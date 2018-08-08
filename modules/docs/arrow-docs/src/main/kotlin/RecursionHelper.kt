@@ -1,7 +1,7 @@
 package arrow.recursion
 
 import arrow.higherkind
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.Functor
 
 sealed class IntList
@@ -12,7 +12,7 @@ data class Cons(val head: Int, val tail: IntList) : IntList()
 object NilPattern : IntListPattern<Nothing>()
 @higherkind data class ConsPattern<out A>(val head: Int, val tail: A) : IntListPattern<A>()
 
-@instance(IntListPattern::class)
+@extension
 interface IntListPatternFunctorInstance : Functor<ForIntListPattern> {
   override fun <A, B> IntListPatternOf<A>.map(f: (A) -> B): IntListPatternOf<B> {
     val lp = fix()

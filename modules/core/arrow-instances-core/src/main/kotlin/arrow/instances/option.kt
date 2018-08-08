@@ -2,11 +2,11 @@ package arrow.instances
 
 import arrow.Kind
 import arrow.core.*
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.*
 import arrow.instances.traverse as optionTraverse
 
-@instance(Option::class)
+@extension
 interface OptionSemigroupInstance<A> : Semigroup<Option<A>> {
 
   fun SG(): Semigroup<A>
@@ -21,13 +21,13 @@ interface OptionSemigroupInstance<A> : Semigroup<Option<A>> {
     }
 }
 
-@instance(Option::class)
-interface OptionMonoidInstance<A> : OptionSemigroupInstance<A>, Monoid<Option<A>> {
+@extension
+interface OptionMonoidInstance<A> : Monoid<Option<A>>, OptionSemigroupInstance<A> {
   override fun empty(): Option<A> = None
 }
 
-@instance(Option::class)
-interface OptionApplicativeErrorInstance : OptionApplicativeInstance, ApplicativeError<ForOption, Unit> {
+@extension
+interface OptionApplicativeErrorInstance : ApplicativeError<ForOption, Unit>, OptionApplicativeInstance {
   override fun <A> raiseError(e: Unit): Option<A> =
     None
 
@@ -35,8 +35,8 @@ interface OptionApplicativeErrorInstance : OptionApplicativeInstance, Applicativ
     fix().orElse({ f(Unit).fix() })
 }
 
-@instance(Option::class)
-interface OptionMonadErrorInstance : OptionMonadInstance, MonadError<ForOption, Unit> {
+@extension
+interface OptionMonadErrorInstance : MonadError<ForOption, Unit>, OptionMonadInstance {
   override fun <A> raiseError(e: Unit): Kind<ForOption, A> =
     None
 
@@ -44,7 +44,7 @@ interface OptionMonadErrorInstance : OptionMonadInstance, MonadError<ForOption, 
     fix().orElse({ f(Unit).fix() })
 }
 
-@instance(Option::class)
+@extension
 interface OptionEqInstance<A> : Eq<Option<A>> {
 
   fun EQ(): Eq<A>
@@ -62,19 +62,19 @@ interface OptionEqInstance<A> : Eq<Option<A>> {
 
 }
 
-@instance(Option::class)
+@extension
 interface OptionShowInstance<A> : Show<Option<A>> {
   override fun Option<A>.show(): String =
     toString()
 }
 
-@instance(Option::class)
+@extension
 interface OptionFunctorInstance : Functor<ForOption> {
   override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
 }
 
-@instance(Option::class)
+@extension
 interface OptionApplicativeInstance : Applicative<ForOption> {
   override fun <A, B> Kind<ForOption, A>.ap(ff: Kind<ForOption, (A) -> B>): Option<B> =
     fix().ap(ff)
@@ -86,7 +86,7 @@ interface OptionApplicativeInstance : Applicative<ForOption> {
     Option.just(a)
 }
 
-@instance(Option::class)
+@extension
 interface OptionMonadInstance : Monad<ForOption> {
   override fun <A, B> Kind<ForOption, A>.ap(ff: Kind<ForOption, (A) -> B>): Option<B> =
     fix().ap(ff)
@@ -104,7 +104,7 @@ interface OptionMonadInstance : Monad<ForOption> {
     Option.just(a)
 }
 
-@instance(Option::class)
+@extension
 interface OptionFoldableInstance : Foldable<ForOption> {
   override fun <A> Kind<ForOption, A>.exists(p: (A) -> Boolean): Boolean =
     fix().exists(p)
@@ -136,7 +136,7 @@ fun <A, G, B> OptionOf<A>.traverseFilter(GA: Applicative<G>, f: (A) -> Kind<G, O
   fix().fold({ just(None) }, f)
 }
 
-@instance(Option::class)
+@extension
 interface OptionTraverseInstance : Traverse<ForOption> {
   override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
     fix().map(f)

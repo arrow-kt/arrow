@@ -6,10 +6,10 @@ import arrow.data.OptionT
 import arrow.data.OptionTOf
 import arrow.data.OptionTPartialOf
 import arrow.data.fix
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.*
 
-@instance(OptionT::class)
+@extension
 interface OptionTFunctorInstance<F> : Functor<OptionTPartialOf<F>> {
 
   fun FF(): Functor<F>
@@ -18,7 +18,7 @@ interface OptionTFunctorInstance<F> : Functor<OptionTPartialOf<F>> {
 
 }
 
-@instance(OptionT::class)
+@extension
 interface OptionTApplicativeInstance<F> : OptionTFunctorInstance<F>, Applicative<OptionTPartialOf<F>> {
 
   override fun FF(): Monad<F>
@@ -31,7 +31,7 @@ interface OptionTApplicativeInstance<F> : OptionTFunctorInstance<F>, Applicative
     fix().ap(FF(), ff)
 }
 
-@instance(OptionT::class)
+@extension
 interface OptionTMonadInstance<F> : OptionTApplicativeInstance<F>, Monad<OptionTPartialOf<F>> {
 
   override fun <A, B> Kind<OptionTPartialOf<F>, A>.map(f: (A) -> B): OptionT<F, B> = fix().map(FF(), f)
@@ -61,7 +61,7 @@ fun <F, G, A, B> OptionTOf<F, A>.traverse(FF: Traverse<F>, GA: Applicative<G>, f
 fun <F, G, A> OptionTOf<F, Kind<G, A>>.sequence(FF: Traverse<F>, GA: Applicative<G>): Kind<G, OptionT<F, A>> =
   traverse(FF, GA, ::identity)
 
-@instance(OptionT::class)
+@extension
 interface OptionTFoldableInstance<F> : Foldable<OptionTPartialOf<F>> {
 
   fun FFF(): Foldable<F>
@@ -74,7 +74,7 @@ interface OptionTFoldableInstance<F> : Foldable<OptionTPartialOf<F>> {
 
 }
 
-@instance(OptionT::class)
+@extension
 interface OptionTTraverseInstance<F> : OptionTFoldableInstance<F>, Traverse<OptionTPartialOf<F>> {
 
   override fun FFF(): Traverse<F>
@@ -84,7 +84,7 @@ interface OptionTTraverseInstance<F> : OptionTFoldableInstance<F>, Traverse<Opti
 
 }
 
-@instance(OptionT::class)
+@extension
 interface OptionTSemigroupKInstance<F> : SemigroupK<OptionTPartialOf<F>> {
 
   fun FF(): Monad<F>
@@ -92,7 +92,7 @@ interface OptionTSemigroupKInstance<F> : SemigroupK<OptionTPartialOf<F>> {
   override fun <A> Kind<OptionTPartialOf<F>, A>.combineK(y: Kind<OptionTPartialOf<F>, A>): OptionT<F, A> = fix().orElse(FF(), { y.fix() })
 }
 
-@instance(OptionT::class)
+@extension
 interface OptionTMonoidKInstance<F> : MonoidK<OptionTPartialOf<F>>, OptionTSemigroupKInstance<F> {
   override fun <A> empty(): OptionT<F, A> = OptionT(FF().just(None))
 }

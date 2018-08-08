@@ -1,8 +1,6 @@
 package arrow.instances
 
-import arrow.common.utils.AbstractProcessor
-import arrow.common.utils.ClassOrPackageDataWrapper
-import arrow.common.utils.knownError
+import arrow.common.utils.*
 import com.google.auto.service.AutoService
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import java.io.File
@@ -29,7 +27,7 @@ class InstanceProcessor : AbstractProcessor() {
       .getElementsAnnotatedWith(instanceAnnotationClass)
       .map { element ->
         when (element.kind) {
-          ElementKind.INTERFACE -> processClass(element as TypeElement)
+          ElementKind.INTERFACE -> processClass(this, element as TypeElement)
           else -> knownError("$instanceAnnotationName can only be used on interfaces")
         }
       }
@@ -40,21 +38,44 @@ class InstanceProcessor : AbstractProcessor() {
     }
   }
 
-  private fun processClass(element: TypeElement): AnnotatedInstance {
-    val proto: ClassOrPackageDataWrapper.Class = getClassOrPackageDataWrapper(element) as ClassOrPackageDataWrapper.Class
-    val dataType = element.annotationMirrors.flatMap { am ->
-      am.elementValues.entries.filter {
-        "target" == it.key.simpleName.toString()
-      }.map {
-        val targetName = it.value.toString().replace(".class", "")
-        val targetElement = elementUtils.getTypeElement(targetName)
-        getClassOrPackageDataWrapper(targetElement) as ClassOrPackageDataWrapper.Class
+  companion object {
+
+    private fun findNestedType(blob: String): String =
+      blob.removeBackticks()
+        .substringAfter("<")
+        .substringBeforeLast(">")
+        .substringBefore("<")
+        .replace(".For", ".")
+        .removeSuffix("PartialOf")
+        .removeSuffix("Of")
+        .substringBefore(",")
+
+    fun processClass(processor: AbstractProcessor, element: TypeElement): AnnotatedInstance {
+      val proto: ClassOrPackageDataWrapper.Class = processor.getClassOrPackageDataWrapper(element) as ClassOrPackageDataWrapper.Class
+      val typeTable = TypeTable(proto.classProto.typeTable)
+      val superTypes: List<ClassOrPackageDataWrapper.Class> =
+        processor.recurseTypeclassInterfaces(proto, typeTable, emptyList()).map { it as ClassOrPackageDataWrapper.Class }
+      val typeClass = if (superTypes.isEmpty()) {
+        error("@extension `${proto.fullName}` needs to extend a type class (interface with one type parameter)")
+      } else superTypes[0]
+      val dataType: ClassOrPackageDataWrapper.Class = if (typeClass.typeParameters.isEmpty()) {
+        error("@extension `${proto.fullName}` needs to extend a type class (interface with one type parameter)")
+      } else {
+        val name = proto.classProto.getSupertype(0).extractFullName(proto)
+        val target = findNestedType(name)
+        val dataTypeElement = processor.elementUtils.getTypeElement(target)
+          ?: error("found null datatype element on `${proto.fullName}` for $name, targeted at -> $target")
+        processor.getClassOrPackageDataWrapper(dataTypeElement) as ClassOrPackageDataWrapper.Class
       }
+      return AnnotatedInstance(
+        instance = element,
+        dataTypeInstance = proto,
+        superTypes = superTypes,
+        processor = processor,
+        dataType = dataType,
+        typeClass = typeClass
+      )
     }
-    val typeTable = TypeTable(proto.classProto.typeTable)
-    val superTypes: List<ClassOrPackageDataWrapper.Class> =
-      recurseTypeclassInterfaces(proto, typeTable, emptyList()).map { it as ClassOrPackageDataWrapper.Class }
-    return AnnotatedInstance(element, proto, superTypes, this, dataType[0])
   }
 
 }

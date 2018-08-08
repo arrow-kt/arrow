@@ -1,7 +1,11 @@
 package arrow.instances
 
 import arrow.common.Package
+import arrow.common.messager.logW
 import arrow.common.utils.*
+import arrow.derive.FunctionSignature
+import arrow.derive.HKArgs
+import arrow.derive.normalizeType
 import me.eugeniomarletti.kotlin.metadata.modality
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
@@ -9,7 +13,7 @@ import java.io.File
 
 data class FunctionMapping(
   val name: String,
-  val typeclass: ClassOrPackageDataWrapper.Class,
+  val typeClass: ClassOrPackageDataWrapper.Class,
   val function: ProtoBuf.Function,
   val retTypeName: String)
 
@@ -17,7 +21,7 @@ data class Instance(
   val `package`: Package,
   val target: AnnotatedInstance
 ) {
-  val name = target.classElement.simpleName
+  val name = target.instance.simpleName
 
   val receiverTypeName = target.dataType.nameResolver.getString(target.dataType.classProto.fqName).replace("/", ".")
 
@@ -28,42 +32,43 @@ data class Instance(
     .replace("Instance", "")
     .decapitalize()
 
-  fun expandedTypeArgs(reified: Boolean = false): String =
-    if (target.classOrPackageProto.typeParameters.isNotEmpty()) {
-      target.classOrPackageProto.typeParameters.joinToString(
-        prefix = "<",
-        separator = ", ",
-        transform = {
-          val name = target.classOrPackageProto.nameResolver.getString(it.name)
-          if (reified) "reified $name" else name
-        },
-        postfix = ">"
-      )
+  fun typeArgs(reified: Boolean = false): List<String> =
+    if (target.dataTypeInstance.typeParameters.isNotEmpty()) {
+      target.dataTypeInstance.typeParameters.map {
+        val name = target.dataTypeInstance.nameResolver.getString(it.name)
+        if (reified) "reified $name" else name
+      }
     } else {
-      ""
+      emptyList()
     }
 
-  fun typeConstraints() = target.classOrPackageProto.typeConstraints()
+  fun expandedTypeArgs(reified: Boolean = false): String {
+    val ta = typeArgs(reified)
+    return if (ta.isEmpty()) ""
+    else ta.joinToString(prefix = "<", separator = ", ", postfix = ">")
+  }
+
+  fun typeConstraints() = target.dataTypeInstance.typeConstraints()
 
   private val abstractFunctions: List<FunctionMapping> =
     getTypeclassReturningFunctions().fold(emptyList(), normalizeOverridenFunctions())
 
   private fun normalizeOverridenFunctions(): (List<FunctionMapping>, FunctionMapping) -> List<FunctionMapping> =
     { acc, func ->
-      val retType = func.function.returnType.extractFullName(func.typeclass).removeBackticks()
+      val retType = func.function.returnType.extractFullName(func.typeClass).normalizeType()
       val existingParamInfo = getParamInfo(func.name to retType)
       when {
         acc.contains(func) -> acc //if the same param was already added ignore it
         else -> { //remove accumulated functions whose return types  supertypes of the current evaluated one and add the current one
           val remove = acc.find { av ->
-            val avRetType = av.function.returnType.extractFullName(av.typeclass)
-              .removeBackticks().replace(".", "/").substringBefore("<")
+            val avRetType = av.function.returnType.extractFullName(av.typeClass)
+              .normalizeType().substringBefore("<")
             existingParamInfo.superTypes.contains(avRetType)
           }
           val ignore = acc.any { av ->
-            val avRetTypeUnparsed = av.function.returnType.extractFullName(av.typeclass)
+            val avRetTypeUnparsed = av.function.returnType.extractFullName(av.typeClass)
               .removeBackticks()
-            val parsedRetType = retType.replace(".", "/").substringBefore("<")
+            val parsedRetType = retType.normalizeType().substringBefore("<")
             val avParamInfo = getParamInfo(av.name to avRetTypeUnparsed)
             avParamInfo.superTypes.contains(parsedRetType)
           }
@@ -76,8 +81,25 @@ data class Instance(
       }
     }
 
+  fun extendingFunctions(): List<FunctionMapping> =
+    (listOf(target.typeClass)).flatMap { tc ->
+      tc.functionList
+        .map { it to it.returnType.extractFullName(tc).removeBackticks() }
+        .distinctBy { (_, name) -> name }
+        .flatMap { (it, name) ->
+          val retTypeName = name.substringBefore("<")
+          val retType = target.processor.elementUtils.getTypeElement(retTypeName)
+          when {
+            retType != null -> {
+              listOf(FunctionMapping(tc.nameResolver.getString(it.name), tc, it, retTypeName))
+            }
+            else -> emptyList()
+          }
+        }
+    }
+
   private fun getTypeclassReturningFunctions(): List<FunctionMapping> =
-    (target.superTypes + listOf(target.classOrPackageProto)).flatMap { tc ->
+    (target.superTypes + listOf(target.dataTypeInstance)).flatMap { tc ->
       tc.functionList
         .filter { it.modality == ProtoBuf.Modality.ABSTRACT }
         .map { it to it.returnType.extractFullName(tc).removeBackticks() }
@@ -116,8 +138,8 @@ data class Instance(
   }
 
   val args: List<Pair<String, String>> = abstractFunctions.sortedBy { f ->
-    val typeClassTypeArgs = f.typeclass.typeParameters.map { f.typeclass.nameResolver.getString(it.name) }
-    val functionRetTypeTypeArgs = f.function.returnType.extractFullName(f.typeclass)
+    val typeClassTypeArgs = f.typeClass.typeParameters.map { f.typeClass.nameResolver.getString(it.name) }
+    val functionRetTypeTypeArgs = f.function.returnType.extractFullName(f.typeClass)
       .removeBackticks().substringAfter("<").substringBefore(">")
     typeClassTypeArgs.indexOf(functionRetTypeTypeArgs)
   }.map { (name, tc, func) ->
@@ -126,10 +148,12 @@ data class Instance(
   }
 
   val targetImplementations = args.joinToString(
-    separator = "\n",
+    separator = "",
+    prefix = "{",
     transform = {
-      "      override fun ${it.first}(): ${it.second} = ${it.first}"
-    }
+      "\n\toverride fun ${it.first}(): ${it.second} = ${it.first}"
+    },
+    postfix = "}"
   )
 
 }
@@ -147,15 +171,16 @@ class InstanceFileGenerator(
   fun generate() {
     instances.forEach {
       val elementsToGenerate: List<String> =
-        listOf(genImports(it), genCompanionExtensions(it))
-      val source: String = elementsToGenerate.joinToString(prefix = "package ${it.`package`}\n\n", separator = "\n", postfix = "\n")
-      val file = File(generatedDir, instanceAnnotationClass.simpleName + ".${it.target.classElement.qualifiedName}.kt")
+        listOf(genImports(it), genCompanionExtensions(it), genDatatypeExtensions(it))
+      val source: String = elementsToGenerate.joinToString(prefix = "package ${it.`package`}.${it.companionFactoryName}\n\n", separator = "\n", postfix = "\n")
+      val file = File(generatedDir, instanceAnnotationClass.simpleName + ".${it.target.instance.qualifiedName}.kt")
       file.writeText(source)
     }
   }
 
   private fun genImports(i: Instance): String = """
-            |import ${i.target.classOrPackageProto.`package`}.*
+            |import ${i.`package`}.*
+            |import ${i.target.dataTypeInstance.`package`}.*
             |""".trimMargin()
 
   private fun genCompanionExtensions(i: Instance): String =
@@ -164,9 +189,66 @@ class InstanceFileGenerator(
       "${it.first}: ${it.second}"
     } + (if (i.args.isNotEmpty()) listOf("@Suppress(\"UNUSED_PARAMETER\") dummy: kotlin.Unit = kotlin.Unit") else emptyList())).joinToString(", ")
     }): ${i.name}${i.expandedTypeArgs()}${i.typeConstraints()} =
-                |    object : ${i.name}${i.expandedTypeArgs()} {
-                |${i.targetImplementations}
-                |    }
-                |
+                |    object : ${i.name}${i.expandedTypeArgs()} ${i.targetImplementations}
                 |""".trimMargin()
+
+  private fun genDatatypeExtensions(i: Instance): String = i.extendingFunctions().joinToString(separator = "\n", transform = { fm ->
+      try {
+        val typeClassTypeArgs = i.target.typeClass.typeParameters.drop(1).flatMap {
+          if (it.hasName()) listOf(i.target.typeClass.nameResolver.getString(it.name))
+          else emptyList()
+        }
+        val appliedTypeArgs = i.target.dataTypeInstance.classProto.supertypeList[0].argumentList.drop(1).flatMap {
+          if (it.type.hasClassName()) listOf(i.target.dataTypeInstance.nameResolver.getString(it.type.className))
+          else emptyList()
+        } + i.typeArgs()
+        val typesToApply: List<Pair<String, String>> =
+          if (typeClassTypeArgs.size == appliedTypeArgs.size) typeClassTypeArgs.zip(appliedTypeArgs)
+          else emptyList()
+
+        val sg: FunctionSignature = FunctionSignature.from(
+          recType = i.target.dataType,
+          typeClass = i.target.typeClass,
+          f = fm.function,
+          invariantTypeArgs = i.typeArgs(),
+          unappliedTypeArgs = typesToApply
+        )
+
+        if (typeClassTypeArgs.isNotEmpty())
+          i.target.processor.logW(
+            "\n${i.target.dataType.fullName.normalizeType()}#${sg.name}*\ntypeClassTypeArgs: \t\t$typeClassTypeArgs\nappliedTypeArgs: \t\t$appliedTypeArgs\ntypesToApply: \t\t$typesToApply"
+          )
+
+        val typeArgs = sg.tparams.joinToString(separator = ", ", prefix = "<", postfix = ">")
+        val args = i.args + sg.args
+        val combinedTypeArgs = (i.typeArgs() + sg.tparams).distinct()
+        val biasedTypeArgs =
+          if (combinedTypeArgs.isEmpty()) ""
+          else combinedTypeArgs.joinToString(separator = ", ", prefix = "<", postfix = ">")
+
+        val retType = sg.retType.removeBackticks()
+        if (sg.hkArgs is HKArgs.First) {
+          """|
+         |@Suppress("UNCHECKED_CAST")
+         |fun ${biasedTypeArgs} ${sg.hkArgs.receiver.removeBackticks()}.`${fm.name}`(${args.joinToString(",") { "\n\t${it.first}: ${it.second.removeBackticks()}" }}): $retType =
+         |  ${i.receiverTypeName}.${i.companionFactoryName}${i.expandedTypeArgs()}(${i.args.joinToString(", ") { it.first }}).run {
+         |    this@`${fm.name}`.`${fm.name}`${typeArgs}(${sg.args.joinToString(", ") { it.first }}) as $retType
+         |  }
+         |
+         |""".trimMargin()
+        } else {
+          """|
+         |@Suppress("UNCHECKED_CAST")
+         |fun ${biasedTypeArgs} ${i.receiverTypeName}.Companion.`${fm.name}`(${args.joinToString(",") { "\n\t${it.first}: ${it.second.removeBackticks()}" }}): $retType =
+         |  ${i.receiverTypeName}.${i.companionFactoryName}${i.expandedTypeArgs()}(${i.args.joinToString(", ") { it.first }}).run {
+         |    this.`${fm.name}`${typeArgs}(${sg.args.joinToString(", ") { it.first }}) as $retType
+         |  }
+         |""".trimMargin()
+        }
+      } catch (iob: Throwable) {
+        i.target.processor.logW("skipped extension for fm: ${fm.name}")
+        ""
+      }
+    })
+
 }

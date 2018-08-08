@@ -6,17 +6,17 @@ import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.*
 import kotlin.coroutines.experimental.CoroutineContext
 
-@instance(SingleK::class)
+@extension
 interface SingleKFunctorInstance : Functor<ForSingleK> {
   override fun <A, B> Kind<ForSingleK, A>.map(f: (A) -> B): SingleK<B> =
     fix().map(f)
 }
 
-@instance(SingleK::class)
+@extension
 interface SingleKApplicativeInstance : Applicative<ForSingleK> {
   override fun <A, B> SingleKOf<A>.ap(ff: SingleKOf<(A) -> B>): SingleK<B> =
     fix().ap(ff)
@@ -28,7 +28,7 @@ interface SingleKApplicativeInstance : Applicative<ForSingleK> {
     SingleK.just(a)
 }
 
-@instance(SingleK::class)
+@extension
 interface SingleKMonadInstance : Monad<ForSingleK> {
   override fun <A, B> SingleKOf<A>.ap(ff: SingleKOf<(A) -> B>): SingleK<B> =
     fix().ap(ff)
@@ -46,7 +46,7 @@ interface SingleKMonadInstance : Monad<ForSingleK> {
     SingleK.just(a)
 }
 
-@instance(SingleK::class)
+@extension
 interface SingleKApplicativeErrorInstance :
   SingleKApplicativeInstance,
   ApplicativeError<ForSingleK, Throwable> {
@@ -57,7 +57,7 @@ interface SingleKApplicativeErrorInstance :
     fix().handleErrorWith { f(it).fix() }
 }
 
-@instance(SingleK::class)
+@extension
 interface SingleKMonadErrorInstance :
   SingleKMonadInstance,
   MonadError<ForSingleK, Throwable> {
@@ -68,7 +68,7 @@ interface SingleKMonadErrorInstance :
     fix().handleErrorWith { f(it).fix() }
 }
 
-@instance(SingleK::class)
+@extension
 interface SingleKMonadDeferInstance :
   SingleKMonadErrorInstance,
   MonadDefer<ForSingleK> {
@@ -76,7 +76,7 @@ interface SingleKMonadDeferInstance :
     SingleK.defer(fa)
 }
 
-@instance(SingleK::class)
+@extension
 interface SingleKAsyncInstance :
   SingleKMonadDeferInstance,
   Async<ForSingleK> {
@@ -87,7 +87,7 @@ interface SingleKAsyncInstance :
     fix().continueOn(ctx)
 }
 
-@instance(SingleK::class)
+@extension
 interface SingleKEffectInstance :
   SingleKAsyncInstance,
   Effect<ForSingleK> {

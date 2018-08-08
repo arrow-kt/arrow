@@ -5,16 +5,16 @@ import arrow.free.Cofree
 import arrow.free.CofreeOf
 import arrow.free.CofreePartialOf
 import arrow.free.fix
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
 
-@instance(Cofree::class)
+@extension
 interface CofreeFunctorInstance<S> : Functor<CofreePartialOf<S>> {
   override fun <A, B> Kind<CofreePartialOf<S>, A>.map(f: (A) -> B): Cofree<S, B> = fix().map(f)
 }
 
-@instance(Cofree::class)
+@extension
 interface CofreeComonadInstance<S> : CofreeFunctorInstance<S>, Comonad<CofreePartialOf<S>> {
   override fun <A, B> Kind<CofreePartialOf<S>, A>.coflatMap(f: (Kind<CofreePartialOf<S>, A>) -> B): Cofree<S, B> = fix().coflatMap(f)
 

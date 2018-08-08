@@ -8,6 +8,7 @@ import java.io.File
 import javax.lang.model.element.Name
 
 val KindPostFix = "Of"
+val KindPartialPostFix = "PartialOf"
 val KindedJPostFix = "KindedJ"
 val HKMarkerPreFix = "For"
 

@@ -7,10 +7,10 @@ import arrow.data.Coproduct
 import arrow.data.CoproductOf
 import arrow.data.CoproductPartialOf
 import arrow.data.fix
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.*
 
-@instance(Coproduct::class)
+@extension
 interface CoproductFunctorInstance<F, G> : Functor<CoproductPartialOf<F, G>> {
 
   fun FF(): Functor<F>
@@ -20,7 +20,7 @@ interface CoproductFunctorInstance<F, G> : Functor<CoproductPartialOf<F, G>> {
   override fun <A, B> Kind<CoproductPartialOf<F, G>, A>.map(f: (A) -> B): Coproduct<F, G, B> = fix().map(FF(), FG(), f)
 }
 
-@instance(Coproduct::class)
+@extension
 interface CoproductComonadInstance<F, G> : Comonad<CoproductPartialOf<F, G>> {
 
   fun CF(): Comonad<F>
@@ -35,7 +35,7 @@ interface CoproductComonadInstance<F, G> : Comonad<CoproductPartialOf<F, G>> {
 
 }
 
-@instance(Coproduct::class)
+@extension
 interface CoproductFoldableInstance<F, G> : Foldable<CoproductPartialOf<F, G>> {
 
   fun FF(): Foldable<F>
@@ -50,7 +50,7 @@ interface CoproductFoldableInstance<F, G> : Foldable<CoproductPartialOf<F, G>> {
 
 }
 
-@instance(Coproduct::class)
+@extension
 interface CoproductTraverseInstance<F, G> : Traverse<CoproductPartialOf<F, G>> {
 
   fun TF(): Traverse<F>

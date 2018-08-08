@@ -6,17 +6,17 @@ import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.*
 import kotlin.coroutines.experimental.CoroutineContext
 
-@instance(MonoK::class)
+@extension
 interface MonoKFunctorInstance : Functor<ForMonoK> {
   override fun <A, B> Kind<ForMonoK, A>.map(f: (A) -> B): MonoK<B> =
       fix().map(f)
 }
 
-@instance(MonoK::class)
+@extension
 interface MonoKApplicativeInstance : Applicative<ForMonoK> {
   override fun <A, B> MonoKOf<A>.ap(ff: MonoKOf<(A) -> B>): MonoK<B> =
       fix().ap(ff)
@@ -28,7 +28,7 @@ interface MonoKApplicativeInstance : Applicative<ForMonoK> {
       MonoK.just(a)
 }
 
-@instance(MonoK::class)
+@extension
 interface MonoKMonadInstance : Monad<ForMonoK> {
   override fun <A, B> MonoKOf<A>.ap(ff: MonoKOf<(A) -> B>): MonoK<B> =
       fix().ap(ff)
@@ -46,7 +46,7 @@ interface MonoKMonadInstance : Monad<ForMonoK> {
       MonoK.just(a)
 }
 
-@instance(MonoK::class)
+@extension
 interface MonoKApplicativeErrorInstance :
     MonoKApplicativeInstance,
     ApplicativeError<ForMonoK, Throwable> {
@@ -57,7 +57,7 @@ interface MonoKApplicativeErrorInstance :
       fix().handleErrorWith { f(it).fix() }
 }
 
-@instance(MonoK::class)
+@extension
 interface MonoKMonadErrorInstance :
     MonoKMonadInstance,
     MonadError<ForMonoK, Throwable> {
@@ -68,7 +68,7 @@ interface MonoKMonadErrorInstance :
       fix().handleErrorWith { f(it).fix() }
 }
 
-@instance(MonoK::class)
+@extension
 interface MonoKMonadDeferInstance :
     MonoKMonadErrorInstance,
     MonadDefer<ForMonoK> {
@@ -76,7 +76,7 @@ interface MonoKMonadDeferInstance :
       MonoK.defer(fa)
 }
 
-@instance(MonoK::class)
+@extension
 interface MonoKAsyncInstance :
     MonoKMonadDeferInstance,
     Async<ForMonoK> {
@@ -87,7 +87,7 @@ interface MonoKAsyncInstance :
     fix().continueOn(ctx)
 }
 
-@instance(MonoK::class)
+@extension
 interface MonoKEffectInstance :
     MonoKAsyncInstance,
     Effect<ForMonoK> {
