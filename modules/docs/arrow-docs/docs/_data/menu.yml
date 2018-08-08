@@ -28,6 +28,9 @@ options:
       - title: Dependency Injection
         url: /docs/patterns/dependency_injection/
 
+      - title: The Monad Tutorial
+        url: /docs/patterns/monads/
+
       - title: Monad Comprehensions
         url: /docs/patterns/monad_comprehensions/
 
@@ -194,6 +197,12 @@ options:
 
       - title: Bimonad
         url: /docs/typeclasses/bimonad/
+
+      - title: Bifunctor
+        url: /docs/typeclasses/bifunctor
+
+      - title: Profunctor
+        url: /docs/typeclasses/profunctor
 
       - title: SemigroupK
         url: /docs/typeclasses/semigroupk/

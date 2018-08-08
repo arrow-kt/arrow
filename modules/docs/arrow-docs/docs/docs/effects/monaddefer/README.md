@@ -125,3 +125,6 @@ The following data types in Arrow provide instances that adhere to the `MonadDef
 - [ObservableK]({{ '/docs/integrations/rx2' | relative_url }})
 - [FlowableK]({{ '/docs/integrations/rx2' | relative_url }})
 - [DeferredK]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }})
+- [FluxK]({{ '/docs/integrations/reactor' | relative_url }})
+- [MonoK]({{ '/docs/integrations/reactor' | relative_url }})
+
