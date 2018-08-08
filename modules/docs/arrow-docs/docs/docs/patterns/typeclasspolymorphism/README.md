@@ -31,12 +31,11 @@ eyes on a simple example first and then we talk about those. Deal?
 
 ### A canonical problem
 
-I'm grabbing the following code samples from my mate [Raúl Raja](https://twitter.com/raulraja) who helped to polish this 
-post.
+I'm grabbing the following code samples from my mate [Raúl Raja](https://twitter.com/raulraja) who helped to polish this post.
 
 Let's say we have a **TODO** app, and we want  to fetch some user `Tasks` from a local cache. In case we don't find them
-, we'll try to fetch them from a network service. We could have a common contract for for both of the `DataSources` 
-that would provide a way to retrieve a `List` of `Tasks` for a given `User`, regardless of the source:
+, we'll try to fetch them from a network service. We could have a common contract for for both of the `DataSources` that 
+would provide a way to retrieve a `List` of `Tasks` for a given `User`, regardless of the source:
 
 ```kotlin
 interface DataSource {
@@ -460,9 +459,9 @@ object test {
 
     val singleModule = Module(SingleK.async())
     singleModule.run {
-      repository.allTasksByUser(user1).fix().single.subscribe({ println(it) }, { println(it) })
-      repository.allTasksByUser(user2).fix().single.subscribe({ println(it) }, { println(it) })
-      repository.allTasksByUser(user3).fix().single.subscribe({ println(it) }, { println(it) })
+      repository.allTasksByUser(user1).fix().single.subscribe(::println, ::println)
+      repository.allTasksByUser(user2).fix().single.subscribe(::println, ::println)
+      repository.allTasksByUser(user3).fix().single.subscribe(::println, ::println)
     }
   }
 }
@@ -493,9 +492,9 @@ fun main(args: Array<String>): Unit {
 
     val maybeModule = Module(MaybeK.async())
     maybeModule.run {
-      repository.allTasksByUser(user1).fix().maybe.subscribe({ println(it) }, { println(it) })
-      repository.allTasksByUser(user2).fix().maybe.subscribe({ println(it) }, { println(it) })
-      repository.allTasksByUser(user3).fix().maybe.subscribe({ println(it) }, { println(it) })
+      repository.allTasksByUser(user1).fix().maybe.subscribe(::println, ::println)
+      repository.allTasksByUser(user2).fix().maybe.subscribe(::println, ::println)
+      repository.allTasksByUser(user3).fix().maybe.subscribe(::println, ::println)
     }
 }
 ```
@@ -522,16 +521,16 @@ object test {
 
     val observableModule = Module(ObservableK.async())
     observableModule.run {
-      repository.allTasksByUser(user1).fix().observable.subscribe { println(it) }
-      repository.allTasksByUser(user2).fix().observable.subscribe { println(it) }
-      repository.allTasksByUser(user3).fix().observable.subscribe({ println(it) }, { println(it) })
+      repository.allTasksByUser(user1).fix().observable.subscribe(::println, ::println)
+      repository.allTasksByUser(user2).fix().observable.subscribe(::println, ::println)
+      repository.allTasksByUser(user3).fix().observable.subscribe(::println, ::println)
     }
 
     val flowableModule = Module(FlowableK.async())
     flowableModule.run {
-      repository.allTasksByUser(user1).fix().flowable.subscribe { println(it) }
-      repository.allTasksByUser(user2).fix().flowable.subscribe { println(it) }
-      repository.allTasksByUser(user3).fix().flowable.subscribe({ println(it) }, { println(it) })
+      repository.allTasksByUser(user1).fix().flowable.subscribe(::println)
+      repository.allTasksByUser(user2).fix().flowable.subscribe(::println)
+      repository.allTasksByUser(user3).fix().flowable.subscribe(::println, ::println)
     }
   }
 }
@@ -591,7 +590,7 @@ Same result one more time:
 UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user)))
 ```
 
-There's also an alternative api provided by Arrow a bit more fancier for [`DeferredK`]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }}):
+There's also an alternative api provided by Arrow a bit more fancier for [`DeferredK`]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }}). It takes care of runBlocking and awaiting on the operations for you:
 
 ```kotlin
 object test {
@@ -604,16 +603,10 @@ object test {
 
     val deferredModuleAlt = Module(DeferredK.async())
     deferredModuleAlt.run {
-      runBlocking {
-        try {
           println(repository.allTasksByUser(user1).fix().unsafeAttemptSync())
           println(repository.allTasksByUser(user2).fix().unsafeAttemptSync())
           println(repository.allTasksByUser(user3).fix().unsafeAttemptSync())
-        } catch (e: UserNotInRemoteStorage) {
-          println(e)
         }
-      }
-    }
   }
 }
 ```

@@ -12,6 +12,7 @@
 [<typeclasses>Comonad]<-[<typeclasses>Bimonad]
 [<typeclasses>Functor]<-[<typeclasses>Comonad]
 [<typeclasses>Functor]<-[<typeclasses>Traverse]
+<<<<<<< HEAD
 [<typeclasses>Foldable]<-[<typeclasses>Traverse]
 [<typeclasses>Applicative]<-[<typeclasses>ApplicativeError]
 [<typeclasses>Functor]<-[<typeclasses>Applicative]
@@ -33,6 +34,13 @@
 [<typeclasses>Index]<-[<instances>Index Instances|MapKIndexInstance|SequenceKIndexInstance|NonEmptyListIndexInstance|ListKIndexInstance]
 [<typeclasses>At]<-[<instances>At Instances|MapKAtInstance|SetKAtInstance]
 [<typeclasses>Each]<-[<instances>Each Instances|ListKEachInstance|OptionEachInstance|EitherEachInstance|TryEachInstance|SequenceKEachInstance|NonEmptyListEachInstance|MapKEachInstance]
+=======
+[<typeclasses>Index]<-[<instances>Index Instances|ListKIndexInstance|MapKIndexInstance|NonEmptyListIndexInstance|SequenceKIndexInstance|ListKFilterIndexInstance|MapKFilterIndexInstance|NonEmptyListFilterIndexInstance|SequenceKFilterIndexInstance]
+[<typeclasses>MonadCombine]<-[<instances>MonadCombine Instances|ListKMonadCombineInstance|StateTMonadCombineInstance]
+[<typeclasses>MonadDefer]<-[<instances>MonadDefer Instances|IOMonadDeferInstance|DeferredKMonadDeferInstance|FlowableKMonadDeferInstance|MaybeKMonadDeferInstance|ObservableKMonadDeferInstance|SingleKMonadDeferInstance|FluxKMonadDeferInstance|MonoKMonadDeferInstance]
+[<typeclasses>MonadDefer]<-[<typeclasses>Async]
+[<typeclasses>MonadError]<-[<instances>MonadError Instances|EitherMonadErrorInstance|OptionMonadErrorInstance|TryMonadErrorInstance|KleisliMonadErrorInstance|StateTMonadErrorInstance|IOMonadErrorInstance|DeferredKMonadErrorInstance|FlowableKMonadErrorInstance|MaybeKMonadErrorInstance|ObservableKMonadErrorInstance|SingleKMonadErrorInstance|FluxKMonadErrorInstance|MonoKMonadErrorInstance]
+>>>>>>> new PR feedback
 [<typeclasses>MonadError]<-[<typeclasses>MonadDefer]
 [<typeclasses>MonadDefer]<-[<typeclasses>Async]
 [<typeclasses>Async]<-[<typeclasses>Effect]
