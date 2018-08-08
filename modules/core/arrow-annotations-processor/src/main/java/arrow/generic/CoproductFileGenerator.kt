@@ -159,6 +159,4 @@ private fun mapFunction(generics: List<String>): String {
     |""".trimMargin()
 }
 
-private fun additionalParameters(count: Int): List<String> {
-    return List(count) { "dummy$it: Unit = Unit" }
-}
+private fun additionalParameters(count: Int): List<String> = List(count) { "dummy$it: Unit = Unit" }
