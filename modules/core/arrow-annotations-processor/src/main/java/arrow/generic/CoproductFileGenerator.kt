@@ -2,11 +2,34 @@ package arrow.generic
 
 import java.io.File
 
-private const val allGenerics = "ABCDEFGHIJKLMNOPQRSTUV"
+private val genericsToClassNames = mapOf(
+        "A" to "First",
+        "B" to "Second",
+        "C" to "Third",
+        "D" to "Fourth",
+        "E" to "Fifth",
+        "F" to "Sixth",
+        "G" to "Seventh",
+        "H" to "Eighth",
+        "I" to "Ninth",
+        "J" to "Tenth",
+        "K" to "Eleventh",
+        "L" to "Twelfth",
+        "M" to "Thirteenth",
+        "N" to "Fourteenth",
+        "O" to "Fifteenth",
+        "P" to "Sixteenth",
+        "Q" to "Seventeenth",
+        "R" to "Eighteenth",
+        "S" to "Nineteenth",
+        "T" to "Twentieth",
+        "U" to "TwentyFirst",
+        "V" to "TwentySecond"
+)
 
 fun generateCoproducts(destination: File) {
-    for (size in 2 until allGenerics.length + 1) {
-        val generics = allGenerics.subSequence(0, size).toList()
+    for (size in 2 until genericsToClassNames.size + 1) {
+        val generics = genericsToClassNames.keys.toList().take(size)
 
         val fileString = listOf(
                 packageName(size),
@@ -34,67 +57,59 @@ private fun packageName(size: Int) = "package arrow.generic.coproduct$size"
 private fun imports() = """|
     |import arrow.core.Option
     |import arrow.core.toOption
-    |import java.lang.IllegalStateException
     |import kotlin.Unit
 |""".trimMargin()
 
-private fun coproductClassDeclaration(generics: List<Char>) = "data class Coproduct${generics.size}<${generics.joinToString()}> internal constructor(val value: Any?)\n"
+private fun coproductClassDeclaration(generics: List<String>): String {
+    val allGenerics = generics.joinToString()
+    val parentClass = "Coproduct${generics.size}<$allGenerics>"
+    val parentClassDeclaration = "sealed class $parentClass\n"
 
-private fun coproductOfConstructors(generics: List<Char>): String {
+    val subClasses = generics.map {
+        "data class ${genericsToClassNames[it]}<$allGenerics>(val ${it.toLowerCase()}: $it): $parentClass()\n"
+    }
+
+    return (listOf(parentClassDeclaration) + subClasses)
+            .joinToString(separator = "")
+}
+
+private fun coproductOfConstructors(generics: List<String>): String {
     val size = generics.size
     val genericsDeclaration = generics.joinToString(separator = ", ")
 
-    val result = StringBuilder()
-
-    for (generic in generics) {
+    return generics.mapIndexed { index, generic ->
         val params = listOf("${generic.toLowerCase()} : $generic") + additionalParameters(generics.indexOf(generic))
 
-        result.append(
-                "fun <$genericsDeclaration> coproductOf(${params.joinToString()}) = Coproduct$size<$genericsDeclaration>(${generic.toLowerCase()})\n"
-        )
-    }
-
-    return result.toString()
+        "fun <$genericsDeclaration> coproductOf(${params.joinToString()}): Coproduct$size<$genericsDeclaration> = ${genericsToClassNames[generic]}<$genericsDeclaration>(${generic.toLowerCase()})\n"
+    }.joinToString(separator = "")
 }
 
-private fun copExtensionConstructors(generics: List<Char>): String {
+private fun copExtensionConstructors(generics: List<String>): String {
+    val size = generics.size
     val genericsDeclaration = generics.joinToString(separator = ", ")
 
-    val result = StringBuilder()
-
-    for (generic in generics) {
+    return generics.mapIndexed { index, generic ->
         val params = additionalParameters(generics.indexOf(generic)).joinToString()
 
-        result.append(
-                "fun <$genericsDeclaration> $generic.cop($params) = coproductOf<$genericsDeclaration>(this)\n"
-        )
-    }
-
-    return result.toString()
+        "fun <$genericsDeclaration> $generic.cop($params): Coproduct$size<$genericsDeclaration> = coproductOf<$genericsDeclaration>(this)\n"
+    }.joinToString(separator = "")
 }
 
-private fun selectFunctions(generics: List<Char>): String {
+private fun selectFunctions(generics: List<String>): String {
     val size = generics.size
-    val result = StringBuilder()
 
-    for (generic in generics) {
+    return generics.mapIndexed { index, generic ->
         val params = additionalParameters(generics.indexOf(generic)).joinToString()
         val receiverGenerics = generics.map { if (it == generic) generic.toString() else "*" }
                 .joinToString(separator = ", ")
 
-        result.append(
-                "inline fun <reified $generic> Coproduct$size<$receiverGenerics>.select($params): Option<$generic> = (value as? $generic).toOption()\n"
-        )
-    }
-
-    return result.toString()
+        "inline fun <reified $generic> Coproduct$size<$receiverGenerics>.select($params): Option<$generic> = (this as? ${genericsToClassNames[generic]})?.${generic.toLowerCase()}.toOption()\n"
+    }.joinToString(separator = "")
 }
 
-private fun foldFunction(generics: List<Char>): String {
+private fun foldFunction(generics: List<String>): String {
     val size = generics.size
     val genericsDeclaration = generics.joinToString(separator = ", ")
-
-    val exceptionMessage = "Invalid Coproduct$size \$this"
 
     val functionGenerics = (generics.map { "reified $it" } + "RESULT").joinToString()
 
@@ -103,22 +118,21 @@ private fun foldFunction(generics: List<Char>): String {
     }.joinToString(separator = ",\n")
 
     val cases = generics.map {
-        "       is $it -> ${it.toLowerCase()}(value)"
+        "       is ${genericsToClassNames[it]} -> ${it.toLowerCase()}(this.${it.toLowerCase()})"
     }.joinToString(separator = "\n")
 
     return """
         |inline fun <$functionGenerics> Coproduct$size<$genericsDeclaration>.fold(
         |$params
         |): RESULT {
-        |   return when (value) {
+        |   return when (this) {
         |$cases
-        |       else -> throw IllegalStateException("$exceptionMessage")
         |   }
         |}
     |""".trimMargin()
 }
 
-private fun mapFunction(generics: List<Char>): String {
+private fun mapFunction(generics: List<String>): String {
     val size = generics.size
     val genericsDeclaration = generics.joinToString(separator = ", ")
 
