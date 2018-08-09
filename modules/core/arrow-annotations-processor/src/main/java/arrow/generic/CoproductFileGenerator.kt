@@ -66,7 +66,7 @@ private fun coproductClassDeclaration(generics: List<String>): String {
     val parentClassDeclaration = "sealed class $parentClass\n"
 
     val subClasses = generics.map {
-        "data class ${genericsToClassNames[it]}<$allGenerics>(val ${it.toLowerCase()}: $it): $parentClass()\n"
+        "internal data class ${genericsToClassNames[it]}<$allGenerics>(val ${it.toLowerCase()}: $it): $parentClass()\n"
     }
 
     return (listOf(parentClassDeclaration) + subClasses)
