@@ -349,7 +349,7 @@ class IOTest : UnitSpec() {
       }.unsafeRunTimed(2.seconds) shouldBe Some(IOCancellationException("User cancellation"))
     }
 
-    "unsafeRunAsyncCancellable should cancel only at operator boundaries" {
+    "unsafeRunAsyncCancellable can cancel only at operator boundaries" {
       IO.async<Unit> { cb ->
         val cancel =
           IO(newSingleThreadContext("RunThread")) { }
