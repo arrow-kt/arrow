@@ -362,6 +362,15 @@ class IOTest : UnitSpec() {
       }.unsafeRunTimed(2.seconds) shouldBe None
     }
 
+    "unsafeRunAsyncCancellable should not silence IOCancellationException thrown by the user" {
+      IO.async<Either<Throwable, Int>> { cb ->
+        IO(newSingleThreadContext("RunThread")) { throw IOCancellationException("TEST") }
+          .unsafeRunAsyncCancellable(OnCancel.Silent) {
+            cb(it.right())
+          }
+      }.unsafeRunTimed(2.seconds) shouldBe Some(Either.Left(IOCancellationException("TEST")))
+    }
+
     "IO.binding should for comprehend over IO" {
       val result = IO.monad().binding {
         val x = IO.just(1).bind()
