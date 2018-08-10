@@ -5,6 +5,6 @@
     <ID>ComplexMethod:FreeApplicative.kt$FreeApplicative$// Beware: smart code @Suppress("UNCHECKED_CAST") fun &lt;G&gt; foldMap(f: FunctionK&lt;F, G&gt;, GA: Applicative&lt;G&gt;): Kind&lt;G, A&gt;</ID>
     <ID>ComplexMethod:tuple.kt$Tuple10EqInstance$override fun Tuple10&lt;A, B, C, D, E, F, G, H, I, J&gt;.eqv(b: Tuple10&lt;A, B, C, D, E, F, G, H, I, J&gt;): Boolean</ID>
     <ID>ComplexMethod:IORunLoop.kt$IORunLoop$fun &lt;A&gt; step(source: IO&lt;A&gt;): IO&lt;A&gt;</ID>
-    <ID>ComplexMethod:IORunLoop.kt$IORunLoop$private fun loop( source: Current, cb: (Either&lt;Throwable, Any?&gt;) -&gt; Unit, rcbRef: RestartCallback?, bFirstRef: BindF?, bRestRef: CallStack?): Unit</ID>
+    <ID>ComplexMethod:IORunLoop.kt$IORunLoop$private fun loop( source: Current, cb: (Either&lt;Throwable, Any?&gt;) -&gt; Unit, rcbRef: RestartCallback?, bFirstRef: BindF?, bRestRef: CallStack?, isCancelled: (() -> Boolean)?): Unit</ID>
   </Whitelist>
 </SmellBaseline>
