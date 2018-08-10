@@ -89,13 +89,13 @@ sealed class IO<out A> : IOOf<A> {
 
   fun unsafeRunAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> Unit): Disposable {
     var ab = false
-    val cancel = onceOnly { ab = true }
+    val cancel = { ab = true }
     val onCancelCb =
       when (onCancel) {
-        Silent ->
-          cb
         ThrowCancellationException ->
-          { either -> either.fold({ if (it !is IOCancellationException) cb(either) }, { cb(either) }) }
+          cb
+        Silent ->
+          { either -> either.fold({ if (!ab && it !is IOCancellationException) cb(either) }, { cb(either) }) }
       }
     IORunLoop.start(this, onCancelCb) { ab }
     return cancel
