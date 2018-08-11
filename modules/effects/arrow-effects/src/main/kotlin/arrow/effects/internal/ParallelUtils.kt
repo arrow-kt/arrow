@@ -11,7 +11,7 @@ import kotlin.coroutines.experimental.suspendCoroutine
 
 /* See par3 */
 internal fun <F, A, B, C> Effect<F>.parMap2(ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, f: (A, B) -> C,
-  /* start is used because this should return Tuple3<Proc, Future, Future>, but there's no good implementation of Future before Java8 */
+  /* start is used because this has to start inside the coroutine. Using Future won't work */
                                             start: (Kind<F, Unit>) -> Unit): Proc<C> = { cc ->
   val a: suspend () -> Either<A, B> = {
     suspendCoroutine { ca: Continuation<Either<A, B>> ->
@@ -37,7 +37,7 @@ internal fun <F, A, B, C> Effect<F>.parMap2(ctx: CoroutineContext, ioA: Kind<F, 
  * Elements at higher depths that are synchronous can prevent elements at a lower depth from starting.
  * Thus, we need to provide solutions for even and uneven amounts of IOs for all to be started at the same depth. */
 internal fun <F, A, B, C, D> Effect<F>.parMap3(ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, ioC: Kind<F, C>, f: (A, B, C) -> D,
-  /* start is used because this should return Tuple4<Proc, Future, Future, Future>, but there's no good implementation of Future before Java8 */
+  /* start is used because this has to start inside the coroutine. Using Future won't work */
                                                start: (Kind<F, Unit>) -> Unit): Proc<D> = { cc ->
   val a: suspend () -> Treither<A, B, C> = {
     suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
