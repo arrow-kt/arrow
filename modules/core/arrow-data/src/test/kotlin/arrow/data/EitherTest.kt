@@ -30,8 +30,8 @@ class EitherTest : UnitSpec() {
         BifunctorLaws.laws(Either.bifunctor(), { Right(it) }, EQ2),
         SemigroupLaws.laws(Either.semigroup(String.semigroup(), String.semigroup()), Either.right("1"), Either.right("2"), Either.right("3"), Either.eq(String.eq(), String.eq())),
         MonoidLaws.laws(Either.monoid(MOL=String.monoid(), MOR = Int.monoid()), Either.right(1), Either.eq(String.eq(), Int.eq())),
-        EqLaws.laws(Either.eq(String.eq(), Int.eq()), { Right(it) }),
-        ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq()), { Right(it) }),
+        EqLaws.laws(Either.eq(String.eq(), Int.eq())) { Right(it) },
+        ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq())) { Right(it) },
         MonadErrorLaws.laws(this, Eq.any(), Eq.any()),
         TraverseLaws.laws(this, this, { Right(it) }, Eq.any()),
         SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ)

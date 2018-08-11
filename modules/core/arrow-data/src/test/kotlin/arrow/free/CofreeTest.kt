@@ -22,10 +22,10 @@ class CofreeTest : UnitSpec() {
     ForCofree<ForOption>() extensions {
       testLaws(ComonadLaws.laws(this, {
         val sideEffect = SideEffect()
-        unfold(Option.functor(), sideEffect.counter, {
+        unfold(Option.functor(), sideEffect.counter) {
           sideEffect.increment()
           if (it % 2 == 0) None else Some(it + 1)
-        })
+        }
       }, Eq { a, b ->
         a.fix().run().fix() == b.fix().run().fix()
       }))
@@ -33,7 +33,7 @@ class CofreeTest : UnitSpec() {
 
     "tailForced should evaluate and return" {
       val sideEffect = SideEffect()
-      val start: Cofree<ForId, Int> = unfold(Id.functor(), sideEffect.counter, { sideEffect.increment(); Id(it + 1) })
+      val start: Cofree<ForId, Int> = unfold(Id.functor(), sideEffect.counter) { sideEffect.increment(); Id(it + 1) }
       sideEffect.counter shouldBe 0
       start.tailForced()
       sideEffect.counter shouldBe 1
@@ -41,7 +41,7 @@ class CofreeTest : UnitSpec() {
 
     "runTail should run once and return" {
       val sideEffect = SideEffect()
-      val start: Cofree<ForId, Int> = unfold(Id.functor(), sideEffect.counter, { sideEffect.increment(); Id(it) })
+      val start: Cofree<ForId, Int> = unfold(Id.functor(), sideEffect.counter) { sideEffect.increment(); Id(it) }
       sideEffect.counter shouldBe 0
       start.runTail()
       sideEffect.counter shouldBe 1
@@ -49,10 +49,10 @@ class CofreeTest : UnitSpec() {
 
     "run should fold until completion" {
       val sideEffect = SideEffect()
-      val start: Cofree<ForOption, Int> = unfold(Option.functor(), sideEffect.counter, {
+      val start: Cofree<ForOption, Int> = unfold(Option.functor(), sideEffect.counter) {
         sideEffect.increment()
         if (it == 5) None else Some(it + 1)
-      })
+      }
       sideEffect.counter shouldBe 0
       start.run()
       sideEffect.counter shouldBe 6
@@ -63,10 +63,10 @@ class CofreeTest : UnitSpec() {
       try {
         val limit = 10000
         val counter = SideEffect()
-        val startThousands: Cofree<ForOption, Int> = unfold(Option.functor(), counter.counter, {
+        val startThousands: Cofree<ForOption, Int> = unfold(Option.functor(), counter.counter) {
           counter.increment()
           if (it == limit) None else Some(it + 1)
-        })
+        }
         startThousands.run()
         throw AssertionError("Run should overflow on a stack-unsafe monad")
       } catch (e: StackOverflowError) {
@@ -76,15 +76,15 @@ class CofreeTest : UnitSpec() {
 
     "run with an stack-safe monad should not blow up the stack" {
       val counter = SideEffect()
-      val startThousands: Cofree<ForEval, Int> = unfold(Eval.functor(), counter.counter, {
+      val startThousands: Cofree<ForEval, Int> = unfold(Eval.functor(), counter.counter) {
         counter.increment()
         Eval.now(it + 1)
-      })
+      }
       startThousands.run()
       counter.counter shouldBe 1
     }
 
-    val startHundred: Cofree<ForOption, Int> = unfold(Option.functor(), 0, { if (it == 100) None else Some(it + 1) })
+    val startHundred: Cofree<ForOption, Int> = unfold(Option.functor(), 0) { if (it == 100) None else Some(it + 1) }
 
     "mapBranchingRoot should modify the value of the functor" {
       val mapped = startHundred.mapBranchingRoot(object : FunctionK<ForOption, ForOption> {
@@ -114,7 +114,7 @@ class CofreeTest : UnitSpec() {
       cata shouldBe expected
     }
 
-    val startTwoThousand: Cofree<ForOption, Int> = unfold(Option.functor(), 0, { if (it == 2000) None else Some(it + 1) })
+    val startTwoThousand: Cofree<ForOption, Int> = unfold(Option.functor(), 0) { if (it == 2000) None else Some(it + 1) }
 
     with(startTwoThousand) {
       "cata with an stack-unsafe monad should blow up the stack" {
