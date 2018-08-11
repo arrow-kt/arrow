@@ -1,9 +1,6 @@
 package arrow.effects.internal
 
-import arrow.core.Either
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
+import arrow.core.*
 import arrow.effects.IO
 import arrow.effects.typeclasses.Duration
 import java.util.*
@@ -73,6 +70,26 @@ object Platform {
       is Either.Left -> throw eitherRef.a
       is Either.Right -> Some(eitherRef.b)
     }
+  }
+}
+
+internal class Future<A> {
+  private val latch = OneShotLatch()
+  private var ref: A? = null
+
+  fun unsafeGet(): A {
+    latch.acquireSharedInterruptibly(1)
+    return ref!!
+  }
+
+  fun get(limit: Duration): Option<A> {
+    latch.tryAcquireSharedNanos(1, limit.nanoseconds)
+    return ref.toOption()
+  }
+
+  fun set(value: A) {
+    ref = value
+    latch.releaseShared(1)
   }
 }
 
