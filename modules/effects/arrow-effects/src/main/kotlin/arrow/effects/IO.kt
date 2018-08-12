@@ -2,13 +2,19 @@ package arrow.effects
 
 import arrow.core.*
 import arrow.core.Either.Left
+import arrow.effects.OnCancel.Silent
+import arrow.effects.OnCancel.ThrowCancellationException
+import arrow.effects.data.internal.IOCancellationException
 import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
+import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import kotlin.coroutines.experimental.CoroutineContext
+
+enum class OnCancel { ThrowCancellationException, Silent }
 
 @higherkind
 sealed class IO<out A> : IOOf<A> {
@@ -76,7 +82,25 @@ sealed class IO<out A> : IOOf<A> {
     IO { unsafeRunAsync(cb.andThen { it.fix().unsafeRunAsync { } }) }
 
   fun unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
-    IORunLoop.start(this, cb)
+    IORunLoop.start(this, cb, null)
+
+  fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
+    IO { unsafeRunAsyncCancellable(onCancel, cb.andThen { it.fix().unsafeRunAsync { } }) }
+
+  fun unsafeRunAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> Unit): Disposable {
+    var cancelled = false
+    val cancel = { cancelled = true }
+    val isCancelled = { cancelled }
+    val onCancelCb =
+      when (onCancel) {
+        ThrowCancellationException ->
+          cb
+        Silent ->
+          { either -> either.fold({ if (!cancelled || it !is IOCancellationException) cb(either) }, { cb(either) }) }
+      }
+    IORunLoop.start(this, onCancelCb, isCancelled)
+    return cancel
+  }
 
   fun unsafeRunSync(): A =
     unsafeRunTimed(Duration.INFINITE)
