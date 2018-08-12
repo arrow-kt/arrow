@@ -4,6 +4,7 @@ import arrow.core.*
 import arrow.effects.IO
 import arrow.effects.typeclasses.Duration
 import java.util.*
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
 
@@ -74,22 +75,22 @@ object Platform {
 }
 
 internal class Future<A> {
-  private val latch = OneShotLatch()
+  private val latch = CountDownLatch(1)
   private var ref: A? = null
 
   fun unsafeGet(): A {
-    latch.acquireSharedInterruptibly(1)
+    latch.await()
     return ref!!
   }
 
   fun get(limit: Duration): Option<A> {
-    latch.tryAcquireSharedNanos(1, limit.nanoseconds)
+    latch.await(limit.amount, limit.timeUnit)
     return ref.toOption()
   }
 
   fun set(value: A) {
     ref = value
-    latch.releaseShared(1)
+    latch.countDown()
   }
 }
 
