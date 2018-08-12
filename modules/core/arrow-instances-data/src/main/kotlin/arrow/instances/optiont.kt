@@ -36,7 +36,7 @@ interface OptionTMonadInstance<F> : OptionTApplicativeInstance<F>, Monad<OptionT
 
   override fun <A, B> Kind<OptionTPartialOf<F>, A>.map(f: (A) -> B): OptionT<F, B> = fix().map(FF(), f)
 
-  override fun <A, B> Kind<OptionTPartialOf<F>, A>.flatMap(f: (A) -> Kind<OptionTPartialOf<F>, B>): OptionT<F, B> = fix().flatMap(FF(), { f(it).fix() })
+  override fun <A, B> Kind<OptionTPartialOf<F>, A>.flatMap(f: (A) -> Kind<OptionTPartialOf<F>, B>): OptionT<F, B> = fix().flatMap(FF()) { f(it).fix() }
 
   override fun <A, B> Kind<OptionTPartialOf<F>, A>.ap(ff: Kind<OptionTPartialOf<F>, (A) -> B>): OptionT<F, B> =
     fix().ap(FF(), ff)
@@ -89,7 +89,7 @@ interface OptionTSemigroupKInstance<F> : SemigroupK<OptionTPartialOf<F>> {
 
   fun FF(): Monad<F>
 
-  override fun <A> Kind<OptionTPartialOf<F>, A>.combineK(y: Kind<OptionTPartialOf<F>, A>): OptionT<F, A> = fix().orElse(FF(), { y.fix() })
+  override fun <A> Kind<OptionTPartialOf<F>, A>.combineK(y: Kind<OptionTPartialOf<F>, A>): OptionT<F, A> = fix().orElse(FF()) { y.fix() }
 }
 
 @instance(OptionT::class)

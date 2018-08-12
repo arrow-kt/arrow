@@ -44,7 +44,7 @@ class FreeApplicativeTest : UnitSpec() {
 
     ForFreeApplicative<OpsAp.F>() extensions {
       testLaws(
-        EqLaws.laws(EQ, { OpsAp.value(it) }),
+        EqLaws.laws(EQ) { OpsAp.value(it) },
         ApplicativeLaws.laws(OpsAp, EQ),
         ApplicativeLaws.laws(this, EQ)
       )
@@ -61,9 +61,9 @@ class FreeApplicativeTest : UnitSpec() {
       val loops = 10000
       val start = 333
       val r = FreeApplicative.liftF(NonEmptyList.of(start))
-      val rr = (1..loops).toList().fold(r, { v, _ -> v.ap(FreeApplicative.liftF(NonEmptyList.of({ a: Int -> a + 1 }))) })
+      val rr = (1..loops).toList().fold(r) { v, _ -> v.ap(FreeApplicative.liftF(NonEmptyList.of({ a: Int -> a + 1 }))) }
       rr.foldK(NonEmptyList.applicative()) shouldBe NonEmptyList.of(start + loops)
-      val rx = (1..loops).toList().foldRight(r, { _, v -> v.ap(FreeApplicative.liftF(NonEmptyList.of({ a: Int -> a + 1 }))) })
+      val rx = (1..loops).toList().foldRight(r) { _, v -> v.ap(FreeApplicative.liftF(NonEmptyList.of({ a: Int -> a + 1 }))) }
       rx.foldK(NonEmptyList.applicative()) shouldBe NonEmptyList.of(start + loops)
     }
   }

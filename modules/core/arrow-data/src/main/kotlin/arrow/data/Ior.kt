@@ -145,7 +145,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     fold({ lc }, { f(it, lc) }, { _, b -> f(b, lc) })
 
   fun <G, C> traverse(GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Ior<A, C>> = GA.run {
-    fold({ just(Left(it)) }, { f(it).map({ Right<A, C>(it) }) }, { _, b -> f(b).map({ Right<A, C>(it) }) })
+    fold({ just(Left(it)) }, { f(it).map { Right<A, C>(it) } }, { _, b -> f(b).map { Right<A, C>(it) } })
   }
 
   /**

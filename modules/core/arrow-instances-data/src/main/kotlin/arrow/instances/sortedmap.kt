@@ -32,10 +32,10 @@ interface SortedMapKSemigroupInstance<A : Comparable<A>, B> : Semigroup<SortedMa
   fun SG(): Semigroup<B>
 
   override fun SortedMapKOf<A, B>.combine(b: SortedMapKOf<A, B>): SortedMapKOf<A, B> =
-    if (this.fix().size < b.fix().size) this.fix().foldLeft<B>(b.fix(), { my, (k, b) ->
+    if (this.fix().size < b.fix().size) this.fix().foldLeft<B>(b.fix()) { my, (k, b) ->
       my.updated(k, SG().run { b.maybeCombine(my[k]) })
-    })
-    else b.fix().foldLeft<B>(this.fix(), { my: SortedMapK<A, B>, (k, a) -> my.updated(k, SG().run { a.maybeCombine(my[k]) }) })
+    }
+    else b.fix().foldLeft<B>(this.fix()) { my: SortedMapK<A, B>, (k, a) -> my.updated(k, SG().run { a.maybeCombine(my[k]) }) }
 }
 
 @instance(SortedMapK::class)

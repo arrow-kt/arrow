@@ -60,9 +60,9 @@ fun <A> ListInstances.filterIndex(): FilterIndex<List<A>, Int, A> = ListFilterIn
 interface ListFilterIndexInstance<A> : FilterIndex<List<A>, Int, A> {
   override fun filter(p: (Int) -> Boolean): Traversal<List<A>, A> = object : Traversal<List<A>, A> {
     override fun <F> modifyF(FA: Applicative<F>, s: List<A>, f: (A) -> Kind<F, A>): Kind<F, List<A>> = FA.run {
-      s.mapIndexed { index, a -> a toT index }.k().traverse(FA, { (a, j) ->
+      s.mapIndexed { index, a -> a toT index }.k().traverse(FA) { (a, j) ->
         if (p(j)) f(a) else just(a)
-      }).map { it.list }
+      }.map { it.list }
     }
   }
 

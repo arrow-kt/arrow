@@ -54,7 +54,7 @@ class FreeTest : UnitSpec() {
 
     ForFree<Ops.F>() extensions {
       testLaws(
-        EqLaws.laws(EQ, { Ops.value(it) }),
+        EqLaws.laws(EQ) { Ops.value(it) },
         MonadLaws.laws(Ops, EQ),
         MonadLaws.laws(this, EQ)
       )
