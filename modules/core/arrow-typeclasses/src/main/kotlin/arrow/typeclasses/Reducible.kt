@@ -43,7 +43,7 @@ interface Reducible<F> : Foldable<F> {
   fun <A, B> Kind<F, A>.reduceRightTo(f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<B>
 
   override fun <A, B> Kind<F, A>.reduceRightToOption(f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<Option<B>> =
-    reduceRightTo(f, g).map({ Some(it) })
+    reduceRightTo(f, g).map { Some(it) }
 
   override fun <A> Kind<F, A>.isEmpty(): Boolean = false
 
@@ -53,7 +53,7 @@ interface Reducible<F> : Foldable<F> {
    * Reduce a F<A> value using the given Semigroup<A>.
    */
   fun <A> Kind<F, A>.reduce(SG: Semigroup<A>): A = SG.run {
-    reduceLeft({ a, b -> a.combine(b) })
+    reduceLeft { a, b -> a.combine(b) }
   }
 
   /**
@@ -69,7 +69,7 @@ interface Reducible<F> : Foldable<F> {
    * Apply f to each element of fa and combine them using the given Semigroup<B>.
    */
   fun <A, B> Kind<F, A>.reduceMap(SG: Semigroup<B>, f: (A) -> B): B = SG.run {
-    reduceLeftTo(f, { b, a -> b.combine(f(a)) })
+    reduceLeftTo(f) { b, a -> b.combine(f(a)) }
   }
 }
 
@@ -90,20 +90,20 @@ interface NonEmptyReducible<F, G> : Reducible<F> {
   }
 
   override fun <A, B> Kind<F, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = FG().run {
-    Eval.Always({ split() }).flatMap { (a, ga) -> f(a, ga.foldRight(lb, f)) }
+    Eval.Always { split() }.flatMap { (a, ga) -> f(a, ga.foldRight(lb, f)) }
   }
 
   override fun <A, B> Kind<F, A>.reduceLeftTo(f: (A) -> B, g: (B, A) -> B): B = FG().run {
     val (a, ga) = split()
-    ga.foldLeft(f(a), { bb, aa -> g(bb, aa) })
+    ga.foldLeft(f(a)) { bb, aa -> g(bb, aa) }
   }
 
   override fun <A, B> Kind<F, A>.reduceRightTo(f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<B> = FG().run {
-    Eval.Always({ split() }).flatMap { (a, ga) ->
+    Eval.Always { split() }.flatMap { (a, ga) ->
       ga.reduceRightToOption(f, g).flatMap { option ->
         when (option) {
           is Some<B> -> g(a, Eval.Now(option.t))
-          is None -> Eval.Later({ f(a) })
+          is None -> Eval.Later { f(a) }
         }
       }
     }
@@ -142,6 +142,6 @@ interface NonEmptyReducible<F, G> : Reducible<F> {
 
   fun <A, B> Kind<F, A>.foldM_(M: Monad<G>, z: B, f: (B, A) -> Kind<G, B>): Kind<G, B> = M.run {
     val (a, ga) = split()
-    return f(z, a).flatMap({ FG().run { ga.foldM(M, it, f) } })
+    return f(z, a).flatMap { FG().run { ga.foldM(M, it, f) } }
   }
 }

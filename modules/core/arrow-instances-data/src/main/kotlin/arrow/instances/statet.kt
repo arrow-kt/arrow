@@ -48,7 +48,7 @@ interface StateTMonadInstance<F, S> : StateTApplicativeInstance<F, S>, Monad<Sta
     StateT.tailRecM(FF(), a, f)
 
   override fun <A, B> Kind<StateTPartialOf<F, S>, A>.ap(ff: Kind<StateTPartialOf<F, S>, (A) -> B>): StateT<F, S, B> =
-    ff.fix().map2(FF(), fix(), { f, a -> f(a) })
+    ff.fix().map2(FF(), fix()) { f, a -> f(a) }
 
 }
 
@@ -71,7 +71,7 @@ interface StateTApplicativeErrorInstance<F, S, E> : StateTApplicativeInstance<F,
   override fun <A> raiseError(e: E): Kind<StateTPartialOf<F, S>, A> = StateT.lift(FF(), FF().raiseError(e))
 
   override fun <A> Kind<StateTPartialOf<F, S>, A>.handleErrorWith(f: (E) -> Kind<StateTPartialOf<F, S>, A>): StateT<F, S, A> =
-    StateT(FF().just({ s -> FF().run { runM(FF(), s).handleErrorWith({ e -> f(e).runM(FF(), s) }) } }))
+    StateT(FF().just({ s -> FF().run { runM(FF(), s).handleErrorWith { e -> f(e).runM(FF(), s) } } }))
 }
 
 @instance(StateT::class)

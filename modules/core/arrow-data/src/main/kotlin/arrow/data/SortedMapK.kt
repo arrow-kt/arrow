@@ -48,9 +48,9 @@ data class SortedMapK<A : Comparable<A>, B>(val map: SortedMap<A, B>) : SortedMa
     this.map.foldLeft(c) { m: SortedMap<A, C>, (a, b) -> f(m.k(), Tuple2(a, b)) }.k()
 
   fun <G, C> traverse(GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, SortedMapK<A, C>> = GA.run {
-    (Foldable.iterateRight(map.iterator(), Eval.always { just(sortedMapOf<A, C>().k()) }))({ kv, lbuf ->
+    (Foldable.iterateRight(map.iterator(), Eval.always { just(sortedMapOf<A, C>().k()) })) { kv, lbuf ->
       f(kv.value).map2Eval(lbuf) { (mapOf(kv.key to it.a).k() + it.b).toSortedMap().k() }
-    }).value()
+    }.value()
   }
 
   companion object
@@ -63,7 +63,7 @@ fun <A : Comparable<A>, B> Option<Tuple2<A, B>>.k(): SortedMapK<A, B> = this.fol
   { mapEntry -> sortedMapOf<A, B>(mapEntry.a to mapEntry.b).k() }
 )
 
-inline fun <K: Comparable<K>, V, G> SortedMapKOf<K, Kind<G, V>>.sequence(GA: Applicative<G>): Kind<G, SortedMapK<K, V>> =
+inline fun <K : Comparable<K>, V, G> SortedMapKOf<K, Kind<G, V>>.sequence(GA: Applicative<G>): Kind<G, SortedMapK<K, V>> =
   fix().traverse(GA, ::identity)
 
 fun <A : Comparable<A>, B> List<Map.Entry<A, B>>.k(): SortedMapK<A, B> =

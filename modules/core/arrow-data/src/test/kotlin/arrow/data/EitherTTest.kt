@@ -31,9 +31,9 @@ class EitherTTest : UnitSpec() {
       forAll { i: Int, j: Int ->
         val left: Either<Int, Int> = Left(i)
         val right: Either<Int, Int> = Right(j)
-        EitherT(Option(left)).mapLeft(Option.functor(), { it + 1 }) == EitherT(Option(Left(i + 1))) &&
-          EitherT(Option(right)).mapLeft(Option.functor(), { it + 1 }) == EitherT(Option(right)) &&
-          EitherT(Option.empty<Either<Int, Int>>()).mapLeft(Option.functor(), { it + 1 }) == EitherT(Option.empty<Either<Int, Int>>())
+        EitherT(Option(left)).mapLeft(Option.functor()) { it + 1 } == EitherT(Option(Left(i + 1))) &&
+          EitherT(Option(right)).mapLeft(Option.functor()) { it + 1 } == EitherT(Option(right)) &&
+          EitherT(Option.empty<Either<Int, Int>>()).mapLeft(Option.functor()) { it + 1 } == EitherT(Option.empty<Either<Int, Int>>())
       }
     }
 
