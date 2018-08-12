@@ -67,27 +67,27 @@ fun <A, B> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>): IO<Eit
       a.flatMap { IO { complete(it.left().right()) } },
       b.flatMap { IO { complete(it.right().right()) } },
       ::Tuple2
-    ).unsafeRunAsyncCancellable { it.fold({ cb(it.left()) }, { /* should never happen */ }) }
+    ).unsafeRunAsyncCancellable { it.fold({ complete(it.left()) }, { /* should never happen */ }) }
 
     cancel.set(disposeParallel)
   }
 
 fun <A, B, C> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>, c: IO<C>): IO<Either<A, Either<B, C>>> =
-  IO.async { asyncCb ->
+  IO.async { cb ->
 
     val cancel: Future<Disposable> = Future()
 
-    val cb = onceOnly { result: Either<Throwable, Either<A, Either<B, C>>> ->
+    val complete = onceOnly { result: Either<Throwable, Either<A, Either<B, C>>> ->
       cancel.unsafeGet().invoke()
-      asyncCb(result)
+      cb(result)
     }
 
     val disposeParallel = parallelMapN(ctx,
-      a.flatMap { IO { cb(it.left().right()) } },
-      b.flatMap { IO { cb(it.left().right().right()) } },
-      c.flatMap { IO { cb(it.right().right().right()) } },
+      a.flatMap { IO { complete(it.left().right()) } },
+      b.flatMap { IO { complete(it.left().right().right()) } },
+      c.flatMap { IO { complete(it.right().right().right()) } },
       ::Tuple3
-    ).unsafeRunAsyncCancellable { it.fold({ asyncCb(it.left()) }, { /* should never happen */ }) }
+    ).unsafeRunAsyncCancellable { it.fold({ complete(it.left()) }, { /* should never happen */ }) }
 
     cancel.set(disposeParallel)
   }
