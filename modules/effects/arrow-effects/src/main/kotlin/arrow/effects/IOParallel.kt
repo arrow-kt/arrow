@@ -92,56 +92,44 @@ fun <A, B, C> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>, c: I
     cancel.set(disposeParallel)
   }
 
-//fun <A, B, C, D> IO.Companion.raceN(a: IO<A>, b: IO<B>, c: IO<C>, d: IO<D>): IO<Either<Either<A, B>, Either<C, D>>> =
-//  raceN(
-//    raceN(a, b),
-//    raceN(c, d)
-//  )
-//
-//fun <A, B, C, D, E> IO.Companion.raceN(a: IO<A>, b: IO<B>, c: IO<C>, d: IO<D>, e: IO<E>): IO<Either<Either<A, Either<B, C>>, Either<D, E>>> =
-//  raceN(
-//    raceN(a, b, c),
-//    raceN(d, e)
-//  )
-//
-//fun <A, B, C, D, E, F> IO.Companion.raceN(a: IO<A>, b: IO<B>, c: IO<C>, d: IO<D>, e: IO<E>, f: IO<F>): IO<Either<Either<A, B>, Either<Either<C, D>, Either<E, F>>>> =
-//  raceN(
-//    raceN(a, b),
-//    raceN(c, d),
-//    raceN(e, f)
-//  )
-//
-//fun <A, B, C, D, E, F, G> IO.Companion.raceN(a: IO<A>, b: IO<B>, c: IO<C>, d: IO<D>, e: IO<E>, f: IO<F>, g: IO<G>): IO<Either<Either<A, Either<B, C>>, Either<Either<D, E>, Either<F, G>>>> =
-//  raceN(
-//    raceN(a, b, c),
-//    raceN(d, e),
-//    raceN(f, g)
-//  )
-//
-//fun <A, B, C, D, E, F, G, H> IO.Companion.raceN(a: IO<A>, b: IO<B>, c: IO<C>, d: IO<D>, e: IO<E>, f: IO<F>, g: IO<G>, h: IO<H>): IO<Either<Either<Either<A, B>, Either<C, D>>, Either<Either<E, F>, Either<G, H>>>> =
-//  raceN(
-//    raceN(a, b),
-//    raceN(c, d),
-//    raceN(e, f),
-//    raceN(g, h)
-//  )
-//
-//fun <A, B, C, D, E, F, G, H, I> IO.Companion.raceN(a: IO<A>, b: IO<B>, c: IO<C>, d: IO<D>, e: IO<E>, f: IO<F>, g: IO<G>, h: IO<H>, i: IO<I>): IO<Either<Either<Either<A, Either<B, C>>, Either<D, E>>, Either<Either<F, G>, Either<H, I>>>> =
-//  raceN(
-//    raceN(a, b, c),
-//    raceN(d, e),
-//    raceN(f, g),
-//    raceN(h, i)
-//  )
+fun <A, B, C, D> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>, c: IO<C>, d: IO<D>): IO<Either<Either<A, B>, Either<C, D>>> =
+  raceN(ctx,
+    raceN(ctx, a, b),
+    raceN(ctx, c, d)
+  )
 
-fun <A> IO.Companion.race(l: List<IO<A>>): IO<A> =
-  IO.async { asyncCb ->
-    val cancellation: Future<List<Disposable>> = Future()
+fun <A, B, C, D, E> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>, c: IO<C>, d: IO<D>, e: IO<E>): IO<Either<Either<A, Either<B, C>>, Either<D, E>>> =
+  raceN(ctx,
+    raceN(ctx, a, b, c),
+    raceN(ctx, d, e)
+  )
 
-    val cb = onceOnly { result: Either<Throwable, A> ->
-      cancellation.unsafeGet().let { it.forEach { it() } }
-      asyncCb(result)
-    }
+fun <A, B, C, D, E, F> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>, c: IO<C>, d: IO<D>, e: IO<E>, f: IO<F>): IO<Either<Either<A, B>, Either<Either<C, D>, Either<E, F>>>> =
+  raceN(ctx,
+    raceN(ctx, a, b),
+    raceN(ctx, c, d),
+    raceN(ctx, e, f)
+  )
 
-    cancellation.set(l.map { it.unsafeRunAsyncCancellable(cb = cb) })
-  }
+fun <A, B, C, D, E, F, G> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>, c: IO<C>, d: IO<D>, e: IO<E>, f: IO<F>, g: IO<G>): IO<Either<Either<A, Either<B, C>>, Either<Either<D, E>, Either<F, G>>>> =
+  raceN(ctx,
+    raceN(ctx, a, b, c),
+    raceN(ctx, d, e),
+    raceN(ctx, f, g)
+  )
+
+fun <A, B, C, D, E, F, G, H> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>, c: IO<C>, d: IO<D>, e: IO<E>, f: IO<F>, g: IO<G>, h: IO<H>): IO<Either<Either<Either<A, B>, Either<C, D>>, Either<Either<E, F>, Either<G, H>>>> =
+  raceN(ctx,
+    raceN(ctx, a, b),
+    raceN(ctx, c, d),
+    raceN(ctx, e, f),
+    raceN(ctx, g, h)
+  )
+
+fun <A, B, C, D, E, F, G, H, I> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>, c: IO<C>, d: IO<D>, e: IO<E>, f: IO<F>, g: IO<G>, h: IO<H>, i: IO<I>): IO<Either<Either<Either<A, Either<B, C>>, Either<D, E>>, Either<Either<F, G>, Either<H, I>>>> =
+  raceN(ctx,
+    raceN(ctx, a, b, c),
+    raceN(ctx, d, e),
+    raceN(ctx, f, g),
+    raceN(ctx, h, i)
+  )
