@@ -110,33 +110,33 @@ class TraversalTest : UnitSpec() {
     with(listKTraverse) {
 
       "Getting all targets of a traversal" {
-        forAll(Gen.list(Gen.int()), { ints ->
+        forAll(Gen.list(Gen.int())) { ints ->
           getAll(ints.k()) == ints.k()
-        })
+        }
       }
 
       "Folding all the values of a traversal" {
-        forAll(Gen.list(Gen.int()), { ints ->
+        forAll(Gen.list(Gen.int())) { ints ->
           fold(Int.monoid(), ints.k()) == ints.sum()
-        })
+        }
       }
 
       "Combining all the values of a traversal" {
-        forAll(Gen.list(Gen.int()), { ints ->
+        forAll(Gen.list(Gen.int())) { ints ->
           combineAll(Int.monoid(), ints.k()) == ints.sum()
-        })
+        }
       }
 
       "Finding an number larger than 10" {
-        forAll(Gen.list(Gen.choose(-100, 100)), { ints ->
+        forAll(Gen.list(Gen.choose(-100, 100))) { ints ->
           find(ints.k()) { it > 10 } == Option.fromNullable(ints.firstOrNull { it > 10 })
-        })
+        }
       }
 
       "Get the length from a traversal" {
-        forAll(Gen.list(Gen.int()), { ints ->
+        forAll(Gen.list(Gen.int())) { ints ->
           size(ints.k()) == ints.size
-        })
+        }
       }
     }
 

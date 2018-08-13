@@ -19,14 +19,14 @@ import io.kotlintest.properties.forAll
 object FoldableLaws {
   inline fun <F> laws(FF: Foldable<F>, noinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>): List<Law> =
     listOf(
-      Law("Foldable Laws: Left fold consistent with foldMap", { FF.leftFoldConsistentWithFoldMap(cf, EQ) }),
-      Law("Foldable Laws: Right fold consistent with foldMap", { FF.rightFoldConsistentWithFoldMap(cf, EQ) }),
-      Law("Foldable Laws: Exists is consistent with find", { FF.existsConsistentWithFind(cf) }),
-      Law("Foldable Laws: Exists is lazy", { FF.existsIsLazy(cf, EQ) }),
-      Law("Foldable Laws: ForAll is lazy", { FF.forAllIsLazy(cf, EQ) }),
-      Law("Foldable Laws: ForAll consistent with exists", { FF.forallConsistentWithExists(cf) }),
-      Law("Foldable Laws: ForAll returns true if isEmpty", { FF.forallReturnsTrueIfEmpty(cf) }),
-      Law("Foldable Laws: FoldM for Id is equivalent to fold left", { FF.foldMIdIsFoldL(cf, EQ) })
+      Law("Foldable Laws: Left fold consistent with foldMap") { FF.leftFoldConsistentWithFoldMap(cf, EQ) },
+      Law("Foldable Laws: Right fold consistent with foldMap") { FF.rightFoldConsistentWithFoldMap(cf, EQ) },
+      Law("Foldable Laws: Exists is consistent with find") { FF.existsConsistentWithFind(cf) },
+      Law("Foldable Laws: Exists is lazy") { FF.existsIsLazy(cf, EQ) },
+      Law("Foldable Laws: ForAll is lazy") { FF.forAllIsLazy(cf, EQ) },
+      Law("Foldable Laws: ForAll consistent with exists") { FF.forallConsistentWithExists(cf) },
+      Law("Foldable Laws: ForAll returns true if isEmpty") { FF.forallReturnsTrueIfEmpty(cf) },
+      Law("Foldable Laws: FoldM for Id is equivalent to fold left") { FF.foldMIdIsFoldL(cf, EQ) }
     )
 
   fun <F> Foldable<F>.leftFoldConsistentWithFoldMap(cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>) =

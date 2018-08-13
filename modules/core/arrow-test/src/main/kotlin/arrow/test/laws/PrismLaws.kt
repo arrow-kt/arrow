@@ -10,21 +10,20 @@ import io.kotlintest.properties.forAll
 object PrismLaws {
 
   inline fun <A, B> laws(prism: Prism<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQOptionB: Eq<Option<B>>): List<Law> = listOf(
-    Law("Prism law: partial round trip one way", { prism.partialRoundTripOneWay(aGen, EQA) }),
-    Law("Prism law: round trip other way", { prism.roundTripOtherWay(bGen, EQOptionB) }),
-    Law("Prism law: modify identity", { prism.modifyIdentity(aGen, EQA) }),
-    Law("Prism law: compose modify", { prism.composeModify(aGen, funcGen, EQA) }),
-    Law("Prism law: consistent set modify", { prism.consistentSetModify(aGen, bGen, EQA) }),
-    Law("Prism law: consistent modify with modifyF Id", { prism.consistentModifyModifyFId(aGen, funcGen, EQA) }),
-    Law("Prism law: consistent get option modify id", { prism.consistentGetOptionModifyId(aGen, EQOptionB) })
+    Law("Prism law: partial round trip one way") { prism.partialRoundTripOneWay(aGen, EQA) },
+    Law("Prism law: round trip other way") { prism.roundTripOtherWay(bGen, EQOptionB) },
+    Law("Prism law: modify identity") { prism.modifyIdentity(aGen, EQA) },
+    Law("Prism law: compose modify") { prism.composeModify(aGen, funcGen, EQA) },
+    Law("Prism law: consistent set modify") { prism.consistentSetModify(aGen, bGen, EQA) },
+    Law("Prism law: consistent modify with modifyF Id") { prism.consistentModifyModifyFId(aGen, funcGen, EQA) },
+    Law("Prism law: consistent get option modify id") { prism.consistentGetOptionModifyId(aGen, EQOptionB) }
   )
 
-  fun <A, B> Prism<A, B>.partialRoundTripOneWay(aGen: Gen<A>, EQA: Eq<A>): Unit = run{
+  fun <A, B> Prism<A, B>.partialRoundTripOneWay(aGen: Gen<A>, EQA: Eq<A>): Unit =
     forAll(aGen) { a ->
       getOrModify(a).fold(::identity, ::reverseGet)
         .equalUnderTheLaw(a, EQA)
     }
-  }
 
   fun <A, B> Prism<A, B>.roundTripOtherWay(bGen: Gen<B>, EQOptionB: Eq<Option<B>>): Unit =
     forAll(bGen) { b ->
@@ -49,7 +48,7 @@ object PrismLaws {
 
   fun <A, B> Prism<A, B>.consistentModifyModifyFId(aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>): Unit =
     forAll(aGen, funcGen) { a, f ->
-      modifyF(Id.applicative(), a, { Id.just(f(it)) }).value().equalUnderTheLaw(modify(a, f), EQA)
+      modifyF(Id.applicative(), a) { Id.just(f(it)) }.value().equalUnderTheLaw(modify(a, f), EQA)
     }
 
   fun <A, B> Prism<A, B>.consistentGetOptionModifyId(aGen: Gen<A>, EQOptionB: Eq<Option<B>>): Unit =
@@ -58,7 +57,7 @@ object PrismLaws {
         override fun Option<B>.combine(b: Option<B>): Option<B> = orElse { b }
 
         override fun empty(): Option<B> = None
-      }), a, { Const(Some(it)) }).value().equalUnderTheLaw(getOption(a), EQOptionB)
+      }), a) { Const(Some(it)) }.value().equalUnderTheLaw(getOption(a), EQOptionB)
     }
 
 }

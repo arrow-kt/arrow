@@ -16,21 +16,21 @@ import kotlinx.coroutines.experimental.newSingleThreadContext
 object MonadSuspendLaws {
   inline fun <F> laws(SC: MonadDefer<F>, EQ: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>, EQERR: Eq<Kind<F, Int>> = EQ): List<Law> =
     MonadErrorLaws.laws(SC, EQERR, EQ_EITHER, EQ) + listOf(
-      Law("Sync bind: binding blocks", { SC.asyncBind(EQ) }),
-      Law("Sync bind: binding failure", { SC.asyncBindError(EQERR) }),
-      Law("Sync bind: unsafe binding", { SC.asyncBindUnsafe(EQ) }),
-      Law("Sync bind: unsafe binding failure", { SC.asyncBindUnsafeError(EQERR) }),
-      Law("Sync bind: binding in parallel", { SC.asyncParallelBind(EQ) }),
-      Law("Sync bind: binding cancellation before flatMap", { SC.asyncCancellationBefore(EQ) }),
-      Law("Sync bind: binding cancellation after flatMap", { SC.asyncCancellationAfter(EQ) }),
-      Law("Sync bind: bindingInContext cancellation before flatMap", { SC.inContextCancellationBefore(EQ) }),
-      Law("Sync bind: bindingInContext cancellation after flatMap", { SC.inContextCancellationAfter(EQ) }),
-      Law("Sync bind: bindingInContext throw equivalent to raiseError", { SC.inContextErrorThrow(EQERR) }),
-      Law("Sync bind: monad comprehensions binding in other threads equivalence", { SC.monadComprehensionsBindInContextEquivalent(EQ) })
+      Law("Sync bind: binding blocks") { SC.asyncBind(EQ) },
+      Law("Sync bind: binding failure") { SC.asyncBindError(EQERR) },
+      Law("Sync bind: unsafe binding") { SC.asyncBindUnsafe(EQ) },
+      Law("Sync bind: unsafe binding failure") { SC.asyncBindUnsafeError(EQERR) },
+      Law("Sync bind: binding in parallel") { SC.asyncParallelBind(EQ) },
+      Law("Sync bind: binding cancellation before flatMap") { SC.asyncCancellationBefore(EQ) },
+      Law("Sync bind: binding cancellation after flatMap") { SC.asyncCancellationAfter(EQ) },
+      Law("Sync bind: bindingInContext cancellation before flatMap") { SC.inContextCancellationBefore(EQ) },
+      Law("Sync bind: bindingInContext cancellation after flatMap") { SC.inContextCancellationAfter(EQ) },
+      Law("Sync bind: bindingInContext throw equivalent to raiseError") { SC.inContextErrorThrow(EQERR) },
+      Law("Sync bind: monad comprehensions binding in other threads equivalence") { SC.monadComprehensionsBindInContextEquivalent(EQ) }
     )
 
   fun <F> MonadDefer<F>.asyncBind(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genIntSmall(), genIntSmall(), genIntSmall(), { x: Int, y: Int, z: Int ->
+    forAll(genIntSmall(), genIntSmall(), genIntSmall()) { x: Int, y: Int, z: Int ->
       val (bound, dispose) = bindingCancellable {
         val a = bindDefer { x }
         val b = bindDefer { a + y }
@@ -38,18 +38,18 @@ object MonadSuspendLaws {
         c
       }
       bound.equalUnderTheLaw(just<Int>(x + y + z), EQ)
-    })
+    }
 
   fun <F> MonadDefer<F>.asyncBindError(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genThrowable(), { e: Throwable ->
+    forAll(genThrowable()) { e: Throwable ->
       val (bound: Kind<F, Int>, cancel) = bindingCancellable<F, Int> {
         bindDefer { throw e }
       }
       bound.equalUnderTheLaw(raiseError<Int>(e), EQ)
-    })
+    }
 
   fun <F> MonadDefer<F>.asyncBindUnsafe(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genIntSmall(), genIntSmall(), genIntSmall(), { x: Int, y: Int, z: Int ->
+    forAll(genIntSmall(), genIntSmall(), genIntSmall()) { x: Int, y: Int, z: Int ->
       val (bound, dispose) = bindingCancellable {
         val a = bindDeferUnsafe { Right(x) }
         val b = bindDeferUnsafe { Right(a + y) }
@@ -57,27 +57,27 @@ object MonadSuspendLaws {
         c
       }
       bound.equalUnderTheLaw(just<Int>(x + y + z), EQ)
-    })
+    }
 
   fun <F> MonadDefer<F>.asyncBindUnsafeError(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genThrowable(), { e: Throwable ->
+    forAll(genThrowable()) { e: Throwable ->
       val (bound: Kind<F, Int>, dispose) = bindingCancellable<F, Int> {
         bindDeferUnsafe { Left(e) }
       }
       bound.equalUnderTheLaw(raiseError<Int>(e), EQ)
-    })
+    }
 
   fun <F> MonadDefer<F>.asyncParallelBind(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genIntSmall(), genIntSmall(), genIntSmall(), { x: Int, y: Int, z: Int ->
+    forAll(genIntSmall(), genIntSmall(), genIntSmall()) { x: Int, y: Int, z: Int ->
       val (bound, dispose) = bindingCancellable {
         val value = bind { tupled(invoke { x }, invoke { y }, invoke { z }) }
         value.a + value.b + value.c
       }
       bound.equalUnderTheLaw(just<Int>(x + y + z), EQ)
-    })
+    }
 
   fun <F> MonadDefer<F>.asyncCancellationBefore(EQ: Eq<Kind<F, Int>>): Unit =
-    forFew(5, genIntSmall(), { num: Int ->
+    forFew(5, genIntSmall()) { num: Int ->
       val sideEffect = SideEffect()
       val (binding, dispose) = bindingCancellable {
         val a = bindDefer { Thread.sleep(500); num }
@@ -88,10 +88,10 @@ object MonadSuspendLaws {
       }
       Try { Thread.sleep(250); dispose() }.recover { throw it }
       binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 0
-    })
+    }
 
   fun <F> MonadDefer<F>.asyncCancellationAfter(EQ: Eq<Kind<F, Int>>): Unit =
-    forFew(5, genIntSmall(), { num: Int ->
+    forFew(5, genIntSmall()) { num: Int ->
       val sideEffect = SideEffect()
       val (binding, dispose) = bindingCancellable {
         val a = bindDefer { num }
@@ -102,10 +102,10 @@ object MonadSuspendLaws {
       Try { Thread.sleep(250); dispose() }.recover { throw it }
       binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ)
         && sideEffect.counter == 0
-    })
+    }
 
   fun <F> MonadDefer<F>.inContextCancellationBefore(EQ: Eq<Kind<F, Int>>): Unit =
-    forFew(5, genIntSmall(), { num: Int ->
+    forFew(5, genIntSmall()) { num: Int ->
       val sideEffect = SideEffect()
       val (binding, dispose) = bindingCancellable {
         val a = bindIn(CommonPool) { Thread.sleep(500); num }
@@ -116,10 +116,10 @@ object MonadSuspendLaws {
       }
       Try { Thread.sleep(250); dispose() }.recover { throw it }
       binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 0
-    })
+    }
 
   fun <F> MonadDefer<F>.inContextCancellationAfter(EQ: Eq<Kind<F, Int>>): Unit =
-    forFew(5, genIntSmall(), { num: Int ->
+    forFew(5, genIntSmall()) { num: Int ->
       val sideEffect = SideEffect()
       val (binding, dispose) = bindingCancellable {
         val a = bindIn(CommonPool) { num }
@@ -130,18 +130,18 @@ object MonadSuspendLaws {
       Try { Thread.sleep(250); dispose() }.recover { throw it }
       binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ)
         && sideEffect.counter == 0
-    })
+    }
 
   fun <F> MonadDefer<F>.inContextErrorThrow(EQ: Eq<Kind<F, Int>>): Unit =
-    forFew(5, genThrowable(), { throwable: Throwable ->
+    forFew(5, genThrowable()) { throwable: Throwable ->
       bindingCancellable {
         val a: Int = bindIn(newSingleThreadContext("1")) { throw throwable }
         a
       }.a.equalUnderTheLaw(raiseError(throwable), EQ)
-    })
+    }
 
   fun <F> MonadDefer<F>.monadComprehensionsBindInContextEquivalent(EQ: Eq<Kind<F, Int>>): Unit =
-    forFew(5, genIntSmall(), { num: Int ->
+    forFew(5, genIntSmall()) { num: Int ->
       val bindM = bindingCancellable {
         val a = bindDeferIn(newSingleThreadContext("$num")) { num + 1 }
         val b = bindDeferIn(newSingleThreadContext("$a")) { a + 1 }
@@ -153,5 +153,5 @@ object MonadSuspendLaws {
         b
       }
       bindM.a.equalUnderTheLaw(bind.a, EQ)
-    })
+    }
 }

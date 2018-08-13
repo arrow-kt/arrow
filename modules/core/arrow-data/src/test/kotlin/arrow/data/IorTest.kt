@@ -33,7 +33,7 @@ class IorTest : UnitSpec() {
     ForIor(Int.semigroup()) extensions {
       testLaws(
         BifunctorLaws.laws(Ior.bifunctor(), { Ior.Both(it, it) }, EQ2),
-        EqLaws.laws(EQ, { Right(it) }),
+        EqLaws.laws(EQ) { Right(it) },
         ShowLaws.laws(Ior.show(), EQ) { Right(it) },
         MonadLaws.laws(this, Eq.any()),
         TraverseLaws.laws(Ior.traverse(), this, ::Right, Eq.any())
@@ -130,7 +130,7 @@ class IorTest : UnitSpec() {
 
     "Ior.monad.flatMap should combine left values" {
       val ior1 = Ior.Both(3, "Hello, world!")
-      val iorResult = intIorMonad.run { ior1.flatMap({ Ior.Left<Int, String>(7) }) }
+      val iorResult = intIorMonad.run { ior1.flatMap { Ior.Left<Int, String>(7) } }
       iorResult shouldBe Ior.Left<Int, String>(10)
     }
 

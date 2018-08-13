@@ -18,8 +18,8 @@ class ConstTest : UnitSpec() {
       testLaws(
         TraverseFilterLaws.laws(this, this, { Const(it) }, Eq.any()),
         ApplicativeLaws.laws(this, Eq.any()),
-        EqLaws.laws(Const.eq<Int, Int>(Eq.any()), { Const(it) }),
-        ShowLaws.laws(Const.show(), Const.eq<Int, Int>(Eq.any()), { Const(it) })
+        EqLaws.laws(Const.eq<Int, Int>(Eq.any())) { Const(it) },
+        ShowLaws.laws(Const.show(), Const.eq<Int, Int>(Eq.any())) { Const(it) }
       )
     }
   }

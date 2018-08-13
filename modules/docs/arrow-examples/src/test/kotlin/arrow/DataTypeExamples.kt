@@ -130,7 +130,7 @@ class DataTypeExamples : FreeSpec() { init {
 
     "Functor" {
       // Transforming the value, if the computation is a success:
-      val actual = Try.functor().run { Try { "3".toInt() }.map({ it + 1 }) }
+      val actual = Try.functor().run { Try { "3".toInt() }.map { it + 1 } }
       actual shouldBe Try.Success(4)
     }
 

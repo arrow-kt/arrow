@@ -19,7 +19,7 @@ class CoyonedaTest : UnitSpec() {
   init {
 
     ForCoyoneda<ForId, Int>() extensions {
-      testLaws(FunctorLaws.laws(this, { Coyoneda(Id(0), { it }) }, EQ))
+      testLaws(FunctorLaws.laws(this, { Coyoneda(Id(0)) { it } }, EQ))
     }
 
     "map should be stack-safe" {

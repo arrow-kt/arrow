@@ -56,7 +56,7 @@ fun <A, B, C> PartialFunction<A, B>.andThen(f: (B) -> C): PartialFunction<A, C> 
   }
 
 private class Lifted<A, B>(val pf: PartialFunction<A, B>) : (A) -> Option<B> {
-  override fun invoke(x: A): Option<B> = pf.andThen { Some(it) }.invokeOrElse(x, { None })
+  override fun invoke(x: A): Option<B> = pf.andThen { Some(it) }.invokeOrElse(x) { None }
 }
 
 fun <A, B> ((A) -> B).toPartialFunction(definedAt: (A) -> Boolean): PartialFunction<A, B> = PartialFunction(definedAt, this)
