@@ -114,7 +114,7 @@ class TryTest : UnitSpec() {
       val e: Throwable = Exception()
 
       Success(1).getOrElse { _: Throwable -> 2 } shouldBe 1
-      Failure(e).getOrElse { (it shouldEqual e); 2 } shouldBe 2
+      Failure(e).getOrElse { (it shouldBe e); 2 } shouldBe 2
     }
 
     "orNull returns null if Failure" {

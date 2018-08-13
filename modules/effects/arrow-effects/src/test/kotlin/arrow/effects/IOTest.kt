@@ -12,7 +12,6 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.binding
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.fail
-import io.kotlintest.shouldEqual
 import kotlinx.coroutines.experimental.newSingleThreadContext
 import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
@@ -35,9 +34,9 @@ class IOTest : UnitSpec() {
     "should defer evaluation until run" {
       var run = false
       val ioa = IO { run = true }
-      run shouldEqual false
+      run shouldBe false
       ioa.unsafeRunSync()
-      run shouldEqual true
+      run shouldBe true
     }
 
     class MyException : Exception()
