@@ -709,3 +709,7 @@ Some of the mentioned concepts like purity are described in the following blogpo
 
 * [Kotlin Functional Programming: Does it make sense?](https://medium.com/@JorgeCastilloPr/kotlin-functional-programming-does-it-make-sense-36ad07e6bacf) by [Jorge Castillo](https://www.twitter.com/JorgeCastilloPR))
 * [Kotlin purity and Function Memoization](https://medium.com/@JorgeCastilloPr/kotlin-purity-and-function-memoization-b12ab35d70a5) by [Jorge Castillo](https://www.twitter.com/JorgeCastilloPR))
+
+Also, consider watching [FP to the max](https://youtu.be/sxudIMiOo68) by [John De Goes](https://twitter.com/jdegoes) and
+the related `FpToTheMax.kt` example located in the `arrow-examples` module. This technique may seem to be a huge overhead
+on such a small example, but it is meant to be used at scale.
