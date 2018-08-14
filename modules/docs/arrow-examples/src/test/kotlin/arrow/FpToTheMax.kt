@@ -46,7 +46,7 @@ class MonadAndConsoleRandom<F>(M: Monad<F>, C: Console<F>, R: FRandom<F>): Monad
 
 }
 
-object Step1 {
+object FpToTheMax {
 
     fun parseInt(s: String): Option<Int> = Try { s.toInt() }.toOption()
 
