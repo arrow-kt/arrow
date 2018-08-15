@@ -1,13 +1,7 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.EitherOf
-import arrow.core.Left
-import arrow.core.OptionOf
-import arrow.core.Right
-import arrow.core.TryOf
-import arrow.core.identity
+import arrow.core.*
 
 interface ApplicativeError<F, E> : Applicative<F> {
 
@@ -17,13 +11,13 @@ interface ApplicativeError<F, E> : Applicative<F> {
 
   fun <A> E.raiseError(dummy: Unit = Unit): Kind<F, A> =
     raiseError(this)
-  
+
   fun <A> OptionOf<A>.lift(f: () -> E): Kind<F, A> =
     fix().fold({ raiseError<A>(f()) }, { just(it) })
-  
+
   fun <A> EitherOf<E, A>.lift(): Kind<F, A> =
     fix().fold({ raiseError<A>(it) }, { just(it) })
-  
+
   fun <A> TryOf<A>.lift(f: (Throwable) -> E): Kind<F, A> =
     fix().fold({ raiseError<A>(f(it)) }, { just(it) })
 
