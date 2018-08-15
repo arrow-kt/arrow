@@ -94,16 +94,24 @@ AE_TRY.run { Try { "3".toInt() }.attempt() }
 AE_TRY.run { Try { "nope".toInt() }.attempt() }
 ```
 
-#### fromEither
+#### lift
 
-Constructor function from an [`Either<E, A>`]({{ '/docs/datatypes/either' | relative_url }}) to the current datatype.
+Constructor function from an [`Either<E, A>`]({{ '/docs/datatypes/either' | relative_url }}), [`Option<A>`]({{ '/docs/datatypes/option' | relative_url }}), or [`Try<A>`]({{ '/docs/datatypes/try' | relative_url }}) to the current datatype.
 
 ```kotlin:ank
-AE_TRY.fromEither(Either.Right(1))
+AE_TRY.run { Either.Right(1).lift() }
 ```
 
 ```kotlin:ank
-AE_TRY.fromEither(Either.Left(RuntimeException("Boom")))
+AE_TRY.run { Either.Left(RuntimeException("Boom")).lift() }
+```
+
+```kotlin:ank
+AE_TRY.run { Some(1).lift { RuntimeException("Boom") } }
+```
+
+```kotlin:ank
+AE_EITHER.run { Try { RuntimeException("Boom") }.lift { it } }
 ```
 
 #### catch
