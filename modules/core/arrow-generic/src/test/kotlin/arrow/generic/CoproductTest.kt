@@ -8,19 +8,15 @@ import arrow.generic.coproduct2.Coproduct2
 import arrow.generic.coproduct2.cop
 import arrow.generic.coproduct2.coproductOf
 import arrow.generic.coproduct2.fold
-import arrow.generic.coproduct2.map
 import arrow.generic.coproduct2.select
 import arrow.generic.coproduct22.Coproduct22
-import arrow.generic.coproduct3.Third
 import arrow.generic.coproduct3.cop
 import arrow.generic.coproduct3.fold
-import arrow.generic.coproduct3.map
 import arrow.generic.coproduct3.select
 import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
-import java.math.BigDecimal
 
 @RunWith(KTestJUnitRunner::class)
 class CoproductTest : UnitSpec() {
@@ -46,15 +42,6 @@ class CoproductTest : UnitSpec() {
             "String".cop<String, Long>() shouldBe coproductOf<String, Long>("String")
         }
 
-        "Coproduct2 should map over all types but only operate on the present instance" {
-            val coproduct2 = "String".cop<Long, String>()
-
-            coproduct2.map(
-                    { 6L },
-                    { BigDecimal.ONE }
-            ) shouldBe BigDecimal.ONE.cop<Long, BigDecimal>()
-        }
-
         "Coproduct2 fold" {
             val coproduct2 = 100L.cop<Long, Int>()
 
@@ -70,19 +57,13 @@ class CoproductTest : UnitSpec() {
 
             coproduct3.select<Long>() shouldBe None
             coproduct3.select<Float?>() shouldBe None
-            coproduct3.select<String?>() shouldBe None //This is weird but since we're using Option it makes sense?
+            coproduct3.select<String?>() shouldBe None
 
             coproduct3.fold(
                     { "First" },
                     { "Second" },
                     { "Third" }
             ) shouldBe "Third"
-
-            coproduct3.map(
-                    { "First" },
-                    { "Second" },
-                    { "Third" }
-            ) shouldBe Third<Long, Float?, String?>("Third")
         }
 
         "Coproduct3 should handle multiple types with generics" {
@@ -98,12 +79,6 @@ class CoproductTest : UnitSpec() {
                     { "Second" },
                     { "Third" }
             ) shouldBe "Third"
-
-            coproduct3.map(
-                    { "First" },
-                    { "Second" },
-                    { "Third" }
-            ) shouldBe Third<Long, Float?, String?>("Third")
         }
     }
 }

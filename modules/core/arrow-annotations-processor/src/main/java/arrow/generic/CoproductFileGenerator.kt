@@ -1,6 +1,16 @@
 package arrow.generic
 
+import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.LambdaTypeName
+import com.squareup.kotlinpoet.ParameterSpec
+import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.TypeVariableName
 import java.io.File
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 
 private val genericsToClassNames = mapOf(
         "A" to "First",
@@ -31,104 +41,141 @@ fun generateCoproducts(destination: File) {
     for (size in 2 until genericsToClassNames.size + 1) {
         val generics = genericsToClassNames.keys.toList().take(size)
 
-        val fileString = listOf(
-                packageName(size),
-                imports(),
-                coproductClassDeclaration(generics),
-                coproductOfConstructors(generics),
-                copExtensionConstructors(generics),
-                selectFunctions(generics),
-                foldFunction(generics)
-        ).joinToString(separator = "\n")
-
-        val parentDir = File(destination, "arrow/generic/coproduct$size")
-                .also { it.mkdirs() }
-
-        File(parentDir, "Coproduct$size.kt")
-                .also { it.createNewFile() }
-                .printWriter()
-                .use { it.println(fileString) }
+        FileSpec.builder("arrow.generic.coproduct$size", "Coproduct$size")
+                .apply {
+                    addCoproductClassDeclaration(generics)
+                    addCoproductOfConstructors(generics)
+                    addCopExtensionConstructors(generics)
+                    addSelectFunctions(generics)
+                    addFoldFunction(generics)
+                }
+                .build()
+                .writeTo(destination)
     }
 }
 
-private fun packageName(size: Int) = "package arrow.generic.coproduct$size"
+private fun FileSpec.Builder.addCoproductClassDeclaration(generics: List<String>) {
+    addType(
+            TypeSpec.classBuilder("Coproduct${generics.size}")
+                    .addModifiers(KModifier.SEALED)
+                    .addTypeVariables(generics.map { TypeVariableName(it) })
+                    .build()
+    )
 
-private fun imports() = """|
-    |import arrow.core.Option
-    |import arrow.core.toOption
-    |import kotlin.Unit
-|""".trimMargin()
-
-private fun coproductClassDeclaration(generics: List<String>): String {
-    val allGenerics = generics.joinToString()
-    val parentClass = "Coproduct${generics.size}<$allGenerics>"
-    val parentClassDeclaration = "sealed class $parentClass\n"
-
-    val subClasses = generics.map {
-        "internal data class ${genericsToClassNames[it]}<$allGenerics>(val ${it.toLowerCase()}: $it): $parentClass()\n"
+    for (generic in generics) {
+        addType(
+                TypeSpec.classBuilder(genericsToClassNames[generic]!!)
+                        .addModifiers(KModifier.INTERNAL, KModifier.DATA)
+                        .addTypeVariables(generics.map { TypeVariableName(it) })
+                        .superclass(
+                                ClassName("", "Coproduct${generics.size}")
+                                        .parameterizedBy(*generics.map { TypeVariableName(it) }.toTypedArray())
+                        )
+                        .addProperty(
+                                PropertySpec.builder(generic.toLowerCase(), TypeVariableName(generic))
+                                        .initializer(generic.toLowerCase())
+                                        .build()
+                        )
+                        .primaryConstructor(
+                                FunSpec.constructorBuilder()
+                                        .addParameter(generic.toLowerCase(), TypeVariableName(generic))
+                                        .build()
+                        )
+                        .build()
+        )
     }
-
-    return (listOf(parentClassDeclaration) + subClasses)
-            .joinToString(separator = "")
 }
 
-private fun coproductOfConstructors(generics: List<String>): String {
-    val size = generics.size
-    val genericsDeclaration = generics.joinToString(separator = ", ")
-
-    return generics.mapIndexed { index, generic ->
-        val params = listOf("${generic.toLowerCase()} : $generic") + additionalParameters(generics.indexOf(generic))
-
-        "fun <$genericsDeclaration> coproductOf(${params.joinToString()}): Coproduct$size<$genericsDeclaration> = ${genericsToClassNames[generic]}(${generic.toLowerCase()})\n"
-    }.joinToString(separator = "")
+private fun FileSpec.Builder.addCoproductOfConstructors(generics: List<String>) {
+    for (generic in generics) {
+        addFunction(
+                FunSpec.builder("coproductOf")
+                        .addTypeVariables(generics.map { TypeVariableName(it) })
+                        .addParameter(generic.toLowerCase(), TypeVariableName(generic))
+                        .addParameters(additionalParameterSpecs(generics.indexOf(generic)))
+                        .addStatement("return ${genericsToClassNames[generic]}(${generic.toLowerCase()})")
+                        .returns(
+                                ClassName("", "Coproduct${generics.size}")
+                                        .parameterizedBy(*generics.map { TypeVariableName(it) }.toTypedArray())
+                        )
+                        .build()
+        )
+    }
 }
 
-private fun copExtensionConstructors(generics: List<String>): String {
-    val size = generics.size
-    val genericsDeclaration = generics.joinToString(separator = ", ")
-
-    return generics.mapIndexed { index, generic ->
-        val params = additionalParameters(generics.indexOf(generic)).joinToString()
-
-        "fun <$genericsDeclaration> $generic.cop($params): Coproduct$size<$genericsDeclaration> = coproductOf<$genericsDeclaration>(this)\n"
-    }.joinToString(separator = "")
+private fun FileSpec.Builder.addCopExtensionConstructors(generics: List<String>) {
+    for (generic in generics) {
+        addFunction(
+                FunSpec.builder("cop")
+                        .receiver(TypeVariableName(generic))
+                        .addTypeVariables(generics.map { TypeVariableName(it) })
+                        .addParameters(additionalParameterSpecs(generics.indexOf(generic)))
+                        .addStatement("return coproductOf<${generics.joinToString(separator = ", ")}>(this)")
+                        .returns(
+                                ClassName("", "Coproduct${generics.size}")
+                                        .parameterizedBy(*generics.map { TypeVariableName(it) }.toTypedArray())
+                        )
+                        .build()
+        )
+    }
 }
 
-private fun selectFunctions(generics: List<String>): String {
-    val size = generics.size
+private fun FileSpec.Builder.addSelectFunctions(generics: List<String>) {
+    addImport("arrow.core", "Option")
+    addImport("arrow.core", "toOption")
 
-    return generics.mapIndexed { index, generic ->
-        val params = additionalParameters(generics.indexOf(generic)).joinToString()
-        val receiverGenerics = generics.map { if (it == generic) generic else "*" }
-                .joinToString(separator = ", ")
+    for (generic in generics) {
+        val receiverGenerics = generics
+                .map { if (it == generic) TypeVariableName(generic) else TypeVariableName("*") }
+                .toTypedArray()
 
-        "fun <$generic> Coproduct$size<$receiverGenerics>.select($params): Option<$generic> = (this as? ${genericsToClassNames[generic]})?.${generic.toLowerCase()}.toOption()\n"
-    }.joinToString(separator = "")
+        addFunction(
+                FunSpec.builder("select")
+                        .addTypeVariable(TypeVariableName(generic))
+                        .receiver(ClassName("", "Coproduct${generics.size}").parameterizedBy(*receiverGenerics))
+                        .addParameters(additionalParameterSpecs(generics.indexOf(generic)))
+                        .returns(ClassName("arrow.core", "Option").parameterizedBy(TypeVariableName(generic)))
+                        .addStatement("return (this as? ${genericsToClassNames[generic]})?.${generic.toLowerCase()}.toOption()")
+                        .build()
+        )
+    }
 }
 
-private fun foldFunction(generics: List<String>): String {
-    val size = generics.size
-    val genericsDeclaration = generics.joinToString(separator = ", ")
-
-    val functionGenerics = (generics + "RESULT").joinToString()
-
-    val params = generics.map {
-        "   ${it.toLowerCase()}: ($it) -> RESULT"
-    }.joinToString(separator = ",\n")
-
-    val cases = generics.map {
-        "       is ${genericsToClassNames[it]} -> ${it.toLowerCase()}(this.${it.toLowerCase()})"
-    }.joinToString(separator = "\n")
-
-    return """
-        |fun <$functionGenerics> Coproduct$size<$genericsDeclaration>.fold(
-        |$params
-        |): RESULT {
-        |   return when (this) {
-        |$cases
-        |   }
-        |}
-    |""".trimMargin()
+private fun FileSpec.Builder.addFoldFunction(generics: List<String>) {
+    addFunction(
+            FunSpec.builder("fold")
+                    .receiver(
+                            ClassName(
+                                    "",
+                                    "Coproduct${generics.size}"
+                            ).parameterizedBy(*generics.map { TypeVariableName(it) }.toTypedArray())
+                    )
+                    .addTypeVariables((generics + "RESULT").map { TypeVariableName(it) })
+                    .addParameters(
+                            generics.map {
+                                ParameterSpec.builder(
+                                        it.toLowerCase(),
+                                        LambdaTypeName.get(
+                                                parameters = listOf(ParameterSpec.unnamed(TypeVariableName(it))),
+                                                returnType = TypeVariableName("RESULT")
+                                        )
+                                ).build()
+                            }
+                    )
+                    .returns(TypeVariableName("RESULT"))
+                    .apply {
+                        beginControlFlow("return when (this)")
+                        for (generic in generics) {
+                            addStatement("is ${genericsToClassNames[generic]} -> ${generic.toLowerCase()}(this.${generic.toLowerCase()})")
+                        }
+                        endControlFlow()
+                    }
+                    .build()
+    )
 }
 
-private fun additionalParameters(count: Int): List<String> = List(count) { "dummy$it: Unit = Unit" }
+private fun additionalParameterSpecs(count: Int): List<ParameterSpec> = List(count) {
+    ParameterSpec.builder("dummy$it", Unit::class)
+            .defaultValue("Unit")
+            .build()
+}
