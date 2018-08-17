@@ -14,7 +14,7 @@ import com.squareup.kotlinpoet.TypeVariableName
 import java.io.File
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 
-private val genericsToClassNames = mapOf(
+private val genericsToClassNames: Map<String, String> = mapOf(
         "A" to "First",
         "B" to "Second",
         "C" to "Third",
@@ -39,7 +39,7 @@ private val genericsToClassNames = mapOf(
         "V" to "TwentySecond"
 )
 
-fun generateCoproducts(destination: File) {
+fun generateCoproducts(destination: File): Unit {
     for (size in 2 until genericsToClassNames.size + 1) {
         val generics = genericsToClassNames.keys.toList().take(size)
 
@@ -56,7 +56,7 @@ fun generateCoproducts(destination: File) {
     }
 }
 
-private fun FileSpec.Builder.addCoproductClassDeclaration(generics: List<String>) {
+private fun FileSpec.Builder.addCoproductClassDeclaration(generics: List<String>): Unit {
     addType(
             TypeSpec.classBuilder("Coproduct${generics.size}")
                     .addModifiers(KModifier.SEALED)
@@ -85,7 +85,7 @@ private fun FileSpec.Builder.addCoproductClassDeclaration(generics: List<String>
     }
 }
 
-private fun FileSpec.Builder.addCoproductOfConstructors(generics: List<String>) {
+private fun FileSpec.Builder.addCoproductOfConstructors(generics: List<String>): Unit {
     for (generic in generics) {
         val additionalParameterCount = generics.indexOf(generic)
 
@@ -102,7 +102,7 @@ private fun FileSpec.Builder.addCoproductOfConstructors(generics: List<String>) 
     }
 }
 
-private fun FileSpec.Builder.addCopExtensionConstructors(generics: List<String>) {
+private fun FileSpec.Builder.addCopExtensionConstructors(generics: List<String>): Unit {
     for (generic in generics) {
         val additionalParameterCount = generics.indexOf(generic)
 
@@ -119,7 +119,7 @@ private fun FileSpec.Builder.addCopExtensionConstructors(generics: List<String>)
     }
 }
 
-private fun FileSpec.Builder.addSelectFunctions(generics: List<String>) {
+private fun FileSpec.Builder.addSelectFunctions(generics: List<String>): Unit {
     addImport("arrow.core", "Option")
     addImport("arrow.core", "toOption")
 
@@ -142,7 +142,7 @@ private fun FileSpec.Builder.addSelectFunctions(generics: List<String>) {
     }
 }
 
-private fun FileSpec.Builder.addFoldFunction(generics: List<String>) {
+private fun FileSpec.Builder.addFoldFunction(generics: List<String>): Unit {
     addFunction(
             FunSpec.builder("fold")
                     .receiver(parameterizedCoproductNClassName(generics))
@@ -170,7 +170,7 @@ private fun FileSpec.Builder.addFoldFunction(generics: List<String>) {
     )
 }
 
-private fun List<String>.toTypeParameters() = map { TypeVariableName(it) }
+private fun List<String>.toTypeParameters(): List<TypeVariableName> = map { TypeVariableName(it) }
 
 private fun parameterizedCoproductNClassName(generics: List<String>): ParameterizedTypeName =
         ClassName("", "Coproduct${generics.size}")
