@@ -6,6 +6,7 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.LambdaTypeName
 import com.squareup.kotlinpoet.ParameterSpec
+import com.squareup.kotlinpoet.ParameterizedTypeName
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeVariableName
@@ -66,11 +67,8 @@ private fun FileSpec.Builder.addCoproductClassDeclaration(generics: List<String>
         addType(
                 TypeSpec.classBuilder(genericsToClassNames[generic]!!)
                         .addModifiers(KModifier.INTERNAL, KModifier.DATA)
-                        .addTypeVariables(generics.map { TypeVariableName(it) })
-                        .superclass(
-                                ClassName("", "Coproduct${generics.size}")
-                                        .parameterizedBy(*generics.map { TypeVariableName(it) }.toTypedArray())
-                        )
+                        .addTypeVariables(generics.toTypeParameters())
+                        .superclass(parameterizedCoproductNClassName(generics))
                         .addProperty(
                                 PropertySpec.builder(generic.toLowerCase(), TypeVariableName(generic))
                                         .initializer(generic.toLowerCase())
@@ -90,14 +88,11 @@ private fun FileSpec.Builder.addCoproductOfConstructors(generics: List<String>) 
     for (generic in generics) {
         addFunction(
                 FunSpec.builder("coproductOf")
-                        .addTypeVariables(generics.map { TypeVariableName(it) })
+                        .addTypeVariables(generics.toTypeParameters())
                         .addParameter(generic.toLowerCase(), TypeVariableName(generic))
                         .addParameters(additionalParameterSpecs(generics.indexOf(generic)))
                         .addStatement("return ${genericsToClassNames[generic]}(${generic.toLowerCase()})")
-                        .returns(
-                                ClassName("", "Coproduct${generics.size}")
-                                        .parameterizedBy(*generics.map { TypeVariableName(it) }.toTypedArray())
-                        )
+                        .returns(parameterizedCoproductNClassName(generics))
                         .build()
         )
     }
@@ -108,13 +103,10 @@ private fun FileSpec.Builder.addCopExtensionConstructors(generics: List<String>)
         addFunction(
                 FunSpec.builder("cop")
                         .receiver(TypeVariableName(generic))
-                        .addTypeVariables(generics.map { TypeVariableName(it) })
+                        .addTypeVariables(generics.toTypeParameters())
                         .addParameters(additionalParameterSpecs(generics.indexOf(generic)))
                         .addStatement("return coproductOf<${generics.joinToString(separator = ", ")}>(this)")
-                        .returns(
-                                ClassName("", "Coproduct${generics.size}")
-                                        .parameterizedBy(*generics.map { TypeVariableName(it) }.toTypedArray())
-                        )
+                        .returns(parameterizedCoproductNClassName(generics))
                         .build()
         )
     }
@@ -144,13 +136,8 @@ private fun FileSpec.Builder.addSelectFunctions(generics: List<String>) {
 private fun FileSpec.Builder.addFoldFunction(generics: List<String>) {
     addFunction(
             FunSpec.builder("fold")
-                    .receiver(
-                            ClassName(
-                                    "",
-                                    "Coproduct${generics.size}"
-                            ).parameterizedBy(*generics.map { TypeVariableName(it) }.toTypedArray())
-                    )
-                    .addTypeVariables((generics + "RESULT").map { TypeVariableName(it) })
+                    .receiver(parameterizedCoproductNClassName(generics))
+                    .addTypeVariables(generics.toTypeParameters() + TypeVariableName("RESULT"))
                     .addParameters(
                             generics.map {
                                 ParameterSpec.builder(
@@ -172,6 +159,13 @@ private fun FileSpec.Builder.addFoldFunction(generics: List<String>) {
                     }
                     .build()
     )
+}
+
+private fun List<String>.toTypeParameters() = map { TypeVariableName(it) }
+
+private fun parameterizedCoproductNClassName(generics: List<String>): ParameterizedTypeName {
+    return ClassName("", "Coproduct${generics.size}")
+            .parameterizedBy(*generics.map { TypeVariableName(it) }.toTypedArray())
 }
 
 private fun additionalParameterSpecs(count: Int): List<ParameterSpec> = List(count) {
