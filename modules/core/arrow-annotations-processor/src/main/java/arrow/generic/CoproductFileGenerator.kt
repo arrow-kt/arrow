@@ -1,5 +1,6 @@
 package arrow.generic
 
+import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -86,11 +87,14 @@ private fun FileSpec.Builder.addCoproductClassDeclaration(generics: List<String>
 
 private fun FileSpec.Builder.addCoproductOfConstructors(generics: List<String>) {
     for (generic in generics) {
+        val additionalParameterCount = generics.indexOf(generic)
+
         addFunction(
                 FunSpec.builder("coproductOf")
+                        .addAnnotations(additionalParameterSuppressAnnotation(additionalParameterCount))
                         .addTypeVariables(generics.toTypeParameters())
                         .addParameter(generic.toLowerCase(), TypeVariableName(generic))
-                        .addParameters(additionalParameterSpecs(generics.indexOf(generic)))
+                        .addParameters(additionalParameterSpecs(additionalParameterCount))
                         .addStatement("return ${genericsToClassNames[generic]}(${generic.toLowerCase()})")
                         .returns(parameterizedCoproductNClassName(generics))
                         .build()
@@ -100,11 +104,14 @@ private fun FileSpec.Builder.addCoproductOfConstructors(generics: List<String>) 
 
 private fun FileSpec.Builder.addCopExtensionConstructors(generics: List<String>) {
     for (generic in generics) {
+        val additionalParameterCount = generics.indexOf(generic)
+
         addFunction(
                 FunSpec.builder("cop")
+                        .addAnnotations(additionalParameterSuppressAnnotation(additionalParameterCount))
                         .receiver(TypeVariableName(generic))
                         .addTypeVariables(generics.toTypeParameters())
-                        .addParameters(additionalParameterSpecs(generics.indexOf(generic)))
+                        .addParameters(additionalParameterSpecs(additionalParameterCount))
                         .addStatement("return coproductOf<${generics.joinToString(separator = ", ")}>(this)")
                         .returns(parameterizedCoproductNClassName(generics))
                         .build()
@@ -120,12 +127,14 @@ private fun FileSpec.Builder.addSelectFunctions(generics: List<String>) {
         val receiverGenerics = generics
                 .map { if (it == generic) TypeVariableName(generic) else TypeVariableName("*") }
                 .toTypedArray()
+        val additionalParameterCount = generics.indexOf(generic)
 
         addFunction(
                 FunSpec.builder("select")
+                        .addAnnotations(additionalParameterSuppressAnnotation(additionalParameterCount))
                         .addTypeVariable(TypeVariableName(generic))
                         .receiver(ClassName("", "Coproduct${generics.size}").parameterizedBy(*receiverGenerics))
-                        .addParameters(additionalParameterSpecs(generics.indexOf(generic)))
+                        .addParameters(additionalParameterSpecs(additionalParameterCount))
                         .returns(ClassName("arrow.core", "Option").parameterizedBy(TypeVariableName(generic)))
                         .addStatement("return (this as? ${genericsToClassNames[generic]})?.${generic.toLowerCase()}.toOption()")
                         .build()
@@ -163,10 +172,20 @@ private fun FileSpec.Builder.addFoldFunction(generics: List<String>) {
 
 private fun List<String>.toTypeParameters() = map { TypeVariableName(it) }
 
-private fun parameterizedCoproductNClassName(generics: List<String>): ParameterizedTypeName {
-    return ClassName("", "Coproduct${generics.size}")
-            .parameterizedBy(*generics.map { TypeVariableName(it) }.toTypedArray())
-}
+private fun parameterizedCoproductNClassName(generics: List<String>): ParameterizedTypeName =
+        ClassName("", "Coproduct${generics.size}")
+                .parameterizedBy(*generics.map { TypeVariableName(it) }.toTypedArray())
+
+private fun additionalParameterSuppressAnnotation(count: Int): List<AnnotationSpec> =
+        if (count > 0) {
+            listOf(
+                    AnnotationSpec.builder(Suppress::class)
+                            .addMember("\"UNUSED_PARAMETER\"")
+                            .build()
+            )
+        } else {
+            emptyList()
+        }
 
 private fun additionalParameterSpecs(count: Int): List<ParameterSpec> = List(count) {
     ParameterSpec.builder("dummy$it", Unit::class)
