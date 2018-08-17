@@ -38,8 +38,7 @@ fun generateCoproducts(destination: File) {
                 coproductOfConstructors(generics),
                 copExtensionConstructors(generics),
                 selectFunctions(generics),
-                foldFunction(generics),
-                mapFunction(generics)
+                foldFunction(generics)
         ).joinToString(separator = "\n")
 
         val parentDir = File(destination, "arrow/generic/coproduct$size")
@@ -128,33 +127,6 @@ private fun foldFunction(generics: List<String>): String {
         |   return when (this) {
         |$cases
         |   }
-        |}
-    |""".trimMargin()
-}
-
-private fun mapFunction(generics: List<String>): String {
-    val size = generics.size
-    val genericsDeclaration = generics.joinToString(separator = ", ")
-
-    val returnGenerics = generics.map { "$it" + 1 }
-    val returnGenericsString = returnGenerics.joinToString()
-    val functionGenerics = (generics + returnGenerics).joinToString()
-
-    val params = generics.map {
-        "   ${it.toLowerCase()}: ($it) -> $it" + 1
-    }.joinToString(separator = ",\n")
-
-    val lambdas = generics.map {
-        "       { ${it.toLowerCase()}(it).cop<$returnGenericsString>() }"
-    }.joinToString(separator = ",\n")
-
-    return """
-        |fun <$functionGenerics> Coproduct$size<$genericsDeclaration>.map(
-        |$params
-        |): Coproduct$size<$returnGenericsString> {
-        |   return fold(
-        |$lambdas
-        |   )
         |}
     |""".trimMargin()
 }
