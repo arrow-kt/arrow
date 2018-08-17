@@ -56,9 +56,9 @@ fun <S, A> StateFun<S, A>.toState(): State<S, A> = State(IdBimonad, this)
 fun <S, A> StateFunOf<S, A>.toState(): State<S, A> = State(this)
 
 fun <S, T, P1, R> State<S, T>.map(sx: State<S, P1>, f: (T, P1) -> R): State<S, R> =
-  flatMap(IdBimonad, { t -> sx.map { x -> f(t, x) } }).fix()
+  flatMap(IdBimonad) { t -> sx.map { x -> f(t, x) } }.fix()
 
-fun <S, T, R> State<S, T>.map(f: (T) -> R): State<S, R> = flatMap(IdBimonad, { t -> StateApi.just<S, R>(f(t)) }).fix()
+fun <S, T, R> State<S, T>.map(f: (T) -> R): State<S, R> = flatMap(IdBimonad) { t -> StateApi.just<S, R>(f(t)) }.fix()
 
 /**
  * Alias for [StateT.run] `StateT<ForId, S, A>`

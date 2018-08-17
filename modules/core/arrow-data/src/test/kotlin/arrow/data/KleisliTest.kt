@@ -22,11 +22,11 @@ class KleisliTest : UnitSpec() {
     }
 
     "andThen should continue sequence" {
-      val kleisli: Kleisli<ForId, Int, Int> = Kleisli({ a: Int -> Id(a) })
+      val kleisli: Kleisli<ForId, Int, Int> = Kleisli { a: Int -> Id(a) }
 
       kleisli.andThen(Id.monad(), Id(3)).run(0).fix().value shouldBe 3
 
-      kleisli.andThen(Id.monad(), { b -> Id(b + 1) }).run(0).fix().value shouldBe 1
+      kleisli.andThen(Id.monad()) { b -> Id(b + 1) }.run(0).fix().value shouldBe 1
     }
   }
 }

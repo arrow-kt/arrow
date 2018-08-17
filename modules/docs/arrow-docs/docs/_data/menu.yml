@@ -34,6 +34,9 @@ options:
       - title: Monad Comprehensions
         url: /docs/patterns/monad_comprehensions/
 
+      - title: Polymorphic Programs
+        url: /docs/patterns/polymorphic_programs/
+
       - title: Free Algebras
         url: /docs/patterns/free_algebras/
 

@@ -43,8 +43,8 @@ class OptionTest : UnitSpec() {
 
     ForOption extensions {
       testLaws(
-        EqLaws.laws(Option.eq(Int.eq()), { genOption(Gen.int()).generate() }),
-        ShowLaws.laws(Option.show(), Option.eq(Int.eq()), { Some(it) }),
+        EqLaws.laws(Option.eq(Int.eq())) { genOption(Gen.int()).generate() },
+        ShowLaws.laws(Option.show(), Option.eq(Int.eq())) { Some(it) },
         MonoidLaws.laws(Option.monoid(Int.monoid()), Some(1), Option.eq(Int.eq())),
         //testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
         TraverseFilterLaws.laws(this, this, ::Some, Eq.any()),

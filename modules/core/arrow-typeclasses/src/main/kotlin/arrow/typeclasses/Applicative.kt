@@ -25,20 +25,20 @@ interface Applicative<F> : Functor<F> {
   fun <A, B, Z> Kind<F, Tuple2<A, B>>.product(
     other: Kind<F, Z>,
     dummyImplicit: Any? = null): Kind<F, Tuple3<A, B, Z>> =
-    other.product(this).map({ Tuple3(it.b.a, it.b.b, it.a) })
+    other.product(this).map { Tuple3(it.b.a, it.b.b, it.a) }
 
   fun <A, B, C, Z> Kind<F, Tuple3<A, B, C>>.product(
     other: Kind<F, Z>,
     dummyImplicit: Any? = null,
     dummyImplicit2: Any? = null): Kind<F, Tuple4<A, B, C, Z>> =
-    other.product(this).map({ Tuple4(it.b.a, it.b.b, it.b.c, it.a) })
+    other.product(this).map { Tuple4(it.b.a, it.b.b, it.b.c, it.a) }
 
   fun <A, B, C, D, Z> Kind<F, Tuple4<A, B, C, D>>.product(
     other: Kind<F, Z>,
     dummyImplicit: Any? = null,
     dummyImplicit2: Any? = null,
     dummyImplicit3: Any? = null): Kind<F, Tuple5<A, B, C, D, Z>> =
-    other.product(this).map({ Tuple5(it.b.a, it.b.b, it.b.c, it.b.d, it.a) })
+    other.product(this).map { Tuple5(it.b.a, it.b.b, it.b.c, it.b.d, it.a) }
 
   fun <A, B, C, D, E, Z> Kind<F, Tuple5<A, B, C, D, E>>.product(
     other: Kind<F, Z>,
@@ -46,7 +46,7 @@ interface Applicative<F> : Functor<F> {
     dummyImplicit2: Any? = null,
     dummyImplicit3: Any? = null,
     dummyImplicit4: Any? = null): Kind<F, Tuple6<A, B, C, D, E, Z>> =
-    other.product(this).map({ Tuple6(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.a) })
+    other.product(this).map { Tuple6(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.a) }
 
   fun <A, B, C, D, E, FF, Z> Kind<F, Tuple6<A, B, C, D, E, FF>>.product(
     other: Kind<F, Z>,
@@ -55,7 +55,7 @@ interface Applicative<F> : Functor<F> {
     dummyImplicit3: Any? = null,
     dummyImplicit4: Any? = null,
     dummyImplicit5: Any? = null): Kind<F, Tuple7<A, B, C, D, E, FF, Z>> =
-    other.product(this).map({ Tuple7(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.b.f, it.a) })
+    other.product(this).map { Tuple7(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.b.f, it.a) }
 
   fun <A, B, C, D, E, FF, G, Z> Kind<F, Tuple7<A, B, C, D, E, FF, G>>.product(
     other: Kind<F, Z>,
@@ -65,7 +65,7 @@ interface Applicative<F> : Functor<F> {
     dummyImplicit4: Any? = null,
     dummyImplicit5: Any? = null,
     dummyImplicit6: Any? = null): Kind<F, Tuple8<A, B, C, D, E, FF, G, Z>> =
-    other.product(this).map({ Tuple8(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.b.f, it.b.g, it.a) })
+    other.product(this).map { Tuple8(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.b.f, it.b.g, it.a) }
 
   fun <A, B, C, D, E, FF, G, H, Z> Kind<F, Tuple8<A, B, C, D, E, FF, G, H>>.product(
     other: Kind<F, Z>,
@@ -76,7 +76,7 @@ interface Applicative<F> : Functor<F> {
     dummyImplicit5: Any? = null,
     dummyImplicit6: Any? = null,
     dummyImplicit7: Any? = null): Kind<F, Tuple9<A, B, C, D, E, FF, G, H, Z>> =
-    other.product(this).map({ Tuple9(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.b.f, it.b.g, it.b.h, it.a) })
+    other.product(this).map { Tuple9(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.b.f, it.b.g, it.b.h, it.a) }
 
   fun <A, B, C, D, E, FF, G, H, I, Z> Kind<F, Tuple9<A, B, C, D, E, FF, G, H, I>>.product(
     other: Kind<F, Z>,
@@ -88,7 +88,7 @@ interface Applicative<F> : Functor<F> {
     dummyImplicit6: Any? = null,
     dummyImplicit7: Any? = null,
     dummyImplicit9: Any? = null): Kind<F, Tuple10<A, B, C, D, E, FF, G, H, I, Z>> =
-    other.product(this).map({ Tuple10(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.b.f, it.b.g, it.b.h, it.b.i, it.a) })
+    other.product(this).map { Tuple10(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.b.f, it.b.g, it.b.h, it.b.i, it.a) }
 
   fun <A, B> tupled(
     a: Kind<F, A>,

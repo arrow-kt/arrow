@@ -102,7 +102,7 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
   /**
    * Apply a function to a Valid value, returning a new Valid value
    */
-  fun <B> map(f: (A) -> B): Validated<E, B> = bimap(::identity, { f(it) })
+  fun <B> map(f: (A) -> B): Validated<E, B> = bimap(::identity) { f(it) }
 
   /**
    * Apply a function to an Invalid value, returning a new Invalid value.
@@ -177,7 +177,7 @@ fun <E, A> ValidatedOf<E, A>.orElse(default: () -> Validated<E, A>): Validated<E
 fun <E, A, B> ValidatedOf<E, A>.ap(SE: Semigroup<E>, f: Validated<E, (A) -> B>): Validated<E, B> =
   fix().fold(
     { e -> f.fold({ Invalid(SE.run { it.combine(e) }) }, { Invalid(e) }) },
-    { a -> f.fold(::Invalid, { Valid(it(a)) }) }
+    { a -> f.fold(::Invalid) { Valid(it(a)) } }
   )
 
 fun <E, A> ValidatedOf<E, A>.handleLeftWith(f: (E) -> ValidatedOf<E, A>): Validated<E, A> =

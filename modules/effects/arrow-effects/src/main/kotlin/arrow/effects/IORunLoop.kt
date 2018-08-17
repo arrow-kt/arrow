@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
+import arrow.effects.data.internal.IOCancellationException
 import arrow.effects.internal.Platform.ArrayStack
 import arrow.effects.typeclasses.Proc
 import kotlin.coroutines.experimental.Continuation
@@ -16,8 +17,8 @@ private typealias Callback = (Either<Throwable, Any?>) -> Unit
 
 @Suppress("UNCHECKED_CAST")
 internal object IORunLoop {
-  fun <A> start(source: IO<A>, cb: (Either<Throwable, A>) -> Unit): Unit =
-    loop(source, cb as Callback, null, null, null)
+  fun <A> start(source: IO<A>, cb: (Either<Throwable, A>) -> Unit, isCancelled: (() -> Boolean)?): Unit =
+    loop(source, cb as Callback, null, null, null, isCancelled)
 
   fun <A> step(source: IO<A>): IO<A> {
     var currentIO: Current? = source
@@ -35,7 +36,7 @@ internal object IORunLoop {
         is IO.RaiseError -> {
           val errorHandler: IOFrame<Any?, IO<Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
           when (errorHandler) {
-          // Return case for unhandled errors
+            // Return case for unhandled errors
             null -> return currentIO
             else -> {
               val exception: Throwable = currentIO.exception
@@ -83,7 +84,7 @@ internal object IORunLoop {
           bFirst = { c: Any? -> IO.just(c) }
 
           currentIO = IO.async { cc ->
-            loop(localCont, cc.asyncCallback(currentCC), null, null, null)
+            loop(localCont, cc.asyncCallback(currentCC), null, null, null, null)
           }
         }
         is IO.Map<*, *> -> {
@@ -133,7 +134,7 @@ internal object IORunLoop {
     when {
       bFirst != null || (bRest != null && bRest.isNotEmpty()) ->
         IO.Async { cb ->
-          val rcb = RestartCallback(cb as Callback)
+          val rcb = RestartCallback(cb as Callback, null)
           rcb.prepare(bFirst, bRest)
           register(rcb)
         }
@@ -145,7 +146,8 @@ internal object IORunLoop {
     cb: (Either<Throwable, Any?>) -> Unit,
     rcbRef: RestartCallback?,
     bFirstRef: BindF?,
-    bRestRef: CallStack?): Unit {
+    bRestRef: CallStack?,
+    isCancelled: (() -> Boolean)?): Unit {
     var currentIO: Current? = source
     var bFirst: BindF? = bFirstRef
     var bRest: CallStack? = bRestRef
@@ -156,6 +158,10 @@ internal object IORunLoop {
     var result: Any? = null
 
     do {
+      if (isCancelled?.invoke() == true) {
+        cb(Left(IOCancellationException("User cancellation")))
+        return
+      }
       when (currentIO) {
         is IO.Pure -> {
           result = currentIO.a
@@ -164,7 +170,7 @@ internal object IORunLoop {
         is IO.RaiseError -> {
           val errorHandler: IOFrame<Any?, IO<Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
           when (errorHandler) {
-          // Return case for unhandled errors
+            // Return case for unhandled errors
             null -> {
               cb(Left(currentIO.exception))
               return
@@ -191,7 +197,7 @@ internal object IORunLoop {
         }
         is IO.Async -> {
           if (rcb == null) {
-            rcb = RestartCallback(cb)
+            rcb = RestartCallback(cb, isCancelled)
           }
           rcb.prepare(bFirst, bRest)
           // Return case for Async operations
@@ -220,7 +226,7 @@ internal object IORunLoop {
           bFirst = { c: Any? -> IO.just(c) }
 
           currentIO = IO.async { cc ->
-            loop(localCont, cc.asyncCallback(currentCC), null, null, null)
+            loop(localCont, cc.asyncCallback(currentCC), null, null, null, isCancelled)
           }
 
         }
@@ -309,7 +315,7 @@ internal object IORunLoop {
     return result
   }
 
-  private data class RestartCallback(val cb: Callback) : Callback {
+  private data class RestartCallback(val cb: Callback, val isCancelled: (() -> Boolean)?) : Callback {
 
     private var canCall = false
     private var bFirst: BindF? = null
@@ -325,17 +331,17 @@ internal object IORunLoop {
       if (canCall) {
         canCall = false
         when (either) {
-          is Either.Left -> loop(IO.RaiseError(either.a), cb, this, bFirst, bRest)
-          is Either.Right -> loop(IO.Pure(either.b), cb, this, bFirst, bRest)
+          is Either.Left -> loop(IO.RaiseError(either.a), cb, this, bFirst, bRest, isCancelled)
+          is Either.Right -> loop(IO.Pure(either.b), cb, this, bFirst, bRest, isCancelled)
         }
       }
     }
 
     companion object {
-      operator fun invoke(cb: Callback): RestartCallback =
+      operator fun invoke(cb: Callback, isCancelled: (() -> Boolean)?): RestartCallback =
         when (cb) {
           is RestartCallback -> cb
-          else -> RestartCallback(cb)
+          else -> RestartCallback(cb, isCancelled)
         }
     }
   }
