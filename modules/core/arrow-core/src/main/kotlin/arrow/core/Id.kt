@@ -15,7 +15,7 @@ data class Id<out A>(val value: A) : IdOf<A> {
 
   fun <B> foldRight(initial: Eval<B>, operation: (A, Eval<B>) -> Eval<B>): Eval<B> = operation(this.fix().value, initial)
 
-  fun <B> coflatMap(f: (IdOf<A>) -> B): Id<B> = this.fix().map({ f(this) })
+  fun <B> coflatMap(f: (IdOf<A>) -> B): Id<B> = this.fix().map { f(this) }
 
   fun extract(): A = this.fix().value
 

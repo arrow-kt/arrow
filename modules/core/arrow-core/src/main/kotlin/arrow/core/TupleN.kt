@@ -7,6 +7,9 @@ data class Tuple2<out A, out B>(val a: A, val b: B) : Tuple2Of<A, B> {
   fun <C> map(f: (B) -> C) =
     a toT f(b)
 
+  fun <C, D> bimap(fl: (A) -> C, fr: (B) -> D) =
+    fl(a) toT fr(b)
+
   fun <C> ap(f: Tuple2Of<*, (B) -> C>) =
     map(f.fix().b)
 

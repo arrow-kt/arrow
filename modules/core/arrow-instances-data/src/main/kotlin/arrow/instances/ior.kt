@@ -1,6 +1,7 @@
 package arrow.instances
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.data.*
@@ -13,7 +14,13 @@ interface IorFunctorInstance<L> : Functor<IorPartialOf<L>> {
 }
 
 @extension
-interface IorApplicativeInstance<L> : IorFunctorInstance<L>, Applicative<IorPartialOf<L>> {
+interface IorBifunctorInstance : Bifunctor<ForIor> {
+  override fun <A, B, C, D> Kind2<ForIor, A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Kind2<ForIor, C, D> =
+    fix().bimap(fl, fr)
+}
+
+@extension
+interface IorApplicativeInstance<L> : Applicative<IorPartialOf<L>>, IorFunctorInstance<L> {
 
   fun SL(): Semigroup<L>
 
