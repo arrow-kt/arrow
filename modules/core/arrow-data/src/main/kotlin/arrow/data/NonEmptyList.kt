@@ -47,9 +47,9 @@ class NonEmptyList<out A> private constructor(
   fun <G, B> traverse(AG: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, NonEmptyList<B>> = with(AG) {
     f(fix().head).map2Eval(Eval.always {
       tail.k().traverse(AG, f)
-    }, {
+    }) {
       NonEmptyList(it.a, it.b.fix().list)
-    }).value()
+    }.value()
   }
 
   fun <B> coflatMap(f: (NonEmptyListOf<A>) -> B): NonEmptyList<B> {

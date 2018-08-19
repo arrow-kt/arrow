@@ -36,7 +36,7 @@ interface OptionTMonadInstance<F> : OptionTApplicativeInstance<F>, Monad<OptionT
 
   override fun <A, B> Kind<OptionTPartialOf<F>, A>.map(f: (A) -> B): OptionT<F, B> = fix().map(FF(), f)
 
-  override fun <A, B> Kind<OptionTPartialOf<F>, A>.flatMap(f: (A) -> Kind<OptionTPartialOf<F>, B>): OptionT<F, B> = fix().flatMap(FF(), { f(it).fix() })
+  override fun <A, B> Kind<OptionTPartialOf<F>, A>.flatMap(f: (A) -> Kind<OptionTPartialOf<F>, B>): OptionT<F, B> = fix().flatMap(FF()) { f(it).fix() }
 
   override fun <A, B> Kind<OptionTPartialOf<F>, A>.ap(ff: Kind<OptionTPartialOf<F>, (A) -> B>): OptionT<F, B> =
     fix().ap(FF(), ff)
@@ -53,7 +53,7 @@ fun <F, A, B> OptionTOf<F, A>.foldRight(FF: Foldable<F>, lb: Eval<B>, f: (A, Eva
 }
 
 fun <F, G, A, B> OptionTOf<F, A>.traverse(FF: Traverse<F>, GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, OptionT<F, B>> {
-  val fa = ComposedTraverse(FF, Option.traverse(), Option.applicative()).traverseC(fix().value, f, GA)
+  val fa = ComposedTraverse(FF, Option.traverse(), Option.applicative()).run { fix().value.traverseC(f, GA) }
   val mapper: (Kind<Nested<F, ForOption>, B>) -> OptionT<F, B> = { OptionT(FF.run { it.unnest().map { it.fix() } }) }
   return GA.run { fa.map(mapper) }
 }
@@ -89,7 +89,7 @@ interface OptionTSemigroupKInstance<F> : SemigroupK<OptionTPartialOf<F>> {
 
   fun FF(): Monad<F>
 
-  override fun <A> Kind<OptionTPartialOf<F>, A>.combineK(y: Kind<OptionTPartialOf<F>, A>): OptionT<F, A> = fix().orElse(FF(), { y.fix() })
+  override fun <A> Kind<OptionTPartialOf<F>, A>.combineK(y: Kind<OptionTPartialOf<F>, A>): OptionT<F, A> = fix().orElse(FF()) { y.fix() }
 }
 
 @instance(OptionT::class)

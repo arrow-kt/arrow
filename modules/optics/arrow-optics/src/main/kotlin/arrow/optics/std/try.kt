@@ -21,7 +21,7 @@ fun <A> Try.Companion.success(): Prism<Try<A>, A> = pSuccess()
  * [Prism] to focus into an [arrow.Try.Failure]
  */
 fun <A> Try.Companion.failure(): Prism<Try<A>, Throwable> = Prism(
-  getOrModify = { aTry -> aTry.fold(::Right, { Either.Left(aTry) }) },
+  getOrModify = { aTry -> aTry.fold(::Right) { Either.Left(aTry) } },
   reverseGet = ::Failure
 )
 

@@ -91,9 +91,8 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
    */
   fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FA.run {
     getOrModify(s).fold(
-      ::just,
-      { f(it).map({ set(s, it) }) }
-    )
+      ::just
+    ) { f(it).map { set(s, it) } }
   }
 
   /**
@@ -236,7 +235,7 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
   /**
    * Modify the focus of a [POptional] with a function [f]
    */
-  fun modify(s: S, f: (A) -> B): T = getOrModify(s).fold(::identity, { a -> set(s, f(a)) })
+  fun modify(s: S, f: (A) -> B): T = getOrModify(s).fold(::identity) { a -> set(s, f(a)) }
 
   /**
    * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
@@ -247,7 +246,7 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
    * Modify the focus of a [POptional] with a function [f]
    * @return [Option.None] if the [POptional] is not matching
    */
-  fun modifiyOption(s: S, f: (A) -> B): Option<T> = getOption(s).map({ set(s, f(it)) })
+  fun modifiyOption(s: S, f: (A) -> B): Option<T> = getOption(s).map { set(s, f(it)) }
 
   /**
    * Find the focus that satisfies the predicate [p]

@@ -49,7 +49,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
       Single.defer { fa().value() }.k()
 
     fun <A> async(fa: Proc<A>): SingleK<A> =
-      Single.create({ emitter: SingleEmitter<A> ->
+      Single.create { emitter: SingleEmitter<A> ->
         fa { either: Either<Throwable, A> ->
           either.fold({
             emitter.onError(it)
@@ -58,7 +58,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
           })
 
         }
-      }).k()
+      }.k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> SingleKOf<Either<A, B>>): SingleK<B> {
       val either = f(a).fix().value().blockingGet()

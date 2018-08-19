@@ -8,21 +8,23 @@ permalink: /docs/quickstart/blogs/
 
 A selection of external links to some of the content created by maintainers and users.
 
+### State of the functional ecosystem in Kotlin: Mid 2018 checkup
+
+This talk focuses on the day-to-day problems Arrow solves, from small ideas to big concepts.
+
+It includes an overview of all the modules available, and some of the 3rd party libraries made by the community.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/q_1xPYQLyaU?rel=0" frameborder="0" allowfullscreen></iframe>
+
+Conference for Kotliners, Budapest, Jun '18 - version 0.7.2
+
 ### Functional Programming in Kotlin with Arrow
 
-A rundown of all the features included in the library.
+A rundown of all the features included in the library, focusing on implementation details.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/IL5XzaCMKpQ?rel=0" frameborder="0" allowfullscreen></iframe>
 
 Lambda World, Cadiz, Nov '17 - version 0.3.11
-
-### Kotlin for the Pragmatic Functionalist
-
-An introduction to Arrow and the enhancements it brings to Kotlin's standard library.
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/s9oMED6ZikQ?rel=0" frameborder="0" allowfullscreen></iframe>
-
-KotlinConf, San Francisco, Nov '17 - version 0.3.11
 
 ### Architectures Using Functional Programming Concepts
 
@@ -47,6 +49,14 @@ KotlinConf, San Francisco, Nov '17 - version 0.3.11
 <iframe width="560" height="315" src="https://www.youtube.com/embed/qGef3sFAIxU" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
  
  Mobilization 7, Łódź, Oct '17 - version 0.3.11
+ 
+### Kotlin for the Pragmatic Functionalist
+
+An introduction to Arrow and the enhancements it brings to Kotlin's standard library.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/s9oMED6ZikQ?rel=0" frameborder="0" allowfullscreen></iframe>
+
+KotlinConf, San Francisco, Nov '17 - version 0.3.11
  
 ### It's all about morphisms
  
@@ -78,6 +88,14 @@ It's hard coming back down to the earth of a JVM based language after spending t
 <iframe width="560" height="315" src="https://www.youtube.com/embed/ERM0mBPNLHc" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
 
 Yow! Lambda Jam, Sydney, Australia, June '18 - version 0.7
+
+### Arrow and Functional Programming for Kotlin Developers
+
+A beginner level introduction to Functional Programming for Kotlin and/or Android Developers or developers with OOP background.
+ 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/qYgilPqMOp0" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+ 
+DroidJam India, Bangalore, India, July '18 - version 0.7.2
 
 ### Functional Programming in Kotlin
 
@@ -119,6 +137,9 @@ Kotlin Brooklyn Meetup, Jan '18 - version 0.6.1
 ### Android Functional Validation
 
 [@dcampogiani](https://github.com/dcampogiani) explores some data types in Arrow and uses them to validate a form on Android.
+
+Video in Italian
+<iframe src="https://player.vimeo.com/video/279931528" width="560" height="315" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
 
 * [Introduction](http://danielecampogiani.com/blog/2018/02/android-functional-validation-1-intro/)
 * [Option](http://danielecampogiani.com/blog/2018/02/android-functional-validation-2-option/)

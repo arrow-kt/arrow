@@ -140,67 +140,67 @@ class OptionalTest : UnitSpec() {
     }
 
     "void should always " {
-      forAll({ string: String ->
+      forAll { string: String ->
         Optional.void<String, Int>().getOption(string) == None
-      })
+      }
     }
 
     "void should always return source when setting target" {
-      forAll({ int: Int, string: String ->
+      forAll { int: Int, string: String ->
         Optional.void<String, Int>().set(string, int) == string
-      })
+      }
     }
 
     "Checking if there is no target" {
-      forAll(Gen.list(Gen.int()), { list ->
+      forAll(Gen.list(Gen.int())) { list ->
         optionalHead.nonEmpty(list) == list.isNotEmpty()
-      })
+      }
     }
 
     "Lift should be consistent with modify" {
-      forAll(Gen.list(Gen.int()), { list ->
+      forAll(Gen.list(Gen.int())) { list ->
         val f = { i: Int -> i + 5 }
         optionalHead.lift(f)(list) == optionalHead.modify(list, f)
-      })
+      }
     }
 
     "LiftF should be consistent with modifyF" {
-      forAll(Gen.list(Gen.int()), genTry(Gen.int()), { list, tryInt ->
+      forAll(Gen.list(Gen.int()), genTry(Gen.int())) { list, tryInt ->
         val f = { _: Int -> tryInt }
         optionalHead.liftF(Try.applicative(), f)(list) == optionalHead.modifyF(Try.applicative(), list, f)
-      })
+      }
     }
 
     "Checking if a target exists" {
-      forAll(Gen.list(Gen.int()), { list ->
+      forAll(Gen.list(Gen.int())) { list ->
         optionalHead.isEmpty(list) == list.isEmpty()
-      })
+      }
     }
 
     "Finding a target using a predicate should be wrapped in the correct option result" {
-      forAll(Gen.list(Gen.int()), Gen.bool(), { list, predicate ->
+      forAll(Gen.list(Gen.int()), Gen.bool()) { list, predicate ->
         optionalHead.find(list) { predicate }.fold({ false }, { true }) == predicate
-      })
+      }
     }
 
     "Checking existence predicate over the target should result in same result as predicate" {
-      forAll(Gen.list(Gen.int()), Gen.bool(), { list, predicate ->
+      forAll(Gen.list(Gen.int()), Gen.bool()) { list, predicate ->
         optionalHead.exists(list) { predicate } == predicate
-      })
+      }
     }
 
     "Checking satisfaction of predicate over the target should result in opposite result as predicate" {
-      forAll(Gen.list(Gen.int()), Gen.bool(), { list, predicate ->
+      forAll(Gen.list(Gen.int()), Gen.bool()) { list, predicate ->
         optionalHead.all(list) { predicate } == predicate
-      })
+      }
     }
 
     "Joining two optionals together with same target should yield same result" {
       val joinedOptional = optionalHead.choice(defaultHead)
 
-      forAll(Gen.int(), { int ->
+      forAll(Gen.int()) { int ->
         joinedOptional.getOption(Left(listOf(int))) == joinedOptional.getOption(Right(int))
-      })
+      }
     }
 
   }

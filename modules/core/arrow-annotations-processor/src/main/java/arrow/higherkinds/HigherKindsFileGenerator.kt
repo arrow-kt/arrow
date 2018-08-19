@@ -61,7 +61,7 @@ class HigherKindsFileGenerator(
     val appliedTypeArgs = hk.typeArgs.dropLast(1)
     val expandedAppliedTypeArgs = appliedTypeArgs.joinToString(", ")
     val hkimpl = if (appliedTypeArgs.size == 1) "arrow.Kind" else "arrow.Kind${appliedTypeArgs.size}"
-    return "typealias ${hk.name.replace("Of$".toRegex(), { "PartialOf" })}<$expandedAppliedTypeArgs> = $hkimpl<${hk.markerName}, $expandedAppliedTypeArgs>"
+    return "typealias ${hk.name.replace("Of$".toRegex()) { "PartialOf" }}<$expandedAppliedTypeArgs> = $hkimpl<${hk.markerName}, $expandedAppliedTypeArgs>"
   }
 
   private fun genKindedJTypeAliases(hk: HigherKind): String =

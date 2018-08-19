@@ -2,6 +2,7 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.*
+import arrow.effects.data.internal.IOCancellationException
 import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
 import arrow.test.UnitSpec
@@ -212,7 +213,7 @@ class IOTest : UnitSpec() {
     with(IO.monad()) {
 
       "should map values correctly on success" {
-        val run = IO.just(1).map() { it + 1 }.unsafeRunSync()
+        val run = IO.just(1).map { it + 1 }.unsafeRunSync()
 
         val expected = 2
 
@@ -257,7 +258,8 @@ class IOTest : UnitSpec() {
         }
 
       val result =
-        IO.parallelMapN(newSingleThreadContext("all"), makePar(6), makePar(3), makePar(2), makePar(4), makePar(1), makePar(5))
+        IO.parallelMapN(newSingleThreadContext("all"),
+          makePar(6), makePar(3), makePar(2), makePar(4), makePar(1), makePar(5))
         { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
           .unsafeRunSync()
 
@@ -282,7 +284,8 @@ class IOTest : UnitSpec() {
         }.order()
 
       val result =
-        IO.parallelMapN(newSingleThreadContext("all"), makePar(6), IO.just(1L).order(), makePar(4), IO.defer { IO.just(2L) }.order(), makePar(5), IO { 3L }.order())
+        IO.parallelMapN(newSingleThreadContext("all"),
+          makePar(6), IO.just(1L).order(), makePar(4), IO.defer { IO.just(2L) }.order(), makePar(5), IO { 3L }.order())
         { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
           .unsafeRunSync()
 
@@ -299,7 +302,8 @@ class IOTest : UnitSpec() {
         }
 
       val result =
-        IO.parallelMapN(newSingleThreadContext("all"), makePar(6), IO.just(1L), makePar(4), IO.defer { IO.just(2L) }, makePar(5), IO { 3L })
+        IO.parallelMapN(newSingleThreadContext("all"),
+          makePar(6), IO.just(1L), makePar(4), IO.defer { IO.just(2L) }, makePar(5), IO { 3L })
         { _, _, _, _, _, _ ->
           Thread.currentThread().name
         }.unsafeRunSync()
@@ -310,11 +314,61 @@ class IOTest : UnitSpec() {
     "parallel IO#defer, IO#suspend and IO#async are run in the expected CoroutineContext" {
       val result =
         IO.parallelMapN(newSingleThreadContext("here"),
-          IO { Thread.currentThread().name }, IO.defer { IO.just(Thread.currentThread().name) }, IO.async<String> { it(Thread.currentThread().name.right()) },
+          IO { Thread.currentThread().name },
+          IO.defer { IO.just(Thread.currentThread().name) },
+          IO.async<String> { it(Thread.currentThread().name.right()) },
           ::Tuple3)
           .unsafeRunSync()
 
       result shouldBe Tuple3("here", "here", "here")
+    }
+
+    "unsafeRunAsyncCancellable should cancel correctly" {
+      IO.async<Unit> { cb ->
+        val cancel =
+          IO(newSingleThreadContext("RunThread")) { }
+            .flatMap { IO.async<Int> { Thread.sleep(500); it(1.right()) } }
+            .unsafeRunAsyncCancellable(OnCancel.Silent) {
+              cb(Unit.right())
+            }
+        IO(newSingleThreadContext("CancelThread")) { }
+          .unsafeRunAsync { cancel() }
+      }.unsafeRunTimed(2.seconds) shouldBe None
+    }
+
+    "unsafeRunAsyncCancellable should throw the appropriate exception" {
+      IO.async<Throwable> { cb ->
+        val cancel =
+          IO(newSingleThreadContext("RunThread")) { }
+            .flatMap { IO.async<Int> { Thread.sleep(500); it(1.right()) } }
+            .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
+              it.fold({ t -> cb(t.right()) }, { _ -> })
+            }
+        IO(newSingleThreadContext("CancelThread")) { }
+          .unsafeRunAsync { cancel() }
+      }.unsafeRunTimed(2.seconds) shouldBe Some(IOCancellationException("User cancellation"))
+    }
+
+    "unsafeRunAsyncCancellable can cancel only at operator boundaries" {
+      IO.async<Unit> { cb ->
+        val cancel =
+          IO(newSingleThreadContext("RunThread")) { }
+            .flatMap { IO.async<Int> { /* Never reaches the operator boundary */ } }
+            .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
+              cb(Unit.right())
+            }
+        IO(newSingleThreadContext("CancelThread")) { Thread.sleep(500); }
+          .unsafeRunAsync { cancel() }
+      }.unsafeRunTimed(2.seconds) shouldBe None
+    }
+
+    "unsafeRunAsyncCancellable should not silence IOCancellationException thrown by the user" {
+      IO.async<Either<Throwable, Int>> { cb ->
+        IO(newSingleThreadContext("RunThread")) { throw IOCancellationException("TEST") }
+          .unsafeRunAsyncCancellable(OnCancel.Silent) {
+            cb(it.right())
+          }
+      }.unsafeRunTimed(2.seconds) shouldBe Some(Either.Left(IOCancellationException("TEST")))
     }
 
     "IO.binding should for comprehend over IO" {

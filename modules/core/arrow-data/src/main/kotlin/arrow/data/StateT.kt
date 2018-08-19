@@ -157,7 +157,7 @@ class StateT<F, S, A>(
    * @param f the function to apply.
    * @param FF [Functor] for the context [F].
    */
-  fun <B> map(FF: Functor<F>, f: (A) -> B): StateT<F, S, B> = transform(FF, { (s, a) -> Tuple2(s, f(a)) })
+  fun <B> map(FF: Functor<F>, f: (A) -> B): StateT<F, S, B> = transform(FF) { (s, a) -> Tuple2(s, f(a)) }
 
   /**
    * Combine with another [StateT] of same context [F] and state [S].
@@ -201,7 +201,7 @@ class StateT<F, S, A>(
    * @param MF [Monad] for the context [F].
    */
   fun <B> ap(MF: Monad<F>, ff: StateTOf<F, S, (A) -> B>): StateT<F, S, B> =
-    ff.fix().map2(MF, this, { f, a -> f(a) })
+    ff.fix().map2(MF, this) { f, a -> f(a) }
 
   /**
    * Create a product of the value types of [StateT].
@@ -209,7 +209,7 @@ class StateT<F, S, A>(
    * @param sb other stateful computation.
    * @param MF [Monad] for the context [F].
    */
-  fun <B> product(MF: Monad<F>, sb: StateT<F, S, B>): StateT<F, S, Tuple2<A, B>> = map2(MF, sb, { a, b -> Tuple2(a, b) })
+  fun <B> product(MF: Monad<F>, sb: StateT<F, S, B>): StateT<F, S, Tuple2<A, B>> = map2(MF, sb) { a, b -> Tuple2(a, b) }
 
   /**
    * Map the value [A] to another [StateT] object for the same state [S] and context [F] and flatten the structure.

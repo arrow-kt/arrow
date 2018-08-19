@@ -38,9 +38,9 @@ inline fun <reified F, A> Gen<A>.generateIn(applicative: Applicative<F>): Gen<Ki
   Gen.create { applicative.just(this.generate()) }
 
 inline fun <reified F> Applicative<F>.testPersonApplicative() {
-  forAll(Gen.string(), Gen.int(), personGen(), { a, b, c ->
+  forAll(Gen.string(), Gen.int(), personGen()) { a, b, c ->
     mapToPerson(just(a), just(b), just(c.some())) == just(Person(a, b, c.some()))
-  })
+  }
 }
 
 @RunWith(KTestJUnitRunner::class)
@@ -48,31 +48,31 @@ class ProductTest : UnitSpec() {
   init {
 
     ".tupled()" {
-      forAll(personGen(), {
+      forAll(personGen()) {
         it.tupled() == Tuple3(it.name, it.age, it.related)
-      })
+      }
     }
 
     ".toPerson()" {
-      forAll(tuple3Gen(), {
+      forAll(tuple3Gen()) {
         it.toPerson() == Person(it.a, it.b, it.c)
-      })
+      }
     }
 
     ".tupledLabeled()" {
-      forAll(personGen(), {
+      forAll(personGen()) {
         it.tupledLabeled() == Tuple3(
           "name" toT it.name,
           "age" toT it.age,
           "related" toT it.related
         )
-      })
+      }
     }
 
     "List<@product>.combineAll()" {
-      forAll(Gen.list(personGen()), {
+      forAll(Gen.list(personGen())) {
         it.combineAll() == it.reduce { a, b -> a + b }
-      })
+      }
     }
 
 
@@ -99,7 +99,7 @@ class ProductTest : UnitSpec() {
     }
 
     "Semigroup combine" {
-      forAll(personGen(), personGen(), { a, b ->
+      forAll(personGen(), personGen()) { a, b ->
         with(Person.semigroup()) {
           a.combine(b) == Person(
             a.name + b.name,
@@ -107,34 +107,34 @@ class ProductTest : UnitSpec() {
             Option.monoid(this).combineAll(a.related, b.related)
           )
         }
-      })
+      }
     }
 
     "Semigroup + syntax" {
-      forAll(personGen(), personGen(), { a, b ->
+      forAll(personGen(), personGen()) { a, b ->
         a + b == Person(
           a.name + b.name,
           a.age + b.age,
           Option.monoid(Person.monoid()).combineAll(a.related, b.related)
         )
-      })
+      }
     }
 
     "Monoid empty" {
-      forAll(personGen(), personGen(), { a, b ->
+      forAll(personGen(), personGen()) { a, b ->
         Person.monoid().empty() == Person("", 0, None)
-      })
+      }
     }
 
     "Monoid empty syntax" {
-      forAll(personGen(), personGen(), { a, b ->
+      forAll(personGen(), personGen()) { a, b ->
         emptyPerson() == Person("", 0, None)
-      })
+      }
     }
 
     with(Gen) {
       testLaws(
-        EqLaws.laws(Person.eq(), { personGen().generate().copy(age = it) }),
+        EqLaws.laws(Person.eq()) { personGen().generate().copy(age = it) },
         SemigroupLaws.laws(
           Person.semigroup(),
           personGen().generate(),

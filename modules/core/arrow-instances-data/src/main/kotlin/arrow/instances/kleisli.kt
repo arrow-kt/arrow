@@ -19,7 +19,7 @@ interface KleisliApplicativeInstance<F, D> : KleisliFunctorInstance<F, D>, Appli
 
   override fun FF(): Applicative<F>
 
-  override fun <A> just(a: A): Kleisli<F, D, A> = Kleisli({ FF().just(a) })
+  override fun <A> just(a: A): Kleisli<F, D, A> = Kleisli { FF().just(a) }
 
   override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.map(f: (A) -> B): Kleisli<F, D, B> =
     fix().map(FF(), f)
@@ -28,7 +28,7 @@ interface KleisliApplicativeInstance<F, D> : KleisliFunctorInstance<F, D>, Appli
     fix().ap(FF(), ff)
 
   override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.product(fb: Kind<KleisliPartialOf<F, D>, B>): Kleisli<F, D, Tuple2<A, B>> =
-    Kleisli({ FF().run { fix().run(it).product(fb.fix().run(it)) } })
+    Kleisli { FF().run { fix().run(it).product(fb.fix().run(it)) } }
 }
 
 @instance(Kleisli::class)
