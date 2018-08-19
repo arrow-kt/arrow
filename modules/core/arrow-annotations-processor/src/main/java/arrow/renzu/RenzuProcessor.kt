@@ -2,10 +2,7 @@ package arrow.renzu
 
 import arrow.common.utils.AbstractProcessor
 import arrow.common.utils.knownError
-import arrow.instances.AnnotatedInstance
-import arrow.instances.InstanceProcessor
-import arrow.instances.instanceAnnotationClass
-import arrow.instances.instanceAnnotationName
+import arrow.instances.*
 import com.google.auto.service.AutoService
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
@@ -30,7 +27,7 @@ class RenzuProcessor(val isolateForTests: Boolean = false) : AbstractProcessor()
       .getElementsAnnotatedWith(instanceAnnotationClass)
       .map { element ->
         when (element.kind) {
-          ElementKind.INTERFACE -> InstanceProcessor.processClass(this, element as TypeElement)
+          ElementKind.INTERFACE -> LegacyInstanceProcessor.processClass(this, element as TypeElement)
           else -> knownError("$instanceAnnotationName can only be used on interfaces")
         }
       }

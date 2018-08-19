@@ -33,7 +33,7 @@ interface IorApplicativeInstance<L> : Applicative<IorPartialOf<L>>, IorFunctorIn
 }
 
 @extension
-interface IorMonadInstance<L> : IorApplicativeInstance<L>, Monad<IorPartialOf<L>> {
+interface IorMonadInstance<L> : Monad<IorPartialOf<L>>, IorApplicativeInstance<L> {
 
   override fun <A, B> Kind<IorPartialOf<L>, A>.map(f: (A) -> B): Ior<L, B> = fix().map(f)
 
@@ -59,7 +59,7 @@ interface IorFoldableInstance<L> : Foldable<IorPartialOf<L>> {
 }
 
 @extension
-interface IorTraverseInstance<L> : IorFoldableInstance<L>, Traverse<IorPartialOf<L>> {
+interface IorTraverseInstance<L> : Traverse<IorPartialOf<L>>, IorFoldableInstance<L> {
 
   override fun <G, B, C> IorOf<L, B>.traverse(AP: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Ior<L, C>> =
     fix().traverse(AP, f)

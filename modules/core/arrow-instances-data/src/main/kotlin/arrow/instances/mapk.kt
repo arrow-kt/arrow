@@ -3,6 +3,7 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.Eval
 import arrow.data.*
+import arrow.data.eq.eq
 import arrow.extension
 import arrow.typeclasses.*
 
@@ -21,7 +22,7 @@ interface MapKFoldableInstance<K> : Foldable<MapKPartialOf<K>> {
 }
 
 @extension
-interface MapKTraverseInstance<K> : MapKFoldableInstance<K>, Traverse<MapKPartialOf<K>> {
+interface MapKTraverseInstance<K> : Traverse<MapKPartialOf<K>>, MapKFoldableInstance<K> {
 
   override fun <G, A, B> MapKOf<K, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, MapKOf<K, B>> =
     fix().traverse(AP, f)
@@ -40,7 +41,7 @@ interface MapKSemigroupInstance<K, A> : Semigroup<MapK<K, A>> {
 }
 
 @extension
-interface MapKMonoidInstance<K, A> : MapKSemigroupInstance<K, A>, Monoid<MapK<K, A>> {
+interface MapKMonoidInstance<K, A> : Monoid<MapK<K, A>>, MapKSemigroupInstance<K, A> {
 
   override fun empty(): MapK<K, A> = emptyMap<K, A>().k()
 }

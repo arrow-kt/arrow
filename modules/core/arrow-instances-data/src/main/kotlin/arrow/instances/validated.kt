@@ -13,7 +13,7 @@ interface ValidatedFunctorInstance<E> : Functor<ValidatedPartialOf<E>> {
 }
 
 @extension
-interface ValidatedApplicativeInstance<E> : ValidatedFunctorInstance<E>, Applicative<ValidatedPartialOf<E>> {
+interface ValidatedApplicativeInstance<E> : Applicative<ValidatedPartialOf<E>>, ValidatedFunctorInstance<E> {
 
   fun SE(): Semigroup<E>
 
@@ -26,7 +26,7 @@ interface ValidatedApplicativeInstance<E> : ValidatedFunctorInstance<E>, Applica
 }
 
 @extension
-interface ValidatedApplicativeErrorInstance<E> : ValidatedApplicativeInstance<E>, ApplicativeError<ValidatedPartialOf<E>, E> {
+interface ValidatedApplicativeErrorInstance<E> : ApplicativeError<ValidatedPartialOf<E>, E>, ValidatedApplicativeInstance<E> {
 
   override fun <A> raiseError(e: E): Validated<E, A> = Invalid(e)
 
@@ -46,7 +46,7 @@ interface ValidatedFoldableInstance<E> : Foldable<ValidatedPartialOf<E>> {
 }
 
 @extension
-interface ValidatedTraverseInstance<E> : ValidatedFoldableInstance<E>, Traverse<ValidatedPartialOf<E>> {
+interface ValidatedTraverseInstance<E> : Traverse<ValidatedPartialOf<E>>, ValidatedFoldableInstance<E> {
 
   override fun <G, A, B> Kind<ValidatedPartialOf<E>, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> =
     fix().validatedTraverse(AP, f)

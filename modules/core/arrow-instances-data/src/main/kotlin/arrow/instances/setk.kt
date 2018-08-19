@@ -15,7 +15,7 @@ interface SetKSemigroupInstance<A> : Semigroup<SetK<A>> {
 }
 
 @extension
-interface SetKMonoidInstance<A> : SetKSemigroupInstance<A>, Monoid<SetK<A>> {
+interface SetKMonoidInstance<A> : Monoid<SetK<A>>, SetKSemigroupInstance<A> {
   override fun empty(): SetK<A> = emptySet<A>().k()
 }
 

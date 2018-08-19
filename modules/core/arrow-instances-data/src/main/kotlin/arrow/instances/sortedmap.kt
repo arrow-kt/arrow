@@ -22,7 +22,7 @@ interface SortedMapKFoldableInstance<A : Comparable<A>> : Foldable<SortedMapKPar
 }
 
 @extension
-interface SortedMapKTraverseInstance<A : Comparable<A>> : SortedMapKFoldableInstance<A>, Traverse<SortedMapKPartialOf<A>> {
+interface SortedMapKTraverseInstance<A : Comparable<A>> : Traverse<SortedMapKPartialOf<A>>, SortedMapKFoldableInstance<A> {
   override fun <G, B, C> SortedMapKOf<A, B>.traverse(AP: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Kind<SortedMapKPartialOf<A>, C>> =
     fix().traverse(AP, f)
 }
@@ -39,7 +39,7 @@ interface SortedMapKSemigroupInstance<A : Comparable<A>, B> : Semigroup<SortedMa
 }
 
 @extension
-interface SortedMapKMonoidInstance<A : Comparable<A>, B> : SortedMapKSemigroupInstance<A, B>, Monoid<SortedMapKOf<A, B>> {
+interface SortedMapKMonoidInstance<A : Comparable<A>, B> : Monoid<SortedMapKOf<A, B>>, SortedMapKSemigroupInstance<A, B> {
   override fun empty(): SortedMapK<A, B> = sortedMapOf<A, B>().k()
 }
 

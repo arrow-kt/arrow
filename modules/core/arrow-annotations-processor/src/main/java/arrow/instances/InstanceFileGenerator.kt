@@ -32,18 +32,23 @@ data class Instance(
     .replace("Instance", "")
     .decapitalize()
 
-  fun typeArgs(reified: Boolean = false): List<String> =
+  fun typeArgs(reified: Boolean = false, includeBounds: Boolean = false): List<String> =
     if (target.dataTypeInstance.typeParameters.isNotEmpty()) {
       target.dataTypeInstance.typeParameters.map {
         val name = target.dataTypeInstance.nameResolver.getString(it.name)
-        if (reified) "reified $name" else name
+        val upperBound = if (includeBounds && it.upperBoundList.isNotEmpty())
+          it.upperBoundList
+            .map { it.extractFullName(target.dataTypeInstance).normalizeType() }
+            .joinToString(separator = " : ", prefix = ": ")
+        else ""
+        if (reified) "reified $name" + upperBound else name + upperBound
       }
     } else {
       emptyList()
     }
 
-  fun expandedTypeArgs(reified: Boolean = false): String {
-    val ta = typeArgs(reified)
+  fun expandedTypeArgs(reified: Boolean = false, includeBounds: Boolean = false): String {
+    val ta = typeArgs(reified, includeBounds)
     return if (ta.isEmpty()) ""
     else ta.joinToString(prefix = "<", separator = ", ", postfix = ">")
   }
@@ -98,8 +103,13 @@ data class Instance(
         }
     }
 
-  private fun getTypeclassReturningFunctions(): List<FunctionMapping> =
-    (target.superTypes + listOf(target.dataTypeInstance)).flatMap { tc ->
+  private fun getTypeclassReturningFunctions(): List<FunctionMapping> {
+    val concreteFunctionNames: List<String> = (target.superTypes + listOf(target.dataTypeInstance)).flatMap { tc ->
+      tc.functionList
+        .filter { it.modality != ProtoBuf.Modality.ABSTRACT }
+        .map { tc.nameResolver.getString(it.name) }
+    }
+    return (target.superTypes + listOf(target.dataTypeInstance)).flatMap { tc ->
       tc.functionList
         .filter { it.modality == ProtoBuf.Modality.ABSTRACT }
         .map { it to it.returnType.extractFullName(tc).removeBackticks() }
@@ -116,7 +126,10 @@ data class Instance(
             else -> emptyList()
           }
         }
-    }
+    }.filterNot { currentFunction ->
+      concreteFunctionNames.contains(currentFunction.name)
+    }.distinctBy { it.name }
+  }
 
   data class ParamInfo(
     val param: Pair<String, String>,
@@ -130,7 +143,7 @@ data class Instance(
     val paramType = target.processor.getClassOrPackageDataWrapper(rt) as ClassOrPackageDataWrapper.Class
     val paramTypeName = paramType.nameResolver.getString(paramType.classProto.fqName)
     val typeTable = TypeTable(paramType.classProto.typeTable)
-    val superTypes = target.processor.recurseTypeclassInterfaces(paramType, typeTable, emptyList()).map {
+    val superTypes = target.processor.supertypes(paramType, typeTable, emptyList()).map {
       val t = it as ClassOrPackageDataWrapper.Class
       t.nameResolver.getString(t.classProto.fqName)
     }
@@ -193,42 +206,57 @@ class InstanceFileGenerator(
                 |""".trimMargin()
 
   private fun genDatatypeExtensions(i: Instance): String = i.extendingFunctions().joinToString(separator = "\n", transform = { fm ->
-      try {
-        val typeClassTypeArgs = i.target.typeClass.typeParameters.drop(1).flatMap {
-          if (it.hasName()) listOf(i.target.typeClass.nameResolver.getString(it.name))
-          else emptyList()
-        }
-        val appliedTypeArgs = i.target.dataTypeInstance.classProto.supertypeList[0].argumentList.drop(1).flatMap {
-          if (it.type.hasClassName()) listOf(i.target.dataTypeInstance.nameResolver.getString(it.type.className))
-          else emptyList()
-        } + i.typeArgs()
-        val typesToApply: List<Pair<String, String>> =
-          if (typeClassTypeArgs.size == appliedTypeArgs.size) typeClassTypeArgs.zip(appliedTypeArgs)
-          else emptyList()
+    try {
+      val typeClassTypeArgs = i.target.typeClass.typeParameters.drop(1).flatMap {
+        if (it.hasName()) listOf(i.target.typeClass.nameResolver.getString(it.name))
+        else emptyList()
+      }
+      val appliedTypeArgs = i.target.dataTypeInstance.classProto.supertypeList[0].argumentList.drop(1).flatMap {
+        if (it.type.hasClassName()) listOf(i.target.dataTypeInstance.nameResolver.getString(it.type.className))
+        else emptyList()
+      } + i.typeArgs()
+      val typesToApply: List<Pair<String, String>> =
+        if (typeClassTypeArgs.size == appliedTypeArgs.size) typeClassTypeArgs.zip(appliedTypeArgs)
+        else emptyList()
 
-        val sg: FunctionSignature = FunctionSignature.from(
-          recType = i.target.dataType,
-          typeClass = i.target.typeClass,
-          f = fm.function,
-          invariantTypeArgs = i.typeArgs(),
-          unappliedTypeArgs = typesToApply
-        )
+      val invariantTypeArgs =
+        if (i.target.dataType.typeParameters.size > 2) {
+          i.typeArgs() - typeClassTypeArgs
+        } else i.typeArgs()
 
-        if (typeClassTypeArgs.isNotEmpty())
-          i.target.processor.logW(
-            "\n${i.target.dataType.fullName.normalizeType()}#${sg.name}*\ntypeClassTypeArgs: \t\t$typeClassTypeArgs\nappliedTypeArgs: \t\t$appliedTypeArgs\ntypesToApply: \t\t$typesToApply"
-          )
+      val sg: FunctionSignature = FunctionSignature.from(
+        recType = i.target.dataType,
+        typeClass = i.target.typeClass,
+        f = fm.function,
+        invariantTypeArgs = invariantTypeArgs,
+        unappliedTypeArgs = typesToApply
+      )
 
-        val typeArgs = sg.tparams.joinToString(separator = ", ", prefix = "<", postfix = ">")
-        val args = i.args + sg.args
-        val combinedTypeArgs = (i.typeArgs() + sg.tparams).distinct()
-        val biasedTypeArgs =
-          if (combinedTypeArgs.isEmpty()) ""
-          else combinedTypeArgs.joinToString(separator = ", ", prefix = "<", postfix = ">")
+      val altFunction = i.target.dataTypeInstance.functionList.map {
+        val name = i.target.dataTypeInstance.nameResolver.getString(it.name)
+        val retType = it.returnType.extractFullName(i.target.dataTypeInstance)
+        name to retType
+      }
 
-        val retType = sg.retType.removeBackticks()
-        if (sg.hkArgs is HKArgs.First) {
-          """|
+      i.target.processor.logW(
+        "\n${i.target.dataTypeInstance.fullName.normalizeType()}#${sg.name}*" +
+          "\naltFunction : \t\t$altFunction" +
+          "\ndatatype typeargs : \t\t${i.typeArgs()}" +
+          "\ntypeClassTypeArgs: \t\t$typeClassTypeArgs" +
+          "\nappliedTypeArgs: \t\t$appliedTypeArgs" +
+          "\ntypesToApply: \t\t$typesToApply"
+      )
+
+      val typeArgs = sg.tparams.joinToString(separator = ", ", prefix = "<", postfix = ">")
+      val args = i.args + sg.args
+      val combinedTypeArgs = (i.typeArgs(includeBounds = true) + (sg.tparams - i.typeArgs()))
+      val biasedTypeArgs =
+        if (combinedTypeArgs.isEmpty()) ""
+        else combinedTypeArgs.joinToString(separator = ", ", prefix = "<", postfix = ">")
+
+      val retType = sg.retType.removeBackticks()
+      if (sg.hkArgs is HKArgs.First) {
+        """|
          |@Suppress("UNCHECKED_CAST")
          |fun ${biasedTypeArgs} ${sg.hkArgs.receiver.removeBackticks()}.`${fm.name}`(${args.joinToString(",") { "\n\t${it.first}: ${it.second.removeBackticks()}" }}): $retType =
          |  ${i.receiverTypeName}.${i.companionFactoryName}${i.expandedTypeArgs()}(${i.args.joinToString(", ") { it.first }}).run {
@@ -236,19 +264,19 @@ class InstanceFileGenerator(
          |  }
          |
          |""".trimMargin()
-        } else {
-          """|
+      } else {
+        """|
          |@Suppress("UNCHECKED_CAST")
          |fun ${biasedTypeArgs} ${i.receiverTypeName}.Companion.`${fm.name}`(${args.joinToString(",") { "\n\t${it.first}: ${it.second.removeBackticks()}" }}): $retType =
          |  ${i.receiverTypeName}.${i.companionFactoryName}${i.expandedTypeArgs()}(${i.args.joinToString(", ") { it.first }}).run {
          |    this.`${fm.name}`${typeArgs}(${sg.args.joinToString(", ") { it.first }}) as $retType
          |  }
          |""".trimMargin()
-        }
-      } catch (iob: Throwable) {
-        i.target.processor.logW("skipped extension for fm: ${fm.name}")
-        ""
       }
-    })
+    } catch (iob: Throwable) {
+      i.target.processor.logW("skipped extension for fm: ${fm.name}")
+      ""
+    }
+  })
 
 }

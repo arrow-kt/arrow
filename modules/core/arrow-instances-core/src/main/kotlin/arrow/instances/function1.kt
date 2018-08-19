@@ -16,7 +16,7 @@ interface Function1FunctorInstance<I> : Functor<Function1PartialOf<I>> {
 
 @extension
 interface Function1ProfunctorInstance : Profunctor<ForFunction1> {
-  override fun <A, B, C, D> Kind<Function1PartialOf<A>, B>.dimap(fl: (C) -> A, fr: (B) -> D): kotlin.Function1<C, D> =
+  override fun <A, B, C, D> Kind<Function1PartialOf<A>, B>.dimap(fl: (C) -> A, fr: (B) -> D): Function1<C, D> =
     (fr compose fix().f compose fl).k()
 }
 

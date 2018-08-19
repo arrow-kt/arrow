@@ -3,7 +3,7 @@ package arrow.optics
 import arrow.Kind
 import arrow.core.*
 import arrow.data.ListK
-import arrow.data.monoid
+import arrow.data.monoid.monoid
 import arrow.higherkind
 import arrow.instances.monoid
 import arrow.typeclasses.Const

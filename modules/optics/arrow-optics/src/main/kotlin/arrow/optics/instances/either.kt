@@ -2,7 +2,8 @@ package arrow.optics.instances
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.traverse
+import arrow.core.fix
+import arrow.core.traverse.traverse
 import arrow.extension
 import arrow.optics.Traversal
 import arrow.optics.typeclasses.Each

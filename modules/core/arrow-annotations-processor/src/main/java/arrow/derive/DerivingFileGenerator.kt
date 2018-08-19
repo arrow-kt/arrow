@@ -15,8 +15,7 @@ import java.io.File
 private fun List<String>.prependTypeArgs(): String =
   when {
     isEmpty() -> ""
-    size == 1 -> joinToString(postfix = ", ")
-    else -> joinToString(", ")
+    else -> joinToString(", ", postfix = ", ")
   }
 
 private fun kindedRegex(typeClassFirstTypeArg: String): Regex = "arrow.Kind<$typeClassFirstTypeArg,\\s".toRegex()
@@ -112,6 +111,8 @@ data class FunctionSignature(
       val receiverType = recType.fullName.normalizeType()
       val typeParams = f.typeParameterList.map { it.name.get() }
       val typeClassAbstractKind = typeClass.typeParameters[0].name.get().normalizeType()
+      val functionName = typeClass.nameResolver.getString(f.name)
+
       val args = f.valueParameterList.map {
         val argName = it.name.get()
         val argType = it.type.extractFullName(typeClass).normalizeType()
@@ -126,7 +127,7 @@ data class FunctionSignature(
       val isAbstract = f.modality == ProtoBuf.Modality.ABSTRACT
       return FunctionSignature(
         tparams = typeParams,
-        name = typeClass.nameResolver.getString(f.name),
+        name = functionName,
         args = args,
         retType = concreteType,
         hkArgs = findArgs(f, typeClassAbstractKind.normalizeType(), typeClass, recType, invariantTypeArgs, unappliedTypeArgs),

@@ -83,7 +83,7 @@ interface ProcessorUtils : KotlinMetadataUtils {
     }
   }
 
-  fun recurseTypeclassInterfaces(
+  fun supertypes(
     current: ClassOrPackageDataWrapper.Class,
     typeTable: TypeTable,
     acc: List<ClassOrPackageDataWrapper>): List<ClassOrPackageDataWrapper> {
@@ -101,7 +101,7 @@ interface ProcessorUtils : KotlinMetadataUtils {
             val typeClassElement = elementUtils.getTypeElement(className)
             val parentInterface = getClassOrPackageDataWrapper(typeClassElement)
             val newAcc = acc + parentInterface
-            recurseTypeclassInterfaces(parentInterface as ClassOrPackageDataWrapper.Class, typeTable, newAcc)
+            supertypes(parentInterface as ClassOrPackageDataWrapper.Class, typeTable, newAcc)
           } catch (_: Throwable) {
             emptyList<ClassOrPackageDataWrapper>()
           }

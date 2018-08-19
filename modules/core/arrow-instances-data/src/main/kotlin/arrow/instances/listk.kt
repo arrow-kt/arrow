@@ -15,7 +15,7 @@ interface ListKSemigroupInstance<A> : Semigroup<ListK<A>> {
 }
 
 @extension
-interface ListKMonoidInstance<A> : ListKSemigroupInstance<A>, Monoid<ListK<A>> {
+interface ListKMonoidInstance<A> : Monoid<ListK<A>>, ListKSemigroupInstance<A> {
   override fun empty(): ListK<A> =
     emptyList<A>().k()
 }
@@ -131,3 +131,36 @@ object ListKContext : ListKMonadInstance, ListKTraverseInstance, ListKMonoidKIns
 
 infix fun <A> ForListK.Companion.extensions(f: ListKContext.() -> A): A =
   f(ListKContext)
+
+//object test {
+//
+//  // dog names can be treated as unique IDs here
+//  data class Dog(val id: String, val owner: String)
+//
+//
+//  val dogsAreCute: List<Pair<Dog, Boolean>> = listOf(
+//    Dog("Kessi", "Marc") to true,
+//    Dog("Rocky", "Martin") to false,
+//    Dog("Molly", "Martin") to true
+//  )
+//
+//  // loaded by the backend, so can contain new data
+//  val newDogs: List<Dog> = listOf(
+//    Dog("Kessi", "Marc"),
+//    Dog("Rocky", "Marc"),
+//    Dog("Buddy", "Martin")
+//  )
+//
+//  // this should be the result: a union that preserves the extra Boolean, but replaces dogs by
+//  // their new updated data
+//  val expected = listOf(
+//    newDogs[0] to true,
+//    newDogs[1] to false
+//  )
+//
+//  @JvmStatic
+//  fun main(args: Array<String>) {
+//    val actual = dogsAreCute.zip(newDogs)
+//    println(actual)
+//  }
+//}

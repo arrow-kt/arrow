@@ -20,34 +20,36 @@ interface WriterTFunctorInstance<F, W> : Functor<WriterTPartialOf<F, W>> {
 @extension
 interface WriterTApplicativeInstance<F, W> : Applicative<WriterTPartialOf<F, W>>, WriterTFunctorInstance<F, W> {
 
-  override fun FF(): Monad<F>
+  fun MF(): Monad<F>
+
+  override fun FF(): Functor<F> = MF()
 
   fun MM(): Monoid<W>
 
   override fun <A> just(a: A): WriterTOf<F, W, A> =
-    WriterT(FF().just(MM().empty() toT a))
+    WriterT(MF().just(MM().empty() toT a))
 
   override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.ap(ff: Kind<WriterTPartialOf<F, W>, (A) -> B>): WriterT<F, W, B> =
-    fix().ap(FF(), MM(), ff)
+    fix().ap(MF(), MM(), ff)
 
   override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.map(f: (A) -> B): WriterT<F, W, B> =
     fix().map(FF(), { f(it) })
 }
 
 @extension
-interface WriterTMonadInstance<F, W> : WriterTApplicativeInstance<F, W>, Monad<WriterTPartialOf<F, W>> {
+interface WriterTMonadInstance<F, W> : Monad<WriterTPartialOf<F, W>>, WriterTApplicativeInstance<F, W> {
 
   override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.map(f: (A) -> B): WriterT<F, W, B> =
     fix().map(FF(), { f(it) })
 
   override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.flatMap(f: (A) -> Kind<WriterTPartialOf<F, W>, B>): WriterT<F, W, B> =
-    fix().flatMap(FF(), MM(), { f(it).fix() })
+    fix().flatMap(MF(), MM(), { f(it).fix() })
 
   override fun <A, B> tailRecM(a: A, f: (A) -> Kind<WriterTPartialOf<F, W>, Either<A, B>>): WriterT<F, W, B> =
-    WriterT.tailRecM(FF(), a, f)
+    WriterT.tailRecM(MF(), a, f)
 
   override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.ap(ff: Kind<WriterTPartialOf<F, W>, (A) -> B>): WriterT<F, W, B> =
-    fix().ap(FF(), MM(), ff)
+    fix().ap(MF(), MM(), ff)
 }
 
 @extension
@@ -62,14 +64,16 @@ interface WriterTSemigroupKInstance<F, W> : SemigroupK<WriterTPartialOf<F, W>> {
 @extension
 interface WriterTMonoidKInstance<F, W> : MonoidK<WriterTPartialOf<F, W>>, WriterTSemigroupKInstance<F, W> {
 
-  override fun SS(): MonoidK<F>
+  fun MF(): MonoidK<F>
 
-  override fun <A> empty(): WriterT<F, W, A> = WriterT(SS().empty())
+  override fun SS(): SemigroupK<F> = MF()
+
+  override fun <A> empty(): WriterT<F, W, A> = WriterT(MF().empty())
 }
 
 class WriterTContext<F, W>(val MF: Monad<F>, val MW: Monoid<W>) : WriterTMonadInstance<F, W> {
-  override fun FF(): Monad<F> = MF
-
+  override fun FF(): Functor<F> = MF
+  override fun MF(): Monad<F> = MF
   override fun MM(): Monoid<W> = MW
 }
 
