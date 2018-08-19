@@ -1,6 +1,7 @@
 package arrow.test.generators
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.*
 import arrow.data.*
 import arrow.recursion.Algebra
@@ -41,6 +42,12 @@ fun genThrowable(): Gen<Throwable> = object : Gen<Throwable> {
 inline fun <F, A> genConstructor(valueGen: Gen<A>, crossinline cf: (A) -> Kind<F, A>): Gen<Kind<F, A>> =
   object : Gen<Kind<F, A>> {
     override fun generate(): Kind<F, A> =
+      cf(valueGen.generate())
+  }
+
+inline fun <F, A> genDoubleConstructor(valueGen: Gen<A>, crossinline cf: (A) -> Kind2<F, A, A>): Gen<Kind2<F, A, A>> =
+  object : Gen<Kind2<F, A, A>> {
+    override fun generate(): Kind2<F, A, A> =
       cf(valueGen.generate())
   }
 
@@ -135,7 +142,7 @@ inline fun <reified E, reified A> genValidated(genE: Gen<E>, genA: Gen<A>): Gen<
 
 inline fun <reified A> genTry(genA: Gen<A>, genThrowable: Gen<Throwable> = genThrowable()): Gen<Try<A>> = Gen.create {
   genEither(genThrowable, genA).generate().fold(
-    { throwable -> Failure<A>(throwable) },
+    { throwable -> Failure(throwable) },
     { a -> Success(a) }
   )
 }

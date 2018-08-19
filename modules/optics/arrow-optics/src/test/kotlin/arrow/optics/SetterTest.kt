@@ -47,16 +47,16 @@ class SetterTest : UnitSpec() {
       val token = Token(oldValue)
       val user = User(token)
 
-      forAll({ value: String ->
+      forAll { value: String ->
         joinedSetter.set(token.left(), value).swap().getOrElse { Token("Wrong value") }.value ==
           joinedSetter.set(user.right(), value).getOrElse { User(Token("Wrong value")) }.token.value
-      })
+      }
     }
 
     "Lifting a function should yield the same result as direct modify" {
-      forAll(TokenGen, Gen.string(), { token, value ->
+      forAll(TokenGen, Gen.string()) { token, value ->
         tokenSetter.modify(token) { value } == tokenSetter.lift { value }(token)
-      })
+      }
     }
   }
 }

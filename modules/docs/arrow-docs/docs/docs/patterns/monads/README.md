@@ -371,11 +371,13 @@ In Arrow terms, a Monad is an interface with two operations: a constructor `just
 interface Monad<F>: Applicative<F>, Functor<F> {
     fun <A> just (instance: A): Kind<F, A>
 
-    fun <A, B> Kind<F, A>.flatMap(f: (A) ->  Kind<F, B>)
+    fun <A, B> Kind<F, A>.flatMap(f: (A) ->  Kind<F, B>) : Kind<F, B>
 }
 ```
 
-The constructor `just` is used to put an object into container `Kind<F, A>` as described in the [glossary]({{ '/docs/patterns/glossary/#type-constructors' | relative_url }}), `flatMap` is used to replace one contained object with another contained object.
+See that instead of `WorkflowThatReturns<A>` our containers are called `Kind<F, A>`, where `F` is the generic parameter of the container and `A` the generic parameter of the content. We talk more about them in the [glossary]({{ '/docs/patterns/glossary/#type-constructors' | relative_url }}).
+
+The constructor `just` is used to put an object into a container `Kind<F, A>`, and `flatMap` is used to replace one contained object with another contained object.
 
 It's important that `flatMaps`'s argument returns `Kind<F, B>` and not just `B`, as this new contained object can have different behavior, like a left branch of `Either` or an async execution of `IO`.
 
@@ -464,7 +466,7 @@ While the typical usage of Deferred in Kotlin is different from the Monad patter
 ```kotlin
 class Future<T>(
     val instance: Deferred<T>
-) {
+): Kind<ForFuture, A> {
     constructor(instance: T) {
         this.instance = async(LAZY) { instance }
     }
@@ -518,7 +520,7 @@ object FutureMonadInstance: Monad<ForFuture> {
     override fun <A> just (instance: A): Future<A> =
         Future(a)
 
-    override fun <A, B> FutureOf<A>.flatMap(f: (A) ->  FutureOf<F, B>): Future<B> =
+    override fun <A, B> Kind<ForFuture, A>.flatMap(f: (A) ->  Kind<ForFuture, B>): Future<B> =
         flatMap(f) // as per precedence rules the class method is called
 }
 
@@ -526,14 +528,16 @@ object OptionMonadInstance: Monad<ForOption> {
     override fun <A> just (instance: A): Option<A> =
         Some(a)
 
+    // OptionOf<T> is an alias for Kind<ForOption, T>
     override fun <A, B> OptionOf<A>.flatMap(f: (A) ->  OptionOf<B>): Option<B> =
-        flatMap(f) // as per precedence rules the class method is called
+        flatMap(f)
 }
 
 object ObservableSwitchMonadInstance: Monad<ForObservable> {
     override fun <A> just (instance: A): Observable<A> =
         Observable.just(a)
 
+    // ObservableOf<T> is an alias for Kind<ForObservable, T>
     override fun <A, B> ObservableOf<A>.flatMap(f: (A) ->  ObservableOf<B>): Observable<B> =
         switchMap(f)
 }
@@ -542,6 +546,7 @@ object ObservableConcatMonadInstance: Monad<ForObservable> {
     override fun <A> just (instance: A): Observable<A> =
         Observable.just(a)
 
+    // ObservableOf<T> is an alias for Kind<ForObservable, T>
     override fun <A, B> ObservableOf<A>.flatMap(f: (A) ->  ObservableOf<B>): Observable<B> =
         concatMap(f)
 }
@@ -643,7 +648,7 @@ These laws are encoded in Arrow as tests you can find in the `arrow-test` module
 
 A typical monad tutorial will make a lot of emphasis on the laws, but I find them less important to explain to a beginner. Nonetheless, here they are for the sake of completeness.
 
-`Left Identity law` says that that Monad constructor is a neutral operation: you can safely run it before Bind, and it won't change the result of the function call:
+`Left Identity law` says that Monad constructor is a neutral operation: you can safely run it before `flatMap`, and it won't change the result of the function call:
 
 ```
 // Given
@@ -654,7 +659,7 @@ val f: (A) -> Kind<F, B>
 just(value).flatMap(f) == f(value)
 ```
 
-`Right Identity law` says that given a monadic value, wrapping its contained data into another monad of same type and then Binding it, doesn't change the original value:
+`Right Identity law` says that given a monadic value, wrapping its contained data into another monad of same type and then `flatMap` it, doesn't change the original value:
 
 ```
 // Given
@@ -664,7 +669,7 @@ val monadicValue: Kind<F, A>
 monadicValue.flatMap { x -> just(x) } == monadicValue
 ```
 
-`Associativity law` means that the order in which Bind operations are composed does not matter:
+`Associativity law` means that the order in which `flatMap` operations are composed does not matter:
 
 ```
 // Given

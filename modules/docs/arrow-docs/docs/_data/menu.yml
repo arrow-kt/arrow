@@ -34,6 +34,9 @@ options:
       - title: Monad Comprehensions
         url: /docs/patterns/monad_comprehensions/
 
+      - title: Polymorphic Programs
+        url: /docs/patterns/polymorphic_programs/
+
       - title: Free Algebras
         url: /docs/patterns/free_algebras/
 
@@ -197,6 +200,12 @@ options:
 
       - title: Bimonad
         url: /docs/typeclasses/bimonad/
+
+      - title: Bifunctor
+        url: /docs/typeclasses/bifunctor
+
+      - title: Profunctor
+        url: /docs/typeclasses/profunctor
 
       - title: SemigroupK
         url: /docs/typeclasses/semigroupk/

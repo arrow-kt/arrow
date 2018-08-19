@@ -43,7 +43,7 @@ allprojects {
 Add the dependencies into the project's `build.gradle`
 
 ```groovy
-def arrow_version = "0.7.2"
+def arrow_version = "0.7.3"
 dependencies {
     compile "io.arrow-kt:arrow-core:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -76,7 +76,7 @@ Add the dependencies into the project's `build.gradle`
 apply plugin: 'kotlin-kapt' //optional
 apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //only for Android projects
 
-def arrow_version = "0.7.2"
+def arrow_version = "0.7.3"
 dependencies {
     ...
     kapt    'io.arrow-kt:arrow-annotations-processor:$arrow_version' //optional

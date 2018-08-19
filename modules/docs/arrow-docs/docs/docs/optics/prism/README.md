@@ -151,7 +151,7 @@ When dealing with polymorphic sum types like `Try<A>` we can also have polymorph
 
 ```kotlin
 fun <A, B> trySuccess(): PPrism<Try<A>, Try<B>, A, B> = PPrism(
-        getOrModify = { aTry -> aTry.fold({ Try.Failure<B>(it).left() }, { it.right() }) },
+        getOrModify = { aTry -> aTry.fold({ Try.Failure(it).left() }, { it.right() }) },
         reverseGet = { b -> Try.Success(b) }
 )
 
@@ -159,7 +159,7 @@ val liftSuccess: (Try<Int>) -> Try<String> = pTrySuccess<Int, String>().lift(Int
 liftSuccess(Try.Success(5))
 ```
 ```kotlin
-liftSuccess(Try.Failure<Int>(ArithmeticException("/ by zero")))
+liftSuccess(Try.Failure(ArithmeticException("/ by zero")))
 ```
 
 ### Laws
