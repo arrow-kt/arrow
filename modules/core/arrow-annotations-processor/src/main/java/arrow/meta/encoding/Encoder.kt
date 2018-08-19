@@ -1,3 +1,0 @@
-package arrow.meta
-
-interface

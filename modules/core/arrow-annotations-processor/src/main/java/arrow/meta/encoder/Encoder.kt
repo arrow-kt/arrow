@@ -1,4 +1,4 @@
-package arrow.meta.encoding
+package arrow.meta.encoder
 
 import arrow.meta.ast.Tree
 import javax.lang.model.element.Element
