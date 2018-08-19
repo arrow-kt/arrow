@@ -8,14 +8,14 @@ object EqLaws {
 
   inline fun <F> laws(EQ: Eq<F>, noinline cf: (Int) -> F): List<Law> =
     listOf(
-      Law("Eq Laws: identity") { EQ.identityEquality(cf) },
+      Law("Eq Laws: reflexivity") { EQ.reflexivityEquality(cf) },
       Law("Eq Laws: commutativity") { EQ.commutativeEquality(cf) }
     )
 
-  fun <F> Eq<F>.identityEquality(cf: (Int) -> F): Unit =
+  fun <F> Eq<F>.reflexivityEquality(cf: (Int) -> F): Unit =
     forAll(Gen.int()) { int: Int ->
       val a = cf(int)
-      a.eqv(a) == a.eqv(a)
+      a.eqv(a)
     }
 
   fun <F> Eq<F>.commutativeEquality(cf: (Int) -> F): Unit =
