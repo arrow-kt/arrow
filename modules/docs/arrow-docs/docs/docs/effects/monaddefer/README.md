@@ -9,9 +9,9 @@ permalink: /docs/effects/monaddefer/
 {:.intermediate}
 intermediate
 
-`MonadDefer` is a typeclass representing suspension of execution via functions, allowing for asynchronous and lazy computations.
+`MonadDefer` is a typeclass to abstract over lazy computations. This means that the computations are run *synchronously* at a different time than when they're created. 
 
-`MonadDefer` includes all combinators present in [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}).
+All the new combinators added by `MonadDefer` are constructors. `MonadDefer` also includes all combinators present in [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}).
 
 ### Main Combinators
 
@@ -88,30 +88,6 @@ IO.async()
 ```
 
 > deferUnsafe() exists for performance purposes when throwing can be avoided.
-
-### Comprehensions
-
-#### bindindCancellable
-
-It starts a [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) that allows for cancellation and suspension in separate threads.
-
-#### bindindCancellable#bindDefer
-
-Binds the function parameter by wrapping the result in `just()`.
-
-Exceptions are wrapped in `raiseError()`.
-
-#### bindindCancellable#bindDeferIn
-
-Executes the function parameter in a separate `CoroutineContext` and wraps the result in `just()`.
-
-Exceptions are wrapped in `raiseError()`.
-
-#### bindindCancellable#bindDeferUnsafe
-
-Binds the function parameter by wrapping the result in `just()`.
-
-While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution.
 
 ### Laws
 
