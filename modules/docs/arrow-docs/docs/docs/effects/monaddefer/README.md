@@ -9,11 +9,25 @@ permalink: /docs/effects/monaddefer/
 {:.intermediate}
 intermediate
 
-`MonadDefer` is a typeclass to abstract over lazy computations. This means that the computations are run *synchronously* at a different time than when they're created. 
+`MonadDefer` is a typeclass to abstract over computations that cause side effects. This means that the computations are defered until they're are asked to be performed *synchronously*. Without effect suspension the effects would otherwise run immediately.
 
-All the new combinators added by `MonadDefer` are constructors. `MonadDefer` also includes all combinators present in [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}).
+```kotlin
+val now = IO.applicative().just(println("eager side effect"))
+// Print: "eager side effect"
+
+now.unsafeRunAsync { }
+// Nothing, the effect has run already
+
+val later = IO.monadDefer().invoke { println("lazy side effect") }
+// Nothing, the effect is deferred until executed
+
+later.unsafeRunAsync { }
+// Print: "lazy side effect"
+```
 
 ### Main Combinators
+
+All the new combinators added by `MonadDefer` are constructors. `MonadDefer` also includes all combinators present in [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}).
 
 #### invoke
 
