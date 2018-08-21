@@ -1,7 +1,6 @@
 package arrow.effects
 
 import arrow.core.*
-import arrow.effects.data.internal.IOCancellationException
 import arrow.effects.internal.*
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.typeclasses.Disposable
@@ -71,7 +70,7 @@ fun <A, B> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>): IO<Eit
     { it.fix().unsafeRunAsync { it.fold({ /* should never happen */ }, { cancel.set(it) }) } }
     ).unsafeRunAsync { it.fold({ complete(it.left()) }, { /* should never happen */ }) }
   }.handleErrorWith {
-    if (it == IOCancellationException) {
+    if (it == OnCancel.CancellationException) {
       complete(it.left())
     }
     raiseError(it)
@@ -98,7 +97,7 @@ fun <A, B, C> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>, c: I
     { it.fix().unsafeRunAsync { it.fold({ /* should never happen */ }, { cancel.set(it) }) } }
     ).unsafeRunAsync { it.fold({ complete(it.left()) }, { /* should never happen */ }) }
   }.handleErrorWith {
-    if (it == IOCancellationException) {
+    if (it == OnCancel.CancellationException) {
       complete(it.left())
     }
     raiseError(it)

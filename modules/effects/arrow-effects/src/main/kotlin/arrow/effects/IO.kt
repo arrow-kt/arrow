@@ -2,9 +2,9 @@ package arrow.effects
 
 import arrow.core.*
 import arrow.core.Either.Left
+import arrow.effects.OnCancel.Companion.CancellationException
 import arrow.effects.OnCancel.Silent
 import arrow.effects.OnCancel.ThrowCancellationException
-import arrow.effects.data.internal.IOCancellationException
 import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
@@ -102,7 +102,7 @@ sealed class IO<out A> : IOOf<A> {
           ThrowCancellationException ->
             cb
           Silent ->
-            { either -> either.fold({ if (!cancelled || it != IOCancellationException) cb(either) }, { cb(either) }) }
+            { either -> either.fold({ if (!cancelled || it != CancellationException) cb(either) }, { cb(either) }) }
         }
       ccb(cancel.right())
       IORunLoop.start(this, onCancelCb, isCancelled)
