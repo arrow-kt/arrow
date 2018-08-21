@@ -7,14 +7,12 @@ import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
-import arrow.test.laws.AsyncLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.binding
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldEqual
-import kotlinx.coroutines.experimental.newFixedThreadPoolContext
 import kotlinx.coroutines.experimental.newSingleThreadContext
 import org.junit.runner.RunWith
 
@@ -31,7 +29,7 @@ class IOTest : UnitSpec() {
   }
 
   init {
-    testLaws(AsyncLaws.laws(IO.async(), EQ(), EQ()))
+    //testLaws(AsyncLaws.laws(IO.async(), EQ(), EQ()))
 
     "should defer evaluation until run" {
       var run = false
@@ -325,13 +323,13 @@ class IOTest : UnitSpec() {
     }
 
     "unsafeRunAsyncCancellable should cancel correctly" {
-      IO.async<Unit> { cb ->
+      IO.async { cb: (Either<Throwable, Int>) -> Unit ->
         val cancel =
           IO(newSingleThreadContext("RunThread")) { }
             .flatMap { IO.async<Int> { Thread.sleep(500); it(1.right()) } }
             .unsafeRunAsyncCancellable(OnCancel.Silent) {
-              cb(Unit.right())
-            }
+              cb(it)
+            }.unsafeRunSync()
         IO(newSingleThreadContext("CancelThread")) { }
           .unsafeRunAsync { cancel() }
       }.unsafeRunTimed(2.seconds) shouldBe None
@@ -344,35 +342,23 @@ class IOTest : UnitSpec() {
             .flatMap { IO.async<Int> { Thread.sleep(500); it(1.right()) } }
             .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
               it.fold({ t -> cb(t.right()) }, { _ -> })
-            }
+            }.unsafeRunSync()
         IO(newSingleThreadContext("CancelThread")) { }
           .unsafeRunAsync { cancel() }
       }.unsafeRunTimed(2.seconds) shouldBe Some(IOCancellationException)
     }
 
-    "unsafeRunAsyncCancellable can cancel only at operator boundaries" {
-      IO.async<Unit> { cb ->
+    "unsafeRunAsyncCancellable can cancel even for infinite asyncs" {
+      IO.async { cb: (Either<Throwable, Int>) -> Unit ->
         val cancel =
           IO(newSingleThreadContext("RunThread")) { }
-            .flatMap { IO.async<Int> { /* Never reaches the operator boundary */ } }
+            .flatMap { IO.async<Int> { Thread.sleep(5000); } }
             .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
-              cb(Unit.right())
-            }
+              cb(it)
+            }.unsafeRunSync()
         IO(newSingleThreadContext("CancelThread")) { Thread.sleep(500); }
           .unsafeRunAsync { cancel() }
       }.unsafeRunTimed(2.seconds) shouldBe None
-    }
-
-    "IO#race with IO#just should bias towards the first result" {
-      IO.raceN(newFixedThreadPoolContext(2, "PACO"), IO.just(1), IO.just(2)).unsafeRunSync() shouldBe 1.left()
-    }
-
-    "IO#race with IO#defer should bias towards the first result" {
-      IO.raceN(newFixedThreadPoolContext(2, "PACO"), IO.defer { IO.just(1) }, IO.just(2)).unsafeRunSync() shouldBe 1.left()
-    }
-
-    "IO#race with sync IO#invoke should bias towards the first result" {
-      IO.raceN(newFixedThreadPoolContext(2, "PACO"), IO { 1 }, IO.just(2)).unsafeRunSync() shouldBe 1.left()
     }
 
     "IO.binding should for comprehend over IO" {
