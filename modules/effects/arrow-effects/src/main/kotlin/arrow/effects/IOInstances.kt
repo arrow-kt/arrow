@@ -2,10 +2,7 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.effects.typeclasses.Async
-import arrow.effects.typeclasses.Effect
-import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.*
 import arrow.instance
 import arrow.typeclasses.*
 import kotlin.coroutines.experimental.CoroutineContext
@@ -93,6 +90,12 @@ interface IOAsyncInstance : IOMonadDeferInstance, Async<ForIO> {
 interface IOEffectInstance : IOAsyncInstance, Effect<ForIO> {
   override fun <A> Kind<ForIO, A>.runAsync(cb: (Either<Throwable, A>) -> Kind<ForIO, Unit>): IO<Unit> =
     fix().runAsync(cb)
+}
+
+@instance(IO::class)
+interface IOCancellableEffectInstance : IOEffectInstance, CancellableEffect<ForIO> {
+  override fun <A> Kind<ForIO, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> Kind<ForIO, Unit>): IO<Disposable> =
+    fix().runAsyncCancellable(OnCancel.Silent, cb)
 }
 
 @instance(IO::class)

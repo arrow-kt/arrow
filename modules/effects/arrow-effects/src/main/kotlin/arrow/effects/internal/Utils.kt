@@ -1,6 +1,9 @@
 package arrow.effects.internal
 
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
 import arrow.effects.IO
 import arrow.effects.typeclasses.Duration
 import java.util.*
@@ -74,22 +77,22 @@ object Platform {
   }
 }
 
-internal class Future<A> {
-  private val latch = CountDownLatch(1)
-  private var ref: A? = null
+internal class FutureN<A>(count: Int = 1) {
+  private val latch = CountDownLatch(count)
+  private var ref: MutableList<A> = mutableListOf()
 
-  fun unsafeGet(): A {
+  fun unsafeGet(): List<A> {
     latch.await()
-    return ref!!
+    return ref.toList()
   }
 
-  fun get(limit: Duration): Option<A> {
+  fun get(limit: Duration): List<A> {
     latch.await(limit.amount, limit.timeUnit)
-    return ref.toOption()
+    return ref.toList()
   }
 
-  fun set(value: A) {
-    ref = value
+  fun set(value: A) = synchronized(this) {
+    ref.add(value)
     latch.countDown()
   }
 }

@@ -159,7 +159,7 @@ internal object IORunLoop {
 
     do {
       if (isCancelled?.invoke() == true) {
-        cb(Left(IOCancellationException("User cancellation")))
+        cb(Left(IOCancellationException))
         return
       }
       when (currentIO) {

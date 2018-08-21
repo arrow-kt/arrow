@@ -96,7 +96,7 @@ sealed class IO<out A> : IOOf<A> {
         ThrowCancellationException ->
           cb
         Silent ->
-          { either -> either.fold({ if (!cancelled || it !is IOCancellationException) cb(either) }, { cb(either) }) }
+          { either -> either.fold({ if (!cancelled || it != IOCancellationException) cb(either) }, { cb(either) }) }
       }
     IORunLoop.start(this, onCancelCb, isCancelled)
     return cancel

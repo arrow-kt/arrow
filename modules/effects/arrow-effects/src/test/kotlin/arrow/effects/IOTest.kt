@@ -347,7 +347,7 @@ class IOTest : UnitSpec() {
             }
         IO(newSingleThreadContext("CancelThread")) { }
           .unsafeRunAsync { cancel() }
-      }.unsafeRunTimed(2.seconds) shouldBe Some(IOCancellationException("User cancellation"))
+      }.unsafeRunTimed(2.seconds) shouldBe Some(IOCancellationException)
     }
 
     "unsafeRunAsyncCancellable can cancel only at operator boundaries" {
@@ -361,15 +361,6 @@ class IOTest : UnitSpec() {
         IO(newSingleThreadContext("CancelThread")) { Thread.sleep(500); }
           .unsafeRunAsync { cancel() }
       }.unsafeRunTimed(2.seconds) shouldBe None
-    }
-
-    "unsafeRunAsyncCancellable should not silence IOCancellationException thrown by the user" {
-      IO.async<Either<Throwable, Int>> { cb ->
-        IO(newSingleThreadContext("RunThread")) { throw IOCancellationException("TEST") }
-          .unsafeRunAsyncCancellable(OnCancel.Silent) {
-            cb(it.right())
-          }
-      }.unsafeRunTimed(2.seconds) shouldBe Some(Either.Left(IOCancellationException("TEST")))
     }
 
     "IO#race with IO#just should bias towards the first result" {
