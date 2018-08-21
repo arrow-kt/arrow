@@ -25,6 +25,7 @@ buildscript {
         daggerVersion = '2.15'
         kotlinxCoroutinesVersion = '0.23.3'
         kotlinxCollectionsImmutableVersion = '0.1'
+        kotlinPoetVersion='1.0.0-RC1'
     }
 
     repositories {
