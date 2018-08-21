@@ -329,7 +329,7 @@ class IOTest : UnitSpec() {
             .flatMap { IO.async<Int> { Thread.sleep(500); it(1.right()) } }
             .unsafeRunAsyncCancellable(OnCancel.Silent) {
               cb(it)
-            }.unsafeRunSync()
+            }
         IO(newSingleThreadContext("CancelThread")) { }
           .unsafeRunAsync { cancel() }
       }.unsafeRunTimed(2.seconds) shouldBe None
@@ -342,7 +342,7 @@ class IOTest : UnitSpec() {
             .flatMap { IO.async<Int> { Thread.sleep(500); it(1.right()) } }
             .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
               it.fold({ t -> cb(t.right()) }, { _ -> })
-            }.unsafeRunSync()
+            }
         IO(newSingleThreadContext("CancelThread")) { }
           .unsafeRunAsync { cancel() }
       }.unsafeRunTimed(2.seconds) shouldBe Some(IOCancellationException)
@@ -355,7 +355,7 @@ class IOTest : UnitSpec() {
             .flatMap { IO.async<Int> { Thread.sleep(5000); } }
             .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
               cb(it)
-            }.unsafeRunSync()
+            }
         IO(newSingleThreadContext("CancelThread")) { Thread.sleep(500); }
           .unsafeRunAsync { cancel() }
       }.unsafeRunTimed(2.seconds) shouldBe None

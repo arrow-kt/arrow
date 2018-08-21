@@ -95,7 +95,7 @@ interface IOEffectInstance : IOAsyncInstance, Effect<ForIO> {
 @instance(IO::class)
 interface IOCancellableEffectInstance : IOEffectInstance, CancellableEffect<ForIO> {
   override fun <A> Kind<ForIO, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> Kind<ForIO, Unit>): IO<Disposable> =
-    fix().runAsyncCancellable(OnCancel.ThrowCancellationException, cb).unsafeRunSync()
+    fix().runAsyncCancellable(OnCancel.ThrowCancellationException, cb)
 }
 
 @instance(IO::class)
