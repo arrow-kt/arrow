@@ -32,7 +32,7 @@ fun <A, B, C> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IO<A>, ioB: 
 }
 
 fun <A, B, C, D> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, f: (A, B, C) -> D): IO<D> {
-  val cancel: FutureN<Disposable> = FutureN(2)
+  val cancel: FutureN<Disposable> = FutureN(3)
 
   val cbf: FutureN<(Either<Throwable, D>) -> Unit> = FutureN()
 
