@@ -79,7 +79,7 @@ fun <A, B> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>): IO<Eit
 }
 
 fun <A, B, C> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>, c: IO<C>): IO<Either<A, Either<B, C>>> {
-  val cancel: FutureN<Disposable> = FutureN(2)
+  val cancel: FutureN<Disposable> = FutureN(3)
 
   val cbf: FutureN<(Either<Throwable, Either<A, Either<B, C>>>) -> Unit> = FutureN()
 
