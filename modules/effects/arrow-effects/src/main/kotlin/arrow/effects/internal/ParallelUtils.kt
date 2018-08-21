@@ -90,6 +90,36 @@ internal fun <F, A, B, C> CancellableEffect<F>.parMapCancellable2(ctx: Coroutine
   b.startCoroutine(parCont)
 }
 
+internal fun <F, A, B, C, D> CancellableEffect<F>.parMapCancellable3(ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, ioC: Kind<F, C>, f: (A, B, C) -> D,
+  /* start is used because this has to start inside the coroutine. Using Future won't work */
+                                                                     start: (Kind<F, Disposable>) -> Unit): Proc<D> = { cc ->
+  val a: suspend () -> Treither<A, B, C> = {
+    suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
+      start(ioA.map { Treither.Left<A, B, C>(it) }.runAsyncCancellable {
+        it.fold({ invoke { ca.resumeWithException(it) } }, { invoke { ca.resume(it) } })
+      })
+    }
+  }
+  val b: suspend () -> Treither<A, B, C> = {
+    suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
+      start(ioB.map { Treither.Middle<A, B, C>(it) }.runAsyncCancellable {
+        it.fold({ invoke { ca.resumeWithException(it) } }, { invoke { ca.resume(it) } })
+      })
+    }
+  }
+  val c: suspend () -> Treither<A, B, C> = {
+    suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
+      start(ioC.map { Treither.Right<A, B, C>(it) }.runAsyncCancellable {
+        it.fold({ invoke { ca.resumeWithException(it) } }, { invoke { ca.resume(it) } })
+      })
+    }
+  }
+  val triCont = triContinuation(ctx, f, asyncIOContinuation(ctx, cc))
+  a.startCoroutine(triCont)
+  b.startCoroutine(triCont)
+  c.startCoroutine(triCont)
+}
+
 private fun <A, B, C> parContinuation(ctx: CoroutineContext, f: (A, B) -> C, cc: Continuation<C>): Continuation<Either<A, B>> =
   object : Continuation<Either<A, B>> {
     override val context: CoroutineContext = ctx
