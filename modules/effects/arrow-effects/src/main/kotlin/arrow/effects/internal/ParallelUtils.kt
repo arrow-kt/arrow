@@ -11,7 +11,7 @@ import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.startCoroutine
 import kotlin.coroutines.experimental.suspendCoroutine
 
-/* See par3 */
+/* See parMap3 */
 internal fun <F, A, B, C> Effect<F>.parMap2(ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, f: (A, B) -> C,
   /* start is used because this has to start inside the coroutine. Using Future won't work */
                                             start: (Kind<F, Unit>) -> Unit): Proc<C> = { cc ->
@@ -68,6 +68,7 @@ internal fun <F, A, B, C, D> Effect<F>.parMap3(ctx: CoroutineContext, ioA: Kind<
   c.startCoroutine(triCont)
 }
 
+/* See parMap3 */
 internal fun <F, A, B, C> CancellableEffect<F>.parMapCancellable2(ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, f: (A, B) -> C,
   /* start is used because this has to start inside the coroutine. Using Future won't work */
                                                                   start: (Kind<F, Disposable>) -> Unit): Proc<C> = { cc ->
@@ -90,6 +91,7 @@ internal fun <F, A, B, C> CancellableEffect<F>.parMapCancellable2(ctx: Coroutine
   b.startCoroutine(parCont)
 }
 
+/* See parMap3 */
 internal fun <F, A, B, C, D> CancellableEffect<F>.parMapCancellable3(ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, ioC: Kind<F, C>, f: (A, B, C) -> D,
   /* start is used because this has to start inside the coroutine. Using Future won't work */
                                                                      start: (Kind<F, Disposable>) -> Unit): Proc<D> = { cc ->
