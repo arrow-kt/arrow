@@ -1,16 +1,58 @@
 package arrow.effects
 
 import arrow.core.*
-import arrow.effects.internal.*
+import arrow.effects.internal.FutureN
 import arrow.effects.internal.Platform.onceOnly
+import arrow.effects.internal.parMapCancellable2
+import arrow.effects.internal.parMapCancellable3
 import arrow.effects.typeclasses.Disposable
 import kotlin.coroutines.experimental.CoroutineContext
 
-fun <A, B, C> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, f: (A, B) -> C): IO<C> =
-  IO.async(IO.effect().parMap2(ctx, ioA, ioB, f) /* see parMap2 notes on this parameter */ { it.fix().unsafeRunSync() })
+fun <A, B, C> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, f: (A, B) -> C): IO<C> {
+  val cancel: FutureN<Disposable> = FutureN(2)
 
-fun <A, B, C, D> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, f: (A, B, C) -> D): IO<D> =
-  IO.async(IO.effect().parMap3(ctx, ioA, ioB, ioC, f) /* see parMap2 notes on this parameter */ { it.fix().unsafeRunSync() })
+  val cbf: FutureN<(Either<Throwable, C>) -> Unit> = FutureN()
+
+  val complete = onceOnly { result: Either<Throwable, C> ->
+    cancel.unsafeGet().forEach { it() }
+    cbf.unsafeGet().forEach { it(result) }
+  }
+
+  return IO.async { cb: (Either<Throwable, C>) -> Unit ->
+    cbf.set(cb)
+    IO.async(IO.cancellableEffect().parMapCancellable2(ctx, ioA, ioB, f)
+    { it.fix().unsafeRunAsync { it.fold({ cb(it.left()) }, { cancel.set(it) }) } }
+    ).unsafeRunAsync(complete)
+  }.handleErrorWith {
+    if (it == OnCancel.CancellationException) {
+      complete(it.left())
+    }
+    IO.raiseError(it)
+  }
+}
+
+fun <A, B, C, D> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, f: (A, B, C) -> D): IO<D> {
+  val cancel: FutureN<Disposable> = FutureN(2)
+
+  val cbf: FutureN<(Either<Throwable, D>) -> Unit> = FutureN()
+
+  val complete = onceOnly { result: Either<Throwable, D> ->
+    cancel.unsafeGet().forEach { it() }
+    cbf.unsafeGet().forEach { it(result) }
+  }
+
+  return IO.async { cb: (Either<Throwable, D>) -> Unit ->
+    cbf.set(cb)
+    IO.async(IO.cancellableEffect().parMapCancellable3(ctx, ioA, ioB, ioC, f)
+    { it.fix().unsafeRunAsync { it.fold({ cb(it.left()) }, { cancel.set(it) }) } }
+    ).unsafeRunAsync(complete)
+  }.handleErrorWith {
+    if (it == OnCancel.CancellationException) {
+      complete(it.left())
+    }
+    IO.raiseError(it)
+  }
+}
 
 fun <A, B, C, D, E> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, ioD: IO<D>, f: (A, B, C, D) -> E): IO<E> =
   parallelMapN(ctx,
@@ -67,7 +109,7 @@ fun <A, B> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>): IO<Eit
       a.flatMap { IO { complete(it.left().right()) } },
       b.flatMap { IO { complete(it.right().right()) } },
       ::Tuple2)
-    { it.fix().unsafeRunAsync { it.fold({ /* should never happen */ }, { cancel.set(it) }) } }
+    { it.fix().unsafeRunAsync { it.fold({ cb(it.left()) }, { cancel.set(it) }) } }
     ).unsafeRunAsync { it.fold({ complete(it.left()) }, { /* should never happen */ }) }
   }.handleErrorWith {
     if (it == OnCancel.CancellationException) {
@@ -94,7 +136,7 @@ fun <A, B, C> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>, c: I
       b.flatMap { IO { complete(it.left().right().right()) } },
       c.flatMap { IO { complete(it.right().right().right()) } },
       ::Tuple3)
-    { it.fix().unsafeRunAsync { it.fold({ /* should never happen */ }, { cancel.set(it) }) } }
+    { it.fix().unsafeRunAsync { it.fold({ cb(it.left()) }, { cancel.set(it) }) } }
     ).unsafeRunAsync { it.fold({ complete(it.left()) }, { /* should never happen */ }) }
   }.handleErrorWith {
     if (it == OnCancel.CancellationException) {
