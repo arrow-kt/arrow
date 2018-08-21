@@ -90,23 +90,23 @@ sealed class IO<out A> : IOOf<A> {
     IORunLoop.start(this, cb, null)
 
   fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
-    IO { unsafeRunAsyncCancellable(onCancel, cb.andThen { it.fix().unsafeRunAsync { } }) }
-
-  fun unsafeRunAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> Unit): Disposable =
-    IO.async<Disposable> { ccb ->
+    IO.async { ccb ->
       var cancelled = false
       val cancel = { cancelled = true }
       val isCancelled = { cancelled }
       val onCancelCb =
         when (onCancel) {
           ThrowCancellationException ->
-            cb
+            cb andThen { it.fix().unsafeRunAsync { } }
           Silent ->
             { either -> either.fold({ if (!cancelled || it != CancellationException) cb(either) }, { cb(either) }) }
         }
       ccb(cancel.right())
       IORunLoop.start(this, onCancelCb, isCancelled)
-    }.unsafeRunSync()
+    }
+
+  fun unsafeRunAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> Unit): Disposable =
+    runAsyncCancellable(onCancel, cb andThen { it.liftIO() }).unsafeRunSync()
 
   fun unsafeRunSync(): A =
     unsafeRunTimed(Duration.INFINITE)
