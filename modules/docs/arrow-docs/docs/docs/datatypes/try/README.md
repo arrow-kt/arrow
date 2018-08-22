@@ -136,6 +136,37 @@ lotteryTry.transform(
     { Try.just(emptyList<Int>()) })
 ```
 
+When using Try, it is a common scenario to convert the returned `Try<Throwable, DomainObject>` instance to `Either<DomainError, DomainObject>`. One can use `toEither`, and than call `mapLeft` to achieve this goal:
+
+```kotlin
+sealed class DomainError(val message: String, val cause: Throwable) {
+    class GeneralError(message: String, cause: Throwable) : DomainError(message, cause)
+    class NoConnectionError(message: String, cause: Throwable) : DomainError(message, cause)
+    class AuthorizationError(message: String, cause: Throwable) : DomainError(message, cause)
+}
+
+Try {
+    getLotteryNumbersFromCloud()
+}.toEither()
+    .mapLeft { 
+        DomainError.NoConnectionError("Failed to fetch lottery numbers from cloud", it)
+    }
+// Left(a=DomainError$NoConnectionError@3ada9e37)
+```
+
+As the codebase grows, it is easy to recognize, that this pattern reoccurs everywhere when `Try` to `Either` conversion is being used.
+
+To help this problem, `Try` has a convenient `toEither` implementation, which takes an `onLeft: (Throwable) -> B` parameter. If the result of the conversion from `Try` to `Either` fails, the supplied `onLeft` argument is called to supply domain specific value for the left (error) branch. Using this version, the code can be simplified to the one below:
+
+```kotlin
+Try {
+    getLotteryNumbersFromCloud()
+}.toEither {
+    DomainError.NoConnectionError("Failed to fetch lottery numbers from cloud", it)
+}
+// Left(a=DomainError$NoConnectionError@574caa3f)
+```
+
 Lastly, Arrow contains `Try` instances for many useful typeclasses that allows you to use and transform fallibale values:
 
 [`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }})
