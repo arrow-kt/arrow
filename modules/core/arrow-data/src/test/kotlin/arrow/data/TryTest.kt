@@ -146,8 +146,8 @@ class TryTest : UnitSpec() {
         map(
           Success("11th"),
           Success("Doctor"),
-          Success("Who"),
-          { (a, b, c) -> "$a $b $c" }) shouldBe Success("11th Doctor Who")
+          Success("Who")
+        ) { (a, b, c) -> "$a $b $c" } shouldBe Success("11th Doctor Who")
       }
     }
 

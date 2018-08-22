@@ -34,8 +34,8 @@ interface MapKSemigroupInstance<K, A> : Semigroup<MapK<K, A>> {
   fun SG(): Semigroup<A>
 
   override fun MapK<K, A>.combine(b: MapK<K, A>): MapK<K, A> = with(SG()) {
-    if (fix().size < b.fix().size) fix().foldLeft<A>(b.fix(), { my, (k, b) -> my.updated(k, b.maybeCombine(my[k])) })
-    else b.fix().foldLeft<A>(fix(), { my, (k, a) -> my.updated(k, a.maybeCombine(my[k])) })
+    if (fix().size < b.fix().size) fix().foldLeft<A>(b.fix()) { my, (k, b) -> my.updated(k, b.maybeCombine(my[k])) }
+    else b.fix().foldLeft<A>(fix()) { my, (k, a) -> my.updated(k, a.maybeCombine(my[k])) }
   }
 
 }

@@ -24,28 +24,28 @@ class CoreaderTest : UnitSpec() {
 
         "flatMap should map over the inner value" {
           forAll { num: Int ->
-            invoke<Int, Int>({ it -> it * 2 }).flatMap { a -> Coreader.just<Int, Int>(this, a * 3) }
+            invoke<Int, Int> { it -> it * 2 }.flatMap { a -> Coreader.just<Int, Int>(this, a * 3) }
               .runId(num) == num * 6
           }
         }
 
         "bimap should map over both sides of the run function" {
           forAll { num: Int ->
-            invoke<Int, Int>({ it -> it * 2 }).bimap({ a: String -> Integer.parseInt(a) }, { it.toString() })
+            invoke<Int, Int> { it -> it * 2 }.bimap({ a: String -> Integer.parseInt(a) }, { it.toString() })
               .runId("$num") == "${num * 2}"
           }
         }
 
         "lmap should map over the left side of the function" {
           forAll { num: Int ->
-            invoke<Int, Int>({ it -> it * 2 }).lmap { a: String -> Integer.parseInt(a) }
+            invoke<Int, Int> { it -> it * 2 }.lmap { a: String -> Integer.parseInt(a) }
               .runId("$num") == num * 2
           }
         }
 
         "contramapValue" {
           forAll { num: Int ->
-            invoke<Int, Int>({ it -> it * 2 }).contramapValue { a: IdOf<Int> -> Id(a.value() * 3) }
+            invoke<Int, Int> { it -> it * 2 }.contramapValue { a: IdOf<Int> -> Id(a.value() * 3) }
               .runId(num) == num * 6
           }
         }
@@ -61,7 +61,7 @@ class CoreaderTest : UnitSpec() {
 
           cokleisli.andThen(Id(3)).run(Id(0)) shouldBe 3
 
-          cokleisli.andThen(invoke<Int, Int>({ it + 1 })).run(Id(0)) shouldBe 1
+          cokleisli.andThen(invoke<Int, Int> { it + 1 }).run(Id(0)) shouldBe 1
         }
       }
     }

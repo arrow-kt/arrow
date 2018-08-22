@@ -14,7 +14,7 @@ import arrow.typeclasses.*
 interface WriterTFunctorInstance<F, W> : Functor<WriterTPartialOf<F, W>> {
   fun FF(): Functor<F>
 
-  override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.map(f: (A) -> B): WriterT<F, W, B> = fix().map(FF(), { f(it) })
+  override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.map(f: (A) -> B): WriterT<F, W, B> = fix().map(FF()) { f(it) }
 }
 
 @extension
@@ -33,14 +33,14 @@ interface WriterTApplicativeInstance<F, W> : Applicative<WriterTPartialOf<F, W>>
     fix().ap(MF(), MM(), ff)
 
   override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.map(f: (A) -> B): WriterT<F, W, B> =
-    fix().map(FF(), { f(it) })
+    fix().map(FF()) { f(it) }
 }
 
 @extension
 interface WriterTMonadInstance<F, W> : Monad<WriterTPartialOf<F, W>>, WriterTApplicativeInstance<F, W> {
 
   override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.map(f: (A) -> B): WriterT<F, W, B> =
-    fix().map(FF(), { f(it) })
+    fix().map(FF()) { f(it) }
 
   override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.flatMap(f: (A) -> Kind<WriterTPartialOf<F, W>, B>): WriterT<F, W, B> =
     fix().flatMap(MF(), MM(), { f(it).fix() })

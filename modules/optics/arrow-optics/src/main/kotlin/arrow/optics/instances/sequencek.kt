@@ -39,9 +39,9 @@ interface SequenceKEachInstance<A> : Each<SequenceK<A>, A> {
 interface SequenceKFilterIndexInstance<A> : FilterIndex<SequenceK<A>, Int, A> {
   override fun filter(p: (Int) -> Boolean): Traversal<SequenceK<A>, A> = object : Traversal<SequenceK<A>, A> {
     override fun <F> modifyF(FA: Applicative<F>, s: SequenceK<A>, f: (A) -> Kind<F, A>): Kind<F, SequenceK<A>> = FA.run {
-      s.mapIndexed { index, a -> a toT index }.k().traverse(FA, { (a, j) ->
+      s.mapIndexed { index, a -> a toT index }.k().traverse(FA) { (a, j) ->
         if (p(j)) f(a) else just(a)
-      })
+      }
     }
   }
 }

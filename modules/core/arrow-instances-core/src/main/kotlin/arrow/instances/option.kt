@@ -32,7 +32,7 @@ interface OptionApplicativeErrorInstance : ApplicativeError<ForOption, Unit>, Op
     None
 
   override fun <A> Kind<ForOption, A>.handleErrorWith(f: (Unit) -> Kind<ForOption, A>): Option<A> =
-    fix().orElse({ f(Unit).fix() })
+    fix().orElse { f(Unit).fix() }
 }
 
 @extension
@@ -41,7 +41,7 @@ interface OptionMonadErrorInstance : MonadError<ForOption, Unit>, OptionMonadIns
     None
 
   override fun <A> Kind<ForOption, A>.handleErrorWith(f: (Unit) -> Kind<ForOption, A>): Option<A> =
-    fix().orElse({ f(Unit).fix() })
+    fix().orElse { f(Unit).fix() }
 }
 
 @extension

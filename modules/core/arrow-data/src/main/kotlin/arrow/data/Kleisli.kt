@@ -61,9 +61,9 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
    * @param MF [Monad] for the context [F].
    */
   fun <B> zip(MF: Monad<F>, o: Kleisli<F, D, B>): Kleisli<F, D, Tuple2<A, B>> =
-    flatMap(MF, { a ->
-      o.map(MF, { b -> Tuple2(a, b) })
-    })
+    flatMap(MF) { a ->
+      o.map(MF) { b -> Tuple2(a, b) }
+    }
 
   /**
    * Compose this arrow with another function to transform the input of the arrow.
@@ -96,7 +96,7 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
    * @param fb the new end of the arrow.
    * @param MF [Monad] for the context [F].
    */
-  fun <B> andThen(MF: Monad<F>, fb: Kind<F, B>): Kleisli<F, D, B> = andThen(MF, { fb })
+  fun <B> andThen(MF: Monad<F>, fb: Kind<F, B>): Kleisli<F, D, B> = andThen(MF) { fb }
 
   /**
    * Handle error within context of [F] given a [ApplicativeError] is defined for [F].
@@ -125,7 +125,7 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
      * @param MF [Monad] for the context [F].
      */
     fun <F, D, A, B> tailRecM(MF: Monad<F>, a: A, f: (A) -> KleisliOf<F, D, Either<A, B>>): Kleisli<F, D, B> =
-      Kleisli { b -> MF.tailRecM(a, { f(it).fix().run(b) }) }
+      Kleisli { b -> MF.tailRecM(a) { f(it).fix().run(b) } }
 
     /**
      * Create an arrow for a value of [A].

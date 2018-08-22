@@ -7,8 +7,8 @@ object MonoidLaws {
 
   inline fun <F> laws(M: Monoid<F>, A: F, EQ: Eq<F>): List<Law> =
     listOf(
-      Law("Monoid Laws: Left identity", { M.monoidLeftIdentity(A, EQ) }),
-      Law("Monoid Laws: Right identity", { M.monoidRightIdentity(A, EQ) })
+      Law("Monoid Laws: Left identity") { M.monoidLeftIdentity(A, EQ) },
+      Law("Monoid Laws: Right identity") { M.monoidRightIdentity(A, EQ) }
     )
 
   fun <F> Monoid<F>.monoidLeftIdentity(A: F, EQ: Eq<F>): Boolean =

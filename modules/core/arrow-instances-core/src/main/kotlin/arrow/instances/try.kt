@@ -128,7 +128,7 @@ interface TryFoldableInstance : Foldable<ForTry> {
 }
 
 fun <A, B, G> TryOf<A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Try<B>> = GA.run {
-  fix().fold({ just(Try.raise(it)) }, { f(it).map({ Try.just(it) }) })
+  fix().fold({ just(Try.raise(it)) }, { f(it).map { Try.just(it) } })
 }
 
 fun <A, G> TryOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Try<A>> =

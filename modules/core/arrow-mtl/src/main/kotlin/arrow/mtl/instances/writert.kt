@@ -24,11 +24,11 @@ interface WriterTMonadFilterInstance<F, W> : WriterTMonadInstance<F, W>, MonadFi
 interface WriterTMonadWriterInstance<F, W> : MonadWriter<WriterTPartialOf<F, W>, W>, WriterTMonadInstance<F, W> {
 
   override fun <A> Kind<WriterTPartialOf<F, W>, A>.listen(): Kind<WriterTPartialOf<F, W>, Tuple2<W, A>> = FF().run {
-    WriterT(fix().content(this).flatMap({ a -> fix().write(this).map({ l -> Tuple2(l, Tuple2(l, a)) }) }))
+    WriterT(fix().content(this).flatMap { a -> fix().write(this).map { l -> Tuple2(l, Tuple2(l, a)) } })
   }
 
   override fun <A> Kind<WriterTPartialOf<F, W>, Tuple2<(W) -> W, A>>.pass(): WriterT<F, W, A> = FF().run {
-    WriterT(fix().content(this).flatMap({ tuple2FA -> fix().write(this).map({ l -> Tuple2(tuple2FA.a(l), tuple2FA.b) }) }))
+    WriterT(fix().content(this).flatMap { tuple2FA -> fix().write(this).map { l -> Tuple2(tuple2FA.a(l), tuple2FA.b) } })
   }
 
   override fun <A> writer(aw: Tuple2<W, A>): WriterT<F, W, A> = WriterT.put2(FF(), aw.b, aw.a)
