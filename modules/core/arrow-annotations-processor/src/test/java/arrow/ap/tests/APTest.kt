@@ -17,7 +17,8 @@ abstract class APTest(
 
   fun testProcessor(
     vararg processor: AnnotationProcessor,
-    generationDir: File = Files.createTempDir()
+    generationDir: File = Files.createTempDir(),
+    actualFileLocation: (File) -> String = { it.path }
   ) {
 
     processor.forEach { (name, sources, dest, proc, error) ->
@@ -61,7 +62,7 @@ abstract class APTest(
           targetDir.listFiles().size shouldBe 1
 
           val expected = File(expectedDir, dest).readText()
-          val actual = targetDir.listFiles()[0].readText()
+          val actual = File(actualFileLocation(targetDir)).listFiles()[0].readText()
 
           actual shouldBe expected
 
