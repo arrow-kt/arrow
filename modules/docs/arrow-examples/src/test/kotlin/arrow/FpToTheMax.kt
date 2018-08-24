@@ -57,7 +57,7 @@ class TestIOConsoleInstance: Console<ForTestIO> {
 
 
 
-object Step1 {
+object FpToTheMax {
 
     fun parseInt(s: String): Option<Int> = Try { s.toInt() }.toOption()
 
