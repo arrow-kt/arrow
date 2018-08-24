@@ -38,14 +38,17 @@ With Coproducts, we're able to define a result for this api call as `Coproduct3<
 So now that we've got our api response modeled, we need to be able to create an instance of `Coproduct3`.
 
 ```kotlin:ank
-coproductOf<CommonServerError, RegistrationError, Registration>(ServerError) //Returns Coproduct3<CommonServerError, RegistrationError, Registration>
+import arrow.generic.*
+import arrow.generic.coproduct3.coproductOf
+
+val apiResult = coproductOf<CommonServerError, RegistrationError, Registration>(ServerError) //Returns Coproduct3<CommonServerError, RegistrationError, Registration>
 ```
 
 There are `coproductOf` constructor functions for each Coproduct. All we have to do is pass in our value and have the correct type parameters on it, the value must be a type declared on the function call.
 
 If we pass in a value that doesn't correspond to any types on the Coproduct, it won't compile:
 ```kolint:ank
-coproductOf<String, RegistrationError, Registration>(ServerError) //Doesn't compile
+//val apiResult = coproductOf<String, RegistrationError, Registration>(ServerError)
 ```
 
 ##### cop
@@ -53,13 +56,16 @@ coproductOf<String, RegistrationError, Registration>(ServerError) //Doesn't comp
 You might be saying "That's great and all but passing in values as parameters is so Java, I want something more Kotlin!". Well look no further, just like `Either`'s `left()` and `right()` extension methods, Coproducts can be created with an extension method on any type:
 
 ```kotlin:ank
-ServerError.cop<CommonServerError, RegistrationError, Registration>() //Returns Coproduct3<CommonServerError, RegistrationError, Registration>
+import arrow.generic.*
+import arrow.generic.coproduct3.cop
+
+val apiResult = ServerError.cop<CommonServerError, RegistrationError, Registration>() //Returns Coproduct3<CommonServerError, RegistrationError, Registration>
 ```
 
 All we have to do is provide the type parameters and we can make a Coproduct using the `cop` extension method. Just like `coproductOf`, if the type of the value isn't in the type parameters of the method call, it won't compile:
 
 ```kotlin:ank
-ServerError.cop<String, RegistrationError, Registration>() //Doesn't compile
+//val apiResult = ServerError.cop<String, RegistrationError, Registration>()
 ```
 
 ##### fold
@@ -67,24 +73,34 @@ ServerError.cop<String, RegistrationError, Registration>() //Doesn't compile
 Obviously, we're not just modeling errors for fun, we're going to handle them! All Coproducts have `fold` which allows us to condense the Coproduct down to a single type. For example, we could handle errors as such in a UI:
 
 ```kotlin:ank
+import arrow.generic.*
+import arrow.generic.coproduct3.Coproduct3
+import arrow.generic.coproduct3.fold
+
+fun handleCommonError(commonError: CommonServerError) {
+}
+
+fun showCarAlreadyRegistered() {
+}
+
+fun callPolice() {
+}
+
+fun showCarSuccessfullyRegistered(car: Car) {
+}
+
 fun renderApiResult(apiResult: Coproduct3<CommonServerError, RegistrationError, Registration>) = apiResult.fold(
-            { commonError ->
-                when (commonError) {
-                    ServerError -> //Show error
-                    UserUnauthorized -> //Log out user
-                    OverRequestLimit -> //Show error
-                }
-            },
+            { commonError -> handleCommonError(commonError) },
             { registrationError ->
                 when (registrationError) {
-                    RegistrationAlreadyExists -> //Show that the car is already registered
-                    CarStolen -> //Call the police!
+                    CarAlreadyRegistered -> showCarAlreadyRegistered()
+                    StolenCar -> callPolice()
                 }
             },
             { registration ->
                 val registeredCar = registration.car
 
-                //Render success! Yay!
+                showCarSuccessfullyRegistered(registeredCar)
             }
     )
 ```
@@ -92,6 +108,9 @@ fun renderApiResult(apiResult: Coproduct3<CommonServerError, RegistrationError, 
 This example returns `Unit` because all of these are side effects, let's say our application was built for a command line and we just have to show a `String` for the result of the call (if only it was always that easy):
 
 ```kotlin:ank
+import arrow.generic.*
+import arrow.generic.coproduct3.Coproduct3
+import arrow.generic.coproduct3.fold
 
 fun renderApiResult(apiResult: Coproduct3<CommonServerError, RegistrationError, Registration>): String = apiResult.fold(
             { commonError ->
@@ -103,8 +122,8 @@ fun renderApiResult(apiResult: Coproduct3<CommonServerError, RegistrationError, 
             },
             { registrationError ->
                 when (registrationError) {
-                    RegistrationAlreadyExists -> "Car already registered."
-                    CarStolen -> "Car reported stolen!"
+                    CarAlreadyRegistered -> "Car already registered."
+                    StolenCar -> "Car reported stolen!"
                 }
             },
             { registration ->
@@ -120,6 +139,10 @@ Here we're able to return the result of the `fold` and we're forced to handle al
 Let's say we also want to store the `Registration` object into our database when we successfully register a car. We don't really want to have to `fold` over every single case just to handle something for the `Registration`, this is where `select<T>` comes to the rescue! We're able to take a Coproduct and `select` the type we care about from it. `select` returns an `Option`, if the value of the Coproduct was for the type you're trying to `select`, you'll get `Some`, if it was not the type used with `select`, you'll get `None`.
 
 ```kotlin:ank
+import arrow.generic.*
+import arrow.generic.coproduct3.Coproduct3
+import arrow.generic.coproduct3.select
+
 fun handleApiResult(
         database: Database,
         apiResult: Coproduct3<CommonServerError, RegistrationError, Registration>
@@ -134,7 +157,11 @@ fun handleApiResult(
 
 `select` can only be called with a type that exists on the Coproduct, if the type doesn't exist, it won't compile:
 ```kotlin:ank
+import arrow.generic.*
+import arrow.generic.coproduct3.Coproduct3
+import arrow.generic.coproduct3.select
+
 fun handleApiResult(apiResult: Coproduct3<CommonServerError, RegistrationError, Registration>): Unit {
-    apiResult.select<String>() //Doesn't compile
+    //apiResult.select<String>() Doesn't compile
 }
 ```
