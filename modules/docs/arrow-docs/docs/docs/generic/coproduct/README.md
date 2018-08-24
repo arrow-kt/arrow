@@ -41,7 +41,7 @@ So now that we've got our api response modeled, we need to be able to create an 
 coproductOf<CommonServerError, RegistrationError, Registration>(ServerError) //Returns Coproduct3<CommonServerError, RegistrationError, Registration>
 ```
 
-There are `coproductOf` constructor functions for each Coproduct. All we have to do is pass in our value and have the correct type parameters on it, the value must be a Type declared on the function call.
+There are `coproductOf` constructor functions for each Coproduct. All we have to do is pass in our value and have the correct type parameters on it, the value must be a type declared on the function call.
 
 If we pass in a value that doesn't correspond to any types on the Coproduct, it won't compile:
 ```kolint:ank
@@ -56,7 +56,7 @@ You might be saying "That's great and all but passing in values as parameters is
 ServerError.cop<CommonServerError, RegistrationError, Registration>() //Returns Coproduct3<CommonServerError, RegistrationError, Registration>
 ```
 
-All we have to do is provide the type parameters we can make a Coproduct using the `cop` extension method. Just like `coproductOf`, if the Type of the value isn't in the Type parameters of the method call, it won't compile:
+All we have to do is provide the type parameters and we can make a Coproduct using the `cop` extension method. Just like `coproductOf`, if the type of the value isn't in the type parameters of the method call, it won't compile:
 
 ```kotlin:ank
 ServerError.cop<String, RegistrationError, Registration>() //Doesn't compile
@@ -89,7 +89,7 @@ fun renderApiResult(apiResult: Coproduct3<CommonServerError, RegistrationError, 
     )
 ```
 
-This example likely would return `Unit` from the `fold` as there's likely not a common type to be returned for showing various UI elements and this is likely all side effects, let's say our application was built for a command line and we just have to show a `String` for the result of the call (if only it was always that easy):
+This example returns `Unit` because all of these are side effects, let's say our application was built for a command line and we just have to show a `String` for the result of the call (if only it was always that easy):
 
 ```kotlin:ank
 
@@ -117,7 +117,7 @@ Here we're able to return the result of the `fold` and we're forced to handle al
 
 ##### select
 
-Let's say we also want to store the `Registration` object into our database when we successfully register a car, because we're a good offline first application like that. We don't really want to have to `fold` over every single case just to handle something for the `Registration`, this is where `select<T>` comes to the rescue! We're able to take a Coproduct and `select` the type we care about from it. `select` returns an `Option`, if the value of the Coproduct was for the type you're trying to `select`, you'll get `Some`, if it was not the type used with `select`, you'll get `None`.
+Let's say we also want to store the `Registration` object into our database when we successfully register a car. We don't really want to have to `fold` over every single case just to handle something for the `Registration`, this is where `select<T>` comes to the rescue! We're able to take a Coproduct and `select` the type we care about from it. `select` returns an `Option`, if the value of the Coproduct was for the type you're trying to `select`, you'll get `Some`, if it was not the type used with `select`, you'll get `None`.
 
 ```kotlin:ank
 fun handleApiResult(
