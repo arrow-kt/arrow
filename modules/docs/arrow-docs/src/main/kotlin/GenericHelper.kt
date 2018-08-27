@@ -1,10 +1,6 @@
 package arrow.generic
 
 import arrow.product
-import arrow.generic.coproduct3.coproductOf
-import arrow.generic.coproduct3.fold
-import arrow.generic.coproduct3.select
-import arrow.generic.coproduct3.Coproduct3
 
 @product
 data class Account(val balance: Int, val available: Int) {
