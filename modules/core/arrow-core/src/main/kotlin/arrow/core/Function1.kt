@@ -35,6 +35,6 @@ class Function1<I, out O>(val f: (I) -> O) : Function1Of<I, O> {
 
     fun <I, A, B> tailRecM(a: A, f: (A) -> Function1Of<I, Either<A, B>>): Function1<I, B> = { t: I -> step(a, t, f) }.k()
 
-    fun <I> id(): Function1<I, I> = { a : I -> a }.k()
+    fun <I> id(): Function1<I, I> = Function1(::identity)
   }
 }
