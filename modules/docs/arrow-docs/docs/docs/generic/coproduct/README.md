@@ -9,7 +9,7 @@ permalink: /docs/generic/coproduct/
 {:.beginner}
 beginner
 
-`arrow-generic` provides meta programming facilities over Product types like data classes, tuples, and heterogeneous lists; and Coproduct types like sealed classes.
+`arrow-generic` provides meta programming facilities over Product types (data classes, tuples, heterogeneous lists...). It also provides the Coproduct type, similar to sealed classes.
 
 ### Install
 
@@ -21,7 +21,23 @@ compile 'io.arrow-kt:arrow-generic:$arrow_version'
 
 #### Coproduct
 
-Coproducts represent a container in which only one of the specified set of types exist. It's very similar in `Either` in that respect. `Either` supports one of two values, an `Either<A, B>` has to contain an instance of `A` or `B`. We can extrapolate that concept to `N` number of types. So a `Coproduct5<A, B, C, D, E>` has to contain an instance of `A`, `B`, `C`, `D`, or `E`. For example, perhaps there's a search function for a Car Dealer app that can show `Dealership`s, `Car`s and `SalesPerson`s, we could model that list of results as `List<Coproduct3<Dealership, Car, SalesPerson>`. The result would contain a list of heterogeneous elements but each element is one of `Dealership`, `Car` or `SalesPerson` and our UI can render the list elements based on those types.
+Coproducts represent a sealed hierarchy of types where only one of the specified set of types exist every time. Conceptually, it's very similar to the stdlib `sealed` class, or to [Either]({{ '/docs/datatypes/either' | relative_url }}) if we move on to Arrow data types. [Either]({{ '/docs/datatypes/either' | relative_url }}) supports one of two values, an `Either<A, B>` has to contain an instance of `A` or `B`. We can extrapolate that concept to `N` number of types. So a `Coproduct5<A, B, C, D, E>` has to contain an instance of `A`, `B`, `C`, `D`, or `E`. For example, perhaps there's a search function for a Car Dealer app that can show `Dealership`s, `Car`s and `SalesPerson`s in a list, we could model that list of results as `List<Coproduct3<Dealership, Car, SalesPerson>`. The result would contain a list of heterogeneous elements but each element is one of `Dealership`, `Car` or `SalesPerson` and our UI can render the list elements based on those types.
+
+```kotlin:ank
+import arrow.generic.*
+import arrow.generic.coproduct3.Coproduct3
+import arrow.generic.coproduct3.fold
+
+fun toDisplayValues(items: List<Coproduct3<Car, Dealership, Salesperson>>): List<String> {
+  return items.map {
+    it.fold(
+            { "Car: Speed: ${it.speed.kmh}" },
+            { "Dealership: ${it.location}" },
+            { "Salesperson: ${it.name}"}
+    )
+  }
+}
+```
 
 Let's say we have an api. Our api operates under the following conditions:
 - Every endpoint could tell the client, `ServerError`, `UserUnauthorized` or `OverRequestLimit`.
@@ -44,16 +60,17 @@ import arrow.generic.coproduct3.coproductOf
 val apiResult = coproductOf<CommonServerError, RegistrationError, Registration>(ServerError) //Returns Coproduct3<CommonServerError, RegistrationError, Registration>
 ```
 
-There are `coproductOf` constructor functions for each Coproduct. All we have to do is pass in our value and have the correct type parameters on it, the value must be a type declared on the function call.
+There are `coproductOf` constructor functions for each Coproduct regardless of the arity (number of types). All we have to do is pass in our value and have the correct type parameters on it, the value must be a type declared on the function call.
 
 If we pass in a value that doesn't correspond to any types on the Coproduct, it won't compile:
+
 ```kolint:ank
 //val apiResult = coproductOf<String, RegistrationError, Registration>(ServerError)
 ```
 
 ##### cop
 
-You might be saying "That's great and all but passing in values as parameters is so Java, I want something more Kotlin!". Well look no further, just like `Either`'s `left()` and `right()` extension methods, Coproducts can be created with an extension method on any type:
+You might be saying "That's great and all but passing in values as parameters is so Java, I want something more Kotlin!". Well look no further, just like [Either]({{ '/docs/datatypes/either' | relative_url }})'s `left()` and `right()` extension methods, Coproducts can be created with an extension method on any type:
 
 ```kotlin:ank
 import arrow.generic.*
@@ -132,11 +149,11 @@ fun renderApiResult(apiResult: Coproduct3<CommonServerError, RegistrationError, 
     )
 ```
 
-Here we're able to return the result of the `fold` and we're forced to handle all cases! Neat!
+Here we're able to return the result of the `fold` and since it's exhaustively evaluated, we're forced to handle all cases! Neat! Let's say we also want to store the `Registration` object into our database when we successfully register a car. We don't really want to have to `fold` over every single case just to handle something for the `Registration`, this is where `select<T>` comes to the rescue!
 
 ##### select
 
-Let's say we also want to store the `Registration` object into our database when we successfully register a car. We don't really want to have to `fold` over every single case just to handle something for the `Registration`, this is where `select<T>` comes to the rescue! We're able to take a Coproduct and `select` the type we care about from it. `select` returns an `Option`, if the value of the Coproduct was for the type you're trying to `select`, you'll get `Some`, if it was not the type used with `select`, you'll get `None`.
+We're able to take a Coproduct and `select` the type we care about from it. `select` returns an `Option`, if the value of the Coproduct was for the type you're trying to `select`, you'll get `Some`, if it was not the type used with `select`, you'll get `None`.
 
 ```kotlin:ank
 import arrow.generic.*

@@ -17,6 +17,9 @@ data class Car(val speed: Speed) {
   companion object
 }
 
+data class Salesperson(val name: String)
+data class Dealership(val location: String)
+
 sealed class CommonServerError
 object ServerError : CommonServerError()
 object UserUnauthorized : CommonServerError()
