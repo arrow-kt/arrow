@@ -1,9 +1,11 @@
 package arrow.instances
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.*
 import arrow.instance
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Category
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Profunctor
@@ -59,3 +61,9 @@ class Function1ContextPartiallyApplied<L> {
 fun <L> ForFunction1(): Function1ContextPartiallyApplied<L> =
   Function1ContextPartiallyApplied()
 
+@instance(Function1::class)
+interface Function1CategoryInstance : Category<ForFunction1> {
+  override fun <A> id(): Kind2<ForFunction1, A, A> = Function1.id()
+
+  override fun <A, B, C> Kind2<ForFunction1, B, C>.compose(arr: Kind2<ForFunction1, A, B>): Kind2<ForFunction1, A, C> = fix().compose(arr.fix())
+}
