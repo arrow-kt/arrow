@@ -64,7 +64,7 @@ There are `coproductOf` constructor functions for each Coproduct regardless of t
 
 If we pass in a value that doesn't correspond to any types on the Coproduct, it won't compile:
 
-```kolint:ank
+```kotlin:ank
 import arrow.generic.*
 import arrow.generic.coproduct3.coproductOf
 
