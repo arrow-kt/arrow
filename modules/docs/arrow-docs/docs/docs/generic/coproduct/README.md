@@ -65,7 +65,11 @@ There are `coproductOf` constructor functions for each Coproduct regardless of t
 If we pass in a value that doesn't correspond to any types on the Coproduct, it won't compile:
 
 ```kolint:ank
+import arrow.generic.*
+import arrow.generic.coproduct3.coproductOf
+
 //val apiResult = coproductOf<String, RegistrationError, Registration>(ServerError)
+//error: type mismatch: inferred type is ServerError but String was expected
 ```
 
 ##### cop
@@ -82,7 +86,11 @@ val apiResult = ServerError.cop<CommonServerError, RegistrationError, Registrati
 All we have to do is provide the type parameters and we can make a Coproduct using the `cop` extension method. Just like `coproductOf`, if the type of the value isn't in the type parameters of the method call, it won't compile:
 
 ```kotlin:ank
+import arrow.generic.*
+import arrow.generic.coproduct3.cop
+
 //val apiResult = ServerError.cop<String, RegistrationError, Registration>()
+//error: type mismatch: inferred type is ServerError but String was expected
 ```
 
 ##### fold
@@ -179,6 +187,7 @@ import arrow.generic.coproduct3.Coproduct3
 import arrow.generic.coproduct3.select
 
 fun handleApiResult(apiResult: Coproduct3<CommonServerError, RegistrationError, Registration>): Unit {
-    //apiResult.select<String>() Doesn't compile
+//    apiResult.select<String>()
+//error: type mismatch: inferred type is Coproduct3<CommonServerError, RegistrationError, Registration> but Coproduct3<String, *, *> was expected
 }
 ```
