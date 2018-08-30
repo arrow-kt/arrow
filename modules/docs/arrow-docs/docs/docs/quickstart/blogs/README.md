@@ -158,8 +158,10 @@ April '18 - version 0.7
 
 ### Arrow 101 — Building an Android app using Functional Programming
 
-[Leandro Ferreira](https://twitter.com/mLeandroBF) presents how to build a simple app using Arrow, step by step. 
+[Leandro Ferreira](https://twitter.com/mLeandroBF) presents how to build a simple app using Arrow and how to implement solutions with Semigroups.
 
 [Arrow 101 — Building an Android app using Functional Programming](https://medium.com/@lehen01/arrow-101-building-an-android-app-using-functional-programming-fe959675d96d)
+
+[Arrow 101 — Modelling a real world problem with Semigroups](https://medium.com/@lehen01/arrow-101-modelling-a-real-world-problem-with-semigroups-d8f22cdf54c)
 
 June '18 - version 0.7
