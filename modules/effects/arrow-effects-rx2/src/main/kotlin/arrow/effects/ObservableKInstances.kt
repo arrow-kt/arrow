@@ -3,10 +3,7 @@ package arrow.effects
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.effects.typeclasses.Async
-import arrow.effects.typeclasses.Effect
-import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.*
 import arrow.instance
 import arrow.typeclasses.*
 import kotlin.coroutines.experimental.CoroutineContext
@@ -120,7 +117,13 @@ interface ObservableKEffectInstance :
     fix().runAsync(cb)
 }
 
-object ObservableKContext : ObservableKEffectInstance, ObservableKTraverseInstance {
+@instance(ObservableK::class)
+interface ObservableKCancellableEffectInstance : ObservableKEffectInstance, CancellableEffect<ForObservableK> {
+  override fun <A> Kind<ForObservableK, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Disposable> =
+    fix().runAsyncCancellable(cb)
+}
+
+object ObservableKContext : ObservableKCancellableEffectInstance, ObservableKTraverseInstance {
   override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
     fix().map(f)
 }
