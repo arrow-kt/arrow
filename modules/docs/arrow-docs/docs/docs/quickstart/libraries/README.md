@@ -18,7 +18,7 @@ In this doc we'll describe all the modules that form the core, alongside a list 
 {:.beginner}
 beginner
 
-The smallest set of constructs necessary to start in FP, and that other libraries can build upon.
+The smallest set of [datatypes]({{ '/docs/datatypes/intro/' | relative_url }}) necessary to start in FP, and that other libraries can build upon.
 The focus here is on API design and abstracting small code patterns.
 
 Datatypes: [`Either`]({{ '/docs/datatypes/either/' | relative_url }}), [`Option`]({{ '/docs/datatypes/option/' | relative_url }}), [`Try`]({{ '/docs/datatypes/try/' | relative_url }}), [`Eval`]({{ '/docs/datatypes/eval/' | relative_url }}), [`Id`]({{ '/docs/datatypes/id/' | relative_url }}), `TupleN`, `Function0`, `Function1`, `FunctionK`
