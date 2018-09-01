@@ -59,7 +59,7 @@ You can also find more advanced constructs for pure functional programming like 
 
 Dependencies: arrow-typeclasses
 
-Datatypes: [`Cokleisli`]({{ '/docs/datatypes/cokleisli/' | relative_url }}), [`Coreader`]({{ '/docs/datatypes/coreader/' | relative_url }}), [`Ior`]({{ '/docs/datatypes/ior/' | relative_url }}), [`ListK`]({{ '/docs/datatypes/listK/' | relative_url }}), [`NonEmptyList`]({{ '/docs/datatypes/nonEmptyList/' | relative_url }}), [`SequenceK`]({{ '/docs/datatypes/sequenceK/' | relative_url }}), [`SortedMapK`]({{ '/docs/datatypes/sortedMapK/' | relative_url }}), [`StateT`]({{ '/docs/datatypes/stateT/' | relative_url }}), [`WriterT`]({{ '/docs/datatypes/writerT/' | relative_url }}), [`Coproduct`]({{ '/docs/datatypes/coproduct/' | relative_url }}), [`EitherT`]({{ '/docs/datatypes/eitherT/' | relative_url }}), [`Kleisli`]({{ '/docs/datatypes/kleisli/' | relative_url }}), [`MapK`]({{ '/docs/datatypes/mapK/' | relative_url }}), [`OptionT`]({{ '/docs/datatypes/optionT/' | relative_url }}), [`Reader`]({{ '/docs/datatypes/reader/' | relative_url }}), [`SetK`]({{ '/docs/datatypes/setK/' | relative_url }}), [`State`]({{ '/docs/datatypes/state/' | relative_url }}), [`Validated`]({{ '/docs/datatypes/validated/' | relative_url }})
+Datatypes: [`Cokleisli`]({{ '/docs/datatypes/cokleisli/' | relative_url }}), [`Coreader`]({{ '/docs/datatypes/coreader/' | relative_url }}), [`Ior`]({{ '/docs/datatypes/ior/' | relative_url }}), [`ListK`]({{ '/docs/datatypes/listk/' | relative_url }}), [`NonEmptyList`]({{ '/docs/datatypes/nonemptylist/' | relative_url }}), [`SequenceK`]({{ '/docs/datatypes/sequencek/' | relative_url }}), [`SortedMapK`]({{ '/docs/datatypes/sortedmapk/' | relative_url }}), [`StateT`]({{ '/docs/datatypes/statet/' | relative_url }}), [`WriterT`]({{ '/docs/datatypes/writert/' | relative_url }}), [`Coproduct`]({{ '/docs/datatypes/coproduct/' | relative_url }}), [`EitherT`]({{ '/docs/datatypes/eithert/' | relative_url }}), [`Kleisli`]({{ '/docs/datatypes/kleisli/' | relative_url }}), [`MapK`]({{ '/docs/datatypes/mapk/' | relative_url }}), [`OptionT`]({{ '/docs/datatypes/optiont/' | relative_url }}), [`Reader`]({{ '/docs/datatypes/reader/' | relative_url }}), [`SetK`]({{ '/docs/datatypes/setk/' | relative_url }}), [`State`]({{ '/docs/datatypes/state/' | relative_url }}), [`Validated`]({{ '/docs/datatypes/validated/' | relative_url }})
 
 ### arrow-instances-(core, data)
 
@@ -81,7 +81,7 @@ It also includes the instances available for datatypes in both arrow-core and ar
 
 Dependencies: arrow-instances-data
 
-Typeclasses: [`FunctorFilter`]({{ '/docs/typeclasses/functorFilter/' | relative_url }}), [`MonadFilter`]({{ '/docs/typeclasses/monadFilter/' | relative_url }}), [`MonadReader`]({{ '/docs/typeclasses/monadReader/' | relative_url }}), [`MonadWriter`]({{ '/docs/typeclasses/monadWriter/' | relative_url }}), [`MonadCombine`]({{ '/docs/typeclasses/monadCombine/' | relative_url }}), [`MonadState`]({{ '/docs/typeclasses/monadState/' | relative_url }}), [`TraverseFilter`]({{ '/docs/typeclasses/traverseFilter/' | relative_url }})
+Typeclasses: [`FunctorFilter`]({{ '/docs/typeclasses/functorfilter/' | relative_url }}), [`MonadFilter`]({{ '/docs/typeclasses/monadfilter/' | relative_url }}), [`MonadReader`]({{ '/docs/typeclasses/monadreader/' | relative_url }}), [`MonadWriter`]({{ '/docs/typeclasses/monadwriter/' | relative_url }}), [`MonadCombine`]({{ '/docs/typeclasses/monadcombine/' | relative_url }}), [`MonadState`]({{ '/docs/typeclasses/monadstate/' | relative_url }}), [`TraverseFilter`]({{ '/docs/typeclasses/traversefilter/' | relative_url }})
 
 ## Extension libraries
 
@@ -111,7 +111,7 @@ The effects library abstracts over concurrency frameworks using typeclasses. Add
 
 Datatypes: [`IO`]({{ '/docs/effects/io/' | relative_url }})
 
-Typeclasses: [`MonadSuspend`]({{ '/docs/effects/monadsuspend/' | relative_url }}), [`Async`]({{ '/docs/effects/async/' | relative_url }}), [`Effect`]({{ '/docs/effects/effect/' | relative_url }})
+Typeclasses: [`MonadDefer`]({{ '/docs/effects/monaddefer/' | relative_url }}), [`Async`]({{ '/docs/effects/async/' | relative_url }}), [`Effect`]({{ '/docs/effects/effect/' | relative_url }})
 
 
 ### arrow-effects-(rx2, reactor, kotlinx-coroutines)
