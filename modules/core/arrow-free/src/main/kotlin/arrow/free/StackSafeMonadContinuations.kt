@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.typeclasses.Continuation
 import arrow.typeclasses.Monad
 import arrow.typeclasses.stateStack
-import arrow.typeclasses.success
 import kotlin.coroutines.*
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
@@ -33,7 +32,7 @@ open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: C
     val labelHere = c.stateStack // save the whole coroutine stack labels
     returnedMonad = m().flatMap { z ->
       c.stateStack = labelHere
-      c.resumeWith(z.success())
+      c.resumeWith(SuccessOrFailure.success(z))
       returnedMonad
     }
     COROUTINE_SUSPENDED

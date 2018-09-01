@@ -6,7 +6,6 @@ import arrow.effects.data.internal.BindingCancellationException
 import arrow.typeclasses.MonadErrorContinuation
 import arrow.typeclasses.bindingCatch
 import arrow.typeclasses.stateStack
-import arrow.typeclasses.success
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -43,7 +42,7 @@ open class MonadDeferCancellableContinuation<F, A>(SC: MonadDefer<F>, override v
       if (cancelled.get()) {
         throw BindingCancellationException()
       }
-      c.resumeWith(x.success())
+      c.resumeWith(SuccessOrFailure.success(x))
       returnedMonad
     }
     COROUTINE_SUSPENDED
@@ -62,7 +61,7 @@ open class MonadDeferCancellableContinuation<F, A>(SC: MonadDefer<F>, override v
         if (cancelled.get()) {
           throw BindingCancellationException()
         }
-        c.resumeWith(xx.success())
+        c.resumeWith(SuccessOrFailure.success(xx))
         returnedMonad
       }
     }

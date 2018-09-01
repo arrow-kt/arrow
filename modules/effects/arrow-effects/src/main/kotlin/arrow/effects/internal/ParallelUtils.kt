@@ -5,8 +5,6 @@ import arrow.core.*
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.Proc
 import arrow.typeclasses.Continuation as AContinuation
-import arrow.typeclasses.failure
-import arrow.typeclasses.success
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.startCoroutine
@@ -19,14 +17,14 @@ internal fun <F, A, B, C> Effect<F>.parMap2(ctx: CoroutineContext, ioA: Kind<F, 
   val a: suspend () -> Either<A, B> = {
     suspendCoroutine { ca: Continuation<Either<A, B>> ->
       start(ioA.map { it.left() }.runAsync {
-        it.fold({ invoke { ca.resumeWith(it.failure()) } }, { invoke { ca.resumeWith(it.success()) } })
+        it.fold({ invoke { ca.resumeWith(SuccessOrFailure.failure(it)) } }, { invoke { ca.resumeWith(SuccessOrFailure.success(it)) } })
       })
     }
   }
   val b: suspend () -> Either<A, B> = {
     suspendCoroutine { ca: Continuation<Either<A, B>> ->
       start(ioB.map { it.right() }.runAsync {
-        it.fold({ invoke { ca.resumeWith(it.failure()) } }, { invoke { ca.resumeWith(it.success()) } })
+        it.fold({ invoke { ca.resumeWith(SuccessOrFailure.failure(it)) } }, { invoke { ca.resumeWith(SuccessOrFailure.success(it)) } })
       })
     }
   }
@@ -45,21 +43,21 @@ internal fun <F, A, B, C, D> Effect<F>.parMap3(ctx: CoroutineContext, ioA: Kind<
   val a: suspend () -> Treither<A, B, C> = {
     suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
       start(ioA.map { Treither.Left<A, B, C>(it) }.runAsync {
-        it.fold({ invoke { ca.resumeWith(it.failure()) } }, { invoke { ca.resumeWith(it.success()) } })
+        it.fold({ invoke { ca.resumeWith(SuccessOrFailure.failure(it)) } }, { invoke { ca.resumeWith(SuccessOrFailure.success(it)) } })
       })
     }
   }
   val b: suspend () -> Treither<A, B, C> = {
     suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
       start(ioB.map { Treither.Middle<A, B, C>(it) }.runAsync {
-        it.fold({ invoke { ca.resumeWith(it.failure()) } }, { invoke { ca.resumeWith(it.success()) } })
+        it.fold({ invoke { ca.resumeWith(SuccessOrFailure.failure(it)) } }, { invoke { ca.resumeWith(SuccessOrFailure.success(it)) } })
       })
     }
   }
   val c: suspend () -> Treither<A, B, C> = {
     suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
       start(ioC.map { Treither.Right<A, B, C>(it) }.runAsync {
-        it.fold({ invoke { ca.resumeWith(it.failure()) } }, { invoke { ca.resumeWith(it.success()) } })
+        it.fold({ invoke { ca.resumeWith(SuccessOrFailure.failure(it)) } }, { invoke { ca.resumeWith(SuccessOrFailure.success(it)) } })
       })
     }
   }
