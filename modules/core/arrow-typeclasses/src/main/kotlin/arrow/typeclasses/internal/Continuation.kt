@@ -15,3 +15,6 @@ inline fun <A> A.success(): SuccessOrFailure<A> =
 
 inline fun <A> Throwable.failure(): SuccessOrFailure<A> =
   SuccessOrFailure.failure(this)
+
+inline fun <A, B> SuccessOrFailure<A>.flatMap(f: (A) -> SuccessOrFailure<B>): SuccessOrFailure<B> =
+  fold(f, { it.failure() })
