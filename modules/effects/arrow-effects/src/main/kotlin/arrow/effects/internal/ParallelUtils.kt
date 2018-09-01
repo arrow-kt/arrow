@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.Proc
-import arrow.typeclasses.Continuation as AContinuation
+import arrow.core.Continuation as AContinuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.startCoroutine

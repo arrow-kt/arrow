@@ -1,7 +1,7 @@
 package arrow.free
 
 import arrow.Kind
-import arrow.typeclasses.Continuation
+import arrow.core.Continuation
 import arrow.typeclasses.Monad
 import arrow.typeclasses.stateStack
 import kotlin.coroutines.*

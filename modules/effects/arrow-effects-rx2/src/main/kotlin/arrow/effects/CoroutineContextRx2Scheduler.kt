@@ -1,6 +1,6 @@
 package arrow.effects
 
-import arrow.typeclasses.Continuation
+import arrow.core.Continuation
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.internal.disposables.EmptyDisposable

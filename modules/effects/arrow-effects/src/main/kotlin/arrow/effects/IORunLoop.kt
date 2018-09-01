@@ -6,7 +6,7 @@ import arrow.core.Right
 import arrow.effects.data.internal.IOCancellationException
 import arrow.effects.internal.Platform.ArrayStack
 import arrow.effects.typeclasses.Proc
-import arrow.typeclasses.Continuation
+import arrow.core.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 
