@@ -1,8 +1,8 @@
 package arrow.typeclasses
 
-import kotlin.coroutines.experimental.Continuation
+import kotlin.coroutines.Continuation
 
-private val coroutineImplClass by lazy { Class.forName("kotlin.coroutines.experimental.jvm.internal.CoroutineImpl") }
+private val coroutineImplClass by lazy { Class.forName("kotlin.coroutines.jvm.internal.CoroutineImpl") }
 
 private val labelField by lazy { coroutineImplClass.getDeclaredField("label").apply { isAccessible = true } }
 

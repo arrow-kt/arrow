@@ -6,7 +6,7 @@ import arrow.core.Tuple2
 import arrow.core.toT
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.typeclasses.MonadError
-import kotlin.coroutines.experimental.startCoroutine
+import kotlin.coroutines.startCoroutine
 
 /** The context required to defer evaluating a safe computation. **/
 interface MonadDefer<F> : MonadError<F, Throwable> {

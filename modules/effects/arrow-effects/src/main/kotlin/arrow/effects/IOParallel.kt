@@ -4,7 +4,7 @@ import arrow.core.Tuple2
 import arrow.core.Tuple3
 import arrow.effects.internal.parMap2
 import arrow.effects.internal.parMap3
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
 
 fun <A, B, C> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, f: (A, B) -> C): IO<C> =
   IO.async(IO.effect().parMap2(ctx, ioA, ioB, f /* see parMap2 notes on this parameter */) { it.fix().unsafeRunSync() })

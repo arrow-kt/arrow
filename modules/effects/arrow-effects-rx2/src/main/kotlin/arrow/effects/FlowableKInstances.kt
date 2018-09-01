@@ -10,7 +10,7 @@ import arrow.effects.typeclasses.Proc
 import arrow.instance
 import arrow.typeclasses.*
 import io.reactivex.BackpressureStrategy
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
 
 @instance(FlowableK::class)
 interface FlowableKFunctorInstance : Functor<ForFlowableK> {

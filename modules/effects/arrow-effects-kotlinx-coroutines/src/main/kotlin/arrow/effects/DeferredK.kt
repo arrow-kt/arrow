@@ -6,7 +6,7 @@ import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Traverse
 import kotlinx.coroutines.experimental.*
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
 
 fun <A> Deferred<A>.k(): DeferredK<A> =
   DeferredK(this)

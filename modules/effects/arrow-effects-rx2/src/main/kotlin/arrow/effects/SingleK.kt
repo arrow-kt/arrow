@@ -8,7 +8,7 @@ import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
 
 fun <A> Single<A>.k(): SingleK<A> = SingleK(this)
 
