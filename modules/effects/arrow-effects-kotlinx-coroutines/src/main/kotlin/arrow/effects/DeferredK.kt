@@ -5,7 +5,7 @@ import arrow.core.*
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Traverse
-import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Deferred<A>.k(): DeferredK<A> =
@@ -23,12 +23,12 @@ data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferre
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
   fun <B> flatMap(f: (A) -> DeferredKOf<B>): DeferredK<B> =
-    kotlinx.coroutines.experimental.async(Unconfined, CoroutineStart.LAZY) {
+    kotlinx.coroutines.async(Unconfined, CoroutineStart.LAZY) {
       f(await()).await()
     }.k()
 
   fun continueOn(ctx: CoroutineContext): DeferredK<A> =
-    kotlinx.coroutines.experimental.async(ctx, CoroutineStart.LAZY) {
+    kotlinx.coroutines.async(ctx, CoroutineStart.LAZY) {
       deferred.await()
     }.k()
 
@@ -40,13 +40,13 @@ data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferre
       CompletableDeferred(a).k()
 
     fun <A> defer(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.LAZY, f: suspend () -> A): DeferredK<A> =
-      kotlinx.coroutines.experimental.async(ctx, start) { f() }.k()
+      kotlinx.coroutines.async(ctx, start) { f() }.k()
 
     fun <A> defer(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.LAZY, fa: () -> DeferredKOf<A>): DeferredK<A> =
-      kotlinx.coroutines.experimental.async(ctx, start) { fa().await() }.k()
+      kotlinx.coroutines.async(ctx, start) { fa().await() }.k()
 
     operator fun <A> invoke(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.DEFAULT, f: () -> A): DeferredK<A> =
-      kotlinx.coroutines.experimental.async(ctx, start) { f() }.k()
+      kotlinx.coroutines.async(ctx, start) { f() }.k()
 
     fun <A> failed(t: Throwable): DeferredK<A> =
       CompletableDeferred<A>().apply { completeExceptionally(t) }.k()
@@ -62,7 +62,7 @@ data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferre
      * and its [CoroutineStart] is [CoroutineStart.DEFAULT].
      */
     fun <A> async(ctx: CoroutineContext = DefaultDispatcher, start: CoroutineStart = CoroutineStart.DEFAULT, fa: Proc<A>): DeferredK<A> =
-      kotlinx.coroutines.experimental.async(ctx, start) {
+      kotlinx.coroutines.async(ctx, start) {
         CompletableDeferred<A>().apply {
           fa {
             it.fold(this::completeExceptionally, this::complete)
@@ -73,7 +73,7 @@ data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferre
     fun <A, B> tailRecM(a: A, f: (A) -> DeferredKOf<Either<A, B>>): DeferredK<B> =
       f(a).value().let { initial: Deferred<Either<A, B>> ->
         var current: Deferred<Either<A, B>> = initial
-        kotlinx.coroutines.experimental.async(Unconfined, CoroutineStart.LAZY) {
+        kotlinx.coroutines.async(Unconfined, CoroutineStart.LAZY) {
           val result: B
           while (true) {
             val actual: Either<A, B> = current.await()

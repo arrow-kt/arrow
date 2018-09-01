@@ -10,8 +10,8 @@ import arrow.test.generators.genIntSmall
 import arrow.test.generators.genThrowable
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.forAll
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.newSingleThreadContext
+import kotlinx.coroutines.CommonPool
+import kotlinx.coroutines.newSingleThreadContext
 
 object MonadSuspendLaws {
   inline fun <F> laws(SC: MonadDefer<F>, EQ: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>, EQERR: Eq<Kind<F, Int>> = EQ): List<Law> =

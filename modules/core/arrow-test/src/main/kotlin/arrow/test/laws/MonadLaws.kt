@@ -15,7 +15,7 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.binding
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kotlinx.coroutines.experimental.newSingleThreadContext
+import kotlinx.coroutines.newSingleThreadContext
 
 object MonadLaws {
 

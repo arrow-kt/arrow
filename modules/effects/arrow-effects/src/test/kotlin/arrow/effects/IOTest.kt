@@ -14,7 +14,7 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldEqual
-import kotlinx.coroutines.experimental.newSingleThreadContext
+import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

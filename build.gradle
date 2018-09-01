@@ -23,7 +23,7 @@ buildscript {
         kotlinTestVersion = '2.0.7'
         kotlinVersion = '1.3-M2'
         daggerVersion = '2.15'
-        kotlinxCoroutinesVersion = '0.25.0'
+        kotlinxCoroutinesVersion = '0.25.1-eap13'
         kotlinxCollectionsImmutableVersion = '0.1'
         kotlinPoetVersion='1.0.0-RC1'
     }
