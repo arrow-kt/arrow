@@ -95,7 +95,7 @@ ForOption extensions {
 
 #### effectM
 
-Executes sequentially two elements and ignores the result of the second. This is useful for effects like logging.
+Executes two elements sequentially and ignores the result of the second. This is useful for effects like logging.
 
 ```kotlin:ank
 fun logValue(i: Int): IO<Unit> = IO { /* println(i) */ }
