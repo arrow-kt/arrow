@@ -1,8 +1,8 @@
 package arrow.effects
 
+import arrow.typeclasses.Continuation
 import reactor.core.Disposable
 import reactor.core.scheduler.Scheduler
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 

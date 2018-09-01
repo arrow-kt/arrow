@@ -1,10 +1,10 @@
 package arrow.effects
 
+import arrow.typeclasses.Continuation
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.internal.disposables.EmptyDisposable
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 
