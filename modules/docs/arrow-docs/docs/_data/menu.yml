@@ -281,6 +281,9 @@ options:
   - title: Generic
     nested_options:
 
+          - title: Coproduct
+            url: /docs/generic/coproduct
+
           - title: Product
             url: /docs/generic/product/
 

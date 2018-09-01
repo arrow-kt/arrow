@@ -128,6 +128,32 @@ sealed class Try<out A> : TryOf<A> {
 
   fun toEither(): Either<Throwable, A> = fold({ Left(it) }, { Right(it) })
 
+  /**
+   * * Convenient method to solve a common scenario when using [Try]. The created [Try] object is often
+   * converted to [Either], and right after [Either.mapLeft] is called to translate the [Throwable] to a
+   * domain specific error object.
+   * * To make it easier this method takes an [onLeft] error domain object supplier, which does the conversion to domain error
+   * in the same time as conversion to [Either] occurs.
+   * * So instead of
+   * ```
+   * Try {
+   *    dangerousOperation()
+   * }.toEither()
+   *    .mapLeft { Error.ServerError("This really went wrong", it) }
+   * // Left(a=Error.ServerError@3ada9e34)
+   * ```
+   * One can write
+   * ```
+   * Try {
+   *    dangerousOperation()
+   * }.toEither {
+   *    Error.ServerError("This really went wrong", it)
+   * }
+   * // Left(a=Error.ServerError@4a5a3234)
+   * ```
+   */
+  fun <B> toEither(onLeft: (Throwable) -> B): Either<B, A> = this.toEither().fold({ onLeft(it).left() }, { it.right() })
+
   fun <B> foldLeft(initial: B, operation: (B, A) -> B): B = fix().fold({ initial }, { operation(initial, it) })
 
   fun <B> foldRight(initial: Eval<B>, operation: (A, Eval<B>) -> Eval<B>): Eval<B> = fix().fold({ initial }, { operation(it, initial) })
