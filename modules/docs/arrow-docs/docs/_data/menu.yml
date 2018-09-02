@@ -219,6 +219,9 @@ options:
       - title: Alternative
         url: /docs/typeclasses/alternative/
 
+      - title: Category
+        url: /docs/typeclasses/category/
+
   - title: Effects
 
     nested_options:
