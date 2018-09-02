@@ -9,7 +9,7 @@ permalink: /docs/typeclasses/category/
 {:.intermediate}
 intermediate
 
-TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}).
+`Category` is a typeclass that represents a mathematical Category. In essence a category provides a context for unifying ideas in different disciplines of mathematics. It turns out that a Category can play the same role in functional programming. To learn more about this a good reference is Bartosz Milewski's blog [Category Theory for Programmers](https://bartoszmilewski.com/2014/10/28/category-theory-for-programmers-the-preface/).
 
 ### Laws
 
