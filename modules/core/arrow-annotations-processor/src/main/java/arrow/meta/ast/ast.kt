@@ -1,67 +1,98 @@
 package arrow.meta.ast
 
-data class Code(val value : String)
+import arrow.optics.optics
 
-sealed class Tree
+@optics
+data class Code(val value : String) {
+  companion object
+}
 
+@optics
+sealed class Tree {
+  companion object
+}
+
+@optics
 data class PackageName(
   val value: String) : Tree() {
   companion object
 }
 
+@optics
 data class TypeAlias(
   val name: String,
-  val value: TypeName) : Tree()
+  val value: TypeName) : Tree() {
+  companion object
+}
 
+@optics
 data class Import(
   val qualifiedName: String,
-  val alias: String? = null): Tree()
+  val alias: String? = null) : Tree() {
+  companion object
+}
 
+@optics
 data class File(
   val fileName: String,
   val packageName: PackageName? = null,
   val imports: List<Import> = emptyList(),
   val types: List<Type> = emptyList(),
-  val functions : List<Fun> = emptyList()) {
+  val functions : List<Func> = emptyList()) {
   companion object
 }
 
+@optics
 sealed class TypeName : Tree() {
+
+  @optics
   data class TypeVariable(
     val name: String,
     val bounds: List<TypeName> = emptyList(),
     val variance: Modifier? = null,
     val reified: Boolean = false,
     val nullable: Boolean = false,
-    val annotations: List<Annotation> = emptyList()) : TypeName()
+    val annotations: List<Annotation> = emptyList()) : TypeName() {
+    companion object
+  }
 
+  @optics
   data class WildcardType(
     val name: String,
     val upperBounds: List<TypeName>,
     val lowerBounds: List<TypeName>,
     val nullable: Boolean,
-    val annotations: List<Annotation>) : TypeName()
+    val annotations: List<Annotation>) : TypeName() {
+    companion object
+  }
 
+  @optics
   data class ParameterizedType(
     val name: String,
     val enclosingType: TypeName? = null,
-    val rawType: TypeName,
+    val rawType: Classy,
     val typeArguments: List<TypeName> = emptyList(),
     val nullable: Boolean = false,
-    val annotations: List<Annotation> = emptyList()) : TypeName()
+    val annotations: List<Annotation> = emptyList()) : TypeName() {
+    companion object
+  }
 
-  data class Class(
+  @optics
+  data class Classy(
     val simpleName: String,
     val fqName: String,
     val pckg: PackageName,
     val nullable: Boolean = false,
-    val annotations: List<Annotation> = emptyList()) : TypeName()
+    val annotations: List<Annotation> = emptyList()) : TypeName() {
+    companion object
+  }
 
   companion object {
-    val Unit: TypeName = TypeName.Class(simpleName = "Unit", pckg = PackageName("kotlin"), fqName = "kotlin.Unit")
+    val Unit: TypeName = TypeName.Classy(simpleName = "Unit", pckg = PackageName("kotlin"), fqName = "kotlin.Unit")
   }
 }
 
+@optics
 sealed class UseSiteTarget {
   object File : UseSiteTarget()
   object Property : UseSiteTarget()
@@ -71,20 +102,29 @@ sealed class UseSiteTarget {
   object Receiver : UseSiteTarget()
   object Param : UseSiteTarget()
   object SetParam : UseSiteTarget()
-  object Delegate : UseSiteTarget() }
+  object Delegate : UseSiteTarget()
+  companion object
+}
 
+@optics
 data class Parameter(
   val name: String,
   val type: TypeName,
   val defaultValue: Code? = null,
   val annotations: List<Annotation> = emptyList(),
-  val modifiers: List<Modifier> = emptyList()): Tree()
+  val modifiers: List<Modifier> = emptyList()) : Tree() {
+  companion object
+}
 
+@optics
 data class Annotation(
   val type: TypeName,
   val members: List<Code>,
-  val useSiteTarget: UseSiteTarget?): Tree()
+  val useSiteTarget: UseSiteTarget?) : Tree() {
+  companion object
+}
 
+@optics
 data class Property(
   val name: String,
   val type: TypeName,
@@ -92,15 +132,18 @@ data class Property(
   val kdoc: Code? = null,
   val initializer: Code? = null,
   val delegated: Boolean = false,
-  val getter: Fun,
-  val setter: Fun?,
+  val getter: Func,
+  val setter: Func?,
   val receiverType: TypeName? = null,
   val jvmPropertySignature: String,
   val jvmFieldSignature: String?,
   val annotations: List<Annotation> = emptyList(),
-  val modifiers: List<Modifier> = emptyList()): Tree()
+  val modifiers: List<Modifier> = emptyList()) : Tree() {
+  companion object
+}
 
-data class Fun(
+@optics
+data class Func(
   val name: String,
   val kdoc: Code? = null,
   val receiverType: TypeName? = null,
@@ -110,7 +153,9 @@ data class Fun(
   val modifiers: List<Modifier> = emptyList(),
   val typeVariables: List<TypeName.TypeVariable> = emptyList(),
   val parameters: List<Parameter> = emptyList(),
-  val jvmMethodSignature: String): Tree()
+  val jvmMethodSignature: String) : Tree() {
+  companion object
+}
 
 sealed class Modifier {
   object Public : Modifier()
@@ -132,7 +177,7 @@ sealed class Modifier {
   object Inner : Modifier()
   object Enum : Modifier()
   object Annotation : Modifier()
-  object Companion : Modifier()
+  object CompanionObject : Modifier()
   object Inline : Modifier()
   object NoInline : Modifier()
   object CrossInline : Modifier()
@@ -140,17 +185,19 @@ sealed class Modifier {
   object Infix : Modifier()
   object Operator : Modifier()
   object Data : Modifier()
-  object In : Modifier()
-  object Out : Modifier()
+  object InVariance : Modifier()
+  object OutVariance : Modifier()
   object VarArg: Modifier()
+  companion object
 }
 
+@optics
 data class Type(
   val name: TypeName,
   val kind: Type.Kind,
   val kdoc: Code? = null,
   val modifiers: List<Modifier> = emptyList(),
-  val primaryConstructor: Fun? = null,
+  val primaryConstructor: Func? = null,
   val superclass: TypeName? = null,
   val initializer: Code? = null,
   val superInterfaces: List<TypeName> = emptyList(),
@@ -159,14 +206,17 @@ data class Type(
   val typeVariables: List<TypeName.TypeVariable> = emptyList(),
   val superclassConstructorParameters: List<Code> = emptyList(),
   val properties: List<Property> = emptyList(),
-  val declaredFunctions: List<Fun> = emptyList(),
-  val allFunctions: List<Fun> = emptyList(),
-  val types: List<Type> = emptyList()): Tree() {
+  val declaredFunctions: List<Func> = emptyList(),
+  val allFunctions: List<Func> = emptyList(),
+  val types: List<Type> = emptyList()) : Tree() {
 
   sealed class Kind {
     object Class : Kind()
     object Interface: Kind()
     object Object: Kind()
+    companion object
   }
+
+  companion object
 
 }

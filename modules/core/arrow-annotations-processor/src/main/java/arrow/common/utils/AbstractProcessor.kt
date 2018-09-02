@@ -1,6 +1,8 @@
 package arrow.common.utils
 
+import aballano.kotlinmemoization.memoize
 import arrow.common.messager.logE
+import arrow.meta.processor.MetaProcessorUtils
 import me.eugeniomarletti.kotlin.processing.KotlinAbstractProcessor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.Element
@@ -12,7 +14,7 @@ class KnownException(message: String, val element: Element?) : RuntimeException(
   operator fun component2() = element
 }
 
-abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils {
+abstract class AbstractProcessor : KotlinAbstractProcessor(), MetaProcessorUtils {
 
   override final fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
     if (!roundEnv.errorRaised()) {
@@ -26,4 +28,11 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils {
   }
 
   protected abstract fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment)
+
+  val typeElementToMeta: (classElement: TypeElement) -> ClassOrPackageDataWrapper =
+    ::getClassOrPackageDataWrapper.memoize()
+
+  override val TypeElement.meta: ClassOrPackageDataWrapper.Class
+    get() = typeElementToMeta(this) as ClassOrPackageDataWrapper.Class
+
 }

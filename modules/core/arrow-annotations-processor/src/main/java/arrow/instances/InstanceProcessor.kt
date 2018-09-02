@@ -2,10 +2,14 @@ package arrow.instances
 
 import arrow.common.utils.*
 import arrow.extension
+import arrow.meta.ast.Func
+import arrow.meta.ast.Type
+import arrow.meta.decoder.TypeDecoder
+import arrow.meta.encoder.instances.TypeEncoder
 import arrow.meta.processor.MetaProcessor
+import arrow.meta.processor.MetaProcessorUtils
 import com.google.auto.service.AutoService
 import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.FunSpec
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import java.io.File
 import javax.annotation.processing.Processor
@@ -15,34 +19,29 @@ import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
 
 @AutoService(Processor::class)
-class InstanceProcessor : MetaProcessor<extension>(annotations = listOf(extension::class)) {
-
+class InstanceProcessor : MetaProcessor<extension, Type>(annotations = listOf(extension::class)), TypeEncoder, TypeDecoder {
   override fun transform(annotatedElement: AnnotatedElement): FileSpec.Builder =
     when (annotatedElement) {
       is AnnotatedElement.Interface -> {
-        val info = annotatedElement.typeElement.typeClassInstanceInfo()
+        val info = annotatedElement.typeElement.typeClassInstance(this)
         info?.genDataTypeExtensions()?.fold(annotatedElement.fileSpec) { spec, func ->
-          spec.addFunction(func)
+          spec.addFunction(func.lyrics())
         } ?: annotatedElement.fileSpec.addComment("Not Processes by Instance Type Class Generator")
       }
       else -> knownError("@instance is only allowed on `interface` extending another interface of at least one type argument (type class) as first declaration in the extension list")
     }
 
+  //  override fun transform(annotatedElement: AnnotatedElement): FileSpec.Builder =
 
-  fun TypeClassInstance.genDataTypeExtensions(): List<FunSpec> {
-    val extensionSet = typeClass.declaredFunctions().map { it.jvmMethodSignature }
-    return instance
+//
+//
+  fun MetaProcessorUtils.TypeClassInstance.genDataTypeExtensions(): List<Func> {
+    val extensionSet = typeClass.declaredFunctions.map { it.jvmMethodSignature }
+    return instanceTypeElement
       .allFunctions()
       .filter { extensionSet.contains(it.jvmMethodSignature) }
-      .map {
-        val funSpecBuilder = it.funSpec.toBuilder()
-        funSpecBuilder.modifiers.clear()
-        funSpecBuilder.build()
-      }
   }
 }
-
-
 
 //@AutoService(Processor::class)
 class LegacyInstanceProcessor : AbstractProcessor() {

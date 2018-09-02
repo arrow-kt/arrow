@@ -1,12 +1,17 @@
 package arrow.meta.processor
 
-import aballano.kotlinmemoization.memoize
 import arrow.common.utils.*
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Try
+import arrow.core.some
 import arrow.derive.normalizeType
 import arrow.meta.ast.*
 import arrow.meta.ast.Annotation
 import arrow.meta.ast.Modifier
 import arrow.meta.ast.TypeName
+import arrow.meta.encoder.MetaEncoder
+import javax.lang.model.element.Modifier as ElModifier
 import com.squareup.kotlinpoet.*
 import me.eugeniomarletti.kotlin.metadata.*
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmConstructorSignature
@@ -14,6 +19,7 @@ import me.eugeniomarletti.kotlin.metadata.jvm.getJvmFieldSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmMethodSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.jvmPropertySignature
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.NameResolver
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.hasReceiver
 import java.lang.IllegalArgumentException
@@ -32,29 +38,29 @@ interface MetaProcessorUtils : ProcessorUtils {
         name = meta.nameResolver.getString(property.name),
         jvmPropertySignature = jvmPropertySignature,
         jvmFieldSignature = jvmFieldSignature?.toString(),
-        type = property.returnType.asTypeName(meta, false),
+        type = property.returnType.asTypeName(meta),
         mutable = property.isVar,
         modifiers = listOfNotNull(
           property.visibility?.asModifier(),
           property.modality?.asModifier()
         ),
-        receiverType = property.receiverType.asTypeName(meta, false),
+        receiverType = property.receiverType.asTypeName(meta),
         delegated = property.isDelegated,
-        getter = Fun(
+        getter = Func(
           name = "get",
-          returnType = property.returnType.asTypeName(meta, false),
+          returnType = property.returnType.asTypeName(meta),
           jvmMethodSignature = jvmPropertySignature,
-          receiverType = property.receiverType.asTypeName(meta, false),
+          receiverType = property.receiverType.asTypeName(meta),
           modifiers = listOfNotNull(
             property.getterVisibility?.asModifier(),
             property.getterModality?.asModifier()
           )
         ),
-        setter = Fun(
+        setter = Func(
           name = "set",
           returnType = TypeName.Unit,
           jvmMethodSignature = jvmPropertySignature,
-          receiverType = property.receiverType.asTypeName(meta, false),
+          receiverType = property.receiverType.asTypeName(meta),
           modifiers = listOfNotNull(
             property.getterVisibility?.asModifier(),
             property.getterModality?.asModifier()
@@ -62,18 +68,18 @@ interface MetaProcessorUtils : ProcessorUtils {
         )
       )
       if (property.hasReceiver()) {
-        prop.copy(receiverType = property.receiverType.asTypeName(meta, true))
+        prop.copy(receiverType = property.receiverType.asTypeName(meta))
       } else prop
     }
 
-  fun TypeElement.declaredFunctions(): List<Fun> {
+  fun TypeElement.declaredFunctions(): List<Func> {
     val declaredFunctionSignatures = meta.functionList.map { it.getJvmMethodSignature(meta.nameResolver, meta.classProto.typeTable) }
     return allFunctions().filter {
       declaredFunctionSignatures.contains(it.jvmMethodSignature)
     }
   }
 
-  fun TypeElement.allFunctions(): List<Fun> {
+  fun TypeElement.allFunctions(): List<Func> {
     val superTypes = supertypes(meta, TypeTable(meta.classProto.typeTable), emptyList())
       .filterIsInstance(ClassOrPackageDataWrapper.Class::class.java)
     val declaredFunctions = meta.functionList.map { meta to it }
@@ -82,6 +88,8 @@ interface MetaProcessorUtils : ProcessorUtils {
     val allMembers = ElementFilter.methodsIn(elementUtils.getAllMembers(this))
     val declaredType = typeUtils.getDeclaredType(this)
     return allMembers.filterNot {
+      it.modifiers.containsAll(listOf(javax.lang.model.element.Modifier.PRIVATE, javax.lang.model.element.Modifier.FINAL))
+    }.filterNot {
       it.modifiers.containsAll(listOf(javax.lang.model.element.Modifier.PUBLIC, javax.lang.model.element.Modifier.FINAL))
     }.map { member ->
       val templateFunction = allFunctions.find { (proto, function) ->
@@ -116,9 +124,9 @@ interface MetaProcessorUtils : ProcessorUtils {
           typeArguments = type.argumentList.map {
             TypeName.TypeVariable(name = it.type.extractFullName(meta).normalizeType())
           },
-          rawType = TypeName.Class(simpleName, "$pckg.$simpleName", PackageName(pckg), nullable = false)
+          rawType = TypeName.Classy(simpleName, "$pckg.$simpleName", PackageName(pckg), nullable = false)
         )
-      else TypeName.Class(simpleName, superTypeName, PackageName(pckg), nullable = false)
+      else TypeName.Classy(simpleName, superTypeName, PackageName(pckg), nullable = false)
     }
 
   fun TypeElement.typeVariables(): List<TypeName.TypeVariable> =
@@ -138,15 +146,42 @@ interface MetaProcessorUtils : ProcessorUtils {
       }
     }
 
-  private fun ExecutableElement.asConstructor(typeElement: TypeElement): Pair<Boolean, Fun>? =
+  fun ExecutableElement.asConstructor(typeElement: TypeElement): Pair<Boolean, Func>? =
     typeElement.meta.constructorList.find {
       it.getJvmConstructorSignature(typeElement.meta.nameResolver, typeElement.meta.classProto.typeTable) == this.jvmMethodSignature
     }?.let {
-      val declaredType = typeUtils.getDeclaredType(typeElement)
-      it.isPrimary to FunSpec
-        .overriding(this, declaredType, typeUtils).build()
-        .toMeta(this)
-        .copy(name = "constructor")
+      it.isPrimary to
+      Func(
+        name = "constructor",
+        annotations = emptyList(),
+        typeVariables = emptyList(),
+        modifiers = modifiers.mapNotNull { it.toMeta() },
+        returnType = returnType?.asTypeName()?.toMeta(),
+        receiverType = receiverType?.asTypeName()?.toMeta(),
+        kdoc = null,
+        body = null,
+        parameters = parameters.map { it.toMeta() },
+        jvmMethodSignature = jvmMethodSignature
+      )
+    }
+
+  private fun VariableElement.toMeta(): Parameter =
+    Parameter(simpleName.toString(), asType().asTypeName().toMeta())
+
+  private fun ElModifier.toMeta(): Modifier? =
+    when (this) {
+      ElModifier.PUBLIC -> Modifier.Public
+      ElModifier.PROTECTED -> Modifier.Protected
+      ElModifier.PRIVATE -> Modifier.Private
+      ElModifier.ABSTRACT -> Modifier.Abstract
+      ElModifier.DEFAULT -> null
+      ElModifier.STATIC -> null
+      ElModifier.FINAL -> Modifier.Final
+      ElModifier.TRANSIENT -> null
+      ElModifier.VOLATILE -> null
+      ElModifier.SYNCHRONIZED -> null
+      ElModifier.NATIVE -> null
+      ElModifier.STRICTFP -> null
     }
 
   fun TypeElement.sealedSubClassNames(): List<TypeName> =
@@ -157,22 +192,63 @@ interface MetaProcessorUtils : ProcessorUtils {
       }
     else emptyList()
 
-  fun TypeElement.nestedClassNames(): List<TypeName> =
-    if (meta.classProto.nestedClassNameList.isNotEmpty())
-      meta.classProto.nestedClassNameList.map {
-        val fqName = meta.nameOf(it).normalizeType()
-        ClassName.bestGuess(fqName).toMeta()
-      }
-    else emptyList()
-
   private fun ClassOrPackageDataWrapper.Class.nameOf(id: Int): String =
     nameResolver.getString(id)
 
-  private fun ProtoBuf.Type.asTypeName(meta: ClassOrPackageDataWrapper.Class, outputTypeAlias: Boolean): TypeName {
-    val fullName = extractFullName(meta, outputTypeAlias).normalizeType()
+  private fun ProtoBuf.Type.extractFullName(
+    nameResolver: NameResolver,
+    getTypeParameter: (index: Int) -> ProtoBuf.TypeParameter?,
+    outputTypeAlias: Boolean = true,
+    throwOnGeneric: Throwable? = null
+  ): String {
+
+    if (!hasClassName() && throwOnGeneric != null) throw throwOnGeneric
+
+    val typeParam = getTypeParameter(typeParameter)
+
+    val name = when {
+      hasTypeParameter() && typeParam != null -> typeParam.name
+      hasTypeParameterName() -> typeParameterName
+      outputTypeAlias && hasAbbreviatedType() -> abbreviatedType.typeAliasName
+      else -> className
+    }.let { nameResolver.getString(it).escapedClassName }
+
+    val argumentList = when {
+      outputTypeAlias && hasAbbreviatedType() -> abbreviatedType.argumentList
+      else -> argumentList
+    }
+    val arguments = argumentList
+      .takeIf { it.isNotEmpty() }
+      ?.joinToString(prefix = "<", postfix = ">") {
+        when {
+          it.hasType() -> it.type.extractFullName(nameResolver, getTypeParameter, outputTypeAlias, throwOnGeneric)
+          throwOnGeneric != null -> throw throwOnGeneric
+          else -> "*"
+        }
+      }
+      ?: ""
+
+    val nullability = if (nullable) "?" else ""
+
+    return name + arguments + nullability
+  }
+
+  private fun ProtoBuf.Type.extractFullName(
+    classData: ClassOrPackageDataWrapper,
+    outputTypeAlias: Boolean = true
+  ): String =
+    extractFullName(
+      nameResolver = classData.nameResolver,
+      getTypeParameter = { classData.getTypeParameter(it) },
+      outputTypeAlias = outputTypeAlias,
+      throwOnGeneric = null
+    )
+
+  private fun ProtoBuf.Type.asTypeName(meta: ClassOrPackageDataWrapper.Class): TypeName {
+    val fullName = extractFullName(meta).normalizeType()
     val pck = fullName.substringBefore("<").substringBeforeLast(".")
     val simpleName = fullName.substringBefore("<").substringAfterLast(".")
-    return if (argumentList.isEmpty()) TypeName.Class(
+    return if (argumentList.isEmpty()) TypeName.Classy(
       simpleName = simpleName,
       fqName = fullName,
       pckg = PackageName(pck),
@@ -180,9 +256,9 @@ interface MetaProcessorUtils : ProcessorUtils {
     )
     else TypeName.ParameterizedType(
       name = fullName,
-      rawType = TypeName.Class(simpleName, "$pck.$simpleName", PackageName(pck)),
+      rawType = TypeName.Classy(simpleName, "$pck.$simpleName", PackageName(pck)),
       typeArguments = argumentList.map { TypeName.TypeVariable(it.type.extractFullName(meta).normalizeType()) },
-      enclosingType = TypeName.Class(
+      enclosingType = TypeName.Classy(
         simpleName = meta.simpleName,
         fqName = meta.fullName.normalizeType(),
         pckg = PackageName(meta.`package`),
@@ -234,8 +310,8 @@ interface MetaProcessorUtils : ProcessorUtils {
       defaultValue = defaultValue?.toMeta()
     )
 
-  private fun com.squareup.kotlinpoet.FunSpec.toMeta(element: ExecutableElement): Fun =
-    Fun(
+  private fun com.squareup.kotlinpoet.FunSpec.toMeta(element: ExecutableElement): Func =
+    Func(
       name = element.simpleName.toString(),
       annotations = annotations.map { it.toMeta() },
       typeVariables = typeVariables.map { it.toMeta() },
@@ -251,7 +327,6 @@ interface MetaProcessorUtils : ProcessorUtils {
   private fun com.squareup.kotlinpoet.AnnotationSpec.toMeta(): Annotation =
     Annotation(type.toMeta(), members = members.map { it.toMeta() }, useSiteTarget = useSiteTarget?.toMeta())
 
-
   private fun com.squareup.kotlinpoet.WildcardTypeName.toMeta(): TypeName.WildcardType =
     TypeName.WildcardType(
       toString(),
@@ -261,8 +336,8 @@ interface MetaProcessorUtils : ProcessorUtils {
       annotations = annotations.map { it.toMeta() }
     )
 
-  private fun com.squareup.kotlinpoet.ClassName.toMeta(): TypeName.Class =
-    TypeName.Class(
+  private fun com.squareup.kotlinpoet.ClassName.toMeta(): TypeName.Classy =
+    TypeName.Classy(
       simpleName = simpleName,
       fqName = canonicalName,
       annotations = annotations.map { it.toMeta() },
@@ -302,7 +377,7 @@ interface MetaProcessorUtils : ProcessorUtils {
       KModifier.INNER -> Modifier.Inner
       KModifier.ENUM -> Modifier.Enum
       KModifier.ANNOTATION -> Modifier.Annotation
-      KModifier.COMPANION -> Modifier.Companion
+      KModifier.COMPANION -> Modifier.CompanionObject
       KModifier.INLINE -> Modifier.Inline
       KModifier.NOINLINE -> Modifier.NoInline
       KModifier.CROSSINLINE -> Modifier.CrossInline
@@ -310,10 +385,9 @@ interface MetaProcessorUtils : ProcessorUtils {
       KModifier.INFIX -> Modifier.Infix
       KModifier.OPERATOR -> Modifier.Operator
       KModifier.DATA -> Modifier.Data
-      KModifier.IN -> Modifier.In
-      KModifier.OUT -> Modifier.Out
+      KModifier.IN -> Modifier.InVariance
+      KModifier.OUT -> Modifier.OutVariance
     }
-
 
   private fun com.squareup.kotlinpoet.TypeVariableName.toMeta(): TypeName.TypeVariable =
     TypeName.TypeVariable(
@@ -325,7 +399,7 @@ interface MetaProcessorUtils : ProcessorUtils {
       variance = variance?.toMeta()
     )
 
-  private fun com.squareup.kotlinpoet.TypeName.toMeta(): TypeName =
+  fun com.squareup.kotlinpoet.TypeName.toMeta(): TypeName =
     when (this) {
       is WildcardTypeName -> toMeta()
       is ClassName -> toMeta()
@@ -333,9 +407,72 @@ interface MetaProcessorUtils : ProcessorUtils {
       is TypeVariableName -> toMeta()
       else -> throw IllegalArgumentException("Unsupported type name: $this")
     }
-}
 
-abstract class CachingMetaProcessorUtils : MetaProcessorUtils {
-  val typeElementToMeta: (classElement: TypeElement) -> ClassOrPackageDataWrapper =
-    ::getClassOrPackageDataWrapper.memoize()
+  private fun getTypeElement(name: String): Option<TypeElement> =
+    Try { elementUtils.getTypeElement(name) }.fold({ None }) { el -> if (el == null) None else el.some() }
+
+  tailrec fun TypeName.asType(encoder: MetaEncoder<Type>): Type? =
+    when (this) {
+      is TypeName.TypeVariable -> getTypeElement(name).map { it.asMetaType(encoder) }.orNull()
+      is TypeName.WildcardType -> null
+      is TypeName.ParameterizedType -> rawType.asType(encoder)
+      is TypeName.Classy -> getTypeElement(fqName).map { it.asMetaType(encoder) }.orNull()
+    }
+
+  fun TypeElement.asMetaType(encoder: MetaEncoder<Type>): Type? =
+    encoder.encode(this).fold({ null }, { it })
+
+  fun TypeName.TypeVariable.downKind(): TypeName.TypeVariable {
+    val rawTypeName = name.substringBefore("<")
+    val pckg = rawTypeName.substringBeforeLast(".")
+    val simpleName = rawTypeName.substringAfterLast(".")
+    val unAppliedName =
+      if (simpleName.startsWith("For")) simpleName.drop("For".length)
+      else simpleName
+    val unPrefixedName =
+      if (unAppliedName.endsWith("PartialOf")) unAppliedName.substringBeforeLast("PartialOf")
+      else unAppliedName
+    return copy(name = "$pckg.$unPrefixedName")
+  }
+
+  fun TypeName.downKind(): TypeName =
+    when (this) {
+      is TypeName.TypeVariable -> downKind()
+      is TypeName.WildcardType -> TODO()
+      is TypeName.ParameterizedType -> TODO()
+      is TypeName.Classy -> TODO()
+    }
+
+  data class TypeClassInstance(
+    val instance: Type,
+    val dataType: Type,
+    val typeClass: Type,
+    val instanceTypeElement: TypeElement,
+    val dataTypeTypeElement: TypeElement,
+    val typeClassTypeElement: TypeElement
+  )
+
+  fun TypeElement.typeClassInstance(typeEncoder: MetaEncoder<Type>): TypeClassInstance? {
+    val superInterfaces = superInterfaces()
+    val instance = asMetaType(typeEncoder)
+    return if (instance != null && superInterfaces.isNotEmpty()) {
+      val typeClassTypeName = superInterfaces[0]
+      val typeClass = typeClassTypeName.asType(typeEncoder)
+      if (typeClass != null && typeClassTypeName is TypeName.ParameterizedType && typeClassTypeName.typeArguments.isNotEmpty()) {
+        val dataTypeName = typeClassTypeName.typeArguments[0]
+        val dataTypeDownKinded = dataTypeName.downKind()
+        val dataType = dataTypeDownKinded.asType(typeEncoder)
+        if (dataType != null && dataTypeDownKinded is TypeName.TypeVariable) TypeClassInstance(
+          instance = instance,
+          dataType = dataType,
+          typeClass = typeClass,
+          instanceTypeElement = this,
+          dataTypeTypeElement = elementUtils.getTypeElement(dataTypeDownKinded.name),
+          typeClassTypeElement = elementUtils.getTypeElement(typeClassTypeName.rawType.fqName)
+        )
+        else null
+      } else null
+    } else null
+  }
+
 }

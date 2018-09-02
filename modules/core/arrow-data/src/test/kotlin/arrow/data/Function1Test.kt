@@ -5,6 +5,7 @@ import arrow.core.Function1Of
 import arrow.core.invoke
 import arrow.core.profunctor
 import arrow.instances.ForFunction1
+import arrow.syntax.function.forwardCompose
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadLaws
 import arrow.test.laws.ProfunctorLaws
