@@ -199,3 +199,7 @@ The Monad Template Library module gives more specialized version of existing typ
 - [`Recursive`]({{ '/docs/recursion/recursive/' | relative_url }}) - traverses a structure backwards from the base case
 
 - [`Birecursive`]({{ '/docs/recursion/birecursive/' | relative_url }}) - it is both recursive and corecursive
+
+#### Category
+
+- [`Category`]({{ '/docs/typeclasses/category/' | relative_url }}) - a representation of a mathematical Category
