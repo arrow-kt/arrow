@@ -94,15 +94,11 @@ interface MetaProcessorUtils : ProcessorUtils {
       }
       val function = FunSpec.overriding(member, declaredType, typeUtils).build().toMeta(member)
       val result =
-        if (templateFunction != null) {
-          val returningFun =
-            function.copy(returnType = member.returnType.asTypeName().toMeta())
-          if (templateFunction.second.hasReceiverType()) {
-            val receiverTypeName = returningFun.parameters[0].type
-            val functionWithReceiver = returningFun.copy(receiverType = receiverTypeName)
-            val arguments = functionWithReceiver.parameters.drop(1)
-            functionWithReceiver.copy(parameters = arguments)
-          } else returningFun
+        if (templateFunction != null && templateFunction.second.hasReceiverType()) {
+          val receiverTypeName = function.parameters[0].type
+          val functionWithReceiver = function.copy(receiverType = receiverTypeName)
+          val arguments = functionWithReceiver.parameters.drop(1)
+          functionWithReceiver.copy(parameters = arguments)
         } else function
       result
     }
@@ -361,19 +357,21 @@ interface MetaProcessorUtils : ProcessorUtils {
       defaultValue = defaultValue?.toMeta()
     )
 
-  private fun com.squareup.kotlinpoet.FunSpec.toMeta(element: ExecutableElement): Func =
-    Func(
+  private fun com.squareup.kotlinpoet.FunSpec.toMeta(element: ExecutableElement): Func {
+    val retType = returnType
+    return Func(
       name = element.simpleName.toString(),
       annotations = annotations.map { it.toMeta() },
       typeVariables = typeVariables.map { it.toMeta() },
       modifiers = modifiers.map { it.toMeta() },
-      returnType = returnType?.toMeta(),
+      returnType = returnType?.toMeta()?.downKind(),
       receiverType = receiverType?.toMeta(),
       kdoc = kdoc.toMeta(),
       body = body.toMeta(),
       parameters = parameters.map { it.toMeta() },
       jvmMethodSignature = element.jvmMethodSignature
     )
+  }
 
   private fun com.squareup.kotlinpoet.AnnotationSpec.toMeta(): Annotation =
     Annotation(type.toMeta(), members = members.map { it.toMeta() }, useSiteTarget = useSiteTarget?.toMeta())
@@ -442,8 +440,8 @@ interface MetaProcessorUtils : ProcessorUtils {
 
   private fun com.squareup.kotlinpoet.TypeVariableName.toMeta(): TypeName.TypeVariable =
     TypeName.TypeVariable(
-      name = toString(),
-      bounds = bounds.mapNotNull { it.toMeta().removeConstrains() },
+      name = name,
+      bounds = bounds.map { it.toMeta().removeConstrains() },
       annotations = annotations.map { it.toMeta() },
       nullable = nullable,
       reified = reified,
@@ -486,25 +484,25 @@ interface MetaProcessorUtils : ProcessorUtils {
 
 
   fun TypeName.TypeVariable.downKind(): TypeName.TypeVariable =
-    name.downKind().let {
-      (pckg, unPrefixedName) -> copy(name = "$pckg.$unPrefixedName")
-    }
+    this
 
   fun TypeName.ParameterizedType.downKind(): TypeName.ParameterizedType =
     if (rawType.fqName == "arrow.Kind" && typeArguments.size >= 2) {
       val witness = typeArguments[0].downKind()
       val tail = typeArguments.drop(1)
-      copy(typeArguments = listOf(witness) + tail)
+      if (witness is TypeName.Classy)
+        copy(name = witness.fqName, rawType = witness, typeArguments = tail.map { it.downKind() })
+      else this
     } else this
 
   fun TypeName.WildcardType.downKind(): TypeName.WildcardType =
-    name.downKind().let {
-      (pckg, unPrefixedName) -> copy(name = "$pckg.$unPrefixedName")
+    name.downKind().let { (pckg, unPrefixedName) ->
+      copy(name = "$pckg.$unPrefixedName")
     }
 
   fun TypeName.Classy.downKind(): TypeName.Classy =
-    fqName.downKind().let {
-      (pckg, unPrefixedName) -> copy(simpleName = unPrefixedName, fqName = "$pckg.$unPrefixedName")
+    fqName.downKind().let { (pckg, unPrefixedName) ->
+      copy(simpleName = unPrefixedName, fqName = "$pckg.$unPrefixedName")
     }
 
   fun TypeName.downKind(): TypeName =
