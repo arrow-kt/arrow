@@ -4,6 +4,7 @@ import arrow.meta.ast.*
 import arrow.meta.ast.Annotation
 import arrow.meta.ast.TypeName
 import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.plusParameter
 
 interface MetaDecoder<in A : Tree> {
   fun decode(tree: A): Code
@@ -72,9 +73,10 @@ interface TypeDecoder : MetaDecoder<Type> {
     }
 
   fun Annotation.lyrics(): AnnotationSpec {
-    val builder = AnnotationSpec.builder(type.asClassName()).useSiteTarget(useSiteTarget?.lyrics())
-    return members.fold(builder) { builder, member ->
-      builder.addMember(member.lyrics())
+    val className = ClassName.bestGuess(type.toString())
+    val builder = AnnotationSpec.builder(className).useSiteTarget(useSiteTarget?.lyrics())
+    return members.fold(builder) { b, member ->
+      b.addMember(member.lyrics())
     }.build()
   }
 
@@ -148,32 +150,21 @@ interface TypeDecoder : MetaDecoder<Type> {
     else name.asNonNullable()
   }
 
-  fun TypeName.WildcardType.lyrics(): WildcardTypeName =
+  fun TypeName.WildcardType.lyrics(): com.squareup.kotlinpoet.TypeName =
     when {
-      lowerBounds.isNotEmpty() -> WildcardTypeName.supertypeOf(lowerBounds[0].lyrics())
-      upperBounds.isNotEmpty() -> WildcardTypeName.subtypeOf(upperBounds[0].lyrics())
+      lowerBounds.isNotEmpty() -> lowerBounds[0].lyrics()
+      upperBounds.isNotEmpty() -> upperBounds[0].lyrics()
       else -> WildcardTypeName.STAR
     }
 
-  fun TypeName.asClassName(): ClassName {
-    val name = toString()
-    val pck = name.substringBefore("<").substringBeforeLast(".")
-    val simpleName = name.substringBefore("<").substringAfterLast(".")
-    return ClassName(pck, simpleName)
-  }
+  private fun String.removeVariance(): String =
+    replace("out ", "").replace("in ", "")
 
   fun TypeName.ParameterizedType.lyrics(): com.squareup.kotlinpoet.TypeName =
     ParameterizedTypeName.run {
-      this@lyrics.typeArguments.fold(asClassName() as com.squareup.kotlinpoet.TypeName) { type, typeArgName ->
-        val lyrics = typeArgName.lyrics()
-        when (type) {
-          is ClassName -> type.plusParameter(lyrics)
-          is ParameterizedTypeName -> if (lyrics is ClassName) type.plusParameter(lyrics) else type
-          else -> type
-        }
-      }
+      val className = rawType.lyrics()
+      className.parameterizedBy(*typeArguments.map { it.lyrics() }.toTypedArray())
     }
-
 
   fun TypeName.Classy.lyrics(): ClassName =
     ClassName(packageName = pckg.value, simpleName = simpleName)

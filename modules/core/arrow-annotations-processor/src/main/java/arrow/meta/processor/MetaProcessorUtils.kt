@@ -1,10 +1,7 @@
 package arrow.meta.processor
 
 import arrow.common.utils.*
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Try
-import arrow.core.some
+import arrow.core.*
 import arrow.derive.normalizeType
 import arrow.meta.ast.*
 import arrow.meta.ast.Annotation
@@ -111,6 +108,57 @@ interface MetaProcessorUtils : ProcessorUtils {
     }
   }
 
+  fun TypeName.TypeVariable.removeConstrains(): TypeName.TypeVariable =
+    copy(
+      bounds = bounds.mapNotNull { if (it is TypeName.Classy && it.fqName == "java.lang.Object") null else it.removeConstrains() },
+      variance = null
+    )
+
+  fun TypeName.WildcardType.removeConstrains(): TypeName.WildcardType =
+    copy(
+      upperBounds = upperBounds.map { it.removeConstrains() },
+      lowerBounds = lowerBounds.map { it.removeConstrains() }
+    )
+
+  fun TypeName.ParameterizedType.removeConstrains(): TypeName.ParameterizedType =
+    copy(
+      enclosingType = enclosingType?.removeConstrains(),
+      rawType = rawType.removeConstrains(),
+      typeArguments = typeArguments.map { it.removeConstrains() }
+    )
+
+  fun TypeName.Classy.removeConstrains(): TypeName.Classy = this
+
+  fun TypeName.removeConstrains(): TypeName =
+    when (this) {
+      is TypeName.TypeVariable -> removeConstrains()
+      is TypeName.WildcardType -> removeConstrains()
+      is TypeName.ParameterizedType -> removeConstrains()
+      is TypeName.Classy -> removeConstrains()
+    }
+
+  fun Parameter.removeConstrains(): Parameter =
+    copy(
+      modifiers = emptyList(),
+      type = type.removeConstrains()
+    )
+
+  fun Parameter.downKind(): Parameter =
+    copy(type = type.downKind())
+
+  fun Func.downKindParameters(): Func =
+    copy(parameters = parameters.map { it.downKind() })
+
+  fun Func.removeConstrains(): Func =
+    copy(
+      modifiers = emptyList(),
+      annotations = emptyList(),
+      receiverType = receiverType?.removeConstrains(),
+      returnType = returnType?.removeConstrains(),
+      parameters = parameters.map { it.removeConstrains() },
+      typeVariables = typeVariables.map { it.removeConstrains() }
+    )
+
   fun TypeElement.superInterfaces(): List<TypeName> =
     meta.classProto.supertypeList.map { type ->
       val superTypeName = type.extractFullName(meta, true).normalizeType()
@@ -118,7 +166,7 @@ interface MetaProcessorUtils : ProcessorUtils {
       val simpleName = superTypeName.substringBefore("<").substringAfterLast(".")
       if (type.argumentList.isNotEmpty())
         TypeName.ParameterizedType(
-          name = superTypeName,
+          name = superTypeName.removeVariance(),
           enclosingType = asTypeName(),
           nullable = false,
           typeArguments = type.argumentList.map {
@@ -151,18 +199,18 @@ interface MetaProcessorUtils : ProcessorUtils {
       it.getJvmConstructorSignature(typeElement.meta.nameResolver, typeElement.meta.classProto.typeTable) == this.jvmMethodSignature
     }?.let {
       it.isPrimary to
-      Func(
-        name = "constructor",
-        annotations = emptyList(),
-        typeVariables = emptyList(),
-        modifiers = modifiers.mapNotNull { it.toMeta() },
-        returnType = returnType?.asTypeName()?.toMeta(),
-        receiverType = receiverType?.asTypeName()?.toMeta(),
-        kdoc = null,
-        body = null,
-        parameters = parameters.map { it.toMeta() },
-        jvmMethodSignature = jvmMethodSignature
-      )
+        Func(
+          name = "constructor",
+          annotations = emptyList(),
+          typeVariables = emptyList(),
+          modifiers = modifiers.mapNotNull { it.toMeta() },
+          returnType = returnType?.asTypeName()?.toMeta(),
+          receiverType = receiverType?.asTypeName()?.toMeta(),
+          kdoc = null,
+          body = null,
+          parameters = parameters.map { it.toMeta() },
+          jvmMethodSignature = jvmMethodSignature
+        )
     }
 
   private fun VariableElement.toMeta(): Parameter =
@@ -255,7 +303,7 @@ interface MetaProcessorUtils : ProcessorUtils {
       nullable = nullable
     )
     else TypeName.ParameterizedType(
-      name = fullName,
+      name = fullName.removeVariance(),
       rawType = TypeName.Classy(simpleName, "$pck.$simpleName", PackageName(pck)),
       typeArguments = argumentList.map { TypeName.TypeVariable(it.type.extractFullName(meta).normalizeType()) },
       enclosingType = TypeName.Classy(
@@ -266,6 +314,9 @@ interface MetaProcessorUtils : ProcessorUtils {
       )
     )
   }
+
+  private fun String.removeVariance(): String =
+    replace("out ", "").replace("in ", "")
 
   private fun ProtoBuf.Visibility.asModifier(): Modifier? =
     when (this) {
@@ -329,7 +380,7 @@ interface MetaProcessorUtils : ProcessorUtils {
 
   private fun com.squareup.kotlinpoet.WildcardTypeName.toMeta(): TypeName.WildcardType =
     TypeName.WildcardType(
-      toString(),
+      toString().replace("out ", "").replace("in ", ""),
       upperBounds.map { it.toMeta() },
       lowerBounds = lowerBounds.map { it.toMeta() },
       nullable = nullable,
@@ -347,7 +398,7 @@ interface MetaProcessorUtils : ProcessorUtils {
 
   private fun com.squareup.kotlinpoet.ParameterizedTypeName.toMeta(): TypeName =
     TypeName.ParameterizedType(
-      name = toString(),
+      name = toString().removeVariance(),
       nullable = nullable,
       annotations = annotations.map { it.toMeta() },
       enclosingType = null,
@@ -392,7 +443,7 @@ interface MetaProcessorUtils : ProcessorUtils {
   private fun com.squareup.kotlinpoet.TypeVariableName.toMeta(): TypeName.TypeVariable =
     TypeName.TypeVariable(
       name = toString(),
-      bounds = bounds.map { it.toMeta() },
+      bounds = bounds.mapNotNull { it.toMeta().removeConstrains() },
       annotations = annotations.map { it.toMeta() },
       nullable = nullable,
       reified = reified,
@@ -422,25 +473,46 @@ interface MetaProcessorUtils : ProcessorUtils {
   fun TypeElement.asMetaType(encoder: MetaEncoder<Type>): Type? =
     encoder.encode(this).fold({ null }, { it })
 
-  fun TypeName.TypeVariable.downKind(): TypeName.TypeVariable {
-    val rawTypeName = name.substringBefore("<")
+  private fun String.downKind(): Tuple2<String, String> {
+    val rawTypeName = substringBefore("<")
     val pckg = rawTypeName.substringBeforeLast(".")
     val simpleName = rawTypeName.substringAfterLast(".")
     val unAppliedName =
       if (simpleName.startsWith("For")) simpleName.drop("For".length)
       else simpleName
-    val unPrefixedName =
-      if (unAppliedName.endsWith("PartialOf")) unAppliedName.substringBeforeLast("PartialOf")
-      else unAppliedName
-    return copy(name = "$pckg.$unPrefixedName")
+    return if (unAppliedName.endsWith("PartialOf")) pckg toT unAppliedName.substringBeforeLast("PartialOf")
+    else pckg toT unAppliedName
   }
+
+
+  fun TypeName.TypeVariable.downKind(): TypeName.TypeVariable =
+    name.downKind().let {
+      (pckg, unPrefixedName) -> copy(name = "$pckg.$unPrefixedName")
+    }
+
+  fun TypeName.ParameterizedType.downKind(): TypeName.ParameterizedType =
+    if (rawType.fqName == "arrow.Kind" && typeArguments.size >= 2) {
+      val witness = typeArguments[0].downKind()
+      val tail = typeArguments.drop(1)
+      copy(typeArguments = listOf(witness) + tail)
+    } else this
+
+  fun TypeName.WildcardType.downKind(): TypeName.WildcardType =
+    name.downKind().let {
+      (pckg, unPrefixedName) -> copy(name = "$pckg.$unPrefixedName")
+    }
+
+  fun TypeName.Classy.downKind(): TypeName.Classy =
+    fqName.downKind().let {
+      (pckg, unPrefixedName) -> copy(simpleName = unPrefixedName, fqName = "$pckg.$unPrefixedName")
+    }
 
   fun TypeName.downKind(): TypeName =
     when (this) {
       is TypeName.TypeVariable -> downKind()
-      is TypeName.WildcardType -> TODO()
-      is TypeName.ParameterizedType -> TODO()
-      is TypeName.Classy -> TODO()
+      is TypeName.WildcardType -> downKind()
+      is TypeName.ParameterizedType -> downKind()
+      is TypeName.Classy -> downKind()
     }
 
   data class TypeClassInstance(

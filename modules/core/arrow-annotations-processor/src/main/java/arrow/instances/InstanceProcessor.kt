@@ -2,8 +2,7 @@ package arrow.instances
 
 import arrow.common.utils.*
 import arrow.extension
-import arrow.meta.ast.Func
-import arrow.meta.ast.Type
+import arrow.meta.ast.*
 import arrow.meta.decoder.TypeDecoder
 import arrow.meta.encoder.instances.TypeEncoder
 import arrow.meta.processor.MetaProcessor
@@ -25,7 +24,8 @@ class InstanceProcessor : MetaProcessor<extension, Type>(annotations = listOf(ex
       is AnnotatedElement.Interface -> {
         val info = annotatedElement.typeElement.typeClassInstance(this)
         info?.genDataTypeExtensions()?.fold(annotatedElement.fileSpec) { spec, func ->
-          spec.addFunction(func.lyrics())
+          val cleaned = func.removeConstrains().downKindParameters()
+          spec.addFunction(cleaned.lyrics())
         } ?: annotatedElement.fileSpec.addComment("Not Processes by Instance Type Class Generator")
       }
       else -> knownError("@instance is only allowed on `interface` extending another interface of at least one type argument (type class) as first declaration in the extension list")
@@ -37,8 +37,7 @@ class InstanceProcessor : MetaProcessor<extension, Type>(annotations = listOf(ex
 //
   fun MetaProcessorUtils.TypeClassInstance.genDataTypeExtensions(): List<Func> {
     val extensionSet = typeClass.declaredFunctions.map { it.jvmMethodSignature }
-    return instanceTypeElement
-      .allFunctions()
+    return instance.allFunctions
       .filter { extensionSet.contains(it.jvmMethodSignature) }
   }
 }
