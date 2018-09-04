@@ -50,14 +50,17 @@ interface TypeDecoder : MetaDecoder<Type> {
     CodeBlock.builder().build()
 
   fun Code.lyrics(): CodeBlock =
-    CodeBlock.of("", value)
+    CodeBlock.of(value)
 
-  fun Parameter.lyrics(): ParameterSpec =
-    ParameterSpec.builder(
+  fun Parameter.lyrics(): ParameterSpec {
+    val builder = ParameterSpec.builder(
       name = name,
       type = type.lyrics(),
       modifiers = *modifiers.map { it.lyrics() }.toTypedArray()
-    ).build()
+    )
+    val builderDefaultValue = if (defaultValue != null) builder.defaultValue(defaultValue.lyrics()) else builder
+    return builderDefaultValue.build()
+  }
 
   fun UseSiteTarget.lyrics(): AnnotationSpec.UseSiteTarget =
     when (this) {

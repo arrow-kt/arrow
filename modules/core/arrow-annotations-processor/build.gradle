@@ -15,6 +15,7 @@ dependencies {
     compile 'com.squareup:kotlinpoet:1.0.0-RC1'
     compile 'com.github.aballano:MnemoniK:1.0.0'
     compileOnly 'com.google.auto.service:auto-service:1.0-rc4'
+    compileOnly "io.arrow-kt:arrow-instances-core:$metaArrowVersion"
     compileOnly "io.arrow-kt:arrow-instances-data:$metaArrowVersion"
     compileOnly "io.arrow-kt:arrow-recursion:$metaArrowVersion"
     compileOnly "io.arrow-kt:arrow-optics:$metaArrowVersion"

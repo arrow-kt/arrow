@@ -45,6 +45,8 @@ data class File(
 @optics
 sealed class TypeName : Tree() {
 
+  abstract val simpleName: String
+
   @optics
   data class TypeVariable(
     val name: String,
@@ -53,6 +55,10 @@ sealed class TypeName : Tree() {
     val reified: Boolean = false,
     val nullable: Boolean = false,
     val annotations: List<Annotation> = emptyList()) : TypeName() {
+
+    override val simpleName: String
+      get() = name
+
     companion object
   }
 
@@ -63,6 +69,10 @@ sealed class TypeName : Tree() {
     val lowerBounds: List<TypeName>,
     val nullable: Boolean,
     val annotations: List<Annotation>) : TypeName() {
+
+    override val simpleName: String
+      get() = name
+
     companion object
   }
 
@@ -74,12 +84,16 @@ sealed class TypeName : Tree() {
     val typeArguments: List<TypeName> = emptyList(),
     val nullable: Boolean = false,
     val annotations: List<Annotation> = emptyList()) : TypeName() {
+
+    override val simpleName: String
+      get() = rawType.simpleName
+
     companion object
   }
 
   @optics
   data class Classy(
-    val simpleName: String,
+    override val simpleName: String,
     val fqName: String,
     val pckg: PackageName,
     val nullable: Boolean = false,
@@ -153,7 +167,7 @@ data class Func(
   val modifiers: List<Modifier> = emptyList(),
   val typeVariables: List<TypeName.TypeVariable> = emptyList(),
   val parameters: List<Parameter> = emptyList(),
-  val jvmMethodSignature: String) : Tree() {
+  val jvmMethodSignature: String = "") : Tree() {
   companion object
 }
 
@@ -193,6 +207,7 @@ sealed class Modifier {
 
 @optics
 data class Type(
+  val packageName: PackageName,
   val name: TypeName,
   val kind: Type.Kind,
   val kdoc: Code? = null,

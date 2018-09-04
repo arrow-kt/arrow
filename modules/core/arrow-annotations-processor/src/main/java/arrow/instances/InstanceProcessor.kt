@@ -1,13 +1,17 @@
 package arrow.instances
 
 import arrow.common.utils.*
+import arrow.core.*
 import arrow.extension
 import arrow.meta.ast.*
 import arrow.meta.decoder.TypeDecoder
 import arrow.meta.encoder.instances.TypeEncoder
 import arrow.meta.processor.MetaProcessor
 import arrow.meta.processor.MetaProcessorUtils
+import arrow.typeclasses.binding
 import com.google.auto.service.AutoService
+import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import java.io.File
@@ -22,19 +26,35 @@ class InstanceProcessor : MetaProcessor<extension, Type>(annotations = listOf(ex
   override fun transform(annotatedElement: AnnotatedElement): FileSpec.Builder =
     when (annotatedElement) {
       is AnnotatedElement.Interface -> {
-        val info = annotatedElement.typeElement.typeClassInstance(this)
-        info?.genDataTypeExtensions()?.fold(annotatedElement.fileSpec) { spec, func ->
-          val cleaned = func.removeConstrains().downKindParameters()
-          spec.addFunction(cleaned.lyrics())
-        } ?: annotatedElement.fileSpec.addComment("Not Processes by Instance Type Class Generator")
-      }
-      else -> knownError("@instance is only allowed on `interface` extending another interface of at least one type argument (type class) as first declaration in the extension list")
+          val info = annotatedElement.typeElement.typeClassInstance(this@InstanceProcessor)
+          val functions = info?.genDataTypeExtensions()?.plus(listOf(info.genCompanionFactory()))
+          functions?.fold(annotatedElement.fileSpec) { spec, func ->
+              val cleaned = func
+                .removeConstrains()
+                .downKindParameters()
+                .defaultDummyArgValues()
+                .addExtraDummyArg()
+              spec.addFunction(cleaned.lyrics().toBuilder()
+                .build())
+            } ?: annotatedElement.fileSpec.addComment("Not Processed by @extension Type Class Generator")
+        }
+      else -> knownError("@extension is only allowed on `interface` extending another interface of at least one type argument (type class) as first declaration in the extension list")
     }
 
   //  override fun transform(annotatedElement: AnnotatedElement): FileSpec.Builder =
 
 //
 //
+
+  fun MetaProcessorUtils.TypeClassInstance.genCompanionFactory(): Func {
+    return Func(
+      name = typeClass.name.simpleName.decapitalize(),
+      receiverType = TypeName.Classy("${dataType.name.simpleName}.Companion", "${dataType.packageName.value}.Companion", dataType.packageName),
+      returnType = instance.name,
+      body = Code.TODO
+    )
+  }
+
   fun MetaProcessorUtils.TypeClassInstance.genDataTypeExtensions(): List<Func> {
     val extensionSet = typeClass.declaredFunctions.map { it.jvmMethodSignature }
     return instance.allFunctions

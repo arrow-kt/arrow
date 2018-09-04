@@ -89,10 +89,10 @@ interface MetaProcessorUtils : ProcessorUtils {
     }.filterNot {
       it.modifiers.containsAll(listOf(javax.lang.model.element.Modifier.PUBLIC, javax.lang.model.element.Modifier.FINAL))
     }.map { member ->
-      val templateFunction = allFunctions.find { (proto, function) ->
+      val templateFunction: Pair<ClassOrPackageDataWrapper.Class, ProtoBuf.Function>? = allFunctions.find { (proto, function) ->
         function.getJvmMethodSignature(proto.nameResolver, proto.classProto.typeTable) == member.jvmMethodSignature
       }
-      val function = FunSpec.overriding(member, declaredType, typeUtils).build().toMeta(member)
+      val function = FunSpec.overriding(member, declaredType, typeUtils).build().toMeta(member, templateFunction)
       val result =
         if (templateFunction != null && templateFunction.second.hasReceiverType()) {
           val receiverTypeName = function.parameters[0].type
@@ -142,8 +142,22 @@ interface MetaProcessorUtils : ProcessorUtils {
   fun Parameter.downKind(): Parameter =
     copy(type = type.downKind())
 
+  fun Parameter.defaultDummyArgValue(): Parameter =
+    copy(defaultValue = when {
+      type.simpleName == "Unit" -> Code("Unit")
+      else -> null
+    })
+
   fun Func.downKindParameters(): Func =
     copy(parameters = parameters.map { it.downKind() })
+
+  fun Func.defaultDummyArgValues(): Func =
+    copy(parameters = parameters.map { it.defaultDummyArgValue() })
+
+  fun Func.addExtraDummyArg(): Func {
+    val dummyArg: Parameter = Parameter("arg${parameters.size + 1}", TypeName.Unit).defaultDummyArgValue()
+    return copy(parameters = parameters + listOf(dummyArg))
+  }
 
   fun Func.removeConstrains(): Func =
     copy(
@@ -210,7 +224,10 @@ interface MetaProcessorUtils : ProcessorUtils {
     }
 
   private fun VariableElement.toMeta(): Parameter =
-    Parameter(simpleName.toString(), asType().asTypeName().toMeta())
+    Parameter(
+      name = simpleName.toString(),
+      type = asType().asTypeName().toMeta()
+    )
 
   private fun ElModifier.toMeta(): Modifier? =
     when (this) {
@@ -333,7 +350,7 @@ interface MetaProcessorUtils : ProcessorUtils {
     }
 
   private fun com.squareup.kotlinpoet.CodeBlock.toMeta(): Code =
-    Code(toString())
+    Code(this.toString())
 
   private fun com.squareup.kotlinpoet.AnnotationSpec.UseSiteTarget.toMeta(): UseSiteTarget =
     when (this) {
@@ -357,8 +374,22 @@ interface MetaProcessorUtils : ProcessorUtils {
       defaultValue = defaultValue?.toMeta()
     )
 
-  private fun com.squareup.kotlinpoet.FunSpec.toMeta(element: ExecutableElement): Func {
-    val retType = returnType
+  fun ProtoBuf.ValueParameter.defaultInitValue(meta: ClassOrPackageDataWrapper.Class): Code {
+    val tpe = type.asTypeName(meta)
+    return when (tpe) {
+      is TypeName.TypeVariable -> Code("= TODO()")
+      is TypeName.WildcardType -> Code("= TODO()")
+      is TypeName.ParameterizedType -> Code("= TODO()")
+      is TypeName.Classy -> {
+        Code("= ${tpe.simpleName}")
+      }
+    }
+  }
+
+  private fun com.squareup.kotlinpoet.FunSpec.toMeta(
+    element: ExecutableElement,
+    templateFunction: Pair<ClassOrPackageDataWrapper.Class, ProtoBuf.Function>?): Func {
+    val params = parameters
     return Func(
       name = element.simpleName.toString(),
       annotations = annotations.map { it.toMeta() },
@@ -482,6 +513,8 @@ interface MetaProcessorUtils : ProcessorUtils {
     else pckg toT unAppliedName
   }
 
+  val Code.Companion.TODO: Code
+    get() = Code("return TODO()")
 
   fun TypeName.TypeVariable.downKind(): TypeName.TypeVariable =
     this
