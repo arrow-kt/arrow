@@ -331,11 +331,12 @@ class TryTest : UnitSpec() {
     }
 
     "success" {
-      "1".toInt().success() shouldBe success
+      10.success() shouldBe success
     }
 
     "failure" {
-      NumberFormatException().failure<Int>() shouldBe failure
+      val ex = NumberFormatException()
+      ex.failure<Int>() shouldBe Failure(ex)
     }
 
     "flatten" {
