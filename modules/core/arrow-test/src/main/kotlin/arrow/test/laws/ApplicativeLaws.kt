@@ -13,7 +13,7 @@ object ApplicativeLaws {
 
   inline fun <F> laws(A: Applicative<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
     FunctorLaws.laws(A, EQ) + listOf(
-      Law("Applicative Laws: ap identity") { A.apIdentity(EQ) },
+      Law("Applicative Laws: apPipe identity") { A.apIdentity(EQ) },
       Law("Applicative Laws: homomorphism") { A.homomorphism(EQ) },
       Law("Applicative Laws: interchange") { A.interchange(EQ) },
       Law("Applicative Laws: map derived") { A.mapDerived(EQ) },
@@ -23,22 +23,22 @@ object ApplicativeLaws {
 
   fun <F> Applicative<F>.apIdentity(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genApplicative(Gen.int(), this)) { fa: Kind<F, Int> ->
-      fa.ap(just({ n: Int -> n })).equalUnderTheLaw(fa, EQ)
+      fa.apPipe(just({ n: Int -> n })).equalUnderTheLaw(fa, EQ)
     }
 
   fun <F> Applicative<F>.homomorphism(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genFunctionAToB<Int, Int>(Gen.int()), Gen.int()) { ab: (Int) -> Int, a: Int ->
-      just(a).ap(just(ab)).equalUnderTheLaw(just(ab(a)), EQ)
+      just(a).apPipe(just(ab)).equalUnderTheLaw(just(ab(a)), EQ)
     }
 
   fun <F> Applicative<F>.interchange(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genApplicative(genFunctionAToB<Int, Int>(Gen.int()), this), Gen.int()) { fa: Kind<F, (Int) -> Int>, a: Int ->
-      just(a).ap(fa).equalUnderTheLaw(fa.ap(just({ x: (Int) -> Int -> x(a) })), EQ)
+      just(a).apPipe(fa).equalUnderTheLaw(fa.apPipe(just({ x: (Int) -> Int -> x(a) })), EQ)
     }
 
   fun <F> Applicative<F>.mapDerived(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genApplicative(Gen.int(), this), genFunctionAToB<Int, Int>(Gen.int())) { fa: Kind<F, Int>, f: (Int) -> Int ->
-      fa.map(f).equalUnderTheLaw(fa.ap(just(f)), EQ)
+      fa.map(f).equalUnderTheLaw(fa.apPipe(just(f)), EQ)
     }
 
   fun <F> Applicative<F>.cartesianBuilderMap(EQ: Eq<Kind<F, Int>>): Unit =

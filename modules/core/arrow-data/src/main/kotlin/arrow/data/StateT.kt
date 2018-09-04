@@ -200,7 +200,7 @@ class StateT<F, S, A>(
    * @param ff function with the [StateT] context.
    * @param MF [Monad] for the context [F].
    */
-  fun <B> ap(MF: Monad<F>, ff: StateTOf<F, S, (A) -> B>): StateT<F, S, B> =
+  fun <B> apPipe(MF: Monad<F>, ff: StateTOf<F, S, (A) -> B>): StateT<F, S, B> =
     ff.fix().map2(MF, this) { f, a -> f(a) }
 
   /**
@@ -301,6 +301,12 @@ class StateT<F, S, A>(
     run(MF, s).map { it.a }
   }
 }
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun <F, S, A, B> StateTOf<F, S, (A) -> B>.ap(
+  MF: Monad<F>,
+  fa: StateTOf<F, S, A>
+): StateT<F, S, B> = fa.fix().apPipe(MF, this)
 
 /**
  * Wrap the function with [StateT].

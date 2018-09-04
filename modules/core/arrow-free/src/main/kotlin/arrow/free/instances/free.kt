@@ -9,7 +9,7 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
-import arrow.free.ap as freeAp
+import arrow.free.apPipe as freeApPipe
 import arrow.free.flatMap as freeFlatMap
 import arrow.free.map as freeMap
 
@@ -28,8 +28,8 @@ interface FreeApplicativeInstance<S> : FreeFunctorInstance<S>, Applicative<FreeP
   override fun <A, B> Kind<FreePartialOf<S>, A>.map(f: (A) -> B): Free<S, B> =
     fix().freeMap(f)
 
-  override fun <A, B> Kind<FreePartialOf<S>, A>.ap(ff: Kind<FreePartialOf<S>, (A) -> B>): Free<S, B> =
-    fix().freeAp(ff)
+  override fun <A, B> Kind<FreePartialOf<S>, A>.apPipe(ff: Kind<FreePartialOf<S>, (A) -> B>): Free<S, B> =
+    fix().freeApPipe(ff)
 }
 
 @instance(Free::class)
@@ -38,8 +38,8 @@ interface FreeMonadInstance<S> : FreeApplicativeInstance<S>, Monad<FreePartialOf
   override fun <A, B> Kind<FreePartialOf<S>, A>.map(f: (A) -> B): Free<S, B> =
     fix().freeMap(f)
 
-  override fun <A, B> Kind<FreePartialOf<S>, A>.ap(ff: Kind<FreePartialOf<S>, (A) -> B>): Free<S, B> =
-    fix().freeAp(ff)
+  override fun <A, B> Kind<FreePartialOf<S>, A>.apPipe(ff: Kind<FreePartialOf<S>, (A) -> B>): Free<S, B> =
+    fix().freeApPipe(ff)
 
   override fun <A, B> Kind<FreePartialOf<S>, A>.flatMap(f: (A) -> Kind<FreePartialOf<S>, B>): Free<S, B> =
     fix().freeFlatMap { f(it).fix() }

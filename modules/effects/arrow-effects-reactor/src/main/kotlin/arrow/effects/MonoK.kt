@@ -20,7 +20,7 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
   fun <B> map(f: (A) -> B): MonoK<B> =
       mono.map(f).k()
 
-  fun <B> ap(fa: MonoKOf<(A) -> B>): MonoK<B> =
+  fun <B> apPipe(fa: MonoKOf<(A) -> B>): MonoK<B> =
       flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
   fun <B> flatMap(f: (A) -> MonoKOf<B>): MonoK<B> =
@@ -68,3 +68,6 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
     }
   }
 }
+
+@Suppress("NOTHING_TO_INLINE")
+inline infix fun <A, B> MonoKOf<(A) -> B>.ap(fa: MonoKOf<A>): MonoK<B> = fa.fix().apPipe(this)

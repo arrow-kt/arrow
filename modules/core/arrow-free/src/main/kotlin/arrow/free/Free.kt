@@ -34,8 +34,8 @@ sealed class Free<S, out A> : FreeOf<S, A> {
         override fun <A> just(a: A): Free<F, A> =
           Companion.just(a)
 
-        override fun <A, B> Kind<FreePartialOf<F>, A>.ap(ff: Kind<FreePartialOf<F>, (A) -> B>): Free<F, B> =
-          applicative.run { ap(ff).fix() }
+        override fun <A, B> FreeOf<F, A>.apPipe(ff: FreeOf<F, (A) -> B>): Free<F, B> =
+          applicative.run { apPipe(ff).fix() }
       }
   }
 
@@ -61,7 +61,12 @@ fun <S, A, B> FreeOf<S, A>.map(f: (A) -> B): Free<S, B> = flatMap { Free.Pure<S,
 
 fun <S, A, B> FreeOf<S, A>.flatMap(f: (A) -> Free<S, B>): Free<S, B> = Free.FlatMapped(this.fix(), f)
 
-fun <S, A, B> FreeOf<S, A>.ap(ff: FreeOf<S, (A) -> B>): Free<S, B> = ff.fix().flatMap { f -> map(f = f) }.fix()
+fun <S, A, B> FreeOf<S, A>.apPipe(ff: FreeOf<S, (A) -> B>): Free<S, B> =
+  ff.fix().flatMap { f -> map(f = f) }.fix()
+
+@Suppress("NOTHING_TO_INLINE")
+inline infix fun <S, A, B> FreeOf<S, (A) -> B>.ap(fa: FreeOf<S, A>): Free<S, B> =
+  fa.apPipe(this)
 
 @Suppress("UNCHECKED_CAST")
 tailrec fun <S, A> Free<S, A>.step(): Free<S, A> =

@@ -25,8 +25,8 @@ data class SortedMapK<A : Comparable<A>, B>(val map: SortedMap<A, B>) : SortedMa
     if (fc.value().isEmpty()) Eval.now(sortedMapOf<A, Z>().k())
     else fc.map { c -> this.map2(c, f) }
 
-  fun <C> ap(ff: SortedMapK<A, (B) -> C>): SortedMapK<A, C> =
-    ff.flatMap { this.map(it) }
+  fun <C> apPipe(ff: SortedMapKOf<A, (B) -> C>): SortedMapK<A, C> =
+    ff.fix().flatMap { this.map(it) }
 
   fun <C, Z> ap2(f: SortedMapK<A, (B, C) -> Z>, fc: SortedMapK<A, C>): SortedMap<A, Z> =
     f.map.flatMap { (k, f) ->
@@ -62,6 +62,11 @@ fun <A : Comparable<A>, B> Option<Tuple2<A, B>>.k(): SortedMapK<A, B> = this.fol
   { sortedMapOf<A, B>().k() },
   { mapEntry -> sortedMapOf<A, B>(mapEntry.a to mapEntry.b).k() }
 )
+
+@Suppress("NOTHING_TO_INLINE")
+inline infix fun <A : Comparable<A>, B, C> SortedMapKOf<A, (B) -> C>.ap(
+  fa: SortedMapKOf<A, B>
+): SortedMapK<A, C> = fa.fix().apPipe(this)
 
 inline fun <K : Comparable<K>, V, G> SortedMapKOf<K, Kind<G, V>>.sequence(GA: Applicative<G>): Kind<G, SortedMapK<K, V>> =
   fix().traverse(GA, ::identity)

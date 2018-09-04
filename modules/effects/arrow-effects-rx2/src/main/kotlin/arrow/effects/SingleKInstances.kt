@@ -18,8 +18,8 @@ interface SingleKFunctorInstance : Functor<ForSingleK> {
 
 @instance(SingleK::class)
 interface SingleKApplicativeInstance : Applicative<ForSingleK> {
-  override fun <A, B> SingleKOf<A>.ap(ff: SingleKOf<(A) -> B>): SingleK<B> =
-    fix().ap(ff)
+  override fun <A, B> SingleKOf<A>.apPipe(ff: SingleKOf<(A) -> B>): SingleK<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForSingleK, A>.map(f: (A) -> B): SingleK<B> =
     fix().map(f)
@@ -30,8 +30,8 @@ interface SingleKApplicativeInstance : Applicative<ForSingleK> {
 
 @instance(SingleK::class)
 interface SingleKMonadInstance : Monad<ForSingleK> {
-  override fun <A, B> SingleKOf<A>.ap(ff: SingleKOf<(A) -> B>): SingleK<B> =
-    fix().ap(ff)
+  override fun <A, B> SingleKOf<A>.apPipe(ff: SingleKOf<(A) -> B>): SingleK<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> SingleKOf<A>.flatMap(f: (A) -> Kind<ForSingleK, B>): SingleK<B> =
     fix().flatMap(f)

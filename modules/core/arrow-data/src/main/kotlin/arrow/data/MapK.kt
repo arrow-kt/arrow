@@ -21,12 +21,12 @@ data class MapK<K, out A>(val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> by map {
     if (fb.value().isEmpty()) Eval.now(emptyMap<K, Z>().k())
     else fb.map { b -> this.map2(b, f) }
 
-  fun <B> ap(ff: MapK<K, (A) -> B>): MapK<K, B> =
-    ff.flatMap { this.map(it) }
+  fun <B> apPipe(ff: MapKOf<K, (A) -> B>): MapK<K, B> =
+    ff.fix().flatMap { this.map(it) }
 
-  fun <B, Z> ap2(f: MapK<K, (A, B) -> Z>, fb: MapK<K, B>): Map<K, Z> =
-    f.map.flatMap { (k, f) ->
-      this.flatMap { a -> fb.flatMap { b -> mapOf(Tuple2(k, f(a, b))).k() } }
+  fun <B, Z> apPipe2(f: MapKOf<K, (A, B) -> Z>, fb: MapKOf<K, B>): MapK<K, Z> =
+    f.fix().map.flatMap { (k, f) ->
+      this.flatMap { a -> fb.fix().flatMap { b -> mapOf(Tuple2(k, f(a, b))).k() } }
         .getOption(k).map { Tuple2(k, it) }.k().asIterable()
     }.k()
 
@@ -58,6 +58,14 @@ fun <K, A> Option<Tuple2<K, A>>.k(): MapK<K, A> =
     is Some -> mapOf(this.t).k()
     is None -> emptyMap<K, A>().k()
   }
+
+@Suppress("NOTHING_TO_INLINE")
+inline infix fun <K, A, B> MapKOf<K, (A) -> B>.ap(fa: MapKOf<K, A>): MapK<K, B> =
+  fa.fix().apPipe(this)
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun <K, A, B, Z> MapKOf<K, (A, B) -> Z>.ap2(fa: MapKOf<K, A>, fb: MapKOf<K, B>): MapK<K, Z> =
+  fa.fix().apPipe2(this, fb)
 
 inline fun <K, V, G> MapKOf<K, Kind<G, V>>.sequence(GA: Applicative<G>): Kind<G, MapK<K, V>> =
   fix().traverse(GA, ::identity)

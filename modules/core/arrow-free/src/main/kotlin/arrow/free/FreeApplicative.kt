@@ -19,7 +19,10 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
   companion object {
     fun <F, A> just(a: A): FreeApplicative<F, A> = Pure(a)
 
-    fun <F, P, A> ap(fp: FreeApplicative<F, P>, fn: FreeApplicative<F, (P) -> A>): FreeApplicative<F, A> = Ap(fn, fp)
+    fun <F, P, A> apPipe(
+      fp: FreeApplicativeOf<F, P>,
+      fn: FreeApplicativeOf<F, (P) -> A>
+    ): FreeApplicative<F, A> = Ap(fn.fix(), fp.fix())
 
     fun <F, A> liftF(fa: Kind<F, A>): FreeApplicative<F, A> = Lift(fa)
 
@@ -34,16 +37,20 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
       override fun <A> just(a: A): FreeApplicative<F, A> =
         Companion.just(a)
 
-      override fun <A, B> Kind<FreeApplicativePartialOf<F>, A>.ap(ff: Kind<FreeApplicativePartialOf<F>, (A) -> B>): FreeApplicative<F, B> =
-        Companion.ap(fix(), ff.fix())
+      override fun <A, B> FreeApplicativeOf<F, A>.apPipe(
+        ff: FreeApplicativeOf<F, (A) -> B>
+      ): FreeApplicative<F, B> =
+        Companion.apPipe(fix(), ff.fix())
     }
   }
 
-  fun <B> ap(ap: FreeApplicative<F, (A) -> B>): FreeApplicative<F, B> =
-    when (ap) {
-      is Pure -> map(ap.value)
-      else -> Ap(ap, this)
+  fun <B> apPipe(ap: FreeApplicativeOf<F, (A) -> B>): FreeApplicative<F, B> {
+    val fixed = ap.fix()
+    return when (fixed) {
+      is Pure -> map(fixed.value)
+      else -> Ap(fixed, this)
     }
+  }
 
   fun <C> map(f: (A) -> C): FreeApplicative<F, C> =
     when (this) {
@@ -104,7 +111,7 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
           fns = fns.drop(1)
           fnsLength -= 1
 
-          var res = GA.run { argT.ap(fn.gab) }
+          var res = GA.run { argT.apPipe(fn.gab) }
 
           if (fn.remaining > 1) {
             fns = listOf(CurriedFunction(res as Kind<G, (Any?) -> Any?>, fn.remaining - 1)) + fns
@@ -118,7 +125,7 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
                 fn = fns.first()
                 fns = fns.drop(1)
                 fnsLength -= 1
-                res = GA.run { res.ap(fn.gab) }
+                res = GA.run { res.apPipe(fn.gab) }
 
                 if (fn.remaining > 1) {
                   fns = listOf(CurriedFunction(res as Kind<G, (Any?) -> Any?>, fn.remaining - 1)) + fns
@@ -167,5 +174,10 @@ private fun <F, G, A> foldArg(node: FreeApplicative<F, A>, f: FunctionK<F, G>, G
       f(lift.fa)
     }
   }
+
+@Suppress("NOTHING_TO_INLINE")
+inline infix fun <F, A, B> FreeApplicativeOf<F, (A) -> B>.ap(
+  fa: FreeApplicativeOf<F, A>
+): FreeApplicative<F, B> = fa.fix().apPipe(this)
 
 fun <S, A> A.freeAp(): FreeApplicative<S, A> = FreeApplicative.just(this)

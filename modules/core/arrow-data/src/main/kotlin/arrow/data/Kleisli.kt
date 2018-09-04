@@ -32,8 +32,8 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
    * @param ff function with the [Kleisli] context.
    * @param AF [Applicative] for the context [F].
    */
-  fun <B> ap(AF: Applicative<F>, ff: KleisliOf<F, D, (A) -> B>): Kleisli<F, D, B> =
-    AF.run { Kleisli { run(it).ap(ff.fix().run(it)) } }
+  fun <B> apPipe(AF: Applicative<F>, ff: KleisliOf<F, D, (A) -> B>): Kleisli<F, D, B> =
+    AF.run { Kleisli { run(it).apPipe(ff.fix().run(it)) } }
 
   /**
    * Map the end of the arrow [A] to [B] given a function [f].
@@ -153,6 +153,12 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
 
   }
 }
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun <F, D, A, B> KleisliOf<F, D, (A) -> B>.ap(
+  AF: Applicative<F>,
+  fa: KleisliOf<F, D, A>
+): Kleisli<F, D, B> = fa.fix().apPipe(AF, this)
 
 /**
  * Flatten nested [Kleisli] arrows.

@@ -45,7 +45,7 @@ Applying a sequence of functions to a sequence:
 import arrow.instances.*
 ForSequenceK extensions {
   sequenceOf(1, 2, 3).k()
-    .ap(sequenceOf({ x: Int -> x + 1}, { x: Int -> x * 2}).k())
+    .apPipe(sequenceOf({ x: Int -> x + 1}, { x: Int -> x * 2}).k())
     .toList() 
 }
 ```

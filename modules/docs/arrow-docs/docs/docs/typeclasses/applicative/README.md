@@ -62,14 +62,26 @@ It lifts a value into the computational context of a type constructor.
 Option.just(1) // Some(1)
 ```
 
-#### Kind<F, A>#ap
+#### Kind<F, A>#apPipe
 
 Apply a function inside the type constructor's context
 
-`fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B>`
+`fun <A, B> Kind<F, A>.apPipe(ff: Kind<F, (A) -> B>): Kind<F, B>`
 
 ```kotlin:ank
-Option.applicative().run { Some(1).ap(Some({ n: Int -> n + 1 })) }
+Option.applicative().run { Some(1).apPipe(Some({ n: Int -> n + 1 })) }
+```
+
+#### Kind<F, (A) -> B>#ap
+
+Apply a function inside the type constructor's context
+
+`infix fun <A, B> Kind<F, (A) -> B>.ap(fa: Kind<F, A>): Kind<F, B>`
+
+This is an infix version of `Kind<F, A>#apPipe` with its argument and receiver flipped in order to allow for more idiomatic usage with curried functions.
+
+```kotlin:ank
+Option.applicative().run { pure(::Profile.curried()) ap profileService() ap phoneService() ap addressService() }
 ```
 
 #### Other combinators

@@ -19,8 +19,8 @@ interface MaybeKFunctorInstance : Functor<ForMaybeK> {
 
 @instance(MaybeK::class)
 interface MaybeKApplicativeInstance : Applicative<ForMaybeK> {
-  override fun <A, B> MaybeKOf<A>.ap(ff: MaybeKOf<(A) -> B>): MaybeK<B> =
-    fix().ap(ff)
+  override fun <A, B> MaybeKOf<A>.apPipe(ff: MaybeKOf<(A) -> B>): MaybeK<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForMaybeK, A>.map(f: (A) -> B): MaybeK<B> =
     fix().map(f)
@@ -31,8 +31,8 @@ interface MaybeKApplicativeInstance : Applicative<ForMaybeK> {
 
 @instance(MaybeK::class)
 interface MaybeKMonadInstance : Monad<ForMaybeK> {
-  override fun <A, B> MaybeKOf<A>.ap(ff: MaybeKOf<(A) -> B>): MaybeK<B> =
-    fix().ap(ff)
+  override fun <A, B> MaybeKOf<A>.apPipe(ff: MaybeKOf<(A) -> B>): MaybeK<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> MaybeKOf<A>.flatMap(f: (A) -> Kind<ForMaybeK, B>): MaybeK<B> =
     fix().flatMap(f)

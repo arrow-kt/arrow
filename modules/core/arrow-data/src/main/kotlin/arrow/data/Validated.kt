@@ -174,11 +174,19 @@ fun <E, A> ValidatedOf<E, A>.orElse(default: () -> Validated<E, A>): Validated<E
  * From Apply:
  * if both the function and this value are Valid, apply the function
  */
-fun <E, A, B> ValidatedOf<E, A>.ap(SE: Semigroup<E>, f: Validated<E, (A) -> B>): Validated<E, B> =
-  fix().fold(
-    { e -> f.fold({ Invalid(SE.run { it.combine(e) }) }, { Invalid(e) }) },
-    { a -> f.fold(::Invalid) { Valid(it(a)) } }
-  )
+fun <E, A, B> ValidatedOf<E, A>.apPipe(
+  SE: Semigroup<E>,
+  ff: ValidatedOf<E, (A) -> B>
+): Validated<E, B> = fix().fold(
+  { e -> ff.fix().fold({ Invalid(SE.run { it.combine(e) }) }, { Invalid(e) }) },
+  { a -> ff.fix().fold(::Invalid) { Valid(it(a)) } }
+)
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun <E, A, B> ValidatedOf<E, (A) -> B>.ap(
+  SE: Semigroup<E>,
+  fa: ValidatedOf<E, A>
+): Validated<E, B> = fa.apPipe(SE, this)
 
 fun <E, A> ValidatedOf<E, A>.handleLeftWith(f: (E) -> ValidatedOf<E, A>): Validated<E, A> =
   fix().fold({ f(it).fix() }, ::Valid)

@@ -31,7 +31,8 @@ class NonEmptyList<out A> private constructor(
 
   fun <B> flatMap(f: (A) -> NonEmptyListOf<B>): NonEmptyList<B> = f(head).fix() + tail.flatMap { f(it).fix().all }
 
-  fun <B> ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> = ff.fix().flatMap { f -> map(f) }.fix()
+  fun <B> apPipe(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> =
+    ff.fix().flatMap { f -> map(f) }.fix()
 
   operator fun plus(l: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> = NonEmptyList(all + l.all)
 
@@ -123,6 +124,10 @@ class NonEmptyList<out A> private constructor(
 }
 
 fun <A> A.nel(): NonEmptyList<A> = NonEmptyList.of(this)
+
+@Suppress("NOTHING_TO_INLINE")
+inline infix fun <A, B, C> NonEmptyListOf<(A) -> B>.ap(fa: NonEmptyListOf<A>): NonEmptyList<B> =
+  fa.fix().apPipe(this)
 
 inline fun <A, G> NonEmptyListOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, NonEmptyList<A>> =
   fix().traverse(GA, ::identity)

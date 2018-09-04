@@ -47,7 +47,7 @@ sealed class Try<out A> : TryOf<A> {
   @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("getOrElse { ifEmpty }"))
   operator fun invoke() = get()
 
-  fun <B> ap(ff: TryOf<(A) -> B>): Try<B> = ff.fix().flatMap { f -> map(f) }.fix()
+  fun <B> apPipe(ff: TryOf<(A) -> B>): Try<B> = ff.fix().flatMap { f -> map(f) }.fix()
 
   /**
    * Returns the given function applied to the value from this `Success` or returns this if this is a `Failure`.
@@ -240,3 +240,6 @@ inline fun <A, B> TryOf<A>.transform(ifSuccess: (A) -> TryOf<B>, ifFailure: (Thr
 fun <A> (() -> A).try_(): Try<A> = Try(this)
 
 fun <T> TryOf<TryOf<T>>.flatten(): Try<T> = fix().flatMap(::identity)
+
+@Suppress("NOTHING_TO_INLINE")
+inline infix fun <A, B> TryOf<(A) -> B>.ap(fa: TryOf<A>): Try<B> = fa.fix().apPipe(this)

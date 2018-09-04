@@ -9,7 +9,7 @@ import arrow.effects.typeclasses.Proc
 import arrow.instance
 import arrow.typeclasses.*
 import kotlin.coroutines.experimental.CoroutineContext
-import arrow.effects.ap as ioAp
+import arrow.effects.apPipe as ioApPipe
 import arrow.effects.handleErrorWith as ioHandleErrorWith
 
 @instance(IO::class)
@@ -26,8 +26,8 @@ interface IOApplicativeInstance : Applicative<ForIO> {
   override fun <A> just(a: A): IO<A> =
     IO.just(a)
 
-  override fun <A, B> Kind<ForIO, A>.ap(ff: IOOf<(A) -> B>): IO<B> =
-    fix().ioAp(ff)
+  override fun <A, B> Kind<ForIO, A>.apPipe(ff: IOOf<(A) -> B>): IO<B> =
+    fix().ioApPipe(ff)
 }
 
 @instance(IO::class)

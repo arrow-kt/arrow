@@ -11,12 +11,14 @@ interface Applicative<F> : Functor<F> {
 
   fun <A> A.just(dummy: Unit = Unit): Kind<F, A> = just(this)
 
-  fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B>
+  fun <A, B> Kind<F, A>.apPipe(ff: Kind<F, (A) -> B>): Kind<F, B>
+
+  infix fun <A, B> Kind<F, (A) -> B>.ap(fa: Kind<F, A>): Kind<F, B> = fa.apPipe(this)
 
   fun <A, B> Kind<F, A>.product(fb: Kind<F, B>): Kind<F, Tuple2<A, B>> =
-    fb.ap(this.map { a: A -> { b: B -> Tuple2(a, b) } })
+    fb.apPipe(this.map { a: A -> { b: B -> Tuple2(a, b) } })
 
-  override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> = ap(just(f))
+  override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> = apPipe(just(f))
 
   fun <A, B, Z> Kind<F, A>.map2(fb: Kind<F, B>, f: (Tuple2<A, B>) -> Z): Kind<F, Z> = product(fb).map(f)
 

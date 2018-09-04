@@ -27,8 +27,8 @@ interface WriterTApplicativeInstance<F, W> : Applicative<WriterTPartialOf<F, W>>
   override fun <A> just(a: A): WriterTOf<F, W, A> =
     WriterT(FF().just(MM().empty() toT a))
 
-  override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.ap(ff: Kind<WriterTPartialOf<F, W>, (A) -> B>): WriterT<F, W, B> =
-    fix().ap(FF(), MM(), ff)
+  override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.apPipe(ff: Kind<WriterTPartialOf<F, W>, (A) -> B>): WriterT<F, W, B> =
+    fix().apPipe(FF(), MM(), ff)
 
   override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.map(f: (A) -> B): WriterT<F, W, B> =
     fix().map(FF()) { f(it) }
@@ -46,8 +46,8 @@ interface WriterTMonadInstance<F, W> : WriterTApplicativeInstance<F, W>, Monad<W
   override fun <A, B> tailRecM(a: A, f: (A) -> Kind<WriterTPartialOf<F, W>, Either<A, B>>): WriterT<F, W, B> =
     WriterT.tailRecM(FF(), a, f)
 
-  override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.ap(ff: Kind<WriterTPartialOf<F, W>, (A) -> B>): WriterT<F, W, B> =
-    fix().ap(FF(), MM(), ff)
+  override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.apPipe(ff: Kind<WriterTPartialOf<F, W>, (A) -> B>): WriterT<F, W, B> =
+    fix().apPipe(FF(), MM(), ff)
 }
 
 @instance(WriterT::class)

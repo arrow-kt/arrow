@@ -19,8 +19,8 @@ interface ObservableKFunctorInstance : Functor<ForObservableK> {
 
 @instance(ObservableK::class)
 interface ObservableKApplicativeInstance : Applicative<ForObservableK> {
-  override fun <A, B> ObservableKOf<A>.ap(ff: ObservableKOf<(A) -> B>): ObservableK<B> =
-    fix().ap(ff)
+  override fun <A, B> ObservableKOf<A>.apPipe(ff: ObservableKOf<(A) -> B>): ObservableK<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
     fix().map(f)
@@ -31,8 +31,8 @@ interface ObservableKApplicativeInstance : Applicative<ForObservableK> {
 
 @instance(ObservableK::class)
 interface ObservableKMonadInstance : Monad<ForObservableK> {
-  override fun <A, B> ObservableKOf<A>.ap(ff: ObservableKOf<(A) -> B>): ObservableK<B> =
-    fix().ap(ff)
+  override fun <A, B> ObservableKOf<A>.apPipe(ff: ObservableKOf<(A) -> B>): ObservableK<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
     fix().flatMap(f)

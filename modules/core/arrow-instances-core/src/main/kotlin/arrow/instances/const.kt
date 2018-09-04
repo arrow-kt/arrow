@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.core.Eval
 import arrow.instance
 import arrow.typeclasses.*
-import arrow.typeclasses.ap as constAp
+import arrow.typeclasses.apPipe as constApPipe
 import arrow.typeclasses.combine as combineAp
 
 @instance(Const::class)
@@ -23,8 +23,8 @@ interface ConstApplicativeInstance<A> : Applicative<ConstPartialOf<A>> {
     override fun SA(): Monoid<A> = MA()
   }.empty().fix()
 
-  override fun <T, U> Kind<ConstPartialOf<A>, T>.ap(ff: Kind<ConstPartialOf<A>, (T) -> U>): Const<A, U> =
-    constAp(MA(), ff)
+  override fun <T, U> Kind<ConstPartialOf<A>, T>.apPipe(ff: Kind<ConstPartialOf<A>, (T) -> U>): Const<A, U> =
+    constApPipe(MA(), ff)
 }
 
 @instance(Const::class)

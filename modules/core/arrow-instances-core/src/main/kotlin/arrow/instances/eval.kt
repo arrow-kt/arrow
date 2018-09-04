@@ -13,8 +13,8 @@ interface EvalFunctorInstance : Functor<ForEval> {
 
 @instance(Eval::class)
 interface EvalApplicativeInstance : Applicative<ForEval> {
-  override fun <A, B> Kind<ForEval, A>.ap(ff: Kind<ForEval, (A) -> B>): Eval<B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<ForEval, A>.apPipe(ff: Kind<ForEval, (A) -> B>): Eval<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForEval, A>.map(f: (A) -> B): Eval<B> =
     fix().map(f)
@@ -25,8 +25,8 @@ interface EvalApplicativeInstance : Applicative<ForEval> {
 
 @instance(Eval::class)
 interface EvalMonadInstance : Monad<ForEval> {
-  override fun <A, B> Kind<ForEval, A>.ap(ff: Kind<ForEval, (A) -> B>): Eval<B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<ForEval, A>.apPipe(ff: Kind<ForEval, (A) -> B>): Eval<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForEval, A>.flatMap(f: (A) -> Kind<ForEval, B>): Eval<B> =
     fix().flatMap(f)
@@ -55,8 +55,8 @@ interface EvalComonadInstance : Comonad<ForEval> {
 
 @instance(Eval::class)
 interface EvalBimonadInstance : Bimonad<ForEval> {
-  override fun <A, B> Kind<ForEval, A>.ap(ff: Kind<ForEval, (A) -> B>): Eval<B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<ForEval, A>.apPipe(ff: Kind<ForEval, (A) -> B>): Eval<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForEval, A>.flatMap(f: (A) -> Kind<ForEval, B>): Eval<B> =
     fix().flatMap(f)

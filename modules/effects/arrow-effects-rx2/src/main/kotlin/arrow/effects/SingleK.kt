@@ -20,7 +20,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
   fun <B> map(f: (A) -> B): SingleK<B> =
     single.map(f).k()
 
-  fun <B> ap(fa: SingleKOf<(A) -> B>): SingleK<B> =
+  fun <B> apPipe(fa: SingleKOf<(A) -> B>): SingleK<B> =
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
   fun <B> flatMap(f: (A) -> SingleKOf<B>): SingleK<B> =
@@ -69,3 +69,6 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
     }
   }
 }
+
+@Suppress("NOTHING_TO_INLINE")
+inline infix fun <A, B> SingleKOf<(A) -> B>.ap(fa: SingleKOf<A>): SingleK<B> = fa.fix().apPipe(this)

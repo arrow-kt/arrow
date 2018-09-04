@@ -166,8 +166,11 @@ sealed class IO<out A> : IOOf<A> {
   }
 }
 
-fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
+fun <A, B> IOOf<A>.apPipe(ff: IOOf<(A) -> B>): IO<B> =
   fix().flatMap { a -> ff.fix().map { it(a) } }
+
+@Suppress("NOTHING_TO_INLINE")
+inline infix fun <A, B> IOOf<(A) -> B>.ap(fa: IOOf<A>): IO<B> = fa.apPipe(this)
 
 fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
   IO.Bind(fix(), IOFrame.errorHandler(f))

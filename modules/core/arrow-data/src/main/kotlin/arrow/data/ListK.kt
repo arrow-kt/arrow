@@ -22,7 +22,7 @@ data class ListK<out A>(val list: List<A>) : ListKOf<A>, List<A> by list {
     return Eval.defer { loop(this.fix()) }
   }
 
-  fun <B> ap(ff: ListKOf<(A) -> B>): ListK<B> = ff.fix().flatMap { f -> map(f) }.fix()
+  fun <B> apPipe(ff: ListKOf<(A) -> B>): ListK<B> = ff.fix().flatMap { f -> map(f) }.fix()
 
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ListK<B>> =
     foldRight(Eval.always { GA.just(emptyList<B>().k()) }) { a, eval ->
@@ -70,6 +70,9 @@ data class ListK<out A>(val list: List<A>) : ListKOf<A>, List<A> by list {
   }
 
 }
+
+@Suppress("NOTHING_TO_INLINE")
+inline infix fun <A, B> ListKOf<(A) -> B>.ap(fa: ListKOf<A>): ListK<B> = fa.fix().apPipe(this)
 
 fun <A> ListKOf<A>.combineK(y: ListKOf<A>): ListK<A> =
   (fix().list + y.fix().list).k()

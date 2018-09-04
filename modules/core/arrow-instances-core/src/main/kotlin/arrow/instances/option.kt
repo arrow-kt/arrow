@@ -76,8 +76,8 @@ interface OptionFunctorInstance : Functor<ForOption> {
 
 @instance(Option::class)
 interface OptionApplicativeInstance : Applicative<ForOption> {
-  override fun <A, B> Kind<ForOption, A>.ap(ff: Kind<ForOption, (A) -> B>): Option<B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<ForOption, A>.apPipe(ff: Kind<ForOption, (A) -> B>): Option<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
@@ -88,8 +88,8 @@ interface OptionApplicativeInstance : Applicative<ForOption> {
 
 @instance(Option::class)
 interface OptionMonadInstance : Monad<ForOption> {
-  override fun <A, B> Kind<ForOption, A>.ap(ff: Kind<ForOption, (A) -> B>): Option<B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<ForOption, A>.apPipe(ff: Kind<ForOption, (A) -> B>): Option<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForOption, A>.flatMap(f: (A) -> Kind<ForOption, B>): Option<B> =
     fix().flatMap(f)

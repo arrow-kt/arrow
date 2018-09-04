@@ -21,8 +21,8 @@ interface ListKMonadCombineInstance : MonadCombine<ForListK> {
   override fun <A, B> Kind<ForListK, A>.mapFilter(f: (A) -> Option<B>): ListK<B> =
     fix().mapFilter(f)
 
-  override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<ForListK, A>.apPipe(ff: Kind<ForListK, (A) -> B>): ListK<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForListK, A>.flatMap(f: (A) -> Kind<ForListK, B>): ListK<B> =
     fix().flatMap(f)
@@ -60,8 +60,8 @@ interface ListKMonadFilterInstance : MonadFilter<ForListK> {
   override fun <A, B> Kind<ForListK, A>.mapFilter(f: (A) -> Option<B>): ListK<B> =
     fix().mapFilter(f)
 
-  override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<ForListK, A>.apPipe(ff: Kind<ForListK, (A) -> B>): ListK<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForListK, A>.flatMap(f: (A) -> Kind<ForListK, B>): ListK<B> =
     fix().flatMap(f)

@@ -136,14 +136,14 @@ class ValidatedTest : UnitSpec() {
       Invalid(10).findValid(plusIntSemigroup) { Invalid(5) } shouldBe Invalid(15)
     }
 
-    "ap should return Valid(f(a)) if both are Valid" {
-      Valid(10).ap<Int, Int, Int>(plusIntSemigroup, Valid({ a -> a + 5 })) shouldBe Valid(15)
+    "apPipe should return Valid(f(a)) if both are Valid" {
+      Valid(10).apPipe<Int, Int, Int>(plusIntSemigroup, Valid({ a -> a + 5 })) shouldBe Valid(15)
     }
 
-    "ap should return first Invalid found if is unique or combine both in otherwise" {
-      Invalid(10).ap<Int, Int, Int>(plusIntSemigroup, Valid({ a -> a + 5 })) shouldBe Invalid(10)
-      Valid(10).ap<Int, Int, Int>(plusIntSemigroup, Invalid(5)) shouldBe Invalid(5)
-      Invalid(10).ap<Int, Int, Int>(plusIntSemigroup, Invalid(5)) shouldBe Invalid(15)
+    "apPipe should return first Invalid found if is unique or combine both in otherwise" {
+      Invalid(10).apPipe<Int, Int, Int>(plusIntSemigroup, Valid({ a -> a + 5 })) shouldBe Invalid(10)
+      Valid(10).apPipe<Int, Int, Int>(plusIntSemigroup, Invalid(5)) shouldBe Invalid(5)
+      Invalid(10).apPipe<Int, Int, Int>(plusIntSemigroup, Invalid(5)) shouldBe Invalid(15)
     }
 
     data class MyException(val msg: String) : Exception()

@@ -5,7 +5,7 @@ import arrow.Kind2
 import arrow.core.*
 import arrow.instance
 import arrow.typeclasses.*
-import arrow.core.ap as eitherAp
+import arrow.core.apPipe as eitherApPipe
 import arrow.core.combineK as eitherCombineK
 import arrow.core.flatMap as eitherFlatMap
 import arrow.instances.traverse as eitherTraverse
@@ -63,8 +63,8 @@ interface EitherApplicativeInstance<L> : EitherFunctorInstance<L>, Applicative<E
 
   override fun <A, B> Kind<EitherPartialOf<L>, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 
-  override fun <A, B> Kind<EitherPartialOf<L>, A>.ap(ff: Kind<EitherPartialOf<L>, (A) -> B>): Either<L, B> =
-    fix().eitherAp(ff)
+  override fun <A, B> Kind<EitherPartialOf<L>, A>.apPipe(ff: Kind<EitherPartialOf<L>, (A) -> B>): Either<L, B> =
+    fix().eitherApPipe(ff)
 }
 
 @instance(Either::class)
@@ -72,8 +72,8 @@ interface EitherMonadInstance<L> : EitherApplicativeInstance<L>, Monad<EitherPar
 
   override fun <A, B> Kind<EitherPartialOf<L>, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 
-  override fun <A, B> Kind<EitherPartialOf<L>, A>.ap(ff: Kind<EitherPartialOf<L>, (A) -> B>): Either<L, B> =
-    fix().eitherAp(ff)
+  override fun <A, B> Kind<EitherPartialOf<L>, A>.apPipe(ff: Kind<EitherPartialOf<L>, (A) -> B>): Either<L, B> =
+    fix().eitherApPipe(ff)
 
   override fun <A, B> Kind<EitherPartialOf<L>, A>.flatMap(f: (A) -> Kind<EitherPartialOf<L>, B>): Either<L, B> =
     fix().eitherFlatMap { f(it).fix() }

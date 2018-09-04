@@ -104,5 +104,12 @@ data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, 
     })
   }
 
-  fun <C> ap(MF: Monad<F>, ff: EitherTOf<F, A, (B) -> C>): EitherT<F, A, C> = ff.fix().flatMap(MF) { f -> map(MF, f) }
+  fun <C> apPipe(MF: Monad<F>, ff: EitherTOf<F, A, (B) -> C>): EitherT<F, A, C> =
+    ff.fix().flatMap(MF) { f -> map(MF, f) }
 }
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun <F, A, B, C> EitherTOf<F, A, (B) -> C>.ap(
+  MF: Monad<F>,
+  fb: EitherTOf<F, A, B>
+): EitherT<F, A, C> = fb.fix().apPipe(MF, this)

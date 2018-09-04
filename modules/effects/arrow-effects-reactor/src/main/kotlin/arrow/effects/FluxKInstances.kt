@@ -22,8 +22,8 @@ interface FluxKApplicativeInstance : Applicative<ForFluxK> {
   override fun <A> just(a: A): FluxK<A> =
       FluxK.just(a)
 
-  override fun <A, B> FluxKOf<A>.ap(ff: FluxKOf<(A) -> B>): FluxK<B> =
-      fix().ap(ff)
+  override fun <A, B> FluxKOf<A>.apPipe(ff: FluxKOf<(A) -> B>): FluxK<B> =
+      fix().apPipe(ff)
 
   override fun <A, B> Kind<ForFluxK, A>.map(f: (A) -> B): FluxK<B> =
       fix().map(f)
@@ -31,8 +31,8 @@ interface FluxKApplicativeInstance : Applicative<ForFluxK> {
 
 @instance(FluxK::class)
 interface FluxKMonadInstance : Monad<ForFluxK> {
-  override fun <A, B> FluxKOf<A>.ap(ff: FluxKOf<(A) -> B>): FluxK<B> =
-      fix().ap(ff)
+  override fun <A, B> FluxKOf<A>.apPipe(ff: FluxKOf<(A) -> B>): FluxK<B> =
+      fix().apPipe(ff)
 
   override fun <A, B> Kind<ForFluxK, A>.flatMap(f: (A) -> Kind<ForFluxK, B>): FluxK<B> =
       fix().flatMap(f)

@@ -15,7 +15,7 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
 
   fun <B> flatMap(f: (A) -> SequenceKOf<B>): SequenceK<B> = this.fix().sequence.flatMap { f(it).fix().sequence }.k()
 
-  fun <B> ap(ff: SequenceKOf<(A) -> B>): SequenceK<B> = ff.fix().flatMap { f -> map(f) }.fix()
+  fun <B> apPipe(ff: SequenceKOf<(A) -> B>): SequenceK<B> = ff.fix().flatMap { f -> map(f) }.fix()
 
   fun <B> map(f: (A) -> B): SequenceK<B> = this.fix().sequence.map(f).k()
 
@@ -76,6 +76,10 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
 
   }
 }
+
+@Suppress("NOTHING_TO_INLINE")
+inline infix fun <A, B> SequenceKOf<(A) -> B>.ap(fa: SequenceKOf<A>): SequenceK<B> =
+  fa.fix().apPipe(this)
 
 fun <A> SequenceKOf<A>.combineK(y: SequenceKOf<A>): SequenceK<A> = (fix().sequence + y.fix().sequence).k()
 

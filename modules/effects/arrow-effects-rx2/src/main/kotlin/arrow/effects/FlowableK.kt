@@ -21,7 +21,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
   fun <B> map(f: (A) -> B): FlowableK<B> =
     flowable.map(f).k()
 
-  fun <B> ap(fa: FlowableKOf<(A) -> B>): FlowableK<B> =
+  fun <B> apPipe(fa: FlowableKOf<(A) -> B>): FlowableK<B> =
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
   fun <B> flatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
@@ -171,6 +171,10 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
     }
   }
 }
+
+@Suppress("NOTHING_TO_INLINE")
+inline infix fun <A, B> FlowableKOf<(A) -> B>.ap(fa: FlowableKOf<A>): FlowableK<B> =
+  fa.fix().apPipe(this)
 
 inline fun <A, G> FlowableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, FlowableK<A>> =
   fix().traverse(GA, ::identity)

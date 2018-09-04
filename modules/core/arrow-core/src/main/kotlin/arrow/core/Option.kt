@@ -90,7 +90,7 @@ sealed class Option<out A> : OptionOf<A> {
       is Some -> f(t).fix()
     }
 
-  fun <B> ap(ff: OptionOf<(A) -> B>): Option<B> =
+  fun <B> apPipe(ff: OptionOf<(A) -> B>): Option<B> =
     ff.fix().flatMap { this.fix().map(it) }
 
   /**
@@ -211,3 +211,6 @@ fun <A> Boolean.maybe(f: () -> A): Option<A> =
 fun <A> A.some(): Option<A> = Some(this)
 
 fun <A> none(): Option<A> = None
+
+@Suppress("NOTHING_TO_INLINE")
+inline infix fun <A, B> OptionOf<(A) -> B>.ap(fa: OptionOf<A>): Option<B> = fa.fix().apPipe(this)

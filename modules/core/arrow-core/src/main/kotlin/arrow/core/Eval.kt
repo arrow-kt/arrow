@@ -157,7 +157,7 @@ sealed class Eval<out A> : EvalOf<A> {
 
   fun <B> map(f: (A) -> B): Eval<B> = flatMap { a -> Now(f(a)) }
 
-  fun <B> ap(ff: EvalOf<(A) -> B>): Eval<B> = ff.fix().flatMap { f -> map(f) }.fix()
+  fun <B> apPipe(ff: EvalOf<(A) -> B>): Eval<B> = ff.fix().flatMap { f -> map(f) }.fix()
 
   @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
   fun <B> flatMap(f: (A) -> EvalOf<B>): Eval<B> =
@@ -268,3 +268,6 @@ sealed class Eval<out A> : EvalOf<A> {
     }
   }
 }
+
+@Suppress("NOTHING_TO_INLINE")
+inline infix fun <A, B> EvalOf<(A) -> B>.ap(fa: EvalOf<A>): Eval<B> = fa.fix().apPipe(this)

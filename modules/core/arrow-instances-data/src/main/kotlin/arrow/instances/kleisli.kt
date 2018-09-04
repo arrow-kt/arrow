@@ -24,8 +24,8 @@ interface KleisliApplicativeInstance<F, D> : KleisliFunctorInstance<F, D>, Appli
   override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.map(f: (A) -> B): Kleisli<F, D, B> =
     fix().map(FF(), f)
 
-  override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.ap(ff: Kind<KleisliPartialOf<F, D>, (A) -> B>): Kleisli<F, D, B> =
-    fix().ap(FF(), ff)
+  override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.apPipe(ff: Kind<KleisliPartialOf<F, D>, (A) -> B>): Kleisli<F, D, B> =
+    fix().apPipe(FF(), ff)
 
   override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.product(fb: Kind<KleisliPartialOf<F, D>, B>): Kleisli<F, D, Tuple2<A, B>> =
     Kleisli { FF().run { fix().run(it).product(fb.fix().run(it)) } }
@@ -42,8 +42,8 @@ interface KleisliMonadInstance<F, D> : KleisliApplicativeInstance<F, D>, Monad<K
   override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.flatMap(f: (A) -> Kind<KleisliPartialOf<F, D>, B>): Kleisli<F, D, B> =
     fix().flatMap(FF(), f.andThen { it.fix() })
 
-  override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.ap(ff: Kind<KleisliPartialOf<F, D>, (A) -> B>): Kleisli<F, D, B> =
-    fix().ap(FF(), ff)
+  override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.apPipe(ff: Kind<KleisliPartialOf<F, D>, (A) -> B>): Kleisli<F, D, B> =
+    fix().apPipe(FF(), ff)
 
   override fun <A, B> tailRecM(a: A, f: (A) -> KleisliOf<F, D, Either<A, B>>): Kleisli<F, D, B> =
     Kleisli.tailRecM(FF(), a, f)

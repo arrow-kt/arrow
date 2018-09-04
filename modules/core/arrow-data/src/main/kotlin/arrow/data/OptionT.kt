@@ -49,7 +49,8 @@ data class OptionT<F, A>(val value: Kind<F, Option<A>>) : OptionTOf<F, A>, Optio
 
   fun <B> cata(FF: Functor<F>, default: () -> B, f: (A) -> B): Kind<F, B> = fold(FF, default, f)
 
-  fun <B> ap(MF: Monad<F>, ff: OptionTOf<F, (A) -> B>): OptionT<F, B> = ff.fix().flatMap(MF) { f -> map(MF, f) }
+  fun <B> apPipe(MF: Monad<F>, ff: OptionTOf<F, (A) -> B>): OptionT<F, B> =
+    ff.fix().flatMap(MF) { f -> map(MF, f) }
 
   fun <B> flatMap(MF: Monad<F>, f: (A) -> OptionT<F, B>): OptionT<F, B> = flatMapF(MF) { it -> f(it).value }
 
@@ -112,6 +113,10 @@ data class OptionT<F, A>(val value: Kind<F, Option<A>>) : OptionTOf<F, A>, Optio
   fun <L> toRight(FF: Functor<F>, default: () -> L): EitherT<F, L, A> =
     EitherT(cata(FF, { Left(default()) }, { Right(it) }))
 }
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun <F, A, B> OptionTOf<F, (A) -> B>.ap(MF: Monad<F>, fa: OptionTOf<F, A>): OptionT<F, B> =
+  fa.fix().apPipe(MF, this)
 
 fun <F, A, B> OptionTOf<F, A>.mapFilter(FF: Functor<F>, f: (A) -> Option<B>): OptionT<F, B> = FF.run {
   OptionT(fix().value.map { it.flatMap(f) })

@@ -31,8 +31,8 @@ interface Function1ApplicativeInstance<I> : Function1FunctorInstance<I>, Applica
   override fun <A, B> Kind<Function1PartialOf<I>, A>.map(f: (A) -> B): Function1<I, B> =
     fix().map(f)
 
-  override fun <A, B> Kind<Function1PartialOf<I>, A>.ap(ff: Kind<Function1PartialOf<I>, (A) -> B>): Function1<I, B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<Function1PartialOf<I>, A>.apPipe(ff: Kind<Function1PartialOf<I>, (A) -> B>): Function1<I, B> =
+    fix().apPipe(ff)
 }
 
 @instance(Function1::class)
@@ -41,8 +41,8 @@ interface Function1MonadInstance<I> : Function1ApplicativeInstance<I>, Monad<Fun
   override fun <A, B> Kind<Function1PartialOf<I>, A>.map(f: (A) -> B): Function1<I, B> =
     fix().map(f)
 
-  override fun <A, B> Kind<Function1PartialOf<I>, A>.ap(ff: Kind<Function1PartialOf<I>, (A) -> B>): Function1<I, B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<Function1PartialOf<I>, A>.apPipe(ff: Kind<Function1PartialOf<I>, (A) -> B>): Function1<I, B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<Function1PartialOf<I>, A>.flatMap(f: (A) -> Kind<Function1PartialOf<I>, B>): Function1<I, B> =
     fix().flatMap(f)

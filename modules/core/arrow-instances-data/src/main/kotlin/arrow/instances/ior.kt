@@ -28,8 +28,8 @@ interface IorApplicativeInstance<L> : IorFunctorInstance<L>, Applicative<IorPart
 
   override fun <A, B> Kind<IorPartialOf<L>, A>.map(f: (A) -> B): Ior<L, B> = fix().map(f)
 
-  override fun <A, B> Kind<IorPartialOf<L>, A>.ap(ff: Kind<IorPartialOf<L>, (A) -> B>): Ior<L, B> =
-    fix().ap(SL(), ff)
+  override fun <A, B> Kind<IorPartialOf<L>, A>.apPipe(ff: Kind<IorPartialOf<L>, (A) -> B>): Ior<L, B> =
+    fix().apPipe(SL(), ff)
 }
 
 @instance(Ior::class)
@@ -40,8 +40,8 @@ interface IorMonadInstance<L> : IorApplicativeInstance<L>, Monad<IorPartialOf<L>
   override fun <A, B> Kind<IorPartialOf<L>, A>.flatMap(f: (A) -> Kind<IorPartialOf<L>, B>): Ior<L, B> =
     fix().flatMap(SL()) { f(it).fix() }
 
-  override fun <A, B> Kind<IorPartialOf<L>, A>.ap(ff: Kind<IorPartialOf<L>, (A) -> B>): Ior<L, B> =
-    fix().ap(SL(), ff)
+  override fun <A, B> Kind<IorPartialOf<L>, A>.apPipe(ff: Kind<IorPartialOf<L>, (A) -> B>): Ior<L, B> =
+    fix().apPipe(SL(), ff)
 
   override fun <A, B> tailRecM(a: A, f: (A) -> IorOf<L, Either<A, B>>): Ior<L, B> =
     Ior.tailRecM(a, f, SL())

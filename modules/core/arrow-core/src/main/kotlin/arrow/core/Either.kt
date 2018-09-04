@@ -306,8 +306,12 @@ inline fun <A, B> EitherOf<A, B?>.leftIfNull(crossinline default: () -> A): Eith
 fun <A, B> EitherOf<A, B>.contains(elem: B): Boolean =
   fix().fold({ false }, { it == elem })
 
-fun <A, B, C> EitherOf<A, B>.ap(ff: EitherOf<A, (B) -> C>): Either<A, C> =
+fun <A, B, C> EitherOf<A, B>.apPipe(ff: EitherOf<A, (B) -> C>): Either<A, C> =
   ff.fix().flatMap { f -> fix().map(f) }.fix()
+
+@Suppress("NOTHING_TO_INLINE")
+inline infix fun <A, B, C> EitherOf<A, (B) -> C>.ap(fb: EitherOf<A, B>): Either<A, C> =
+  fb.apPipe(this)
 
 fun <A, B> EitherOf<A, B>.combineK(y: EitherOf<A, B>): Either<A, B> =
   when (this) {

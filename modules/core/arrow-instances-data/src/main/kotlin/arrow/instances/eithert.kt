@@ -23,16 +23,16 @@ interface EitherTApplicativeInstance<F, L> : EitherTFunctorInstance<F, L>, Appli
 
   override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.map(f: (A) -> B): EitherT<F, L, B> = fix().map(MF()) { f(it) }
 
-  override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.ap(ff: Kind<EitherTPartialOf<F, L>, (A) -> B>): EitherT<F, L, B> =
-    fix().ap(MF(), ff)
+  override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.apPipe(ff: Kind<EitherTPartialOf<F, L>, (A) -> B>): EitherT<F, L, B> =
+    fix().apPipe(MF(), ff)
 }
 
 interface EitherTMonadInstance<F, L> : EitherTApplicativeInstance<F, L>, Monad<EitherTPartialOf<F, L>> {
 
   override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.map(f: (A) -> B): EitherT<F, L, B> = fix().map(MF()) { f(it) }
 
-  override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.ap(ff: Kind<EitherTPartialOf<F, L>, (A) -> B>): EitherT<F, L, B> =
-    fix().ap(MF(), ff)
+  override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.apPipe(ff: Kind<EitherTPartialOf<F, L>, (A) -> B>): EitherT<F, L, B> =
+    fix().apPipe(MF(), ff)
 
   override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.flatMap(f: (A) -> Kind<EitherTPartialOf<F, L>, B>): EitherT<F, L, B> = fix().flatMap(MF()) { f(it).fix() }
 

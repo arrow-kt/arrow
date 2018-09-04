@@ -27,8 +27,8 @@ interface OptionTApplicativeInstance<F> : OptionTFunctorInstance<F>, Applicative
 
   override fun <A, B> Kind<OptionTPartialOf<F>, A>.map(f: (A) -> B): OptionT<F, B> = fix().map(FF(), f)
 
-  override fun <A, B> Kind<OptionTPartialOf<F>, A>.ap(ff: Kind<OptionTPartialOf<F>, (A) -> B>): OptionT<F, B> =
-    fix().ap(FF(), ff)
+  override fun <A, B> Kind<OptionTPartialOf<F>, A>.apPipe(ff: Kind<OptionTPartialOf<F>, (A) -> B>): OptionT<F, B> =
+    fix().apPipe(FF(), ff)
 }
 
 @instance(OptionT::class)
@@ -38,8 +38,8 @@ interface OptionTMonadInstance<F> : OptionTApplicativeInstance<F>, Monad<OptionT
 
   override fun <A, B> Kind<OptionTPartialOf<F>, A>.flatMap(f: (A) -> Kind<OptionTPartialOf<F>, B>): OptionT<F, B> = fix().flatMap(FF()) { f(it).fix() }
 
-  override fun <A, B> Kind<OptionTPartialOf<F>, A>.ap(ff: Kind<OptionTPartialOf<F>, (A) -> B>): OptionT<F, B> =
-    fix().ap(FF(), ff)
+  override fun <A, B> Kind<OptionTPartialOf<F>, A>.apPipe(ff: Kind<OptionTPartialOf<F>, (A) -> B>): OptionT<F, B> =
+    fix().apPipe(FF(), ff)
 
   override fun <A, B> tailRecM(a: A, f: (A) -> OptionTOf<F, Either<A, B>>): OptionT<F, B> =
     OptionT.tailRecM(FF(), a, f)

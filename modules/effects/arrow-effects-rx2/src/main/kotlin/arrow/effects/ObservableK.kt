@@ -20,7 +20,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
   fun <B> map(f: (A) -> B): ObservableK<B> =
     observable.map(f).k()
 
-  fun <B> ap(fa: ObservableKOf<(A) -> B>): ObservableK<B> =
+  fun <B> apPipe(fa: ObservableKOf<(A) -> B>): ObservableK<B> =
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
   fun <B> flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
@@ -115,6 +115,10 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
     }
   }
 }
+
+@Suppress("NOTHING_TO_INLINE")
+inline infix fun <A, B> ObservableKOf<(A) -> B>.ap(fa: ObservableKOf<A>): ObservableK<B> =
+  fa.fix().apPipe(this)
 
 inline fun <A, G> ObservableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, ObservableK<A>> =
   fix().traverse(GA, ::identity)

@@ -20,8 +20,8 @@ interface FlowableKFunctorInstance : Functor<ForFlowableK> {
 
 @instance(FlowableK::class)
 interface FlowableKApplicativeInstance : Applicative<ForFlowableK> {
-  override fun <A, B> FlowableKOf<A>.ap(ff: FlowableKOf<(A) -> B>): FlowableK<B> =
-    fix().ap(ff)
+  override fun <A, B> FlowableKOf<A>.apPipe(ff: FlowableKOf<(A) -> B>): FlowableK<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForFlowableK, A>.map(f: (A) -> B): FlowableK<B> =
     fix().map(f)
@@ -32,8 +32,8 @@ interface FlowableKApplicativeInstance : Applicative<ForFlowableK> {
 
 @instance(FlowableK::class)
 interface FlowableKMonadInstance : Monad<ForFlowableK> {
-  override fun <A, B> FlowableKOf<A>.ap(ff: FlowableKOf<(A) -> B>): FlowableK<B> =
-    fix().ap(ff)
+  override fun <A, B> FlowableKOf<A>.apPipe(ff: FlowableKOf<(A) -> B>): FlowableK<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> FlowableKOf<A>.flatMap(f: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
     fix().flatMap(f)

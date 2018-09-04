@@ -45,8 +45,8 @@ interface ListKFunctorInstance : Functor<ForListK> {
 
 @instance(ListK::class)
 interface ListKApplicativeInstance : Applicative<ForListK> {
-  override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<ForListK, A>.apPipe(ff: Kind<ForListK, (A) -> B>): ListK<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
     fix().map(f)
@@ -60,8 +60,8 @@ interface ListKApplicativeInstance : Applicative<ForListK> {
 
 @instance(ListK::class)
 interface ListKMonadInstance : Monad<ForListK> {
-  override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<ForListK, A>.apPipe(ff: Kind<ForListK, (A) -> B>): ListK<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForListK, A>.flatMap(f: (A) -> Kind<ForListK, B>): ListK<B> =
     fix().flatMap(f)

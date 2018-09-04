@@ -19,7 +19,7 @@ data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferre
   fun <B> map(f: (A) -> B): DeferredK<B> =
     flatMap { a: A -> just(f(a)) }
 
-  fun <B> ap(fa: DeferredKOf<(A) -> B>): DeferredK<B> =
+  fun <B> apPipe(fa: DeferredKOf<(A) -> B>): DeferredK<B> =
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
   fun <B> flatMap(f: (A) -> DeferredKOf<B>): DeferredK<B> =
@@ -89,6 +89,10 @@ data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferre
       }
   }
 }
+
+@Suppress("NOTHING_TO_INLINE")
+inline infix fun <A, B> DeferredKOf<(A) -> B>.ap(fa: DeferredKOf<A>): DeferredK<B> =
+  fa.fix().apPipe(this)
 
 fun <A> DeferredKOf<A>.handleErrorWith(f: (Throwable) -> DeferredK<A>): DeferredK<A> =
   async(Unconfined, CoroutineStart.LAZY) {

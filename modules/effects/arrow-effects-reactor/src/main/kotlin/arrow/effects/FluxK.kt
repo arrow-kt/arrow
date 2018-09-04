@@ -20,7 +20,7 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
   fun <B> map(f: (A) -> B): FluxK<B> =
       flux.map(f).k()
 
-  fun <B> ap(fa: FluxKOf<(A) -> B>): FluxK<B> =
+  fun <B> apPipe(fa: FluxKOf<(A) -> B>): FluxK<B> =
       flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
   fun <B> flatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
@@ -115,6 +115,9 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
     }
   }
 }
+
+@Suppress("NOTHING_TO_INLINE")
+inline infix fun <A, B> FluxKOf<(A) -> B>.ap(fa: FluxKOf<A>): FluxK<B> = fa.fix().apPipe(this)
 
 inline fun <A, G> FluxKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, FluxK<A>> =
     fix().traverse(GA, ::identity)

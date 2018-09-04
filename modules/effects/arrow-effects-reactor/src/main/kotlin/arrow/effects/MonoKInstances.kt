@@ -18,8 +18,8 @@ interface MonoKFunctorInstance : Functor<ForMonoK> {
 
 @instance(MonoK::class)
 interface MonoKApplicativeInstance : Applicative<ForMonoK> {
-  override fun <A, B> MonoKOf<A>.ap(ff: MonoKOf<(A) -> B>): MonoK<B> =
-      fix().ap(ff)
+  override fun <A, B> MonoKOf<A>.apPipe(ff: MonoKOf<(A) -> B>): MonoK<B> =
+      fix().apPipe(ff)
 
   override fun <A, B> Kind<ForMonoK, A>.map(f: (A) -> B): MonoK<B> =
       fix().map(f)
@@ -30,8 +30,8 @@ interface MonoKApplicativeInstance : Applicative<ForMonoK> {
 
 @instance(MonoK::class)
 interface MonoKMonadInstance : Monad<ForMonoK> {
-  override fun <A, B> MonoKOf<A>.ap(ff: MonoKOf<(A) -> B>): MonoK<B> =
-      fix().ap(ff)
+  override fun <A, B> MonoKOf<A>.apPipe(ff: MonoKOf<(A) -> B>): MonoK<B> =
+      fix().apPipe(ff)
 
   override fun <A, B> MonoKOf<A>.flatMap(f: (A) -> Kind<ForMonoK, B>): MonoK<B> =
       fix().flatMap(f)

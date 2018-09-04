@@ -13,8 +13,8 @@ interface Function0FunctorInstance : Functor<ForFunction0> {
 
 @instance(Function0::class)
 interface Function0ApplicativeInstance : Applicative<ForFunction0> {
-  override fun <A, B> Kind<ForFunction0, A>.ap(ff: Kind<ForFunction0, (A) -> B>): Function0<B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<ForFunction0, A>.apPipe(ff: Kind<ForFunction0, (A) -> B>): Function0<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForFunction0, A>.map(f: (A) -> B): Function0<B> =
     fix().map(f)
@@ -25,8 +25,8 @@ interface Function0ApplicativeInstance : Applicative<ForFunction0> {
 
 @instance(Function0::class)
 interface Function0MonadInstance : Monad<ForFunction0> {
-  override fun <A, B> Kind<ForFunction0, A>.ap(ff: Kind<ForFunction0, (A) -> B>): Function0<B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<ForFunction0, A>.apPipe(ff: Kind<ForFunction0, (A) -> B>): Function0<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForFunction0, A>.flatMap(f: (A) -> Kind<ForFunction0, B>): Function0<B> =
     fix().flatMap(f)
@@ -55,8 +55,8 @@ interface Function0ComonadInstance : Comonad<ForFunction0> {
 
 @instance(Function0::class)
 interface Function0BimonadInstance : Bimonad<ForFunction0> {
-  override fun <A, B> Kind<ForFunction0, A>.ap(ff: Kind<ForFunction0, (A) -> B>): Function0<B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<ForFunction0, A>.apPipe(ff: Kind<ForFunction0, (A) -> B>): Function0<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForFunction0, A>.flatMap(f: (A) -> Kind<ForFunction0, B>): Function0<B> =
     fix().flatMap(f)

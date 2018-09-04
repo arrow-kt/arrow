@@ -75,7 +75,7 @@ Or you can apply a list of transformations using `ap` from [`Applicative`](/docs
 import arrow.instances.*
 ForListK extensions {
   listOf(1, 2, 3).k()
-    .ap(listOf({ x: Int -> x + 10}, { x: Int -> x * 2}).k())
+    .apPipe(listOf({ x: Int -> x + 10}, { x: Int -> x * 2}).k())
 }
 ```
 

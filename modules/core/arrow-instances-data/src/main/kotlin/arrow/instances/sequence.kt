@@ -47,8 +47,8 @@ interface SequenceKFunctorInstance : Functor<ForSequenceK> {
 
 @instance(SequenceK::class)
 interface SequenceKApplicativeInstance : Applicative<ForSequenceK> {
-  override fun <A, B> Kind<ForSequenceK, A>.ap(ff: Kind<ForSequenceK, (A) -> B>): SequenceK<B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<ForSequenceK, A>.apPipe(ff: Kind<ForSequenceK, (A) -> B>): SequenceK<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForSequenceK, A>.map(f: (A) -> B): SequenceK<B> =
     fix().map(f)
@@ -62,8 +62,8 @@ interface SequenceKApplicativeInstance : Applicative<ForSequenceK> {
 
 @instance(SequenceK::class)
 interface SequenceKMonadInstance : Monad<ForSequenceK> {
-  override fun <A, B> Kind<ForSequenceK, A>.ap(ff: Kind<ForSequenceK, (A) -> B>): SequenceK<B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<ForSequenceK, A>.apPipe(ff: Kind<ForSequenceK, (A) -> B>): SequenceK<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForSequenceK, A>.flatMap(f: (A) -> Kind<ForSequenceK, B>): SequenceK<B> =
     fix().flatMap(f)

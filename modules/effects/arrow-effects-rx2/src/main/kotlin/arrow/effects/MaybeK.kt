@@ -18,7 +18,7 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
   fun <B> map(f: (A) -> B): MaybeK<B> =
     maybe.map(f).k()
 
-  fun <B> ap(fa: MaybeKOf<(A) -> B>): MaybeK<B> =
+  fun <B> apPipe(fa: MaybeKOf<(A) -> B>): MaybeK<B> =
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
   fun <B> flatMap(f: (A) -> MaybeKOf<B>): MaybeK<B> =
@@ -85,3 +85,6 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
     }
   }
 }
+
+@Suppress("NOTHING_TO_INLINE")
+inline infix fun <A, B> MaybeKOf<(A) -> B>.ap(fa: MaybeKOf<A>): MaybeK<B> = fa.fix().apPipe(this)

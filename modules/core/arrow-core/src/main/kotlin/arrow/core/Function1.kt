@@ -13,7 +13,8 @@ class Function1<I, out O>(val f: (I) -> O) : Function1Of<I, O> {
 
   fun <B> flatMap(f: (O) -> Function1Of<I, B>): Function1<I, B> = { p: I -> f(this.f(p))(p) }.k()
 
-  fun <B> ap(ff: Function1Of<I, (O) -> B>): Function1<I, B> = ff.fix().flatMap { f -> map(f) }.fix()
+  fun <B> apPipe(ff: Function1Of<I, (O) -> B>): Function1<I, B> =
+    ff.fix().flatMap { f -> map(f) }.fix()
 
   fun local(f: (I) -> I): Function1<I, O> = f.andThen { this(it) }.k()
 
@@ -38,3 +39,7 @@ class Function1<I, out O>(val f: (I) -> O) : Function1Of<I, O> {
     fun <I> id(): Function1<I, I> = Function1(::identity)
   }
 }
+
+@Suppress("NOTHING_TO_INLINE")
+inline infix fun <I, O, B> Function1Of<I, (O) -> B>.ap(fo: Function1Of<I, O>): Function1<I, B> =
+  fo.fix().apPipe(this)

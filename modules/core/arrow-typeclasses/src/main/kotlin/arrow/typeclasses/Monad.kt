@@ -16,7 +16,7 @@ interface Monad<F> : Applicative<F> {
   override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> =
     flatMap { a -> just(f(a)) }
 
-  override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> =
+  override fun <A, B> Kind<F, A>.apPipe(ff: Kind<F, (A) -> B>): Kind<F, B> =
     ff.flatMap { f -> this.map(f) }
 
   fun <A> Kind<F, Kind<F, A>>.flatten(): Kind<F, A> =

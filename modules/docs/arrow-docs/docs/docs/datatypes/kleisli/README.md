@@ -57,7 +57,7 @@ val optionIntDoubleKleisli = Kleisli { str: String ->
   if (str.toCharArray().all { it.isDigit() }) Some(intToDouble) else None
 }
 
-optionIntKleisli.ap(Option.applicative(), optionIntDoubleKleisli).fix().run("1")
+optionIntKleisli.apPipe(Option.applicative(), optionIntDoubleKleisli).fix().run("1")
 ```
 
 #### Map

@@ -47,8 +47,8 @@ interface OptionMonadFilterInstance : MonadFilter<ForOption> {
   override fun <A> empty(): Option<A> =
     Option.empty()
 
-  override fun <A, B> Kind<ForOption, A>.ap(ff: Kind<ForOption, (A) -> B>): Option<B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<ForOption, A>.apPipe(ff: Kind<ForOption, (A) -> B>): Option<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForOption, A>.flatMap(f: (A) -> Kind<ForOption, B>): Option<B> =
     fix().flatMap(f)

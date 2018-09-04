@@ -80,7 +80,20 @@ fun <D, A, B> Reader<D, A>.flatMap(f: (A) -> Reader<D, B>): Reader<D, B> = flatM
  *
  * @param ff function that maps [A] to [B] within the [Reader] context.
  */
-fun <D, A, B> Reader<D, A>.ap(ff: ReaderOf<D, (A) -> B>): Reader<D, B> = ap(IdBimonad, ff)
+fun <D, A, B> ReaderOf<D, A>.apPipe(ff: ReaderOf<D, (A) -> B>): Reader<D, B> =
+  fix().apPipe(IdBimonad, ff)
+
+/**
+ * Apply this function which operates within the context of [Reader] to a value in the context of
+ * [Reader].
+ *
+ * Version of [apPipe] with flipped receiver and parameter.
+ *
+ * @param fa value that is mapped to [B] by this function within the [Reader] context.
+ */
+@Suppress("NOTHING_TO_INLINE")
+inline infix fun <D, A, B> ReaderOf<D, (A) -> B>.ap(fa: ReaderOf<D, A>): ReaderOf<D, B> =
+  fa.apPipe(this)
 
 /**
  * Zip with another [Reader].

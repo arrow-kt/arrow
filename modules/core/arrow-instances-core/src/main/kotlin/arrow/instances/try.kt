@@ -87,8 +87,8 @@ interface TryFunctorInstance : Functor<ForTry> {
 
 @instance(Try::class)
 interface TryApplicativeInstance : Applicative<ForTry> {
-  override fun <A, B> Kind<ForTry, A>.ap(ff: Kind<ForTry, (A) -> B>): Try<B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<ForTry, A>.apPipe(ff: Kind<ForTry, (A) -> B>): Try<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForTry, A>.map(f: (A) -> B): Try<B> =
     fix().map(f)
@@ -99,8 +99,8 @@ interface TryApplicativeInstance : Applicative<ForTry> {
 
 @instance(Try::class)
 interface TryMonadInstance : Monad<ForTry> {
-  override fun <A, B> Kind<ForTry, A>.ap(ff: Kind<ForTry, (A) -> B>): Try<B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<ForTry, A>.apPipe(ff: Kind<ForTry, (A) -> B>): Try<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForTry, A>.flatMap(f: (A) -> Kind<ForTry, B>): Try<B> =
     fix().flatMap(f)

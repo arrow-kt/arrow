@@ -38,8 +38,8 @@ interface NonEmptyListFunctorInstance : Functor<ForNonEmptyList> {
 
 @instance(NonEmptyList::class)
 interface NonEmptyListApplicativeInstance : Applicative<ForNonEmptyList> {
-  override fun <A, B> Kind<ForNonEmptyList, A>.ap(ff: Kind<ForNonEmptyList, (A) -> B>): NonEmptyList<B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<ForNonEmptyList, A>.apPipe(ff: Kind<ForNonEmptyList, (A) -> B>): NonEmptyList<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
     fix().map(f)
@@ -50,8 +50,8 @@ interface NonEmptyListApplicativeInstance : Applicative<ForNonEmptyList> {
 
 @instance(NonEmptyList::class)
 interface NonEmptyListMonadInstance : Monad<ForNonEmptyList> {
-  override fun <A, B> Kind<ForNonEmptyList, A>.ap(ff: Kind<ForNonEmptyList, (A) -> B>): NonEmptyList<B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<ForNonEmptyList, A>.apPipe(ff: Kind<ForNonEmptyList, (A) -> B>): NonEmptyList<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForNonEmptyList, A>.flatMap(f: (A) -> Kind<ForNonEmptyList, B>): NonEmptyList<B> =
     fix().flatMap(f)
@@ -80,8 +80,8 @@ interface NonEmptyListComonadInstance : Comonad<ForNonEmptyList> {
 
 @instance(NonEmptyList::class)
 interface NonEmptyListBimonadInstance : Bimonad<ForNonEmptyList> {
-  override fun <A, B> Kind<ForNonEmptyList, A>.ap(ff: Kind<ForNonEmptyList, (A) -> B>): NonEmptyList<B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<ForNonEmptyList, A>.apPipe(ff: Kind<ForNonEmptyList, (A) -> B>): NonEmptyList<B> =
+    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForNonEmptyList, A>.flatMap(f: (A) -> Kind<ForNonEmptyList, B>): NonEmptyList<B> =
     fix().flatMap(f)

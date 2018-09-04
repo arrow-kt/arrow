@@ -19,7 +19,7 @@ data class Id<out A>(val value: A) : IdOf<A> {
 
   fun extract(): A = this.fix().value
 
-  fun <B> ap(ff: IdOf<(A) -> B>): Id<B> = ff.fix().flatMap { f -> map(f) }.fix()
+  fun <B> apPipe(ff: IdOf<(A) -> B>): Id<B> = ff.fix().flatMap { f -> map(f) }.fix()
 
   companion object {
 
@@ -34,3 +34,6 @@ data class Id<out A>(val value: A) : IdOf<A> {
     fun <A> just(a: A): Id<A> = Id(a)
   }
 }
+
+@Suppress("NOTHING_TO_INLINE")
+inline infix fun <A, B> IdOf<(A) -> B>.ap(fa: IdOf<A>): Id<B> = fa.fix().apPipe(this)
