@@ -239,6 +239,10 @@ inline fun <A, B> TryOf<A>.transform(ifSuccess: (A) -> TryOf<B>, ifFailure: (Thr
 
 fun <A> (() -> A).try_(): Try<A> = Try(this)
 
+fun <A> A.success(): Try<A> = Success(this)
+
+fun <A> Throwable.failure(): Try<A> = Failure(this)
+
 fun <T> TryOf<TryOf<T>>.flatten(): Try<T> = fix().flatMap(::identity)
 
 @Suppress("NOTHING_TO_INLINE")
