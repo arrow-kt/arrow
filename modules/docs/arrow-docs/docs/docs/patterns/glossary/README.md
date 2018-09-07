@@ -28,7 +28,7 @@ Some of these patterns are implemented using a mix of `sealed` classes where eac
 For example, the internal representation of an `Option` is a `sealed` class with two `data` classes `Some<A>(val a: A)` and `None`,
 and `Ior` is a `sealed` class with three `data` class inheritors, `Left(val a: A)`, `Right(val b: B)`, and `Both(val a: A, val b: B)`.
 
-Datatypes that encapsulate lazy evaluation can even be recursive, nesting themselves with every operation in their creation chain until they are executed via evaluation. One example is `IO`.
+Datatypes that express patterns like deferred evaluation can do it by nesting themselves with every operation they chain. One example is `IO`.
 
 ```kotlin:ank
 import arrow.effects.*
