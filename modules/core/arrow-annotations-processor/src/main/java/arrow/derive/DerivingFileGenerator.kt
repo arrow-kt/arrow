@@ -20,7 +20,10 @@ private fun List<String>.prependTypeArgs(): String =
 
 private fun kindedRegex(typeClassFirstTypeArg: String): Regex = "arrow.Kind<$typeClassFirstTypeArg,\\s".toRegex()
 
-fun String.normalizeType(): String = removeBackticks().replace("/", ".")
+fun String.asKotlin(): String =
+  removeBackticks()
+    .replace("/", ".")
+    .replace("kotlin.jvm.functions", "kotlin")
 
 fun String.appendTypePrefix(prefix: String): String {
   val pkg = substringBeforeLast(".")
@@ -33,7 +36,7 @@ fun String.applyUnappliedTypeArgs(unappliedTypeArgs: List<Pair<String, String>>)
     if (remainingTypeArgs.isEmpty()) acc
     else {
       val head = remainingTypeArgs[0]
-      val replacement = head.second.normalizeType()
+      val replacement = head.second.asKotlin()
       val newAcc = acc
         .replace("<${head.first}>", "<$replacement>")
         .replace("<${head.first}", "<$replacement")
@@ -46,7 +49,7 @@ fun String.applyUnappliedTypeArgs(unappliedTypeArgs: List<Pair<String, String>>)
 
 fun argAsSeenFromReceiver(typeClassFirstTypeArg: String, abstractType: String, recType: ClassOrPackageDataWrapper.Class, invariantTypeArgs: List<String>, unappliedTypeArgs: List<Pair<String, String>>): String {
   val extraTypeArgs = invariantTypeArgs.prependTypeArgs()
-  val receiverType = recType.fullName.normalizeType()
+  val receiverType = recType.fullName.asKotlin()
   val receiverPostFix = if (recType.typeParameters.size > 1) "$KindPartialPostFix<${invariantTypeArgs.joinToString(", ")}>" else ""
   val receiverPrefix = if (recType.typeParameters.size == 1) HKMarkerPreFix else ""
   return abstractType
@@ -57,7 +60,7 @@ fun argAsSeenFromReceiver(typeClassFirstTypeArg: String, abstractType: String, r
 
 fun retTypeAsSeenFromReceiver(typeClassFirstTypeArg: String, abstractType: String, recType: ClassOrPackageDataWrapper.Class, invariantTypeArgs: List<String>, unappliedTypeArgs: List<Pair<String, String>>): String {
   val extraTypeArgs = invariantTypeArgs.prependTypeArgs()
-  val receiverType = recType.fullName.normalizeType()
+  val receiverType = recType.fullName.asKotlin()
   return when {
   //abstractType.matches("arrow.Kind<(.*?), arrow.Kind<$typeClassFirstTypeArg, (.*?)>>".toRegex()) -> abstractType.replace(kindedRegex(typeClassFirstTypeArg), "$receiverType$KindPostFix<$extraTypeArgs")
     abstractType.startsWith("arrow.Kind<") -> abstractType.replace(kindedRegex(typeClassFirstTypeArg), "$receiverType<$extraTypeArgs")
@@ -108,18 +111,18 @@ data class FunctionSignature(
       fun Int.get() =
         typeClass.nameResolver.getString(this)
 
-      val receiverType = recType.fullName.normalizeType()
+      val receiverType = recType.fullName.asKotlin()
       val typeParams = f.typeParameterList.map { it.name.get() }
-      val typeClassAbstractKind = typeClass.typeParameters[0].name.get().normalizeType()
+      val typeClassAbstractKind = typeClass.typeParameters[0].name.get().asKotlin()
       val functionName = typeClass.nameResolver.getString(f.name)
 
       val args = f.valueParameterList.map {
         val argName = it.name.get()
-        val argType = it.type.extractFullName(typeClass).normalizeType()
+        val argType = it.type.extractFullName(typeClass).asKotlin()
         argName to argAsSeenFromReceiver(typeClassAbstractKind, argType, recType, invariantTypeArgs, unappliedTypeArgs)
       }
 
-      val abstractReturnType = f.returnType.extractFullName(typeClass, outputTypeAlias = true).normalizeType()
+      val abstractReturnType = f.returnType.extractFullName(typeClass, outputTypeAlias = true).asKotlin()
       val concreteType = retTypeAsSeenFromReceiver(
         typeClassAbstractKind,
         abstractReturnType,
@@ -130,7 +133,7 @@ data class FunctionSignature(
         name = functionName,
         args = args,
         retType = concreteType,
-        hkArgs = findArgs(f, typeClassAbstractKind.normalizeType(), typeClass, recType, invariantTypeArgs, unappliedTypeArgs),
+        hkArgs = findArgs(f, typeClassAbstractKind.asKotlin(), typeClass, recType, invariantTypeArgs, unappliedTypeArgs),
         receiverType = receiverType,
         isAbstract = isAbstract,
         retTypeIsKinded = abstractReturnType.contains(kindedRegex(typeClassAbstractKind))
@@ -140,7 +143,7 @@ data class FunctionSignature(
     private fun findArgs(f: ProtoBuf.Function, typeClassAbstractKind: String, typeClass: ClassOrPackageDataWrapper, receiverType: ClassOrPackageDataWrapper.Class, invariantTypeArgs: List<String>, unappliedTypeArgs: List<Pair<String, String>>): HKArgs =
       when {
         f.hasReceiver() ->
-          HKArgs.First(argAsSeenFromReceiver(typeClassAbstractKind, f.receiverType.extractFullName(typeClass).normalizeType(), receiverType, invariantTypeArgs, unappliedTypeArgs))
+          HKArgs.First(argAsSeenFromReceiver(typeClassAbstractKind, f.receiverType.extractFullName(typeClass).asKotlin(), receiverType, invariantTypeArgs, unappliedTypeArgs))
         f.valueParameterList.isEmpty() -> HKArgs.None
         else -> HKArgs.Unknown
       }

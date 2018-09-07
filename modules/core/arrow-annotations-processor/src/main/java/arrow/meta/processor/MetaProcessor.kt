@@ -23,8 +23,8 @@ abstract class MetaProcessor<A : Annotation, B : Tree>(
   override fun getSupportedAnnotationTypes(): Set<String> = annotations.map { it.java.canonicalName }.toSet()
 
   sealed class AnnotatedElement {
-    data class Interface(val fileSpec: FileSpec.Builder, val typeElement: TypeElement, val type: Type) : AnnotatedElement()
-    data class Class(val fileSpec: FileSpec.Builder, val typeElement: TypeElement, val type: Type) : AnnotatedElement()
+    data class Interface(val typeElement: TypeElement, val type: Type) : AnnotatedElement()
+    data class Class(val typeElement: TypeElement, val type: Type) : AnnotatedElement()
   }
 
   abstract fun transform(annotatedElement: AnnotatedElement): FileSpec.Builder
@@ -45,18 +45,15 @@ abstract class MetaProcessor<A : Annotation, B : Tree>(
             ElementKind.INTERFACE, ElementKind.CLASS -> {
               val typeEncoder = this as MetaEncoder<Type>
               val typeElement = element as TypeElement
-              val className = typeElement.asClassName()
               val encodingResult = typeEncoder.encode(typeElement)
               encodingResult.fold({ knownError(it.toString()) }, {
                 transform(
                   if (element.kind.isInterface)
                     AnnotatedElement.Interface(
-                      fileSpec = FileSpec.builder(className.packageName, className.simpleName),
                       typeElement = typeElement,
                       type = it
                     )
                   else AnnotatedElement.Class(
-                    fileSpec = FileSpec.builder(className.packageName, className.simpleName),
                     typeElement = typeElement,
                     type = it
                   ))

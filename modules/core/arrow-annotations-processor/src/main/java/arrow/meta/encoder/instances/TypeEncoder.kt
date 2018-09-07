@@ -46,8 +46,8 @@ interface TypeEncoder : MetaEncoder<Type>, MetaProcessorUtils {
         modifiers = typeElement.modifiers(),
         typeVariables = typeElement.typeVariables(),
         superInterfaces = typeElement.superInterfaces(),
-        allFunctions = typeElement.allFunctions(),
-        declaredFunctions = typeElement.declaredFunctions(),
+        allFunctions = typeElement.allFunctions(typeElement),
+        declaredFunctions = typeElement.declaredFunctions(typeElement),
         properties = typeElement.properties(),
         types = typeElement.sealedSubClassNames().mapNotNull {
           if(it is TypeName.Classy && it.simpleName == "Companion") null else it.asType(this)

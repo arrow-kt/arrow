@@ -4,7 +4,10 @@ import arrow.optics.optics
 
 @optics
 data class Code(val value : String) {
-  companion object
+  override fun toString(): String = value
+  companion object {
+    val empty = Code("")
+  }
 }
 
 @optics

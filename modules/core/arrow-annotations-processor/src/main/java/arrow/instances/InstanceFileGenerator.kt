@@ -5,7 +5,7 @@ import arrow.common.messager.logW
 import arrow.common.utils.*
 import arrow.derive.FunctionSignature
 import arrow.derive.HKArgs
-import arrow.derive.normalizeType
+import arrow.derive.asKotlin
 import me.eugeniomarletti.kotlin.metadata.modality
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
@@ -38,7 +38,7 @@ data class Instance(
         val name = target.dataTypeInstance.nameResolver.getString(it.name)
         val upperBound = if (includeBounds && it.upperBoundList.isNotEmpty())
           it.upperBoundList
-            .map { it.extractFullName(target.dataTypeInstance).normalizeType() }
+            .map { it.extractFullName(target.dataTypeInstance).asKotlin() }
             .joinToString(separator = " : ", prefix = ": ")
         else ""
         if (reified) "reified $name" + upperBound else name + upperBound
@@ -60,20 +60,20 @@ data class Instance(
 
   private fun normalizeOverridenFunctions(): (List<FunctionMapping>, FunctionMapping) -> List<FunctionMapping> =
     { acc, func ->
-      val retType = func.function.returnType.extractFullName(func.typeClass).normalizeType()
+      val retType = func.function.returnType.extractFullName(func.typeClass).asKotlin()
       val existingParamInfo = getParamInfo(func.name to retType)
       when {
         acc.contains(func) -> acc //if the same param was already added ignore it
         else -> { //remove accumulated functions whose return types  supertypes of the current evaluated one and add the current one
           val remove = acc.find { av ->
             val avRetType = av.function.returnType.extractFullName(av.typeClass)
-              .normalizeType().substringBefore("<")
+              .asKotlin().substringBefore("<")
             existingParamInfo.superTypes.contains(avRetType)
           }
           val ignore = acc.any { av ->
             val avRetTypeUnparsed = av.function.returnType.extractFullName(av.typeClass)
               .removeBackticks()
-            val parsedRetType = retType.normalizeType().substringBefore("<")
+            val parsedRetType = retType.asKotlin().substringBefore("<")
             val avParamInfo = getParamInfo(av.name to avRetTypeUnparsed)
             avParamInfo.superTypes.contains(parsedRetType)
           }
@@ -239,7 +239,7 @@ class InstanceFileGenerator(
       }
 
       i.target.processor.logW(
-        "\n${i.target.dataTypeInstance.fullName.normalizeType()}#${sg.name}*" +
+        "\n${i.target.dataTypeInstance.fullName.asKotlin()}#${sg.name}*" +
           "\naltFunction : \t\t$altFunction" +
           "\ndatatype typeargs : \t\t${i.typeArgs()}" +
           "\ntypeClassTypeArgs: \t\t$typeClassTypeArgs" +

@@ -76,7 +76,7 @@ interface TypeDecoder : MetaDecoder<Type> {
     }
 
   fun Annotation.lyrics(): AnnotationSpec {
-    val className = ClassName.bestGuess(type.toString())
+    val className = if (type is TypeName.Classy) ClassName(type.pckg.value, type.simpleName) else ClassName.bestGuess(type.toString())
     val builder = AnnotationSpec.builder(className).useSiteTarget(useSiteTarget?.lyrics())
     return members.fold(builder) { b, member ->
       b.addMember(member.lyrics())
@@ -179,4 +179,39 @@ interface TypeDecoder : MetaDecoder<Type> {
       is TypeName.ParameterizedType -> lyrics()
       is TypeName.Classy -> lyrics()
     }
+
+  operator fun Code.Companion.invoke(f: () -> String): Code =
+    Code(CodeBlock.of(f().trimMargin()).toString())
+
+  operator fun TypeName?.unaryPlus(): Code =
+    if (this != null) Code(CodeBlock.of("%T", this.lyrics()).toString())
+    else Code("")
+
+  operator fun String.unaryPlus(): Code =
+    Code(CodeBlock.of("%N", this).toString())
+
+  operator fun List<String>.unaryPlus(): Code =
+    Code(joinToCode("%N").toString())
+
+  operator fun Iterable<TypeName.TypeVariable>.unaryPlus(): Code {
+    val list = toList()
+    return if (list.isEmpty()) Code.empty
+    else Code("<${list.joinToCode("%T")}>")
+  }
+
+  fun <A : Any> List<A>.joinToCode(separator: String): Code =
+    if (isEmpty()) Code(CodeBlock.of("").toString())
+    else {
+      val code = joinToString(", ") { separator }
+      val args = map { it.resolveDynamicArg() }.toTypedArray()
+      Code((if (args.isEmpty()) CodeBlock.of(code) else CodeBlock.of(code, *args)).toString())
+    }
+
+  private fun Any?.resolveDynamicArg(): Any? =
+    when (this) {
+      is TypeName -> lyrics()
+      is Parameter -> lyrics()
+      else -> this
+    }
+
 }
