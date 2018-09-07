@@ -28,6 +28,7 @@ Because `Kind<F, B>` cannot be created until `A` is unwrapped, it means that one
 ```kotlin:ank
 import arrow.core.*
 import arrow.instances.*
+import arrow.effects.*
 
 Some(1).flatMap { a ->
   Some(a + 1)
@@ -89,6 +90,18 @@ The [`Eval`]({{ '/docs/datatypes/eval' | relative_url }}) variant allows you to 
 ```kotlin:ank
 ForOption extensions {
   Some(1).followedBy(Some(2))
+}
+```
+
+#### effectM
+
+Executes two elements sequentially and ignores the result of the second. This is useful for effects like logging.
+
+```kotlin:ank
+fun logValue(i: Int): IO<Unit> = IO { /* println(i) */ }
+
+ForIO extensions {
+  IO.just(1).effectM(::logValue).fix().unsafeRunSync()
 }
 ```
 

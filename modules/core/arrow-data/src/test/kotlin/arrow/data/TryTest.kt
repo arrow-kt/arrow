@@ -330,6 +330,15 @@ class TryTest : UnitSpec() {
       failure.transform({ Try { it.toString() } }) { Try { "NaN" } }.get() shouldBe "NaN"
     }
 
+    "success" {
+      10.success() shouldBe success
+    }
+
+    "failure" {
+      val ex = NumberFormatException()
+      ex.failure<Int>() shouldBe Failure(ex)
+    }
+
     "flatten" {
       (Try { success }.flatten().isSuccess()) shouldBe true
       (Try { failure }.flatten().isFailure()) shouldBe true
