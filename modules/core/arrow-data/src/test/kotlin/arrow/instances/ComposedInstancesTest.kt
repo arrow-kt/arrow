@@ -36,7 +36,15 @@ class ComposedInstancesTest : UnitSpec() {
       }
 
     val EQ_OPTION_FN1: Eq<NestedType<ForOption, Conested<ForFunction1, Int>, Int>> = Eq { a, b ->
-      a.unnest().fix() == b.unnest().fix()
+      a.unnest().fix().fold(
+          { b.unnest().fix().isEmpty() },
+          { fnA ->
+            b.unnest().fix().fold(
+                { false },
+                { it.counnest().invoke(1) == fnA.counnest().invoke(1) }
+            )
+          }
+      )
     }
 
     val EQ_TUPLE2: Eq<Kind2<Nested<ForTuple2, ForTuple2>, Int, Int>> = Eq { a, b ->
