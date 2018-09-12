@@ -13,7 +13,7 @@ import io.kotlintest.properties.forAll
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.newSingleThreadContext
 
-object MonadSuspendLaws {
+object MonadDeferLaws {
   inline fun <F> laws(SC: MonadDefer<F>, EQ: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>, EQERR: Eq<Kind<F, Int>> = EQ): List<Law> =
     MonadErrorLaws.laws(SC, EQERR, EQ_EITHER, EQ) + listOf(
       Law("Sync bind: binding blocks") { SC.asyncBind(EQ) },
