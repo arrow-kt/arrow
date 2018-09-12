@@ -13,7 +13,6 @@ class ConstTest : UnitSpec() {
   init {
     ForConst(Int.monoid()) extensions {
       testLaws(
-        InvariantLaws.laws(this, { Const(it) }, Eq.any()),
         TraverseFilterLaws.laws(this, this, { Const(it) }, Eq.any()),
         ApplicativeLaws.laws(this, Eq.any()),
         EqLaws.laws(Const.eq<Int, Int>(Eq.any())) { Const(it) },

@@ -68,7 +68,6 @@ class ComposedInstancesTest : UnitSpec() {
     )
 
     testLaws(
-      InvariantLaws.laws(ComposedInvariant(Option.functor(), NonEmptyList.functor()), cf, EQ_OPTION_NEL),
       FunctorLaws.laws(ComposedFunctor(Option.functor(), NonEmptyList.functor()), cf, EQ_OPTION_NEL),
       FunctorFilterLaws.laws(ComposedFunctorFilter(OptionT.functorFilter(Id.monad()), OptionT.functorFilter(NonEmptyList.monad())), { OptionT.just(Id.monad(), OptionT.just(NonEmptyList.monad(), it)).nest() }, EQ_OPTIONT_ID_NEL),
       ApplicativeLaws.laws(ComposedApplicative(Option.applicative(), NonEmptyList.applicative()), EQ_OPTION_NEL),
