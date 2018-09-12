@@ -11,6 +11,8 @@ class Function1<I, out O>(val f: (I) -> O) : Function1Of<I, O> {
 
   fun <B> map(f: (O) -> B): Function1<I, B> = f.compose { a: I -> this.f(a) }.k()
 
+  fun <B> contramap(f: (B) -> I): Function1<B, O> = (this.f compose f).k()
+
   fun <B> flatMap(f: (O) -> Function1Of<I, B>): Function1<I, B> = { p: I -> f(this.f(p))(p) }.k()
 
   fun <B> ap(ff: Function1Of<I, (O) -> B>): Function1<I, B> = ff.fix().flatMap { f -> map(f) }.fix()
