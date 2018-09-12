@@ -149,4 +149,4 @@ The following data types in Arrow provide instances that adhere to the `Monad` t
 - [Mono]({{ '/docs/integrations/reactor' | relative_url }})
 - [IO]({{ '/docs/effects/io' | relative_url }})
 
-[monad_law_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/MonadLaws.kt
+[monad_law_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/MonadLaws.kt
