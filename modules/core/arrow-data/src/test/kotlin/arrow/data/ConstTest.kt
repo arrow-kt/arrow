@@ -3,10 +3,7 @@ package arrow.data
 import arrow.instances.monoid
 import arrow.mtl.instances.*
 import arrow.test.UnitSpec
-import arrow.test.laws.ApplicativeLaws
-import arrow.test.laws.EqLaws
-import arrow.test.laws.ShowLaws
-import arrow.test.laws.TraverseFilterLaws
+import arrow.test.laws.*
 import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import org.junit.runner.RunWith
