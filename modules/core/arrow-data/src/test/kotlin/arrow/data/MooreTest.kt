@@ -18,14 +18,12 @@ class MooreTest : UnitSpec() {
     fun handle(x: Int): Moore<Int, Int> = Moore(x, ::handle)
     val intMoore: (Int) -> MooreOf<Int, Int> = { x: Int -> Moore(x, ::handle) }
 
-    val EQ = object : Eq<MooreOf<Int, Int>> {
-      override fun MooreOf<Int, Int>.eqv(b: MooreOf<Int, Int>): Boolean =
-          this.fix().extract() == b.fix().extract()
+    val EQ = Eq<MooreOf<Int, Int>> { a, b ->
+      a.fix().extract() == b.fix().extract()
     }
 
     ForMoore<Int>() extensions {
       testLaws(
-          FunctorLaws.laws(Moore.functor(), intMoore, EQ),
           ComonadLaws.laws(Moore.comonad(), intMoore, EQ)
       )
     }

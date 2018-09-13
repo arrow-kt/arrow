@@ -17,21 +17,17 @@ data class Sum<F, G, V>(
     object Right : Side()
   }
 
-  fun <A> extend(CF: Comonad<F>, CG: Comonad<G>, f: (Sum<F, G, V>) -> A): Sum<F, G, A> = CF.run {
-    CG.run {
-      Sum(
-          left.coflatMap { f(Sum(left, right, Side.Left)) },
-          right.coflatMap { f(Sum(left, right, Side.Right)) },
-          side
-      )
-    }
-  }
+  fun <A> extend(CF: Comonad<F>, CG: Comonad<G>, f: (Sum<F, G, V>) -> A): Sum<F, G, A> = Sum(
+      CF.run { left.coflatMap { f(Sum(left, right, Side.Left)) } },
+      CG.run { right.coflatMap { f(Sum(left, right, Side.Right)) } },
+      side
+  )
 
-  fun <A> map(FF: Functor<F>, FG: Functor<G>, f: (V) -> A): Sum<F, G, A> = FF.run {
-    FG.run {
-      Sum(left.map(f), right.map(f), side)
-    }
-  }
+  fun <A> map(FF: Functor<F>, FG: Functor<G>, f: (V) -> A): Sum<F, G, A> = Sum(
+      FF.run { left.map(f) },
+      FG.run { right.map(f) },
+      side
+  )
 
   fun extract(CF: Comonad<F>, CG: Comonad<G>): V = CF.run {
     CG.run {

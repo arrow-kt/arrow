@@ -23,8 +23,7 @@ class StoreTest : UnitSpec() {
 
     ForStore<Int>() extensions {
       testLaws(
-          ComonadLaws.laws(Store.comonad(), intStore, EQ),
-          FunctorLaws.laws(Store.functor(), intStore, EQ)
+          ComonadLaws.laws(Store.comonad(), intStore, EQ)
       )
     }
 

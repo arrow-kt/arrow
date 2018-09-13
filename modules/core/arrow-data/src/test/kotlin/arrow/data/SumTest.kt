@@ -28,7 +28,6 @@ class SumTest : UnitSpec() {
 
     ForSum<ForId, ForId>(Id.comonad(), Id.comonad()) extensions {
       testLaws(
-          FunctorLaws.laws(Sum.functor(Id.functor(), Id.functor()), cf, EQ),
           ComonadLaws.laws(Sum.comonad(Id.comonad(), Id.comonad()), cf, EQ)
       )
     }
