@@ -11,7 +11,7 @@ import arrow.typeclasses.Functor
 @instance(Store::class)
 interface StoreComonadInstance<S> : Comonad<StorePartialOf<S>> {
   override fun <A, B> Kind<StorePartialOf<S>, A>.coflatMap(f: (Kind<StorePartialOf<S>, A>) -> B): Store<S, B> =
-      fix().extend(f)
+      fix().coflatmap(f)
 
   override fun <A> Kind<StorePartialOf<S>, A>.extract(): A =
       fix().extract()

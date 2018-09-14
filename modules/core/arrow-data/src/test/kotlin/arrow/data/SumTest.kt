@@ -1,19 +1,13 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.ForId
-import arrow.core.Id
-import arrow.core.comonad
-import arrow.core.fix
-import arrow.core.functor
+import arrow.core.*
 import arrow.instances.ForSum
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
-import arrow.test.laws.FunctorLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
-import javafx.geometry.Side
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -28,7 +22,7 @@ class SumTest : UnitSpec() {
 
     ForSum<ForId, ForId>(Id.comonad(), Id.comonad()) extensions {
       testLaws(
-          ComonadLaws.laws(Sum.comonad(Id.comonad(), Id.comonad()), cf, EQ)
+        ComonadLaws.laws(Sum.comonad(Id.comonad(), Id.comonad()), cf, EQ)
       )
     }
 
@@ -46,7 +40,7 @@ class SumTest : UnitSpec() {
 
     "Sum extend should transform view type" {
       val asciiValueFromLetter = { x: String -> x.first().toInt() }
-      val sum = abSum.extend(Id.comonad(), Id.comonad()) {
+      val sum = abSum.coflatMap(Id.comonad(), Id.comonad()) {
         when (it.side) {
           is Sum.Side.Left -> asciiValueFromLetter(it.left.fix().extract())
           is Sum.Side.Right -> asciiValueFromLetter(it.right.fix().extract())

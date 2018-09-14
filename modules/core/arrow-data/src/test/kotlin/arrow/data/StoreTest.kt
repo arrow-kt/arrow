@@ -3,7 +3,6 @@ package arrow.data
 import arrow.instances.ForStore
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
-import arrow.test.laws.FunctorLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
@@ -18,12 +17,12 @@ class StoreTest : UnitSpec() {
 
     val EQ = object : Eq<StoreOf<Int, Int>> {
       override fun StoreOf<Int, Int>.eqv(b: StoreOf<Int, Int>): Boolean =
-          this.fix().extract() == b.fix().extract()
+        this.fix().extract() == b.fix().extract()
     }
 
     ForStore<Int>() extensions {
       testLaws(
-          ComonadLaws.laws(Store.comonad(), intStore, EQ)
+        ComonadLaws.laws(Store.comonad(), intStore, EQ)
       )
     }
 
@@ -37,16 +36,16 @@ class StoreTest : UnitSpec() {
 
     "extend should create a new Store from the current one" {
       val store = greetingStore("Cotel")
-          .extend { (state) ->
-            if (state == "Cotel") "This is my master" else "This is not my master"
-          }
+        .coflatmap { (state) ->
+          if (state == "Cotel") "This is my master" else "This is not my master"
+        }
 
       store.extract() shouldBe "This is my master"
     }
 
     "map should modify the render result" {
       val store = greetingStore("Cotel")
-          .map { it.toUpperCase() }
+        .map { it.toUpperCase() }
 
       store.extract() shouldBe "HI COTEL!"
     }

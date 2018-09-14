@@ -11,7 +11,7 @@ import arrow.typeclasses.Functor
 @instance(Moore::class)
 interface MooreComonadInstance<V> : Comonad<MoorePartialOf<V>> {
   override fun <A, B> Kind<MoorePartialOf<V>, A>.coflatMap(f: (Kind<MoorePartialOf<V>, A>) -> B): Moore<V, B> =
-      fix().extend(f)
+      fix().coflatmap(f)
 
   override fun <A> Kind<MoorePartialOf<V>, A>.extract(): A =
       fix().extract()

@@ -4,7 +4,6 @@ import arrow.core.Id
 import arrow.instances.ForMoore
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
-import arrow.test.laws.FunctorLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
@@ -24,7 +23,7 @@ class MooreTest : UnitSpec() {
 
     ForMoore<Int>() extensions {
       testLaws(
-          ComonadLaws.laws(Moore.comonad(), intMoore, EQ)
+        ComonadLaws.laws(Moore.comonad(), intMoore, EQ)
       )
     }
 
@@ -38,47 +37,47 @@ class MooreTest : UnitSpec() {
 
     "routerMoore view should be about after sending about event" {
       val currentRoute = routerMoore
-          .handle("About")
-          .extract()
-          .extract()
+        .handle("About")
+        .extract()
+        .extract()
 
       currentRoute shouldBe "About"
     }
 
     "routerMoore view should be home after sending home event" {
       val currentRoute = routerMoore
-          .handle("About")
-          .handle("Home")
-          .extract()
-          .extract()
+        .handle("About")
+        .handle("Home")
+        .extract()
+        .extract()
 
       currentRoute shouldBe "Home"
     }
 
     "routerMoore view should be 0 after extending it for transforming view type" {
       val currentRoute = routerMoore
-          .extend { (view) ->
-            when (view.extract()) {
-              "About" -> 1
-              "Home" -> 2
-              else -> 0
-            }
+        .coflatmap { (view) ->
+          when (view.extract()) {
+            "About" -> 1
+            "Home" -> 2
+            else -> 0
           }
-          .extract()
+        }
+        .extract()
 
       currentRoute shouldBe 0
     }
 
     "routerMoore view should be 0 after mapping it for transforming view type" {
       val currentRoute = routerMoore
-          .map {
-            when (it.extract()) {
-              "About" -> 1
-              "Home" -> 2
-              else -> 0
-            }
+        .map {
+          when (it.extract()) {
+            "About" -> 1
+            "Home" -> 2
+            else -> 0
           }
-          .extract()
+        }
+        .extract()
 
       currentRoute shouldBe 0
     }

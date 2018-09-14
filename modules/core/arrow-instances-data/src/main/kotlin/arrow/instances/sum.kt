@@ -16,7 +16,7 @@ interface ComonadSumInstance<F, G> : Comonad<SumPartialOf<F, G>> {
   fun CG(): Comonad<G>
 
   override fun <A, B> Kind<SumPartialOf<F, G>, A>.coflatMap(f: (Kind<SumPartialOf<F, G>, A>) -> B): Sum<F, G, B> =
-      fix().extend(CF(), CG(), f)
+      fix().coflatMap(CF(), CG(), f)
 
   override fun <A> Kind<SumPartialOf<F, G>, A>.extract(): A =
       fix().extract(CF(), CG())
