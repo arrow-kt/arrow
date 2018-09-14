@@ -1,10 +1,12 @@
 package arrow.instances
 
+import arrow.Kind
 import arrow.data.Day
 import arrow.data.DayOf
 import arrow.data.DayPartialOf
 import arrow.data.fix
 import arrow.instance
+import arrow.typeclasses.Applicative
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
 
@@ -31,16 +33,37 @@ interface FunctorDayInstance<F, G> : Functor<DayPartialOf<F, G>> {
     fix().map(f)
 }
 
-class DayContext<F, G>(val CF: Comonad<F>, val CG: Comonad<G>) : ComonadDayInstance<F, G> {
+@instance(Day::class)
+interface ApplicativeDayInstance<F, G> : Applicative<DayPartialOf<F, G>> {
+  fun AF(): Applicative<F>
+
+  fun AG(): Applicative<G>
+
+  override fun <A, B> DayOf<F, G, A>.map(f: (A) -> B): Day<F, G, B> =
+    fix().map(f)
+
+  override fun <A> just(a: A): Day<F, G, A> =
+    Day.just(AF(), AG(), a)
+
+  override fun <A, B> Kind<DayPartialOf<F, G>, A>.ap(ff: Kind<DayPartialOf<F, G>, (A) -> B>): Day<F, G, B> =
+    fix().ap(AF(), AG(), ff)
+}
+
+class DayContext<F, G>(val AF: Applicative<F>, val AG: Applicative<G>, val CF: Comonad<F>, val CG: Comonad<G>) : ComonadDayInstance<F, G>, ApplicativeDayInstance<F, G> {
+  override fun <A, B> DayOf<F, G, A>.map(f: (A) -> B): Day<F, G, B> =
+    fix().map(f)
+
+  override fun AF(): Applicative<F> = AF
+  override fun AG(): Applicative<G> = AG
 
   override fun CF(): Comonad<F> = CF
   override fun CG(): Comonad<G> = CG
 }
 
-class DayContextPartiallyApplied<F, G>(val CF: Comonad<F>, val CG: Comonad<G>) {
+class DayContextPartiallyApplied<F, G>(val AF: Applicative<F>, val AG: Applicative<G>, val CF: Comonad<F>, val CG: Comonad<G>) {
   infix fun <A> extensions(f: DayContext<F, G>.() -> A): A =
-    f(DayContext(CF, CG))
+    f(DayContext(AF, AG, CF, CG))
 }
 
-fun <F, G> ForDay(CF: Comonad<F>, CG: Comonad<G>): DayContextPartiallyApplied<F, G> =
-  DayContextPartiallyApplied(CF, CG)
+fun <F, G> ForDay(AF: Applicative<F>, AG: Applicative<G>, CF: Comonad<F>, CG: Comonad<G>): DayContextPartiallyApplied<F, G> =
+  DayContextPartiallyApplied(AF, AG, CF, CG)
