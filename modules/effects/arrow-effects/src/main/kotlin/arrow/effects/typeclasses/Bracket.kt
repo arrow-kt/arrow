@@ -5,7 +5,7 @@ import arrow.typeclasses.MonadError
 
 interface Bracket<F, E> : MonadError<F, E> {
 
-  fun <F, A, B> Kind<F, A>.bracketCase(release: (A, ExitCase<E>) -> Kind<F, Unit>, use: (A) -> Kind<F, B>): Kind<F, B>
+  fun <A, B> Kind<F, A>.bracketCase(release: (A, ExitCase<E>) -> Kind<F, Unit>, use: (A) -> Kind<F, B>): Kind<F, B>
 
   fun <A, B> Kind<F, A>.bracket(release: (A) -> Kind<F, Unit>, use: (A) -> Kind<F, B>): Kind<F, B> =
     bracketCase({ a, _ -> release(a) }, use)
