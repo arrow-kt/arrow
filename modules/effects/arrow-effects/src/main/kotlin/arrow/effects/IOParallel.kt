@@ -20,7 +20,7 @@ fun <A, B, C> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IO<A>, ioB: 
 
   return IO.async { cb: (Either<Throwable, C>) -> Unit ->
     cbf.set(cb)
-    IO.async(IO.cancellableEffect().parMapCancellable2(ctx, ioA, ioB, f)
+    IO.async(IO.concurrentEffect().parMapCancellable2(ctx, ioA, ioB, f)
     { it.fix().unsafeRunAsync { it.fold({ cb(it.left()) }, { cancel.set(it) }) } }
     ).unsafeRunAsync(complete)
   }.handleErrorWith {
@@ -43,7 +43,7 @@ fun <A, B, C, D> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IO<A>, io
 
   return IO.async { cb: (Either<Throwable, D>) -> Unit ->
     cbf.set(cb)
-    IO.async(IO.cancellableEffect().parMapCancellable3(ctx, ioA, ioB, ioC, f)
+    IO.async(IO.concurrentEffect().parMapCancellable3(ctx, ioA, ioB, ioC, f)
     { it.fix().unsafeRunAsync { it.fold({ cb(it.left()) }, { cancel.set(it) }) } }
     ).unsafeRunAsync(complete)
   }.handleErrorWith {
@@ -105,7 +105,7 @@ fun <A, B> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>): IO<Eit
 
   return IO.async { cb: (Either<Throwable, Either<A, B>>) -> Unit ->
     cbf.set(cb)
-    IO.async(IO.cancellableEffect().parMapCancellable2(ctx,
+    IO.async(IO.concurrentEffect().parMapCancellable2(ctx,
       a.flatMap { IO { complete(it.left().right()) } },
       b.flatMap { IO { complete(it.right().right()) } },
       ::Tuple2)
@@ -131,7 +131,7 @@ fun <A, B, C> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>, c: I
 
   return IO.async { cb: (Either<Throwable, Either<A, Either<B, C>>>) -> Unit ->
     cbf.set(cb)
-    IO.async(IO.cancellableEffect().parMapCancellable3(ctx,
+    IO.async(IO.concurrentEffect().parMapCancellable3(ctx,
       a.flatMap { IO { complete(it.left().right()) } },
       b.flatMap { IO { complete(it.left().right().right()) } },
       c.flatMap { IO { complete(it.right().right().right()) } },
