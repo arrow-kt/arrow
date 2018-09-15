@@ -14,9 +14,6 @@ import arrow.typeclasses.Comonad
  * `runDay` is an encoding of an Existential function for <R>, meaning that it can't be passed as a constructor parameter.
  * The inputs and outputs are both `Any?` to avoid type annotations that won't be used externally.
  *
- * The other functions start by creating their own private `Day` object so they don't eagerly invoke `runDay`.
- * They could be made safer by using the invoke constructor, but that'll make them eager.
- *
  * There are only two constructors, and thank got they're type-safe externally.
  */
 
