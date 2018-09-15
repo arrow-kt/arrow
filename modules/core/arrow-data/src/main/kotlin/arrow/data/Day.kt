@@ -15,6 +15,7 @@ import arrow.typeclasses.Comonad
  * The inputs and outputs are both `Any?` to avoid type annotations that won't be used externally.
  *
  * The other functions start by creating their own private `Day` object so they don't eagerly invoke `runDay`.
+ * They could be made safer by using the invoke constructor, but that'll make them eager.
  *
  * There are only two constructors, and thank got they're type-safe externally.
  */
@@ -27,7 +28,14 @@ abstract class Day<F, G, A> private constructor() : DayOf<F, G, A> {
   fun extract(CF: Comonad<F>, CG: Comonad<G>): A =
     runDay { left, right, get -> get(CF.run { left.extract() }, CG.run { right.extract() }) }
 
-  fun <B> map(f: (A) -> B): Day<F, G, B> = object : Day<F, G, B>() {
+  fun <B> map(f: (A) -> B): Day<F, G, B> =
+    this@Day.runDay { left, right, get ->
+      Day(left, right) { x, y ->
+        f(get(x, y))
+      }
+    }
+
+  fun <B> mapLazy(f: (A) -> B): Day<F, G, B> = object : Day<F, G, B>() {
     override fun <R> runDay(ff: (left: Kind<F, *>, right: Kind<G, *>, get: (Any?, Any?) -> B) -> R): R =
       this@Day.runDay { left, right, get ->
         ff(left, right) { x, y ->
@@ -36,8 +44,19 @@ abstract class Day<F, G, A> private constructor() : DayOf<F, G, A> {
       }
   }
 
+  fun <B> ap(AF: Applicative<F>, AG: Applicative<G>, f: DayOf<F, G, (A) -> B>): Day<F, G, B> =
+    this@Day.runDay { left, right, get ->
+      f.fix().runDay { lf, rf, getf ->
+        val l = AF.run { tupled(left, lf) }
+        val r = AG.run { tupled(right, rf) }
+        Day(l, r) { x, y ->
+          getf(x.b, y.b).invoke(get(x.a, y.a))
+        }
+      }
+    }
+
   @Suppress("UNCHECKED_CAST")
-  fun <B> ap(AF: Applicative<F>, AG: Applicative<G>, f: DayOf<F, G, (A) -> B>): Day<F, G, B> = object : Day<F, G, B>() {
+  fun <B> apLazy(AF: Applicative<F>, AG: Applicative<G>, f: DayOf<F, G, (A) -> B>): Day<F, G, B> = object : Day<F, G, B>() {
     override fun <R> runDay(ff: (Kind<F, *>, Kind<G, *>, (Any?, Any?) -> B) -> R): R =
       this@Day.runDay { left, right, get ->
         f.fix().runDay { lf, rf, getf ->
@@ -53,8 +72,17 @@ abstract class Day<F, G, A> private constructor() : DayOf<F, G, A> {
       }
   }
 
+  fun <B> coflatMap(CF: Comonad<F>, CG: Comonad<G>, f: (DayOf<F, G, A>) -> B): Day<F, G, B> =
+    this@Day.runDay { left, right, get ->
+      val l = CF.run { left.duplicate() }
+      val r = CG.run { right.duplicate() }
+      Day(l, r) { x, y ->
+        f(Day(x, y, get))
+      }
+    }
+
   @Suppress("UNCHECKED_CAST")
-  fun <B> coflatMap(CF: Comonad<F>, CG: Comonad<G>, f: (DayOf<F, G, A>) -> B): Day<F, G, B> = object : Day<F, G, B>() {
+  fun <B> coflatMapLazy(CF: Comonad<F>, CG: Comonad<G>, f: (DayOf<F, G, A>) -> B): Day<F, G, B> = object : Day<F, G, B>() {
     override fun <R> runDay(ff: (Kind<F, *>, Kind<G, *>, (Any?, Any?) -> B) -> R): R =
       this@Day.runDay { left, right, get ->
         val l = CF.run { left.duplicate() }
@@ -70,10 +98,7 @@ abstract class Day<F, G, A> private constructor() : DayOf<F, G, A> {
 
   companion object {
     fun <F, G, A> just(AF: Applicative<F>, AG: Applicative<G>, a: A): Day<F, G, A> =
-      object : Day<F, G, A>() {
-        override fun <R> runDay(ff: (Kind<F, *>, Kind<G, *>, (Any?, Any?) -> A) -> R): R =
-          ff(AF.just(Unit), AG.just(Unit)) { _, _ -> a }
-      }
+      Day(AF.just(Unit), AG.just(Unit)) { _, _ -> a }
 
     @Suppress("UNCHECKED_CAST")
     operator fun <F, G, X, Y, A> invoke(left: Kind<F, X>, right: Kind<G, Y>, f: (X, Y) -> A): Day<F, G, A> = object : Day<F, G, A>() {
