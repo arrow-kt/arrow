@@ -9,7 +9,7 @@ import arrow.typeclasses.MonadError
 import kotlin.coroutines.experimental.startCoroutine
 
 /** The context required to defer evaluating a safe computation. **/
-interface MonadDefer<F> : MonadError<F, Throwable> {
+interface MonadDefer<F> : Bracket<F, Throwable> {
   fun <A> defer(fa: () -> Kind<F, A>): Kind<F, A>
 
   operator fun <A> invoke(f: () -> A): Kind<F, A> =

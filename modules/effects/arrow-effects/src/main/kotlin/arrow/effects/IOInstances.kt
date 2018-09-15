@@ -67,7 +67,13 @@ interface IOMonadErrorInstance : IOMonadInstance, MonadError<ForIO, Throwable> {
 }
 
 @instance(IO::class)
-interface IOMonadDeferInstance : IOMonadErrorInstance, MonadDefer<ForIO> {
+interface IOBracketInstance : IOMonadErrorInstance, Bracket<ForIO, Throwable> {
+  override fun <A, B> IOOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
+    TODO()
+}
+
+@instance(IO::class)
+interface IOMonadDeferInstance : IOBracketInstance, MonadDefer<ForIO> {
   override fun <A> defer(fa: () -> IOOf<A>): IO<A> =
     IO.defer(fa)
 
