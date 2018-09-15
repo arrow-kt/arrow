@@ -11,7 +11,7 @@ interface Bracket<F, E> : MonadError<F, E> {
     bracketCase({ a, _ -> release(a) }, use)
 
   fun <A> Kind<F, A>.uncancelable(): Kind<F, A> =
-    bracket({ just(Unit) }, { just(it) })
+    bracket({ just<Unit>(Unit) }, { just(it) })
 
   fun <A> Kind<F, A>.guarantee(finalizer: Kind<F, Unit>): Kind<F, A> =
     bracket({ _ -> finalizer }, { _ -> this })
