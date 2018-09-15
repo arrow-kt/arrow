@@ -118,12 +118,12 @@ interface ObservableKEffectInstance :
 }
 
 @instance(ObservableK::class)
-interface ObservableKCancellableEffectInstance : ObservableKEffectInstance, CancellableEffect<ForObservableK> {
+interface ObservableKConcurrentEffectInstance : ObservableKEffectInstance, ConcurrentEffect<ForObservableK> {
   override fun <A> Kind<ForObservableK, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Disposable> =
     fix().runAsyncCancellable(cb)
 }
 
-object ObservableKContext : ObservableKCancellableEffectInstance, ObservableKTraverseInstance {
+object ObservableKContext : ObservableKConcurrentEffectInstance, ObservableKTraverseInstance {
   override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
     fix().map(f)
 }

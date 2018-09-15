@@ -2,7 +2,7 @@ package arrow.effects.internal
 
 import arrow.Kind
 import arrow.core.*
-import arrow.effects.typeclasses.CancellableEffect
+import arrow.effects.typeclasses.ConcurrentEffect
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.Proc
@@ -69,7 +69,7 @@ internal fun <F, A, B, C, D> Effect<F>.parMap3(ctx: CoroutineContext, ioA: Kind<
 }
 
 /* See parMap3 */
-internal fun <F, A, B, C> CancellableEffect<F>.parMapCancellable2(ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, f: (A, B) -> C,
+internal fun <F, A, B, C> ConcurrentEffect<F>.parMapCancellable2(ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, f: (A, B) -> C,
   /* start is used because this has to start inside the coroutine. Using Future won't work */
                                                                   start: (Kind<F, Disposable>) -> Unit): Proc<C> = { cc ->
   val a: suspend () -> Either<A, B> = {
@@ -92,7 +92,7 @@ internal fun <F, A, B, C> CancellableEffect<F>.parMapCancellable2(ctx: Coroutine
 }
 
 /* See parMap3 */
-internal fun <F, A, B, C, D> CancellableEffect<F>.parMapCancellable3(ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, ioC: Kind<F, C>, f: (A, B, C) -> D,
+internal fun <F, A, B, C, D> ConcurrentEffect<F>.parMapCancellable3(ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, ioC: Kind<F, C>, f: (A, B, C) -> D,
   /* start is used because this has to start inside the coroutine. Using Future won't work */
                                                                      start: (Kind<F, Disposable>) -> Unit): Proc<D> = { cc ->
   val a: suspend () -> Treither<A, B, C> = {

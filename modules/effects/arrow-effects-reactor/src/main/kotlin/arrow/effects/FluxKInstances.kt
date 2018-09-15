@@ -118,14 +118,14 @@ interface FluxKEffectInstance :
 }
 
 @instance(FluxK::class)
-interface FluxKCancellableEffectInstance :
+interface FluxKConcurrentEffectInstance :
   FluxKEffectInstance,
-  CancellableEffect<ForFluxK> {
+  ConcurrentEffect<ForFluxK> {
   override fun <A> Kind<ForFluxK, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> FluxKOf<Unit>): FluxK<Disposable> =
     fix().runAsyncCancellable(cb)
 }
 
-object FluxKContext : FluxKCancellableEffectInstance, FluxKTraverseInstance {
+object FluxKContext : FluxKConcurrentEffectInstance, FluxKTraverseInstance {
   override fun <A, B> FluxKOf<A>.map(f: (A) -> B): FluxK<B> =
     fix().map(f)
 }

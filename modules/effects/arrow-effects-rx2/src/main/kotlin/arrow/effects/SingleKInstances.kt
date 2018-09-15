@@ -93,12 +93,12 @@ interface SingleKEffectInstance :
 }
 
 @instance(SingleK::class)
-interface SingleKCancellableEffectInstance : SingleKEffectInstance, CancellableEffect<ForSingleK> {
+interface SingleKConcurrentEffectInstance : SingleKEffectInstance, ConcurrentEffect<ForSingleK> {
   override fun <A> Kind<ForSingleK, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> SingleKOf<Unit>): SingleK<Disposable> =
     fix().runAsyncCancellable(cb)
 }
 
-object SingleKContext : SingleKCancellableEffectInstance
+object SingleKContext : SingleKConcurrentEffectInstance
 
 infix fun <A> ForSingleK.Companion.extensions(f: SingleKContext.() -> A): A =
   f(SingleKContext)

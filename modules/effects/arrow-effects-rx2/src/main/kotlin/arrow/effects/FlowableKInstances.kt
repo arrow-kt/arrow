@@ -121,12 +121,12 @@ interface FlowableKEffectInstance :
 }
 
 @instance(FlowableK::class)
-interface FlowableKCancellableEffectInstance : FlowableKEffectInstance, CancellableEffect<ForFlowableK> {
+interface FlowableKConcurrentEffectInstance : FlowableKEffectInstance, ConcurrentEffect<ForFlowableK> {
   override fun <A> Kind<ForFlowableK, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Disposable> =
     fix().runAsyncCancellable(cb)
 }
 
-object FlowableKContext : FlowableKCancellableEffectInstance, FlowableKTraverseInstance {
+object FlowableKContext : FlowableKConcurrentEffectInstance, FlowableKTraverseInstance {
   override fun <A, B> FlowableKOf<A>.map(f: (A) -> B): FlowableK<B> =
     fix().map(f)
 }

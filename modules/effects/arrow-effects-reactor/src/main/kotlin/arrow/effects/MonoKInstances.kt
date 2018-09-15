@@ -93,14 +93,14 @@ interface MonoKEffectInstance :
 }
 
 @instance(MonoK::class)
-interface MonoKCancellableEffectInstance :
+interface MonoKConcurrentEffectInstance :
   MonoKEffectInstance,
-  CancellableEffect<ForMonoK> {
+  ConcurrentEffect<ForMonoK> {
   override fun <A> Kind<ForMonoK, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Disposable> =
     fix().runAsyncCancellable(cb)
 }
 
-object MonoKContext : MonoKCancellableEffectInstance
+object MonoKContext : MonoKConcurrentEffectInstance
 
 infix fun <A> ForMonoK.Companion.extensions(f: MonoKContext.() -> A): A =
   f(MonoKContext)

@@ -91,12 +91,12 @@ interface DeferredKEffectInstance : DeferredKAsyncInstance, Effect<ForDeferredK>
 }
 
 @instance(DeferredK::class)
-interface DeferredKCancellableEffectInstance : DeferredKEffectInstance, CancellableEffect<ForDeferredK> {
+interface DeferredKConcurrentEffectInstance : DeferredKEffectInstance, ConcurrentEffect<ForDeferredK> {
   override fun <A> Kind<ForDeferredK, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> Kind<ForDeferredK, Unit>): Kind<ForDeferredK, Disposable> =
     fix().runAsyncCancellable(OnCancel.ThrowCancellationException, cb)
 }
 
-object DeferredKContext : DeferredKCancellableEffectInstance
+object DeferredKContext : DeferredKConcurrentEffectInstance
 
 infix fun <A> ForDeferredK.Companion.extensions(f: DeferredKContext.() -> A): A =
   f(DeferredKContext)

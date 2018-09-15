@@ -93,7 +93,7 @@ interface IOEffectInstance : IOAsyncInstance, Effect<ForIO> {
 }
 
 @instance(IO::class)
-interface IOCancellableEffectInstance : IOEffectInstance, CancellableEffect<ForIO> {
+interface IOConcurrentEffectInstance : IOEffectInstance, ConcurrentEffect<ForIO> {
   override fun <A> Kind<ForIO, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> Kind<ForIO, Unit>): IO<Disposable> =
     fix().runAsyncCancellable(OnCancel.ThrowCancellationException, cb)
 }
@@ -118,7 +118,7 @@ interface IOSemigroupInstance<A> : Semigroup<Kind<ForIO, A>> {
     fix().flatMap { a1: A -> b.fix().map { a2: A -> SG().run { a1.combine(a2) } } }
 }
 
-object IOContext : IOCancellableEffectInstance
+object IOContext : IOConcurrentEffectInstance
 
 infix fun <A> ForIO.Companion.extensions(f: IOContext.() -> A): A =
   f(IOContext)
