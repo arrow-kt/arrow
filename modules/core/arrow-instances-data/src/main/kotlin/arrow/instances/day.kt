@@ -12,16 +12,12 @@ import arrow.typeclasses.Functor
 
 @instance(Day::class)
 interface ComonadDayInstance<F, G> : Comonad<DayPartialOf<F, G>> {
-  fun AF(): Applicative<F>
-
-  fun AG(): Applicative<G>
-
   fun CF(): Comonad<F>
 
   fun CG(): Comonad<G>
 
   override fun <A, B> DayOf<F, G, A>.coflatMap(f: (DayOf<F, G, A>) -> B): Day<F, G, B> =
-    fix().coflatMap(AF(), AG(), f)
+    fix().coflatMap(CF(), CG(), f)
 
   override fun <A> DayOf<F, G, A>.extract(): A =
     fix().extract(CF(), CG())
@@ -43,10 +39,6 @@ interface ApplicativeDayInstance<F, G> : Applicative<DayPartialOf<F, G>> {
 
   fun AG(): Applicative<G>
 
-  fun CF(): Comonad<F>
-
-  fun CG(): Comonad<G>
-
   override fun <A, B> DayOf<F, G, A>.map(f: (A) -> B): Day<F, G, B> =
     fix().map(f)
 
@@ -54,7 +46,7 @@ interface ApplicativeDayInstance<F, G> : Applicative<DayPartialOf<F, G>> {
     Day.just(AF(), AG(), a)
 
   override fun <A, B> Kind<DayPartialOf<F, G>, A>.ap(ff: Kind<DayPartialOf<F, G>, (A) -> B>): Day<F, G, B> =
-    fix().ap(CF(), CG(), ff)
+    fix().ap(AF(), AG(), ff)
 }
 
 class DayContext<F, G>(val AF: Applicative<F>, val AG: Applicative<G>, val CF: Comonad<F>, val CG: Comonad<G>) : ComonadDayInstance<F, G>, ApplicativeDayInstance<F, G> {

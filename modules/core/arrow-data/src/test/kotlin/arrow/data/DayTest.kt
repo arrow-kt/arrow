@@ -24,8 +24,8 @@ class DayTest : UnitSpec() {
 
     ForDay(Id.applicative(), Id.applicative(), Id.comonad(), Id.comonad()) extensions {
       testLaws(
-        ApplicativeLaws.laws(Day.applicative(Id.applicative(), Id.comonad(), Id.applicative(), Id.comonad()), EQ),
-        ComonadLaws.laws(Day.comonad(Id.applicative(), Id.comonad(), Id.applicative(), Id.comonad()), cf, EQ)
+        ApplicativeLaws.laws(Day.applicative(Id.applicative(), Id.applicative()), EQ),
+        ComonadLaws.laws(Day.comonad(Id.comonad(), Id.comonad()), cf, EQ)
       )
     }
   }
