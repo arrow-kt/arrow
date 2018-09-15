@@ -26,7 +26,7 @@ abstract class Day<F, G, A> private constructor() : DayOf<F, G, A> {
     runDay { left, right, get -> get(CF.run { left.extract() }, CG.run { right.extract() }) }
 
   fun <B> map(f: (A) -> B): Day<F, G, B> =
-    this@Day.runDay { left, right, get ->
+    runDay { left, right, get ->
       Day(left, right) { x, y ->
         f(get(x, y))
       }
@@ -42,7 +42,7 @@ abstract class Day<F, G, A> private constructor() : DayOf<F, G, A> {
   }
 
   fun <B> ap(AF: Applicative<F>, AG: Applicative<G>, f: DayOf<F, G, (A) -> B>): Day<F, G, B> =
-    this@Day.runDay { left, right, get ->
+    runDay { left, right, get ->
       f.fix().runDay { lf, rf, getf ->
         val l = AF.run { tupled(left, lf) }
         val r = AG.run { tupled(right, rf) }
@@ -70,7 +70,7 @@ abstract class Day<F, G, A> private constructor() : DayOf<F, G, A> {
   }
 
   fun <B> coflatMap(CF: Comonad<F>, CG: Comonad<G>, f: (DayOf<F, G, A>) -> B): Day<F, G, B> =
-    this@Day.runDay { left, right, get ->
+    runDay { left, right, get ->
       val l = CF.run { left.duplicate() }
       val r = CG.run { right.duplicate() }
       Day(l, r) { x, y ->
