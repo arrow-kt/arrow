@@ -16,7 +16,7 @@ import org.junit.runner.RunWith
 class DayTest : UnitSpec() {
   init {
 
-    val cf = { x: Int -> Day.just(Id.applicative(), Id.applicative(), x) }
+    val cf = { x: Int -> Day(Id(x), Id(0)) { xx, yy -> xx + yy } }
 
     val EQ: Eq<DayOf<ForId, ForId, Int>> = Eq { a, b ->
       a.fix().extract(Id.comonad(), Id.comonad()) == b.fix().extract(Id.comonad(), Id.comonad())
