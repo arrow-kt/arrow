@@ -18,7 +18,7 @@ import arrow.typeclasses.Comonad
  */
 
 @higherkind
-abstract class Day<F, G, A> private constructor() : DayOf<F, G, A> {
+abstract class Day<F, G, A> private constructor() : DayOf<F, G, A>, DayKindedJ<F, G, A> {
 
   internal abstract fun <R> runDay(ff: (Kind<F, *>, Kind<G, *>, (Any?, Any?) -> A) -> R): R
 

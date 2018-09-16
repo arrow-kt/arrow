@@ -3,7 +3,7 @@ package arrow.data
 import arrow.higherkind
 
 @higherkind
-data class Moore<E, V>(val view: V, val handle: (E) -> Moore<E, V>) : MooreOf<E, V> {
+data class Moore<E, V>(val view: V, val handle: (E) -> Moore<E, V>) : MooreOf<E, V>, MooreKindedJ<E, V> {
 
   fun <A> coflatmap(f: (Moore<E, V>) -> A): Moore<E, A> =
     Moore(f(Moore(view, handle))) { update -> handle(update).coflatmap(f) }
