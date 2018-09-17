@@ -1,5 +1,6 @@
 package arrow.data
 
+import arrow.core.identity
 import arrow.higherkind
 
 @higherkind
@@ -11,6 +12,10 @@ data class Store<S, V>(val state: S, val render: (S) -> V) : StoreOf<S, V>, Stor
     Store(state) { next: S -> f(Store(next, render)) }
 
   fun extract(): V = render(state)
+
+  fun duplicate(): Store<S, Store<S, V>> = coflatmap(::identity)
+
+  fun move(newState: S): Store<S, V> = duplicate().render(newState)
 
   companion object
 }

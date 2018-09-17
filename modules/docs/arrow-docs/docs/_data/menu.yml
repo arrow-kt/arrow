@@ -98,6 +98,9 @@ options:
       - title: StateT
         url: /docs/datatypes/statet/
 
+      - title: Store
+        url: /docs/datatypes/store/
+
       - title: WriterT
         url: /docs/datatypes/writert/
 
