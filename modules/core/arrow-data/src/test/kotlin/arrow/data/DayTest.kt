@@ -4,6 +4,7 @@ import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.IdOf
 import arrow.core.Tuple2
+import arrow.core.Tuple2Of
 import arrow.core.applicative
 import arrow.core.comonad
 import arrow.core.fix
@@ -49,8 +50,8 @@ class DayTest : UnitSpec() {
 
 
     "Day coflatMap should transform result type" {
-      val day = day.coflatMap(Id.comonad(), Id.comonad()) {
-          val (left, right) = it.fix().extract(Id.comonad(), Id.comonad())
+      val day = day.coflatMap(Id.comonad(), Id.comonad()) { it: DayOf<ForId, ForId, Tuple2Of<Int, Int>> ->
+          val (left, right) = it.fix().extract(Id.comonad(), Id.comonad()).fix()
           compareSides(left, right)
         }
 
@@ -69,8 +70,8 @@ class DayTest : UnitSpec() {
     }
 
     "Day coflatMapLazy should transform result type" {
-      val day = day.coflatMapLazy(Id.comonad(), Id.comonad()) {
-        val (left, right) = it.fix().extract(Id.comonad(), Id.comonad())
+      val day = day.coflatMapLazy(Id.comonad(), Id.comonad()) { it: DayOf<ForId, ForId, Tuple2Of<Int, Int>> ->
+        val (left, right) = it.fix().extract(Id.comonad(), Id.comonad()).fix()
         compareSides(left, right)
       }
 
