@@ -2,6 +2,7 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.*
+import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Traverse
@@ -106,6 +107,18 @@ fun <A> DeferredKOf<A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKOf<Unit>)
     unsafeRunAsync(cb.andThen { })
   }
 
+fun <A> DeferredKOf<A>.runAsyncCancellable(onCancel: OnCancel = OnCancel.Silent, cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Disposable> =
+  async {
+    val call = runAsync(cb)
+    val disposable: Disposable = {
+      when (onCancel) {
+        OnCancel.ThrowCancellationException -> call.cancel(OnCancel.CancellationException)
+        OnCancel.Silent -> call.cancel()
+      }
+    }
+    disposable
+  }.k()
+
 fun <A> DeferredKOf<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
   async(Unconfined, CoroutineStart.DEFAULT) {
     Try { await() }.fold({ cb(Left(it)) }, { cb(Right(it)) })
@@ -119,5 +132,5 @@ fun <A> DeferredKOf<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit 
 suspend fun <A> DeferredKOf<A>.await(): A = this.fix().await()
 
 suspend fun <F, A> Kind<F, DeferredKOf<A>>.awaitAll(T: Traverse<F>): Kind<F, A> = T.run {
-    this@awaitAll.sequence(DeferredK.applicative()).await()
+  this@awaitAll.sequence(DeferredK.applicative()).await()
 }

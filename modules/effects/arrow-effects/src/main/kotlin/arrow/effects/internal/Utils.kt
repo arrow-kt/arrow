@@ -7,6 +7,7 @@ import arrow.core.Some
 import arrow.effects.IO
 import arrow.effects.typeclasses.Duration
 import java.util.*
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
 
@@ -73,6 +74,26 @@ object Platform {
       is Either.Left -> throw eitherRef.a
       is Either.Right -> Some(eitherRef.b)
     }
+  }
+}
+
+internal class FutureN<A>(count: Int = 1) {
+  private val latch = CountDownLatch(count)
+  private var ref: MutableList<A> = mutableListOf()
+
+  fun unsafeGet(): List<A> {
+    latch.await()
+    return ref.toList()
+  }
+
+  fun get(limit: Duration): List<A> {
+    latch.await(limit.amount, limit.timeUnit)
+    return ref.toList()
+  }
+
+  fun set(value: A) = synchronized(this) {
+    ref.add(value)
+    latch.countDown()
   }
 }
 

@@ -2,10 +2,7 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.effects.typeclasses.Async
-import arrow.effects.typeclasses.Effect
-import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.*
 import arrow.instance
 import arrow.typeclasses.*
 import kotlin.coroutines.experimental.CoroutineContext
@@ -93,7 +90,13 @@ interface DeferredKEffectInstance : DeferredKAsyncInstance, Effect<ForDeferredK>
     fix().deferredRunAsync(cb)
 }
 
-object DeferredKContext : DeferredKEffectInstance
+@instance(DeferredK::class)
+interface DeferredKConcurrentEffectInstance : DeferredKEffectInstance, ConcurrentEffect<ForDeferredK> {
+  override fun <A> Kind<ForDeferredK, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> Kind<ForDeferredK, Unit>): Kind<ForDeferredK, Disposable> =
+    fix().runAsyncCancellable(OnCancel.ThrowCancellationException, cb)
+}
+
+object DeferredKContext : DeferredKConcurrentEffectInstance
 
 infix fun <A> ForDeferredK.Companion.extensions(f: DeferredKContext.() -> A): A =
   f(DeferredKContext)
