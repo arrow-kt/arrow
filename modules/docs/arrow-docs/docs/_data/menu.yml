@@ -101,6 +101,9 @@ options:
       - title: Store
         url: /docs/datatypes/store/
 
+      - title: Moore
+        url: /docs/datatype/moore/
+
       - title: WriterT
         url: /docs/datatypes/writert/
 

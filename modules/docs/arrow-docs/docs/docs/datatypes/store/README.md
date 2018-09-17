@@ -34,12 +34,12 @@ We also have two methods from `Comonad`:
 
 * `extract` for rendering the current state.
 
-* `coflatMap` for replacing the representation type in each future state.
+* `coflatmap` for replacing the representation type in each future state.
 
 ```kotlin:ank
 import arrow.core.*
 
-val tupleStore = store.coflatMap { it: Store<Int, String> -> Tuple2("State", it.state) }
+val tupleStore = store.coflatmap { it: Store<Int, String> -> Tuple2("State", it.state) }
 tupleStore.extract()
 ```
 
