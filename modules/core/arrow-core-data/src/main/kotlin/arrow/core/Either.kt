@@ -361,3 +361,13 @@ fun <A, B> B?.rightIfNotNull(default: () -> A): Either<A, B> = when (this) {
   null -> Either.Left(default())
   else -> Either.Right(this)
 }
+
+/**
+ * Convenience extension for [Collection<Either<*, A>>] to get a [Collection<A>] with only the Either.rights.
+ *
+ * Example:
+ * ```
+ * listOf("value".right(), "other".left()).collect() // ["value"]
+ * ```
+ */
+fun <A> Collection<Either<*, A>>.collect(): Collection<A> where A : Any = mapNotNull { it.orNull() }

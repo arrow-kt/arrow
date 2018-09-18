@@ -129,6 +129,12 @@ class EitherTest : UnitSpec() {
       }
     }
 
+    "collect should return only the Right values" {
+      forAll { a: Int, b: Int ->
+        listOf(a.right(), b.left()).collect() == listOf(a)
+      }
+    }
+
     "swap should interchange values" {
       forAll { a: Int ->
         Left(a).swap() == Right(a)
