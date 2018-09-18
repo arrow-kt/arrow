@@ -43,11 +43,11 @@ val tupleStore = store.coflatmap { it: Store<Int, String> -> Tuple2("State", it.
 tupleStore.extract()
 ```
 
-And as a `Comonad` is also a `Functor` we have `map` which works similarly to `coflatMap`:
+And as a `Comonad` is also a `Functor` we have `map` which allows us to transform the state representation:
 
 ```kotlin:ank
-val functorTupleStore = store.map { it: Int -> Tuple2("State", it) } 
-functorTupleStore.extract()
+val upperCaseStore = store.map { it: String -> it.toUpperCase() } 
+upperCaseStore.extract()
 ```
 
 ## Available Instances
