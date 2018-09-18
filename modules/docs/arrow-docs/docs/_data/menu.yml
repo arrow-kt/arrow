@@ -104,6 +104,9 @@ options:
       - title: Moore
         url: /docs/datatype/moore/
 
+      - title: Sum
+        url: /docs/datatype/sum/
+
       - title: WriterT
         url: /docs/datatypes/writert/
 
