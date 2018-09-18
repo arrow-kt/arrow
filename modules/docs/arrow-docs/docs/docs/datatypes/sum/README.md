@@ -27,7 +27,7 @@ sum.extract(Store.comonad(), Store.comonad())
 We can change the active side with `changeSide`.
 
 ```kotlin:ank
-sum.changeSide(Sum.Side.Right).extract()
+sum.changeSide(Sum.Side.Right).extract(Store.comonad(), Store.comonad())
 ```
 
 As Sum is also a `Comonad` we have access to `coflatmap` and `map` for changing the `extract` result.
@@ -40,7 +40,7 @@ val overridenSum = sum.coflatmap(Store.comonad(), Store.comonad()) {
   }
 }
 
-overridenSum.extract()
+overridenSum.extract(Store.comonad(), Store.comonad())
 ```
 
 ## Available Instances
