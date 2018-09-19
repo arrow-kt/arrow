@@ -17,7 +17,7 @@ data class Sum<F, G, V>(
     object Right : Side()
   }
 
-  fun <A> coflatMap(CF: Comonad<F>, CG: Comonad<G>, f: (Sum<F, G, V>) -> A): Sum<F, G, A> = Sum(
+  fun <A> coflatmap(CF: Comonad<F>, CG: Comonad<G>, f: (Sum<F, G, V>) -> A): Sum<F, G, A> = Sum(
     CF.run { left.coflatMap { f(Sum(left, right, Side.Left)) } },
     CG.run { right.coflatMap { f(Sum(left, right, Side.Right)) } },
     side

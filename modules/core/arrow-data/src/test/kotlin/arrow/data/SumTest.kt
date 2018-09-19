@@ -40,7 +40,7 @@ class SumTest : UnitSpec() {
 
     "Sum extend should transform view type" {
       val asciiValueFromLetter = { x: String -> x.first().toInt() }
-      val sum = abSum.coflatMap(Id.comonad(), Id.comonad()) {
+      val sum = abSum.coflatmap(Id.comonad(), Id.comonad()) {
         when (it.side) {
           is Sum.Side.Left -> asciiValueFromLetter(it.left.fix().extract())
           is Sum.Side.Right -> asciiValueFromLetter(it.right.fix().extract())

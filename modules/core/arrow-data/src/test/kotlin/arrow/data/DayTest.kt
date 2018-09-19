@@ -49,7 +49,7 @@ class DayTest : UnitSpec() {
     }
 
 
-    "Day coflatMap should transform result type" {
+    "Day coflatmap should transform result type" {
       val day = day.coflatMap(Id.comonad(), Id.comonad()) { it: DayOf<ForId, ForId, Tuple2Of<Int, Int>> ->
           val (left, right) = it.fix().extract(Id.comonad(), Id.comonad()).fix()
           compareSides(left, right)
