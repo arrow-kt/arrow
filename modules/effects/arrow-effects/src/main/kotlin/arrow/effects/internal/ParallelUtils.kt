@@ -2,6 +2,8 @@ package arrow.effects.internal
 
 import arrow.Kind
 import arrow.core.*
+import arrow.effects.typeclasses.ConcurrentEffect
+import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.Proc
 import kotlin.coroutines.experimental.Continuation
@@ -9,9 +11,9 @@ import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.startCoroutine
 import kotlin.coroutines.experimental.suspendCoroutine
 
-/* See par3 */
+/* See parMap3 */
 internal fun <F, A, B, C> Effect<F>.parMap2(ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, f: (A, B) -> C,
-  /* start is used because this should return Tuple3<Proc, Future, Future>, but there's no good implementation of Future before Java8 */
+  /* start is used because this has to start inside the coroutine. Using Future won't work */
                                             start: (Kind<F, Unit>) -> Unit): Proc<C> = { cc ->
   val a: suspend () -> Either<A, B> = {
     suspendCoroutine { ca: Continuation<Either<A, B>> ->
@@ -37,7 +39,7 @@ internal fun <F, A, B, C> Effect<F>.parMap2(ctx: CoroutineContext, ioA: Kind<F, 
  * Elements at higher depths that are synchronous can prevent elements at a lower depth from starting.
  * Thus, we need to provide solutions for even and uneven amounts of IOs for all to be started at the same depth. */
 internal fun <F, A, B, C, D> Effect<F>.parMap3(ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, ioC: Kind<F, C>, f: (A, B, C) -> D,
-  /* start is used because this should return Tuple4<Proc, Future, Future, Future>, but there's no good implementation of Future before Java8 */
+  /* start is used because this has to start inside the coroutine. Using Future won't work */
                                                start: (Kind<F, Unit>) -> Unit): Proc<D> = { cc ->
   val a: suspend () -> Treither<A, B, C> = {
     suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
@@ -56,6 +58,60 @@ internal fun <F, A, B, C, D> Effect<F>.parMap3(ctx: CoroutineContext, ioA: Kind<
   val c: suspend () -> Treither<A, B, C> = {
     suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
       start(ioC.map { Treither.Right<A, B, C>(it) }.runAsync {
+        it.fold({ invoke { ca.resumeWithException(it) } }, { invoke { ca.resume(it) } })
+      })
+    }
+  }
+  val triCont = triContinuation(ctx, f, asyncIOContinuation(ctx, cc))
+  a.startCoroutine(triCont)
+  b.startCoroutine(triCont)
+  c.startCoroutine(triCont)
+}
+
+/* See parMap3 */
+internal fun <F, A, B, C> ConcurrentEffect<F>.parMapCancellable2(ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, f: (A, B) -> C,
+  /* start is used because this has to start inside the coroutine. Using Future won't work */
+                                                                 start: (Kind<F, Disposable>) -> Unit): Proc<C> = { cc ->
+  val a: suspend () -> Either<A, B> = {
+    suspendCoroutine { ca: Continuation<Either<A, B>> ->
+      start(ioA.map { it.left() }.runAsyncCancellable {
+        it.fold({ invoke { ca.resumeWithException(it) } }, { invoke { ca.resume(it) } })
+      })
+    }
+  }
+  val b: suspend () -> Either<A, B> = {
+    suspendCoroutine { ca: Continuation<Either<A, B>> ->
+      start(ioB.map { it.right() }.runAsyncCancellable {
+        it.fold({ invoke { ca.resumeWithException(it) } }, { invoke { ca.resume(it) } })
+      })
+    }
+  }
+  val parCont = parContinuation(ctx, f, asyncIOContinuation(ctx, cc))
+  a.startCoroutine(parCont)
+  b.startCoroutine(parCont)
+}
+
+/* See parMap3 */
+internal fun <F, A, B, C, D> ConcurrentEffect<F>.parMapCancellable3(ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, ioC: Kind<F, C>, f: (A, B, C) -> D,
+  /* start is used because this has to start inside the coroutine. Using Future won't work */
+                                                                    start: (Kind<F, Disposable>) -> Unit): Proc<D> = { cc ->
+  val a: suspend () -> Treither<A, B, C> = {
+    suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
+      start(ioA.map { Treither.Left<A, B, C>(it) }.runAsyncCancellable {
+        it.fold({ invoke { ca.resumeWithException(it) } }, { invoke { ca.resume(it) } })
+      })
+    }
+  }
+  val b: suspend () -> Treither<A, B, C> = {
+    suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
+      start(ioB.map { Treither.Middle<A, B, C>(it) }.runAsyncCancellable {
+        it.fold({ invoke { ca.resumeWithException(it) } }, { invoke { ca.resume(it) } })
+      })
+    }
+  }
+  val c: suspend () -> Treither<A, B, C> = {
+    suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
+      start(ioC.map { Treither.Right<A, B, C>(it) }.runAsyncCancellable {
         it.fold({ invoke { ca.resumeWithException(it) } }, { invoke { ca.resume(it) } })
       })
     }

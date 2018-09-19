@@ -1,6 +1,5 @@
 
 dependencies {
-    compile project(':arrow-data')
     compile project(':arrow-effects')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile project(':arrow-annotations')
@@ -13,7 +12,7 @@ dependencies {
     testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
     testCompile project(':arrow-test')
 
-    compile "io.reactivex.rxjava2:rxjava:2.1.13"
+    compile "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

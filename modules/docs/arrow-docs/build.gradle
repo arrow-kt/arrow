@@ -28,8 +28,8 @@ dependencies {
     testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
     compile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
-    compile "io.reactivex.rxjava2:rxjava:2.1.13"
-    compile "io.projectreactor:reactor-core:3.1.3.RELEASE"
+    compile "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
+    compile "io.projectreactor:reactor-core:$projectReactorVersion"
 }
 
 task printcp {

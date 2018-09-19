@@ -11,6 +11,9 @@ data class Coproduct<F, G, A>(val run: Either<Kind<F, A>, Kind<G, A>>) : Coprodu
   fun <B> map(CF: Functor<F>, CG: Functor<G>, f: (A) -> B): Coproduct<F, G, B> =
     Coproduct(run.bimap(CF.lift(f), CG.lift(f)))
 
+  fun <B> contramap(CF: Contravariant<F>, CG: Contravariant<G>, f: (B) -> A): Coproduct<F, G, B> =
+    Coproduct(run.bimap(CF.lift(f), CG.lift(f)))
+
   fun <B> coflatMap(CF: Comonad<F>, CG: Comonad<G>, f: (Coproduct<F, G, A>) -> B): Coproduct<F, G, B> =
     Coproduct(run.bimap(
       { CF.run { it.coflatMap { f(Coproduct(Left(it))) } } },

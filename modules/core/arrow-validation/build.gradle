@@ -12,4 +12,5 @@ dependencies {
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
 }
 
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
 apply plugin: 'kotlin-kapt'

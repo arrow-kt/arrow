@@ -24,6 +24,21 @@ branching in code with [`Either`]({{ '/docs/datatypes/either' | relative_url }})
 catching exceptions with [`Try`]({{ '/docs/datatypes/try' | relative_url }}),
 or interacting with the platform the program runs in using [`IO`]({{ '/docs/effects/io' | relative_url }}).
 
+Some of these patterns are implemented using a mix of `sealed` classes where each inheritor is a `data` class.
+For example, the internal representation of an `Option` is a `sealed` class with two `data` classes `Some<A>(val a: A)` and `None`,
+and `Ior` is a `sealed` class with three `data` class inheritors, `Left(val a: A)`, `Right(val b: B)`, and `Both(val a: A, val b: B)`.
+
+Datatypes that express patterns like deferred evaluation can do it by nesting themselves with every operation they chain. One example is `IO`.
+
+```kotlin:ank
+import arrow.effects.*
+
+IO { 0 }
+ .continueOn(UI)
+ .flatMap { IO { it * 2 } }
+ .map { it + 1 }
+```
+
 You can read more about all the [datatypes]({{ '/docs/datatypes/intro' | relative_url }}) that Arrow provides in its [section of the docs]({{ '/docs/datatypes/intro' | relative_url }}).
  
 ### Typeclasses

@@ -28,6 +28,9 @@ interface Monad<F> : Applicative<F> {
   fun <A, B> Kind<F, A>.followedByEval(fb: Eval<Kind<F, B>>): Kind<F, B> =
     flatMap { fb.value() }
 
+  fun <A, B> Kind<F, A>.effectM(f: (A) -> Kind<F, B>): Kind<F, A> =
+    flatMap { a -> f(a).map { a } }
+
   fun <A, B> Kind<F, A>.forEffect(fb: Kind<F, B>): Kind<F, A> =
     flatMap { a -> fb.map { a } }
 

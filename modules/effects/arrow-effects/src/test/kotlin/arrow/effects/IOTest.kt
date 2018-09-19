@@ -323,12 +323,12 @@ class IOTest : UnitSpec() {
     }
 
     "unsafeRunAsyncCancellable should cancel correctly" {
-      IO.async<Unit> { cb ->
+      IO.async { cb: (Either<Throwable, Int>) -> Unit ->
         val cancel =
           IO(newSingleThreadContext("RunThread")) { }
             .flatMap { IO.async<Int> { Thread.sleep(500); it(1.right()) } }
             .unsafeRunAsyncCancellable(OnCancel.Silent) {
-              cb(Unit.right())
+              cb(it)
             }
         IO(newSingleThreadContext("CancelThread")) { }
           .unsafeRunAsync { cancel() }
@@ -345,29 +345,20 @@ class IOTest : UnitSpec() {
             }
         IO(newSingleThreadContext("CancelThread")) { }
           .unsafeRunAsync { cancel() }
-      }.unsafeRunTimed(2.seconds) shouldBe Some(IOCancellationException("User cancellation"))
+      }.unsafeRunTimed(2.seconds) shouldBe Some(IOCancellationException)
     }
 
-    "unsafeRunAsyncCancellable can cancel only at operator boundaries" {
-      IO.async<Unit> { cb ->
+    "unsafeRunAsyncCancellable can cancel even for infinite asyncs" {
+      IO.async { cb: (Either<Throwable, Int>) -> Unit ->
         val cancel =
           IO(newSingleThreadContext("RunThread")) { }
-            .flatMap { IO.async<Int> { /* Never reaches the operator boundary */ } }
+            .flatMap { IO.async<Int> { Thread.sleep(5000); } }
             .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
-              cb(Unit.right())
+              cb(it)
             }
         IO(newSingleThreadContext("CancelThread")) { Thread.sleep(500); }
           .unsafeRunAsync { cancel() }
       }.unsafeRunTimed(2.seconds) shouldBe None
-    }
-
-    "unsafeRunAsyncCancellable should not silence IOCancellationException thrown by the user" {
-      IO.async<Either<Throwable, Int>> { cb ->
-        IO(newSingleThreadContext("RunThread")) { throw IOCancellationException("TEST") }
-          .unsafeRunAsyncCancellable(OnCancel.Silent) {
-            cb(it.right())
-          }
-      }.unsafeRunTimed(2.seconds) shouldBe Some(Either.Left(IOCancellationException("TEST")))
     }
 
     "IO.binding should for comprehend over IO" {

@@ -136,6 +136,14 @@ class TryTest : UnitSpec() {
       Failure(Exception()).recover { 2 } shouldBe Success(2)
     }
 
+    "toEither with onLeft should return Either.Right with correct right value if Try is Success" {
+      Success(1).toEither { "myDomainError" } shouldBe 1.right()
+    }
+
+    "toEither with onLeft should return Either.Left with correct left value if Try is Failure" {
+      Failure(Exception()).toEither { "myDomainError" } shouldBe "myDomainError".left()
+    }
+
     "transform applies left function for Success" {
       Success(1).transform({ Success(2) }, { Success(3) }) shouldBe Success(2)
     }
@@ -323,6 +331,15 @@ class TryTest : UnitSpec() {
     "transform" {
       success.transform({ Try { it.toString() } }) { Try { "NaN" } } shouldBe Success("10")
       failure.transform({ Try { it.toString() } }) { Try { "NaN" } } shouldBe Try{ "NaN" }
+    }
+
+    "success" {
+      10.success() shouldBe success
+    }
+
+    "failure" {
+      val ex = NumberFormatException()
+      ex.failure<Int>() shouldBe Failure(ex)
     }
 
     "flatten" {
