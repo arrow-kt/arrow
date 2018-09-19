@@ -36,7 +36,7 @@ class StoreTest : UnitSpec() {
 
     "extend should create a new Store from the current one" {
       val store = greetingStore("Cotel")
-        .coflatmap { (state) ->
+        .coflatMap { (state) ->
           if (state == "Cotel") "This is my master" else "This is not my master"
         }
 

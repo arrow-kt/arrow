@@ -16,7 +16,7 @@ object ComonadLaws {
     FunctorLaws.laws(CM, cf, EQ) + listOf(
       Law("Comonad Laws: duplicate then extract is identity") { CM.duplicateThenExtractIsId(cf, EQ) },
       Law("Comonad Laws: duplicate then map into extract is identity") { CM.duplicateThenMapExtractIsId(cf, EQ) },
-      Law("Comonad Laws: map and coflatmap are coherent") { CM.mapAndCoflatmapCoherence(cf, EQ) },
+      Law("Comonad Laws: map and coflatMap are coherent") { CM.mapAndCoflatmapCoherence(cf, EQ) },
       Law("Comonad Laws: left identity") { CM.comonadLeftIdentity(cf, EQ) },
       Law("Comonad Laws: right identity") { CM.comonadRightIdentity(cf, EQ) },
       Law("Comonad Laws: cokleisli left identity") { CM.cokleisliLeftIdentity(cf, EQ) },

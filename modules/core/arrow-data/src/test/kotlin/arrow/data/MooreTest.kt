@@ -56,7 +56,7 @@ class MooreTest : UnitSpec() {
 
     "routerMoore view should be 0 after extending it for transforming view type" {
       val currentRoute = routerMoore
-        .coflatmap { (view) ->
+        .coflatMap { (view) ->
           when (view.extract()) {
             "About" -> 1
             "Home" -> 2

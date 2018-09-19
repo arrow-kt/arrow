@@ -32,11 +32,11 @@ routerMoore
     .extract()
 ```
 
-We also have an `extract` function which returns the current state and a `coflatmap` which transforms its type:
+We also have an `extract` function which returns the current state and a `coflatMap` which transforms its type:
 
 ```kotlin:ank
 routerMoore
-    .coflatmap { (view) ->
+    .coflatMap { (view) ->
       when (view.extract()) {
         "About" -> 1
         "Home" -> 2
