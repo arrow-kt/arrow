@@ -4,10 +4,10 @@ import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.laws.InvariantLaws
 import arrow.typeclasses.*
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class MonoidTest : UnitSpec() {
 
     val EQ: Eq<MonoidOf<Int>> = Eq.invoke { a, b ->
