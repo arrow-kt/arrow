@@ -1,9 +1,13 @@
 package arrow
 
+import arrow.core.Id
+import arrow.core.comonad
+import arrow.data.Day
 import arrow.data.ForStore
 import arrow.data.Store
 import arrow.data.Sum
 import arrow.data.comonad
+import arrow.data.fix
 import arrow.data.functor
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.specs.FreeSpec
@@ -28,6 +32,21 @@ class ComonadicUisTest : FreeSpec() {
       sum
         .copy(left = counterStore.move(10))
         .extract() shouldBe "Counter value: 10"
+    }
+
+
+    "Day of two Ids" {
+      val renderHtml = { left: String, right: Int -> """
+          |<div>
+          | <p>$left</p>
+          | <p>$right</p>
+          |</div>
+        """.trimMargin()
+      }
+      val day = Day(Id.just("Hello"), Id.just(0), renderHtml)
+
+      day.extract(Id.comonad(), Id.comonad()) shouldBe renderHtml("Hello", 0)
+
     }
 
   }
