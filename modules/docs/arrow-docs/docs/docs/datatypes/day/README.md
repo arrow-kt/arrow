@@ -11,6 +11,7 @@ When building user interfaces it is common to have two screens side by side evol
 `Day` is a [`comonadic`]({{ /docs/typeclasses/comonad | relative_url }}) data structure which holds two `Comonads` and a rendering function for both states.
 
 ```kotlin:ank
+import arrow.core.*
 import arrow.data.*
 
 val renderHtml = { left: String, right: Int -> """     
@@ -21,7 +22,7 @@ val renderHtml = { left: String, right: Int -> """
   """.trimMargin()                                     
 }                                                      
 val day = Day(Id.just("Hello"), Id.just(0), renderHtml)
-day.extract()
+day.extract(Id.comonad(), Id.comonad())
 ```
 
 ## Available Instances
