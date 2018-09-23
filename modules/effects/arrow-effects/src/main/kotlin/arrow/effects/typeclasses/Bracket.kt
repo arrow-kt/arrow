@@ -41,4 +41,3 @@ interface Bracket<F, E> : MonadError<F, E> {
         }
     }
 }
-
