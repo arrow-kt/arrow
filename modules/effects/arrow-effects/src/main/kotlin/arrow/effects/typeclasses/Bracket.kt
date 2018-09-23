@@ -33,5 +33,12 @@ interface Bracket<F, E> : MonadError<F, E> {
     fun <A> Kind<F, A>.guaranteeCase(finalizer: (ExitCase<E>) -> Kind<F, Unit>): Kind<F, A> =
         bracketCase({ _, e -> finalizer(e) }, { _ -> this })
 
-    companion object
+    companion object {
+
+        fun <E, A> attempt(value: Either<E, A>): ExitCase<E> = when (value) {
+            is Either.Left -> Error(value.a)
+            is Either.Right -> ExitCase.Completed
+        }
+    }
 }
+
