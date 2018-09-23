@@ -1,7 +1,9 @@
 package arrow.dagger.instances
 
 import arrow.data.KleisliPartialOf
+import arrow.effects.typeclasses.Bracket
 import arrow.instances.KleisliApplicativeInstance
+import arrow.instances.KleisliBracketInstance
 import arrow.instances.KleisliFunctorInstance
 import arrow.instances.KleisliMonadErrorInstance
 import arrow.instances.KleisliMonadInstance
@@ -11,7 +13,7 @@ import dagger.Provides
 import javax.inject.Inject
 
 @Module
-abstract class KleisliInstances<F, D> {
+abstract class KleisliInstances<F, D, E> {
 
   @Provides
   fun kleisliFunctor(ev: DaggerKleisliFunctorInstance<F, D>): Functor<KleisliPartialOf<F, D>> = ev
@@ -27,6 +29,9 @@ abstract class KleisliInstances<F, D> {
 
   @Provides
   fun kleisliMonadError(ev: DaggerKleisliMonadErrorInstance<F, D>): MonadError<KleisliPartialOf<F, D>, D> = ev
+
+  @Provides
+  fun kleisliBracket(ev: DaggerKleisliBracketInstance<F, D, E>): Bracket<KleisliPartialOf<F, D>, E> = ev
 }
 
 class DaggerKleisliFunctorInstance<F, L> @Inject constructor(val FF: Functor<F>) : KleisliFunctorInstance<F, L> {
@@ -46,4 +51,9 @@ class DaggerKleisliMonadInstance<F, L> @Inject constructor(val MF: Monad<F>) : K
 class DaggerKleisliMonadErrorInstance<F, L> @Inject constructor(val MF: MonadError<F, L>) : KleisliMonadErrorInstance<F, L, L> {
   override fun FF(): MonadError<F, L> = MF
   override fun ME(): MonadError<F, L> = MF
+}
+
+class DaggerKleisliBracketInstance<F, D, E> @Inject constructor(val BFE: Bracket<F, E>, val KME: KleisliMonadErrorInstance<F, D, E>) : KleisliBracketInstance<F, D, E> {
+  override fun BFE(): Bracket<F, E> = BFE
+  override fun KME(): KleisliMonadErrorInstance<F, D, E> = KME
 }
