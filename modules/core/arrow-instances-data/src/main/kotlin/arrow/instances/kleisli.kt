@@ -129,16 +129,18 @@ interface KleisliBracketInstance<F, R, E> : Bracket<KleisliPartialOf<F, R>, E>, 
     }
 
   override fun <A, B> Kind<KleisliPartialOf<F, R>, A>.bracketCase(
-    release: (A, ExitCase<E>) -> Kind<KleisliPartialOf<F, R>, Unit>,
-    use: (A) -> Kind<KleisliPartialOf<F, R>, B>): Kleisli<F, R, B> = FF().run {
-    Kleisli { r ->
-      this@bracketCase.fix().run(r).bracketCase({ a, br ->
-        release(a, br).fix().run(r)
-      }, { a ->
-        use(a).fix().run(r)
-      })
+    use: (A) -> Kind<KleisliPartialOf<F, R>, B>,
+    release: (A, ExitCase<E>) -> Kind<KleisliPartialOf<F, R>, Unit>
+  ): Kleisli<F, R, B> =
+    FF().run {
+      Kleisli { r ->
+        this@bracketCase.fix().run(r).bracketCase({ a ->
+          use(a).fix().run(r)
+        }, { a, br ->
+          release(a, br).fix().run(r)
+        })
+      }
     }
-  }
 
   override fun <A> Kind<KleisliPartialOf<F, R>, A>.uncancelable(): Kleisli<F, R, A> =
     Kleisli { r -> FF().run { this@uncancelable.fix().run(r).uncancelable() } }

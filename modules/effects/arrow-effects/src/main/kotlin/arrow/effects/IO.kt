@@ -124,10 +124,10 @@ sealed class IO<out A> : IOOf<A> {
 
   internal abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
 
-  fun <B> bracket(release: (A) -> IO<Unit>, use: (A) -> IO<B>): IO<B> =
-    bracketCase({ a, _ -> release(a) }, use)
+  fun <B> bracket(use: (A) -> IO<B>, release: (A) -> IO<Unit>): IO<B> =
+    bracketCase(use) { a, _ -> release(a) }
 
-  fun <B> bracketCase(release: (A, ExitCase<Throwable>) -> IO<Unit>, use: (A) -> IO<B>): IO<B> =
+  fun <B> bracketCase(use: (A) -> IO<B>, release: (A, ExitCase<Throwable>) -> IO<Unit>): IO<B> =
     IOBracket(this, use, release)
 
   fun guarantee(finalizer: IO<Unit>): IO<A> = guaranteeCase { finalizer }
