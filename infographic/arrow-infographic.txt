@@ -1,0 +1,95 @@
+#.instances: fill=#B9F6CA visual=class italic bold dashed
+#.typeclasses: fill=#64B5F6 visual=database bold
+#arrowSize: 1
+#bendSize: 0.3
+#fill: #64B5F6
+#font: Menlo
+#fontSize: 10
+#lineWidth: 2
+#padding: 8
+#zoom: 1
+<<<<<<< HEAD
+[<typeclasses>ApplicativeError]<-[<instances>ApplicativeError Instances|IOApplicativeErrorInstance|DeferredKApplicativeErrorInstance|FluxKApplicativeErrorInstance|MonoKApplicativeErrorInstance|FlowableKApplicativeErrorInstance|MaybeKApplicativeErrorInstance|ObservableKApplicativeErrorInstance|SingleKApplicativeErrorInstance]
+[<typeclasses>ApplicativeError]<-[<typeclasses>MonadError]
+[<typeclasses>Applicative]<-[<instances>Applicative Instances|IOApplicativeInstance|DeferredKApplicativeInstance|FluxKApplicativeInstance|MonoKApplicativeInstance|FlowableKApplicativeInstance|MaybeKApplicativeInstance|ObservableKApplicativeInstance|SingleKApplicativeInstance]
+=======
+[<typeclasses>Alternative]<-[<typeclasses>MonadCombine]
+[<typeclasses>ApplicativeError]<-[<instances>ApplicativeError Instances|IOApplicativeErrorInstance|EitherApplicativeErrorInstance|OptionApplicativeErrorInstance|TryApplicativeErrorInstance|KleisliApplicativeErrorInstance|StateTApplicativeErrorInstance|ValidatedApplicativeErrorInstance|DeferredKApplicativeErrorInstance|FlowableKApplicativeErrorInstance|MaybeKApplicativeErrorInstance|ObservableKApplicativeErrorInstance|SingleKApplicativeErrorInstance|FluxKApplicativeErrorInstance|MonoKApplicativeErrorInstance]
+[<typeclasses>ApplicativeError]<-[<typeclasses>MonadError]
+[<typeclasses>Applicative]<-[<instances>Applicative Instances|IOApplicativeInstance|ConstApplicativeInstance|EitherApplicativeInstance|EvalApplicativeInstance|Function0ApplicativeInstance|Function1ApplicativeInstance|IdApplicativeInstance|OptionApplicativeInstance|TryApplicativeInstance|Tuple2ApplicativeInstance|IorApplicativeInstance|KleisliApplicativeInstance|ListKApplicativeInstance|NonEmptyListApplicativeInstance|OptionTApplicativeInstance|SequenceKApplicativeInstance|StateTApplicativeInstance|ValidatedApplicativeInstance|WriterTApplicativeInstance|DeferredKApplicativeInstance|FlowableKApplicativeInstance|MaybeKApplicativeInstance|ObservableKApplicativeInstance|SingleKApplicativeInstance|FluxKApplicativeInstance|MonoKApplicativeInstance|FreeApplicativeApplicativeInstance|FreeApplicativeInstance]
+>>>>>>> moar updates
+[<typeclasses>Applicative]<-[<typeclasses>ApplicativeError]
+[<typeclasses>Applicative]<-[<typeclasses>Monad]
+[<typeclasses>Async]<-[<instances>Async Instances|IOAsyncInstance|DeferredKAsyncInstance|FluxKAsyncInstance|MonoKAsyncInstance|FlowableKAsyncInstance|MaybeKAsyncInstance|ObservableKAsyncInstance|SingleKAsyncInstance]
+[<typeclasses>Async]<-[<typeclasses>Effect]
+[<typeclasses>At]<-[<instances>At Instances|MapKAtInstance|SetKAtInstance]
+<<<<<<< HEAD
+[<typeclasses>ConcurrentEffect]<-[<instances>ConcurrentEffect Instances|IOConcurrentEffectInstance|DeferredKConcurrentEffectInstance|FluxKConcurrentEffectInstance|MonoKConcurrentEffectInstance|FlowableKConcurrentEffectInstance|ObservableKConcurrentEffectInstance|SingleKConcurrentEffectInstance]
+[<typeclasses>Each]<-[<instances>Each Instances|EitherEachInstance|ListKEachInstance|MapKEachInstance|NonEmptyListEachInstance|OptionEachInstance|SequenceKEachInstance|TryEachInstance]
+[<typeclasses>Effect]<-[<instances>Effect Instances|IOEffectInstance|DeferredKConcurrentEffectInstance|FluxKConcurrentEffectInstance|MonoKConcurrentEffectInstance|FlowableKConcurrentEffectInstance|ObservableKConcurrentEffectInstance|SingleKConcurrentEffectInstance]
+=======
+[<typeclasses>Bifunctor]<-[<instances>Bifunctor Instances|EitherBifunctorInstance|Tuple2BifunctorInstance|IorBifunctorInstance]
+[<typeclasses>Bimonad]<-[<instances>Bimonad Instances|EvalBimonadInstance|Function0BimonadInstance|IdBimonadInstance|NonEmptyListBimonadInstance]
+[<typeclasses>Birecursive]<-[<instances>Birecursive Instances|FixBirecursiveInstance|MuBirecursiveInstance|NuBirecursiveInstance]
+[<typeclasses>Bracket]<-[<instances>Bracket Instances|IOBracketInstance|KleisliBracketInstance|DeferredKBracketInstance|FlowableKBracketInstance|MaybeKBracketInstance|ObservableKBracketInstance|SingleKBracketInstance|FluxKBracketInstance|MonoKBracketInstance]
+[<typeclasses>Bracket]<-[<typeclasses>MonadDefer]
+[<typeclasses>Category]<-[<instances>Category Instances|Function1CategoryInstance]
+[<typeclasses>Comonad]<-[<instances>Comonad Instances|EvalComonadInstance|Function0ComonadInstance|IdComonadInstance|Tuple2ComonadInstance|CoproductComonadInstance|NonEmptyListComonadInstance|CofreeComonadInstance]
+[<typeclasses>Comonad]<-[<typeclasses>Bimonad]
+[<typeclasses>ConcurrentEffect]<-[<instances>ConcurrentEffect Instances|IOConcurrentEffectInstance|DeferredKConcurrentEffectInstance|FlowableKConcurrentEffectInstance|ObservableKConcurrentEffectInstance|SingleKConcurrentEffectInstance|FluxKConcurrentEffectInstance|MonoKConcurrentEffectInstance]
+[<typeclasses>Contravariant]<-[<instances>Contravariant Instances|ConstContravariant|Function1ContravariantInstance|CokleisliContravariantInstance|CoproductContravariantInstance|KleisliContravariant]
+[<typeclasses>Corecursive]<-[<instances>Corecursive Instances|FixCorecursiveInstance|MuCorecursiveInstance|NuCorecursiveInstance]
+[<typeclasses>Corecursive]<-[<typeclasses>Birecursive]
+[<typeclasses>Each]<-[<instances>Each Instances|EitherEachInstance|ListKEachInstance|MapKEachInstance|NonEmptyListEachInstance|OptionEachInstance|SequenceKEachInstance|TryEachInstance]
+[<typeclasses>Effect]<-[<instances>Effect Instances|IOEffectInstance|DeferredKConcurrentEffectInstance|FlowableKConcurrentEffectInstance|ObservableKConcurrentEffectInstance|SingleKConcurrentEffectInstance|FluxKConcurrentEffectInstance|MonoKConcurrentEffectInstance|IOConcurrentEffectInstance]
+>>>>>>> moar updates
+[<typeclasses>Effect]<-[<typeclasses>ConcurrentEffect]
+[<typeclasses>FilterIndex]<-[<instances>FilterIndex Instances|ListKFilterIndexInstance|MapKFilterIndexInstance|NonEmptyListFilterIndexInstance|SequenceKFilterIndexInstance]
+[<typeclasses>Foldable]<-[<instances>Foldable Instances|FluxKFoldableInstance|FlowableKFoldableInstance|MaybeKFoldableInstance|ObservableKFoldableInstance]
+[<typeclasses>Foldable]<-[<typeclasses>Traverse]
+[<typeclasses>Functor]<-[<typeclasses>Applicative]
+[<typeclasses>Functor]<-[<typeclasses>Traverse]
+[<typeclasses>Index]<-[<instances>Index Instances|ListKIndexInstance|MapKIndexInstance|NonEmptyListIndexInstance|SequenceKIndexInstance]
+[<typeclasses>Invariant]<-[<typeclasses>Functor]
+[<typeclasses>MonadDefer]<-[<instances>MonadDefer Instances|IOMonadDeferInstance|DeferredKMonadDeferInstance|FluxKMonadDeferInstance|MonoKMonadDeferInstance|FlowableKMonadDeferInstance|MaybeKMonadDeferInstance|ObservableKMonadDeferInstance|SingleKMonadDeferInstance]
+[<typeclasses>MonadDefer]<-[<typeclasses>Async]
+<<<<<<< HEAD
+[<typeclasses>MonadError]<-[<instances>MonadError Instances|IOMonadErrorInstance|DeferredKMonadErrorInstance|FluxKMonadErrorInstance|MonoKMonadErrorInstance|FlowableKMonadErrorInstance|MaybeKMonadErrorInstance|ObservableKMonadErrorInstance|SingleKMonadErrorInstance]
+[<typeclasses>MonadError]<-[<typeclasses>MonadDefer]
+[<typeclasses>Monad]<-[<instances>Monad Instances|IOMonadInstance|DeferredKMonadInstance|FluxKMonadInstance|MonoKMonadInstance|FlowableKMonadInstance|MaybeKMonadInstance|ObservableKMonadInstance|SingleKMonadInstance]
+[<typeclasses>Monad]<-[<typeclasses>MonadError]
+[<typeclasses>Monoid]<-[<instances>Monoid Instances|IOMonoidInstance]
+[<typeclasses>Semigroup]<-[<instances>Semigroup Instances|IOMonoidInstance|IOSemigroupInstance]
+[<typeclasses>Semigroup]<-[<typeclasses>Monoid]
+[<typeclasses>Traverse]<-[<instances>Traverse Instances|FluxKTraverseInstance|FlowableKTraverseInstance|ObservableKTraverseInstance]
+[<typeclasses>Functor]<-[<instances>Functor Instances|IOFunctorInstance|DeferredKFunctorInstance|FluxKFunctorInstance|MonoKFunctorInstance|FlowableKFunctorInstance|MaybeKFunctorInstance|ObservableKFunctorInstance|SingleKFunctorInstance|IntListPatternFunctorInstance]
+=======
+[<typeclasses>MonadError]<-[<instances>MonadError Instances|IOMonadErrorInstance|EitherMonadErrorInstance|OptionMonadErrorInstance|TryMonadErrorInstance|KleisliMonadErrorInstance|StateTMonadErrorInstance|DeferredKMonadErrorInstance|FlowableKMonadErrorInstance|MaybeKMonadErrorInstance|ObservableKMonadErrorInstance|SingleKMonadErrorInstance|FluxKMonadErrorInstance|MonoKMonadErrorInstance]
+[<typeclasses>MonadError]<-[<typeclasses>Bracket]
+[<typeclasses>MonadFilter]<-[<instances>MonadFilter Instances|ListKMonadFilterInstance|OptionMonadFilterInstance|WriterTMonadFilterInstance]
+[<typeclasses>MonadFilter]<-[<typeclasses>MonadCombine]
+[<typeclasses>MonadReader]<-[<instances>MonadReader Instances|Function1MonadReaderInstance|KleisliMonadReaderInstance]
+[<typeclasses>MonadState]<-[<instances>MonadState Instances|StateTMonadStateInstance]
+[<typeclasses>MonadWriter]<-[<instances>MonadWriter Instances|WriterTMonadWriterInstance]
+[<typeclasses>Monad]<-[<instances>Monad Instances|IOMonadInstance|EitherMonadInstance|EvalMonadInstance|Function0MonadInstance|Function1MonadInstance|IdMonadInstance|OptionMonadInstance|TryMonadInstance|Tuple2MonadInstance|IorMonadInstance|KleisliMonadInstance|ListKMonadInstance|NonEmptyListMonadInstance|OptionTMonadInstance|SequenceKMonadInstance|StateTMonadInstance|WriterTMonadInstance|DeferredKMonadInstance|FlowableKMonadInstance|MaybeKMonadInstance|ObservableKMonadInstance|SingleKMonadInstance|FluxKMonadInstance|MonoKMonadInstance|FreeMonadInstance]
+[<typeclasses>Monad]<-[<typeclasses>Bimonad]
+[<typeclasses>Monad]<-[<typeclasses>MonadError]
+[<typeclasses>Monad]<-[<typeclasses>MonadFilter]
+[<typeclasses>Monad]<-[<typeclasses>MonadReader]
+[<typeclasses>Monad]<-[<typeclasses>MonadState]
+[<typeclasses>Monad]<-[<typeclasses>MonadWriter]
+[<typeclasses>MonoidK]<-[<instances>MonoidK Instances|ListKMonoidKInstance|OptionTMonoidKInstance|SequenceKMonoidKInstance|SetKMonoidKInstance|WriterTMonoidKInstance]
+[<typeclasses>Monoid]<-[<instances>Monoid Instances|IOMonoidInstance|ConstMonoidInstance|EitherMonoidInstance|OptionMonoidInstance|TryMonoidInstance|Tuple2MonoidInstance|ListKMonoidInstance|MapKMonoidInstance|SequenceKMonoidInstance|SetKMonoidInstance|SortedMapKMonoidInstance]
+[<typeclasses>Profunctor]<-[<instances>Profunctor Instances|Function1ProfunctorInstance|CokleisliProfunctorInstance]
+[<typeclasses>Recursive]<-[<instances>Recursive Instances|FixRecursiveInstance|MuRecursiveInstance|NuRecursiveInstance]
+[<typeclasses>Recursive]<-[<typeclasses>Birecursive]
+[<typeclasses>SemigroupK]<-[<instances>SemigroupK Instances|EitherSemigroupKInstance|ListKSemigroupKInstance|NonEmptyListSemigroupKInstance|OptionTSemigroupKInstance|SequenceKSemigroupKInstance|SetKSemigroupKInstance|StateTSemigroupKInstance|ValidatedSemigroupKInstance|WriterTSemigroupKInstance]
+[<typeclasses>SemigroupK]<-[<typeclasses>MonoidK]
+[<typeclasses>Semigroup]<-[<instances>Semigroup Instances|IOMonoidInstance|IOSemigroupInstance|ConstSemigroupInstance|EitherSemigroupInstance|OptionSemigroupInstance|TrySemigroupInstance|ListKSemigroupInstance|MapKSemigroupInstance|NonEmptyListSemigroupInstance|SequenceKSemigroupInstance|SetKSemigroupInstance|SortedMapKSemigroupInstance]
+[<typeclasses>Semigroup]<-[<typeclasses>Monoid]
+[<typeclasses>Show]<-[<instances>Show Instances|ConstShowInstance|EitherShowInstance|IdShowInstance|OptionShowInstance|TryShowInstance|Tuple10ShowInstance|Tuple2ShowInstance|Tuple3ShowInstance|Tuple4ShowInstance|Tuple5ShowInstance|Tuple6ShowInstance|Tuple7ShowInstance|Tuple8ShowInstance|Tuple9ShowInstance|IorShowInstance|ListKShowInstance|MapKShowInstance|NonEmptyListShowInstance|SequenceKShowInstance|SetKShowInstance|SortedMapKShowInstance|ValidatedShowInstance]
+[<typeclasses>TraverseFilter]<-[<instances>TraverseFilter Instances|ConstTraverseFilterInstance|OptionTTraverseFilterInstance|OptionTraverseFilterInstance]
+[<typeclasses>Traverse]<-[<instances>Traverse Instances|ConstTraverseInstance|EitherTraverseInstance|IdTraverseInstance|OptionTraverseInstance|TryTraverseInstance|Tuple2TraverseInstance|CoproductTraverseInstance|IorTraverseInstance|ListKTraverseInstance|MapKTraverseInstance|NonEmptyListTraverseInstance|OptionTTraverseInstance|SequenceKTraverseInstance|SortedMapKTraverseInstance|ValidatedTraverseInstance|FlowableKTraverseInstance|ObservableKTraverseInstance|FluxKTraverseInstance]
+[<typeclasses>Traverse]<-[<typeclasses>TraverseFilter]
+[<typeclasses>Functor]<-[<instances>Functor Instances|IOFunctorInstance|ConstFunctorInstance|EitherFunctorInstance|EvalFunctorInstance|Function0FunctorInstance|Function1FunctorInstance|IdFunctorInstance|OptionFunctorInstance|TryFunctorInstance|Tuple2FunctorInstance|CoproductFunctorInstance|IorFunctorInstance|KleisliFunctorInstance|ListKFunctorInstance|MapKFunctorInstance|NonEmptyListFunctorInstance|OptionTFunctorInstance|SequenceKFunctorInstance|SortedMapKFunctorInstance|StateTFunctorInstance|ValidatedFunctorInstance|WriterTFunctorInstance|DeferredKFunctorInstance|FlowableKFunctorInstance|MaybeKFunctorInstance|ObservableKFunctorInstance|SingleKFunctorInstance|FluxKFunctorInstance|MonoKFunctorInstance|CofreeFunctorInstance|CoyonedaFunctorInstance|FreeApplicativeFunctorInstance|FreeFunctorInstance|YonedaFunctorInstance|IntListPatternFunctorInstance]
+>>>>>>> moar updates

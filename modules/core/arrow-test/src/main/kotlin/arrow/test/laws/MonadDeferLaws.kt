@@ -1,7 +1,11 @@
 package arrow.test.laws
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
+import arrow.core.Try
+import arrow.core.recover
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.typeclasses.MonadDefer
 import arrow.test.concurrency.SideEffect
@@ -13,8 +17,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.newSingleThreadContext
 
 object MonadDeferLaws {
+
   fun <F> laws(SC: MonadDefer<F>, EQ: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>, EQERR: Eq<Kind<F, Int>> = EQ): List<Law> =
-    MonadErrorLaws.laws(SC, EQERR, EQ_EITHER, EQ) + listOf(
+    BracketLaws.laws(SC, EQERR, EQ_EITHER, EQ) + listOf(
       Law("Sync bind: binding blocks") { SC.asyncBind(EQ) },
       Law("Sync bind: binding failure") { SC.asyncBindError(EQERR) },
       Law("Sync bind: unsafe binding") { SC.asyncBindUnsafe(EQ) },

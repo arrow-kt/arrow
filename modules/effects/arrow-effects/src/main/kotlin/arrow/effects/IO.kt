@@ -1,15 +1,23 @@
 package arrow.effects
 
-import arrow.core.*
+import arrow.core.Either
 import arrow.core.Either.Left
+import arrow.core.Eval
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.andThen
+import arrow.core.identity
+import arrow.core.right
 import arrow.effects.OnCancel.Companion.CancellationException
 import arrow.effects.OnCancel.Silent
 import arrow.effects.OnCancel.ThrowCancellationException
+import arrow.effects.internal.IOBracket
 import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Duration
+import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import kotlin.coroutines.CoroutineContext
@@ -115,6 +123,17 @@ sealed class IO<out A> : IOOf<A> {
   fun unsafeRunTimed(limit: Duration): Option<A> = IORunLoop.step(this).unsafeRunTimedTotal(limit)
 
   internal abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
+
+  fun <B> bracket(release: (A) -> IO<Unit>, use: (A) -> IO<B>): IO<B> =
+    bracketCase({ a, _ -> release(a) }, use)
+
+  fun <B> bracketCase(release: (A, ExitCase<Throwable>) -> IO<Unit>, use: (A) -> IO<B>): IO<B> =
+    IOBracket(this, use, release)
+
+  fun guarantee(finalizer: IO<Unit>): IO<A> = guaranteeCase { finalizer }
+
+  fun guaranteeCase(finalizer: (ExitCase<Throwable>) -> IO<Unit>): IO<A> =
+    IOBracket.guaranteeCase(this, finalizer)
 
   internal data class Pure<out A>(val a: A) : IO<A>() {
     // Pure can be replaced by its value
