@@ -97,17 +97,19 @@ interface ObservableKMonadErrorInstance :
 interface ObservableKMonadThrowInstance : MonadThrow<ForObservableK>, ObservableKMonadErrorInstance
 
 @extension
-interface ObservableKMonadDeferInstance :
-  MonadDefer<ForObservableK>,
-  ObservableKMonadErrorInstance {
+interface ObservableKBracketInstance : Bracket<ForObservableK, Throwable>, ObservableKMonadThrowInstance {
+  override fun <A, B> Kind<ForObservableK, A>.bracketCase(use: (A) -> Kind<ForObservableK, B>, release: (A, ExitCase<Throwable>) -> Kind<ForObservableK, Unit>): ObservableK<B> =
+    fix().bracketCase({ a -> use(a).fix() }, { a, e -> release(a, e).fix() })
+}
+
+@extension
+interface ObservableKMonadDeferInstance : MonadDefer<ForObservableK>, ObservableKBracketInstance {
   override fun <A> defer(fa: () -> ObservableKOf<A>): ObservableK<A> =
     ObservableK.defer(fa)
 }
 
 @extension
-interface ObservableKAsyncInstance :
-  Async<ForObservableK>,
-  ObservableKMonadDeferInstance {
+interface ObservableKAsyncInstance : Async<ForObservableK>, ObservableKMonadDeferInstance {
   override fun <A> async(fa: Proc<A>): ObservableK<A> =
     ObservableK.runAsync(fa)
 
@@ -116,9 +118,7 @@ interface ObservableKAsyncInstance :
 }
 
 @extension
-interface ObservableKEffectInstance :
-  Effect<ForObservableK>,
-  ObservableKAsyncInstance {
+interface ObservableKEffectInstance : Effect<ForObservableK>, ObservableKAsyncInstance {
   override fun <A> ObservableKOf<A>.runAsync(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Unit> =
     fix().runAsync(cb)
 }
