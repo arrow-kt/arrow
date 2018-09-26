@@ -79,5 +79,9 @@ include {
             _ 'dagger-effects-rx2'
             _ 'dagger-effects-kotlinx-coroutines'
         }
+
+        shadow {
+            _ 'shadow'
+        }
     }
 }

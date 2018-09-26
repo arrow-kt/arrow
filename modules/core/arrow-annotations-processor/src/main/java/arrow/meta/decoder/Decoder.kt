@@ -4,7 +4,6 @@ import arrow.meta.ast.*
 import arrow.meta.ast.Annotation
 import arrow.meta.ast.TypeName
 import com.squareup.kotlinpoet.*
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.plusParameter
 
 interface MetaDecoder<in A : Tree> {
   fun decode(tree: A): Code
@@ -192,6 +191,28 @@ interface TypeDecoder : MetaDecoder<Type> {
 
   operator fun List<String>.unaryPlus(): Code =
     Code(joinToCode("%N").toString())
+
+  fun Iterable<Parameter>.codeNames(): Code =
+    code {
+      if (it.modifiers.contains(Modifier.VarArg)) Code("*${it.name}")
+      else Code(it.name)
+    }
+
+  fun Iterable<Parameter>.code(f: (Parameter) -> Code = { Code(it.lyrics().toString()) }): Code {
+    val list = toList()
+    return if (list.isEmpty()) Code.empty
+    else Code(list.joinToString(", ") {
+      f(it).toString()
+    })
+  }
+
+  fun Iterable<Func>.code(dummy: Unit = Unit): Code {
+    val list = toList()
+    return if (list.isEmpty()) Code.empty
+    else Code(list.joinToString("\n\n  ") {
+      it.lyrics().toString()
+    })
+  }
 
   operator fun Iterable<TypeName.TypeVariable>.unaryPlus(): Code {
     val list = toList()

@@ -3,10 +3,6 @@ import org.gradle.internal.jvm.Jvm
 apply plugin: 'kotlin'
 apply plugin: 'kotlin-kapt'
 
-ext {
-    metaArrowVersion = '0.7.3'
-}
-
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     compile "com.squareup:kotlinpoet:$kotlinPoetVersion"
@@ -15,12 +11,9 @@ dependencies {
     compile 'com.squareup:kotlinpoet:1.0.0-RC1'
     compile 'com.github.aballano:MnemoniK:1.0.0'
     compileOnly 'com.google.auto.service:auto-service:1.0-rc4'
-    compileOnly "io.arrow-kt:arrow-instances-core:$metaArrowVersion"
-    compileOnly "io.arrow-kt:arrow-instances-data:$metaArrowVersion"
-    compileOnly "io.arrow-kt:arrow-recursion:$metaArrowVersion"
-    compileOnly "io.arrow-kt:arrow-optics:$metaArrowVersion"
     kapt 'com.google.auto.service:auto-service:1.0-rc4'
-    kapt "io.arrow-kt:arrow-annotations-processor:$metaArrowVersion"
+    compile project(path: ':arrow-shadow', configuration: 'shadow')
+    compile files('../../shadow/arrow-shadow/build/libs/arrow-shadow-0.7.4-SNAPSHOT-all.jar')
 
     //To generate stubs for data classes
     kaptTest 'com.google.auto.service:auto-service:1.0-rc4'

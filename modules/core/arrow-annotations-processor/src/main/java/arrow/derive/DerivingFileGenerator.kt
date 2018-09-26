@@ -24,6 +24,8 @@ fun String.asKotlin(): String =
   removeBackticks()
     .replace("/", ".")
     .replace("kotlin.jvm.functions", "kotlin")
+    .replace("java.util.Collection", "kotlin.collections.Collection")
+    .replace("java.lang.Throwable", "kotlin.Throwable")
 
 fun String.appendTypePrefix(prefix: String): String {
   val pkg = substringBeforeLast(".")

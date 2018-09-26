@@ -4,6 +4,7 @@ package arrow.typeclasses
 
 import arrow.Kind
 import arrow.core.*
+import java.math.BigDecimal
 
 interface Applicative<F> : Functor<F> {
 
@@ -211,6 +212,9 @@ interface Applicative<F> : Functor<F> {
     f: Kind<F, FF>,
     lbd: (Tuple6<A, B, C, D, E, FF>) -> Z): Kind<F, Z> =
     a.product(b).product(c).product(d).product(e).product(f).map(lbd)
+
+  operator fun Kind<F, BigDecimal>.plus(other: Kind<F, BigDecimal>): Kind<F, BigDecimal> =
+    map(this, other) { (a, b) -> a + b }
 
   fun <A, B, C, D, E, FF, G, Z> map(
     a: Kind<F, A>,

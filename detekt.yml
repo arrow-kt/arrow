@@ -32,6 +32,7 @@ complexity:
     active: false
   LargeClass:
     threshold: 300
+    active: false
   ComplexMethod:
     threshold: 10
   NestedBlockDepth:

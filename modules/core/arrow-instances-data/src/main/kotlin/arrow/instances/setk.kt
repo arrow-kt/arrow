@@ -34,11 +34,11 @@ interface SetKEqInstance<A> : Eq<SetK<A>> {
 
 }
 
-@extension
-interface SetKShowInstance<A> : Show<SetK<A>> {
-  override fun SetK<A>.show(): String =
-    toString()
-}
+//@extension
+//interface SetKShowInstance<A> : Show<SetK<A>> {
+//  override fun SetK<A>.show(): String =
+//    toString()
+//}
 
 @extension
 interface SetKFoldableInstance : Foldable<ForSetK> {

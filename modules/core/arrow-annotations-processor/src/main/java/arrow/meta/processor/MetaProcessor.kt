@@ -6,7 +6,6 @@ import arrow.meta.ast.Tree
 import arrow.meta.ast.Type
 import arrow.meta.encoder.MetaEncoder
 import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.asClassName
 import java.io.File
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion

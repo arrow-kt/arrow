@@ -1,0 +1,35 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.0'
+    }
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'java'
+
+ext {
+    metaArrowVersion = '0.7.3'
+}
+
+dependencies {
+    compile "io.arrow-kt:arrow-effects:$metaArrowVersion"
+    compile "io.arrow-kt:arrow-optics:$metaArrowVersion"
+}
+
+shadowJar {
+    relocate 'arrow', 'shadow'
+}
+
+shadowJar.doLast {
+    copyJarToBin
+}
+
+task copyJarToBin(type: Copy) {
+    from shadowJar.outputs.files // shortcut for createJar.outputs.files
+    into "libs"
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

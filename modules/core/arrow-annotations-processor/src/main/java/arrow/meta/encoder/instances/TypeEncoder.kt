@@ -50,7 +50,7 @@ interface TypeEncoder : MetaEncoder<Type>, MetaProcessorUtils {
         declaredFunctions = typeElement.declaredFunctions(typeElement),
         properties = typeElement.properties(),
         types = typeElement.sealedSubClassNames().mapNotNull {
-          if(it is TypeName.Classy && it.simpleName == "Companion") null else it.asType(this)
+          if (it is TypeName.Classy && it.simpleName == "Companion") null else it.asType(this)
         }
       )
     }

@@ -34,6 +34,9 @@ interface Tuple2ApplicativeInstance<F> : Applicative<Tuple2PartialOf<F>>, Tuple2
 
 @extension
 interface Tuple2MonadInstance<F> : Monad<Tuple2PartialOf<F>>, Tuple2ApplicativeInstance<F> {
+
+  override fun MF(): Monoid<F>
+
   override fun <A, B> Kind<Tuple2PartialOf<F>, A>.map(f: (A) -> B) =
     fix().map(f)
 

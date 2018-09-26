@@ -23,6 +23,7 @@ interface OptionSemigroupInstance<A> : Semigroup<Option<A>> {
 
 @extension
 interface OptionMonoidInstance<A> : Monoid<Option<A>>, OptionSemigroupInstance<A> {
+  override fun SG(): Semigroup<A>
   override fun empty(): Option<A> = None
 }
 

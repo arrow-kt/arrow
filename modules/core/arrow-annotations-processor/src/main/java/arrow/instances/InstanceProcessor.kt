@@ -1,5 +1,6 @@
 package arrow.instances
 
+import arrow.common.messager.logW
 import arrow.common.utils.*
 import arrow.extension
 import arrow.meta.ast.*
@@ -22,23 +23,32 @@ class InstanceProcessor : MetaProcessor<extension, Type>(annotations = listOf(ex
   override fun transform(annotatedElement: AnnotatedElement): FileSpec.Builder =
     when (annotatedElement) {
       is AnnotatedElement.Interface -> {
-        val info = annotatedElement.typeElement.typeClassInstance(this@InstanceProcessor)
-        val fileSpec = info?.let {
+        try {
+          val info = annotatedElement.typeElement.typeClassInstance(this@InstanceProcessor)
+          logW("Processing: ${info?.instance?.name?.simpleName}")
+          val fileSpec = info?.let {
+            FileSpec.builder(
+              "${annotatedElement.type.packageName.value}.syntax.${info.dataType.name.downKind().simpleName.decapitalize()}.${info.typeClass.name.simpleName.decapitalize()}",
+              annotatedElement.type.name.simpleName
+            )
+          }
+          if (fileSpec != null) {
+            val functions = info.genDataTypeExtensions() + listOf(info.genCompanionFactory())
+            functions.fold(fileSpec) { spec, func ->
+              spec.addFunction(func.lyrics().toBuilder()
+                .build())
+            }
+          } else FileSpec.builder(
+            annotatedElement.type.packageName.value,
+            annotatedElement.type.name.simpleName
+          )
+        } catch (e: StackOverflowError) {
+          logW("stack overflow in: ${annotatedElement.type}" )
           FileSpec.builder(
-            "${annotatedElement.type.packageName.value}.syntax.${info.dataType.name.downKind().simpleName.decapitalize()}.${info.typeClass.name.simpleName.decapitalize()}",
+            annotatedElement.type.packageName.value,
             annotatedElement.type.name.simpleName
           )
         }
-        if (fileSpec != null) {
-          val functions = info.genDataTypeExtensions() + listOf(info.genCompanionFactory())
-          functions.fold(fileSpec) { spec, func ->
-            spec.addFunction(func.lyrics().toBuilder()
-              .build())
-          }
-        } else FileSpec.builder(
-          annotatedElement.type.packageName.value,
-          annotatedElement.type.name.simpleName
-        )
       }
       else -> notAnInstanceError()
     }
@@ -51,41 +61,45 @@ class InstanceProcessor : MetaProcessor<extension, Type>(annotations = listOf(ex
   private fun notAnInstanceError(): Nothing =
     knownError("@extension is only allowed on `interface` extending another interface of at least one type argument (type class) as first declaration in the extension list")
 
-  fun MetaProcessorUtils.TypeClassInstance.genCompanionFactory(): Func {
-    return Func(
+  fun MetaProcessorUtils.TypeClassInstance.genCompanionFactory(): Func = Func(
       name = typeClass.name.simpleName.decapitalize(),
+      parameters = requiredParameters,
       receiverType = TypeName.Classy(
-        "Companion",
-        "${dataType.packageName.value}.Companion",
-        PackageName(dataType.packageName.value + "." + dataType.name.downKind().simpleName)
+        simpleName = "Companion",
+        fqName = "${dataType.packageName.value}.Companion",
+        pckg = PackageName(dataType.packageName.value + "." + dataType.name.downKind().simpleName)
       ),
       typeVariables = instance.typeVariables.map { it.removeConstrains() },
       returnType = instance.name,
       body = Code {
         """|return object : ${+instance.name} {
+           |  ${requiredAbstractFunctions.code()}
            |}
         """
       }
     )
-  }
 
   fun MetaProcessorUtils.TypeClassInstance.genDataTypeExtensions(): List<Func> {
     val extensionSet = typeClass.declaredFunctions.map { it.jvmMethodSignature }
     return instance
       .allFunctions
+      .asSequence()
       .filter { extensionSet.contains(it.jvmMethodSignature) }
-      .distinctBy { it.name + it.parameters.map { p -> p.type.simpleName } }
+      .distinctBy { it.name + it.parameters.filterNot { it.type is TypeName.TypeVariable }.map { p -> p.type.simpleName } }
       .map { it.removeConstrains() }
       .map { f ->
         val func = f.removeDummyArgs().downKindReturnType()
         val dummyArgsCount = f.countDummyArgs()
+        val allArgs = func.parameters + requiredParameters
+        val typeVariables = instance.typeVariables.map { it.removeConstrains() } + func.typeVariables.map { it.disambiguate(instance.typeVariables) }
         func
           .copy(
-            typeVariables = instance.typeVariables.map { it.removeConstrains() } + func.typeVariables,
+            typeVariables = typeVariables,
             annotations = listOf(
               JvmName(func.name + if (dummyArgsCount > 0) dummyArgsCount else ""),
               SuppressAnnotation(""""UNCHECKED_CAST"""")
             ),
+            parameters = allArgs,
             body = Code {
               val receiverType = func.receiverType
               val dataTypeCompanion = dataType.name.downKind().let {
@@ -97,20 +111,21 @@ class InstanceProcessor : MetaProcessor<extension, Type>(annotations = listOf(ex
                 }
               }
               if (receiverType != null) {
-                """|return ${+dataTypeCompanion}.${typeClass.name.simpleName.decapitalize()}${+instance.typeVariables}().run {
-                   |  this@${+func.name}.${+func.name}(${+func.parameters.map { it.name }}) as ${+func.returnType}
-                   |}
-                   |
-                 """
+                """|return ${+dataTypeCompanion}.${typeClass.name.simpleName.decapitalize()}${+instance.typeVariables}(${requiredParameters.code { +it.name }}).run {
+                     |  this@${+func.name}.${+func.name}${+typeVariables}(${allArgs.codeNames()}) as ${+func.returnType}
+                     |}
+                     |
+                   """
               } else {
                 """|return ${+dataTypeCompanion}
-                   |   .${typeClass.name.simpleName.decapitalize()}${+instance.typeVariables}()
-                   |   .${+func.name}(${+func.parameters.map { it.name }}) as ${+func.returnType}
-                   |
-                 """
+                     |   .${typeClass.name.simpleName.decapitalize()}${+instance.typeVariables}(${requiredParameters.code { +it.name }})
+                     |   .${+func.name}${+func.typeVariables}(${func.parameters.codeNames()}) as ${+func.returnType}
+                     |
+                   """
               }
             })
       }
+      .toList()
 
   }
 }
