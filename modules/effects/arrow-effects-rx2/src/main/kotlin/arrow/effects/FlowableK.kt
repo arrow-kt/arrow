@@ -1,9 +1,14 @@
 package arrow.effects
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.Left
+import arrow.core.Right
+import arrow.core.identity
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Applicative
@@ -27,6 +32,14 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
 
   fun <B> flatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
     flowable.flatMap { f(it).fix().flowable }.k()
+
+  fun <B> bracketCase(use: (A) -> FlowableK<B>, release: (A, ExitCase<Throwable>) -> FlowableK<Unit>): FlowableK<B> =
+    flatMap { a ->
+      use(a).flowable
+        .doOnNext { release(a, ExitCase.Completed) }
+        .doOnError { release(a, ExitCase.Error(it)) }
+        .k()
+    }
 
   fun <B> concatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
     flowable.concatMap { f(it).fix().flowable }.k()
