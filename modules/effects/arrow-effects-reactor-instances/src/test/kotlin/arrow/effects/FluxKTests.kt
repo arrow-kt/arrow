@@ -54,7 +54,7 @@ class FluxKTest : UnitSpec() {
   init {
 
     testLaws(
-        AsyncLaws.laws(FluxK.async(), EQ(), EQ()),
+        AsyncLaws.laws(FluxK.async(), { FluxK.just(it) }, EQ(), EQ()),
         FoldableLaws.laws(FluxK.foldable(), { FluxK.just(it) }, Eq.any()),
         TraverseLaws.laws(FluxK.traverse(), FluxK.functor(), { FluxK.just(it) }, EQ())
     )
