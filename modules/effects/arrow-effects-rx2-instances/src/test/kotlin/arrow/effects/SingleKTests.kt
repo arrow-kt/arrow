@@ -52,9 +52,8 @@ class SingleKTests : UnitSpec() {
       MonadLaws.laws(SingleK.monad(), EQ()),
       MonadErrorLaws.laws(SingleK.monadError(), EQ(), EQ(), EQ()),
       ApplicativeErrorLaws.laws(SingleK.applicativeError(), EQ(), EQ(), EQ()),
-      MonadDeferLaws.laws(SingleK.monadDefer(), EQ(), EQ(), EQ()),
-      AsyncLaws.laws(SingleK.async(), EQ(), EQ(), EQ()),
-      AsyncLaws.laws(SingleK.effect(), EQ(), EQ(), EQ())
+      AsyncLaws.laws(SingleK.async(), { SingleK.just(it) }, EQ(), EQ(), EQ()),
+      AsyncLaws.laws(SingleK.effect(), { SingleK.just(it) }, EQ(), EQ(), EQ())
     )
 
     "Multi-thread Singles finish correctly" {

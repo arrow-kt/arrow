@@ -46,7 +46,7 @@ class ObservableKTest : UnitSpec() {
 
   init {
 
-    testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
+    testLaws(AsyncLaws.laws(ObservableK.async(), { ObservableK.just(it) }, EQ(), EQ()))
     // FIXME(paco) #691
     //testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
     //testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))

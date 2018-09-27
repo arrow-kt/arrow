@@ -1,11 +1,6 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.*
-import arrow.instances.`try`.monadError.monadError
-import arrow.instances.id.monad.monad
-import arrow.instances.kleisli.contravariant.contravariant
-import arrow.instances.kleisli.monadError.monadError
 import arrow.core.ForId
 import arrow.core.ForTry
 import arrow.core.Id
@@ -13,7 +8,6 @@ import arrow.core.Try
 import arrow.core.fix
 import arrow.core.monad
 import arrow.core.monadError
-import arrow.instances.ForKleisli
 import arrow.test.UnitSpec
 import arrow.test.laws.BracketLaws
 import arrow.test.laws.ContravariantLaws
@@ -39,19 +33,14 @@ class KleisliTest : UnitSpec() {
   init {
     testLaws(
       ContravariantLaws.laws(Kleisli.contravariant(), { Kleisli { x: Int -> Try.just(x) }.conest() }, ConestEQ()),
-      MonadErrorLaws.laws(Kleisli.monadError<ForTry, Int, Throwable>(Try.monadError()), EQ(), EQ())
+      MonadErrorLaws.laws(Kleisli.monadError<ForTry, Int, Throwable>(Try.monadError()), EQ(), EQ()),
+      BracketLaws.laws(Kleisli.bracket(),
+        { n -> ListK(listOf(n)) },
+        EQ(),
+        EQ(),
+        EQ())
     )
-
-    ForKleisli<ForTry, Int, Throwable>(Try.monadError()) extensions {
-      testLaws(
-        BracketLaws.laws(Kleisli.bracket(),
-          { n -> ListK(listOf(n)) },
-          EQ(),
-          EQ(),
-          EQ())
-      )
-    }
-
+    
     "andThen should continue sequence" {
       val kleisli: Kleisli<ForId, Int, Int> = Kleisli { a: Int -> Id(a) }
 
