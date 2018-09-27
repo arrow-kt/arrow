@@ -6,7 +6,14 @@ import arrow.core.Eval
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.fluxk.monad.monad
 import arrow.effects.fluxk.monadError.monadError
-import arrow.effects.typeclasses.*
+import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.Bracket
+import arrow.effects.typeclasses.ConcurrentEffect
+import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.Effect
+import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.MonadDefer
+import arrow.effects.typeclasses.Proc
 import arrow.extension
 import arrow.typeclasses.*
 import kotlin.coroutines.CoroutineContext
@@ -97,9 +104,15 @@ interface FluxKMonadErrorInstance :
 interface FluxKMonadThrowInstance : MonadThrow<ForFluxK>, FluxKMonadErrorInstance
 
 @extension
+interface FluxKBracketInstance : Bracket<ForFluxK, Throwable>, FluxKMonadThrowInstance {
+  override fun <A, B> Kind<ForFluxK, A>.bracketCase(use: (A) -> Kind<ForFluxK, B>, release: (A, ExitCase<Throwable>) -> Kind<ForFluxK, Unit>): FluxK<B> =
+    fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
+}
+
+@extension
 interface FluxKMonadDeferInstance :
   MonadDefer<ForFluxK>,
-  FluxKMonadErrorInstance {
+  FluxKBracketInstance {
   override fun <A> defer(fa: () -> FluxKOf<A>): FluxK<A> =
     FluxK.defer(fa)
 }

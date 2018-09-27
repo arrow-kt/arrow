@@ -1,9 +1,14 @@
 package arrow.effects
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.Left
+import arrow.core.Right
+import arrow.core.identity
 import arrow.effects.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Applicative
@@ -27,6 +32,14 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
 
   fun <B> flatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
     flux.flatMap { f(it).fix().flux }.k()
+
+  fun <B> bracketCase(use: (A) -> FluxKOf<B>, release: (A, ExitCase<Throwable>) -> FluxKOf<Unit>): FluxK<B> =
+    flatMap { a ->
+      use(a).fix().flux
+        .doOnNext { release(a, ExitCase.Completed) }
+        .doOnError { release(a, ExitCase.Error(it)) }
+        .k()
+    }
 
   fun <B> concatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
     flux.concatMap { f(it).fix().flux }.k()
