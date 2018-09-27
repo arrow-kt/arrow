@@ -80,15 +80,4 @@ interface Bracket<F, E> : MonadError<F, E> {
    */
   fun <A> Kind<F, A>.guaranteeCase(finalizer: (ExitCase<E>) -> Kind<F, Unit>): Kind<F, A> =
     bracketCase({ _ -> this }, { _, e -> finalizer(e) })
-
-  companion object {
-
-    /**
-     * Converts from `Either`, which is often the result of `MonadError`'s `attempt` operation, into an [[ExitCase]].
-     */
-    fun <E, A> attempt(value: Either<E, A>): ExitCase<E> = when (value) {
-      is Either.Left -> Error(value.a)
-      is Either.Right -> ExitCase.Completed
-    }
-  }
 }
