@@ -25,9 +25,9 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
   fun <B> flatMap(f: (A) -> MaybeKOf<B>): MaybeK<B> =
     maybe.flatMap { f(it).fix().maybe }.k()
 
-  fun <B> bracketCase(use: (A) -> MaybeK<B>, release: (A, ExitCase<Throwable>) -> MaybeK<Unit>): MaybeK<B> =
+  fun <B> bracketCase(use: (A) -> MaybeKOf<B>, release: (A, ExitCase<Throwable>) -> MaybeKOf<Unit>): MaybeK<B> =
     flatMap { a ->
-      use(a).maybe
+      use(a).fix().maybe
         .doOnSuccess { release(a, ExitCase.Completed) }
         .doOnError { release(a, ExitCase.Error(it)) }
         .k()

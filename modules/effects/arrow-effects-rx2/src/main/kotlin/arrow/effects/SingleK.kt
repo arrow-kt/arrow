@@ -28,9 +28,9 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
   fun <B> flatMap(f: (A) -> SingleKOf<B>): SingleK<B> =
     single.flatMap { f(it).fix().single }.k()
 
-  fun <B> bracketCase(use: (A) -> SingleK<B>, release: (A, ExitCase<Throwable>) -> SingleK<Unit>): SingleK<B> =
+  fun <B> bracketCase(use: (A) -> SingleKOf<B>, release: (A, ExitCase<Throwable>) -> SingleKOf<Unit>): SingleK<B> =
     flatMap { a ->
-      use(a).single
+      use(a).fix().single
         .doOnSuccess { release(a, ExitCase.Completed) }
         .doOnError { release(a, ExitCase.Error(it)) }
         .k()

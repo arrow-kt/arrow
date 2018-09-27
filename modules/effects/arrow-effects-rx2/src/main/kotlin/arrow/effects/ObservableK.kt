@@ -32,9 +32,9 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
   fun <B> flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     observable.flatMap { f(it).fix().observable }.k()
 
-  fun <B> bracketCase(use: (A) -> ObservableK<B>, release: (A, ExitCase<Throwable>) -> ObservableK<Unit>): ObservableK<B> =
+  fun <B> bracketCase(use: (A) -> ObservableKOf<B>, release: (A, ExitCase<Throwable>) -> ObservableKOf<Unit>): ObservableK<B> =
     flatMap { a ->
-      use(a).observable
+      use(a).fix().observable
         .doOnNext { release(a, ExitCase.Completed) }
         .doOnError { release(a, ExitCase.Error(it)) }
         .k()

@@ -5,6 +5,7 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.effects.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import reactor.core.publisher.Mono
@@ -26,6 +27,14 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
 
   fun <B> flatMap(f: (A) -> MonoKOf<B>): MonoK<B> =
     mono.flatMap { f(it).fix().mono }.k()
+
+  fun <B> bracketCase(use: (A) -> MonoKOf<B>, release: (A, ExitCase<Throwable>) -> MonoKOf<Unit>): MonoK<B> =
+    flatMap { a ->
+      use(a).fix().mono
+        .doOnNext { release(a, ExitCase.Completed) }
+        .doOnError { release(a, ExitCase.Error(it)) }
+        .k()
+    }
 
   fun handleErrorWith(function: (Throwable) -> MonoK<A>): MonoK<A> =
     mono.onErrorResume { t: Throwable -> function(t).mono }.k()

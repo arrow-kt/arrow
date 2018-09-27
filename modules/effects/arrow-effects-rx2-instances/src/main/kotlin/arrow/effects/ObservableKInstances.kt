@@ -99,7 +99,7 @@ interface ObservableKMonadThrowInstance : MonadThrow<ForObservableK>, Observable
 @extension
 interface ObservableKBracketInstance : Bracket<ForObservableK, Throwable>, ObservableKMonadThrowInstance {
   override fun <A, B> Kind<ForObservableK, A>.bracketCase(use: (A) -> Kind<ForObservableK, B>, release: (A, ExitCase<Throwable>) -> Kind<ForObservableK, Unit>): ObservableK<B> =
-    fix().bracketCase({ a -> use(a).fix() }, { a, e -> release(a, e).fix() })
+    fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 
 @extension

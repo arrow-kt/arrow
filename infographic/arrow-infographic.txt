@@ -9,10 +9,13 @@
 #padding: 8
 #zoom: 1
 <<<<<<< HEAD
+<<<<<<< HEAD
 [<typeclasses>ApplicativeError]<-[<instances>ApplicativeError Instances|IOApplicativeErrorInstance|DeferredKApplicativeErrorInstance|FluxKApplicativeErrorInstance|MonoKApplicativeErrorInstance|FlowableKApplicativeErrorInstance|MaybeKApplicativeErrorInstance|ObservableKApplicativeErrorInstance|SingleKApplicativeErrorInstance]
 [<typeclasses>ApplicativeError]<-[<typeclasses>MonadError]
 [<typeclasses>Applicative]<-[<instances>Applicative Instances|IOApplicativeInstance|DeferredKApplicativeInstance|FluxKApplicativeInstance|MonoKApplicativeInstance|FlowableKApplicativeInstance|MaybeKApplicativeInstance|ObservableKApplicativeInstance|SingleKApplicativeInstance]
 =======
+=======
+>>>>>>> add reactor MonoK bracket instance
 [<typeclasses>Alternative]<-[<typeclasses>MonadCombine]
 [<typeclasses>ApplicativeError]<-[<instances>ApplicativeError Instances|IOApplicativeErrorInstance|EitherApplicativeErrorInstance|OptionApplicativeErrorInstance|TryApplicativeErrorInstance|KleisliApplicativeErrorInstance|StateTApplicativeErrorInstance|ValidatedApplicativeErrorInstance|DeferredKApplicativeErrorInstance|FlowableKApplicativeErrorInstance|MaybeKApplicativeErrorInstance|ObservableKApplicativeErrorInstance|SingleKApplicativeErrorInstance|FluxKApplicativeErrorInstance|MonoKApplicativeErrorInstance]
 [<typeclasses>ApplicativeError]<-[<typeclasses>MonadError]
@@ -92,4 +95,37 @@
 [<typeclasses>Traverse]<-[<instances>Traverse Instances|ConstTraverseInstance|EitherTraverseInstance|IdTraverseInstance|OptionTraverseInstance|TryTraverseInstance|Tuple2TraverseInstance|CoproductTraverseInstance|IorTraverseInstance|ListKTraverseInstance|MapKTraverseInstance|NonEmptyListTraverseInstance|OptionTTraverseInstance|SequenceKTraverseInstance|SortedMapKTraverseInstance|ValidatedTraverseInstance|FlowableKTraverseInstance|ObservableKTraverseInstance|FluxKTraverseInstance]
 [<typeclasses>Traverse]<-[<typeclasses>TraverseFilter]
 [<typeclasses>Functor]<-[<instances>Functor Instances|IOFunctorInstance|ConstFunctorInstance|EitherFunctorInstance|EvalFunctorInstance|Function0FunctorInstance|Function1FunctorInstance|IdFunctorInstance|OptionFunctorInstance|TryFunctorInstance|Tuple2FunctorInstance|CoproductFunctorInstance|IorFunctorInstance|KleisliFunctorInstance|ListKFunctorInstance|MapKFunctorInstance|NonEmptyListFunctorInstance|OptionTFunctorInstance|SequenceKFunctorInstance|SortedMapKFunctorInstance|StateTFunctorInstance|ValidatedFunctorInstance|WriterTFunctorInstance|DeferredKFunctorInstance|FlowableKFunctorInstance|MaybeKFunctorInstance|ObservableKFunctorInstance|SingleKFunctorInstance|FluxKFunctorInstance|MonoKFunctorInstance|CofreeFunctorInstance|CoyonedaFunctorInstance|FreeApplicativeFunctorInstance|FreeFunctorInstance|YonedaFunctorInstance|IntListPatternFunctorInstance]
+<<<<<<< HEAD
 >>>>>>> moar updates
+=======
+=======
+[<typeclasses>ApplicativeError]<-[<typeclasses>MonadError]
+[<typeclasses>Applicative]<-[<typeclasses>ApplicativeError]
+[<typeclasses>Applicative]<-[<typeclasses>Monad]
+[<typeclasses>Async]<-[<typeclasses>Effect]
+[<typeclasses>Bracket]<-[<typeclasses>MonadDefer]
+[<typeclasses>Effect]<-[<typeclasses>ConcurrentEffect]
+[<typeclasses>Foldable]<-[<typeclasses>Traverse]
+[<typeclasses>Functor]<-[<typeclasses>Applicative]
+[<typeclasses>Functor]<-[<typeclasses>Traverse]
+[<typeclasses>Invariant]<-[<typeclasses>Functor]
+[<typeclasses>MonadDefer]<-[<typeclasses>Async]
+[<typeclasses>MonadError]<-[<typeclasses>Bracket]
+[<typeclasses>Monad]<-[<typeclasses>MonadError]
+[<typeclasses>Monoid]<-[<instances>Monoid Instances|IOMonoidInstance]
+[<typeclasses>Semigroup]<-[<instances>Semigroup Instances|IOMonoidInstance|IOSemigroupInstance]
+[<typeclasses>Semigroup]<-[<typeclasses>Monoid]
+[<typeclasses>ApplicativeError]<-[<instances>ApplicativeError Instances|IOApplicativeErrorInstance|DeferredKApplicativeErrorInstance|FlowableKApplicativeErrorInstance|MaybeKApplicativeErrorInstance|ObservableKApplicativeErrorInstance|SingleKApplicativeErrorInstance|FluxKApplicativeErrorInstance|MonoKApplicativeErrorInstance]
+[<typeclasses>Applicative]<-[<instances>Applicative Instances|IOApplicativeInstance|DeferredKApplicativeInstance|FlowableKApplicativeInstance|MaybeKApplicativeInstance|ObservableKApplicativeInstance|SingleKApplicativeInstance|FluxKApplicativeInstance|MonoKApplicativeInstance]
+[<typeclasses>Async]<-[<instances>Async Instances|IOAsyncInstance|DeferredKAsyncInstance|FlowableKAsyncInstance|MaybeKAsyncInstance|ObservableKAsyncInstance|SingleKAsyncInstance|FluxKAsyncInstance|MonoKAsyncInstance]
+[<typeclasses>Bracket]<-[<instances>Bracket Instances|IOBracketInstance|DeferredKBracketInstance|FlowableKBracketInstance|MaybeKBracketInstance|ObservableKBracketInstance|SingleKBracketInstance|FluxKBracketInstance]
+[<typeclasses>ConcurrentEffect]<-[<instances>ConcurrentEffect Instances|IOConcurrentEffectInstance|DeferredKConcurrentEffectInstance|FlowableKConcurrentEffectInstance|ObservableKConcurrentEffectInstance|SingleKConcurrentEffectInstance|FluxKConcurrentEffectInstance|MonoKConcurrentEffectInstance]
+[<typeclasses>Effect]<-[<instances>Effect Instances|IOEffectInstance|DeferredKConcurrentEffectInstance|FlowableKConcurrentEffectInstance|ObservableKConcurrentEffectInstance|SingleKConcurrentEffectInstance|FluxKConcurrentEffectInstance|MonoKConcurrentEffectInstance]
+[<typeclasses>Foldable]<-[<instances>Foldable Instances|FlowableKFoldableInstance|MaybeKFoldableInstance|ObservableKFoldableInstance|FluxKFoldableInstance]
+[<typeclasses>Functor]<-[<instances>Functor Instances|IOFunctorInstance|DeferredKFunctorInstance|FlowableKFunctorInstance|MaybeKFunctorInstance|ObservableKFunctorInstance|SingleKFunctorInstance|FluxKFunctorInstance|MonoKFunctorInstance]
+[<typeclasses>MonadDefer]<-[<instances>MonadDefer Instances|IOMonadDeferInstance|DeferredKMonadDeferInstance|FlowableKMonadDeferInstance|MaybeKMonadDeferInstance|ObservableKMonadDeferInstance|SingleKMonadDeferInstance|FluxKMonadDeferInstance|MonoKMonadDeferInstance]
+[<typeclasses>MonadError]<-[<instances>MonadError Instances|IOMonadErrorInstance|DeferredKMonadErrorInstance|FlowableKMonadErrorInstance|MaybeKMonadErrorInstance|ObservableKMonadErrorInstance|SingleKMonadErrorInstance|FluxKMonadErrorInstance|MonoKMonadErrorInstance]
+[<typeclasses>Monad]<-[<instances>Monad Instances|IOMonadInstance|DeferredKMonadInstance|FlowableKMonadInstance|MaybeKMonadInstance|ObservableKMonadInstance|SingleKMonadInstance|FluxKMonadInstance|MonoKMonadInstance]
+[<typeclasses>Traverse]<-[<instances>Traverse Instances|FlowableKTraverseInstance|ObservableKTraverseInstance|FluxKTraverseInstance]
+>>>>>>> add reactor MonoK bracket instance
+>>>>>>> add reactor MonoK bracket instance

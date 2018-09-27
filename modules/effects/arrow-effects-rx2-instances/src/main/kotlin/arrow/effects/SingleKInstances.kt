@@ -72,7 +72,7 @@ interface SingleKMonadThrowInstance : MonadThrow<ForSingleK>, SingleKMonadErrorI
 @extension
 interface SingleKBracketInstance : Bracket<ForSingleK, Throwable>, SingleKMonadThrowInstance {
   override fun <A, B> Kind<ForSingleK, A>.bracketCase(use: (A) -> Kind<ForSingleK, B>, release: (A, ExitCase<Throwable>) -> Kind<ForSingleK, Unit>): SingleK<B> =
-    fix().bracketCase({ a -> use(a).fix() }, { a, e -> release(a, e).fix() })
+    fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 
 @extension
