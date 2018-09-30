@@ -98,6 +98,15 @@ options:
       - title: StateT
         url: /docs/datatypes/statet/
 
+      - title: Store
+        url: /docs/datatypes/store/
+
+      - title: Moore
+        url: /docs/datatype/moore/
+
+      - title: Sum
+        url: /docs/datatype/sum/
+
       - title: WriterT
         url: /docs/datatypes/writert/
 
