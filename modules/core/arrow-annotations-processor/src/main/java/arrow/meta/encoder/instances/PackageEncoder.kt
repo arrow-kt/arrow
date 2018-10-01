@@ -1,8 +1,6 @@
 package arrow.meta.encoder.instances
 
-import arrow.core.Either
-import arrow.core.left
-import arrow.core.right
+import shadow.core.*
 import arrow.meta.ast.PackageName
 import arrow.meta.encoder.EncodingError
 import arrow.meta.encoder.MetaEncoder
@@ -13,8 +11,9 @@ object PackageEncoder : MetaEncoder<PackageName> {
 
   override fun encode(element: Element): Either<EncodingError, PackageName> =
     when (element) {
-      is PackageElement -> PackageName(element.qualifiedName.toString()).right()
-      else -> EncodingError.UnsupportedElementType("Unsupported $element, as (${element.kind}) to PackageName", element).left()
+      is PackageElement -> Either.Right(PackageName(element.qualifiedName.toString()))
+        else
+      -> Either.Left(EncodingError.UnsupportedElementType("Unsupported $element, as (${element.kind}) to PackageName", element))
     }
 
 }

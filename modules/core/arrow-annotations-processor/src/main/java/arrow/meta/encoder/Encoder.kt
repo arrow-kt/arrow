@@ -1,6 +1,6 @@
 package arrow.meta.encoder
 
-import shadow.arrow.core.Either
+import shadow.core.Either
 import arrow.meta.ast.Tree
 import javax.lang.model.element.Element
 

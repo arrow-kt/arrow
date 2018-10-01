@@ -111,7 +111,7 @@ interface ProcessorUtils : KotlinMetadataUtils {
   }
 }
 
-fun String.removeBackticks() = this.replace("`", "")
+fun String.removeBackticks() = replace("`", "")
 
 fun knownError(message: String, element: Element? = null): Nothing = throw KnownException(message, element)
 

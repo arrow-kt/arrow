@@ -2,14 +2,14 @@ package arrow.instances
 
 import arrow.Kind
 import arrow.core.*
-import arrow.core.applicative.applicative
-import arrow.core.functor.functor
-import arrow.core.monad.monad
 import arrow.data.*
-import arrow.data.applicative.applicative
-import arrow.data.functor.functor
-import arrow.data.monad.monad
 import arrow.extension
+import arrow.instances.syntax.id.applicative.applicative
+import arrow.instances.syntax.id.functor.functor
+import arrow.instances.syntax.id.monad.monad
+import arrow.instances.syntax.kleisli.applicative.applicative
+import arrow.instances.syntax.kleisli.functor.functor
+import arrow.instances.syntax.kleisli.monad.monad
 import arrow.typeclasses.*
 
 @extension

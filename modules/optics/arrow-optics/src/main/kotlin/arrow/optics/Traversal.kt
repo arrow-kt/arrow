@@ -2,13 +2,13 @@ package arrow.optics
 
 import arrow.Kind
 import arrow.core.*
-import arrow.core.applicative.applicative
 import arrow.data.*
-import arrow.data.monoid.monoid
 import arrow.higherkind
 import arrow.instances.monoid
+import arrow.instances.syntax.const.applicative.applicative
+import arrow.instances.syntax.id.applicative.applicative
+import arrow.instances.syntax.listK.monoid.monoid
 import arrow.typeclasses.*
-import arrow.typeclasses.applicative.applicative
 
 /**
  * [Traversal] is a type alias for [PTraversal] which fixes the type arguments
@@ -191,7 +191,7 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
    * Map each target to a Monoid and combine the results
    */
   fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R =
-    modifyF(Const.applicative(M, Unit), s) { b -> Const(f(b)) }.value()
+    modifyF(Const.applicative(M), s) { b -> Const(f(b)) }.value()
 
   /**
    * Fold using the given [Monoid] instance.

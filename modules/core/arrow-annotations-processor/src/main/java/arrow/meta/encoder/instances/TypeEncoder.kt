@@ -1,8 +1,6 @@
 package arrow.meta.encoder.instances
 
-import arrow.core.Either
-import arrow.core.left
-import arrow.core.right
+import shadow.core.Either
 import arrow.meta.ast.PackageName
 import arrow.meta.ast.Type
 import arrow.meta.ast.TypeName
@@ -23,7 +21,7 @@ interface TypeEncoder : MetaEncoder<Type>, MetaProcessorUtils {
     val encodingResult: Either<EncodingError, Type> =
       elementUtils.getPackageOf(element).let { pckg ->
         when (element.kind) {
-          ElementKind.INTERFACE -> Type(PackageName(pckg.qualifiedName.toString()), element.asType().asTypeName().toMeta(), Type.Kind.Interface).right()
+          ElementKind.INTERFACE -> Either.Right(Type(PackageName(pckg.qualifiedName.toString()), element.asType().asTypeName().toMeta(), Type.Kind.Interface))
           ElementKind.CLASS -> {
             val typeElement = element as TypeElement
             val classBuilder = Type(PackageName(pckg.qualifiedName.toString()), element.asType().asTypeName().toMeta(), Type.Kind.Class)
@@ -31,12 +29,12 @@ interface TypeEncoder : MetaEncoder<Type>, MetaProcessorUtils {
             val constructors = ElementFilter.constructorsIn(elementUtils.getAllMembers(element)).filter {
               declaredConstructorSignatures.contains(it.jvmMethodSignature)
             }.mapNotNull { it.asConstructor(element) }
-            classBuilder.copy(
+            Either.Right(classBuilder.copy(
               primaryConstructor = constructors.find { it.first }?.second,
               superclass = if (typeElement.superclass is NoType) null else typeElement.superclass.asTypeName().toMeta()
-            ).right()
+            ))
           }
-          else -> EncodingError.UnsupportedElementType("Unsupported ${this}, as (${element.kind}) to Type", element).left()
+          else -> Either.Left(EncodingError.UnsupportedElementType("Unsupported ${this}, as (${element.kind}) to Type", element))
         }
       }
     return encodingResult.map {

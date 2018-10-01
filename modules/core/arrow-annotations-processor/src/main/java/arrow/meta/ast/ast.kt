@@ -101,7 +101,18 @@ sealed class TypeName : Tree() {
     val pckg: PackageName,
     val nullable: Boolean = false,
     val annotations: List<Annotation> = emptyList()) : TypeName() {
-    companion object
+
+    fun companion(): Classy =
+      copy(
+        simpleName = "Companion",
+        fqName = "$fqName.Companion",
+        pckg = PackageName("${pckg.value}.$simpleName")
+      )
+
+    companion object {
+      fun from(pck: String, simpleName: String) : Classy =
+        Classy(simpleName, "$pck.$simpleName", PackageName(pck))
+    }
   }
 
   companion object {

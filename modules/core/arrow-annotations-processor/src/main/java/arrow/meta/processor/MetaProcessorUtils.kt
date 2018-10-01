@@ -1,13 +1,11 @@
 package arrow.meta.processor
 
-import arrow.common.messager.logW
 import arrow.common.utils.*
 import arrow.meta.ast.*
 import arrow.meta.ast.Annotation
 import arrow.meta.ast.Modifier
 import arrow.meta.ast.TypeName
 import arrow.meta.encoder.MetaEncoder
-import shadow.arrow.core.*
 import com.squareup.kotlinpoet.*
 import me.eugeniomarletti.kotlin.metadata.*
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmConstructorSignature
@@ -18,6 +16,10 @@ import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.NameResolver
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.hasReceiver
+import shadow.core.None
+import shadow.core.Some
+import shadow.core.Try
+import shadow.core.Tuple2
 import javax.lang.model.element.*
 import javax.lang.model.util.ElementFilter
 import kotlin.reflect.KClass
@@ -84,7 +86,10 @@ interface MetaProcessorUtils : ProcessorUtils {
       .replace("java.lang.Throwable", "kotlin.Throwable").let {
         if (it == "java.lang") it.replace("java.lang", "kotlin")
         else it
-      }
+      }.let {
+        if (it == "java.util") it.replace("java.util", "kotlin.collections")
+        else it
+      }.replace("Integer", "Int")
 
   fun TypeElement.allFunctions(declaredElement: TypeElement): List<Func> {
     val superTypes = supertypes(declaredElement.meta, TypeTable(declaredElement.meta.classProto.typeTable), emptyList())
@@ -107,7 +112,7 @@ interface MetaProcessorUtils : ProcessorUtils {
         if (templateFunction != null && templateFunction.second.modality != null) {
           val fMod = function.copy(modifiers = function.modifiers + listOfNotNull(templateFunction.second.modality?.toMeta()))
           if (templateFunction.second.hasReceiverType()) {
-            val receiverTypeName = fMod.parameters[0].type
+            val receiverTypeName = fMod.parameters[0].type.asKotlin()
             val functionWithReceiver = fMod.copy(receiverType = receiverTypeName)
             val arguments = functionWithReceiver.parameters.drop(1)
             functionWithReceiver.copy(parameters = arguments)
@@ -127,7 +132,7 @@ interface MetaProcessorUtils : ProcessorUtils {
 
   fun TypeName.TypeVariable.removeConstrains(): TypeName.TypeVariable =
     copy(
-      bounds = bounds.mapNotNull { if (it is TypeName.Classy && it.fqName == "java.lang.Object") null else it.removeConstrains() },
+      bounds = bounds.mapNotNull { if (it is TypeName.Classy && it.fqName == "java.lang.Object") null else it },
       variance = null
     )
 
@@ -264,7 +269,7 @@ interface MetaProcessorUtils : ProcessorUtils {
   private fun VariableElement.toMeta(): Parameter =
     Parameter(
       name = simpleName.toString(),
-      type = asType().asTypeName().toMeta(),
+      type = asType().asTypeName().toMeta().asKotlin(),
       modifiers = modifiers.mapNotNull { it.toMeta() }
     )
 
@@ -409,7 +414,7 @@ interface MetaProcessorUtils : ProcessorUtils {
       name = name,
       modifiers = modifiers.map { it.toMeta() },
       annotations = annotations.map { it.toMeta() },
-      type = type.toMeta(),
+      type = type.toMeta().asKotlin(),
       defaultValue = defaultValue?.toMeta()
     )
 
@@ -426,28 +431,26 @@ interface MetaProcessorUtils : ProcessorUtils {
   }
 
   private fun com.squareup.kotlinpoet.FunSpec.toMeta(element: ExecutableElement): Func =
-    trampolined {
-      Func(
-        name = element.simpleName.toString(),
-        annotations = annotations.map { it.toMeta() },
-        typeVariables = typeVariables.map { it.toMeta() },
-        modifiers = modifiers.map { it.toMeta() },
-        returnType = returnType?.toMeta()?.downKind(),
-        receiverType = receiverType?.toMeta(),
-        kdoc = kdoc.toMeta(),
-        body = body.toMeta(),
-        parameters = parameters.map { it.toMeta() },
-        jvmMethodSignature = element.jvmMethodSignature
-      )
-    }
+    Func(
+      name = element.simpleName.toString(),
+      annotations = annotations.map { it.toMeta() },
+      typeVariables = typeVariables.map { it.toMeta() },
+      modifiers = modifiers.map { it.toMeta() },
+      returnType = returnType?.toMeta(),
+      receiverType = receiverType?.toMeta(),
+      kdoc = kdoc.toMeta(),
+      body = body.toMeta(),
+      parameters = parameters.map { it.toMeta() },
+      jvmMethodSignature = element.jvmMethodSignature
+    )
 
   private fun com.squareup.kotlinpoet.AnnotationSpec.toMeta(): Annotation =
     Annotation(type.toMeta(), members = members.map { it.toMeta() }, useSiteTarget = useSiteTarget?.toMeta())
 
   private fun com.squareup.kotlinpoet.WildcardTypeName.toMeta(): TypeName.WildcardType =
     TypeName.WildcardType(
-      toString().removeVariance().asKotlin(),
-      upperBounds.map { it.toMeta() },
+      name = toString().removeVariance().asKotlin(),
+      upperBounds = upperBounds.map { it.toMeta() },
       lowerBounds = lowerBounds.map { it.toMeta() },
       nullable = nullable,
       annotations = annotations.map { it.toMeta() }
@@ -506,35 +509,38 @@ interface MetaProcessorUtils : ProcessorUtils {
       KModifier.OUT -> Modifier.OutVariance
     }
 
-  fun <A> trampolined(f: () -> A) : A =
-    Trampoline.delay(f).runT()
-
   private fun com.squareup.kotlinpoet.TypeVariableName.toMeta(): TypeName.TypeVariable =
-    trampolined {
-      TypeName.TypeVariable(
-        name = name.asKotlin(),
-        bounds = bounds.map
-        { it.toMeta().removeConstrains() },
-        annotations = annotations.map
-        { it.toMeta() },
-        nullable = nullable,
-        reified = reified,
-        variance = variance?.toMeta()
-      )
-    }
+    TypeName.TypeVariable(
+      name = name.asKotlin(),
+      bounds = bounds.map
+      { it.toMeta().removeConstrains() },
+      annotations = annotations.map
+      { it.toMeta() },
+      nullable = nullable,
+      reified = reified,
+      variance = variance?.toMeta()
+    )
 
-  fun com.squareup.kotlinpoet.TypeName.toMeta(): TypeName = trampolined {
-    when (this) {
-      is WildcardTypeName -> toMeta()
-      is ClassName -> toMeta()
-      is ParameterizedTypeName -> toMeta()
-      is TypeVariableName -> toMeta()
+  fun trace(): Unit = Unit
+
+  val typeNameToMeta: (typeName: com.squareup.kotlinpoet.TypeName) -> TypeName
+
+  fun com.squareup.kotlinpoet.TypeName.toMeta(): TypeName =
+    typeNameToMeta(this)
+
+  fun typeNameToMetaImpl(typeName: com.squareup.kotlinpoet.TypeName): TypeName {
+    trace()
+    return when (typeName) {
+      is ClassName -> typeName.toMeta()
+      is ParameterizedTypeName -> typeName.toMeta()
+      is TypeVariableName -> typeName.toMeta()
+      is WildcardTypeName -> typeName.toMeta()
       else -> throw IllegalArgumentException("arrow-meta has no bindings for unsupported type name: $this")
     }
   }
 
   private fun getTypeElement(name: String): shadow.core.Option<TypeElement> =
-    Try { elementUtils.getTypeElement(name) }.fold({ None }) { el -> if (el == null) None else el.some() }
+    Try { elementUtils.getTypeElement(name) }.fold({ None }) { el -> if (el == null) None else Some(el) }
 
   tailrec fun TypeName.asType(encoder: MetaEncoder<Type>): Type? =
     when (this) {
@@ -560,8 +566,8 @@ interface MetaProcessorUtils : ProcessorUtils {
     val unAppliedName =
       if (classy.simpleName.startsWith("For")) classy.simpleName.drop("For".length)
       else classy.simpleName
-    return if (unAppliedName.endsWith("PartialOf")) classy.pckg.value toT unAppliedName.substringBeforeLast("PartialOf")
-    else classy.pckg.value toT unAppliedName
+    return if (unAppliedName.endsWith("PartialOf")) Tuple2(classy.pckg.value, unAppliedName.substringBeforeLast("PartialOf"))
+    else Tuple2(classy.pckg.value, unAppliedName)
   }
 
   val Code.Companion.TODO: Code
@@ -572,14 +578,16 @@ interface MetaProcessorUtils : ProcessorUtils {
       if (pckg.isBlank()) this else copy(name = "$pckg.$unPrefixedName")
     }
 
+  fun TypeName.ParameterizedType.isKinded(): Boolean =
+    rawType.fqName == "arrow.Kind" && typeArguments.size == 2 && (typeArguments[0] !is TypeName.TypeVariable)
+
   fun TypeName.ParameterizedType.downKind(): TypeName.ParameterizedType =
-    if (rawType.fqName == "arrow.Kind" && typeArguments.size >= 2) {
+    if (isKinded()) {
       val witness = typeArguments[0].downKind()
       val tail = when (witness) {
         is TypeName.ParameterizedType -> typeArguments.drop(1) + witness.typeArguments
         else -> typeArguments.drop(1)
       }.map { it.downKind() }
-      typeArguments.drop(1).map { it.downKind() }
       val fullName = when (witness) {
         is TypeName.TypeVariable -> witness.name
         is TypeName.WildcardType -> witness.name
@@ -587,12 +595,6 @@ interface MetaProcessorUtils : ProcessorUtils {
         is TypeName.Classy -> witness.fqName
       }
       copy(name = fullName, rawType = fullName.asClassy(), typeArguments = tail)
-    } else if (rawType.pckg.value.isBlank()) { //this may be a G<> type arg
-      copy(
-        name = "arrow.Kind<${rawType.simpleName}, ${typeArguments.joinToString { it.simpleName }}>",
-        rawType = TypeName.Classy("Kind", "arrow.Kind", PackageName("arrow")),
-        typeArguments = listOf(TypeName.TypeVariable(rawType.simpleName)) + typeArguments
-      )
     } else this
 
   fun Func.containsModifier(modifier: Modifier): Boolean =
@@ -612,13 +614,18 @@ interface MetaProcessorUtils : ProcessorUtils {
       copy(simpleName = unPrefixedName, fqName = "$pckg.$unPrefixedName")
     }
 
-  fun TypeName.downKind(): TypeName =
-    when (this) {
-      is TypeName.TypeVariable -> downKind()
-      is TypeName.WildcardType -> downKind()
-      is TypeName.ParameterizedType -> downKind()
-      is TypeName.Classy -> downKind()
+  fun typeNameDownKindImpl(typeName: TypeName): TypeName =
+    when (typeName) {
+      is TypeName.TypeVariable -> typeName.downKind().asKotlin()
+      is TypeName.WildcardType -> typeName.downKind().asKotlin()
+      is TypeName.ParameterizedType -> typeName.downKind().asKotlin()
+      is TypeName.Classy -> typeName.downKind().asKotlin()
     }
+
+  val typeNameDownKind: (typeName: TypeName) -> TypeName
+
+  fun TypeName.downKind(): TypeName =
+    typeNameDownKind(this)
 
   fun TypeName.asKotlin(): TypeName =
     when (this) {
@@ -635,7 +642,11 @@ interface MetaProcessorUtils : ProcessorUtils {
     copy(name = name.asKotlin(), rawType = rawType.asKotlin(), typeArguments = typeArguments.map { it.asKotlin() })
 
   fun TypeName.WildcardType.asKotlin(): TypeName.WildcardType =
-    copy(name = name.asKotlin())
+    copy(
+      name = name.asKotlin(),
+      upperBounds = upperBounds.map { it.asKotlin() },
+      lowerBounds = lowerBounds.map { it.asKotlin() }
+    )
 
   fun TypeName.Classy.asKotlin(): TypeName.Classy =
     copy(simpleName = simpleName.asKotlin(), fqName = fqName.asKotlin(), pckg = PackageName(pckg.value.asKotlin()))
@@ -646,7 +657,8 @@ interface MetaProcessorUtils : ProcessorUtils {
     val typeClass: Type,
     val instanceTypeElement: TypeElement,
     val dataTypeTypeElement: TypeElement,
-    val typeClassTypeElement: TypeElement
+    val typeClassTypeElement: TypeElement,
+    val projectedCompanion: TypeName
   )
 
   val TypeClassInstance.requiredAbstractFunctions: List<Func>
@@ -694,6 +706,17 @@ interface MetaProcessorUtils : ProcessorUtils {
       if (typeClass != null && typeClassTypeName is TypeName.ParameterizedType && typeClassTypeName.typeArguments.isNotEmpty()) {
         val dataTypeName = typeClassTypeName.typeArguments[0]
         val dataTypeDownKinded = dataTypeName.downKind()
+        //profunctor cases are parametric to Kind2 values
+        val projectedCompanion =
+          if (dataTypeName is TypeName.TypeVariable && dataTypeDownKinded.simpleName == "arrow.Kind")
+            dataTypeName.simpleName
+              .substringAfter("<").substringBefore(",")
+              .downKind().let { (pckg, simpleName) ->
+                TypeName.Classy.from(pckg, simpleName)
+              }
+          else if (dataTypeDownKinded is TypeName.Classy) {
+            dataTypeDownKinded
+          } else dataTypeDownKinded
         val dataType = dataTypeDownKinded.asType(typeEncoder)
         if (dataType != null && dataTypeDownKinded is TypeName.TypeVariable) TypeClassInstance(
           instance = instance,
@@ -701,7 +724,8 @@ interface MetaProcessorUtils : ProcessorUtils {
           typeClass = typeClass,
           instanceTypeElement = this@typeClassInstance,
           dataTypeTypeElement = elementUtils.getTypeElement(dataTypeDownKinded.name),
-          typeClassTypeElement = elementUtils.getTypeElement(typeClassTypeName.rawType.fqName)
+          typeClassTypeElement = elementUtils.getTypeElement(typeClassTypeName.rawType.fqName),
+          projectedCompanion = projectedCompanion
         )
         else null
       } else null

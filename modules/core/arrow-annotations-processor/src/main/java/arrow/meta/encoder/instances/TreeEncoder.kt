@@ -1,7 +1,6 @@
 package arrow.meta.encoder.instances
 
-import arrow.core.Either
-import arrow.core.left
+import shadow.core.Either
 import arrow.meta.ast.PackageName
 import arrow.meta.ast.Tree
 import arrow.meta.ast.Type
@@ -20,7 +19,7 @@ class TreeEncoder(
       ElementKind.PACKAGE -> packageEncoder.encode(element)
       ElementKind.CLASS -> typeEncoder.encode(element)
       ElementKind.INTERFACE -> typeEncoder.encode(element)
-      else -> EncodingError.UnsupportedElementType("Not supported: ${element.kind}", element).left()
+      else -> Either.Left(EncodingError.UnsupportedElementType("Not supported: ${element.kind}", element))
     }
 
 }

@@ -39,6 +39,10 @@ interface WriterTApplicativeInstance<F, W> : Applicative<WriterTPartialOf<F, W>>
 @extension
 interface WriterTMonadInstance<F, W> : Monad<WriterTPartialOf<F, W>>, WriterTApplicativeInstance<F, W> {
 
+  override fun MF(): Monad<F>
+
+  override fun MM(): Monoid<W>
+
   override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.map(f: (A) -> B): WriterT<F, W, B> =
     fix().map(FF()) { f(it) }
 

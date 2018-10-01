@@ -2,12 +2,12 @@ package arrow.instances
 
 import arrow.Kind
 import arrow.core.*
-import arrow.core.monad.monad
 import arrow.data.*
-import arrow.data.applicative.applicative
-import arrow.data.functor.functor
-import arrow.data.monad.monad
 import arrow.extension
+import arrow.instances.syntax.id.monad.monad
+import arrow.instances.syntax.stateT.applicative.applicative
+import arrow.instances.syntax.stateT.functor.functor
+import arrow.instances.syntax.stateT.monad.monad
 import arrow.typeclasses.*
 
 @extension
@@ -44,6 +44,8 @@ interface StateTApplicativeInstance<F, S> : Applicative<StateTPartialOf<F, S>>, 
 @extension
 interface StateTMonadInstance<F, S> : Monad<StateTPartialOf<F, S>>, StateTApplicativeInstance<F, S> {
 
+  override fun MF(): Monad<F>
+
   override fun <A, B> Kind<StateTPartialOf<F, S>, A>.map(f: (A) -> B): StateT<F, S, B> =
     fix().map(MF(), f)
 
@@ -77,6 +79,8 @@ interface StateTApplicativeErrorInstance<F, S, E> : ApplicativeError<StateTParti
 
   override fun FF(): Functor<F> = ME()
 
+  override fun MF(): Monad<F> = ME()
+
   override fun <A> raiseError(e: E): Kind<StateTPartialOf<F, S>, A> = StateT.lift(ME(), ME().raiseError(e))
 
   override fun <A> Kind<StateTPartialOf<F, S>, A>.handleErrorWith(f: (E) -> Kind<StateTPartialOf<F, S>, A>): StateT<F, S, A> =
@@ -84,22 +88,28 @@ interface StateTApplicativeErrorInstance<F, S, E> : ApplicativeError<StateTParti
 }
 
 @extension
-interface StateTMonadErrorInstance<F, S, E> : MonadError<StateTPartialOf<F, S>, E>, StateTApplicativeErrorInstance<F, S, E>, StateTMonadInstance<F, S>
+interface StateTMonadErrorInstance<F, S, E> : MonadError<StateTPartialOf<F, S>, E>, StateTApplicativeErrorInstance<F, S, E>, StateTMonadInstance<F, S> {
+
+  override fun MF(): Monad<F> = ME()
+
+  override fun ME(): MonadError<F, E>
+
+}
 
 /**
  * Alias for[StateT.Companion.applicative]
  */
-fun <S> StateApi.applicative(): Applicative<StateTPartialOf<ForId, S>> = StateT.applicative<ForId, S>(Id.monad())
+fun <S> StateApi.applicative(): Applicative<StateTPartialOf<ForId, S>> = StateT.applicative(Id.monad())
 
 /**
  * Alias for [StateT.Companion.functor]
  */
-fun <S> StateApi.functor(): Functor<StateTPartialOf<ForId, S>> = StateT.functor<ForId, S>(Id.monad())
+fun <S> StateApi.functor(): Functor<StateTPartialOf<ForId, S>> = StateT.functor(Id.monad())
 
 /**
  * Alias for [StateT.Companion.monad]
  */
-fun <S> StateApi.monad(): Monad<StateTPartialOf<ForId, S>> = StateT.monad<ForId, S>(Id.monad())
+fun <S> StateApi.monad(): Monad<StateTPartialOf<ForId, S>> = StateT.monad(Id.monad())
 
 class StateTContext<F, S, E>(val ME: MonadError<F, E>) : StateTMonadErrorInstance<F, S, E> {
   override fun MF(): Monad<F> = ME()

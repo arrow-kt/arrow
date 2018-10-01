@@ -1,5 +1,6 @@
 package arrow.instances
 
+import arrow.common.messager.log
 import arrow.common.messager.logW
 import arrow.common.utils.*
 import arrow.extension
@@ -25,7 +26,7 @@ class InstanceProcessor : MetaProcessor<extension, Type>(annotations = listOf(ex
       is AnnotatedElement.Interface -> {
         try {
           val info = annotatedElement.typeElement.typeClassInstance(this@InstanceProcessor)
-          logW("Processing: ${info?.instance?.name?.simpleName}")
+          log("[${info?.instance?.name?.simpleName}] : Generating [${info?.typeClass?.name?.simpleName}] extensions for [${info?.dataType?.name?.simpleName}]")
           val fileSpec = info?.let {
             FileSpec.builder(
               "${annotatedElement.type.packageName.value}.syntax.${info.dataType.name.downKind().simpleName.decapitalize()}.${info.typeClass.name.simpleName.decapitalize()}",
@@ -61,23 +62,29 @@ class InstanceProcessor : MetaProcessor<extension, Type>(annotations = listOf(ex
   private fun notAnInstanceError(): Nothing =
     knownError("@extension is only allowed on `interface` extending another interface of at least one type argument (type class) as first declaration in the extension list")
 
-  fun MetaProcessorUtils.TypeClassInstance.genCompanionFactory(): Func = Func(
-      name = typeClass.name.simpleName.decapitalize(),
-      parameters = requiredParameters,
-      receiverType = TypeName.Classy(
+  fun MetaProcessorUtils.TypeClassInstance.genCompanionFactory(): Func {
+    val target = when (projectedCompanion) {
+      is TypeName.Classy -> projectedCompanion.companion()
+      else -> TypeName.Classy(
         simpleName = "Companion",
         fqName = "${dataType.packageName.value}.Companion",
         pckg = PackageName(dataType.packageName.value + "." + dataType.name.downKind().simpleName)
-      ),
+      )
+    }
+    return Func(
+      name = typeClass.name.simpleName.decapitalize(),
+      parameters = requiredParameters,
+      receiverType = target,
       typeVariables = instance.typeVariables.map { it.removeConstrains() },
       returnType = instance.name,
       body = Code {
         """|return object : ${+instance.name} {
-           |  ${requiredAbstractFunctions.code()}
-           |}
-        """
+             |  ${requiredAbstractFunctions.code()}
+             |}
+          """
       }
     )
+  }
 
   fun MetaProcessorUtils.TypeClassInstance.genDataTypeExtensions(): List<Func> {
     val extensionSet = typeClass.declaredFunctions.map { it.jvmMethodSignature }
@@ -91,33 +98,33 @@ class InstanceProcessor : MetaProcessor<extension, Type>(annotations = listOf(ex
         val func = f.removeDummyArgs().downKindReturnType()
         val dummyArgsCount = f.countDummyArgs()
         val allArgs = func.parameters + requiredParameters
-        val typeVariables = instance.typeVariables.map { it.removeConstrains() } + func.typeVariables.map { it.disambiguate(instance.typeVariables) }
+        val typeVariables = (func.typeVariables + instance.typeVariables)
+          .asSequence()
+          .map { it.removeConstrains() }
+          .distinctBy { it.name }
+          .toList()
         func
           .copy(
             typeVariables = typeVariables,
             annotations = listOf(
               JvmName(func.name + if (dummyArgsCount > 0) dummyArgsCount else ""),
-              SuppressAnnotation(""""UNCHECKED_CAST"""")
+              SuppressAnnotation(
+                """"UNCHECKED_CAST"""",
+                """"USELESS_CAST"""",
+                """"EXTENSION_SHADOWED_BY_MEMBER""""
+              )
             ),
             parameters = allArgs,
             body = Code {
               val receiverType = func.receiverType
-              val dataTypeCompanion = dataType.name.downKind().let {
-                when (it) {
-                  is TypeName.TypeVariable -> it
-                  is TypeName.WildcardType -> it
-                  is TypeName.ParameterizedType -> it.rawType
-                  is TypeName.Classy -> it
-                }
-              }
               if (receiverType != null) {
-                """|return ${+dataTypeCompanion}.${typeClass.name.simpleName.decapitalize()}${+instance.typeVariables}(${requiredParameters.code { +it.name }}).run {
-                     |  this@${+func.name}.${+func.name}${+typeVariables}(${allArgs.codeNames()}) as ${+func.returnType}
+                """|return ${+projectedCompanion}.${typeClass.name.simpleName.decapitalize()}${+instance.typeVariables}(${requiredParameters.code { +it.name }}).run {
+                     |  ${+func.name}${+func.typeVariables}(${func.parameters.codeNames()}) as ${+func.returnType}
                      |}
                      |
                    """
               } else {
-                """|return ${+dataTypeCompanion}
+                """|return ${+projectedCompanion}
                      |   .${typeClass.name.simpleName.decapitalize()}${+instance.typeVariables}(${requiredParameters.code { +it.name }})
                      |   .${+func.name}${+func.typeVariables}(${func.parameters.codeNames()}) as ${+func.returnType}
                      |

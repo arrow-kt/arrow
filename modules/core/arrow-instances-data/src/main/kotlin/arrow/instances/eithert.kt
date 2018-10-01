@@ -2,13 +2,13 @@ package arrow.instances
 
 import arrow.Kind
 import arrow.core.*
-import arrow.core.foldable.foldable
-import arrow.core.monad.monad
-import arrow.core.traverse.traverse
 import arrow.data.EitherT
 import arrow.data.EitherTOf
 import arrow.data.EitherTPartialOf
 import arrow.data.fix
+import arrow.instances.syntax.either.foldable.foldable
+import arrow.instances.syntax.either.monad.monad
+import arrow.instances.syntax.either.traverse.traverse
 import arrow.typeclasses.*
 
 interface EitherTFunctorInstance<F, L> : Functor<EitherTPartialOf<F, L>> {

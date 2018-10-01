@@ -28,6 +28,8 @@ interface ValidatedApplicativeInstance<E> : Applicative<ValidatedPartialOf<E>>, 
 @extension
 interface ValidatedApplicativeErrorInstance<E> : ApplicativeError<ValidatedPartialOf<E>, E>, ValidatedApplicativeInstance<E> {
 
+  override fun SE(): Semigroup<E>
+
   override fun <A> raiseError(e: E): Validated<E, A> = Invalid(e)
 
   override fun <A> Kind<ValidatedPartialOf<E>, A>.handleErrorWith(f: (E) -> Kind<ValidatedPartialOf<E>, A>): Validated<E, A> =

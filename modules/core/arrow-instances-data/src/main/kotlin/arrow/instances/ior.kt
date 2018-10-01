@@ -35,6 +35,8 @@ interface IorApplicativeInstance<L> : Applicative<IorPartialOf<L>>, IorFunctorIn
 @extension
 interface IorMonadInstance<L> : Monad<IorPartialOf<L>>, IorApplicativeInstance<L> {
 
+  override fun SL(): Semigroup<L>
+
   override fun <A, B> Kind<IorPartialOf<L>, A>.map(f: (A) -> B): Ior<L, B> = fix().map(f)
 
   override fun <A, B> Kind<IorPartialOf<L>, A>.flatMap(f: (A) -> Kind<IorPartialOf<L>, B>): Ior<L, B> =

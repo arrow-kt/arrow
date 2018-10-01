@@ -3,8 +3,8 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.Eval
 import arrow.data.*
-import arrow.data.eq.eq
 import arrow.extension
+import arrow.instances.syntax.setK.eq.eq
 import arrow.typeclasses.*
 
 @extension
@@ -42,6 +42,8 @@ interface MapKSemigroupInstance<K, A> : Semigroup<MapK<K, A>> {
 
 @extension
 interface MapKMonoidInstance<K, A> : Monoid<MapK<K, A>>, MapKSemigroupInstance<K, A> {
+
+  override fun SG(): Semigroup<A>
 
   override fun empty(): MapK<K, A> = emptyMap<K, A>().k()
 }

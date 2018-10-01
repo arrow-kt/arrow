@@ -2,14 +2,14 @@ package arrow.instances
 
 import arrow.Kind
 import arrow.core.*
-import arrow.core.applicative.applicative
-import arrow.core.foldable.foldable
-import arrow.core.traverse.traverse
 import arrow.data.OptionT
 import arrow.data.OptionTOf
 import arrow.data.OptionTPartialOf
 import arrow.data.fix
 import arrow.extension
+import arrow.instances.syntax.option.applicative.applicative
+import arrow.instances.syntax.option.foldable.foldable
+import arrow.instances.syntax.option.traverse.traverse
 import arrow.typeclasses.*
 
 @extension
@@ -38,6 +38,8 @@ interface OptionTApplicativeInstance<F> : Applicative<OptionTPartialOf<F>>, Opti
 
 @extension
 interface OptionTMonadInstance<F> : Monad<OptionTPartialOf<F>>, OptionTApplicativeInstance<F> {
+
+  override fun MF(): Monad<F>
 
   override fun <A, B> Kind<OptionTPartialOf<F>, A>.map(f: (A) -> B): OptionT<F, B> = fix().map(FF(), f)
 
@@ -101,6 +103,9 @@ interface OptionTSemigroupKInstance<F> : SemigroupK<OptionTPartialOf<F>> {
 
 @extension
 interface OptionTMonoidKInstance<F> : MonoidK<OptionTPartialOf<F>>, OptionTSemigroupKInstance<F> {
+
+  override fun MF(): Monad<F>
+
   override fun <A> empty(): OptionT<F, A> = OptionT(MF().just(None))
 }
 

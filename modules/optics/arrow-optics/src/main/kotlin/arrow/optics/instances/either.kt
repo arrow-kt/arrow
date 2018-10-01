@@ -3,8 +3,8 @@ package arrow.optics.instances
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.fix
-import arrow.core.traverse.traverse
 import arrow.extension
+import arrow.instances.syntax.either.traverse.traverse
 import arrow.optics.Traversal
 import arrow.optics.typeclasses.Each
 import arrow.typeclasses.Applicative

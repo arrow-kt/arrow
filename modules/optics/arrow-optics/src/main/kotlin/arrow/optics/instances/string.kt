@@ -2,10 +2,10 @@ package arrow.optics.instances
 
 import arrow.*
 import arrow.data.*
-import arrow.data.filterIndex.filterIndex
-import arrow.data.index.index
 import arrow.typeclasses.*
 import arrow.optics.*
+import arrow.optics.instances.syntax.listK.filterIndex.filterIndex
+import arrow.optics.instances.syntax.listK.index.index
 import arrow.optics.typeclasses.*
 
 /**

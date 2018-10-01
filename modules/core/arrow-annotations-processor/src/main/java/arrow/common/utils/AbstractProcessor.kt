@@ -3,6 +3,7 @@ package arrow.common.utils
 import aballano.kotlinmemoization.memoize
 import arrow.common.messager.logE
 import arrow.meta.processor.MetaProcessorUtils
+import com.squareup.kotlinpoet.TypeName
 import me.eugeniomarletti.kotlin.processing.KotlinAbstractProcessor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.Element
@@ -16,7 +17,13 @@ class KnownException(message: String, val element: Element?) : RuntimeException(
 
 abstract class AbstractProcessor : KotlinAbstractProcessor(), MetaProcessorUtils {
 
-  override final fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
+  override val typeNameToMeta: (typeName: TypeName) -> arrow.meta.ast.TypeName =
+    ::typeNameToMetaImpl.memoize()
+
+  override val typeNameDownKind: (typeName: arrow.meta.ast.TypeName) -> arrow.meta.ast.TypeName =
+    ::typeNameDownKindImpl.memoize()
+
+  final override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
     if (!roundEnv.errorRaised()) {
       try {
         onProcess(annotations, roundEnv)
