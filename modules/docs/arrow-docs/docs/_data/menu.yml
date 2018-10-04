@@ -102,10 +102,13 @@ options:
         url: /docs/datatypes/store/
 
       - title: Moore
-        url: /docs/datatype/moore/
+        url: /docs/datatypes/moore/
 
       - title: Sum
-        url: /docs/datatype/sum/
+        url: /docs/datatypes/sum/
+        
+      - title: Day
+        url: /docs/datatypes/day/
 
       - title: WriterT
         url: /docs/datatypes/writert/
