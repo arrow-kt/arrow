@@ -77,14 +77,14 @@ class OptionTest : UnitSpec() {
         is Some<String> -> {
           option shouldBe some
         }
-        is None -> fail("")
+        is None         -> fail("")
       }
 
       val otherOption = none
 
       when (otherOption) {
         is Some<String> -> fail("")
-        is None -> otherOption shouldBe None
+        is None         -> otherOption shouldBe None
       }
 
     }

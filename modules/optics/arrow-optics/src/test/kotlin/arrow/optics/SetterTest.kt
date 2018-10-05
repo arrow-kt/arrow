@@ -1,14 +1,15 @@
 package arrow.optics
 
+import arrow.Kind
 import arrow.core.*
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genOption
 import arrow.test.laws.SetterLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -26,7 +27,7 @@ class SetterTest : UnitSpec() {
 
     testLaws(SetterLaws.laws(
       setter = tokenSetter,
-      aGen = TokenGen,
+      aGen = genToken,
       bGen = Gen.string(),
       funcGen = genFunctionAToB(Gen.string()),
       EQA = Eq.any()
@@ -34,7 +35,7 @@ class SetterTest : UnitSpec() {
 
     testLaws(SetterLaws.laws(
       setter = Setter.fromFunctor<ForOption, String, String>(Option.functor()),
-      aGen = genOption(Gen.string()),
+      aGen = genOption(Gen.string()).map<Kind<ForOption, String>> { it },
       bGen = Gen.string(),
       funcGen = genFunctionAToB(Gen.string()),
       EQA = Eq.any()
@@ -54,7 +55,7 @@ class SetterTest : UnitSpec() {
     }
 
     "Lifting a function should yield the same result as direct modify" {
-      forAll(TokenGen, Gen.string()) { token, value ->
+      forAll(genToken, Gen.string()) { token, value ->
         tokenSetter.modify(token) { value } == tokenSetter.lift { value }(token)
       }
     }

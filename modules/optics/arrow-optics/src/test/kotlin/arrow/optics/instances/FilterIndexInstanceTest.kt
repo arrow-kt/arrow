@@ -4,13 +4,12 @@ import arrow.core.Option
 import arrow.core.eq
 import arrow.data.*
 import arrow.instances.eq
-import arrow.optics.typeclasses.FilterIndex
 import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -49,9 +48,9 @@ class FilterIndexInstanceTest : UnitSpec() {
 
     testLaws(TraversalLaws.laws(
       traversal = SequenceK.filterIndex<Char>().filter { true },
-      aGen = genSequenceK(genChars()),
-      bGen = genChars(),
-      funcGen = genFunctionAToB(genChars()),
+      aGen = genSequenceK(genChar()),
+      bGen = genChar(),
+      funcGen = genFunctionAToB(genChar()),
       EQA = SequenceK.eq(Char.eq()),
       EQOptionB = Option.eq(Eq.any()),
       EQListB = ListK.eq(Eq.any())
@@ -59,7 +58,7 @@ class FilterIndexInstanceTest : UnitSpec() {
 
     testLaws(TraversalLaws.laws(
       traversal = MapK.filterIndex<Char, Int>().filter { true },
-      aGen = genMapK(genChars(), genIntSmall()),
+      aGen = genMapK(genChar(), genIntSmall()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
       EQA = Eq.any(),
@@ -69,8 +68,8 @@ class FilterIndexInstanceTest : UnitSpec() {
 
     testLaws(TraversalLaws.laws(
       traversal = MapFilterIndexInstance<Char, Int>().filter { true },
-      aGen = genMapK(genChars(), genIntSmall()),
-      bGen = Gen.int(),
+      aGen = Gen.map(genChar(), genIntSmall()),
+      bGen = genIntSmall(),
       funcGen = genFunctionAToB(Gen.int()),
       EQA = Eq.any(),
       EQOptionB = Option.eq(Eq.any()),
@@ -80,8 +79,8 @@ class FilterIndexInstanceTest : UnitSpec() {
     testLaws(TraversalLaws.laws(
       traversal = String.filterIndex().filter { true },
       aGen = Gen.string(),
-      bGen = genChars(),
-      funcGen = genFunctionAToB(genChars()),
+      bGen = genChar(),
+      funcGen = genFunctionAToB(genChar()),
       EQA = Eq.any(),
       EQOptionB = Option.eq(Eq.any()),
       EQListB = ListK.eq(Eq.any())

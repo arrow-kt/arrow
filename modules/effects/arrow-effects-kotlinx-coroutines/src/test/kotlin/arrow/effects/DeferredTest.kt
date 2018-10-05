@@ -10,7 +10,7 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Traverse
 import io.kotlintest.runner.junit4.KotlinTestRunner
-import io.kotlintest.matchers.fail
+import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe

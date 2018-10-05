@@ -10,8 +10,8 @@ import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genSetK
 import arrow.test.laws.LensLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -20,7 +20,7 @@ class SetInstanceTest : UnitSpec() {
   init {
 
     testLaws(LensLaws.laws(
-      lens = SetK.at<String>().at(Gen.string().generate()),
+      lens = SetK.at<String>().at(Gen.string().random().first()),
       aGen = genSetK(Gen.string()),
       bGen = Gen.bool(),
       funcGen = genFunctionAToB(Gen.bool()),
@@ -30,7 +30,7 @@ class SetInstanceTest : UnitSpec() {
     ))
 
     testLaws(LensLaws.laws(
-      lens = SetAtInstance<String>().at(Gen.string().generate()),
+      lens = SetAtInstance<String>().at(Gen.string().random().first()),
       aGen = Gen.set(Gen.string()),
       bGen = Gen.bool(),
       funcGen = genFunctionAToB(Gen.bool()),

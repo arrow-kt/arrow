@@ -87,7 +87,7 @@ class SingleKTests : UnitSpec() {
       }.value()
 
       val test: TestObserver<Long> = value.doOnSubscribe { subscription ->
-        Single.timer(1, TimeUnit.SECONDS).subscribe { a ->
+        Single.timer(1, TimeUnit.SECONDS).subscribe { _ ->
           subscription.dispose()
         }
       }.test()

@@ -1,19 +1,21 @@
 package arrow.optics.instances
 
-import arrow.core.*
+import arrow.core.Option
+import arrow.core.Try
+import arrow.core.each
+import arrow.core.eq
 import arrow.data.ListK
 import arrow.data.eq
-import arrow.optics.typeclasses.FilterIndex
 import arrow.test.UnitSpec
-import arrow.test.generators.*
-import arrow.test.laws.OptionalLaws
+import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genTry
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class TryInstanceTest : UnitSpec() {
 
   init {

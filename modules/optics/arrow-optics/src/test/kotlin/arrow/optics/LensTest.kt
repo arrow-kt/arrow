@@ -24,7 +24,7 @@ class LensTest : UnitSpec() {
     testLaws(
       LensLaws.laws(
         lens = tokenLens,
-        aGen = TokenGen,
+        aGen = genToken,
         bGen = Gen.string(),
         funcGen = genFunctionAToB(Gen.string()),
         EQA = Eq.any(),
@@ -34,7 +34,7 @@ class LensTest : UnitSpec() {
 
       TraversalLaws.laws(
         traversal = tokenLens.asTraversal(),
-        aGen = TokenGen,
+        aGen = genToken,
         bGen = Gen.string(),
         funcGen = genFunctionAToB(Gen.string()),
         EQA = Eq.any(),
@@ -44,7 +44,7 @@ class LensTest : UnitSpec() {
 
       OptionalLaws.laws(
         optional = tokenLens.asOptional(),
-        aGen = TokenGen,
+        aGen = genToken,
         bGen = Gen.string(),
         funcGen = genFunctionAToB(Gen.string()),
         EQA = Eq.any(),
@@ -53,7 +53,7 @@ class LensTest : UnitSpec() {
 
       SetterLaws.laws(
         setter = tokenLens.asSetter(),
-        aGen = TokenGen,
+        aGen = genToken,
         bGen = Gen.string(),
         funcGen = genFunctionAToB(Gen.string()),
         EQA = Token.eq()
@@ -71,79 +71,79 @@ class LensTest : UnitSpec() {
     ))
 
     "asFold should behave as valid Fold: size" {
-      forAll(TokenGen) { token ->
+      forAll(genToken) { token ->
         tokenLens.asFold().size(token) == 1
       }
     }
 
     "asFold should behave as valid Fold: nonEmpty" {
-      forAll(TokenGen) { token ->
+      forAll(genToken) { token ->
         tokenLens.asFold().nonEmpty(token)
       }
     }
 
     "asFold should behave as valid Fold: isEmpty" {
-      forAll(TokenGen) { token ->
+      forAll(genToken) { token ->
         !tokenLens.asFold().isEmpty(token)
       }
     }
 
     "asFold should behave as valid Fold: getAll" {
-      forAll(TokenGen) { token ->
+      forAll(genToken) { token ->
         tokenLens.asFold().getAll(token) == listOf(token.value).k()
       }
     }
 
     "asFold should behave as valid Fold: combineAll" {
-      forAll(TokenGen) { token ->
+      forAll(genToken) { token ->
         tokenLens.asFold().combineAll(String.monoid(), token) == token.value
       }
     }
 
     "asFold should behave as valid Fold: fold" {
-      forAll(TokenGen) { token ->
+      forAll(genToken) { token ->
         tokenLens.asFold().fold(String.monoid(), token) == token.value
       }
     }
 
     "asFold should behave as valid Fold: headOption" {
-      forAll(TokenGen) { token ->
+      forAll(genToken) { token ->
         tokenLens.asFold().headOption(token) == Some(token.value)
       }
     }
 
     "asFold should behave as valid Fold: lastOption" {
-      forAll(TokenGen) { token ->
+      forAll(genToken) { token ->
         tokenLens.asFold().lastOption(token) == Some(token.value)
       }
     }
 
     "asGetter should behave as valid Getter: get" {
-      forAll(TokenGen) { token ->
+      forAll(genToken) { token ->
         tokenLens.asGetter().get(token) == tokenGetter.get(token)
       }
     }
 
     "asGetter should behave as valid Getter: find" {
-      forAll(TokenGen, genFunctionAToB<String, Boolean>(Gen.bool())) { token, p ->
+      forAll(genToken, genFunctionAToB<String, Boolean>(Gen.bool())) { token, p ->
         tokenLens.asGetter().find(token, p) == tokenGetter.find(token, p)
       }
     }
 
     "asGetter should behave as valid Getter: exist" {
-      forAll(TokenGen, genFunctionAToB<String, Boolean>(Gen.bool())) { token, p ->
+      forAll(genToken, genFunctionAToB<String, Boolean>(Gen.bool())) { token, p ->
         tokenLens.asGetter().exist(token, p) == tokenGetter.exist(token, p)
       }
     }
 
     "Lifting a function should yield the same result as not yielding" {
-      forAll(TokenGen, Gen.string()) { token, value ->
+      forAll(genToken, Gen.string()) { token, value ->
         tokenLens.set(token, value) == tokenLens.lift { value }(token)
       }
     }
 
     "Lifting a function as a functor should yield the same result as not yielding" {
-      forAll(TokenGen, Gen.string()) { token, value ->
+      forAll(genToken, Gen.string()) { token, value ->
         tokenLens.modifyF(Option.functor(), token) { Some(value) } == tokenLens.liftF(Option.functor()) { Some(value) }(token)
       }
     }
@@ -173,21 +173,21 @@ class LensTest : UnitSpec() {
 
     "Pairing two disjoint lenses should yield a pair of their results" {
       val spiltLens: Lens<Tuple2<Token, User>, Tuple2<String, Token>> = tokenLens split userLens
-      forAll(TokenGen, UserGen) { token: Token, user: User ->
+      forAll(genToken, genUser) { token: Token, user: User ->
         spiltLens.get(token toT user) == token.value toT user.token
       }
     }
 
     "Creating a first pair with a type should result in the target to value" {
       val first = tokenLens.first<Int>()
-      forAll(TokenGen, Gen.int()) { token: Token, int: Int ->
+      forAll(genToken, Gen.int()) { token: Token, int: Int ->
         first.get(token toT int) == token.value toT int
       }
     }
 
     "Creating a second pair with a type should result in the value target" {
       val first = tokenLens.second<Int>()
-      forAll(Gen.int(), TokenGen) { int: Int, token: Token ->
+      forAll(Gen.int(), genToken) { int: Int, token: Token ->
         first.get(int toT token) == int toT token.value
       }
     }

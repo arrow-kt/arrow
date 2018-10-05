@@ -1,21 +1,23 @@
 package arrow.optics.instances
 
-import arrow.core.*
+import arrow.core.MapInstances
+import arrow.core.Option
+import arrow.core.eq
+import arrow.core.monoid
 import arrow.data.*
 import arrow.instances.monoid
 import arrow.instances.semigroup
-import arrow.optics.typeclasses.FilterIndex
 import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.LensLaws
 import arrow.test.laws.OptionalLaws
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class MapInstanceTest : UnitSpec() {
 
   init {
@@ -42,7 +44,7 @@ class MapInstanceTest : UnitSpec() {
 
     testLaws(TraversalLaws.laws(
       traversal = MapK.filterIndex<Char, Int>().filter { true },
-      aGen = genMapK(genChars(), genIntSmall()),
+      aGen = genMapK(genChar(), genIntSmall()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
       EQA = Eq.any(),
@@ -52,7 +54,7 @@ class MapInstanceTest : UnitSpec() {
 
     testLaws(TraversalLaws.laws(
       traversal = MapInstances.filterIndex<Char, Int>().filter { true },
-      aGen = genMapK(genChars(), genIntSmall()),
+      aGen = Gen.map(genChar(), genIntSmall()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
       EQA = Eq.any(),
@@ -61,7 +63,7 @@ class MapInstanceTest : UnitSpec() {
     ))
 
     testLaws(OptionalLaws.laws(
-      optional = MapK.index<String, Int>().index(Gen.string().generate()),
+      optional = MapK.index<String, Int>().index(Gen.string().random().toList().toString()),
       aGen = genMapK(Gen.string(), Gen.int()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
@@ -70,7 +72,7 @@ class MapInstanceTest : UnitSpec() {
     ))
 
     testLaws(OptionalLaws.laws(
-      optional = MapInstances.index<String, Int>().index(Gen.string().generate()),
+      optional = MapInstances.index<String, Int>().index(Gen.string().random().toList().toString()),
       aGen = Gen.map(Gen.string(), Gen.int()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
@@ -79,7 +81,7 @@ class MapInstanceTest : UnitSpec() {
     ))
 
     testLaws(LensLaws.laws(
-      lens = MapK.at<String, Int>().at(Gen.string().generate()),
+      lens = MapK.at<String, Int>().at(Gen.string().random().toList().toString()),
       aGen = genMapK(Gen.string(), Gen.int()),
       bGen = genOption(Gen.int()),
       funcGen = genFunctionAToB(genOption(Gen.int())),
@@ -89,7 +91,7 @@ class MapInstanceTest : UnitSpec() {
     ))
 
     testLaws(LensLaws.laws(
-      lens = MapInstances.at<String, Int>().at(Gen.string().generate()),
+      lens = MapInstances.at<String, Int>().at(Gen.string().random().toList().toString()),
       aGen = Gen.map(Gen.string(), Gen.int()),
       bGen = genOption(Gen.int()),
       funcGen = genFunctionAToB(genOption(Gen.int())),

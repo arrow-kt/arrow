@@ -1,11 +1,11 @@
 package arrow.optics
 
+import arrow.Kind
 import arrow.core.Option
 import arrow.core.eq
 import arrow.core.toOption
 import arrow.core.toT
 import arrow.data.*
-import arrow.instances.IntMonoidInstance
 import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
@@ -14,9 +14,9 @@ import arrow.test.generators.genTuple
 import arrow.test.laws.SetterLaws
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -29,7 +29,7 @@ class TraversalTest : UnitSpec() {
     testLaws(
       TraversalLaws.laws(
         traversal = listKTraverse,
-        aGen = genListK(Gen.int()),
+        aGen = genListK(Gen.int()).map<Kind<ForListK, Int>> { it },
         bGen = Gen.int(),
         funcGen = genFunctionAToB(Gen.int()),
         EQA = Eq.any(),
@@ -39,7 +39,7 @@ class TraversalTest : UnitSpec() {
 
       SetterLaws.laws(
         setter = listKTraverse.asSetter(),
-        aGen = genListK(Gen.int()),
+        aGen = genListK(Gen.int()).map<Kind<ForListK, Int>> { it },
         bGen = Gen.int(),
         funcGen = genFunctionAToB(Gen.int()),
         EQA = ListK.eq(Eq.any())

@@ -7,7 +7,7 @@ import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.binding
 import arrow.typeclasses.bindingCatch
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldNotBe
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.startsWith
@@ -18,7 +18,7 @@ import reactor.core.scheduler.Schedulers
 import reactor.test.test
 import java.time.Duration
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class FluxKTest : UnitSpec() {
 
   fun <T> assertThreadNot(flux: Flux<T>, name: String): Flux<T> =

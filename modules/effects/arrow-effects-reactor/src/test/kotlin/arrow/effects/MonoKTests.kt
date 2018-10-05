@@ -4,7 +4,7 @@ import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.bindingCatch
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldNotBe
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.startsWith
@@ -15,7 +15,7 @@ import reactor.core.scheduler.Schedulers
 import reactor.test.test
 import java.time.Duration
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class MonoKTest : UnitSpec() {
 
   fun <T> assertThreadNot(mono: Mono<T>, name: String): Mono<T> =

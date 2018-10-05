@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit
 fun <F, A> genApplicative(valueGen: Gen<A>, AP: Applicative<F>): Gen<Kind<F, A>> =
    valueGen.map { AP.just(it) }
 
-inline fun <reified A, reified B> genFunctionAToB(genB: Gen<B>): Gen<(A) -> B> = genB.map { b:B -> { _: A -> b } }
+fun <A, B> genFunctionAToB(genB: Gen<B>): Gen<(A) -> B> = genB.map { b:B -> { _: A -> b } }
 
 fun <A> genFunctionAAToA(genA: Gen<A>): Gen<(A, A) -> A> = genA.map { a:A -> { _: A, _: A -> a } }
 
@@ -94,7 +94,7 @@ fun <A> genListK(genA: Gen<A>): Gen<ListK<A>> = Gen.list(genA).map{ it.k() }
 
 fun <A> genSequenceK(genA: Gen<A>): Gen<SequenceK<A>> = Gen.list(genA).map{ it.asSequence().k() }
 
-fun genChars(): Gen<Char> =
+fun genChar(): Gen<Char> =
   Gen.from(('A'..'Z') + ('a'..'z') + ('0'..'9') + "!@#$%%^&*()_-~`,<.?/:;}{][±§".toList())
 
 fun <A> genSetK(genA: Gen<A>): Gen<SetK<A>> = Gen.set(genA).map{ it.k() }

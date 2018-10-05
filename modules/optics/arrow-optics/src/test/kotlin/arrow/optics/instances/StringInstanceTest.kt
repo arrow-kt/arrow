@@ -1,19 +1,20 @@
 package arrow.optics.instances
 
-import arrow.core.*
+import arrow.core.Option
+import arrow.core.eq
 import arrow.data.ListK
 import arrow.data.eq
-import arrow.optics.typeclasses.FilterIndex
 import arrow.test.UnitSpec
-import arrow.test.generators.*
+import arrow.test.generators.genChar
+import arrow.test.generators.genFunctionAToB
 import arrow.test.laws.OptionalLaws
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class StringInstanceTest : UnitSpec() {
 
   init {
@@ -21,8 +22,8 @@ class StringInstanceTest : UnitSpec() {
     testLaws(TraversalLaws.laws(
       traversal = String.each().each(),
       aGen = Gen.string(),
-      bGen = genChars(),
-      funcGen = genFunctionAToB(genChars()),
+      bGen = genChar(),
+      funcGen = genFunctionAToB(genChar()),
       EQA = Eq.any(),
       EQOptionB = Option.eq(Eq.any()),
       EQListB = ListK.eq(Eq.any())
@@ -31,8 +32,8 @@ class StringInstanceTest : UnitSpec() {
     testLaws(TraversalLaws.laws(
       traversal = String.filterIndex().filter { true },
       aGen = Gen.string(),
-      bGen = genChars(),
-      funcGen = genFunctionAToB(genChars()),
+      bGen = genChar(),
+      funcGen = genFunctionAToB(genChar()),
       EQA = Eq.any(),
       EQOptionB = Option.eq(Eq.any()),
       EQListB = ListK.eq(Eq.any())
@@ -41,8 +42,8 @@ class StringInstanceTest : UnitSpec() {
     testLaws(OptionalLaws.laws(
       optional = String.index().index(5),
       aGen = Gen.string(),
-      bGen = genChars(),
-      funcGen = genFunctionAToB(genChars()),
+      bGen = genChar(),
+      funcGen = genFunctionAToB(genChar()),
       EQOptionB = Eq.any(),
       EQA = Eq.any()
     ))
