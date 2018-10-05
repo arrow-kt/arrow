@@ -1,23 +1,16 @@
 package arrow.data
 
-import arrow.core.ForId
-import arrow.core.Id
-import arrow.core.IdOf
-import arrow.core.Tuple2
-import arrow.core.Tuple2Of
-import arrow.core.applicative
-import arrow.core.comonad
-import arrow.core.fix
+import arrow.core.*
 import arrow.instances.ForDay
 import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class DayTest : UnitSpec() {
   init {
 

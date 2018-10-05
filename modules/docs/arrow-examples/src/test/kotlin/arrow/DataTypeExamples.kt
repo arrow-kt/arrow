@@ -3,8 +3,8 @@ package arrow
 import arrow.Problem.*
 import arrow.core.*
 import arrow.typeclasses.binding
-import io.kotlintest.matchers.Matcher
-import io.kotlintest.matchers.Result
+import io.kotlintest.Matcher
+import io.kotlintest.Result
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.FreeSpec
 import kotlin.reflect.KClass
@@ -33,9 +33,9 @@ class DataTypeExamples : FreeSpec() { init {
       // Option can also be used with when statements:
       val msg = when (someValue) {
         is Some -> "ok"
-        None -> "ko"
+        None    -> "ko"
       }
-      msg shouldBe any
+      msg shouldBe "ok"
     }
 
     "Functor/Foldable style operations" {
@@ -150,7 +150,7 @@ class DataTypeExamples : FreeSpec() { init {
   "Either left or right" - {
     fun parse(s: String): ProblemOrInt = Try { Right(s.toInt()) }.getOrElse { Left(invalidInt) }
     fun reciprocal(i: Int): Either<Problem, Double> = when (i) {
-      0 -> Left(noReciprocal)
+      0    -> Left(noReciprocal)
       else -> Either.Right(1.0 / i)
     }
 
@@ -193,10 +193,14 @@ class DataTypeExamples : FreeSpec() { init {
 
   fun aFailureOfType(expected: KClass<*>): Matcher<Try<Int>> = object : Matcher<Try<Int>> {
     override fun test(value: Try<Int>): Result = when (value) {
-      is Success -> Result(false, "Expected a failure, got $value")
+      is Success -> Result(false, "Expected a failure, got $value", "Received expected failure")
       is Failure -> {
         val javaClass = value.exception.javaClass
-        Result(expected.java.isAssignableFrom(javaClass), "Expected Try.Failure(${expected.java}), got $value")
+        Result(
+          expected.java.isAssignableFrom(javaClass),
+          "Expected Try.Failure(${expected.java}), got $value",
+          "Received expected failure"
+        )
       }
     }
   }
@@ -219,9 +223,9 @@ private object AuthorizationException : GeneralException()
 
 fun playLottery(guess: Int): Int {
   return when (guess) {
-    42 -> 1000 // jackpot
+    42        -> 1000 // jackpot
     in 10..41 -> 1
-    in 0..9 -> throw AuthorizationException
-    else -> throw NoConnectionException
+    in 0..9   -> throw AuthorizationException
+    else      -> throw NoConnectionException
   }
 }

@@ -34,7 +34,7 @@ class FunctionSyntaxTest : UnitSpec() {
       val get = { potato }
       val map = { word: String -> ninja + word }
       (get andThen map)()
-      (ninja + potato).shouldBe<T, U>(any)
+      (ninja + potato) shouldBe (get andThen map)()
     }
 
     "it should compose function correctly (forwardCompose)" {
@@ -157,7 +157,7 @@ class FunctionSyntaxTest : UnitSpec() {
       val prefixAndPostfix = { prefix: String, x: String, postfix: String -> "$prefix$x$postfix" }
 
       val helloX = prefixAndPostfix.partially1("Hello, ").partially2("!")
-      helloX("Arrow") shouldBe any
+      helloX("Arrow") shouldBe "Hello, Arrow!"
     }
 
     "partials" {
@@ -168,7 +168,7 @@ class FunctionSyntaxTest : UnitSpec() {
       sum2intsTo17(1, 2) shouldBe 20
       val prefixAndPostfix = { prefix: String, x: String, postfix: String -> "$prefix$x$postfix" }
       val helloX: (String) -> String = prefixAndPostfix(p1 = "Hello, ")(p2 = "!")
-      helloX("Arrow") shouldBe any
+      helloX("Arrow") shouldBe "Hello, Arrow!"
     }
 
     "bind" {

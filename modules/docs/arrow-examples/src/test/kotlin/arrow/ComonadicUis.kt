@@ -2,14 +2,8 @@ package arrow
 
 import arrow.core.Id
 import arrow.core.comonad
-import arrow.data.Day
-import arrow.data.ForStore
-import arrow.data.Store
-import arrow.data.Sum
-import arrow.data.comonad
-import arrow.data.fix
-import arrow.data.functor
-import io.kotlintest.matchers.shouldBe
+import arrow.data.*
+import io.kotlintest.shouldBe
 import io.kotlintest.specs.FreeSpec
 
 class ComonadicUisTest : FreeSpec() {

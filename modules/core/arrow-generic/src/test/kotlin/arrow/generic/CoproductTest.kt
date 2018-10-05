@@ -15,7 +15,6 @@ import arrow.generic.coproduct3.fold
 import arrow.generic.coproduct3.select
 import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
