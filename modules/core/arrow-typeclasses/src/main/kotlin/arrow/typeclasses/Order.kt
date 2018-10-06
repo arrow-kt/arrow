@@ -24,6 +24,9 @@ interface Order<F> : Eq<F> {
    */
   fun F.compare(b: F): Int
 
+  /** Kotlin operator overload */
+  operator fun F.compareTo(b: F): Int = compare(b)
+
   /** @see [Eq.eqv] */
   override fun F.eqv(b: F): Boolean = this.compare(b) == 0
 
