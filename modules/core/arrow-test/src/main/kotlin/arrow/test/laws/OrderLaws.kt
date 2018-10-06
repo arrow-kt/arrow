@@ -22,7 +22,8 @@ object OrderLaws {
       Law("Order law: totality order") { O.totalityOrder(fGen) },
       Law("Order law: compare order") { O.compareOrder(fGen) },
       Law("Order law: min order") { O.minOrder(fGen) },
-      Law("Order law: max order") { O.maxOrder(fGen) }
+      Law("Order law: max order") { O.maxOrder(fGen) },
+      Law("Order law: operator compareTo delegates to compare order") { O.operatorCompareToOrder(fGen) }
     )
 
   fun <F> Order<F>.reflexitivityEq(fGen: Gen<F>) =
