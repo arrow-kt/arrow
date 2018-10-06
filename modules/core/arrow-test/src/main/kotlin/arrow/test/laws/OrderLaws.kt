@@ -103,4 +103,9 @@ object OrderLaws {
       else if (c == 0) (m == x) && (m == y)
       else m == x
     }
+
+  fun <F> Order<F>.operatorCompareToOrder(fGen: Gen<F>): Unit =
+    forAll(fGen, fGen) { x, y ->
+      x.compare(y) == x.compareTo(y)
+    }
 }
