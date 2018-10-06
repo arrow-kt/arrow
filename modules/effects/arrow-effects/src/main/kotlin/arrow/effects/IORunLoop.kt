@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
+import arrow.effects.internal.IOConnection
 import arrow.effects.internal.Platform.ArrayStack
 import arrow.effects.typeclasses.Proc
 import arrow.core.Continuation
@@ -16,8 +17,16 @@ private typealias Callback = (Either<Throwable, Any?>) -> Unit
 
 @Suppress("UNCHECKED_CAST")
 internal object IORunLoop {
+
   fun <A> start(source: IO<A>, cb: (Either<Throwable, A>) -> Unit, isCancelled: (() -> Boolean)?): Unit =
-    loop(source, cb as Callback, null, null, null, isCancelled)
+    loop(source, IOConnection.uncancelable, cb as Callback, null, null, null, isCancelled)
+
+  /**
+   * Evaluates the given `IO` reference, calling the given callback
+   * with the result when completed.
+   */
+  fun <A> startCancelable(source: IO<A>, conn: IOConnection, cb: (Either<Throwable, A>) -> Unit, isCancelled: (() -> Boolean)?): Unit =
+    loop(source, conn, cb as Callback, null, null, null, isCancelled)
 
   fun <A> step(source: IO<A>): IO<A> {
     var currentIO: Current? = source
@@ -82,8 +91,8 @@ internal object IORunLoop {
 
           bFirst = { c: Any? -> IO.just(c) }
 
-          currentIO = IO.async { cc ->
-            loop(localCont, cc.asyncCallback(currentCC), null, null, null, null)
+          currentIO = IO.async { conn, cc ->
+            loop(localCont, conn, cc.asyncCallback(currentCC), null, null, null, null)
           }
         }
         is IO.Map<*, *> -> {
@@ -132,22 +141,24 @@ internal object IORunLoop {
   // the loop with the collected stack
     when {
       bFirst != null || (bRest != null && bRest.isNotEmpty()) ->
-        IO.Async { cb ->
+        IO.Async { conn, cb ->
           val rcb = RestartCallback(cb as Callback, null)
           rcb.prepare(bFirst, bRest)
-          register(rcb)
+          register(conn, rcb)
         }
       else -> currentIO
     }
 
   private fun loop(
     source: Current,
+    cancelable: IOConnection?,
     cb: (Either<Throwable, Any?>) -> Unit,
     rcbRef: RestartCallback?,
     bFirstRef: BindF?,
     bRestRef: CallStack?,
     isCancelled: (() -> Boolean)?): Unit {
     var currentIO: Current? = source
+    var conn: IOConnection? = cancelable
     var bFirst: BindF? = bFirstRef
     var bRest: CallStack? = bRestRef
     var rcb: RestartCallback? = rcbRef
@@ -195,12 +206,15 @@ internal object IORunLoop {
           }
         }
         is IO.Async -> {
+          if (conn == null) {
+            conn = IOConnection()
+          }
           if (rcb == null) {
-            rcb = RestartCallback(cb, isCancelled)
+            rcb = RestartCallback(conn, cb, isCancelled)
           }
           rcb.prepare(bFirst, bRest)
           // Return case for Async operations
-          currentIO.cont(rcb)
+          currentIO.cont(conn, rcb)
           return
         }
         is IO.Bind<*, *> -> {
@@ -224,8 +238,8 @@ internal object IORunLoop {
 
           bFirst = { c: Any? -> IO.just(c) }
 
-          currentIO = IO.async { cc ->
-            loop(localCont, cc.asyncCallback(currentCC), null, null, null, isCancelled)
+          currentIO = IO.async { conn, cc ->
+            loop(localCont, conn, cc.asyncCallback(currentCC), null, null, null, isCancelled)
           }
 
         }
@@ -314,8 +328,9 @@ internal object IORunLoop {
     return result
   }
 
-  private data class RestartCallback(val cb: Callback, val isCancelled: (() -> Boolean)?) : Callback {
+  private data class RestartCallback(val connInit: IOConnection, val cb: Callback, val isCancelled: (() -> Boolean)?) : Callback {
 
+    private var conn: IOConnection = connInit
     private var canCall = false
     private var bFirst: BindF? = null
     private var bRest: CallStack? = null
@@ -330,8 +345,8 @@ internal object IORunLoop {
       if (canCall) {
         canCall = false
         when (either) {
-          is Either.Left -> loop(IO.RaiseError(either.a), cb, this, bFirst, bRest, isCancelled)
-          is Either.Right -> loop(IO.Pure(either.b), cb, this, bFirst, bRest, isCancelled)
+          is Either.Left -> loop(IO.RaiseError(either.a), conn, cb, this, bFirst, bRest, isCancelled)
+          is Either.Right -> loop(IO.Pure(either.b), conn, cb, this, bFirst, bRest, isCancelled)
         }
       }
     }
