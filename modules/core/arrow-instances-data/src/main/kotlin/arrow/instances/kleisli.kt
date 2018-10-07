@@ -21,6 +21,15 @@ interface KleisliFunctorInstance<F, D> : Functor<KleisliPartialOf<F, D>> {
 }
 
 @extension
+interface KleisliContravariant<F, D> : Contravariant<Conested<Kind<ForKleisli, F>, D>> {
+  override fun <A, B> Kind<Conested<Kind<ForKleisli, F>, D>, A>.contramap(f: (B) -> A): Kind<Conested<Kind<ForKleisli, F>, D>, B> =
+    counnest().fix().local(f).conest()
+
+  fun <A, B> KleisliOf<F, A, D>.contramapC(f: (B) -> A): KleisliOf<F, B, D> =
+    conest().contramap(f).counnest()
+}
+
+@extension
 interface KleisliApplicativeInstance<F, D> : Applicative<KleisliPartialOf<F, D>>, KleisliFunctorInstance<F, D> {
 
   fun AF(): Applicative<F>

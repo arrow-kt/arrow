@@ -3,10 +3,7 @@ package arrow.effects
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.effects.typeclasses.Async
-import arrow.effects.typeclasses.Effect
-import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.typeclasses.*
 import io.reactivex.BackpressureStrategy
@@ -74,8 +71,8 @@ interface FlowableKTraverseInstance : Traverse<ForFlowableK> {
 
 @extension
 interface FlowableKApplicativeErrorInstance :
-  FlowableKApplicativeInstance,
-  ApplicativeError<ForFlowableK, Throwable> {
+  ApplicativeError<ForFlowableK, Throwable>,
+  FlowableKApplicativeInstance {
   override fun <A> raiseError(e: Throwable): FlowableK<A> =
     FlowableK.raiseError(e)
 
@@ -85,8 +82,8 @@ interface FlowableKApplicativeErrorInstance :
 
 @extension
 interface FlowableKMonadErrorInstance :
-  FlowableKMonadInstance,
-  MonadError<ForFlowableK, Throwable> {
+  MonadError<ForFlowableK, Throwable>,
+  FlowableKMonadInstance {
   override fun <A> raiseError(e: Throwable): FlowableK<A> =
     FlowableK.raiseError(e)
 
@@ -96,8 +93,8 @@ interface FlowableKMonadErrorInstance :
 
 @extension
 interface FlowableKMonadDeferInstance :
-  FlowableKMonadErrorInstance,
-  MonadDefer<ForFlowableK> {
+  MonadDefer<ForFlowableK>,
+  FlowableKMonadErrorInstance {
   override fun <A> defer(fa: () -> FlowableKOf<A>): FlowableK<A> =
     FlowableK.defer(fa)
 
@@ -106,8 +103,8 @@ interface FlowableKMonadDeferInstance :
 
 @extension
 interface FlowableKAsyncInstance :
-  FlowableKMonadDeferInstance,
-  Async<ForFlowableK> {
+  Async<ForFlowableK>,
+  FlowableKMonadDeferInstance {
   override fun <A> async(fa: Proc<A>): FlowableK<A> =
     FlowableK.async(fa, BS())
 
@@ -117,13 +114,19 @@ interface FlowableKAsyncInstance :
 
 @extension
 interface FlowableKEffectInstance :
-  FlowableKAsyncInstance,
-  Effect<ForFlowableK> {
+  Effect<ForFlowableK>,
+  FlowableKAsyncInstance {
   override fun <A> FlowableKOf<A>.runAsync(cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Unit> =
     fix().runAsync(cb)
 }
 
-object FlowableKContext : FlowableKEffectInstance, FlowableKTraverseInstance {
+@extension
+interface FlowableKConcurrentEffectInstance : FlowableKEffectInstance, ConcurrentEffect<ForFlowableK> {
+  override fun <A> Kind<ForFlowableK, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Disposable> =
+    fix().runAsyncCancellable(cb)
+}
+
+object FlowableKContext : FlowableKConcurrentEffectInstance, FlowableKTraverseInstance {
   override fun <A, B> FlowableKOf<A>.map(f: (A) -> B): FlowableK<B> =
     fix().map(f)
 }

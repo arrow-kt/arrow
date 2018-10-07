@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.Kind
 import arrow.core.*
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
+import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Applicative
@@ -56,7 +57,14 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
     flowable.observeOn(ctx.asScheduler()).k()
 
   fun runAsync(cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Unit> =
-    flowable.flatMap { cb(Right(it)).value() }.onErrorResumeNext(io.reactivex.functions.Function { cb(Left(it)).value() }).k()
+    flowable.flatMap { cb(Right(it)).value() }.onErrorResumeNext { t: Throwable -> cb(Left(t)).value() }.k()
+
+  fun runAsyncCancellable(cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Disposable> =
+    Flowable.fromCallable {
+      val disposable: io.reactivex.disposables.Disposable = runAsync(cb).value().subscribe()
+      val dispose: () -> Unit = { disposable.dispose() }
+      dispose
+    }.k()
 
   companion object {
     fun <A> just(a: A): FlowableK<A> =

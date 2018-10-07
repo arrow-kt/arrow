@@ -2,9 +2,9 @@ package arrow.effects
 
 import arrow.core.*
 import arrow.core.Either.Left
+import arrow.effects.OnCancel.Companion.CancellationException
 import arrow.effects.OnCancel.Silent
 import arrow.effects.OnCancel.ThrowCancellationException
-import arrow.effects.data.internal.IOCancellationException
 import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
@@ -14,7 +14,12 @@ import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import kotlin.coroutines.experimental.CoroutineContext
 
-enum class OnCancel { ThrowCancellationException, Silent }
+enum class OnCancel { ThrowCancellationException, Silent;
+
+  companion object {
+    val CancellationException = arrow.effects.data.internal.IOCancellationException
+  }
+}
 
 @higherkind
 sealed class IO<out A> : IOOf<A> {
@@ -85,22 +90,23 @@ sealed class IO<out A> : IOOf<A> {
     IORunLoop.start(this, cb, null)
 
   fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
-    IO { unsafeRunAsyncCancellable(onCancel, cb.andThen { it.fix().unsafeRunAsync { } }) }
+    IO.async { ccb ->
+      var cancelled = false
+      val cancel = { cancelled = true }
+      val isCancelled = { cancelled }
+      val onCancelCb =
+        when (onCancel) {
+          ThrowCancellationException ->
+            cb andThen { it.fix().unsafeRunAsync { } }
+          Silent ->
+            { either -> either.fold({ if (!cancelled || it != CancellationException) cb(either) }, { cb(either) }) }
+        }
+      ccb(cancel.right())
+      IORunLoop.start(this, onCancelCb, isCancelled)
+    }
 
-  fun unsafeRunAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> Unit): Disposable {
-    var cancelled = false
-    val cancel = { cancelled = true }
-    val isCancelled = { cancelled }
-    val onCancelCb =
-      when (onCancel) {
-        ThrowCancellationException ->
-          cb
-        Silent ->
-          { either -> either.fold({ if (!cancelled || it !is IOCancellationException) cb(either) }, { cb(either) }) }
-      }
-    IORunLoop.start(this, onCancelCb, isCancelled)
-    return cancel
-  }
+  fun unsafeRunAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> Unit): Disposable =
+    runAsyncCancellable(onCancel, cb andThen { it.liftIO() }).unsafeRunSync()
 
   fun unsafeRunSync(): A =
     unsafeRunTimed(Duration.INFINITE)

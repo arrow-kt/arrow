@@ -52,6 +52,13 @@ value1.getOrElse { "No value" }
 value2.getOrElse { "No value" }
 ```
 
+Creating a `Option<T>` of a `T?`. Useful for working with values that can be nullable:
+
+```kotlin:ank
+val myString: String? = "Nullable string"
+val option: Option<String> = Option.fromNullable(myString)
+```
+
 Checking whether option has value:
 
 ```kotlin:ank

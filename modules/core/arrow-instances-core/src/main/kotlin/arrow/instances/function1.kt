@@ -1,17 +1,32 @@
 package arrow.instances
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.*
 import arrow.extension
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Contravariant
+import arrow.typeclasses.Category
+import arrow.typeclasses.Conested
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Profunctor
+import arrow.typeclasses.conest
+import arrow.typeclasses.counnest
 
 @extension
 interface Function1FunctorInstance<I> : Functor<Function1PartialOf<I>> {
   override fun <A, B> Kind<Function1PartialOf<I>, A>.map(f: (A) -> B): Function1<I, B> =
     fix().map(f)
+}
+
+@extension
+interface Function1ContravariantInstance<O> : Contravariant<Conested<ForFunction1, O>> {
+  override fun <A, B> Kind<Conested<ForFunction1, O>, A>.contramap(f: (B) -> A): Kind<Conested<ForFunction1, O>, B> =
+    counnest().fix().contramap(f).conest()
+
+  fun <A, B> Function1Of<A, O>.contramapC(f: (B) -> A): Function1Of<B, O> =
+    conest().contramap(f).counnest()
 }
 
 @extension
@@ -48,6 +63,14 @@ interface Function1MonadInstance<I> : Monad<Function1PartialOf<I>>, Function1App
   override fun <A, B> tailRecM(a: A, f: (A) -> Function1Of<I, Either<A, B>>): Function1<I, B> =
     Function1.tailRecM(a, f)
 }
+
+@extension
+interface Function1CategoryInstance : Category<ForFunction1> {
+  override fun <A> id(): Kind2<ForFunction1, A, A> = Function1.id()
+
+  override fun <A, B, C> Kind2<ForFunction1, B, C>.compose(arr: Kind2<ForFunction1, A, B>): Kind2<ForFunction1, A, C> = fix().compose(arr.fix())
+}
+
 
 class Function1Context<A> : Function1MonadInstance<A>
 

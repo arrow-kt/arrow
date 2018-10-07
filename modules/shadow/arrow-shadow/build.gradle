@@ -21,6 +21,12 @@ dependencies {
 
 shadowJar {
     relocate 'arrow', 'shadow'
+    archiveName = "$baseName-$version.$extension"
+    dependencies {
+        exclude(dependency { it.moduleGroup == 'org.jetbrains.kotlin' })
+        exclude(dependency { it.moduleGroup == 'org.intellij' })
+        exclude(dependency { it.moduleGroup == 'org.jetbrains' })
+    }
 }
 
 shadowJar.doLast {
@@ -30,6 +36,10 @@ shadowJar.doLast {
 task copyJarToBin(type: Copy) {
     from shadowJar.outputs.files // shortcut for createJar.outputs.files
     into "libs"
+}
+
+artifacts {
+    archives shadowJar
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

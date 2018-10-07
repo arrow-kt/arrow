@@ -2,10 +2,7 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.effects.typeclasses.Async
-import arrow.effects.typeclasses.Effect
-import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.typeclasses.*
 import kotlin.coroutines.experimental.CoroutineContext
@@ -96,6 +93,11 @@ interface IOEffectInstance : Effect<ForIO>, IOAsyncInstance {
 }
 
 @extension
+interface IOConcurrentEffectInstance : IOEffectInstance, ConcurrentEffect<ForIO> {
+  override fun <A> Kind<ForIO, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> Kind<ForIO, Unit>): IO<Disposable> =
+    fix().runAsyncCancellable(OnCancel.ThrowCancellationException, cb)
+}
+
 interface IOSemigroupInstance<A> : Semigroup<IO<A>> {
 
   fun SG(): Semigroup<A>
@@ -117,7 +119,7 @@ interface IOMonoidInstance<A> : Monoid<IO<A>>, IOSemigroupInstance<A> {
   override fun empty(): IO<A> = IO.just(SM().empty())
 }
 
-object IOContext : IOEffectInstance
+object IOContext : IOConcurrentEffectInstance
 
 infix fun <A> ForIO.Companion.extensions(f: IOContext.() -> A): A =
   f(IOContext)
