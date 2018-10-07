@@ -3,7 +3,6 @@ package arrow.effects
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
-import arrow.effects.data.internal.IOCancellationException
 import arrow.effects.internal.Platform.ArrayStack
 import arrow.effects.typeclasses.Proc
 import kotlin.coroutines.experimental.Continuation
@@ -159,7 +158,7 @@ internal object IORunLoop {
 
     do {
       if (isCancelled?.invoke() == true) {
-        cb(Left(IOCancellationException("User cancellation")))
+        cb(Left(OnCancel.CancellationException))
         return
       }
       when (currentIO) {

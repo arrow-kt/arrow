@@ -1,0 +1,46 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.0'
+    }
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'java'
+
+ext {
+    metaArrowVersion = '0.7.3'
+}
+
+dependencies {
+    compile "io.arrow-kt:arrow-core:$metaArrowVersion"
+    compile "io.arrow-kt:arrow-syntax:$metaArrowVersion"
+    compile "io.arrow-kt:arrow-typeclasses:$metaArrowVersion"
+    compile "io.arrow-kt:arrow-data:$metaArrowVersion"
+    compile "io.arrow-kt:arrow-instances-core:$metaArrowVersion"
+    compile "io.arrow-kt:arrow-instances-data:$metaArrowVersion"
+    compile "io.arrow-kt:arrow-free:$metaArrowVersion"
+    compile "io.arrow-kt:arrow-mtl:$metaArrowVersion"
+    compile "io.arrow-kt:arrow-effects:$metaArrowVersion"
+    compile "io.arrow-kt:arrow-optics:$metaArrowVersion"
+    compile "io.arrow-kt:arrow-generic:$metaArrowVersion"
+    compile "io.arrow-kt:arrow-recursion:$metaArrowVersion"
+}
+
+shadowJar {
+    relocate 'arrow', 'shadow'
+    archiveName = "$baseName-$version.$extension"
+    dependencies {
+        exclude(dependency { it.moduleGroup == 'org.jetbrains.kotlin' })
+        exclude(dependency { it.moduleGroup == 'org.intellij' })
+        exclude(dependency { it.moduleGroup == 'org.jetbrains' })
+    }
+}
+
+artifacts {
+    archives shadowJar
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

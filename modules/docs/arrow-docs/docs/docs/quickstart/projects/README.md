@@ -30,6 +30,10 @@ Note: This section keeps on growing! Keep an eye on it from time to time.
 
 [raulh82vlc/FunctionalKotlin](https://github.com/raulh82vlc/FunctionalKotlin): Functional Kotlin with Arrow (project done for Android)
 
+[Karumi/KataLogInLogOutKotlin](https://github.com/Karumi/KataLogInLogOutKotlin/): Android development kata used to practice unit testing with test doubles in Kotlin using also Arrow.
+
 #### Backend
 
 [istonikula/realworld-api](https://github.com/istonikula/realworld-api): A spring 5 project
+
+[Karumi/play-framework-kotlin](https://github.com/Karumi/play-framework-kotlin): A Play Framework project using Kotlin and Arrow.

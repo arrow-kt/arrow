@@ -2,10 +2,7 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.effects.typeclasses.Async
-import arrow.effects.typeclasses.Effect
-import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.*
 import arrow.instance
 import arrow.typeclasses.*
 import kotlin.coroutines.experimental.CoroutineContext
@@ -95,8 +92,13 @@ interface SingleKEffectInstance :
     fix().runAsync(cb)
 }
 
-object SingleKContext : SingleKEffectInstance
+@instance(SingleK::class)
+interface SingleKConcurrentEffectInstance : SingleKEffectInstance, ConcurrentEffect<ForSingleK> {
+  override fun <A> Kind<ForSingleK, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> SingleKOf<Unit>): SingleK<Disposable> =
+    fix().runAsyncCancellable(cb)
+}
+
+object SingleKContext : SingleKConcurrentEffectInstance
 
 infix fun <A> ForSingleK.Companion.extensions(f: SingleKContext.() -> A): A =
   f(SingleKContext)
-
