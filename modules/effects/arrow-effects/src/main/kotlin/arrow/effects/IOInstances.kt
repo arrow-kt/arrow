@@ -46,7 +46,7 @@ interface IOMonadInstance : Monad<ForIO> {
 }
 
 @extension
-interface IOApplicativeErrorInstance : IOApplicativeInstance, ApplicativeError<ForIO, Throwable> {
+interface IOApplicativeErrorInstance : ApplicativeError<ForIO, Throwable>, IOApplicativeInstance {
   override fun <A> Kind<ForIO, A>.attempt(): IO<Either<Throwable, A>> =
     fix().attempt()
 
@@ -70,7 +70,7 @@ interface IOMonadErrorInstance : IOMonadInstance, MonadError<ForIO, Throwable> {
 }
 
 @extension
-interface IOMonadDeferInstance : IOMonadErrorInstance, MonadDefer<ForIO> {
+interface IOMonadDeferInstance : MonadDefer<ForIO>, IOMonadErrorInstance {
   override fun <A> defer(fa: () -> IOOf<A>): IO<A> =
     IO.defer(fa)
 
@@ -78,7 +78,7 @@ interface IOMonadDeferInstance : IOMonadErrorInstance, MonadDefer<ForIO> {
 }
 
 @extension
-interface IOAsyncInstance : IOMonadDeferInstance, Async<ForIO> {
+interface IOAsyncInstance : Async<ForIO>, IOMonadDeferInstance {
   override fun <A> async(fa: Proc<A>): IO<A> =
     IO.async(fa)
 
@@ -90,29 +90,31 @@ interface IOAsyncInstance : IOMonadDeferInstance, Async<ForIO> {
 }
 
 @extension
-interface IOEffectInstance : IOAsyncInstance, Effect<ForIO> {
+interface IOEffectInstance : Effect<ForIO>, IOAsyncInstance {
   override fun <A> Kind<ForIO, A>.runAsync(cb: (Either<Throwable, A>) -> Kind<ForIO, Unit>): IO<Unit> =
     fix().runAsync(cb)
 }
 
 @extension
-interface IOMonoidInstance<A> : Monoid<Kind<ForIO, A>>, Semigroup<Kind<ForIO, A>> {
-
-  fun SM(): Monoid<A>
-
-  override fun IOOf<A>.combine(b: IOOf<A>): IO<A> =
-    fix().flatMap { a1: A -> b.fix().map { a2: A -> SM().run { a1.combine(a2) } } }
-
-  override fun empty(): IO<A> = IO.just(SM().empty())
-}
-
-@extension
-interface IOSemigroupInstance<A> : Semigroup<Kind<ForIO, A>> {
+interface IOSemigroupInstance<A> : Semigroup<IO<A>> {
 
   fun SG(): Semigroup<A>
 
-  override fun IOOf<A>.combine(b: IOOf<A>): IO<A> =
-    fix().flatMap { a1: A -> b.fix().map { a2: A -> SG().run { a1.combine(a2) } } }
+  override fun IO<A>.combine(b: IO<A>): IO<A> =
+    flatMap { a1: A -> b.map { a2: A -> SG().run { a1.combine(a2) } } }
+}
+
+@extension
+interface IOMonoidInstance<A> : Monoid<IO<A>>, IOSemigroupInstance<A> {
+
+  override fun SG(): Semigroup<A> = SM()
+
+  fun SM(): Monoid<A>
+
+  override fun IO<A>.combine(b: IO<A>): IO<A> =
+    flatMap { a1: A -> b.map { a2: A -> SM().run { a1.combine(a2) } } }
+
+  override fun empty(): IO<A> = IO.just(SM().empty())
 }
 
 object IOContext : IOEffectInstance

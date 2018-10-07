@@ -113,7 +113,8 @@ interface ProcessorUtils : KotlinMetadataUtils {
 
 fun String.removeBackticks() = replace("`", "")
 
-fun knownError(message: String, element: Element? = null): Nothing = throw KnownException(message, element)
+fun knownError(message: String, element: Element? = null): Nothing =
+  throw KnownException(message, element)
 
 val ProtoBuf.Class.Kind.isCompanionOrObject
   get() = when (this) {
