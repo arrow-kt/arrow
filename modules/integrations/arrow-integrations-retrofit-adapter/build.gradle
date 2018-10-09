@@ -1,0 +1,21 @@
+dependencies {
+    def retrofitVersion = "2.4.0"
+
+    compile project(':arrow-effects')
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+    compile project(':arrow-annotations')
+    compile "com.squareup.retrofit2:retrofit:2.4.0"
+    kapt project(':arrow-annotations-processor')
+    kaptTest project(':arrow-annotations-processor')
+    compileOnly project(':arrow-annotations-processor')
+    testCompileOnly project(':arrow-annotations-processor')
+    testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
+    testCompile project(':arrow-test')
+    testCompile "com.squareup.retrofit2:converter-gson:${retrofitVersion}"
+    testCompile 'io.kotlintest:kotlintest-runner-junit5:3.1.10'
+    testCompile 'com.squareup.okhttp3:mockwebserver:3.11.0'
+    testCompile project(':arrow-effects-rx2')
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+apply plugin: 'kotlin-kapt'

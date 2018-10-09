@@ -60,6 +60,10 @@ include {
             _ 'effects-reactor'
         }
 
+        integrations {
+            _ 'integrations-retrofit-adapter'
+        }
+
         folder('recursion-schemes') {
             _ 'recursion'
         }
